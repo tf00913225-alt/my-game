@@ -196,6 +196,10 @@
     let activeBattleContext=null;
     let battleStarting=false;
     let abyssSession=false;
+    let towerAutoAdvanceEnabled=false;
+    let towerAutoAdvanceCountdown=null;
+    let towerAutoAdvanceTimeoutId=null;
+    let towerAutoAdvanceGeneration=0;
 
     function ensureCurrentTowerWeek(now){
         const week=utcWeekInfo(now);
@@ -331,6 +335,81 @@
             return '<button type="button" class="tower-floor-band '+(done?'done ':'')+(current?'current':'')+'" '+(enabled?'onclick="vGameplaySelectTowerBand('+target+')"':'disabled')+'><b>'+start+'～'+end+' 層</b><small>'+escapeHtml(end%10===0?'含第 '+end+' 層守關 BOSS':'精英與普通試煉')+(done?'・已通過':'')+'</small></button>';
         }).join("")+'</div>';
     }
+    function cancelTowerAutoAdvance(disable){
+        towerAutoAdvanceGeneration++;
+        if(towerAutoAdvanceTimeoutId){
+            clearTimeout(towerAutoAdvanceTimeoutId);
+            towerAutoAdvanceTimeoutId=null;
+        }
+        towerAutoAdvanceCountdown=null;
+        if(disable!==false){ towerAutoAdvanceEnabled=false; }
+    }
+    function towerAutoCanContinue(){
+        ensureCurrentTowerWeek();
+        if(!towerAutoAdvanceEnabled){ return false; }
+        if(typeof battleActive!=="undefined"&&battleActive){ return false; }
+        if(highestCharacterLevel()<TOWER_UNLOCK_LEVEL){ return false; }
+        if(state.tower.pendingRelicChoice){ return false; }
+        if(state.tower.completedFloor>=TOWER_FLOORS){ return false; }
+        const next=state.tower.completedFloor+1;
+        return next>=1&&next<=TOWER_FLOORS;
+    }
+    function scheduleTowerAutoAdvance(){
+        cancelTowerAutoAdvance(false);
+        if(!towerAutoCanContinue()){
+            towerAutoAdvanceEnabled=false;
+            renderTowerPage();
+            return false;
+        }
+        const generation=++towerAutoAdvanceGeneration;
+        towerAutoAdvanceCountdown=3;
+        renderTowerPage();
+
+        function tick(){
+            if(
+                generation!==towerAutoAdvanceGeneration||
+                !towerAutoAdvanceEnabled||
+                !towerAutoCanContinue()
+            ){
+                cancelTowerAutoAdvance(true);
+                renderTowerPage();
+                return;
+            }
+            if(towerAutoAdvanceCountdown>1){
+                towerAutoAdvanceCountdown--;
+                renderTowerPage();
+                towerAutoAdvanceTimeoutId=setTimeout(tick,1000);
+                return;
+            }
+            towerAutoAdvanceCountdown=null;
+            towerAutoAdvanceTimeoutId=null;
+            const next=state.tower.completedFloor+1;
+            const started=startTowerFloor(next);
+            if(!started){
+                cancelTowerAutoAdvance(true);
+                renderTowerPage();
+            }
+        }
+        towerAutoAdvanceTimeoutId=setTimeout(tick,1000);
+        return true;
+    }
+    function toggleTowerAutoAdvance(checked){
+        const enabled=!!checked;
+        if(!enabled){
+            cancelTowerAutoAdvance(true);
+            renderTowerPage();
+            return false;
+        }
+        if(highestCharacterLevel()<TOWER_UNLOCK_LEVEL||state.tower.pendingRelicChoice||state.tower.completedFloor>=TOWER_FLOORS){
+            cancelTowerAutoAdvance(true);
+            renderTowerPage();
+            return false;
+        }
+        towerAutoAdvanceEnabled=true;
+        renderTowerPage();
+        return true;
+    }
+
     function renderTowerPage(){
         ensureCurrentTowerWeek();
         const content=document.getElementById("towerPageContent");
@@ -341,7 +420,9 @@
             '<section class="tower-element-hero" style="--tower-color:'+element.color+';--tower-glow:'+element.glow+'"><div><small>本週元素試煉</small><h3>'+escapeHtml(element.label)+'元素</h3><strong>'+tower.completedFloor+' / 100</strong><p>'+escapeHtml(element.style)+'</p></div></section>'+
             '<div class="tower-summary-grid"><div><small>本週最高</small><b>'+tower.highestThisWeek+' 層</b></div><div><small>歷史最高</small><b>'+tower.historicalHighest+' 層</b></div><div><small>下一層</small><b>第 '+next+' 層</b></div><div><small>下一重要獎勵</small><b>第 '+nextTowerRewardFloor(tower.completedFloor)+' 層</b></div></div>'+
             (level<TOWER_UNLOCK_LEVEL?'<div class="boss-overview-line"><span>四象塔於 Lv30 開放</span><b>目前 Lv.'+level+'</b></div>':'')+
-            '<div class="tower-actions"><button type="button" class="gameplay-primary-action" '+(level<TOWER_UNLOCK_LEVEL||tower.pendingRelicChoice?'disabled':'onclick="vGameplayContinueTower()"')+'>'+(tower.completedFloor>=100?'再戰第 100 層':'繼續挑戰')+'</button><button type="button" class="tower-secondary-action" onclick="vGameplayToggleTowerOverview()">'+(towerOverviewOpen?'收起樓層一覽':'樓層一覽')+'</button></div>'+
+            '<label class="tower-auto-advance"><input type="checkbox" '+(towerAutoAdvanceEnabled?'checked ':'')+(level<TOWER_UNLOCK_LEVEL||tower.pendingRelicChoice||tower.completedFloor>=TOWER_FLOORS?'disabled ':'')+'onchange="vGameplayToggleTowerAutoAdvance(this.checked)"><span>自動挑戰下一層</span></label>'+
+            (towerAutoAdvanceCountdown?'<div class="tower-auto-countdown" role="status" aria-live="polite"><small>下一層即將開始</small><b>'+towerAutoAdvanceCountdown+'</b></div>':'')+
+            '<div class="tower-actions"><button type="button" class="gameplay-primary-action" '+(level<TOWER_UNLOCK_LEVEL||tower.pendingRelicChoice||towerAutoAdvanceCountdown?'disabled':'onclick="vGameplayContinueTower()"')+'>'+(tower.completedFloor>=100?'再戰第 100 層':'繼續挑戰')+'</button><button type="button" class="tower-secondary-action" onclick="vGameplayToggleTowerOverview()">'+(towerOverviewOpen?'收起樓層一覽':'樓層一覽')+'</button></div>'+
             (towerOverviewOpen?towerOverviewMarkup():'')+'</div>';
         content.scrollTop=0;
     }
@@ -616,6 +697,37 @@
             .filter(entry=>entry.monster&&entry.monster.alive&&entry.monster.hp>0&&(!type||entry.monster.objectType===type));
     }
     function bossHasObject(type){ return aliveBossObjects(type).length>0; }
+    function bossObjectTriggerText(entry){
+        const key=String(entry&&entry.monster&&entry.monster.objectSourceKey||"");
+        const match=/^object-plan-(\d+)$/.exec(key);
+        const plan=match&&activeBattleContext&&activeBattleContext.objectPlan
+            ?activeBattleContext.objectPlan[Number(match[1])]
+            :null;
+        if(plan&&plan.round!==undefined){ return "第 "+plan.round+" 回合出現"; }
+        if(plan&&plan.hpBelow!==undefined){ return "BOSS 生命低於 "+Math.round(Number(plan.hpBelow)*100)+"% 時出現"; }
+        return "Boss 戰鬥機制觸發";
+    }
+    function bossMechanismInspectorCards(){
+        return aliveBossObjects().map(entry=>{
+            const object=entry.monster;
+            const definition=objectDefinition(object.objectType)||{};
+            const isCharge=object.objectType==="charge";
+            return {
+                id:"boss-object-"+entry.index,
+                name:object.name||definition.name||"Boss 功能卡",
+                icon:object.vGameplayPortrait||definition.portrait||"",
+                effect:object.objectEffect||definition.effect||"",
+                trigger:bossObjectTriggerText(entry),
+                status:isCharge?"蓄力中":"生效中",
+                remaining:isCharge?Math.max(0,Math.floor(numeric(object.countdown,0)))+" 回合":"破壞前持續"
+            };
+        });
+    }
+    function syncBossMechanismInspector(){
+        const stats=window.FourSymbolsBattleStatistics;
+        if(!stats||typeof stats.setBossMechanisms!=="function"){ return; }
+        stats.setBossMechanisms(bossMechanismInspectorCards());
+    }
     function nextBossObjectSlot(){
         const owner=battlefieldSlotOwner(),snapshot=bossBattlefieldSnapshot();
         if(owner&&snapshot){
@@ -794,6 +906,7 @@
         }
         if(typeof renderBattle==="function"){ renderBattle(); }
         else if(typeof updateUI==="function"){ updateUI(); }
+        syncBossMechanismInspector();
         return object;
     }
 
@@ -861,8 +974,13 @@
                 damage-=absorbed;
             }
             if(damage>0){
+                const beforeHp=Math.max(0,numeric(character.hp,0));
                 character.hp=Math.max(0,character.hp-damage);
-                if(typeof showPlayerHit==="function"){ showPlayerHit(damage,"hp",index,false); }
+                const actual=Math.max(0,beforeHp-numeric(character.hp,0));
+                if(typeof battleStatisticsRecordDamageTakenByIndex==="function"){
+                    battleStatisticsRecordDamageTakenByIndex(index,actual);
+                }
+                if(typeof showPlayerHit==="function"){ showPlayerHit(actual,"hp",index,false); }
             }
         });
         if(typeof updateUI==="function"){ updateUI(); }
@@ -876,6 +994,7 @@
             addBattleLog("【"+entry.monster.name+"】消失。"+(entry.monster.objectType==="charge"&&reason!=="resolved"?"大型技能已取消。":""));
         }
         if(typeof renderBattle==="function"){ renderBattle(); }
+        syncBossMechanismInspector();
     }
     function processBossRound(){
         if(!activeBattleContext){ return false; }
@@ -912,6 +1031,7 @@
             }
         });
         syncBossShieldHud();
+        syncBossMechanismInspector();
         return false;
     }
     function combatPhaseLabel(phase){ return ["第一階段","第二階段","第三階段","最終階段"][Math.max(1,Math.floor(numeric(phase,1)))-1]||("第 "+phase+" 階段"); }
@@ -952,9 +1072,12 @@
         }
         syncBossShieldHud();
         if(typeof renderBattle==="function"){ renderBattle(); }
+        syncBossMechanismInspector();
         return true;
     }
     function cleanupBossBattlePresentation(){
+        const stats=window.FourSymbolsBattleStatistics;
+        if(stats&&typeof stats.clearBossMechanisms==="function"){ stats.clearBossMechanisms(); }
         releaseBossBattlefieldSnapshot();
         if(typeof document!=="undefined"){
             const area=document.getElementById("battleMonsterArea");
@@ -991,12 +1114,26 @@
         if(typeof rebuildInventorySlots==="function"){ rebuildInventorySlots(); }if(typeof updateGoldDisplay==="function"){ updateGoldDisplay(); }
         if(typeof window.v141ShowBlackGoldReward==="function"){ window.v141ShowBlackGoldReward({gold:goldAmount,exp:0,items:[]}); }
     }
+    function showBossBattleResult(title,outcome,onClose){
+        const stats=window.FourSymbolsBattleStatistics;
+        if(!stats||typeof stats.showResultDetails!=="function"){ return false; }
+        return stats.showResultDetails({
+            title:title,
+            subtitle:outcome&&outcome.result==="win"?"挑戰勝利":"挑戰失敗",
+            onClose:onClose
+        });
+    }
     function completePersonalBoss(definition,outcome){
         const progress=state.personal[definition.id];
         if(outcome&&outcome.result==="win"){
             const first=!progress.firstClear;grantConfiguredReward(definition,first);progress.firstClear=true;progress.clears++;persist();
         }
-        cleanupBossBattlePresentation();activeBattleContext=null;bossDetail={type:"personal",id:definition.id};if(typeof showPage==="function"){ showPage("boss"); }renderBossPage();
+        const finish=()=>{
+            cleanupBossBattlePresentation();activeBattleContext=null;bossDetail={type:"personal",id:definition.id};
+            if(typeof showPage==="function"){ showPage("boss"); }
+            renderBossPage();
+        };
+        if(!showBossBattleResult(definition.name+"・戰鬥詳細結算",outcome,finish)){ finish(); }
     }
     function completeWorldStage(definition,stage,outcome){
         const progress=state.world[definition.id];
@@ -1006,7 +1143,12 @@
                 const first=!progress.firstClear;grantConfiguredReward(definition,first);progress.firstClear=true;progress.completedStages=4;progress.clears++;persist();
             }
         }
-        cleanupBossBattlePresentation();activeBattleContext=null;bossDetail={type:"world",id:definition.id};if(typeof showPage==="function"){ showPage("boss"); }renderBossPage();
+        const finish=()=>{
+            cleanupBossBattlePresentation();activeBattleContext=null;bossDetail={type:"world",id:definition.id};
+            if(typeof showPage==="function"){ showPage("boss"); }
+            renderBossPage();
+        };
+        if(!showBossBattleResult(definition.name+"・"+WORLD_STAGE_PROFILES[stage-1].label+"詳細結算",outcome,finish)){ finish(); }
     }
     function startBoss(type,id){
         if(battleStarting||typeof battleActive!=="undefined"&&battleActive){ return false; }
@@ -1037,13 +1179,32 @@
         return true;
     }
     function completeTowerFloor(floor,outcome){
-        if(outcome&&outcome.result==="win"){
+        const won=!!(outcome&&outcome.result==="win");
+        if(won){
             if(floor>state.tower.completedFloor){ state.tower.completedFloor=floor; }
             state.tower.highestThisWeek=Math.max(state.tower.highestThisWeek,floor);
             state.tower.historicalHighest=Math.max(state.tower.historicalHighest,floor);
             towerReward(floor);persist();
+        }else{
+            cancelTowerAutoAdvance(true);
         }
-        cleanupBossBattlePresentation();activeBattleContext=null;if(typeof showPage==="function"){ showPage("tower"); }renderTowerPage();
+        cleanupBossBattlePresentation();
+        activeBattleContext=null;
+        if(typeof showPage==="function"){ showPage("tower"); }
+        renderTowerPage();
+
+        if(!won){ return; }
+        if(
+            towerAutoAdvanceEnabled&&
+            state.tower.completedFloor<TOWER_FLOORS&&
+            !state.tower.pendingRelicChoice&&
+            highestCharacterLevel()>=TOWER_UNLOCK_LEVEL
+        ){
+            scheduleTowerAutoAdvance();
+        }else if(towerAutoAdvanceEnabled){
+            cancelTowerAutoAdvance(true);
+            renderTowerPage();
+        }
     }
     function startTowerFloor(floor){
         ensureCurrentTowerWeek();
@@ -1074,20 +1235,26 @@
         document.querySelectorAll(".nav-button").forEach(button=>button.classList.remove("active"));
         const button=document.getElementById("bossNav");if(button){ button.classList.add("active"); }
     }
-    function openGameplay(){ abyssSession=false;if(typeof showPage==="function"){ showPage("gameplay"); }renderGameplayHub(); }
-    function openBoss(){ abyssSession=false;bossDetail=null;if(typeof showPage==="function"){ showPage("boss"); }renderBossPage(); }
+    function openGameplay(){ cancelTowerAutoAdvance(true);abyssSession=false;if(typeof showPage==="function"){ showPage("gameplay"); }renderGameplayHub(); }
+    function openBoss(){ cancelTowerAutoAdvance(true);abyssSession=false;bossDetail=null;if(typeof showPage==="function"){ showPage("boss"); }renderBossPage(); }
     function openTower(){ abyssSession=false;towerOverviewOpen=false;if(typeof showPage==="function"){ showPage("tower"); }renderTowerPage(); }
     function openAbyss(){
+        cancelTowerAutoAdvance(true);
         abyssSession=true;if(typeof showPage==="function"){ showPage("dungeon"); }
         if(typeof window.v174AbyssBackToSelection==="function"){ window.v174AbyssBackToSelection(); }
         else if(typeof switchDungeonTab==="function"){ switchDungeonTab("abyss"); }
         markGameplayNav();return true;
     }
-    function openDailyDungeons(){ abyssSession=false;if(typeof showPage==="function"){ showPage("dungeon"); }if(typeof switchDungeonTab==="function"){ switchDungeonTab("daily"); } }
+    function openDailyDungeons(){ cancelTowerAutoAdvance(true);abyssSession=false;if(typeof showPage==="function"){ showPage("dungeon"); }if(typeof switchDungeonTab==="function"){ switchDungeonTab("daily"); } }
 
     if(typeof showPage==="function"){
         const previous=showPage;
         showPage=function(page){
+            const continuingTowerBattle=
+                page==="battle"&&activeBattleContext&&activeBattleContext.mode==="tower";
+            if(page!=="tower"&&!continuingTowerBattle&&(towerAutoAdvanceEnabled||towerAutoAdvanceTimeoutId)){
+                cancelTowerAutoAdvance(true);
+            }
             const result=previous.apply(this,arguments);
             if(page==="gameplay"){ renderGameplayHub(); }
             else if(page==="boss"){ renderBossPage(); }
@@ -1107,6 +1274,7 @@
     window.vGameplayCloseBossDetail=function(){ bossDetail=null;renderBossPage(); };
     window.vGameplayStartBoss=startBoss;
     window.vGameplayContinueTower=function(){ return startTowerFloor(state.tower.completedFloor>=TOWER_FLOORS?TOWER_FLOORS:state.tower.completedFloor+1); };
+    window.vGameplayToggleTowerAutoAdvance=toggleTowerAutoAdvance;
     window.vGameplayToggleTowerOverview=function(){ towerOverviewOpen=!towerOverviewOpen;renderTowerPage(); };
     window.vGameplaySelectTowerBand=startTowerFloor;
     window.vGameplayChooseTowerRelic=chooseTowerRelic;
@@ -1127,6 +1295,7 @@
         getLifecycleDiagnostics:function(){ return activeBattleContext&&copy(activeBattleContext.lifecycleDiagnostics||[]); },
         recordLifecycleViolation:recordLifecycleViolation,
         getObjectSlots:function(){ return BOSS_OBJECT_SLOTS.slice(); },
+        getActiveMechanisms:function(){ return copy(bossMechanismInspectorCards()); },
         resolveEnemyDamageTargets:resolveEnemyDamageTargets,
         getTargetGeometry:targetGeometry,
         getShieldState:function(){ const shield=bossShield();return shield?copy(shield):null; },
@@ -1448,7 +1617,6 @@
     let relicFocusedTargetCards=[];
     let relicFocusedTargetLayers=[];
     const relicPresentationLockReleases=new Set();
-    let devPreviewRelicId=null;
 
     function numeric(value){ const n=Number(value); return Number.isFinite(n)?n:0; }
     function esc(value){ return String(value==null?"":value).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;").replace(/'/g,"&#039;"); }
@@ -1472,7 +1640,7 @@
         return host===RELIC_DEV_HOST||host==="localhost"||host==="127.0.0.1"||host==="::1";
     }
     function effectiveLoadoutRelicId(){
-        return isRelicDevTestingEnvironment()&&devPreviewRelicId?devPreviewRelicId:teamLoadout.relicId;
+        return teamLoadout.relicId;
     }
     function hasLiveBattlePresentationHost(){
         return typeof document!=="undefined"&&typeof document.getElementById==="function"&&!!document.getElementById("battlePage");
@@ -1826,7 +1994,7 @@
     }
     function normalizeLoadout(raw){
         const id=raw&&typeof raw.relicId==="string"?raw.relicId:null;
-        return {relicId:id&&relicCatalog[id]&&relicCatalog[id].runtimeReady?id:null,subRelicId:null};
+        return {relicId:id&&relicCatalog[id]?id:null,subRelicId:null};
     }
     function readSaveDocument(){
         try{
@@ -2410,22 +2578,22 @@
     function equipmentAllowed(){ return !(typeof battleActive!=="undefined"&&battleActive); }
     function equipRelic(id){
         const def=relicCatalog[id],owned=statusOf(id);
-        const devTesting=isRelicDevTestingEnvironment();
-        if(!def||(!def.runtimeReady&&!devTesting)||!owned.unlocked||!equipmentAllowed()){ return false; }
+        if(!def||!owned.unlocked||!equipmentAllowed()){ return false; }
         preloadRelicVfx(id);
-        if(devTesting){
-            devPreviewRelicId=id;
-            syncHomeRelicUi(); renderRelicPage(); return true;
-        }
-        devPreviewRelicId=null;
         teamLoadout.relicId=id;
         if(playerRelics[id]){ playerRelics[id].seen=true; }
-        saveRelics(); syncHomeRelicUi(); renderRelicPage(); return true;
+        saveRelics();
+        syncHomeRelicUi();
+        renderRelicPage();
+        return true;
     }
     function unequipRelic(){
         if(!equipmentAllowed()){ return false; }
-        if(isRelicDevTestingEnvironment()&&devPreviewRelicId){ devPreviewRelicId=null; syncHomeRelicUi(); renderRelicPage(); return true; }
-        teamLoadout.relicId=null; saveRelics(); syncHomeRelicUi(); renderRelicPage(); return true;
+        teamLoadout.relicId=null;
+        saveRelics();
+        syncHomeRelicUi();
+        renderRelicPage();
+        return true;
     }
     function upgradeRelic(id){
         const def=relicCatalog[id],owned=statusOf(id); if(!def||!def.runtimeReady||!owned.unlocked||owned.level>=MAX_LEVEL){ return false; }
@@ -2441,20 +2609,17 @@
     }
     function cardMarkup(def){
         const owned=statusOf(def.id),equipped=effectiveLoadoutRelicId()===def.id;
-        const devTesting=isRelicDevTestingEnvironment();
-        if(devTesting){
-            const runtimeStatus=def.runtimeReady?"Runtime Ready（正式功能已完成）":"Presentation Only（僅演出預覽）";
-            return '<div class="team-relic-card team-relic-card-dev '+rarityClass(def)+(equipped?' equipped':'')+'">'+
-                '<button type="button" class="team-relic-card-open-overlay" aria-label="查看'+esc(def.name)+'詳情" onclick="v174OpenRelicDetail(\''+esc(def.id)+'\')"></button>'+
-                '<span class="team-relic-card-art">'+relicIconMarkup(def,false)+'</span><span class="team-relic-card-name">'+esc(def.name)+'</span>'+
-                '<span class="team-relic-card-meta">'+esc(runtimeStatus)+'・'+esc(CATEGORY_LABELS[def.category]||def.category)+'</span>'+
-                '<button type="button" class="team-relic-dev-equip" onclick="event.stopPropagation();v174EquipRelic(\''+esc(def.id)+'\')">'+(equipped?'DEV 已配裝':(def.runtimeReady?'DEV 正式功能配裝':'DEV 僅演出配裝'))+'</button>'+
-                (equipped?'<em>DEV已配裝</em>':'')+'</div>';
-        }
-        return '<button type="button" class="team-relic-card '+rarityClass(def)+(owned.unlocked?' unlocked':' locked')+(equipped?' equipped':'')+'" onclick="v174OpenRelicDetail(\''+esc(def.id)+'\')">'+
-            '<span class="team-relic-card-art">'+relicIconMarkup(def,false)+'</span><span class="team-relic-card-name">'+esc(def.name)+'</span>'+
+        const canEquip=owned.unlocked&&equipmentAllowed();
+        return '<div class="team-relic-card '+rarityClass(def)+(owned.unlocked?' unlocked':' locked')+(equipped?' equipped':'')+'">'+
+            '<button type="button" class="team-relic-card-open-overlay" aria-label="查看'+esc(def.name)+'詳情" onclick="v174OpenRelicDetail(\''+esc(def.id)+'\')"></button>'+
+            '<span class="team-relic-card-art">'+relicIconMarkup(def,false)+'</span>'+
+            '<span class="team-relic-card-name">'+esc(def.name)+'</span>'+
             '<span class="team-relic-card-meta">'+(owned.unlocked?'Lv.'+owned.level:'尚未獲得')+'・'+esc(CATEGORY_LABELS[def.category]||def.category)+'</span>'+
-            (equipped?'<em>已裝備</em>':'')+'</button>';
+            (owned.unlocked
+                ?'<button type="button" class="team-relic-equip" '+(canEquip?'':'disabled')+' onclick="event.stopPropagation();v174EquipRelic(\''+esc(def.id)+'\')">'+(equipped?'已裝備':'裝備')+'</button>'
+                :'<button type="button" class="team-relic-equip" disabled>尚未獲得</button>')+
+            (equipped?'<em>已裝備</em>':'')+
+        '</div>';
     }
     function renderRelicList(){
         const equippedId=effectiveLoadoutRelicId();
@@ -2463,26 +2628,20 @@
             '<div class="team-relic-current-card empty"><div class="team-relic-empty-slot">寶</div><div class="team-relic-current-copy"><small>目前隊伍秘寶</small><b>尚未裝備秘寶</b><p>每支隊伍只能啟用一件秘寶。</p></div><button class="team-relic-select-first" onclick="v174SetRelicFilter(\'all\')">選擇秘寶</button></div>';
         const filters=["all","attack","recovery","defense","buff","control","element","special"].map(key=>'<button class="'+(currentFilter===key?'active':'')+'" onclick="v174SetRelicFilter(\''+key+'\')">'+esc(CATEGORY_LABELS[key])+'</button>').join("");
         const cards=sortedRelics().filter(filterMatch).map(cardMarkup).join("");
-        return '<div class="team-relic-page"><div class="team-relic-resource-line"><span>隊伍共用戰場神器</span><b>'+(isRelicDevTestingEnvironment()?'DEV：10 件 Runtime Ready（正式功能已完成）／10 件 Presentation Only（僅演出預覽）':'強化：目前僅消耗金幣')+'</b></div>'+current+
+        return '<div class="team-relic-page"><div class="team-relic-resource-line"><span>隊伍共用戰場神器</span><b>每支隊伍可裝備 1 件秘寶</b></div>'+current+
             '<div class="team-relic-tabs">'+filters+'</div><div class="team-relic-grid">'+cards+'</div></div>';
     }
     function detailMarkup(def){
         const owned=statusOf(def.id),level=owned.level,next=nextMilestone(def,level),cost=RELIC_BALANCE_CONFIG.upgradeGoldBase+RELIC_BALANCE_CONFIG.upgradeGoldPerLevel*level;
-        const devTesting=isRelicDevTestingEnvironment();
-        const devPresentation=devTesting&&!def.runtimeReady;
         const equipped=effectiveLoadoutRelicId()===def.id;
-        const devStatus=def.runtimeReady?"Runtime Ready（正式功能已完成）":"Presentation Only（僅演出預覽；不具正式 Trigger／Effect）";
-        const canPreview=devTesting&&typeof battleActive!=="undefined"&&battleActive;
         return '<div class="team-relic-detail"><button class="team-relic-detail-back" onclick="v174OpenRelicPage()">‹ 返回秘寶列表</button><div class="team-relic-detail-hero '+rarityClass(def)+'">'+
             '<div class="team-relic-detail-art">'+relicIconMarkup(def,true)+'</div><h2>'+esc(def.name)+'</h2><p>'+esc(RARITY_LABELS[def.rarity]||def.rarity)+'・Lv.'+level+' / 20</p><strong>'+esc(CATEGORY_LABELS[def.category]||def.category)+(def.tags&&def.tags.length?' / '+esc(def.tags.join('・')):'')+'</strong></div>'+
             '<section><h3>觸發條件</h3><p>'+esc(def.triggerText||"尚未定義")+'</p></section><section><h3>秘寶效果</h3><p>'+esc(currentEffectText(def,level))+'</p></section><section><h3>觸發限制</h3><p>'+esc(def.limitText||"依秘寶設定。")+'</p></section>'+
-            (devTesting?'<section><h3>DEV 狀態</h3><p>'+esc(devStatus)+'</p></section>':'')+
             '<section><h3>下一強化</h3><p>'+(level>=20?'已達最高等級。':next?'Lv.'+next+'：'+esc(def.nextText[next]):'下一級提升效果數值。')+'</p></section>'+
-            '<section class="team-relic-upgrade"><h3>強化</h3><p>目前 Lv.'+level+' → '+(level>=20?'MAX':'Lv.'+(level+1))+'</p><p>素材：第一版尚未啟用正式素材來源；目前只消耗金幣。</p><b>金幣 '+cost.toLocaleString("zh-TW")+'</b></section>'+
+            '<section class="team-relic-upgrade"><h3>強化</h3><p>目前 Lv.'+level+' → '+(level>=20?'MAX':'Lv.'+(level+1))+'</p><p>依目前正式秘寶養成規則消耗對應素材。</p><b>金幣 '+cost.toLocaleString("zh-TW")+'</b></section>'+
             '<div class="team-relic-detail-actions">'+
             (owned.unlocked&&def.runtimeReady&&level<20?'<button onclick="v174UpgradeRelic(\''+esc(def.id)+'\')">強化</button>':'')+
-            (owned.unlocked&&(def.runtimeReady||devPresentation)?'<button onclick="v174EquipRelic(\''+esc(def.id)+'\')">'+(devTesting?(equipped?'DEV 已配裝':(def.runtimeReady?'DEV 正式功能配裝':'DEV 僅演出配裝')):(equipped?'已裝備':'裝備'))+'</button>':'<button disabled>'+(def.runtimeReady?'尚未獲得':'第一版未開放')+'</button>')+
-            (devPresentation&&canPreview?'<button onclick="v174RelicDevPreviewPresentation(\''+esc(def.id)+'\')">DEV 演出預覽</button>':'')+
+            (owned.unlocked?'<button onclick="v174EquipRelic(\''+esc(def.id)+'\')">'+(equipped?'已裝備':'裝備')+'</button>':'<button disabled>尚未獲得</button>')+
             '</div></div>';
     }
 

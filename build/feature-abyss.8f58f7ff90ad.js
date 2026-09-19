@@ -584,8 +584,21 @@
         battleStarting=true;const roster=buildRoster(run.difficulty,run.regionIndex,run.encounterIndex);
         if(typeof window.v132LaunchDungeonBattle!=="function"){ battleStarting=false;throw new Error("Abyss requires v132LaunchDungeonBattle runtime owner."); }
         const started=window.v132LaunchDungeonBattle(roster,function(outcome){
-            battleStarting=false;if(typeof showPage==="function"){ showPage("dungeon"); }mapEntered=true;rootState.selectedDifficulty=run.difficulty;
-            resolveBattleResult(outcome&&outcome.result);if(typeof switchDungeonTab==="function"){ switchDungeonTab("abyss"); }else{ refresh(); }
+            battleStarting=false;
+            const finish=function(){
+                if(typeof showPage==="function"){ showPage("dungeon"); }
+                mapEntered=true;
+                rootState.selectedDifficulty=run.difficulty;
+                resolveBattleResult(outcome&&outcome.result);
+                if(typeof switchDungeonTab==="function"){ switchDungeonTab("abyss"); }else{ refresh(); }
+            };
+            const stats=window.FourSymbolsBattleStatistics;
+            const shown=stats&&typeof stats.showResultDetails==="function"&&stats.showResultDetails({
+                title:"深淵・戰鬥詳細結算",
+                subtitle:outcome&&outcome.result==="win"?"挑戰勝利":"挑戰失敗",
+                onClose:finish
+            });
+            if(!shown){ finish(); }
         });
         if(!started){ battleStarting=false; }return !!started;
     }

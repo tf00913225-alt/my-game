@@ -90,24 +90,30 @@ for(const id of ids){
 assert.match(relic,/RELIC_DEV_HOST="dev\.four-symbols-dev\.pages\.dev"/);
 assert.match(relic,/function statusOf\(id\)[\s\S]*unlocked:true,seen:true/,
   "DEV must expose all relics without requiring fragments");
-assert.match(relic,/team-relic-card-dev[\s\S]*team-relic-dev-equip[\s\S]*DEV 正式功能配裝[\s\S]*DEV 僅演出配裝/,
-  "DEV relic cards must expose a directly clickable testing equip control");
-assert.match(relic,/Runtime Ready（正式功能已完成）/);
-assert.match(relic,/Presentation Only（僅演出預覽/);
-assert.match(relic,/DEV 演出預覽/,
-  "presentation-only relic detail must expose an explicit manual preview control during battle");
-assert.match(css,/\.team-relic-card-dev \.team-relic-dev-equip\{[^}]*min-height:34px/,
-  "DEV testing equip control must be visibly actionable");
-assert.match(relic,/function equipRelic\(id\)[\s\S]*if\(devTesting\)\{[\s\S]*devPreviewRelicId=id;[\s\S]*return true;[\s\S]*teamLoadout\.relicId=id;/,
-  "DEV equipment must remain transient before the production save path");
-const equipSource=relic.slice(relic.indexOf("function equipRelic(id)"),relic.indexOf("function unequipRelic()"));
-const transientBranch=(equipSource.match(/if\(devTesting\)\{([\s\S]*?)\n        \}/)||[])[1]||"";
-assert.doesNotMatch(transientBranch,/saveRelics\(|teamLoadout\.relicId/,
-  "DEV testing equipment must not write formal ownership/loadout data");
+const relicCardSource=relic.slice(
+  relic.indexOf("function cardMarkup(def)"),
+  relic.indexOf("function renderRelicList()")
+);
+assert.match(relicCardSource,/class="team-relic-equip"/,
+  "DEV test ownership must use the same formal player-facing equip control");
+assert.match(relicCardSource,/equipped\?'已裝備':'裝備'/,
+  "formal equip control must expose 裝備／已裝備 without DEV labels");
+assert.doesNotMatch(relic,/team-relic-card-dev|team-relic-dev-equip|DEV 正式功能配裝|DEV 僅演出配裝|Runtime Ready（正式功能已完成）|Presentation Only（僅演出預覽/,
+  "player-facing relic markup must not expose DEV or capability classification");
+assert.match(relic,/v174RelicDevPreviewPresentation=function\(id\)/,
+  "internal manual presentation diagnostic may remain available without a player-facing button");
+assert.match(css,/\.team-relic-card \.team-relic-equip\{[^}]*min-height:34px/,
+  "formal equip control must be visibly actionable");
+assert.doesNotMatch(css,/team-relic-card-dev|team-relic-dev-equip/,
+  "relic CSS must not keep a second DEV-only card contract");
+assert.match(relic,/function equipRelic\(id\)[\s\S]*teamLoadout\.relicId=id;[\s\S]*saveRelics\(\);[\s\S]*syncHomeRelicUi\(\)/,
+  "DEV and production testing must converge on the canonical teamLoadout save path");
+assert.doesNotMatch(relic,/devPreviewRelicId/,
+  "parallel DEV loadout state must not return");
 
 assert.match(core,/const POST_ACTION_DELAY_MS=1150;/,
   "global battle pacing must remain untouched");
 assert.match(v143,/function relicSheet\(src,hitFrame,options\)[\s\S]*authoredHitFrame:frame/,
   "reviewed relic authored hit frames must remain untouched");
 
-console.log("✓ relic cinematic target reveal, dedicated icon and DEV equip contracts passed");
+console.log("✓ relic cinematic target reveal, dedicated icon and formal equip contracts passed");

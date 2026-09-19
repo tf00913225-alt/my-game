@@ -43,6 +43,7 @@ html,body{
     --safe-right:env(safe-area-inset-right,0px);
     --safe-bottom:env(safe-area-inset-bottom,0px);
     --safe-left:env(safe-area-inset-left,0px);
+    --bottom-nav-height:70px;
 
     /*
        ★ 真的找到根本問題了：
@@ -685,10 +686,15 @@ button:disabled{
     */
     height:100%;
     min-height:0;
-    overflow:hidden;
+    box-sizing:border-box;
+    overflow-y:auto;
+    overflow-x:hidden;
+    overscroll-behavior-y:contain;
+    -webkit-overflow-scrolling:touch;
 
     margin:-14px;
     padding:14px;
+    padding-bottom:calc(14px + var(--bottom-nav-height,70px) + var(--safe-bottom,0px));
 }
 
 .home-bg-fixed-layer{
@@ -5699,7 +5705,7 @@ body.skill-detail-scroll-active,
     width:100%;
     max-width:600px;
 
-    height:70px;
+    height:var(--bottom-nav-height,70px);
 
     display:grid;
 

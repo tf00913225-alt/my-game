@@ -1,4 +1,208 @@
 
+/* bundled source: css/battle-statistics-system.css */
+/* Battle Statistics / Detailed battle status UI owner. */
+#battlePage .battle-stats-edge-button,
+#battlePage .battle-mechanism-alert{
+    position:absolute;
+    z-index:175;
+    border:1px solid rgba(230,176,73,.86);
+    background:linear-gradient(180deg,rgba(34,25,14,.96),rgba(9,8,6,.96));
+    color:#f5d67f;
+    box-shadow:0 3px 10px rgba(0,0,0,.58);
+}
+#battlePage .battle-stats-edge-button[hidden],
+#battlePage .battle-mechanism-alert[hidden]{display:none;}
+#battlePage .battle-stats-edge-button{
+    top:82px;
+    left:0;
+    width:29px;
+    min-height:112px;
+    padding:7px 4px;
+    border-left:0;
+    border-radius:0 8px 8px 0;
+    font-size:15px;
+    font-weight:900;
+    line-height:1.25;
+}
+#battlePage .battle-stats-edge-button span{display:block;}
+#battlePage .battle-mechanism-alert{
+    top:98px;
+    right:0;
+    width:36px;
+    height:48px;
+    border-right:0;
+    border-radius:8px 0 0 8px;
+    color:#ff3b30;
+    font-size:32px;
+    font-weight:1000;
+    line-height:42px;
+    text-shadow:0 0 8px rgba(255,59,48,.65);
+    animation:battleMechanismAlertPulse .48s steps(2,end) infinite;
+}
+@keyframes battleMechanismAlertPulse{
+    0%,100%{opacity:1;transform:scale(1);}
+    50%{opacity:.28;transform:scale(.9);}
+}
+#battlePage .battle-insight-scrim{
+    position:absolute;
+    inset:0;
+    z-index:179;
+    display:none;
+    width:100%;
+    height:100%;
+    padding:0;
+    border:0;
+    background:rgba(0,0,0,.48);
+}
+#battlePage .battle-insight-scrim.open{display:block;}
+#battlePage .battle-insight-drawer{
+    position:absolute;
+    top:0;
+    bottom:0;
+    z-index:180;
+    width:min(342px,86%);
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    border:1px solid rgba(210,158,64,.9);
+    background:linear-gradient(180deg,rgba(23,18,12,.99),rgba(7,7,6,.99));
+    box-shadow:0 0 24px rgba(0,0,0,.68);
+    transition:transform .18s ease-out;
+}
+#battlePage .battle-stats-drawer{left:0;transform:translateX(-102%);border-left:0;}
+#battlePage .battle-boss-mechanism-drawer{right:0;transform:translateX(102%);border-right:0;}
+#battlePage .battle-insight-drawer.open{transform:translateX(0);}
+#battlePage .battle-insight-drawer > header{
+    flex:0 0 auto;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    min-height:48px;
+    padding:8px 10px;
+    border-bottom:1px solid rgba(189,138,54,.62);
+    color:#f4d586;
+}
+#battlePage .battle-insight-drawer > header b{font-size:18px;}
+#battlePage .battle-insight-drawer > header button{
+    width:38px;height:36px;border:1px solid rgba(199,150,67,.68);border-radius:7px;
+    background:rgba(38,27,14,.9);color:#f6dda1;font-size:23px;line-height:30px;
+}
+#battlePage .battle-insight-drawer-body{
+    flex:1 1 auto;
+    min-height:0;
+    overflow-y:auto;
+    overflow-x:hidden;
+    padding:9px;
+    overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
+}
+.battle-stat-card,.battle-result-stat-card,.battle-mechanism-card{
+    margin:0 0 9px;
+    padding:9px;
+    border:1px solid rgba(158,116,51,.56);
+    border-radius:9px;
+    background:linear-gradient(145deg,rgba(39,27,15,.93),rgba(10,9,7,.94));
+}
+.battle-stat-identity{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    min-width:0;
+    margin-bottom:8px;
+}
+.battle-stat-identity img,.battle-stat-avatar-fallback{
+    flex:0 0 46px;
+    width:46px;height:46px;border:1px solid rgba(220,173,82,.78);border-radius:50%;
+    object-fit:cover;object-position:center 22%;background:#0a0907;
+}
+.battle-stat-avatar-fallback{display:grid;place-items:center;color:#d8b76d;}
+.battle-stat-identity > div{min-width:0;display:grid;gap:2px;}
+.battle-stat-identity b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#f6dfaa;font-size:16px;}
+.battle-stat-identity small{color:#bda982;font-size:13px;}
+.battle-stat-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:6px;
+}
+.battle-stat-grid > div{
+    display:grid;
+    gap:2px;
+    min-width:0;
+    padding:6px 7px;
+    border:1px solid rgba(141,102,46,.42);
+    border-radius:6px;
+    background:rgba(7,7,6,.56);
+}
+.battle-stat-grid span,.battle-mechanism-card > div span{color:#b9a47a;font-size:13px;}
+.battle-stat-grid b{color:#ffe198;font-size:16px;font-variant-numeric:tabular-nums;}
+.battle-insight-empty{padding:20px 8px;color:#c5b38e;font-size:14px;line-height:1.6;text-align:center;}
+.battle-mechanism-title{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+.battle-mechanism-title img,.battle-mechanism-title > span{
+    width:42px;height:42px;border:1px solid rgba(202,73,59,.7);border-radius:7px;object-fit:contain;
+}
+.battle-mechanism-title > span{display:grid;place-items:center;color:#ff5144;font-size:28px;font-weight:1000;}
+.battle-mechanism-title b{color:#f6d99a;font-size:16px;}
+.battle-mechanism-card p{margin:6px 0 10px;color:#eadcc0;font-size:14px;line-height:1.55;}
+.battle-mechanism-card > div:not(.battle-mechanism-title){
+    display:grid;grid-template-columns:72px minmax(0,1fr);gap:6px;margin-top:5px;
+}
+.battle-mechanism-card > div:not(.battle-mechanism-title) b{color:#f0d493;font-size:14px;line-height:1.45;}
+
+#battlePage .battle-round-prompt{
+    position:absolute;
+    top:72px;
+    left:50%;
+    z-index:174;
+    min-width:132px;
+    padding:7px 18px;
+    border:1px solid rgba(229,176,74,.88);
+    border-radius:999px;
+    background:rgba(13,10,7,.9);
+    color:#ffe09b;
+    font-size:20px;
+    font-weight:1000;
+    line-height:1.25;
+    text-align:center;
+    text-shadow:0 1px 4px #000;
+    transform:translateX(-50%);
+    pointer-events:none;
+}
+#battlePage .battle-round-prompt[hidden]{display:none;}
+
+#app .battle-statistics-result-modal{
+    position:absolute;
+    inset:0;
+    z-index:360;
+    display:grid;
+    place-items:center;
+    padding:18px 12px;
+    background:rgba(0,0,0,.72);
+}
+#app .battle-statistics-result-modal[hidden]{display:none;}
+.battle-statistics-result-panel{
+    width:min(390px,100%);
+    max-height:94%;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    border:2px solid rgba(213,161,67,.9);
+    border-radius:12px;
+    background:linear-gradient(180deg,#21170d,#090806);
+    box-shadow:0 10px 28px rgba(0,0,0,.75);
+    color:#f5e5c3;
+}
+.battle-statistics-result-panel > header{padding:12px 13px 8px;border-bottom:1px solid rgba(183,133,54,.58);}
+.battle-statistics-result-panel > header small{color:#aa9670;font-size:11px;}
+.battle-statistics-result-panel > header h2{margin:3px 0;color:#f1d184;font-size:21px;}
+.battle-statistics-result-panel > header p{margin:0;color:#cab58a;font-size:13px;}
+.battle-statistics-result-body{flex:1 1 auto;min-height:0;overflow-y:auto;padding:10px;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;}
+.battle-statistics-result-panel > footer{flex:0 0 auto;padding:9px 12px 12px;border-top:1px solid rgba(183,133,54,.48);}
+.battle-statistics-result-panel > footer button{
+    width:100%;min-height:42px;border:1px solid rgba(220,167,73,.82);border-radius:8px;
+    background:linear-gradient(180deg,#4c3218,#21150b);color:#ffe2a0;font-size:16px;font-weight:900;
+}
+
+
 /* bundled source: css/05-stage-v10-battle-log-scroll-fix.css */
 /* ============================================================
    V10 — BATTLE INFORMATION PANEL SCROLL FIX
@@ -4573,6 +4777,25 @@ body.quest-scroll-active,
 #game-stage .v141-upgrade-flow{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin:9px 0;}
 #game-stage .v141-upgrade-flow section{display:flex;min-width:0;flex-direction:column;align-items:center;gap:4px;padding:9px;border:1px solid rgba(200,154,72,.16);border-radius:8px;background:linear-gradient(155deg,rgba(25,19,13,.64),rgba(10,8,6,.80));text-align:center;}
 #game-stage .v141-upgrade-flow section > svg{width:54px;height:54px;}
+/* Talisman synthesis is owned by gameplay-core, not the Abyss feature CSS.
+   Both previews are intentional: left is the 3x material stack and right is
+   the crafted next tier. Keep each 2:3 artwork contained inside its slot. */
+#game-stage #homeFeatureModal.v141-synthesis-modal .v141-upgrade-flow .v169-talisman-art{
+    width:92px;
+    height:138px;
+    max-width:100%;
+    flex:0 0 auto;
+    overflow:hidden;
+}
+#game-stage #homeFeatureModal.v141-synthesis-modal .v141-upgrade-flow .v169-talisman-art > img{
+    display:block;
+    width:100%;
+    height:100%;
+    max-width:100%;
+    max-height:100%;
+    object-fit:contain;
+    object-position:center;
+}
 #game-stage .v141-upgrade-flow section b{font-size:12px;}
 #game-stage .v141-upgrade-flow i{color:#efc76e;font-size:23px;font-style:normal;}
 #game-stage .v141-quantity{display:flex;align-items:center;justify-content:center;gap:5px;margin:7px 0;}
