@@ -79,6 +79,7 @@ jobs:
           node tests/battle-layout-vfx-runtime-20260917.test.js
           node tests/boss-battle-architecture-convergence-20260918.test.js
           node tests/gameplay-boss-tower-system.test.js
+          node tests/battle-stats-relic-tower-auto-20260920.test.js
           node tests/v142-skill-animation.test.js
           node tests/v150-ice-arrow-rain-vfx.test.js
           node tests/v173.23-wind-vfx.test.js
