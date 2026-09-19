@@ -6,7 +6,7 @@
 
     const AD_FREE_MODE_CLASS="ad-free-service-info-mode";
     const AD_FREE_CONFIG_KEY="SIXIANG_AD_FREE_SERVICE_CONFIG";
-    const AD_FREE_DISPLAY_POLICY=Object.freeze({mode:"every-entry"});
+    const AD_FREE_DISPLAY_POLICY=Object.freeze({mode:"manual"});
     const DEFAULT_AD_FREE_CONFIG=Object.freeze({
         supportEmail:"",
         refundPolicyUrl:"",
@@ -15,11 +15,6 @@
         purchaseUrl:"",
         purchaseEnabled:false
     });
-    const adFreeState={
-        shownThisEntry:false,
-        observer:null,
-        armed:false
-    };
 
     function apply(){
         const home = document.getElementById("homePage");
@@ -140,16 +135,7 @@
         // TODO(ECPay): 完成綠界付款與付款結果驗證後，才可設定 purchaseEnabled=true 與 purchaseUrl。
     }
 
-    function disconnectAdFreeObserver(){
-        if(adFreeState.observer){
-            adFreeState.observer.disconnect();
-            adFreeState.observer=null;
-        }
-    }
-
-    function openAdFreeServiceInfoModal(options){
-        const manual=Boolean(options&&options.manual);
-        if(!manual&&adFreeState.shownThisEntry){ return false; }
+    function openAdFreeServiceInfoModal(){
         const parts=getModalParts();
         if(!parts){ return false; }
         if(parts.modal.classList.contains("show")&&!parts.modal.classList.contains(AD_FREE_MODE_CLASS)){
@@ -164,8 +150,6 @@
         parts.modal.setAttribute("aria-modal","true");
         parts.modal.setAttribute("aria-labelledby","homeFeatureModalTitle");
         parts.modal.classList.add("show");
-        adFreeState.shownThisEntry=true;
-        disconnectAdFreeObserver();
         return true;
     }
 
@@ -184,71 +168,8 @@
         return true;
     }
 
-    function isVisible(element){
-        if(!element||element.hidden){ return false; }
-        if(typeof window.getComputedStyle!=="function"){ return true; }
-        const style=window.getComputedStyle(element);
-        return style.display!=="none"&&style.visibility!=="hidden";
-    }
-
-    function shouldAutoShowAdFreeServiceInfo(){
-        return AD_FREE_DISPLAY_POLICY.mode==="every-entry"&&!adFreeState.shownThisEntry;
-    }
-
-    function isHomeReadyForAdFreeDisclosure(){
-        const startup=document.getElementById("startupLoader");
-        const game=document.getElementById("gameInterface");
-        const home=document.getElementById("homePage");
-        const modal=document.getElementById("homeFeatureModal");
-        if(startup&&isVisible(startup)){ return false; }
-        if(!isVisible(game)){ return false; }
-        if(!home||!home.classList.contains("active")){ return false; }
-        if(modal&&modal.classList.contains("show")){ return false; }
-        return true;
-    }
-
-    function tryAutoShowAdFreeServiceInfo(){
-        if(!shouldAutoShowAdFreeServiceInfo()||!isHomeReadyForAdFreeDisclosure()){
-            return false;
-        }
-        return openAdFreeServiceInfoModal({manual:false});
-    }
-
-    function scheduleAutoShowAdFreeServiceInfo(){
-        if(!shouldAutoShowAdFreeServiceInfo()){ return; }
-        if(typeof window.requestAnimationFrame==="function"){
-            window.requestAnimationFrame(tryAutoShowAdFreeServiceInfo);
-        }else{
-            window.setTimeout(tryAutoShowAdFreeServiceInfo,0);
-        }
-    }
-
-    function armAdFreeServiceInfo(){
-        if(adFreeState.armed){ return; }
-        adFreeState.armed=true;
-        ensureAdFreeConfig();
-
-        document.addEventListener("v173.20:startup-entered",scheduleAutoShowAdFreeServiceInfo);
-        window.addEventListener("pageshow",scheduleAutoShowAdFreeServiceInfo);
-
-        if(typeof MutationObserver==="function"){
-            const observer=new MutationObserver(scheduleAutoShowAdFreeServiceInfo);
-            ["startupLoader","gameInterface","homePage","homeFeatureModal"].forEach(function(id){
-                const element=document.getElementById(id);
-                if(element){
-                    observer.observe(element,{attributes:true,attributeFilter:["class","style","hidden"]});
-                }
-            });
-            adFreeState.observer=observer;
-        }
-
-        scheduleAutoShowAdFreeServiceInfo();
-    }
-
     window.AD_FREE_SERVICE_DISPLAY_POLICY=AD_FREE_DISPLAY_POLICY;
-    window.openAdFreeServiceInfoModal=function(){
-        return openAdFreeServiceInfoModal({manual:true});
-    };
+    window.openAdFreeServiceInfoModal=openAdFreeServiceInfoModal;
     window.closeAdFreeServiceInfoModal=closeAdFreeServiceInfoModal;
 
 
@@ -277,48 +198,167 @@
         node.textContent=rosterResourceText(whole);
         node.title=full; node.setAttribute("aria-label",full);
     }
-    function renderHomeRoster(){
+    const HOME_RELIC_SUMMARY_CATALOG=Object.freeze({
+        relic_qiankun_flask:Object.freeze({name:"乾坤玉壺",triggerText:"奇數回合結束時"}),
+        relic_sun_orb:Object.freeze({name:"烈陽神珠",triggerText:"偶數回合開始時"}),
+        relic_xuanwu_seal:Object.freeze({name:"玄武靈印",triggerText:"每第3回合開始時"}),
+        relic_soul_bell:Object.freeze({name:"鎮魂古鐘",triggerText:"每第4回合開始時"}),
+        relic_tiangang_banner:Object.freeze({name:"天罡戰旗",triggerText:"我方累積受到6次敵方有效攻擊後"}),
+        relic_nine_dragon_fire:Object.freeze({name:"九龍神火罩",triggerText:"敵方累積完成7次有效行動後"}),
+        relic_cold_spring_jade:Object.freeze({name:"寒泉玉珮",triggerText:"任一我方角色在傷害結算後低於35%最大HP時"}),
+        relic_qinglan_feather:Object.freeze({name:"青嵐羽符",triggerText:"戰鬥開始時"}),
+        relic_rock_mountain_seal:Object.freeze({name:"岩岳鎮印",triggerText:"開場；另於我方累積受8次有效攻擊時"}),
+        relic_returning_wheel:Object.freeze({name:"回天寶輪",triggerText:"本場第一次有我方角色將受到致命傷害時"}),
+        relic_origin_talisman:Object.freeze({name:"太初聖符",triggerText:"每第4回合結束"}),
+        relic_broken_army_scroll:Object.freeze({name:"破軍殘卷",triggerText:"角色攻擊／技能擊敗敵人後"}),
+        relic_red_sky_war_mark:Object.freeze({name:"赤霄戰紋",triggerText:"戰鬥開始時"}),
+        relic_ice_mirror_heart:Object.freeze({name:"玄冰鏡心",triggerText:"每第3回合結束"}),
+        relic_wind_chasing_talisman:Object.freeze({name:"追風行符",triggerText:"每第3回合開始"}),
+        relic_mountain_river_cauldron:Object.freeze({name:"山河寶鼎",triggerText:"我方累積受7次有效攻擊後"}),
+        relic_burning_star_mark:Object.freeze({name:"焚星殘印",triggerText:"偶數回合結束"}),
+        relic_spirit_spring_bottle:Object.freeze({name:"靈泉法瓶",triggerText:"每第3回合結束"}),
+        relic_demon_suppressing_seal:Object.freeze({name:"伏魔金印",triggerText:"戰鬥開始；首次成功受到一般負面狀態"}),
+        relic_all_returning_array:Object.freeze({name:"萬象歸元盤",triggerText:"每第4回合開始"})
+    });
+
+    function homeRosterPlaceholder(index){
+        return '<article class="v146-home-character v146-home-character-placeholder" data-home-roster-slot="'+index+'" aria-busy="true">'+
+            '<div class="v146-home-avatar" aria-hidden="true"></div>'+
+            '<div class="v146-home-character-main"><div><b>隊伍資料載入中</b><span>--</span></div>'+
+            '<div class="v146-home-resource hp"><i style="width:0%"></i><strong>HP --</strong></div>'+
+            '<div class="v146-home-resource sp"><i style="width:0%"></i><strong>SP --</strong></div></div></article>';
+    }
+
+    function ensureHomeRosterShell(){
         const page=document.getElementById("homePage");
         const grid=page&&page.querySelector(".home-card-grid");
-        if(!page||!grid||typeof getExistingPartyIndexes!=="function"){ return false; }
+        if(!page||!grid){ return null; }
+        let roster=document.getElementById("v146HomeRoster");
+        if(!roster){
+            roster=document.createElement("section");
+            roster.id="v146HomeRoster";
+            roster.className="v146-home-roster";
+            roster.setAttribute("aria-label","冒險隊伍");
+            grid.insertAdjacentElement("afterend",roster);
+        }
+        if(!roster.querySelector(":scope > header")){
+            const header=document.createElement("header");
+            header.innerHTML='<b>冒險隊伍</b><span class="v146-home-roster-count">隊伍 -- / 6</span><button type="button" class="v-fixed-formation-entry" data-feature="gameplay-core" onclick="openHomeFeature(\'formation\')">佈陣</button>';
+            roster.appendChild(header);
+        }
+        if(!roster.querySelector(".v146-home-character")){
+            for(let index=0;index<3;index++){
+                roster.insertAdjacentHTML("beforeend",homeRosterPlaceholder(index));
+            }
+        }
+        let relicSlot=roster.querySelector(".team-relic-loadout-slot");
+        if(!relicSlot){
+            relicSlot=document.createElement("div");
+            relicSlot.className="team-relic-loadout-slot";
+            relicSlot.dataset.ready="false";
+            relicSlot.innerHTML='<span>隊伍秘寶</span><b>秘寶資料載入中</b><small>等待正式存檔完成解析</small><button type="button" data-feature="relic" onclick="openHomeFeature(\'relic\')" disabled>選擇</button>';
+            roster.appendChild(relicSlot);
+        }
+        return roster;
+    }
+
+    function readHomeRelicSave(){
+        try{
+            const repository=window.FourSymbolsAccountSave;
+            const uid=repository&&repository.getActiveUid();
+            if(!repository||!uid){ return null; }
+            const result=repository.readForUid(uid);
+            return result&&result.status==="ready"&&result.save&&typeof result.save==="object"
+                ?result.save
+                :null;
+        }catch(_){
+            return null;
+        }
+    }
+
+    function syncHomeRelicSummary(){
+        const roster=ensureHomeRosterShell();
+        const slot=roster&&roster.querySelector(".team-relic-loadout-slot");
+        if(!slot){ return false; }
+        const save=readHomeRelicSave();
+        if(!save){
+            slot.dataset.ready="false";
+            return false;
+        }
+        const relicId=save.teamLoadout&&typeof save.teamLoadout==="object"
+            ?String(save.teamLoadout.relicId||"")
+            :"";
+        const definition=relicId?HOME_RELIC_SUMMARY_CATALOG[relicId]:null;
+        const owned=relicId&&save.playerRelics&&typeof save.playerRelics==="object"
+            ?save.playerRelics[relicId]
+            :null;
+        const level=Math.max(1,Math.min(20,Math.floor(rosterNumber(owned&&owned.level)||1)));
+        slot.innerHTML=definition
+            ?'<span>隊伍秘寶</span><b>'+rosterEscape(definition.name)+' Lv.'+level+'</b><small>'+rosterEscape(definition.triggerText)+'</small><button type="button" data-feature="relic" onclick="openHomeFeature(\'relic\')">更換</button>'
+            :'<span>隊伍秘寶</span><b>尚未裝備</b><small>每隊僅能裝備1件秘寶</small><button type="button" data-feature="relic" onclick="openHomeFeature(\'relic\')">選擇</button>';
+        slot.dataset.ready="true";
+        return true;
+    }
+
+    function renderHomeRoster(){
+        const roster=ensureHomeRosterShell();
+        if(!roster||typeof getExistingPartyIndexes!=="function"){ return false; }
         const partyIndexes=getExistingPartyIndexes().slice(0,3);
         const availableExp=typeof window.v173GetAvailableExpPool==="function"
             ?window.v173GetAvailableExpPool(Date.now())
             :(typeof sharedExp!=="undefined"?sharedExp:0);
         syncRosterResource(document.getElementById("homeHudGoldValue"),typeof gold!=="undefined"?gold:0);
         syncRosterResource(document.getElementById("homeHudExpValue"),availableExp);
-        let roster=document.getElementById("v146HomeRoster");
-        if(!roster){
-            roster=document.createElement("section");
-            roster.id="v146HomeRoster"; roster.className="v146-home-roster";
-            roster.setAttribute("aria-label","冒險隊伍");
-            grid.insertAdjacentElement("afterend",roster);
-        }
-        const cards=partyIndexes.map(index=>{
-            const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(index):null;
-            const stats=typeof getPartyBattleStats==="function"?getPartyBattleStats(index):null;
-            if(!character||!stats){ return ""; }
+        const count=roster.querySelector(".v146-home-roster-count");
+        if(count){ count.textContent="隊伍 "+partyIndexes.length+" / 6"; }
+
+        const cards=[];
+        for(let slotIndex=0;slotIndex<3;slotIndex++){
+            const index=partyIndexes[slotIndex];
+            const character=typeof index==="number"&&typeof getPartyCharacterByIndex==="function"
+                ?getPartyCharacterByIndex(index)
+                :null;
+            const stats=typeof index==="number"&&typeof getPartyBattleStats==="function"
+                ?getPartyBattleStats(index)
+                :null;
+            if(!character||!stats){
+                cards.push('<article class="v146-home-character v146-home-character-empty" data-home-roster-slot="'+slotIndex+'"><div class="v146-home-avatar" aria-hidden="true"></div><div class="v146-home-character-main"><div><b>隊伍空位</b><span>--</span></div><div class="v146-home-resource hp"><i style="width:0%"></i><strong>HP --</strong></div><div class="v146-home-resource sp"><i style="width:0%"></i><strong>SP --</strong></div></div></article>');
+                continue;
+            }
             const hp=Math.max(0,Math.min(rosterNumber(stats.maxHP),rosterNumber(character.hp)));
             const sp=Math.max(0,Math.min(rosterNumber(stats.maxSP),rosterNumber(character.sp)));
             const hpPercent=rosterNumber(stats.maxHP)>0?hp/rosterNumber(stats.maxHP)*100:0;
             const spPercent=rosterNumber(stats.maxSP)>0?sp/rosterNumber(stats.maxSP)*100:0;
             const artwork=typeof getCharacterArtworkPath==="function"?getCharacterArtworkPath(character):"";
-            return '<article class="v146-home-character" data-element="'+rosterEscape(character.element||"fire")+'">'+
+            cards.push('<article class="v146-home-character" data-home-roster-slot="'+slotIndex+'" data-element="'+rosterEscape(character.element||"fire")+'">'+
                 '<div class="v146-home-avatar"><img src="'+rosterEscape(artwork)+'" alt="'+rosterEscape(character.id||"角色")+'頭像"></div>'+
                 '<div class="v146-home-character-main"><div><b>'+rosterEscape(character.id||("角色"+(index+1)))+'</b><span>Lv.'+Math.max(1,Math.floor(rosterNumber(character.level)||1))+'</span></div>'+
                 '<div class="v146-home-resource hp"><i style="width:'+hpPercent+'%"></i><strong>HP '+Math.floor(hp)+' / '+Math.floor(rosterNumber(stats.maxHP))+'</strong></div>'+
-                '<div class="v146-home-resource sp"><i style="width:'+spPercent+'%"></i><strong>SP '+Math.floor(sp)+' / '+Math.floor(rosterNumber(stats.maxSP))+'</strong></div></div></article>';
-        }).join("");
-        roster.innerHTML='<header><b>冒險隊伍</b><span>隊伍 '+partyIndexes.length+' / 6</span><button type="button" class="v-fixed-formation-entry" data-feature="gameplay-core" onclick="openHomeFeature(\'formation\')">佈陣</button></header>'+cards;
+                '<div class="v146-home-resource sp"><i style="width:'+spPercent+'%"></i><strong>SP '+Math.floor(sp)+' / '+Math.floor(rosterNumber(stats.maxSP))+'</strong></div></div></article>');
+        }
+
+        roster.querySelectorAll(".v146-home-character").forEach(node=>node.remove());
+        const relicSlot=roster.querySelector(".team-relic-loadout-slot");
+        if(relicSlot){ relicSlot.insertAdjacentHTML("beforebegin",cards.join("")); }
+        else{ roster.insertAdjacentHTML("beforeend",cards.join("")); }
         roster.dataset.ready="true";
+        syncHomeRelicSummary();
         return true;
     }
     window.v54RenderHomeRoster=renderHomeRoster;
-    document.addEventListener("four-symbols:startup-ready",renderHomeRoster);
+    window.FourSymbolsHomeRelicSummary=Object.freeze({
+        ensureShell:ensureHomeRosterShell,
+        sync:syncHomeRelicSummary
+    });
+    document.addEventListener("four-symbols:startup-ready",function(){
+        renderHomeRoster();
+        syncHomeRelicSummary();
+    });
 
     function boot(){
         apply();
-        armAdFreeServiceInfo();
+        ensureAdFreeConfig();
+        ensureHomeRosterShell();
     }
 
     if(document.readyState === "loading"){
