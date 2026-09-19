@@ -83,9 +83,9 @@ test("both patrol fight frames point to the newly supplied images",()=>{
 });
 
 test("the development release and cache advance to V173.39",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.65"/);
-    assert.match(index,/<title>四象江湖傳 V173\.65<\/title>/);
-    assert.match(index,/aria-label="目前版本 V173\.65"[\s\S]*?>V173\.65<\/div>/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.66"/);
+    assert.match(index,/<title>四象江湖傳 V173\.66<\/title>/);
+    assert.match(index,/aria-label="目前版本 V173\.66"[\s\S]*?>V173\.66<\/div>/);
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.css/);
 });
 

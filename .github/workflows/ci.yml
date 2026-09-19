@@ -59,10 +59,14 @@ jobs:
           node --check .github/scripts/run-relic-progression-browser-qa.mjs
           node --check .github/scripts/run-adventure-browser-qa.mjs
           node --check .github/scripts/run-fixed-slot-battlefield-browser-qa.mjs
+          node --check .github/scripts/run-release-update-notification-browser-qa.mjs
           node --check .github/scripts/battle-layer-audio-live-qa.mjs
 
       - name: Check all project JavaScript syntax
         run: node .github/scripts/ci.mjs syntax
+
+      - name: Run Release Update Notification targeted regression
+        run: node tests/release-update-notification-system.test.js
 
       - name: Run Adventure V1 targeted regression
         run: node tests/adventure-node-system-v1.test.js
@@ -103,6 +107,24 @@ jobs:
       - name: Verify production build is synchronized
         id: build_sync
         run: npm run build:check
+
+      - name: Run Release Update Notification mobile browser QA
+        id: release_update_browser
+        if: success() && (github.event_name == 'pull_request' || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main')
+        run: node .github/scripts/run-release-update-notification-browser-qa.mjs
+
+      - name: Upload Release Update Notification browser evidence
+        if: always() && steps.release_update_browser.outcome != 'skipped'
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-update-notification-browser-qa-${{ github.sha }}
+          path: |
+            artifacts/browser-qa/release-update-notification-browser-qa.json
+            artifacts/browser-qa/release-update-notification-360x800.png
+            artifacts/browser-qa/release-update-notification-390x844.png
+            artifacts/browser-qa/release-update-notification-412x915.png
+          if-no-files-found: error
+          retention-days: 90
 
       - name: Capture build synchronization evidence
         if: failure() && steps.build_sync.outcome == 'failure'

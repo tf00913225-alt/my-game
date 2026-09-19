@@ -43,6 +43,7 @@ const appScripts=[
     "js/13-stage-v49-runtime.js",
     "js/14-stage-v50-runtime.js",
     "js/15-stage-v51-runtime.js",
+    "js/relic-summary-catalog.js",
     "js/16-stage-v54-main-city-runtime.js",
     "js/17-stage-v60-training-render-guard.js",
     "js/18-stage-v64-character-touch-action-runtime.js",
@@ -50,7 +51,8 @@ const appScripts=[
     "js/23-v125-character-creation-bootstrap.js",
     "js/24-v125-character-creation-native-runtime.js",
     "js/20-anonymous-20.js",
-    "js/61-v174-ui-regression-guards.js"
+    "js/61-v174-ui-regression-guards.js",
+    "js/release-update-notification.js"
 ];
 const gameplayScripts=[
     "js/battlefield-slot-owner.js",
@@ -115,7 +117,8 @@ const appStyles=[
     "css/08-stage-v14-character-scroll-fix.css","css/09-stage-v15-native-character-shell.css",
     "css/19-stage-v54-main-city-moderate-native-scale.css","css/20-stage-v60-training-only-safety.css",
     "css/21-stage-v64-character-touch-action-bridge.css",
-    "css/30-v130-requested-updates.css","css/56-v174-critical-ui-regressions.css","css/ad-free-service-info-modal.css"
+    "css/30-v130-requested-updates.css","css/56-v174-critical-ui-regressions.css","css/ad-free-service-info-modal.css",
+    "css/release-update-notification.css"
 ];
 const gameplayStyles=[
     "css/05-stage-v10-battle-log-scroll-fix.css",

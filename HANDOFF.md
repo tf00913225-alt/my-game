@@ -1,3 +1,56 @@
+## 2026-09-19 — DEV 正式版本公告視覺預覽（VERIFIED／main 未修改）
+
+## 2026-09-19 — V173.66 DEV 發布驗證（REL-01～04 VERIFIED／main PENDING）
+
+- V173.66 release candidate PR #349 的候選 CI runs `35453776605`、`35454779325` 已 SUCCESS。
+- 候選合併後 `dev@7d8a7180afc2c054b5966048e172f171a2fe5a8b`，push CI run `35454884505` SUCCESS；Repository checks job `105928300907`、Dev deployment gate job `105928430038` 均 SUCCESS。
+- DEV 部署 job 已逐步通過：仍為 dev HEAD、Release Gate、immutable static site、Cloudflare deploy、部署後 Commit SHA／Game Version／Cache Version 驗證、deployed battle/VFX live QA。
+- 正式版本：Game Version `V173.66`，Cache Version `173.66`；正式公告 `release-v17366` 已依實際 main...dev 玩家可感知差異整理。
+- Requirement Batch：`release/requirement-batches/2026-09-19-v17366-main-release.json`。REL-01～04 VERIFIED；REL-05 等待 protected `dev → main` PR、main CI 與 production SHA 驗證。
+- 本文件收尾 PR 只記錄 DEV 發布證據，不修改玩法／數值／runtime。
+
+
+## 2026-09-19 — Release Update 每次登入公告 + 今日不再提醒（3/3 VERIFIED）
+
+- Base：`dev@d2dfc01045ddead0e6ca71888334dc9c8eddccf7`；工作分支：`feature/release-update-daily-login-reminder-20260919`；`main` 不修改。
+- 唯一 runtime owner 仍是 `js/release-update-notification.js`，重用既有 `#homeFeatureModal` 與跑馬燈；沒有第二套公告系統。
+- 當前正式版本公告改為：每次新的登入工作階段進入主城後，自動顯示一次。既有 `last-seen-version`／`last-seen-notice` 只保留已讀／通知語意，不再永久阻止下次登入公告。
+- 公告底部新增小型 checkbox：「今日不再跳出提醒」。勾選後只在 per-UID localStorage sidecar 保存 `noticeId + 玩家裝置當地日期`；同日同公告不再自動跳出，隔日重新顯示；同日若新 `noticeId` 上線，新公告仍顯示。
+- 今日抑制只影響登入自動 Modal，不關閉跑馬燈、新版本偵測、forced update、安全 reload，也不寫入 Cloud Save。
+- CSS owner 仍為 `css/release-update-notification.css`；勾選文字 13px、checkbox 18px，位於發布時間與「我知道了」按鈕之間。
+- Targeted regression 已更新：驗證已讀仍新登入顯示、同一登入只顯示一次、今日抑制、隔日恢復、新 noticeId 繞過舊抑制、原有 normal/forced/update/polling 行為維持。
+- Requirement Batch：`release/requirement-batches/2026-09-19-release-update-daily-login-reminder.json`。目前 3/3 VERIFIED。PR #348 CI run `35452586346` 已全綠：targeted regression、deterministic build:check、Release Update mobile browser QA、Fixed Slot mobile QA、exact-candidate real battle QA、Adventure mobile QA、resources、loader integrity、Release Gate、git-diff 均 SUCCESS。
+- Game／Cache Version 維持 173.65；本輪不修改 `release/release-update.json` 公告內容，正式發布文案仍由既有 dev → main Diff 契約產生。
+
+
+## 2026-09-19 — Mobile lifecycle／Shop／Element Box／Adventure／Home First Screen 七項根因修復（7/7 VERIFIED）
+
+- Base：`dev@ccf587d0feec8d4790d17834a11b67a6d05bc55f`；工作分支：`fix/mobile-lifecycle-shop-elementbox-adventure-home-hud-20260919`；`main` 全程禁止修改。Requirement Batch：`release/requirement-batches/2026-09-19-mobile-lifecycle-shop-elementbox-adventure-home-hud.json`。
+- Screen Wake Lock 唯一 owner 仍為 `js/startup/screen-wake-lock-runtime.js`：system release 可見時重取、request 失敗只有有限節流 retry、hidden/pagehide 取消 retry 並 release；`FourSymbolsScreenWakeLock.getDiagnostics()` 提供 supported／held／failure／acquire／release 診斷，不阻塞 Startup。
+- Mobile resume owner 仍在 `js/00-main.js`：visibility hidden／pagehide／freeze 即時 `saveGame()`；`FourSymbolsMobileLifecycleDiagnostics` 記錄 `document.wasDiscarded`、navigation type、pageshow persisted、freeze/resume。普通 pageshow/resume 不重跑 Startup；reload/discard 後仍由 account-first Auth／UID save resolution／hydrate 恢復，不以本機 resume state 覆蓋 Cloud Save。
+- 商店數量規則收斂到 V133 `normalizeShopPurchaseQuantity()`，最大 999；V141 已移除會被 V144 覆蓋的舊 render／buy wrapper。V144 是最終補品 render／buy owner，V146 即時計價會直接把輸入框 >999 改回 999；V169 成功提示仍只依實際背包差額顯示。
+- 元素匣仍由 `js/45-v154-dev-fixes.js::finishAutoRecovery()`：Element Box active 時 HP=0 可進 HP 補品候選，必須真扣補品；若 HP 未成功恢復，SP path 不執行；一般 Battle heal 規則未改。
+- Patrol 正式離場 hook 為 `js/00-main.js::FourSymbolsPatrolLifecycle.exit()`，重用既有 `stopMonsterMovement()`／`stopAutoPatrol()`。Adventure `returnFromPatrol()` 只呼叫此 owner，不複製 timer/state；Fight Animation callback 以 lifecycle generation + map active + autoPatrolEnabled 三重確認，離場後失效。
+- NT$99 30天免廣告資訊在 `js/16-stage-v54-main-city-runtime.js` 改為 manual-only；已移除 startup／pageshow／MutationObserver auto-show 生命週期，保留 `openAdFreeServiceInfoModal()` 手動能力；ECPay／獎勵廣告未改。
+- Main City First Screen：`js/16-stage-v54-main-city-runtime.js` 在 app-shell 先建立固定 `#v146HomeRoster`、三格角色 placeholder 與 `.team-relic-loadout-slot`；hydrate 後只填內容。新增小型 `js/relic-summary-catalog.js` 作 `id/name/triggerText` 唯一摘要資料橋；完整 `feature-boss-relic` 仍 lazy，`js/60-team-relic-system.js` 不再建立首頁摘要 DOM。
+- 受影響 production build 已重建新 content-hashed Boot/App/Gameplay/Relic/Adventure bundles，`asset-manifest.json`／`build/asset-manifest.json`／`index.html` 已同步；Game／Cache Version 維持 173.65。
+- Targeted tests 已新增／更新：`tests/screen-wake-lock.test.js`、`tests/mobile-lifecycle-shop-elementbox-adventure-home-hud-20260919.test.js`、Adventure／ad-free／V146 shop／main-city／team relic save/runtime 既有測試。
+- PR #347 CI run `35450909260` 已 SUCCESS：syntax、Release Update、Adventure、Fixed Slot、battle/VFX、relic lifecycle、deterministic `build:check`、Release Update mobile browser QA、Fixed Slot mobile QA、exact-candidate real battle QA、Adventure mobile QA、static resources、HTML IDs、loader integrity、Release Gate、git-diff 全部通過。Requirement Batch 已 7/7 VERIFIED。
+
+
+- 工作分支：`feature/release-update-dev-preview-20260919`，PR [#345](https://github.com/tf00913225-alt/my-game/pull/345) 已在 CI run `35446496532` 全綠後合併為 `dev@fff36cf702a92638f812698049015537001345b0`；DEV deployment run `35446584392` 也已全綠並核對 exact SHA。main 禁止修改。`js/release-update-notification.js` 是唯一 owner，沒有新建公告、跑馬燈或 Modal。
+- DEV／本機驗收網址使用同一份 `release/release-update.json`：`?releaseUpdatePreview=marquee` 顯示正式跑馬燈，點擊後開正式更新視窗；`?releaseUpdatePreview=modal` 直接開同一視窗。只允許 `dev.four-symbols-dev.pages.dev`、`localhost`、`127.0.0.1`、`::1`，main host 必須忽略 query。
+- Preview 僅供版面、文案與內容驗收：不得改 loaded／正式 release version、不得寫 `last-seen` localStorage、不得 reload。更新視窗維持正式 normal／forced 樣式；preview 中的行動按鈕安全地只關閉視窗。
+- 直接測試必須覆蓋：DEV 現行版本仍可顯示跑馬燈與內容、按立即更新不 reload／不寫已讀、main 帶相同 query 不顯示 preview。
+
+## 2026-09-19 — Release Update Notification System（VERIFIED／main 未修改）
+
+- 工作分支：`feature/release-update-notification-system-20260919`，基準為最新 `origin/dev@af7d0f6b132ebbaeb5f594133db1338d2545861c`；本輪只會 PR 回 `dev`，不得直接修改或發布 `main`。
+- 正式玩家版本公告唯一資料為 `release/release-update.json`，與 `release/release.json` 的 Game／Cache Version 對齊；`release-manifest.json` 仍只供部署 SHA 驗證。`js/release-update-notification.js` 為 runtime owner，重用 `#game-overlay-layer` 跑馬燈和 `#homeFeatureModal`，不可另建 Modal／公告系統。
+- Runtime 在 startup ready、每 4 分鐘、visibility 回前景與 online 恢復時，節流讀取 cache-busted `release/release-update.json`；正常更新只通知，強制更新待安全狀態再鎖定。安全 reload 唯一入口為 `canSafelyReloadForUpdate()`，且已接上 battle／presentation／reward、背包交易與 account save write critical operation。
+- 永久 dev → main Release Contract 已補入 `AGENTS.md`、`SYSTEM_CONTRACTS.md`、`ARCHITECTURE_RULES.md` 與 `docs/RELEASE_VERIFICATION_RULES.md`：除非專案負責人明確說「本次不公告」，每次發布 owner 必須從完整 main...dev 實際 diff 自行整理所有玩家可感知變更到同一份 manifest；不可要求另給公告文案，也不可對玩家顯示檔名、函式、SHA、CI 或 debug 用語。`npm run release:update-diff -- --base origin/main --head HEAD` 是內部差異規劃 helper。
+- 實際驗證：PR [#344](https://github.com/tf00913225-alt/my-game/pull/344) 只目標 `dev`；GitHub Actions CI [run 35445108483](https://github.com/tf00913225-alt/my-game/actions/runs/35445108483) 已全綠。它完成 targeted Case A–J、deterministic build／build check、Release Gate、360×800／390×844／412×915 更新通知 browser QA、既有戰鬥與資源／loader 檢查；更新通知截圖與 JSON 證據已上傳為該 run artifact。`main` 仍未修改；最終 `dev` SHA 以 PR 合併結果為準。
+
 ## 2026-09-19 — Phase 1 main 發布檢查：Firebase 模組數過期測試修正
 
 - 發布 PR #342 的 CI run `35441331170` 實際發現 `tests/critical-feature-budget.test.js` 仍要求 5 個 Firebase 模組；Phase 1 正式建置 owner 已明確包含 `session-client.js` 與 `firebase-session.js`，共 7 個。分類為 stale test contract，非正式程式錯誤；自主失敗額度 1/4、修正 1 次。

@@ -97,7 +97,8 @@ test("the roster renderer keeps all character details in the six-position advent
     assert.doesNotMatch(rosterRuntime,/primaryCharacter=partyIndexes/);
     assert.match(rosterRuntime,/homeHudGoldValue/);
     assert.match(rosterRuntime,/homeHudExpValue/);
-    assert.match(rosterRuntime,/隊伍 '\+partyIndexes\.length\+' \/ 6/);
+    assert.match(rosterRuntime,/v146-home-roster-count[^\n]*隊伍 -- \/ 6/);
+    assert.match(rosterRuntime,/count\.textContent="隊伍 "\+partyIndexes\.length\+" \/ 6"/);
     assert.match(rosterRuntime,/class="v146-home-avatar"/);
     assert.match(rosterCss,/\.v146-home-roster\{[\s\S]*display:grid;[\s\S]*grid-template-columns:repeat\(3,minmax\(0,1fr\)\);[\s\S]*gap:4px;[\s\S]*background:linear-gradient\(155deg,rgba\(29,19,11,.91\),rgba\(5,5,4,.86\)\)/);
     assert.match(rosterCss,/\.v146-home-roster > header\{[\s\S]*grid-column:1\/-1;[\s\S]*min-height:23px;[\s\S]*font-size:15px/);
@@ -141,9 +142,9 @@ test("the enlarged three-character horizontal roster still fits above the unchan
 });
 
 test("development cache and visible version stay synchronized",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.65"/);
-    assert.match(index,/<title>四象江湖傳 V173\.65<\/title>/);
-    assert.match(index,/aria-label="目前版本 V173\.65"[\s\S]*?>V173\.65<\/div>/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.66"/);
+    assert.match(index,/<title>四象江湖傳 V173\.66<\/title>/);
+    assert.match(index,/aria-label="目前版本 V173\.66"[\s\S]*?>V173\.66<\/div>/);
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.css/);
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);

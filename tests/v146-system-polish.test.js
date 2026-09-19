@@ -47,7 +47,7 @@ function baseContext(overrides={}){
 
 test("V146 remains ordered before V149 under the current cache key",()=>{
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
-    assert.match(loader,/const V_ASSET_VERSION="173\.65"/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.66"/);
     assert.match(loader,/css\/42-v146-system-polish\.css/);
     const paths=[
         "js/39-v143-skill-animation.js","js/40-v144-rules-and-abyss.js","js/41-v146-system-polish.js"
@@ -109,6 +109,12 @@ test("shop quantity calculates and disables against the live total",()=>{
     assert.equal(output.textContent,"315 金幣");
     assert.equal(output.dataset.total,"315");
     assert.equal(button.disabled,true);
+
+    context.normalizeShopPurchaseQuantity=value=>Math.max(1,Math.min(999,Math.floor(Number(value)||1)));
+    input.value="1000"; input.dataset.unitPrice="2"; context.gold=5000;
+    assert.equal(context.v146UpdateShopTotal("hpPotion20"),1998);
+    assert.equal(input.value,"999","shop input must visibly clamp values above 999");
+    assert.equal(output.textContent,"1,998 金幣");
 });
 
 test("all forty set pieces receive exact stats, role names and element locks",()=>{

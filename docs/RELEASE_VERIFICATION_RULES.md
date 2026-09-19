@@ -40,6 +40,60 @@ main 若沒有可驗證實際 production SHA 的 deployment owner／workflow，�
 
 發布產物必須包含 Release Manifest，至少記錄 Version、Commit SHA、Included Requirements、Verification Result、Cache Version、Deploy Result。部署前 manifest 可為 `PENDING_VERIFICATION`；部署後必須產生最終 `SUCCESS` 記錄並確認 SHA。
 
+## 6A. 玩家正式版本通知與 dev → main Release Contract
+
+本節是永久發布契約。未來任何 Work（工作模式）、GPT、Claude、Codex 或其他發布 owner 都必須執行；不需要專案負責人重複提醒。
+
+### 唯一正式玩家資料來源
+
+- `release/release.json`：工程用 Game Version／Cache Version 與 release readiness。
+- `release/release-update.json`：唯一玩家公告 manifest。跑馬燈、首頁／首次登入公告、Update Detail Modal 必須直接共用它，不得各自維護文案或另建公告資料來源。
+- 部署產物 `release-manifest.json`：Commit SHA／部署核對專用。它不是玩家公告資料，也不得以 Git SHA 判斷玩家是否看過版本。
+
+`release/release-update.json` 至少必須有：
+
+```json
+{
+  "schemaVersion": 1,
+  "publicNotice": true,
+  "releaseVersion": "V173.66",
+  "noticeId": "release-v17366",
+  "title": "V173.66 更新",
+  "summary": "玩家看得懂的一句摘要",
+  "content": ["玩家可感知變更一", "玩家可感知變更二"],
+  "publishedAt": "2026-09-19T00:00:00.000Z",
+  "updateMode": "normal",
+  "minimumVersion": null
+}
+```
+
+- `releaseVersion` 必須與 `release/release.json` 的 Game Version 相同；版本比較要使用數字 parser，不得用字串大小。
+- `noticeId` 每一正式版本必須唯一，建議 `release-v<去除小數點的版本>`。
+- `title`、`summary`、`content` 必須是玩家看得懂的繁體中文；不可出現程式檔名、函式名、Commit SHA、CI、測試、cache、debug 或工程排錯術語。
+- `updateMode` 只可為 `normal` 或 `forced`。`minimumVersion` 為 null 或合法版本；當載入版本低於它時，必須視為強制更新。
+- `publicNotice:false` 只允許專案負責人於本次明確說出「本次不公告」且本批變更完全不影響玩家時使用；必須附 `skipReason`。文件、CI、開發工具或完全不可感知的內部變更才可跳過，發布 owner 不得自行默認跳過。
+
+### 發布前自動差異整理（必做）
+
+每次 `dev → main`，除非有上述明確「本次不公告」指示，發布 owner 必須自行執行以下流程，不能要求專案負責人另外提供跑馬燈文案、首頁公告文案或 Release Notes：
+
+1. 先更新 remote refs，從實際 current `main` 到即將發布的候選 `dev` 做完整三點差異；建議執行 `npm run release:update-diff -- --base origin/main --head HEAD`。
+2. 檢查完整 diff，而非只看最後一個 commit、PR 標題或檔案清單。若自上一次 main 累積多項玩家可感知修改，必須全部整理進本次 `content`。
+3. 自行把真正影響玩家的結果濃縮成玩家語言：新增了什麼、體驗如何改善、修正了什麼。不可把工程實作、內部檔名或未發布功能偽裝成玩家內容。
+4. 將同一份 manifest 填入 `summary` 與 `content`；遊戲三個入口自動共用，禁止再手寫三份不一致文字。
+5. 由 `release-gate` 驗證 manifest 結構、版本對齊、公開／跳過原因，再連同 Requirement Verification、CI 與 dev 驗收走既有發布流程。
+
+### normal／forced 與安全 reload
+
+- `normal`：背景偵測到新版本後顯示跑馬燈，玩家可查看內容、稍後更新或在安全狀態按「立即更新」。不得自動 reload。
+- `forced`：安全狀態直接顯示不可略過的更新 Modal；戰鬥、結算、領獎、合成、冶煉、商店交易、背包／裝備資料變更、Boss 獎勵與存檔寫入中只標記 pending，完成後才要求更新。不可按背景、ESC、返回鍵或返回按鈕繞過。
+- `last-seen-version`／`last-seen-notice` 只代表已讀與通知狀態，不再代表「往後登入都不顯示」。玩家每次新的登入工作階段進入主城後，當前正式公告要自動顯示一次。公告底部提供「今日不再跳出提醒」；勾選後以 per-UID localStorage sidecar 保存目前 `noticeId` 與玩家裝置當地日期，只抑制該公告當日的登入自動 Modal。隔日同公告重新顯示；同日若發布新 `noticeId`，新公告仍顯示。此 sidecar 不進 Cloud Save。
+- runtime 每 4 分鐘檢查，另在 startup、頁面回到前景與 online 恢復時以節流檢查。`release/release-update.json` 必須 query cache-bust、`cache: no-store`，並以 `_headers` 排除長期 cache。現況沒有 Service Worker；未來導入 PWA／Service Worker 時，必須先保障此檔 network-first 或不被舊 cache 攔截。
+
+### 正式發布流程
+
+`功能開發完成 → 合併 dev → dev 驗收 → 自動比對 main...dev 並整理玩家可感知內容 → 更新 Game/Cache Version 與 release manifest 欄位 → Requirement Verification／最終 CI → dev → main → main 發布完成 → 在線玩家背景發現新版 → 跑馬燈／完整內容 → 玩家安全時 reload → 每次新登入進主城自動顯示當前公告一次（若已勾選今日不再跳出則當日略過）`。
+
 ## 7. 能自動驗證的規格必須進 CI
 
 能用程式搜尋／斷言驗證的內容不得只靠人工。正式廢除功能的舊 DOM id、class、函式、設定 key、顯示文字若仍存在於正式 HTML/JS/CSS，CI 必須失敗。其他固定公式／階級／掉落規格只要可穩定斷言，也應逐步納入現有 CI，而不是建立重複測試系統。

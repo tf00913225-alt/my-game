@@ -17,8 +17,8 @@ const confirmSources=[
     "js/00-main.js",
     "js/25-v131-fix-batch.js",
     "js/27-v132-content-expansion.js",
-    "js/35-v141-ui-battle.js",
-    "js/36-v141-content-systems.js"
+    "js/36-v141-content-systems.js",
+    "js/40-v144-rules-and-abyss.js"
 ].map(file=>[file,fs.readFileSync(file,"utf8")]);
 
 let passed=0;
@@ -248,7 +248,7 @@ test("perpetual modal glow and skill-card compositing are static",()=>{
 });
 
 test("V169 styles and runtimes are deployed last under fresh cache keys",()=>{
-    assert.match(loaderSource,/const V_ASSET_VERSION="173\.65"/);
+    assert.match(loaderSource,/const V_ASSET_VERSION="173\.66"/);
     assert.match(indexSource,/build\/boot-core\.[0-9a-f]{12}\.js/);
     assert.match(indexSource,/build\/boot-core\.[0-9a-f]{12}\.js/);
     assert.match(indexSource,/build\/boot-core\.[0-9a-f]{12}\.js/);

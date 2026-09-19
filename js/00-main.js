@@ -317,19 +317,58 @@ const STARTUP_SESSION_READY_KEY="sixiang_startup_session_ready_v1";
         }
     }
 
+    function navigationType(){
+        try{
+            const entries=window.performance&&typeof window.performance.getEntriesByType==="function"
+                ?window.performance.getEntriesByType("navigation")
+                :[];
+            if(entries&&entries[0]&&entries[0].type){ return String(entries[0].type); }
+            if(window.performance&&window.performance.navigation){
+                const legacy=Number(window.performance.navigation.type);
+                return legacy===1?"reload":legacy===2?"back_forward":"navigate";
+            }
+        }catch(_){ }
+        return "unknown";
+    }
+
+    const lifecycleDiagnostics={
+        wasDiscarded:document.wasDiscarded===true,
+        navigationType:navigationType(),
+        sessionPreviouslyEntered:sessionHasEntered(),
+        lastEvent:"install",
+        lastEventAt:Date.now(),
+        lastPageShowPersisted:false,
+        backgroundSaveCount:0,
+        eventCounts:{visibilitychange:0,pagehide:0,pageshow:0,freeze:0,resume:0}
+    };
+
+    function markLifecycleEvent(name,detail){
+        lifecycleDiagnostics.lastEvent=name;
+        lifecycleDiagnostics.lastEventAt=Date.now();
+        if(Object.prototype.hasOwnProperty.call(lifecycleDiagnostics.eventCounts,name)){
+            lifecycleDiagnostics.eventCounts[name]++;
+        }
+        if(name==="pageshow"){
+            lifecycleDiagnostics.lastPageShowPersisted=!!(detail&&detail.persisted);
+        }
+    }
+
     function rememberEnteredSession(){
         try{
             window.sessionStorage.setItem(STARTUP_SESSION_READY_KEY,"1");
         }catch(_){ }
     }
 
-    function persistBeforeSuspend(){
+    function persistBeforeSuspend(reason){
         try{
-            if(typeof saveGame==="function"){ saveGame(); }
+            if(typeof saveGame==="function"){
+                const saved=saveGame({source:"mobile-"+String(reason||"background")});
+                if(saved!==false){ lifecycleDiagnostics.backgroundSaveCount++; }
+            }
         }catch(_){ }
     }
 
-    if(sessionHasEntered()){
+    if(lifecycleDiagnostics.sessionPreviouslyEntered){
         const startupRoot=document.getElementById("startupLoader");
         if(startupRoot){
             startupRoot.hidden=true;
@@ -341,10 +380,44 @@ const STARTUP_SESSION_READY_KEY="sixiang_startup_session_ready_v1";
     document.addEventListener("v173.20:startup-entered",rememberEnteredSession);
 
     document.addEventListener("visibilitychange",function(){
-        if(document.hidden){ persistBeforeSuspend(); }
+        markLifecycleEvent("visibilitychange",{hidden:document.hidden});
+        if(document.hidden){ persistBeforeSuspend("visibility-hidden"); }
     });
 
-    window.addEventListener("pagehide",persistBeforeSuspend);
+    window.addEventListener("pagehide",function(event){
+        markLifecycleEvent("pagehide",{persisted:!!(event&&event.persisted)});
+        persistBeforeSuspend("pagehide");
+    });
+
+    window.addEventListener("pageshow",function(event){
+        markLifecycleEvent("pageshow",{persisted:!!(event&&event.persisted)});
+        /* Normal foreground resume never re-runs Startup. A real reload/discard
+           is reconstructed by the existing account-first Startup owner. */
+    });
+
+    document.addEventListener("freeze",function(){
+        markLifecycleEvent("freeze");
+        persistBeforeSuspend("freeze");
+    });
+
+    document.addEventListener("resume",function(){
+        markLifecycleEvent("resume");
+    });
+
+    window.FourSymbolsMobileLifecycleDiagnostics=Object.freeze({
+        getSnapshot:function(){
+            return Object.freeze({
+                wasDiscarded:lifecycleDiagnostics.wasDiscarded,
+                navigationType:lifecycleDiagnostics.navigationType,
+                sessionPreviouslyEntered:lifecycleDiagnostics.sessionPreviouslyEntered,
+                lastEvent:lifecycleDiagnostics.lastEvent,
+                lastEventAt:lifecycleDiagnostics.lastEventAt,
+                lastPageShowPersisted:lifecycleDiagnostics.lastPageShowPersisted,
+                backgroundSaveCount:lifecycleDiagnostics.backgroundSaveCount,
+                eventCounts:Object.freeze(Object.assign({},lifecycleDiagnostics.eventCounts))
+            });
+        }
+    });
 
 })();
 
@@ -6611,10 +6684,26 @@ function saveGame(options={}){
 
 
         const persistenceOptions=options&&typeof options==="object"?options:{};
-        repository.writeForUid(activeUid,saveData,{
-            source:String(persistenceOptions.source||"gameplay"),
-            ...(typeof persistenceOptions.localDirty==="boolean"?{localDirty:persistenceOptions.localDirty}:{})
-        });
+        let endReleaseSaveOperation=null;
+        try{
+            if(
+                window.FourSymbolsReleaseUpdate&&
+                typeof window.FourSymbolsReleaseUpdate.beginCriticalOperation==="function"
+            ){
+                endReleaseSaveOperation=
+                    window.FourSymbolsReleaseUpdate.beginCriticalOperation("account-save-write");
+            }
+        }catch(_){ }
+        try{
+            repository.writeForUid(activeUid,saveData,{
+                source:String(persistenceOptions.source||"gameplay"),
+                ...(typeof persistenceOptions.localDirty==="boolean"?{localDirty:persistenceOptions.localDirty}:{})
+            });
+        }finally{
+            if(typeof endReleaseSaveOperation==="function"){
+                endReleaseSaveOperation();
+            }
+        }
         return true;
 
     }
@@ -8610,14 +8699,9 @@ function enterMap(){
 
 function leaveMap(){
 
-    if(battleActive){
+    if(!exitPatrolContext("leave-map")){
         return;
     }
-
-
-    stopMonsterMovement();
-
-    stopAutoPatrol();
 
     showPage("training");
 
@@ -8714,6 +8798,17 @@ let patrolFightAnimTimeoutIds=
 
 let patrolBattleTransitionPending=
     false;
+
+let patrolLifecycleGeneration=
+    0;
+
+function isPatrolMapActive(){
+    const mapPageElement=$("mapPage");
+    return !!(
+        mapPageElement &&
+        mapPageElement.classList.contains("active")
+    );
+}
 
 
 /*
@@ -9010,6 +9105,9 @@ function playPatrolFightAnimation(callback){
     const t1=
         setTimeout(()=>{
 
+            patrolFightAnimTimeoutIds=
+                patrolFightAnimTimeoutIds.filter(id=>id!==t1);
+
             if(img){
 
                 img.style.transform=
@@ -9025,6 +9123,9 @@ function playPatrolFightAnimation(callback){
 
     const t2=
         setTimeout(()=>{
+
+            patrolFightAnimTimeoutIds=
+                patrolFightAnimTimeoutIds.filter(id=>id!==t2);
 
             patrolInFightAnimation=
                 false;
@@ -9138,6 +9239,8 @@ function stopAutoPatrol(){
     autoPatrolEnabled=
         false;
 
+    patrolLifecycleGeneration++;
+
 
     if(autoPatrolIntervalId){
 
@@ -9210,6 +9313,32 @@ function stopAutoPatrol(){
 
     stopPatrolCharacterWalking();
 
+}
+
+
+function exitPatrolContext(reason){
+
+    if(battleActive){
+        return false;
+    }
+
+    stopMonsterMovement();
+    stopAutoPatrol();
+
+    if(typeof window!=="undefined"){
+        window.v173PatrolLastExitReason=String(reason||"unknown");
+    }
+
+    return true;
+}
+
+if(typeof window!=="undefined"){
+    window.FourSymbolsPatrolLifecycle=Object.freeze({
+        exit:exitPatrolContext,
+        isActive:function(){
+            return autoPatrolEnabled&&isPatrolMapActive();
+        }
+    });
 }
 
 
@@ -9300,15 +9429,8 @@ function runAutoPatrolCheck(){
     }
 
 
-    const mapPageElement=
-        $("mapPage");
-
-
     if(
-        !mapPageElement ||
-        !mapPageElement.classList.contains(
-            "active"
-        )
+        !isPatrolMapActive()
     ){
 
         stopAutoPatrol();
@@ -9353,12 +9475,23 @@ function runAutoPatrolCheck(){
             patrolBattleTransitionPending=
                 true;
 
+            const transitionGeneration=
+                patrolLifecycleGeneration;
+
 
             playPatrolFightAnimation(
                 ()=>{
 
                     patrolBattleTransitionPending=
                         false;
+
+                    if(
+                        transitionGeneration!==patrolLifecycleGeneration ||
+                        !autoPatrolEnabled ||
+                        !isPatrolMapActive()
+                    ){
+                        return;
+                    }
 
 
                     /*
@@ -26073,6 +26206,27 @@ function closeHomeFeature(){
     const modal=
         $("homeFeatureModal");
 
+    const releaseUpdate=
+        window.FourSymbolsReleaseUpdate;
+
+    if(
+        releaseUpdate&&
+        typeof releaseUpdate.shouldPreventSharedModalClose==="function"&&
+        releaseUpdate.shouldPreventSharedModalClose()
+    ){
+        if(typeof releaseUpdate.announceForcedLock==="function"){
+            releaseUpdate.announceForcedLock();
+        }
+        return false;
+    }
+
+    if(
+        releaseUpdate&&
+        typeof releaseUpdate.onSharedModalClosed==="function"
+    ){
+        releaseUpdate.onSharedModalClosed();
+    }
+
 
     if(modal){
 
@@ -28078,6 +28232,21 @@ function claimAchievement(achievementId){
 ===================================================== */
 
 function renderAnnouncementContent(){
+
+    const releaseUpdate=
+        window.FourSymbolsReleaseUpdate;
+
+    if(
+        releaseUpdate&&
+        typeof releaseUpdate.renderAnnouncementContent==="function"
+    ){
+        const releaseContent=
+            releaseUpdate.renderAnnouncementContent();
+
+        if(releaseContent){
+            return releaseContent;
+        }
+    }
 
     return (
 
@@ -33896,6 +34065,15 @@ catch(error){
             history.pushState({rpgExitGuard:true},"",location.href);
             guardRestored=true;
         }catch(_){ }
+
+        if(
+            window.FourSymbolsReleaseUpdate&&
+            typeof window.FourSymbolsReleaseUpdate.isForcedUpdateBlocking==="function"&&
+            window.FourSymbolsReleaseUpdate.isForcedUpdateBlocking()
+        ){
+            window.FourSymbolsReleaseUpdate.announceForcedLock();
+            return;
+        }
 
         if(exitPromptOpen){ return; }
         exitPromptOpen=true;

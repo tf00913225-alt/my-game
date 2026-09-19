@@ -1,11 +1,12 @@
 {
   "schemaVersion": 1,
-  "version": "173.65",
-  "cacheVersion": "173.65",
+  "version": "173.66",
+  "cacheVersion": "173.66",
   "status": "READY",
   "loaderFile": "js/20-anonymous-20.js",
   "requirementsFile": "release/requirements.json",
   "deprecatedCodeFile": "release/deprecated-code.json",
   "managedCacheReferences": [],
+  "updateNoticeFile": "release/release-update.json",
   "releaseNotesFile": "CHANGELOG.md"
 }

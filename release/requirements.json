@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "releaseVersion": "173.65",
+  "releaseVersion": "173.66",
   "requirements": [
     {
       "id": "REQ-01",
@@ -145,6 +145,23 @@
         ],
         "verification": "GitHub Pages platform-managed build/deploy head_sha 與 protected main HEAD 核對",
         "result": "Production Pages Run #100 build/deploy 與 main CI Run #770 均綁定 main SHA ac735f17b5e9ed3526b689bffbf68a2a2c94860c"
+      }
+    },
+    {
+      "id": "REQ-11",
+      "title": "正式版本更新通知與玩家公告 Release Contract",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "release/release-update.json",
+          "js/release-update-notification.js",
+          "css/release-update-notification.css",
+          "tests/release-update-notification-system.test.js",
+          ".github/scripts/run-release-update-notification-browser-qa.mjs",
+          "docs/RELEASE_VERIFICATION_RULES.md"
+        ],
+        "verification": "targeted A–J、production build/build check、Release Gate，以及 PR #344 CI 的 360×800／390×844／412×915 mobile browser QA",
+        "result": "GitHub Actions CI run 35445108483 已通過；同一 run 完成更新通知 browser QA、既有戰鬥 QA、靜態資源、loader 與 Release Gate 檢查。"
       }
     }
   ]

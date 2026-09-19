@@ -256,28 +256,41 @@
                 return '<div class="shop-potion-card '+item.resource+'">'+
                     '<div class="shop-potion-card-head"><span class="shop-potion-type">'+label+'</span><span class="shop-potion-stock">持有 '+getPotionCount(item.id)+'</span></div>'+
                     '<div class="shop-potion-name">'+escapeHtml(item.name)+'</div><div class="shop-potion-effect">回復最大'+label+'的 '+item.recoveryPercent+'%</div>'+
-                    '<div class="shop-potion-purchase-row"><label for="shopQuantity-'+item.id+'">數量</label><input id="shopQuantity-'+item.id+'" class="shop-potion-quantity" data-unit-price="'+price+'" type="number" inputmode="numeric" min="1" max="9999" step="1" value="1" oninput="v146UpdateShopTotal(\''+item.id+'\')">'+
+                    '<div class="shop-potion-purchase-row"><label for="shopQuantity-'+item.id+'">數量</label><input id="shopQuantity-'+item.id+'" class="shop-potion-quantity" data-unit-price="'+price+'" type="number" inputmode="numeric" min="1" max="999" step="1" value="1" oninput="v146UpdateShopTotal(\''+item.id+'\')">'+
                     '<span class="v146-shop-total" id="shopTotal-'+item.id+'">'+price+' 金幣</span><button class="home-feature-buy-btn shop-potion-buy" '+(gold<price?'disabled':'')+' onclick="buyShopItem(\''+item.id+'\',document.getElementById(\'shopQuantity-'+item.id+'\').value)">購買</button></div></div>';
             }).join("");
-            return '<div class="shop-potion-interface"><div class="shop-potion-note">只販售 HP／SP 10%、20%、30% 回復藥水</div>'+
+            return '<div class="v141-shop-wallet">目前金幣 <b>'+Math.max(0,Math.floor(numeric(gold))).toLocaleString("zh-TW")+'</b></div>'+
+                '<div class="shop-potion-interface"><div class="shop-potion-note">只販售 HP／SP 10%、20%、30% 回復藥水</div>'+
                 '<div class="v133-shop-tier-note">目前商店階級：'+tier.label+'（價格×'+tier.multiplier+'）</div><div class="shop-potion-list">'+cards+'</div></div>';
         };
     }
 
     if(typeof buyShopItem==="function"){
-        buyShopItem=function(itemId,requestedQuantity){
-            if(!SHOP_POTION_IDS.includes(itemId)){ return; }
+        buyShopItem=async function(itemId,requestedQuantity){
+            if(!SHOP_POTION_IDS.includes(itemId)){ return false; }
             const item=getPotionDefinition(itemId);
-            if(!item){ return; }
-            const quantity=Math.max(1,Math.min(9999,Math.floor(numeric(requestedQuantity)||1)));
+            if(!item){ return false; }
+            const quantity=typeof window.normalizeShopPurchaseQuantity==="function"
+                ?window.normalizeShopPurchaseQuantity(requestedQuantity)
+                :Math.max(1,Math.min(999,Math.floor(numeric(requestedQuantity)||1)));
             const unitPrice=shopUnitPrice(item);
             const totalPrice=unitPrice*quantity;
-            if(gold<totalPrice){ alert("金幣不夠，本次需要 "+totalPrice.toLocaleString("zh-TW")+" 金幣。"); return; }
-            if(!addPotionToInventory(itemId,quantity)){ alert("背包已滿，或該藥水已沒有可用的堆疊空間。"); return; }
+            if(
+                typeof window.rpgConfirm==="function" &&
+                !await window.rpgConfirm(
+                    "確認購買「"+item.name+"」×"+quantity+"？\n將消耗 "+totalPrice.toLocaleString("zh-TW")+" 金幣。",
+                    {title:"商店購買",confirmText:"確定購買",cancelText:"返回"}
+                )
+            ){
+                return false;
+            }
+            if(gold<totalPrice){ alert("金幣不夠，本次需要 "+totalPrice.toLocaleString("zh-TW")+" 金幣。"); return false; }
+            if(!addPotionToInventory(itemId,quantity)){ alert("背包已滿，或該藥水已沒有可用的堆疊空間。"); return false; }
             gold-=totalPrice;
             rebuildInventorySlots(); updateGoldDisplay(); saveGame();
             const body=document.getElementById("homeFeatureModalBody");
             if(body){ body.innerHTML=renderShopContent(); }
+            return true;
         };
     }
 
@@ -859,7 +872,10 @@
         const input=document.getElementById("shopQuantity-"+itemId);
         const output=document.getElementById("shopTotal-"+itemId);
         if(!input||!output){ return 0; }
-        const quantity=Math.max(1,Math.min(9999,Math.floor(numeric(input.value)||1)));
+        const quantity=typeof window.normalizeShopPurchaseQuantity==="function"
+            ?window.normalizeShopPurchaseQuantity(input.value)
+            :Math.max(1,Math.min(999,Math.floor(numeric(input.value)||1)));
+        input.value=String(quantity);
         const unitPrice=Math.max(0,Math.floor(numeric(input.dataset.unitPrice)));
         const total=quantity*unitPrice;
         output.textContent=total.toLocaleString("zh-TW")+" 金幣";
@@ -4994,8 +5010,9 @@
                 stats:getPartyBattleStats(characterIndex)
             };
             if(
-                !entry.character||entry.character.hp<=0||!entry.config||!entry.stats||
-                (!entry.config.enabled&&!elementBoxActive)
+                !entry.character||!entry.config||!entry.stats||
+                (!entry.config.enabled&&!elementBoxActive)||
+                (Number(entry.character.hp)<=0&&!elementBoxActive)
             ){ return null; }
             return entry;
         }).filter(Boolean);
@@ -5010,6 +5027,9 @@
                     const character=entry.character;
                     const config=entry.config;
                     const stats=entry.stats;
+                    if(resource==="sp"&&(Number(character.hp)||0)<=0){
+                        return;
+                    }
                     const maxValue=resource==="hp"?Number(stats.maxHP):Number(stats.maxSP);
                     const threshold=normalizeAutoBattleThreshold(
                         config[resource],

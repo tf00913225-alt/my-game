@@ -14,10 +14,10 @@ function createEmitter(){
             if(!listeners.has(name)){ listeners.set(name,[]); }
             listeners.get(name).push({handler,once:!!options.once});
         },
-        emit(name){
+        emit(name,detail={}){
             const entries=[...(listeners.get(name)||[])];
             for(const entry of entries){
-                entry.handler({type:name});
+                entry.handler(Object.assign({type:name},detail));
                 if(entry.once){
                     const current=listeners.get(name)||[];
                     const index=current.indexOf(entry);
@@ -32,6 +32,8 @@ function createHarness({supported=true,rejectRequest=false,deferRequest=false}={
     const documentEvents=createEmitter();
     const windowEvents=createEmitter();
     const deferred=[];
+    const timers=new Map();
+    let timerSerial=0;
     let requestCount=0;
     let releaseCount=0;
     let currentSentinel=null;
@@ -71,9 +73,23 @@ function createHarness({supported=true,rejectRequest=false,deferRequest=false}={
     }:{};
 
     const document={visibilityState:"visible",addEventListener:documentEvents.addEventListener};
-    const window={navigator,document,addEventListener:windowEvents.addEventListener};
+    const window={
+        navigator,
+        document,
+        addEventListener:windowEvents.addEventListener,
+        setTimeout(handler,delay){
+            const id=++timerSerial;
+            timers.set(id,{handler,delay});
+            return id;
+        },
+        clearTimeout(id){ timers.delete(id); }
+    };
     window.window=window;
-    const context={window,document,navigator,Promise,globalThis:window};
+    const context={
+        window,document,navigator,Promise,
+        setTimeout:window.setTimeout,clearTimeout:window.clearTimeout,
+        globalThis:window
+    };
 
     function install(){ vm.runInNewContext(runtimeSource,context,{filename:"screen-wake-lock-runtime.js"}); }
     install();
@@ -82,12 +98,19 @@ function createHarness({supported=true,rejectRequest=false,deferRequest=false}={
         window,
         document,
         install,
-        async flush(){ for(let index=0;index<8;index++){ await Promise.resolve(); } },
+        async flush(){ for(let index=0;index<10;index++){ await Promise.resolve(); } },
         resolveNextRequest(){ const resolve=deferred.shift(); assert.ok(resolve,"expected a deferred request"); resolve(); },
+        runNextTimer(){
+            const first=[...timers.entries()].sort((a,b)=>a[0]-b[0])[0];
+            assert.ok(first,"expected a scheduled retry timer");
+            timers.delete(first[0]);
+            first[1].handler();
+        },
         emitDocument:event=>documentEvents.emit(event),
-        emitWindow:event=>windowEvents.emit(event),
+        emitWindow:(event,detail)=>windowEvents.emit(event,detail),
         get requestCount(){ return requestCount; },
         get releaseCount(){ return releaseCount; },
+        get pendingTimerCount(){ return timers.size; },
         get currentSentinel(){ return currentSentinel; }
     };
 }
@@ -100,6 +123,10 @@ test("visible game page acquires one screen wake lock and avoids duplicate reque
     assert.equal(harness.window.FourSymbolsScreenWakeLock.isHeld(),true);
     assert.equal(await harness.window.FourSymbolsScreenWakeLock.acquire(),true);
     assert.equal(harness.requestCount,1);
+    const diagnostics=harness.window.FourSymbolsScreenWakeLock.getDiagnostics();
+    assert.equal(diagnostics.supported,true);
+    assert.equal(diagnostics.held,true);
+    assert.equal(diagnostics.status,"held");
 });
 
 test("visibility lifecycle actively releases while hidden and reacquires in foreground",async()=>{
@@ -110,6 +137,7 @@ test("visibility lifecycle actively releases while hidden and reacquires in fore
     await harness.flush();
     assert.equal(harness.releaseCount,1);
     assert.equal(harness.window.FourSymbolsScreenWakeLock.isHeld(),false);
+    assert.equal(harness.window.FourSymbolsScreenWakeLock.getDiagnostics().lastReleaseReason,"visibility-hidden");
     harness.document.visibilityState="visible";
     harness.emitDocument("visibilitychange");
     await harness.flush();
@@ -117,17 +145,49 @@ test("visibility lifecycle actively releases while hidden and reacquires in fore
     assert.equal(harness.window.FourSymbolsScreenWakeLock.isHeld(),true);
 });
 
-test("pageshow reacquires after a browser release and pagehide releases the active lock",async()=>{
+test("system release while still visible automatically reacquires exactly one lock",async()=>{
     const harness=createHarness();
     await harness.flush();
     harness.currentSentinel.systemRelease();
+    await harness.flush();
+    assert.equal(harness.requestCount,2);
+    assert.equal(harness.window.FourSymbolsScreenWakeLock.isHeld(),true);
+    assert.equal(harness.window.FourSymbolsScreenWakeLock.getDiagnostics().lastAcquireReason,"system-release");
+});
+
+test("rejected requests use bounded throttled retry without crashing or looping",async()=>{
+    const harness=createHarness({rejectRequest:true});
+    await harness.flush();
+    assert.equal(harness.requestCount,1);
+    assert.equal(harness.pendingTimerCount,1);
+    assert.equal(harness.window.FourSymbolsScreenWakeLock.isHeld(),false);
+    assert.equal(harness.window.FourSymbolsScreenWakeLock.getDiagnostics().lastFailureReason,"wake lock denied");
+
+    harness.runNextTimer();
+    await harness.flush();
+    assert.equal(harness.requestCount,2);
+    assert.equal(harness.pendingTimerCount,1);
+
+    harness.runNextTimer();
+    await harness.flush();
+    assert.equal(harness.requestCount,3);
+    assert.equal(harness.pendingTimerCount,0);
+    assert.equal(harness.window.FourSymbolsScreenWakeLock.getDiagnostics().status,"retry-exhausted");
+});
+
+test("pagehide cancels pending retry and pageshow can start a fresh foreground attempt",async()=>{
+    const harness=createHarness({rejectRequest:true});
+    await harness.flush();
+    assert.equal(harness.pendingTimerCount,1);
+    harness.document.visibilityState="hidden";
+    harness.emitWindow("pagehide");
+    await harness.flush();
+    assert.equal(harness.pendingTimerCount,0);
+    harness.document.visibilityState="visible";
     harness.emitWindow("pageshow");
     await harness.flush();
     assert.equal(harness.requestCount,2);
-    harness.emitWindow("pagehide");
-    await harness.flush();
-    assert.equal(harness.releaseCount,1);
-    assert.equal(harness.window.FourSymbolsScreenWakeLock.isHeld(),false);
+    assert.equal(harness.pendingTimerCount,1);
 });
 
 test("release invalidates and frees a wake lock request that resolves late",async()=>{
@@ -156,19 +216,14 @@ test("pageshow queues a fresh request when pagehide invalidated an in-flight req
     assert.equal(harness.window.FourSymbolsScreenWakeLock.isHeld(),true);
 });
 
-test("unsupported Screen Wake Lock API and rejected requests degrade safely",async()=>{
-    const unsupported=createHarness({supported:false});
-    await unsupported.flush();
-    assert.equal(unsupported.window.FourSymbolsScreenWakeLock.isSupported(),false);
-    assert.equal(await unsupported.window.FourSymbolsScreenWakeLock.acquire(),false);
-    assert.equal(unsupported.requestCount,0);
-
-    const rejected=createHarness({rejectRequest:true});
-    await rejected.flush();
-    assert.equal(rejected.requestCount,1);
-    assert.equal(rejected.window.FourSymbolsScreenWakeLock.isHeld(),false);
-    assert.equal(await rejected.window.FourSymbolsScreenWakeLock.acquire(),false);
-    assert.equal(rejected.requestCount,2);
+test("unsupported Screen Wake Lock API degrades safely",async()=>{
+    const harness=createHarness({supported:false});
+    await harness.flush();
+    assert.equal(harness.window.FourSymbolsScreenWakeLock.isSupported(),false);
+    assert.equal(await harness.window.FourSymbolsScreenWakeLock.acquire(),false);
+    assert.equal(harness.requestCount,0);
+    assert.equal(harness.pendingTimerCount,0);
+    assert.equal(harness.window.FourSymbolsScreenWakeLock.getDiagnostics().status,"unsupported");
 });
 
 test("install guard prevents duplicate runtime and listener installation",async()=>{

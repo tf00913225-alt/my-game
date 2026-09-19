@@ -684,10 +684,24 @@
 
     function runInventoryTransaction(operation){
         const snapshot=cloneInventorySnapshot();
+        let endReleaseInventoryOperation=null;
+        try{
+            if(
+                window.FourSymbolsReleaseUpdate&&
+                typeof window.FourSymbolsReleaseUpdate.beginCriticalOperation==="function"
+            ){
+                endReleaseInventoryOperation=
+                    window.FourSymbolsReleaseUpdate.beginCriticalOperation("inventory-transaction");
+            }
+        }catch(_){ }
         try{
             if(operation()){ return true; }
         }catch(error){
             console.error("背包交易失敗，已還原：",error);
+        }finally{
+            if(typeof endReleaseInventoryOperation==="function"){
+                endReleaseInventoryOperation();
+            }
         }
         restoreInventorySnapshot(snapshot);
         return false;

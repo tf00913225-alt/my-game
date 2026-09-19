@@ -799,6 +799,15 @@
             showMessage("戰鬥結束後可返回冒險。");
             return false;
         }
+        const patrolLifecycle=window.FourSymbolsPatrolLifecycle;
+        if(!patrolLifecycle||typeof patrolLifecycle.exit!=="function"){
+            showMessage("巡怪離場狀態尚未就緒，請稍後再返回冒險。");
+            return false;
+        }
+        if(!patrolLifecycle.exit("adventure-return")){
+            showMessage("戰鬥結束後可返回冒險。");
+            return false;
+        }
         const state=chapterState();
         const objective=state&&state.objective;
         if(!objective){ return open(); }

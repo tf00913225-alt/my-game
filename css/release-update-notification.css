@@ -1,0 +1,236 @@
+/*
+   Release Update Notification System — visual owner
+   The notice strip lives in the native 1080×1920 overlay. Release detail
+   reuses the existing home-feature modal and keeps exactly one scroll owner.
+*/
+
+#game-stage > #game-overlay-layer .release-update-marquee{
+    position:absolute;
+    left:42px;
+    top:30px;
+    width:996px;
+    min-height:132px;
+    margin:0;
+    padding:18px 26px;
+    box-sizing:border-box;
+    display:grid;
+    grid-template-columns:auto minmax(0,1fr) auto;
+    align-items:center;
+    gap:16px;
+    overflow:hidden;
+    border:2px solid rgba(208,162,72,.9);
+    border-radius:18px;
+    color:#f4ead6;
+    background:
+        linear-gradient(90deg,rgba(88,53,18,.97),rgba(22,17,11,.97) 30%,rgba(11,10,8,.98)),
+        #14100b;
+    box-shadow:0 8px 22px rgba(0,0,0,.5),inset 0 1px rgba(255,230,162,.22);
+    font-family:"Noto Serif TC",serif;
+    text-align:left;
+    cursor:pointer;
+    pointer-events:auto;
+    touch-action:manipulation;
+}
+
+#game-stage > #game-overlay-layer .release-update-marquee[hidden]{
+    display:none;
+}
+
+#game-stage > #game-overlay-layer .release-update-marquee-tag{
+    flex:0 0 auto;
+    padding:7px 13px;
+    border:1px solid rgba(255,218,136,.9);
+    border-radius:8px;
+    color:#271806;
+    background:linear-gradient(180deg,#f8d887,#bf7e2f);
+    font-size:34px;
+    font-weight:900;
+    letter-spacing:.08em;
+    line-height:1;
+    white-space:nowrap;
+}
+
+#game-stage > #game-overlay-layer .release-update-marquee-text{
+    min-width:0;
+    overflow:hidden;
+    color:#f3e5c9;
+    font-size:38px;
+    font-weight:700;
+    line-height:1.2;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+#game-stage > #game-overlay-layer .release-update-marquee-action{
+    flex:0 0 auto;
+    color:#f2c866;
+    font-size:34px;
+    font-weight:900;
+    letter-spacing:.08em;
+    white-space:nowrap;
+}
+
+#game-stage > #game-overlay-layer .release-update-marquee.is-forced{
+    border-color:#e37b59;
+    background:linear-gradient(90deg,rgba(92,30,22,.98),rgba(29,13,10,.98));
+}
+
+#game-stage > #game-overlay-layer .release-update-marquee.is-forced .release-update-marquee-tag{
+    color:#fff0e8;
+    border-color:#f3a184;
+    background:linear-gradient(180deg,#b34f3b,#68241b);
+}
+
+#game-stage > #game-overlay-layer .release-update-marquee.is-pending .release-update-marquee-action{
+    color:#f6d18c;
+}
+
+#game-stage #homeFeatureModal.release-update-modal{
+    padding:14px;
+}
+
+#game-stage #homeFeatureModal.release-update-modal .home-feature-modal-box{
+    width:min(94%,390px);
+    max-width:390px;
+    max-height:88dvh;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    box-sizing:border-box;
+}
+
+#game-stage #homeFeatureModal.release-update-modal .home-feature-modal-title{
+    flex:0 0 auto;
+    margin-bottom:0;
+    padding-bottom:10px;
+}
+
+#game-stage #homeFeatureModal.release-update-modal #homeFeatureModalBody{
+    flex:1 1 auto;
+    min-height:0;
+    overflow-x:hidden;
+    overflow-y:auto;
+    padding:12px 2px 2px;
+    box-sizing:border-box;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior-y:contain;
+    touch-action:pan-y;
+}
+
+#game-stage #homeFeatureModal.release-update-modal.release-update-forced .home-feature-close-btn{
+    display:none;
+}
+
+#game-stage #homeFeatureModal.release-update-modal .release-update-detail,
+#game-stage #homeFeatureModal.release-update-modal .release-update-announcement{
+    color:#f1e7d4;
+    font-size:16px;
+    line-height:1.65;
+}
+
+#game-stage #homeFeatureModal.release-update-modal .release-update-version,
+#game-stage #homeFeatureModal.release-update-modal .release-update-announcement-version{
+    margin:0 0 8px;
+    color:#f4ca72;
+    font-size:18px;
+    font-weight:900;
+    letter-spacing:.04em;
+}
+
+#game-stage #homeFeatureModal.release-update-modal .release-update-intro,
+#game-stage #homeFeatureModal.release-update-modal .release-update-announcement-status{
+    margin:0 0 12px;
+    color:#d8c6a4;
+}
+
+#game-stage #homeFeatureModal.release-update-modal .release-update-detail h3{
+    margin:0 0 7px;
+    color:#f1cf86;
+    font-size:17px;
+}
+
+#game-stage #homeFeatureModal.release-update-modal .release-update-notes{
+    margin:0;
+    padding-left:1.35em;
+}
+
+#game-stage #homeFeatureModal.release-update-modal .release-update-notes li{
+    margin:0 0 8px;
+}
+
+#game-stage #homeFeatureModal.release-update-modal .release-update-published{
+    margin:14px 0 0;
+    color:#ae9c7e;
+    font-size:14px;
+}
+
+#game-stage #homeFeatureModal.release-update-modal .release-update-suppress-today{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:7px;
+    margin:12px 1px -4px;
+    color:#baa98c;
+    font-size:13px;
+    font-weight:700;
+    line-height:18px;
+    cursor:pointer;
+    user-select:none;
+}
+
+#game-stage #homeFeatureModal.release-update-modal .release-update-suppress-today-input{
+    width:18px;
+    height:18px;
+    margin:0;
+    flex:0 0 18px;
+    accent-color:#d3a04c;
+    cursor:pointer;
+}
+
+#game-stage #homeFeatureModal.release-update-modal .release-update-actions{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+    margin-top:18px;
+}
+
+#game-stage #homeFeatureModal.release-update-modal .release-update-actions:has(:only-child){
+    grid-template-columns:minmax(0,1fr);
+}
+
+#game-stage #homeFeatureModal.release-update-modal .release-update-actions button,
+#game-stage #homeFeatureModal .release-update-announcement .release-update-primary{
+    min-height:52px;
+    padding:8px 12px;
+    font-size:16px;
+    font-weight:900;
+    letter-spacing:.04em;
+}
+
+#game-stage #homeFeatureModal.release-update-modal .release-update-primary,
+#game-stage #homeFeatureModal .release-update-announcement .release-update-primary{
+    color:#2b1907;
+    border-color:#e2b961;
+    background:linear-gradient(180deg,#f5d98a,#c48632);
+    text-shadow:none;
+}
+
+#game-stage #homeFeatureModal .release-update-announcement{
+    max-width:34em;
+    margin:0 auto;
+    padding:4px 3px 16px;
+    color:#ded1b8;
+    font-size:16px;
+    line-height:1.7;
+    overflow-wrap:anywhere;
+}
+
+#game-stage #homeFeatureModal .release-update-announcement p{
+    margin:0 0 10px;
+}
+
+#game-stage #homeFeatureModal .release-update-announcement .release-update-primary{
+    width:100%;
+    margin-top:4px;
+}
