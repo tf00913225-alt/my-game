@@ -35,10 +35,14 @@ assert.match(relic,/function queueRelicPresentation\(def,onStart,visualContext\)
   "formal relic VFX must start only after target reveal, and battlefield restore must wait for the V143 gate to finish");
 assert.match(relic,/function endRelicCinematic\(node\)[\s\S]*classList\.add\("releasing"\)[\s\S]*waitMs\(RELIC_DIM_OUT_MS\)/,
   "battlefield must fade back in after the relic VFX lifecycle ends");
+const liveQueueSource=relic.slice(
+  relic.indexOf("const generation=relicPresentationGeneration",relic.indexOf("function queueRelicPresentation")),
+  relic.indexOf("function normalizeOwned")
+);
 assert.doesNotMatch(
-  relic.slice(relic.indexOf("function queueRelicPresentation"),relic.indexOf("function normalizeOwned")),
+  liveQueueSource,
   /showBanner\(def\)/,
-  "the old small banner must not compete with the live cinematic identity layer"
+  "the old small banner may remain only as a no-battle-host fallback, never in the live cinematic path"
 );
 assert.match(relic,/function cleanupRelicCutin\(\)[\s\S]*clearRelicTargetFocus\(\)[\s\S]*node\.remove\(\)/,
   "cleanup must remove target focus and cinematic DOM on battle end/reset");
