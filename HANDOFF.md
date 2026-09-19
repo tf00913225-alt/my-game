@@ -1,5 +1,18 @@
 ## 2026-09-19 — DEV 正式版本公告視覺預覽（VERIFIED／main 未修改）
 
+## 2026-09-19 — Release Update 每次登入公告 + 今日不再提醒（3/3 VERIFIED）
+
+- Base：`dev@d2dfc01045ddead0e6ca71888334dc9c8eddccf7`；工作分支：`feature/release-update-daily-login-reminder-20260919`；`main` 不修改。
+- 唯一 runtime owner 仍是 `js/release-update-notification.js`，重用既有 `#homeFeatureModal` 與跑馬燈；沒有第二套公告系統。
+- 當前正式版本公告改為：每次新的登入工作階段進入主城後，自動顯示一次。既有 `last-seen-version`／`last-seen-notice` 只保留已讀／通知語意，不再永久阻止下次登入公告。
+- 公告底部新增小型 checkbox：「今日不再跳出提醒」。勾選後只在 per-UID localStorage sidecar 保存 `noticeId + 玩家裝置當地日期`；同日同公告不再自動跳出，隔日重新顯示；同日若新 `noticeId` 上線，新公告仍顯示。
+- 今日抑制只影響登入自動 Modal，不關閉跑馬燈、新版本偵測、forced update、安全 reload，也不寫入 Cloud Save。
+- CSS owner 仍為 `css/release-update-notification.css`；勾選文字 13px、checkbox 18px，位於發布時間與「我知道了」按鈕之間。
+- Targeted regression 已更新：驗證已讀仍新登入顯示、同一登入只顯示一次、今日抑制、隔日恢復、新 noticeId 繞過舊抑制、原有 normal/forced/update/polling 行為維持。
+- Requirement Batch：`release/requirement-batches/2026-09-19-release-update-daily-login-reminder.json`。目前 3/3 VERIFIED。PR #348 CI run `35452586346` 已全綠：targeted regression、deterministic build:check、Release Update mobile browser QA、Fixed Slot mobile QA、exact-candidate real battle QA、Adventure mobile QA、resources、loader integrity、Release Gate、git-diff 均 SUCCESS。
+- Game／Cache Version 維持 173.65；本輪不修改 `release/release-update.json` 公告內容，正式發布文案仍由既有 dev → main Diff 契約產生。
+
+
 ## 2026-09-19 — Mobile lifecycle／Shop／Element Box／Adventure／Home First Screen 七項根因修復（7/7 VERIFIED）
 
 - Base：`dev@ccf587d0feec8d4790d17834a11b67a6d05bc55f`；工作分支：`fix/mobile-lifecycle-shop-elementbox-adventure-home-hud-20260919`；`main` 全程禁止修改。Requirement Batch：`release/requirement-batches/2026-09-19-mobile-lifecycle-shop-elementbox-adventure-home-hud.json`。

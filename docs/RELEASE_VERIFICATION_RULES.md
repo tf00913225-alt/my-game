@@ -87,12 +87,12 @@ main 若沒有可驗證實際 production SHA 的 deployment owner／workflow，�
 
 - `normal`：背景偵測到新版本後顯示跑馬燈，玩家可查看內容、稍後更新或在安全狀態按「立即更新」。不得自動 reload。
 - `forced`：安全狀態直接顯示不可略過的更新 Modal；戰鬥、結算、領獎、合成、冶煉、商店交易、背包／裝備資料變更、Boss 獎勵與存檔寫入中只標記 pending，完成後才要求更新。不可按背景、ESC、返回鍵或返回按鈕繞過。
-- 已讀只記錄 localStorage account sidecar `release-update-last-seen-version`／`release-update-last-seen-notice`；不進 Cloud Save。相同版本確認後不重複強制跳出；下一個 `noticeId`／版本仍必須正常辨識。
+- `last-seen-version`／`last-seen-notice` 只代表已讀與通知狀態，不再代表「往後登入都不顯示」。玩家每次新的登入工作階段進入主城後，當前正式公告要自動顯示一次。公告底部提供「今日不再跳出提醒」；勾選後以 per-UID localStorage sidecar 保存目前 `noticeId` 與玩家裝置當地日期，只抑制該公告當日的登入自動 Modal。隔日同公告重新顯示；同日若發布新 `noticeId`，新公告仍顯示。此 sidecar 不進 Cloud Save。
 - runtime 每 4 分鐘檢查，另在 startup、頁面回到前景與 online 恢復時以節流檢查。`release/release-update.json` 必須 query cache-bust、`cache: no-store`，並以 `_headers` 排除長期 cache。現況沒有 Service Worker；未來導入 PWA／Service Worker 時，必須先保障此檔 network-first 或不被舊 cache 攔截。
 
 ### 正式發布流程
 
-`功能開發完成 → 合併 dev → dev 驗收 → 自動比對 main...dev 並整理玩家可感知內容 → 更新 Game/Cache Version 與 release manifest 欄位 → Requirement Verification／最終 CI → dev → main → main 發布完成 → 在線玩家背景發現新版 → 跑馬燈／完整內容 → 玩家安全時 reload → 新登入玩家首次看一次公告`。
+`功能開發完成 → 合併 dev → dev 驗收 → 自動比對 main...dev 並整理玩家可感知內容 → 更新 Game/Cache Version 與 release manifest 欄位 → Requirement Verification／最終 CI → dev → main → main 發布完成 → 在線玩家背景發現新版 → 跑馬燈／完整內容 → 玩家安全時 reload → 每次新登入進主城自動顯示當前公告一次（若已勾選今日不再跳出則當日略過）`。
 
 ## 7. 能自動驗證的規格必須進 CI
 

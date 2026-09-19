@@ -27,6 +27,7 @@
 4. Runtime 只可維持一個 3～5 分鐘版本 polling interval；visibility／online 使用節流。延後更新期間的單一短期 recheck timer 必須在 pending work 結束後清除，不得演變成第二套全域 timer。
 5. `release/release-update.json` 由 `release-gate` 驗證，並以 `no-store`／cache-busting 請求；未來加入 Service Worker 或 PWA 前，必須明確把此檔排除於長期 cache 或補上等價的 network-first 規則與跨版本測試。
 6. DEV／本機視覺驗收只可使用同一 runtime 的 `?releaseUpdatePreview=marquee` 或 `?releaseUpdatePreview=modal`。它只允許精確 hostname：`dev.four-symbols-dev.pages.dev`、`localhost`、`127.0.0.1`、`::1`；必須沿用正式 manifest、跑馬燈與共用 Modal，不得寫入已讀狀態或 reload，且 `main` 不得啟用。
+7. 當前正式公告在每次新的登入工作階段進入主城時最多自動顯示一次；是否已讀不得取消下一次登入顯示。唯一同日抑制機制是 per-UID sidecar 的 `noticeId + local date`，UI 文字固定為「今日不再跳出提醒」。此抑制只影響登入自動 Modal，不得停用新版本跑馬燈、forced update（強制更新）或新 `noticeId`。
 
 ## Boot Architecture
 

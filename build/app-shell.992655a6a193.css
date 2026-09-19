@@ -3352,6 +3352,29 @@ html body .skill-preview-modal.v141-body-preview .skill-preview-body{
     font-size:14px;
 }
 
+#game-stage #homeFeatureModal.release-update-modal .release-update-suppress-today{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:7px;
+    margin:12px 1px -4px;
+    color:#baa98c;
+    font-size:13px;
+    font-weight:700;
+    line-height:18px;
+    cursor:pointer;
+    user-select:none;
+}
+
+#game-stage #homeFeatureModal.release-update-modal .release-update-suppress-today-input{
+    width:18px;
+    height:18px;
+    margin:0;
+    flex:0 0 18px;
+    accent-color:#d3a04c;
+    cursor:pointer;
+}
+
 #game-stage #homeFeatureModal.release-update-modal .release-update-actions{
     display:grid;
     grid-template-columns:repeat(2,minmax(0,1fr));

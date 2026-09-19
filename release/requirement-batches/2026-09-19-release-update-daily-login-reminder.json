@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-19-release-update-daily-login-reminder",
+  "baseBranch": "dev",
+  "baseCommit": "d2dfc01045ddead0e6ca71888334dc9c8eddccf7",
+  "officialVersion": "173.65",
+  "officialVersionBumpAllowed": false,
+  "overallStatus": "VERIFIED",
+  "requirements": [
+    {
+      "id": "NOTICE-01",
+      "status": "VERIFIED",
+      "requirement": "玩家每次新的登入工作階段進入主城後，當前正式版本公告自動顯示一次；既有 last-seen 不得永久阻止後續登入公告。",
+      "evidence": [
+        "js/release-update-notification.js",
+        "tests/release-update-notification-system.test.js"
+      ]
+    },
+    {
+      "id": "NOTICE-02",
+      "status": "VERIFIED",
+      "requirement": "公告底部提供『今日不再跳出提醒』勾選框；只以 per-UID localStorage sidecar 保存 noticeId + 玩家裝置當地日期，同日同公告不再自動跳出，隔日重新顯示，新 noticeId 不受舊抑制影響。",
+      "evidence": [
+        "js/release-update-notification.js",
+        "css/release-update-notification.css",
+        "tests/release-update-notification-system.test.js",
+        "SYSTEM_CONTRACTS.md",
+        "docs/RELEASE_VERIFICATION_RULES.md"
+      ]
+    },
+    {
+      "id": "NOTICE-03",
+      "status": "VERIFIED",
+      "requirement": "每日抑制只影響登入自動 Modal，不停用跑馬燈、新版本偵測、forced update、安全 reload 或 Cloud Save 權威。",
+      "evidence": [
+        "js/release-update-notification.js",
+        "ARCHITECTURE_RULES.md",
+        "tests/release-update-notification-system.test.js"
+      ]
+    }
+  ],
+  "automatedVerification": "PR #348 CI run 35452586346 Repository checks SUCCESS; Release Update targeted regression, deterministic build:check, Release Update mobile browser QA, Fixed Slot mobile QA, exact-candidate real battle QA, Adventure V1 mobile QA, static resources, loader integrity, Release Gate and git-diff all SUCCESS.",
+  "visualVerification": "Release Update mobile browser QA SUCCESS in PR #348 CI run 35452586346; checkbox styling and shared modal behavior verified through the existing release-update mobile QA surface.",
+  "verifiedSourceCommit": "8d98d103072749527e081e619ea7fa5ff487fbd7",
+  "mergedDevCommit": null,
+  "verificationRunId": 35452586346,
+  "verifiedAt": "2026-09-19",
+  "prNumber": 348,
+  "prCiRun": 35452586346
+}
