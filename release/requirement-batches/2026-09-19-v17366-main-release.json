@@ -38,11 +38,11 @@
       "evidence": [
         "PR #349",
         "CI run 35453776605 Repository checks SUCCESS",
-        "V173.66 Release Update targeted regression SUCCESS",
+        "Release Update targeted regression SUCCESS",
         "deterministic build:check SUCCESS",
         "Release Update mobile browser QA SUCCESS",
-        "Fixed Slot mobile QA / exact-candidate real battle QA / Adventure mobile QA SUCCESS",
-        "Release Gate / resources / loader / git-diff SUCCESS"
+        "Fixed Slot / exact-candidate battle / Adventure mobile QA SUCCESS",
+        "Release Gate / loader / resources / git-diff SUCCESS"
       ]
     },
     {
@@ -58,8 +58,8 @@
       "evidence": []
     }
   ],
-  "automatedVerification": "RELEASE_CANDIDATE_PR_349_CI_SUCCESS_PENDING_DEV_MERGE_AND_DEPLOY",
-  "visualVerification": "PR #349 Release Update mobile browser QA SUCCESS; formal dev deployment still pending.",
+  "automatedVerification": "REL-03 VERIFIED on PR #349 CI run 35453776605; awaiting merge to dev and exact-SHA DEV deployment before REL-04.",
+  "visualVerification": "Release Update mobile browser QA, Fixed Slot mobile QA, exact-candidate battle QA and Adventure mobile QA SUCCESS on PR #349 CI run 35453776605.",
   "verifiedSourceCommit": "8da0de53a00199fbefb91ed358beeb3e6c99d728",
   "mergedDevCommit": null,
   "mergedMainCommit": null,
