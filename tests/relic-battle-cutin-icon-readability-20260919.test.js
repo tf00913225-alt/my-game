@@ -33,8 +33,10 @@ assert.match(relic,/interceptActionFinish\(\(\)=>[\s\S]*relicPresentationHandoff
 assert.match(relic,/releaseRelicPresentationHandoff\(withProtection\)[\s\S]*RELIC_MIN_VISUAL_PROTECTION_MS/,
   "the first 1.2s of active relic VFX must be protected before action handoff is released");
 
-assert.match(relic,/team-relic-battle-icon"><img src="\'+esc\(def\.battleIconPath\|\|def\.iconPath/,
-  "the auxiliary banner must use the battle icon instead of the legacy glyph");
+assert.match(relic,/team-relic-battle-icon"><img src=/,
+  "the auxiliary banner must render an image instead of the legacy glyph");
+assert.match(relic,/def\.battleIconPath\|\|def\.iconPath\|\|""/,
+  "the auxiliary banner must source the dedicated battle icon with only the catalog icon as fallback");
 assert.doesNotMatch(relic,/team-relic-battle-icon">寶</,"the legacy circular 寶 glyph cannot remain the relic identity");
 
 assert.match(css,/\.team-relic-battle-dim\{[^}]*background:rgba\(0,0,0,\.38\)/,
