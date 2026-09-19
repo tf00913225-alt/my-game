@@ -11,6 +11,10 @@ const timing=fs.readFileSync("js/37-v142-skill-animation.js","utf8");
 const fireWindEarthRules=fs.readFileSync("js/43-v149-skill-ui-rules.js","utf8");
 const waterRules=fs.readFileSync("js/50-v169-water-skill-rules.js","utf8");
 const bossSystem=fs.readFileSync("js/gameplay-boss-tower-system.js","utf8");
+const relicRuntime=fs.readFileSync("js/60-team-relic-system.js","utf8");
+const relicCss=fs.readFileSync("css/55-team-relic-system.css","utf8");
+const legacyBattleCss=fs.readFileSync("css/12-stage-v45-battle-black-overlay-skill-text.css","utf8");
+const v143Css=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");
 
 function sourceTargetType(source,id){
     const start=source.indexOf(id+":{");
@@ -116,4 +120,37 @@ assert.match(bossSystem,/if\(targetType==="all"\|\|targetType==="enemyAll"\)\{ r
 assert.match(bossSystem,/return alive\.includes\(primaryIndex\)\?\[primaryIndex\]:\[\]/,"non-all Boss skills hit only the selected entity");
 assert.doesNotMatch(bossSystem,/blockingShield|mandatoryMechanismTarget|resolveMechanismAction/);
 
-console.log("Battle drawer layout and four-element VFX range contract passed.");
+/* Relic cinematic target stacking shares the canonical battle/VFX geometry. */
+assert.match(legacyBattleCss,/#battlePage > \.battle-wrap\{[\s\S]*z-index:1 !important;/,
+    "the historical battle-wrap stacking context is the regression root");
+assert.match(relicRuntime,/battlePage\.querySelector\("\.battle-wrap"\)[\s\S]*host\.appendChild\(node\)/,
+    "relic cinematic must render inside the existing battle-wrap stacking context");
+assert.match(relicRuntime,/function relicTargetLayer\(card\)[\s\S]*\.v-fixed-enemy-slot,\.v-fixed-ally-slot,\.v-fixed-boss-footprint/,
+    "enemy, ally and Boss target entities must elevate their real Fixed Slot carrier");
+assert.match(relicRuntime,/relicFocusedTargetLayers=Array\.from\(new Set\(relicFocusedTargetCards\.map\(relicTargetLayer\)\.filter\(Boolean\)\)\)/);
+assert.match(relicCss,/\.v-fixed-enemy-slot\.team-relic-battle-target-layer,[\s\S]*\.v-fixed-ally-slot\.team-relic-battle-target-layer,[\s\S]*\.v-fixed-boss-footprint\.team-relic-battle-target-layer\{z-index:6105!important;\}/);
+const relicDimZ=Number((relicCss.match(/team-relic-battle-dim\{[^}]*z-index:(\d+)/)||[])[1]);
+const relicTargetZ=Number((relicCss.match(/team-relic-battle-target-layer\{z-index:(\d+)!important/ )||[])[1]);
+const relicIdentityZ=Number((relicCss.match(/team-relic-battle-cutin\{[^}]*z-index:(\d+)/)||[])[1]);
+const formalVfxZ=Number((v143Css.match(/\.v143-skill-stage\{[^}]*z-index:(\d+)/)||[])[1]);
+assert.equal(relicDimZ,6090);
+assert.equal(relicTargetZ,6105);
+assert.equal(relicIdentityZ,6120);
+assert.equal(formalVfxZ,16000);
+assert.ok(relicDimZ<relicTargetZ&&relicTargetZ<relicIdentityZ&&relicTargetZ<formalVfxZ,
+    "target units must paint above dim but below relic identity and formal V143 VFX");
+
+const relicPresentation=relicRuntime.slice(
+    relicRuntime.indexOf("const RELIC_VFX_PRESENTATION=Object.freeze({"),
+    relicRuntime.indexOf("const RELIC_BATTLE_ICON_PATHS=Object.freeze({")
+);
+const relicTargetModes=Array.from(relicPresentation.matchAll(/\b(relic_[a-z0-9_]+):relicVfx\([^\n]*?"(allyAll|enemyAll|singleAlly|singleEnemy)"\)/g));
+assert.equal(relicTargetModes.length,20,"all 20 relic battle presentations share the audited target pipeline");
+assert.deepEqual(
+    Array.from(new Set(relicTargetModes.map(match=>match[2]))).sort(),
+    ["allyAll","enemyAll","singleAlly","singleEnemy"].sort()
+);
+assert.match(relicRuntime,/resolvedTarget=relicVfxTarget[\s\S]*beginRelicCinematic\(def,resolvedTarget\)[\s\S]*playRelicVfx\([\s\S]*resolvedTarget/,
+    "the same resolved target set must drive both highlighting and formal relic VFX");
+
+console.log("Battle drawer layout, four-element VFX range and relic target stacking contracts passed.");

@@ -955,6 +955,9 @@
 #game-stage #battlePage .team-relic-battle-cutin-icon img{display:block;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 8px 12px rgba(0,0,0,.68));}
 #game-stage #battlePage .team-relic-battle-cutin-copy{display:block;max-width:100%;margin:8px 0 0;padding:0;border:0;background:none;box-shadow:none;text-align:center;text-shadow:0 2px 5px #000;}
 #game-stage #battlePage .team-relic-battle-cutin-copy strong{display:block;max-width:100%;color:#ffe5ad;font:900 clamp(23px,7vw,31px)/1.2 "Noto Serif TC",serif;letter-spacing:.08em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#game-stage #battlePage .v-fixed-enemy-slot.team-relic-battle-target-layer,
+#game-stage #battlePage .v-fixed-ally-slot.team-relic-battle-target-layer,
+#game-stage #battlePage .v-fixed-boss-footprint.team-relic-battle-target-layer{z-index:6105!important;}
 #game-stage #battlePage .battle-player.team-relic-battle-target-focus,
 #game-stage #battlePage .battle-monster.team-relic-battle-target-focus{z-index:6105!important;opacity:.30!important;filter:brightness(.24) saturate(.55)!important;transition:opacity .42s ease,filter .42s ease!important;}
 #game-stage #battlePage .battle-player.team-relic-battle-target-focus.team-relic-battle-target-focus-visible,
