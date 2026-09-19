@@ -18,6 +18,13 @@
     const REQUEST_TIMEOUT_MS=8000;
     const PENDING_RECHECK_MS=1500;
     const STORAGE_NAMESPACE="four-symbols:release-update:";
+    const DEV_PREVIEW_QUERY="releaseUpdatePreview";
+    const DEV_PREVIEW_HOSTS=new Set([
+        "dev.four-symbols-dev.pages.dev",
+        "localhost",
+        "127.0.0.1",
+        "::1"
+    ]);
 
     const state={
         started:false,
@@ -34,11 +41,37 @@
         forcedModalLock:false,
         modalOpen:false,
         modalKind:null,
+        devPreviewMode:null,
         criticalOperations:new Map(),
         nextOperationId:1
     };
 
     function now(){ return Date.now(); }
+
+    function getLocationHostname(){
+        try{
+            const location=global.location;
+            const hostname=String(location&&location.hostname||"")
+                .trim()
+                .toLowerCase()
+                .replace(/^\[|\]$/g,"");
+            if(hostname){ return hostname; }
+            const href=String(location&&location.href||"");
+            return href?new URL(href).hostname.toLowerCase().replace(/^\[|\]$/g,""):"";
+        }catch(_){ return ""; }
+    }
+
+    function getDevPreviewMode(){
+        if(!DEV_PREVIEW_HOSTS.has(getLocationHostname())){ return null; }
+        try{
+            const location=global.location;
+            const base=(global.document&&global.document.baseURI)||(location&&location.href)||undefined;
+            const mode=new URL(String(location&&location.href||""),base)
+                .searchParams
+                .get(DEV_PREVIEW_QUERY);
+            return mode==="marquee"||mode==="modal"?mode:null;
+        }catch(_){ return null; }
+    }
 
     function normalizeVersion(value){
         const raw=String(value==null?"":value).trim().replace(/^V/i,"");
@@ -258,6 +291,10 @@
         marquee.addEventListener("click",()=>{
             const manifest=state.manifest;
             if(!manifest){ return; }
+            if(state.devPreviewMode){
+                openReleaseDetail(isForcedForLoadedVersion(manifest)?"forced":"preview");
+                return;
+            }
             if(isForcedForLoadedVersion(manifest)&&!canSafelyReloadForUpdate()){
                 showMarquee(manifest,"forced-pending");
                 schedulePendingResolution();
@@ -316,7 +353,7 @@
 
     function renderReleaseContent(manifest,kind){
         const forced=kind==="forced";
-        const update=kind==="update";
+        const update=kind==="update"||kind==="preview";
         const intro=forced
             ? "目前版本已停止使用，請更新後繼續遊戲。"
             : update
@@ -444,6 +481,10 @@
     function deferNormalUpdate(){
         const manifest=state.manifest;
         if(!manifest){ return; }
+        if(state.devPreviewMode){
+            closeReleaseDetail();
+            return;
+        }
         markCurrentNoticeSeen();
         hideMarquee();
         closeReleaseDetail();
@@ -461,6 +502,10 @@
     function requestReload(){
         const manifest=state.manifest;
         if(!manifest){ return false; }
+        if(state.devPreviewMode){
+            closeReleaseDetail();
+            return false;
+        }
         markCurrentNoticeSeen();
         const forced=isForcedForLoadedVersion(manifest);
         if(!canSafelyReloadForUpdate()){
@@ -596,8 +641,19 @@
         if(!manifest){ return; }
         state.manifest=manifest;
         state.loadedReleaseVersion=getLoadedReleaseVersion();
+        state.devPreviewMode=null;
         if(!manifest.publicNotice||!state.loadedReleaseVersion){
             hideMarquee();
+            return;
+        }
+        const devPreviewMode=getDevPreviewMode();
+        if(devPreviewMode){
+            state.devPreviewMode=devPreviewMode;
+            if(devPreviewMode==="modal"){
+                openReleaseDetail(isForcedForLoadedVersion(manifest)?"forced":"preview");
+            }else{
+                showMarquee(manifest,isForcedForLoadedVersion(manifest)?"forced":"update");
+            }
             return;
         }
         const comparison=compareVersions(state.loadedReleaseVersion,manifest.releaseVersion);
@@ -700,7 +756,8 @@
             criticalOperationCount:state.criticalOperations.size,
             unsafeReasons:getUnsafeReasons().slice(),
             pollIntervalMs:CHECK_INTERVAL_MS,
-            minimumCheckGapMs:MIN_CHECK_GAP_MS
+            minimumCheckGapMs:MIN_CHECK_GAP_MS,
+            devPreviewMode:state.devPreviewMode
         };
     }
 

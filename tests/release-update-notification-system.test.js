@@ -88,7 +88,12 @@ function releaseManifest(version,overrides={}){
     };
 }
 
-function createHarness({loadedVersion="173.41",responses=[],seen=null}={}){
+function createHarness({
+    loadedVersion="173.41",
+    responses=[],
+    seen=null,
+    locationHref="https://example.test/my-game/"
+}={}){
     const elements=new Map();
     const element=id=>{
         const node=new FakeElement(id);
@@ -144,7 +149,11 @@ function createHarness({loadedVersion="173.41",responses=[],seen=null}={}){
         FourSymbolsBattleFlow:{isPresentationActive:()=>false},
         battleActive:false,
         battlePhase:"declare",
-        location:{href:"https://example.test/my-game/",reload(){ reloads++; }},
+        location:{
+            href:locationHref,
+            hostname:new URL(locationHref).hostname,
+            reload(){ reloads++; }
+        },
         addEventListener(type,listener){ (windowListeners[type]||(windowListeners[type]=[])).push(listener); },
         dispatch(type,event={}){ (windowListeners[type]||[]).forEach(listener=>listener(event)); },
         setTimeout(fn,ms){ const id=nextTimer++; timers.set(id,{fn,ms}); return id; },
@@ -201,6 +210,8 @@ async function test(name,callback){
         assert.match(headers,/\/release\/release-update\.json\n\s+Cache-Control: no-cache, no-store, must-revalidate/);
         assert.match(runtimeSource,/cache:"no-store"/);
         assert.match(runtimeSource,/release-update-check/);
+        assert.match(runtimeSource,/releaseUpdatePreview/);
+        assert.match(runtimeSource,/dev\.four-symbols-dev\.pages\.dev/);
         assert.match(read("docs/RELEASE_VERIFICATION_RULES.md"),/自動比對 main\.\.\.dev/);
         assert.match(css,/left:42px;[\s\S]*top:30px;[\s\S]*width:996px;[\s\S]*min-height:132px;/);
         assert.match(css,/pointer-events:auto;/);
@@ -214,6 +225,47 @@ async function test(name,callback){
         await harness.api.checkForUpdate("case-a",{force:true});
         assert.equal(harness.overlay.children.length,0);
         assert.equal(harness.modal.classList.contains("show"),false);
+    });
+
+    await test("DEV-only preview: the same manifest can show the marquee and detail modal without reading or reloading",async()=>{
+        const current=releaseManifest("V173.65");
+        const dev=createHarness({
+            loadedVersion:"173.65",
+            responses:[current],
+            seen:current,
+            locationHref:"https://dev.four-symbols-dev.pages.dev/?releaseUpdatePreview=marquee"
+        });
+        const storageBefore=[...dev.storage.entries()];
+        await dev.api.checkForUpdate("dev-preview",{force:true});
+        assert.equal(dev.api.getState().devPreviewMode,"marquee");
+        assert.equal(dev.overlay.children.length,1);
+        dev.overlay.children[0].dispatch("click");
+        assert.equal(dev.modal.classList.contains("show"),true);
+        assert.match(dev.body.innerHTML,/V173\.65/);
+        assert.match(dev.body.innerHTML,/發現新版本/);
+        assert.equal(dev.api.requestReload(),false);
+        assert.equal(dev.reloads,0);
+        assert.deepEqual([...dev.storage.entries()],storageBefore);
+
+        const ipv6=createHarness({
+            loadedVersion:"173.65",
+            responses:[current],
+            seen:current,
+            locationHref:"http://[::1]/?releaseUpdatePreview=modal"
+        });
+        await ipv6.api.checkForUpdate("ipv6-preview",{force:true});
+        assert.equal(ipv6.api.getState().devPreviewMode,"modal");
+        assert.equal(ipv6.modal.classList.contains("show"),true);
+
+        const main=createHarness({
+            loadedVersion:"173.65",
+            responses:[current],
+            seen:current,
+            locationHref:"https://tf00913225-alt.github.io/my-game/?releaseUpdatePreview=marquee"
+        });
+        await main.api.checkForUpdate("main-preview-attempt",{force:true});
+        assert.equal(main.api.getState().devPreviewMode,null);
+        assert.equal(main.overlay.children.length,0);
     });
 
     await test("Case B/C: a newer normal release shows one cache-busted marquee and its shared detail modal",async()=>{
