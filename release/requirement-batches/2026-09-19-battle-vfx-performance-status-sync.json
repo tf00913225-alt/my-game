@@ -16,7 +16,7 @@
         "js/39-v143-skill-animation.js::syncStatusSpriteEffects()",
         "js/39-v143-skill-animation.js::queueStatusSpriteEffects()"
       ],
-      "implementation": "普通與純傷害技能不再掃描所有狀態；只有具 deferred status 的技能建立相關狀態快照。updateUI 全場刷新改為同一 event loop 合併一次；updateMonsterUI 與角色狀態 badge 改成只同步受影響單位；dispose 會取消尚未執行的狀態刷新。"
+      "implementation": "普通與純傷害技能不再掃描所有狀態；只有具 deferred status 的技能建立相關狀態快照。updateUI 保留同步生命週期但移除原本 0ms 的第二次重複全場掃描；updateMonsterUI 與角色狀態 badge 改成只同步受影響單位；技能命中與卡牌效果的已知目標亦只刷新該單位。"
     }
   ],
   "verification": [
