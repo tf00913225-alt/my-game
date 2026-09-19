@@ -162,9 +162,6 @@
             root.appendChild(alertButton);
         }
 
-        const staleScrim=document.getElementById("battleInsightScrim");
-        if(staleScrim&&typeof staleScrim.remove==="function"){ staleScrim.remove(); }
-
         let statsDrawer=document.getElementById("battleStatsDrawer");
         if(!statsDrawer){
             statsDrawer=document.createElement("aside");
