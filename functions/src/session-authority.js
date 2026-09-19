@@ -25,11 +25,17 @@ function createSessionAuthority({db,FieldValue,HttpsError,now=Date.now}){
         if(!Number.isSafeInteger(authTime)||authTime<=0||authTime>Math.floor(now()/1000)+60){
             fail("SESSION_INVALID");
         }
-        return {uid,authTime};
+        const sourceAuthTime=request.auth.token.authBridge==="android-facebook"
+            ?request.auth.token.sessionSourceAuthTime:null;
+        if(request.auth.token.authBridge==="android-facebook"&&
+           (!Number.isSafeInteger(sourceAuthTime)||sourceAuthTime<=0||sourceAuthTime>authTime)){
+            fail("SESSION_REAUTH_REQUIRED","failed-precondition");
+        }
+        return {uid,authTime,sourceAuthTime};
     }
 
     async function create(request){
-        const {uid,authTime}=identity(request);
+        const {uid,authTime,sourceAuthTime}=identity(request);
         const sessionId=randomBytes(24).toString("base64url");
         const credential=randomBytes(32).toString("base64url");
         return db.runTransaction(async transaction=>{
@@ -47,6 +53,10 @@ function createSessionAuthority({db,FieldValue,HttpsError,now=Date.now}){
              * refresh. Old logins cannot steal authority back by clearing local
              * storage. Equal-second logins require an explicit later sign-in. */
             if(previous&&(authTime<=previous.authTime||Math.floor(now()/1000)-authTime>RECENT_LOGIN_SECONDS)){
+                fail("SESSION_REAUTH_REQUIRED","failed-precondition");
+            }
+            if(previous&&sourceAuthTime!==null&&(sourceAuthTime<previous.authTime||
+               (sourceAuthTime===previous.authTime&&previous.status!=="active"))){
                 fail("SESSION_REAUTH_REQUIRED","failed-precondition");
             }
             const timestamp=FieldValue.serverTimestamp();
@@ -98,6 +108,22 @@ function createSessionAuthority({db,FieldValue,HttpsError,now=Date.now}){
         return {uid,sessionId:supplied.sessionId,revision:record.revision,reference,recordRef};
     }
 
+    /* Native handoffs mint fresh Firebase auth_time values. Fence issue and
+     * redemption, and carry their signed source epoch through the custom token
+     * so a token redeemed before a takeover cannot be replayed afterward. */
+    async function requireCurrentLoginEpoch(transaction,uid,authTime){
+        if(!Number.isSafeInteger(authTime)||authTime<=0){ fail("SESSION_REAUTH_REQUIRED","failed-precondition"); }
+        const snapshot=await transaction.get(authorityRef(uid));
+        if(!snapshot.exists){ return; }
+        const active=snapshot.data();
+        if(active.uid!==uid||active.schemaVersion!==SCHEMA_VERSION||!Number.isSafeInteger(active.authTime)){
+            fail("SESSION_INVALID");
+        }
+        if(authTime<active.authTime||(authTime===active.authTime&&active.status!=="active")){
+            fail("SESSION_REAUTH_REQUIRED","failed-precondition");
+        }
+    }
+
     async function runProtected(request,operation){
         return db.runTransaction(async transaction=>{
             const session=await requireActiveSession(transaction,request);
@@ -120,7 +146,7 @@ function createSessionAuthority({db,FieldValue,HttpsError,now=Date.now}){
             result:"SUCCESS",uid:session.uid,sessionId:session.sessionId,revision:session.revision
         }));
     }
-    return Object.freeze({create,revoke,protectedTest,runProtected,requireActiveSession});
+    return Object.freeze({create,revoke,protectedTest,runProtected,requireActiveSession,requireCurrentLoginEpoch});
 }
 
 module.exports={createSessionAuthority};

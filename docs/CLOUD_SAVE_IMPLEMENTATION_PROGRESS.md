@@ -69,7 +69,7 @@
 - `functions/src/session-authority.js`：唯一 session policy／transaction owner。
 - `functions/index.js`：三支新 callable `createGameSession`、`revokeGameSession`、`protectedTest`；`verifyGameIdentity()` 用 Admin `verifyIdToken(token,true)` 檢查 Firebase 身分與撤銷狀態。
 - 兩支既有存檔 callable 改用 `sessions.runProtected(request, operation)`，**授權檢查與資料寫入在同一 Firestore transaction**；不能在 helper 回傳後另做正式寫入。
-- native auth handoff 仍只負責登入身分交換，不得用作遊戲資料写入入口。
+- native auth handoff 仍只負責登入身分交換。稽核複查發現它可 mint 新 auth_time，故加入必要的相依防護：建立／兌換交接碼均在交易內驗證 source authTime 未被取代；custom token 攜帶 server-issued `sessionSourceAuthTime`，新 session 建立時再次比對，封住「先兌換、取代後才登入」的競態。Firebase revocation 同時檢查來源登入；不改原生 UI 或遊戲資料。
 - 取代交易同時寫入新 record／active pointer 並撤銷上一 record。已先完成的交易可線性化於 takeover 前；B takeover 完成之後才開始的 A 操作必須失敗。
 
 ### 資料結構與安全資訊
@@ -102,7 +102,9 @@
 - `node scripts/build-production.mjs --check` PASS。
 - `scripts/test-session-authority-emulator.mjs`：本機 Auth＋Firestore emulator／direct exported handlers PASS：A 成功、B 取代、A 被拒、B 成功；UID 隔離、tampering、logout、私人路徑 rules、兩支既有 protected writer、併發取代／寫入先後、Firebase revoked／disabled identity 均通過。完整 HTTP callable 結果待本次 CI 回填。
 - 本機 Functions emulator 被執行環境 Unix socket `EPERM` 限制；未放寬平台權限。測試保留 TCP-only direct callable fallback，完整 HTTP callable 由 GitHub emulator job 驗證。
-- `.github/scripts/run-boot-architecture-browser-qa.mjs` 同步新的 session module mock，驗證 backend unavailable 不破壞帳號啟動；本機 Chromium 下載失敗，交由同一 PR 的 GitHub browser gate 實際執行，結果待回填。
+- `.github/scripts/run-boot-architecture-browser-qa.mjs` 同步新的 session module mock；PR #335／Session Authority run `35430277320` 的 account boot browser gate PASS，確認 backend unavailable 不破壞帳號啟動。
+- 第一輪 Repository checks `35430277442` PASS；第一輪 HTTP callable 已跑過 A/B 與併發檢查，最後 revoked-identity assertion 誤將明確 `AUTH_REQUIRED` 視為通用 `UNAUTHENTICATED` 而失敗。修正 test adapter／期望代碼後重跑，不放寬後端檢查、不硬併。
+- 原生 Android 身分交換既有精準測試另 6 tests PASS（未執行裝置 OAuth／整套 Android build）。
 - 併發驗證使用 Firestore document `updateTime` 比較實際提交順序；`serverTimestamp()` 是 server request time，不能把其值誤當 commit ordering。未放寬交易／授權断言。
 - Live Firebase 部署、真正雲端 A/B 與瀏覽器驗收：尚未宣稱通過。
 
@@ -143,7 +145,7 @@
 - **中：** 不做背景 heartbeat／idle expiry／session records retention；此階段以 takeover、logout 或 Firebase 身分撤銷失效。未來加入 expiry／清理時不可刪除 authTime tombstone 使舊登入復活。
 - **中：** Firebase auth_time 精度為秒；相同秒重登需再明確登入，這是保守拒絕，不以 client timestamp 猜順序。
 - **中：** 舊客户端沒有 game session credential，部署後其舊 callable 寫入被拒絕；其 login／readonly read 不受影響。不能為相容而保留無 session 的寫入後門。
-- **中：** native auth handoff 既有交易內 delete 後 throw 會 rollback 清理；清理／一次性交接可靠性屬原生登入獨立任務，未更動。
+- **中：** native auth handoff 既有交易內 delete 後 throw 會 rollback 清理；清理／一次性交接可靠性屬原生登入獨立任務，未更動。部署前舊交接碼／舊 custom login 缺少 source authTime，不能取得新遊戲 session，需原 UID 重新登入／重新產生交接碼。
 - **中：** 同一 Firebase project 為多個前端共用。`main` 程式碼未修改；部署 session authority 的後端安全行為會適用同 project 所有 caller。
 
 ## Backend 部署與 protected-test 操作
@@ -156,10 +158,10 @@ Node.js 22、Java 21（emulator）、Firebase CLI 15.30.0；backend project `fou
 npm --prefix functions ci
 npx --yes firebase-tools@15.30.0 emulators:exec --project demo-four-symbols-session --config firebase.session-emulators.json --only auth,firestore,functions 'node scripts/test-session-authority-emulator.mjs'
 # 使用有權限的 ADC／正式 Secret，不把服務帳號 JSON 寫入 repo：
-npx --yes firebase-tools@15.30.0 deploy --project four-symbols-jianghu --non-interactive --only 'functions:createGameSession,functions:revokeGameSession,functions:protectedTest,functions:bootstrapCloudSave,functions:submitLegacyMigrationCandidate,firestore:rules'
+npx --yes firebase-tools@15.30.0 deploy --project four-symbols-jianghu --non-interactive --only 'functions:createGameSession,functions:revokeGameSession,functions:protectedTest,functions:bootstrapCloudSave,functions:submitLegacyMigrationCandidate,functions:createNativeAuthHandoff,functions:redeemNativeAuthHandoff,firestore:rules'
 ```
 
-Cloudflare 的靜態部署不部署 Firebase。獨立部署只列明這五支函式，保留兩支 native auth handoff；禁止 `--force` 刪除其他函式。若需回退，不可部署回沒有 session check 的 protected writer；應先停止受保護寫入並保留資料，再另修。
+Cloudflare 的靜態部署不部署 Firebase。獨立部署明列三支新 session、兩支既有 save、兩支必要的 native handoff guard，共七支函式；禁止 `--force` 刪除其他函式。部署鎖沿用既有 native-auth backend concurrency group，避免兩個部署互相覆蓋。若需回退，不可部署回沒有 session check 的 protected writer 或沒有 source epoch 的 token issuer；應先停止受保護寫入並保留資料，再另修。
 
 在 DEV 頁面登入後，可於自己的開發工具呼叫（不要貼出 raw credential／ID Token）：
 

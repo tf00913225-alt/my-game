@@ -85,6 +85,14 @@ async function verifyGameIdentity(request){
     try{
         const decoded=await getAdminAuth().verifyIdToken(bearer.slice(7),true);
         if(decoded.uid!==uid){ throw new Error("UID mismatch"); }
+        if(decoded.authBridge==="android-facebook"){
+            const user=await getAdminAuth().getUser(uid);
+            const source=decoded.sessionSourceAuthTime;
+            if(!Number.isSafeInteger(source)||source<=0||source>decoded.auth_time||
+               source*1000<Date.parse(user.tokensValidAfterTime)){
+                throw new Error("Native source login is invalid or revoked");
+            }
+        }
         return {...request,auth:{uid,token:decoded}};
     }catch(_){
         throw new HttpsError("unauthenticated","AUTH_REQUIRED",{code:"AUTH_REQUIRED"});
@@ -113,6 +121,7 @@ function nativeAuthHandoffRef(db,code){
 }
 
 exports.createNativeAuthHandoff=onCall(CALLABLE_OPTIONS,async(request)=>{
+    request=await verifyGameIdentity(request);
     const uid=requireUid(request);
     const provider=authProvider(request);
     if(provider!=="facebook.com"){
@@ -127,12 +136,14 @@ exports.createNativeAuthHandoff=onCall(CALLABLE_OPTIONS,async(request)=>{
         const db=getFirestore();
         const now=Date.now();
         const reference=nativeAuthHandoffRef(db,code);
-        await reference.set({
-            uid,
-            provider,
-            createdAt:Timestamp.fromMillis(now),
-            expiresAt:Timestamp.fromMillis(now+NATIVE_AUTH_HANDOFF_TTL_MS),
-            used:false
+        await db.runTransaction(async transaction=>{
+            await sessions.requireCurrentLoginEpoch(transaction,uid,request.auth.token.auth_time);
+            transaction.create(reference,{
+                uid,provider,authTime:request.auth.token.auth_time,
+                createdAt:Timestamp.fromMillis(now),
+                expiresAt:Timestamp.fromMillis(now+NATIVE_AUTH_HANDOFF_TTL_MS),
+                used:false
+            });
         });
         return {
             ok:true,
@@ -156,7 +167,7 @@ exports.redeemNativeAuthHandoff=onCall(CALLABLE_OPTIONS,async(request)=>{
     try{
         const db=getFirestore();
         const reference=nativeAuthHandoffRef(db,code);
-        const uid=await db.runTransaction(async(transaction)=>{
+        const handoff=await db.runTransaction(async(transaction)=>{
             const snapshot=await transaction.get(reference);
             if(!snapshot.exists){
                 throw new HttpsError("not-found","Native auth handoff is missing or already used.");
@@ -178,14 +189,16 @@ exports.redeemNativeAuthHandoff=onCall(CALLABLE_OPTIONS,async(request)=>{
                 transaction.delete(reference);
                 throw new HttpsError("data-loss","Native auth handoff has no Firebase UID.");
             }
+            const authTime=snapshot.get("authTime");
+            await sessions.requireCurrentLoginEpoch(transaction,ownerUid,authTime);
             transaction.delete(reference);
-            return ownerUid;
+            return {uid:ownerUid,authTime};
         });
 
-        const customToken=await getAdminAuth().createCustomToken(uid,{
-            authBridge:"android-facebook"
+        const customToken=await getAdminAuth().createCustomToken(handoff.uid,{
+            authBridge:"android-facebook",sessionSourceAuthTime:handoff.authTime
         });
-        return {ok:true,uid,customToken};
+        return {ok:true,uid:handoff.uid,customToken};
     }catch(error){
         throw asHttpsError(error);
     }

@@ -64,7 +64,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     concurrency:
-      group: firebase-session-authority-deploy
+      group: firebase-native-auth-backend
       cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
@@ -105,4 +105,4 @@ jobs:
         shell: bash
         run: |
           test "$(git ls-remote origin refs/heads/dev | cut -f1)" = "$GITHUB_SHA"
-          npx --yes firebase-tools@15.30.0 deploy --project four-symbols-jianghu --non-interactive --only 'functions:createGameSession,functions:revokeGameSession,functions:protectedTest,functions:bootstrapCloudSave,functions:submitLegacyMigrationCandidate,firestore:rules'
+          npx --yes firebase-tools@15.30.0 deploy --project four-symbols-jianghu --non-interactive --only 'functions:createGameSession,functions:revokeGameSession,functions:protectedTest,functions:bootstrapCloudSave,functions:submitLegacyMigrationCandidate,functions:createNativeAuthHandoff,functions:redeemNativeAuthHandoff,firestore:rules'

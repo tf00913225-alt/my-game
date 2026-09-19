@@ -1,9 +1,10 @@
 /* Real Auth + Functions + Firestore emulator integration. Never target live data. */
 import assert from "node:assert/strict";
 import {createRequire} from "node:module";
+import {createHash,randomBytes} from "node:crypto";
 const require=createRequire(new URL("../functions/package.json",import.meta.url));
 const {initializeApp}=require("firebase-admin/app");
-const {getFirestore}=require("firebase-admin/firestore");
+const {getFirestore,Timestamp}=require("firebase-admin/firestore");
 const {getAuth}=require("firebase-admin/auth");
 const project="demo-four-symbols-session";
 if(process.env.GCLOUD_PROJECT!==project||process.env.FIRESTORE_EMULATOR_HOST!=="127.0.0.1:18080"||
@@ -27,7 +28,7 @@ async function invoke(name,token,data){
         // and real Firestore transactions. CI also tests the HTTP callable layer.
         let decoded=null;try{decoded=claims(token);}catch(_){}
         try{return await direct[name].run({data,auth:decoded?{uid:decoded.user_id,token:decoded}:null,rawRequest:{headers:{authorization:headers.Authorization}}});}
-        catch(error){throw Object.assign(new Error(error.message),{code:error.code==="unauthenticated"?"UNAUTHENTICATED":error.details?.code||error.code});}
+        catch(error){throw Object.assign(new Error(error.message),{code:error.details?.code||(error.code==="unauthenticated"?"UNAUTHENTICATED":error.code)});}
     }
     const response=await fetch(functionUrl+name,{method:"POST",signal:AbortSignal.timeout(20000),headers,body:JSON.stringify({data})});
     const result=await response.json();
@@ -54,6 +55,21 @@ while(Math.floor(Date.now()/1000)<=claims(a.idToken).auth_time){await new Promis
 const b=await login("accounts:signInWithPassword",{email:"session-x@example.test",password});
 assert.equal(b.localId,x);
 const sessionB=await invoke("createGameSession",b.idToken,{uid:x});
+async function seedHandoff(authTime){
+    // Emulator-only fixture for a previously issued Facebook handoff, without
+    // contacting Meta or faking a production Firebase identity provider.
+    const code=randomBytes(32).toString("base64url");
+    await db.doc(`nativeAuthHandoffs/${createHash("sha256").update(code).digest("hex")}`).set({
+        uid:x,provider:"facebook.com",authTime,used:false,
+        createdAt:Timestamp.now(),expiresAt:Timestamp.fromMillis(Date.now()+120000)
+    });
+    return code;
+}
+await rejected("redeemNativeAuthHandoff",null,{code:await seedHandoff(claims(a.idToken).auth_time)},"SESSION_REAUTH_REQUIRED");
+const bridge=await invoke("redeemNativeAuthHandoff",null,{code:await seedHandoff(claims(b.idToken).auth_time)});
+const nativeLogin=await login("accounts:signInWithCustomToken",{token:bridge.customToken});
+assert.equal(claims(nativeLogin.idToken).user_id,x);
+assert.equal(claims(nativeLogin.idToken).sessionSourceAuthTime,claims(b.idToken).auth_time);
 await rejected("protectedTest",a.idToken,{uid:x,session:sessionA},"SESSION_REVOKED");
 assert.equal((await invoke("protectedTest",b.idToken,{uid:x,session:sessionB})).result,"SUCCESS");
 await rejected("revokeGameSession",a.idToken,{uid:x,session:sessionA},"SESSION_REVOKED");
@@ -120,10 +136,13 @@ assert.ok(saveAfterOverlap.updateTime.toMillis()<=sessionAfterOverlap.updateTime
     }));
 await rejected("protectedTest",d.idToken,{uid:x,session:sessionD},"SESSION_REVOKED");
 assert.equal((await invoke("protectedTest",e.idToken,{uid:x,session:sessionE})).result,"SUCCESS");
+const replayedBridge=await login("accounts:signInWithCustomToken",{token:bridge.customToken});
+await rejected("createGameSession",replayedBridge.idToken,{uid:x},"SESSION_REAUTH_REQUIRED");
 await getAuth(testApp).revokeRefreshTokens(y);
-await rejected("protectedTest",yUser.idToken,{uid:y,session:sessionY},"UNAUTHENTICATED");
+await rejected("protectedTest",yUser.idToken,{uid:y,session:sessionY},"AUTH_REQUIRED");
+await rejected("createNativeAuthHandoff",yUser.idToken,{},"AUTH_REQUIRED");
 await getAuth(testApp).updateUser(x,{disabled:true});
-await rejected("protectedTest",e.idToken,{uid:x,session:sessionE},"UNAUTHENTICATED");
+await rejected("protectedTest",e.idToken,{uid:x,session:sessionE},"AUTH_REQUIRED");
 console.log(`PASS (${direct?"direct exported handlers":"HTTP callable"}): A SUCCESS -> B takeover -> A SESSION_REVOKED -> B SUCCESS; logout, UID isolation, tampering, private rules, protected writers, concurrent takeover/write ordering, revoked/disabled Firebase identity.`);
 await db.terminate();
 if(direct){await getFirestore().terminate();}
