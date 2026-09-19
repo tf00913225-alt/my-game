@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "title": "Release update preview / main-city relic / battle result / non-blocking drawers follow-up",
+  "base": "dev@5679db5fad7b07ad158656c169838458ba66c8c6",
+  "branch": "fix/release-update-battle-ui-followup-20260920",
+  "mainModified": false,
+  "status": "IMPLEMENTED",
+  "requirements": [
+    {
+      "id": "FOLLOW-01",
+      "status": "IMPLEMENTED",
+      "requirement": "DEV update preview must not show a fake immediately-update action; preview remains non-reloading and uses a clear close-preview action.",
+      "evidence": [
+        "js/release-update-notification.js",
+        "tests/release-update-notification-system.test.js",
+        "ARCHITECTURE_RULES.md",
+        "docs/RELEASE_VERIFICATION_RULES.md",
+        "SYSTEM_CONTRACTS.md"
+      ]
+    },
+    {
+      "id": "FOLLOW-02",
+      "status": "IMPLEMENTED",
+      "requirement": "Main-city team relic block must be fully scrollable above the fixed bottom navigation using the actual final-content owner and safe-area/nav reserve.",
+      "evidence": [
+        "css/00-main.css",
+        "css/19-stage-v54-main-city-moderate-native-scale.css",
+        "tests/battle-stats-relic-tower-auto-20260920.test.js"
+      ]
+    },
+    {
+      "id": "FOLLOW-03",
+      "status": "IMPLEMENTED",
+      "requirement": "Boss/Abyss battle result details must use a substantially larger mobile-readable panel in the 1080-wide app coordinate system.",
+      "evidence": [
+        "css/battle-statistics-system.css",
+        "tests/battle-stats-relic-tower-auto-20260920.test.js"
+      ]
+    },
+    {
+      "id": "FOLLOW-04",
+      "status": "IMPLEMENTED",
+      "requirement": "Battle statistics and Boss mechanism drawers must not pause auto/manual battle; no blocking scrim or drawer pause lock may remain.",
+      "evidence": [
+        "js/battle-statistics-system.js",
+        "css/battle-statistics-system.css",
+        "SYSTEM_CONTRACTS.md",
+        "tests/battle-stats-relic-tower-auto-20260920.test.js"
+      ]
+    },
+    {
+      "id": "FOLLOW-05",
+      "status": "IMPLEMENTED",
+      "requirement": "Skill VFX must render above both drawers; the left battle-status entry stays attached to the left edge, is vertically draggable, and remains below battle action controls.",
+      "evidence": [
+        "js/battle-statistics-system.js",
+        "css/battle-statistics-system.css",
+        "SYSTEM_CONTRACTS.md",
+        "tests/battle-stats-relic-tower-auto-20260920.test.js"
+      ]
+    }
+  ],
+  "verification": {
+    "targeted": [
+      "tests/release-update-notification-system.test.js",
+      "tests/battle-stats-relic-tower-auto-20260920.test.js"
+    ],
+    "repositoryChecks": "PENDING"
+  }
+}
