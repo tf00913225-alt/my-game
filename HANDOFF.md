@@ -1,6 +1,6 @@
-## 2026-09-19 — DEV 正式版本公告視覺預覽（待 DEV CI）
+## 2026-09-19 — DEV 正式版本公告視覺預覽（VERIFIED／main 未修改）
 
-- 工作分支：`feature/release-update-dev-preview-20260919`，必須 PR 回 `dev`；main 禁止修改。`js/release-update-notification.js` 是唯一 owner，沒有新建公告、跑馬燈或 Modal。
+- 工作分支：`feature/release-update-dev-preview-20260919`，PR [#345](https://github.com/tf00913225-alt/my-game/pull/345) 已在 CI run `35446496532` 全綠後合併為 `dev@fff36cf702a92638f812698049015537001345b0`；DEV deployment run `35446584392` 也已全綠並核對 exact SHA。main 禁止修改。`js/release-update-notification.js` 是唯一 owner，沒有新建公告、跑馬燈或 Modal。
 - DEV／本機驗收網址使用同一份 `release/release-update.json`：`?releaseUpdatePreview=marquee` 顯示正式跑馬燈，點擊後開正式更新視窗；`?releaseUpdatePreview=modal` 直接開同一視窗。只允許 `dev.four-symbols-dev.pages.dev`、`localhost`、`127.0.0.1`、`::1`，main host 必須忽略 query。
 - Preview 僅供版面、文案與內容驗收：不得改 loaded／正式 release version、不得寫 `last-seen` localStorage、不得 reload。更新視窗維持正式 normal／forced 樣式；preview 中的行動按鈕安全地只關閉視窗。
 - 直接測試必須覆蓋：DEV 現行版本仍可顯示跑馬燈與內容、按立即更新不 reload／不寫已讀、main 帶相同 query 不顯示 preview。
