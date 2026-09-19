@@ -33,9 +33,17 @@
     },
     {
       "id": "REL-03",
-      "status": "TODO",
+      "status": "VERIFIED",
       "requirement": "V173.66 發布候選 PR 回 dev 的 Repository checks、build:check、Release Update browser QA 與 Release Gate 全綠。",
-      "evidence": []
+      "evidence": [
+        "PR #349",
+        "CI run 35453776605 Repository checks SUCCESS",
+        "V173.66 Release Update targeted regression SUCCESS",
+        "deterministic build:check SUCCESS",
+        "Release Update mobile browser QA SUCCESS",
+        "Fixed Slot mobile QA / exact-candidate real battle QA / Adventure mobile QA SUCCESS",
+        "Release Gate / resources / loader / git-diff SUCCESS"
+      ]
     },
     {
       "id": "REL-04",
@@ -50,9 +58,10 @@
       "evidence": []
     }
   ],
-  "automatedVerification": "PENDING_RELEASE_CANDIDATE_CI",
-  "visualVerification": "PENDING_RELEASE_UPDATE_MOBILE_BROWSER_QA",
-  "verifiedSourceCommit": null,
+  "automatedVerification": "RELEASE_CANDIDATE_PR_349_CI_SUCCESS_PENDING_DEV_MERGE_AND_DEPLOY",
+  "visualVerification": "PR #349 Release Update mobile browser QA SUCCESS; formal dev deployment still pending.",
+  "verifiedSourceCommit": "8da0de53a00199fbefb91ed358beeb3e6c99d728",
   "mergedDevCommit": null,
-  "mergedMainCommit": null
+  "mergedMainCommit": null,
+  "candidateCiRun": 35453776605
 }
