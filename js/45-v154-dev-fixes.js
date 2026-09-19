@@ -372,8 +372,9 @@
                 stats:getPartyBattleStats(characterIndex)
             };
             if(
-                !entry.character||entry.character.hp<=0||!entry.config||!entry.stats||
-                (!entry.config.enabled&&!elementBoxActive)
+                !entry.character||!entry.config||!entry.stats||
+                (!entry.config.enabled&&!elementBoxActive)||
+                (Number(entry.character.hp)<=0&&!elementBoxActive)
             ){ return null; }
             return entry;
         }).filter(Boolean);
@@ -388,6 +389,9 @@
                     const character=entry.character;
                     const config=entry.config;
                     const stats=entry.stats;
+                    if(resource==="sp"&&(Number(character.hp)||0)<=0){
+                        return;
+                    }
                     const maxValue=resource==="hp"?Number(stats.maxHP):Number(stats.maxSP);
                     const threshold=normalizeAutoBattleThreshold(
                         config[resource],
