@@ -76,7 +76,16 @@ assert.match(statsCss,/\.battle-mechanism-alert[\s\S]*right:0/);
 assert.match(statsCss,/@keyframes battleMechanismAlertPulse/);
 assert.match(statsCss,/\.battle-stats-drawer\{left:0;transform:translateX\(-102%\)/);
 assert.match(statsCss,/\.battle-boss-mechanism-drawer\{right:0;transform:translateX\(102%\)/);
-assert.doesNotMatch(statsSource,/battleInsightScrim/,"non-blocking drawers must not install a full-screen scrim");
+assert.doesNotMatch(
+    statsSource,
+    /className="battle-insight-scrim"|scrim=document\.createElement|ui\.scrim\.classList\.add/,
+    "non-blocking drawers must not install or open a full-screen scrim"
+);
+assert.match(
+    statsSource,
+    /staleScrim=document\.getElementById\("battleInsightScrim"\)[\s\S]*?staleScrim\.remove\(\)/,
+    "legacy scrim cleanup may remain only to remove stale DOM from an older runtime"
+);
 assert.match(statsSource,/function installStatsEdgeDrag\(edge,root\)/);
 assert.match(statsCss,/\.battle-stats-edge-button[\s\S]*touch-action:none/);
 assert.match(statsCss,/\.battle-insight-drawer\{[\s\S]*z-index:72/);
