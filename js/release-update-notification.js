@@ -38,6 +38,7 @@
         pendingNormalReload:false,
         pendingForcedUpdate:false,
         pendingAnnouncement:false,
+        loginAnnouncementShown:false,
         forcedModalLock:false,
         modalOpen:false,
         modalKind:null,
@@ -140,6 +141,53 @@
         catch(_){ }
     }
 
+    function removeStorage(suffix){
+        const storage=getStorage();
+        if(!storage){ return; }
+        try{
+            if(typeof storage.removeItem==="function"){ storage.removeItem(storageKey(suffix)); }
+        }catch(_){ }
+    }
+
+    function localDateKey(value){
+        const date=new Date(value==null?now():value);
+        if(Number.isNaN(date.getTime())){ return ""; }
+        const yyyy=date.getFullYear();
+        const mm=String(date.getMonth()+1).padStart(2,"0");
+        const dd=String(date.getDate()).padStart(2,"0");
+        return yyyy+"-"+mm+"-"+dd;
+    }
+
+    function readTodaySuppression(){
+        try{
+            const value=JSON.parse(readStorage("suppress-today")||"null");
+            return value&&typeof value==="object"?value:null;
+        }catch(_){ return null; }
+    }
+
+    function isCurrentNoticeSuppressedToday(manifest){
+        if(!manifest){ return false; }
+        const value=readTodaySuppression();
+        return !!(
+            value&&
+            value.noticeId===manifest.noticeId&&
+            value.dateKey===localDateKey()
+        );
+    }
+
+    function setCurrentNoticeSuppressedToday(enabled){
+        const manifest=state.manifest;
+        if(!manifest){ return; }
+        if(enabled){
+            writeStorage("suppress-today",JSON.stringify({
+                noticeId:manifest.noticeId,
+                dateKey:localDateKey()
+            }));
+        }else{
+            removeStorage("suppress-today");
+        }
+    }
+
     function validateManifest(value){
         if(!value||typeof value!=="object"||Array.isArray(value)){ return null; }
         const releaseVersion=normalizeVersion(value.releaseVersion);
@@ -194,6 +242,29 @@
         writeStorage("last-seen-version",manifest.releaseVersion);
         writeStorage("last-seen-notice",manifest.noticeId);
         refreshNotificationDots();
+    }
+
+    function shouldAutoShowLoginAnnouncement(manifest){
+        const loaded=state.loadedReleaseVersion||getLoadedReleaseVersion();
+        if(
+            state.loginAnnouncementShown||
+            state.pendingAnnouncement||
+            !manifest||
+            !manifest.publicNotice||
+            !loaded||
+            compareVersions(loaded,manifest.releaseVersion)!==0
+        ){
+            return false;
+        }
+        return !isCurrentNoticeSuppressedToday(manifest);
+    }
+
+    function isSharedModalAvailableForAnnouncement(){
+        const parts=getSharedModalParts();
+        return !!(
+            parts&&
+            (!parts.modal.classList||!parts.modal.classList.contains("show"))
+        );
     }
 
     function readReminder(){
@@ -365,6 +436,9 @@
             : update
                 ? '<div class="release-update-actions"><button type="button" data-release-update-action="later">稍後更新</button><button type="button" class="release-update-primary" data-release-update-action="reload">立即更新</button></div>'
                 : '<div class="release-update-actions"><button type="button" class="release-update-primary" data-release-update-action="acknowledge">我知道了</button></div>';
+        const suppressToday=!forced&&!update
+            ? '<label class="release-update-suppress-today"><input class="release-update-suppress-today-input" type="checkbox" data-release-update-suppress-today="true"><span>今日不再跳出提醒</span></label>'
+            : '';
         return (
             '<section class="release-update-detail" data-release-update-kind="'+escapeHtml(kind)+'">'+
                 '<p class="release-update-version">'+escapeHtml(manifest.releaseVersion)+'　'+escapeHtml(manifest.summary)+'</p>'+
@@ -372,6 +446,7 @@
                 '<h3>更新內容</h3>'+
                 '<ul class="release-update-notes">'+notes+'</ul>'+
                 '<p class="release-update-published">發布時間：'+escapeHtml(formatPublishedAt(manifest.publishedAt))+'</p>'+
+                suppressToday+
                 actions+
             '</section>'
         );
@@ -426,6 +501,7 @@
         state.modalOpen=true;
         state.modalKind=kind;
         state.forcedModalLock=forced;
+        if(kind==="acknowledge"){ state.loginAnnouncementShown=true; }
         bindReleaseActions(parts.body,kind);
         if(forced){
             const primary=parts.body.querySelector(".release-update-primary");
@@ -472,6 +548,11 @@
     }
 
     function acknowledgeCurrentRelease(){
+        const parts=getSharedModalParts();
+        const checkbox=parts&&parts.body&&typeof parts.body.querySelector==="function"
+            ?parts.body.querySelector(".release-update-suppress-today-input")
+            :null;
+        setCurrentNoticeSuppressedToday(!!(checkbox&&checkbox.checked));
         markCurrentNoticeSeen();
         state.pendingAnnouncement=false;
         closeReleaseDetail();
@@ -549,7 +630,15 @@
             performReload();
             return;
         }
-        if(state.pendingAnnouncement&&hasUnreadReleaseNotice()){
+        if(state.pendingAnnouncement){
+            if(isCurrentNoticeSuppressedToday(state.manifest)){
+                state.pendingAnnouncement=false;
+                return;
+            }
+            if(!isSharedModalAvailableForAnnouncement()){
+                schedulePendingResolution();
+                return;
+            }
             state.pendingAnnouncement=false;
             openReleaseDetail("acknowledge");
         }
@@ -661,13 +750,8 @@
         if(comparison===0){
             refreshAnnouncementSurface();
             refreshNotificationDots();
-            const sharedModal=getSharedModalParts();
-            if(
-                hasUnreadReleaseNotice()&&
-                !state.modalOpen&&
-                !(sharedModal&&sharedModal.modal.classList.contains("show"))
-            ){
-                if(canSafelyReloadForUpdate()){
+            if(shouldAutoShowLoginAnnouncement(manifest)){
+                if(canSafelyReloadForUpdate()&&isSharedModalAvailableForAnnouncement()){
                     openReleaseDetail("acknowledge");
                 }else{
                     state.pendingAnnouncement=true;
@@ -753,6 +837,8 @@
             pendingNormalReload:state.pendingNormalReload,
             pendingForcedUpdate:state.pendingForcedUpdate,
             pendingAnnouncement:state.pendingAnnouncement,
+            loginAnnouncementShown:state.loginAnnouncementShown,
+            suppressedToday:isCurrentNoticeSuppressedToday(state.manifest),
             criticalOperationCount:state.criticalOperations.size,
             unsafeReasons:getUnsafeReasons().slice(),
             pollIntervalMs:CHECK_INTERVAL_MS,
@@ -772,6 +858,7 @@
         beginCriticalOperation,
         notifySafeState:resolvePendingWhenSafe,
         hasUnreadReleaseNotice,
+        isCurrentNoticeSuppressedToday:()=>isCurrentNoticeSuppressedToday(state.manifest),
         renderAnnouncementContent,
         openFromAnnouncement,
         openReleaseDetail,
