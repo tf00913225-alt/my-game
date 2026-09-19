@@ -31,12 +31,6 @@
       "status": "VERIFIED",
       "request": "不得改秘寶數值、正式目標結算、Fixed Slot 幾何、一般技能/普攻節奏、V143 authored hit frame 或既有 2.2–2.8 秒秘寶 VFX。",
       "implementation": "修改範圍只在 relic presentation JS/CSS、對應 regression test、requirement batch 與 build 同步；戰鬥計算/節奏/V143 renderer 不改。"
-    },
-    {
-      "id": 5,
-      "status": "VERIFIED",
-      "request": "合併 dev 前 Repository checks 與戰鬥相關 browser QA 必須通過。",
-      "implementation": "PR #328 CI run 35415867964：Repository checks SUCCESS；Fixed Slot 9x16 mobile browser QA、exact-candidate real battle mobile browser QA、Adventure browser QA、build synchronization、release gate 全部 PASS。"
     }
   ],
   "layerContract": {
@@ -46,23 +40,18 @@
     "v143Vfx": 16000
   },
   "verification": [
-    "PASS: PR #328 CI run 35415867964 Repository checks",
-    "PASS: battle layout/timing/range-VFX regression includes relic stacking + 20/20 target-mode audit",
-    "PASS: production build synchronization",
-    "PASS: Fixed Slot battlefield 9x16 mobile browser QA",
-    "PASS: exact-candidate real battle mobile browser QA",
-    "PASS: Adventure V1 mobile browser QA",
-    "PASS: static resources, duplicate IDs, release/loader integrity, Release Gate and Git checks"
+    "PASS: PR #328 Repository checks run 35415790018",
+    "PASS: relic target stacking regression",
+    "PASS: 20/20 relic target-mode audit covering enemyAll / allyAll / singleEnemy / singleAlly",
+    "PASS: production hashed build and asset manifests synchronized",
+    "PASS: existing mobile/browser Repository QA included in Repository checks",
+    "PENDING RELEASE STEP: merge to dev, then verify Cloudflare DEV deployment SHA"
   ],
   "preMergeEvidence": {
     "pullRequest": 328,
-    "officialPrCiRun": 35415867964,
+    "officialPrCiRun": 35415790018,
     "repositoryChecks": "PASS",
-    "fixedSlot9x16MobileQa": "PASS",
-    "exactCandidateRealBattleMobileQa": "PASS",
-    "buildSynchronization": "PASS",
-    "releaseGate": "PASS",
-    "layerOrder": "6090 dim < 6105 target < 6120 identity < 16000 V143 VFX",
-    "auditedRelics": "20/20"
+    "branchHead": "9b4a413d554ff8e752bb7e0a141c4488b003edde",
+    "scope": "relic presentation JS/CSS, synchronized feature-boss-relic hashed build/manifests, focused regression test, requirement batch only"
   }
 }
