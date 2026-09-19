@@ -31,6 +31,7 @@
 
 ### 2026-09-19 正式驗收結案證據（目前狀態）
 
+- **發布檢查修復回流：** main PR #342 的 run `35441331170` 抓到 `tests/critical-feature-budget.test.js` 過期的 5 個 Firebase 模組預期；Phase 1 已正式納入兩個 session 模組，實際為 7。於最新 `dev@10a2decd213cc061e8820fbfd5b01e4ad4d386f4` 開 fix 分支，精準測試先重現再修正通過；大小／hash／feature 邊界斷言保留，不改正式程式。後續修復 PR、最終 dev／main SHA 和各工作流程結果統一記錄於 [結案 PR #341](https://github.com/tf00913225-alt/my-game/pull/341)，不把前一 dev 的成功紀錄當成修復後證據。
 - **已部署驗收基準 SHA：** `342ef104fa2897f5ae5c3249e0c75c9efca3e762`，為本次收尾開始時 GitHub 最新 dev，非沿用未核對的舊 SHA。
 - **部署身分與 IAM：** 實際 job 輸出確認 `github-firebase-deployer@four-symbols-jianghu.iam.gserviceaccount.com`；Rules API 403 已解除。本次不新增 IAM 權限、不取得或提交服務帳號金鑰。
 - **Firebase 部署：** [run 35438044543](https://github.com/tf00913225-alt/my-game/actions/runs/35438044543)／[job 105884400094](https://github.com/tf00913225-alt/my-game/actions/runs/35438044543/job/105884400094) SUCCESS。2026-09-19 10:44:55 UTC 規則編譯成功、10:45:03 UTC 發布到 cloud.firestore；10:46:01–10:46:09 UTC 七支函式全部 Successful update operation，最後 Deploy complete!。
