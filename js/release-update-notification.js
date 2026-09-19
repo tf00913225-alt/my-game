@@ -51,10 +51,13 @@
     function getLocationHostname(){
         try{
             const location=global.location;
-            const hostname=String(location&&location.hostname||"").trim().toLowerCase();
+            const hostname=String(location&&location.hostname||"")
+                .trim()
+                .toLowerCase()
+                .replace(/^\[|\]$/g,"");
             if(hostname){ return hostname; }
             const href=String(location&&location.href||"");
-            return href?new URL(href).hostname.toLowerCase():"";
+            return href?new URL(href).hostname.toLowerCase().replace(/^\[|\]$/g,""):"";
         }catch(_){ return ""; }
     }
 

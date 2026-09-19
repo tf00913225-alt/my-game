@@ -247,6 +247,16 @@ async function test(name,callback){
         assert.equal(dev.reloads,0);
         assert.deepEqual([...dev.storage.entries()],storageBefore);
 
+        const ipv6=createHarness({
+            loadedVersion:"173.65",
+            responses:[current],
+            seen:current,
+            locationHref:"http://[::1]/?releaseUpdatePreview=modal"
+        });
+        await ipv6.api.checkForUpdate("ipv6-preview",{force:true});
+        assert.equal(ipv6.api.getState().devPreviewMode,"modal");
+        assert.equal(ipv6.modal.classList.contains("show"),true);
+
         const main=createHarness({
             loadedVersion:"173.65",
             responses:[current],
