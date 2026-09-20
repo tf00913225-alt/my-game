@@ -19,7 +19,7 @@
     },
     {
       "id": "REL-02",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "依 V173.66 main 到最新 dev 的玩家可感知差異建立 V173.67 Game/Cache Version、玩家公告、CHANGELOG 與 deterministic build。",
       "evidence": [
         "release/release.json",
@@ -29,14 +29,26 @@
         "package.json",
         "asset-manifest.json",
         "build/asset-manifest.json",
-        "index.html"
+        "index.html",
+        "PR #358 CI run 35479058549 Repository checks SUCCESS",
+        "deterministic build:check SUCCESS",
+        "V173.67 release notice / loader / Release Gate coherence SUCCESS"
       ]
     },
     {
       "id": "REL-03",
-      "status": "TODO",
+      "status": "VERIFIED",
       "requirement": "V173.67 發布候選 PR 回 dev 的 Repository checks、build:check、手機 browser QA 與 Release Gate 全綠。",
-      "evidence": []
+      "evidence": [
+        "PR #358",
+        "CI run 35479058549 Repository checks SUCCESS",
+        "Release Update targeted regression SUCCESS",
+        "Release Update mobile browser QA SUCCESS",
+        "Fixed Slot 9x16 mobile QA SUCCESS",
+        "exact-candidate real battle mobile QA SUCCESS",
+        "Adventure mobile QA SUCCESS",
+        "static resources / loader integrity / Release Gate / git-diff SUCCESS"
+      ]
     },
     {
       "id": "REL-04",
@@ -51,12 +63,12 @@
       "evidence": []
     }
   ],
-  "automatedVerification": "Release preparation created; awaiting V173.67 candidate PR CI.",
-  "visualVerification": "Underlying feature/fix PRs #355, #356 and #357 already passed their required Repository checks; V173.67 final candidate browser QA remains pending.",
-  "verifiedSourceCommit": null,
+  "automatedVerification": "REL-01..03 VERIFIED. PR #358 candidate CI run 35479058549 SUCCESS; awaiting merge to dev and exact-SHA DEV deployment before REL-04.",
+  "visualVerification": "Release Update mobile browser QA、Fixed Slot 9x16 mobile QA、exact-candidate real battle mobile QA 與 Adventure mobile QA all passed on PR #358 CI run 35479058549.",
+  "verifiedSourceCommit": "8c042790ec1b5a517c02c334f0a361546466bef8",
   "mergedDevCommit": null,
   "mergedMainCommit": null,
-  "candidateCiRun": null,
+  "candidateCiRun": 35479058549,
   "devPushCiRun": null,
   "devDeployJob": null
 }
