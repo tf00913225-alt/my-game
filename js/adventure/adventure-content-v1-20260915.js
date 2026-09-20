@@ -137,14 +137,14 @@
         road_first:{gold:150},
         gate_first:{gold:350},
         commission_turnin:{gold:300},
-        road_chest:{gold:420,potions:[{id:"hpPotion50",count:1}]},
+        road_chest:{gold:420,potions:[{id:"hpPotion30",count:1}]},
         boss_first:{gold:650,sharedExp:300},
         chapter_v1_clear:{gold:1000,potions:[{id:"taichingQiPill",count:1}]}
     };
 
     const merchantPool=[
-        {id:"hpPotion50",name:"回復 50% HP 藥水",kind:"potion",price:220,quantity:2,tierKey:"blue"},
-        {id:"spPotion50",name:"回復 50% SP 藥水",kind:"potion",price:260,quantity:2,tierKey:"blue"},
+        {id:"hpPotion30",name:"大還丹",kind:"potion",price:220,quantity:2,tierKey:"blue"},
+        {id:"spPotion30",name:"歸元丹",kind:"potion",price:260,quantity:2,tierKey:"blue"},
         {id:"hpPotion100",name:"回復 100% HP 藥水",kind:"potion",price:520,quantity:1,tierKey:"purple"},
         {id:"nineTurnRestorationPill",name:"九轉回元丹",kind:"potion",price:1800,quantity:1,tierKey:"orange",rare:true},
         {id:"taichingQiPill",name:"太清聚氣丹",kind:"potion",price:1800,quantity:1,tierKey:"orange",rare:true}
