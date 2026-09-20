@@ -11,6 +11,6 @@
     {"id":"VR-05","status":"IMPLEMENTED","request":"Foreground feature request 可超車 queued background，且不重複下載或 execute。","owner":["js/startup/feature-loader.js"]},
     {"id":"VR-06","status":"IMPLEMENTED","request":"秘寶 Runtime Ready 不得等同 Visual Ready；首次開啟只顯示局部 loading，20 icon 完整後一次呈現。","owner":["js/60-team-relic-system.js","css/55-team-relic-system.css"]},
     {"id":"VR-07","status":"IMPLEMENTED","request":"秘寶 iconPath 維持唯一真相，背景預抓不 execute Boss／Tower runtime。","owner":["js/60-team-relic-system.js","scripts/build-production.mjs","asset-manifest.json"]},
-    {"id":"VR-08","status":"TODO","request":"全新 Browser Context、Cache clear、slow network、warm reload 與 390×844／412×915 實際驗收。","owner":[".github/scripts/run-boot-architecture-browser-qa.mjs"]}
+    {"id":"VR-08","status":"VERIFIED","request":"全新 Browser Context、Cache clear、slow network、warm reload 與 390×844／412×915 實際驗收。","owner":[".github/scripts/run-boot-architecture-browser-qa.mjs"],"evidence":["正式 V173.69 網址：使用者於 2026-09-20 回報實機驗收通過；390×844／412×915 兩種尺寸均完成全新 Browser Context、清除站點快取、slow network、warm reload、登入後主城首屏與秘寶首次開啟。","tests/cold-start-visual-ready-background-prefetch-20260920.test.js","tests/boot-architecture.test.js"],"verification":"PASS：使用者實機回報兩種手機尺寸的冷啟動、主城 Visual Ready、背景 UI 預抓、秘寶首次開啟與 warm reload 均通過。","evidenceBoundary":"實機結果為使用者在正式網址的驗收回報；未將本機自動測試或合成 Browser QA 冒充正式實機遙測。"}
   ]
 }
