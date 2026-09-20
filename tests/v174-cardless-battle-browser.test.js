@@ -132,7 +132,7 @@ window.__qaBefore=qaRects();
       hitAnimation:getComputedStyle(art).animationName,
       footShadowContent:getComputedStyle(art,'::after').content,
       abyssOwnerOpacity:getComputedStyle(enemy.querySelector('.v162-abyss-battle-portrait-art')).opacity,
-      overlayPosition:getComputedStyle(overlay).position,
+      overlayPresent:!!overlay,
       playerHp:player.querySelector('.hp-bar-text').textContent,
       playerSp:player.querySelector('.sp-bar-text').textContent,
       enemyHp:enemy.querySelector('.monster-hp .monster-bar-text').textContent,
@@ -187,7 +187,7 @@ function runViewport(chrome,width,height){
     assert.equal(data.hitAnimation,"v174BattleIdle","damage popups must not replace the formal cardless idle animation with hit feedback");
     assert.notEqual(data.footShadowContent,"none");
     assert.equal(data.abyssOwnerOpacity,"0");
-    assert.equal(data.overlayPosition,"absolute");
+    assert.equal(data.overlayPresent,false,"retired full-card status overlays must be removed from cardless units");
     assert.equal(data.playerHp,"835");
     assert.equal(data.playerSp,"412");
     assert.equal(data.enemyHp,"1380");
