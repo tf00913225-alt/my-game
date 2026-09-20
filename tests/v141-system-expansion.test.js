@@ -142,7 +142,9 @@ test("final EXP curve follows the eight-monster zones and deterministic 10% elit
     };
     Object.values(checkpoints).forEach(point=>{
         const averageLevel=point.levels.reduce((sum,value)=>sum+value,0)/point.levels.length;
-        const averageExp=Math.round(averageLevel*10*1.05*point.group*3.5);
+        // Monster data now owns the formal 35 EXP baseline directly; the
+        // historical global ×3.5 multiplier must not return here.
+        const averageExp=Math.round(averageLevel*35*1.05*point.group);
         assert.equal(averageExp,point.avg);
         assert.equal(averageExp*point.battles,point.next);
     });
