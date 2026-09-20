@@ -110,7 +110,6 @@ const V_ASSET_VERSION="173.69";
     document.addEventListener("click",enter,true);
     document.addEventListener("click",()=>setTimeout(primeExpPoolSafety,0),true);
     document.addEventListener("four-symbols:startup-ready",()=>{
-        /* The sole Feature Loader api.idle() owner starts this low-priority queue. */
         const api=loader();
         if(api){
             try{if(performance&&typeof performance.mark==="function"){performance.mark("four-symbols:background-prefetch-start");}}catch(_){ }
