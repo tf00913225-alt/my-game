@@ -58,7 +58,8 @@ const critContext={
     CRIT_MULTIPLIER_BASE:2,CRIT_MULTIPLIER_PER_INTELLIGENCE_POINT:0,
     CRIT_MULTIPLIER_PER_ATTACK_POINT:0,ANTI_CRIT_MAX_PERCENT:100,
     CRIT_CHANCE_MIN_AFTER_ANTI_CRIT:0,CRIT_MULTIPLIER_MAX:9,
-    getLearnedElementEX:()=>null
+    getLearnedElementEX:()=>null,
+    battleStatisticsRecordCriticalByActor:()=>{}
 };
 vm.createContext(critContext);
 vm.runInContext(core.slice(rollStart,rollEnd)+"this.rollCritical=rollCritical;",critContext);
