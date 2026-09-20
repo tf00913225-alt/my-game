@@ -1,0 +1,39 @@
+name: Temporary potion verification
+
+on:
+  push:
+    branches:
+      - fix/potion-names-icons-webp-20260920
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    if: contains(github.event.head_commit.message, '[potion-verify-stage]')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/potion-names-icons-webp-20260920
+          fetch-depth: 0
+      - name: Run focused potion and item UI checks
+        run: |
+          set -euo pipefail
+          node tests/v144-rules-and-abyss.test.js
+          node tests/potion-icon-assets-20260920.test.js
+          node tests/ui-panel-browser-layout.test.js
+          node tests/v169-rpg-ui.test.js
+          node tests/v173.17-item-ui-assets.test.js
+          node tests/v173.18-final-request.test.js
+          npm run build:check
+      - name: Remove staging workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/_tmp-potion-verification.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "test: verify potion presentation"
+          git push origin HEAD:fix/potion-names-icons-webp-20260920
