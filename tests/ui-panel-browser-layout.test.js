@@ -30,6 +30,7 @@ const html=`<!doctype html>
 <link rel="stylesheet" href="css/38-v141-system-expansion.css">
 <link rel="stylesheet" href="css/44-v149-skill-ui-rules.css">
 <link rel="stylesheet" href="css/49-v169-rpg-ui.css">
+<link rel="stylesheet" href="css/53-v173.51-qa.css">
 <style>
 html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#000;}
 #game-stage{position:relative!important;width:1080px!important;height:1920px!important;overflow:hidden!important;}

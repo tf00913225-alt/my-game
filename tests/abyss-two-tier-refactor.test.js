@@ -92,7 +92,7 @@ function value(context,expression){ return JSON.parse(vm.runInContext("JSON.stri
 let passed=0;
 function test(name,fn){ fn();passed++;console.log("✓ "+name); }
 
-test("fixed difficulties remain Lv20/Lv40 and skill levels stay Lv1/Lv2 before final-v155 launch patch",()=>{
+test("fixed difficulties remain Lv20/Lv40 and only the Lv40 final five use Lv5",()=>{
     [20,40].forEach(level=>{
         const {context}=load({playerLevel:80});
         for(let region=0;region<5;region++) for(let stage=0;stage<5;stage++){
@@ -100,7 +100,8 @@ test("fixed difficulties remain Lv20/Lv40 and skill levels stay Lv1/Lv2 before f
             const expectedCount=stage<4?8:(level===40&&region===4?10:8);
             assert.equal(roster.length,expectedCount);
             assert.equal(roster.every(monster=>monster.level===level),true);
-            assert.equal(roster.every(monster=>monster.v141ForceSkillLevel===(level===20?1:2)),true);
+            const expectedLevel=level===40&&region===4&&stage===4?5:(level===20?1:2);
+            assert.equal(roster.every(monster=>monster.v141ForceSkillLevel===expectedLevel),true);
         }
     });
 });

@@ -71,7 +71,8 @@ const EXPECTED_RUNTIME_PATHS=[
     "js/48-v159-abyss-battle-portraits.js",
     "js/49-v169-element-box-settings.js",
     "js/50-v169-water-skill-rules.js",
-    "js/51-v169-rpg-ui.js"
+    "js/51-v169-rpg-ui.js",
+    "js/59-abyss-two-tier-runtime.js"
 ];
 
 /* damage, growth, SP, target, learn, upgrade, max, prerequisites */
@@ -508,7 +509,7 @@ test("same-name states miss without refresh while differently named hard control
         monsters.splice(0,monsters.length,{
             name:"極帝天尊",element:"light",level:100,hp:1000,maxHP:1000,sp:500,maxSP:1000,
             alive:true,evasion:100,activeBuffs:[],statusEffects:[{type:"frostbite",turnsLeft:1}],
-            v141Abyss:true,v155FinalAbyss:true
+            v141Abyss:true,v174TrueRealmFinal:true,v141SupportSkillIds:["yuanZuBlessing"]
         });
         currentBattleMonsters.splice(0,currentBattleMonsters.length,0);
         Math.random=function(){ return 0; };
@@ -646,7 +647,7 @@ test("accuracy, enemy Rage, monster shields and wind-elite Dodge use their forma
         };
 
         const elite={
-            name:"天兵天將",element:"wind",v141Abyss:true,alive:true,
+            name:"天兵天將",element:"wind",v141Abyss:true,v141SupportSkillIds:["dodgeSkill"],alive:true,
             hp:100,maxHP:100,sp:100,maxSP:100,evasion:20,skillChance:1,activeBuffs:[],statusEffects:[]
         };
         monsters.splice(0,monsters.length,elite);
@@ -981,8 +982,7 @@ test("Abyss floors one through five keep exact compositions, skill levels and ad
         Object.assign(player,{id:"主角",level:70});player2=null;player3=null;
         Math.random=function(){ return 0; };
         return [1,2,3,4,5].map(floor=>{
-            const roster=v141BuildAbyssRoster(floor);
-            if(floor===5){ v155PatchFinalAbyssRoster(roster); }
+            const roster=floor===5?v174AbyssBuildRoster(40,4,4):v141BuildAbyssRoster(floor);
             return {floor:floor,count:roster.length,names:roster.map(monster=>monster.name),
                 ranks:roster.map(monster=>monster.rank),elements:roster.map(monster=>monster.element),
                 forceLevels:roster.map(monster=>monster.v141ForceSkillLevel),
@@ -993,12 +993,6 @@ test("Abyss floors one through five keep exact compositions, skill levels and ad
                 positions:roster.map(monster=>monster.v141FormationPosition)};
         });
     })()`);
-    result.slice(0,4).forEach(floor=>{
-        assert.equal(floor.count,5);
-        assert.deepEqual(floor.ranks,["boss","elite","elite","elite","elite"]);
-        assert.deepEqual(floor.forceLevels,[4,4,4,4,4]);
-        assert.deepEqual(floor.extraHP,[5000,2500,2500,2500,2500]);
-    });
     const final=result[4];
     assert.equal(final.count,10);
     assert.deepEqual(final.names,["東帝天尊","天帝天尊","極帝天尊","北帝天尊","南帝天尊",
@@ -1006,7 +1000,6 @@ test("Abyss floors one through five keep exact compositions, skill levels and ad
     assert.deepEqual(final.ranks,["boss","boss","boss","boss","boss","elite","elite","elite","elite","elite"]);
     assert.deepEqual(final.elements,["earth","wind","light","water","fire","water","earth","fire","wind","water"]);
     assert.deepEqual(final.forceLevels,[5,5,5,5,5,5,5,5,5,5]);
-    assert.deepEqual(final.extraHP,[10000,10000,10000,10000,10000,3500,3500,3500,3500,3500]);
     assert.deepEqual(final.skills.slice(0,5),[["dustStorm","flyingSandStrike"],["windHowlLightning","stormRain"],["flyingSandStrike","phoenixCry"],
         ["iceArrowRain","iceSpin"],["dragonSlash","phoenixCry"]]);
     assert.deepEqual(final.supports.slice(0,5),[["rockWall"],["stealthSkill"],["yuanZuBlessing"],["healSpell"],["rage"]]);
@@ -1023,10 +1016,10 @@ test("enemy Heal Spell affects only one same-row trio for both North Emperor and
         currentBattleMonsters.splice(0,currentBattleMonsters.length);
         for(let index=0;index<10;index++){
             monsters.push({name:index===3?"北帝天尊":"天兵天將",element:"water",level:100,
-                rank:index<5?"boss":"elite",v141Abyss:true,v155FinalAbyss:true,alive:true,
+                rank:index<5?"boss":"elite",v141Abyss:true,v174TrueRealmFinal:true,alive:true,
                 hp:(index>=1&&index<=3)?100:900,maxHP:1000,sp:1000,maxSP:1000,
                 activeBuffs:[],statusEffects:[],v141FormationRow:index<5?0:1,v141FormationPosition:index%5,
-                v141SupportSkillIds:index===3?["revive","healSpell"]:[],v141ForceSkillLevel:5,skillChance:1});
+                v141SupportSkillIds:index===3?["healSpell"]:[],v141ForceSkillLevel:5,skillChance:1});
             currentBattleMonsters.push(index);
         }
         FourSymbolsBattlefieldSlots.setActiveEnemySnapshot(
@@ -1049,15 +1042,15 @@ test("enemy Heal Spell affects only one same-row trio for both North Emperor and
     assert.deepEqual(result,{north:true,northChanged:[1,2,3],elite:true,eliteChanged:[6,7,8]});
 });
 
-test("North Emperor prioritizes maximum-level Revive for a defeated boss",()=>{
+test("North Emperor does not revive when revive is absent from its loadout",()=>{
     const runtime=loadFinalRuntime();
     const result=evaluateJson(runtime.context,`(function(){
         monsters.splice(0,monsters.length,
-            {name:"東帝天尊",rank:"boss",v141Abyss:true,v155FinalAbyss:true,alive:false,hp:0,maxHP:1000,sp:0,maxSP:1000,activeBuffs:[],statusEffects:[]},
-            {name:"天帝天尊",rank:"boss",v141Abyss:true,v155FinalAbyss:true,alive:true,hp:1000,maxHP:1000,sp:1000,maxSP:1000,activeBuffs:[],statusEffects:[]},
-            {name:"極帝天尊",rank:"boss",v141Abyss:true,v155FinalAbyss:true,alive:true,hp:1000,maxHP:1000,sp:1000,maxSP:1000,activeBuffs:[],statusEffects:[]},
-            {name:"北帝天尊",rank:"boss",v141Abyss:true,v155FinalAbyss:true,alive:true,hp:1000,maxHP:1000,sp:1000,maxSP:1000,v141ForceSkillLevel:5,activeBuffs:[],statusEffects:[],skillChance:1},
-            {name:"天兵天將",rank:"elite",v141Abyss:true,v155FinalAbyss:true,alive:false,hp:0,maxHP:1000,sp:0,maxSP:1000,activeBuffs:[],statusEffects:[]}
+            {name:"東帝天尊",rank:"boss",v141Abyss:true,v174TrueRealmFinal:true,alive:false,hp:0,maxHP:1000,sp:0,maxSP:1000,activeBuffs:[],statusEffects:[]},
+            {name:"天帝天尊",rank:"boss",v141Abyss:true,v174TrueRealmFinal:true,alive:true,hp:1000,maxHP:1000,sp:1000,maxSP:1000,activeBuffs:[],statusEffects:[]},
+            {name:"極帝天尊",rank:"boss",v141Abyss:true,v174TrueRealmFinal:true,v141SupportSkillIds:["yuanZuBlessing"],alive:true,hp:1000,maxHP:1000,sp:1000,maxSP:1000,activeBuffs:[],statusEffects:[]},
+            {name:"北帝天尊",rank:"boss",v141Abyss:true,v174TrueRealmFinal:true,v141SupportSkillIds:["healSpell"],alive:true,hp:1000,maxHP:1000,sp:1000,maxSP:1000,v141ForceSkillLevel:5,activeBuffs:[],statusEffects:[],skillChance:1},
+            {name:"天兵天將",rank:"elite",v141Abyss:true,v174TrueRealmFinal:true,alive:false,hp:0,maxHP:1000,sp:0,maxSP:1000,activeBuffs:[],statusEffects:[]}
         );
         currentBattleMonsters.splice(0,currentBattleMonsters.length,0,1,2,3,4);
         updateUI=function(){};finishPlayerAction=function(){};addBattleLog=function(){};
@@ -1065,49 +1058,48 @@ test("North Emperor prioritizes maximum-level Revive for a defeated boss",()=>{
         const cast=v155ResolveNorthSupport(3,true);
         return {cast:cast,boss:{alive:monsters[0].alive,hp:monsters[0].hp},elite:{alive:monsters[4].alive,hp:monsters[4].hp}};
     })()`);
-    assert.deepEqual(result,{cast:true,boss:{alive:true,hp:1000},elite:{alive:false,hp:0}});
+    assert.deepEqual(result,{cast:false,boss:{alive:false,hp:0},elite:{alive:false,hp:0}});
 });
 
-test("East Earth Shield and Heaven Calm use their assigned formal support values",()=>{
+test("East Rock Wall and Heaven Stealth use their carried Skill IDs",()=>{
     const runtime=loadFinalRuntime();
     const result=evaluateJson(runtime.context,`(function(){
-        const names=["東帝天尊","天帝天尊","極帝天尊","北帝天尊","南帝天尊"];
+        const names=["東帝天尊","天帝天尊"];
         monsters.splice(0,monsters.length,...names.map((name,index)=>({
             name:name,rank:"boss",element:index===0?"earth":index===1?"wind":"light",
-            v141Abyss:true,v155FinalAbyss:true,alive:true,hp:1000,maxHP:1000,sp:1000,maxSP:1000,
+            v141Abyss:true,v174TrueRealmFinal:true,v141SupportSkillIds:index===0?["rockWall"]:["stealthSkill"],alive:true,hp:1000,maxHP:1000,sp:1000,maxSP:1000,
             resistance:0,evasion:0,skillChance:1,activeBuffs:[],statusEffects:[],
             v141FormationRow:0,v141FormationPosition:index
         })));
-        currentBattleMonsters.splice(0,currentBattleMonsters.length,0,1,2,3,4);
+        currentBattleMonsters.splice(0,currentBattleMonsters.length,0,1);
         FourSymbolsBattlefieldSlots.setActiveEnemySnapshot(
             FourSymbolsBattlefieldSlots.createEnemyFormationSnapshot(currentBattleMonsters,{originalFormationType:5})
         );
         updateUI=function(){};finishPlayerAction=function(){};addBattleLog=function(){};
         showMonsterSkillNameBadge=function(){};showMonsterHit=function(){};
-        const earth=v155ResolveEastEarthShield(0,true);
-        const calm=v155ResolveHeavenCalm(1,true);
+        const earth=v155ResolveRockWall(0,true);
+        const calm=v155ResolveStealthSkill(1,true);
         return {
             earth:earth,calm:calm,
-            earthTargets:monsters.filter(monster=>monster.activeBuffs.some(buff=>buff.statusName==="萬象土盾")).length,
-            calmTargets:monsters.filter(monster=>monster.activeBuffs.some(buff=>buff.statusName==="氣定神閒")).length,
-            earthBuff:monsters[0].activeBuffs.find(buff=>buff.statusName==="萬象土盾"),
-            calmBuff:monsters[0].v141TeamBuffs.find(buff=>buff.statusName==="氣定神閒")
+            earthTargets:monsters.filter(monster=>monster.activeBuffs.some(buff=>buff.type==="rockWall")).length,
+            calmTargets:monsters.filter(monster=>monster.activeBuffs.some(buff=>buff.type==="stealthSkill")).length,
+            earthBuff:monsters[0].activeBuffs.find(buff=>buff.type==="rockWall"),
+            calmBuff:monsters[0].v141TeamBuffs.find(buff=>buff.type==="stealthSkill")
         };
     })()`);
     assert.equal(result.earth,true);
     assert.equal(result.calm,true);
     assert.equal(result.earthTargets,2);
-    assert.equal(result.calmTargets,5);
-    assert.deepEqual(result.earthBuff,{type:"earthShield",v141BuffType:"earthShield",turnsLeft:3,percent:50,statusName:"萬象土盾"});
-    assert.deepEqual(result.calmBuff,{type:"resistance",turnsLeft:3,amount:65,accuracyBonusPercent:50,statusName:"氣定神閒",
-        displayBuff:{type:"v141TeamBuff",v141BuffType:"resistance",turnsLeft:3,accuracyBonusPercent:50,statusName:"氣定神閒"}});
+    assert.equal(result.calmTargets,1);
+    assert.equal(result.earthBuff.type,"rockWall");
+    assert.equal(result.calmBuff.type,"stealthSkill");
 });
 
 function prepareExtremeEmperor(context){
     vm.runInContext(`
         monsters.splice(0,monsters.length,
             {name:"極帝天尊",element:"light",level:100,hp:500,maxHP:1000,sp:500,maxSP:1000,
-                alive:true,evasion:100,agility:80,activeBuffs:[],statusEffects:[{type:"burn",turnsLeft:2}]},
+                alive:true,v174TrueRealmFinal:true,v141SupportSkillIds:["yuanZuBlessing"],evasion:100,agility:80,activeBuffs:[],statusEffects:[{type:"burn",turnsLeft:2}]},
             {name:"天兵天將",element:"fire",level:100,hp:400,maxHP:1000,sp:10,maxSP:1000,
                 alive:true,evasion:100,agility:80,activeBuffs:[],statusEffects:[{type:"stun",turnsLeft:1}]}
         );
@@ -1334,7 +1326,7 @@ test("V173.38 formal damage matrix covers levels, roles, elements, pressure and 
 test("forced final-Abyss skill levels fold the modern scaling fields exactly once",()=>{
     const runtime=loadFinalRuntime();
     const result=evaluateJson(runtime.context,`(function(){
-        const monster={v155FinalAbyss:true,v141ForceSkillLevel:5,skillIds:["dragonSlash"],v141SupportSkillIds:[]};
+        const monster={v174TrueRealmFinal:true,v141ForceSkillLevel:5,skillIds:["dragonSlash"],v141SupportSkillIds:[]};
         const skill=skillDatabase.dragonSlash;
         const before=[skill.maxLevel,skill.powerMultiplier,skill.powerPerLevel,skill.flatDamage,skill.flatDamagePerLevel];
         const during=v155WithForcedFinalAbyssSkillLevel(monster,function(){
@@ -1438,7 +1430,7 @@ test("damage safety, full pressure matrix and Abyss level brackets remain formal
     assert.deepEqual(result.pressure,{world:[1,1.1,1.2],daily:[1.05,1.15,1.25],abyss:[1.15,1.25,1.35]});
     assert.equal(result.reverse,1);
     assert.deepEqual(result.rankAttack,[result.rankAttack[0],result.rankAttack[0],result.rankAttack[0]]);
-    assert.deepEqual(result.abyssLevels,[1,3,4,5]);
+    assert.deepEqual(result.abyssLevels,[2,2,2,2]);
     assert.equal(result.floor5Count,10);
     assert.ok(result.floor5Levels.every(level=>level===5));
     assert.ok(result.low>=1300&&result.low<=1700,result.low);

@@ -78,6 +78,25 @@
         Object.freeze({name:"北帝天尊",regionIndex:3}),
         Object.freeze({name:"南帝天尊",regionIndex:1})
     ]);
+    /* Lv40 真境最終戰的唯一正式技能 Owner。前四區帝王戰仍使用各自
+       region.bossSkills / bossSupports；只有最終五帝使用這份固定配置。 */
+    const FINAL_TRUE_REALM_LOADOUTS=Object.freeze({
+        "東帝天尊":Object.freeze({element:"earth",skills:Object.freeze(["dustStorm","flyingSandStrike"]),supports:Object.freeze(["rockWall"])}),
+        "天帝天尊":Object.freeze({element:"wind",skills:Object.freeze(["windHowlLightning","stormRain"]),supports:Object.freeze(["stealthSkill"])}),
+        "極帝天尊":Object.freeze({element:"light",skills:Object.freeze(["flyingSandStrike","phoenixCry"]),supports:Object.freeze(["yuanZuBlessing"])}),
+        "北帝天尊":Object.freeze({element:"water",skills:Object.freeze(["iceArrowRain","iceSpin"]),supports:Object.freeze(["healSpell"])}),
+        "南帝天尊":Object.freeze({element:"fire",skills:Object.freeze(["dragonSlash","phoenixCry"]),supports:Object.freeze(["rage"])})
+    });
+    /* The five final heavenly soldiers remain a single canonical companion
+       loadout. Keeping them here preserves the approved formation without
+       reintroducing a V144/V155 final-roster patch. */
+    const FINAL_TRUE_REALM_ELITE_LOADOUTS=Object.freeze([
+        Object.freeze({element:"water",skills:Object.freeze([]),supports:Object.freeze(["healSpell"])}),
+        Object.freeze({element:"earth",skills:Object.freeze(["stoneBreakSky"]),supports:Object.freeze([])}),
+        Object.freeze({element:"fire",skills:Object.freeze(["flameTornado"]),supports:Object.freeze([])}),
+        Object.freeze({element:"wind",skills:Object.freeze([]),supports:Object.freeze(["dodgeSkill"])}),
+        Object.freeze({element:"water",skills:Object.freeze([]),supports:Object.freeze(["healSpell"])})
+    ]);
 
     const BOSS_POSITIONS=Object.freeze([[50,27],[50,27],[50,25],[50,27],[50,24]]);
     const FLOOR_MAPS=Object.freeze([
@@ -335,7 +354,7 @@
         return monster;
     }
 
-    function makeAbyssMonster(name,config,region,rank,hpMultiplier,boss){
+    function makeAbyssMonster(name,config,region,rank,hpMultiplier,boss,loadout){
         if(typeof window.v132BuildDungeonMonster!=="function"){
             throw new Error("Abyss requires v132BuildDungeonMonster runtime owner.");
         }
@@ -352,13 +371,15 @@
         monster.v144SkillLevel=config.skillLevel;
         monster.activeBuffs=[];
         if(boss){
-            monster.skillIds=region.bossSkills.slice();
-            monster.v141SupportSkillIds=region.bossSupports.slice();
+            monster.skillIds=(loadout?loadout.skills:region.bossSkills).slice();
+            monster.v141SupportSkillIds=(loadout?loadout.supports:region.bossSupports).slice();
+            if(loadout){ monster.element=loadout.element; }
             monster.skillChance=region.id==="extreme"?0.78:0.72;
             if(region.id==="extreme"){ monster.v141AbyssAi="support"; }
         }else{
-            monster.skillIds=Array.isArray(monster.skillIds)?monster.skillIds.slice():[];
-            monster.v141SupportSkillIds=[];
+            monster.skillIds=(loadout?loadout.skills:monster.skillIds||[]).slice();
+            monster.v141SupportSkillIds=(loadout?loadout.supports:[]).slice();
+            if(loadout){ monster.element=loadout.element; }
         }
         return monster;
     }
@@ -367,14 +388,22 @@
         const roster=[];
         FINAL_TRUE_REALM_EMPERORS.forEach((definition,position)=>{
             const emperorRegion=ABYSS_REGIONS[definition.regionIndex];
-            const boss=makeAbyssMonster(definition.name,config,emperorRegion,"boss",config.bossHpMultiplier,true);
+            const loadout=FINAL_TRUE_REALM_LOADOUTS[definition.name];
+            const boss=makeAbyssMonster(definition.name,config,emperorRegion,"boss",config.bossHpMultiplier,true,loadout);
+            boss.v141ForceSkillLevel=5;
+            boss.v141SkillLevel=5;
+            boss.v144SkillLevel=5;
             boss.v141FormationRow=0;
             boss.v141FormationPosition=position;
             boss.v174TrueRealmFinal=true;
             roster.push(boss);
         });
         for(let position=0;position<5;position++){
-            const elite=makeAbyssMonster("天兵天將",config,ABYSS_REGIONS[4],"elite",config.bossEliteHpMultiplier,false);
+            const elite=makeAbyssMonster("天兵天將",config,ABYSS_REGIONS[4],"elite",config.bossEliteHpMultiplier,false,FINAL_TRUE_REALM_ELITE_LOADOUTS[position]);
+            elite.v141ForceSkillLevel=5;
+            elite.v141SkillLevel=5;
+            elite.v144SkillLevel=5;
+            elite.skillChance=.78;
             elite.v141FormationRow=1;
             elite.v141FormationPosition=position;
             elite.v174TrueRealmFinal=true;

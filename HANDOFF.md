@@ -1,3 +1,12 @@
+## 2026-09-20 — Lv40 深淵 Owner 收斂／五帝立繪／商店與主城 Header（IMPLEMENTED／PR CI 與 dev 實機驗收待完成）
+
+- Base：最新 `origin/dev@bd084a1f200dc527ca101436b68b4d150a52cb3a`；工作分支：`fix/abyss-lv40-skill-owner-five-emperor-portrait-20260920`；`main` 未修改，未 rebase／force push。
+- Lv40 最終五帝正式技能唯一 owner 為 `js/59-abyss-two-tier-runtime.js::FINAL_TRUE_REALM_LOADOUTS`；`js/40` 舊 final roster patch、`js/46` 舊 roster override 與三組未接線角色 handler 已退休。V141／V155 只從實際 `skillIds`／`v141SupportSkillIds` 進入 Skill-ID dispatcher；北帝未攜帶 `revive` 時不會復活。
+- `js/45-v154-dev-fixes.js::resolveMonsterPortraitRecord()` 已改為專屬圖／Registry／正式 Abyss mapping 優先，Boss placeholder 只作最後 fallback；五帝 Registry existing 各自解析 floor5 portrait。V159 只保留 timing bridge。
+- V173.51 shop QA runtime 已改為 inert，正式商店回到 `js/equipment-progression.js::replaceEquipmentShop`；`css/53` 舊兩列覆寫移除。主城隊伍 Header 由正式 Grid 欄位 owner 分隔隊伍數、金幣與佈陣。
+- 已新增 owner convergence、五帝 portrait、production bundle/cascade、390／412 Header browser 與商店 browser regression guard；目前本機沒有 Chrome，兩個 browser suite 只會 skip，不能視為實機 VERIFIED。
+- 本地 source／runtime、deterministic build、build:check、syntax、loader、resources、HTML IDs、Release Gate 均通過；待 commit／push／PR → `dev`、required CI、DEV deployment 與使用者 390／412 實機確認後再升為 VERIFIED。Game／Cache Version 維持 V173.69，`main` 禁止修改。
+
 ## 2026-09-20 — 背包／商店金幣／主城金幣／離線廣告／客服／登入六項修復（6/6 VERIFIED／V173.69 發布中）
 
 - Base：最新 dev@5b7d1052579e4bbce13291c63b9d7cc28fbb0964；工作分支：fix/backpack-shop-homegold-offline-auth-20260920-v2；main 未修改。舊分支因施工途中 dev 前進且同時修改商店 CSS，已保留但不再作整合候選；本分支從新 dev 重新套用，避免覆蓋最新數量欄字級修正。

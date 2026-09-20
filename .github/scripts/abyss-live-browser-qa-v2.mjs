@@ -326,7 +326,9 @@ try{
         return {
             pre:{count:pre.length,levels:pre.map(m=>m.level),skills:pre.map(m=>m.v141ForceSkillLevel),regularHp:pre[0].maxHP,eliteHp:pre[5].maxHP},
             boss:{count:boss.length,eliteHp:boss.find(m=>m.rank==='elite').maxHP,bosses:boss.filter(m=>m.rank==='boss').map(m=>({name:m.name,hp:m.maxHP,level:m.level,skill:m.v141ForceSkillLevel}))},
-            final:{count:final.length,eliteCount:final.filter(m=>m.rank==='elite').length,bosses:final.filter(m=>m.rank==='boss').map(m=>({name:m.name,hp:m.maxHP,level:m.level,skill:m.v141ForceSkillLevel}))}
+            final:{count:final.length,eliteCount:final.filter(m=>m.rank==='elite').length,
+                bosses:final.filter(m=>m.rank==='boss').map(m=>({name:m.name,hp:m.maxHP,level:m.level,skill:m.v141ForceSkillLevel,skills:m.skillIds,supports:m.v141SupportSkillIds})),
+                elites:final.filter(m=>m.rank==='elite').map(m=>({element:m.element,skills:m.skillIds,supports:m.v141SupportSkillIds,level:m.v141ForceSkillLevel}))}
         };
     })()`);
     evidence.checks.lv40=lv40;
@@ -335,8 +337,22 @@ try{
     assert.equal(lv40.pre.skills.every(v=>v===2),true);
     assert.deepEqual([lv40.pre.regularHp,lv40.pre.eliteHp],[644,2059]);
     assert.deepEqual([lv40.boss.eliteHp,lv40.boss.bosses[0].hp],[2517,5149]);
-    assert.deepEqual(lv40.final.bosses,[{name:"極帝天尊",hp:5149,level:40,skill:2}]);
-    assert.equal(lv40.final.eliteCount,9);
+    assert.equal(lv40.final.count,10);
+    assert.equal(lv40.final.eliteCount,5);
+    assert.deepEqual(lv40.final.bosses.map(b=>[b.name,b.level,b.skill,b.skills,b.supports]),[
+        ["東帝天尊",40,5,["dustStorm","flyingSandStrike"],["rockWall"]],
+        ["天帝天尊",40,5,["windHowlLightning","stormRain"],["stealthSkill"]],
+        ["極帝天尊",40,5,["flyingSandStrike","phoenixCry"],["yuanZuBlessing"]],
+        ["北帝天尊",40,5,["iceArrowRain","iceSpin"],["healSpell"]],
+        ["南帝天尊",40,5,["dragonSlash","phoenixCry"],["rage"]]
+    ]);
+    assert.deepEqual(lv40.final.elites.map(e=>[e.element,e.skills,e.supports,e.level]),[
+        ["water",[],["healSpell"],5],
+        ["earth",["stoneBreakSky"],[],5],
+        ["fire",["flameTornado"],[],5],
+        ["wind",[],["dodgeSkill"],5],
+        ["water",[],["healSpell"],5]
+    ]);
 
     const screenshot=await client.send("Page.captureScreenshot",{format:"png",fromSurface:true});
     if(screenshot.data){ fs.writeFileSync(path.join(artifactDir,"abyss-live-mobile.png"),Buffer.from(screenshot.data,"base64")); }
