@@ -1,3 +1,14 @@
+## 2026-09-20 — 背包／商店金幣／主城金幣／離線廣告／客服／登入六項修復（IMPLEMENTED／QA PENDING）
+
+- Base：最新 dev@49ba42f21237858545fe9e8de509c70ea9ce10af；工作分支：fix/backpack-shop-homegold-offline-auth-20260920；main 未修改。
+- 50% 藥水：正式背包篩選 owner js/00-main.js::getFilteredInventoryItems() 排除 hpPotion50/spPotion50；舊 definition 暫留只為安全解析既有存檔，不做破壞性存檔遷移。Adventure V1 寶箱／商人停止再產出 50% 藥水，改用正式 30% hpPotion30/spPotion30。
+- 裝備商店金幣：Runtime 原本已有 wallet markup，真正根因是 css/49-v169-rpg-ui.css one-screen 幾何把 .v17345-equipment-wallet 設為 display:none；已在同一 owner 恢復 32px compact row，V169 與 equipment-progression 兩個既有 renderer 都顯示「目前金幣」。
+- 主城紅圈位置：js/16-stage-v54-main-city-runtime.js::ensureHomeRosterShell() 在冒險隊伍 header 加入總金幣；js/00-main.js::updateGoldDisplay() 新增同一 DOM sink，因此獲得／消費金幣沿用既有同步 owner，不新增 timer／observer。
+- 離線經驗：Compact UI 曾呼叫不存在的 watchOfflineExpAd()，所以按鈕無反應；已改回核心既有 claimOfflineExpWithAd() → showRewardedAd() → claimOfflineExp(true)，不建立第二套廣告流程。
+- 客服信箱：Critical Boot 唯一 owner js/startup/support-contact.js 與 privacy.html 統一為 foursymbols.support@gmail.com；Firebase/Cloud Save 現行文件與 responsive/support 測試同步。
+- Facebook：只從 js/firebase/firebase-auth-ui.js 移除 Web 登入按鈕、import/bind；firebase-auth.js 的 provider/core、既有 Facebook 身分相容與 Android native handoff 均保留，符合「暫時不開放」而非永久刪除帳號能力。
+- Requirement Batch：release/requirement-batches/2026-09-20-backpack-shop-homegold-offline-auth.json；目前 6/6 IMPLEMENTED，需完成 deterministic build、targeted tests、responsive/mobile browser QA 與 Repository checks 才能升為 VERIFIED。
+
 ## 2026-09-20 — Battle Statistics／正式秘寶配裝／Boss 戰況抽屜／元素塔自動續戰（VERIFIED／main 未修改）
 
 - 工作分支：`feature/battle-stats-relic-ui-tower-auto-20260920`；PR #355；最新基準已合併 `dev@48bca3e4672591b67a1fbc75d8a67c6b7a66eae9`，未 rebase／force push，`main` 全程未修改。
