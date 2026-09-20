@@ -44,9 +44,16 @@
     },
     {
       "id": "REL-04",
-      "status": "TODO",
+      "status": "VERIFIED",
       "requirement": "發布候選合併 dev 後，最新 dev HEAD CI 與 DEV exact-SHA deployment 成功並核對 V173.67。",
-      "evidence": []
+      "evidence": [
+        "latest dev merge bd6f51b094ceda6cd841f271a72051edeee451e9",
+        "dev push CI run 35481574504 Repository checks SUCCESS",
+        "DEV deployment job 106000328588 SUCCESS",
+        "Confirm this commit is still dev HEAD SUCCESS",
+        "Verify deployed commit, game version V173.67 and cache version 173.67 SUCCESS",
+        "deployed battle layout and VFX live QA SUCCESS"
+      ]
     },
     {
       "id": "REL-05",
@@ -55,12 +62,12 @@
       "evidence": []
     }
   ],
-  "automatedVerification": "REL-01..03 VERIFIED for the expanded latest-dev V173.67 scope. PR #365 CI run 35481398149 SUCCESS; awaiting merge to dev and exact-SHA DEV deployment before REL-04.",
-  "visualVerification": "Latest combined V173.67 candidate passed Release Update, Fixed Slot 9x16, exact-candidate real battle and Adventure mobile QA on PR #365.",
+  "automatedVerification": "REL-01..04 VERIFIED for the expanded latest-dev V173.67 scope. PR #365 candidate CI runs 35481398149 / 35481480999 SUCCESS; latest dev bd6f51b094ceda6cd841f271a72051edeee451e9 push CI 35481574504 and DEV deployment job 106000328588 SUCCESS. REL-05 remains pending protected main promotion.",
+  "visualVerification": "Latest combined V173.67 candidate mobile QA passed; exact latest-dev Cloudflare deployment and deployed battle layout/VFX live QA are SUCCESS.",
   "verifiedSourceCommit": "60cceba3fa72d6a738f2ada7b27963f770faabba",
-  "mergedDevCommit": null,
+  "mergedDevCommit": "bd6f51b094ceda6cd841f271a72051edeee451e9",
   "mergedMainCommit": null,
   "candidateCiRun": 35481398149,
-  "devPushCiRun": null,
-  "devDeployJob": null
+  "devPushCiRun": 35481574504,
+  "devDeployJob": 106000328588
 }
