@@ -19,7 +19,7 @@ assert.match(css,/\.shop-potion-card\{[\s\S]*?display:grid !important;[\s\S]*?gr
 assert.match(css,/\.shop-potion-summary\{[\s\S]*?grid-template-columns:38px minmax\(0,1fr\) !important;[\s\S]*?height:38px !important;/);
 assert.match(css,/\.shop-potion-name\{[\s\S]*?min-height:0 !important;[\s\S]*?height:18px !important;[\s\S]*?margin:0 !important;/);
 assert.match(css,/\.shop-potion-effect\{[\s\S]*?min-height:0 !important;[\s\S]*?height:18px !important;[\s\S]*?margin:0 !important;/);
-assert.match(css,/\.shop-potion-purchase-row\{[\s\S]*?grid-template-columns:34px minmax\(48px,1fr\) 54px !important;[\s\S]*?grid-template-rows:36px !important;[\s\S]*?height:36px !important;/);
+assert.match(css,/\.shop-potion-purchase-row\{[\s\S]*?grid-template-columns:32px minmax\(48px,1fr\) 54px !important;[\s\S]*?grid-template-rows:36px !important;[\s\S]*?height:36px !important;/);
 assert.match(css,/\.shop-potion-purchase-row label\{[\s\S]*?display:none !important;/);
 assert.match(css,/\.shop-potion-purchase-row \.shop-potion-buy\{[\s\S]*?grid-column:3 !important;[\s\S]*?grid-row:1 !important;[\s\S]*?height:36px !important;[\s\S]*?font-size:15px !important;/);
 assert.ok(equip.includes("前5次免費；第6～10次尚未開放。"));
