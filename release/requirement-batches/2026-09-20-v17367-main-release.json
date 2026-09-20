@@ -40,21 +40,24 @@
       "status": "VERIFIED",
       "requirement": "V173.67 發布候選 PR 回 dev 的 Repository checks、build:check、手機 browser QA 與 Release Gate 全綠。",
       "evidence": [
-        "PR #358",
-        "CI run 35479058549 Repository checks SUCCESS",
-        "Release Update targeted regression SUCCESS",
-        "Release Update mobile browser QA SUCCESS",
-        "Fixed Slot 9x16 mobile QA SUCCESS",
-        "exact-candidate real battle mobile QA SUCCESS",
-        "Adventure mobile QA SUCCESS",
-        "static resources / loader integrity / Release Gate / git-diff SUCCESS"
+        "PR #358 final head 393729c80ffbc88e527dc488f85c0064965bba38",
+        "final candidate CI run 35479143694 Repository checks SUCCESS",
+        "deterministic build:check / Release Update mobile QA / Fixed Slot 9x16 mobile QA / exact-candidate real battle QA / Adventure mobile QA / Release Gate SUCCESS"
       ]
     },
     {
       "id": "REL-04",
-      "status": "TODO",
+      "status": "VERIFIED",
       "requirement": "發布候選合併 dev 後，最新 dev HEAD CI 與 DEV exact-SHA deployment 成功並核對 V173.67。",
-      "evidence": []
+      "evidence": [
+        "dev runtime merge b7b9216f2bbb1cda2df9194f434fac6751b97fbe",
+        "dev push CI run 35479281534 Repository checks SUCCESS",
+        "DEV deployment job 105994113171 SUCCESS",
+        "Confirm this commit is still dev HEAD SUCCESS",
+        "Verify deployed commit, game version and cache version SUCCESS",
+        "deployed battle layout and VFX live QA SUCCESS",
+        "Cloudflare DEV deployment bound to V173.67 / cache 173.67"
+      ]
     },
     {
       "id": "REL-05",
@@ -63,12 +66,12 @@
       "evidence": []
     }
   ],
-  "automatedVerification": "REL-01..03 VERIFIED. PR #358 candidate CI run 35479058549 SUCCESS; awaiting merge to dev and exact-SHA DEV deployment before REL-04.",
-  "visualVerification": "Release Update mobile browser QA、Fixed Slot 9x16 mobile QA、exact-candidate real battle mobile QA 與 Adventure mobile QA all passed on PR #358 CI run 35479058549.",
-  "verifiedSourceCommit": "8c042790ec1b5a517c02c334f0a361546466bef8",
-  "mergedDevCommit": null,
+  "automatedVerification": "REL-01..04 VERIFIED. PR #358 final CI run 35479143694 SUCCESS; dev push CI run 35479281534 SUCCESS; DEV deployment job 105994113171 exact-SHA / V173.67 / cache 173.67 / live battle QA SUCCESS. REL-05 remains pending protected main promotion.",
+  "visualVerification": "V173.67 candidate mobile browser QA and deployed DEV battle layout/VFX live QA are SUCCESS.",
+  "verifiedSourceCommit": "393729c80ffbc88e527dc488f85c0064965bba38",
+  "mergedDevCommit": "b7b9216f2bbb1cda2df9194f434fac6751b97fbe",
   "mergedMainCommit": null,
-  "candidateCiRun": 35479058549,
-  "devPushCiRun": null,
-  "devDeployJob": null
+  "candidateCiRun": 35479143694,
+  "devPushCiRun": 35479281534,
+  "devDeployJob": 105994113171
 }
