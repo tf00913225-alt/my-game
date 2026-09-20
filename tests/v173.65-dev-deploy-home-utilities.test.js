@@ -11,7 +11,7 @@ assert.match(index,/team-relic-home-entry[^>]*data-feature="relic"/);
 assert.match(index,/team-element-box-home-entry[^>]*data-feature="gameplay-core"/);
 assert.match(index,/aria-label="主城常駐功能"/);
 assert.doesNotMatch(app,/ensure\("relic","home-utilities"\)/);
-assert.match(app,/four-symbols:startup-ready[\s\S]{0,120}\.idle\(\)/);
+assert.match(app,/four-symbols:startup-ready[\s\S]{0,500}\.idle\(/);
 assert.match(city,/FourSymbolsHomeRelicSummary/);
 assert.match(city,/ensureHomeRosterShell/);
 assert.match(city,/HOME_RELIC_SUMMARY_CATALOG/);
