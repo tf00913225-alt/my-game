@@ -30,6 +30,15 @@
 - single 的中心是實際目標格；tri 即使只剩一個單位也保留三人格視覺尺寸；all 永遠保留完整目標側範圍；projectile（飛行技能）從施放者中心飛向正式主要目標中心。
 - DOM 例外、MISS（未命中）、Buff（增益）、Heal、Shield、Debuff（減益）與 VFX 清理都不得讓同一 initiative（行動序）永久等待。
 
+## 持續效果回合生命週期契約
+
+- 「持續 N 回合」必須提供目標 N 個真正有效的行動／限制機會；不得由無關的大回合邊界預先扣除。
+- Buff（增益）在目標實際行動結束後才消耗 1 回合；施放 Buff 的那次行動不消耗剛建立的 Buff。尚未行動的受益者可立刻在自己的行動享受效果，已行動者必須保留完整 N 次後續有效行動。
+- Freeze（冰封）與 Petrify（石化）以實際阻止行動次數計算；N 回合必須阻止 N 次行動，玩家與所有怪物階級使用相同語意。
+- Burn（燃燒）是獨立 DoT（持續傷害）生命週期：套用當下不額外跳傷害，之後在正式 Status Tick（狀態結算點）恰好造成 N 次傷害。
+- Frostbite（凍傷）及其他有回合數的軟性 Debuff（減益）不得再以玩家專用 `deferFirstTick` 形成不同算法；同樣在受影響單位的有效行動邊界消耗。
+- `FourSymbolsDurationLifecycle` 是持續回合扣除的共用協調入口；新技能不得另建全域 round-start 倒數或 timer（計時器）繞過它。
+
 ## Battle Statistics（戰鬥統計）與戰況介面契約
 
 - `FourSymbolsBattleStatistics` 是每場戰鬥統計的唯一 owner（控制來源）；每場開始建立一次、戰鬥中累積、結束時凍結同一份 snapshot（快照），戰後結算禁止重新推算第二份數字。

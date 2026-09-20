@@ -266,12 +266,6 @@
         }
         entity.statusEffects=entity.statusEffects||[];
         const entry={type:"frostbite",turnsLeft:duration||2,value:0};
-        if(
-            typeof getPartyCharacterIndex==="function"&&
-            getPartyCharacterIndex(entity)>=0
-        ){
-            entry.deferFirstTick=true;
-        }
         if(typeof window.v173MarkPersistentStateName==="function"){
             window.v173MarkPersistentStateName(entry,"frostbite");
         }
@@ -371,11 +365,13 @@
                 });
             }
             const result=previousTickStatusEffects.apply(this,arguments);
-            livingMonsterIndexes().forEach(index=>tickFrostbite(monsters[index],monsters[index].name));
-            partyIndexes().forEach(index=>{
-                const character=getPartyCharacterByIndex(index);
-                if(character&&numeric(character.hp)>0){ tickFrostbite(character,character.id||"角色"); }
-            });
+            if(!(typeof window!=="undefined"&&window.v175DurationLifecycleActive)){
+                livingMonsterIndexes().forEach(index=>tickFrostbite(monsters[index],monsters[index].name));
+                partyIndexes().forEach(index=>{
+                    const character=getPartyCharacterByIndex(index);
+                    if(character&&numeric(character.hp)>0){ tickFrostbite(character,character.id||"角色"); }
+                });
+            }
             return result;
         };
     }
