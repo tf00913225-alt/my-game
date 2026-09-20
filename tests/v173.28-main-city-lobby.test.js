@@ -121,8 +121,10 @@ test("gold and EXP share one compact formatter without ellipsis",()=>{
     assert.doesNotMatch(baseCss,/\.home-hud-resources b\{[\s\S]{0,180}text-overflow:ellipsis/);
 });
 
-test("the fixed 9:16 home keeps one substantial non-scrolling layout owner",()=>{
-    assert.match(baseCss,/#homePage\{[\s\S]{0,420}height:100%;[\s\S]{0,120}overflow:hidden/);
+test("the fixed 9:16 home keeps one bounded vertical scroll owner above the fixed navigation",()=>{
+    assert.match(baseCss,/#homePage\{[\s\S]{0,520}height:100%;[\s\S]{0,220}overflow-y:auto;[\s\S]{0,120}overflow-x:hidden/);
+    assert.match(baseCss,/#homePage\{[\s\S]{0,720}scroll-padding-bottom:calc\(var\(--bottom-nav-height,70px\) \+ var\(--safe-bottom,0px\) \+ 14px\)/);
+    assert.match(rosterCss,/\.v146-home-roster\{[\s\S]{0,420}margin:18px 10px calc\(var\(--bottom-nav-height,70px\) \+ var\(--safe-bottom,0px\) \+ 12px\)/);
     assert.match(baseCss,/\.home-card-grid\{[\s\S]*display:flex;[\s\S]*flex:0 0 auto/);
     assert.match(baseCss,/\.home-card-primary\{[\s\S]*height:90px/);
     assert.match(baseCss,/\.home-secondary-actions\{[\s\S]*min-height:343px/);
