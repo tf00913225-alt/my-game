@@ -157,9 +157,13 @@ try{
     snapshots.filter(shot=>shot.page==='potion').forEach(shot=>{
         assert.equal(shot.potionCardRects.length,6,"potion shop must show six cards on one screen");
         assert.equal(shot.potionIconRects.length,6,"each potion card needs one formal icon");
+        const viewportScale=shot.modal.width/420;
         shot.potionIconRects.forEach((icon,index)=>{
             const card=shot.potionCardRects[index];
-            assert.ok(Math.abs(icon.width-48)<0.25&&Math.abs(icon.height-48)<0.25,"potion icons must stay 48×48: "+JSON.stringify(icon));
+            assert.ok(
+                Math.abs(icon.width/viewportScale-48)<0.25&&Math.abs(icon.height/viewportScale-48)<0.25,
+                "potion icons must stay 48×48 logical px: "+JSON.stringify({viewportScale,icon})
+            );
             assert.ok(icon.left>=card.left-0.25&&icon.right<=card.right+0.25,"potion icon escaped its card horizontally");
             assert.ok(icon.top>=card.top-0.25&&icon.bottom<=card.bottom+0.25,"potion icon escaped its card vertically");
         });
