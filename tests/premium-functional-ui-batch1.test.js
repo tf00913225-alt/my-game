@@ -28,7 +28,7 @@ assert.match(authCss,/\.firebase-auth-dialog\{[\s\S]*?overflow-y:auto/);
 assert.match(authCss,/\.firebase-auth-button\{[\s\S]*?min-height:44px/);
 assert.match(authCss,/\.firebase-auth-field input\{[\s\S]*?min-height:44px/);
 
-assert.match(support,/const EMAIL="tf00913225@gmail\.com"/);
+assert.match(support,/const EMAIL="foursymbols\.support@gmail\.com"/);
 assert.match(support,/if\(event\.target===overlay\)\{ close\(\); \}/);
 assert.match(support,/event\.key==="Escape"/);
 

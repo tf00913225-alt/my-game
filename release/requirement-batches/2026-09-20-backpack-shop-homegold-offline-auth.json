@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "releaseVersion": "173.68",
+  "title": "背包／商店金幣／主城金幣／離線廣告／客服／登入六項修復",
+  "status": "IMPLEMENTED",
+  "requirements": [
+    {
+      "id": "FIX-01",
+      "status": "IMPLEMENTED",
+      "request": "背包不顯示已退役的 50% HP/SP 藥水，且新冒險內容不再產出 50% 藥水。",
+      "owner": [
+        "js/00-main.js",
+        "js/adventure/adventure-content-v1-20260915.js"
+      ],
+      "verification": "Targeted regression + browser/CI pending.",
+      "evidence": [
+        "tests/backpack-shop-homegold-offline-auth-20260920.test.js"
+      ]
+    },
+    {
+      "id": "FIX-02",
+      "status": "IMPLEMENTED",
+      "request": "商店裝備頁顯示玩家當前金幣。",
+      "owner": [
+        "js/51-v169-rpg-ui.js",
+        "js/equipment-progression.js",
+        "css/49-v169-rpg-ui.css"
+      ],
+      "verification": "Targeted regression + mobile browser/CI pending.",
+      "evidence": [
+        "tests/backpack-shop-homegold-offline-auth-20260920.test.js"
+      ]
+    },
+    {
+      "id": "FIX-03",
+      "status": "IMPLEMENTED",
+      "request": "主城冒險隊伍標題列顯示玩家總金幣，並跟既有金幣刷新 owner 同步。",
+      "owner": [
+        "js/16-stage-v54-main-city-runtime.js",
+        "js/00-main.js",
+        "css/19-stage-v54-main-city-moderate-native-scale.css"
+      ],
+      "verification": "Targeted regression + mobile browser/CI pending.",
+      "evidence": [
+        "tests/backpack-shop-homegold-offline-auth-20260920.test.js"
+      ]
+    },
+    {
+      "id": "FIX-04",
+      "status": "IMPLEMENTED",
+      "request": "離線經驗的模擬廣告雙倍領取可正常呼叫既有 rewarded-ad 流程。",
+      "owner": [
+        "js/35-v141-ui-battle.js",
+        "js/00-main.js",
+        "js/54-v173.51-battle-qa.js"
+      ],
+      "verification": "Targeted regression + browser/CI pending.",
+      "evidence": [
+        "tests/backpack-shop-homegold-offline-auth-20260920.test.js"
+      ]
+    },
+    {
+      "id": "FIX-05",
+      "status": "IMPLEMENTED",
+      "request": "遊戲客服與隱私權政策客服信箱統一為 foursymbols.support@gmail.com。",
+      "owner": [
+        "js/startup/support-contact.js",
+        "privacy.html",
+        "docs/FIREBASE_AUTH_CLOUD_SAVE.md"
+      ],
+      "verification": "Targeted regression + responsive browser/CI pending.",
+      "evidence": [
+        "tests/backpack-shop-homegold-offline-auth-20260920.test.js",
+        "tests/v174-auth-responsive-support.test.js"
+      ]
+    },
+    {
+      "id": "FIX-06",
+      "status": "IMPLEMENTED",
+      "request": "帳號登入頁暫時移除 Facebook 登入選項，不移除既有 Firebase provider/core 與 Android native handoff。",
+      "owner": [
+        "js/firebase/firebase-auth-ui.js"
+      ],
+      "verification": "Targeted regression + responsive browser/CI pending.",
+      "evidence": [
+        "tests/backpack-shop-homegold-offline-auth-20260920.test.js",
+        "tests/firebase-auth-foundation.test.mjs"
+      ]
+    }
+  ]
+}

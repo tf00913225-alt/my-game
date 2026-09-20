@@ -1279,6 +1279,16 @@ const potionDefinitions=[
 
 const shopItems=potionDefinitions;
 
+/*
+   50% HP/SP potions are retired from the backpack surface.
+   Keep the legacy definitions readable so old saves can still be parsed
+   without mutating player data; new content must not award these IDs.
+*/
+const RETIRED_BACKPACK_POTION_IDS=new Set([
+    "hpPotion50",
+    "spPotion50"
+]);
+
 /* =====================================================
    V92 — 背包堆疊規則
    - 裝備類：每格最多 1 件。
@@ -26924,7 +26934,8 @@ function updateGoldDisplay(){
 
     [
         $("homeGoldValue"),
-        $("inventoryGoldValue")
+        $("inventoryGoldValue"),
+        $("v146HomeRosterGoldValue")
     ].forEach(el=>{
         if(el){
             el.textContent=value.toLocaleString("zh-TW");
@@ -31457,6 +31468,7 @@ function getFilteredInventoryItems(){
 
     return inventoryItems.filter(item=>{
         if(!item) return false;
+        if(RETIRED_BACKPACK_POTION_IDS.has(String(item.id||""))) return false;
 
         if(inventoryFilter==="equipment"){
             return equipmentTypes.includes(item.type);
@@ -35954,7 +35966,10 @@ catch(error){
         }
         if(!roster.querySelector(":scope > header")){
             const header=document.createElement("header");
-            header.innerHTML='<b>冒險隊伍</b><span class="v146-home-roster-count">隊伍 -- / 6</span><button type="button" class="v-fixed-formation-entry" data-feature="gameplay-core" onclick="openHomeFeature(\'formation\')">佈陣</button>';
+            const currentGold=typeof gold!=="undefined"
+                ?Math.max(0,Math.floor(rosterNumber(gold))).toLocaleString("zh-TW")
+                :"0";
+            header.innerHTML='<b>冒險隊伍</b><span class="v146-home-roster-count">隊伍 -- / 6</span><span class="v146-home-roster-gold">金幣 <strong id="v146HomeRosterGoldValue">'+currentGold+'</strong></span><button type="button" class="v-fixed-formation-entry" data-feature="gameplay-core" onclick="openHomeFeature(\'formation\')">佈陣</button>';
             roster.appendChild(header);
         }
         if(!roster.querySelector(".v146-home-character")){

@@ -1128,7 +1128,7 @@
                 '<span>離線倍率 ×'+multiplier.toFixed(1)+'・上限 '+OFFLINE_EXP_MAX_MINUTES+' 分鐘</span></section>'+
                 '<div class="v141-offline-actions">'+
                 '<button type="button" '+(pendingOfflineExp<=0?"disabled":"")+' onclick="claimOfflineExp(false)">直接領取</button>'+
-                '<button type="button" '+(pendingOfflineExp<=0?"disabled":"")+' onclick="watchOfflineExpAd()">廣告雙倍</button></div>'+
+                '<button type="button" '+(pendingOfflineExp<=0?"disabled":"")+' onclick="claimOfflineExpWithAd()">廣告雙倍</button></div>'+
                 '<section class="rested"><small>休息經驗</small><strong>'+rested.battles+' / '+rested.maxBattles+' 場</strong>'+
                 '<span>一般練功 EXP ×2；元素匣與副本不消耗</span></section></div>';
         };

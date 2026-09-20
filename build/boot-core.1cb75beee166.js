@@ -1,4 +1,4 @@
-window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.68","firebaseBootstrap":"build/firebase/firebase-bootstrap.fdb2a754f69b.js"});
+window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.68","firebaseBootstrap":"build/firebase/firebase-bootstrap.0128f5b3761e.js"});
 
 /* bundled source: js/startup/support-contact.js */
 /* =====================================================
@@ -11,7 +11,7 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.68","firebaseBootstr
 
     if(!global||global.FourSymbolsSupport){ return; }
 
-    const EMAIL="tf00913225@gmail.com";
+    const EMAIL="foursymbols.support@gmail.com";
     const OVERLAY_ID="fourSymbolsSupportOverlay";
 
     function close(){

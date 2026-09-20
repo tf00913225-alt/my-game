@@ -7691,7 +7691,7 @@
             ?"免費刷新（剩"+freeRemaining+"次）"
             :state.refreshCount>=SHOP_MAX_REFRESHES?"今日刷新已達上限":"金幣刷新・價格待設定";
         return '<div class="v17345-equipment-shop">'+
-            '<div class="v17345-equipment-wallet"><span>裝備商店</span><b>金幣 '+goldText+'</b></div>'+
+            '<div class="v17345-equipment-wallet"><span>目前金幣</span><b>'+goldText+'</b></div>'+
             '<div class="v17345-equipment-grid">'+offers.map(item=>
                 '<article class="v17345-equipment-card"><div class="v17345-equipment-icon" aria-hidden="true">'+shopEscape(item.glyph)+'</div>'+
                 '<b>'+shopEscape(item.name)+'</b><span>'+shopEscape(item.slot)+'・普通裝備</span>'+
@@ -8415,7 +8415,7 @@
         const freeRemaining=Math.max(0,5-state.refreshCount);
         const currentGold=typeof gold!=="undefined"?Math.max(0,Math.floor(Number(gold)||0)):0;
         const goldText=currentGold.toLocaleString("zh-TW");
-        root.innerHTML='<div class="v17345-equipment-wallet"><span>裝備商店</span><b>金幣 '+goldText+'</b></div><div class="v17345-equipment-grid">'+offers.map((item,index)=>{
+        root.innerHTML='<div class="v17345-equipment-wallet"><span>目前金幣</span><b>'+goldText+'</b></div><div class="v17345-equipment-grid">'+offers.map((item,index)=>{
             const rarity=RARITY_BY_KEY[item.rarityKey];
             const canBuy=currentGold>=rarity.shopPrice;
             return '<article class="v17345-equipment-card v17346-shop-card '+(canBuy?'is-affordable':'is-unaffordable')+'" data-rarity="'+escapeHtml(item.rarityKey)+'" role="button" tabindex="0" aria-label="預覽 '+escapeHtml(item.name)+'" onclick="v17346PreviewEquipmentShopOffer('+index+')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();v17346PreviewEquipmentShopOffer('+index+')}"><div class="v17345-equipment-icon v17346-gear-art">'+item.icon+'</div><b class="v17346-shop-name">'+escapeHtml(item.name)+'</b><span class="v17346-shop-slot">'+escapeHtml(SLOT_META[item.type].label)+'</span><span class="v17346-stat">'+escapeHtml(statLine(item))+'</span>'+(item.reforgeSlots?'<span class="v17346-reforge-mini">[可冶煉]</span>':'')+'<button class="v17346-shop-buy" type="button" '+(canBuy?'onclick="event.stopPropagation();v17346BuyEquipmentShopOffer('+index+')"':'disabled aria-disabled="true"')+'>'+rarity.shopPrice.toLocaleString("zh-TW")+' 金幣</button></article>';

@@ -13,7 +13,7 @@ const main=read("js/00-main.js");
 const service=read("js/16-stage-v54-main-city-runtime.js");
 const build=read("scripts/build-production.mjs");
 
-assert.match(authUi,/id="firebaseFacebookButton"[^>]*>Facebook 登入</);
+assert.doesNotMatch(authUi,/firebaseFacebookButton|Facebook 登入/);
 assert.match(authUi,/id="firebaseSupportButton"[^>]*>聯絡客服</);
 assert.match(authUi,/firebaseSupportButton[\s\S]*FourSymbolsSupport\.show\(\)/);
 assert.match(authUi,/const host=document\.body/,
@@ -24,7 +24,7 @@ assert.match(service,/formalSupportEmail=String\(window\.FourSymbolsSupport/);
 assert.match(service,/config\.supportEmail=formalSupportEmail/);
 assert.match(service,/supportEmail\.textContent=configuredEmail/);
 assert.doesNotMatch(service,/客服 Email：[\s\S]{0,180}尚未設定/);
-assert.match(support,/const EMAIL="tf00913225@gmail\.com"/);
+assert.match(support,/const EMAIL="foursymbols\.support@gmail\.com"/);
 
 const bootScripts=build.slice(build.indexOf("const bootScripts="),build.indexOf("const appScripts="));
 assert.ok(bootScripts.indexOf("js/startup/support-contact.js")>=0);
@@ -62,7 +62,7 @@ const html=`<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">
   <h2 class="firebase-auth-title">帳號與角色</h2>
   <p class="firebase-auth-subtitle">先確認 Firebase UID，再讀取此帳號的角色資料。</p>
   <div class="firebase-auth-status">請先登入、註冊或使用訪客開始遊戲。沒有 UID 時不能建立角色。</div>
-  <div class="firebase-auth-actions"><button class="firebase-auth-button">Google 登入</button><button class="firebase-auth-button">Facebook 登入</button></div>
+  <div class="firebase-auth-actions"><button class="firebase-auth-button">Google 登入</button></div>
   <div class="firebase-auth-footer"><button class="firebase-auth-button secondary">訪客開始遊戲</button></div>
   <div class="firebase-auth-divider">或使用 Email</div>
   <div class="firebase-auth-field"><label>Email</label><input type="email"></div>
@@ -115,7 +115,7 @@ try{
         assert.equal(data.support.position,"fixed");
         assert.ok(within(data.support.dialog,data.viewport.width,data.viewport.height),
             `support dialog escaped ${data.viewport.width}x${data.viewport.height}`);
-        assert.equal(data.support.email,"tf00913225@gmail.com");
+        assert.equal(data.support.email,"foursymbols.support@gmail.com");
     }
 }finally{
     try{fs.unlinkSync(fixture);}catch(_){ }

@@ -2257,6 +2257,8 @@ html, body, #game-viewport{
 }
 #game-stage #homePage .v146-home-roster > header{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;min-height:23px;color:#f0cb70;font-size:15px;line-height:20px;letter-spacing:.04em;}
 #game-stage #homePage .v146-home-roster > header span{color:#c7ad76;font-size:13px;line-height:18px;font-weight:800;}
+#game-stage #homePage .v146-home-roster > header .v146-home-roster-gold{white-space:nowrap;}
+#game-stage #homePage .v146-home-roster > header .v146-home-roster-gold strong{color:#f2cf79;font-size:13px;line-height:18px;font-weight:900;}
 #game-stage #homePage .v146-home-character-placeholder,
 #game-stage #homePage .v146-home-character-empty{opacity:.72;}
 #game-stage #homePage .v146-home-character-placeholder .v146-home-avatar,
