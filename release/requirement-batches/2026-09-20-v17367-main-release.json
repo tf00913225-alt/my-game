@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "batchId": "2026-09-20-v17367-main-release",
   "baseBranch": "dev",
-  "baseCommit": "803d430e1d0c7d8462ce0fbac1cef9aab8059c42",
+  "baseCommit": "b28177f3c64bc45b44bde84287d51b36b2a982ce",
   "officialVersion": "173.67",
   "officialVersionBumpAllowed": true,
   "overallStatus": "IMPLEMENTED",
@@ -19,45 +19,29 @@
     },
     {
       "id": "REL-02",
-      "status": "VERIFIED",
+      "status": "IMPLEMENTED",
       "requirement": "依 V173.66 main 到最新 dev 的玩家可感知差異建立 V173.67 Game/Cache Version、玩家公告、CHANGELOG 與 deterministic build。",
       "evidence": [
         "release/release.json",
         "release/release-update.json",
         "CHANGELOG.md",
-        "js/20-anonymous-20.js",
-        "package.json",
         "asset-manifest.json",
         "build/asset-manifest.json",
-        "index.html",
-        "PR #358 CI run 35479058549 Repository checks SUCCESS",
-        "deterministic build:check SUCCESS",
-        "V173.67 release notice / loader / Release Gate coherence SUCCESS"
+        "PR #363 2/2 VERIFIED potion names/icons scope added after the first V173.67 candidate",
+        "V173.67 player notice and CHANGELOG updated to include the latest dev potion scope"
       ]
     },
     {
       "id": "REL-03",
-      "status": "VERIFIED",
+      "status": "TODO",
       "requirement": "V173.67 發布候選 PR 回 dev 的 Repository checks、build:check、手機 browser QA 與 Release Gate 全綠。",
-      "evidence": [
-        "PR #358 final head 393729c80ffbc88e527dc488f85c0064965bba38",
-        "final candidate CI run 35479143694 Repository checks SUCCESS",
-        "deterministic build:check / Release Update mobile QA / Fixed Slot 9x16 mobile QA / exact-candidate real battle QA / Adventure mobile QA / Release Gate SUCCESS"
-      ]
+      "evidence": []
     },
     {
       "id": "REL-04",
-      "status": "VERIFIED",
+      "status": "TODO",
       "requirement": "發布候選合併 dev 後，最新 dev HEAD CI 與 DEV exact-SHA deployment 成功並核對 V173.67。",
-      "evidence": [
-        "dev runtime merge b7b9216f2bbb1cda2df9194f434fac6751b97fbe",
-        "dev push CI run 35479281534 Repository checks SUCCESS",
-        "DEV deployment job 105994113171 SUCCESS",
-        "Confirm this commit is still dev HEAD SUCCESS",
-        "Verify deployed commit, game version and cache version SUCCESS",
-        "deployed battle layout and VFX live QA SUCCESS",
-        "Cloudflare DEV deployment bound to V173.67 / cache 173.67"
-      ]
+      "evidence": []
     },
     {
       "id": "REL-05",
@@ -66,12 +50,12 @@
       "evidence": []
     }
   ],
-  "automatedVerification": "REL-01..04 VERIFIED. PR #358 final CI run 35479143694 SUCCESS; dev push CI run 35479281534 SUCCESS; DEV deployment job 105994113171 exact-SHA / V173.67 / cache 173.67 / live battle QA SUCCESS. REL-05 remains pending protected main promotion.",
-  "visualVerification": "V173.67 candidate mobile browser QA and deployed DEV battle layout/VFX live QA are SUCCESS.",
-  "verifiedSourceCommit": "393729c80ffbc88e527dc488f85c0064965bba38",
-  "mergedDevCommit": "b7b9216f2bbb1cda2df9194f434fac6751b97fbe",
+  "automatedVerification": "Release scope expanded after the first candidate because PR #363 entered dev. REL-02 is IMPLEMENTED with the updated V173.67 notice/CHANGELOG; final candidate CI and latest-dev exact-SHA deployment must be re-verified before main promotion.",
+  "visualVerification": "Underlying runtime/UI changes remain verified, including PR #363 potion icon layout; final combined V173.67 candidate verification is pending.",
+  "verifiedSourceCommit": null,
+  "mergedDevCommit": null,
   "mergedMainCommit": null,
-  "candidateCiRun": 35479143694,
-  "devPushCiRun": 35479281534,
-  "devDeployJob": 105994113171
+  "candidateCiRun": null,
+  "devPushCiRun": null,
+  "devDeployJob": null
 }
