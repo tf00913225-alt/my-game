@@ -1,6 +1,6 @@
 ## 2026-09-20 — 背包／商店金幣／主城金幣／離線廣告／客服／登入六項修復（IMPLEMENTED／QA PENDING）
 
-- Base：最新 dev@49ba42f21237858545fe9e8de509c70ea9ce10af；工作分支：fix/backpack-shop-homegold-offline-auth-20260920；main 未修改。
+- Base：最新 dev@5b7d1052579e4bbce13291c63b9d7cc28fbb0964；工作分支：fix/backpack-shop-homegold-offline-auth-20260920-v2；main 未修改。舊分支因施工途中 dev 前進且同時修改商店 CSS，已保留但不再作整合候選；本分支從新 dev 重新套用，避免覆蓋最新數量欄字級修正。
 - 50% 藥水：正式背包篩選 owner js/00-main.js::getFilteredInventoryItems() 排除 hpPotion50/spPotion50；舊 definition 暫留只為安全解析既有存檔，不做破壞性存檔遷移。Adventure V1 寶箱／商人停止再產出 50% 藥水，改用正式 30% hpPotion30/spPotion30。
 - 裝備商店金幣：Runtime 原本已有 wallet markup，真正根因是 css/49-v169-rpg-ui.css one-screen 幾何把 .v17345-equipment-wallet 設為 display:none；已在同一 owner 恢復 32px compact row，V169 與 equipment-progression 兩個既有 renderer 都顯示「目前金幣」。
 - 主城紅圈位置：js/16-stage-v54-main-city-runtime.js::ensureHomeRosterShell() 在冒險隊伍 header 加入總金幣；js/00-main.js::updateGoldDisplay() 新增同一 DOM sink，因此獲得／消費金幣沿用既有同步 owner，不新增 timer／observer。
