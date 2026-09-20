@@ -19,6 +19,8 @@ A resource is complete only after its HTTP response succeeds, its byte length an
 
 Runtime progress uses downloaded bytes divided by deterministic total bytes. Task completion is the fallback if byte totals are unavailable. The runtime worker pool is limited by the manifest and currently uses 5 workers (hard-capped at 6).
 
+First Play Blob decode only warms detached resources. It does not expose an authenticated main city: the live Visual Ready gate separately checks current DOM images, CSS backgrounds, required fonts and browser paint.
+
 The completion record is stored under `four_symbols_first_play_ready` and contains the game version, First Play manifest version, asset-pack version, manifest hash, completion time, and the content hash of each completed resource. A changed manifest does not make an old record current. Unchanged cached resources are reused; new, changed or missing resources are fetched and verified.
 
 ## First launch

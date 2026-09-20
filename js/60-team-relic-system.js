@@ -255,6 +255,19 @@
             formalMaterialSource:null
         };
     });
+    let relicVisualReadyPromise=null;
+    function nextVisualPaint(){ return new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))); }
+    function decodeRelicIcon(path){
+        return new Promise((resolve,reject)=>{const image=new Image();image.decoding="async";image.onload=()=>typeof image.decode==="function"?image.decode().then(resolve,reject):resolve();image.onerror=()=>reject(new Error("秘寶圖片無法載入："+path));image.src=path;});
+    }
+    function prepareRelicVisuals(){
+        if(relicVisualReadyPromise){return relicVisualReadyPromise;}
+        const iconPaths=[...new Set(RELIC_CATALOG_LIST.map(def=>def.iconPath).filter(Boolean))];
+        const loader=window.FourSymbolsFeatures;
+        const iconReady=loader&&typeof loader.ensureAssets==="function"?loader.ensureAssets(iconPaths):Promise.all(iconPaths.map(decodeRelicIcon));
+        relicVisualReadyPromise=Promise.all([document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve(),iconReady]).then(()=>iconPaths).catch(error=>{relicVisualReadyPromise=null;throw error;});
+        return relicVisualReadyPromise;
+    }
     const relicCatalog=Object.freeze(Object.fromEntries(RELIC_CATALOG_LIST.map(item=>[item.id,Object.freeze(item)])));
     let playerRelics={};
     let teamLoadout={relicId:null,subRelicId:null};
@@ -1305,6 +1318,7 @@
     }
 
     function modalNodes(){ return {modal:document.getElementById("homeFeatureModal"),body:document.getElementById("homeFeatureModalBody"),title:document.getElementById("homeFeatureModalTitle")}; }
+    function renderRelicLoading(nodes){ nodes.modal.classList.remove("team-relic-detail-mode"); nodes.body.innerHTML='<div class="team-relic-loading" role="status" aria-live="polite">正在載入秘寶…</div>'; }
     function prepareRelicModal(){
         const nodes=modalNodes(); if(!nodes.modal||!nodes.body){ return null; }
         /* Opening the relic surface must not close and immediately reopen the shared modal.
@@ -1319,10 +1333,11 @@
         return nodes;
     }
     function openRelicPage(){
-        currentDetailId=null; Object.values(playerRelics).forEach(state=>{ if(state.unlocked){state.seen=true;} }); saveRelics();
-        const nodes=prepareRelicModal(); if(!nodes){ return false; } nodes.modal.classList.remove("team-relic-detail-mode"); nodes.body.innerHTML=renderRelicList(); syncHomeRelicUi(); return true;
+        currentDetailId=null; const nodes=prepareRelicModal(); if(!nodes){return false;} renderRelicLoading(nodes);
+        prepareRelicVisuals().then(async()=>{if(!nodes.modal.classList.contains("team-relic-modal")){return;}Object.values(playerRelics).forEach(state=>{if(state.unlocked){state.seen=true;}});saveRelics();nodes.modal.classList.remove("team-relic-detail-mode");nodes.body.innerHTML=renderRelicList();await nextVisualPaint();try{if(performance&&typeof performance.mark==="function"){performance.mark("four-symbols:relic-visual-ready");}}catch(_){ }syncHomeRelicUi();}).catch(error=>{nodes.body.innerHTML='<div class="team-relic-loading team-relic-loading-error" role="alert">秘寶載入失敗。<button type="button" onclick="v174OpenRelicPage()">重新載入</button></div>';document.dispatchEvent(new CustomEvent("four-symbols:feature-local-error",{detail:{feature:"relic",error}}));});
+        return true;
     }
-    function openRelicDetail(id){ const def=relicCatalog[id]; if(!def){ return false; } currentDetailId=id; const nodes=prepareRelicModal(); if(!nodes){return false;} nodes.modal.classList.add("team-relic-detail-mode"); nodes.body.innerHTML=detailMarkup(def); return true; }
+    function openRelicDetail(id){ const def=relicCatalog[id]; if(!def){return false;} currentDetailId=id; const nodes=prepareRelicModal(); if(!nodes){return false;} renderRelicLoading(nodes); prepareRelicVisuals().then(async()=>{if(!nodes.modal.classList.contains("team-relic-modal")||currentDetailId!==id){return;}nodes.modal.classList.add("team-relic-detail-mode");nodes.body.innerHTML=detailMarkup(def);await nextVisualPaint();try{if(performance&&typeof performance.mark==="function"){performance.mark("four-symbols:relic-visual-ready");}}catch(_){ }}).catch(error=>{nodes.body.innerHTML='<div class="team-relic-loading team-relic-loading-error" role="alert">秘寶載入失敗。<button type="button" onclick="v174OpenRelicPage()">重新載入</button></div>';document.dispatchEvent(new CustomEvent("four-symbols:feature-local-error",{detail:{feature:"relic",error}}));});return true; }
     function renderRelicPage(preferred){ if(!document||!document.getElementById("homeFeatureModal")?.classList.contains("team-relic-modal")){return;} if(preferred||currentDetailId){openRelicDetail(preferred||currentDetailId);}else{openRelicPage();} }
 
     function syncHomeRelicUi(){
@@ -1382,6 +1397,7 @@
     window.v174RelicDebugDispatch=dispatchRelicEvent;
     window.v174RelicDebugState=function(){ return relicBattleState?JSON.parse(JSON.stringify(relicBattleState)):null; };
     window.v174RelicPresentationState=function(){ return {active:relicPresentationPending>0,pending:relicPresentationPending,generation:relicPresentationGeneration}; };
+    try{if(performance&&typeof performance.mark==="function"){performance.mark("four-symbols:relic-runtime-ready");}}catch(_){ }
     window.v174RelicSystem=Object.freeze({
         catalog:relicCatalog,balance:RELIC_BALANCE_CONFIG,rarityLabels:RARITY_LABELS,categoryLabels:CATEGORY_LABELS,
         cutinDurationMs:RELIC_CUTIN_DURATION_MS,minVisualProtectionMs:RELIC_MIN_VISUAL_PROTECTION_MS,

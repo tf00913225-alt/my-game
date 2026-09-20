@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "releaseVersion": "173.69",
+  "title": "Cold Start Visual Ready／主城首屏 Gate／背景 UI 預抓／秘寶首次開啟",
+  "status": "IMPLEMENTED",
+  "requirements": [
+    {"id":"VR-01","status":"IMPLEMENTED","request":"主城資料 Ready 不得早於 Visual Ready 隱藏 Loading。","owner":["js/52-v173.20-startup-loader.js","js/16-stage-v54-main-city-runtime.js"]},
+    {"id":"VR-02","status":"IMPLEMENTED","request":"主城 CSS background、角色 avatar、底部導覽與必要字型納入首屏 Gate。","owner":["js/16-stage-v54-main-city-runtime.js","config/first-play-manifest.json"]},
+    {"id":"VR-03","status":"IMPLEMENTED","request":"主城首屏必要資源失敗不得 fail-open。","owner":["js/52-v173.20-startup-loader.js"]},
+    {"id":"VR-04","status":"IMPLEMENTED","request":"主城後以唯一 Feature Loader 低優先背景預抓 common UI，限制 concurrency 並保留 lazy runtime。","owner":["js/startup/feature-loader.js","js/20-anonymous-20.js"]},
+    {"id":"VR-05","status":"IMPLEMENTED","request":"Foreground feature request 可超車 queued background，且不重複下載或 execute。","owner":["js/startup/feature-loader.js"]},
+    {"id":"VR-06","status":"IMPLEMENTED","request":"秘寶 Runtime Ready 不得等同 Visual Ready；首次開啟只顯示局部 loading，20 icon 完整後一次呈現。","owner":["js/60-team-relic-system.js","css/55-team-relic-system.css"]},
+    {"id":"VR-07","status":"IMPLEMENTED","request":"秘寶 iconPath 維持唯一真相，背景預抓不 execute Boss／Tower runtime。","owner":["js/60-team-relic-system.js","scripts/build-production.mjs","asset-manifest.json"]},
+    {"id":"VR-08","status":"TODO","request":"全新 Browser Context、Cache clear、slow network、warm reload 與 390×844／412×915 實際驗收。","owner":[".github/scripts/run-boot-architecture-browser-qa.mjs"]}
+  ]
+}

@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "id": "first-play-core",
-  "manifestVersion": "2026-09-11.1",
-  "assetPackVersion": "2026-09-11.1",
+  "manifestVersion": "2026-09-20.1",
+  "assetPackVersion": "2026-09-20.1",
   "concurrency": 5,
   "bundles": [
     {"id": "critical", "priority": "P0"},
@@ -34,14 +34,19 @@
     {"path": "assets/ui/home-announcement.png", "priority": "P1", "type": "image", "decode": true},
     {"path": "assets/ui/home-offline-exp.png", "priority": "P1", "type": "image", "decode": true},
     {"path": "assets/ui/home-system.png", "priority": "P1", "type": "image", "decode": true},
+    {"path": "assets/ui/home-relic-v174.eed14e806044.webp", "priority": "P1", "type": "image", "decode": true},
+    {"path": "assets/ui/home-element-box-v174.webp", "priority": "P1", "type": "image", "decode": true},
 
     {"path": "assets/ui/nav-home.png", "priority": "P1", "type": "image", "decode": true},
+    {"path": "assets/ui/nav-training.png", "priority": "P1", "type": "image", "decode": true},
     {"path": "assets/ui/nav-dungeon.png", "priority": "P1", "type": "image", "decode": true},
     {"path": "assets/ui/nav-boss.png", "priority": "P1", "type": "image", "decode": true},
     {"path": "assets/ui/nav-character.png", "priority": "P1", "type": "image", "decode": true},
     {"path": "assets/ui/nav-backpack.png", "priority": "P1", "type": "image", "decode": true},
     {"path": "assets/ui/nav-quest.png", "priority": "P1", "type": "image", "decode": true},
     {"path": "assets/ui/nav-element-box.png", "priority": "P1", "type": "image", "decode": true},
+    {"path": "assets/ui/nav-gameplay.png", "priority": "P1", "type": "image", "decode": true},
+    {"path": "assets/ui/nav-relic-v175.webp", "priority": "P1", "type": "image", "decode": true},
     {"path": "assets/ui/map-return.png", "priority": "P1", "type": "image", "decode": true},
     {"path": "assets/ui/patrol-appearance-switch-icon.png", "priority": "P1", "type": "image", "decode": true},
 
