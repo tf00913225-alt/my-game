@@ -118,7 +118,7 @@ test("the owner runtime opens once on a ready home screen and closes through the
         set innerHTML(value){
             this._innerHTML=String(value);
             const ids=[
-                ["adFreeSupportEmail","tf00913225@gmail.com",false],
+                ["adFreeSupportEmail","foursymbols.support@gmail.com",false],
                 ["adFreeRefundPolicyButton","查看退款規則",false],
                 ["adFreeTermsButton","查看服務條款",false],
                 ["adFreePrivacyButton","查看隱私權政策",false],
@@ -171,7 +171,7 @@ test("the owner runtime opens once on a ready home screen and closes through the
     const window={
         document,
         location:{href:"https://game.example.test/"},
-        FourSymbolsSupport:{email:"tf00913225@gmail.com"},
+        FourSymbolsSupport:{email:"foursymbols.support@gmail.com"},
         getComputedStyle(element){
             if(element===game)return {display:"block",visibility:"visible"};
             return {display:"block",visibility:"visible"};
@@ -201,7 +201,7 @@ test("the owner runtime opens once on a ready home screen and closes through the
     assert.equal(elements.get("adFreeRefundPolicyButton").disabled,true);
     assert.equal(elements.get("adFreeTermsButton").disabled,true);
     assert.equal(elements.get("adFreePrivacyButton").disabled,true);
-    assert.equal(elements.get("adFreeSupportEmail").textContent,"tf00913225@gmail.com");
+    assert.equal(elements.get("adFreeSupportEmail").textContent,"foursymbols.support@gmail.com");
     assert.equal(elements.get("adFreeSupportEmail").dataset.todo,"false");
     assert.equal((document.head.children||[]).some(element=>element.id==="ad-free-service-info-style"),false,
         "the bundled stylesheet must not be downloaded again through a raw runtime link");

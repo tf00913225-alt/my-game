@@ -59,18 +59,17 @@ test("bootstrap exposes the narrow Firebase bridge and cloud-read events", ()=>{
     assert.match(bootstrap, /cloudSaveWritePolicy:\s*CLOUD_SAVE_WRITE_POLICY/);
 });
 
-test("authentication UI supports Google, Facebook, email and Firebase anonymous identity without production bypass", ()=>{
+test("authentication UI exposes Google, email and Firebase anonymous identity while Facebook remains backend-only", ()=>{
     assert.match(auth, /FacebookAuthProvider/);
     assert.match(auth, /export async function signInWithFacebook\(\)/);
     assert.match(auth, /new FacebookAuthProvider\(\)/);
     assert.match(ui, /signInWithGoogle/);
-    assert.match(ui, /signInWithFacebook/);
+    assert.doesNotMatch(ui, /signInWithFacebook/);
     assert.match(ui, /signInWithEmail/);
     assert.match(ui, /createAccountWithEmail/);
     assert.match(ui, /signInAsAnonymous/);
     assert.match(ui, /signOutFirebase/);
-    assert.match(ui, /id="firebaseFacebookButton"[^>]*>Facebook 登入<\/button>/);
-    assert.match(ui, /firebaseFacebookButton[\s\S]*signInWithFacebook/);
+    assert.doesNotMatch(ui, /firebaseFacebookButton/);
     assert.match(bootstrap, /signInWithGoogle,signInWithFacebook,signInWithEmail/);
     assert.doesNotMatch(ui, /先使用本機存檔/);
     assert.match(ui, /沒有 UID 時不能建立角色/);
@@ -99,14 +98,14 @@ test("authentication UI supports Google, Facebook, email and Firebase anonymous 
     assert.match(touch, /\.firebase-auth-dialog/);
 });
 
-test("Facebook auth stays in the Firebase popup flow on mobile and desktop", ()=>{
+test("retained Facebook auth helper stays in the Firebase popup flow if re-enabled", ()=>{
     assert.match(auth, /getRedirectResult/);
     assert.match(auth, /await getRedirectResult\(firebaseAuth\)/);
     assert.match(auth, /provider\.setCustomParameters\(\{ display:"popup" \}\)/);
     assert.match(auth, /const credential = await signInWithPopup\(auth, provider\)/);
     assert.doesNotMatch(auth, /signInWithRedirect/);
     assert.doesNotMatch(auth, /function isMobileBrowser\(\)/);
-    assert.match(docs, /Facebook sign-in uses Firebase popup/i);
+    assert.match(docs, /Facebook Web button is temporarily not exposed/i);
 });
 
 test("temporary direct-Meta Facebook diagnostic is fully removed", ()=>{
@@ -119,7 +118,7 @@ test("temporary direct-Meta Facebook diagnostic is fully removed", ()=>{
 });
 
 test("one Critical Boot support owner serves login and in-game contact surfaces", ()=>{
-    assert.match(support, /const EMAIL="tf00913225@gmail\.com"/);
+    assert.match(support, /const EMAIL="foursymbols\.support@gmail\.com"/);
     assert.match(support, /global\.FourSymbolsSupport=Object\.freeze/);
     assert.match(support, /id="supportContactTitle">聯絡客服/);
     assert.match(support, /href="mailto:/);

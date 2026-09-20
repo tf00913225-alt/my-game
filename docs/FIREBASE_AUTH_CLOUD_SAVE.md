@@ -18,16 +18,16 @@ Firebase Authentication is a required identity gate for production character own
 Fresh production sessions stop at the account UI until one of these Firebase identities exists:
 
 - Google sign-in.
-- Facebook sign-in.
+- Facebook web sign-in is temporarily not exposed in the account UI; the provider/core remains available for existing identities and the Android native handoff.
 - Email/password sign-in.
 - Email/password account creation.
 - `訪客開始遊戲`, implemented with Firebase Anonymous Auth.
 
 There is no production `先使用本機存檔` path. No UID means no save lookup and no first-character creation. Test doubles are confined to the local QA HTTP server in `.github/scripts/run-boot-architecture-browser-qa.mjs`; the deployed runtime contains no DEV auth bypass.
 
-The account surface is mounted directly under `document.body`, outside the fixed 1080×1920 game stage. It sizes against the real viewport (`100dvh` plus safe-area insets), so signed-out users do not depend on the authenticated app-shell stage scaler. Its `聯絡客服` button and the in-game system page both open `FourSymbolsSupport`, which displays `tf00913225@gmail.com` from one Critical Boot owner.
+The account surface is mounted directly under `document.body`, outside the fixed 1080×1920 game stage. It sizes against the real viewport (`100dvh` plus safe-area insets), so signed-out users do not depend on the authenticated app-shell stage scaler. Its `聯絡客服` button and the in-game system page both open `FourSymbolsSupport`, which displays `foursymbols.support@gmail.com` from one Critical Boot owner.
 
-Google, Facebook, Email/password and Anonymous providers must be enabled in Firebase Console. Every deployed custom domain used by popup or redirect sign-in must also be listed under Authentication → Settings → Authorized domains. Facebook additionally requires the same Meta App ID/App Secret configured in Firebase Authentication and the Firebase OAuth redirect URI (`https://four-symbols-jianghu.firebaseapp.com/__/auth/handler`) listed as a valid OAuth redirect URI in the Meta app. Facebook sign-in uses Firebase popup on both mobile and desktop so the OAuth flow remains in the browser instead of handing a full-page `facebook.com` navigation to an installed Android Facebook app. `getRedirectResult()` remains during initialization only to safely finish any older in-flight redirect session. If Firebase reports `auth/account-exists-with-different-credential`, the UI asks the player to use the original provider; it never silently links identities or reassigns an existing UID.
+Google, Email/password and Anonymous are the currently exposed Web account choices. The Facebook Web button is temporarily not exposed; the Firebase Facebook provider/core remains configured only for existing identities, compatibility and the Android native handoff. Every deployed custom domain used by popup or redirect sign-in must still be listed under Authentication → Settings → Authorized domains. The retained Facebook helper remains popup-only if it is re-enabled later, and `getRedirectResult()` remains during initialization only to safely finish any older in-flight redirect session. If Firebase reports `auth/account-exists-with-different-credential`, the UI asks the player to use the original provider; it never silently links identities or reassigns an existing UID.
 
 ## Account and character order
 

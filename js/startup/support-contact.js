@@ -8,7 +8,7 @@
 
     if(!global||global.FourSymbolsSupport){ return; }
 
-    const EMAIL="tf00913225@gmail.com";
+    const EMAIL="foursymbols.support@gmail.com";
     const OVERLAY_ID="fourSymbolsSupportOverlay";
 
     function close(){

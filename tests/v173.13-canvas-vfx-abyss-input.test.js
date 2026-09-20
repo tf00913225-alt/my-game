@@ -228,9 +228,9 @@ test("Abyss dialogue is owned by the map and blank-area taps can advance it",()=
 });
 
 test("the published release metadata is still internally aligned before this branch version bump",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.68"/);
-    assert.match(index,/<title>四象江湖傳 V173\.68<\/title>/);
-    assert.match(index,/aria-label="目前版本 V173\.68"[\s\S]*?>V173\.68<\/div>/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.69"/);
+    assert.match(index,/<title>四象江湖傳 V173\.69<\/title>/);
+    assert.match(index,/aria-label="目前版本 V173\.69"[\s\S]*?>V173\.69<\/div>/);
 });
 
 console.log("\n"+passed+" V173.39 raster VFX and Abyss input tests passed.");

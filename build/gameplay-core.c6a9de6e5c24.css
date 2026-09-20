@@ -7676,14 +7676,19 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     overflow:hidden !important;
 }
 
-/* The top HUD already owns the gold balance, so the duplicated equipment
-   wallet row is removed and that space is returned to the six merchandise cards. */
+/* Equipment page keeps a compact current-gold row so purchases never
+   require leaving the tab to confirm the account balance. */
 #game-stage #homeFeatureModal.v131-shop-open .v17345-equipment-wallet{
-    display:none !important;
+    display:flex !important;
+    flex:0 0 32px !important;
+    min-height:32px !important;
+    padding:4px 8px !important;
+    box-sizing:border-box !important;
+    font-size:13px !important;
 }
 #game-stage #homeFeatureModal.v131-shop-open .v17345-equipment-shop{
     display:grid !important;
-    grid-template-rows:minmax(0,1fr) 58px !important;
+    grid-template-rows:32px minmax(0,1fr) 58px !important;
     gap:7px !important;
 }
 #game-stage #homeFeatureModal.v131-shop-open .v17345-equipment-grid{
