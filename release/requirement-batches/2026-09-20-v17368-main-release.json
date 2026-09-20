@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-20-v17368-main-release",
+  "baseBranch": "dev",
+  "baseCommit": "83798ee8760026cde244da8ff8ecd3378f4eb472",
+  "officialVersion": "173.68",
+  "officialVersionBumpAllowed": true,
+  "overallStatus": "IMPLEMENTED",
+  "requirements": [
+    {
+      "id": "REL-01",
+      "status": "VERIFIED",
+      "requirement": "確認 current main 為既有 V173.67 正式版，本次候選來源固定為已完成手機實機驗收的最新 dev；禁止直接修改 main、rebase 或 force push。",
+      "evidence": [
+        "main@3ac9027eff0ce6a7217b4613bd619183e2fcbffb",
+        "dev@83798ee8760026cde244da8ff8ecd3378f4eb472",
+        "專案負責人確認可推 main"
+      ]
+    },
+    {
+      "id": "REL-02",
+      "status": "VERIFIED",
+      "requirement": "依 current main...dev 玩家可感知差異產生 V173.68 公告、CHANGELOG、Game/Cache Version 與 deterministic build。",
+      "evidence": [
+        "release/release.json",
+        "release/release-update.json",
+        "CHANGELOG.md",
+        "js/20-anonymous-20.js",
+        "index.html",
+        "package.json",
+        "asset-manifest.json",
+        "build/asset-manifest.json",
+        "release/requirement-batches/2026-09-20-shop-potion-home-relic-layout.json"
+      ]
+    },
+    {
+      "id": "REL-03",
+      "status": "TODO",
+      "requirement": "V173.68 發布候選 PR 必須通過 Repository checks、版本／公告／build synchronization 與必要 browser QA。",
+      "evidence": []
+    },
+    {
+      "id": "REL-04",
+      "status": "TODO",
+      "requirement": "候選合併 dev 後，最新 dev HEAD CI 與 DEV exact-SHA deployment 必須成功並核對 V173.68。",
+      "evidence": []
+    },
+    {
+      "id": "REL-05",
+      "status": "TODO",
+      "requirement": "以 protected dev → main PR 發布，main-target CI 成功後合併，並確認 production main SHA／版本。",
+      "evidence": []
+    }
+  ],
+  "automatedVerification": "REL-01..02 VERIFIED；REL-03..05 pending candidate CI, dev deployment and protected main promotion.",
+  "visualVerification": "Shop potion layout and main-city relic HUD were accepted by the project owner on deployed DEV before release preparation.",
+  "verifiedSourceCommit": "83798ee8760026cde244da8ff8ecd3378f4eb472",
+  "mergedDevCommit": null,
+  "mergedMainCommit": null,
+  "candidateCiRun": null,
+  "devPushCiRun": null,
+  "devDeployJob": null
+}
