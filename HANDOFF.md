@@ -4066,3 +4066,9 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 - 商店補品版面唯一後層 owner 維持 `css/49-v169-rpg-ui.css`；正式資料／購買 owner 仍為 `js/40-v144-rules-and-abyss.js`，HP/SP 交錯排序 owner 仍為 `js/51-v169-rpg-ui.js::arrangeShopColumns()`。本次不新增 late CSS 檔或 runtime wrapper；六張補品卡維持 2×3，但改成明確 Header／Icon+文字／數量+價格／購買按鈕分區，避免內容互相重疊。
 - 主城隊伍秘寶摘要 First Screen owner 維持 `js/16-stage-v54-main-city-runtime.js` + `css/19-stage-v54-main-city-moderate-native-scale.css`。不載入完整秘寶 feature；只在既有 slot 隱藏次要 trigger 說明，將列高 58px→44px、按鈕視覺高 34px→30px，保留名稱、Lv 與更換操作。
 - Requirement batch：`release/requirement-batches/2026-09-20-shop-potion-home-relic-layout.json`。目前兩項均為 IMPLEMENTED，待 dev 實際部署與手機視覺確認後才可升為 VERIFIED。
+## 2026-09-20 — Persistent Effect Duration Lifecycle 與焚血訣（dev 整合前）
+
+- 正式 duration owner 為 `js/00-main.js` 的 round/status sweep 加上 `js/60-v173.64-skill-progression-rebalance.js::FourSymbolsDurationLifecycle` 的 initiative action snapshot。舊全域 round-start sweep 不再扣除 Freeze／Petrify／凍傷與一般 soft Debuff；增益也不再因施放或無關大回合少算有效行動。
+- `deferFirstTick` 不再寫入凍傷。Freeze／Petrify 仍在本次受控單位的行動時阻擋行動，然後由 action-finished boundary 扣除一次，因此 N 回合必定阻擋 N 次；Burn 保留獨立 round-start Status Tick，套用時不立即跳傷害，N 回合產生 N 次 DoT。
+- 焚血訣 owner 仍是 `js/60-v173.64-skill-progression-rebalance.js`：Lv1–5 改為消耗最大 HP 5/10/15/20/25%，接下來三次玩家主動火系直接傷害各提升同樣百分比；燃燒 DoT、免費追擊不使用。施放本身不消耗這三次，第四次火系直接傷害不再加成。
+- 回歸 owner：`tests/skill-progression-rebalance.test.js`。已覆蓋焚血 Lv1–5 的精確 HP 成本、三次加成與第四次失效，以及 Buff／Freeze／Frostbite 的有效／阻擋行動扣除與當回合新 Buff 不預扣。

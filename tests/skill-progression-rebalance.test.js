@@ -66,6 +66,8 @@ function makeRuntime(options={}){
     let burnShouldAdd=false;
     let critShouldHit=false;
     let finished=0;
+    const beforeCombatantObservers=[];
+    const actionFinishedObservers=[];
     const context={
         console,Math,Number,Object,Array,String,Set,Map,Date,JSON,
         skillDatabase,characterSkillLoadouts,currentSkillCharacter:options.key||"fire",activeBattleCharacterIndex:0,
@@ -96,6 +98,11 @@ function makeRuntime(options={}){
             if(skillId==="earthShield") observedSupport=skillDatabase.earthShield.reflectPercent;
             return observedSupport;
         },
+        FourSymbolsBattleFlow:{
+            subscribeBeforeCombatant(observer){ beforeCombatantObservers.push(observer); return ()=>{}; },
+            subscribeActionFinished(observer){ actionFinishedObservers.push(observer); return ()=>{}; }
+        },
+        monsters:options.monsters||[],
         document:undefined
     };
     context.window=context;
@@ -104,7 +111,9 @@ function makeRuntime(options={}){
     return {
         context,owners,loadouts:characterSkillLoadouts,skills:skillDatabase,
         setBurn(value){ burnShouldAdd=value; },setCrit(value){ critShouldHit=value; },
-        observedBonus:()=>observedBonus,observedSupport:()=>observedSupport,finished:()=>finished
+        observedBonus:()=>observedBonus,observedSupport:()=>observedSupport,finished:()=>finished,
+        beginAction(entry){ beforeCombatantObservers.forEach(observer=>observer({token:1,turn:1,index:0,queue:[entry]})); },
+        finishAction(){ actionFinishedObservers.forEach(observer=>observer()); }
     };
 }
 
@@ -236,19 +245,22 @@ test("existing burn does not grant resonance momentum",()=>{
     assert.equal(r.owners.fire.activeBuffs.some(buff=>buff.type==="fireMomentum"),false);
 });
 
-test("blood burn enforces HP threshold, pays raw max-HP cost and only buffs next player-active main cast",()=>{
+test("blood burn pays each level's max-HP cost and buffs exactly three player-active fire casts",()=>{
     const r=makeRuntime();
-    r.loadouts.fire.skillLevels.bloodBurnArt=1;
     r.loadouts.fire.skillLevels.flameSlash=1;
-    r.owners.fire.hp=1000;r.owners.fire.sp=1000;
-    assert.equal(r.context.v17364CastNewFireTactical(0,"bloodBurnArt"),true);
-    assert.equal(r.owners.fire.hp,900);assert.equal(r.owners.fire.sp,980);
-    r.context.castDamageSkill("flameSlash",0);
-    assert.equal(r.observedBonus(),20);
-    assert.equal(r.owners.fire.activeBuffs.some(buff=>buff.type==="bloodBurn"),false);
-    r.owners.fire.hp=200;r.owners.fire.sp=1000;
-    assert.equal(r.context.v17364CastNewFireTactical(0,"bloodBurnArt"),false);
-    assert.equal(r.owners.fire.hp,200);assert.equal(r.owners.fire.sp,1000);
+    for(const [level,cost,bonus] of [[1,50,5],[2,100,10],[3,150,15],[4,200,20],[5,250,25]]){
+        r.owners.fire.activeBuffs=[];r.owners.fire.hp=1000;r.owners.fire.sp=1000;
+        r.loadouts.fire.skillLevels.bloodBurnArt=level;
+        assert.equal(r.context.v17364CastNewFireTactical(0,"bloodBurnArt"),true,`Lv${level} can cast`);
+        assert.equal(r.owners.fire.hp,1000-cost,`Lv${level} pays exact max-HP percentage`);
+        for(let cast=1;cast<=3;cast++){
+            r.context.castDamageSkill("flameSlash",0);
+            assert.equal(r.observedBonus(),bonus,`Lv${level} fire cast ${cast} is buffed`);
+        }
+        assert.equal(r.owners.fire.activeBuffs.some(buff=>buff.type==="bloodBurn"),false,`Lv${level} ends after the third fire cast`);
+        r.context.castDamageSkill("flameSlash",0);
+        assert.equal(r.observedBonus(),0,`Lv${level} fourth fire cast is not buffed`);
+    }
 });
 
 test("momentum and blood burn add in the same damage bonus bucket instead of multiplying",()=>{
@@ -258,8 +270,28 @@ test("momentum and blood burn add in the same damage bonus bucket instead of mul
     r.setCrit(true);r.context.castDamageSkill("flameSlash",0);
     r.setCrit(false);r.context.v17364CastNewFireTactical(0,"bloodBurnArt");
     r.context.castDamageSkill("flameSlash",0);
-    assert.equal(r.observedBonus(),32);
+    assert.equal(r.observedBonus(),17);
     assert.equal(r.skills.flameSlash.damageBonusPercent,undefined,"temporary bucket contribution is restored after the main cast");
+});
+
+test("duration lifecycle counts effective actions, blocked actions and never consumes a newly-cast buff",()=>{
+    const r=makeRuntime();
+    const actor=r.owners.fire;
+    actor.activeBuffs=[{type:"rage",turnsLeft:3}];
+    actor.statusEffects=[{type:"freeze",turnsLeft:3},{type:"frostbite",turnsLeft:2}];
+    for(let action=1;action<=3;action++){
+        r.beginAction({type:"player",characterIndex:0});
+        if(action===1){ actor.activeBuffs.push({type:"dodgeSkill",turnsLeft:3}); }
+        r.finishAction();
+        if(action<3){
+            assert.equal(actor.activeBuffs.find(buff=>buff.type==="rage")?.turnsLeft,3-action,`rage action ${action}`);
+            assert.equal(actor.statusEffects.find(effect=>effect.type==="freeze")?.turnsLeft,3-action,`freeze blocks action ${action}`);
+        }
+    }
+    assert.equal(actor.activeBuffs.some(buff=>buff.type==="rage"),false,"three effective actions exhaust a three-turn buff");
+    assert.equal(actor.statusEffects.some(effect=>effect.type==="freeze"),false,"three blocked actions exhaust a three-turn Freeze");
+    assert.equal(actor.activeBuffs.find(buff=>buff.type==="dodgeSkill")?.turnsLeft,1,"a buff created during the action does not lose that action");
+    assert.equal(actor.statusEffects.some(effect=>effect.type==="frostbite"),false,"two affected actions exhaust two-turn Frostbite");
 });
 
 test("wind and earth level-scaled support values feed the existing support owner",()=>{
