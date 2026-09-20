@@ -135,9 +135,9 @@ test("既有存檔與已穿戴套裝會同步取得新版圖示",()=>{
 });
 
 test("開發版本與快取版本更新為 V173.39",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.66"/);
-    assert.match(index,/<title>四象江湖傳 V173\.66<\/title>/);
-    assert.match(index,/aria-label="目前版本 V173\.66"[\s\S]*?>V173\.66<\/div>/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.67"/);
+    assert.match(index,/<title>四象江湖傳 V173\.67<\/title>/);
+    assert.match(index,/aria-label="目前版本 V173\.67"[\s\S]*?>V173\.67<\/div>/);
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
 
