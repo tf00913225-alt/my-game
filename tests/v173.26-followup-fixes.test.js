@@ -90,7 +90,7 @@ test("turn-end status and buff cleanup resynchronize Sprites at one shared bound
         tickStatusEffects(){ entity.statusEffects=[]; },
         tickPlayerBuffs(){ entity.activeBuffs=[]; },
         checkBattleEnd(){ return false; },
-        updateActionHudVisibility(){},beginCharacterTurn(){}
+        updateActionHudVisibility(){},showAutoBattleRoundPrompt(){},beginCharacterTurn(){}
     };
     context.window=context;
     context.v143SyncStatusSpriteEffects=function(){
