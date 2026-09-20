@@ -68,9 +68,9 @@ body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scro
 #game-stage #homeFeatureModal.v131-shop-open .shop-potion-stock{font-size:13px!important;line-height:17px!important}
 #game-stage #homeFeatureModal.v131-shop-open .shop-potion-name{font-size:16px!important;line-height:20px!important}
 #game-stage #homeFeatureModal.v131-shop-open .shop-potion-effect{font-size:14px!important;line-height:18px!important}
-#game-stage #homeFeatureModal.v131-shop-open .shop-potion-purchase-row{grid-template-columns:38px 48px minmax(0,1fr)!important;gap:4px!important}
+#game-stage #homeFeatureModal.v131-shop-open .shop-potion-purchase-row{grid-template-columns:24px minmax(56px,1fr) 54px!important;gap:3px!important}
 #game-stage #homeFeatureModal.v131-shop-open .shop-potion-purchase-row label{font-size:13px!important}
-#game-stage #homeFeatureModal.v131-shop-open .shop-potion-quantity{width:48px!important;min-width:48px!important;height:38px!important;min-height:38px!important;font-size:15px!important}
+#game-stage #homeFeatureModal.v131-shop-open .shop-potion-quantity{width:24px!important;min-width:24px!important;max-width:24px!important;height:38px!important;min-height:38px!important;padding:0!important;-webkit-appearance:textfield!important;appearance:textfield!important;font-family:Arial,sans-serif!important;font-size:12px!important}
 #game-stage #homeFeatureModal.v131-shop-open .v146-shop-total{font-size:13px!important;line-height:17px!important}
 #game-stage #homeFeatureModal.v131-shop-open .shop-potion-purchase-row .shop-potion-buy{height:42px!important;min-height:42px!important;font-size:15px!important}
 
