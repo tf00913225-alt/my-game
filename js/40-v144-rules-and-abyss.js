@@ -535,62 +535,10 @@
         };
     }
 
-    /* ----- Abyss floor 5 exact formation and carried skills. ----- */
-    const FINAL_BOSS_ORDER=["東帝天尊","天帝天尊","極帝天尊","北帝天尊","南帝天尊"];
-    const FINAL_BOSS_RULES={
-        東帝天尊:{element:"earth",skills:["dustStorm","stoneBreakSky"],supports:["barrier"]},
-        天帝天尊:{element:"wind",skills:["windHowlLightning","stormRain","stormSpell"],supports:[]},
-        極帝天尊:{element:"light",skills:[],supports:["yuanXiangGuangMing","yuanGuangShield","yuanZuBlessing"]},
-        北帝天尊:{element:"water",skills:["iceArrowRain","freeze"],supports:["healSpell"]},
-        南帝天尊:{element:"fire",skills:["phoenixCry","dragonSlash"],supports:["rage"]}
-    };
-    const FINAL_ELITES=[
-        {element:"water",skills:[],supports:["healSpell"]},
-        {element:"earth",skills:["stoneBreakSky"],supports:[]},
-        {element:"fire",skills:["phoenixCry"],supports:[]},
-        {element:"wind",skills:[],supports:["dodgeSkill"]},
-        {element:"water",skills:[],supports:["healSpell"]}
-    ];
-
-    function isFinalAbyssRoster(roster){
-        return Array.isArray(roster)&&roster.length===10&&FINAL_BOSS_ORDER.every(name=>roster.some(monster=>monster&&monster.name===name&&monster.v141Abyss));
-    }
-
-    function patchFinalAbyssRoster(roster){
-        if(!isFinalAbyssRoster(roster)){ return roster; }
-        const bosses=FINAL_BOSS_ORDER.map(name=>roster.find(monster=>monster&&monster.name===name));
-        const elites=roster.filter(monster=>monster&&monster.name==="天兵天將").slice(0,5);
-        bosses.forEach((monster,position)=>{
-            const rule=FINAL_BOSS_RULES[monster.name];
-            monster.element=rule.element;
-            monster.skillIds=rule.skills.slice();
-            monster.v141SupportSkillIds=rule.supports.slice();
-            monster.v141ForceSkillLevel=5;
-            monster.v141FormationRow=0;
-            monster.v141FormationPosition=position;
-            monster.skillChance=monster.name==="極帝天尊"?1:.78;
-        });
-        elites.forEach((monster,position)=>{
-            const rule=FINAL_ELITES[position];
-            monster.name="天兵天將";
-            monster.element=rule.element;
-            monster.skillIds=rule.skills.slice();
-            monster.v141SupportSkillIds=rule.supports.slice();
-            monster.v141ForceSkillLevel=4;
-            monster.v141FormationRow=1;
-            monster.v141FormationPosition=position;
-        });
-        roster.splice(0,roster.length,...bosses,...elites);
-        roster.v144FinalAbyss=true;
-        return roster;
-    }
-    window.v144PatchFinalAbyssRoster=patchFinalAbyssRoster;
-
     if(typeof window.v132LaunchDungeonBattle==="function"){
         const previousLaunchDungeonBattle=window.v132LaunchDungeonBattle;
         window.v132LaunchDungeonBattle=function(roster){
-            if(isFinalAbyssRoster(roster)){ patchFinalAbyssRoster(roster); }
-            else{
+            if(!(Array.isArray(roster)&&roster.some(monster=>monster&&monster.v174TrueRealmFinal))){
                 const encounterId="dungeon-"+(++encounterSequence);
                 (roster||[]).forEach(monster=>configureEncounterSkills(monster,encounterId));
             }
@@ -605,13 +553,12 @@
         const previousRenderBattleForSkills=renderBattle;
         renderBattle=function(){
             const roster=typeof monsters!=="undefined"?monsters:null;
-            if(isFinalAbyssRoster(roster)){ patchFinalAbyssRoster(roster); }
             const result=previousRenderBattleForSkills.apply(this,arguments);
             const token=typeof battleToken!=="undefined"?battleToken:null;
             if(
                 window.v132ActiveDungeonRun&&
                 token!==configuredDungeonBattleToken&&
-                !isFinalAbyssRoster(roster)
+                !(Array.isArray(roster)&&roster.some(monster=>monster&&monster.v174TrueRealmFinal))
             ){
                 configuredDungeonBattleToken=token;
                 const encounterId="dungeon-render-"+(++encounterSequence);
@@ -628,184 +575,10 @@
             .map(index=>({index:index,monster:monsters[index]}));
     }
 
-    function monsterControlled(monster){
-        return (typeof isMonsterFrozen==="function"&&isMonsterFrozen(monster))||
-            (typeof isMonsterPetrified==="function"&&isMonsterPetrified(monster));
-    }
-
-    function spendAndBadge(monster,index,skillId){
-        const skill=skillDatabase[skillId];
-        if(!skill||numeric(monster.sp)<numeric(skill.spCost)){ return false; }
-        monster.sp=Math.max(0,numeric(monster.sp)-numeric(skill.spCost));
-        showMonsterSkillNameBadge(skill.name,skill.element||monster.element,index);
-        return true;
-    }
-
-    function applyExtremeAgility(monster){
-        if(!monster||!monster.alive){ return; }
-        let buff=monster.v142AgilityBlessing;
-        if(!buff){
-            const display={type:"v141TeamBuff",v141BuffType:"agility",turnsLeft:2};
-            buff={originalAgility:numeric(monster.agility),turnsLeft:2,displayBuff:display};
-            monster.v142AgilityBlessing=buff;
-            monster.agility=Math.round(buff.originalAgility*1.75);
-            monster.activeBuffs=monster.activeBuffs||[];
-            monster.activeBuffs.push(display);
-        }else{
-            buff.turnsLeft=2;
-            buff.displayBuff.turnsLeft=2;
-        }
-    }
-
-    function castExtremeEmperor(monsterIndex){
-        const monster=monsters[monsterIndex];
-        if(!monster||monster.name!=="極帝天尊"||monsterControlled(monster)){ return false; }
-        const allies=abyssAllies().filter(entry=>entry.monster&&entry.monster.alive);
-        const needsLight=allies.some(entry=>{
-            const ally=entry.monster;
-            const shield=ally.v141Shield;
-            const baseHp=shield?numeric(ally.hp)-numeric(shield.remaining):numeric(ally.hp);
-            const maxHp=shield?numeric(shield.baseMaxHP):numeric(ally.maxHP);
-            return baseHp<maxHp||numeric(ally.sp)<numeric(ally.maxSP)||
-                (Array.isArray(ally.statusEffects)&&ally.statusEffects.length>0)||
-                !(ally.v142AgilityBlessing&&ally.v142AgilityBlessing.turnsLeft>0);
-        });
-        const needsShield=allies.some(entry=>!(entry.monster.v141Shield&&numeric(entry.monster.v141Shield.remaining)>0));
-        const skillId=needsLight?"yuanXiangGuangMing":needsShield?"yuanGuangShield":null;
-        if(!skillId||!spendAndBadge(monster,monsterIndex,skillId)){ return false; }
-        if(skillId==="yuanXiangGuangMing"){
-            let hpTotal=0,spTotal=0,removed=0;
-            allies.forEach(entry=>{
-                const ally=entry.monster;
-                const healed=typeof window.v141HealMonsterPreservingShield==="function"
-                    ?window.v141HealMonsterPreservingShield(ally,450):0;
-                hpTotal+=healed;
-                const before=numeric(ally.sp);
-                ally.sp=Math.min(numeric(ally.maxSP),before+95);
-                const restoredSp=ally.sp-before;
-                spTotal+=restoredSp;
-                removed+=Array.isArray(ally.statusEffects)?ally.statusEffects.length:0;
-                ally.statusEffects=[];
-                applyExtremeAgility(ally);
-                if(healed>0&&typeof showMonsterHit==="function"){ showMonsterHit(entry.index,healed,"heal"); }
-                if(restoredSp>0&&typeof showDamagePopup==="function"){
-                    const card=document.getElementById("battleMonster"+entry.index);
-                    if(card){ showDamagePopup(card,"+"+restoredSp+" SP","sp"); }
-                }
-                if(typeof window.v141PlayCardEffect==="function"){ window.v141PlayCardEffect("monster",entry.index,"heal"); }
-            });
-            addBattleLog("極帝天尊施放元相光明：全體回復"+hpTotal+" HP、"+spTotal+" SP，解除"+removed+"個負面狀態並提升75%敏捷2回合。");
-        }else{
-            allies.forEach(entry=>{
-                window.v141ApplyMonsterShield(entry.monster,200,2);
-                if(typeof window.v141PlayCardEffect==="function"){ window.v141PlayCardEffect("monster",entry.index,"shield"); }
-            });
-            addBattleLog("極帝天尊施放元光護體：全體獲得200護盾，持續2回合。");
-        }
-        updateUI(); finishPlayerAction();
-        return true;
-    }
-
-    function castNorthSupport(monsterIndex){
-        const monster=monsters[monsterIndex];
-        if(!monster||monster.name!=="北帝天尊"||monsterControlled(monster)){ return false; }
-        const entries=abyssAllies().filter(entry=>entry.monster&&entry.monster.alive);
-        const living=typeof window.v141GetMonsterAllyTriTargets==="function"
-            ?window.v141GetMonsterAllyTriTargets(monsterIndex,entries)
-            :entries.slice(0,3);
-        const skillId=living.some(entry=>{
-            const ally=entry.monster;
-            const shield=ally.v141Shield;
-            const hp=shield?numeric(ally.hp)-numeric(shield.remaining):numeric(ally.hp);
-            const max=shield?numeric(shield.baseMaxHP):numeric(ally.maxHP);
-            return hp<max||numeric(ally.sp)<numeric(ally.maxSP);
-        })?"healSpell":null;
-        if(!skillId||Math.random()>.55||!spendAndBadge(monster,monsterIndex,skillId)){ return false; }
-        const skill=skillDatabase.healSpell;
-        const level=Math.max(1,numeric(skill.maxLevel)||1);
-        const hpAmount=numeric(skill.baseHeal)+numeric(skill.healPerLevel)*(level-1);
-        const spAmount=numeric(skill.baseHealSP)+numeric(skill.healSPPerLevel)*(level-1);
-        let hpTotal=0,spTotal=0;
-        living.forEach(entry=>{
-            const ally=entry.monster;
-            const healed=typeof window.v141HealMonsterPreservingShield==="function"
-                ?window.v141HealMonsterPreservingShield(ally,hpAmount):0;
-            hpTotal+=healed;
-            const before=numeric(ally.sp);
-            ally.sp=Math.min(numeric(ally.maxSP),before+spAmount);
-            const restoredSp=ally.sp-before;
-            spTotal+=restoredSp;
-            if(skill.cleanseAll&&Array.isArray(ally.statusEffects)){ ally.statusEffects=[]; }
-            if(healed>0&&typeof showMonsterHit==="function"){ showMonsterHit(entry.index,healed,"heal"); }
-            if(restoredSp>0&&typeof showDamagePopup==="function"){
-                const card=document.getElementById("battleMonster"+entry.index);
-                if(card){ showDamagePopup(card,"+"+restoredSp+" SP","sp"); }
-            }
-            if(typeof window.v141PlayCardEffect==="function"){ window.v141PlayCardEffect("monster",entry.index,"heal"); }
-        });
-        addBattleLog("北帝天尊施放最高等級治療術：同排最多"+living.length+"名友方共回復"+
-            hpTotal+" HP、"+spTotal+" SP。");
-        updateUI(); finishPlayerAction();
-        return true;
-    }
-
     function hasV144Buff(monster,key){ return !!(monster&&monster[key]&&numeric(monster[key].turnsLeft)>0); }
 
-    function castCalmOrDodge(monsterIndex){
-        const monster=monsters[monsterIndex];
-        if(!monster||monsterControlled(monster)||Math.random()>.55){ return false; }
-        const calm=monster.name==="天帝天尊";
-        const dodge=monster.name==="天兵天將"&&monster.element==="wind"&&
-            (monster.v141SupportSkillIds||[]).includes("dodgeSkill");
-        if(!calm&&!dodge){ return false; }
-        const key=calm?"v144CalmBuff":"v144DodgeBuff";
-        const allies=abyssAllies().filter(entry=>entry.monster&&entry.monster.alive);
-        if(allies.every(entry=>hasV144Buff(entry.monster,key))){ return false; }
-        const skillId=calm?"dinghaishenzhen":"dodgeSkill";
-        if(!spendAndBadge(monster,monsterIndex,skillId)){ return false; }
-        allies.forEach(entry=>{
-            const ally=entry.monster;
-            if(hasV144Buff(ally,key)){
-                ally[key].turnsLeft=calm?3:2;
-                ally[key].display.turnsLeft=ally[key].turnsLeft;
-                return;
-            }
-            const display={type:"v141TeamBuff",v141BuffType:calm?"accuracy":"dodge",turnsLeft:calm?3:2};
-            const buff={turnsLeft:display.turnsLeft,display:display};
-            if(calm){
-                buff.originalAccuracy=numeric(ally.accuracy);
-                buff.originalResistance=numeric(ally.resistance);
-                ally.accuracy=Math.round(buff.originalAccuracy*1.5);
-                ally.resistance=buff.originalResistance+45;
-            }else{
-                buff.originalEvasion=numeric(ally.evasion);
-                ally.evasion=Math.round(buff.originalEvasion*1.6);
-            }
-            ally[key]=buff;
-            ally.activeBuffs=ally.activeBuffs||[];
-            ally.activeBuffs.push(display);
-            if(typeof window.v141PlayCardEffect==="function"){ window.v141PlayCardEffect("monster",entry.index,"buff"); }
-        });
-        addBattleLog(monster.name+"施放"+skillDatabase[skillId].name+"：敵方全體"+
-            (calm?"異常抗性提升45%、命中提升50%，持續3回合。":"閃躲率提升60%，持續2回合。"));
-        updateUI(); finishPlayerAction();
-        return true;
-    }
-
-    if(typeof window.v141TryMonsterSpecialAction==="function"){
-        const previousTryMonsterSpecialAction=window.v141TryMonsterSpecialAction;
-        window.v141TryMonsterSpecialAction=function(monsterIndex){
-            const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
-            if(monster&&monster.v141Abyss){
-                if(monster.name==="極帝天尊"){ return castExtremeEmperor(monsterIndex); }
-                if(monster.name==="北帝天尊"){ return castNorthSupport(monsterIndex); }
-                if(monster.name==="天帝天尊"||(monster.name==="天兵天將"&&monster.element==="wind")){
-                    return castCalmOrDodge(monsterIndex);
-                }
-            }
-            return previousTryMonsterSpecialAction.apply(this,arguments);
-        };
-    }
+    /* V144 no longer owns an enemy support dispatcher. The shared Skill-ID
+       dispatcher in V141/V155 is the sole runtime owner. */
 
     let v144AbyssBuffTick="";
     if(typeof startTurn==="function"){

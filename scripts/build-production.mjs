@@ -87,7 +87,6 @@ const gameplayScripts=[
     "js/53-v173.50-inventory-qol.js",
     "js/54-v173.51-battle-qa.js",
     "js/55-v173.51-inventory-qa.js",
-    "js/56-v173.51-shop-qa.js",
     "js/57-v173.51-quest-qa.js",
     "js/58-v173.63-functional-fixes.js",
     "js/battlefield-render-geometry-adapter.js"

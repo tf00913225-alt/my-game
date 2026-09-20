@@ -8,21 +8,6 @@
     window.__v155DevFixesInstalled=true;
 
     const VERSION="155";
-    const FINAL_BOSS_ORDER=["東帝天尊","天帝天尊","極帝天尊","北帝天尊","南帝天尊"];
-    const FINAL_BOSS_RULES={
-        東帝天尊:{element:"earth",skills:["dustStorm","flyingSandStrike"],supports:["rockWall"]},
-        天帝天尊:{element:"wind",skills:["windHowlLightning","stormRain"],supports:["stealthSkill"]},
-        極帝天尊:{element:"light",skills:["flyingSandStrike","phoenixCry"],supports:["yuanZuBlessing"]},
-        北帝天尊:{element:"water",skills:["iceArrowRain","iceSpin"],supports:["healSpell"]},
-        南帝天尊:{element:"fire",skills:["dragonSlash","phoenixCry"],supports:["rage"]}
-    };
-    const FINAL_ELITE_RULES=[
-        {element:"water",skills:[],supports:["healSpell"]},
-        {element:"earth",skills:["stoneBreakSky"],supports:[]},
-        {element:"fire",skills:["flameTornado"],supports:[]},
-        {element:"wind",skills:[],supports:["dodgeSkill"]},
-        {element:"water",skills:[],supports:["healSpell"]}
-    ];
 
     function numeric(value){
         const result=Number(value);
@@ -72,96 +57,6 @@
 }
     installMonsterOnlyFireBurst();
 
-    function rosterMonsters(roster){
-        if(!Array.isArray(roster)){ return []; }
-        return roster.map(item=>{
-            if(item&&typeof item==="object"){ return item; }
-            return typeof monsters!=="undefined"?monsters[item]:null;
-        }).filter(Boolean);
-    }
-
-    function isFinalAbyssRoster(roster){
-        const entries=rosterMonsters(roster);
-        return FINAL_BOSS_ORDER.every(name=>entries.some(monster=>monster.v141Abyss&&monster.name===name))&&
-            entries.filter(monster=>monster.v141Abyss&&monster.name==="天兵天將").length>=5;
-    }
-
-    function patchFinalAbyssRoster(roster){
-        if(!isFinalAbyssRoster(roster)){ return roster; }
-        const entries=rosterMonsters(roster);
-        const bosses=FINAL_BOSS_ORDER.map(name=>entries.find(monster=>monster.v141Abyss&&monster.name===name));
-        const elites=entries.filter(monster=>monster.v141Abyss&&monster.name==="天兵天將").slice(0,5);
-
-        bosses.forEach((monster,position)=>{
-            const rule=FINAL_BOSS_RULES[monster.name];
-            monster.element=rule.element;
-            monster.skillIds=rule.skills.slice();
-            monster.v141SupportSkillIds=rule.supports.slice();
-            monster.v141ForceSkillLevel=5;
-            monster.v141SkillLevel=5;
-            monster.v144SkillLevel=5;
-            monster.v141FormationRow=0;
-            monster.v141FormationPosition=position;
-            monster.skillChance=monster.name==="極帝天尊"?1:.78;
-            monster.v141AbyssAi=monster.name==="極帝天尊"?"v155-support":"v155-combat";
-            monster.v155FinalAbyss=true;
-        });
-        elites.forEach((monster,position)=>{
-            const rule=FINAL_ELITE_RULES[position];
-            monster.name="天兵天將";
-            monster.element=rule.element;
-            monster.skillIds=rule.skills.slice();
-            monster.v141SupportSkillIds=rule.supports.slice();
-            monster.v141ForceSkillLevel=5;
-            monster.v141SkillLevel=5;
-            monster.v144SkillLevel=5;
-            monster.v141FormationRow=1;
-            monster.v141FormationPosition=position;
-            monster.skillChance=.78;
-            monster.v141AbyssAi="v155-combat";
-            monster.v155FinalAbyss=true;
-        });
-        if(roster.every(item=>item&&typeof item==="object")&&roster.length===10){
-            roster.splice(0,roster.length,...bosses,...elites);
-        }
-        roster.v155FinalAbyss=true;
-        return roster;
-    }
-    window.v155PatchFinalAbyssRoster=patchFinalAbyssRoster;
-
-    if(typeof window.v144PatchFinalAbyssRoster==="function"){
-        const previousPatchFinalAbyssRoster=window.v144PatchFinalAbyssRoster;
-        window.v144PatchFinalAbyssRoster=function(roster){
-            const result=previousPatchFinalAbyssRoster.apply(this,arguments);
-            return patchFinalAbyssRoster(result||roster);
-        };
-    }
-
-    if(typeof window.v132LaunchDungeonBattle==="function"){
-        const previousLaunchDungeonBattle=window.v132LaunchDungeonBattle;
-        window.v132LaunchDungeonBattle=function(roster){
-            patchFinalAbyssRoster(roster);
-            const result=previousLaunchDungeonBattle.apply(this,arguments);
-            patchFinalAbyssRoster(roster);
-            return result;
-        };
-    }
-
-    function patchCurrentFinalAbyssRoster(){
-        if(typeof currentBattleMonsters==="undefined"||typeof monsters==="undefined"){ return; }
-        patchFinalAbyssRoster(currentBattleMonsters.map(index=>monsters[index]));
-    }
-
-    if(typeof renderBattle==="function"){
-        const previousRenderBattle=renderBattle;
-        renderBattle=function(){
-            patchCurrentFinalAbyssRoster();
-            const result=previousRenderBattle.apply(this,arguments);
-            patchCurrentFinalAbyssRoster();
-            return result;
-        };
-    }
-
     function hardControlled(character){
         return !!(character&&(
             (typeof isMonsterFrozen==="function"&&isMonsterFrozen(character))||
@@ -171,7 +66,7 @@
 
     function withForcedFinalAbyssSkillLevel(monster,callback){
         const forced=Math.max(1,Math.floor(numeric(monster&&monster.v141ForceSkillLevel)||1));
-        if(!monster||!monster.v155FinalAbyss||typeof skillDatabase==="undefined"){
+        if(!monster||!monster.v174TrueRealmFinal||typeof skillDatabase==="undefined"){
             return callback();
         }
         const ids=Array.from(new Set((monster.skillIds||[]).concat(monster.v141SupportSkillIds||[])));
@@ -344,7 +239,7 @@
 
     function resolveExtremeEmperorAction(monsterIndex,forcedSkillId,forcedCleanse){
         const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
-        if(!monster||monster.name!=="極帝天尊"||monster.alive===false||numeric(monster.hp)<=0||hardControlled(monster)){
+        if(!monster||!(monster.v141SupportSkillIds||[]).includes("yuanZuBlessing")||monster.alive===false||numeric(monster.hp)<=0||hardControlled(monster)){
             return false;
         }
         monster.v141AbyssAi="v155-support";
@@ -438,7 +333,7 @@
         if(typeof window.v173MarkPersistentStateName==="function"){
             window.v173MarkPersistentStateName(entry,stateName);
         }else if(entry){
-            entry.statusName={earthShield:"萬象土盾",dinghaishenzhen:"氣定神閒",dodgeSkill:"風行"}[stateName]||stateName;
+            entry.statusName={earthShield:"萬象土盾",rockWall:"岩石壁壘",dinghaishenzhen:"氣定神閒",stealthSkill:"隱身",dodgeSkill:"風行"}[stateName]||stateName;
         }
     }
 
@@ -509,7 +404,7 @@
     function resolveNorthRevive(monsterIndex,forceCast){
         const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
         const skill=typeof skillDatabase!=="undefined"?skillDatabase.revive:null;
-        if(!monster||monster.name!=="北帝天尊"||monster.alive===false||numeric(monster.hp)<=0||!skill||hardControlled(monster)){ return false; }
+        if(!monster||(monster.v141SupportSkillIds||[]).indexOf("revive")<0||monster.alive===false||numeric(monster.hp)<=0||!skill||hardControlled(monster)){ return false; }
         const defeated=currentAbyssEntriesIncludingDefeated().filter(entry=>
             entry.index!==monsterIndex&&(entry.monster.alive===false||numeric(entry.monster.hp)<=0)
         ).sort((left,right)=>(right.monster.rank==="boss")-(left.monster.rank==="boss")||left.index-right.index);
@@ -537,86 +432,91 @@
     window.v155ResolveNorthRevive=resolveNorthRevive;
 
     function resolveNorthSupport(monsterIndex,forceCast){
+        const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
+        const supports=monster&&monster.v141SupportSkillIds||[];
         const hasDefeated=currentAbyssEntriesIncludingDefeated().some(entry=>
             entry.index!==monsterIndex&&(entry.monster.alive===false||numeric(entry.monster.hp)<=0)
         );
-        return hasDefeated
-            ?resolveNorthRevive(monsterIndex,forceCast)
-            :resolveNorthHeal(monsterIndex,forceCast);
+        if(hasDefeated&&supports.includes("revive")){ return resolveNorthRevive(monsterIndex,forceCast); }
+        if(supports.includes("healSpell")){ return resolveNorthHeal(monsterIndex,forceCast); }
+        return false;
     }
     window.v155ResolveNorthSupport=resolveNorthSupport;
 
-    function resolveEastEarthShield(monsterIndex,forceCast){
+    function resolveRockWall(monsterIndex,forceCast){
         const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
-        const skill=typeof skillDatabase!=="undefined"?skillDatabase.earthShield:null;
-        if(!monster||monster.name!=="東帝天尊"||monster.alive===false||numeric(monster.hp)<=0||!skill||hardControlled(monster)){ return false; }
-        const targets=allyTriTargets(monsterIndex).filter(entry=>!hasNamedState(entry.monster,"萬象土盾"));
+        const skill=typeof skillDatabase!=="undefined"?skillDatabase.rockWall:null;
+        if(!monster||(monster.v141SupportSkillIds||[]).indexOf("rockWall")<0||monster.alive===false||numeric(monster.hp)<=0||!skill||hardControlled(monster)){ return false; }
+        const targets=currentAbyssEntries().filter(entry=>!hasNamedState(entry.monster,"rockWall"));
         if(!targets.length||!supportCastAllowed(monster,forceCast)||numeric(monster.sp)<numeric(skill.spCost)){ return false; }
         monster.sp=Math.max(0,numeric(monster.sp)-numeric(skill.spCost));
         if(typeof showMonsterSkillNameBadge==="function"){
             showMonsterSkillNameBadge(skill.name,skill.element||"earth",monsterIndex);
         }
         const duration=Math.max(1,Math.floor(numeric(skill.duration)||3));
-        const percent=Math.max(0,numeric(skill.reflectPercent)||50);
+        const percent=Math.max(0,numeric(skill.defenseBonusPercent)||30);
         let applied=0;
         targets.forEach(entry=>{
-            if(!canApplyNamedState(entry.monster,"earthShield",entry.index,skill.name)){ return; }
-            const display={type:"earthShield",v141BuffType:"earthShield",turnsLeft:duration,percent:percent};
-            const buff={type:"earthShield",turnsLeft:duration,percent:percent};
-            markNamedState(display,"earthShield");
-            markNamedState(buff,"earthShield");
+            if(!canApplyNamedState(entry.monster,"rockWall",entry.index,skill.name)){ return; }
+            const display={type:"rockWall",v141BuffType:"rockWall",turnsLeft:duration,percent:percent};
+            const buff={type:"rockWall",turnsLeft:duration,percent:percent};
+            markNamedState(display,"rockWall");
+            markNamedState(buff,"rockWall");
+            entry.monster.v155RockWall={
+                originalDefense:numeric(entry.monster.defense),
+                displayBuff:display,
+                battleToken:currentBattleToken(),
+                expiresTurn:currentRound()+duration
+            };
+            entry.monster.defense=Math.max(0,numeric(entry.monster.defense)*(1+percent/100));
             registerMonsterTeamBuff(entry.monster,buff,display);
             applied++;
             if(typeof window.v141PlayCardEffect==="function"){ window.v141PlayCardEffect("monster",entry.index,"shield"); }
         });
         if(typeof addBattleLog==="function"){
-            addBattleLog("東帝天尊施放萬象土盾，同排"+applied+"名友方獲得"+percent+"%反傷，持續"+duration+"回合。");
+            addBattleLog(monster.name+"施放"+skill.name+"，全體"+applied+"名友方防禦提升"+percent+"%，持續"+duration+"回合。");
         }
         if(typeof updateUI==="function"){ updateUI(); }
         if(typeof finishPlayerAction==="function"){ finishPlayerAction(); }
         return true;
     }
-    window.v155ResolveEastEarthShield=resolveEastEarthShield;
+    window.v155ResolveRockWall=resolveRockWall;
 
-    function resolveHeavenCalm(monsterIndex,forceCast){
+    function resolveStealthSkill(monsterIndex,forceCast){
         const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
-        const skill=typeof skillDatabase!=="undefined"?skillDatabase.dinghaishenzhen:null;
-        if(!monster||monster.name!=="天帝天尊"||monster.alive===false||numeric(monster.hp)<=0||!skill||hardControlled(monster)){ return false; }
-        const targets=currentAbyssEntries().filter(entry=>!hasNamedState(entry.monster,"氣定神閒"));
+        const skill=typeof skillDatabase!=="undefined"?skillDatabase.stealthSkill:null;
+        if(!monster||(monster.v141SupportSkillIds||[]).indexOf("stealthSkill")<0||monster.alive===false||numeric(monster.hp)<=0||!skill||hardControlled(monster)){ return false; }
+        const targets=currentAbyssEntries().filter(entry=>!hasNamedState(entry.monster,"stealthSkill")).slice(0,1);
         if(!targets.length||!supportCastAllowed(monster,forceCast)||numeric(monster.sp)<numeric(skill.spCost)){ return false; }
         monster.sp=Math.max(0,numeric(monster.sp)-numeric(skill.spCost));
         if(typeof showMonsterSkillNameBadge==="function"){
             showMonsterSkillNameBadge(skill.name,skill.element||"wind",monsterIndex);
         }
         const duration=Math.max(1,Math.floor(numeric(skill.duration)||3));
-        const resistance=Math.max(0,numeric(skill.statusResistBonus)||65);
-        const accuracy=Math.max(0,numeric(skill.accuracyBonusPercent)||50);
         let applied=0;
         targets.forEach(entry=>{
-            if(!canApplyNamedState(entry.monster,"dinghaishenzhen",entry.index,skill.name)){ return; }
-            const display={type:"v141TeamBuff",v141BuffType:"resistance",turnsLeft:duration,accuracyBonusPercent:accuracy};
-            const buff={type:"resistance",turnsLeft:duration,amount:resistance,accuracyBonusPercent:accuracy};
-            markNamedState(display,"dinghaishenzhen");
-            markNamedState(buff,"dinghaishenzhen");
-            entry.monster.resistance=numeric(entry.monster.resistance)+resistance;
+            if(!canApplyNamedState(entry.monster,"stealthSkill",entry.index,skill.name)){ return; }
+            const display={type:"stealthSkill",v141BuffType:"stealthSkill",turnsLeft:duration};
+            const buff={type:"stealthSkill",turnsLeft:duration};
+            markNamedState(display,"stealthSkill");
+            markNamedState(buff,"stealthSkill");
             registerMonsterTeamBuff(entry.monster,buff,display);
             applied++;
             if(typeof window.v141PlayCardEffect==="function"){ window.v141PlayCardEffect("monster",entry.index,"buff"); }
         });
         if(typeof addBattleLog==="function"){
-            addBattleLog("天帝天尊施放氣定神閒，"+applied+"名友方異常抗性提升"+resistance+"%、命中提升"+
-                accuracy+"%，持續"+duration+"回合。");
+            addBattleLog(monster.name+"施放"+skill.name+"，"+applied+"名友方進入隱身，持續"+duration+"回合。");
         }
         if(typeof updateUI==="function"){ updateUI(); }
         if(typeof finishPlayerAction==="function"){ finishPlayerAction(); }
         return true;
     }
-    window.v155ResolveHeavenCalm=resolveHeavenCalm;
+    window.v155ResolveStealthSkill=resolveStealthSkill;
 
     function resolveWindEliteDodge(monsterIndex,forceCast){
         const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
         const skill=typeof skillDatabase!=="undefined"?skillDatabase.dodgeSkill:null;
-        if(!monster||monster.name!=="天兵天將"||monster.element!=="wind"||monster.alive===false||numeric(monster.hp)<=0||!skill||hardControlled(monster)){
+        if(!monster||!(monster.v141SupportSkillIds||[]).includes("dodgeSkill")||monster.element!=="wind"||monster.alive===false||numeric(monster.hp)<=0||!skill||hardControlled(monster)){
             return false;
         }
         const targets=allyTriTargets(monsterIndex).filter(entry=>!hasNamedState(entry.monster,"風行"));
@@ -680,20 +580,22 @@
         window.v141TryMonsterSpecialAction=function(monsterIndex){
             const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
             if(monster&&monster.v141Abyss&&hardControlled(monster)){ return false; }
-            if(monster&&monster.v155FinalAbyss){
+            if(monster&&monster.v174TrueRealmFinal){
                 const plan=chooseFinalAbyssAction(monster);
                 if(plan.kind==="heal"){ return resolveNorthHeal(monsterIndex,true); }
                 if(plan.kind==="attack"&&plan.skillId){
                     monster.v175ForcedAttackSkillId=plan.skillId;
                     return false;
                 }
-                if(monster.name==="東帝天尊"){ return resolveEastEarthShield(monsterIndex); }
-                if(monster.name==="天帝天尊"){ return resolveHeavenCalm(monsterIndex); }
-                if(monster.name==="極帝天尊"){ return resolveExtremeEmperorAction(monsterIndex); }
-                if(monster.name==="北帝天尊"){ return resolveNorthSupport(monsterIndex); }
-                if(monster.name==="天兵天將"&&monster.element==="wind"){
-                    return resolveWindEliteDodge(monsterIndex);
+                if(plan.kind==="buff"&&plan.skillId==="rockWall"){ return resolveRockWall(monsterIndex,true); }
+                if(plan.kind==="buff"&&plan.skillId==="stealthSkill"){ return resolveStealthSkill(monsterIndex,true); }
+                if(plan.kind==="buff"&&plan.skillId==="yuanZuBlessing"){ return resolveExtremeEmperorAction(monsterIndex,"yuanZuBlessing"); }
+                if(plan.kind==="buff"&&["rage","dodgeSkill"].includes(plan.skillId)){
+                    monster.v175ForcedSupportSkillId=plan.skillId;
+                    return previousMonsterSpecial.apply(this,arguments);
                 }
+                if(plan.kind==="heal"){ return resolveNorthHeal(monsterIndex,true); }
+                if(plan.kind==="support"){ return resolveNorthSupport(monsterIndex,true); }
             }
             return previousMonsterSpecial.apply(this,arguments);
         };
@@ -715,6 +617,14 @@
         recomputeV155Evasion(monster);
     }
 
+    function removeRockWall(monster){
+        const state=monster&&monster.v155RockWall;
+        if(!state){ return; }
+        monster.defense=numeric(state.originalDefense);
+        removeDisplayBuff(monster,state.displayBuff);
+        delete monster.v155RockWall;
+    }
+
     function tickV155TimedStates(){
         const token=currentBattleToken();
         const round=currentRound();
@@ -732,6 +642,11 @@
                         dodge.turnsLeft=Math.max(1,numeric(dodge.expiresTurn)-round);
                         dodge.displayBuff.turnsLeft=dodge.turnsLeft;
                     }
+                }
+                const wall=monster&&monster.v155RockWall;
+                if(wall){
+                    if(wall.battleToken!==token||round>=numeric(wall.expiresTurn)){ removeRockWall(monster); }
+                    else{ wall.displayBuff.turnsLeft=Math.max(1,numeric(wall.expiresTurn)-round); }
                 }
                 if(monster&&Array.isArray(monster.activeBuffs)){
                     monster.activeBuffs=monster.activeBuffs.filter(buff=>{
@@ -967,8 +882,6 @@
             return invokeAtForcedLevel();
         };
     }
-
-    patchCurrentFinalAbyssRoster();
 
     window.v155RuleDiagnostics=function(){
         return {

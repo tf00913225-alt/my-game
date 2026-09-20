@@ -17985,7 +17985,6 @@ function processSingleMonsterAttack(monsterIndex,token){
         monsterIndex
     );
 
-
     /*
        ★ 修正（依照使用者要求，第2、3項）：
        1. 技能名稱不再自己取，改成從技能池

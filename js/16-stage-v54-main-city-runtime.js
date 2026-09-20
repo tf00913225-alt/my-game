@@ -320,6 +320,7 @@
             :(typeof sharedExp!=="undefined"?sharedExp:0);
         syncRosterResource(document.getElementById("homeHudGoldValue"),typeof gold!=="undefined"?gold:0);
         syncRosterResource(document.getElementById("homeHudExpValue"),availableExp);
+        syncRosterResource(document.getElementById("v146HomeRosterGoldValue"),typeof gold!=="undefined"?gold:0);
         const count=roster.querySelector(".v146-home-roster-count");
         if(count){ count.textContent="隊伍 "+partyIndexes.length+" / 6"; }
 

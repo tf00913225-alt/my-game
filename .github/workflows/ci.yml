@@ -76,6 +76,14 @@ jobs:
 
       - name: Run battle layout, timing and range-VFX regressions
         run: |
+          node tests/abyss-owner-convergence-20260920.test.js
+          node tests/abyss-two-tier-refactor.test.js
+          node tests/monster-portrait-runtime.test.js
+          node tests/v173.51-qa.test.js
+          node tests/v173.56-shop-layout-preview-regression.test.js
+          node tests/production-bundle-abyss-shop-owner.test.js
+          node tests/ui-panel-browser-layout.test.js
+          node tests/main-city-roster-header-browser.test.js
           node tests/battle-layout-vfx-runtime-20260917.test.js
           node tests/boss-battle-architecture-convergence-20260918.test.js
           node tests/gameplay-boss-tower-system.test.js

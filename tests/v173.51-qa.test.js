@@ -43,12 +43,8 @@ assert.match(css,/v17351-quality-menu/);
 assert.match(css,/v17351-inventory-fullscreen \.native-bottom-nav-layer\{display:none/);
 assert.match(css,/game-content>\.content[\s\S]*height:100%/);
 
-assert.match(shop,/BOUGHT=window\.FourSymbolsAccountSave\.accountKey\("equipment-shop-purchases"\)/);
-assert.match(shop,/✓ 已購買/);
-assert.match(shop,/本輪已購買/);
-assert.match(shop,/測試模式・無限免費刷新/);
-assert.match(shop,/售價待設定/);
-assert.match(shop,/v17351RetryShopImage/);
+assert.match(shop,/V173\.51 shop QA runtime retired/);
+assert.doesNotMatch(shop,/MutationObserver|setInterval|setTimeout|innerHTML/);
 
 assert.match(quest,/const PAGE=5/);
 assert.match(quest,/✓ 已領取/);
@@ -59,7 +55,8 @@ assert.match(quest,/v17351PreviewQuestMilestone/);
 assert.match(css,/quest-card-name\{font-size:17px/);
 
 assert.match(build,/"css\/53-v173\.51-qa\.css"/);
-assert.match(build,/"js\/53-v173\.50-inventory-qol\.js"[\s\S]*?"js\/54-v173\.51-battle-qa\.js"[\s\S]*?"js\/55-v173\.51-inventory-qa\.js"[\s\S]*?"js\/56-v173\.51-shop-qa\.js"[\s\S]*?"js\/57-v173\.51-quest-qa\.js"/);
+assert.match(build,/"js\/53-v173\.50-inventory-qol\.js"[\s\S]*?"js\/54-v173\.51-battle-qa\.js"[\s\S]*?"js\/55-v173\.51-inventory-qa\.js"[\s\S]*?"js\/57-v173\.51-quest-qa\.js"/);
+assert.doesNotMatch(build,/"js\/56-v173\.51-shop-qa\.js"/);
 assert.doesNotMatch(qol,/createElement\(["']script["']\)|\.onload\s*=/);
 assert.doesNotMatch(equipment,/createElement\(["']script["']\)|__v17351QaReady/);
 assert.ok(loader.includes('const V_ASSET_VERSION="173.69";'));

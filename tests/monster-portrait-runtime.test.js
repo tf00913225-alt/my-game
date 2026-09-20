@@ -80,7 +80,7 @@ function loadRuntime(monsterRows){
     context.window=context;
     vm.createContext(context);
     vm.runInContext(source,context);
-    return {context,cards,battlePage};
+    return {context,cards,battlePage,monsters:monsterRows};
 }
 
 const registry={
@@ -95,6 +95,13 @@ const registry={
             ["soldier.water","天兵天將","water","regular","standard","assets/monsters/soldiers/heavenly-soldier-water.png","existing"],
             ["soldier.wind","天兵天將","wind","regular","standard","assets/monsters/soldiers/heavenly-soldier-wind.png","existing"],
             ["soldier.earth","天兵天將","earth","regular","standard","assets/monsters/soldiers/heavenly-soldier-earth.png","existing"]
+        ],
+        "abyss-boss":[
+            ["abyss.final.east","東帝天尊","earth","boss","boss","assets/dungeons/abyss/floor5-east-emperor.webp","existing"],
+            ["abyss.final.heaven","天帝天尊","wind","boss","boss","assets/dungeons/abyss/floor5-heaven-emperor.webp","existing"],
+            ["abyss.final.extreme","極帝天尊","light","boss","boss","assets/dungeons/abyss/floor5-extreme-emperor.webp","existing"],
+            ["abyss.final.north","北帝天尊","water","boss","boss","assets/dungeons/abyss/floor5-north-emperor.webp","existing"],
+            ["abyss.final.south","南帝天尊","fire","boss","boss","assets/dungeons/abyss/floor5-south-emperor.webp","existing"]
         ]
     }
 };
@@ -103,9 +110,9 @@ const registry={
     const runtime=loadRuntime([{name:"哥布林",element:"fire"},{name:"史萊姆",element:"water"}]);
     runtime.context.v154InstallMonsterPortraitRegistry(registry);
     runtime.context.v154SyncMonsterPortraits();
-    assert.equal(runtime.context.resolveMonsterPortrait(runtime.context.monsters[0]),"assets/dungeons/abyss/soldier.webp");
+    assert.equal(runtime.context.resolveMonsterPortrait(runtime.context.monsters[0]),"assets/monsters/wild/zone-01/fire-01.png");
     assert.equal(runtime.context.resolveMonsterPortrait(runtime.context.monsters[1]),"assets/dungeons/abyss/soldier.webp");
-    assert.equal(runtime.cards[0].dataset.monsterPortraitKey,"temporary.heavenly-soldier");
+    assert.equal(runtime.cards[0].dataset.monsterPortraitKey,"wild.zone-01.fire-01");
     assert.equal(runtime.cards[1].dataset.monsterPortraitKey,"temporary.heavenly-soldier");
 }
 
@@ -115,10 +122,23 @@ const registry={
     })));
     runtime.context.v154InstallMonsterPortraitRegistry(registry);
     runtime.context.v154SyncMonsterPortraits();
-    assert.deepEqual(
-        runtime.cards.slice(0,5).map(card=>card.dataset.monsterPortraitKey),
-        Array(5).fill("temporary.heavenly-soldier")
-    );
+    assert.deepEqual(runtime.cards.slice(0,5).map(card=>card.dataset.monsterPortraitKey),
+        ["soldier.water","soldier.earth","soldier.fire","soldier.wind","soldier.water"]);
+}
+
+{
+    const names=["東帝天尊","天帝天尊","極帝天尊","北帝天尊","南帝天尊"];
+    const runtime=loadRuntime(names.map((name,index)=>({name,element:["earth","wind","light","water","fire"][index],rank:"boss",v141Abyss:true})));
+    runtime.context.v154InstallMonsterPortraitRegistry(registry);
+    runtime.context.v154SyncMonsterPortraits();
+    assert.deepEqual(runtime.cards.slice(0,5).map(card=>card.dataset.monsterPortraitKey),[
+        "abyss.final.east","abyss.final.heaven","abyss.final.extreme","abyss.final.north","abyss.final.south"]);
+    assert.deepEqual(runtime.monsters.map(monster=>runtime.context.resolveMonsterPortrait(monster)),[
+        "assets/dungeons/abyss/floor5-east-emperor.webp",
+        "assets/dungeons/abyss/floor5-heaven-emperor.webp",
+        "assets/dungeons/abyss/floor5-extreme-emperor.webp",
+        "assets/dungeons/abyss/floor5-north-emperor.webp",
+        "assets/dungeons/abyss/floor5-south-emperor.webp"]);
 }
 
 {
@@ -126,7 +146,7 @@ const registry={
     runtime.context.v154InstallMonsterPortraitRegistry(registry);
     runtime.context.v154SyncMonsterPortraits();
     assert.equal(runtime.context.resolveMonsterPortrait(runtime.context.monsters[0]),"assets/dungeons/abyss/soldier.webp");
-    assert.equal(runtime.cards[0].dataset.monsterPortraitKey,"temporary.heavenly-soldier");
+    assert.equal(runtime.cards[0].dataset.monsterPortraitKey,"legacy.abyss.天兵天將");
 }
 
 assert.match(source,/MONSTER_PORTRAIT_REGISTRY_URL="config\/monster-portrait-registry\.json"/);

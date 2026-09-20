@@ -23,9 +23,14 @@
     margin:18px 10px calc(var(--bottom-nav-height,70px) + var(--safe-bottom,0px) + 12px);padding:5px 7px 7px;border:1px solid rgba(190,139,59,.54);border-radius:11px;color:#f4e7c8;
     background:linear-gradient(155deg,rgba(29,19,11,.91),rgba(5,5,4,.86));box-shadow:0 5px 13px rgba(0,0,0,.46),inset 0 0 13px rgba(214,158,63,.04);
 }
-#game-stage #homePage .v146-home-roster > header{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;min-height:23px;color:#f0cb70;font-size:15px;line-height:20px;letter-spacing:.04em;}
-#game-stage #homePage .v146-home-roster > header span{color:#c7ad76;font-size:13px;line-height:18px;font-weight:800;}
-#game-stage #homePage .v146-home-roster > header .v146-home-roster-gold{white-space:nowrap;}
+#game-stage #homePage .v146-home-roster > header{
+    grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1.55fr) auto;
+    align-items:center;column-gap:8px;min-height:30px;color:#f0cb70;font-size:15px;line-height:20px;letter-spacing:.04em;
+}
+#game-stage #homePage .v146-home-roster > header>b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+#game-stage #homePage .v146-home-roster > header span{min-width:0;color:#c7ad76;font-size:13px;line-height:18px;font-weight:800;}
+#game-stage #homePage .v146-home-roster > header .v146-home-roster-count{white-space:nowrap;}
+#game-stage #homePage .v146-home-roster > header .v146-home-roster-gold{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 #game-stage #homePage .v146-home-roster > header .v146-home-roster-gold strong{color:#f2cf79;font-size:13px;line-height:18px;font-weight:900;}
 #game-stage #homePage .v146-home-character-placeholder,
 #game-stage #homePage .v146-home-character-empty{opacity:.72;}

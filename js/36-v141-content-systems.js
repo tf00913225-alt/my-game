@@ -862,14 +862,17 @@
         const allyEntries=currentBattleMonsters.map(index=>({index:index,monster:monsters[index]}))
             .filter(entry=>entry.monster&&entry.monster.alive);
         const allies=allyEntries.map(entry=>entry.monster);
-        let skillId=null;
+        const forcedSupportSkillId=monster&&monster.v175ForcedSupportSkillId;
+        if(monster){ delete monster.v175ForcedSupportSkillId; }
+        let skillId=forcedSupportSkillId&&supportIds.includes(forcedSupportSkillId)
+            &&skillDatabase[forcedSupportSkillId]?forcedSupportSkillId:null;
         let target=null;
         let healTargets=[];
         const allAlliesNeedHealing=allyEntries.some(entry=>
             monsterBaseHp(entry.monster)<monsterBaseMaxHp(entry.monster)*.70
         );
         const healSkill=skillDatabase.healSpell;
-        if(supportIds.includes("healSpell")&&allAlliesNeedHealing&&healSkill&&monster.sp>=(healSkill.spCost||0)){
+        if(!skillId&&supportIds.includes("healSpell")&&allAlliesNeedHealing&&healSkill&&monster.sp>=(healSkill.spCost||0)){
             healTargets=getMonsterAllyTriTargets(monsterIndex,allyEntries);
             if(healTargets.length){ skillId="healSpell"; }
         }
