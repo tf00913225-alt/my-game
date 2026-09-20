@@ -7972,7 +7972,7 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 }
 #game-stage #homeFeatureModal.v131-shop-open .shop-potion-purchase-row{
     display:grid !important;
-    grid-template-columns:38px minmax(48px,1fr) 54px !important;
+    grid-template-columns:32px minmax(48px,1fr) 54px !important;
     grid-template-rows:36px !important;
     align-items:center !important;
     gap:4px !important;
@@ -7989,12 +7989,12 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 #game-stage #homeFeatureModal.v131-shop-open .shop-potion-quantity{
     grid-column:1 !important;
     grid-row:1 !important;
-    width:38px !important;
-    min-width:38px !important;
+    width:32px !important;
+    min-width:32px !important;
     height:34px !important;
     min-height:34px !important;
     margin:0 !important;
-    padding:0 3px !important;
+    padding:0 2px !important;
     box-sizing:border-box !important;
     font-size:15px !important;
     line-height:34px !important;
