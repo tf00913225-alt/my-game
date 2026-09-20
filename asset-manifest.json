@@ -493,19 +493,19 @@
         "decode": true
       },
       {
-        "path": "build/app-shell.ca23fcd5a5a9.js",
-        "sha256": "ca23fcd5a5a9",
-        "bytes": 996215,
-        "priority": "P1",
-        "type": "script",
-        "decode": false
-      },
-      {
         "path": "build/app-shell.5a26fcd61aad.css",
         "sha256": "5a26fcd61aad",
         "bytes": 109667,
         "priority": "P1",
         "type": "style",
+        "decode": false
+      },
+      {
+        "path": "build/app-shell.ca23fcd5a5a9.js",
+        "sha256": "ca23fcd5a5a9",
+        "bytes": 996215,
+        "priority": "P1",
+        "type": "script",
         "decode": false
       },
       {
