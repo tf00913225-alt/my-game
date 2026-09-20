@@ -13,7 +13,7 @@
 
     const SKILL_UPGRADE_COST_BY_TARGET_LEVEL=Object.freeze({2:1,3:2,4:3,5:4});
     const FIRE_MOMENTUM_BY_LEVEL=Object.freeze([12,15,18,21,25]);
-    const BLOOD_BURN_BY_LEVEL=Object.freeze([20,25,30,35,40]);
+    const BLOOD_BURN_BY_LEVEL=Object.freeze([5,10,15,20,25]);
     const DODGE_BY_LEVEL=Object.freeze([30,40,50,60,70]);
     const ROCK_WALL_BY_LEVEL=Object.freeze([15,20,25,30,35]);
     const EARTH_SHIELD_BY_LEVEL=Object.freeze([20,30,35,40,50]);
@@ -66,10 +66,10 @@
         },
         bloodBurnArt:{
             id:"bloodBurnArt",name:"焚血訣",element:"fire",category:"buff",targetType:"self",
-            learnLevel:35,learnCost:18,maxLevel:5,spCost:20,duration:2,requires:["fireSoulResonance"],progressionGroup:"tactical",
+            learnLevel:35,learnCost:18,maxLevel:5,spCost:20,duration:3,requires:["fireSoulResonance"],progressionGroup:"tactical",
             directDamageBonusByLevel:BLOOD_BURN_BY_LEVEL.slice(),icon:"血",
             iconAssetPath:null,vfxAssetPath:null,
-            description:"需先學習炎魂共鳴。自身目前HP高於最大HP的20%時可施放，立即消耗最大HP的10%並獲得焚血，最多持續2回合。焚血使下一次玩家主動施放的火元素直接傷害主施放提高20%/25%/30%/35%/40%，使用後消失；不強化燃燒持續傷害與免費追擊。"
+            description:"消耗最大生命5%/10%/15%/20%/25%。接下來3個有效回合，火系攻擊傷害提高5%/10%/15%/20%/25%。不強化燃燒持續傷害與免費追擊。"
         },
         fireEX:{learnLevel:50,learnCost:20,maxLevel:1,progressionGroup:"ex"},
 
@@ -480,14 +480,14 @@
                 return notify("焚血尚未消耗，無法重複施放或刷新。");
             }
             const maxHp=actorMaxHp(actor,actorIndex);
-            if(numeric(actor.hp)<=maxHp*.20){ return notify("目前HP必須高於最大HP的20%才能施放焚血訣。"); }
             if(!canAddNamedBuff(actor,"bloodBurn",actorIndex,"焚血")){
                 return notify("焚血尚未消耗，無法重複施放或刷新。");
             }
+            const hpCost=Math.max(1,Math.round(maxHp*(BLOOD_BURN_BY_LEVEL[clampLevel(level,5)-1]/100)));
+            if(numeric(actor.hp)<=hpCost){ return notify("目前HP不足以承受焚血訣的生命消耗。"); }
             actor.sp=numeric(actor.sp)-cost;
-            const hpCost=Math.max(1,Math.round(maxHp*.10));
-            actor.hp=Math.max(1,numeric(actor.hp)-hpCost);
-            addNamedBuff(actor,"bloodBurn",actorIndex,"焚血",2,{skillLevel:level,hpCost});
+            actor.hp=numeric(actor.hp)-hpCost;
+            addNamedBuff(actor,"bloodBurn",actorIndex,"焚血",3,{skillLevel:level,hpCost,remainingFireActions:3});
             announceSkill(actorIndex,skill);finishTacticalAction();return true;
         }
         return false;
@@ -552,7 +552,11 @@
         const succeeded=context.finished||numeric(actor.sp)<beforeSp;
         if(succeeded){
             if(momentum){ removeBuff(actor,momentum); }
-            if(blood){ removeBuff(actor,blood); }
+            if(blood){
+                blood.remainingFireActions=Math.max(0,numeric(blood.remainingFireActions,3)-1);
+                blood.turnsLeft=blood.remainingFireActions;
+                if(blood.remainingFireActions<=0){ removeBuff(actor,blood); }
+            }
             if(!momentum&&resonance&&(context.critical||context.burnAdded)&&activeBuff(actor,"fireSoulResonance")){
                 createMomentum(actor,actorIndex,resonance);
             }
@@ -581,6 +585,228 @@
             if(fireCastContext){ fireCastContext.finished=true; }
         });
     }
+
+    /*
+     * Persistent Effect Duration Lifecycle
+     *
+     * `turnsLeft` is deliberately consumed from a real initiative action,
+     * rather than from the global round-start sweep.  A state created during
+     * the current action is absent from this snapshot, so casting a Buff does
+     * not silently consume one of its own effective actions.  Freeze/Petrify
+     * remain present while their action is skipped, then consume exactly one
+     * blocked action at the normal action-finished boundary.  Burn is a DoT
+     * and therefore remains owned by the formal round-start tick path.
+     */
+    const ACTION_DURATION_STATUS_TYPES=new Set([
+        "freeze","petrify","frostbite","agilityDown","statDown","damageDown","defenseDown","stun"
+    ]);
+    const ACTION_DURATION_EXCLUDED_BUFFS=new Set(["fireMomentum","phoenixMight","bloodBurn"]);
+    let durationAction=null;
+    window.v175DurationLifecycleActive=true;
+
+    function partyAndMonsterEntities(){
+        const result=[];
+        if(typeof getExistingPartyIndexes==="function"&&typeof getPartyCharacterByIndex==="function"){
+            getExistingPartyIndexes().forEach(index=>{
+                const entity=getPartyCharacterByIndex(index);
+                if(entity){ result.push(entity); }
+            });
+        }
+        if(typeof monsters!=="undefined"&&Array.isArray(monsters)){
+            monsters.forEach(entity=>{ if(entity){ result.push(entity); } });
+        }
+        return result;
+    }
+    function captureActionDurationEntries(kind){
+        const entries=[];
+        partyAndMonsterEntities().forEach(entity=>{
+            const list=kind==="buff"?entity.activeBuffs:entity.statusEffects;
+            if(!Array.isArray(list)){ return; }
+            list.forEach(entry=>{
+                const eligible=kind==="buff"
+                    ?entry&&numeric(entry.turnsLeft)>0&&!entry.oneShot&&!ACTION_DURATION_EXCLUDED_BUFFS.has(entry.type)
+                    :entry&&numeric(entry.turnsLeft)>0&&ACTION_DURATION_STATUS_TYPES.has(entry.type);
+                if(eligible){ entries.push({entity,entry,turnsLeft:entry.turnsLeft,deferFirstTick:entry.deferFirstTick}); }
+            });
+        });
+        return entries;
+    }
+    function restoreActionDurationEntries(kind,entries){
+        entries.forEach(record=>{
+            const key=kind==="buff"?"activeBuffs":"statusEffects";
+            const list=Array.isArray(record.entity[key])?record.entity[key]:[];
+            record.entry.turnsLeft=record.turnsLeft;
+            if(record.deferFirstTick!==undefined){ record.entry.deferFirstTick=record.deferFirstTick; }
+            if(!list.includes(record.entry)){ list.push(record.entry); }
+            record.entity[key]=list;
+        });
+    }
+    if(typeof tickStatusEffects==="function"){
+        const previousTickStatusEffects=tickStatusEffects;
+        tickStatusEffects=function(){
+            const snapshot=captureActionDurationEntries("status");
+            const result=previousTickStatusEffects.apply(this,arguments);
+            restoreActionDurationEntries("status",snapshot);
+            return result;
+        };
+    }
+    if(typeof tickPlayerBuffs==="function"){
+        const previousTickPlayerBuffs=tickPlayerBuffs;
+        tickPlayerBuffs=function(){
+            const snapshot=captureActionDurationEntries("buff");
+            const result=previousTickPlayerBuffs.apply(this,arguments);
+            restoreActionDurationEntries("buff",snapshot);
+            return result;
+        };
+    }
+    function captureMonsterSupportDurations(){
+        const records=[];
+        if(typeof monsters==="undefined"||!Array.isArray(monsters)){ return records; }
+        monsters.forEach(entity=>{
+            if(!entity){ return; }
+            const stats={attack:entity.attack,magicAttack:entity.magicAttack,resistance:entity.resistance,evasion:entity.evasion,accuracy:entity.accuracy};
+            (entity.v141TeamBuffs||[]).forEach(state=>{
+                if(state&&numeric(state.turnsLeft)>0){
+                    records.push({entity,state,display:state.displayBuff,turnsLeft:state.turnsLeft,displayTurns:state.displayBuff&&state.displayBuff.turnsLeft,stats});
+                }
+            });
+            ["v144CalmBuff","v144DodgeBuff","v155EvasionBlessing","v155WindDodge"].forEach(key=>{
+                const state=entity[key];
+                const display=state&&(state.display||state.displayBuff);
+                if(state&&numeric(state.turnsLeft)>0){
+                    records.push({entity,key,state,display,turnsLeft:state.turnsLeft,displayTurns:display&&display.turnsLeft,stats});
+                }
+            });
+        });
+        return records;
+    }
+    function restoreMonsterSupportDurations(records){
+        records.forEach(record=>{
+            const {entity,state,display,stats}=record;
+            state.turnsLeft=record.turnsLeft;
+            if(display){ display.turnsLeft=record.displayTurns; }
+            if(record.key){ entity[record.key]=state; }
+            else{
+                entity.v141TeamBuffs=Array.isArray(entity.v141TeamBuffs)?entity.v141TeamBuffs:[];
+                if(!entity.v141TeamBuffs.includes(state)){ entity.v141TeamBuffs.push(state); }
+            }
+            if(display){
+                entity.activeBuffs=Array.isArray(entity.activeBuffs)?entity.activeBuffs:[];
+                if(!entity.activeBuffs.includes(display)){ entity.activeBuffs.push(display); }
+            }
+            Object.assign(entity,stats);
+        });
+    }
+    if(typeof startTurn==="function"){
+        const previousStartTurnForDuration=startTurn;
+        startTurn=function(){
+            const snapshot=captureMonsterSupportDurations();
+            const result=previousStartTurnForDuration.apply(this,arguments);
+            restoreMonsterSupportDurations(snapshot);
+            return result;
+        };
+    }
+
+    function entityForActionEntry(entry){
+        if(!entry){ return null; }
+        if(entry.type==="player"&&typeof getPartyCharacterByIndex==="function"){
+            return getPartyCharacterByIndex(entry.characterIndex);
+        }
+        if(entry.type==="monster"&&typeof monsters!=="undefined"&&Array.isArray(monsters)){
+            return monsters[entry.monsterIndex]||null;
+        }
+        return null;
+    }
+    function snapshotTimedEntries(entity){
+        return {
+            buffs:new Set((entity&&Array.isArray(entity.activeBuffs)?entity.activeBuffs:[]).filter(buff=>
+                buff&&numeric(buff.turnsLeft)>0&&!buff.oneShot&&!ACTION_DURATION_EXCLUDED_BUFFS.has(buff.type)
+            )),
+            statuses:new Set((entity&&Array.isArray(entity.statusEffects)?entity.statusEffects:[]).filter(effect=>
+                effect&&numeric(effect.turnsLeft)>0&&ACTION_DURATION_STATUS_TYPES.has(effect.type)
+            ))
+        };
+    }
+    function expireActionBuff(entity,buff){
+        if(!entity||!buff||!Array.isArray(entity.activeBuffs)){ return; }
+        buff.turnsLeft=Math.max(0,numeric(buff.turnsLeft)-1);
+        const mirrored=Array.isArray(entity.v141TeamBuffs)
+            ?entity.v141TeamBuffs.find(item=>item&&item.displayBuff===buff):null;
+        if(mirrored){ mirrored.turnsLeft=buff.turnsLeft; }
+        if(buff.turnsLeft>0){ return; }
+        entity.activeBuffs=entity.activeBuffs.filter(item=>item!==buff);
+        if(mirrored){
+            entity.v141TeamBuffs=entity.v141TeamBuffs.filter(item=>item!==mirrored);
+            if(mirrored.type==="rage"){
+                entity.attack=mirrored.originalAttack;
+                entity.magicAttack=mirrored.originalMagicAttack;
+            }else if(mirrored.type==="resistance"){
+                entity.resistance=Math.max(0,numeric(entity.resistance)-numeric(mirrored.amount));
+            }else if(mirrored.type==="dodge"){
+                entity.evasion=mirrored.originalEvasion;
+            }
+        }
+        ["v144CalmBuff","v144DodgeBuff","v155EvasionBlessing","v155WindDodge"].forEach(key=>{
+            const state=entity[key];
+            const display=state&&(state.display||state.displayBuff);
+            if(display!==buff){ return; }
+            if(key==="v144CalmBuff"){
+                entity.accuracy=state.originalAccuracy;
+                entity.resistance=state.originalResistance;
+            }else if(key==="v144DodgeBuff"){
+                entity.evasion=state.originalEvasion;
+            }
+            delete entity[key];
+            if((key==="v155EvasionBlessing"||key==="v155WindDodge")&&
+                !entity.v155EvasionBlessing&&!entity.v155WindDodge&&Object.prototype.hasOwnProperty.call(entity,"v155EvasionBase")){
+                entity.evasion=numeric(entity.v155EvasionBase);
+                delete entity.v155EvasionBase;
+            }
+        });
+        if(typeof addBattleLog==="function"){
+            addBattleLog("⏳"+(buff.statusName||buff.type)+"效果已結束。");
+        }
+    }
+    function expireActionStatus(entity,effect){
+        if(!entity||!effect||!Array.isArray(entity.statusEffects)){ return; }
+        effect.turnsLeft=Math.max(0,numeric(effect.turnsLeft)-1);
+        if(effect.turnsLeft>0){ return; }
+        entity.statusEffects=entity.statusEffects.filter(item=>item!==effect);
+        if(typeof addBattleLog==="function"){
+            const name=effect.type==="freeze"?"冰封":effect.type==="petrify"?"石化":effect.type==="frostbite"?"凍傷":effect.type;
+            addBattleLog((entity.id||entity.name||"目標")+"的"+name+"效果已解除。");
+        }
+    }
+    function beginDurationAction(event){
+        const entry=event&&event.queue&&event.queue[event.index];
+        const entity=entityForActionEntry(entry);
+        if(!entity||numeric(entity.hp)<=0){ durationAction=null; return; }
+        const snapshot=snapshotTimedEntries(entity);
+        durationAction={token:event.token,index:event.index,entry,entity,buffs:snapshot.buffs,statuses:snapshot.statuses};
+    }
+    function finishDurationAction(){
+        const action=durationAction;
+        durationAction=null;
+        if(!action){ return; }
+        action.buffs.forEach(buff=>{
+            if(Array.isArray(action.entity.activeBuffs)&&action.entity.activeBuffs.includes(buff)){
+                expireActionBuff(action.entity,buff);
+            }
+        });
+        action.statuses.forEach(effect=>{
+            if(Array.isArray(action.entity.statusEffects)&&action.entity.statusEffects.includes(effect)){
+                expireActionStatus(action.entity,effect);
+            }
+        });
+    }
+    if(window.FourSymbolsBattleFlow&&typeof window.FourSymbolsBattleFlow.subscribeBeforeCombatant==="function"){
+        window.FourSymbolsBattleFlow.subscribeBeforeCombatant(beginDurationAction);
+        window.FourSymbolsBattleFlow.subscribeActionFinished(finishDurationAction);
+    }
+    window.FourSymbolsDurationLifecycle=Object.freeze({
+        beginAction:beginDurationAction,finishAction:finishDurationAction,
+        snapshotFor:entity=>snapshotTimedEntries(entity)
+    });
 
     if(typeof castDamageSkill==="function"){
         const previousCastDamageSkill=castDamageSkill;
