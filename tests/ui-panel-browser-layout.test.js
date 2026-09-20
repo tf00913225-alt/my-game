@@ -77,10 +77,13 @@ html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#000;}
       '<button class="v17346-shop-buy">4,000 金幣</button></article>';
   }
   function potionCard(index){
-    return '<div class="shop-potion-card '+(index%2?'sp':'hp')+'">'+
-      '<div class="shop-potion-card-head"><span class="shop-potion-type">'+(index%2?'SP':'HP')+'</span><span class="shop-potion-stock">持有 0</span></div>'+
-      '<div class="shop-potion-name">測試補品'+index+'</div>'+
-      '<div class="shop-potion-effect">回復最大'+(index%2?'SP':'HP')+'的 30%</div>'+
+    const hp=index%2===0;
+    const art=hp?'assets/items/potions/hp-potion-30-dahuan.webp':'assets/items/potions/sp-potion-30-guiyuan.webp';
+    const name=hp?'大還丹':'歸元丹';
+    return '<div class="shop-potion-card '+(hp?'hp':'sp')+'">'+
+      '<div class="shop-potion-card-head"><span class="shop-potion-type">'+(hp?'HP':'SP')+'</span><span class="shop-potion-stock">持有 0</span></div>'+
+      '<div class="shop-potion-summary"><div class="shop-potion-icon"><span class="v169-item-art v169-potion-art"><img src="'+art+'" alt=""></span></div><div class="shop-potion-copy">'+
+      '<div class="shop-potion-name">'+name+'</div><div class="shop-potion-effect">回復最大'+(hp?'HP':'SP')+'的 30%</div></div></div>'+
       '<div class="shop-potion-purchase-row"><label>數量</label><input class="shop-potion-quantity" value="1"><span class="v146-shop-total">1,500 金幣</span><button class="shop-potion-buy">購買</button></div></div>';
   }
   const pages=['equipment','potion','equipment','potion','equipment'];
@@ -95,10 +98,13 @@ html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#000;}
     void box.offsetHeight;
     const equipmentCards=Array.from(content.querySelectorAll('.v17346-shop-card'));
     const buyButtons=Array.from(content.querySelectorAll('.v17346-shop-buy'));
+    const potionCards=Array.from(content.querySelectorAll('.shop-potion-card'));
+    const potionIcons=Array.from(content.querySelectorAll('.shop-potion-icon'));
     snapshots.push({
       page:page,box:rect(box),header:rect(header),close:rect(close),tabs:rect(tabs),body:rect(body),modal:rect(modal),content:rect(content),
       scrollHeight:body.scrollHeight,clientHeight:body.clientHeight,contentScrollHeight:content.scrollHeight,contentClientHeight:content.clientHeight,
-      cardRects:equipmentCards.map(rect),buyRects:buyButtons.map(rect)
+      cardRects:equipmentCards.map(rect),buyRects:buyButtons.map(rect),
+      potionCardRects:potionCards.map(rect),potionIconRects:potionIcons.map(rect)
     });
   });
   document.getElementById('result').textContent=JSON.stringify(snapshots);
@@ -148,7 +154,18 @@ try{
         });
     });
 
-    console.log("Headless Chrome: shop stayed fixed, non-scrollable and aligned across 5 tab switches");
+    snapshots.filter(shot=>shot.page==='potion').forEach(shot=>{
+        assert.equal(shot.potionCardRects.length,6,"potion shop must show six cards on one screen");
+        assert.equal(shot.potionIconRects.length,6,"each potion card needs one formal icon");
+        shot.potionIconRects.forEach((icon,index)=>{
+            const card=shot.potionCardRects[index];
+            assert.ok(Math.abs(icon.width-48)<0.25&&Math.abs(icon.height-48)<0.25,"potion icons must stay 48×48");
+            assert.ok(icon.left>=card.left-0.25&&icon.right<=card.right+0.25,"potion icon escaped its card horizontally");
+            assert.ok(icon.top>=card.top-0.25&&icon.bottom<=card.bottom+0.25,"potion icon escaped its card vertically");
+        });
+    });
+
+    console.log("Headless Chrome: shop stayed fixed, non-scrollable and aligned with six potion icons across 5 tab switches");
 }finally{
     try{ fs.unlinkSync(fixture); }catch(_){ }
 }
