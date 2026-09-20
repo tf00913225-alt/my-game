@@ -36,7 +36,7 @@ test("newbie EXP keeps the Lv1-to-10 reference but now pays per monster and foll
     const total=targetBattles.reduce((sum,battles)=>sum+184*battles,0);
     assert.equal(total,13800);
     assert.equal(Math.ceil(total/20),690);
-    assert.match(curve,/TRAINING_EXP_MULTIPLIER=3\.5/);
+    assert.doesNotMatch(curve,/TRAINING_EXP_MULTIPLIER|V131_EXP_MULTIPLIER|legacyExpMultiplier/);
 });
 
 test("both patrol fight frames display rotated clockwise ninety degrees and walking resets rotation",()=>{

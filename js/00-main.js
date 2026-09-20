@@ -13760,17 +13760,23 @@ const LOCKDOWN_HIT_BOUNDS = {
 
     regular:{
         min:5,
-        max:80
+        max:90
     },
 
     elite:{
         min:5,
-        max:60
+        max:80
     },
 
     boss:{
         min:5,
-        max:40
+        max:70
+    },
+
+    /* Enemy-to-player hard control never inherits monster rank. */
+    player:{
+        min:5,
+        max:60
     }
 
 };
@@ -13795,6 +13801,23 @@ function getMonsterRank(monster){
     return "regular";
 
 }
+
+/* The one formal category chooser for enemy skills.  Callers provide only
+   legal entries, so an empty category always falls back without re-rolling. */
+function chooseEnemySkillCategory(attackSkillIds,buffSkillIds,randomValue){
+    const attacks=Array.isArray(attackSkillIds)?attackSkillIds.filter(Boolean):[];
+    const buffs=Array.isArray(buffSkillIds)?buffSkillIds.filter(Boolean):[];
+    if(!attacks.length&&!buffs.length){ return "normal"; }
+    if(!attacks.length){ return "buff"; }
+    if(!buffs.length){ return "attack"; }
+    return Number(randomValue)<.70?"attack":"buff";
+}
+window.FourSymbolsEnemySkillAI=Object.freeze({
+    chooseCategory:chooseEnemySkillCategory,
+    healingThresholdPercent:70,
+    attackWeightPercent:70,
+    buffWeightPercent:30
+});
 
 
 /*
@@ -15303,7 +15326,7 @@ function applySkillDebuffEffectsToPlayer(
         const hit=rollNamedPersistentStatusEffect(
             targetCharacter,"freeze",[
                 skill.freezeChance,casterLevel,targetCharacter.level,
-                casterIntelligence,targetFinalSpirit,true,"regular",
+                casterIntelligence,targetFinalSpirit,true,"player",
                 getPlayerStatusResistBonus(targetCharacter)
             ],"player",targetIndex,skill.name
         ).hit;
@@ -15335,7 +15358,7 @@ function applySkillDebuffEffectsToPlayer(
         const hit=rollNamedPersistentStatusEffect(
             targetCharacter,"petrify",[
                 chance,casterLevel,targetCharacter.level,casterIntelligence,
-                targetFinalSpirit,true,"regular",getPlayerStatusResistBonus(targetCharacter)
+                targetFinalSpirit,true,"player",getPlayerStatusResistBonus(targetCharacter)
             ],"player",targetIndex,skill.name
         ).hit;
 
@@ -18025,16 +18048,18 @@ function processSingleMonsterAttack(monsterIndex,token){
         [];
 
 
+    const forcedAttackSkillId=monster.v175ForcedAttackSkillId;
+    const forcedAttackIsLegal=affordableSkillIds.includes(forcedAttackSkillId);
+    delete monster.v175ForcedAttackSkillId;
     const usesSkill=
-
-        affordableSkillIds.length>0 &&
-        Math.random()<
-        (
-            monster.skillChance!==undefined
-            ?
-            monster.skillChance
-            :
-            0
+        forcedAttackIsLegal||(
+            affordableSkillIds.length>0 &&
+            Math.random()<
+            (
+                monster.skillChance!==undefined
+                ?monster.skillChance
+                :0
+            )
         );
 
 
@@ -18047,14 +18072,9 @@ function processSingleMonsterAttack(monsterIndex,token){
 
     if(usesSkill){
 
-        castSkillId=
-
-            affordableSkillIds[
-                Math.floor(
-                    Math.random()*
-                    affordableSkillIds.length
-                )
-            ];
+        castSkillId=forcedAttackIsLegal
+            ?forcedAttackSkillId
+            :affordableSkillIds[Math.floor(Math.random()*affordableSkillIds.length)];
 
 
         castSkillData=

@@ -1007,9 +1007,9 @@ test("Abyss floors one through five keep exact compositions, skill levels and ad
     assert.deepEqual(final.elements,["earth","wind","light","water","fire","water","earth","fire","wind","water"]);
     assert.deepEqual(final.forceLevels,[5,5,5,5,5,5,5,5,5,5]);
     assert.deepEqual(final.extraHP,[10000,10000,10000,10000,10000,3500,3500,3500,3500,3500]);
-    assert.deepEqual(final.skills.slice(0,5),[["dustStorm","stoneBreakSky"],["windHowlLightning","stormRain"],[],
-        ["iceArrowRain"],["dragonSlash","flameTornado"]]);
-    assert.deepEqual(final.supports.slice(0,5),[["earthShield"],["dinghaishenzhen"],["yuanZuBlessing"],["revive","healSpell"],["rage"]]);
+    assert.deepEqual(final.skills.slice(0,5),[["dustStorm","flyingSandStrike"],["windHowlLightning","stormRain"],["flyingSandStrike","phoenixCry"],
+        ["iceArrowRain","iceSpin"],["dragonSlash","phoenixCry"]]);
+    assert.deepEqual(final.supports.slice(0,5),[["rockWall"],["stealthSkill"],["yuanZuBlessing"],["healSpell"],["rage"]]);
     assert.deepEqual(final.skills.slice(5),[[],["stoneBreakSky"],["flameTornado"],[],[]]);
     assert.deepEqual(final.supports.slice(5),[["healSpell"],[],[],["dodgeSkill"],["healSpell"]]);
     assert.deepEqual(final.rows,[0,0,0,0,0,1,1,1,1,1]);

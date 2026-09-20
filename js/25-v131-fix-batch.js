@@ -22,16 +22,14 @@
     const V173_32_WILD_ZONE_STRENGTHS=Object.freeze([
         0.75,0.90,0.95,1.00,1.05,1.10,1.15,1.20,1.25,1.30
     ]);
-    const V131_EXP_MULTIPLIER=3.5;
     const ELEMENT_BOX_REWARD_MS=8*60*60*1000;
     const ELEMENT_BOX_KEY=window.FourSymbolsAccountSave.accountKey("element-box-state");
 
     /*
        ★ 新增（依照使用者要求，經濟／養成重新設計第一輪）：
        1. 精英/BOSS的戰鬥EXP要比普通怪高（精英×1.5、BOSS×3），
-          原本不管rank一律是「等級×10」，這裡在既有×3.5加成
-          「之前」先套rank倍率，兩個倍率疊乘、不是另外多加一次
-          ×3.5（使用者明確要求×3.5保留、不要再疊加）。
+          正式怪物 EXP 直接以怪物資料公式產生，再套 rank 倍率；不再
+          透過全域歷史倍率補正。
        2. 元素匣（自動掛機）戰鬥的EXP只給70%，金幣/掉落/材料
           完全不受影響（那些是另外獨立的函式，這裡完全沒有動）。
           目的是讓「掛機」明顯比「手動玩」慢，避免無腦掛機
@@ -71,6 +69,13 @@
         return 1;
     }
 
+    /* Formal base EXP: a normal monster's own reward before rank/mode rules.
+       35 is the established Lv×10 × historical 3.5 result, now encoded at
+       this data owner so every player-facing reward remains unchanged. */
+    function getFormalMonsterBaseExp(monster){
+        return Math.max(0,Math.floor((Number(monster&&monster.level)||0)*35));
+    }
+
     function getPatrolProgressionExpMultiplier(level){
         const safeLevel=Math.max(1,Math.floor(Number(level)||1));
         return safeLevel<20 ? V17342_GLOBAL_EXP_REWARD_MULTIPLIER : 1;
@@ -95,10 +100,10 @@
     function calculateStandardPatrolExp(monsterList,progressionLevel){
         const rankAdjustedExp=(Array.isArray(monsterList)?monsterList:[]).reduce((total,monster)=>{
             if(!monster){ return total; }
-            return total+(Number(monster.level)||0)*10*getMonsterExpRankMultiplier(monster);
+            return total+getFormalMonsterBaseExp(monster)*getMonsterExpRankMultiplier(monster);
         },0);
         return Math.max(0,Math.floor(
-            rankAdjustedExp*V131_EXP_MULTIPLIER*getPatrolProgressionExpMultiplier(progressionLevel)
+            rankAdjustedExp*getPatrolProgressionExpMultiplier(progressionLevel)
         ));
     }
 
@@ -111,6 +116,7 @@
     }
 
     window.v173GetPatrolProgressionExpMultiplier=getPatrolProgressionExpMultiplier;
+    window.v173GetFormalMonsterBaseExp=getFormalMonsterBaseExp;
     window.v173GetPatrolProgressionReferenceLevel=getPatrolProgressionReferenceLevel;
     window.v173CalculateStandardPatrolExp=calculateStandardPatrolExp;
     window.v173ApplyPatrolExpMode=applyPatrolExpMode;
@@ -1102,7 +1108,7 @@
             /*
                flatExpGain：跟原本winBattle()內部自己會算、
                直接加進sharedExp的數字完全一樣算法（等級×10，
-               不含rank倍率、不含3.5倍加成）——用來推算「原本
+               不含rank倍率、不含正式怪物 EXP 差額）——用來推算「原本
                函式這次會自己加多少」，才能正確算出還要「補多少
                差額」，不會跟原本的計算重複疊加。
             */
@@ -1112,7 +1118,7 @@
             );
 
             /* 正式巡怪 EXP 只走 calculateStandardPatrolExp()：
-               怪物基礎 EXP × rank × 3.5；V173.42 ×3 僅保留 Lv1～19 快速期。
+               正式怪物 EXP × rank；V173.42 ×3 僅保留 Lv1～19 快速期。
                Lv20 起不再有第二個全域 ×3。 */
             const progressionLevel=getPatrolProgressionReferenceLevel();
             let finalExp=calculateStandardPatrolExp(
