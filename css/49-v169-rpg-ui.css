@@ -978,6 +978,41 @@
 #game-stage #homeFeatureModal.v131-shop-open .shop-potion-card-head{
     margin-bottom:1px !important;
 }
+#game-stage #homeFeatureModal.v131-shop-open .shop-potion-summary{
+    display:grid !important;
+    grid-template-columns:48px minmax(0,1fr) !important;
+    gap:6px !important;
+    align-items:center !important;
+    min-width:0 !important;
+    min-height:0 !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .shop-potion-icon{
+    display:grid !important;
+    place-items:center !important;
+    width:48px !important;
+    height:48px !important;
+    min-width:48px !important;
+    min-height:48px !important;
+    overflow:hidden !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .shop-potion-icon > .v169-item-art{
+    width:100% !important;
+    height:100% !important;
+    min-width:0 !important;
+    min-height:0 !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .shop-potion-icon > .v169-item-art > img{
+    width:100% !important;
+    height:100% !important;
+    object-fit:contain !important;
+    object-position:center !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .shop-potion-copy{
+    display:grid !important;
+    gap:1px !important;
+    min-width:0 !important;
+    min-height:0 !important;
+}
 #game-stage #homeFeatureModal.v131-shop-open .shop-potion-type{
     font-size:11px !important;
     line-height:13px !important;
