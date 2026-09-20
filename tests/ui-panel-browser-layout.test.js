@@ -192,7 +192,7 @@ try{
             assert.ok(head.bottom<=summary.top+0.25,"potion header overlaps summary");
             assert.ok(summary.bottom<=purchase.top+0.25,"potion summary overlaps purchase row");
             assert.ok(name.bottom<=effect.top+0.25,"potion name overlaps effect copy");
-            assert.ok(Math.abs(quantity.width/viewportScale-30)<0.25,"potion quantity input must stay 30px wide");
+            assert.ok(Math.abs(quantity.width/viewportScale-24)<0.25,"potion quantity input must stay 24px wide");
             assert.ok(quantity.right<=total.left+0.25,"potion quantity overlaps price");
             assert.ok(total.right<=buy.left+0.25,"potion price overlaps buy button");
         });
