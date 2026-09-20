@@ -159,7 +159,7 @@ try{
         assert.equal(shot.potionIconRects.length,6,"each potion card needs one formal icon");
         shot.potionIconRects.forEach((icon,index)=>{
             const card=shot.potionCardRects[index];
-            assert.ok(Math.abs(icon.width-48)<0.25&&Math.abs(icon.height-48)<0.25,"potion icons must stay 48×48");
+            assert.ok(Math.abs(icon.width-48)<0.25&&Math.abs(icon.height-48)<0.25,"potion icons must stay 48×48: "+JSON.stringify(icon));
             assert.ok(icon.left>=card.left-0.25&&icon.right<=card.right+0.25,"potion icon escaped its card horizontally");
             assert.ok(icon.top>=card.top-0.25&&icon.bottom<=card.bottom+0.25,"potion icon escaped its card vertically");
         });
