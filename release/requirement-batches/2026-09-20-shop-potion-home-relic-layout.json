@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "releaseVersion": "173.68",
+  "title": "商店補品重排與主城秘寶 HUD 壓縮",
+  "status": "VERIFIED",
+  "requirements": [
+    {
+      "id": "SHOP-01",
+      "status": "VERIFIED",
+      "request": "商店補品頁重新排版，六種 HP/SP 補品在手機版不再出現 icon、名稱、數量、價格與購買按鈕互相重疊或穿圖。",
+      "owner": [
+        "css/49-v169-rpg-ui.css",
+        "js/40-v144-rules-and-abyss.js",
+        "js/51-v169-rpg-ui.js"
+      ],
+      "verification": "DEV 以最新正式 owner 與 2×3 補品卡實裝；最終數量欄由後層 QA owner 同步收斂，Repository checks 與 DEV exact-SHA deployment SUCCESS；專案負責人以手機實機確認排版後指示可推 main。",
+      "evidence": [
+        "dev@83798ee8760026cde244da8ff8ecd3378f4eb472",
+        "GitHub Actions run 35486935841 SUCCESS",
+        "css/49-v169-rpg-ui.css",
+        "css/53-v173.51-qa.css",
+        "tests/ui-panel-browser-layout.test.js",
+        "tests/v173.48-premium-shop-layout.test.js",
+        "tests/premium-functional-ui-batch4.test.js"
+      ]
+    },
+    {
+      "id": "HOME-RELIC-01",
+      "status": "VERIFIED",
+      "request": "主城隊伍秘寶摘要移除觸發解釋文字，縮小更換按鈕上下高度並壓縮 HUD 高度，避免與底部導航穿圖。",
+      "owner": [
+        "css/19-stage-v54-main-city-moderate-native-scale.css",
+        "js/16-stage-v54-main-city-runtime.js"
+      ],
+      "verification": "DEV 已移除主城隊伍秘寶次要觸發說明、壓縮秘寶列與更換按鈕高度；同一最新 DEV 候選部署通過，專案負責人完成本批實機驗收後指示可推 main。",
+      "evidence": [
+        "dev@83798ee8760026cde244da8ff8ecd3378f4eb472",
+        "GitHub Actions run 35486935841 SUCCESS",
+        "css/19-stage-v54-main-city-moderate-native-scale.css",
+        "tests/mobile-lifecycle-shop-elementbox-adventure-home-hud-20260919.test.js"
+      ]
+    }
+  ]
+}

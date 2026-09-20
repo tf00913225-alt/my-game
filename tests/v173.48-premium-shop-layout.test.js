@@ -15,12 +15,21 @@ assert.match(css,/\.v17346-shop-card \.v17346-shop-buy\{[\s\S]*?grid-column:1 \/
 assert.match(css,/\.v17346-shop-card \.v17346-reforge-mini\{[\s\S]*?grid-row:4 !important;/);
 assert.match(css,/\.v17345-equipment-refresh\{[\s\S]*?grid-template-columns:minmax\(0,1fr\) 128px !important;[\s\S]*?height:58px !important;/);
 assert.match(css,/\.shop-potion-list\{[\s\S]*?grid-template-rows:repeat\(3,minmax\(0,1fr\)\) !important;[\s\S]*?overflow:hidden !important;/);
+assert.match(css,/\.shop-potion-card\{[\s\S]*?display:grid !important;[\s\S]*?grid-template-rows:18px 38px 36px !important;[\s\S]*?row-gap:3px !important;/);
+assert.match(css,/\.shop-potion-summary\{[\s\S]*?grid-template-columns:38px minmax\(0,1fr\) !important;[\s\S]*?height:38px !important;/);
+assert.match(css,/\.shop-potion-name\{[\s\S]*?min-height:0 !important;[\s\S]*?height:18px !important;[\s\S]*?margin:0 !important;/);
+assert.match(css,/\.shop-potion-effect\{[\s\S]*?min-height:0 !important;[\s\S]*?height:18px !important;[\s\S]*?margin:0 !important;/);
+assert.match(css,/\.shop-potion-purchase-row\{[\s\S]*?grid-template-columns:24px minmax\(56px,1fr\) 54px !important;[\s\S]*?grid-template-rows:36px !important;[\s\S]*?height:36px !important;/);
+assert.match(css,/\.shop-potion-purchase-row label\{[\s\S]*?display:none !important;/);
+assert.match(css,/\.shop-potion-quantity\{[\s\S]*?width:24px !important;[\s\S]*?max-width:24px !important;[\s\S]*?appearance:textfield !important;[\s\S]*?font-size:13px !important;/);
+assert.match(css,/\.shop-potion-quantity::-webkit-inner-spin-button\{[\s\S]*?-webkit-appearance:none !important;/);
+assert.match(css,/\.shop-potion-purchase-row \.shop-potion-buy\{[\s\S]*?grid-column:3 !important;[\s\S]*?grid-row:1 !important;[\s\S]*?height:36px !important;[\s\S]*?font-size:15px !important;/);
 assert.ok(equip.includes("前5次免費；第6～10次尚未開放。"));
-assert.ok(loader.includes('const V_ASSET_VERSION="173.67";'));
+assert.ok(loader.includes('const V_ASSET_VERSION="173.68";'));
 assert.ok(build.indexOf('"js/51-v169-rpg-ui.js"')<build.indexOf('"js/equipment-progression.js"'));
 assert.doesNotMatch(ui,/createElement\(["']script["']\)/);
-assert.ok(index.includes('<title>四象江湖傳 V173.67</title>'));
-assert.ok(index.includes('>V173.67</div>'));
+assert.ok(index.includes('<title>四象江湖傳 V173.68</title>'));
+assert.ok(index.includes('>V173.68</div>'));
 assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 
 console.log("✓ V173.50 premium one-screen shop layout");

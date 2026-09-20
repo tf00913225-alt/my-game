@@ -99,12 +99,23 @@ html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#000;}
     const equipmentCards=Array.from(content.querySelectorAll('.v17346-shop-card'));
     const buyButtons=Array.from(content.querySelectorAll('.v17346-shop-buy'));
     const potionCards=Array.from(content.querySelectorAll('.shop-potion-card'));
+    const potionHeads=Array.from(content.querySelectorAll('.shop-potion-card-head'));
+    const potionSummaries=Array.from(content.querySelectorAll('.shop-potion-summary'));
     const potionIcons=Array.from(content.querySelectorAll('.shop-potion-icon'));
+    const potionNames=Array.from(content.querySelectorAll('.shop-potion-name'));
+    const potionEffects=Array.from(content.querySelectorAll('.shop-potion-effect'));
+    const potionPurchases=Array.from(content.querySelectorAll('.shop-potion-purchase-row'));
+    const potionQuantities=Array.from(content.querySelectorAll('.shop-potion-quantity'));
+    const potionTotals=Array.from(content.querySelectorAll('.v146-shop-total'));
+    const potionBuys=Array.from(content.querySelectorAll('.shop-potion-buy'));
     snapshots.push({
       page:page,box:rect(box),header:rect(header),close:rect(close),tabs:rect(tabs),body:rect(body),modal:rect(modal),content:rect(content),
       scrollHeight:body.scrollHeight,clientHeight:body.clientHeight,contentScrollHeight:content.scrollHeight,contentClientHeight:content.clientHeight,
       cardRects:equipmentCards.map(rect),buyRects:buyButtons.map(rect),
-      potionCardRects:potionCards.map(rect),potionIconRects:potionIcons.map(rect)
+      potionCardRects:potionCards.map(rect),potionHeadRects:potionHeads.map(rect),potionSummaryRects:potionSummaries.map(rect),
+      potionIconRects:potionIcons.map(rect),potionNameRects:potionNames.map(rect),potionEffectRects:potionEffects.map(rect),
+      potionPurchaseRects:potionPurchases.map(rect),potionQuantityRects:potionQuantities.map(rect),
+      potionTotalRects:potionTotals.map(rect),potionBuyRects:potionBuys.map(rect)
     });
   });
   document.getElementById('result').textContent=JSON.stringify(snapshots);
@@ -156,16 +167,34 @@ try{
 
     snapshots.filter(shot=>shot.page==='potion').forEach(shot=>{
         assert.equal(shot.potionCardRects.length,6,"potion shop must show six cards on one screen");
-        assert.equal(shot.potionIconRects.length,6,"each potion card needs one formal icon");
+        for(const key of ["potionHeadRects","potionSummaryRects","potionIconRects","potionNameRects","potionEffectRects","potionPurchaseRects","potionQuantityRects","potionTotalRects","potionBuyRects"]){
+            assert.equal(shot[key].length,6,key+" must have one node per potion card");
+        }
         const viewportScale=shot.modal.width/420;
-        shot.potionIconRects.forEach((icon,index)=>{
-            const card=shot.potionCardRects[index];
+        shot.potionCardRects.forEach((card,index)=>{
+            const head=shot.potionHeadRects[index];
+            const summary=shot.potionSummaryRects[index];
+            const icon=shot.potionIconRects[index];
+            const name=shot.potionNameRects[index];
+            const effect=shot.potionEffectRects[index];
+            const purchase=shot.potionPurchaseRects[index];
+            const quantity=shot.potionQuantityRects[index];
+            const total=shot.potionTotalRects[index];
+            const buy=shot.potionBuyRects[index];
             assert.ok(
-                Math.abs(icon.width/viewportScale-48)<0.25&&Math.abs(icon.height/viewportScale-48)<0.25,
-                "potion icons must stay 48×48 logical px: "+JSON.stringify({viewportScale,icon})
+                Math.abs(icon.width/viewportScale-38)<0.25&&Math.abs(icon.height/viewportScale-38)<0.25,
+                "potion icons must stay 38×38 logical px: "+JSON.stringify({viewportScale,icon})
             );
-            assert.ok(icon.left>=card.left-0.25&&icon.right<=card.right+0.25,"potion icon escaped its card horizontally");
-            assert.ok(icon.top>=card.top-0.25&&icon.bottom<=card.bottom+0.25,"potion icon escaped its card vertically");
+            for(const node of [head,summary,icon,name,effect,purchase,quantity,total,buy]){
+                assert.ok(node.left>=card.left-0.25&&node.right<=card.right+0.25,"potion child escaped its card horizontally");
+                assert.ok(node.top>=card.top-0.25&&node.bottom<=card.bottom+0.25,"potion child escaped its card vertically");
+            }
+            assert.ok(head.bottom<=summary.top+0.25,"potion header overlaps summary");
+            assert.ok(summary.bottom<=purchase.top+0.25,"potion summary overlaps purchase row");
+            assert.ok(name.bottom<=effect.top+0.25,"potion name overlaps effect copy");
+            assert.ok(Math.abs(quantity.width/viewportScale-24)<0.25,"potion quantity input must stay 24px wide");
+            assert.ok(quantity.right<=total.left+0.25,"potion quantity overlaps price");
+            assert.ok(total.right<=buy.left+0.25,"potion price overlaps buy button");
         });
     });
 

@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-20-v17368-main-release",
+  "baseBranch": "dev",
+  "baseCommit": "83798ee8760026cde244da8ff8ecd3378f4eb472",
+  "officialVersion": "173.68",
+  "officialVersionBumpAllowed": true,
+  "overallStatus": "IMPLEMENTED",
+  "requirements": [
+    {
+      "id": "REL-01",
+      "status": "VERIFIED",
+      "requirement": "確認 current main 為既有 V173.67 正式版，本次候選來源固定為已完成手機實機驗收的最新 dev；禁止直接修改 main、rebase 或 force push。",
+      "evidence": [
+        "main@3ac9027eff0ce6a7217b4613bd619183e2fcbffb",
+        "dev@83798ee8760026cde244da8ff8ecd3378f4eb472",
+        "專案負責人確認可推 main"
+      ]
+    },
+    {
+      "id": "REL-02",
+      "status": "VERIFIED",
+      "requirement": "依 current main...dev 玩家可感知差異產生 V173.68 公告、CHANGELOG、Game/Cache Version 與 deterministic build。",
+      "evidence": [
+        "release/release.json",
+        "release/release-update.json",
+        "CHANGELOG.md",
+        "js/20-anonymous-20.js",
+        "index.html",
+        "package.json",
+        "asset-manifest.json",
+        "build/asset-manifest.json",
+        "release/requirement-batches/2026-09-20-shop-potion-home-relic-layout.json"
+      ]
+    },
+    {
+      "id": "REL-03",
+      "status": "VERIFIED",
+      "requirement": "V173.68 發布候選 PR 必須通過 Repository checks、版本／公告／build synchronization 與必要 browser QA。",
+      "evidence": [
+        "PR #374 candidate CI run 35487635285 Repository checks SUCCESS",
+        "Release Update Notification targeted regression SUCCESS",
+        "Fixed Slot battlefield 9x16 mobile browser QA SUCCESS",
+        "exact-candidate real battle mobile browser QA SUCCESS",
+        "Adventure V1 mobile browser QA SUCCESS",
+        "production build synchronization SUCCESS",
+        "release/version/notice gates SUCCESS"
+      ]
+    },
+    {
+      "id": "REL-04",
+      "status": "VERIFIED",
+      "requirement": "候選合併 dev 後，最新 dev HEAD CI 與 DEV exact-SHA deployment 必須成功並核對 V173.68。",
+      "evidence": [
+        "merged dev commit 637ef3ddd7afd4a88ecb0e87464ad11091e79968",
+        "dev push CI run 35487717751 Repository checks SUCCESS",
+        "DEV deployment job 106017163502 SUCCESS",
+        "Confirm this commit is still dev HEAD SUCCESS",
+        "Verify deployed commit, game version and cache version SUCCESS",
+        "deployed battle layout and VFX live QA SUCCESS"
+      ]
+    },
+    {
+      "id": "REL-05",
+      "status": "TODO",
+      "requirement": "以 protected dev → main PR 發布，main-target CI 成功後合併，並確認 production main SHA／版本。",
+      "evidence": []
+    }
+  ],
+  "automatedVerification": "REL-01..04 VERIFIED. PR #374 candidate CI run 35487635285 SUCCESS; dev push CI run 35487717751 and DEV deployment job 106017163502 SUCCESS with exact-SHA / V173.68 / cache 173.68 verification. REL-05 remains pending protected main promotion.",
+  "visualVerification": "Shop potion layout and main-city relic HUD were accepted by the project owner on deployed DEV before release preparation.",
+  "verifiedSourceCommit": "4b5b2ae2eb23015a0f9407a51c26cbb1bd0eec81",
+  "mergedDevCommit": "637ef3ddd7afd4a88ecb0e87464ad11091e79968",
+  "mergedMainCommit": null,
+  "candidateCiRun": 35487635285,
+  "devPushCiRun": 35487717751,
+  "devDeployJob": 106017163502
+}
