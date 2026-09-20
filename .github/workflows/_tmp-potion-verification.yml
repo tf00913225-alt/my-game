@@ -17,7 +17,7 @@ jobs:
         with:
           ref: fix/potion-names-icons-webp-20260920
           fetch-depth: 0
-      - name: Run focused potion and item UI checks
+      - name: Run focused potion and item UI checks # retry measured bounds
         run: |
           set -euo pipefail
           node tests/v144-rules-and-abyss.test.js
