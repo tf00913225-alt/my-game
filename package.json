@@ -1,12 +1,12 @@
 {
   "name": "four-symbols-jianghu",
   "private": true,
-  "version": "173.67.0",
+  "version": "173.68.0",
   "scripts": {
     "build": "node scripts/build-production.mjs",
     "build:check": "node scripts/build-production.mjs --check",
-  "test": "node .github/scripts/ci.mjs tests",
-  "qa:boot": "node .github/scripts/run-boot-architecture-browser-qa.mjs",
-  "release:update-diff": "node scripts/prepare-release-update-diff.mjs"
-}
+    "test": "node .github/scripts/ci.mjs tests",
+    "qa:boot": "node .github/scripts/run-boot-architecture-browser-qa.mjs",
+    "release:update-diff": "node scripts/prepare-release-update-diff.mjs"
+  }
 }

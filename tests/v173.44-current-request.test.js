@@ -61,7 +61,7 @@ assert.match(main,/function learnSkill\(skillId\)[\s\S]*?isSkillPrereqMet\([\s\S
 assert.match(water,/applyFinalSkillData\(\);[\s\S]*?renderSkillLoadout\(\)/);
 assert.match(abyssCss,/home-background-v17344\.png/);
 assert.equal(fs.existsSync("assets/ui/home-background-v17344.png"),true,"assets/ui/home-background-v17344.png");
-assert.match(loader,/const V_ASSET_VERSION="173\.67"/);
-assert.match(index,/id="homeVersionBadge"[\s\S]*?aria-label="目前版本 V173\.67"[\s\S]*?>V173\.67<\/div>/);
+assert.match(loader,/const V_ASSET_VERSION="173\.68"/);
+assert.match(index,/id="homeVersionBadge"[\s\S]*?aria-label="目前版本 V173\.68"[\s\S]*?>V173\.68<\/div>/);
 
 console.log("✓ V173.50 current request regression passed");
