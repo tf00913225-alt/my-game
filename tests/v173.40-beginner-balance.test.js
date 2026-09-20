@@ -60,8 +60,8 @@ test("range VFX fixes remain fixed-size and centered after casualties",()=>{
 });
 
 test("release/cache advances to V173.40",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.66"/);
-    assert.match(index,/<title>四象江湖傳 V173\.66<\/title>/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.67"/);
+    assert.match(index,/<title>四象江湖傳 V173\.67<\/title>/);
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });

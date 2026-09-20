@@ -212,8 +212,8 @@ test("the Wanxiang loop is raster-owned and the old procedural corner effect is 
 });
 
 test("V173.39 cache version loads the new owner code without stale V173.38 browser assets",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.66"/);
-    assert.match(index,/<title>四象江湖傳 V173\.66<\/title>/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.67"/);
+    assert.match(index,/<title>四象江湖傳 V173\.67<\/title>/);
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
 

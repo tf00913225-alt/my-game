@@ -37571,7 +37571,7 @@ window.v78ApplyCharacterInventoryLayout=
 
 /* bundled source: js/20-anonymous-20.js */
 /* Critical/feature boundary owner. No global input lock and no network-order patch chain. */
-const V_ASSET_VERSION="173.66";
+const V_ASSET_VERSION="173.67";
 
 (function installFeatureIntentBoundary(){
     "use strict";

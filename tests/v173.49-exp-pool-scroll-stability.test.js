@@ -30,7 +30,7 @@ assert.match(featureBoundary,/if\(info\.expPool\)\{[\s\S]*?refreshExpPoolSafetyU
 assert.match(featureBoundary,/new MutationObserver\(\(\)=>\{[\s\S]*?if\(expPoolSafetyUiReady\)\{ return; \}/);
 assert.doesNotMatch(featureBoundary,/if\(info\.expPool\)[\s\S]{0,260}element\.click\(\)/,"old EXP-pool DOM must never be replayed after lazy owner install");
 
-assert.ok(loader.includes('const V_ASSET_VERSION="173.66";'));
-assert.ok(index.includes('<title>四象江湖傳 V173.66</title>'));
+assert.ok(loader.includes('const V_ASSET_VERSION="173.67";'));
+assert.ok(index.includes('<title>四象江湖傳 V173.67</title>'));
 
 console.log("V173.50 EXP pool scroll stability + lazy safety-owner regression checks passed");
