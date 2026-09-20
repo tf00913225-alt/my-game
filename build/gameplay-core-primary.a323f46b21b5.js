@@ -1076,16 +1076,14 @@
     const V173_32_WILD_ZONE_STRENGTHS=Object.freeze([
         0.75,0.90,0.95,1.00,1.05,1.10,1.15,1.20,1.25,1.30
     ]);
-    const V131_EXP_MULTIPLIER=3.5;
     const ELEMENT_BOX_REWARD_MS=8*60*60*1000;
     const ELEMENT_BOX_KEY=window.FourSymbolsAccountSave.accountKey("element-box-state");
 
     /*
        ★ 新增（依照使用者要求，經濟／養成重新設計第一輪）：
        1. 精英/BOSS的戰鬥EXP要比普通怪高（精英×1.5、BOSS×3），
-          原本不管rank一律是「等級×10」，這裡在既有×3.5加成
-          「之前」先套rank倍率，兩個倍率疊乘、不是另外多加一次
-          ×3.5（使用者明確要求×3.5保留、不要再疊加）。
+          正式怪物 EXP 直接以怪物資料公式產生，再套 rank 倍率；不再
+          透過全域歷史倍率補正。
        2. 元素匣（自動掛機）戰鬥的EXP只給70%，金幣/掉落/材料
           完全不受影響（那些是另外獨立的函式，這裡完全沒有動）。
           目的是讓「掛機」明顯比「手動玩」慢，避免無腦掛機
@@ -1125,6 +1123,13 @@
         return 1;
     }
 
+    /* Formal base EXP: a normal monster's own reward before rank/mode rules.
+       35 is the established Lv×10 × historical 3.5 result, now encoded at
+       this data owner so every player-facing reward remains unchanged. */
+    function getFormalMonsterBaseExp(monster){
+        return Math.max(0,Math.floor((Number(monster&&monster.level)||0)*35));
+    }
+
     function getPatrolProgressionExpMultiplier(level){
         const safeLevel=Math.max(1,Math.floor(Number(level)||1));
         return safeLevel<20 ? V17342_GLOBAL_EXP_REWARD_MULTIPLIER : 1;
@@ -1149,10 +1154,10 @@
     function calculateStandardPatrolExp(monsterList,progressionLevel){
         const rankAdjustedExp=(Array.isArray(monsterList)?monsterList:[]).reduce((total,monster)=>{
             if(!monster){ return total; }
-            return total+(Number(monster.level)||0)*10*getMonsterExpRankMultiplier(monster);
+            return total+getFormalMonsterBaseExp(monster)*getMonsterExpRankMultiplier(monster);
         },0);
         return Math.max(0,Math.floor(
-            rankAdjustedExp*V131_EXP_MULTIPLIER*getPatrolProgressionExpMultiplier(progressionLevel)
+            rankAdjustedExp*getPatrolProgressionExpMultiplier(progressionLevel)
         ));
     }
 
@@ -1165,6 +1170,7 @@
     }
 
     window.v173GetPatrolProgressionExpMultiplier=getPatrolProgressionExpMultiplier;
+    window.v173GetFormalMonsterBaseExp=getFormalMonsterBaseExp;
     window.v173GetPatrolProgressionReferenceLevel=getPatrolProgressionReferenceLevel;
     window.v173CalculateStandardPatrolExp=calculateStandardPatrolExp;
     window.v173ApplyPatrolExpMode=applyPatrolExpMode;
@@ -2156,7 +2162,7 @@
             /*
                flatExpGain：跟原本winBattle()內部自己會算、
                直接加進sharedExp的數字完全一樣算法（等級×10，
-               不含rank倍率、不含3.5倍加成）——用來推算「原本
+               不含rank倍率、不含正式怪物 EXP 差額）——用來推算「原本
                函式這次會自己加多少」，才能正確算出還要「補多少
                差額」，不會跟原本的計算重複疊加。
             */
@@ -2166,7 +2172,7 @@
             );
 
             /* 正式巡怪 EXP 只走 calculateStandardPatrolExp()：
-               怪物基礎 EXP × rank × 3.5；V173.42 ×3 僅保留 Lv1～19 快速期。
+               正式怪物 EXP × rank；V173.42 ×3 僅保留 Lv1～19 快速期。
                Lv20 起不再有第二個全域 ×3。 */
             const progressionLevel=getPatrolProgressionReferenceLevel();
             let finalExp=calculateStandardPatrolExp(
@@ -5000,7 +5006,6 @@
     "use strict";
 
     const MAX_CHARACTER_LEVEL=100;
-    const TRAINING_EXP_MULTIPLIER=3.5;
     const DAY_MS=24*60*60*1000;
     const CHARGE_MAX_MS=72*60*60*1000;
     const GROWTH_STATE_KEY=window.FourSymbolsAccountSave.accountKey("exp-pool-growth-state");
@@ -5098,9 +5103,12 @@
         if(!roster){ return profile.fallbackAverageExp; }
         const average=roster.reduce((sum,monster)=>{
             if(!monster){ return sum; }
-            return sum+Math.max(1,Number(monster.level)||1)*10*getCurveMonsterRankMultiplier(monster);
+            const formalBase=typeof window.v173GetFormalMonsterBaseExp==="function"
+                ?window.v173GetFormalMonsterBaseExp(monster)
+                :Math.max(1,Math.floor((Number(monster.level)||1)*35));
+            return sum+formalBase*getCurveMonsterRankMultiplier(monster);
         },0)/roster.length;
-        return Math.max(1,Math.round(average*profile.averageGroupSize*TRAINING_EXP_MULTIPLIER));
+        return Math.max(1,Math.round(average*profile.averageGroupSize));
     }
     function getTargetBattlesForLevel(level){
         const safe=Math.min(99,Math.max(1,Math.floor(Number(level)||1)));
@@ -11260,19 +11268,40 @@
     window.v141TryMonsterSpecialAction=function(monsterIndex){
         const monster=monsters[monsterIndex];
         const supportIds=monster&&monster.v141SupportSkillIds||[];
-        if(!monster||!monster.alive||!supportIds.length||Math.random()>.55){ return false; }
+        if(!monster||!monster.alive||!supportIds.length){ return false; }
         const allyEntries=currentBattleMonsters.map(index=>({index:index,monster:monsters[index]}))
             .filter(entry=>entry.monster&&entry.monster.alive);
         const allies=allyEntries.map(entry=>entry.monster);
         let skillId=null;
         let target=null;
         let healTargets=[];
-        if(supportIds.includes("healSpell")){
+        const allAlliesNeedHealing=allyEntries.some(entry=>
+            monsterBaseHp(entry.monster)<monsterBaseMaxHp(entry.monster)*.70
+        );
+        const healSkill=skillDatabase.healSpell;
+        if(supportIds.includes("healSpell")&&allAlliesNeedHealing&&healSkill&&monster.sp>=(healSkill.spCost||0)){
             healTargets=getMonsterAllyTriTargets(monsterIndex,allyEntries);
-            if(healTargets.some(entry=>
-                monsterBaseHp(entry.monster)<monsterBaseMaxHp(entry.monster)||
-                Number(entry.monster.sp)<Number(entry.monster.maxSP)
-            )){ skillId="healSpell"; }
+            if(healTargets.length){ skillId="healSpell"; }
+        }
+        const affordableAttacks=(monster.skillIds||[]).filter(id=>{
+            const skill=skillDatabase[id];
+            return !!(skill&&monster.sp>=(skill.spCost||0));
+        });
+        const affordableBuffs=supportIds.filter(id=>{
+            const skill=skillDatabase[id];
+            return id!=="healSpell"&&!!(skill&&monster.sp>=(skill.spCost||0));
+        });
+        if(!skillId){
+            const category=window.FourSymbolsEnemySkillAI
+                ?window.FourSymbolsEnemySkillAI.chooseCategory(affordableAttacks,affordableBuffs,Math.random())
+                :(Math.random()<.70?"attack":"buff");
+            if(category==="attack"&&affordableAttacks.length){
+                monster.v175ForcedAttackSkillId=affordableAttacks[Math.floor(Math.random()*affordableAttacks.length)];
+                return false;
+            }
+            if(category!=="buff"&&affordableBuffs.length){
+                /* An unaffordable/missing attack pool falls back once to buffs. */
+            }else if(category==="normal"){ return false; }
         }
         if(!skillId&&supportIds.includes("barrier")){
             target=allies.find(item=>!(item.v141Shield&&item.v141Shield.isBarrier));
@@ -11281,7 +11310,12 @@
         if(!skillId&&supportIds.includes("rage")&&!allies.some(item=>item.v141TeamBuffs?.some(buff=>buff.type==="rage"&&buff.turnsLeft>0))){ skillId="rage"; }
         if(!skillId&&supportIds.includes("dinghaishenzhen")&&!allies.some(item=>item.v141TeamBuffs?.some(buff=>buff.type==="resistance"&&buff.turnsLeft>0))){ skillId="dinghaishenzhen"; }
         if(!skillId&&supportIds.includes("dodgeSkill")&&!allies.some(item=>item.v141TeamBuffs?.some(buff=>buff.type==="dodge"&&buff.turnsLeft>0))){ skillId="dodgeSkill"; }
-        if(!skillId){ return false; }
+        if(!skillId){
+            if(affordableAttacks.length){
+                monster.v175ForcedAttackSkillId=affordableAttacks[Math.floor(Math.random()*affordableAttacks.length)];
+            }
+            return false;
+        }
         const skill=skillDatabase[skillId];
         if(monster.sp<(skill.spCost||0)){ return false; }
         monster.sp-=skill.spCost||0;
@@ -12362,12 +12396,15 @@
             rain.baseDamage=30;
             rain.damagePerLevel=12;
             rain.spCost=75;
-            rain.freezeChance=50;
-            rain.freezeDuration=2;
-            rain.freezeSingleTarget=false;
+            /* Ice Arrow Rain is Frostbite, not the hard-control Freeze state. */
+            delete rain.freezeChance;
+            delete rain.freezeDuration;
+            delete rain.freezeSingleTarget;
+            rain.frostbiteChance=50;
+            rain.frostbiteDuration=2;
             rain.lifestealPercentByLevel=[1,2,3,4,5];
             rain.requires=["floodBeast"];
-            rain.description="對敵方全體各造成30點基礎法術傷害；吸取實際傷害的1%/2%/3%/4%/5%恢復自身HP；每個命中目標各有50%基礎機率冰封2回合。";
+            rain.description="對敵方全體各造成30點基礎法術傷害；吸取實際傷害的1%/2%/3%/4%/5%恢復自身HP；每個命中目標各有50%基礎機率凍傷2回合。";
         }
         const freeze=skillDatabase.freeze;
         if(freeze){
@@ -12385,122 +12422,15 @@
     window.v143CombatRuleSnapshot=function(){
         return {
             version:VERSION,
-            lockdownCaps:{regular:80,elite:60,boss:40},
+            lockdownCaps:{regular:90,elite:80,boss:70,player:60},
             stormRain:skillDatabase&&skillDatabase.stormRain,
             iceArrowRain:skillDatabase&&skillDatabase.iceArrowRain,
             freeze:skillDatabase&&skillDatabase.freeze
         };
     };
 
-    /* Ice Arrow Rain damages everyone and each hit target rolls Freeze. */
-    function playerIceRainTargets(centerIndex){
-        if(typeof getSkillTargets!=="function"){ return []; }
-        let center=Number.isInteger(centerIndex)?centerIndex:
-            (typeof selectedMonster!=="undefined"?selectedMonster:0);
-        if(typeof findAliveTargetIndex==="function"){ center=findAliveTargetIndex(center); }
-        return center===null?[]:getSkillTargets(center,"all").slice();
-    }
-
-    function applyIceRainFreezeToTargets(casterIndex,targetIndexes){
-        if(!targetIndexes.length || typeof rollStatusEffectHit!=="function"){ return; }
-        const skill=typeof skillDatabase!=="undefined"?skillDatabase.iceArrowRain:null;
-        const freezeChance=Math.max(0,numeric(skill&&skill.freezeChance));
-        const freezeDuration=Math.max(1,numeric(skill&&skill.freezeDuration)||2);
-        if(!freezeChance){ return; }
-        const candidates=targetIndexes.filter(index=>{
-            const monster=typeof monsters!=="undefined"?monsters[index]:null;
-            return monster&&monster.alive&&monster.hp>0;
-        });
-        if(!candidates.length){ return; }
-        const caster=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(casterIndex):null;
-        const stats=typeof getPartyBattleStats==="function"?getPartyBattleStats(casterIndex):null;
-        if(!caster||!stats){ return; }
-        candidates.forEach(index=>{
-            const monster=monsters[index];
-            const hit=rollStatusEffectHit(
-                freezeChance,caster.level,monster.level,stats.intelligence,
-                typeof getMonsterEffectiveSpiritPoints==="function"?getMonsterEffectiveSpiritPoints(monster):numeric(monster.spiritPoints),
-                true,typeof getMonsterRank==="function"?getMonsterRank(monster):"regular"
-            );
-            if(hit){
-                applyFreezeEffect(monster,freezeDuration);
-                addBattleLog(monster.name+"被冰霜箭雨冰封"+freezeDuration+"回合！");
-                if(typeof updateMonsterUI==="function"){ updateMonsterUI(index); }
-            }else{
-                addBattleLog("冰霜箭雨的冰封效果被"+monster.name+"抵抗了。");
-            }
-        });
-    }
-
-    function wrapPlayerIceRainFunction(name,casterIndexFromArgs,centerFromArgs){
-        const previous=window[name];
-        if(typeof previous!=="function"){ return; }
-        window[name]=function(){
-            const args=arguments;
-            const skillId=name==="castSecondaryCharacterSkill"?args[1]:args[0];
-            if(skillId!=="iceArrowRain"){ return previous.apply(this,args); }
-            const casterIndex=casterIndexFromArgs(args);
-            const center=centerFromArgs(args);
-            const targets=playerIceRainTargets(center);
-            const skill=skillDatabase.iceArrowRain;
-            const caster=getPartyCharacterByIndex(casterIndex);
-            const beforeSp=caster?numeric(caster.sp):0;
-            const chance=skill.freezeChance;
-            skill.freezeChance=0;
-            let result;
-            try{ result=previous.apply(this,args); }
-            finally{ skill.freezeChance=chance; }
-            if(caster&&numeric(caster.sp)<beforeSp){ applyIceRainFreezeToTargets(casterIndex,targets); }
-            return result;
-        };
-    }
-    wrapPlayerIceRainFunction("castDamageSkill",()=>0,args=>typeof selectedMonster!=="undefined"?selectedMonster:0);
-    wrapPlayerIceRainFunction("castSecondaryCharacterSkill",args=>Number(args[0])||0,args=>Number(args[2]));
-    wrapPlayerIceRainFunction("castPlayer2Skill",()=>1,args=>Number(args[1]));
-
-    /* Monster Ice Arrow Rain follows the same per-target Freeze rule. */
-    if(typeof processSingleMonsterAttack==="function"){
-        const previousProcessSingleMonsterAttack=processSingleMonsterAttack;
-        processSingleMonsterAttack=function(monsterIndex){
-            let usedIceRain=false;
-            const skill=typeof skillDatabase!=="undefined"?skillDatabase.iceArrowRain:null;
-            const savedChance=skill?skill.freezeChance:0;
-            const previousBadge=typeof showMonsterSkillNameBadge==="function"?showMonsterSkillNameBadge:null;
-            if(previousBadge){
-                showMonsterSkillNameBadge=function(name){
-                    if(skill&&name===skill.name){ usedIceRain=true; skill.freezeChance=0; }
-                    return previousBadge.apply(this,arguments);
-                };
-            }
-            let result;
-            try{ result=previousProcessSingleMonsterAttack.apply(this,arguments); }
-            finally{
-                if(previousBadge){ showMonsterSkillNameBadge=previousBadge; }
-                if(skill){ skill.freezeChance=savedChance; }
-            }
-            if(usedIceRain&&skill){
-                const freezeChance=Math.max(0,numeric(skill.freezeChance));
-                const freezeDuration=Math.max(1,numeric(skill.freezeDuration)||2);
-                const living=(typeof getExistingPartyIndexes==="function"?getExistingPartyIndexes():[0,1,2]).filter(index=>{
-                    const character=getPartyCharacterByIndex(index);
-                    return character&&character.hp>0;
-                });
-                living.forEach(targetIndex=>{
-                    const target=getPartyCharacterByIndex(targetIndex);
-                    const caster=monsters[monsterIndex];
-                    const spirit=typeof getFinalBattleSpiritForPlayerTarget==="function"
-                        ?getFinalBattleSpiritForPlayerTarget(target,targetIndex):numeric(target.spirit);
-                    if(rollStatusEffectHit(freezeChance,caster.level,target.level,numeric(caster.intelligencePoints),spirit,true,"regular",
-                        typeof getPlayerStatusResistBonus==="function"?getPlayerStatusResistBonus(target):0)){
-                        applyFreezeEffect(target,freezeDuration);
-                        addBattleLog((target.id||"角色")+"被冰霜箭雨冰封"+freezeDuration+"回合！");
-                        if(typeof updateUI==="function"){ updateUI(); }
-                    }
-                });
-            }
-            return result;
-        };
-    }
+    /* Ice Arrow Rain is finalized by the shared Frostbite owner in V149.
+       Do not install a second per-target Freeze path here. */
 
     /* ----- 1. Enemy card text: start large, only fit when it truly overflows. ----- */
     function fitEnemyIdentity(card,node){
