@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "releaseVersion": "173.67",
+  "title": "商店補品重排與主城秘寶 HUD 壓縮",
+  "status": "IMPLEMENTED",
+  "requirements": [
+    {
+      "id": "SHOP-01",
+      "status": "IMPLEMENTED",
+      "request": "商店補品頁重新排版，六種 HP/SP 補品在手機版不再出現 icon、名稱、數量、價格與購買按鈕互相重疊或穿圖。",
+      "owner": [
+        "css/49-v169-rpg-ui.css",
+        "js/40-v144-rules-and-abyss.js",
+        "js/51-v169-rpg-ui.js"
+      ],
+      "verification": "待 dev 部署後以 390×844 / 412×915 與使用者實機截圖確認文字、icon、數量輸入、價格與購買按鈕完整可見。"
+    },
+    {
+      "id": "HOME-RELIC-01",
+      "status": "IMPLEMENTED",
+      "request": "主城隊伍秘寶摘要移除觸發解釋文字，縮小更換按鈕上下高度並壓縮 HUD 高度，避免與底部導航穿圖。",
+      "owner": [
+        "css/19-stage-v54-main-city-moderate-native-scale.css",
+        "js/16-stage-v54-main-city-runtime.js"
+      ],
+      "verification": "待 dev 部署後以短螢幕手機確認秘寶列完整位於底部導航上方，且更換按鈕仍可正常點擊。"
+    }
+  ]
+}
