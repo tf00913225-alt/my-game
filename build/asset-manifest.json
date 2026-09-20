@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "release": "173.67",
+  "release": "173.68",
   "generatedAt": "deterministic",
   "critical": {
     "scripts": [
-      "build/boot-core.d40ea77f58c6.js"
+      "build/boot-core.da044b1f4dd7.js"
     ],
     "styles": [
       "build/boot-core.dac14ff4912b.css"
@@ -20,7 +20,7 @@
     "bundles": {
       "app-shell": {
         "scripts": [
-          "build/app-shell.ca23fcd5a5a9.js"
+          "build/app-shell.90e0f20d5b14.js"
         ],
         "styles": [
           "build/app-shell.5a26fcd61aad.css"
@@ -181,8 +181,8 @@
         "decode": true
       },
       {
-        "path": "build/boot-core.d40ea77f58c6.js",
-        "sha256": "d40ea77f58c6",
+        "path": "build/boot-core.da044b1f4dd7.js",
+        "sha256": "da044b1f4dd7",
         "bytes": 67275,
         "priority": "P0",
         "type": "script",
@@ -501,8 +501,8 @@
         "decode": false
       },
       {
-        "path": "build/app-shell.ca23fcd5a5a9.js",
-        "sha256": "ca23fcd5a5a9",
+        "path": "build/app-shell.90e0f20d5b14.js",
+        "sha256": "90e0f20d5b14",
         "bytes": 996215,
         "priority": "P1",
         "type": "script",
@@ -749,17 +749,17 @@
         "decode": false
       }
     ],
-    "manifestHash": "b6463c4a1de6",
+    "manifestHash": "fe06a845801d",
     "totalBytes": 20957778,
     "totalResources": 73
   },
   "assets": {
-    "build/boot-core.d40ea77f58c6.js": {
-      "sha256": "d40ea77f58c6",
+    "build/boot-core.da044b1f4dd7.js": {
+      "sha256": "da044b1f4dd7",
       "bytes": 67275
     },
-    "build/app-shell.ca23fcd5a5a9.js": {
-      "sha256": "ca23fcd5a5a9",
+    "build/app-shell.90e0f20d5b14.js": {
+      "sha256": "90e0f20d5b14",
       "bytes": 996215
     },
     "build/gameplay-core-primary.ced31e3fdb6a.js": {
