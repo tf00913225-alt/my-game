@@ -111,7 +111,13 @@ const V_ASSET_VERSION="173.69";
     document.addEventListener("click",()=>setTimeout(primeExpPoolSafety,0),true);
     document.addEventListener("four-symbols:startup-ready",()=>{
         const api=loader();
-        if(api){ api.idle(); }
+        if(api){
+            try{if(performance&&typeof performance.mark==="function"){performance.mark("four-symbols:background-prefetch-start");}}catch(_){ }
+            api.idle(["inventory","shop","equipment","synthesis","relic"],["relicIcons"]).then(result=>{
+                try{if(Array.isArray(result)&&result.at(-1)&&performance&&typeof performance.mark==="function"){performance.mark("four-symbols:relic-prefetch-ready");}}catch(_){ }
+                return api.idle(["patrol","skill"]);
+            }).then(()=>{try{if(performance&&typeof performance.mark==="function"){performance.mark("four-symbols:background-prefetch-idle");}}catch(_){ }});
+        }
         primeExpPoolSafety();
     },{once:true});
 

@@ -35963,6 +35963,34 @@ catch(error){
         node.title=full; node.setAttribute("aria-label",full);
     }
     const HOME_RELIC_SUMMARY_CATALOG=window.FourSymbolsRelicSummaryCatalog||Object.freeze({});
+    let firstScreenVisualReadyPromise=null;
+    function nextPaint(){ return new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))); }
+    function urlsFromStyle(value){
+        const urls=[];
+        String(value||"").replace(/url\((?:"([^"]+)"|'([^']+)'|([^\)]+))\)/g,(_all,doubleQuoted,singleQuoted,plain)=>{const url=(doubleQuoted||singleQuoted||plain||"").trim();if(url&&url!=="none"){urls.push(url);}return _all;});
+        return urls;
+    }
+    function decodeImageUrl(url){
+        return new Promise((resolve,reject)=>{const image=new Image();image.decoding="async";image.onload=()=>typeof image.decode==="function"?image.decode().then(resolve,reject):resolve();image.onerror=()=>reject(new Error("主城首屏圖片無法載入："+url));image.src=url;});
+    }
+    function collectFirstScreenVisualUrls(){
+        const urls=new Set();
+        ["#homePage","#homePage .home-bg-fixed-layer","#homePage .home-card-icon","#v146HomeRoster","#homePage img","#bottomNav img","#mainBottomNav img"].forEach(selector=>document.querySelectorAll(selector).forEach(node=>{if(node.tagName==="IMG"&&node.currentSrc){urls.add(node.currentSrc);}urlsFromStyle(getComputedStyle(node).backgroundImage).forEach(url=>urls.add(url));}));
+        return [...urls];
+    }
+    async function prepareFirstScreenVisuals(){
+        if(firstScreenVisualReadyPromise){return firstScreenVisualReadyPromise;}
+        firstScreenVisualReadyPromise=(async()=>{
+            const home=document.getElementById("homePage"),roster=document.getElementById("v146HomeRoster");
+            if(!home||!roster||roster.dataset.ready!=="true"){throw new Error("主城首屏資料尚未完成。 ");}
+            const urls=collectFirstScreenVisualUrls(); if(!urls.length){throw new Error("主城首屏圖片清單為空。 ");}
+            const fonts=document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve(); await Promise.all([fonts,...urls.map(decodeImageUrl)]); await nextPaint();
+            const liveUrls=new Set(collectFirstScreenVisualUrls()); if(urls.some(url=>!liveUrls.has(url))){throw new Error("主城首屏圖片在繪製前被替換。 ");}
+            try{if(performance&&typeof performance.mark==="function"){performance.mark("four-symbols:main-city-visual-ready");}}catch(_){ }
+            return Object.freeze({assets:urls.length});
+        })().catch(error=>{firstScreenVisualReadyPromise=null;throw error;});
+        return firstScreenVisualReadyPromise;
+    }
 
     function homeRosterPlaceholder(index){
         return '<article class="v146-home-character v146-home-character-placeholder" data-home-roster-slot="'+index+'" aria-busy="true">'+
@@ -36047,6 +36075,7 @@ catch(error){
     }
 
     function renderHomeRoster(){
+        firstScreenVisualReadyPromise=null;
         const roster=ensureHomeRosterShell();
         if(!roster||typeof getExistingPartyIndexes!=="function"){ return false; }
         const partyIndexes=getExistingPartyIndexes().slice(0,3);
@@ -36094,10 +36123,12 @@ catch(error){
     window.v54RenderHomeRoster=renderHomeRoster;
     window.FourSymbolsHomeRelicSummary=Object.freeze({
         ensureShell:ensureHomeRosterShell,
-        sync:syncHomeRelicSummary
+        sync:syncHomeRelicSummary,
+        prepareFirstScreenVisuals
     });
     document.addEventListener("four-symbols:startup-ready",function(){
-        renderHomeRoster();
+        const roster=document.getElementById("v146HomeRoster");
+        if(!roster||roster.dataset.ready!=="true"){renderHomeRoster();}
         syncHomeRelicSummary();
     });
 
@@ -37718,7 +37749,13 @@ const V_ASSET_VERSION="173.69";
     document.addEventListener("click",()=>setTimeout(primeExpPoolSafety,0),true);
     document.addEventListener("four-symbols:startup-ready",()=>{
         const api=loader();
-        if(api){ api.idle(); }
+        if(api){
+            try{if(performance&&typeof performance.mark==="function"){performance.mark("four-symbols:background-prefetch-start");}}catch(_){ }
+            api.idle(["inventory","shop","equipment","synthesis","relic"],["relicIcons"]).then(result=>{
+                try{if(Array.isArray(result)&&result.at(-1)&&performance&&typeof performance.mark==="function"){performance.mark("four-symbols:relic-prefetch-ready");}}catch(_){ }
+                return api.idle(["patrol","skill"]);
+            }).then(()=>{try{if(performance&&typeof performance.mark==="function"){performance.mark("four-symbols:background-prefetch-idle");}}catch(_){ }});
+        }
         primeExpPoolSafety();
     },{once:true});
 

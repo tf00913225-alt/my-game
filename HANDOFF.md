@@ -4072,3 +4072,11 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 - `deferFirstTick` 不再寫入凍傷。Freeze／Petrify 仍在本次受控單位的行動時阻擋行動，然後由 action-finished boundary 扣除一次，因此 N 回合必定阻擋 N 次；Burn 保留獨立 round-start Status Tick，套用時不立即跳傷害，N 回合產生 N 次 DoT。
 - 焚血訣 owner 仍是 `js/60-v173.64-skill-progression-rebalance.js`：Lv1–5 改為消耗最大 HP 5/10/15/20/25%，接下來三次玩家主動火系直接傷害各提升同樣百分比；燃燒 DoT、免費追擊不使用。施放本身不消耗這三次，第四次火系直接傷害不再加成。
 - 回歸 owner：`tests/skill-progression-rebalance.test.js`。已覆蓋焚血 Lv1–5 的精確 HP 成本、三次加成與第四次失效，以及 Buff／Freeze／Frostbite 的有效／阻擋行動扣除與當回合新 Buff 不預扣。
+
+## 2026-09-20 — Cold Start Visual Ready／主城首屏 Gate／背景 UI 預抓
+
+- 根因：資料 hydrate、detached Blob decode 與兩次 paint 不等於 live 主城 DOM 已可繪製；startup-ready listener 另有一次 roster 重建競態。
+- 修復：`prepareFirstScreenVisuals()` gate 實際 `<img>`、CSS background、必要字型與 paint；`hideLoader()` 只能在 visual-ready 後執行。首屏失敗沿用正式 Startup Retry。
+- 三層模型：Level 1 首屏完整後曝光；Level 2 主城可操作後由唯一 Feature Loader、idle、concurrency 1 背景預抓；Level 3 大型玩法維持按需 Lazy Load。
+- Relic 首次開啟先顯示正式局部 loading，20 icon 只由 `RELIC_CATALOG_LIST[].iconPath` 衍生並在 visual-ready 後一次呈現；背景不 execute Boss／Tower／Relic runtime。
+- 工作分支：`fix/cold-start-visual-ready-background-prefetch-20260920`；以最新 `dev` 為基準，main 不修改。待 GitHub 認證後依保護流程推送、CI、PR 合併。

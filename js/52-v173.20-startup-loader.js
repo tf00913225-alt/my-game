@@ -170,7 +170,12 @@
         const loaded=global.FourSymbolsGameSave&&typeof global.FourSymbolsGameSave.hydrate==="function"&&global.FourSymbolsGameSave.hydrate(save);
         if(!loaded){ throw new Error("Resolved account save could not hydrate gameplay state."); }
         if(typeof global.v54RenderHomeRoster==="function"){ global.v54RenderHomeRoster(); }
-        await nextPaint();
+        mark("four-symbols:main-city-data-ready");
+        if(!global.FourSymbolsHomeRelicSummary||typeof global.FourSymbolsHomeRelicSummary.prepareFirstScreenVisuals!=="function"){
+            throw new Error("Main City First Screen Visual Ready owner is unavailable.");
+        }
+        status("準備主城畫面","正在完成首屏圖片、字型與版面繪製");
+        await global.FourSymbolsHomeRelicSummary.prepareFirstScreenVisuals();
         transition(offline?STATES.OFFLINE_READY:STATES.READY,{uid:resolvedUid});
         firebase.closeAuth(); status("載入完成","主城已可操作");
         mark("four-symbols:critical-ready");

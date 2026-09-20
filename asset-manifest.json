@@ -4,7 +4,7 @@
   "generatedAt": "deterministic",
   "critical": {
     "scripts": [
-      "build/boot-core.cc39ec291f8f.js"
+      "build/boot-core.187f4e5eaae2.js"
     ],
     "styles": [
       "build/boot-core.dac14ff4912b.css"
@@ -20,7 +20,7 @@
     "bundles": {
       "app-shell": {
         "scripts": [
-          "build/app-shell.5cbecd833d92.js"
+          "build/app-shell.30c9d05fd790.js"
         ],
         "styles": [
           "build/app-shell.26bb5c82276e.css"
@@ -111,11 +111,11 @@
       },
       "feature-boss-relic": {
         "scripts": [
-          "build/feature-boss-relic.cfb7560b83ed.js",
+          "build/feature-boss-relic.07ffb0122f1e.js",
           "build/feature-relic-progression.0013b6d4dea5.js"
         ],
         "styles": [
-          "build/feature-boss-relic.6fe865f60e5c.css",
+          "build/feature-boss-relic.09a544c0880c.css",
           "build/feature-relic-progression.8844d5eb6e81.css"
         ],
         "dependencies": [
@@ -157,11 +157,33 @@
       "feature-patrol"
     ]
   },
+  "relicIcons": [
+    "assets/relics/icons/relic_qiankun_flask.webp",
+    "assets/relics/icons/relic_sun_orb.webp",
+    "assets/relics/icons/relic_xuanwu_seal.webp",
+    "assets/relics/icons/relic_soul_bell.webp",
+    "assets/relics/icons/relic_tiangang_banner.webp",
+    "assets/relics/icons/relic_nine_dragon_fire.webp",
+    "assets/relics/icons/relic_cold_spring_jade.webp",
+    "assets/relics/icons/relic_qinglan_feather.webp",
+    "assets/relics/icons/relic_rock_mountain_seal.webp",
+    "assets/relics/icons/relic_returning_wheel.webp",
+    "assets/relics/icons/relic_origin_talisman.webp",
+    "assets/relics/icons/relic_broken_army_scroll.webp",
+    "assets/relics/icons/relic_red_sky_war_mark.webp",
+    "assets/relics/icons/relic_ice_mirror_heart.webp",
+    "assets/relics/icons/relic_wind_chasing_talisman.webp",
+    "assets/relics/icons/relic_mountain_river_cauldron.webp",
+    "assets/relics/icons/relic_burning_star_mark.webp",
+    "assets/relics/icons/relic_spirit_spring_bottle.webp",
+    "assets/relics/icons/relic_demon_suppressing_seal.webp",
+    "assets/relics/icons/relic_all_returning_array.webp"
+  ],
   "firstPlay": {
     "schemaVersion": 1,
     "id": "first-play-core",
-    "manifestVersion": "2026-09-11.1",
-    "assetPackVersion": "2026-09-11.1",
+    "manifestVersion": "2026-09-20.1",
+    "assetPackVersion": "2026-09-20.1",
     "concurrency": 5,
     "resources": [
       {
@@ -181,9 +203,9 @@
         "decode": true
       },
       {
-        "path": "build/boot-core.cc39ec291f8f.js",
-        "sha256": "cc39ec291f8f",
-        "bytes": 67284,
+        "path": "build/boot-core.187f4e5eaae2.js",
+        "sha256": "187f4e5eaae2",
+        "bytes": 59088,
         "priority": "P0",
         "type": "script",
         "decode": false
@@ -373,6 +395,14 @@
         "decode": true
       },
       {
+        "path": "assets/ui/home-element-box-v174.webp",
+        "sha256": "ddfc5cbd6012",
+        "bytes": 6438,
+        "priority": "P1",
+        "type": "image",
+        "decode": true
+      },
+      {
         "path": "assets/ui/home-offline-exp.png",
         "sha256": "88c0e7411f06",
         "bytes": 145630,
@@ -384,6 +414,14 @@
         "path": "assets/ui/home-quest.png",
         "sha256": "2f9b27f3230b",
         "bytes": 107133,
+        "priority": "P1",
+        "type": "image",
+        "decode": true
+      },
+      {
+        "path": "assets/ui/home-relic-v174.eed14e806044.webp",
+        "sha256": "eed14e806044",
+        "bytes": 7248,
         "priority": "P1",
         "type": "image",
         "decode": true
@@ -469,6 +507,14 @@
         "decode": true
       },
       {
+        "path": "assets/ui/nav-gameplay.png",
+        "sha256": "86180b48962f",
+        "bytes": 210084,
+        "priority": "P1",
+        "type": "image",
+        "decode": true
+      },
+      {
         "path": "assets/ui/nav-home.png",
         "sha256": "692c58ebc556",
         "bytes": 257573,
@@ -480,6 +526,22 @@
         "path": "assets/ui/nav-quest.png",
         "sha256": "5bdcf6f56ace",
         "bytes": 200290,
+        "priority": "P1",
+        "type": "image",
+        "decode": true
+      },
+      {
+        "path": "assets/ui/nav-relic-v175.webp",
+        "sha256": "2b1a365ae746",
+        "bytes": 89312,
+        "priority": "P1",
+        "type": "image",
+        "decode": true
+      },
+      {
+        "path": "assets/ui/nav-training.png",
+        "sha256": "1c9a6cd6847a",
+        "bytes": 197942,
         "priority": "P1",
         "type": "image",
         "decode": true
@@ -501,9 +563,9 @@
         "decode": false
       },
       {
-        "path": "build/app-shell.5cbecd833d92.js",
-        "sha256": "5cbecd833d92",
-        "bytes": 997978,
+        "path": "build/app-shell.30c9d05fd790.js",
+        "sha256": "30c9d05fd790",
+        "bytes": 1001293,
         "priority": "P1",
         "type": "script",
         "decode": false
@@ -749,18 +811,18 @@
         "decode": false
       }
     ],
-    "manifestHash": "799beabd8e94",
-    "totalBytes": 20956952,
-    "totalResources": 73
+    "manifestHash": "c2febaf4d482",
+    "totalBytes": 21463095,
+    "totalResources": 78
   },
   "assets": {
-    "build/boot-core.cc39ec291f8f.js": {
-      "sha256": "cc39ec291f8f",
-      "bytes": 67284
+    "build/boot-core.187f4e5eaae2.js": {
+      "sha256": "187f4e5eaae2",
+      "bytes": 59088
     },
-    "build/app-shell.5cbecd833d92.js": {
-      "sha256": "5cbecd833d92",
-      "bytes": 997978
+    "build/app-shell.30c9d05fd790.js": {
+      "sha256": "30c9d05fd790",
+      "bytes": 1001293
     },
     "build/gameplay-core-primary.a323f46b21b5.js": {
       "sha256": "a323f46b21b5",
@@ -782,9 +844,9 @@
       "sha256": "e53e76008d09",
       "bytes": 46065
     },
-    "build/feature-boss-relic.cfb7560b83ed.js": {
-      "sha256": "cfb7560b83ed",
-      "bytes": 178245
+    "build/feature-boss-relic.07ffb0122f1e.js": {
+      "sha256": "07ffb0122f1e",
+      "bytes": 180942
     },
     "build/feature-relic-progression.0013b6d4dea5.js": {
       "sha256": "0013b6d4dea5",
@@ -830,9 +892,9 @@
       "sha256": "793114fc856d",
       "bytes": 25218
     },
-    "build/feature-boss-relic.6fe865f60e5c.css": {
-      "sha256": "6fe865f60e5c",
-      "bytes": 43155
+    "build/feature-boss-relic.09a544c0880c.css": {
+      "sha256": "09a544c0880c",
+      "bytes": 43455
     },
     "build/feature-relic-progression.8844d5eb6e81.css": {
       "sha256": "8844d5eb6e81",
