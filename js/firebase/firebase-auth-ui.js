@@ -1,7 +1,7 @@
 /* Account UI owner. Signed-out production flow cannot be dismissed without Firebase identity. */
 import {
     createAccountWithEmail,getSignedInUser,signInAsAnonymous,signInWithEmail,
-    signInWithFacebook,signInWithGoogle,signOutFirebase
+    signInWithGoogle,signOutFirebase
 } from "./firebase-auth.js";
 
 const OVERLAY_ID="firebaseAuthOverlay";
@@ -73,7 +73,6 @@ function markup(){
           <div class="firebase-auth-divider">其他登入方式</div>
           <div class="firebase-auth-actions">
             <button id="firebaseGoogleButton" class="firebase-auth-button" type="button">Google 登入</button>
-            <button id="firebaseFacebookButton" class="firebase-auth-button" type="button">Facebook 登入</button>
           </div>
           <div class="firebase-auth-footer">
             <button id="firebaseGuestButton" class="firebase-auth-button secondary" type="button">訪客開始遊戲</button>
@@ -112,7 +111,7 @@ function markup(){
 }
 function setBusy(value){
     busy=value===true;
-    ["firebaseGoogleButton","firebaseFacebookButton","firebaseGuestButton","firebaseEmailSignInButton","firebaseEmailCreateButton","firebaseMigrationConfirmButton","firebaseRetryButton","firebaseSignOutButton","firebaseAuthBackButton","firebaseSwitchAccountButton","firebaseSessionTestButton"].forEach(id=>{ const button=byId(id); if(button){ button.disabled=busy; } });
+    ["firebaseGoogleButton","firebaseGuestButton","firebaseEmailSignInButton","firebaseEmailCreateButton","firebaseMigrationConfirmButton","firebaseRetryButton","firebaseSignOutButton","firebaseAuthBackButton","firebaseSwitchAccountButton","firebaseSessionTestButton"].forEach(id=>{ const button=byId(id); if(button){ button.disabled=busy; } });
 }
 function renderResumeCountdown(){
     if(!resumeActive){ return; }
@@ -226,7 +225,6 @@ function startResumeGrace(){
 }
 function bind(){
     byId("firebaseGoogleButton").addEventListener("click",()=>performInteractive("正在開啟 Google 登入…",signInWithGoogle));
-    byId("firebaseFacebookButton").addEventListener("click",()=>performInteractive("正在開啟 Facebook 登入…",signInWithFacebook));
     byId("firebaseGuestButton").addEventListener("click",()=>performInteractive("正在建立 Firebase 訪客 UID…",signInAsAnonymous));
     byId("firebaseEmailSignInButton").addEventListener("click",()=>performInteractive("正在登入 Email 帳號…",()=>{ const value=credentials(); return signInWithEmail(value.email,value.password); }));
     byId("firebaseEmailCreateButton").addEventListener("click",()=>performInteractive("正在建立 Email 帳號…",()=>{ const value=credentials(); return createAccountWithEmail(value.email,value.password); }));
