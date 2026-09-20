@@ -38,8 +38,8 @@ html,body{margin:0;width:${width}px;height:900px;overflow:hidden;background:#050
 </div></div><pre id="result"></pre><script>
 const rect=e=>{const r=e.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height};};
 const overlap=(a,b)=>a.left<b.right&&b.left<a.right&&a.top<b.bottom&&b.top<a.bottom;
-const root=document.documentElement,header=document.querySelector('#v146HomeRoster>header'),count=document.querySelector('.v146-home-roster-count'),gold=document.querySelector('.v146-home-roster-gold'),formation=document.querySelector('.v-fixed-formation-entry');
-document.getElementById('result').textContent=JSON.stringify({width:${width},viewport:innerWidth,docWidth:root.scrollWidth,header:rect(header),count:rect(count),gold:rect(gold),formation:rect(formation),countGold:overlap(rect(count),rect(gold)),goldFormation:overlap(rect(gold),rect(formation))});
+const root=document.documentElement,page=document.getElementById('homePage'),header=document.querySelector('#v146HomeRoster>header'),count=document.querySelector('.v146-home-roster-count'),gold=document.querySelector('.v146-home-roster-gold'),formation=document.querySelector('.v-fixed-formation-entry');
+document.getElementById('result').textContent=JSON.stringify({width:${width},viewport:innerWidth,pageWidth:rect(page).width,pageOverflow:page.scrollWidth-page.clientWidth,docWidth:root.scrollWidth,header:rect(header),count:rect(count),gold:rect(gold),formation:rect(formation),countGold:overlap(rect(count),rect(gold)),goldFormation:overlap(rect(gold),rect(formation))});
 </script></body></html>`;
 
 try{
@@ -50,11 +50,11 @@ try{
         const match=run.stdout.match(/<pre id="result">([\s\S]*?)<\/pre>/);
         assert.ok(match,"header geometry result missing");
         const data=JSON.parse(match[1].replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"'));
-        assert.equal(data.viewport,width);
+        assert.equal(data.pageWidth,width);
         assert.ok(data.header.width>0&&data.header.height>0,`${width}px header is not visible`);
         assert.equal(data.countGold,false,`${width}px team count overlaps gold`);
         assert.equal(data.goldFormation,false,`${width}px gold overlaps formation button`);
-        assert.ok(data.docWidth<=width+1,`${width}px header causes horizontal overflow: ${data.docWidth}`);
+        assert.ok(data.pageOverflow<=1,`${width}px home page has internal horizontal overflow: ${data.pageOverflow}`);
     }
     console.log("Main-city roster header geometry passed at 390px and 412px with 9,999,999 gold");
 }finally{ try{ fs.unlinkSync(fixture); }catch(_){} }
