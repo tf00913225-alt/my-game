@@ -121,8 +121,10 @@ test("gold and EXP share one compact formatter without ellipsis",()=>{
     assert.doesNotMatch(baseCss,/\.home-hud-resources b\{[\s\S]{0,180}text-overflow:ellipsis/);
 });
 
-test("the fixed 9:16 home keeps one substantial non-scrolling layout owner",()=>{
-    assert.match(baseCss,/#homePage\{[\s\S]{0,420}height:100%;[\s\S]{0,120}overflow:hidden/);
+test("the fixed 9:16 home keeps one bounded vertical scroll owner above the fixed navigation",()=>{
+    assert.match(baseCss,/#homePage\{[\s\S]{0,520}height:100%;[\s\S]{0,220}overflow-y:auto;[\s\S]{0,120}overflow-x:hidden/);
+    assert.match(baseCss,/#homePage\{[\s\S]{0,720}scroll-padding-bottom:calc\(var\(--bottom-nav-height,70px\) \+ var\(--safe-bottom,0px\) \+ 14px\)/);
+    assert.match(rosterCss,/\.v146-home-roster\{[\s\S]{0,420}margin:18px 10px calc\(var\(--bottom-nav-height,70px\) \+ var\(--safe-bottom,0px\) \+ 12px\)/);
     assert.match(baseCss,/\.home-card-grid\{[\s\S]*display:flex;[\s\S]*flex:0 0 auto/);
     assert.match(baseCss,/\.home-card-primary\{[\s\S]*height:90px/);
     assert.match(baseCss,/\.home-secondary-actions\{[\s\S]*min-height:343px/);
@@ -142,9 +144,9 @@ test("the enlarged three-character horizontal roster still fits above the unchan
 });
 
 test("development cache and visible version stay synchronized",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.66"/);
-    assert.match(index,/<title>四象江湖傳 V173\.66<\/title>/);
-    assert.match(index,/aria-label="目前版本 V173\.66"[\s\S]*?>V173\.66<\/div>/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.67"/);
+    assert.match(index,/<title>四象江湖傳 V173\.67<\/title>/);
+    assert.match(index,/aria-label="目前版本 V173\.67"[\s\S]*?>V173\.67<\/div>/);
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.css/);
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);

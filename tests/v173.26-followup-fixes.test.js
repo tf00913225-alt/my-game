@@ -90,7 +90,7 @@ test("turn-end status and buff cleanup resynchronize Sprites at one shared bound
         tickStatusEffects(){ entity.statusEffects=[]; },
         tickPlayerBuffs(){ entity.activeBuffs=[]; },
         checkBattleEnd(){ return false; },
-        updateActionHudVisibility(){},beginCharacterTurn(){}
+        updateActionHudVisibility(){},showAutoBattleRoundPrompt(){},beginCharacterTurn(){}
     };
     context.window=context;
     context.v143SyncStatusSpriteEffects=function(){
@@ -111,10 +111,10 @@ test("status popup stays below the HP damage lane",()=>{
 });
 
 test("development release advances to V173.39",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.66"/);
-    assert.match(index,/<title>四象江湖傳 V173\.66<\/title>/);
-    assert.match(index,/aria-label="目前版本 V173\.66"/);
-    assert.match(index,/>V173\.66<\/div>/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.67"/);
+    assert.match(index,/<title>四象江湖傳 V173\.67<\/title>/);
+    assert.match(index,/aria-label="目前版本 V173\.67"/);
+    assert.match(index,/>V173\.67<\/div>/);
 });
 
 console.log("\n"+passed+" V173.39 follow-up regression tests passed.");

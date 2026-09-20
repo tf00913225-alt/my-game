@@ -606,6 +606,451 @@
 })();
 
 
+/* bundled source: js/battle-statistics-system.js */
+/* =====================================================
+   Battle Statistics / Battle Insight UI
+   - One per-battle statistics owner keyed by combatant id.
+   - UI reads the same live/final snapshot; no duplicate result calculation.
+   - Drawers are non-blocking observers; combat continues while they are open.
+===================================================== */
+(function installBattleStatisticsSystem(){
+    "use strict";
+
+    if(typeof window==="undefined"||window.__battleStatisticsSystemInstalled){ return; }
+    window.__battleStatisticsSystemInstalled=true;
+
+    const VALID_KINDS=new Set(["playerCharacter","heroNpc","reinforcement"]);
+    let session=null;
+    let finalSnapshot=null;
+    let bossMechanisms=[];
+    let openDrawer=null;
+    let resultCloseCallback=null;
+
+    function number(value){
+        const result=Number(value);
+        return Number.isFinite(result)?result:0;
+    }
+    function amount(value){ return Math.max(0,number(value)); }
+    function escapeHtml(value){
+        return String(value==null?"":value)
+            .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+            .replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+    }
+    function copy(value){ return JSON.parse(JSON.stringify(value)); }
+    function normalizeCombatant(input){
+        if(!input||!input.id){ return null; }
+        const kind=VALID_KINDS.has(input.kind)?input.kind:"playerCharacter";
+        const battleIndex=Number.isInteger(Number(input.battleIndex))?Number(input.battleIndex):null;
+        return {
+            id:String(input.id),
+            kind:kind,
+            side:input.side==="enemy"?"enemy":"ally",
+            battleIndex:battleIndex,
+            name:String(input.name||"未命名單位"),
+            portrait:String(input.portrait||""),
+            damageDealt:Math.max(0,number(input.damageDealt)),
+            healingDone:Math.max(0,number(input.healingDone)),
+            damageTaken:Math.max(0,number(input.damageTaken)),
+            criticalHits:Math.max(0,Math.floor(number(input.criticalHits)))
+        };
+    }
+    function snapshotFrom(source){
+        if(!source){ return null; }
+        return {
+            battleToken:source.battleToken,
+            active:!!source.active,
+            result:source.result||null,
+            combatants:Array.from(source.combatants.values())
+                .filter(item=>item.side==="ally")
+                .map(item=>copy(item))
+        };
+    }
+    function currentSnapshot(){
+        return session&&session.active?snapshotFrom(session):finalSnapshot&&copy(finalSnapshot);
+    }
+    function findCombatant(id){
+        if(!session||!session.active||!id){ return null; }
+        return session.combatants.get(String(id))||null;
+    }
+    function formatValue(value){
+        return Math.max(0,Math.floor(number(value))).toLocaleString("zh-TW");
+    }
+
+    function battleRoot(){
+        return document.getElementById("battlePage");
+    }
+    function appRoot(){
+        return document.getElementById("app")||document.getElementById("game-content")||document.body;
+    }
+    function clampEdgeTop(edge,root,value){
+        const height=Math.max(1,Number(root&&root.clientHeight)||0);
+        const edgeHeight=Math.max(1,Number(edge&&edge.offsetHeight)||0);
+        const minTop=8;
+        const maxTop=Math.max(minTop,height-edgeHeight-8);
+        return Math.max(minTop,Math.min(maxTop,Number(value)||minTop));
+    }
+    function installStatsEdgeDrag(edge,root){
+        if(!edge||!root||edge.__battleStatsEdgeDragInstalled){ return; }
+        edge.__battleStatsEdgeDragInstalled=true;
+        let drag=null;
+
+        function finishDrag(event){
+            if(!drag){ return; }
+            if(event&&event.pointerId!==undefined&&drag.pointerId!==undefined&&event.pointerId!==drag.pointerId){ return; }
+            const moved=drag.moved;
+            drag=null;
+            edge.classList.remove("is-dragging");
+            if(moved){
+                edge.__suppressNextClick=true;
+                setTimeout(()=>{ edge.__suppressNextClick=false; },0);
+            }
+        }
+
+        edge.addEventListener("pointerdown",event=>{
+            if(event.button!==undefined&&event.button!==0){ return; }
+            const rect=root.getBoundingClientRect();
+            const rootHeight=Math.max(1,Number(root.clientHeight)||rect.height||1);
+            drag={
+                pointerId:event.pointerId,
+                startClientY:Number(event.clientY)||0,
+                startTop:clampEdgeTop(edge,root,edge.offsetTop),
+                scaleY:rect.height>0?rootHeight/rect.height:1,
+                moved:false
+            };
+            edge.classList.add("is-dragging");
+            if(typeof edge.setPointerCapture==="function"&&event.pointerId!==undefined){
+                try{ edge.setPointerCapture(event.pointerId); }catch(_){ }
+            }
+            event.preventDefault();
+        });
+        edge.addEventListener("pointermove",event=>{
+            if(!drag||event.pointerId!==drag.pointerId){ return; }
+            const delta=((Number(event.clientY)||0)-drag.startClientY)*drag.scaleY;
+            if(!drag.moved&&Math.abs(delta)>=3){ drag.moved=true; }
+            if(!drag.moved){ return; }
+            edge.style.top=clampEdgeTop(edge,root,drag.startTop+delta)+"px";
+            event.preventDefault();
+        });
+        edge.addEventListener("pointerup",finishDrag);
+        edge.addEventListener("pointercancel",finishDrag);
+    }
+    function ensureBattleUi(){
+        if(typeof document==="undefined"){ return null; }
+        const root=battleRoot();
+        if(!root){ return null; }
+
+        let edge=document.getElementById("battleStatsEdgeButton");
+        if(!edge){
+            edge=document.createElement("button");
+            edge.type="button";
+            edge.id="battleStatsEdgeButton";
+            edge.className="battle-stats-edge-button";
+            edge.setAttribute("aria-label","詳細戰況");
+            edge.innerHTML="<span>詳</span><span>細</span><span>戰</span><span>況</span>";
+            edge.addEventListener("click",event=>{
+                if(edge.__suppressNextClick){
+                    edge.__suppressNextClick=false;
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+                    return;
+                }
+                openBattleDrawer("stats");
+            });
+            root.appendChild(edge);
+        }
+
+        let alertButton=document.getElementById("battleMechanismAlert");
+        if(!alertButton){
+            alertButton=document.createElement("button");
+            alertButton.type="button";
+            alertButton.id="battleMechanismAlert";
+            alertButton.className="battle-mechanism-alert";
+            alertButton.setAttribute("aria-label","查看 Boss 功能卡");
+            alertButton.textContent="!";
+            alertButton.addEventListener("click",()=>openBattleDrawer("boss"));
+            root.appendChild(alertButton);
+        }
+
+        const staleScrim=document.getElementById("battleInsightScrim");
+        if(staleScrim&&typeof staleScrim.remove==="function"){ staleScrim.remove(); }
+
+        let statsDrawer=document.getElementById("battleStatsDrawer");
+        if(!statsDrawer){
+            statsDrawer=document.createElement("aside");
+            statsDrawer.id="battleStatsDrawer";
+            statsDrawer.className="battle-insight-drawer battle-stats-drawer";
+            statsDrawer.setAttribute("aria-label","詳細戰況");
+            statsDrawer.innerHTML='<header><b>詳細戰況</b><button type="button" data-close>×</button></header><div class="battle-insight-drawer-body"></div>';
+            statsDrawer.querySelector("[data-close]").addEventListener("click",closeBattleDrawer);
+            root.appendChild(statsDrawer);
+        }
+
+        let bossDrawer=document.getElementById("battleBossMechanismDrawer");
+        if(!bossDrawer){
+            bossDrawer=document.createElement("aside");
+            bossDrawer.id="battleBossMechanismDrawer";
+            bossDrawer.className="battle-insight-drawer battle-boss-mechanism-drawer";
+            bossDrawer.setAttribute("aria-label","Boss 功能卡");
+            bossDrawer.innerHTML='<header><b>Boss 功能卡</b><button type="button" data-close>×</button></header><div class="battle-insight-drawer-body"></div>';
+            bossDrawer.querySelector("[data-close]").addEventListener("click",closeBattleDrawer);
+            root.appendChild(bossDrawer);
+        }
+        installStatsEdgeDrag(edge,root);
+        return {edge,alertButton,statsDrawer,bossDrawer};
+    }
+    function syncBattleEntryVisibility(){
+        const ui=ensureBattleUi();
+        if(!ui){ return; }
+        const active=!!(session&&session.active);
+        ui.edge.hidden=!active;
+        ui.alertButton.hidden=!active||bossMechanisms.length===0;
+        if(!active){ closeBattleDrawer(); }
+    }
+    function statRow(label,value){
+        return '<div><span>'+escapeHtml(label)+'</span><b>'+formatValue(value)+'</b></div>';
+    }
+    function renderStatsDrawer(){
+        const drawer=document.getElementById("battleStatsDrawer");
+        const body=drawer&&drawer.querySelector(".battle-insight-drawer-body");
+        if(!body){ return; }
+        const snapshot=currentSnapshot();
+        const combatants=snapshot&&Array.isArray(snapshot.combatants)?snapshot.combatants:[];
+        body.innerHTML=combatants.length?combatants.map(item=>
+            '<article class="battle-stat-card">'+
+                '<div class="battle-stat-identity">'+
+                    (item.portrait?'<img src="'+escapeHtml(item.portrait)+'" alt="">':'<span class="battle-stat-avatar-fallback" aria-hidden="true">◆</span>')+
+                    '<div><b>'+escapeHtml(item.name)+'</b><small>'+escapeHtml(item.kind==="heroNpc"?"英雄 NPC":item.kind==="reinforcement"?"援軍":"玩家角色")+'</small></div>'+
+                '</div>'+
+                '<div class="battle-stat-grid">'+
+                    statRow("總傷害",item.damageDealt)+
+                    statRow("造成治療量",item.healingDone)+
+                    statRow("承受傷害",item.damageTaken)+
+                    statRow("暴擊次數",item.criticalHits)+
+                '</div>'+
+            '</article>'
+        ).join(""):'<p class="battle-insight-empty">目前沒有可統計的我方戰鬥單位。</p>';
+    }
+    function mechanismMarkup(item){
+        const remaining=item.remaining===null||item.remaining===undefined||item.remaining===""
+            ?""
+            :'<div><span>剩餘</span><b>'+escapeHtml(item.remaining)+'</b></div>';
+        return '<article class="battle-mechanism-card">'+
+            '<div class="battle-mechanism-title">'+
+                (item.icon?'<img src="'+escapeHtml(item.icon)+'" alt="">':'<span aria-hidden="true">!</span>')+
+                '<b>'+escapeHtml(item.name||"Boss 機制")+'</b>'+
+            '</div>'+
+            '<p>'+escapeHtml(item.effect||"")+'</p>'+
+            '<div><span>觸發條件</span><b>'+escapeHtml(item.trigger||"戰鬥機制觸發")+'</b></div>'+
+            '<div><span>目前狀態</span><b>'+escapeHtml(item.status||"生效中")+'</b></div>'+
+            remaining+
+        '</article>';
+    }
+    function renderBossDrawer(){
+        const drawer=document.getElementById("battleBossMechanismDrawer");
+        const body=drawer&&drawer.querySelector(".battle-insight-drawer-body");
+        if(!body){ return; }
+        body.innerHTML=bossMechanisms.length
+            ?bossMechanisms.map(mechanismMarkup).join("")
+            :'<p class="battle-insight-empty">目前場上沒有生效中的 Boss 功能卡。</p>';
+    }
+    function openBattleDrawer(kind){
+        if(!session||!session.active){ return false; }
+        const next=kind==="boss"?"boss":"stats";
+        if(next==="boss"&&bossMechanisms.length===0){ return false; }
+        const ui=ensureBattleUi();
+        if(!ui){ return false; }
+
+        if(openDrawer===next){ return true; }
+        closeBattleDrawer();
+        openDrawer=next;
+
+        const drawer=next==="boss"?ui.bossDrawer:ui.statsDrawer;
+        drawer.classList.add("open");
+        if(next==="boss"){ renderBossDrawer(); }else{ renderStatsDrawer(); }
+        return true;
+    }
+    function closeBattleDrawer(){
+        if(typeof document!=="undefined"){
+            const stats=document.getElementById("battleStatsDrawer");
+            const boss=document.getElementById("battleBossMechanismDrawer");
+            if(stats){ stats.classList.remove("open"); }
+            if(boss){ boss.classList.remove("open"); }
+        }
+        openDrawer=null;
+    }
+    function syncOpenDrawer(){
+        if(openDrawer==="stats"){ renderStatsDrawer(); }
+        else if(openDrawer==="boss"){ renderBossDrawer(); }
+    }
+
+    function ensureResultModal(){
+        if(typeof document==="undefined"){ return null; }
+        let modal=document.getElementById("battleStatisticsResultModal");
+        if(modal){ return modal; }
+        modal=document.createElement("section");
+        modal.id="battleStatisticsResultModal";
+        modal.className="battle-statistics-result-modal";
+        modal.hidden=true;
+        modal.innerHTML='<div class="battle-statistics-result-panel"><header><div><small>Battle Result Details（戰鬥詳細結算）</small><h2 data-title>戰鬥詳細結算</h2><p data-subtitle></p></div></header><div class="battle-statistics-result-body"></div><footer><button type="button" data-close>關閉</button></footer></div>';
+        modal.querySelector("[data-close]").addEventListener("click",()=>hideResultDetails(true));
+        appRoot().appendChild(modal);
+        return modal;
+    }
+    function showResultDetails(options){
+        if(!finalSnapshot||!Array.isArray(finalSnapshot.combatants)){ return false; }
+        const modal=ensureResultModal();
+        if(!modal){ return false; }
+        const config=options&&typeof options==="object"?options:{};
+        resultCloseCallback=typeof config.onClose==="function"?config.onClose:null;
+        modal.querySelector("[data-title]").textContent=String(config.title||"戰鬥詳細結算");
+        modal.querySelector("[data-subtitle]").textContent=String(config.subtitle||"");
+        const body=modal.querySelector(".battle-statistics-result-body");
+        body.innerHTML=finalSnapshot.combatants.map(item=>
+            '<article class="battle-result-stat-card">'+
+                '<div class="battle-stat-identity">'+
+                    (item.portrait?'<img src="'+escapeHtml(item.portrait)+'" alt="">':'<span class="battle-stat-avatar-fallback" aria-hidden="true">◆</span>')+
+                    '<div><b>'+escapeHtml(item.name)+'</b><small>'+escapeHtml(item.kind==="heroNpc"?"英雄 NPC":item.kind==="reinforcement"?"援軍":"玩家角色")+'</small></div>'+
+                '</div>'+
+                '<div class="battle-stat-grid">'+
+                    statRow("總傷害",item.damageDealt)+
+                    statRow("造成治療量",item.healingDone)+
+                    statRow("承受傷害",item.damageTaken)+
+                    statRow("暴擊次數",item.criticalHits)+
+                '</div>'+
+            '</article>'
+        ).join("");
+        modal.hidden=false;
+        return true;
+    }
+    function hideResultDetails(invokeCallback){
+        const modal=typeof document!=="undefined"?document.getElementById("battleStatisticsResultModal"):null;
+        if(modal){ modal.hidden=true; }
+        const callback=resultCloseCallback;
+        resultCloseCallback=null;
+        if(invokeCallback!==false&&typeof callback==="function"){
+            try{ callback(); }catch(error){ console.error("戰鬥詳細結算關閉回呼失敗：",error); }
+        }
+    }
+
+    function begin(config){
+        closeBattleDrawer();
+        hideResultDetails(false);
+        bossMechanisms=[];
+        const input=config&&typeof config==="object"?config:{};
+        session={
+            battleToken:input.battleToken==null?null:input.battleToken,
+            active:true,
+            result:null,
+            combatants:new Map()
+        };
+        (Array.isArray(input.combatants)?input.combatants:[]).forEach(registerCombatant);
+        finalSnapshot=null;
+        syncBattleEntryVisibility();
+        syncOpenDrawer();
+        return currentSnapshot();
+    }
+    function registerCombatant(input){
+        if(!session||!session.active){ return false; }
+        const next=normalizeCombatant(input);
+        if(!next){ return false; }
+        const current=session.combatants.get(next.id);
+        if(current){
+            next.damageDealt=current.damageDealt;
+            next.healingDone=current.healingDone;
+            next.damageTaken=current.damageTaken;
+            next.criticalHits=current.criticalHits;
+        }
+        session.combatants.set(next.id,next);
+        syncOpenDrawer();
+        return true;
+    }
+    function recordDamage(input){
+        if(!session||!session.active){ return false; }
+        const event=input&&typeof input==="object"?input:{};
+        const value=amount(event.amount);
+        const source=findCombatant(event.sourceId);
+        const target=findCombatant(event.targetId);
+        if(source&&value>0){ source.damageDealt+=value; }
+        if(target&&value>0){ target.damageTaken+=value; }
+        syncOpenDrawer();
+        return !!(source||target);
+    }
+    function recordHealing(input){
+        if(!session||!session.active){ return false; }
+        const event=input&&typeof input==="object"?input:{};
+        const value=amount(event.amount);
+        const source=findCombatant(event.sourceId);
+        if(source&&value>0){ source.healingDone+=value;syncOpenDrawer();return true; }
+        return false;
+    }
+    function recordCritical(input){
+        if(!session||!session.active){ return false; }
+        const event=input&&typeof input==="object"?input:{id:input};
+        const source=findCombatant(event&&event.id);
+        if(!source){ return false; }
+        source.criticalHits+=1;
+        syncOpenDrawer();
+        return true;
+    }
+    function finish(input){
+        if(!session){ return finalSnapshot&&copy(finalSnapshot); }
+        if(session.active){
+            session.active=false;
+            session.result=input&&input.result?String(input.result):null;
+            finalSnapshot=snapshotFrom(session);
+        }
+        bossMechanisms=[];
+        closeBattleDrawer();
+        syncBattleEntryVisibility();
+        return finalSnapshot&&copy(finalSnapshot);
+    }
+    function getCombatantIdByBattleIndex(index){
+        const source=session&&session.active?session:null;
+        if(!source){ return null; }
+        for(const item of source.combatants.values()){
+            if(item.side==="ally"&&item.battleIndex===Number(index)){ return item.id; }
+        }
+        return null;
+    }
+    function setBossMechanisms(cards){
+        bossMechanisms=(Array.isArray(cards)?cards:[]).map((item,index)=>({
+            id:String(item&&item.id||("mechanism-"+index)),
+            name:String(item&&item.name||"Boss 機制"),
+            icon:String(item&&item.icon||""),
+            effect:String(item&&item.effect||""),
+            trigger:String(item&&item.trigger||"戰鬥機制觸發"),
+            status:String(item&&item.status||"生效中"),
+            remaining:item&&item.remaining!==undefined?item.remaining:null
+        }));
+        if(openDrawer==="boss"&&bossMechanisms.length===0){ closeBattleDrawer(); }
+        syncBattleEntryVisibility();
+        syncOpenDrawer();
+        return copy(bossMechanisms);
+    }
+    function clearBossMechanisms(){ return setBossMechanisms([]); }
+
+    window.FourSymbolsBattleStatistics=Object.freeze({
+        version:"battle-statistics-v1",
+        begin:begin,
+        registerCombatant:registerCombatant,
+        recordDamage:recordDamage,
+        recordHealing:recordHealing,
+        recordCritical:recordCritical,
+        finish:finish,
+        getSnapshot:function(){ const value=currentSnapshot();return value&&copy(value); },
+        getFinalSnapshot:function(){ return finalSnapshot&&copy(finalSnapshot); },
+        getCombatantIdByBattleIndex:getCombatantIdByBattleIndex,
+        setBossMechanisms:setBossMechanisms,
+        clearBossMechanisms:clearBossMechanisms,
+        openStatistics:function(){ return openBattleDrawer("stats"); },
+        openBossMechanisms:function(){ return openBattleDrawer("boss"); },
+        closeDrawer:closeBattleDrawer,
+        showResultDetails:showResultDetails,
+        hideResultDetails:hideResultDetails
+    });
+})();
+
+
 /* bundled source: js/25-v131-fix-batch.js */
 /* V131 — targeted gameplay/UI fixes for request batch 17. */
 (function installV131FixBatch(){
@@ -3823,6 +4268,12 @@
 
         battleActive=true;
         battleToken++;
+        battleRoundBoundaryKeys=new Set();
+        battlePresentationLocks.clear();
+        battleInputResumeToken=null;
+        battleResolutionResumeToken=null;
+        battleAutoActionResume=null;
+        clearBattleRoundPrompt();
         stopMonsterMovement();
         clearInterval(timerId);
         if(battleAdvanceTimeoutId){
@@ -3875,6 +4326,7 @@
         }
         syncBattleAutoSettings();
         updateAutoButton();
+        beginBattleStatisticsSession();
 
         selectBattleTarget(0);
         clearBattleLog();
@@ -3910,6 +4362,8 @@
             }
 
             battleActive=false;
+            clearBattleRoundPrompt();
+            finishBattleStatisticsSession("win");
             autoBattle=false;
             actionReady=false;
             pendingAction=null;
@@ -3953,6 +4407,8 @@
                callback回到日常副本頁。
             */
             battleActive=false;
+            clearBattleRoundPrompt();
+            finishBattleStatisticsSession("lose");
             autoBattle=false;
             actionReady=false;
             pendingAction=null;
@@ -5443,9 +5899,12 @@
         return Math.max(1,Math.min(SHOP_PURCHASE_MAX_QUANTITY,Math.floor(Number(value)||1)));
     }
     window.normalizeShopPurchaseQuantity=normalizeShopPurchaseQuantity;
-    window.v133NormalizeShopQuantityInput=function(input){
+    window.v133NormalizeShopQuantityInput=function(input,options){
         if(!input){ return 1; }
-        const quantity=normalizeShopPurchaseQuantity(input.value);
+        const commit=!!(options&&options.commit);
+        const raw=String(input.value==null?"":input.value).trim();
+        if(raw===""&&!commit){ return null; }
+        const quantity=normalizeShopPurchaseQuantity(raw);
         input.value=String(quantity);
         return quantity;
     };
@@ -5487,7 +5946,7 @@
                     <div class="shop-potion-card-head"><span class="shop-potion-type">${resourceLabel}</span><span class="shop-potion-stock">持有 ${count}</span></div>
                     <div class="shop-potion-name">${shopItem.name}</div><div class="shop-potion-effect">${effectText}</div>
                     <div class="shop-potion-purchase-row"><label for="shopQuantity-${shopItem.id}">數量</label>
-                    <input id="shopQuantity-${shopItem.id}" class="shop-potion-quantity" type="number" inputmode="numeric" min="1" max="999" step="1" value="1" oninput="v133NormalizeShopQuantityInput(this)">
+                    <input id="shopQuantity-${shopItem.id}" class="shop-potion-quantity" type="number" inputmode="numeric" min="1" max="999" step="1" value="1" oninput="v133NormalizeShopQuantityInput(this)" onblur="v133NormalizeShopQuantityInput(this,{commit:true})">
                     <button class="home-feature-buy-btn shop-potion-buy" ${disabled?"disabled":""} onclick="buyShopItem('${shopItem.id}',document.getElementById('shopQuantity-${shopItem.id}').value)">${buttonText}</button></div></div>`;
             }).join("");
             return `<div class="shop-potion-interface"><div class="shop-potion-note">只販售 HP／SP 回復藥水</div>
@@ -10365,7 +10824,7 @@
             '<label>選擇符咒<select onchange="v141SelectTalisman(this.value)">'+list.map(item=>
                 '<option value="'+item.id+'" '+(item.id===source.id?'selected':'')+'>'+escapeHtml(item.name)+'（'+countItem(item.id)+'）</option>'
             ).join("")+'</select></label>'+
-            '<div class="v141-upgrade-flow"><section>'+source.icon+'<b>'+escapeHtml(source.name)+' ×'+(qty*3)+'</b></section><i>→</i><section>'+target.icon+'<b>'+escapeHtml(target.name)+' ×'+qty+'</b></section></div>'+
+            '<div class="v141-upgrade-flow"><section class="v141-talisman-source" aria-label="合成材料">'+source.icon+'<b>'+escapeHtml(source.name)+' ×'+(qty*3)+'</b></section><i aria-hidden="true">→</i><section class="v141-talisman-target" aria-label="合成目標">'+target.icon+'<b>'+escapeHtml(target.name)+' ×'+qty+'</b></section></div>'+
             '<div class="v141-quantity"><button onclick="v141AdjustTalismanQty(-1)">－</button><strong>'+qty+'</strong><button onclick="v141AdjustTalismanQty(1)">＋</button><button onclick="v141AdjustTalismanQty(\'max\')">MAX</button></div>'+
             '<div class="v141-material-lines"><span>持有 '+owned+'</span><span>消耗 '+(qty*3)+'</span><span>金幣 '+(TALISMAN_GOLD[normalizeTierKey(source.tierKey)]*qty).toLocaleString('zh-TW')+'</span></div>'+
             '<button class="v141-synthesis-primary" '+(can?'':'disabled')+' onclick="v141CraftTalismans()">開始合成</button></div>';

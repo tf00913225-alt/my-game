@@ -1,0 +1,47 @@
+{
+  "date": "2026-09-20",
+  "title": "補品正名與 WebP 圖示正式導入",
+  "base_branch": "dev",
+  "base_sha": "b7b9216f2bbb1cda2df9194f434fac6751b97fbe",
+  "work_branch": "fix/potion-names-icons-webp-20260920",
+  "officialVersion": "173.67",
+  "status": "VERIFIED",
+  "requirements": [
+    {
+      "id": 1,
+      "status": "VERIFIED",
+      "request": "將標準 HP／SP 10%、20%、30% 補品正式正名為回春散、養命丹、大還丹、凝氣散、聚氣丹、歸元丹，保留既有存檔相容 ID、回復比例與商店價格。",
+      "owner": [
+        "js/40-v144-rules-and-abyss.js::SHOP_POTION_PRESENTATION",
+        "js/40-v144-rules-and-abyss.js::ensurePotion()"
+      ],
+      "implementation": "沿用 hpPotion10/hpPotion20/hpPotion30/spPotion10/spPotion20/spPotion30 六個既有 ID，不改 recoveryPercent、resource、price 與購買/使用邏輯；正式名稱與 shortName 由同一份 SHOP_POTION_PRESENTATION 權威資料提供，ensurePotion 同步既有背包堆疊的玩家可見名稱與圖示。"
+    },
+    {
+      "id": 2,
+      "status": "VERIFIED",
+      "request": "將 assets-library/assets/inbox/道具icon 的六張補品 PNG 轉為無損 WebP，配置到商店與背包既有欄位。",
+      "owner": [
+        "assets/items/potions/",
+        "js/40-v144-rules-and-abyss.js::potionIconMarkup()",
+        "js/40-v144-rules-and-abyss.js::renderShopContent()",
+        "css/49-v169-rpg-ui.css"
+      ],
+      "implementation": "六張母圖從 assets-library 以 Git blob 精確對應後，以 cwebp -lossless -exact 轉入 assets/items/potions；逐張驗證 1254×1254、Alpha 保留與解碼後像素差異為 0。商店與背包共用既有 item.icon → .v169-item-art 圖片管線，商店只在正式 owner 補上 48×48 邏輯像素圖示欄位，未建立第二套圖片 renderer 或 late CSS override。"
+    }
+  ],
+  "verification": [
+    "tests/v144-rules-and-abyss.test.js",
+    "tests/potion-icon-assets-20260920.test.js",
+    "tests/ui-panel-browser-layout.test.js",
+    "tests/v169-rpg-ui.test.js",
+    "tests/v173.17-item-ui-assets.test.js",
+    "tests/v173.18-final-request.test.js",
+    "npm run build:check",
+    "GitHub Actions run 35479367145",
+    "GitHub Actions run 35479563504",
+    "GitHub Actions run 35479782922"
+  ],
+  "verificationResult": "2/2 VERIFIED；六張來源 PNG 均轉為 lossless WebP 並逐張確認 1254×1254、透明 Alpha 與解碼後像素一致。六種正式名稱已由標準藥水 owner 統一提供，既有 ID、回復比例、價格與存檔相容性不變；商店、背包與物品詳細視窗共用既有 item.icon / v169-item-art 呈現鏈。Headless Chrome 商店版面驗證確認六張圖示為 48×48 邏輯像素、卡片內不溢出，商店維持單頁無額外捲動；相關 item UI 測試與 build:check 全數通過。",
+  "releasedAs": null
+}

@@ -71,8 +71,11 @@ assert.doesNotMatch(
     "presentation-only relics must not auto-play when battle starts"
 );
 assert.match(relic,/v174RelicDevPreviewPresentation=function\(id\)/);
-assert.match(relic,/Runtime Ready（正式功能已完成）/);
-assert.match(relic,/Presentation Only（僅演出預覽/);
+assert.doesNotMatch(
+    relic,
+    /Runtime Ready（正式功能已完成）|Presentation Only（僅演出預覽|DEV 已配裝|DEV 正式功能配裝|DEV 僅演出配裝/,
+    "player-facing relic UI must not expose engineering capability or DEV loadout labels"
+);
 
 function classList(initial=[]){
     const values=new Set(initial);

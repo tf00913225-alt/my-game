@@ -16,6 +16,14 @@
         spPotion10:25,spPotion20:55,spPotion30:90
     };
     const SHOP_POTION_IDS=Object.keys(SHOP_POTION_PRICES);
+    const SHOP_POTION_PRESENTATION=Object.freeze({
+        hpPotion10:Object.freeze({name:"回春散",iconPath:"assets/items/potions/hp-potion-10-huichun.webp"}),
+        hpPotion20:Object.freeze({name:"養命丹",iconPath:"assets/items/potions/hp-potion-20-yangming.webp"}),
+        hpPotion30:Object.freeze({name:"大還丹",iconPath:"assets/items/potions/hp-potion-30-dahuan.webp"}),
+        spPotion10:Object.freeze({name:"凝氣散",iconPath:"assets/items/potions/sp-potion-10-ningqi.webp"}),
+        spPotion20:Object.freeze({name:"聚氣丹",iconPath:"assets/items/potions/sp-potion-20-juqi.webp"}),
+        spPotion30:Object.freeze({name:"歸元丹",iconPath:"assets/items/potions/sp-potion-30-guiyuan.webp"})
+    });
     const SHOP_PRICE_TIERS=[
         {maxLevel:30,multiplier:1,label:"Lv.1～30"},
         {maxLevel:40,multiplier:1.5,label:"Lv.31～40"},
@@ -37,6 +45,10 @@
     function escapeHtml(value){
         return String(value==null?"":value).replace(/&/g,"&amp;").replace(/</g,"&lt;")
             .replace(/>/g,"&gt;").replace(/\"/g,"&quot;").replace(/'/g,"&#039;");
+    }
+
+    function potionIconMarkup(path){
+        return '<span class="v169-item-art v169-potion-art"><img src="'+escapeHtml(path)+'" alt="" aria-hidden="true" draggable="false" decoding="async" onerror="this.hidden=true"></span>';
     }
 
     /* ----- Revised player support skills. ----- */
@@ -212,16 +224,30 @@
     /* ----- Shop: only 10/20/30% potions, with the existing level multiplier. ----- */
     function ensurePotion(id,resource,percent,price){
         if(typeof potionDefinitions==="undefined"||!Array.isArray(potionDefinitions)){ return null; }
+        const presentation=SHOP_POTION_PRESENTATION[id];
         let potion=potionDefinitions.find(item=>item&&item.id===id);
         if(!potion){
             potion={id:id,name:"",shortName:"",icon:"",type:"potion",resource:resource,recoveryPercent:percent,price:price,stats:{}};
             potionDefinitions.push(potion);
         }
         Object.assign(potion,{
-            name:"回復"+percent+"%"+resource.toUpperCase()+"藥水",
-            shortName:resource.toUpperCase()+" "+percent+"%",
+            name:presentation?presentation.name:"回復"+percent+"%"+resource.toUpperCase()+"藥水",
+            shortName:presentation?presentation.name:resource.toUpperCase()+" "+percent+"%",
+            icon:presentation?potionIconMarkup(presentation.iconPath):(potion.icon||""),
             type:"potion",resource:resource,recoveryPercent:percent,price:price,stats:potion.stats||{}
         });
+        if(typeof getPotionInventoryItems==="function"){
+            getPotionInventoryItems(id).forEach(item=>{
+                item.name=potion.name;
+                item.shortName=potion.shortName;
+                item.icon=potion.icon;
+                item.type="potion";
+                item.resource=potion.resource;
+                item.recoveryPercent=potion.recoveryPercent;
+                item.price=potion.price;
+                item.stats={};
+            });
+        }
         return potion;
     }
 
@@ -255,8 +281,9 @@
                 const price=shopUnitPrice(item);
                 return '<div class="shop-potion-card '+item.resource+'">'+
                     '<div class="shop-potion-card-head"><span class="shop-potion-type">'+label+'</span><span class="shop-potion-stock">持有 '+getPotionCount(item.id)+'</span></div>'+
-                    '<div class="shop-potion-name">'+escapeHtml(item.name)+'</div><div class="shop-potion-effect">回復最大'+label+'的 '+item.recoveryPercent+'%</div>'+
-                    '<div class="shop-potion-purchase-row"><label for="shopQuantity-'+item.id+'">數量</label><input id="shopQuantity-'+item.id+'" class="shop-potion-quantity" data-unit-price="'+price+'" type="number" inputmode="numeric" min="1" max="999" step="1" value="1" oninput="v146UpdateShopTotal(\''+item.id+'\')">'+
+                    '<div class="shop-potion-summary"><div class="shop-potion-icon">'+item.icon+'</div><div class="shop-potion-copy">'+
+                    '<div class="shop-potion-name">'+escapeHtml(item.name)+'</div><div class="shop-potion-effect">回復最大'+label+'的 '+item.recoveryPercent+'%</div></div></div>'+
+                    '<div class="shop-potion-purchase-row"><label for="shopQuantity-'+item.id+'">數量</label><input id="shopQuantity-'+item.id+'" class="shop-potion-quantity" data-unit-price="'+price+'" type="number" inputmode="numeric" min="1" max="999" step="1" value="1" oninput="v146UpdateShopTotal(\''+item.id+'\')" onblur="v146CommitShopQuantity(\''+item.id+'\')">'+
                     '<span class="v146-shop-total" id="shopTotal-'+item.id+'">'+price+' 金幣</span><button class="home-feature-buy-btn shop-potion-buy" '+(gold<price?'disabled':'')+' onclick="buyShopItem(\''+item.id+'\',document.getElementById(\'shopQuantity-'+item.id+'\').value)">購買</button></div></div>';
             }).join("");
             return '<div class="v141-shop-wallet">目前金幣 <b>'+Math.max(0,Math.floor(numeric(gold))).toLocaleString("zh-TW")+'</b></div>'+
@@ -872,17 +899,37 @@
         const input=document.getElementById("shopQuantity-"+itemId);
         const output=document.getElementById("shopTotal-"+itemId);
         if(!input||!output){ return 0; }
+
+        const button=input.parentElement&&input.parentElement.querySelector(".shop-potion-buy");
+        const raw=String(input.value==null?"":input.value).trim();
+
+        /* Empty is a valid editing draft. Do not immediately turn it back into 1,
+           otherwise the original default "1" can never be deleted on mobile. */
+        if(raw===""){
+            output.textContent="— 金幣";
+            output.dataset.total="0";
+            if(button){ button.disabled=true; }
+            return 0;
+        }
+
         const quantity=typeof window.normalizeShopPurchaseQuantity==="function"
-            ?window.normalizeShopPurchaseQuantity(input.value)
-            :Math.max(1,Math.min(999,Math.floor(numeric(input.value)||1)));
+            ?window.normalizeShopPurchaseQuantity(raw)
+            :Math.max(1,Math.min(999,Math.floor(numeric(raw)||1)));
         input.value=String(quantity);
         const unitPrice=Math.max(0,Math.floor(numeric(input.dataset.unitPrice)));
         const total=quantity*unitPrice;
         output.textContent=total.toLocaleString("zh-TW")+" 金幣";
         output.dataset.total=String(total);
-        const button=input.parentElement&&input.parentElement.querySelector(".shop-potion-buy");
         if(button){ button.disabled=numeric(typeof gold!=="undefined"?gold:0)<total; }
         return total;
+    };
+
+    window.v146CommitShopQuantity=function(itemId){
+        const input=document.getElementById("shopQuantity-"+itemId);
+        if(!input){ return 1; }
+        if(String(input.value==null?"":input.value).trim()===""){ input.value="1"; }
+        window.v146UpdateShopTotal(itemId);
+        return Number(input.value)||1;
     };
 
     function syncShopTotals(){

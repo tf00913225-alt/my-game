@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-20-v17367-main-release",
+  "baseBranch": "dev",
+  "baseCommit": "b28177f3c64bc45b44bde84287d51b36b2a982ce",
+  "officialVersion": "173.67",
+  "officialVersionBumpAllowed": true,
+  "overallStatus": "IMPLEMENTED",
+  "requirements": [
+    {
+      "id": "REL-01",
+      "status": "VERIFIED",
+      "requirement": "確認 current main 仍為 V173.66 正式發布 SHA，且本次候選來源固定為最新 dev；禁止 force push 或 main 獨立修復。",
+      "evidence": [
+        "main@82332eb2e01c29876f9c03aa8b0696ff12ae8fd3",
+        "dev@803d430e1d0c7d8462ce0fbac1cef9aab8059c42",
+        "protected main PR promotion only"
+      ]
+    },
+    {
+      "id": "REL-02",
+      "status": "VERIFIED",
+      "requirement": "依 V173.66 main 到最新 dev 的玩家可感知差異建立 V173.67 Game/Cache Version、玩家公告、CHANGELOG 與 deterministic build。",
+      "evidence": [
+        "release/release-update.json and CHANGELOG.md include PR #363 potion names/icons",
+        "PR #363 potion scope 2/2 VERIFIED",
+        "PR #365 CI run 35481398149 Repository checks SUCCESS",
+        "deterministic build:check and Release Gate SUCCESS"
+      ]
+    },
+    {
+      "id": "REL-03",
+      "status": "VERIFIED",
+      "requirement": "V173.67 發布候選 PR 回 dev 的 Repository checks、build:check、手機 browser QA 與 Release Gate 全綠。",
+      "evidence": [
+        "PR #365",
+        "CI run 35481398149 Repository checks SUCCESS",
+        "Release Update mobile browser QA SUCCESS",
+        "Fixed Slot 9x16 mobile QA SUCCESS",
+        "exact-candidate real battle mobile QA SUCCESS",
+        "Adventure mobile QA SUCCESS",
+        "static resources / loader integrity / Release Gate / git-diff SUCCESS"
+      ]
+    },
+    {
+      "id": "REL-04",
+      "status": "VERIFIED",
+      "requirement": "發布候選合併 dev 後，最新 dev HEAD CI 與 DEV exact-SHA deployment 成功並核對 V173.67。",
+      "evidence": [
+        "latest dev merge bd6f51b094ceda6cd841f271a72051edeee451e9",
+        "dev push CI run 35481574504 Repository checks SUCCESS",
+        "DEV deployment job 106000328588 SUCCESS",
+        "Confirm this commit is still dev HEAD SUCCESS",
+        "Verify deployed commit, game version V173.67 and cache version 173.67 SUCCESS",
+        "deployed battle layout and VFX live QA SUCCESS"
+      ]
+    },
+    {
+      "id": "REL-05",
+      "status": "TODO",
+      "requirement": "最新 dev → protected main PR 全綠後合併，並驗證 production main SHA 與 V173.67。",
+      "evidence": []
+    }
+  ],
+  "automatedVerification": "REL-01..04 VERIFIED for the expanded latest-dev V173.67 scope. PR #365 candidate CI runs 35481398149 / 35481480999 SUCCESS; latest dev bd6f51b094ceda6cd841f271a72051edeee451e9 push CI 35481574504 and DEV deployment job 106000328588 SUCCESS. REL-05 remains pending protected main promotion.",
+  "visualVerification": "Latest combined V173.67 candidate mobile QA passed; exact latest-dev Cloudflare deployment and deployed battle layout/VFX live QA are SUCCESS.",
+  "verifiedSourceCommit": "60cceba3fa72d6a738f2ada7b27963f770faabba",
+  "mergedDevCommit": "bd6f51b094ceda6cd841f271a72051edeee451e9",
+  "mergedMainCommit": null,
+  "candidateCiRun": 35481398149,
+  "devPushCiRun": 35481574504,
+  "devDeployJob": 106000328588
+}

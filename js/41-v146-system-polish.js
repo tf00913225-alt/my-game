@@ -46,17 +46,37 @@
         const input=document.getElementById("shopQuantity-"+itemId);
         const output=document.getElementById("shopTotal-"+itemId);
         if(!input||!output){ return 0; }
+
+        const button=input.parentElement&&input.parentElement.querySelector(".shop-potion-buy");
+        const raw=String(input.value==null?"":input.value).trim();
+
+        /* Empty is a valid editing draft. Do not immediately turn it back into 1,
+           otherwise the original default "1" can never be deleted on mobile. */
+        if(raw===""){
+            output.textContent="— 金幣";
+            output.dataset.total="0";
+            if(button){ button.disabled=true; }
+            return 0;
+        }
+
         const quantity=typeof window.normalizeShopPurchaseQuantity==="function"
-            ?window.normalizeShopPurchaseQuantity(input.value)
-            :Math.max(1,Math.min(999,Math.floor(numeric(input.value)||1)));
+            ?window.normalizeShopPurchaseQuantity(raw)
+            :Math.max(1,Math.min(999,Math.floor(numeric(raw)||1)));
         input.value=String(quantity);
         const unitPrice=Math.max(0,Math.floor(numeric(input.dataset.unitPrice)));
         const total=quantity*unitPrice;
         output.textContent=total.toLocaleString("zh-TW")+" 金幣";
         output.dataset.total=String(total);
-        const button=input.parentElement&&input.parentElement.querySelector(".shop-potion-buy");
         if(button){ button.disabled=numeric(typeof gold!=="undefined"?gold:0)<total; }
         return total;
+    };
+
+    window.v146CommitShopQuantity=function(itemId){
+        const input=document.getElementById("shopQuantity-"+itemId);
+        if(!input){ return 1; }
+        if(String(input.value==null?"":input.value).trim()===""){ input.value="1"; }
+        window.v146UpdateShopTotal(itemId);
+        return Number(input.value)||1;
     };
 
     function syncShopTotals(){

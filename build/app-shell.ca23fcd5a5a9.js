@@ -4128,6 +4128,11 @@ const battleActionFinishInterceptors=[];
 let battleRoundBoundaryKeys=new Set();
 const battlePresentationLocks=new Set();
 let battleInputResumeToken=null;
+let battleResolutionResumeToken=null;
+let battleAutoActionResume=null;
+let battleRoundPromptTimeoutId=null;
+let battleRoundPromptRelease=null;
+let activeBattleStatisticsAction=null;
 if(typeof window!=="undefined"){
     window.FourSymbolsBattleFlow=Object.freeze({
         subscribeActionFinished(observer){
@@ -4160,17 +4165,18 @@ if(typeof window!=="undefined"){
                 active=false;
                 battlePresentationLocks.delete(lock);
                 if(typeof updateActionHudVisibility==="function"){ updateActionHudVisibility(); }
-                if(
-                    battlePresentationLocks.size===0&&battleInputResumeToken!==null&&
-                    battleActive&&battlePhase==="declare"&&battleInputResumeToken===battleToken
-                ){
-                    const resumeToken=battleInputResumeToken;
-                    battleInputResumeToken=null;
-                    beginCharacterTurn(resumeToken);
+                if(battlePresentationLocks.size===0){
+                    resumeBattleAfterPresentationLocks();
                 }
             };
         },
         isPresentationActive(){ return battlePresentationLocks.size>0; },
+        acquirePauseLock(owner){
+            return window.FourSymbolsBattleFlow.acquirePresentationLock("pause:"+String(owner||"battle-flow"));
+        },
+        isPaused(){ return battlePresentationLocks.size>0; },
+        isAutoBattle(){ return !!autoBattle; },
+        isBattleActive(){ return !!battleActive; },
         interceptActionFinish(interceptor){
             if(typeof interceptor!=="function"){ return function(){}; }
             battleActionFinishInterceptors.push(interceptor);
@@ -4184,6 +4190,228 @@ if(typeof window!=="undefined"){
         }
     });
 }
+
+function resumeBattleAfterPresentationLocks(){
+    if(battlePresentationLocks.size>0||!battleActive){ return; }
+
+    if(
+        battleAutoActionResume&&
+        battleAutoActionResume.token===battleToken&&
+        battlePhase==="declare"
+    ){
+        const pending=battleAutoActionResume;
+        battleAutoActionResume=null;
+        autoActionForCharacter(pending.characterIndex,pending.token);
+        return;
+    }
+
+    if(
+        battleInputResumeToken!==null&&
+        battlePhase==="declare"&&
+        battleInputResumeToken===battleToken
+    ){
+        const resumeToken=battleInputResumeToken;
+        battleInputResumeToken=null;
+        beginCharacterTurn(resumeToken);
+        return;
+    }
+
+    if(
+        battleResolutionResumeToken!==null&&
+        battlePhase==="resolve"&&
+        battleResolutionResumeToken===battleToken
+    ){
+        const resumeToken=battleResolutionResumeToken;
+        battleResolutionResumeToken=null;
+        processNextCombatant(resumeToken);
+    }
+}
+
+function clearBattleRoundPrompt(){
+    if(battleRoundPromptTimeoutId){
+        clearTimeout(battleRoundPromptTimeoutId);
+        battleRoundPromptTimeoutId=null;
+    }
+    const prompt=typeof document!=="undefined"
+        ?document.getElementById("battleRoundPrompt")
+        :null;
+    if(prompt){ prompt.hidden=true; }
+    if(battleRoundPromptRelease){
+        const release=battleRoundPromptRelease;
+        battleRoundPromptRelease=null;
+        release();
+    }
+}
+
+function showAutoBattleRoundPrompt(token){
+    clearBattleRoundPrompt();
+    if(!battleActive||token!==battleToken||!autoBattle){ return false; }
+
+    const page=typeof document!=="undefined"?document.getElementById("battlePage"):null;
+    if(!page){ return false; }
+
+    let prompt=document.getElementById("battleRoundPrompt");
+    if(!prompt){
+        prompt=document.createElement("div");
+        prompt.id="battleRoundPrompt";
+        prompt.className="battle-round-prompt";
+        prompt.setAttribute("role","status");
+        prompt.setAttribute("aria-live","polite");
+        page.appendChild(prompt);
+    }
+
+    prompt.textContent="第 "+Math.max(1,Math.floor(Number(turn)||1))+" 回合";
+    prompt.hidden=false;
+
+    const flow=window.FourSymbolsBattleFlow;
+    battleRoundPromptRelease=flow&&typeof flow.acquirePresentationLock==="function"
+        ?flow.acquirePresentationLock("auto-round-prompt")
+        :null;
+
+    battleRoundPromptTimeoutId=setTimeout(()=>{
+        battleRoundPromptTimeoutId=null;
+        if(prompt){ prompt.hidden=true; }
+        const release=battleRoundPromptRelease;
+        battleRoundPromptRelease=null;
+        if(release){ release(); }
+    },500);
+    return true;
+}
+
+function getBattleStatisticsOwner(){
+    return typeof window!=="undefined"&&window.FourSymbolsBattleStatistics
+        ?window.FourSymbolsBattleStatistics
+        :null;
+}
+
+function getBattleStatisticsCombatantKind(character){
+    const kind=character&&String(character.combatantKind||character.unitKind||"");
+    if(kind==="heroNpc"||kind==="reinforcement"){ return kind; }
+    return "playerCharacter";
+}
+
+function buildBattleStatisticsCombatant(characterIndex){
+    const character=getPartyCharacterByIndex(characterIndex);
+    if(!character){ return null; }
+    const kind=getBattleStatisticsCombatantKind(character);
+    const identity=String(character.id||("角色"+(characterIndex+1)));
+    return {
+        id:kind+":"+characterIndex+":"+identity,
+        kind:kind,
+        side:"ally",
+        battleIndex:characterIndex,
+        name:identity,
+        portrait:typeof getCharacterBattleArtworkPath==="function"
+            ?getCharacterBattleArtworkPath(character)
+            :""
+    };
+}
+
+function beginBattleStatisticsSession(){
+    activeBattleStatisticsAction=null;
+    const owner=getBattleStatisticsOwner();
+    if(!owner||typeof owner.begin!=="function"){ return false; }
+    const combatants=getExistingPartyIndexes()
+        .map(buildBattleStatisticsCombatant)
+        .filter(Boolean);
+    owner.begin({battleToken:battleToken,combatants:combatants});
+    return true;
+}
+
+function finishBattleStatisticsSession(result){
+    battleStatisticsFinishAction();
+    const owner=getBattleStatisticsOwner();
+    if(owner&&typeof owner.finish==="function"){
+        owner.finish({result:String(result||"")});
+    }
+    activeBattleStatisticsAction=null;
+}
+
+function battleStatisticsBeginAction(entry){
+    const owner=getBattleStatisticsOwner();
+    if(!owner||!entry){ activeBattleStatisticsAction=null;return; }
+
+    const sourceId=entry.type==="player"&&typeof owner.getCombatantIdByBattleIndex==="function"
+        ?owner.getCombatantIdByBattleIndex(entry.characterIndex)
+        :null;
+    const partyHp={};
+    getExistingPartyIndexes().forEach(index=>{
+        const character=getPartyCharacterByIndex(index);
+        if(character){ partyHp[index]=Math.max(0,Number(character.hp)||0); }
+    });
+    const enemyHp={};
+    currentBattleMonsters.forEach(index=>{
+        const monster=monsters[index];
+        if(monster){ enemyHp[index]=Math.max(0,Number(monster.hp)||0); }
+    });
+    activeBattleStatisticsAction={sourceId:sourceId,partyHp:partyHp,enemyHp:enemyHp};
+}
+
+function battleStatisticsFinishAction(){
+    const action=activeBattleStatisticsAction;
+    activeBattleStatisticsAction=null;
+    const owner=getBattleStatisticsOwner();
+    if(!action||!owner){ return; }
+
+    Object.keys(action.partyHp).forEach(key=>{
+        const index=Number(key);
+        const character=getPartyCharacterByIndex(index);
+        if(!character){ return; }
+        const before=action.partyHp[key];
+        const after=Math.max(0,Number(character.hp)||0);
+        const targetId=typeof owner.getCombatantIdByBattleIndex==="function"
+            ?owner.getCombatantIdByBattleIndex(index)
+            :null;
+        if(after<before&&targetId&&typeof owner.recordDamage==="function"){
+            owner.recordDamage({targetId:targetId,amount:before-after});
+        }else if(after>before&&action.sourceId&&typeof owner.recordHealing==="function"){
+            owner.recordHealing({sourceId:action.sourceId,targetId:targetId,amount:after-before});
+        }
+    });
+
+    if(action.sourceId&&typeof owner.recordDamage==="function"){
+        Object.keys(action.enemyHp).forEach(key=>{
+            const monster=monsters[Number(key)];
+            if(!monster){ return; }
+            const before=action.enemyHp[key];
+            const after=Math.max(0,Number(monster.hp)||0);
+            if(after<before){
+                owner.recordDamage({sourceId:action.sourceId,amount:before-after});
+            }
+        });
+    }
+}
+
+function battleStatisticsRecordCriticalByActor(character){
+    const owner=getBattleStatisticsOwner();
+    if(!owner||typeof owner.recordCritical!=="function"){ return; }
+    const index=typeof getPartyCharacterIndex==="function"?getPartyCharacterIndex(character):-1;
+    if(index<0||typeof owner.getCombatantIdByBattleIndex!=="function"){ return; }
+    const id=owner.getCombatantIdByBattleIndex(index);
+    if(id){ owner.recordCritical({id:id}); }
+}
+
+function battleStatisticsRecordDamageTakenByIndex(characterIndex,value){
+    const owner=getBattleStatisticsOwner();
+    if(!owner||typeof owner.recordDamage!=="function"||typeof owner.getCombatantIdByBattleIndex!=="function"){ return; }
+    const id=owner.getCombatantIdByBattleIndex(characterIndex);
+    const actual=Math.max(0,Number(value)||0);
+    if(id&&actual>0){ owner.recordDamage({targetId:id,amount:actual}); }
+}
+
+function battleStatisticsRecordDamageDealtByIndex(characterIndex,value){
+    const owner=getBattleStatisticsOwner();
+    if(!owner||typeof owner.recordDamage!=="function"||typeof owner.getCombatantIdByBattleIndex!=="function"){ return; }
+    const id=owner.getCombatantIdByBattleIndex(characterIndex);
+    const actual=Math.max(0,Number(value)||0);
+    if(id&&actual>0){ owner.recordDamage({sourceId:id,amount:actual}); }
+}
+
+function battleStatisticsRecordDamageDealtByActor(character,value){
+    const index=typeof getPartyCharacterIndex==="function"?getPartyCharacterIndex(character):-1;
+    if(index>=0){ battleStatisticsRecordDamageDealtByIndex(index,value); }
+}
+
 function notifyBattleActionFinished(){
     battleActionFinishObservers.forEach(observer=>{
         try{ observer(); }
@@ -10365,6 +10593,10 @@ function startBattle(triggerIndex){
     battleRoundBoundaryKeys=new Set();
     battlePresentationLocks.clear();
     battleInputResumeToken=null;
+    battleResolutionResumeToken=null;
+    battleAutoActionResume=null;
+    battleResolutionResumeToken=null;
+    clearBattleRoundPrompt();
 
 
     stopMonsterMovement();
@@ -10666,6 +10898,8 @@ function startBattle(triggerIndex){
 
     updateAutoButton();
 
+    beginBattleStatisticsSession();
+
 
     selectBattleTarget(
         triggerIndex
@@ -10831,8 +11065,10 @@ function startTurn(token){
     updateActionHudVisibility();
 
 
-    /* The preceding action already owns the complete round handoff window.
-       The round label renders inside that window; it has no second delay. */
+    /* Auto Battle owns a short, tracked presentation lock before the first
+       declaration/action of the newly established round. Manual battle keeps
+       the existing timing unchanged. */
+    showAutoBattleRoundPrompt(token);
     beginCharacterTurn(token);
 
 }
@@ -11080,6 +11316,8 @@ function beginCharacterTurn(token){
 
     if(autoOn){
 
+        const scheduledAutoCharacterIndex=activeBattleCharacterIndex;
+
         /*
            ★ 修正（依照使用者要求，加快節奏）：
            原本1000ms才會真正出手，這是專門
@@ -11096,6 +11334,14 @@ function beginCharacterTurn(token){
                 !battleActive ||
                 token!==battleToken
             ){
+                return;
+            }
+
+            if(battlePresentationLocks.size>0){
+                battleAutoActionResume={
+                    token:token,
+                    characterIndex:scheduledAutoCharacterIndex
+                };
                 return;
             }
 
@@ -11118,8 +11364,13 @@ function beginCharacterTurn(token){
 
             try{
 
+                battleStatisticsBeginAction({
+                    type:"player",
+                    characterIndex:scheduledAutoCharacterIndex
+                });
+
                 autoActionForCharacter(
-                    activeBattleCharacterIndex,
+                    scheduledAutoCharacterIndex,
                     token
                 );
 
@@ -12824,6 +13075,13 @@ function processNextCombatant(token){
         return;
     }
 
+    if(battlePresentationLocks.size>0&&battlePhase==="resolve"){
+        battleResolutionResumeToken=token;
+        updateActionHudVisibility();
+        return;
+    }
+    battleResolutionResumeToken=null;
+
     notifyBeforeCombatant(token);
 
     if(checkBattleEnd()){
@@ -12994,6 +13252,11 @@ function processNextCombatant(token){
            真正拿出來執行。
         */
 
+        battleStatisticsBeginAction({
+            type:"player",
+            characterIndex:entry.characterIndex
+        });
+
         try{
             resolveQueuedPlayerAction(
                 entry.characterIndex,
@@ -13014,6 +13277,11 @@ function processNextCombatant(token){
             processNextCombatant(token);
             return;
         }
+
+        battleStatisticsBeginAction({
+            type:"monster",
+            monsterIndex:entry.monsterIndex
+        });
 
         try{
             processSingleMonsterAttack(
@@ -15307,6 +15575,14 @@ function tickStatusEffects(){
 
 
                         const directShield=monster.v141Shield;
+                        const hpBeforeDot=directShield
+                            ?Math.max(
+                                0,
+                                Number.isFinite(Number(directShield.baseHp))
+                                    ?Number(directShield.baseHp)
+                                    :(Number(monster.hp)||0)-(Number(directShield.remaining)||0)
+                            )
+                            :Math.max(0,Number(monster.hp)||0);
                         if(directShield&&!directShield.isBarrier){
                             const remaining=Math.max(0,Number(directShield.remaining)||0);
                             const baseHp=Math.max(0,(Number(monster.hp)||0)-remaining);
@@ -15341,6 +15617,11 @@ function tickStatusEffects(){
                                     :(Number(monster.hp)||0)-(Number(monster.v141Shield.remaining)||0)
                             )
                             :monster.hp;
+
+                        battleStatisticsRecordDamageDealtByActor(
+                            effect.sourceActor,
+                            Math.max(0,hpBeforeDot-hpAfterDot)
+                        );
 
                         if(hpAfterDot<=0){
 
@@ -15510,12 +15791,17 @@ function tickStatusEffects(){
 
 
                         if(burnDamage>0){
+                            const hpBeforeBurn=Math.max(0,Number(character.hp)||0);
                             character.hp=
                                 Math.max(
                                     0,
                                     character.hp-
                                     burnDamage
                                 );
+                            battleStatisticsRecordDamageTakenByIndex(
+                                charIndex,
+                                Math.max(0,hpBeforeBurn-character.hp)
+                            );
 
                             showPlayerHit(
                                 burnDamage,
@@ -15741,6 +16027,10 @@ function rollCritical(character,category="physical",targetAntiCritPercent=0,targ
     const isCrit =
         Math.random()*100<
         critChance;
+
+    if(isCrit){
+        battleStatisticsRecordCriticalByActor(character);
+    }
 
     critMultiplier=Math.min(CRIT_MULTIPLIER_MAX,critMultiplier);
 
@@ -17404,6 +17694,7 @@ function windArrowAttack(){
 
 function finishPlayerAction(){
 
+    battleStatisticsFinishAction();
     notifyBattleActionFinished();
     if(interceptBattleActionFinish()){
         return;
@@ -18259,12 +18550,17 @@ function processSingleMonsterAttack(monsterIndex,token){
                     );
 
 
+                const hpBeforeReflect=Math.max(0,Number(monster.hp)||0);
                 monster.hp=
                     Math.max(
                         0,
                         monster.hp-
                         reflectDamage
                     );
+                battleStatisticsRecordDamageDealtByIndex(
+                    targetIndex,
+                    Math.max(0,hpBeforeReflect-monster.hp)
+                );
 
 
                 addBattleLog(
@@ -18551,6 +18847,8 @@ function winBattle(){
 
 
     battleActive=false;
+    clearBattleRoundPrompt();
+    finishBattleStatisticsSession("win");
 
     autoBattle=false;
 
@@ -18816,6 +19114,8 @@ function loseBattle(){
 
 
     battleActive=false;
+    clearBattleRoundPrompt();
+    finishBattleStatisticsSession("lose");
 
     autoBattle=false;
 
@@ -37271,7 +37571,7 @@ window.v78ApplyCharacterInventoryLayout=
 
 /* bundled source: js/20-anonymous-20.js */
 /* Critical/feature boundary owner. No global input lock and no network-order patch chain. */
-const V_ASSET_VERSION="173.66";
+const V_ASSET_VERSION="173.67";
 
 (function installFeatureIntentBoundary(){
     "use strict";
@@ -38119,18 +38419,23 @@ const V_ASSET_VERSION="173.66";
 
     function renderReleaseContent(manifest,kind){
         const forced=kind==="forced";
-        const update=kind==="update"||kind==="preview";
-        const intro=forced
-            ? "目前版本已停止使用，請更新後繼續遊戲。"
-            : update
-                ? "發現新版本。你可先完成目前操作，再更新至最新版本。"
-                : "以下是本次正式版本更新內容。";
+        const preview=kind==="preview";
+        const update=kind==="update";
+        const intro=preview
+            ? "目前為開發預覽模式；此畫面只用於檢查更新公告，不會重新載入遊戲。"
+            : forced
+                ? "目前版本已停止使用，請更新後繼續遊戲。"
+                : update
+                    ? "發現新版本。你可先完成目前操作，再更新至最新版本。"
+                    : "以下是本次正式版本更新內容。";
         const notes=manifest.content.map(item=>"<li>"+escapeHtml(item)+"</li>").join("");
-        const actions=forced
-            ? '<div class="release-update-actions"><button type="button" class="release-update-primary" data-release-update-action="reload">立即更新</button></div>'
-            : update
-                ? '<div class="release-update-actions"><button type="button" data-release-update-action="later">稍後更新</button><button type="button" class="release-update-primary" data-release-update-action="reload">立即更新</button></div>'
-                : '<div class="release-update-actions"><button type="button" class="release-update-primary" data-release-update-action="acknowledge">我知道了</button></div>';
+        const actions=preview
+            ? '<div class="release-update-actions"><button type="button" class="release-update-primary" data-release-update-action="preview-close">關閉預覽</button></div>'
+            : forced
+                ? '<div class="release-update-actions"><button type="button" class="release-update-primary" data-release-update-action="reload">立即更新</button></div>'
+                : update
+                    ? '<div class="release-update-actions"><button type="button" data-release-update-action="later">稍後更新</button><button type="button" class="release-update-primary" data-release-update-action="reload">立即更新</button></div>'
+                    : '<div class="release-update-actions"><button type="button" class="release-update-primary" data-release-update-action="acknowledge">我知道了</button></div>';
         const suppressToday=!forced&&!update
             ? '<label class="release-update-suppress-today"><input class="release-update-suppress-today-input" type="checkbox" data-release-update-suppress-today="true"><span>今日不再跳出提醒</span></label>'
             : '';
@@ -38164,6 +38469,7 @@ const V_ASSET_VERSION="173.66";
                 if(action==="reload"){ requestReload(); }
                 else if(action==="later"){ deferNormalUpdate(); }
                 else if(action==="acknowledge"){ acknowledgeCurrentRelease(); }
+                else if(action==="preview-close"){ closeReleaseDetail(); }
             });
         });
     }

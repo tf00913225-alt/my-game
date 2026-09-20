@@ -422,7 +422,7 @@
             '<label>選擇符咒<select onchange="v141SelectTalisman(this.value)">'+list.map(item=>
                 '<option value="'+item.id+'" '+(item.id===source.id?'selected':'')+'>'+escapeHtml(item.name)+'（'+countItem(item.id)+'）</option>'
             ).join("")+'</select></label>'+
-            '<div class="v141-upgrade-flow"><section>'+source.icon+'<b>'+escapeHtml(source.name)+' ×'+(qty*3)+'</b></section><i>→</i><section>'+target.icon+'<b>'+escapeHtml(target.name)+' ×'+qty+'</b></section></div>'+
+            '<div class="v141-upgrade-flow"><section class="v141-talisman-source" aria-label="合成材料">'+source.icon+'<b>'+escapeHtml(source.name)+' ×'+(qty*3)+'</b></section><i aria-hidden="true">→</i><section class="v141-talisman-target" aria-label="合成目標">'+target.icon+'<b>'+escapeHtml(target.name)+' ×'+qty+'</b></section></div>'+
             '<div class="v141-quantity"><button onclick="v141AdjustTalismanQty(-1)">－</button><strong>'+qty+'</strong><button onclick="v141AdjustTalismanQty(1)">＋</button><button onclick="v141AdjustTalismanQty(\'max\')">MAX</button></div>'+
             '<div class="v141-material-lines"><span>持有 '+owned+'</span><span>消耗 '+(qty*3)+'</span><span>金幣 '+(TALISMAN_GOLD[normalizeTierKey(source.tierKey)]*qty).toLocaleString('zh-TW')+'</span></div>'+
             '<button class="v141-synthesis-primary" '+(can?'':'disabled')+' onclick="v141CraftTalismans()">開始合成</button></div>';
