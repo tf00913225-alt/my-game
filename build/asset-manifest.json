@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "release": "173.68",
+  "release": "173.69",
   "generatedAt": "deterministic",
   "critical": {
     "scripts": [
-      "build/boot-core.1cb75beee166.js"
+      "build/boot-core.cc39ec291f8f.js"
     ],
     "styles": [
       "build/boot-core.dac14ff4912b.css"
@@ -20,7 +20,7 @@
     "bundles": {
       "app-shell": {
         "scripts": [
-          "build/app-shell.c3255088d5dc.js"
+          "build/app-shell.e2b9b5b3bf05.js"
         ],
         "styles": [
           "build/app-shell.26bb5c82276e.css"
@@ -181,8 +181,8 @@
         "decode": true
       },
       {
-        "path": "build/boot-core.1cb75beee166.js",
-        "sha256": "1cb75beee166",
+        "path": "build/boot-core.cc39ec291f8f.js",
+        "sha256": "cc39ec291f8f",
         "bytes": 67284,
         "priority": "P0",
         "type": "script",
@@ -501,8 +501,8 @@
         "decode": false
       },
       {
-        "path": "build/app-shell.c3255088d5dc.js",
-        "sha256": "c3255088d5dc",
+        "path": "build/app-shell.e2b9b5b3bf05.js",
+        "sha256": "e2b9b5b3bf05",
         "bytes": 996899,
         "priority": "P1",
         "type": "script",
@@ -749,19 +749,11 @@
         "decode": false
       }
     ],
-    "manifestHash": "f0194088f9b3",
+    "manifestHash": "467571a2d896",
     "totalBytes": 20958575,
     "totalResources": 73
   },
   "assets": {
-    "build/boot-core.1cb75beee166.js": {
-      "sha256": "1cb75beee166",
-      "bytes": 67284
-    },
-    "build/app-shell.c3255088d5dc.js": {
-      "sha256": "c3255088d5dc",
-      "bytes": 996899
-    },
     "build/gameplay-core-primary.1ae225b7cc5f.js": {
       "sha256": "1ae225b7cc5f",
       "bytes": 672601
@@ -881,6 +873,14 @@
     "assets/ui/startup-main-city.d43e67af1c1c.jpg": {
       "sha256": "d43e67af1c1c",
       "bytes": 363193
+    },
+    "build/boot-core.cc39ec291f8f.js": {
+      "sha256": "cc39ec291f8f",
+      "bytes": 67284
+    },
+    "build/app-shell.e2b9b5b3bf05.js": {
+      "sha256": "e2b9b5b3bf05",
+      "bytes": 996899
     }
   }
 }
