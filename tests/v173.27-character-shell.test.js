@@ -113,10 +113,10 @@ test("the functional V173.63 repair runtime follows late owners inside gameplay-
 });
 
 test("the repository source remains V173.62 and dev deployment keeps that source version",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.67"/);
-    assert.match(index,/<title>四象江湖傳 V173\.67<\/title>/);
-    assert.match(index,/aria-label="目前版本 V173\.67"/);
-    assert.match(index,/>V173\.67<\/div>/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.68"/);
+    assert.match(index,/<title>四象江湖傳 V173\.68<\/title>/);
+    assert.match(index,/aria-label="目前版本 V173\.68"/);
+    assert.match(index,/>V173\.68<\/div>/);
 });
 
 console.log("\n"+passed+" character-shell regression tests passed.");
