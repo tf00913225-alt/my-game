@@ -86,10 +86,57 @@ test("shop sells only HP/SP 10, 20 and 30 percent potions at balanced base price
     assert.equal(byId.spPotion10.price,25);
     assert.equal(byId.spPotion20.price,55);
     assert.equal(byId.spPotion30.price,90);
+    assert.deepEqual(
+        ["hpPotion10","hpPotion20","hpPotion30","spPotion10","spPotion20","spPotion30"].map(id=>byId[id].name),
+        ["回春散","養命丹","大還丹","凝氣散","聚氣丹","歸元丹"]
+    );
+    assert.deepEqual(
+        ["hpPotion10","hpPotion20","hpPotion30","spPotion10","spPotion20","spPotion30"].map(id=>byId[id].shortName),
+        ["回春散","養命丹","大還丹","凝氣散","聚氣丹","歸元丹"]
+    );
+    assert.match(byId.hpPotion10.icon,/assets\/items\/potions\/hp-potion-10-huichun\.webp/);
+    assert.match(byId.hpPotion20.icon,/assets\/items\/potions\/hp-potion-20-yangming\.webp/);
+    assert.match(byId.hpPotion30.icon,/assets\/items\/potions\/hp-potion-30-dahuan\.webp/);
+    assert.match(byId.spPotion10.icon,/assets\/items\/potions\/sp-potion-10-ningqi\.webp/);
+    assert.match(byId.spPotion20.icon,/assets\/items\/potions\/sp-potion-20-juqi\.webp/);
+    assert.match(byId.spPotion30.icon,/assets\/items\/potions\/sp-potion-30-guiyuan\.webp/);
+    assert.ok(["hpPotion10","hpPotion20","hpPotion30","spPotion10","spPotion20","spPotion30"].every(id=>byId[id].icon.includes("v169-item-art")));
     assert.equal(byId.hpPotion50.recoveryPercent,50,"legacy owned potions stay usable");
     assert.equal(byId.spPotion100.recoveryPercent,100,"legacy rare potions stay usable");
     assert.match(source,/SHOP_PRICE_TIERS/);
     assert.match(source,/v133GetShopItemPrice/);
+});
+
+test("formal potion presentation syncs existing inventory stacks and shop cards",()=>{
+    const owned={
+        hpPotion10:[{id:"hpPotion10",name:"舊名稱",icon:""}],
+        hpPotion20:[{id:"hpPotion20",name:"舊名稱",icon:""}],
+        hpPotion30:[{id:"hpPotion30",name:"舊名稱",icon:""}],
+        spPotion10:[{id:"spPotion10",name:"舊名稱",icon:""}],
+        spPotion20:[{id:"spPotion20",name:"舊名稱",icon:""}],
+        spPotion30:[{id:"spPotion30",name:"舊名稱",icon:""}]
+    };
+    const context=run(baseContext({
+        getPotionInventoryItems:id=>owned[id]||[],
+        getPotionCount:()=>0,
+        gold:999999,
+        renderShopContent:()=>"",
+        v133GetHighestCreatedCharacterLevel:()=>1
+    }));
+    const expected={
+        hpPotion10:"回春散",hpPotion20:"養命丹",hpPotion30:"大還丹",
+        spPotion10:"凝氣散",spPotion20:"聚氣丹",spPotion30:"歸元丹"
+    };
+    Object.entries(expected).forEach(([id,name])=>{
+        assert.equal(owned[id][0].name,name);
+        assert.match(owned[id][0].icon,/\.webp/);
+    });
+    const markup=context.renderShopContent();
+    assert.equal((markup.match(/shop-potion-icon/g)||[]).length,6);
+    assert.match(markup,/回春散/);
+    assert.match(markup,/歸元丹/);
+    assert.match(markup,/assets\/items\/potions\/hp-potion-10-huichun\.webp/);
+    assert.match(markup,/assets\/items\/potions\/sp-potion-30-guiyuan\.webp/);
 });
 
 test("general monsters sample one to three legal skills once per encounter",()=>{
