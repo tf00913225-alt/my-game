@@ -7759,13 +7759,42 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     box-shadow:inset 0 1px 0 rgba(255,238,196,.025),0 3px 8px rgba(0,0,0,.24) !important;
 }
 #game-stage #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-gear-art{
+    display:flex !important;
+    position:relative !important;
     grid-column:1 !important;
     grid-row:1 / 5 !important;
     width:50px !important;
     height:50px !important;
+    min-width:50px !important;
+    min-height:50px !important;
+    max-width:50px !important;
+    max-height:50px !important;
     margin:0 !important;
     align-self:center !important;
     justify-self:center !important;
+    overflow:hidden !important;
+    box-sizing:border-box !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-gear-art > .v169-item-art{
+    display:block !important;
+    width:100% !important;
+    height:100% !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    max-width:100% !important;
+    max-height:100% !important;
+    overflow:hidden !important;
+    box-sizing:border-box !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-gear-art > .v169-item-art > img,
+#game-stage #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-gear-art > .v169-item-art > svg{
+    display:block !important;
+    width:100% !important;
+    height:100% !important;
+    max-width:100% !important;
+    max-height:100% !important;
+    object-fit:contain !important;
+    object-position:center !important;
 }
 #game-stage #homeFeatureModal.v131-shop-open .v17346-shop-card .v17346-shop-name{
     grid-column:2 !important;
