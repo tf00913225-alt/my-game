@@ -2262,14 +2262,14 @@ html, body, #game-viewport{
 #game-stage #homePage .v146-home-character-placeholder .v146-home-avatar,
 #game-stage #homePage .v146-home-character-empty .v146-home-avatar{background:linear-gradient(135deg,rgba(80,60,34,.42),rgba(18,16,12,.88));}
 #game-stage #v146HomeRoster .team-relic-loadout-slot{
-    grid-column:1/-1;min-height:58px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;
-    grid-template-areas:"label name action" ". detail action";column-gap:7px;row-gap:2px;align-items:center;
-    padding:5px 6px;border:1px solid rgba(178,126,49,.52);border-radius:7px;background:linear-gradient(90deg,rgba(42,28,14,.84),rgba(10,9,7,.9));box-sizing:border-box;
+    grid-column:1/-1;min-height:44px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;
+    grid-template-areas:"label name action";column-gap:6px;row-gap:0;align-items:center;
+    padding:3px 5px;border:1px solid rgba(178,126,49,.52);border-radius:7px;background:linear-gradient(90deg,rgba(42,28,14,.84),rgba(10,9,7,.9));box-sizing:border-box;
 }
 #game-stage #v146HomeRoster .team-relic-loadout-slot>span{grid-area:label;color:#bda46d;font-size:13px;font-weight:800;white-space:nowrap;}
-#game-stage #v146HomeRoster .team-relic-loadout-slot>b{grid-area:name;color:#f2d696;font-size:16px;line-height:20px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-#game-stage #v146HomeRoster .team-relic-loadout-slot>small{grid-area:detail;display:block;min-width:0;color:#cdbb94;font-size:13px;line-height:17px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-#game-stage #v146HomeRoster .team-relic-loadout-slot>button{grid-area:action;min-width:52px;min-height:34px;padding:4px 8px;border:1px solid rgba(211,161,70,.7);border-radius:6px;background:linear-gradient(180deg,#493016,#21140a);color:#ffe0a0;font-size:15px;font-weight:900;}
+#game-stage #v146HomeRoster .team-relic-loadout-slot>b{grid-area:name;min-width:0;color:#f2d696;font-size:15px;line-height:19px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+#game-stage #v146HomeRoster .team-relic-loadout-slot>small{display:none;}
+#game-stage #v146HomeRoster .team-relic-loadout-slot>button{grid-area:action;min-width:50px;height:30px;min-height:30px;padding:1px 8px;border:1px solid rgba(211,161,70,.7);border-radius:6px;background:linear-gradient(180deg,#493016,#21140a);color:#ffe0a0;font-size:15px;line-height:1;font-weight:900;}
 #game-stage #v146HomeRoster .team-relic-loadout-slot>button:disabled{opacity:.5;}
 #game-stage #homePage .v146-home-character{
     display:grid;grid-template-columns:40px minmax(0,1fr);gap:5px;align-items:center;min-width:0;min-height:84px;padding:5px 4px 5px 3px;

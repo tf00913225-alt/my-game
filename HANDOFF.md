@@ -4048,3 +4048,10 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 - 全域 tap ripple 在 `#battlePage` 停用；其他頁面共用單一 DOM node，動畫由 width／height／margin 改為 transform＋opacity，快速點擊不再累積 20 個高 z-index animated nodes。
 - Focused Node tests、10 件秘寶 runtime、正式回合路徑、HUD Lock、VFX/cinematic regressions、V141/V142/V152 與 deterministic build 均 PASS。PR #332 Repository checks run 35424956704 SUCCESS；390×844／412×915 hitbox 與 20 次 pointerdown browser QA 均通過。
 - Requirement batch: `release/requirement-batches/2026-09-19-relic-trigger-lifecycle-battle-input-ui.json`。
+
+## 2026-09-20 — 商店補品重排與主城秘寶 HUD 壓縮（IMPLEMENTED / 實機 QA 待確認）
+
+- Base：最新 GitHub `dev`；工作分支 `fix/shop-potion-home-relic-layout-20260920`；`main` 不修改。
+- 商店補品版面唯一後層 owner 維持 `css/49-v169-rpg-ui.css`；正式資料／購買 owner 仍為 `js/40-v144-rules-and-abyss.js`，HP/SP 交錯排序 owner 仍為 `js/51-v169-rpg-ui.js::arrangeShopColumns()`。本次不新增 late CSS 檔或 runtime wrapper；六張補品卡維持 2×3，但改成明確 Header／Icon+文字／數量+價格／購買按鈕分區，避免內容互相重疊。
+- 主城隊伍秘寶摘要 First Screen owner 維持 `js/16-stage-v54-main-city-runtime.js` + `css/19-stage-v54-main-city-moderate-native-scale.css`。不載入完整秘寶 feature；只在既有 slot 隱藏次要 trigger 說明，將列高 58px→44px、按鈕視覺高 34px→30px，保留名稱、Lv 與更換操作。
+- Requirement batch：`release/requirement-batches/2026-09-20-shop-potion-home-relic-layout.json`。目前兩項均為 IMPLEMENTED，待 dev 實際部署與手機視覺確認後才可升為 VERIFIED。

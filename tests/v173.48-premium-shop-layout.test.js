@@ -15,6 +15,10 @@ assert.match(css,/\.v17346-shop-card \.v17346-shop-buy\{[\s\S]*?grid-column:1 \/
 assert.match(css,/\.v17346-shop-card \.v17346-reforge-mini\{[\s\S]*?grid-row:4 !important;/);
 assert.match(css,/\.v17345-equipment-refresh\{[\s\S]*?grid-template-columns:minmax\(0,1fr\) 128px !important;[\s\S]*?height:58px !important;/);
 assert.match(css,/\.shop-potion-list\{[\s\S]*?grid-template-rows:repeat\(3,minmax\(0,1fr\)\) !important;[\s\S]*?overflow:hidden !important;/);
+assert.match(css,/\.shop-potion-card\{[\s\S]*?display:grid !important;[\s\S]*?grid-template-rows:auto minmax\(0,1fr\) auto !important;/);
+assert.match(css,/\.shop-potion-summary\{[\s\S]*?grid-template-columns:46px minmax\(0,1fr\) !important;/);
+assert.match(css,/\.shop-potion-purchase-row\{[\s\S]*?grid-template-columns:auto 46px minmax\(0,1fr\) !important;[\s\S]*?grid-template-rows:36px 40px !important;/);
+assert.match(css,/\.shop-potion-purchase-row \.shop-potion-buy\{[\s\S]*?grid-row:2 !important;[\s\S]*?font-size:15px !important;/);
 assert.ok(equip.includes("前5次免費；第6～10次尚未開放。"));
 assert.ok(loader.includes('const V_ASSET_VERSION="173.67";'));
 assert.ok(build.indexOf('"js/51-v169-rpg-ui.js"')<build.indexOf('"js/equipment-progression.js"'));
