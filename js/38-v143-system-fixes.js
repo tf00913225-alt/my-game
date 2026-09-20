@@ -74,12 +74,15 @@
             rain.baseDamage=30;
             rain.damagePerLevel=12;
             rain.spCost=75;
-            rain.freezeChance=50;
-            rain.freezeDuration=2;
-            rain.freezeSingleTarget=false;
+            /* Ice Arrow Rain is Frostbite, not the hard-control Freeze state. */
+            delete rain.freezeChance;
+            delete rain.freezeDuration;
+            delete rain.freezeSingleTarget;
+            rain.frostbiteChance=50;
+            rain.frostbiteDuration=2;
             rain.lifestealPercentByLevel=[1,2,3,4,5];
             rain.requires=["floodBeast"];
-            rain.description="對敵方全體各造成30點基礎法術傷害；吸取實際傷害的1%/2%/3%/4%/5%恢復自身HP；每個命中目標各有50%基礎機率冰封2回合。";
+            rain.description="對敵方全體各造成30點基礎法術傷害；吸取實際傷害的1%/2%/3%/4%/5%恢復自身HP；每個命中目標各有50%基礎機率凍傷2回合。";
         }
         const freeze=skillDatabase.freeze;
         if(freeze){
