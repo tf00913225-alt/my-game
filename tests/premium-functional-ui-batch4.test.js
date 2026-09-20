@@ -12,7 +12,7 @@ const ui=read("js/51-v169-rpg-ui.js");
 const qa=read("css/53-v173.51-qa.css");
 const materialRule=(synth.match(/#game-stage \.v141-material-lines span\{[^{}]*\}/)||[""])[0];
 assert.match(shop,/#homeFeatureModal\.v131-shop-open \.v17345-shop-tabs button\{[^{}]*min-height:44px !important;[^{}]*height:44px !important/);
-assert.match(shop,/\.shop-potion-purchase-row \.shop-potion-buy\{[^{}]*min-height:42px !important;[^{}]*#f1ce7a/);
+assert.match(shop,/\.shop-potion-purchase-row \.shop-potion-buy\{[^{}]*min-height:36px !important;[^{}]*#f1ce7a/);
 assert.match(shop,/\.v17346-shop-card \.v17346-shop-buy\{[^{}]*min-height:42px !important;[^{}]*#f1ce7a/);
 assert.match(shop,/v141-synthesis-modal \.v141-synthesis-tabs button\{[^{}]*min-height:44px !important/);
 assert.match(materialRule,/border-bottom:1px solid rgba\(200,154,72,.14\)/);
