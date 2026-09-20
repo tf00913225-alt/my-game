@@ -1,0 +1,39 @@
+name: Temporary potion build sync
+
+on:
+  push:
+    branches:
+      - fix/potion-names-icons-webp-20260920
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    if: contains(github.event.head_commit.message, '[potion-build-stage]')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/potion-names-icons-webp-20260920
+          fetch-depth: 0
+      - name: Run focused potion checks
+        run: |
+          set -euo pipefail
+          node tests/v144-rules-and-abyss.test.js
+          node tests/potion-icon-assets-20260920.test.js
+      - name: Synchronize formal production build
+        run: |
+          set -euo pipefail
+          npm run build
+          npm run build:check
+      - name: Commit build artifacts and remove staging workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/_tmp-potion-build-sync.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "build: sync potion presentation artifacts"
+          git push origin HEAD:fix/potion-names-icons-webp-20260920
