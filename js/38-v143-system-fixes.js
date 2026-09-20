@@ -100,122 +100,15 @@
     window.v143CombatRuleSnapshot=function(){
         return {
             version:VERSION,
-            lockdownCaps:{regular:80,elite:60,boss:40},
+            lockdownCaps:{regular:90,elite:80,boss:70,player:60},
             stormRain:skillDatabase&&skillDatabase.stormRain,
             iceArrowRain:skillDatabase&&skillDatabase.iceArrowRain,
             freeze:skillDatabase&&skillDatabase.freeze
         };
     };
 
-    /* Ice Arrow Rain damages everyone and each hit target rolls Freeze. */
-    function playerIceRainTargets(centerIndex){
-        if(typeof getSkillTargets!=="function"){ return []; }
-        let center=Number.isInteger(centerIndex)?centerIndex:
-            (typeof selectedMonster!=="undefined"?selectedMonster:0);
-        if(typeof findAliveTargetIndex==="function"){ center=findAliveTargetIndex(center); }
-        return center===null?[]:getSkillTargets(center,"all").slice();
-    }
-
-    function applyIceRainFreezeToTargets(casterIndex,targetIndexes){
-        if(!targetIndexes.length || typeof rollStatusEffectHit!=="function"){ return; }
-        const skill=typeof skillDatabase!=="undefined"?skillDatabase.iceArrowRain:null;
-        const freezeChance=Math.max(0,numeric(skill&&skill.freezeChance));
-        const freezeDuration=Math.max(1,numeric(skill&&skill.freezeDuration)||2);
-        if(!freezeChance){ return; }
-        const candidates=targetIndexes.filter(index=>{
-            const monster=typeof monsters!=="undefined"?monsters[index]:null;
-            return monster&&monster.alive&&monster.hp>0;
-        });
-        if(!candidates.length){ return; }
-        const caster=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(casterIndex):null;
-        const stats=typeof getPartyBattleStats==="function"?getPartyBattleStats(casterIndex):null;
-        if(!caster||!stats){ return; }
-        candidates.forEach(index=>{
-            const monster=monsters[index];
-            const hit=rollStatusEffectHit(
-                freezeChance,caster.level,monster.level,stats.intelligence,
-                typeof getMonsterEffectiveSpiritPoints==="function"?getMonsterEffectiveSpiritPoints(monster):numeric(monster.spiritPoints),
-                true,typeof getMonsterRank==="function"?getMonsterRank(monster):"regular"
-            );
-            if(hit){
-                applyFreezeEffect(monster,freezeDuration);
-                addBattleLog(monster.name+"被冰霜箭雨冰封"+freezeDuration+"回合！");
-                if(typeof updateMonsterUI==="function"){ updateMonsterUI(index); }
-            }else{
-                addBattleLog("冰霜箭雨的冰封效果被"+monster.name+"抵抗了。");
-            }
-        });
-    }
-
-    function wrapPlayerIceRainFunction(name,casterIndexFromArgs,centerFromArgs){
-        const previous=window[name];
-        if(typeof previous!=="function"){ return; }
-        window[name]=function(){
-            const args=arguments;
-            const skillId=name==="castSecondaryCharacterSkill"?args[1]:args[0];
-            if(skillId!=="iceArrowRain"){ return previous.apply(this,args); }
-            const casterIndex=casterIndexFromArgs(args);
-            const center=centerFromArgs(args);
-            const targets=playerIceRainTargets(center);
-            const skill=skillDatabase.iceArrowRain;
-            const caster=getPartyCharacterByIndex(casterIndex);
-            const beforeSp=caster?numeric(caster.sp):0;
-            const chance=skill.freezeChance;
-            skill.freezeChance=0;
-            let result;
-            try{ result=previous.apply(this,args); }
-            finally{ skill.freezeChance=chance; }
-            if(caster&&numeric(caster.sp)<beforeSp){ applyIceRainFreezeToTargets(casterIndex,targets); }
-            return result;
-        };
-    }
-    wrapPlayerIceRainFunction("castDamageSkill",()=>0,args=>typeof selectedMonster!=="undefined"?selectedMonster:0);
-    wrapPlayerIceRainFunction("castSecondaryCharacterSkill",args=>Number(args[0])||0,args=>Number(args[2]));
-    wrapPlayerIceRainFunction("castPlayer2Skill",()=>1,args=>Number(args[1]));
-
-    /* Monster Ice Arrow Rain follows the same per-target Freeze rule. */
-    if(typeof processSingleMonsterAttack==="function"){
-        const previousProcessSingleMonsterAttack=processSingleMonsterAttack;
-        processSingleMonsterAttack=function(monsterIndex){
-            let usedIceRain=false;
-            const skill=typeof skillDatabase!=="undefined"?skillDatabase.iceArrowRain:null;
-            const savedChance=skill?skill.freezeChance:0;
-            const previousBadge=typeof showMonsterSkillNameBadge==="function"?showMonsterSkillNameBadge:null;
-            if(previousBadge){
-                showMonsterSkillNameBadge=function(name){
-                    if(skill&&name===skill.name){ usedIceRain=true; skill.freezeChance=0; }
-                    return previousBadge.apply(this,arguments);
-                };
-            }
-            let result;
-            try{ result=previousProcessSingleMonsterAttack.apply(this,arguments); }
-            finally{
-                if(previousBadge){ showMonsterSkillNameBadge=previousBadge; }
-                if(skill){ skill.freezeChance=savedChance; }
-            }
-            if(usedIceRain&&skill){
-                const freezeChance=Math.max(0,numeric(skill.freezeChance));
-                const freezeDuration=Math.max(1,numeric(skill.freezeDuration)||2);
-                const living=(typeof getExistingPartyIndexes==="function"?getExistingPartyIndexes():[0,1,2]).filter(index=>{
-                    const character=getPartyCharacterByIndex(index);
-                    return character&&character.hp>0;
-                });
-                living.forEach(targetIndex=>{
-                    const target=getPartyCharacterByIndex(targetIndex);
-                    const caster=monsters[monsterIndex];
-                    const spirit=typeof getFinalBattleSpiritForPlayerTarget==="function"
-                        ?getFinalBattleSpiritForPlayerTarget(target,targetIndex):numeric(target.spirit);
-                    if(rollStatusEffectHit(freezeChance,caster.level,target.level,numeric(caster.intelligencePoints),spirit,true,"regular",
-                        typeof getPlayerStatusResistBonus==="function"?getPlayerStatusResistBonus(target):0)){
-                        applyFreezeEffect(target,freezeDuration);
-                        addBattleLog((target.id||"角色")+"被冰霜箭雨冰封"+freezeDuration+"回合！");
-                        if(typeof updateUI==="function"){ updateUI(); }
-                    }
-                });
-            }
-            return result;
-        };
-    }
+    /* Ice Arrow Rain is finalized by the shared Frostbite owner in V149.
+       Do not install a second per-target Freeze path here. */
 
     /* ----- 1. Enemy card text: start large, only fit when it truly overflows. ----- */
     function fitEnemyIdentity(card,node){

@@ -98,17 +98,14 @@ test("skill names are brief caster labels and hit numbers wait for the target fr
     assert.doesNotMatch(animation,/font-size","72px/);
 });
 
-test("the three revised skills and hard-control caps match the requested values",()=>{
+test("the three revised skills retain their current status identities",()=>{
     assert.match(system,/storm\.spCost=75/);
     assert.match(system,/rain\.spCost=75/);
-    assert.match(system,/rain\.freezeChance=50/);
-    assert.match(system,/rain\.freezeDuration=2/);
-    assert.match(system,/rain\.freezeSingleTarget=false/);
+    assert.match(system,/rain\.frostbiteChance=50/);
+    assert.match(system,/rain\.frostbiteDuration=2/);
+    assert.match(system,/delete rain\.freezeChance/);
     assert.match(system,/freeze\.freezeChance=80/);
     assert.match(system,/freeze\.freezeDuration=4/);
-    assert.match(rules,/regular:\{min:5,max:80\}/);
-    assert.match(rules,/elite:\{min:5,max:60\}/);
-    assert.match(rules,/boss:\{min:5,max:40\}/);
 });
 
 test("V143 rule patch applies the requested skill metadata at runtime",()=>{
@@ -127,41 +124,18 @@ test("V143 rule patch applies the requested skill metadata at runtime",()=>{
     vm.createContext(context);
     vm.runInContext(system,context);
     const snapshot=context.v143CombatRuleSnapshot();
-    assert.deepEqual(JSON.parse(JSON.stringify(snapshot.lockdownCaps)),{regular:80,elite:60,boss:40});
+    assert.deepEqual(JSON.parse(JSON.stringify(snapshot.lockdownCaps)),{regular:90,elite:80,boss:70,player:60});
     assert.equal(snapshot.stormRain.spCost,75);
     assert.equal(snapshot.iceArrowRain.spCost,75);
-    assert.equal(snapshot.iceArrowRain.freezeChance,50);
-    assert.equal(snapshot.iceArrowRain.freezeSingleTarget,false);
+    assert.equal(snapshot.iceArrowRain.frostbiteChance,50);
+    assert.equal(snapshot.iceArrowRain.freezeChance,undefined);
     assert.equal(snapshot.freeze.freezeChance,80);
 });
 
-test("Ice Arrow Rain rolls Freeze independently for every living target after damage",()=>{
-    let originalFreezeChance=null;
-    let frozen=0;
-    const caster={level:30,sp:200,hp:500};
-    const context={
-        window:null,console,Math,Date,Event:function(){},selectedMonster:0,
-        setTimeout:callback=>{ callback(); return 1; },clearTimeout(){},
-        document:{readyState:"complete",body:{},getElementById:()=>null,querySelector:()=>null,querySelectorAll:()=>[]},
-        skillDatabase:{stormRain:{},iceArrowRain:{freezeChance:50,freezeDuration:2},freeze:{},barrier:{barrierBlockCount:5}},
-        monsters:[
-            {name:"甲",alive:true,hp:100,level:20,spiritPoints:0},
-            {name:"乙",alive:true,hp:100,level:20,spiritPoints:0},
-            {name:"丙",alive:true,hp:100,level:20,spiritPoints:0}
-        ],
-        getSkillTargets:()=>[0,1,2],findAliveTargetIndex:index=>index,
-        getPartyCharacterByIndex:()=>caster,getPartyBattleStats:()=>({intelligence:80}),
-        getMonsterEffectiveSpiritPoints:()=>0,getMonsterRank:()=>"regular",
-        rollStatusEffectHit:()=>true,applyFreezeEffect(){ frozen++; },addBattleLog(){},updateMonsterUI(){},
-        castDamageSkill(){ originalFreezeChance=this.skillDatabase.iceArrowRain.freezeChance; caster.sp-=75; }
-    };
-    context.window=context;
-    vm.createContext(context);
-    vm.runInContext(system,context);
-    context.castDamageSkill("iceArrowRain");
-    assert.equal(originalFreezeChance,0,"the legacy per-target Freeze loop must be disabled");
-    assert.equal(frozen,3,"every successfully rolled target receives Freeze");
-    assert.equal(context.skillDatabase.iceArrowRain.freezeChance,50,"metadata must be restored after the cast");
+test("Ice Arrow Rain has no legacy per-target Freeze wrapper",()=>{
+    assert.doesNotMatch(system,/applyIceRainFreezeToTargets/);
+    assert.doesNotMatch(system,/wrapPlayerIceRainFunction/);
+    assert.match(system,/shared Frostbite owner in V149/);
 });
 
 test("dungeon escape restores its owner and Abyss portrait opens dialogue directly",()=>{
