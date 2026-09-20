@@ -16,8 +16,6 @@ const release=JSON.parse(read("release/release.json"));
 const featureTemplate=JSON.parse(read("config/feature-manifest.json"));
 const firstPlayTemplate=JSON.parse(read("config/first-play-manifest.json"));
 const criticalImagePaths=["assets/ui/startup-logo.4631c0bc3f2b.jpg","assets/ui/startup-main-city.d43e67af1c1c.jpg"];
-const relicIconPaths=[...read("js/60-team-relic-system.js").matchAll(/iconPath:"([^"]+)"/g)].map(match=>match[1]);
-if(new Set(relicIconPaths).size!==20){ throw new Error("Relic icon prefetch list must derive exactly 20 unique RELIC_CATALOG_LIST iconPath values."); }
 
 const bootScripts=[
     "js/startup/support-contact.js",
@@ -98,6 +96,8 @@ const patrolScripts=["js/26-v131-patrol-appearance.js"];
 const abyssScripts=["js/59-abyss-two-tier-runtime.js"];
 const skillScripts=["js/60-v173.64-skill-progression-rebalance.js"];
 const bossRelicScripts=["js/gameplay-boss-tower-system.js","js/60-team-relic-system.js"];
+const relicIconPaths=[...read(bossRelicScripts[1]).matchAll(/iconPath:"([^"]+)"/g)].map(match=>match[1]);
+if(new Set(relicIconPaths).size!==20){ throw new Error("Relic icon prefetch list must derive exactly 20 unique RELIC_CATALOG_LIST iconPath values."); }
 const relicProgressionScripts=["js/relic-progression-drop-system.js"];
 const adventureEntryScripts=["js/adventure/adventure-entry-v1-20260915.js"];
 const adventureItemsScripts=["js/adventure/adventure-items-v1-20260915.js"];
