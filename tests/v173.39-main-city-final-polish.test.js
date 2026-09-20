@@ -21,7 +21,7 @@ test("utility buttons use image-over-text cards and preserve the centre passage"
  assert.equal(396-(74*2)-(92*2),64);
 });
 test("roster keeps three cells while growing enough for the permanent typography floor",()=>{
- assert.match(roster,/\.v146-home-roster\{[\s\S]*?grid-template-columns:repeat\(3,minmax\(0,1fr\)\);[\s\S]*?gap:4px;[\s\S]*?margin:18px 10px 0;padding:5px 7px 7px;/);
+ assert.match(roster,/\.v146-home-roster\{[\s\S]*?grid-template-columns:repeat\(3,minmax\(0,1fr\)\);[\s\S]*?gap:4px;[\s\S]*?margin:18px 10px calc\(var\(--bottom-nav-height,70px\) \+ var\(--safe-bottom,0px\) \+ 12px\);padding:5px 7px 7px;/);
  assert.match(roster,/\.v146-home-roster > header\{[\s\S]*?grid-column:1\/-1;[\s\S]*?min-height:23px;[\s\S]*?font-size:15px;[\s\S]*?line-height:20px;/);
  assert.match(roster,/\.v146-home-character\{[\s\S]*?grid-template-columns:40px minmax\(0,1fr\);[\s\S]*?min-height:84px;[\s\S]*?padding:5px 4px 5px 3px;/);
  assert.match(roster,/\.v146-home-avatar\{[\s\S]*?width:40px;[\s\S]*?height:40px;[\s\S]*?transform:none/);
@@ -37,6 +37,6 @@ test("forbidden entry sizes and navigation remain untouched",()=>{
  assert.match(base,/\.home-card-primary\{[\s\S]*?height:90px;/);
  assert.match(base,/\.home-card-secondary\{[\s\S]*?width:80px;[\s\S]*?height:82px;/);
  assert.match(base,/\.home-secondary-actions\{[\s\S]*?grid-template-columns:repeat\(2,80px\);[\s\S]*?grid-template-rows:repeat\(4,82px\);/);
- assert.match(base,/#homePage\{[\s\S]{0,520}height:100%;[\s\S]{0,180}overflow:hidden/);
+ assert.match(base,/#homePage\{[\s\S]{0,520}height:100%;[\s\S]{0,220}overflow-y:auto;[\s\S]{0,120}overflow-x:hidden/);
 });
 console.log("\n"+passed+" V173.39 main-city pixel-tune tests passed.");
