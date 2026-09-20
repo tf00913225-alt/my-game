@@ -16,6 +16,8 @@ const release=JSON.parse(read("release/release.json"));
 const featureTemplate=JSON.parse(read("config/feature-manifest.json"));
 const firstPlayTemplate=JSON.parse(read("config/first-play-manifest.json"));
 const criticalImagePaths=["assets/ui/startup-logo.4631c0bc3f2b.jpg","assets/ui/startup-main-city.d43e67af1c1c.jpg"];
+const relicIconPaths=[...read("js/60-team-relic-system.js").matchAll(/iconPath:"([^"]+)"/g)].map(match=>match[1]);
+if(new Set(relicIconPaths).size!==20){ throw new Error("Relic icon prefetch list must derive exactly 20 unique RELIC_CATALOG_LIST iconPath values."); }
 
 const bootScripts=[
     "js/startup/support-contact.js",
@@ -316,6 +318,7 @@ const assetManifest={
     schemaVersion:1,release:release.version,generatedAt:"deterministic",
     critical:{scripts:[bootOutput.path],styles:[styleOutputs.critical.path],images:[...criticalImagePaths],firebaseBootstrap:firebaseMap["firebase-bootstrap.js"]},
     featureManifest,
+    relicIcons:[...new Set(relicIconPaths)],
     firstPlay:firstPlayPack,
     assets:Object.fromEntries(declared.map(item=>[item.path,{sha256:item.digest,bytes:Buffer.byteLength(item.content)}]))
 };

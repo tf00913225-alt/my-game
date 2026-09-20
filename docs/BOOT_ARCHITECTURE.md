@@ -121,6 +121,12 @@ Gameplay payload 保留既有 schema；ownership 不塞入戰鬥或數值欄位�
 
 Loading progress 以已完成 task 為準：boot shell、account UI、Auth SDK、Auth state、save resolution、initial destination。100% 表示當前 destination 已可操作；唯一離場延遲是 360ms fade，不存在 cinematic minimum 或 90→100 計時補值。
 
+## Three-level visual loading contract (2026-09-20)
+
+`Runtime Ready ≠ Visual Ready`。Level 1 First Screen Required 由 `prepareFirstScreenVisuals()` 收集主城 live `<img>`、computed CSS background、必要字型並 decode、等待兩次 paint；startup loader 只有在 `four-symbols:main-city-visual-ready` 後才能隱藏，失敗沿用正式 Retry。Level 2 Background Prefetch 在主城可操作後由唯一 Feature Loader 使用 idle queue、concurrency 1 低優先準備 common UI、Relic CSS／bundle 與 20 張 icon，不 execute Boss／Tower／Battle runtime；失敗不影響主城。Level 3 On-Demand Lazy Load 保留大型玩法按需載入，前景請求可取消未開始的背景工作並提升同一請求 priority。
+
+秘寶首次開啟先顯示局部 loading，等 runtime、CSS、唯一 `RELIC_CATALOG_LIST[].iconPath`、字型與 live paint 完成後才一次顯示完整頁面。
+
 ## Feature manifest
 
 | Bundle | 玩家功能 | Dependency |
@@ -170,7 +176,7 @@ Loading progress 以已完成 task 為準：boot shell、account UI、Auth SDK�
 - Android／Chrome freeze 或 discard 不能由網頁禁止。`js/00-main.js` 在 visibility hidden、pagehide、freeze 做既有正式 save，並用 `document.wasDiscarded`、Navigation Timing type、pageshow persisted、resume/freeze 計數提供 `FourSymbolsMobileLifecycleDiagnostics`。
 - 普通 resume／pageshow 不得重跑 account-first Startup。真正 reload／discard 後重建仍由 Firebase Auth → UID save resolution → hydrate 的既有 StartupStateMachine 恢復；sessionStorage 只可省略同分頁已看過的長啟動呈現，不得成為權威進度來源，也不得覆蓋 Cloud Save。
 
-永久 marks：`four-symbols:boot-core-ready`、`auth-initialized`、`auth-resolved`、`save-resolved`、`critical-ready`、`auth-ui-interactive`、`character-creation-interactive`、`main-city-interactive`。
+永久 marks：`four-symbols:boot-core-ready`、`auth-initialized`、`auth-resolved`、`save-resolved`、`critical-ready`、`auth-ui-interactive`、`character-creation-interactive`、`main-city-data-ready`、`main-city-visual-ready`、`main-city-interactive`、`background-prefetch-start`、`background-prefetch-idle`、`relic-prefetch-ready`、`relic-runtime-ready`、`relic-visual-ready`。
 
 | Budget | Gate |
 | --- | --- |

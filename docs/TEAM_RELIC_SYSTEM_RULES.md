@@ -45,6 +45,7 @@
 - 秘寶頁手機優先、滿版、兩欄 Grid、內部垂直捲動；分類列可橫向滑動。
 - 主城左側新增「秘寶」、右側連到既有「元素匣」 owner；不得複製第二套元素匣。
 - 主城隊伍秘寶摘要是 app-shell First Screen UI：固定 shell 先存在，再從正式存檔 `teamLoadout.relicId`／`playerRelics` 填入名稱、Lv、觸發摘要；不得為摘要 execute 完整 `feature-boss-relic`，也不得複製第二份裝備狀態。
+- `RELIC_CATALOG_LIST[].iconPath` 是 List／Detail／Current Equipment／background prefetch 唯一正式 icon path。Runtime Ready 不等於 Visual Ready；首次開頁先顯示局部 loading，等必要 icon decode、字型與 live render paint 完成後才一次顯示完整內容。
 - 玩家可見秘寶列表／詳情／目前隊伍秘寶只能使用正式「裝備／已裝備／卸下／詳情」語言；`runtimeReady`、能力階段、DEV preview 等工程 metadata 可保留於內部，但不得成為玩家 UI 文案或第二份 loadout state。
 - 即使在 DEV host 驗收，裝備動作也必須寫入正式 `teamLoadout.relicId`；禁止 `devPreviewRelicId` 或其他平行配裝鏡像。尚未具正式 Trigger／Effect 的秘寶不得因此假裝已有戰鬥效果，既有已實裝秘寶仍依正式 `runtimeReady`／Trigger engine 執行。
 - 正式美術尚未提供時只能使用高質感 placeholder，並保留 `iconPath`／`assets/treasures/` 擴充位置；禁止自行下載網路素材。

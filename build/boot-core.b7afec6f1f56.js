@@ -494,6 +494,11 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.69","firebaseBootstr
     const ready=new Set();
     const readyFeatures=new Set();
     const bundleFeatures=new Map();
+    const backgroundQueue=[];
+    const backgroundJobs=new Map();
+    const assetPreparation=new Map();
+    const BACKGROUND_CONCURRENCY=1;
+    let backgroundActive=0;
 
     function emit(name,detail){
         try{ global.dispatchEvent(new CustomEvent(name,{detail})); }catch(_){ }
@@ -516,14 +521,19 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.69","firebaseBootstr
             document.head.appendChild(link);
         });
     }
-    function prepareBundle(name,bundle){
+    function prepareBundle(name,bundle,options={}){
         if(preparation.has(name)){ return preparation.get(name); }
+        const background=options.background===true;
         const promise=Promise.all([
-            ...(bundle.styles||[]).map(url=>addLink({rel:"stylesheet",href:url,"data-feature-style":name})),
-            ...(bundle.scripts||[]).map(url=>addLink({rel:"preload",as:"script",href:url,"data-feature-preload":name}))
+            ...(bundle.styles||[]).map(url=>addLink({rel:"stylesheet",href:url,"data-feature-style":name,...(background?{fetchpriority:"low"}:{})})),
+            ...(bundle.scripts||[]).map(url=>addLink({rel:"preload",as:"script",href:url,"data-feature-preload":name,...(background?{fetchpriority:"low"}:{})}))
         ]);
         preparation.set(name,promise);
         return promise;
+    }
+    function promoteBundle(name){
+        if(typeof document==="undefined"||typeof document.querySelectorAll!=="function"){ return; }
+        document.querySelectorAll('[data-feature-style="'+name+'"],[data-feature-preload="'+name+'"]').forEach(link=>link.setAttribute("fetchpriority","high"));
     }
     function topology(target,bundles){
         const ordered=[]; const visiting=new Set(); const visited=new Set();
@@ -573,7 +583,9 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.69","firebaseBootstr
         });
         const target=(data.features&&data.features[feature]) || (data.bundles&&data.bundles[feature]?feature:null);
         if(!target){ throw new Error("Unknown feature: "+feature); }
+        cancelQueuedBackground("feature:"+target);
         const order=topology(target,data.bundles||{});
+        order.forEach(promoteBundle);
         // Start every network fetch before executing the first dependency.
         await Promise.all(order.map(name=>prepareBundle(name,data.bundles[name])));
         for(const name of order){ await executeBundle(name,data.bundles[name]); }
@@ -588,17 +600,66 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.69","firebaseBootstr
             return Promise.all(order.map(name=>prepareBundle(name,data.bundles[name]))).then(()=>true);
         }).catch(()=>false);
     }
-    function idle(){
-        const run=()=>manifest().then(data=>Promise.all((data.idlePreload||[]).map(item=>prefetch(item,"idle"))));
+    function cancelQueuedBackground(key){
+        const job=backgroundJobs.get(key);
+        if(!job||job.started){ return; }
+        job.cancelled=true; backgroundJobs.delete(key); job.resolve(false);
+    }
+    function drainBackground(){
+        while(backgroundActive<BACKGROUND_CONCURRENCY&&backgroundQueue.length){
+            const job=backgroundQueue.shift();
+            if(job.cancelled){ continue; }
+            job.started=true; backgroundActive+=1;
+            Promise.resolve().then(job.run).then(job.resolve,error=>{ emit("four-symbols:background-prefetch-error",{key:job.key,error}); job.resolve(false); }).finally(()=>{ backgroundActive-=1; backgroundJobs.delete(job.key); drainBackground(); });
+        }
+    }
+    function queueBackground(key,run){
+        const existing=backgroundJobs.get(key); if(existing){ return existing.promise; }
+        let resolve; const promise=new Promise(done=>{resolve=done;});
+        const job={key,run,resolve,promise,started:false,cancelled:false}; backgroundJobs.set(key,job); backgroundQueue.push(job); drainBackground(); return promise;
+    }
+    function backgroundPrefetch(feature,reason="idle"){
+        return manifest().then(data=>{
+            const target=(data.features&&data.features[feature])||(data.bundles&&data.bundles[feature]?feature:null);
+            if(!target){ return false; }
+            return queueBackground("feature:"+target,async()=>{ const order=topology(target,data.bundles||{}); for(const name of order){ await prepareBundle(name,data.bundles[name],{background:true}); } emit("four-symbols:background-prefetch-complete",{feature,bundle:target,reason}); return true; });
+        }).catch(()=>false);
+    }
+    function decodeAsset(url,priority="high"){
+        const existing=assetPreparation.get(url);
+        if(existing){ if(priority==="high"){ existing.image.fetchPriority="high"; } return existing.promise; }
+        let image;
+        const promise=new Promise((resolve,reject)=>{
+            image=new Image(); image.decoding="async"; image.fetchPriority=priority;
+            image.onload=()=>typeof image.decode==="function"?image.decode().then(resolve,reject):resolve();
+            image.onerror=()=>reject(new Error("Failed to prefetch asset "+url)); image.src=url;
+        }).catch(error=>{assetPreparation.delete(url);throw error;});
+        assetPreparation.set(url,{image,promise}); return promise;
+    }
+    function prefetchAssets(paths,reason="idle"){
+        const unique=[...new Set((paths||[]).filter(path=>typeof path==="string"&&path))];
+        return Promise.all(unique.map(path=>queueBackground("asset:"+path,async()=>{ await decodeAsset(path,"low"); emit("four-symbols:background-asset-ready",{path,reason}); return true; }))).then(results=>results.every(Boolean));
+    }
+    function prefetchManifestAssets(key,reason="idle"){
+        return manifest().then(data=>prefetchAssets(data[key]||[],reason)).catch(()=>false);
+    }
+    function ensureAssets(paths){
+        return Promise.all([...new Set((paths||[]).filter(path=>typeof path==="string"&&path))].map(path=>{ cancelQueuedBackground("asset:"+path); return decodeAsset(path,"high"); }));
+    }
+    function idle(features,assetManifestKeys=[]){
+        let resolve; const completion=new Promise(done=>{resolve=done;});
+        const run=()=>manifest().then(data=>Promise.all([...(features||data.idlePreload||[]).map(item=>backgroundPrefetch(item,"idle")),...assetManifestKeys.map(key=>prefetchAssets(data[key]||[],"idle"))])).then(resolve,()=>resolve(false));
         if(typeof global.requestIdleCallback==="function"){
             global.requestIdleCallback(run,{timeout:2500});
         }else{ global.setTimeout(run,800); }
+        return completion;
     }
 
     global.FourSymbolsFeatures=Object.freeze({
-        ensure,prefetch,idle,
+        ensure,prefetch,backgroundPrefetch,prefetchAssets,prefetchManifestAssets,ensureAssets,idle,
         isReady:name=>ready.has(name)||readyFeatures.has(name),
-        manifest
+        manifest,
+        getBackgroundPrefetchState:()=>Object.freeze({concurrency:BACKGROUND_CONCURRENCY,active:backgroundActive,queued:backgroundQueue.filter(job=>!job.cancelled).map(job=>job.key)})
     });
 })(typeof window!=="undefined"?window:globalThis);
 
@@ -1065,7 +1126,12 @@ window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.69","firebaseBootstr
         const loaded=global.FourSymbolsGameSave&&typeof global.FourSymbolsGameSave.hydrate==="function"&&global.FourSymbolsGameSave.hydrate(save);
         if(!loaded){ throw new Error("Resolved account save could not hydrate gameplay state."); }
         if(typeof global.v54RenderHomeRoster==="function"){ global.v54RenderHomeRoster(); }
-        await nextPaint();
+        mark("four-symbols:main-city-data-ready");
+        if(!global.FourSymbolsHomeRelicSummary||typeof global.FourSymbolsHomeRelicSummary.prepareFirstScreenVisuals!=="function"){
+            throw new Error("Main City First Screen Visual Ready owner is unavailable.");
+        }
+        status("準備主城畫面","正在完成首屏圖片、字型與版面繪製");
+        await global.FourSymbolsHomeRelicSummary.prepareFirstScreenVisuals();
         transition(offline?STATES.OFFLINE_READY:STATES.READY,{uid:resolvedUid});
         firebase.closeAuth(); status("載入完成","主城已可操作");
         mark("four-symbols:critical-ready");
