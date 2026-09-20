@@ -171,6 +171,18 @@ const adventureStyles=["css/adventure-v1-20260915.css"];
 function combineScripts(files,prefix=""){
     return prefix+files.map(file=>`\n/* bundled source: ${file} */\n${read(file).trim()}\n`).join("\n");
 }
+function compactBootJavaScript(content){
+    // Critical Boot keeps the source owners readable in js/, while the shipped
+    // boot artifact removes comments/indentation so the signed-out byte budget
+    // cannot be consumed by formatting. This only removes lexical whitespace;
+    // line breaks and string contents remain intact.
+    return content
+        .replace(/\/\*[\s\S]*?\*\//g,"")
+        .replace(/^[ \t]+|[ \t]+$/gm,"")
+        .replace(/[ \t]{2,}/g," ")
+        .replace(/\n{2,}/g,"\n")
+        .trim()+"\n";
+}
 function combineStyles(files){
     return files.map(file=>`\n/* bundled source: ${file} */\n${read(file).trim()}\n`).join("\n");
 }
@@ -268,7 +280,7 @@ const bootPrefix=`window.__FOUR_SYMBOLS_BUILD__=Object.freeze(${JSON.stringify({
     release:release.version,
     firebaseBootstrap:firebaseMap["firebase-bootstrap.js"]
 })});\n`;
-const bootOutput=target("boot-core","js",combineScripts(bootScripts,bootPrefix));
+const bootOutput=target("boot-core","js",compactBootJavaScript(combineScripts(bootScripts,bootPrefix)));
 writeTarget(bootOutput);
 
 const criticalImages=criticalImagePaths.map(file=>({path:file,content:bytes(file),digest:hash(bytes(file))}));
