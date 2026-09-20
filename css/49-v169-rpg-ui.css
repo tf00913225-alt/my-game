@@ -1078,7 +1078,7 @@
 }
 #game-stage #homeFeatureModal.v131-shop-open .shop-potion-purchase-row{
     display:grid !important;
-    grid-template-columns:30px minmax(50px,1fr) 54px !important;
+    grid-template-columns:24px minmax(56px,1fr) 54px !important;
     grid-template-rows:36px !important;
     align-items:center !important;
     gap:3px !important;
@@ -1095,20 +1095,28 @@
 #game-stage #homeFeatureModal.v131-shop-open .shop-potion-quantity{
     grid-column:1 !important;
     grid-row:1 !important;
-    width:30px !important;
-    min-width:30px !important;
-    max-width:30px !important;
-    inline-size:30px !important;
-    min-inline-size:30px !important;
-    max-inline-size:30px !important;
-    height:34px !important;
-    min-height:34px !important;
+    width:24px !important;
+    min-width:24px !important;
+    max-width:24px !important;
+    inline-size:24px !important;
+    min-inline-size:24px !important;
+    max-inline-size:24px !important;
+    height:32px !important;
+    min-height:32px !important;
     margin:0 !important;
-    padding:0 1px !important;
+    padding:0 !important;
     box-sizing:border-box !important;
-    font-size:14px !important;
-    line-height:34px !important;
+    -webkit-appearance:textfield !important;
+    appearance:textfield !important;
+    font-family:Arial,sans-serif !important;
+    font-size:12px !important;
+    line-height:32px !important;
     text-align:center !important;
+}
+#game-stage #homeFeatureModal.v131-shop-open .shop-potion-quantity::-webkit-outer-spin-button,
+#game-stage #homeFeatureModal.v131-shop-open .shop-potion-quantity::-webkit-inner-spin-button{
+    -webkit-appearance:none !important;
+    margin:0 !important;
 }
 #game-stage #homeFeatureModal.v131-shop-open .v146-shop-total{
     grid-column:2 !important;
