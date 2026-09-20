@@ -10,11 +10,11 @@
     const VERSION="155";
     const FINAL_BOSS_ORDER=["東帝天尊","天帝天尊","極帝天尊","北帝天尊","南帝天尊"];
     const FINAL_BOSS_RULES={
-        東帝天尊:{element:"earth",skills:["dustStorm","stoneBreakSky"],supports:["earthShield"]},
-        天帝天尊:{element:"wind",skills:["windHowlLightning","stormRain"],supports:["dinghaishenzhen"]},
-        極帝天尊:{element:"light",skills:[],supports:["yuanZuBlessing"]},
-        北帝天尊:{element:"water",skills:["iceArrowRain"],supports:["revive","healSpell"]},
-        南帝天尊:{element:"fire",skills:["dragonSlash","flameTornado"],supports:["rage"]}
+        東帝天尊:{element:"earth",skills:["dustStorm","flyingSandStrike"],supports:["rockWall"]},
+        天帝天尊:{element:"wind",skills:["windHowlLightning","stormRain"],supports:["stealthSkill"]},
+        極帝天尊:{element:"light",skills:["flyingSandStrike","phoenixCry"],supports:["yuanZuBlessing"]},
+        北帝天尊:{element:"water",skills:["iceArrowRain","iceSpin"],supports:["healSpell"]},
+        南帝天尊:{element:"fire",skills:["dragonSlash","phoenixCry"],supports:["rage"]}
     };
     const FINAL_ELITE_RULES=[
         {element:"water",skills:[],supports:["healSpell"]},
@@ -467,10 +467,11 @@
     function resolveNorthHeal(monsterIndex,forceCast){
         const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
         const skill=typeof skillDatabase!=="undefined"?skillDatabase.healSpell:null;
-        if(!monster||monster.name!=="北帝天尊"||monster.alive===false||numeric(monster.hp)<=0||!skill||hardControlled(monster)){ return false; }
+        if(!monster||(monster.v141SupportSkillIds||[]).indexOf("healSpell")<0||monster.alive===false||numeric(monster.hp)<=0||!skill||hardControlled(monster)){ return false; }
         const allies=allyTriTargets(monsterIndex);
-        const needsHeal=allies.some(entry=>monsterBaseHp(entry.monster)<monsterBaseMaxHp(entry.monster)||
-            numeric(entry.monster.sp)<numeric(entry.monster.maxSP));
+        const needsHeal=currentAbyssEntries().some(entry=>
+            monsterBaseHp(entry.monster)<monsterBaseMaxHp(entry.monster)*.70
+        );
         if(!needsHeal||!supportCastAllowed(monster,forceCast)||numeric(monster.sp)<numeric(skill.spCost)){ return false; }
         monster.sp=Math.max(0,numeric(monster.sp)-numeric(skill.spCost));
         if(typeof showMonsterSkillNameBadge==="function"){
@@ -655,12 +656,37 @@
     }
     window.v155ResolveWindEliteDodge=resolveWindEliteDodge;
 
+    function chooseFinalAbyssAction(monster){
+        const living=currentAbyssEntries();
+        const attacks=(monster&&monster.skillIds||[]).filter(id=>{
+            const skill=skillDatabase[id]; return !!(skill&&numeric(monster.sp)>=numeric(skill.spCost));
+        });
+        const supports=(monster&&monster.v141SupportSkillIds||[]).filter(id=>{
+            const skill=skillDatabase[id]; return !!(skill&&numeric(monster.sp)>=numeric(skill.spCost));
+        });
+        const healNeeded=living.some(entry=>monsterBaseHp(entry.monster)<monsterBaseMaxHp(entry.monster)*.70);
+        if(healNeeded&&supports.includes("healSpell")){ return {kind:"heal",skillId:"healSpell"}; }
+        const buffs=supports.filter(id=>id!=="healSpell");
+        const category=window.FourSymbolsEnemySkillAI
+            ?window.FourSymbolsEnemySkillAI.chooseCategory(attacks,buffs,Math.random())
+            :(Math.random()<.70?"attack":"buff");
+        const pool=category==="attack"?attacks:category==="buff"?buffs:[];
+        return {kind:category,skillId:pool.length?pool[Math.floor(Math.random()*pool.length)]:null};
+    }
+    window.v155ChooseFinalAbyssAction=chooseFinalAbyssAction;
+
     if(typeof window.v141TryMonsterSpecialAction==="function"){
         const previousMonsterSpecial=window.v141TryMonsterSpecialAction;
         window.v141TryMonsterSpecialAction=function(monsterIndex){
             const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
             if(monster&&monster.v141Abyss&&hardControlled(monster)){ return false; }
             if(monster&&monster.v155FinalAbyss){
+                const plan=chooseFinalAbyssAction(monster);
+                if(plan.kind==="heal"){ return resolveNorthHeal(monsterIndex,true); }
+                if(plan.kind==="attack"&&plan.skillId){
+                    monster.v175ForcedAttackSkillId=plan.skillId;
+                    return false;
+                }
                 if(monster.name==="東帝天尊"){ return resolveEastEarthShield(monsterIndex); }
                 if(monster.name==="天帝天尊"){ return resolveHeavenCalm(monsterIndex); }
                 if(monster.name==="極帝天尊"){ return resolveExtremeEmperorAction(monsterIndex); }

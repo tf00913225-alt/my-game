@@ -94,14 +94,15 @@ test("final Abyss roster uses the exact ten-enemy loadout at maximum skill level
     const context=load({monsters:roster,currentBattleMonsters:roster.map((_,index)=>index)});
     context.v155PatchFinalAbyssRoster(roster);
     const byName=name=>roster.find(monster=>monster.name===name);
-    assert.deepEqual(array(byName("東帝天尊").skillIds),["dustStorm","stoneBreakSky"]);
-    assert.deepEqual(array(byName("東帝天尊").v141SupportSkillIds),["earthShield"]);
+    assert.deepEqual(array(byName("東帝天尊").skillIds),["dustStorm","flyingSandStrike"]);
+    assert.deepEqual(array(byName("東帝天尊").v141SupportSkillIds),["rockWall"]);
     assert.deepEqual(array(byName("天帝天尊").skillIds),["windHowlLightning","stormRain"]);
-    assert.deepEqual(array(byName("天帝天尊").v141SupportSkillIds),["dinghaishenzhen"]);
+    assert.deepEqual(array(byName("天帝天尊").v141SupportSkillIds),["stealthSkill"]);
+    assert.deepEqual(array(byName("極帝天尊").skillIds),["flyingSandStrike","phoenixCry"]);
     assert.deepEqual(array(byName("極帝天尊").v141SupportSkillIds),["yuanZuBlessing"]);
-    assert.deepEqual(array(byName("北帝天尊").skillIds),["iceArrowRain"]);
-    assert.deepEqual(array(byName("北帝天尊").v141SupportSkillIds),["revive","healSpell"]);
-    assert.deepEqual(array(byName("南帝天尊").skillIds),["dragonSlash","flameTornado"]);
+    assert.deepEqual(array(byName("北帝天尊").skillIds),["iceArrowRain","iceSpin"]);
+    assert.deepEqual(array(byName("北帝天尊").v141SupportSkillIds),["healSpell"]);
+    assert.deepEqual(array(byName("南帝天尊").skillIds),["dragonSlash","phoenixCry"]);
     assert.deepEqual(array(byName("南帝天尊").v141SupportSkillIds),["rage"]);
     roster.slice(0,5).forEach(monster=>assert.equal(monster.v141ForceSkillLevel,5));
     assert.deepEqual(roster.slice(5).map(monster=>[monster.name,monster.element,array(monster.skillIds),array(monster.v141SupportSkillIds),monster.v141ForceSkillLevel]),[
@@ -120,6 +121,18 @@ test("final Abyss roster uses the exact ten-enemy loadout at maximum skill level
     });
     assert.deepEqual(forcedSnapshot,[1,297,0,2],"a low-level floor 5 boss still resolves the maximum skill rank");
     assert.deepEqual([context.skillDatabase.dragonSlash.maxLevel,context.skillDatabase.dragonSlash.baseDamage],[5,165]);
+});
+
+test("enemy AI keeps 70/30 category selection and hard-control caps directional",()=>{
+    assert.match(coreSource,/Number\(randomValue\)<\.70\?"attack":"buff"/);
+    assert.match(coreSource,/regular:\{\s*min:5,\s*max:90/);
+    assert.match(coreSource,/elite:\{\s*min:5,\s*max:80/);
+    assert.match(coreSource,/boss:\{\s*min:5,\s*max:70/);
+    assert.match(coreSource,/player:\{\s*min:5,\s*max:60/);
+    assert.match(coreSource,/targetFinalSpirit,true,"player"/);
+    const v143=fs.readFileSync("js/38-v143-system-fixes.js","utf8");
+    assert.match(v143,/rain\.frostbiteChance=50/);
+    assert.doesNotMatch(v143,/rain\.freezeChance=50/);
 });
 
 test("Extreme Emperor uses only Yuan Zu Blessing with independent cleanse and instant recovery",()=>{
@@ -156,7 +169,7 @@ test("Extreme Emperor uses only Yuan Zu Blessing with independent cleanse and in
 
 test("North Emperor revives first, then heals at level five",()=>{
     let finishes=0;
-    const north={name:"北帝天尊",v141Abyss:true,alive:true,hp:500,maxHP:500,sp:500,maxSP:500,v141ForceSkillLevel:5,activeBuffs:[],statusEffects:[]};
+    const north={name:"北帝天尊",v141Abyss:true,v141SupportSkillIds:["healSpell"],alive:true,hp:500,maxHP:500,sp:500,maxSP:500,v141ForceSkillLevel:5,activeBuffs:[],statusEffects:[]};
     const ally={name:"盟友",rank:"boss",v141Abyss:true,alive:false,hp:0,maxHP:1000,sp:10,maxSP:500,activeBuffs:[],statusEffects:[]};
     const context=load({
         monsters:[north,ally],currentBattleMonsters:[0,1],
