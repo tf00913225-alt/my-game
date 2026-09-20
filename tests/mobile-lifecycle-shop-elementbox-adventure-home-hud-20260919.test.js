@@ -83,7 +83,7 @@ test("shop quantity has one 999 normalizer and all final purchase math uses the 
     const quantitySource=sliceThrough(
         economy,
         "const SHOP_PURCHASE_MAX_QUANTITY=999;",
-        "window.v133NormalizeShopQuantityInput=function(input){\n        if(!input){ return 1; }\n        const quantity=normalizeShopPurchaseQuantity(input.value);\n        input.value=String(quantity);\n        return quantity;\n    };"
+        "window.v133NormalizeShopQuantityInput=function(input,options){\n        if(!input){ return 1; }\n        const commit=!!(options&&options.commit);\n        const raw=String(input.value==null?\"\":input.value).trim();\n        if(raw===\"\"&&!commit){ return null; }\n        const quantity=normalizeShopPurchaseQuantity(raw);\n        input.value=String(quantity);\n        return quantity;\n    };"
     );
     const context={window:{},Number,Math,String};
     vm.runInNewContext(quantitySource,context,{filename:"shop-quantity-snippet.js"});
@@ -95,10 +95,20 @@ test("shop quantity has one 999 normalizer and all final purchase math uses the 
     assert.equal(context.window.v133NormalizeShopQuantityInput(input),999);
     assert.equal(input.value,"999","visible input must immediately show 999");
 
+    input.value="";
+    assert.equal(context.window.v133NormalizeShopQuantityInput(input),null,"empty field remains a temporary editing draft");
+    assert.equal(input.value,"","the default 1 must be deletable");
+    assert.equal(context.window.v133NormalizeShopQuantityInput(input,{commit:true}),1);
+    assert.equal(input.value,"1","blur/commit restores the minimum only after editing ends");
+
     assert.doesNotMatch(economy,/max="9999"|Math\.min\(9999/);
     assert.doesNotMatch(shop,/max="9999"|Math\.min\(9999/);
     assert.doesNotMatch(shopUi,/Math\.min\(9999/);
     assert.match(shop,/max="999"/);
+    assert.match(shop,/oninput="v146UpdateShopTotal/);
+    assert.match(shop,/onblur="v146CommitShopQuantity/);
+    assert.match(shopUi,/raw===""[\s\S]*?output\.textContent="— 金幣"/);
+    assert.match(shopUi,/function\(itemId\)[\s\S]*?input\.value="1"/);
     assert.match(shop,/window\.normalizeShopPurchaseQuantity\(requestedQuantity\)/);
     assert.match(shop,/const totalPrice=unitPrice\*quantity/);
     assert.match(shop,/addPotionToInventory\(itemId,quantity\)/);

@@ -254,7 +254,7 @@
                 return '<div class="shop-potion-card '+item.resource+'">'+
                     '<div class="shop-potion-card-head"><span class="shop-potion-type">'+label+'</span><span class="shop-potion-stock">持有 '+getPotionCount(item.id)+'</span></div>'+
                     '<div class="shop-potion-name">'+escapeHtml(item.name)+'</div><div class="shop-potion-effect">回復最大'+label+'的 '+item.recoveryPercent+'%</div>'+
-                    '<div class="shop-potion-purchase-row"><label for="shopQuantity-'+item.id+'">數量</label><input id="shopQuantity-'+item.id+'" class="shop-potion-quantity" data-unit-price="'+price+'" type="number" inputmode="numeric" min="1" max="999" step="1" value="1" oninput="v146UpdateShopTotal(\''+item.id+'\')">'+
+                    '<div class="shop-potion-purchase-row"><label for="shopQuantity-'+item.id+'">數量</label><input id="shopQuantity-'+item.id+'" class="shop-potion-quantity" data-unit-price="'+price+'" type="number" inputmode="numeric" min="1" max="999" step="1" value="1" oninput="v146UpdateShopTotal(\''+item.id+'\')" onblur="v146CommitShopQuantity(\''+item.id+'\')">'+
                     '<span class="v146-shop-total" id="shopTotal-'+item.id+'">'+price+' 金幣</span><button class="home-feature-buy-btn shop-potion-buy" '+(gold<price?'disabled':'')+' onclick="buyShopItem(\''+item.id+'\',document.getElementById(\'shopQuantity-'+item.id+'\').value)">購買</button></div></div>';
             }).join("");
             return '<div class="v141-shop-wallet">目前金幣 <b>'+Math.max(0,Math.floor(numeric(gold))).toLocaleString("zh-TW")+'</b></div>'+

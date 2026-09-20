@@ -905,9 +905,12 @@
         return Math.max(1,Math.min(SHOP_PURCHASE_MAX_QUANTITY,Math.floor(Number(value)||1)));
     }
     window.normalizeShopPurchaseQuantity=normalizeShopPurchaseQuantity;
-    window.v133NormalizeShopQuantityInput=function(input){
+    window.v133NormalizeShopQuantityInput=function(input,options){
         if(!input){ return 1; }
-        const quantity=normalizeShopPurchaseQuantity(input.value);
+        const commit=!!(options&&options.commit);
+        const raw=String(input.value==null?"":input.value).trim();
+        if(raw===""&&!commit){ return null; }
+        const quantity=normalizeShopPurchaseQuantity(raw);
         input.value=String(quantity);
         return quantity;
     };
@@ -949,7 +952,7 @@
                     <div class="shop-potion-card-head"><span class="shop-potion-type">${resourceLabel}</span><span class="shop-potion-stock">持有 ${count}</span></div>
                     <div class="shop-potion-name">${shopItem.name}</div><div class="shop-potion-effect">${effectText}</div>
                     <div class="shop-potion-purchase-row"><label for="shopQuantity-${shopItem.id}">數量</label>
-                    <input id="shopQuantity-${shopItem.id}" class="shop-potion-quantity" type="number" inputmode="numeric" min="1" max="999" step="1" value="1" oninput="v133NormalizeShopQuantityInput(this)">
+                    <input id="shopQuantity-${shopItem.id}" class="shop-potion-quantity" type="number" inputmode="numeric" min="1" max="999" step="1" value="1" oninput="v133NormalizeShopQuantityInput(this)" onblur="v133NormalizeShopQuantityInput(this,{commit:true})">
                     <button class="home-feature-buy-btn shop-potion-buy" ${disabled?"disabled":""} onclick="buyShopItem('${shopItem.id}',document.getElementById('shopQuantity-${shopItem.id}').value)">${buttonText}</button></div></div>`;
             }).join("");
             return `<div class="shop-potion-interface"><div class="shop-potion-note">只販售 HP／SP 回復藥水</div>

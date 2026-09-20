@@ -115,6 +115,23 @@ test("shop quantity calculates and disables against the live total",()=>{
     assert.equal(context.v146UpdateShopTotal("hpPotion20"),1998);
     assert.equal(input.value,"999","shop input must visibly clamp values above 999");
     assert.equal(output.textContent,"1,998 金幣");
+
+    input.value="";
+    button.disabled=false;
+    assert.equal(context.v146UpdateShopTotal("hpPotion20"),0,"empty input is an editing draft, not an immediate quantity 1");
+    assert.equal(input.value,"","deleting the default 1 must leave the field empty while typing");
+    assert.equal(output.textContent,"— 金幣");
+    assert.equal(button.disabled,true,"blank quantity cannot be purchased");
+
+    input.value="5";
+    assert.equal(context.v146UpdateShopTotal("hpPotion20"),10);
+    input.value="50";
+    assert.equal(context.v146UpdateShopTotal("hpPotion20"),100);
+    assert.equal(input.value,"50","typing 50 after deleting 1 must produce exactly 50, never 150");
+
+    input.value="";
+    assert.equal(context.v146CommitShopQuantity("hpPotion20"),1);
+    assert.equal(input.value,"1","leaving a still-empty field restores the safe minimum only after editing ends");
 });
 
 test("all forty set pieces receive exact stats, role names and element locks",()=>{
