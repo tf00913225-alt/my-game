@@ -35,15 +35,30 @@
     },
     {
       "id": "REL-03",
-      "status": "TODO",
+      "status": "VERIFIED",
       "requirement": "V173.68 發布候選 PR 必須通過 Repository checks、版本／公告／build synchronization 與必要 browser QA。",
-      "evidence": []
+      "evidence": [
+        "PR #374 candidate CI run 35487635285 Repository checks SUCCESS",
+        "Release Update Notification targeted regression SUCCESS",
+        "Fixed Slot battlefield 9x16 mobile browser QA SUCCESS",
+        "exact-candidate real battle mobile browser QA SUCCESS",
+        "Adventure V1 mobile browser QA SUCCESS",
+        "production build synchronization SUCCESS",
+        "release/version/notice gates SUCCESS"
+      ]
     },
     {
       "id": "REL-04",
-      "status": "TODO",
+      "status": "VERIFIED",
       "requirement": "候選合併 dev 後，最新 dev HEAD CI 與 DEV exact-SHA deployment 必須成功並核對 V173.68。",
-      "evidence": []
+      "evidence": [
+        "merged dev commit 637ef3ddd7afd4a88ecb0e87464ad11091e79968",
+        "dev push CI run 35487717751 Repository checks SUCCESS",
+        "DEV deployment job 106017163502 SUCCESS",
+        "Confirm this commit is still dev HEAD SUCCESS",
+        "Verify deployed commit, game version and cache version SUCCESS",
+        "deployed battle layout and VFX live QA SUCCESS"
+      ]
     },
     {
       "id": "REL-05",
@@ -52,12 +67,12 @@
       "evidence": []
     }
   ],
-  "automatedVerification": "REL-01..02 VERIFIED；REL-03..05 pending candidate CI, dev deployment and protected main promotion.",
+  "automatedVerification": "REL-01..04 VERIFIED. PR #374 candidate CI run 35487635285 SUCCESS; dev push CI run 35487717751 and DEV deployment job 106017163502 SUCCESS with exact-SHA / V173.68 / cache 173.68 verification. REL-05 remains pending protected main promotion.",
   "visualVerification": "Shop potion layout and main-city relic HUD were accepted by the project owner on deployed DEV before release preparation.",
-  "verifiedSourceCommit": "83798ee8760026cde244da8ff8ecd3378f4eb472",
-  "mergedDevCommit": null,
+  "verifiedSourceCommit": "4b5b2ae2eb23015a0f9407a51c26cbb1bd0eec81",
+  "mergedDevCommit": "637ef3ddd7afd4a88ecb0e87464ad11091e79968",
   "mergedMainCommit": null,
-  "candidateCiRun": null,
-  "devPushCiRun": null,
-  "devDeployJob": null
+  "candidateCiRun": 35487635285,
+  "devPushCiRun": 35487717751,
+  "devDeployJob": 106017163502
 }
