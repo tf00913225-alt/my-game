@@ -1078,10 +1078,10 @@
 }
 #game-stage #homeFeatureModal.v131-shop-open .shop-potion-purchase-row{
     display:grid !important;
-    grid-template-columns:32px minmax(48px,1fr) 54px !important;
+    grid-template-columns:30px minmax(50px,1fr) 54px !important;
     grid-template-rows:36px !important;
     align-items:center !important;
-    gap:4px !important;
+    gap:3px !important;
     width:100% !important;
     min-width:0 !important;
     min-height:0 !important;
@@ -1095,14 +1095,18 @@
 #game-stage #homeFeatureModal.v131-shop-open .shop-potion-quantity{
     grid-column:1 !important;
     grid-row:1 !important;
-    width:32px !important;
-    min-width:32px !important;
+    width:30px !important;
+    min-width:30px !important;
+    max-width:30px !important;
+    inline-size:30px !important;
+    min-inline-size:30px !important;
+    max-inline-size:30px !important;
     height:34px !important;
     min-height:34px !important;
     margin:0 !important;
-    padding:0 2px !important;
+    padding:0 1px !important;
     box-sizing:border-box !important;
-    font-size:15px !important;
+    font-size:14px !important;
     line-height:34px !important;
     text-align:center !important;
 }
