@@ -2,7 +2,7 @@
 #battlePage .battle-stats-edge-button,
 #battlePage .battle-mechanism-alert{
     position:absolute;
-    z-index:175;
+    z-index:70;
     border:1px solid rgba(230,176,73,.86);
     background:linear-gradient(180deg,rgba(34,25,14,.96),rgba(9,8,6,.96));
     color:#f5d67f;
@@ -21,7 +21,12 @@
     font-size:15px;
     font-weight:900;
     line-height:1.25;
+    touch-action:none;
+    user-select:none;
+    -webkit-user-select:none;
+    cursor:ns-resize;
 }
+#battlePage .battle-stats-edge-button.is-dragging{filter:brightness(1.18);}
 #battlePage .battle-stats-edge-button span{display:block;}
 #battlePage .battle-mechanism-alert{
     top:98px;
@@ -41,23 +46,11 @@
     0%,100%{opacity:1;transform:scale(1);}
     50%{opacity:.28;transform:scale(.9);}
 }
-#battlePage .battle-insight-scrim{
-    position:absolute;
-    inset:0;
-    z-index:179;
-    display:none;
-    width:100%;
-    height:100%;
-    padding:0;
-    border:0;
-    background:rgba(0,0,0,.48);
-}
-#battlePage .battle-insight-scrim.open{display:block;}
 #battlePage .battle-insight-drawer{
     position:absolute;
     top:0;
     bottom:0;
-    z-index:180;
+    z-index:72;
     width:min(342px,86%);
     display:flex;
     flex-direction:column;
@@ -66,10 +59,15 @@
     background:linear-gradient(180deg,rgba(23,18,12,.99),rgba(7,7,6,.99));
     box-shadow:0 0 24px rgba(0,0,0,.68);
     transition:transform .18s ease-out;
+    pointer-events:none;
 }
 #battlePage .battle-stats-drawer{left:0;transform:translateX(-102%);border-left:0;}
 #battlePage .battle-boss-mechanism-drawer{right:0;transform:translateX(102%);border-right:0;}
-#battlePage .battle-insight-drawer.open{transform:translateX(0);}
+#battlePage .battle-insight-drawer.open{transform:translateX(0);pointer-events:auto;}
+#battlePage.v-fixed-slot-render-v2 .battle-center-region{
+    position:relative;
+    z-index:80;
+}
 #battlePage .battle-insight-drawer > header{
     flex:0 0 auto;
     display:flex;
@@ -173,29 +171,47 @@
     z-index:360;
     display:grid;
     place-items:center;
-    padding:18px 12px;
+    padding:40px 28px;
     background:rgba(0,0,0,.72);
 }
 #app .battle-statistics-result-modal[hidden]{display:none;}
 .battle-statistics-result-panel{
-    width:min(390px,100%);
-    max-height:94%;
+    width:min(900px,calc(100% - 24px));
+    max-height:calc(100% - 72px);
     display:flex;
     flex-direction:column;
     overflow:hidden;
-    border:2px solid rgba(213,161,67,.9);
-    border-radius:12px;
+    border:3px solid rgba(213,161,67,.9);
+    border-radius:16px;
     background:linear-gradient(180deg,#21170d,#090806);
     box-shadow:0 10px 28px rgba(0,0,0,.75);
     color:#f5e5c3;
 }
-.battle-statistics-result-panel > header{padding:12px 13px 8px;border-bottom:1px solid rgba(183,133,54,.58);}
-.battle-statistics-result-panel > header small{color:#aa9670;font-size:11px;}
-.battle-statistics-result-panel > header h2{margin:3px 0;color:#f1d184;font-size:21px;}
-.battle-statistics-result-panel > header p{margin:0;color:#cab58a;font-size:13px;}
-.battle-statistics-result-body{flex:1 1 auto;min-height:0;overflow-y:auto;padding:10px;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;}
-.battle-statistics-result-panel > footer{flex:0 0 auto;padding:9px 12px 12px;border-top:1px solid rgba(183,133,54,.48);}
+.battle-statistics-result-panel > header{padding:18px 22px 14px;border-bottom:1px solid rgba(183,133,54,.58);}
+.battle-statistics-result-panel > header small{color:#aa9670;font-size:14px;}
+.battle-statistics-result-panel > header h2{margin:5px 0;color:#f1d184;font-size:28px;line-height:1.25;}
+.battle-statistics-result-panel > header p{margin:0;color:#cab58a;font-size:16px;}
+.battle-statistics-result-body{flex:1 1 auto;min-height:0;overflow-y:auto;padding:16px 18px;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;}
+.battle-statistics-result-panel .battle-result-stat-card{
+    margin-bottom:12px;
+    padding:14px 16px;
+    border-radius:12px;
+}
+.battle-statistics-result-panel .battle-stat-identity{gap:13px;margin-bottom:12px;}
+.battle-statistics-result-panel .battle-stat-identity img,
+.battle-statistics-result-panel .battle-stat-avatar-fallback{
+    flex-basis:62px;
+    width:62px;
+    height:62px;
+}
+.battle-statistics-result-panel .battle-stat-identity b{font-size:20px;}
+.battle-statistics-result-panel .battle-stat-identity small{font-size:15px;}
+.battle-statistics-result-panel .battle-stat-grid{gap:10px;}
+.battle-statistics-result-panel .battle-stat-grid > div{padding:10px 12px;border-radius:8px;}
+.battle-statistics-result-panel .battle-stat-grid span{font-size:15px;}
+.battle-statistics-result-panel .battle-stat-grid b{font-size:22px;}
+.battle-statistics-result-panel > footer{flex:0 0 auto;padding:12px 18px 18px;border-top:1px solid rgba(183,133,54,.48);}
 .battle-statistics-result-panel > footer button{
-    width:100%;min-height:42px;border:1px solid rgba(220,167,73,.82);border-radius:8px;
-    background:linear-gradient(180deg,#4c3218,#21150b);color:#ffe2a0;font-size:16px;font-weight:900;
+    width:100%;min-height:56px;border:1px solid rgba(220,167,73,.82);border-radius:9px;
+    background:linear-gradient(180deg,#4c3218,#21150b);color:#ffe2a0;font-size:19px;font-weight:900;
 }

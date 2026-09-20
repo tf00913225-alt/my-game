@@ -38419,18 +38419,23 @@ const V_ASSET_VERSION="173.66";
 
     function renderReleaseContent(manifest,kind){
         const forced=kind==="forced";
-        const update=kind==="update"||kind==="preview";
-        const intro=forced
-            ? "目前版本已停止使用，請更新後繼續遊戲。"
-            : update
-                ? "發現新版本。你可先完成目前操作，再更新至最新版本。"
-                : "以下是本次正式版本更新內容。";
+        const preview=kind==="preview";
+        const update=kind==="update";
+        const intro=preview
+            ? "目前為開發預覽模式；此畫面只用於檢查更新公告，不會重新載入遊戲。"
+            : forced
+                ? "目前版本已停止使用，請更新後繼續遊戲。"
+                : update
+                    ? "發現新版本。你可先完成目前操作，再更新至最新版本。"
+                    : "以下是本次正式版本更新內容。";
         const notes=manifest.content.map(item=>"<li>"+escapeHtml(item)+"</li>").join("");
-        const actions=forced
-            ? '<div class="release-update-actions"><button type="button" class="release-update-primary" data-release-update-action="reload">立即更新</button></div>'
-            : update
-                ? '<div class="release-update-actions"><button type="button" data-release-update-action="later">稍後更新</button><button type="button" class="release-update-primary" data-release-update-action="reload">立即更新</button></div>'
-                : '<div class="release-update-actions"><button type="button" class="release-update-primary" data-release-update-action="acknowledge">我知道了</button></div>';
+        const actions=preview
+            ? '<div class="release-update-actions"><button type="button" class="release-update-primary" data-release-update-action="preview-close">關閉預覽</button></div>'
+            : forced
+                ? '<div class="release-update-actions"><button type="button" class="release-update-primary" data-release-update-action="reload">立即更新</button></div>'
+                : update
+                    ? '<div class="release-update-actions"><button type="button" data-release-update-action="later">稍後更新</button><button type="button" class="release-update-primary" data-release-update-action="reload">立即更新</button></div>'
+                    : '<div class="release-update-actions"><button type="button" class="release-update-primary" data-release-update-action="acknowledge">我知道了</button></div>';
         const suppressToday=!forced&&!update
             ? '<label class="release-update-suppress-today"><input class="release-update-suppress-today-input" type="checkbox" data-release-update-suppress-today="true"><span>今日不再跳出提醒</span></label>'
             : '';
@@ -38464,6 +38469,7 @@ const V_ASSET_VERSION="173.66";
                 if(action==="reload"){ requestReload(); }
                 else if(action==="later"){ deferNormalUpdate(); }
                 else if(action==="acknowledge"){ acknowledgeCurrentRelease(); }
+                else if(action==="preview-close"){ closeReleaseDetail(); }
             });
         });
     }

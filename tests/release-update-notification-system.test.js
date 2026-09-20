@@ -51,7 +51,7 @@ class FakeElement{
             this._selectorChildren[".release-update-suppress-today-input"]=new FakeElement();
             this._selectorChildren[".release-update-suppress-today-input"].type="checkbox";
         }
-        for(const action of ["acknowledge","later","reload"]){
+        for(const action of ["acknowledge","later","reload","preview-close"]){
             if(this._innerHTML.includes('data-release-update-action="'+action+'"')){
                 const button=new FakeElement();
                 button.setAttribute("data-release-update-action",action);
@@ -279,7 +279,14 @@ async function test(name,callback){
         dev.overlay.children[0].dispatch("click");
         assert.equal(dev.modal.classList.contains("show"),true);
         assert.match(dev.body.innerHTML,/V173\.65/);
-        assert.match(dev.body.innerHTML,/發現新版本/);
+        assert.match(dev.body.innerHTML,/開發預覽模式/);
+        assert.match(dev.body.innerHTML,/關閉預覽/);
+        assert.doesNotMatch(dev.body.innerHTML,/立即更新/);
+        const previewClose=dev.body.querySelectorAll("[data-release-update-action]")
+            .find(button=>button.getAttribute("data-release-update-action")==="preview-close");
+        assert.ok(previewClose);
+        previewClose.dispatch("click");
+        assert.equal(dev.modal.classList.contains("show"),false);
         assert.equal(dev.api.requestReload(),false);
         assert.equal(dev.reloads,0);
         assert.deepEqual([...dev.storage.entries()],storageBefore);

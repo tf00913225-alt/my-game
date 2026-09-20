@@ -694,7 +694,8 @@ button:disabled{
 
     margin:-14px;
     padding:14px;
-    padding-bottom:calc(14px + var(--bottom-nav-height,70px) + var(--safe-bottom,0px));
+    padding-bottom:14px;
+    scroll-padding-bottom:calc(var(--bottom-nav-height,70px) + var(--safe-bottom,0px) + 14px);
 }
 
 .home-bg-fixed-layer{

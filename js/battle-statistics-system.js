@@ -2,7 +2,7 @@
    Battle Statistics / Battle Insight UI
    - One per-battle statistics owner keyed by combatant id.
    - UI reads the same live/final snapshot; no duplicate result calculation.
-   - Drawers reuse FourSymbolsBattleFlow presentation locks.
+   - Drawers are non-blocking observers; combat continues while they are open.
 ===================================================== */
 (function installBattleStatisticsSystem(){
     "use strict";
@@ -15,7 +15,6 @@
     let finalSnapshot=null;
     let bossMechanisms=[];
     let openDrawer=null;
-    let releaseDrawerLock=null;
     let resultCloseCallback=null;
 
     function number(value){
@@ -74,6 +73,58 @@
     function appRoot(){
         return document.getElementById("app")||document.getElementById("game-content")||document.body;
     }
+    function clampEdgeTop(edge,root,value){
+        const height=Math.max(1,Number(root&&root.clientHeight)||0);
+        const edgeHeight=Math.max(1,Number(edge&&edge.offsetHeight)||0);
+        const minTop=8;
+        const maxTop=Math.max(minTop,height-edgeHeight-8);
+        return Math.max(minTop,Math.min(maxTop,Number(value)||minTop));
+    }
+    function installStatsEdgeDrag(edge,root){
+        if(!edge||!root||edge.__battleStatsEdgeDragInstalled){ return; }
+        edge.__battleStatsEdgeDragInstalled=true;
+        let drag=null;
+
+        function finishDrag(event){
+            if(!drag){ return; }
+            if(event&&event.pointerId!==undefined&&drag.pointerId!==undefined&&event.pointerId!==drag.pointerId){ return; }
+            const moved=drag.moved;
+            drag=null;
+            edge.classList.remove("is-dragging");
+            if(moved){
+                edge.__suppressNextClick=true;
+                setTimeout(()=>{ edge.__suppressNextClick=false; },0);
+            }
+        }
+
+        edge.addEventListener("pointerdown",event=>{
+            if(event.button!==undefined&&event.button!==0){ return; }
+            const rect=root.getBoundingClientRect();
+            const rootHeight=Math.max(1,Number(root.clientHeight)||rect.height||1);
+            drag={
+                pointerId:event.pointerId,
+                startClientY:Number(event.clientY)||0,
+                startTop:clampEdgeTop(edge,root,edge.offsetTop),
+                scaleY:rect.height>0?rootHeight/rect.height:1,
+                moved:false
+            };
+            edge.classList.add("is-dragging");
+            if(typeof edge.setPointerCapture==="function"&&event.pointerId!==undefined){
+                try{ edge.setPointerCapture(event.pointerId); }catch(_){ }
+            }
+            event.preventDefault();
+        });
+        edge.addEventListener("pointermove",event=>{
+            if(!drag||event.pointerId!==drag.pointerId){ return; }
+            const delta=((Number(event.clientY)||0)-drag.startClientY)*drag.scaleY;
+            if(!drag.moved&&Math.abs(delta)>=3){ drag.moved=true; }
+            if(!drag.moved){ return; }
+            edge.style.top=clampEdgeTop(edge,root,drag.startTop+delta)+"px";
+            event.preventDefault();
+        });
+        edge.addEventListener("pointerup",finishDrag);
+        edge.addEventListener("pointercancel",finishDrag);
+    }
     function ensureBattleUi(){
         if(typeof document==="undefined"){ return null; }
         const root=battleRoot();
@@ -87,7 +138,15 @@
             edge.className="battle-stats-edge-button";
             edge.setAttribute("aria-label","詳細戰況");
             edge.innerHTML="<span>詳</span><span>細</span><span>戰</span><span>況</span>";
-            edge.addEventListener("click",()=>openBattleDrawer("stats"));
+            edge.addEventListener("click",event=>{
+                if(edge.__suppressNextClick){
+                    edge.__suppressNextClick=false;
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+                    return;
+                }
+                openBattleDrawer("stats");
+            });
             root.appendChild(edge);
         }
 
@@ -103,16 +162,8 @@
             root.appendChild(alertButton);
         }
 
-        let scrim=document.getElementById("battleInsightScrim");
-        if(!scrim){
-            scrim=document.createElement("button");
-            scrim.type="button";
-            scrim.id="battleInsightScrim";
-            scrim.className="battle-insight-scrim";
-            scrim.setAttribute("aria-label","關閉戰鬥資訊");
-            scrim.addEventListener("click",closeBattleDrawer);
-            root.appendChild(scrim);
-        }
+        const staleScrim=document.getElementById("battleInsightScrim");
+        if(staleScrim&&typeof staleScrim.remove==="function"){ staleScrim.remove(); }
 
         let statsDrawer=document.getElementById("battleStatsDrawer");
         if(!statsDrawer){
@@ -135,7 +186,8 @@
             bossDrawer.querySelector("[data-close]").addEventListener("click",closeBattleDrawer);
             root.appendChild(bossDrawer);
         }
-        return {edge,alertButton,scrim,statsDrawer,bossDrawer};
+        installStatsEdgeDrag(edge,root);
+        return {edge,alertButton,statsDrawer,bossDrawer};
     }
     function syncBattleEntryVisibility(){
         const ui=ensureBattleUi();
@@ -192,16 +244,6 @@
             ?bossMechanisms.map(mechanismMarkup).join("")
             :'<p class="battle-insight-empty">目前場上沒有生效中的 Boss 功能卡。</p>';
     }
-    function acquireDrawerPause(){
-        const flow=window.FourSymbolsBattleFlow;
-        if(!flow||typeof flow.isAutoBattle!=="function"||!flow.isAutoBattle()){ return null; }
-        if(typeof flow.acquirePauseLock==="function"){
-            return flow.acquirePauseLock("battle-insight-drawer");
-        }
-        return typeof flow.acquirePresentationLock==="function"
-            ?flow.acquirePresentationLock("battle-insight-drawer")
-            :null;
-    }
     function openBattleDrawer(kind){
         if(!session||!session.active){ return false; }
         const next=kind==="boss"?"boss":"stats";
@@ -212,9 +254,7 @@
         if(openDrawer===next){ return true; }
         closeBattleDrawer();
         openDrawer=next;
-        releaseDrawerLock=acquireDrawerPause();
 
-        ui.scrim.classList.add("open");
         const drawer=next==="boss"?ui.bossDrawer:ui.statsDrawer;
         drawer.classList.add("open");
         if(next==="boss"){ renderBossDrawer(); }else{ renderStatsDrawer(); }
@@ -222,19 +262,12 @@
     }
     function closeBattleDrawer(){
         if(typeof document!=="undefined"){
-            const scrim=document.getElementById("battleInsightScrim");
             const stats=document.getElementById("battleStatsDrawer");
             const boss=document.getElementById("battleBossMechanismDrawer");
-            if(scrim){ scrim.classList.remove("open"); }
             if(stats){ stats.classList.remove("open"); }
             if(boss){ boss.classList.remove("open"); }
         }
         openDrawer=null;
-        if(releaseDrawerLock){
-            const release=releaseDrawerLock;
-            releaseDrawerLock=null;
-            release();
-        }
     }
     function syncOpenDrawer(){
         if(openDrawer==="stats"){ renderStatsDrawer(); }
