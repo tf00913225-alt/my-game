@@ -24,7 +24,7 @@ assert.match(synth,/\.v141-synthesis-body\{[^{}]*overflow-y:auto[^{}]*touch-acti
 assert.match(qa,/v17346-shop-card \.v17346-shop-buy\{[^{}]*min-height:42px!important/);
 assert.match(qa,/v17345-equipment-refresh>button\{[^{}]*min-height:44px!important/);
 assert.match(qa,/shop-potion-purchase-row\{[^{}]*grid-template-columns:24px minmax\(56px,1fr\) 54px!important;[^{}]*gap:3px!important/);
-assert.match(qa,/shop-potion-quantity\{[^{}]*width:24px!important;[^{}]*max-width:24px!important;[^{}]*min-height:38px!important;[^{}]*font-size:12px!important/);
+assert.match(qa,/shop-potion-quantity\{[^{}]*width:24px!important;[^{}]*max-width:24px!important;[^{}]*min-height:38px!important;[^{}]*font-size:13px!important/);
 assert.match(qa,/shop-potion-purchase-row \.shop-potion-buy\{[^{}]*min-height:42px!important/);
 assert.match(qa,/v141-synthesis-modal \.v141-synthesis-tabs button\{[^{}]*min-height:44px!important/);
 assert.match(synthesis,/\["reforge","裝備冶煉"\]/);
