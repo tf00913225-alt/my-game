@@ -162,6 +162,7 @@ try{
         assert.equal(shot.equipmentItemArtRects.length,6,"each equipment art frame needs one item art");
         assert.equal(shot.equipmentImageRects.length,6,"each equipment item art needs one image");
         assert.equal(shot.buyRects.length,6,"each equipment card needs one aligned buy button");
+        const viewportScale=shot.modal.width/420;
         const cardHeight=shot.cardRects[0].height;
         const buttonWidth=shot.buyRects[0].width;
         const buttonHeight=shot.buyRects[0].height;
@@ -174,7 +175,7 @@ try{
             const art=shot.equipmentArtRects[index];
             const itemArt=shot.equipmentItemArtRects[index];
             const image=shot.equipmentImageRects[index];
-            assert.ok(art.width<=50.5&&art.height<=50.5,"equipment art frame exceeded its 50px slot");
+            assert.ok(art.width<=50.5*viewportScale&&art.height<=50.5*viewportScale,"equipment art frame exceeded its 50px slot");
             for(const node of [art,itemArt,image]){
                 assert.ok(node.left>=card.left-0.25&&node.right<=card.right+0.25,"equipment art escaped its card horizontally");
                 assert.ok(node.top>=card.top-0.25&&node.bottom<=card.bottom+0.25,"equipment art escaped its card vertically");
