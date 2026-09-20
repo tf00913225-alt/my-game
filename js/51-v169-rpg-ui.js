@@ -294,7 +294,7 @@
             ?"免費刷新（剩"+freeRemaining+"次）"
             :state.refreshCount>=SHOP_MAX_REFRESHES?"今日刷新已達上限":"金幣刷新・價格待設定";
         return '<div class="v17345-equipment-shop">'+
-            '<div class="v17345-equipment-wallet"><span>裝備商店</span><b>金幣 '+goldText+'</b></div>'+
+            '<div class="v17345-equipment-wallet"><span>目前金幣</span><b>'+goldText+'</b></div>'+
             '<div class="v17345-equipment-grid">'+offers.map(item=>
                 '<article class="v17345-equipment-card"><div class="v17345-equipment-icon" aria-hidden="true">'+shopEscape(item.glyph)+'</div>'+
                 '<b>'+shopEscape(item.name)+'</b><span>'+shopEscape(item.slot)+'・普通裝備</span>'+
