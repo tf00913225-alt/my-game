@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-20-v17367-main-release",
+  "baseBranch": "dev",
+  "baseCommit": "803d430e1d0c7d8462ce0fbac1cef9aab8059c42",
+  "officialVersion": "173.67",
+  "officialVersionBumpAllowed": true,
+  "overallStatus": "IMPLEMENTED",
+  "requirements": [
+    {
+      "id": "REL-01",
+      "status": "VERIFIED",
+      "requirement": "確認 current main 仍為 V173.66 正式發布 SHA，且本次候選來源固定為最新 dev；禁止 force push 或 main 獨立修復。",
+      "evidence": [
+        "main@82332eb2e01c29876f9c03aa8b0696ff12ae8fd3",
+        "dev@803d430e1d0c7d8462ce0fbac1cef9aab8059c42",
+        "protected main PR promotion only"
+      ]
+    },
+    {
+      "id": "REL-02",
+      "status": "IMPLEMENTED",
+      "requirement": "依 V173.66 main 到最新 dev 的玩家可感知差異建立 V173.67 Game/Cache Version、玩家公告、CHANGELOG 與 deterministic build。",
+      "evidence": [
+        "release/release.json",
+        "release/release-update.json",
+        "CHANGELOG.md",
+        "js/20-anonymous-20.js",
+        "package.json",
+        "asset-manifest.json",
+        "build/asset-manifest.json",
+        "index.html"
+      ]
+    },
+    {
+      "id": "REL-03",
+      "status": "TODO",
+      "requirement": "V173.67 發布候選 PR 回 dev 的 Repository checks、build:check、手機 browser QA 與 Release Gate 全綠。",
+      "evidence": []
+    },
+    {
+      "id": "REL-04",
+      "status": "TODO",
+      "requirement": "發布候選合併 dev 後，最新 dev HEAD CI 與 DEV exact-SHA deployment 成功並核對 V173.67。",
+      "evidence": []
+    },
+    {
+      "id": "REL-05",
+      "status": "TODO",
+      "requirement": "最新 dev → protected main PR 全綠後合併，並驗證 production main SHA 與 V173.67。",
+      "evidence": []
+    }
+  ],
+  "automatedVerification": "Release preparation created; awaiting V173.67 candidate PR CI.",
+  "visualVerification": "Underlying feature/fix PRs #355, #356 and #357 already passed their required Repository checks; V173.67 final candidate browser QA remains pending.",
+  "verifiedSourceCommit": null,
+  "mergedDevCommit": null,
+  "mergedMainCommit": null,
+  "candidateCiRun": null,
+  "devPushCiRun": null,
+  "devDeployJob": null
+}
