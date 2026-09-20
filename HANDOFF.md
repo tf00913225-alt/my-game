@@ -1,4 +1,4 @@
-## 2026-09-20 — 背包／商店金幣／主城金幣／離線廣告／客服／登入六項修復（IMPLEMENTED／QA PENDING）
+## 2026-09-20 — 背包／商店金幣／主城金幣／離線廣告／客服／登入六項修復（6/6 VERIFIED／V173.69 發布中）
 
 - Base：最新 dev@5b7d1052579e4bbce13291c63b9d7cc28fbb0964；工作分支：fix/backpack-shop-homegold-offline-auth-20260920-v2；main 未修改。舊分支因施工途中 dev 前進且同時修改商店 CSS，已保留但不再作整合候選；本分支從新 dev 重新套用，避免覆蓋最新數量欄字級修正。
 - 50% 藥水：正式背包篩選 owner js/00-main.js::getFilteredInventoryItems() 排除 hpPotion50/spPotion50；舊 definition 暫留只為安全解析既有存檔，不做破壞性存檔遷移。Adventure V1 寶箱／商人停止再產出 50% 藥水，改用正式 30% hpPotion30/spPotion30。
@@ -7,7 +7,7 @@
 - 離線經驗：Compact UI 曾呼叫不存在的 watchOfflineExpAd()，所以按鈕無反應；已改回核心既有 claimOfflineExpWithAd() → showRewardedAd() → claimOfflineExp(true)，不建立第二套廣告流程。
 - 客服信箱：Critical Boot 唯一 owner js/startup/support-contact.js 與 privacy.html 統一為 foursymbols.support@gmail.com；Firebase/Cloud Save 現行文件與 responsive/support 測試同步。
 - Facebook：只從 js/firebase/firebase-auth-ui.js 移除 Web 登入按鈕、import/bind；firebase-auth.js 的 provider/core、既有 Facebook 身分相容與 Android native handoff 均保留，符合「暫時不開放」而非永久刪除帳號能力。
-- Requirement Batch：release/requirement-batches/2026-09-20-backpack-shop-homegold-offline-auth.json；目前 6/6 IMPLEMENTED，需完成 deterministic build、targeted tests、responsive/mobile browser QA 與 Repository checks 才能升為 VERIFIED。
+- Requirement Batch：release/requirement-batches/2026-09-20-backpack-shop-homegold-offline-auth.json；6/6 VERIFIED。dev@29544c8035136462d52475be56bbe770beb8d896 的 CI run 35491059103 與 DEV exact-SHA deployment 已 SUCCESS，Session Authority run 35491058808 SUCCESS；專案負責人已明確指示推到 main。正式發布版本為 V173.69，需完成 release branch → dev → protected dev→main PR、main CI 與 production SHA 驗證後才可結案。
 
 ## 2026-09-20 — Battle Statistics／正式秘寶配裝／Boss 戰況抽屜／元素塔自動續戰（VERIFIED／main 未修改）
 
