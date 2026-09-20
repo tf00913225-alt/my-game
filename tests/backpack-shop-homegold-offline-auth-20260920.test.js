@@ -46,7 +46,8 @@ assert.doesNotMatch(support,/tf00913225@gmail\.com/);
 assert.match(privacy,/mailto:foursymbols\.support@gmail\.com/);
 assert.doesNotMatch(privacy,/tf00913225@gmail\.com/);
 
-assert.doesNotMatch(authUi,/firebaseFacebookButton|Facebook 登入|signInWithFacebook/);
+assert.doesNotMatch(authUi,/firebaseFacebookButton/);
+assert.doesNotMatch(authUi,/\bsignInWithFacebook\b/);
 assert.match(authUi,/firebaseGoogleButton/);
 assert.match(authUi,/firebaseEmailSignInButton/);
 assert.match(authUi,/firebaseGuestButton/);

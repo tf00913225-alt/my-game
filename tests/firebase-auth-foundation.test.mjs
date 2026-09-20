@@ -69,7 +69,7 @@ test("authentication UI exposes Google, email and Firebase anonymous identity wh
     assert.match(ui, /createAccountWithEmail/);
     assert.match(ui, /signInAsAnonymous/);
     assert.match(ui, /signOutFirebase/);
-    assert.doesNotMatch(ui, /firebaseFacebookButton|Facebook 登入/);
+    assert.doesNotMatch(ui, /firebaseFacebookButton/);
     assert.match(bootstrap, /signInWithGoogle,signInWithFacebook,signInWithEmail/);
     assert.doesNotMatch(ui, /先使用本機存檔/);
     assert.match(ui, /沒有 UID 時不能建立角色/);

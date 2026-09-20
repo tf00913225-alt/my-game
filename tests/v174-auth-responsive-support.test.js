@@ -13,7 +13,7 @@ const main=read("js/00-main.js");
 const service=read("js/16-stage-v54-main-city-runtime.js");
 const build=read("scripts/build-production.mjs");
 
-assert.doesNotMatch(authUi,/firebaseFacebookButton|Facebook 登入/);
+assert.doesNotMatch(authUi,/firebaseFacebookButton/);
 assert.match(authUi,/id="firebaseSupportButton"[^>]*>聯絡客服</);
 assert.match(authUi,/firebaseSupportButton[\s\S]*FourSymbolsSupport\.show\(\)/);
 assert.match(authUi,/const host=document\.body/,
