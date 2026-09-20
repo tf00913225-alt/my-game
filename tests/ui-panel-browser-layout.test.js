@@ -71,7 +71,7 @@ html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#000;}
   function equipmentCard(index){
     const reforge=index%2===0?'<span class="v17346-reforge-mini">[可冶煉]</span>':'';
     return '<article class="v17345-equipment-card v17346-shop-card is-affordable">'+
-      '<div class="v17345-equipment-icon v17346-gear-art">裝</div>'+
+      '<div class="v17345-equipment-icon v17346-gear-art"><span class="v169-item-art v169-equipment-art v17346-rarity-purple"><img alt="" src="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%22900%22%20height=%22500%22%3E%3Crect%20width=%22900%22%20height=%22500%22%20fill=%22red%22/%3E%3C/svg%3E"></span></div>'+
       '<b class="v17346-shop-name">測試裝備'+index+'</b>'+
       '<span class="v17346-shop-slot">衣服</span>'+
       '<span class="v17346-stat">敏捷 +9</span>'+reforge+
@@ -98,6 +98,9 @@ html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#000;}
     }
     void box.offsetHeight;
     const equipmentCards=Array.from(content.querySelectorAll('.v17346-shop-card'));
+    const equipmentArts=Array.from(content.querySelectorAll('.v17346-gear-art'));
+    const equipmentItemArts=Array.from(content.querySelectorAll('.v17346-gear-art > .v169-item-art'));
+    const equipmentImages=Array.from(content.querySelectorAll('.v17346-gear-art > .v169-item-art > img'));
     const buyButtons=Array.from(content.querySelectorAll('.v17346-shop-buy'));
     const potionCards=Array.from(content.querySelectorAll('.shop-potion-card'));
     const potionHeads=Array.from(content.querySelectorAll('.shop-potion-card-head'));
@@ -112,7 +115,7 @@ html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#000;}
     snapshots.push({
       page:page,box:rect(box),header:rect(header),close:rect(close),tabs:rect(tabs),body:rect(body),modal:rect(modal),content:rect(content),
       scrollHeight:body.scrollHeight,clientHeight:body.clientHeight,contentScrollHeight:content.scrollHeight,contentClientHeight:content.clientHeight,
-      cardRects:equipmentCards.map(rect),buyRects:buyButtons.map(rect),
+      cardRects:equipmentCards.map(rect),equipmentArtRects:equipmentArts.map(rect),equipmentItemArtRects:equipmentItemArts.map(rect),equipmentImageRects:equipmentImages.map(rect),buyRects:buyButtons.map(rect),
       potionCardRects:potionCards.map(rect),potionHeadRects:potionHeads.map(rect),potionSummaryRects:potionSummaries.map(rect),
       potionIconRects:potionIcons.map(rect),potionNameRects:potionNames.map(rect),potionEffectRects:potionEffects.map(rect),
       potionPurchaseRects:potionPurchases.map(rect),potionQuantityRects:potionQuantities.map(rect),
@@ -155,6 +158,9 @@ try{
 
     snapshots.filter(shot=>shot.page==='equipment').forEach(shot=>{
         assert.equal(shot.cardRects.length,6,"equipment shop must show six cards on one screen");
+        assert.equal(shot.equipmentArtRects.length,6,"each equipment card needs one bounded art frame");
+        assert.equal(shot.equipmentItemArtRects.length,6,"each equipment art frame needs one item art");
+        assert.equal(shot.equipmentImageRects.length,6,"each equipment item art needs one image");
         assert.equal(shot.buyRects.length,6,"each equipment card needs one aligned buy button");
         const cardHeight=shot.cardRects[0].height;
         const buttonWidth=shot.buyRects[0].width;
@@ -163,6 +169,20 @@ try{
         shot.buyRects.forEach(button=>{
             assert.ok(Math.abs(button.width-buttonWidth)<0.25,"equipment buy button widths are inconsistent");
             assert.ok(Math.abs(button.height-buttonHeight)<0.25,"equipment buy button heights are inconsistent");
+        });
+        shot.cardRects.forEach((card,index)=>{
+            const art=shot.equipmentArtRects[index];
+            const itemArt=shot.equipmentItemArtRects[index];
+            const image=shot.equipmentImageRects[index];
+            assert.ok(art.width<=50.5&&art.height<=50.5,"equipment art frame exceeded its 50px slot");
+            for(const node of [art,itemArt,image]){
+                assert.ok(node.left>=card.left-0.25&&node.right<=card.right+0.25,"equipment art escaped its card horizontally");
+                assert.ok(node.top>=card.top-0.25&&node.bottom<=card.bottom+0.25,"equipment art escaped its card vertically");
+            }
+            assert.ok(itemArt.left>=art.left-0.25&&itemArt.right<=art.right+0.25,"item art escaped its frame horizontally");
+            assert.ok(itemArt.top>=art.top-0.25&&itemArt.bottom<=art.bottom+0.25,"item art escaped its frame vertically");
+            assert.ok(image.left>=itemArt.left-0.25&&image.right<=itemArt.right+0.25,"equipment image escaped its item art horizontally");
+            assert.ok(image.top>=itemArt.top-0.25&&image.bottom<=itemArt.bottom+0.25,"equipment image escaped its item art vertically");
         });
     });
 
