@@ -50,6 +50,8 @@ assert.match(index,/team-relic-home-entry[^>]*data-feature="relic"/);
 assert.match(index,/team-element-box-home-entry[^>]*data-feature="gameplay-core"/);
 assert.match(baseCss,/grid-template-rows:repeat\(4,82px\)/);
 assert.match(v131,/V17342_GLOBAL_EXP_REWARD_MULTIPLIER=3/);
+assert.match(v131,/function getFormalMonsterBaseExp/);
+assert.doesNotMatch(v131,/V131_EXP_MULTIPLIER/);
 assert.match(v131,/V17342_GLOBAL_GOLD_REWARD_MULTIPLIER=5/);
 assert.match(v131,/getBeginnerForestMonsterExpUnit/);
 assert.match(v131,/beginnerMonsterUnits/);

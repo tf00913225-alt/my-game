@@ -119,8 +119,11 @@ test("formal growth curve is owned by runtime zone EXP × target battle anchors 
     assert.equal(vm.runInContext("v173GetNaturalChargeLevelsPerDay(99)",context),0.32);
 });
 
-test("monster EXP keeps ×3.5, rank multipliers, newcomer-only ×3, and element-box 70%",()=>{
-    assert.match(v131Source,/const V131_EXP_MULTIPLIER=3\.5/);
+test("monster EXP is formal at source, keeps rank multipliers, newcomer-only ×3, and element-box 70%",()=>{
+    assert.match(v131Source,/function getFormalMonsterBaseExp/);
+    assert.match(v131Source,/\*35/);
+    assert.doesNotMatch(v131Source,/V131_EXP_MULTIPLIER/);
+    assert.doesNotMatch(v133Source,/TRAINING_EXP_MULTIPLIER/);
     assert.match(v131Source,/const ELEMENT_BOX_EXP_RATIO=0\.70/);
     assert.match(v131Source,/rank==="boss"\)\{ return 3; \}/);
     assert.match(v131Source,/rank==="elite"\)\{ return 1\.5; \}/);

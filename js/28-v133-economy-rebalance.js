@@ -6,7 +6,6 @@
     "use strict";
 
     const MAX_CHARACTER_LEVEL=100;
-    const TRAINING_EXP_MULTIPLIER=3.5;
     const DAY_MS=24*60*60*1000;
     const CHARGE_MAX_MS=72*60*60*1000;
     const GROWTH_STATE_KEY=window.FourSymbolsAccountSave.accountKey("exp-pool-growth-state");
@@ -104,9 +103,12 @@
         if(!roster){ return profile.fallbackAverageExp; }
         const average=roster.reduce((sum,monster)=>{
             if(!monster){ return sum; }
-            return sum+Math.max(1,Number(monster.level)||1)*10*getCurveMonsterRankMultiplier(monster);
+            const formalBase=typeof window.v173GetFormalMonsterBaseExp==="function"
+                ?window.v173GetFormalMonsterBaseExp(monster)
+                :Math.max(1,Math.floor((Number(monster.level)||1)*35));
+            return sum+formalBase*getCurveMonsterRankMultiplier(monster);
         },0)/roster.length;
-        return Math.max(1,Math.round(average*profile.averageGroupSize*TRAINING_EXP_MULTIPLIER));
+        return Math.max(1,Math.round(average*profile.averageGroupSize));
     }
     function getTargetBattlesForLevel(level){
         const safe=Math.min(99,Math.max(1,Math.floor(Number(level)||1)));
