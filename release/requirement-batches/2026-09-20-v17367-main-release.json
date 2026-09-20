@@ -47,12 +47,14 @@
       "status": "VERIFIED",
       "requirement": "發布候選合併 dev 後，最新 dev HEAD CI 與 DEV exact-SHA deployment 成功並核對 V173.67。",
       "evidence": [
-        "latest dev merge bd6f51b094ceda6cd841f271a72051edeee451e9",
+        "latest expanded dev merge bd6f51b094ceda6cd841f271a72051edeee451e9",
         "dev push CI run 35481574504 Repository checks SUCCESS",
         "DEV deployment job 106000328588 SUCCESS",
         "Confirm this commit is still dev HEAD SUCCESS",
-        "Verify deployed commit, game version V173.67 and cache version 173.67 SUCCESS",
-        "deployed battle layout and VFX live QA SUCCESS"
+        "Verify deployed commit, game version and cache version SUCCESS",
+        "Cloudflare DEV exact-SHA / Game Version V173.67 / Cache Version 173.67 SUCCESS",
+        "deployed battle layout and VFX live QA SUCCESS",
+        "main-target PR #360 run 35481577721 Repository checks SUCCESS"
       ]
     },
     {
@@ -62,8 +64,8 @@
       "evidence": []
     }
   ],
-  "automatedVerification": "REL-01..04 VERIFIED for the expanded latest-dev V173.67 scope. PR #365 candidate CI runs 35481398149 / 35481480999 SUCCESS; latest dev bd6f51b094ceda6cd841f271a72051edeee451e9 push CI 35481574504 and DEV deployment job 106000328588 SUCCESS. REL-05 remains pending protected main promotion.",
-  "visualVerification": "Latest combined V173.67 candidate mobile QA passed; exact latest-dev Cloudflare deployment and deployed battle layout/VFX live QA are SUCCESS.",
+  "automatedVerification": "REL-01..04 VERIFIED for the expanded latest-dev V173.67 scope. PR #365 candidate CI run 35481398149 SUCCESS; dev push CI run 35481574504 SUCCESS; DEV deployment job 106000328588 exact-SHA / V173.67 / cache 173.67 / live battle QA SUCCESS; PR #360 main-target run 35481577721 SUCCESS. REL-05 remains pending protected main promotion.",
+  "visualVerification": "Latest combined V173.67 candidate and deployed DEV passed Release Update, Fixed Slot 9x16, exact-candidate battle, Adventure and deployed battle/VFX live QA.",
   "verifiedSourceCommit": "60cceba3fa72d6a738f2ada7b27963f770faabba",
   "mergedDevCommit": "bd6f51b094ceda6cd841f271a72051edeee451e9",
   "mergedMainCommit": null,
