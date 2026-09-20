@@ -1078,7 +1078,7 @@
 }
 #game-stage #homeFeatureModal.v131-shop-open .shop-potion-purchase-row{
     display:grid !important;
-    grid-template-columns:38px minmax(48px,1fr) 54px !important;
+    grid-template-columns:34px minmax(48px,1fr) 54px !important;
     grid-template-rows:36px !important;
     align-items:center !important;
     gap:4px !important;
@@ -1095,8 +1095,8 @@
 #game-stage #homeFeatureModal.v131-shop-open .shop-potion-quantity{
     grid-column:1 !important;
     grid-row:1 !important;
-    width:38px !important;
-    min-width:38px !important;
+    width:34px !important;
+    min-width:34px !important;
     height:34px !important;
     min-height:34px !important;
     margin:0 !important;
