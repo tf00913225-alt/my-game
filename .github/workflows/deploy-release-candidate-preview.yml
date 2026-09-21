@@ -1,0 +1,128 @@
+name: Deploy release candidate preview
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-candidate-preview-\${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Release candidate DEV preview
+    if: \${{ github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'release/v173.70-main-sync-20260921' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_API_TOKEN_RAW: \${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID_RAW: \${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      PROJECT_NAME: four-symbols-dev
+      EXPECTED_BRANCH: release/v173.70-main-sync-20260921
+      EXPECTED_COMMIT_SHA: \${{ github.event.pull_request.head.sha }}
+
+    steps:
+      - name: Checkout exact candidate SHA
+        uses: actions/checkout@v4
+        with:
+          ref: \${{ github.event.pull_request.head.sha }}
+          fetch-depth: 1
+
+      - name: Confirm exact candidate checkout
+        shell: bash
+        run: |
+          test "$(git rev-parse HEAD)" = "$EXPECTED_COMMIT_SHA"
+          test "$EXPECTED_COMMIT_SHA" = "$(git ls-remote origin "refs/heads/$EXPECTED_BRANCH" | cut -f1)"
+
+      - name: Use current Node.js LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Re-run release gate before packaging
+        env:
+          CI_BASE_SHA: ""
+        run: node .github/scripts/release-gate.mjs ci
+
+      - name: Normalize and verify Cloudflare credentials
+        shell: bash
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN_RAW"
+          test -n "$CLOUDFLARE_ACCOUNT_ID_RAW"
+          TOKEN="$(printf '%s' "$CLOUDFLARE_API_TOKEN_RAW" | tr -d '\r\n' | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//; s/^[Bb]earer[[:space:]]+//; s/^"//; s/"$//')"
+          ACCOUNT_ID="$(printf '%s' "$CLOUDFLARE_ACCOUNT_ID_RAW" | tr -d '\r\n[:space:]' | sed -E 's/^"//; s/"$//')"
+          test -n "$TOKEN"
+          test -n "$ACCOUNT_ID"
+          echo "::add-mask::$TOKEN"
+          echo "::add-mask::$ACCOUNT_ID"
+          printf 'CLOUDFLARE_API_TOKEN=%s\n' "$TOKEN" >> "$GITHUB_ENV"
+          printf 'CLOUDFLARE_ACCOUNT_ID=%s\n' "$ACCOUNT_ID" >> "$GITHUB_ENV"
+
+      - name: Prepare immutable candidate artifact
+        shell: bash
+        run: |
+          mkdir -p _deploy
+          rsync -a \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='tests/' \
+            --exclude='node_modules/' \
+            --exclude='functions/' \
+            --exclude='.firebaserc' \
+            --exclude='firebase.json' \
+            --exclude='firestore.rules' \
+            --exclude='_deploy/' \
+            --exclude='release-manifest.final.json' \
+            ./ _deploy/
+          test -f _deploy/index.html
+          DEPLOY_DIR=_deploy \
+          EXPECTED_COMMIT_SHA="$EXPECTED_COMMIT_SHA" \
+          EXPECTED_BRANCH="$EXPECTED_BRANCH" \
+          node .github/scripts/release-gate.mjs prepare-artifact
+
+      - name: Deploy exact candidate to Cloudflare Pages preview
+        id: deploy_preview
+        shell: bash
+        working-directory: _deploy
+        run: |
+          npx --yes wrangler@4 pages deploy . \
+            --project-name="$PROJECT_NAME" \
+            --branch="$EXPECTED_BRANCH" \
+            --commit-hash="$EXPECTED_COMMIT_SHA" \
+            --commit-message="\${EXPECTED_COMMIT_SHA::7} exact candidate preview" \
+            --commit-dirty=true 2>&1 | tee /tmp/release-candidate-deploy.log
+          PREVIEW_URL="$(grep -Eo 'https://[^[:space:]]+\.pages\.dev' /tmp/release-candidate-deploy.log | tail -1 | tr -d '\r')"
+          test -n "$PREVIEW_URL"
+          printf 'DEPLOY_BASE_URL=%s\n' "$PREVIEW_URL" >> "$GITHUB_ENV"
+          printf 'preview_url=%s\n' "$PREVIEW_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Verify exact candidate deployment
+        run: node .github/scripts/release-gate.mjs verify-deployed
+
+      - name: Run deployed battle, VFX and Abyss live QA
+        run: node .github/scripts/battle-layer-audio-live-qa.mjs
+
+      - name: Upload candidate live QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-candidate-live-qa-\${{ github.event.pull_request.head.sha }}
+          path: |
+            artifacts/browser-qa/battle-layer-audio-live-qa.json
+            artifacts/browser-qa/battle-layout-wind-flame-mobile.png
+            artifacts/browser-qa/battle-layer-element-box-mobile.png
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Candidate preview summary
+        if: success()
+        run: |
+          echo "Candidate SHA: $EXPECTED_COMMIT_SHA" >> "$GITHUB_STEP_SUMMARY"
+          echo "Candidate branch: $EXPECTED_BRANCH" >> "$GITHUB_STEP_SUMMARY"
+          echo "Deployment SHA verified: YES" >> "$GITHUB_STEP_SUMMARY"
+          echo "Preview URL: $DEPLOY_BASE_URL" >> "$GITHUB_STEP_SUMMARY"
