@@ -43,27 +43,30 @@ runtime 不得把怪物中文名稱直接轉成檔名，也不得靠「王／皇
 
 ## 3. 圖片尺寸與格式
 
-### 3.1 一般怪／精英／BOSS 援軍／日常副本普通與精英／天兵天將
+### 3.1 一般怪／精英／BOSS 援軍／日常副本全類型／天兵天將
 
-- 母檔：**1024 × 1536 px**
-- 比例：**2:3**
-- 格式：**PNG**
-- 背景：**透明 Alpha**
-- 本體可視高度：**78%～85%**
+- Library 母檔：**1024 × 1536 px 透明 PNG**。
+- 正式 runtime 資產：**1024 × 1536 px 無損 WebP**。
+- 比例：**2:3**。
+- 本體可視高度：**78%～85%**。
 
-### 3.2 個人 BOSS／世界 BOSS／四象塔 BOSS／深淵帝王／日常副本 BOSS
+日常副本的 `regular`、`elite`、`boss` 三種階級全部使用此尺寸；日常副本
+Boss（修行教頭、礦脈統領、金庫總管）不得套用大型 Boss 尺寸，也不得為了
+符合舊規則放大、重製或 resize。
 
-- 母檔：**1536 × 2048 px**
-- 比例：**3:4**
-- 格式：**PNG**
-- 背景：**透明 Alpha**
+### 3.2 個人 BOSS／世界 BOSS／四象塔 BOSS／深淵帝王
+
+- Library 母檔：**1536 × 2048 px 透明 PNG**。
+- 正式 runtime 資產：**1536 × 2048 px 無損 WebP**。
+- 比例：**3:4**。
 - 本體可視高度：**85%～92%**
 
 ### 3.3 既有已核准素材
 
 既有深淵五帝透明 WebP 不因本規格強制重製。`assets/dungeons/abyss/*.webp` 可繼續作為 grandfathered approved assets。
 
-新生成的母檔一律先保留透明 PNG；正式 build 若為效能產生 WebP derivative 可以接受，但不得只保留壓縮 derivative 而丟失母檔。
+新生成的母檔一律先保留透明 PNG；正式 runtime 必須使用完成尺寸、Alpha 與無損驗證的 WebP，
+但不得只保留 runtime derivative 而丟失母檔。
 
 ## 4. 構圖統一規範
 
@@ -118,12 +121,11 @@ assets/dungeons/abyss/
 ### 5.3 路徑例
 
 ```text
-assets/monsters/wild/zone-01/fire-01.png
-assets/monsters/daily/exp/regular.png
-assets/monsters/boss/personal/personal-20.png
-assets/monsters/boss/world/world-100.png
-assets/monsters/boss-support/water-01.png
-assets/monsters/tower/boss/fire-envoy.png
+assets/monsters/wild/zone-01/fire-01.webp
+assets/monsters/daily/exp/regular.webp
+assets/monsters/boss/personal/personal-20.webp
+assets/monsters/boss/world/world-100.webp
+assets/monsters/boss-support/water-01.webp
 assets/monsters/soldiers/heavenly-soldier-earth.png
 ```
 
@@ -144,7 +146,9 @@ assets/monsters/soldiers/heavenly-soldier-earth.png
 - 材料：礦脈守衛／礦脈精英／礦脈統領
 - 金幣：金庫守衛／金庫精英／金庫總管
 
-同名稱在不同波次／不同元素位置仍共用同一張立繪。教頭／統領／總管使用 BOSS 尺寸級別。
+同名稱在不同波次／不同元素位置仍共用同一張立繪。三個日常副本 Boss
+（教頭／統領／總管）與一般怪、精英一樣使用 **1024 × 1536** 標準尺寸，
+正式 runtime 使用無損 WebP。
 
 ### 6.3 個人／世界 BOSS
 
@@ -261,8 +265,9 @@ node scripts/audit-monster-portraits.mjs
 - runtime 怪物名稱是否全部出現在 registry。
 - registry 是否有重複 `portraitKey`。
 - registry 是否有重複目標 path。
-- `status=existing` 的素材是否真的存在。
+- `status=existing` 的素材是否真的存在，且新正式 runtime 立繪為 WebP。
 - `status=planned` 的缺圖數量。
+- `status=retired` 的永久停用 target 不列入待辦、批次 committed/pending 或素材解碼稽核；保留 registry row 僅供歷史識別與 runtime 名稱對帳，除非使用者明確重新授權，不得重新排程、生成或導入。
 - 四象天兵是否恰好是 fire / water / wind / earth 四張。
 - 深淵領域與最終戰規則是否仍符合本文件。
 
@@ -279,7 +284,7 @@ node scripts/audit-monster-portraits.mjs --strict
 每一批素材接線後最小必要驗證：
 
 1. 靜態檔案存在且可解碼。
-2. PNG 有 alpha channel。
+2. WebP 可正常解碼並有 alpha channel。
 3. 寬高符合該 `sizeClass`。
 4. 首次進戰鬥就能看到，不依賴第二次重繪。
 5. 戰鬥重繪／換波／副本換層後仍正確。

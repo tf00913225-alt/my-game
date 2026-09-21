@@ -149,8 +149,10 @@ generatedExisting.forEach(target=>{
     const expected=registry.dimensions&&registry.dimensions[target.sizeClass];
     const absolute=path.join(root,target.path);
     if(!fs.existsSync(absolute)){ return; }
-    if(path.extname(target.path).toLowerCase()!==".png"){
-        invalidGeneratedAssets.push({portraitKey:target.portraitKey,path:target.path,reason:"new portrait is not PNG"});
+    const extension=path.extname(target.path).toLowerCase();
+    const legacyApprovedPng=target.path.startsWith("assets/monsters/soldiers/")&&extension===".png";
+    if(extension!==".webp"&&!legacyApprovedPng){
+        invalidGeneratedAssets.push({portraitKey:target.portraitKey,path:target.path,reason:"runtime portrait is not WebP"});
         return;
     }
     if(!expected){
@@ -158,8 +160,11 @@ generatedExisting.forEach(target=>{
         return;
     }
     try{
-        const meta=execFileSync("identify",["-format","%wx%h|%[channels]|%[opaque]",absolute],{encoding:"utf8"}).trim();
-        const [geometry,channels,opaque]=meta.split("|");
+        const meta=execFileSync("identify",["-format","%m|%wx%h|%[channels]|%[opaque]",absolute],{encoding:"utf8"}).trim();
+        const [format,geometry,channels,opaque]=meta.split("|");
+        if(extension===".webp"&&String(format).toUpperCase()!=="WEBP"){
+            invalidGeneratedAssets.push({portraitKey:target.portraitKey,path:target.path,reason:`decoder format ${format} != WEBP`});
+        }
         const expectedGeometry=expected.width+"x"+expected.height;
         if(geometry!==expectedGeometry){
             invalidGeneratedAssets.push({portraitKey:target.portraitKey,path:target.path,reason:`geometry ${geometry} != ${expectedGeometry}`});

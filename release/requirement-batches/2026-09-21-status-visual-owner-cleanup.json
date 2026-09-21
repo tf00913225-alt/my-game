@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "title": "Persistent status visual owner cleanup and low-motion modes",
+  "base": "dev@2da319ad7d90cc56f56967a787d0f4ef87e2df5c",
+  "branch": "fix/status-visual-owner-cleanup-20260921",
+  "mainModified": false,
+  "status": "VERIFIED",
+  "requirements": [
+    {
+      "id": "SVIS-01",
+      "status": "VERIFIED",
+      "requirement": "持續狀態視覺移除逐幀 Sprite Sheet loop；V143 單一 owner 只保留 pulse、static、iconPulse 三種低動態模式，技能施放 Cast VFX 不改。",
+      "evidence": [
+        "js/39-v143-skill-animation.js",
+        "css/40-v143-combat-dungeon-polish.css"
+      ]
+    },
+    {
+      "id": "SVIS-02",
+      "status": "VERIFIED",
+      "requirement": "移除已退休 V141 Card Effect renderer 與 base burn/freeze 卡片覆蓋動畫，避免同一狀態被兩套視覺 owner 重複處理。",
+      "evidence": [
+        "js/35-v141-ui-battle.js",
+        "js/00-main.js",
+        "css/00-main.css"
+      ]
+    },
+    {
+      "id": "SVIS-03",
+      "status": "VERIFIED",
+      "requirement": "Fixed Slot 幾何仍為狀態圖片定位唯一來源；護盾/結界/冰封/石化等固定圖片不呼吸，數值型減益改 iconPulse，重要持續增益使用單圖 opacity 呼吸。",
+      "evidence": [
+        "js/39-v143-skill-animation.js",
+        "css/40-v143-combat-dungeon-polish.css",
+        "css/fixed-slot-battlefield-rendering-v2.css"
+      ]
+    },
+    {
+      "id": "SVIS-04",
+      "status": "VERIFIED",
+      "requirement": "正式移除的舊狀態動畫 token 由 deprecated-code gate 禁止回歸；production bundles、targeted tests、Repository checks 與必要 battle browser QA 必須通過後才可 VERIFIED。",
+      "evidence": [
+        "release/deprecated-code.json"
+      ]
+    }
+  ],
+  "verification": {
+    "targeted": [
+      "tests/v153-fire-vfx.test.js",
+      "tests/v166-water-vfx.test.js",
+      "tests/v173.23-wind-vfx.test.js",
+      "tests/v173.39-earth-light-vfx.test.js",
+      "tests/battle-vfx-performance-status-sync-20260919.test.js",
+      "tests/fixed-slot-battlefield-rendering-v2.test.js",
+      "tests/v174-raster-only-combat-vfx-owner.test.js"
+    ],
+    "repositoryChecks": "GitHub Actions CI run 35593978289 Repository checks SUCCESS on candidate 06720bf172075e4723ad345a14283e4cedc7d4b7",
+    "result": "Syntax, battle/VFX regressions, relic/input regressions, deterministic production build, Release Update mobile QA, Fixed Slot 9:16 mobile QA, exact-candidate real battle mobile QA, Adventure mobile QA, static resources, loader integrity, deprecated-code Release Gate and git-diff all passed. No gameplay formulas, status durations, turn consumption, Boss AI or skill values were changed."
+  }
+}

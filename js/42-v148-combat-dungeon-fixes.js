@@ -817,6 +817,10 @@
         return names[type][rank||"regular"];
     }
 
+    function dailyMonsterPortraitKey(type,rank){
+        return "daily."+String(type)+"."+String(rank||"regular");
+    }
+
     function buildDailyWave(type,wave,level,context){
         const roster=[];
         for(let slot=0;slot<6;slot++){
@@ -825,6 +829,7 @@
             const monster=typeof window.v132BuildDungeonMonster==="function"
                 ?window.v132BuildDungeonMonster(dailyMonsterName(type,rank),level,element,rank||undefined)
                 :makeZoneMonster(dailyMonsterName(type,rank),level,element,rank||undefined);
+            monster.portraitKey=dailyMonsterPortraitKey(type,rank);
             monster.v132Dungeon=true;
             monster.v173DailyDungeonType=type;
             monster.v141DungeonStage=wave;

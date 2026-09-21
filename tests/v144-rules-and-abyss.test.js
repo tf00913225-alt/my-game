@@ -7,6 +7,7 @@ const vm=require("node:vm");
 const index=fs.readFileSync("index.html","utf8");
 const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const source=fs.readFileSync("js/40-v144-rules-and-abyss.js","utf8");
+const v143Source=fs.readFileSync("js/38-v143-system-fixes.js","utf8");
 const css=fs.readFileSync("css/41-v144-rules-and-abyss.css","utf8");
 
 let passed=0;
@@ -272,11 +273,37 @@ test("V144 leaves the final support cast to the shared Skill-ID dispatcher",()=>
     assert.doesNotMatch(source,/monster\.name===\"極帝天尊\"|monster\.name===\"北帝天尊\"|monster\.name===\"天帝天尊\"/);
 });
 
-test("daily dungeon locking runs after element rebalance and never touches Abyss",()=>{
+test("daily dungeon locking uses the existing post-render owner and never touches Abyss",()=>{
     const renderBlock=source.slice(source.indexOf("let configuredDungeonBattleToken"),source.indexOf("function abyssAllies"));
-    assert.match(renderBlock,/previousRenderBattleForSkills\.apply[\s\S]*configureEncounterSkills/);
+    assert.doesNotMatch(renderBlock,/renderBattle\s*=\s*function/);
+    assert.match(source,/function configureDungeonBattleSkillsAfterRender/);
+    assert.match(source,/window\.v144ConfigureDungeonBattleSkillsAfterRender=configureDungeonBattleSkillsAfterRender/);
+    assert.match(v143Source,/v144ConfigureDungeonBattleSkillsAfterRender/);
     assert.match(renderBlock,/v174TrueRealmFinal/);
     assert.match(source,/if\(!monster\|\|monster\.v141Abyss\)\{ return monster; \}/);
+});
+
+test("the existing V143 render owner invokes V144 dungeon locking once per battle",()=>{
+    let renderCalls=0;
+    const dungeonMonsters=[{name:"火怪",level:50,element:"fire",skillIds:[]}];
+    const context=baseContext({
+        renderBattle(){ renderCalls++; return "rendered"; },
+        requestAnimationFrame(){},
+        setTimeout(){ return 1; },
+        v132ActiveDungeonRun:true,
+        battleToken:"battle-a",
+        currentBattleMonsters:[0],
+        monsters:dungeonMonsters
+    });
+    vm.createContext(context);
+    vm.runInContext(v143Source,context);
+    vm.runInContext(source,context);
+    assert.equal(context.renderBattle(),"rendered");
+    assert.equal(renderCalls,1);
+    assert.match(dungeonMonsters[0].v144SkillEncounter,/^dungeon-render-/);
+    const encounter=dungeonMonsters[0].v144SkillEncounter;
+    context.renderBattle();
+    assert.equal(dungeonMonsters[0].v144SkillEncounter,encounter);
 });
 
 console.log("\nV144 rules/Abyss suite: "+passed+" tests passed.");
