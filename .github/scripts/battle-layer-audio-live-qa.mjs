@@ -359,9 +359,9 @@ try{
         const monsterArt=monsterCard?.querySelector('.v174-battle-art');
         const rect=node=>{const value=node?.getBoundingClientRect();return value?{top:value.top,bottom:value.bottom,height:value.height}:null;};
         const playerStatus=document.createElement('div');
-        playerStatus.className='v153-status-vfx v153-status-vfx-rage';
+        playerStatus.className='v143-status-visual v143-status-visual-rage v143-status-visual--pulse';
         const monsterStatus=document.createElement('div');
-        monsterStatus.className='v153-status-vfx v153-status-vfx-rage';
+        monsterStatus.className='v143-status-visual v143-status-visual-rage v143-status-visual--pulse';
         playerCard.appendChild(playerStatus);
         monsterCard.appendChild(monsterStatus);
         const result={

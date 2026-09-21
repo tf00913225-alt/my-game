@@ -172,6 +172,9 @@
             const result=previousRenderBattle.apply(this,arguments);
             decorateEnemyCards();
             if(typeof requestAnimationFrame==="function"){ requestAnimationFrame(decorateEnemyCards); }
+            if(typeof window.v144ConfigureDungeonBattleSkillsAfterRender==="function"){
+                window.v144ConfigureDungeonBattleSkillsAfterRender();
+            }
             return result;
         };
     }
