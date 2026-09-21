@@ -482,7 +482,7 @@
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit.attacker-lunge-down > .v174-battle-art{animation:v174BattleLungeDown .45s ease !important;}
 
 /* Status artwork is anchored to the Slot-sized Unit, not to source image bounds. */
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v153-status-vfx{
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v143-status-visual{
     left:50% !important;
     top:42% !important;
     transform:translate(-50%,-50%) !important;

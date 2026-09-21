@@ -604,7 +604,7 @@ test("tri-target Freeze and ally-all Heal use their fixed semantic footprints",(
     assert.equal(healSprites[0].style.height,"440px","Heal preserves its authored square frame over the complete ally formation");
 });
 
-test("Freeze and Frostbite loops mirror statusEffects only and never open an action gate",()=>{
+test("Freeze uses a fixed image and Frostbite uses an icon pulse without opening an action gate",()=>{
     const monsters=[
         {alive:true,hp:100,statusEffects:[{type:"frostbite",turnsLeft:2}],activeBuffs:[]},
         {alive:true,hp:100,statusEffects:[{type:"freeze",turnsLeft:2}],activeBuffs:[]},
@@ -620,62 +620,62 @@ test("Freeze and Frostbite loops mirror statusEffects only and never open an act
     const runtime=loadRuntime({monsters,party});
     const beforePlay=runtime.playCalls();
     const hpBefore=monsters.map(monster=>monster.hp);
-    runtime.context.v143SyncStatusSpriteEffects();
-    assert.equal(runtime.playCalls(),beforePlay,"status rendering must not open an action gate");
-    assert.deepEqual(monsters.map(monster=>monster.hp),hpBefore,"visual loops must not resolve DOT");
+    runtime.context.v143SyncStatusVisualEffects();
+    assert.equal(runtime.playCalls(),beforePlay,"persistent status rendering must not open an action gate");
+    assert.deepEqual(monsters.map(monster=>monster.hp),hpBefore,"status visuals must not resolve gameplay");
 
-    const frostbite=runtime.cards.battleMonster0.querySelector(".v153-status-vfx-frostbite");
-    const frozen=runtime.cards.battleMonster1.querySelector(".v153-status-vfx-freeze");
-    assert.ok(frostbite,"Frostbite loop");
-    assert.ok(frozen,"Frozen loop");
-    assert.equal(runtime.cards.battleMonster2.querySelector(".v153-status-vfx-frostbite"),null);
-    assert.equal(runtime.cards.battleMonster2.querySelector(".v153-status-vfx-freeze"),null);
-    assert.ok(runtime.cards.battlePlayerCard0.querySelector(".v153-status-vfx-freeze"));
-    assert.ok(runtime.cards.battlePlayerCard1.querySelector(".v153-status-vfx-frostbite"));
-    assert.ok(frostbite.style.backgroundImage.includes("frostbite-status-loop-vfx.png?v=166"));
+    const frostbite=runtime.cards.battleMonster0.querySelector(".v143-status-icon-frostbite");
+    const frozen=runtime.cards.battleMonster1.querySelector(".v143-status-visual-freeze");
+    assert.ok(frostbite,"Frostbite icon pulse");
+    assert.equal(frostbite.dataset.statusMode,"iconPulse");
+    assert.ok(frozen,"Frozen fixed image");
+    assert.equal(frozen.dataset.statusMode,"static");
     assert.ok(frozen.style.backgroundImage.includes("frozen-status-loop-vfx.png?v=166"));
-    assert.equal(frostbite.style["--v153-status-duration"],"1000ms");
-    assert.equal(frozen.style["--v153-status-duration"],"1100ms");
+    assert.equal(runtime.cards.battleMonster2.querySelector(".v143-status-icon-frostbite"),null);
+    assert.equal(runtime.cards.battleMonster2.querySelector(".v143-status-visual-freeze"),null);
+    assert.ok(runtime.cards.battlePlayerCard0.querySelector(".v143-status-visual-freeze"));
+    assert.ok(runtime.cards.battlePlayerCard1.querySelector(".v143-status-icon-frostbite"));
 
     monsters[0].statusEffects[0].turnsLeft=0;
     monsters[1].statusEffects=[];
-    runtime.context.v143SyncStatusSpriteEffects();
-    assert.equal(runtime.cards.battleMonster0.querySelector(".v153-status-vfx-frostbite"),null);
-    assert.equal(runtime.cards.battleMonster1.querySelector(".v153-status-vfx-freeze"),null);
-    assert.match(css,/v153-status-vfx-frostbite[\s\S]*?infinite/);
-    assert.match(css,/v153-status-vfx-freeze[\s\S]*?infinite/);
+    runtime.context.v143SyncStatusVisualEffects();
+    assert.equal(runtime.cards.battleMonster0.querySelector(".v143-status-icon-frostbite"),null);
+    assert.equal(runtime.cards.battleMonster1.querySelector(".v143-status-visual-freeze"),null);
+    assert.match(css,/\.v143-status-visual--static\{[\s\S]*?animation:none/);
+    assert.match(css,/@keyframes v143StatusIconBreath/);
+    assert.doesNotMatch(css,/v143StatusRasterFrames/);
 });
 
-test("existing Frozen and Frostbite loops do not restart during a duplicate cast",()=>{
+test("existing Freeze and Frostbite visuals do not restart during a duplicate cast",()=>{
     [
-        {id:"freeze",type:"freeze",duration:950},
-        {id:"frostCrush",type:"frostbite",duration:1150}
-    ].forEach(({id,type,duration})=>{
+        {id:"freeze",type:"freeze",selector:".v143-status-visual-freeze",duration:950},
+        {id:"frostCrush",type:"frostbite",selector:".v143-status-icon-frostbite",duration:1150}
+    ].forEach(({id,type,selector,duration})=>{
         const monsters=[
             {alive:true,hp:100,statusEffects:[{type,turnsLeft:2}],activeBuffs:[]},
             {alive:false,hp:0,statusEffects:[],activeBuffs:[]},
             {alive:false,hp:0,statusEffects:[],activeBuffs:[]}
         ];
         const runtime=loadRuntime({monsters,targetIndexes:[0]});
-        runtime.context.v143SyncStatusSpriteEffects();
-        const existing=runtime.cards.battleMonster0.querySelector(".v153-status-vfx-"+type);
+        runtime.context.v143SyncStatusVisualEffects();
+        const existing=runtime.cards.battleMonster0.querySelector(selector);
         assert.ok(existing);
         runtime.context.v142SkillAnimationDirector.play(
             castConfig(id,id==="freeze"?"tri":"single"),
             {side:"player",actorIndex:0,targetSide:"monster",targetId:0,targetIds:[0]}
         );
         assert.strictEqual(
-            runtime.cards.battleMonster0.querySelector(".v153-status-vfx-"+type),
+            runtime.cards.battleMonster0.querySelector(selector),
             existing,
-            id+" duplicate cast must preserve the existing loop"
+            id+" duplicate cast must preserve the existing visual"
         );
         const completion=runtime.scheduled.find(timer=>timer.delay>=duration-2&&timer.delay<=duration+2);
         assert.ok(completion,id+" full cast timer");
         completion.callback();
         assert.strictEqual(
-            runtime.cards.battleMonster0.querySelector(".v153-status-vfx-"+type),
+            runtime.cards.battleMonster0.querySelector(selector),
             existing,
-            id+" duplicate cast must not restart the loop after completion"
+            id+" duplicate cast must not recreate the persistent visual after completion"
         );
     });
 });
@@ -695,7 +695,7 @@ test("enemy Freeze uses its explicit successful player target",()=>{
     assert.equal(sprites[0].style.top,"418px");
     assert.equal(sprites[0].style.width,"398px");
     assert.equal(sprites[0].style.height,"398px","enemy Freeze preserves its authored square frame across the fixed tri-target footprint");
-    assert.equal(runtime.cards.battlePlayerCard1.querySelector(".v153-status-vfx-freeze"),null);
+    assert.equal(runtime.cards.battlePlayerCard1.querySelector(".v143-status-visual-freeze"),null);
 });
 
 test("legacy Ice Spin projectile is suppressed while its official sheet is active",()=>{
