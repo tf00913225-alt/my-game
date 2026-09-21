@@ -522,19 +522,18 @@
             const exact=document.getElementById(id);
             if(exact){ return exact; }
         }
-        return card&&typeof card.querySelector==="function"
+        const nested=card&&typeof card.querySelector==="function"
             ?card.querySelector(".monster-status-badges")
             :null;
+        return nested||card||null;
     }
 
     function statusIconNode(host,type){
         if(!host){ return null; }
-        if(typeof host.querySelector==="function"){
-            return host.querySelector('.v143-status-icon[data-status-type="'+type+'"]');
-        }
+        const className="v143-status-icon-"+type;
+        if(typeof host.querySelector==="function"){ return host.querySelector("."+className); }
         return Array.from(host.children||[]).find(node=>
-            String(node.className||"").split(/\s+/).includes("v143-status-icon")&&
-            node.dataset&&node.dataset.statusType===type
+            String(node.className||"").split(/\s+/).includes(className)
         )||null;
     }
 
