@@ -144,7 +144,9 @@ test("old procedural CSS choreography and word-circle CSS are gone",()=>{
     ].forEach(pattern=>assert.doesNotMatch(css143,pattern));
     assert.doesNotMatch(css149,/v149-word-circle-stage|v149BarrierCornerPulse/);
     assert.match(css143,/v143RasterCastFrames/);
-    assert.match(css143,/v143StatusRasterFrames/);
+    assert.doesNotMatch(css143,/v143StatusRasterFrames/);
+    assert.match(css143,/v143StatusImageBreath/);
+    assert.match(css143,/v143StatusIconBreath/);
 });
 
 test("all formal four-element active skills resolve to raster Sprite Sheets",()=>{

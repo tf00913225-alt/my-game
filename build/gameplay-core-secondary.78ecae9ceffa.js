@@ -551,26 +551,22 @@
     /* 日常副本的舊啟動器保留在 V132 私有閉包內；在真正 renderBattle
        完成元素平均化後再鎖定一次，涵蓋所有副本入口且不會每回合重抽。 */
     let configuredDungeonBattleToken=null;
-    if(typeof renderBattle==="function"){
-        const previousRenderBattleForSkills=renderBattle;
-        renderBattle=function(){
-            const roster=typeof monsters!=="undefined"?monsters:null;
-            const result=previousRenderBattleForSkills.apply(this,arguments);
-            const token=typeof battleToken!=="undefined"?battleToken:null;
-            if(
-                window.v132ActiveDungeonRun&&
-                token!==configuredDungeonBattleToken&&
-                !(Array.isArray(roster)&&roster.some(monster=>monster&&monster.v174TrueRealmFinal))
-            ){
-                configuredDungeonBattleToken=token;
-                const encounterId="dungeon-render-"+(++encounterSequence);
-                (typeof currentBattleMonsters!=="undefined"?currentBattleMonsters:[]).forEach(index=>
-                    configureEncounterSkills(monsters[index],encounterId)
-                );
-            }
-            return result;
-        };
+    function configureDungeonBattleSkillsAfterRender(){
+        const roster=typeof monsters!=="undefined"?monsters:null;
+        const token=typeof battleToken!=="undefined"?battleToken:null;
+        if(
+            window.v132ActiveDungeonRun&&
+            token!==configuredDungeonBattleToken&&
+            !(Array.isArray(roster)&&roster.some(monster=>monster&&monster.v174TrueRealmFinal))
+        ){
+            configuredDungeonBattleToken=token;
+            const encounterId="dungeon-render-"+(++encounterSequence);
+            (typeof currentBattleMonsters!=="undefined"?currentBattleMonsters:[]).forEach(index=>
+                configureEncounterSkills(monsters[index],encounterId)
+            );
+        }
     }
+    window.v144ConfigureDungeonBattleSkillsAfterRender=configureDungeonBattleSkillsAfterRender;
 
     function abyssAllies(){
         return (typeof currentBattleMonsters!=="undefined"?currentBattleMonsters:[])
@@ -2405,6 +2401,10 @@
         return names[type][rank||"regular"];
     }
 
+    function dailyMonsterPortraitKey(type,rank){
+        return "daily."+String(type)+"."+String(rank||"regular");
+    }
+
     function buildDailyWave(type,wave,level,context){
         const roster=[];
         for(let slot=0;slot<6;slot++){
@@ -2413,6 +2413,7 @@
             const monster=typeof window.v132BuildDungeonMonster==="function"
                 ?window.v132BuildDungeonMonster(dailyMonsterName(type,rank),level,element,rank||undefined)
                 :makeZoneMonster(dailyMonsterName(type,rank),level,element,rank||undefined);
+            monster.portraitKey=dailyMonsterPortraitKey(type,rank);
             monster.v132Dungeon=true;
             monster.v173DailyDungeonType=type;
             monster.v141DungeonStage=wave;
@@ -4650,14 +4651,35 @@
     function syncCardlessPresentation(card,record){
         if(!card){ return; }
         const previousManaged=!!card.dataset.monsterPortraitKey;
-        const art=typeof card.querySelector==="function"?card.querySelector(".v174-battle-art"):null;
+        let art=typeof card.querySelector==="function"?card.querySelector(".v174-battle-art"):null;
         if(record){
             const cssValue='url("'+record.path+'")';
             if(!previousManaged&&card.dataset.v174BattleArtwork){
                 card.dataset.v154BaseBattleArtwork=card.dataset.v174BattleArtwork;
             }
             card.dataset.v174BattleArtwork=cssValue;
-            if(art&&art.style){ art.style.backgroundImage=cssValue; }
+            const presentation=typeof window!=="undefined"?window.FourSymbolsBattlePresentation:null;
+            if(presentation&&typeof presentation.applyUnit==="function"){
+                try{ presentation.applyUnit(card,"monster"); }catch(_){ }
+            }
+            art=typeof card.querySelector==="function"?card.querySelector(".v174-battle-art"):null;
+            if(!art&&typeof document!=="undefined"&&typeof document.createElement==="function"){
+                art=document.createElement("div");
+                art.className="v174-battle-art";
+                if(card.classList&&typeof card.classList.add==="function"){
+                    card.classList.add("v174-cardless-unit");
+                }
+                if(card.firstChild&&typeof card.insertBefore==="function"){
+                    card.insertBefore(art,card.firstChild);
+                }else if(typeof card.appendChild==="function"){
+                    card.appendChild(art);
+                }
+            }
+            if(art&&art.style){
+                if(typeof art.style.setProperty==="function"){
+                    art.style.setProperty("background-image",cssValue,"important");
+                }else{ art.style.backgroundImage=cssValue; }
+            }
             return;
         }
         if(!previousManaged){ return; }
@@ -4691,18 +4713,21 @@
             const record=resolveMonsterPortraitRecord(monster,{finalAbyss:finalFloor});
             const portrait=record&&record.path;
             const abyssPortrait=!!(portrait&&monster&&monster.v141Abyss);
+            if(portrait){
+                card.style.setProperty("--v152-abyss-portrait",'url("'+portrait+'")');
+            }else{
+                card.style.removeProperty("--v152-abyss-portrait");
+            }
             syncCardlessPresentation(card,record);
             card.classList.toggle("v152-abyss-portrait",abyssPortrait);
             card.classList.toggle("v154-abyss-portrait",abyssPortrait);
             card.classList.toggle("v154-monster-portrait",!!portrait);
             if(portrait){
-                card.style.setProperty("--v152-abyss-portrait",'url("'+portrait+'")');
                 card.dataset.monsterPortraitKey=record.portraitKey;
                 card.dataset.monsterPortraitPath=portrait;
                 if(abyssPortrait){ card.dataset.abyssPortrait=finalFloor?"floor5":"floor1-4"; }
                 else{ delete card.dataset.abyssPortrait; }
             }else{
-                card.style.removeProperty("--v152-abyss-portrait");
                 delete card.dataset.monsterPortraitKey;
                 delete card.dataset.monsterPortraitPath;
                 delete card.dataset.abyssPortrait;

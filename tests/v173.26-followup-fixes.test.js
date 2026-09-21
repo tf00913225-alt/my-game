@@ -93,7 +93,7 @@ test("turn-end status and buff cleanup resynchronize Sprites at one shared bound
         updateActionHudVisibility(){},showAutoBattleRoundPrompt(){},beginCharacterTurn(){}
     };
     context.window=context;
-    context.v143SyncStatusSpriteEffects=function(){
+    context.v143SyncStatusVisualEffects=function(){
         synced={
             statuses:entity.statusEffects.slice(),
             buffs:entity.activeBuffs.slice()

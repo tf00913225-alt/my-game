@@ -18,34 +18,33 @@ test("timed status snapshot only scans status types relevant to the current cast
     assert.match(vfx,/deferredActorStatusTypes/);
     assert.match(vfx,/if\(!relevantTypes\.length\)\{ return snapshot; \}/);
     assert.match(vfx,/statusAtStart:snapshotTimedEffects\(model\)/);
-    assert.doesNotMatch(vfx,/function snapshotTimedEffects\(\)\{[\s\S]*Object\.keys\(RAW_STATUS_SPRITES\)/);
+    assert.doesNotMatch(vfx,/function snapshotTimedEffects\(\)\{[\s\S]*Object\.keys\(RAW_STATUS_VISUALS\)/);
 });
 
 test("known combatant refreshes use a single-unit status path",()=>{
-    assert.match(vfx,/function syncStatusSpritesForUnit\(side,index\)/);
-    assert.match(vfx,/updateMonsterUI=function\(index\)[\s\S]*syncStatusSpritesForUnit\("monster",Number\(index\)\)/);
-    assert.match(vfx,/updateSingleCharacterStatusBadge=function\(index\)[\s\S]*syncStatusSpritesForUnit\("player",Number\(index\)\)/);
-    assert.match(vfx,/function officialCardEffect\(side,index\)[\s\S]*syncStatusSpritesForUnit\(side,unitIndex\)/);
+    assert.match(vfx,/function syncStatusVisualsForUnit\(side,index\)/);
+    assert.match(vfx,/updateMonsterUI=function\(index\)[\s\S]*syncStatusVisualsForUnit\("monster",Number\(index\)\)/);
+    assert.match(vfx,/updateSingleCharacterStatusBadge=function\(index\)[\s\S]*syncStatusVisualsForUnit\("player",Number\(index\)\)/);
+    assert.match(vfx,/function officialCardEffect\(side,index\)[\s\S]*syncStatusVisualsForUnit\(side,unitIndex\)/);
 });
 
-test("global updateUI keeps synchronous lifecycle semantics but performs only one full battlefield status pass",()=>{
-    const block=vfx.match(/if\(typeof updateUI==="function"\)\{[\s\S]*?\n    \}/);
-    assert.ok(block,"updateUI wrapper missing");
-    assert.match(block[0],/syncStatusSpriteEffects\(\)/);
-    assert.doesNotMatch(block[0],/setTimer\(syncStatusSpriteEffects,0\)/);
-    const calls=(block[0].match(/syncStatusSpriteEffects\(\)/g)||[]).length;
-    assert.equal(calls,1,"updateUI must do exactly one full status pass");
+test("global updateUI no longer installs a redundant full battlefield status scan",()=>{
+    assert.doesNotMatch(
+        vfx,
+        /if\(typeof updateUI==="function"\)\{[\s\S]*?syncStatusVisualEffects\(\)/,
+        "V143 must rely on the base per-unit UI refresh path instead of wrapping updateUI"
+    );
 });
 
-test("the old duplicate zero-delay full battlefield scan stays removed",()=>{
-    assert.doesNotMatch(vfx,/setTimer\(syncStatusSpriteEffects,0\)/);
+test("zero-delay full battlefield status scans stay removed",()=>{
+    assert.doesNotMatch(vfx,/setTimer\(syncStatusVisualEffects,0\)/);
 });
 
-test("dispose contains no queued-sync state and still clears every status loop",()=>{
+test("dispose contains no queued-sync state and still clears every persistent status visual",()=>{
     const block=vfx.match(/director\.dispose=function\(\)\{[\s\S]*?return originalDispose\(\);\n    \};/);
     assert.ok(block,"dispose wrapper missing");
     assert.doesNotMatch(block[0],/statusSyncTimer|statusFullSyncQueued|statusUnitSyncQueue/);
-    assert.match(block[0],/removeStatusSpriteEffects\(\)/);
+    assert.match(block[0],/removeStatusVisualEffects\(\)/);
 });
 
 console.log("battle VFX performance status sync: "+passed+" checks passed");
