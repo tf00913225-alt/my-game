@@ -11,6 +11,7 @@ const indexSource=fs.readFileSync("index.html","utf8");
 const battleCss=fs.readFileSync("css/31-v131-fix-batch.css","utf8");
 const slotOwnerSource=fs.readFileSync("js/battlefield-slot-owner.js","utf8");
 const coreSource=fs.readFileSync("js/00-main.js","utf8");
+const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 
 function extractFunction(source,name){
     const start=source.indexOf("function "+name+"(");
@@ -175,7 +176,8 @@ test("set bonuses and skill costs are visible before extra detail clicks",()=>{
 test("current release uses a hashed boot entry and feature manifest",()=>{
     const manifest=JSON.parse(fs.readFileSync("asset-manifest.json","utf8"));
     assert.match(indexSource,/build\/boot-core\.[0-9a-f]{12}\.js/);
-    assert.match(loaderSource,/const V_ASSET_VERSION="173\.69"/);
+    const assetVersionMatch=loaderSource.match(/const V_ASSET_VERSION="([^"]+)"/);
+    assert.equal(assetVersionMatch?.[1],releaseMeta.cacheVersion);
     assert.equal(manifest.release,"173.70");
     assert.ok(manifest.featureManifest.bundles["gameplay-core"]);
 });
