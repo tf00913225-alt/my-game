@@ -1,73 +1,74 @@
 《my-game 專案檢查報告》
 
-版本：V173.65
-更新日期：2026-09-14
+版本：V173.69
+更新日期：2026-09-21
 基線分支：dev
-測試／資源核對來源：dev@0b747b12ab4d2fed1aeeb44900760afca4c924cd
-Game / Cache Version：V173.65 / 173.65
+基線 SHA：2d22118c62455667c29fbb4fbdbf126e8453b493
+測試／資源核對來源：GitHub Actions CI run 35550383070（#2469）
+Game / Cache Version：V173.69 / 173.69
 
-本文件是目前專案「測試結構、靜態資源與 deterministic build」的快速判讀基線。
-本次修正只修改 CHECK_REPORT.txt，不修改程式、測試、資產、build 產物或版本，因此以下 js／tests／assets tree 可作為本次可追溯基線：
-- js tree：9654a94516c6fc2e06d6e05b96098fa4cd3b142a
-- tests tree：97ad5c4d78c283725810d3526036a8de876f7739
-- assets tree：fdd37be4af1b6169bca3401abfafd3bdd9ee2e7a
+本文件是目前專案測試結構、靜態資源與 deterministic build 的可追溯基線。
+本次只更新 CHECK_REPORT.txt，不修改程式、測試、資產或正式版本號。
 
-V173.4、V121 與其他歷史版本的數字全部只屬歷史紀錄，不得再拿來判斷目前 dev。為避免後續 AI 誤讀，本文件不再重列那些舊數字。
+一、目前 CI 實際驗證結果
 
-一、目前 V173.65 測試基線（2026-09-14）
+GitHub Actions CI run 35550383070（#2469）中的 Repository checks 通過：
 
-目前 repository 結構：
-- js/：76 個 JavaScript 檔案。
-- tests/：165 個 JavaScript／MJS 檔案。
-- 其中 164 個符合 *.test.js／*.test.cjs／*.test.mjs，屬 Node unit／integration suite inventory。
-- 另 1 個 tests/v138-browser-smoke.js 為 browser smoke，不計入上述 164 個 Node suite。
+- JavaScript syntax：290 / 290 files passed。
+- Node unit / integration suites：201 / 201 suites passed。
+- Release Update Notification targeted regression：12 cases passed。
+- Abyss regression：15 tests passed。
+- Boss target-entity runtime tests：13 tests passed。
+- Static resources：388 unique local targets exist。
+- HTML IDs：252 static IDs are unique across 4 HTML files。
+- Production build：32 build assets 全部符合 content hash。
+- Git whitespace：通過。
+- Unresolved conflict markers：0。
+- Release / loader / deprecated-code gates：通過。
 
-目前 dev GitHub Actions（run 34836479707）實際輸出：
-- JavaScript syntax：241 / 241 通過（js/ + tests/）。
-- npm run build:check：通過。
-- Release source coherence：V173.65，cache 173.65。
-- Requirements：10 / 10 VERIFIED。
-- Git diff whitespace：通過。
-- unresolved conflict markers：0。
+Browser QA：
 
-重要：這次 dev 變更屬 documentation-only diff，CI 的 Node unit／integration suites、mobile browser QA 等步驟依 diff-scope 規則為 skipped。
-因此：
-- 「164」是目前 Node suite 的實際檔案 inventory，不代表這次 run 有重新執行 164 / 164。
-- 「CI SUCCESS」也不得被解讀成此次 run 已重新跑完所有 browser／mobile suites。
-- 若需要宣稱完整 suite PASS，必須引用實際執行該 suite 的 run，或重新執行完整測試。
+- Release Update Notification：360×800、390×844、412×915 通過。
+- Fixed Slot battlefield：412×915、393×873、360×800 通過。
+- Adventure：360×800、390×844、412×915 通過。
+- Exact-candidate real battle mobile QA：通過。
+- Battle layer/audio live mobile QA：PASS。
+- Boot / First Play mobile QA：通過。
+  - 首次資源包：78 resources / 21,440,243 bytes。
+  - Returning auth：10,067.4 ms。
+  - Warm city：10,639.4 ms。
+- Skill progression mobile QA：通過。
+- Relic progression 390×844 QA：通過。
 
-二、目前 V173.65 靜態資源／asset／build 基線（2026-09-14）
+注意：
 
-目前 dev GitHub Actions（run 34836479707）實際輸出：
-- Static resources：302 個 unique local targets，全部存在。
-- 靜態資源掃描範圍：4 HTML、60 CSS、76 non-embedded JavaScript。
-- HTML IDs：251 個 static IDs，跨 4 個 HTML 全部唯一。
-- Deterministic production build：22 個 build assets 全部符合 content hash。
-- Critical Boot：exactly 1 hashed script + 1 hashed stylesheet；gameplay features 維持 non-critical。
-- FeatureLoader：仍為唯一 dynamic script owner。
-- release／loader／build gates：通過。
+- tests/v138-browser-smoke.js 需要 Playwright／Chromium，本次未執行且不計入 Node suite。
+- 上述 388 是 CI 驗證的 unique local resource targets，不是 assets/ 原始檔案總數。
+- 32 是 deterministic production build asset 數量，不可與歷史版本的 build 數量混用。
+- 怪物立繪內容數量須直接以目前 registry 與 assets tree 判斷，不得以歷史 queue、Library 或暫存工作區數量代替。
 
-資產判讀注意：
-- 上述 302 是 CI 實際驗證的「unique local resource targets」，不是 assets/ 資料夾的 raw file count，兩者不可混用。
-- assets/ raw file inventory 若未重新由目前 tree 計數，不得沿用任何歷史總數。
-- 目前 assets/monsters tree 實際只有 5 個 image blobs；過去怪物立繪 Pipeline 的 98 張 queue／工作區產物／規劃數量，不等於目前 dev 已存在 98 張怪物資產。
-- 若要判斷某批美術是否已合入 dev，必須直接查目前 assets tree／registry，不得只引用 HANDOFF、queue 或本機工作區紀錄。
+二、Release Verification 狀態
 
-三、後續 AI／維護者判讀規則
+目前 release/requirements.json 的全域 checklist：
 
-1. 判斷目前專案時，優先使用最新 dev 的實際 CI／build 輸出與本文件；不得回退使用 V173.4、V121 或其他舊版數字。
-2. 241 / 241 是本次實際執行並通過的 JavaScript syntax 數；164 是目前 Node suite inventory，兩者意義不同。
-3. CI 顯示 skipped 時，必須解讀為「依 diff-scope 未執行」，不能寫成 PASS，也不能寫成 FAIL／不存在。
-4. 302 resources、251 static IDs、22 deterministic build assets 是 2026-09-14 此基線的可重現 CI 數字；未來 dev 結構改變後必須以新 CI 輸出更新，不得永久硬套。
-5. assets/ raw file count、圖片格式分布、某類素材數量若沒有從最新 tree 重新計數，就不要填舊數字。
-6. 若新增／刪除正式 script、test suite、resource、static ID、asset 或 deterministic build asset，使基線永久改變，應在同一輪更新本文件。
-7. Game / Cache Version 即使仍為 V173.65，也不能代表測試／資產結構數字一定沒有改變。
-8. 若本文件與最新 dev 的可重現 CI／build／tree 結果衝突，以最新實際結果為準，並立即修正本文件。
+- Requirements：11 / 11 VERIFIED。
+- release/release.json：V173.69 / cache 173.69。
+- 目前正式版本號仍為 V173.69；本文件更新不代表 V173.70 已正式發布。
 
-結論：
-- 目前版本基線：V173.65／cache 173.65。
-- 目前實際 syntax 基線：241 / 241 PASS。
-- 目前 Node suite inventory：164；本次 documentation-only CI 未重新執行全套 Node suites。
-- 目前靜態資源基線：302 unique local targets、251 static IDs。
-- 目前 deterministic build 基線：22 build assets，全數 content-hash match。
-- V173.4 與更早版本的數字已退出現行判讀，不得再作為目前專案基線。
+三、目前已知未完成項目
+
+以下內容不屬於本次 CHECK_REPORT 文件更新：
+
+- V173.70 尚未合併至 main。
+- PR #418 的 VFX 整合尚未合併至 dev。
+- 怪物／副本立繪仍有 planned 內容，尚未完成正式導入。
+- renderBattle() 多層 wrapper 尚未收斂。
+- 舊 PR 與舊 release 分支尚未清理。
+- 雲端帳號 Phase 2～10 尚未開始。
+
+判讀原則：
+
+1. 優先使用最新 dev 的實際 CI、build、tree 與 deployment evidence。
+2. CI SUCCESS 不等同所有需求均已完成；需求仍須依 Requirement Verification 流程逐項確認。
+3. 若未來 dev 新增或刪除正式 script、test suite、resource、static ID 或 build asset，必須重新更新本文件。
+4. 不得再使用 V173.65、241 syntax、164 suites、302 resources 或 22 build assets 作為目前健康基線。
