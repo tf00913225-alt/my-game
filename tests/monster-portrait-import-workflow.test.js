@@ -15,7 +15,7 @@ assert.match(source,/--group=<group>/);
 assert.match(source,/--reactivate-retired/);
 assert.match(source,/target\.status!==\"existing\"/);
 assert.match(source,/monster\.portraitKey=dailyMonsterPortraitKey\(type,rank\)/);
-assert.match(source,/assets\/monsters\/.*\\\.webp/);
+assert.match(source,/assets\\/monsters\\//);\nassert.match(source,/webpCandidate/);\nassert.match(source,/matching formal WebP is missing/);
 assert.match(source,/ImageMagick identify failed/);
 assert.match(source,/geometry mismatch/);
 assert.match(source,/alpha channel missing/);
