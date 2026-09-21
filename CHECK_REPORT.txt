@@ -3,7 +3,7 @@
 版本：V173.69
 更新日期：2026-09-21
 基線分支：main
-基線提交：f747717493da6e2a7f259079a9d1fc0afeb9b5c0
+基線提交：abc8f53eb1012b233c49087d80ece9f4015d8025
 Game / Cache Version：V173.69 / 173.69
 
 本文件是目前正式 main 的健康基線。舊版 V173.65／2026-09-14 的數字已退役，不得再當作目前狀態；歷史紀錄若出現在 HANDOFF.md，只能作為歷史脈絡。
@@ -28,9 +28,9 @@ Game / Cache Version：V173.69 / 173.69
 
 三、目前發布阻塞
 
-- V173.70 候選 PR #423 已關閉且未合併。
-- 關閉原因是候選內四個日常副本 WebP 無法通過圖片完整性檢查；圖片修復工作目前結案。
-- 因此目前沒有可直接發布的 V173.70 candidate。下一次發布必須以最新 main／dev 重新建立候選並完成完整驗收。
+- V173.70 候選 PR #452 已關閉且未合併；其候選樹與目前正式 main 相同，屬過時重複候選。
+- 關閉原因是正式 main 已先合入相同內容；四個日常副本 WebP 維持永久退休，圖片修復工作已結案。
+- 因此目前沒有待合併的 V173.70 candidate；下一次功能發布必須以最新 main／dev 重新建立候選並完成完整驗收。
 
 四、持續維護規則
 
@@ -41,6 +41,6 @@ Game / Cache Version：V173.69 / 173.69
 5. Chrome 模擬尺寸 QA 不取代 S23 Ultra 實機驗收。
 
 結論：
-- 正式版本：V173.69，main SHA `f747717493da6e2a7f259079a9d1fc0afeb9b5c0`。
+- 正式版本：V173.69，main SHA `abc8f53eb1012b233c49087d80ece9f4015d8025`。
 - 正式 main CI 基線：287 / 287 syntax、198 / 198 Node suites、388 resources、252 HTML IDs、32 deterministic build assets。
-- V173.70 尚無可發布候選；PR #423 已結案，main／dev 未因本次文件修復而直接修改。
+- 目前沒有待合併的 V173.70 候選；PR #452 已結案，正式 main CI 與 Pages deployment 均已成功。

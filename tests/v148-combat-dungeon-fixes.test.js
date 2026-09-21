@@ -2,6 +2,7 @@
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 const vm=require("node:vm");
 
 const index=fs.readFileSync("index.html","utf8");
@@ -75,7 +76,7 @@ function setEnemyFormation(context,indexes){
 
 test("V148 remains ordered inside the deterministic gameplay bundle",()=>{
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
-    assert.match(loader,/const V_ASSET_VERSION="173\.69"/);
+    assert.equal((loader.match(/const V_ASSET_VERSION="([^"]+)"/)||[])[1],releaseMeta.cacheVersion);
     assert.match(buildSource,/"js\/01-stage-v8-touch-lock\.js"/);
     assert.match(buildSource,/"css\/43-v148-combat-dungeon-fixes\.css"/);
     const v146=buildSource.indexOf("js/41-v146-system-polish.js");
