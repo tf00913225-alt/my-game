@@ -1,5 +1,6 @@
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 
 const read=path=>fs.readFileSync(path,"utf8");
 const index=read("index.html");
@@ -88,9 +89,9 @@ test("status text sits below damage and stays fully visible for one second",()=>
 });
 
 test("development cache and visible build advance to V173.39",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.69"/);
-    assert.match(index,/<title>四象江湖傳 V173\.69<\/title>/);
-    assert.match(index,/>V173\.69<\/div>/);
+    assert.equal((loader.match(/const V_ASSET_VERSION="([^"]+)"/)||[])[1],releaseMeta.cacheVersion);
+    assert.ok(index.includes("<title>四象江湖傳 V"+releaseMeta.version+"</title>"));
+    assert.ok(index.includes(">V"+releaseMeta.version+"</div>"));
 });
 
 console.log("\n"+passed+" V173.39 UI polish tests passed.");
