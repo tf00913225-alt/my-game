@@ -1,3 +1,21 @@
+## 2026-09-21 — 目前正式狀態／V173.70 候選結案
+
+- 正式 `main`：V173.69，Game／Cache Version 為 `173.69`；目前 SHA：`f747717493da6e2a7f259079a9d1fc0afeb9b5c0`。正式 CI 與 Pages deployment 均已成功。
+- 最新 `dev`：`2da319ad7d90cc56f56967a787d0f4ef87e2df5c`；本輪文件更新以此為基準，未直接修改 `dev` 或 `main`。
+- 原 V173.70 候選 PR #423 已關閉且未合併：候選 CI 被四個無效日常副本 WebP 阻塞，圖片修復工作已由專案負責人明確結案；後續不得把該候選 SHA 當成可發布版本。
+- 下一次發布必須重新以最新 `main`／最新 `dev` 建立候選，重新跑完整 CI、DEV exact-SHA deployment 與 S23 Ultra 實機驗收。未完成前不得推送 `main`。
+- 目前仍保留的非阻斷技術債：戰鬥核心多層 `renderBattle()` wrapper 尚未收斂；真機驗收仍不能由模擬尺寸 CI 取代。以下較早的 NOT COMPLETE／待驗收紀錄均為歷史紀錄，不代表目前正式狀態。
+
+## 2026-09-21 — 持續狀態視覺 Owner 收斂（4/4 VERIFIED／PR #426）
+
+- Base：`dev@2da319ad7d90cc56f56967a787d0f4ef87e2df5c`；工作分支：`fix/status-visual-owner-cleanup-20260921`；`main` 未修改，未 rebase／force push。
+- 持續狀態視覺唯一 owner 收斂到 `js/39-v143-skill-animation.js`：只保留 `pulse`（單張呼吸）、`static`（固定單圖）、`iconPulse`（Icon 呼吸）三種低動態模式；持續狀態不再使用逐幀 Sprite loop／Front-Back clock。技能施放瞬間的 12 幀 Cast VFX 保持不變。
+- `js/00-main.js` 的戰鬥狀態列只保留 host，不再自行畫燃燒／冰封／重力／破防等第二套 badge；舊燃燒／冰封 card overlay 已移除。`js/35-v141-ui-battle.js` 的 retired Card Effect renderer 已刪除，只保留相容呼叫面。
+- 分類：燃燒／怒火／風行／氣定神閒／元祖賜福等使用單圖呼吸；護盾／萬象土盾／岩石壁壘／結界／冰封／石化／隱身使用固定圖；凍傷／重力／殤風／暈眩／破防／全屬性降低／炎勢／鳳威使用 Icon 呼吸。
+- `release/deprecated-code.json` 新增 DEP-006，禁止 `v143StatusRasterFrames`、`.v153-status-vfx`、舊 Status Sprite API 與舊 burn/freeze card overlay 回歸。Fixed Slot geometry 仍是人物身上狀態圖唯一定位來源。
+- 未修改傷害／治療公式、狀態命中、持續回合、回合扣除、Boss AI、技能數值或存檔。V142 仍保留 Timing Gate；其歷史 gameplay resolver 技術債本次不擴大處理。
+- Requirement Batch：`release/requirement-batches/2026-09-21-status-visual-owner-cleanup.json`，4/4 VERIFIED。候選 CI run `35593978289` 的 Repository checks SUCCESS，包含 battle/VFX regressions、deterministic build、Fixed Slot 9:16 mobile QA、exact-candidate real battle mobile QA、resources、loader、deprecated-code Release Gate 與 git-diff。
+
 ## 2026-09-20 — Lv40 深淵 Owner 收斂／五帝立繪／商店與主城 Header（IMPLEMENTED／PR CI 與 dev 實機驗收待完成）
 
 - Base：最新 `origin/dev@bd084a1f200dc527ca101436b68b4d150a52cb3a`；工作分支：`fix/abyss-lv40-skill-owner-five-emperor-portrait-20260920`；`main` 未修改，未 rebase／force push。
