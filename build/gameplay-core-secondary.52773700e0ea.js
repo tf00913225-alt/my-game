@@ -4650,13 +4650,30 @@
     function syncCardlessPresentation(card,record){
         if(!card){ return; }
         const previousManaged=!!card.dataset.monsterPortraitKey;
-        const art=typeof card.querySelector==="function"?card.querySelector(".v174-battle-art"):null;
+        let art=typeof card.querySelector==="function"?card.querySelector(".v174-battle-art"):null;
         if(record){
             const cssValue='url("'+record.path+'")';
             if(!previousManaged&&card.dataset.v174BattleArtwork){
                 card.dataset.v154BaseBattleArtwork=card.dataset.v174BattleArtwork;
             }
             card.dataset.v174BattleArtwork=cssValue;
+            const presentation=typeof window!=="undefined"?window.FourSymbolsBattlePresentation:null;
+            if(presentation&&typeof presentation.applyUnit==="function"){
+                try{ presentation.applyUnit(card,"monster"); }catch(_){ }
+            }
+            art=typeof card.querySelector==="function"?card.querySelector(".v174-battle-art"):null;
+            if(!art&&typeof document!=="undefined"&&typeof document.createElement==="function"){
+                art=document.createElement("div");
+                art.className="v174-battle-art";
+                if(card.classList&&typeof card.classList.add==="function"){
+                    card.classList.add("v174-cardless-unit");
+                }
+                if(card.firstChild&&typeof card.insertBefore==="function"){
+                    card.insertBefore(art,card.firstChild);
+                }else if(typeof card.appendChild==="function"){
+                    card.appendChild(art);
+                }
+            }
             if(art&&art.style){ art.style.backgroundImage=cssValue; }
             return;
         }
