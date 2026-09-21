@@ -23346,6 +23346,13 @@ function renderBattle(){
         bossPresentationOwner.syncHud();
     }
 
+    const renderHooks=typeof window!=="undefined"&&Array.isArray(window.FourSymbolsBattleRenderHooks)
+        ? window.FourSymbolsBattleRenderHooks.slice()
+        : [];
+    renderHooks.forEach(hook=>{
+        if(typeof hook==="function"){ hook(); }
+    });
+
 
     /*
        ★ 重新加回來（依照使用者指正，這是對的）：
