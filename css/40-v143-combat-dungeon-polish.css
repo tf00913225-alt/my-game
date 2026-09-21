@@ -223,8 +223,11 @@
     }
 }
 
-/* Formal persistent status Sprite Sheets. */
-#game-stage #battlePage .v153-status-vfx{
+/* Persistent status visuals are intentionally low-motion.
+   Cast VFX keep their raster Sprite Sheet animation; persistent states use
+   one cropped still image with opacity breathing, a fixed image, or a small
+   breathing status icon. No persistent frame clock exists. */
+#game-stage #battlePage .v143-status-visual{
     position:absolute;
     left:50%;
     top:44%;
@@ -238,67 +241,94 @@
     pointer-events:none;
     transform:translate(-50%,-50%);
     transform-origin:center;
-    will-change:background-position;
-    animation:v143StatusRasterFrames var(--v153-status-duration,1000ms) steps(1,end) infinite;
 }
 
-#game-stage #battlePage .v153-status-vfx-burn{
+#game-stage #battlePage .v143-status-visual--pulse{
+    animation:v143StatusImageBreath 2.2s ease-in-out infinite;
+    will-change:opacity;
+}
+
+#game-stage #battlePage .v143-status-visual--static{
+    animation:none;
+    opacity:.9;
+}
+
+#game-stage #battlePage .v143-status-icon{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:10px;
+    height:10px;
+    flex:0 0 10px;
+    border:1px solid rgba(244,221,170,.7);
+    border-radius:50%;
+    color:#fff4d4;
+    background:rgba(16,12,9,.88);
+    box-shadow:0 0 4px rgba(240,190,90,.38);
+    font-style:normal;
+    font-size:8px;
+    font-weight:900;
+    line-height:1;
+    pointer-events:none;
+    transform-origin:center;
+}
+
+#game-stage #battlePage .v143-status-icon--pulse{
+    animation:v143StatusIconBreath 1.8s ease-in-out infinite;
+    will-change:opacity,transform;
+}
+
+#game-stage #battlePage .v143-status-visual-burn{
     filter:drop-shadow(0 0 7px rgba(255,79,23,.82));
 }
-#game-stage #battlePage .v153-status-vfx-rage{
+#game-stage #battlePage .v143-status-visual-rage{
     z-index:5;
-    opacity:1;
     filter:drop-shadow(0 0 8px rgba(255,35,20,.9));
 }
-#game-stage #battlePage .v153-status-vfx-frostbite{
-    filter:drop-shadow(0 0 8px rgba(101,219,255,.88));
-}
-#game-stage #battlePage .v153-status-vfx-freeze{
+#game-stage #battlePage .v143-status-visual-freeze{
+    z-index:5;
     opacity:.94;
     filter:drop-shadow(0 0 10px rgba(178,238,255,.96));
 }
-#game-stage #battlePage .v153-status-vfx-agilityDown,
-#game-stage #battlePage .v153-status-vfx-damageDown,
-#game-stage #battlePage .v153-status-vfx-stun,
-#game-stage #battlePage .v153-status-vfx-dodgeSkill,
-#game-stage #battlePage .v153-status-vfx-stealthSkill,
-#game-stage #battlePage .v153-status-vfx-dinghaishenzhen{
+#game-stage #battlePage .v143-status-visual-dodgeSkill,
+#game-stage #battlePage .v143-status-visual-stealthSkill,
+#game-stage #battlePage .v143-status-visual-dinghaishenzhen{
     z-index:5;
     filter:drop-shadow(0 0 9px rgba(127,255,205,.92));
 }
-#game-stage #battlePage .v153-status-vfx-defenseDown,
-#game-stage #battlePage .v153-status-vfx-shield,
-#game-stage #battlePage .v153-status-vfx-petrify,
-#game-stage #battlePage .v153-status-vfx-earthShield,
-#game-stage #battlePage .v153-status-vfx-rockWall,
-#game-stage #battlePage .v153-status-vfx-barrier{
+#game-stage #battlePage .v143-status-visual-shield,
+#game-stage #battlePage .v143-status-visual-petrify,
+#game-stage #battlePage .v143-status-visual-earthShield,
+#game-stage #battlePage .v143-status-visual-rockWall,
+#game-stage #battlePage .v143-status-visual-barrier{
     z-index:5;
     filter:drop-shadow(0 0 9px rgba(222,178,90,.92));
 }
-#game-stage #battlePage .v153-status-vfx-yuanZuBlessing{
+#game-stage #battlePage .v143-status-visual-yuanZuBlessing{
     z-index:5;
     filter:drop-shadow(0 0 10px rgba(255,232,135,.94));
 }
 
-#game-stage #battlePage .battle-monster.v152-abyss-portrait > .v153-status-vfx{
+#game-stage #battlePage .battle-monster.v152-abyss-portrait > .v143-status-visual{
     position:absolute !important;
     z-index:5 !important;
 }
 
-#battlePage .v146-defeated > .v153-status-vfx,
-#battlePage .battle-player.down > .v153-status-vfx{
+#battlePage .v146-defeated > .v143-status-visual,
+#battlePage .battle-player.down > .v143-status-visual,
+#battlePage .v146-defeated .v143-status-icon,
+#battlePage .battle-player.down .v143-status-icon{
     display:none !important;
 }
 
-@keyframes v143StatusRasterFrames{
-    0%{background-position:0 0}
-    12.5%{background-position:33.333333% 0}
-    25%{background-position:66.666667% 0}
-    37.5%{background-position:100% 0}
-    50%{background-position:0 100%}
-    62.5%{background-position:33.333333% 100%}
-    75%{background-position:66.666667% 100%}
-    87.5%,100%{background-position:100% 100%}
+@keyframes v143StatusImageBreath{
+    0%,100%{opacity:.42}
+    50%{opacity:.78}
+}
+
+@keyframes v143StatusIconBreath{
+    0%,100%{opacity:.48;transform:scale(.92)}
+    50%{opacity:1;transform:scale(1.08)}
 }
 
 /* 4 / 5. Dungeon content uses the available screen and its nav is in-scale. */

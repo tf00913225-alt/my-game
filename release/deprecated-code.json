@@ -1,7 +1,15 @@
 {
   "schemaVersion": 1,
-  "scanRoots": ["index.html", "js", "css"],
-  "extensions": [".html", ".js", ".css"],
+  "scanRoots": [
+    "index.html",
+    "js",
+    "css"
+  ],
+  "extensions": [
+    ".html",
+    ".js",
+    ".css"
+  ],
   "assertions": [
     {
       "id": "DEP-001-patrol-power-saving",
@@ -74,6 +82,23 @@
         "rejectFrostbittenSkill",
         "withoutLegacyFrostbiteLock",
         "v169FrostbiteCompatibilityActive"
+      ]
+    },
+    {
+      "id": "DEP-006-persistent-status-frame-renderer",
+      "description": "持續狀態逐幀 Sprite renderer、V153 狀態節點與舊燃燒/冰封卡片覆蓋層已正式退役；持續狀態只能由 V143 low-motion status visual owner 顯示。",
+      "enabled": true,
+      "forbidden": [
+        "v143StatusRasterFrames",
+        "v153-status-vfx",
+        "v143StatusSpriteManifest",
+        "v143SyncStatusSpriteEffects",
+        "function statusSheet(",
+        "card-status-overlay",
+        "battleMonsterFreezeOverlay",
+        "battleMonsterBurnOverlay",
+        "freezeOverlayShimmer",
+        "burnOverlayFlicker"
       ]
     }
   ]
