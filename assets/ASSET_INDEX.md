@@ -35,6 +35,7 @@
 | 隱身 | `隱身  前景.png` / `隱身 後景.png` | `assets/vfx/status/wind/stealth-skill-front.webp` | `assets/vfx/status/wind/stealth-skill-back.webp` |
 | 風行 | `風行 前景.png` / `風行 後景.png` | `assets/vfx/status/wind/dinghaishenzhen-front.webp` | `assets/vfx/status/wind/dinghaishenzhen-back.webp` |
 | 鳳威 | `鳳威 前景.png` / `鳳威 後景.png` | `assets/vfx/status/fire/phoenix-might-front.webp` | `assets/vfx/status/fire/phoenix-might-back.webp` |
+| 暈眩 | `image-gen-1(20260920-141230).png` / `image-gen-2(7).png` | `assets/vfx/status/wind/stun-front.webp` | `assets/vfx/status/wind/stun-back.webp` |
 
 ## 尚待雙層遷移
 
@@ -42,4 +43,3 @@
 
 - `freeze`／凍結
 - `yuanZuBlessing`／元祖祝福
-- `stun`／暈眩：來源雖有 Front + Back，但實際畫布為 `1448×1086`（4×3），不符合本批次固定 4×2／8 幀規格，未接管 Runtime。
