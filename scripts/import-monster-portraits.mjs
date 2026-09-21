@@ -108,20 +108,31 @@ if(runtimeTest.status!==0){
     fail("monster portrait runtime contract test failed before import: "+String(runtimeTest.stderr||runtimeTest.stdout||"").trim());
 }
 
-function validateRelativeAssetPath(rel,key){
+function resolveFormalRuntimePath(rel,key){
     const normalized=String(rel||"").replace(/\\/g,"/");
     if(!normalized||path.isAbsolute(normalized)||normalized.split("/").includes("..")){
         fail("invalid registry asset path for "+key+": "+normalized);
     }
-    if(!normalized.startsWith("assets/monsters/")||path.extname(normalized).toLowerCase()!==".webp"){
-        fail("fast import only accepts formal assets/monsters/*.webp targets: "+key+" -> "+normalized);
+    if(!normalized.startsWith("assets/monsters/")){
+        fail("fast import only accepts formal assets/monsters targets: "+key+" -> "+normalized);
     }
-    return normalized;
+    const extension=path.extname(normalized).toLowerCase();
+    if(extension===".webp"){ return {path:normalized,normalizedFrom:null}; }
+    if(![".png",".jpg",".jpeg"].includes(extension)){
+        fail("unsupported registry asset extension for "+key+": "+extension);
+    }
+    const webpCandidate=normalized.slice(0,-extension.length)+".webp";
+    const webpAbsolute=path.join(root,webpCandidate);
+    if(!fs.existsSync(webpAbsolute)||!fs.statSync(webpAbsolute).isFile()){
+        fail("registry still points to "+extension+" and matching formal WebP is missing: "+key+" -> "+webpCandidate);
+    }
+    return {path:webpCandidate,normalizedFrom:normalized};
 }
 
 function validateImage(target,key){
     const row=target.row;
-    const rel=validateRelativeAssetPath(row[pathIndex],key);
+    const resolved=resolveFormalRuntimePath(row[pathIndex],key);
+    const rel=resolved.path;
     const absolute=path.join(root,rel);
     if(!fs.existsSync(absolute)||!fs.statSync(absolute).isFile()){
         fail("approved runtime WebP is not present at registry path: "+key+" -> "+rel);
@@ -149,7 +160,7 @@ function validateImage(target,key){
     if(String(opaque||"").toLowerCase()==="true"){
         fail("transparent pixels missing for "+key);
     }
-    return {rel,geometry,channels,opaque};
+    return {rel,geometry,channels,opaque,normalizedFrom:resolved.normalizedFrom};
 }
 
 const validated=[];
@@ -168,10 +179,21 @@ for(const key of selectedKeys){
         fail("unsupported registry status for "+key+": "+status);
     }
 
+    if(status==="existing"&&image.normalizedFrom){
+        fail("existing target still points to a non-WebP registry path: "+key+" -> "+image.normalizedFrom);
+    }
+    if(image.normalizedFrom&&!dryRun){ row[pathIndex]=image.rel; }
+
     if(status==="existing"){
         alreadyExisting.push(key);
     }else{
-        promoted.push({portraitKey:key,from:status,to:"existing",path:image.rel});
+        promoted.push({
+            portraitKey:key,
+            from:status,
+            to:"existing",
+            path:image.rel,
+            normalizedPathFrom:image.normalizedFrom
+        });
         if(!dryRun){ row[statusIndex]="existing"; }
     }
     validated.push({
@@ -180,8 +202,9 @@ for(const key of selectedKeys){
         name:String(row[nameIndex]||""),
         path:image.rel,
         statusBefore:status,
-        statusAfter:status==="existing"?"existing":"existing",
-        geometry:image.geometry
+        statusAfter:"existing",
+        geometry:image.geometry,
+        normalizedPathFrom:image.normalizedFrom
     });
 }
 
