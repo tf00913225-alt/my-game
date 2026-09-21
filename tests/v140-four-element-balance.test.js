@@ -4,6 +4,7 @@
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 const vm=require("node:vm");
 
 const mainSource=fs.readFileSync("js/00-main.js","utf8");
@@ -589,7 +590,7 @@ test("V140 remains before the ordered V141/V142 layers and both cache keys are b
     ].map(path=>loaderSource.indexOf(path));
     assert.ok(runtimeOrder.every(index=>index>=0));
     assert.deepEqual(runtimeOrder.slice().sort((a,b)=>a-b),runtimeOrder);
-    assert.match(loaderSource,/const V_ASSET_VERSION="173\.69"/);
+    assert.equal((loaderSource.match(/const V_ASSET_VERSION="([^"]+)"/)||[])[1],releaseMeta.cacheVersion);
     assert.match(indexSource,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
 
