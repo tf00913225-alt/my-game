@@ -630,7 +630,9 @@
 
     function removeStatusVisualEffects(){
         if(typeof document==="undefined"||typeof document.querySelectorAll!=="function"){ return; }
-        document.querySelectorAll(".v143-status-visual,.v143-status-icon").forEach(node=>node.remove());
+        [".v143-status-visual",".v143-status-icon"].forEach(selector=>
+            document.querySelectorAll(selector).forEach(node=>node.remove())
+        );
     }
     window.v143SyncStatusVisualEffects=syncStatusVisualEffects;
 
