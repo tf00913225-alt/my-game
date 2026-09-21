@@ -2,14 +2,12 @@
   "date": "2026-09-11",
   "branch": "feature/monster-portrait-pipeline-v1-20260911",
   "batch": 1,
-  "status": "IN_PROGRESS",
+  "status": "COMPLETE",
   "committed": [
     "soldier.fire",
     "soldier.water",
     "soldier.wind",
-    "soldier.earth"
-  ],
-  "pending": [
+    "soldier.earth",
     "daily.exp.regular",
     "daily.exp.elite",
     "daily.exp.boss",
@@ -17,9 +15,11 @@
     "daily.material.elite",
     "daily.material.boss"
   ],
+  "pending": [],
   "notes": [
-    "All four heavenly soldier portraits are real PNG files under assets/monsters/soldiers/.",
-    "Registry promotion is performed only after the corresponding PNG exists.",
+    "All four heavenly soldier portraits are existing legacy PNG files under assets/monsters/soldiers/.",
+    "New portrait registry promotion is performed only after the corresponding lossless WebP exists.",
+    "Daily gold portraits 63–65 are outside this batch and remain blocked until formal Library file_id values are available.",
     "No dev/main merge is authorized."
   ]
 }

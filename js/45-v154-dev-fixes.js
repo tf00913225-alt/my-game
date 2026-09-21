@@ -196,14 +196,35 @@
     function syncCardlessPresentation(card,record){
         if(!card){ return; }
         const previousManaged=!!card.dataset.monsterPortraitKey;
-        const art=typeof card.querySelector==="function"?card.querySelector(".v174-battle-art"):null;
+        let art=typeof card.querySelector==="function"?card.querySelector(".v174-battle-art"):null;
         if(record){
             const cssValue='url("'+record.path+'")';
             if(!previousManaged&&card.dataset.v174BattleArtwork){
                 card.dataset.v154BaseBattleArtwork=card.dataset.v174BattleArtwork;
             }
             card.dataset.v174BattleArtwork=cssValue;
-            if(art&&art.style){ art.style.backgroundImage=cssValue; }
+            const presentation=typeof window!=="undefined"?window.FourSymbolsBattlePresentation:null;
+            if(presentation&&typeof presentation.applyUnit==="function"){
+                try{ presentation.applyUnit(card,"monster"); }catch(_){ }
+            }
+            art=typeof card.querySelector==="function"?card.querySelector(".v174-battle-art"):null;
+            if(!art&&typeof document!=="undefined"&&typeof document.createElement==="function"){
+                art=document.createElement("div");
+                art.className="v174-battle-art";
+                if(card.classList&&typeof card.classList.add==="function"){
+                    card.classList.add("v174-cardless-unit");
+                }
+                if(card.firstChild&&typeof card.insertBefore==="function"){
+                    card.insertBefore(art,card.firstChild);
+                }else if(typeof card.appendChild==="function"){
+                    card.appendChild(art);
+                }
+            }
+            if(art&&art.style){
+                if(typeof art.style.setProperty==="function"){
+                    art.style.setProperty("background-image",cssValue,"important");
+                }else{ art.style.backgroundImage=cssValue; }
+            }
             return;
         }
         if(!previousManaged){ return; }
@@ -237,18 +258,21 @@
             const record=resolveMonsterPortraitRecord(monster,{finalAbyss:finalFloor});
             const portrait=record&&record.path;
             const abyssPortrait=!!(portrait&&monster&&monster.v141Abyss);
+            if(portrait){
+                card.style.setProperty("--v152-abyss-portrait",'url("'+portrait+'")');
+            }else{
+                card.style.removeProperty("--v152-abyss-portrait");
+            }
             syncCardlessPresentation(card,record);
             card.classList.toggle("v152-abyss-portrait",abyssPortrait);
             card.classList.toggle("v154-abyss-portrait",abyssPortrait);
             card.classList.toggle("v154-monster-portrait",!!portrait);
             if(portrait){
-                card.style.setProperty("--v152-abyss-portrait",'url("'+portrait+'")');
                 card.dataset.monsterPortraitKey=record.portraitKey;
                 card.dataset.monsterPortraitPath=portrait;
                 if(abyssPortrait){ card.dataset.abyssPortrait=finalFloor?"floor5":"floor1-4"; }
                 else{ delete card.dataset.abyssPortrait; }
             }else{
-                card.style.removeProperty("--v152-abyss-portrait");
                 delete card.dataset.monsterPortraitKey;
                 delete card.dataset.monsterPortraitPath;
                 delete card.dataset.abyssPortrait;

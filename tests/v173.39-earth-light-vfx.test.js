@@ -29,13 +29,13 @@ const CASTS={
 };
 
 const STATUSES={
-    defenseDown:{file:"assets/vfx/earth/defense-down-loop.png",duration:1100,collection:"statusEffects"},
-    shield:{file:"assets/vfx/earth/rock-shield-loop.png",duration:1200,collection:"activeBuffs"},
-    petrify:{file:"assets/vfx/earth/petrify-loop.png",duration:1300,collection:"statusEffects"},
-    earthShield:{file:"assets/vfx/earth/earth-shield-loop.png",duration:1000,collection:"activeBuffs"},
-    rockWall:{file:"assets/vfx/earth/rock-wall-loop.png",duration:1400,collection:"activeBuffs"},
-    barrier:{file:"assets/vfx/earth/barrier-loop.png",duration:1200,collection:"activeBuffs"},
-    yuanZuBlessing:{file:"assets/vfx/light/yuan-zu-blessing-loop.png",duration:1200,collection:"activeBuffs",statusName:"元祖賜福"}
+    defenseDown:{file:"assets/vfx/earth/defense-down-loop.png",mode:"iconPulse",collection:"statusEffects"},
+    shield:{file:"assets/vfx/earth/rock-shield-loop.png",mode:"static",collection:"activeBuffs"},
+    petrify:{file:"assets/vfx/earth/petrify-loop.png",mode:"static",collection:"statusEffects"},
+    earthShield:{file:"assets/vfx/earth/earth-shield-loop.png",mode:"static",collection:"activeBuffs"},
+    rockWall:{file:"assets/vfx/earth/rock-wall-loop.png",mode:"static",collection:"activeBuffs"},
+    barrier:{file:"assets/vfx/earth/barrier-loop.png",mode:"static",collection:"activeBuffs"},
+    yuanZuBlessing:{file:"assets/vfx/light/yuan-zu-blessing-loop.png",mode:"pulse",collection:"activeBuffs",statusName:"元祖賜福"}
 };
 
 function pngSize(path){
@@ -163,17 +163,19 @@ test("earth trio sheets opt into fixed slot alignment and full-field earth stays
     assert.match(animation,/const destination=bounds\.centerOnBounds&&placement!=="trajectory"[\s\S]*?\?\{x:bounds\.centerX,y:bounds\.centerY\}[\s\S]*?:primaryAnchor[\s\S]*?\?\{x:primaryAnchor\.x,y:primaryAnchor\.y\}/);
 });
 
-test("all seven persistent effects use 4x2 runtime cropping with the requested loop cadence",()=>{
+test("earth and light persistent states use low-motion modes without a frame clock",()=>{
     const runtime=statusRuntime();
-    const manifest=runtime.context.v143StatusSpriteManifest;
+    const manifest=runtime.context.v143StatusVisualManifest;
     Object.entries(STATUSES).forEach(([type,spec])=>{
         const model=manifest[type];
         assert.ok(model,type);
-        assert.equal(model.src,spec.file+"?v=173.39",type);
-        assert.deepEqual(Array.from([model.columns,model.rows,model.frames]),[4,2,8],type);
-        assert.equal(model.renderer,"dom-sprite",type);
-        assert.equal(model.duration,spec.duration,type);
+        assert.equal(model.mode,spec.mode,type);
+        assert.equal(model.renderer,"dom-status-visual",type);
         assert.equal(model.collection,spec.collection,type);
+        assert.deepEqual(Array.from([model.cropColumns,model.cropRows]),[4,2],type);
+        assert.equal(model.src,spec.mode==="iconPulse"?"":spec.file+"?v=173.39",type);
+        assert.equal(model.frames,undefined,type+" has no persistent frame loop");
+        assert.equal(model.duration,undefined,type+" has no persistent frame clock");
         if(spec.statusName){ assert.equal(model.statusName,spec.statusName,type); }
         if(type==="barrier"){ assert.equal(model.cellAspect,.75,type); }
     });
@@ -190,14 +192,17 @@ test("persistent earth states and Yuan Zu blessing bind to their real combat sta
     runtime.party[2].activeBuffs.push({type:"rockWall",turnsLeft:4,percent:35});
     runtime.monsters[1].activeBuffs.push({type:"barrier",turnsLeft:5,remainingBlocks:5});
     runtime.monsters[2].activeBuffs.push({type:"v141TeamBuff",statusName:"元祖賜福",turnsLeft:2});
-    runtime.context.v143SyncStatusSpriteEffects();
-    assert.ok(runtime.cards.battleMonster0.querySelector(".v153-status-vfx-defenseDown"));
-    assert.ok(runtime.cards.battleMonster0.querySelector(".v153-status-vfx-petrify"));
-    assert.ok(runtime.cards.battlePlayerCard0.querySelector(".v153-status-vfx-shield"));
-    assert.ok(runtime.cards.battlePlayerCard1.querySelector(".v153-status-vfx-earthShield"));
-    assert.ok(runtime.cards.battlePlayerCard2.querySelector(".v153-status-vfx-rockWall"));
-    assert.ok(runtime.cards.battleMonster1.querySelector(".v153-status-vfx-barrier"));
-    assert.ok(runtime.cards.battleMonster2.querySelector(".v153-status-vfx-yuanZuBlessing"));
+    runtime.context.v143SyncStatusVisualEffects();
+    assert.ok(runtime.cards.battleMonster0.querySelector(".v143-status-icon-defenseDown"));
+    assert.ok(runtime.cards.battleMonster0.querySelector(".v143-status-visual-petrify"));
+    assert.ok(runtime.cards.battlePlayerCard0.querySelector(".v143-status-visual-shield"));
+    assert.ok(runtime.cards.battlePlayerCard1.querySelector(".v143-status-visual-earthShield"));
+    assert.ok(runtime.cards.battlePlayerCard2.querySelector(".v143-status-visual-rockWall"));
+    assert.ok(runtime.cards.battleMonster1.querySelector(".v143-status-visual-barrier"));
+    assert.ok(runtime.cards.battleMonster2.querySelector(".v143-status-visual-yuanZuBlessing"));
+    assert.equal(runtime.cards.battleMonster0.querySelector(".v143-status-visual-petrify").dataset.statusMode,"static");
+    assert.equal(runtime.cards.battlePlayerCard1.querySelector(".v143-status-visual-earthShield").dataset.statusMode,"static");
+    assert.equal(runtime.cards.battleMonster2.querySelector(".v143-status-visual-yuanZuBlessing").dataset.statusMode,"pulse");
 });
 
 test("rock shield on the attacking caster is deferred until its cast sheet finishes",()=>{
@@ -206,9 +211,9 @@ test("rock shield on the attacking caster is deferred until its cast sheet finis
     assert.match(animation,/current\.statusAtStart&&current\.statusAtStart\.has\(side\+":"\+index\+":"\+type\)/);
 });
 
-test("the Wanxiang loop is raster-owned and the old procedural corner effect is absent",()=>{
+test("Wanxiang uses a fixed image and the old procedural corner effect stays absent",()=>{
     assert.doesNotMatch(legacyEarth,/v143-earth-shield-effect/);
-    assert.match(animation,/earthShield:statusSheet\("assets\/vfx\/earth\/earth-shield-loop\.png\?v=173\.39",1000,"activeBuffs"/);
+    assert.match(animation,/earthShield:statusVisual\("assets\/vfx\/earth\/earth-shield-loop\.png\?v=173\.39","static","activeBuffs"/);
 });
 
 test("V173.39 cache version loads the new owner code without stale V173.38 browser assets",()=>{
