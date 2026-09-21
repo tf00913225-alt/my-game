@@ -289,6 +289,7 @@ test("the existing V143 render owner invokes V144 dungeon locking once per battl
     const context=baseContext({
         renderBattle(){ renderCalls++; return "rendered"; },
         requestAnimationFrame(){},
+        setTimeout(){ return 1; },
         v132ActiveDungeonRun:true,
         battleToken:"battle-a",
         currentBattleMonsters:[0],
