@@ -11025,9 +11025,9 @@ function startTurn(token){
 
     if(
         typeof window!=="undefined" &&
-        typeof window.v143SyncStatusSpriteEffects==="function"
+        typeof window.v143SyncStatusVisualEffects==="function"
     ){
-        window.v143SyncStatusSpriteEffects();
+        window.v143SyncStatusVisualEffects();
     }
 
 
