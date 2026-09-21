@@ -50,7 +50,7 @@
       "gameplay-core": {
         "scripts": [
           "build/gameplay-core-primary.22cba2375540.js",
-          "build/gameplay-core-secondary.78ecae9ceffa.js"
+          "build/gameplay-core-secondary.c6dbabfdf4f1.js"
         ],
         "styles": [
           "build/gameplay-core.c0f1862f56ff.css"
@@ -828,10 +828,6 @@
       "sha256": "22cba2375540",
       "bytes": 669454
     },
-    "build/gameplay-core-secondary.78ecae9ceffa.js": {
-      "sha256": "78ecae9ceffa",
-      "bytes": 528304
-    },
     "build/feature-patrol.5312ee69f0b5.js": {
       "sha256": "5312ee69f0b5",
       "bytes": 7770
@@ -943,6 +939,10 @@
     "assets/ui/startup-main-city.d43e67af1c1c.jpg": {
       "sha256": "d43e67af1c1c",
       "bytes": 363193
+    },
+    "build/gameplay-core-secondary.c6dbabfdf4f1.js": {
+      "sha256": "c6dbabfdf4f1",
+      "bytes": 528214
     }
   }
 }
