@@ -314,16 +314,18 @@
 
     let elementBoxBattleStartExp=null;
 
-    if(typeof renderBattle==="function"){
-        const originalRenderBattle=renderBattle;
-        renderBattle=function(){
-            originalRenderBattle.apply(this,arguments);
-            applyBattleFormation();
-            applyAllyBattleFormation();
-            applyPlayerElementFrames();
-            elementBoxBattleStartExp=Math.max(0,Number(sharedExp)||0);
-        };
-    }
+    /*
+       renderBattle 的 DOM 建立由 00-main.js 統一負責；本子系統只註冊
+       post-render 工作，不再覆寫 renderBattle。這樣保留原有執行順序，
+       同時讓其他戰鬥 owner 不必再穿透一層 wrapper。
+    */
+    window.FourSymbolsBattleRenderHooks=window.FourSymbolsBattleRenderHooks||[];
+    window.FourSymbolsBattleRenderHooks.push(function applyV138BattleRenderHook(){
+        applyBattleFormation();
+        applyAllyBattleFormation();
+        applyPlayerElementFrames();
+        elementBoxBattleStartExp=Math.max(0,Number(sharedExp)||0);
+    });
 
     window.v138GetFormationRows=getFormationRows;
     window.v138BattlePacing={
