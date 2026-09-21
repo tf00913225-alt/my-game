@@ -320,16 +320,12 @@ test("all eleven casts and six loops use the requested mapping, timing and share
             damageDown:"assets/vfx/status/wind/damage-down-front.webp",
             dodgeSkill:"assets/vfx/status/wind/dodge-skill-front.webp",
             stealthSkill:"assets/vfx/status/wind/stealth-skill-front.webp",
-            dinghaishenzhen:"assets/vfx/status/wind/dinghaishenzhen-front.webp"
+            dinghaishenzhen:"assets/vfx/status/wind/dinghaishenzhen-front.webp",
+            stun:"assets/vfx/status/wind/stun-front.webp"
         }[type];
-        if(type==="stun"){
-            assert.equal(sprite.src,"assets/vfx/wind/stun-loop.png?v=173.24",type);
-            assert.equal(sprite.layers,undefined,type);
-        }else{
-            assert.equal(sprite.src,formal+"?v=174-front-back-webp",type);
-            assert.equal(sprite.layers.front,formal+"?v=174-front-back-webp",type);
-            assert.match(sprite.layers.back,/assets\/vfx\/status\/wind\/.*-back\.webp\?v=174-front-back-webp/,type);
-        }
+        assert.equal(sprite.src,formal+"?v=174-front-back-webp",type);
+        assert.equal(sprite.layers.front,formal+"?v=174-front-back-webp",type);
+        assert.match(sprite.layers.back,/assets\/vfx\/status\/wind\/.*-back\.webp\?v=174-front-back-webp/,type);
         assert.deepEqual(
             Array.from([sprite.columns,sprite.rows,sprite.frames]),
             [4,2,8],type
