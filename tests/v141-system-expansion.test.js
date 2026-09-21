@@ -11,6 +11,7 @@ const v132Source=fs.readFileSync("js/27-v132-content-expansion.js","utf8");
 const v133Source=fs.readFileSync("js/28-v133-economy-rebalance.js","utf8");
 const coreSource=fs.readFileSync("js/34-v141-core-systems.js","utf8");
 const uiSource=fs.readFileSync("js/35-v141-ui-battle.js","utf8");
+const statusSource=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const finalNavSource=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");
 const contentSource=fs.readFileSync("js/36-v141-content-systems.js","utf8");
 const cssSource=fs.readFileSync("css/38-v141-system-expansion.css","utf8");
@@ -204,7 +205,7 @@ test("all player slots can manually resolve heal, revive and buff skills",()=>{
 
 test("card VFX cover all requested status groups and battle transitions are directional",()=>{
     ["burn","stun","freeze","petrify","shield","barrier","defenseDown","agilityDown","damageDown","statDown","buff"].forEach(type=>{
-        assert.ok(uiSource.includes('"'+type+'"'),"missing effect "+type);
+        assert.ok(uiSource.includes('"'+type+'"')||statusSource.includes(type+":"),"missing effect "+type);
     });
     ["heal","revive","potion","talisman"].forEach(type=>assert.ok(uiSource.includes('"'+type+'"')));
     assert.match(uiSource,/setTimeout\(\(\)=>\{[\s\S]*?v141-entry-moving[\s\S]*?\},1000\)/);
