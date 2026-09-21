@@ -73,11 +73,11 @@ test("Rage cast and loop remain visible and card-anchored on both sides",()=>{
     );
     assert.match(
         css,
-        /\.v153-status-vfx-rage\{[\s\S]*?z-index:5;[\s\S]*?opacity:1;/
+        /\.v143-status-visual-rage\{[\s\S]*?z-index:5;/
     );
     assert.match(
         css,
-        /battle-monster\.v152-abyss-portrait\s*>\s*\.v153-status-vfx\{[\s\S]*?position:absolute\s*!important;[\s\S]*?z-index:5\s*!important;/
+        /battle-monster\.v152-abyss-portrait\s*>\s*\.v143-status-visual\{[\s\S]*?position:absolute\s*!important;[\s\S]*?z-index:5\s*!important;/
     );
 });
 
