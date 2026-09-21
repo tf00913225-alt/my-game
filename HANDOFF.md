@@ -1,3 +1,12 @@
+## 2026-09-21 — Current release and integration status (V173.69 / V173.70 candidate)
+
+- Current GitHub refs: `dev@2d22118c62455667c29fbb4fbdbf126e8453b493`; `main@f747717493da6e2a7f259079a9d1fc0afeb9b5c0`. Game/Cache Version remains V173.69. `main` and `dev` were not directly modified in this work; no rebase or force push was used.
+- V173.70 release candidate: `release/v173.70-main-sync-20260921`, PR #417, candidate `a157199265a08fb94630d54e5581ff810bb9db5d`. Candidate CI, exact-SHA DEV preview/deployment, runtime regression evidence and S23 Ultra acceptance record are complete; PR remains open and has not been merged to `main`.
+- Status/VFX integration: PR #418, branch `integration/status-vfx-front-back-monster-portraits-20260921`, head `9c93b9c0935a7d2db58152a6275cd9114c30119e`. It targets `dev`, has successful CI and exact-SHA preview at `https://integration-status-vfx-front.four-symbols-dev.pages.dev`, and remains unmerged.
+- Monster portrait batch 57–65: PR #420, branch `feature/monster-portraits-batch-57-65-formal-20260921`, head `24b258ee5c824cc70ef2ca4593f18a4f25af30cc`. Four Library-verified standard portraits (57, 58, 60, 61) were imported; 59 and 62 were not imported because the available files do not meet the BOSS dimensions, and 63–65 remain pending without trusted Library source IDs. Exact-SHA preview `https://feature-monster-portraits-ba.four-symbols-dev.pages.dev` is available. CI and deployment succeeded; daily-dungeon runtime QA and the batch audit remain pending. Do not mark this batch VERIFIED yet.
+- Documentation: PR #419 updates `CHECK_REPORT.txt` to the actual V173.69 CI baseline (290/290 syntax, 201/201 Node tests on the current baseline, 388 static resources, 252 HTML IDs, 32 build hashes) and this current-status section. PR #419 targets `dev`, is open/ready, and has not been merged.
+- Remaining release and maintenance items: converge existing `renderBattle()` wrappers one subsystem at a time without adding new wrappers; close or mark superseded obsolete PRs/branches only after checking their current state; Cloud Account Phase 2–10 has not started; the monster portrait registry still has planned entries. Historical entries below are preserved and may describe older baselines.
+
 ## 2026-09-20 — Lv40 深淵 Owner 收斂／五帝立繪／商店與主城 Header（IMPLEMENTED／PR CI 與 dev 實機驗收待完成）
 
 - Base：最新 `origin/dev@bd084a1f200dc527ca101436b68b4d150a52cb3a`；工作分支：`fix/abyss-lv40-skill-owner-five-emperor-portrait-20260920`；`main` 未修改，未 rebase／force push。
