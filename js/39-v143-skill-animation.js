@@ -31,11 +31,14 @@
         },options||{});
     }
 
-    function statusSheet(src,duration,collection,options){
+    function statusVisual(src,mode,collection,options){
         return Object.assign({
-            src:src,columns:4,rows:2,frames:8,
-            duration:duration,collection:collection||"statusEffects",
-            renderer:"dom-sprite"
+            src:src||"",
+            mode:mode||"static",
+            collection:collection||"statusEffects",
+            cropColumns:4,
+            cropRows:2,
+            renderer:"dom-status-visual"
         },options||{});
     }
 
@@ -141,24 +144,27 @@
         yuanZuBlessing:{hit:.5,deferredStatusTypes:["yuanZuBlessing"],sprite:castSheet("assets/vfx/light/yuan-zu-blessing-cast.png?v=173.39","battlefield",{scale:1.08,minSize:280})}
     };
 
-    const RAW_STATUS_SPRITES={
-        burn:statusSheet("assets/vfx/fire/burn-loop.png?v=165",800,"statusEffects"),
-        rage:statusSheet("assets/vfx/fire/rage-buff-loop.png?v=165",1000,"activeBuffs"),
-        frostbite:statusSheet("assets/vfx/water/frostbite-status-loop-vfx.png?v=166",1000,"statusEffects",{scale:1.22}),
-        freeze:statusSheet("assets/vfx/water/frozen-status-loop-vfx.png?v=166",1100,"statusEffects",{scale:1.28}),
-        agilityDown:statusSheet("assets/vfx/wind/agility-down-loop.png?v=173.24",1000,"statusEffects"),
-        damageDown:statusSheet("assets/vfx/wind/damage-down-loop.png?v=173.24",1100,"statusEffects"),
-        stun:statusSheet("assets/vfx/wind/stun-loop.png?v=173.24",900,"statusEffects"),
-        dodgeSkill:statusSheet("assets/vfx/wind/dodge-skill-loop.png?v=173.24",850,"activeBuffs"),
-        stealthSkill:statusSheet("assets/vfx/wind/stealth-skill-loop.png?v=173.24",1200,"activeBuffs"),
-        dinghaishenzhen:statusSheet("assets/vfx/wind/dinghaishenzhen-loop.png?v=173.24",1200,"activeBuffs"),
-        defenseDown:statusSheet("assets/vfx/earth/defense-down-loop.png?v=173.39",1100,"statusEffects"),
-        shield:statusSheet("assets/vfx/earth/rock-shield-loop.png?v=173.39",1200,"activeBuffs",{scale:1.22}),
-        petrify:statusSheet("assets/vfx/earth/petrify-loop.png?v=173.39",1300,"statusEffects",{scale:1.22}),
-        earthShield:statusSheet("assets/vfx/earth/earth-shield-loop.png?v=173.39",1000,"activeBuffs",{scale:1.20}),
-        rockWall:statusSheet("assets/vfx/earth/rock-wall-loop.png?v=173.39",1400,"activeBuffs",{scale:1.20}),
-        barrier:statusSheet("assets/vfx/earth/barrier-loop.png?v=173.39",1200,"activeBuffs",{scale:1.24,cellAspect:.75}),
-        yuanZuBlessing:statusSheet("assets/vfx/light/yuan-zu-blessing-loop.png?v=173.39",1200,"activeBuffs",{statusName:"元祖賜福",scale:1.18})
+    const RAW_STATUS_VISUALS={
+        burn:statusVisual("assets/vfx/fire/burn-loop.png?v=165","pulse","statusEffects",{label:"燃燒"}),
+        rage:statusVisual("assets/vfx/fire/rage-buff-loop.png?v=165","pulse","activeBuffs",{label:"怒火"}),
+        frostbite:statusVisual("","iconPulse","statusEffects",{label:"凍傷",glyph:"❄"}),
+        freeze:statusVisual("assets/vfx/water/frozen-status-loop-vfx.png?v=166","static","statusEffects",{label:"冰封",scale:1.28}),
+        agilityDown:statusVisual("","iconPulse","statusEffects",{label:"重力",glyph:"重"}),
+        statDown:statusVisual("","iconPulse","statusEffects",{label:"全屬性降低",glyph:"降"}),
+        damageDown:statusVisual("","iconPulse","statusEffects",{label:"殤風",glyph:"傷"}),
+        stun:statusVisual("","iconPulse","statusEffects",{label:"暈眩",glyph:"✦"}),
+        dodgeSkill:statusVisual("assets/vfx/wind/dodge-skill-loop.png?v=173.24","pulse","activeBuffs",{label:"風行"}),
+        stealthSkill:statusVisual("assets/vfx/wind/stealth-skill-loop.png?v=173.24","static","activeBuffs",{label:"隱身"}),
+        dinghaishenzhen:statusVisual("assets/vfx/wind/dinghaishenzhen-loop.png?v=173.24","pulse","activeBuffs",{label:"氣定神閒"}),
+        defenseDown:statusVisual("","iconPulse","statusEffects",{label:"破防",glyph:"破"}),
+        shield:statusVisual("assets/vfx/earth/rock-shield-loop.png?v=173.39","static","activeBuffs",{label:"護盾",scale:1.22}),
+        petrify:statusVisual("assets/vfx/earth/petrify-loop.png?v=173.39","static","statusEffects",{label:"石化",scale:1.22}),
+        earthShield:statusVisual("assets/vfx/earth/earth-shield-loop.png?v=173.39","static","activeBuffs",{label:"萬象土盾",scale:1.20}),
+        rockWall:statusVisual("assets/vfx/earth/rock-wall-loop.png?v=173.39","static","activeBuffs",{label:"岩石壁壘",scale:1.20}),
+        barrier:statusVisual("assets/vfx/earth/barrier-loop.png?v=173.39","static","activeBuffs",{label:"結界",scale:1.24,cellAspect:.75}),
+        yuanZuBlessing:statusVisual("assets/vfx/light/yuan-zu-blessing-loop.png?v=173.39","pulse","activeBuffs",{statusName:"元祖賜福",label:"元祖賜福",scale:1.18}),
+        fireMomentum:statusVisual("","iconPulse","activeBuffs",{label:"炎勢",glyph:"炎"}),
+        phoenixMight:statusVisual("","iconPulse","activeBuffs",{statusName:"鳳威",label:"鳳威",glyph:"鳳"})
     };
 
     function protectObject(value,label){
@@ -175,8 +181,8 @@
         if(model.sprite){ model.sprite=protectObject(model.sprite,"sprite:"+id); }
         RAW_MANIFEST[id]=protectObject(model,"model:"+id);
     });
-    Object.keys(RAW_STATUS_SPRITES).forEach(type=>{
-        RAW_STATUS_SPRITES[type]=protectObject(RAW_STATUS_SPRITES[type],"status:"+type);
+    Object.keys(RAW_STATUS_VISUALS).forEach(type=>{
+        RAW_STATUS_VISUALS[type]=protectObject(RAW_STATUS_VISUALS[type],"status:"+type);
     });
 
     const MANIFEST=typeof Proxy==="function"
@@ -186,16 +192,16 @@
             defineProperty:function(){ blockedManifestWrites++; return true; }
         })
         :RAW_MANIFEST;
-    const STATUS_SPRITES=typeof Proxy==="function"
-        ?new Proxy(RAW_STATUS_SPRITES,{
+    const STATUS_VISUALS=typeof Proxy==="function"
+        ?new Proxy(RAW_STATUS_VISUALS,{
             set:function(){ blockedManifestWrites++; return true; },
             deleteProperty:function(){ blockedManifestWrites++; return true; },
             defineProperty:function(){ blockedManifestWrites++; return true; }
         })
-        :RAW_STATUS_SPRITES;
+        :RAW_STATUS_VISUALS;
 
     window.v143SkillAnimationManifest=MANIFEST;
-    window.v143StatusSpriteManifest=STATUS_SPRITES;
+    window.v143StatusVisualManifest=STATUS_VISUALS;
     window.v143GetSkillAnimationModel=function(skillId){
         return MANIFEST[skillId]||{hit:DEFAULT_HIT,noVisual:true,missingAsset:true,signature:"missing-"+String(skillId||"unknown")};
     };
@@ -212,7 +218,10 @@
         const sprite=model&&model.sprite;
         if(sprite&&sprite.src&&!model.lazyAsset){ preflightAsset(sprite.src); }
     });
-    Object.keys(RAW_STATUS_SPRITES).forEach(type=>preflightAsset(RAW_STATUS_SPRITES[type].src));
+    Object.keys(RAW_STATUS_VISUALS).forEach(type=>{
+        const source=RAW_STATUS_VISUALS[type]&&RAW_STATUS_VISUALS[type].src;
+        if(source){ preflightAsset(source); }
+    });
     window.v143PreloadBattleVfxAsset=function(effectId){
         const model=MANIFEST[effectId];
         const sprite=model&&model.sprite;
@@ -434,7 +443,7 @@
 
     function hasTimedEffect(entity,type){
         if(!entity){ return false; }
-        const spec=STATUS_SPRITES[type];
+        const spec=STATUS_VISUALS[type];
         const collection=spec&&spec.collection==="statusEffects"?entity.statusEffects:entity.activeBuffs;
         if(Array.isArray(collection)&&collection.some(effect=>
             effect&&Number(effect.turnsLeft)>0&&(
@@ -452,7 +461,7 @@
             []
                 .concat(Array.isArray(model&&model.deferredStatusTypes)?model.deferredStatusTypes:[])
                 .concat(Array.isArray(model&&model.deferredActorStatusTypes)?model.deferredActorStatusTypes:[])
-        )).filter(type=>!!STATUS_SPRITES[type]);
+        )).filter(type=>!!STATUS_VISUALS[type]);
         if(!relevantTypes.length){ return snapshot; }
         const groups=[
             ["monster",typeof currentBattleMonsters!=="undefined"?currentBattleMonsters.filter(Number.isInteger):[]],
@@ -498,38 +507,102 @@
         return false;
     }
 
-    function statusNode(card,type){
+    function statusVisualNode(card,type){
         if(!card){ return null; }
-        if(typeof card.querySelector==="function"){ return card.querySelector(".v153-status-vfx-"+type); }
+        const className="v143-status-visual-"+type;
+        if(typeof card.querySelector==="function"){ return card.querySelector("."+className); }
         return Array.from(card.children||[]).find(node=>
-            String(node.className||"").split(/\s+/).includes("v153-status-vfx-"+type)
+            String(node.className||"").split(/\s+/).includes(className)
         )||null;
     }
 
-    function syncStatusSprite(side,index,type){
-        const spec=STATUS_SPRITES[type];
+    function statusIconHost(side,index,card){
+        if(typeof document!=="undefined"&&typeof document.getElementById==="function"){
+            const id=side==="monster"?"battleMonsterStatus"+index:"battlePlayerStatus"+index;
+            const exact=document.getElementById(id);
+            if(exact){ return exact; }
+        }
+        return card&&typeof card.querySelector==="function"
+            ?card.querySelector(".monster-status-badges")
+            :null;
+    }
+
+    function statusIconNode(host,type){
+        if(!host){ return null; }
+        if(typeof host.querySelector==="function"){
+            return host.querySelector('.v143-status-icon[data-status-type="'+type+'"]');
+        }
+        return Array.from(host.children||[]).find(node=>
+            String(node.className||"").split(/\s+/).includes("v143-status-icon")&&
+            node.dataset&&node.dataset.statusType===type
+        )||null;
+    }
+
+    function removeStatusVisual(card,side,index,type){
+        const visual=statusVisualNode(card,type);
+        if(visual&&typeof visual.remove==="function"){ visual.remove(); }
+        else if(visual&&visual.parentNode){ visual.parentNode.removeChild(visual); }
+        const host=statusIconHost(side,index,card);
+        const icon=statusIconNode(host,type);
+        if(icon&&typeof icon.remove==="function"){ icon.remove(); }
+        else if(icon&&icon.parentNode){ icon.parentNode.removeChild(icon); }
+    }
+
+    function createBodyStatusVisual(type,spec){
+        const node=document.createElement("i");
+        node.className="v143-status-visual v143-status-visual-"+type+" v143-status-visual--"+spec.mode;
+        node.dataset.statusType=type;
+        node.dataset.statusMode=spec.mode;
+        node.dataset.renderer="dom-status-visual";
+        if(typeof node.setAttribute==="function"){ node.setAttribute("aria-hidden","true"); }
+        node.style.backgroundImage='url("'+String(spec.src).replace(/"/g,"%22")+'")';
+        node.style.backgroundSize=(Math.max(1,Number(spec.cropColumns)||1)*100)+"% "+
+            (Math.max(1,Number(spec.cropRows)||1)*100)+"%";
+        node.style.backgroundPosition="0 0";
+        return node;
+    }
+
+    function createStatusIcon(type,spec){
+        const node=document.createElement("i");
+        node.className="v143-status-icon v143-status-icon--pulse v143-status-icon-"+type;
+        node.dataset.statusType=type;
+        node.dataset.statusMode="iconPulse";
+        node.dataset.renderer="dom-status-icon";
+        node.textContent=spec.glyph||"•";
+        node.title=spec.label||type;
+        if(typeof node.setAttribute==="function"){ node.setAttribute("aria-label",spec.label||type); }
+        return node;
+    }
+
+    function syncStatusVisual(side,index,type){
+        const spec=STATUS_VISUALS[type];
         const card=cardFor(side,index);
         const entity=entityFor(side,index);
         const alive=!!(spec&&card&&entity&&Number(entity.hp)>0&&(side!=="monster"||entity.alive!==false));
         const active=alive&&hasTimedEffect(entity,type);
-        let node=statusNode(card,type);
         if(!active||deferredStatusDuringCast(side,index,type)){
-            if(node&&typeof node.remove==="function"){ node.remove(); }
-            else if(node&&node.parentNode){ node.parentNode.removeChild(node); }
+            removeStatusVisual(card,side,index,type);
             return;
         }
+
+        if(spec.mode==="iconPulse"){
+            const host=statusIconHost(side,index,card);
+            if(!host){ return; }
+            if(!statusIconNode(host,type)){ host.appendChild(createStatusIcon(type,spec)); }
+            const body=statusVisualNode(card,type);
+            if(body&&typeof body.remove==="function"){ body.remove(); }
+            return;
+        }
+
+        let node=statusVisualNode(card,type);
         if(!node){
-            node=document.createElement("i");
-            node.className="v153-status-vfx v153-status-vfx-"+type;
-            node.dataset.statusType=type;
-            node.dataset.frames=String(spec.frames);
-            node.dataset.renderer="dom-sprite";
-            if(typeof node.setAttribute==="function"){ node.setAttribute("aria-hidden","true"); }
-            node.style.backgroundImage='url("'+String(spec.src).replace(/"/g,"%22")+'")';
-            node.style.backgroundSize=(spec.columns*100)+"% "+(spec.rows*100)+"%";
-            node.style.setProperty("--v153-status-duration",spec.duration+"ms");
+            node=createBodyStatusVisual(type,spec);
             card.appendChild(node);
         }
+        const host=statusIconHost(side,index,card);
+        const icon=statusIconNode(host,type);
+        if(icon&&typeof icon.remove==="function"){ icon.remove(); }
+
         const anchor=slotAnchor(side,index,card);
         if(!anchor){ return; }
         const scale=(Number(spec.scale)||1.18)*1.28;
@@ -545,24 +618,24 @@
         }
     }
 
-    function syncStatusSpritesForUnit(side,index){
-        Object.keys(RAW_STATUS_SPRITES).forEach(type=>syncStatusSprite(side,index,type));
+    function syncStatusVisualsForUnit(side,index){
+        Object.keys(RAW_STATUS_VISUALS).forEach(type=>syncStatusVisual(side,index,type));
     }
 
-    function syncStatusSpriteEffects(){
+    function syncStatusVisualEffects(){
         purgeLegacyCardVfx();
         const enemyIndexes=typeof currentBattleMonsters!=="undefined"?currentBattleMonsters.filter(Number.isInteger):[];
-        enemyIndexes.forEach(index=>syncStatusSpritesForUnit("monster",index));
-        for(let index=0;index<6;index++){ syncStatusSpritesForUnit("player",index); }
+        enemyIndexes.forEach(index=>syncStatusVisualsForUnit("monster",index));
+        for(let index=0;index<6;index++){ syncStatusVisualsForUnit("player",index); }
     }
 
-    function removeStatusSpriteEffects(){
+    function removeStatusVisualEffects(){
         if(typeof document==="undefined"||typeof document.querySelectorAll!=="function"){ return; }
-        document.querySelectorAll(".v153-status-vfx").forEach(node=>node.remove());
+        document.querySelectorAll(".v143-status-visual,.v143-status-icon").forEach(node=>node.remove());
     }
-    window.v143SyncStatusSpriteEffects=syncStatusSpriteEffects;
+    window.v143SyncStatusVisualEffects=syncStatusVisualEffects;
 
-    function syncAppliedStatusSprite(entity,type){
+    function syncAppliedStatusVisual(entity,type){
         if(!entity){ return; }
         let side=null,index=-1;
         if(typeof monsters!=="undefined"&&Array.isArray(monsters)){
@@ -584,12 +657,12 @@
                 let tracked=current.deferredStatusTargets.get(type);
                 if(!tracked){ tracked=new Set(); current.deferredStatusTargets.set(type,tracked); }
                 tracked.add(index);
-                syncStatusSprite(side,index,type);
+                syncStatusVisual(side,index,type);
                 return;
             }
         }
         const wait=existingTargetDelay(side,index);
-        const invoke=()=>syncStatusSprite(side,index,type);
+        const invoke=()=>syncStatusVisual(side,index,type);
         if(wait>8){ setTimer(invoke,wait); } else{ invoke(); }
     }
 
@@ -597,7 +670,7 @@
         const previous=applyBurnEffect;
         applyBurnEffect=function(entity){
             const result=previous.apply(this,arguments);
-            if(result!==false){ syncAppliedStatusSprite(entity,"burn"); }
+            if(result!==false){ syncAppliedStatusVisual(entity,"burn"); }
             return result;
         };
     }
@@ -605,7 +678,7 @@
         const previous=applyFreezeEffect;
         applyFreezeEffect=function(entity){
             const result=previous.apply(this,arguments);
-            if(result!==false){ syncAppliedStatusSprite(entity,"freeze"); }
+            if(result!==false){ syncAppliedStatusVisual(entity,"freeze"); }
             return result;
         };
     }
@@ -613,7 +686,7 @@
         const previous=applyMonsterDebuff;
         applyMonsterDebuff=function(entity,type){
             const result=previous.apply(this,arguments);
-            if(result!==false&&STATUS_SPRITES[type]){ syncAppliedStatusSprite(entity,type); }
+            if(result!==false&&STATUS_VISUALS[type]){ syncAppliedStatusVisual(entity,type); }
             return result;
         };
     }
@@ -859,7 +932,7 @@
         const card=cardFor(current.targetSide,index);
         if(card&&card.classList){ card.classList.remove("v143-effects-pending"); }
         current.hitReached=true;
-        syncStatusSpritesForUnit(current.targetSide,index);
+        syncStatusVisualsForUnit(current.targetSide,index);
     }
 
     function emitSprite(current,index,allowDefeated){
@@ -896,7 +969,7 @@
             state.stage.remove();
         }
         if(state.current===current){ state.current=null; state.stage=null; }
-        syncStatusSpriteEffects();
+        syncStatusVisualEffects();
         state.metrics.completed++;
         if(current.gate&&!current.gate.done){ current.gate.complete(reason||"v143-raster-complete"); }
     }
@@ -966,7 +1039,7 @@
         if(
             (Array.isArray(model.deferredStatusTypes)&&model.deferredStatusTypes.length)||
             (Array.isArray(model.deferredActorStatusTypes)&&model.deferredActorStatusTypes.length)
-        ){ syncStatusSpriteEffects(); }
+        ){ syncStatusVisualEffects(); }
 
         if(model.noVisual||!model.sprite){
             if(!model.passive){ state.metrics.missingVisuals++; }
@@ -1022,7 +1095,7 @@
         if(typeof document!=="undefined"&&typeof document.querySelectorAll==="function"){
             document.querySelectorAll("#v143-skill-stage").forEach(node=>node.remove());
         }
-        removeStatusSpriteEffects();
+        removeStatusVisualEffects();
         purgeLegacyCardVfx();
         return originalDispose();
     };
@@ -1129,9 +1202,9 @@
         const invoke=function(){
             const unitIndex=Number(index);
             if((side==="player"||side==="monster")&&Number.isInteger(unitIndex)){
-                syncStatusSpritesForUnit(side,unitIndex);
+                syncStatusVisualsForUnit(side,unitIndex);
             }else{
-                syncStatusSpriteEffects();
+                syncStatusVisualEffects();
             }
         };
         if(wait>8){ setTimer(invoke,wait); }else{ invoke(); }
@@ -1179,25 +1252,13 @@
                     setTimer(()=>{
                         state.pendingUpdates.delete(key);
                         previous.apply(this,args);
-                        syncStatusSpritesForUnit("monster",Number(index));
+                        syncStatusVisualsForUnit("monster",Number(index));
                     },wait);
                 }
                 return;
             }
             const result=previous.apply(this,arguments);
-            syncStatusSpritesForUnit("monster",Number(index));
-            return result;
-        };
-    }
-
-    if(typeof updateUI==="function"){
-        const previous=updateUI;
-        updateUI=function(){
-            const result=previous.apply(this,arguments);
-            /* Preserve synchronous lifecycle semantics, but perform only one
-               complete status pass. The old zero-delay duplicate pass made
-               every battle UI refresh scan the battlefield twice. */
-            syncStatusSpriteEffects();
+            syncStatusVisualsForUnit("monster",Number(index));
             return result;
         };
     }
@@ -1214,13 +1275,13 @@
                     setTimer(()=>{
                         state.pendingUpdates.delete(key);
                         previous.apply(this,args);
-                        syncStatusSpritesForUnit("player",Number(index));
+                        syncStatusVisualsForUnit("player",Number(index));
                     },wait);
                 }
                 return;
             }
             const result=previous.apply(this,arguments);
-            syncStatusSpritesForUnit("player",Number(index));
+            syncStatusVisualsForUnit("player",Number(index));
             return result;
         };
     }
@@ -1240,7 +1301,7 @@
     wrapBadge("showMonsterSkillNameBadge");
 
     if(typeof document!=="undefined"){
-        const boot=function(){ purgeLegacyCardVfx(); syncStatusSpriteEffects(); };
+        const boot=function(){ purgeLegacyCardVfx(); syncStatusVisualEffects(); };
         if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",boot,{once:true}); }
         else{ boot(); }
     }
@@ -1256,6 +1317,7 @@
             blockedCardEffectOverrides:blockedCardEffectOverrides,
             failedAssets:Array.from(failedAssets),
             renderer:"dom-sprite-only",
+            statusRenderer:"dom-status-visual",
             geometryOwner:"fixed-slot",
             stageNodes:state.stage?state.stage.querySelectorAll("*").length:0
         });
