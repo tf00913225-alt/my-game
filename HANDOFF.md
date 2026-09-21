@@ -4107,3 +4107,27 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 - 三層模型：Level 1 首屏完整後曝光；Level 2 主城可操作後由唯一 Feature Loader、idle、concurrency 1 背景預抓；Level 3 大型玩法維持按需 Lazy Load。
 - Relic 首次開啟先顯示正式局部 loading，20 icon 只由 `RELIC_CATALOG_LIST[].iconPath` 衍生並在 visual-ready 後一次呈現；背景不 execute Boss／Tower／Relic runtime。
 - 工作分支：`fix/cold-start-visual-ready-background-prefetch-20260920`；以最新 `dev` 為基準，main 不修改。待 GitHub 認證後依保護流程推送、CI、PR 合併。
+
+
+## 2026-09-22 — Monster Portrait Fast Import（已生成怪物立繪快速導入）
+
+### 永久 Owner
+- 已生成且已落正式路徑的怪物立繪，正式快速導入 owner：`scripts/import-monster-portraits.mjs`。
+- CLI alias：`npm run portrait:import -- ...`。
+- Registry owner 仍為 `config/monster-portrait-registry.json`。
+- Runtime resolver owner 仍為 `js/45-v154-dev-fixes.js` 的 `resolveMonsterPortraitRecord()`；V159 僅同步時序，不新增 wrapper。
+
+### 固定流程
+1. 母圖／待處理素材仍依 `docs/IMAGE_ASSET_SPEC.md` 完成無損 WebP 與透明／尺寸驗證。
+2. 核准 WebP 放到 registry 指定的 `assets/monsters/` 正式路徑。
+3. 已生成素材不再要求建立 monster portrait batch manifest；直接使用：
+   `npm run portrait:import -- --keys=<portraitKey,...>`
+4. `planned` 通過檢查後升為 `existing`。
+5. `retired` 預設禁止重新啟用；只有專案負責人明確授權時使用 `--reactivate-retired`。
+6. 工具必須驗證 WebP 解碼、sizeClass 尺寸、Alpha／透明像素、V154 resolver 契約與既有 monster portrait runtime test。
+7. 未生成素材仍維持既有 batch generate/finalize/strict audit 流程。
+
+### 收斂目的
+- 解決「圖片已存在，但仍因 planned／retired／batch manifest 流程而長時間卡在正式接線」。
+- 避免只看檔案存在就誤判完成；正式導入仍以 `status=existing` 且 Runtime owner 可解析為準。
+- 快速導入工具只處理本子系統，不修改戰鬥玩法、UI、怪物數值或 main。
