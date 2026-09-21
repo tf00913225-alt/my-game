@@ -21,6 +21,6 @@ assert.match(canonicalCss,/v17345-equipment-shop[\s\S]*grid-template-rows:32px m
 assert.match(canonicalCss,/v17346-shop-card \.v17346-gear-art\{[\s\S]*overflow:hidden !important[\s\S]*box-sizing:border-box !important/);
 assert.match(canonicalCss,/v17346-gear-art\s*>\s*\.v169-item-art\{[\s\S]*max-width:100% !important[\s\S]*max-height:100% !important[\s\S]*overflow:hidden !important/);
 assert.match(canonicalCss,/v17346-gear-art\s*>\s*\.v169-item-art\s*>\s*(?:img|svg)\{[\s\S]*object-fit:contain !important/);
-assert.match(loader,/const V_ASSET_VERSION="173\\.70"/);
+assert.match(loader,/const V_ASSET_VERSION="173\.70"/);
 assert.match(index,/<title>四象江湖傳 V173\.69<\/title>/);
 console.log("✓ V173.62 restores premium equipment shop layout and click preview");
