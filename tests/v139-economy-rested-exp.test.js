@@ -223,7 +223,8 @@ test("modular item art is permanent guidance and current assets are cache-versio
     assert.match(uiGuidelines,/新增約 100 個一般道具/);
     assert.match(loaderSource,/js\/32-v139-rested-experience\.js/);
     assert.match(loaderSource,/css\/37-v139-rested-experience\.css/);
-    assert.match(loaderSource,/const V_ASSET_VERSION="173\.69"/);
+    const assetVersionMatch=loaderSource.match(/const V_ASSET_VERSION="([^"]+)"/);
+    assert.equal(assetVersionMatch?.[1],releaseMeta.cacheVersion);
     assert.match(indexSource,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
 
