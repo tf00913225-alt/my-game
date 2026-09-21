@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-21-v17370-main-release",
+  "baseBranch": "dev",
+  "baseCommit": "0061a439b74b3cf0c319d5a6c79d4e6506a2b875",
+  "officialVersion": "173.70",
+  "officialVersionBumpAllowed": true,
+  "overallStatus": "IMPLEMENTED",
+  "requirements": [
+    {
+      "id": "REL-01",
+      "status": "VERIFIED",
+      "requirement": "確認候選來源為最新 dev，已完成專案負責人深淵實戰驗收；main 全程不直接修改、禁止 rebase 與 force push。",
+      "evidence": [
+        "dev@0061a439b74b3cf0c319d5a6c79d4e6506a2b875",
+        "專案負責人已確認最新 dev 深淵實戰驗收成功",
+        "main@abc8f53eb1012b233c49087d80ece9f4015d8025"
+      ]
+    },
+    {
+      "id": "REL-02",
+      "status": "VERIFIED",
+      "requirement": "以 current main 與最新 dev 建立真實整合候選，並確認候選內容完整納入 main 與 dev 的共同歷史。",
+      "evidence": [
+        "PR #455 candidate f11d498b5b3164dd09e27289828bb54fed88ecc0",
+        "parents: main@abc8f53 + dev@0061a43",
+        "candidate tree = dev tree"
+      ]
+    },
+    {
+      "id": "REL-03",
+      "status": "IMPLEMENTED",
+      "requirement": "依完整差異建立 V173.70 的玩家公告、CHANGELOG 與 Game/Cache Version，並通過正式 build、版本與公告同步檢查。",
+      "evidence": [
+        "release/release.json",
+        "release/release-update.json",
+        "CHANGELOG.md",
+        "release/requirements.json"
+      ]
+    },
+    {
+      "id": "REL-04",
+      "status": "TODO",
+      "requirement": "發布準備 PR 合併 dev 後，最新 dev HEAD 的 Repository checks、DEV exact-SHA deployment 與部署版本核對必須成功。",
+      "evidence": []
+    },
+    {
+      "id": "REL-05",
+      "status": "TODO",
+      "requirement": "以新的 protected dev → main 正式發布 PR 推進 main；main CI 與 production deployment 成功，並核對 production SHA、Game Version、Cache Version。",
+      "evidence": []
+    }
+  ],
+  "automatedVerification": "PR #455 的 candidate CI run 35617243606 已在 main+dev 真實整合候選上成功。V173.70 metadata PR 的 CI / build / version / notice gate 與合併後 dev exact-SHA deployment 尚待執行。",
+  "visualVerification": "專案負責人已確認最新 dev@0061a43 的深淵實戰驗收成功。",
+  "verifiedSourceCommit": "f11d498b5b3164dd09e27289828bb54fed88ecc0",
+  "mergedDevCommit": null,
+  "mergedMainCommit": null,
+  "candidateCiRun": 35617243606,
+  "devPushCiRun": null,
+  "devDeployJob": null
+}
