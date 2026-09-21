@@ -12,7 +12,7 @@ let passed=0;
 function test(name,handler){ handler(); passed++; console.log("✓ "+name); }
 
 test("HP and SP resource HUD stays above persistent status VFX",()=>{
-    assert.match(vfxCss,/\.v153-status-vfx-rage\{[\s\S]*?z-index:5;/);
+    assert.match(vfxCss,/\.v143-status-visual-rage\{[\s\S]*?z-index:5;/);
     assert.match(
         layerCss,
         /#game-stage #battlePage \.battle-player \.hp-bar,[\s\S]*?#game-stage #battlePage \.battle-monster \.monster-sp\{[\s\S]*?position:relative !important;[\s\S]*?z-index:20 !important;/

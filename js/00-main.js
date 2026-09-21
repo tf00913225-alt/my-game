@@ -11025,9 +11025,9 @@ function startTurn(token){
 
     if(
         typeof window!=="undefined" &&
-        typeof window.v143SyncStatusSpriteEffects==="function"
+        typeof window.v143SyncStatusVisualEffects==="function"
     ){
-        window.v143SyncStatusSpriteEffects();
+        window.v143SyncStatusVisualEffects();
     }
 
 
@@ -23260,18 +23260,7 @@ function renderBattle(){
 
             card.innerHTML =
 
-            `
-            <div
-                id="battleMonsterFreezeOverlay${index}"
-                class="card-status-overlay freeze-overlay"
-            ></div>
-
-            <div
-                id="battleMonsterBurnOverlay${index}"
-                class="card-status-overlay burn-overlay"
-            ></div>
-
-            <div class="battle-monster-icon">
+            `            <div class="battle-monster-icon">
                 ${icon}
             </div>
 
@@ -23417,175 +23406,10 @@ function updateMonsterUI(index){
     const statusArea =
         $("battleMonsterStatus"+index);
 
-
     if(statusArea){
-
-        const hasBurn =
-            monster.statusEffects &&
-            monster.statusEffects.some(
-                effect=>
-                    effect.type==="burn"
-            );
-
-
-        const hasFreeze =
-            isMonsterFrozen(
-                monster
-            );
-
-
-        /*
-           ★ 新增（依照使用者要求）：
-           石化跟四種簡單減益效果，也一併
-           顯示小圖示，玩家才看得出這隻怪物
-           身上現在掛著哪些效果，不用只能
-           從戰鬥紀錄裡回頭找。
-        */
-
-        const hasPetrify=
-
-            monster.statusEffects &&
-            monster.statusEffects.some(
-                effect=>
-
-                    effect.type==="petrify"&&
-                    effect.turnsLeft>0
-
-            );
-
-
-        const hasAgilityDown=
-
-            getMonsterDebuffValue(
-                monster,
-                "agilityDown"
-            )>0;
-
-
-        const hasStatDown=
-
-            getMonsterDebuffValue(
-                monster,
-                "statDown"
-            )>0;
-
-
-        const hasDefenseDown=
-
-            getMonsterDebuffValue(
-                monster,
-                "defenseDown"
-            )>0;
-
-
-        const hasDamageDown=
-
-            getMonsterDebuffValue(
-                monster,
-                "damageDown"
-            )>0;
-
-
-        const hasStun=
-
-            getMonsterDebuffValue(
-                monster,
-                "stun"
-            )>0;
-
-
-        statusArea.innerHTML =
-
-            (
-                hasBurn
-                ?
-                '<span class="monster-status-badge burn"title="燃燒中"></span>'
-                :
-                ""
-            )+
-            (
-                hasFreeze
-                ?
-                '<span class="monster-status-badge freeze"title="冰封中"></span>'
-                :
-                ""
-            )+
-            (
-                hasPetrify
-                ?
-                '<span class="monster-status-badge"title="石化中"></span>'
-                :
-                ""
-            )+
-            (
-                hasAgilityDown
-                ?
-                '<span class="monster-status-badge"title="重力中"></span>'
-                :
-                ""
-            )+
-            (
-                hasStatDown
-                ?
-                '<span class="monster-status-badge"title="全屬性降低中"></span>'
-                :
-                ""
-            )+
-            (
-                hasDefenseDown
-                ?
-                '<span class="monster-status-badge"title="破防中"></span>'
-                :
-                ""
-            )+
-            (
-                hasDamageDown
-                ?
-                '<span class="monster-status-badge"title="殤風中"></span>'
-                :
-                ""
-            )+
-            (
-                hasStun
-                ?
-                '<span class="monster-status-badge"title="暈眩中"></span>'
-                :
-                ""
-            );
-
-
-        /*
-           ★ 新增：整張卡片的冰封/燃燒包覆效果，
-           跟上面小圖示同步開關。
-        */
-
-        const freezeOverlay=
-            $("battleMonsterFreezeOverlay"+index);
-
-
-        const burnOverlay=
-            $("battleMonsterBurnOverlay"+index);
-
-
-        if(freezeOverlay){
-
-            freezeOverlay.classList.toggle(
-                "show",
-                hasFreeze
-            );
-
-        }
-
-
-        if(burnOverlay){
-
-            burnOverlay.classList.toggle(
-                "show",
-                hasBurn
-            );
-
-        }
-
+        /* V143 is the sole persistent-status visual owner. Base battle UI only
+           keeps the stable host and clears stale markup before that owner syncs. */
+        statusArea.innerHTML="";
     }
 
 
@@ -23824,26 +23648,12 @@ function updateSingleCharacterStatusBadge(
     const statusArea =
         $("battlePlayerStatus"+index);
 
-
     if(!statusArea){
         return;
     }
 
-
-    const rageBuff =
-        (character.activeBuffs||[])
-        .find(
-            b=>b.type==="rage"
-        );
-
-
-    statusArea.innerHTML =
-
-        rageBuff
-        ?
-        '<span class="monster-status-badge rage"title="怒火生效中"></span>'
-        :
-        "";
+    /* Persistent status content is rendered by V143 after this base UI pass. */
+    statusArea.innerHTML="";
 
 }
 

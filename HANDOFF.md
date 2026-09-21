@@ -1,7 +1,7 @@
 ## 2026-09-21 — 目前正式狀態／V173.70 候選結案
 
 - 正式 `main`：V173.69，Game／Cache Version 為 `173.69`；目前 SHA：`f747717493da6e2a7f259079a9d1fc0afeb9b5c0`。正式 CI 與 Pages deployment 均已成功。
-- 最新 `dev`：`2da319ad7d90cc56f56967a787d0f4ef87e2df5c`；本輪文件更新以此為基準，未直接修改 `dev` 或 `main`。
+- 最新 `dev`：`ce40dfe0a619b86b5910060ec6e003d9d3acb475`；本輪文件更新以此為基準，未直接修改 `dev` 或 `main`。
 - 原 V173.70 候選 PR #423 已關閉且未合併：候選 CI 被四個無效日常副本 WebP 阻塞，圖片修復工作已由專案負責人明確結案；後續不得把該候選 SHA 當成可發布版本。
 - 下一次發布必須重新以最新 `main`／最新 `dev` 建立候選，重新跑完整 CI、DEV exact-SHA deployment 與 S23 Ultra 實機驗收。未完成前不得推送 `main`。
 - 目前仍保留的非阻斷技術債：戰鬥核心多層 `renderBattle()` wrapper 尚未收斂；真機驗收仍不能由模擬尺寸 CI 取代。以下較早的 NOT COMPLETE／待驗收紀錄均為歷史紀錄，不代表目前正式狀態。
