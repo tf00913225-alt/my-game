@@ -4124,7 +4124,7 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
    `npm run portrait:import -- --keys=<portraitKey,...>`
 4. `planned` 通過檢查後升為 `existing`。
 5. `retired` 預設禁止重新啟用；只有專案負責人明確授權時使用 `--reactivate-retired`。
-6. 工具必須驗證 WebP 解碼、sizeClass 尺寸、Alpha／透明像素、V154 resolver 契約與既有 monster portrait runtime test。
+6. 工具必須驗證 WebP 解碼、sizeClass 尺寸、Alpha／透明像素、V154 resolver 契約與既有 monster portrait runtime test；若 registry 還是舊 `.png/.jpg/.jpeg` path，但同 stem 正式 WebP 已存在，工具會自動收斂成 `.webp`。
 7. 未生成素材仍維持既有 batch generate/finalize/strict audit 流程。
 
 ### 收斂目的
