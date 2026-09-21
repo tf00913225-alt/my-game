@@ -551,26 +551,22 @@
     /* 日常副本的舊啟動器保留在 V132 私有閉包內；在真正 renderBattle
        完成元素平均化後再鎖定一次，涵蓋所有副本入口且不會每回合重抽。 */
     let configuredDungeonBattleToken=null;
-    if(typeof renderBattle==="function"){
-        const previousRenderBattleForSkills=renderBattle;
-        renderBattle=function(){
-            const roster=typeof monsters!=="undefined"?monsters:null;
-            const result=previousRenderBattleForSkills.apply(this,arguments);
-            const token=typeof battleToken!=="undefined"?battleToken:null;
-            if(
-                window.v132ActiveDungeonRun&&
-                token!==configuredDungeonBattleToken&&
-                !(Array.isArray(roster)&&roster.some(monster=>monster&&monster.v174TrueRealmFinal))
-            ){
-                configuredDungeonBattleToken=token;
-                const encounterId="dungeon-render-"+(++encounterSequence);
-                (typeof currentBattleMonsters!=="undefined"?currentBattleMonsters:[]).forEach(index=>
-                    configureEncounterSkills(monsters[index],encounterId)
-                );
-            }
-            return result;
-        };
+    function configureDungeonBattleSkillsAfterRender(){
+        const roster=typeof monsters!=="undefined"?monsters:null;
+        const token=typeof battleToken!=="undefined"?battleToken:null;
+        if(
+            window.v132ActiveDungeonRun&&
+            token!==configuredDungeonBattleToken&&
+            !(Array.isArray(roster)&&roster.some(monster=>monster&&monster.v174TrueRealmFinal))
+        ){
+            configuredDungeonBattleToken=token;
+            const encounterId="dungeon-render-"+(++encounterSequence);
+            (typeof currentBattleMonsters!=="undefined"?currentBattleMonsters:[]).forEach(index=>
+                configureEncounterSkills(monsters[index],encounterId)
+            );
+        }
     }
+    window.v144ConfigureDungeonBattleSkillsAfterRender=configureDungeonBattleSkillsAfterRender;
 
     function abyssAllies(){
         return (typeof currentBattleMonsters!=="undefined"?currentBattleMonsters:[])
