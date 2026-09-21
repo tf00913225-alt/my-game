@@ -82,7 +82,7 @@ for(const key of batchKeys){
 }
 
 const existingTargets=rows.filter(row=>row[statusIndex]==="existing").length+(dryRun?promoted.length:0);
-const plannedTargets=rows.length-existingTargets;
+const plannedTargets=rows.filter(row=>row[statusIndex]==="planned").length-(dryRun?promoted.length:0);
 const nextManifest={
     ...manifest,
     status:pending.length?"IN_PROGRESS":"COMPLETE",
