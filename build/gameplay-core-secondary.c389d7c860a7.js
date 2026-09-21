@@ -2405,6 +2405,10 @@
         return names[type][rank||"regular"];
     }
 
+    function dailyMonsterPortraitKey(type,rank){
+        return "daily."+String(type)+"."+String(rank||"regular");
+    }
+
     function buildDailyWave(type,wave,level,context){
         const roster=[];
         for(let slot=0;slot<6;slot++){
@@ -2413,6 +2417,7 @@
             const monster=typeof window.v132BuildDungeonMonster==="function"
                 ?window.v132BuildDungeonMonster(dailyMonsterName(type,rank),level,element,rank||undefined)
                 :makeZoneMonster(dailyMonsterName(type,rank),level,element,rank||undefined);
+            monster.portraitKey=dailyMonsterPortraitKey(type,rank);
             monster.v132Dungeon=true;
             monster.v173DailyDungeonType=type;
             monster.v141DungeonStage=wave;
@@ -4674,7 +4679,11 @@
                     card.appendChild(art);
                 }
             }
-            if(art&&art.style){ art.style.backgroundImage=cssValue; }
+            if(art&&art.style){
+                if(typeof art.style.setProperty==="function"){
+                    art.style.setProperty("background-image",cssValue,"important");
+                }else{ art.style.backgroundImage=cssValue; }
+            }
             return;
         }
         if(!previousManaged){ return; }
@@ -4708,18 +4717,21 @@
             const record=resolveMonsterPortraitRecord(monster,{finalAbyss:finalFloor});
             const portrait=record&&record.path;
             const abyssPortrait=!!(portrait&&monster&&monster.v141Abyss);
+            if(portrait){
+                card.style.setProperty("--v152-abyss-portrait",'url("'+portrait+'")');
+            }else{
+                card.style.removeProperty("--v152-abyss-portrait");
+            }
             syncCardlessPresentation(card,record);
             card.classList.toggle("v152-abyss-portrait",abyssPortrait);
             card.classList.toggle("v154-abyss-portrait",abyssPortrait);
             card.classList.toggle("v154-monster-portrait",!!portrait);
             if(portrait){
-                card.style.setProperty("--v152-abyss-portrait",'url("'+portrait+'")');
                 card.dataset.monsterPortraitKey=record.portraitKey;
                 card.dataset.monsterPortraitPath=portrait;
                 if(abyssPortrait){ card.dataset.abyssPortrait=finalFloor?"floor5":"floor1-4"; }
                 else{ delete card.dataset.abyssPortrait; }
             }else{
-                card.style.removeProperty("--v152-abyss-portrait");
                 delete card.dataset.monsterPortraitKey;
                 delete card.dataset.monsterPortraitPath;
                 delete card.dataset.abyssPortrait;
