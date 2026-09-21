@@ -23260,18 +23260,7 @@ function renderBattle(){
 
             card.innerHTML =
 
-            `
-            <div
-                id="battleMonsterFreezeOverlay${index}"
-                class="card-status-overlay freeze-overlay"
-            ></div>
-
-            <div
-                id="battleMonsterBurnOverlay${index}"
-                class="card-status-overlay burn-overlay"
-            ></div>
-
-            <div class="battle-monster-icon">
+            `            <div class="battle-monster-icon">
                 ${icon}
             </div>
 
@@ -23552,41 +23541,6 @@ function updateMonsterUI(index){
                 :
                 ""
             );
-
-
-        /*
-           ★ 新增：整張卡片的冰封/燃燒包覆效果，
-           跟上面小圖示同步開關。
-        */
-
-        const freezeOverlay=
-            $("battleMonsterFreezeOverlay"+index);
-
-
-        const burnOverlay=
-            $("battleMonsterBurnOverlay"+index);
-
-
-        if(freezeOverlay){
-
-            freezeOverlay.classList.toggle(
-                "show",
-                hasFreeze
-            );
-
-        }
-
-
-        if(burnOverlay){
-
-            burnOverlay.classList.toggle(
-                "show",
-                hasBurn
-            );
-
-        }
-
-    }
 
 
     const hpBar =
