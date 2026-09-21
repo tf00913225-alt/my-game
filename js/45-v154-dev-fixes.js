@@ -287,6 +287,9 @@
         const previousRenderBattle=renderBattle;
         renderBattle=function(){
             const result=previousRenderBattle.apply(this,arguments);
+            if(typeof window.v152SyncAbyssBattleUi==="function"){
+                window.v152SyncAbyssBattleUi();
+            }
             syncMonsterPortraits();
             return result;
         };

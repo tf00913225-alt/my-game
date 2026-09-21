@@ -8,9 +8,12 @@
 
 ## 1. 目標與工作流
 
-正式工作流固定為：
+正式工作流分成兩條：
 
-**自動盤點 → 自動生成 → 自動放置 → 自動接線 → 驗證**
+- **素材尚未生成**：自動盤點 → 自動生成 → 自動放置 → batch finalize → batch strict audit。
+- **素材已生成並核准**：正式 WebP 落位 → `portrait:import` 快速導入 → Runtime 契約驗證。
+
+已生成素材不得因舊 batch 流程重做生成；尚未生成素材也不得用快速導入假裝完成。
 
 只有同時滿足以下條件，才可把一隻怪物標示為「立繪完成」：
 
@@ -251,6 +254,28 @@ assets/dungeons/abyss/floor5-soldier.webp
 - BOSS 額外要求更高辨識度、威壓、裝備與氣場
 
 不得因為名稱像某個現成 IP 角色就模仿該 IP 的特定造型。
+
+## 9.1 已生成素材的正式快速導入
+
+若圖片已經完成生成、核准、無損 WebP 轉檔，並已放到 registry 指定的正式 `assets/monsters/` 路徑，後續正式接線改由：
+
+```bash
+npm run portrait:import -- --keys=<portraitKey,portraitKey,...>
+```
+
+處理。此流程不需要另外建立 batch manifest，也不需要再次執行生成／裁切。
+
+固定安全限制：
+
+- 必須明確指定 `--keys` 或 `--group`，禁止無範圍全量升級。
+- 目標必須位於 registry 已定義的 `assets/monsters/`；若舊 registry path 是 `.png/.jpg/.jpeg`，同 stem 的正式 `.webp` 已存在時可由工具自動收斂路徑。
+- 工具必須檢查解碼、sizeClass 尺寸、Alpha channel 與實際透明像素。
+- `planned` 通過後可升為 `existing`。
+- `retired` 不得默默復活；只有專案負責人明確要求重新啟用時才可使用 `--reactivate-retired`。
+- 日常副本必須保留明確 `portraitKey` runtime 接線；若 owner 契約或 runtime regression test 失敗，工具必須停止，不得只因檔案存在就宣稱導入成功。
+- 此快速流程不改 V154／V159 runtime owner，也不得新增第三套 portrait wrapper。
+
+尚未生成的素材仍使用既有 batch 流程；兩者用途不同。
 
 ## 10. 自動盤點／驗證標準
 
