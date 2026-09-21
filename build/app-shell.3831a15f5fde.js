@@ -2155,12 +2155,14 @@ function getEquipmentBonus(characterId){
 /* =====================================================
    V119 — 玩家戰鬥中六圍減益統一入口
 
-   風系「降低敏捷／降低所有能力值」與土系「降低防禦」
-   先前能寫進 statusEffects，但玩家最終能力沒有完整讀取，
-   造成怪物對玩家施放時看得到文字、實際數值卻沒有下降。
+   風系「降低敏捷」與土系「降低防禦」，以及歷史相容的
+   statDown（全屬性降低），都共用 statusEffects 狀態管線。
+   先前玩家最終能力沒有完整讀取這些減益，造成怪物對玩家施放時
+   看得到文字、實際數值卻沒有下降。
 
    這裡統一規則：
-   - statDown 直接降低對應六圍點數；若技能有 excludedStats，該六圍不降。
+   - statDown 為歷史相容狀態；現役玩家技能目前未使用。若舊資料或怪物技能帶入，
+     仍降低對應六圍點數；若技能有 excludedStats，該六圍不降。
    - agilityDown 再額外降低有效敏捷。
    - defenseDown 在所有防禦加成算完後再降低最終防禦。
    - 暫時性的 vitality / energy 降低「不動態縮減 maxHP / maxSP」，
@@ -11025,9 +11027,9 @@ function startTurn(token){
 
     if(
         typeof window!=="undefined" &&
-        typeof window.v143SyncStatusSpriteEffects==="function"
+        typeof window.v143SyncStatusVisualEffects==="function"
     ){
-        window.v143SyncStatusSpriteEffects();
+        window.v143SyncStatusVisualEffects();
     }
 
 
@@ -12627,8 +12629,8 @@ const HIT_CHANCE_MAX_PERCENT = 99;
    技能的減益效果）：
    這三個函式現在會依序扣掉agilityDown
    （直接降敏捷的技能，例如暴風拳/狂風術）、
-   statDown（降全屬性的技能，例如暴風亂擊/
-   風焰術）、stun（提高MISS率＝降低命中率，
+   statDown（全屬性下降的歷史相容狀態；目前
+   現役玩家技能未使用）、stun（提高MISS率＝降低命中率，
    例如暈眩猛擊/風起雲湧）這幾種減益效果目前
    的百分比，多個效果同時存在會依序疊乘
    （不是相加），跟等級差修正的邏輯一致，
@@ -23260,18 +23262,7 @@ function renderBattle(){
 
             card.innerHTML =
 
-            `
-            <div
-                id="battleMonsterFreezeOverlay${index}"
-                class="card-status-overlay freeze-overlay"
-            ></div>
-
-            <div
-                id="battleMonsterBurnOverlay${index}"
-                class="card-status-overlay burn-overlay"
-            ></div>
-
-            <div class="battle-monster-icon">
+            `            <div class="battle-monster-icon">
                 ${icon}
             </div>
 
@@ -23417,175 +23408,10 @@ function updateMonsterUI(index){
     const statusArea =
         $("battleMonsterStatus"+index);
 
-
     if(statusArea){
-
-        const hasBurn =
-            monster.statusEffects &&
-            monster.statusEffects.some(
-                effect=>
-                    effect.type==="burn"
-            );
-
-
-        const hasFreeze =
-            isMonsterFrozen(
-                monster
-            );
-
-
-        /*
-           ★ 新增（依照使用者要求）：
-           石化跟四種簡單減益效果，也一併
-           顯示小圖示，玩家才看得出這隻怪物
-           身上現在掛著哪些效果，不用只能
-           從戰鬥紀錄裡回頭找。
-        */
-
-        const hasPetrify=
-
-            monster.statusEffects &&
-            monster.statusEffects.some(
-                effect=>
-
-                    effect.type==="petrify"&&
-                    effect.turnsLeft>0
-
-            );
-
-
-        const hasAgilityDown=
-
-            getMonsterDebuffValue(
-                monster,
-                "agilityDown"
-            )>0;
-
-
-        const hasStatDown=
-
-            getMonsterDebuffValue(
-                monster,
-                "statDown"
-            )>0;
-
-
-        const hasDefenseDown=
-
-            getMonsterDebuffValue(
-                monster,
-                "defenseDown"
-            )>0;
-
-
-        const hasDamageDown=
-
-            getMonsterDebuffValue(
-                monster,
-                "damageDown"
-            )>0;
-
-
-        const hasStun=
-
-            getMonsterDebuffValue(
-                monster,
-                "stun"
-            )>0;
-
-
-        statusArea.innerHTML =
-
-            (
-                hasBurn
-                ?
-                '<span class="monster-status-badge burn"title="燃燒中"></span>'
-                :
-                ""
-            )+
-            (
-                hasFreeze
-                ?
-                '<span class="monster-status-badge freeze"title="冰封中"></span>'
-                :
-                ""
-            )+
-            (
-                hasPetrify
-                ?
-                '<span class="monster-status-badge"title="石化中"></span>'
-                :
-                ""
-            )+
-            (
-                hasAgilityDown
-                ?
-                '<span class="monster-status-badge"title="重力中"></span>'
-                :
-                ""
-            )+
-            (
-                hasStatDown
-                ?
-                '<span class="monster-status-badge"title="全屬性降低中"></span>'
-                :
-                ""
-            )+
-            (
-                hasDefenseDown
-                ?
-                '<span class="monster-status-badge"title="破防中"></span>'
-                :
-                ""
-            )+
-            (
-                hasDamageDown
-                ?
-                '<span class="monster-status-badge"title="殤風中"></span>'
-                :
-                ""
-            )+
-            (
-                hasStun
-                ?
-                '<span class="monster-status-badge"title="暈眩中"></span>'
-                :
-                ""
-            );
-
-
-        /*
-           ★ 新增：整張卡片的冰封/燃燒包覆效果，
-           跟上面小圖示同步開關。
-        */
-
-        const freezeOverlay=
-            $("battleMonsterFreezeOverlay"+index);
-
-
-        const burnOverlay=
-            $("battleMonsterBurnOverlay"+index);
-
-
-        if(freezeOverlay){
-
-            freezeOverlay.classList.toggle(
-                "show",
-                hasFreeze
-            );
-
-        }
-
-
-        if(burnOverlay){
-
-            burnOverlay.classList.toggle(
-                "show",
-                hasBurn
-            );
-
-        }
-
+        /* V143 is the sole persistent-status visual owner. Base battle UI only
+           keeps the stable host and clears stale markup before that owner syncs. */
+        statusArea.innerHTML="";
     }
 
 
@@ -23824,26 +23650,12 @@ function updateSingleCharacterStatusBadge(
     const statusArea =
         $("battlePlayerStatus"+index);
 
-
     if(!statusArea){
         return;
     }
 
-
-    const rageBuff =
-        (character.activeBuffs||[])
-        .find(
-            b=>b.type==="rage"
-        );
-
-
-    statusArea.innerHTML =
-
-        rageBuff
-        ?
-        '<span class="monster-status-badge rage"title="怒火生效中"></span>'
-        :
-        "";
+    /* Persistent status content is rendered by V143 after this base UI pass. */
+    statusArea.innerHTML="";
 
 }
 

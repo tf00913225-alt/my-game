@@ -69,8 +69,8 @@ for(const key of batchKeys){
     const fileExists=Boolean(rel)&&fs.existsSync(absolute)&&fs.statSync(absolute).isFile();
 
     if(row[statusIndex]==="planned" && fileExists){
-        if(!rel.startsWith("assets/monsters/") || path.extname(rel).toLowerCase()!==".png"){
-            fail("refusing to promote planned target outside new PNG asset policy: "+key+" -> "+rel);
+        if(!rel.startsWith("assets/monsters/") || path.extname(rel).toLowerCase()!==".webp"){
+            fail("refusing to promote planned target outside new WebP asset policy: "+key+" -> "+rel);
         }
         if(!dryRun){ row[statusIndex]="existing"; }
         promoted.push({portraitKey:key,path:rel});

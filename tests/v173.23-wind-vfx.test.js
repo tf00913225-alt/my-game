@@ -29,12 +29,12 @@ const CASTS={
 };
 
 const STATUSES={
-    agilityDown:{file:"agility-down-loop.png",duration:1000,collection:"statusEffects",hash:"fb1b42d3c0c87ab4e93b4fd495657852268cb15e9234bfefdeb2edf0546e7d7a"},
-    damageDown:{file:"damage-down-loop.png",duration:1100,collection:"statusEffects",hash:"25e984ef5973616bc6f37cfc5842d445ff484f981a98902894febca59a92ae34"},
-    stun:{file:"stun-loop.png",duration:900,collection:"statusEffects",hash:"45903df26e32ddc265d45217639211bb9966fb69b3a02389f07afa0500d53071"},
-    dodgeSkill:{file:"dodge-skill-loop.png",duration:850,collection:"activeBuffs",hash:"397338dc6fc01967de860e285c1f65febe5248f0a111c01f789dfb676c141c5b"},
-    stealthSkill:{file:"stealth-skill-loop.png",duration:1200,collection:"activeBuffs",hash:"58523f3066068e2d7a784c309fe072c3cbb92361a0d703ed8b4d9b1da4a0a02b"},
-    dinghaishenzhen:{file:"dinghaishenzhen-loop.png",duration:1200,collection:"activeBuffs",hash:"3607d280f4ff4092d80b8ead216e410425815a4996b22437af556bf28673f31b"}
+    agilityDown:{file:"agility-down-loop.png",mode:"iconPulse",collection:"statusEffects",hash:"fb1b42d3c0c87ab4e93b4fd495657852268cb15e9234bfefdeb2edf0546e7d7a"},
+    damageDown:{file:"damage-down-loop.png",mode:"iconPulse",collection:"statusEffects",hash:"25e984ef5973616bc6f37cfc5842d445ff484f981a98902894febca59a92ae34"},
+    stun:{file:"stun-loop.png",mode:"iconPulse",collection:"statusEffects",hash:"45903df26e32ddc265d45217639211bb9966fb69b3a02389f07afa0500d53071"},
+    dodgeSkill:{file:"dodge-skill-loop.png",mode:"pulse",collection:"activeBuffs",hash:"397338dc6fc01967de860e285c1f65febe5248f0a111c01f789dfb676c141c5b"},
+    stealthSkill:{file:"stealth-skill-loop.png",mode:"static",collection:"activeBuffs",hash:"58523f3066068e2d7a784c309fe072c3cbb92361a0d703ed8b4d9b1da4a0a02b"},
+    dinghaishenzhen:{file:"dinghaishenzhen-loop.png",mode:"pulse",collection:"activeBuffs",hash:"3607d280f4ff4092d80b8ead216e410425815a4996b22437af556bf28673f31b"}
 };
 
 function pngInfo(path){
@@ -295,7 +295,7 @@ test("the supplied wind PNG files remain byte-identical and keep their actual so
     });
 });
 
-test("all eleven casts and six loops use the requested mapping, timing and shared Sprite renderer",()=>{
+test("all eleven casts keep Sprite timing while six persistent states use low-motion visual modes",()=>{
     const runtime=loadRuntime();
     const manifest=runtime.context.v143SkillAnimationManifest;
     Object.entries(CASTS).forEach(([id,spec])=>{
@@ -312,17 +312,21 @@ test("all eleven casts and six loops use the requested mapping, timing and share
         assert.deepEqual(Array.from(model.deferredStatusTypes),[spec.status],id);
         assert.match(timing,new RegExp(id+":\\["+spec.duration+"(?:,|\\])"),id+" duration");
     });
-    const statuses=runtime.context.v143StatusSpriteManifest;
+    const statuses=runtime.context.v143StatusVisualManifest;
     Object.entries(STATUSES).forEach(([type,spec])=>{
-        const sprite=statuses[type];
-        assert.equal(sprite.src,"assets/vfx/wind/"+spec.file+"?v=173.24",type);
-        assert.deepEqual(
-            Array.from([sprite.columns,sprite.rows,sprite.frames]),
-            [4,2,8],type
+        const visual=statuses[type];
+        assert.ok(visual,type);
+        assert.equal(visual.mode,spec.mode,type);
+        assert.equal(visual.renderer,"dom-status-visual",type);
+        assert.equal(visual.collection,spec.collection,type);
+        assert.deepEqual(Array.from([visual.cropColumns,visual.cropRows]),[4,2],type);
+        assert.equal(
+            visual.src,
+            spec.mode==="iconPulse"?"":"assets/vfx/wind/"+spec.file+"?v=173.24",
+            type
         );
-        assert.equal(sprite.renderer,"dom-sprite",type);
-        assert.equal(sprite.duration,spec.duration,type);
-        assert.equal(sprite.collection,spec.collection,type);
+        assert.equal(visual.frames,undefined,type+" must not own a persistent frame loop");
+        assert.equal(visual.duration,undefined,type+" must not own a persistent frame clock");
     });
 });
 
@@ -470,28 +474,27 @@ test("frame seven releases resolved attack results once, while buffs never shake
     });
 });
 
-test("status loops start only on success, never restart on duplicate MISS, and clear with lifecycle",()=>{
+test("persistent status visuals start only on success, survive duplicate MISS, and clear with lifecycle",()=>{
     const applied=loadRuntime();
     applied.context.v142SkillAnimationDirector.play(
         config("stormFist","single","physical"),
         {side:"player",actorIndex:0,targetId:0}
     );
     assert.equal(applied.context.applyMonsterDebuff(applied.monsters[0],"agilityDown",2,15),true);
-    assert.equal(applied.cards.battleMonster0.querySelector(".v153-status-vfx-agilityDown"),null,"loop waits for cast completion");
+    assert.equal(applied.cards.battleMonster0.querySelector(".v143-status-icon-agilityDown"),null,"visual waits for cast completion");
     applied.setClock(1200);
     runTimers(applied,1200);
-    const gravity=applied.cards.battleMonster0.querySelector(".v153-status-vfx-agilityDown");
-    assert.ok(gravity,"successful status starts its loop");
-    assert.ok(gravity.style.backgroundImage.includes("agility-down-loop.png?v=173.24"));
-    assert.equal(gravity.style["--v153-status-duration"],"1000ms");
+    const gravity=applied.cards.battleMonster0.querySelector(".v143-status-icon-agilityDown");
+    assert.ok(gravity,"successful status starts its icon pulse");
+    assert.equal(gravity.dataset.statusMode,"iconPulse");
 
     applied.monsters[0].statusEffects.push({type:"damageDown",turnsLeft:1});
-    applied.context.v143SyncStatusSpriteEffects();
-    assert.ok(applied.cards.battleMonster0.querySelector(".v153-status-vfx-damageDown"),"different states may coexist");
+    applied.context.v143SyncStatusVisualEffects();
+    assert.ok(applied.cards.battleMonster0.querySelector(".v143-status-icon-damageDown"),"different status icons may coexist");
     applied.monsters[0].statusEffects.forEach(effect=>{ effect.turnsLeft=0; });
-    applied.context.updateUI();
-    assert.equal(applied.cards.battleMonster0.querySelector(".v153-status-vfx-agilityDown"),null,"expired loop clears");
-    assert.equal(applied.cards.battleMonster0.querySelector(".v153-status-vfx-damageDown"),null,"all expired loops clear");
+    applied.context.v143SyncStatusVisualEffects();
+    assert.equal(applied.cards.battleMonster0.querySelector(".v143-status-icon-agilityDown"),null,"expired visual clears");
+    assert.equal(applied.cards.battleMonster0.querySelector(".v143-status-icon-damageDown"),null,"all expired visuals clear");
 
     const duplicate=loadRuntime({
         monsters:[
@@ -500,36 +503,39 @@ test("status loops start only on success, never restart on duplicate MISS, and c
             {alive:true,hp:100,statusEffects:[],activeBuffs:[]}
         ]
     });
-    duplicate.context.v143SyncStatusSpriteEffects();
-    const existing=duplicate.cards.battleMonster0.querySelector(".v153-status-vfx-agilityDown");
+    duplicate.context.v143SyncStatusVisualEffects();
+    const existing=duplicate.cards.battleMonster0.querySelector(".v143-status-icon-agilityDown");
     duplicate.context.v142SkillAnimationDirector.play(
         config("stormFist","single","physical"),
         {side:"player",actorIndex:0,targetId:0}
     );
     assert.equal(duplicate.context.applyMonsterDebuff(duplicate.monsters[0],"agilityDown",2,15),false);
-    assert.strictEqual(duplicate.cards.battleMonster0.querySelector(".v153-status-vfx-agilityDown"),existing,"duplicate MISS preserves the same node");
+    assert.strictEqual(duplicate.cards.battleMonster0.querySelector(".v143-status-icon-agilityDown"),existing,"duplicate MISS preserves the same icon");
     duplicate.setClock(1200);
     runTimers(duplicate,1200);
-    assert.strictEqual(duplicate.cards.battleMonster0.querySelector(".v153-status-vfx-agilityDown"),existing,"completion does not restart it");
+    assert.strictEqual(duplicate.cards.battleMonster0.querySelector(".v143-status-icon-agilityDown"),existing,"completion does not recreate it");
     duplicate.monsters[0].hp=0;
     duplicate.monsters[0].alive=false;
-    duplicate.context.updateUI();
-    assert.equal(duplicate.cards.battleMonster0.querySelector(".v153-status-vfx-agilityDown"),null,"death clears the loop");
+    duplicate.context.v143SyncStatusVisualEffects();
+    assert.equal(duplicate.cards.battleMonster0.querySelector(".v143-status-icon-agilityDown"),null,"death clears the visual");
 
     applied.party[1].activeBuffs.push({type:"stealthSkill",turnsLeft:2});
-    applied.context.v143SyncStatusSpriteEffects();
-    assert.ok(applied.cards.battlePlayerCard1.querySelector(".v153-status-vfx-stealthSkill"));
+    applied.context.v143SyncStatusVisualEffects();
+    assert.ok(applied.cards.battlePlayerCard1.querySelector(".v143-status-visual-stealthSkill"));
     applied.context.v142SkillAnimationDirector.dispose();
-    assert.equal(applied.body.querySelectorAll(".v153-status-vfx").length,0,"battle disposal clears every loop");
+    assert.equal(applied.body.querySelectorAll(".v143-status-visual").length,0,"battle disposal clears body visuals");
+    assert.equal(applied.body.querySelectorAll(".v143-status-icon").length,0,"battle disposal clears status icons");
 });
 
-test("wind sheets replace procedural wind effects and keep noninteractive status layering",()=>{
+test("wind casts remain Sprite Sheets while persistent states use noninteractive low-motion visuals",()=>{
     assert.doesNotMatch(css,/data-skill="windCrossSlash"/);
     assert.doesNotMatch(css,/data-skill="stormRain"/);
-    assert.match(css,/#game-stage #battlePage \.v153-status-vfx\{[\s\S]*?z-index:4;[\s\S]*?pointer-events:none;/);
-    assert.match(css,/@keyframes v143StatusRasterFrames\{[\s\S]*?87\.5%,100%\{background-position:100% 100%\}/);
-    assert.match(animation,/node\.dataset\.renderer="dom-sprite";/);
-    assert.match(animation,/node\.style\.backgroundSize=\(spec\.columns\*100\)\+"% "\+\(spec\.rows\*100\)\+"%";/);
+    assert.match(css,/#game-stage #battlePage \.v143-status-visual\{[\s\S]*?z-index:4;[\s\S]*?pointer-events:none;/);
+    assert.match(css,/@keyframes v143StatusImageBreath/);
+    assert.match(css,/@keyframes v143StatusIconBreath/);
+    assert.doesNotMatch(css,/v143StatusRasterFrames/);
+    assert.match(animation,/node\.dataset\.renderer="dom-status-visual";/);
+    assert.match(animation,/node\.style\.backgroundSize=\(Math\.max\(1,Number\(spec\.cropColumns\)\|\|1\)\*100\)\+"% "/);
     assert.doesNotMatch(animation,/getSpriteImage|frameX=frameIndex|frameY=Math\.floor/);
     assert.doesNotMatch(animation,/assets\/inbox\/[\s\S]{0,80}(?:base64|blob:)/i);
 });

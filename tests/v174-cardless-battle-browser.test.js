@@ -36,7 +36,6 @@ function escapeAttribute(value){
 function enemyCard(index){
     const hp=1380-index*5,sp=630-index*3;
     return `<div id="battleMonster${index}" class="battle-monster v154-abyss-portrait" style="--v152-abyss-portrait:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='112'%3E%3Crect width='80' height='112' fill='%23654'%3E%3C/rect%3E%3C/svg%3E&quot;)">
-      <div id="battleMonsterFreezeOverlay${index}" class="card-status-overlay freeze-overlay"></div>
       <img class="v162-abyss-battle-portrait-art" alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='112'%3E%3Crect width='80' height='112' fill='%23654'/%3E%3C/svg%3E">
       <div class="battle-monster-icon"></div>
       <div class="battle-monster-name">天兵${index+1}</div>
@@ -104,7 +103,6 @@ window.__qaBefore=qaRects();
     var after=qaRects();
     var enemy=document.getElementById('battleMonster0');
     var enemyArt=enemy.querySelector(':scope > .v174-battle-art');
-    var overlay=document.getElementById('battleMonsterFreezeOverlay0');
     var result={
       rows:document.querySelectorAll('#battleMonsterArea > .v-fixed-enemy-row').length,
       enemies:document.querySelectorAll('#battleMonsterArea .battle-monster').length,
@@ -132,7 +130,6 @@ window.__qaBefore=qaRects();
       hitAnimation:getComputedStyle(art).animationName,
       footShadowContent:getComputedStyle(art,'::after').content,
       abyssOwnerOpacity:getComputedStyle(enemy.querySelector('.v162-abyss-battle-portrait-art')).opacity,
-      overlayPosition:getComputedStyle(overlay).position,
       playerHp:player.querySelector('.hp-bar-text').textContent,
       playerSp:player.querySelector('.sp-bar-text').textContent,
       enemyHp:enemy.querySelector('.monster-hp .monster-bar-text').textContent,
@@ -187,7 +184,6 @@ function runViewport(chrome,width,height){
     assert.equal(data.hitAnimation,"v174BattleIdle","damage popups must not replace the formal cardless idle animation with hit feedback");
     assert.notEqual(data.footShadowContent,"none");
     assert.equal(data.abyssOwnerOpacity,"0");
-    assert.equal(data.overlayPosition,"absolute");
     assert.equal(data.playerHp,"835");
     assert.equal(data.playerSp,"412");
     assert.equal(data.enemyHp,"1380");
