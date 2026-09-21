@@ -11,6 +11,7 @@ const v132Source=fs.readFileSync("js/27-v132-content-expansion.js","utf8");
 const v133Source=fs.readFileSync("js/28-v133-economy-rebalance.js","utf8");
 const v136Source=fs.readFileSync("js/31-v136-auto-battle-fix.js","utf8");
 const indexSource=fs.readFileSync("index.html","utf8");
+const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 
 function extractFunction(source,name){
     const start=source.indexOf("function "+name+"(");
