@@ -29,24 +29,34 @@ function writeManifest(file,data){
 
 const registryBefore=fs.readFileSync(registryPath,"utf8");
 const liveBatchBefore=fs.readFileSync(liveBatchPath,"utf8");
+const liveBatch=JSON.parse(liveBatchBefore);
 const registry=JSON.parse(registryBefore);
 const tupleIndex=Object.fromEntries(registry.tupleSchema.map((field,index)=>[field,index]));
 const dailyRows=Object.values(registry.groups).flatMap(rows=>rows).filter(row=>String(row[tupleIndex.portraitKey]).startsWith("daily."));
 const dailyByKey=new Map(dailyRows.map(row=>[row[tupleIndex.portraitKey],row]));
 for(const [key,pathValue] of [
     ["daily.exp.regular","assets/monsters/daily/exp/regular.webp"],
-    ["daily.exp.elite","assets/monsters/daily/exp/elite.webp"],
-    ["daily.exp.boss","assets/monsters/daily/exp/boss.webp"],
-    ["daily.material.regular","assets/monsters/daily/material/regular.webp"],
-    ["daily.material.elite","assets/monsters/daily/material/elite.webp"],
-    ["daily.material.boss","assets/monsters/daily/material/boss.webp"]
+    ["daily.exp.elite","assets/monsters/daily/exp/elite.webp"]
 ]){
     const row=dailyByKey.get(key);
-    assert.ok(row,`missing registry row ${key}`);
-    assert.equal(row[tupleIndex.path],pathValue,`${key} must use runtime WebP`);
-    assert.equal(row[tupleIndex.status],"existing",`${key} must be existing`);
-    assert.equal(row[tupleIndex.sizeClass],"standard",`${key} must use standard dimensions`);
+    assert.ok(row,"missing registry row "+key);
+    assert.equal(row[tupleIndex.path],pathValue,key+" must use runtime WebP");
+    assert.equal(row[tupleIndex.status],"existing",key+" must be existing");
+    assert.equal(row[tupleIndex.sizeClass],"standard",key+" must use standard dimensions");
 }
+for(const key of [
+    "daily.exp.boss",
+    "daily.material.regular",
+    "daily.material.elite",
+    "daily.material.boss"
+]){
+    const row=dailyByKey.get(key);
+    assert.ok(row,"missing retired registry row "+key);
+    assert.equal(row[tupleIndex.status],"retired",key+" must be permanently retired");
+    assert.equal(liveBatch.committed.includes(key),false,key+" must not remain in committed work");
+    assert.equal(liveBatch.pending.includes(key),false,key+" must not remain pending");
+}
+assert.equal(liveBatch.pending.length,0,"live batch must have no pending targets");
 assert.equal(dailyByKey.get("daily.gold.boss")[tupleIndex.sizeClass],"standard");
 
 try{

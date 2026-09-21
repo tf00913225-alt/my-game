@@ -267,6 +267,7 @@ node scripts/audit-monster-portraits.mjs
 - registry 是否有重複目標 path。
 - `status=existing` 的素材是否真的存在，且新正式 runtime 立繪為 WebP。
 - `status=planned` 的缺圖數量。
+- `status=retired` 的永久停用 target 不列入待辦、批次 committed/pending 或素材解碼稽核；保留 registry row 僅供歷史識別與 runtime 名稱對帳，除非使用者明確重新授權，不得重新排程、生成或導入。
 - 四象天兵是否恰好是 fire / water / wind / earth 四張。
 - 深淵領域與最終戰規則是否仍符合本文件。
 
