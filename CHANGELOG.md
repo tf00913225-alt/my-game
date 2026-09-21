@@ -1,16 +1,26 @@
 # 四象江湖傳版本紀錄
 
-## V173.69 — 2026-09-20
+## V173.69 — 2026-09-20（9 月 21 日更新補充）
 
-本版本聚焦背包舊補品、商店／主城金幣顯示、離線經驗廣告領取與帳號入口；不調整戰鬥公式、角色技能、Boss 數值、EXP 曲線、掉落率或既定金幣數值。
+本版本聚焦背包舊補品、商店／主城金幣顯示、離線經驗廣告領取、帳號入口、冷啟動與秘寶首次開啟體驗，並修正 Lv40 深淵最終五帝的技能施放與戰鬥立繪，以及手機版商店／主城隊伍資訊排版；不調整玩家角色技能、Boss 數值、EXP 曲線、掉落率或既定金幣數值。
 
 ### 背包／冒險
 - 背包不再顯示已退役的 50% HP／SP 藥水；既有舊存檔仍保留相容解析，不做破壞性資料遷移。
 - 冒險寶箱與商人停止產出 50% 舊藥水，改回正式補品規格。
 
+### 深淵最終戰
+- Lv40 深淵最終五帝只會從各自的正式攜帶技能中選擇並施放技能；北帝未攜帶復活術時，不會再因場上有倒下隊友而錯誤復活。
+- 東帝、天帝、極帝、北帝與南帝在戰鬥中各自使用專屬立繪，不再共用同一張頭目臨時圖片。
+
 ### 商店／主城
-- 商店裝備頁重新顯示玩家目前持有金幣。
-- 主城冒險隊伍標題列加入總金幣，並沿用既有金幣更新流程同步刷新。
+- 商店裝備頁重新顯示玩家目前持有金幣，並修正手機版金幣列、六件裝備區與刷新列互相擠壓的問題。
+- 裝備卡的圖片恢復在卡片內正確裁切顯示，不會再溢出或遮住內容。
+- 主城冒險隊伍標題列加入總金幣，並調整隊伍數、金幣與佈陣按鈕的欄位間距；金幣數較大時也不會黏字或重疊。
+
+### 啟動／秘寶
+- 修正登入後主城首屏載入節奏，必要圖片、背景與字型準備完成後才顯示主城，降低冷啟動時黑框、缺圖與畫面逐塊出現的情況。
+- 主城可操作後會以低優先且受限並行的方式預先準備常用介面，減少首次開啟功能頁時的等待。
+- 修正首次開啟秘寶頁的載入流程，20 件秘寶圖示完整準備後再呈現，避免黑圖、空白或半成品畫面。
 
 ### 離線經驗
 - 修正「廣告雙倍」按鈕呼叫失效；模擬廣告完成後會走既有雙倍領取流程。
@@ -19,8 +29,10 @@
 - 遊戲客服與隱私權政策客服信箱統一更新為 foursymbols.support@gmail.com。
 - Web 帳號登入頁暫時移除 Facebook 登入按鈕；Google、Email、訪客與既有帳號核心流程維持不變。
 
-### 對應 Requirement Batch
+### 對應 Requirement Batches
 - `2026-09-20-backpack-shop-homegold-offline-auth`
+- `2026-09-20-cold-start-visual-ready-background-prefetch`
+- `2026-09-20-shop-potion-home-relic-layout`
 
 
 ## V173.68 — 2026-09-20
@@ -109,7 +121,6 @@
 ### 存檔歸屬與安全
 - Canonical local save、背包／裝備／進度 sidecar 全部依 UID namespace 隔離；帳號切換會清除前一帳號 active memory，不共享角色資料。
 - `battle_full_version_save_v5` 只作為未綁定 legacy candidate；需使用者確認、先備份、衝突 fail closed，雲端已有角色時不會被本機資料靜默覆蓋。
-- Firestore browser client 維持 owner-read-only；正式寫入仍限定可信後端，不因登入流程重構而放寬安全規則。
 
 ### 效能、資產與 CI
 - Production build 產生 content-hashed boot/app/gameplay/feature bundles；Critical Boot 只載帳號與下一階段必要程式，其他功能以 feature-local loading 與 idle/pointer prefetch 載入。
@@ -147,40 +158,3 @@ Requirement Batch：`release/requirement-batches/2026-09-09-cold-start-auth-boot
 - `2026-09-08-relic-navigation-dialog-abyss-boss`
 - `2026-09-08-battle-presentation-sequencing`
 - `2026-09-08-gameplay-boss-tower-hub`
-
-## V173.63 — 2026-09-07
-
-本版本收錄自 V173.62 之後，已完成自動化測試、DEV 部署、手機實機驗證與正式 main 發布驗證的修正。
-
-### 合成／裝備／副本 UI
-- 冶煉材料階級改為橫向滑動排列，避免內容被向下擠壓裁切。
-- 裝備冶煉與材料合成內頁支援完整垂直捲動，可滑至最底部。
-- 材料合成移除瀏覽器原生下拉選單，改為《四象江湖傳》黑金／階級色自訂選單。
-- 材料合成圖片縮小，釋放下方設計圖升階操作空間。
-- 裝備合成與符咒合成首次開啟即顯示正式 icon，不再需要先點擊一次。
-- 背包装備比較改為同部位雙欄比較，修正武器／頭部／鞋子等槽位錯配與「明明已裝備卻顯示未裝備」。
-- 裝備比較重新分隔 icon、數值與穿戴／售出／鎖定操作區。
-- 副本獎勵預覽框加高，長文字不再穿出框或壓到背景圖片。
-
-### 全域 UI／手機操作
-- 全遊戲禁止雙指 pinch zoom，同時保留合法的單指上下／左右捲動。
-- 全遊戲圖片、SVG、Canvas 等視覺素材禁止長按叫出下載、分享、Google Lens、開新分頁等瀏覽器原生選單。
-- 禁止遊戲視覺素材原生拖曳與非輸入區文字選取，避免破壞手遊操作感。
-
-### 戰鬥／技能動畫
-- 修復技能 VFX 偶發或整體不顯示問題。
-- 恢復玩家與怪物技能 badge 對 V142 動畫 runtime 的 direct trigger，不再依賴容易被後載入程式覆蓋的 wrapper 順序。
-- V142 支援 partial-sentinel recovery：若只留下 installed 旗標但 director／trigger 不完整，會重新建立動畫 runtime。
-- 移除 V173.51 QA 對 V143 VFX stage visibility 的錯誤 ownership，避免技能名稱／傷害出現但特效舞台被隱藏。
-- 新增永久 regression，防止未來再次退回 wrapper-only 導致技能動畫失效。
-
-### 系統／發布安全
-- 正式移除巡怪省電模式舊 DOM、handler、設定 key 與相容性 WakeLock 殘留。
-- Release Gate、Requirement Checklist、deprecated-code assertion、DEV exact-SHA deploy 與部署後 SHA/version/cache read-back 已實際運作。
-- 正式版本升級現在必須同步更新本 CHANGELOG；沒有對應版本紀錄時 CI 會拒絕發布。
-
-### 對應 Requirement Batches
-- `2026-09-07-synthesis-dungeon-equipment-ui`
-- `2026-09-07-synthesis-vertical-scroll`
-- `2026-09-07-synthesis-first-render-icons`
-- `2026-09-07-global-ui-gesture-vfx-lock`
