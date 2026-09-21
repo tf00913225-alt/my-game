@@ -471,13 +471,13 @@ test("enemy Rage loop begins on the hit frame and follows its canonical ledger",
     );
     monsters[4].v141TeamBuffs=[{type:"rage",turnsLeft:2}];
     runtime.context.v141PlayCardEffect("monster",4,"buff");
-    runtime.context.v143SyncStatusSpriteEffects();
-    assert.equal(runtime.cards.battleMonster4.querySelector(".v153-status-vfx-rage"),null);
+    runtime.context.v143SyncStatusVisualEffects();
+    assert.equal(runtime.cards.battleMonster4.querySelector(".v143-status-visual-rage"),null);
 
     const impactTimer=runtime.scheduled.find(timer=>timer.delay>=860&&timer.delay<=890);
     assert.ok(impactTimer,"frame-eight Rage impact timer");
     impactTimer.callback();
-    assert.ok(runtime.cards.battleMonster4.querySelector(".v153-status-vfx-rage"));
+    assert.ok(runtime.cards.battleMonster4.querySelector(".v143-status-visual-rage"));
 });
 
 test("frame eight delays hit numbers together and Fire Critical keeps its critical text reaction",()=>{
@@ -498,7 +498,7 @@ test("frame eight delays hit numbers together and Fire Critical keeps its critic
     assert.ok(runtime.scheduled.some(timer=>timer.delay>=1040),"full twelve-frame gate must remain active");
 });
 
-test("Burn and Rage loops follow live status records without owning an action gate",()=>{
+test("Burn and Rage breathing images follow live status records without owning an action gate",()=>{
     const runtime=loadRuntime({
         monsters:[
             {alive:true,hp:100,statusEffects:[{type:"burn",turnsLeft:2}],activeBuffs:[]},
@@ -511,28 +511,28 @@ test("Burn and Rage loops follow live status records without owning an action ga
             {hp:100,statusEffects:[],activeBuffs:[]}
         ]
     });
-    runtime.context.v143SyncStatusSpriteEffects();
-    assert.ok(runtime.cards.battleMonster0.querySelector(".v153-status-vfx-burn"));
-    assert.equal(runtime.cards.battleMonster1.querySelector(".v153-status-vfx-burn"),null);
-    assert.ok(runtime.cards.battleMonster2.querySelector(".v153-status-vfx-rage"));
-    assert.ok(runtime.cards.battlePlayerCard0.querySelector(".v153-status-vfx-rage"));
-    assert.equal(runtime.cards.battlePlayerCard1.querySelector(".v153-status-vfx-rage"),null);
-    assert.equal(runtime.context.v143SkillAnimationState.current,null,"status loops must not open an action gate");
+    runtime.context.v143SyncStatusVisualEffects();
+    assert.ok(runtime.cards.battleMonster0.querySelector(".v143-status-visual-burn"));
+    assert.equal(runtime.cards.battleMonster1.querySelector(".v143-status-visual-burn"),null);
+    assert.ok(runtime.cards.battleMonster2.querySelector(".v143-status-visual-rage"));
+    assert.ok(runtime.cards.battlePlayerCard0.querySelector(".v143-status-visual-rage"));
+    assert.equal(runtime.cards.battlePlayerCard1.querySelector(".v143-status-visual-rage"),null);
+    assert.equal(runtime.context.v143SkillAnimationState.current,null,"persistent status visuals must not open an action gate");
 
     runtime.monsters[0].statusEffects[0].turnsLeft=0;
     runtime.monsters[2].v141TeamBuffs[0].turnsLeft=0;
     runtime.party[0].activeBuffs[0].turnsLeft=0;
-    runtime.context.v143SyncStatusSpriteEffects();
-    assert.equal(runtime.cards.battleMonster0.querySelector(".v153-status-vfx-burn"),null);
-    assert.equal(runtime.cards.battleMonster2.querySelector(".v153-status-vfx-rage"),null);
-    assert.equal(runtime.cards.battlePlayerCard0.querySelector(".v153-status-vfx-rage"),null);
+    runtime.context.v143SyncStatusVisualEffects();
+    assert.equal(runtime.cards.battleMonster0.querySelector(".v143-status-visual-burn"),null);
+    assert.equal(runtime.cards.battleMonster2.querySelector(".v143-status-visual-rage"),null);
+    assert.equal(runtime.cards.battlePlayerCard0.querySelector(".v143-status-visual-rage"),null);
     assert.match(
         css,
-        /battle-monster\.v152-abyss-portrait\s*>\s*\.v153-status-vfx\{[\s\S]*?position:absolute\s*!important;[\s\S]*?z-index:5\s*!important;/
+        /battle-monster\.v152-abyss-portrait\s*>\s*\.v143-status-visual\{[\s\S]*?position:absolute\s*!important;[\s\S]*?z-index:5\s*!important;/
     );
 });
 
-test("a newly applied Burn starts its loop on the exact target hit frame",()=>{
+test("a newly applied Burn starts its breathing image on the exact target hit frame",()=>{
     const runtime=loadRuntime();
     runtime.context.v142SkillAnimationDirector.play(
         castConfig("flameTornado",2100,"single","magic"),
@@ -541,22 +541,23 @@ test("a newly applied Burn starts its loop on the exact target hit frame",()=>{
     runtime.context.showMonsterHit(1,135,"hp",false);
     const beforeBurn=runtime.scheduled.length;
     runtime.context.applyBurnEffect(runtime.monsters[1],2,3);
-    assert.equal(runtime.cards.battleMonster1.querySelector(".v153-status-vfx-burn"),null);
+    assert.equal(runtime.cards.battleMonster1.querySelector(".v143-status-visual-burn"),null);
     assert.equal(runtime.scheduled.length,beforeBurn+1);
     const statusTimer=runtime.scheduled[runtime.scheduled.length-1];
     assert.ok(statusTimer.delay>0);
     statusTimer.callback();
-    assert.ok(runtime.cards.battleMonster1.querySelector(".v153-status-vfx-burn"));
-    assert.equal(runtime.cards.battleMonster0.querySelector(".v153-status-vfx-burn"),null);
-    assert.equal(runtime.cards.battleMonster2.querySelector(".v153-status-vfx-burn"),null);
+    assert.ok(runtime.cards.battleMonster1.querySelector(".v143-status-visual-burn"));
+    assert.equal(runtime.cards.battleMonster0.querySelector(".v143-status-visual-burn"),null);
+    assert.equal(runtime.cards.battleMonster2.querySelector(".v143-status-visual-burn"),null);
 });
 
-test("cast sheets are one-shot, status sheets loop, and cache version is V165",()=>{
+test("cast sheets stay one-shot while Burn and Rage use single-image breathing",()=>{
     assert.match(css,/v143RasterCastFrames var\(--v143-sprite-duration,1200ms\) steps\(1,end\) var\(--v143-sprite-delay,0ms\) 1 both/);
     assert.doesNotMatch(css,/v143RasterCastFrames[^;]*infinite/);
-    assert.match(css,/v143StatusRasterFrames var\(--v153-status-duration,1000ms\) steps\(1,end\) infinite/);
-    assert.match(animation,/burn:statusSheet\("assets\/vfx\/fire\/burn-loop\.png\?v=165",800,"statusEffects"\)/);
-    assert.match(animation,/rage:statusSheet\("assets\/vfx\/fire\/rage-buff-loop\.png\?v=165",1000,"activeBuffs"\)/);
+    assert.doesNotMatch(css,/v143StatusRasterFrames/);
+    assert.match(css,/\.v143-status-visual--pulse\{[\s\S]*?v143StatusImageBreath 2\.2s ease-in-out infinite/);
+    assert.match(animation,/burn:statusVisual\("assets\/vfx\/fire\/burn-loop\.png\?v=165","pulse","statusEffects"/);
+    assert.match(animation,/rage:statusVisual\("assets\/vfx\/fire\/rage-buff-loop\.png\?v=165","pulse","activeBuffs"/);
     assert.match(loader,/const V_ASSET_VERSION="173\.69"/);
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
