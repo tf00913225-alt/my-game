@@ -632,7 +632,8 @@ test("Freeze and Frostbite loops mirror statusEffects only and never open an act
     assert.equal(runtime.cards.battleMonster2.querySelector(".v153-status-vfx-freeze"),null);
     assert.ok(runtime.cards.battlePlayerCard0.querySelector(".v153-status-vfx-freeze"));
     assert.ok(runtime.cards.battlePlayerCard1.querySelector(".v153-status-vfx-frostbite"));
-    assert.ok(frostbite.style.backgroundImage.includes("frostbite-status-loop-vfx.png?v=166"));
+    assert.ok(frostbite.style.backgroundImage.includes("frostbite-front.webp?v=174-front-back-webp"));
+    assert.ok(runtime.cards.battleMonster0.querySelector(".v153-status-vfx-back-frostbite"));
     assert.ok(frozen.style.backgroundImage.includes("frozen-status-loop-vfx.png?v=166"));
     assert.equal(frostbite.style["--v153-status-duration"],"1000ms");
     assert.equal(frozen.style["--v153-status-duration"],"1100ms");
@@ -642,7 +643,7 @@ test("Freeze and Frostbite loops mirror statusEffects only and never open an act
     runtime.context.v143SyncStatusSpriteEffects();
     assert.equal(runtime.cards.battleMonster0.querySelector(".v153-status-vfx-frostbite"),null);
     assert.equal(runtime.cards.battleMonster1.querySelector(".v153-status-vfx-freeze"),null);
-    assert.match(css,/v153-status-vfx-frostbite[\s\S]*?infinite/);
+    assert.match(css,/v153-status-vfx-back\{[\s\S]*?animation:none/);
     assert.match(css,/v153-status-vfx-freeze[\s\S]*?infinite/);
 });
 

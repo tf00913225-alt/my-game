@@ -23,6 +23,79 @@
     const PLACEMENT_SIZE_SCALE=Object.freeze({single:.88,targetTrajectory:.80,trajectory:1,group:1,battlefield:1});
     const spriteFrameAspectCache=new Map();
     const spriteFrameAspectLoading=new Set();
+    const STATUS_LAYER_VERSION="174-front-back-webp";
+    const statusClock={records:new Set(),rafId:0};
+
+    function statusClockNow(){
+        return typeof performance!=="undefined"&&typeof performance.now==="function"
+            ?performance.now():Date.now();
+    }
+
+    function statusFramePosition(spec,elapsed){
+        const duration=Math.max(1,Number(spec&&spec.duration)||1000);
+        const frames=Math.max(1,Number(spec&&spec.frames)||8);
+        const columns=Math.max(1,Number(spec&&spec.columns)||4);
+        const rows=Math.max(1,Number(spec&&spec.rows)||2);
+        const progress=((Number(elapsed)||0)%duration+duration)%duration/duration;
+        const frame=Math.min(frames-1,Math.floor(progress*frames));
+        const column=frame%columns;
+        const row=Math.floor(frame/columns);
+        const x=columns<=1?0:(column/(columns-1))*100;
+        const y=rows<=1?0:(row/(rows-1))*100;
+        return {frame,progress,position:x+"% "+y+"%"};
+    }
+
+    function applyStatusClockFrame(record,now){
+        if(!record||!record.front||!record.back){ return; }
+        const frame=statusFramePosition(record.spec,now-record.startedAt);
+        [record.back,record.front].forEach(node=>{
+            if(!node||!node.style){ return; }
+            node.style.backgroundPosition=frame.position;
+            if(node.dataset){
+                node.dataset.frame=String(frame.frame);
+                node.dataset.loopProgress=String(frame.progress);
+            }
+        });
+    }
+
+    function stopStatusClock(){
+        if(statusClock.rafId&&typeof cancelAnimationFrame==="function"){
+            cancelAnimationFrame(statusClock.rafId);
+        }
+        statusClock.rafId=0;
+    }
+
+    function tickStatusClock(now){
+        statusClock.rafId=0;
+        if(!statusClock.records.size){ return; }
+        statusClock.records.forEach(record=>applyStatusClockFrame(record,Number(now)||statusClockNow()));
+        if(typeof requestAnimationFrame==="function"){
+            statusClock.rafId=requestAnimationFrame(tickStatusClock);
+        }
+    }
+
+    function startStatusClock(){
+        if(statusClock.rafId||typeof requestAnimationFrame!=="function"||!statusClock.records.size){ return; }
+        statusClock.rafId=requestAnimationFrame(tickStatusClock);
+    }
+
+    function registerStatusClock(front,back,spec){
+        let record=Array.from(statusClock.records).find(entry=>entry.front===front&&entry.back===back);
+        if(!record){
+            record={front,back,spec,startedAt:statusClockNow()};
+            statusClock.records.add(record);
+        }
+        applyStatusClockFrame(record,statusClockNow());
+        startStatusClock();
+        return record;
+    }
+
+    function unregisterStatusClock(front,back){
+        statusClock.records.forEach(record=>{
+            if(record.front===front||record.back===back){ statusClock.records.delete(record); }
+        });
+        if(!statusClock.records.size){ stopStatusClock(); }
+    }
 
     function castSheet(src,placement,options){
         return Object.assign({
@@ -65,6 +138,8 @@
         flameTornado:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/flame-tornado-cast.png?v=165","single",{scale:2.35,maxSize:300})},
         phoenixCry:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/phoenix-cry-cast.png?v=165","battlefield",{scale:1.12,minSize:280})},
         rage:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/rage-cast.png?v=165","single",{scale:1.08,minSize:96,maxSize:148})},
+        fireSoulResonance:{hit:DEFAULT_HIT,deferredActorStatusTypes:["fireSoulResonance"],sprite:castSheet("assets/vfx/fire/fire-soul-resonance-cast.webp?v="+STATUS_LAYER_VERSION,"single",{scale:1.08,minSize:96,maxSize:148})},
+        bloodBurnArt:{hit:DEFAULT_HIT,deferredActorStatusTypes:["bloodBurn"],sprite:castSheet("assets/vfx/fire/blood-burn-cast.webp?v="+STATUS_LAYER_VERSION,"single",{scale:1.08,minSize:96,maxSize:148})},
         fireEX:{hit:.74,noVisual:true,passive:true},
 
         waterKnife:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/water-blade-slash-vfx.png?v=166","single",{scale:2.05,maxSize:250})},
@@ -77,7 +152,7 @@
         freeze:{hit:DEFAULT_HIT,deferredStatusTypes:["freeze"],sprite:castSheet("assets/vfx/water/freeze-cast-vfx.png?v=166","single",{scale:2.2,maxSize:270})},
         healSpell:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/water-heal-vfx.png?v=166","single",{scale:2.05,maxSize:250})},
         revive:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/water-revive-vfx.png?v=166","single",{scale:2.3,maxSize:285})},
-        purifyMind:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/water-heal-vfx.png?v=166","single",{scale:2.05,maxSize:250,reusedFrom:"healSpell"})},
+        purifyMind:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/purify-mind-cast.webp?v="+STATUS_LAYER_VERSION,"single",{scale:2.05,maxSize:250})},
         waterEX:{hit:.74,noVisual:true,passive:true},
 
         stormFist:{hit:.5,deferredStatusTypes:["agilityDown"],sprite:castSheet("assets/vfx/wind/storm-fist-cast.png?v=173.24","single",{scale:2.15,maxSize:260})},
@@ -142,22 +217,25 @@
     };
 
     const RAW_STATUS_SPRITES={
-        burn:statusSheet("assets/vfx/fire/burn-loop.png?v=165",800,"statusEffects"),
-        rage:statusSheet("assets/vfx/fire/rage-buff-loop.png?v=165",1000,"activeBuffs"),
-        frostbite:statusSheet("assets/vfx/water/frostbite-status-loop-vfx.png?v=166",1000,"statusEffects",{scale:1.22}),
+        burn:statusSheet("assets/vfx/status/fire/burn-front.webp?v="+STATUS_LAYER_VERSION,800,"statusEffects",{layers:{front:"assets/vfx/status/fire/burn-front.webp?v="+STATUS_LAYER_VERSION,back:"assets/vfx/status/fire/burn-back.webp?v="+STATUS_LAYER_VERSION}}),
+        rage:statusSheet("assets/vfx/status/fire/rage-front.webp?v="+STATUS_LAYER_VERSION,1000,"activeBuffs",{layers:{front:"assets/vfx/status/fire/rage-front.webp?v="+STATUS_LAYER_VERSION,back:"assets/vfx/status/fire/rage-back.webp?v="+STATUS_LAYER_VERSION}}),
+        fireSoulResonance:statusSheet("assets/vfx/status/fire/fire-soul-resonance-front.webp?v="+STATUS_LAYER_VERSION,1200,"activeBuffs",{statusName:"炎魂共鳴",layers:{front:"assets/vfx/status/fire/fire-soul-resonance-front.webp?v="+STATUS_LAYER_VERSION,back:"assets/vfx/status/fire/fire-soul-resonance-back.webp?v="+STATUS_LAYER_VERSION}}),
+        bloodBurn:statusSheet("assets/vfx/status/fire/blood-burn-front.webp?v="+STATUS_LAYER_VERSION,1200,"activeBuffs",{statusName:"焚血",layers:{front:"assets/vfx/status/fire/blood-burn-front.webp?v="+STATUS_LAYER_VERSION,back:"assets/vfx/status/fire/blood-burn-back.webp?v="+STATUS_LAYER_VERSION}}),
+        phoenixMight:statusSheet("assets/vfx/status/fire/phoenix-might-front.webp?v="+STATUS_LAYER_VERSION,1000,"activeBuffs",{statusName:"鳳威",layers:{front:"assets/vfx/status/fire/phoenix-might-front.webp?v="+STATUS_LAYER_VERSION,back:"assets/vfx/status/fire/phoenix-might-back.webp?v="+STATUS_LAYER_VERSION}}),
+        frostbite:statusSheet("assets/vfx/status/water/frostbite-front.webp?v="+STATUS_LAYER_VERSION,1000,"statusEffects",{scale:1.22,layers:{front:"assets/vfx/status/water/frostbite-front.webp?v="+STATUS_LAYER_VERSION,back:"assets/vfx/status/water/frostbite-back.webp?v="+STATUS_LAYER_VERSION}}),
         freeze:statusSheet("assets/vfx/water/frozen-status-loop-vfx.png?v=166",1100,"statusEffects",{scale:1.28}),
-        agilityDown:statusSheet("assets/vfx/wind/agility-down-loop.png?v=173.24",1000,"statusEffects"),
-        damageDown:statusSheet("assets/vfx/wind/damage-down-loop.png?v=173.24",1100,"statusEffects"),
-        stun:statusSheet("assets/vfx/wind/stun-loop.png?v=173.24",900,"statusEffects"),
-        dodgeSkill:statusSheet("assets/vfx/wind/dodge-skill-loop.png?v=173.24",850,"activeBuffs"),
-        stealthSkill:statusSheet("assets/vfx/wind/stealth-skill-loop.png?v=173.24",1200,"activeBuffs"),
-        dinghaishenzhen:statusSheet("assets/vfx/wind/dinghaishenzhen-loop.png?v=173.24",1200,"activeBuffs"),
-        defenseDown:statusSheet("assets/vfx/earth/defense-down-loop.png?v=173.39",1100,"statusEffects"),
-        shield:statusSheet("assets/vfx/earth/rock-shield-loop.png?v=173.39",1200,"activeBuffs",{scale:1.22}),
-        petrify:statusSheet("assets/vfx/earth/petrify-loop.png?v=173.39",1300,"statusEffects",{scale:1.22}),
-        earthShield:statusSheet("assets/vfx/earth/earth-shield-loop.png?v=173.39",1000,"activeBuffs",{scale:1.20}),
-        rockWall:statusSheet("assets/vfx/earth/rock-wall-loop.png?v=173.39",1400,"activeBuffs",{scale:1.20}),
-        barrier:statusSheet("assets/vfx/earth/barrier-loop.png?v=173.39",1200,"activeBuffs",{scale:1.24,cellAspect:.75}),
+        agilityDown:statusSheet("assets/vfx/status/wind/agility-down-front.webp?v="+STATUS_LAYER_VERSION,1000,"statusEffects",{layers:{front:"assets/vfx/status/wind/agility-down-front.webp?v="+STATUS_LAYER_VERSION,back:"assets/vfx/status/wind/agility-down-back.webp?v="+STATUS_LAYER_VERSION}}),
+        damageDown:statusSheet("assets/vfx/status/wind/damage-down-front.webp?v="+STATUS_LAYER_VERSION,1100,"statusEffects",{layers:{front:"assets/vfx/status/wind/damage-down-front.webp?v="+STATUS_LAYER_VERSION,back:"assets/vfx/status/wind/damage-down-back.webp?v="+STATUS_LAYER_VERSION}}),
+        stun:statusSheet("assets/vfx/status/wind/stun-front.webp?v="+STATUS_LAYER_VERSION,900,"statusEffects",{columns:4,rows:3,frames:12,layers:{front:"assets/vfx/status/wind/stun-front.webp?v="+STATUS_LAYER_VERSION,back:"assets/vfx/status/wind/stun-back.webp?v="+STATUS_LAYER_VERSION}}),
+        dodgeSkill:statusSheet("assets/vfx/status/wind/dodge-skill-front.webp?v="+STATUS_LAYER_VERSION,850,"activeBuffs",{layers:{front:"assets/vfx/status/wind/dodge-skill-front.webp?v="+STATUS_LAYER_VERSION,back:"assets/vfx/status/wind/dodge-skill-back.webp?v="+STATUS_LAYER_VERSION}}),
+        stealthSkill:statusSheet("assets/vfx/status/wind/stealth-skill-front.webp?v="+STATUS_LAYER_VERSION,1200,"activeBuffs",{layers:{front:"assets/vfx/status/wind/stealth-skill-front.webp?v="+STATUS_LAYER_VERSION,back:"assets/vfx/status/wind/stealth-skill-back.webp?v="+STATUS_LAYER_VERSION}}),
+        dinghaishenzhen:statusSheet("assets/vfx/status/wind/dinghaishenzhen-front.webp?v="+STATUS_LAYER_VERSION,1200,"activeBuffs",{layers:{front:"assets/vfx/status/wind/dinghaishenzhen-front.webp?v="+STATUS_LAYER_VERSION,back:"assets/vfx/status/wind/dinghaishenzhen-back.webp?v="+STATUS_LAYER_VERSION}}),
+        defenseDown:statusSheet("assets/vfx/status/earth/defense-down-front.webp?v="+STATUS_LAYER_VERSION,1100,"statusEffects",{layers:{front:"assets/vfx/status/earth/defense-down-front.webp?v="+STATUS_LAYER_VERSION,back:"assets/vfx/status/earth/defense-down-back.webp?v="+STATUS_LAYER_VERSION}}),
+        shield:statusSheet("assets/vfx/status/earth/rock-shield-front.webp?v="+STATUS_LAYER_VERSION,1200,"activeBuffs",{scale:1.22,layers:{front:"assets/vfx/status/earth/rock-shield-front.webp?v="+STATUS_LAYER_VERSION,back:"assets/vfx/status/earth/rock-shield-back.webp?v="+STATUS_LAYER_VERSION}}),
+        petrify:statusSheet("assets/vfx/status/earth/petrify-front.webp?v="+STATUS_LAYER_VERSION,1300,"statusEffects",{scale:1.22,layers:{front:"assets/vfx/status/earth/petrify-front.webp?v="+STATUS_LAYER_VERSION,back:"assets/vfx/status/earth/petrify-back.webp?v="+STATUS_LAYER_VERSION}}),
+        earthShield:statusSheet("assets/vfx/status/earth/earth-shield-front.webp?v="+STATUS_LAYER_VERSION,1000,"activeBuffs",{scale:1.20,layers:{front:"assets/vfx/status/earth/earth-shield-front.webp?v="+STATUS_LAYER_VERSION,back:"assets/vfx/status/earth/earth-shield-back.webp?v="+STATUS_LAYER_VERSION}}),
+        rockWall:statusSheet("assets/vfx/status/earth/rock-wall-front.webp?v="+STATUS_LAYER_VERSION,1400,"activeBuffs",{scale:1.20,layers:{front:"assets/vfx/status/earth/rock-wall-front.webp?v="+STATUS_LAYER_VERSION,back:"assets/vfx/status/earth/rock-wall-back.webp?v="+STATUS_LAYER_VERSION}}),
+        barrier:statusSheet("assets/vfx/status/earth/barrier-front.webp?v="+STATUS_LAYER_VERSION,1200,"activeBuffs",{scale:1.24,cellAspect:.75,layers:{front:"assets/vfx/status/earth/barrier-front.webp?v="+STATUS_LAYER_VERSION,back:"assets/vfx/status/earth/barrier-back.webp?v="+STATUS_LAYER_VERSION}}),
         yuanZuBlessing:statusSheet("assets/vfx/light/yuan-zu-blessing-loop.png?v=173.39",1200,"activeBuffs",{statusName:"元祖賜福",scale:1.18})
     };
 
@@ -506,6 +584,43 @@
         )||null;
     }
 
+    function statusBackNode(card,type){
+        if(!card){ return null; }
+        const className="v153-status-vfx-back-"+type;
+        if(typeof card.querySelector==="function"){ return card.querySelector("."+className); }
+        return Array.from(card.children||[]).find(node=>
+            String(node.className||"").split(/\s+/).includes(className)
+        )||null;
+    }
+
+    function removeStatusNodes(card,type){
+        const front=statusNode(card,type);
+        const back=statusBackNode(card,type);
+        unregisterStatusClock(front,back);
+        [front,back].forEach(node=>{
+            if(node&&typeof node.remove==="function"){ node.remove(); }
+            else if(node&&node.parentNode){ node.parentNode.removeChild(node); }
+        });
+    }
+
+    function createStatusNode(type,spec,layer){
+        const node=document.createElement("i");
+        const isBack=layer==="back";
+        node.className=isBack
+            ?"v153-status-vfx-back v153-status-vfx-back-"+type
+            :"v153-status-vfx v153-status-vfx-"+type+" v153-status-vfx-front";
+        node.dataset.statusType=type;
+        node.dataset.statusLayer=layer;
+        node.dataset.frames=String(spec.frames);
+        node.dataset.renderer="dom-sprite";
+        if(typeof node.setAttribute==="function"){ node.setAttribute("aria-hidden","true"); }
+        const source=spec.layers&&spec.layers[layer]||spec.src;
+        node.style.backgroundImage='url("'+String(source).replace(/"/g,"%22")+'")';
+        node.style.backgroundSize=(spec.columns*100)+"% "+(spec.rows*100)+"%";
+        node.style.setProperty("--v153-status-duration",spec.duration+"ms");
+        return node;
+    }
+
     function syncStatusSprite(side,index,type){
         const spec=STATUS_SPRITES[type];
         const card=cardFor(side,index);
@@ -513,21 +628,22 @@
         const alive=!!(spec&&card&&entity&&Number(entity.hp)>0&&(side!=="monster"||entity.alive!==false));
         const active=alive&&hasTimedEffect(entity,type);
         let node=statusNode(card,type);
+        const paired=!!(spec&&spec.layers&&spec.layers.front&&spec.layers.back);
+        let back=paired?statusBackNode(card,type):null;
         if(!active||deferredStatusDuringCast(side,index,type)){
-            if(node&&typeof node.remove==="function"){ node.remove(); }
-            else if(node&&node.parentNode){ node.parentNode.removeChild(node); }
+            removeStatusNodes(card,type);
             return;
         }
-        if(!node){
-            node=document.createElement("i");
-            node.className="v153-status-vfx v153-status-vfx-"+type;
-            node.dataset.statusType=type;
-            node.dataset.frames=String(spec.frames);
-            node.dataset.renderer="dom-sprite";
-            if(typeof node.setAttribute==="function"){ node.setAttribute("aria-hidden","true"); }
-            node.style.backgroundImage='url("'+String(spec.src).replace(/"/g,"%22")+'")';
-            node.style.backgroundSize=(spec.columns*100)+"% "+(spec.rows*100)+"%";
-            node.style.setProperty("--v153-status-duration",spec.duration+"ms");
+        if(paired){
+            if(!node||!back){
+                removeStatusNodes(card,type);
+                back=createStatusNode(type,spec,"back");
+                node=createStatusNode(type,spec,"front");
+                card.appendChild(back);
+                card.appendChild(node);
+            }
+        }else if(!node){
+            node=createStatusNode(type,spec,"legacy");
             card.appendChild(node);
         }
         const anchor=slotAnchor(side,index,card);
@@ -542,6 +658,11 @@
         }else{
             node.style.width=(size*cellAspect)+"px";
             node.style.height=size+"px";
+        }
+        if(paired){
+            back.style.width=node.style.width;
+            back.style.height=node.style.height;
+            registerStatusClock(node,back,spec);
         }
     }
 
@@ -558,7 +679,10 @@
 
     function removeStatusSpriteEffects(){
         if(typeof document==="undefined"||typeof document.querySelectorAll!=="function"){ return; }
+        statusClock.records.clear();
+        stopStatusClock();
         document.querySelectorAll(".v153-status-vfx").forEach(node=>node.remove());
+        document.querySelectorAll(".v153-status-vfx-back").forEach(node=>node.remove());
     }
     window.v143SyncStatusSpriteEffects=syncStatusSpriteEffects;
 

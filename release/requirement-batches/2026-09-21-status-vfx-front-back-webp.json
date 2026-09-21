@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-09-21",
+  "title": "持續狀態 VFX Front／Back Layer 與正式 WebP 接管",
+  "base_branch": "dev",
+  "base_sha": "c9beac4329e832c58049786ea09d07553f88ef77",
+  "work_branch": "feature/status-vfx-front-back-webp-20260921",
+  "status": "IMPLEMENTED",
+  "requirements": [
+    {
+      "id": "SVFX-01",
+      "status": "IMPLEMENTED",
+      "request": "掃描 assets-library 新資料夾，建立狀態名稱到 Front／Back 的實際配對；無法配對者不得猜測。",
+      "owner": ["assets/ASSET_INDEX.md", "js/39-v143-skill-animation.js"],
+      "implementation": "已辨識 18 組 Front／Back 名稱配對，全部以正式 Front／Back WebP 接管；其中 17 組為 4×2／8 幀，暈眩保留來源 4×3／12 幀例外；freeze 與 yuanZuBlessing 因來源無完整配對列入 Pending Front/Back Migration。"
+    },
+    {
+      "id": "SVFX-02",
+      "status": "IMPLEMENTED",
+      "request": "三張技能釋放圖與 18 組狀態圖轉成保留 Alpha、尺寸與影格排列的無損 WebP，Runtime 不得引用 inbox PNG。",
+      "owner": ["assets/vfx/", "assets/ASSET_INDEX.md"],
+      "implementation": "技能釋放圖保留 1448×1086、4×3、12 幀；17 組接管狀態圖保留來源畫布、4×2、8 幀，暈眩 Front／Back 保留 1448×1086、4×3、12 幀例外；正式 registry 指向 WebP。"
+    },
+    {
+      "id": "SVFX-03",
+      "status": "IMPLEMENTED",
+      "request": "單一 Status VFX Runtime Owner 建立 Back → Actor → Front 圖層，且玩家、隊友、敵人、Boss、援軍共用。",
+      "owner": ["js/39-v143-skill-animation.js", "css/40-v143-combat-dungeon-polish.css", "css/fixed-slot-battlefield-rendering-v2.css"],
+      "implementation": "V143 renderer 建立 paired back/front sibling nodes；Back z-index 0、Front z-index 5，HUD／名稱／浮字維持更高層；未新增 late CSS owner。"
+    },
+    {
+      "id": "SVFX-04",
+      "status": "IMPLEMENTED",
+      "request": "同一狀態的 Front／Back 共用單一動畫時間來源，刷新不重複建立節點，解除／死亡／退場／戰鬥結束清除完整。",
+      "owner": ["js/39-v143-skill-animation.js"],
+      "implementation": "新增 shared status clock，單一 requestAnimationFrame 驅動同一 status pair；pair refresh、expiry、death、removeStatusSpriteEffects 均同步清除。"
+    },
+    {
+      "id": "SVFX-05",
+      "status": "IMPLEMENTED",
+      "request": "Gameplay Effect 與 VFX Presentation 分離，不修改數值、回合、觸發、傷害、治療、護盾、命中、元素公式、AI 或 Boss 邏輯。",
+      "owner": ["js/39-v143-skill-animation.js"],
+      "implementation": "本批次只調整 V143 cast/status presentation registry、DOM layer 與素材，不改 gameplay effect resolver。"
+    },
+    {
+      "id": "SVFX-06",
+      "status": "PENDING_VERIFICATION",
+      "request": "完成 targeted tests、build、CI 與 390px／412px Runtime Regression，確認多角色、多狀態、Boss、HP／Shield、浮字、Auto Battle 與下一場戰鬥無殘留。",
+      "owner": ["tests/", ".github/workflows/ci.yml"],
+      "implementation": "本地驗證與 GitHub PR checks 待本批次測試更新後執行；在 CI、部署 SHA 與瀏覽器／實機證據完成前不得標為 VERIFIED。"
+    }
+  ],
+  "verification": [],
+  "verificationResult": "IMPLEMENTED；尚未宣稱 CI、PR、部署或實機驗證完成。",
+  "releasedAs": null
+}

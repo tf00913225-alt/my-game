@@ -315,10 +315,20 @@ test("all eleven casts and six loops use the requested mapping, timing and share
     const statuses=runtime.context.v143StatusSpriteManifest;
     Object.entries(STATUSES).forEach(([type,spec])=>{
         const sprite=statuses[type];
-        assert.equal(sprite.src,"assets/vfx/wind/"+spec.file+"?v=173.24",type);
+        const formal={
+            agilityDown:"assets/vfx/status/wind/agility-down-front.webp",
+            damageDown:"assets/vfx/status/wind/damage-down-front.webp",
+            dodgeSkill:"assets/vfx/status/wind/dodge-skill-front.webp",
+            stealthSkill:"assets/vfx/status/wind/stealth-skill-front.webp",
+            dinghaishenzhen:"assets/vfx/status/wind/dinghaishenzhen-front.webp",
+            stun:"assets/vfx/status/wind/stun-front.webp"
+        }[type];
+        assert.equal(sprite.src,formal+"?v=174-front-back-webp",type);
+        assert.equal(sprite.layers.front,formal+"?v=174-front-back-webp",type);
+        assert.match(sprite.layers.back,/assets\/vfx\/status\/wind\/.*-back\.webp\?v=174-front-back-webp/,type);
         assert.deepEqual(
             Array.from([sprite.columns,sprite.rows,sprite.frames]),
-            [4,2,8],type
+            type==="stun"?[4,3,12]:[4,2,8],type
         );
         assert.equal(sprite.renderer,"dom-sprite",type);
         assert.equal(sprite.duration,spec.duration,type);
@@ -482,7 +492,8 @@ test("status loops start only on success, never restart on duplicate MISS, and c
     runTimers(applied,1200);
     const gravity=applied.cards.battleMonster0.querySelector(".v153-status-vfx-agilityDown");
     assert.ok(gravity,"successful status starts its loop");
-    assert.ok(gravity.style.backgroundImage.includes("agility-down-loop.png?v=173.24"));
+    assert.ok(gravity.style.backgroundImage.includes("agility-down-front.webp?v=174-front-back-webp"));
+    assert.ok(applied.cards.battleMonster0.querySelector(".v153-status-vfx-back-agilityDown"));
     assert.equal(gravity.style["--v153-status-duration"],"1000ms");
 
     applied.monsters[0].statusEffects.push({type:"damageDown",turnsLeft:1});
@@ -520,13 +531,14 @@ test("status loops start only on success, never restart on duplicate MISS, and c
     applied.context.v143SyncStatusSpriteEffects();
     assert.ok(applied.cards.battlePlayerCard1.querySelector(".v153-status-vfx-stealthSkill"));
     applied.context.v142SkillAnimationDirector.dispose();
-    assert.equal(applied.body.querySelectorAll(".v153-status-vfx").length,0,"battle disposal clears every loop");
+    assert.equal(applied.body.querySelectorAll(".v153-status-vfx").length,0,"battle disposal clears every front loop");
+    assert.equal(applied.body.querySelectorAll(".v153-status-vfx-back").length,0,"battle disposal clears every back loop");
 });
 
 test("wind sheets replace procedural wind effects and keep noninteractive status layering",()=>{
     assert.doesNotMatch(css,/data-skill="windCrossSlash"/);
     assert.doesNotMatch(css,/data-skill="stormRain"/);
-    assert.match(css,/#game-stage #battlePage \.v153-status-vfx\{[\s\S]*?z-index:4;[\s\S]*?pointer-events:none;/);
+    assert.match(css,/#game-stage #battlePage \.v153-status-vfx,[\s\S]*?#game-stage #battlePage \.v153-status-vfx-back\{[\s\S]*?z-index:4;[\s\S]*?pointer-events:none;/);
     assert.match(css,/@keyframes v143StatusRasterFrames\{[\s\S]*?87\.5%,100%\{background-position:100% 100%\}/);
     assert.match(animation,/node\.dataset\.renderer="dom-sprite";/);
     assert.match(animation,/node\.style\.backgroundSize=\(spec\.columns\*100\)\+"% "\+\(spec\.rows\*100\)\+"%";/);

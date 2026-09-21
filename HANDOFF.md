@@ -4089,3 +4089,11 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 - 三層模型：Level 1 首屏完整後曝光；Level 2 主城可操作後由唯一 Feature Loader、idle、concurrency 1 背景預抓；Level 3 大型玩法維持按需 Lazy Load。
 - Relic 首次開啟先顯示正式局部 loading，20 icon 只由 `RELIC_CATALOG_LIST[].iconPath` 衍生並在 visual-ready 後一次呈現；背景不 execute Boss／Tower／Relic runtime。
 - 工作分支：`fix/cold-start-visual-ready-background-prefetch-20260920`；以最新 `dev` 為基準，main 不修改。待 GitHub 認證後依保護流程推送、CI、PR 合併。
+
+## 2026-09-21 — 持續狀態 VFX Front／Back Layer 與正式 WebP（IMPLEMENTED / CI 待驗證）
+
+- 基準：最新 GitHub `dev@c9beac4329e832c58049786ea09d07553f88ef77`；工作分支 `feature/status-vfx-front-back-webp-20260921`；`main` 不修改。
+- 持續狀態 VFX 的唯一 Runtime owner 維持 `js/39-v143-skill-animation.js`。本輪掃描到 18 組名稱配對，其中 17 組符合固定 4×2／8 幀規格並收斂為正式 Front／Back registry，新增 `assets/vfx/status/**.webp`；`暈眩` 實際為 4×3／12 幀，列為 spec-mismatch unresolved 並維持舊單層。`assets/ASSET_INDEX.md` 記錄 assets-library 原始 PNG 到正式 WebP 的對應。
+- V143 renderer 現在建立 `status-vfx-back → actor → status-vfx-front`；同一狀態的兩層共用一個 status clock／requestAnimationFrame、frame index 與 loop progress。HP／Shield bar、名稱與傷害浮字維持高於 VFX 的 UI 層；一次性技能 VFX 不共用本次持續狀態 layer。
+- `freeze` 與 `yuanZuBlessing` 因本批次沒有完整 Front／Back 原始配對，維持原正式單層素材並列入 Pending Front/Back Migration；未使用其他狀態作 placeholder。技能釋放素材 `焚血訣`、`炎魂共鳴`、`淨心訣` 已轉為正式 WebP 並接入 V143 cast registry。
+- Requirement Batch：`release/requirement-batches/2026-09-21-status-vfx-front-back-webp.json`。目前為 IMPLEMENTED；待 targeted/full CI、PR checks、部署 SHA 與 390×844／412×915 Runtime QA 後才可升為 VERIFIED。

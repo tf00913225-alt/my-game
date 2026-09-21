@@ -169,7 +169,21 @@ test("all seven persistent effects use 4x2 runtime cropping with the requested l
     Object.entries(STATUSES).forEach(([type,spec])=>{
         const model=manifest[type];
         assert.ok(model,type);
-        assert.equal(model.src,spec.file+"?v=173.39",type);
+        const formal={
+            defenseDown:"assets/vfx/status/earth/defense-down-front.webp",
+            shield:"assets/vfx/status/earth/rock-shield-front.webp",
+            petrify:"assets/vfx/status/earth/petrify-front.webp",
+            earthShield:"assets/vfx/status/earth/earth-shield-front.webp",
+            rockWall:"assets/vfx/status/earth/rock-wall-front.webp",
+            barrier:"assets/vfx/status/earth/barrier-front.webp",
+            yuanZuBlessing:"assets/vfx/light/yuan-zu-blessing-loop.png"
+        }[type];
+        const version=type==="yuanZuBlessing"?"173.39":"174-front-back-webp";
+        assert.equal(model.src,formal+"?v="+version,type);
+        if(type!=="yuanZuBlessing"){
+            assert.equal(model.layers.front,formal+"?v="+version,type);
+            assert.match(model.layers.back,/assets\/vfx\/status\/earth\/.*-back\.webp\?v=174-front-back-webp/,type);
+        }
         assert.deepEqual(Array.from([model.columns,model.rows,model.frames]),[4,2,8],type);
         assert.equal(model.renderer,"dom-sprite",type);
         assert.equal(model.duration,spec.duration,type);
@@ -208,7 +222,7 @@ test("rock shield on the attacking caster is deferred until its cast sheet finis
 
 test("the Wanxiang loop is raster-owned and the old procedural corner effect is absent",()=>{
     assert.doesNotMatch(legacyEarth,/v143-earth-shield-effect/);
-    assert.match(animation,/earthShield:statusSheet\("assets\/vfx\/earth\/earth-shield-loop\.png\?v=173\.39",1000,"activeBuffs"/);
+    assert.match(animation,/earthShield:statusSheet\("assets\/vfx\/status\/earth\/earth-shield-front\.webp\?v=\"\+STATUS_LAYER_VERSION,1000,"activeBuffs"/);
 });
 
 test("V173.39 cache version loads the new owner code without stale V173.38 browser assets",()=>{

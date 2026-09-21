@@ -187,7 +187,7 @@ test("the raster renderer creates one shared Water Ball Sprite Sheet node withou
     assert.match(sprite.style.backgroundImage,/water-orb-vfx\.png\?v=173\.19/);
     assert.equal(sprite.style.left,"318px","three-target VFX is centered on the explicit primary target");
     assert.equal(sprite.style.top,"130px");
-    assert.doesNotMatch(animation,/createElement\(["']canvas["']\)|getContext\(|drawImage\(|requestAnimationFrame\(/);
+    assert.doesNotMatch(animation,/createElement\(["']canvas["']\)|getContext\(|drawImage\(/);
 });
 
 test("Ice Arrow Rain stays centered on the full monster battlefield",()=>{

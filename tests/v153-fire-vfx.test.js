@@ -555,8 +555,10 @@ test("cast sheets are one-shot, status sheets loop, and cache version is V165",(
     assert.match(css,/v143RasterCastFrames var\(--v143-sprite-duration,1200ms\) steps\(1,end\) var\(--v143-sprite-delay,0ms\) 1 both/);
     assert.doesNotMatch(css,/v143RasterCastFrames[^;]*infinite/);
     assert.match(css,/v143StatusRasterFrames var\(--v153-status-duration,1000ms\) steps\(1,end\) infinite/);
-    assert.match(animation,/burn:statusSheet\("assets\/vfx\/fire\/burn-loop\.png\?v=165",800,"statusEffects"\)/);
-    assert.match(animation,/rage:statusSheet\("assets\/vfx\/fire\/rage-buff-loop\.png\?v=165",1000,"activeBuffs"\)/);
+    assert.match(animation,/burn:statusSheet\("assets\/vfx\/status\/fire\/burn-front\.webp\?v=\"\+STATUS_LAYER_VERSION,800,"statusEffects"/);
+    assert.match(animation,/rage:statusSheet\("assets\/vfx\/status\/fire\/rage-front\.webp\?v=\"\+STATUS_LAYER_VERSION,1000,"activeBuffs"/);
+    assert.match(animation,/layers:\{front:"assets\/vfx\/status\/fire\/burn-front\.webp\?v=\"\+STATUS_LAYER_VERSION,back:"assets\/vfx\/status\/fire\/burn-back\.webp/);
+    assert.match(animation,/layers:\{front:"assets\/vfx\/status\/fire\/rage-front\.webp\?v=\"\+STATUS_LAYER_VERSION,back:"assets\/vfx\/status\/fire\/rage-back\.webp/);
     assert.match(loader,/const V_ASSET_VERSION="173\.69"/);
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
