@@ -350,50 +350,11 @@
         return document.getElementById(side==="monster"?"battleMonster"+index:"battlePlayerCard"+index);
     }
 
-    function ensureEffectLayer(card){
-        if(!card){ return null; }
-        let layer=card.querySelector(":scope > .v141-card-effects");
-        if(!layer){
-            layer=document.createElement("div");
-            layer.className="v141-card-effects";
-            layer.setAttribute("aria-hidden","true");
-            card.appendChild(layer);
-        }
-        return layer;
-    }
+    /* Persistent visual rendering is owned by V143. Keep only this stable
+       compatibility call surface because older support actions still invoke it
+       after their gameplay result is committed. */
+    window.v141PlayCardEffect=function(){ return false; };
 
-    function activeEffectTypes(entity){
-        const types=new Set();
-        (entity&&entity.statusEffects||[]).forEach(effect=>{
-            if(effect&&effect.type&&(effect.turnsLeft===undefined||effect.turnsLeft>0)){ types.add(effect.type); }
-        });
-        (entity&&entity.activeBuffs||[]).forEach(buff=>{
-            if(!buff||!buff.type||buff.turnsLeft<=0){ return; }
-            const map={
-                shield:"shield",barrier:"barrier",earthShield:"barrier",rockWall:"buff",
-                rage:"buff",phoenixMight:"buff",dodgeSkill:"buff",stealthSkill:"buff",dinghaishenzhen:"buff",
-                v141TeamBuff:"buff"
-            };
-            if(map[buff.type]){ types.add(map[buff.type]); }
-        });
-        if(entity&&entity.v141Shield&&entity.v141Shield.remaining>0){
-            types.add(entity.v141Shield.isBarrier?"barrier":"shield");
-        }
-        return [...types].filter(type=>[
-            "burn","stun","freeze","petrify","shield","barrier","defenseDown",
-            "agilityDown","damageDown","statDown","buff"
-        ].includes(type));
-    }
-
-    function syncCardEffects(card){
-        if(!card||typeof card.querySelector!=="function"){ return; }
-        const layer=card.querySelector(":scope > .v141-card-effects");
-        if(!layer){ return; }
-        layer.querySelectorAll(":scope > .v141-effect").forEach(node=>node.remove());
-        if(!layer.children.length){ layer.remove(); }
-    }
-
-        window.v141PlayCardEffect=function(){ return false; };
 
     function executeAdditionalSupportAction(characterIndex,queued,skill){
         const character=getPartyCharacterByIndex(characterIndex);
@@ -500,9 +461,7 @@
             }
             const result=originalUpdateMonsterUI.apply(this,arguments);
             const monster=monsters[index];
-            const card=cardFor("monster",index);
-            syncCardEffects(card,monster);
-            if(monster&&card){
+            if(monster){
                 const normalBar=document.getElementById("battleMonsterBar"+index);
                 const shieldBar=document.getElementById("battleMonsterShieldBar"+index);
                 const hpText=document.getElementById("battleMonsterHPText"+index);
@@ -532,14 +491,6 @@
         };
     }
 
-    if(typeof updateSingleCharacterStatusBadge==="function"){
-        const originalUpdateSingleCharacterStatusBadge=updateSingleCharacterStatusBadge;
-        updateSingleCharacterStatusBadge=function(index,character){
-            const result=originalUpdateSingleCharacterStatusBadge.apply(this,arguments);
-            syncCardEffects(cardFor("player",index),character);
-            return result;
-        };
-    }
 
     if(typeof resolveQueuedPlayerAction==="function"){
         const originalResolveQueuedPlayerAction=resolveQueuedPlayerAction;
@@ -662,12 +613,8 @@
             if(card&&monster){
                 card.dataset.element=monster.element||"unknown";
                 card.dataset.rank=getMonsterRank(monster);
-                syncCardEffects(card,monster);
                 updateMonsterUI(index);
             }
-        });
-        getExistingPartyIndexes().forEach(index=>{
-            syncCardEffects(cardFor("player",index),getPartyCharacterByIndex(index));
         });
         applyFixedAbyssFormation();
     }

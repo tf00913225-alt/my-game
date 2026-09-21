@@ -189,7 +189,7 @@ test("monster shields are real HP absorption with their own white HUD bar",()=>{
     assert.equal(context.monster.maxHP,500);
     assert.equal(context.monster.hp,400);
     assert.match(uiSource,/v141-monster-shield-bar/);
-    assert.match(uiSource,/entity\.v141Shield\.isBarrier\?"barrier":"shield"/);
+    assert.match(mainSource,/type:entity\.v141Shield\.isBarrier\?"barrier":"shield"/);
     assert.match(cssSource,/background:linear-gradient\(90deg,#f7fbff,#cfeeff/);
 });
 
