@@ -102,7 +102,7 @@ test("the formal registry owns every supplied Front/Back pair and never points m
     assert.doesNotMatch(animation,/assets\/inbox\//);
     assert.match(index,/焚血訣 技能釋放\.png/);
     assert.equal((index.match(/\| `assets\/vfx\/status\//g)||[]).length,36);
-    assert.deepEqual({columns:registry.stun.columns,rows:registry.stun.rows,frames:registry.stun.frames},{columns:4,rows:2,frames:8});
+    assert.deepEqual({columns:registry.stun.columns,rows:registry.stun.rows,frames:registry.stun.frames},{columns:4,rows:3,frames:12});
 });
 
 test("a paired status creates one Back and one Front node driven by one RAF",()=>{

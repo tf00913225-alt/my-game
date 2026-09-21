@@ -12,14 +12,14 @@
       "status": "IMPLEMENTED",
       "request": "掃描 assets-library 新資料夾，建立狀態名稱到 Front／Back 的實際配對；無法配對者不得猜測。",
       "owner": ["assets/ASSET_INDEX.md", "js/39-v143-skill-animation.js"],
-      "implementation": "已辨識 18 組 Front／Back 名稱配對，全部以正式 Front／Back WebP 接管；freeze 與 yuanZuBlessing 因來源無完整配對列入 Pending Front/Back Migration。"
+      "implementation": "已辨識 18 組 Front／Back 名稱配對，全部以正式 Front／Back WebP 接管；其中 17 組為 4×2／8 幀，暈眩保留來源 4×3／12 幀例外；freeze 與 yuanZuBlessing 因來源無完整配對列入 Pending Front/Back Migration。"
     },
     {
       "id": "SVFX-02",
       "status": "IMPLEMENTED",
       "request": "三張技能釋放圖與 18 組狀態圖轉成保留 Alpha、尺寸與影格排列的無損 WebP，Runtime 不得引用 inbox PNG。",
       "owner": ["assets/vfx/", "assets/ASSET_INDEX.md"],
-      "implementation": "技能釋放圖保留 1448×1086、4×3、12 幀；18 組接管狀態圖均保留來源畫布、4×2、8 幀；正式 registry 指向 WebP。"
+      "implementation": "技能釋放圖保留 1448×1086、4×3、12 幀；17 組接管狀態圖保留來源畫布、4×2、8 幀，暈眩 Front／Back 保留 1448×1086、4×3、12 幀例外；正式 registry 指向 WebP。"
     },
     {
       "id": "SVFX-03",

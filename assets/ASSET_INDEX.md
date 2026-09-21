@@ -14,7 +14,7 @@
 
 ## 持續狀態 Front / Back Sprite Sheet
 
-所有正式檔案均為與來源相同尺寸的透明、無損 WebP；每張為 `4×2`、8 幀。Front 與 Back 使用相同畫布、影格索引與 Runtime 動畫時鐘。
+除暈眩規格例外外，所有正式檔案均為與來源相同尺寸的透明、無損 WebP；每張為 `4×2`、8 幀。Front 與 Back 使用相同畫布、影格索引與 Runtime 動畫時鐘。
 
 | 狀態 | 原始 Front / Back PNG（assets-library） | 正式 Front WebP | 正式 Back WebP |
 |---|---|---|---|
@@ -36,6 +36,8 @@
 | 風行 | `風行 前景.png` / `風行 後景.png` | `assets/vfx/status/wind/dinghaishenzhen-front.webp` | `assets/vfx/status/wind/dinghaishenzhen-back.webp` |
 | 鳳威 | `鳳威 前景.png` / `鳳威 後景.png` | `assets/vfx/status/fire/phoenix-might-front.webp` | `assets/vfx/status/fire/phoenix-might-back.webp` |
 | 暈眩 | `image-gen-1(20260920-141230).png` / `image-gen-2(7).png` | `assets/vfx/status/wind/stun-front.webp` | `assets/vfx/status/wind/stun-back.webp` |
+
+暈眩 Front／Back 保留來源 `1448×1086`、`4×3`、12 幀規格例外；兩層仍共用同一動畫時鐘。
 
 ## 尚待雙層遷移
 

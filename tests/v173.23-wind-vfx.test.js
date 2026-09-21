@@ -328,7 +328,7 @@ test("all eleven casts and six loops use the requested mapping, timing and share
         assert.match(sprite.layers.back,/assets\/vfx\/status\/wind\/.*-back\.webp\?v=174-front-back-webp/,type);
         assert.deepEqual(
             Array.from([sprite.columns,sprite.rows,sprite.frames]),
-            [4,2,8],type
+            type==="stun"?[4,3,12]:[4,2,8],type
         );
         assert.equal(sprite.renderer,"dom-sprite",type);
         assert.equal(sprite.duration,spec.duration,type);
