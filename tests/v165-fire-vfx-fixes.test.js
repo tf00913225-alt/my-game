@@ -3,6 +3,7 @@
 const assert=require("node:assert/strict");
 const crypto=require("node:crypto");
 const fs=require("node:fs");
+const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 const zlib=require("node:zlib");
 
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
@@ -137,7 +138,7 @@ test("Fire Rocket travels from its caster to the real target group before bursti
 test("the current cache version publishes the repaired sheets and choreography",()=>{
     assert.match(animation,/dragon-slash-cast\.png\?v=165/);
     assert.match(animation,/rage-cast\.png\?v=165/);
-    assert.match(loader,/const V_ASSET_VERSION="173\.69"/);
+    assert.equal((loader.match(/const V_ASSET_VERSION="([^"]+)"/)||[])[1],releaseMeta.cacheVersion);
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
 
