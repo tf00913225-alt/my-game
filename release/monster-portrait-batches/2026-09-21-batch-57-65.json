@@ -1,0 +1,37 @@
+{
+  "date": "2026-09-21",
+  "title": "怪物立繪批次 57–65：日常副本",
+  "base_branch": "dev",
+  "base_sha": "2d22118c62455667c29fbb4fbdbf126e8453b493",
+  "work_branch": "feature/monster-portraits-batch-57-65-formal-20260921",
+  "batch": "57-65",
+  "status": "IN_PROGRESS",
+  "scope": "只處理日常副本 portraitKey daily.exp.regular、daily.exp.elite、daily.exp.boss、daily.material.regular、daily.material.elite、daily.material.boss、daily.gold.regular、daily.gold.elite、daily.gold.boss。",
+  "committed": [
+    "daily.exp.regular",
+    "daily.exp.elite",
+    "daily.material.regular",
+    "daily.material.elite"
+  ],
+  "pending": [
+    "daily.exp.boss",
+    "daily.material.boss",
+    "daily.gold.regular",
+    "daily.gold.elite",
+    "daily.gold.boss"
+  ],
+  "sourceEvidence": {
+    "daily.exp.regular": "libfile_cc28bd382a7081919adf91334b923ce6",
+    "daily.exp.elite": "libfile_d2b6cd622ef481918836ec8828b9071b",
+    "daily.exp.boss": "libfile_9aeda1d424208191898c9c5e90ea6121",
+    "daily.material.regular": "libfile_ff28035dacbc819193998b3fc8250801",
+    "daily.material.elite": "libfile_de59af8166c08191806785eacd795380",
+    "daily.material.boss": "libfile_14fb48a30cd481919c1aab8819f872fa"
+  },
+  "notes": [
+    "57、58、60、61 為 1024×1536 RGBA 透明 PNG，符合 standard 尺寸。",
+    "59、62 為日常副本 Boss，但目前來源尺寸為 1024×1536，不符合 1536×2048 Boss 尺寸，維持 pending。",
+    "63、64、65 目前沒有正式 Library file_id，禁止硬配或以對話 file_id 冒充 Library file_id。",
+    "本批不修改 runtime portrait owner，不新增 wrapper；先完成素材與 registry 批次導入。"
+  ]
+}
