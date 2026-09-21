@@ -209,7 +209,8 @@ test("CSS advances one formal 4x3 sheet row-major without Canvas fallback",()=>{
     assert.match(css,/33\.333333%\{background-position:0 50%\}/);
     assert.match(css,/66\.666667%\{background-position:0 100%\}/);
     assert.match(css,/91\.666667%,100%\{background-position:100% 100%\}/);
-    assert.doesNotMatch(animation,/createElement\(["']canvas["']\)|getContext\(|drawImage\(|requestAnimationFrame\(/);
+    assert.doesNotMatch(animation,/createElement\(["']canvas["']\)|getContext\(|drawImage\(/);
+    assert.match(animation,/function registerStatusClock\(front,back,spec\)/,"paired status layers may use the shared clock");
     assert.doesNotMatch(css,/data-skill="iceArrowRain"[\s\S]*?v166-water-cast-sprite/);
 });
 

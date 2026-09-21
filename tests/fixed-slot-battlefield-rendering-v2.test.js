@@ -60,7 +60,7 @@ assert.match(css,/--battle-ally-row-gap:8px/);
 assert.doesNotMatch(css,/v-fixed-mechanism-zone|MECH_L|MECH_C|MECH_R/,"retired function-card plane is absent");
 assert.match(css,/\.v-fixed-enemy-slot > \.battle-monster,[\s\S]*\.v-fixed-ally-slot > \.battle-player\{[\s\S]*position:absolute !important;[\s\S]*inset:0 !important;/);
 assert.match(css,/\.v174-battle-art\{[\s\S]*background-size:contain !important;[\s\S]*overflow:visible !important;/);
-assert.match(css,/\.v153-status-vfx\{[\s\S]*left:50% !important;[\s\S]*top:42% !important;[\s\S]*transform:translate\(-50%,-50%\) !important;/,"status VFX must stay Slot-relative");
+assert.match(css,/\.v153-status-vfx,[\s\S]*\.v153-status-vfx-back\{[\s\S]*left:50% !important;[\s\S]*top:42% !important;[\s\S]*transform:translate\(-50%,-50%\) !important;/,"status VFX must stay Slot-relative");
 assert.match(css,/\.v143-skill-stage\[data-geometry-owner="fixed-slot"\]\{[\s\S]*overflow:visible !important;[\s\S]*contain:none !important;/);
 assert.match(css,/\.v-fixed-slot-popup\{[\s\S]*position:fixed !important;/);
 assert.match(css,/@keyframes v174BattleLungeUp/);

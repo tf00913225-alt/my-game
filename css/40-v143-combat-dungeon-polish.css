@@ -224,7 +224,8 @@
 }
 
 /* Formal persistent status Sprite Sheets. */
-#game-stage #battlePage .v153-status-vfx{
+#game-stage #battlePage .v153-status-vfx,
+#game-stage #battlePage .v153-status-vfx-back{
     position:absolute;
     left:50%;
     top:44%;
@@ -240,6 +241,18 @@
     transform-origin:center;
     will-change:background-position;
     animation:v143StatusRasterFrames var(--v153-status-duration,1000ms) steps(1,end) infinite;
+}
+
+/* A migrated status has one shared clock record for both layers. The legacy
+   single-layer states below keep the historical CSS loop until their paired
+   source assets arrive. */
+#game-stage #battlePage .v153-status-vfx[data-status-layer="front"]{
+    z-index:5;
+    animation:none;
+}
+#game-stage #battlePage .v153-status-vfx-back{
+    z-index:0;
+    animation:none;
 }
 
 #game-stage #battlePage .v153-status-vfx-burn{
@@ -280,13 +293,20 @@
     filter:drop-shadow(0 0 10px rgba(255,232,135,.94));
 }
 
+#game-stage #battlePage .v153-status-vfx-back,
+#game-stage #battlePage .v153-status-vfx-back[class*="v153-status-vfx-back-"]{
+    z-index:0;
+}
+
 #game-stage #battlePage .battle-monster.v152-abyss-portrait > .v153-status-vfx{
     position:absolute !important;
     z-index:5 !important;
 }
 
 #battlePage .v146-defeated > .v153-status-vfx,
-#battlePage .battle-player.down > .v153-status-vfx{
+#battlePage .battle-player.down > .v153-status-vfx,
+#battlePage .v146-defeated > .v153-status-vfx-back,
+#battlePage .battle-player.down > .v153-status-vfx-back{
     display:none !important;
 }
 
