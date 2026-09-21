@@ -5,6 +5,7 @@ const fs=require("node:fs");
 const vm=require("node:vm");
 
 const source=fs.readFileSync("js/45-v154-dev-fixes.js","utf8");
+const dailySource=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");
 const timingSource=fs.readFileSync("js/48-v159-abyss-battle-portraits.js","utf8");
 const battlefieldCss=fs.readFileSync("css/fixed-slot-battlefield-rendering-v2.css","utf8");
 
@@ -114,6 +115,8 @@ const registry={
     assert.equal(runtime.context.resolveMonsterPortrait(runtime.context.monsters[1]),"assets/dungeons/abyss/soldier.webp");
     assert.equal(runtime.cards[0].dataset.monsterPortraitKey,"wild.zone-01.fire-01");
     assert.equal(runtime.cards[1].dataset.monsterPortraitKey,"temporary.heavenly-soldier");
+    assert.equal(runtime.cards[0].querySelector(".v174-battle-art").style.getPropertyValue("background-image"),
+        'url("assets/monsters/wild/zone-01/fire-01.png")');
 }
 
 {
@@ -153,6 +156,10 @@ assert.match(source,/MONSTER_PORTRAIT_REGISTRY_URL="config\/monster-portrait-reg
 assert.match(source,/TEMPORARY_MONSTER_PORTRAIT="assets\/dungeons\/abyss\/soldier\.webp"/);
 assert.match(source,/TEMPORARY_BOSS_PORTRAIT="assets\/monsters\/boss\/boss-placeholder-fire-demon\.webp"/);
 assert.match(source,/target\.status!=="existing"/);
+assert.match(source,/presentation\.applyUnit\(card,"monster"\)/,
+    "portrait sync must invoke the canonical cardless presentation owner");
+assert.match(dailySource,/monster\.portraitKey=dailyMonsterPortraitKey\(type,rank\)/,
+    "daily dungeon monsters must carry an explicit portrait key");
 assert.doesNotMatch(source,/background-size:contain!important/,
     "portrait selection runtime must not inject a second geometry owner");
 assert.match(battlefieldCss,/\.v174-battle-art\{[\s\S]*background-size:contain !important/,
