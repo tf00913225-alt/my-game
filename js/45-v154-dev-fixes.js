@@ -111,19 +111,6 @@
                 dedicated:true
             };
         }
-        const temporaryBoss=monster.rank==="boss"||monster.unitKind==="boss"||monster.vGameplayBoss===true||monster.v141BattleRank==="boss"||(monster.v141Abyss===true&&monster.name!=="天兵天將"&&(Object.prototype.hasOwnProperty.call(EARLY_ABYSS_PORTRAITS,monster.name)||Object.prototype.hasOwnProperty.call(FINAL_ABYSS_PORTRAITS,monster.name)));
-        return {
-            portraitKey:temporaryBoss?"temporary.boss-reference":"temporary.heavenly-soldier",
-            name:monster.name||"",
-            element:monster.element||"dynamic",
-            rank:temporaryBoss?"boss":(monster.rank||"regular"),
-            sizeClass:temporaryBoss?"boss":"regular",
-            path:temporaryBoss?TEMPORARY_BOSS_PORTRAIT:TEMPORARY_MONSTER_PORTRAIT,
-            status:"existing",
-            temporary:true
-        };
-        /* Dedicated registry resolution is intentionally retained below for the
-           later removal of this temporary all-monster presentation switch. */
         const explicitKey=String(monster.portraitKey||monster.monsterPortraitKey||"").trim();
         if(explicitKey&&monsterPortraitByKey.has(explicitKey)){
             return monsterPortraitByKey.get(explicitKey);
@@ -147,7 +134,19 @@
             path:legacy,
             status:"existing",
             legacy:true
-        }:null;
+        }:(()=>{
+            const temporaryBoss=monster.rank==="boss"||monster.unitKind==="boss"||monster.vGameplayBoss===true||monster.v141BattleRank==="boss";
+            return {
+                portraitKey:temporaryBoss?"temporary.boss-reference":"temporary.heavenly-soldier",
+                name:monster.name||"",
+                element:monster.element||"dynamic",
+                rank:temporaryBoss?"boss":(monster.rank||"regular"),
+                sizeClass:temporaryBoss?"boss":"regular",
+                path:temporaryBoss?TEMPORARY_BOSS_PORTRAIT:TEMPORARY_MONSTER_PORTRAIT,
+                status:"fallback",
+                temporary:true
+            };
+        })();
     }
     window.v154ResolveMonsterPortraitRecord=resolveMonsterPortraitRecord;
     window.resolveMonsterPortrait=function(monster){

@@ -17985,7 +17985,6 @@ function processSingleMonsterAttack(monsterIndex,token){
         monsterIndex
     );
 
-
     /*
        ★ 修正（依照使用者要求，第2、3項）：
        1. 技能名稱不再自己取，改成從技能池
@@ -36084,6 +36083,7 @@ catch(error){
             :(typeof sharedExp!=="undefined"?sharedExp:0);
         syncRosterResource(document.getElementById("homeHudGoldValue"),typeof gold!=="undefined"?gold:0);
         syncRosterResource(document.getElementById("homeHudExpValue"),availableExp);
+        syncRosterResource(document.getElementById("v146HomeRosterGoldValue"),typeof gold!=="undefined"?gold:0);
         const count=roster.querySelector(".v146-home-roster-count");
         if(count){ count.textContent="隊伍 "+partyIndexes.length+" / 6"; }
 

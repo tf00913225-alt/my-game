@@ -262,57 +262,20 @@ test("Heal Spell restores its exact level-scaled HP and SP to every living ally"
     assert.equal(finishes,1);
 });
 
-test("Abyss floor 5 has the exact fixed order, skills and maximum levels",()=>{
-    const names=["東帝天尊","天帝天尊","極帝天尊","北帝天尊","南帝天尊"];
-    const bosses=names.map(name=>({name,v141Abyss:true,skillIds:["old"],v141SupportSkillIds:[]}));
-    const elements=["water","earth","fire","wind","water"];
-    const elites=elements.map(element=>({name:"天兵天將",element,v141Abyss:true,skillIds:["old"]}));
-    const roster=[...bosses,...elites];
-    const context=run(baseContext());
-    context.v144PatchFinalAbyssRoster(roster);
-    assert.deepEqual(roster.slice(0,5).map(monster=>monster.name),names);
-    assert.deepEqual(roster.slice(5).map(monster=>monster.element),elements);
-    assert.deepEqual(Array.from(roster[0].skillIds),["dustStorm","stoneBreakSky"]);
-    assert.deepEqual(Array.from(roster[0].v141SupportSkillIds),["barrier"]);
-    assert.deepEqual(Array.from(roster[2].v141SupportSkillIds),["yuanXiangGuangMing","yuanGuangShield","yuanZuBlessing"]);
-    assert.deepEqual(Array.from(roster[3].skillIds),["iceArrowRain","freeze"]);
-    assert.deepEqual(Array.from(roster[3].v141SupportSkillIds),["healSpell"]);
-    assert.deepEqual(Array.from(roster[4].skillIds),["phoenixCry","dragonSlash"]);
-    assert.deepEqual(Array.from(roster[7].skillIds),["phoenixCry"]);
-    assert.deepEqual(Array.from(roster[8].v141SupportSkillIds),["dodgeSkill"]);
-    assert.ok(roster.slice(0,5).every(monster=>monster.v141ForceSkillLevel===5));
-    assert.ok(roster.slice(5).every(monster=>monster.v141ForceSkillLevel===4));
+test("V144 no longer owns or patches the final Lv40 Abyss roster",()=>{
+    assert.doesNotMatch(source,/FINAL_BOSS_RULES|FINAL_ELITES|v144PatchFinalAbyssRoster/);
+    assert.match(source,/v174TrueRealmFinal/);
 });
 
-test("Extreme Emperor's Light heals 450/95, cleanses and grants 75% agility",()=>{
-    let finishes=0;
-    const monsters=Array.from({length:10},(_,index)=>({
-        name:index===2?"極帝天尊":"天兵天將",v141Abyss:true,alive:true,
-        hp:index===0?100:1000,maxHP:1000,sp:100,maxSP:300,agility:100,statusEffects:index===0?[{type:"burn"}]:[]
-    }));
-    monsters[2].sp=300;
-    const context=run(baseContext({
-        monsters,currentBattleMonsters:[0,1,2,3,4,5,6,7,8,9],
-        v141TryMonsterSpecialAction:()=>false,
-        showMonsterSkillNameBadge(){},addBattleLog(){},updateUI(){},finishPlayerAction(){ finishes++; },
-        v141HealMonsterPreservingShield(monster,amount){
-            const before=monster.hp; monster.hp=Math.min(monster.maxHP,monster.hp+amount); return monster.hp-before;
-        },
-        v141ApplyMonsterShield(monster,amount,turns){ monster.v141Shield={remaining:amount,turnsLeft:turns}; monster.hp+=amount; }
-    }));
-    assert.equal(context.v141TryMonsterSpecialAction(2),true);
-    assert.equal(monsters[0].hp,550);
-    assert.equal(monsters[0].sp,195);
-    assert.equal(monsters[0].statusEffects.length,0);
-    assert.equal(monsters[0].agility,175);
-    assert.equal(monsters[0].v142AgilityBlessing.turnsLeft,2);
-    assert.equal(finishes,1);
+test("V144 leaves the final support cast to the shared Skill-ID dispatcher",()=>{
+    assert.doesNotMatch(source,/window\.v141TryMonsterSpecialAction=function/);
+    assert.doesNotMatch(source,/monster\.name===\"極帝天尊\"|monster\.name===\"北帝天尊\"|monster\.name===\"天帝天尊\"/);
 });
 
 test("daily dungeon locking runs after element rebalance and never touches Abyss",()=>{
     const renderBlock=source.slice(source.indexOf("let configuredDungeonBattleToken"),source.indexOf("function abyssAllies"));
     assert.match(renderBlock,/previousRenderBattleForSkills\.apply[\s\S]*configureEncounterSkills/);
-    assert.match(renderBlock,/!isFinalAbyssRoster\(roster\)/);
+    assert.match(renderBlock,/v174TrueRealmFinal/);
     assert.match(source,/if\(!monster\|\|monster\.v141Abyss\)\{ return monster; \}/);
 });
 

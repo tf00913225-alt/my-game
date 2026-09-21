@@ -473,6 +473,42 @@
     scrollbar-gutter:auto !important;
 }
 
+/* Keep body-mounted equipment art inside the preview frame on mobile. */
+.v132-reward-modal .v17346-shop-preview-modal,
+.v132-reward-modal .v17346-shop-preview-modal *{
+    min-width:0 !important;
+    box-sizing:border-box !important;
+}
+
+.v132-reward-modal .v17346-shop-preview-modal .v17346-shop-preview-art{
+    width:min(138px,100%) !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    overflow:hidden !important;
+}
+
+.v132-reward-modal .v17346-shop-preview-modal .v17346-shop-preview-art > .v169-item-art{
+    display:block !important;
+    width:100% !important;
+    height:100% !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    max-width:100% !important;
+    max-height:100% !important;
+    overflow:hidden !important;
+}
+
+.v132-reward-modal .v17346-shop-preview-modal .v17346-shop-preview-art > .v169-item-art > img,
+.v132-reward-modal .v17346-shop-preview-modal .v17346-shop-preview-art > .v169-item-art > svg{
+    display:block !important;
+    width:100% !important;
+    height:100% !important;
+    max-width:100% !important;
+    max-height:100% !important;
+    object-fit:contain !important;
+    object-position:center !important;
+}
+
 .v132-reward-modal .v17346-shop-preview-modal > h3{
     position:static !important;
     top:auto !important;

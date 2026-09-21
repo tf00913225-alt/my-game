@@ -101,7 +101,7 @@ test("the roster renderer keeps all character details in the six-position advent
     assert.match(rosterRuntime,/count\.textContent="隊伍 "\+partyIndexes\.length\+" \/ 6"/);
     assert.match(rosterRuntime,/class="v146-home-avatar"/);
     assert.match(rosterCss,/\.v146-home-roster\{[\s\S]*display:grid;[\s\S]*grid-template-columns:repeat\(3,minmax\(0,1fr\)\);[\s\S]*gap:4px;[\s\S]*background:linear-gradient\(155deg,rgba\(29,19,11,.91\),rgba\(5,5,4,.86\)\)/);
-    assert.match(rosterCss,/\.v146-home-roster > header\{[\s\S]*grid-column:1\/-1;[\s\S]*min-height:23px;[\s\S]*font-size:15px/);
+    assert.match(rosterCss,/\.v146-home-roster > header\{[\s\S]*grid-column:1\/-1;[\s\S]*display:grid;[\s\S]*grid-template-columns:minmax\(0,1fr\) auto minmax\(0,1\.55fr\) auto;[\s\S]*column-gap:8px;[\s\S]*min-height:30px;[\s\S]*font-size:15px/);
     assert.match(rosterCss,/\.v146-home-roster\{[\s\S]*border:1px solid rgba\(190,139,59,.54\);[\s\S]*inset 0 0 13px rgba\(214,158,63,.04\)/);
     assert.match(rosterCss,/\.v146-home-character\{[\s\S]*grid-template-columns:40px minmax\(0,1fr\);[\s\S]*min-height:84px/);
     assert.match(rosterCss,/\.v146-home-character\{[\s\S]*border:1px solid rgba\(145,107,53,.38\);[\s\S]*inset 0 0 0 1px rgba\(255,222,146,.02\)/);

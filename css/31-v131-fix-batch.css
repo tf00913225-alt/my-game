@@ -710,7 +710,7 @@
     height:102px;
 }
 .v146-home-roster>header .v-fixed-formation-entry{
-    margin-left:auto;
+    margin-left:0;
     min-width:54px;
     min-height:30px;
     border:1px solid rgba(223,187,95,.7);

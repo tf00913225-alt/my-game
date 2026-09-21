@@ -22,7 +22,7 @@ test("utility buttons use image-over-text cards and preserve the centre passage"
 });
 test("roster keeps three cells while growing enough for the permanent typography floor",()=>{
  assert.match(roster,/\.v146-home-roster\{[\s\S]*?grid-template-columns:repeat\(3,minmax\(0,1fr\)\);[\s\S]*?gap:4px;[\s\S]*?margin:18px 10px calc\(var\(--bottom-nav-height,70px\) \+ var\(--safe-bottom,0px\) \+ 12px\);padding:5px 7px 7px;/);
- assert.match(roster,/\.v146-home-roster > header\{[\s\S]*?grid-column:1\/-1;[\s\S]*?min-height:23px;[\s\S]*?font-size:15px;[\s\S]*?line-height:20px;/);
+ assert.match(roster,/\.v146-home-roster > header\{[\s\S]*?grid-column:1\/-1;[\s\S]*?display:grid;[\s\S]*?grid-template-columns:minmax\(0,1fr\) auto minmax\(0,1\.55fr\) auto;[\s\S]*?column-gap:8px;[\s\S]*?min-height:30px;[\s\S]*?font-size:15px;[\s\S]*?line-height:20px;/);
  assert.match(roster,/\.v146-home-character\{[\s\S]*?grid-template-columns:40px minmax\(0,1fr\);[\s\S]*?min-height:84px;[\s\S]*?padding:5px 4px 5px 3px;/);
  assert.match(roster,/\.v146-home-avatar\{[\s\S]*?width:40px;[\s\S]*?height:40px;[\s\S]*?transform:none/);
  assert.match(roster,/\.v146-home-character-main > div:first-child\{[\s\S]*?font-size:15px;[\s\S]*?line-height:19px/);
