@@ -29,6 +29,25 @@ function writeManifest(file,data){
 
 const registryBefore=fs.readFileSync(registryPath,"utf8");
 const liveBatchBefore=fs.readFileSync(liveBatchPath,"utf8");
+const registry=JSON.parse(registryBefore);
+const tupleIndex=Object.fromEntries(registry.tupleSchema.map((field,index)=>[field,index]));
+const dailyRows=Object.values(registry.groups).flatMap(rows=>rows).filter(row=>String(row[tupleIndex.portraitKey]).startsWith("daily."));
+const dailyByKey=new Map(dailyRows.map(row=>[row[tupleIndex.portraitKey],row]));
+for(const [key,pathValue] of [
+    ["daily.exp.regular","assets/monsters/daily/exp/regular.webp"],
+    ["daily.exp.elite","assets/monsters/daily/exp/elite.webp"],
+    ["daily.exp.boss","assets/monsters/daily/exp/boss.webp"],
+    ["daily.material.regular","assets/monsters/daily/material/regular.webp"],
+    ["daily.material.elite","assets/monsters/daily/material/elite.webp"],
+    ["daily.material.boss","assets/monsters/daily/material/boss.webp"]
+]){
+    const row=dailyByKey.get(key);
+    assert.ok(row,`missing registry row ${key}`);
+    assert.equal(row[tupleIndex.path],pathValue,`${key} must use runtime WebP`);
+    assert.equal(row[tupleIndex.status],"existing",`${key} must be existing`);
+    assert.equal(row[tupleIndex.sizeClass],"standard",`${key} must use standard dimensions`);
+}
+assert.equal(dailyByKey.get("daily.gold.boss")[tupleIndex.sizeClass],"standard");
 
 try{
     fs.mkdirSync(batchDir,{recursive:true});
