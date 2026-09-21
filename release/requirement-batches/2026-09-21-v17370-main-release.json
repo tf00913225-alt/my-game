@@ -29,20 +29,27 @@
     },
     {
       "id": "REL-03",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "依完整差異建立 V173.70 的玩家公告、CHANGELOG 與 Game/Cache Version，並通過正式 build、版本與公告同步檢查。",
       "evidence": [
         "release/release.json",
         "release/release-update.json",
         "CHANGELOG.md",
-        "release/requirements.json"
+        "release/requirements.json",
+        "PR #456 CI run 35623454365 success",
+        "merged dev commit b963099e9422d83dd9705646616d65f277b6f40d"
       ]
     },
     {
       "id": "REL-04",
-      "status": "TODO",
+      "status": "VERIFIED",
       "requirement": "發布準備 PR 合併 dev 後，最新 dev HEAD 的 Repository checks、DEV exact-SHA deployment 與部署版本核對必須成功。",
-      "evidence": []
+      "evidence": [
+        "dev push CI run 35623758067 success",
+        "DEV deployment job 106413379670 success",
+        "exact deployed SHA b963099e9422d83dd9705646616d65f277b6f40d",
+        "deployment manifest and post-deploy battle VFX QA success"
+      ]
     },
     {
       "id": "REL-05",
@@ -51,12 +58,12 @@
       "evidence": []
     }
   ],
-  "automatedVerification": "PR #455 的 candidate CI run 35617243606 已在 main+dev 真實整合候選上成功。V173.70 metadata PR 的 CI / build / version / notice gate 與合併後 dev exact-SHA deployment 尚待執行。",
+  "automatedVerification": "PR #456 CI run 35623454365 passed. dev push CI run 35623758067 passed. DEV exact-SHA deployment job 106413379670 passed for b963099e9422d83dd9705646616d65f277b6f40d.",
   "visualVerification": "專案負責人已確認最新 dev@0061a43 的深淵實戰驗收成功。",
-  "verifiedSourceCommit": "f11d498b5b3164dd09e27289828bb54fed88ecc0",
-  "mergedDevCommit": null,
+  "verifiedSourceCommit": "b963099e9422d83dd9705646616d65f277b6f40d",
+  "mergedDevCommit": "b963099e9422d83dd9705646616d65f277b6f40d",
   "mergedMainCommit": null,
   "candidateCiRun": 35617243606,
-  "devPushCiRun": null,
-  "devDeployJob": null
+  "devPushCiRun": 35623758067,
+  "devDeployJob": 106413379670
 }
