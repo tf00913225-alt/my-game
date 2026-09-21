@@ -10,9 +10,11 @@ const index=fs.readFileSync("index.html","utf8");
 const build=fs.readFileSync("scripts/build-production.mjs","utf8");
 const featureLoader=fs.readFileSync("js/startup/feature-loader.js","utf8");
 
-for(const name of ["54-v173.51-battle-qa.js","55-v173.51-inventory-qa.js","56-v173.51-shop-qa.js","57-v173.51-quest-qa.js"]){
+for(const name of ["54-v173.51-battle-qa.js","55-v173.51-inventory-qa.js","57-v173.51-quest-qa.js"]){
     assert.ok(build.includes('"js/'+name+'"'));
 }
+assert.doesNotMatch(build,/"js\/56-v173\.51-shop-qa\.js"/,
+    "retired shop QA runtime must not return to the production bundle");
 assert.doesNotMatch(qol,/createElement\(["']script["']\)|\.onload\s*=/);
 assert.doesNotMatch(equipment,/createElement\(["']script["']\)|v17351:qa-ready|30000/);
 assert.doesNotMatch(ui,/createElement\(["']script["']\)|equipment-progression\.js\?v=/);
