@@ -23277,6 +23277,7 @@ const BATTLE_RENDER_HOOK_ORDER=Object.freeze({
         "v141AfterBattleRender",
         "v143AfterBattleRender",
         "v154AfterBattleRender",
+        "v17351AfterBattleRender",
         "vFixedSlotAfterBattleRender"
     ])
 });
@@ -31568,6 +31569,11 @@ function renderInventoryItems(){
         tab.classList.toggle("active",active);
         tab.setAttribute("aria-selected",active ? "true" : "false");
     });
+
+    if(typeof window!=="undefined"){
+        if(typeof window.v17351SyncInventoryQa==="function"){ window.v17351SyncInventoryQa(); }
+        if(typeof window.v17363SyncFunctionalFixes==="function"){ window.v17363SyncFunctionalFixes(); }
+    }
 }
 
 function renderInventory(){
