@@ -88,3 +88,5 @@ jobs:
           git diff --cached --check
           git commit -m "assets: import battle status WebP art and sync build"
           git push origin "HEAD:$BRANCH_NAME"
+
+# rerun-from-latest-head
