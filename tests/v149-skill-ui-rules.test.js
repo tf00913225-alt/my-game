@@ -371,7 +371,7 @@ test("Barrier is raster-owned while revive, rank and reflect feedback remain",()
     assert.match(source,/setTimeout\(\(\)=>syncMonsterCard\(index\),1900\)/);
     assert.doesNotMatch(source,/v149-barrier-corners/);
     assert.doesNotMatch(css,/v149-barrier-corners|v149BarrierCornerPulse/);
-    assert.match(animationSource,/barrier:statusVisual\("assets\/vfx\/earth\/barrier-loop\.png\?v=173\.39","static","activeBuffs"/);
+    assert.match(animationSource,/barrier:statusVisual\("assets\/vfx\/status\/barrier\.webp","static","activeBuffs"/);
     assert.match(css,/battle-monster\.v149-has-barrier \.v141-monster-shield-bar[\s\S]*display:none/);
     assert.match(css,/data-rank="elite"[\s\S]*#ff9f43/);
     assert.match(css,/data-rank="boss"[\s\S]*#ff5f9d/);
