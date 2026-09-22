@@ -25,7 +25,7 @@ jobs:
       - name: Import and verify lossless WebP assets
         shell: bash
         run: |
-          set -euo pipefail
+          set -euxo pipefail
           git fetch origin assets-library:refs/remotes/origin/assets-library
           rm -rf /tmp/battle-assets
           mkdir -p /tmp/battle-assets
@@ -41,7 +41,7 @@ jobs:
             local expected="$1"
             local webp="$2"
             local decoded="/tmp/battle-assets/decoded-$(basename "${webp}").png"
-            dwebp "${webp}" -o "${decoded}" >/dev/null 2>&1
+            dwebp "${webp}" -o "${decoded}"
             local expected_size decoded_size ae
             expected_size="$(identify -format '%wx%h' "${expected}")"
             decoded_size="$(identify -format '%wx%h' "${decoded}")"
