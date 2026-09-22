@@ -34,7 +34,7 @@
     },
     {
       "id": "REL-03",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "建立 V173.71 Game/Cache Version、玩家公告、CHANGELOG 與 production build，並通過 release gate、完整 CI 與版本同步檢查。",
       "evidence": [
         "release/release.json",
@@ -42,7 +42,10 @@
         "release/requirements.json",
         "CHANGELOG.md",
         "js/20-anonymous-20.js",
-        "index.html"
+        "index.html",
+        "V173.71 deterministic build gate run 35753899803 SUCCESS",
+        "npm run build / build:check / release-gate ci / git diff --check PASS",
+        "production bundles synchronized at release candidate head 34f865486e8063b06167ab2054b9740fa4bd7b0e"
       ]
     },
     {
@@ -64,12 +67,12 @@
     "2026-09-22-battle-enemy-status-performance-info-drawer-followup",
     "2026-09-22-battle-status-size-breath-drawer-cleanup"
   ],
-  "automatedVerification": "Pre-release source dev@8ca1475 passed CI run 35748958296 and exact-SHA dev deployment with battle live QA. V173.71 candidate CI is pending.",
+  "automatedVerification": "Pre-release source dev@8ca1475 passed CI run 35748958296 and exact-SHA dev deployment with battle live QA. V173.71 deterministic build gate run 35753899803 succeeded and synchronized production bundles; PR-to-dev CI remains pending.",
   "visualVerification": "Project owner authorized promotion after completion; deployed battle live QA passed on dev exact SHA.",
   "verifiedSourceCommit": "8ca1475943a10a49481be24d7f28176913f06cc2",
   "mergedDevCommit": null,
   "mergedMainCommit": null,
-  "candidateCiRun": null,
+  "candidateCiRun": 35753899803,
   "devPushCiRun": 35748958296,
   "devDeployJob": 106818143380
 }
