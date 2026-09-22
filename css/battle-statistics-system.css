@@ -2,7 +2,7 @@
 #battlePage .battle-stats-edge-button,
 #battlePage .battle-mechanism-alert{
     position:absolute;
-    z-index:70;
+    z-index:18030;
     border:1px solid rgba(230,176,73,.86);
     background:linear-gradient(180deg,rgba(34,25,14,.96),rgba(9,8,6,.96));
     color:#f5d67f;
@@ -50,7 +50,7 @@
     position:absolute;
     top:0;
     bottom:0;
-    z-index:72;
+    z-index:18040;
     width:min(342px,86%);
     display:flex;
     flex-direction:column;
