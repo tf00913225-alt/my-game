@@ -50,9 +50,16 @@
     },
     {
       "id": "REL-04",
-      "status": "TODO",
+      "status": "VERIFIED",
       "requirement": "發布準備 PR 合併 dev 後，V173.71 最新 dev HEAD 再次通過 Repository checks、DEV exact-SHA deployment、版本核對與 live QA。",
-      "evidence": []
+      "evidence": [
+        "dev@26e2bdca614f383d77263495f6fb714c45e7e3d6",
+        "dev push CI run 35755276108 Repository checks SUCCESS",
+        "DEV deployment job 106839783417 SUCCESS",
+        "exact deployed SHA 26e2bdca614f383d77263495f6fb714c45e7e3d6",
+        "Game / Cache Version 173.71 / 173.71 verified",
+        "deployed battle layout / VFX live mobile QA PASS"
+      ]
     },
     {
       "id": "REL-05",
@@ -67,12 +74,12 @@
     "2026-09-22-battle-enemy-status-performance-info-drawer-followup",
     "2026-09-22-battle-status-size-breath-drawer-cleanup"
   ],
-  "automatedVerification": "Pre-release source dev@8ca1475 passed CI run 35748958296 and exact-SHA dev deployment with battle live QA. V173.71 deterministic build gate run 35753899803 succeeded and synchronized production bundles; PR-to-dev CI remains pending.",
+  "automatedVerification": "V173.71 release-prep PR #520 merged to dev@26e2bdca614f383d77263495f6fb714c45e7e3d6. Dev push CI run 35755276108 and exact-SHA deployment job 106839783417 both succeeded; Game/Cache 173.71 and deployed battle layout/VFX live QA passed. Protected dev → main promotion remains pending.",
   "visualVerification": "Project owner authorized promotion after completion; deployed battle live QA passed on dev exact SHA.",
   "verifiedSourceCommit": "8ca1475943a10a49481be24d7f28176913f06cc2",
-  "mergedDevCommit": null,
+  "mergedDevCommit": "26e2bdca614f383d77263495f6fb714c45e7e3d6",
   "mergedMainCommit": null,
   "candidateCiRun": 35753899803,
-  "devPushCiRun": 35748958296,
-  "devDeployJob": 106818143380
+  "devPushCiRun": 35755276108,
+  "devDeployJob": 106839783417
 }
