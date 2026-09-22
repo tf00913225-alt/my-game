@@ -389,17 +389,7 @@
     });
     window.FourSymbolsBattlefieldRenderGeometry=api;
 
-    if(typeof window.renderBattle==="function"&&!window.renderBattle.__fixedSlotRenderV2){
-        const previous=window.renderBattle;
-        const wrapped=function(){
-            const result=previous.apply(this,arguments);
-            reconcile();
-            return result;
-        };
-        wrapped.__fixedSlotRenderV2=true;
-        window.renderBattle=wrapped;
-        try{ renderBattle=wrapped; }catch(_){ }
-    }
+    window.vFixedSlotAfterBattleRender=reconcile;
 
     neutralizeLegacyPresentationGeometry();
     wrapDamagePopup();
