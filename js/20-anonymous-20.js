@@ -1,5 +1,5 @@
 /* Critical/feature boundary owner. No global input lock and no network-order patch chain. */
-const V_ASSET_VERSION="173.69";
+const V_ASSET_VERSION="173.70";
 
 (function installFeatureIntentBoundary(){
     "use strict";

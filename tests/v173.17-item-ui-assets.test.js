@@ -13,6 +13,7 @@ const rewardCss=read("css/33-v132-content-expansion.css");
 const itemCss=read("css/38-v141-system-expansion.css");
 const assetCss=read("css/50-v169-abyss-flow.css");
 const html=read("index.html");
+const releaseMeta=JSON.parse(read("release/release.json"));
 
 function extractFunction(source,name){
     const start=source.indexOf("function "+name+"(");
@@ -121,9 +122,10 @@ test("equipment reward has a visible return action and resilient image fallback"
 });
 
 test("published development label advances to V173.39",()=>{
-    assert.match(html,/<title>四象江湖傳 V173\.69<\/title>/);
-    assert.match(html,/>V173\.69<\/div>/);
-    assert.match(read("js/20-anonymous-20.js"),/const V_ASSET_VERSION="173\.69"/);
+    assert.ok(html.includes("<title>四象江湖傳 V"+releaseMeta.version+"</title>"));
+    assert.ok(html.includes(">V"+releaseMeta.version+"</div>"));
+    const assetVersionMatch=read("js/20-anonymous-20.js").match(/const V_ASSET_VERSION="([^"]+)"/);
+    assert.equal(assetVersionMatch?.[1],releaseMeta.cacheVersion);
 });
 
 console.log("\n"+passed+" V173.39 item UI and asset tests passed.");
