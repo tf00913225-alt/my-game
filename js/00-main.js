@@ -14397,7 +14397,11 @@ function getSkillTargets(centerIndex,targetType){
 const PERSISTENT_STATE_NAMES=Object.freeze({
     burn:"燃燒",
     rage:"怒火",
+    fireSoulResonance:"炎魂共鳴",
+    bloodBurn:"焚血",
+    fireMomentum:"炎勢",
     phoenixMight:"鳳威",
+    yuanZuBlessing:"元祖賜福",
     frostbite:"凍傷",
     freeze:"冰封",
     agilityDown:"重力",
