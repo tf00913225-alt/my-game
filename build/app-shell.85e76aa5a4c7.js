@@ -1,5 +1,5 @@
 
-
+/* bundled source: js/00-main.js */
 /* =====================================================
    ★ 1080 × 1920 整體等比例縮放控制器
    - 遊戲邏輯舞台固定 1080 × 1920
@@ -34541,3 +34541,4312 @@ catch(error){
     );
 
 }
+
+
+/* bundled source: js/01-stage-v8-touch-lock.js */
+(function(){
+    "use strict";
+
+    /*
+     * V78 ROOT FIX
+     *
+     * 舊版用 target.closest(...) 只看第一個符合元素。
+     * 背包裡第一個符合的是 #inventoryPage，
+     * 但真正的 scroll owner 是它上面的 .content。
+     *
+     * 這裡改成一路往祖先走，只要其中任何一層
+     * 是真正可以垂直或水平捲動的容器，就允許手勢通過。
+     */
+    function isInsideAllowedScroller(target){
+        if(!target){
+            return false;
+        }
+
+        /*
+           ★ 修正（依照使用者回報，「全屬性技能預覽」頁面
+           「不能捲動，下面看不到」）：
+           這裡是全域的觸控鎖，`#game-stage`裡任何觸控目標
+           只要不在這份白名單覆蓋的可捲動容器內，一律
+           `preventDefault()`擋掉原生捲動手勢。
+           `.skill-preview-body`（全屬性技能預覽彈窗真正
+           的捲動容器）從一開始就沒有被加進這份白名單，
+           程式化設定`scrollTop`看起來正常、但手指真的滑動
+           時（真正會經過touchmove事件）完全被這裡擋掉，
+           這是原本就存在的bug，只是內容字級變大、真的需要
+           捲動才會看到內容之後才會被踩到——之前字級小、
+           內容剛好塞得進viewport，從來沒真的需要捲動過。
+
+           V173.45 shop frame hotfix：商店改成固定 Large Panel 後，
+           真正的內容 scroll owner 是 #homeFeatureModalBody。
+           外框 .home-feature-modal-box 只負責固定尺寸且 overflow:hidden，
+           因此不能代替內頁通過觸控鎖；把真正 scroll owner 納入
+           同一份權威白名單，避免再次出現「看得到 scrollbar、
+           但手指滑不動」的假捲動狀態。
+
+           合成裝備選擇列是水平 scroll owner。舊判斷只接受
+           overflow-y，因此即使畫面已出現橫向 scrollbar，手指左右
+           滑仍會被全域 touch lock 阻擋。現在同一份權威判斷同時
+           接受真正可捲動的 X/Y 軸，避免再為單一頁面另做事件補丁。
+
+           角色詳細能力視窗的真正 scroll owner 是
+           .inventory-character-detail-grid；外框
+           .inventory-character-detail-box 本身是 overflow:hidden，
+           不能替內容區通過觸控鎖。把真正內容層加入同一白名單。
+
+           練功區地區資訊收斂成 Medium Modal 後，真正 scroll owner
+           改為 #trainingZoneModalBody；外框只負責固定尺寸。
+
+           狀態／能力說明收斂成 Medium Modal 後，真正 scroll owner
+           是 #statusHelpModal 內的 .item-stat-list；外框與返回鍵固定。
+
+           V174：秘寶頁的垂直 scroll owner 是
+           #homeFeatureModal.team-relic-mode #homeFeatureModalBody，分類列
+           .team-relic-tabs 則是水平 scroll owner。兩者都必須通過這個
+           全域觸控鎖；否則手勢從分類列或秘寶內容起始時會被
+           preventDefault()，造成「有時能滑、有時不能滑」的裝置差異。
+
+           Firebase 帳號視窗使用獨立於 game stage 的 responsive viewport
+           overlay，真正的垂直 scroll owner 是 .firebase-auth-dialog；
+           同樣只在這份全域白名單登記一次，不為登入頁另加 touchmove 補丁。
+        */
+        const allowedSelector =
+            ".content, .content-scrollable, .creation-page-scroll, .creation-role-card, .inventory-grid-scroll, .quest-tab-body, .battle-item-list, " +
+            ".characterTabContent, #characterTabContent, #inventoryPage, " +
+            ".adventure-view, " +
+            ".home-feature-modal-box, #homeFeatureModalBody, #homeFeatureModal.team-relic-mode #homeFeatureModalBody, .team-relic-tabs, .v141-synthesis-body, #trainingZoneModalBody, .auto-settings-expanded, " +
+            ".inventory-character-detail-box, .inventory-character-detail-grid, .item-modal-box, #itemModalStats, #skillDetailStats, " +
+            "#statusHelpModal .item-stat-list, .skill-preview-body, .creation-skill-detail-levels, #dungeonTabContent, .gameplay-panel-scroll, .v17342-abyss-battle-log, .v143-item-picker, .v17358-reforge-tiers, .v17363-game-select-menu, .v17351-compare-stats, .firebase-auth-dialog, " +
+            "textarea, select, input";
+
+        let node =
+            target.nodeType===1
+            ? target
+            : target.parentElement;
+
+        while(node && node!==document.documentElement){
+
+            if(
+                node.matches &&
+                node.matches(allowedSelector)
+            ){
+                const style =
+                    window.getComputedStyle(node);
+
+                const canScrollY =
+                    (
+                        style.overflowY==="auto" ||
+                        style.overflowY==="scroll"
+                    ) &&
+                    node.scrollHeight >
+                    node.clientHeight + 1;
+
+                const canScrollX =
+                    (
+                        style.overflowX==="auto" ||
+                        style.overflowX==="scroll"
+                    ) &&
+                    node.scrollWidth >
+                    node.clientWidth + 1;
+
+                if(canScrollY || canScrollX){
+                    return true;
+                }
+            }
+
+            node=node.parentElement;
+        }
+
+        return false;
+    }
+
+    document.addEventListener(
+        "touchmove",
+        function(event){
+            const gameSurface =
+                event.target &&
+                event.target.closest &&
+                event.target.closest("#game-stage");
+
+            if(
+                gameSurface &&
+                event.touches &&
+                event.touches.length>1
+            ){
+                event.preventDefault();
+                return;
+            }
+
+            if(
+                gameSurface &&
+                !isInsideAllowedScroller(
+                    event.target
+                )
+            ){
+                event.preventDefault();
+            }
+        },
+        {passive:false}
+    );
+
+    document.addEventListener(
+        "pointermove",
+        function(event){
+            if(
+                event.pointerType==="touch" &&
+                event.target &&
+                event.target.closest &&
+                event.target.closest("#game-stage") &&
+                !isInsideAllowedScroller(
+                    event.target
+                )
+            ){
+                event.preventDefault();
+            }
+        },
+        {passive:false}
+    );
+
+    /*
+       全遊戲瀏覽器原生互動鎖：
+       - 單指仍依既有 scroll whitelist 正常捲動。
+       - 兩指以上永遠不交給瀏覽器做 pinch zoom。
+       - 非文字輸入 UI 不開啟長按 context menu、不原生拖曳、不文字選取。
+       這是全域 owner，禁止各頁另疊長按／縮放補丁。
+    */
+    function isGameSurfaceTarget(target){
+        return !!(
+            target &&
+            target.closest &&
+            target.closest("#game-stage")
+        );
+    }
+
+    function isEditableGameControl(target){
+        return !!(
+            target &&
+            target.closest &&
+            target.closest('input, textarea, [contenteditable="true"]')
+        );
+    }
+
+
+    document.addEventListener(
+        "contextmenu",
+        function(event){
+            if(
+                isGameSurfaceTarget(event.target) &&
+                !isEditableGameControl(event.target)
+            ){
+                event.preventDefault();
+            }
+        },
+        {capture:true}
+    );
+
+    document.addEventListener(
+        "dragstart",
+        function(event){
+            if(
+                isGameSurfaceTarget(event.target) &&
+                !isEditableGameControl(event.target)
+            ){
+                event.preventDefault();
+            }
+        },
+        {capture:true}
+    );
+
+    document.addEventListener(
+        "selectstart",
+        function(event){
+            if(
+                isGameSurfaceTarget(event.target) &&
+                !isEditableGameControl(event.target)
+            ){
+                event.preventDefault();
+            }
+        },
+        {capture:true}
+    );
+
+    document.addEventListener(
+        "wheel",
+        function(event){
+            if(
+                event.ctrlKey &&
+                isGameSurfaceTarget(event.target)
+            ){
+                event.preventDefault();
+            }
+        },
+        {capture:true,passive:false}
+    );
+
+    window.addEventListener(
+        "gesturestart",
+        function(event){
+            if(
+                event.target &&
+                event.target.closest &&
+                event.target.closest("#game-stage")
+            ){
+                event.preventDefault();
+            }
+        },
+        {passive:false}
+    );
+
+    window.addEventListener(
+        "gesturechange",
+        function(event){
+            if(
+                event.target &&
+                event.target.closest &&
+                event.target.closest("#game-stage")
+            ){
+                event.preventDefault();
+            }
+        },
+        {passive:false}
+    );
+
+    window.isInsideAllowedScrollerV78 =
+        isInsideAllowedScroller;
+})();
+
+
+/* bundled source: js/02-stage-v9-native-coordinate-api.js */
+/* ============================================================
+   V9 — NATIVE 1080×1920 COORDINATE API
+
+   New features MUST use these helpers instead of browser
+   viewport coordinates.
+
+   Existing game logic is intentionally untouched.
+============================================================ */
+(function installNativeGameCoordinateAPI(){
+    const GAME_W = 1080;
+    const GAME_H = 1920;
+
+    function getStage(){
+        return document.getElementById("game-stage");
+    }
+
+    function getOverlay(){
+        return document.getElementById("game-overlay-layer");
+    }
+
+    function screenToGame(clientX, clientY){
+        const stage = getStage();
+        if(!stage){
+            return {x: clientX, y: clientY};
+        }
+
+        const rect = stage.getBoundingClientRect();
+        const scale = window.gameStageScale || 1;
+
+        return {
+            x: (clientX - rect.left) / scale,
+            y: (clientY - rect.top) / scale
+        };
+    }
+
+    function gameToScreen(x, y){
+        const stage = getStage();
+        if(!stage){
+            return {x, y};
+        }
+
+        const rect = stage.getBoundingClientRect();
+
+        return {
+            x: rect.left + x * (rect.width / GAME_W),
+            y: rect.top + y * (rect.height / GAME_H)
+        };
+    }
+
+    function eventToGame(event){
+        const point = event.touches && event.touches.length
+            ? event.touches[0]
+            : event.changedTouches && event.changedTouches.length
+                ? event.changedTouches[0]
+                : event;
+
+        return screenToGame(point.clientX, point.clientY);
+    }
+
+    function createNativeElement(className){
+        const overlay = getOverlay();
+        if(!overlay){
+            return null;
+        }
+
+        const el = document.createElement("div");
+        el.className = "game-native-element " + (className || "");
+        overlay.appendChild(el);
+        return el;
+    }
+
+    function setNativeRect(el, x, y, width, height){
+        if(!el) return;
+
+        el.style.position = "absolute";
+        el.style.left = x + "px";
+        el.style.top = y + "px";
+        el.style.width = width + "px";
+        el.style.height = height + "px";
+    }
+
+    function setNativePosition(el, x, y){
+        if(!el) return;
+
+        el.style.position = "absolute";
+        el.style.left = x + "px";
+        el.style.top = y + "px";
+    }
+
+    window.GAME_NATIVE_WIDTH = GAME_W;
+    window.GAME_NATIVE_HEIGHT = GAME_H;
+
+    window.screenToGame = screenToGame;
+    window.gameToScreen = gameToScreen;
+    window.eventToGame = eventToGame;
+    window.createNativeGameElement = createNativeElement;
+    window.setNativeGameRect = setNativeRect;
+    window.setNativeGamePosition = setNativePosition;
+})();
+
+
+/* bundled source: js/03-stage-v10-battle-log-scroll-runtime.js */
+(function(){
+    "use strict";
+
+    function findScrollableBattlePanel(target){
+        if(!target || !target.closest) return null;
+
+        return target.closest(
+            '[data-battle-log-scroll],' +
+            '.battle-log-scrollable,' +
+            '.battle-log,' +
+            '.battle-info,' +
+            '.battle-info-box,' +
+            '.battle-log-box,' +
+            '.battle-log-container,' +
+            '.combat-log,' +
+            '.combat-log-box,' +
+            '.battle-text,' +
+            '.battle-message-list'
+        );
+    }
+
+    function canScrollVertically(el){
+        if(!el) return false;
+
+        const style = window.getComputedStyle(el);
+        const overflowY = style.overflowY;
+
+        return (
+            (overflowY === "auto" || overflowY === "scroll") &&
+            el.scrollHeight > el.clientHeight + 1
+        );
+    }
+
+    /*
+     * Mark the actual scrollable battle log so the existing global
+     * touch lock can recognize it.
+     */
+    function markBattleScrollers(){
+        const selectors = [
+            '[class*="battle"][class*="log"]',
+            '[class*="battle"][class*="info"]',
+            '[class*="combat"][class*="log"]',
+            '[id*="battle"][id*="log"]',
+            '[id*="battle"][id*="info"]',
+            '[id*="combat"][id*="log"]'
+        ];
+
+        document.querySelectorAll(selectors.join(",")).forEach(function(el){
+            if(canScrollVertically(el)){
+                el.setAttribute("data-battle-log-scroll", "true");
+                el.style.touchAction = "pan-y";
+            }
+        });
+    }
+
+    /*
+     * A capture-phase listener runs before the old global touch lock.
+     * For the actual battle log, allow the browser's vertical scroll.
+     * For everything else, the existing game-wide lock remains unchanged.
+     */
+    document.addEventListener("touchmove", function(event){
+        const scroller = findScrollableBattlePanel(event.target);
+
+        if(scroller && canScrollVertically(scroller)){
+            event.stopImmediatePropagation();
+            return;
+        }
+    }, {capture:true, passive:false});
+
+    document.addEventListener("pointermove", function(event){
+        if(event.pointerType !== "touch") return;
+
+        const scroller = findScrollableBattlePanel(event.target);
+
+        if(scroller && canScrollVertically(scroller)){
+            event.stopImmediatePropagation();
+            return;
+        }
+    }, {capture:true, passive:false});
+
+    markBattleScrollers();
+
+    const observer = new MutationObserver(function(){
+        markBattleScrollers();
+    });
+
+    observer.observe(document.body, {
+        childList:true,
+        subtree:true,
+        attributes:true,
+        attributeFilter:["class","style"]
+    });
+
+    window.addEventListener("resize", markBattleScrollers, {passive:true});
+})();
+
+
+/* bundled source: js/04-stage-v11-native-bottom-nav-runtime.js */
+(function(){
+    "use strict";
+
+    /*
+     * Convert the existing bottom navigation into a native-coordinate
+     * overlay without changing its click handlers or game logic.
+     *
+     * We clone no buttons and do not replace existing event listeners.
+     * The original nav is moved into the native overlay layer.
+     */
+    function migrateBottomNav(){
+        const overlay = document.getElementById("game-overlay-layer");
+        if(!overlay) return;
+
+        const candidates = [
+            document.getElementById("bottomNav"),
+            document.getElementById("mapPageNav"),
+            document.querySelector("#game-content .bottom-nav")
+        ].filter(Boolean);
+
+        candidates.forEach(function(nav){
+            if(!nav || nav.dataset.nativeV11 === "true") return;
+
+            /*
+             * Only migrate nav elements that are actual game navigation.
+             * Do not touch unrelated fixed controls.
+             */
+            const isBottomNav =
+                nav.id === "bottomNav" ||
+                nav.id === "mapPageNav" ||
+                nav.classList.contains("bottom-nav");
+
+            if(!isBottomNav) return;
+
+            const wrapper = document.createElement("div");
+            wrapper.className = "native-bottom-nav-layer";
+            wrapper.dataset.nativeV11 = "true";
+
+            const nativeNav = document.createElement("div");
+            nativeNav.className = "native-bottom-nav";
+            nativeNav.dataset.nativeV11 = "true";
+
+            /*
+             * Move the existing element, preserving its existing DOM,
+             * children, IDs, and event listeners.
+             */
+            nav.parentNode.insertBefore(wrapper, nav);
+            wrapper.appendChild(nativeNav);
+            nativeNav.appendChild(nav);
+
+            /*
+             * Remove legacy viewport positioning from the moved element.
+             * Its visual size is preserved by the existing child styles.
+             */
+            nav.style.position = "relative";
+            nav.style.left = "auto";
+            nav.style.right = "auto";
+            nav.style.top = "auto";
+            nav.style.bottom = "auto";
+            nav.style.transform = "none";
+            nav.style.marginLeft = "0";
+            nav.style.marginRight = "0";
+            nav.style.width = "100%";
+
+            nav.dataset.nativeV11 = "true";
+        });
+    }
+
+    /*
+     * Run after existing initialization and after DOM changes.
+     * This is migration-only; it does not alter game mechanics.
+     */
+    if(document.readyState === "loading"){
+        document.addEventListener("DOMContentLoaded", migrateBottomNav, {once:true});
+    }else{
+        migrateBottomNav();
+    }
+
+    const observer = new MutationObserver(function(){
+        migrateBottomNav();
+    });
+
+    observer.observe(document.body, {
+        childList:true,
+        subtree:true
+    });
+
+    window.migrateBottomNavToNative1080 = migrateBottomNav;
+})();
+
+
+/* bundled source: js/05-stage-v13-native-map-nav-runtime.js */
+(function(){
+    "use strict";
+
+    function migrateMapNav(){
+        const overlay = document.getElementById("game-overlay-layer");
+        if(!overlay) return;
+
+        const nav = document.getElementById("mapPageNav");
+        if(!nav || nav.dataset.nativeV13 === "true") return;
+
+        /*
+         * Only migrate the map/training navigation.
+         * Existing DOM, children, IDs and event listeners are preserved.
+         */
+        const wrapper = document.createElement("div");
+        wrapper.className = "native-map-nav-layer";
+        wrapper.dataset.nativeV13 = "true";
+
+        const nativeNav = document.createElement("div");
+        nativeNav.className = "native-map-nav";
+        nativeNav.dataset.nativeV13 = "true";
+
+        nav.parentNode.insertBefore(wrapper, nav);
+        wrapper.appendChild(nativeNav);
+        nativeNav.appendChild(nav);
+
+        nav.style.position = "relative";
+        nav.style.left = "auto";
+        nav.style.right = "auto";
+        nav.style.top = "auto";
+        nav.style.bottom = "auto";
+        nav.style.transform = "none";
+        nav.style.marginLeft = "0";
+        nav.style.marginRight = "0";
+        nav.style.width = "100%";
+
+        nav.dataset.nativeV13 = "true";
+    }
+
+    if(document.readyState === "loading"){
+        document.addEventListener("DOMContentLoaded", migrateMapNav, {once:true});
+    }else{
+        migrateMapNav();
+    }
+
+    const observer = new MutationObserver(function(){
+        migrateMapNav();
+    });
+
+    observer.observe(document.body, {
+        childList:true,
+        subtree:true
+    });
+
+    window.migrateMapNavToNative1080 = migrateMapNav;
+})();
+
+
+/* bundled source: js/06-stage-v39-battle-map-background-runtime.js */
+(function(){
+    "use strict";
+
+    window.GAME_NATIVE_CONFIRMED_BASELINE = "V38";
+    window.GAME_NATIVE_CURRENT_VERSION = "V39";
+
+    /*
+     * V39 map-background bridge.
+     *
+     * Priority:
+     *  1) Existing current patrol/map background element's computed/current
+     *     background image.
+     *  2) Existing map data/background variables if exposed by the game.
+     *
+     * We do not replace the game's map state or battle state.
+     */
+
+    function getBattlePage(){
+        return document.getElementById("battlePage");
+    }
+
+    function getPatrolMapBackground(){
+        const candidates = [
+            document.getElementById("patrolPage"),
+            document.getElementById("mapPage"),
+            document.getElementById("trainingPage"),
+            document.getElementById("mapBackground"),
+            document.querySelector("#game-content .map-background"),
+            document.querySelector("#game-content .patrol-background"),
+            document.querySelector("#game-content .training-background")
+        ].filter(Boolean);
+
+        for(const el of candidates){
+            const cs = getComputedStyle(el);
+            const bg = cs.backgroundImage;
+            if(bg && bg !== "none"){
+                return bg;
+            }
+            const inline = el.style.backgroundImage;
+            if(inline){
+                return inline;
+            }
+        }
+        return null;
+    }
+
+    function applyCurrentMapBackground(){
+        const battle = getBattlePage();
+        if(!battle) return false;
+
+        const bg = getPatrolMapBackground();
+        if(!bg) return false;
+
+        battle.style.setProperty("background-image", bg, "important");
+        battle.style.setProperty("background-size", "cover", "important");
+        battle.style.setProperty("background-position", "center", "important");
+        battle.style.setProperty("background-repeat", "no-repeat", "important");
+
+        return true;
+    }
+
+    /*
+     * Battle may be rendered after map navigation. Observe only the
+     * game-content subtree for battlePage/map-page changes and reapply
+     * the current map image. This does not alter battle mechanics.
+     */
+    function init(){
+        applyCurrentMapBackground();
+
+        const root = document.getElementById("game-content") ||
+                     document.getElementById("game-stage");
+        if(!root) return;
+
+        const observer = new MutationObserver(function(){
+            if(document.getElementById("battlePage")){
+                applyCurrentMapBackground();
+            }
+        });
+
+        observer.observe(root, {childList:true, subtree:true});
+
+        window.addEventListener("resize", applyCurrentMapBackground);
+    }
+
+    window.syncBattleBackgroundToCurrentMap = applyCurrentMapBackground;
+
+    if(document.readyState === "loading"){
+        document.addEventListener("DOMContentLoaded", init, {once:true});
+    }else{
+        init();
+    }
+})();
+
+
+/* bundled source: js/07-stage-v40-root-battle-background-runtime.js */
+(function(){
+    "use strict";
+
+    window.GAME_NATIVE_CONFIRMED_BASELINE = "V39";
+    window.GAME_NATIVE_CURRENT_VERSION = "V40";
+
+    const LEGACY_WIDTH = 420;
+    const NATIVE_WIDTH = 1080;
+    const CHARACTER_CARD_LEGACY_WIDTH = 124;
+    const CAST_BADGE_NATIVE_WIDTH =
+        CHARACTER_CARD_LEGACY_WIDTH * (NATIVE_WIDTH / LEGACY_WIDTH);
+
+    function ensureBattleBackgroundLayer(){
+        const battle = document.getElementById("battlePage");
+        if(!battle) return null;
+
+        let layer = battle.querySelector(":scope > .battle-bg-shared");
+        if(!layer){
+            layer = document.createElement("div");
+            layer.className = "battle-bg-shared";
+            layer.setAttribute("aria-hidden","true");
+            battle.insertBefore(layer, battle.firstChild);
+        }
+        return layer;
+    }
+
+    function getActualPatrolBackground(){
+        /*
+         * SOURCE OF TRUTH:
+         * enterMap() calls applyMapZoneBackground(currentZone),
+         * which writes the current map image to #mapPageBgLayer.
+         *
+         * We read that exact rendered layer rather than guessing
+         * from #mapPage itself.
+         */
+        const mapLayer = document.getElementById("mapPageBgLayer");
+        if(mapLayer){
+            const bg = getComputedStyle(mapLayer).backgroundImage;
+            if(bg && bg !== "none"){
+                return bg;
+            }
+            if(mapLayer.style.backgroundImage){
+                return mapLayer.style.backgroundImage;
+            }
+        }
+
+        /*
+         * Fallback only if the map layer is not available:
+         * use the game's actual map-zone table and currentZone.
+         */
+        try{
+            if(typeof mapZoneBackgroundImages !== "undefined"){
+                const url = mapZoneBackgroundImages[currentZone] ||
+                            mapZoneBackgroundImages.forest;
+                if(url){
+                    return "url(" + url + ")";
+                }
+            }
+        }catch(e){}
+
+        return null;
+    }
+
+    function syncBattleBackgroundToCurrentMap(){
+        const layer = ensureBattleBackgroundLayer();
+        if(!layer) return false;
+
+        const bg = getActualPatrolBackground();
+        if(!bg) return false;
+
+        layer.style.setProperty("background-image", "linear-gradient(rgba(0,0,0,.52), rgba(0,0,0,.52)), " + bg, "important");
+        layer.style.setProperty("background-size", "cover", "important");
+        layer.style.setProperty("background-position", "center top", "important");
+        layer.style.setProperty("background-repeat", "no-repeat", "important");
+
+        return true;
+    }
+
+    function ensureCastBadgeSourceSize(badge){
+        if(!badge || !badge.classList.contains("skill-name-badge")) return;
+        /*
+         * This is native-overlay space, so match the legacy card:
+         * 124 legacy px × 2.571428... = 318.857 native px.
+         */
+        badge.style.setProperty(
+            "width",
+            CAST_BADGE_NATIVE_WIDTH + "px",
+            "important"
+        );
+        badge.style.setProperty(
+            "min-width",
+            CAST_BADGE_NATIVE_WIDTH + "px",
+            "important"
+        );
+        badge.style.setProperty(
+            "max-width",
+            CAST_BADGE_NATIVE_WIDTH + "px",
+            "important"
+        );
+        badge.style.setProperty("font-size","72px","important");
+        badge.style.setProperty("font-weight","900","important");
+        badge.style.setProperty("text-align","center","important");
+        badge.style.setProperty("white-space","nowrap","important");
+    }
+
+    /*
+     * The skill badge is dynamically created by
+     * showSkillNameBadge()/showMonsterSkillNameBadge().
+     * Catch the real node at creation time.
+     */
+    function watchOverlay(){
+        const overlay = document.getElementById("game-overlay-layer");
+        if(!overlay) return;
+
+        overlay.querySelectorAll(".skill-name-badge")
+            .forEach(ensureCastBadgeSourceSize);
+
+        const observer = new MutationObserver(function(mutations){
+            mutations.forEach(function(mutation){
+                mutation.addedNodes.forEach(function(node){
+                    if(node.nodeType !== 1) return;
+                    if(node.classList &&
+                       node.classList.contains("skill-name-badge")){
+                        ensureCastBadgeSourceSize(node);
+                    }
+                    if(node.querySelectorAll){
+                        node.querySelectorAll(".skill-name-badge")
+                            .forEach(ensureCastBadgeSourceSize);
+                    }
+                });
+            });
+        });
+        observer.observe(overlay,{childList:true,subtree:true});
+    }
+
+    function init(){
+        ensureBattleBackgroundLayer();
+        syncBattleBackgroundToCurrentMap();
+        watchOverlay();
+
+        /*
+         * When currentZone/map background changes, #mapPageBgLayer is
+         * updated by applyMapZoneBackground(). MutationObserver on the
+         * style attribute guarantees battle receives the same image.
+         */
+        const mapLayer = document.getElementById("mapPageBgLayer");
+        if(mapLayer){
+            const mapObserver = new MutationObserver(
+                syncBattleBackgroundToCurrentMap
+            );
+            mapObserver.observe(mapLayer,{attributes:true,attributeFilter:["style"]});
+        }
+
+        /*
+         * Also resync when the battle page is rendered/activated.
+         */
+        const content = document.getElementById("game-content");
+        if(content){
+            const pageObserver = new MutationObserver(function(){
+                if(document.getElementById("battlePage")){
+                    syncBattleBackgroundToCurrentMap();
+                }
+            });
+            pageObserver.observe(content,{childList:true,subtree:true});
+        }
+
+        window.syncBattleBackgroundToCurrentMap =
+            syncBattleBackgroundToCurrentMap;
+    }
+
+    window.getV40BattleVisualDiagnostics = function(){
+        const layer = document.querySelector(
+            "#game-stage > #app > #game-content #battlePage > .battle-bg-shared"
+        );
+        const badge = document.querySelector(
+            "#game-stage > #game-overlay-layer .skill-name-badge"
+        );
+        return {
+            currentZone:
+                (typeof currentZone !== "undefined" ? currentZone : null),
+            battleBackground:
+                layer ? getComputedStyle(layer).backgroundImage : null,
+            badgeFont:
+                badge ? getComputedStyle(badge).fontSize : null,
+            badgeWidth:
+                badge ? badge.getBoundingClientRect().width : null,
+            badgeText:
+                badge ? badge.textContent : null
+        };
+    };
+
+    if(document.readyState === "loading"){
+        document.addEventListener("DOMContentLoaded",init,{once:true});
+    }else{
+        init();
+    }
+})();
+
+
+/* bundled source: js/08-stage-v41-runtime.js */
+(function(){
+    "use strict";
+    window.GAME_NATIVE_CONFIRMED_BASELINE = "V40";
+    window.GAME_NATIVE_CURRENT_VERSION = "V41";
+})();
+
+
+/* bundled source: js/09-stage-v45-runtime.js */
+(function(){
+    "use strict";
+    window.GAME_NATIVE_CONFIRMED_BASELINE = "V41";
+    window.GAME_NATIVE_CURRENT_VERSION = "V45";
+    window.GAME_BATTLE_BACKGROUND_TINT = "rgba(0,0,0,.38)";
+    window.GAME_CAST_SKILL_BADGE_FONT_SIZE = "106px";
+})();
+
+
+/* bundled source: js/10-stage-v46-runtime.js */
+(function(){
+    "use strict";
+    window.GAME_NATIVE_CONFIRMED_BASELINE = "V45";
+    window.GAME_NATIVE_CURRENT_VERSION = "V46";
+    window.GAME_BATTLE_BACKGROUND_TINT = "rgba(0,0,0,.52)";
+    window.GAME_CAST_SKILL_BADGE_FONT_SIZE = "132px";
+})();
+
+
+/* bundled source: js/11-stage-v47-runtime.js */
+(function(){
+    "use strict";
+    window.GAME_NATIVE_CONFIRMED_BASELINE = "V46";
+    window.GAME_NATIVE_CURRENT_VERSION = "V47";
+    window.GAME_CAST_SKILL_BADGE_SOURCE_FONT_SIZE = "150px";
+    window.GAME_CAST_SKILL_BADGE_SOURCE_WIDTH = "900px";
+})();
+
+
+/* bundled source: js/12-stage-v48-runtime.js */
+(function(){
+    "use strict";
+    window.GAME_NATIVE_CONFIRMED_BASELINE = "V47";
+    window.GAME_NATIVE_CURRENT_VERSION = "V48";
+    window.GAME_CAST_SKILL_BADGE_FONT_SIZE = "72px";
+    window.GAME_CAST_SKILL_BADGE_STROKE = "none";
+})();
+
+
+/* bundled source: js/13-stage-v49-runtime.js */
+(function(){
+    "use strict";
+    window.GAME_NATIVE_CONFIRMED_BASELINE = "V48";
+    window.GAME_NATIVE_CURRENT_VERSION = "V49";
+    window.GAME_CAST_SKILL_BADGE_STROKE = "none";
+
+    function removeSkillWhiteStroke(){
+        document.querySelectorAll(".skill-name-badge").forEach(function(el){
+            el.style.setProperty("-webkit-text-stroke","0","important");
+            el.style.setProperty("text-stroke","0","important");
+            el.style.setProperty("border","0","important");
+            el.style.setProperty("outline","0","important");
+        });
+    }
+
+    if(document.readyState === "loading"){
+        document.addEventListener("DOMContentLoaded", removeSkillWhiteStroke, {once:true});
+    }else{
+        removeSkillWhiteStroke();
+    }
+})();
+
+
+/* bundled source: js/14-stage-v50-runtime.js */
+(function(){
+    "use strict";
+    window.GAME_NATIVE_CONFIRMED_BASELINE = "V49";
+    window.GAME_NATIVE_CURRENT_VERSION = "V50";
+
+    function fixBattleBackgroundEdge(){
+        const stage = document.getElementById("game-stage");
+        const battle = document.getElementById("battlePage");
+        const bg = battle && battle.querySelector(".battle-bg-shared");
+        if(!stage || !battle || !bg) return;
+
+        /* Use the actual battle viewport dimensions, never Legacy 420px. */
+        bg.style.setProperty("left","0","important");
+        bg.style.setProperty("top","0","important");
+        bg.style.setProperty("width","100%","important");
+        bg.style.setProperty("height","100%","important");
+        bg.style.setProperty("right","0","important");
+        bg.style.setProperty("bottom","0","important");
+        bg.style.setProperty("border","0","important");
+        bg.style.setProperty("outline","0","important");
+        bg.style.setProperty("box-shadow","none","important");
+
+        battle.style.setProperty("overflow","hidden","important");
+    }
+
+    if(document.readyState === "loading"){
+        document.addEventListener("DOMContentLoaded", fixBattleBackgroundEdge, {once:true});
+    }else{
+        fixBattleBackgroundEdge();
+    }
+})();
+
+
+/* bundled source: js/15-stage-v51-runtime.js */
+(function(){
+    "use strict";
+    window.GAME_NATIVE_CONFIRMED_BASELINE = "V50";
+    window.GAME_NATIVE_CURRENT_VERSION = "V93";
+
+    /*
+      Restore white outline only on combat result nodes.
+      Do not touch skill-name-badge.
+    */
+    const combatResultSelector = [
+        ".battle-damage",
+        ".battle-damage-number",
+        ".damage-number",
+        ".damage-text",
+        ".combat-damage",
+        ".combat-result",
+        ".combat-result-text",
+        ".battle-miss",
+        ".miss-text",
+        ".battle-heal",
+        ".heal-number",
+        ".hp-change",
+        ".hp-change-number"
+    ].join(",");
+
+    function applyCombatResultStroke(root){
+        const base = root && root.querySelectorAll ? root : document;
+        base.querySelectorAll(combatResultSelector).forEach(function(el){
+            el.style.setProperty("-webkit-text-stroke","3px #ffffff","important");
+            el.style.setProperty("text-stroke","3px #ffffff","important");
+        });
+    }
+
+    function init(){
+        applyCombatResultStroke(document);
+
+        const stage = document.getElementById("game-stage");
+        if(stage){
+            new MutationObserver(function(){
+                applyCombatResultStroke(stage);
+            }).observe(stage, {childList:true, subtree:true});
+        }
+    }
+
+    if(document.readyState === "loading"){
+        document.addEventListener("DOMContentLoaded", init, {once:true});
+    }else{
+        init();
+    }
+})();
+
+
+/* bundled source: js/relic-summary-catalog.js */
+/* First-screen-safe Team Relic summary catalog.
+   Owns only the static fields required by the main-city summary and the full relic catalog. */
+(function installRelicSummaryCatalog(global){
+    "use strict";
+    if(!global||global.FourSymbolsRelicSummaryCatalog){ return; }
+    const entries=[
+        ["relic_qiankun_flask","乾坤玉壺","奇數回合結束時"],
+        ["relic_sun_orb","烈陽神珠","偶數回合開始時"],
+        ["relic_xuanwu_seal","玄武靈印","每第3回合開始時"],
+        ["relic_soul_bell","鎮魂古鐘","每第4回合開始時"],
+        ["relic_tiangang_banner","天罡戰旗","我方累積受到6次敵方有效攻擊後"],
+        ["relic_nine_dragon_fire","九龍神火罩","敵方累積完成7次有效行動後"],
+        ["relic_cold_spring_jade","寒泉玉珮","任一我方角色在傷害結算後低於35%最大HP時"],
+        ["relic_qinglan_feather","青嵐羽符","戰鬥開始時"],
+        ["relic_rock_mountain_seal","岩岳鎮印","開場；另於我方累積受8次有效攻擊時"],
+        ["relic_returning_wheel","回天寶輪","本場第一次有我方角色將受到致命傷害時"],
+        ["relic_origin_talisman","太初聖符","每第4回合結束"],
+        ["relic_broken_army_scroll","破軍殘卷","角色攻擊／技能擊敗敵人後"],
+        ["relic_red_sky_war_mark","赤霄戰紋","戰鬥開始時"],
+        ["relic_ice_mirror_heart","玄冰鏡心","每第3回合結束"],
+        ["relic_wind_chasing_talisman","追風行符","每第3回合開始"],
+        ["relic_mountain_river_cauldron","山河寶鼎","我方累積受7次有效攻擊後"],
+        ["relic_burning_star_mark","焚星殘印","偶數回合結束"],
+        ["relic_spirit_spring_bottle","靈泉法瓶","每第3回合結束"],
+        ["relic_demon_suppressing_seal","伏魔金印","戰鬥開始；首次成功受到一般負面狀態"],
+        ["relic_all_returning_array","萬象歸元盤","每第4回合開始"]
+    ];
+    global.FourSymbolsRelicSummaryCatalog=Object.freeze(Object.fromEntries(entries.map(entry=>[
+        entry[0],
+        Object.freeze({id:entry[0],name:entry[1],triggerText:entry[2]})
+    ])));
+})(typeof window!=="undefined"?window:globalThis);
+
+
+/* bundled source: js/16-stage-v54-main-city-runtime.js */
+(function(){
+    "use strict";
+    window.GAME_NATIVE_CONFIRMED_BASELINE = "V51";
+    window.GAME_NATIVE_CURRENT_VERSION = "V54";
+    window.GAME_NATIVE_LAST_SCOPE = "main-city-moderate-scale";
+
+    const AD_FREE_MODE_CLASS="ad-free-service-info-mode";
+    const AD_FREE_CONFIG_KEY="SIXIANG_AD_FREE_SERVICE_CONFIG";
+    const AD_FREE_DISPLAY_POLICY=Object.freeze({mode:"manual"});
+    const DEFAULT_AD_FREE_CONFIG=Object.freeze({
+        supportEmail:"",
+        refundPolicyUrl:"",
+        termsUrl:"",
+        privacyPolicyUrl:"",
+        purchaseUrl:"",
+        purchaseEnabled:false
+    });
+
+    function apply(){
+        const home = document.getElementById("homePage");
+        if(!home) return;
+        home.classList.add("main-city-lobby-ready");
+    }
+
+    function ensureAdFreeConfig(){
+        const formalSupportEmail=String(window.FourSymbolsSupport&&window.FourSymbolsSupport.email||"").trim();
+        const existing=window[AD_FREE_CONFIG_KEY]&&typeof window[AD_FREE_CONFIG_KEY]==="object"
+            ? window[AD_FREE_CONFIG_KEY]
+            : {};
+        const config=Object.assign({},DEFAULT_AD_FREE_CONFIG,existing);
+        if(formalSupportEmail){ config.supportEmail=formalSupportEmail; }
+        window[AD_FREE_CONFIG_KEY]=config;
+        return config;
+    }
+
+    function getModalParts(){
+        const modal=document.getElementById("homeFeatureModal");
+        if(!modal){ return null; }
+        const box=modal.querySelector(".home-feature-modal-box");
+        const title=document.getElementById("homeFeatureModalTitle");
+        const body=document.getElementById("homeFeatureModalBody");
+        if(!box||!title||!body){ return null; }
+        return {modal,box,title,body};
+    }
+
+    function resolveConfiguredUrl(value){
+        const raw=String(value||"").trim();
+        if(!raw){ return ""; }
+        try{
+            const url=new URL(raw,window.location.href);
+            return url.protocol==="https:"||url.protocol==="http:" ? url.href : "";
+        }catch(_){
+            return "";
+        }
+    }
+
+    function configurePolicyButton(buttonId,configuredUrl,todoLabel){
+        const button=document.getElementById(buttonId);
+        if(!button){ return; }
+        const url=resolveConfiguredUrl(configuredUrl);
+        if(!url){
+            button.disabled=true;
+            button.title="TODO：待接正式"+todoLabel+"頁面";
+            return;
+        }
+        button.disabled=false;
+        button.title="";
+        button.addEventListener("click",function(){
+            window.open(url,"_blank","noopener,noreferrer");
+        });
+    }
+
+    function renderAdFreeServiceBody(body){
+        const config=ensureAdFreeConfig();
+        const configuredEmail=String(config.supportEmail||"").trim();
+        body.innerHTML=[
+            '<section class="ad-free-service-panel" data-ad-free-service-info="true">',
+                '<div class="ad-free-service-hero">',
+                    '<div class="ad-free-service-subtitle">30 天免廣告服務</div>',
+                    '<div class="ad-free-service-price" aria-label="價格 NT$99">NT$99</div>',
+                    '<div class="ad-free-service-badge">單次購買・非自動續訂</div>',
+                '</div>',
+                '<div class="ad-free-service-copy">',
+                    '<p>一次付款，提供 30 天免廣告權益。</p>',
+                    '<p>本服務為單次購買，不會自動續訂。</p>',
+                    '<p>購買成功後，免廣告權益將綁定玩家帳號，自付款成功起生效 30 天。</p>',
+                    '<p>此服務不提供額外角色、裝備、能力、遊戲幣或其他戰力加成。</p>',
+                '</div>',
+                '<section class="ad-free-service-support" aria-label="客服與條款">',
+                    '<div class="ad-free-service-support-row">',
+                        '<span>客服 Email：</span>',
+                        '<b id="adFreeSupportEmail">'+configuredEmail+'</b>',
+                    '</div>',
+                    '<div class="ad-free-service-policy-actions">',
+                        '<button id="adFreeRefundPolicyButton" type="button">查看退款規則</button>',
+                        '<button id="adFreeTermsButton" type="button">查看服務條款</button>',
+                        '<button id="adFreePrivacyButton" type="button">查看隱私權政策</button>',
+                    '</div>',
+                    '<p class="ad-free-service-todo-note">退款規則、服務條款與隱私權政策頁面尚待設定；未設定前不會導向不存在的網址。</p>',
+                '</section>',
+                '<div class="ad-free-service-actions">',
+                    '<button id="adFreePurchaseButton" class="ad-free-service-purchase" type="button" disabled aria-label="購買 30 天免廣告 NT$99，目前付款服務準備中">付款服務準備中</button>',
+                    '<button id="adFreeAcknowledgeButton" class="ad-free-service-acknowledge" type="button">我知道了</button>',
+                '</div>',
+            '</section>'
+        ].join("");
+
+        const supportEmail=document.getElementById("adFreeSupportEmail");
+        if(supportEmail){
+            supportEmail.textContent=configuredEmail;
+            supportEmail.dataset.todo="false";
+        }
+
+        configurePolicyButton("adFreeRefundPolicyButton",config.refundPolicyUrl,"退款規則");
+        configurePolicyButton("adFreeTermsButton",config.termsUrl,"服務條款");
+        configurePolicyButton("adFreePrivacyButton",config.privacyPolicyUrl,"隱私權政策");
+
+        const purchaseButton=document.getElementById("adFreePurchaseButton");
+        const purchaseUrl=resolveConfiguredUrl(config.purchaseUrl);
+        if(purchaseButton&&config.purchaseEnabled===true&&purchaseUrl){
+            purchaseButton.disabled=false;
+            purchaseButton.textContent="購買 30 天免廣告 NT$99";
+            purchaseButton.setAttribute("aria-label","購買 30 天免廣告 NT$99");
+            purchaseButton.addEventListener("click",function(){
+                window.open(purchaseUrl,"_blank","noopener,noreferrer");
+            });
+        }
+
+        const acknowledgeButton=document.getElementById("adFreeAcknowledgeButton");
+        if(acknowledgeButton){
+            acknowledgeButton.addEventListener("click",closeAdFreeServiceInfoModal);
+        }
+
+        // TODO(ECPay): 填入正式退款規則、服務條款、隱私權政策網址。
+        // TODO(ECPay): 完成綠界付款與付款結果驗證後，才可設定 purchaseEnabled=true 與 purchaseUrl。
+    }
+
+    function openAdFreeServiceInfoModal(){
+        const parts=getModalParts();
+        if(!parts){ return false; }
+        if(parts.modal.classList.contains("show")&&!parts.modal.classList.contains(AD_FREE_MODE_CLASS)){
+            return false;
+        }
+
+        parts.title.textContent="《四象江湖傳》";
+        renderAdFreeServiceBody(parts.body);
+        parts.body.scrollTop=0;
+        parts.modal.classList.add(AD_FREE_MODE_CLASS);
+        parts.modal.setAttribute("role","dialog");
+        parts.modal.setAttribute("aria-modal","true");
+        parts.modal.setAttribute("aria-labelledby","homeFeatureModalTitle");
+        parts.modal.classList.add("show");
+        return true;
+    }
+
+    function closeAdFreeServiceInfoModal(){
+        const parts=getModalParts();
+        if(!parts||!parts.modal.classList.contains(AD_FREE_MODE_CLASS)){ return false; }
+        if(typeof window.closeHomeFeature==="function"){
+            window.closeHomeFeature();
+        }else{
+            parts.modal.classList.remove("show");
+        }
+        parts.modal.classList.remove(AD_FREE_MODE_CLASS);
+        parts.modal.removeAttribute("role");
+        parts.modal.removeAttribute("aria-modal");
+        parts.modal.removeAttribute("aria-labelledby");
+        return true;
+    }
+
+    window.AD_FREE_SERVICE_DISPLAY_POLICY=AD_FREE_DISPLAY_POLICY;
+    window.openAdFreeServiceInfoModal=openAdFreeServiceInfoModal;
+    window.closeAdFreeServiceInfoModal=closeAdFreeServiceInfoModal;
+
+
+    function rosterNumber(value){
+        const number=Number(value);
+        return Number.isFinite(number)?number:0;
+    }
+    function rosterEscape(value){
+        return String(value==null?"":value)
+            .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+            .replace(/\"/g,"&quot;").replace(/'/g,"&#039;");
+    }
+    function rosterResourceText(value){
+        const whole=Math.max(0,Math.floor(rosterNumber(value)));
+        if(whole>=100000000){
+            const compact=whole/100000000;
+            return compact.toFixed(compact>=10?1:2).replace(/\.?0+$/g,"")+"億";
+        }
+        if(whole>=10000){ return Math.floor(whole/10000)+"萬"; }
+        return whole.toLocaleString("zh-TW");
+    }
+    function syncRosterResource(node,value){
+        if(!node){ return; }
+        const whole=Math.max(0,Math.floor(rosterNumber(value)));
+        const full=whole.toLocaleString("zh-TW");
+        node.textContent=rosterResourceText(whole);
+        node.title=full; node.setAttribute("aria-label",full);
+    }
+    const HOME_RELIC_SUMMARY_CATALOG=window.FourSymbolsRelicSummaryCatalog||Object.freeze({});
+    let firstScreenVisualReadyPromise=null;
+    function nextPaint(){ return new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))); }
+    function urlsFromStyle(value){
+        const urls=[];
+        String(value||"").replace(/url\((?:"([^"]+)"|'([^']+)'|([^\)]+))\)/g,(_all,doubleQuoted,singleQuoted,plain)=>{const url=(doubleQuoted||singleQuoted||plain||"").trim();if(url&&url!=="none"){urls.push(url);}return _all;});
+        return urls;
+    }
+    function decodeImageUrl(url){
+        return new Promise((resolve,reject)=>{const image=new Image();image.decoding="async";image.onload=()=>typeof image.decode==="function"?image.decode().then(resolve,reject):resolve();image.onerror=()=>reject(new Error("主城首屏圖片無法載入："+url));image.src=url;});
+    }
+    function collectFirstScreenVisualUrls(){
+        const urls=new Set();
+        ["#homePage","#homePage .home-bg-fixed-layer","#homePage .home-card-icon","#v146HomeRoster","#homePage img","#bottomNav img","#mainBottomNav img"].forEach(selector=>document.querySelectorAll(selector).forEach(node=>{if(node.tagName==="IMG"&&node.currentSrc){urls.add(node.currentSrc);}urlsFromStyle(getComputedStyle(node).backgroundImage).forEach(url=>urls.add(url));}));
+        return [...urls];
+    }
+    async function prepareFirstScreenVisuals(){
+        if(firstScreenVisualReadyPromise){return firstScreenVisualReadyPromise;}
+        firstScreenVisualReadyPromise=(async()=>{
+            const home=document.getElementById("homePage"),roster=document.getElementById("v146HomeRoster");
+            if(!home||!roster||roster.dataset.ready!=="true"){throw new Error("主城首屏資料尚未完成。 ");}
+            const urls=collectFirstScreenVisualUrls(); if(!urls.length){throw new Error("主城首屏圖片清單為空。 ");}
+            const fonts=document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve(); await Promise.all([fonts,...urls.map(decodeImageUrl)]); await nextPaint();
+            const liveUrls=new Set(collectFirstScreenVisualUrls()); if(urls.some(url=>!liveUrls.has(url))){throw new Error("主城首屏圖片在繪製前被替換。 ");}
+            try{if(performance&&typeof performance.mark==="function"){performance.mark("four-symbols:main-city-visual-ready");}}catch(_){ }
+            return Object.freeze({assets:urls.length});
+        })().catch(error=>{firstScreenVisualReadyPromise=null;throw error;});
+        return firstScreenVisualReadyPromise;
+    }
+
+    function homeRosterPlaceholder(index){
+        return '<article class="v146-home-character v146-home-character-placeholder" data-home-roster-slot="'+index+'" aria-busy="true">'+
+            '<div class="v146-home-avatar" aria-hidden="true"></div>'+
+            '<div class="v146-home-character-main"><div><b>隊伍資料載入中</b><span>--</span></div>'+
+            '<div class="v146-home-resource hp"><i style="width:0%"></i><strong>HP --</strong></div>'+
+            '<div class="v146-home-resource sp"><i style="width:0%"></i><strong>SP --</strong></div></div></article>';
+    }
+
+    function ensureHomeRosterShell(){
+        const page=document.getElementById("homePage");
+        const grid=page&&page.querySelector(".home-card-grid");
+        if(!page||!grid){ return null; }
+        let roster=document.getElementById("v146HomeRoster");
+        if(!roster){
+            roster=document.createElement("section");
+            roster.id="v146HomeRoster";
+            roster.className="v146-home-roster";
+            roster.setAttribute("aria-label","冒險隊伍");
+            grid.insertAdjacentElement("afterend",roster);
+        }
+        if(!roster.querySelector(":scope > header")){
+            const header=document.createElement("header");
+            const currentGold=typeof gold!=="undefined"
+                ?Math.max(0,Math.floor(rosterNumber(gold))).toLocaleString("zh-TW")
+                :"0";
+            header.innerHTML='<b>冒險隊伍</b><span class="v146-home-roster-count">隊伍 -- / 6</span><span class="v146-home-roster-gold">金幣 <strong id="v146HomeRosterGoldValue">'+currentGold+'</strong></span><button type="button" class="v-fixed-formation-entry" data-feature="gameplay-core" onclick="openHomeFeature(\'formation\')">佈陣</button>';
+            roster.appendChild(header);
+        }
+        if(!roster.querySelector(".v146-home-character")){
+            for(let index=0;index<3;index++){
+                roster.insertAdjacentHTML("beforeend",homeRosterPlaceholder(index));
+            }
+        }
+        let relicSlot=roster.querySelector(".team-relic-loadout-slot");
+        if(!relicSlot){
+            relicSlot=document.createElement("div");
+            relicSlot.className="team-relic-loadout-slot";
+            relicSlot.dataset.ready="false";
+            relicSlot.innerHTML='<span>隊伍秘寶</span><b>秘寶資料載入中</b><small>等待正式存檔完成解析</small><button type="button" data-feature="relic" onclick="openHomeFeature(\'relic\')" disabled>選擇</button>';
+            roster.appendChild(relicSlot);
+        }
+        return roster;
+    }
+
+    function readHomeRelicSave(){
+        try{
+            const repository=window.FourSymbolsAccountSave;
+            const uid=repository&&repository.getActiveUid();
+            if(!repository||!uid){ return null; }
+            const result=repository.readForUid(uid);
+            return result&&result.status==="ready"&&result.save&&typeof result.save==="object"
+                ?result.save
+                :null;
+        }catch(_){
+            return null;
+        }
+    }
+
+    function syncHomeRelicSummary(){
+        const roster=ensureHomeRosterShell();
+        const slot=roster&&roster.querySelector(".team-relic-loadout-slot");
+        if(!slot){ return false; }
+        const save=readHomeRelicSave();
+        if(!save){
+            slot.dataset.ready="false";
+            return false;
+        }
+        const relicId=save.teamLoadout&&typeof save.teamLoadout==="object"
+            ?String(save.teamLoadout.relicId||"")
+            :"";
+        const definition=relicId?HOME_RELIC_SUMMARY_CATALOG[relicId]:null;
+        const owned=relicId&&save.playerRelics&&typeof save.playerRelics==="object"
+            ?save.playerRelics[relicId]
+            :null;
+        const level=Math.max(1,Math.min(20,Math.floor(rosterNumber(owned&&owned.level)||1)));
+        slot.innerHTML=definition
+            ?'<span>隊伍秘寶</span><b>'+rosterEscape(definition.name)+' Lv.'+level+'</b><small>'+rosterEscape(definition.triggerText)+'</small><button type="button" data-feature="relic" onclick="openHomeFeature(\'relic\')">更換</button>'
+            :'<span>隊伍秘寶</span><b>尚未裝備</b><small>每隊僅能裝備1件秘寶</small><button type="button" data-feature="relic" onclick="openHomeFeature(\'relic\')">選擇</button>';
+        slot.dataset.ready="true";
+        return true;
+    }
+
+    function renderHomeRoster(){
+        firstScreenVisualReadyPromise=null;
+        const roster=ensureHomeRosterShell();
+        if(!roster||typeof getExistingPartyIndexes!=="function"){ return false; }
+        const partyIndexes=getExistingPartyIndexes().slice(0,3);
+        const availableExp=typeof window.v173GetAvailableExpPool==="function"
+            ?window.v173GetAvailableExpPool(Date.now())
+            :(typeof sharedExp!=="undefined"?sharedExp:0);
+        syncRosterResource(document.getElementById("homeHudGoldValue"),typeof gold!=="undefined"?gold:0);
+        syncRosterResource(document.getElementById("homeHudExpValue"),availableExp);
+        syncRosterResource(document.getElementById("v146HomeRosterGoldValue"),typeof gold!=="undefined"?gold:0);
+        const count=roster.querySelector(".v146-home-roster-count");
+        if(count){ count.textContent="隊伍 "+partyIndexes.length+" / 6"; }
+
+        const cards=[];
+        for(let slotIndex=0;slotIndex<3;slotIndex++){
+            const index=partyIndexes[slotIndex];
+            const character=typeof index==="number"&&typeof getPartyCharacterByIndex==="function"
+                ?getPartyCharacterByIndex(index)
+                :null;
+            const stats=typeof index==="number"&&typeof getPartyBattleStats==="function"
+                ?getPartyBattleStats(index)
+                :null;
+            if(!character||!stats){
+                cards.push('<article class="v146-home-character v146-home-character-empty" data-home-roster-slot="'+slotIndex+'"><div class="v146-home-avatar" aria-hidden="true"></div><div class="v146-home-character-main"><div><b>隊伍空位</b><span>--</span></div><div class="v146-home-resource hp"><i style="width:0%"></i><strong>HP --</strong></div><div class="v146-home-resource sp"><i style="width:0%"></i><strong>SP --</strong></div></div></article>');
+                continue;
+            }
+            const hp=Math.max(0,Math.min(rosterNumber(stats.maxHP),rosterNumber(character.hp)));
+            const sp=Math.max(0,Math.min(rosterNumber(stats.maxSP),rosterNumber(character.sp)));
+            const hpPercent=rosterNumber(stats.maxHP)>0?hp/rosterNumber(stats.maxHP)*100:0;
+            const spPercent=rosterNumber(stats.maxSP)>0?sp/rosterNumber(stats.maxSP)*100:0;
+            const artwork=typeof getCharacterArtworkPath==="function"?getCharacterArtworkPath(character):"";
+            cards.push('<article class="v146-home-character" data-home-roster-slot="'+slotIndex+'" data-element="'+rosterEscape(character.element||"fire")+'">'+
+                '<div class="v146-home-avatar"><img src="'+rosterEscape(artwork)+'" alt="'+rosterEscape(character.id||"角色")+'頭像"></div>'+
+                '<div class="v146-home-character-main"><div><b>'+rosterEscape(character.id||("角色"+(index+1)))+'</b><span>Lv.'+Math.max(1,Math.floor(rosterNumber(character.level)||1))+'</span></div>'+
+                '<div class="v146-home-resource hp"><i style="width:'+hpPercent+'%"></i><strong>HP '+Math.floor(hp)+' / '+Math.floor(rosterNumber(stats.maxHP))+'</strong></div>'+
+                '<div class="v146-home-resource sp"><i style="width:'+spPercent+'%"></i><strong>SP '+Math.floor(sp)+' / '+Math.floor(rosterNumber(stats.maxSP))+'</strong></div></div></article>');
+        }
+
+        roster.querySelectorAll(".v146-home-character").forEach(node=>node.remove());
+        const relicSlot=roster.querySelector(".team-relic-loadout-slot");
+        if(relicSlot){ relicSlot.insertAdjacentHTML("beforebegin",cards.join("")); }
+        else{ roster.insertAdjacentHTML("beforeend",cards.join("")); }
+        roster.dataset.ready="true";
+        syncHomeRelicSummary();
+        return true;
+    }
+    window.v54RenderHomeRoster=renderHomeRoster;
+    window.FourSymbolsHomeRelicSummary=Object.freeze({
+        ensureShell:ensureHomeRosterShell,
+        sync:syncHomeRelicSummary,
+        prepareFirstScreenVisuals
+    });
+    document.addEventListener("four-symbols:startup-ready",function(){
+        const roster=document.getElementById("v146HomeRoster");
+        if(!roster||roster.dataset.ready!=="true"){renderHomeRoster();}
+        syncHomeRelicSummary();
+    });
+
+    function boot(){
+        apply();
+        ensureAdFreeConfig();
+        ensureHomeRosterShell();
+    }
+
+    if(document.readyState === "loading"){
+        document.addEventListener("DOMContentLoaded",boot,{once:true});
+    }else{
+        boot();
+    }
+})();
+
+
+/* bundled source: js/17-stage-v60-training-render-guard.js */
+(function(){
+"use strict";
+window.GAME_NATIVE_CONFIRMED_BASELINE="V54";
+window.GAME_NATIVE_CURRENT_VERSION="V60";
+window.GAME_NATIVE_LAST_SCOPE="training-full-source-audit";
+
+const V17344_ZONE_ART={
+    desert:"assets/maps/desert-v17344.png",
+    ice:"assets/maps/ice-v17344.png",
+    zone4:"assets/maps/zone4-v17344.png",
+    zone5:"assets/maps/zone5-v17344.png",
+    zone6:"assets/maps/zone6-v17344.png",
+    zone7:"assets/maps/zone7-v17344.png",
+    zone8:"assets/maps/zone8-v17344.png",
+    zone9:"assets/maps/zone9-v17344.png",
+    zone10:"assets/maps/zone10-v17344.png"
+};
+try{ if(typeof zoneBackgroundImages!=="undefined"){ Object.assign(zoneBackgroundImages,V17344_ZONE_ART); } }catch(_){ }
+try{ if(typeof mapZoneBackgroundImages!=="undefined"){ Object.assign(mapZoneBackgroundImages,V17344_ZONE_ART); } }catch(_){ }
+
+function enforceTrainingRender(){
+    const page=document.getElementById("trainingPage");
+    if(page){
+        page.querySelectorAll(".training-zone-item").forEach(function(el){
+            el.style.setProperty("font-size","20px","important");
+            el.style.setProperty("padding","6px 14px","important");
+            el.style.setProperty("min-height","42px","important");
+            el.style.setProperty("line-height","1.15","important");
+            el.style.setProperty("box-sizing","border-box","important");
+        });
+    }
+
+    /*
+       The training zone information modal used to receive width/max-height/
+       overflow inline styles here. Those declarations fought the shared UI
+       sizing authority and made the whole frame the scroll owner. Geometry is
+       now owned by css/20-stage-v60-training-only-safety.css; this runtime guard
+       intentionally touches only the training-zone list items above.
+    */
+}
+if(document.readyState==="loading"){
+    document.addEventListener("DOMContentLoaded",enforceTrainingRender,{once:true});
+}else{
+    enforceTrainingRender();
+}
+})();
+
+
+/* bundled source: js/18-stage-v64-character-touch-action-runtime.js */
+(function(){
+"use strict";
+function setCharacterTouchMode(active){
+    const root=document.documentElement;
+    const body=document.body;
+    const viewport=document.getElementById("game-viewport");
+    const stage=document.getElementById("game-stage");
+    [root,body,viewport,stage].forEach(function(el){
+        if(!el)return;
+        el.classList.toggle("character-scroll-active",!!active);
+    });
+}
+function syncCharacterTouchMode(){
+    const modal=document.getElementById("homeFeatureModal");
+    const tabs=document.getElementById("characterTabContent");
+    const active=!!(modal && tabs && getComputedStyle(modal).display!=="none" && modal.classList.contains("show"));
+    setCharacterTouchMode(active);
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",syncCharacterTouchMode,{once:true});
+else syncCharacterTouchMode();
+const observer=new MutationObserver(syncCharacterTouchMode);
+observer.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:["class","style"]});
+window.syncCharacterTouchMode=syncCharacterTouchMode;
+})();
+
+
+/* bundled source: js/19-stage-v78-character-inventory-runtime.js */
+(function(){
+"use strict";
+
+let rafId=0;
+
+function getStageScale(){
+    const stage=
+        document.getElementById(
+            "game-stage"
+        );
+
+    if(!stage){
+        return 1;
+    }
+
+    const rect=
+        stage.getBoundingClientRect();
+
+    const scale=
+        rect.width/1080;
+
+    return (
+        Number.isFinite(scale) &&
+        scale>0
+    )
+        ? scale
+        : 1;
+}
+
+function releaseCharacterLayoutOwnership(modal,body,root,inventory,force){
+    if(
+        !modal ||
+        (!force && modal.dataset.v78CharacterLayoutActive!=="1")
+    ){
+        return;
+    }
+
+    const box=modal.querySelector(".home-feature-modal-box.wide");
+    if(box){
+        [
+            "display","flex-direction","width","max-width","height",
+            "max-height","min-height","overflow"
+        ].forEach(property=>box.style.removeProperty(property));
+    }
+
+    if(body){
+        [
+            "display","flex-direction","flex","height","min-height","overflow"
+        ].forEach(property=>body.style.removeProperty(property));
+    }
+
+    if(root){
+        [
+            "flex","height","max-height","min-height","overflow-y","overflow-x",
+            "-webkit-overflow-scrolling","overscroll-behavior-y","touch-action",
+            "scrollbar-gutter"
+        ].forEach(property=>root.style.removeProperty(property));
+    }
+
+    if(inventory){
+        ["overflow","transform"].forEach(property=>inventory.style.removeProperty(property));
+    }
+
+    delete modal.dataset.v78CharacterLayoutActive;
+}
+
+function applyNow(){
+    const modal=
+        document.getElementById(
+            "homeFeatureModal"
+        );
+
+    const body=
+        document.getElementById(
+            "homeFeatureModalBody"
+        );
+
+    const root=
+        document.getElementById(
+            "characterTabContent"
+        );
+
+    const inventory=
+        document.getElementById(
+            "inventoryPage"
+        );
+
+    if(
+        !modal ||
+        !body ||
+        !modal.classList.contains("show")
+    ){
+        return;
+    }
+
+    /*
+       Team Relic owns the shared modal body as its vertical scroll container.
+       Its class can be applied before #characterTabContent is physically
+       replaced, so containment alone is not a sufficient ownership test.
+       Relinquish the character layout synchronously as soon as the relic modal
+       class appears; force also clears any stale inline !important styles left
+       by an older character view even if the dataset marker was lost.
+    */
+    const relicOwnsSharedModal=
+        modal.classList.contains("team-relic-modal") ||
+        modal.classList.contains("team-relic-mode");
+
+    if(relicOwnsSharedModal){
+        releaseCharacterLayoutOwnership(
+            modal,
+            body,
+            root,
+            inventory,
+            true
+        );
+        return;
+    }
+
+    /*
+       This owner is only valid while the character/status/skill/inventory
+       shell is actually mounted inside the shared modal body. The same modal
+       is reused by shop, quests, synthesis and Team Relic. Previously this
+       function kept writing inline !important overflow:hidden to the shared
+       body even after another feature took ownership, which could override
+       Team Relic's legitimate overflow-y:auto and produce intermittent mobile
+       scrolling depending on MutationObserver timing.
+
+       The root can be completely removed when another feature replaces the
+       modal body, so release must also run when #characterTabContent no longer
+       exists at all; returning early on !root would leave the stale inline
+       styles behind indefinitely. DOM test doubles used by the repository do
+       not all implement Element.contains(), so the real containment check is
+       used when available and otherwise falls back to the historical mounted
+       assumption for those isolated fixtures.
+    */
+    const characterRootMounted=!!root&&(
+        typeof body.contains==="function"
+            ?body.contains(root)
+            :true
+    );
+    if(!characterRootMounted){
+        releaseCharacterLayoutOwnership(modal,body,root,inventory);
+        return;
+    }
+
+    const box=
+        modal.querySelector(
+            ".home-feature-modal-box.wide"
+        );
+
+    if(!box){
+        return;
+    }
+
+    modal.dataset.v78CharacterLayoutActive="1";
+
+    box.style.setProperty(
+        "display",
+        "flex",
+        "important"
+    );
+
+    box.style.setProperty(
+        "flex-direction",
+        "column",
+        "important"
+    );
+
+    /*
+       V173.63 visible-layout authority:
+       character/status/skill/inventory share the maximum mobile canvas.
+       The former 396 × 620 inline Large Panel values overrode the V173.62
+       stylesheet, so the screen never actually expanded on phones. Keep one
+       fixed outer frame here and let only the inner tab content scroll.
+    */
+    box.style.setProperty(
+        "width",
+        "calc(100% - 8px)",
+        "important"
+    );
+
+    box.style.setProperty(
+        "max-width",
+        "none",
+        "important"
+    );
+
+    box.style.setProperty(
+        "height",
+        "calc(100% - 8px)",
+        "important"
+    );
+
+    box.style.setProperty(
+        "max-height",
+        "calc(100% - 8px)",
+        "important"
+    );
+
+    box.style.setProperty(
+        "min-height",
+        "0",
+        "important"
+    );
+
+    box.style.setProperty(
+        "overflow",
+        "hidden",
+        "important"
+    );
+
+    body.style.setProperty(
+        "display",
+        "flex",
+        "important"
+    );
+
+    body.style.setProperty(
+        "flex-direction",
+        "column",
+        "important"
+    );
+
+    body.style.setProperty(
+        "flex",
+        "1 1 auto",
+        "important"
+    );
+
+    body.style.setProperty(
+        "height",
+        "auto",
+        "important"
+    );
+
+    body.style.setProperty(
+        "min-height",
+        "0",
+        "important"
+    );
+
+    body.style.setProperty(
+        "overflow",
+        "hidden",
+        "important"
+    );
+
+    root.style.setProperty(
+        "flex",
+        "1 1 auto",
+        "important"
+    );
+
+    root.style.setProperty(
+        "height",
+        "auto",
+        "important"
+    );
+
+    root.style.setProperty(
+        "max-height",
+        "none",
+        "important"
+    );
+
+    root.style.setProperty(
+        "min-height",
+        "0",
+        "important"
+    );
+
+    const inventoryOwnsScroll=
+        !!(
+            inventory &&
+            inventory.parentElement===root
+        );
+
+    root.style.setProperty(
+        "overflow-y",
+        inventoryOwnsScroll
+            ? "hidden"
+            : "scroll",
+        "important"
+    );
+
+    root.style.setProperty(
+        "overflow-x",
+        "hidden",
+        "important"
+    );
+
+    root.style.setProperty(
+        "-webkit-overflow-scrolling",
+        "touch",
+        "important"
+    );
+
+    root.style.setProperty(
+        "overscroll-behavior-y",
+        "contain",
+        "important"
+    );
+
+    root.style.setProperty(
+        "touch-action",
+        "pan-y",
+        "important"
+    );
+
+    root.style.setProperty(
+        "scrollbar-gutter",
+        "stable",
+        "important"
+    );
+
+    if(inventoryOwnsScroll){
+        inventory.style.setProperty(
+            "overflow",
+            "visible",
+            "important"
+        );
+
+        inventory.style.setProperty(
+            "transform",
+            "none",
+            "important"
+        );
+
+        /*
+           V77 的 1/3 再縮小 1/3：
+           1/3 × 2/3 = 2/9 可視高度。
+        */
+        const stageHeight=
+            Math.max(
+                180,
+                Math.min(
+                    300,
+                    Math.round(
+                        Math.max(
+                            180,
+                            root.clientHeight
+                        )*
+                        2/9
+                    )
+                )
+            );
+
+        inventory.style.setProperty(
+            "--inventory-stage-height",
+            stageHeight+"px"
+        );
+    }
+}
+
+function schedule(){
+    if(rafId){
+        cancelAnimationFrame(
+            rafId
+        );
+    }
+
+    rafId=
+        requestAnimationFrame(
+            function(){
+                rafId=0;
+                applyNow();
+            }
+        );
+}
+
+/* Late feature runtimes are production bundles owned by FourSymbolsFeatures. */
+
+if(
+    document.readyState===
+    "loading"
+){
+    document.addEventListener(
+        "DOMContentLoaded",
+        function(){
+            schedule();
+        },
+        {once:true}
+    );
+}
+else{
+    schedule();
+}
+
+const observer=
+    new MutationObserver(
+        schedule
+    );
+
+observer.observe(
+    document.body,
+    {
+        childList:true,
+        subtree:true,
+        attributes:true,
+        attributeFilter:["class"]
+    }
+);
+
+document.addEventListener(
+    "click",
+    schedule,
+    {passive:true}
+);
+
+window.addEventListener(
+    "resize",
+    schedule,
+    {passive:true}
+);
+
+window.v78ApplyCharacterInventoryLayout=
+    schedule;
+})();
+
+
+/* bundled source: js/23-v125-character-creation-bootstrap.js */
+/* =====================================================
+   V174 — PRE-PAINT CHARACTER CREATION BOOTSTRAP + SAVE GUARD
+   The creation page starts inside #app for legacy HTML compatibility.
+
+   IMPORTANT:
+   - This bootstrap only prepares the DOM location. It never decides that
+     character creation is active before persisted data has been restored.
+   - A fail-closed primary-character guard prevents an accidental creation
+     screen after reload from overwriting an existing saved slot-1 character.
+===================================================== */
+(function bootstrapNativeCreationPage(){
+    "use strict";
+
+    const page=document.getElementById("creationPage");
+    const overlay=document.getElementById("game-overlay-layer");
+
+    if(page&&overlay&&page.parentElement!==overlay){
+        overlay.appendChild(page);
+    }
+    if(page){
+        page.dataset.nativePrepaint="v174-dom-only";
+    }
+
+    function loadCriticalUiStyle(){
+        /* Production app-shell CSS owns this style; no runtime stylesheet request. */
+        return true;
+    }
+
+    function primaryState(state,primary,reason){
+        return {state,primary:primary||null,reason:reason||""};
+    }
+
+    function readPersistedPrimaryCharacter(){
+        let raw="";
+        try{
+            const repository=window.FourSymbolsAccountSave;
+            const active=repository&&repository.readActive();
+            if(!active||active.status==="inactive"){ return primaryState("unsafe",null,"account-unresolved"); }
+            if(active.status==="empty"){ return primaryState("empty",null,"no-account-save"); }
+            raw=JSON.stringify(active.save);
+        }catch(_){
+            /* Storage being unreadable must never turn into permission to
+               overwrite character data. This is intentionally fail-closed. */
+            return primaryState("unsafe",null,"storage-unreadable");
+        }
+
+        if(!raw){
+            return primaryState("empty",null,"no-save");
+        }
+
+        let saved=null;
+        try{
+            saved=JSON.parse(raw);
+        }catch(_){
+            return primaryState("unsafe",null,"save-json-invalid");
+        }
+
+        if(!saved||typeof saved!=="object"||Array.isArray(saved)){
+            return primaryState("unsafe",null,"save-shape-invalid");
+        }
+
+        const primary=saved.player;
+        if(primary===undefined||primary===null){
+            /* An empty object is a valid pre-character state in historical
+               startup/test flows. */
+            return primaryState("empty",null,"no-primary");
+        }
+        if(typeof primary!=="object"||Array.isArray(primary)){
+            return primaryState("unsafe",null,"primary-shape-invalid");
+        }
+
+        /* Character ID is the canonical creation identity. Once it exists,
+           slot 1 is occupied regardless of whether another field (for example
+           level) has become malformed. Never require level to be healthy in
+           order to protect an existing character. */
+        const id=String(primary.id||"").trim();
+        if(id){
+            return primaryState("occupied",primary,"primary-id-present");
+        }
+
+        /* The canonical uncreated template is id:"", level:1, exp:0.
+           If identity is missing but progress/secondary-character evidence is
+           present, treat the save as unsafe instead of assuming the slot is
+           free. This prevents a partially damaged save from being overwritten. */
+        const level=Number(primary.level);
+        const exp=Number(primary.exp);
+        const progressed=(Number.isFinite(level)&&level>1)||(Number.isFinite(exp)&&exp>0);
+        const hasSecondary=!!(
+            saved.player2&&typeof saved.player2==="object"&&String(saved.player2.id||"").trim()
+        )||!!(
+            saved.player3&&typeof saved.player3==="object"&&String(saved.player3.id||"").trim()
+        );
+
+        if(progressed||hasSecondary){
+            return primaryState("unsafe",primary,"primary-identity-missing");
+        }
+
+        return primaryState("empty",primary,"blank-primary-template");
+    }
+
+    function showPrimaryProtection(state){
+        const primary=state&&state.primary;
+        const id=String(primary&&primary.id||"").trim();
+        const level=Number(primary&&primary.level);
+        const occupied=state&&state.state==="occupied";
+        const message=occupied
+            ?("偵測到既有主角色存檔「"+id+"」"+
+                (Number.isFinite(level)&&level>=1?"Lv."+Math.floor(level):"")+"。為避免覆寫原角色，本次創建已取消；請重新整理後繼續遊戲。")
+            :"偵測到角色存檔讀取異常或既有角色痕跡。為避免任何角色資料被覆寫，本次創建已取消；請先重新整理，若仍出現此訊息請保留存檔並停止建立角色。";
+        if(typeof window.rpgAlert==="function"){
+            void window.rpgAlert(message,{title:"角色存檔保護",confirmText:"知道了",danger:true});
+        }else if(typeof window.alert==="function"){
+            window.alert(message);
+        }
+    }
+
+    function installPrimaryCreationSaveGuard(){
+        const current=window.createCharacter;
+        if(typeof current!=="function"||current.__v174PersistedPrimaryGuard===true){
+            return;
+        }
+
+        function guardedCreateCharacter(){
+            let targetSlot=1;
+            try{
+                if(typeof creationTargetSlot!=="undefined"){
+                    targetSlot=Math.max(1,Math.floor(Number(creationTargetSlot)||1));
+                }
+            }catch(_){ }
+
+            const persisted=readPersistedPrimaryCharacter();
+
+            /* An unreadable/corrupt canonical save blocks every character
+               creation path, because createAdditionalCharacter eventually
+               saves through the same canonical key. A healthy occupied primary
+               blocks only slot 1; slot 2/3 remain legitimate additions. */
+            if(
+                persisted.state==="unsafe"||
+                (targetSlot===1&&persisted.state==="occupied")
+            ){
+                showPrimaryProtection(persisted);
+                return false;
+            }
+
+            return current.apply(this,arguments);
+        }
+
+        guardedCreateCharacter.__v174PersistedPrimaryGuard=true;
+        guardedCreateCharacter.__v174OriginalCreateCharacter=current;
+        window.createCharacter=guardedCreateCharacter;
+    }
+
+    function finalizeBootstrap(){
+        installPrimaryCreationSaveGuard();
+    }
+
+    loadCriticalUiStyle();
+
+    if(document.readyState==="loading"){
+        document.addEventListener("DOMContentLoaded",finalizeBootstrap,{once:true});
+    }else{
+        finalizeBootstrap();
+    }
+})();
+
+
+/* bundled source: js/24-v125-character-creation-native-runtime.js */
+/* =====================================================
+   V128 — FIXED TWO-STEP 1080 × 1920 CHARACTER CREATION RUNTIME
+   - Uses the V128 pre-paint native bootstrap; reparenting is only a fallback
+   - Uses real native component dimensions, never migration scale
+   - Gender / portrait switching
+   - Element positioning with larger element descriptions
+   - Fixed Android Chrome canvas with no page scroll or pinch zoom
+   - Two-step creation flow; ability allocation lives on page two
+   Existing combat/stat/skill formulas are not changed.
+===================================================== */
+(function(){
+    "use strict";
+
+    const PORTRAITS={
+        female:{
+            fire:"assets/characters/female_fire.jpg",
+            water:"assets/characters/female_water.jpg",
+            wind:"assets/characters/female_wind.jpg",
+            earth:"assets/characters/female_earth.jpg"
+        },
+        male:{
+            fire:"assets/characters/male_fire.jpg",
+            water:"assets/characters/male_water.jpg",
+            wind:"assets/characters/male_wind.jpg",
+            earth:"assets/characters/male_earth.jpg"
+        }
+    };
+
+    const META={
+        fire:{
+            glyph:"火",
+            title:"烈焰之道",
+            role:"爆發輸出 · 爆擊 · 燃燒",
+            description:"以高爆發、爆擊與燃燒持續傷害壓制敵人，物理與法術兩條路線都偏向主動進攻。",
+            tags:["高爆發","爆擊強化","燃燒傷害"]
+        },
+        water:{
+            glyph:"水",
+            title:"寒水之道",
+            role:"吸取回復 · 冰封 · 治療復活",
+            description:"兼具續航、控場與隊伍回復；攻擊技能可吸取HP與SP，並擁有冰封、治療與復活能力。",
+            tags:["HP/SP吸取","冰封控場","治療復活"]
+        },
+        wind:{
+            glyph:"風",
+            title:"疾風之道",
+            role:"速度干擾 · 傷害削弱 · 閃避控場",
+            description:"透過敏捷、閃避與各式干擾掌握戰鬥節奏，可降低敵方能力、傷害與命中並施加暈眩。",
+            tags:["敏捷干擾","閃避強化","暈眩／降傷"]
+        },
+        earth:{
+            glyph:"土",
+            title:"厚土之道",
+            role:"護盾防禦 · 降防 · 石化反傷",
+            description:"重視生存與隊伍防護，能建立護盾、反傷與結界，同時以降防與石化控制敵方。",
+            tags:["護盾防護","降防石化","反傷結界"]
+        }
+    };
+
+    let selectedGender="female";
+    let selectedCreationStep=1;
+
+    function byId(id){
+        return document.getElementById(id);
+    }
+
+    function migrateCreationPageToNativeLayer(){
+        const page=byId("creationPage");
+        const overlay=byId("game-overlay-layer");
+        if(!page || !overlay){return null;}
+
+        if(page.parentElement!==overlay){
+            overlay.appendChild(page);
+        }
+
+        page.classList.add("native-creation-page","game-native-ui");
+        page.dataset.nativeWidth="1080";
+        page.dataset.nativeHeight="1920";
+        page.dataset.nativeMigration="actual-dimensions";
+
+        [
+            "left","top","right","bottom","width","height",
+            "min-width","min-height","max-width","max-height",
+            "margin","transform","transform-origin"
+        ].forEach(function(property){
+            page.style.removeProperty(property);
+        });
+
+        /* This layer contains interactive native UI, so it cannot stay
+           hidden from accessibility APIs. Pointer ownership remains on
+           #creationPage; the overlay itself still uses pointer-events:none. */
+        overlay.removeAttribute("aria-hidden");
+        return page;
+    }
+
+    function setCreationTouchMode(active){
+        const fixedNodes=[
+            document.documentElement,
+            document.body,
+            byId("game-viewport"),
+            byId("game-stage"),
+            byId("game-overlay-layer")
+        ];
+
+        fixedNodes.forEach(function(node){
+            if(node){
+                node.classList.remove("creation-scroll-active");
+                node.classList.toggle("creation-fixed-active",!!active);
+            }
+        });
+
+        if(active){
+            fixedNodes.concat(byId("creationPage")).forEach(function(node){
+                if(node){
+                    node.scrollTop=0;
+                    node.scrollLeft=0;
+                }
+            });
+        }
+
+        const stage=byId("game-stage");
+        const app=byId("app");
+
+        if(stage){
+            stage.classList.toggle("creation-native-active",!!active);
+        }
+
+        if(app){
+            app.inert=!!active;
+            if(active){
+                app.setAttribute("aria-hidden","true");
+            }else{
+                app.removeAttribute("aria-hidden");
+            }
+        }
+
+        if(active){
+            window.scrollTo(0,0);
+        }
+    }
+
+    function syncCreationTouchMode(){
+        const page=migrateCreationPageToNativeLayer();
+        const visible=!!page && window.getComputedStyle(page).display!=="none";
+        setCreationTouchMode(visible);
+    }
+
+    function installCreationGestureLock(){
+        const page=byId("creationPage");
+        if(!page || page.dataset.gestureLockReady==="true"){
+            return;
+        }
+
+        ["touchmove","wheel","gesturestart","gesturechange","gestureend"].forEach(function(eventName){
+            page.addEventListener(eventName,function(event){
+                event.preventDefault();
+            },{passive:false});
+        });
+
+        page.dataset.gestureLockReady="true";
+    }
+
+    function applyCreationStep(step){
+        const page=byId("creationPage");
+        const normalized=Number(step)===2?2:1;
+        selectedCreationStep=normalized;
+
+        document.querySelectorAll("#creationPage [data-creation-step]").forEach(function(panel){
+            const active=Number(panel.dataset.creationStep)===normalized;
+            panel.classList.toggle("is-active",active);
+            panel.hidden=!active;
+            panel.setAttribute("aria-hidden",active?"false":"true");
+        });
+
+        document.querySelectorAll("#creationPage [data-creation-step-indicator]").forEach(function(indicator){
+            const active=Number(indicator.dataset.creationStepIndicator)===normalized;
+            indicator.classList.toggle("is-active",active);
+            if(active){
+                indicator.setAttribute("aria-current","step");
+            }else{
+                indicator.removeAttribute("aria-current");
+            }
+        });
+
+        if(page){
+            page.dataset.step=String(normalized);
+            page.scrollTop=0;
+        }
+
+        ["game-viewport","game-stage","game-overlay-layer"].forEach(function(id){
+            const node=byId(id);
+            if(node){
+                node.scrollTop=0;
+                node.scrollLeft=0;
+            }
+        });
+
+        if(document.activeElement && typeof document.activeElement.blur==="function"){
+            document.activeElement.blur();
+        }
+        window.scrollTo(0,0);
+    }
+
+    window.setCreationStep=function(step){
+        applyCreationStep(step);
+    };
+
+    function orderedSkills(element,category){
+        if(typeof skillDatabase==="undefined"){
+            return [];
+        }
+        return Object.keys(skillDatabase)
+            .map(function(id){return skillDatabase[id];})
+            .filter(function(skill){
+                return skill && skill.element===element && skill.category===category;
+            })
+            .sort(function(a,b){
+                return Number(a.tier||99)-Number(b.tier||99);
+            });
+    }
+
+    function specialSkills(element){
+        if(typeof skillDatabase==="undefined"){
+            return [];
+        }
+        const order={buff:1,heal:2,revive:3,passive:4};
+        return Object.keys(skillDatabase)
+            .map(function(id){return skillDatabase[id];})
+            .filter(function(skill){
+                return skill && skill.element===element && order[skill.category];
+            })
+            .sort(function(a,b){
+                const cat=(order[a.category]||99)-(order[b.category]||99);
+                if(cat!==0){return cat;}
+                return Number(a.tier||99)-Number(b.tier||99);
+            });
+    }
+
+    function renderSkillChips(containerId,skills){
+        const box=byId(containerId);
+        if(!box){return;}
+        box.innerHTML="";
+        skills.forEach(function(skill,index){
+            const chip=document.createElement("button");
+            chip.type="button";
+            chip.className="creation-skill-chip"+(index===skills.length-1?" signature":"");
+            chip.dataset.skillId=skill.id;
+            chip.textContent=skill.name;
+            chip.title=skill.description||skill.name;
+            chip.setAttribute("aria-haspopup","dialog");
+            chip.setAttribute("aria-label",skill.name+"，點擊查看詳細介紹");
+            chip.addEventListener("click",function(){
+                window.showCreationSkillDetail(skill.id);
+            });
+            box.appendChild(chip);
+        });
+    }
+
+    function escapeHTML(value){
+        return String(value===undefined||value===null?"":value)
+            .replace(/&/g,"&amp;")
+            .replace(/</g,"&lt;")
+            .replace(/>/g,"&gt;")
+            .replace(/"/g,"&quot;")
+            .replace(/'/g,"&#39;");
+    }
+
+    function valueAtLevel(values,level){
+        if(!Array.isArray(values) || values.length<1){
+            return undefined;
+        }
+        return values[Math.min(level-1,values.length-1)];
+    }
+
+    function creationSkillCategoryLabel(category){
+        try{
+            if(typeof getSkillCategoryLabel==="function"){
+                return getSkillCategoryLabel(category);
+            }
+        }catch(error){}
+
+        const labels={
+            physical:"物理",
+            magic:"法術",
+            buff:"增益",
+            heal:"回復",
+            revive:"復活",
+            passive:"被動"
+        };
+        return labels[category]||"技能";
+    }
+
+    function creationSkillTargetLabel(targetType){
+        const labels={
+            single:"單體敵人",
+            tri:"同橫排最多3名敵人",
+            row:"任一敵方橫排",
+            all:"敵方全體",
+            ally:"單一友方",
+            allyAll:"我方全體",
+            deadAlly:"死亡友方",
+            none:"永久被動"
+        };
+        return labels[targetType]||"依技能規則";
+    }
+
+    function skillLevelParts(skill,level){
+        const parts=[];
+
+        if(
+            (skill.category==="physical" || skill.category==="magic") &&
+            skill.baseDamage!==undefined
+        ){
+            let damage=Number(skill.baseDamage||0)+Number(skill.damagePerLevel||0)*(level-1);
+            try{
+                if(typeof getSkillDamageAtLevel==="function"){
+                    damage=getSkillDamageAtLevel(skill,level);
+                }
+            }catch(error){}
+
+            parts.push(
+                "傷害"+Math.floor(damage)+
+                (skill.damagePerLevel ? "（每級+"+skill.damagePerLevel+"）" : "")
+            );
+        }
+
+        const burnPercent=valueAtLevel(skill.burnPercentByLevel,level);
+        if(skill.burnChance!==undefined && burnPercent!==undefined){
+            parts.push(
+                skill.burnChance+"%機率燃燒"+
+                (skill.burnDuration||2)+"回合，每回合造成最大HP "+
+                burnPercent+"%傷害"
+            );
+        }
+
+        if(skill.freezeChance!==undefined){
+            parts.push(
+                skill.freezeChance+"%機率冰封"+
+                (skill.freezeDuration||1)+"回合"
+            );
+        }
+
+        const lifesteal=valueAtLevel(skill.lifestealPercentByLevel,level);
+        if(lifesteal!==undefined){
+            parts.push("吸取傷害"+lifesteal+"%，等量回復自身HP與SP");
+        }
+
+        const agilityDown=valueAtLevel(skill.agilityDownByLevel,level);
+        if(agilityDown!==undefined){
+            parts.push(
+                skill.agilityDownChance+"%機率降低敏捷"+
+                agilityDown+"%，持續"+(skill.agilityDownDuration||2)+"回合"
+            );
+        }
+
+        const statDown=valueAtLevel(skill.statDownByLevel,level);
+        if(statDown!==undefined){
+            parts.push(
+                skill.statDownChance+"%機率降低所有能力"+
+                statDown+"%，持續"+(skill.statDownDuration||2)+"回合"
+            );
+        }
+
+        const damageDown=valueAtLevel(skill.damageDownByLevel,level);
+        if(damageDown!==undefined){
+            parts.push(
+                skill.damageDownChance+"%機率降低造成傷害"+
+                damageDown+"%，持續"+(skill.damageDownDuration||1)+"回合"
+            );
+        }
+
+        const defenseDown=valueAtLevel(skill.defenseDownByLevel,level);
+        if(defenseDown!==undefined){
+            parts.push(
+                skill.defenseDownChance+"%機率降低防禦"+
+                defenseDown+"%，持續"+(skill.defenseDownDuration||2)+"回合"
+            );
+        }
+
+        const finalHitChanceDown=valueAtLevel(skill.missBonusByLevel,level);
+        if(finalHitChanceDown!==undefined){
+            parts.push(
+                skill.stunChance+"%機率暈眩"+
+                (skill.stunDuration||2)+"回合，最終命中率降低"+finalHitChanceDown+"%"
+            );
+        }
+
+        const petrifyChance=valueAtLevel(skill.petrifyChanceByLevel,level);
+        if(petrifyChance!==undefined){
+            parts.push(
+                petrifyChance+"%機率石化"+
+                (skill.petrifyDuration||2)+"回合"
+            );
+        }
+
+        const selfShield=valueAtLevel(skill.selfShieldByLevel,level);
+        if(selfShield!==undefined){
+            parts.push(
+                "自身護盾"+selfShield+"點，持續"+
+                (skill.shieldDuration||2)+"回合"
+            );
+        }
+
+        const allyShield=valueAtLevel(skill.allyShieldByLevel,level);
+        if(allyShield!==undefined){
+            parts.push(
+                "我方全體護盾"+allyShield+"點，持續"+
+                (skill.shieldDuration||2)+"回合"
+            );
+        }
+
+        const critBonus=valueAtLevel(skill.critBonusByLevel,level);
+        if(skill.category==="buff" && critBonus!==undefined){
+            parts.push(
+                "我方爆擊率與爆擊傷害 +"+critBonus+
+                "%，持續"+skill.duration+"回合"
+            );
+        }
+        else if(skill.category==="buff" && skill.evasionBonusPercent!==undefined){
+            parts.push(
+                "閃躲率 +"+skill.evasionBonusPercent+
+                "%，持續"+skill.duration+"回合"
+            );
+        }
+        else if(skill.category==="buff" && skill.defenseBonusPercent!==undefined){
+            parts.push(
+                "防禦力 +"+skill.defenseBonusPercent+
+                "%，持續"+skill.duration+"回合"
+            );
+        }
+        else if(skill.category==="buff" && skill.reflectPercent!==undefined){
+            parts.push(
+                "反傷 "+skill.reflectPercent+
+                "%，持續"+skill.duration+"回合"
+            );
+        }
+        else if(skill.category==="buff" && skill.statusResistBonus!==undefined){
+            parts.push(
+                "異常狀態抗性 +"+skill.statusResistBonus+
+                "%，持續"+skill.duration+"回合"
+            );
+        }
+        else if(skill.category==="buff"){
+            parts.push(skill.description);
+        }
+
+        if(skill.category==="heal"){
+            let hpCoefficient=1.25;
+            let spCoefficient=.5;
+            try{
+                if(typeof HEALING_INT_COEFFICIENT!=="undefined"){
+                    hpCoefficient=HEALING_INT_COEFFICIENT;
+                }
+                if(typeof SP_HEALING_INT_COEFFICIENT!=="undefined"){
+                    spCoefficient=SP_HEALING_INT_COEFFICIENT;
+                }
+            }catch(error){}
+
+            const hpBase=Number(skill.baseHeal||0)+Number(skill.healPerLevel||0)*(level-1);
+            const spBase=Number(skill.baseHealSP||0)+Number(skill.healSPPerLevel||0)*(level-1);
+            parts.push(
+                "回復HP：基礎"+hpBase+"＋智力×"+hpCoefficient+
+                "；回復SP：基礎"+spBase+"＋智力×"+spCoefficient+
+                "（施放者本人不回復SP）"
+            );
+        }
+
+        const revivePercent=valueAtLevel(skill.reviveHealPercentByLevel,level);
+        if(skill.category==="revive" && revivePercent!==undefined){
+            parts.push("復活並恢復"+revivePercent+"%最大HP");
+        }
+
+        if(skill.category==="passive"){
+            parts.push(skill.description);
+        }
+
+        if(parts.length<1){
+            parts.push(skill.description||"依技能說明生效。");
+        }
+
+        return Array.from(new Set(parts.filter(Boolean)));
+    }
+
+    function buildCreationSkillLevelRows(skill){
+        const maxLevel=Math.max(1,Number(skill.maxLevel)||1);
+        const rows=[];
+
+        for(let level=1;level<=maxLevel;level++){
+            const details=skillLevelParts(skill,level);
+            rows.push(
+                '<div class="creation-skill-detail-level-row">'+
+                    '<b>Lv.'+level+'</b>'+
+                    '<span>'+details.map(escapeHTML).join("｜")+'</span>'+
+                '</div>'
+            );
+        }
+
+        return rows.join("");
+    }
+
+    function ensureCreationSkillDetailModal(){
+        let modal=byId("creationSkillDetailModal");
+        if(modal){
+            return modal;
+        }
+
+        const overlay=byId("game-overlay-layer");
+        if(!overlay){
+            return null;
+        }
+
+        modal=document.createElement("div");
+        modal.id="creationSkillDetailModal";
+        modal.setAttribute("role","dialog");
+        modal.setAttribute("aria-modal","true");
+        modal.setAttribute("aria-hidden","true");
+        modal.setAttribute("aria-labelledby","creationSkillDetailName");
+        modal.innerHTML=
+            '<div class="creation-skill-detail-box">'+
+                '<div class="creation-skill-detail-header">'+
+                    '<div id="creationSkillDetailGlyph" class="creation-skill-detail-glyph">技</div>'+
+                    '<div class="creation-skill-detail-heading">'+
+                        '<div id="creationSkillDetailName" class="creation-skill-detail-name">技能介紹</div>'+
+                        '<div id="creationSkillDetailPath" class="creation-skill-detail-path"></div>'+
+                    '</div>'+
+                    '<button id="creationSkillDetailX" class="creation-skill-detail-x" type="button" aria-label="關閉技能介紹">×</button>'+
+                '</div>'+
+                '<div id="creationSkillDetailTags" class="creation-skill-detail-tags"></div>'+
+                '<div id="creationSkillDetailDescription" class="creation-skill-detail-description"></div>'+
+                '<div id="creationSkillDetailMeta" class="creation-skill-detail-meta"></div>'+
+                '<div class="creation-skill-detail-section-title">各等級數值</div>'+
+                '<div id="creationSkillDetailLevels" class="creation-skill-detail-levels"></div>'+
+                '<button id="creationSkillDetailClose" class="creation-skill-detail-close" type="button">關閉</button>'+
+            '</div>';
+
+        overlay.appendChild(modal);
+
+        modal.addEventListener("click",function(event){
+            if(event.target===modal){
+                window.closeCreationSkillDetail();
+            }
+        });
+
+        byId("creationSkillDetailX").addEventListener("click",window.closeCreationSkillDetail);
+        byId("creationSkillDetailClose").addEventListener("click",window.closeCreationSkillDetail);
+        return modal;
+    }
+
+    let creationSkillDetailReturnFocus=null;
+
+    window.showCreationSkillDetail=function(skillId){
+        if(typeof skillDatabase==="undefined"){
+            return;
+        }
+
+        const skill=skillDatabase[skillId];
+        const modal=ensureCreationSkillDetailModal();
+        const page=byId("creationPage");
+        if(!skill || !modal || !page){
+            return;
+        }
+
+        creationSkillDetailReturnFocus=document.activeElement;
+        modal.dataset.element=skill.element||"fire";
+
+        const elementLabels={fire:"火",water:"水",wind:"風",earth:"土"};
+        byId("creationSkillDetailGlyph").textContent=elementLabels[skill.element]||"技";
+        byId("creationSkillDetailName").textContent=skill.name;
+        byId("creationSkillDetailPath").textContent=
+            (elementLabels[skill.element]||"元素")+"系 · "+
+            creationSkillCategoryLabel(skill.category);
+        byId("creationSkillDetailDescription").textContent=skill.description||"";
+
+        const tags=[
+            creationSkillCategoryLabel(skill.category),
+            creationSkillTargetLabel(skill.targetType),
+            "最高 Lv."+(skill.maxLevel||1)
+        ];
+        byId("creationSkillDetailTags").innerHTML=tags
+            .map(function(text){
+                return '<span class="creation-skill-detail-tag">'+escapeHTML(text)+'</span>';
+            })
+            .join("");
+
+        const meta=[];
+        const spCost=skill.spCost!==undefined?skill.spCost:skill.cost;
+        if(skill.category==="passive"){
+            meta.push("被動技能，不用裝備，學習後永久生效");
+        }
+        else if(spCost!==undefined){
+            meta.push("消耗 "+spCost+" SP");
+        }
+        if(skill.learnCost!==undefined){
+            meta.push("學習需要 "+skill.learnCost+" 技能點");
+        }
+        if(Array.isArray(skill.requires) && skill.requires.length){
+            meta.push(
+                "前置技能："+skill.requires
+                    .map(function(id){
+                        return skillDatabase[id]?skillDatabase[id].name:id;
+                    })
+                    .join("、")
+            );
+        }
+        byId("creationSkillDetailMeta").textContent=meta.join("｜");
+        byId("creationSkillDetailLevels").innerHTML=buildCreationSkillLevelRows(skill);
+        byId("creationSkillDetailLevels").scrollTop=0;
+
+        page.classList.add("creation-skill-detail-open");
+        page.inert=true;
+        page.setAttribute("aria-hidden","true");
+        modal.classList.add("show");
+        modal.setAttribute("aria-hidden","false");
+
+        window.setTimeout(function(){
+            const closeButton=byId("creationSkillDetailX");
+            if(closeButton){
+                closeButton.focus({preventScroll:true});
+            }
+        },0);
+    };
+
+    window.closeCreationSkillDetail=function(){
+        const modal=byId("creationSkillDetailModal");
+        const page=byId("creationPage");
+
+        if(modal){
+            modal.classList.remove("show");
+            modal.setAttribute("aria-hidden","true");
+        }
+
+        if(page){
+            page.classList.remove("creation-skill-detail-open");
+            page.inert=false;
+            page.removeAttribute("aria-hidden");
+        }
+
+        const focusTarget=creationSkillDetailReturnFocus;
+        creationSkillDetailReturnFocus=null;
+        window.setTimeout(function(){
+            if(
+                focusTarget &&
+                focusTarget.isConnected &&
+                page &&
+                window.getComputedStyle(page).display!=="none"
+            ){
+                focusTarget.focus({preventScroll:true});
+            }
+        },0);
+    };
+
+    document.addEventListener("keydown",function(event){
+        const modal=byId("creationSkillDetailModal");
+        if(event.key==="Escape" && modal && modal.classList.contains("show")){
+            event.preventDefault();
+            window.closeCreationSkillDetail();
+        }
+    });
+
+    function renderCreationShowcase(element){
+        const page=byId("creationPage");
+        if(!page){return;}
+
+        const chosen=META[element]?element:"fire";
+        const meta=META[chosen];
+        page.dataset.element=chosen;
+        page.dataset.gender=selectedGender;
+
+        const portrait=byId("creationPortrait");
+        if(portrait){
+            portrait.src=PORTRAITS[selectedGender][chosen];
+            portrait.alt=(chosen==="fire"?"火":chosen==="water"?"水":chosen==="wind"?"風":"土")+
+                "元素"+(selectedGender==="male"?"男性":"女性")+"角色立繪";
+        }
+
+        const labelMap={fire:"火元素",water:"水元素",wind:"風元素",earth:"土元素"};
+        if(byId("creationPortraitElement")){byId("creationPortraitElement").textContent=labelMap[chosen];}
+        if(byId("creationPortraitGender")){byId("creationPortraitGender").textContent=selectedGender==="male"?"少俠":"女俠";}
+        if(byId("creationElementBadge")){byId("creationElementBadge").textContent=meta.glyph;}
+        if(byId("creationElementTitle")){byId("creationElementTitle").textContent=meta.title;}
+        if(byId("creationElementRole")){byId("creationElementRole").textContent=meta.role;}
+        if(byId("creationElementDescription")){byId("creationElementDescription").textContent=meta.description;}
+
+        const tags=byId("creationElementTags");
+        if(tags){
+            tags.innerHTML="";
+            meta.tags.forEach(function(text){
+                const tag=document.createElement("span");
+                tag.className="creation-role-tag";
+                tag.textContent=text;
+                tags.appendChild(tag);
+            });
+        }
+
+    }
+
+    window.selectCreationGender=function(gender){
+        selectedGender=gender==="male"?"male":"female";
+
+        const female=byId("creationGenderFemale");
+        const male=byId("creationGenderMale");
+        if(female){female.classList.toggle("selected",selectedGender==="female");}
+        if(male){male.classList.toggle("selected",selectedGender==="male");}
+
+        let element="fire";
+        try{
+            if(typeof selectedCreationElement!=="undefined" && META[selectedCreationElement]){
+                element=selectedCreationElement;
+            }
+        }catch(error){}
+        renderCreationShowcase(element);
+    };
+
+    /* Keep one source of truth for element mechanics: use the existing selectElement().
+       This wrapper only adds the new creation-page visual refresh. */
+    if(typeof window.selectElement==="function"){
+        const originalSelectElement=window.selectElement;
+        window.selectElement=function(element){
+            const result=originalSelectElement.apply(this,arguments);
+            renderCreationShowcase(element);
+            return result;
+        };
+    }
+
+    /* Gender is presentation/profile data only. It does not alter any formulas.
+       Assign before the existing createCharacter() saves player. */
+    if(typeof window.createCharacter==="function"){
+        const originalCreateCharacter=window.createCharacter;
+        window.createCharacter=function(){
+            try{
+                if(
+                    typeof player!=="undefined" &&
+                    (
+                        typeof creationTargetSlot==="undefined" ||
+                        creationTargetSlot===1
+                    )
+                ){
+                    player.gender=selectedGender;
+                }
+            }catch(error){}
+            try{
+                return originalCreateCharacter.apply(this,arguments);
+            }finally{
+                /* 驗證失敗時創角頁仍會顯示，不能提前關掉手機垂直滑動。 */
+                syncCreationTouchMode();
+            }
+        };
+    }
+
+    if(typeof window.showCreation==="function"){
+        const originalShowCreation=window.showCreation;
+        window.showCreation=function(){
+            migrateCreationPageToNativeLayer();
+            try{
+                return originalShowCreation.apply(this,arguments);
+            }finally{
+                setCreationTouchMode(true);
+                installCreationGestureLock();
+                applyCreationStep(1);
+                renderCreationShowcase(
+                    (typeof selectedCreationElement!=="undefined" && META[selectedCreationElement])
+                    ? selectedCreationElement
+                    : "fire"
+                );
+            }
+        };
+    }
+
+    /* Existing saves do not contain gender. Defaulting to female is backward-compatible. */
+    try{
+        if(typeof player!=="undefined" && player && (player.gender==="male" || player.gender==="female")){
+            selectedGender=player.gender;
+        }
+    }catch(error){}
+
+    const initialElement=(function(){
+        try{
+            return (typeof selectedCreationElement!=="undefined" && META[selectedCreationElement])
+                ? selectedCreationElement
+                : "fire";
+        }catch(error){
+            return "fire";
+        }
+    })();
+
+    migrateCreationPageToNativeLayer();
+    installCreationGestureLock();
+    applyCreationStep(1);
+    window.selectCreationGender(selectedGender);
+    renderCreationShowcase(initialElement);
+    syncCreationTouchMode();
+
+    window.getCreationNativeLayoutDiagnostics=function(){
+        const page=migrateCreationPageToNativeLayer();
+        const shell=page && page.querySelector(".creation-premium-shell");
+        if(!page){return null;}
+        const pageStyle=window.getComputedStyle(page);
+        const shellStyle=shell?window.getComputedStyle(shell):null;
+        return {
+            parentId:page.parentElement?page.parentElement.id:null,
+            nativeWidth:pageStyle.width,
+            nativeHeight:pageStyle.height,
+            transform:pageStyle.transform,
+            overflowY:pageStyle.overflowY,
+            pointerEvents:pageStyle.pointerEvents,
+            shellPadding:shellStyle?shellStyle.padding:null,
+            migration:page.dataset.nativeMigration||null,
+            prepaint:page.dataset.nativePrepaint||null,
+            fixedMode:document.documentElement.classList.contains("creation-fixed-active"),
+            step:selectedCreationStep,
+            skillPreviewPresent:!!byId("creationPhysicalSkills")
+        };
+    };
+
+    /* 第二／三角色共用創角頁時，取消或完成後也要能主動解除
+       Android 的固定創角手勢模式。 */
+    window.syncCreationTouchMode=syncCreationTouchMode;
+
+    /* No MutationObserver / extra touch listeners.
+       A second sync after current call stack covers loadGame() timing safely. */
+    window.setTimeout(syncCreationTouchMode,0);
+})();
+
+
+/* bundled source: js/20-anonymous-20.js */
+/* Critical/feature boundary owner. No global input lock and no network-order patch chain. */
+const V_ASSET_VERSION="173.70";
+
+(function installFeatureIntentBoundary(){
+    "use strict";
+    if(window.__fourSymbolsFeatureIntentInstalled){ return; }
+    window.__fourSymbolsFeatureIntentInstalled=true;
+
+    const rules=[
+        {pattern:/showPage\(['"]map|openMap|patrol/i,feature:"patrol",label:"巡怪"},
+        {pattern:/showPage\(['"]inventory|open.*inventory|backpack/i,feature:"inventory",label:"背包"},
+        {pattern:/equipment|reforge/i,feature:"equipment",label:"裝備"},
+        {pattern:/showPage\(['"]dungeon|dungeon/i,feature:"dungeon",label:"副本"},
+        {pattern:/abyss/i,feature:"abyss",label:"深淵"},
+        {pattern:/boss|tower/i,feature:"boss-tower",label:"四象塔"},
+        {pattern:/relic/i,feature:"relic",label:"秘寶"},
+        {pattern:/skill/i,feature:"skill",label:"技能"},
+        {pattern:/shop/i,feature:"shop",label:"商店"},
+        {pattern:/synth/i,feature:"synthesis",label:"合成"},
+        {pattern:/battle/i,feature:"battle",label:"戰鬥"}
+    ];
+    function target(event){ return event.target&&event.target.closest&&event.target.closest("button,a,[data-feature]"); }
+    function isExpPoolInteraction(element){
+        return !!(element&&element.closest&&element.closest("#homeExpPoolCard"));
+    }
+    function descriptor(element){
+        if(!element){ return null; }
+        /* 經驗池本身屬於主城 app-shell，但「預覽升級＋二次確認」owner 在
+           gameplay-core。自從 gameplay-core 改成 lazy 後，若不先載入 owner，
+           舊的即時分配按鈕就可能在防呆安裝前被點到。 */
+        if(isExpPoolInteraction(element)){
+            return {feature:"battle",label:"經驗池安全升級",expPool:true};
+        }
+        const explicit=element.dataset&&element.dataset.feature;
+        if(explicit){ return {feature:explicit,label:element.getAttribute("aria-label")||element.textContent||explicit}; }
+        const signature=[element.id,element.className,element.getAttribute&&element.getAttribute("onclick"),element.textContent].join(" ");
+        return rules.find(rule=>rule.pattern.test(signature))||null;
+    }
+    function loader(){ return window.FourSymbolsFeatures; }
+    function setLocalLoading(element,active,label){
+        if(!element){ return; }
+        element.classList.toggle("is-feature-loading",active);
+        element.setAttribute("aria-busy",active?"true":"false");
+        if(active){ element.dataset.featureLoadingLabel="正在載入"+(label||"功能")+"…"; }
+        else{ delete element.dataset.featureLoadingLabel; }
+    }
+
+    let expPoolPrimePromise=null;
+    let expPoolSafetyUiReady=false;
+    function refreshExpPoolSafetyUiOnce(){
+        if(expPoolSafetyUiReady){ return; }
+        expPoolSafetyUiReady=true;
+        if(typeof window.renderExpDistributeList==="function"){
+            window.renderExpDistributeList();
+        }
+        if(typeof window.v173DecorateExpPoolDistributionUi==="function"){
+            window.v173DecorateExpPoolDistributionUi();
+        }
+        const pool=document.getElementById("homeExpPoolCard");
+        if(pool){ pool.dataset.expSafetyOwner="ready"; }
+    }
+    function primeExpPoolSafety(){
+        const pool=document.getElementById("homeExpPoolCard");
+        const api=loader();
+        if(!pool||!api){ return; }
+        const visible=!pool.hidden&&window.getComputedStyle(pool).display!=="none"&&pool.getClientRects().length>0;
+        if(!visible){ return; }
+        if(api.isReady("battle")){
+            refreshExpPoolSafetyUiOnce();
+            return;
+        }
+        if(expPoolPrimePromise){ return; }
+        setLocalLoading(pool,true,"經驗池安全升級");
+        expPoolPrimePromise=api.ensure("battle","exp-pool-safety").then(()=>{
+            setLocalLoading(pool,false);
+            refreshExpPoolSafetyUiOnce();
+        }).catch(error=>{
+            setLocalLoading(pool,false);
+            console.error("EXP pool safety owner failed to load:",error);
+            document.dispatchEvent(new CustomEvent("four-symbols:feature-local-error",{detail:{feature:"battle",error}}));
+        }).finally(()=>{ expPoolPrimePromise=null; });
+    }
+    function prefetch(event){
+        const element=target(event); const info=descriptor(element); const api=loader();
+        if(info&&api&&!api.isReady(info.feature)){ void api.prefetch(info.feature,event.type); }
+    }
+    function enter(event){
+        const element=target(event); const info=descriptor(element); const api=loader();
+        if(!info||!api||api.isReady(info.feature)||element.dataset.featureReplay==="1"){ return; }
+        event.preventDefault(); event.stopImmediatePropagation();
+        if(element.dataset.featureLoading==="1"){ return; }
+        element.dataset.featureLoading="1"; setLocalLoading(element,true,info.label);
+        api.ensure(info.feature,info.expPool?"exp-pool-safety":"navigation").then(()=>{
+            delete element.dataset.featureLoading; setLocalLoading(element,false);
+            if(info.expPool){
+                /* 不 replay 舊 DOM 上可能仍指向 immediate distribute 的 handler。
+                   先由正式 owner 重繪成「預覽 → 確認」UI，玩家再點一次才會花 EXP。 */
+                refreshExpPoolSafetyUiOnce();
+                return;
+            }
+            element.dataset.featureReplay="1"; element.click(); delete element.dataset.featureReplay;
+        }).catch(error=>{
+            delete element.dataset.featureLoading; setLocalLoading(element,false);
+            console.error("Feature failed to load:",info.feature,error);
+            document.dispatchEvent(new CustomEvent("four-symbols:feature-local-error",{detail:{feature:info.feature,error}}));
+        });
+    }
+    document.addEventListener("pointerdown",prefetch,{capture:true,passive:true});
+    document.addEventListener("touchstart",prefetch,{capture:true,passive:true});
+    document.addEventListener("click",enter,true);
+    document.addEventListener("click",()=>setTimeout(primeExpPoolSafety,0),true);
+    document.addEventListener("four-symbols:startup-ready",()=>{
+        const api=loader();
+        if(api){
+            try{if(performance&&typeof performance.mark==="function"){performance.mark("four-symbols:background-prefetch-start");}}catch(_){ }
+            api.idle(["inventory","shop","equipment","synthesis","relic"],["relicIcons"]).then(result=>{
+                try{if(Array.isArray(result)&&result.at(-1)&&performance&&typeof performance.mark==="function"){performance.mark("four-symbols:relic-prefetch-ready");}}catch(_){ }
+                return api.idle(["patrol","skill"]);
+            }).then(()=>{try{if(performance&&typeof performance.mark==="function"){performance.mark("four-symbols:background-prefetch-idle");}}catch(_){ }});
+        }
+        primeExpPoolSafety();
+    },{once:true});
+
+    function installExpPoolVisibilityObserver(){
+        if(!document.body||typeof MutationObserver==="undefined"){ return; }
+        const observer=new MutationObserver(()=>{
+            if(expPoolSafetyUiReady){ return; }
+            primeExpPoolSafety();
+        });
+        observer.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:["class","style","hidden"]});
+        primeExpPoolSafety();
+    }
+    if(document.readyState==="loading"){
+        document.addEventListener("DOMContentLoaded",installExpPoolVisibilityObserver,{once:true});
+    }else{
+        installExpPoolVisibilityObserver();
+    }
+})();
+
+(function initBattleElementBoxDrag(){
+    function bind(){
+        const button=document.getElementById("battleElementBoxButton");
+        const page=document.getElementById("battlePage");
+        if(!button||!page||button.dataset.dragReady==="1"){ return; }
+        button.dataset.dragReady="1";
+        let drag=null; let suppressClick=false; const threshold=5;
+        function logicalScale(){
+            const rect=page.getBoundingClientRect();
+            return {rect,sx:rect.width?page.clientWidth/rect.width:1,sy:rect.height?page.clientHeight/rect.height:1};
+        }
+        button.addEventListener("pointerdown",event=>{
+            if(event.pointerType==="mouse"&&event.button!==0){ return; }
+            const scale=logicalScale(); const bounds=button.getBoundingClientRect();
+            drag={pointerId:event.pointerId,x:event.clientX,y:event.clientY,left:(bounds.left-scale.rect.left)*scale.sx,top:(bounds.top-scale.rect.top)*scale.sy,sx:scale.sx,sy:scale.sy,moved:false};
+            suppressClick=false; button.classList.add("dragging");
+            try{ button.setPointerCapture(event.pointerId); }catch(_){ }
+            event.preventDefault();
+        });
+        button.addEventListener("pointermove",event=>{
+            if(!drag||event.pointerId!==drag.pointerId){ return; }
+            const dx=event.clientX-drag.x,dy=event.clientY-drag.y;
+            if(!drag.moved&&Math.hypot(dx,dy)>=threshold){ drag.moved=true; }
+            if(!drag.moved){ return; }
+            const left=Math.max(0,Math.min(Math.max(0,page.clientWidth-button.offsetWidth),drag.left+dx*drag.sx));
+            const top=Math.max(0,Math.min(Math.max(0,page.clientHeight-button.offsetHeight),drag.top+dy*drag.sy));
+            button.style.setProperty("left",left+"px","important"); button.style.setProperty("top",top+"px","important");
+            button.style.setProperty("bottom","auto","important"); event.preventDefault();
+        });
+        function finish(event){
+            if(!drag||event.pointerId!==drag.pointerId){ return; }
+            suppressClick=drag.moved; drag=null; button.classList.remove("dragging"); event.preventDefault();
+        }
+        button.addEventListener("pointerup",finish); button.addEventListener("pointercancel",finish);
+        button.addEventListener("click",event=>{
+            if(suppressClick){ suppressClick=false; event.preventDefault(); event.stopPropagation(); return; }
+            if(typeof openHomeFeature==="function"){ openHomeFeature("autoBattleSettings"); }
+        });
+        button.addEventListener("dragstart",event=>event.preventDefault());
+    }
+    if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",bind,{once:true}); }else{ bind(); }
+})();
+
+
+/* bundled source: js/61-v174-ui-regression-guards.js */
+/* =====================================================
+   V174 — dynamic UI regression guards
+   Owner for cross-cutting UI invariants created by multiple late runtimes:
+   1) skill learn/upgrade action cards must stay compact;
+   2) dark text on bright gold/yellow buttons must not have a text shadow;
+   3) system save/delete subflows must always offer an explicit return path.
+
+   No gameplay, save, battle, skill-cost or equipment business rules live here.
+===================================================== */
+(function installV174UiRegressionGuards(){
+    "use strict";
+
+    if(typeof window==="undefined"||typeof document==="undefined"||window.__v174UiRegressionGuardsInstalled){
+        return;
+    }
+    window.__v174UiRegressionGuardsInstalled=true;
+
+    let rafId=0;
+
+    function compactSkillActionLabel(source){
+        const text=String(source||"").replace(/\s+/g," ").trim();
+        if(!text){ return text; }
+
+        let match=text.match(/^角色\s*Lv\s*(\d+)\s*可升至技能\s*Lv\s*(\d+)/i);
+        if(match){ return "Lv"+match[1]+" 解鎖"; }
+
+        match=text.match(/^升至\s*Lv\s*(\d+)\s*需要\s*(\d+)\s*技能點/i);
+        if(match){ return "需 "+match[2]+" 點"; }
+
+        match=text.match(/^升至\s*Lv\s*(\d+)\s*[・·]\s*(\d+)\s*點/i);
+        if(match){ return "升 Lv"+match[1]+"・"+match[2]+"點"; }
+
+        match=text.match(/^學習\s*[・·]\s*(\d+)\s*點/i);
+        if(match){ return "學習・"+match[1]+"點"; }
+
+        match=text.match(/Lv\s*(\d+)\s*解鎖/i);
+        if(match){ return "Lv"+match[1]+" 解鎖"; }
+
+        match=text.match(/需要\s*(\d+)\s*技能點/i);
+        if(match){ return "需 "+match[1]+" 點"; }
+
+        if(/前置[:：]/.test(text)){ return "需前置"; }
+        return text;
+    }
+
+    function normalizeSkillActionCards(){
+        const labels=document.querySelectorAll("#allSkillsList .skill-action-card .skill-action-card-label");
+        labels.forEach(label=>{
+            const card=label.closest(".skill-action-card");
+            if(!card){ return; }
+
+            const current=String(label.textContent||"").replace(/\s+/g," ").trim();
+            const previousCompact=label.dataset.v174CompactLabel||"";
+            if(current!==previousCompact){
+                const full=current;
+                const compact=compactSkillActionLabel(full);
+                label.dataset.v174FullLabel=full;
+                label.dataset.v174CompactLabel=compact;
+                if(compact!==full){ label.textContent=compact; }
+                card.title=full;
+                card.setAttribute("aria-label",full);
+            }
+
+            if(card.style.getPropertyValue("width")!=="104px"||card.style.getPropertyPriority("width")!=="important"){
+                card.style.setProperty("width","104px","important");
+                card.style.setProperty("max-width","104px","important");
+                card.style.setProperty("min-width","84px","important");
+                card.style.setProperty("flex-basis","104px","important");
+            }
+        });
+    }
+
+    function colorTriples(value){
+        const triples=[];
+        String(value||"").replace(/rgba?\(\s*(\d+(?:\.\d+)?)\s*[, ]\s*(\d+(?:\.\d+)?)\s*[, ]\s*(\d+(?:\.\d+)?)(?:\s*[,/]\s*(\d*(?:\.\d+)?))?\s*\)/gi,
+            function(_,r,g,b,a){
+                const alpha=a===""||a===undefined?1:Number(a);
+                triples.push({r:Number(r),g:Number(g),b:Number(b),a:Number.isFinite(alpha)?alpha:1});
+                return _;
+            }
+        );
+        return triples;
+    }
+
+    function luminance(color){
+        return color.r*.2126+color.g*.7152+color.b*.0722;
+    }
+
+    function isBrightGold(color){
+        return color.a>.05&&
+            color.r>=145&&
+            color.g>=90&&
+            color.g<=225&&
+            color.b<=145&&
+            color.r>=color.g&&
+            luminance(color)>=115;
+    }
+
+    function isDarkText(color){
+        return color&&color.a>.05&&luminance(color)<=115;
+    }
+
+    function normalizeGoldButtonTextShadows(){
+        document.querySelectorAll("#game-stage button, #creationPage button").forEach(button=>{
+            const style=window.getComputedStyle(button);
+            const textColor=colorTriples(style.color)[0];
+            const backgroundColors=colorTriples(style.backgroundColor+" "+style.backgroundImage);
+            const qualifies=isDarkText(textColor)&&backgroundColors.some(isBrightGold);
+
+            if(qualifies){
+                if(button.dataset.v174DarkGoldShadow!=="1"||style.textShadow!=="none"){
+                    button.style.setProperty("text-shadow","none","important");
+                    button.dataset.v174DarkGoldShadow="1";
+                }
+            }else if(button.dataset.v174DarkGoldShadow==="1"){
+                button.style.removeProperty("text-shadow");
+                delete button.dataset.v174DarkGoldShadow;
+            }
+        });
+    }
+
+    function ensureStylesheetLast(){
+        const link=document.getElementById("v174-critical-ui-regression-style");
+        if(link&&link.parentElement===document.head&&link!==document.head.lastElementChild){
+            document.head.appendChild(link);
+        }
+    }
+
+    function systemRowTitle(button){
+        const row=button&&button.closest&&button.closest(".system-panel-row");
+        const title=row&&row.querySelector("strong");
+        return String(title&&title.textContent||"").trim();
+    }
+
+    async function ensureRpgDialogOwner(reason){
+        if(typeof window.rpgAlert==="function"&&typeof window.rpgConfirm==="function"){ return true; }
+        if(window.FourSymbolsFeatures&&typeof window.FourSymbolsFeatures.ensure==="function"){
+            try{ await window.FourSymbolsFeatures.ensure("gameplay-core",reason||"system-dialog"); }
+            catch(error){ console.error("System dialog owner failed to load:",error); }
+        }
+        return typeof window.rpgAlert==="function"&&typeof window.rpgConfirm==="function";
+    }
+
+    async function runSystemSaveAction(button){
+        if(button.dataset.v174SystemBusy==="1"){ return; }
+        button.dataset.v174SystemBusy="1";
+        button.disabled=true;
+        try{
+            const saved=typeof window.saveGame==="function"?window.saveGame():false;
+            const ready=await ensureRpgDialogOwner("system-save-feedback");
+            const success=saved!==false;
+            if(ready){
+                await window.rpgAlert(
+                    success?"已完成手動存檔。":"目前無法完成手動存檔。",
+                    {title:"遊戲存檔",confirmText:"返回系統",tone:success?"success":"normal"}
+                );
+            }else if(typeof window.alert==="function"){
+                window.alert(success?"已完成手動存檔。":"目前無法完成手動存檔。");
+            }
+        }finally{
+            delete button.dataset.v174SystemBusy;
+            button.disabled=false;
+        }
+    }
+
+    async function runSystemDeleteAction(button){
+        if(button.dataset.v174SystemBusy==="1"){ return; }
+        button.dataset.v174SystemBusy="1";
+        button.disabled=true;
+        try{
+            const ready=await ensureRpgDialogOwner("system-delete-confirm");
+            if(ready&&typeof window.resetGame==="function"){
+                await window.resetGame();
+            }
+        }finally{
+            delete button.dataset.v174SystemBusy;
+            button.disabled=false;
+        }
+    }
+
+    function interceptSystemAction(event){
+        const button=event.target&&event.target.closest&&event.target.closest(".system-panel-row .home-feature-buy-btn");
+        if(!button){ return; }
+        const title=systemRowTitle(button);
+        if(title!=="遊戲存檔"&&title!=="刪除角色"){ return; }
+
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        if(title==="遊戲存檔"){ void runSystemSaveAction(button); }
+        else{ void runSystemDeleteAction(button); }
+    }
+
+    function normalizeSystemDialogNavigation(){
+        const layer=document.getElementById("v169RpgDialogLayer");
+        if(!layer||!layer.classList.contains("show")){ return; }
+        const title=layer.querySelector("#v169RpgDialogTitle");
+        if(String(title&&title.textContent||"").trim()!=="刪除角色"){ return; }
+        const cancel=layer.querySelector(".v169-rpg-dialog-actions .v169-rpg-dialog-button.secondary");
+        if(cancel&&!cancel.hidden&&cancel.textContent!=="返回系統"){
+            cancel.textContent="返回系統";
+            cancel.setAttribute("aria-label","返回系統，不刪除角色");
+        }
+    }
+
+    function apply(){
+        normalizeSkillActionCards();
+        normalizeGoldButtonTextShadows();
+        normalizeSystemDialogNavigation();
+        ensureStylesheetLast();
+    }
+
+    function schedule(){
+        if(rafId){ return; }
+        rafId=requestAnimationFrame(()=>{
+            rafId=0;
+            apply();
+        });
+    }
+
+    const observer=new MutationObserver(schedule);
+    observer.observe(document.body,{
+        childList:true,
+        subtree:true,
+        characterData:true,
+        attributes:true,
+        attributeFilter:["class","style","disabled"]
+    });
+
+    document.addEventListener("click",interceptSystemAction,true);
+    document.addEventListener("click",schedule,{passive:true});
+    document.addEventListener("v173:runtime-ready",schedule,{passive:true});
+    window.addEventListener("resize",schedule,{passive:true});
+
+    if(document.readyState==="loading"){
+        document.addEventListener("DOMContentLoaded",schedule,{once:true});
+    }else{
+        schedule();
+    }
+
+    window.v174ApplyUiRegressionGuards=schedule;
+})();
+
+
+/* bundled source: js/release-update-notification.js */
+/*
+   Release Update Notification System
+   ----------------------------------
+   Player-facing release notices are owned by release/release-update.json.
+   This app-shell module deliberately reuses #homeFeatureModal and the native
+   #game-overlay-layer; it does not introduce a second modal or announcement
+   framework.
+*/
+(function installReleaseUpdateNotification(global){
+    "use strict";
+
+    if(!global||global.FourSymbolsReleaseUpdate){ return; }
+
+    const RELEASE_NOTICE_PATH="release/release-update.json";
+    const CHECK_INTERVAL_MS=4*60*1000;
+    const MIN_CHECK_GAP_MS=45*1000;
+    const REMINDER_COOLDOWN_MS=20*60*1000;
+    const REQUEST_TIMEOUT_MS=8000;
+    const PENDING_RECHECK_MS=1500;
+    const STORAGE_NAMESPACE="four-symbols:release-update:";
+    const DEV_PREVIEW_QUERY="releaseUpdatePreview";
+    const DEV_PREVIEW_HOSTS=new Set([
+        "dev.four-symbols-dev.pages.dev",
+        "localhost",
+        "127.0.0.1",
+        "::1"
+    ]);
+
+    const state={
+        started:false,
+        checking:null,
+        lastCheckAt:0,
+        manifest:null,
+        loadedReleaseVersion:null,
+        marquee:null,
+        pollTimer:null,
+        pendingTimer:null,
+        pendingNormalReload:false,
+        pendingForcedUpdate:false,
+        pendingAnnouncement:false,
+        loginAnnouncementShown:false,
+        forcedModalLock:false,
+        modalOpen:false,
+        modalKind:null,
+        devPreviewMode:null,
+        criticalOperations:new Map(),
+        nextOperationId:1
+    };
+
+    function now(){ return Date.now(); }
+
+    function getLocationHostname(){
+        try{
+            const location=global.location;
+            const hostname=String(location&&location.hostname||"")
+                .trim()
+                .toLowerCase()
+                .replace(/^\[|\]$/g,"");
+            if(hostname){ return hostname; }
+            const href=String(location&&location.href||"");
+            return href?new URL(href).hostname.toLowerCase().replace(/^\[|\]$/g,""):"";
+        }catch(_){ return ""; }
+    }
+
+    function getDevPreviewMode(){
+        if(!DEV_PREVIEW_HOSTS.has(getLocationHostname())){ return null; }
+        try{
+            const location=global.location;
+            const base=(global.document&&global.document.baseURI)||(location&&location.href)||undefined;
+            const mode=new URL(String(location&&location.href||""),base)
+                .searchParams
+                .get(DEV_PREVIEW_QUERY);
+            return mode==="marquee"||mode==="modal"?mode:null;
+        }catch(_){ return null; }
+    }
+
+    function normalizeVersion(value){
+        const raw=String(value==null?"":value).trim().replace(/^V/i,"");
+        return raw ? "V"+raw : "";
+    }
+
+    function parseVersion(value){
+        const normalized=normalizeVersion(value).replace(/^V/,"");
+        if(!/^\d+(?:\.\d+)+$/.test(normalized)){ return null; }
+        return normalized.split(".").map(part=>Number(part));
+    }
+
+    function compareVersions(left,right){
+        const a=parseVersion(left);
+        const b=parseVersion(right);
+        if(!a||!b){ return null; }
+        const length=Math.max(a.length,b.length);
+        for(let index=0;index<length;index++){
+            const delta=(a[index]||0)-(b[index]||0);
+            if(delta!==0){ return delta>0?1:-1; }
+        }
+        return 0;
+    }
+
+    function escapeHtml(value){
+        return String(value==null?"":value)
+            .replace(/&/g,"&amp;")
+            .replace(/</g,"&lt;")
+            .replace(/>/g,"&gt;")
+            .replace(/\"/g,"&quot;")
+            .replace(/'/g,"&#039;");
+    }
+
+    function getLoadedReleaseVersion(){
+        const build=global.__FOUR_SYMBOLS_BUILD__;
+        const value=build&&build.release;
+        return normalizeVersion(value);
+    }
+
+    function getStorage(){
+        try{ return global.localStorage||null; }
+        catch(_){ return null; }
+    }
+
+    function storageKey(suffix){
+        const repository=global.FourSymbolsAccountSave;
+        try{
+            if(repository&&typeof repository.accountKey==="function"){
+                return repository.accountKey("release-update-"+suffix);
+            }
+        }catch(_){ }
+        return STORAGE_NAMESPACE+suffix;
+    }
+
+    function readStorage(suffix){
+        const storage=getStorage();
+        if(!storage){ return null; }
+        try{ return storage.getItem(storageKey(suffix)); }
+        catch(_){ return null; }
+    }
+
+    function writeStorage(suffix,value){
+        const storage=getStorage();
+        if(!storage){ return; }
+        try{ storage.setItem(storageKey(suffix),String(value)); }
+        catch(_){ }
+    }
+
+    function removeStorage(suffix){
+        const storage=getStorage();
+        if(!storage){ return; }
+        try{
+            if(typeof storage.removeItem==="function"){ storage.removeItem(storageKey(suffix)); }
+        }catch(_){ }
+    }
+
+    function localDateKey(value){
+        const date=new Date(value==null?now():value);
+        if(Number.isNaN(date.getTime())){ return ""; }
+        const yyyy=date.getFullYear();
+        const mm=String(date.getMonth()+1).padStart(2,"0");
+        const dd=String(date.getDate()).padStart(2,"0");
+        return yyyy+"-"+mm+"-"+dd;
+    }
+
+    function readTodaySuppression(){
+        try{
+            const value=JSON.parse(readStorage("suppress-today")||"null");
+            return value&&typeof value==="object"?value:null;
+        }catch(_){ return null; }
+    }
+
+    function isCurrentNoticeSuppressedToday(manifest){
+        if(!manifest){ return false; }
+        const value=readTodaySuppression();
+        return !!(
+            value&&
+            value.noticeId===manifest.noticeId&&
+            value.dateKey===localDateKey()
+        );
+    }
+
+    function setCurrentNoticeSuppressedToday(enabled){
+        const manifest=state.manifest;
+        if(!manifest){ return; }
+        if(enabled){
+            writeStorage("suppress-today",JSON.stringify({
+                noticeId:manifest.noticeId,
+                dateKey:localDateKey()
+            }));
+        }else{
+            removeStorage("suppress-today");
+        }
+    }
+
+    function validateManifest(value){
+        if(!value||typeof value!=="object"||Array.isArray(value)){ return null; }
+        const releaseVersion=normalizeVersion(value.releaseVersion);
+        const updateMode=value.updateMode;
+        const minimumVersion=value.minimumVersion===null||value.minimumVersion===undefined||value.minimumVersion===""
+            ? null
+            : normalizeVersion(value.minimumVersion);
+        const content=Array.isArray(value.content)?value.content:null;
+        if(
+            value.schemaVersion!==1||
+            typeof value.publicNotice!=="boolean"||
+            !parseVersion(releaseVersion)||
+            typeof value.noticeId!=="string"||!value.noticeId.trim()||
+            typeof value.title!=="string"||!value.title.trim()||
+            typeof value.summary!=="string"||!value.summary.trim()||
+            !content||content.length===0||content.some(item=>typeof item!=="string"||!item.trim())||
+            typeof value.publishedAt!=="string"||!value.publishedAt.trim()||
+            !Number.isFinite(Date.parse(value.publishedAt))||
+            (updateMode!=="normal"&&updateMode!=="forced")||
+            (minimumVersion!==null&&!parseVersion(minimumVersion))
+        ){
+            return null;
+        }
+        return {
+            schemaVersion:1,
+            publicNotice:value.publicNotice,
+            releaseVersion,
+            noticeId:value.noticeId.trim(),
+            title:value.title.trim(),
+            summary:value.summary.trim(),
+            content:content.map(item=>item.trim()),
+            publishedAt:value.publishedAt,
+            updateMode,
+            minimumVersion
+        };
+    }
+
+    function hasUnreadReleaseNotice(){
+        const manifest=state.manifest;
+        const loaded=state.loadedReleaseVersion||getLoadedReleaseVersion();
+        if(!manifest||!manifest.publicNotice||!loaded){ return false; }
+        if(compareVersions(loaded,manifest.releaseVersion)!==0){ return false; }
+        return (
+            readStorage("last-seen-version")!==manifest.releaseVersion||
+            readStorage("last-seen-notice")!==manifest.noticeId
+        );
+    }
+
+    function markCurrentNoticeSeen(){
+        const manifest=state.manifest;
+        if(!manifest){ return; }
+        writeStorage("last-seen-version",manifest.releaseVersion);
+        writeStorage("last-seen-notice",manifest.noticeId);
+        refreshNotificationDots();
+    }
+
+    function shouldAutoShowLoginAnnouncement(manifest){
+        const loaded=state.loadedReleaseVersion||getLoadedReleaseVersion();
+        if(
+            state.loginAnnouncementShown||
+            state.pendingAnnouncement||
+            !manifest||
+            !manifest.publicNotice||
+            !loaded||
+            compareVersions(loaded,manifest.releaseVersion)!==0
+        ){
+            return false;
+        }
+        return !isCurrentNoticeSuppressedToday(manifest);
+    }
+
+    function isSharedModalAvailableForAnnouncement(){
+        const parts=getSharedModalParts();
+        return !!(
+            parts&&
+            (!parts.modal.classList||!parts.modal.classList.contains("show"))
+        );
+    }
+
+    function readReminder(){
+        try{
+            const value=JSON.parse(readStorage("last-reminder")||"null");
+            return value&&typeof value==="object"?value:null;
+        }catch(_){ return null; }
+    }
+
+    function shouldShowReminder(manifest){
+        const reminder=readReminder();
+        return !reminder||reminder.noticeId!==manifest.noticeId||now()-Number(reminder.at||0)>=REMINDER_COOLDOWN_MS;
+    }
+
+    function rememberReminder(manifest){
+        writeStorage("last-reminder",JSON.stringify({noticeId:manifest.noticeId,at:now()}));
+    }
+
+    function getUnsafeReasons(){
+        const reasons=[];
+        try{
+            if(typeof battleActive!=="undefined"&&battleActive){ reasons.push("battle"); }
+            if(typeof battlePhase!=="undefined"&&battlePhase==="resolve"){ reasons.push("battle-resolution"); }
+        }catch(_){ }
+        try{
+            if(
+                global.FourSymbolsBattleFlow&&
+                typeof global.FourSymbolsBattleFlow.isPresentationActive==="function"&&
+                global.FourSymbolsBattleFlow.isPresentationActive()
+            ){
+                reasons.push("battle-presentation");
+            }
+        }catch(_){ }
+        if(state.criticalOperations.size){ reasons.push("critical-operation"); }
+
+        const documentRef=global.document;
+        if(!documentRef||typeof documentRef.getElementById!=="function"){ return reasons; }
+        const reward=documentRef.getElementById("v132RewardModal");
+        if(reward&&reward.classList&&reward.classList.contains("show")){ reasons.push("reward"); }
+        const dialog=documentRef.getElementById("v169RpgDialogLayer");
+        if(dialog&&dialog.classList&&dialog.classList.contains("show")){ reasons.push("transaction-dialog"); }
+        const modal=documentRef.getElementById("homeFeatureModal");
+        if(
+            modal&&modal.classList&&modal.classList.contains("show")&&
+            !modal.classList.contains("release-update-modal")&&
+            (
+                modal.classList.contains("v141-synthesis-modal")||
+                modal.classList.contains("v131-shop-open")||
+                modal.classList.contains("team-relic-modal")
+            )
+        ){
+            reasons.push("high-value-feature");
+        }
+        return reasons;
+    }
+
+    function canSafelyReloadForUpdate(){
+        return getUnsafeReasons().length===0;
+    }
+
+    function beginCriticalOperation(label){
+        const operationId=state.nextOperationId++;
+        let active=true;
+        state.criticalOperations.set(operationId,String(label||"critical-operation"));
+        return function endCriticalOperation(){
+            if(!active){ return; }
+            active=false;
+            state.criticalOperations.delete(operationId);
+            resolvePendingWhenSafe();
+        };
+    }
+
+    function getOverlayLayer(){
+        const documentRef=global.document;
+        return documentRef&&documentRef.getElementById
+            ? documentRef.getElementById("game-overlay-layer")
+            : null;
+    }
+
+    function ensureMarquee(){
+        if(state.marquee&&state.marquee.isConnected!==false){ return state.marquee; }
+        const documentRef=global.document;
+        const layer=getOverlayLayer();
+        if(!documentRef||!layer||typeof documentRef.createElement!=="function"){ return null; }
+        const marquee=documentRef.createElement("button");
+        marquee.type="button";
+        marquee.id="releaseUpdateMarquee";
+        marquee.className="release-update-marquee";
+        marquee.setAttribute("aria-live","polite");
+        marquee.setAttribute("aria-label","查看版本更新內容");
+        marquee.innerHTML=
+            '<span class="release-update-marquee-tag">更新</span>'+
+            '<span class="release-update-marquee-text"></span>'+
+            '<span class="release-update-marquee-action">查看</span>';
+        marquee.addEventListener("click",()=>{
+            const manifest=state.manifest;
+            if(!manifest){ return; }
+            if(state.devPreviewMode){
+                openReleaseDetail(isForcedForLoadedVersion(manifest)?"forced":"preview");
+                return;
+            }
+            if(isForcedForLoadedVersion(manifest)&&!canSafelyReloadForUpdate()){
+                showMarquee(manifest,"forced-pending");
+                schedulePendingResolution();
+                return;
+            }
+            openReleaseDetail(isForcedForLoadedVersion(manifest)?"forced":"update");
+        });
+        layer.appendChild(marquee);
+        state.marquee=marquee;
+        return marquee;
+    }
+
+    function showMarquee(manifest,kind){
+        const marquee=ensureMarquee();
+        if(!marquee||!manifest){ return; }
+        const tag=marquee.querySelector(".release-update-marquee-tag");
+        const text=marquee.querySelector(".release-update-marquee-text");
+        const action=marquee.querySelector(".release-update-marquee-action");
+        const pending=kind==="normal-pending"||kind==="forced-pending";
+        if(tag){ tag.textContent=kind&&kind.indexOf("forced")===0?"重要更新":"更新"; }
+        if(text){
+            text.textContent=pending
+                ? manifest.releaseVersion+" 已發布；目前操作完成後將自動進行更新。"
+                : manifest.releaseVersion+" 已發布，"+manifest.summary;
+        }
+        if(action){ action.textContent=pending?"待更新":"查看"; }
+        marquee.classList.toggle("is-forced",kind&&kind.indexOf("forced")===0);
+        marquee.classList.toggle("is-pending",!!pending);
+        marquee.hidden=false;
+    }
+
+    function hideMarquee(){
+        if(state.marquee){ state.marquee.hidden=true; }
+    }
+
+    function isForcedForLoadedVersion(manifest){
+        const loaded=state.loadedReleaseVersion||getLoadedReleaseVersion();
+        if(!manifest||!loaded){ return false; }
+        if(manifest.updateMode==="forced"){ return true; }
+        return !!(
+            manifest.minimumVersion&&
+            compareVersions(loaded,manifest.minimumVersion)!==null&&
+            compareVersions(loaded,manifest.minimumVersion)<0
+        );
+    }
+
+    function getSharedModalParts(){
+        const documentRef=global.document;
+        if(!documentRef||typeof documentRef.getElementById!=="function"){ return null; }
+        const modal=documentRef.getElementById("homeFeatureModal");
+        const title=documentRef.getElementById("homeFeatureModalTitle");
+        const body=documentRef.getElementById("homeFeatureModalBody");
+        if(!modal||!title||!body){ return null; }
+        return {modal,title,body};
+    }
+
+    function renderReleaseContent(manifest,kind){
+        const forced=kind==="forced";
+        const preview=kind==="preview";
+        const update=kind==="update";
+        const intro=preview
+            ? "目前為開發預覽模式；此畫面只用於檢查更新公告，不會重新載入遊戲。"
+            : forced
+                ? "目前版本已停止使用，請更新後繼續遊戲。"
+                : update
+                    ? "發現新版本。你可先完成目前操作，再更新至最新版本。"
+                    : "以下是本次正式版本更新內容。";
+        const notes=manifest.content.map(item=>"<li>"+escapeHtml(item)+"</li>").join("");
+        const actions=preview
+            ? '<div class="release-update-actions"><button type="button" class="release-update-primary" data-release-update-action="preview-close">關閉預覽</button></div>'
+            : forced
+                ? '<div class="release-update-actions"><button type="button" class="release-update-primary" data-release-update-action="reload">立即更新</button></div>'
+                : update
+                    ? '<div class="release-update-actions"><button type="button" data-release-update-action="later">稍後更新</button><button type="button" class="release-update-primary" data-release-update-action="reload">立即更新</button></div>'
+                    : '<div class="release-update-actions"><button type="button" class="release-update-primary" data-release-update-action="acknowledge">我知道了</button></div>';
+        const suppressToday=!forced&&!update
+            ? '<label class="release-update-suppress-today"><input class="release-update-suppress-today-input" type="checkbox" data-release-update-suppress-today="true"><span>今日不再跳出提醒</span></label>'
+            : '';
+        return (
+            '<section class="release-update-detail" data-release-update-kind="'+escapeHtml(kind)+'">'+
+                '<p class="release-update-version">'+escapeHtml(manifest.releaseVersion)+'　'+escapeHtml(manifest.summary)+'</p>'+
+                '<p class="release-update-intro">'+escapeHtml(intro)+'</p>'+
+                '<h3>更新內容</h3>'+
+                '<ul class="release-update-notes">'+notes+'</ul>'+
+                '<p class="release-update-published">發布時間：'+escapeHtml(formatPublishedAt(manifest.publishedAt))+'</p>'+
+                suppressToday+
+                actions+
+            '</section>'
+        );
+    }
+
+    function formatPublishedAt(value){
+        const date=new Date(value);
+        if(Number.isNaN(date.getTime())){ return value; }
+        const yyyy=date.getFullYear();
+        const mm=String(date.getMonth()+1).padStart(2,"0");
+        const dd=String(date.getDate()).padStart(2,"0");
+        return yyyy+"-"+mm+"-"+dd;
+    }
+
+    function bindReleaseActions(body,kind){
+        if(!body||typeof body.querySelectorAll!=="function"){ return; }
+        body.querySelectorAll("[data-release-update-action]").forEach(button=>{
+            button.addEventListener("click",()=>{
+                const action=button.getAttribute("data-release-update-action");
+                if(action==="reload"){ requestReload(); }
+                else if(action==="later"){ deferNormalUpdate(); }
+                else if(action==="acknowledge"){ acknowledgeCurrentRelease(); }
+                else if(action==="preview-close"){ closeReleaseDetail(); }
+            });
+        });
+    }
+
+    function openReleaseDetail(kind){
+        const manifest=state.manifest;
+        const parts=getSharedModalParts();
+        if(!manifest||!parts){ return false; }
+        const forced=kind==="forced";
+        if(forced&&!canSafelyReloadForUpdate()){
+            state.pendingForcedUpdate=true;
+            showMarquee(manifest,"forced-pending");
+            schedulePendingResolution();
+            return false;
+        }
+
+        /* Existing owner performs its normal borrowed-element cleanup first. */
+        state.forcedModalLock=false;
+        if(typeof global.closeHomeFeature==="function"){
+            global.closeHomeFeature();
+        }else{
+            parts.modal.classList.remove("show");
+        }
+
+        parts.modal.classList.add("release-update-modal");
+        parts.modal.classList.toggle("release-update-forced",forced);
+        parts.title.textContent=manifest.title;
+        parts.body.innerHTML=renderReleaseContent(manifest,kind);
+        parts.modal.classList.add("show");
+        state.modalOpen=true;
+        state.modalKind=kind;
+        state.forcedModalLock=forced;
+        if(kind==="acknowledge"){ state.loginAnnouncementShown=true; }
+        bindReleaseActions(parts.body,kind);
+        if(forced){
+            const primary=parts.body.querySelector(".release-update-primary");
+            if(primary&&typeof primary.focus==="function"){ primary.focus(); }
+        }
+        return true;
+    }
+
+    function onSharedModalClosed(){
+        const parts=getSharedModalParts();
+        if(parts){
+            parts.modal.classList.remove("release-update-modal","release-update-forced");
+        }
+        state.modalOpen=false;
+        state.modalKind=null;
+        state.forcedModalLock=false;
+    }
+
+    function shouldPreventSharedModalClose(){
+        return state.forcedModalLock&&state.modalOpen;
+    }
+
+    function isForcedUpdateBlocking(){
+        return shouldPreventSharedModalClose();
+    }
+
+    function announceForcedLock(){
+        const parts=getSharedModalParts();
+        if(parts&&parts.modal.classList.contains("release-update-forced")){
+            const primary=parts.body.querySelector(".release-update-primary");
+            if(primary&&typeof primary.focus==="function"){ primary.focus(); }
+        }
+    }
+
+    function closeReleaseDetail(){
+        state.forcedModalLock=false;
+        if(typeof global.closeHomeFeature==="function"){
+            global.closeHomeFeature();
+        }else{
+            const parts=getSharedModalParts();
+            if(parts){ parts.modal.classList.remove("show"); }
+            onSharedModalClosed();
+        }
+    }
+
+    function acknowledgeCurrentRelease(){
+        const parts=getSharedModalParts();
+        const checkbox=parts&&parts.body&&typeof parts.body.querySelector==="function"
+            ?parts.body.querySelector(".release-update-suppress-today-input")
+            :null;
+        setCurrentNoticeSuppressedToday(!!(checkbox&&checkbox.checked));
+        markCurrentNoticeSeen();
+        state.pendingAnnouncement=false;
+        closeReleaseDetail();
+        refreshNotificationDots();
+    }
+
+    function deferNormalUpdate(){
+        const manifest=state.manifest;
+        if(!manifest){ return; }
+        if(state.devPreviewMode){
+            closeReleaseDetail();
+            return;
+        }
+        markCurrentNoticeSeen();
+        hideMarquee();
+        closeReleaseDetail();
+        refreshNotificationDots();
+    }
+
+    function performReload(){
+        try{
+            if(global.location&&typeof global.location.reload==="function"){
+                global.location.reload();
+            }
+        }catch(_){ }
+    }
+
+    function requestReload(){
+        const manifest=state.manifest;
+        if(!manifest){ return false; }
+        if(state.devPreviewMode){
+            closeReleaseDetail();
+            return false;
+        }
+        markCurrentNoticeSeen();
+        const forced=isForcedForLoadedVersion(manifest);
+        if(!canSafelyReloadForUpdate()){
+            if(forced){ state.pendingForcedUpdate=true; }
+            else{ state.pendingNormalReload=true; }
+            state.forcedModalLock=false;
+            closeReleaseDetail();
+            showMarquee(manifest,forced?"forced-pending":"normal-pending");
+            schedulePendingResolution();
+            return false;
+        }
+        performReload();
+        return true;
+    }
+
+    function hasPendingWork(){
+        return state.pendingForcedUpdate||state.pendingNormalReload||state.pendingAnnouncement;
+    }
+
+    function schedulePendingResolution(){
+        if(!hasPendingWork()||state.pendingTimer!==null){ return; }
+        state.pendingTimer=global.setTimeout(()=>{
+            state.pendingTimer=null;
+            resolvePendingWhenSafe();
+        },PENDING_RECHECK_MS);
+    }
+
+    function resolvePendingWhenSafe(){
+        if(!hasPendingWork()){ return; }
+        if(!canSafelyReloadForUpdate()){
+            schedulePendingResolution();
+            return;
+        }
+        if(state.pendingForcedUpdate){
+            state.pendingForcedUpdate=false;
+            openReleaseDetail("forced");
+            return;
+        }
+        if(state.pendingNormalReload){
+            state.pendingNormalReload=false;
+            performReload();
+            return;
+        }
+        if(state.pendingAnnouncement){
+            if(isCurrentNoticeSuppressedToday(state.manifest)){
+                state.pendingAnnouncement=false;
+                return;
+            }
+            if(!isSharedModalAvailableForAnnouncement()){
+                schedulePendingResolution();
+                return;
+            }
+            state.pendingAnnouncement=false;
+            openReleaseDetail("acknowledge");
+        }
+    }
+
+    function refreshNotificationDots(){
+        try{
+            if(typeof global.v141UpdateNotificationDots==="function"){
+                global.v141UpdateNotificationDots();
+            }
+        }catch(_){ }
+    }
+
+    function refreshAnnouncementSurface(){
+        const parts=getSharedModalParts();
+        if(
+            !parts||state.modalOpen||!parts.modal.classList.contains("show")||
+            parts.title.textContent!=="公告"
+        ){
+            return;
+        }
+        const content=renderAnnouncementContent();
+        if(content){ parts.body.innerHTML=content; }
+    }
+
+    function renderAnnouncementContent(){
+        const manifest=state.manifest;
+        if(!manifest||!manifest.publicNotice){ return ""; }
+        const loaded=state.loadedReleaseVersion||getLoadedReleaseVersion();
+        const comparison=loaded?compareVersions(loaded,manifest.releaseVersion):null;
+        const needsUpdate=comparison!==null&&comparison<0;
+        const actionLabel=needsUpdate?"查看更新內容":"查看本次更新";
+        const status=needsUpdate
+            ? "已有新版本可更新；完成目前操作後即可更新。"
+            : "目前正式版本的更新內容。";
+        return (
+            '<section class="release-update-announcement">'+
+                '<p class="release-update-announcement-version">'+escapeHtml(manifest.releaseVersion)+' 更新</p>'+
+                '<p>'+escapeHtml(manifest.summary)+'</p>'+
+                '<p class="release-update-announcement-status">'+escapeHtml(status)+'</p>'+
+                '<button type="button" class="release-update-primary" onclick="window.FourSymbolsReleaseUpdate.openFromAnnouncement()">'+actionLabel+'</button>'+
+            '</section>'
+        );
+    }
+
+    function openFromAnnouncement(){
+        const manifest=state.manifest;
+        if(!manifest){ return false; }
+        const loaded=state.loadedReleaseVersion||getLoadedReleaseVersion();
+        const needsUpdate=loaded&&compareVersions(loaded,manifest.releaseVersion)<0;
+        return openReleaseDetail(needsUpdate&&isForcedForLoadedVersion(manifest)?"forced":needsUpdate?"update":"acknowledge");
+    }
+
+    async function fetchManifest(){
+        const fetcher=typeof global.fetch==="function"?global.fetch.bind(global):null;
+        if(!fetcher){ return null; }
+        let timeoutId=null;
+        let controller=null;
+        try{
+            if(typeof global.AbortController==="function"){
+                controller=new global.AbortController();
+                timeoutId=global.setTimeout(()=>controller.abort(),REQUEST_TIMEOUT_MS);
+            }
+            let url=RELEASE_NOTICE_PATH;
+            try{
+                const base=(global.document&&global.document.baseURI)||(global.location&&global.location.href)||undefined;
+                const parsed=new URL(RELEASE_NOTICE_PATH,base);
+                parsed.searchParams.set("release-update-check",String(now()));
+                url=parsed.toString();
+            }catch(_){
+                url=RELEASE_NOTICE_PATH+"?release-update-check="+now();
+            }
+            const response=await fetcher(url,{
+                cache:"no-store",
+                headers:{"Cache-Control":"no-cache"},
+                ...(controller?{signal:controller.signal}:{})
+            });
+            if(!response||response.ok===false||typeof response.json!=="function"){ return null; }
+            return validateManifest(await response.json());
+        }catch(_){
+            /* Offline, timeout, malformed JSON and temporary deploy gaps must never block play. */
+            return null;
+        }finally{
+            if(timeoutId!==null){ global.clearTimeout(timeoutId); }
+        }
+    }
+
+    function handleManifest(manifest){
+        if(!manifest){ return; }
+        state.manifest=manifest;
+        state.loadedReleaseVersion=getLoadedReleaseVersion();
+        state.devPreviewMode=null;
+        if(!manifest.publicNotice||!state.loadedReleaseVersion){
+            hideMarquee();
+            return;
+        }
+        const devPreviewMode=getDevPreviewMode();
+        if(devPreviewMode){
+            state.devPreviewMode=devPreviewMode;
+            if(devPreviewMode==="modal"){
+                openReleaseDetail(isForcedForLoadedVersion(manifest)?"forced":"preview");
+            }else{
+                showMarquee(manifest,isForcedForLoadedVersion(manifest)?"forced":"update");
+            }
+            return;
+        }
+        const comparison=compareVersions(state.loadedReleaseVersion,manifest.releaseVersion);
+        if(comparison===null||comparison>0){ return; }
+        if(comparison===0){
+            refreshAnnouncementSurface();
+            refreshNotificationDots();
+            if(shouldAutoShowLoginAnnouncement(manifest)){
+                if(canSafelyReloadForUpdate()&&isSharedModalAvailableForAnnouncement()){
+                    openReleaseDetail("acknowledge");
+                }else{
+                    state.pendingAnnouncement=true;
+                    showMarquee(manifest,"announcement-pending");
+                    schedulePendingResolution();
+                }
+            }
+            return;
+        }
+
+        const forced=isForcedForLoadedVersion(manifest);
+        if(forced){
+            if(isForcedUpdateBlocking()){ return; }
+            state.pendingForcedUpdate=true;
+            showMarquee(manifest,canSafelyReloadForUpdate()?"forced":"forced-pending");
+            if(canSafelyReloadForUpdate()){
+                resolvePendingWhenSafe();
+            }else{
+                schedulePendingResolution();
+            }
+            return;
+        }
+
+        if(shouldShowReminder(manifest)){
+            rememberReminder(manifest);
+            showMarquee(manifest,"update");
+        }
+        refreshAnnouncementSurface();
+        refreshNotificationDots();
+    }
+
+    function checkForUpdate(reason,options){
+        const force=!!(options&&options.force);
+        if(state.checking){ return state.checking; }
+        if(!force&&state.lastCheckAt&&now()-state.lastCheckAt<MIN_CHECK_GAP_MS){
+            return Promise.resolve(null);
+        }
+        state.lastCheckAt=now();
+        state.checking=fetchManifest().then(manifest=>{
+            if(manifest){ handleManifest(manifest,reason); }
+            return manifest;
+        }).finally(()=>{
+            state.checking=null;
+        });
+        return state.checking;
+    }
+
+    function start(){
+        if(state.started){ return; }
+        state.started=true;
+        checkForUpdate("boot",{force:true});
+        state.pollTimer=global.setInterval(()=>checkForUpdate("poll"),CHECK_INTERVAL_MS);
+        const documentRef=global.document;
+        if(documentRef&&typeof documentRef.addEventListener==="function"){
+            documentRef.addEventListener("visibilitychange",()=>{
+                if(documentRef.hidden||documentRef.visibilityState==="hidden"){ return; }
+                checkForUpdate("visibility");
+            });
+            documentRef.addEventListener("keydown",event=>{
+                if(event&&event.key==="Escape"&&isForcedUpdateBlocking()){
+                    event.preventDefault();
+                    if(typeof event.stopImmediatePropagation==="function"){ event.stopImmediatePropagation(); }
+                    announceForcedLock();
+                }
+            },true);
+        }
+        if(typeof global.addEventListener==="function"){
+            global.addEventListener("online",()=>checkForUpdate("online"));
+        }
+    }
+
+    function stop(){
+        if(state.pollTimer!==null){ global.clearInterval(state.pollTimer); state.pollTimer=null; }
+        if(state.pendingTimer!==null){ global.clearTimeout(state.pendingTimer); state.pendingTimer=null; }
+        state.started=false;
+    }
+
+    function getState(){
+        return {
+            loadedReleaseVersion:state.loadedReleaseVersion||getLoadedReleaseVersion(),
+            availableReleaseVersion:state.manifest&&state.manifest.releaseVersion||null,
+            noticeId:state.manifest&&state.manifest.noticeId||null,
+            pendingNormalReload:state.pendingNormalReload,
+            pendingForcedUpdate:state.pendingForcedUpdate,
+            pendingAnnouncement:state.pendingAnnouncement,
+            loginAnnouncementShown:state.loginAnnouncementShown,
+            suppressedToday:isCurrentNoticeSuppressedToday(state.manifest),
+            criticalOperationCount:state.criticalOperations.size,
+            unsafeReasons:getUnsafeReasons().slice(),
+            pollIntervalMs:CHECK_INTERVAL_MS,
+            minimumCheckGapMs:MIN_CHECK_GAP_MS,
+            devPreviewMode:state.devPreviewMode
+        };
+    }
+
+    global.FourSymbolsReleaseUpdate=Object.freeze({
+        start,
+        stop,
+        checkForUpdate,
+        getState,
+        parseVersion,
+        compareVersions,
+        canSafelyReloadForUpdate,
+        beginCriticalOperation,
+        notifySafeState:resolvePendingWhenSafe,
+        hasUnreadReleaseNotice,
+        isCurrentNoticeSuppressedToday:()=>isCurrentNoticeSuppressedToday(state.manifest),
+        renderAnnouncementContent,
+        openFromAnnouncement,
+        openReleaseDetail,
+        requestReload,
+        isForcedUpdateBlocking,
+        shouldPreventSharedModalClose,
+        announceForcedLock,
+        onSharedModalClosed
+    });
+    global.canSafelyReloadForUpdate=canSafelyReloadForUpdate;
+
+    const documentRef=global.document;
+    if(documentRef&&typeof documentRef.addEventListener==="function"){
+        documentRef.addEventListener("four-symbols:startup-ready",start,{once:true});
+    }
+    try{
+        const startupState=global.FourSymbolsStartupPolicy&&global.FourSymbolsStartupPolicy.getState&&global.FourSymbolsStartupPolicy.getState();
+        if(startupState==="READY"||startupState==="OFFLINE_READY"){
+            global.setTimeout(start,0);
+        }
+    }catch(_){ }
+
+})(window);
