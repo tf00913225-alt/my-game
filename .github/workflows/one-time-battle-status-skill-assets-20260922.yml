@@ -103,14 +103,15 @@ jobs:
             convert_exact "$src" "$dst" "$label"
           done
 
-          verify_4x3 '/tmp/fs-assets/stun-sheet.png' '暈眩狀態來源'
           sw="$(identify -format '%w' '/tmp/fs-assets/stun-sheet.png')"
           sh="$(identify -format '%h' '/tmp/fs-assets/stun-sheet.png')"
-          fw=$((sw/4))
-          fh=$((sh/3))
-          crop="${fw}x${fh}+$((fw*2))+$fh"
+          if [ "$sw" -ne $((sh*2)) ]; then
+            echo "暈眩狀態來源預期為 2x1 方格，實際 "$sw"x"$sh >&2
+            exit 1
+          fi
+          crop="${sh}x${sh}+0+0"
           convert '/tmp/fs-assets/stun-sheet.png' -crop "$crop" +repage '/tmp/fs-assets/stun-frame.png'
-          convert_exact '/tmp/fs-assets/stun-frame.png' 'assets/vfx/status/stun.webp' '暈眩 body frame'
+          convert_exact '/tmp/fs-assets/stun-frame.png' 'assets/vfx/status/stun.webp' '暈眩單張 body frame'
 
       - name: Run focused tests and production build
         shell: bash
