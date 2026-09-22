@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "id": "2026-09-22-battle-status-info-assets",
+  "title": "Battle status icon row, detail modal and formal status art",
+  "baseBranch": "dev",
+  "targetBranch": "dev",
+  "status": "VERIFIED",
+  "requirements": [
+    {
+      "id": "STATUS-01",
+      "title": "狀態 Icon 固定顯示於 HP 上方且不呼吸",
+      "status": "VERIFIED",
+      "evidence": [
+        "js/39-v143-skill-animation.js",
+        "css/40-v143-combat-dungeon-polish.css",
+        "css/fixed-slot-battlefield-rendering-v2.css"
+      ],
+      "verification": "PR #515 exact-candidate CI run 35719594516 SUCCESS"
+    },
+    {
+      "id": "STATUS-02",
+      "title": "Idle 點擊敵我卡牌開啟元素／名稱／HP／SP／增益／負面／剩餘回合資訊",
+      "status": "VERIFIED",
+      "evidence": [
+        "js/00-main.js",
+        "js/39-v143-skill-animation.js"
+      ],
+      "verification": "PR #515 exact-candidate CI run 35719594516 SUCCESS"
+    },
+    {
+      "id": "STATUS-03",
+      "title": "單張呼吸與固定狀態圖收斂在自身卡牌內，不覆蓋左右卡牌",
+      "status": "VERIFIED",
+      "evidence": [
+        "js/39-v143-skill-animation.js",
+        "css/40-v143-combat-dungeon-polish.css"
+      ],
+      "verification": "PR #515 exact-candidate CI run 35719594516 SUCCESS"
+    },
+    {
+      "id": "STATUS-04",
+      "title": "assets-library 狀態母圖轉為 lossless WebP 並接到正確 Runtime 狀態",
+      "status": "VERIFIED",
+      "evidence": [
+        "assets/vfx/status/",
+        "tests/battle-status-info-assets-20260922.test.js"
+      ],
+      "verification": "PR #515 exact-candidate CI run 35719594516 SUCCESS"
+    }
+  ],
+  "finalEvidence": {
+    "pr": 515,
+    "candidateSha": "0a53add00ee113fd06b79f5fb9299337f10accde",
+    "ciRun": 35719594516,
+    "result": "Repository checks SUCCESS; battle/VFX regressions, Fixed Slot 9:16 mobile QA, exact-candidate real battle mobile QA, resources, loader, Release Gate and git diff checks all passed.",
+    "assetConversionRun": 35718725670,
+    "assetConversionCommit": "4a32bcd7ef0d032bcd688bd57be085cbf5395a32"
+  }
+}
