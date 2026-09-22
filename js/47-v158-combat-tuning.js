@@ -20,11 +20,11 @@
         const directReduction=Math.max(0,numeric(directChanceReductionPercent));
         const rawAccuracyChance=
             95+
-            numeric(casterAccuracy)*0.3-
-            directReduction;
+            numeric(casterAccuracy)*0.3;
         const accuracyChance=clamp(rawAccuracyChance,50,99);
         const evasionRate=clamp(numeric(targetEvasion),0,85);
-        return clamp(accuracyChance*(1-evasionRate/100),1,99);
+        const evasionAdjustedChance=accuracyChance*(1-evasionRate/100);
+        return clamp(evasionAdjustedChance-directReduction,1,99);
     }
 
     window.v158GetHitChancePercent=hitChancePercent;
