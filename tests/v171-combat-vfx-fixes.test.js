@@ -15,7 +15,8 @@ let passed=0;
 function test(name,handler){ handler(); passed++; console.log("✓ "+name); }
 
 test("V171 cache-busts every changed combat asset",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.69"/);
+    const assetVersionMatch=loader.match(/const V_ASSET_VERSION="([^"]+)"/);
+    assert.equal(assetVersionMatch?.[1],releaseMeta.cacheVersion);
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
