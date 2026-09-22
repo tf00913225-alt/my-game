@@ -332,9 +332,10 @@ window.v17363ChooseMaterialOption=function(key,value){
     MATERIAL_STATE[key]=String(value||"");renderMaterialSynthesis();
 };
 window.v17363SetMaterialOption=window.v17363ChooseMaterialOption;
-document.addEventListener("click",event=>{
-    document.querySelectorAll(".v17363-game-select.open").forEach(root=>{if(root.contains(event.target)){return;}root.classList.remove("open");const button=root.querySelector(".v17363-game-select-trigger");if(button){button.setAttribute("aria-expanded","false");}});
-});
+const functionalModalRoot=document.getElementById("homeFeatureModal");
+if(functionalModalRoot){functionalModalRoot.addEventListener("click",event=>{
+    functionalModalRoot.querySelectorAll(".v17363-game-select.open").forEach(root=>{if(root.contains(event.target)){return;}root.classList.remove("open");const button=root.querySelector(".v17363-game-select-trigger");if(button){button.setAttribute("aria-expanded","false");}});
+});}
 window.v17363CraftMaterial=function(kind){
     const isOre=kind==="ore";
     const tier=isOre?MATERIAL_STATE.oreTier:MATERIAL_STATE.blueprintTier;
