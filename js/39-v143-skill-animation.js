@@ -608,8 +608,8 @@
         const anchor=slotAnchor(side,index,card);
         if(!anchor){ return; }
         const cardRect=typeof card.getBoundingClientRect==="function"?card.getBoundingClientRect():anchor.rect;
-        const width=Math.max(42,Math.min(anchor.rect.width*.68,cardRect.width*.68));
-        const height=Math.max(54,Math.min(anchor.rect.height*.72,cardRect.height*.72));
+        const width=Math.max(24,Math.min(anchor.rect.width*.68,cardRect.width*.68));
+        const height=Math.max(36,Math.min(anchor.rect.height*.72,cardRect.height*.72));
         node.dataset.slot=anchor.slot;
         node.style.width=Math.round(width)+"px";
         node.style.height=Math.round(height)+"px";
