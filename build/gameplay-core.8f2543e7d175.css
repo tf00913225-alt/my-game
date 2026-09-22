@@ -4,7 +4,7 @@
 #battlePage .battle-stats-edge-button,
 #battlePage .battle-mechanism-alert{
     position:absolute;
-    z-index:70;
+    z-index:210;
     border:1px solid rgba(230,176,73,.86);
     background:linear-gradient(180deg,rgba(34,25,14,.96),rgba(9,8,6,.96));
     color:#f5d67f;
@@ -52,7 +52,7 @@
     position:absolute;
     top:0;
     bottom:0;
-    z-index:72;
+    z-index:220;
     width:min(342px,86%);
     display:flex;
     flex-direction:column;
@@ -5197,9 +5197,9 @@ body.quest-scroll-active,
 }
 
 /* Persistent status visuals are intentionally low-motion.
-   Cast VFX keep their raster Sprite Sheet animation; persistent states use
-   one single image with opacity breathing or a fixed image. Status icons are
-   static information markers above the resource bars and never breathe. */
+   Cast VFX keep their raster Sprite Sheet animation; each unit renders only
+   one body-status image at a time. Multiple body states rotate every second.
+   Status icons remain static information markers above the resource bars. */
 #game-stage #battlePage .v143-status-visual{
     position:absolute;
     left:50%;
@@ -5210,27 +5210,26 @@ body.quest-scroll-active,
     background-position:0 0;
     background-repeat:no-repeat;
     image-rendering:auto;
-    opacity:.9;
+    opacity:1;
     pointer-events:none;
     transform:translate(-50%,-50%);
     transform-origin:center;
 }
 
 #game-stage #battlePage .v143-status-visual--pulse{
-    animation:v143StatusImageBreath 2.2s ease-in-out infinite;
-    will-change:opacity;
+    animation:v143StatusImageBreath 1s ease-in-out infinite;
 }
 
 #game-stage #battlePage .v143-status-visual--static{
     animation:none;
-    opacity:.9;
+    opacity:1;
 }
 
 #game-stage #battlePage .v143-status-icon{
     display:inline-block;
-    width:14px;
-    height:14px;
-    flex:0 0 14px;
+    width:16px;
+    height:16px;
+    flex:0 0 16px;
     border:0;
     border-radius:2px;
     background-color:transparent;
@@ -5296,7 +5295,7 @@ body.quest-scroll-active,
 
 @keyframes v143StatusImageBreath{
     0%,100%{opacity:.42}
-    50%{opacity:.78}
+    50%{opacity:1}
 }
 
 @keyframes v143StatusIconBreath{
@@ -5422,12 +5421,28 @@ body.quest-scroll-active,
 }
 
 
+
+/* Readability wins while a battle information surface is intentionally open.
+   V143 timing continues normally; only transient body-level paint is hidden so
+   skill sheets, caster labels and floating damage cannot cover readable UI. */
+body.v174-battle-status-detail-open > .v143-skill-stage,
+body.v174-battle-info-open > .v143-skill-stage,
+body.v174-battle-insight-open > .v143-skill-stage,
+body.v174-battle-status-detail-open > .damage-popup.v152-top-damage,
+body.v174-battle-info-open > .damage-popup.v152-top-damage,
+body.v174-battle-insight-open > .damage-popup.v152-top-damage,
+body.v174-battle-status-detail-open > .skill-name-badge.v143-caster-skill-label,
+body.v174-battle-info-open > .skill-name-badge.v143-caster-skill-label,
+body.v174-battle-insight-open > .skill-name-badge.v143-caster-skill-label{
+    visibility:hidden !important;
+}
+
 /* V176 battle status inspection: idle card tap shows current state details. */
 #game-stage #battlePage .battle-status-detail-modal[hidden]{display:none !important;}
 #game-stage #battlePage .battle-status-detail-modal{
     position:absolute;
     inset:0;
-    z-index:120;
+    z-index:260;
     display:flex;
     align-items:center;
     justify-content:center;
@@ -8930,6 +8945,8 @@ body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scro
     background:none !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-center-region > .turn-target-row{
+    position:relative;
+    z-index:95;
     align-self:center;
     width:max-content;
     min-width:112px;
@@ -8937,7 +8954,14 @@ body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scro
     min-height:36px;
     max-height:36px;
     margin:0 auto;
+    opacity:1;
+    pointer-events:none;
     transform:none !important;
+    transition:opacity .16s ease-out !important;
+}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-center-region > .turn-target-row.battle-operation-active{
+    opacity:.25;
+    pointer-events:none;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-center-region > .battle-middle{
     width:100%;
@@ -8949,7 +8973,7 @@ body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scro
     left:0 !important;
     right:0 !important;
     bottom:0 !important;
-    z-index:80 !important;
+    z-index:190 !important;
     display:grid;
     grid-template-rows:var(--battle-info-handle-height) minmax(0,1fr);
     gap:0;
@@ -8981,7 +9005,7 @@ body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scro
     display:flex;
     align-items:center;
     justify-content:center;
-    width:64px;
+    width:92px;
     height:32px;
     margin:0;
     padding:0;
@@ -8996,21 +9020,35 @@ body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scro
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-toggle > span{
     display:block;
-    font-size:24px;
+    font-size:14px;
+    font-weight:900;
     line-height:22px;
-    transform:translateY(1px);
-    transition:transform .26s ease;
-}
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region.is-expanded .battle-info-toggle > span{
-    transform:translateY(-1px) rotate(180deg);
+    white-space:nowrap;
+    transform:none;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region #battleTurnIndicator{
-    opacity:0;
+    position:absolute;
+    left:4px;
+    top:0;
+    display:flex;
+    align-items:center;
+    height:32px;
+    padding:0 10px;
+    border:3px solid #d9ad50;
+    border-bottom:0;
+    border-radius:10px 10px 0 0;
+    color:#f5cf72;
+    background:rgba(0,0,0,.62);
+    box-sizing:border-box;
+    font-size:14px;
+    font-weight:900;
+    line-height:22px;
+    opacity:1;
     pointer-events:none;
     transition:opacity .16s ease;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region.is-expanded #battleTurnIndicator{
-    opacity:1;
+    opacity:0;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region > #battleInfo{
     min-height:0 !important;

@@ -745,8 +745,8 @@
             edge.type="button";
             edge.id="battleStatsEdgeButton";
             edge.className="battle-stats-edge-button";
-            edge.setAttribute("aria-label","詳細戰況");
-            edge.innerHTML="<span>詳</span><span>細</span><span>戰</span><span>況</span>";
+            edge.setAttribute("aria-label","戰鬥數據");
+            edge.innerHTML="<span>戰</span><span>鬥</span><span>數</span><span>據</span>";
             edge.addEventListener("click",event=>{
                 if(edge.__suppressNextClick){
                     edge.__suppressNextClick=false;
@@ -779,8 +779,8 @@
             statsDrawer=document.createElement("aside");
             statsDrawer.id="battleStatsDrawer";
             statsDrawer.className="battle-insight-drawer battle-stats-drawer";
-            statsDrawer.setAttribute("aria-label","詳細戰況");
-            statsDrawer.innerHTML='<header><b>詳細戰況</b><button type="button" data-close>×</button></header><div class="battle-insight-drawer-body"></div>';
+            statsDrawer.setAttribute("aria-label","戰鬥數據");
+            statsDrawer.innerHTML='<header><b>戰鬥數據</b><button type="button" data-close>×</button></header><div class="battle-insight-drawer-body"></div>';
             statsDrawer.querySelector("[data-close]").addEventListener("click",closeBattleDrawer);
             root.appendChild(statsDrawer);
         }
@@ -866,6 +866,7 @@
 
         const drawer=next==="boss"?ui.bossDrawer:ui.statsDrawer;
         drawer.classList.add("open");
+        if(document.body){ document.body.classList.add("v174-battle-insight-open"); }
         if(next==="boss"){ renderBossDrawer(); }else{ renderStatsDrawer(); }
         return true;
     }
@@ -875,6 +876,9 @@
             const boss=document.getElementById("battleBossMechanismDrawer");
             if(stats){ stats.classList.remove("open"); }
             if(boss){ boss.classList.remove("open"); }
+        }
+        if(typeof document!=="undefined"&&document.body){
+            document.body.classList.remove("v174-battle-insight-open");
         }
         openDrawer=null;
     }
@@ -3221,6 +3225,7 @@
             const promptAction=document.getElementById("battleTargetPromptAction");
 
             if(region){ region.classList.add("target-selecting"); }
+            if(typeof syncTurnTimerWithBattlePickers==="function"){ syncTurnTimerWithBattlePickers(); }
             if(promptAction){
                 promptAction.textContent="選擇 ["+definition.name+"] 的我方目標";
             }
@@ -12690,6 +12695,7 @@
             closeMenus();
             const region=document.getElementById("battleActionRegion");
             if(region){ region.classList.add("target-selecting"); }
+            if(typeof syncTurnTimerWithBattlePickers==="function"){ syncTurnTimerWithBattlePickers(); }
             const prompt=document.getElementById("battleTargetPromptAction");
             if(prompt){ prompt.textContent="選擇要使用［"+definition.name+"］的角色"; }
             currentBattleMonsters.forEach(index=>{
@@ -13057,6 +13063,8 @@
         flameTornado:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/flame-tornado-cast.png?v=165","single",{scale:2.35,maxSize:300})},
         phoenixCry:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/phoenix-cry-cast.png?v=165","battlefield",{scale:1.12,minSize:280})},
         rage:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/rage-cast.png?v=165","single",{scale:1.08,minSize:96,maxSize:148})},
+        fireSoulResonance:{hit:DEFAULT_HIT,deferredActorStatusTypes:["fireSoulResonance"],sprite:castSheet("assets/vfx/fire/fire-soul-resonance-cast.webp","single",{scale:2.05,maxSize:250})},
+        bloodBurnArt:{hit:DEFAULT_HIT,deferredActorStatusTypes:["bloodBurn"],sprite:castSheet("assets/vfx/fire/blood-burn-art-cast.webp","single",{scale:2.05,maxSize:250})},
         fireEX:{hit:.74,noVisual:true,passive:true},
 
         waterKnife:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/water-blade-slash-vfx.png?v=166","single",{scale:2.05,maxSize:250})},
@@ -13069,7 +13077,7 @@
         freeze:{hit:DEFAULT_HIT,deferredStatusTypes:["freeze"],sprite:castSheet("assets/vfx/water/freeze-cast-vfx.png?v=166","single",{scale:2.2,maxSize:270})},
         healSpell:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/water-heal-vfx.png?v=166","single",{scale:2.05,maxSize:250})},
         revive:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/water-revive-vfx.png?v=166","single",{scale:2.3,maxSize:285})},
-        purifyMind:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/water-heal-vfx.png?v=166","single",{scale:2.05,maxSize:250,reusedFrom:"healSpell"})},
+        purifyMind:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/purify-mind-cast.webp","single",{scale:2.05,maxSize:250})},
         waterEX:{hit:.74,noVisual:true,passive:true},
 
         stormFist:{hit:.5,deferredStatusTypes:["agilityDown"],sprite:castSheet("assets/vfx/wind/storm-fist-cast.png?v=173.24","single",{scale:2.15,maxSize:260})},
@@ -13140,7 +13148,7 @@
         freeze:statusVisual("assets/vfx/status/freeze.webp","static","statusEffects",{label:"冰封",statusName:"冰封",iconSrc:"assets/vfx/status/freeze.webp"}),
         agilityDown:statusVisual("","icon","statusEffects",{label:"重力",statusName:"重力",iconSrc:"assets/vfx/status/gravity-icon.webp"}),
         damageDown:statusVisual("","icon","statusEffects",{label:"殤風",statusName:"殤風",iconSrc:"assets/vfx/status/damage-down-icon.webp"}),
-        stun:statusVisual("","icon","statusEffects",{label:"暈眩",statusName:"暈眩",iconSrc:"assets/vfx/status/stun-icon.webp"}),
+        stun:statusVisual("assets/vfx/status/stun.webp","pulse","statusEffects",{label:"暈眩",statusName:"暈眩",iconSrc:"assets/vfx/status/stun-icon.webp"}),
         dodgeSkill:statusVisual("assets/vfx/status/windwalk.webp","pulse","activeBuffs",{label:"風行",statusName:"風行",iconSrc:"assets/vfx/status/windwalk.webp"}),
         stealthSkill:statusVisual("assets/vfx/status/stealth.webp","static","activeBuffs",{label:"隱身",statusName:"隱身",iconSrc:"assets/vfx/status/stealth.webp"}),
         dinghaishenzhen:statusVisual("assets/vfx/status/calm-mind.webp","pulse","activeBuffs",{label:"氣定神閒",statusName:"氣定神閒",iconSrc:"assets/vfx/status/calm-mind.webp"}),
@@ -13225,8 +13233,10 @@
     const originalDispose=director.dispose.bind(director);
     const state={
         version:VERSION,current:null,stage:null,timers:new Set(),pendingUpdates:new Map(),
-        metrics:{started:0,completed:0,missingVisuals:0,legacyNodesPurged:0,delayedNumbers:0,delayedDeaths:0}
+        statusCarouselTimer:0,statusCarouselStep:0,
+        metrics:{started:0,completed:0,missingVisuals:0,legacyNodesPurged:0,delayedNumbers:0,delayedDeaths:0,statusCarouselTicks:0}
     };
+    const STATUS_CAROUSEL_MS=1000;
     window.v143SkillAnimationState=state;
 
     function setTimer(callback,delay){
@@ -13239,6 +13249,8 @@
         state.timers.forEach(id=>clearTimeout(id));
         state.timers.clear();
         state.pendingUpdates.clear();
+        state.statusCarouselTimer=0;
+        state.statusCarouselStep=0;
     }
 
     function purgeLegacyCardVfx(){
@@ -13518,23 +13530,10 @@
         return nested||card||null;
     }
 
-    function statusIconNode(host,type){
-        if(!host){ return null; }
-        const className="v143-status-icon-"+type;
-        if(typeof host.querySelector==="function"){ return host.querySelector("."+className); }
-        return Array.from(host.children||[]).find(node=>
-            String(node.className||"").split(/\s+/).includes(className)
-        )||null;
-    }
-
-    function removeStatusVisual(card,side,index,type){
-        const visual=statusVisualNode(card,type);
-        if(visual&&typeof visual.remove==="function"){ visual.remove(); }
-        else if(visual&&visual.parentNode){ visual.parentNode.removeChild(visual); }
-        const host=statusIconHost(side,index,card);
-        const icon=statusIconNode(host,type);
-        if(icon&&typeof icon.remove==="function"){ icon.remove(); }
-        else if(icon&&icon.parentNode){ icon.parentNode.removeChild(icon); }
+    function removeNode(node){
+        if(!node){ return; }
+        if(typeof node.remove==="function"){ node.remove(); }
+        else if(node.parentNode){ node.parentNode.removeChild(node); }
     }
 
     function createBodyStatusVisual(type,spec){
@@ -13547,6 +13546,7 @@
         node.style.backgroundImage='url("'+String(spec.src).replace(/"/g,"%22")+'")';
         node.style.backgroundSize="contain";
         node.style.backgroundPosition="center";
+        node.style.backgroundRepeat="no-repeat";
         return node;
     }
 
@@ -13568,57 +13568,129 @@
         return node;
     }
 
-    function syncStatusVisual(side,index,type){
-        const spec=STATUS_VISUALS[type];
-        const card=cardFor(side,index);
-        const entity=entityFor(side,index);
-        const alive=!!(spec&&card&&entity&&Number(entity.hp)>0&&(side!=="monster"||entity.alive!==false));
-        const active=alive&&hasTimedEffect(entity,type);
-        if(!active||deferredStatusDuringCast(side,index,type)){
-            removeStatusVisual(card,side,index,type);
-            return;
+    function clearUnitStatusNodes(card,host){
+        if(card&&typeof card.querySelectorAll==="function"){
+            card.querySelectorAll(".v143-status-visual").forEach(removeNode);
         }
-
-        const host=statusIconHost(side,index,card);
-        if(host&&!statusIconNode(host,type)){ host.appendChild(createStatusIcon(type,spec)); }
-
-        if(spec.mode==="icon"){
-            const body=statusVisualNode(card,type);
-            if(body&&typeof body.remove==="function"){ body.remove(); }
-            return;
+        if(host&&typeof host.querySelectorAll==="function"){
+            host.querySelectorAll(".v143-status-icon").forEach(removeNode);
         }
+    }
 
-        let node=statusVisualNode(card,type);
-        if(!node){
-            node=createBodyStatusVisual(type,spec);
-            card.appendChild(node);
-        }
-
-        const anchor=slotAnchor(side,index,card);
-        if(!anchor){ return; }
-        const cardRect=typeof card.getBoundingClientRect==="function"?card.getBoundingClientRect():anchor.rect;
-        const width=Math.max(24,Math.min(anchor.rect.width*.68,cardRect.width*.68));
-        const height=Math.max(36,Math.min(anchor.rect.height*.72,cardRect.height*.72));
-        node.dataset.slot=anchor.slot;
-        node.style.width=Math.round(width)+"px";
-        node.style.height=Math.round(height)+"px";
+    function activeStatusTypes(side,index,entity){
+        return Object.keys(RAW_STATUS_VISUALS).filter(type=>
+            hasTimedEffect(entity,type)&&!deferredStatusDuringCast(side,index,type)
+        );
     }
 
     function syncStatusVisualsForUnit(side,index){
-        Object.keys(RAW_STATUS_VISUALS).forEach(type=>syncStatusVisual(side,index,type));
+        const card=cardFor(side,index);
+        const entity=entityFor(side,index);
+        const host=statusIconHost(side,index,card);
+        const alive=!!(card&&entity&&Number(entity.hp)>0&&(side!=="monster"||entity.alive!==false));
+        if(!alive){
+            clearUnitStatusNodes(card,host);
+            return false;
+        }
+
+        const activeTypes=activeStatusTypes(side,index,entity);
+        const activeSet=new Set(activeTypes);
+        const existingIcons=new Map();
+        if(host&&typeof host.querySelectorAll==="function"){
+            host.querySelectorAll(".v143-status-icon").forEach(node=>{
+                const type=String(node.dataset&&node.dataset.statusType||"");
+                if(!activeSet.has(type)){ removeNode(node); return; }
+                existingIcons.set(type,node);
+            });
+        }
+        activeTypes.forEach(type=>{
+            const spec=STATUS_VISUALS[type];
+            if(host&&spec&&!existingIcons.has(type)){
+                host.appendChild(createStatusIcon(type,spec));
+            }
+        });
+
+        const bodyTypes=activeTypes.filter(type=>{
+            const spec=STATUS_VISUALS[type];
+            return !!(spec&&spec.mode!=="icon"&&spec.src);
+        });
+        const selectedType=bodyTypes.length
+            ?bodyTypes[state.statusCarouselStep%bodyTypes.length]
+            :"";
+
+        let selectedNode=null;
+        if(card&&typeof card.querySelectorAll==="function"){
+            card.querySelectorAll(".v143-status-visual").forEach(node=>{
+                const type=String(node.dataset&&node.dataset.statusType||"");
+                if(type!==selectedType){ removeNode(node); }
+                else{ selectedNode=node; }
+            });
+        }
+        if(!selectedType){ return false; }
+
+        const selectedSpec=STATUS_VISUALS[selectedType];
+        if(!selectedNode){
+            selectedNode=createBodyStatusVisual(selectedType,selectedSpec);
+            card.appendChild(selectedNode);
+        }
+
+        const anchor=slotAnchor(side,index,card);
+        if(anchor){
+            const width=Math.max(30,anchor.rect.width*.84);
+            const height=Math.max(44,anchor.rect.height*.88);
+            selectedNode.dataset.slot=anchor.slot;
+            selectedNode.style.width=Math.round(width)+"px";
+            selectedNode.style.height=Math.round(height)+"px";
+        }
+        const needsCarousel=bodyTypes.length>1;
+        if(needsCarousel){ scheduleStatusCarousel(); }
+        return needsCarousel;
+    }
+
+    function stopStatusCarousel(){
+        if(state.statusCarouselTimer){
+            clearTimeout(state.statusCarouselTimer);
+            state.timers.delete(state.statusCarouselTimer);
+            state.statusCarouselTimer=0;
+        }
+    }
+
+    function scheduleStatusCarousel(){
+        if(state.statusCarouselTimer){ return; }
+        state.statusCarouselTimer=setTimer(()=>{
+            state.statusCarouselTimer=0;
+            state.statusCarouselStep++;
+            state.metrics.statusCarouselTicks++;
+            syncStatusCarouselFrame();
+        },STATUS_CAROUSEL_MS);
+    }
+
+    function syncStatusCarouselFrame(){
+        let needsCarousel=false;
+        const enemyIndexes=typeof currentBattleMonsters!=="undefined"?currentBattleMonsters.filter(Number.isInteger):[];
+        enemyIndexes.forEach(index=>{ needsCarousel=syncStatusVisualsForUnit("monster",index)||needsCarousel; });
+        for(let index=0;index<6;index++){
+            needsCarousel=syncStatusVisualsForUnit("player",index)||needsCarousel;
+        }
+        stopStatusCarousel();
+        if(needsCarousel){
+            scheduleStatusCarousel();
+        }else{
+            state.statusCarouselStep=0;
+        }
     }
 
     function syncStatusVisualEffects(){
         purgeLegacyCardVfx();
-        const enemyIndexes=typeof currentBattleMonsters!=="undefined"?currentBattleMonsters.filter(Number.isInteger):[];
-        enemyIndexes.forEach(index=>syncStatusVisualsForUnit("monster",index));
-        for(let index=0;index<6;index++){ syncStatusVisualsForUnit("player",index); }
+        syncStatusCarouselFrame();
     }
 
     function removeStatusVisualEffects(){
+        stopStatusCarousel();
+        state.statusCarouselStep=0;
         if(typeof document==="undefined"||typeof document.querySelectorAll!=="function"){ return; }
         [".v143-status-visual",".v143-status-icon"].forEach(selector=>
-            document.querySelectorAll(selector).forEach(node=>node.remove())
+            document.querySelectorAll(selector).forEach(removeNode)
         );
     }
     window.v143SyncStatusVisualEffects=syncStatusVisualEffects;

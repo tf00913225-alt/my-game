@@ -3657,6 +3657,8 @@ const elementSkillIconMap = {
     fireRocket:"assets/skills/fire-rocket.jpg",
     phoenixCry:"assets/skills/fire-phoenix-cry.jpg",
     flameTornado:"assets/skills/fire-flame-tornado.jpg",
+    fireSoulResonance:"assets/skills/fire-soul-resonance.webp",
+    bloodBurnArt:"assets/skills/fire-blood-burn-art.webp",
     fireEX:"assets/skills/fire-ex.jpg",
 
     /*
@@ -3709,6 +3711,7 @@ const elementSkillIconMap = {
     freeze:"assets/skills/water-freeze.jpg",
     revive:"assets/skills/water-revive.jpg",
     floodBeast:"assets/skills/water-flood-beast.jpg",
+    purifyMind:"assets/skills/water-purify-mind.webp",
 
     /*
        ★ 新增（依照使用者要求，「水元素
@@ -11647,6 +11650,7 @@ function syncTurnTimerWithBattlePickers(){
     const skillOverlay=$("skillQuickBar");
     const itemOverlay=$("itemMenu");
     const turnRow=$("turnTargetRow");
+    const actionRegion=$("battleActionRegion");
 
     if(!turnRow){
         return;
@@ -11670,6 +11674,15 @@ function syncTurnTimerWithBattlePickers(){
     turnRow.classList.toggle(
         "battle-item-open",
         itemOpen
+    );
+
+    const targetSelecting=!!(
+        actionRegion &&
+        actionRegion.classList.contains("target-selecting")
+    );
+    turnRow.classList.toggle(
+        "battle-operation-active",
+        skillOpen || itemOpen || targetSelecting
     );
 }
 
@@ -11744,6 +11757,7 @@ function setBattleTargetSelectionMode(actionType){
             "target-selecting"
         );
     }
+    syncTurnTimerWithBattlePickers();
 
     if(promptAction){
         promptAction.textContent=
@@ -11781,6 +11795,7 @@ function clearBattleTargetSelectionMode(){
     if(region){
         region.classList.remove("target-selecting");
     }
+    syncTurnTimerWithBattlePickers();
 
     document
         .querySelectorAll(
@@ -11824,6 +11839,7 @@ function setBattleAllyTargetSelectionMode(actionType){
     const promptAction=$("battleTargetPromptAction");
 
     if(region){ region.classList.add("target-selecting"); }
+    syncTurnTimerWithBattlePickers();
 
     if(promptAction){
         promptAction.textContent="選擇 ["+getBattleActionDisplayName(actionType)+"] 的我方目標";
@@ -23347,6 +23363,7 @@ function closeBattleStatusDetailModal(){
     if(!modal){ return; }
     modal.hidden=true;
     modal.setAttribute("aria-hidden","true");
+    if(document.body){ document.body.classList.remove("v174-battle-status-detail-open"); }
 }
 
 function renderBattleStatusDetailList(host,items){
@@ -23413,6 +23430,7 @@ function openBattleStatusDetailModal(side,index){
     renderBattleStatusDetailList(modal.querySelector('[data-list="debuffs"]'),summary.debuffs);
     modal.hidden=false;
     modal.setAttribute("aria-hidden","false");
+    if(document.body){ document.body.classList.add("v174-battle-status-detail-open"); }
     return true;
 }
 
@@ -33029,6 +33047,7 @@ function setBattleInfoExpanded(expanded){
     region.classList.toggle("is-expanded",next);
     toggle.setAttribute("aria-expanded",next?"true":"false");
     toggle.setAttribute("aria-label",next?"收合戰鬥資訊":"展開戰鬥資訊");
+    if(document.body){ document.body.classList.toggle("v174-battle-info-open",next); }
     return true;
 
 }

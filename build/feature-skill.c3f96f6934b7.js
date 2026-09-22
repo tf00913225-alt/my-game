@@ -61,14 +61,14 @@
             id:"fireSoulResonance",name:"炎魂共鳴",element:"fire",category:"buff",targetType:"self",
             learnLevel:25,learnCost:14,maxLevel:5,spCost:35,duration:3,requires:["rage"],progressionGroup:"tactical",
             momentumBonusByLevel:FIRE_MOMENTUM_BY_LEVEL.slice(),icon:"炎",
-            iconAssetPath:null,vfxAssetPath:null,
+            iconAssetPath:"assets/skills/fire-soul-resonance.webp",vfxAssetPath:"assets/vfx/fire/fire-soul-resonance-cast.webp",
             description:"需先學習怒火。自身進入炎魂共鳴3回合。期間火元素技能發生爆擊，或成功新增燃燒時，若尚未持有炎勢則獲得炎勢；炎勢使下一次玩家主動施放的火元素直接傷害主施放提高12%/15%/18%/21%/25%，使用後消失。炎勢不強化燃燒持續傷害與免費追擊。"
         },
         bloodBurnArt:{
             id:"bloodBurnArt",name:"焚血訣",element:"fire",category:"buff",targetType:"self",
             learnLevel:35,learnCost:18,maxLevel:5,spCost:20,duration:3,requires:["fireSoulResonance"],progressionGroup:"tactical",
             directDamageBonusByLevel:BLOOD_BURN_BY_LEVEL.slice(),icon:"血",
-            iconAssetPath:null,vfxAssetPath:null,
+            iconAssetPath:"assets/skills/fire-blood-burn-art.webp",vfxAssetPath:"assets/vfx/fire/blood-burn-art-cast.webp",
             description:"消耗最大生命5%/10%/15%/20%/25%。接下來3個有效回合，火系攻擊傷害提高5%/10%/15%/20%/25%。不強化燃燒持續傷害與免費追擊。"
         },
         fireEX:{learnLevel:50,learnCost:20,maxLevel:1,progressionGroup:"ex"},
@@ -83,7 +83,7 @@
         healSpell:{learnLevel:15,learnCost:8,maxLevel:5,requires:["frostPunch","floodBeast"],progressionGroup:"tactical"},
         revive:{learnLevel:20,learnCost:10,maxLevel:5,requires:["healSpell"],progressionGroup:"tactical"},
         freeze:{learnLevel:25,learnCost:14,maxLevel:1,requires:["iceSpin","iceArrowRain"],progressionGroup:"tactical"},
-        purifyMind:{learnLevel:35,learnCost:18,maxLevel:1,requires:["healSpell"],progressionGroup:"tactical"},
+        purifyMind:{learnLevel:35,learnCost:18,maxLevel:1,requires:["healSpell"],progressionGroup:"tactical",iconAssetPath:"assets/skills/water-purify-mind.webp",vfxAssetPath:"assets/vfx/water/purify-mind-cast.webp"},
         waterEX:{learnLevel:50,learnCost:20,maxLevel:1,progressionGroup:"ex"},
 
         stormFist:{learnLevel:1,learnCost:2,progressionGroup:"physical"},
