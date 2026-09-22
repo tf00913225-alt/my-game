@@ -88,7 +88,10 @@ assert.match(
 );
 assert.match(statsSource,/function installStatsEdgeDrag\(edge,root\)/);
 assert.match(statsCss,/\.battle-stats-edge-button[\s\S]*touch-action:none/);
-assert.match(statsCss,/\.battle-insight-drawer\{[\s\S]*z-index:72/);
+assert.match(statsCss,/\.battle-insight-drawer\{[\s\S]*z-index:18040/);
+assert.match(statsCss,/\.battle-stats-edge-button,[\s\S]*?z-index:18030/);
+assert.match(statsSource,/aria-label","戰鬥數據"/);
+assert.match(statsSource,/<header><b>戰鬥數據<\/b>/);
 assert.match(statsCss,/#battlePage\.v-fixed-slot-render-v2 \.battle-center-region\{[\s\S]*z-index:80/);
 assert.match(statsCss,/\.battle-statistics-result-panel\{[\s\S]*width:min\(900px,calc\(100% - 24px\)\)/);
 assert.match(statsCss,/\.battle-statistics-result-panel \.battle-stat-grid b\{font-size:22px/);
