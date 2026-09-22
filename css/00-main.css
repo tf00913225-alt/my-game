@@ -139,6 +139,14 @@ h1,h2,h3,
     z-index:0;
 }
 
+/* Interactive battle drawers/modals temporarily own the top battle plane.
+   Skill VFX and detached damage popups render on document.body at 16000/17020,
+   so raising the canonical game stage while a drawer is open prevents those
+   transient paint layers from covering controls or readable battle data. */
+#game-stage.battle-ui-priority{
+    z-index:18000;
+}
+
 /*
    全遊戲圖片／視覺媒體禁止瀏覽器原生長按、拖曳與選取。
    不使用 pointer-events:none，避免破壞既有按鈕／圖片點擊行為。
