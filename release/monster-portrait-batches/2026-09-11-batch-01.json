@@ -17,6 +17,6 @@
     "New portrait registry promotion is performed only after the corresponding lossless WebP exists.",
     "Daily gold portraits 63–65 are outside this batch and remain blocked until formal Library file_id values are available.",
     "No dev/main merge is authorized.",
-    "Historical note: four daily WebP targets were retired on 2026-09-21. On 2026-09-22 the project owner explicitly reauthorized already-present images; validated targets may return through the fast-import path without reopening this historical batch."
+    "Four corrupt daily WebP targets are permanently retired: they remain historical registry rows but are excluded from future batches, pending work, and generated-asset audits."
   ]
 }
