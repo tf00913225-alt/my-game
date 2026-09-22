@@ -76,5 +76,5 @@ Game / Cache Version：V173.70 / 173.70
 - V173.70 Release Lifecycle（發布生命週期）正式結案，此結論不因後續 dev 開發而改變。
 - 後續 dev 已完成 renderBattle Owner P1：PR #507 合併後 dev@07ce72ac6fc602ac4a31809c26d7e4e531d4d1b1。
 - renderBattle P1 Full Node Suite：203 / 203 PASS；PR #507 candidate CI、dev push CI、DEV exact-SHA deployment 與 deployed battle/VFX Live QA 均 SUCCESS。
-- 目前 dev behind main = 0、ahead main = 18；main / dev 實際檔案內容不再相同，原因是 V173.70 發布後已有文件收尾與已驗證 dev-only 重構。
+- 目前 dev behind main = 0；dev 已領先 main，main / dev 實際檔案內容不再相同，原因是 V173.70 發布後已有文件收尾與已驗證 dev-only 重構。
 - 正式 main 仍為 V173.70；不得把 dev-only renderBattle P1 誤寫成已發布 main。
