@@ -490,8 +490,6 @@
     window.v141AfterMonsterUiUpdate=v141AfterMonsterUiUpdate;
 
     if(typeof resolveQueuedPlayerAction==="function"){
-
-    if(typeof resolveQueuedPlayerAction==="function"){
         const originalResolveQueuedPlayerAction=resolveQueuedPlayerAction;
         resolveQueuedPlayerAction=function(characterIndex,token){
             const queued=queuedPlayerActions[characterIndex]
