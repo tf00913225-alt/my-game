@@ -621,12 +621,15 @@
         if(!anchor){ return; }
         const cardRect=typeof card.getBoundingClientRect==="function"?card.getBoundingClientRect():anchor.rect;
         const regularEnemy=side==="monster"&&!isBossIndexForVfx(index);
+        const shellStatus=type==="shield"||type==="barrier"||type==="earthShield"||type==="rockWall";
+        const widthScale=(regularEnemy?1.45:1.40)*(shellStatus?1.08:1);
+        const heightScale=(regularEnemy?1.36:1.34)*(shellStatus?1.08:1);
         const width=regularEnemy
-            ?Math.max(60,Math.min(anchor.rect.width*1.20,cardRect.width*1.20))
-            :Math.max(44,Math.min(anchor.rect.width*1.16,cardRect.width*1.16));
+            ?Math.max(72,Math.min(anchor.rect.width*widthScale,cardRect.width*widthScale))
+            :Math.max(62,Math.min(anchor.rect.width*widthScale,cardRect.width*widthScale));
         const height=regularEnemy
-            ?Math.max(58,Math.min(anchor.rect.height*1.16,cardRect.height*1.16))
-            :Math.max(52,Math.min(anchor.rect.height*1.14,cardRect.height*1.14));
+            ?Math.max(68,Math.min(anchor.rect.height*heightScale,cardRect.height*heightScale))
+            :Math.max(64,Math.min(anchor.rect.height*heightScale,cardRect.height*heightScale));
         node.dataset.slot=anchor.slot;
         node.style.width=Math.round(width)+"px";
         node.style.height=Math.round(height)+"px";
