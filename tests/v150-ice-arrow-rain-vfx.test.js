@@ -298,7 +298,7 @@ test("all damage numbers share frame eight while remaining target-specific",()=>
 });
 
 test("the current cache version publishes the 1.6 second battlefield choreography",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.70"/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.71"/);
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
     assert.match(animation,/frost-arrow-rain-vfx\.png\?v=173\.19/);
 });
