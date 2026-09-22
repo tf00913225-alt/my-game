@@ -107,6 +107,8 @@
             id:"purifyMind",tier:5,name:"淨心訣",element:"water",category:"buff",
             targetType:"ally",enemyTargetAllowed:true,learnCost:1,maxLevel:1,spCost:22,
             removeAllStates:true,requires:["frostPunch","floodBeast"],
+            iconAssetPath:"assets/skills/water-purify-mind.webp",
+            vfxAssetPath:"assets/vfx/water/purify-mind-cast.webp",
             description:"需先學習冰霜拳或洪水猛獸其一。初次學習需1技能點，可選擇1名我方或敵方目標；對我方解除所有增益與所有異常狀態，對敵方解除所有增益狀態（包含結界、護盾等），不會移除敵方負面狀態。消耗22 SP，最高1級。"
         },
         waterEX:{
