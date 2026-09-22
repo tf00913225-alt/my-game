@@ -95,7 +95,8 @@ test("stun final hit reduction applies after capped accuracy and evasion",()=>{
     assert.equal(context.v158GetHitChancePercent(0,10,0),85.5);
     assert.equal(context.v158GetHitChancePercent(0,1000,0),14.250000000000002);
     assert.equal(context.v158GetHitChancePercent(0,1000,50),1);
-    assert.equal(context.v158GetHitChancePercent(1000,0,0),99);\n    assert.ok(Math.abs(context.v158GetHitChancePercent(1000,10,15)-74.1)<Number.EPSILON*100);
+    assert.equal(context.v158GetHitChancePercent(1000,0,0),99);
+    assert.ok(Math.abs(context.v158GetHitChancePercent(1000,10,15)-74.1)<Number.EPSILON*100);
 });
 
 test("default monster evasion is level times 0.3 capped at 30 without replacing any custom evasion",()=>{
