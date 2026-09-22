@@ -4,11 +4,45 @@
 
 1. `docs/MONSTER_PORTRAIT_SPEC_V1.md` — 人類可讀正式規格。
 2. `config/monster-portrait-registry.json` — 機器可讀目標清單與路徑。
-3. `scripts/audit-monster-portraits.mjs` — 全域自動盤點與缺圖驗證。
-4. `release/monster-portrait-batches/*.json` — 每批唯一允許處理的 registry keys。
-5. `scripts/audit-monster-portrait-batch.mjs` — 單批 strict gate。
+3. `scripts/import-monster-portraits.mjs` — 已生成素材的正式快速導入 owner。
+4. `scripts/audit-monster-portraits.mjs` — 全域自動盤點與缺圖驗證。
+5. `release/monster-portrait-batches/*.json` — 尚未生成素材的 batch 邊界。
+6. `scripts/audit-monster-portrait-batch.mjs` — 單批 strict gate。
 
-固定流程：
+固定流程分成兩條，禁止混用：
+
+### A. 已生成素材快速導入（預設）
+
+當核准素材已經完成 WebP 轉檔，且已放到 `config/monster-portrait-registry.json` 指定的正式路徑時，**不再要求建立 batch manifest 或重跑生成流程**。
+
+直接使用：
+
+```bash
+npm run portrait:import -- --keys=<portraitKey,portraitKey,...>
+```
+
+也可針對單一 registry group：
+
+```bash
+npm run portrait:import -- --group=daily --dry-run
+```
+
+工具固定負責：
+
+- 驗證選取範圍，禁止無 scope 全量升級。
+- 正式目標限定在 `assets/monsters/`；若舊 Registry 仍是 `.png/.jpg/.jpeg`，但同 stem 的核准 `.webp` 已存在，工具會自動把 Registry 路徑收斂成 `.webp`。
+- 驗證 WebP 可解碼、尺寸符合 sizeClass、保留 Alpha 且真的有透明像素。
+- `planned` 素材通過後直接升為 `existing`。
+- `retired` 預設拒絕；只有已明確授權重新啟用的 target 才可加 `--reactivate-retired`。
+- 日常副本必須仍由 runtime 寫入明確 `portraitKey`。
+- 匯入前必須跑既有 `tests/monster-portrait-runtime.test.js`，確認 V154 owner／V159 同步契約沒有漂移。
+- 更新 registry snapshot 時，`retired` 不得被誤算成 `planned`。
+
+這條快速流程只處理「素材已生成、已核准、已落正式路徑」的導入；**不得重新生成、裁切、改圖或自行從中文檔名猜對應關係**。
+
+### B. 尚未生成素材的批次流程
+
+只有素材尚未完成時，才走：
 
 **自動盤點 → 按 batch 生成 → 自動放置 → batch finalize → batch strict audit → 下一批**
 

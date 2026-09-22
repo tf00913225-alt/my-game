@@ -7,6 +7,7 @@
     "build:check": "node scripts/build-production.mjs --check",
     "test": "node .github/scripts/ci.mjs tests",
     "qa:boot": "node .github/scripts/run-boot-architecture-browser-qa.mjs",
-    "release:update-diff": "node scripts/prepare-release-update-diff.mjs"
+    "release:update-diff": "node scripts/prepare-release-update-diff.mjs",
+    "portrait:import": "node scripts/import-monster-portraits.mjs"
   }
 }
