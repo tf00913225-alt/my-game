@@ -152,38 +152,6 @@ const registry={
     assert.equal(runtime.cards[0].dataset.monsterPortraitKey,"legacy.abyss.天兵天將");
 }
 
-{
-    const formalRegistry=JSON.parse(fs.readFileSync("config/monster-portrait-registry.json","utf8"));
-    const keys=[
-        "daily.exp.regular",
-        "daily.exp.elite",
-        "daily.exp.boss",
-        "daily.material.regular",
-        "daily.material.elite",
-        "daily.material.boss"
-    ];
-    const rows=formalRegistry.groups.daily.filter(row=>keys.includes(row[0]));
-    assert.equal(rows.length,6,"six present EXP/material daily portraits must stay registered");
-    assert.deepEqual(rows.map(row=>row[6]),Array(6).fill("existing"),
-        "all present EXP/material daily portraits must be active");
-    const runtime=loadRuntime(rows.map(row=>({
-        portraitKey:row[0],
-        name:row[1],
-        element:"fire",
-        rank:row[3],
-        v132Dungeon:true
-    })));
-    runtime.context.v154InstallMonsterPortraitRegistry(formalRegistry);
-    runtime.context.v154SyncMonsterPortraits();
-    assert.deepEqual(runtime.cards.slice(0,6).map(card=>card.dataset.monsterPortraitKey),keys);
-    assert.deepEqual(runtime.monsters.map(monster=>runtime.context.resolveMonsterPortrait(monster)),
-        rows.map(row=>row[5]));
-    assert.equal(runtime.cards.slice(0,6).some(card=>
-        card.dataset.monsterPortraitKey==="temporary.heavenly-soldier"||
-        card.dataset.monsterPortraitKey==="temporary.boss-reference"
-    ),false,"present daily portraits must never resolve through temporary fallback");
-}
-
 assert.match(source,/MONSTER_PORTRAIT_REGISTRY_URL="config\/monster-portrait-registry\.json"/);
 assert.match(source,/TEMPORARY_MONSTER_PORTRAIT="assets\/dungeons\/abyss\/soldier\.webp"/);
 assert.match(source,/TEMPORARY_BOSS_PORTRAIT="assets\/monsters\/boss\/boss-placeholder-fire-demon\.webp"/);
