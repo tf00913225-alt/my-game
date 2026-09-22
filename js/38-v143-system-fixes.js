@@ -166,18 +166,14 @@
         currentBattleMonsters.forEach(decorateEnemyCard);
     }
 
-    if(typeof renderBattle==="function"){
-        const previousRenderBattle=renderBattle;
-        renderBattle=function(){
-            const result=previousRenderBattle.apply(this,arguments);
-            decorateEnemyCards();
-            if(typeof requestAnimationFrame==="function"){ requestAnimationFrame(decorateEnemyCards); }
-            if(typeof window.v144ConfigureDungeonBattleSkillsAfterRender==="function"){
-                window.v144ConfigureDungeonBattleSkillsAfterRender();
-            }
-            return result;
-        };
+    function v143AfterBattleRender(){
+        decorateEnemyCards();
+        if(typeof requestAnimationFrame==="function"){ requestAnimationFrame(decorateEnemyCards); }
+        if(typeof window.v144ConfigureDungeonBattleSkillsAfterRender==="function"){
+            window.v144ConfigureDungeonBattleSkillsAfterRender();
+        }
     }
+    window.v143AfterBattleRender=v143AfterBattleRender;
     if(typeof updateMonsterUI==="function"){
         const previousUpdateMonsterUI=updateMonsterUI;
         updateMonsterUI=function(index){
