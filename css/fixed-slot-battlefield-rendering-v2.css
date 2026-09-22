@@ -15,6 +15,9 @@
     --battle-ally-region-track:42fr;
     --battle-info-panel-height:150px;
     --battle-info-handle-height:34px;
+    --battle-command-row-height:66px;
+    --battle-command-art-overhang:34px;
+    --battle-command-visual-height:calc(var(--battle-command-row-height) + var(--battle-command-art-overhang));
     --battle-region-gap:4px;
     --battle-title-height:20px;
     --battle-enemy-zone-height:100%;
@@ -92,7 +95,7 @@
     position:absolute;
     left:0;
     right:0;
-    bottom:78px;
+    bottom:var(--battle-command-visual-height);
     align-self:center;
     flex:0 0 36px;
     width:max-content;
@@ -125,9 +128,9 @@
     height:var(--battle-info-panel-height) !important;
     padding:0 4px 4px;
     overflow:visible !important;
-    border-top:1px solid rgba(210,158,64,.9);
-    background:linear-gradient(180deg,rgba(23,18,12,.99),rgba(7,7,6,.99));
-    box-shadow:0 -8px 22px rgba(0,0,0,.68);
+    border:0;
+    background:transparent;
+    box-shadow:none;
     pointer-events:none;
     transform:translateY(calc(100% - var(--battle-info-handle-height)));
     transition:transform .26s ease;
@@ -139,6 +142,11 @@
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region.is-expanded{
     pointer-events:auto;
     transform:translateY(0);
+    border:1px solid rgba(138,106,58,.72);
+    border-bottom:0;
+    border-radius:8px 8px 0 0;
+    background:rgba(8,8,8,.96);
+    box-shadow:none;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region > .battle-info-header-row{
     position:relative;
