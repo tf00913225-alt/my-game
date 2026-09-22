@@ -412,6 +412,7 @@
             closeMenus();
             const region=document.getElementById("battleActionRegion");
             if(region){ region.classList.add("target-selecting"); }
+            if(typeof syncTurnTimerWithBattlePickers==="function"){ syncTurnTimerWithBattlePickers(); }
             const prompt=document.getElementById("battleTargetPromptAction");
             if(prompt){ prompt.textContent="選擇要使用［"+definition.name+"］的角色"; }
             currentBattleMonsters.forEach(index=>{
