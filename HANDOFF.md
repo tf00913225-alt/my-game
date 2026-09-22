@@ -1,3 +1,22 @@
+## 2026-09-22 — V173.70 正式發布完成／main-dev 收斂完成
+
+- 正式版本：V173.70。
+- V173.70 功能發布 SHA：`25c34a2dbbfce4600691df959cc2823eff80aeab`。
+- 最新 `main`：`0b62be5944ff7a440682bfae28b3ccc43ee2fe91`。
+- 最新 `dev`：`9a2bbc31604331fb0fe97843b25036b3cbd5a5c1`。
+- PR #503：V173.70 正式發布成功。
+- PR #504：CHECK_REPORT 發布後文件收尾成功。
+- PR #505：main→dev 歷史收斂成功。
+- main CI：SUCCESS（run 35683542056）。
+- GitHub Pages：SUCCESS（run 35683540344）。
+- dev CI：SUCCESS。
+- Full Node Suite：203 / 203 PASS。
+- Game / Cache Version：173.70 / 173.70。
+- Open PR：0；Open Issue：0。
+- `main`／`dev` 實際檔案內容一致；`dev` behind `main` = 0，僅多 1 個 main→dev 收斂 Merge Commit。
+- V173.70 Release Lifecycle（發布生命週期）已正式結案。
+- **Historical Record（歷史紀錄）註記：下方 V173.69 與舊 V173.70 候選內容只保留作歷史脈絡，不得再被 AI／代理當成目前正式狀態或下一步發布指示。**
+
 ## 2026-09-21 — 目前正式狀態／V173.70 候選結案
 
 - 正式 `main`：V173.69，Game／Cache Version 為 `173.69`；目前 SHA：`f747717493da6e2a7f259079a9d1fc0afeb9b5c0`。正式 CI 與 Pages deployment 均已成功。

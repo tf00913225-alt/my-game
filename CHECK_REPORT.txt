@@ -72,4 +72,8 @@ Game / Cache Version：V173.70 / 173.70
 - Requirements：11 / 11 VERIFIED。
 - 正式 main CI：292 / 292 syntax、203 / 203 Node suites、383 resources、252 HTML IDs、32 deterministic build assets。
 - 正式 main CI 與 GitHub Pages deployment 均 SUCCESS。
-- 發布後唯一剩餘收尾：以 PR 將最新 main 歷史回流 dev，完成分支收斂。
+- PR #505 已完成 main→dev 回流。
+- 最新 dev：9a2bbc31604331fb0fe97843b25036b3cbd5a5c1。
+- dev behind main = 0。
+- main / dev 實際檔案內容一致；dev 只多 1 個收斂 Merge Commit。
+- V173.70 Release Lifecycle（發布生命週期）正式結案。
