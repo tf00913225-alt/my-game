@@ -556,9 +556,9 @@ test("cast sheets stay one-shot while Burn and Rage use single-image breathing",
     assert.match(css,/v143RasterCastFrames var\(--v143-sprite-duration,1200ms\) steps\(1,end\) var\(--v143-sprite-delay,0ms\) 1 both/);
     assert.doesNotMatch(css,/v143RasterCastFrames[^;]*infinite/);
     assert.doesNotMatch(css,/v143StatusRasterFrames/);
-    assert.match(css,/\.v143-status-visual--pulse\{[\s\S]*?v143StatusImageBreath 2\.2s ease-in-out infinite/);
-    assert.match(animation,/burn:statusVisual\("assets\/vfx\/fire\/burn-loop\.png\?v=165","pulse","statusEffects"/);
-    assert.match(animation,/rage:statusVisual\("assets\/vfx\/fire\/rage-buff-loop\.png\?v=165","pulse","activeBuffs"/);
+    assert.match(css,/\.v143-status-visual--pulse\{[\s\S]*?v143StatusImageBreath 2s ease-in-out infinite/);
+    assert.match(animation,/burn:statusVisual\("assets\/vfx\/status\/burn\.webp","pulse","statusEffects"/);
+    assert.match(animation,/rage:statusVisual\("assets\/vfx\/status\/rage\.webp","pulse","activeBuffs"/);
     assert.equal((loader.match(/const V_ASSET_VERSION="([^"]+)"/)||[])[1],releaseMeta.cacheVersion);
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
