@@ -86,7 +86,7 @@ for(const [element,groups] of Object.entries(ELEMENT_DAMAGE_SKILLS)){
     }
 }
 
-assert.match(index,/<section class="battle-enemy-region"[\s\S]*id="battleMonsterArea"[\s\S]*<section class="battle-center-region"[\s\S]*id="turnTargetRow"[\s\S]*id="battleActionRegion"[\s\S]*<section class="battle-ally-region"[\s\S]*id="battlePlayerRow"[\s\S]*<section class="battle-info-region"[\s\S]*id="battleInfo"/);
+assert.match(index,/<section class="battle-enemy-region"[\s\S]*id="battleMonsterArea"[\s\S]*<section class="battle-center-region"[\s\S]*id="battleActionRegion"[\s\S]*id="turnTargetRow"[\s\S]*<section class="battle-ally-region"[\s\S]*id="battlePlayerRow"[\s\S]*<section class="battle-info-region"[\s\S]*id="battleInfo"/);
 const centerMarkup=index.slice(index.indexOf('<section class="battle-center-region"'),index.indexOf('<section class="battle-ally-region"'));
 assert.doesNotMatch(centerMarkup,/id="battleInfo"/,"the bottom battle log must not be owned by the middle controls");
 assert.doesNotMatch(index,/<div class="battle-monster-gap-filler"><\/div>/,"legacy space-filler must not own battle layout");
