@@ -174,18 +174,15 @@
         }
     }
     window.v143AfterBattleRender=v143AfterBattleRender;
-    if(typeof updateMonsterUI==="function"){
-        const previousUpdateMonsterUI=updateMonsterUI;
-        updateMonsterUI=function(index){
-            const result=previousUpdateMonsterUI.apply(this,arguments);
-            decorateEnemyCard(index);
-            syncEarthShieldEffects();
-            syncMonsterBarrierText(index);
-            const card=document.getElementById("battleMonster"+index);
-            if(card){ fitEnemyBars(card); }
-            return result;
-        };
+    function v143SystemAfterMonsterUiUpdate(index){
+        decorateEnemyCard(index);
+        syncMonsterBarrierText(index);
+        const card=document.getElementById("battleMonster"+index);
+        if(card){ fitEnemyBars(card); }
     }
+    window.v143SystemAfterMonsterUiUpdate=v143SystemAfterMonsterUiUpdate;
+
+    /* ----- 7. Wanxiang Earth Shield owns a four-corner elemental frame. ----- */
 
     /* ----- 7. Wanxiang Earth Shield owns a four-corner elemental frame. ----- */
     function hasActiveBuffType(entity,type){
@@ -679,15 +676,6 @@
             return result;
         };
     }
-    if(typeof updateUI==="function"){
-        const previousUpdateUI=updateUI;
-        updateUI=function(){
-            const result=previousUpdateUI.apply(this,arguments);
-            decorateEnemyCards(); syncEarthShieldEffects();
-            return result;
-        };
-    }
-
     function boot(){
         fixDungeonNavigation();
         decorateEnemyCards();
