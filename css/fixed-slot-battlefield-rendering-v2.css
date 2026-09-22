@@ -337,8 +337,10 @@
     overflow:visible !important;
     contain:none !important;
     transform-origin:center bottom !important;
-    will-change:transform,filter !important;
-    animation:v174BattleIdle 3.4s ease-in-out infinite !important;
+    /* Dense battles previously promoted every portrait to a continuously
+       animated/filtering compositor layer. Keep portraits static between
+       actions; attacker lunge and target reticle still animate on demand. */
+    animation:none !important;
     filter:drop-shadow(0 7px 4px rgba(0,0,0,.52));
     pointer-events:none !important;
 }
@@ -350,9 +352,9 @@
     width:66%;
     height:10px;
     border-radius:50%;
-    background:rgba(0,0,0,.42);
-    filter:blur(2px);
+    background:rgba(0,0,0,.34);
     transform:translateX(-50%);
+    opacity:.72;
     pointer-events:none;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit > .v174-battle-art ~ *{z-index:6;}
