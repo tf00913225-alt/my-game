@@ -1452,7 +1452,11 @@
             queued=true;
             requestAnimationFrame(()=>{ queued=false; syncContextNavigation(); syncQuestNoticeDots(); });
         });
-        const observe=()=>observer.observe(document.body,{childList:true,subtree:true});
+        const observe=()=>[
+            document.getElementById("mapPage"),
+            document.getElementById("dungeonPage"),
+            document.getElementById("homeFeatureModal")
+        ].filter(Boolean).forEach(root=>observer.observe(root,{childList:true,subtree:true,attributes:true,attributeFilter:["class"]}));
         if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",observe,{once:true}); }
         else{ observe(); }
     }
