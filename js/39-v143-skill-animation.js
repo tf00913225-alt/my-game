@@ -23,6 +23,9 @@
     const PLACEMENT_SIZE_SCALE=Object.freeze({single:.88,targetTrajectory:.80,trajectory:1,group:1,battlefield:1});
     const spriteFrameAspectCache=new Map();
     const spriteFrameAspectLoading=new Set();
+    const STATUS_CAROUSEL_INTERVAL_MS=1000;
+    let statusCarouselTimer=null;
+    let statusCarouselPhase=0;
 
     function castSheet(src,placement,options){
         return Object.assign({
@@ -68,6 +71,8 @@
         flameTornado:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/flame-tornado-cast.png?v=165","single",{scale:2.35,maxSize:300})},
         phoenixCry:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/phoenix-cry-cast.png?v=165","battlefield",{scale:1.12,minSize:280})},
         rage:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/rage-cast.png?v=165","single",{scale:1.08,minSize:96,maxSize:148})},
+        fireSoulResonance:{hit:DEFAULT_HIT,deferredActorStatusTypes:["fireSoulResonance"],sprite:castSheet("assets/vfx/fire/fire-soul-resonance-cast.webp","single",{scale:1.55,minSize:128,maxSize:190})},
+        bloodBurnArt:{hit:DEFAULT_HIT,deferredActorStatusTypes:["bloodBurn"],sprite:castSheet("assets/vfx/fire/blood-burn-cast.webp","single",{scale:1.55,minSize:128,maxSize:190})},
         fireEX:{hit:.74,noVisual:true,passive:true},
 
         waterKnife:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/water-blade-slash-vfx.png?v=166","single",{scale:2.05,maxSize:250})},
@@ -80,7 +85,7 @@
         freeze:{hit:DEFAULT_HIT,deferredStatusTypes:["freeze"],sprite:castSheet("assets/vfx/water/freeze-cast-vfx.png?v=166","single",{scale:2.2,maxSize:270})},
         healSpell:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/water-heal-vfx.png?v=166","single",{scale:2.05,maxSize:250})},
         revive:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/water-revive-vfx.png?v=166","single",{scale:2.3,maxSize:285})},
-        purifyMind:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/water-heal-vfx.png?v=166","single",{scale:2.05,maxSize:250,reusedFrom:"healSpell"})},
+        purifyMind:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/purify-mind-cast.webp","single",{scale:2.05,maxSize:250})},
         waterEX:{hit:.74,noVisual:true,passive:true},
 
         stormFist:{hit:.5,deferredStatusTypes:["agilityDown"],sprite:castSheet("assets/vfx/wind/storm-fist-cast.png?v=173.24","single",{scale:2.15,maxSize:260})},
@@ -151,7 +156,7 @@
         freeze:statusVisual("assets/vfx/status/freeze.webp","static","statusEffects",{label:"冰封",statusName:"冰封",iconSrc:"assets/vfx/status/freeze.webp"}),
         agilityDown:statusVisual("","icon","statusEffects",{label:"重力",statusName:"重力",iconSrc:"assets/vfx/status/gravity-icon.webp"}),
         damageDown:statusVisual("","icon","statusEffects",{label:"殤風",statusName:"殤風",iconSrc:"assets/vfx/status/damage-down-icon.webp"}),
-        stun:statusVisual("","icon","statusEffects",{label:"暈眩",statusName:"暈眩",iconSrc:"assets/vfx/status/stun-icon.webp"}),
+        stun:statusVisual("assets/vfx/wind/stun-loop.png","pulse","statusEffects",{label:"暈眩",statusName:"暈眩",iconSrc:"assets/vfx/status/stun-icon.webp",frameColumns:4,frameRows:3,frameIndex:5}),
         dodgeSkill:statusVisual("assets/vfx/status/windwalk.webp","pulse","activeBuffs",{label:"風行",statusName:"風行",iconSrc:"assets/vfx/status/windwalk.webp"}),
         stealthSkill:statusVisual("assets/vfx/status/stealth.webp","static","activeBuffs",{label:"隱身",statusName:"隱身",iconSrc:"assets/vfx/status/stealth.webp"}),
         dinghaishenzhen:statusVisual("assets/vfx/status/calm-mind.webp","pulse","activeBuffs",{label:"氣定神閒",statusName:"氣定神閒",iconSrc:"assets/vfx/status/calm-mind.webp"}),
@@ -538,10 +543,14 @@
         )||null;
     }
 
-    function removeStatusVisual(card,side,index,type){
+    function removeStatusBodyVisual(card,type){
         const visual=statusVisualNode(card,type);
         if(visual&&typeof visual.remove==="function"){ visual.remove(); }
         else if(visual&&visual.parentNode){ visual.parentNode.removeChild(visual); }
+    }
+
+    function removeStatusVisual(card,side,index,type){
+        removeStatusBodyVisual(card,type);
         const host=statusIconHost(side,index,card);
         const icon=statusIconNode(host,type);
         if(icon&&typeof icon.remove==="function"){ icon.remove(); }
@@ -556,8 +565,20 @@
         node.dataset.renderer="dom-status-visual";
         if(typeof node.setAttribute==="function"){ node.setAttribute("aria-hidden","true"); }
         node.style.backgroundImage='url("'+String(spec.src).replace(/"/g,"%22")+'")';
-        node.style.backgroundSize="contain";
-        node.style.backgroundPosition="center";
+        const columns=Math.max(1,Number(spec.frameColumns)||1);
+        const rows=Math.max(1,Number(spec.frameRows)||1);
+        if(columns>1||rows>1){
+            const frame=Math.max(0,Math.min(columns*rows-1,Number(spec.frameIndex)||0));
+            const col=frame%columns;
+            const row=Math.floor(frame/columns);
+            node.style.backgroundSize=(columns*100)+"% "+(rows*100)+"%";
+            node.style.backgroundPosition=
+                (columns>1?(col/(columns-1))*100:50)+"% "+
+                (rows>1?(row/(rows-1))*100:50)+"%";
+        }else{
+            node.style.backgroundSize="contain";
+            node.style.backgroundPosition="center";
+        }
         return node;
     }
 
@@ -579,13 +600,17 @@
         return node;
     }
 
-    function syncStatusVisual(side,index,type){
+    function activeStatusTypesForUnit(side,index,card,entity){
+        if(!card||!entity||Number(entity.hp)<=0||(side==="monster"&&entity.alive===false)){ return []; }
+        return Object.keys(RAW_STATUS_VISUALS).filter(type=>
+            hasTimedEffect(entity,type)&&!deferredStatusDuringCast(side,index,type)
+        );
+    }
+
+    function syncStatusVisual(side,index,type,activeTypes,activeBodyType,card){
         const spec=STATUS_VISUALS[type];
-        const card=cardFor(side,index);
-        const entity=entityFor(side,index);
-        const alive=!!(spec&&card&&entity&&Number(entity.hp)>0&&(side!=="monster"||entity.alive!==false));
-        const active=alive&&hasTimedEffect(entity,type);
-        if(!active||deferredStatusDuringCast(side,index,type)){
+        const active=!!(spec&&activeTypes.has(type));
+        if(!active){
             removeStatusVisual(card,side,index,type);
             return;
         }
@@ -593,9 +618,8 @@
         const host=statusIconHost(side,index,card);
         if(host&&!statusIconNode(host,type)){ host.appendChild(createStatusIcon(type,spec)); }
 
-        if(spec.mode==="icon"){
-            const body=statusVisualNode(card,type);
-            if(body&&typeof body.remove==="function"){ body.remove(); }
+        if(spec.mode==="icon"||!spec.src||activeBodyType!==type){
+            removeStatusBodyVisual(card,type);
             return;
         }
 
@@ -608,25 +632,65 @@
         const anchor=slotAnchor(side,index,card);
         if(!anchor){ return; }
         const cardRect=typeof card.getBoundingClientRect==="function"?card.getBoundingClientRect():anchor.rect;
-        const width=Math.max(24,Math.min(anchor.rect.width*.68,cardRect.width*.68));
-        const height=Math.max(36,Math.min(anchor.rect.height*.72,cardRect.height*.72));
+        const width=Math.max(28,Math.min(anchor.rect.width*.82,cardRect.width*.82));
+        const height=Math.max(42,Math.min(anchor.rect.height*.84,cardRect.height*.84));
         node.dataset.slot=anchor.slot;
         node.style.width=Math.round(width)+"px";
         node.style.height=Math.round(height)+"px";
     }
 
     function syncStatusVisualsForUnit(side,index){
-        Object.keys(RAW_STATUS_VISUALS).forEach(type=>syncStatusVisual(side,index,type));
+        const card=cardFor(side,index);
+        const entity=entityFor(side,index);
+        const activeList=activeStatusTypesForUnit(side,index,card,entity);
+        const activeTypes=new Set(activeList);
+        const bodyTypes=activeList.filter(type=>{
+            const spec=STATUS_VISUALS[type];
+            return !!(spec&&spec.mode!=="icon"&&spec.src);
+        });
+        const activeBodyType=bodyTypes.length
+            ?bodyTypes[statusCarouselPhase%bodyTypes.length]
+            :null;
+        Object.keys(RAW_STATUS_VISUALS).forEach(type=>
+            syncStatusVisual(side,index,type,activeTypes,activeBodyType,card)
+        );
+        return bodyTypes.length>1;
+    }
+
+    function stopStatusCarousel(){
+        if(statusCarouselTimer!==null&&typeof clearInterval==="function"){
+            clearInterval(statusCarouselTimer);
+        }
+        statusCarouselTimer=null;
+    }
+
+    function setStatusCarouselActive(active){
+        if(!active){
+            stopStatusCarousel();
+            statusCarouselPhase=0;
+            return;
+        }
+        if(statusCarouselTimer!==null||typeof setInterval!=="function"){ return; }
+        statusCarouselTimer=setInterval(()=>{
+            statusCarouselPhase=(statusCarouselPhase+1)%1000000;
+            syncStatusVisualEffects();
+        },STATUS_CAROUSEL_INTERVAL_MS);
     }
 
     function syncStatusVisualEffects(){
         purgeLegacyCardVfx();
+        let needsCarousel=false;
         const enemyIndexes=typeof currentBattleMonsters!=="undefined"?currentBattleMonsters.filter(Number.isInteger):[];
-        enemyIndexes.forEach(index=>syncStatusVisualsForUnit("monster",index));
-        for(let index=0;index<6;index++){ syncStatusVisualsForUnit("player",index); }
+        enemyIndexes.forEach(index=>{ if(syncStatusVisualsForUnit("monster",index)){ needsCarousel=true; } });
+        for(let index=0;index<6;index++){
+            if(syncStatusVisualsForUnit("player",index)){ needsCarousel=true; }
+        }
+        setStatusCarouselActive(needsCarousel);
     }
 
     function removeStatusVisualEffects(){
+        stopStatusCarousel();
+        statusCarouselPhase=0;
         if(typeof document==="undefined"||typeof document.querySelectorAll!=="function"){ return; }
         [".v143-status-visual",".v143-status-icon"].forEach(selector=>
             document.querySelectorAll(selector).forEach(node=>node.remove())
