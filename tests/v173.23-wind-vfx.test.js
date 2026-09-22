@@ -485,8 +485,8 @@ test("persistent status visuals start only on success, survive duplicate MISS, a
     applied.setClock(1200);
     runTimers(applied,1200);
     const gravity=applied.cards.battleMonster0.querySelector(".v143-status-icon-agilityDown");
-    assert.ok(gravity,"successful status starts its icon pulse");
-    assert.equal(gravity.dataset.statusMode,"iconPulse");
+    assert.ok(gravity,"successful status starts its fixed icon");
+    assert.equal(gravity.dataset.statusMode,"icon");
 
     applied.monsters[0].statusEffects.push({type:"damageDown",turnsLeft:1});
     applied.context.v143SyncStatusVisualEffects();
