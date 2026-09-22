@@ -620,8 +620,6 @@
     }
 
     if(typeof window.v141PlayCardEffect==="function"){
-
-    if(typeof window.v141PlayCardEffect==="function"){
         const previousPlayCardEffect=window.v141PlayCardEffect;
         window.v141PlayCardEffect=function(side,index,type){
             if(side==="monster"&&type==="revive"){ syncMonsterCard(index); }
