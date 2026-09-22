@@ -387,7 +387,7 @@ if(originalSwitchSynthesis){
 
 /* ---------- 4. Force current return artwork on patrol/dungeon navigation. ---------- */
 function syncReturnIcons(){
-    document.querySelectorAll('img[src*="map-return.png"],img[src*="patrol-back.png"]').forEach(img=>{
+    document.querySelectorAll('img[src*="map-return.png"]').forEach(img=>{
         if(img.src&&!/assets\/ui\/map-return\.png(?:\?|$)/.test(img.getAttribute("src")||"")){img.setAttribute("src","assets/ui/map-return.png");}
     });
 }
