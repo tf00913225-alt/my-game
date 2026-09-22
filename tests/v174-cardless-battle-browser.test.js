@@ -179,9 +179,9 @@ function runViewport(chrome,width,height){
     assert.equal(data.activeOutlineWidth,"0px");
     assert.equal(data.activeShadow,"none");
     assert.notEqual(data.activeArtFilter,"none","active cardless feedback must remain on artwork instead of a card frame");
-    assert.equal(data.playerIdle,"v174BattleIdle");
+    assert.equal(data.playerIdle,"none","cardless portraits stay static between actions to avoid permanent compositor work");
     assert.equal(data.lungeAnimation,"v174BattleLungeUp");
-    assert.equal(data.hitAnimation,"v174BattleIdle","damage popups must not replace the formal cardless idle animation with hit feedback");
+    assert.equal(data.hitAnimation,"none","damage popups must not start a persistent portrait animation");
     assert.notEqual(data.footShadowContent,"none");
     assert.equal(data.abyssOwnerOpacity,"0");
     assert.equal(data.playerHp,"835");
