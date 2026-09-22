@@ -1,3 +1,16 @@
+## 2026-09-22 — 戰鬥狀態輪播／抽屜圖層／倒數框／三技能 VFX Follow-up（candidate）
+
+- Base：`dev@d55410bd88590b9a9052b1b4d714a27b3cc9a411`；工作分支：`fix/battle-status-carousel-drawers-vfx-20260922`；`main`／`dev` 均未直接修改。
+- Persistent Status Visual Owner 維持 `js/39-v143-skill-animation.js`。狀態 Icon 由 14px 放大至 17px；Body 狀態圖由約 68%×72% 放大至約 82%×86%；多個 Body 狀態改為每 1 秒只顯示一種並輪播，Icon 仍可同時保留作資訊列。呼吸最大透明度改為 100%。
+- 暈眩正式 Body 狀態圖接為 `assets/vfx/status/stun.webp`。原始素材實際為 1774×887 單張圖，不是 4×3 Sprite Sheet；因此未做錯誤裁幀。
+- 戰鬥資訊底部入口改為橫向「戰鬥資訊」；左側統計入口／Drawer 改名「戰鬥數據」。底部抽屜收合時顯示目前回合，展開時隱藏該重複回合文字。
+- `syncBattleUiPriorityLayer()` 為互動資訊圖層協調入口：戰鬥資訊、戰鬥數據、Boss 功能卡或狀態資訊視窗打開時，`#game-stage` 暫時提升到技能 VFX（16000）與 detached damage popup（17020）之上；關閉後恢復一般戰場繪製順序。Drawer 仍為 non-blocking observer，不取得 BattleFlow pause lock。
+- 手動回合倒數框已移入 `#battleActionRegion`，固定於操作面板上方；技能／物品選擇及目標選擇時透明度降為 25%，且 `pointer-events:none`，不攔截玩家選擇目標。
+- Lag 根因之一為密集戰場每張角色／怪物立繪永久執行 idle transform + filter compositor 工作。現在待機立繪靜止；實際攻擊 lunge 與 target reticle 仍保留動畫；每單位腳下 blur filter 已移除。
+- 三個技能正式新素材：淨心訣、炎魂共鳴、焚血訣各自新增裁切正方形 lossless WebP Icon，以及保留完整 4×3 畫布的 lossless WebP cast VFX。VFX 尺寸均為 1448×1086。所有轉檔使用 `cwebp -lossless -exact`，反解碼後尺寸一致且 AE=0。
+- 有效資產轉檔 Run：`35730204057` SUCCESS；生成／Build commit：`563d1608ac04ba62908ff91444d27daad800c94f`。一次性資產 Workflow 已從工作分支移除。
+- Requirement Batch：`release/requirement-batches/2026-09-22-battle-status-carousel-drawers-vfx-followup.json` 目前 IMPLEMENTED；待 PR Repository checks／mobile browser QA／DEV exact-SHA deployment 後再升級 VERIFIED。
+
 ## 2026-09-22 — 戰鬥狀態 Icon／卡牌資訊視窗／正式狀態圖（DEV candidate）
 
 - Base：最新 `dev@c496d98d6ee373a4f0d31bc299cdd648d3be5da5`；工作分支：`fix/battle-status-info-assets-20260922`；`main` 未修改。

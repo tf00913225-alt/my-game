@@ -244,8 +244,7 @@
 }
 
 #game-stage #battlePage .v143-status-visual--pulse{
-    animation:v143StatusImageBreath 2.2s ease-in-out infinite;
-    will-change:opacity;
+    animation:v143StatusImageBreath 1s ease-in-out infinite;
 }
 
 #game-stage #battlePage .v143-status-visual--static{
@@ -255,9 +254,9 @@
 
 #game-stage #battlePage .v143-status-icon{
     display:inline-block;
-    width:14px;
-    height:14px;
-    flex:0 0 14px;
+    width:17px;
+    height:17px;
+    flex:0 0 17px;
     border:0;
     border-radius:2px;
     background-color:transparent;
@@ -323,7 +322,7 @@
 
 @keyframes v143StatusImageBreath{
     0%,100%{opacity:.42}
-    50%{opacity:.78}
+    50%{opacity:1}
 }
 
 @keyframes v143StatusIconBreath{
@@ -454,7 +453,7 @@
 #game-stage #battlePage .battle-status-detail-modal{
     position:absolute;
     inset:0;
-    z-index:120;
+    z-index:18120;
     display:flex;
     align-items:center;
     justify-content:center;
