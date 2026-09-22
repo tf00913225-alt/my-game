@@ -11,6 +11,7 @@ const wordRules=fs.readFileSync("js/43-v149-skill-ui-rules.js","utf8");
 const css=fs.readFileSync("css/44-v149-skill-ui-rules.css","utf8");
 const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const index=fs.readFileSync("index.html","utf8");
+const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 
 let passed=0;
 function test(name,handler){ handler(); passed++; console.log("✓ "+name); }
@@ -65,7 +66,8 @@ test("the official Sprite has no word-circle or procedural fallback",()=>{
 });
 
 test("the current cache version publishes the corrected source asset and metadata",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.69"/);
+    const assetVersionMatch=loader.match(/const V_ASSET_VERSION="([^"]+)"/);
+    assert.equal(assetVersionMatch?.[1],releaseMeta.cacheVersion);
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
 

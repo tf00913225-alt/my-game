@@ -8,6 +8,7 @@ const source=fs.readFileSync("js/52-v173.20-startup-loader.js","utf8");
 const contract=fs.readFileSync("js/startup/startup-contract.js","utf8");
 const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const manifest=JSON.parse(fs.readFileSync("asset-manifest.json","utf8"));
+const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 
 for(const file of ["assets/ui/startup-logo.4631c0bc3f2b.jpg","assets/ui/startup-main-city.d43e67af1c1c.jpg"]){
     const details=execFileSync("identify",["-format","%m %w %h",file],{encoding:"utf8"});
@@ -17,7 +18,7 @@ assert.ok(html.indexOf('id="startupLoader"')<html.indexOf('id="app"'));
 assert.equal((html.match(/<script\b[^>]*\bsrc=/g)||[]).length,1);
 assert.match(html,/build\/boot-core\.[0-9a-f]{12}\.js/);
 assert.match(html,/build\/boot-core\.[0-9a-f]{12}\.css/);
-assert.match(loader,/const V_ASSET_VERSION="173\.69"/);
+assert.equal((loader.match(/const V_ASSET_VERSION="([^"]+)"/)||[])[1],releaseMeta.cacheVersion);
 assert.doesNotMatch(loader,/TOTAL_RUNTIME_MODULES|__v173ReportRuntimeProgress|createElement\(["']script["']\)/);
 assert.match(source,/Sole StartupStateMachine owner/);
 for(const state of ["BOOT_LOADING","AUTH_RESOLVING","AUTH_REQUIRED","SAVE_LOADING","MIGRATION_REQUIRED","NEED_CHARACTER","READY","OFFLINE_READY","ERROR"]){

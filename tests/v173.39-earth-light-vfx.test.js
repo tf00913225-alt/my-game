@@ -2,6 +2,7 @@
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 const vm=require("node:vm");
 
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
@@ -217,8 +218,8 @@ test("Wanxiang uses a fixed image and the old procedural corner effect stays abs
 });
 
 test("V173.39 cache version loads the new owner code without stale V173.38 browser assets",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.69"/);
-    assert.match(index,/<title>四象江湖傳 V173\.69<\/title>/);
+    assert.equal((loader.match(/const V_ASSET_VERSION="([^"]+)"/)||[])[1],releaseMeta.cacheVersion);
+    assert.ok(index.includes("<title>四象江湖傳 V"+releaseMeta.version+"</title>"));
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
 

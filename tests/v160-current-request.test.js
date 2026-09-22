@@ -11,12 +11,14 @@ const balance=fs.readFileSync("js/33-v140-four-element-balance.js","utf8");
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const finalWater=fs.readFileSync("js/50-v169-water-skill-rules.js","utf8");
 const recovery=fs.readFileSync("js/45-v154-dev-fixes.js","utf8");
+const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 
 let passed=0;
 function test(name,handler){ handler(); passed++; console.log("✓ "+name); }
 
 test("V160 corrections remain published under the current cache version",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.69"/);
+    const assetVersionMatch=loader.match(/const V_ASSET_VERSION="([^"]+)"/);
+    assert.equal(assetVersionMatch?.[1],releaseMeta.cacheVersion);
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
 
