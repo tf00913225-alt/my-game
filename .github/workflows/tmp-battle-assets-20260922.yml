@@ -47,6 +47,7 @@ jobs:
             decoded_size="$(identify -format '%wx%h' "${decoded}")"
             test "${expected_size}" = "${decoded_size}"
             ae="$(compare -metric AE "${expected}" "${decoded}" null: 2>&1 || true)"
+            echo "verify $(basename "${webp}"): ${expected_size}, AE=${ae}"
             test "${ae}" = "0"
             head -c 4 "${webp}" | grep -q '^RIFF$'
             dd if="${webp}" bs=1 skip=8 count=4 status=none | grep -q '^WEBP$'
@@ -64,7 +65,7 @@ jobs:
             read -r w h < <(identify -format '%w %h' "${cropped}")
             if [ "${w}" -gt "${h}" ]; then side="${w}"; else side="${h}"; fi
             convert "${cropped}" -background none -gravity center -extent "${side}x${side}" "${square}"
-            cwebp -quiet -lossless -m 6 "${square}" -o "${dest}"
+            cwebp -quiet -lossless -exact -m 6 "${square}" -o "${dest}"
             verify_lossless "${square}" "${dest}"
           }
 
@@ -75,7 +76,7 @@ jobs:
             read -r w h < <(identify -format '%w %h' "${source}")
             test $((w % 4)) -eq 0
             test $((h % 3)) -eq 0
-            cwebp -quiet -lossless -m 6 "${source}" -o "${dest}"
+            cwebp -quiet -lossless -exact -m 6 "${source}" -o "${dest}"
             verify_lossless "${source}" "${dest}"
           }
 
@@ -123,7 +124,7 @@ jobs:
           else
             cp /tmp/battle-assets/stun-source.png /tmp/battle-assets/stun-still.png
           fi
-          cwebp -quiet -lossless -m 6 /tmp/battle-assets/stun-still.png -o assets/vfx/status/stun.webp
+          cwebp -quiet -lossless -exact -m 6 /tmp/battle-assets/stun-still.png -o assets/vfx/status/stun.webp
           verify_lossless /tmp/battle-assets/stun-still.png assets/vfx/status/stun.webp
 
           echo "Imported asset dimensions:"
