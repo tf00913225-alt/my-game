@@ -19,7 +19,10 @@ function syncCharacterTouchMode(){
 }
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",syncCharacterTouchMode,{once:true});
 else syncCharacterTouchMode();
-const observer=new MutationObserver(syncCharacterTouchMode);
-observer.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:["class","style"]});
+const characterModal=document.getElementById("homeFeatureModal");
+if(characterModal&&typeof MutationObserver!=="undefined"){
+    const observer=new MutationObserver(syncCharacterTouchMode);
+    observer.observe(characterModal,{subtree:true,childList:true,attributes:true,attributeFilter:["class","style"]});
+}
 window.syncCharacterTouchMode=syncCharacterTouchMode;
 })();
