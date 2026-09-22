@@ -868,18 +868,6 @@
         }
     }
 
-    if(typeof MutationObserver!=="undefined"&&typeof document!=="undefined"){
-        let queued=false;
-        const observer=new MutationObserver(()=>{
-            if(queued){ return; }
-            queued=true;
-            requestAnimationFrame(()=>{ queued=false; syncAllCombatCards(); });
-        });
-        const observe=()=>observer.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:["class"]});
-        if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",observe,{once:true}); }
-        else{ observe(); }
-    }
-
     if(typeof document!=="undefined"&&document.readyState==="loading"){
         document.addEventListener("DOMContentLoaded",boot,{once:true});
     }else{ boot(); }
