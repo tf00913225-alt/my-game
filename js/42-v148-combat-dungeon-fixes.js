@@ -1190,15 +1190,6 @@
         };
     }
 
-    if(typeof updateUI==="function"){
-        const previousUpdateUI=updateUI;
-        updateUI=function(){
-            const result=previousUpdateUI.apply(this,arguments);
-            syncQuestNoticeDots();
-            return result;
-        };
-    }
-
     if(typeof openHomeFeature==="function"){
         const previousOpenHomeFeature=openHomeFeature;
         openHomeFeature=function(){
