@@ -88,7 +88,17 @@
     min-height:36px;
     max-height:36px;
     margin:0 auto;
+    position:relative;
+    z-index:40;
+    opacity:1;
+    pointer-events:none;
     transform:none !important;
+    transition:opacity .16s ease;
+}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-center-region > .turn-target-row.skill-picker-open,
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-center-region > .turn-target-row.battle-item-open,
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-center-region:has(#battleActionRegion.target-selecting) > .turn-target-row{
+    opacity:.25;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-center-region > .battle-middle{
     width:100%;
@@ -100,7 +110,7 @@
     left:0 !important;
     right:0 !important;
     bottom:0 !important;
-    z-index:80 !important;
+    z-index:18020 !important;
     display:grid;
     grid-template-rows:var(--battle-info-handle-height) minmax(0,1fr);
     gap:0;
@@ -132,7 +142,7 @@
     display:flex;
     align-items:center;
     justify-content:center;
-    width:64px;
+    width:108px;
     height:32px;
     margin:0;
     padding:0;
@@ -147,21 +157,33 @@
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-toggle > span{
     display:block;
-    font-size:24px;
-    line-height:22px;
-    transform:translateY(1px);
-    transition:transform .26s ease;
-}
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region.is-expanded .battle-info-toggle > span{
-    transform:translateY(-1px) rotate(180deg);
+    font-size:13px;
+    font-weight:900;
+    line-height:20px;
+    white-space:nowrap;
+    transform:none;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region #battleTurnIndicator{
-    opacity:0;
+    position:absolute;
+    left:4px;
+    top:0;
+    display:flex;
+    align-items:center;
+    height:32px;
+    padding:0 8px;
+    border:1px solid rgba(217,173,80,.55);
+    border-bottom:0;
+    border-radius:8px 8px 0 0;
+    color:#f5cf72;
+    background:rgba(0,0,0,.56);
+    font-size:13px;
+    font-weight:900;
+    opacity:1;
     pointer-events:none;
     transition:opacity .16s ease;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region.is-expanded #battleTurnIndicator{
-    opacity:1;
+    opacity:0;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region > #battleInfo{
     min-height:0 !important;
