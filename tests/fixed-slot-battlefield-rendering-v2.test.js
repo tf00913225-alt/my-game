@@ -13,6 +13,7 @@ const vfxSource=read("js/39-v143-skill-animation.js");
 const qaSource=read("js/54-v173.51-battle-qa.js");
 const css=read("css/fixed-slot-battlefield-rendering-v2.css");
 const build=read("scripts/build-production.mjs");
+const index=read("index.html");
 
 assert.match(ownerSource,/window\.FourSymbolsBattlefieldSlots/);
 assert.match(ownerSource,/getGeometryRectFromShape/);
@@ -62,6 +63,12 @@ assert.match(css,/\.v-fixed-enemy-slot > \.battle-monster,[\s\S]*\.v-fixed-ally-
 assert.match(css,/\.v174-battle-art\{[\s\S]*background-size:contain !important;[\s\S]*overflow:visible !important;/);
 assert.match(css,/\.v143-status-visual\{[\s\S]*left:50% !important;[\s\S]*top:42% !important;[\s\S]*transform:translate\(-50%,-50%\) !important;/,"status VFX must stay Slot-relative");
 assert.match(css,/\.v143-skill-stage\[data-geometry-owner="fixed-slot"\]\{[\s\S]*overflow:visible !important;[\s\S]*contain:none !important;/);
+assert.match(css,/\.battle-info-region\{[\s\S]*z-index:18020 !important;/,"battle info drawer must stay above skill VFX and damage popups");
+assert.match(index,/id="battleInfoToggle"[\s\S]*〔戰鬥資訊〕/,"battle info handle must use horizontal text instead of the old arrow");
+assert.match(css,/\.battle-info-region #battleTurnIndicator\{[\s\S]*opacity:1;/,"collapsed battle info must expose the current round at bottom-left");
+assert.match(css,/\.battle-info-region\.is-expanded #battleTurnIndicator\{[\s\S]*opacity:0;/,"expanded battle info must hide the duplicate round label");
+assert.match(css,/\.turn-target-row\{[\s\S]*z-index:40;[\s\S]*pointer-events:none;[\s\S]*transition:opacity \.16s ease;/,"manual turn countdown must stay above the action panel without intercepting target clicks");
+assert.match(css,/\.turn-target-row\.skill-picker-open,[\s\S]*\.turn-target-row\.battle-item-open,[\s\S]*target-selecting[\s\S]*opacity:\.25;/,"skill, item and target selection must dim the countdown to 25 percent");
 assert.match(css,/\.v-fixed-slot-popup\{[\s\S]*position:fixed !important;/);
 assert.match(css,/@keyframes v174BattleLungeUp/);
 assert.doesNotMatch(css,/@media \(max-width:380px\)/,"fixed Slot geometry must not have a one-phone geometry override");
