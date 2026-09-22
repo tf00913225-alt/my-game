@@ -183,8 +183,6 @@
     window.v143SystemAfterMonsterUiUpdate=v143SystemAfterMonsterUiUpdate;
 
     /* ----- 7. Wanxiang Earth Shield owns a four-corner elemental frame. ----- */
-
-    /* ----- 7. Wanxiang Earth Shield owns a four-corner elemental frame. ----- */
     function hasActiveBuffType(entity,type){
         return !!(entity&&Array.isArray(entity.activeBuffs)&&entity.activeBuffs.some(buff=>
             buff&&buff.type===type&&numeric(buff.turnsLeft)>0
