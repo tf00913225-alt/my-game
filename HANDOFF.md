@@ -1,7 +1,7 @@
 ## 2026-09-22 — renderBattle Owner P1 收斂完成（DEV）
 
 - 正式 `main` 仍為 V173.70：`0b62be5944ff7a440682bfae28b3ccc43ee2fe91`；本次 renderBattle Owner 重構**尚未發布到 main**。
-- 最新 `dev`：`07ce72ac6fc602ac4a31809c26d7e4e531d4d1b1`。
+- renderBattle P1 Runtime 合併至 dev 的 SHA：`07ce72ac6fc602ac4a31809c26d7e4e531d4d1b1`；後續純文件收尾 commit 不得被誤當成新的 Runtime 變更。
 - PR #507 已合併 dev；`js/00-main.js::renderBattle()` 現為唯一正式 Render Owner。
 - 原正式 Runtime 共 6 層 renderBattle Wrapper（V131／V141／V143／V154／V158／Fixed Slot adapter）已全部移除，改為固定順序 named hooks；Production Runtime 不再允許新增 renderBattle wrapper。
 - Before-render 順序固定：V158 日常副本正規化 → V141 野怪／副本 lifecycle；After-render 順序固定：V131 Formation → V141 Battle UI／entry → V143 enemy decoration／RAF／V144 hook → V154 Abyss UI／Portrait → Fixed Slot reconcile。
