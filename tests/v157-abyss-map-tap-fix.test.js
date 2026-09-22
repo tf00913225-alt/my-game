@@ -8,6 +8,7 @@ const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("sc
 const abyss=fs.readFileSync("js/36-v141-content-systems.js","utf8");
 const polish=fs.readFileSync("js/41-v146-system-polish.js","utf8");
 const css=fs.readFileSync("css/46-v154-dev-fixes.css","utf8");
+const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 
 let passed=0;
 function test(name,handler){
@@ -17,7 +18,8 @@ function test(name,handler){
 }
 
 test("the current cache key delivers the Abyss tap correction",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.69"/);
+    const assetVersionMatch=loader.match(/const V_ASSET_VERSION="([^"]+)"/);
+    assert.equal(assetVersionMatch?.[1],releaseMeta.cacheVersion);
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
 
