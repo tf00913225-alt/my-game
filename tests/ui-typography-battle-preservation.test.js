@@ -13,7 +13,7 @@ assert.match(fixed,/#battlePlayerRow > \.v-fixed-ally-slot-row\{[\s\S]*?grid-tem
 assert.match(fixed,/--battle-resource-bar-height:11px/);
 assert.match(fixed,/\.monster-bar-text,[\s\S]*?font-size:9px !important/);
 assert.match(fixed,/\.battle-info-region\{[\s\S]*?position:absolute !important;[\s\S]*?bottom:0 !important/);
-assert.match(fixed,/\.battle-info-toggle\{[\s\S]*?width:96px;[\s\S]*?height:32px;[\s\S]*?border:3px solid #d9ad50;[\s\S]*?font-size:14px/);
+assert.match(fixed,/\.battle-info-toggle\{[\s\S]*?width:96px;[\s\S]*?height:32px;[\s\S]*?border:1px solid rgba\(210,158,64,\.9\);[\s\S]*?box-shadow:none;[\s\S]*?font-size:14px/);
 
 assert.match(boss,/\/\* ---------- Boss battle target-entity presentation ---------- \*\//);
 assert.match(boss,/\.v-fixed-boss-footprint\{[\s\S]*?left:calc\(20% \+ 5px\);[\s\S]*?right:calc\(20% \+ 5px\);[\s\S]*?pointer-events:none/);
