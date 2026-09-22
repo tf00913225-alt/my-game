@@ -10,7 +10,10 @@ test("persistent body status visuals rotate one at a time every second",()=>{
   const js=read("js/39-v143-skill-animation.js");
   const css=read("css/40-v143-combat-dungeon-polish.css");
   assert.match(js,/const STATUS_ROTATION_MS=1000/);
-  assert.match(js,/activeBodyType=bodyTypes\.length[\s\S]*?Math\.floor\(Date\.now\(\)\/STATUS_ROTATION_MS\)%bodyTypes\.length/);
+  assert.match(js,/const statusRotationByUnit=new Map\(\)/);
+  assert.match(js,/rotation\.index=\(rotation\.index\+1\)%bodyTypes\.length/);
+  assert.match(js,/syncStatusVisualEffects\(true\)/);
+  assert.doesNotMatch(js,/Math\.floor\(Date\.now\(\)\/STATUS_ROTATION_MS\)%bodyTypes\.length/);
   assert.match(js,/syncStatusVisual\(side,index,type,type===activeBodyType\)/);
   assert.match(js,/stun:statusVisual\("assets\/vfx\/status\/stun\.webp","pulse"/);
   assert.match(css,/\.v143-status-icon\{[\s\S]*?width:17px;[\s\S]*?height:17px;/);
@@ -31,6 +34,9 @@ test("battle information handles and turn timer follow the requested interaction
   assert.match(stats,/aria-label","戰鬥數據"/);
   assert.match(stats,/innerHTML="<span>戰<\/span><span>鬥<\/span><span>數<\/span><span>據<\/span>"/);
   assert.match(js,/function syncBattleUiPriorityLayer\(\)/);
+  assert.match(js,/function installBattleInfoHandleDrag\(\)/);
+  assert.match(css,/\.battle-info-toggle\{[\s\S]*?touch-action:none;[\s\S]*?cursor:ew-resize/);
+  assert.match(css,/#battleActionRegion > \.turn-target-row\{[\s\S]*?position:absolute;[\s\S]*?bottom:78px/);
 });
 
 test("interactive battlefield overlays outrank detached VFX and damage popups",()=>{
@@ -42,6 +48,8 @@ test("interactive battlefield overlays outrank detached VFX and damage popups",(
   assert.match(fixedCss,/\.battle-info-region\{[\s\S]*?z-index:18060 !important/);
   assert.match(statsCss,/z-index:18072/);
   assert.match(vfxCss,/\.battle-status-detail-modal\{[\s\S]*?z-index:18120/);
+  assert.match(vfxCss,/body\.v174-battle-reading-open > \.v143-skill-stage,[\s\S]*?visibility:hidden !important;[\s\S]*?opacity:0 !important/);
+  assert.match(fixedCss,/\.battle-info-region\{[\s\S]*?background:linear-gradient\(180deg,rgba\(23,18,12,\.99\),rgba\(7,7,6,\.99\)\)/);
 });
 
 test("new skill icons and 4x3 cast sheets use dedicated WebP runtime assets",()=>{
@@ -76,4 +84,16 @@ test("dense battle portraits no longer run a permanent compositor animation",()=
   assert.match(artRule[1],/animation:none !important/);
   assert.doesNotMatch(artRule[1],/will-change:transform,filter/);
   assert.match(css,/\.v174-cardless-unit > \.v174-battle-art::after\{[\s\S]*?opacity:\.72/);
+});
+
+test("battle target selection avoids the dense compositor and unrelated global UI rebuild",()=>{
+  const main=read("js/00-main.js");
+  const fixed=read("css/fixed-slot-battlefield-rendering-v2.css");
+  const start=main.indexOf("function selectBattleTarget(index)");
+  const end=main.indexOf("function executeAction(",start);
+  const selectBlock=main.slice(start,end);
+  assert.ok(start>=0&&end>start);
+  assert.doesNotMatch(selectBlock,/updateUI\(\)/);
+  assert.match(fixed,/\.battle-monster\.v174-cardless-unit\.targetable::after,[\s\S]*?animation:none !important;[\s\S]*?filter:none !important/);
+  assert.match(fixed,/\.battle-player\.v174-cardless-unit\.active-turn::after\{[\s\S]*?animation:none !important/);
 });
