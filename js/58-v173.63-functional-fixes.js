@@ -400,14 +400,8 @@ function scheduleRepairs(){
     if(typeof requestAnimationFrame==="function"){requestAnimationFrame(runRepairs);}else{setTimeout(runRepairs,0);}
 }
 
-/* Re-run after the established owners render or move the shared DOM. */
-["renderInventoryItems","renderInventory","rebuildInventorySlots","openMapInventoryOverlay"].forEach(name=>{
-    const previous=window[name];if(typeof previous!=="function"||previous.__v17363Wrapped){return;}
-    const wrapped=function(){const result=previous.apply(this,arguments);scheduleRepairs();return result;};wrapped.__v17363Wrapped=true;window[name]=wrapped;
-    try{if(name in globalThis){globalThis[name]=wrapped;}}catch(_){ }
-});
-
+/* Production repairs are lifecycle-driven. Inventory/open/render owners call this
+   explicit hook; synthesis already calls scheduleRepairs from its own render lifecycle. */
+window.v17363SyncFunctionalFixes=runRepairs;
 ensureFunctionalStyles();runRepairs();
-if(typeof MutationObserver!=="undefined"&&document.body){new MutationObserver(scheduleRepairs).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:["class"]});}
-document.addEventListener("click",scheduleRepairs,true);document.addEventListener("change",scheduleRepairs,true);window.addEventListener("resize",scheduleRepairs,{passive:true});
 })();
