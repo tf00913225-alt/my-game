@@ -10,7 +10,7 @@
 - Full Node Suite 以 CI-only Draft PR #508 驗證：run `35697472769`，**203 / 203 PASS**；PR #508 已關閉且未合併 main。
 - dev push CI run `35697890251`：SUCCESS；Dev deployment gate／exact-SHA verification／Game+Cache verification／deployed battle layout & VFX Live QA 全部 SUCCESS。
 - 收尾時 Open PR：0；Open Issue：0。
-- 目前 `main...dev`：dev ahead 18、behind 0。這是 V173.70 發布後的文件收尾與已驗證 dev-only renderBattle 重構，不代表 V173.70 Release Lifecycle 失敗或需要重發舊版本。
+- 目前 `dev` behind `main` = 0；dev 已因 V173.70 發布後的文件收尾與已驗證 dev-only renderBattle 重構而領先 main。這不代表 V173.70 Release Lifecycle 失敗，也不代表需要重發舊版本。
 - 本次未修改技能數值、傷害公式、Boss AI、掉落／經濟、玩家存檔 Schema、Firebase 正式資料行為或其他 UI。
 
 ## 2026-09-22 — V173.70 正式發布完成／main-dev 收斂完成
