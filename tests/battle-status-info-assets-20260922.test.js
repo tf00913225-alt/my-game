@@ -12,7 +12,7 @@ const STATUS_ASSETS=[
   "stealth.webp","calm-mind.webp","defense-down-icon.webp","shield.webp",
   "petrify.webp","earth-shield.webp","rock-wall.webp","barrier.webp",
   "yuan-zu-blessing.webp","fire-momentum-icon.webp","phoenix-might-icon.webp",
-  "fire-soul-resonance.webp","blood-burn.webp"
+  "fire-soul-resonance.webp","blood-burn.webp","stun.webp"
 ];
 
 test("persistent status icons are static while body states stay pulse/static",()=>{
@@ -29,8 +29,8 @@ test("persistent status icons are static while body states stay pulse/static",()
 
 test("status body art is constrained inside its own card",()=>{
   const js=read("js/39-v143-skill-animation.js");
-  assert.match(js,/cardRect\.width\*\.68/);
-  assert.match(js,/cardRect\.height\*\.72/);
+  assert.match(js,/cardRect\.width\*\.82/);
+  assert.match(js,/cardRect\.height\*\.86/);
   assert.match(js,/node\.style\.backgroundSize="contain"/);
 });
 
