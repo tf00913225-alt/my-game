@@ -37,7 +37,7 @@ jobs:
             local source="$1"
             local target="$2"
             git show "origin/assets-library:assets/inbox/技能icon/[戰鬥狀態圖與icon]/$source" > "/tmp/status-src/$source"
-            magick "/tmp/status-src/$source" -define webp:lossless=true -quality 100 "assets/vfx/status/$target"
+            convert "/tmp/status-src/$source" -define webp:lossless=true -quality 100 "assets/vfx/status/$target"
             test "$(magick compare -metric AE "/tmp/status-src/$source" "assets/vfx/status/$target" null: 2>&1 || true)" = "0 (0)"
             test "$(magick identify -format '%wx%h' "/tmp/status-src/$source")" = "$(magick identify -format '%wx%h' "assets/vfx/status/$target")"
             test "$(head -c 4 "assets/vfx/status/$target")" = "RIFF"
@@ -90,3 +90,5 @@ jobs:
           git push origin "HEAD:$BRANCH_NAME"
 
 # rerun-from-latest-head
+
+# imagemagick6-command-fix
