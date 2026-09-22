@@ -95,6 +95,7 @@ window.showMissEffect=function(isPlayerTarget,index,label){var el=document.getEl
  var hpPopups=Array.from(document.querySelectorAll('.damage-popup.hp-popup')),damage=hpPopups[hpPopups.length-3],critical=hpPopups[hpPopups.length-2],heal=hpPopups[hpPopups.length-1],miss=Array.from(document.querySelectorAll('.damage-popup.miss-popup')).pop();
  var stage=document.createElement('div');stage.className='v143-skill-stage';stage.dataset.geometryOwner='fixed-slot';document.body.appendChild(stage);
  var turnNode=document.getElementById('turnTargetRow'),actionRegion=document.getElementById('battleActionRegion');
+ turnNode.style.transition='none';
  var turnUi={normal:{opacity:getComputedStyle(turnNode).opacity,pointerEvents:getComputedStyle(turnNode).pointerEvents,rect:rect('#turnTargetRow')}};
  turnNode.classList.add('skill-picker-open');turnUi.skillPicker={opacity:getComputedStyle(turnNode).opacity};turnNode.classList.remove('skill-picker-open');
  turnNode.classList.add('battle-item-open');turnUi.itemPicker={opacity:getComputedStyle(turnNode).opacity};turnNode.classList.remove('battle-item-open');
