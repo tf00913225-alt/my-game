@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-22-battle-status-drawers-vfx-followup",
+  "baseBranch": "dev",
+  "baseSha": "d55410bd88590b9a9052b1b4d714a27b3cc9a411",
+  "workBranch": "fix/battle-status-drawers-vfx-followup-20260922",
+  "title": "Battle status carousel / drawers / countdown / skill assets follow-up",
+  "status": "IMPLEMENTED",
+  "requirements": [
+    {
+      "id": "STATUS-01",
+      "status": "IMPLEMENTED",
+      "requirement": "狀態 icon 稍放大；角色身體狀態圖放大；暈眩加入身體狀態圖；多個身體狀態每 1 秒輪播一種；呼吸峰值透明度 100%；狀態詳情不可被 VFX/浮字覆蓋。",
+      "evidence": [
+        "js/39-v143-skill-animation.js",
+        "css/40-v143-combat-dungeon-polish.css",
+        "assets/vfx/status/stun.webp",
+        "tests/battle-status-drawers-vfx-followup-20260922.test.js"
+      ]
+    },
+    {
+      "id": "DRAWER-02",
+      "status": "IMPLEMENTED",
+      "requirement": "右下戰鬥資訊箭頭改橫向「戰鬥資訊」；左側改「戰鬥數據」；戰鬥資訊收合時左下顯示當前回合、展開時隱藏；戰鬥閱讀抽屜/功能卡不被技能動畫與浮字覆蓋。",
+      "evidence": [
+        "index.html",
+        "js/00-main.js",
+        "css/fixed-slot-battlefield-rendering-v2.css",
+        "js/battle-statistics-system.js",
+        "css/battle-statistics-system.css",
+        "SYSTEM_CONTRACTS.md"
+      ]
+    },
+    {
+      "id": "PERF-03",
+      "status": "IMPLEMENTED",
+      "requirement": "持續狀態 renderer 不建立逐幀循環；每名角色只保留一張身體狀態圖，僅多狀態時啟用單一 1 秒 tracked timer，減少重複 DOM/geometry 與透明圖層合成。",
+      "evidence": [
+        "js/39-v143-skill-animation.js",
+        "tests/battle-status-drawers-vfx-followup-20260922.test.js"
+      ]
+    },
+    {
+      "id": "TIMER-04",
+      "status": "IMPLEMENTED",
+      "requirement": "手動回合倒數固定在戰鬥操作面板上方；技能/物品/普通攻擊或其他目標選擇期間變為 25% 透明，但倒數框本身不攔截 pointer，目標選擇仍可操作。",
+      "evidence": [
+        "js/00-main.js",
+        "js/38-v143-system-fixes.js",
+        "js/27-v132-content-expansion.js",
+        "css/fixed-slot-battlefield-rendering-v2.css"
+      ]
+    },
+    {
+      "id": "ASSET-05",
+      "status": "IMPLEMENTED",
+      "requirement": "淨心訣、焚血訣、炎魂共鳴正式導入縮圖 icon 與 4×3 技能 VFX：母圖從 assets-library 指定檔案取用，lossless WebP、保留完整 4×3 sheet 畫布並由 V143 runtime 分幀播放。",
+      "evidence": [
+        "assets/skills/water-purify-mind.webp",
+        "assets/skills/fire-soul-resonance.webp",
+        "assets/skills/fire-blood-burn-art.webp",
+        "assets/vfx/water/purify-mind-cast.webp",
+        "assets/vfx/fire/fire-soul-resonance-cast.webp",
+        "assets/vfx/fire/blood-burn-art-cast.webp",
+        "js/39-v143-skill-animation.js",
+        "js/00-main.js",
+        "js/60-v173.64-skill-progression-rebalance.js"
+      ]
+    }
+  ],
+  "verification": {
+    "targetedTests": "PENDING",
+    "assetLosslessAndGrid": "PENDING",
+    "build": "PENDING",
+    "buildCheck": "PENDING",
+    "repositoryChecks": "PENDING",
+    "mobileBrowserQa": "PENDING",
+    "devDeployment": "PENDING"
+  }
+}
