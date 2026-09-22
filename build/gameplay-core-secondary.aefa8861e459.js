@@ -4392,14 +4392,7 @@
         });
     }
 
-    if(typeof renderBattle==="function"){
-        const previousRenderBattle=renderBattle;
-        renderBattle=function(){
-            const result=previousRenderBattle.apply(this,arguments);
-            syncAbyssBattleUi();
-            return result;
-        };
-    }
+    window.v152SyncAbyssBattleUi=syncAbyssBattleUi;
     if(typeof updateMonsterUI==="function"){
         const previousUpdateMonsterUI=updateMonsterUI;
         updateMonsterUI=function(){
@@ -4742,6 +4735,9 @@
         const previousRenderBattle=renderBattle;
         renderBattle=function(){
             const result=previousRenderBattle.apply(this,arguments);
+            if(typeof window.v152SyncAbyssBattleUi==="function"){
+                window.v152SyncAbyssBattleUi();
+            }
             syncMonsterPortraits();
             return result;
         };

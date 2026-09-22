@@ -1,6 +1,7 @@
 "use strict";
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 const main=fs.readFileSync("js/00-main.js","utf8");
 const rewards=fs.readFileSync("js/25-v131-fix-batch.js","utf8");
 const curve=fs.readFileSync("js/28-v133-economy-rebalance.js","utf8");
@@ -60,8 +61,8 @@ test("range VFX fixes remain fixed-size and centered after casualties",()=>{
 });
 
 test("release/cache advances to V173.40",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.69"/);
-    assert.match(index,/<title>四象江湖傳 V173\.69<\/title>/);
+    assert.equal((loader.match(/const V_ASSET_VERSION="([^"]+)"/)||[])[1],releaseMeta.cacheVersion);
+    assert.ok(index.includes("<title>四象江湖傳 V"+releaseMeta.version+"</title>"));
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
