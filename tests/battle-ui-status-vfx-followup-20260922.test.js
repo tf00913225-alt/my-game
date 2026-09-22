@@ -6,10 +6,10 @@ const path=require("node:path");
 const ROOT=path.resolve(__dirname,"..");
 const read=relative=>fs.readFileSync(path.join(ROOT,relative),"utf8");
 
-test("persistent body status visuals rotate one at a time every second",()=>{
+test("persistent body status visuals rotate one at a time every two seconds",()=>{
   const js=read("js/39-v143-skill-animation.js");
   const css=read("css/40-v143-combat-dungeon-polish.css");
-  assert.match(js,/const STATUS_ROTATION_MS=1000/);
+  assert.match(js,/const STATUS_ROTATION_MS=2000/);
   assert.match(js,/const statusRotationByUnit=new Map\(\)/);
   assert.match(js,/rotation\.index=\(rotation\.index\+1\)%bodyTypes\.length/);
   assert.match(js,/syncStatusVisualEffects\(true\)/);
@@ -17,6 +17,7 @@ test("persistent body status visuals rotate one at a time every second",()=>{
   assert.match(js,/syncStatusVisual\(side,index,type,type===activeBodyType\)/);
   assert.match(js,/stun:statusVisual\("assets\/vfx\/status\/stun\.webp","pulse"/);
   assert.match(css,/\.v143-status-icon\{[\s\S]*?width:17px;[\s\S]*?height:17px;/);
+  assert.match(css,/\.v143-status-visual--pulse\{[\s\S]*?animation:v143StatusImageBreath 2s ease-in-out infinite/);
   assert.match(css,/@keyframes v143StatusImageBreath\{[\s\S]*?50%\{opacity:1\}/);
 });
 
@@ -35,7 +36,8 @@ test("battle information handles and turn timer follow the requested interaction
   assert.match(stats,/innerHTML="<span>戰<\/span><span>鬥<\/span><span>數<\/span><span>據<\/span>"/);
   assert.match(js,/function syncBattleUiPriorityLayer\(\)/);
   assert.match(js,/function installBattleInfoHandleDrag\(\)/);
-  assert.match(css,/\.battle-info-toggle\{[\s\S]*?touch-action:none;[\s\S]*?cursor:ew-resize/);
+  assert.match(css,/\.battle-info-toggle\{[\s\S]*?border:1px solid rgba\(210,158,64,\.9\);[\s\S]*?box-shadow:none;[\s\S]*?touch-action:none;[\s\S]*?cursor:ew-resize/);
+  assert.match(css,/\.battle-info-region:not\(\.is-expanded\)\{[\s\S]*?background:transparent;[\s\S]*?box-shadow:none/);
   assert.match(css,/#battleActionRegion > \.turn-target-row\{[\s\S]*?position:absolute;[\s\S]*?bottom:78px/);
 });
 
