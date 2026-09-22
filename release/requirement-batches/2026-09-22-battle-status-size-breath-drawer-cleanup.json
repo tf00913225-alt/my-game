@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-22-battle-status-size-breath-drawer-cleanup",
+  "baseBranch": "dev",
+  "baseSha": "43d01c0b8a0551c1578492d16a46b1246ae309fd",
+  "workBranch": "fix/battle-status-size-breath-drawer-cleanup-20260922",
+  "title": "戰鬥狀態圖放大／2 秒低頻輪播與呼吸／戰鬥資訊收合黑邊簡化／新版暈眩單張素材接管",
+  "status": "IMPLEMENTED",
+  "supersedes": [
+    "2026-09-22-battle-enemy-status-performance-info-drawer-followup 的 STATUS-ENEMY-01 尺寸與 CAROUSEL-05 一秒輪播呈現設定"
+  ],
+  "requirements": [
+    {
+      "id": "STUN-ASSET-01",
+      "status": "IMPLEMENTED",
+      "requirement": "使用 assets-library 最新上傳的 assets/inbox/技能icon/[戰鬥狀態圖與icon]/暈眩-單張狀態圖片.png，無裁切、無縮放轉為 lossless WebP，正式覆蓋 assets/vfx/status/stun.webp；保留暈眩 HUD icon 作詳細資訊用途。",
+      "evidence": [
+        "assets/vfx/status/stun.webp",
+        "js/39-v143-skill-animation.js"
+      ]
+    },
+    {
+      "id": "STATUS-SIZE-02",
+      "status": "IMPLEMENTED",
+      "requirement": "Body 狀態圖整體放大並允許略觸及／超出卡牌邊緣；一般敵方使用 1.20×1.16 Slot 比例，我方／Boss 使用 1.16×1.14，避免護盾視覺小於角色。",
+      "evidence": [
+        "js/39-v143-skill-animation.js"
+      ]
+    },
+    {
+      "id": "STATUS-COMFORT-03",
+      "status": "IMPLEMENTED",
+      "requirement": "多 Body 狀態改為每 2 秒才切換一次；pulse 類狀態呼吸動畫改為完整 2 秒週期，峰值透明度維持 100%，降低快速閃爍造成的不適。",
+      "evidence": [
+        "js/39-v143-skill-animation.js",
+        "css/40-v143-combat-dungeon-polish.css"
+      ]
+    },
+    {
+      "id": "INFO-FRAME-04",
+      "status": "IMPLEMENTED",
+      "requirement": "戰鬥資訊收合時移除橫跨底部的黑色 Header 背景與陰影，只保留細金色上緣、回合文字與戰鬥資訊把手；把手邊框由 3px 統一為 1px 並移除外發光。展開後仍保留近不透明黑底以確保可讀性。",
+      "evidence": [
+        "css/fixed-slot-battlefield-rendering-v2.css"
+      ]
+    }
+  ],
+  "verification": {
+    "sourceAssetRevision": "assets-library b1434a0c159e4be71cb099932b2bc151e30e5400 (2026-09-22T14:39:04Z)",
+    "losslessWebp": "PENDING",
+    "focusedTests": "PENDING",
+    "build": "PENDING",
+    "buildCheck": "PENDING",
+    "repositoryChecks": "PENDING",
+    "mobileBrowserQa": "PENDING",
+    "devDeployment": "PENDING"
+  }
+}
