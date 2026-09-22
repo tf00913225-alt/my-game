@@ -255,9 +255,9 @@
 
 #game-stage #battlePage .v143-status-icon{
     display:inline-block;
-    width:14px;
-    height:14px;
-    flex:0 0 14px;
+    width:16px;
+    height:16px;
+    flex:0 0 16px;
     border:0;
     border-radius:2px;
     background-color:transparent;
@@ -322,8 +322,8 @@
 }
 
 @keyframes v143StatusImageBreath{
-    0%,100%{opacity:.42}
-    50%{opacity:.78}
+    0%,100%{opacity:.46}
+    50%{opacity:1}
 }
 
 @keyframes v143StatusIconBreath{
@@ -454,7 +454,7 @@
 #game-stage #battlePage .battle-status-detail-modal{
     position:absolute;
     inset:0;
-    z-index:120;
+    z-index:18120;
     display:flex;
     align-items:center;
     justify-content:center;
