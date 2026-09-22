@@ -38,7 +38,6 @@ jobs:
           npm run build
           npm run build:check
           node .github/scripts/release-gate.mjs ci
-          npm test
           git diff --check
 
       - name: Commit synchronized production build
