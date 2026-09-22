@@ -8,7 +8,7 @@
 - 從 `assets-library/assets/inbox/技能icon/[戰鬥狀態圖與icon]` 導入目前 Runtime 實際使用的 22 張狀態圖至 `assets/vfx/status/`。全部使用 lossless WebP；轉檔流程逐張驗證像素 AE=0、尺寸一致與 RIFF/WEBP signature。未將沒有獨立 Runtime 狀態 Owner 的通用 Icon 強行接入正式遊戲。
 - 一次性資產轉檔 Workflow 只存在於施工過程；完成 asset commit 後已自動刪除，最終分支不保留臨時 Workflow。
 - 專項 `tests/battle-status-info-assets-20260922.test.js` PASS；`npm run build` PASS；`npm run build:check` PASS。資產轉檔有效 Run #4：`35718725670` SUCCESS；生成資產／同步 Build commit：`4a32bcd7ef0d032bcd688bd57be085cbf5395a32`。
-- Requirement Batch：`release/requirement-batches/2026-09-22-battle-status-info-assets.json`；目前 IMPLEMENTED，待 PR Repository checks／mobile browser QA 後升級 VERIFIED。
+- Requirement Batch：`release/requirement-batches/2026-09-22-battle-status-info-assets.json` 已升級為 VERIFIED。PR #515 exact-candidate CI run `35719594516` SUCCESS；Battle/VFX regressions、Fixed Slot 9:16 mobile QA、exact-candidate real battle mobile QA、resources、loader、Release Gate、git diff 全部通過。
 
 ## 2026-09-22 — 全域捲軸視覺隱藏（DEV candidate）
 
