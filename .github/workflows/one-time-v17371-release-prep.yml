@@ -128,7 +128,7 @@ jobs:
           const touched=[];
           for(const p of walk("tests")){
             const before=read(p);
-            let after=before.replaceAll(OLD,NEXT).replaceAll("173\\\\.70","173\\\\.71");
+            let after=before.replaceAll(OLD,NEXT).replaceAll("173\\.70","173\\.71");
             if(after!==before){
               write(p,after);
               touched.push(p);
