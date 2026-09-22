@@ -284,7 +284,7 @@ test("daily dungeon locking uses the existing post-render owner and never touche
     assert.match(source,/if\(!monster\|\|monster\.v141Abyss\)\{ return monster; \}/);
 });
 
-test("the existing V143 render owner invokes V144 dungeon locking once per battle",()=>{
+test("the existing V143 render hook invokes V144 dungeon locking once per battle",()=>{
     let renderCalls=0;
     const dungeonMonsters=[{name:"火怪",level:50,element:"fire",skillIds:[]}];
     const context=baseContext({
@@ -300,10 +300,12 @@ test("the existing V143 render owner invokes V144 dungeon locking once per battl
     vm.runInContext(v143Source,context);
     vm.runInContext(source,context);
     assert.equal(context.renderBattle(),"rendered");
+    context.v143AfterBattleRender();
     assert.equal(renderCalls,1);
     assert.match(dungeonMonsters[0].v144SkillEncounter,/^dungeon-render-/);
     const encounter=dungeonMonsters[0].v144SkillEncounter;
     context.renderBattle();
+    context.v143AfterBattleRender();
     assert.equal(dungeonMonsters[0].v144SkillEncounter,encounter);
 });
 
