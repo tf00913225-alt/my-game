@@ -2,6 +2,7 @@
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const css=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");
@@ -44,9 +45,10 @@ test("CSS advances the formal 4x3 sheet once without Canvas or per-target travel
     assert.doesNotMatch(css,/data-skill="waterBall"[\s\S]*?v166-water-cast-sprite/);
 });
 
-test("the published build label is V173.69",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.69"/);
-    assert.match(index,/aria-label="目前版本 V173\.69"[\s\S]*?>V173\.69<\/div>/);
+test("the published build label is V173.70",()=>{
+    assert.equal((loader.match(/const V_ASSET_VERSION="([^"]+)"/)||[])[1],releaseMeta.cacheVersion);
+    assert.ok(index.includes('aria-label="目前版本 V'+releaseMeta.version+'"'));
+    assert.ok(index.includes(">V"+releaseMeta.version+"</div>"));
 });
 
 console.log("\nV173 Water Ball target-group raster VFX suite: "+passed+" tests passed.");
