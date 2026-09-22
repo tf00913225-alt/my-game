@@ -7,7 +7,7 @@
       "build/boot-core.7897301b7787.js"
     ],
     "styles": [
-      "build/boot-core.d6eb3e8e25b5.css"
+      "build/boot-core.779d83b83ac9.css"
     ],
     "images": [
       "assets/ui/startup-logo.4631c0bc3f2b.jpg",
@@ -53,7 +53,7 @@
           "build/gameplay-core-secondary.0ad526c11ece.js"
         ],
         "styles": [
-          "build/gameplay-core.c0f1862f56ff.css"
+          "build/gameplay-core.760c0d509bd9.css"
         ],
         "dependencies": [
           "app-shell",
@@ -203,19 +203,19 @@
         "decode": true
       },
       {
+        "path": "build/boot-core.779d83b83ac9.css",
+        "sha256": "779d83b83ac9",
+        "bytes": 221136,
+        "priority": "P0",
+        "type": "style",
+        "decode": false
+      },
+      {
         "path": "build/boot-core.7897301b7787.js",
         "sha256": "7897301b7787",
         "bytes": 59088,
         "priority": "P0",
         "type": "script",
-        "decode": false
-      },
-      {
-        "path": "build/boot-core.d6eb3e8e25b5.css",
-        "sha256": "d6eb3e8e25b5",
-        "bytes": 220733,
-        "priority": "P0",
-        "type": "style",
         "decode": false
       },
       {
@@ -803,16 +803,16 @@
         "decode": false
       },
       {
-        "path": "build/gameplay-core.c0f1862f56ff.css",
-        "sha256": "c0f1862f56ff",
-        "bytes": 360957,
+        "path": "build/gameplay-core.760c0d509bd9.css",
+        "sha256": "760c0d509bd9",
+        "bytes": 360911,
         "priority": "P2",
         "type": "style",
         "decode": false
       }
     ],
-    "manifestHash": "4a28f72b218d",
-    "totalBytes": 21437239,
+    "manifestHash": "e2834848dd8c",
+    "totalBytes": 21437596,
     "totalResources": 78
   },
   "assets": {
@@ -872,17 +872,17 @@
       "sha256": "1ea3fa4cb350",
       "bytes": 25931
     },
-    "build/boot-core.d6eb3e8e25b5.css": {
-      "sha256": "d6eb3e8e25b5",
-      "bytes": 220733
+    "build/boot-core.779d83b83ac9.css": {
+      "sha256": "779d83b83ac9",
+      "bytes": 221136
     },
     "build/app-shell.883034960e20.css": {
       "sha256": "883034960e20",
       "bytes": 110242
     },
-    "build/gameplay-core.c0f1862f56ff.css": {
-      "sha256": "c0f1862f56ff",
-      "bytes": 360957
+    "build/gameplay-core.760c0d509bd9.css": {
+      "sha256": "760c0d509bd9",
+      "bytes": 360911
     },
     "build/feature-patrol.e8e0adf7d268.css": {
       "sha256": "e8e0adf7d268",

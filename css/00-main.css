@@ -35,6 +35,23 @@
     box-sizing:border-box;
 }
 
+/*
+   Global scrollbar visibility owner.
+   Scroll containers keep their existing overflow/touch behavior; only the
+   browser-drawn scrollbar track/thumb is hidden across the game UI.
+*/
+#game-stage,
+#game-stage *{
+    scrollbar-width:none !important;
+}
+
+#game-stage::-webkit-scrollbar,
+#game-stage *::-webkit-scrollbar{
+    width:0 !important;
+    height:0 !important;
+    display:none !important;
+}
+
 html,body{
     margin:0;
     padding:0;
