@@ -13572,7 +13572,7 @@
         return node;
     }
 
-    const STATUS_ROTATION_MS=1000;
+    const STATUS_ROTATION_MS=2000;
     let statusRotationTimer=null;
     const statusRotationByUnit=new Map();
 
@@ -13613,11 +13613,11 @@
         const cardRect=typeof card.getBoundingClientRect==="function"?card.getBoundingClientRect():anchor.rect;
         const regularEnemy=side==="monster"&&!isBossIndexForVfx(index);
         const width=regularEnemy
-            ?Math.max(54,Math.min(anchor.rect.width*1.08,cardRect.width*1.08))
-            :Math.max(28,Math.min(anchor.rect.width*.82,cardRect.width*.82));
+            ?Math.max(60,Math.min(anchor.rect.width*1.20,cardRect.width*1.20))
+            :Math.max(44,Math.min(anchor.rect.width*1.16,cardRect.width*1.16));
         const height=regularEnemy
-            ?Math.max(52,Math.min(anchor.rect.height*1.02,cardRect.height*1.02))
-            :Math.max(42,Math.min(anchor.rect.height*.86,cardRect.height*.86));
+            ?Math.max(58,Math.min(anchor.rect.height*1.16,cardRect.height*1.16))
+            :Math.max(52,Math.min(anchor.rect.height*1.14,cardRect.height*1.14));
         node.dataset.slot=anchor.slot;
         node.style.width=Math.round(width)+"px";
         node.style.height=Math.round(height)+"px";

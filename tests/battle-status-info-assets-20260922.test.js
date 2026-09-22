@@ -27,13 +27,13 @@ test("persistent status icons are static while body states stay pulse/static",()
   assert.match(css,/\.v143-status-visual--pulse\{[\s\S]*?v143StatusImageBreath/);
 });
 
-test("status body art keeps ally sizing while regular enemy art is enlarged",()=>{
+test("status body art can reach card edges and remains larger than the old footprint",()=>{
   const js=read("js/39-v143-skill-animation.js");
   assert.match(js,/regularEnemy=side==="monster"&&!isBossIndexForVfx\(index\)/);
-  assert.match(js,/anchor\.rect\.width\*1\.08/);
-  assert.match(js,/anchor\.rect\.height\*1\.02/);
-  assert.match(js,/cardRect\.width\*\.82/);
-  assert.match(js,/cardRect\.height\*\.86/);
+  assert.match(js,/anchor\.rect\.width\*1\.20/);
+  assert.match(js,/anchor\.rect\.height\*1\.16/);
+  assert.match(js,/cardRect\.width\*1\.16/);
+  assert.match(js,/cardRect\.height\*1\.14/);
   assert.match(js,/node\.style\.backgroundSize="contain"/);
 });
 
