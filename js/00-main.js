@@ -9008,6 +9008,48 @@ const PATROL_FIGHT1_B64="assets/battle/patrol-fight-1-v173.21.webp";
 
 const PATROL_FIGHT2_B64="assets/battle/patrol-fight-2-v173.21.webp";
 
+/*
+   Patrol artwork bridge:
+   - js/26-v131-patrol-appearance.js is the formal appearance owner.
+   - Core patrol lifecycle may request front/back facing, but must not replace
+     the selected character's gender/element artwork once that owner is ready.
+   - The legacy PNG pair remains only as a pre-feature fallback.
+*/
+function applyPatrolCharacterArtwork(facingBack){
+
+    const img=
+        $("patrolCharacterImg");
+
+    if(!img){
+        return false;
+    }
+
+    img.style.transform=
+        "none";
+
+    if(
+        typeof window!=="undefined" &&
+        typeof window.v131ApplyPatrolArt==="function"
+    ){
+
+        window.v131ApplyPatrolArt(
+            !!facingBack
+        );
+
+        return true;
+
+    }
+
+    img.src=
+        facingBack
+        ? PATROL_CHAR_BACK_B64
+        : PATROL_CHAR_FRONT_B64;
+
+    return false;
+
+}
+
+
 
 let patrolWalkIntervalId=
     null;
@@ -9110,11 +9152,9 @@ function resetPatrolCharacterToIdle(){
         img.style.width=
             "70px";
 
-        img.style.transform=
-            "none";
-
-        img.src=
-            PATROL_CHAR_FRONT_B64;
+        applyPatrolCharacterArtwork(
+            false
+        );
 
     }
 
@@ -9189,11 +9229,9 @@ function movePatrolCharacterRandomly(){
         newTop<patrolCurrentTop;
 
 
-    img.style.transform=
-        "none";
-
-    img.src=
-        (movingUp ? PATROL_CHAR_BACK_B64 : PATROL_CHAR_FRONT_B64);
+    applyPatrolCharacterArtwork(
+        movingUp
+    );
 
 
     wrap.style.left=
@@ -9334,7 +9372,7 @@ function playPatrolFightAnimation(callback){
             "120px";
 
         img.style.transform=
-            "rotate(90deg)";
+            "none";
 
         img.src=
             PATROL_FIGHT1_B64;
@@ -9351,7 +9389,7 @@ function playPatrolFightAnimation(callback){
             if(img){
 
                 img.style.transform=
-                    "rotate(90deg)";
+                    "none";
 
                 img.src=
                     PATROL_FIGHT2_B64;
@@ -9369,6 +9407,18 @@ function playPatrolFightAnimation(callback){
 
             patrolInFightAnimation=
                 false;
+
+
+            if(img){
+
+                img.style.width=
+                    "70px";
+
+                applyPatrolCharacterArtwork(
+                    false
+                );
+
+            }
 
 
             if(callback){
