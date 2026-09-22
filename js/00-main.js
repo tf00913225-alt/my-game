@@ -23285,6 +23285,138 @@ if(typeof window!=="undefined"){
     window.FourSymbolsBattleRenderHookOrder=BATTLE_RENDER_HOOK_ORDER;
 }
 
+function isBattleStatusInspectionBlocked(){
+    if(!battleActive||actionReady||pendingAction){ return true; }
+    const skillQuickBar=$("skillQuickBar");
+    const skillMenu=$("skillMenu");
+    const itemMenu=$("itemMenu");
+    if(skillQuickBar&&skillQuickBar.classList.contains("show")){ return true; }
+    if(skillMenu&&(skillMenu.classList.contains("show")||skillMenu.classList.contains("expanded"))){ return true; }
+    if(itemMenu&&itemMenu.classList.contains("show")){ return true; }
+    return !!document.querySelector(
+        "#battlePage .battle-monster.targetable,#battlePage .battle-player.ally-targetable"
+    );
+}
+
+function battleStatusElementLabel(entity){
+    const key=String(entity&&entity.element||"");
+    if(typeof elementDatabase!=="undefined"&&elementDatabase&&elementDatabase[key]){
+        return elementDatabase[key].name||elementDatabase[key].label||
+            ({fire:"火",water:"水",wind:"風",earth:"土",light:"元光"}[key]||key||"無");
+    }
+    return ({fire:"火",water:"水",wind:"風",earth:"土",light:"元光"}[key]||key||"無");
+}
+
+function ensureBattleStatusDetailModal(){
+    let modal=document.getElementById("battleStatusDetailModal");
+    if(modal){ return modal; }
+    modal=document.createElement("div");
+    modal.id="battleStatusDetailModal";
+    modal.className="battle-status-detail-modal";
+    modal.hidden=true;
+    modal.setAttribute("aria-hidden","true");
+    modal.innerHTML=
+        '<div class="battle-status-detail-panel" role="dialog" aria-modal="true" aria-labelledby="battleStatusDetailTitle">'+
+            '<button type="button" class="battle-status-detail-close" aria-label="關閉">×</button>'+
+            '<h3 id="battleStatusDetailTitle">戰鬥狀態</h3>'+
+            '<div class="battle-status-detail-core">'+
+                '<span data-field="element"></span>'+
+                '<span data-field="name"></span>'+
+                '<span data-field="hp"></span>'+
+                '<span data-field="sp"></span>'+
+            '</div>'+
+            '<section><h4>增益狀態：</h4><div data-list="buffs" class="battle-status-detail-list"></div></section>'+
+            '<section><h4>負面狀態：</h4><div data-list="debuffs" class="battle-status-detail-list"></div></section>'+
+        '</div>';
+    const host=$("battlePage")||document.body;
+    host.appendChild(modal);
+    const close=modal.querySelector(".battle-status-detail-close");
+    if(close){ close.addEventListener("click",closeBattleStatusDetailModal); }
+    modal.addEventListener("click",event=>{
+        if(event.target===modal){ closeBattleStatusDetailModal(); }
+    });
+    return modal;
+}
+
+function closeBattleStatusDetailModal(){
+    const modal=document.getElementById("battleStatusDetailModal");
+    if(!modal){ return; }
+    modal.hidden=true;
+    modal.setAttribute("aria-hidden","true");
+}
+
+function renderBattleStatusDetailList(host,items){
+    if(!host){ return; }
+    host.innerHTML="";
+    if(!Array.isArray(items)||items.length===0){
+        const empty=document.createElement("div");
+        empty.className="battle-status-detail-empty";
+        empty.textContent="無";
+        host.appendChild(empty);
+        return;
+    }
+    items.forEach(item=>{
+        const row=document.createElement("div");
+        row.className="battle-status-detail-row";
+        const icon=document.createElement("span");
+        icon.className="battle-status-detail-icon";
+        if(item&&item.iconSrc){
+            icon.style.backgroundImage='url("'+String(item.iconSrc).replace(/"/g,"%22")+'")';
+        }
+        icon.setAttribute("aria-hidden","true");
+        const text=document.createElement("span");
+        text.className="battle-status-detail-text";
+        const name=document.createElement("b");
+        name.textContent=(item&&item.name||"狀態")+"：";
+        const effect=document.createElement("span");
+        effect.textContent=(item&&item.effect||"效果生效中")+"　剩餘 "+(item&&item.remainingText||"0 回合");
+        text.appendChild(name);
+        text.appendChild(effect);
+        row.appendChild(icon);
+        row.appendChild(text);
+        host.appendChild(row);
+    });
+}
+
+function openBattleStatusDetailModal(side,index){
+    if(isBattleStatusInspectionBlocked()){ return false; }
+    const isMonster=side==="monster";
+    const entity=isMonster
+        ?(typeof monsters!=="undefined"&&monsters[index])
+        :(typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(index):null);
+    if(!entity){ return false; }
+
+    const modal=ensureBattleStatusDetailModal();
+    const stats=!isMonster&&typeof getPartyBattleStats==="function"?getPartyBattleStats(index):null;
+    const maxHP=isMonster?Number(entity.maxHP)||Math.max(1,Number(entity.hp)||1):
+        Number(stats&&stats.maxHP)||Number(entity.maxHP)||Math.max(1,Number(entity.hp)||1);
+    const maxSP=isMonster?Number(entity.maxSP)||Math.max(0,Number(entity.sp)||0):
+        Number(stats&&stats.maxSP)||Number(entity.maxSP)||Math.max(0,Number(entity.sp)||0);
+    const summary=typeof window.v143GetBattleStatusSummary==="function"
+        ?window.v143GetBattleStatusSummary(entity)
+        :{buffs:[],debuffs:[]};
+    const fields={
+        element:"元素："+battleStatusElementLabel(entity),
+        name:"名稱："+String(entity.name||entity.id||"角色"),
+        hp:"HP："+Math.max(0,Number(entity.hp)||0)+" / "+maxHP,
+        sp:"SP："+Math.max(0,Number(entity.sp)||0)+" / "+maxSP
+    };
+    Object.keys(fields).forEach(key=>{
+        const node=modal.querySelector('[data-field="'+key+'"]');
+        if(node){ node.textContent=fields[key]; }
+    });
+    renderBattleStatusDetailList(modal.querySelector('[data-list="buffs"]'),summary.buffs);
+    renderBattleStatusDetailList(modal.querySelector('[data-list="debuffs"]'),summary.debuffs);
+    modal.hidden=false;
+    modal.setAttribute("aria-hidden","false");
+    return true;
+}
+
+if(typeof window!=="undefined"){
+    window.openBattleStatusDetailModal=openBattleStatusDetailModal;
+    window.closeBattleStatusDetailModal=closeBattleStatusDetailModal;
+}
+
 function renderBattle(){
 
     runBattleRenderHooks("before",this,arguments);
@@ -23319,9 +23451,11 @@ function renderBattle(){
 
 
             card.onclick=()=>{
-                selectBattleTarget(
-                    index
-                );
+                if(card.classList.contains("targetable")){
+                    selectBattleTarget(index);
+                    return;
+                }
+                openBattleStatusDetailModal("monster",index);
             };
 
 
@@ -23682,7 +23816,9 @@ function renderPlayers(){
             ()=>{
                 if(box.classList.contains("ally-targetable")){
                     selectBattleAllyTarget(index);
+                    return;
                 }
+                openBattleStatusDetailModal("player",index);
             }
         );
 
