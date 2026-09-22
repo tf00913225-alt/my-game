@@ -257,8 +257,7 @@
     ){
         const rawAccuracyChance=
             95+
-            casterAccuracy*0.3-
-            (directChanceReductionPercent||0);
+            casterAccuracy*0.3;
 
         const accuracyChance=clamp(
             rawAccuracyChance,
@@ -266,8 +265,15 @@
             99
         );
         const evasionRate=clamp(targetEvasion,0,85);
+        const evasionAdjustedChance=
+            accuracyChance*(1-evasionRate/100);
 
-        return clamp(accuracyChance*(1-evasionRate/100),1,99);
+        return clamp(
+            evasionAdjustedChance-
+            Math.max(0,numeric(directChanceReductionPercent)),
+            1,
+            99
+        );
     }
 
     window.v140GetHitChancePercent=getV140HitChancePercent;
