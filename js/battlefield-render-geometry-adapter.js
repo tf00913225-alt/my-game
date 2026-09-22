@@ -395,40 +395,9 @@
     wrapDamagePopup();
     wrapMissPopup();
 
-    function isOwnedFixedStructure(node){
-        if(!(node instanceof Element)||node.dataset.geometryOwner!=="fixed-slot"){ return false; }
-        return !!node.matches?.(".v-fixed-slot-row,.v-fixed-enemy-slot,.v-fixed-ally-slot,.v-fixed-boss-footprint");
-    }
-
-    const observer=new MutationObserver(records=>{
-        let needsReconcile=false;
-        records.forEach(record=>{
-            record.addedNodes.forEach(node=>{
-                if(!(node instanceof Element)){ return; }
-                const popups=node.matches&&node.matches(".damage-popup")?[node]:Array.from(node.querySelectorAll?.(".damage-popup")||[]);
-                popups.forEach(popup=>{
-                    if(popup.dataset.geometryOwner==="fixed-slot"){ return; }
-                    const card=popup.closest?.(".battle-player,.battle-monster,[data-slot]");
-                    const slot=card?slotForElement(card):null;
-                    if(slot){ applyPopupAnchor(popup,slot,popupKind(popup,[])); }
-                    else{ consumePending(popup); }
-                });
-                /* Reconcile only legacy/new combat content. The fixed rows and
-                   holders below are created by reconcile() itself; observing them
-                   must not recursively schedule another reconcile forever. */
-                if(isOwnedFixedStructure(node)){ return; }
-                if(
-                    node.id==="battleMonsterArea"||node.id==="battlePlayerRow"||
-                    node.matches?.(".battle-monster,.battle-player,.v131-monster-row")||
-                    node.querySelector?.(".battle-monster,.battle-player")
-                ){
-                    needsReconcile=true;
-                }
-            });
-        });
-        if(needsReconcile){ queueReconcile(); }
-    });
-    if(document.body){ observer.observe(document.body,{subtree:true,childList:true}); }
+    /* renderBattle() and explicit battle lifecycle hooks are the geometry authority.
+       Dynamic damage/miss popups are already anchored by wrapDamagePopup()/wrapMissPopup();
+       no document.body observer is required in the battle hot path. */
 
     reconcile();
 })();
