@@ -47,10 +47,10 @@
   ],
   "verification": {
     "sourceAssetRevision": "assets-library b1434a0c159e4be71cb099932b2bc151e30e5400 (2026-09-22T14:39:04Z)",
-    "losslessWebp": "PENDING",
-    "focusedTests": "PENDING",
-    "build": "PENDING",
-    "buildCheck": "PENDING",
+    "losslessWebp": "PASS — Run 35746772424: latest authored stun still 1232x1277 → lossless WebP, dimensions preserved, AE=0",
+    "focusedTests": "PASS — Run 35746772424: 11/11",
+    "build": "PASS — Run 35746772424",
+    "buildCheck": "PASS — Run 35746772424",
     "repositoryChecks": "PENDING",
     "mobileBrowserQa": "PENDING",
     "devDeployment": "PENDING"
