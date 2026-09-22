@@ -532,10 +532,10 @@ test("wind casts remain Sprite Sheets while persistent states use noninteractive
     assert.doesNotMatch(css,/data-skill="stormRain"/);
     assert.match(css,/#game-stage #battlePage \.v143-status-visual\{[\s\S]*?z-index:4;[\s\S]*?pointer-events:none;/);
     assert.match(css,/@keyframes v143StatusImageBreath/);
-    assert.match(css,/@keyframes v143StatusIconBreath/);
+    assert.match(css,/\.v143-status-icon--pulse\{[\s\S]*?animation:none !important/);
     assert.doesNotMatch(css,/v143StatusRasterFrames/);
     assert.match(animation,/node\.dataset\.renderer="dom-status-visual";/);
-    assert.match(animation,/node\.style\.backgroundSize=\(Math\.max\(1,Number\(spec\.cropColumns\)\|\|1\)\*100\)\+"% "/);
+    assert.match(animation,/node\.style\.backgroundSize="contain"/);
     assert.doesNotMatch(animation,/getSpriteImage|frameX=frameIndex|frameY=Math\.floor/);
     assert.doesNotMatch(animation,/assets\/inbox\/[\s\S]{0,80}(?:base64|blob:)/i);
 });
