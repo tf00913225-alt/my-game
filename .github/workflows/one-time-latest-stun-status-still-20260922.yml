@@ -1,0 +1,91 @@
+name: One-time latest stun status still import
+
+on:
+  push:
+    branches:
+      - fix/battle-status-size-breath-drawer-cleanup-20260922
+
+permissions:
+  contents: write
+
+concurrency:
+  group: one-time-latest-stun-status-still-20260922
+  cancel-in-progress: false
+
+jobs:
+  import-stun:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: fix/battle-status-size-breath-drawer-cleanup-20260922
+
+      - name: Install lossless image tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y webp imagemagick
+
+      - name: Fetch exact latest stun source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin assets-library:refs/remotes/origin/assets-library
+          mkdir -p /tmp/fs-assets
+          git show 'origin/assets-library:assets/inbox/技能icon/[戰鬥狀態圖與icon]/暈眩-單張狀態圖片.png' > '/tmp/fs-assets/stun-still.png'
+          identify '/tmp/fs-assets/stun-still.png'
+
+      - name: Convert exact lossless WebP and verify identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p assets/vfx/status
+          src='/tmp/fs-assets/stun-still.png'
+          dst='assets/vfx/status/stun.webp'
+          cwebp -quiet -lossless -exact -mt "$src" -o "$dst"
+
+          sw="$(identify -format '%w' "$src")"
+          sh="$(identify -format '%h' "$src")"
+          dw="$(identify -format '%w' "$dst")"
+          dh="$(identify -format '%h' "$dst")"
+          test "$sw" = "$dw"
+          test "$sh" = "$dh"
+
+          set +e
+          metric="$(compare -metric AE "$src" "$dst" null: 2>&1)"
+          status=$?
+          set -e
+          if [ "$status" -ne 0 ] || [ "$metric" != "0" ]; then
+            echo "stun still pixel mismatch: AE=$metric status=$status" >&2
+            exit 1
+          fi
+
+          test "$(head -c 4 "$dst")" = "RIFF"
+          test "$(dd if="$dst" bs=1 skip=8 count=4 status=none)" = "WEBP"
+          echo "stun still exact: ${sw}x${sh}, AE=0"
+
+      - name: Run focused tests and production build
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --test \
+            tests/battle-status-info-assets-20260922.test.js \
+            tests/battle-ui-status-vfx-followup-20260922.test.js
+          npm run build
+          npm run build:check
+          git diff --check
+
+      - name: Commit generated asset and build
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add assets/vfx/status/stun.webp asset-manifest.json build
+          if git diff --cached --quiet; then
+            echo 'No generated asset/build changes to commit.'
+            exit 0
+          fi
+          git commit -m 'assets: import latest stun still and rebuild battle bundles'
+          git push origin HEAD:fix/battle-status-size-breath-drawer-cleanup-20260922
