@@ -23,9 +23,6 @@ jobs:
         with:
           node-version: 22
 
-      - name: Install dependencies
-        run: npm ci
-
       - name: Focused battle regressions
         run: |
           node tests/battle-status-info-assets-20260922.test.js
