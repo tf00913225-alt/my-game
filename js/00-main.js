@@ -3652,6 +3652,8 @@ const elementSkillIconMap = {
     dragonSlash:"assets/skills/fire-dragon-slash.jpg",
     explosiveFlurry:"assets/skills/fire-explosive-flurry.jpg",
     rage:"assets/skills/fire-rage.jpg",
+    fireSoulResonance:"assets/skills/fire-soul-resonance.webp",
+    bloodBurnArt:"assets/skills/fire-blood-burn.webp",
     blazeSpell:"assets/skills/fire-blaze-spell.jpg",
     fireCritical:"assets/skills/fire-critical.jpg",
     fireRocket:"assets/skills/fire-rocket.jpg",
@@ -3708,6 +3710,7 @@ const elementSkillIconMap = {
     waterBall:"assets/skills/water-ball.jpg",
     freeze:"assets/skills/water-freeze.jpg",
     revive:"assets/skills/water-revive.jpg",
+    purifyMind:"assets/skills/water-purify-mind.webp",
     floodBeast:"assets/skills/water-flood-beast.jpg",
 
     /*
