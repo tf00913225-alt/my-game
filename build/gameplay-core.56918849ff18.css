@@ -5517,6 +5517,18 @@ body.quest-scroll-active,
 }
 
 
+/* Reading surfaces are non-blocking observers, but transient battle paint must
+   not cover them. Animations/timing continue underneath; only the paint is
+   hidden for the short time a status/info/stats drawer is being read. */
+body.v174-battle-reading-open > .v143-skill-stage,
+body.v174-battle-reading-open > .v-fixed-slot-popup,
+body.v174-battle-reading-open > .damage-popup,
+body.v174-battle-reading-open > .skill-name-badge.v143-caster-skill-label{
+    visibility:hidden !important;
+    opacity:0 !important;
+}
+
+
 /* bundled source: css/41-v144-rules-and-abyss.css */
 /* V144 exact battle transition wording. */
 #game-stage #battlePage .v141-battle-transition b{
@@ -8937,6 +8949,10 @@ body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scro
     justify-content:flex-end;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion > .turn-target-row{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:78px;
     align-self:center;
     flex:0 0 36px;
     width:max-content;
@@ -8944,7 +8960,7 @@ body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scro
     height:36px;
     min-height:36px;
     max-height:36px;
-    margin:0 auto 3px;
+    margin:0 auto;
     opacity:1;
     transform:none !important;
     transition:opacity .16s ease-out;
@@ -8969,6 +8985,9 @@ body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scro
     height:var(--battle-info-panel-height) !important;
     padding:0 4px 4px;
     overflow:visible !important;
+    border-top:1px solid rgba(210,158,64,.9);
+    background:linear-gradient(180deg,rgba(23,18,12,.99),rgba(7,7,6,.99));
+    box-shadow:0 -8px 22px rgba(0,0,0,.68);
     pointer-events:none;
     transform:translateY(calc(100% - var(--battle-info-handle-height)));
     transition:transform .26s ease;
@@ -9008,7 +9027,14 @@ body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scro
     font-weight:900;
     white-space:nowrap;
     transform:none;
+    touch-action:none;
+    user-select:none;
+    -webkit-user-select:none;
+    cursor:ew-resize;
     pointer-events:auto;
+}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-toggle.is-dragging{
+    filter:brightness(1.18);
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region #battleTurnIndicator{
     position:absolute;
@@ -9294,6 +9320,7 @@ body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scro
     border:0 !important;
     background:none !important;
     box-shadow:none !important;
+    animation:none !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn{
     outline:0 !important;
@@ -9314,6 +9341,17 @@ body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scro
     background:none !important;
     box-shadow:none !important;
 }
+
+/* Target selection used to start one fast filter animation per selectable
+   unit. Ten enemies meant ten simultaneous compositor loops exactly when the
+   player pressed an action button. Keep the reticle visible but static. */
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.targetable::after,
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.ally-targetable::after{
+    animation:none !important;
+    filter:none !important;
+    opacity:.9 !important;
+}
+
 /* Formal target feedback is a compact reticle over the artwork, never a card
    outline. The same owner covers normal enemies, Boss, reinforcements and
    destructible Boss objects as soon as they enter the Unit pipeline. */

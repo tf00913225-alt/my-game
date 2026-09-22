@@ -583,6 +583,7 @@
 
     const STATUS_ROTATION_MS=1000;
     let statusRotationTimer=null;
+    const statusRotationByUnit=new Map();
 
     function syncStatusVisual(side,index,type,showBody){
         const spec=STATUS_VISUALS[type];
@@ -596,7 +597,13 @@
         }
 
         const host=statusIconHost(side,index,card);
-        if(host&&!statusIconNode(host,type)){ host.appendChild(createStatusIcon(type,spec)); }
+        const existingIcon=statusIconNode(host,type);
+        if(spec.mode==="icon"){
+            if(host&&!existingIcon){ host.appendChild(createStatusIcon(type,spec)); }
+        }else if(existingIcon){
+            if(typeof existingIcon.remove==="function"){ existingIcon.remove(); }
+            else if(existingIcon.parentNode){ existingIcon.parentNode.removeChild(existingIcon); }
+        }
 
         if(spec.mode==="icon"||showBody===false){
             const body=statusVisualNode(card,type);
@@ -613,14 +620,19 @@
         const anchor=slotAnchor(side,index,card);
         if(!anchor){ return; }
         const cardRect=typeof card.getBoundingClientRect==="function"?card.getBoundingClientRect():anchor.rect;
-        const width=Math.max(28,Math.min(anchor.rect.width*.82,cardRect.width*.82));
-        const height=Math.max(42,Math.min(anchor.rect.height*.86,cardRect.height*.86));
+        const regularEnemy=side==="monster"&&!isBossIndexForVfx(index);
+        const width=regularEnemy
+            ?Math.max(54,Math.min(anchor.rect.width*1.08,cardRect.width*1.08))
+            :Math.max(28,Math.min(anchor.rect.width*.82,cardRect.width*.82));
+        const height=regularEnemy
+            ?Math.max(52,Math.min(anchor.rect.height*1.02,cardRect.height*1.02))
+            :Math.max(42,Math.min(anchor.rect.height*.86,cardRect.height*.86));
         node.dataset.slot=anchor.slot;
         node.style.width=Math.round(width)+"px";
         node.style.height=Math.round(height)+"px";
     }
 
-    function syncStatusVisualsForUnit(side,index){
+    function syncStatusVisualsForUnit(side,index,advanceRotation){
         const entity=entityFor(side,index);
         const bodyTypes=entity?Object.keys(RAW_STATUS_VISUALS).filter(type=>{
             const spec=RAW_STATUS_VISUALS[type];
@@ -630,19 +642,31 @@
                 !deferredStatusDuringCast(side,index,type)
             );
         }):[];
-        const activeBodyType=bodyTypes.length
-            ?bodyTypes[Math.floor(Date.now()/STATUS_ROTATION_MS)%bodyTypes.length]
+        const rotationKey=side+":"+index;
+        const signature=bodyTypes.join("|");
+        let rotation=statusRotationByUnit.get(rotationKey);
+        if(!bodyTypes.length){
+            statusRotationByUnit.delete(rotationKey);
+            rotation=null;
+        }else if(!rotation||rotation.signature!==signature){
+            rotation={signature:signature,index:0};
+            statusRotationByUnit.set(rotationKey,rotation);
+        }else if(advanceRotation===true&&bodyTypes.length>1){
+            rotation.index=(rotation.index+1)%bodyTypes.length;
+        }
+        const activeBodyType=rotation&&bodyTypes.length
+            ?bodyTypes[rotation.index%bodyTypes.length]
             :null;
         Object.keys(RAW_STATUS_VISUALS).forEach(type=>
             syncStatusVisual(side,index,type,type===activeBodyType)
         );
     }
 
-    function syncStatusVisualEffects(){
+    function syncStatusVisualEffects(advanceRotation){
         purgeLegacyCardVfx();
         const enemyIndexes=typeof currentBattleMonsters!=="undefined"?currentBattleMonsters.filter(Number.isInteger):[];
-        enemyIndexes.forEach(index=>syncStatusVisualsForUnit("monster",index));
-        for(let index=0;index<6;index++){ syncStatusVisualsForUnit("player",index); }
+        enemyIndexes.forEach(index=>syncStatusVisualsForUnit("monster",index,advanceRotation===true));
+        for(let index=0;index<6;index++){ syncStatusVisualsForUnit("player",index,advanceRotation===true); }
     }
 
     function removeStatusVisualEffects(){
@@ -650,6 +674,7 @@
         [".v143-status-visual",".v143-status-icon"].forEach(selector=>
             document.querySelectorAll(selector).forEach(node=>node.remove())
         );
+        statusRotationByUnit.clear();
     }
     window.v143SyncStatusVisualEffects=syncStatusVisualEffects;
 
@@ -657,7 +682,7 @@
         if(statusRotationTimer||typeof window==="undefined"||typeof window.setInterval!=="function"){ return; }
         statusRotationTimer=window.setInterval(()=>{
             if(typeof battleActive!=="undefined"&&!battleActive){ return; }
-            syncStatusVisualEffects();
+            syncStatusVisualEffects(true);
         },STATUS_ROTATION_MS);
     }
     ensureStatusRotationTimer();
@@ -825,12 +850,12 @@
                 let tracked=current.deferredStatusTargets.get(type);
                 if(!tracked){ tracked=new Set(); current.deferredStatusTargets.set(type,tracked); }
                 tracked.add(index);
-                syncStatusVisual(side,index,type);
+                syncStatusVisualsForUnit(side,index,false);
                 return;
             }
         }
         const wait=existingTargetDelay(side,index);
-        const invoke=()=>syncStatusVisual(side,index,type);
+        const invoke=()=>syncStatusVisualsForUnit(side,index,false);
         if(wait>8){ setTimer(invoke,wait); } else{ invoke(); }
     }
 

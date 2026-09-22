@@ -12332,8 +12332,6 @@ function selectBattleTarget(index){
            造成多少傷害」合併成一行就好。
         */
 
-        updateUI();
-
         finishPlayerAction();
 
     }
@@ -23631,15 +23629,9 @@ function updateMonsterUI(index){
        直到燃燒結束才消失。
     */
 
-    const statusArea =
-        $("battleMonsterStatus"+index);
-
-    if(statusArea){
-        /* V143 is the sole persistent-status visual owner. Base battle UI only
-           keeps the stable host and clears stale markup before that owner syncs. */
-        statusArea.innerHTML="";
-    }
-
+    /* V143 is the sole persistent-status visual owner. HP/SP refreshes must
+       preserve its existing icon/body nodes instead of tearing them down and
+       rebuilding them on every global updateUI() pass. */
 
     const hpBar =
         $("battleMonsterBar"+index);
@@ -23882,8 +23874,8 @@ function updateSingleCharacterStatusBadge(
         return;
     }
 
-    /* Persistent status content is rendered by V143 after this base UI pass. */
-    statusArea.innerHTML="";
+    /* Persistent status content is rendered and diffed by V143. Do not clear
+       this host during an unrelated HP/SP or action-HUD refresh. */
 
 }
 
@@ -33035,6 +33027,7 @@ function syncBattleUiPriorityLayer(){
     const active=!!(statusDetail||sideDrawer||battleInfo);
 
     stage.classList.toggle("battle-ui-priority",active);
+    if(document.body){ document.body.classList.toggle("v174-battle-reading-open",active); }
     return active;
 
 }
@@ -33059,12 +33052,76 @@ function setBattleInfoExpanded(expanded){
 
 }
 
+function clampBattleInfoHandleRight(toggle,page,value){
+    const pageWidth=Math.max(1,Number(page&&page.clientWidth)||420);
+    const handleWidth=Math.max(1,Number(toggle&&toggle.offsetWidth)||96);
+    const minRight=4;
+    const maxRight=Math.max(minRight,pageWidth-handleWidth-4);
+    return Math.max(minRight,Math.min(maxRight,Number(value)||minRight));
+}
+
+function installBattleInfoHandleDrag(){
+    const toggle=$("battleInfoToggle");
+    const page=$("battlePage");
+    if(!toggle||!page||toggle.__battleInfoHandleDragInstalled){ return; }
+    toggle.__battleInfoHandleDragInstalled=true;
+    let drag=null;
+
+    function finishDrag(event){
+        if(!drag){ return; }
+        if(event&&event.pointerId!==undefined&&drag.pointerId!==undefined&&event.pointerId!==drag.pointerId){ return; }
+        const moved=drag.moved;
+        drag=null;
+        toggle.classList.remove("is-dragging");
+        if(moved){
+            toggle.__suppressNextBattleInfoClick=true;
+            setTimeout(()=>{ toggle.__suppressNextBattleInfoClick=false; },0);
+        }
+    }
+
+    toggle.addEventListener("pointerdown",event=>{
+        if(event.button!==undefined&&event.button!==0){ return; }
+        const rect=page.getBoundingClientRect();
+        const pageWidth=Math.max(1,Number(page.clientWidth)||rect.width||420);
+        const computedRight=parseFloat(getComputedStyle(toggle).right);
+        drag={
+            pointerId:event.pointerId,
+            startClientX:Number(event.clientX)||0,
+            startRight:clampBattleInfoHandleRight(toggle,page,Number.isFinite(computedRight)?computedRight:4),
+            scaleX:rect.width>0?pageWidth/rect.width:1,
+            moved:false
+        };
+        toggle.classList.add("is-dragging");
+        if(typeof toggle.setPointerCapture==="function"&&event.pointerId!==undefined){
+            try{ toggle.setPointerCapture(event.pointerId); }catch(_){ }
+        }
+        event.preventDefault();
+    });
+    toggle.addEventListener("pointermove",event=>{
+        if(!drag||event.pointerId!==drag.pointerId){ return; }
+        const delta=((Number(event.clientX)||0)-drag.startClientX)*drag.scaleX;
+        if(!drag.moved&&Math.abs(delta)>=3){ drag.moved=true; }
+        if(!drag.moved){ return; }
+        toggle.style.right=clampBattleInfoHandleRight(toggle,page,drag.startRight-delta)+"px";
+        event.preventDefault();
+    });
+    toggle.addEventListener("pointerup",finishDrag);
+    toggle.addEventListener("pointercancel",finishDrag);
+}
+
 function toggleBattleInfoPanel(){
 
+    const toggle=$("battleInfoToggle");
+    if(toggle&&toggle.__suppressNextBattleInfoClick){
+        toggle.__suppressNextBattleInfoClick=false;
+        return false;
+    }
     const region=document.querySelector("#battlePage .battle-info-region");
     return setBattleInfoExpanded(!(region&&region.classList.contains("is-expanded")));
 
 }
+
+installBattleInfoHandleDrag();
 
 function clearBattleLog(){
 

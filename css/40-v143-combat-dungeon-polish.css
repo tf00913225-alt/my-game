@@ -542,3 +542,15 @@
     color:#a99d87;
     font-size:13px;
 }
+
+
+/* Reading surfaces are non-blocking observers, but transient battle paint must
+   not cover them. Animations/timing continue underneath; only the paint is
+   hidden for the short time a status/info/stats drawer is being read. */
+body.v174-battle-reading-open > .v143-skill-stage,
+body.v174-battle-reading-open > .v-fixed-slot-popup,
+body.v174-battle-reading-open > .damage-popup,
+body.v174-battle-reading-open > .skill-name-badge.v143-caster-skill-label{
+    visibility:hidden !important;
+    opacity:0 !important;
+}

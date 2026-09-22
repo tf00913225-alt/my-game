@@ -89,6 +89,10 @@
     justify-content:flex-end;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion > .turn-target-row{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:78px;
     align-self:center;
     flex:0 0 36px;
     width:max-content;
@@ -96,7 +100,7 @@
     height:36px;
     min-height:36px;
     max-height:36px;
-    margin:0 auto 3px;
+    margin:0 auto;
     opacity:1;
     transform:none !important;
     transition:opacity .16s ease-out;
@@ -121,6 +125,9 @@
     height:var(--battle-info-panel-height) !important;
     padding:0 4px 4px;
     overflow:visible !important;
+    border-top:1px solid rgba(210,158,64,.9);
+    background:linear-gradient(180deg,rgba(23,18,12,.99),rgba(7,7,6,.99));
+    box-shadow:0 -8px 22px rgba(0,0,0,.68);
     pointer-events:none;
     transform:translateY(calc(100% - var(--battle-info-handle-height)));
     transition:transform .26s ease;
@@ -160,7 +167,14 @@
     font-weight:900;
     white-space:nowrap;
     transform:none;
+    touch-action:none;
+    user-select:none;
+    -webkit-user-select:none;
+    cursor:ew-resize;
     pointer-events:auto;
+}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-toggle.is-dragging{
+    filter:brightness(1.18);
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region #battleTurnIndicator{
     position:absolute;
@@ -446,6 +460,7 @@
     border:0 !important;
     background:none !important;
     box-shadow:none !important;
+    animation:none !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn{
     outline:0 !important;
@@ -466,6 +481,17 @@
     background:none !important;
     box-shadow:none !important;
 }
+
+/* Target selection used to start one fast filter animation per selectable
+   unit. Ten enemies meant ten simultaneous compositor loops exactly when the
+   player pressed an action button. Keep the reticle visible but static. */
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.targetable::after,
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.ally-targetable::after{
+    animation:none !important;
+    filter:none !important;
+    opacity:.9 !important;
+}
+
 /* Formal target feedback is a compact reticle over the artwork, never a card
    outline. The same owner covers normal enemies, Boss, reinforcements and
    destructible Boss objects as soon as they enter the Unit pipeline. */

@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-22-battle-enemy-status-performance-info-drawer-followup",
+  "baseBranch": "dev",
+  "baseSha": "26ddebcd3f56d3f5784fa9c8260a5f4ef2f59f1f",
+  "title": "戰鬥敵方狀態尺寸／操作卡頓／回合框／戰鬥資訊閱讀層／嚴格輪播／Body 狀態去重",
+  "status": "IMPLEMENTED",
+  "requirements": [
+    {
+      "id": "STATUS-ENEMY-01",
+      "status": "IMPLEMENTED",
+      "requirement": "敵方一般單位的 Body 狀態圖明顯放大；我方既有尺寸維持。",
+      "evidence": [
+        "js/39-v143-skill-animation.js"
+      ]
+    },
+    {
+      "id": "PERF-02",
+      "status": "IMPLEMENTED",
+      "requirement": "手動操作選目標時移除多敵人同時 filter/flash compositor loop，並移除選定目標前不必要的全域 updateUI 重建與持續狀態 host teardown。",
+      "evidence": [
+        "css/fixed-slot-battlefield-rendering-v2.css",
+        "js/00-main.js"
+      ]
+    },
+    {
+      "id": "TURN-03",
+      "status": "IMPLEMENTED",
+      "requirement": "手動回合框再上移，不覆蓋 66px 操作面板，技能／物品／選目標時仍維持 25% 透明且不攔截點擊。",
+      "evidence": [
+        "css/fixed-slot-battlefield-rendering-v2.css"
+      ]
+    },
+    {
+      "id": "INFO-04",
+      "status": "IMPLEMENTED",
+      "requirement": "戰鬥資訊／戰鬥數據／狀態閱讀時瞬時 VFX 與浮字不得覆蓋；下方戰鬥資訊使用近不透明黑底，戰鬥資訊把手可沿底部左右拖移。",
+      "evidence": [
+        "js/00-main.js",
+        "css/40-v143-combat-dungeon-polish.css",
+        "css/fixed-slot-battlefield-rendering-v2.css"
+      ]
+    },
+    {
+      "id": "CAROUSEL-05",
+      "status": "IMPLEMENTED",
+      "requirement": "多個 Body 狀態嚴格每秒依序 1→2→1→2，不使用 Date.now bucket 造成重複顯示。",
+      "evidence": [
+        "js/39-v143-skill-animation.js"
+      ]
+    },
+    {
+      "id": "STATUS-ICON-06",
+      "status": "IMPLEMENTED",
+      "requirement": "具有 Body 狀態圖的狀態不再於角色 HUD 重複顯示同一 Icon；點開狀態詳細資訊時仍保留該 Icon。",
+      "evidence": [
+        "js/39-v143-skill-animation.js",
+        "js/00-main.js"
+      ]
+    }
+  ],
+  "verification": {
+    "focusedTests": "PENDING",
+    "build": "PENDING",
+    "buildCheck": "PENDING",
+    "repositoryChecks": "PENDING",
+    "mobileBrowserQa": "PENDING",
+    "devDeployment": "PENDING"
+  }
+}
