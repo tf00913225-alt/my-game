@@ -4,7 +4,7 @@
 #battlePage .battle-stats-edge-button,
 #battlePage .battle-mechanism-alert{
     position:absolute;
-    z-index:70;
+    z-index:18070;
     border:1px solid rgba(230,176,73,.86);
     background:linear-gradient(180deg,rgba(34,25,14,.96),rgba(9,8,6,.96));
     color:#f5d67f;
@@ -52,7 +52,7 @@
     position:absolute;
     top:0;
     bottom:0;
-    z-index:72;
+    z-index:18072;
     width:min(342px,86%);
     display:flex;
     flex-direction:column;
@@ -5217,8 +5217,7 @@ body.quest-scroll-active,
 }
 
 #game-stage #battlePage .v143-status-visual--pulse{
-    animation:v143StatusImageBreath 2.2s ease-in-out infinite;
-    will-change:opacity;
+    animation:v143StatusImageBreath 1s ease-in-out infinite;
 }
 
 #game-stage #battlePage .v143-status-visual--static{
@@ -5228,9 +5227,9 @@ body.quest-scroll-active,
 
 #game-stage #battlePage .v143-status-icon{
     display:inline-block;
-    width:14px;
-    height:14px;
-    flex:0 0 14px;
+    width:17px;
+    height:17px;
+    flex:0 0 17px;
     border:0;
     border-radius:2px;
     background-color:transparent;
@@ -5296,7 +5295,7 @@ body.quest-scroll-active,
 
 @keyframes v143StatusImageBreath{
     0%,100%{opacity:.42}
-    50%{opacity:.78}
+    50%{opacity:1}
 }
 
 @keyframes v143StatusIconBreath{
@@ -5427,7 +5426,7 @@ body.quest-scroll-active,
 #game-stage #battlePage .battle-status-detail-modal{
     position:absolute;
     inset:0;
-    z-index:120;
+    z-index:18120;
     display:flex;
     align-items:center;
     justify-content:center;
@@ -8922,34 +8921,47 @@ body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scro
     margin:0 !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-center-region{
-    display:grid;
-    grid-template-rows:36px minmax(0,1fr);
-    gap:3px;
+    display:block;
     padding:3px 4px;
     border:0;
     background:none !important;
 }
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-center-region > .turn-target-row{
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-center-region > .battle-middle{
+    width:100%;
+    height:100%;
+    min-height:0;
+    margin:0;
+}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion{
+    height:100%;
+    justify-content:flex-end;
+}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion > .turn-target-row{
     align-self:center;
+    flex:0 0 36px;
     width:max-content;
     min-width:112px;
     height:36px;
     min-height:36px;
     max-height:36px;
-    margin:0 auto;
+    margin:0 auto 3px;
+    opacity:1;
     transform:none !important;
+    transition:opacity .16s ease-out;
+    pointer-events:none;
+    z-index:90;
 }
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-center-region > .battle-middle{
-    width:100%;
-    min-height:0;
-    margin:0;
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion > .turn-target-row.skill-picker-open,
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion > .turn-target-row.battle-item-open,
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion.target-selecting > .turn-target-row{
+    opacity:.25;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region{
     position:absolute !important;
     left:0 !important;
     right:0 !important;
     bottom:0 !important;
-    z-index:80 !important;
+    z-index:18060 !important;
     display:grid;
     grid-template-rows:var(--battle-info-handle-height) minmax(0,1fr);
     gap:0;
@@ -8981,36 +8993,37 @@ body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scro
     display:flex;
     align-items:center;
     justify-content:center;
-    width:64px;
+    width:96px;
     height:32px;
     margin:0;
-    padding:0;
+    padding:0 10px;
     border:3px solid #d9ad50;
     border-bottom:0;
     border-radius:10px 10px 0 0;
     color:#f5cf72;
     background:rgba(0,0,0,.62);
     box-shadow:0 -2px 10px rgba(217,173,80,.34);
+    font-size:14px;
+    line-height:26px;
+    font-weight:900;
+    white-space:nowrap;
     transform:none;
     pointer-events:auto;
 }
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-toggle > span{
-    display:block;
-    font-size:24px;
-    line-height:22px;
-    transform:translateY(1px);
-    transition:transform .26s ease;
-}
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region.is-expanded .battle-info-toggle > span{
-    transform:translateY(-1px) rotate(180deg);
-}
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region #battleTurnIndicator{
-    opacity:0;
+    position:absolute;
+    left:8px;
+    top:5px;
+    opacity:1;
+    color:#f5cf72;
+    font-size:14px;
+    line-height:24px;
+    font-weight:900;
     pointer-events:none;
     transition:opacity .16s ease;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region.is-expanded #battleTurnIndicator{
-    opacity:1;
+    opacity:0;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region > #battleInfo{
     min-height:0 !important;
@@ -9172,8 +9185,10 @@ body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scro
     overflow:visible !important;
     contain:none !important;
     transform-origin:center bottom !important;
-    will-change:transform,filter !important;
-    animation:v174BattleIdle 3.4s ease-in-out infinite !important;
+    /* Dense battles previously promoted every portrait to a continuously
+       animated/filtering compositor layer. Keep portraits static between
+       actions; attacker lunge and target reticle still animate on demand. */
+    animation:none !important;
     filter:drop-shadow(0 7px 4px rgba(0,0,0,.52));
     pointer-events:none !important;
 }
@@ -9185,9 +9200,9 @@ body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scro
     width:66%;
     height:10px;
     border-radius:50%;
-    background:rgba(0,0,0,.42);
-    filter:blur(2px);
+    background:rgba(0,0,0,.34);
     transform:translateX(-50%);
+    opacity:.72;
     pointer-events:none;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit > .v174-battle-art ~ *{z-index:6;}

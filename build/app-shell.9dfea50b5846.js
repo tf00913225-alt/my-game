@@ -3652,6 +3652,8 @@ const elementSkillIconMap = {
     dragonSlash:"assets/skills/fire-dragon-slash.jpg",
     explosiveFlurry:"assets/skills/fire-explosive-flurry.jpg",
     rage:"assets/skills/fire-rage.jpg",
+    fireSoulResonance:"assets/skills/fire-soul-resonance.webp",
+    bloodBurnArt:"assets/skills/fire-blood-burn.webp",
     blazeSpell:"assets/skills/fire-blaze-spell.jpg",
     fireCritical:"assets/skills/fire-critical.jpg",
     fireRocket:"assets/skills/fire-rocket.jpg",
@@ -3708,6 +3710,7 @@ const elementSkillIconMap = {
     waterBall:"assets/skills/water-ball.jpg",
     freeze:"assets/skills/water-freeze.jpg",
     revive:"assets/skills/water-revive.jpg",
+    purifyMind:"assets/skills/water-purify-mind.webp",
     floodBeast:"assets/skills/water-flood-beast.jpg",
 
     /*
@@ -23347,6 +23350,7 @@ function closeBattleStatusDetailModal(){
     if(!modal){ return; }
     modal.hidden=true;
     modal.setAttribute("aria-hidden","true");
+    syncBattleUiPriorityLayer();
 }
 
 function renderBattleStatusDetailList(host,items){
@@ -23413,6 +23417,7 @@ function openBattleStatusDetailModal(side,index){
     renderBattleStatusDetailList(modal.querySelector('[data-list="debuffs"]'),summary.debuffs);
     modal.hidden=false;
     modal.setAttribute("aria-hidden","false");
+    syncBattleUiPriorityLayer();
     return true;
 }
 
@@ -33018,6 +33023,26 @@ function syncBattleAutoSettings(){
    戰鬥資訊
 ===================================================== */
 
+function syncBattleUiPriorityLayer(){
+
+    const stage=$("game-stage");
+    const page=$("battlePage");
+    if(!stage||!page){ return false; }
+
+    const statusDetail=page.querySelector(".battle-status-detail-modal:not([hidden])");
+    const sideDrawer=page.querySelector(".battle-insight-drawer.open");
+    const battleInfo=page.querySelector(".battle-info-region.is-expanded");
+    const active=!!(statusDetail||sideDrawer||battleInfo);
+
+    stage.classList.toggle("battle-ui-priority",active);
+    return active;
+
+}
+
+if(typeof window!=="undefined"){
+    window.syncBattleUiPriorityLayer=syncBattleUiPriorityLayer;
+}
+
 function setBattleInfoExpanded(expanded){
 
     const region=document.querySelector("#battlePage .battle-info-region");
@@ -33029,6 +33054,7 @@ function setBattleInfoExpanded(expanded){
     region.classList.toggle("is-expanded",next);
     toggle.setAttribute("aria-expanded",next?"true":"false");
     toggle.setAttribute("aria-label",next?"收合戰鬥資訊":"展開戰鬥資訊");
+    syncBattleUiPriorityLayer();
     return true;
 
 }
