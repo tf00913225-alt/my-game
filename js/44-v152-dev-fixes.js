@@ -412,23 +412,8 @@
     }
 
     window.v152SyncAbyssBattleUi=syncAbyssBattleUi;
-    if(typeof updateMonsterUI==="function"){
-        const previousUpdateMonsterUI=updateMonsterUI;
-        updateMonsterUI=function(){
-            const result=previousUpdateMonsterUI.apply(this,arguments);
-            syncAbyssBattleUi();
-            return result;
-        };
-    }
-    if(typeof updateUI==="function"){
-        const previousUpdateUI=updateUI;
-        updateUI=function(){
-            const result=previousUpdateUI.apply(this,arguments);
-            syncSkillPointDisplay();
-            syncAbyssBattleUi();
-            return result;
-        };
-    }
+
+    function boot(){
 
     function boot(){
         cleanAccidentalFireSkill();
@@ -437,15 +422,6 @@
         removeTaskTracker();
     }
 
-    if(typeof MutationObserver!=="undefined"&&typeof document!=="undefined"){
-        const beginObserve=()=>{
-            if(!document.body){ return; }
-            const observer=new MutationObserver(()=>removeTaskTracker());
-            observer.observe(document.body,{childList:true,subtree:true});
-        };
-        if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",beginObserve,{once:true}); }
-        else{ beginObserve(); }
-    }
     if(typeof document!=="undefined"&&document.readyState==="loading"){
         document.addEventListener("DOMContentLoaded",boot,{once:true});
     }else{ boot(); }
