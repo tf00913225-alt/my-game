@@ -1,3 +1,15 @@
+## 2026-09-22 — 戰鬥狀態 Icon／卡牌資訊視窗／正式狀態圖（DEV candidate）
+
+- Base：最新 `dev@c496d98d6ee373a4f0d31bc299cdd648d3be5da5`；工作分支：`fix/battle-status-info-assets-20260922`；`main` 未修改。
+- Render Owner 保持 `js/00-main.js::renderBattle()` 唯一控制來源；本次沒有新增 renderBattle wrapper。卡牌點擊只有在 Idle（未選技能／物品／目標）時開啟資訊視窗，既有敵方／我方 targetable 選取優先。
+- Persistent Status Visual Owner 仍為 `js/39-v143-skill-animation.js`：狀態 Icon 固定顯示於 HP/SP 上方，不再呼吸；單張呼吸／固定圖仍保留角色本體視覺，但寬度／高度限制在自身卡牌約 68%／72% 範圍並使用 contain，避免蓋到左右卡牌。
+- 卡牌資訊視窗顯示元素、名稱、HP、SP、增益狀態、負面狀態；每筆狀態顯示正式 Icon、效果文字與剩餘回合／觸發後消失。無對應狀態時顯示「無」。
+- 正式狀態清單依目前 Runtime 對應，不重新導入已退休的「全屬性下降」。新火系持續狀態 `炎魂共鳴／焚血／炎勢` 與 `元祖賜福` 已補入正式 Persistent State 名稱表；未修改技能數值、命中率、持續回合或結算公式。
+- 從 `assets-library/assets/inbox/技能icon/[戰鬥狀態圖與icon]` 導入目前 Runtime 實際使用的 22 張狀態圖至 `assets/vfx/status/`。全部使用 lossless WebP；轉檔流程逐張驗證像素 AE=0、尺寸一致與 RIFF/WEBP signature。未將沒有獨立 Runtime 狀態 Owner 的通用 Icon 強行接入正式遊戲。
+- 一次性資產轉檔 Workflow 只存在於施工過程；完成 asset commit 後已自動刪除，最終分支不保留臨時 Workflow。
+- 專項 `tests/battle-status-info-assets-20260922.test.js` PASS；`npm run build` PASS；`npm run build:check` PASS。資產轉檔有效 Run #4：`35718725670` SUCCESS；生成資產／同步 Build commit：`4a32bcd7ef0d032bcd688bd57be085cbf5395a32`。
+- Requirement Batch：`release/requirement-batches/2026-09-22-battle-status-info-assets.json`；目前 IMPLEMENTED，待 PR Repository checks／mobile browser QA 後升級 VERIFIED。
+
 ## 2026-09-22 — 全域捲軸視覺隱藏（DEV candidate）
 
 - Base：最新 `dev@cfde7fda6041b0e53e34c614351e40ff3aafa0c0`；工作分支：`feature/hide-scrollbars-global-20260922`；`main` 未修改。
