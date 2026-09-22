@@ -897,8 +897,6 @@
     }
 
     if(typeof updateGoldDisplay==="function"){
-
-    if(typeof updateGoldDisplay==="function"){
         const previousUpdateGoldDisplay=updateGoldDisplay;
         updateGoldDisplay=function(){
             const result=previousUpdateGoldDisplay.apply(this,arguments);
