@@ -23206,7 +23206,40 @@ function killMonster(index){
    戰鬥畫面
 ===================================================== */
 
+const BATTLE_RENDER_HOOK_ORDER=Object.freeze({
+    before:Object.freeze([
+        "v158PrepareBattleRender",
+        "v141PrepareBattleRender"
+    ]),
+    after:Object.freeze([
+        "v131AfterBattleRender",
+        "v141AfterBattleRender",
+        "v143AfterBattleRender",
+        "v154AfterBattleRender",
+        "vFixedSlotAfterBattleRender"
+    ])
+});
+
+function runBattleRenderHooks(phase,context,args){
+    const root=typeof window!=="undefined"
+        ? window
+        : (typeof globalThis!=="undefined" ? globalThis : null);
+    const hookNames=BATTLE_RENDER_HOOK_ORDER[phase]||[];
+    hookNames.forEach(name=>{
+        const hook=root&&root[name];
+        if(typeof hook==="function"){
+            hook.apply(context,args);
+        }
+    });
+}
+
+if(typeof window!=="undefined"){
+    window.FourSymbolsBattleRenderHookOrder=BATTLE_RENDER_HOOK_ORDER;
+}
+
 function renderBattle(){
+
+    runBattleRenderHooks("before",this,arguments);
 
     const area =
         $("battleMonsterArea");
@@ -23336,6 +23369,8 @@ function renderBattle(){
     if(bossPresentationOwner&&typeof bossPresentationOwner.syncHud==="function"){
         bossPresentationOwner.syncHud();
     }
+
+    runBattleRenderHooks("after",this,arguments);
 
 
     /*

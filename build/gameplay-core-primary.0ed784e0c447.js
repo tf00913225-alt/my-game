@@ -1368,16 +1368,13 @@
 
     let elementBoxBattleStartExp=null;
 
-    if(typeof renderBattle==="function"){
-        const originalRenderBattle=renderBattle;
-        renderBattle=function(){
-            originalRenderBattle.apply(this,arguments);
-            applyBattleFormation();
-            applyAllyBattleFormation();
-            applyPlayerElementFrames();
-            elementBoxBattleStartExp=Math.max(0,Number(sharedExp)||0);
-        };
+    function v131AfterBattleRender(){
+        applyBattleFormation();
+        applyAllyBattleFormation();
+        applyPlayerElementFrames();
+        elementBoxBattleStartExp=Math.max(0,Number(sharedExp)||0);
     }
+    window.v131AfterBattleRender=v131AfterBattleRender;
 
     window.v138GetFormationRows=getFormationRows;
     window.v138BattlePacing={
@@ -9665,37 +9662,39 @@
     }
 
     const startedEntryTokens=new Set();
-    if(typeof renderBattle==="function"){
-        const originalRenderBattle=renderBattle;
-        renderBattle=function(){
-            const isDungeon=!!window.v132ActiveDungeonRun;
-            if(!isDungeon && lastWildRankToken!==battleToken){
-                lastWildRankToken=battleToken;
-                if(typeof window.v141RollWildMonsterRanks==="function"){
-                    window.v141RollWildMonsterRanks(currentBattleMonsters);
-                }
-            }
-            if(isDungeon){ rebalanceDungeonElements(); }
 
-            battleSnapshot={
-                token:battleToken,
-                gold:Math.max(0,Number(gold)||0),
-                exp:Math.max(0,Number(sharedExp)||0),
-                items:getItemCounts(),
-                dungeon:isDungeon
-            };
-            const result=originalRenderBattle.apply(this,arguments);
-            decorateBattleCards();
-            const page=document.getElementById("battlePage");
-            /* Reinforcements redraw the existing battle. Its entry has already
-               started, so startTurn will not run the entry cleanup again. */
-            if(page&&!startedEntryTokens.has(battleToken)){
-                page.classList.remove("v141-entry-moving","v141-exit-player","v141-exit-monster");
-                page.classList.add("v141-preparing-entry");
+    function v141PrepareBattleRender(){
+        const isDungeon=!!window.v132ActiveDungeonRun;
+        if(!isDungeon && lastWildRankToken!==battleToken){
+            lastWildRankToken=battleToken;
+            if(typeof window.v141RollWildMonsterRanks==="function"){
+                window.v141RollWildMonsterRanks(currentBattleMonsters);
             }
-            return result;
+        }
+        if(isDungeon){ rebalanceDungeonElements(); }
+
+        battleSnapshot={
+            token:battleToken,
+            gold:Math.max(0,Number(gold)||0),
+            exp:Math.max(0,Number(sharedExp)||0),
+            items:getItemCounts(),
+            dungeon:isDungeon
         };
     }
+
+    function v141AfterBattleRender(){
+        decorateBattleCards();
+        const page=document.getElementById("battlePage");
+        /* Reinforcements redraw the existing battle. Its entry has already
+           started, so startTurn will not run the entry cleanup again. */
+        if(page&&!startedEntryTokens.has(battleToken)){
+            page.classList.remove("v141-entry-moving","v141-exit-player","v141-exit-monster");
+            page.classList.add("v141-preparing-entry");
+        }
+    }
+
+    window.v141PrepareBattleRender=v141PrepareBattleRender;
+    window.v141AfterBattleRender=v141AfterBattleRender;
 
     /* =====================================================
        Battle transitions and post-battle reward timing
@@ -12438,18 +12437,14 @@
         currentBattleMonsters.forEach(decorateEnemyCard);
     }
 
-    if(typeof renderBattle==="function"){
-        const previousRenderBattle=renderBattle;
-        renderBattle=function(){
-            const result=previousRenderBattle.apply(this,arguments);
-            decorateEnemyCards();
-            if(typeof requestAnimationFrame==="function"){ requestAnimationFrame(decorateEnemyCards); }
-            if(typeof window.v144ConfigureDungeonBattleSkillsAfterRender==="function"){
-                window.v144ConfigureDungeonBattleSkillsAfterRender();
-            }
-            return result;
-        };
+    function v143AfterBattleRender(){
+        decorateEnemyCards();
+        if(typeof requestAnimationFrame==="function"){ requestAnimationFrame(decorateEnemyCards); }
+        if(typeof window.v144ConfigureDungeonBattleSkillsAfterRender==="function"){
+            window.v144ConfigureDungeonBattleSkillsAfterRender();
+        }
     }
+    window.v143AfterBattleRender=v143AfterBattleRender;
     if(typeof updateMonsterUI==="function"){
         const previousUpdateMonsterUI=updateMonsterUI;
         updateMonsterUI=function(index){

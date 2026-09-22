@@ -4731,17 +4731,13 @@
     window.v154SyncMonsterPortraits=syncMonsterPortraits;
     window.v154SyncAbyssPortraits=syncMonsterPortraits;
 
-    if(typeof renderBattle==="function"){
-        const previousRenderBattle=renderBattle;
-        renderBattle=function(){
-            const result=previousRenderBattle.apply(this,arguments);
-            if(typeof window.v152SyncAbyssBattleUi==="function"){
-                window.v152SyncAbyssBattleUi();
-            }
-            syncMonsterPortraits();
-            return result;
-        };
+    function v154AfterBattleRender(){
+        if(typeof window.v152SyncAbyssBattleUi==="function"){
+            window.v152SyncAbyssBattleUi();
+        }
+        syncMonsterPortraits();
     }
+    window.v154AfterBattleRender=v154AfterBattleRender;
     if(typeof updateMonsterUI==="function"){
         const previousUpdateMonsterUI=updateMonsterUI;
         updateMonsterUI=function(){
@@ -6124,23 +6120,20 @@
         };
     }
 
-    if(typeof renderBattle==="function"){
-        const previousRenderBattle=renderBattle;
-        renderBattle=function(){
-            const isDungeonBattle=
-                typeof currentZone!=="undefined"&&currentZone==="dungeon"&&
-                !!window.v132ActiveDungeonRun&&
-                typeof currentBattleMonsters!=="undefined"&&
-                Array.isArray(currentBattleMonsters)&&
-                typeof monsters!=="undefined"&&Array.isArray(monsters);
-            if(isDungeonBattle){
-                const roster=currentBattleMonsters.map(index=>monsters[index]).filter(Boolean);
-                const isAbyss=roster.some(monster=>monster&&monster.v141Abyss===true);
-                if(!isAbyss){ roster.forEach(normalizeDailyDungeonMonster); }
-            }
-            return previousRenderBattle.apply(this,arguments);
-        };
+    function v158PrepareBattleRender(){
+        const isDungeonBattle=
+            typeof currentZone!=="undefined"&&currentZone==="dungeon"&&
+            !!window.v132ActiveDungeonRun&&
+            typeof currentBattleMonsters!=="undefined"&&
+            Array.isArray(currentBattleMonsters)&&
+            typeof monsters!=="undefined"&&Array.isArray(monsters);
+        if(isDungeonBattle){
+            const roster=currentBattleMonsters.map(index=>monsters[index]).filter(Boolean);
+            const isAbyss=roster.some(monster=>monster&&monster.v141Abyss===true);
+            if(!isAbyss){ roster.forEach(normalizeDailyDungeonMonster); }
+        }
     }
+    window.v158PrepareBattleRender=v158PrepareBattleRender;
 
     if(typeof getMonsterEvasion==="function"){
         const previousGetMonsterEvasion=getMonsterEvasion;
@@ -9905,17 +9898,7 @@ document.addEventListener("click",scheduleRepairs,true);document.addEventListene
     });
     window.FourSymbolsBattlefieldRenderGeometry=api;
 
-    if(typeof window.renderBattle==="function"&&!window.renderBattle.__fixedSlotRenderV2){
-        const previous=window.renderBattle;
-        const wrapped=function(){
-            const result=previous.apply(this,arguments);
-            reconcile();
-            return result;
-        };
-        wrapped.__fixedSlotRenderV2=true;
-        window.renderBattle=wrapped;
-        try{ renderBattle=wrapped; }catch(_){ }
-    }
+    window.vFixedSlotAfterBattleRender=reconcile;
 
     neutralizeLegacyPresentationGeometry();
     wrapDamagePopup();

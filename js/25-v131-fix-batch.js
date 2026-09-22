@@ -314,16 +314,13 @@
 
     let elementBoxBattleStartExp=null;
 
-    if(typeof renderBattle==="function"){
-        const originalRenderBattle=renderBattle;
-        renderBattle=function(){
-            originalRenderBattle.apply(this,arguments);
-            applyBattleFormation();
-            applyAllyBattleFormation();
-            applyPlayerElementFrames();
-            elementBoxBattleStartExp=Math.max(0,Number(sharedExp)||0);
-        };
+    function v131AfterBattleRender(){
+        applyBattleFormation();
+        applyAllyBattleFormation();
+        applyPlayerElementFrames();
+        elementBoxBattleStartExp=Math.max(0,Number(sharedExp)||0);
     }
+    window.v131AfterBattleRender=v131AfterBattleRender;
 
     window.v138GetFormationRows=getFormationRows;
     window.v138BattlePacing={
