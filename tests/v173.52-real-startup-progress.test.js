@@ -1,6 +1,7 @@
 "use strict";
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 
 const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const startup=fs.readFileSync("js/52-v173.20-startup-loader.js","utf8");
@@ -32,5 +33,5 @@ assert.equal((featureLoader.match(/createElement\("script"\)/g)||[]).length,1);
 assert.match(build,/"js\/equipment-progression\.js"[\s\S]*?"js\/53-v173\.50-inventory-qol\.js"[\s\S]*?"js\/54-v173\.51-battle-qa\.js"/);
 assert.equal((index.match(/<script\b[^>]*\bsrc=/g)||[]).length,1);
 assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
-assert.match(index,/<title>四象江湖傳 V173\.69<\/title>/);
+assert.ok(index.includes("<title>四象江湖傳 V"+releaseMeta.version+"</title>"));
 console.log("✓ real First Play progress and deterministic feature loading");
