@@ -148,6 +148,49 @@ Repository checks SUCCESS 只表示既有自動檢查通過；Deploy SUCCESS 只
 
 未經 dev 驗收不得直接推 main。`assets-library` 維持素材專用，不得混入程式功能修改。
 
+## 16A. Repository Closeout 與 main/dev 有效內容收斂
+
+本節為 `dev / main` 固定流程不可省略的最後階段，適用於所有 Work、GPT、Claude、Codex 與其他開發／發布 owner。
+
+標準完整流程改為：
+
+`最新 dev → 工作分支 → PR 回 dev → CI/Requirement Verification → 合併 dev → 安全清理已完成工作分支／被取代 PR → dev preview／使用者確認 → dev → main PR → main CI → production deploy → production version/SHA verification → 安全清理發布分支 → main/dev 有效內容收斂確認`。
+
+### 16A-1. 合併後分支清理
+- PR 合併後，來源工作分支必須立即進入「是否可刪除」判定。
+- 僅當分支內容已完整吸收、沒有獨立有效 commit／diff、也沒有明確長期保存需求時才刪除。
+- `main`、`dev`、`assets-library` 及專案負責人明確指定保留的 backup／長期分支禁止自動刪除。
+- 不得為降低 branch count 而刪除尚未吸收內容。
+
+### 16A-2. 舊 PR／被取代 PR 收尾
+- 舊 PR 只有在有效內容已完整進入目前權威分支，或由另一個明確 PR／commit 完整取代時，才可關閉。
+- 關閉時應能指出 replacement PR／commit 或已吸收的目標 SHA；仍含獨立有效內容時不得關閉。
+- 已合併、已取代且無獨立內容的 PR 不應繼續被週報列為「待開發／待修復」。
+
+### 16A-3. dev → main 發布後收斂
+- 正式發布完成後必須比較 `main` 與 `dev` 的**實際有效內容**。
+- `ahead/behind`、merge commit 數、commit graph 或 GitHub 顯示 `diverged` 只能作為線索，不能單獨證明內容分歧。
+- 若兩邊實際 tree／有效 diff 一致，單純 commit 歷史不同視為已收斂，不得因此把發布狀態降級。
+- 若 `main` 有 `dev` 未吸收的有效內容，必須建立受控同步 PR／工作分支完成回流；禁止 rebase、force push、直接覆寫 `main`／`dev`。
+- 發布候選 branch／PR 在正式發布成功且內容已吸收後，必須進入安全清理判定，不得無理由永久保留。
+
+### 16A-4. 週報健康燈號
+週報必須把「系統健康」與「Repository Hygiene（程式庫清潔）」分開：
+
+- **綠燈**：production／dev 的必要 CI 與部署健康；沒有會阻塞下一次發布的有效未吸收內容、實質 main/dev 內容分歧或 P0/P1 發布阻塞。
+- **黃燈**：存在會實際影響下一次發布的問題，例如必要 CI 失敗、有效 PR 衝突、未吸收獨立內容、實質 main/dev 內容分歧或部署／Release Gate 未完成。
+- **紅燈**：production 已知嚴重故障、核心玩家資料／登入／存檔／付款等高風險失效、正式部署失敗或嚴重 Regression。
+- 歷史已完成 branch 數量、已被取代且無獨立內容的舊 PR、純 merge-history 差異，只能列入 Hygiene，不得單獨把總燈號從綠降成黃。
+
+### 16A-5. 結案回報
+每次完成工作若涉及 GitHub 分支／PR，完成回報除既有欄位外，還必須補：
+- Source branch closeout：DELETED／RETAINED（附原因）
+- Superseded PR closeout：CLOSED／NONE／RETAINED（附原因）
+- Release branch closeout：DELETED／N/A／RETAINED（附原因）
+- main/dev effective-content convergence：VERIFIED／NOT APPLICABLE／BLOCKED
+
+能安全完成但尚未完成的 closeout 項目，不得省略不報。
+
 ## 17. 玩家資料安全
 
 Cache、版本、Service Worker 更新只允許處理靜態資源 Cache。禁止因此清除玩家 `localStorage`、IndexedDB、雲端存檔、帳號、背包、等級、裝備或遊戲進度。Cache invalidation 與 Save Data 必須完全分離。
