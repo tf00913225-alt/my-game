@@ -647,7 +647,9 @@
             selectedNode.style.width=Math.round(width)+"px";
             selectedNode.style.height=Math.round(height)+"px";
         }
-        return bodyTypes.length>1;
+        const needsCarousel=bodyTypes.length>1;
+        if(needsCarousel){ scheduleStatusCarousel(); }
+        return needsCarousel;
     }
 
     function stopStatusCarousel(){
@@ -656,6 +658,16 @@
             state.timers.delete(state.statusCarouselTimer);
             state.statusCarouselTimer=0;
         }
+    }
+
+    function scheduleStatusCarousel(){
+        if(state.statusCarouselTimer){ return; }
+        state.statusCarouselTimer=setTimer(()=>{
+            state.statusCarouselTimer=0;
+            state.statusCarouselStep++;
+            state.metrics.statusCarouselTicks++;
+            syncStatusCarouselFrame();
+        },STATUS_CAROUSEL_MS);
     }
 
     function syncStatusCarouselFrame(){
@@ -667,12 +679,7 @@
         }
         stopStatusCarousel();
         if(needsCarousel){
-            state.statusCarouselTimer=setTimer(()=>{
-                state.statusCarouselTimer=0;
-                state.statusCarouselStep++;
-                state.metrics.statusCarouselTicks++;
-                syncStatusCarouselFrame();
-            },STATUS_CAROUSEL_MS);
+            scheduleStatusCarousel();
         }else{
             state.statusCarouselStep=0;
         }
