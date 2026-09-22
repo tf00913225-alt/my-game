@@ -5198,8 +5198,8 @@ body.quest-scroll-active,
 
 /* Persistent status visuals are intentionally low-motion.
    Cast VFX keep their raster Sprite Sheet animation; persistent states use
-   one single image with opacity breathing or a fixed image. Status icons are
-   static information markers above the resource bars and never breathe. */
+   one body image at a time with a two-second opacity breath or a fixed image.
+   Status icons stay static above the resource bars and never breathe. */
 #game-stage #battlePage .v143-status-visual{
     position:absolute;
     left:50%;
@@ -5217,7 +5217,7 @@ body.quest-scroll-active,
 }
 
 #game-stage #battlePage .v143-status-visual--pulse{
-    animation:v143StatusImageBreath 1s ease-in-out infinite;
+    animation:v143StatusImageBreath 2s ease-in-out infinite;
 }
 
 #game-stage #battlePage .v143-status-visual--static{
@@ -8992,6 +8992,10 @@ body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scro
     transform:translateY(calc(100% - var(--battle-info-handle-height)));
     transition:transform .26s ease;
 }
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region:not(.is-expanded){
+    background:transparent;
+    box-shadow:none;
+}
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region.is-expanded{
     pointer-events:auto;
     transform:translateY(0);
@@ -9016,12 +9020,12 @@ body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scro
     height:32px;
     margin:0;
     padding:0 10px;
-    border:3px solid #d9ad50;
+    border:1px solid rgba(210,158,64,.9);
     border-bottom:0;
     border-radius:10px 10px 0 0;
     color:#f5cf72;
     background:rgba(0,0,0,.62);
-    box-shadow:0 -2px 10px rgba(217,173,80,.34);
+    box-shadow:none;
     font-size:14px;
     line-height:26px;
     font-weight:900;
