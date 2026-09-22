@@ -1,6 +1,7 @@
 "use strict";
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 
 const qol=fs.readFileSync("js/53-v173.50-inventory-qol.js","utf8");
 const equipment=fs.readFileSync("js/equipment-progression.js","utf8");
@@ -19,8 +20,8 @@ assert.doesNotMatch(qol,/createElement\(["']script["']\)|\.onload\s*=/);
 assert.doesNotMatch(equipment,/createElement\(["']script["']\)|v17351:qa-ready|30000/);
 assert.doesNotMatch(ui,/createElement\(["']script["']\)|equipment-progression\.js\?v=/);
 assert.match(featureLoader,/script\.async=false/);
-assert.match(loader,/const V_ASSET_VERSION="173\.69"/);
+assert.equal((loader.match(/const V_ASSET_VERSION="([^"]+)"/)||[])[1],releaseMeta.cacheVersion);
 assert.doesNotMatch(loader,/runtimeReady|TOTAL_RUNTIME_MODULES/);
 assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
-assert.match(index,/<title>四象江湖傳 V173\.69<\/title>/);
+assert.ok(index.includes("<title>四象江湖傳 V"+releaseMeta.version+"</title>"));
 console.log("✓ bundled QA execution order without HTTP readiness chain");
