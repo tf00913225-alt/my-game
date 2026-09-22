@@ -38,8 +38,12 @@ jobs:
             local target="$2"
             git show "origin/assets-library:assets/inbox/技能icon/[戰鬥狀態圖與icon]/$source" > "/tmp/status-src/$source"
             convert "/tmp/status-src/$source" -define webp:lossless=true -quality 100 "assets/vfx/status/$target"
-            test "$(magick compare -metric AE "/tmp/status-src/$source" "assets/vfx/status/$target" null: 2>&1 || true)" = "0 (0)"
-            test "$(magick identify -format '%wx%h' "/tmp/status-src/$source")" = "$(magick identify -format '%wx%h' "assets/vfx/status/$target")"
+            diff_pixels="$(compare -metric AE "/tmp/status-src/$source" "assets/vfx/status/$target" null: 2>&1 || true)"
+            if [[ "$diff_pixels" != "0" && "$diff_pixels" != "0 (0)" ]]; then
+              echo "pixel mismatch for $source -> $target: $diff_pixels"
+              exit 1
+            fi
+            test "$(identify -format '%wx%h' "/tmp/status-src/$source")" = "$(identify -format '%wx%h' "assets/vfx/status/$target")"
             test "$(head -c 4 "assets/vfx/status/$target")" = "RIFF"
             test "$(dd if="assets/vfx/status/$target" bs=1 skip=8 count=4 status=none)" = "WEBP"
           }
@@ -92,3 +96,5 @@ jobs:
 # rerun-from-latest-head
 
 # imagemagick6-command-fix
+
+# comparison-command-fix
