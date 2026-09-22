@@ -2,6 +2,7 @@
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 const path=require("node:path");
 const vm=require("node:vm");
 
@@ -248,7 +249,7 @@ test("perpetual modal glow and skill-card compositing are static",()=>{
 });
 
 test("V169 styles and runtimes are deployed last under fresh cache keys",()=>{
-    assert.match(loaderSource,/const V_ASSET_VERSION="173\.69"/);
+    assert.equal((loaderSource.match(/const V_ASSET_VERSION="([^"]+)"/)||[])[1],releaseMeta.cacheVersion);
     assert.match(indexSource,/build\/boot-core\.[0-9a-f]{12}\.js/);
     assert.match(indexSource,/build\/boot-core\.[0-9a-f]{12}\.js/);
     assert.match(indexSource,/build\/boot-core\.[0-9a-f]{12}\.js/);
