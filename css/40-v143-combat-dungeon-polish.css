@@ -224,9 +224,9 @@
 }
 
 /* Persistent status visuals are intentionally low-motion.
-   Cast VFX keep their raster Sprite Sheet animation; persistent states use
-   one single image with opacity breathing or a fixed image. Status icons are
-   static information markers above the resource bars and never breathe. */
+   Cast VFX keep their raster Sprite Sheet animation; each unit renders only
+   one body-status image at a time. Multiple body states rotate every second.
+   Status icons remain static information markers above the resource bars. */
 #game-stage #battlePage .v143-status-visual{
     position:absolute;
     left:50%;
@@ -237,27 +237,26 @@
     background-position:0 0;
     background-repeat:no-repeat;
     image-rendering:auto;
-    opacity:.9;
+    opacity:1;
     pointer-events:none;
     transform:translate(-50%,-50%);
     transform-origin:center;
 }
 
 #game-stage #battlePage .v143-status-visual--pulse{
-    animation:v143StatusImageBreath 2.2s ease-in-out infinite;
-    will-change:opacity;
+    animation:v143StatusImageBreath 1s ease-in-out infinite;
 }
 
 #game-stage #battlePage .v143-status-visual--static{
     animation:none;
-    opacity:.9;
+    opacity:1;
 }
 
 #game-stage #battlePage .v143-status-icon{
     display:inline-block;
-    width:14px;
-    height:14px;
-    flex:0 0 14px;
+    width:16px;
+    height:16px;
+    flex:0 0 16px;
     border:0;
     border-radius:2px;
     background-color:transparent;
@@ -323,7 +322,7 @@
 
 @keyframes v143StatusImageBreath{
     0%,100%{opacity:.42}
-    50%{opacity:.78}
+    50%{opacity:1}
 }
 
 @keyframes v143StatusIconBreath{
@@ -449,12 +448,28 @@
 }
 
 
+
+/* Readability wins while a battle information surface is intentionally open.
+   V143 timing continues normally; only transient body-level paint is hidden so
+   skill sheets, caster labels and floating damage cannot cover readable UI. */
+body.v174-battle-status-detail-open > .v143-skill-stage,
+body.v174-battle-info-open > .v143-skill-stage,
+body.v174-battle-insight-open > .v143-skill-stage,
+body.v174-battle-status-detail-open > .damage-popup.v152-top-damage,
+body.v174-battle-info-open > .damage-popup.v152-top-damage,
+body.v174-battle-insight-open > .damage-popup.v152-top-damage,
+body.v174-battle-status-detail-open > .skill-name-badge.v143-caster-skill-label,
+body.v174-battle-info-open > .skill-name-badge.v143-caster-skill-label,
+body.v174-battle-insight-open > .skill-name-badge.v143-caster-skill-label{
+    visibility:hidden !important;
+}
+
 /* V176 battle status inspection: idle card tap shows current state details. */
 #game-stage #battlePage .battle-status-detail-modal[hidden]{display:none !important;}
 #game-stage #battlePage .battle-status-detail-modal{
     position:absolute;
     inset:0;
-    z-index:120;
+    z-index:260;
     display:flex;
     align-items:center;
     justify-content:center;
