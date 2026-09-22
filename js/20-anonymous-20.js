@@ -108,7 +108,6 @@ const V_ASSET_VERSION="173.71";
     document.addEventListener("pointerdown",prefetch,{capture:true,passive:true});
     document.addEventListener("touchstart",prefetch,{capture:true,passive:true});
     document.addEventListener("click",enter,true);
-    document.addEventListener("click",()=>setTimeout(primeExpPoolSafety,0),true);
     document.addEventListener("four-symbols:startup-ready",()=>{
         const api=loader();
         if(api){
@@ -122,12 +121,14 @@ const V_ASSET_VERSION="173.71";
     },{once:true});
 
     function installExpPoolVisibilityObserver(){
-        if(!document.body||typeof MutationObserver==="undefined"){ return; }
+        const pool=document.getElementById("homeExpPoolCard");
+        const root=document.getElementById("homePage")||pool;
+        if(!root||typeof MutationObserver==="undefined"){ primeExpPoolSafety(); return; }
         const observer=new MutationObserver(()=>{
-            if(expPoolSafetyUiReady){ return; }
+            if(expPoolSafetyUiReady){ observer.disconnect(); return; }
             primeExpPoolSafety();
         });
-        observer.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:["class","style","hidden"]});
+        observer.observe(root,{subtree:true,childList:true,attributes:true,attributeFilter:["class","style","hidden"]});
         primeExpPoolSafety();
     }
     if(document.readyState==="loading"){
