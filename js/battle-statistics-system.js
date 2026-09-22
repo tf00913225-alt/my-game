@@ -136,8 +136,8 @@
             edge.type="button";
             edge.id="battleStatsEdgeButton";
             edge.className="battle-stats-edge-button";
-            edge.setAttribute("aria-label","詳細戰況");
-            edge.innerHTML="<span>詳</span><span>細</span><span>戰</span><span>況</span>";
+            edge.setAttribute("aria-label","戰鬥數據");
+            edge.innerHTML="<span>戰</span><span>鬥</span><span>數</span><span>據</span>";
             edge.addEventListener("click",event=>{
                 if(edge.__suppressNextClick){
                     edge.__suppressNextClick=false;
@@ -170,8 +170,8 @@
             statsDrawer=document.createElement("aside");
             statsDrawer.id="battleStatsDrawer";
             statsDrawer.className="battle-insight-drawer battle-stats-drawer";
-            statsDrawer.setAttribute("aria-label","詳細戰況");
-            statsDrawer.innerHTML='<header><b>詳細戰況</b><button type="button" data-close>×</button></header><div class="battle-insight-drawer-body"></div>';
+            statsDrawer.setAttribute("aria-label","戰鬥數據");
+            statsDrawer.innerHTML='<header><b>戰鬥數據</b><button type="button" data-close>×</button></header><div class="battle-insight-drawer-body"></div>';
             statsDrawer.querySelector("[data-close]").addEventListener("click",closeBattleDrawer);
             root.appendChild(statsDrawer);
         }
@@ -257,6 +257,7 @@
 
         const drawer=next==="boss"?ui.bossDrawer:ui.statsDrawer;
         drawer.classList.add("open");
+        if(document.body){ document.body.classList.add("v174-battle-insight-open"); }
         if(next==="boss"){ renderBossDrawer(); }else{ renderStatsDrawer(); }
         return true;
     }
@@ -266,6 +267,9 @@
             const boss=document.getElementById("battleBossMechanismDrawer");
             if(stats){ stats.classList.remove("open"); }
             if(boss){ boss.classList.remove("open"); }
+        }
+        if(typeof document!=="undefined"&&document.body){
+            document.body.classList.remove("v174-battle-insight-open");
         }
         openDrawer=null;
     }
