@@ -1,9 +1,24 @@
+## 2026-09-22 — renderBattle Owner P1 收斂完成（DEV）
+
+- 正式 `main` 仍為 V173.70：`0b62be5944ff7a440682bfae28b3ccc43ee2fe91`；本次 renderBattle Owner 重構**尚未發布到 main**。
+- 最新 `dev`：`07ce72ac6fc602ac4a31809c26d7e4e531d4d1b1`。
+- PR #507 已合併 dev；`js/00-main.js::renderBattle()` 現為唯一正式 Render Owner。
+- 原正式 Runtime 共 6 層 renderBattle Wrapper（V131／V141／V143／V154／V158／Fixed Slot adapter）已全部移除，改為固定順序 named hooks；Production Runtime 不再允許新增 renderBattle wrapper。
+- Before-render 順序固定：V158 日常副本正規化 → V141 野怪／副本 lifecycle；After-render 順序固定：V131 Formation → V141 Battle UI／entry → V143 enemy decoration／RAF／V144 hook → V154 Abyss UI／Portrait → Fixed Slot reconcile。
+- 原正式行為保持：Formation、Monster Portrait、Abyss 五帝、Dungeon／Wild／Boss、Fixed Slot、Status／Skill VFX、Battle Statistics、Boss Drawer、回合順序與 Action cadence 均未改規格；`POST_ACTION_DELAY_MS` 未修改。
+- PR #507 candidate CI run `35697256998`：SUCCESS；包含 syntax、build:check、Fixed Slot、battle layout/timing/VFX、relic/battle-input、resources、HTML IDs、loader、Release Gate、git diff 與 exact-candidate real battle mobile browser QA。
+- Full Node Suite 以 CI-only Draft PR #508 驗證：run `35697472769`，**203 / 203 PASS**；PR #508 已關閉且未合併 main。
+- dev push CI run `35697890251`：SUCCESS；Dev deployment gate／exact-SHA verification／Game+Cache verification／deployed battle layout & VFX Live QA 全部 SUCCESS。
+- 收尾時 Open PR：0；Open Issue：0。
+- 目前 `dev` behind `main` = 0；dev 已因 V173.70 發布後的文件收尾與已驗證 dev-only renderBattle 重構而領先 main。這不代表 V173.70 Release Lifecycle 失敗，也不代表需要重發舊版本。
+- 本次未修改技能數值、傷害公式、Boss AI、掉落／經濟、玩家存檔 Schema、Firebase 正式資料行為或其他 UI。
+
 ## 2026-09-22 — V173.70 正式發布完成／main-dev 收斂完成
 
 - 正式版本：V173.70。
 - V173.70 功能發布 SHA：`25c34a2dbbfce4600691df959cc2823eff80aeab`。
 - 最新 `main`：`0b62be5944ff7a440682bfae28b3ccc43ee2fe91`。
-- 最新 `dev`：`9a2bbc31604331fb0fe97843b25036b3cbd5a5c1`。
+- V173.70 Release Lifecycle 收斂當時的 `dev`：`9a2bbc31604331fb0fe97843b25036b3cbd5a5c1`；後續 dev 進度以本文件最上方最新區塊為準。
 - PR #503：V173.70 正式發布成功。
 - PR #504：CHECK_REPORT 發布後文件收尾成功。
 - PR #505：main→dev 歷史收斂成功。
@@ -13,7 +28,7 @@
 - Full Node Suite：203 / 203 PASS。
 - Game / Cache Version：173.70 / 173.70。
 - Open PR：0；Open Issue：0。
-- `main`／`dev` 實際檔案內容一致；`dev` behind `main` = 0，僅多 1 個 main→dev 收斂 Merge Commit。
+- 在 V173.70 Release Lifecycle 結案當下，`main`／`dev` 實際檔案內容一致、`dev` behind `main` = 0，且 dev 僅多 1 個 main→dev 收斂 Merge Commit；這是歷史結案快照，不代表後續 dev 永遠不得前進。
 - V173.70 Release Lifecycle（發布生命週期）已正式結案。
 - **Historical Record（歷史紀錄）註記：下方 V173.69 與舊 V173.70 候選內容只保留作歷史脈絡，不得再被 AI／代理當成目前正式狀態或下一步發布指示。**
 
