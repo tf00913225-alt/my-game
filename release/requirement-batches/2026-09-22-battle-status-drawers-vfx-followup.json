@@ -69,10 +69,10 @@
     }
   ],
   "verification": {
-    "targetedTests": "PENDING",
-    "assetLosslessAndGrid": "PENDING",
-    "build": "PENDING",
-    "buildCheck": "PENDING",
+    "targetedTests": "12/12 PASS — one-time asset Run 35730450172",
+    "assetLosslessAndGrid": "PASS — 3 icons 1254x1254 AE=0; 3 cast sheets 1448x1086 4x3 / 362x362 per frame AE=0; stun still 887x887 AE=0",
+    "build": "PASS — npm run build (Run 35730450172)",
+    "buildCheck": "PASS — npm run build:check (Run 35730450172)",
     "repositoryChecks": "PENDING",
     "mobileBrowserQa": "PENDING",
     "devDeployment": "PENDING"
