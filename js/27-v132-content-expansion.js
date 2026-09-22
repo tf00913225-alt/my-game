@@ -954,6 +954,7 @@
             const promptAction=document.getElementById("battleTargetPromptAction");
 
             if(region){ region.classList.add("target-selecting"); }
+            if(typeof syncTurnTimerWithBattlePickers==="function"){ syncTurnTimerWithBattlePickers(); }
             if(promptAction){
                 promptAction.textContent="選擇 ["+definition.name+"] 的我方目標";
             }
