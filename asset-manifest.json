@@ -203,19 +203,19 @@
         "decode": true
       },
       {
-        "path": "build/boot-core.7897301b7787.js",
-        "sha256": "7897301b7787",
-        "bytes": 59088,
-        "priority": "P0",
-        "type": "script",
-        "decode": false
-      },
-      {
         "path": "build/boot-core.779d83b83ac9.css",
         "sha256": "779d83b83ac9",
         "bytes": 221136,
         "priority": "P0",
         "type": "style",
+        "decode": false
+      },
+      {
+        "path": "build/boot-core.7897301b7787.js",
+        "sha256": "7897301b7787",
+        "bytes": 59088,
+        "priority": "P0",
+        "type": "script",
         "decode": false
       },
       {
