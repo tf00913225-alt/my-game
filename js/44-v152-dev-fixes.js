@@ -414,8 +414,6 @@
     window.v152SyncAbyssBattleUi=syncAbyssBattleUi;
 
     function boot(){
-
-    function boot(){
         cleanAccidentalFireSkill();
         syncSkillPointDisplay();
         syncAbyssBattleUi();
