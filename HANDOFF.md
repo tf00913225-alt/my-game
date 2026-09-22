@@ -1,3 +1,10 @@
+## 2026-09-22 — 全域捲軸視覺隱藏（DEV candidate）
+
+- Base：最新 `dev@cfde7fda6041b0e53e34c614351e40ff3aafa0c0`；工作分支：`feature/hide-scrollbars-global-20260922`；`main` 未修改。
+- 全域 Scrollbar（捲軸）視覺唯一 owner 為 `css/00-main.css`：所有 `#game-stage` 內既有與未來捲動容器保留原本 `overflow`、`touch-action`、慣性捲動與手勢行為，只隱藏瀏覽器繪製的 scrollbar track/thumb。
+- Firefox 使用 `scrollbar-width:none`；Blink／WebKit 使用 `::-webkit-scrollbar` 隱藏。未修改 scroll whitelist、內容高度、捲動方向、戰鬥／存檔／數值／玩法。
+- 已移除 `css/46-v154-dev-fixes.css` 深淵戰鬥紀錄與 `css/38-v141-system-expansion.css` 重鑄橫向列表的舊 `scrollbar-width:thin` 覆蓋，避免後層重新顯示可見捲軸。
+
 ## 2026-09-22 — renderBattle Owner P1 收斂完成（DEV）
 
 - 正式 `main` 仍為 V173.70：`0b62be5944ff7a440682bfae28b3ccc43ee2fe91`；本次 renderBattle Owner 重構**尚未發布到 main**。
