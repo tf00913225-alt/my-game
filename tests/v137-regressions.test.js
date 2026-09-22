@@ -11,6 +11,7 @@ const v132Source=fs.readFileSync("js/27-v132-content-expansion.js","utf8");
 const v133Source=fs.readFileSync("js/28-v133-economy-rebalance.js","utf8");
 const v136Source=fs.readFileSync("js/31-v136-auto-battle-fix.js","utf8");
 const indexSource=fs.readFileSync("index.html","utf8");
+const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 
 function extractFunction(source,name){
     const start=source.indexOf("function "+name+"(");
@@ -332,7 +333,8 @@ test("V137 regressions remain wired through the current deployed entry points",(
     assert.match(indexSource,/build\/boot-core\.[0-9a-f]{12}\.js/);
     assert.match(appBundle,/bundled source: js\/00-main\.js/);
     assert.match(appBundle,/bundled source: js\/20-anonymous-20\.js/);
-    assert.match(loaderSource,/const V_ASSET_VERSION="173\.69"/);
+    const assetVersionMatch=loaderSource.match(/const V_ASSET_VERSION="([^"]+)"/);
+    assert.equal(assetVersionMatch?.[1],releaseMeta.cacheVersion);
     assert.match(v133Source,/const MAX_CHARACTER_LEVEL=100/);
     assert.doesNotMatch(mainSource,/safeBind\(\s*["'](?:autoEnabled|autoSkillHome|hpUsePctHome|spUsePctHome)/);
     assert.doesNotMatch(v132Source,/const result=originalLoseBattle\.apply/);

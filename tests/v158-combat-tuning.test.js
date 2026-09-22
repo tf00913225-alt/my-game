@@ -4,6 +4,7 @@
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 const vm=require("node:vm");
 
 const source=fs.readFileSync("js/47-v158-combat-tuning.js","utf8");
@@ -52,7 +53,7 @@ function load(overrides={}){
 }
 
 test("V158 and V159 remain ordered before the final V169 runtimes",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.69"/);
+    assert.equal((loader.match(/const V_ASSET_VERSION="([^"]+)"/)||[])[1],releaseMeta.cacheVersion);
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
     assert.match(loader,/css\/47-v158-combat-tuning\.css/);
     const v155=loader.indexOf("js/46-v155-dev-fixes.js");

@@ -9,6 +9,7 @@ const css=fs.readFileSync("css/46-v154-dev-fixes.css","utf8");
 const abyss=fs.readFileSync("js/36-v141-content-systems.js","utf8");
 const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const index=fs.readFileSync("index.html","utf8");
+const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 
 let passed=0;
 function test(name,handler){
@@ -51,7 +52,8 @@ function loadRuntime(overrides={}){
 }
 
 test("the current cache key delivers the repaired runtime and CSS",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.69"/);
+    const assetVersionMatch=loader.match(/const V_ASSET_VERSION="([^"]+)"/);
+    assert.equal(assetVersionMatch?.[1],releaseMeta.cacheVersion);
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
     assert.match(loader,/css\/46-v154-dev-fixes\.css/);
     assert.match(loader,/js\/45-v154-dev-fixes\.js/);
