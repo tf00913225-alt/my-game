@@ -174,7 +174,7 @@ test("synthesis is icon-first and creates ordinary random gear without a set ID"
 test("earth shield is raster-owned while ally targeting and Barrier rules remain intact",()=>{
     assert.doesNotMatch(system,/v143-earth-shield-effect|effect\.innerHTML=.*象/);
     assert.doesNotMatch(css,/v143-earth-shield-effect|v143EarthCornerBreath/);
-    assert.match(animation,/earthShield:statusVisual\("assets\/vfx\/earth\/earth-shield-loop\.png\?v=173\.39","static","activeBuffs"/);
+    assert.match(animation,/earthShield:statusVisual\("assets\/vfx\/status\/earth-shield\.webp","static","activeBuffs"/);
     assert.match(css,/\.battle-player\.ally-targetable::after/);
     assert.match(system,/targetAlly:index/);
     assert.match(system,/monster\.v141Shield\.remainingBlocks=5/);
