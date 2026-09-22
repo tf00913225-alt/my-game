@@ -1,0 +1,148 @@
+name: Temporary battle asset import 20260922
+
+on:
+  push:
+    branches:
+      - fix/battle-status-carousel-drawers-vfx-20260922
+
+permissions:
+  contents: write
+
+jobs:
+  import-assets:
+    if: ${{ !contains(github.event.head_commit.message, '[asset-sync]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install image tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y webp imagemagick
+
+      - name: Import and verify lossless WebP assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin assets-library:refs/remotes/origin/assets-library
+          rm -rf /tmp/battle-assets
+          mkdir -p /tmp/battle-assets
+          mkdir -p assets/skills assets/vfx/fire assets/vfx/water assets/vfx/status
+
+          extract() {
+            local repo_path="$1"
+            local out="$2"
+            git show "origin/assets-library:${repo_path}" > "${out}"
+          }
+
+          verify_lossless() {
+            local expected="$1"
+            local webp="$2"
+            local decoded="/tmp/battle-assets/decoded-$(basename "${webp}").png"
+            dwebp "${webp}" -o "${decoded}" >/dev/null 2>&1
+            local expected_size decoded_size ae
+            expected_size="$(identify -format '%wx%h' "${expected}")"
+            decoded_size="$(identify -format '%wx%h' "${decoded}")"
+            test "${expected_size}" = "${decoded_size}"
+            ae="$(compare -metric AE "${expected}" "${decoded}" null: 2>&1 || true)"
+            test "${ae}" = "0"
+            head -c 4 "${webp}" | grep -q '^RIFF$'
+            dd if="${webp}" bs=1 skip=8 count=4 status=none | grep -q '^WEBP$'
+          }
+
+          convert_icon() {
+            local source="$1"
+            local dest="$2"
+            local stem
+            stem="$(basename "${dest}" .webp)"
+            local cropped="/tmp/battle-assets/${stem}-cropped.png"
+            local square="/tmp/battle-assets/${stem}-square.png"
+            convert "${source}" -trim +repage "${cropped}"
+            local w h side
+            read -r w h < <(identify -format '%w %h' "${cropped}")
+            if [ "${w}" -gt "${h}" ]; then side="${w}"; else side="${h}"; fi
+            convert "${cropped}" -background none -gravity center -extent "${side}x${side}" "${square}"
+            cwebp -quiet -lossless -m 6 "${square}" -o "${dest}"
+            verify_lossless "${square}" "${dest}"
+          }
+
+          convert_sheet() {
+            local source="$1"
+            local dest="$2"
+            local w h
+            read -r w h < <(identify -format '%w %h' "${source}")
+            test $((w % 4)) -eq 0
+            test $((h % 3)) -eq 0
+            cwebp -quiet -lossless -m 6 "${source}" -o "${dest}"
+            verify_lossless "${source}" "${dest}"
+          }
+
+          extract "assets/inbox/技能icon/淨心訣 icon.png" /tmp/battle-assets/purify-icon.png
+          extract "assets/inbox/技能icon/淨心訣 技能釋放.png" /tmp/battle-assets/purify-cast.png
+          extract "assets/inbox/技能icon/炎魂共鳴 icon.png" /tmp/battle-assets/fire-soul-icon.png
+          extract "assets/inbox/技能icon/炎魂共鳴 技能釋放.png" /tmp/battle-assets/fire-soul-cast.png
+          extract "assets/inbox/技能icon/焚血訣 icon.png" /tmp/battle-assets/blood-burn-icon.png
+          extract "assets/inbox/技能icon/焚血訣 技能釋放.png" /tmp/battle-assets/blood-burn-cast.png
+          extract "assets/inbox/技能icon/暈眩-狀態循環圖.png" /tmp/battle-assets/stun-source.png
+
+          convert_icon /tmp/battle-assets/purify-icon.png assets/skills/water-purify-mind.webp
+          convert_icon /tmp/battle-assets/fire-soul-icon.png assets/skills/fire-soul-resonance.webp
+          convert_icon /tmp/battle-assets/blood-burn-icon.png assets/skills/fire-blood-burn.webp
+
+          convert_sheet /tmp/battle-assets/purify-cast.png assets/vfx/water/purify-mind-cast.webp
+          convert_sheet /tmp/battle-assets/fire-soul-cast.png assets/vfx/fire/fire-soul-resonance-cast.webp
+          convert_sheet /tmp/battle-assets/blood-burn-cast.png assets/vfx/fire/blood-burn-art-cast.webp
+
+          # The stun source is the old 4x3 loop sheet. Persistent state display
+          # needs one still image, so extract the frame with the greatest alpha
+          # coverage while preserving that frame's full authored canvas.
+          read -r sw sh < <(identify -format '%w %h' /tmp/battle-assets/stun-source.png)
+          if [ $((sw * 3)) -eq $((sh * 4)) ] && [ $((sw % 4)) -eq 0 ] && [ $((sh % 3)) -eq 0 ]; then
+            fw=$((sw / 4))
+            fh=$((sh / 3))
+            best_frame=""
+            best_score="-1"
+            frame=0
+            for row in 0 1 2; do
+              for col in 0 1 2 3; do
+                x=$((col * fw))
+                y=$((row * fh))
+                candidate="/tmp/battle-assets/stun-frame-${frame}.png"
+                convert /tmp/battle-assets/stun-source.png -crop "${fw}x${fh}+${x}+${y}" +repage "${candidate}"
+                score="$(convert "${candidate}" -alpha extract -format '%[fx:mean]' info:)"
+                if awk "BEGIN {exit !(${score} > ${best_score})}"; then
+                  best_score="${score}"
+                  best_frame="${candidate}"
+                fi
+                frame=$((frame + 1))
+              done
+            done
+            cp "${best_frame}" /tmp/battle-assets/stun-still.png
+          else
+            cp /tmp/battle-assets/stun-source.png /tmp/battle-assets/stun-still.png
+          fi
+          cwebp -quiet -lossless -m 6 /tmp/battle-assets/stun-still.png -o assets/vfx/status/stun.webp
+          verify_lossless /tmp/battle-assets/stun-still.png assets/vfx/status/stun.webp
+
+          echo "Imported asset dimensions:"
+          identify assets/skills/water-purify-mind.webp assets/skills/fire-soul-resonance.webp assets/skills/fire-blood-burn.webp
+          identify assets/vfx/water/purify-mind-cast.webp assets/vfx/fire/fire-soul-resonance-cast.webp assets/vfx/fire/blood-burn-art-cast.webp assets/vfx/status/stun.webp
+
+      - name: Rebuild production bundles
+        run: npm run build
+
+      - name: Commit generated assets and build
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add             assets/skills/water-purify-mind.webp             assets/skills/fire-soul-resonance.webp             assets/skills/fire-blood-burn.webp             assets/vfx/water/purify-mind-cast.webp             assets/vfx/fire/fire-soul-resonance-cast.webp             assets/vfx/fire/blood-burn-art-cast.webp             assets/vfx/status/stun.webp             asset-manifest.json build
+          if git diff --cached --quiet; then
+            echo "No generated changes to commit."
+            exit 0
+          fi
+          git commit -m "[asset-sync] battle: import skill icons and vfx"
+          git push origin HEAD:fix/battle-status-carousel-drawers-vfx-20260922
