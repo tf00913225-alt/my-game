@@ -35,6 +35,23 @@
     box-sizing:border-box;
 }
 
+/*
+   Global scrollbar visibility owner.
+   Scroll containers keep their existing overflow/touch behavior; only the
+   browser-drawn scrollbar track/thumb is hidden across the game UI.
+*/
+#game-stage,
+#game-stage *{
+    scrollbar-width:none !important;
+}
+
+#game-stage::-webkit-scrollbar,
+#game-stage *::-webkit-scrollbar{
+    width:0 !important;
+    height:0 !important;
+    display:none !important;
+}
+
 html,body{
     margin:0;
     padding:0;
@@ -120,6 +137,14 @@ h1,h2,h3,
     background:#0c0b0a;
     transform-origin:center center;
     z-index:0;
+}
+
+/* Interactive battle drawers/modals temporarily own the top battle plane.
+   Skill VFX and detached damage popups render on document.body at 16000/17020,
+   so raising the canonical game stage while a drawer is open prevents those
+   transient paint layers from covering controls or readable battle data. */
+#game-stage.battle-ui-priority{
+    z-index:18000;
 }
 
 /*

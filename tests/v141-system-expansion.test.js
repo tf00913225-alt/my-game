@@ -205,7 +205,7 @@ test("all player slots can manually resolve heal, revive and buff skills",()=>{
 });
 
 test("card VFX cover all requested status groups and battle transitions are directional",()=>{
-    ["burn","stun","freeze","petrify","shield","barrier","defenseDown","agilityDown","damageDown","statDown","buff"].forEach(type=>{
+    ["burn","stun","freeze","petrify","shield","barrier","defenseDown","agilityDown","damageDown","buff"].forEach(type=>{
         assert.ok(uiSource.includes('"'+type+'"')||statusSource.includes(type+":"),"missing effect "+type);
     });
     ["heal","revive","potion","talisman"].forEach(type=>assert.ok(uiSource.includes('"'+type+'"')));

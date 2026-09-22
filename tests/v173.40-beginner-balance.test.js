@@ -3,6 +3,8 @@ const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 const main=fs.readFileSync("js/00-main.js","utf8");
+const patrolAppearance=fs.readFileSync("js/26-v131-patrol-appearance.js","utf8");
+const functionalFixes=fs.readFileSync("js/58-v173.63-functional-fixes.js","utf8");
 const rewards=fs.readFileSync("js/25-v131-fix-batch.js","utf8");
 const curve=fs.readFileSync("js/28-v133-economy-rebalance.js","utf8");
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
@@ -40,10 +42,15 @@ test("newbie EXP keeps the Lv1-to-10 reference but now pays per monster and foll
     assert.doesNotMatch(curve,/TRAINING_EXP_MULTIPLIER|V131_EXP_MULTIPLIER|legacyExpMultiplier/);
 });
 
-test("both patrol fight frames display rotated clockwise ninety degrees and walking resets rotation",()=>{
-    assert.match(main,/PATROL_FIGHT1_B64[\s\S]*?function playPatrolFightAnimation[\s\S]*?img\.style\.transform=\s*"rotate\(90deg\)";[\s\S]*?PATROL_FIGHT1_B64/);
-    assert.match(main,/setTimeout\(\(\)=>\{[\s\S]*?img\.style\.transform=\s*"rotate\(90deg\)";[\s\S]*?PATROL_FIGHT2_B64/);
-    assert.ok((main.match(/img\.style\.transform=\s*"none";/g)||[]).length>=2);
+test("patrol artwork stays upright and returns to the selected appearance owner",()=>{
+    assert.match(main,/function applyPatrolCharacterArtwork\(facingBack\)[\s\S]*?v131ApplyPatrolArt\([\s\S]*?!!facingBack/);
+    assert.match(main,/function resetPatrolCharacterToIdle\(\)[\s\S]*?applyPatrolCharacterArtwork\([\s\S]*?false/);
+    assert.match(main,/function movePatrolCharacterRandomly\(\)[\s\S]*?applyPatrolCharacterArtwork\([\s\S]*?movingUp/);
+    assert.doesNotMatch(main,/img\.style\.transform=\s*"rotate\(90deg\)"/);
+    assert.match(main,/function playPatrolFightAnimation\(callback\)[\s\S]*?PATROL_FIGHT1_B64[\s\S]*?PATROL_FIGHT2_B64[\s\S]*?applyPatrolCharacterArtwork\([\s\S]*?false[\s\S]*?if\(callback\)/);
+    assert.match(patrolAppearance,/function artFor\(character,facing\)[\s\S]*?character\.gender[\s\S]*?character\.element/);
+    assert.match(patrolAppearance,/image\.src=artFor\(character,facing\)/);
+    assert.doesNotMatch(functionalFixes,/patrol-back\.png/);
 });
 
 test("range VFX fixes remain fixed-size and centered after casualties",()=>{

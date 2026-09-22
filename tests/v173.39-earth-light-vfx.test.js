@@ -30,13 +30,13 @@ const CASTS={
 };
 
 const STATUSES={
-    defenseDown:{file:"assets/vfx/earth/defense-down-loop.png",mode:"iconPulse",collection:"statusEffects"},
-    shield:{file:"assets/vfx/earth/rock-shield-loop.png",mode:"static",collection:"activeBuffs"},
-    petrify:{file:"assets/vfx/earth/petrify-loop.png",mode:"static",collection:"statusEffects"},
-    earthShield:{file:"assets/vfx/earth/earth-shield-loop.png",mode:"static",collection:"activeBuffs"},
-    rockWall:{file:"assets/vfx/earth/rock-wall-loop.png",mode:"static",collection:"activeBuffs"},
-    barrier:{file:"assets/vfx/earth/barrier-loop.png",mode:"static",collection:"activeBuffs"},
-    yuanZuBlessing:{file:"assets/vfx/light/yuan-zu-blessing-loop.png",mode:"pulse",collection:"activeBuffs",statusName:"元祖賜福"}
+    defenseDown:{runtimeFile:"defense-down-icon.webp",mode:"icon",collection:"statusEffects"},
+    shield:{runtimeFile:"shield.webp",mode:"static",collection:"activeBuffs"},
+    petrify:{runtimeFile:"petrify.webp",mode:"static",collection:"statusEffects"},
+    earthShield:{runtimeFile:"earth-shield.webp",mode:"static",collection:"activeBuffs"},
+    rockWall:{runtimeFile:"rock-wall.webp",mode:"static",collection:"activeBuffs"},
+    barrier:{runtimeFile:"barrier.webp",mode:"static",collection:"activeBuffs"},
+    yuanZuBlessing:{runtimeFile:"yuan-zu-blessing.webp",mode:"pulse",collection:"activeBuffs",statusName:"元祖賜福"}
 };
 
 function pngSize(path){
@@ -123,10 +123,15 @@ test("earth and Yuan Zu cast sheets keep the supplied production dimensions and 
     });
 });
 
-test("persistent sheets keep the supplied production dimensions and natural 4x2 grid",()=>{
+test("persistent states use the formal runtime WebP assets",()=>{
     Object.entries(STATUSES).forEach(([type,spec])=>{
-        const expected=type==="barrier"?[1536,1024]:[1774,887];
-        assert.deepEqual(pngSize(spec.file),expected,spec.file);
+        if(spec.mode==="icon"){
+            assert.equal(spec.runtimeFile,"defense-down-icon.webp",type);
+            return;
+        }
+        const runtimePath="assets/vfx/status/"+spec.runtimeFile;
+        assert.ok(fs.existsSync(runtimePath),runtimePath);
+        assert.ok(fs.statSync(runtimePath).size>0,runtimePath+" must not be empty");
     });
 });
 
@@ -173,14 +178,14 @@ test("earth and light persistent states use low-motion modes without a frame clo
         assert.equal(model.mode,spec.mode,type);
         assert.equal(model.renderer,"dom-status-visual",type);
         assert.equal(model.collection,spec.collection,type);
-        assert.deepEqual(Array.from([model.cropColumns,model.cropRows]),[4,2],type);
-        assert.equal(model.src,spec.mode==="iconPulse"?"":spec.file+"?v=173.39",type);
+        assert.deepEqual(Array.from([model.cropColumns,model.cropRows]),[1,1],type);
+        assert.equal(model.src,spec.mode==="icon"?"":"assets/vfx/status/"+spec.runtimeFile,type);
         assert.equal(model.frames,undefined,type+" has no persistent frame loop");
         assert.equal(model.duration,undefined,type+" has no persistent frame clock");
         if(spec.statusName){ assert.equal(model.statusName,spec.statusName,type); }
-        if(type==="barrier"){ assert.equal(model.cellAspect,.75,type); }
+        assert.equal(model.cellAspect,undefined,type+" uses a single contained image");
     });
-    assert.match(animation,/const cellAspect=Math\.max\(\.1,Number\(spec\.cellAspect\)\|\|1\)/);
+    assert.match(animation,/node\.style\.backgroundSize="contain"/);
     assert.doesNotMatch(animation,/drawImage\(|getContext\(|canvas-crop/);
 });
 
@@ -214,7 +219,7 @@ test("rock shield on the attacking caster is deferred until its cast sheet finis
 
 test("Wanxiang uses a fixed image and the old procedural corner effect stays absent",()=>{
     assert.doesNotMatch(legacyEarth,/v143-earth-shield-effect/);
-    assert.match(animation,/earthShield:statusVisual\("assets\/vfx\/earth\/earth-shield-loop\.png\?v=173\.39","static","activeBuffs"/);
+    assert.match(animation,/earthShield:statusVisual\("assets\/vfx\/status\/earth-shield\.webp","static","activeBuffs"/);
 });
 
 test("V173.39 cache version loads the new owner code without stale V173.38 browser assets",()=>{

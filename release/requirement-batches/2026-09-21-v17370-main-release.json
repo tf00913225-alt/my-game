@@ -5,7 +5,7 @@
   "baseCommit": "0061a439b74b3cf0c319d5a6c79d4e6506a2b875",
   "officialVersion": "173.70",
   "officialVersionBumpAllowed": true,
-  "overallStatus": "IMPLEMENTED",
+  "overallStatus": "VERIFIED",
   "requirements": [
     {
       "id": "REL-01",
@@ -53,16 +53,27 @@
     },
     {
       "id": "REL-05",
-      "status": "TODO",
+      "status": "VERIFIED",
       "requirement": "以新的 protected dev → main 正式發布 PR 推進 main；main CI 與 production deployment 成功，並核對 production SHA、Game Version、Cache Version。",
-      "evidence": []
+      "evidence": [
+        "Release PR #503 merged successfully",
+        "V173.70 functional release main@25c34a2dbbfce4600691df959cc2823eff80aeab",
+        "release candidate CI SUCCESS",
+        "main CI run 35683542056 success",
+        "GitHub Pages run 35683540344 success",
+        "Game Version 173.70 / Cache Version 173.70",
+        "Full Node Suite 203 / 203 PASS",
+        "Requirements 11 / 11 VERIFIED",
+        "post-release documentation PR #504 completed",
+        "main→dev convergence PR #505 completed; dev@9a2bbc31604331fb0fe97843b25036b3cbd5a5c1"
+      ]
     }
   ],
-  "automatedVerification": "PR #456 CI run 35623454365 passed. dev push CI run 35623758067 passed. DEV exact-SHA deployment job 106413379670 passed for b963099e9422d83dd9705646616d65f277b6f40d.",
+  "automatedVerification": "PR #456 CI run 35623454365 passed. dev push CI run 35623758067 passed. DEV exact-SHA deployment job 106413379670 passed for b963099e9422d83dd9705646616d65f277b6f40d. Final V173.70 release completed via PR #503 at main@25c34a2dbbfce4600691df959cc2823eff80aeab; main CI run 35683542056 SUCCESS; GitHub Pages run 35683540344 SUCCESS; Game/Cache 173.70; Full Node Suite 203/203 PASS; Requirements 11/11 VERIFIED. PR #504 completed post-release documentation and PR #505 completed main→dev convergence to dev@9a2bbc31604331fb0fe97843b25036b3cbd5a5c1.",
   "visualVerification": "專案負責人已確認最新 dev@0061a43 的深淵實戰驗收成功。",
   "verifiedSourceCommit": "b963099e9422d83dd9705646616d65f277b6f40d",
   "mergedDevCommit": "b963099e9422d83dd9705646616d65f277b6f40d",
-  "mergedMainCommit": null,
+  "mergedMainCommit": "25c34a2dbbfce4600691df959cc2823eff80aeab",
   "candidateCiRun": 35617243606,
   "devPushCiRun": 35623758067,
   "devDeployJob": 106413379670

@@ -424,11 +424,11 @@ test("Burn, Frostbite, Freeze and every other final status definition are exact"
         stormFist:{agilityDownChance:50,agilityDownByLevel:[30,40,50,60,70],agilityDownDuration:1},
         stormFlurry:{damageDownChance:50,damageDownByLevel:[10,20,30,40,50],damageDownDuration:2},
         windCrossSlash:{damageDownChance:65,damageDownByLevel:[20,30,35,40,50],damageDownDuration:1},
-        dizzyFist:{stunChance:65,missBonusByLevel:[30,45,50,55,65],stunDuration:5},
+        dizzyFist:{stunChance:65,missBonusByLevel:[15,20,25,30,35],stunDuration:5},
         windSpell:{agilityDownChance:50,agilityDownByLevel:[10,20,30,40,50],agilityDownDuration:1},
         stormCircle:{damageDownChance:55,damageDownByLevel:[15,18,21,25,30],damageDownDuration:1},
         windHowlLightning:{damageDownChance:65,damageDownByLevel:[15,20,25,30,35],damageDownDuration:1},
-        stormRain:{stunChance:35,missBonusByLevel:[30,45,50,55,65],stunDuration:1},
+        stormRain:{stunChance:35,missBonusByLevel:[15,20,25,30,35],stunDuration:1},
         stoneSlash:{defenseDownChance:65,defenseDownByLevel:[10,20,30,40,50],defenseDownDuration:1},
         stoneThrow:{defenseDownChance:65,defenseDownByLevel:[10,20,30,40,50],defenseDownDuration:1},
         sandWind:{defenseDownChance:65,defenseDownByLevel:[10,20,30,40,50],defenseDownDuration:1},
@@ -464,7 +464,7 @@ test("final normal hit and status-effect bounds override the historical floors",
     const hit=runtime.context.v158GetHitChancePercent;
     assert.deepEqual(
         [hit(0,0,0),hit(10,0,0),hit(0,10,0),hit(0,1000,0),hit(0,1000,50),hit(1000,0,0)],
-        [95,98,85.5,14.250000000000002,7.500000000000001,99]
+        [95,98,85.5,14.250000000000002,1,99]
     );
     const status=runtime.context.v140CalculateStatusEffectChance;
     assert.equal(status(50,10,10,100,20,false,"regular",0,"physical"),54);

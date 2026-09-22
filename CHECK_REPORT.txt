@@ -62,7 +62,7 @@ Game / Cache Version：V173.70 / 173.70
 3. 正式發布完成後，必須依既有 Release Contract 將 main 發布歷史回流到 dev；不得留下 dev／main 長期 diverged。
 4. 回流只能走 PR／既有保護流程，不得直接改寫 dev、rebase 或 force push。
 5. assets raw file count、怪物立繪 queue 數量與規劃數量不可互相混用。
-6. 戰鬥核心既有 wrapper 尚未收斂；後續修改同一子系統時不得新增 wrapper。
+6. 戰鬥核心 renderBattle 多層 wrapper 技術債已於 dev PR #507 收斂完成：`js/00-main.js::renderBattle()` 為唯一 Owner，其餘責任改為固定順序 hook；main V173.70 尚未包含此 dev-only 重構，後續不得重新新增 renderBattle wrapper。
 7. Chrome 模擬尺寸 QA 不取代 S23 Ultra 實機驗收。
 
 結論：
@@ -72,4 +72,9 @@ Game / Cache Version：V173.70 / 173.70
 - Requirements：11 / 11 VERIFIED。
 - 正式 main CI：292 / 292 syntax、203 / 203 Node suites、383 resources、252 HTML IDs、32 deterministic build assets。
 - 正式 main CI 與 GitHub Pages deployment 均 SUCCESS。
-- 發布後唯一剩餘收尾：以 PR 將最新 main 歷史回流 dev，完成分支收斂。
+- PR #505 已完成 V173.70 發布當下的 main→dev 回流。
+- V173.70 Release Lifecycle（發布生命週期）正式結案，此結論不因後續 dev 開發而改變。
+- 後續 dev 已完成 renderBattle Owner P1：PR #507 合併後 dev@07ce72ac6fc602ac4a31809c26d7e4e531d4d1b1。
+- renderBattle P1 Full Node Suite：203 / 203 PASS；PR #507 candidate CI、dev push CI、DEV exact-SHA deployment 與 deployed battle/VFX Live QA 均 SUCCESS。
+- 目前 dev behind main = 0；dev 已領先 main，main / dev 實際檔案內容不再相同，原因是 V173.70 發布後已有文件收尾與已驗證 dev-only 重構。
+- 正式 main 仍為 V173.70；不得把 dev-only renderBattle P1 誤寫成已發布 main。

@@ -377,11 +377,11 @@
             );
         }
 
-        const missBonus=valueAtLevel(skill.missBonusByLevel,level);
-        if(missBonus!==undefined){
+        const finalHitChanceDown=valueAtLevel(skill.missBonusByLevel,level);
+        if(finalHitChanceDown!==undefined){
             parts.push(
                 skill.stunChance+"%機率暈眩"+
-                (skill.stunDuration||2)+"回合，MISS率提高"+missBonus+"%"
+                (skill.stunDuration||2)+"回合，最終命中率降低"+finalHitChanceDown+"%"
             );
         }
 

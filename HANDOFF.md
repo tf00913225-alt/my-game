@@ -1,3 +1,69 @@
+## 2026-09-22 — 戰鬥狀態輪播／抽屜圖層／倒數框／三技能 VFX Follow-up（candidate）
+
+- Base：`dev@d55410bd88590b9a9052b1b4d714a27b3cc9a411`；工作分支：`fix/battle-status-carousel-drawers-vfx-20260922`；`main`／`dev` 均未直接修改。
+- Persistent Status Visual Owner 維持 `js/39-v143-skill-animation.js`。狀態 Icon 由 14px 放大至 17px；Body 狀態圖由約 68%×72% 放大至約 82%×86%；多個 Body 狀態改為每 1 秒只顯示一種並輪播，Icon 仍可同時保留作資訊列。呼吸最大透明度改為 100%。
+- 暈眩正式 Body 狀態圖接為 `assets/vfx/status/stun.webp`。原始素材實際為 1774×887 單張圖，不是 4×3 Sprite Sheet；因此未做錯誤裁幀。
+- 戰鬥資訊底部入口改為橫向「戰鬥資訊」；左側統計入口／Drawer 改名「戰鬥數據」。底部抽屜收合時顯示目前回合，展開時隱藏該重複回合文字。
+- `syncBattleUiPriorityLayer()` 為互動資訊圖層協調入口：戰鬥資訊、戰鬥數據、Boss 功能卡或狀態資訊視窗打開時，`#game-stage` 暫時提升到技能 VFX（16000）與 detached damage popup（17020）之上；關閉後恢復一般戰場繪製順序。Drawer 仍為 non-blocking observer，不取得 BattleFlow pause lock。
+- 手動回合倒數框已移入 `#battleActionRegion`，固定於操作面板上方；技能／物品選擇及目標選擇時透明度降為 25%，且 `pointer-events:none`，不攔截玩家選擇目標。
+- Lag 根因之一為密集戰場每張角色／怪物立繪永久執行 idle transform + filter compositor 工作。現在待機立繪靜止；實際攻擊 lunge 與 target reticle 仍保留動畫；每單位腳下 blur filter 已移除。
+- 三個技能正式新素材：淨心訣、炎魂共鳴、焚血訣各自新增裁切正方形 lossless WebP Icon，以及保留完整 4×3 畫布的 lossless WebP cast VFX。VFX 尺寸均為 1448×1086。所有轉檔使用 `cwebp -lossless -exact`，反解碼後尺寸一致且 AE=0。
+- 有效資產轉檔 Run：`35730204057` SUCCESS；生成／Build commit：`563d1608ac04ba62908ff91444d27daad800c94f`。一次性資產 Workflow 已從工作分支移除。
+- Requirement Batch：`release/requirement-batches/2026-09-22-battle-status-carousel-drawers-vfx-followup.json` 目前 IMPLEMENTED；待 PR Repository checks／mobile browser QA／DEV exact-SHA deployment 後再升級 VERIFIED。
+
+## 2026-09-22 — 戰鬥狀態 Icon／卡牌資訊視窗／正式狀態圖（DEV candidate）
+
+- Base：最新 `dev@c496d98d6ee373a4f0d31bc299cdd648d3be5da5`；工作分支：`fix/battle-status-info-assets-20260922`；`main` 未修改。
+- Render Owner 保持 `js/00-main.js::renderBattle()` 唯一控制來源；本次沒有新增 renderBattle wrapper。卡牌點擊只有在 Idle（未選技能／物品／目標）時開啟資訊視窗，既有敵方／我方 targetable 選取優先。
+- Persistent Status Visual Owner 仍為 `js/39-v143-skill-animation.js`：狀態 Icon 固定顯示於 HP/SP 上方，不再呼吸；單張呼吸／固定圖仍保留角色本體視覺，但寬度／高度限制在自身卡牌約 68%／72% 範圍並使用 contain，避免蓋到左右卡牌。
+- 卡牌資訊視窗顯示元素、名稱、HP、SP、增益狀態、負面狀態；每筆狀態顯示正式 Icon、效果文字與剩餘回合／觸發後消失。無對應狀態時顯示「無」。
+- 正式狀態清單依目前 Runtime 對應，不重新導入已退休的「全屬性下降」。新火系持續狀態 `炎魂共鳴／焚血／炎勢` 與 `元祖賜福` 已補入正式 Persistent State 名稱表；未修改技能數值、命中率、持續回合或結算公式。
+- 從 `assets-library/assets/inbox/技能icon/[戰鬥狀態圖與icon]` 導入目前 Runtime 實際使用的 22 張狀態圖至 `assets/vfx/status/`。全部使用 lossless WebP；轉檔流程逐張驗證像素 AE=0、尺寸一致與 RIFF/WEBP signature。未將沒有獨立 Runtime 狀態 Owner 的通用 Icon 強行接入正式遊戲。
+- 一次性資產轉檔 Workflow 只存在於施工過程；完成 asset commit 後已自動刪除，最終分支不保留臨時 Workflow。
+- 專項 `tests/battle-status-info-assets-20260922.test.js` PASS；`npm run build` PASS；`npm run build:check` PASS。資產轉檔有效 Run #4：`35718725670` SUCCESS；生成資產／同步 Build commit：`4a32bcd7ef0d032bcd688bd57be085cbf5395a32`。
+- Requirement Batch：`release/requirement-batches/2026-09-22-battle-status-info-assets.json` 已升級為 VERIFIED。PR #515 exact-candidate CI run `35719594516` SUCCESS；Battle/VFX regressions、Fixed Slot 9:16 mobile QA、exact-candidate real battle mobile QA、resources、loader、Release Gate、git diff 全部通過。
+
+## 2026-09-22 — 全域捲軸視覺隱藏（DEV candidate）
+
+- Base：最新 `dev@cfde7fda6041b0e53e34c614351e40ff3aafa0c0`；工作分支：`feature/hide-scrollbars-global-20260922`；`main` 未修改。
+- 全域 Scrollbar（捲軸）視覺唯一 owner 為 `css/00-main.css`：所有 `#game-stage` 內既有與未來捲動容器保留原本 `overflow`、`touch-action`、慣性捲動與手勢行為，只隱藏瀏覽器繪製的 scrollbar track/thumb。
+- Firefox 使用 `scrollbar-width:none`；Blink／WebKit 使用 `::-webkit-scrollbar` 隱藏。未修改 scroll whitelist、內容高度、捲動方向、戰鬥／存檔／數值／玩法。
+- 已移除 `css/46-v154-dev-fixes.css` 深淵戰鬥紀錄與 `css/38-v141-system-expansion.css` 重鑄橫向列表的舊 `scrollbar-width:thin` 覆蓋，避免後層重新顯示可見捲軸。
+
+## 2026-09-22 — renderBattle Owner P1 收斂完成（DEV）
+
+- 正式 `main` 仍為 V173.70：`0b62be5944ff7a440682bfae28b3ccc43ee2fe91`；本次 renderBattle Owner 重構**尚未發布到 main**。
+- 最新 `dev`：`07ce72ac6fc602ac4a31809c26d7e4e531d4d1b1`。
+- PR #507 已合併 dev；`js/00-main.js::renderBattle()` 現為唯一正式 Render Owner。
+- 原正式 Runtime 共 6 層 renderBattle Wrapper（V131／V141／V143／V154／V158／Fixed Slot adapter）已全部移除，改為固定順序 named hooks；Production Runtime 不再允許新增 renderBattle wrapper。
+- Before-render 順序固定：V158 日常副本正規化 → V141 野怪／副本 lifecycle；After-render 順序固定：V131 Formation → V141 Battle UI／entry → V143 enemy decoration／RAF／V144 hook → V154 Abyss UI／Portrait → Fixed Slot reconcile。
+- 原正式行為保持：Formation、Monster Portrait、Abyss 五帝、Dungeon／Wild／Boss、Fixed Slot、Status／Skill VFX、Battle Statistics、Boss Drawer、回合順序與 Action cadence 均未改規格；`POST_ACTION_DELAY_MS` 未修改。
+- PR #507 candidate CI run `35697256998`：SUCCESS；包含 syntax、build:check、Fixed Slot、battle layout/timing/VFX、relic/battle-input、resources、HTML IDs、loader、Release Gate、git diff 與 exact-candidate real battle mobile browser QA。
+- Full Node Suite 以 CI-only Draft PR #508 驗證：run `35697472769`，**203 / 203 PASS**；PR #508 已關閉且未合併 main。
+- dev push CI run `35697890251`：SUCCESS；Dev deployment gate／exact-SHA verification／Game+Cache verification／deployed battle layout & VFX Live QA 全部 SUCCESS。
+- 收尾時 Open PR：0；Open Issue：0。
+- 目前 `dev` behind `main` = 0；dev 已因 V173.70 發布後的文件收尾與已驗證 dev-only renderBattle 重構而領先 main。這不代表 V173.70 Release Lifecycle 失敗，也不代表需要重發舊版本。
+- 本次未修改技能數值、傷害公式、Boss AI、掉落／經濟、玩家存檔 Schema、Firebase 正式資料行為或其他 UI。
+
+## 2026-09-22 — V173.70 正式發布完成／main-dev 收斂完成
+
+- 正式版本：V173.70。
+- V173.70 功能發布 SHA：`25c34a2dbbfce4600691df959cc2823eff80aeab`。
+- 最新 `main`：`0b62be5944ff7a440682bfae28b3ccc43ee2fe91`。
+- V173.70 Release Lifecycle 收斂當時的 `dev`：`9a2bbc31604331fb0fe97843b25036b3cbd5a5c1`；後續 dev 進度以本文件最上方最新區塊為準。
+- PR #503：V173.70 正式發布成功。
+- PR #504：CHECK_REPORT 發布後文件收尾成功。
+- PR #505：main→dev 歷史收斂成功。
+- main CI：SUCCESS（run 35683542056）。
+- GitHub Pages：SUCCESS（run 35683540344）。
+- dev CI：SUCCESS。
+- Full Node Suite：203 / 203 PASS。
+- Game / Cache Version：173.70 / 173.70。
+- Open PR：0；Open Issue：0。
+- 在 V173.70 Release Lifecycle 結案當下，`main`／`dev` 實際檔案內容一致、`dev` behind `main` = 0，且 dev 僅多 1 個 main→dev 收斂 Merge Commit；這是歷史結案快照，不代表後續 dev 永遠不得前進。
+- V173.70 Release Lifecycle（發布生命週期）已正式結案。
+- **Historical Record（歷史紀錄）註記：下方 V173.69 與舊 V173.70 候選內容只保留作歷史脈絡，不得再被 AI／代理當成目前正式狀態或下一步發布指示。**
+
 ## 2026-09-21 — 目前正式狀態／V173.70 候選結案
 
 - 正式 `main`：V173.69，Game／Cache Version 為 `173.69`；目前 SHA：`f747717493da6e2a7f259079a9d1fc0afeb9b5c0`。正式 CI 與 Pages deployment 均已成功。

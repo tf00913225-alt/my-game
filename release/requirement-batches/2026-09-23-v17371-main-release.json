@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-23-v17371-main-release",
+  "baseBranch": "dev",
+  "baseCommit": "8ca1475943a10a49481be24d7f28176913f06cc2",
+  "currentMain": "0b62be5944ff7a440682bfae28b3ccc43ee2fe91",
+  "officialVersion": "173.71",
+  "officialVersionBumpAllowed": true,
+  "overallStatus": "IMPLEMENTED",
+  "requirements": [
+    {
+      "id": "REL-01",
+      "status": "VERIFIED",
+      "requirement": "確認 V173.71 來源為最新 dev，並完成 Repository checks、DEV exact-SHA deployment 與戰鬥 live mobile QA；專案負責人已明確指示完成後推進 main。",
+      "evidence": [
+        "dev@8ca1475943a10a49481be24d7f28176913f06cc2",
+        "CI run 35748958296 SUCCESS",
+        "DEV deploy job 106818143380 SUCCESS",
+        "Cloudflare exact deployed SHA 8ca1475943a10a49481be24d7f28176913f06cc2",
+        "Battle layer/VFX live mobile QA PASS"
+      ]
+    },
+    {
+      "id": "REL-02",
+      "status": "VERIFIED",
+      "requirement": "依 current main...dev 完整差異盤點本次玩家可感知變更，並整理正式玩家公告與 CHANGELOG。",
+      "evidence": [
+        "main@0b62be5944ff7a440682bfae28b3ccc43ee2fe91",
+        "dev@8ca1475943a10a49481be24d7f28176913f06cc2",
+        "compare: dev ahead 141 commits / 86 changed files",
+        "player-visible PRs #511 #512 #514 #515 #516 #518 #519",
+        "renderBattle convergence PR #507"
+      ]
+    },
+    {
+      "id": "REL-03",
+      "status": "VERIFIED",
+      "requirement": "建立 V173.71 Game/Cache Version、玩家公告、CHANGELOG 與 production build，並通過 release gate、完整 CI 與版本同步檢查。",
+      "evidence": [
+        "release/release.json",
+        "release/release-update.json",
+        "release/requirements.json",
+        "CHANGELOG.md",
+        "js/20-anonymous-20.js",
+        "index.html",
+        "V173.71 deterministic build gate run 35753899803 SUCCESS",
+        "npm run build / build:check / release-gate ci / git diff --check PASS",
+        "production bundles synchronized at release candidate head 34f865486e8063b06167ab2054b9740fa4bd7b0e"
+      ]
+    },
+    {
+      "id": "REL-04",
+      "status": "VERIFIED",
+      "requirement": "發布準備 PR 合併 dev 後，V173.71 最新 dev HEAD 再次通過 Repository checks、DEV exact-SHA deployment、版本核對與 live QA。",
+      "evidence": [
+        "dev@26e2bdca614f383d77263495f6fb714c45e7e3d6",
+        "dev push CI run 35755276108 Repository checks SUCCESS",
+        "DEV deployment job 106839783417 SUCCESS",
+        "exact deployed SHA 26e2bdca614f383d77263495f6fb714c45e7e3d6",
+        "Game / Cache Version 173.71 / 173.71 verified",
+        "deployed battle layout / VFX live mobile QA PASS"
+      ]
+    },
+    {
+      "id": "REL-05",
+      "status": "TODO",
+      "requirement": "以 protected dev → main 正式發布 PR 推進 main；main CI、production Pages deployment、production SHA、Game Version、Cache Version 全部驗證成功。",
+      "evidence": []
+    }
+  ],
+  "includedRequirementBatches": [
+    "2026-09-22-battle-status-info-assets",
+    "2026-09-22-battle-status-carousel-drawers-vfx-followup",
+    "2026-09-22-battle-enemy-status-performance-info-drawer-followup",
+    "2026-09-22-battle-status-size-breath-drawer-cleanup"
+  ],
+  "automatedVerification": "V173.71 release-prep PR #520 merged to dev@26e2bdca614f383d77263495f6fb714c45e7e3d6. Dev push CI run 35755276108 and exact-SHA deployment job 106839783417 both succeeded; Game/Cache 173.71 and deployed battle layout/VFX live QA passed. Protected dev → main promotion remains pending.",
+  "visualVerification": "Project owner authorized promotion after completion; deployed battle live QA passed on dev exact SHA.",
+  "verifiedSourceCommit": "8ca1475943a10a49481be24d7f28176913f06cc2",
+  "mergedDevCommit": "26e2bdca614f383d77263495f6fb714c45e7e3d6",
+  "mergedMainCommit": null,
+  "candidateCiRun": 35753899803,
+  "devPushCiRun": 35755276108,
+  "devDeployJob": 106839783417
+}

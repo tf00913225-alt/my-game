@@ -151,8 +151,8 @@ test("every special percentage, duration and prerequisite is exact",()=>{
     assertArray(s.stormFist.agilityDownByLevel,[30,40,50,60,70]);
     assertArray(s.stormFlurry.damageDownByLevel,[10,20,30,40,50]);
     assertArray(s.windCrossSlash.damageDownByLevel,[20,30,35,40,50]);
-    assertArray(s.dizzyFist.missBonusByLevel,[30,45,50,55,65]);
-    assertArray(s.stormRain.missBonusByLevel,[30,45,50,55,65]);
+    assertArray(s.dizzyFist.missBonusByLevel,[15,20,25,30,35]);
+    assertArray(s.stormRain.missBonusByLevel,[15,20,25,30,35]);
     assert.deepEqual([s.dodgeSkill.evasionBonusPercent,s.dodgeSkill.duration],[75,3]);
     assert.deepEqual([s.dinghaishenzhen.statusResistBonus,s.dinghaishenzhen.accuracyBonusPercent,s.dinghaishenzhen.duration],[65,50,3]);
     assert.equal(s.windEX.evasionBonusPercent,35);
@@ -371,7 +371,7 @@ test("Barrier is raster-owned while revive, rank and reflect feedback remain",()
     assert.match(source,/setTimeout\(\(\)=>syncMonsterCard\(index\),1900\)/);
     assert.doesNotMatch(source,/v149-barrier-corners/);
     assert.doesNotMatch(css,/v149-barrier-corners|v149BarrierCornerPulse/);
-    assert.match(animationSource,/barrier:statusVisual\("assets\/vfx\/earth\/barrier-loop\.png\?v=173\.39","static","activeBuffs"/);
+    assert.match(animationSource,/barrier:statusVisual\("assets\/vfx\/status\/barrier\.webp","static","activeBuffs"/);
     assert.match(css,/battle-monster\.v149-has-barrier \.v141-monster-shield-bar[\s\S]*display:none/);
     assert.match(css,/data-rank="elite"[\s\S]*#ff9f43/);
     assert.match(css,/data-rank="boss"[\s\S]*#ff5f9d/);

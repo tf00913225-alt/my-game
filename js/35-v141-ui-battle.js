@@ -620,37 +620,39 @@
     }
 
     const startedEntryTokens=new Set();
-    if(typeof renderBattle==="function"){
-        const originalRenderBattle=renderBattle;
-        renderBattle=function(){
-            const isDungeon=!!window.v132ActiveDungeonRun;
-            if(!isDungeon && lastWildRankToken!==battleToken){
-                lastWildRankToken=battleToken;
-                if(typeof window.v141RollWildMonsterRanks==="function"){
-                    window.v141RollWildMonsterRanks(currentBattleMonsters);
-                }
-            }
-            if(isDungeon){ rebalanceDungeonElements(); }
 
-            battleSnapshot={
-                token:battleToken,
-                gold:Math.max(0,Number(gold)||0),
-                exp:Math.max(0,Number(sharedExp)||0),
-                items:getItemCounts(),
-                dungeon:isDungeon
-            };
-            const result=originalRenderBattle.apply(this,arguments);
-            decorateBattleCards();
-            const page=document.getElementById("battlePage");
-            /* Reinforcements redraw the existing battle. Its entry has already
-               started, so startTurn will not run the entry cleanup again. */
-            if(page&&!startedEntryTokens.has(battleToken)){
-                page.classList.remove("v141-entry-moving","v141-exit-player","v141-exit-monster");
-                page.classList.add("v141-preparing-entry");
+    function v141PrepareBattleRender(){
+        const isDungeon=!!window.v132ActiveDungeonRun;
+        if(!isDungeon && lastWildRankToken!==battleToken){
+            lastWildRankToken=battleToken;
+            if(typeof window.v141RollWildMonsterRanks==="function"){
+                window.v141RollWildMonsterRanks(currentBattleMonsters);
             }
-            return result;
+        }
+        if(isDungeon){ rebalanceDungeonElements(); }
+
+        battleSnapshot={
+            token:battleToken,
+            gold:Math.max(0,Number(gold)||0),
+            exp:Math.max(0,Number(sharedExp)||0),
+            items:getItemCounts(),
+            dungeon:isDungeon
         };
     }
+
+    function v141AfterBattleRender(){
+        decorateBattleCards();
+        const page=document.getElementById("battlePage");
+        /* Reinforcements redraw the existing battle. Its entry has already
+           started, so startTurn will not run the entry cleanup again. */
+        if(page&&!startedEntryTokens.has(battleToken)){
+            page.classList.remove("v141-entry-moving","v141-exit-player","v141-exit-monster");
+            page.classList.add("v141-preparing-entry");
+        }
+    }
+
+    window.v141PrepareBattleRender=v141PrepareBattleRender;
+    window.v141AfterBattleRender=v141AfterBattleRender;
 
     /* =====================================================
        Battle transitions and post-battle reward timing

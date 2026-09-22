@@ -29,12 +29,12 @@ const CASTS={
 };
 
 const STATUSES={
-    agilityDown:{file:"agility-down-loop.png",mode:"iconPulse",collection:"statusEffects",hash:"fb1b42d3c0c87ab4e93b4fd495657852268cb15e9234bfefdeb2edf0546e7d7a"},
-    damageDown:{file:"damage-down-loop.png",mode:"iconPulse",collection:"statusEffects",hash:"25e984ef5973616bc6f37cfc5842d445ff484f981a98902894febca59a92ae34"},
-    stun:{file:"stun-loop.png",mode:"iconPulse",collection:"statusEffects",hash:"45903df26e32ddc265d45217639211bb9966fb69b3a02389f07afa0500d53071"},
-    dodgeSkill:{file:"dodge-skill-loop.png",mode:"pulse",collection:"activeBuffs",hash:"397338dc6fc01967de860e285c1f65febe5248f0a111c01f789dfb676c141c5b"},
-    stealthSkill:{file:"stealth-skill-loop.png",mode:"static",collection:"activeBuffs",hash:"58523f3066068e2d7a784c309fe072c3cbb92361a0d703ed8b4d9b1da4a0a02b"},
-    dinghaishenzhen:{file:"dinghaishenzhen-loop.png",mode:"pulse",collection:"activeBuffs",hash:"3607d280f4ff4092d80b8ead216e410425815a4996b22437af556bf28673f31b"}
+    agilityDown:{file:"agility-down-loop.png",runtimeFile:"gravity-icon.webp",mode:"icon",collection:"statusEffects",hash:"fb1b42d3c0c87ab4e93b4fd495657852268cb15e9234bfefdeb2edf0546e7d7a"},
+    damageDown:{file:"damage-down-loop.png",runtimeFile:"damage-down-icon.webp",mode:"icon",collection:"statusEffects",hash:"25e984ef5973616bc6f37cfc5842d445ff484f981a98902894febca59a92ae34"},
+    stun:{file:"stun-loop.png",runtimeFile:"stun.webp",mode:"pulse",collection:"statusEffects",hash:"45903df26e32ddc265d45217639211bb9966fb69b3a02389f07afa0500d53071"},
+    dodgeSkill:{file:"dodge-skill-loop.png",runtimeFile:"windwalk.webp",mode:"pulse",collection:"activeBuffs",hash:"397338dc6fc01967de860e285c1f65febe5248f0a111c01f789dfb676c141c5b"},
+    stealthSkill:{file:"stealth-skill-loop.png",runtimeFile:"stealth.webp",mode:"static",collection:"activeBuffs",hash:"58523f3066068e2d7a784c309fe072c3cbb92361a0d703ed8b4d9b1da4a0a02b"},
+    dinghaishenzhen:{file:"dinghaishenzhen-loop.png",runtimeFile:"calm-mind.webp",mode:"pulse",collection:"activeBuffs",hash:"3607d280f4ff4092d80b8ead216e410425815a4996b22437af556bf28673f31b"}
 };
 
 function pngInfo(path){
@@ -319,10 +319,10 @@ test("all eleven casts keep Sprite timing while six persistent states use low-mo
         assert.equal(visual.mode,spec.mode,type);
         assert.equal(visual.renderer,"dom-status-visual",type);
         assert.equal(visual.collection,spec.collection,type);
-        assert.deepEqual(Array.from([visual.cropColumns,visual.cropRows]),[4,2],type);
+        assert.deepEqual(Array.from([visual.cropColumns,visual.cropRows]),[1,1],type);
         assert.equal(
             visual.src,
-            spec.mode==="iconPulse"?"":"assets/vfx/wind/"+spec.file+"?v=173.24",
+            spec.mode==="icon"?"":"assets/vfx/status/"+spec.runtimeFile,
             type
         );
         assert.equal(visual.frames,undefined,type+" must not own a persistent frame loop");
@@ -485,8 +485,8 @@ test("persistent status visuals start only on success, survive duplicate MISS, a
     applied.setClock(1200);
     runTimers(applied,1200);
     const gravity=applied.cards.battleMonster0.querySelector(".v143-status-icon-agilityDown");
-    assert.ok(gravity,"successful status starts its icon pulse");
-    assert.equal(gravity.dataset.statusMode,"iconPulse");
+    assert.ok(gravity,"successful status starts its fixed icon");
+    assert.equal(gravity.dataset.statusMode,"icon");
 
     applied.monsters[0].statusEffects.push({type:"damageDown",turnsLeft:1});
     applied.context.v143SyncStatusVisualEffects();
@@ -532,17 +532,17 @@ test("wind casts remain Sprite Sheets while persistent states use noninteractive
     assert.doesNotMatch(css,/data-skill="stormRain"/);
     assert.match(css,/#game-stage #battlePage \.v143-status-visual\{[\s\S]*?z-index:4;[\s\S]*?pointer-events:none;/);
     assert.match(css,/@keyframes v143StatusImageBreath/);
-    assert.match(css,/@keyframes v143StatusIconBreath/);
+    assert.match(css,/\.v143-status-icon--pulse\{[\s\S]*?animation:none !important/);
     assert.doesNotMatch(css,/v143StatusRasterFrames/);
     assert.match(animation,/node\.dataset\.renderer="dom-status-visual";/);
-    assert.match(animation,/node\.style\.backgroundSize=\(Math\.max\(1,Number\(spec\.cropColumns\)\|\|1\)\*100\)\+"% "/);
+    assert.match(animation,/node\.style\.backgroundSize="contain"/);
     assert.doesNotMatch(animation,/getSpriteImage|frameX=frameIndex|frameY=Math\.floor/);
     assert.doesNotMatch(animation,/assets\/inbox\/[\s\S]{0,80}(?:base64|blob:)/i);
 });
 
 test("the development cache release is V173.39",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.70"/);
-    assert.match(index,/<title>四象江湖傳 V173\.70<\/title>/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.71"/);
+    assert.match(index,/<title>四象江湖傳 V173\.71<\/title>/);
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
 

@@ -605,7 +605,7 @@ test("tri-target Freeze and ally-all Heal use their fixed semantic footprints",(
     assert.equal(healSprites[0].style.height,"440px","Heal preserves its authored square frame over the complete ally formation");
 });
 
-test("Freeze uses a fixed image and Frostbite uses an icon pulse without opening an action gate",()=>{
+test("Freeze uses a fixed image and Frostbite uses a fixed icon without opening an action gate",()=>{
     const monsters=[
         {alive:true,hp:100,statusEffects:[{type:"frostbite",turnsLeft:2}],activeBuffs:[]},
         {alive:true,hp:100,statusEffects:[{type:"freeze",turnsLeft:2}],activeBuffs:[]},
@@ -627,11 +627,11 @@ test("Freeze uses a fixed image and Frostbite uses an icon pulse without opening
 
     const frostbite=runtime.cards.battleMonster0.querySelector(".v143-status-icon-frostbite");
     const frozen=runtime.cards.battleMonster1.querySelector(".v143-status-visual-freeze");
-    assert.ok(frostbite,"Frostbite icon pulse");
-    assert.equal(frostbite.dataset.statusMode,"iconPulse");
+    assert.ok(frostbite,"Frostbite fixed icon");
+    assert.equal(frostbite.dataset.statusMode,"icon");
     assert.ok(frozen,"Frozen fixed image");
     assert.equal(frozen.dataset.statusMode,"static");
-    assert.ok(frozen.style.backgroundImage.includes("frozen-status-loop-vfx.png?v=166"));
+    assert.ok(frozen.style.backgroundImage.includes("assets/vfx/status/freeze.webp"));
     assert.equal(runtime.cards.battleMonster2.querySelector(".v143-status-icon-frostbite"),null);
     assert.equal(runtime.cards.battleMonster2.querySelector(".v143-status-visual-freeze"),null);
     assert.ok(runtime.cards.battlePlayerCard0.querySelector(".v143-status-visual-freeze"));
@@ -643,7 +643,7 @@ test("Freeze uses a fixed image and Frostbite uses an icon pulse without opening
     assert.equal(runtime.cards.battleMonster0.querySelector(".v143-status-icon-frostbite"),null);
     assert.equal(runtime.cards.battleMonster1.querySelector(".v143-status-visual-freeze"),null);
     assert.match(css,/\.v143-status-visual--static\{[\s\S]*?animation:none/);
-    assert.match(css,/@keyframes v143StatusIconBreath/);
+    assert.match(css,/\.v143-status-icon--pulse\{[\s\S]*?animation:none !important/);
     assert.doesNotMatch(css,/v143StatusRasterFrames/);
 });
 

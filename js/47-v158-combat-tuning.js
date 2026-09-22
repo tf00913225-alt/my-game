@@ -20,11 +20,11 @@
         const directReduction=Math.max(0,numeric(directChanceReductionPercent));
         const rawAccuracyChance=
             95+
-            numeric(casterAccuracy)*0.3-
-            directReduction;
+            numeric(casterAccuracy)*0.3;
         const accuracyChance=clamp(rawAccuracyChance,50,99);
         const evasionRate=clamp(numeric(targetEvasion),0,85);
-        return clamp(accuracyChance*(1-evasionRate/100),1,99);
+        const evasionAdjustedChance=accuracyChance*(1-evasionRate/100);
+        return clamp(evasionAdjustedChance-directReduction,1,99);
     }
 
     window.v158GetHitChancePercent=hitChancePercent;
@@ -203,23 +203,20 @@
         };
     }
 
-    if(typeof renderBattle==="function"){
-        const previousRenderBattle=renderBattle;
-        renderBattle=function(){
-            const isDungeonBattle=
-                typeof currentZone!=="undefined"&&currentZone==="dungeon"&&
-                !!window.v132ActiveDungeonRun&&
-                typeof currentBattleMonsters!=="undefined"&&
-                Array.isArray(currentBattleMonsters)&&
-                typeof monsters!=="undefined"&&Array.isArray(monsters);
-            if(isDungeonBattle){
-                const roster=currentBattleMonsters.map(index=>monsters[index]).filter(Boolean);
-                const isAbyss=roster.some(monster=>monster&&monster.v141Abyss===true);
-                if(!isAbyss){ roster.forEach(normalizeDailyDungeonMonster); }
-            }
-            return previousRenderBattle.apply(this,arguments);
-        };
+    function v158PrepareBattleRender(){
+        const isDungeonBattle=
+            typeof currentZone!=="undefined"&&currentZone==="dungeon"&&
+            !!window.v132ActiveDungeonRun&&
+            typeof currentBattleMonsters!=="undefined"&&
+            Array.isArray(currentBattleMonsters)&&
+            typeof monsters!=="undefined"&&Array.isArray(monsters);
+        if(isDungeonBattle){
+            const roster=currentBattleMonsters.map(index=>monsters[index]).filter(Boolean);
+            const isAbyss=roster.some(monster=>monster&&monster.v141Abyss===true);
+            if(!isAbyss){ roster.forEach(normalizeDailyDungeonMonster); }
+        }
     }
+    window.v158PrepareBattleRender=v158PrepareBattleRender;
 
     if(typeof getMonsterEvasion==="function"){
         const previousGetMonsterEvasion=getMonsterEvasion;

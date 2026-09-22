@@ -178,7 +178,7 @@ test("current release uses a hashed boot entry and feature manifest",()=>{
     assert.match(indexSource,/build\/boot-core\.[0-9a-f]{12}\.js/);
     const assetVersionMatch=loaderSource.match(/const V_ASSET_VERSION="([^"]+)"/);
     assert.equal(assetVersionMatch?.[1],releaseMeta.cacheVersion);
-    assert.equal(manifest.release,"173.70");
+    assert.equal(manifest.release,"173.71");
     assert.ok(manifest.featureManifest.bundles["gameplay-core"]);
 });
 

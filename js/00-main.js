@@ -2790,8 +2790,8 @@ const skillDatabase = {
     dizzyFist:{
         id:"dizzyFist", tier:4, name:"暈眩猛擊", element:"wind", category:"physical", targetType:"single",
         learnCost:30, maxLevel:5, baseDamage:120, damagePerLevel:15, spCost:55,
-        description:"對單體造成120點基礎傷害；65%機率使目標暈眩2回合，最終命中率額外降低10%/20%/30%/40%/50%。",
-        stunChance:65, missBonusByLevel:[10,20,30,40,50], stunDuration:2, requires:["stormFlurry"]
+        description:"對單體造成120點基礎傷害；65%機率使目標暈眩2回合，使目標最終命中率降低15%/20%/25%/30%/35%。",
+        stunChance:65, missBonusByLevel:[15,20,25,30,35], stunDuration:2, requires:["stormFlurry"]
     },
 
     /* ===== 風系：法術 ===== */
@@ -2816,8 +2816,8 @@ const skillDatabase = {
     stormRain:{
         id:"stormRain", tier:4, name:"風起雲湧", element:"wind", category:"magic", targetType:"all",
         learnCost:30, maxLevel:5, baseDamage:48, damagePerLevel:14, spCost:55,
-        description:"對敵方全體各造成48點基礎法術傷害；35%機率暈眩1回合，使目標MISS率提高30%/45%/50%/55%/65%。",
-        stunChance:35, missBonusByLevel:[30,45,50,55,65], stunDuration:1, requires:["windHowlLightning"]
+        description:"對敵方全體各造成48點基礎法術傷害；35%機率暈眩1回合，使目標最終命中率降低15%/20%/25%/30%/35%。",
+        stunChance:35, missBonusByLevel:[15,20,25,30,35], stunDuration:1, requires:["windHowlLightning"]
     },
 
     /* ===== 風系：增益 ===== */
@@ -3652,6 +3652,8 @@ const elementSkillIconMap = {
     dragonSlash:"assets/skills/fire-dragon-slash.jpg",
     explosiveFlurry:"assets/skills/fire-explosive-flurry.jpg",
     rage:"assets/skills/fire-rage.jpg",
+    fireSoulResonance:"assets/skills/fire-soul-resonance.webp",
+    bloodBurnArt:"assets/skills/fire-blood-burn.webp",
     blazeSpell:"assets/skills/fire-blaze-spell.jpg",
     fireCritical:"assets/skills/fire-critical.jpg",
     fireRocket:"assets/skills/fire-rocket.jpg",
@@ -3708,6 +3710,7 @@ const elementSkillIconMap = {
     waterBall:"assets/skills/water-ball.jpg",
     freeze:"assets/skills/water-freeze.jpg",
     revive:"assets/skills/water-revive.jpg",
+    purifyMind:"assets/skills/water-purify-mind.webp",
     floodBeast:"assets/skills/water-flood-beast.jpg",
 
     /*
@@ -9008,6 +9011,48 @@ const PATROL_FIGHT1_B64="assets/battle/patrol-fight-1-v173.21.webp";
 
 const PATROL_FIGHT2_B64="assets/battle/patrol-fight-2-v173.21.webp";
 
+/*
+   Patrol artwork bridge:
+   - js/26-v131-patrol-appearance.js is the formal appearance owner.
+   - Core patrol lifecycle may request front/back facing, but must not replace
+     the selected character's gender/element artwork once that owner is ready.
+   - The legacy PNG pair remains only as a pre-feature fallback.
+*/
+function applyPatrolCharacterArtwork(facingBack){
+
+    const img=
+        $("patrolCharacterImg");
+
+    if(!img){
+        return false;
+    }
+
+    img.style.transform=
+        "none";
+
+    if(
+        typeof window!=="undefined" &&
+        typeof window.v131ApplyPatrolArt==="function"
+    ){
+
+        window.v131ApplyPatrolArt(
+            !!facingBack
+        );
+
+        return true;
+
+    }
+
+    img.src=
+        facingBack
+        ? PATROL_CHAR_BACK_B64
+        : PATROL_CHAR_FRONT_B64;
+
+    return false;
+
+}
+
+
 
 let patrolWalkIntervalId=
     null;
@@ -9110,11 +9155,9 @@ function resetPatrolCharacterToIdle(){
         img.style.width=
             "70px";
 
-        img.style.transform=
-            "none";
-
-        img.src=
-            PATROL_CHAR_FRONT_B64;
+        applyPatrolCharacterArtwork(
+            false
+        );
 
     }
 
@@ -9189,11 +9232,9 @@ function movePatrolCharacterRandomly(){
         newTop<patrolCurrentTop;
 
 
-    img.style.transform=
-        "none";
-
-    img.src=
-        (movingUp ? PATROL_CHAR_BACK_B64 : PATROL_CHAR_FRONT_B64);
+    applyPatrolCharacterArtwork(
+        movingUp
+    );
 
 
     wrap.style.left=
@@ -9334,7 +9375,7 @@ function playPatrolFightAnimation(callback){
             "120px";
 
         img.style.transform=
-            "rotate(90deg)";
+            "none";
 
         img.src=
             PATROL_FIGHT1_B64;
@@ -9351,7 +9392,7 @@ function playPatrolFightAnimation(callback){
             if(img){
 
                 img.style.transform=
-                    "rotate(90deg)";
+                    "none";
 
                 img.src=
                     PATROL_FIGHT2_B64;
@@ -9369,6 +9410,18 @@ function playPatrolFightAnimation(callback){
 
             patrolInFightAnimation=
                 false;
+
+
+            if(img){
+
+                img.style.width=
+                    "70px";
+
+                applyPatrolCharacterArtwork(
+                    false
+                );
+
+            }
 
 
             if(callback){
@@ -12279,8 +12332,6 @@ function selectBattleTarget(index){
            造成多少傷害」合併成一行就好。
         */
 
-        updateUI();
-
         finishPlayerAction();
 
     }
@@ -12591,8 +12642,8 @@ function calculateDamage(
 /* =====================================================
    ★ 命中判定（新增）
 
-   基礎命中率 = clamp(95 + 命中×0.3 - 直接命中率降低, 50%, 99%)。
-   最終命中率 = clamp(基礎命中率 × (1 - 最終閃躲率), 1%, 99%)。
+   基礎命中率 = clamp(95 + 命中×0.3, 50%, 99%)。
+   最終命中率 = clamp(基礎命中率 × (1 - 最終閃躲率) - 最終命中率降低, 1%, 99%)。
    玩家基礎閃躲為有效敏捷×0.6%；普通怪物預設閃躲為
    min(30%, 等級×0.3%)，特殊怪物明確指定的 evasion 保留。
 ===================================================== */
@@ -12627,14 +12678,11 @@ const HIT_CHANCE_MAX_PERCENT = 99;
 /*
    ★ 修正（依照使用者要求，接上風系/土系
    技能的減益效果）：
-   這三個函式現在會依序扣掉agilityDown
-   （直接降敏捷的技能，例如暴風拳/狂風術）、
-   statDown（全屬性下降的歷史相容狀態；目前
-   現役玩家技能未使用）、stun（提高MISS率＝降低命中率，
-   例如暈眩猛擊/風起雲湧）這幾種減益效果目前
-   的百分比，多個效果同時存在會依序疊乘
-   （不是相加），跟等級差修正的邏輯一致，
-   避免疊加太多個減益直接歸零。
+   敏捷與命中屬性層只處理 agilityDown 與
+   statDown 等真正會修改能力值的減益。
+   stun（暈眩）不再修改命中屬性本身；它會在
+   rollHitChance() 的最後一步，直接降低最終命中率，
+   讓技能描述與實戰計算一致。
 */
 
 function getMonsterEvasion(monster){
@@ -12676,7 +12724,7 @@ function getMonsterEvasion(monster){
    打折扣，再讓打完折的命中值去跑正常的
    命中公式，等於是「間接」影響最終機率，
    使用者最新給的數值是「降低機率由技能
-   等級低至高為-10%/…/-50%」，讀起來是
+   等級低至高為-15%/-20%/-25%/-30%/-35%」，讀起來是
    直接從最終命中機率扣掉這個%數，不是
    在命中值這層打折——兩種算法算出來的
    最終命中率不一樣，照字面意思改成
@@ -13586,14 +13634,12 @@ function resolveQueuedPlayerAction(characterIndex,token){
 /*
    ★ 修正（依照使用者要求，暈眩猛擊重新
    設計）：新增第3個參數
-   directChanceReductionPercent，直接從
-   算好的命中機率（還沒套用60~99上下限
-   之前）扣掉這個%數，代表暈眩帶來的
-   命中率下降是「扣點數」，不是「打折」，
-   跟命中值/閃避這些既有加成用同一套
-   加減邏輯、同一個上下限夾住，不會出現
-   暈眩把命中率直接砍到負數或需要另外
-   處理的極端值。
+   directChanceReductionPercent，代表「最終命中率
+   下降幾個百分點」。先依命中值算出50%～99%的
+   基礎命中率，再套用目標最終閃躲率，最後才直接
+   扣除暈眩等效果。這樣技能寫「最終命中率降低15%」
+   時，實戰就會真的在最後結果扣15個百分點；最低
+   仍保留1%命中率，避免降到負數。
    不傳這個參數（大部分呼叫的地方都不需要）
    的話效果跟以前完全一樣，只有monster
    出手攻擊玩家、且monster身上真的有stun
@@ -13609,8 +13655,7 @@ function rollHitChance(
     const rawAccuracyChance =
         HIT_CHANCE_BASE+
         casterAccuracy*
-        HIT_CHANCE_ACCURACY_COEFFICIENT-
-        (directChanceReductionPercent||0);
+        HIT_CHANCE_ACCURACY_COEFFICIENT;
 
     const accuracyChance =
         Math.max(
@@ -13626,11 +13671,15 @@ function rollHitChance(
         Math.min(FINAL_EVASION_RATE_CAP,Number(targetEvasion)||0)
     );
 
+    const evasionAdjustedChance=
+        accuracyChance*(1-evasionRate/100);
+
     const chance=Math.max(
         1,
         Math.min(
             HIT_CHANCE_MAX_PERCENT,
-            accuracyChance*(1-evasionRate/100)
+            evasionAdjustedChance-
+            Math.max(0,Number(directChanceReductionPercent)||0)
         )
     );
 
@@ -14349,7 +14398,11 @@ function getSkillTargets(centerIndex,targetType){
 const PERSISTENT_STATE_NAMES=Object.freeze({
     burn:"燃燒",
     rage:"怒火",
+    fireSoulResonance:"炎魂共鳴",
+    bloodBurn:"焚血",
+    fireMomentum:"炎勢",
     phoenixMight:"鳳威",
+    yuanZuBlessing:"元祖賜福",
     frostbite:"凍傷",
     freeze:"冰封",
     agilityDown:"重力",
@@ -15019,7 +15072,7 @@ function applySkillDebuffEffects(
             addBattleLog(
                 ""+
                 monster.name+
-                "陷入暈眩，MISS率提高！"
+                "陷入暈眩，最終命中率降低！"
             );
 
         }
@@ -15315,7 +15368,7 @@ function applySkillDebuffEffectsToPlayer(
 
             addBattleLog(
                 targetName+
-                "陷入暈眩，MISS率提高！"
+                "陷入暈眩，最終命中率降低！"
             );
 
         }
@@ -23206,7 +23259,174 @@ function killMonster(index){
    戰鬥畫面
 ===================================================== */
 
+const BATTLE_RENDER_HOOK_ORDER=Object.freeze({
+    before:Object.freeze([
+        "v158PrepareBattleRender",
+        "v141PrepareBattleRender"
+    ]),
+    after:Object.freeze([
+        "v131AfterBattleRender",
+        "v141AfterBattleRender",
+        "v143AfterBattleRender",
+        "v154AfterBattleRender",
+        "vFixedSlotAfterBattleRender"
+    ])
+});
+
+function runBattleRenderHooks(phase,context,args){
+    const root=typeof window!=="undefined"
+        ? window
+        : (typeof globalThis!=="undefined" ? globalThis : null);
+    const hookNames=BATTLE_RENDER_HOOK_ORDER[phase]||[];
+    hookNames.forEach(name=>{
+        const hook=root&&root[name];
+        if(typeof hook==="function"){
+            hook.apply(context,args);
+        }
+    });
+}
+
+if(typeof window!=="undefined"){
+    window.FourSymbolsBattleRenderHookOrder=BATTLE_RENDER_HOOK_ORDER;
+}
+
+function isBattleStatusInspectionBlocked(){
+    if(!battleActive||actionReady||pendingAction){ return true; }
+    const skillQuickBar=$("skillQuickBar");
+    const skillMenu=$("skillMenu");
+    const itemMenu=$("itemMenu");
+    if(skillQuickBar&&skillQuickBar.classList.contains("show")){ return true; }
+    if(skillMenu&&(skillMenu.classList.contains("show")||skillMenu.classList.contains("expanded"))){ return true; }
+    if(itemMenu&&itemMenu.classList.contains("show")){ return true; }
+    return !!document.querySelector(
+        "#battlePage .battle-monster.targetable,#battlePage .battle-player.ally-targetable"
+    );
+}
+
+function battleStatusElementLabel(entity){
+    const key=String(entity&&entity.element||"");
+    if(typeof elementDatabase!=="undefined"&&elementDatabase&&elementDatabase[key]){
+        return elementDatabase[key].name||elementDatabase[key].label||
+            ({fire:"火",water:"水",wind:"風",earth:"土",light:"元光"}[key]||key||"無");
+    }
+    return ({fire:"火",water:"水",wind:"風",earth:"土",light:"元光"}[key]||key||"無");
+}
+
+function ensureBattleStatusDetailModal(){
+    let modal=document.getElementById("battleStatusDetailModal");
+    if(modal){ return modal; }
+    modal=document.createElement("div");
+    modal.id="battleStatusDetailModal";
+    modal.className="battle-status-detail-modal";
+    modal.hidden=true;
+    modal.setAttribute("aria-hidden","true");
+    modal.innerHTML=
+        '<div class="battle-status-detail-panel" role="dialog" aria-modal="true" aria-labelledby="battleStatusDetailTitle">'+
+            '<button type="button" class="battle-status-detail-close" aria-label="關閉">×</button>'+
+            '<h3 id="battleStatusDetailTitle">戰鬥狀態</h3>'+
+            '<div class="battle-status-detail-core">'+
+                '<span data-field="element"></span>'+
+                '<span data-field="name"></span>'+
+                '<span data-field="hp"></span>'+
+                '<span data-field="sp"></span>'+
+            '</div>'+
+            '<section><h4>增益狀態：</h4><div data-list="buffs" class="battle-status-detail-list"></div></section>'+
+            '<section><h4>負面狀態：</h4><div data-list="debuffs" class="battle-status-detail-list"></div></section>'+
+        '</div>';
+    const host=$("battlePage")||document.body;
+    host.appendChild(modal);
+    const close=modal.querySelector(".battle-status-detail-close");
+    if(close){ close.addEventListener("click",closeBattleStatusDetailModal); }
+    modal.addEventListener("click",event=>{
+        if(event.target===modal){ closeBattleStatusDetailModal(); }
+    });
+    return modal;
+}
+
+function closeBattleStatusDetailModal(){
+    const modal=document.getElementById("battleStatusDetailModal");
+    if(!modal){ return; }
+    modal.hidden=true;
+    modal.setAttribute("aria-hidden","true");
+    syncBattleUiPriorityLayer();
+}
+
+function renderBattleStatusDetailList(host,items){
+    if(!host){ return; }
+    host.innerHTML="";
+    if(!Array.isArray(items)||items.length===0){
+        const empty=document.createElement("div");
+        empty.className="battle-status-detail-empty";
+        empty.textContent="無";
+        host.appendChild(empty);
+        return;
+    }
+    items.forEach(item=>{
+        const row=document.createElement("div");
+        row.className="battle-status-detail-row";
+        const icon=document.createElement("span");
+        icon.className="battle-status-detail-icon";
+        if(item&&item.iconSrc){
+            icon.style.backgroundImage='url("'+String(item.iconSrc).replace(/"/g,"%22")+'")';
+        }
+        icon.setAttribute("aria-hidden","true");
+        const text=document.createElement("span");
+        text.className="battle-status-detail-text";
+        const name=document.createElement("b");
+        name.textContent=(item&&item.name||"狀態")+"：";
+        const effect=document.createElement("span");
+        effect.textContent=(item&&item.effect||"效果生效中")+"　剩餘 "+(item&&item.remainingText||"0 回合");
+        text.appendChild(name);
+        text.appendChild(effect);
+        row.appendChild(icon);
+        row.appendChild(text);
+        host.appendChild(row);
+    });
+}
+
+function openBattleStatusDetailModal(side,index){
+    if(isBattleStatusInspectionBlocked()){ return false; }
+    const isMonster=side==="monster";
+    const entity=isMonster
+        ?(typeof monsters!=="undefined"&&monsters[index])
+        :(typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(index):null);
+    if(!entity){ return false; }
+
+    const modal=ensureBattleStatusDetailModal();
+    const stats=!isMonster&&typeof getPartyBattleStats==="function"?getPartyBattleStats(index):null;
+    const maxHP=isMonster?Number(entity.maxHP)||Math.max(1,Number(entity.hp)||1):
+        Number(stats&&stats.maxHP)||Number(entity.maxHP)||Math.max(1,Number(entity.hp)||1);
+    const maxSP=isMonster?Number(entity.maxSP)||Math.max(0,Number(entity.sp)||0):
+        Number(stats&&stats.maxSP)||Number(entity.maxSP)||Math.max(0,Number(entity.sp)||0);
+    const summary=typeof window.v143GetBattleStatusSummary==="function"
+        ?window.v143GetBattleStatusSummary(entity)
+        :{buffs:[],debuffs:[]};
+    const fields={
+        element:"元素："+battleStatusElementLabel(entity),
+        name:"名稱："+String(entity.name||entity.id||"角色"),
+        hp:"HP："+Math.max(0,Number(entity.hp)||0)+" / "+maxHP,
+        sp:"SP："+Math.max(0,Number(entity.sp)||0)+" / "+maxSP
+    };
+    Object.keys(fields).forEach(key=>{
+        const node=modal.querySelector('[data-field="'+key+'"]');
+        if(node){ node.textContent=fields[key]; }
+    });
+    renderBattleStatusDetailList(modal.querySelector('[data-list="buffs"]'),summary.buffs);
+    renderBattleStatusDetailList(modal.querySelector('[data-list="debuffs"]'),summary.debuffs);
+    modal.hidden=false;
+    modal.setAttribute("aria-hidden","false");
+    syncBattleUiPriorityLayer();
+    return true;
+}
+
+if(typeof window!=="undefined"){
+    window.openBattleStatusDetailModal=openBattleStatusDetailModal;
+    window.closeBattleStatusDetailModal=closeBattleStatusDetailModal;
+}
+
 function renderBattle(){
+
+    runBattleRenderHooks("before",this,arguments);
 
     const area =
         $("battleMonsterArea");
@@ -23238,9 +23458,11 @@ function renderBattle(){
 
 
             card.onclick=()=>{
-                selectBattleTarget(
-                    index
-                );
+                if(card.classList.contains("targetable")){
+                    selectBattleTarget(index);
+                    return;
+                }
+                openBattleStatusDetailModal("monster",index);
             };
 
 
@@ -23337,6 +23559,8 @@ function renderBattle(){
         bossPresentationOwner.syncHud();
     }
 
+    runBattleRenderHooks("after",this,arguments);
+
 
     /*
        ★ 重新加回來（依照使用者指正，這是對的）：
@@ -23405,15 +23629,9 @@ function updateMonsterUI(index){
        直到燃燒結束才消失。
     */
 
-    const statusArea =
-        $("battleMonsterStatus"+index);
-
-    if(statusArea){
-        /* V143 is the sole persistent-status visual owner. Base battle UI only
-           keeps the stable host and clears stale markup before that owner syncs. */
-        statusArea.innerHTML="";
-    }
-
+    /* V143 is the sole persistent-status visual owner. HP/SP refreshes must
+       preserve its existing icon/body nodes instead of tearing them down and
+       rebuilding them on every global updateUI() pass. */
 
     const hpBar =
         $("battleMonsterBar"+index);
@@ -23599,7 +23817,9 @@ function renderPlayers(){
             ()=>{
                 if(box.classList.contains("ally-targetable")){
                     selectBattleAllyTarget(index);
+                    return;
                 }
+                openBattleStatusDetailModal("player",index);
             }
         );
 
@@ -23654,8 +23874,8 @@ function updateSingleCharacterStatusBadge(
         return;
     }
 
-    /* Persistent status content is rendered by V143 after this base UI pass. */
-    statusArea.innerHTML="";
+    /* Persistent status content is rendered and diffed by V143. Do not clear
+       this host during an unrelated HP/SP or action-HUD refresh. */
 
 }
 
@@ -31218,7 +31438,7 @@ function openInventoryCharacterDetail(){
             `
         ).join("")+
         `<div class="inventory-character-detail-note">
-            基礎命中率＝clamp(95%＋命中×0.3－直接命中率降低, 50%, 99%)，再乘上(1－目標最終閃躲率)。<br>
+            基礎命中率＝clamp(95%＋命中×0.3, 50%, 99%)，先乘上(1－目標最終閃躲率)，最後再扣除暈眩等「最終命中率降低」效果（最低1%）。<br>
             一般異常每1精神降低0.05個百分點命中率；每1敏捷＝+1速度、+0.6個百分點基礎閃躲。
         </div>`;
 
@@ -32795,6 +33015,27 @@ function syncBattleAutoSettings(){
    戰鬥資訊
 ===================================================== */
 
+function syncBattleUiPriorityLayer(){
+
+    const stage=$("game-stage");
+    const page=$("battlePage");
+    if(!stage||!page){ return false; }
+
+    const statusDetail=page.querySelector(".battle-status-detail-modal:not([hidden])");
+    const sideDrawer=page.querySelector(".battle-insight-drawer.open");
+    const battleInfo=page.querySelector(".battle-info-region.is-expanded");
+    const active=!!(statusDetail||sideDrawer||battleInfo);
+
+    stage.classList.toggle("battle-ui-priority",active);
+    if(document.body){ document.body.classList.toggle("v174-battle-reading-open",active); }
+    return active;
+
+}
+
+if(typeof window!=="undefined"){
+    window.syncBattleUiPriorityLayer=syncBattleUiPriorityLayer;
+}
+
 function setBattleInfoExpanded(expanded){
 
     const region=document.querySelector("#battlePage .battle-info-region");
@@ -32806,16 +33047,81 @@ function setBattleInfoExpanded(expanded){
     region.classList.toggle("is-expanded",next);
     toggle.setAttribute("aria-expanded",next?"true":"false");
     toggle.setAttribute("aria-label",next?"收合戰鬥資訊":"展開戰鬥資訊");
+    syncBattleUiPriorityLayer();
     return true;
 
 }
 
+function clampBattleInfoHandleRight(toggle,page,value){
+    const pageWidth=Math.max(1,Number(page&&page.clientWidth)||420);
+    const handleWidth=Math.max(1,Number(toggle&&toggle.offsetWidth)||96);
+    const minRight=4;
+    const maxRight=Math.max(minRight,pageWidth-handleWidth-4);
+    return Math.max(minRight,Math.min(maxRight,Number(value)||minRight));
+}
+
+function installBattleInfoHandleDrag(){
+    const toggle=$("battleInfoToggle");
+    const page=$("battlePage");
+    if(!toggle||!page||toggle.__battleInfoHandleDragInstalled){ return; }
+    toggle.__battleInfoHandleDragInstalled=true;
+    let drag=null;
+
+    function finishDrag(event){
+        if(!drag){ return; }
+        if(event&&event.pointerId!==undefined&&drag.pointerId!==undefined&&event.pointerId!==drag.pointerId){ return; }
+        const moved=drag.moved;
+        drag=null;
+        toggle.classList.remove("is-dragging");
+        if(moved){
+            toggle.__suppressNextBattleInfoClick=true;
+            setTimeout(()=>{ toggle.__suppressNextBattleInfoClick=false; },0);
+        }
+    }
+
+    toggle.addEventListener("pointerdown",event=>{
+        if(event.button!==undefined&&event.button!==0){ return; }
+        const rect=page.getBoundingClientRect();
+        const pageWidth=Math.max(1,Number(page.clientWidth)||rect.width||420);
+        const computedRight=parseFloat(getComputedStyle(toggle).right);
+        drag={
+            pointerId:event.pointerId,
+            startClientX:Number(event.clientX)||0,
+            startRight:clampBattleInfoHandleRight(toggle,page,Number.isFinite(computedRight)?computedRight:4),
+            scaleX:rect.width>0?pageWidth/rect.width:1,
+            moved:false
+        };
+        toggle.classList.add("is-dragging");
+        if(typeof toggle.setPointerCapture==="function"&&event.pointerId!==undefined){
+            try{ toggle.setPointerCapture(event.pointerId); }catch(_){ }
+        }
+        event.preventDefault();
+    });
+    toggle.addEventListener("pointermove",event=>{
+        if(!drag||event.pointerId!==drag.pointerId){ return; }
+        const delta=((Number(event.clientX)||0)-drag.startClientX)*drag.scaleX;
+        if(!drag.moved&&Math.abs(delta)>=3){ drag.moved=true; }
+        if(!drag.moved){ return; }
+        toggle.style.right=clampBattleInfoHandleRight(toggle,page,drag.startRight-delta)+"px";
+        event.preventDefault();
+    });
+    toggle.addEventListener("pointerup",finishDrag);
+    toggle.addEventListener("pointercancel",finishDrag);
+}
+
 function toggleBattleInfoPanel(){
 
+    const toggle=$("battleInfoToggle");
+    if(toggle&&toggle.__suppressNextBattleInfoClick){
+        toggle.__suppressNextBattleInfoClick=false;
+        return false;
+    }
     const region=document.querySelector("#battlePage .battle-info-region");
     return setBattleInfoExpanded(!(region&&region.classList.contains("is-expanded")));
 
 }
+
+installBattleInfoHandleDrag();
 
 function clearBattleLog(){
 

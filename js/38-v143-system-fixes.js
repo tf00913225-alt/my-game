@@ -63,9 +63,9 @@
             storm.spCost=75;
             storm.stunChance=35;
             storm.stunDuration=1;
-            storm.missBonusByLevel=[30,45,50,55,65];
+            storm.missBonusByLevel=[15,20,25,30,35];
             storm.requires=["windHowlLightning"];
-            storm.description="對敵方全體各造成48點基礎法術傷害；35%基礎機率暈眩1回合，使目標MISS率提高30%/45%/50%/55%/65%。";
+            storm.description="對敵方全體各造成48點基礎法術傷害；35%基礎機率暈眩1回合，使目標最終命中率降低15%/20%/25%/30%/35%。";
         }
         const rain=skillDatabase.iceArrowRain;
         if(rain){
@@ -166,18 +166,14 @@
         currentBattleMonsters.forEach(decorateEnemyCard);
     }
 
-    if(typeof renderBattle==="function"){
-        const previousRenderBattle=renderBattle;
-        renderBattle=function(){
-            const result=previousRenderBattle.apply(this,arguments);
-            decorateEnemyCards();
-            if(typeof requestAnimationFrame==="function"){ requestAnimationFrame(decorateEnemyCards); }
-            if(typeof window.v144ConfigureDungeonBattleSkillsAfterRender==="function"){
-                window.v144ConfigureDungeonBattleSkillsAfterRender();
-            }
-            return result;
-        };
+    function v143AfterBattleRender(){
+        decorateEnemyCards();
+        if(typeof requestAnimationFrame==="function"){ requestAnimationFrame(decorateEnemyCards); }
+        if(typeof window.v144ConfigureDungeonBattleSkillsAfterRender==="function"){
+            window.v144ConfigureDungeonBattleSkillsAfterRender();
+        }
     }
+    window.v143AfterBattleRender=v143AfterBattleRender;
     if(typeof updateMonsterUI==="function"){
         const previousUpdateMonsterUI=updateMonsterUI;
         updateMonsterUI=function(index){
