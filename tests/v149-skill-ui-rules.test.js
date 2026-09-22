@@ -151,8 +151,8 @@ test("every special percentage, duration and prerequisite is exact",()=>{
     assertArray(s.stormFist.agilityDownByLevel,[30,40,50,60,70]);
     assertArray(s.stormFlurry.damageDownByLevel,[10,20,30,40,50]);
     assertArray(s.windCrossSlash.damageDownByLevel,[20,30,35,40,50]);
-    assertArray(s.dizzyFist.missBonusByLevel,[30,45,50,55,65]);
-    assertArray(s.stormRain.missBonusByLevel,[30,45,50,55,65]);
+    assertArray(s.dizzyFist.missBonusByLevel,[15,20,25,30,35]);
+    assertArray(s.stormRain.missBonusByLevel,[15,20,25,30,35]);
     assert.deepEqual([s.dodgeSkill.evasionBonusPercent,s.dodgeSkill.duration],[75,3]);
     assert.deepEqual([s.dinghaishenzhen.statusResistBonus,s.dinghaishenzhen.accuracyBonusPercent,s.dinghaishenzhen.duration],[65,50,3]);
     assert.equal(s.windEX.evasionBonusPercent,35);

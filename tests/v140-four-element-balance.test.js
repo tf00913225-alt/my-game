@@ -367,11 +367,11 @@ test("the complete authoritative four-element skill table is exact",()=>{
         stormFist:{category:"physical",targetType:"single",learnCost:2,maxLevel:5,baseDamage:14,damagePerLevel:2,spCost:7,agilityDownChance:50,agilityDownByLevel:[30,40,50,60,70],agilityDownDuration:1},
         stormFlurry:{category:"physical",targetType:"tri",learnCost:10,maxLevel:5,baseDamage:28,damagePerLevel:7,spCost:20,damageDownChance:50,damageDownByLevel:[15,18,21,25,30],damageDownDuration:1,requires:["stormFist"]},
         windCrossSlash:{category:"physical",targetType:"single",learnCost:15,maxLevel:5,baseDamage:90,damagePerLevel:12,spCost:39,damageDownChance:65,damageDownByLevel:[15,20,25,30,35],damageDownDuration:1,requires:["stormFlurry"]},
-        dizzyFist:{category:"physical",targetType:"single",learnCost:30,maxLevel:5,baseDamage:120,damagePerLevel:15,spCost:55,stunChance:65,missBonusByLevel:[10,20,30,40,50],stunDuration:2,requires:["stormFlurry"]},
+        dizzyFist:{category:"physical",targetType:"single",learnCost:30,maxLevel:5,baseDamage:120,damagePerLevel:15,spCost:55,stunChance:65,missBonusByLevel:[15,20,25,30,35],stunDuration:2,requires:["stormFlurry"]},
         windSpell:{category:"magic",targetType:"tri",learnCost:2,maxLevel:5,baseDamage:18,damagePerLevel:2,spCost:9,agilityDownChance:50,agilityDownByLevel:[10,20,30,40,50],agilityDownDuration:1},
         stormCircle:{category:"magic",targetType:"row",learnCost:10,maxLevel:5,baseDamage:38,damagePerLevel:9,spCost:18,damageDownChance:55,damageDownByLevel:[15,18,21,25,30],damageDownDuration:1,requires:["windSpell"]},
         windHowlLightning:{category:"magic",targetType:"single",learnCost:15,maxLevel:5,baseDamage:95,damagePerLevel:12,spCost:39,damageDownChance:65,damageDownByLevel:[15,20,25,30,35],damageDownDuration:1,requires:["stormCircle"]},
-        stormRain:{category:"magic",targetType:"all",learnCost:30,maxLevel:5,baseDamage:48,damagePerLevel:14,spCost:55,stunChance:35,missBonusByLevel:[30,45,50,55,65],stunDuration:1,requires:["windHowlLightning"]},
+        stormRain:{category:"magic",targetType:"all",learnCost:30,maxLevel:5,baseDamage:48,damagePerLevel:14,spCost:55,stunChance:35,missBonusByLevel:[15,20,25,30,35],stunDuration:1,requires:["windHowlLightning"]},
         dodgeSkill:{category:"buff",targetType:"allyAll",learnCost:10,maxLevel:1,spCost:20,duration:2,evasionBonusPercent:30,requires:["windCrossSlash","windHowlLightning"]},
         stealthSkill:{category:"buff",targetType:"ally",learnCost:15,maxLevel:1,spCost:25,duration:2,requires:["dodgeSkill"]},
         dinghaishenzhen:{category:"buff",targetType:"allyAll",learnCost:20,maxLevel:1,spCost:55,duration:3,statusResistBonus:35,requires:["stealthSkill"]},
@@ -558,11 +558,11 @@ test("skill UI text matches HP-only lifesteal, split rage values, and no self SP
     assert.match(breakdown("healSpell"),/施放者本人不回復SP/);
 });
 
-test("hit chance applies the final capped evasion rate after accuracy",()=>{
+test("final hit reduction applies after capped accuracy and evasion",()=>{
     const context=makeContext();
     assert.equal(context.v140GetHitChancePercent(0,1000,0),14.250000000000002);
     assert.equal(context.v140GetHitChancePercent(1000,0,0),99);
-    assert.ok(Math.abs(context.v140GetHitChancePercent(100,80,10)-19.8)<Number.EPSILON*100);
+    assert.ok(Math.abs(context.v140GetHitChancePercent(100,80,10)-9.8)<Number.EPSILON*100);
 });
 
 test("existing lifesteal paths still accumulate post-critical final damage",()=>{

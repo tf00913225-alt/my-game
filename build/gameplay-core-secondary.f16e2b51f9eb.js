@@ -3177,8 +3177,8 @@
         },
         dizzyFist:{
             learnCost:30,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:141,damagePerLevel:29,spCost:55,
-            stunChance:65,missBonusByLevel:[30,45,50,55,65],stunDuration:5,requires:["stormFlurry"],
-            description:"需先學習暴風亂擊。初次學習需30技能點，對單體造成141點傷害，消耗55 SP；65%基礎機率使目標暈眩5回合，MISS率提高30%/45%/50%/55%/65%。最高5級，每升1級消耗1技能點，傷害+29。"
+            stunChance:65,missBonusByLevel:[15,20,25,30,35],stunDuration:5,requires:["stormFlurry"],
+            description:"需先學習暴風亂擊。初次學習需30技能點，對單體造成141點傷害，消耗55 SP；65%基礎機率使目標暈眩5回合，使目標最終命中率降低15%/20%/25%/30%/35%。最高5級，每升1級消耗1技能點，傷害+29。"
         },
         windSpell:{
             learnCost:2,maxLevel:5,upgradeCost:1,targetType:"tri",baseDamage:12,damagePerLevel:3,spCost:9,
@@ -3197,8 +3197,8 @@
         },
         stormRain:{
             learnCost:30,maxLevel:5,upgradeCost:1,targetType:"all",baseDamage:24,damagePerLevel:5,spCost:75,
-            stunChance:35,missBonusByLevel:[30,45,50,55,65],stunDuration:1,requires:["windHowlLightning"],
-            description:"需先學習風哮電擊。初次學習需30技能點，對敵方全體各造成24點傷害，消耗75 SP；35%基礎機率附加【暈眩】1回合，使目標MISS率提高30%/45%/50%/55%/65%。最高5級，每升1級消耗1技能點，傷害+5。"
+            stunChance:35,missBonusByLevel:[15,20,25,30,35],stunDuration:1,requires:["windHowlLightning"],
+            description:"需先學習風哮電擊。初次學習需30技能點，對敵方全體各造成24點傷害，消耗75 SP；35%基礎機率附加【暈眩】1回合，使目標最終命中率降低15%/20%/25%/30%/35%。最高5級，每升1級消耗1技能點，傷害+5。"
         },
         dodgeSkill:{
             learnCost:10,maxLevel:1,targetType:"allyTri",spCost:20,duration:3,evasionBonusPercent:75,
@@ -5937,11 +5937,11 @@
         const directReduction=Math.max(0,numeric(directChanceReductionPercent));
         const rawAccuracyChance=
             95+
-            numeric(casterAccuracy)*0.3-
-            directReduction;
+            numeric(casterAccuracy)*0.3;
         const accuracyChance=clamp(rawAccuracyChance,50,99);
         const evasionRate=clamp(numeric(targetEvasion),0,85);
-        return clamp(accuracyChance*(1-evasionRate/100),1,99);
+        const evasionAdjustedChance=accuracyChance*(1-evasionRate/100);
+        return clamp(evasionAdjustedChance-directReduction,1,99);
     }
 
     window.v158GetHitChancePercent=hitChancePercent;

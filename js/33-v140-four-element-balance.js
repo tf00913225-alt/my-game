@@ -247,7 +247,8 @@
     };
 
     /*
-       命中先依既有命中值算出基礎命中率，再讓正式閃躲率獨立擲算。
+       命中先依既有命中值算出基礎命中率，再套用正式閃躲率。
+       暈眩等「最終命中率降低」效果最後才直接扣除百分點；
        閃躲來源本身已在角色能力端用乘算合併，最終上限85%。
     */
     function getV140HitChancePercent(
@@ -257,8 +258,7 @@
     ){
         const rawAccuracyChance=
             95+
-            casterAccuracy*0.3-
-            (directChanceReductionPercent||0);
+            casterAccuracy*0.3;
 
         const accuracyChance=clamp(
             rawAccuracyChance,
@@ -266,8 +266,15 @@
             99
         );
         const evasionRate=clamp(targetEvasion,0,85);
+        const evasionAdjustedChance=
+            accuracyChance*(1-evasionRate/100);
 
-        return clamp(accuracyChance*(1-evasionRate/100),1,99);
+        return clamp(
+            evasionAdjustedChance-
+            Math.max(0,numeric(directChanceReductionPercent)),
+            1,
+            99
+        );
     }
 
     window.v140GetHitChancePercent=getV140HitChancePercent;
