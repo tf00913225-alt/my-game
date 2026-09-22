@@ -36,15 +36,6 @@
         };
     }
 
-    if(typeof updateUI==="function"){
-        const previousUpdateUI=updateUI;
-        updateUI=function(){
-            const result=previousUpdateUI.apply(this,arguments);
-            syncPortraits();
-            return result;
-        };
-    }
-
     if(typeof document!=="undefined"&&document.readyState==="loading"){
         document.addEventListener("DOMContentLoaded",syncAfterDomSettles,{once:true});
     }else{
