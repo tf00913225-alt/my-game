@@ -644,17 +644,6 @@
         }
     }
 
-    if(typeof MutationObserver!=="undefined"){
-        const observer=new MutationObserver(()=>{
-            if(document.querySelector(".v141-synthesis")&&!document.querySelector(".v141-synthesis.v143-synthesis")){
-                requestAnimationFrame(decorateSynthesis);
-            }
-        });
-        const startObserver=()=>observer.observe(document.body,{childList:true,subtree:true});
-        if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",startObserver,{once:true}); }
-        else{ startObserver(); }
-    }
-
     if(typeof window.v141RenderSynthesis==="function"){
         const previousRenderSynthesis=window.v141RenderSynthesis;
         window.v141RenderSynthesis=function(){
