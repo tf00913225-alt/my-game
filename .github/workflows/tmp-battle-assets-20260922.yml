@@ -62,7 +62,7 @@ jobs:
             local square="/tmp/battle-assets/${stem}-square.png"
             convert "${source}" -trim +repage "${cropped}"
             local w h side
-            read -r w h < <(identify -format '%w %h' "${cropped}")
+            read -r w h < <(identify -format '%w %h\n' "${cropped}")
             if [ "${w}" -gt "${h}" ]; then side="${w}"; else side="${h}"; fi
             convert "${cropped}" -background none -gravity center -extent "${side}x${side}" "${square}"
             cwebp -quiet -lossless -exact -m 6 "${square}" -o "${dest}"
@@ -73,7 +73,7 @@ jobs:
             local source="$1"
             local dest="$2"
             local w h
-            read -r w h < <(identify -format '%w %h' "${source}")
+            read -r w h < <(identify -format '%w %h\n' "${source}")
             test $((w % 4)) -eq 0
             test $((h % 3)) -eq 0
             cwebp -quiet -lossless -exact -m 6 "${source}" -o "${dest}"
@@ -99,7 +99,7 @@ jobs:
           # The stun source is the old 4x3 loop sheet. Persistent state display
           # needs one still image, so extract the frame with the greatest alpha
           # coverage while preserving that frame's full authored canvas.
-          read -r sw sh < <(identify -format '%w %h' /tmp/battle-assets/stun-source.png)
+          read -r sw sh < <(identify -format '%w %h\n' /tmp/battle-assets/stun-source.png)
           if [ $((sw * 3)) -eq $((sh * 4)) ] && [ $((sw % 4)) -eq 0 ] && [ $((sh % 3)) -eq 0 ]; then
             fw=$((sw / 4))
             fh=$((sh / 3))
