@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>深淵 Camera Follow Demo</title><style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#090b10;color:#eee;font-family:system-ui,sans-serif;touch-action:none}
+#game{width:100%;height:100%;display:block;background:#151923}.hud{position:fixed;z-index:2;left:12px;top:12px;padding:9px 11px;background:#0009;border:1px solid #ffffff2b;border-radius:9px;font-size:15px;line-height:1.45;pointer-events:none}.hint{position:fixed;z-index:2;bottom:16px;left:50%;translate:-50% 0;width:max-content;max-width:92%;padding:8px 12px;background:#000b;border-radius:18px;font-size:15px;pointer-events:none}
+</style></head><body><canvas id="game"></canvas><div class="hud">深淵移動 Demo<br>角色保持中央／世界移動</div><div class="hint">點擊、按住或拖曳地面移動；途中可立即改方向</div>
+<script>
+const c=document.querySelector('#game'),x=c.getContext('2d');let dpr=1,w=0,h=0;
+const world={w:3600,h:3600};const p={x:1800,y:1800,tx:1800,ty:1800,speed:390};let cam={x:p.x,y:p.y};let down=false,last=performance.now();
+const marks=Array.from({length:45},(_,i)=>({x:180+(i*613)%3240,y:180+(i*947)%3240,r:18+(i%4)*6}));
+function resize(){dpr=Math.min(devicePixelRatio||1,2);w=innerWidth;h=innerHeight;c.width=w*dpr;c.height=h*dpr;c.style.width=w+'px';c.style.height=h+'px';x.setTransform(dpr,0,0,dpr,0,0)}addEventListener('resize',resize);resize();
+function target(e){const r=c.getBoundingClientRect();p.tx=Math.max(0,Math.min(world.w,cam.x+(e.clientX-r.left-w/2)));p.ty=Math.max(0,Math.min(world.h,cam.y+(e.clientY-r.top-h/2)))}
+c.addEventListener('pointerdown',e=>{down=true;c.setPointerCapture(e.pointerId);target(e)});c.addEventListener('pointermove',e=>{if(down)target(e)});c.addEventListener('pointerup',()=>down=false);c.addEventListener('pointercancel',()=>down=false);
+function update(dt){let dx=p.tx-p.x,dy=p.ty-p.y,dist=Math.hypot(dx,dy);if(dist>2){let step=Math.min(dist,p.speed*dt);p.x+=dx/dist*step;p.y+=dy/dist*step}cam.x=p.x;cam.y=p.y}
+function draw(){x.clearRect(0,0,w,h);x.save();x.translate(w/2-cam.x,h/2-cam.y);
+x.fillStyle='#202733';x.fillRect(0,0,world.w,world.h);x.strokeStyle='#344052';x.lineWidth=2;for(let i=0;i<=world.w;i+=180){x.beginPath();x.moveTo(i,0);x.lineTo(i,world.h);x.stroke()}for(let j=0;j<=world.h;j+=180){x.beginPath();x.moveTo(0,j);x.lineTo(world.w,j);x.stroke()}
+x.strokeStyle='#7b6d4c';x.lineWidth=90;x.lineCap='round';x.beginPath();x.moveTo(300,1800);x.bezierCurveTo(900,1450,1200,2150,1800,1800);x.bezierCurveTo(2400,1450,2700,2150,3300,1800);x.stroke();
+for(const m of marks){x.fillStyle='#48596a';x.beginPath();x.arc(m.x,m.y,m.r,0,Math.PI*2);x.fill();x.fillStyle='#75899b';x.fillRect(m.x-4,m.y-m.r-22,8,20)}
+x.strokeStyle='#b86d60';x.lineWidth=4;x.strokeRect(10,10,world.w-20,world.h-20);x.restore();
+x.save();x.translate(w/2,h/2);x.fillStyle='#0007';x.beginPath();x.ellipse(0,23,22,8,0,0,Math.PI*2);x.fill();x.fillStyle='#d7d9df';x.beginPath();x.arc(0,-3,14,0,Math.PI*2);x.fill();x.fillStyle='#8f3340';x.fillRect(-12,9,24,31);x.fillStyle='#e2b85e';x.fillRect(-4,9,8,31);x.restore();
+x.fillStyle='#ffffffaa';x.font='15px system-ui';x.fillText('World '+Math.round(p.x)+', '+Math.round(p.y),12,h-18)}
+function loop(now){let dt=Math.min(.035,(now-last)/1000);last=now;update(dt);draw();requestAnimationFrame(loop)}requestAnimationFrame(loop);
+</script></body></html>
