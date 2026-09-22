@@ -2790,8 +2790,8 @@ const skillDatabase = {
     dizzyFist:{
         id:"dizzyFist", tier:4, name:"暈眩猛擊", element:"wind", category:"physical", targetType:"single",
         learnCost:30, maxLevel:5, baseDamage:120, damagePerLevel:15, spCost:55,
-        description:"對單體造成120點基礎傷害；65%機率使目標暈眩2回合，最終命中率額外降低10%/20%/30%/40%/50%。",
-        stunChance:65, missBonusByLevel:[10,20,30,40,50], stunDuration:2, requires:["stormFlurry"]
+        description:"對單體造成120點基礎傷害；65%機率使目標暈眩2回合，使目標最終命中率降低15%/20%/25%/30%/35%。",
+        stunChance:65, missBonusByLevel:[15,20,25,30,35], stunDuration:2, requires:["stormFlurry"]
     },
 
     /* ===== 風系：法術 ===== */
@@ -2816,8 +2816,8 @@ const skillDatabase = {
     stormRain:{
         id:"stormRain", tier:4, name:"風起雲湧", element:"wind", category:"magic", targetType:"all",
         learnCost:30, maxLevel:5, baseDamage:48, damagePerLevel:14, spCost:55,
-        description:"對敵方全體各造成48點基礎法術傷害；35%機率暈眩1回合，使目標MISS率提高30%/45%/50%/55%/65%。",
-        stunChance:35, missBonusByLevel:[30,45,50,55,65], stunDuration:1, requires:["windHowlLightning"]
+        description:"對敵方全體各造成48點基礎法術傷害；35%機率暈眩1回合，使目標最終命中率降低15%/20%/25%/30%/35%。",
+        stunChance:35, missBonusByLevel:[15,20,25,30,35], stunDuration:1, requires:["windHowlLightning"]
     },
 
     /* ===== 風系：增益 ===== */
@@ -12676,7 +12676,7 @@ function getMonsterEvasion(monster){
    打折扣，再讓打完折的命中值去跑正常的
    命中公式，等於是「間接」影響最終機率，
    使用者最新給的數值是「降低機率由技能
-   等級低至高為-10%/…/-50%」，讀起來是
+   等級低至高為-15%/-20%/-25%/-30%/-35%」，讀起來是
    直接從最終命中機率扣掉這個%數，不是
    在命中值這層打折——兩種算法算出來的
    最終命中率不一樣，照字面意思改成
@@ -13586,14 +13586,12 @@ function resolveQueuedPlayerAction(characterIndex,token){
 /*
    ★ 修正（依照使用者要求，暈眩猛擊重新
    設計）：新增第3個參數
-   directChanceReductionPercent，直接從
-   算好的命中機率（還沒套用60~99上下限
-   之前）扣掉這個%數，代表暈眩帶來的
-   命中率下降是「扣點數」，不是「打折」，
-   跟命中值/閃避這些既有加成用同一套
-   加減邏輯、同一個上下限夾住，不會出現
-   暈眩把命中率直接砍到負數或需要另外
-   處理的極端值。
+   directChanceReductionPercent，代表「最終命中率
+   下降幾個百分點」。先依命中值算出50%～99%的
+   基礎命中率，再套用目標最終閃躲率，最後才直接
+   扣除暈眩等效果。這樣技能寫「最終命中率降低15%」
+   時，實戰就會真的在最後結果扣15個百分點；最低
+   仍保留1%命中率，避免降到負數。
    不傳這個參數（大部分呼叫的地方都不需要）
    的話效果跟以前完全一樣，只有monster
    出手攻擊玩家、且monster身上真的有stun
@@ -13609,8 +13607,7 @@ function rollHitChance(
     const rawAccuracyChance =
         HIT_CHANCE_BASE+
         casterAccuracy*
-        HIT_CHANCE_ACCURACY_COEFFICIENT-
-        (directChanceReductionPercent||0);
+        HIT_CHANCE_ACCURACY_COEFFICIENT;
 
     const accuracyChance =
         Math.max(
@@ -13626,11 +13623,15 @@ function rollHitChance(
         Math.min(FINAL_EVASION_RATE_CAP,Number(targetEvasion)||0)
     );
 
+    const evasionAdjustedChance=
+        accuracyChance*(1-evasionRate/100);
+
     const chance=Math.max(
         1,
         Math.min(
             HIT_CHANCE_MAX_PERCENT,
-            accuracyChance*(1-evasionRate/100)
+            evasionAdjustedChance-
+            Math.max(0,Number(directChanceReductionPercent)||0)
         )
     );
 
@@ -15019,7 +15020,7 @@ function applySkillDebuffEffects(
             addBattleLog(
                 ""+
                 monster.name+
-                "陷入暈眩，MISS率提高！"
+                "陷入暈眩，最終命中率降低！"
             );
 
         }
@@ -15315,7 +15316,7 @@ function applySkillDebuffEffectsToPlayer(
 
             addBattleLog(
                 targetName+
-                "陷入暈眩，MISS率提高！"
+                "陷入暈眩，最終命中率降低！"
             );
 
         }
@@ -31253,7 +31254,7 @@ function openInventoryCharacterDetail(){
             `
         ).join("")+
         `<div class="inventory-character-detail-note">
-            基礎命中率＝clamp(95%＋命中×0.3－直接命中率降低, 50%, 99%)，再乘上(1－目標最終閃躲率)。<br>
+            基礎命中率＝clamp(95%＋命中×0.3, 50%, 99%)，先乘上(1－目標最終閃躲率)，最後再扣除暈眩等「最終命中率降低」效果（最低1%）。<br>
             一般異常每1精神降低0.05個百分點命中率；每1敏捷＝+1速度、+0.6個百分點基礎閃躲。
         </div>`;
 
