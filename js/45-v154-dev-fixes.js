@@ -283,17 +283,13 @@
     window.v154SyncMonsterPortraits=syncMonsterPortraits;
     window.v154SyncAbyssPortraits=syncMonsterPortraits;
 
-    if(typeof renderBattle==="function"){
-        const previousRenderBattle=renderBattle;
-        renderBattle=function(){
-            const result=previousRenderBattle.apply(this,arguments);
-            if(typeof window.v152SyncAbyssBattleUi==="function"){
-                window.v152SyncAbyssBattleUi();
-            }
-            syncMonsterPortraits();
-            return result;
-        };
+    function v154AfterBattleRender(){
+        if(typeof window.v152SyncAbyssBattleUi==="function"){
+            window.v152SyncAbyssBattleUi();
+        }
+        syncMonsterPortraits();
     }
+    window.v154AfterBattleRender=v154AfterBattleRender;
     if(typeof updateMonsterUI==="function"){
         const previousUpdateMonsterUI=updateMonsterUI;
         updateMonsterUI=function(){
