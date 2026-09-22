@@ -2,6 +2,7 @@
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 
 const main=fs.readFileSync("js/00-main.js","utf8");
 const patrol=fs.readFileSync("js/26-v131-patrol-appearance.js","utf8");
@@ -83,9 +84,10 @@ test("both patrol fight frames point to the newly supplied images",()=>{
 });
 
 test("the development release and cache advance to V173.39",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.69"/);
-    assert.match(index,/<title>四象江湖傳 V173\.69<\/title>/);
-    assert.match(index,/aria-label="目前版本 V173\.69"[\s\S]*?>V173\.69<\/div>/);
+    assert.equal((loader.match(/const V_ASSET_VERSION="([^"]+)"/)||[])[1],releaseMeta.cacheVersion);
+    assert.ok(index.includes("<title>四象江湖傳 V"+releaseMeta.version+"</title>"));
+    assert.ok(index.includes('aria-label="目前版本 V'+releaseMeta.version+'"'));
+    assert.ok(index.includes(">V"+releaseMeta.version+"</div>"));
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.css/);
 });
 

@@ -1,6 +1,7 @@
 "use strict";
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 const battle=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");
 const tuning=fs.readFileSync("js/47-v158-combat-tuning.js","utf8");
 const abyss=fs.readFileSync("js/36-v141-content-systems.js","utf8");
@@ -61,7 +62,8 @@ assert.match(main,/function learnSkill\(skillId\)[\s\S]*?isSkillPrereqMet\([\s\S
 assert.match(water,/applyFinalSkillData\(\);[\s\S]*?renderSkillLoadout\(\)/);
 assert.match(abyssCss,/home-background-v17344\.png/);
 assert.equal(fs.existsSync("assets/ui/home-background-v17344.png"),true,"assets/ui/home-background-v17344.png");
-assert.match(loader,/const V_ASSET_VERSION="173\.69"/);
-assert.match(index,/id="homeVersionBadge"[\s\S]*?aria-label="目前版本 V173\.69"[\s\S]*?>V173\.69<\/div>/);
+assert.equal((loader.match(/const V_ASSET_VERSION="([^"]+)"/)||[])[1],releaseMeta.cacheVersion);
+assert.ok(index.includes('aria-label="目前版本 V'+releaseMeta.version+'"'));
+assert.ok(index.includes(">V"+releaseMeta.version+"</div>"));
 
 console.log("✓ V173.50 current request regression passed");

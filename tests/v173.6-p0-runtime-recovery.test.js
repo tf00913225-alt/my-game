@@ -2,6 +2,7 @@
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 
 const main=fs.readFileSync("js/00-main.js","utf8");
 const v142=fs.readFileSync("js/37-v142-skill-animation.js","utf8");
@@ -15,7 +16,7 @@ assert.doesNotMatch(v142,/const previous=showSkillNameBadge/);
 assert.match(main,/v142PlaySkillAnimationFromBadge\("player",skillName,elementType,[\s\S]*?characterIndex\|\|0,targetContract\.targetId,targetContract\.targetIds,targetContract/);
 assert.match(main,/v142PlaySkillAnimationFromBadge\("monster",skillName,elementType,[\s\S]*?monsterIndex\|\|0,targetContract\.targetId,targetContract\.targetIds,targetContract/);
 assert.match(animation,/water-orb-vfx\.png\?v=173\.19/);
-assert.match(loader,/const V_ASSET_VERSION="173\.69"/);
-assert.match(index,/<title>四象江湖傳 V173\.69<\/title>/);
+assert.equal((loader.match(/const V_ASSET_VERSION="([^"]+)"/)||[])[1],releaseMeta.cacheVersion);
+assert.ok(index.includes("<title>四象江湖傳 V"+releaseMeta.version+"</title>"));
 
 console.log("V173.62 P0 direct animation runtime recovery: 8 tests passed.");

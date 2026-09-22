@@ -79,6 +79,7 @@ jobs:
           node tests/abyss-owner-convergence-20260920.test.js
           node tests/abyss-two-tier-refactor.test.js
           node tests/monster-portrait-runtime.test.js
+          node tests/monster-portrait-import-workflow.test.js
           node tests/v173.51-qa.test.js
           node tests/v173.56-shop-layout-preview-regression.test.js
           node tests/production-bundle-abyss-shop-owner.test.js

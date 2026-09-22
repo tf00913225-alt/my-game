@@ -9,12 +9,14 @@ const finalWaterRules=fs.readFileSync("js/50-v169-water-skill-rules.js","utf8");
 const css=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");
 const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const index=fs.readFileSync("index.html","utf8");
+const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 
 let passed=0;
 function test(name,handler){ handler(); passed++; console.log("✓ "+name); }
 
 test("V171 cache-busts every changed combat asset",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.69"/);
+    const assetVersionMatch=loader.match(/const V_ASSET_VERSION="([^"]+)"/);
+    assert.equal(assetVersionMatch?.[1],releaseMeta.cacheVersion);
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
