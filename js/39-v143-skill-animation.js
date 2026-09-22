@@ -68,6 +68,8 @@
         flameTornado:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/flame-tornado-cast.png?v=165","single",{scale:2.35,maxSize:300})},
         phoenixCry:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/phoenix-cry-cast.png?v=165","battlefield",{scale:1.12,minSize:280})},
         rage:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/rage-cast.png?v=165","single",{scale:1.08,minSize:96,maxSize:148})},
+        fireSoulResonance:{hit:DEFAULT_HIT,deferredActorStatusTypes:["fireSoulResonance"],sprite:castSheet("assets/vfx/fire/fire-soul-resonance-cast.webp","single",{scale:1.7,maxSize:225})},
+        bloodBurnArt:{hit:DEFAULT_HIT,deferredActorStatusTypes:["bloodBurn"],sprite:castSheet("assets/vfx/fire/blood-burn-art-cast.webp","single",{scale:1.7,maxSize:225})},
         fireEX:{hit:.74,noVisual:true,passive:true},
 
         waterKnife:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/water-blade-slash-vfx.png?v=166","single",{scale:2.05,maxSize:250})},
@@ -80,7 +82,7 @@
         freeze:{hit:DEFAULT_HIT,deferredStatusTypes:["freeze"],sprite:castSheet("assets/vfx/water/freeze-cast-vfx.png?v=166","single",{scale:2.2,maxSize:270})},
         healSpell:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/water-heal-vfx.png?v=166","single",{scale:2.05,maxSize:250})},
         revive:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/water-revive-vfx.png?v=166","single",{scale:2.3,maxSize:285})},
-        purifyMind:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/water-heal-vfx.png?v=166","single",{scale:2.05,maxSize:250,reusedFrom:"healSpell"})},
+        purifyMind:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/purify-mind-cast.webp","single",{scale:2.05,maxSize:250})},
         waterEX:{hit:.74,noVisual:true,passive:true},
 
         stormFist:{hit:.5,deferredStatusTypes:["agilityDown"],sprite:castSheet("assets/vfx/wind/storm-fist-cast.png?v=173.24","single",{scale:2.15,maxSize:260})},
@@ -151,7 +153,7 @@
         freeze:statusVisual("assets/vfx/status/freeze.webp","static","statusEffects",{label:"冰封",statusName:"冰封",iconSrc:"assets/vfx/status/freeze.webp"}),
         agilityDown:statusVisual("","icon","statusEffects",{label:"重力",statusName:"重力",iconSrc:"assets/vfx/status/gravity-icon.webp"}),
         damageDown:statusVisual("","icon","statusEffects",{label:"殤風",statusName:"殤風",iconSrc:"assets/vfx/status/damage-down-icon.webp"}),
-        stun:statusVisual("","icon","statusEffects",{label:"暈眩",statusName:"暈眩",iconSrc:"assets/vfx/status/stun-icon.webp"}),
+        stun:statusVisual("assets/vfx/status/stun.webp","pulse","statusEffects",{label:"暈眩",statusName:"暈眩",iconSrc:"assets/vfx/status/stun-icon.webp"}),
         dodgeSkill:statusVisual("assets/vfx/status/windwalk.webp","pulse","activeBuffs",{label:"風行",statusName:"風行",iconSrc:"assets/vfx/status/windwalk.webp"}),
         stealthSkill:statusVisual("assets/vfx/status/stealth.webp","static","activeBuffs",{label:"隱身",statusName:"隱身",iconSrc:"assets/vfx/status/stealth.webp"}),
         dinghaishenzhen:statusVisual("assets/vfx/status/calm-mind.webp","pulse","activeBuffs",{label:"氣定神閒",statusName:"氣定神閒",iconSrc:"assets/vfx/status/calm-mind.webp"}),
@@ -579,7 +581,10 @@
         return node;
     }
 
-    function syncStatusVisual(side,index,type){
+    const STATUS_ROTATION_MS=1000;
+    let statusRotationTimer=null;
+
+    function syncStatusVisual(side,index,type,showBody){
         const spec=STATUS_VISUALS[type];
         const card=cardFor(side,index);
         const entity=entityFor(side,index);
@@ -593,7 +598,7 @@
         const host=statusIconHost(side,index,card);
         if(host&&!statusIconNode(host,type)){ host.appendChild(createStatusIcon(type,spec)); }
 
-        if(spec.mode==="icon"){
+        if(spec.mode==="icon"||showBody===false){
             const body=statusVisualNode(card,type);
             if(body&&typeof body.remove==="function"){ body.remove(); }
             return;
@@ -608,15 +613,29 @@
         const anchor=slotAnchor(side,index,card);
         if(!anchor){ return; }
         const cardRect=typeof card.getBoundingClientRect==="function"?card.getBoundingClientRect():anchor.rect;
-        const width=Math.max(24,Math.min(anchor.rect.width*.68,cardRect.width*.68));
-        const height=Math.max(36,Math.min(anchor.rect.height*.72,cardRect.height*.72));
+        const width=Math.max(28,Math.min(anchor.rect.width*.82,cardRect.width*.82));
+        const height=Math.max(42,Math.min(anchor.rect.height*.86,cardRect.height*.86));
         node.dataset.slot=anchor.slot;
         node.style.width=Math.round(width)+"px";
         node.style.height=Math.round(height)+"px";
     }
 
     function syncStatusVisualsForUnit(side,index){
-        Object.keys(RAW_STATUS_VISUALS).forEach(type=>syncStatusVisual(side,index,type));
+        const entity=entityFor(side,index);
+        const bodyTypes=entity?Object.keys(RAW_STATUS_VISUALS).filter(type=>{
+            const spec=RAW_STATUS_VISUALS[type];
+            return !!(
+                spec&&spec.mode!=="icon"&&spec.src&&
+                hasTimedEffect(entity,type)&&
+                !deferredStatusDuringCast(side,index,type)
+            );
+        }):[];
+        const activeBodyType=bodyTypes.length
+            ?bodyTypes[Math.floor(Date.now()/STATUS_ROTATION_MS)%bodyTypes.length]
+            :null;
+        Object.keys(RAW_STATUS_VISUALS).forEach(type=>
+            syncStatusVisual(side,index,type,type===activeBodyType)
+        );
     }
 
     function syncStatusVisualEffects(){
@@ -633,6 +652,15 @@
         );
     }
     window.v143SyncStatusVisualEffects=syncStatusVisualEffects;
+
+    function ensureStatusRotationTimer(){
+        if(statusRotationTimer||typeof window==="undefined"||typeof window.setInterval!=="function"){ return; }
+        statusRotationTimer=window.setInterval(()=>{
+            if(typeof battleActive!=="undefined"&&!battleActive){ return; }
+            syncStatusVisualEffects();
+        },STATUS_ROTATION_MS);
+    }
+    ensureStatusRotationTimer();
 
     function statusVisualTypeForEntry(entry){
         if(!entry){ return null; }
