@@ -123,10 +123,15 @@ test("earth and Yuan Zu cast sheets keep the supplied production dimensions and 
     });
 });
 
-test("persistent sheets keep the supplied production dimensions and natural 4x2 grid",()=>{
+test("persistent states use the formal runtime WebP assets",()=>{
     Object.entries(STATUSES).forEach(([type,spec])=>{
-        const expected=type==="barrier"?[1536,1024]:[1774,887];
-        assert.deepEqual(pngSize(spec.file),expected,spec.file);
+        if(spec.mode==="icon"){
+            assert.equal(spec.runtimeFile,"defense-down-icon.webp",type);
+            return;
+        }
+        const runtimePath="assets/vfx/status/"+spec.runtimeFile;
+        assert.ok(fs.existsSync(runtimePath),runtimePath);
+        assert.ok(fs.statSync(runtimePath).size>0,runtimePath+" must not be empty");
     });
 });
 
