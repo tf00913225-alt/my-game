@@ -1,0 +1,61 @@
+name: Temporary Battle UI Finalize 20260922
+
+on:
+  push:
+    branches:
+      - fix/battle-ui-status-carousel-vfx-20260922
+    paths:
+      - .github/workflows/temp-battle-ui-finalize-20260922.yml
+
+permissions:
+  contents: write
+
+jobs:
+  validate-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/battle-ui-status-carousel-vfx-20260922
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Focused battle regressions
+        run: |
+          node tests/battle-status-info-assets-20260922.test.js
+          node tests/fixed-slot-battlefield-rendering-v2.test.js
+          node tests/battle-stats-relic-tower-auto-20260920.test.js
+          node tests/v142-skill-animation.test.js
+
+      - name: Full node suite
+        run: npm test
+
+      - name: Regenerate production build
+        run: npm run build
+
+      - name: Verify build synchronization
+        run: npm run build:check
+
+      - name: Remove temporary workflows and commit build
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/temp-battle-skill-asset-import-20260922.yml
+          rm -f .github/workflows/temp-battle-ui-finalize-20260922.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          if git diff --cached --quiet; then
+            echo "No generated changes"
+            exit 0
+          fi
+          git diff --cached --stat
+          git commit -m "build: sync battle UI and VFX runtime"
+          git push origin HEAD:fix/battle-ui-status-carousel-vfx-20260922
