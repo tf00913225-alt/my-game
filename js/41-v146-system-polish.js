@@ -913,7 +913,6 @@
         syncShopTotals();
         syncDungeonShell();
         polishSynthesis();
-        syncDefeatedCards();
         syncCharacterAttentionDots();
     }
     if(typeof MutationObserver!=="undefined"){
@@ -922,7 +921,12 @@
             mutationQueued=true;
             requestAnimationFrame(syncDynamicDom);
         });
-        const startObserver=()=>observer.observe(document.body,{childList:true,subtree:true});
+        const startObserver=()=>{
+            [
+                document.getElementById("homeFeatureModal"),
+                document.getElementById("dungeonPage")
+            ].filter(Boolean).forEach(root=>observer.observe(root,{childList:true,subtree:true,attributes:true,attributeFilter:["class"]}));
+        };
         if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",startObserver,{once:true}); }
         else{ startObserver(); }
     }
