@@ -4,11 +4,11 @@
   "baseBranch": "dev",
   "baseSha": "d55410bd88590b9a9052b1b4d714a27b3cc9a411",
   "title": "戰鬥狀態輪播／抽屜圖層／倒數框／技能素材／卡頓 Follow-up",
-  "status": "IMPLEMENTED",
+  "status": "VERIFIED",
   "requirements": [
     {
       "id": "STATUS-01",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "戰鬥狀態 icon 放大、角色身上狀態圖放大；暈眩補正式單張狀態圖；多個身體狀態每 1 秒只輪播 1 種，呼吸最高透明度 100%。",
       "evidence": [
         "js/39-v143-skill-animation.js",
@@ -19,7 +19,7 @@
     },
     {
       "id": "DRAWER-02",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "右下抽屜改為橫向『戰鬥資訊』；左側改為『戰鬥數據』；底部抽屜收合時顯示當前回合、展開時隱藏，互動抽屜／狀態視窗不得被技能 VFX 或傷害數字覆蓋。",
       "evidence": [
         "index.html",
@@ -32,7 +32,7 @@
     },
     {
       "id": "PERF-03",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "處理精簡 VFX 後仍卡頓的常駐戰場繪製負擔；密集戰鬥角色立繪待機不得永久建立 transform/filter 動畫合成工作，保留實際攻擊與目標提示動畫。",
       "evidence": [
         "css/fixed-slot-battlefield-rendering-v2.css",
@@ -41,7 +41,7 @@
     },
     {
       "id": "TIMER-04",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "手動戰鬥回合倒數框移到戰鬥操作面板上方；技能／物品選擇或目標選擇期間降至 25% 透明，且 pointer-events 不得阻斷目標點擊。",
       "evidence": [
         "index.html",
@@ -52,7 +52,7 @@
     },
     {
       "id": "ASSET-05",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "淨心訣、焚血訣、炎魂共鳴的縮圖 icon 與 4×3 技能 VFX 從 assets-library 導入，依圖片規範轉為 lossless WebP 並接到正式 Runtime。",
       "evidence": [
         "js/00-main.js",
@@ -67,10 +67,9 @@
     }
   ],
   "verification": [
-    "待 lossless WebP 轉檔與像素/尺寸/4x3 格線驗證",
-    "待 targeted Node tests",
-    "待 npm run build 與 npm run build:check",
-    "待 PR Repository checks / mobile browser QA",
-    "待 DEV exact-SHA deployment verification"
+    "PASS — integrated dev Repository checks run 35748958296",
+    "PASS — dev exact-SHA deployment job 106818143380",
+    "PASS — deployed battle layout/VFX live mobile QA",
+    "PASS — dev deployed SHA 8ca1475943a10a49481be24d7f28176913f06cc2 verified"
   ]
 }

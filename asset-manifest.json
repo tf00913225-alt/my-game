@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "release": "173.70",
+  "release": "173.71",
   "generatedAt": "deterministic",
   "critical": {
     "scripts": [
-      "build/boot-core.7897301b7787.js"
+      "build/boot-core.753c8d6428d4.js"
     ],
     "styles": [
       "build/boot-core.4eb0eabcabd7.css"
@@ -20,7 +20,7 @@
     "bundles": {
       "app-shell": {
         "scripts": [
-          "build/app-shell.3054ef9015f3.js"
+          "build/app-shell.c9a2ba36d608.js"
         ],
         "styles": [
           "build/app-shell.883034960e20.css"
@@ -211,8 +211,8 @@
         "decode": false
       },
       {
-        "path": "build/boot-core.7897301b7787.js",
-        "sha256": "7897301b7787",
+        "path": "build/boot-core.753c8d6428d4.js",
+        "sha256": "753c8d6428d4",
         "bytes": 59088,
         "priority": "P0",
         "type": "script",
@@ -555,19 +555,19 @@
         "decode": true
       },
       {
-        "path": "build/app-shell.3054ef9015f3.js",
-        "sha256": "3054ef9015f3",
-        "bytes": 1009557,
-        "priority": "P1",
-        "type": "script",
-        "decode": false
-      },
-      {
         "path": "build/app-shell.883034960e20.css",
         "sha256": "883034960e20",
         "bytes": 110242,
         "priority": "P1",
         "type": "style",
+        "decode": false
+      },
+      {
+        "path": "build/app-shell.c9a2ba36d608.js",
+        "sha256": "c9a2ba36d608",
+        "bytes": 1009557,
+        "priority": "P1",
+        "type": "script",
         "decode": false
       },
       {
@@ -811,17 +811,17 @@
         "decode": false
       }
     ],
-    "manifestHash": "9cdd101b74c2",
+    "manifestHash": "1211f34a05c7",
     "totalBytes": 21464370,
     "totalResources": 78
   },
   "assets": {
-    "build/boot-core.7897301b7787.js": {
-      "sha256": "7897301b7787",
+    "build/boot-core.753c8d6428d4.js": {
+      "sha256": "753c8d6428d4",
       "bytes": 59088
     },
-    "build/app-shell.3054ef9015f3.js": {
-      "sha256": "3054ef9015f3",
+    "build/app-shell.c9a2ba36d608.js": {
+      "sha256": "c9a2ba36d608",
       "bytes": 1009557
     },
     "build/gameplay-core-primary.76ce361bcdc5.js": {
