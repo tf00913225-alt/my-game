@@ -1430,35 +1430,6 @@
     這幾輪一直卡住的問題。
 -->
 
-<div
-    id="turnTargetRow"
-    class="turn-target-row"
->
-
-    <div class="turn-number">
-        第
-        <span id="turnNumber">1</span>
-        回合
-    </div>
-
-    <div
-        id="timer"
-        class="timer"
-    >
-        20
-    </div>
-
-    <!-- V99：目標文字不再顯示在回合倒數框內。元素保留給既有 JS 安全更新。 -->
-    <div
-        id="battleTarget"
-        class="battle-target-inline"
-        aria-hidden="true"
-    >
-        目標：尚未選擇
-    </div>
-
-</div>
-
 <div class="battle-middle">
 
 <!--
@@ -1501,6 +1472,35 @@
         gap:4px;
     "
 >
+
+<div
+    id="turnTargetRow"
+    class="turn-target-row"
+>
+
+    <div class="turn-number">
+        第
+        <span id="turnNumber">1</span>
+        回合
+    </div>
+
+    <div
+        id="timer"
+        class="timer"
+    >
+        20
+    </div>
+
+    <!-- V99：目標文字不再顯示在回合倒數框內。元素保留給既有 JS 安全更新。 -->
+    <div
+        id="battleTarget"
+        class="battle-target-inline"
+        aria-hidden="true"
+    >
+        目標：尚未選擇
+    </div>
+
+</div>
 
 <!--
     ★ 修正（依照使用者要求重新設計）：
@@ -1708,7 +1708,7 @@
         aria-expanded="false"
         aria-label="展開戰鬥資訊"
         onclick="toggleBattleInfoPanel()"
-    ><span aria-hidden="true">⌃</span></button>
+    >戰鬥資訊</button>
     <div id="battleTurnIndicator">第 1 回合</div>
 </div>
 
