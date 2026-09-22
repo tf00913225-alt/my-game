@@ -1,46 +1,75 @@
 《my-game 專案檢查報告》
 
-版本：V173.69
-更新日期：2026-09-21
-基線分支：main
-基線提交：abc8f53eb1012b233c49087d80ece9f4015d8025
-Game / Cache Version：V173.69 / 173.69
+版本：V173.70
+更新日期：2026-09-22
+正式發布分支：main
+V173.70 正式發布 SHA：25c34a2dbbfce4600691df959cc2823eff80aeab
+正式發布 Tree：94aa752b41b914c0710f6dda0ebe73942b2256e3
+Game / Cache Version：V173.70 / 173.70
 
-本文件是目前正式 main 的健康基線。舊版 V173.65／2026-09-14 的數字已退役，不得再當作目前狀態；歷史紀錄若出現在 HANDOFF.md，只能作為歷史脈絡。
+本文件是 V173.70 正式發布後的健康基線。後續若只有純文件收尾提交，不得把文件提交 SHA 誤當成 V173.70 功能發布 SHA；正式功能發布證據仍以 PR #503 與 main@25c34a2dbbfce4600691df959cc2823eff80aeab 為準。
 
 一、正式 main CI 實際驗證
 
-- JavaScript syntax：287 / 287 通過。
-- Node unit／integration suites：198 / 198 通過。
-- Static resources：388 個引用全部存在。
+- GitHub Actions CI run：35683542056，SUCCESS。
+- JavaScript syntax：292 / 292 通過。
+- Node unit／integration suites：203 / 203 通過。
+- Static resources：383 個本機資源目標全部存在。
 - HTML IDs：252 個，無重複。
 - Deterministic production build：32 個 build 產物全部通過內容雜湊核對。
-- Browser QA：360×800、390×844、412×915 的公告、冒險、固定戰場流程通過。
-- Cold／warm startup、技能、秘寶流程 QA 通過。
+- Release source coherence：V173.70 / cache 173.70。
+- Requirements：11 / 11 VERIFIED。
+- Release Update Notification mobile browser QA：通過。
+- Fixed Slot battlefield 9:16 mobile browser QA：通過。
+- Adventure V1 mobile browser QA：通過。
+- Account-first cold／warm mobile browser QA：通過。
+- Skill progression mobile browser QA：通過。
+- Relic progression mobile browser QA：通過。
+- main CI 的 exact-candidate real battle mobile browser QA 步驟為 skipped，不得記為 PASS。
 - Git whitespace 與 unresolved conflict markers：通過。
 
-二、快取與部署基線
+二、DEV 精確 SHA 與線上驗證
 
-- HTML、版本資訊與公告不快取。
-- Content-hash build 檔可長期快取。
-- 正式 Pages deployment 已成功，部署內容對應正式 main。
-- 以上數字只代表正式 main V173.69；最新 dev 的新增提交必須另行通過候選 CI 與 DEV／真機驗收，不得直接套用本基線。
+- 發布前最新 dev：bc3313ad396b934bc0972531d1ebbf6178cac548。
+- dev Tree：94aa752b41b914c0710f6dda0ebe73942b2256e3，與正式 main V173.70 Tree 完全一致。
+- DEV CI／部署 run：35682973128，SUCCESS。
+- exact-SHA deployment：SUCCESS。
+- deployed Game Version / Cache Version verification：SUCCESS。
+- deployed Battle Layout / VFX Live QA：SUCCESS。
+- 因 main 正式 CI 的 real-battle 步驟為 skipped，本段 DEV 線上 Live QA 是戰鬥／VFX 的可執行部署證據；不得把 skipped 誤寫成 main PASS。
 
-三、目前發布阻塞
+三、正式 Pages 部署
 
-- V173.70 候選 PR #452 已關閉且未合併；其候選樹與目前正式 main 相同，屬過時重複候選。
-- 關閉原因是正式 main 已先合入相同內容；四個日常副本 WebP 維持永久退休，圖片修復工作已結案。
-- 因此目前沒有待合併的 V173.70 candidate；下一次功能發布必須以最新 main／dev 重新建立候選並完成完整驗收。
+- GitHub Pages run：35683540344，SUCCESS。
+- build：SUCCESS。
+- deploy：SUCCESS。
+- 正式部署來源：main@25c34a2dbbfce4600691df959cc2823eff80aeab。
+- 正式 release/release.json：version 173.70、cacheVersion 173.70、status READY。
+- release/release-update.json 已為 V173.70 正式玩家公告來源。
 
-四、持續維護規則
+四、本次發布阻塞與修復結果
+
+- 先前 main 候選依 Full Node Suite 逐步暴露多個過期版本測試契約；皆屬 tests-only stale release metadata contract，未藉由放寬測試掩蓋 production runtime 錯誤。
+- V173.16、V173.17、V173.2 與其餘殘留 V173.69 版本斷言已收斂為讀取 release/release.json 或目前正式 V173.70。
+- 最終 main CI 已實際完成 203 / 203 Node suites；目前沒有 V173.70 發布阻塞。
+- 四個已永久退休的損壞怪物 WebP 維持退休，不列為本次阻塞。
+- 未來金幣副本三張尚未正式提供 file_id 的立繪不列為本次阻塞。
+
+五、發布後分支收尾規則
 
 1. main／dev 的版本、測試與資源數字必須以最新實際 CI／build 輸出更新。
 2. CI skipped 只能記為未執行，不得寫成 PASS。
-3. assets raw file count、怪物立繪 queue 數量與規劃數量不可互相混用。
-4. 戰鬥核心既有 wrapper 尚未收斂；後續修改同一子系統時不得新增 wrapper。
-5. Chrome 模擬尺寸 QA 不取代 S23 Ultra 實機驗收。
+3. 正式發布完成後，必須依既有 Release Contract 將 main 發布歷史回流到 dev；不得留下 dev／main 長期 diverged。
+4. 回流只能走 PR／既有保護流程，不得直接改寫 dev、rebase 或 force push。
+5. assets raw file count、怪物立繪 queue 數量與規劃數量不可互相混用。
+6. 戰鬥核心既有 wrapper 尚未收斂；後續修改同一子系統時不得新增 wrapper。
+7. Chrome 模擬尺寸 QA 不取代 S23 Ultra 實機驗收。
 
 結論：
-- 正式版本：V173.69，main SHA `abc8f53eb1012b233c49087d80ece9f4015d8025`。
-- 正式 main CI 基線：287 / 287 syntax、198 / 198 Node suites、388 resources、252 HTML IDs、32 deterministic build assets。
-- 目前沒有待合併的 V173.70 候選；PR #452 已結案，正式 main CI 與 Pages deployment 均已成功。
+- 正式版本：V173.70。
+- V173.70 正式發布 SHA：25c34a2dbbfce4600691df959cc2823eff80aeab。
+- Game / Cache Version：V173.70 / 173.70。
+- Requirements：11 / 11 VERIFIED。
+- 正式 main CI：292 / 292 syntax、203 / 203 Node suites、383 resources、252 HTML IDs、32 deterministic build assets。
+- 正式 main CI 與 GitHub Pages deployment 均 SUCCESS。
+- 發布後唯一剩餘收尾：以 PR 將最新 main 歷史回流 dev，完成分支收斂。
