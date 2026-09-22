@@ -1,0 +1,98 @@
+name: Temporary Battle Skill Asset Import 20260922
+
+on:
+  push:
+    branches:
+      - fix/battle-ui-status-carousel-vfx-20260922
+    paths:
+      - .github/workflows/temp-battle-skill-asset-import-20260922.yml
+
+permissions:
+  contents: write
+
+jobs:
+  import-assets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/battle-ui-status-carousel-vfx-20260922
+          fetch-depth: 0
+
+      - name: Fetch source art branch
+        run: git fetch --no-tags origin assets-library:refs/remotes/origin/assets-library
+
+      - name: Ensure ImageMagick WebP support
+        run: |
+          if ! command -v convert >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends imagemagick
+          fi
+          convert -version
+          identify -list format | grep -E '^ *WEBP' || true
+
+      - name: Convert approved source assets losslessly
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/battle-skill-src assets/skills assets/vfx/fire assets/vfx/water
+
+          git show "origin/assets-library:assets/inbox/技能icon/淨心訣 icon.png" > "/tmp/battle-skill-src/purify-icon.png"
+          git show "origin/assets-library:assets/inbox/技能icon/淨心訣 技能釋放.png" > "/tmp/battle-skill-src/purify-vfx.png"
+          git show "origin/assets-library:assets/inbox/技能icon/炎魂共鳴 icon.png" > "/tmp/battle-skill-src/fire-soul-icon.png"
+          git show "origin/assets-library:assets/inbox/技能icon/炎魂共鳴 技能釋放.png" > "/tmp/battle-skill-src/fire-soul-vfx.png"
+          git show "origin/assets-library:assets/inbox/技能icon/焚血訣 icon.png" > "/tmp/battle-skill-src/blood-burn-icon.png"
+          git show "origin/assets-library:assets/inbox/技能icon/焚血訣 技能釋放.png" > "/tmp/battle-skill-src/blood-burn-vfx.png"
+
+          convert "/tmp/battle-skill-src/purify-icon.png" -define webp:lossless=true "assets/skills/water-purify-mind.webp"
+          convert "/tmp/battle-skill-src/purify-vfx.png" -define webp:lossless=true "assets/vfx/water/purify-mind-cast.webp"
+          convert "/tmp/battle-skill-src/fire-soul-icon.png" -define webp:lossless=true "assets/skills/fire-soul-resonance.webp"
+          convert "/tmp/battle-skill-src/fire-soul-vfx.png" -define webp:lossless=true "assets/vfx/fire/fire-soul-resonance-cast.webp"
+          convert "/tmp/battle-skill-src/blood-burn-icon.png" -define webp:lossless=true "assets/skills/fire-blood-burn.webp"
+          convert "/tmp/battle-skill-src/blood-burn-vfx.png" -define webp:lossless=true "assets/vfx/fire/blood-burn-cast.webp"
+
+      - name: Verify dimensions alpha and 4x3 grids
+        shell: bash
+        run: |
+          set -euo pipefail
+          pairs=(
+            "/tmp/battle-skill-src/purify-icon.png|assets/skills/water-purify-mind.webp|icon"
+            "/tmp/battle-skill-src/purify-vfx.png|assets/vfx/water/purify-mind-cast.webp|vfx"
+            "/tmp/battle-skill-src/fire-soul-icon.png|assets/skills/fire-soul-resonance.webp|icon"
+            "/tmp/battle-skill-src/fire-soul-vfx.png|assets/vfx/fire/fire-soul-resonance-cast.webp|vfx"
+            "/tmp/battle-skill-src/blood-burn-icon.png|assets/skills/fire-blood-burn.webp|icon"
+            "/tmp/battle-skill-src/blood-burn-vfx.png|assets/vfx/fire/blood-burn-cast.webp|vfx"
+          )
+          for entry in "${pairs[@]}"; do
+            IFS='|' read -r src out kind <<< "$entry"
+            sw=$(identify -format '%w' "$src")
+            sh=$(identify -format '%h' "$src")
+            ow=$(identify -format '%w' "$out")
+            oh=$(identify -format '%h' "$out")
+            sch=$(identify -format '%[channels]' "$src")
+            och=$(identify -format '%[channels]' "$out")
+            echo "$kind: $src -> $out :: ${sw}x${sh} $sch -> ${ow}x${oh} $och"
+            test "$sw" = "$ow"
+            test "$sh" = "$oh"
+            identify "$out" >/dev/null
+            if [ "$kind" = "vfx" ]; then
+              test $((sw % 4)) -eq 0
+              test $((sh % 3)) -eq 0
+            fi
+          done
+
+      - name: Commit converted runtime assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/skills/water-purify-mind.webp \
+                  assets/skills/fire-soul-resonance.webp \
+                  assets/skills/fire-blood-burn.webp \
+                  assets/vfx/water/purify-mind-cast.webp \
+                  assets/vfx/fire/fire-soul-resonance-cast.webp \
+                  assets/vfx/fire/blood-burn-cast.webp
+          git diff --cached --stat
+          git commit -m "assets: import three skill icons and cast sheets"
+          git push origin HEAD:fix/battle-ui-status-carousel-vfx-20260922
