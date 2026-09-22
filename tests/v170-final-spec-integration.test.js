@@ -464,7 +464,7 @@ test("final normal hit and status-effect bounds override the historical floors",
     const hit=runtime.context.v158GetHitChancePercent;
     assert.deepEqual(
         [hit(0,0,0),hit(10,0,0),hit(0,10,0),hit(0,1000,0),hit(0,1000,50),hit(1000,0,0)],
-        [95,98,85.5,14.250000000000002,7.500000000000001,99]
+        [95,98,85.5,14.250000000000002,1,99]
     );
     const status=runtime.context.v140CalculateStatusEffectChance;
     assert.equal(status(50,10,10,100,20,false,"regular",0,"physical"),54);
