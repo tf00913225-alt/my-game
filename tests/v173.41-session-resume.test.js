@@ -1,6 +1,7 @@
 "use strict";
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 const vm=require("node:vm");
 
 const main=fs.readFileSync("js/00-main.js","utf8");
@@ -57,8 +58,8 @@ function harness(initialReady){
     assert.equal(h.saves,2,"pagehide must also persist before renderer eviction");
 }
 
-assert.match(loader,/const V_ASSET_VERSION="173\.69"/);
-assert.match(index,/<title>四象江湖傳 V173\.69<\/title>/);
+assert.equal((loader.match(/const V_ASSET_VERSION="([^"]+)"/)||[])[1],releaseMeta.cacheVersion);
+assert.ok(index.includes("<title>四象江湖傳 V"+releaseMeta.version+"</title>"));
 assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 console.log("✓ V173.50 same-session resume and background save regression passed");

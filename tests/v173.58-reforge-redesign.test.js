@@ -1,6 +1,7 @@
 "use strict";
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 const synthesis=fs.readFileSync("js/36-v141-content-systems.js","utf8");
 const equipment=fs.readFileSync("js/equipment-progression.js","utf8");
 const css=fs.readFileSync("css/38-v141-system-expansion.css","utf8");
@@ -30,6 +31,6 @@ assert.doesNotMatch(equipment,/item\.reforgeUsed=Math\.min/);
 assert.match(css,/V173\.58 — FREE-MATERIAL REFORGE UI/);
 assert.match(css,/\.v17358-reforge-tiers/);
 assert.match(css,/\.v17358-affix-lock\.locked/);
-assert.match(loader,/const V_ASSET_VERSION="173\.69"/);
-assert.match(index,/<title>四象江湖傳 V173\.69<\/title>/);
+assert.equal((loader.match(/const V_ASSET_VERSION="([^"]+)"/)||[])[1],releaseMeta.cacheVersion);
+assert.ok(index.includes("<title>四象江湖傳 V"+releaseMeta.version+"</title>"));
 console.log("✓ V173.62 unlimited free-material reforge redesign");

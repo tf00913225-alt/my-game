@@ -2,6 +2,7 @@
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 const vm=require("node:vm");
 
 const read=path=>fs.readFileSync(path,"utf8");
@@ -113,10 +114,10 @@ test("the functional V173.63 repair runtime follows late owners inside gameplay-
 });
 
 test("the repository source remains V173.62 and dev deployment keeps that source version",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.69"/);
-    assert.match(index,/<title>四象江湖傳 V173\.69<\/title>/);
-    assert.match(index,/aria-label="目前版本 V173\.69"/);
-    assert.match(index,/>V173\.69<\/div>/);
+    assert.equal((loader.match(/const V_ASSET_VERSION="([^"]+)"/)||[])[1],releaseMeta.cacheVersion);
+    assert.ok(index.includes("<title>四象江湖傳 V"+releaseMeta.version+"</title>"));
+    assert.ok(index.includes('aria-label="目前版本 V'+releaseMeta.version+'"'));
+    assert.ok(index.includes(">V"+releaseMeta.version+"</div>"));
 });
 
 console.log("\n"+passed+" character-shell regression tests passed.");
