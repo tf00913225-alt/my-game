@@ -111,17 +111,6 @@ window.v17351SyncManagement=syncManagement;
 function adLayer(){let l=document.getElementById("v17351AdSimulator");if(l)return l;l=document.createElement("div");l.id="v17351AdSimulator";l.className="v17351-ad-simulator";l.setAttribute("aria-hidden","true");l.innerHTML='<section class="v17351-ad-panel" role="dialog" aria-modal="true"><div class="v17351-ad-badge">AD</div><h2>模擬觀看廣告</h2><p>測試模式：播放完成後才發放獎勵。</p><strong id="v17351AdCountdown">3</strong><span id="v17351AdStatus">秒後完成</span></section>';document.body.appendChild(l);return l;}
 window.showRewardedAd=function(onSuccess,onFail){if(adRunning)return false;adRunning=true;const l=adLayer(),num=l.querySelector("#v17351AdCountdown"),status=l.querySelector("#v17351AdStatus");l.classList.add("show");l.setAttribute("aria-hidden","false");let remain=3;num.textContent="3";status.textContent="秒後完成";const timer=setInterval(()=>{remain--;if(remain>0){num.textContent=String(remain);return}clearInterval(timer);num.textContent="✓";status.textContent="觀看完成";setTimeout(()=>{l.classList.remove("show");l.setAttribute("aria-hidden","true");adRunning=false;try{if(typeof onSuccess==="function")onSuccess()}catch(err){console.error(err);if(typeof onFail==="function")onFail(err)}},280)},1000);return true;};
 
-const observer=new MutationObserver(mutations=>{
-    let needsResourceSync=false;
-    mutations.forEach(record=>record.addedNodes.forEach(node=>{
-        if(!(node instanceof Element)){ return; }
-        const units=node.matches?.(".battle-player,.battle-monster")
-            ?[node]:Array.from(node.querySelectorAll?.(".battle-player,.battle-monster")||[]);
-        units.forEach(card=>syncUnitArtwork(card,card.classList.contains("battle-monster")?"monster":"player"));
-        if(units.length){ needsResourceSync=true; }
-    }));
-    if(needsResourceSync){ syncResourceNumbers(); }
-});
-observer.observe(document.body,{subtree:true,childList:true});
+window.v17351AfterBattleRender=syncBattlePresentation;
 syncManagement();
 })();
