@@ -104,6 +104,7 @@ function formulaRuntime(){
     const statusFn=sourceFunction(main,"calculateStatusEffectChance");
     assert.doesNotMatch(statusFn,/Math\.sqrt|levelFactor|LEVEL_DIFF_FACTOR|LOCKDOWN_STATUS_SPIRIT_COEFFICIENT/);
     assert.doesNotMatch(v140,/calculateStatusEffectChance\s*=\s*function|rollHitChance\s*=\s*function|Math\.sqrt\(power\)/);
+    assert.doesNotMatch(v140,/previousCalculateStatusEffectChance|v140PreviousCalculateStatusEffectChance/);
     assert.doesNotMatch(v158,/v158GetHitChancePercent|rollHitChance\s*=\s*function/);
     assert.doesNotMatch(v149,/rollStatusEffectHit\s*=\s*function/);
     assert.doesNotMatch(v169,/getMonsterEvasion\s*=\s*function|getMonsterEffectiveSpiritPoints\s*=\s*function|getPlayerStatusResistBonus\s*=\s*function/);
