@@ -24,7 +24,9 @@
 - Target Reticle（目標準星）由 Fixed Slot V2 唯一投影；敵方、我方、Boss、援軍與可破壞 Boss object 共用同一金色準星。歷史 `::after` 準星不得與正式 `::before` 準星並存。
 - Status Icon（狀態圖示）HUD 必須位於 HP／SP 資源條之上，正式 24px Icon 不得被塞入低於自身高度的容器或被資源條 z-index 蓋住。
 - 正式 Battle Info Drawer（戰鬥資訊抽屜）外殼永遠透明；收合／展開都保留左側回合文字，只有右側「戰鬥資訊／返回」小 Tab 與展開後的紀錄正文可有黑底。巡怪 `#mapBattleInfo` 是獨立固定黑色紀錄框，不得再共享正式 Drawer 外觀 owner。
-- Battle Info Tab 左右拖曳只允許 pointerdown 時量測幾何；pointermove 只更新座標並以 requestAnimationFrame + compositor transform 繪製，放手後才落正式座標。禁止每個 pointermove 反覆讀 layout，也禁止 timer／polling 修拖曳。
+- Battle Info Tab 固定錨定於戰鬥畫面右下；不可拖曳、不可自由定位。展開／收合只允許改變 Drawer（抽屜）狀態，不得改變 Tab 錨點。
+- 巡怪頁底部導覽與副本／Gameplay 共用 `js/42-v148-combat-dungeon-fixes.js` 的 context navigation owner；順序固定為「角色／背包／秘寶／元素匣／返回」。巡怪頁不得再建立右上角第二顆返回鈕或自行硬寫另一套底部按鈕 markup。
+- 手動戰鬥在技能／物品／目標選擇期間，回合／倒數列必須保持 100% 可見並位於選擇 UI 上層；不得以降低 opacity（透明度）或被其他 UI 覆蓋的方式讓位。
 - 巡怪人物初始畫面不得顯示 legacy `patrol-character.png` 再切換；`js/26-v131-patrol-appearance.js` 必須先解析玩家選定角色／性別／元素素材，待 decode/load 成功後直接顯示正式 WebP。
 
 ## VFX 與回合流程契約
