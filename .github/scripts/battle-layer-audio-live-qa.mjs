@@ -892,7 +892,6 @@ try{
             titleFont:getComputedStyle(title).fontSize,labelFont:getComputedStyle(label).fontSize,
             valueFont:getComputedStyle(value).fontSize,closeFont:getComputedStyle(close).fontSize
         };
-        api.hideResultDetails(false);
         return result;
     })()`);
     evidence.checks.resultModalReadability=resultModalReadability;
@@ -905,6 +904,7 @@ try{
     assert.ok(resultModalReadability.close?.height>=50,`Battle result close button is too small on mobile: ${resultModalReadability.close?.height}`);
     const resultScreenshot=await client.send("Page.captureScreenshot",{format:"png",fromSurface:true});
     if(resultScreenshot.data){ fs.writeFileSync(path.join(artifactDir,"battle-result-modal-mobile.png"),Buffer.from(resultScreenshot.data,"base64")); }
+    await client.eval("window.FourSymbolsBattleStatistics?.hideResultDetails(false);true");
     const bossBootstrap=await client.eval(`(()=>{
         if(typeof player!=='undefined'&&player){
             player.level=100;
