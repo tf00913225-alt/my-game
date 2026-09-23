@@ -16,8 +16,8 @@ assert.match(
 
 assert.match(
   relic,
-  /const battlePage=document\.getElementById\("battlePage"\);[\s\S]*?battlePage\.querySelector\("\.battle-wrap"\)[\s\S]*?host\.appendChild\(node\)/,
-  "relic cinematic must live inside the existing battle-wrap stacking context"
+  /const battlePage=document\.getElementById\("battlePage"\);[\s\S]*?const host=battlePage\|\|null[\s\S]*?host\.appendChild\(node\)/,
+  "relic cinematic must live on the complete battlePage surface"
 );
 assert.match(
   relic,
@@ -39,18 +39,19 @@ const dimZ=Number((relicCss.match(/team-relic-battle-dim\{[^}]*z-index:(\d+)/)||
 const targetZ=Number((relicCss.match(/team-relic-battle-target-layer\{z-index:(\d+)!important/ )||[])[1]);
 const cutinZ=Number((relicCss.match(/team-relic-battle-cutin\{[^}]*z-index:(\d+)/)||[])[1]);
 const vfxZ=Number((vfxCss.match(/\.v143-skill-stage\{[^}]*z-index:(\d+)/)||[])[1]);
+const activeRelicVfxZ=Number((relicCss.match(/team-relic-cinematic-active > \.v143-skill-stage\{z-index:(\d+)!important/ )||[])[1]);
 
-assert.equal(dimZ,6090,"relic dim layer contract changed unexpectedly");
-assert.equal(targetZ,6105,"target carrier must sit immediately above the relic dim layer");
-assert.equal(cutinZ,6120,"relic identity must remain above highlighted targets");
-assert.equal(vfxZ,16000,"formal V143 VFX owner layer changed unexpectedly");
-assert.ok(dimZ<targetZ,"resolved targets must paint above the dim layer");
-assert.ok(targetZ<cutinZ,"resolved targets must not cover the relic identity reveal");
-assert.ok(targetZ<vfxZ,"resolved targets must never rise above formal relic VFX");
+assert.equal(dimZ,18090,"relic dim layer contract changed unexpectedly");
+assert.equal(targetZ,18110,"target carrier must sit immediately above the relic dim layer");
+assert.equal(cutinZ,18120,"relic identity must remain above highlighted targets");
+assert.equal(vfxZ,16000,"formal V143 base layer changed unexpectedly");
+assert.equal(activeRelicVfxZ,18130,"formal V143 relic cast must rise above the cinematic identity");
+assert.ok(dimZ<targetZ&&targetZ<cutinZ&&cutinZ<activeRelicVfxZ,
+  "relic stack must be dim → targets → identity → active V143 VFX");
 
 assert.match(
   relicCss,
-  /\.v-fixed-enemy-slot\.team-relic-battle-target-layer,[\s\S]*?\.v-fixed-ally-slot\.team-relic-battle-target-layer,[\s\S]*?\.v-fixed-boss-footprint\.team-relic-battle-target-layer\{z-index:6105!important;\}/,
+  /\.v-fixed-enemy-slot\.team-relic-battle-target-layer,[\s\S]*?\.v-fixed-ally-slot\.team-relic-battle-target-layer,[\s\S]*?\.v-fixed-boss-footprint\.team-relic-battle-target-layer\{z-index:18110!important;\}/,
   "all fixed-slot target carrier families must share the same safe elevation"
 );
 assert.match(
