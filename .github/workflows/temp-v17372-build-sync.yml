@@ -10,7 +10,6 @@ permissions:
 
 jobs:
   build-sync-artifact:
-    if: "!contains(github.event.head_commit.message, 'ci: add temporary build sync artifact')"
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
