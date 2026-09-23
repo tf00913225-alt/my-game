@@ -3349,6 +3349,24 @@ function getMonsterSkillPoolForLevel(
 }
 
 
+/* =====================================================
+   怪物預設閃躲唯一 Owner
+   必須在頂層建立 zone monster 之前完成初始化，避免早期 App Shell
+   建怪時讀到後置 const 的 TDZ。正式值：level×0.1%，最高10%。
+===================================================== */
+const DEFAULT_MONSTER_EVASION_PER_LEVEL = 0.1;
+const DEFAULT_MONSTER_EVASION_CAP = 10;
+
+function getDefaultMonsterEvasion(level){
+    return Math.min(
+        DEFAULT_MONSTER_EVASION_CAP,
+        Math.max(0,Number(level)||0)*DEFAULT_MONSTER_EVASION_PER_LEVEL
+    );
+}
+
+window.v173GetDefaultMonsterEvasion=getDefaultMonsterEvasion;
+
+
 function makeZoneMonster(
     name,
     level,
@@ -12688,17 +12706,6 @@ const HIT_CHANCE_BASE = 95;
 const HIT_CHANCE_ACCURACY_COEFFICIENT = 0.15;
 const HIT_CHANCE_MIN_PERCENT = 70;
 const HIT_CHANCE_MAX_PERCENT = 99;
-const DEFAULT_MONSTER_EVASION_PER_LEVEL = 0.1;
-const DEFAULT_MONSTER_EVASION_CAP = 10;
-
-function getDefaultMonsterEvasion(level){
-    return Math.min(
-        DEFAULT_MONSTER_EVASION_CAP,
-        Math.max(0,Number(level)||0)*DEFAULT_MONSTER_EVASION_PER_LEVEL
-    );
-}
-
-window.v173GetDefaultMonsterEvasion=getDefaultMonsterEvasion;
 
 
 /*
