@@ -4238,6 +4238,6 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 - 巡怪人物不再先顯示 legacy `patrol-character.png`；正式 WebP decode/load 完成後才顯示。巡怪 `#mapBattleInfo` 與正式 Battle Info Drawer 樣式 Owner 分離。
 - Battle UI：唯一金色 Target Reticle；怪物名稱透明；24px 狀態 Icon HUD 高於 HP/SP；選目標時倒數框與 Target Prompt 使用正式不重疊幾何；Battle Info 外殼透明、只保留小 Tab／展開正文黑底；Tab 拖曳改為 pointerdown 一次量測＋rAF/translate3d；操作面板改用透明素材投影。
 - 施工期間 Browser QA 抓到一個真啟動順序問題：`makeZoneMonster()` 在 App Shell 頂層建怪時早於後置的 default evasion const 初始化，會造成 TDZ 並中止 App Shell。正式 Default Monster Evasion Owner 已移到 zone roster 建立之前，並新增 boot-order regression。
-- Production build commit：`015ea24ba6d599309983eca07b78536d1ccbcb21`。Verified source candidate：`d3a0e3807c5cb78e8bb03b0521115219f2785fca`。
-- GitHub Actions Repository checks run `35864849759`：SUCCESS。包含 Syntax、Battle Runtime Architecture Guard、專項／既有 battle regressions、production build synchronization、Fixed Slot 9:16 mobile browser QA、exact-candidate real battle mobile browser QA、Adventure mobile QA、static resources、release gate 與 `git diff --check` 全部通過。
+- Production build commit：`7567aa216fba3f32e92792ea9dac317ff9f8d942`。Verified source candidate：`1596ea0a36e564facca92432376775d9728bc0fe`。
+- GitHub Actions Repository checks run `35866039901`：SUCCESS。包含 Syntax、Battle Runtime Architecture Guard、專項／既有 battle regressions、production build synchronization、Fixed Slot 9:16 mobile browser QA、exact-candidate real battle mobile browser QA、Adventure mobile QA、static resources、release gate 與 `git diff --check` 全部通過。
 - Requirement Batch：`release/requirement-batches/2026-09-23-battle-ui-hit-status-owner-convergence.json` 已升級為 VERIFIED。
