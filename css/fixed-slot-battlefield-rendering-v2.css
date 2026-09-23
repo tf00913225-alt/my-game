@@ -108,9 +108,13 @@
     z-index:90;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion > .turn-target-row.skill-picker-open,
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion > .turn-target-row.battle-item-open,
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion.target-selecting > .turn-target-row{
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion > .turn-target-row.battle-item-open{
     opacity:.25;
+}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion.target-selecting > .turn-target-row{
+    top:0;
+    bottom:auto;
+    opacity:1;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region{
     position:absolute !important;
@@ -133,17 +137,16 @@
     transition:transform .26s ease;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region:not(.is-expanded){
-    background:rgba(0,0,0,.92);
-    border-top:1px solid rgba(138,106,58,.55);
+    background:transparent;
+    border:0;
     box-shadow:none;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region.is-expanded{
     pointer-events:auto;
     transform:translateY(0);
-    border:1px solid rgba(138,106,58,.72);
-    border-bottom:0;
-    border-radius:8px 8px 0 0;
-    background:rgba(8,8,8,.96);
+    border:0;
+    border-radius:0;
+    background:transparent;
     box-shadow:none;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region > .battle-info-header-row{
@@ -199,7 +202,7 @@
     transition:opacity .16s ease;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region.is-expanded #battleTurnIndicator{
-    opacity:0;
+    opacity:1;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region > #battleInfo{
     min-height:0 !important;
@@ -210,6 +213,16 @@
     overflow-y:auto !important;
     box-sizing:border-box !important;
     pointer-events:auto;
+    background:transparent !important;
+    border:0 !important;
+    border-radius:0 !important;
+    box-shadow:none !important;
+}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region.is-expanded > #battleInfo{
+    background:rgba(0,0,0,.92) !important;
+    border:1px solid rgba(138,106,58,.68) !important;
+    border-bottom:0 !important;
+    border-radius:8px 8px 0 0 !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-ally-region{
     display:block;
@@ -405,6 +418,10 @@
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .battle-monster-name{
     bottom:0 !important;
+    background:none !important;
+    border:0 !important;
+    border-radius:0 !important;
+    box-shadow:none !important;
     height:var(--battle-name-row-height) !important;
     min-height:var(--battle-name-row-height) !important;
     max-height:var(--battle-name-row-height) !important;
@@ -457,12 +474,12 @@
     position:absolute !important;
     left:0 !important;
     right:0 !important;
-    bottom:37px !important;
+    bottom:40px !important;
     width:auto !important;
-    min-height:14px !important;
-    max-height:14px !important;
+    min-height:24px !important;
+    max-height:24px !important;
     overflow:visible !important;
-    z-index:9 !important;
+    z-index:32 !important;
 }
 
 /* Presentation-only state effects formerly co-located with V173.51 geometry. */
@@ -492,21 +509,19 @@
     box-shadow:none !important;
 }
 
-/* Target selection used to start one fast filter animation per selectable
-   unit. Ten enemies meant ten simultaneous compositor loops exactly when the
-   player pressed an action button. Keep the reticle visible but static. */
+/* Fixed Slot owns the only selectable-target reticle. Retire all historical
+   ::after reticles so allies, enemies, Bosses and reinforcements can never
+   display two crosshairs at once. */
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.targetable::after,
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.ally-targetable::after{
+    content:none !important;
+    display:none !important;
     animation:none !important;
-    filter:none !important;
-    opacity:.9 !important;
 }
 
-/* Formal target feedback is a compact reticle over the artwork, never a card
-   outline. The same owner covers normal enemies, Boss, reinforcements and
-   destructible Boss objects as soon as they enter the Unit pipeline. */
+/* Formal target feedback is one shared gold reticle over the artwork. */
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.ally-targetable::before,
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.target::before{
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.targetable::before{
     content:"" !important;
     position:absolute !important;
     z-index:30 !important;
