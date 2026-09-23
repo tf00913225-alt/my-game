@@ -86,8 +86,11 @@ test("support skill final arrays and runtime owners match the formal spec",()=>{
   assert.match(support,/spRestorePercentByLevel/);
   assert.match(support,/removeRemovableStatusEffects/);
   assert.match(support,/targetCountByLevel/);
-  assert.match(freezeOwner,/freezeChanceByLevel/);
-  assert.match(freezeOwner,/targetTypeAtMaxLevel/);
+  assert.match(progression,/freeze:\{[\s\S]*?targetType:"column",targetTypeAtMaxLevel:"tri"[\s\S]*?freezeChanceByLevel:FREEZE_CHANCE_BY_LEVEL\.slice\(\)[\s\S]*?freezeDurationByLevel:FREEZE_DURATION_BY_LEVEL\.slice\(\)/);
+  assert.match(main,/function getEffectiveSkillTargetType\(skill,level\)/);
+  assert.match(main,/function getSkillFreezeChanceAtLevel\(skill,level\)/);
+  assert.match(main,/function getSkillFreezeDurationAtLevel\(skill,level\)/);
+  assert.doesNotMatch(freezeOwner,/castTriFreeze|v158CastTriFreeze|previousCastDamageSkill|previousCastSecondaryCharacterSkill|previousCastPlayer2Skill/);
   assert.doesNotMatch(water,/withFinalFreezeTargets|wrapSecondaryFreeze/);
 });
 
