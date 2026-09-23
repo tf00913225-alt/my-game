@@ -61,9 +61,23 @@ jobs:
           node --check .github/scripts/run-fixed-slot-battlefield-browser-qa.mjs
           node --check .github/scripts/run-release-update-notification-browser-qa.mjs
           node --check .github/scripts/battle-layer-audio-live-qa.mjs
+          node --check .github/scripts/battle-runtime-architecture-guard.mjs
 
       - name: Check all project JavaScript syntax
         run: node .github/scripts/ci.mjs syntax
+
+      - name: Enforce Battle Runtime architecture guard
+        id: battle_architecture
+        run: node .github/scripts/battle-runtime-architecture-guard.mjs --write
+
+      - name: Upload Battle Runtime architecture evidence
+        if: always() && steps.battle_architecture.outcome != 'skipped'
+        uses: actions/upload-artifact@v4
+        with:
+          name: battle-runtime-architecture-${{ github.sha }}
+          path: artifacts/architecture/battle-runtime-architecture.json
+          if-no-files-found: error
+          retention-days: 90
 
       - name: Run Release Update Notification targeted regression
         run: node tests/release-update-notification-system.test.js
@@ -92,6 +106,7 @@ jobs:
           node tests/v142-skill-animation.test.js
           node tests/v150-ice-arrow-rain-vfx.test.js
           node tests/v173.23-wind-vfx.test.js
+          node tests/battle-runtime-hot-path-convergence-20260923.test.js
 
       - name: Run relic lifecycle and battle input regressions
         run: |
