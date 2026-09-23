@@ -30,10 +30,12 @@ test("persistent status icons are static while body states stay pulse/static",()
 test("status body art can reach card edges and remains larger than the old footprint",()=>{
   const js=read("js/39-v143-skill-animation.js");
   assert.match(js,/regularEnemy=side==="monster"&&!isBossIndexForVfx\(index\)/);
-  assert.match(js,/anchor\.rect\.width\*1\.20/);
-  assert.match(js,/anchor\.rect\.height\*1\.16/);
-  assert.match(js,/cardRect\.width\*1\.16/);
-  assert.match(js,/cardRect\.height\*1\.14/);
+  assert.match(js,/const widthScale=\(regularEnemy\?1\.45:1\.40\)\*\(shellStatus\?1\.08:1\)/);
+  assert.match(js,/const heightScale=\(regularEnemy\?1\.36:1\.34\)\*\(shellStatus\?1\.08:1\)/);
+  assert.match(js,/anchor\.rect\.width\*widthScale/);
+  assert.match(js,/cardRect\.width\*widthScale/);
+  assert.match(js,/anchor\.rect\.height\*heightScale/);
+  assert.match(js,/cardRect\.height\*heightScale/);
   assert.match(js,/node\.style\.backgroundSize="contain"/);
 });
 
@@ -46,7 +48,10 @@ test("body-art statuses do not duplicate a HUD icon but detail data keeps iconSr
 test("idle card inspection yields to existing target-selection interaction",()=>{
   const js=read("js/00-main.js");
   assert.match(js,/function isBattleStatusInspectionBlocked\(\)/);
-  assert.match(js,/actionReady\|\|pendingAction/);
+  assert.match(js,/if\(actionRegion&&actionRegion\.classList\.contains\("target-selecting"\)\)/);
+  const inspection=js.slice(js.indexOf("function isBattleStatusInspectionBlocked()"),js.indexOf("function battleStatusElementLabel"));
+  assert.doesNotMatch(inspection,/actionReady|pendingAction/);
+  assert.match(inspection,/#battlePage \.battle-monster\.targetable,#battlePage \.battle-player\.ally-targetable/);
   assert.match(js,/\.battle-monster\.targetable/);
   assert.match(js,/card\.classList\.contains\("targetable"\)[\s\S]*?selectBattleTarget\(index\)/);
   assert.match(js,/box\.classList\.contains\("ally-targetable"\)[\s\S]*?selectBattleAllyTarget\(index\)/);
