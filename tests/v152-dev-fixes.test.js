@@ -235,11 +235,9 @@ test("HP popups are reparented above the full-screen skill stage",()=>{
     assert.match(css,/z-index:2147483646/);
 });
 
-test("the final abnormal formula and Ice Arrow Rain Frostbite owner remain authoritative",()=>{
-    assert.match(v140,/GENERAL_STATUS_COEFFICIENT=0\.05/);
-    assert.match(v140,/GENERAL_STATUS_SPIRIT_COEFFICIENT=0\.05/);
-    assert.match(v140,/LOCKDOWN_STATUS_SPIRIT_COEFFICIENT=0\.3/);
-    assert.match(v140,/Math\.sqrt\(power\)\*LOCKDOWN_STATUS_COEFFICIENT/);
+test("legacy abnormal formula owner is retired while Ice Arrow Rain Frostbite remains authoritative",()=>{
+    assert.doesNotMatch(v140,/GENERAL_STATUS_COEFFICIENT|LOCKDOWN_STATUS_COEFFICIENT|Math\.sqrt\(power\)/);
+    assert.doesNotMatch(v140,/calculateStatusEffectChance\s*=\s*function|rollHitChance\s*=\s*function/);
     assert.match(v143,/rain\.frostbiteChance=50/);
     assert.match(v143,/delete rain\.freezeChance/);
     assert.doesNotMatch(v143,/applyIceRainFreezeToTargets/);
