@@ -171,7 +171,11 @@ function runViewport(chrome,width,height){
     close(data.turnUi.normal.rect.bottom,baseline.commandVisualTop,"turn timer bottom aligns with command art visual top",.8);
     assert.ok(data.turnUi.normal.rect.bottom<=baseline.commandVisualTop+.8,"turn timer must not overlap command art");
     assert.ok(data.turnUi.targetSelecting.rect.top>=baseline.center.top-.5,"target-selecting turn timer stays inside center region");
-    assert.ok(data.turnUi.targetSelecting.promptRect.top>=data.turnUi.targetSelecting.rect.bottom-.5,"target-selecting turn timer stays above the target prompt without overlap");
+    assert.ok(
+        data.turnUi.targetSelecting.promptRect.top>=data.turnUi.targetSelecting.rect.bottom-.5,
+        "target-selecting turn timer stays above the target prompt without overlap: "+
+        JSON.stringify({turn:data.turnUi.targetSelecting.rect,prompt:data.turnUi.targetSelecting.promptRect,center:baseline.center})
+    );
     assert.ok(data.turnUi.targetSelecting.promptRect.bottom<=baseline.center.bottom+.5,"target prompt stays inside center region");
     close(baseline.elementBox.width,66,"element box width");close(baseline.elementBox.height,66,"element box height");
     for(const count of [1,3,5,6,8,10]){const scenario=data.scenarios[count];assert.equal(scenario.slots,10);close(scenario.lower.enemy.height,baseline.enemy.height,`enemy region height count ${count}`);close(scenario.lower.center.height,baseline.center.height,`center region height count ${count}`);close(scenario.lower.ally.top,baseline.ally.top,`ally top count ${count}`);close(scenario.lower.middle.top,baseline.middle.top,`middle top count ${count}`);close(scenario.lower.action.top,baseline.action.top,`action top count ${count}`);scenario.unitRects.forEach(function(rect){close(rect.width,scenario.unitRects[0].width,`enemy card width count ${count}`);close(rect.height,scenario.unitRects[0].height,`enemy card height count ${count}`);assert.ok(rect.bottom<=scenario.lower.enemy.bottom+.5,`enemy card stays above center count ${count}`);});for(const shape of ["single","tri","row","column","all"]){close(scenario[shape].width,data.scenarios[1][shape].width,`${shape} width count ${count}`);close(scenario[shape].height,data.scenarios[1][shape].height,`${shape} height count ${count}`);close(scenario[shape].centerX,(scenario[shape].left+scenario[shape].right)/2,`${shape} centerX count ${count}`);close(scenario[shape].centerY,(scenario[shape].top+scenario[shape].bottom)/2,`${shape} centerY count ${count}`);}}
