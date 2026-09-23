@@ -140,15 +140,42 @@ test("Team Relic runtime is guaranteed by gameplay-core, not a Boss-only side ef
   );
 });
 
-test("10 runtime-ready relics retain one Trigger/Effect owner and 10 unopened relics are gated",()=>{
-  const ready=(relic.match(/runtimeReady:true/g)||[]).length;
-  const pending=(relic.match(/runtimeReady:false/g)||[]).length;
-  assert.equal(ready,10);
-  assert.equal(pending,10);
+test("10 runtime-ready relics retain real Trigger/Effect/Scalar data and 10 unopened relics stay metadata-only",()=>{
+  const readyIds=[
+    "relic_qiankun_flask","relic_sun_orb","relic_xuanwu_seal","relic_soul_bell","relic_tiangang_banner",
+    "relic_nine_dragon_fire","relic_cold_spring_jade","relic_qinglan_feather","relic_rock_mountain_seal","relic_returning_wheel"
+  ];
+  const pendingIds=[
+    "relic_origin_talisman","relic_broken_army_scroll","relic_red_sky_war_mark","relic_ice_mirror_heart","relic_wind_chasing_talisman",
+    "relic_mountain_river_cauldron","relic_burning_star_mark","relic_spirit_spring_bottle","relic_demon_suppressing_seal","relic_all_returning_array"
+  ];
+  const block=id=>{
+    const marker='id:"'+id+'"';
+    const start=relic.indexOf(marker);
+    assert.ok(start>=0,id+" missing");
+    const next=relic.indexOf('\n        {',start+marker.length);
+    return relic.slice(start,next>=0?next:relic.length);
+  };
+  readyIds.forEach(id=>{
+    const source=block(id);
+    assert.match(source,/runtimeReady:true/,id+" runtimeReady");
+    assert.match(source,/scalars:\{/,id+" scalars");
+    assert.match(source,/triggers:\[/,id+" triggers");
+    assert.match(source,/effect\(/,id+" effects");
+    assert.match(source,/limitText:/,id+" limit");
+    assert.match(source,/nextText:\{/,id+" nextText");
+  });
+  pendingIds.forEach(id=>{
+    const source=block(id);
+    assert.match(source,/runtimeReady:false/,id+" pending flag");
+    assert.doesNotMatch(source,/triggers:\[|effect\(|scalars:\{|nextText:\{/,id+" must remain metadata-only");
+  });
   assert.match(relic,/function dispatchRelicEvent\(event,payload\)/);
   assert.match(relic,/function resolveEffects\(triggerDef,def,payload\)/);
   assert.match(relic,/function equipRelic\(id\)[\s\S]*?def\.runtimeReady!==true/);
+  assert.match(relic,/function upgradeRelic\(id\)[\s\S]*?!def\.runtimeReady/);
   assert.match(relic,/function normalizeLoadout\(raw\)[\s\S]*?def&&def\.runtimeReady===true\?id:null/);
+  assert.match(relicProgression,/function upgradeRelic\(relicId\)[\s\S]*?def\.runtimeReady!==true/);
   assert.match(relicProgression,/def\.runtimeReady!==true[\s\S]*?目前不可合成、裝備或強化/);
   assert.match(relic,/效果尚未覺醒/);
   assert.match(relic,/能力尚未開放/);
