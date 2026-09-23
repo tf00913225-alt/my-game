@@ -29,7 +29,6 @@
 
     let reconciling=false;
     let reconcileQueued=false;
-    const pendingPopupAnchors=[];
 
     /* Cardless presentation is source CSS only. Remove the retired runtime
        stylesheet if an old session created it; never inject a replacement. */
@@ -306,19 +305,6 @@
         return null;
     }
 
-    function rememberPending(slot,kind){
-        if(!slot){ return; }
-        pendingPopupAnchors.push({slot:slot,kind:kind,expiresAt:Date.now()+2400});
-        while(pendingPopupAnchors.length>24){ pendingPopupAnchors.shift(); }
-    }
-
-    function consumePending(popup){
-        const now=Date.now();
-        while(pendingPopupAnchors.length&&pendingPopupAnchors[0].expiresAt<now){ pendingPopupAnchors.shift(); }
-        const pending=pendingPopupAnchors.shift();
-        return pending?applyPopupAnchor(popup,pending.slot,pending.kind):false;
-    }
-
     function wrapDamagePopup(){
         if(typeof window.showDamagePopup!=="function"||window.showDamagePopup.__fixedSlotPopupOwner){ return; }
         const previous=window.showDamagePopup;
@@ -326,12 +312,11 @@
             const args=Array.prototype.slice.call(arguments);
             const slot=slotForElement(element);
             const before=new Set(document.querySelectorAll(".damage-popup"));
-            rememberPending(slot,"damage");
             const result=previous.apply(this,args);
             const popup=newestPopup(before,".damage-popup",element);
             if(popup){
                 const kind=popupKind(popup,args);
-                if(applyPopupAnchor(popup,slot,kind)){ pendingPopupAnchors.pop(); }
+                applyPopupAnchor(popup,slot,kind);
             }
             return result;
         };
@@ -347,8 +332,12 @@
         const wrapped=function(isPlayerTarget,index){
             const side=isPlayerTarget?"player":"monster";
             const slot=slots.getSlotForCombatant(side,Number(index)||0,{enemySnapshot:slots.getActiveEnemySnapshot()});
-            rememberPending(slot,"miss");
-            return previous.apply(this,arguments);
+            const target=document.getElementById((isPlayerTarget?"battlePlayerCard":"battleMonster")+(Number(index)||0));
+            const before=new Set(document.querySelectorAll(".damage-popup.miss-popup"));
+            const result=previous.apply(this,arguments);
+            const popup=newestPopup(before,".damage-popup.miss-popup",target);
+            if(popup){ applyPopupAnchor(popup,slot,"miss"); }
+            return result;
         };
         wrapped.__fixedSlotPopupOwner=true;
         wrapped.__previous=previous;
