@@ -944,7 +944,7 @@ test("Flood Beast stays single-target while Ice Arrow Rain resolves every living
     `,runtime.context);
     assert.deepEqual(evaluateJson(runtime.context,"getSkillTargets(4,skillDatabase.floodBeast.targetType)"),[4]);
     assert.deepEqual(evaluateJson(runtime.context,"getSkillTargets(4,skillDatabase.iceArrowRain.targetType)"),[0,1,2,3,4,5,6,7,8,9]);
-    assert.match(mainSource,/getSkillTargets\(\s*centerIndex,\s*skill\.targetType\s*\)[\s\S]*?targets\.forEach\(index=>/);
+    assert.match(mainSource,/const effectiveTargetType=getEffectiveSkillTargetType\(skill,level\);[\s\S]*?getSkillTargets\(\s*centerIndex,\s*effectiveTargetType\s*\)[\s\S]*?targets\.forEach\(index=>/);
 
     const flood=executeFullWaterCast("floodBeast");
     assert.deepEqual(flood.after.map((hp,index)=>hp<flood.before[index]),[
