@@ -232,7 +232,22 @@ try{
     const accountState=await prepareAccountFirstRuntime(client,["abyss","boss-tower"]);
     evidence.checks.accountState=accountState;
     await waitFor(client,"window.__v174TwoTierAbyssInstalled===true&&typeof window.v174AbyssBuildRoster==='function'","two-tier Abyss runtime");
-    await waitFor(client,"typeof window.v132LaunchDungeonBattle==='function'&&window.v141Audio&&typeof window.v141Audio.playSkill==='function'","battle/audio runtime");
+    try{
+        await waitFor(client,"typeof window.v132LaunchDungeonBattle==='function'&&window.v141Audio&&typeof window.v141Audio.playSkill==='function'","battle/audio runtime");
+    }catch(error){
+        const diagnostics=await client.eval(`(()=>({
+            gameplayCoreReady:window.FourSymbolsFeatures?.isReady?.("gameplay-core")??null,
+            battleFeatureReady:window.FourSymbolsFeatures?.isReady?.("battle")??null,
+            v132Type:typeof window.v132LaunchDungeonBattle,
+            v141AudioType:typeof window.v141Audio,
+            v141PlaySkillType:typeof window.v141Audio?.playSkill,
+            scripts:[...document.querySelectorAll("script[data-feature-bundle]")].map(script=>({
+                bundle:script.dataset.featureBundle||null,
+                src:script.src
+            }))
+        }))()`);
+        throw new Error(error.message+" diagnostics="+JSON.stringify(diagnostics)+" CDP="+JSON.stringify(client.events.slice(-25)));
+    }
 
     await client.eval(`(()=>{
         if(typeof showPage==='function'){showPage('home');}
