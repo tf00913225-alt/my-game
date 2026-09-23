@@ -8972,6 +8972,9 @@ body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scro
     bottom:auto;
     opacity:1;
 }
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion.target-selecting > .battle-target-prompt{
+    transform:none !important;
+}
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region{
     position:absolute !important;
     left:0 !important;
