@@ -40,14 +40,20 @@ jobs:
           walk("tests");
           files.sort();
           let passed=0;
+          const failures=[];
           for(const file of files){
             if(skip.has(file)) continue;
             const result=spawnSync(process.execPath,[file],{stdio:"inherit"});
             if(result.status!==0){
               console.error("FAILED:",file);
-              process.exit(result.status||1);
+              failures.push(file);
+              continue;
             }
             passed++;
           }
           console.log("PASS:",passed,"Node suites; skipped confirmed Base failure:",[...skip].join(", "));
+          if(failures.length){
+            console.error("FAILURE SUITES:",failures.join(", "));
+            process.exit(1);
+          }
           NODE
