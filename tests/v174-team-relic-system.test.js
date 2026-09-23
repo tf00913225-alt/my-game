@@ -306,13 +306,13 @@ cancelled.context.loseBattle();
 assert.equal(cancelled.getPresentationLockCount(),0,"presentation cancellation releases the core HUD/input lock without reverting gameplay");
 
 const devPreview=createRuntime({dev:true,livePresentation:true});
-assert.equal(devPreview.context.v174EquipRelic("relic_origin_talisman"),true,"DEV test ownership still uses the same formal equip path");
+assert.equal(devPreview.context.v174EquipRelic("relic_origin_talisman"),false,"runtimeReady:false relics cannot enter the formal loadout even in DEV");
 const devSaved=JSON.parse(devPreview.store.get(devPreview.accountSaveKey));
-assert.equal(devSaved.teamLoadout.relicId,"relic_origin_talisman","DEV equip writes the canonical teamLoadout.relicId instead of a preview-only mirror");
+assert.equal(devSaved.teamLoadout.relicId,null,"DEV must not persist an unfinished relic into canonical teamLoadout");
 devPreview.context.startBattle();
-assert.equal(devPreview.context.v174RelicPresentationState().pending,0,"presentation-only relics never auto-play on battle entry");
-assert.equal(devPreview.context.v174RelicDebugState().totalTriggers,0,"presentation-only relics never create formal trigger state");
-assert.equal(devPreview.context.v174RelicDevPreviewPresentation("relic_origin_talisman"),true,"manual DEV presentation remains available");
+assert.equal(devPreview.context.v174RelicPresentationState().pending,0,"unopened relic abilities never auto-play on battle entry");
+assert.equal(devPreview.context.v174RelicDebugState().totalTriggers,0,"unopened relic abilities never create formal trigger state");
+assert.equal(devPreview.context.v174RelicDevPreviewPresentation("relic_origin_talisman"),true,"manual internal DEV presentation remains available without equipping");
 assert.equal(devPreview.context.v174RelicPresentationState().pending,1,"manual DEV preview is the only presentation queue entry");
 devPreview.context.loseBattle();
 
