@@ -126,6 +126,6 @@ test("battle target selection avoids the dense compositor and unrelated global U
   assert.ok(start>=0&&end>start);
   assert.doesNotMatch(selectBlock,/updateUI\(\)/);
   assert.match(fixed,/\.battle-monster\.v174-cardless-unit\.targetable::after,[\s\S]*?content:none !important;[\s\S]*?display:none !important/);
-  assert.match(fixed,/\.battle-player\.v174-cardless-unit\.ally-targetable::before,[\s\S]*?\.battle-monster\.v174-cardless-unit\.targetable::before\{/);
+  assert.match(fixed,/\.battle-player\.v174-cardless-unit\.ally-targetable::before,[\s\S]*?\.battle-monster\.v174-cardless-unit\.targetable::before,[\s\S]*?\.battle-monster\.v174-cardless-unit\.target::before\{/);
   assert.match(fixed,/\.battle-player\.v174-cardless-unit\.active-turn::after\{[\s\S]*?animation:none !important/);
 });
