@@ -117,6 +117,12 @@ async function waitFor(client,expression,label,timeoutMs=30000){
         }catch(error){ last=error.message; }
         await sleep(180);
     }
+    if(label==="App Shell character/save owners"){
+        throw new Error(
+            `Timed out waiting for ${label}. Last result: ${String(last)}. `+
+            `Recent runtime events: ${JSON.stringify(client.events.slice(-12))}`
+        );
+    }
     throw new Error(`Timed out waiting for ${label}. Last result: ${String(last)}`);
 }
 
