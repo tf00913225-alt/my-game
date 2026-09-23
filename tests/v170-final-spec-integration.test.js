@@ -493,18 +493,28 @@ test("final normal hit and status-effect bounds override the historical floors",
     );
 });
 
-test("same-name states miss without refresh while differently named hard controls coexist",()=>{
+test("Freeze and Petrify are mutually exclusive without refreshing the active hard control",()=>{
     const runtime=loadFinalRuntime();
     const result=evaluateJson(runtime.context,`(function(){
         const target={name:"狀態目標",hp:100,maxHP:100,alive:true,statusEffects:[]};
         applyBurnEffect(target,2,3);
         applyBurnEffect(target,2,8);
         const burn=target.statusEffects.filter(effect=>effect.type==="burn");
-        applyFreezeEffect(target,5);
-        applyMonsterDebuff(target,"petrify",3,0);
-        const afterPetrify=target.statusEffects.map(effect=>effect.type);
-        applyFreezeEffect(target,5);
-        const afterFreeze=target.statusEffects.map(effect=>effect.type);
+
+        const freezeApplied=applyFreezeEffect(target,5);
+        const freezeBefore=target.statusEffects.find(effect=>effect.type==="freeze").turnsLeft;
+        const petrifyWhileFrozen=applyMonsterDebuff(target,"petrify",3,0);
+        const freezeAgain=applyFreezeEffect(target,2);
+        const freezeAfter=target.statusEffects.find(effect=>effect.type==="freeze").turnsLeft;
+        const whileFrozen=target.statusEffects.map(effect=>effect.type);
+
+        target.statusEffects=target.statusEffects.filter(effect=>effect.type!=="freeze");
+        const petrifyAfterRelease=applyMonsterDebuff(target,"petrify",3,0);
+        const petrifyBefore=target.statusEffects.find(effect=>effect.type==="petrify").turnsLeft;
+        const freezeWhilePetrified=applyFreezeEffect(target,4);
+        const petrifyAgain=applyMonsterDebuff(target,"petrify",1,0);
+        const petrifyAfter=target.statusEffects.find(effect=>effect.type==="petrify").turnsLeft;
+        const whilePetrified=target.statusEffects.map(effect=>effect.type);
 
         monsters.splice(0,monsters.length,{
             name:"極帝天尊",element:"light",level:100,hp:1000,maxHP:1000,sp:500,maxSP:1000,
@@ -514,12 +524,43 @@ test("same-name states miss without refresh while differently named hard control
         currentBattleMonsters.splice(0,currentBattleMonsters.length,0);
         Math.random=function(){ return 0; };
         const action=v141TryMonsterSpecialAction(0);
-        return {burn:burn,afterPetrify:afterPetrify,afterFreeze:afterFreeze,action:action,sp:monsters[0].sp};
+        return {
+            burn:burn,
+            freezeApplied:freezeApplied,freezeBefore:freezeBefore,
+            petrifyWhileFrozen:petrifyWhileFrozen,freezeAgain:freezeAgain,freezeAfter:freezeAfter,
+            whileFrozen:whileFrozen,
+            petrifyAfterRelease:petrifyAfterRelease,petrifyBefore:petrifyBefore,
+            freezeWhilePetrified:freezeWhilePetrified,petrifyAgain:petrifyAgain,petrifyAfter:petrifyAfter,
+            whilePetrified:whilePetrified,action:action,sp:monsters[0].sp
+        };
     })()`);
     assert.deepEqual(result,{
         burn:[{type:"burn",turnsLeft:2,percent:3,statusName:"燃燒"}],
-        afterPetrify:["burn","freeze","petrify"],afterFreeze:["burn","freeze","petrify"],
+        freezeApplied:true,freezeBefore:5,
+        petrifyWhileFrozen:false,freezeAgain:false,freezeAfter:5,
+        whileFrozen:["burn","freeze"],
+        petrifyAfterRelease:true,petrifyBefore:3,
+        freezeWhilePetrified:false,petrifyAgain:false,petrifyAfter:3,
+        whilePetrified:["burn","petrify"],
         action:true,sp:555
+    });
+});
+
+test("exclusive hard-control conflict is rejected before the status probability roll",()=>{
+    const runtime=loadFinalRuntime();
+    const result=evaluateJson(runtime.context,`(function(){
+        const target={name:"硬控目標",alive:true,hp:100,statusEffects:[
+            {type:"freeze",statusName:"冰封",turnsLeft:4}
+        ]};
+        let rolls=0;
+        rollStatusEffectHit=function(){ rolls++; return true; };
+        const blocked=v173RollNamedPersistentStatusEffect(
+            target,"petrify",[100,1,1,0,0,true,"regular"],"monster",0,"石化"
+        );
+        return {blocked:blocked,rolls:rolls,turns:target.statusEffects[0].turnsLeft};
+    })()`);
+    assert.deepEqual(result,{
+        blocked:{duplicate:true,hit:false},rolls:0,turns:4
     });
 });
 
