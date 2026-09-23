@@ -22,34 +22,15 @@
         return Math.max(min,Math.min(max,value));
     }
 
-    function hitChancePercent(casterAccuracy,targetEvasion,directChanceReductionPercent){
-        const directReduction=Math.max(0,numeric(directChanceReductionPercent));
-        const rawAccuracyChance=
-            95+
-            numeric(casterAccuracy)*0.3;
-        const accuracyChance=clamp(rawAccuracyChance,50,99);
-        const evasionRate=clamp(numeric(targetEvasion),0,85);
-        const evasionAdjustedChance=accuracyChance*(1-evasionRate/100);
-        return clamp(evasionAdjustedChance-directReduction,1,99);
-    }
-
-    window.v158GetHitChancePercent=hitChancePercent;
-
-    if(typeof rollHitChance==="function"){
-        rollHitChance=function(casterAccuracy,targetEvasion,directChanceReductionPercent){
-            return Math.random()*100<hitChancePercent(
-                casterAccuracy,
-                targetEvasion,
-                directChanceReductionPercent
-            );
-        };
-    }
+    /* Hit chance is owned by js/00-main.js. V158 must not override it. */
 
     function normalizeMonsterDefaultEvasion(monster){
         if(!monster){ return monster; }
         const level=Math.max(1,numeric(monster.level)||1);
         if(monster.evasion===undefined){
-            monster.evasion=Math.min(30,level*0.3);
+            monster.evasion=typeof window.v173GetDefaultMonsterEvasion==="function"
+                ?window.v173GetDefaultMonsterEvasion(level)
+                :Math.min(10,level*0.1);
         }
         return monster;
     }
@@ -224,15 +205,8 @@
     }
     window.v158PrepareBattleRender=v158PrepareBattleRender;
 
-    if(typeof getMonsterEvasion==="function"){
-        const previousGetMonsterEvasion=getMonsterEvasion;
-        getMonsterEvasion=function(monster){
-            return previousGetMonsterEvasion.call(
-                this,
-                normalizeMonsterDefaultEvasion(monster)
-            );
-        };
-    }
+    /* getMonsterEvasion() remains the single core owner; no late V158 wrapper. */
+
 
     function castTriFreeze(characterIndex,skillId,centerIndex,legacyPlayer2){
         const skill=typeof skillDatabase!=="undefined"?skillDatabase[skillId]:null;
