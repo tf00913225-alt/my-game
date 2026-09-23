@@ -5,11 +5,11 @@
   "baseSha": "9d32e8cb022ff824e83d5dc3022f2e0a24c8d58a",
   "workBranch": "fix/skill-relic-runtime-owner-convergence-20260923",
   "title": "四元素 Lv10 技能成長＋輔助技能＋岩石壁壘＋秘寶 Runtime／說明 Owner 收斂",
-  "status": "IMPLEMENTED",
+  "status": "VERIFIED",
   "requirements": [
     {
       "id": "SKILL-DAMAGE-01",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "31 個玩家直接傷害技能統一 Lv10；Lv5/Lv10 使用同一 getSkillDamageAtLevel() 突破公式，正式 Math.round 取整。",
       "evidence": [
         "js/00-main.js",
@@ -19,7 +19,7 @@
     },
     {
       "id": "SKILL-COST-02",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "所有可升級技能 Lv2～Max 每次固定 1 技能點；既有技能等級原值保留。",
       "evidence": [
         "js/60-v173.64-skill-progression-rebalance.js",
@@ -28,7 +28,7 @@
     },
     {
       "id": "SUPPORT-03",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "炎魂共鳴、焚血訣、水／風／土支援技能使用本次正式等級、SP、目標、持續與效果數值。",
       "evidence": [
         "js/60-v173.64-skill-progression-rebalance.js",
@@ -38,7 +38,7 @@
     },
     {
       "id": "ROCK-WALL-04",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "敵方岩石壁壘接回 allyTriTargets Targeting owner，最多3名；AI、Runtime、Log、VFX 使用同一 targets。",
       "evidence": [
         "js/46-v155-dev-fixes.js",
@@ -47,7 +47,7 @@
     },
     {
       "id": "SKILL-TEXT-05",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "玩家技能列表／詳細／等級明細由正式 Skill Data 與 getSkillDamageAtLevel 動態投影；淘汰 V144/V169 重複文字 Owner。",
       "evidence": [
         "js/60-v173.64-skill-progression-rebalance.js",
@@ -57,7 +57,7 @@
     },
     {
       "id": "SKILL-LOAD-06",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "正式技能 Final Data owner 隨 gameplay-core 載入，戰鬥不再依賴先開技能頁。",
       "evidence": [
         "scripts/build-production.mjs",
@@ -66,7 +66,7 @@
     },
     {
       "id": "RELIC-LOAD-07",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "Team Relic Trigger Engine 固定置於 gameplay-core 最末端，所有正式 Battle 入口在成立前已同步取得同一 Runtime；Boss/Tower/養成不塞 Critical Boot。",
       "evidence": [
         "scripts/build-production.mjs",
@@ -76,7 +76,7 @@
     },
     {
       "id": "RELIC-READY-08",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "前10件 runtimeReady 秘寶維持單一 Trigger/Effect Engine；後10件未實裝秘寶不可裝備／強化／觸發／顯示假下一級。",
       "evidence": [
         "js/60-team-relic-system.js",
@@ -86,7 +86,7 @@
     },
     {
       "id": "RELIC-TEXT-09",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "寒泉玉珮、岩岳鎮印、九龍神火罩、烈陽神珠玩家說明與正式 Trigger/Scalar 一致。",
       "evidence": [
         "js/60-team-relic-system.js",
@@ -95,7 +95,7 @@
     },
     {
       "id": "OWNER-10",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "不新增 vXXX 後置補丁、第二套技能資料庫、第二套秘寶 Trigger Engine、setTimeout／MutationObserver 戰鬥補救。",
       "evidence": [
         "SYSTEM_CONTRACTS.md",
@@ -105,10 +105,14 @@
     }
   ],
   "verification": {
-    "focusedTests": "PASS on earlier exact candidate; final fresh PR CI pending after Heal fallback / Purify primary-target hardening.",
-    "build": "PASS — final deterministic production build synchronized as 0a3405fdb53e125fd9d0024709239e5b45f0e37c; both one-time workflows removed from branch.",
-    "repositoryChecks": "PENDING — fresh PR CI on final synchronized candidate.",
-    "diffCheck": "PENDING — fresh PR CI on final synchronized candidate.",
-    "extraAudit": "One-time Full Node audit exposed two pre-existing Base UI stale tests and several historical V143/V144/V155/V169 snapshots that intentionally encode retired values. It also found the Purify primary-VFX anchor and Heal fallback robustness issues; both were fixed and added to the focused regression."
+    "focusedTests": "PASS — PR CI run 35837276372 on synchronized candidate completed skill-progression-rebalance, skill-relic-owner-convergence, Team Relic lifecycle/hardening/presentation and existing battle regressions.",
+    "build": "PASS — deterministic production build synchronized as 0a3405fdb53e125fd9d0024709239e5b45f0e37c; npm build:check passed on PR CI run 35837276372.",
+    "repositoryChecks": "PASS — GitHub Actions PR CI run 35837276372, Repository checks SUCCESS.",
+    "browserQA": "PASS — exact-candidate real battle mobile browser QA succeeded in PR CI run 35837276372.",
+    "diffCheck": "PASS — git diff --check / conflict-marker gate succeeded in PR CI run 35837276372.",
+    "verifiedRunId": 35837276372,
+    "verifiedSourceHeadSha": "e52a7f78eb02978bdfe4ab4423b6cb4ddf629515",
+    "buildCommitSha": "0a3405fdb53e125fd9d0024709239e5b45f0e37c",
+    "extraAudit": "One-time all-suite audit confirmed the task regressions, found and fixed Purify selected-primary VFX anchoring plus legacy Heal SP-helper fallback. It also exposed pre-existing/stale UI snapshots (for example battle-status-info-assets-20260922 and ui-critical-regressions-mobile-browser) and historical V143/V144/V155/V169 specs that encode retired values; those are not used to override the current formal contract."
   }
 }
