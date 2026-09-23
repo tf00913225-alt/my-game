@@ -935,46 +935,6 @@
         snapshotFor:entity=>snapshotTimedEntries(entity)
     });
 
-    if(typeof castDamageSkill==="function"){
-        const previousCastDamageSkill=castDamageSkill;
-        castDamageSkill=function(skillId){
-            return withFireActiveCast(0,skillId,()=>previousCastDamageSkill.apply(this,arguments));
-        };
-    }
-    if(typeof castSecondaryCharacterSkill==="function"){
-        const previousCastSecondaryCharacterSkill=castSecondaryCharacterSkill;
-        castSecondaryCharacterSkill=function(characterIndex,skillId){
-            if(skillId==="fireSoulResonance"||skillId==="bloodBurnArt"){
-                return castNewFireTactical(characterIndex,skillId);
-            }
-            return withScaledSupport(characterIndex,skillId,()=>
-                withFireActiveCast(characterIndex,skillId,()=>previousCastSecondaryCharacterSkill.apply(this,arguments))
-            );
-        };
-    }
-    if(typeof castPlayer2Skill==="function"){
-        const previousCastPlayer2Skill=castPlayer2Skill;
-        castPlayer2Skill=function(skillId){
-            if(skillId==="fireSoulResonance"||skillId==="bloodBurnArt"){
-                return castNewFireTactical(1,skillId);
-            }
-            return withScaledSupport(1,skillId,()=>
-                withFireActiveCast(1,skillId,()=>previousCastPlayer2Skill.apply(this,arguments))
-            );
-        };
-    }
-    if(typeof castBuffSkill==="function"){
-        const previousCastBuffSkill=castBuffSkill;
-        castBuffSkill=function(skillId){
-            const actorIndex=typeof activeBattleCharacterIndex!=="undefined"&&Number.isInteger(activeBattleCharacterIndex)
-                ?activeBattleCharacterIndex:0;
-            if(skillId==="fireSoulResonance"||skillId==="bloodBurnArt"){
-                return castNewFireTactical(actorIndex,skillId);
-            }
-            return withScaledSupport(actorIndex,skillId,()=>previousCastBuffSkill.apply(this,arguments));
-        };
-    }
-
     if(typeof document!=="undefined"&&!document.getElementById("v17364-skill-progression-style")){
         const style=document.createElement("style");
         style.id="v17364-skill-progression-style";
@@ -986,6 +946,16 @@
             ".v17364-progression-detail span{text-align:right;overflow-wrap:anywhere;}";
         document.head.appendChild(style);
     }
+
+    window.FourSymbolsSkillSpec=Object.freeze({
+        damageSkillIds:PLAYER_DAMAGE_SKILL_IDS.slice(),
+        upgradeCosts:SKILL_UPGRADE_COST_BY_TARGET_LEVEL,
+        castFireTactical:castNewFireTactical,
+        withPlayerDirectSkillCast:withPlayerDirectSkillCast,
+        getRequiredCharacterLevelForSkillLevel:getRequiredCharacterLevelForSkillLevel,
+        getUpgradeCostForTargetLevel:getUpgradeCostForTargetLevel,
+        applyFinalData:applyFinalProgressionData
+    });
 
     window.v17364SkillUpgradeCostByTargetLevel=SKILL_UPGRADE_COST_BY_TARGET_LEVEL;
     window.v17364GetRequiredCharacterLevelForSkillLevel=getRequiredCharacterLevelForSkillLevel;
