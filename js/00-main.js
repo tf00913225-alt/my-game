@@ -2600,13 +2600,19 @@ function hasDamageRoleProfile(skill){
 }
 
 function getSkillPowerAtLevel(skill,level){
-    const resolvedLevel=Math.max(1,Math.floor(Number(level)||1));
-    return Number(skill.powerMultiplier)+Number(skill.powerPerLevel)*(resolvedLevel-1);
+    return getSkillLevelCurveValue(
+        Number(skill&&skill.powerMultiplier)||0,
+        Number(skill&&skill.powerPerLevel)||0,
+        level
+    );
 }
 
 function getSkillFlatDamageAtLevel(skill,level){
-    const resolvedLevel=Math.max(1,Math.floor(Number(level)||1));
-    return Number(skill.flatDamage)+Number(skill.flatDamagePerLevel)*(resolvedLevel-1);
+    return getSkillLevelCurveValue(
+        Number(skill&&skill.flatDamage)||0,
+        Number(skill&&skill.flatDamagePerLevel)||0,
+        level
+    );
 }
 
 window.v173DamageRoleProfiles=DAMAGE_ROLE_PROFILES;
@@ -13711,11 +13717,14 @@ function rollHitChance(
 
 function getSkillRawAttack(skill,skillLevel,effectiveAttack){
     const attack=Math.max(0,Number(effectiveAttack)||0);
+    if(skill&&Number.isFinite(Number(skill.baseDamage))){
+        return attack+getSkillDamageAtLevel(skill,skillLevel);
+    }
     if(hasDamageRoleProfile(skill)){
         return attack*getSkillPowerAtLevel(skill,skillLevel)+
             getSkillFlatDamageAtLevel(skill,skillLevel);
     }
-    return attack+getSkillDamageAtLevel(skill,skillLevel);
+    return attack;
 }
 
 window.v173GetSkillRawAttack=getSkillRawAttack;
@@ -14305,23 +14314,33 @@ function getSkillLevel(characterId,skillId){
 }
 
 
-function getSkillDamageAtLevel(skill,level){
+function getSkillLevelCurveValue(baseValue,growthPerLevel,level){
+    const resolvedLevel=Math.max(1,Math.floor(Number(level)||1));
+    const growth=Number(growthPerLevel)||0;
+    let value=Number(baseValue)||0;
+    for(let currentLevel=2;currentLevel<=resolvedLevel;currentLevel++){
+        if(currentLevel===5||currentLevel===10){
+            value=Math.round(value*1.5);
+        }else{
+            value+=growth;
+        }
+    }
+    return value;
+}
 
-    if(
-        level<=0 ||
-        !skill.baseDamage
-    ){
+function getSkillDamageAtLevel(skill,level){
+    if(!skill||Number(level)<=0||!Number.isFinite(Number(skill.baseDamage))){
         return 0;
     }
-
-
-    return (
-        skill.baseDamage+
-        skill.damagePerLevel*
-        (level-1)
+    return getSkillLevelCurveValue(
+        Number(skill.baseDamage),
+        Number(skill.damagePerLevel)||0,
+        level
     );
-
 }
+
+window.v176GetSkillLevelCurveValue=getSkillLevelCurveValue;
+window.v176GetSkillDamageAtLevel=getSkillDamageAtLevel;
 
 
 /*
