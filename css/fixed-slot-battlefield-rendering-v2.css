@@ -202,7 +202,6 @@
     cursor:pointer;
     pointer-events:auto;
 }
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region #battleTurnIndicator{
     position:absolute;
     left:8px;
