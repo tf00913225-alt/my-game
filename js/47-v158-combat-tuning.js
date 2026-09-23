@@ -383,8 +383,8 @@
                 const note=document.querySelector("#inventoryCharacterDetailStats .inventory-character-detail-note");
                 if(note){
                     note.innerHTML=
-                        "命中先依95%＋命中×0.3計算（50%～99%），再乘上(1－目標最終閃躲率)。<br>"+
-                        "所有閃躲來源採乘算，最終閃躲率最高85%；一般異常每1精神降低0.05個百分點命中率，硬控維持原公式。";
+                        "最終命中率＝95%＋命中×0.15%＋最終命中加成－目標最終閃躲－最終命中下降，最後限制70%～99%。<br>"+
+                        "所有命中／閃躲／異常抗性技能百分比都以最終百分點加減；異常主屬性與目標精神每1點各換算0.05個百分點。";
                 }
             }
             return result;
