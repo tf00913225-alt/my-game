@@ -16,20 +16,6 @@
 (function applyV140FourElementBalance(){
     "use strict";
 
-    const GENERAL_STATUS_BOUNDS={min:5,max:95};
-    const LOCKDOWN_STATUS_BOUNDS={
-        regular:{min:5,max:80},
-        elite:{min:5,max:60},
-        boss:{min:5,max:40}
-    };
-    const LEVEL_FACTOR_PER_LEVEL=0.02;
-    const LEVEL_FACTOR_MIN=0.70;
-    const LEVEL_FACTOR_MAX=1.30;
-    const GENERAL_STATUS_COEFFICIENT=0.05;
-    const LOCKDOWN_STATUS_COEFFICIENT=0.2;
-    const GENERAL_STATUS_SPIRIT_COEFFICIENT=0.05;
-    const LOCKDOWN_STATUS_SPIRIT_COEFFICIENT=0.3;
-
     const LIFESTEAL_BY_SKILL={
         waterKnife:[4,5,6,7,8],
         frostPunch:[4,5,6,7,8],
@@ -39,8 +25,6 @@
         floodBeast:[4,5,6,7,8],
         iceArrowRain:[1,2,3,4,5]
     };
-
-    let statusSkillContext=null;
 
     function numeric(value){
         const result=Number(value);
@@ -167,129 +151,10 @@
     );
 
     /*
-       純計算入口同時供正式判定與回歸測試使用。
-       等級差、精神、額外抗性及既有上下限完整保留；
-       一般異常的物理攻擊／智力與目標精神統一使用0.05；
-       硬控仍維持開根號屬性加成與原本精神係數。
+       命中／異常機率公式已收斂回 js/00-main.js 唯一 Owner。
+       V140 只保留四元素資料與歷史相容行為，不再覆寫
+       calculateStatusEffectChance() 或 rollHitChance()。
     */
-    function calculateV140StatusChance(
-        baseChancePercent,
-        casterLevel,
-        targetLevel,
-        offensivePower,
-        targetSpirit,
-        isLockdown,
-        targetRank,
-        targetBonusResistancePercent,
-        skillCategory
-    ){
-        const levelFactor=clamp(
-            1+(numeric(casterLevel)-numeric(targetLevel))*LEVEL_FACTOR_PER_LEVEL,
-            LEVEL_FACTOR_MIN,
-            LEVEL_FACTOR_MAX
-        );
-
-        const power=Math.max(0,numeric(offensivePower));
-        const attributeBonus=isLockdown
-            ? Math.sqrt(power)*LOCKDOWN_STATUS_COEFFICIENT
-            : power*GENERAL_STATUS_COEFFICIENT;
-        const spiritCoefficient=isLockdown
-            ? LOCKDOWN_STATUS_SPIRIT_COEFFICIENT
-            : GENERAL_STATUS_SPIRIT_COEFFICIENT;
-
-        const rawChance=
-            numeric(baseChancePercent)*levelFactor+
-            attributeBonus-
-            Math.max(0,numeric(targetSpirit))*spiritCoefficient-
-            numeric(targetBonusResistancePercent);
-
-        const bounds=isLockdown
-            ? (LOCKDOWN_STATUS_BOUNDS[targetRank]||LOCKDOWN_STATUS_BOUNDS.regular)
-            : GENERAL_STATUS_BOUNDS;
-
-        return clamp(rawChance,bounds.min,bounds.max);
-    }
-
-    window.v140CalculateStatusEffectChance=calculateV140StatusChance;
-
-    const previousCalculateStatusEffectChance=calculateStatusEffectChance;
-    calculateStatusEffectChance=function(
-        baseChancePercent,
-        casterLevel,
-        targetLevel,
-        casterIntelligence,
-        targetSpirit,
-        isLockdown,
-        targetRank,
-        targetBonusResistancePercent
-    ){
-        const context=statusSkillContext;
-        const category=context&&context.skill
-            ? context.skill.category
-            : "magic";
-        const offensivePower=context&&context.skill
-            ? (category==="physical"
-                ? context.physicalAttack
-                : context.intelligence)
-            : casterIntelligence;
-
-        return calculateV140StatusChance(
-            baseChancePercent,
-            casterLevel,
-            targetLevel,
-            offensivePower,
-            targetSpirit,
-            isLockdown,
-            targetRank,
-            targetBonusResistancePercent,
-            category
-        );
-    };
-
-    /*
-       命中先依既有命中值算出基礎命中率，再套用正式閃躲率。
-       暈眩等「最終命中率降低」效果最後才直接扣除百分點；
-       閃躲來源本身已在角色能力端用乘算合併，最終上限85%。
-    */
-    function getV140HitChancePercent(
-        casterAccuracy,
-        targetEvasion,
-        directChanceReductionPercent
-    ){
-        const rawAccuracyChance=
-            95+
-            casterAccuracy*0.3;
-
-        const accuracyChance=clamp(
-            rawAccuracyChance,
-            50,
-            99
-        );
-        const evasionRate=clamp(targetEvasion,0,85);
-        const evasionAdjustedChance=
-            accuracyChance*(1-evasionRate/100);
-
-        return clamp(
-            evasionAdjustedChance-
-            Math.max(0,numeric(directChanceReductionPercent)),
-            1,
-            99
-        );
-    }
-
-    window.v140GetHitChancePercent=getV140HitChancePercent;
-
-    rollHitChance=function(
-        casterAccuracy,
-        targetEvasion,
-        directChanceReductionPercent
-    ){
-        return Math.random()*100<getV140HitChancePercent(
-            casterAccuracy,
-            targetEvasion,
-            directChanceReductionPercent
-        );
-    };
 
     /*
        怒火改為兩組獨立數值。舊函式一次只讀 bonusPercent，
@@ -691,14 +556,12 @@
             return execute();
         }
 
-        const previousContext=statusSkillContext;
         const context={
             skill:skill,
             physicalAttack:numeric(stats.attack),
             intelligence:numeric(stats.intelligence),
             spAfterCost:null
         };
-        statusSkillContext=context;
 
         const isLifesteal=Array.isArray(skill.lifestealPercentByLevel);
         const previousLog=typeof addBattleLog==="function"?addBattleLog:null;
@@ -731,8 +594,6 @@
             if(isLifesteal&&previousLog){
                 addBattleLog=previousLog;
             }
-            statusSkillContext=previousContext;
-
             if(
                 isLifesteal&&
                 context.spAfterCost!==null&&
@@ -837,7 +698,6 @@
             return previousProcessSingleMonsterAttack.apply(this,arguments);
         }
 
-        const previousContext=statusSkillContext;
         const previousBarrierContext=directBarrierCastContext;
         directBarrierCastContext={blockedCharacters:new Set()};
         const context={
@@ -846,7 +706,6 @@
             intelligence:getMonsterIntelligence(monster),
             spAfterCost:null
         };
-        statusSkillContext=context;
 
         const previousBadge=typeof showMonsterSkillNameBadge==="function"
             ? showMonsterSkillNameBadge
@@ -888,7 +747,6 @@
             if(previousBadge){ showMonsterSkillNameBadge=previousBadge; }
             if(previousLog){ addBattleLog=previousLog; }
             hasActiveBuff=previousHasActiveBuff;
-            statusSkillContext=previousContext;
             directBarrierCastContext=previousBarrierContext;
 
             if(
