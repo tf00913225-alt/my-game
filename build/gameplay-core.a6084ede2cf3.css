@@ -8871,6 +8871,8 @@ body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scro
     --battle-ally-region-track:42fr;
     --battle-info-panel-height:150px;
     --battle-info-handle-height:34px;
+    --battle-target-prompt-height:60px;
+    --battle-target-select-gap:6px;
     --battle-region-gap:4px;
     --battle-title-height:20px;
     --battle-enemy-zone-height:100%;
@@ -8968,11 +8970,21 @@ body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scro
     opacity:.25;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion.target-selecting > .turn-target-row{
-    top:0;
-    bottom:auto;
+    top:auto;
+    bottom:calc(var(--battle-target-prompt-height) + var(--battle-target-select-gap));
     opacity:1;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion.target-selecting > .battle-target-prompt{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:0;
+    width:max-content;
+    height:var(--battle-target-prompt-height);
+    min-height:var(--battle-target-prompt-height);
+    margin:0 auto;
+    padding:4px 11px 4px 15px;
+    box-sizing:border-box;
     transform:none !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region{
