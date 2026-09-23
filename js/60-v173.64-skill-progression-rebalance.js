@@ -653,6 +653,22 @@
         sorted.forEach(row=>list.appendChild(row));
     }
 
+    if(typeof getSkillEffectPreviewText==="function"){
+        getSkillEffectPreviewText=function(skill,level){
+            return effectText(skill,level);
+        };
+    }
+    if(typeof buildSkillLevelBreakdownHTML==="function"){
+        buildSkillLevelBreakdownHTML=function(skill){
+            return levelBreakdownHtml(skill);
+        };
+    }
+    if(typeof window.getSkillPreviewSummary==="function"){
+        window.getSkillPreviewSummary=function(skill){
+            return descriptionFor(skill);
+        };
+    }
+
     if(typeof renderSkillLoadout==="function"){
         const previousRenderSkillLoadout=renderSkillLoadout;
         renderSkillLoadout=function(){
