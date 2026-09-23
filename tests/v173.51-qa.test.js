@@ -59,7 +59,7 @@ assert.match(build,/"js\/53-v173\.50-inventory-qol\.js"[\s\S]*?"js\/54-v173\.51-
 assert.doesNotMatch(build,/"js\/56-v173\.51-shop-qa\.js"/);
 assert.doesNotMatch(qol,/createElement\(["']script["']\)|\.onload\s*=/);
 assert.doesNotMatch(equipment,/createElement\(["']script["']\)|__v17351QaReady/);
-assert.ok(loader.includes('const V_ASSET_VERSION="173.71";'));
+assert.ok(loader.includes('const V_ASSET_VERSION="173.72";'));
 assert.doesNotMatch(ui,/equipment-progression\.js\?v=|createElement\(["']script["']\)/);
-assert.ok(index.includes('<title>四象江湖傳 V173.71</title>'));
+assert.ok(index.includes('<title>四象江湖傳 V173.72</title>'));
 console.log("✓ V173.51 QA fixes");
