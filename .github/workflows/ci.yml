@@ -203,8 +203,10 @@ jobs:
             return response.status===204?{}:response.json();
           }
           (async()=>{
-            const refPath="/git/ref/heads/"+branch.split("/").map(encodeURIComponent).join("/");
-            const ref=await call("GET",refPath);
+            const encodedBranch=branch.split("/").map(encodeURIComponent).join("/");
+            const readRefPath="/git/ref/heads/"+encodedBranch;
+            const writeRefPath="/git/refs/heads/"+encodedBranch;
+            const ref=await call("GET",readRefPath);
             if(ref.object.sha!==expected){
               throw new Error("PR branch moved during build sync: expected "+expected+", actual "+ref.object.sha);
             }
@@ -233,7 +235,7 @@ jobs:
               tree:tree.sha,
               parents:[expected]
             });
-            await call("PATCH",refPath,{sha:commit.sha,force:false});
+            await call("PATCH",writeRefPath,{sha:commit.sha,force:false});
             console.log("Synced "+entries.length+" generated paths at "+commit.sha);
           })().catch(error=>{ console.error(error); process.exit(1); });
           NODE
