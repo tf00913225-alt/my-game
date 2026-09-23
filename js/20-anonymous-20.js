@@ -7,7 +7,7 @@ const V_ASSET_VERSION="173.71";
     window.__fourSymbolsFeatureIntentInstalled=true;
 
     const rules=[
-        {pattern:/showPage\(['"]map|openMap|patrol/i,feature:"patrol",label:"巡怪"},
+        {pattern:/showPage\(['"]map|enterZone|enterMap|openMap|patrol/i,feature:"patrol",label:"巡怪"},
         {pattern:/showPage\(['"]inventory|open.*inventory|backpack/i,feature:"inventory",label:"背包"},
         {pattern:/equipment|reforge/i,feature:"equipment",label:"裝備"},
         {pattern:/showPage\(['"]dungeon|dungeon/i,feature:"dungeon",label:"副本"},
