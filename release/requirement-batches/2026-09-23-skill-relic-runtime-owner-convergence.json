@@ -105,9 +105,10 @@
     }
   ],
   "verification": {
-    "focusedTests": "PASS — PR CI run 35828899167 completed syntax, Battle architecture, skill owner regressions, Team Relic lifecycle/hardening/presentation and existing battle regressions before build synchronization.",
-    "build": "SYNCED — deterministic production build committed as d852f922e667a27939632bcff6886ab6986042ae; fresh PR CI pending.",
-    "repositoryChecks": "PENDING — fresh PR CI on synchronized candidate.",
-    "diffCheck": "PENDING — fresh PR CI on synchronized candidate."
+    "focusedTests": "PASS on earlier exact candidate; final fresh PR CI pending after Heal fallback / Purify primary-target hardening.",
+    "build": "PASS — final deterministic production build synchronized as 0a3405fdb53e125fd9d0024709239e5b45f0e37c; both one-time workflows removed from branch.",
+    "repositoryChecks": "PENDING — fresh PR CI on final synchronized candidate.",
+    "diffCheck": "PENDING — fresh PR CI on final synchronized candidate.",
+    "extraAudit": "One-time Full Node audit exposed two pre-existing Base UI stale tests and several historical V143/V144/V155/V169 snapshots that intentionally encode retired values. It also found the Purify primary-VFX anchor and Heal fallback robustness issues; both were fixed and added to the focused regression."
   }
 }
