@@ -8051,8 +8051,8 @@
         }));
     };
 
-    /* 保留舊函式參照供除錯；正式流程已由上方覆蓋。 */
-    window.v140PreviousCalculateStatusEffectChance=previousCalculateStatusEffectChance;
+    /* Hit / Status formulas are owned by js/00-main.js.
+       V140 deliberately exports no previous/alternate formula reference. */
 })();
 
 
