@@ -9,12 +9,36 @@
     if(typeof window==="undefined"||window.__v17364SkillProgressionInstalled){ return; }
     window.__v17364SkillProgressionInstalled=true;
 
-    const SKILL_UPGRADE_COST_BY_TARGET_LEVEL=Object.freeze({2:1,3:2,4:3,5:4});
+    const SKILL_UPGRADE_COST_BY_TARGET_LEVEL=Object.freeze({
+        2:1,3:1,4:1,5:1,6:1,7:1,8:1,9:1,10:1
+    });
+    const PLAYER_DAMAGE_SKILL_IDS=Object.freeze([
+        "flameSlash","fireCritical","explosiveFlurry","dragonSlash",
+        "fireRocket","blazeSpell","flameTornado","phoenixCry",
+        "waterKnife","frostPunch","iceSpin","frostCrush",
+        "waterBall","floodBeast","iceArrowRain",
+        "stormFist","stormFlurry","windCrossSlash","dizzyFist",
+        "windSpell","stormCircle","windHowlLightning","stormRain",
+        "stoneSlash","petrifyFist","stoneBreakSky","earthquakeCrush",
+        "stoneThrow","sandWind","flyingSandStrike","dustStorm"
+    ]);
     const FIRE_MOMENTUM_BY_LEVEL=Object.freeze([12,15,18,21,25]);
-    const BLOOD_BURN_BY_LEVEL=Object.freeze([5,10,15,20,25]);
+    const BLOOD_BURN_HP_COST_BY_LEVEL=Object.freeze([5,10,15,20,25]);
+    const BLOOD_BURN_BY_LEVEL=Object.freeze([5,10,15,20,35]);
+    const HEAL_HP_BY_LEVEL=Object.freeze([550,580,610,640,670]);
+    const HEAL_SP_PERCENT_BY_LEVEL=Object.freeze([0,0,5,10,15]);
+    const FREEZE_CHANCE_BY_LEVEL=Object.freeze([55,65,75,85,95]);
+    const FREEZE_DURATION_BY_LEVEL=Object.freeze([3,3,3,4,5]);
+    const PURIFY_TARGET_COUNT_BY_LEVEL=Object.freeze([1,1,3]);
     const DODGE_BY_LEVEL=Object.freeze([30,40,50,60,70]);
+    const STEALTH_DURATION_BY_LEVEL=Object.freeze([2,3,4]);
+    const CALM_RESIST_BY_LEVEL=Object.freeze([25,35,45,55,65]);
+    const CALM_ACCURACY_BY_LEVEL=Object.freeze([10,20,30,40,50]);
     const ROCK_WALL_BY_LEVEL=Object.freeze([15,20,25,30,35]);
     const EARTH_SHIELD_BY_LEVEL=Object.freeze([20,30,35,40,50]);
+    const EARTH_SHIELD_DURATION_BY_LEVEL=Object.freeze([3,3,3,4,5]);
+    const BARRIER_BLOCKS_BY_LEVEL=Object.freeze([3,3,3,4,5]);
+    const BARRIER_DURATION_BY_LEVEL=Object.freeze([3,3,3,4,5]);
     const GROUP_ORDER=Object.freeze({physical:0,magic:1,tactical:2,ex:3});
 
     function numeric(value,fallback){
@@ -57,17 +81,16 @@
         rage:{learnLevel:18,learnCost:10,maxLevel:5,progressionGroup:"tactical"},
         fireSoulResonance:{
             id:"fireSoulResonance",name:"炎魂共鳴",element:"fire",category:"buff",targetType:"self",
-            learnLevel:25,learnCost:14,maxLevel:5,spCost:35,duration:3,requires:["rage"],progressionGroup:"tactical",
-            momentumBonusByLevel:FIRE_MOMENTUM_BY_LEVEL.slice(),icon:"炎",
-            iconAssetPath:null,vfxAssetPath:null,
-            description:"需先學習怒火。自身進入炎魂共鳴3回合。期間火元素技能發生爆擊，或成功新增燃燒時，若尚未持有炎勢則獲得炎勢；炎勢使下一次玩家主動施放的火元素直接傷害主施放提高12%/15%/18%/21%/25%，使用後消失。炎勢不強化燃燒持續傷害與免費追擊。"
+            learnLevel:25,learnCost:14,maxLevel:5,spCost:45,duration:3,requires:["rage"],progressionGroup:"tactical",
+            momentumBonusByLevel:FIRE_MOMENTUM_BY_LEVEL.slice(),maxExtensionRounds:3,maxExtensionsPerRound:1,icon:"炎",
+            iconAssetPath:null,vfxAssetPath:null
         },
         bloodBurnArt:{
             id:"bloodBurnArt",name:"焚血訣",element:"fire",category:"buff",targetType:"self",
-            learnLevel:35,learnCost:18,maxLevel:5,spCost:20,duration:3,requires:["fireSoulResonance"],progressionGroup:"tactical",
-            directDamageBonusByLevel:BLOOD_BURN_BY_LEVEL.slice(),icon:"血",
-            iconAssetPath:null,vfxAssetPath:null,
-            description:"消耗最大生命5%/10%/15%/20%/25%。接下來3個有效回合，火系攻擊傷害提高5%/10%/15%/20%/25%。不強化燃燒持續傷害與免費追擊。"
+            learnLevel:35,learnCost:18,maxLevel:5,spCost:35,duration:3,requires:["fireSoulResonance"],progressionGroup:"tactical",
+            hpCostPercentByLevel:BLOOD_BURN_HP_COST_BY_LEVEL.slice(),
+            directDamageBonusByLevel:BLOOD_BURN_BY_LEVEL.slice(),fireActionCharges:3,icon:"血",
+            iconAssetPath:null,vfxAssetPath:null
         },
         fireEX:{learnLevel:50,learnCost:20,maxLevel:1,progressionGroup:"ex"},
 
@@ -78,10 +101,22 @@
         waterBall:{learnLevel:1,learnCost:2,progressionGroup:"magic"},
         floodBeast:{learnLevel:7,learnCost:6,progressionGroup:"magic"},
         iceArrowRain:{learnLevel:14,learnCost:10,progressionGroup:"magic"},
-        healSpell:{learnLevel:15,learnCost:8,maxLevel:5,requires:["frostPunch","floodBeast"],progressionGroup:"tactical"},
-        revive:{learnLevel:20,learnCost:10,maxLevel:5,requires:["healSpell"],progressionGroup:"tactical"},
-        freeze:{learnLevel:25,learnCost:14,maxLevel:1,requires:["iceSpin","iceArrowRain"],progressionGroup:"tactical"},
-        purifyMind:{learnLevel:35,learnCost:18,maxLevel:1,requires:["healSpell"],progressionGroup:"tactical"},
+        healSpell:{
+            learnLevel:15,learnCost:8,maxLevel:5,upgradeCost:1,requires:["frostPunch","floodBeast"],progressionGroup:"tactical",
+            targetType:"allyTri",spCost:45,baseHeal:550,healPerLevel:30,
+            healHpByLevel:HEAL_HP_BY_LEVEL.slice(),spRestorePercentByLevel:HEAL_SP_PERCENT_BY_LEVEL.slice(),cleanseAll:true
+        },
+        revive:{learnLevel:20,learnCost:10,maxLevel:5,upgradeCost:1,requires:["healSpell"],progressionGroup:"tactical"},
+        freeze:{
+            learnLevel:25,learnCost:14,maxLevel:5,upgradeCost:1,requires:["iceSpin","iceArrowRain"],progressionGroup:"tactical",
+            targetType:"column",targetTypeAtMaxLevel:"tri",spCost:32,
+            freezeChanceByLevel:FREEZE_CHANCE_BY_LEVEL.slice(),freezeDurationByLevel:FREEZE_DURATION_BY_LEVEL.slice()
+        },
+        purifyMind:{
+            learnLevel:35,learnCost:18,maxLevel:3,upgradeCost:1,requires:["healSpell"],progressionGroup:"tactical",
+            targetType:"ally",enemyTargetAllowed:true,spCost:22,removeAllStates:true,
+            targetCountByLevel:PURIFY_TARGET_COUNT_BY_LEVEL.slice()
+        },
         waterEX:{learnLevel:50,learnCost:20,maxLevel:1,progressionGroup:"ex"},
 
         stormFist:{learnLevel:1,learnCost:2,progressionGroup:"physical"},
@@ -96,8 +131,16 @@
             learnLevel:18,learnCost:10,maxLevel:5,progressionGroup:"tactical",
             evasionBonusPercentByLevel:DODGE_BY_LEVEL.slice()
         },
-        stealthSkill:{learnLevel:25,learnCost:14,maxLevel:1,progressionGroup:"tactical"},
-        dinghaishenzhen:{learnLevel:35,learnCost:18,maxLevel:1,progressionGroup:"tactical"},
+        stealthSkill:{
+            learnLevel:25,learnCost:14,maxLevel:3,upgradeCost:1,progressionGroup:"tactical",
+            targetType:"ally",spCost:45,durationByLevel:STEALTH_DURATION_BY_LEVEL.slice()
+        },
+        dinghaishenzhen:{
+            learnLevel:35,learnCost:18,maxLevel:5,upgradeCost:1,progressionGroup:"tactical",
+            targetType:"allyAll",spCost:77,duration:3,
+            statusResistBonusByLevel:CALM_RESIST_BY_LEVEL.slice(),
+            accuracyBonusPercentByLevel:CALM_ACCURACY_BY_LEVEL.slice()
+        },
         windEX:{learnLevel:50,learnCost:20,maxLevel:1,progressionGroup:"ex"},
 
         stoneSlash:{learnLevel:1,learnCost:2,progressionGroup:"physical"},
@@ -109,14 +152,19 @@
         flyingSandStrike:{learnLevel:14,learnCost:10,progressionGroup:"magic"},
         dustStorm:{learnLevel:30,learnCost:16,progressionGroup:"magic"},
         rockWall:{
-            learnLevel:18,learnCost:10,maxLevel:5,requires:["petrifyFist","sandWind"],progressionGroup:"tactical",
-            defenseBonusPercentByLevel:ROCK_WALL_BY_LEVEL.slice()
+            learnLevel:18,learnCost:10,maxLevel:5,upgradeCost:1,requires:["petrifyFist","sandWind"],progressionGroup:"tactical",
+            targetType:"allyTri",spCost:45,duration:4,defenseBonusPercentByLevel:ROCK_WALL_BY_LEVEL.slice()
         },
         earthShield:{
-            learnLevel:25,learnCost:14,maxLevel:5,requires:["rockWall"],progressionGroup:"tactical",
-            reflectPercentByLevel:EARTH_SHIELD_BY_LEVEL.slice()
+            learnLevel:25,learnCost:14,maxLevel:5,upgradeCost:1,requires:["rockWall"],progressionGroup:"tactical",
+            targetType:"allyTri",spCost:66,reflectPercentByLevel:EARTH_SHIELD_BY_LEVEL.slice(),
+            durationByLevel:EARTH_SHIELD_DURATION_BY_LEVEL.slice()
         },
-        barrier:{learnLevel:35,learnCost:18,maxLevel:1,requires:["earthShield"],progressionGroup:"tactical"},
+        barrier:{
+            learnLevel:35,learnCost:18,maxLevel:5,upgradeCost:1,requires:["earthShield"],progressionGroup:"tactical",
+            targetType:"ally",spCost:40,barrierBlockCountByLevel:BARRIER_BLOCKS_BY_LEVEL.slice(),
+            durationByLevel:BARRIER_DURATION_BY_LEVEL.slice()
+        },
         earthEX:{learnLevel:50,learnCost:20,maxLevel:1,progressionGroup:"ex"}
     };
 
