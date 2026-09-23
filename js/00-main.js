@@ -16647,7 +16647,7 @@ function castDamageSkill(skillId){
             monster,
             index,
             player.level,
-            skill.category==="physical"?stats.attack:stats.intelligence
+            skill.category==="physical"?stats.attackPoints:stats.intelligence
         );
 
 
@@ -22206,7 +22206,7 @@ function castSecondaryCharacterSkill(characterIndex,skillId,centerIndex){
 
         applySkillDebuffEffects(
             skill,level,monster,index,character.level,
-            skill.category==="physical"?stats.attack:stats.intelligence
+            skill.category==="physical"?stats.attackPoints:stats.intelligence
         );
 
         if(skill.lifestealPercentByLevel){ totalLifesteal+=actualDamageDealt; }
@@ -22926,7 +22926,7 @@ function castPlayer2Skill(skillId,centerIndex){
             monster,
             index,
             player2.level,
-            skill.category==="physical"?stats2.attack:stats2.intelligence
+            skill.category==="physical"?stats2.attackPoints:stats2.intelligence
         );
 
 
