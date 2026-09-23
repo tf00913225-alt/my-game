@@ -13651,18 +13651,10 @@ function resolveQueuedPlayerAction(characterIndex,token){
 
 
 /*
-   ★ 修正（依照使用者要求，暈眩猛擊重新
-   設計）：新增第3個參數
-   directChanceReductionPercent，代表「最終命中率
-   下降幾個百分點」。先依命中值算出50%～99%的
-   基礎命中率，再套用目標最終閃躲率，最後才直接
-   扣除暈眩等效果。這樣技能寫「最終命中率降低15%」
-   時，實戰就會真的在最後結果扣15個百分點；最低
-   仍保留1%命中率，避免降到負數。
-   不傳這個參數（大部分呼叫的地方都不需要）
-   的話效果跟以前完全一樣，只有monster
-   出手攻擊玩家、且monster身上真的有stun
-   這個減益時才會傳進來。
+   命中判定的所有加減效果都在最後以百分點結算。
+   directChanceReductionPercent 是最終命中下降，
+   directChanceBonusPercent 是最終命中提升。
+   目標閃躲同樣直接扣除百分點，最後才統一 clamp 70%～99%。
 */
 
 function calculateHitChancePercent(
@@ -15104,7 +15096,7 @@ function applySkillDebuffEffects(
 
         const hit=rollNamedPersistentStatusEffect(
             monster,"petrify",[
-                chance,casterLevel,monster.level,casterIntelligence,
+                chance,casterLevel,monster.level,casterOffensiveAttribute,
                 getMonsterEffectiveSpiritPoints(monster),true,getMonsterRank(monster)
             ],"monster",index,skill.name
         ).hit;
@@ -15424,7 +15416,7 @@ function applySkillDebuffEffectsToPlayer(
 
         const hit=rollNamedPersistentStatusEffect(
             targetCharacter,"petrify",[
-                chance,casterLevel,targetCharacter.level,casterIntelligence,
+                chance,casterLevel,targetCharacter.level,casterOffensiveAttribute,
                 targetFinalSpirit,true,"player",getPlayerStatusResistBonus(targetCharacter)
             ],"player",targetIndex,skill.name
         ).hit;
