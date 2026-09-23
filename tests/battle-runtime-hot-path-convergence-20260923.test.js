@@ -100,7 +100,7 @@ function block(source,startToken,endToken){
     assert.match(guard,/updateMonsterUIWrappers:0/);
     assert.match(guard,/bodyObservers:0/);
     assert.match(guard,/retired QA\/repair polling pattern returned/);
-    assert.match(guard,/setIntervals:14/);
+    assert.match(guard,/setIntervals:15/);
     assert.match(guard,/globalClickListeners:5/);
 }
 
