@@ -542,8 +542,8 @@ test("wind casts remain Sprite Sheets while persistent states use noninteractive
 });
 
 test("the development cache release is V173.39",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.71"/);
-    assert.match(index,/<title>四象江湖傳 V173\.71<\/title>/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.72"/);
+    assert.match(index,/<title>四象江湖傳 V173\.72<\/title>/);
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
 
