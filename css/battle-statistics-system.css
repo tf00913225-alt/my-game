@@ -212,6 +212,6 @@
 .battle-statistics-result-panel .battle-stat-grid b{font-size:19px;}
 .battle-statistics-result-panel > footer{flex:0 0 auto;padding:10px 14px 14px;border-top:1px solid rgba(183,133,54,.48);}
 .battle-statistics-result-panel > footer button{
-    width:100%;min-height:50px;border:1px solid rgba(220,167,73,.82);border-radius:9px;
+    width:100%;min-height:52px;border:1px solid rgba(220,167,73,.82);border-radius:9px;
     background:linear-gradient(180deg,#4c3218,#21150b);color:#ffe2a0;font-size:18px;font-weight:900;
 }
