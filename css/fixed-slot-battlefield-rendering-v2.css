@@ -109,10 +109,37 @@
     pointer-events:none;
     z-index:18070 !important;
 }
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion > .turn-target-row.skill-picker-open,
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion > .turn-target-row.skill-picker-open{
+    bottom:calc(var(--battle-command-visual-height) + 44px);
+    opacity:1;
+}
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion > .turn-target-row.battle-item-open{
     opacity:1;
 }
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar.skill-quick-bar{
+    left:14px;
+    right:14px;
+    top:-24px;
+    bottom:10px;
+    z-index:18065 !important;
+    gap:3px;
+}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar .skill-quick-close{
+    flex-basis:28px;
+    height:28px;
+    line-height:26px;
+}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar .skill-quick-grid{gap:4px;}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar .skill-quick-button{
+    min-height:62px;
+    padding:4px 2px;
+}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar .skill-quick-button .sq-icon-wrap{
+    width:34px;
+    height:34px;
+    flex-basis:34px;
+}
+
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion.target-selecting > .turn-target-row{
     top:auto;
     bottom:calc(var(--battle-target-prompt-height) + var(--battle-target-select-gap));
