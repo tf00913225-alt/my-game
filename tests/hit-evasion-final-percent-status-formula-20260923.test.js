@@ -135,7 +135,7 @@ function formulaRuntime(){
     assert.match(progression,/鳳威/);
     assert.match(progression,/免費追擊也不消耗3次有效施放次數/);
     assert.match(progression,/不清除永久被動、EX、裝備效果、Boss固有機制、HP／SP或死亡狀態/);
-    assert.match(progression,/凍傷：[\s\S]*?傷害-25%[\s\S]*?最終閃躲-25個百分點[\s\S]*?最終異常狀態抗性-25個百分點/);
+    assert.match(progression,/凍傷：[\s\S]*?傷害-25%[\s\S]*?最終閃躲-25%[\s\S]*?最終異常狀態抗性-25%/);
 }
 
 {
