@@ -49,6 +49,11 @@
     function clampLevel(value,maxLevel){
         return Math.max(1,Math.min(Math.max(1,numeric(maxLevel,1)),Math.floor(numeric(value,1))));
     }
+    function levelValue(values,level,fallback){
+        if(!Array.isArray(values)||!values.length){ return numeric(fallback); }
+        const index=Math.max(0,Math.min(values.length-1,Math.floor(numeric(level,1))-1));
+        return numeric(values[index]);
+    }
     function notify(message){
         if(typeof alert==="function"){ alert(message); }
         return false;
