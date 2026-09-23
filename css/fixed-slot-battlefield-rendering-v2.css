@@ -528,19 +528,20 @@
 /* Fixed Slot owns the only selectable-target reticle. Retire all historical
    ::after reticles so allies, enemies, Bosses and reinforcements can never
    display two crosshairs at once. */
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.targetable::after,
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.ally-targetable::after{
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.targetable::after,
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.ally-targetable::after{
     content:none !important;
     display:none !important;
     animation:none !important;
 }
 
 /* Formal target feedback is one shared gold reticle over the artwork.
-   targetable = selectable candidate; target = formally selected enemy.
-   Both semantic states project through this same ::before owner. */
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.ally-targetable::before,
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.targetable::before,
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.target::before{
+   battlePage is migrated into the native V20 battle shell on real mobile,
+   so this owner must survive reparenting and must not depend on #app/#game-content.
+   targetable = selectable candidate; target = formally selected enemy. */
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.ally-targetable::before,
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.targetable::before,
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.target::before{
     content:"" !important;
     position:absolute !important;
     z-index:30 !important;
