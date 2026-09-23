@@ -391,14 +391,6 @@
         }
     }
 
-    function withGuaranteedBurn(skill,callback){
-        /* Guaranteed Burn is carried explicitly by the formal skill data and
-           rollNamedPersistentStatusEffect(..., guaranteedHit). Never replace
-           the global status formula owner at cast time. */
-        void skill;
-        return callback();
-    }
-
     /* Every qualifying Fire physical skill reuses this one owner. */
     function firstLivingMonsterIndex(){
         const indexes=livingMonsterIndexes();
@@ -463,9 +455,7 @@
         }
         try{
             result=withPlayerSkillContext(options.context,()=>{
-                const invoke=()=>withGuaranteedBurn(
-                    options.skill,()=>options.previous.apply(options.that,options.args)
-                );
+                const invoke=()=>options.previous.apply(options.that,options.args);
                 const formal=window.FourSymbolsSkillSpec;
                 return formal&&typeof formal.withPlayerDirectSkillCast==="function"
                     ?formal.withPlayerDirectSkillCast(
@@ -535,7 +525,7 @@
             if(!skill||!skill.followUpOnCriticalOrDefeat){
                 const that=this;
                 return withPlayerSkillContext(context,()=>{
-                    const invoke=()=>withGuaranteedBurn(skill,()=>previous.apply(that,args));
+                    const invoke=()=>previous.apply(that,args);
                     const formal=window.FourSymbolsSkillSpec;
                     return formal&&typeof formal.withPlayerDirectSkillCast==="function"&&skill
                         ?formal.withPlayerDirectSkillCast(characterIndex,skill.id,{freeCast:false},invoke)
