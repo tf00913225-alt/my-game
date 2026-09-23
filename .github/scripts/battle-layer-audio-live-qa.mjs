@@ -1146,7 +1146,7 @@ try{
     assert.equal(/(?:^|\\s)(?:red-hit|hit)(?:\\s|$)/.test(bossMode.healFeedback.className),false,"Damage must not add a root red-hit card state");
     assert.equal(/(?:^|\\s)(?:red-hit|hit)(?:\\s|$)/.test(bossMode.bossFeedback.className),false,"Heal must not add a red damage state");
     assert.equal(bossMode.healFeedback.reticleBorder,"3px","Destructible Boss objects must expose the formal target reticle");
-    assert.match(bossMode.healFeedback.reticleAnimation,/v174TargetReticlePulse/);
+    assert.equal(bossMode.healFeedback.reticleAnimation,"none","Formal shared target reticle stays static");
     assert.ok(Math.abs(bossMode.footprint.left-bossMode.bossCard.left)<=1&&Math.abs(bossMode.footprint.right-bossMode.bossCard.right)<=1&&Math.abs(bossMode.footprint.top-bossMode.bossCard.top)<=1&&Math.abs(bossMode.footprint.bottom-bossMode.bossCard.bottom)<=1,"One Boss hit area must fill the central six-Slot visual footprint");
     assert.equal(bossMode.bossHud.hpPosition,"absolute","Boss HP must remain on its absolute HUD anchor");
     assert.equal(bossMode.bossHud.spPosition,"absolute","Boss SP must remain on its absolute HUD anchor");
