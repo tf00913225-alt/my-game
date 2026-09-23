@@ -323,6 +323,87 @@ try{
     assert.ok(layout.hud.length>=9,"The real Abyss battle must expose one ally and eight enemy card HUDs");
     assert.ok(layout.hud.every(entry=>entry.name&&entry.hp&&entry.sp),"Every live combatant must keep its name, HP and SP visible");
 
+    const normalAttackPerformance=await client.eval(`(async()=>{
+        const metrics=window.FourSymbolsBattleRuntimeMetrics;
+        const page=document.getElementById('battlePage');
+        const normalButton=Array.from(document.querySelectorAll('#mainBattleMenu > .menu-button')).find(button=>
+            String(button.getAttribute('onclick')||'').includes("prepareAction('normal')")
+        );
+        if(!metrics||!page||!normalButton){return {available:false};}
+
+        const originalAuto=typeof autoBattle!=='undefined'?autoBattle:false;
+        const originalIndex=typeof activeBattleCharacterIndex!=='undefined'?activeBattleCharacterIndex:0;
+        const originalActionReady=typeof actionReady!=='undefined'?actionReady:false;
+        const originalPending=typeof pendingAction!=='undefined'?pendingAction:null;
+        if(typeof autoBattle!=='undefined'){autoBattle=false;}
+        if(typeof activeBattleCharacterIndex!=='undefined'){activeBattleCharacterIndex=0;}
+        if(typeof actionReady!=='undefined'){actionReady=false;}
+        if(typeof pendingAction!=='undefined'){pendingAction=null;}
+        if(typeof clearBattleTargetSelectionMode==='function'){clearBattleTargetSelectionMode();}
+
+        const repairHooks=['v17351SyncInventoryQa','v17351PreviewQuestMilestones','v17363SyncFunctionalFixes','v78ApplyCharacterInventoryLayout'];
+        const originals={};
+        const repairCalls={};
+        repairHooks.forEach(name=>{
+            repairCalls[name]=0;
+            if(typeof window[name]==='function'){
+                originals[name]=window[name];
+                window[name]=function(){repairCalls[name]++;return originals[name].apply(this,arguments);};
+            }
+        });
+
+        let mutationCount=0;
+        const mutationObserver=new MutationObserver(records=>{mutationCount+=records.length;});
+        mutationObserver.observe(page,{subtree:true,childList:true,attributes:true,characterData:true});
+
+        const longTasks=[];
+        let longTaskObserver=null;
+        if(typeof PerformanceObserver==='function'&&PerformanceObserver.supportedEntryTypes?.includes('longtask')){
+            longTaskObserver=new PerformanceObserver(list=>{
+                list.getEntries().forEach(entry=>longTasks.push({duration:entry.duration,startTime:entry.startTime}));
+            });
+            longTaskObserver.observe({type:'longtask',buffered:false});
+        }
+
+        metrics.enabled=true;
+        metrics.reset();
+        const started=performance.now();
+        normalButton.click();
+        const syncDuration=performance.now()-started;
+        await new Promise(resolve=>setTimeout(resolve,120));
+        const counters=metrics.snapshot();
+        const targetSelecting=page.querySelector('#battleActionRegion')?.classList.contains('target-selecting')||false;
+        mutationObserver.disconnect();
+        if(longTaskObserver){longTaskObserver.disconnect();}
+        metrics.enabled=false;
+
+        repairHooks.forEach(name=>{if(originals[name]){window[name]=originals[name];}});
+        if(typeof actionReady!=='undefined'){actionReady=originalActionReady;}
+        if(typeof pendingAction!=='undefined'){pendingAction=originalPending;}
+        if(typeof activeBattleCharacterIndex!=='undefined'){activeBattleCharacterIndex=originalIndex;}
+        if(typeof autoBattle!=='undefined'){autoBattle=originalAuto;}
+        if(typeof clearBattleTargetSelectionMode==='function'){clearBattleTargetSelectionMode();}
+        if(typeof closeMenus==='function'){closeMenus();}
+        if(typeof updateActionHudVisibility==='function'){updateActionHudVisibility();}
+
+        return {
+            available:true,syncDuration,mutationCount,targetSelecting,counters,repairCalls,
+            longTaskCount:longTasks.length,
+            maxLongTaskDuration:longTasks.reduce((max,item)=>Math.max(max,item.duration),0)
+        };
+    })()`);
+    evidence.checks.normalAttackPerformance=normalAttackPerformance;
+    assert.equal(normalAttackPerformance.available,true,"Normal-attack performance instrumentation must be available");
+    assert.equal(normalAttackPerformance.targetSelecting,true,"Normal attack click must immediately enter target selection");
+    assert.ok(normalAttackPerformance.syncDuration<100,`Normal attack synchronous click path is too slow: ${normalAttackPerformance.syncDuration}ms`);
+    assert.ok(normalAttackPerformance.mutationCount<80,`Normal attack produced excessive DOM mutations: ${normalAttackPerformance.mutationCount}`);
+    assert.equal(normalAttackPerformance.counters.syncMonsterPortraits,0,"Normal attack click must not rescan monster portraits");
+    assert.equal(normalAttackPerformance.counters.quickBarRebuild,0,"Normal attack click must not rebuild the skill quick bar");
+    assert.equal(normalAttackPerformance.counters.repairScheduler,0,"Normal attack click must not invoke a repair scheduler");
+    Object.entries(normalAttackPerformance.repairCalls).forEach(([name,count])=>
+        assert.equal(count,0,`Normal attack click unexpectedly invoked ${name}`)
+    );
+    assert.ok(normalAttackPerformance.maxLongTaskDuration<120,`Normal attack generated a long task of ${normalAttackPerformance.maxLongTaskDuration}ms`);
     const infoDrawer=await client.eval(`(()=>{
         const region=document.querySelector('#battlePage .battle-info-region');
         const button=document.getElementById('battleInfoToggle');
