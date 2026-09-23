@@ -49,7 +49,7 @@ test("battle information handles and turn timer follow the requested interaction
   assert.match(stats,/innerHTML="<span>戰<\/span><span>鬥<\/span><span>數<\/span><span>據<\/span>"/);
   assert.match(js,/function syncBattleUiPriorityLayer\(\)/);
   assert.match(js,/function installBattleInfoHandleDrag\(\)/);
-  assert.match(css,/\.battle-info-toggle\{[\s\S]*?border:1px solid rgba\(210,158,64,\.9\);[\s\S]*?box-shadow:none;[\s\S]*?touch-action:none;[\s\S]*?cursor:ew-resize/);
+  assert.match(css,/#battleInfoToggle\.battle-info-toggle\{[\s\S]*?border:1px solid rgba\(210,158,64,\.9\);[\s\S]*?background-color:rgba\(0,0,0,\.82\) !important;[\s\S]*?background-image:none !important;[\s\S]*?box-shadow:none;[\s\S]*?touch-action:none;[\s\S]*?cursor:ew-resize/);
   assert.match(css,/\.battle-info-region:not\(\.is-expanded\)\{[\s\S]*?background:transparent;[\s\S]*?box-shadow:none/);
   assert.match(css,/\.battle-info-region\.is-expanded > #battleInfo\{[\s\S]*?background:rgba\(0,0,0,\.92\) !important/);
   assert.match(js,/toggle\.textContent=next\?"返回":"戰鬥資訊"/);
