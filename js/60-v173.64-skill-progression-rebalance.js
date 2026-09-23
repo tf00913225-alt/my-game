@@ -479,7 +479,7 @@
             dodge.evasionBonusPercentByLevel=DODGE_BY_LEVEL.slice();
             dodge.targetType="allyTri"; dodge.duration=3; dodge.spCost=20;
             delete dodge.evasionBonusPercent;
-            dodge.description="我方中、左、右最多3名存活角色閃躲率提升30%/40%/50%/60%/70%，持續3回合。SP 20。";
+            dodge.description="我方中、左、右最多3名存活角色最終閃躲提升5/10/15/20/25個百分點，持續3回合。SP 20。";
         }
         const stealth=skillDatabase.stealthSkill;
         if(stealth){
@@ -493,7 +493,7 @@
             calm.accuracyBonusPercentByLevel=CALM_ACCURACY_BY_LEVEL.slice();
             calm.targetType="allyAll"; calm.duration=3; calm.spCost=77;
             delete calm.statusResistBonus; delete calm.accuracyBonusPercent;
-            calm.description="我方全體異常狀態抗性提升25%/35%/45%/55%/65%，命中提升10%/20%/30%/40%/50%，持續3回合。SP 77。";
+            calm.description="我方全體最終異常狀態抗性提升5/8/10/12/15個百分點、最終命中率提升5/10/15/20/25個百分點，持續3回合。SP 77。";
         }
         const wall=skillDatabase.rockWall;
         if(wall){
