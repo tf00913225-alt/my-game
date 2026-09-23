@@ -247,11 +247,11 @@
         return {character:character,key:key,level:level,cost:cost,stats:stats};
     }
 
-    function animateSupportCast(state,characterIndex,skill,targetId,targetIds,targetSide){
+    function animateSupportCast(state,characterIndex,skill,targetId,targetIds,targetSide,targetTypeOverride){
         state.character.sp=Math.max(0,numeric(state.character.sp)-state.cost);
         if(typeof lungePlayerCard==="function"){ lungePlayerCard(characterIndex); }
         if(typeof showSkillNameBadge==="function"){
-            showSkillNameBadge(skill.name,skill.element,characterIndex,targetId,targetIds,targetSide);
+            showSkillNameBadge(skill.name,skill.element,characterIndex,targetId,targetIds,targetSide,targetTypeOverride);
         }
         if(typeof showPlayerSpPopup==="function"){
             setTimeout(()=>showPlayerSpPopup(state.cost,characterIndex),500);
@@ -340,7 +340,7 @@
         });
 
         const primaryTarget=selectedSupportPrimary(characterIndex,queued,requested);
-        animateSupportCast(state,characterIndex,skill,primaryTarget,requested,"player");
+        animateSupportCast(state,characterIndex,skill,primaryTarget,requested,"player",skill.targetType);
         const extra=buffFields(skill,state.level);
         eligible.forEach(index=>{
             const target=getPartyCharacterByIndex(index);
@@ -411,7 +411,7 @@
         const targets=requestedBuffTargets(characterIndex,queued,skill);
         if(!targets.length){ return finishSupport(skill.name+"目前沒有可治療的存活目標。"); }
         const primaryTarget=selectedSupportPrimary(characterIndex,queued,targets);
-        animateSupportCast(state,characterIndex,skill,primaryTarget,targets,"player");
+        animateSupportCast(state,characterIndex,skill,primaryTarget,targets,"player",skill.targetType);
         let hpTotal=0;
         let spTotal=0;
         let cleansedTotal=0;
@@ -453,7 +453,7 @@
         const targetStats=getPartyBattleStats(targetIndex);
         if(!targetStats){ return finishSupport("復活目標資料無法讀取。"); }
 
-        animateSupportCast(state,characterIndex,skill,targetIndex,[targetIndex],"player");
+        animateSupportCast(state,characterIndex,skill,targetIndex,[targetIndex],"player",skill.targetType);
         const exSkill=typeof skillDatabase!=="undefined"?skillDatabase[skill.element+"EX"]:null;
         const exLevel=Math.max(0,Math.floor(numeric(getSkillLevel(state.key,skill.element+"EX"))));
         const multiplier=exSkill&&exLevel>0&&numeric(exSkill.healBonusPercent)>0
@@ -569,7 +569,10 @@
             ?enemyIndex
             :(Number.isInteger(queued.targetAlly)?queued.targetAlly:targets[0]);
         const primaryTarget=targets.includes(selectedPrimary)?selectedPrimary:targets[0];
-        animateSupportCast(state,characterIndex,skill,primaryTarget,targets,targetSide);
+        const presentationTargetType=targets.length>1
+            ?(targetSide==="monster"?"tri":"allyTri")
+            :(targetSide==="monster"?"single":"ally");
+        animateSupportCast(state,characterIndex,skill,primaryTarget,targets,targetSide,presentationTargetType);
 
         let removed=0;
         targets.forEach(index=>{
@@ -638,42 +641,6 @@
         };
     }
 
-    /* Embedded shield bonuses from damage skills also cannot refresh a live buff. */
-    function snapshotActivePartyBuffs(){
-        return partyIndexes().map(index=>{
-            const character=getPartyCharacterByIndex(index);
-            const buffs=(character&&character.activeBuffs||[]).filter(buff=>buff&&numeric(buff.turnsLeft)>0);
-            return {
-                character:character,
-                records:buffs.map(buff=>({reference:buff,values:Object.assign({},buff)}))
-            };
-        }).filter(entry=>entry.character&&entry.records.length);
-    }
-
-    function restoreActivePartyBuffs(snapshot){
-        snapshot.forEach(entry=>{
-            const protectedTypes=new Set(entry.records.map(record=>record.reference.type));
-            const current=(entry.character.activeBuffs||[]).filter(buff=>
-                !buff||!protectedTypes.has(buff.type)
-            );
-            entry.records.forEach(record=>{
-                Object.assign(record.reference,record.values);
-                current.push(record.reference);
-            });
-            entry.character.activeBuffs=current;
-        });
-    }
-
-    ["castDamageSkill","castSecondaryCharacterSkill","castPlayer2Skill"].forEach(functionName=>{
-        const previous=window[functionName];
-        if(typeof previous!=="function"){ return; }
-        window[functionName]=function(){
-            const snapshot=snapshotActivePartyBuffs();
-            try{ return previous.apply(this,arguments); }
-            finally{ restoreActivePartyBuffs(snapshot); }
-        };
-    });
-
     /* Enemy Rage uses one visual trio and never the complete ten-card roster. */
     function activeMonsterTeamBuff(monster,type){
         if(typeof window.v173HasNamedPersistentState==="function"){
@@ -684,12 +651,13 @@
         ));
     }
 
-    function bestMonsterRageTargets(casterIndex){
+    function bestMonsterRageTargeting(casterIndex){
         const indexes=typeof currentBattleMonsters!=="undefined"?currentBattleMonsters:[];
         const alive=indexes.filter(monsterAlive);
         const owner=battlefieldSlots();
         const snapshot=activeFormationSnapshot(indexes);
         let best=[];
+        let bestPrimary=null;
         let bestScore=-1;
         alive.forEach(center=>{
             const trio=owner&&snapshot
@@ -697,9 +665,9 @@
                 :[center];
             const eligible=trio.filter(target=>!activeMonsterTeamBuff(monsters[target],"rage"));
             const score=eligible.length*100+(center===casterIndex?20:(trio.includes(casterIndex)?10:0));
-            if(score>bestScore){ best=trio; bestScore=score; }
+            if(score>bestScore){ best=trio; bestPrimary=center; bestScore=score; }
         });
-        return best.slice(0,3);
+        return {targets:best.slice(0,3),primaryIndex:bestPrimary};
     }
 
     function tryMonsterRage(monsterIndex){
@@ -709,12 +677,13 @@
         const controlled=(typeof isMonsterFrozen==="function"&&isMonsterFrozen(caster))||
             (typeof isMonsterPetrified==="function"&&isMonsterPetrified(caster));
         if(controlled||Math.random()>.55){ return false; }
-        const targets=bestMonsterRageTargets(monsterIndex);
+        const targeting=bestMonsterRageTargeting(monsterIndex);
+        const targets=targeting.targets;
         const cost=Math.max(0,numeric(skill.spCost));
         if(!targets.length||numeric(caster.sp)<cost){ return false; }
         caster.sp=Math.max(0,numeric(caster.sp)-cost);
         if(typeof showMonsterSkillNameBadge==="function"){
-            showMonsterSkillNameBadge(skill.name,skill.element||caster.element,monsterIndex);
+            showMonsterSkillNameBadge(skill.name,skill.element||caster.element,monsterIndex,targeting.primaryIndex,targets,"monster",skill.targetType);
         }
         let appliedCount=0;
         targets.forEach(index=>{
@@ -1386,6 +1355,7 @@
     function syncContextNavigation(){
         if(typeof document==="undefined"){ return; }
         const page=document.getElementById("dungeonPage");
+        const trainingPage=document.getElementById("trainingPage");
         const app=document.getElementById("app");
         const patrolNav=document.getElementById("mapPageNav");
         if(patrolNav){
@@ -1393,8 +1363,9 @@
         }
         const gameplayPageId=activeGameplayPageId();
         const dungeonActive=!!(page&&page.classList&&page.classList.contains("active"));
+        const trainingActive=!!(trainingPage&&trainingPage.classList&&trainingPage.classList.contains("active"));
         const gameplayActive=!!gameplayPageId;
-        const contextActive=dungeonActive||gameplayActive;
+        const contextActive=dungeonActive||gameplayActive||trainingActive;
         if(app&&app.classList&&typeof app.classList.toggle==="function"){
   app.classList.toggle("v148-context-nav-active",contextActive);
         }
@@ -1426,12 +1397,16 @@
         if(!nav||!contextActive){ return; }
         if(nav.classList&&typeof nav.classList.add==="function"){ nav.classList.add("v148-context-nav"); }
 
-        const returnAction=gameplayActive&&!dungeonActive
+        const returnAction=trainingActive
+  ?"showPage('home')"
+  :(gameplayActive&&!dungeonActive
   ?"v148ReturnFromGameplay()"
-  :dungeonReturnAction(abyssMapActive,abyssSelectionActive);
-        const mode=gameplayActive&&!dungeonActive
+  :dungeonReturnAction(abyssMapActive,abyssSelectionActive));
+        const mode=trainingActive
+  ?"training"
+  :(gameplayActive&&!dungeonActive
   ?"gameplay:"+gameplayPageId
-  :(abyssMapActive?"abyss-map":(abyssSelectionActive?"abyss-selection":"daily"));
+  :(abyssMapActive?"abyss-map":(abyssSelectionActive?"abyss-selection":"daily")));
         renderContextNav(nav,returnAction,mode);
     }
 
