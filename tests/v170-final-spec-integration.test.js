@@ -1353,7 +1353,8 @@ test("dynamic defense, recalibrated attributes and modern or legacy skills share
     assert.equal(result.monster.attack,result.monster.expectedAttack);
     assert.equal(result.monster.magicAttack,result.monster.expectedMagicAttack);
     assert.equal(result.monster.defense,result.monster.expectedDefense);
-    assert.deepEqual([result.modern,result.modernRaw],[120,120]);
+    assert.deepEqual([result.modern,result.modernRaw],[150,150],
+        "single_low role = effectiveAttack×1.20 + Lv1 skill damage 30");
     assert.deepEqual([result.legacy,result.legacyRaw],[140,140]);
 });
 
