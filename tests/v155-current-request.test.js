@@ -83,7 +83,7 @@ test("V155 preserves the final Fire owner while retaining Emperor support data",
     assert.deepEqual(array(s.phoenixCry.burnPercentByLevel),[5,7,9,11,13]);
     assert.deepEqual(
         [s.yuanZuBlessing.baseHeal,s.yuanZuBlessing.baseHealSP,s.yuanZuBlessing.cleanseChance,s.yuanZuBlessing.evasionBonusPercent,s.yuanZuBlessing.duration],
-        [100,100,35,35,2]
+        [100,100,35,15,2]
     );
     assert.equal(s.yuanZuBlessing.agilityBonusPercent,undefined);
 });
