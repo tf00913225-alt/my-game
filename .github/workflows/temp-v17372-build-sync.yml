@@ -23,11 +23,11 @@ jobs:
         run: node scripts/build-production.mjs
       - name: Collect exact generated diff
         run: |
-          mkdir -p .build-sync-artifact/files
-          git status --porcelain=v1 > .build-sync-artifact/status.txt
+          mkdir -p build-sync-artifact/files
+          git status --porcelain=v1 > build-sync-artifact/status.txt
           node <<'NODE'
           const fs=require("fs"),path=require("path");
-          const rows=fs.readFileSync(".build-sync-artifact/status.txt","utf8").split(/\r?\n/).filter(Boolean);
+          const rows=fs.readFileSync("build-sync-artifact/status.txt","utf8").split(/\r?\n/).filter(Boolean);
           const changes=[];
           for(const row of rows){
             const status=row.slice(0,2);
@@ -36,17 +36,17 @@ jobs:
             const exists=fs.existsSync(file)&&fs.statSync(file).isFile();
             changes.push({status,path:file,exists});
             if(exists){
-              const out=path.join(".build-sync-artifact","files",file);
+              const out=path.join("build-sync-artifact","files",file);
               fs.mkdirSync(path.dirname(out),{recursive:true});
               fs.copyFileSync(file,out);
             }
           }
-          fs.writeFileSync(".build-sync-artifact/changes.json",JSON.stringify(changes,null,2)+"\n");
+          fs.writeFileSync("build-sync-artifact/changes.json",JSON.stringify(changes,null,2)+"\n");
           console.log(JSON.stringify(changes));
           NODE
       - uses: actions/upload-artifact@v4
         with:
           name: v17372-build-sync
-          path: .build-sync-artifact
+          path: build-sync-artifact
           if-no-files-found: error
           retention-days: 1
