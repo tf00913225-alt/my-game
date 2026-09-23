@@ -42,7 +42,7 @@
     display:grid !important;
     grid-template-rows:
         minmax(0,var(--battle-enemy-region-track))
-        minmax(var(--battle-center-min-height),var(--battle-center-region-track))
+        minmax(0,var(--battle-center-region-track))
         minmax(0,var(--battle-ally-region-track)) !important;
     gap:var(--battle-region-gap) !important;
     min-height:0 !important;
