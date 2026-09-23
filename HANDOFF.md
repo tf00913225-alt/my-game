@@ -1,4 +1,4 @@
-## 2026-09-23 — 冰封／石化互斥硬控與 Body Status Base Layer 收斂（candidate）
+## 2026-09-23 — 冰封／石化互斥硬控與 Body Status Base Layer 收斂（VERIFIED candidate）
 
 - Base：`dev@8bab02b38197824ac47f3ba2269ba6e19cbfd52f`；工作分支：`fix/freeze-petrify-exclusive-status-layer-20260923`；`main`／`dev` 均未直接修改。
 - Gameplay Hard Control Owner 維持 `js/00-main.js` 的 Persistent State Gate。Freeze／Petrify 現為同一 Exclusive Hard Control Group：同名與跨名都會在機率骰點與正式寫入前以「狀態MISS」阻止；既有狀態不覆蓋、不刷新、不延長。
@@ -7,7 +7,7 @@
 - CSS 由 `css/40-v143-combat-dungeon-polish.css` 只呈現上述正式語意層；已移除 Freeze／Petrify／Abyss 的同層 z-index 特例，不以 `z-index:99999 !important` 類補丁處理。
 - Runtime 若觀察到同一 entity 同時存在 Freeze + Petrify，V143 只回報 Hard Control Contract violation，不替資料層隱藏／正規化其中一個。
 - Regression 已覆蓋：同名／跨名 MISS、剩餘回合不變、解除後另一硬控可重新施加、正式「狀態MISS」文案、玩家／一般怪／Boss／深淵共用 Gate、Freeze 固定底層＋一般狀態輪播、死亡／解除立即清理、Cast deferred lifecycle。
-- Requirement Batch：`release/requirement-batches/2026-09-23-freeze-petrify-exclusive-status-layer.json`；目前 IMPLEMENTED，待 PR GitHub Actions／Build／Repository checks 完成後升級 VERIFIED。
+- Requirement Batch：`release/requirement-batches/2026-09-23-freeze-petrify-exclusive-status-layer.json` 已 VERIFIED。PR #531：完整 Node／整合回歸於 Run `35820871917` 通過；deterministic production build 已同步；Run `35821205754` Repository checks SUCCESS。
 - `DATA_SECURITY_CONTRACTS.md` 在本次最新 dev 仍為 404；本次未修改帳號／雲端存檔／安全資料流程，未自行補寫不存在的契約。
 
 ## 2026-09-22 — 戰鬥狀態輪播／抽屜圖層／倒數框／三技能 VFX Follow-up（candidate）
