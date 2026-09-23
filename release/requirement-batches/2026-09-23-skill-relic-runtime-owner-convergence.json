@@ -67,7 +67,7 @@
     {
       "id": "RELIC-LOAD-07",
       "status": "IMPLEMENTED",
-      "requirement": "Team Relic Trigger Engine 拆為 feature-relic-runtime，所有正式 Battle feature 在 ready 前先依賴同一 Runtime；Boss/Tower 不塞 Critical Boot。",
+      "requirement": "Team Relic Trigger Engine 固定置於 gameplay-core 最末端，所有正式 Battle 入口在成立前已同步取得同一 Runtime；Boss/Tower/養成不塞 Critical Boot。",
       "evidence": [
         "scripts/build-production.mjs",
         "config/feature-manifest.json",
