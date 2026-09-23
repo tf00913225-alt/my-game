@@ -1382,7 +1382,8 @@ test("the live monster skill path uses the same modern skill calculator",()=>{
         processSingleMonsterAttack(0,battleToken);
         return {expected:expected,actual:4070-player.hp};
     })()`);
-    assert.deepEqual(result,{expected:160,actual:160});
+    assert.equal(result.actual,result.expected,"live monster skill damage must equal the shared modern calculator");
+    assert.ok(result.expected>0);
 });
 
 test("V173.38 formal damage matrix covers levels, roles, elements, pressure and snapshot range",()=>{

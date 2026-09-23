@@ -117,31 +117,12 @@ test("V158 leaves the shared damage formula owned by the core runtime",()=>{
     assert.equal(context.calculateDamage(),321);
 });
 
-test("secondary Freeze resolves all three selected formation targets",()=>{
-    const partyMember={id:"水系角色",level:50,sp:100};
-    const targets=[0,1,2].map(index=>({name:"目標"+index,level:50,hp:100,alive:true,rank:"regular"}));
-    let finishes=0;
-    const context=load({
-        monsters:targets,selectedMonster:1,
-        getPartyCharacterByIndex:()=>partyMember,
-        getPartyCharacterKey:()=>"player2",
-        getPartyBattleStats:()=>({intelligence:80}),
-        getSkillLevel:()=>1,
-        findAliveTargetIndex:index=>index,
-        getSkillTargets:()=>[0,1,2],
-        getMonsterEffectiveSpiritPoints:()=>0,
-        getMonsterRank:monster=>monster.rank,
-        rollStatusEffectHit:()=>true,
-        applyFreezeEffect:(monster,duration)=>{ monster.frozenFor=duration; },
-        lungePlayerCard(){},showSkillNameBadge(){},showPlayerSpPopup(){},
-        addBattleLog(){},showMissEffect(){},updateUI(){},
-        finishPlayerAction(){ finishes++; },
-        castSecondaryCharacterSkill(){ throw new Error("old single-target path must not run"); }
-    });
-    context.castSecondaryCharacterSkill(1,"freeze",1);
-    assert.deepEqual(targets.map(target=>target.frozenFor),[4,4,4]);
-    assert.equal(partyMember.sp,78);
-    assert.equal(finishes,1);
+test("V158 leaves player Freeze execution on the core battle owner",()=>{
+    const originalSecondary=function(){ return "core-freeze"; };
+    const context=load({castSecondaryCharacterSkill:originalSecondary});
+    assert.equal(context.castSecondaryCharacterSkill,originalSecondary);
+    assert.equal(context.v158CastTriFreeze,undefined);
+    assert.doesNotMatch(source,/castTriFreeze|v158CastTriFreeze|previousCastSecondaryCharacterSkill|previousCastPlayer2Skill/);
 });
 
 test("Abyss map portraits have no frame or black card background",()=>{
