@@ -1,3 +1,17 @@
+## 2026-09-23 — Lv10 技能／輔助技能／秘寶 Runtime Owner 收斂（candidate）
+
+- Base：`dev@9d32e8cb022ff824e83d5dc3022f2e0a24c8d58a`；工作分支：`fix/skill-relic-runtime-owner-convergence-20260923`；`main` 未修改。
+- 31 個玩家直接傷害技能改為 Lv10。唯一 Damage Curve owner 為 `js/00-main.js::getSkillDamageAtLevel()`：Lv2～4 線性、Lv5=Lv4×1.5、Lv6～9 線性、Lv10=Lv9×1.5，與正式 `calculateDamage()` 一致使用 `Math.round`。
+- `js/60-v173.64-skill-progression-rebalance.js` 現為 Final Skill Data／Progression／玩家說明 projection owner，並固定進 `gameplay-core`；所有可升級技能每級固定 1 技能點，既有 `skillLevels` 不遷移／不重置。
+- 火系：炎魂共鳴 SP45、炎勢 12/15/18/21/25%，Lv5 爆擊／成功新增燃燒每正式回合最多延長1、整次最多+3，免費追擊不延長；焚血訣 SP35、HP成本5/10/15/20/25%，接下來3次非免費火系直接施放 +5/10/15/20/35%，DoT／免費追擊不使用也不消耗。
+- 水／風／土支援技能均改讀正式 ByLevel 欄位；冰封 Lv5 才由 column 升為 tri；淨心訣 Lv3 才升3目標且雙方都清除所有可解除臨時戰鬥狀態；結界只擋直接傷害並依 3/3/3/4/5 次與回合數。
+- 敵方岩石壁壘已由全體 `currentAbyssEntries()` 改回正式 `allyTriTargets()`，最多3名；V144 反向 `requires:["barrier"]`／`allyAll` 舊資料已退休。
+- Team Relic Trigger Engine 從 `feature-boss-relic` 拆為 `feature-relic-runtime`；battle／patrol／abyss／adventure／boss-tower 等 Battle feature 都透過 dependency 在正式進場前 execute 同一 `js/60-team-relic-system.js`。Boss／Tower／養成沒有塞回 Critical Boot。
+- 10 件 `runtimeReady:false` 秘寶 hydrate／equip／progression 全部 fail closed；玩家只見「效果尚未覺醒／能力尚未開放」。寒泉玉珮、九龍神火罩、岩岳鎮印、烈陽神珠說明已同步實際 Trigger／Scalar。
+- 專項測試：`tests/skill-relic-owner-convergence-20260923.test.js`；既有 `tests/skill-progression-rebalance.test.js` 同步新規格，兩者已加入 dev PR 必跑 CI。
+- Requirement Batch：`release/requirement-batches/2026-09-23-skill-relic-runtime-owner-convergence.json`；目前 IMPLEMENTED，待 PR CI、deterministic build、Repository checks 後升級 VERIFIED。
+- `DATA_SECURITY_CONTRACTS.md` 在施工 Base 仍不存在；本次沒有修改 Cloud Save／帳號安全 schema。
+
 ## 2026-09-23 — 冰封／石化互斥硬控與 Body Status Base Layer 收斂（VERIFIED candidate）
 
 - Base：`dev@8bab02b38197824ac47f3ba2269ba6e19cbfd52f`；工作分支：`fix/freeze-petrify-exclusive-status-layer-20260923`；`main`／`dev` 均未直接修改。
