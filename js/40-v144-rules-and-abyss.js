@@ -96,10 +96,11 @@
         const rockWall=skillDatabase.rockWall;
         if(rockWall){
             Object.assign(rockWall,{
-                learnCost:15,maxLevel:1,spCost:45,targetType:"allyAll",duration:4,
-                defenseBonusPercent:30,requires:["barrier"],
-                description:"需先學習結界。使我方全體防禦力提升30%，持續4回合。"
+                learnCost:15,maxLevel:5,spCost:45,targetType:"allyTri",duration:4,
+                defenseBonusPercentByLevel:[15,20,25,30,35],requires:["petrifyFist","sandWind"],
+                description:"使我方同排中、左、右最多3名存活角色提升防禦，持續4回合。"
             });
+            delete rockWall.defenseBonusPercent;
         }
         const waterEX=skillDatabase.waterEX;
         if(waterEX){
