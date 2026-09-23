@@ -163,10 +163,10 @@ test("final progression data standardizes Lv10 damage skills, EX and support str
     assert.deepEqual(Array.from(r.skills.freeze.freezeDurationByLevel),[3,3,3,4,5]);
     assert.deepEqual(Array.from(r.skills.purifyMind.targetCountByLevel),[1,1,3]);
     assert.deepEqual([r.skills.dodgeSkill.maxLevel,r.skills.stealthSkill.maxLevel,r.skills.dinghaishenzhen.maxLevel],[5,3,5]);
-    assert.deepEqual(Array.from(r.skills.dodgeSkill.evasionBonusPercentByLevel),[30,40,50,60,70]);
+    assert.deepEqual(Array.from(r.skills.dodgeSkill.evasionBonusPercentByLevel),[5,10,15,20,25]);
     assert.deepEqual(Array.from(r.skills.stealthSkill.durationByLevel),[2,3,4]);
-    assert.deepEqual(Array.from(r.skills.dinghaishenzhen.statusResistBonusByLevel),[25,35,45,55,65]);
-    assert.deepEqual(Array.from(r.skills.dinghaishenzhen.accuracyBonusPercentByLevel),[10,20,30,40,50]);
+    assert.deepEqual(Array.from(r.skills.dinghaishenzhen.statusResistBonusByLevel),[5,8,10,12,15]);
+    assert.deepEqual(Array.from(r.skills.dinghaishenzhen.accuracyBonusPercentByLevel),[5,10,15,20,25]);
     assert.deepEqual(Array.from(r.skills.rockWall.defenseBonusPercentByLevel),[15,20,25,30,35]);
     assert.deepEqual(Array.from(r.skills.earthShield.reflectPercentByLevel),[20,30,35,40,50]);
     assert.deepEqual(Array.from(r.skills.earthShield.durationByLevel),[3,3,3,4,5]);
@@ -330,7 +330,7 @@ test("duration lifecycle counts effective actions, blocked actions and never con
 
 test("wind and earth support values stay in formal arrays instead of transient skill mutation",()=>{
     const r=makeRuntime();
-    assert.deepEqual(Array.from(r.skills.dodgeSkill.evasionBonusPercentByLevel),[30,40,50,60,70]);
+    assert.deepEqual(Array.from(r.skills.dodgeSkill.evasionBonusPercentByLevel),[5,10,15,20,25]);
     assert.equal(r.skills.dodgeSkill.evasionBonusPercent,undefined);
     assert.deepEqual(Array.from(r.skills.rockWall.defenseBonusPercentByLevel),[15,20,25,30,35]);
     assert.equal(r.skills.rockWall.defenseBonusPercent,undefined);
