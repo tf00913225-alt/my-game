@@ -404,6 +404,43 @@ try{
         assert.equal(count,0,`Normal attack click unexpectedly invoked ${name}`)
     );
     assert.ok(normalAttackPerformance.maxLongTaskDuration<120,`Normal attack generated a long task of ${normalAttackPerformance.maxLongTaskDuration}ms`);
+
+    const spQuickBar=await client.eval(`(()=>{
+        if(typeof populateSkillQuickBar!=='function'||typeof getPartyCharacterByIndex!=='function'){return null;}
+        const actorIndex=typeof activeBattleCharacterIndex==='number'?activeBattleCharacterIndex:0;
+        const actor=getPartyCharacterByIndex(actorIndex);
+        if(!actor){return null;}
+        const originalSp=actor.sp;
+        actor.sp=99999;
+        populateSkillQuickBar();
+        const buttons=Array.from(document.querySelectorAll('#skillQuickBarGrid .skill-quick-button'))
+            .filter(button=>button.dataset.skillId);
+        const state=buttons.map(button=>{
+            const block=button.querySelector('.sq-sp-block');
+            const skill=typeof skillDatabase!=='undefined'?skillDatabase[button.dataset.skillId]:null;
+            const cost=Number(skill&&(skill.spCost!==undefined?skill.spCost:skill.cost))||0;
+            return {
+                skillId:button.dataset.skillId,
+                cost,
+                disabled:button.disabled,
+                insufficient:button.classList.contains('sp-insufficient'),
+                blockHidden:block?block.hidden:null,
+                blockDisplay:block?getComputedStyle(block).display:null
+            };
+        });
+        actor.sp=originalSp;
+        populateSkillQuickBar();
+        return {actorIndex,state};
+    })()`);
+    evidence.checks.spQuickBar=spQuickBar;
+    assert.ok(spQuickBar?.state?.length>0,"Real battle quick bar must expose at least one equipped skill");
+    spQuickBar.state.forEach(item=>{
+        assert.equal(item.disabled,false,`${item.skillId} should be enabled when the active actor has enough SP`);
+        assert.equal(item.insufficient,false,`${item.skillId} must not keep the insufficient-SP class when SP is enough`);
+        assert.equal(item.blockHidden,true,`${item.skillId} insufficient-SP overlay should be semantically hidden`);
+        assert.equal(item.blockDisplay,"none",`${item.skillId} insufficient-SP overlay must be visually hidden`);
+    });
+
     const infoDrawer=await client.eval(`(()=>{
         const region=document.querySelector('#battlePage .battle-info-region');
         const button=document.getElementById('battleInfoToggle');
