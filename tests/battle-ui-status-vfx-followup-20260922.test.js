@@ -38,7 +38,10 @@ test("battle information handles and turn timer follow the requested interaction
   assert.match(js,/function installBattleInfoHandleDrag\(\)/);
   assert.match(css,/\.battle-info-toggle\{[\s\S]*?border:1px solid rgba\(210,158,64,\.9\);[\s\S]*?box-shadow:none;[\s\S]*?touch-action:none;[\s\S]*?cursor:ew-resize/);
   assert.match(css,/\.battle-info-region:not\(\.is-expanded\)\{[\s\S]*?background:transparent;[\s\S]*?box-shadow:none/);
-  assert.match(css,/--battle-command-visual-height:calc\(var\(--battle-command-row-height\) \+ var\(--battle-command-art-overhang\)\)/);
+  const mainCss=read("css/00-main.css");
+  assert.match(mainCss,/#battlePage\{[\s\S]*?--battle-command-row-height:66px;[\s\S]*?--battle-command-art-overhang:34px;[\s\S]*?--battle-command-visual-height:calc\(var\(--battle-command-row-height\) \+ var\(--battle-command-art-overhang\)\);[\s\S]*?--battle-center-min-height:/);
+  assert.doesNotMatch(css,/--battle-command-row-height:66px|--battle-command-art-overhang:34px/);
+  assert.match(css,/grid-template-rows:[\s\S]*?minmax\(var\(--battle-center-min-height\),var\(--battle-center-region-track\)\)/);
   assert.match(css,/#battleActionRegion > \.turn-target-row\{[\s\S]*?position:absolute;[\s\S]*?bottom:var\(--battle-command-visual-height\)/);
 });
 
