@@ -212,8 +212,8 @@ jobs:
             const raw=cp.execFileSync("git",[
               "status","--porcelain=v1","--untracked-files=all","--",
               "index.html","asset-manifest.json","build"
-            ],{encoding:"utf8"}).trim();
-            const rows=raw?raw.split("\n"):[];
+            ],{encoding:"utf8"});
+            const rows=raw.split("\n").filter(Boolean);
             if(!rows.length){ console.log("No generated build changes to sync."); return; }
             const entries=[];
             for(const row of rows){
