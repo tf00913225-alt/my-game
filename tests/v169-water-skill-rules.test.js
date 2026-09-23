@@ -160,10 +160,10 @@ test("secondary and legacy player-two Freeze resolve the front/back column",()=>
     const observed=[];
     const context=load({
         castSecondaryCharacterSkill(characterIndex,skillId,centerIndex){
-            observed.push(["secondary",Array.from(this.getSkillTargets(centerIndex,"tri"))]);
+            observed.push(["secondary",Array.from(this.getSkillTargets(centerIndex,this.skillDatabase[skillId].targetType))]);
         },
         castPlayer2Skill(skillId,centerIndex){
-            observed.push(["player2",Array.from(this.getSkillTargets(centerIndex,"tri"))]);
+            observed.push(["player2",Array.from(this.getSkillTargets(centerIndex,this.skillDatabase[skillId].targetType))]);
         }
     });
     context.castSecondaryCharacterSkill(2,"freeze",4);

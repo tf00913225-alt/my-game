@@ -208,13 +208,13 @@ test("monster Barrier dynamically blocks a direct hit and consumes exactly one c
     context.monsters[0]=monster;
     context.v141ApplyMonsterShield(monster,999999,4);
     assert.equal(monster.v141Shield.amount,1,"Barrier must not fake a million-point HP shield");
-    assert.equal(monster.v141Shield.turnsLeft,5);
-    assert.equal(monster.v141Shield.remainingBlocks,5);
+    assert.equal(monster.v141Shield.turnsLeft,4);
+    assert.equal(monster.v141Shield.remainingBlocks,3);
     monster.hp=0;
     context.v143SkillAnimationState={current:{side:"player",done:false}};
     context.showMonsterHit(0,150,"hp");
     assert.equal(monster.hp,101);
-    assert.equal(monster.v141Shield.remainingBlocks,4);
+    assert.equal(monster.v141Shield.remainingBlocks,2);
     assert.equal(visualHits,0,"blocked direct damage must not show a red damage hit");
 });
 

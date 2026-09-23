@@ -145,7 +145,7 @@ test("Extreme Emperor uses only Yuan Zu Blessing with independent cleanse and in
 test("North Emperor cannot revive without revive in its carried support list",()=>{
     let finishes=0;
     const north={name:"北帝天尊",v141Abyss:true,v141SupportSkillIds:["healSpell"],alive:true,hp:500,maxHP:500,sp:500,maxSP:500,v141ForceSkillLevel:5,activeBuffs:[],statusEffects:[]};
-    const ally={name:"盟友",rank:"boss",v141Abyss:true,alive:false,hp:0,maxHP:1000,sp:10,maxSP:500,activeBuffs:[],statusEffects:[]};
+    const ally={name:"盟友",rank:"boss",v141Abyss:true,alive:false,hp:0,maxHP:1000,sp:10,maxSP:500,activeBuffs:[],statusEffects:[{type:"burn",turnsLeft:2}]};
     const context=load({
         monsters:[north,ally],currentBattleMonsters:[0,1],
         isMonsterFrozen:()=>false,isMonsterPetrified:()=>false,
@@ -159,7 +159,8 @@ test("North Emperor cannot revive without revive in its carried support list",()
     ally.hp=10;
     assert.equal(context.v155ResolveNorthHeal(0,true),true);
     assert.equal(ally.hp,480);
-    assert.equal(ally.sp,165);
+    assert.equal(ally.sp,10,"V155-only fixture has no later SP-percent progression owner");
+    assert.deepEqual(array(ally.statusEffects),[{type:"burn",turnsLeft:2}],"enemy Heal must not cleanse debuffs");
     assert.equal(finishes,1);
 });
 

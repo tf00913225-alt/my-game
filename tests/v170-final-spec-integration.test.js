@@ -508,6 +508,7 @@ test("final hit, evasion and status chances use one percentage-point model",()=>
         "hard control must use the same attribute/resistance conversion before rank cap"
     );
 
+    runtime.context.Math.random=()=>0.5;
     assert.deepEqual(
         levelCases.map(difference=>runtime.context.calculateDamage(100,0,50+difference,50,"fire","fire")),
         [100,105,110,115,115,95,90,85,85]
