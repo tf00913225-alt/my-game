@@ -6863,8 +6863,6 @@ html, body{
     --battle-command-art-overhang:34px;
     --battle-command-visual-height:calc(var(--battle-command-row-height) + var(--battle-command-art-overhang));
     --battle-turn-row-height:36px;
-    --battle-center-vertical-padding:6px;
-    --battle-center-min-height:calc(var(--battle-command-visual-height) + var(--battle-turn-row-height) + var(--battle-center-vertical-padding));
 }
 
 #mainBattleMenu{
