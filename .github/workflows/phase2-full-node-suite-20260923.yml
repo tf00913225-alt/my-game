@@ -1,0 +1,22 @@
+name: Phase2 Full Node Suite 20260923
+
+on:
+  push:
+    branches:
+      - fix/skill-relic-runtime-owner-convergence-20260923
+
+permissions:
+  contents: read
+
+jobs:
+  full-node:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/skill-relic-runtime-owner-convergence-20260923
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+      - name: Run complete Node unit and integration suite
+        run: node .github/scripts/ci.mjs tests
