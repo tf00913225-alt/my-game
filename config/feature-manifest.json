@@ -68,15 +68,6 @@
         "gameplay-core"
       ]
     },
-    "feature-skill": {
-      "scripts": [
-        "__BUILD_SKILL__"
-      ],
-      "styles": [],
-      "dependencies": [
-        "gameplay-core"
-      ]
-    },
     "feature-boss-relic": {
       "scripts": [
         "__BUILD_BOSS_RELIC__",
@@ -115,7 +106,7 @@
     "shop": "gameplay-core",
     "synthesis": "gameplay-core",
     "abyss": "feature-abyss",
-    "skill": "feature-skill",
+    "skill": "gameplay-core",
     "relic": "feature-boss-relic",
     "boss-tower": "feature-boss-relic",
     "adventure": "feature-adventure"
