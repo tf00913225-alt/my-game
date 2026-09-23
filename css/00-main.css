@@ -6882,10 +6882,10 @@ html, body{
     bottom:0;
     z-index:1;
     pointer-events:none;
-    background-image:url("../assets/battle/battle-command-panel.jpg");
+    background-image:url("../assets/battle/battle-command-panel-transparent.svg");
     background-repeat:no-repeat;
     background-position:center center;
-    background-size:100% auto;
+    background-size:100% 100%;
 }
 
 #mainBattleMenu > .menu-button{
