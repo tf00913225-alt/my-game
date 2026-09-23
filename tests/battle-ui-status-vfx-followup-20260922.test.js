@@ -25,7 +25,7 @@ test("persistent body status owner keeps hard-control base fixed under the two-s
   assert.match(js,/stun:statusVisual\("assets\/vfx\/status\/stun\.webp","pulse"/);
   assert.match(css,/--v143-status-layer-hard-control-base:4/);
   assert.match(css,/--v143-status-layer-rotating:5/);
-  assert.match(css,/--v143-status-layer-hud:20/);
+  assert.match(css,/--v143-status-layer-hud:34/);
   assert.match(css,/\.v143-status-visual--layer-hard-control-base\{[\s\S]*?z-index:var\(--v143-status-layer-hard-control-base\)/);
   assert.match(css,/\.v143-status-icon\{[\s\S]*?width:24px;[\s\S]*?height:24px;/);
   assert.match(css,/\.v143-status-visual--pulse\{[\s\S]*?animation:v143StatusImageBreath 2s ease-in-out infinite/);
@@ -41,15 +41,17 @@ test("battle information handles and turn timer follow the requested interaction
   assert.match(html,/id="battleInfoToggle"[\s\S]*?>戰鬥資訊<\/button>/);
   assert.ok(html.indexOf('id="battleActionRegion"')<html.indexOf('id="turnTargetRow"'),"turn row should be inside the battle action region");
   assert.match(css,/#battleActionRegion > \.turn-target-row[\s\S]*?opacity:1/);
-  assert.match(css,/\.turn-target-row\.skill-picker-open,[\s\S]*?\.battle-item-open,[\s\S]*?#battleActionRegion\.target-selecting > \.turn-target-row\{[\s\S]*?opacity:\.25/);
+  assert.match(css,/\.turn-target-row\.skill-picker-open,[\s\S]*?\.battle-item-open\{[\s\S]*?opacity:\.25/);
+  assert.match(css,/#battleActionRegion\.target-selecting > \.turn-target-row\{[\s\S]*?top:0;[\s\S]*?bottom:auto;[\s\S]*?opacity:1/);
   assert.match(css,/\.battle-info-region #battleTurnIndicator\{[\s\S]*?opacity:1/);
-  assert.match(css,/\.battle-info-region\.is-expanded #battleTurnIndicator\{[\s\S]*?opacity:0/);
+  assert.match(css,/\.battle-info-region\.is-expanded #battleTurnIndicator\{[\s\S]*?opacity:1/);
   assert.match(stats,/aria-label","戰鬥數據"/);
   assert.match(stats,/innerHTML="<span>戰<\/span><span>鬥<\/span><span>數<\/span><span>據<\/span>"/);
   assert.match(js,/function syncBattleUiPriorityLayer\(\)/);
   assert.match(js,/function installBattleInfoHandleDrag\(\)/);
   assert.match(css,/\.battle-info-toggle\{[\s\S]*?border:1px solid rgba\(210,158,64,\.9\);[\s\S]*?box-shadow:none;[\s\S]*?touch-action:none;[\s\S]*?cursor:ew-resize/);
-  assert.match(css,/\.battle-info-region:not\(\.is-expanded\)\{[\s\S]*?background:rgba\(0,0,0,\.92\);[\s\S]*?box-shadow:none/);
+  assert.match(css,/\.battle-info-region:not\(\.is-expanded\)\{[\s\S]*?background:transparent;[\s\S]*?box-shadow:none/);
+  assert.match(css,/\.battle-info-region\.is-expanded > #battleInfo\{[\s\S]*?background:rgba\(0,0,0,\.92\) !important/);
   assert.match(js,/toggle\.textContent=next\?"返回":"戰鬥資訊"/);
   const mainCss=read("css/00-main.css");
   assert.match(mainCss,/\.skill-quick-button \.sq-sp-block\[hidden\]\{[\s\S]*?display:none;/);
@@ -70,8 +72,9 @@ test("interactive battlefield overlays outrank detached VFX and damage popups",(
   assert.match(statsCss,/z-index:18072/);
   assert.match(vfxCss,/\.battle-status-detail-modal\{[\s\S]*?z-index:18120/);
   assert.match(vfxCss,/body\.v174-battle-reading-open > \.v143-skill-stage,[\s\S]*?visibility:hidden !important;[\s\S]*?opacity:0 !important/);
-  assert.match(fixedCss,/\.battle-info-region:not\(\.is-expanded\)\{[\s\S]*?background:rgba\(0,0,0,\.92\);[\s\S]*?box-shadow:none/);
-  assert.match(fixedCss,/\.battle-info-region\.is-expanded\{[\s\S]*?background:rgba\(8,8,8,\.96\);[\s\S]*?box-shadow:none/);
+  assert.match(fixedCss,/\.battle-info-region:not\(\.is-expanded\)\{[\s\S]*?background:transparent;[\s\S]*?box-shadow:none/);
+  assert.match(fixedCss,/\.battle-info-region\.is-expanded\{[\s\S]*?background:transparent;[\s\S]*?box-shadow:none/);
+  assert.match(fixedCss,/\.battle-info-region\.is-expanded > #battleInfo\{[\s\S]*?background:rgba\(0,0,0,\.92\) !important/);
 });
 
 test("new skill icons and 4x3 cast sheets use dedicated WebP runtime assets",()=>{
@@ -116,6 +119,7 @@ test("battle target selection avoids the dense compositor and unrelated global U
   const selectBlock=main.slice(start,end);
   assert.ok(start>=0&&end>start);
   assert.doesNotMatch(selectBlock,/updateUI\(\)/);
-  assert.match(fixed,/\.battle-monster\.v174-cardless-unit\.targetable::after,[\s\S]*?animation:none !important;[\s\S]*?filter:none !important/);
+  assert.match(fixed,/\.battle-monster\.v174-cardless-unit\.targetable::after,[\s\S]*?content:none !important;[\s\S]*?display:none !important/);
+  assert.match(fixed,/\.battle-player\.v174-cardless-unit\.ally-targetable::before,[\s\S]*?\.battle-monster\.v174-cardless-unit\.targetable::before\{/);
   assert.match(fixed,/\.battle-player\.v174-cardless-unit\.active-turn::after\{[\s\S]*?animation:none !important/);
 });
