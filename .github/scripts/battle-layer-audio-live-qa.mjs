@@ -116,7 +116,35 @@ async function prepareAccountFirstRuntime(client,features){
             input.value='QA俠客';
             return createCharacter()===true;
         })()`);
-        if(!created){ throw new Error("Live anonymous account could not complete the formal character-creation flow"); }
+        if(!created){
+            const diagnostics=await client.eval(`(()=>{
+                let targetSlot=null;
+                try{ targetSlot=typeof creationTargetSlot!=="undefined"?creationTargetSlot:null; }catch(_){}
+                let persisted=null;
+                try{
+                    const repo=window.FourSymbolsAccountSave;
+                    const uid=repo&&repo.getActiveUid&&repo.getActiveUid();
+                    const read=uid&&repo.readForUid?repo.readForUid(uid):null;
+                    persisted={
+                        uid:uid||null,
+                        saveKey:uid&&repo.saveKey?repo.saveKey(uid):null,
+                        readStatus:read&&read.status||null,
+                        savedPlayerId:read&&read.save&&read.save.player&&read.save.player.id||null
+                    };
+                }catch(error){ persisted={error:String(error&&error.message||error)}; }
+                return {
+                    startupState:window.FourSymbolsStartupPolicy&&FourSymbolsStartupPolicy.getState(),
+                    canCreate:Boolean(window.FourSymbolsStartupPolicy&&FourSymbolsStartupPolicy.canCreateCharacter()),
+                    targetSlot,
+                    inputValue:document.getElementById('creationId')?.value||null,
+                    creationVisible:getComputedStyle(document.getElementById('creationPage')).display,
+                    playerId:typeof player!=="undefined"?player.id:null,
+                    saveOwner:persisted,
+                    guarded:Boolean(window.createCharacter&&window.createCharacter.__v174PersistedPrimaryGuard)
+                };
+            })()`);
+            throw new Error("Live anonymous account could not complete the formal character-creation flow: "+JSON.stringify(diagnostics));
+        }
         await waitFor(client,"FourSymbolsStartupPolicy.getState()==='READY'&&getComputedStyle(document.getElementById('gameInterface')).display!=='none'","anonymous character creation completion",30000);
         state="READY";
     }
