@@ -2600,13 +2600,11 @@ function hasDamageRoleProfile(skill){
 }
 
 function getSkillPowerAtLevel(skill,level){
-    const resolvedLevel=Math.max(1,Math.floor(Number(level)||1));
-    return Number(skill.powerMultiplier)+Number(skill.powerPerLevel)*(resolvedLevel-1);
+    return Number(skill.powerMultiplier);
 }
 
 function getSkillFlatDamageAtLevel(skill,level){
-    const resolvedLevel=Math.max(1,Math.floor(Number(level)||1));
-    return Number(skill.flatDamage)+Number(skill.flatDamagePerLevel)*(resolvedLevel-1);
+    return Number(skill.flatDamage);
 }
 
 window.v173DamageRoleProfiles=DAMAGE_ROLE_PROFILES;
