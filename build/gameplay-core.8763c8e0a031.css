@@ -2300,7 +2300,8 @@ body.quest-scroll-active,
     min-width:0 !important;
 }
 
-#game-stage #battlePage button,
+/* Icon/raster surfaces may be transparent, but the generic battle button
+   must keep its own component background owner (e.g. battle-info toggle). */
 #game-stage #battlePage button img,
 #game-stage #trainingPage button img,
 #game-stage #mapPage button img,
