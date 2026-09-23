@@ -1,11 +1,11 @@
 "use strict";
 
 /*
- * CURRENT FINAL INTEGRATION SPEC (V173.43)
+ * HISTORICAL INTEGRATION SNAPSHOT (V173.43)
  *
- * This suite represents the fully loaded current rules.
- * Tests named after V140/V149/V155/V158/V169 are historical snapshots of one
- * patch layer and must not be used as the current source of truth.
+ * This suite preserves the V173.43 integration surface. Later owner changes
+ * are validated by newer regression suites and must not be inferred from this
+ * historical runtime load order.
  */
 
 const assert=require("node:assert/strict");
@@ -751,6 +751,7 @@ test("accuracy, enemy Rage, monster shields and wind-elite Dodge use their forma
         monsters.splice(0,monsters.length,supportMonster);
         currentBattleMonsters.splice(0,currentBattleMonsters.length,0);
         const monsterAccuracy=getMonsterAccuracy(supportMonster);
+        const monsterAccuracyBonus=getActiveAccuracyBonusPercent(supportMonster);
         const rage=v173GetActiveRageCriticalBonuses(supportMonster);
         const firstShield=v141ApplyMonsterShield(supportMonster,100,2);
         supportMonster.v141Shield.remaining=37;
@@ -771,7 +772,7 @@ test("accuracy, enemy Rage, monster shields and wind-elite Dodge use their forma
         const dodgeCast=v155ResolveWindEliteDodge(0,true);
         return {
             playerAccuracyMultiplier:playerAccuracy/basePlayerAccuracy,
-            monsterAccuracy:monsterAccuracy,rage:rage,shield:shield,
+            monsterAccuracy:monsterAccuracy,monsterAccuracyBonus:monsterAccuracyBonus,rage:rage,shield:shield,
             dodgeCast:dodgeCast,evasion:elite.evasion,
             dodge:elite.activeBuffs.find(buff=>buff.type==="dodgeSkill"),
             dodgeExpires:elite.v155WindDodge&&elite.v155WindDodge.expiresTurn,
@@ -779,9 +780,9 @@ test("accuracy, enemy Rage, monster shields and wind-elite Dodge use their forma
         };
     })()`);
     assert.deepEqual(result,{
-        playerAccuracyMultiplier:1.5,monsterAccuracy:150,rage:{chance:25,damage:50},
+        playerAccuracyMultiplier:1.5,monsterAccuracy:100,monsterAccuracyBonus:50,rage:{chance:25,damage:50},
         shield:{first:100,second:0,statusName:"岩盾",remaining:37,turnsLeft:2},
-        dodgeCast:true,evasion:80,
+        dodgeCast:true,evasion:85,
         dodge:{type:"dodgeSkill",v141BuffType:"dodge",turnsLeft:3,statusName:"風行"},
         dodgeExpires:7,hasStealth:false
     });

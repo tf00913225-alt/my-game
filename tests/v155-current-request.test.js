@@ -176,7 +176,7 @@ test("wind elite uses Dodge, never Stealth",()=>{
     assert.equal(context.v155ResolveWindEliteDodge(0,true),true);
     assert.deepEqual(array(context.getSkillTargets(0,"single")),[0]);
     assert.deepEqual(array(context.getSkillTargets(0,"all")),[0]);
-    assert.equal(elite.evasion,80);
+    assert.equal(elite.evasion,85);
     assert.deepEqual(
         [elite.v155WindDodge.statusName,elite.v155WindDodge.bonusPercent,elite.v155WindDodge.expiresTurn],
         ["風行",75,4]

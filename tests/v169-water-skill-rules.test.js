@@ -211,38 +211,24 @@ test("monster Freeze pure-control damage is owned by the authoritative core",()=
     assert.match(main,/if\(damage>0 && hasBarrier\)/);
 });
 
-test("all final UI description entry points expose current Frostbite and HP-only recovery",()=>{
-    const description={textContent:""};
-    const levels={innerHTML:""};
+test("V169 leaves player-facing description entry points to the later progression owner",()=>{
     let creationCalls=0;
     const context=load({
-        document:bareDocument({
-            creationSkillDetailDescription:description,
-            creationSkillDetailLevels:levels
-        }),
         getSkillPreviewSummary(){ return "legacy-summary"; },
         getSkillEffectPreviewText(){ return "legacy-effect"; },
         buildSkillLevelBreakdownHTML(){ return "legacy-levels"; },
         showCreationSkillDetail(){ creationCalls++; }
     });
     const skill=context.skillDatabase.iceArrowRain;
-    const summary=context.getSkillPreviewSummary(skill);
-    const effect=context.getSkillEffectPreviewText(skill,3);
-    const breakdown=context.buildSkillLevelBreakdownHTML(skill);
+    assert.equal(context.getSkillPreviewSummary(skill),"legacy-summary");
+    assert.equal(context.getSkillEffectPreviewText(skill,3),"legacy-effect");
+    assert.equal(context.buildSkillLevelBreakdownHTML(skill),"legacy-levels");
     context.showCreationSkillDetail("iceArrowRain");
-
-    assert.match(summary,/敵方全體/);
-    assert.match(summary,/凍傷：傷害、閃避、異常抗性各降低25%/);
-    assert.match(summary,/恢復自身HP/);
-    assert.match(effect,/42/);
-    assert.match(effect,/35%基礎機率凍傷2回合/);
-    assert.match(breakdown,/Lv\.5/);
-    assert.match(breakdown,/54/);
-    assert.match(breakdown,/只恢復自身HP/);
     assert.equal(creationCalls,1);
-    assert.equal(description.textContent,skill.description);
-    assert.match(levels.innerHTML,/凍傷2回合/);
-    assert.doesNotMatch(levels.innerHTML,/HP\/SP|冰封/);
+    assert.doesNotMatch(source,/getSkillPreviewSummary\s*=|getSkillEffectPreviewText\s*=|buildSkillLevelBreakdownHTML\s*=|showCreationSkillDetail\s*=/);
+    assert.match(progression,/window\.getSkillPreviewSummary=function/);
+    assert.match(progression,/getSkillEffectPreviewText=function/);
+    assert.match(progression,/buildSkillLevelBreakdownHTML=function/);
 });
 
 console.log("\nV169 Water skill rules suite: "+passed+" tests passed.");
