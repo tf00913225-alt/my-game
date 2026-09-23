@@ -221,8 +221,9 @@
         };
     }
 
-    /* Different formal names may coexist.  Only a repeated name is rejected
-       by the shared persistent-state owner in 00-main.js. */
+    /* Freeze and Petrify are one exclusive hard-control group. The canonical
+       persistent-state owner in 00-main.js rejects same-name and cross-name
+       applications before mutation. */
     function normalizeAllHardControls(){ return HARD_CONTROL_TYPES.length; }
 
     /* ----- One support resolver for every party slot. ----- */
@@ -282,22 +283,40 @@
         return target&&numeric(target.hp)>0?[selected]:[];
     }
 
+    function buffDuration(skill,level){
+        return Math.max(1,Math.floor(
+            levelValue(skill.durationByLevel,level,numeric(skill.duration)||2)
+        ));
+    }
+
     function buffFields(skill,level){
         if(skill.id==="rage"){
             const chance=levelValue(skill.critChanceBonusByLevel||skill.critBonusByLevel,level,0);
             const damage=levelValue(skill.critDamageBonusByLevel||skill.critBonusByLevel,level,0);
             return {bonusPercent:chance,critChanceBonusPercent:chance,critDamageBonusPercent:damage};
         }
-        if(skill.id==="dodgeSkill"){ return {percent:numeric(skill.evasionBonusPercent)}; }
-        if(skill.id==="rockWall"){ return {percent:numeric(skill.defenseBonusPercent)}; }
-        if(skill.id==="earthShield"){ return {percent:numeric(skill.reflectPercent)}; }
+        if(skill.id==="dodgeSkill"){
+            return {percent:levelValue(skill.evasionBonusPercentByLevel,level,skill.evasionBonusPercent)};
+        }
+        if(skill.id==="rockWall"){
+            return {percent:levelValue(skill.defenseBonusPercentByLevel,level,skill.defenseBonusPercent)};
+        }
+        if(skill.id==="earthShield"){
+            return {percent:levelValue(skill.reflectPercentByLevel,level,skill.reflectPercent)};
+        }
         if(skill.id==="dinghaishenzhen"){
-            return {resistBonus:numeric(skill.statusResistBonus),accuracyBonusPercent:numeric(skill.accuracyBonusPercent)};
+            return {
+                resistBonus:levelValue(skill.statusResistBonusByLevel,level,skill.statusResistBonus),
+                accuracyBonusPercent:levelValue(skill.accuracyBonusPercentByLevel,level,skill.accuracyBonusPercent)
+            };
         }
         if(skill.id==="barrier"){
             return {
                 sourceSkill:"barrier",barrierRule:"shared",
-                remainingBlocks:Math.max(1,numeric(skill.barrierBlockCount)||5)
+                remainingBlocks:Math.max(
+                    1,
+                    Math.floor(levelValue(skill.barrierBlockCountByLevel,level,skill.barrierBlockCount||3))
+                )
             };
         }
         return {};
@@ -328,7 +347,7 @@
                 )
             );
             const buff=Object.assign({
-                type:skill.id,turnsLeft:Math.max(1,numeric(skill.duration)||2)
+                type:skill.id,turnsLeft:buffDuration(skill,state.level)
             },extra);
             if(typeof window.v173MarkPersistentStateName==="function"){
                 window.v173MarkPersistentStateName(buff,skill.id);
@@ -346,19 +365,37 @@
         );
     }
 
+    function isRemovableTemporaryState(entry){
+        return !!(entry&&entry.dispellable!==false&&entry.uncleansable!==true);
+    }
+
+    function removeRemovableStatusEffects(entity){
+        if(!entity||!Array.isArray(entity.statusEffects)){ return 0; }
+        const before=entity.statusEffects.length;
+        entity.statusEffects=entity.statusEffects.filter(entry=>!isRemovableTemporaryState(entry));
+        return before-entity.statusEffects.length;
+    }
+
     function healAmounts(skill,state,targetStats,isFlatPartyHeal){
         const exSkill=typeof skillDatabase!=="undefined"?skillDatabase[skill.element+"EX"]:null;
         const exLevel=Math.max(0,Math.floor(numeric(getSkillLevel(state.key,skill.element+"EX"))));
         const multiplier=exSkill&&exLevel>0&&numeric(exSkill.healBonusPercent)>0
             ?1+numeric(exSkill.healBonusPercent)/100:1;
-        const hpBase=numeric(skill.baseHeal)+numeric(skill.healPerLevel)*(state.level-1);
-        const spBase=numeric(skill.baseHealSP)+numeric(skill.healSPPerLevel)*(state.level-1);
+        const hpBase=levelValue(
+            skill.healHpByLevel,
+            state.level,
+            numeric(skill.baseHeal)+numeric(skill.healPerLevel)*(state.level-1)
+        );
         const hp=isFlatPartyHeal
             ?Math.floor(hpBase*multiplier)
             :Math.floor(calculateHealingAmount(hpBase,state.stats.intelligence)*multiplier);
-        const sp=isFlatPartyHeal
-            ?Math.floor(spBase)
-            :Math.floor(calculateSPHealingAmount(spBase,state.stats.intelligence));
+        const spPercent=levelValue(skill.spRestorePercentByLevel,state.level,0);
+        const sp=isFlatPartyHeal&&Array.isArray(skill.spRestorePercentByLevel)
+            ?Math.floor(numeric(targetStats.maxSP)*spPercent/100)
+            :Math.floor(calculateSPHealingAmount(
+                numeric(skill.baseHealSP)+numeric(skill.healSPPerLevel)*(state.level-1),
+                state.stats.intelligence
+            ));
         return {hp:Math.max(0,hp),sp:Math.max(0,sp),maxHP:numeric(targetStats.maxHP),maxSP:numeric(targetStats.maxSP)};
     }
 
@@ -378,9 +415,8 @@
             const sp=index===characterIndex?0:Math.max(0,Math.min(planned.sp,planned.maxSP-numeric(target.sp)));
             target.hp=Math.min(planned.maxHP,numeric(target.hp)+planned.hp);
             if(index!==characterIndex){ target.sp=Math.min(planned.maxSP,numeric(target.sp)+planned.sp); }
-            if(skill.cleanseAll&&Array.isArray(target.statusEffects)){
-                cleansedTotal+=target.statusEffects.length;
-                target.statusEffects=[];
+            if(skill.cleanseAll){
+                cleansedTotal+=removeRemovableStatusEffects(target);
             }
             hpTotal+=hp;
             spTotal+=sp;
