@@ -43,6 +43,8 @@ test("canonical Lv10 damage curve uses formal rounding and exact breakthrough no
   assert.match(fn,/Math\.round\(damage\*1\.5\)/);
   assert.match(main,/function calculateDamage[\s\S]*?return Math\.max\(1,Math\.round\(result\)\)/);
   assert.match(main,/function getSkillRawAttack[\s\S]*?getSkillDamageAtLevel\(skill,skillLevel\)/);
+  assert.match(main,/function getSkillPowerAtLevel\(skill,level\)\{\s*return Number\(skill\.powerMultiplier\);\s*\}/);
+  assert.doesNotMatch(main,/function getSkillPowerAtLevel[\s\S]{0,220}?powerPerLevel\*\(resolvedLevel-1\)/);
 });
 
 test("all 31 player direct-damage skills are Lv10 and every upgrade target costs one point",()=>{
