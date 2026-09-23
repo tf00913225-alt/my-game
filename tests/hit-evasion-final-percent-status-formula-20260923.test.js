@@ -166,11 +166,9 @@ function formulaRuntime(){
 }
 
 {
-    const drag=sourceFunction(main,"installBattleInfoHandleDrag");
-    assert.match(drag,/requestAnimationFrame\(paintDrag\)/);
-    assert.match(drag,/translate3d\(/);
-    assert.doesNotMatch(drag,/pointermove[\s\S]*?clientWidth|pointermove[\s\S]*?offsetWidth/);
-    assert.doesNotMatch(drag,/setTimeout/);
+    assert.doesNotMatch(main,/installBattleInfoHandleDrag|__battleInfoHandleDragInstalled|__suppressNextBattleInfoClick/);
+    assert.doesNotMatch(fixedCss,/battle-info-toggle\\.is-dragging|cursor:ew-resize/);
+    assert.match(fixedCss,/#battleInfoToggle\\.battle-info-toggle\\{[\\s\\S]*?touch-action:manipulation;[\\s\\S]*?cursor:pointer/);
 }
 
 console.log("Hit/evasion/status formula + battle UI owner convergence: PASS");
