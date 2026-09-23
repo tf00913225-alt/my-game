@@ -5,11 +5,11 @@
   "baseSha": "8bab02b38197824ac47f3ba2269ba6e19cbfd52f",
   "workBranch": "fix/freeze-petrify-exclusive-status-layer-20260923",
   "title": "冰封／石化互斥硬控與固定包覆底層 Owner 收斂",
-  "status": "IMPLEMENTED",
+  "status": "VERIFIED",
   "requirements": [
     {
       "id": "HARD-CONTROL-01",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "冰封與石化屬於同一 Exclusive Hard Control Group；同名或跨名皆在正式狀態寫入與命中骰點前 MISS，不覆蓋、不刷新、不延長既有狀態。",
       "evidence": [
         "js/00-main.js",
@@ -18,7 +18,7 @@
     },
     {
       "id": "MISS-02",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "互斥失敗走正式『狀態MISS』呈現；跨名 Log 同時指出目前既有狀態與新的失敗狀態，不誤標為抵抗。",
       "evidence": [
         "js/00-main.js",
@@ -27,7 +27,7 @@
     },
     {
       "id": "ENTRY-03",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "玩家、怪物、Boss、深淵與直接 mutation 入口共同受 canApplyNamedPersistentState / rollNamedPersistentStatusEffect Gate 保護；applyFreezeEffect 與 applyMonsterDebuff 不可繞過。",
       "evidence": [
         "js/00-main.js",
@@ -37,7 +37,7 @@
     },
     {
       "id": "BASE-LAYER-04",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "冰封／石化從 Body Rotation Pool 抽離為 hard-control-base 固定包覆底層；兩者 static、不呼吸、不閃爍，且 Base 層低於 Rotating Body Status。",
       "evidence": [
         "js/39-v143-skill-animation.js",
@@ -47,7 +47,7 @@
     },
     {
       "id": "ROTATION-05",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "其他一般 Body Status 保留既有 2 秒嚴格循序輪播，不使用 Date.now bucket；冰封／石化不參與輪播且單獨存在時無空白期。",
       "evidence": [
         "js/39-v143-skill-animation.js",
@@ -57,7 +57,7 @@
     },
     {
       "id": "LIFECYCLE-06",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "死亡、正式解除／淨化後 Base Cover 於下一次正式同步立即清除；Cast VFX 期間沿用 deferredStatusDuringCast，Cast 結束後由 Persistent Status 接手而非等待輪播。",
       "evidence": [
         "js/39-v143-skill-animation.js",
@@ -66,7 +66,7 @@
     },
     {
       "id": "CONTRACT-07",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "Runtime 若偵測同角色同時存在 freeze+petrify，視為 Gameplay Contract violation 並報錯，不以 UI 正規化或隱藏其中一個掩蓋資料問題。",
       "evidence": [
         "js/39-v143-skill-animation.js"
@@ -74,9 +74,11 @@
     }
   ],
   "verification": {
-    "focusedTests": "PASS — CI run 35820871917 completed all targeted and full Node/integration suites before build synchronization.",
-    "build": "SYNCED — deterministic production build committed as cd04433925b5925aba4678bce366515aeb16739c; fresh PR CI pending.",
-    "repositoryChecks": "PENDING — fresh PR CI after build synchronization.",
-    "diffCheck": "PENDING — fresh PR CI after build synchronization."
+    "focusedTests": "PASS — PR CI run 35820871917 completed the full targeted/Node/integration suite before deterministic build synchronization.",
+    "build": "PASS — deterministic production build synchronized in cd04433925b5925aba4678bce366515aeb16739c; PR CI run 35821205754 Repository checks SUCCESS on the synchronized candidate.",
+    "repositoryChecks": "PASS — GitHub Actions PR CI run 35821205754, Repository checks SUCCESS.",
+    "diffCheck": "PASS — covered by the successful Repository checks on PR head 335308ff56e15846b2e14834fef02e095bb664e0.",
+    "verifiedRunId": 35821205754,
+    "verifiedHeadSha": "335308ff56e15846b2e14834fef02e095bb664e0"
   }
 }
