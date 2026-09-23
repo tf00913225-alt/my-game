@@ -257,7 +257,7 @@
 
         monster.sp=Math.max(0,numeric(monster.sp)-numeric(skill.spCost));
         if(typeof showMonsterSkillNameBadge==="function"){
-            showMonsterSkillNameBadge(skill.name,skill.element||"light",monsterIndex);
+            showMonsterSkillNameBadge(skill.name,skill.element||"light",monsterIndex,null,allies.map(entry=>entry.index),"monster",skill.targetType);
         }
         if(skillId==="yuanZuBlessing"){
             let removed=0;
@@ -291,8 +291,8 @@
             });
             if(typeof addBattleLog==="function"){
                 addBattleLog("極帝天尊施放元祖賜福：全體各恢復100 HP、100 SP（實際 "+healedTotal+" HP／"+
-                    restoredSpTotal+" SP）；"+blessedTargets+"名友方獲得閃避提升35%，持續2回合；"+
-                    cleansedTargets+"名目標觸發35%獨立淨化，共解除"+removed+"個負面狀態。");
+                    restoredSpTotal+" SP）；"+blessedTargets+"名友方獲得閃避提升"+numeric(skill.evasionBonusPercent)+"%，持續"+
+                    numeric(skill.duration)+"回合；"+cleansedTargets+"名目標觸發35%獨立淨化，共解除"+removed+"個負面狀態。");
             }
         }else{ return false; }
         if(typeof updateUI==="function"){ updateUI(); }
@@ -311,11 +311,18 @@
         return currentBattleMonsters.map(index=>({index:index,monster:monsters[index]})).filter(entry=>!!entry.monster);
     }
 
-    function allyTriTargets(monsterIndex){
+    function allyTriTargeting(monsterIndex){
         const living=currentAbyssEntries();
-        return typeof window.v141GetMonsterAllyTriTargets==="function"
+        if(typeof window.v141GetMonsterAllyTriTargeting==="function"){
+            return window.v141GetMonsterAllyTriTargeting(monsterIndex,living);
+        }
+        const entries=typeof window.v141GetMonsterAllyTriTargets==="function"
             ?window.v141GetMonsterAllyTriTargets(monsterIndex,living)
             :living.slice(0,3);
+        return {entries:entries,primaryIndex:entries[0]?entries[0].index:null};
+    }
+    function allyTriTargets(monsterIndex){
+        return allyTriTargeting(monsterIndex).entries;
     }
 
     function hasNamedState(monster,stateName){
@@ -363,14 +370,15 @@
         const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
         const skill=typeof skillDatabase!=="undefined"?skillDatabase.healSpell:null;
         if(!monster||(monster.v141SupportSkillIds||[]).indexOf("healSpell")<0||monster.alive===false||numeric(monster.hp)<=0||!skill||hardControlled(monster)){ return false; }
-        const allies=allyTriTargets(monsterIndex);
+        const targeting=allyTriTargeting(monsterIndex);
+        const allies=targeting.entries;
         const needsHeal=currentAbyssEntries().some(entry=>
             monsterBaseHp(entry.monster)<monsterBaseMaxHp(entry.monster)*.70
         );
         if(!needsHeal||!supportCastAllowed(monster,forceCast)||numeric(monster.sp)<numeric(skill.spCost)){ return false; }
         monster.sp=Math.max(0,numeric(monster.sp)-numeric(skill.spCost));
         if(typeof showMonsterSkillNameBadge==="function"){
-            showMonsterSkillNameBadge(skill.name,skill.element||"water",monsterIndex);
+            showMonsterSkillNameBadge(skill.name,skill.element||"water",monsterIndex,targeting.primaryIndex,allies.map(entry=>entry.index),"monster",skill.targetType);
         }
         const level=finalSkillLevel(monster,skill);
         const hpAmount=levelValue(
@@ -379,7 +387,6 @@
             numeric(skill.baseHeal)+numeric(skill.healPerLevel)*(level-1)
         );
         const spPercent=levelValue(skill.spRestorePercentByLevel,level,0);
-        let cleansed=0;
         let restoredSpTotal=0;
         allies.forEach(entry=>{
             const ally=entry.monster;
@@ -389,13 +396,6 @@
                 :Math.floor(Math.max(0,numeric(ally.maxSP))*spPercent/100);
             const restored=spAmount>0?restoreMonsterSp(ally,spAmount):0;
             restoredSpTotal+=restored;
-            if(skill.cleanseAll&&Array.isArray(ally.statusEffects)){
-                const before=ally.statusEffects.length;
-                ally.statusEffects=ally.statusEffects.filter(effect=>
-                    effect&&(effect.dispellable===false||effect.uncleansable===true)
-                );
-                cleansed+=before-ally.statusEffects.length;
-            }
             if(healed>0&&typeof showMonsterHit==="function"){ showMonsterHit(entry.index,healed,"heal"); }
             if(restored>0&&typeof showDamagePopup==="function"&&typeof document!=="undefined"){
                 const card=document.getElementById("battleMonster"+entry.index);
@@ -405,8 +405,7 @@
         });
         if(typeof addBattleLog==="function"){
             addBattleLog("北帝天尊施放治療術：同排最多"+allies.length+"名友方各回復"+
-                hpAmount+" HP，其他目標依最大SP恢復"+spPercent+"%（合計"+restoredSpTotal+" SP），施放者本人不恢復SP"+
-                (skill.cleanseAll?"，並解除"+cleansed+"個可解除負面狀態":"")+"。");
+                hpAmount+" HP，其他目標依最大SP恢復"+spPercent+"%（合計"+restoredSpTotal+" SP），施放者本人不恢復SP。");
         }
         if(typeof updateUI==="function"){ updateUI(); }
         if(typeof finishPlayerAction==="function"){ finishPlayerAction(); }
@@ -425,7 +424,7 @@
         if(!target||!supportCastAllowed(monster,forceCast)||numeric(monster.sp)<numeric(skill.spCost)){ return false; }
         monster.sp=Math.max(0,numeric(monster.sp)-numeric(skill.spCost));
         if(typeof showMonsterSkillNameBadge==="function"){
-            showMonsterSkillNameBadge(skill.name,skill.element||"water",monsterIndex);
+            showMonsterSkillNameBadge(skill.name,skill.element||"water",monsterIndex,target.index,[target.index],"monster",skill.targetType);
         }
         const level=finalSkillLevel(monster,skill);
         const percent=levelValue(skill.reviveHealPercentByLevel,level,100);
@@ -460,11 +459,13 @@
         const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
         const skill=typeof skillDatabase!=="undefined"?skillDatabase.rockWall:null;
         if(!monster||(monster.v141SupportSkillIds||[]).indexOf("rockWall")<0||monster.alive===false||numeric(monster.hp)<=0||!skill||hardControlled(monster)){ return false; }
-        const targets=allyTriTargets(monsterIndex).filter(entry=>!hasNamedState(entry.monster,"rockWall"));
+        const targeting=allyTriTargeting(monsterIndex);
+        const requestedTargets=targeting.entries;
+        const targets=requestedTargets.filter(entry=>!hasNamedState(entry.monster,"rockWall"));
         if(!targets.length||!supportCastAllowed(monster,forceCast)||numeric(monster.sp)<numeric(skill.spCost)){ return false; }
         monster.sp=Math.max(0,numeric(monster.sp)-numeric(skill.spCost));
         if(typeof showMonsterSkillNameBadge==="function"){
-            showMonsterSkillNameBadge(skill.name,skill.element||"earth",monsterIndex);
+            showMonsterSkillNameBadge(skill.name,skill.element||"earth",monsterIndex,targeting.primaryIndex,requestedTargets.map(entry=>entry.index),"monster",skill.targetType);
         }
         const level=finalSkillLevel(monster,skill);
         const duration=Math.max(1,Math.floor(levelValue(skill.durationByLevel,level,skill.duration||4)));
@@ -504,7 +505,7 @@
         if(!targets.length||!supportCastAllowed(monster,forceCast)||numeric(monster.sp)<numeric(skill.spCost)){ return false; }
         monster.sp=Math.max(0,numeric(monster.sp)-numeric(skill.spCost));
         if(typeof showMonsterSkillNameBadge==="function"){
-            showMonsterSkillNameBadge(skill.name,skill.element||"wind",monsterIndex);
+            showMonsterSkillNameBadge(skill.name,skill.element||"wind",monsterIndex,targets[0].index,[targets[0].index],"monster",skill.targetType);
         }
         const level=finalSkillLevel(monster,skill);
         const duration=Math.max(1,Math.floor(levelValue(skill.durationByLevel,level,skill.duration||2)));
@@ -534,11 +535,13 @@
         if(!monster||!(monster.v141SupportSkillIds||[]).includes("dodgeSkill")||monster.element!=="wind"||monster.alive===false||numeric(monster.hp)<=0||!skill||hardControlled(monster)){
             return false;
         }
-        const targets=allyTriTargets(monsterIndex).filter(entry=>!hasNamedState(entry.monster,"風行"));
+        const targeting=allyTriTargeting(monsterIndex);
+        const requestedTargets=targeting.entries;
+        const targets=requestedTargets.filter(entry=>!hasNamedState(entry.monster,"風行"));
         if(!targets.length||!supportCastAllowed(monster,forceCast)||numeric(monster.sp)<numeric(skill.spCost)){ return false; }
         monster.sp=Math.max(0,numeric(monster.sp)-numeric(skill.spCost));
         if(typeof showMonsterSkillNameBadge==="function"){
-            showMonsterSkillNameBadge(skill.name,skill.element||"wind",monsterIndex);
+            showMonsterSkillNameBadge(skill.name,skill.element||"wind",monsterIndex,targeting.primaryIndex,requestedTargets.map(entry=>entry.index),"monster",skill.targetType);
         }
         const level=finalSkillLevel(monster,skill);
         const duration=Math.max(1,Math.floor(levelValue(skill.durationByLevel,level,skill.duration||3)));
