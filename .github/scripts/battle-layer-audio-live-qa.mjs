@@ -412,18 +412,21 @@ try{
         region.style.transition='none';
         const rect=node=>{const value=node.getBoundingClientRect();return {top:value.top,bottom:value.bottom,height:value.height};};
         toggleBattleInfoPanel();
-        const expanded={region:rect(region),info:rect(info),aria:button.getAttribute('aria-expanded'),className:region.className};
+        const expanded={region:rect(region),info:rect(info),aria:button.getAttribute('aria-expanded'),className:region.className,label:button.textContent.trim(),background:getComputedStyle(region).backgroundColor};
         toggleBattleInfoPanel();
-        const collapsed={region:rect(region),info:rect(info),aria:button.getAttribute('aria-expanded'),className:region.className};
+        const collapsed={region:rect(region),info:rect(info),aria:button.getAttribute('aria-expanded'),className:region.className,label:button.textContent.trim(),background:getComputedStyle(region).backgroundColor};
         region.style.removeProperty('transition');
         return {expanded,collapsed};
     })()`);
     evidence.checks.battleInfoDrawer=infoDrawer;
     assert.ok(infoDrawer,"Live battle must expose the formal battle-info drawer owner");
     assert.equal(infoDrawer.expanded.aria,"true","Tapping the handle must expand battle info");
+    assert.equal(infoDrawer.expanded.label,"返回","Expanded battle info handle must become 返回");
     assert.match(infoDrawer.expanded.className,/is-expanded/);
     assert.ok(infoDrawer.expanded.info.top<layout.regions.wrap.bottom,"Expanded battle info must slide into the battlefield viewport");
     assert.equal(infoDrawer.collapsed.aria,"false","Tapping again must collapse battle info");
+    assert.equal(infoDrawer.collapsed.label,"戰鬥資訊","Collapsed battle info handle must restore 戰鬥資訊");
+    assert.match(infoDrawer.collapsed.background,/rgba?\(0, 0, 0(?:, 0\.92)?\)/,"Collapsed battle info must retain a black backing");
     assert.doesNotMatch(infoDrawer.collapsed.className,/is-expanded/);
     assert.ok(infoDrawer.collapsed.info.top>=layout.regions.wrap.bottom-1,"Collapsed battle info must return below the battlefield viewport");
 
@@ -898,6 +901,8 @@ try{
     assert.ok(resultModalReadability?.shown,"Detailed battle result modal must open from the final snapshot");
     assert.equal(resultModalReadability.parentId,"game-content","Battle result modal must use the legacy game-content coordinate owner");
     assert.equal(resultModalReadability.hidden,false,"Detailed battle result modal must be visible while inspected");
+    assert.equal(resultModalReadability.titleFont,"22px","Detailed result title should use normal mobile typography");
+    assert.equal(resultModalReadability.valueFont,"19px","Detailed result values should not dominate the panel");
     assert.ok(resultModalReadability.title?.height>=24,`Battle result title is too small on mobile: ${resultModalReadability.title?.height}`);
     assert.ok(resultModalReadability.label?.height>=13,`Battle result label is too small on mobile: ${resultModalReadability.label?.height}`);
     assert.ok(resultModalReadability.value?.height>=18,`Battle result value is too small on mobile: ${resultModalReadability.value?.height}`);
