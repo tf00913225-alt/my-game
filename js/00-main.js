@@ -3448,7 +3448,7 @@ function makeZoneMonster(
             calculateAntiCritPercent(points.spirit),
 
         evasion:
-            Math.min(30,Math.max(0,Number(level)||0)*0.3),
+            getDefaultMonsterEvasion(level),
 
         agility:
             points.agility,
