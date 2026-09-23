@@ -8,6 +8,7 @@ const fs=require("node:fs");
 const vm=require("node:vm");
 
 const source=fs.readFileSync("js/50-v169-water-skill-rules.js","utf8");
+const progression=fs.readFileSync("js/60-v173.64-skill-progression-rebalance.js","utf8");
 
 let passed=0;
 function test(name,handler){
@@ -147,15 +148,12 @@ test("damage growth sequences and HP-only lifesteal text match every level",()=>
         );
         assert.deepEqual(actual,expected,id);
     });
-    const preview=context.getSkillEffectPreviewText(context.skillDatabase.iceSpin,5);
-    assert.match(preview,/63/);
-    assert.match(preview,/35%基礎機率凍傷2回合/);
-    assert.match(preview,/傷害-25%、閃避-25%、異常狀態抗性-25%/);
-    assert.match(preview,/吸取實際傷害7%（只恢復自身HP）/);
-    assert.doesNotMatch(preview,/HP\/SP|冰封/);
-    const freeze=context.getSkillEffectPreviewText(context.skillDatabase.freeze,1);
-    assert.match(freeze,/90%基礎機率冰封3回合/);
-    assert.match(freeze,/不造成傷害/);
+    assert.equal(context.getSkillEffectPreviewText(context.skillDatabase.iceSpin,5),"legacy");
+    assert.equal(context.buildSkillLevelBreakdownHTML(context.skillDatabase.iceSpin),"legacy");
+    assert.doesNotMatch(source,/getSkillEffectPreviewText\s*=|buildSkillLevelBreakdownHTML\s*=/);
+    assert.match(progression,/frostbiteChance[\s\S]*?傷害-25%、最終閃躲-25%、最終異常狀態抗性-25%/);
+    assert.match(progression,/lifestealPercentByLevel[\s\S]*?實際傷害回復自身HP/);
+    assert.match(progression,/if\(skill\.id==="freeze"\)[\s\S]*?基礎機率冰封/);
 });
 
 test("secondary and legacy player-two Freeze resolve the front/back column",()=>{

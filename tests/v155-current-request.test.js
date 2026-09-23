@@ -101,8 +101,8 @@ test("V155 no longer owns a final-roster patch",()=>{
 test("enemy AI keeps 70/30 category selection and hard-control caps directional",()=>{
     assert.match(coreSource,/Number\(randomValue\)<\.70\?"attack":"buff"/);
     assert.match(coreSource,/regular:\{\s*min:5,\s*max:90/);
-    assert.match(coreSource,/elite:\{\s*min:5,\s*max:80/);
-    assert.match(coreSource,/boss:\{\s*min:5,\s*max:70/);
+    assert.match(coreSource,/elite:\{\s*min:5,\s*max:75/);
+    assert.match(coreSource,/boss:\{\s*min:5,\s*max:60/);
     assert.match(coreSource,/player:\{\s*min:5,\s*max:60/);
     assert.match(coreSource,/targetFinalSpirit,true,"player"/);
     const v143=fs.readFileSync("js/38-v143-system-fixes.js","utf8");

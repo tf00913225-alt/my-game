@@ -179,7 +179,8 @@ test("earth shield is raster-owned while ally targeting and Barrier rules remain
     assert.match(fixedSlotCss,/\.battle-player\.v174-cardless-unit\.ally-targetable::after/);
     assert.match(fixedSlotCss,/\.battle-player\.v174-cardless-unit\.ally-targetable::before/);
     assert.match(system,/targetAlly:index/);
-    assert.match(system,/monster\.v141Shield\.remainingBlocks=5/);
+    assert.match(system,/const resolvedBlocks=barrier\?Math\.max\(1,Math\.floor\(numeric\(barrierBlocks\)\|\|3\)\):0/);
+    assert.match(system,/monster\.v141Shield\.remainingBlocks=resolvedBlocks/);
     assert.match(system,/DOT bypasses Barrier without consuming a block/);
 });
 

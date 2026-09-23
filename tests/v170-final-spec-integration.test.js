@@ -17,6 +17,8 @@ const mainSource=fs.readFileSync("js/00-main.js","utf8");
 const indexSource=fs.readFileSync("index.html","utf8");
 const loaderSource=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const progressionSource=fs.readFileSync("js/60-v173.64-skill-progression-rebalance.js","utf8");
+const v140Source=fs.readFileSync("js/33-v140-four-element-balance.js","utf8");
+const v158Source=fs.readFileSync("js/47-v158-combat-tuning.js","utf8");
 
 const EXPECTED_DIRECT_SCRIPT_PATHS=[
     "js/00-main.js",

@@ -95,7 +95,7 @@ test("formal Heal and Purify runtime keeps robust fallbacks and the selected pri
   assert.match(support,/typeof calculateSPHealingAmount==="function"[\s\S]*?legacySpBase/);
   assert.match(support,/const selectedPrimary=targetSide==="monster"[\s\S]*?\?enemyIndex/);
   assert.match(support,/const primaryTarget=targets\.includes\(selectedPrimary\)\?selectedPrimary:targets\[0\]/);
-  assert.match(support,/animateSupportCast\(state,characterIndex,skill,primaryTarget,targets,targetSide\)/);
+  assert.match(support,/const presentationTargetType=targets\.length>1[\s\S]*?animateSupportCast\(state,characterIndex,skill,primaryTarget,targets,targetSide,presentationTargetType\)/);
 });
 
 test("Lv5 resonance extension and three-cast Blood Burn exclude free follow-ups",()=>{
@@ -109,7 +109,7 @@ test("Lv5 resonance extension and three-cast Blood Burn exclude free follow-ups"
 });
 
 test("enemy Rock Wall shares tri-target owner and formal level data",()=>{
-  assert.match(abyss,/function resolveRockWall[\s\S]*?const targets=allyTriTargets\(monsterIndex\)/);
+  assert.match(abyss,/function resolveRockWall[\s\S]*?const targeting=allyTriTargeting\(monsterIndex\)[\s\S]*?const requestedTargets=targeting\.entries[\s\S]*?const targets=requestedTargets\.filter/);
   assert.match(abyss,/defenseBonusPercentByLevel/);
   assert.match(abyss,/同排最多/);
   assert.doesNotMatch(abyss,/function resolveRockWall[\s\S]{0,700}?const targets=currentAbyssEntries\(\)/);
