@@ -22,6 +22,7 @@
         "stoneSlash","petrifyFist","stoneBreakSky","earthquakeCrush",
         "stoneThrow","sandWind","flyingSandStrike","dustStorm"
     ]);
+    const PLAYER_DAMAGE_SKILL_ID_SET=new Set(PLAYER_DAMAGE_SKILL_IDS);
     const FIRE_MOMENTUM_BY_LEVEL=Object.freeze([12,15,18,21,25]);
     const BLOOD_BURN_HP_COST_BY_LEVEL=Object.freeze([5,10,15,20,25]);
     const BLOOD_BURN_BY_LEVEL=Object.freeze([5,10,15,20,35]);
