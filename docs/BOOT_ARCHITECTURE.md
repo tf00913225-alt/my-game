@@ -113,7 +113,7 @@ Gameplay payload 保留既有 schema；ownership 不塞入戰鬥或數值欄位�
 - 五個 hashed Firebase lifecycle modules，加上 Firebase 官方 SDK 的必要 ESM dependency。
 - `index.html` 的 shell、account UI host、必要錯誤顯示與 navigation DOM。
 
-取得 UID 後，`app-shell` 與 UID save I/O 並行。主城第一畫面的 `#v146HomeRoster` 必須由 app-shell 先建立固定尺寸 shell；存檔 hydrate 前使用固定佔位，hydrate 後只填入三名角色與 `teamLoadout.relicId` 對應摘要，不得等待 `feature-boss-relic` 才新增整塊區域。秘寶名稱／觸發描述的 First Screen-safe 靜態來源固定為 `js/relic-summary-catalog.js`；完整 Catalog／VFX／Battle Trigger／Boss／Tower／progression 仍維持 lazy feature。
+取得 UID 後，`app-shell` 與 UID save I/O 並行。主城第一畫面的 `#v146HomeRoster` 必須由 app-shell 先建立固定尺寸 shell；存檔 hydrate 前使用固定佔位，hydrate 後只填入三名角色與 `teamLoadout.relicId` 對應摘要，不得等待任何秘寶 feature 才新增整塊區域。秘寶名稱／觸發描述的 First Screen-safe 靜態來源固定為 `js/relic-summary-catalog.js`。Team Relic Battle Runtime 獨立為 lazy `feature-relic-runtime`；只有準備進入正式 Battle feature 時才作為 dependency execute。Boss／Tower／秘寶養成仍留在 `feature-boss-relic`，不得把整包塞回 Critical Boot。
 
 取得 UID 後，`app-shell` 與 UID save I/O 並行。`app-shell` 是創角或已有角色進第一個可操作畫面的必要 legacy core；`gameplay-core` 與其餘 feature 不得阻塞 Auth UI、創角或主城互動。
 
@@ -135,8 +135,8 @@ Loading progress 以已完成 task 為準：boot shell、account UI、Auth SDK�
 | `gameplay-core` | 戰鬥共用、背包、裝備、商店、合成、主要副本 runtime | `app-shell` |
 | `feature-patrol` | 巡怪形象與 hashed WebP | `gameplay-core` |
 | `feature-abyss` | 深淵兩層流程 | `gameplay-core` |
-| `feature-skill` | 技能成長規則 | `gameplay-core` |
-| `feature-boss-relic` | 玩法中心、BOSS、四象塔、秘寶；亦包含目前正式副本 opener owner | `gameplay-core` |
+| `feature-relic-runtime` | Team Relic Catalog／Trigger／Effect／Battle VFX Runtime | `gameplay-core` |
+| `feature-boss-relic` | 玩法中心、BOSS、四象塔、秘寶養成；Battle Runtime 由 `feature-relic-runtime` 提供 | `feature-relic-runtime` |
 
 `pointerdown`／`touchstart` 只 prefetch 被指向的 feature；click 時若尚未 ready，只把該 control 標為 `aria-busy` 並顯示局部 loading。其他按鈕與全 app 保持可操作。Critical Ready 後由 `requestIdleCallback`（或 800ms fallback）只預抓高機率 bundle；preload 不等於 execute。
 
