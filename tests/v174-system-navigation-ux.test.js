@@ -21,6 +21,8 @@ assert.match(guard,/window\.FourSymbolsFeatures\.ensure\("gameplay-core"/);
 assert.match(guard,/window\.resetGame\(\)/);
 assert.match(guard,/v169RpgDialogTitle/);
 assert.match(guard,/cancel\.textContent="返回系統"/);
-assert.match(guard,/document\.addEventListener\("click",interceptSystemAction,true\)/);
+assert.match(guard,/const systemRoot=document\.getElementById\("homeFeatureModal"\)/);
+assert.match(guard,/systemRoot\.addEventListener\("click",interceptSystemAction,true\)/);
+assert.doesNotMatch(guard,/document\.addEventListener\("click",interceptSystemAction,true\)/);
 
 console.log("✓ system save/delete flows keep explicit return navigation");

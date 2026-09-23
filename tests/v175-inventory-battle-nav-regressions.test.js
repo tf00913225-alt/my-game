@@ -39,10 +39,17 @@ assert.doesNotMatch(fireCss,/v174FireRocketTravel/);
 assert.doesNotMatch(fireCss,/data-skill="fireRocket"/);
 
 const html=read("index.html");
-const mapNav=html.slice(html.indexOf('id="mapPageNav"'),html.indexOf('id="mapFeatureModal"'));
-const navPositions=["openHomeFeature('character')","openMapInventoryOverlay()","openHomeFeature('relic')","openHomeFeature('autoBattleSettings')","leaveMap()"].map(token=>mapNav.indexOf(token));
-assert.ok(navPositions.every(position=>position>=0)&&navPositions.every((position,index)=>index===0||position>navPositions[index-1]),"map navigation must be 角色、背包、秘寶、元素匣、返回");
-assert.match(mapNav,/assets\/ui\/nav-relic-v175\.webp/);
+const contextNav=read("js/42-v148-combat-dungeon-fixes.js");
+const contextNavStart=contextNav.indexOf("const CONTEXT_NAV_ITEMS=Object.freeze([");
+const contextNavEnd=contextNav.indexOf("function contextNavMarkup",contextNavStart);
+const contextNavItems=contextNav.slice(contextNavStart,contextNavEnd);
+const navPositions=["角色","背包","秘寶","元素匣"].map(label=>contextNavItems.indexOf('["'+label+'",'));
+assert.ok(navPositions.every(position=>position>=0)&&navPositions.every((position,index)=>index===0||position>navPositions[index-1]),"shared context navigation must be 角色、背包、秘寶、元素匣、返回");
+assert.match(contextNav,/buttons\.push\(\["返回","assets\/ui\/map-return\.png",returnAction\]\)/);
+assert.match(contextNav,/renderContextNav\(patrolNav,"leaveMap\(\)","patrol"\)/);
+assert.match(contextNav,/const trainingActive=[\s\S]*?contextActive=dungeonActive\|\|gameplayActive\|\|trainingActive/);
+assert.match(contextNav,/const mode=trainingActive[\s\S]*?\?"training"/);
+assert.match(contextNavItems,/assets\/ui\/nav-relic-v175\.webp/);
 assert.ok(fs.existsSync("assets/ui/nav-relic-v175.webp"),"transparent relic navigation asset must ship");
 assert.doesNotMatch(html,/<button[^>]*class="gameplay-back-button v174-gameplay-home-back"[\s\S]*?<\/button>/);
 
