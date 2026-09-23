@@ -1012,12 +1012,11 @@ test("final support passives and front/back Freeze behavior are exact",()=>{
         "V173.43 historical snapshot keeps its pre-progression Wind EX value"
     );
     assert.match(progressionSource,/windEX:\{[\s\S]*?evasionBonusPercent:10/);
-    assert.deepEqual(Array.from(skills.dodgeSkill.evasionBonusPercentByLevel),[5,10,15,20,25]);
-    assert.deepEqual(Array.from(skills.dinghaishenzhen.statusResistBonusByLevel),[5,8,10,12,15]);
-    assert.deepEqual(Array.from(skills.dinghaishenzhen.accuracyBonusPercentByLevel),[5,10,15,20,25]);
-    assert.equal(skills.dodgeSkill.evasionBonusPercent,undefined);
-    assert.equal(skills.dinghaishenzhen.statusResistBonus,undefined);
-    assert.equal(skills.dinghaishenzhen.accuracyBonusPercent,undefined);
+    assert.match(progressionSource,/DODGE_BY_LEVEL=Object\.freeze\(\[5,10,15,20,25\]\)/);
+    assert.match(progressionSource,/CALM_RESIST_BY_LEVEL=Object\.freeze\(\[5,8,10,12,15\]\)/);
+    assert.match(progressionSource,/CALM_ACCURACY_BY_LEVEL=Object\.freeze\(\[5,10,15,20,25\]\)/);
+    assert.match(progressionSource,/const dodge=skillDatabase\.dodgeSkill;[\s\S]*?dodge\.evasionBonusPercentByLevel=DODGE_BY_LEVEL\.slice\(\)[\s\S]*?delete dodge\.evasionBonusPercent/);
+    assert.match(progressionSource,/const calm=skillDatabase\.dinghaishenzhen;[\s\S]*?calm\.statusResistBonusByLevel=CALM_RESIST_BY_LEVEL\.slice\(\)[\s\S]*?calm\.accuracyBonusPercentByLevel=CALM_ACCURACY_BY_LEVEL\.slice\(\)[\s\S]*?delete calm\.statusResistBonus[\s\S]*?delete calm\.accuracyBonusPercent/);
     assert.deepEqual(
         [skills.earthShield.reflectPercent,skills.earthShield.duration,
             skills.rockWall.defenseBonusPercent,skills.rockWall.duration,
