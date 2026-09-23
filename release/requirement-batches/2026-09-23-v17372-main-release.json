@@ -50,9 +50,16 @@
     },
     {
       "id": "REL-04",
-      "status": "TODO",
+      "status": "VERIFIED",
       "requirement": "發布準備 PR 合併 dev 後，V173.72 最新 dev HEAD 再次通過 Repository checks、DEV exact-SHA deployment、版本核對與 live QA。",
-      "evidence": []
+      "evidence": [
+        "dev@d07ed87616390f13d52ec03a730305d6fdfa4b8f",
+        "dev push CI run 35882240376 Repository checks SUCCESS",
+        "DEV deployment job 107253838427 SUCCESS",
+        "exact deployed SHA d07ed87616390f13d52ec03a730305d6fdfa4b8f",
+        "Game / Cache Version 173.72 / 173.72 verified",
+        "deployed battle layout / VFX live mobile QA PASS"
+      ]
     },
     {
       "id": "REL-05",
@@ -66,12 +73,12 @@
     "2026-09-23-freeze-petrify-exclusive-status-layer",
     "2026-09-23-skill-relic-runtime-owner-convergence"
   ],
-  "automatedVerification": "Source dev@9993440390c752419a16cf612acedd003fa246af passed CI run 35879220843, exact-SHA Cloudflare dev deployment and deployed battle live QA. V173.72 deterministic production build was synchronized at 90fb2bf30a8f6c2c58b8355f6574fa872804a62c; final release-prep head 4699d0d18fb1ef0b47fc06cd50fa970da81132d3 passed CI run 35881597305.",
+  "automatedVerification": "V173.72 release-prep PR #535 merged to dev@d07ed87616390f13d52ec03a730305d6fdfa4b8f. Final release-prep CI run 35881984862 succeeded. Dev push CI run 35882240376 and exact-SHA deployment job 107253838427 both succeeded; Game/Cache 173.72 and deployed battle layout/VFX live QA passed. Protected dev → main promotion remains pending.",
   "visualVerification": "Project owner explicitly requested promotion to main; deployed battle live QA passed on the exact dev source SHA.",
   "verifiedSourceCommit": "9993440390c752419a16cf612acedd003fa246af",
-  "mergedDevCommit": null,
+  "mergedDevCommit": "d07ed87616390f13d52ec03a730305d6fdfa4b8f",
   "mergedMainCommit": null,
-  "candidateCiRun": 35881597305,
-  "devPushCiRun": 35879220843,
-  "devDeployJob": 107243537924
+  "candidateCiRun": 35881984862,
+  "devPushCiRun": 35882240376,
+  "devDeployJob": 107253838427
 }
