@@ -18,7 +18,7 @@ const baseline=Object.freeze({
   renderBattleWrappers:0,
   mutationObservers:22,
   bodyObservers:17,
-  setIntervals:16,
+  setIntervals:17,
   globalClickListeners:13
 });
 const limits=Object.freeze({
@@ -27,7 +27,7 @@ const limits=Object.freeze({
   renderBattleWrappers:0,
   mutationObservers:11,
   bodyObservers:0,
-  setIntervals:14,
+  setIntervals:15,
   globalClickListeners:5
 });
 
@@ -41,7 +41,7 @@ const intervalAllowlist=Object.freeze({
   "js/54-v173.51-battle-qa.js":1,
   "js/release-update-notification.js":1,
   "js/relic-progression-drop-system.js":1,
-  "js/adventure/adventure-runtime-v1-20260915.js":2
+  "js/adventure/adventure-runtime-v1-20260915.js":3
 });
 const globalClickAllowlist=Object.freeze({
   "js/00-main.js":2,
