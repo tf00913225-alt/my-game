@@ -553,17 +553,11 @@ button:disabled{
     display:none;
 }
 
-/*
-   ★ 修正（依照使用者要求，「把自動戰鬥
-   放進下面導覽列最右邊」）：
-   從3個按鈕（角色/任務/返回）變成4個
-   （角色/任務/返回/自動戰鬥），
-   grid-template-columns改成4欄。
-*/
+/* 巡怪頁底部導覽固定為五鍵；實際按鈕由共用 context navigation owner 投影。 */
 
 #app.on-map-page #mapPageNav{
     display:grid;
-    grid-template-columns:repeat(4,1fr);
+    grid-template-columns:repeat(5,1fr);
 }
 
 .player-name{
@@ -5403,47 +5397,14 @@ body.skill-detail-scroll-active,
 
 
 /* =====================================================
-   V115 — 巡怪頁導覽 UI
-   下方固定：角色 / 背包 / 任務 / 元素匣
-   返回：右上角獨立透明 PNG 按鈕
+   巡怪頁底部導覽
+   角色 / 背包 / 秘寶 / 元素匣 / 返回
+   內容由 js/42-v148-combat-dungeon-fixes.js 的 context navigation owner 投影
 ===================================================== */
 #app.on-map-page #mapPageNav{
-    grid-template-columns:repeat(4,1fr) !important;
+    grid-template-columns:repeat(5,1fr) !important;
 }
 
-.map-page-return-float{
-    position:fixed;
-    top:10px;
-    right:10px;
-    z-index:55;
-    width:68px;
-    height:68px;
-    padding:0;
-    margin:0;
-    border:0;
-    background:transparent;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    line-height:0;
-    -webkit-tap-highlight-color:transparent;
-    -webkit-touch-callout:none;
-}
-.map-page-return-float img{
-    display:block;
-    width:68px;
-    height:68px;
-    object-fit:contain;
-    pointer-events:none;
-    user-select:none;
-    -webkit-user-drag:none;
-    filter:drop-shadow(0 2px 5px rgba(0,0,0,.55));
-    transition:transform .12s ease,filter .12s ease;
-}
-.map-page-return-float:active img{
-    transform:scale(.92);
-    filter:brightness(1.12) drop-shadow(0 2px 6px rgba(0,0,0,.65));
-}
 
 /* =====================================================
    V115 — 巡怪頁背包改為頁內浮層 + 左上快捷鈕放大
