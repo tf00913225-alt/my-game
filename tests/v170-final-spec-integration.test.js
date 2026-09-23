@@ -1008,8 +1008,10 @@ test("final support passives and front/back Freeze behavior are exact",()=>{
     assert.deepEqual(
         [skills.rage.duration,skills.dodgeSkill.duration,skills.stealthSkill.duration,
             skills.windEX.evasionBonusPercent],
-        [3,3,3,10]
+        [3,3,3,35],
+        "V173.43 historical snapshot keeps its pre-progression Wind EX value"
     );
+    assert.match(progressionSource,/windEX:\{[\s\S]*?evasionBonusPercent:10/);
     assert.deepEqual(Array.from(skills.dodgeSkill.evasionBonusPercentByLevel),[5,10,15,20,25]);
     assert.deepEqual(Array.from(skills.dinghaishenzhen.statusResistBonusByLevel),[5,8,10,12,15]);
     assert.deepEqual(Array.from(skills.dinghaishenzhen.accuracyBonusPercentByLevel),[5,10,15,20,25]);
