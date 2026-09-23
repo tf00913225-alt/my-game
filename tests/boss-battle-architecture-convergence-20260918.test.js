@@ -70,7 +70,7 @@ assert.match(fixedCss,/--battle-resource-bar-height:11px/);
 assert.match(fixedCss,/--battle-enemy-region-track:42fr[\s\S]*?--battle-center-region-track:16fr[\s\S]*?--battle-ally-region-track:42fr/);
 assert.match(fixedCss,/\.battle-center-region\{[\s\S]*?border:0/);
 assert.match(fixedCss,/\.battle-info-region\{[\s\S]*?position:absolute !important;[\s\S]*?bottom:0 !important/);
-assert.match(fixedCss,/\.battle-info-toggle\{[\s\S]*?left:auto;[\s\S]*?right:4px;[\s\S]*?width:96px;[\s\S]*?background:rgba\(0,0,0,\.62\);[\s\S]*?font-size:14px/);
+assert.match(fixedCss,/#battleInfoToggle\.battle-info-toggle\{[\s\S]*?left:auto;[\s\S]*?right:4px;[\s\S]*?width:96px;[\s\S]*?background-color:rgba\(0,0,0,\.82\) !important;[\s\S]*?background-image:none !important;[\s\S]*?font-size:14px/);
 assert.match(fixedCss,/\.battle-element-box-button\{[\s\S]*?width:66px !important;[\s\S]*?height:66px !important/);
 
 assert.match(home,/openHomeFeature\(\\'formation\\'\)/);
