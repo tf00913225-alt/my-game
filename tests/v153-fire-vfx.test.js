@@ -529,7 +529,11 @@ test("Burn and Rage breathing images follow live status records without owning a
     assert.equal(runtime.cards.battlePlayerCard0.querySelector(".v143-status-visual-rage"),null);
     assert.match(
         css,
-        /battle-monster\.v152-abyss-portrait\s*>\s*\.v143-status-visual\{[\s\S]*?position:absolute\s*!important;[\s\S]*?z-index:5\s*!important;/
+        /battle-monster\.v152-abyss-portrait\s*>\s*\.v143-status-visual\{[\s\S]*?position:absolute\s*!important;/
+    );
+    assert.doesNotMatch(
+        css,
+        /battle-monster\.v152-abyss-portrait\s*>\s*\.v143-status-visual\{[\s\S]*?z-index:5\s*!important;/
     );
 });
 
