@@ -5920,12 +5920,6 @@
         return Number.isFinite(result)?result:0;
     }
 
-    function levelValue(values,level,fallback){
-        if(!Array.isArray(values)||!values.length){ return numeric(fallback); }
-        const index=Math.max(0,Math.min(values.length-1,Math.floor(numeric(level)||1)-1));
-        return numeric(values[index]);
-    }
-
     function clamp(value,min,max){
         return Math.max(min,Math.min(max,value));
     }
@@ -6116,95 +6110,6 @@
     /* getMonsterEvasion() remains the single core owner; no late V158 wrapper. */
 
 
-    function castTriFreeze(characterIndex,skillId,centerIndex,legacyPlayer2){
-        const skill=typeof skillDatabase!=="undefined"?skillDatabase[skillId]:null;
-        const character=legacyPlayer2
-            ?(typeof player2!=="undefined"?player2:null)
-            :(typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(characterIndex):null);
-        const characterKey=legacyPlayer2
-            ?"player2"
-            :(typeof getPartyCharacterKey==="function"?getPartyCharacterKey(characterIndex):null);
-        const stats=legacyPlayer2
-            ?(typeof getPlayer2BattleStats==="function"?getPlayer2BattleStats():null)
-            :(typeof getPartyBattleStats==="function"?getPartyBattleStats(characterIndex):null);
-        const level=skill&&characterKey&&typeof getSkillLevel==="function"
-            ?getSkillLevel(characterKey,skillId)
-            :0;
-        const spCost=skill&&skill.spCost!==undefined?numeric(skill.spCost):numeric(skill&&skill.cost);
-
-        if(!skill||!character||!stats||level<=0||numeric(character.sp)<spCost){ return false; }
-
-        const resolvedIndex=typeof findAliveTargetIndex==="function"
-            ?findAliveTargetIndex(centerIndex)
-            :centerIndex;
-        if(resolvedIndex===null||resolvedIndex===undefined){
-            if(!legacyPlayer2&&typeof finishPlayerAction==="function"){ finishPlayerAction(); }
-            return true;
-        }
-
-        character.sp=Math.max(0,numeric(character.sp)-spCost);
-        if(typeof selectedMonster!=="undefined"){ selectedMonster=resolvedIndex; }
-        if(typeof lungePlayerCard==="function"){ lungePlayerCard(characterIndex); }
-        if(typeof showSkillNameBadge==="function"){
-            showSkillNameBadge(skill.name,skill.element,characterIndex);
-        }
-        if(typeof setTimeout==="function"&&typeof showPlayerSpPopup==="function"){
-            setTimeout(()=>showPlayerSpPopup(spCost,characterIndex),500);
-        }
-
-        const targetType=level>=Math.max(1,numeric(skill.maxLevel)||1)
-            ?(skill.targetTypeAtMaxLevel||"tri")
-            :(skill.targetType||"column");
-        const chance=levelValue(skill.freezeChanceByLevel,level,skill.freezeChance);
-        const duration=Math.max(1,Math.floor(levelValue(skill.freezeDurationByLevel,level,skill.freezeDuration||3)));
-        const targets=typeof getSkillTargets==="function"
-            ?getSkillTargets(resolvedIndex,targetType)
-            :[resolvedIndex];
-
-        targets.forEach(index=>{
-            const monster=typeof monsters!=="undefined"?monsters[index]:null;
-            if(!monster||monster.alive===false||numeric(monster.hp)<=0){ return; }
-            const rollArguments=[
-                chance,
-                character.level,
-                monster.level,
-                stats.intelligence,
-                typeof getMonsterEffectiveSpiritPoints==="function"
-                    ?getMonsterEffectiveSpiritPoints(monster)
-                    :numeric(monster.spiritPoints),
-                true,
-                typeof getMonsterRank==="function"?getMonsterRank(monster):monster.rank
-            ];
-            const statusResult=typeof window.v173RollNamedPersistentStatusEffect==="function"
-                ?window.v173RollNamedPersistentStatusEffect(
-                    monster,"freeze",rollArguments,"monster",index,skill.name
-                )
-                :{
-                    duplicate:false,
-                    hit:typeof rollStatusEffectHit==="function"&&
-                        rollStatusEffectHit.apply(null,rollArguments)
-                };
-
-            if(statusResult.hit){
-                if(typeof applyFreezeEffect==="function"){
-                    applyFreezeEffect(monster,duration);
-                }
-                if(typeof addBattleLog==="function"){
-                    addBattleLog(monster.name+"被冰封了！");
-                }
-            }else if(!statusResult.duplicate){
-                if(typeof showMissEffect==="function"){ showMissEffect(false,index,"抵抗"); }
-                if(typeof addBattleLog==="function"){
-                    addBattleLog(skill.name+"對"+monster.name+"沒有生效（抵抗）。");
-                }
-            }
-        });
-
-        if(typeof updateUI==="function"){ updateUI(); }
-        if(!legacyPlayer2&&typeof finishPlayerAction==="function"){ finishPlayerAction(); }
-        return true;
-    }
-
     /* Solo Lv1-20 formal daily protection: wave 1 is normal-attack only.
        From wave 2 onward skills are allowed at a reduced rate; a BOSS that just
        used a skill must perform one non-skill action before another skill. */
@@ -6248,31 +6153,8 @@
         };
     }
 
-    window.v158CastTriFreeze=castTriFreeze;
-
-    if(typeof castDamageSkill==="function"){
-        const previousCastDamageSkill=castDamageSkill;
-        castDamageSkill=function(skillId,centerIndex){
-            if(skillId==="freeze"&&castTriFreeze(0,skillId,centerIndex,false)){ return; }
-            return previousCastDamageSkill.apply(this,arguments);
-        };
-    }
-
-    if(typeof castSecondaryCharacterSkill==="function"){
-        const previousCastSecondaryCharacterSkill=castSecondaryCharacterSkill;
-        castSecondaryCharacterSkill=function(characterIndex,skillId,centerIndex){
-            if(skillId==="freeze"&&castTriFreeze(characterIndex,skillId,centerIndex,false)){ return; }
-            return previousCastSecondaryCharacterSkill.apply(this,arguments);
-        };
-    }
-
-    if(typeof castPlayer2Skill==="function"){
-        const previousCastPlayer2Skill=castPlayer2Skill;
-        castPlayer2Skill=function(skillId,centerIndex){
-            if(skillId==="freeze"&&castTriFreeze(1,skillId,centerIndex,true)){ return; }
-            return previousCastPlayer2Skill.apply(this,arguments);
-        };
-    }
+    /* Freeze/Hard Control execution is owned by js/00-main.js.
+       V158 keeps only combat tuning and must not wrap player skill casts. */
 
     if(typeof openInventoryCharacterDetail==="function"){
         const previousOpenInventoryCharacterDetail=openInventoryCharacterDetail;
@@ -10461,7 +10343,9 @@ ensureFunctionalStyles();runRepairs();
         return Math.max(1,max);
     }
     function announceSkill(actorIndex,skill){
-        if(typeof showSkillNameBadge==="function"){ showSkillNameBadge(skill.name,"fire",actorIndex); }
+        if(typeof showSkillNameBadge==="function"){
+            showSkillNameBadge(skill.name,skill.element||"fire",actorIndex,actorIndex,[actorIndex],"player","self");
+        }
         if(typeof addBattleLog==="function"){ addBattleLog((actorByPartyIndex(actorIndex)?.id||"角色")+"施放「"+skill.name+"」。"); }
     }
     function finishTacticalAction(){
