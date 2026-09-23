@@ -13711,11 +13711,11 @@ function rollHitChance(
 
 function getSkillRawAttack(skill,skillLevel,effectiveAttack){
     const attack=Math.max(0,Number(effectiveAttack)||0);
+    const skillDamage=getSkillDamageAtLevel(skill,skillLevel);
     if(hasDamageRoleProfile(skill)){
-        return attack*getSkillPowerAtLevel(skill,skillLevel)+
-            getSkillFlatDamageAtLevel(skill,skillLevel);
+        return attack*getSkillPowerAtLevel(skill,skillLevel)+skillDamage;
     }
-    return attack+getSkillDamageAtLevel(skill,skillLevel);
+    return attack+skillDamage;
 }
 
 window.v173GetSkillRawAttack=getSkillRawAttack;
@@ -14307,19 +14307,25 @@ function getSkillLevel(characterId,skillId){
 
 function getSkillDamageAtLevel(skill,level){
 
-    if(
-        level<=0 ||
-        !skill.baseDamage
-    ){
+    if(!skill || level<=0 || !Number.isFinite(Number(skill.baseDamage))){
         return 0;
     }
 
+    const resolvedLevel=Math.max(1,Math.floor(Number(level)||1));
+    const growth=Number.isFinite(Number(skill.damagePerLevel))
+        ?Number(skill.damagePerLevel)
+        :0;
+    let damage=Number(skill.baseDamage);
 
-    return (
-        skill.baseDamage+
-        skill.damagePerLevel*
-        (level-1)
-    );
+    for(let current=2;current<=resolvedLevel;current++){
+        if(current===5 || current===10){
+            damage=Math.round(damage*1.5);
+        }else{
+            damage+=growth;
+        }
+    }
+
+    return Math.max(0,Math.round(damage));
 
 }
 
