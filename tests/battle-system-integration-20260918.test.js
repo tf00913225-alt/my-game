@@ -54,8 +54,8 @@ assert.doesNotMatch(vfx,/queuedPlayerActions|selectedMonster|getSkillTargets/,
     "the VFX runtime must never infer combat targets");
 assert.match(vfx,/meta\.targetContract\.targetSide/);
 assert.match(support,/showSkillNameBadge\(skill\.name,skill\.element,characterIndex,targetId,targetIds,targetSide\)/);
-assert.match(support,/animateSupportCast\(state,characterIndex,skill,enemyIndex,\[enemyIndex\],"monster"\)/,
-    "Purify Mind must preserve an explicitly selected enemy target");
+assert.match(support,/const selectedPrimary=targetSide==="monster"[\s\S]*?\?enemyIndex[\s\S]*?const primaryTarget=targets\.includes\(selectedPrimary\)\?selectedPrimary:targets\[0\][\s\S]*?animateSupportCast\(state,characterIndex,skill,primaryTarget,targets,targetSide\)/,
+    "Purify Mind must preserve an explicitly selected target as the primary VFX anchor");
 
 // Fixed geometry is occupancy-independent: tri uses a fixed shape, all uses a side rect.
 assert.match(vfx,/getGeometryRectFromShape\(current\.targetSide,primarySlot,shape\)/);
