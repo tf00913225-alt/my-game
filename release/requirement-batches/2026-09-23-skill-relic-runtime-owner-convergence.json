@@ -105,9 +105,9 @@
     }
   ],
   "verification": {
-    "focusedTests": "PENDING — PR GitHub Actions",
-    "build": "PENDING — deterministic production build synchronization",
-    "repositoryChecks": "PENDING — PR GitHub Actions",
-    "diffCheck": "PENDING — PR GitHub Actions"
+    "focusedTests": "PASS — PR CI run 35828899167 completed syntax, Battle architecture, skill owner regressions, Team Relic lifecycle/hardening/presentation and existing battle regressions before build synchronization.",
+    "build": "SYNCED — deterministic production build committed as d852f922e667a27939632bcff6886ab6986042ae; fresh PR CI pending.",
+    "repositoryChecks": "PENDING — fresh PR CI on synchronized candidate.",
+    "diffCheck": "PENDING — fresh PR CI on synchronized candidate."
   }
 }
