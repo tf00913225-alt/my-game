@@ -169,6 +169,13 @@
         earthEX:{learnLevel:50,learnCost:20,maxLevel:1,progressionGroup:"ex"}
     };
 
+    function extendLevelArrayToTen(values){
+        if(!Array.isArray(values)||!values.length){ return values; }
+        const result=values.slice(0,10);
+        while(result.length<10){ result.push(result[result.length-1]); }
+        return result;
+    }
+
     function applyFinalProgressionData(){
         if(typeof skillDatabase==="undefined"||!skillDatabase){ return false; }
         Object.entries(FINAL_PROGRESSION).forEach(([skillId,fields])=>{
@@ -179,27 +186,90 @@
             const skill=skillDatabase[skillId];
             Object.entries(fields).forEach(([key,value])=>{ skill[key]=copyArray(value); });
             skill.id=skill.id||skillId;
-            if(skill.maxLevel===5){
+
+            if(PLAYER_DAMAGE_SKILL_ID_SET.has(skillId)){
+                skill.maxLevel=10;
+                skill.upgradeCost=1;
+                Object.keys(skill).forEach(key=>{
+                    if(/ByLevel$/.test(key)&&Array.isArray(skill[key])){
+                        skill[key]=extendLevelArrayToTen(skill[key]);
+                    }
+                });
+            }
+
+            if(numeric(skill.maxLevel,1)>1){
+                skill.upgradeCost=1;
                 skill.upgradeCostByTargetLevel=SKILL_UPGRADE_COST_BY_TARGET_LEVEL;
             }else{
                 delete skill.upgradeCostByTargetLevel;
             }
             skill.description=sanitizeDescription(skill.description);
         });
+
+        const heal=skillDatabase.healSpell;
+        if(heal){
+            heal.baseHeal=550; heal.healPerLevel=30;
+            heal.healHpByLevel=HEAL_HP_BY_LEVEL.slice();
+            heal.spRestorePercentByLevel=HEAL_SP_PERCENT_BY_LEVEL.slice();
+            delete heal.baseHealSP; delete heal.healSPPerLevel;
+            heal.description="我方中、左、右最多3名存活角色恢復550/580/610/640/670 HP，並依等級恢復目標最大SP的0%/0%/5%/10%/15%；解除所有可解除負面狀態。施放者可恢復自身HP，但不恢復自身SP。SP 45。";
+        }
+        const freeze=skillDatabase.freeze;
+        if(freeze){
+            freeze.freezeChanceByLevel=FREEZE_CHANCE_BY_LEVEL.slice();
+            freeze.freezeDurationByLevel=FREEZE_DURATION_BY_LEVEL.slice();
+            delete freeze.freezeChance; delete freeze.freezeDuration;
+            delete freeze.baseDamage; delete freeze.damagePerLevel;
+            freeze.description="Lv1～4攻擊同一直列前、後最多2名敵人；Lv5攻擊中、左、右最多3名敵人。基礎冰封機率55%/65%/75%/85%/95%，持續3/3/3/4/5回合；仍受正式硬控命中上限與冰封／石化互斥規則限制。SP 32。";
+        }
+        const purify=skillDatabase.purifyMind;
+        if(purify){
+            purify.targetCountByLevel=PURIFY_TARGET_COUNT_BY_LEVEL.slice();
+            purify.description="Lv1～2選擇1名我方或敵方；Lv3選擇中、左、右最多3名目標。立即清除所有可解除的臨時Buff、Debuff、Shield、Barrier與異常狀態；不清除永久被動、EX、裝備、Boss固有機制、HP/SP或死亡狀態。SP 22。";
+        }
         const dodge=skillDatabase.dodgeSkill;
         if(dodge){
             dodge.evasionBonusPercentByLevel=DODGE_BY_LEVEL.slice();
-            dodge.description="提升我方指定範圍角色閃躲率30%/40%/50%/60%/70%。持續時間、目標數量與SP消耗沿用正式設定。";
+            dodge.targetType="allyTri"; dodge.duration=3; dodge.spCost=20;
+            delete dodge.evasionBonusPercent;
+            dodge.description="我方中、左、右最多3名存活角色閃躲率提升30%/40%/50%/60%/70%，持續3回合。SP 20。";
+        }
+        const stealth=skillDatabase.stealthSkill;
+        if(stealth){
+            stealth.durationByLevel=STEALTH_DURATION_BY_LEVEL.slice();
+            stealth.duration=2; stealth.targetType="ally"; stealth.spCost=45;
+            stealth.description="我方1人隱身2/3/4回合；無法被單體技能選中，仍會受到範圍技能影響。SP 45。";
+        }
+        const calm=skillDatabase.dinghaishenzhen;
+        if(calm){
+            calm.statusResistBonusByLevel=CALM_RESIST_BY_LEVEL.slice();
+            calm.accuracyBonusPercentByLevel=CALM_ACCURACY_BY_LEVEL.slice();
+            calm.targetType="allyAll"; calm.duration=3; calm.spCost=77;
+            delete calm.statusResistBonus; delete calm.accuracyBonusPercent;
+            calm.description="我方全體異常狀態抗性提升25%/35%/45%/55%/65%，命中提升10%/20%/30%/40%/50%，持續3回合。SP 77。";
         }
         const wall=skillDatabase.rockWall;
         if(wall){
             wall.defenseBonusPercentByLevel=ROCK_WALL_BY_LEVEL.slice();
-            wall.description="提升我方指定範圍角色防禦15%/20%/25%/30%/35%。持續時間、目標數量與SP消耗沿用正式設定。";
+            wall.targetType="allyTri"; wall.duration=4; wall.spCost=45; wall.requires=["petrifyFist","sandWind"];
+            delete wall.defenseBonusPercent;
+            wall.description="我方中、左、右最多3名存活角色防禦提升15%/20%/25%/30%/35%，持續4回合。SP 45。";
         }
         const shield=skillDatabase.earthShield;
         if(shield){
             shield.reflectPercentByLevel=EARTH_SHIELD_BY_LEVEL.slice();
-            shield.description="使我方指定範圍角色獲得萬象土盾，反傷比例20%/30%/35%/40%/50%。持續時間、目標數量與SP消耗沿用正式設定；同名狀態不可疊加或刷新。";
+            shield.durationByLevel=EARTH_SHIELD_DURATION_BY_LEVEL.slice();
+            shield.targetType="allyTri"; shield.spCost=66; shield.requires=["rockWall"];
+            delete shield.reflectPercent;
+            shield.description="我方中、左、右最多3名存活角色獲得萬象土盾，反傷20%/30%/35%/40%/50%，持續3/3/3/4/5回合；同名不可疊加或刷新。SP 66。";
+        }
+        const barrier=skillDatabase.barrier;
+        if(barrier){
+            barrier.barrierBlockCountByLevel=BARRIER_BLOCKS_BY_LEVEL.slice();
+            barrier.durationByLevel=BARRIER_DURATION_BY_LEVEL.slice();
+            barrier.targetType="ally"; barrier.spCost=40; barrier.requires=["earthShield"];
+            delete barrier.barrierBlockCount; delete barrier.duration;
+            barrier.description="我方1人獲得結界，抵擋3/3/3/4/5次直接傷害，最長持續3/3/3/4/5回合；燃燒、毒等DoT不抵擋且不消耗次數。SP 40。";
         }
         return true;
     }
