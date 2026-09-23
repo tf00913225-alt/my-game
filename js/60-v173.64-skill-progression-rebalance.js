@@ -9,9 +9,9 @@
     if(typeof window==="undefined"||window.__v17364SkillProgressionInstalled){ return; }
     window.__v17364SkillProgressionInstalled=true;
 
-    const SKILL_UPGRADE_COST_BY_TARGET_LEVEL=Object.freeze({2:1,3:2,4:3,5:4});
-    const FIRE_MOMENTUM_BY_LEVEL=Object.freeze([12,15,18,21,25]);
-    const BLOOD_BURN_BY_LEVEL=Object.freeze([5,10,15,20,25]);
+    const FIRE_RESONANCE_DAMAGE_BY_LEVEL=Object.freeze([12,15,18,21,25]);
+    const BLOOD_BURN_HP_COST_BY_LEVEL=Object.freeze([5,10,15,20,25]);
+    const BLOOD_BURN_DAMAGE_BY_LEVEL=Object.freeze([5,10,15,20,35]);
     const DODGE_BY_LEVEL=Object.freeze([30,40,50,60,70]);
     const ROCK_WALL_BY_LEVEL=Object.freeze([15,20,25,30,35]);
     const EARTH_SHIELD_BY_LEVEL=Object.freeze([20,30,35,40,50]);
@@ -54,18 +54,19 @@
         blazeSpell:{learnLevel:7,learnCost:6,progressionGroup:"magic"},
         flameTornado:{learnLevel:14,learnCost:10,progressionGroup:"magic"},
         phoenixCry:{learnLevel:30,learnCost:16,progressionGroup:"magic"},
-        rage:{learnLevel:18,learnCost:10,maxLevel:5,progressionGroup:"tactical"},
+        rage:{learnLevel:18,learnCost:2,maxLevel:5,progressionGroup:"tactical"},
         fireSoulResonance:{
             id:"fireSoulResonance",name:"炎魂共鳴",element:"fire",category:"buff",targetType:"self",
-            learnLevel:25,learnCost:14,maxLevel:5,spCost:35,duration:3,requires:["rage"],progressionGroup:"tactical",
-            momentumBonusByLevel:FIRE_MOMENTUM_BY_LEVEL.slice(),icon:"炎",
+            learnLevel:25,learnCost:6,maxLevel:5,spCost:45,duration:3,requires:["rage"],progressionGroup:"tactical",
+            fireDamageBonusPercentByLevel:FIRE_RESONANCE_DAMAGE_BY_LEVEL.slice(),icon:"炎",
             iconAssetPath:null,vfxAssetPath:null,
             description:"需先學習怒火。自身進入炎魂共鳴3回合。期間火元素技能發生爆擊，或成功新增燃燒時，若尚未持有炎勢則獲得炎勢；炎勢使下一次玩家主動施放的火元素直接傷害主施放提高12%/15%/18%/21%/25%，使用後消失。炎勢不強化燃燒持續傷害與免費追擊。"
         },
         bloodBurnArt:{
             id:"bloodBurnArt",name:"焚血訣",element:"fire",category:"buff",targetType:"self",
-            learnLevel:35,learnCost:18,maxLevel:5,spCost:20,duration:3,requires:["fireSoulResonance"],progressionGroup:"tactical",
-            directDamageBonusByLevel:BLOOD_BURN_BY_LEVEL.slice(),icon:"血",
+            learnLevel:35,learnCost:10,maxLevel:5,spCost:35,duration:3,requires:["fireSoulResonance"],progressionGroup:"tactical",
+            hpCostPercentByLevel:BLOOD_BURN_HP_COST_BY_LEVEL.slice(),
+            directDamageBonusByLevel:BLOOD_BURN_DAMAGE_BY_LEVEL.slice(),icon:"血",
             iconAssetPath:null,vfxAssetPath:null,
             description:"消耗最大生命5%/10%/15%/20%/25%。接下來3個有效回合，火系攻擊傷害提高5%/10%/15%/20%/25%。不強化燃燒持續傷害與免費追擊。"
         },
@@ -78,10 +79,10 @@
         waterBall:{learnLevel:1,learnCost:2,progressionGroup:"magic"},
         floodBeast:{learnLevel:7,learnCost:6,progressionGroup:"magic"},
         iceArrowRain:{learnLevel:14,learnCost:10,progressionGroup:"magic"},
-        healSpell:{learnLevel:15,learnCost:8,maxLevel:5,requires:["frostPunch","floodBeast"],progressionGroup:"tactical"},
-        revive:{learnLevel:20,learnCost:10,maxLevel:5,requires:["healSpell"],progressionGroup:"tactical"},
-        freeze:{learnLevel:25,learnCost:14,maxLevel:1,requires:["iceSpin","iceArrowRain"],progressionGroup:"tactical"},
-        purifyMind:{learnLevel:35,learnCost:18,maxLevel:1,requires:["healSpell"],progressionGroup:"tactical"},
+        healSpell:{learnLevel:15,learnCost:2,maxLevel:5,requires:["frostPunch","floodBeast"],progressionGroup:"tactical"},
+        revive:{learnLevel:20,learnCost:6,maxLevel:5,requires:["healSpell"],progressionGroup:"tactical"},
+        freeze:{learnLevel:25,learnCost:10,maxLevel:5,requires:["iceSpin","iceArrowRain"],progressionGroup:"tactical"},
+        purifyMind:{learnLevel:35,learnCost:16,maxLevel:3,requires:["healSpell"],progressionGroup:"tactical"},
         waterEX:{learnLevel:50,learnCost:20,maxLevel:1,progressionGroup:"ex"},
 
         stormFist:{learnLevel:1,learnCost:2,progressionGroup:"physical"},
@@ -93,11 +94,11 @@
         windHowlLightning:{learnLevel:14,learnCost:10,progressionGroup:"magic"},
         stormRain:{learnLevel:30,learnCost:16,progressionGroup:"magic"},
         dodgeSkill:{
-            learnLevel:18,learnCost:10,maxLevel:5,progressionGroup:"tactical",
+            learnLevel:18,learnCost:2,maxLevel:5,progressionGroup:"tactical",
             evasionBonusPercentByLevel:DODGE_BY_LEVEL.slice()
         },
-        stealthSkill:{learnLevel:25,learnCost:14,maxLevel:1,progressionGroup:"tactical"},
-        dinghaishenzhen:{learnLevel:35,learnCost:18,maxLevel:1,progressionGroup:"tactical"},
+        stealthSkill:{learnLevel:25,learnCost:6,maxLevel:3,progressionGroup:"tactical"},
+        dinghaishenzhen:{learnLevel:35,learnCost:10,maxLevel:5,progressionGroup:"tactical"},
         windEX:{learnLevel:50,learnCost:20,maxLevel:1,progressionGroup:"ex"},
 
         stoneSlash:{learnLevel:1,learnCost:2,progressionGroup:"physical"},
@@ -109,14 +110,14 @@
         flyingSandStrike:{learnLevel:14,learnCost:10,progressionGroup:"magic"},
         dustStorm:{learnLevel:30,learnCost:16,progressionGroup:"magic"},
         rockWall:{
-            learnLevel:18,learnCost:10,maxLevel:5,requires:["petrifyFist","sandWind"],progressionGroup:"tactical",
+            learnLevel:18,learnCost:2,maxLevel:5,requires:["petrifyFist","sandWind"],progressionGroup:"tactical",
             defenseBonusPercentByLevel:ROCK_WALL_BY_LEVEL.slice()
         },
         earthShield:{
-            learnLevel:25,learnCost:14,maxLevel:5,requires:["rockWall"],progressionGroup:"tactical",
+            learnLevel:25,learnCost:6,maxLevel:5,requires:["rockWall"],progressionGroup:"tactical",
             reflectPercentByLevel:EARTH_SHIELD_BY_LEVEL.slice()
         },
-        barrier:{learnLevel:35,learnCost:18,maxLevel:1,requires:["earthShield"],progressionGroup:"tactical"},
+        barrier:{learnLevel:35,learnCost:10,maxLevel:5,requires:["earthShield"],progressionGroup:"tactical"},
         earthEX:{learnLevel:50,learnCost:20,maxLevel:1,progressionGroup:"ex"}
     };
 
@@ -130,11 +131,8 @@
             const skill=skillDatabase[skillId];
             Object.entries(fields).forEach(([key,value])=>{ skill[key]=copyArray(value); });
             skill.id=skill.id||skillId;
-            if(skill.maxLevel===5){
-                skill.upgradeCostByTargetLevel=SKILL_UPGRADE_COST_BY_TARGET_LEVEL;
-            }else{
-                delete skill.upgradeCostByTargetLevel;
-            }
+            if(skill.maxLevel>1){ skill.upgradeCost=1; }
+            delete skill.upgradeCostByTargetLevel;
             skill.description=sanitizeDescription(skill.description);
         });
         const dodge=skillDatabase.dodgeSkill;
@@ -150,8 +148,15 @@
         const shield=skillDatabase.earthShield;
         if(shield){
             shield.reflectPercentByLevel=EARTH_SHIELD_BY_LEVEL.slice();
-            shield.description="使我方指定範圍角色獲得萬象土盾，反傷比例20%/30%/35%/40%/50%。持續時間、目標數量與SP消耗沿用正式設定；同名狀態不可疊加或刷新。";
         }
+        Object.values(skillDatabase).forEach(skill=>{
+            if(!skill||!["fire","water","wind","earth"].includes(skill.element)){ return; }
+            if(!["physical","magic"].includes(skill.category)){ return; }
+            if(!Number.isFinite(Number(skill.baseDamage))){ return; }
+            skill.maxLevel=10;
+            skill.upgradeCost=1;
+            delete skill.upgradeCostByTargetLevel;
+        });
         return true;
     }
 
@@ -165,8 +170,10 @@
         return Math.max(learnLevel+45,80);
     }
     function getUpgradeCostForTargetLevel(skill,targetSkillLevel){
-        if(!skill||numeric(skill.maxLevel,1)<=1){ return 0; }
-        return numeric(SKILL_UPGRADE_COST_BY_TARGET_LEVEL[Math.floor(numeric(targetSkillLevel))],0);
+        const target=Math.floor(numeric(targetSkillLevel));
+        const max=Math.max(1,Math.floor(numeric(skill&&skill.maxLevel,1)));
+        if(!skill||max<=1||target<2||target>max){ return 0; }
+        return 1;
     }
     function getSkillContext(characterKey){
         const key=characterKey!==undefined&&characterKey!==null?characterKey:
@@ -362,7 +369,7 @@
         if(numeric(skill.maxLevel,1)>1){
             upgradeText=next
                 ?getUpgradeCostForTargetLevel(skill,next)+" 技能點"
-                :"Lv2 1・Lv3 2・Lv4 3・Lv5 4 技能點";
+                :"每次升級固定 1 技能點";
         }
         const rows=[
             ["最低學習等級","Lv"+skill.learnLevel],
