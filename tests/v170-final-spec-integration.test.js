@@ -586,6 +586,58 @@ test("same-name detection runs before the probability roll and keeps the origina
     });
 });
 
+test("exclusive hard-control MISS uses the formal status-MISS presentation and names both states",()=>{
+    const runtime=loadFinalRuntime();
+    const result=evaluateJson(runtime.context,`(function(){
+        const popups=[],logs=[];
+        showMissEffect=function(isPlayer,index,text){ popups.push([isPlayer,index,text]); };
+        addBattleLog=function(message){ logs.push(message); };
+        const target={name:"測試目標",alive:true,hp:100,statusEffects:[
+            {type:"freeze",statusName:"冰封",turnsLeft:2}
+        ]};
+        const allowed=v173CanApplyNamedPersistentState(
+            target,"petrify","monster",0,"石化術"
+        );
+        return {allowed:allowed,popups:popups,logs:logs};
+    })()`);
+    assert.deepEqual(result,{
+        allowed:false,
+        popups:[[false,0,"狀態MISS"]],
+        logs:["石化術：測試目標目前已有【冰封】，新的【石化】MISS。"]
+    });
+});
+
+test("player, regular monster, Boss and Abyss share the same Freeze-Petrify gate",()=>{
+    const runtime=loadFinalRuntime();
+    const result=evaluateJson(runtime.context,`(function(){
+        let rolls=0;
+        rollStatusEffectHit=function(){ rolls++; return true; };
+        showMissEffect=function(){};
+        addBattleLog=function(){};
+        const cases=[
+            {side:"player",index:0,entity:{id:"玩家",hp:100,statusEffects:[{type:"freeze",turnsLeft:2}]}},
+            {side:"monster",index:0,entity:{name:"一般怪",alive:true,hp:100,statusEffects:[{type:"petrify",turnsLeft:2}]}},
+            {side:"monster",index:1,entity:{name:"Boss",rank:"boss",alive:true,hp:100,statusEffects:[{type:"freeze",turnsLeft:2}]}},
+            {side:"monster",index:2,entity:{name:"深淵怪",v141Abyss:true,alive:true,hp:100,statusEffects:[{type:"petrify",turnsLeft:2}]}}
+        ];
+        const results=cases.map(item=>{
+            const next=item.entity.statusEffects[0].type==="freeze"?"petrify":"freeze";
+            const before=item.entity.statusEffects[0].turnsLeft;
+            const roll=v173RollNamedPersistentStatusEffect(
+                item.entity,next,[100,1,1,0,0,true,item.entity.rank||"regular"],
+                item.side,item.index,"硬控測試"
+            );
+            return {roll:roll,before:before,after:item.entity.statusEffects[0].turnsLeft};
+        });
+        return {rolls:rolls,results:results};
+    })()`);
+    assert.equal(result.rolls,0);
+    result.results.forEach(entry=>{
+        assert.deepEqual(entry.roll,{duplicate:true,hit:false});
+        assert.equal(entry.after,entry.before);
+    });
+});
+
 test("guaranteed Burn bypasses probability only after the same-name check",()=>{
     const runtime=loadFinalRuntime();
     const result=evaluateJson(runtime.context,`(function(){
