@@ -197,10 +197,10 @@ test("Frostbite is a soft debuff and never blocks skills or monster special acti
     assert.equal(context.prepareAction("waterKnife"),"skill-ok");
     assert.equal(context.processSingleMonsterAttack(0),"monster-skill-ok");
     assert.equal(context.getOutgoingDamageDownPercent(frostbitten),25);
-    assert.equal(context.getMonsterEvasion(frostbitten),30);
-    assert.equal(context.getMonsterEffectiveSpiritPoints(frostbitten),60);
-    assert.equal(context.getFinalBattleSpiritForPlayerTarget(frostbitten),75);
-    assert.equal(context.getPlayerStatusResistBonus(frostbitten),15);
+    assert.equal(context.getMonsterEvasion(frostbitten),40,"V169 must not wrap core evasion");
+    assert.equal(context.getMonsterEffectiveSpiritPoints(frostbitten),80,"V169 must not wrap Spirit");
+    assert.equal(context.getFinalBattleSpiritForPlayerTarget(frostbitten),100,"V169 must not wrap player Spirit");
+    assert.equal(context.getPlayerStatusResistBonus(frostbitten),20,"V169 must not wrap core status resistance");
     assert.equal(context.v169WaterSkillRules.frostbitePenaltyPercent,25);
     assert.equal(context.v169WaterSkillRules.isFrostbitten(frostbitten),true);
 });
