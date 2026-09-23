@@ -98,10 +98,11 @@
         const rockWall=skillDatabase.rockWall;
         if(rockWall){
             Object.assign(rockWall,{
-                learnCost:15,maxLevel:1,spCost:45,targetType:"allyAll",duration:4,
-                defenseBonusPercent:30,requires:["barrier"],
-                description:"需先學習結界。使我方全體防禦力提升30%，持續4回合。"
+                learnCost:15,maxLevel:5,spCost:45,targetType:"allyTri",duration:4,
+                defenseBonusPercentByLevel:[15,20,25,30,35],requires:["petrifyFist","sandWind"],
+                description:"使我方同排中、左、右最多3名存活角色提升防禦，持續4回合。"
             });
+            delete rockWall.defenseBonusPercent;
         }
         const waterEX=skillDatabase.waterEX;
         if(waterEX){
@@ -157,55 +158,16 @@
     }
     patchSkillData();
 
-    /* 舊預覽仍會自行補上智力係數與「施放者不回SP」文字；本次治療術
-       已改為明確固定值，因此詳細頁也必須使用同一份最終規格。 */
-    if(typeof getSkillEffectPreviewText==="function"){
-        const previousSkillEffectPreview=getSkillEffectPreviewText;
-        getSkillEffectPreviewText=function(skill,level){
-            if(skill&&skill.id==="healSpell"){
-                const lv=Math.max(1,Math.min(5,Math.floor(numeric(level)||1)));
-                return "我方全體回復 "+(350+30*(lv-1))+" HP、"+(35+30*(lv-1))+" SP";
-            }
-            if(skill&&skill.id==="dinghaishenzhen"){
-                return "我方全體異常狀態抗性 +65%、命中 +50%，持續3回合";
-            }
-            return previousSkillEffectPreview.apply(this,arguments);
-        };
-    }
-
-    if(typeof buildSkillLevelBreakdownHTML==="function"){
-        const previousSkillLevelBreakdown=buildSkillLevelBreakdownHTML;
-        buildSkillLevelBreakdownHTML=function(skill){
-            if(skill&&skill.id==="healSpell"){
-                return Array.from({length:5},(_,index)=>{
-                    const level=index+1;
-                    return '<div style="display:flex;gap:6px;padding:3px 0;border-bottom:1px solid rgba(240,180,41,.12);"><span style="flex:0 0 40px;color:#f0b429;font-weight:bold;">Lv.'+level+'</span><span style="flex:1;">我方全體回復 '+(350+30*index)+' HP、'+(35+30*index)+' SP</span></div>';
-                }).join("");
-            }
-            if(skill&&skill.id==="dinghaishenzhen"){
-                return '<div style="display:flex;gap:6px;padding:3px 0;border-bottom:1px solid rgba(240,180,41,.12);"><span style="flex:0 0 40px;color:#f0b429;font-weight:bold;">Lv.1</span><span style="flex:1;">我方全體異常狀態抗性 +65%、命中 +50%，持續3回合</span></div>';
-            }
-            return previousSkillLevelBreakdown.apply(this,arguments);
-        };
-    }
-
-    if(typeof getSkillPreviewSummary==="function"){
-        const previousSkillPreviewSummary=getSkillPreviewSummary;
-        getSkillPreviewSummary=function(skill){
-            if(skill&&skill.id==="dinghaishenzhen"){
-                return "支援我方全體；提升異常狀態抗性與命中。";
-            }
-            return previousSkillPreviewSummary.apply(this,arguments);
-        };
-    }
+    /* Player-facing skill text is owned by FourSymbolsSkillSpec after the
+       gameplay bundle finishes loading. V144 no longer overrides previews. */
 
     /* 氣定神閒的命中提升要進入實際戰鬥能力，而不只停在描述。 */
     function accuracyMultiplier(character){
         if(!character||!Array.isArray(character.activeBuffs)){ return 1; }
-        const active=character.activeBuffs.some(buff=>
+        const active=character.activeBuffs.find(buff=>
             buff&&buff.type==="dinghaishenzhen"&&numeric(buff.turnsLeft)>0
         );
-        return active?1+(numeric(skillDatabase.dinghaishenzhen&&skillDatabase.dinghaishenzhen.accuracyBonusPercent)||50)/100:1;
+        return active?1+Math.max(0,numeric(active.accuracyBonusPercent))/100:1;
     }
 
     function wrapAccuracyStats(name,characterFromArgs){
@@ -1794,8 +1756,9 @@
         };
     }
 
-    /* Different formal names may coexist.  Only a repeated name is rejected
-       by the shared persistent-state owner in 00-main.js. */
+    /* Freeze and Petrify are one exclusive hard-control group. The canonical
+       persistent-state owner in 00-main.js rejects same-name and cross-name
+       applications before mutation. */
     function normalizeAllHardControls(){ return HARD_CONTROL_TYPES.length; }
 
     /* ----- One support resolver for every party slot. ----- */
@@ -1855,22 +1818,40 @@
         return target&&numeric(target.hp)>0?[selected]:[];
     }
 
+    function buffDuration(skill,level){
+        return Math.max(1,Math.floor(
+            levelValue(skill.durationByLevel,level,numeric(skill.duration)||2)
+        ));
+    }
+
     function buffFields(skill,level){
         if(skill.id==="rage"){
             const chance=levelValue(skill.critChanceBonusByLevel||skill.critBonusByLevel,level,0);
             const damage=levelValue(skill.critDamageBonusByLevel||skill.critBonusByLevel,level,0);
             return {bonusPercent:chance,critChanceBonusPercent:chance,critDamageBonusPercent:damage};
         }
-        if(skill.id==="dodgeSkill"){ return {percent:numeric(skill.evasionBonusPercent)}; }
-        if(skill.id==="rockWall"){ return {percent:numeric(skill.defenseBonusPercent)}; }
-        if(skill.id==="earthShield"){ return {percent:numeric(skill.reflectPercent)}; }
+        if(skill.id==="dodgeSkill"){
+            return {percent:levelValue(skill.evasionBonusPercentByLevel,level,skill.evasionBonusPercent)};
+        }
+        if(skill.id==="rockWall"){
+            return {percent:levelValue(skill.defenseBonusPercentByLevel,level,skill.defenseBonusPercent)};
+        }
+        if(skill.id==="earthShield"){
+            return {percent:levelValue(skill.reflectPercentByLevel,level,skill.reflectPercent)};
+        }
         if(skill.id==="dinghaishenzhen"){
-            return {resistBonus:numeric(skill.statusResistBonus),accuracyBonusPercent:numeric(skill.accuracyBonusPercent)};
+            return {
+                resistBonus:levelValue(skill.statusResistBonusByLevel,level,skill.statusResistBonus),
+                accuracyBonusPercent:levelValue(skill.accuracyBonusPercentByLevel,level,skill.accuracyBonusPercent)
+            };
         }
         if(skill.id==="barrier"){
             return {
                 sourceSkill:"barrier",barrierRule:"shared",
-                remainingBlocks:Math.max(1,numeric(skill.barrierBlockCount)||5)
+                remainingBlocks:Math.max(
+                    1,
+                    Math.floor(levelValue(skill.barrierBlockCountByLevel,level,skill.barrierBlockCount||3))
+                )
             };
         }
         return {};
@@ -1901,7 +1882,7 @@
                 )
             );
             const buff=Object.assign({
-                type:skill.id,turnsLeft:Math.max(1,numeric(skill.duration)||2)
+                type:skill.id,turnsLeft:buffDuration(skill,state.level)
             },extra);
             if(typeof window.v173MarkPersistentStateName==="function"){
                 window.v173MarkPersistentStateName(buff,skill.id);
@@ -1919,19 +1900,37 @@
         );
     }
 
+    function isRemovableTemporaryState(entry){
+        return !!(entry&&entry.dispellable!==false&&entry.uncleansable!==true);
+    }
+
+    function removeRemovableStatusEffects(entity){
+        if(!entity||!Array.isArray(entity.statusEffects)){ return 0; }
+        const before=entity.statusEffects.length;
+        entity.statusEffects=entity.statusEffects.filter(entry=>!isRemovableTemporaryState(entry));
+        return before-entity.statusEffects.length;
+    }
+
     function healAmounts(skill,state,targetStats,isFlatPartyHeal){
         const exSkill=typeof skillDatabase!=="undefined"?skillDatabase[skill.element+"EX"]:null;
         const exLevel=Math.max(0,Math.floor(numeric(getSkillLevel(state.key,skill.element+"EX"))));
         const multiplier=exSkill&&exLevel>0&&numeric(exSkill.healBonusPercent)>0
             ?1+numeric(exSkill.healBonusPercent)/100:1;
-        const hpBase=numeric(skill.baseHeal)+numeric(skill.healPerLevel)*(state.level-1);
-        const spBase=numeric(skill.baseHealSP)+numeric(skill.healSPPerLevel)*(state.level-1);
+        const hpBase=levelValue(
+            skill.healHpByLevel,
+            state.level,
+            numeric(skill.baseHeal)+numeric(skill.healPerLevel)*(state.level-1)
+        );
         const hp=isFlatPartyHeal
             ?Math.floor(hpBase*multiplier)
             :Math.floor(calculateHealingAmount(hpBase,state.stats.intelligence)*multiplier);
-        const sp=isFlatPartyHeal
-            ?Math.floor(spBase)
-            :Math.floor(calculateSPHealingAmount(spBase,state.stats.intelligence));
+        const spPercent=levelValue(skill.spRestorePercentByLevel,state.level,0);
+        const sp=isFlatPartyHeal&&Array.isArray(skill.spRestorePercentByLevel)
+            ?Math.floor(numeric(targetStats.maxSP)*spPercent/100)
+            :Math.floor(calculateSPHealingAmount(
+                numeric(skill.baseHealSP)+numeric(skill.healSPPerLevel)*(state.level-1),
+                state.stats.intelligence
+            ));
         return {hp:Math.max(0,hp),sp:Math.max(0,sp),maxHP:numeric(targetStats.maxHP),maxSP:numeric(targetStats.maxSP)};
     }
 
@@ -1951,9 +1950,8 @@
             const sp=index===characterIndex?0:Math.max(0,Math.min(planned.sp,planned.maxSP-numeric(target.sp)));
             target.hp=Math.min(planned.maxHP,numeric(target.hp)+planned.hp);
             if(index!==characterIndex){ target.sp=Math.min(planned.maxSP,numeric(target.sp)+planned.sp); }
-            if(skill.cleanseAll&&Array.isArray(target.statusEffects)){
-                cleansedTotal+=target.statusEffects.length;
-                target.statusEffects=[];
+            if(skill.cleanseAll){
+                cleansedTotal+=removeRemovableStatusEffects(target);
             }
             hpTotal+=hp;
             spTotal+=sp;
@@ -2011,65 +2009,118 @@
         return finishSupport();
     }
 
-    function clearEnemyPositiveStates(enemy){
-        (enemy&&Array.isArray(enemy.v141TeamBuffs)?enemy.v141TeamBuffs:[]).forEach(buff=>{
-            if(!buff){ return; }
-            if(buff.type==="rage"){
-                if(Number.isFinite(Number(buff.originalAttack))){ enemy.attack=Number(buff.originalAttack); }
-                if(Number.isFinite(Number(buff.originalMagicAttack))){ enemy.magicAttack=Number(buff.originalMagicAttack); }
-            }else if(buff.type==="resistance"){
-                enemy.resistance=Math.max(0,numeric(enemy.resistance)-numeric(buff.amount));
-            }else if(buff.type==="dodge"&&Number.isFinite(Number(buff.originalEvasion))){
-                enemy.evasion=Number(buff.originalEvasion);
-            }
-        });
-        if(enemy){
-            enemy.v141TeamBuffs=[];
-            enemy.activeBuffs=[];
-            if(enemy.v141Shield){ enemy.v141Shield=null; }
+    function restoreRemovedMonsterTeamBuff(enemy,buff){
+        if(!enemy||!buff){ return; }
+        if(buff.type==="rage"){
+            if(Number.isFinite(Number(buff.originalAttack))){ enemy.attack=Number(buff.originalAttack); }
+            if(Number.isFinite(Number(buff.originalMagicAttack))){ enemy.magicAttack=Number(buff.originalMagicAttack); }
+        }else if(buff.type==="resistance"){
+            enemy.resistance=Math.max(0,numeric(enemy.resistance)-numeric(buff.amount));
+        }else if(buff.type==="dodge"&&Number.isFinite(Number(buff.originalEvasion))){
+            enemy.evasion=Number(buff.originalEvasion);
         }
+    }
+
+    function clearRemovableEntityStates(entity,side){
+        if(!entity){ return 0; }
+        let removed=removeRemovableStatusEffects(entity);
+
+        if(side==="monster"&&typeof window.v155ClearRemovableCombatStates==="function"){
+            removed+=Math.max(0,numeric(window.v155ClearRemovableCombatStates(entity)));
+        }
+
+        if(Array.isArray(entity.v141TeamBuffs)){
+            const kept=[];
+            entity.v141TeamBuffs.forEach(buff=>{
+                if(isRemovableTemporaryState(buff)){
+                    restoreRemovedMonsterTeamBuff(entity,buff);
+                    removed++;
+                }else{
+                    kept.push(buff);
+                }
+            });
+            entity.v141TeamBuffs=kept;
+        }
+
+        if(Array.isArray(entity.activeBuffs)){
+            const before=entity.activeBuffs.length;
+            entity.activeBuffs=entity.activeBuffs.filter(buff=>!isRemovableTemporaryState(buff));
+            removed+=before-entity.activeBuffs.length;
+        }
+
+        if(entity.v141Shield&&isRemovableTemporaryState(entity.v141Shield)){
+            entity.v141Shield=null;
+            removed++;
+        }
+        return removed;
+    }
+
+    function purifyEnemyTargets(centerIndex,skillLevel){
+        const targetCount=Math.max(1,Math.floor(levelValue(
+            skillDatabase.purifyMind&&skillDatabase.purifyMind.targetCountByLevel,
+            skillLevel,
+            1
+        )));
+        if(targetCount<3||typeof getSkillTargets!=="function"){
+            return monsterAlive(centerIndex)?[centerIndex]:[];
+        }
+        return getSkillTargets(centerIndex,"tri").filter(monsterAlive).slice(0,3);
+    }
+
+    function purifyAllyTargets(characterIndex,queued,skillLevel){
+        const skill=skillDatabase.purifyMind;
+        const targetCount=Math.max(1,Math.floor(levelValue(skill&&skill.targetCountByLevel,skillLevel,1)));
+        const selected=Number.isInteger(queued.targetAlly)?queued.targetAlly:characterIndex;
+        if(targetCount<3){
+            const target=getPartyCharacterByIndex(selected);
+            return target&&numeric(target.hp)>0?[selected]:[];
+        }
+        return requestedBuffTargets(
+            characterIndex,
+            Object.assign({},queued,{targetAlly:selected}),
+            Object.assign({},skill,{targetType:"allyTri"})
+        ).slice(0,3);
     }
 
     function resolvePartyStateClear(characterIndex,queued,skill,state){
         const enemyIndex=skill.id==="purifyMind"&&Number.isInteger(queued.target)&&!Number.isInteger(queued.targetAlly)
             ?queued.target:null;
-        if(enemyIndex!==null){
-            const enemy=typeof monsters!=="undefined"?monsters[enemyIndex]:null;
-            const isCurrent=typeof currentBattleMonsters!=="undefined"&&currentBattleMonsters.includes(enemyIndex);
-            if(!enemy||!isCurrent||enemy.alive===false||numeric(enemy.hp)<=0){
-                return finishSupport(skill.name+"目前沒有有效目標。");
-            }
-            animateSupportCast(state,characterIndex,skill,enemyIndex,[enemyIndex],"monster");
-            clearEnemyPositiveStates(enemy);
-            if(typeof window.v141PlayCardEffect==="function"){
-                window.v141PlayCardEffect("monster",enemyIndex,"buff");
-            }
-            return finishSupport(
-                (state.character.id||"角色")+"施放"+skill.name+"，解除"+
-                (enemy.name||("敵人"+(enemyIndex+1)))+"身上所有增益狀態；負面狀態保留。"
-            );
-        }
+        const targetSide=enemyIndex!==null?"monster":"player";
+        const targets=targetSide==="monster"
+            ?purifyEnemyTargets(enemyIndex,state.level)
+            :purifyAllyTargets(characterIndex,queued,state.level);
 
-        const targetIndex=Number.isInteger(queued.targetAlly)?queued.targetAlly:characterIndex;
-        const target=getPartyCharacterByIndex(targetIndex);
-        if(!target||numeric(target.hp)<=0){ return finishSupport(skill.name+"目前沒有有效目標。"); }
-        animateSupportCast(state,characterIndex,skill,targetIndex,[targetIndex],"player");
-        const negativeCount=Array.isArray(target.statusEffects)?target.statusEffects.length:0;
-        const buffCount=Array.isArray(target.activeBuffs)?target.activeBuffs.length:0;
-        target.statusEffects=[];
-        target.activeBuffs=[];
-        if(target.v141Shield){ target.v141Shield=null; }
-        if(typeof window.v141PlayCardEffect==="function"){
-            window.v141PlayCardEffect("player",targetIndex,"buff");
-        }
+        if(!targets.length){ return finishSupport(skill.name+"目前沒有有效目標。"); }
+        animateSupportCast(state,characterIndex,skill,targets[0],targets,targetSide);
+
+        let removed=0;
+        targets.forEach(index=>{
+            const entity=targetSide==="monster"
+                ?(typeof monsters!=="undefined"?monsters[index]:null)
+                :getPartyCharacterByIndex(index);
+            if(!entity){ return; }
+            removed+=clearRemovableEntityStates(entity,targetSide);
+            if(typeof window.v141PlayCardEffect==="function"){
+                window.v141PlayCardEffect(targetSide,index,"buff");
+            }
+        });
+
         return finishSupport(
-            (state.character.id||"角色")+"施放"+skill.name+"，解除"+
-            (target.id||("角色"+(targetIndex+1)))+"身上"+(negativeCount+buffCount)+"個增益／異常狀態。"
+            (state.character.id||"角色")+"施放"+skill.name+"，清除"+
+            targets.length+"名"+(targetSide==="monster"?"敵方":"我方")+"目標共"+
+            removed+"個可解除臨時戰鬥狀態。"
         );
     }
 
     function resolveSupportAction(characterIndex,queued,skill){
         if(typeof activeBattleCharacterIndex!=="undefined"){ activeBattleCharacterIndex=characterIndex; }
+        if(
+            (skill.id==="fireSoulResonance"||skill.id==="bloodBurnArt")&&
+            window.FourSymbolsSkillSpec&&
+            typeof window.FourSymbolsSkillSpec.castFireTactical==="function"
+        ){
+            return window.FourSymbolsSkillSpec.castFireTactical(characterIndex,skill.id);
+        }
         const state=validateSupportCaster(characterIndex,skill);
         if(state.error){ return finishSupport(state.error); }
         if(skill.removeAllStates){ return resolvePartyStateClear(characterIndex,queued,skill,state); }
@@ -3522,9 +3573,20 @@
             };
         }
         try{
-            result=withPlayerSkillContext(options.context,()=>
-                withGuaranteedBurn(options.skill,()=>options.previous.apply(options.that,options.args))
-            );
+            result=withPlayerSkillContext(options.context,()=>{
+                const invoke=()=>withGuaranteedBurn(
+                    options.skill,()=>options.previous.apply(options.that,options.args)
+                );
+                const formal=window.FourSymbolsSkillSpec;
+                return formal&&typeof formal.withPlayerDirectSkillCast==="function"
+                    ?formal.withPlayerDirectSkillCast(
+                        options.context.characterIndex,
+                        options.skill.id,
+                        {freeCast:freeCast===true},
+                        invoke
+                    )
+                    :invoke();
+            });
         }finally{
             if(originalRoll){ rollCritical=originalRoll; }
             releaseFinishCapture();
@@ -3583,7 +3645,13 @@
             const context={skill:skill,character:character,characterIndex:characterIndex};
             if(!skill||!skill.followUpOnCriticalOrDefeat){
                 const that=this;
-                return withPlayerSkillContext(context,()=>withGuaranteedBurn(skill,()=>previous.apply(that,args)));
+                return withPlayerSkillContext(context,()=>{
+                    const invoke=()=>withGuaranteedBurn(skill,()=>previous.apply(that,args));
+                    const formal=window.FourSymbolsSkillSpec;
+                    return formal&&typeof formal.withPlayerDirectSkillCast==="function"&&skill
+                        ?formal.withPlayerDirectSkillCast(characterIndex,skill.id,{freeCast:false},invoke)
+                        :invoke();
+                });
             }
             const originalTarget=Number.isInteger(centerArgIndex)&&Number.isInteger(args[centerArgIndex])
                 ?args[centerArgIndex]
@@ -5326,16 +5394,28 @@
             showMonsterSkillNameBadge(skill.name,skill.element||"water",monsterIndex);
         }
         const level=finalSkillLevel(monster,skill);
-        const hpAmount=numeric(skill.baseHeal)+numeric(skill.healPerLevel)*(level-1);
-        const spAmount=numeric(skill.baseHealSP)+numeric(skill.healSPPerLevel)*(level-1);
+        const hpAmount=levelValue(
+            skill.healHpByLevel,
+            level,
+            numeric(skill.baseHeal)+numeric(skill.healPerLevel)*(level-1)
+        );
+        const spPercent=levelValue(skill.spRestorePercentByLevel,level,0);
         let cleansed=0;
+        let restoredSpTotal=0;
         allies.forEach(entry=>{
             const ally=entry.monster;
             const healed=restoreMonsterHp(ally,hpAmount);
-            const restored=restoreMonsterSp(ally,spAmount);
+            const spAmount=entry.index===monsterIndex
+                ?0
+                :Math.floor(Math.max(0,numeric(ally.maxSP))*spPercent/100);
+            const restored=spAmount>0?restoreMonsterSp(ally,spAmount):0;
+            restoredSpTotal+=restored;
             if(skill.cleanseAll&&Array.isArray(ally.statusEffects)){
-                cleansed+=ally.statusEffects.length;
-                ally.statusEffects=[];
+                const before=ally.statusEffects.length;
+                ally.statusEffects=ally.statusEffects.filter(effect=>
+                    effect&&(effect.dispellable===false||effect.uncleansable===true)
+                );
+                cleansed+=before-ally.statusEffects.length;
             }
             if(healed>0&&typeof showMonsterHit==="function"){ showMonsterHit(entry.index,healed,"heal"); }
             if(restored>0&&typeof showDamagePopup==="function"&&typeof document!=="undefined"){
@@ -5345,8 +5425,9 @@
             if(typeof window.v141PlayCardEffect==="function"){ window.v141PlayCardEffect("monster",entry.index,"heal"); }
         });
         if(typeof addBattleLog==="function"){
-            addBattleLog("北帝天尊施放最高等級治療術：同排最多"+allies.length+"名友方各回復"+
-                hpAmount+" HP、"+spAmount+" SP"+(skill.cleanseAll?"，並解除"+cleansed+"個負面狀態":"")+"。");
+            addBattleLog("北帝天尊施放治療術：同排最多"+allies.length+"名友方各回復"+
+                hpAmount+" HP，其他目標依最大SP恢復"+spPercent+"%（合計"+restoredSpTotal+" SP），施放者本人不恢復SP"+
+                (skill.cleanseAll?"，並解除"+cleansed+"個可解除負面狀態":"")+"。");
         }
         if(typeof updateUI==="function"){ updateUI(); }
         if(typeof finishPlayerAction==="function"){ finishPlayerAction(); }
@@ -5400,14 +5481,15 @@
         const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
         const skill=typeof skillDatabase!=="undefined"?skillDatabase.rockWall:null;
         if(!monster||(monster.v141SupportSkillIds||[]).indexOf("rockWall")<0||monster.alive===false||numeric(monster.hp)<=0||!skill||hardControlled(monster)){ return false; }
-        const targets=currentAbyssEntries().filter(entry=>!hasNamedState(entry.monster,"rockWall"));
+        const targets=allyTriTargets(monsterIndex).filter(entry=>!hasNamedState(entry.monster,"rockWall"));
         if(!targets.length||!supportCastAllowed(monster,forceCast)||numeric(monster.sp)<numeric(skill.spCost)){ return false; }
         monster.sp=Math.max(0,numeric(monster.sp)-numeric(skill.spCost));
         if(typeof showMonsterSkillNameBadge==="function"){
             showMonsterSkillNameBadge(skill.name,skill.element||"earth",monsterIndex);
         }
-        const duration=Math.max(1,Math.floor(numeric(skill.duration)||3));
-        const percent=Math.max(0,numeric(skill.defenseBonusPercent)||30);
+        const level=finalSkillLevel(monster,skill);
+        const duration=Math.max(1,Math.floor(levelValue(skill.durationByLevel,level,skill.duration||4)));
+        const percent=Math.max(0,levelValue(skill.defenseBonusPercentByLevel,level,skill.defenseBonusPercent||35));
         let applied=0;
         targets.forEach(entry=>{
             if(!canApplyNamedState(entry.monster,"rockWall",entry.index,skill.name)){ return; }
@@ -5427,7 +5509,7 @@
             if(typeof window.v141PlayCardEffect==="function"){ window.v141PlayCardEffect("monster",entry.index,"shield"); }
         });
         if(typeof addBattleLog==="function"){
-            addBattleLog(monster.name+"施放"+skill.name+"，全體"+applied+"名友方防禦提升"+percent+"%，持續"+duration+"回合。");
+            addBattleLog(monster.name+"施放"+skill.name+"，同排最多"+applied+"名友方防禦提升"+percent+"%，持續"+duration+"回合。");
         }
         if(typeof updateUI==="function"){ updateUI(); }
         if(typeof finishPlayerAction==="function"){ finishPlayerAction(); }
@@ -5445,7 +5527,8 @@
         if(typeof showMonsterSkillNameBadge==="function"){
             showMonsterSkillNameBadge(skill.name,skill.element||"wind",monsterIndex);
         }
-        const duration=Math.max(1,Math.floor(numeric(skill.duration)||3));
+        const level=finalSkillLevel(monster,skill);
+        const duration=Math.max(1,Math.floor(levelValue(skill.durationByLevel,level,skill.duration||2)));
         let applied=0;
         targets.forEach(entry=>{
             if(!canApplyNamedState(entry.monster,"stealthSkill",entry.index,skill.name)){ return; }
@@ -5478,8 +5561,9 @@
         if(typeof showMonsterSkillNameBadge==="function"){
             showMonsterSkillNameBadge(skill.name,skill.element||"wind",monsterIndex);
         }
-        const duration=Math.max(1,Math.floor(numeric(skill.duration)||3));
-        const percent=Math.max(0,numeric(skill.evasionBonusPercent)||75);
+        const level=finalSkillLevel(monster,skill);
+        const duration=Math.max(1,Math.floor(levelValue(skill.durationByLevel,level,skill.duration||3)));
+        const percent=Math.max(0,levelValue(skill.evasionBonusPercentByLevel,level,skill.evasionBonusPercent||70));
         let applied=0;
         targets.forEach(entry=>{
             const ally=entry.monster;
@@ -5577,6 +5661,16 @@
         removeDisplayBuff(monster,state.displayBuff);
         delete monster.v155RockWall;
     }
+
+    function clearRemovableCombatStates(monster){
+        if(!monster){ return 0; }
+        let removed=0;
+        if(monster.v155EvasionBlessing){ removeEvasionBlessing(monster); removed++; }
+        if(monster.v155WindDodge){ removeWindDodge(monster); removed++; }
+        if(monster.v155RockWall){ removeRockWall(monster); removed++; }
+        return removed;
+    }
+    window.v155ClearRemovableCombatStates=clearRemovableCombatStates;
 
     function tickV155TimedStates(){
         const token=currentBattleToken();
@@ -5861,6 +5955,12 @@
         return Number.isFinite(result)?result:0;
     }
 
+    function levelValue(values,level,fallback){
+        if(!Array.isArray(values)||!values.length){ return numeric(fallback); }
+        const index=Math.max(0,Math.min(values.length-1,Math.floor(numeric(level)||1)-1));
+        return numeric(values[index]);
+    }
+
     function clamp(value,min,max){
         return Math.max(min,Math.min(max,value));
     }
@@ -6113,15 +6213,20 @@
             setTimeout(()=>showPlayerSpPopup(spCost,characterIndex),500);
         }
 
+        const targetType=level>=Math.max(1,numeric(skill.maxLevel)||1)
+            ?(skill.targetTypeAtMaxLevel||"tri")
+            :(skill.targetType||"column");
+        const chance=levelValue(skill.freezeChanceByLevel,level,skill.freezeChance);
+        const duration=Math.max(1,Math.floor(levelValue(skill.freezeDurationByLevel,level,skill.freezeDuration||3)));
         const targets=typeof getSkillTargets==="function"
-            ?getSkillTargets(resolvedIndex,"tri")
+            ?getSkillTargets(resolvedIndex,targetType)
             :[resolvedIndex];
 
         targets.forEach(index=>{
             const monster=typeof monsters!=="undefined"?monsters[index]:null;
             if(!monster||monster.alive===false||numeric(monster.hp)<=0){ return; }
             const rollArguments=[
-                skill.freezeChance,
+                chance,
                 character.level,
                 monster.level,
                 stats.intelligence,
@@ -6143,7 +6248,7 @@
 
             if(statusResult.hit){
                 if(typeof applyFreezeEffect==="function"){
-                    applyFreezeEffect(monster,skill.freezeDuration);
+                    applyFreezeEffect(monster,duration);
                 }
                 if(typeof addBattleLog==="function"){
                     addBattleLog(monster.name+"被冰封了！");
@@ -6205,6 +6310,14 @@
     }
 
     window.v158CastTriFreeze=castTriFreeze;
+
+    if(typeof castDamageSkill==="function"){
+        const previousCastDamageSkill=castDamageSkill;
+        castDamageSkill=function(skillId,centerIndex){
+            if(skillId==="freeze"&&castTriFreeze(0,skillId,centerIndex,false)){ return; }
+            return previousCastDamageSkill.apply(this,arguments);
+        };
+    }
 
     if(typeof castSecondaryCharacterSkill==="function"){
         const previousCastSecondaryCharacterSkill=castSecondaryCharacterSkill;
@@ -6833,205 +6946,13 @@
         };
     }
 
-    /* V158's compatibility resolver asks for tri. Freeze's final target truth is
-       a front/back column of at most two valid targets. */
-    function withFinalFreezeTargets(callback){
-        const previousTargets=window.getSkillTargets;
-        if(typeof previousTargets!=="function"){ return callback(); }
-
-        window.getSkillTargets=function(centerIndex,targetType){
-            if(targetType==="tri"){ return previousTargets(centerIndex,"column"); }
-            return previousTargets.apply(this,arguments);
-        };
-
-        try{ return callback(); }
-        finally{ window.getSkillTargets=previousTargets; }
-    }
-
-    function wrapSecondaryFreeze(functionName,skillArgumentIndex){
-        const previous=window[functionName];
-        if(typeof previous!=="function"){ return; }
-        window[functionName]=function(){
-            const args=arguments;
-            if(args[skillArgumentIndex]==="freeze"){
-                return withFinalFreezeTargets(()=>previous.apply(this,args));
-            }
-            return previous.apply(this,args);
-        };
-    }
-
-    wrapSecondaryFreeze("castSecondaryCharacterSkill",1);
-    wrapSecondaryFreeze("castPlayer2Skill",0);
-
-    if(typeof window.castDamageSkill==="function"&&typeof window.v158CastTriFreeze==="function"){
-        const previousCastDamageSkill=window.castDamageSkill;
-        window.castDamageSkill=function(skillId,centerIndex){
-            if(
-                skillId==="freeze"&&
-                withFinalFreezeTargets(()=>
-                    window.v158CastTriFreeze(0,skillId,centerIndex,false)
-                )
-            ){
-                return;
-            }
-            return previousCastDamageSkill.apply(this,arguments);
-        };
-    }
-
-    function levelValue(values,level){
-        if(!Array.isArray(values)||!values.length){ return 0; }
-        const index=Math.max(0,Math.min(values.length-1,Math.floor(numeric(level)||1)-1));
-        return numeric(values[index]);
-    }
-
-    function damageAtLevel(skill,level){
-        if(!skill||skill.baseDamage===undefined){ return null; }
-        return numeric(skill.baseDamage)+numeric(skill.damagePerLevel)*(Math.max(1,numeric(level))-1);
-    }
-
-    function waterSkillEffectParts(skill,level){
-        const parts=[];
-        const damage=damageAtLevel(skill,level);
-        if(damage!==null){
-            parts.push("傷害"+Math.floor(damage)+(numeric(skill.damagePerLevel)>0?"（每級+"+numeric(skill.damagePerLevel)+"）":""));
-        }
-        if(numeric(skill.frostbiteChance)>0){
-            parts.push(
-                numeric(skill.frostbiteChance)+"%基礎機率凍傷"+
-                Math.max(1,numeric(skill.frostbiteDuration)||1)+"回合（傷害-25%、閃避-25%、異常狀態抗性-25%）"
-            );
-        }
-        if(numeric(skill.freezeChance)>0){
-            parts.push(
-                numeric(skill.freezeChance)+"%基礎機率冰封"+
-                Math.max(1,numeric(skill.freezeDuration)||1)+"回合（完全無法行動）"
-            );
-        }
-        if(Array.isArray(skill.lifestealPercentByLevel)){
-            parts.push("吸取實際傷害"+levelValue(skill.lifestealPercentByLevel,level)+"%（只恢復自身HP）");
-        }
-        if(skill.id==="freeze"){ parts.push("不造成傷害"); }
-        return parts;
-    }
-
-    function buildWaterSkillLevelBreakdown(skill){
-        const lines=[];
-        const maxLevel=Math.max(1,Math.floor(numeric(skill&&skill.maxLevel)||1));
-        for(let level=1;level<=maxLevel;level++){
-            const parts=waterSkillEffectParts(skill,level);
-            lines.push(
-                '<div style="display:flex;gap:6px;padding:3px 0;border-bottom:1px solid rgba(240,180,41,.12);">'+
-                '<span style="flex:0 0 40px;color:#f0b429;font-weight:bold;">Lv.'+level+'</span>'+
-                '<span style="flex:1;">'+escapeHtml(parts.join("｜"))+'</span></div>'
-            );
-        }
-        return lines.join("");
-    }
-
-    function waterSupportEffectText(skill,level){
-        const lv=Math.max(1,Math.min(numeric(skill&&skill.maxLevel)||1,Math.floor(numeric(level)||1)));
-        if(skill&&skill.id==="healSpell"){
-            return "我方中、左、右最多3名存活角色恢復 "+
-                (numeric(skill.baseHeal)+numeric(skill.healPerLevel)*(lv-1))+" HP、固定35 SP並解除所有可解除負面狀態；施放者本人可恢復HP與解除負面，但不恢復自身SP";
-        }
-        if(skill&&skill.id==="revive"){
-            return "使1名死亡友方原地復活並恢復最大HP的"+
-                levelValue(skill.reviveHealPercentByLevel,lv)+"%；不恢復SP";
-        }
-        if(skill&&skill.id==="purifyMind"){
-            return "可選擇1名我方或敵方目標；我方解除所有增益與異常狀態，敵方解除所有增益（包含結界、護盾等），不移除敵方負面狀態";
-        }
-        if(skill&&skill.id==="waterEX"){
-            return "永久提升水元素傷害5%、回復類技能HP恢復量10%；每回合開始前有30%機率解除自身所有可解除負面狀態";
-        }
-        return "";
-    }
-
-    function buildWaterSupportLevelBreakdown(skill){
-        const maxLevel=Math.max(1,Math.floor(numeric(skill&&skill.maxLevel)||1));
-        return Array.from({length:maxLevel},(_,index)=>
-            '<div style="display:flex;gap:6px;padding:3px 0;border-bottom:1px solid rgba(240,180,41,.12);">'+
-            '<span style="flex:0 0 40px;color:#f0b429;font-weight:bold;">Lv.'+(index+1)+'</span>'+
-            '<span style="flex:1;">'+escapeHtml(waterSupportEffectText(skill,index+1))+'</span></div>'
-        ).join("");
-    }
-
-    if(typeof window.getSkillPreviewSummary==="function"){
-        const previousPreviewSummary=window.getSkillPreviewSummary;
-        window.getSkillPreviewSummary=function(skill){
-            if(skill&&WATER_SUPPORT_PREVIEW_SKILL_ID_SET.has(skill.id)){
-                return waterSupportEffectText(skill,1)+"。";
-            }
-            if(!skill||!WATER_PREVIEW_SKILL_ID_SET.has(skill.id)){
-                return previousPreviewSummary.apply(this,arguments);
-            }
-            const scope={single:"單一敵人",tri:"同排最多3名有效敵人",column:"前後排同位置最多2名敵人",all:"敵方全體"}[skill.targetType]||"技能目標";
-            const type=skill.id==="freeze"?"純控制":(skill.category==="physical"?"物理傷害":"法術傷害");
-            const status=numeric(skill.frostbiteChance)>0
-                ?"；可能使目標凍傷：傷害、閃避、異常抗性各降低25%"
-                :numeric(skill.freezeChance)>0?"；可能使目標冰封並完全無法行動":"";
-            const steal=Array.isArray(skill.lifestealPercentByLevel)?"；吸取實際傷害恢復自身HP":"";
-            return scope+"；"+type+status+steal+"。";
-        };
-    }
-
-    if(typeof window.getSkillEffectPreviewText==="function"){
-        const previousEffectPreview=window.getSkillEffectPreviewText;
-        window.getSkillEffectPreviewText=function(skill,level){
-            if(skill&&WATER_SUPPORT_PREVIEW_SKILL_ID_SET.has(skill.id)){
-                return waterSupportEffectText(skill,level);
-            }
-            if(skill&&WATER_PREVIEW_SKILL_ID_SET.has(skill.id)){
-                return waterSkillEffectParts(skill,level).join("｜");
-            }
-            return previousEffectPreview.apply(this,arguments);
-        };
-    }
-
-    if(typeof window.buildSkillLevelBreakdownHTML==="function"){
-        const previousLevelBreakdown=window.buildSkillLevelBreakdownHTML;
-        window.buildSkillLevelBreakdownHTML=function(skill){
-            if(skill&&WATER_SUPPORT_PREVIEW_SKILL_ID_SET.has(skill.id)){
-                return buildWaterSupportLevelBreakdown(skill);
-            }
-            if(skill&&WATER_PREVIEW_SKILL_ID_SET.has(skill.id)){
-                return buildWaterSkillLevelBreakdown(skill);
-            }
-            return previousLevelBreakdown.apply(this,arguments);
-        };
-    }
-
-    if(typeof window.showCreationSkillDetail==="function"){
-        const previousCreationSkillDetail=window.showCreationSkillDetail;
-        window.showCreationSkillDetail=function(skillId){
-            const result=previousCreationSkillDetail.apply(this,arguments);
-            const skill=typeof skillDatabase!=="undefined"?skillDatabase[skillId]:null;
-            if(
-                skill&&(
-                    WATER_PREVIEW_SKILL_ID_SET.has(skill.id)||
-                    WATER_SUPPORT_PREVIEW_SKILL_ID_SET.has(skill.id)
-                )&&typeof document!=="undefined"
-            ){
-                const description=document.getElementById("creationSkillDetailDescription");
-                const levels=document.getElementById("creationSkillDetailLevels");
-                if(description){ description.textContent=skill.description; }
-                if(levels){
-                    levels.innerHTML=WATER_SUPPORT_PREVIEW_SKILL_ID_SET.has(skill.id)
-                        ?buildWaterSupportLevelBreakdown(skill)
-                        :buildWaterSkillLevelBreakdown(skill);
-                }
-            }
-            return result;
-        };
-    }
+    /* Freeze targeting and all player-facing skill text are now owned by
+       the canonical V158/V173.64 runtime and FourSymbolsSkillSpec. V169 keeps
+       only Water-specific Frostbite mechanics and its historical data bridge. */
 
     window.v169WaterSkillRules=Object.freeze({
         version:VERSION,
         skillIds:WATER_SKILL_IDS.slice(),
-        effectParts:function(skillId,level){
-            const skill=typeof skillDatabase!=="undefined"?skillDatabase[skillId]:null;
-            return skill?waterSkillEffectParts(skill,level).slice():[];
-        },
         isFrostbitten:activeFrostbite,
         frostbitePenaltyPercent:25
     });
@@ -9804,4 +9725,2624 @@ ensureFunctionalStyles();runRepairs();
        no document.body observer is required in the battle hot path. */
 
     reconcile();
+})();
+
+
+/* bundled source: js/60-v173.64-skill-progression-rebalance.js */
+/* =====================================================
+   V173.64 — 四元素技能成長節奏正式 owner
+   玩家技能樹專用：學習資格、境界門檻、技能點成本、技能頁提示。
+   怪物／深淵／符咒不經過本層 learn/upgrade gate。
+===================================================== */
+(function installV17364SkillProgression(){
+    "use strict";
+
+    if(typeof window==="undefined"||window.__v17364SkillProgressionInstalled){ return; }
+    window.__v17364SkillProgressionInstalled=true;
+
+    const SKILL_UPGRADE_COST_BY_TARGET_LEVEL=Object.freeze({
+        2:1,3:1,4:1,5:1,6:1,7:1,8:1,9:1,10:1
+    });
+    const PLAYER_DAMAGE_SKILL_IDS=Object.freeze([
+        "flameSlash","fireCritical","explosiveFlurry","dragonSlash",
+        "fireRocket","blazeSpell","flameTornado","phoenixCry",
+        "waterKnife","frostPunch","iceSpin","frostCrush",
+        "waterBall","floodBeast","iceArrowRain",
+        "stormFist","stormFlurry","windCrossSlash","dizzyFist",
+        "windSpell","stormCircle","windHowlLightning","stormRain",
+        "stoneSlash","petrifyFist","stoneBreakSky","earthquakeCrush",
+        "stoneThrow","sandWind","flyingSandStrike","dustStorm"
+    ]);
+    const PLAYER_DAMAGE_SKILL_ID_SET=new Set(PLAYER_DAMAGE_SKILL_IDS);
+    const FIRE_MOMENTUM_BY_LEVEL=Object.freeze([12,15,18,21,25]);
+    const BLOOD_BURN_HP_COST_BY_LEVEL=Object.freeze([5,10,15,20,25]);
+    const BLOOD_BURN_BY_LEVEL=Object.freeze([5,10,15,20,35]);
+    const HEAL_HP_BY_LEVEL=Object.freeze([550,580,610,640,670]);
+    const HEAL_SP_PERCENT_BY_LEVEL=Object.freeze([0,0,5,10,15]);
+    const FREEZE_CHANCE_BY_LEVEL=Object.freeze([55,65,75,85,95]);
+    const FREEZE_DURATION_BY_LEVEL=Object.freeze([3,3,3,4,5]);
+    const PURIFY_TARGET_COUNT_BY_LEVEL=Object.freeze([1,1,3]);
+    const DODGE_BY_LEVEL=Object.freeze([30,40,50,60,70]);
+    const STEALTH_DURATION_BY_LEVEL=Object.freeze([2,3,4]);
+    const CALM_RESIST_BY_LEVEL=Object.freeze([25,35,45,55,65]);
+    const CALM_ACCURACY_BY_LEVEL=Object.freeze([10,20,30,40,50]);
+    const ROCK_WALL_BY_LEVEL=Object.freeze([15,20,25,30,35]);
+    const EARTH_SHIELD_BY_LEVEL=Object.freeze([20,30,35,40,50]);
+    const EARTH_SHIELD_DURATION_BY_LEVEL=Object.freeze([3,3,3,4,5]);
+    const BARRIER_BLOCKS_BY_LEVEL=Object.freeze([3,3,3,4,5]);
+    const BARRIER_DURATION_BY_LEVEL=Object.freeze([3,3,3,4,5]);
+    const GROUP_ORDER=Object.freeze({physical:0,magic:1,tactical:2,ex:3});
+
+    function numeric(value,fallback){
+        const number=Number(value);
+        return Number.isFinite(number)?number:(fallback===undefined?0:fallback);
+    }
+    function clampLevel(value,maxLevel){
+        return Math.max(1,Math.min(Math.max(1,numeric(maxLevel,1)),Math.floor(numeric(value,1))));
+    }
+    function levelValue(values,level,fallback){
+        if(!Array.isArray(values)||!values.length){ return numeric(fallback); }
+        const index=Math.max(0,Math.min(values.length-1,Math.floor(numeric(level,1))-1));
+        return numeric(values[index]);
+    }
+    function notify(message){
+        if(typeof alert==="function"){ alert(message); }
+        return false;
+    }
+    function copyArray(value){ return Array.isArray(value)?value.slice():value; }
+    function skillById(skillId){
+        return typeof skillDatabase!=="undefined"&&skillDatabase?skillDatabase[skillId]:null;
+    }
+    function skillLabel(skillId){
+        const skill=skillById(skillId);
+        return skill&&skill.name?skill.name:String(skillId||"");
+    }
+    function sanitizeDescription(value){
+        return String(value||"")
+            .replace(/初次學習需\s*\d+\s*技能點[。；，,]?/g,"")
+            .replace(/每升\s*1\s*級消耗\s*1\s*技能點[。；，,]?/g,"")
+            .replace(/最高\s*5\s*級，\s*(?=傷害|效果|$)/g,"最高5級，")
+            .replace(/\s{2,}/g," ")
+            .trim();
+    }
+
+    const FINAL_PROGRESSION={
+        flameSlash:{learnLevel:1,learnCost:2,progressionGroup:"physical"},
+        fireCritical:{learnLevel:7,learnCost:6,progressionGroup:"physical"},
+        explosiveFlurry:{learnLevel:14,learnCost:10,progressionGroup:"physical"},
+        dragonSlash:{learnLevel:30,learnCost:16,progressionGroup:"physical"},
+        fireRocket:{learnLevel:1,learnCost:2,progressionGroup:"magic"},
+        blazeSpell:{learnLevel:7,learnCost:6,progressionGroup:"magic"},
+        flameTornado:{learnLevel:14,learnCost:10,progressionGroup:"magic"},
+        phoenixCry:{learnLevel:30,learnCost:16,progressionGroup:"magic"},
+        rage:{learnLevel:18,learnCost:10,maxLevel:5,progressionGroup:"tactical"},
+        fireSoulResonance:{
+            id:"fireSoulResonance",name:"炎魂共鳴",element:"fire",category:"buff",targetType:"self",
+            learnLevel:25,learnCost:14,maxLevel:5,spCost:45,duration:3,requires:["rage"],progressionGroup:"tactical",
+            momentumBonusByLevel:FIRE_MOMENTUM_BY_LEVEL.slice(),maxExtensionRounds:3,maxExtensionsPerRound:1,icon:"炎",
+            iconAssetPath:null,vfxAssetPath:null
+        },
+        bloodBurnArt:{
+            id:"bloodBurnArt",name:"焚血訣",element:"fire",category:"buff",targetType:"self",
+            learnLevel:35,learnCost:18,maxLevel:5,spCost:35,duration:3,requires:["fireSoulResonance"],progressionGroup:"tactical",
+            hpCostPercentByLevel:BLOOD_BURN_HP_COST_BY_LEVEL.slice(),
+            directDamageBonusByLevel:BLOOD_BURN_BY_LEVEL.slice(),fireActionCharges:3,icon:"血",
+            iconAssetPath:null,vfxAssetPath:null
+        },
+        fireEX:{learnLevel:50,learnCost:20,maxLevel:1,progressionGroup:"ex"},
+
+        waterKnife:{learnLevel:1,learnCost:2,progressionGroup:"physical"},
+        frostPunch:{learnLevel:7,learnCost:6,progressionGroup:"physical"},
+        iceSpin:{learnLevel:14,learnCost:10,progressionGroup:"physical"},
+        frostCrush:{learnLevel:30,learnCost:16,progressionGroup:"physical"},
+        waterBall:{learnLevel:1,learnCost:2,progressionGroup:"magic"},
+        floodBeast:{learnLevel:7,learnCost:6,progressionGroup:"magic"},
+        iceArrowRain:{learnLevel:14,learnCost:10,progressionGroup:"magic"},
+        healSpell:{
+            learnLevel:15,learnCost:8,maxLevel:5,upgradeCost:1,requires:["frostPunch","floodBeast"],progressionGroup:"tactical",
+            targetType:"allyTri",spCost:45,baseHeal:550,healPerLevel:30,
+            healHpByLevel:HEAL_HP_BY_LEVEL.slice(),spRestorePercentByLevel:HEAL_SP_PERCENT_BY_LEVEL.slice(),cleanseAll:true
+        },
+        revive:{learnLevel:20,learnCost:10,maxLevel:5,upgradeCost:1,requires:["healSpell"],progressionGroup:"tactical"},
+        freeze:{
+            learnLevel:25,learnCost:14,maxLevel:5,upgradeCost:1,requires:["iceSpin","iceArrowRain"],progressionGroup:"tactical",
+            targetType:"column",targetTypeAtMaxLevel:"tri",spCost:32,
+            freezeChanceByLevel:FREEZE_CHANCE_BY_LEVEL.slice(),freezeDurationByLevel:FREEZE_DURATION_BY_LEVEL.slice()
+        },
+        purifyMind:{
+            learnLevel:35,learnCost:18,maxLevel:3,upgradeCost:1,requires:["healSpell"],progressionGroup:"tactical",
+            targetType:"ally",enemyTargetAllowed:true,spCost:22,removeAllStates:true,
+            targetCountByLevel:PURIFY_TARGET_COUNT_BY_LEVEL.slice()
+        },
+        waterEX:{learnLevel:50,learnCost:20,maxLevel:1,progressionGroup:"ex"},
+
+        stormFist:{learnLevel:1,learnCost:2,progressionGroup:"physical"},
+        stormFlurry:{learnLevel:7,learnCost:6,progressionGroup:"physical"},
+        windCrossSlash:{learnLevel:14,learnCost:10,progressionGroup:"physical"},
+        dizzyFist:{learnLevel:30,learnCost:16,progressionGroup:"physical"},
+        windSpell:{learnLevel:1,learnCost:2,progressionGroup:"magic"},
+        stormCircle:{learnLevel:7,learnCost:6,progressionGroup:"magic"},
+        windHowlLightning:{learnLevel:14,learnCost:10,progressionGroup:"magic"},
+        stormRain:{learnLevel:30,learnCost:16,progressionGroup:"magic"},
+        dodgeSkill:{
+            learnLevel:18,learnCost:10,maxLevel:5,progressionGroup:"tactical",
+            evasionBonusPercentByLevel:DODGE_BY_LEVEL.slice()
+        },
+        stealthSkill:{
+            learnLevel:25,learnCost:14,maxLevel:3,upgradeCost:1,progressionGroup:"tactical",
+            targetType:"ally",spCost:45,durationByLevel:STEALTH_DURATION_BY_LEVEL.slice()
+        },
+        dinghaishenzhen:{
+            learnLevel:35,learnCost:18,maxLevel:5,upgradeCost:1,progressionGroup:"tactical",
+            targetType:"allyAll",spCost:77,duration:3,
+            statusResistBonusByLevel:CALM_RESIST_BY_LEVEL.slice(),
+            accuracyBonusPercentByLevel:CALM_ACCURACY_BY_LEVEL.slice()
+        },
+        windEX:{learnLevel:50,learnCost:20,maxLevel:1,progressionGroup:"ex"},
+
+        stoneSlash:{learnLevel:1,learnCost:2,progressionGroup:"physical"},
+        petrifyFist:{learnLevel:7,learnCost:6,progressionGroup:"physical"},
+        stoneBreakSky:{learnLevel:14,learnCost:10,progressionGroup:"physical"},
+        earthquakeCrush:{learnLevel:30,learnCost:16,progressionGroup:"physical"},
+        stoneThrow:{learnLevel:1,learnCost:2,progressionGroup:"magic"},
+        sandWind:{learnLevel:7,learnCost:6,progressionGroup:"magic"},
+        flyingSandStrike:{learnLevel:14,learnCost:10,progressionGroup:"magic"},
+        dustStorm:{learnLevel:30,learnCost:16,progressionGroup:"magic"},
+        rockWall:{
+            learnLevel:18,learnCost:10,maxLevel:5,upgradeCost:1,requires:["petrifyFist","sandWind"],progressionGroup:"tactical",
+            targetType:"allyTri",spCost:45,duration:4,defenseBonusPercentByLevel:ROCK_WALL_BY_LEVEL.slice()
+        },
+        earthShield:{
+            learnLevel:25,learnCost:14,maxLevel:5,upgradeCost:1,requires:["rockWall"],progressionGroup:"tactical",
+            targetType:"allyTri",spCost:66,reflectPercentByLevel:EARTH_SHIELD_BY_LEVEL.slice(),
+            durationByLevel:EARTH_SHIELD_DURATION_BY_LEVEL.slice()
+        },
+        barrier:{
+            learnLevel:35,learnCost:18,maxLevel:5,upgradeCost:1,requires:["earthShield"],progressionGroup:"tactical",
+            targetType:"ally",spCost:40,barrierBlockCountByLevel:BARRIER_BLOCKS_BY_LEVEL.slice(),
+            durationByLevel:BARRIER_DURATION_BY_LEVEL.slice()
+        },
+        earthEX:{learnLevel:50,learnCost:20,maxLevel:1,progressionGroup:"ex"}
+    };
+
+    function extendLevelArrayToTen(values){
+        if(!Array.isArray(values)||!values.length){ return values; }
+        const result=values.slice(0,10);
+        while(result.length<10){ result.push(result[result.length-1]); }
+        return result;
+    }
+
+    function escapeText(value){
+        return String(value==null?"":value)
+            .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+            .replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+    }
+
+    function targetLabel(skill,level){
+        if(!skill){ return "—"; }
+        if(skill.id==="freeze"){
+            return level>=5?"敵方中、左、右最多3名":"同一直列前、後最多2名敵人";
+        }
+        if(skill.id==="purifyMind"){
+            return level>=3?"我方或敵方中、左、右最多3名":"我方或敵方1名";
+        }
+        const labels={
+            single:"敵方1名",tri:"同排中、左、右最多3名",row:"敵方同排",
+            column:"同一直列前、後最多2名",all:"敵方全體",
+            self:"自己",ally:"我方1名",allyTri:"我方中、左、右最多3名",
+            allyAll:"我方全體",deadAlly:"死亡友方1名",none:"被動"
+        };
+        return labels[skill.targetType]||"技能目標";
+    }
+
+    function skillDamageValue(skill,level){
+        if(!PLAYER_DAMAGE_SKILL_ID_SET.has(skill&&skill.id)){ return null; }
+        return typeof getSkillDamageAtLevel==="function"
+            ?getSkillDamageAtLevel(skill,level)
+            :null;
+    }
+
+    function damageStatusParts(skill,level){
+        const parts=[];
+        const lv=clampLevel(level,skill&&skill.maxLevel||1);
+        if(numeric(skill&&skill.burnChance)>0&&Array.isArray(skill.burnPercentByLevel)){
+            parts.push("燃燒："+numeric(skill.burnChance)+"%基礎機率，"+
+                levelValue(skill.burnPercentByLevel,lv,0)+"%最大HP／回合，"+
+                Math.max(1,numeric(skill.burnDuration)||1)+"回合");
+        }
+        if(numeric(skill&&skill.frostbiteChance)>0){
+            parts.push("凍傷："+numeric(skill.frostbiteChance)+"%基礎機率，"+
+                Math.max(1,numeric(skill.frostbiteDuration)||1)+"回合");
+        }
+        if(Array.isArray(skill&&skill.lifestealPercentByLevel)){
+            parts.push("吸血："+levelValue(skill.lifestealPercentByLevel,lv,0)+"%實際傷害回復自身HP");
+        }
+        if(Array.isArray(skill&&skill.defenseDownByLevel)){
+            parts.push("破防："+numeric(skill.defenseDownChance)+"%基礎機率，防禦-"+
+                levelValue(skill.defenseDownByLevel,lv,0)+"%，"+
+                Math.max(1,numeric(skill.defenseDownDuration)||1)+"回合");
+        }
+        if(Array.isArray(skill&&skill.damageDownByLevel)){
+            parts.push("殤風："+numeric(skill.damageDownChance)+"%基礎機率，傷害-"+
+                levelValue(skill.damageDownByLevel,lv,0)+"%，"+
+                Math.max(1,numeric(skill.damageDownDuration)||1)+"回合");
+        }
+        if(Array.isArray(skill&&skill.agilityDownByLevel)){
+            parts.push("重力："+numeric(skill.agilityDownChance)+"%基礎機率，敏捷-"+
+                levelValue(skill.agilityDownByLevel,lv,0)+"%，"+
+                Math.max(1,numeric(skill.agilityDownDuration)||1)+"回合");
+        }
+        if(Array.isArray(skill&&skill.missBonusByLevel)){
+            parts.push("暈眩："+numeric(skill.stunChance)+"%基礎機率，命中降低"+
+                levelValue(skill.missBonusByLevel,lv,0)+"%，"+
+                Math.max(1,numeric(skill.stunDuration)||1)+"回合");
+        }
+        if(Array.isArray(skill&&skill.petrifyChanceByLevel)){
+            parts.push("石化："+levelValue(skill.petrifyChanceByLevel,lv,0)+"%基礎機率，"+
+                Math.max(1,numeric(skill.petrifyDuration)||1)+"回合");
+        }
+        if(Array.isArray(skill&&skill.selfShieldByLevel)){
+            parts.push("自身護盾："+levelValue(skill.selfShieldByLevel,lv,0)+"，"+
+                Math.max(1,numeric(skill.shieldDuration)||1)+"回合");
+        }
+        if(Array.isArray(skill&&skill.allyShieldByLevel)){
+            parts.push("我方護盾："+levelValue(skill.allyShieldByLevel,lv,0)+"，"+
+                Math.max(1,numeric(skill.shieldDuration)||1)+"回合");
+        }
+        return parts;
+    }
+
+    function supportEffectText(skill,level){
+        if(!skill){ return ""; }
+        const lv=clampLevel(level,skill.maxLevel||1);
+        if(skill.id==="fireSoulResonance"){
+            return "炎勢使火系直接攻擊傷害+"+levelValue(skill.momentumBonusByLevel,lv,0)+
+                "%，基礎3回合"+(lv>=5?"；爆擊或成功新增燃燒時每回合最多延長1回合、整次最多+3回合":"");
+        }
+        if(skill.id==="bloodBurnArt"){
+            return "消耗最大HP "+levelValue(skill.hpCostPercentByLevel,lv,0)+
+                "%；接下來3次成功施放的火系直接攻擊傷害+"+
+                levelValue(skill.directDamageBonusByLevel,lv,0)+"%；不強化DoT與免費追擊";
+        }
+        if(skill.id==="healSpell"){
+            return "恢復"+levelValue(skill.healHpByLevel,lv,0)+" HP，並恢復目標最大SP的"+
+                levelValue(skill.spRestorePercentByLevel,lv,0)+
+                "%；解除所有可解除負面狀態；施放者不恢復自身SP";
+        }
+        if(skill.id==="revive"){
+            return "復活1名死亡友方並恢復最大HP的"+
+                levelValue(skill.reviveHealPercentByLevel,lv,0)+"%；不恢復SP";
+        }
+        if(skill.id==="freeze"){
+            return levelValue(skill.freezeChanceByLevel,lv,0)+"%基礎機率冰封，持續"+
+                levelValue(skill.freezeDurationByLevel,lv,0)+"回合；完全無法行動，受硬控命中上限與冰封／石化互斥限制";
+        }
+        if(skill.id==="purifyMind"){
+            return "立即清除所有可解除的臨時Buff、Debuff、Shield、Barrier與異常狀態";
+        }
+        if(skill.id==="dodgeSkill"){
+            return "閃躲率+"+levelValue(skill.evasionBonusPercentByLevel,lv,0)+"%，持續3回合";
+        }
+        if(skill.id==="stealthSkill"){
+            return "隱身"+levelValue(skill.durationByLevel,lv,2)+"回合；無法被單體技能選中，仍受範圍技能影響";
+        }
+        if(skill.id==="dinghaishenzhen"){
+            return "異常狀態抗性+"+levelValue(skill.statusResistBonusByLevel,lv,0)+
+                "%、命中+"+levelValue(skill.accuracyBonusPercentByLevel,lv,0)+"%，持續3回合";
+        }
+        if(skill.id==="rockWall"){
+            return "防禦+"+levelValue(skill.defenseBonusPercentByLevel,lv,0)+"%，持續4回合";
+        }
+        if(skill.id==="earthShield"){
+            return "反傷"+levelValue(skill.reflectPercentByLevel,lv,0)+"%，持續"+
+                levelValue(skill.durationByLevel,lv,3)+"回合；同名不可疊加或刷新";
+        }
+        if(skill.id==="barrier"){
+            return "抵擋"+levelValue(skill.barrierBlockCountByLevel,lv,3)+"次直接傷害，最長"+
+                levelValue(skill.durationByLevel,lv,3)+"回合；DoT不抵擋且不消耗次數";
+        }
+        if(skill.id==="rage"&&Array.isArray(skill.critBonusByLevel)){
+            const chance=levelValue(skill.critChanceBonusByLevel||skill.critBonusByLevel,lv,0);
+            const damage=levelValue(skill.critDamageBonusByLevel||skill.critBonusByLevel,lv,0);
+            return "爆擊率+"+chance+"%、爆擊傷害+"+damage+"%，持續"+
+                Math.max(1,numeric(skill.duration)||1)+"回合";
+        }
+        return String(skill.description||"");
+    }
+
+    function effectText(skill,level){
+        if(!skill){ return ""; }
+        const damage=skillDamageValue(skill,level);
+        const parts=[];
+        if(damage!==null){ parts.push("傷害 "+damage); }
+        if(skill.id==="freeze"||skill.category==="buff"||skill.category==="heal"||skill.category==="revive"){
+            const support=supportEffectText(skill,level);
+            if(support){ parts.push(support); }
+        }else{
+            parts.push(...damageStatusParts(skill,level));
+        }
+        if(skill.category==="passive"&&skill.description){ parts.push(skill.description); }
+        return parts.filter(Boolean).join("｜");
+    }
+
+    function descriptionFor(skill){
+        if(!skill){ return ""; }
+        const max=Math.max(1,Math.floor(numeric(skill.maxLevel,1)));
+        const parts=["範圍："+targetLabel(skill,1)];
+        if(PLAYER_DAMAGE_SKILL_ID_SET.has(skill.id)){
+            parts.push("Lv1傷害 "+skillDamageValue(skill,1));
+            parts.push("Lv5突破 "+skillDamageValue(skill,5));
+            parts.push("Lv10突破 "+skillDamageValue(skill,10));
+            const extras=damageStatusParts(skill,Math.min(max,10));
+            if(extras.length){ parts.push(extras.join("；")); }
+        }else{
+            parts.push(supportEffectText(skill,1));
+            if(max>1){ parts.push("最高 Lv"+max); }
+        }
+        if(skill.spCost!==undefined){ parts.push("SP "+numeric(skill.spCost)); }
+        return parts.filter(Boolean).join("。")+"。";
+    }
+
+    function levelBreakdownHtml(skill){
+        if(!skill){ return ""; }
+        const max=Math.max(1,Math.floor(numeric(skill.maxLevel,1)));
+        return Array.from({length:max},(_,index)=>{
+            const level=index+1;
+            const breakthrough=PLAYER_DAMAGE_SKILL_ID_SET.has(skill.id)&&(level===5||level===10)
+                ?"（突破×1.5）":"";
+            return '<div style="display:flex;gap:6px;padding:3px 0;border-bottom:1px solid rgba(240,180,41,.12);">'+
+                '<span style="flex:0 0 40px;color:#f0b429;font-weight:bold;">Lv.'+level+'</span>'+
+                '<span style="flex:1;">'+escapeText(effectText(skill,level)+breakthrough)+'</span></div>';
+        }).join("");
+    }
+
+    function applyFinalProgressionData(){
+        if(typeof skillDatabase==="undefined"||!skillDatabase){ return false; }
+        Object.entries(FINAL_PROGRESSION).forEach(([skillId,fields])=>{
+            if(!skillDatabase[skillId]){
+                if(skillId!=="fireSoulResonance"&&skillId!=="bloodBurnArt"){ return; }
+                skillDatabase[skillId]={id:skillId};
+            }
+            const skill=skillDatabase[skillId];
+            Object.entries(fields).forEach(([key,value])=>{ skill[key]=copyArray(value); });
+            skill.id=skill.id||skillId;
+
+            if(PLAYER_DAMAGE_SKILL_ID_SET.has(skillId)){
+                skill.maxLevel=10;
+                skill.upgradeCost=1;
+                Object.keys(skill).forEach(key=>{
+                    if(/ByLevel$/.test(key)&&Array.isArray(skill[key])){
+                        skill[key]=extendLevelArrayToTen(skill[key]);
+                    }
+                });
+            }
+
+            if(numeric(skill.maxLevel,1)>1){
+                skill.upgradeCost=1;
+                skill.upgradeCostByTargetLevel=SKILL_UPGRADE_COST_BY_TARGET_LEVEL;
+            }else{
+                delete skill.upgradeCostByTargetLevel;
+            }
+            skill.description=sanitizeDescription(skill.description);
+        });
+
+        const heal=skillDatabase.healSpell;
+        if(heal){
+            heal.baseHeal=550; heal.healPerLevel=30;
+            heal.healHpByLevel=HEAL_HP_BY_LEVEL.slice();
+            heal.spRestorePercentByLevel=HEAL_SP_PERCENT_BY_LEVEL.slice();
+            delete heal.baseHealSP; delete heal.healSPPerLevel;
+            heal.description="我方中、左、右最多3名存活角色恢復550/580/610/640/670 HP，並依等級恢復目標最大SP的0%/0%/5%/10%/15%；解除所有可解除負面狀態。施放者可恢復自身HP，但不恢復自身SP。SP 45。";
+        }
+        const freeze=skillDatabase.freeze;
+        if(freeze){
+            freeze.freezeChanceByLevel=FREEZE_CHANCE_BY_LEVEL.slice();
+            freeze.freezeDurationByLevel=FREEZE_DURATION_BY_LEVEL.slice();
+            delete freeze.freezeChance; delete freeze.freezeDuration;
+            delete freeze.baseDamage; delete freeze.damagePerLevel;
+            freeze.description="Lv1～4攻擊同一直列前、後最多2名敵人；Lv5攻擊中、左、右最多3名敵人。基礎冰封機率55%/65%/75%/85%/95%，持續3/3/3/4/5回合；仍受正式硬控命中上限與冰封／石化互斥規則限制。SP 32。";
+        }
+        const purify=skillDatabase.purifyMind;
+        if(purify){
+            purify.targetCountByLevel=PURIFY_TARGET_COUNT_BY_LEVEL.slice();
+            purify.description="Lv1～2選擇1名我方或敵方；Lv3選擇中、左、右最多3名目標。立即清除所有可解除的臨時Buff、Debuff、Shield、Barrier與異常狀態；不清除永久被動、EX、裝備、Boss固有機制、HP/SP或死亡狀態。SP 22。";
+        }
+        const dodge=skillDatabase.dodgeSkill;
+        if(dodge){
+            dodge.evasionBonusPercentByLevel=DODGE_BY_LEVEL.slice();
+            dodge.targetType="allyTri"; dodge.duration=3; dodge.spCost=20;
+            delete dodge.evasionBonusPercent;
+            dodge.description="我方中、左、右最多3名存活角色閃躲率提升30%/40%/50%/60%/70%，持續3回合。SP 20。";
+        }
+        const stealth=skillDatabase.stealthSkill;
+        if(stealth){
+            stealth.durationByLevel=STEALTH_DURATION_BY_LEVEL.slice();
+            stealth.duration=2; stealth.targetType="ally"; stealth.spCost=45;
+            stealth.description="我方1人隱身2/3/4回合；無法被單體技能選中，仍會受到範圍技能影響。SP 45。";
+        }
+        const calm=skillDatabase.dinghaishenzhen;
+        if(calm){
+            calm.statusResistBonusByLevel=CALM_RESIST_BY_LEVEL.slice();
+            calm.accuracyBonusPercentByLevel=CALM_ACCURACY_BY_LEVEL.slice();
+            calm.targetType="allyAll"; calm.duration=3; calm.spCost=77;
+            delete calm.statusResistBonus; delete calm.accuracyBonusPercent;
+            calm.description="我方全體異常狀態抗性提升25%/35%/45%/55%/65%，命中提升10%/20%/30%/40%/50%，持續3回合。SP 77。";
+        }
+        const wall=skillDatabase.rockWall;
+        if(wall){
+            wall.defenseBonusPercentByLevel=ROCK_WALL_BY_LEVEL.slice();
+            wall.targetType="allyTri"; wall.duration=4; wall.spCost=45; wall.requires=["petrifyFist","sandWind"];
+            delete wall.defenseBonusPercent;
+            wall.description="我方中、左、右最多3名存活角色防禦提升15%/20%/25%/30%/35%，持續4回合。SP 45。";
+        }
+        const shield=skillDatabase.earthShield;
+        if(shield){
+            shield.reflectPercentByLevel=EARTH_SHIELD_BY_LEVEL.slice();
+            shield.durationByLevel=EARTH_SHIELD_DURATION_BY_LEVEL.slice();
+            shield.targetType="allyTri"; shield.spCost=66; shield.requires=["rockWall"];
+            delete shield.reflectPercent;
+            shield.description="我方中、左、右最多3名存活角色獲得萬象土盾，反傷20%/30%/35%/40%/50%，持續3/3/3/4/5回合；同名不可疊加或刷新。SP 66。";
+        }
+        const barrier=skillDatabase.barrier;
+        if(barrier){
+            barrier.barrierBlockCountByLevel=BARRIER_BLOCKS_BY_LEVEL.slice();
+            barrier.durationByLevel=BARRIER_DURATION_BY_LEVEL.slice();
+            barrier.targetType="ally"; barrier.spCost=40; barrier.requires=["earthShield"];
+            delete barrier.barrierBlockCount; delete barrier.duration;
+            barrier.description="我方1人獲得結界，抵擋3/3/3/4/5次直接傷害，最長持續3/3/3/4/5回合；燃燒、毒等DoT不抵擋且不消耗次數。SP 40。";
+        }
+        Object.values(skillDatabase).forEach(skill=>{
+            if(!skill||!skill.id){ return; }
+            if(PLAYER_DAMAGE_SKILL_ID_SET.has(skill.id)||[
+                "rage","fireSoulResonance","bloodBurnArt","healSpell","revive","freeze","purifyMind",
+                "dodgeSkill","stealthSkill","dinghaishenzhen","rockWall","earthShield","barrier"
+            ].includes(skill.id)){
+                skill.description=descriptionFor(skill);
+            }
+        });
+        return true;
+    }
+
+    function getRequiredCharacterLevelForSkillLevel(skill,targetSkillLevel){
+        const learnLevel=Math.max(1,Math.floor(numeric(skill&&skill.learnLevel,1)));
+        const target=Math.max(1,Math.floor(numeric(targetSkillLevel,1)));
+        if(target<=1){ return learnLevel; }
+        if(target===2){ return Math.max(learnLevel+8,15); }
+        if(target===3){ return Math.max(learnLevel+18,30); }
+        if(target===4){ return Math.max(learnLevel+30,50); }
+        return Math.max(learnLevel+45,80);
+    }
+    function getUpgradeCostForTargetLevel(skill,targetSkillLevel){
+        if(!skill||numeric(skill.maxLevel,1)<=1){ return 0; }
+        return numeric(SKILL_UPGRADE_COST_BY_TARGET_LEVEL[Math.floor(numeric(targetSkillLevel))],0);
+    }
+    function getSkillContext(characterKey){
+        const key=characterKey!==undefined&&characterKey!==null?characterKey:
+            (typeof currentSkillCharacter!=="undefined"?currentSkillCharacter:null);
+        const loadout=typeof characterSkillLoadouts!=="undefined"&&characterSkillLoadouts&&key!==null
+            ?characterSkillLoadouts[key]:null;
+        let character=null;
+        if(typeof getSkillCharacterObject==="function"&&key!==null){ character=getSkillCharacterObject(key); }
+        if(!character&&key!==null){
+            if(key==="player2"&&typeof player2!=="undefined"){ character=player2; }
+            else if(key==="player3"&&typeof player3!=="undefined"){ character=player3; }
+            else if(typeof player!=="undefined"){ character=player; }
+        }
+        return {key,character,loadout};
+    }
+    function learnedLevel(context,skillId){
+        return Math.max(0,Math.floor(numeric(context&&context.loadout&&context.loadout.skillLevels&&context.loadout.skillLevels[skillId])));
+    }
+    function prerequisiteMet(levels,skill){
+        const required=Array.isArray(skill&&skill.requires)?skill.requires.filter(Boolean):[];
+        if(!required.length){ return true; }
+        return required.some(skillId=>numeric(levels&&levels[skillId])>0);
+    }
+    function prerequisiteLabel(skill){
+        const required=Array.isArray(skill&&skill.requires)?skill.requires.filter(Boolean):[];
+        if(!required.length){ return "無"; }
+        return required.map(skillLabel).join(" 或 ");
+    }
+    function finalizeSkillMutation(){
+        if(typeof saveGame==="function"){ saveGame(); }
+        if(typeof renderSkillLoadout==="function"){ renderSkillLoadout(); }
+        if(typeof updateUI==="function"){ updateUI(); }
+    }
+
+    applyFinalProgressionData();
+
+    if(typeof learnSkill==="function"){
+        learnSkill=function(skillId){
+            const skill=skillById(skillId);
+            const context=getSkillContext();
+            if(!skill||!context.character||!context.loadout){ return notify("目前無法取得角色技能資料。"); }
+            context.loadout.skillLevels=context.loadout.skillLevels||{};
+            if(learnedLevel(context,skillId)>0){ return true; }
+            const characterLevel=Math.max(1,Math.floor(numeric(context.character.level,1)));
+            const requiredLevel=getRequiredCharacterLevelForSkillLevel(skill,1);
+            const levels=context.loadout.skillLevels;
+            const prereqOk=prerequisiteMet(levels,skill);
+            if(characterLevel<requiredLevel){
+                return notify(prereqOk
+                    ?("角色 Lv"+requiredLevel+" 才能學習「"+skill.name+"」。")
+                    :("需要 Lv"+requiredLevel+"・前置："+prerequisiteLabel(skill)));
+            }
+            if(!prereqOk){ return notify("需要前置："+prerequisiteLabel(skill)); }
+            const learnCost=Math.max(0,Math.floor(numeric(skill.learnCost)));
+            const points=Math.max(0,Math.floor(numeric(context.character.skillPoints)));
+            if(points<learnCost){ return notify("技能點不足，需要"+learnCost+"點。"); }
+            context.character.skillPoints=points-learnCost;
+            context.loadout.skillLevels[skillId]=1;
+            finalizeSkillMutation();
+            return true;
+        };
+    }
+
+    if(typeof upgradeSkill==="function"){
+        upgradeSkill=function(skillId){
+            const skill=skillById(skillId);
+            const context=getSkillContext();
+            if(!skill||!context.character||!context.loadout){ return notify("目前無法取得角色技能資料。"); }
+            context.loadout.skillLevels=context.loadout.skillLevels||{};
+            const current=learnedLevel(context,skillId);
+            const maxLevel=Math.max(1,Math.floor(numeric(skill.maxLevel,1)));
+            if(current<=0){ return notify("請先學會「"+skill.name+"」。"); }
+            if(current>=maxLevel){ return notify("「"+skill.name+"」已達最高技能等級。"); }
+            const target=current+1;
+            const requiredLevel=getRequiredCharacterLevelForSkillLevel(skill,target);
+            const characterLevel=Math.max(1,Math.floor(numeric(context.character.level,1)));
+            if(characterLevel<requiredLevel){
+                return notify("角色 Lv"+requiredLevel+" 可升至技能 Lv"+target+"。");
+            }
+            const cost=getUpgradeCostForTargetLevel(skill,target);
+            const points=Math.max(0,Math.floor(numeric(context.character.skillPoints)));
+            if(points<cost){ return notify("技能點不足，升至技能 Lv"+target+"需要"+cost+"點。"); }
+            context.character.skillPoints=points-cost;
+            context.loadout.skillLevels[skillId]=target;
+            finalizeSkillMutation();
+            return true;
+        };
+    }
+
+    function actionCardForRow(row){
+        const cards=Array.from(row&&row.querySelectorAll?row.querySelectorAll(".skill-action-card"):[]);
+        return cards.find(card=>{
+            const onclick=String(card.getAttribute&&card.getAttribute("onclick")||"");
+            const label=card.querySelector&&card.querySelector(".skill-action-card-label");
+            const text=String(label&&label.textContent||"");
+            return /learnSkill|upgradeSkill/.test(onclick)||/學習|升級|技能點|滿級/.test(text);
+        })||cards[0]||null;
+    }
+    function setActionCard(card,enabled,label,onclick){
+        if(!card){ return; }
+        const target=card.querySelector(".skill-action-card-label");
+        if(target){ target.textContent=label; }
+        card.classList.toggle("disabled",!enabled);
+        card.setAttribute("aria-disabled",enabled?"false":"true");
+        if(enabled&&onclick){ card.setAttribute("onclick",onclick); }
+        else{ card.removeAttribute("onclick"); }
+    }
+    function rowSkillId(row){
+        const icon=row&&row.querySelector?row.querySelector("[id^='skillIcon_']"):null;
+        return icon?icon.id.slice("skillIcon_".length):"";
+    }
+    function decorateSkillProgressionUi(){
+        if(typeof document==="undefined"){ return; }
+        const list=document.getElementById("allSkillsList");
+        const context=getSkillContext();
+        if(!list||!context.character||!context.loadout){ return; }
+        context.loadout.skillLevels=context.loadout.skillLevels||{};
+        const rows=Array.from(list.querySelectorAll(".skill-row"));
+        rows.forEach(row=>{
+            const skillId=rowSkillId(row);
+            if(skillId==="stormSpell"){
+                row.remove();
+                return;
+            }
+            const skill=skillById(skillId);
+            if(!skill||!Object.prototype.hasOwnProperty.call(skill,"learnLevel")){ return; }
+            const current=learnedLevel(context,skillId);
+            const level=Math.max(1,Math.floor(numeric(context.character.level,1)));
+            const points=Math.max(0,Math.floor(numeric(context.character.skillPoints)));
+            const card=actionCardForRow(row);
+            const levels=context.loadout.skillLevels;
+            if(current<=0){
+                const prereqOk=prerequisiteMet(levels,skill);
+                const levelOk=level>=skill.learnLevel;
+                const costOk=points>=numeric(skill.learnCost);
+                if(levelOk&&prereqOk&&costOk){
+                    setActionCard(card,true,"學習・"+skill.learnCost+"點","learnSkill('"+skillId+"')");
+                }else{
+                    const reasons=[];
+                    if(!levelOk){ reasons.push("Lv"+skill.learnLevel+" 解鎖"); }
+                    if(!prereqOk){ reasons.push("前置："+prerequisiteLabel(skill)); }
+                    if(levelOk&&prereqOk&&!costOk){ reasons.push("需要 "+skill.learnCost+" 技能點"); }
+                    setActionCard(card,false,reasons.join("・"),"");
+                }
+            }else if(current<numeric(skill.maxLevel,1)){
+                const target=current+1;
+                const required=getRequiredCharacterLevelForSkillLevel(skill,target);
+                const cost=getUpgradeCostForTargetLevel(skill,target);
+                if(level<required){
+                    setActionCard(card,false,"角色 Lv"+required+" 可升至技能 Lv"+target,"");
+                }else if(points<cost){
+                    setActionCard(card,false,"升至 Lv"+target+" 需要 "+cost+" 技能點","");
+                }else{
+                    setActionCard(card,true,"升至 Lv"+target+"・"+cost+"點","upgradeSkill('"+skillId+"')");
+                }
+            }
+        });
+        const sorted=Array.from(list.querySelectorAll(".skill-row")).sort((left,right)=>{
+            const a=skillById(rowSkillId(left))||{};
+            const b=skillById(rowSkillId(right))||{};
+            const ga=numeric(GROUP_ORDER[a.progressionGroup],9),gb=numeric(GROUP_ORDER[b.progressionGroup],9);
+            if(ga!==gb){ return ga-gb; }
+            const la=numeric(a.learnLevel,999),lb=numeric(b.learnLevel,999);
+            if(la!==lb){ return la-lb; }
+            return String(a.name||a.id||"").localeCompare(String(b.name||b.id||""),"zh-Hant");
+        });
+        sorted.forEach(row=>list.appendChild(row));
+    }
+
+    if(typeof getSkillEffectPreviewText==="function"){
+        getSkillEffectPreviewText=function(skill,level){
+            return effectText(skill,level);
+        };
+    }
+    if(typeof buildSkillLevelBreakdownHTML==="function"){
+        buildSkillLevelBreakdownHTML=function(skill){
+            return levelBreakdownHtml(skill);
+        };
+    }
+    if(typeof window.getSkillPreviewSummary==="function"){
+        window.getSkillPreviewSummary=function(skill){
+            return descriptionFor(skill);
+        };
+    }
+
+    if(typeof renderSkillLoadout==="function"){
+        const previousRenderSkillLoadout=renderSkillLoadout;
+        renderSkillLoadout=function(){
+            const result=previousRenderSkillLoadout.apply(this,arguments);
+            decorateSkillProgressionUi();
+            return result;
+        };
+    }
+
+    function renderSkillDetailProgression(skillId){
+        if(typeof document==="undefined"){ return; }
+        const skill=skillById(skillId);
+        if(!skill||!Object.prototype.hasOwnProperty.call(skill,"learnLevel")){ return; }
+        const host=document.getElementById("skillDetailStats");
+        const context=getSkillContext();
+        if(!host||!context.loadout){ return; }
+        const old=host.querySelector(".v17364-progression-detail");
+        if(old){ old.remove(); }
+        const current=learnedLevel(context,skillId);
+        const next=current>0&&current<numeric(skill.maxLevel,1)?current+1:null;
+        const block=document.createElement("div");
+        block.className="v17364-progression-detail";
+        let upgradeText="—";
+        if(numeric(skill.maxLevel,1)>1){
+            upgradeText=next
+                ?getUpgradeCostForTargetLevel(skill,next)+" 技能點"
+                :"每次升級固定 1 技能點";
+        }
+        const rows=[
+            ["最低學習等級","Lv"+skill.learnLevel],
+            ["目前技能等級",current>0?"Lv"+current:"尚未學習"],
+            ["下一級角色需求",next?"角色 Lv"+getRequiredCharacterLevelForSkillLevel(skill,next):"—"],
+            ["學習成本",skill.learnCost+" 技能點"],
+            ["升級成本",upgradeText],
+            ["前置技能",prerequisiteLabel(skill)]
+        ];
+        rows.forEach(([label,value])=>{
+            const row=document.createElement("div");
+            const strong=document.createElement("strong");
+            const span=document.createElement("span");
+            strong.textContent=label;
+            span.textContent=value;
+            row.appendChild(strong);row.appendChild(span);block.appendChild(row);
+        });
+        host.appendChild(block);
+    }
+
+    if(typeof showSkillDetail==="function"){
+        const previousShowSkillDetail=showSkillDetail;
+        showSkillDetail=function(skillId){
+            const result=previousShowSkillDetail.apply(this,arguments);
+            renderSkillDetailProgression(skillId);
+            return result;
+        };
+    }
+
+    function actorByPartyIndex(index){
+        if(typeof getPartyCharacterByIndex==="function"){ return getPartyCharacterByIndex(index); }
+        if(index===1&&typeof player2!=="undefined"){ return player2; }
+        if(index===2&&typeof player3!=="undefined"){ return player3; }
+        return typeof player!=="undefined"?player:null;
+    }
+    function keyByPartyIndex(index,actor){
+        if(typeof getPartyCharacterKey==="function"){
+            const key=getPartyCharacterKey(index);
+            if(key!==undefined&&key!==null){ return key; }
+        }
+        if(typeof getCharacterSkillKey==="function"&&actor){
+            const key=getCharacterSkillKey(actor);
+            if(key!==undefined&&key!==null){ return key; }
+        }
+        if(index===1){ return "player2"; }
+        if(index===2){ return "player3"; }
+        return actor&&actor.element?actor.element:(typeof currentSkillCharacter!=="undefined"?currentSkillCharacter:null);
+    }
+    function partySkillLevel(index,skillId){
+        const actor=actorByPartyIndex(index);
+        const context=getSkillContext(keyByPartyIndex(index,actor));
+        return learnedLevel(context,skillId);
+    }
+    function activeBuff(actor,type){
+        return actor&&Array.isArray(actor.activeBuffs)
+            ?actor.activeBuffs.find(buff=>buff&&buff.type===type&&numeric(buff.turnsLeft,1)>0)||null:null;
+    }
+    function removeBuff(actor,buff){
+        if(!actor||!buff||!Array.isArray(actor.activeBuffs)){ return; }
+        actor.activeBuffs=actor.activeBuffs.filter(entry=>entry!==buff);
+    }
+    function canAddNamedBuff(actor,type,index,label){
+        if(activeBuff(actor,type)){ return false; }
+        if(typeof window.v173CanApplyNamedPersistentState==="function"){
+            return window.v173CanApplyNamedPersistentState(actor,type,"player",index,label)!==false;
+        }
+        return true;
+    }
+    function addNamedBuff(actor,type,index,label,turns,extra){
+        if(!canAddNamedBuff(actor,type,index,label)){ return null; }
+        actor.activeBuffs=Array.isArray(actor.activeBuffs)?actor.activeBuffs:[];
+        const buff=Object.assign({type,turnsLeft:Math.max(1,Math.floor(numeric(turns,1)))},extra||{});
+        if(typeof window.v173MarkPersistentStateName==="function"){
+            window.v173MarkPersistentStateName(buff,type);
+        }
+        actor.activeBuffs.push(buff);
+        return buff;
+    }
+    function actorMaxHp(actor,index){
+        let max=numeric(actor&&actor.maxHP);
+        if(max<=0&&typeof getPartyBattleStats==="function"){
+            const stats=getPartyBattleStats(index);
+            max=numeric(stats&&(stats.maxHP||stats.maxHp||stats.hpMax));
+        }
+        if(max<=0){ max=Math.max(1,numeric(actor&&actor.hp,1)); }
+        return Math.max(1,max);
+    }
+    function announceSkill(actorIndex,skill){
+        if(typeof showSkillNameBadge==="function"){ showSkillNameBadge(skill.name,"fire",actorIndex); }
+        if(typeof addBattleLog==="function"){ addBattleLog((actorByPartyIndex(actorIndex)?.id||"角色")+"施放「"+skill.name+"」。"); }
+    }
+    function finishTacticalAction(){
+        if(typeof updateUI==="function"){ updateUI(); }
+        if(typeof finishPlayerAction==="function"){ finishPlayerAction(); }
+    }
+    function castNewFireTactical(actorIndex,skillId){
+        const actor=actorByPartyIndex(actorIndex);
+        const skill=skillById(skillId);
+        const level=partySkillLevel(actorIndex,skillId);
+        if(!actor||!skill||level<=0){ return notify("尚未學會「"+(skill&&skill.name||skillId)+"」。"); }
+        const cost=Math.max(0,numeric(skill.spCost));
+        if(numeric(actor.sp)<cost){ return notify("SP不足，需要"+cost+"點。"); }
+        if(skillId==="fireSoulResonance"){
+            if(!canAddNamedBuff(actor,"fireSoulResonance",actorIndex,"炎魂共鳴")){
+                return notify("炎魂共鳴仍在持續中，無法重複施放或刷新。");
+            }
+            actor.sp=numeric(actor.sp)-cost;
+            const resolvedLevel=clampLevel(level,5);
+            const resonance=addNamedBuff(actor,"fireSoulResonance",actorIndex,"炎魂共鳴",3,{
+                skillLevel:resolvedLevel,extensionCount:0,lastExtendedRound:null
+            });
+            if(resonance){
+                addNamedBuff(actor,"fireMomentum",actorIndex,"炎勢",3,{
+                    skillLevel:resolvedLevel,
+                    bonusPercent:FIRE_MOMENTUM_BY_LEVEL[resolvedLevel-1],
+                    resonanceLinked:true
+                });
+            }
+            announceSkill(actorIndex,skill);finishTacticalAction();return true;
+        }
+        if(skillId==="bloodBurnArt"){
+            if(activeBuff(actor,"bloodBurn")){
+                return notify("焚血尚未消耗，無法重複施放或刷新。");
+            }
+            const maxHp=actorMaxHp(actor,actorIndex);
+            if(!canAddNamedBuff(actor,"bloodBurn",actorIndex,"焚血")){
+                return notify("焚血尚未消耗，無法重複施放或刷新。");
+            }
+            const resolvedLevel=clampLevel(level,5);
+            const hpCost=Math.max(1,Math.round(maxHp*(BLOOD_BURN_HP_COST_BY_LEVEL[resolvedLevel-1]/100)));
+            if(numeric(actor.hp)<=hpCost){ return notify("目前HP不足以承受焚血訣的生命消耗。"); }
+            actor.sp=numeric(actor.sp)-cost;
+            actor.hp=numeric(actor.hp)-hpCost;
+            addNamedBuff(actor,"bloodBurn",actorIndex,"焚血",3,{
+                skillLevel:resolvedLevel,hpCost,remainingFireActions:3
+            });
+            announceSkill(actorIndex,skill);finishTacticalAction();return true;
+        }
+        return false;
+    }
+
+    let fireCastContext=null;
+    function isPlayerFireDirectSkill(skill){
+        return !!(skill&&skill.element==="fire"&&(skill.category==="physical"||skill.category==="magic"));
+    }
+    function formalRound(){
+        return typeof turn!=="undefined"?Math.max(1,Math.floor(numeric(turn,1))):1;
+    }
+    function extendResonanceOncePerRound(actor,resonance,momentum){
+        if(!resonance||clampLevel(resonance.skillLevel,5)<5){ return false; }
+        const round=formalRound();
+        const maxExtensions=Math.max(0,numeric(skillById("fireSoulResonance")?.maxExtensionRounds,3));
+        if(numeric(resonance.extensionCount)>=maxExtensions||numeric(resonance.lastExtendedRound)===round){
+            return false;
+        }
+        resonance.extensionCount=numeric(resonance.extensionCount)+1;
+        resonance.lastExtendedRound=round;
+        resonance.turnsLeft=Math.max(1,numeric(resonance.turnsLeft,1))+1;
+        if(momentum){
+            momentum.turnsLeft=Math.max(1,numeric(momentum.turnsLeft,1))+1;
+        }
+        return true;
+    }
+    function withPlayerDirectSkillCast(actorIndex,skillId,options,invoke){
+        const skill=skillById(skillId);
+        if(!isPlayerFireDirectSkill(skill)||fireCastContext){ return invoke(); }
+        const actor=actorByPartyIndex(actorIndex);
+        if(!actor){ return invoke(); }
+        const freeCast=!!(options&&options.freeCast);
+        const resonance=activeBuff(actor,"fireSoulResonance");
+        const momentum=activeBuff(actor,"fireMomentum");
+        const blood=activeBuff(actor,"bloodBurn");
+        const resonanceBonus=numeric(momentum&&momentum.bonusPercent);
+        const bloodBonus=!freeCast&&blood
+            ?BLOOD_BURN_BY_LEVEL[clampLevel(blood.skillLevel,5)-1]
+            :0;
+        const bonus=resonanceBonus+bloodBonus;
+        const hadDamageBonus=Object.prototype.hasOwnProperty.call(skill,"damageBonusPercent");
+        const previousDamageBonus=skill.damageBonusPercent;
+        if(bonus){ skill.damageBonusPercent=numeric(previousDamageBonus)+bonus; }
+        const beforeSp=numeric(actor.sp);
+        const context={
+            actor,actorIndex,skillId,resonance,momentum,blood,freeCast,
+            critical:false,burnAdded:false,finished:false
+        };
+        fireCastContext=context;
+        let result;
+        try{ result=invoke(); }
+        finally{
+            fireCastContext=null;
+            if(bonus){
+                if(hadDamageBonus){ skill.damageBonusPercent=previousDamageBonus; }
+                else{ delete skill.damageBonusPercent; }
+            }
+        }
+        const succeeded=freeCast||context.finished||numeric(actor.sp)<beforeSp;
+        if(succeeded&&!freeCast){
+            if(blood){
+                blood.remainingFireActions=Math.max(0,numeric(blood.remainingFireActions,3)-1);
+                blood.turnsLeft=blood.remainingFireActions;
+                if(blood.remainingFireActions<=0){ removeBuff(actor,blood); }
+            }
+            if(resonance&&(context.critical||context.burnAdded)){
+                extendResonanceOncePerRound(actor,resonance,momentum);
+            }
+        }
+        return result;
+    }
+
+    if(typeof rollCritical==="function"){
+        const previousRollCritical=rollCritical;
+        rollCritical=function(){
+            const result=previousRollCritical.apply(this,arguments);
+            if(fireCastContext&&result&&result.isCrit){ fireCastContext.critical=true; }
+            return result;
+        };
+    }
+    if(typeof applyBurnEffect==="function"){
+        const previousApplyBurnEffect=applyBurnEffect;
+        applyBurnEffect=function(){
+            const result=previousApplyBurnEffect.apply(this,arguments);
+            if(fireCastContext&&result===true){ fireCastContext.burnAdded=true; }
+            return result;
+        };
+    }
+    if(window.FourSymbolsBattleFlow&&typeof window.FourSymbolsBattleFlow.subscribeActionFinished==="function"){
+        window.FourSymbolsBattleFlow.subscribeActionFinished(()=>{
+            if(fireCastContext){ fireCastContext.finished=true; }
+        });
+    }
+
+    /*
+     * Persistent Effect Duration Lifecycle
+     *
+     * `turnsLeft` is deliberately consumed from a real initiative action,
+     * rather than from the global round-start sweep.  A state created during
+     * the current action is absent from this snapshot, so casting a Buff does
+     * not silently consume one of its own effective actions.  Freeze/Petrify
+     * remain present while their action is skipped, then consume exactly one
+     * blocked action at the normal action-finished boundary.  Burn is a DoT
+     * and therefore remains owned by the formal round-start tick path.
+     */
+    const ACTION_DURATION_STATUS_TYPES=new Set([
+        "freeze","petrify","frostbite","agilityDown","statDown","damageDown","defenseDown","stun"
+    ]);
+    const ACTION_DURATION_EXCLUDED_BUFFS=new Set(["phoenixMight","bloodBurn"]);
+    let durationAction=null;
+    window.v175DurationLifecycleActive=true;
+
+    function partyAndMonsterEntities(){
+        const result=[];
+        if(typeof getExistingPartyIndexes==="function"&&typeof getPartyCharacterByIndex==="function"){
+            getExistingPartyIndexes().forEach(index=>{
+                const entity=getPartyCharacterByIndex(index);
+                if(entity){ result.push(entity); }
+            });
+        }
+        if(typeof monsters!=="undefined"&&Array.isArray(monsters)){
+            monsters.forEach(entity=>{ if(entity){ result.push(entity); } });
+        }
+        return result;
+    }
+    function captureActionDurationEntries(kind){
+        const entries=[];
+        partyAndMonsterEntities().forEach(entity=>{
+            const list=kind==="buff"?entity.activeBuffs:entity.statusEffects;
+            if(!Array.isArray(list)){ return; }
+            list.forEach(entry=>{
+                const eligible=kind==="buff"
+                    ?entry&&numeric(entry.turnsLeft)>0&&!entry.oneShot&&!ACTION_DURATION_EXCLUDED_BUFFS.has(entry.type)
+                    :entry&&numeric(entry.turnsLeft)>0&&ACTION_DURATION_STATUS_TYPES.has(entry.type);
+                if(eligible){ entries.push({entity,entry,turnsLeft:entry.turnsLeft,deferFirstTick:entry.deferFirstTick}); }
+            });
+        });
+        return entries;
+    }
+    function restoreActionDurationEntries(kind,entries){
+        entries.forEach(record=>{
+            const key=kind==="buff"?"activeBuffs":"statusEffects";
+            const list=Array.isArray(record.entity[key])?record.entity[key]:[];
+            record.entry.turnsLeft=record.turnsLeft;
+            if(record.deferFirstTick!==undefined){ record.entry.deferFirstTick=record.deferFirstTick; }
+            if(!list.includes(record.entry)){ list.push(record.entry); }
+            record.entity[key]=list;
+        });
+    }
+    if(typeof tickStatusEffects==="function"){
+        const previousTickStatusEffects=tickStatusEffects;
+        tickStatusEffects=function(){
+            const snapshot=captureActionDurationEntries("status");
+            const result=previousTickStatusEffects.apply(this,arguments);
+            restoreActionDurationEntries("status",snapshot);
+            return result;
+        };
+    }
+    if(typeof tickPlayerBuffs==="function"){
+        const previousTickPlayerBuffs=tickPlayerBuffs;
+        tickPlayerBuffs=function(){
+            const snapshot=captureActionDurationEntries("buff");
+            const result=previousTickPlayerBuffs.apply(this,arguments);
+            restoreActionDurationEntries("buff",snapshot);
+            return result;
+        };
+    }
+    function captureMonsterSupportDurations(){
+        const records=[];
+        if(typeof monsters==="undefined"||!Array.isArray(monsters)){ return records; }
+        monsters.forEach(entity=>{
+            if(!entity){ return; }
+            const stats={attack:entity.attack,magicAttack:entity.magicAttack,resistance:entity.resistance,evasion:entity.evasion,accuracy:entity.accuracy};
+            (entity.v141TeamBuffs||[]).forEach(state=>{
+                if(state&&numeric(state.turnsLeft)>0){
+                    records.push({entity,state,display:state.displayBuff,turnsLeft:state.turnsLeft,displayTurns:state.displayBuff&&state.displayBuff.turnsLeft,stats});
+                }
+            });
+            ["v144CalmBuff","v144DodgeBuff","v155EvasionBlessing","v155WindDodge"].forEach(key=>{
+                const state=entity[key];
+                const display=state&&(state.display||state.displayBuff);
+                if(state&&numeric(state.turnsLeft)>0){
+                    records.push({entity,key,state,display,turnsLeft:state.turnsLeft,displayTurns:display&&display.turnsLeft,stats});
+                }
+            });
+        });
+        return records;
+    }
+    function restoreMonsterSupportDurations(records){
+        records.forEach(record=>{
+            const {entity,state,display,stats}=record;
+            state.turnsLeft=record.turnsLeft;
+            if(display){ display.turnsLeft=record.displayTurns; }
+            if(record.key){ entity[record.key]=state; }
+            else{
+                entity.v141TeamBuffs=Array.isArray(entity.v141TeamBuffs)?entity.v141TeamBuffs:[];
+                if(!entity.v141TeamBuffs.includes(state)){ entity.v141TeamBuffs.push(state); }
+            }
+            if(display){
+                entity.activeBuffs=Array.isArray(entity.activeBuffs)?entity.activeBuffs:[];
+                if(!entity.activeBuffs.includes(display)){ entity.activeBuffs.push(display); }
+            }
+            Object.assign(entity,stats);
+        });
+    }
+    if(typeof startTurn==="function"){
+        const previousStartTurnForDuration=startTurn;
+        startTurn=function(){
+            const snapshot=captureMonsterSupportDurations();
+            const result=previousStartTurnForDuration.apply(this,arguments);
+            restoreMonsterSupportDurations(snapshot);
+            return result;
+        };
+    }
+
+    function entityForActionEntry(entry){
+        if(!entry){ return null; }
+        if(entry.type==="player"&&typeof getPartyCharacterByIndex==="function"){
+            return getPartyCharacterByIndex(entry.characterIndex);
+        }
+        if(entry.type==="monster"&&typeof monsters!=="undefined"&&Array.isArray(monsters)){
+            return monsters[entry.monsterIndex]||null;
+        }
+        return null;
+    }
+    function snapshotTimedEntries(entity){
+        return {
+            buffs:new Set((entity&&Array.isArray(entity.activeBuffs)?entity.activeBuffs:[]).filter(buff=>
+                buff&&numeric(buff.turnsLeft)>0&&!buff.oneShot&&!ACTION_DURATION_EXCLUDED_BUFFS.has(buff.type)
+            )),
+            statuses:new Set((entity&&Array.isArray(entity.statusEffects)?entity.statusEffects:[]).filter(effect=>
+                effect&&numeric(effect.turnsLeft)>0&&ACTION_DURATION_STATUS_TYPES.has(effect.type)
+            ))
+        };
+    }
+    function expireActionBuff(entity,buff){
+        if(!entity||!buff||!Array.isArray(entity.activeBuffs)){ return; }
+        buff.turnsLeft=Math.max(0,numeric(buff.turnsLeft)-1);
+        const mirrored=Array.isArray(entity.v141TeamBuffs)
+            ?entity.v141TeamBuffs.find(item=>item&&item.displayBuff===buff):null;
+        if(mirrored){ mirrored.turnsLeft=buff.turnsLeft; }
+        if(buff.turnsLeft>0){ return; }
+        entity.activeBuffs=entity.activeBuffs.filter(item=>item!==buff);
+        if(mirrored){
+            entity.v141TeamBuffs=entity.v141TeamBuffs.filter(item=>item!==mirrored);
+            if(mirrored.type==="rage"){
+                entity.attack=mirrored.originalAttack;
+                entity.magicAttack=mirrored.originalMagicAttack;
+            }else if(mirrored.type==="resistance"){
+                entity.resistance=Math.max(0,numeric(entity.resistance)-numeric(mirrored.amount));
+            }else if(mirrored.type==="dodge"){
+                entity.evasion=mirrored.originalEvasion;
+            }
+        }
+        ["v144CalmBuff","v144DodgeBuff","v155EvasionBlessing","v155WindDodge"].forEach(key=>{
+            const state=entity[key];
+            const display=state&&(state.display||state.displayBuff);
+            if(display!==buff){ return; }
+            if(key==="v144CalmBuff"){
+                entity.accuracy=state.originalAccuracy;
+                entity.resistance=state.originalResistance;
+            }else if(key==="v144DodgeBuff"){
+                entity.evasion=state.originalEvasion;
+            }
+            delete entity[key];
+            if((key==="v155EvasionBlessing"||key==="v155WindDodge")&&
+                !entity.v155EvasionBlessing&&!entity.v155WindDodge&&Object.prototype.hasOwnProperty.call(entity,"v155EvasionBase")){
+                entity.evasion=numeric(entity.v155EvasionBase);
+                delete entity.v155EvasionBase;
+            }
+        });
+        if(typeof addBattleLog==="function"){
+            addBattleLog("⏳"+(buff.statusName||buff.type)+"效果已結束。");
+        }
+    }
+    function expireActionStatus(entity,effect){
+        if(!entity||!effect||!Array.isArray(entity.statusEffects)){ return; }
+        effect.turnsLeft=Math.max(0,numeric(effect.turnsLeft)-1);
+        if(effect.turnsLeft>0){ return; }
+        entity.statusEffects=entity.statusEffects.filter(item=>item!==effect);
+        if(typeof addBattleLog==="function"){
+            const name=effect.type==="freeze"?"冰封":effect.type==="petrify"?"石化":effect.type==="frostbite"?"凍傷":effect.type;
+            addBattleLog((entity.id||entity.name||"目標")+"的"+name+"效果已解除。");
+        }
+    }
+    function beginDurationAction(event){
+        const entry=event&&event.queue&&event.queue[event.index];
+        const entity=entityForActionEntry(entry);
+        if(!entity||numeric(entity.hp)<=0){ durationAction=null; return; }
+        const snapshot=snapshotTimedEntries(entity);
+        durationAction={token:event.token,index:event.index,entry,entity,buffs:snapshot.buffs,statuses:snapshot.statuses};
+    }
+    function finishDurationAction(){
+        const action=durationAction;
+        durationAction=null;
+        if(!action){ return; }
+        action.buffs.forEach(buff=>{
+            if(Array.isArray(action.entity.activeBuffs)&&action.entity.activeBuffs.includes(buff)){
+                expireActionBuff(action.entity,buff);
+            }
+        });
+        action.statuses.forEach(effect=>{
+            if(Array.isArray(action.entity.statusEffects)&&action.entity.statusEffects.includes(effect)){
+                expireActionStatus(action.entity,effect);
+            }
+        });
+    }
+    if(window.FourSymbolsBattleFlow&&typeof window.FourSymbolsBattleFlow.subscribeBeforeCombatant==="function"){
+        window.FourSymbolsBattleFlow.subscribeBeforeCombatant(beginDurationAction);
+        window.FourSymbolsBattleFlow.subscribeActionFinished(finishDurationAction);
+    }
+    window.FourSymbolsDurationLifecycle=Object.freeze({
+        beginAction:beginDurationAction,finishAction:finishDurationAction,
+        snapshotFor:entity=>snapshotTimedEntries(entity)
+    });
+
+    if(typeof document!=="undefined"&&!document.getElementById("v17364-skill-progression-style")){
+        const style=document.createElement("style");
+        style.id="v17364-skill-progression-style";
+        style.textContent=
+            ".v17364-progression-hint{display:block;margin-top:4px;white-space:normal;overflow-wrap:anywhere;line-height:1.35;opacity:.86;font-size:.82em;}"+
+            ".v17364-progression-detail{display:grid;gap:6px;margin-top:10px;}"+
+            ".v17364-progression-detail>div{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;}"+
+            ".v17364-progression-detail strong{flex:0 0 auto;}"+
+            ".v17364-progression-detail span{text-align:right;overflow-wrap:anywhere;}";
+        document.head.appendChild(style);
+    }
+
+    window.FourSymbolsSkillSpec=Object.freeze({
+        damageSkillIds:PLAYER_DAMAGE_SKILL_IDS.slice(),
+        upgradeCosts:SKILL_UPGRADE_COST_BY_TARGET_LEVEL,
+        castFireTactical:castNewFireTactical,
+        withPlayerDirectSkillCast:withPlayerDirectSkillCast,
+        targetLabel:targetLabel,
+        effectText:effectText,
+        descriptionFor:descriptionFor,
+        levelBreakdownHtml:levelBreakdownHtml,
+        getRequiredCharacterLevelForSkillLevel:getRequiredCharacterLevelForSkillLevel,
+        getUpgradeCostForTargetLevel:getUpgradeCostForTargetLevel,
+        applyFinalData:applyFinalProgressionData
+    });
+
+    window.v17364SkillUpgradeCostByTargetLevel=SKILL_UPGRADE_COST_BY_TARGET_LEVEL;
+    window.v17364GetRequiredCharacterLevelForSkillLevel=getRequiredCharacterLevelForSkillLevel;
+    window.v17364GetUpgradeCostForTargetLevel=getUpgradeCostForTargetLevel;
+    window.v17364ApplyFinalProgressionData=applyFinalProgressionData;
+    window.v17364CastNewFireTactical=castNewFireTactical;
+    window.v17364DecorateSkillProgressionUi=decorateSkillProgressionUi;
+    window.v17364SkillProgression={
+        version:"173.64",upgradeCosts:SKILL_UPGRADE_COST_BY_TARGET_LEVEL,
+        fireMomentumByLevel:FIRE_MOMENTUM_BY_LEVEL,bloodBurnByLevel:BLOOD_BURN_BY_LEVEL,
+        dodgeByLevel:DODGE_BY_LEVEL,rockWallByLevel:ROCK_WALL_BY_LEVEL,earthShieldByLevel:EARTH_SHIELD_BY_LEVEL,
+        getRequiredCharacterLevelForSkillLevel,getUpgradeCostForTargetLevel,applyFinalProgressionData,
+        castNewFireTactical,decorateSkillProgressionUi
+    };
+
+    if(typeof renderSkillLoadout==="function"){ renderSkillLoadout(); }
+})();
+
+
+/* bundled source: js/60-team-relic-system.js */
+/* =====================================================
+   Team Relic System — first production runtime
+   - One relic per party loadout.
+   - Relics are independent battlefield events: no skill slot, action or SP use.
+   - Persistent ownership is embedded in the existing SAVE_KEY save document.
+   - Battle counters are transient and reset for every battle.
+===================================================== */
+(function installTeamRelicSystem(){
+    "use strict";
+
+    if(typeof window==="undefined"||window.__teamRelicSystemInstalled){ return; }
+    window.__teamRelicSystemInstalled=true;
+
+    const SOURCE_RELIC="relic";
+    const MAX_LEVEL=20;
+    const CATEGORY_LABELS={
+        all:"全部",attack:"攻擊",recovery:"回復",defense:"防禦",buff:"增益",
+        control:"控制",element:"元素聯動",special:"特殊"
+    };
+    const RARITY_ORDER={white:0,blue:1,purple:2,orange:3,pink:4,"four-symbol":5};
+    const RARITY_LABELS={white:"白階",blue:"藍階",purple:"紫階",orange:"橙階",pink:"桃紅階","four-symbol":"四象階"};
+
+    const RELIC_VFX_FLOOR_MS=2000;
+    const RELIC_DIM_IN_MS=360;
+    const RELIC_IDENTITY_REVEAL_MS=360;
+    const RELIC_IDENTITY_HOLD_MS=1150;
+    const RELIC_IDENTITY_EXIT_MS=420;
+    const RELIC_TARGET_REVEAL_MS=420;
+    const RELIC_DIM_OUT_MS=420;
+    const RELIC_CUTIN_DURATION_MS=RELIC_DIM_IN_MS+RELIC_IDENTITY_REVEAL_MS+RELIC_IDENTITY_HOLD_MS+Math.max(RELIC_IDENTITY_EXIT_MS,RELIC_TARGET_REVEAL_MS);
+    const RELIC_MIN_VISUAL_PROTECTION_MS=1200;
+    const RELIC_DEV_HOST="dev.four-symbols-dev.pages.dev";
+    const RELIC_BALANCE_CONFIG=Object.freeze({
+        basePower:40,
+        averagePartyLevelPower:5,
+        relicLevelPower:8,
+        bossDamageModifier:0.75,
+        bossDebuffEfficiency:0.65,
+        groupDamageModifier:1,
+        healModifier:1,
+        shieldModifier:1,
+        controlModifier:1,
+        burnPercent:3,
+        bannerDurationMs:1800,
+        presentationDurationMs:2400,
+        presentationLeadGapMs:120,
+        upgradeGoldBase:650,
+        upgradeGoldPerLevel:180
+    });
+
+    function relicVfx(durationMs,element,defaultTarget){
+        return Object.freeze({
+            durationMs:Math.max(RELIC_VFX_FLOOR_MS,Math.floor(Number(durationMs)||0)),
+            element:element||"normal",
+            defaultTarget:defaultTarget||"allyAll"
+        });
+    }
+    const RELIC_VFX_PRESENTATION=Object.freeze({
+        relic_qiankun_flask:relicVfx(2500,"normal","allyAll"),
+        relic_sun_orb:relicVfx(2250,"fire","enemyAll"),
+        relic_xuanwu_seal:relicVfx(2600,"normal","allyAll"),
+        relic_soul_bell:relicVfx(2500,"normal","enemyAll"),
+        relic_tiangang_banner:relicVfx(2800,"normal","enemyAll"),
+        relic_nine_dragon_fire:relicVfx(2550,"fire","enemyAll"),
+        relic_cold_spring_jade:relicVfx(2500,"water","singleAlly"),
+        relic_qinglan_feather:relicVfx(2350,"wind","allyAll"),
+        relic_rock_mountain_seal:relicVfx(2600,"earth","allyAll"),
+        relic_returning_wheel:relicVfx(2750,"normal","singleAlly"),
+        relic_origin_talisman:relicVfx(2350,"normal","allyAll"),
+        relic_broken_army_scroll:relicVfx(2250,"normal","singleEnemy"),
+        relic_red_sky_war_mark:relicVfx(2300,"normal","allyAll"),
+        relic_ice_mirror_heart:relicVfx(2400,"water","enemyAll"),
+        relic_wind_chasing_talisman:relicVfx(2200,"wind","allyAll"),
+        relic_mountain_river_cauldron:relicVfx(2650,"earth","allyAll"),
+        relic_burning_star_mark:relicVfx(2250,"fire","enemyAll"),
+        relic_spirit_spring_bottle:relicVfx(2450,"water","allyAll"),
+        relic_demon_suppressing_seal:relicVfx(2400,"normal","allyAll"),
+        relic_all_returning_array:relicVfx(2800,"normal","allyAll")
+    });
+    const RELIC_BATTLE_ICON_PATHS=Object.freeze({
+        relic_qiankun_flask:"assets/relics/battle-icons/relic_qiankun_flask.webp",
+        relic_sun_orb:"assets/relics/battle-icons/relic_sun_orb.webp",
+        relic_xuanwu_seal:"assets/relics/battle-icons/relic_xuanwu_seal.webp",
+        relic_soul_bell:"assets/relics/battle-icons/relic_soul_bell.webp",
+        relic_tiangang_banner:"assets/relics/battle-icons/relic_tiangang_banner.webp",
+        relic_nine_dragon_fire:"assets/relics/battle-icons/relic_nine_dragon_fire.webp",
+        relic_cold_spring_jade:"assets/relics/battle-icons/relic_cold_spring_jade.webp",
+        relic_qinglan_feather:"assets/relics/battle-icons/relic_qinglan_feather.webp",
+        relic_rock_mountain_seal:"assets/relics/battle-icons/relic_rock_mountain_seal.webp",
+        relic_returning_wheel:"assets/relics/battle-icons/relic_returning_wheel.webp",
+        relic_origin_talisman:"assets/relics/battle-icons/relic_origin_talisman.webp",
+        relic_broken_army_scroll:"assets/relics/battle-icons/relic_broken_army_scroll.webp",
+        relic_red_sky_war_mark:"assets/relics/battle-icons/relic_red_sky_war_mark.webp",
+        relic_ice_mirror_heart:"assets/relics/battle-icons/relic_ice_mirror_heart.webp",
+        relic_wind_chasing_talisman:"assets/relics/battle-icons/relic_wind_chasing_talisman.webp",
+        relic_mountain_river_cauldron:"assets/relics/battle-icons/relic_mountain_river_cauldron.webp",
+        relic_burning_star_mark:"assets/relics/battle-icons/relic_burning_star_mark.webp",
+        relic_spirit_spring_bottle:"assets/relics/battle-icons/relic_spirit_spring_bottle.webp",
+        relic_demon_suppressing_seal:"assets/relics/battle-icons/relic_demon_suppressing_seal.webp",
+        relic_all_returning_array:"assets/relics/battle-icons/relic_all_returning_array.webp"
+    });
+
+    function scalar(points,level){
+        const list=(points||[]).slice().sort((a,b)=>a[0]-b[0]);
+        const lv=Math.max(1,Math.min(MAX_LEVEL,Math.floor(Number(level)||1)));
+        if(!list.length){ return 0; }
+        if(lv<=list[0][0]){ return Number(list[0][1])||0; }
+        for(let i=1;i<list.length;i++){
+            const left=list[i-1],right=list[i];
+            if(lv<=right[0]){
+                const ratio=(lv-left[0])/Math.max(1,right[0]-left[0]);
+                return (Number(left[1])||0)+((Number(right[1])||0)-(Number(left[1])||0))*ratio;
+            }
+        }
+        return Number(list[list.length-1][1])||0;
+    }
+
+    function trigger(id,type,options,effects){
+        return Object.assign({
+            id:id,type:type,phase:null,threshold:null,roundInterval:null,hpThreshold:null,
+            resetOnTrigger:false,maxTriggersPerRound:null,maxTriggersPerBattle:null,
+            cooldownRounds:0,oncePerBattle:false,effects:effects||[]
+        },options||{});
+    }
+    function effect(type,options){ return Object.assign({type:type,sourceType:SOURCE_RELIC},options||{}); }
+
+    const RELIC_CATALOG_LIST=[
+        {
+            id:"relic_qiankun_flask",category:"recovery",tags:["recovery","sustain"],rarity:"blue",maxLevel:20,iconPath:"assets/relics/icons/relic_qiankun_flask.webp",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
+            description:"奇數回合結束時，穩定恢復全隊生命；高等級追加少量SP回復。",
+            scalars:{healHpPercent:[[1,4],[5,4.5],[10,5],[15,6],[20,7]],spPercent:[[1,0],[9,0],[10,1],[15,1.5],[20,2]]},
+            triggers:[trigger("odd_end","odd_round_end",{maxTriggersPerRound:1},[
+                effect("heal_all_allies",{percentKey:"healHpPercent"}),effect("restore_sp_all",{percentKey:"spPercent",minLevel:10})
+            ])],
+            limitText:"無每場總次數限制；每個符合條件的奇數回合最多觸發一次。",
+            nextText:{5:"HP回復提高至4.5%",10:"HP回復5%，追加1%最大SP",15:"HP 6%＋SP 1.5%",20:"HP 7%＋SP 2%"}
+        },
+        {
+            id:"relic_sun_orb",category:"attack",tags:["attack","group"],rarity:"purple",maxLevel:20,iconPath:"assets/relics/icons/relic_sun_orb.webp",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
+            description:"偶數回合開始時對敵方全體造成穩定秘寶傷害，對燃燒目標更強。",
+            scalars:{damageMultiplier:[[1,.75],[10,.9],[20,1.1]],burnBonus:[[1,0],[9,0],[10,.15],[20,.25]]},
+            triggers:[trigger("even_start","even_round_start",{},[
+                effect("damage_all_enemies",{multiplierKey:"damageMultiplier",bonusAgainstStatus:"burn",bonusKey:"burnBonus",element:"fire"})
+            ])],
+            limitText:"不能暴擊，不觸發角色追擊或吸血。",
+            nextText:{10:"傷害0.90×秘寶威力；燃燒目標+15%",20:"傷害1.10×；燃燒目標+25%"}
+        },
+        {
+            id:"relic_xuanwu_seal",category:"defense",tags:["defense","shield"],rarity:"blue",maxLevel:20,iconPath:"assets/relics/icons/relic_xuanwu_seal.webp",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
+            description:"每第3回合開始為全隊建立不疊加的護盾。",
+            scalars:{shieldPercent:[[1,6],[10,8],[20,10]],damageReduction:[[1,0],[19,0],[20,8]]},
+            triggers:[trigger("third_start","every_n_rounds",{phase:"round_start",roundInterval:3},[
+                effect("shield_all",{percentKey:"shieldPercent",durationRounds:2}),effect("buff_all",{minLevel:20,damageReductionKey:"damageReduction",durationRounds:1})
+            ])],
+            limitText:"同一秘寶護盾不可相加；只保留較高護盾值。",
+            nextText:{10:"護盾提高至最大HP 8%",20:"護盾10%，並獲得1回合8%減傷"}
+        },
+        {
+            id:"relic_soul_bell",category:"control",tags:["control","soft-control"],rarity:"purple",maxLevel:20,iconPath:"assets/relics/icons/relic_soul_bell.webp",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
+            description:"每第4回合開始，以降攻與降命中壓制敵方全體。",
+            scalars:{attackDown:[[1,10],[10,12],[20,15]],accuracyDown:[[1,0],[9,0],[10,5],[20,8]]},
+            triggers:[trigger("fourth_start","every_n_rounds",{phase:"round_start",roundInterval:4},[
+                effect("debuff_all_enemies",{attackDownKey:"attackDown",accuracyDownKey:"accuracyDown",durationRounds:1})
+            ])],
+            limitText:"BOSS套用較低效率；不造成全體硬控。",
+            nextText:{10:"降攻12%並追加命中-5%",20:"降攻15%、命中-8%"}
+        },
+        {
+            id:"relic_tiangang_banner",category:"defense",tags:["attack","defense","anti_swarm"],rarity:"orange",maxLevel:20,iconPath:"assets/relics/icons/relic_tiangang_banner.webp",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
+            description:"我方累積遭受6次敵方有效攻擊後反擊全體，敵人越多越容易累積。",
+            scalars:{damageMultiplier:[[1,.65],[10,.8],[20,1]],attackDown:[[1,0],[9,0],[10,5],[20,8]]},
+            triggers:[trigger("ally_hits_6","ally_hit_count",{threshold:6,resetOnTrigger:true,maxTriggersPerRound:1},[
+                effect("damage_all_enemies",{multiplierKey:"damageMultiplier"}),effect("debuff_all_enemies",{minLevel:10,attackDownKey:"attackDown",durationRounds:1})
+            ])],
+            limitText:"觸發後受擊計數歸零；每回合最多一次。",
+            nextText:{10:"全體傷害0.80×並降攻5%一回合",20:"全體傷害1.00×並降攻8%"}
+        },
+        {
+            id:"relic_nine_dragon_fire",category:"element",tags:["attack","fire","anti_swarm"],rarity:"purple",maxLevel:20,iconPath:"assets/relics/icons/relic_nine_dragon_fire.webp",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
+            description:"敵方累積完成7次有效行動後爆發全體火屬性秘寶傷害。",
+            scalars:{damageMultiplier:[[1,.8],[5,.85],[10,.9],[15,1],[20,1.1]],burnChance:[[1,0],[9,0],[10,.2],[15,.25],[20,.3]],burnBonus:[[1,0],[19,0],[20,.15]]},
+            triggers:[trigger("enemy_actions_7","enemy_action_count",{threshold:7,resetOnTrigger:true,maxTriggersPerRound:1},[
+                effect("damage_all_enemies",{multiplierKey:"damageMultiplier",element:"fire",bonusAgainstStatus:"burn",bonusKey:"burnBonus"}),
+                effect("apply_status_all_enemies",{minLevel:10,statusId:"burn",chanceKey:"burnChance",durationRounds:2})
+            ])],
+            limitText:"觸發後敵方行動計數歸零；每回合最多一次。",
+            nextText:{5:"全體火傷提高至0.85×",10:"0.90×並有20%機率燃燒",15:"1.00×、燃燒25%",20:"1.10×、燃燒30%，燃燒目標+15%"}
+        },
+        {
+            id:"relic_cold_spring_jade",category:"recovery",tags:["water","emergency","element"],rarity:"purple",maxLevel:20,iconPath:"assets/relics/icons/relic_cold_spring_jade.webp",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
+            description:"任一隊友HP由35%以上降至35%以下時進行急救。",
+            scalars:{healHpPercent:[[1,12],[10,15],[20,18]],spPercent:[[1,0],[19,0],[20,4]]},
+            triggers:[trigger("hp_below_35","ally_hp_below",{hpThreshold:.35,maxTriggersPerBattle:2,cooldownRounds:3},[
+                effect("heal_single_ally",{percentKey:"healHpPercent"}),effect("cleanse_single",{minLevel:10,count:1}),effect("restore_sp_single",{minLevel:20,percentKey:"spPercent"})
+            ])],
+            limitText:"每場最多2次，全域冷卻3回合；同一傷害事件只判定一次。",
+            nextText:{10:"急救15%最大HP並解除1個一般負面",20:"急救18%HP、淨化1個可解除負面並回4%最大SP"}
+        },
+        {
+            id:"relic_qinglan_feather",category:"buff",tags:["wind","evasion","element"],rarity:"blue",maxLevel:20,iconPath:"assets/relics/icons/relic_qinglan_feather.webp",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
+            description:"戰鬥開始時提高全隊閃避與異常抗性。",
+            scalars:{evasionBonus:[[1,8],[10,10],[20,12]],resistanceBonus:[[1,8],[10,10],[20,12]],duration:[[1,2],[19,2],[20,3]]},
+            triggers:[trigger("battle_start","battle_start",{oncePerBattle:true},[
+                effect("buff_all",{evasionKey:"evasionBonus",resistanceKey:"resistanceBonus",durationKey:"duration"})
+            ])],
+            limitText:"只在開場觸發一次；維持風系靈活、防控定位。",
+            nextText:{10:"閃避與異常抗性各+10%",20:"各+12%，持續3回合"}
+        },
+        {
+            id:"relic_rock_mountain_seal",category:"defense",tags:["earth","pressure","element"],rarity:"purple",maxLevel:20,iconPath:"assets/relics/icons/relic_rock_mountain_seal.webp",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
+            description:"開場提高全隊防禦，受圍攻時再產生隊伍護盾。",
+            scalars:{defenseBonus:[[1,10],[10,12],[20,15]],shieldPercent:[[1,5],[10,6],[20,8]],reflectMultiplier:[[1,0],[19,0],[20,.18]]},
+            triggers:[
+                trigger("battle_start_defense","battle_start",{oncePerBattle:true},[effect("buff_all",{defenseKey:"defenseBonus",durationRounds:3})]),
+                trigger("ally_hits_8","ally_hit_count",{threshold:8,resetOnTrigger:true,maxTriggersPerBattle:2},[
+                    effect("shield_all",{percentKey:"shieldPercent",durationRounds:2}),effect("prepare_reflect",{minLevel:20,multiplierKey:"reflectMultiplier",durationRounds:1})
+                ])
+            ],
+            limitText:"受擊護盾每場最多2次；Lv20反震只作用於下一名實際攻擊者。",
+            nextText:{10:"開場防禦+12%，受擊護盾6%",20:"防禦+15%、護盾8%，追加一次反震"}
+        },
+        {
+            id:"relic_returning_wheel",category:"special",tags:["recovery","survival"],rarity:"pink",maxLevel:20,iconPath:"assets/relics/icons/relic_returning_wheel.webp",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
+            description:"每場第一次致命傷害發生時阻止死亡，留下1HP後立即回復並獲得護盾。",
+            scalars:{healHpPercent:[[1,15],[10,18],[20,22]],shieldPercent:[[1,8],[10,8],[20,10]]},
+            triggers:[trigger("before_lethal","before_lethal_damage",{oncePerBattle:true,maxTriggersPerBattle:1},[
+                effect("prevent_death",{}),effect("heal_single_ally",{percentKey:"healHpPercent",afterPreventDeath:true}),
+                effect("shield_single",{percentKey:"shieldPercent",durationRounds:1}),effect("cleanse_single",{minLevel:20,count:1})
+            ])],
+            limitText:"整支隊伍每場只觸發一次，不是每個角色各一次。",
+            nextText:{10:"保命後回復18%最大HP",20:"回復22%、護盾10%並解除1個一般負面"}
+        },
+        {id:"relic_origin_talisman",category:"buff",tags:["recovery","cleanse","special"],rarity:"purple",maxLevel:20,iconPath:"assets/relics/icons/relic_origin_talisman.webp",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"每第4回合結束淨化負面最多的隊友，並恢復全隊HP。",limitText:"第一版資料已建立，尚未開放取得。"},
+        {id:"relic_broken_army_scroll",category:"attack",tags:["execute"],rarity:"purple",maxLevel:20,iconPath:"assets/relics/icons/relic_broken_army_scroll.webp",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"角色擊敗敵人後，追擊目前HP最低的存活敵人。",limitText:"每回合最多一次；秘寶與DOT擊殺不觸發。"},
+        {id:"relic_red_sky_war_mark",category:"buff",tags:["attack","burst"],rarity:"orange",maxLevel:20,iconPath:"assets/relics/icons/relic_red_sky_war_mark.webp",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"戰鬥開始時短暫提高全隊攻擊，後期追加暴擊率。",limitText:"只觸發一次，不長時間常駐。"},
+        {id:"relic_ice_mirror_heart",category:"element",tags:["water","frostbite","freeze","control"],rarity:"purple",maxLevel:20,iconPath:"assets/relics/icons/relic_ice_mirror_heart.webp",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"每第3回合結束，對凍傷或冰封中的敵人追加水屬性秘寶傷害。",limitText:"不附加冰封，不刷新凍傷。"},
+        {id:"relic_wind_chasing_talisman",category:"buff",tags:["wind","tempo"],rarity:"blue",maxLevel:20,iconPath:"assets/relics/icons/relic_wind_chasing_talisman.webp",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"每第3回合開始提高隊伍節奏與閃避。",limitText:"第一版資料保留；待確認正式速度 owner 後再開放。"},
+        {id:"relic_mountain_river_cauldron",category:"defense",tags:["recovery","anti_swarm"],rarity:"orange",maxLevel:20,iconPath:"assets/relics/icons/relic_mountain_river_cauldron.webp",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"我方累積受7次有效攻擊後，恢復全隊並短暫提高防禦。",limitText:"每回合最多一次。"},
+        {id:"relic_burning_star_mark",category:"element",tags:["fire","burn","attack"],rarity:"purple",maxLevel:20,iconPath:"assets/relics/icons/relic_burning_star_mark.webp",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"偶數回合結束時對燃燒中的敵人追加火屬性秘寶傷害。",limitText:"不消耗或刷新燃燒。"},
+        {id:"relic_spirit_spring_bottle",category:"recovery",tags:["sp","long-battle"],rarity:"blue",maxLevel:20,iconPath:"assets/relics/icons/relic_spirit_spring_bottle.webp",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"每第3回合結束恢復全隊SP，高等級追加少量HP。",limitText:"死亡角色不受影響。"},
+        {id:"relic_demon_suppressing_seal",category:"defense",tags:["buff","cleanse"],rarity:"orange",maxLevel:20,iconPath:"assets/relics/icons/relic_demon_suppressing_seal.webp",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"開場提高異常抗性，並在首次中負面時自動淨化。",limitText:"自動淨化每場一次。"},
+        {id:"relic_all_returning_array",category:"special",tags:["adaptive"],rarity:"four-symbol",maxLevel:20,iconPath:"assets/relics/icons/relic_all_returning_array.webp",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"每第4回合開始依全隊平均HP決定回血或攻防增益。",limitText:"一次只發動回血或攻防其中一種。"}
+    ];
+
+    RELIC_CATALOG_LIST.forEach(def=>{
+        const summary=window.FourSymbolsRelicSummaryCatalog&&window.FourSymbolsRelicSummaryCatalog[def.id];
+        if(!summary){ throw new Error("Missing first-screen relic summary definition: "+def.id); }
+        def.name=summary.name;
+        def.triggerText=summary.triggerText;
+        def.vfx=RELIC_VFX_PRESENTATION[def.id]||null;
+        def.battleIconPath=RELIC_BATTLE_ICON_PATHS[def.id]||null;
+        def.upgradeCost={
+            items:[],
+            goldCost:{base:RELIC_BALANCE_CONFIG.upgradeGoldBase,perLevel:RELIC_BALANCE_CONFIG.upgradeGoldPerLevel},
+            formalMaterialSource:null
+        };
+    });
+    let relicVisualReadyPromise=null;
+    function nextVisualPaint(){ return new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))); }
+    function decodeRelicIcon(path){
+        return new Promise((resolve,reject)=>{const image=new Image();image.decoding="async";image.onload=()=>typeof image.decode==="function"?image.decode().then(resolve,reject):resolve();image.onerror=()=>reject(new Error("秘寶圖片無法載入："+path));image.src=path;});
+    }
+    function prepareRelicVisuals(){
+        if(relicVisualReadyPromise){return relicVisualReadyPromise;}
+        const iconPaths=[...new Set(RELIC_CATALOG_LIST.map(def=>def.iconPath).filter(Boolean))];
+        const loader=window.FourSymbolsFeatures;
+        const iconReady=loader&&typeof loader.ensureAssets==="function"?loader.ensureAssets(iconPaths):Promise.all(iconPaths.map(decodeRelicIcon));
+        relicVisualReadyPromise=Promise.all([document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve(),iconReady]).then(()=>iconPaths).catch(error=>{relicVisualReadyPromise=null;throw error;});
+        return relicVisualReadyPromise;
+    }
+    const relicCatalog=Object.freeze(Object.fromEntries(RELIC_CATALOG_LIST.map(item=>[item.id,Object.freeze(item)])));
+    let playerRelics={};
+    let teamLoadout={relicId:null,subRelicId:null};
+    let relicBattleState=null;
+    let pendingBattleInit=false;
+    let currentFilter="all";
+    let currentDetailId=null;
+    let sourceContext=null;
+    let relicVisualCollector=null;
+    let relicPresentationTail=Promise.resolve();
+    let relicPresentationPending=0;
+    let relicPresentationGeneration=0;
+    let relicVfxSequence=0;
+    let relicPresentationHandoffsPending=0;
+    let relicMinVisualProtectionUntil=0;
+    let relicFinishHeld=false;
+    let relicFinishRetryTimer=0;
+    let relicCutinNode=null;
+    let relicFocusedTargetCards=[];
+    let relicFocusedTargetLayers=[];
+    const relicPresentationLockReleases=new Set();
+
+    function numeric(value){ const n=Number(value); return Number.isFinite(n)?n:0; }
+    function esc(value){ return String(value==null?"":value).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;").replace(/'/g,"&#039;"); }
+    function currentRound(){ return Math.max(1,Math.floor(typeof turn!=="undefined"?numeric(turn):1)); }
+    function currentBattleToken(){ return typeof battleToken!=="undefined"?battleToken:null; }
+    function partyIndexes(){ return typeof getExistingPartyIndexes==="function"?getExistingPartyIndexes().slice(0,3):[0,1,2].filter(i=>typeof getPartyCharacterByIndex==="function"&&getPartyCharacterByIndex(i)); }
+    function characterAt(index){ return typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(index):null; }
+    function statsAt(index){ return typeof getPartyBattleStats==="function"?getPartyBattleStats(index):null; }
+    function relicLevel(id){ return Math.max(1,Math.min(MAX_LEVEL,Math.floor(numeric(playerRelics[id]&&playerRelics[id].level)||1))); }
+    function valueFor(def,key,level){ return def&&def.scalars&&def.scalars[key]?scalar(def.scalars[key],level):0; }
+    function isBoss(monster){ return typeof getMonsterRank==="function"?getMonsterRank(monster)==="boss":!!(monster&&(monster.rank==="boss"||monster.isBoss)); }
+    function hasStatus(entity,type){
+        if(typeof window.v173HasNamedPersistentState==="function"){ try{return !!window.v173HasNamedPersistentState(entity,type);}catch(_){ } }
+        return !!(entity&&Array.isArray(entity.statusEffects)&&entity.statusEffects.some(s=>s&&s.type===type&&numeric(s.turnsLeft)>0));
+    }
+    function withSource(type,callback){ const previous=sourceContext; sourceContext={sourceType:type}; try{return callback();}finally{sourceContext=previous;} }
+    function waitMs(ms){ return new Promise(resolve=>setTimeout(resolve,Math.max(0,Math.floor(numeric(ms))))); }
+    function isRelicDevTestingEnvironment(){
+        if(typeof window==="undefined"||!window.location){ return false; }
+        const host=String(window.location.hostname||"").toLowerCase();
+        return host===RELIC_DEV_HOST||host==="localhost"||host==="127.0.0.1"||host==="::1";
+    }
+    function effectiveLoadoutRelicId(){
+        return teamLoadout.relicId;
+    }
+    function hasLiveBattlePresentationHost(){
+        return typeof document!=="undefined"&&typeof document.getElementById==="function"&&!!document.getElementById("battlePage");
+    }
+    function clearRelicTargetFocus(){
+        const cards=relicFocusedTargetCards.slice();
+        const layers=relicFocusedTargetLayers.slice();
+        relicFocusedTargetCards=[];
+        relicFocusedTargetLayers=[];
+        cards.forEach(card=>{
+            if(card&&card.classList){
+                card.classList.remove("team-relic-battle-target-focus","team-relic-battle-target-focus-visible");
+            }
+        });
+        layers.forEach(layer=>{
+            if(layer&&layer.classList){ layer.classList.remove("team-relic-battle-target-layer"); }
+        });
+        if(typeof document!=="undefined"&&typeof document.querySelectorAll==="function"){
+            document.querySelectorAll(".team-relic-battle-target-focus,.team-relic-battle-target-focus-visible").forEach(card=>{
+                card.classList.remove("team-relic-battle-target-focus","team-relic-battle-target-focus-visible");
+            });
+            document.querySelectorAll(".team-relic-battle-target-layer").forEach(layer=>{
+                layer.classList.remove("team-relic-battle-target-layer");
+            });
+        }
+    }
+    function cleanupRelicCutin(){
+        clearRelicTargetFocus();
+        const node=relicCutinNode||(typeof document!=="undefined"&&document.getElementById?document.getElementById("teamRelicBattlePresentation"):null);
+        if(node&&typeof node.remove==="function"){ node.remove(); }
+        relicCutinNode=null;
+    }
+    function relicTargetCard(side,index){
+        if(typeof document==="undefined"||!Number.isInteger(index)){ return null; }
+        return document.getElementById(side==="monster"?"battleMonster"+index:"battlePlayerCard"+index);
+    }
+    function relicTargetLayer(card){
+        if(!card){ return null; }
+        if(typeof card.closest==="function"){
+            return card.closest(".v-fixed-enemy-slot,.v-fixed-ally-slot,.v-fixed-boss-footprint")||card;
+        }
+        return card;
+    }
+    function revealRelicTargets(target){
+        clearRelicTargetFocus();
+        const cards=target&&Array.isArray(target.targetIds)
+            ?target.targetIds.map(index=>relicTargetCard(target.targetSide,index)).filter(Boolean)
+            :[];
+        relicFocusedTargetCards=Array.from(new Set(cards));
+        relicFocusedTargetLayers=Array.from(new Set(relicFocusedTargetCards.map(relicTargetLayer).filter(Boolean)));
+        relicFocusedTargetLayers.forEach(layer=>layer.classList.add("team-relic-battle-target-layer"));
+        relicFocusedTargetCards.forEach(card=>card.classList.add("team-relic-battle-target-focus"));
+        const show=()=>relicFocusedTargetCards.forEach(card=>card.classList.add("team-relic-battle-target-focus-visible"));
+        if(typeof requestAnimationFrame==="function"){ requestAnimationFrame(show); }else{ show(); }
+        return waitMs(RELIC_TARGET_REVEAL_MS);
+    }
+    function beginRelicCinematic(def,target){
+        if(!hasLiveBattlePresentationHost()||!def){ return Promise.resolve(null); }
+        cleanupRelicCutin();
+        const battlePage=document.getElementById("battlePage");
+        const host=battlePage&&typeof battlePage.querySelector==="function"?battlePage.querySelector(".battle-wrap"):null;
+        if(!host){ return Promise.resolve(null); }
+        const node=document.createElement("div");
+        node.id="teamRelicBattlePresentation";
+        node.className="team-relic-battle-presentation";
+        node.setAttribute("aria-label","秘寶發動："+def.name);
+        node.innerHTML='<span class="team-relic-battle-dim" aria-hidden="true"></span>'+
+            '<div class="team-relic-battle-cutin"><span class="team-relic-battle-cutin-icon">'+
+            '<img src="'+esc(def.battleIconPath||def.iconPath||"")+'" alt=""></span>'+
+            '<span class="team-relic-battle-cutin-copy"><strong>'+esc(def.name)+'</strong></span></div>';
+        host.appendChild(node);
+        relicCutinNode=node;
+        const dim=()=>{ if(node===relicCutinNode){ node.classList.add("dim-visible"); } };
+        if(typeof requestAnimationFrame==="function"){ requestAnimationFrame(dim); }else{ dim(); }
+        return waitMs(RELIC_DIM_IN_MS)
+            .then(()=>{
+                if(node!==relicCutinNode){ return null; }
+                node.classList.add("identity-visible");
+                return waitMs(RELIC_IDENTITY_REVEAL_MS);
+            })
+            .then(()=>{
+                if(node!==relicCutinNode){ return null; }
+                return waitMs(RELIC_IDENTITY_HOLD_MS);
+            })
+            .then(()=>{
+                if(node!==relicCutinNode){ return null; }
+                node.classList.add("identity-exiting");
+                return Promise.all([
+                    waitMs(RELIC_IDENTITY_EXIT_MS),
+                    revealRelicTargets(target)
+                ]).then(()=>node);
+            });
+    }
+    function enterRelicVfxPhase(node){
+        if(node&&node===relicCutinNode){ node.classList.add("vfx-running"); }
+    }
+    function endRelicCinematic(node){
+        if(!node||node!==relicCutinNode){ cleanupRelicCutin(); return Promise.resolve(); }
+        node.classList.add("releasing");
+        return waitMs(RELIC_DIM_OUT_MS).then(()=>{
+            if(node===relicCutinNode){ cleanupRelicCutin(); }
+        });
+    }
+    function clearRelicFinishProtection(){
+        if(relicFinishRetryTimer){ clearTimeout(relicFinishRetryTimer); relicFinishRetryTimer=0; }
+        relicPresentationHandoffsPending=0;
+        relicMinVisualProtectionUntil=0;
+        relicFinishHeld=false;
+    }
+    function retryHeldBattleFinishWhenReady(){
+        if(!relicFinishHeld||relicPresentationHandoffsPending>0){ return; }
+        const wait=Math.max(0,relicMinVisualProtectionUntil-Date.now());
+        if(wait>8){
+            if(relicFinishRetryTimer){ clearTimeout(relicFinishRetryTimer); }
+            relicFinishRetryTimer=setTimeout(()=>{ relicFinishRetryTimer=0; retryHeldBattleFinishWhenReady(); },wait);
+            return;
+        }
+        relicFinishHeld=false;
+        if(typeof battleActive!=="undefined"&&battleActive&&typeof finishPlayerAction==="function"){ finishPlayerAction(); }
+    }
+    function releaseRelicPresentationHandoff(withProtection){
+        relicPresentationHandoffsPending=Math.max(0,relicPresentationHandoffsPending-1);
+        if(withProtection){
+            relicMinVisualProtectionUntil=Math.max(relicMinVisualProtectionUntil,Date.now()+RELIC_MIN_VISUAL_PROTECTION_MS);
+        }
+        retryHeldBattleFinishWhenReady();
+    }
+    function resetRelicPresentationQueue(){
+        relicPresentationGeneration++;
+        relicPresentationTail=Promise.resolve();
+        relicPresentationPending=0;
+        relicVfxSequence=0;
+        relicVisualCollector=null;
+        relicPresentationLockReleases.forEach(release=>{ try{release();}catch(_){ } });
+        relicPresentationLockReleases.clear();
+        cleanupRelicCutin();
+        clearRelicFinishProtection();
+    }
+    function currentAnimationGate(){
+        const director=window.v142SkillAnimationDirector;
+        return director&&typeof director.getActive==="function"?director.getActive():null;
+    }
+    function preloadRelicVfx(defOrId){
+        const id=typeof defOrId==="string"?defOrId:defOrId&&defOrId.id;
+        if(!id||typeof window.v143PreloadBattleVfxAsset!=="function"){ return false; }
+        try{ return !!window.v143PreloadBattleVfxAsset(id); }
+        catch(error){ console.error("秘寶 VFX 預載失敗：",error); return false; }
+    }
+    function eligibleEnemyIndexesForRelicVfx(){
+        const indexes=typeof currentBattleMonsters!=="undefined"&&Array.isArray(currentBattleMonsters)?currentBattleMonsters:[];
+        return indexes.filter(index=>{
+            const monster=typeof monsters!=="undefined"&&monsters?monsters[index]:null;
+            if(!Number.isInteger(index)||!monster||monster.alive===false||numeric(monster.hp)<=0){ return false; }
+            if(
+                window.GameplaySystem&&typeof window.GameplaySystem.canDirectlyAffectMonster==="function"&&
+                !window.GameplaySystem.canDirectlyAffectMonster(monster,index)
+            ){ return false; }
+            return true;
+        });
+    }
+    function fallbackRelicVfxTarget(def,payload){
+        const mode=def&&def.vfx&&def.vfx.defaultTarget||"allyAll";
+        if(mode==="enemyAll"){
+            return {targetSide:"monster",targetType:"all",targetId:null,targetIds:eligibleEnemyIndexesForRelicVfx(),category:"attack"};
+        }
+        if(mode==="singleEnemy"){
+            const requested=payload&&Number.isInteger(payload.monsterIndex)?payload.monsterIndex:
+                payload&&Number.isInteger(payload.targetIndex)?payload.targetIndex:null;
+            const enemies=eligibleEnemyIndexesForRelicVfx();
+            const targetId=requested!==null&&enemies.indexOf(requested)>=0?requested:(enemies.length?enemies[0]:null);
+            return {targetSide:"monster",targetType:"single",targetId:targetId,targetIds:targetId===null?[]:[targetId],category:"attack"};
+        }
+        if(mode==="singleAlly"){
+            const allies=partyIndexes().filter(index=>{ const character=characterAt(index); return character&&numeric(character.hp)>0; });
+            const requested=payload&&Number.isInteger(payload.targetIndex)?payload.targetIndex:null;
+            const targetId=requested!==null&&allies.indexOf(requested)>=0?requested:(allies.length?allies[0]:null);
+            return {targetSide:"player",targetType:"single",targetId:targetId,targetIds:targetId===null?[]:[targetId],category:"buff"};
+        }
+        return {targetSide:"player",targetType:"allyAll",targetId:null,targetIds:partyIndexes().filter(index=>{ const character=characterAt(index); return character&&numeric(character.hp)>0; }),category:"buff"};
+    }
+    function normalizeRelicVfxOverride(override){
+        if(!override||typeof override!=="object"){ return null; }
+        const targetSide=override.targetSide==="monster"?"monster":"player";
+        const targetType=String(override.targetType||"single");
+        let ids=Array.isArray(override.targetIds)?override.targetIds.filter(Number.isInteger):[];
+        if(!ids.length&&Number.isInteger(override.targetId)){ ids=[override.targetId]; }
+        const targetId=targetType==="single"&&ids.length?ids[0]:null;
+        return {targetSide:targetSide,targetType:targetType,targetId:targetId,targetIds:Array.from(new Set(ids)),category:override.category||"buff"};
+    }
+    function relicVfxTarget(def,triggerDef,payload,override){
+        const forced=normalizeRelicVfxOverride(override);
+        if(forced){ return forced; }
+        const effects=triggerDef&&Array.isArray(triggerDef.effects)?triggerDef.effects:[];
+        const types=effects.map(effectDef=>String(effectDef&&effectDef.type||""));
+        if(types.some(type=>["damage_all_enemies","debuff_all_enemies","apply_status_all_enemies"].includes(type))){
+            return {targetSide:"monster",targetType:"all",targetId:null,targetIds:eligibleEnemyIndexesForRelicVfx(),category:"attack"};
+        }
+        if(
+            payload&&Number.isInteger(payload.targetIndex)&&
+            types.some(type=>["heal_single_ally","restore_sp_single","shield_single","cleanse_single","prevent_death"].includes(type))
+        ){
+            return {targetSide:"player",targetType:"single",targetId:payload.targetIndex,targetIds:[payload.targetIndex],category:"buff"};
+        }
+        if(types.some(type=>["heal_all_allies","restore_sp_all","shield_all","buff_all","prepare_reflect"].includes(type))){
+            return {targetSide:"player",targetType:"allyAll",targetId:null,targetIds:partyIndexes().filter(index=>{ const character=characterAt(index); return character&&numeric(character.hp)>0; }),category:"buff"};
+        }
+        return fallbackRelicVfxTarget(def,payload);
+    }
+    function relicPresentationDuration(def){
+        return Math.max(520,numeric(def&&def.vfx&&def.vfx.durationMs)||RELIC_BALANCE_CONFIG.presentationDurationMs);
+    }
+    function playRelicVfx(def,triggerDef,payload,override,resolvedTarget){
+        if(!def||!def.vfx||!hasLiveBattlePresentationHost()){ return null; }
+        const director=window.v142SkillAnimationDirector;
+        if(!director||typeof director.play!=="function"){ return null; }
+        const target=resolvedTarget||relicVfxTarget(def,triggerDef,payload||{},override);
+        if(!target||!target.targetIds.length){ return null; }
+        const duration=relicPresentationDuration(def);
+        const contract=Object.freeze({
+            version:"battle-target-contract-v1",
+            side:"player",
+            targetSide:target.targetSide,
+            targetType:target.targetType,
+            actorIndex:0,
+            targetId:target.targetId,
+            targetIds:Object.freeze(target.targetIds.slice())
+        });
+        try{
+            return director.play({
+                id:def.id,name:def.name,element:def.vfx.element||"normal",
+                category:target.category||"buff",targetType:target.targetType,
+                duration:duration,resolveDuration:duration,tier:"relic",style:"relic"
+            },{
+                side:"player",actorIndex:0,targetSide:target.targetSide,
+                targetId:target.targetId,targetIds:target.targetIds.slice(),
+                targetContract:contract,
+                key:"relic:"+String(currentBattleToken())+":"+def.id+":"+String(++relicVfxSequence)
+            });
+        }catch(error){
+            console.error("秘寶 VFX 啟動失敗：",error);
+            return null;
+        }
+    }
+    function waitForAnimationRelease(gate){
+        if(!gate){ return Promise.resolve(); }
+        const ready=gate.done?Promise.resolve():gate.promise;
+        return Promise.resolve(ready).then(()=>waitMs(Math.max(0,numeric(gate.deadline)+RELIC_BALANCE_CONFIG.presentationLeadGapMs-Date.now())));
+    }
+    function queueRelicVisual(callback){
+        if(typeof callback!=="function"){ return; }
+        if(relicVisualCollector){ relicVisualCollector.push(callback); return; }
+        callback();
+    }
+    function flushRelicVisuals(list){ (list||[]).forEach(callback=>{ try{callback();}catch(error){console.error("秘寶視覺效果失敗：",error);} }); }
+    function queueRelicPresentation(def,onStart,visualContext){
+        if(!hasLiveBattlePresentationHost()){
+            showBanner(def);
+            if(typeof onStart==="function"){ onStart(); }
+            return null;
+        }
+        const generation=relicPresentationGeneration;
+        const token=currentBattleToken();
+        const gate=currentAnimationGate();
+        const previousTail=relicPresentationTail;
+        const flow=window.FourSymbolsBattleFlow;
+        const releasePresentationLock=flow&&typeof flow.acquirePresentationLock==="function"
+            ?flow.acquirePresentationLock("team-relic")
+            :function(){};
+        relicPresentationLockReleases.add(releasePresentationLock);
+        let presentationLockReleased=false;
+        const unlockPresentation=()=>{
+            if(presentationLockReleased){ return; }
+            presentationLockReleased=true;
+            relicPresentationLockReleases.delete(releasePresentationLock);
+            releasePresentationLock();
+        };
+        let handoffReleased=false;
+        const releaseHandoff=withProtection=>{
+            if(handoffReleased){ return; }
+            handoffReleased=true;
+            releaseRelicPresentationHandoff(withProtection===true);
+        };
+        relicPresentationPending++;
+        relicPresentationHandoffsPending++;
+        let cinematicNode=null;
+        let resolvedTarget=null;
+        const job=Promise.resolve(previousTail).catch(()=>{}).then(()=>waitForAnimationRelease(gate)).then(()=>{
+            if(generation!==relicPresentationGeneration||typeof battleActive!=="undefined"&&!battleActive||currentBattleToken()!==token){
+                releaseHandoff(false);
+                return null;
+            }
+            resolvedTarget=relicVfxTarget(
+                def,
+                visualContext&&visualContext.triggerDef,
+                visualContext&&visualContext.payload||{},
+                visualContext&&visualContext.override
+            );
+            if(!resolvedTarget||!resolvedTarget.targetIds.length){
+                releaseHandoff(false);
+                return null;
+            }
+            return beginRelicCinematic(def,resolvedTarget);
+        }).then(node=>{
+            if(!node){ return null; }
+            cinematicNode=node;
+            if(generation!==relicPresentationGeneration||typeof battleActive!=="undefined"&&!battleActive||currentBattleToken()!==token){
+                releaseHandoff(false);
+                cleanupRelicCutin();
+                return null;
+            }
+            enterRelicVfxPhase(node);
+            const relicGate=playRelicVfx(
+                def,
+                visualContext&&visualContext.triggerDef,
+                visualContext&&visualContext.payload,
+                visualContext&&visualContext.override,
+                resolvedTarget
+            );
+            releaseHandoff(true);
+            if(typeof onStart==="function"){ onStart(); }
+            if(relicGate&&relicGate.promise){ return Promise.resolve(relicGate.promise).then(()=>node); }
+            return waitMs(relicPresentationDuration(def)).then(()=>node);
+        }).then(node=>{
+            if(!node){ return; }
+            return endRelicCinematic(node);
+        }).catch(error=>{
+            releaseHandoff(false);
+            cleanupRelicCutin();
+            console.error("秘寶演出序列失敗：",error);
+        }).then(()=>{
+            releaseHandoff(false);
+            if(cinematicNode&&cinematicNode===relicCutinNode){ cleanupRelicCutin(); }
+            if(generation===relicPresentationGeneration){ relicPresentationPending=Math.max(0,relicPresentationPending-1); }
+            unlockPresentation();
+        });
+        relicPresentationTail=job;
+        return job;
+    }
+    function normalizeOwned(raw){
+        const next={};
+        RELIC_CATALOG_LIST.forEach(def=>{
+            const saved=raw&&raw[def.id]&&typeof raw[def.id]==="object"?raw[def.id]:{};
+            next[def.id]={
+                unlocked:saved.unlocked===true||(!Object.prototype.hasOwnProperty.call(saved,"unlocked")&&def.defaultUnlocked===true),
+                level:Math.max(1,Math.min(MAX_LEVEL,Math.floor(numeric(saved.level)||1))),
+                exp:Math.max(0,Math.floor(numeric(saved.exp))),
+                seen:saved.seen===true
+            };
+        });
+        return next;
+    }
+    function normalizeLoadout(raw){
+        const id=raw&&typeof raw.relicId==="string"?raw.relicId:null;
+        const def=id&&relicCatalog[id];
+        return {relicId:def&&def.runtimeReady===true?id:null,subRelicId:null};
+    }
+    function readSaveDocument(){
+        try{
+            const repository=window.FourSymbolsAccountSave;
+            const uid=repository&&repository.getActiveUid();
+            if(!uid){ return null; }
+            const result=repository.readForUid(uid);
+            return result.status==="ready"?result.save:null;
+        }catch(_){ return null; }
+    }
+    function hydrateFromSave(){
+        const data=readSaveDocument()||{};
+        playerRelics=normalizeOwned(data.playerRelics);
+        teamLoadout=normalizeLoadout(data.teamLoadout);
+        window.playerRelics=playerRelics;
+        window.teamLoadout=teamLoadout;
+        if(teamLoadout.relicId){ preloadRelicVfx(teamLoadout.relicId); }
+    }
+    function persistIntoSaveDocument(){
+        try{
+            const repository=window.FourSymbolsAccountSave;
+            const uid=repository&&repository.getActiveUid();
+            if(!uid){ return false; }
+            const current=repository.readForUid(uid);
+            if(current.status!=="ready"){ return false; }
+            const data=current.save;
+            data.playerRelics=playerRelics;
+            data.teamLoadout={relicId:teamLoadout.relicId,subRelicId:null};
+            repository.writeForUid(uid,data,{source:"team-relic"});
+            return true;
+        }catch(error){ console.error("秘寶存檔整合失敗：",error); return false; }
+    }
+    hydrateFromSave();
+
+    if(typeof saveGame==="function"){
+        const previousSaveGame=saveGame;
+        saveGame=function(){ const result=previousSaveGame.apply(this,arguments); persistIntoSaveDocument(); return result; };
+    }
+
+    function saveRelics(){
+        if(typeof saveGame==="function"){ saveGame(); }
+        else{ persistIntoSaveDocument(); }
+    }
+
+    function getRelicPower(id){
+        const indexes=partyIndexes();
+        const avg=indexes.length?indexes.reduce((sum,index)=>sum+Math.max(1,numeric(characterAt(index)&&characterAt(index).level)||1),0)/indexes.length:1;
+        return Math.max(1,Math.round(RELIC_BALANCE_CONFIG.basePower+avg*RELIC_BALANCE_CONFIG.averagePartyLevelPower+relicLevel(id)*RELIC_BALANCE_CONFIG.relicLevelPower));
+    }
+
+    function createBattleState(id){
+        return {
+            relicId:id||null,battleToken:currentBattleToken(),round:currentRound(),enemyActionCount:0,allyHitCount:0,
+            totalTriggers:0,triggerCounts:{},roundTriggerCounts:{},lastTriggerRound:{},onceUsed:{},
+            lastHpDamageEvent:{},damageEventSerial:0,playerMods:{},monsterRestores:[],reflectReady:{},
+            currentEnemyIndex:null,lastEvent:null,boundaryEvents:{}
+        };
+    }
+    function activeBattleRelic(){ return relicBattleState&&relicBattleState.relicId?relicCatalog[relicBattleState.relicId]:null; }
+    function resetRoundCounters(){ if(relicBattleState){ relicBattleState.roundTriggerCounts={}; relicBattleState.round=currentRound(); } }
+    function cleanupPlayerMods(){
+        if(!relicBattleState){ return; }
+        const round=currentRound();
+        Object.keys(relicBattleState.playerMods).forEach(key=>{
+            relicBattleState.playerMods[key]=(relicBattleState.playerMods[key]||[]).filter(mod=>numeric(mod.expiresRound)>=round);
+        });
+        Object.keys(relicBattleState.reflectReady).forEach(key=>{ if(numeric(relicBattleState.reflectReady[key].expiresRound)<round){ delete relicBattleState.reflectReady[key]; } });
+        const keep=[];
+        relicBattleState.monsterRestores.forEach(entry=>{
+            if(numeric(entry.expiresRound)>=round){ keep.push(entry); return; }
+            const monster=entry.monster;
+            if(!monster){ return; }
+            if(entry.attack!==undefined){ monster.attack=entry.attack; }
+            if(entry.magicAttack!==undefined){ monster.magicAttack=entry.magicAttack; }
+            if(entry.accuracy!==undefined){ monster.accuracy=entry.accuracy; }
+        });
+        relicBattleState.monsterRestores=keep;
+    }
+
+    function addPlayerMod(index,mod,duration){
+        if(!relicBattleState){ return; }
+        const key=String(index),expires=currentRound()+Math.max(1,Math.floor(numeric(duration)||1))-1;
+        relicBattleState.playerMods[key]=relicBattleState.playerMods[key]||[];
+        relicBattleState.playerMods[key].push(Object.assign({expiresRound:expires,sourceType:SOURCE_RELIC},mod||{}));
+    }
+    function playerModTotals(index){
+        const list=relicBattleState&&relicBattleState.playerMods[String(index)]||[];
+        return list.reduce((out,mod)=>{
+            ["attackPercent","defensePercent","evasionPercent","resistancePercent","damageReductionPercent"].forEach(key=>{out[key]+=numeric(mod[key]);});
+            return out;
+        },{attackPercent:0,defensePercent:0,evasionPercent:0,resistancePercent:0,damageReductionPercent:0});
+    }
+    function decorateStats(index,stats){
+        if(!stats||!relicBattleState){ return stats; }
+        const mod=playerModTotals(index),copy=Object.assign({},stats);
+        if(mod.attackPercent){ copy.attack=numeric(copy.attack)*(1+mod.attackPercent/100); copy.magicAttack=numeric(copy.magicAttack)*(1+mod.attackPercent/100); }
+        if(mod.defensePercent){ copy.defense=numeric(copy.defense)*(1+mod.defensePercent/100); }
+        if(mod.evasionPercent){ copy.evasion=numeric(copy.evasion)+mod.evasionPercent; }
+        if(mod.resistancePercent){ copy.resistance=numeric(copy.resistance)+mod.resistancePercent; copy.statusResistance=numeric(copy.statusResistance)+mod.resistancePercent; }
+        return copy;
+    }
+
+    if(typeof getPartyBattleStats==="function"){
+        const previous=getPartyBattleStats;
+        getPartyBattleStats=function(index){ return decorateStats(index,previous.apply(this,arguments)); };
+    }
+    [["getMainCharacterStats",0],["getPlayer2BattleStats",1],["getPlayer3BattleStats",2]].forEach(([name,index])=>{
+        const previous=window[name];
+        if(typeof previous==="function"){ window[name]=function(){ return decorateStats(index,previous.apply(this,arguments)); }; }
+    });
+
+    function canTrigger(triggerDef,key){
+        if(!relicBattleState||!triggerDef){ return false; }
+        const round=currentRound();
+        const total=numeric(relicBattleState.triggerCounts[key]);
+        const inRound=numeric(relicBattleState.roundTriggerCounts[key]);
+        if(triggerDef.oncePerBattle&&relicBattleState.onceUsed[key]){ return false; }
+        if(triggerDef.maxTriggersPerBattle!==null&&triggerDef.maxTriggersPerBattle!==undefined&&total>=numeric(triggerDef.maxTriggersPerBattle)){ return false; }
+        if(triggerDef.maxTriggersPerRound!==null&&triggerDef.maxTriggersPerRound!==undefined&&inRound>=numeric(triggerDef.maxTriggersPerRound)){ return false; }
+        const last=relicBattleState.lastTriggerRound[key];
+        if(last!==undefined&&numeric(triggerDef.cooldownRounds)>0&&round-last<numeric(triggerDef.cooldownRounds)){ return false; }
+        return true;
+    }
+    function markTriggered(triggerDef,key){
+        relicBattleState.totalTriggers++;
+        relicBattleState.triggerCounts[key]=numeric(relicBattleState.triggerCounts[key])+1;
+        relicBattleState.roundTriggerCounts[key]=numeric(relicBattleState.roundTriggerCounts[key])+1;
+        relicBattleState.lastTriggerRound[key]=currentRound();
+        if(triggerDef.oncePerBattle){ relicBattleState.onceUsed[key]=true; }
+        if(triggerDef.resetOnTrigger){
+            if(triggerDef.type==="enemy_action_count"){ relicBattleState.enemyActionCount=0; }
+            if(triggerDef.type==="ally_hit_count"){ relicBattleState.allyHitCount=0; }
+        }
+    }
+    function triggerMatches(triggerDef,event,payload,key){
+        const round=currentRound();
+        if(triggerDef.type==="battle_start"){ return event==="battle_start"; }
+        if(triggerDef.type==="round_start"){ return event==="round_start"; }
+        if(triggerDef.type==="round_end"){ return event==="round_end"; }
+        if(triggerDef.type==="odd_round_start"){ return event==="round_start"&&round%2===1; }
+        if(triggerDef.type==="odd_round_end"){ return event==="round_end"&&round%2===1; }
+        if(triggerDef.type==="even_round_start"){ return event==="round_start"&&round%2===0; }
+        if(triggerDef.type==="even_round_end"){ return event==="round_end"&&round%2===0; }
+        if(triggerDef.type==="every_n_rounds"){
+            const phase=triggerDef.phase||"round_start";
+            return event===phase&&round%Math.max(1,numeric(triggerDef.roundInterval)||1)===0;
+        }
+        if(triggerDef.type==="enemy_action_count"){ return event==="after_enemy_action"&&relicBattleState.enemyActionCount>=numeric(triggerDef.threshold); }
+        if(triggerDef.type==="ally_hit_count"){ return event==="after_ally_hit"&&relicBattleState.allyHitCount>=numeric(triggerDef.threshold); }
+        if(triggerDef.type==="ally_hp_below"){
+            if(event!=="ally_hp_below"||!payload||!Number.isInteger(payload.targetIndex)){ return false; }
+            if(relicBattleState.lastHpDamageEvent[key]===payload.damageEventId){ return false; }
+            const character=characterAt(payload.targetIndex),stats=statsAt(payload.targetIndex);
+            const threshold=numeric(triggerDef.hpThreshold);
+            if(payload.previousHpPercent!==undefined&&numeric(payload.previousHpPercent)<threshold){ return false; }
+            return !!(character&&stats&&numeric(character.hp)>0&&numeric(character.hp)/Math.max(1,numeric(stats.maxHP))<threshold);
+        }
+        if(triggerDef.type==="ally_debuffed"){ return event==="ally_debuffed"; }
+        if(triggerDef.type==="enemy_defeated"){ return event==="enemy_defeated"&&payload&&payload.sourceType!==SOURCE_RELIC; }
+        if(triggerDef.type==="ally_down"){ return event==="ally_down"; }
+        if(triggerDef.type==="before_lethal_damage"){ return event==="before_lethal_damage"; }
+        if(triggerDef.type==="once_per_battle"){ return event===(triggerDef.phase||"once_per_battle"); }
+        return false;
+    }
+
+    function showBanner(def){
+        if(typeof document==="undefined"||!def){ return; }
+        let node=document.getElementById("teamRelicBattleBanner");
+        if(!node){
+            node=document.createElement("div"); node.id="teamRelicBattleBanner"; node.className="team-relic-battle-banner";
+            const host=document.getElementById("battlePage")||document.getElementById("game-content")||document.body; if(host){ host.appendChild(node); }
+        }
+        node.innerHTML='<span class="team-relic-battle-icon"><img src="'+esc(def.battleIconPath||def.iconPath||"")+'" alt=""></span><b>秘寶・'+esc(def.name)+'</b>';
+        node.classList.remove("show"); void node.offsetWidth; node.classList.add("show");
+        clearTimeout(node.__hideTimer); node.__hideTimer=setTimeout(()=>node.classList.remove("show"),RELIC_BALANCE_CONFIG.bannerDurationMs);
+    }
+    function battleLog(message){ if(typeof addBattleLog==="function"){ addBattleLog("【秘寶】"+message); } }
+
+    function emitRelicPlayerHit(amount,type,index,isPositive){
+        if(amount<=0||typeof showPlayerHit!=="function"){ return; }
+        queueRelicVisual(()=>withSource(SOURCE_RELIC,()=>showPlayerHit(amount,type,index,isPositive)));
+    }
+    function emitRelicMonsterHit(index,amount,type,isCrit){
+        if(amount<=0||typeof showMonsterHit!=="function"){ return; }
+        queueRelicVisual(()=>withSource(SOURCE_RELIC,()=>showMonsterHit(index,amount,type,isCrit)));
+    }
+    function healAlly(index,percent){
+        const character=characterAt(index),stats=statsAt(index); if(!character||!stats||numeric(character.hp)<=0||percent<=0){ return 0; }
+        const amount=Math.max(1,Math.floor(numeric(stats.maxHP)*percent/100*RELIC_BALANCE_CONFIG.healModifier));
+        const actual=Math.max(0,Math.min(amount,numeric(stats.maxHP)-numeric(character.hp))); character.hp+=actual;
+        if(actual>0){ emitRelicPlayerHit(actual,"heal",index,true); }
+        return actual;
+    }
+    function showRelicSpFloat(index,amount){
+        if(amount<=0){ return; }
+        emitRelicPlayerHit(amount,"sp",index,true);
+    }
+    function restoreSp(index,percent){
+        const character=characterAt(index),stats=statsAt(index); if(!character||!stats||numeric(character.hp)<=0||percent<=0){ return 0; }
+        const amount=Math.max(1,Math.floor(numeric(stats.maxSP)*percent/100));
+        const actual=Math.max(0,Math.min(amount,numeric(stats.maxSP)-numeric(character.sp))); character.sp+=actual;
+        if(actual>0){ showRelicSpFloat(index,actual); }
+        return actual;
+    }
+    function cleanseOne(index){
+        const character=characterAt(index); if(!character||!Array.isArray(character.statusEffects)){ return false; }
+        const i=character.statusEffects.findIndex(state=>state&&state.dispellable!==false&&state.uncleansable!==true&&numeric(state.turnsLeft)>0);
+        if(i<0){ return false; } character.statusEffects.splice(i,1); return true;
+    }
+    function applyShield(index,percent,duration,sourceId){
+        const character=characterAt(index),stats=statsAt(index); if(!character||!stats||numeric(character.hp)<=0||percent<=0){ return 0; }
+        character.activeBuffs=Array.isArray(character.activeBuffs)?character.activeBuffs:[];
+        const amount=Math.max(1,Math.floor(numeric(stats.maxHP)*percent/100*RELIC_BALANCE_CONFIG.shieldModifier));
+        const existing=character.activeBuffs.find(buff=>buff&&buff.type==="shield"&&numeric(buff.turnsLeft)>0&&numeric(buff.remaining)>0);
+        if(existing){
+            if(numeric(existing.remaining)>=amount){ return numeric(existing.remaining); }
+            existing.remaining=amount; existing.amount=Math.max(numeric(existing.amount),amount); existing.turnsLeft=Math.max(1,Math.floor(numeric(duration)||1)); existing.v174RelicSource=sourceId;
+            return amount;
+        }
+        character.activeBuffs.push({type:"shield",statusName:"岩盾",remaining:amount,amount:amount,turnsLeft:Math.max(1,Math.floor(numeric(duration)||1)),v174RelicSource:sourceId,sourceType:SOURCE_RELIC});
+        return amount;
+    }
+    function damageEnemy(index,amount,element){
+        const monster=typeof monsters!=="undefined"?monsters[index]:null; if(!monster||!monster.alive||amount<=0){ return 0; }
+        if(window.GameplaySystem&&typeof window.GameplaySystem.canDirectlyAffectMonster==="function"&&!window.GameplaySystem.canDirectlyAffectMonster(monster,index)){
+            return 0;
+        }
+        const final=Math.max(1,Math.floor(amount*(isBoss(monster)?RELIC_BALANCE_CONFIG.bossDamageModifier:1)));
+        monster.hp=Math.max(0,numeric(monster.hp)-final);
+        emitRelicMonsterHit(index,final,"hp",false);
+        if(monster.hp<=0&&typeof killMonster==="function"){ withSource(SOURCE_RELIC,()=>killMonster(index)); }
+        return final;
+    }
+    function applyEnemyDebuff(monster,attackDown,accuracyDown,duration){
+        if(!monster||!monster.alive||!relicBattleState){ return; }
+        if(window.GameplaySystem&&typeof window.GameplaySystem.canDirectlyAffectMonster==="function"&&!window.GameplaySystem.canDirectlyAffectMonster(monster)){
+            return;
+        }
+        const efficiency=isBoss(monster)?RELIC_BALANCE_CONFIG.bossDebuffEfficiency:1;
+        const attack=Math.max(0,attackDown*efficiency),accuracy=Math.max(0,accuracyDown*efficiency);
+        const restore={monster:monster,expiresRound:currentRound()+Math.max(1,Math.floor(duration||1))-1};
+        if(attack>0){ restore.attack=monster.attack; restore.magicAttack=monster.magicAttack; monster.attack=numeric(monster.attack)*(1-attack/100); monster.magicAttack=numeric(monster.magicAttack)*(1-attack/100); }
+        if(accuracy>0){ restore.accuracy=monster.accuracy; monster.accuracy=numeric(monster.accuracy)*(1-accuracy/100); }
+        relicBattleState.monsterRestores.push(restore);
+    }
+    function applyPlayerBuffAll(effectDef,def,level){
+        const duration=effectDef.durationKey?valueFor(def,effectDef.durationKey,level):Math.max(1,numeric(effectDef.durationRounds)||1);
+        partyIndexes().forEach(index=>{
+            const mod={};
+            if(effectDef.attackKey){ mod.attackPercent=valueFor(def,effectDef.attackKey,level); }
+            if(effectDef.defenseKey){ mod.defensePercent=valueFor(def,effectDef.defenseKey,level); }
+            if(effectDef.evasionKey){ mod.evasionPercent=valueFor(def,effectDef.evasionKey,level); }
+            if(effectDef.resistanceKey){ mod.resistancePercent=valueFor(def,effectDef.resistanceKey,level); }
+            if(effectDef.damageReductionKey){ mod.damageReductionPercent=valueFor(def,effectDef.damageReductionKey,level); }
+            addPlayerMod(index,mod,duration);
+        });
+    }
+
+    function resolveEffects(triggerDef,def,payload){
+        const level=relicLevel(def.id),power=getRelicPower(def.id);
+        let prevented=false;
+        (triggerDef.effects||[]).forEach(eff=>{
+            if(level<Math.max(1,numeric(eff.minLevel)||1)){ return; }
+            if(eff.type==="damage_all_enemies"){
+                const mult=valueFor(def,eff.multiplierKey,level),bonus=valueFor(def,eff.bonusKey,level);
+                (typeof currentBattleMonsters!=="undefined"?currentBattleMonsters:[]).slice().forEach(index=>{
+                    const monster=monsters[index]; if(!monster||!monster.alive){ return; }
+                    const statusBonus=eff.bonusAgainstStatus&&hasStatus(monster,eff.bonusAgainstStatus)?bonus:0;
+                    damageEnemy(index,power*mult*(1+statusBonus)*RELIC_BALANCE_CONFIG.groupDamageModifier,eff.element);
+                });
+            }else if(eff.type==="heal_all_allies"){
+                const p=valueFor(def,eff.percentKey,level); partyIndexes().forEach(index=>healAlly(index,p));
+            }else if(eff.type==="heal_single_ally"){
+                const p=valueFor(def,eff.percentKey,level); if(payload&&Number.isInteger(payload.targetIndex)){ healAlly(payload.targetIndex,p); }
+            }else if(eff.type==="restore_sp_all"){
+                const p=valueFor(def,eff.percentKey,level); if(p>0){ partyIndexes().forEach(index=>restoreSp(index,p)); }
+            }else if(eff.type==="restore_sp_single"){
+                const p=valueFor(def,eff.percentKey,level); if(payload&&Number.isInteger(payload.targetIndex)&&p>0){ restoreSp(payload.targetIndex,p); }
+            }else if(eff.type==="shield_all"){
+                const p=valueFor(def,eff.percentKey,level); partyIndexes().forEach(index=>applyShield(index,p,eff.durationRounds,def.id));
+            }else if(eff.type==="shield_single"){
+                const p=valueFor(def,eff.percentKey,level); if(payload&&Number.isInteger(payload.targetIndex)){ applyShield(payload.targetIndex,p,eff.durationRounds,def.id); }
+            }else if(eff.type==="buff_all"){
+                applyPlayerBuffAll(eff,def,level);
+            }else if(eff.type==="debuff_all_enemies"){
+                const a=eff.attackDownKey?valueFor(def,eff.attackDownKey,level):0,acc=eff.accuracyDownKey?valueFor(def,eff.accuracyDownKey,level):0;
+                (typeof currentBattleMonsters!=="undefined"?currentBattleMonsters:[]).forEach(index=>applyEnemyDebuff(monsters[index],a,acc,eff.durationRounds));
+            }else if(eff.type==="cleanse_single"){
+                if(payload&&Number.isInteger(payload.targetIndex)){ for(let i=0;i<Math.max(1,numeric(eff.count)||1);i++){ if(!cleanseOne(payload.targetIndex)){ break; } } }
+            }else if(eff.type==="apply_status_all_enemies"&&eff.statusId==="burn"){
+                const chance=valueFor(def,eff.chanceKey,level);
+                (typeof currentBattleMonsters!=="undefined"?currentBattleMonsters:[]).forEach(index=>{
+                    const monster=monsters[index]; if(!monster||!monster.alive||Math.random()>=chance){ return; }
+                    if(window.GameplaySystem&&typeof window.GameplaySystem.canDirectlyAffectMonster==="function"&&!window.GameplaySystem.canDirectlyAffectMonster(monster,index)){ return; }
+                    if(typeof applyBurnEffect==="function"){ withSource(SOURCE_RELIC,()=>applyBurnEffect(monster,eff.durationRounds||2,RELIC_BALANCE_CONFIG.burnPercent)); }
+                });
+            }else if(eff.type==="prevent_death"){
+                if(payload&&Number.isInteger(payload.targetIndex)){ const character=characterAt(payload.targetIndex); if(character){ character.hp=Math.max(1,numeric(character.hp)); prevented=true; payload.prevented=true; } }
+            }else if(eff.type==="prepare_reflect"){
+                if(relicBattleState){ const mult=valueFor(def,eff.multiplierKey,level); partyIndexes().forEach(index=>{ relicBattleState.reflectReady[String(index)]={multiplier:mult,expiresRound:currentRound()+Math.max(1,numeric(eff.durationRounds)||1)-1}; }); }
+            }
+        });
+        return prevented;
+    }
+
+    function performRelicPresentation(def,triggerDef,payload,preResolvedVisuals){
+        queueRelicPresentation(def,()=>{
+            flushRelicVisuals(preResolvedVisuals);
+            battleLog(def.name+"｜"+currentEffectText(def,relicLevel(def.id)));
+            if(typeof updateUI==="function"){ try{updateUI();}catch(_){ } }
+        },{
+            triggerDef:triggerDef,
+            payload:payload||{}
+        });
+    }
+
+    function dispatchRelicEvent(event,payload){
+        if(!relicBattleState||!relicBattleState.relicId){ return false; }
+        if(payload&&payload.sourceType===SOURCE_RELIC){ return false; }
+        const def=activeBattleRelic(); if(!def||!def.runtimeReady){ return false; }
+        if(event==="battle_start"||event==="round_start"||event==="round_end"){
+            const boundaryKey=event+":"+String(currentRound());
+            if(relicBattleState.boundaryEvents[boundaryKey]){ return false; }
+            relicBattleState.boundaryEvents[boundaryKey]=true;
+        }
+        relicBattleState.lastEvent={event:event,round:currentRound()};
+        let triggered=false;
+        def.triggers.forEach((triggerDef,index)=>{
+            const key=def.id+":"+(triggerDef.id||index);
+            if(!canTrigger(triggerDef,key)||!triggerMatches(triggerDef,event,payload,key)){ return; }
+            if(triggerDef.type==="ally_hp_below"&&payload){ relicBattleState.lastHpDamageEvent[key]=payload.damageEventId; }
+            markTriggered(triggerDef,key);
+            const visuals=[];
+            const previousCollector=relicVisualCollector;
+            relicVisualCollector=visuals;
+            try{ resolveEffects(triggerDef,def,payload||{}); }
+            finally{ relicVisualCollector=previousCollector; }
+            if(typeof updateUI==="function"){ try{updateUI();}catch(_){ } }
+            performRelicPresentation(def,triggerDef,payload||{},visuals);
+            triggered=true;
+        });
+        return triggered;
+    }
+
+    function initializeBattleRelic(){
+        relicBattleState=createBattleState(effectiveLoadoutRelicId());
+        pendingBattleInit=false;
+        if(relicBattleState.relicId){
+            preloadRelicVfx(relicBattleState.relicId);
+            const def=activeBattleRelic();
+            if(def&&def.runtimeReady){
+                dispatchRelicEvent("battle_start",{sourceType:"system"});
+            }
+        }
+    }
+
+    if(typeof startBattle==="function"){
+        const previous=startBattle;
+        startBattle=function(){
+            resetRelicPresentationQueue();
+            relicBattleState=null; pendingBattleInit=true;
+            const result=previous.apply(this,arguments);
+            if(!battleActive){ pendingBattleInit=false; }
+            return result;
+        };
+    }
+    if(window.FourSymbolsBattleFlow&&typeof window.FourSymbolsBattleFlow.subscribeRoundStart==="function"){
+        window.FourSymbolsBattleFlow.subscribeRoundStart(()=>{
+            if(typeof battleActive==="undefined"||!battleActive){ return; }
+            if(pendingBattleInit||!relicBattleState||relicBattleState.battleToken!==currentBattleToken()){ initializeBattleRelic(); }
+            cleanupPlayerMods();
+            resetRoundCounters();
+            dispatchRelicEvent("round_start",{sourceType:"system"});
+        });
+    }
+    if(window.FourSymbolsBattleFlow&&typeof window.FourSymbolsBattleFlow.interceptActionFinish==="function"){
+        window.FourSymbolsBattleFlow.interceptActionFinish(()=>{
+            if(!hasLiveBattlePresentationHost()){ return false; }
+            if(relicPresentationHandoffsPending<=0&&Date.now()>=relicMinVisualProtectionUntil){ return false; }
+            relicFinishHeld=true;
+            retryHeldBattleFinishWhenReady();
+            return true;
+        });
+    }
+    if(window.FourSymbolsBattleFlow&&typeof window.FourSymbolsBattleFlow.subscribeRoundEnd==="function"){
+        window.FourSymbolsBattleFlow.subscribeRoundEnd(()=>{
+            if(relicBattleState&&typeof battleActive!=="undefined"&&battleActive){
+                dispatchRelicEvent("round_end",{sourceType:"system"});
+            }
+        });
+    }
+
+    function shouldHoldMonsterActionFinishForRelic(hardControlled){
+        const def=activeBattleRelic();
+        if(!def||!def.runtimeReady||!relicBattleState){ return false; }
+        if(Object.keys(relicBattleState.reflectReady||{}).length){ return true; }
+        return def.triggers.some((triggerDef,index)=>{
+            const key=def.id+":"+(triggerDef.id||index);
+            if(!canTrigger(triggerDef,key)){ return false; }
+            if(triggerDef.type==="enemy_action_count"){
+                return !hardControlled&&numeric(relicBattleState.enemyActionCount)+1>=numeric(triggerDef.threshold);
+            }
+            if(triggerDef.type==="ally_hit_count"){
+                return numeric(relicBattleState.allyHitCount)+1>=numeric(triggerDef.threshold);
+            }
+            return false;
+        });
+    }
+
+    if(typeof processSingleMonsterAttack==="function"){
+        const previous=processSingleMonsterAttack;
+        processSingleMonsterAttack=function(monsterIndex){
+            const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
+            const hardControlled=!!(monster&&((typeof isMonsterFrozen==="function"&&isMonsterFrozen(monster))||(typeof isMonsterPetrified==="function"&&isMonsterPetrified(monster))));
+            const finishProbe=shouldHoldMonsterActionFinishForRelic(hardControlled);
+            if(finishProbe){ relicPresentationHandoffsPending++; }
+            try{
+                const before=partyIndexes().map(index=>{
+                    const character=characterAt(index);
+                    const shield=(character&&Array.isArray(character.activeBuffs)?character.activeBuffs:[]).find(buff=>
+                        buff&&buff.type==="shield"&&numeric(buff.turnsLeft)>0&&numeric(buff.remaining)>0
+                    );
+                    return {index:index,hp:numeric(character&&character.hp),shield:numeric(shield&&shield.remaining)};
+                });
+                if(relicBattleState){ relicBattleState.currentEnemyIndex=monsterIndex; }
+                const result=withSource("enemy",()=>previous.apply(this,arguments));
+                const hitTargets=[];
+                before.forEach(entry=>{
+                    const character=characterAt(entry.index);
+                    const shield=(character&&Array.isArray(character.activeBuffs)?character.activeBuffs:[]).find(buff=>
+                        buff&&buff.type==="shield"&&numeric(buff.turnsLeft)>0&&numeric(buff.remaining)>0
+                    );
+                    const shieldAfter=numeric(shield&&shield.remaining);
+                    if(character&&(numeric(character.hp)<entry.hp||shieldAfter<entry.shield)){ hitTargets.push(entry.index); }
+                });
+                if(relicBattleState){
+                    relicBattleState.currentEnemyIndex=null;
+                    if(!hardControlled){ relicBattleState.enemyActionCount++; dispatchRelicEvent("after_enemy_action",{sourceType:"enemy",monsterIndex:monsterIndex}); }
+                    if(hitTargets.length){ relicBattleState.allyHitCount++; dispatchRelicEvent("after_ally_hit",{sourceType:"enemy",monsterIndex:monsterIndex,targetIndexes:hitTargets}); }
+                    const reflectedIndex=hitTargets.find(index=>relicBattleState.reflectReady[String(index)]);
+                    if(reflectedIndex!==undefined&&monster&&monster.alive){
+                        const reflect=relicBattleState.reflectReady[String(reflectedIndex)]; delete relicBattleState.reflectReady[String(reflectedIndex)];
+                        const def=activeBattleRelic();
+                        if(def){
+                            const visuals=[];
+                            const previousCollector=relicVisualCollector;
+                            relicVisualCollector=visuals;
+                            let damage=0;
+                            try{
+                                damage=Math.max(1,Math.floor(getRelicPower(def.id)*numeric(reflect.multiplier)));
+                                damageEnemy(monsterIndex,damage,"earth");
+                            }finally{
+                                relicVisualCollector=previousCollector;
+                            }
+                            queueRelicPresentation(def,()=>{
+                                flushRelicVisuals(visuals);
+                                battleLog(def.name+"反震"+damage+"點秘寶傷害。");
+                                if(typeof updateUI==="function"){ try{updateUI();}catch(_){ } }
+                            },{
+                                payload:{monsterIndex:monsterIndex},
+                                override:{targetSide:"monster",targetType:"single",targetId:monsterIndex,targetIds:[monsterIndex],category:"attack"}
+                            });
+                        }
+                    }
+                }
+                return result;
+            }finally{
+                if(finishProbe){ releaseRelicPresentationHandoff(false); }
+            }
+        };
+    }
+
+    if(typeof showPlayerHit==="function"){
+        const previous=showPlayerHit;
+        showPlayerHit=function(amount,type,index,isPositive){
+            let displayAmount=numeric(amount);
+            if(
+                relicBattleState&&type==="hp"&&!isPositive&&displayAmount>0&&Number.isInteger(index)&&
+                (!sourceContext||sourceContext.sourceType!==SOURCE_RELIC)
+            ){
+                const character=characterAt(index),stats=statsAt(index);
+                if(character&&stats){
+                    const reduction=Math.max(0,Math.min(80,playerModTotals(index).damageReductionPercent));
+                    if(reduction>0){
+                        const refund=Math.min(displayAmount,Math.floor(displayAmount*reduction/100));
+                        character.hp=Math.min(numeric(stats.maxHP),numeric(character.hp)+refund); displayAmount=Math.max(0,displayAmount-refund);
+                    }
+                    relicBattleState.damageEventSerial++;
+                    const eventId=relicBattleState.damageEventSerial;
+                    const previousHp=Math.min(numeric(stats.maxHP),numeric(character.hp)+displayAmount);
+                    const previousHpPercent=previousHp/Math.max(1,numeric(stats.maxHP));
+                    if(numeric(character.hp)<=0){
+                        dispatchRelicEvent("before_lethal_damage",{sourceType:sourceContext&&sourceContext.sourceType||"unknown",targetIndex:index,damageEventId:eventId,damage:displayAmount});
+                    }
+                    if(numeric(character.hp)>0){
+                        dispatchRelicEvent("ally_hp_below",{sourceType:sourceContext&&sourceContext.sourceType||"unknown",targetIndex:index,damageEventId:eventId,damage:displayAmount,previousHpPercent:previousHpPercent});
+                    }else{
+                        dispatchRelicEvent("ally_down",{sourceType:sourceContext&&sourceContext.sourceType||"unknown",targetIndex:index,damageEventId:eventId});
+                    }
+                }
+            }
+            const args=Array.from(arguments); args[0]=displayAmount; return previous.apply(this,args);
+        };
+    }
+
+    if(typeof tickStatusEffects==="function"){
+        const previous=tickStatusEffects;
+        tickStatusEffects=function(){ return withSource("status",()=>previous.apply(this,arguments)); };
+    }
+
+    function wrapAllyDebuffApplication(name){
+        const previous=window[name];
+        if(typeof previous!=="function"){ return; }
+        window[name]=function(entity){
+            const targetIndex=partyIndexes().find(index=>characterAt(index)===entity);
+            const before=targetIndex===undefined?0:(Array.isArray(entity&&entity.statusEffects)?entity.statusEffects.length:0);
+            const result=previous.apply(this,arguments);
+            if(targetIndex!==undefined&&relicBattleState&&(!sourceContext||sourceContext.sourceType!==SOURCE_RELIC)){
+                const after=Array.isArray(entity&&entity.statusEffects)?entity.statusEffects.length:0;
+                if(result!==false&&after>before){
+                    dispatchRelicEvent("ally_debuffed",{sourceType:sourceContext&&sourceContext.sourceType||"enemy",targetIndex:targetIndex});
+                }
+            }
+            return result;
+        };
+    }
+    ["applyBurnEffect","applyFreezeEffect","applyMonsterDebuff","applyPetrifyEffect","applyStunEffect"].forEach(wrapAllyDebuffApplication);
+
+    if(typeof killMonster==="function"){
+        const previous=killMonster;
+        killMonster=function(index){
+            const monster=typeof monsters!=="undefined"?monsters[index]:null;
+            const source=sourceContext&&sourceContext.sourceType||"character";
+            const wasAlive=!!(monster&&monster.alive!==false);
+            const result=previous.apply(this,arguments);
+            if(relicBattleState&&wasAlive&&monster&&monster.alive===false){ dispatchRelicEvent("enemy_defeated",{sourceType:source,monsterIndex:index}); }
+            return result;
+        };
+    }
+
+    if(typeof winBattle==="function"){
+        const previous=winBattle;
+        winBattle=function(){ const result=previous.apply(this,arguments); relicBattleState=null; pendingBattleInit=false; resetRelicPresentationQueue(); return result; };
+    }
+    if(typeof loseBattle==="function"){
+        const previous=loseBattle;
+        loseBattle=function(){ const result=previous.apply(this,arguments); relicBattleState=null; pendingBattleInit=false; resetRelicPresentationQueue(); return result; };
+    }
+
+    function rarityClass(def){ return "rarity-"+(def&&def.rarity||"white"); }
+    function statusOf(id){
+        const state=playerRelics[id]||{unlocked:false,level:1,exp:0,seen:false};
+        return isRelicDevTestingEnvironment()?Object.assign({},state,{unlocked:true,seen:true}):state;
+    }
+    function sortedRelics(){
+        const equippedId=effectiveLoadoutRelicId();
+        return RELIC_CATALOG_LIST.slice().sort((a,b)=>{
+            const ae=equippedId===a.id?1:0,be=equippedId===b.id?1:0;if(ae!==be){return be-ae;}
+            const au=statusOf(a.id).unlocked?1:0,bu=statusOf(b.id).unlocked?1:0;if(au!==bu){return bu-au;}
+            const rr=numeric(RARITY_ORDER[b.rarity])-numeric(RARITY_ORDER[a.rarity]);if(rr){return rr;}
+            return relicLevel(b.id)-relicLevel(a.id);
+        });
+    }
+    function filterMatch(def){ return currentFilter==="all"||def.category===currentFilter||(def.tags||[]).includes(currentFilter); }
+    function nextMilestone(def,level){ const keys=Object.keys(def.nextText||{}).map(Number).sort((a,b)=>a-b); return keys.find(value=>value>level)||null; }
+    function currentEffectText(def,level){
+        if(!def.runtimeReady){ return "秘寶能力尚未開放。"; }
+        if(def.id==="relic_qiankun_flask"){ return "恢復全隊 "+valueFor(def,"healHpPercent",level).toFixed(1).replace(/\.0$/,"")+"%最大HP"+(level>=10?"，並恢復"+valueFor(def,"spPercent",level).toFixed(1).replace(/\.0$/,"")+"%最大SP":"")+"。"; }
+        if(def.id==="relic_sun_orb"){
+            const bonus=Math.round(valueFor(def,"burnBonus",level)*100);
+            return "對敵方全體造成 "+valueFor(def,"damageMultiplier",level).toFixed(2)+"×秘寶威力"+(bonus>0?"；燃燒目標額外+"+bonus+"%":"")+"。";
+        }
+        if(def.id==="relic_xuanwu_seal"){ return "全隊獲得最大HP "+valueFor(def,"shieldPercent",level).toFixed(1).replace(/\.0$/,"")+"%護盾，持續2回合"+(level>=20?"，並獲得8%減傷1回合":"")+"。"; }
+        if(def.id==="relic_soul_bell"){ return "敵方全體攻擊-"+Math.round(valueFor(def,"attackDown",level))+"%"+(level>=10?"、命中-"+Math.round(valueFor(def,"accuracyDown",level))+"%":"")+"，持續1回合。"; }
+        if(def.id==="relic_tiangang_banner"){ return "對敵方全體造成 "+valueFor(def,"damageMultiplier",level).toFixed(2)+"×秘寶威力"+(level>=10?"並降攻"+Math.round(valueFor(def,"attackDown",level))+"%":"")+"。"; }
+        if(def.id==="relic_nine_dragon_fire"){ return "對敵方全體造成 "+valueFor(def,"damageMultiplier",level).toFixed(2)+"×火屬性秘寶傷害"+(level>=10?"，燃燒機率"+Math.round(valueFor(def,"burnChance",level)*100)+"%":"")+(level>=20?"，對燃燒目標額外+15%":"")+"。"; }
+        if(def.id==="relic_cold_spring_jade"){ return "急救目標 "+valueFor(def,"healHpPercent",level).toFixed(1).replace(/\.0$/,"")+"%最大HP"+(level>=10?"並淨化1個一般負面":"")+(level>=20?"、恢復4%最大SP":"")+"；HP由35%以上降至35%以下時觸發，每場最多2次，冷卻3回合。"; }
+        if(def.id==="relic_qinglan_feather"){ return "全隊閃避+"+Math.round(valueFor(def,"evasionBonus",level))+"%、異常抗性+"+Math.round(valueFor(def,"resistanceBonus",level))+"%，持續"+Math.round(valueFor(def,"duration",level))+"回合。"; }
+        if(def.id==="relic_rock_mountain_seal"){ return "開場防禦+"+Math.round(valueFor(def,"defenseBonus",level))+"%持續3回合；受擊計數觸發時獲得"+Math.round(valueFor(def,"shieldPercent",level))+"%最大HP護盾"+(level>=20?"；Lv20護盾後準備一次18%秘寶威力反震，作用於下一名實際攻擊者":"")+"。"; }
+        if(def.id==="relic_returning_wheel"){ return "阻止本場第一次死亡，保留1HP後恢復"+Math.round(valueFor(def,"healHpPercent",level))+"%最大HP並獲得"+Math.round(valueFor(def,"shieldPercent",level))+"%護盾。"; }
+        return def.description;
+    }
+
+    function equipmentAllowed(){ return !(typeof battleActive!=="undefined"&&battleActive); }
+    function equipRelic(id){
+        const def=relicCatalog[id],owned=statusOf(id);
+        if(!def||def.runtimeReady!==true||!owned.unlocked||!equipmentAllowed()){ return false; }
+        preloadRelicVfx(id);
+        teamLoadout.relicId=id;
+        if(playerRelics[id]){ playerRelics[id].seen=true; }
+        saveRelics();
+        syncHomeRelicUi();
+        renderRelicPage();
+        return true;
+    }
+    function unequipRelic(){
+        if(!equipmentAllowed()){ return false; }
+        teamLoadout.relicId=null;
+        saveRelics();
+        syncHomeRelicUi();
+        renderRelicPage();
+        return true;
+    }
+    function upgradeRelic(id){
+        const def=relicCatalog[id],owned=statusOf(id); if(!def||!def.runtimeReady||!owned.unlocked||owned.level>=MAX_LEVEL){ return false; }
+        const next=owned.level+1,pricing=def.upgradeCost&&def.upgradeCost.goldCost||{};
+        const cost=numeric(pricing.base||RELIC_BALANCE_CONFIG.upgradeGoldBase)+numeric(pricing.perLevel||RELIC_BALANCE_CONFIG.upgradeGoldPerLevel)*(next-1);
+        if(typeof gold==="undefined"||numeric(gold)<cost){ return false; }
+        gold-=cost; owned.level=next; saveRelics(); if(typeof updateGoldDisplay==="function"){updateGoldDisplay();} syncHomeRelicUi(); renderRelicPage(id); return true;
+    }
+
+    function relicIconMarkup(def,large){
+        if(def.iconPath){ return '<img src="'+esc(def.iconPath)+'" alt="" draggable="false">'; }
+        return '<span class="team-relic-placeholder'+(large?' large':'')+'" aria-hidden="true"><i>寶</i><b>'+esc(def.name.slice(0,1))+'</b></span>';
+    }
+    function cardMarkup(def){
+        const owned=statusOf(def.id),equipped=effectiveLoadoutRelicId()===def.id;
+        const canEquip=def.runtimeReady===true&&owned.unlocked&&equipmentAllowed();
+        return '<div class="team-relic-card '+rarityClass(def)+(owned.unlocked?' unlocked':' locked')+(equipped?' equipped':'')+'">'+
+            '<button type="button" class="team-relic-card-open-overlay" aria-label="查看'+esc(def.name)+'詳情" onclick="v174OpenRelicDetail(\''+esc(def.id)+'\')"></button>'+
+            '<span class="team-relic-card-art">'+relicIconMarkup(def,false)+'</span>'+
+            '<span class="team-relic-card-name">'+esc(def.name)+'</span>'+
+            '<span class="team-relic-card-meta">'+(def.runtimeReady!==true?'效果尚未覺醒':(owned.unlocked?'Lv.'+owned.level:'尚未獲得'))+'・'+esc(CATEGORY_LABELS[def.category]||def.category)+'</span>'+
+            (def.runtimeReady!==true
+                ?'<button type="button" class="team-relic-equip" disabled>能力尚未開放</button>'
+                :owned.unlocked
+                    ?'<button type="button" class="team-relic-equip" '+(canEquip?'':'disabled')+' onclick="event.stopPropagation();v174EquipRelic(\''+esc(def.id)+'\')">'+(equipped?'已裝備':'裝備')+'</button>'
+                    :'<button type="button" class="team-relic-equip" disabled>尚未獲得</button>')+
+            (equipped?'<em>已裝備</em>':'')+
+        '</div>';
+    }
+    function renderRelicList(){
+        const equippedId=effectiveLoadoutRelicId();
+        const ownedDef=equippedId&&relicCatalog[equippedId],ownedState=ownedDef&&statusOf(ownedDef.id);
+        const current=ownedDef?'<div class="team-relic-current-card"><div class="team-relic-current-art">'+relicIconMarkup(ownedDef,true)+'</div><div class="team-relic-current-copy"><small>目前隊伍秘寶</small><b>'+esc(ownedDef.name)+' <span>Lv.'+ownedState.level+'</span></b><p>'+esc(currentEffectText(ownedDef,ownedState.level))+'</p></div><div class="team-relic-current-actions"><button onclick="v174UnequipRelic()">卸下</button><button onclick="v174OpenRelicDetail(\''+esc(ownedDef.id)+'\')">詳情</button></div></div>':
+            '<div class="team-relic-current-card empty"><div class="team-relic-empty-slot">寶</div><div class="team-relic-current-copy"><small>目前隊伍秘寶</small><b>尚未裝備秘寶</b><p>每支隊伍只能啟用一件秘寶。</p></div><button class="team-relic-select-first" onclick="v174SetRelicFilter(\'all\')">選擇秘寶</button></div>';
+        const filters=["all","attack","recovery","defense","buff","control","element","special"].map(key=>'<button class="'+(currentFilter===key?'active':'')+'" onclick="v174SetRelicFilter(\''+key+'\')">'+esc(CATEGORY_LABELS[key])+'</button>').join("");
+        const cards=sortedRelics().filter(filterMatch).map(cardMarkup).join("");
+        return '<div class="team-relic-page"><div class="team-relic-resource-line"><span>隊伍共用戰場神器</span><b>每支隊伍可裝備 1 件秘寶</b></div>'+current+
+            '<div class="team-relic-tabs">'+filters+'</div><div class="team-relic-grid">'+cards+'</div></div>';
+    }
+    function detailMarkup(def){
+        const owned=statusOf(def.id),level=owned.level,next=nextMilestone(def,level),cost=RELIC_BALANCE_CONFIG.upgradeGoldBase+RELIC_BALANCE_CONFIG.upgradeGoldPerLevel*level;
+        const equipped=effectiveLoadoutRelicId()===def.id;
+        const unavailable=def.runtimeReady!==true;
+        return '<div class="team-relic-detail"><button class="team-relic-detail-back" onclick="v174OpenRelicPage()">‹ 返回秘寶列表</button><div class="team-relic-detail-hero '+rarityClass(def)+'">'+
+            '<div class="team-relic-detail-art">'+relicIconMarkup(def,true)+'</div><h2>'+esc(def.name)+'</h2><p>'+esc(RARITY_LABELS[def.rarity]||def.rarity)+(unavailable?'・效果尚未覺醒':'・Lv.'+level+' / 20')+'</p><strong>'+esc(CATEGORY_LABELS[def.category]||def.category)+(def.tags&&def.tags.length?' / '+esc(def.tags.join('・')):'')+'</strong></div>'+
+            (unavailable
+                ?'<section><h3>秘寶能力</h3><p>秘寶能力尚未開放。正式 Trigger、Effect 與成長數值尚未定案，因此目前不可裝備或強化。</p></section>'
+                :'<section><h3>觸發條件</h3><p>'+esc(def.triggerText||"尚未定義")+'</p></section><section><h3>秘寶效果</h3><p>'+esc(currentEffectText(def,level))+'</p></section><section><h3>觸發限制</h3><p>'+esc(def.limitText||"依秘寶設定。")+'</p></section>'+
+                 '<section><h3>下一強化</h3><p>'+(level>=20?'已達最高等級。':next?'Lv.'+next+'：'+esc(def.nextText[next]):'下一個里程碑尚未到達；實際目前效果以本頁數值為準。')+'</p></section>'+
+                 '<section class="team-relic-upgrade"><h3>強化</h3><p>目前 Lv.'+level+' → '+(level>=20?'MAX':'Lv.'+(level+1))+'</p><p>依目前正式秘寶養成規則消耗對應素材。</p><b>金幣 '+cost.toLocaleString("zh-TW")+'</b></section>')+
+            '<div class="team-relic-detail-actions">'+
+            (unavailable?'<button disabled>能力尚未開放</button>':
+                (owned.unlocked&&level<20?'<button onclick="v174UpgradeRelic(\''+esc(def.id)+'\')">強化</button>':'')+
+                (owned.unlocked?'<button onclick="v174EquipRelic(\''+esc(def.id)+'\')">'+(equipped?'已裝備':'裝備')+'</button>':'<button disabled>尚未獲得</button>'))+
+            '</div></div>';
+    }
+
+    function modalNodes(){ return {modal:document.getElementById("homeFeatureModal"),body:document.getElementById("homeFeatureModalBody"),title:document.getElementById("homeFeatureModalTitle")}; }
+    function renderRelicLoading(nodes){ nodes.modal.classList.remove("team-relic-detail-mode"); nodes.body.innerHTML='<div class="team-relic-loading" role="status" aria-live="polite">正在載入秘寶…</div>'; }
+    function prepareRelicModal(){
+        const nodes=modalNodes(); if(!nodes.modal||!nodes.body){ return null; }
+        /* Opening the relic surface must not close and immediately reopen the shared modal.
+           That hide/show cycle caused visible multi-flash when invoked from Gameplay context navigation. */
+        if(!nodes.modal.classList.contains("team-relic-modal")){
+            nodes.modal.classList.remove("v131-shop-open");
+        }
+        nodes.modal.classList.add("show","team-relic-modal");
+        const box=nodes.modal.querySelector(".home-feature-modal-box"); if(box){ box.classList.add("wide"); }
+        if(nodes.title){ nodes.title.textContent="秘 寶"; }
+        const close=nodes.modal.querySelector(".home-feature-close-btn"); if(close){ close.setAttribute("aria-label","返回主城"); close.title="返回主城"; }
+        return nodes;
+    }
+    function openRelicPage(){
+        currentDetailId=null; const nodes=prepareRelicModal(); if(!nodes){return false;} renderRelicLoading(nodes);
+        prepareRelicVisuals().then(async()=>{if(!nodes.modal.classList.contains("team-relic-modal")){return;}Object.values(playerRelics).forEach(state=>{if(state.unlocked){state.seen=true;}});saveRelics();nodes.modal.classList.remove("team-relic-detail-mode");nodes.body.innerHTML=renderRelicList();await nextVisualPaint();try{if(performance&&typeof performance.mark==="function"){performance.mark("four-symbols:relic-visual-ready");}}catch(_){ }syncHomeRelicUi();}).catch(error=>{nodes.body.innerHTML='<div class="team-relic-loading team-relic-loading-error" role="alert">秘寶載入失敗。<button type="button" onclick="v174OpenRelicPage()">重新載入</button></div>';document.dispatchEvent(new CustomEvent("four-symbols:feature-local-error",{detail:{feature:"relic",error}}));});
+        return true;
+    }
+    function openRelicDetail(id){ const def=relicCatalog[id]; if(!def){return false;} currentDetailId=id; const nodes=prepareRelicModal(); if(!nodes){return false;} renderRelicLoading(nodes); prepareRelicVisuals().then(async()=>{if(!nodes.modal.classList.contains("team-relic-modal")||currentDetailId!==id){return;}nodes.modal.classList.add("team-relic-detail-mode");nodes.body.innerHTML=detailMarkup(def);await nextVisualPaint();try{if(performance&&typeof performance.mark==="function"){performance.mark("four-symbols:relic-visual-ready");}}catch(_){ }}).catch(error=>{nodes.body.innerHTML='<div class="team-relic-loading team-relic-loading-error" role="alert">秘寶載入失敗。<button type="button" onclick="v174OpenRelicPage()">重新載入</button></div>';document.dispatchEvent(new CustomEvent("four-symbols:feature-local-error",{detail:{feature:"relic",error}}));});return true; }
+    function renderRelicPage(preferred){ if(!document||!document.getElementById("homeFeatureModal")?.classList.contains("team-relic-modal")){return;} if(preferred||currentDetailId){openRelicDetail(preferred||currentDetailId);}else{openRelicPage();} }
+
+    function syncHomeRelicUi(){
+        if(typeof document==="undefined"){ return; }
+        const home=document.getElementById("homePage"),grid=home&&home.querySelector(".home-card-grid"); if(!home||!grid){ return; }
+        let tools=home.querySelector(".home-utility-actions.team-relic-home-tools");
+        if(!tools){
+            tools=document.createElement("div"); tools.className="home-utility-actions team-relic-home-tools";
+            tools.innerHTML='<button type="button" class="home-card home-card-utility team-relic-home-entry" onclick="openHomeFeature(\'relic\')" aria-label="秘寶"><span class="home-card-icon team-relic-home-glyph">寶</span><span class="home-card-label">秘寶</span></button>'+
+                '<button type="button" class="home-card home-card-utility team-element-box-home-entry" onclick="openHomeFeature(\'autoBattleSettings\')" aria-label="元素匣"><span class="home-card-icon"><img src="assets/ui/nav-element-box.png" alt="" draggable="false"></span><span class="home-card-label">元素匣</span></button>';
+            grid.appendChild(tools);
+        }
+        const entry=tools.querySelector(".team-relic-home-entry");
+        const needsAttention=!teamLoadout.relicId||Object.values(playerRelics).some(state=>state.unlocked&&!state.seen);
+        let dot=entry&&entry.querySelector(".v141-notice-dot.team-relic-notice-dot");
+        if(needsAttention&&!dot&&entry){ dot=document.createElement("span"); dot.className="v141-notice-dot team-relic-notice-dot"; dot.setAttribute("aria-hidden","true"); entry.appendChild(dot); }
+        if(!needsAttention&&dot){ dot.remove(); }
+        const summary=window.FourSymbolsHomeRelicSummary;
+        if(summary&&typeof summary.sync==="function"){ summary.sync(); }
+    }
+
+    if(typeof openHomeFeature==="function"){
+        const previous=openHomeFeature;
+        openHomeFeature=function(type){ if(type==="relic"){ return openRelicPage(); } return previous.apply(this,arguments); };
+    }
+    if(typeof closeHomeFeature==="function"){
+        const previous=closeHomeFeature;
+        closeHomeFeature=function(){ const modal=document.getElementById("homeFeatureModal"); if(modal){modal.classList.remove("team-relic-modal"); const box=modal.querySelector(".home-feature-modal-box");if(box){box.classList.remove("wide");}} currentDetailId=null; return previous.apply(this,arguments); };
+    }
+    if(typeof showPage==="function"){
+        const previous=showPage; showPage=function(page){ const result=previous.apply(this,arguments); if(page==="home"){setTimeout(syncHomeRelicUi,0);} return result; };
+    }
+
+    window.v174OpenRelicPage=openRelicPage;
+    window.v174OpenRelicDetail=openRelicDetail;
+    window.v174SetRelicFilter=function(filter){ currentFilter=CATEGORY_LABELS[filter]?filter:"all"; currentDetailId=null; renderRelicPage(); };
+    window.v174EquipRelic=equipRelic;
+    window.v174UnequipRelic=unequipRelic;
+    window.v174UpgradeRelic=upgradeRelic;
+    window.v174RelicDevUnlock=function(id){ if(!relicCatalog[id]){return false;} playerRelics[id].unlocked=true; playerRelics[id].seen=false; saveRelics(); syncHomeRelicUi(); return true; };
+    if(isRelicDevTestingEnvironment()){
+        window.v174RelicDevUnlockAllForTesting=function(){
+            syncHomeRelicUi(); renderRelicPage();
+            return RELIC_CATALOG_LIST.map(def=>({id:def.id,unlocked:true,seen:true,runtimeReady:def.runtimeReady,battleIconPath:def.battleIconPath}));
+        };
+        window.v174RelicDevPreviewPresentation=function(id){
+            const def=relicCatalog[id];
+            if(!def||typeof battleActive==="undefined"||!battleActive){ return false; }
+            preloadRelicVfx(def);
+            queueRelicPresentation(def,()=>battleLog(def.name+"｜DEV 戰鬥演出預覽"),{payload:{sourceType:"dev-presentation"}});
+            return true;
+        };
+    }
+    window.v174RelicDebugDispatch=dispatchRelicEvent;
+    window.v174RelicDebugState=function(){ return relicBattleState?JSON.parse(JSON.stringify(relicBattleState)):null; };
+    window.v174RelicPresentationState=function(){ return {active:relicPresentationPending>0,pending:relicPresentationPending,generation:relicPresentationGeneration}; };
+    try{if(performance&&typeof performance.mark==="function"){performance.mark("four-symbols:relic-runtime-ready");}}catch(_){ }
+    window.v174RelicSystem=Object.freeze({
+        catalog:relicCatalog,balance:RELIC_BALANCE_CONFIG,rarityLabels:RARITY_LABELS,categoryLabels:CATEGORY_LABELS,
+        cutinDurationMs:RELIC_CUTIN_DURATION_MS,minVisualProtectionMs:RELIC_MIN_VISUAL_PROTECTION_MS,
+        getRelicPower:getRelicPower,getOwnedState:()=>playerRelics,getTeamLoadout:()=>teamLoadout,
+        getEffectiveRelicId:effectiveLoadoutRelicId,isDevTesting:isRelicDevTestingEnvironment,
+        isPresentationActive:()=>relicPresentationPending>0,
+        dispatch:dispatchRelicEvent
+    });
+
+    if(typeof document!=="undefined"){
+        if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",()=>setTimeout(syncHomeRelicUi,0),{once:true}); }
+        else{ setTimeout(syncHomeRelicUi,0); }
+    }
 })();
