@@ -392,14 +392,11 @@
     }
 
     function withGuaranteedBurn(skill,callback){
-        const previousStatusRoll=typeof rollStatusEffectHit==="function"?rollStatusEffectHit:null;
-        if(!skill||!skill.guaranteedBurn||!previousStatusRoll){ return callback(); }
-        rollStatusEffectHit=function(baseChance){
-            if(numeric(baseChance)===numeric(skill.burnChance)){ return true; }
-            return previousStatusRoll.apply(this,arguments);
-        };
-        try{ return callback(); }
-        finally{ rollStatusEffectHit=previousStatusRoll; }
+        /* Guaranteed Burn is carried explicitly by the formal skill data and
+           rollNamedPersistentStatusEffect(..., guaranteedHit). Never replace
+           the global status formula owner at cast time. */
+        void skill;
+        return callback();
     }
 
     /* Every qualifying Fire physical skill reuses this one owner. */
@@ -692,7 +689,6 @@
             const originalChance=monster.skillChance;
             const originalHit=typeof showPlayerHit==="function"?showPlayerHit:null;
             const originalLog=typeof addBattleLog==="function"?addBattleLog:null;
-            const originalStatusRoll=typeof rollStatusEffectHit==="function"?rollStatusEffectHit:null;
             const previousRepeatAttacker=currentReflectAttacker;
             const livingBefore=livingPartyIndexes().map(index=>({
                 character:getPartyCharacterByIndex(index),
@@ -723,12 +719,6 @@
                     return originalLog.apply(this,arguments);
                 };
             }
-            if(originalStatusRoll&&options.skill.guaranteedBurn){
-                rollStatusEffectHit=function(baseChance){
-                    if(numeric(baseChance)===numeric(options.skill.burnChance)){ return true; }
-                    return originalStatusRoll.apply(this,arguments);
-                };
-            }
             const previousDamageActor=window.v149CurrentDamageActor;
             window.v149CurrentDamageActor=monster;
             try{
@@ -748,7 +738,6 @@
                 releaseFinishCapture();
                 if(originalHit){ showPlayerHit=originalHit; }
                 if(originalLog){ addBattleLog=originalLog; }
-                if(originalStatusRoll){ rollStatusEffectHit=originalStatusRoll; }
                 currentReflectAttacker=previousRepeatAttacker;
                 window.v149CurrentDamageActor=previousDamageActor;
                 options.skill.spCost=originalCost;
@@ -788,7 +777,6 @@
             const previousBadge=typeof showMonsterSkillNameBadge==="function"?showMonsterSkillNameBadge:null;
             const previousHit=typeof showPlayerHit==="function"?showPlayerHit:null;
             const previousLog=typeof addBattleLog==="function"?addBattleLog:null;
-            const previousStatusRoll=typeof rollStatusEffectHit==="function"?rollStatusEffectHit:null;
             const livingBefore=livingPartyIndexes().map(index=>({
                 character:getPartyCharacterByIndex(index),alive:true
             }));
@@ -819,13 +807,6 @@
                     return previousLog.apply(this,arguments);
                 };
             }
-            if(previousStatusRoll){
-                rollStatusEffectHit=function(baseChance){
-                    const skill=castSkillId&&typeof skillDatabase!=="undefined"?skillDatabase[castSkillId]:null;
-                    if(skill&&skill.guaranteedBurn&&numeric(baseChance)===numeric(skill.burnChance)){ return true; }
-                    return previousStatusRoll.apply(this,arguments);
-                };
-            }
             const previousAttacker=currentReflectAttacker;
             const previousDamageActor=window.v149CurrentDamageActor;
             currentReflectAttacker=monsterIndex;
@@ -839,7 +820,6 @@
                 if(previousBadge){ showMonsterSkillNameBadge=previousBadge; }
                 if(previousHit){ showPlayerHit=previousHit; }
                 if(previousLog){ addBattleLog=previousLog; }
-                if(previousStatusRoll){ rollStatusEffectHit=previousStatusRoll; }
             }
             const repeatSkill=castSkillId&&skillDatabase[castSkillId];
             const livingTargets=livingPartyIndexes();
