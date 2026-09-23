@@ -556,7 +556,11 @@
             :purifyAllyTargets(characterIndex,queued,state.level);
 
         if(!targets.length){ return finishSupport(skill.name+"目前沒有有效目標。"); }
-        animateSupportCast(state,characterIndex,skill,targets[0],targets,targetSide);
+        const selectedPrimary=targetSide==="monster"
+            ?enemyIndex
+            :(Number.isInteger(queued.targetAlly)?queued.targetAlly:targets[0]);
+        const primaryTarget=targets.includes(selectedPrimary)?selectedPrimary:targets[0];
+        animateSupportCast(state,characterIndex,skill,primaryTarget,targets,targetSide);
 
         let removed=0;
         targets.forEach(index=>{
