@@ -89,13 +89,14 @@ const gameplayScripts=[
     "js/55-v173.51-inventory-qa.js",
     "js/57-v173.51-quest-qa.js",
     "js/58-v173.63-functional-fixes.js",
-    "js/battlefield-render-geometry-adapter.js"
+    "js/battlefield-render-geometry-adapter.js",
+    "js/60-v173.64-skill-progression-rebalance.js",
+    "js/60-team-relic-system.js"
 ];
 const patrolScripts=["js/26-v131-patrol-appearance.js"];
 const abyssScripts=["js/59-abyss-two-tier-runtime.js"];
-const skillScripts=["js/60-v173.64-skill-progression-rebalance.js"];
-const bossRelicScripts=["js/gameplay-boss-tower-system.js","js/60-team-relic-system.js"];
-const relicIconPaths=[...read(bossRelicScripts[1]).matchAll(/iconPath:"([^"]+)"/g)].map(match=>match[1]);
+const bossRelicScripts=["js/gameplay-boss-tower-system.js"];
+const relicIconPaths=[...read("js/60-team-relic-system.js").matchAll(/iconPath:"([^"]+)"/g)].map(match=>match[1]);
 if(new Set(relicIconPaths).size!==20){ throw new Error("Relic icon prefetch list must derive exactly 20 unique RELIC_CATALOG_LIST iconPath values."); }
 const relicProgressionScripts=["js/relic-progression-drop-system.js"];
 const adventureEntryScripts=["js/adventure/adventure-entry-v1-20260915.js"];
@@ -158,11 +159,12 @@ const gameplayStyles=[
     "css/49-v169-rpg-ui.css",
     "css/52-v173.50-inventory-qol.css",
     "css/53-v173.51-qa.css",
-    "css/fixed-slot-battlefield-rendering-v2.css"
+    "css/fixed-slot-battlefield-rendering-v2.css",
+    "css/55-team-relic-system.css"
 ];
 const patrolStyles=["css/32-v131-patrol-appearance.css"];
 const abyssStyles=["css/50-v169-abyss-flow.css","css/54-v174-abyss-two-tier.css"];
-const bossRelicStyles=["css/gameplay-boss-tower.css","css/55-team-relic-system.css"];
+const bossRelicStyles=["css/gameplay-boss-tower.css"];
 const relicProgressionStyles=["css/relic-progression-drop-system.css"];
 const adventureEntryStyles=["css/adventure-entry-v1-20260915.css"];
 const adventureStyles=["css/adventure-v1-20260915.css"];
@@ -229,7 +231,6 @@ const scriptOutputs={
     gameplaySecondary:target("gameplay-core-secondary","js",combineScripts(gameplayScriptParts[1])),
     patrol:target("feature-patrol","js",combineScripts(patrolScripts)),
     abyss:target("feature-abyss","js",combineScripts(abyssScripts)),
-    skill:target("feature-skill","js",combineScripts(skillScripts)),
     bossRelic:target("feature-boss-relic","js",combineScripts(bossRelicScripts)),
     relicProgression:target("feature-relic-progression","js",read(relicProgressionScripts[0])),
     adventureEntry:target("feature-adventure-entry","js",read(adventureEntryScripts[0])),
@@ -260,7 +261,6 @@ const replacements={
     __BUILD_GAMEPLAY_CORE_STYLE__:styleOutputs.gameplay.path,
     __BUILD_PATROL__:scriptOutputs.patrol.path,__BUILD_PATROL_STYLE__:styleOutputs.patrol.path,
     __BUILD_ABYSS__:scriptOutputs.abyss.path,__BUILD_ABYSS_STYLE__:styleOutputs.abyss.path,
-    __BUILD_SKILL__:scriptOutputs.skill.path,
     __BUILD_BOSS_RELIC__:scriptOutputs.bossRelic.path,__BUILD_BOSS_RELIC_STYLE__:styleOutputs.bossRelic.path,
     __BUILD_RELIC_PROGRESSION__:scriptOutputs.relicProgression.path,__BUILD_RELIC_PROGRESSION_STYLE__:styleOutputs.relicProgression.path,
     __BUILD_ADVENTURE_ENTRY__:scriptOutputs.adventureEntry.path,__BUILD_ADVENTURE_ENTRY_STYLE__:styleOutputs.adventureEntry.path,

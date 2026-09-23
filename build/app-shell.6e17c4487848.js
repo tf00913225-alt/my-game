@@ -2600,13 +2600,11 @@ function hasDamageRoleProfile(skill){
 }
 
 function getSkillPowerAtLevel(skill,level){
-    const resolvedLevel=Math.max(1,Math.floor(Number(level)||1));
-    return Number(skill.powerMultiplier)+Number(skill.powerPerLevel)*(resolvedLevel-1);
+    return Number(skill.powerMultiplier);
 }
 
 function getSkillFlatDamageAtLevel(skill,level){
-    const resolvedLevel=Math.max(1,Math.floor(Number(level)||1));
-    return Number(skill.flatDamage)+Number(skill.flatDamagePerLevel)*(resolvedLevel-1);
+    return Number(skill.flatDamage);
 }
 
 window.v173DamageRoleProfiles=DAMAGE_ROLE_PROFILES;
@@ -13711,11 +13709,11 @@ function rollHitChance(
 
 function getSkillRawAttack(skill,skillLevel,effectiveAttack){
     const attack=Math.max(0,Number(effectiveAttack)||0);
+    const skillDamage=getSkillDamageAtLevel(skill,skillLevel);
     if(hasDamageRoleProfile(skill)){
-        return attack*getSkillPowerAtLevel(skill,skillLevel)+
-            getSkillFlatDamageAtLevel(skill,skillLevel);
+        return attack*getSkillPowerAtLevel(skill,skillLevel)+skillDamage;
     }
-    return attack+getSkillDamageAtLevel(skill,skillLevel);
+    return attack+skillDamage;
 }
 
 window.v173GetSkillRawAttack=getSkillRawAttack;
@@ -14307,19 +14305,25 @@ function getSkillLevel(characterId,skillId){
 
 function getSkillDamageAtLevel(skill,level){
 
-    if(
-        level<=0 ||
-        !skill.baseDamage
-    ){
+    if(!skill || level<=0 || !Number.isFinite(Number(skill.baseDamage))){
         return 0;
     }
 
+    const resolvedLevel=Math.max(1,Math.floor(Number(level)||1));
+    const growth=Number.isFinite(Number(skill.damagePerLevel))
+        ?Number(skill.damagePerLevel)
+        :0;
+    let damage=Number(skill.baseDamage);
 
-    return (
-        skill.baseDamage+
-        skill.damagePerLevel*
-        (level-1)
-    );
+    for(let current=2;current<=resolvedLevel;current++){
+        if(current===5 || current===10){
+            damage=Math.round(damage*1.5);
+        }else{
+            damage+=growth;
+        }
+    }
+
+    return Math.max(0,Math.round(damage));
 
 }
 
@@ -35749,7 +35753,7 @@ catch(error){
         ["relic_soul_bell","鎮魂古鐘","每第4回合開始時"],
         ["relic_tiangang_banner","天罡戰旗","我方累積受到6次敵方有效攻擊後"],
         ["relic_nine_dragon_fire","九龍神火罩","敵方累積完成7次有效行動後"],
-        ["relic_cold_spring_jade","寒泉玉珮","任一我方角色在傷害結算後低於35%最大HP時"],
+        ["relic_cold_spring_jade","寒泉玉珮","任一我方角色HP由35%以上降至35%以下時"],
         ["relic_qinglan_feather","青嵐羽符","戰鬥開始時"],
         ["relic_rock_mountain_seal","岩岳鎮印","開場；另於我方累積受8次有效攻擊時"],
         ["relic_returning_wheel","回天寶輪","本場第一次有我方角色將受到致命傷害時"],

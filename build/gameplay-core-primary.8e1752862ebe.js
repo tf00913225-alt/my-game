@@ -11117,7 +11117,8 @@
     }
     window.v141GetMonsterAllyTriTargets=getMonsterAllyTriTargets;
 
-    function applyTimedMonsterBuff(monstersToBuff,type,turns,amount){
+    function applyTimedMonsterBuff(monstersToBuff,type,turns,amount,options){
+        const opts=options&&typeof options==="object"?options:{};
         monstersToBuff.forEach(monster=>{
             if(!monster||!monster.alive){ return; }
             const monsterIndex=typeof monsters!=="undefined"?monsters.indexOf(monster):-1;
@@ -11137,7 +11138,7 @@
                 buff.critChanceBonusPercent=25;
                 buff.critDamageBonusPercent=50;
             }else if(type==="resistance"){
-                buff.accuracyBonusPercent=50;
+                buff.accuracyBonusPercent=Math.max(0,Number(opts.accuracyBonusPercent)||0);
                 monster.resistance=(Number(monster.resistance)||0)+amount;
             }else if(type==="dodge"){
                 buff.originalEvasion=monster.evasion;
@@ -11227,10 +11228,20 @@
         if(monster.sp<(skill.spCost||0)){ return false; }
         monster.sp-=skill.spCost||0;
         showMonsterSkillNameBadge(skill.name,skill.element||monster.element,monsterIndex);
+        const level=Math.max(1,Math.min(
+            Number(skill.maxLevel)||1,
+            Number(monster.v141ForceSkillLevel||monster.v141SkillLevel)||1
+        ));
+        const levelValue=(values,fallback)=>{
+            if(!Array.isArray(values)||!values.length){ return Number(fallback)||0; }
+            return Number(values[Math.max(0,Math.min(values.length-1,level-1))])||0;
+        };
         if(skillId==="healSpell"){
-            const level=Math.max(1,Math.min(Number(skill.maxLevel)||1,Number(monster.v141ForceSkillLevel||monster.v141SkillLevel)||1));
-            const hpAmount=(Number(skill.baseHeal)||0)+(Number(skill.healPerLevel)||0)*(level-1);
-            const spAmount=(Number(skill.baseHealSP)||0)+(Number(skill.healSPPerLevel)||0)*(level-1);
+            const hpAmount=levelValue(
+                skill.healHpByLevel,
+                (Number(skill.baseHeal)||0)+(Number(skill.healPerLevel)||0)*(level-1)
+            );
+            const spPercent=levelValue(skill.spRestorePercentByLevel,0);
             let hpTotal=0;
             let spTotal=0;
             let cleansedTotal=0;
@@ -11238,11 +11249,17 @@
                 const ally=entry.monster;
                 const healed=window.v141HealMonsterPreservingShield(ally,hpAmount);
                 const beforeSP=Math.max(0,Number(ally.sp)||0);
+                const spAmount=entry.index===monsterIndex
+                    ?0
+                    :Math.floor(Math.max(0,Number(ally.maxSP)||0)*spPercent/100);
                 ally.sp=Math.min(Math.max(beforeSP,Number(ally.maxSP)||0),beforeSP+spAmount);
                 const restoredSP=ally.sp-beforeSP;
                 if(skill.cleanseAll&&Array.isArray(ally.statusEffects)){
-                    cleansedTotal+=ally.statusEffects.length;
-                    ally.statusEffects=[];
+                    const before=ally.statusEffects.length;
+                    ally.statusEffects=ally.statusEffects.filter(effect=>
+                        effect&&(effect.dispellable===false||effect.uncleansable===true)
+                    );
+                    cleansedTotal+=before-ally.statusEffects.length;
                 }
                 hpTotal+=healed;
                 spTotal+=restoredSP;
@@ -11250,20 +11267,25 @@
                 if(typeof window.v141PlayCardEffect==="function"){ window.v141PlayCardEffect("monster",entry.index,"heal"); }
             });
             addBattleLog(monster.name+"施放治療術，為同排最多"+healTargets.length+"名友方共回復"+
-                hpTotal+" HP、"+spTotal+" SP"+(skill.cleanseAll?"，並解除"+cleansedTotal+"個負面狀態":"")+"。");
+                hpTotal+" HP、"+spTotal+" SP"+(skill.cleanseAll?"，並解除"+cleansedTotal+"個可解除負面狀態":"")+"。");
         }else if(skillId==="barrier"){
-            window.v141ApplyMonsterShield(target,999999,4);
+            const duration=Math.max(1,Math.floor(levelValue(skill.durationByLevel,skill.duration||3)));
+            const blocks=Math.max(1,Math.floor(levelValue(skill.barrierBlockCountByLevel,skill.barrierBlockCount||3)));
+            window.v141ApplyMonsterShield(target,999999,duration,blocks);
             target.v141Shield.isBarrier=true;
-            addBattleLog(monster.name+"為"+target.name+"施放結界，完全防護4回合。");
+            addBattleLog(monster.name+"為"+target.name+"施放結界，可抵擋"+blocks+"次直接傷害，最多持續"+duration+"回合。");
         }else if(skillId==="rage"){
             applyTimedMonsterBuff(allies,"rage",3,0);
             addBattleLog(monster.name+"施放怒火，敵方全體爆擊率與爆擊傷害提升3回合。");
         }else if(skillId==="dinghaishenzhen"){
-            applyTimedMonsterBuff(allies,"resistance",3,65);
-            addBattleLog(monster.name+"施放氣定神閒，敵方全體抗性提升3回合。");
+            const resist=levelValue(skill.statusResistBonusByLevel,skill.statusResistBonus||0);
+            const accuracy=levelValue(skill.accuracyBonusPercentByLevel,skill.accuracyBonusPercent||0);
+            applyTimedMonsterBuff(allies,"resistance",3,resist,{accuracyBonusPercent:accuracy});
+            addBattleLog(monster.name+"施放氣定神閒，敵方全體異常抗性提升"+resist+"%、命中提升"+accuracy+"%，持續3回合。");
         }else if(skillId==="dodgeSkill"){
-            applyTimedMonsterBuff(allies,"dodge",3,75);
-            addBattleLog(monster.name+"施放閃躲術，敵方全體閃躲提升3回合。");
+            const evasion=levelValue(skill.evasionBonusPercentByLevel,skill.evasionBonusPercent||0);
+            applyTimedMonsterBuff(allies,"dodge",3,evasion);
+            addBattleLog(monster.name+"施放閃躲術，敵方全體閃躲提升"+evasion+"%，持續3回合。");
         }
         updateUI(); finishPlayerAction();
         return true;
@@ -12434,7 +12456,7 @@
     }
     window.v143SyncEarthShieldEffects=syncEarthShieldEffects;
 
-    /* ----- 10. Both sides use five direct blocks / five rounds for Barrier. ----- */
+    /* ----- 10. Barrier blocks direct damage only; count/duration come from the formal skill level. ----- */
     function isMonsterBarrier(monster){
         return !!(monster&&monster.v141Shield&&monster.v141Shield.isBarrier);
     }
@@ -12450,7 +12472,7 @@
 
     if(typeof window.v141ApplyMonsterShield==="function"){
         const previousApplyMonsterShield=window.v141ApplyMonsterShield;
-        window.v141ApplyMonsterShield=function(monster,amount,turns){
+        window.v141ApplyMonsterShield=function(monster,amount,turns,barrierBlocks){
             const barrier=numeric(amount)>=999999;
             const stateType=barrier?"barrier":"shield";
             const monsterIndex=typeof monsters!=="undefined"?monsters.indexOf(monster):-1;
@@ -12463,12 +12485,14 @@
             ){
                 return 0;
             }
-            const result=previousApplyMonsterShield.call(this,monster,barrier?1:amount,barrier?5:turns);
+            const resolvedTurns=barrier?Math.max(1,Math.floor(numeric(turns)||3)):turns;
+            const resolvedBlocks=barrier?Math.max(1,Math.floor(numeric(barrierBlocks)||3)):0;
+            const result=previousApplyMonsterShield.call(this,monster,barrier?1:amount,resolvedTurns);
             if(monster&&monster.v141Shield){
                 if(barrier){
                     monster.v141Shield.isBarrier=true;
-                    monster.v141Shield.turnsLeft=5;
-                    monster.v141Shield.remainingBlocks=5;
+                    monster.v141Shield.turnsLeft=resolvedTurns;
+                    monster.v141Shield.remainingBlocks=resolvedBlocks;
                     monster.v141Shield.barrierRule="shared";
                 }
                 if(typeof window.v173MarkPersistentStateName==="function"){
@@ -12548,7 +12572,7 @@
                 if(directPlayerBarrierContext){
                     directPlayerBarrierContext.blocked.set(monster,shield);
                 }
-                shield.remainingBlocks=Math.max(0,(numeric(shield.remainingBlocks)||5)-1);
+                shield.remainingBlocks=Math.max(0,(numeric(shield.remainingBlocks)||3)-1);
                 const card=document.getElementById("battleMonster"+index);
                 if(card&&typeof showDamagePopup==="function"){ showDamagePopup(card,"格擋 "+shield.remainingBlocks,"shield"); }
                 if(typeof window.v141PlayCardEffect==="function"){ window.v141PlayCardEffect("monster",index,"barrier"); }
@@ -12569,7 +12593,7 @@
         const monster=typeof monsters!=="undefined"?monsters[index]:null;
         if(!isMonsterBarrier(monster)){ return; }
         const shield=monster.v141Shield;
-        if(!Number.isFinite(Number(shield.remainingBlocks))){ shield.remainingBlocks=5; }
+        if(!Number.isFinite(Number(shield.remainingBlocks))){ shield.remainingBlocks=3; }
         const text=document.getElementById("battleMonsterHPText"+index);
         if(text){ text.textContent=Math.floor(numeric(shield.baseHp))+"/"+Math.floor(numeric(shield.baseMaxHP))+" 結界"+shield.remainingBlocks; }
     }
@@ -12581,7 +12605,7 @@
             if(previousLog){
                 addBattleLog=function(message){
                     const args=Array.prototype.slice.call(arguments);
-                    args[0]=String(message).replace("完全防護4回合","抵擋5次直接傷害，最多5回合");
+                    args[0]=String(message);
                     return previousLog.apply(this,args);
                 };
             }

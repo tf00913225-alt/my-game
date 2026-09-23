@@ -1,3 +1,19 @@
+## 2026-09-23 — Lv10 技能／輔助技能／秘寶 Runtime Owner 收斂（VERIFIED candidate）
+
+- Base：`dev@9d32e8cb022ff824e83d5dc3022f2e0a24c8d58a`；工作分支：`fix/skill-relic-runtime-owner-convergence-20260923`；`main` 未修改。
+- 31 個玩家直接傷害技能改為 Lv10。唯一 Damage Curve owner 為 `js/00-main.js::getSkillDamageAtLevel()`：Lv2～4 線性、Lv5=Lv4×1.5、Lv6～9 線性、Lv10=Lv9×1.5，與正式 `calculateDamage()` 一致使用 `Math.round`。
+- `js/60-v173.64-skill-progression-rebalance.js` 現為 Final Skill Data／Progression／玩家說明 projection owner，並固定進 `gameplay-core`；所有可升級技能每級固定 1 技能點，既有 `skillLevels` 不遷移／不重置。
+- 火系：炎魂共鳴 SP45、炎勢 12/15/18/21/25%，Lv5 爆擊／成功新增燃燒每正式回合最多延長1、整次最多+3，免費追擊不延長；焚血訣 SP35、HP成本5/10/15/20/25%，接下來3次非免費火系直接施放 +5/10/15/20/35%，DoT／免費追擊不使用也不消耗。
+- 水／風／土支援技能均改讀正式 ByLevel 欄位；冰封 Lv5 才由 column 升為 tri；淨心訣 Lv3 才升3目標且雙方都清除所有可解除臨時戰鬥狀態；結界只擋直接傷害並依 3/3/3/4/5 次與回合數。
+- 敵方岩石壁壘已由全體 `currentAbyssEntries()` 改回正式 `allyTriTargets()`，最多3名；V144 反向 `requires:["barrier"]`／`allyAll` 舊資料已退休。
+- Team Relic Trigger Engine 已從 `feature-boss-relic` 拆出並固定放入 `gameplay-core` 最末端；所有正式戰鬥入口因此在可執行前已同步取得同一 `js/60-team-relic-system.js`。Boss／Tower／養成仍 lazy，沒有塞回 Critical Boot，也沒有新增 Battle Start 非同步補載。
+- 10 件 `runtimeReady:false` 秘寶 hydrate／equip／progression 全部 fail closed；玩家只見「效果尚未覺醒／能力尚未開放」。寒泉玉珮、九龍神火罩、岩岳鎮印、烈陽神珠說明已同步實際 Trigger／Scalar。
+- 專項測試：`tests/skill-relic-owner-convergence-20260923.test.js`；既有 `tests/skill-progression-rebalance.test.js` 同步新規格，兩者已加入 dev PR 必跑 CI。
+- Requirement Batch：`release/requirement-batches/2026-09-23-skill-relic-runtime-owner-convergence.json` 已 VERIFIED。PR #532 最終 source candidate `e52a7f78eb02978bdfe4ab4423b6cb4ddf629515`；deterministic build commit `0a3405fdb53e125fd9d0024709239e5b45f0e37c`；PR CI Run `35837276372` Repository checks SUCCESS，包含技能／秘寶專項、Battle/Relic regressions、build:check、exact-candidate real battle mobile QA、resources、Release Gate、git diff。
+- 額外 Full Node audit 曾發現並修復兩個本次相關點：淨心訣 Lv3 擴展3目標時仍保留玩家點選目標為 VFX primary；Heal Spell 在 legacy/test data 缺少新 SP 欄位時不依賴不存在的 helper。Audit 另揭露施工 Base 已存在的 `battle-status-info-assets-20260922.test.js`／`ui-critical-regressions-mobile-browser.test.js` stale UI failure，以及 V143/V144/V155/V169 歷史 snapshot 仍寫死舊技能數值；本次未為追求歷史綠燈而把正式規格改回舊值。
+- 唯一仍待產品規格定案：支援技能沒有明確 Tier 對應，因此初次學習成本暫保留既有正式值；有明確 Tier 的四元素直接傷害技能已使用 2／6／10／16，所有技能的『升級』則固定每級 1 點。
+- `DATA_SECURITY_CONTRACTS.md` 在施工 Base 仍不存在；本次沒有修改 Cloud Save／帳號安全 schema。
+
 ## 2026-09-23 — 冰封／石化互斥硬控與 Body Status Base Layer 收斂（VERIFIED candidate）
 
 - Base：`dev@8bab02b38197824ac47f3ba2269ba6e19cbfd52f`；工作分支：`fix/freeze-petrify-exclusive-status-layer-20260923`；`main`／`dev` 均未直接修改。

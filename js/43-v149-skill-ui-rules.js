@@ -465,9 +465,20 @@
             };
         }
         try{
-            result=withPlayerSkillContext(options.context,()=>
-                withGuaranteedBurn(options.skill,()=>options.previous.apply(options.that,options.args))
-            );
+            result=withPlayerSkillContext(options.context,()=>{
+                const invoke=()=>withGuaranteedBurn(
+                    options.skill,()=>options.previous.apply(options.that,options.args)
+                );
+                const formal=window.FourSymbolsSkillSpec;
+                return formal&&typeof formal.withPlayerDirectSkillCast==="function"
+                    ?formal.withPlayerDirectSkillCast(
+                        options.context.characterIndex,
+                        options.skill.id,
+                        {freeCast:freeCast===true},
+                        invoke
+                    )
+                    :invoke();
+            });
         }finally{
             if(originalRoll){ rollCritical=originalRoll; }
             releaseFinishCapture();
@@ -526,7 +537,13 @@
             const context={skill:skill,character:character,characterIndex:characterIndex};
             if(!skill||!skill.followUpOnCriticalOrDefeat){
                 const that=this;
-                return withPlayerSkillContext(context,()=>withGuaranteedBurn(skill,()=>previous.apply(that,args)));
+                return withPlayerSkillContext(context,()=>{
+                    const invoke=()=>withGuaranteedBurn(skill,()=>previous.apply(that,args));
+                    const formal=window.FourSymbolsSkillSpec;
+                    return formal&&typeof formal.withPlayerDirectSkillCast==="function"&&skill
+                        ?formal.withPlayerDirectSkillCast(characterIndex,skill.id,{freeCast:false},invoke)
+                        :invoke();
+                });
             }
             const originalTarget=Number.isInteger(centerArgIndex)&&Number.isInteger(args[centerArgIndex])
                 ?args[centerArgIndex]

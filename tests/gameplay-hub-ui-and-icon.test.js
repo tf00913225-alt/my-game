@@ -71,9 +71,13 @@ const bossCardRule=cssRule(css,"#game-stage #battleMonsterArea.gameplay-boss-act
 assert.doesNotMatch(bossFootprintRule,/!important/,"Boss footprint coordinates must remain geometry-owned");
 assert.match(bossCardRule,/border:0 !important;[\s\S]*?outline:0 !important;[\s\S]*?background:none !important;[\s\S]*?box-shadow:none !important;/);
 
-const gameplayIndex=loader.indexOf("js/gameplay-boss-tower-system.js");
-const relicIndex=loader.indexOf("js/60-team-relic-system.js");
-assert.ok(gameplayIndex>=0&&relicIndex>=0&&gameplayIndex<relicIndex,"Gameplay Boss integration must load before the final Team Relic wrapper");
+const gameplayIndex=loader.indexOf('const bossRelicScripts=["js/gameplay-boss-tower-system.js"]');
+const relicIndex=loader.indexOf('"js/60-team-relic-system.js"');
+assert.ok(relicIndex>=0&&gameplayIndex>=0,"build must retain both Team Relic core runtime and lazy Boss/Tower source");
+assert.ok(loader.indexOf('"js/60-team-relic-system.js"',loader.indexOf("const gameplayScripts=["))>=0,
+    "Team Relic Trigger Engine must be part of gameplay-core so every formal battle has it ready");
+assert.doesNotMatch(loader,/const bossRelicScripts=\[[^\]]*60-team-relic-system/,
+    "Boss/Tower lazy bundle must not own or duplicate the Team Relic Trigger Engine");
 
 const image=pngRgba("assets/ui/nav-gameplay.png");
 assert.deepEqual([image.width,image.height],[320,320]);

@@ -108,6 +108,11 @@ jobs:
           node tests/v173.23-wind-vfx.test.js
           node tests/battle-runtime-hot-path-convergence-20260923.test.js
 
+      - name: Run skill and relic owner convergence regressions
+        run: |
+          node tests/skill-progression-rebalance.test.js
+          node tests/skill-relic-owner-convergence-20260923.test.js
+
       - name: Run relic lifecycle and battle input regressions
         run: |
           node tests/relic-trigger-lifecycle-battle-input-ui-20260919.test.js

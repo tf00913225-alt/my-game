@@ -42,6 +42,21 @@
 - Frostbite（凍傷）及其他有回合數的軟性 Debuff（減益）不得再以玩家專用 `deferFirstTick` 形成不同算法；同樣在受影響單位的有效行動邊界消耗。
 - `FourSymbolsDurationLifecycle` 是持續回合扣除的共用協調入口；新技能不得另建全域 round-start 倒數或 timer（計時器）繞過它。
 
+## 技能成長與說明契約
+
+- 玩家四元素「主要效果包含直接傷害」技能的正式傷害曲線唯一 owner 為 `js/00-main.js::getSkillDamageAtLevel()`。Lv1 使用 `baseDamage`；Lv2～4 依 `damagePerLevel` 線性增加；Lv5 = Lv4 × 1.5；Lv6～9 再依固定成長增加；Lv10 = Lv9 × 1.5。突破與最終傷害取整統一使用正式戰鬥 `Math.round` 語意。
+- 玩家直接傷害技能正式上限為 Lv10；純 Buff／Heal／Revive／Control／Support／EX 不得因本規則被誤升 Lv10。既有玩家已學等級必須原值保留，Max Lv 提升不得重置、退點、自動補滿或重複扣點。
+- 所有可升級技能 Lv2～Max 每次固定消耗 1 技能點。初次學習成本仍由正式技能階級／資料 owner 決定，不得拿升級成本覆蓋學習成本。
+- `js/60-v173.64-skill-progression-rebalance.js` 是正式玩家技能 Final Data／Progression／玩家說明 projection owner，並隨 `gameplay-core` 固定載入；V144／V169 等舊層不得再各自覆寫技能詳細文字或另算下一級傷害。
+- 技能列表、詳細頁、Lv1～Max 明細與下一級傷害必須由正式 Skill Data 與 `getSkillDamageAtLevel()` 投影。禁止在 UI 寫第二份 10 級傷害表、舊「最高5級」或用「每級+X」假裝完整描述 Lv5/Lv10 突破。
+- 輔助技能 Runtime 必須讀正式 `...ByLevel`／duration／target 欄位；不得在施放前暫時 mutation `skill.xxx` 再還原作為等級縮放。敵方／深淵同名支援技能也必須讀同一份正式數值與 Targeting owner。
+
+## Team Relic Runtime 載入契約
+
+- `js/60-team-relic-system.js` 的 Catalog／Trigger／Effect Engine 固定置於 `gameplay-core` 最末端。任何能成立的正式 Battle Runtime 都必須已同步 execute 此 owner；不得以「玩家是否先開秘寶頁」或 idle prefetch 是否碰巧完成決定秘寶能否觸發。
+- 只允許 Team Relic Runtime 本身進入 `gameplay-core`；Boss／Tower／秘寶養成仍維持 `feature-boss-relic` lazy load，且兩者都不得塞進 Critical Boot。禁止為 Team Relic 再建立額外 feature gate、戰鬥開始後 Promise 補載或 polling。
+- `runtimeReady:false` 秘寶不是可用功能：不得正式裝備、強化、觸發或顯示虛構下一級數值；舊存檔 loadout 若指向未實裝秘寶必須 fail closed 為未裝備。禁止逐件補 `if` 建立第二套 Trigger Engine。
+
 ## Battle Statistics（戰鬥統計）與戰況介面契約
 
 - `FourSymbolsBattleStatistics` 是每場戰鬥統計的唯一 owner（控制來源）；每場開始建立一次、戰鬥中累積、結束時凍結同一份 snapshot（快照），戰後結算禁止重新推算第二份數字。
