@@ -328,14 +328,15 @@ test("duration lifecycle counts effective actions, blocked actions and never con
     assert.equal(actor.statusEffects.some(effect=>effect.type==="frostbite"),false,"two affected actions exhaust two-turn Frostbite");
 });
 
-test("wind and earth level-scaled support values feed the existing support owner",()=>{
+test("wind and earth support values stay in formal arrays instead of transient skill mutation",()=>{
     const r=makeRuntime();
-    r.loadouts.fire.skillLevels.dodgeSkill=5;
-    r.context.castBuffSkill("dodgeSkill",0);assert.equal(r.observedSupport(),70);assert.equal(r.skills.dodgeSkill.evasionBonusPercent,75);
-    r.loadouts.fire.skillLevels.rockWall=5;
-    r.context.castBuffSkill("rockWall",0);assert.equal(r.observedSupport(),35);assert.equal(r.skills.rockWall.defenseBonusPercent,35);
-    r.loadouts.fire.skillLevels.earthShield=5;
-    r.context.castBuffSkill("earthShield",0);assert.equal(r.observedSupport(),50);assert.equal(r.skills.earthShield.reflectPercent,50);
+    assert.deepEqual(Array.from(r.skills.dodgeSkill.evasionBonusPercentByLevel),[30,40,50,60,70]);
+    assert.equal(r.skills.dodgeSkill.evasionBonusPercent,undefined);
+    assert.deepEqual(Array.from(r.skills.rockWall.defenseBonusPercentByLevel),[15,20,25,30,35]);
+    assert.equal(r.skills.rockWall.defenseBonusPercent,undefined);
+    assert.deepEqual(Array.from(r.skills.earthShield.reflectPercentByLevel),[20,30,35,40,50]);
+    assert.equal(r.skills.earthShield.reflectPercent,undefined);
+    assert.deepEqual(Array.from(r.skills.barrier.barrierBlockCountByLevel),[3,3,3,4,5]);
 });
 
 test("legacy learned skills remain intact while the next upgrade obeys the new gate",()=>{
@@ -349,17 +350,20 @@ test("legacy learned skills remain intact while the next upgrade obeys the new g
     assert.equal(r.loadouts.fire.skillLevels.dragonSlash,2);assert.equal(r.owners.fire.skillPoints,777);
 });
 
-test("player progression is isolated from Abyss fixed levels, talisman shared skills and four-slot equip rule",()=>{
+test("player progression is isolated from Abyss fixed levels and lives in gameplay-core",()=>{
     const abyss=fs.readFileSync("js/59-abyss-two-tier-runtime.js","utf8");
     const talisman=fs.readFileSync("js/27-v132-content-expansion.js","utf8");
     const main=fs.readFileSync("js/00-main.js","utf8");
-    const lateLoader=fs.readFileSync("scripts/build-production.mjs","utf8");
+    const build=fs.readFileSync("scripts/build-production.mjs","utf8");
+    const featureManifest=JSON.parse(fs.readFileSync("config/feature-manifest.json","utf8"));
     assert.match(abyss,/v132FixedSkillLoadout\s*=\s*true/);
     assert.match(abyss,/v141ForceSkillLevel\s*=\s*config\.skillLevel/);
     assert.doesNotMatch(abyss,/v17364GetRequiredCharacterLevelForSkillLevel|learnLevel/);
     assert.match(talisman,/sharedSkillId/);
     assert.doesNotMatch(talisman,/v17364GetRequiredCharacterLevelForSkillLevel/);
     assert.match(main,/equippedSkills\.length\s*>=\s*4/);
-    assert.match(lateLoader,/const abyssScripts=\["js\/59-abyss-two-tier-runtime\.js"\]/);
-    assert.match(lateLoader,/const skillScripts=\["js\/60-v173\.64-skill-progression-rebalance\.js"\]/);
+    assert.match(build,/const abyssScripts=\["js\/59-abyss-two-tier-runtime\.js"\]/);
+    assert.match(build,/gameplayScripts=\[[\s\S]*?"js\/60-v173\.64-skill-progression-rebalance\.js"/);
+    assert.doesNotMatch(build,/const skillScripts=/);
+    assert.equal(featureManifest.features.skill,"gameplay-core");
 });
