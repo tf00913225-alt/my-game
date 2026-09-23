@@ -12,6 +12,12 @@
         return Number.isFinite(result)?result:0;
     }
 
+    function levelValue(values,level,fallback){
+        if(!Array.isArray(values)||!values.length){ return numeric(fallback); }
+        const index=Math.max(0,Math.min(values.length-1,Math.floor(numeric(level)||1)-1));
+        return numeric(values[index]);
+    }
+
     function clamp(value,min,max){
         return Math.max(min,Math.min(max,value));
     }
@@ -264,15 +270,20 @@
             setTimeout(()=>showPlayerSpPopup(spCost,characterIndex),500);
         }
 
+        const targetType=level>=Math.max(1,numeric(skill.maxLevel)||1)
+            ?(skill.targetTypeAtMaxLevel||"tri")
+            :(skill.targetType||"column");
+        const chance=levelValue(skill.freezeChanceByLevel,level,skill.freezeChance);
+        const duration=Math.max(1,Math.floor(levelValue(skill.freezeDurationByLevel,level,skill.freezeDuration||3)));
         const targets=typeof getSkillTargets==="function"
-            ?getSkillTargets(resolvedIndex,"tri")
+            ?getSkillTargets(resolvedIndex,targetType)
             :[resolvedIndex];
 
         targets.forEach(index=>{
             const monster=typeof monsters!=="undefined"?monsters[index]:null;
             if(!monster||monster.alive===false||numeric(monster.hp)<=0){ return; }
             const rollArguments=[
-                skill.freezeChance,
+                chance,
                 character.level,
                 monster.level,
                 stats.intelligence,
@@ -294,7 +305,7 @@
 
             if(statusResult.hit){
                 if(typeof applyFreezeEffect==="function"){
-                    applyFreezeEffect(monster,skill.freezeDuration);
+                    applyFreezeEffect(monster,duration);
                 }
                 if(typeof addBattleLog==="function"){
                     addBattleLog(monster.name+"被冰封了！");
