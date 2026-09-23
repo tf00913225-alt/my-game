@@ -53,8 +53,8 @@
 
 ## Team Relic Runtime 載入契約
 
-- `js/60-team-relic-system.js` 的 Catalog／Trigger／Effect Engine 唯一打包 owner 為 `feature-relic-runtime`。所有會進正式戰鬥的 feature 必須先依賴此 bundle；不得以「玩家是否先開秘寶頁」或 idle prefetch 是否碰巧完成決定秘寶能否觸發。
-- `feature-relic-runtime` 只依賴 `gameplay-core`，不得把 Boss／Tower／養成整包塞進 Critical Boot；`feature-boss-relic` 反向依賴 `feature-relic-runtime`。
+- `js/60-team-relic-system.js` 的 Catalog／Trigger／Effect Engine 固定置於 `gameplay-core` 最末端。任何能成立的正式 Battle Runtime 都必須已同步 execute 此 owner；不得以「玩家是否先開秘寶頁」或 idle prefetch 是否碰巧完成決定秘寶能否觸發。
+- 只允許 Team Relic Runtime 本身進入 `gameplay-core`；Boss／Tower／秘寶養成仍維持 `feature-boss-relic` lazy load，且兩者都不得塞進 Critical Boot。禁止為 Team Relic 再建立額外 feature gate、戰鬥開始後 Promise 補載或 polling。
 - `runtimeReady:false` 秘寶不是可用功能：不得正式裝備、強化、觸發或顯示虛構下一級數值；舊存檔 loadout 若指向未實裝秘寶必須 fail closed 為未裝備。禁止逐件補 `if` 建立第二套 Trigger Engine。
 
 ## Battle Statistics（戰鬥統計）與戰況介面契約
