@@ -108,15 +108,17 @@ function formulaRuntime(){
     assert.doesNotMatch(v149,/rollStatusEffectHit\s*=\s*function/);
     assert.doesNotMatch(v169,/getMonsterEvasion\s*=\s*function|getMonsterEffectiveSpiritPoints\s*=\s*function|getPlayerStatusResistBonus\s*=\s*function/);
     assert.match(main,/evasion:\s*\n\s*getDefaultMonsterEvasion\(level\)/);
+    const firstZoneRosterCall=main.indexOf('makeZoneMonster("哥布林",3,"fire")');
+    assert.ok(firstZoneRosterCall>0,"first top-level zone roster call must exist");
     assert.ok(
         main.indexOf("const DEFAULT_MONSTER_EVASION_PER_LEVEL = 0.1;")<
-        main.indexOf("function makeZoneMonster("),
-        "default monster evasion constants must initialize before top-level zone roster creation"
+        firstZoneRosterCall,
+        "default monster evasion constants must initialize before the first top-level zone roster call"
     );
     assert.ok(
         main.indexOf("function getDefaultMonsterEvasion(level)")<
-        main.indexOf("function makeZoneMonster("),
-        "default monster evasion owner must exist before makeZoneMonster is invoked at top level"
+        firstZoneRosterCall,
+        "default monster evasion owner must exist before the first top-level zone roster call"
     );
     assert.match(main,/function combineEvasionRates\(sources\)[\s\S]*?sum\+\(Number\(source\)\|\|0\)/);
 }
