@@ -34,7 +34,13 @@ async function waitForJson(url,timeoutMs=15000){
 }
 
 class CdpClient{
-    constructor(url){ this.url=url; this.nextId=1; this.pending=new Map(); this.socket=null; }
+    constructor(url){
+        this.url=url;
+        this.nextId=1;
+        this.pending=new Map();
+        this.socket=null;
+        this.events=[];
+    }
     async connect(){
         this.socket=new WebSocket(this.url);
         await new Promise((resolve,reject)=>{
@@ -46,7 +52,32 @@ class CdpClient{
             let raw=event.data;
             if(raw&&typeof raw!=="string"&&typeof raw.text==="function"){ raw=await raw.text(); }
             const message=JSON.parse(String(raw));
-            if(!message.id){ return; }
+            if(!message.id){
+                if(message.method==="Runtime.exceptionThrown"){
+                    const details=message.params&&message.params.exceptionDetails;
+                    this.events.push({
+                        method:message.method,
+                        text:details&&(
+                            details.exception&&details.exception.description||
+                            details.text
+                        )||"Runtime exception",
+                        url:details&&details.url||null,
+                        lineNumber:details&&details.lineNumber,
+                        columnNumber:details&&details.columnNumber
+                    });
+                }else if(message.method==="Runtime.consoleAPICalled"){
+                    const type=message.params&&message.params.type;
+                    if(type==="error"||type==="warning"){
+                        this.events.push({
+                            method:message.method,
+                            type,
+                            args:(message.params.args||[]).map(arg=>arg.value!==undefined?arg.value:arg.description)
+                        });
+                    }
+                }
+                if(this.events.length>50){ this.events.splice(0,this.events.length-50); }
+                return;
+            }
             const request=this.pending.get(message.id);
             if(!request){ return; }
             this.pending.delete(message.id);
@@ -162,7 +193,11 @@ async function prepareAccountFirstRuntime(client,features){
                     creationErrors:${JSON.stringify(creationAttempt.errors)}
                 };
             })()`);
-            throw new Error("Live anonymous account could not complete the formal character-creation flow: "+JSON.stringify(diagnostics));
+            throw new Error(
+                "Live anonymous account could not complete the formal character-creation flow: "+
+                JSON.stringify(diagnostics)+
+                " CDP="+JSON.stringify(client.events.slice(-20))
+            );
         }
         await waitFor(client,"FourSymbolsStartupPolicy.getState()==='READY'&&getComputedStyle(document.getElementById('gameInterface')).display!=='none'","anonymous character creation completion",30000);
         state="READY";
