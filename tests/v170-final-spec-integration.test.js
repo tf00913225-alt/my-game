@@ -421,14 +421,14 @@ test("Burn, Frostbite, Freeze and every other final status definition are exact"
         floodBeast:{frostbiteChance:35,frostbiteDuration:2},
         iceArrowRain:{frostbiteChance:35,frostbiteDuration:2},
         freeze:{freezeChance:90,freezeDuration:3},
-        stormFist:{agilityDownChance:50,agilityDownByLevel:[30,40,50,60,70],agilityDownDuration:1},
+        stormFist:{agilityDownChance:50,agilityDownByLevel:[5,7,9,11,13,15,17,19,22,25],agilityDownDuration:1},
         stormFlurry:{damageDownChance:50,damageDownByLevel:[10,20,30,40,50],damageDownDuration:2},
         windCrossSlash:{damageDownChance:65,damageDownByLevel:[20,30,35,40,50],damageDownDuration:1},
-        dizzyFist:{stunChance:65,missBonusByLevel:[15,20,25,30,35],stunDuration:5},
-        windSpell:{agilityDownChance:50,agilityDownByLevel:[10,20,30,40,50],agilityDownDuration:1},
+        dizzyFist:{stunChance:65,missBonusByLevel:[5,7,9,11,13,15,17,19,22,25],stunDuration:5},
+        windSpell:{agilityDownChance:50,agilityDownByLevel:[5,7,9,11,13,15,17,19,22,25],agilityDownDuration:1},
         stormCircle:{damageDownChance:55,damageDownByLevel:[15,18,21,25,30],damageDownDuration:1},
         windHowlLightning:{damageDownChance:65,damageDownByLevel:[15,20,25,30,35],damageDownDuration:1},
-        stormRain:{stunChance:35,missBonusByLevel:[15,20,25,30,35],stunDuration:1},
+        stormRain:{stunChance:35,missBonusByLevel:[5,7,9,11,13,15,17,19,22,25],stunDuration:1},
         stoneSlash:{defenseDownChance:65,defenseDownByLevel:[10,20,30,40,50],defenseDownDuration:1},
         stoneThrow:{defenseDownChance:65,defenseDownByLevel:[10,20,30,40,50],defenseDownDuration:1},
         sandWind:{defenseDownChance:65,defenseDownByLevel:[10,20,30,40,50],defenseDownDuration:1},
@@ -795,7 +795,7 @@ test("reflection uses actual HP loss and cannot reflect absorbed or overkill dam
     assert.deepEqual(result,{playerHp:0,attackerHp:995});
 });
 
-test("evasion sources multiply to 83.75%, cap at 85%, and Barrier spends once per skill cast",()=>{
+test("evasion sources add as final percentage points, cap at 85%, and Barrier spends once per skill cast",()=>{
     const runtime=loadFinalRuntime();
     const result=evaluateJson(runtime.context,`(function(){
         const target={activeBuffs:[{
@@ -810,7 +810,7 @@ test("evasion sources multiply to 83.75%, cap at 85%, and Barrier spends once pe
             blocked:blocked,remaining:target.activeBuffs[0].remainingBlocks
         };
     })()`);
-    assert.deepEqual(result,{combined:83.75,capped:85,blocked:[true,true,true],remaining:4});
+    assert.deepEqual(result,{combined:85,capped:85,blocked:[true,true,true],remaining:4});
 });
 
 test("player agility and default monster level retain the final evasion rules",()=>{
@@ -831,7 +831,7 @@ test("player agility and default monster level retain the final evasion rules",(
             custom:custom.evasion,missing:missing.evasion
         };
     })()`);
-    assert.deepEqual(result,{player:60,level40:12,level200:30,custom:24,missing:30});
+    assert.deepEqual(result,{player:60,level40:4,level200:10,custom:24,missing:10});
 });
 
 test("multi-target buffs resolve same-name MISS independently without replacing existing values",()=>{
@@ -989,11 +989,16 @@ test("final support passives and front/back Freeze behavior are exact",()=>{
     const runtime=loadFinalRuntime();
     const skills=runtime.skills;
     assert.deepEqual(
-        [skills.rage.duration,skills.dodgeSkill.evasionBonusPercent,skills.dodgeSkill.duration,
-            skills.stealthSkill.duration,skills.dinghaishenzhen.statusResistBonus,
-            skills.dinghaishenzhen.accuracyBonusPercent,skills.windEX.evasionBonusPercent],
-        [3,75,3,3,65,50,35]
+        [skills.rage.duration,skills.dodgeSkill.duration,skills.stealthSkill.duration,
+            skills.windEX.evasionBonusPercent],
+        [3,3,3,10]
     );
+    assert.deepEqual(Array.from(skills.dodgeSkill.evasionBonusPercentByLevel),[5,10,15,20,25]);
+    assert.deepEqual(Array.from(skills.dinghaishenzhen.statusResistBonusByLevel),[5,8,10,12,15]);
+    assert.deepEqual(Array.from(skills.dinghaishenzhen.accuracyBonusPercentByLevel),[5,10,15,20,25]);
+    assert.equal(skills.dodgeSkill.evasionBonusPercent,undefined);
+    assert.equal(skills.dinghaishenzhen.statusResistBonus,undefined);
+    assert.equal(skills.dinghaishenzhen.accuracyBonusPercent,undefined);
     assert.deepEqual(
         [skills.earthShield.reflectPercent,skills.earthShield.duration,
             skills.rockWall.defenseBonusPercent,skills.rockWall.duration,
@@ -1241,7 +1246,7 @@ test("Extreme Emperor carries only Yuan Zu Blessing and settles its final behavi
     assert.deepEqual(
         [data.yuanZuBlessing.spCost,data.yuanZuBlessing.baseHeal,data.yuanZuBlessing.baseHealSP,
             data.yuanZuBlessing.cleanseChance,data.yuanZuBlessing.evasionBonusPercent,data.yuanZuBlessing.duration],
-        [45,100,100,35,35,2]
+        [45,100,100,35,15,2]
     );
     assert.equal(data.yuanZuBlessing.agilityBonusPercent,undefined);
 });
