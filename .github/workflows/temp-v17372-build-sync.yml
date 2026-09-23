@@ -59,6 +59,7 @@ jobs:
         run: |
           node <<'NODE'
           const fs=require("fs");
+          (async()=>{
           const repo=process.env.REPO,branch=process.env.BRANCH,parentSha=process.env.PARENT_SHA,token=process.env.GH_TOKEN;
           const changes=JSON.parse(fs.readFileSync("build-sync-artifact/changes.json","utf8"))
             .filter(item=>item.path!=="build-sync-artifact/"&&!item.path.startsWith("build-sync-artifact/"));
@@ -97,4 +98,5 @@ jobs:
           });
           await api("PATCH","/git/refs/heads/"+branch.split("/").map(encodeURIComponent).join("/"),{sha:commit.sha,force:false});
           console.log("Created deterministic build commit "+commit.sha);
+          })().catch(error=>{ console.error(error); process.exit(1); });
           NODE
