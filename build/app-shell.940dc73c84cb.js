@@ -14293,6 +14293,34 @@ function getSkillDamageAtLevel(skill,level){
    只結算 primary target。這裡是敵方傷害目標的唯一 owner。
 */
 
+function getSkillLevelArrayValue(values,level,fallback){
+    if(!Array.isArray(values)||!values.length){ return Number(fallback)||0; }
+    const index=Math.max(0,Math.min(values.length-1,Math.floor(Number(level)||1)-1));
+    return Number(values[index])||0;
+}
+
+function getEffectiveSkillTargetType(skill,level){
+    const base=String(skill&&skill.targetType||"single");
+    if(!skill||!skill.targetTypeAtMaxLevel){ return base; }
+    const maxLevel=Math.max(1,Math.floor(Number(skill.maxLevel)||1));
+    const resolvedLevel=Math.max(1,Math.floor(Number(level)||1));
+    return resolvedLevel>=maxLevel?String(skill.targetTypeAtMaxLevel):base;
+}
+
+function getSkillFreezeChanceAtLevel(skill,level){
+    return Math.max(0,getSkillLevelArrayValue(skill&&skill.freezeChanceByLevel,level,skill&&skill.freezeChance));
+}
+
+function getSkillFreezeDurationAtLevel(skill,level){
+    return Math.max(1,Math.floor(getSkillLevelArrayValue(skill&&skill.freezeDurationByLevel,level,skill&&skill.freezeDuration||1)));
+}
+
+window.FourSymbolsBattleSkillTargeting=Object.freeze({
+    effectiveTargetType:getEffectiveSkillTargetType,
+    freezeChanceAtLevel:getSkillFreezeChanceAtLevel,
+    freezeDurationAtLevel:getSkillFreezeDurationAtLevel
+});
+
 function getSkillTargets(centerIndex,targetType){
 
     const bossOwner=typeof window!=="undefined"?window.FourSymbolsBossBattle:null;
@@ -16290,10 +16318,11 @@ function castDamageSkill(skillId){
         return;
     }
 
+    const effectiveTargetType=getEffectiveSkillTargetType(skill,level);
     const targets =
         getSkillTargets(
             centerIndex,
-            skill.targetType
+            effectiveTargetType
         );
 
 
@@ -16308,8 +16337,10 @@ function castDamageSkill(skillId){
         skill.name,
         skill.element,
         0,
-        skill.targetType==="all"?null:centerIndex,
-        targets
+        effectiveTargetType==="all"?null:centerIndex,
+        targets,
+        undefined,
+        effectiveTargetType
     );
 
 
@@ -16403,56 +16434,25 @@ function castDamageSkill(skillId){
         */
 
         if(!skill.baseDamage){
-
-            if(skill.freezeChance){
-
+            const freezeChance=getSkillFreezeChanceAtLevel(skill,level);
+            const freezeDuration=getSkillFreezeDurationAtLevel(skill,level);
+            if(freezeChance>0){
                 const freezeRoll=rollNamedPersistentStatusEffect(
                     monster,"freeze",[
-                        skill.freezeChance,player.level,monster.level,
+                        freezeChance,player.level,monster.level,
                         stats.intelligence,getMonsterEffectiveSpiritPoints(monster),
                         true,getMonsterRank(monster)
                     ],"monster",index,skill.name
                 );
-
-
                 if(freezeRoll.hit){
-
-                    applyFreezeEffect(
-                        monster,
-                        skill.freezeDuration
-                    );
-
-
-                    addBattleLog(
-                        ""+
-                        monster.name+
-                        "被冰封了！"
-                    );
-
+                    applyFreezeEffect(monster,freezeDuration);
+                    addBattleLog(monster.name+"被冰封了！");
+                }else if(!freezeRoll.duplicate){
+                    showMissEffect(false,index,"抵抗");
+                    addBattleLog(skill.name+"對"+monster.name+"沒有生效（抵抗）。");
                 }
-                else if(!freezeRoll.duplicate){
-
-                    showMissEffect(
-                        false,
-                        index,
-                        "抵抗"
-                    );
-
-
-                    addBattleLog(
-                        skill.name+
-                        "對"+
-                        monster.name+
-                        "沒有生效（抵抗）。"
-                    );
-
-                }
-
             }
-
-
             return;
-
         }
 
 
@@ -18238,9 +18238,22 @@ function processSingleMonsterAttack(monsterIndex,token){
           兩個角色身上。
     */
 
-    const skillTargetType=(usesSkill && castSkillId && skillDatabase[castSkillId])
-        ? skillDatabase[castSkillId].targetType
-        : "single";
+    const effectiveSkillLevel=
+        castSkillData
+        ?Math.min(
+            castSkillData.maxLevel||1,
+            Math.max(
+                1,
+                Number.isFinite(Number(monster.v141ForceSkillLevel))
+                    ?Math.floor(Number(monster.v141ForceSkillLevel))
+                    :Math.round(monster.level/8)
+            )
+        )
+        :0;
+
+    const skillTargetType=usesSkill&&castSkillData
+        ?getEffectiveSkillTargetType(castSkillData,effectiveSkillLevel)
+        :"single";
 
     const isRangeSkill=["tri","row","column","all"].includes(skillTargetType);
 
@@ -18319,7 +18332,9 @@ function processSingleMonsterAttack(monsterIndex,token){
             (castSkillData&&castSkillData.element)||monster.element||"normal",
             monsterIndex,
             skillTargetType==="all"?null:primaryTargetIndex,
-            attackTargetIndexes
+            attackTargetIndexes,
+            "player",
+            skillTargetType
         );
     }else{
         showMonsterSkillNameBadge(
@@ -18346,32 +18361,6 @@ function processSingleMonsterAttack(monsterIndex,token){
         );
 
     }
-
-
-    /*
-       ★ 技能等級沒有存在怪物資料裡（怪物
-       不像玩家有「學會、升級技能」的概念），
-       這裡用怪物等級換算出一個1~技能上限
-       之間的合理技能等級，等級越高的怪物
-       用起技能來威力也越強，不會所有等級
-       的怪物放同一個技能都一樣強。
-    */
-
-    const effectiveSkillLevel=
-
-        castSkillData
-        ?
-        Math.min(
-            castSkillData.maxLevel||1,
-            Math.max(
-                1,
-                Number.isFinite(Number(monster.v141ForceSkillLevel))
-                    ?Math.floor(Number(monster.v141ForceSkillLevel))
-                    :Math.round(monster.level/8)
-            )
-        )
-        :
-        0;
 
 
     /*
@@ -18419,6 +18408,28 @@ function processSingleMonsterAttack(monsterIndex,token){
 
             const targetIndex=
                 targetEntry.index;
+
+
+            if(isPureControlSkill){
+                const freezeChance=getSkillFreezeChanceAtLevel(castSkillData,effectiveSkillLevel);
+                const freezeDuration=getSkillFreezeDurationAtLevel(castSkillData,effectiveSkillLevel);
+                const targetFinalSpirit=getFinalBattleSpiritForPlayerTarget(targetCharacter,targetIndex);
+                const freezeResult=rollNamedPersistentStatusEffect(
+                    targetCharacter,"freeze",[
+                        freezeChance,monster.level,targetCharacter.level,
+                        getMonsterEffectiveAbilityPoints(monster,"intelligence"),
+                        targetFinalSpirit,true,"player",getPlayerStatusResistBonus(targetCharacter)
+                    ],"player",targetIndex,castSkillName
+                );
+                if(freezeResult.hit){
+                    applyFreezeEffect(targetCharacter,freezeDuration);
+                    addBattleLog((targetCharacter.id||"你")+"被冰封了！");
+                }else if(!freezeResult.duplicate){
+                    showMissEffect(true,targetIndex,"抵抗");
+                    addBattleLog(castSkillName+"對"+(targetCharacter.id||"你")+"沒有生效（抵抗）。");
+                }
+                return;
+            }
 
 
             const monsterHit=
@@ -21384,7 +21395,10 @@ function autoActionForCharacter(characterIndex,token){
     }
 
     const skill=skillDatabase[config.skill];
-    const spreads=skill && ["tri","row","column","all"].includes(skill.targetType);
+    const skillKey=getPartyCharacterKey(characterIndex);
+    const skillLevel=skill?getSkillLevel(skillKey,config.skill):0;
+    const effectiveTargetType=skill?getEffectiveSkillTargetType(skill,skillLevel):"single";
+    const spreads=skill && ["tri","row","column","all"].includes(effectiveTargetType);
     let target=aliveInBattle[0];
 
     /*
@@ -21397,7 +21411,7 @@ function autoActionForCharacter(characterIndex,token){
     if(spreads && typeof getSkillTargets==="function"){
         let bestCount=-1;
         aliveInBattle.forEach(candidate=>{
-            const hitCount=getSkillTargets(candidate,skill.targetType).length;
+            const hitCount=getSkillTargets(candidate,effectiveTargetType).length;
             if(hitCount>bestCount){
                 bestCount=hitCount;
                 target=candidate;
@@ -21406,7 +21420,6 @@ function autoActionForCharacter(characterIndex,token){
     }
 
     let action=config.skill||"normal";
-    const skillKey=getPartyCharacterKey(characterIndex);
 
     if(
         action!=="normal" &&
@@ -22081,49 +22094,40 @@ function castSecondaryCharacterSkill(characterIndex,skillId,centerIndex){
         return;
     }
 
-    const targets=getSkillTargets(centerIndex,skill.targetType);
+    const effectiveTargetType=getEffectiveSkillTargetType(skill,level);
+    const targets=getSkillTargets(centerIndex,effectiveTargetType);
 
     character.sp-=spCost;
     lungePlayerCard(characterIndex);
     showSkillNameBadge(
         skill.name,skill.element,characterIndex,
-        skill.targetType==="all"?null:centerIndex,targets
+        effectiveTargetType==="all"?null:centerIndex,targets,undefined,effectiveTargetType
     );
     setTimeout(()=>showPlayerSpPopup(spCost,characterIndex),500);
 
     const statBonus=skill.category==="magic" ? stats.magicAttack : stats.attack;
 
     if(!skill.baseDamage){
-        const resolvedIndex=findAliveTargetIndex(centerIndex);
-
-        if(resolvedIndex!==null && skill.freezeChance){
-            const monster=monsters[resolvedIndex];
+        const freezeChance=getSkillFreezeChanceAtLevel(skill,level);
+        const freezeDuration=getSkillFreezeDurationAtLevel(skill,level);
+        targets.forEach(index=>{
+            const monster=monsters[index];
+            if(!monster||!monster.alive||freezeChance<=0){ return; }
             const freezeResult=rollNamedPersistentStatusEffect(
-                monster,
-                "freeze",
-                [
-                    skill.freezeChance,
-                    character.level,
-                    monster.level,
-                    stats.intelligence,
-                    getMonsterEffectiveSpiritPoints(monster),
-                    true,
-                    getMonsterRank(monster)
-                ],
-                "monster",
-                resolvedIndex,
-                skill.name
+                monster,"freeze",[
+                    freezeChance,character.level,monster.level,
+                    stats.intelligence,getMonsterEffectiveSpiritPoints(monster),
+                    true,getMonsterRank(monster)
+                ],"monster",index,skill.name
             );
-
             if(freezeResult.hit){
-                applyFreezeEffect(monster,skill.freezeDuration);
+                applyFreezeEffect(monster,freezeDuration);
                 addBattleLog(monster.name+"被冰封了！");
             }else if(!freezeResult.duplicate){
-                showMissEffect(false,resolvedIndex,"抵抗");
+                showMissEffect(false,index,"抵抗");
                 addBattleLog(skill.name+"對"+monster.name+"沒有生效（抵抗）。");
             }
-        }
-
+        });
         updateUI();
         finishPlayerAction();
         return;
@@ -22561,7 +22565,8 @@ function castPlayer2Skill(skillId,centerIndex){
         return;
     }
 
-    const targets=getSkillTargets(centerIndex,skill.targetType);
+    const effectiveTargetType=getEffectiveSkillTargetType(skill,level);
+    const targets=getSkillTargets(centerIndex,effectiveTargetType);
 
     player2.sp-=spCost;
 
@@ -22573,8 +22578,10 @@ function castPlayer2Skill(skillId,centerIndex){
         skill.name,
         skill.element,
         1,
-        skill.targetType==="all"?null:centerIndex,
-        targets
+        effectiveTargetType==="all"?null:centerIndex,
+        targets,
+        undefined,
+        effectiveTargetType
     );
 
 
@@ -22627,82 +22634,27 @@ function castPlayer2Skill(skillId,centerIndex){
     */
 
     if(!skill.baseDamage){
-
-        const resolvedIndex=centerIndex;
-
-
-        if(resolvedIndex===null){
-            return;
-        }
-
-
-        selectedMonster=
-            resolvedIndex;
-
-
-        const monster=
-            monsters[resolvedIndex];
-
-
-        if(skill.freezeChance){
-
-            const freezeResult=
-                rollNamedPersistentStatusEffect(
-                    monster,
-                    "freeze",
-                    [
-                        skill.freezeChance,
-                        player2.level,
-                        monster.level,
-                        stats2.intelligence,
-                        getMonsterEffectiveSpiritPoints(monster),
-                        true,
-                        getMonsterRank(monster)
-                    ],
-                    "monster",
-                    resolvedIndex,
-                    skill.name
-                );
-
-
+        const freezeChance=getSkillFreezeChanceAtLevel(skill,level);
+        const freezeDuration=getSkillFreezeDurationAtLevel(skill,level);
+        targets.forEach(index=>{
+            const monster=monsters[index];
+            if(!monster||!monster.alive||freezeChance<=0){ return; }
+            const freezeResult=rollNamedPersistentStatusEffect(
+                monster,"freeze",[
+                    freezeChance,player2.level,monster.level,
+                    stats2.intelligence,getMonsterEffectiveSpiritPoints(monster),
+                    true,getMonsterRank(monster)
+                ],"monster",index,skill.name
+            );
             if(freezeResult.hit){
-
-                applyFreezeEffect(
-                    monster,
-                    skill.freezeDuration
-                );
-
-
-                addBattleLog(
-                    ""+
-                    monster.name+
-                    "被冰封了！"
-                );
-
+                applyFreezeEffect(monster,freezeDuration);
+                addBattleLog(monster.name+"被冰封了！");
+            }else if(!freezeResult.duplicate){
+                showMissEffect(false,index,"抵抗");
+                addBattleLog(skill.name+"對"+monster.name+"沒有生效（抵抗）。");
             }
-            else if(!freezeResult.duplicate){
-
-                showMissEffect(
-                    false,
-                    resolvedIndex,
-                    "抵抗"
-                );
-
-
-                addBattleLog(
-                    skill.name+
-                    "對"+
-                    monster.name+
-                    "沒有生效（抵抗）。"
-                );
-
-            }
-
-        }
-
-
+        });
         return;
-
     }
 
 
@@ -24702,11 +24654,11 @@ function activeBattleTargetIds(side,includeDefeated){
 /* Combat owns target selection. This contract is created before V142/V143 see
    the cast, so the VFX runtime never reads the action queue, hit order or live
    survivor bounds to guess its primary target or semantic footprint. */
-function createBattleTargetContract(side,skillName,elementType,actorIndex,targetId,targetIds,targetSideOverride){
+function createBattleTargetContract(side,skillName,elementType,actorIndex,targetId,targetIds,targetSideOverride,targetTypeOverride){
     const skill=skillName==="普通攻擊"
         ?{id:"normal",targetType:"single",category:"physical"}
         :findBattleSkillByPresentation(skillName,elementType);
-    const targetType=String(skill&&skill.targetType||"single");
+    const targetType=String(targetTypeOverride||skill&&skill.targetType||"single");
     const sameSide=/ally/i.test(targetType)||/heal|revive|buff/.test(String(skill&&skill.category||""));
     const targetSide=targetSideOverride==="player"||targetSideOverride==="monster"
         ?targetSideOverride
@@ -24796,10 +24748,10 @@ function getSkillNameBadgeDuration(skillName,elementType){
 }
 
 
-function showSkillNameBadge(skillName,elementType,characterIndex,targetId,targetIds,targetSide){
+function showSkillNameBadge(skillName,elementType,characterIndex,targetId,targetIds,targetSide,targetTypeOverride){
 
     const targetContract=createBattleTargetContract(
-        "player",skillName,elementType,Number.isInteger(characterIndex)?characterIndex:0,targetId,targetIds,targetSide
+        "player",skillName,elementType,Number.isInteger(characterIndex)?characterIndex:0,targetId,targetIds,targetSide,targetTypeOverride
     );
 
     const element =
@@ -24949,11 +24901,12 @@ function showMonsterSkillNameBadge(
     monsterIndex,
     targetId,
     targetIds,
-    targetSide
+    targetSide,
+    targetTypeOverride
 ){
 
     const targetContract=createBattleTargetContract(
-        "monster",skillName,elementType,Number.isInteger(monsterIndex)?monsterIndex:0,targetId,targetIds,targetSide
+        "monster",skillName,elementType,Number.isInteger(monsterIndex)?monsterIndex:0,targetId,targetIds,targetSide,targetTypeOverride
     );
 
     const element=
@@ -37680,21 +37633,13 @@ const V_ASSET_VERSION="173.72";
         primeExpPoolSafety();
     },{once:true});
 
-    function installExpPoolVisibilityObserver(){
-        const pool=document.getElementById("homeExpPoolCard");
-        const root=document.getElementById("homePage")||pool;
-        if(!root||typeof MutationObserver==="undefined"){ primeExpPoolSafety(); return; }
-        const observer=new MutationObserver(()=>{
-            if(expPoolSafetyUiReady){ observer.disconnect(); return; }
-            primeExpPoolSafety();
-        });
-        observer.observe(root,{subtree:true,childList:true,attributes:true,attributeFilter:["class","style","hidden"]});
+    function primeExpPoolSafetyWhenDomReady(){
         primeExpPoolSafety();
     }
     if(document.readyState==="loading"){
-        document.addEventListener("DOMContentLoaded",installExpPoolVisibilityObserver,{once:true});
+        document.addEventListener("DOMContentLoaded",primeExpPoolSafetyWhenDomReady,{once:true});
     }else{
-        installExpPoolVisibilityObserver();
+        primeExpPoolSafetyWhenDomReady();
     }
 })();
 

@@ -8966,10 +8966,37 @@ body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scro
     pointer-events:none;
     z-index:18070 !important;
 }
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion > .turn-target-row.skill-picker-open,
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion > .turn-target-row.skill-picker-open{
+    bottom:calc(var(--battle-command-visual-height) + 44px);
+    opacity:1;
+}
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion > .turn-target-row.battle-item-open{
     opacity:1;
 }
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar.skill-quick-bar{
+    left:14px;
+    right:14px;
+    top:-24px;
+    bottom:10px;
+    z-index:18065 !important;
+    gap:3px;
+}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar .skill-quick-close{
+    flex-basis:28px;
+    height:28px;
+    line-height:26px;
+}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar .skill-quick-grid{gap:4px;}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar .skill-quick-button{
+    min-height:62px;
+    padding:4px 2px;
+}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar .skill-quick-button .sq-icon-wrap{
+    width:34px;
+    height:34px;
+    flex-basis:34px;
+}
+
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion.target-selecting > .turn-target-row{
     top:auto;
     bottom:calc(var(--battle-target-prompt-height) + var(--battle-target-select-gap));
@@ -9689,11 +9716,12 @@ body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scro
 #game-stage .team-relic-detail-actions button{min-height:44px;border:1px solid #bc8a3e;border-radius:8px;background:linear-gradient(180deg,#543719,#24150a);color:#ffe09a;font-size:15px;font-weight:900;}
 #game-stage .team-relic-detail-actions button:disabled{opacity:.42;filter:grayscale(.5);}
 /* Relic battle cinematic owner: dim -> identity -> real target reveal -> VFX -> restore. */
-#game-stage #battlePage .team-relic-battle-presentation{position:fixed;inset:0;overflow:visible;pointer-events:none;}
-#game-stage #battlePage .team-relic-battle-dim{position:absolute;inset:0;z-index:6090;background:#000;opacity:0;transition:opacity .36s ease;}
+#game-stage #battlePage .team-relic-battle-presentation{position:absolute;inset:0;overflow:visible;pointer-events:none;}
+#game-stage #battlePage .team-relic-battle-dim{position:absolute;inset:0;z-index:18090;background:#000;opacity:0;transition:opacity .36s ease;}
 #game-stage #battlePage .team-relic-battle-presentation.dim-visible .team-relic-battle-dim{opacity:.75;}
 #game-stage #battlePage .team-relic-battle-presentation.releasing .team-relic-battle-dim{opacity:0;transition-duration:.42s;}
-#game-stage #battlePage .team-relic-battle-cutin{position:absolute;left:50%;top:50%;z-index:6120;display:flex;flex-direction:column;align-items:center;justify-content:center;width:min(72vw,280px);margin:0;padding:0;border:0;border-radius:0;background:none;box-shadow:none;opacity:0;transform:translate(-50%,-50%) scale(.96);transition:opacity .36s ease,transform .36s ease;}
+body.team-relic-cinematic-active > .v143-skill-stage{z-index:18130!important;}
+#game-stage #battlePage .team-relic-battle-cutin{position:absolute;left:50%;top:50%;z-index:18120;display:flex;flex-direction:column;align-items:center;justify-content:center;width:min(72vw,280px);margin:0;padding:0;border:0;border-radius:0;background:none;box-shadow:none;opacity:0;transform:translate(-50%,-50%) scale(.96);transition:opacity .36s ease,transform .36s ease;}
 #game-stage #battlePage .team-relic-battle-presentation.identity-visible .team-relic-battle-cutin{opacity:1;transform:translate(-50%,-50%) scale(1);}
 #game-stage #battlePage .team-relic-battle-presentation.identity-exiting .team-relic-battle-cutin,
 #game-stage #battlePage .team-relic-battle-presentation.vfx-running .team-relic-battle-cutin,
@@ -9704,12 +9732,12 @@ body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scro
 #game-stage #battlePage .team-relic-battle-cutin-copy strong{display:block;max-width:100%;color:#ffe5ad;font:900 clamp(28px,8vw,36px)/1.2 "Noto Serif TC",serif;letter-spacing:.08em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 #game-stage #battlePage .v-fixed-enemy-slot.team-relic-battle-target-layer,
 #game-stage #battlePage .v-fixed-ally-slot.team-relic-battle-target-layer,
-#game-stage #battlePage .v-fixed-boss-footprint.team-relic-battle-target-layer{z-index:6105!important;}
+#game-stage #battlePage .v-fixed-boss-footprint.team-relic-battle-target-layer{z-index:18110!important;}
 #game-stage #battlePage .battle-player.team-relic-battle-target-focus,
-#game-stage #battlePage .battle-monster.team-relic-battle-target-focus{z-index:6105!important;opacity:.30!important;filter:brightness(.24) saturate(.55)!important;transition:opacity .42s ease,filter .42s ease!important;}
+#game-stage #battlePage .battle-monster.team-relic-battle-target-focus{z-index:18110!important;opacity:.30!important;filter:brightness(.24) saturate(.55)!important;transition:opacity .42s ease,filter .42s ease!important;}
 #game-stage #battlePage .battle-player.team-relic-battle-target-focus.team-relic-battle-target-focus-visible,
 #game-stage #battlePage .battle-monster.team-relic-battle-target-focus.team-relic-battle-target-focus-visible{opacity:1!important;filter:brightness(1.08) saturate(1.04)!important;}
-#game-stage .team-relic-battle-banner{position:absolute;z-index:6100;left:50%;top:48%;transform:translate(-50%,-50%) scale(.94);display:flex;align-items:center;justify-content:center;gap:9px;min-width:210px;max-width:380px;padding:10px 16px;border:1px solid rgba(229,183,87,.9);border-radius:20px;background:linear-gradient(90deg,rgba(9,8,7,.97),rgba(65,43,17,.97),rgba(9,8,7,.97));color:#f7dda0;box-shadow:0 7px 22px rgba(0,0,0,.65),0 0 18px rgba(211,158,58,.2);opacity:0;pointer-events:none;transition:opacity .13s ease,transform .18s ease;}
+#game-stage .team-relic-battle-banner{position:absolute;z-index:18115;left:50%;top:48%;transform:translate(-50%,-50%) scale(.94);display:flex;align-items:center;justify-content:center;gap:9px;min-width:210px;max-width:380px;padding:10px 16px;border:1px solid rgba(229,183,87,.9);border-radius:20px;background:linear-gradient(90deg,rgba(9,8,7,.97),rgba(65,43,17,.97),rgba(9,8,7,.97));color:#f7dda0;box-shadow:0 7px 22px rgba(0,0,0,.65),0 0 18px rgba(211,158,58,.2);opacity:0;pointer-events:none;transition:opacity .13s ease,transform .18s ease;}
 #game-stage .team-relic-battle-banner.show{opacity:1;transform:translate(-50%,-50%) scale(1);}
 #game-stage .team-relic-battle-banner b{font:900 17px/22px "Noto Serif TC",serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 #game-stage .team-relic-battle-icon{width:34px;height:34px;flex:0 0 34px;display:grid;place-items:center;border:1px solid #c59643;border-radius:9px;background:#21150a;overflow:hidden;}

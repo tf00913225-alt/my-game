@@ -1782,11 +1782,11 @@
         return {character:character,key:key,level:level,cost:cost,stats:stats};
     }
 
-    function animateSupportCast(state,characterIndex,skill,targetId,targetIds,targetSide){
+    function animateSupportCast(state,characterIndex,skill,targetId,targetIds,targetSide,targetTypeOverride){
         state.character.sp=Math.max(0,numeric(state.character.sp)-state.cost);
         if(typeof lungePlayerCard==="function"){ lungePlayerCard(characterIndex); }
         if(typeof showSkillNameBadge==="function"){
-            showSkillNameBadge(skill.name,skill.element,characterIndex,targetId,targetIds,targetSide);
+            showSkillNameBadge(skill.name,skill.element,characterIndex,targetId,targetIds,targetSide,targetTypeOverride);
         }
         if(typeof showPlayerSpPopup==="function"){
             setTimeout(()=>showPlayerSpPopup(state.cost,characterIndex),500);
@@ -1875,7 +1875,7 @@
         });
 
         const primaryTarget=selectedSupportPrimary(characterIndex,queued,requested);
-        animateSupportCast(state,characterIndex,skill,primaryTarget,requested,"player");
+        animateSupportCast(state,characterIndex,skill,primaryTarget,requested,"player",skill.targetType);
         const extra=buffFields(skill,state.level);
         eligible.forEach(index=>{
             const target=getPartyCharacterByIndex(index);
@@ -1946,7 +1946,7 @@
         const targets=requestedBuffTargets(characterIndex,queued,skill);
         if(!targets.length){ return finishSupport(skill.name+"目前沒有可治療的存活目標。"); }
         const primaryTarget=selectedSupportPrimary(characterIndex,queued,targets);
-        animateSupportCast(state,characterIndex,skill,primaryTarget,targets,"player");
+        animateSupportCast(state,characterIndex,skill,primaryTarget,targets,"player",skill.targetType);
         let hpTotal=0;
         let spTotal=0;
         let cleansedTotal=0;
@@ -1988,7 +1988,7 @@
         const targetStats=getPartyBattleStats(targetIndex);
         if(!targetStats){ return finishSupport("復活目標資料無法讀取。"); }
 
-        animateSupportCast(state,characterIndex,skill,targetIndex,[targetIndex],"player");
+        animateSupportCast(state,characterIndex,skill,targetIndex,[targetIndex],"player",skill.targetType);
         const exSkill=typeof skillDatabase!=="undefined"?skillDatabase[skill.element+"EX"]:null;
         const exLevel=Math.max(0,Math.floor(numeric(getSkillLevel(state.key,skill.element+"EX"))));
         const multiplier=exSkill&&exLevel>0&&numeric(exSkill.healBonusPercent)>0
@@ -2104,7 +2104,10 @@
             ?enemyIndex
             :(Number.isInteger(queued.targetAlly)?queued.targetAlly:targets[0]);
         const primaryTarget=targets.includes(selectedPrimary)?selectedPrimary:targets[0];
-        animateSupportCast(state,characterIndex,skill,primaryTarget,targets,targetSide);
+        const presentationTargetType=targets.length>1
+            ?(targetSide==="monster"?"tri":"allyTri")
+            :(targetSide==="monster"?"single":"ally");
+        animateSupportCast(state,characterIndex,skill,primaryTarget,targets,targetSide,presentationTargetType);
 
         let removed=0;
         targets.forEach(index=>{
@@ -2173,42 +2176,6 @@
         };
     }
 
-    /* Embedded shield bonuses from damage skills also cannot refresh a live buff. */
-    function snapshotActivePartyBuffs(){
-        return partyIndexes().map(index=>{
-            const character=getPartyCharacterByIndex(index);
-            const buffs=(character&&character.activeBuffs||[]).filter(buff=>buff&&numeric(buff.turnsLeft)>0);
-            return {
-                character:character,
-                records:buffs.map(buff=>({reference:buff,values:Object.assign({},buff)}))
-            };
-        }).filter(entry=>entry.character&&entry.records.length);
-    }
-
-    function restoreActivePartyBuffs(snapshot){
-        snapshot.forEach(entry=>{
-            const protectedTypes=new Set(entry.records.map(record=>record.reference.type));
-            const current=(entry.character.activeBuffs||[]).filter(buff=>
-                !buff||!protectedTypes.has(buff.type)
-            );
-            entry.records.forEach(record=>{
-                Object.assign(record.reference,record.values);
-                current.push(record.reference);
-            });
-            entry.character.activeBuffs=current;
-        });
-    }
-
-    ["castDamageSkill","castSecondaryCharacterSkill","castPlayer2Skill"].forEach(functionName=>{
-        const previous=window[functionName];
-        if(typeof previous!=="function"){ return; }
-        window[functionName]=function(){
-            const snapshot=snapshotActivePartyBuffs();
-            try{ return previous.apply(this,arguments); }
-            finally{ restoreActivePartyBuffs(snapshot); }
-        };
-    });
-
     /* Enemy Rage uses one visual trio and never the complete ten-card roster. */
     function activeMonsterTeamBuff(monster,type){
         if(typeof window.v173HasNamedPersistentState==="function"){
@@ -2219,12 +2186,13 @@
         ));
     }
 
-    function bestMonsterRageTargets(casterIndex){
+    function bestMonsterRageTargeting(casterIndex){
         const indexes=typeof currentBattleMonsters!=="undefined"?currentBattleMonsters:[];
         const alive=indexes.filter(monsterAlive);
         const owner=battlefieldSlots();
         const snapshot=activeFormationSnapshot(indexes);
         let best=[];
+        let bestPrimary=null;
         let bestScore=-1;
         alive.forEach(center=>{
             const trio=owner&&snapshot
@@ -2232,9 +2200,9 @@
                 :[center];
             const eligible=trio.filter(target=>!activeMonsterTeamBuff(monsters[target],"rage"));
             const score=eligible.length*100+(center===casterIndex?20:(trio.includes(casterIndex)?10:0));
-            if(score>bestScore){ best=trio; bestScore=score; }
+            if(score>bestScore){ best=trio; bestPrimary=center; bestScore=score; }
         });
-        return best.slice(0,3);
+        return {targets:best.slice(0,3),primaryIndex:bestPrimary};
     }
 
     function tryMonsterRage(monsterIndex){
@@ -2244,12 +2212,13 @@
         const controlled=(typeof isMonsterFrozen==="function"&&isMonsterFrozen(caster))||
             (typeof isMonsterPetrified==="function"&&isMonsterPetrified(caster));
         if(controlled||Math.random()>.55){ return false; }
-        const targets=bestMonsterRageTargets(monsterIndex);
+        const targeting=bestMonsterRageTargeting(monsterIndex);
+        const targets=targeting.targets;
         const cost=Math.max(0,numeric(skill.spCost));
         if(!targets.length||numeric(caster.sp)<cost){ return false; }
         caster.sp=Math.max(0,numeric(caster.sp)-cost);
         if(typeof showMonsterSkillNameBadge==="function"){
-            showMonsterSkillNameBadge(skill.name,skill.element||caster.element,monsterIndex);
+            showMonsterSkillNameBadge(skill.name,skill.element||caster.element,monsterIndex,targeting.primaryIndex,targets,"monster",skill.targetType);
         }
         let appliedCount=0;
         targets.forEach(index=>{
@@ -2921,6 +2890,7 @@
     function syncContextNavigation(){
         if(typeof document==="undefined"){ return; }
         const page=document.getElementById("dungeonPage");
+        const trainingPage=document.getElementById("trainingPage");
         const app=document.getElementById("app");
         const patrolNav=document.getElementById("mapPageNav");
         if(patrolNav){
@@ -2928,8 +2898,9 @@
         }
         const gameplayPageId=activeGameplayPageId();
         const dungeonActive=!!(page&&page.classList&&page.classList.contains("active"));
+        const trainingActive=!!(trainingPage&&trainingPage.classList&&trainingPage.classList.contains("active"));
         const gameplayActive=!!gameplayPageId;
-        const contextActive=dungeonActive||gameplayActive;
+        const contextActive=dungeonActive||gameplayActive||trainingActive;
         if(app&&app.classList&&typeof app.classList.toggle==="function"){
   app.classList.toggle("v148-context-nav-active",contextActive);
         }
@@ -2961,12 +2932,16 @@
         if(!nav||!contextActive){ return; }
         if(nav.classList&&typeof nav.classList.add==="function"){ nav.classList.add("v148-context-nav"); }
 
-        const returnAction=gameplayActive&&!dungeonActive
+        const returnAction=trainingActive
+  ?"showPage('home')"
+  :(gameplayActive&&!dungeonActive
   ?"v148ReturnFromGameplay()"
-  :dungeonReturnAction(abyssMapActive,abyssSelectionActive);
-        const mode=gameplayActive&&!dungeonActive
+  :dungeonReturnAction(abyssMapActive,abyssSelectionActive));
+        const mode=trainingActive
+  ?"training"
+  :(gameplayActive&&!dungeonActive
   ?"gameplay:"+gameplayPageId
-  :(abyssMapActive?"abyss-map":(abyssSelectionActive?"abyss-selection":"daily"));
+  :(abyssMapActive?"abyss-map":(abyssSelectionActive?"abyss-selection":"daily")));
         renderContextNav(nav,returnAction,mode);
     }
 
@@ -5265,7 +5240,7 @@
 
         monster.sp=Math.max(0,numeric(monster.sp)-numeric(skill.spCost));
         if(typeof showMonsterSkillNameBadge==="function"){
-            showMonsterSkillNameBadge(skill.name,skill.element||"light",monsterIndex);
+            showMonsterSkillNameBadge(skill.name,skill.element||"light",monsterIndex,null,allies.map(entry=>entry.index),"monster",skill.targetType);
         }
         if(skillId==="yuanZuBlessing"){
             let removed=0;
@@ -5299,8 +5274,8 @@
             });
             if(typeof addBattleLog==="function"){
                 addBattleLog("極帝天尊施放元祖賜福：全體各恢復100 HP、100 SP（實際 "+healedTotal+" HP／"+
-                    restoredSpTotal+" SP）；"+blessedTargets+"名友方獲得閃避提升35%，持續2回合；"+
-                    cleansedTargets+"名目標觸發35%獨立淨化，共解除"+removed+"個負面狀態。");
+                    restoredSpTotal+" SP）；"+blessedTargets+"名友方獲得閃避提升"+numeric(skill.evasionBonusPercent)+"%，持續"+
+                    numeric(skill.duration)+"回合；"+cleansedTargets+"名目標觸發35%獨立淨化，共解除"+removed+"個負面狀態。");
             }
         }else{ return false; }
         if(typeof updateUI==="function"){ updateUI(); }
@@ -5319,11 +5294,18 @@
         return currentBattleMonsters.map(index=>({index:index,monster:monsters[index]})).filter(entry=>!!entry.monster);
     }
 
-    function allyTriTargets(monsterIndex){
+    function allyTriTargeting(monsterIndex){
         const living=currentAbyssEntries();
-        return typeof window.v141GetMonsterAllyTriTargets==="function"
+        if(typeof window.v141GetMonsterAllyTriTargeting==="function"){
+            return window.v141GetMonsterAllyTriTargeting(monsterIndex,living);
+        }
+        const entries=typeof window.v141GetMonsterAllyTriTargets==="function"
             ?window.v141GetMonsterAllyTriTargets(monsterIndex,living)
             :living.slice(0,3);
+        return {entries:entries,primaryIndex:entries[0]?entries[0].index:null};
+    }
+    function allyTriTargets(monsterIndex){
+        return allyTriTargeting(monsterIndex).entries;
     }
 
     function hasNamedState(monster,stateName){
@@ -5371,14 +5353,15 @@
         const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
         const skill=typeof skillDatabase!=="undefined"?skillDatabase.healSpell:null;
         if(!monster||(monster.v141SupportSkillIds||[]).indexOf("healSpell")<0||monster.alive===false||numeric(monster.hp)<=0||!skill||hardControlled(monster)){ return false; }
-        const allies=allyTriTargets(monsterIndex);
+        const targeting=allyTriTargeting(monsterIndex);
+        const allies=targeting.entries;
         const needsHeal=currentAbyssEntries().some(entry=>
             monsterBaseHp(entry.monster)<monsterBaseMaxHp(entry.monster)*.70
         );
         if(!needsHeal||!supportCastAllowed(monster,forceCast)||numeric(monster.sp)<numeric(skill.spCost)){ return false; }
         monster.sp=Math.max(0,numeric(monster.sp)-numeric(skill.spCost));
         if(typeof showMonsterSkillNameBadge==="function"){
-            showMonsterSkillNameBadge(skill.name,skill.element||"water",monsterIndex);
+            showMonsterSkillNameBadge(skill.name,skill.element||"water",monsterIndex,targeting.primaryIndex,allies.map(entry=>entry.index),"monster",skill.targetType);
         }
         const level=finalSkillLevel(monster,skill);
         const hpAmount=levelValue(
@@ -5387,7 +5370,6 @@
             numeric(skill.baseHeal)+numeric(skill.healPerLevel)*(level-1)
         );
         const spPercent=levelValue(skill.spRestorePercentByLevel,level,0);
-        let cleansed=0;
         let restoredSpTotal=0;
         allies.forEach(entry=>{
             const ally=entry.monster;
@@ -5397,13 +5379,6 @@
                 :Math.floor(Math.max(0,numeric(ally.maxSP))*spPercent/100);
             const restored=spAmount>0?restoreMonsterSp(ally,spAmount):0;
             restoredSpTotal+=restored;
-            if(skill.cleanseAll&&Array.isArray(ally.statusEffects)){
-                const before=ally.statusEffects.length;
-                ally.statusEffects=ally.statusEffects.filter(effect=>
-                    effect&&(effect.dispellable===false||effect.uncleansable===true)
-                );
-                cleansed+=before-ally.statusEffects.length;
-            }
             if(healed>0&&typeof showMonsterHit==="function"){ showMonsterHit(entry.index,healed,"heal"); }
             if(restored>0&&typeof showDamagePopup==="function"&&typeof document!=="undefined"){
                 const card=document.getElementById("battleMonster"+entry.index);
@@ -5413,8 +5388,7 @@
         });
         if(typeof addBattleLog==="function"){
             addBattleLog("北帝天尊施放治療術：同排最多"+allies.length+"名友方各回復"+
-                hpAmount+" HP，其他目標依最大SP恢復"+spPercent+"%（合計"+restoredSpTotal+" SP），施放者本人不恢復SP"+
-                (skill.cleanseAll?"，並解除"+cleansed+"個可解除負面狀態":"")+"。");
+                hpAmount+" HP，其他目標依最大SP恢復"+spPercent+"%（合計"+restoredSpTotal+" SP），施放者本人不恢復SP。");
         }
         if(typeof updateUI==="function"){ updateUI(); }
         if(typeof finishPlayerAction==="function"){ finishPlayerAction(); }
@@ -5433,7 +5407,7 @@
         if(!target||!supportCastAllowed(monster,forceCast)||numeric(monster.sp)<numeric(skill.spCost)){ return false; }
         monster.sp=Math.max(0,numeric(monster.sp)-numeric(skill.spCost));
         if(typeof showMonsterSkillNameBadge==="function"){
-            showMonsterSkillNameBadge(skill.name,skill.element||"water",monsterIndex);
+            showMonsterSkillNameBadge(skill.name,skill.element||"water",monsterIndex,target.index,[target.index],"monster",skill.targetType);
         }
         const level=finalSkillLevel(monster,skill);
         const percent=levelValue(skill.reviveHealPercentByLevel,level,100);
@@ -5468,11 +5442,13 @@
         const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
         const skill=typeof skillDatabase!=="undefined"?skillDatabase.rockWall:null;
         if(!monster||(monster.v141SupportSkillIds||[]).indexOf("rockWall")<0||monster.alive===false||numeric(monster.hp)<=0||!skill||hardControlled(monster)){ return false; }
-        const targets=allyTriTargets(monsterIndex).filter(entry=>!hasNamedState(entry.monster,"rockWall"));
+        const targeting=allyTriTargeting(monsterIndex);
+        const requestedTargets=targeting.entries;
+        const targets=requestedTargets.filter(entry=>!hasNamedState(entry.monster,"rockWall"));
         if(!targets.length||!supportCastAllowed(monster,forceCast)||numeric(monster.sp)<numeric(skill.spCost)){ return false; }
         monster.sp=Math.max(0,numeric(monster.sp)-numeric(skill.spCost));
         if(typeof showMonsterSkillNameBadge==="function"){
-            showMonsterSkillNameBadge(skill.name,skill.element||"earth",monsterIndex);
+            showMonsterSkillNameBadge(skill.name,skill.element||"earth",monsterIndex,targeting.primaryIndex,requestedTargets.map(entry=>entry.index),"monster",skill.targetType);
         }
         const level=finalSkillLevel(monster,skill);
         const duration=Math.max(1,Math.floor(levelValue(skill.durationByLevel,level,skill.duration||4)));
@@ -5512,7 +5488,7 @@
         if(!targets.length||!supportCastAllowed(monster,forceCast)||numeric(monster.sp)<numeric(skill.spCost)){ return false; }
         monster.sp=Math.max(0,numeric(monster.sp)-numeric(skill.spCost));
         if(typeof showMonsterSkillNameBadge==="function"){
-            showMonsterSkillNameBadge(skill.name,skill.element||"wind",monsterIndex);
+            showMonsterSkillNameBadge(skill.name,skill.element||"wind",monsterIndex,targets[0].index,[targets[0].index],"monster",skill.targetType);
         }
         const level=finalSkillLevel(monster,skill);
         const duration=Math.max(1,Math.floor(levelValue(skill.durationByLevel,level,skill.duration||2)));
@@ -5542,11 +5518,13 @@
         if(!monster||!(monster.v141SupportSkillIds||[]).includes("dodgeSkill")||monster.element!=="wind"||monster.alive===false||numeric(monster.hp)<=0||!skill||hardControlled(monster)){
             return false;
         }
-        const targets=allyTriTargets(monsterIndex).filter(entry=>!hasNamedState(entry.monster,"風行"));
+        const targeting=allyTriTargeting(monsterIndex);
+        const requestedTargets=targeting.entries;
+        const targets=requestedTargets.filter(entry=>!hasNamedState(entry.monster,"風行"));
         if(!targets.length||!supportCastAllowed(monster,forceCast)||numeric(monster.sp)<numeric(skill.spCost)){ return false; }
         monster.sp=Math.max(0,numeric(monster.sp)-numeric(skill.spCost));
         if(typeof showMonsterSkillNameBadge==="function"){
-            showMonsterSkillNameBadge(skill.name,skill.element||"wind",monsterIndex);
+            showMonsterSkillNameBadge(skill.name,skill.element||"wind",monsterIndex,targeting.primaryIndex,requestedTargets.map(entry=>entry.index),"monster",skill.targetType);
         }
         const level=finalSkillLevel(monster,skill);
         const duration=Math.max(1,Math.floor(levelValue(skill.durationByLevel,level,skill.duration||3)));
@@ -10030,7 +10008,12 @@ ensureFunctionalStyles();runRepairs();
     function descriptionFor(skill){
         if(!skill){ return ""; }
         const max=Math.max(1,Math.floor(numeric(skill.maxLevel,1)));
-        const parts=["範圍："+targetLabel(skill,1)];
+        const firstTarget=targetLabel(skill,1);
+        const finalTarget=targetLabel(skill,max);
+        const parts=["範圍："+firstTarget];
+        if(max>1&&finalTarget!==firstTarget){
+            parts.push("滿級範圍："+finalTarget);
+        }
         if(PLAYER_DAMAGE_SKILL_ID_SET.has(skill.id)){
             parts.push("Lv1傷害 "+skillDamageValue(skill,1));
             parts.push("Lv5突破 "+skillDamageValue(skill,5));
@@ -11236,6 +11219,9 @@ ensureFunctionalStyles();runRepairs();
         clearRelicTargetFocus();
         const node=relicCutinNode||(typeof document!=="undefined"&&document.getElementById?document.getElementById("teamRelicBattlePresentation"):null);
         if(node&&typeof node.remove==="function"){ node.remove(); }
+        if(typeof document!=="undefined"&&document.body&&document.body.classList){
+            document.body.classList.remove("team-relic-cinematic-active");
+        }
         relicCutinNode=null;
     }
     function relicTargetCard(side,index){
@@ -11266,7 +11252,7 @@ ensureFunctionalStyles();runRepairs();
         if(!hasLiveBattlePresentationHost()||!def){ return Promise.resolve(null); }
         cleanupRelicCutin();
         const battlePage=document.getElementById("battlePage");
-        const host=battlePage&&typeof battlePage.querySelector==="function"?battlePage.querySelector(".battle-wrap"):null;
+        const host=battlePage||null;
         if(!host){ return Promise.resolve(null); }
         const node=document.createElement("div");
         node.id="teamRelicBattlePresentation";
@@ -11277,6 +11263,7 @@ ensureFunctionalStyles();runRepairs();
             '<img src="'+esc(def.battleIconPath||def.iconPath||"")+'" alt=""></span>'+
             '<span class="team-relic-battle-cutin-copy"><strong>'+esc(def.name)+'</strong></span></div>';
         host.appendChild(node);
+        if(document.body&&document.body.classList){ document.body.classList.add("team-relic-cinematic-active"); }
         relicCutinNode=node;
         const dim=()=>{ if(node===relicCutinNode){ node.classList.add("dim-visible"); } };
         if(typeof requestAnimationFrame==="function"){ requestAnimationFrame(dim); }else{ dim(); }
