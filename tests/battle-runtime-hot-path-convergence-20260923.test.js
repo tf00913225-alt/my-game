@@ -82,7 +82,8 @@ function block(source,startToken,endToken){
 
 {
     assert.match(mainCss,/\.battle-info\{[\s\S]*?background:transparent;[\s\S]*?border:0;[\s\S]*?border-radius:0/);
-    assert.match(fixedCss,/\.battle-info-region\.is-expanded\{[\s\S]*?border:1px solid rgba\(138,106,58,\.72\);[\s\S]*?background:rgba\(8,8,8,\.96\);[\s\S]*?box-shadow:none/);
+    assert.match(fixedCss,/\.battle-info-region\.is-expanded\{[\s\S]*?border:0;[\s\S]*?background:transparent;[\s\S]*?box-shadow:none/);
+    assert.match(fixedCss,/\.battle-info-region\.is-expanded > #battleInfo\{[\s\S]*?background:rgba\(0,0,0,\.92\) !important;[\s\S]*?border:1px solid rgba\(138,106,58,\.68\) !important/);
     assert.match(mainCss,/#battlePage\{[\s\S]*?--battle-command-row-height:66px;[\s\S]*?--battle-command-art-overhang:34px;[\s\S]*?--battle-command-visual-height:calc\(var\(--battle-command-row-height\) \+ var\(--battle-command-art-overhang\)\);[\s\S]*?--battle-turn-row-height:36px;/);
     assert.doesNotMatch(mainCss,/--battle-center-min-height/);
     assert.doesNotMatch(fixedCss,/--battle-command-row-height:66px|--battle-command-art-overhang:34px/);
