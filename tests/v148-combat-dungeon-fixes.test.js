@@ -250,18 +250,12 @@ test("Revive restores HP and shows its popup only at the official hit frame",()=
     assert.deepEqual(logs,["乙被復活術復活，恢復100 HP。"]);
 });
 
-test("differently named Freeze and Petrify coexist without replacing each other",()=>{
-    const context=baseContext({
-        applyFreezeEffect(entity,duration){
-            entity.statusEffects.push({type:"freeze",turnsLeft:duration});
-        },
-        applyMonsterDebuff(entity,type,duration){
-            entity.statusEffects.push({type,turnsLeft:duration});
-        }
-    });
-    const entity={statusEffects:[{type:"freeze",turnsLeft:2}]};
-    context.applyMonsterDebuff(entity,"petrify",3,0);
-    assert.deepEqual(entity.statusEffects.map(effect=>effect.type),["freeze","petrify"]);
+test("Freeze and Petrify exclusivity is owned by the canonical persistent-state gate",()=>{
+    assert.match(coreSource,/const EXCLUSIVE_HARD_CONTROL_STATE_NAMES=Object\.freeze\(\["冰封","石化"\]\)/);
+    assert.match(coreSource,/function getPersistentStateConflict\(entity,stateOrType\)[\s\S]*?EXCLUSIVE_HARD_CONTROL_STATE_NAMES\.includes\(requestedName\)/);
+    assert.match(coreSource,/function canApplyNamedPersistentState\(entity,stateOrType[\s\S]*?getPersistentStateConflict\(entity,stateOrType\)/);
+    assert.match(coreSource,/function applyFreezeEffect\(monster,duration\)[\s\S]*?canApplyNamedPersistentState\([\s\S]*?monster,"freeze"/);
+    assert.match(coreSource,/function applyMonsterDebuff\([\s\S]*?EXCLUSIVE_HARD_CONTROL_STATE_NAMES\.includes\(persistentName\)[\s\S]*?canApplyNamedPersistentState/);
 });
 
 test("Earth Shield visibly and actually reflects fifty percent",()=>{

@@ -493,18 +493,28 @@ test("final normal hit and status-effect bounds override the historical floors",
     );
 });
 
-test("same-name states miss without refresh while differently named hard controls coexist",()=>{
+test("Freeze and Petrify are mutually exclusive without refreshing the active hard control",()=>{
     const runtime=loadFinalRuntime();
     const result=evaluateJson(runtime.context,`(function(){
         const target={name:"狀態目標",hp:100,maxHP:100,alive:true,statusEffects:[]};
         applyBurnEffect(target,2,3);
         applyBurnEffect(target,2,8);
         const burn=target.statusEffects.filter(effect=>effect.type==="burn");
-        applyFreezeEffect(target,5);
-        applyMonsterDebuff(target,"petrify",3,0);
-        const afterPetrify=target.statusEffects.map(effect=>effect.type);
-        applyFreezeEffect(target,5);
-        const afterFreeze=target.statusEffects.map(effect=>effect.type);
+
+        const freezeApplied=applyFreezeEffect(target,5);
+        const freezeBefore=target.statusEffects.find(effect=>effect.type==="freeze").turnsLeft;
+        const petrifyWhileFrozen=applyMonsterDebuff(target,"petrify",3,0);
+        const freezeAgain=applyFreezeEffect(target,2);
+        const freezeAfter=target.statusEffects.find(effect=>effect.type==="freeze").turnsLeft;
+        const whileFrozen=target.statusEffects.map(effect=>effect.type);
+
+        target.statusEffects=target.statusEffects.filter(effect=>effect.type!=="freeze");
+        const petrifyAfterRelease=applyMonsterDebuff(target,"petrify",3,0);
+        const petrifyBefore=target.statusEffects.find(effect=>effect.type==="petrify").turnsLeft;
+        const freezeWhilePetrified=applyFreezeEffect(target,4);
+        const petrifyAgain=applyMonsterDebuff(target,"petrify",1,0);
+        const petrifyAfter=target.statusEffects.find(effect=>effect.type==="petrify").turnsLeft;
+        const whilePetrified=target.statusEffects.map(effect=>effect.type);
 
         monsters.splice(0,monsters.length,{
             name:"極帝天尊",element:"light",level:100,hp:1000,maxHP:1000,sp:500,maxSP:1000,
@@ -514,12 +524,43 @@ test("same-name states miss without refresh while differently named hard control
         currentBattleMonsters.splice(0,currentBattleMonsters.length,0);
         Math.random=function(){ return 0; };
         const action=v141TryMonsterSpecialAction(0);
-        return {burn:burn,afterPetrify:afterPetrify,afterFreeze:afterFreeze,action:action,sp:monsters[0].sp};
+        return {
+            burn:burn,
+            freezeApplied:freezeApplied,freezeBefore:freezeBefore,
+            petrifyWhileFrozen:petrifyWhileFrozen,freezeAgain:freezeAgain,freezeAfter:freezeAfter,
+            whileFrozen:whileFrozen,
+            petrifyAfterRelease:petrifyAfterRelease,petrifyBefore:petrifyBefore,
+            freezeWhilePetrified:freezeWhilePetrified,petrifyAgain:petrifyAgain,petrifyAfter:petrifyAfter,
+            whilePetrified:whilePetrified,action:action,sp:monsters[0].sp
+        };
     })()`);
     assert.deepEqual(result,{
         burn:[{type:"burn",turnsLeft:2,percent:3,statusName:"燃燒"}],
-        afterPetrify:["burn","freeze","petrify"],afterFreeze:["burn","freeze","petrify"],
+        freezeApplied:true,freezeBefore:5,
+        petrifyWhileFrozen:false,freezeAgain:false,freezeAfter:5,
+        whileFrozen:["burn","freeze"],
+        petrifyAfterRelease:true,petrifyBefore:3,
+        freezeWhilePetrified:false,petrifyAgain:false,petrifyAfter:3,
+        whilePetrified:["burn","petrify"],
         action:true,sp:555
+    });
+});
+
+test("exclusive hard-control conflict is rejected before the status probability roll",()=>{
+    const runtime=loadFinalRuntime();
+    const result=evaluateJson(runtime.context,`(function(){
+        const target={name:"硬控目標",alive:true,hp:100,statusEffects:[
+            {type:"freeze",statusName:"冰封",turnsLeft:4}
+        ]};
+        let rolls=0;
+        rollStatusEffectHit=function(){ rolls++; return true; };
+        const blocked=v173RollNamedPersistentStatusEffect(
+            target,"petrify",[100,1,1,0,0,true,"regular"],"monster",0,"石化"
+        );
+        return {blocked:blocked,rolls:rolls,turns:target.statusEffects[0].turnsLeft};
+    })()`);
+    assert.deepEqual(result,{
+        blocked:{duplicate:true,hit:false},rolls:0,turns:4
     });
 });
 
@@ -542,6 +583,58 @@ test("same-name detection runs before the probability roll and keeps the origina
     assert.deepEqual(result,{
         duplicate:{duplicate:true,hit:false},different:{duplicate:false,hit:true},rolls:1,
         effects:[{type:"burn",statusName:"燃燒",turnsLeft:2,percent:3}]
+    });
+});
+
+test("exclusive hard-control MISS uses the formal status-MISS presentation and names both states",()=>{
+    const runtime=loadFinalRuntime();
+    const result=evaluateJson(runtime.context,`(function(){
+        const popups=[],logs=[];
+        showMissEffect=function(isPlayer,index,text){ popups.push([isPlayer,index,text]); };
+        addBattleLog=function(message){ logs.push(message); };
+        const target={name:"測試目標",alive:true,hp:100,statusEffects:[
+            {type:"freeze",statusName:"冰封",turnsLeft:2}
+        ]};
+        const allowed=v173CanApplyNamedPersistentState(
+            target,"petrify","monster",0,"石化術"
+        );
+        return {allowed:allowed,popups:popups,logs:logs};
+    })()`);
+    assert.deepEqual(result,{
+        allowed:false,
+        popups:[[false,0,"狀態MISS"]],
+        logs:["石化術：測試目標目前已有【冰封】，新的【石化】MISS。"]
+    });
+});
+
+test("player, regular monster, Boss and Abyss share the same Freeze-Petrify gate",()=>{
+    const runtime=loadFinalRuntime();
+    const result=evaluateJson(runtime.context,`(function(){
+        let rolls=0;
+        rollStatusEffectHit=function(){ rolls++; return true; };
+        showMissEffect=function(){};
+        addBattleLog=function(){};
+        const cases=[
+            {side:"player",index:0,entity:{id:"玩家",hp:100,statusEffects:[{type:"freeze",turnsLeft:2}]}},
+            {side:"monster",index:0,entity:{name:"一般怪",alive:true,hp:100,statusEffects:[{type:"petrify",turnsLeft:2}]}},
+            {side:"monster",index:1,entity:{name:"Boss",rank:"boss",alive:true,hp:100,statusEffects:[{type:"freeze",turnsLeft:2}]}},
+            {side:"monster",index:2,entity:{name:"深淵怪",v141Abyss:true,alive:true,hp:100,statusEffects:[{type:"petrify",turnsLeft:2}]}}
+        ];
+        const results=cases.map(item=>{
+            const next=item.entity.statusEffects[0].type==="freeze"?"petrify":"freeze";
+            const before=item.entity.statusEffects[0].turnsLeft;
+            const roll=v173RollNamedPersistentStatusEffect(
+                item.entity,next,[100,1,1,0,0,true,item.entity.rank||"regular"],
+                item.side,item.index,"硬控測試"
+            );
+            return {roll:roll,before:before,after:item.entity.statusEffects[0].turnsLeft};
+        });
+        return {rolls:rolls,results:results};
+    })()`);
+    assert.equal(result.rolls,0);
+    result.results.forEach(entry=>{
+        assert.deepEqual(entry.roll,{duplicate:true,hit:false});
+        assert.equal(entry.after,entry.before);
     });
 });
 

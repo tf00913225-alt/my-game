@@ -35,6 +35,9 @@
 - 「持續 N 回合」必須提供目標 N 個真正有效的行動／限制機會；不得由無關的大回合邊界預先扣除。
 - Buff（增益）在目標實際行動結束後才消耗 1 回合；施放 Buff 的那次行動不消耗剛建立的 Buff。尚未行動的受益者可立刻在自己的行動享受效果，已行動者必須保留完整 N 次後續有效行動。
 - Freeze（冰封）與 Petrify（石化）以實際阻止行動次數計算；N 回合必須阻止 N 次行動，玩家與所有怪物階級使用相同語意。
+- Freeze（冰封）與 Petrify（石化）同屬 `Exclusive Hard Control Group`。任一者有效存在時，再施加 Freeze 或 Petrify 都必須在命中骰點與狀態寫入前走正式「狀態MISS」流程；不得覆蓋、刷新、延長、互轉或先寫入再刪除。正式 Gate 為 `js/00-main.js::canApplyNamedPersistentState()`／`rollNamedPersistentStatusEffect()`，`applyFreezeEffect()` 與 `applyMonsterDebuff()` 也必須受同一 Gate 保護。
+- Persistent Body Status Visual（角色持續狀態圖）唯一 owner 為 `js/39-v143-skill-animation.js`。Body Visual 分為 `hard-control-base` 與 `rotating`：Freeze/Petrify 固定、`animation:none`、不進 2 秒輪播，且永遠位於一般 Body Status 下方；其他既有 Body Status 維持 2 秒嚴格循序輪播。HUD Status Icon 是第三層資訊面，不得與 Body Rotation 混為同一 pool。
+- 同一 Runtime entity 若同時存在有效 Freeze + Petrify，代表 Gameplay Contract violation；視覺層只能報告違規，不得替錯誤資料選一張、隱藏一張或自行正規化。死亡、正式解除／淨化後 Base Cover 必須在正式 UI 同步時立即移除；Cast VFX 仍使用既有 deferred status lifecycle，Persistent Cover 不得提前出現。
 - Burn（燃燒）是獨立 DoT（持續傷害）生命週期：套用當下不額外跳傷害，之後在正式 Status Tick（狀態結算點）恰好造成 N 次傷害。
 - Frostbite（凍傷）及其他有回合數的軟性 Debuff（減益）不得再以玩家專用 `deferFirstTick` 形成不同算法；同樣在受影響單位的有效行動邊界消耗。
 - `FourSymbolsDurationLifecycle` 是持續回合扣除的共用協調入口；新技能不得另建全域 round-start 倒數或 timer（計時器）繞過它。

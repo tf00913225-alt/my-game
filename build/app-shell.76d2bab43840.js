@@ -14399,11 +14399,13 @@ function getSkillTargets(centerIndex,targetType){
 /* =====================================================
    Persistent-state identity
 
-   Every lasting effect is identified by its formal state name.  A target
+   Every lasting effect is identified by its formal state name. A target
    that already owns an active state with the same name rejects the new
-   application before any status-chance roll is made.  The rule is shared by
-   skills, monsters and talismans; instant damage/healing is settled by the
-   caller before it reaches this helper.
+   application before any status-chance roll is made. Freeze and Petrify are
+   additionally members of one exclusive hard-control group: either active
+   member blocks both names until it expires or is formally removed. The rule
+   is shared by skills, monsters, Boss/Abyss actions, items and relics that
+   enter the canonical persistent-state pipeline.
 ===================================================== */
 
 const PERSISTENT_STATE_NAMES=Object.freeze({
@@ -14431,6 +14433,8 @@ const PERSISTENT_STATE_NAMES=Object.freeze({
     rockWall:"岩石壁壘",
     barrier:"結界"
 });
+
+const EXCLUSIVE_HARD_CONTROL_STATE_NAMES=Object.freeze(["冰封","石化"]);
 
 function getPersistentStateName(stateOrType){
     const raw=stateOrType&&typeof stateOrType==="object"
@@ -14477,6 +14481,25 @@ function hasNamedPersistentState(entity,stateOrType){
     );
 }
 
+function getPersistentStateConflict(entity,stateOrType){
+    const requestedName=getPersistentStateName(stateOrType);
+    if(!requestedName){ return null; }
+    const conflictNames=EXCLUSIVE_HARD_CONTROL_STATE_NAMES.includes(requestedName)
+        ?EXCLUSIVE_HARD_CONTROL_STATE_NAMES
+        :[requestedName];
+    const entry=getPersistentStateEntries(entity).find(candidate=>
+        isActivePersistentStateEntry(candidate)&&
+        conflictNames.includes(getPersistentStateName(candidate))
+    );
+    if(!entry){ return null; }
+    return {
+        requestedName:requestedName,
+        existingName:getPersistentStateName(entry),
+        entry:entry,
+        exclusiveHardControl:EXCLUSIVE_HARD_CONTROL_STATE_NAMES.includes(requestedName)
+    };
+}
+
 function markPersistentStateName(entry,stateOrType){
     if(entry&&typeof entry==="object"){
         entry.statusName=getPersistentStateName(stateOrType||entry);
@@ -14484,24 +14507,43 @@ function markPersistentStateName(entry,stateOrType){
     return entry;
 }
 
-function reportPersistentStateMiss(entity,stateOrType,targetSide,targetIndex,sourceName){
+function reportPersistentStateMiss(entity,stateOrType,targetSide,targetIndex,sourceName,conflict){
     const stateName=getPersistentStateName(stateOrType);
+    const existingName=conflict&&conflict.existingName||stateName;
     if(typeof showMissEffect==="function"&&Number.isInteger(targetIndex)){
         showMissEffect(targetSide==="player",targetIndex,"狀態MISS");
     }
     if(typeof addBattleLog==="function"){
         const targetName=entity&&(entity.name||entity.id)||"目標";
+        const existingPrefix=existingName===stateName?"已有":"目前已有";
         addBattleLog(
-            (sourceName?sourceName+"：":"")+targetName+"已有【"+stateName+"】，新的【"+stateName+"】MISS。"
+            (sourceName?sourceName+"：":"")+targetName+existingPrefix+"【"+existingName+"】，新的【"+stateName+"】MISS。"
         );
     }
     return false;
 }
 
 function canApplyNamedPersistentState(entity,stateOrType,targetSide,targetIndex,sourceName){
-    return hasNamedPersistentState(entity,stateOrType)
-        ?reportPersistentStateMiss(entity,stateOrType,targetSide,targetIndex,sourceName)
+    const conflict=getPersistentStateConflict(entity,stateOrType);
+    return conflict
+        ?reportPersistentStateMiss(entity,stateOrType,targetSide,targetIndex,sourceName,conflict)
         :true;
+}
+
+function getPersistentStateTargetContext(entity){
+    const partyIndex=typeof getPartyCharacterIndex==="function"
+        ?getPartyCharacterIndex(entity)
+        :-1;
+    if(Number.isInteger(partyIndex)&&partyIndex>=0){
+        return {targetSide:"player",targetIndex:partyIndex};
+    }
+    const monsterIndex=typeof monsters!=="undefined"&&Array.isArray(monsters)
+        ?monsters.indexOf(entity)
+        :-1;
+    if(monsterIndex>=0){
+        return {targetSide:"monster",targetIndex:monsterIndex};
+    }
+    return {targetSide:null,targetIndex:undefined};
 }
 
 function getMonsterTimedStatusResistanceBonus(monster){
@@ -14549,6 +14591,7 @@ function rollNamedPersistentStatusEffect(
 window.v173PersistentStateNames=PERSISTENT_STATE_NAMES;
 window.v173GetPersistentStateName=getPersistentStateName;
 window.v173HasNamedPersistentState=hasNamedPersistentState;
+window.v173GetPersistentStateConflict=getPersistentStateConflict;
 window.v173CanApplyNamedPersistentState=canApplyNamedPersistentState;
 window.v173MarkPersistentStateName=markPersistentStateName;
 window.v173RollNamedPersistentStatusEffect=rollNamedPersistentStatusEffect;
@@ -14603,7 +14646,10 @@ function applyBurnEffect(monster,duration,percent){
 
 function applyFreezeEffect(monster,duration){
 
-    if(hasNamedPersistentState(monster,"freeze")){
+    const targetContext=getPersistentStateTargetContext(monster);
+    if(!canApplyNamedPersistentState(
+        monster,"freeze",targetContext.targetSide,targetContext.targetIndex
+    )){
         return false;
     }
 
@@ -14670,7 +14716,15 @@ function applyMonsterDebuff(
     extraFields
 ){
 
-    if(hasNamedPersistentState(monster,type)){
+    const persistentName=getPersistentStateName(type);
+    if(EXCLUSIVE_HARD_CONTROL_STATE_NAMES.includes(persistentName)){
+        const targetContext=getPersistentStateTargetContext(monster);
+        if(!canApplyNamedPersistentState(
+            monster,type,targetContext.targetSide,targetContext.targetIndex
+        )){
+            return false;
+        }
+    }else if(hasNamedPersistentState(monster,type)){
         return false;
     }
 
