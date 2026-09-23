@@ -181,6 +181,190 @@
         return result;
     }
 
+    function escapeText(value){
+        return String(value==null?"":value)
+            .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+            .replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+    }
+
+    function targetLabel(skill,level){
+        if(!skill){ return "—"; }
+        if(skill.id==="freeze"){
+            return level>=5?"敵方中、左、右最多3名":"同一直列前、後最多2名敵人";
+        }
+        if(skill.id==="purifyMind"){
+            return level>=3?"我方或敵方中、左、右最多3名":"我方或敵方1名";
+        }
+        const labels={
+            single:"敵方1名",tri:"同排中、左、右最多3名",row:"敵方同排",
+            column:"同一直列前、後最多2名",all:"敵方全體",
+            self:"自己",ally:"我方1名",allyTri:"我方中、左、右最多3名",
+            allyAll:"我方全體",deadAlly:"死亡友方1名",none:"被動"
+        };
+        return labels[skill.targetType]||"技能目標";
+    }
+
+    function skillDamageValue(skill,level){
+        if(!PLAYER_DAMAGE_SKILL_ID_SET.has(skill&&skill.id)){ return null; }
+        return typeof getSkillDamageAtLevel==="function"
+            ?getSkillDamageAtLevel(skill,level)
+            :null;
+    }
+
+    function damageStatusParts(skill,level){
+        const parts=[];
+        const lv=clampLevel(level,skill&&skill.maxLevel||1);
+        if(numeric(skill&&skill.burnChance)>0&&Array.isArray(skill.burnPercentByLevel)){
+            parts.push("燃燒："+numeric(skill.burnChance)+"%基礎機率，"+
+                levelValue(skill.burnPercentByLevel,lv,0)+"%最大HP／回合，"+
+                Math.max(1,numeric(skill.burnDuration)||1)+"回合");
+        }
+        if(numeric(skill&&skill.frostbiteChance)>0){
+            parts.push("凍傷："+numeric(skill.frostbiteChance)+"%基礎機率，"+
+                Math.max(1,numeric(skill.frostbiteDuration)||1)+"回合");
+        }
+        if(Array.isArray(skill&&skill.lifestealPercentByLevel)){
+            parts.push("吸血："+levelValue(skill.lifestealPercentByLevel,lv,0)+"%實際傷害回復自身HP");
+        }
+        if(Array.isArray(skill&&skill.defenseDownByLevel)){
+            parts.push("破防："+numeric(skill.defenseDownChance)+"%基礎機率，防禦-"+
+                levelValue(skill.defenseDownByLevel,lv,0)+"%，"+
+                Math.max(1,numeric(skill.defenseDownDuration)||1)+"回合");
+        }
+        if(Array.isArray(skill&&skill.damageDownByLevel)){
+            parts.push("殤風："+numeric(skill.damageDownChance)+"%基礎機率，傷害-"+
+                levelValue(skill.damageDownByLevel,lv,0)+"%，"+
+                Math.max(1,numeric(skill.damageDownDuration)||1)+"回合");
+        }
+        if(Array.isArray(skill&&skill.agilityDownByLevel)){
+            parts.push("重力："+numeric(skill.agilityDownChance)+"%基礎機率，敏捷-"+
+                levelValue(skill.agilityDownByLevel,lv,0)+"%，"+
+                Math.max(1,numeric(skill.agilityDownDuration)||1)+"回合");
+        }
+        if(Array.isArray(skill&&skill.missBonusByLevel)){
+            parts.push("暈眩："+numeric(skill.stunChance)+"%基礎機率，命中降低"+
+                levelValue(skill.missBonusByLevel,lv,0)+"%，"+
+                Math.max(1,numeric(skill.stunDuration)||1)+"回合");
+        }
+        if(Array.isArray(skill&&skill.petrifyChanceByLevel)){
+            parts.push("石化："+levelValue(skill.petrifyChanceByLevel,lv,0)+"%基礎機率，"+
+                Math.max(1,numeric(skill.petrifyDuration)||1)+"回合");
+        }
+        if(Array.isArray(skill&&skill.selfShieldByLevel)){
+            parts.push("自身護盾："+levelValue(skill.selfShieldByLevel,lv,0)+"，"+
+                Math.max(1,numeric(skill.shieldDuration)||1)+"回合");
+        }
+        if(Array.isArray(skill&&skill.allyShieldByLevel)){
+            parts.push("我方護盾："+levelValue(skill.allyShieldByLevel,lv,0)+"，"+
+                Math.max(1,numeric(skill.shieldDuration)||1)+"回合");
+        }
+        return parts;
+    }
+
+    function supportEffectText(skill,level){
+        if(!skill){ return ""; }
+        const lv=clampLevel(level,skill.maxLevel||1);
+        if(skill.id==="fireSoulResonance"){
+            return "炎勢使火系直接攻擊傷害+"+levelValue(skill.momentumBonusByLevel,lv,0)+
+                "%，基礎3回合"+(lv>=5?"；爆擊或成功新增燃燒時每回合最多延長1回合、整次最多+3回合":"");
+        }
+        if(skill.id==="bloodBurnArt"){
+            return "消耗最大HP "+levelValue(skill.hpCostPercentByLevel,lv,0)+
+                "%；接下來3次成功施放的火系直接攻擊傷害+"+
+                levelValue(skill.directDamageBonusByLevel,lv,0)+"%；不強化DoT與免費追擊";
+        }
+        if(skill.id==="healSpell"){
+            return "恢復"+levelValue(skill.healHpByLevel,lv,0)+" HP，並恢復目標最大SP的"+
+                levelValue(skill.spRestorePercentByLevel,lv,0)+
+                "%；解除所有可解除負面狀態；施放者不恢復自身SP";
+        }
+        if(skill.id==="revive"){
+            return "復活1名死亡友方並恢復最大HP的"+
+                levelValue(skill.reviveHealPercentByLevel,lv,0)+"%；不恢復SP";
+        }
+        if(skill.id==="freeze"){
+            return levelValue(skill.freezeChanceByLevel,lv,0)+"%基礎機率冰封，持續"+
+                levelValue(skill.freezeDurationByLevel,lv,0)+"回合；完全無法行動，受硬控命中上限與冰封／石化互斥限制";
+        }
+        if(skill.id==="purifyMind"){
+            return "立即清除所有可解除的臨時Buff、Debuff、Shield、Barrier與異常狀態";
+        }
+        if(skill.id==="dodgeSkill"){
+            return "閃躲率+"+levelValue(skill.evasionBonusPercentByLevel,lv,0)+"%，持續3回合";
+        }
+        if(skill.id==="stealthSkill"){
+            return "隱身"+levelValue(skill.durationByLevel,lv,2)+"回合；無法被單體技能選中，仍受範圍技能影響";
+        }
+        if(skill.id==="dinghaishenzhen"){
+            return "異常狀態抗性+"+levelValue(skill.statusResistBonusByLevel,lv,0)+
+                "%、命中+"+levelValue(skill.accuracyBonusPercentByLevel,lv,0)+"%，持續3回合";
+        }
+        if(skill.id==="rockWall"){
+            return "防禦+"+levelValue(skill.defenseBonusPercentByLevel,lv,0)+"%，持續4回合";
+        }
+        if(skill.id==="earthShield"){
+            return "反傷"+levelValue(skill.reflectPercentByLevel,lv,0)+"%，持續"+
+                levelValue(skill.durationByLevel,lv,3)+"回合；同名不可疊加或刷新";
+        }
+        if(skill.id==="barrier"){
+            return "抵擋"+levelValue(skill.barrierBlockCountByLevel,lv,3)+"次直接傷害，最長"+
+                levelValue(skill.durationByLevel,lv,3)+"回合；DoT不抵擋且不消耗次數";
+        }
+        if(skill.id==="rage"&&Array.isArray(skill.critBonusByLevel)){
+            const chance=levelValue(skill.critChanceBonusByLevel||skill.critBonusByLevel,lv,0);
+            const damage=levelValue(skill.critDamageBonusByLevel||skill.critBonusByLevel,lv,0);
+            return "爆擊率+"+chance+"%、爆擊傷害+"+damage+"%，持續"+
+                Math.max(1,numeric(skill.duration)||1)+"回合";
+        }
+        return String(skill.description||"");
+    }
+
+    function effectText(skill,level){
+        if(!skill){ return ""; }
+        const damage=skillDamageValue(skill,level);
+        const parts=[];
+        if(damage!==null){ parts.push("傷害 "+damage); }
+        if(skill.id==="freeze"||skill.category==="buff"||skill.category==="heal"||skill.category==="revive"){
+            const support=supportEffectText(skill,level);
+            if(support){ parts.push(support); }
+        }else{
+            parts.push(...damageStatusParts(skill,level));
+        }
+        if(skill.category==="passive"&&skill.description){ parts.push(skill.description); }
+        return parts.filter(Boolean).join("｜");
+    }
+
+    function descriptionFor(skill){
+        if(!skill){ return ""; }
+        const max=Math.max(1,Math.floor(numeric(skill.maxLevel,1)));
+        const parts=["範圍："+targetLabel(skill,1)];
+        if(PLAYER_DAMAGE_SKILL_ID_SET.has(skill.id)){
+            parts.push("Lv1傷害 "+skillDamageValue(skill,1));
+            parts.push("Lv5突破 "+skillDamageValue(skill,5));
+            parts.push("Lv10突破 "+skillDamageValue(skill,10));
+            const extras=damageStatusParts(skill,Math.min(max,10));
+            if(extras.length){ parts.push(extras.join("；")); }
+        }else{
+            parts.push(supportEffectText(skill,1));
+            if(max>1){ parts.push("最高 Lv"+max); }
+        }
+        if(skill.spCost!==undefined){ parts.push("SP "+numeric(skill.spCost)); }
+        return parts.filter(Boolean).join("。")+"。";
+    }
+
+    function levelBreakdownHtml(skill){
+        if(!skill){ return ""; }
+        const max=Math.max(1,Math.floor(numeric(skill.maxLevel,1)));
+        return Array.from({length:max},(_,index)=>{
+            const level=index+1;
+            const breakthrough=PLAYER_DAMAGE_SKILL_ID_SET.has(skill.id)&&(level===5||level===10)
+                ?"（突破×1.5）":"";
+            return '<div style="display:flex;gap:6px;padding:3px 0;border-bottom:1px solid rgba(240,180,41,.12);">'+
+                '<span style="flex:0 0 40px;color:#f0b429;font-weight:bold;">Lv.'+level+'</span>'+
+                '<span style="flex:1;">'+escapeText(effectText(skill,level)+breakthrough)+'</span></div>';
+        }).join("");
+    }
+
     function applyFinalProgressionData(){
         if(typeof skillDatabase==="undefined"||!skillDatabase){ return false; }
         Object.entries(FINAL_PROGRESSION).forEach(([skillId,fields])=>{
@@ -276,6 +460,15 @@
             delete barrier.barrierBlockCount; delete barrier.duration;
             barrier.description="我方1人獲得結界，抵擋3/3/3/4/5次直接傷害，最長持續3/3/3/4/5回合；燃燒、毒等DoT不抵擋且不消耗次數。SP 40。";
         }
+        Object.values(skillDatabase).forEach(skill=>{
+            if(!skill||!skill.id){ return; }
+            if(PLAYER_DAMAGE_SKILL_ID_SET.has(skill.id)||[
+                "rage","fireSoulResonance","bloodBurnArt","healSpell","revive","freeze","purifyMind",
+                "dodgeSkill","stealthSkill","dinghaishenzhen","rockWall","earthShield","barrier"
+            ].includes(skill.id)){
+                skill.description=descriptionFor(skill);
+            }
+        });
         return true;
     }
 
@@ -957,6 +1150,10 @@
         upgradeCosts:SKILL_UPGRADE_COST_BY_TARGET_LEVEL,
         castFireTactical:castNewFireTactical,
         withPlayerDirectSkillCast:withPlayerDirectSkillCast,
+        targetLabel:targetLabel,
+        effectText:effectText,
+        descriptionFor:descriptionFor,
+        levelBreakdownHtml:levelBreakdownHtml,
         getRequiredCharacterLevelForSkillLevel:getRequiredCharacterLevelForSkillLevel,
         getUpgradeCostForTargetLevel:getUpgradeCostForTargetLevel,
         applyFinalData:applyFinalProgressionData
