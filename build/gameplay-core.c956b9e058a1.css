@@ -8999,6 +8999,7 @@ body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scro
     gap:0;
     width:100% !important;
     height:var(--battle-info-panel-height) !important;
+    box-sizing:border-box;
     padding:0 4px 4px;
     overflow:visible !important;
     border:0;
