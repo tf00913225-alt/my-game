@@ -156,12 +156,12 @@ jobs:
         run: |
           npm run build
           mkdir -p artifacts/build-sync
+          cp index.html artifacts/build-sync/index.html
           cp asset-manifest.json artifacts/build-sync/asset-manifest.json
-          cp build/asset-manifest.json artifacts/build-sync/build-asset-manifest.json
-          cp build/gameplay-core.*.js artifacts/build-sync/
-          cp build/gameplay-core.*.css artifacts/build-sync/
-          git diff -- asset-manifest.json config/feature-manifest.json scripts/build-production.mjs 'build/feature-adventure-*' 'build/gameplay-core.*' > artifacts/build-sync/build-sync.diff || true
-          find build -maxdepth 1 -type f \( -name 'feature-adventure-*' -o -name 'gameplay-core.*' \) -print | sort > artifacts/build-sync/build-files.txt
+          cp config/feature-manifest.json artifacts/build-sync/feature-manifest.json
+          cp -R build artifacts/build-sync/build
+          git diff -- index.html asset-manifest.json config/feature-manifest.json build > artifacts/build-sync/build-sync.diff || true
+          find build -type f -print | sort > artifacts/build-sync/build-files.txt
 
       - name: Upload build synchronization evidence
         if: failure() && steps.build_sync.outcome == 'failure'
