@@ -54,7 +54,7 @@
         "__PATROL_ASSETS__"
       ],
       "dependencies": [
-        "gameplay-core"
+        "feature-relic-runtime"
       ]
     },
     "feature-abyss": {
@@ -65,7 +65,7 @@
         "__BUILD_ABYSS_STYLE__"
       ],
       "dependencies": [
-        "gameplay-core"
+        "feature-relic-runtime"
       ]
     },
     "feature-boss-relic": {
@@ -78,7 +78,7 @@
         "__BUILD_RELIC_PROGRESSION_STYLE__"
       ],
       "dependencies": [
-        "gameplay-core"
+        "feature-relic-runtime"
       ]
     },
     "feature-adventure": {
@@ -91,6 +91,17 @@
         "__BUILD_ADVENTURE_STYLE__"
       ],
       "dependencies": [
+        "feature-relic-runtime"
+      ]
+    },
+    "feature-relic-runtime": {
+      "scripts": [
+        "__BUILD_RELIC_RUNTIME__"
+      ],
+      "styles": [
+        "__BUILD_RELIC_RUNTIME_STYLE__"
+      ],
+      "dependencies": [
         "gameplay-core"
       ]
     }
@@ -99,7 +110,7 @@
     "home": "app-shell",
     "character-creation": "app-shell",
     "patrol": "feature-patrol",
-    "battle": "gameplay-core",
+    "battle": "feature-relic-runtime",
     "inventory": "gameplay-core",
     "equipment": "gameplay-core",
     "dungeon": "feature-boss-relic",
