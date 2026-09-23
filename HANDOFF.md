@@ -6,7 +6,7 @@
 - 火系：炎魂共鳴 SP45、炎勢 12/15/18/21/25%，Lv5 爆擊／成功新增燃燒每正式回合最多延長1、整次最多+3，免費追擊不延長；焚血訣 SP35、HP成本5/10/15/20/25%，接下來3次非免費火系直接施放 +5/10/15/20/35%，DoT／免費追擊不使用也不消耗。
 - 水／風／土支援技能均改讀正式 ByLevel 欄位；冰封 Lv5 才由 column 升為 tri；淨心訣 Lv3 才升3目標且雙方都清除所有可解除臨時戰鬥狀態；結界只擋直接傷害並依 3/3/3/4/5 次與回合數。
 - 敵方岩石壁壘已由全體 `currentAbyssEntries()` 改回正式 `allyTriTargets()`，最多3名；V144 反向 `requires:["barrier"]`／`allyAll` 舊資料已退休。
-- Team Relic Trigger Engine 從 `feature-boss-relic` 拆為 `feature-relic-runtime`；battle／patrol／abyss／adventure／boss-tower 等 Battle feature 都透過 dependency 在正式進場前 execute 同一 `js/60-team-relic-system.js`。Boss／Tower／養成沒有塞回 Critical Boot。
+- Team Relic Trigger Engine 已從 `feature-boss-relic` 拆出並固定放入 `gameplay-core` 最末端；所有正式戰鬥入口因此在可執行前已同步取得同一 `js/60-team-relic-system.js`。Boss／Tower／養成仍 lazy，沒有塞回 Critical Boot，也沒有新增 Battle Start 非同步補載。
 - 10 件 `runtimeReady:false` 秘寶 hydrate／equip／progression 全部 fail closed；玩家只見「效果尚未覺醒／能力尚未開放」。寒泉玉珮、九龍神火罩、岩岳鎮印、烈陽神珠說明已同步實際 Trigger／Scalar。
 - 專項測試：`tests/skill-relic-owner-convergence-20260923.test.js`；既有 `tests/skill-progression-rebalance.test.js` 同步新規格，兩者已加入 dev PR 必跑 CI。
 - Requirement Batch：`release/requirement-batches/2026-09-23-skill-relic-runtime-owner-convergence.json`；目前 IMPLEMENTED，待 PR CI、deterministic build、Repository checks 後升級 VERIFIED。
