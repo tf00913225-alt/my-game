@@ -5693,7 +5693,10 @@ function closeCustomDropdown(selectId){
 
 document.addEventListener(
     "click",
-    ()=>{
+    event=>{
+        if(event&&event.target&&typeof event.target.closest==="function"&&event.target.closest("#battlePage")){
+            return;
+        }
 
         Object.keys(
             customDropdownRegistry
@@ -11478,172 +11481,180 @@ function beginCharacterTurn(token){
    不用另外點「技能」按鈕才看得到。
 */
 
+function bumpBattleRuntimeMetric(name,amount){
+    if(typeof window==="undefined"){ return; }
+    const metrics=window.FourSymbolsBattleRuntimeMetrics;
+    if(!metrics||metrics.enabled!==true||!metrics.counters){ return; }
+    const delta=Number.isFinite(Number(amount))?Number(amount):1;
+    metrics.counters[name]=(Number(metrics.counters[name])||0)+delta;
+}
+
+if(typeof window!=="undefined"&&!window.FourSymbolsBattleRuntimeMetrics){
+    const counters={
+        updateUI:0,
+        updateMonsterUI:0,
+        syncMonsterPortraits:0,
+        quickBarPopulate:0,
+        quickBarRebuild:0,
+        repairScheduler:0
+    };
+    window.FourSymbolsBattleRuntimeMetrics={
+        enabled:false,
+        counters:counters,
+        reset:function(){ Object.keys(counters).forEach(key=>{ counters[key]=0; }); },
+        snapshot:function(){ return Object.assign({},counters); }
+    };
+}
+
+function ensureSkillQuickBarButtons(bar){
+    let buttons=Array.from(bar.children).filter(node=>node.classList&&node.classList.contains("skill-quick-button"));
+    if(bar.children.length===4&&buttons.length===4){
+        return buttons;
+    }
+
+    bar.replaceChildren();
+
+    for(let i=0;i<4;i++){
+        const button=document.createElement("button");
+        button.className="skill-quick-button";
+        button.type="button";
+        button.dataset.slot=String(i);
+        button.innerHTML=
+            '<span class="sq-icon-wrap"><span class="sq-icon-image"></span><span class="sq-icon-fallback"></span><span class="sq-sp-block" hidden>SP不足</span></span>'+
+            '<span class="sq-name"></span>'+
+            '<span class="sq-cost"></span>'+
+            '<span class="v135-sq-scope"></span>';
+        button.onclick=()=>{
+            const skillId=button.dataset.skillId||"";
+            if(skillId&&!button.disabled){
+                prepareAction(skillId);
+            }
+        };
+        bar.appendChild(button);
+    }
+
+    bumpBattleRuntimeMetric("quickBarRebuild");
+    buttons=Array.from(bar.children);
+    return buttons;
+}
+
+function syncSkillQuickBarButton(button,skillId,skill,skillLevel,spCost,enoughSP){
+    const iconImage=button.querySelector(".sq-icon-image");
+    const iconFallback=button.querySelector(".sq-icon-fallback");
+    const spBlock=button.querySelector(".sq-sp-block");
+    const nameNode=button.querySelector(".sq-name");
+    const costNode=button.querySelector(".sq-cost");
+    const scopeNode=button.querySelector(".v135-sq-scope");
+
+    button.dataset.skillId=skillId||"";
+
+    if(!skillId||!skill){
+        button.disabled=true;
+        button.classList.remove("sp-insufficient");
+        if(iconImage){
+            iconImage.style.backgroundImage="";
+            iconImage.hidden=true;
+        }
+        if(iconFallback){
+            iconFallback.innerHTML="";
+            iconFallback.hidden=false;
+        }
+        if(spBlock){ spBlock.hidden=true; }
+        if(nameNode){ nameNode.textContent=skillId?"資料錯誤":"（空）"; }
+        if(costNode){ costNode.textContent="—"; }
+        if(scopeNode){ scopeNode.textContent=""; }
+        return;
+    }
+
+    button.disabled=!enoughSP;
+    button.classList.toggle("sp-insufficient",!enoughSP);
+
+    const iconBackground=
+        typeof getSkillIconBackgroundImage==="function"
+        ?getSkillIconBackgroundImage(skillId)
+        :"";
+
+    if(iconImage){
+        iconImage.hidden=!iconBackground;
+        if(iconBackground&&iconImage.style.backgroundImage!==iconBackground){
+            iconImage.style.backgroundImage=iconBackground;
+        }else if(!iconBackground){
+            iconImage.style.backgroundImage="";
+        }
+    }
+
+    if(iconFallback){
+        const fallback=!iconBackground&&typeof getElementIconHTML==="function"
+            ?getElementIconHTML(skill.element)
+            :"";
+        iconFallback.hidden=!!iconBackground;
+        if(iconFallback.innerHTML!==fallback){ iconFallback.innerHTML=fallback; }
+    }
+
+    if(spBlock){ spBlock.hidden=!!enoughSP; }
+    if(nameNode){
+        const text=skill.name+(skillLevel>0?" Lv."+skillLevel:"");
+        if(nameNode.textContent!==text){ nameNode.textContent=text; }
+    }
+    if(costNode){
+        const text="消耗 "+spCost+" SP";
+        if(costNode.textContent!==text){ costNode.textContent=text; }
+    }
+    if(scopeNode){
+        const targetLabel=typeof window!=="undefined"&&typeof window.v135GetSkillTargetScopeLabel==="function"
+            ?window.v135GetSkillTargetScopeLabel(skill)
+            :"";
+        if(scopeNode.textContent!==targetLabel){ scopeNode.textContent=targetLabel; }
+    }
+}
+
 function populateSkillQuickBar(){
 
-    const overlay=
-        $("skillQuickBar");
+    bumpBattleRuntimeMetric("quickBarPopulate");
 
+    const overlay=$("skillQuickBar");
     if(overlay){
         overlay.classList.remove("show");
     }
 
     syncTurnTimerWithBattlePickers();
 
-    const bar=
-        $("skillQuickBarGrid");
-
+    const bar=$("skillQuickBarGrid");
     if(!bar){
         return;
     }
 
     const autoOn=
         activeBattleCharacterIndex===0
-        ? autoBattle
-        : getPartyAutoConfig(activeBattleCharacterIndex).enabled;
+        ?autoBattle
+        :getPartyAutoConfig(activeBattleCharacterIndex).enabled;
 
-    if(
-        !battleActive ||
-        autoOn
-    ){
-        bar.innerHTML="";
+    if(!battleActive||autoOn){
         return;
     }
 
-    const activeCharacterId=
-        getPartyCharacterKey(activeBattleCharacterIndex);
-
-    const activeCharacterObj=
-        getPartyCharacterByIndex(activeBattleCharacterIndex);
-
-    const character=
-        characterSkillLoadouts[
-            activeCharacterId
-        ];
-
-    if(
-        !character ||
-        !activeCharacterObj
-    ){
-        bar.innerHTML="";
-        return;
-    }
-
-    bar.innerHTML="";
+    const activeCharacterId=getPartyCharacterKey(activeBattleCharacterIndex);
+    const activeCharacterObj=getPartyCharacterByIndex(activeBattleCharacterIndex);
+    const character=characterSkillLoadouts[activeCharacterId];
+    const buttons=ensureSkillQuickBarButtons(bar);
 
     for(let i=0;i<4;i++){
+        const skillId=character&&Array.isArray(character.equippedSkills)
+            ?character.equippedSkills[i]
+            :null;
+        const skill=skillId?skillDatabase[skillId]:null;
 
-        const skillId=
-            character.equippedSkills[i];
-
-        const button=
-            document.createElement("button");
-
-        button.className=
-            "skill-quick-button";
-
-        if(!skillId){
-            button.disabled=true;
-            button.innerHTML=
-                '<span class="sq-icon-wrap"></span>'+
-                '<span class="sq-name">（空）</span>'+
-                '<span class="sq-cost">—</span>';
-            bar.appendChild(button);
+        if(!skillId||!skill||!activeCharacterObj){
+            syncSkillQuickBarButton(buttons[i],skillId,skill,0,0,false);
             continue;
         }
 
-        const skill=
-            skillDatabase[skillId];
-
-        if(!skill){
-            button.disabled=true;
-            button.innerHTML=
-                '<span class="sq-icon-wrap"></span>'+
-                '<span class="sq-name">資料錯誤</span>'+
-                '<span class="sq-cost">—</span>';
-            bar.appendChild(button);
-            continue;
-        }
-
-        const skillLevel=
-            getSkillLevel(
-                activeCharacterId,
-                skillId
-            );
-
-        const spCost=
-            skill.spCost!==undefined
-            ? skill.spCost
-            : (skill.cost||0);
-
-        const enoughSP=
-            activeCharacterObj.sp>=spCost;
-
-        button.disabled=!enoughSP;
-        button.classList.toggle(
-            "sp-insufficient",
-            !enoughSP
-        );
-
-        const iconBackground=
-            typeof getSkillIconBackgroundImage==="function"
-            ? getSkillIconBackgroundImage(skillId)
-            : "";
-
-        let iconHTML="";
-
-        if(iconBackground){
-            iconHTML=
-                '<span class="sq-icon-image" style="background-image:'+
-                iconBackground+
-                ';"></span>';
-        }
-        else{
-            const fallback=
-                typeof getElementIconHTML==="function"
-                ? getElementIconHTML(skill.element)
-                : "";
-
-            iconHTML=
-                '<span class="sq-icon-fallback">'+
-                fallback+
-                '</span>';
-        }
-
-        button.innerHTML=
-            '<span class="sq-icon-wrap">'+
-                iconHTML+
-                (
-                    enoughSP
-                    ? ""
-                    : '<span class="sq-sp-block">SP不足</span>'
-                )+
-            '</span>'+
-            '<span class="sq-name">'+
-                skill.name+
-                (skillLevel>0 ? " Lv."+skillLevel : "")+
-            '</span>'+
-            '<span class="sq-cost">消耗 '+
-                spCost+
-                ' SP</span>';
-
-        if(enoughSP){
-            button.onclick=()=>{
-                prepareAction(skillId);
-            };
-        }
-
-        bar.appendChild(button);
+        const skillLevel=getSkillLevel(activeCharacterId,skillId);
+        const spCost=skill.spCost!==undefined?skill.spCost:(skill.cost||0);
+        const enoughSP=activeCharacterObj.sp>=spCost;
+        syncSkillQuickBarButton(buttons[i],skillId,skill,skillLevel,spCost,enoughSP);
     }
 }
-
-
-/*
-   ★ 新增（依照使用者要求）：
-   技能格改成非常駐顯示，平常收起來，
-   按「✨ 技能」按鈕才會出現，
-   出現時蓋住上面那排戰鬥指令按鈕；
-   再按一次（或按右上角✕）就收合回去。
-*/
 
 function syncTurnTimerWithBattlePickers(){
 
@@ -23269,6 +23280,7 @@ const BATTLE_RENDER_HOOK_ORDER=Object.freeze({
         "v141AfterBattleRender",
         "v143AfterBattleRender",
         "v154AfterBattleRender",
+        "v17351AfterBattleRender",
         "vFixedSlotAfterBattleRender"
     ])
 });
@@ -23291,13 +23303,11 @@ if(typeof window!=="undefined"){
 }
 
 function isBattleStatusInspectionBlocked(){
-    if(!battleActive||actionReady||pendingAction){ return true; }
-    const skillQuickBar=$("skillQuickBar");
-    const skillMenu=$("skillMenu");
-    const itemMenu=$("itemMenu");
-    if(skillQuickBar&&skillQuickBar.classList.contains("show")){ return true; }
-    if(skillMenu&&(skillMenu.classList.contains("show")||skillMenu.classList.contains("expanded"))){ return true; }
-    if(itemMenu&&itemMenu.classList.contains("show")){ return true; }
+    if(!battleActive){ return true; }
+    const actionRegion=$("battleActionRegion");
+    if(actionRegion&&actionRegion.classList.contains("target-selecting")){
+        return true;
+    }
     return !!document.querySelector(
         "#battlePage .battle-monster.targetable,#battlePage .battle-player.ally-targetable"
     );
@@ -23608,94 +23618,64 @@ function fillBattleInfoGap(){
    去量測、去補，這整段程式碼已經不需要了。
 */
 
-function updateMonsterUI(index){
+function runBattleMonsterUiHook(name,index,monster){
+    if(typeof window==="undefined"){ return; }
+    const hook=window[name];
+    if(typeof hook!=="function"){ return; }
+    try{
+        hook(index,monster);
+    }catch(error){
+        console.error("Battle monster UI hook failed:",name,error);
+    }
+}
 
-    const monster =
-        monsters[index];
+function applyMonsterUiUpdate(index){
 
-
+    const monster=monsters[index];
     if(!monster){
         return;
     }
 
+    runBattleMonsterUiHook("v141BeforeMonsterUiUpdate",index,monster);
 
-    /*
-       ★ 新增：燃燒狀態圖示。
-       之前燃燒只有在扣血那一刻的戰鬥紀錄裡看得到，
-       持續期間卡片上完全沒有任何提示，
-       玩家看不出「這隻現在正在燒」。
-       改成只要monster.statusEffects裡有燃燒，
-       卡片上就會一直顯示一個閃爍的🔥圖示，
-       直到燃燒結束才消失。
-    */
-
-    /* V143 is the sole persistent-status visual owner. HP/SP refreshes must
-       preserve its existing icon/body nodes instead of tearing them down and
-       rebuilding them on every global updateUI() pass. */
-
-    const hpBar =
-        $("battleMonsterBar"+index);
-
-
-    const spBar =
-        $("battleMonsterSPBar"+index);
-
-
-    const hpText =
-        $("battleMonsterHPText"+index);
-
-
-    const spText =
-        $("battleMonsterSPText"+index);
-
+    const hpBar=$("battleMonsterBar"+index);
+    const spBar=$("battleMonsterSPBar"+index);
+    const hpText=$("battleMonsterHPText"+index);
+    const spText=$("battleMonsterSPText"+index);
 
     if(hpBar){
-
-        hpBar.style.width =
-            (
-                monster.hp/
-                monster.maxHP*
-                100
-            )+
-            "%";
-
+        hpBar.style.width=(monster.hp/monster.maxHP*100)+"%";
     }
-
 
     if(spBar){
-
-        spBar.style.width =
-            (
-                monster.sp/
-                monster.maxSP*
-                100
-            )+
-            "%";
-
+        spBar.style.width=(monster.sp/monster.maxSP*100)+"%";
     }
-
 
     if(hpText){
-
-        hpText.textContent =
-            monster.hp+
-            "/"+
-            monster.maxHP;
-
+        hpText.textContent=monster.hp+"/"+monster.maxHP;
     }
-
 
     if(spText){
-
-        spText.textContent =
-            monster.sp+
-            "/"+
-            monster.maxSP;
-
+        spText.textContent=monster.sp+"/"+monster.maxSP;
     }
 
+    runBattleMonsterUiHook("v141AfterMonsterUiUpdate",index,monster);
+    runBattleMonsterUiHook("v143SystemAfterMonsterUiUpdate",index,monster);
+    runBattleMonsterUiHook("v149AfterMonsterUiUpdate",index,monster);
+    runBattleMonsterUiHook("v143StatusAfterMonsterUiUpdate",index,monster);
 }
 
+function updateMonsterUI(index){
+
+    bumpBattleRuntimeMetric("updateMonsterUI");
+
+    const scheduler=typeof window!=="undefined"?window.v143ScheduleMonsterUiUpdate:null;
+    if(typeof scheduler==="function"){
+        return scheduler(index,()=>applyMonsterUiUpdate(index));
+    }
+
+    return applyMonsterUiUpdate(index);
+}
 
 function renderPlayers(){
 
@@ -23867,18 +23847,27 @@ function updateSingleCharacterStatusBadge(
     character
 ){
 
-    const statusArea =
-        $("battlePlayerStatus"+index);
-
+    const statusArea=$("battlePlayerStatus"+index);
     if(!statusArea){
         return;
     }
 
-    /* Persistent status content is rendered and diffed by V143. Do not clear
-       this host during an unrelated HP/SP or action-HUD refresh. */
+    const applyStatus=()=>{
+        if(
+            typeof window!=="undefined"&&
+            typeof window.v143StatusAfterPlayerUiUpdate==="function"
+        ){
+            window.v143StatusAfterPlayerUiUpdate(index,character);
+        }
+    };
 
+    const scheduler=typeof window!=="undefined"?window.v143SchedulePlayerStatusUiUpdate:null;
+    if(typeof scheduler==="function"){
+        return scheduler(index,applyStatus);
+    }
+
+    return applyStatus();
 }
-
 
 function updateBattlePlayerBars(){
 
@@ -31583,6 +31572,11 @@ function renderInventoryItems(){
         tab.classList.toggle("active",active);
         tab.setAttribute("aria-selected",active ? "true" : "false");
     });
+
+    if(typeof window!=="undefined"){
+        if(typeof window.v17351SyncInventoryQa==="function"){ window.v17351SyncInventoryQa(); }
+        if(typeof window.v17363SyncFunctionalFixes==="function"){ window.v17363SyncFunctionalFixes(); }
+    }
 }
 
 function renderInventory(){
@@ -34018,176 +34012,27 @@ function updateMapPageHeader(){
 
 function updateUI(){
 
-    updateHomeTestTools();
+    bumpBattleRuntimeMetric("updateUI");
 
-    /*
-       ★ 每次更新畫面時，順便檢查一次
-       荒漠地帶的解鎖狀態要不要更新
-       （玩家升級跨過Lv.11那一刻，
-       練功區列表要立刻反映出來，
-       不用特地跳頁才更新）。
-    */
+    const stats=getMainCharacterStats();
 
-    updateTrainingZoneLocks();
-
-    updateSecondCharacterBanner();
-
-
-    /*
-       ★ 新增（依照使用者要求，主城金幣
-       顯示）：金幣是共用資源，任何時候
-       都可能變動（賣裝備、領任務/成就
-       獎勵、商店消費），updateUI()本來
-       就會在很多時機點被呼叫，一起更新
-       最單純，不用另外找地方重複判斷。
-    */
-
-    updateGoldDisplay();
-
-
-    /*
-       ★ 新增：地圖上玩家卡片的名字/等級
-       （包含跟隨方塊）要跟著同步更新，
-       不然升級之後地圖上顯示的還是舊等級。
-    */
-
-    updateMapPlayerCard();
-
-
-    /*
-       ★ 新增：巡邏頁面標題列的怪物資訊
-       （名稱/屬性/血量/敏捷）會隨著戰鬥
-       進行變化（打死一隻換下一隻、
-       血量減少），updateUI()本來就會在
-       很多時機被呼叫，一起更新，
-       不用另外找地方重複判斷。
-    */
-
-    updateMapPageHeader();
-
-
-    /*
-       ★ 新增：戰鬥中SP變化（用了技能、喝了藥水）
-       要即時反映在技能快捷列的可用狀態上，
-       不然SP扣到不夠了，按鈕卻還亮著能點。
-    */
+    player.hp=Math.max(0,Math.min(player.hp,stats.maxHP));
+    player.sp=Math.max(0,Math.min(player.sp,stats.maxSP));
 
     if(battleActive){
 
         populateSkillQuickBar();
 
-    }
+        if(
+            $("itemMenu")&&
+            $("itemMenu").classList.contains("show")
+        ){
+            renderBattlePotionMenu();
+        }
 
-
-    const stats =
-        getMainCharacterStats();
-
-
-    /*
-       如果裝備或能力改變，
-       HP/SP上限變化時不要超出上限。
-    */
-
-    player.hp =
-        Math.max(
-            0,
-            Math.min(
-                player.hp,
-                stats.maxHP
-            )
-        );
-
-
-    player.sp =
-        Math.max(
-            0,
-            Math.min(
-                player.sp,
-                stats.maxSP
-            )
-        );
-
-
-    $("playerLevel")
-        .textContent =
-        player.level;
-
-
-    $("headerHP")
-        .textContent =
-        player.hp;
-
-
-    $("headerSP")
-        .textContent =
-        player.sp;
-
-
-    /*
-       ★ 依照玩家要求，主城首頁的完整屬性列表
-       （最大HP/SP、六圍、防禦、升級進度）
-       整個拿掉了，這些資訊在「狀態」頁本來就有，
-       首頁重複顯示是多餘的雜訊。
-       這裡原本寫給 #homeHP 等元素的那些行也一併移除，
-       不然元素不存在了，繼續寫入會直接噴錯，
-       導致updateUI()後面的東西全部不會執行。
-    */
-
-
-    if(
-        $("itemMenu") &&
-        $("itemMenu").classList.contains("show")
-    ){
-        renderBattlePotionMenu();
-    }
-
-
-    $("skillPoints")
-        .textContent =
-
-        (
-            getSkillCharacterObject(
-                currentSkillCharacter
-            )||
-            player
-        ).skillPoints;
-
-
-    /*
-       經驗池顯示
-    */
-
-    $("sharedExpValue")
-        .textContent =
-        Math.max(0,Math.floor(Number(sharedExp)||0))
-            .toLocaleString("zh-TW");
-
-
-    renderExpDistributeList();
-
-
-    /*
-       狀態頁
-    */
-
-    updateStatusPreview();
-
-
-    /*
-       戰鬥中的血條
-    */
-
-    if(battleActive){
-
-        currentBattleMonsters
-        .forEach(
-            index=>{
-                updateMonsterUI(
-                    index
-                );
-            }
-        );
-
+        currentBattleMonsters.forEach(index=>{
+            updateMonsterUI(index);
+        });
 
         updateBattlePlayerBars();
 
@@ -34196,8 +34041,32 @@ function updateUI(){
             bossPresentationOwner.syncHud();
         }
 
+        return;
     }
 
+    updateHomeTestTools();
+    updateTrainingZoneLocks();
+    updateSecondCharacterBanner();
+    updateGoldDisplay();
+    updateMapPlayerCard();
+    updateMapPageHeader();
+
+    $("playerLevel").textContent=player.level;
+    $("headerHP").textContent=player.hp;
+    $("headerSP").textContent=player.sp;
+
+    $("skillPoints").textContent=
+        (
+            getSkillCharacterObject(currentSkillCharacter)||
+            player
+        ).skillPoints;
+
+    $("sharedExpValue").textContent=
+        Math.max(0,Math.floor(Number(sharedExp)||0))
+            .toLocaleString("zh-TW");
+
+    renderExpDistributeList();
+    updateStatusPreview();
 }
 
 

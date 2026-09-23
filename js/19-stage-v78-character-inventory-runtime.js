@@ -386,26 +386,17 @@ else{
     schedule();
 }
 
-const observer=
-    new MutationObserver(
-        schedule
-    );
-
-observer.observe(
-    document.body,
-    {
+const characterModal=document.getElementById("homeFeatureModal");
+if(characterModal&&typeof MutationObserver!=="undefined"){
+    const observer=new MutationObserver(schedule);
+    observer.observe(characterModal,{
         childList:true,
         subtree:true,
         attributes:true,
         attributeFilter:["class"]
-    }
-);
-
-document.addEventListener(
-    "click",
-    schedule,
-    {passive:true}
-);
+    });
+    characterModal.addEventListener("click",schedule,{passive:true});
+}
 
 window.addEventListener(
     "resize",

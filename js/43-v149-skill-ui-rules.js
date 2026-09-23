@@ -606,13 +606,17 @@
         syncPlayerCards();
     }
 
-    if(typeof window.v143SyncEarthShieldEffects==="function"){
-        const previousEarthShieldSync=window.v143SyncEarthShieldEffects;
-        window.v143SyncEarthShieldEffects=function(){
-            const result=previousEarthShieldSync.apply(this,arguments);
-            syncAllCombatCards();
-            return result;
-        };
+    function syncCombatCard(side,index){
+        if(side==="monster"){
+            syncMonsterCard(index);
+            return;
+        }
+        if(side==="player"){
+            syncBarrierCard(
+                document.getElementById("battlePlayerCard"+index),
+                getPartyCharacterByIndex(index)
+            );
+        }
     }
 
     if(typeof window.v141PlayCardEffect==="function"){
@@ -620,29 +624,15 @@
         window.v141PlayCardEffect=function(side,index,type){
             if(side==="monster"&&type==="revive"){ syncMonsterCard(index); }
             const result=previousPlayCardEffect.apply(this,arguments);
-            setTimeout(syncAllCombatCards,0);
+            setTimeout(()=>syncCombatCard(side,index),0);
             if(side==="monster"&&type==="revive"){ setTimeout(()=>syncMonsterCard(index),1900); }
             return result;
         };
     }
 
-    if(typeof updateMonsterUI==="function"){
-        const previousUpdateMonsterUI=updateMonsterUI;
-        updateMonsterUI=function(index){
-            const result=previousUpdateMonsterUI.apply(this,arguments);
-            syncMonsterCard(index);
-            return result;
-        };
-    }
-
-    if(typeof updateUI==="function"){
-        const previousUpdateUI=updateUI;
-        updateUI=function(){
-            const result=previousUpdateUI.apply(this,arguments);
-            syncAllCombatCards();
-            return result;
-        };
-    }
+    window.v149AfterMonsterUiUpdate=function(index){
+        syncMonsterCard(index);
+    };
 
     /* ----- Reflect damage label and monster Frostbite/Fire follow-ups. ----- */
     let currentReflectAttacker=null;
@@ -876,18 +866,6 @@
             const homeShop=document.getElementById("homeIconShop");
             if(homeShop){ homeShop.style.backgroundImage="url(assets/ui/home-shop.png)"; }
         }
-    }
-
-    if(typeof MutationObserver!=="undefined"&&typeof document!=="undefined"){
-        let queued=false;
-        const observer=new MutationObserver(()=>{
-            if(queued){ return; }
-            queued=true;
-            requestAnimationFrame(()=>{ queued=false; syncAllCombatCards(); });
-        });
-        const observe=()=>observer.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:["class"]});
-        if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",observe,{once:true}); }
-        else{ observe(); }
     }
 
     if(typeof document!=="undefined"&&document.readyState==="loading"){

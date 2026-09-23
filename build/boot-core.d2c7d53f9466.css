@@ -3120,9 +3120,9 @@ button:active{
 
     margin-top:0;
 
-    background:#100e0b;
-    border:1px solid #8a6a3a;
-    border-radius:8px;
+    background:transparent;
+    border:0;
+    border-radius:0;
 
     padding:8px 10px;
 
@@ -6858,6 +6858,13 @@ html, body{
      技能／普通攻擊／背包(既有物品功能)／防禦／逃脫。
    - 技能快捷列仍以較高 z-index 覆蓋此面板，原戰鬥函式不變。
 ===================================================== */
+#battlePage{
+    --battle-command-row-height:66px;
+    --battle-command-art-overhang:34px;
+    --battle-command-visual-height:calc(var(--battle-command-row-height) + var(--battle-command-art-overhang));
+    --battle-turn-row-height:36px;
+}
+
 #mainBattleMenu{
     position:relative !important;
     display:block !important;
@@ -6883,7 +6890,7 @@ html, body{
     position:absolute;
     left:0;
     right:0;
-    top:-34px;
+    top:calc(-1 * var(--battle-command-art-overhang,34px));
     bottom:0;
     z-index:1;
     pointer-events:none;
@@ -6895,7 +6902,7 @@ html, body{
 
 #mainBattleMenu > .menu-button{
     position:absolute !important;
-    top:-34px !important;
+    top:calc(-1 * var(--battle-command-art-overhang,34px)) !important;
     bottom:0 !important;
     width:20% !important;
     height:auto !important;

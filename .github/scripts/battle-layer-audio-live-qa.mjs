@@ -323,6 +323,87 @@ try{
     assert.ok(layout.hud.length>=9,"The real Abyss battle must expose one ally and eight enemy card HUDs");
     assert.ok(layout.hud.every(entry=>entry.name&&entry.hp&&entry.sp),"Every live combatant must keep its name, HP and SP visible");
 
+    const normalAttackPerformance=await client.eval(`(async()=>{
+        const metrics=window.FourSymbolsBattleRuntimeMetrics;
+        const page=document.getElementById('battlePage');
+        const normalButton=Array.from(document.querySelectorAll('#mainBattleMenu > .menu-button')).find(button=>
+            String(button.getAttribute('onclick')||'').includes("prepareAction('normal')")
+        );
+        if(!metrics||!page||!normalButton){return {available:false};}
+
+        const originalAuto=typeof autoBattle!=='undefined'?autoBattle:false;
+        const originalIndex=typeof activeBattleCharacterIndex!=='undefined'?activeBattleCharacterIndex:0;
+        const originalActionReady=typeof actionReady!=='undefined'?actionReady:false;
+        const originalPending=typeof pendingAction!=='undefined'?pendingAction:null;
+        if(typeof autoBattle!=='undefined'){autoBattle=false;}
+        if(typeof activeBattleCharacterIndex!=='undefined'){activeBattleCharacterIndex=0;}
+        if(typeof actionReady!=='undefined'){actionReady=false;}
+        if(typeof pendingAction!=='undefined'){pendingAction=null;}
+        if(typeof clearBattleTargetSelectionMode==='function'){clearBattleTargetSelectionMode();}
+
+        const repairHooks=['v17351SyncInventoryQa','v17351PreviewQuestMilestones','v17363SyncFunctionalFixes','v78ApplyCharacterInventoryLayout'];
+        const originals={};
+        const repairCalls={};
+        repairHooks.forEach(name=>{
+            repairCalls[name]=0;
+            if(typeof window[name]==='function'){
+                originals[name]=window[name];
+                window[name]=function(){repairCalls[name]++;return originals[name].apply(this,arguments);};
+            }
+        });
+
+        let mutationCount=0;
+        const mutationObserver=new MutationObserver(records=>{mutationCount+=records.length;});
+        mutationObserver.observe(page,{subtree:true,childList:true,attributes:true,characterData:true});
+
+        const longTasks=[];
+        let longTaskObserver=null;
+        if(typeof PerformanceObserver==='function'&&PerformanceObserver.supportedEntryTypes?.includes('longtask')){
+            longTaskObserver=new PerformanceObserver(list=>{
+                list.getEntries().forEach(entry=>longTasks.push({duration:entry.duration,startTime:entry.startTime}));
+            });
+            longTaskObserver.observe({type:'longtask',buffered:false});
+        }
+
+        metrics.enabled=true;
+        metrics.reset();
+        const started=performance.now();
+        normalButton.click();
+        const syncDuration=performance.now()-started;
+        await new Promise(resolve=>setTimeout(resolve,120));
+        const counters=metrics.snapshot();
+        const targetSelecting=page.querySelector('#battleActionRegion')?.classList.contains('target-selecting')||false;
+        mutationObserver.disconnect();
+        if(longTaskObserver){longTaskObserver.disconnect();}
+        metrics.enabled=false;
+
+        repairHooks.forEach(name=>{if(originals[name]){window[name]=originals[name];}});
+        if(typeof actionReady!=='undefined'){actionReady=originalActionReady;}
+        if(typeof pendingAction!=='undefined'){pendingAction=originalPending;}
+        if(typeof activeBattleCharacterIndex!=='undefined'){activeBattleCharacterIndex=originalIndex;}
+        if(typeof autoBattle!=='undefined'){autoBattle=originalAuto;}
+        if(typeof clearBattleTargetSelectionMode==='function'){clearBattleTargetSelectionMode();}
+        if(typeof closeMenus==='function'){closeMenus();}
+        if(typeof updateActionHudVisibility==='function'){updateActionHudVisibility();}
+
+        return {
+            available:true,syncDuration,mutationCount,targetSelecting,counters,repairCalls,
+            longTaskCount:longTasks.length,
+            maxLongTaskDuration:longTasks.reduce((max,item)=>Math.max(max,item.duration),0)
+        };
+    })()`);
+    evidence.checks.normalAttackPerformance=normalAttackPerformance;
+    assert.equal(normalAttackPerformance.available,true,"Normal-attack performance instrumentation must be available");
+    assert.equal(normalAttackPerformance.targetSelecting,true,"Normal attack click must immediately enter target selection");
+    assert.ok(normalAttackPerformance.syncDuration<100,`Normal attack synchronous click path is too slow: ${normalAttackPerformance.syncDuration}ms`);
+    assert.ok(normalAttackPerformance.mutationCount<80,`Normal attack produced excessive DOM mutations: ${normalAttackPerformance.mutationCount}`);
+    assert.equal(normalAttackPerformance.counters.syncMonsterPortraits,0,"Normal attack click must not rescan monster portraits");
+    assert.equal(normalAttackPerformance.counters.quickBarRebuild,0,"Normal attack click must not rebuild the skill quick bar");
+    assert.equal(normalAttackPerformance.counters.repairScheduler,0,"Normal attack click must not invoke a repair scheduler");
+    Object.entries(normalAttackPerformance.repairCalls).forEach(([name,count])=>
+        assert.equal(count,0,`Normal attack click unexpectedly invoked ${name}`)
+    );
+    assert.ok(normalAttackPerformance.maxLongTaskDuration<120,`Normal attack generated a long task of ${normalAttackPerformance.maxLongTaskDuration}ms`);
     const infoDrawer=await client.eval(`(()=>{
         const region=document.querySelector('#battlePage .battle-info-region');
         const button=document.getElementById('battleInfoToggle');
@@ -455,6 +536,25 @@ try{
     assert.equal(iceArrowRain.stageOverflow,"visible","The VFX owner must not clip full-range animation paint");
     assert.equal(iceArrowRain.emitted,"true","Ice Arrow Rain must emit a visible production sprite");
 
+    const statusInspectionDuringVfx=await client.eval(`(()=>{
+        if(typeof clearBattleTargetSelectionMode==='function'){clearBattleTargetSelectionMode();}
+        const playerOpened=typeof openBattleStatusDetailModal==='function'&&openBattleStatusDetailModal('player',0)===true;
+        const playerModal=document.getElementById('battleStatusDetailModal');
+        const playerVisible=!!(playerModal&&!playerModal.hidden&&playerModal.getAttribute('aria-hidden')==='false');
+        if(typeof closeBattleStatusDetailModal==='function'){closeBattleStatusDetailModal();}
+        const monsterIndex=(typeof currentBattleMonsters!=='undefined'?currentBattleMonsters:[]).find(index=>monsters[index]?.alive);
+        const monsterOpened=Number.isInteger(monsterIndex)&&typeof openBattleStatusDetailModal==='function'&&openBattleStatusDetailModal('monster',monsterIndex)===true;
+        const monsterModal=document.getElementById('battleStatusDetailModal');
+        const monsterVisible=!!(monsterModal&&!monsterModal.hidden&&monsterModal.getAttribute('aria-hidden')==='false');
+        if(typeof closeBattleStatusDetailModal==='function'){closeBattleStatusDetailModal();}
+        return {playerOpened,playerVisible,monsterIndex,monsterOpened,monsterVisible,stageStillMounted:!!document.getElementById('v143-skill-stage')};
+    })()`);
+    evidence.checks.statusInspectionDuringVfx=statusInspectionDuringVfx;
+    assert.equal(statusInspectionDuringVfx.playerOpened,true,"Read-only player status must open during active VFX");
+    assert.equal(statusInspectionDuringVfx.playerVisible,true,"Player status modal must become visible during active VFX");
+    assert.equal(statusInspectionDuringVfx.monsterOpened,true,"Read-only enemy status must open during active VFX");
+    assert.equal(statusInspectionDuringVfx.monsterVisible,true,"Enemy status modal must become visible during active VFX");
+    assert.equal(statusInspectionDuringVfx.stageStillMounted,true,"Read-only status inspection must not destroy the active VFX lifecycle");
     await sleep(1350);
     const iceGate=await client.eval(`(()=>{
         const gate=window.__battleLayoutIceGate;
@@ -775,6 +875,36 @@ try{
     assert.ok(endTransition.activePage,"Battle-end callback must hand control to a non-battle page");
     assert.equal(endTransition.stageCount,0,"Battle-end path must leave no V143 stage behind");
 
+    const resultModalReadability=await client.eval(`(()=>{
+        const api=window.FourSymbolsBattleStatistics;
+        if(!api||typeof api.showResultDetails!=='function'){return null;}
+        const shown=api.showResultDetails({title:'戰鬥詳細結算',subtitle:'Browser QA'});
+        const modal=document.getElementById('battleStatisticsResultModal');
+        const panel=modal?.querySelector('.battle-statistics-result-panel');
+        const title=modal?.querySelector('[data-title]');
+        const label=modal?.querySelector('.battle-stat-grid span');
+        const value=modal?.querySelector('.battle-stat-grid b');
+        const close=modal?.querySelector('[data-close]');
+        const rect=node=>{const r=node?.getBoundingClientRect();return r?{width:r.width,height:r.height}:null;};
+        const result={
+            shown,parentId:modal?.parentElement?.id||null,hidden:modal?.hidden??true,
+            panel:rect(panel),title:rect(title),label:rect(label),value:rect(value),close:rect(close),
+            titleFont:getComputedStyle(title).fontSize,labelFont:getComputedStyle(label).fontSize,
+            valueFont:getComputedStyle(value).fontSize,closeFont:getComputedStyle(close).fontSize
+        };
+        return result;
+    })()`);
+    evidence.checks.resultModalReadability=resultModalReadability;
+    assert.ok(resultModalReadability?.shown,"Detailed battle result modal must open from the final snapshot");
+    assert.equal(resultModalReadability.parentId,"game-content","Battle result modal must use the legacy game-content coordinate owner");
+    assert.equal(resultModalReadability.hidden,false,"Detailed battle result modal must be visible while inspected");
+    assert.ok(resultModalReadability.title?.height>=24,`Battle result title is too small on mobile: ${resultModalReadability.title?.height}`);
+    assert.ok(resultModalReadability.label?.height>=13,`Battle result label is too small on mobile: ${resultModalReadability.label?.height}`);
+    assert.ok(resultModalReadability.value?.height>=18,`Battle result value is too small on mobile: ${resultModalReadability.value?.height}`);
+    assert.ok(resultModalReadability.close?.height>=50,`Battle result close button is too small on mobile: ${resultModalReadability.close?.height}`);
+    const resultScreenshot=await client.send("Page.captureScreenshot",{format:"png",fromSurface:true});
+    if(resultScreenshot.data){ fs.writeFileSync(path.join(artifactDir,"battle-result-modal-mobile.png"),Buffer.from(resultScreenshot.data,"base64")); }
+    await client.eval("window.FourSymbolsBattleStatistics?.hideResultDetails(false);true");
     const bossBootstrap=await client.eval(`(()=>{
         if(typeof player!=='undefined'&&player){
             player.level=100;

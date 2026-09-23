@@ -16,7 +16,7 @@ test("persistent body status visuals rotate one at a time every two seconds",()=
   assert.doesNotMatch(js,/Math\.floor\(Date\.now\(\)\/STATUS_ROTATION_MS\)%bodyTypes\.length/);
   assert.match(js,/syncStatusVisual\(side,index,type,type===activeBodyType\)/);
   assert.match(js,/stun:statusVisual\("assets\/vfx\/status\/stun\.webp","pulse"/);
-  assert.match(css,/\.v143-status-icon\{[\s\S]*?width:17px;[\s\S]*?height:17px;/);
+  assert.match(css,/\.v143-status-icon\{[\s\S]*?width:24px;[\s\S]*?height:24px;/);
   assert.match(css,/\.v143-status-visual--pulse\{[\s\S]*?animation:v143StatusImageBreath 2s ease-in-out infinite/);
   assert.match(css,/@keyframes v143StatusImageBreath\{[\s\S]*?50%\{opacity:1\}/);
 });
@@ -38,7 +38,12 @@ test("battle information handles and turn timer follow the requested interaction
   assert.match(js,/function installBattleInfoHandleDrag\(\)/);
   assert.match(css,/\.battle-info-toggle\{[\s\S]*?border:1px solid rgba\(210,158,64,\.9\);[\s\S]*?box-shadow:none;[\s\S]*?touch-action:none;[\s\S]*?cursor:ew-resize/);
   assert.match(css,/\.battle-info-region:not\(\.is-expanded\)\{[\s\S]*?background:transparent;[\s\S]*?box-shadow:none/);
-  assert.match(css,/#battleActionRegion > \.turn-target-row\{[\s\S]*?position:absolute;[\s\S]*?bottom:78px/);
+  const mainCss=read("css/00-main.css");
+  assert.match(mainCss,/#battlePage\{[\s\S]*?--battle-command-row-height:66px;[\s\S]*?--battle-command-art-overhang:34px;[\s\S]*?--battle-command-visual-height:calc\(var\(--battle-command-row-height\) \+ var\(--battle-command-art-overhang\)\);/);
+  assert.doesNotMatch(mainCss,/--battle-center-min-height/);
+  assert.doesNotMatch(css,/--battle-command-row-height:66px|--battle-command-art-overhang:34px/);
+  assert.match(css,/grid-template-rows:[\s\S]*?minmax\(0,var\(--battle-center-region-track\)\)/);
+  assert.match(css,/#battleActionRegion > \.turn-target-row\{[\s\S]*?position:absolute;[\s\S]*?bottom:var\(--battle-command-visual-height\)/);
 });
 
 test("interactive battlefield overlays outrank detached VFX and damage popups",()=>{
@@ -51,7 +56,8 @@ test("interactive battlefield overlays outrank detached VFX and damage popups",(
   assert.match(statsCss,/z-index:18072/);
   assert.match(vfxCss,/\.battle-status-detail-modal\{[\s\S]*?z-index:18120/);
   assert.match(vfxCss,/body\.v174-battle-reading-open > \.v143-skill-stage,[\s\S]*?visibility:hidden !important;[\s\S]*?opacity:0 !important/);
-  assert.match(fixedCss,/\.battle-info-region\{[\s\S]*?background:linear-gradient\(180deg,rgba\(23,18,12,\.99\),rgba\(7,7,6,\.99\)\)/);
+  assert.match(fixedCss,/\.battle-info-region\{[\s\S]*?background:transparent;[\s\S]*?box-shadow:none/);
+  assert.match(fixedCss,/\.battle-info-region\.is-expanded\{[\s\S]*?background:rgba\(8,8,8,\.96\);[\s\S]*?box-shadow:none/);
 });
 
 test("new skill icons and 4x3 cast sheets use dedicated WebP runtime assets",()=>{

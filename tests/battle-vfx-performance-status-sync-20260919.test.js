@@ -23,8 +23,11 @@ test("timed status snapshot only scans status types relevant to the current cast
 
 test("known combatant refreshes use a single-unit status path",()=>{
     assert.match(vfx,/function syncStatusVisualsForUnit\(side,index,advanceRotation\)/);
-    assert.match(vfx,/updateMonsterUI=function\(index\)[\s\S]*syncStatusVisualsForUnit\("monster",Number\(index\)\)/);
-    assert.match(vfx,/updateSingleCharacterStatusBadge=function\(index\)[\s\S]*syncStatusVisualsForUnit\("player",Number\(index\)\)/);
+    assert.match(vfx,/window\.v143ScheduleMonsterUiUpdate=function\(index,callback\)/);
+    assert.match(vfx,/window\.v143StatusAfterMonsterUiUpdate=function\(index\)[\s\S]*syncStatusVisualsForUnit\("monster",Number\(index\)\)/);
+    assert.match(vfx,/window\.v143SchedulePlayerStatusUiUpdate=function\(index,callback\)/);
+    assert.match(vfx,/window\.v143StatusAfterPlayerUiUpdate=function\(index\)[\s\S]*syncStatusVisualsForUnit\("player",Number\(index\)\)/);
+    assert.doesNotMatch(vfx,/\bupdateMonsterUI\s*=\s*function|\bupdateSingleCharacterStatusBadge\s*=\s*function/);
     assert.match(vfx,/function officialCardEffect\(side,index\)[\s\S]*syncStatusVisualsForUnit\(side,unitIndex\)/);
 });
 

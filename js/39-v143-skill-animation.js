@@ -621,12 +621,15 @@
         if(!anchor){ return; }
         const cardRect=typeof card.getBoundingClientRect==="function"?card.getBoundingClientRect():anchor.rect;
         const regularEnemy=side==="monster"&&!isBossIndexForVfx(index);
+        const shellStatus=type==="shield"||type==="barrier"||type==="earthShield"||type==="rockWall";
+        const widthScale=(regularEnemy?1.45:1.40)*(shellStatus?1.08:1);
+        const heightScale=(regularEnemy?1.36:1.34)*(shellStatus?1.08:1);
         const width=regularEnemy
-            ?Math.max(60,Math.min(anchor.rect.width*1.20,cardRect.width*1.20))
-            :Math.max(44,Math.min(anchor.rect.width*1.16,cardRect.width*1.16));
+            ?Math.max(72,Math.min(anchor.rect.width*widthScale,cardRect.width*widthScale))
+            :Math.max(62,Math.min(anchor.rect.width*widthScale,cardRect.width*widthScale));
         const height=regularEnemy
-            ?Math.max(58,Math.min(anchor.rect.height*1.16,cardRect.height*1.16))
-            :Math.max(52,Math.min(anchor.rect.height*1.14,cardRect.height*1.14));
+            ?Math.max(68,Math.min(anchor.rect.height*heightScale,cardRect.height*heightScale))
+            :Math.max(64,Math.min(anchor.rect.height*heightScale,cardRect.height*heightScale));
         node.dataset.slot=anchor.slot;
         node.style.width=Math.round(width)+"px";
         node.style.height=Math.round(height)+"px";
@@ -1433,51 +1436,35 @@
         };
     }
 
-    if(typeof updateMonsterUI==="function"){
-        const previous=updateMonsterUI;
-        updateMonsterUI=function(index){
-            const wait=existingTargetDelay("monster",index);
-            if(wait>8){
-                const key="monster:"+index;
-                if(!state.pendingUpdates.has(key)){
-                    const args=arguments;
-                    state.pendingUpdates.set(key,true);
-                    setTimer(()=>{
-                        state.pendingUpdates.delete(key);
-                        previous.apply(this,args);
-                        syncStatusVisualsForUnit("monster",Number(index));
-                    },wait);
-                }
-                return;
+    function scheduleStatusOwnedUiUpdate(side,index,keyPrefix,callback){
+        if(typeof callback!=="function"){ return; }
+        const wait=existingTargetDelay(side,index);
+        if(wait>8){
+            const key=keyPrefix+":"+index;
+            if(!state.pendingUpdates.has(key)){
+                state.pendingUpdates.set(key,true);
+                setTimer(()=>{
+                    state.pendingUpdates.delete(key);
+                    callback();
+                },wait);
             }
-            const result=previous.apply(this,arguments);
-            syncStatusVisualsForUnit("monster",Number(index));
-            return result;
-        };
+            return;
+        }
+        return callback();
     }
 
-    if(typeof updateSingleCharacterStatusBadge==="function"){
-        const previous=updateSingleCharacterStatusBadge;
-        updateSingleCharacterStatusBadge=function(index){
-            const wait=existingTargetDelay("player",index);
-            if(wait>8){
-                const key="player-status:"+index;
-                if(!state.pendingUpdates.has(key)){
-                    const args=arguments;
-                    state.pendingUpdates.set(key,true);
-                    setTimer(()=>{
-                        state.pendingUpdates.delete(key);
-                        previous.apply(this,args);
-                        syncStatusVisualsForUnit("player",Number(index));
-                    },wait);
-                }
-                return;
-            }
-            const result=previous.apply(this,arguments);
-            syncStatusVisualsForUnit("player",Number(index));
-            return result;
-        };
-    }
+    window.v143ScheduleMonsterUiUpdate=function(index,callback){
+        return scheduleStatusOwnedUiUpdate("monster",Number(index),"monster",callback);
+    };
+    window.v143StatusAfterMonsterUiUpdate=function(index){
+        syncStatusVisualsForUnit("monster",Number(index));
+    };
+    window.v143SchedulePlayerStatusUiUpdate=function(index,callback){
+        return scheduleStatusOwnedUiUpdate("player",Number(index),"player-status",callback);
+    };
+    window.v143StatusAfterPlayerUiUpdate=function(index){
+        syncStatusVisualsForUnit("player",Number(index));
+    };
 
     function wrapBadge(name){
         const previous=window[name];

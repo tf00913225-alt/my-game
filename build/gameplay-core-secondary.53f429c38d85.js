@@ -968,8 +968,14 @@
     }
 
     function syncDefeatedCards(){
-        if(typeof monsters!=="undefined"&&Array.isArray(monsters)){
-            monsters.forEach((monster,index)=>{
+        if(
+            typeof monsters!=="undefined"&&
+            Array.isArray(monsters)&&
+            typeof currentBattleMonsters!=="undefined"&&
+            Array.isArray(currentBattleMonsters)
+        ){
+            currentBattleMonsters.forEach(index=>{
+                const monster=monsters[index];
                 const card=document.getElementById("battleMonster"+index);
                 if(card){ card.classList.toggle("v146-defeated",!monster||monster.alive===false||numeric(monster.hp)<=0); }
             });
@@ -1512,27 +1518,6 @@
         };
     }
 
-    if(typeof updateUI==="function"){
-        const previousUpdateUI=updateUI;
-        updateUI=function(){
-            const result=previousUpdateUI.apply(this,arguments);
-            renderHomeRoster();
-            syncDefeatedCards();
-            syncShopTotals();
-            syncCharacterAttentionDots();
-            return result;
-        };
-    }
-
-    if(typeof updateMonsterUI==="function"){
-        const previousUpdateMonsterUI=updateMonsterUI;
-        updateMonsterUI=function(){
-            const result=previousUpdateMonsterUI.apply(this,arguments);
-            syncDefeatedCards();
-            return result;
-        };
-    }
-
     if(typeof updateGoldDisplay==="function"){
         const previousUpdateGoldDisplay=updateGoldDisplay;
         updateGoldDisplay=function(){
@@ -1550,7 +1535,6 @@
         syncShopTotals();
         syncDungeonShell();
         polishSynthesis();
-        syncDefeatedCards();
         syncCharacterAttentionDots();
     }
     if(typeof MutationObserver!=="undefined"){
@@ -1559,7 +1543,12 @@
             mutationQueued=true;
             requestAnimationFrame(syncDynamicDom);
         });
-        const startObserver=()=>observer.observe(document.body,{childList:true,subtree:true});
+        const startObserver=()=>{
+            [
+                document.getElementById("homeFeatureModal"),
+                document.getElementById("dungeonPage")
+            ].filter(Boolean).forEach(root=>observer.observe(root,{childList:true,subtree:true,attributes:true,attributeFilter:["class"]}));
+        };
         if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",startObserver,{once:true}); }
         else{ startObserver(); }
     }
@@ -2774,15 +2763,6 @@
         };
     }
 
-    if(typeof updateUI==="function"){
-        const previousUpdateUI=updateUI;
-        updateUI=function(){
-            const result=previousUpdateUI.apply(this,arguments);
-            syncQuestNoticeDots();
-            return result;
-        };
-    }
-
     if(typeof openHomeFeature==="function"){
         const previousOpenHomeFeature=openHomeFeature;
         openHomeFeature=function(){
@@ -3045,7 +3025,11 @@
             queued=true;
             requestAnimationFrame(()=>{ queued=false; syncContextNavigation(); syncQuestNoticeDots(); });
         });
-        const observe=()=>observer.observe(document.body,{childList:true,subtree:true});
+        const observe=()=>[
+            document.getElementById("mapPage"),
+            document.getElementById("dungeonPage"),
+            document.getElementById("homeFeatureModal")
+        ].filter(Boolean).forEach(root=>observer.observe(root,{childList:true,subtree:true,attributes:true,attributeFilter:["class"]}));
         if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",observe,{once:true}); }
         else{ observe(); }
     }
@@ -3679,13 +3663,17 @@
         syncPlayerCards();
     }
 
-    if(typeof window.v143SyncEarthShieldEffects==="function"){
-        const previousEarthShieldSync=window.v143SyncEarthShieldEffects;
-        window.v143SyncEarthShieldEffects=function(){
-            const result=previousEarthShieldSync.apply(this,arguments);
-            syncAllCombatCards();
-            return result;
-        };
+    function syncCombatCard(side,index){
+        if(side==="monster"){
+            syncMonsterCard(index);
+            return;
+        }
+        if(side==="player"){
+            syncBarrierCard(
+                document.getElementById("battlePlayerCard"+index),
+                getPartyCharacterByIndex(index)
+            );
+        }
     }
 
     if(typeof window.v141PlayCardEffect==="function"){
@@ -3693,29 +3681,15 @@
         window.v141PlayCardEffect=function(side,index,type){
             if(side==="monster"&&type==="revive"){ syncMonsterCard(index); }
             const result=previousPlayCardEffect.apply(this,arguments);
-            setTimeout(syncAllCombatCards,0);
+            setTimeout(()=>syncCombatCard(side,index),0);
             if(side==="monster"&&type==="revive"){ setTimeout(()=>syncMonsterCard(index),1900); }
             return result;
         };
     }
 
-    if(typeof updateMonsterUI==="function"){
-        const previousUpdateMonsterUI=updateMonsterUI;
-        updateMonsterUI=function(index){
-            const result=previousUpdateMonsterUI.apply(this,arguments);
-            syncMonsterCard(index);
-            return result;
-        };
-    }
-
-    if(typeof updateUI==="function"){
-        const previousUpdateUI=updateUI;
-        updateUI=function(){
-            const result=previousUpdateUI.apply(this,arguments);
-            syncAllCombatCards();
-            return result;
-        };
-    }
+    window.v149AfterMonsterUiUpdate=function(index){
+        syncMonsterCard(index);
+    };
 
     /* ----- Reflect damage label and monster Frostbite/Fire follow-ups. ----- */
     let currentReflectAttacker=null;
@@ -3949,18 +3923,6 @@
             const homeShop=document.getElementById("homeIconShop");
             if(homeShop){ homeShop.style.backgroundImage="url(assets/ui/home-shop.png)"; }
         }
-    }
-
-    if(typeof MutationObserver!=="undefined"&&typeof document!=="undefined"){
-        let queued=false;
-        const observer=new MutationObserver(()=>{
-            if(queued){ return; }
-            queued=true;
-            requestAnimationFrame(()=>{ queued=false; syncAllCombatCards(); });
-        });
-        const observe=()=>observer.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:["class"]});
-        if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",observe,{once:true}); }
-        else{ observe(); }
     }
 
     if(typeof document!=="undefined"&&document.readyState==="loading"){
@@ -4393,23 +4355,6 @@
     }
 
     window.v152SyncAbyssBattleUi=syncAbyssBattleUi;
-    if(typeof updateMonsterUI==="function"){
-        const previousUpdateMonsterUI=updateMonsterUI;
-        updateMonsterUI=function(){
-            const result=previousUpdateMonsterUI.apply(this,arguments);
-            syncAbyssBattleUi();
-            return result;
-        };
-    }
-    if(typeof updateUI==="function"){
-        const previousUpdateUI=updateUI;
-        updateUI=function(){
-            const result=previousUpdateUI.apply(this,arguments);
-            syncSkillPointDisplay();
-            syncAbyssBattleUi();
-            return result;
-        };
-    }
 
     function boot(){
         cleanAccidentalFireSkill();
@@ -4418,15 +4363,6 @@
         removeTaskTracker();
     }
 
-    if(typeof MutationObserver!=="undefined"&&typeof document!=="undefined"){
-        const beginObserve=()=>{
-            if(!document.body){ return; }
-            const observer=new MutationObserver(()=>removeTaskTracker());
-            observer.observe(document.body,{childList:true,subtree:true});
-        };
-        if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",beginObserve,{once:true}); }
-        else{ beginObserve(); }
-    }
     if(typeof document!=="undefined"&&document.readyState==="loading"){
         document.addEventListener("DOMContentLoaded",boot,{once:true});
     }else{ boot(); }
@@ -4689,6 +4625,11 @@
 
     function syncMonsterPortraits(){
         if(typeof document==="undefined"){ return; }
+        if(typeof window.bumpBattleRuntimeMetric==="function"){ window.bumpBattleRuntimeMetric("syncMonsterPortraits"); }
+        else if(window.FourSymbolsBattleRuntimeMetrics&&window.FourSymbolsBattleRuntimeMetrics.enabled===true){
+            const counters=window.FourSymbolsBattleRuntimeMetrics.counters||{};
+            counters.syncMonsterPortraits=(Number(counters.syncMonsterPortraits)||0)+1;
+        }
         installMonsterPortraitPresentationStyle();
         const roster=currentAbyssRoster();
         const finalFloor=isFinalAbyssRoster(roster);
@@ -4738,15 +4679,6 @@
         syncMonsterPortraits();
     }
     window.v154AfterBattleRender=v154AfterBattleRender;
-    if(typeof updateMonsterUI==="function"){
-        const previousUpdateMonsterUI=updateMonsterUI;
-        updateMonsterUI=function(){
-            const result=previousUpdateMonsterUI.apply(this,arguments);
-            syncMonsterPortraits();
-            return result;
-        };
-    }
-
     function isElementBoxRecoveryActive(){
         if(typeof window.v131GetElementBoxState==="function"){
             try{
@@ -6352,15 +6284,6 @@
         window.v132LaunchDungeonBattle=function(){
             const result=previousLaunchDungeonBattle.apply(this,arguments);
             if(result){ syncAfterDomSettles(); }
-            return result;
-        };
-    }
-
-    if(typeof updateUI==="function"){
-        const previousUpdateUI=updateUI;
-        updateUI=function(){
-            const result=previousUpdateUI.apply(this,arguments);
-            syncPortraits();
             return result;
         };
     }
@@ -8881,7 +8804,6 @@ function inBattle(){try{return typeof battleActive!=="undefined"&&!!battleActive
 function blocked(){const now=Date.now();if(now-lastBlockedAt<600)return;lastBlockedAt=now;void alertRpg("戰鬥進行中無法調整能力值，也無法學習或升級技能。\n請先結束戰鬥後再操作。",{title:"戰鬥中禁止養成操作",confirmText:"知道了",danger:true});}
 function guard(name){const old=window[name];if(typeof old!=="function"||old.__v17351Guard)return;const fn=function(){if(inBattle()){blocked();return false}return old.apply(this,arguments)};fn.__v17351Guard=true;window[name]=fn;}
 ["addPoint","removePoint","confirmStatus","learnSkill","upgradeSkill"].forEach(guard);
-document.addEventListener("click",e=>{if(!inBattle())return;const b=e.target?.closest?.("button,[role=button]");if(!b)return;const s=String(b.getAttribute?.("onclick")||"");if(!/(addPoint|removePoint|confirmStatus|learnSkill|upgradeSkill)\s*\(/.test(s))return;e.preventDefault();e.stopImmediatePropagation();blocked();},true);
 
 function fivePriority(indexes){
     const list=(indexes||[]).filter(Number.isInteger);
@@ -8982,18 +8904,7 @@ window.v17351SyncManagement=syncManagement;
 function adLayer(){let l=document.getElementById("v17351AdSimulator");if(l)return l;l=document.createElement("div");l.id="v17351AdSimulator";l.className="v17351-ad-simulator";l.setAttribute("aria-hidden","true");l.innerHTML='<section class="v17351-ad-panel" role="dialog" aria-modal="true"><div class="v17351-ad-badge">AD</div><h2>模擬觀看廣告</h2><p>測試模式：播放完成後才發放獎勵。</p><strong id="v17351AdCountdown">3</strong><span id="v17351AdStatus">秒後完成</span></section>';document.body.appendChild(l);return l;}
 window.showRewardedAd=function(onSuccess,onFail){if(adRunning)return false;adRunning=true;const l=adLayer(),num=l.querySelector("#v17351AdCountdown"),status=l.querySelector("#v17351AdStatus");l.classList.add("show");l.setAttribute("aria-hidden","false");let remain=3;num.textContent="3";status.textContent="秒後完成";const timer=setInterval(()=>{remain--;if(remain>0){num.textContent=String(remain);return}clearInterval(timer);num.textContent="✓";status.textContent="觀看完成";setTimeout(()=>{l.classList.remove("show");l.setAttribute("aria-hidden","true");adRunning=false;try{if(typeof onSuccess==="function")onSuccess()}catch(err){console.error(err);if(typeof onFail==="function")onFail(err)}},280)},1000);return true;};
 
-const observer=new MutationObserver(mutations=>{
-    let needsResourceSync=false;
-    mutations.forEach(record=>record.addedNodes.forEach(node=>{
-        if(!(node instanceof Element)){ return; }
-        const units=node.matches?.(".battle-player,.battle-monster")
-            ?[node]:Array.from(node.querySelectorAll?.(".battle-player,.battle-monster")||[]);
-        units.forEach(card=>syncUnitArtwork(card,card.classList.contains("battle-monster")?"monster":"player"));
-        if(units.length){ needsResourceSync=true; }
-    }));
-    if(needsResourceSync){ syncResourceNumbers(); }
-});
-observer.observe(document.body,{subtree:true,childList:true});
+window.v17351AfterBattleRender=syncBattlePresentation;
 syncManagement();
 })();
 
@@ -9054,10 +8965,10 @@ window.v17351ToggleQualityMenu=()=>{const p=document.getElementById("v17351BulkQ
 window.v17351ChooseQuality=v=>{writeQ(v);document.getElementById("v17351BulkQualityPicker")?.classList.remove("open");syncSellUi()};
 function syncSellUi(){const bar=document.getElementById("v17350BulkSellBar");if(!bar)return;const q=readQ(),s=summary(q),b=document.getElementById("v17351BulkQualityButton"),sell=bar.querySelector("#v17350BulkSellButton"),meta=bar.querySelector("#v17350BulkSellMeta");if(b){const text=QL[q]+"以下 ▾";if(b.textContent!==text)b.textContent=text;}document.querySelectorAll("#v17351BulkQualityPicker [data-q]").forEach(o=>{const yes=o.dataset.q===q;if(o.classList.contains("selected")!==yes)o.classList.toggle("selected",yes);const aria=yes?"true":"false";if(o.getAttribute("aria-selected")!==aria)o.setAttribute("aria-selected",aria)});if(sell){if(sell.disabled!==(s.units<=0))sell.disabled=s.units<=0;const text="售出 "+s.units+" 件";if(sell.textContent!==text)sell.textContent=text;if(sell.classList.contains("danger")!==s.orange)sell.classList.toggle("danger",s.orange)}if(meta){const lc=typeof inventoryItems!=="undefined"?inventoryItems.filter(i=>equipment(i)&&locked(i)).length:0;const text=s.units?"預計獲得 "+s.gold.toLocaleString("zh-TW")+" 金幣"+(lc?"・略過 "+lc+" 件鎖定":""):"目前沒有符合條件且未鎖定的裝備";if(meta.textContent!==text)meta.textContent=text}}
 window.v17350BulkSellEquipment=async function(){const q=readQ(),s=summary(q);if(!s.units){await alertRpg("目前沒有符合「"+QL[q]+"以下」且未鎖定的背包裝備。",{title:"一鍵售出",confirmText:"知道了"});return false}const ok=await confirmRpg((s.orange?"⚠ 本次包含橙裝。\n":"")+"將售出 "+s.units+" 件未鎖定裝備，獲得 "+s.gold.toLocaleString("zh-TW")+" 金幣。\n"+(s.orange?"橙裝售出後無法復原，確定繼續嗎？":"確定售出嗎？"),{title:s.orange?"高品質裝備警告":"一鍵售出確認",confirmText:"確認售出",cancelText:"取消",danger:s.orange});if(!ok)return false;const set=new Set(s.c);for(let i=inventoryItems.length-1;i>=0;i--)if(set.has(inventoryItems[i]))inventoryItems.splice(i,1);if(typeof gold!=="undefined")gold+=s.gold;if(typeof selectedInventorySlot!=="undefined")selectedInventorySlot=null;if(typeof closeItemModal==="function")closeItemModal();saveRefresh();picker();await alertRpg("已售出 "+s.units+" 件裝備。\n獲得 "+s.gold.toLocaleString("zh-TW")+" 金幣。",{title:"一鍵售出完成",confirmText:"知道了",tone:"success"});return true};
-document.addEventListener("click",e=>{const p=document.getElementById("v17351BulkQualityPicker");if(p&&p.classList.contains("open")&&!p.contains(e.target))p.classList.remove("open")});
+const inventoryRoot=document.getElementById("inventoryPage");if(inventoryRoot){inventoryRoot.addEventListener("click",e=>{const p=document.getElementById("v17351BulkQualityPicker");if(p&&p.classList.contains("open")&&!p.contains(e.target))p.classList.remove("open")});}
 function visible(el){if(!el)return false;const s=getComputedStyle(el);return s.display!=="none"&&s.visibility!=="hidden"}
 function fullscreen(){const inv=document.getElementById("inventoryPage"),shell=document.getElementById("characterPage")||document.getElementById("characterModal"),shellOpen=!shell||visible(shell),open=!!(inv&&visible(inv)&&(inv.classList.contains("map-inventory-overlay-open")||shellOpen));if(document.body.classList.contains("v17351-inventory-fullscreen")!==open)document.body.classList.toggle("v17351-inventory-fullscreen",open);if(open)picker();}
-let inventorySyncQueued=false;function scheduleInventorySync(){if(inventorySyncQueued)return;inventorySyncQueued=true;const run=()=>{inventorySyncQueued=false;fullscreen();picker();syncSellUi()};if(typeof requestAnimationFrame==="function")requestAnimationFrame(run);else setTimeout(run,0)}const obs=new MutationObserver(scheduleInventorySync);obs.observe(document.body,{subtree:true,childList:true});setInterval(scheduleInventorySync,500);scheduleInventorySync();
+let inventorySyncQueued=false;function scheduleInventorySync(){if(inventorySyncQueued)return;inventorySyncQueued=true;const run=()=>{inventorySyncQueued=false;fullscreen();picker();syncSellUi()};if(typeof requestAnimationFrame==="function")requestAnimationFrame(run);else setTimeout(run,0)}window.v17351SyncInventoryQa=scheduleInventorySync;scheduleInventorySync();
 })();
 
 
@@ -9086,7 +8997,7 @@ if(typeof window.v141ClaimQuestMilestone==="function"){const old=window.v141Clai
 window.v17351PreviewQuestMilestone=(type,threshold,label)=>void alertRpg("完成度達到 "+threshold+"% 後可領取：\n"+(label||"獎勵"),{title:type==="commission"?"委託寶箱預覽":"每日寶箱預覽",confirmText:"知道了"});
 function previewChests(){const modal=document.getElementById("homeFeatureModal");if(!modal)return;const type=/委託/.test(String(document.getElementById("homeFeatureModalTitle")?.textContent||""))?"commission":"daily";modal.querySelectorAll(".quest-milestone:not(.reached) .quest-milestone-slot").forEach(b=>{const t=parseInt(b.closest(".quest-milestone")?.querySelector(".quest-milestone-percent")?.textContent||"0",10)||0,label=String(b.querySelector("small")?.textContent||b.getAttribute("aria-label")||"獎勵");b.disabled=false;b.classList.add("v17351-previewable");b.setAttribute("aria-label","預覽 "+t+"% 獎勵");b.onclick=e=>{e.preventDefault();window.v17351PreviewQuestMilestone(type,t,label)}})}
 if(typeof window.openHomeFeature==="function"){const old=window.openHomeFeature;window.openHomeFeature=function(type){const r=old.apply(this,arguments);if(type==="achievement")setTimeout(refreshAchievements,0);if(type==="daily"||type==="quest")setTimeout(previewChests,0);return r}}
-const obs=new MutationObserver(previewChests);obs.observe(document.body,{subtree:true,childList:true});setInterval(previewChests,700);window.__v17351QaReady=true;
+window.v17351PreviewQuestMilestones=previewChests;previewChests();window.__v17351QaReady=true;
 })();
 
 
@@ -9425,9 +9336,10 @@ window.v17363ChooseMaterialOption=function(key,value){
     MATERIAL_STATE[key]=String(value||"");renderMaterialSynthesis();
 };
 window.v17363SetMaterialOption=window.v17363ChooseMaterialOption;
-document.addEventListener("click",event=>{
-    document.querySelectorAll(".v17363-game-select.open").forEach(root=>{if(root.contains(event.target)){return;}root.classList.remove("open");const button=root.querySelector(".v17363-game-select-trigger");if(button){button.setAttribute("aria-expanded","false");}});
-});
+const functionalModalRoot=document.getElementById("homeFeatureModal");
+if(functionalModalRoot){functionalModalRoot.addEventListener("click",event=>{
+    functionalModalRoot.querySelectorAll(".v17363-game-select.open").forEach(root=>{if(root.contains(event.target)){return;}root.classList.remove("open");const button=root.querySelector(".v17363-game-select-trigger");if(button){button.setAttribute("aria-expanded","false");}});
+});}
 window.v17363CraftMaterial=function(kind){
     const isOre=kind==="ore";
     const tier=isOre?MATERIAL_STATE.oreTier:MATERIAL_STATE.blueprintTier;
@@ -9493,16 +9405,10 @@ function scheduleRepairs(){
     if(typeof requestAnimationFrame==="function"){requestAnimationFrame(runRepairs);}else{setTimeout(runRepairs,0);}
 }
 
-/* Re-run after the established owners render or move the shared DOM. */
-["renderInventoryItems","renderInventory","rebuildInventorySlots","openMapInventoryOverlay"].forEach(name=>{
-    const previous=window[name];if(typeof previous!=="function"||previous.__v17363Wrapped){return;}
-    const wrapped=function(){const result=previous.apply(this,arguments);scheduleRepairs();return result;};wrapped.__v17363Wrapped=true;window[name]=wrapped;
-    try{if(name in globalThis){globalThis[name]=wrapped;}}catch(_){ }
-});
-
+/* Production repairs are lifecycle-driven. Inventory/open/render owners call this
+   explicit hook; synthesis already calls scheduleRepairs from its own render lifecycle. */
+window.v17363SyncFunctionalFixes=runRepairs;
 ensureFunctionalStyles();runRepairs();
-if(typeof MutationObserver!=="undefined"&&document.body){new MutationObserver(scheduleRepairs).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:["class"]});}
-document.addEventListener("click",scheduleRepairs,true);document.addEventListener("change",scheduleRepairs,true);window.addEventListener("resize",scheduleRepairs,{passive:true});
 })();
 
 
@@ -9538,7 +9444,6 @@ document.addEventListener("click",scheduleRepairs,true);document.addEventListene
 
     let reconciling=false;
     let reconcileQueued=false;
-    const pendingPopupAnchors=[];
 
     /* Cardless presentation is source CSS only. Remove the retired runtime
        stylesheet if an old session created it; never inject a replacement. */
@@ -9815,19 +9720,6 @@ document.addEventListener("click",scheduleRepairs,true);document.addEventListene
         return null;
     }
 
-    function rememberPending(slot,kind){
-        if(!slot){ return; }
-        pendingPopupAnchors.push({slot:slot,kind:kind,expiresAt:Date.now()+2400});
-        while(pendingPopupAnchors.length>24){ pendingPopupAnchors.shift(); }
-    }
-
-    function consumePending(popup){
-        const now=Date.now();
-        while(pendingPopupAnchors.length&&pendingPopupAnchors[0].expiresAt<now){ pendingPopupAnchors.shift(); }
-        const pending=pendingPopupAnchors.shift();
-        return pending?applyPopupAnchor(popup,pending.slot,pending.kind):false;
-    }
-
     function wrapDamagePopup(){
         if(typeof window.showDamagePopup!=="function"||window.showDamagePopup.__fixedSlotPopupOwner){ return; }
         const previous=window.showDamagePopup;
@@ -9835,12 +9727,11 @@ document.addEventListener("click",scheduleRepairs,true);document.addEventListene
             const args=Array.prototype.slice.call(arguments);
             const slot=slotForElement(element);
             const before=new Set(document.querySelectorAll(".damage-popup"));
-            rememberPending(slot,"damage");
             const result=previous.apply(this,args);
             const popup=newestPopup(before,".damage-popup",element);
             if(popup){
                 const kind=popupKind(popup,args);
-                if(applyPopupAnchor(popup,slot,kind)){ pendingPopupAnchors.pop(); }
+                applyPopupAnchor(popup,slot,kind);
             }
             return result;
         };
@@ -9856,8 +9747,12 @@ document.addEventListener("click",scheduleRepairs,true);document.addEventListene
         const wrapped=function(isPlayerTarget,index){
             const side=isPlayerTarget?"player":"monster";
             const slot=slots.getSlotForCombatant(side,Number(index)||0,{enemySnapshot:slots.getActiveEnemySnapshot()});
-            rememberPending(slot,"miss");
-            return previous.apply(this,arguments);
+            const target=document.getElementById((isPlayerTarget?"battlePlayerCard":"battleMonster")+(Number(index)||0));
+            const before=new Set(document.querySelectorAll(".damage-popup.miss-popup"));
+            const result=previous.apply(this,arguments);
+            const popup=newestPopup(before,".damage-popup.miss-popup",target);
+            if(popup){ applyPopupAnchor(popup,slot,"miss"); }
+            return result;
         };
         wrapped.__fixedSlotPopupOwner=true;
         wrapped.__previous=previous;
@@ -9904,40 +9799,9 @@ document.addEventListener("click",scheduleRepairs,true);document.addEventListene
     wrapDamagePopup();
     wrapMissPopup();
 
-    function isOwnedFixedStructure(node){
-        if(!(node instanceof Element)||node.dataset.geometryOwner!=="fixed-slot"){ return false; }
-        return !!node.matches?.(".v-fixed-slot-row,.v-fixed-enemy-slot,.v-fixed-ally-slot,.v-fixed-boss-footprint");
-    }
-
-    const observer=new MutationObserver(records=>{
-        let needsReconcile=false;
-        records.forEach(record=>{
-            record.addedNodes.forEach(node=>{
-                if(!(node instanceof Element)){ return; }
-                const popups=node.matches&&node.matches(".damage-popup")?[node]:Array.from(node.querySelectorAll?.(".damage-popup")||[]);
-                popups.forEach(popup=>{
-                    if(popup.dataset.geometryOwner==="fixed-slot"){ return; }
-                    const card=popup.closest?.(".battle-player,.battle-monster,[data-slot]");
-                    const slot=card?slotForElement(card):null;
-                    if(slot){ applyPopupAnchor(popup,slot,popupKind(popup,[])); }
-                    else{ consumePending(popup); }
-                });
-                /* Reconcile only legacy/new combat content. The fixed rows and
-                   holders below are created by reconcile() itself; observing them
-                   must not recursively schedule another reconcile forever. */
-                if(isOwnedFixedStructure(node)){ return; }
-                if(
-                    node.id==="battleMonsterArea"||node.id==="battlePlayerRow"||
-                    node.matches?.(".battle-monster,.battle-player,.v131-monster-row")||
-                    node.querySelector?.(".battle-monster,.battle-player")
-                ){
-                    needsReconcile=true;
-                }
-            });
-        });
-        if(needsReconcile){ queueReconcile(); }
-    });
-    if(document.body){ observer.observe(document.body,{subtree:true,childList:true}); }
+    /* renderBattle() and explicit battle lifecycle hooks are the geometry authority.
+       Dynamic damage/miss popups are already anchored by wrapDamagePopup()/wrapMissPopup();
+       no document.body observer is required in the battle hot path. */
 
     reconcile();
 })();

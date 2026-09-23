@@ -29,7 +29,6 @@
 
     let reconciling=false;
     let reconcileQueued=false;
-    const pendingPopupAnchors=[];
 
     /* Cardless presentation is source CSS only. Remove the retired runtime
        stylesheet if an old session created it; never inject a replacement. */
@@ -306,19 +305,6 @@
         return null;
     }
 
-    function rememberPending(slot,kind){
-        if(!slot){ return; }
-        pendingPopupAnchors.push({slot:slot,kind:kind,expiresAt:Date.now()+2400});
-        while(pendingPopupAnchors.length>24){ pendingPopupAnchors.shift(); }
-    }
-
-    function consumePending(popup){
-        const now=Date.now();
-        while(pendingPopupAnchors.length&&pendingPopupAnchors[0].expiresAt<now){ pendingPopupAnchors.shift(); }
-        const pending=pendingPopupAnchors.shift();
-        return pending?applyPopupAnchor(popup,pending.slot,pending.kind):false;
-    }
-
     function wrapDamagePopup(){
         if(typeof window.showDamagePopup!=="function"||window.showDamagePopup.__fixedSlotPopupOwner){ return; }
         const previous=window.showDamagePopup;
@@ -326,12 +312,11 @@
             const args=Array.prototype.slice.call(arguments);
             const slot=slotForElement(element);
             const before=new Set(document.querySelectorAll(".damage-popup"));
-            rememberPending(slot,"damage");
             const result=previous.apply(this,args);
             const popup=newestPopup(before,".damage-popup",element);
             if(popup){
                 const kind=popupKind(popup,args);
-                if(applyPopupAnchor(popup,slot,kind)){ pendingPopupAnchors.pop(); }
+                applyPopupAnchor(popup,slot,kind);
             }
             return result;
         };
@@ -347,8 +332,12 @@
         const wrapped=function(isPlayerTarget,index){
             const side=isPlayerTarget?"player":"monster";
             const slot=slots.getSlotForCombatant(side,Number(index)||0,{enemySnapshot:slots.getActiveEnemySnapshot()});
-            rememberPending(slot,"miss");
-            return previous.apply(this,arguments);
+            const target=document.getElementById((isPlayerTarget?"battlePlayerCard":"battleMonster")+(Number(index)||0));
+            const before=new Set(document.querySelectorAll(".damage-popup.miss-popup"));
+            const result=previous.apply(this,arguments);
+            const popup=newestPopup(before,".damage-popup.miss-popup",target);
+            if(popup){ applyPopupAnchor(popup,slot,"miss"); }
+            return result;
         };
         wrapped.__fixedSlotPopupOwner=true;
         wrapped.__previous=previous;
@@ -395,40 +384,9 @@
     wrapDamagePopup();
     wrapMissPopup();
 
-    function isOwnedFixedStructure(node){
-        if(!(node instanceof Element)||node.dataset.geometryOwner!=="fixed-slot"){ return false; }
-        return !!node.matches?.(".v-fixed-slot-row,.v-fixed-enemy-slot,.v-fixed-ally-slot,.v-fixed-boss-footprint");
-    }
-
-    const observer=new MutationObserver(records=>{
-        let needsReconcile=false;
-        records.forEach(record=>{
-            record.addedNodes.forEach(node=>{
-                if(!(node instanceof Element)){ return; }
-                const popups=node.matches&&node.matches(".damage-popup")?[node]:Array.from(node.querySelectorAll?.(".damage-popup")||[]);
-                popups.forEach(popup=>{
-                    if(popup.dataset.geometryOwner==="fixed-slot"){ return; }
-                    const card=popup.closest?.(".battle-player,.battle-monster,[data-slot]");
-                    const slot=card?slotForElement(card):null;
-                    if(slot){ applyPopupAnchor(popup,slot,popupKind(popup,[])); }
-                    else{ consumePending(popup); }
-                });
-                /* Reconcile only legacy/new combat content. The fixed rows and
-                   holders below are created by reconcile() itself; observing them
-                   must not recursively schedule another reconcile forever. */
-                if(isOwnedFixedStructure(node)){ return; }
-                if(
-                    node.id==="battleMonsterArea"||node.id==="battlePlayerRow"||
-                    node.matches?.(".battle-monster,.battle-player,.v131-monster-row")||
-                    node.querySelector?.(".battle-monster,.battle-player")
-                ){
-                    needsReconcile=true;
-                }
-            });
-        });
-        if(needsReconcile){ queueReconcile(); }
-    });
-    if(document.body){ observer.observe(document.body,{subtree:true,childList:true}); }
+    /* renderBattle() and explicit battle lifecycle hooks are the geometry authority.
+       Dynamic damage/miss popups are already anchored by wrapDamagePopup()/wrapMissPopup();
+       no document.body observer is required in the battle hot path. */
 
     reconcile();
 })();

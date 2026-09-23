@@ -2708,9 +2708,6 @@
         const previous=closeHomeFeature;
         closeHomeFeature=function(){ const modal=document.getElementById("homeFeatureModal"); if(modal){modal.classList.remove("team-relic-modal"); const box=modal.querySelector(".home-feature-modal-box");if(box){box.classList.remove("wide");}} currentDetailId=null; return previous.apply(this,arguments); };
     }
-    if(typeof updateUI==="function"){
-        const previous=updateUI; updateUI=function(){ const result=previous.apply(this,arguments); syncHomeRelicUi(); return result; };
-    }
     if(typeof showPage==="function"){
         const previous=showPage; showPage=function(page){ const result=previous.apply(this,arguments); if(page==="home"){setTimeout(syncHomeRelicUi,0);} return result; };
     }

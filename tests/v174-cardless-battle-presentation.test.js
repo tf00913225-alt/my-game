@@ -25,7 +25,8 @@ test('HP and SP labels are normalized to current values only without observer ch
     const presentationBlock=source.match(/function syncResourceNumbers\(\)\{([\s\S]*?)\n\}/);
     assert.ok(presentationBlock);
     assert.doesNotMatch(presentationBlock[1],/maxHP|maxSP|"\/"|'\/'/);
-    assert.equal((source.match(/new MutationObserver/g)||[]).length,1);
+    assert.equal((source.match(/new MutationObserver/g)||[]).length,0);
+    assert.match(source,/window\.v17351AfterBattleRender=syncBattlePresentation/);
 });
 
 test('portrait motion keeps lunge while enemy hit feedback has no shake lifecycle',()=>{

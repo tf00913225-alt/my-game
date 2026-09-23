@@ -332,9 +332,10 @@ window.v17363ChooseMaterialOption=function(key,value){
     MATERIAL_STATE[key]=String(value||"");renderMaterialSynthesis();
 };
 window.v17363SetMaterialOption=window.v17363ChooseMaterialOption;
-document.addEventListener("click",event=>{
-    document.querySelectorAll(".v17363-game-select.open").forEach(root=>{if(root.contains(event.target)){return;}root.classList.remove("open");const button=root.querySelector(".v17363-game-select-trigger");if(button){button.setAttribute("aria-expanded","false");}});
-});
+const functionalModalRoot=document.getElementById("homeFeatureModal");
+if(functionalModalRoot){functionalModalRoot.addEventListener("click",event=>{
+    functionalModalRoot.querySelectorAll(".v17363-game-select.open").forEach(root=>{if(root.contains(event.target)){return;}root.classList.remove("open");const button=root.querySelector(".v17363-game-select-trigger");if(button){button.setAttribute("aria-expanded","false");}});
+});}
 window.v17363CraftMaterial=function(kind){
     const isOre=kind==="ore";
     const tier=isOre?MATERIAL_STATE.oreTier:MATERIAL_STATE.blueprintTier;
@@ -400,14 +401,8 @@ function scheduleRepairs(){
     if(typeof requestAnimationFrame==="function"){requestAnimationFrame(runRepairs);}else{setTimeout(runRepairs,0);}
 }
 
-/* Re-run after the established owners render or move the shared DOM. */
-["renderInventoryItems","renderInventory","rebuildInventorySlots","openMapInventoryOverlay"].forEach(name=>{
-    const previous=window[name];if(typeof previous!=="function"||previous.__v17363Wrapped){return;}
-    const wrapped=function(){const result=previous.apply(this,arguments);scheduleRepairs();return result;};wrapped.__v17363Wrapped=true;window[name]=wrapped;
-    try{if(name in globalThis){globalThis[name]=wrapped;}}catch(_){ }
-});
-
+/* Production repairs are lifecycle-driven. Inventory/open/render owners call this
+   explicit hook; synthesis already calls scheduleRepairs from its own render lifecycle. */
+window.v17363SyncFunctionalFixes=runRepairs;
 ensureFunctionalStyles();runRepairs();
-if(typeof MutationObserver!=="undefined"&&document.body){new MutationObserver(scheduleRepairs).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:["class"]});}
-document.addEventListener("click",scheduleRepairs,true);document.addEventListener("change",scheduleRepairs,true);window.addEventListener("resize",scheduleRepairs,{passive:true});
 })();

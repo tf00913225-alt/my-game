@@ -44,14 +44,5 @@
         migrateMapNav();
     }
 
-    const observer = new MutationObserver(function(){
-        migrateMapNav();
-    });
-
-    observer.observe(document.body, {
-        childList:true,
-        subtree:true
-    });
-
     window.migrateMapNavToNative1080 = migrateMapNav;
 })();

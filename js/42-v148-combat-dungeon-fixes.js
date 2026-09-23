@@ -1190,15 +1190,6 @@
         };
     }
 
-    if(typeof updateUI==="function"){
-        const previousUpdateUI=updateUI;
-        updateUI=function(){
-            const result=previousUpdateUI.apply(this,arguments);
-            syncQuestNoticeDots();
-            return result;
-        };
-    }
-
     if(typeof openHomeFeature==="function"){
         const previousOpenHomeFeature=openHomeFeature;
         openHomeFeature=function(){
@@ -1461,7 +1452,11 @@
             queued=true;
             requestAnimationFrame(()=>{ queued=false; syncContextNavigation(); syncQuestNoticeDots(); });
         });
-        const observe=()=>observer.observe(document.body,{childList:true,subtree:true});
+        const observe=()=>[
+            document.getElementById("mapPage"),
+            document.getElementById("dungeonPage"),
+            document.getElementById("homeFeatureModal")
+        ].filter(Boolean).forEach(root=>observer.observe(root,{childList:true,subtree:true,attributes:true,attributeFilter:["class"]}));
         if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",observe,{once:true}); }
         else{ observe(); }
     }

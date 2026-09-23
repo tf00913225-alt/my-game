@@ -27,8 +27,10 @@ assert.match(adapterSource,/neutralizeLegacyPresentationGeometry/);
 assert.match(adapterSource,/if\(style\)\{ style\.remove\(\); \}/,"retired runtime stylesheet is removed, not replaced");
 assert.match(adapterSource,/area\.classList\.remove\("battle-monsters","v131-formation","v141-fixed-formation"\)/);
 assert.match(adapterSource,/area\.classList\.remove\("battle-player-row"\)/);
-assert.match(adapterSource,/function isOwnedFixedStructure\(node\)/);
-assert.match(adapterSource,/if\(isOwnedFixedStructure\(node\)\)\{ return; \}/,"observer must ignore its own fixed Slot rows/holders");
+assert.doesNotMatch(adapterSource,/MutationObserver|function isOwnedFixedStructure\(node\)/,
+    "fixed-slot reconciliation must be lifecycle-driven, not body-observer driven");
+assert.match(adapterSource,/window\.vFixedSlotAfterBattleRender=reconcile/,
+    "renderBattle lifecycle must invoke the canonical fixed-slot reconcile owner");
 assert.match(adapterSource,/VFX_SCALE_CONTRACT/);
 assert.match(adapterSource,/baseWidth:rect\.width/);
 assert.match(adapterSource,/baseHeight:rect\.height/);

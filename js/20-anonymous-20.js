@@ -20,6 +20,9 @@ const V_ASSET_VERSION="173.71";
         {pattern:/battle/i,feature:"battle",label:"戰鬥"}
     ];
     function target(event){ return event.target&&event.target.closest&&event.target.closest("button,a,[data-feature]"); }
+    function isBattleRuntimeInteraction(element){
+        return !!(element&&element.closest&&element.closest("#battlePage"));
+    }
     function isExpPoolInteraction(element){
         return !!(element&&element.closest&&element.closest("#homeExpPoolCard"));
     }
@@ -81,11 +84,13 @@ const V_ASSET_VERSION="173.71";
         }).finally(()=>{ expPoolPrimePromise=null; });
     }
     function prefetch(event){
-        const element=target(event); const info=descriptor(element); const api=loader();
+        const element=target(event); if(isBattleRuntimeInteraction(element)){ return; }
+        const info=descriptor(element); const api=loader();
         if(info&&api&&!api.isReady(info.feature)){ void api.prefetch(info.feature,event.type); }
     }
     function enter(event){
-        const element=target(event); const info=descriptor(element); const api=loader();
+        const element=target(event); if(isBattleRuntimeInteraction(element)){ return; }
+        const info=descriptor(element); const api=loader();
         if(!info||!api||api.isReady(info.feature)||element.dataset.featureReplay==="1"){ return; }
         event.preventDefault(); event.stopImmediatePropagation();
         if(element.dataset.featureLoading==="1"){ return; }
@@ -108,7 +113,6 @@ const V_ASSET_VERSION="173.71";
     document.addEventListener("pointerdown",prefetch,{capture:true,passive:true});
     document.addEventListener("touchstart",prefetch,{capture:true,passive:true});
     document.addEventListener("click",enter,true);
-    document.addEventListener("click",()=>setTimeout(primeExpPoolSafety,0),true);
     document.addEventListener("four-symbols:startup-ready",()=>{
         const api=loader();
         if(api){
@@ -122,12 +126,14 @@ const V_ASSET_VERSION="173.71";
     },{once:true});
 
     function installExpPoolVisibilityObserver(){
-        if(!document.body||typeof MutationObserver==="undefined"){ return; }
+        const pool=document.getElementById("homeExpPoolCard");
+        const root=document.getElementById("homePage")||pool;
+        if(!root||typeof MutationObserver==="undefined"){ primeExpPoolSafety(); return; }
         const observer=new MutationObserver(()=>{
-            if(expPoolSafetyUiReady){ return; }
+            if(expPoolSafetyUiReady){ observer.disconnect(); return; }
             primeExpPoolSafety();
         });
-        observer.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:["class","style","hidden"]});
+        observer.observe(root,{subtree:true,childList:true,attributes:true,attributeFilter:["class","style","hidden"]});
         primeExpPoolSafety();
     }
     if(document.readyState==="loading"){

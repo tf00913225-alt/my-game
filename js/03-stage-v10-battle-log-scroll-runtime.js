@@ -47,10 +47,8 @@
         ];
 
         document.querySelectorAll(selectors.join(",")).forEach(function(el){
-            if(canScrollVertically(el)){
-                el.setAttribute("data-battle-log-scroll", "true");
-                el.style.touchAction = "pan-y";
-            }
+            el.setAttribute("data-battle-log-scroll", "true");
+            el.style.touchAction = "pan-y";
         });
     }
 
@@ -80,17 +78,6 @@
     }, {capture:true, passive:false});
 
     markBattleScrollers();
-
-    const observer = new MutationObserver(function(){
-        markBattleScrollers();
-    });
-
-    observer.observe(document.body, {
-        childList:true,
-        subtree:true,
-        attributes:true,
-        attributeFilter:["class","style"]
-    });
 
     window.addEventListener("resize", markBattleScrollers, {passive:true});
 })();

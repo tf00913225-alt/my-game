@@ -680,7 +680,7 @@
         return document.getElementById("battlePage");
     }
     function appRoot(){
-        return document.getElementById("app")||document.getElementById("game-content")||document.body;
+        return document.getElementById("game-content")||document.getElementById("app")||document.body;
     }
     function clampEdgeTop(edge,root,value){
         const height=Math.max(1,Number(root&&root.clientHeight)||0);
@@ -6359,44 +6359,9 @@
     }
     window.v135GetSkillTargetScopeLabel=getSkillTargetScopeLabel;
 
-    /* --- 2a. 手動戰鬥的技能格：在技能名稱下面補一行作用對象 --- */
-    if(typeof populateSkillQuickBar==="function"){
-        const originalPopulateSkillQuickBar=populateSkillQuickBar;
-        populateSkillQuickBar=function(){
-            const result=originalPopulateSkillQuickBar.apply(this,arguments);
-
-            try{
-                const bar=document.getElementById("skillQuickBarGrid");
-                if(!bar){ return result; }
-
-                const characterId=getPartyCharacterKey(activeBattleCharacterIndex);
-                const loadout=characterSkillLoadouts[characterId];
-                if(!loadout){ return result; }
-
-                Array.from(bar.children).forEach((button,i)=>{
-                    const skillId=loadout.equippedSkills[i];
-                    const skill=skillId ? skillDatabase[skillId] : null;
-                    const label=getSkillTargetScopeLabel(skill);
-                    if(!label){ return; }
-                    if(button.querySelector(".v135-sq-scope")){ return; }
-
-                    const costEl=button.querySelector(".sq-cost");
-                    const scope=document.createElement("span");
-                    scope.className="v135-sq-scope";
-                    scope.textContent=label;
-                    if(costEl && costEl.parentElement){
-                        costEl.parentElement.insertBefore(scope,costEl);
-                    }else{
-                        button.appendChild(scope);
-                    }
-                });
-            }catch(error){
-                console.error("V135 技能格作用對象標示失敗：",error);
-            }
-
-            return result;
-        };
-    }
+    /* --- 2a. 手動戰鬥技能格已由 js/00-main.js Canonical Owner 直接
+       以 v135GetSkillTargetScopeLabel() 做 Diff Update，不再包裝
+       populateSkillQuickBar()。 */
 
     /* --- 2b. 自動戰鬥設定的技能下拉：選項文字後面補作用對象 --- */
     function decorateAutoSettingsSkillOptions(){
@@ -9504,44 +9469,41 @@
         return true;
     }
 
-    if(typeof updateMonsterUI==="function"){
-        const originalUpdateMonsterUI=updateMonsterUI;
-        updateMonsterUI=function(index){
-            if(typeof window.v141SyncMonsterShield==="function"){
-                window.v141SyncMonsterShield(monsters[index]);
-            }
-            const result=originalUpdateMonsterUI.apply(this,arguments);
-            const monster=monsters[index];
-            if(monster){
-                const normalBar=document.getElementById("battleMonsterBar"+index);
-                const shieldBar=document.getElementById("battleMonsterShieldBar"+index);
-                const hpText=document.getElementById("battleMonsterHPText"+index);
-                const shield=monster.v141Shield;
-                const remaining=shield?Math.max(0,Number(shield.remaining)||0):0;
-                if(shield&&remaining>0){
-                    const baseMax=shield.baseMaxHP;
-                    const baseHp=Math.max(0,monster.hp-remaining);
-                    const visibleShield=shield.isBarrier?baseMax:remaining;
-                    const total=Math.max(1,baseMax+visibleShield);
-                    if(normalBar){ normalBar.style.width=(baseHp/total*100)+"%"; }
-                    if(shieldBar){
-                        shieldBar.style.left=(baseHp/total*100)+"%";
-                        shieldBar.style.width=(visibleShield/total*100)+"%";
-                    }
-                    if(hpText){
-                        hpText.textContent=shield.isBarrier
-                            ?Math.floor(baseHp)+"/"+baseMax+"　結界"
-                            :Math.floor(baseHp)+"/"+baseMax+" +"+Math.floor(remaining);
-                    }
-                }else if(shieldBar){
-                    shieldBar.style.left="0";
-                    shieldBar.style.width="0";
-                }
-            }
-            return result;
-        };
+    function v141BeforeMonsterUiUpdate(index,monster){
+        if(typeof window.v141SyncMonsterShield==="function"&&monster){
+            window.v141SyncMonsterShield(monster);
+        }
     }
 
+    function v141AfterMonsterUiUpdate(index,monster){
+        if(!monster){ return; }
+        const normalBar=document.getElementById("battleMonsterBar"+index);
+        const shieldBar=document.getElementById("battleMonsterShieldBar"+index);
+        const hpText=document.getElementById("battleMonsterHPText"+index);
+        const shield=monster.v141Shield;
+        const remaining=shield?Math.max(0,Number(shield.remaining)||0):0;
+        if(shield&&remaining>0){
+            const baseMax=shield.baseMaxHP;
+            const baseHp=Math.max(0,monster.hp-remaining);
+            const visibleShield=shield.isBarrier?baseMax:remaining;
+            const total=Math.max(1,baseMax+visibleShield);
+            if(normalBar){ normalBar.style.width=(baseHp/total*100)+"%"; }
+            if(shieldBar){
+                shieldBar.style.left=(baseHp/total*100)+"%";
+                shieldBar.style.width=(visibleShield/total*100)+"%";
+            }
+            if(hpText){
+                hpText.textContent=shield.isBarrier
+                    ?Math.floor(baseHp)+"/"+baseMax+"　結界"
+                    :Math.floor(baseHp)+"/"+baseMax+" +"+Math.floor(remaining);
+            }
+        }else if(shieldBar){
+            shieldBar.style.left="0";
+            shieldBar.style.width="0";
+        }
+    }
+    window.v141BeforeMonsterUiUpdate=v141BeforeMonsterUiUpdate;
+    window.v141AfterMonsterUiUpdate=v141AfterMonsterUiUpdate;
 
     if(typeof resolveQueuedPlayerAction==="function"){
         const originalResolveQueuedPlayerAction=resolveQueuedPlayerAction;
@@ -10298,20 +10260,7 @@
             }
             if(page==="map"){
                 installPatrolClickMovement();
-                installTaskTracker();
-                renderTaskTracker();
-                requestAnimationFrame(clampTaskTracker);
             }
-            updateNotificationDots();
-            return result;
-        };
-    }
-
-    if(typeof updateUI==="function"){
-        const originalUpdateUI=updateUI;
-        updateUI=function(){
-            const result=originalUpdateUI.apply(this,arguments);
-            renderTaskTracker();
             updateNotificationDots();
             return result;
         };
@@ -12454,18 +12403,13 @@
         }
     }
     window.v143AfterBattleRender=v143AfterBattleRender;
-    if(typeof updateMonsterUI==="function"){
-        const previousUpdateMonsterUI=updateMonsterUI;
-        updateMonsterUI=function(index){
-            const result=previousUpdateMonsterUI.apply(this,arguments);
-            decorateEnemyCard(index);
-            syncEarthShieldEffects();
-            syncMonsterBarrierText(index);
-            const card=document.getElementById("battleMonster"+index);
-            if(card){ fitEnemyBars(card); }
-            return result;
-        };
+    function v143SystemAfterMonsterUiUpdate(index){
+        decorateEnemyCard(index);
+        syncMonsterBarrierText(index);
+        const card=document.getElementById("battleMonster"+index);
+        if(card){ fitEnemyBars(card); }
     }
+    window.v143SystemAfterMonsterUiUpdate=v143SystemAfterMonsterUiUpdate;
 
     /* ----- 7. Wanxiang Earth Shield owns a four-corner elemental frame. ----- */
     function hasActiveBuffType(entity,type){
@@ -12929,17 +12873,6 @@
         }
     }
 
-    if(typeof MutationObserver!=="undefined"){
-        const observer=new MutationObserver(()=>{
-            if(document.querySelector(".v141-synthesis")&&!document.querySelector(".v141-synthesis.v143-synthesis")){
-                requestAnimationFrame(decorateSynthesis);
-            }
-        });
-        const startObserver=()=>observer.observe(document.body,{childList:true,subtree:true});
-        if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",startObserver,{once:true}); }
-        else{ startObserver(); }
-    }
-
     if(typeof window.v141RenderSynthesis==="function"){
         const previousRenderSynthesis=window.v141RenderSynthesis;
         window.v141RenderSynthesis=function(){
@@ -12959,15 +12892,6 @@
             return result;
         };
     }
-    if(typeof updateUI==="function"){
-        const previousUpdateUI=updateUI;
-        updateUI=function(){
-            const result=previousUpdateUI.apply(this,arguments);
-            decorateEnemyCards(); syncEarthShieldEffects();
-            return result;
-        };
-    }
-
     function boot(){
         fixDungeonNavigation();
         decorateEnemyCards();
@@ -13612,12 +13536,15 @@
         if(!anchor){ return; }
         const cardRect=typeof card.getBoundingClientRect==="function"?card.getBoundingClientRect():anchor.rect;
         const regularEnemy=side==="monster"&&!isBossIndexForVfx(index);
+        const shellStatus=type==="shield"||type==="barrier"||type==="earthShield"||type==="rockWall";
+        const widthScale=(regularEnemy?1.45:1.40)*(shellStatus?1.08:1);
+        const heightScale=(regularEnemy?1.36:1.34)*(shellStatus?1.08:1);
         const width=regularEnemy
-            ?Math.max(60,Math.min(anchor.rect.width*1.20,cardRect.width*1.20))
-            :Math.max(44,Math.min(anchor.rect.width*1.16,cardRect.width*1.16));
+            ?Math.max(72,Math.min(anchor.rect.width*widthScale,cardRect.width*widthScale))
+            :Math.max(62,Math.min(anchor.rect.width*widthScale,cardRect.width*widthScale));
         const height=regularEnemy
-            ?Math.max(58,Math.min(anchor.rect.height*1.16,cardRect.height*1.16))
-            :Math.max(52,Math.min(anchor.rect.height*1.14,cardRect.height*1.14));
+            ?Math.max(68,Math.min(anchor.rect.height*heightScale,cardRect.height*heightScale))
+            :Math.max(64,Math.min(anchor.rect.height*heightScale,cardRect.height*heightScale));
         node.dataset.slot=anchor.slot;
         node.style.width=Math.round(width)+"px";
         node.style.height=Math.round(height)+"px";
@@ -14424,51 +14351,35 @@
         };
     }
 
-    if(typeof updateMonsterUI==="function"){
-        const previous=updateMonsterUI;
-        updateMonsterUI=function(index){
-            const wait=existingTargetDelay("monster",index);
-            if(wait>8){
-                const key="monster:"+index;
-                if(!state.pendingUpdates.has(key)){
-                    const args=arguments;
-                    state.pendingUpdates.set(key,true);
-                    setTimer(()=>{
-                        state.pendingUpdates.delete(key);
-                        previous.apply(this,args);
-                        syncStatusVisualsForUnit("monster",Number(index));
-                    },wait);
-                }
-                return;
+    function scheduleStatusOwnedUiUpdate(side,index,keyPrefix,callback){
+        if(typeof callback!=="function"){ return; }
+        const wait=existingTargetDelay(side,index);
+        if(wait>8){
+            const key=keyPrefix+":"+index;
+            if(!state.pendingUpdates.has(key)){
+                state.pendingUpdates.set(key,true);
+                setTimer(()=>{
+                    state.pendingUpdates.delete(key);
+                    callback();
+                },wait);
             }
-            const result=previous.apply(this,arguments);
-            syncStatusVisualsForUnit("monster",Number(index));
-            return result;
-        };
+            return;
+        }
+        return callback();
     }
 
-    if(typeof updateSingleCharacterStatusBadge==="function"){
-        const previous=updateSingleCharacterStatusBadge;
-        updateSingleCharacterStatusBadge=function(index){
-            const wait=existingTargetDelay("player",index);
-            if(wait>8){
-                const key="player-status:"+index;
-                if(!state.pendingUpdates.has(key)){
-                    const args=arguments;
-                    state.pendingUpdates.set(key,true);
-                    setTimer(()=>{
-                        state.pendingUpdates.delete(key);
-                        previous.apply(this,args);
-                        syncStatusVisualsForUnit("player",Number(index));
-                    },wait);
-                }
-                return;
-            }
-            const result=previous.apply(this,arguments);
-            syncStatusVisualsForUnit("player",Number(index));
-            return result;
-        };
-    }
+    window.v143ScheduleMonsterUiUpdate=function(index,callback){
+        return scheduleStatusOwnedUiUpdate("monster",Number(index),"monster",callback);
+    };
+    window.v143StatusAfterMonsterUiUpdate=function(index){
+        syncStatusVisualsForUnit("monster",Number(index));
+    };
+    window.v143SchedulePlayerStatusUiUpdate=function(index,callback){
+        return scheduleStatusOwnedUiUpdate("player",Number(index),"player-status",callback);
+    };
+    window.v143StatusAfterPlayerUiUpdate=function(index){
+        syncStatusVisualsForUnit("player",Number(index));
+    };
 
     function wrapBadge(name){
         const previous=window[name];
