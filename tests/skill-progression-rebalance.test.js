@@ -136,7 +136,7 @@ function resetForLearn(runtime,key,level,points=999){
     runtime.context.lastAlert="";
 }
 
-test("final progression data standardizes attack milestones, costs, EX and support structure",()=>{
+test("final progression data standardizes Lv10 damage skills, EX and support structure",()=>{
     const r=makeRuntime();
     const expected={
         flameSlash:[1,2],fireCritical:[7,6],explosiveFlurry:[14,10],dragonSlash:[30,16],
@@ -145,36 +145,46 @@ test("final progression data standardizes attack milestones, costs, EX and suppo
         stormFist:[1,2],stormFlurry:[7,6],windCrossSlash:[14,10],dizzyFist:[30,16],windSpell:[1,2],stormCircle:[7,6],windHowlLightning:[14,10],stormRain:[30,16],
         stoneSlash:[1,2],petrifyFist:[7,6],stoneBreakSky:[14,10],earthquakeCrush:[30,16],stoneThrow:[1,2],sandWind:[7,6],flyingSandStrike:[14,10],dustStorm:[30,16]
     };
-    for(const [id,value] of Object.entries(expected)) assert.deepEqual([r.skills[id].learnLevel,r.skills[id].learnCost],value,id);
+    for(const [id,value] of Object.entries(expected)){
+        assert.deepEqual([r.skills[id].learnLevel,r.skills[id].learnCost,r.skills[id].maxLevel],[value[0],value[1],10],id);
+        assert.equal(r.skills[id].upgradeCost,1,id+" upgrade cost");
+    }
     for(const id of ["fireEX","waterEX","windEX","earthEX"]) assert.deepEqual([r.skills[id].learnLevel,r.skills[id].learnCost,r.skills[id].maxLevel],[50,20,1],id);
     assert.deepEqual([r.skills.rage.learnLevel,r.skills.rage.learnCost],[18,10]);
-    assert.deepEqual([r.skills.fireSoulResonance.learnLevel,r.skills.fireSoulResonance.learnCost,r.skills.fireSoulResonance.maxLevel],[25,14,5]);
-    assert.deepEqual(Array.from(r.skills.fireSoulResonance.requires),["rage"]);
-    assert.deepEqual([r.skills.bloodBurnArt.learnLevel,r.skills.bloodBurnArt.learnCost,r.skills.bloodBurnArt.maxLevel],[35,18,5]);
-    assert.deepEqual(Array.from(r.skills.bloodBurnArt.requires),["fireSoulResonance"]);
-    assert.deepEqual([r.skills.healSpell.learnLevel,r.skills.healSpell.learnCost,r.skills.revive.learnLevel,r.skills.revive.learnCost],[15,8,20,10]);
-    assert.deepEqual(Array.from(r.skills.healSpell.requires),["frostPunch","floodBeast"]);
-    assert.deepEqual(Array.from(r.skills.revive.requires),["healSpell"]);
-    assert.deepEqual(Array.from(r.skills.freeze.requires),["iceSpin","iceArrowRain"]);
-    assert.deepEqual(Array.from(r.skills.purifyMind.requires),["healSpell"]);
-    assert.deepEqual([r.skills.dodgeSkill.learnLevel,r.skills.dodgeSkill.learnCost,r.skills.dodgeSkill.maxLevel],[18,10,5]);
+    assert.deepEqual([r.skills.fireSoulResonance.learnLevel,r.skills.fireSoulResonance.learnCost,r.skills.fireSoulResonance.maxLevel,r.skills.fireSoulResonance.spCost],[25,14,5,45]);
+    assert.deepEqual(Array.from(r.skills.fireSoulResonance.momentumBonusByLevel),[12,15,18,21,25]);
+    assert.deepEqual([r.skills.bloodBurnArt.learnLevel,r.skills.bloodBurnArt.learnCost,r.skills.bloodBurnArt.maxLevel,r.skills.bloodBurnArt.spCost],[35,18,5,35]);
+    assert.deepEqual(Array.from(r.skills.bloodBurnArt.hpCostPercentByLevel),[5,10,15,20,25]);
+    assert.deepEqual(Array.from(r.skills.bloodBurnArt.directDamageBonusByLevel),[5,10,15,20,35]);
+    assert.deepEqual([r.skills.healSpell.maxLevel,r.skills.freeze.maxLevel,r.skills.purifyMind.maxLevel],[5,5,3]);
+    assert.deepEqual(Array.from(r.skills.healSpell.healHpByLevel),[550,580,610,640,670]);
+    assert.deepEqual(Array.from(r.skills.healSpell.spRestorePercentByLevel),[0,0,5,10,15]);
+    assert.deepEqual(Array.from(r.skills.freeze.freezeChanceByLevel),[55,65,75,85,95]);
+    assert.deepEqual(Array.from(r.skills.freeze.freezeDurationByLevel),[3,3,3,4,5]);
+    assert.deepEqual(Array.from(r.skills.purifyMind.targetCountByLevel),[1,1,3]);
+    assert.deepEqual([r.skills.dodgeSkill.maxLevel,r.skills.stealthSkill.maxLevel,r.skills.dinghaishenzhen.maxLevel],[5,3,5]);
     assert.deepEqual(Array.from(r.skills.dodgeSkill.evasionBonusPercentByLevel),[30,40,50,60,70]);
-    assert.deepEqual([r.skills.rockWall.learnLevel,r.skills.rockWall.learnCost,r.skills.rockWall.maxLevel],[18,10,5]);
-    assert.deepEqual(Array.from(r.skills.rockWall.requires),["petrifyFist","sandWind"]);
+    assert.deepEqual(Array.from(r.skills.stealthSkill.durationByLevel),[2,3,4]);
+    assert.deepEqual(Array.from(r.skills.dinghaishenzhen.statusResistBonusByLevel),[25,35,45,55,65]);
+    assert.deepEqual(Array.from(r.skills.dinghaishenzhen.accuracyBonusPercentByLevel),[10,20,30,40,50]);
     assert.deepEqual(Array.from(r.skills.rockWall.defenseBonusPercentByLevel),[15,20,25,30,35]);
-    assert.deepEqual(Array.from(r.skills.earthShield.requires),["rockWall"]);
     assert.deepEqual(Array.from(r.skills.earthShield.reflectPercentByLevel),[20,30,35,40,50]);
+    assert.deepEqual(Array.from(r.skills.earthShield.durationByLevel),[3,3,3,4,5]);
+    assert.deepEqual([r.skills.barrier.maxLevel,...Array.from(r.skills.barrier.barrierBlockCountByLevel)],[5,3,3,3,4,5]);
+    assert.deepEqual(Array.from(r.skills.barrier.durationByLevel),[3,3,3,4,5]);
+    assert.deepEqual(Array.from(r.skills.rockWall.requires),["petrifyFist","sandWind"]);
+    assert.deepEqual(Array.from(r.skills.earthShield.requires),["rockWall"]);
     assert.deepEqual(Array.from(r.skills.barrier.requires),["earthShield"]);
     assert.equal(r.skills.stormSpell.learnLevel,undefined,"monster-only 暴風術不進玩家 progression");
 });
 
-test("shared level formula and upgrade cost table enforce slow cultivation",()=>{
+test("shared level formula preserves gates while every upgrade costs one point",()=>{
     const r=makeRuntime();
     const required=r.context.v17364GetRequiredCharacterLevelForSkillLevel;
-    assert.deepEqual([1,2,3,4,5].map(level=>required(r.skills.flameSlash,level)),[1,15,30,50,80]);
-    assert.deepEqual([1,2,3,4,5].map(level=>required(r.skills.dragonSlash,level)),[30,38,48,60,80]);
+    assert.deepEqual([1,2,3,4,5,6,7,8,9,10].map(level=>required(r.skills.flameSlash,level)),[1,15,30,50,80,80,80,80,80,80]);
+    assert.deepEqual([1,2,3,4,5,6,7,8,9,10].map(level=>required(r.skills.dragonSlash,level)),[30,38,48,60,80,80,80,80,80,80]);
     assert.deepEqual([1,2,3,4,5].map(level=>required(r.skills.revive,level)),[20,28,38,50,80]);
-    assert.deepEqual(Object.assign({},r.context.v17364SkillUpgradeCostByTargetLevel),{2:1,3:2,4:3,5:4});
+    assert.deepEqual(Object.assign({},r.context.v17364SkillUpgradeCostByTargetLevel),{2:1,3:1,4:1,5:1,6:1,7:1,8:1,9:1,10:1});
 });
 
 test("learning milestones use the selected character own level, prerequisites and points",()=>{
