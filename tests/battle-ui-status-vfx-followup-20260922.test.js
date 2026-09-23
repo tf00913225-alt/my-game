@@ -42,7 +42,7 @@ test("battle information handles and turn timer follow the requested interaction
   assert.ok(html.indexOf('id="battleActionRegion"')<html.indexOf('id="turnTargetRow"'),"turn row should be inside the battle action region");
   assert.match(css,/#battleActionRegion > \.turn-target-row[\s\S]*?opacity:1/);
   assert.match(css,/\.turn-target-row\.skill-picker-open,[\s\S]*?\.battle-item-open\{[\s\S]*?opacity:\.25/);
-  assert.match(css,/#battleActionRegion\.target-selecting > \.turn-target-row\{[\s\S]*?top:0;[\s\S]*?bottom:auto;[\s\S]*?opacity:1/);
+  assert.match(css,/#battleActionRegion\.target-selecting > \.turn-target-row\{[\s\S]*?top:auto;[\s\S]*?bottom:calc\(var\(--battle-target-prompt-height\) \+ var\(--battle-target-select-gap\)\);[\s\S]*?opacity:1/);
   assert.match(css,/\.battle-info-region #battleTurnIndicator\{[\s\S]*?opacity:1/);
   assert.match(css,/\.battle-info-region\.is-expanded #battleTurnIndicator\{[\s\S]*?opacity:1/);
   assert.match(stats,/aria-label","戰鬥數據"/);
