@@ -110,12 +110,6 @@ async function prepareAccountFirstRuntime(client,features){
     }
     await client.eval(`Promise.all(${JSON.stringify(features)}.map(feature=>FourSymbolsFeatures.ensure(feature,"live-browser-qa")))`);
     if(state==="NEED_CHARACTER"){
-        await waitFor(
-            client,
-            "(()=>{try{return Array.isArray(inventoryItems)&&characterSkillLoadouts&&typeof characterSkillLoadouts==='object';}catch(_){return false;}})()",
-            "App Shell character/save owners",
-            30000
-        );
         const creationAttempt=await client.eval(`(()=>{
             const input=document.getElementById('creationId');
             if(!input||typeof createCharacter!=='function'){return {created:false,errors:["creation input/function unavailable"]};}
