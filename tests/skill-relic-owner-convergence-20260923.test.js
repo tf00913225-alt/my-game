@@ -83,6 +83,7 @@ test("support skill final arrays and runtime owners match the formal spec",()=>{
   ].forEach(pattern=>assert.match(progression,pattern));
   assert.match(progression,/fireSoulResonance:[\s\S]*?spCost:45/);
   assert.match(progression,/bloodBurnArt:[\s\S]*?spCost:35/);
+  assert.match(progression,/function announceSkill\(actorIndex,skill\)[\s\S]*?showSkillNameBadge\(skill\.name,skill\.element\|\|"fire",actorIndex,actorIndex,\[actorIndex\],"player","self"\)/);
   assert.match(support,/spRestorePercentByLevel/);
   assert.match(support,/removeRemovableStatusEffects/);
   assert.match(support,/targetCountByLevel/);
