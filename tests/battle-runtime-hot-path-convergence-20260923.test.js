@@ -77,7 +77,7 @@ function block(source,startToken,endToken){
     assert.match(v39,/const STATUS_ROTATION_MS=2000/);
     assert.match(v39,/const shellStatus=type==="shield"\|\|type==="barrier"\|\|type==="earthShield"\|\|type==="rockWall"/);
     assert.match(v39,/widthScale=\(regularEnemy\?1\.45:1\.40\)\*\(shellStatus\?1\.08:1\)/);
-    assert.doesNotMatch(statusCss,/\.v143-status-icon\{[\s\S]*?transform:scale\(/);
+    assert.doesNotMatch(statusCss,/\.v143-status-icon\{[^}]*transform:scale\(/);
 }
 
 {
