@@ -535,9 +535,12 @@
     animation:none !important;
 }
 
-/* Formal target feedback is one shared gold reticle over the artwork. */
+/* Formal target feedback is one shared gold reticle over the artwork.
+   targetable = selectable candidate; target = formally selected enemy.
+   Both semantic states project through this same ::before owner. */
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.ally-targetable::before,
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.targetable::before{
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.targetable::before,
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.target::before{
     content:"" !important;
     position:absolute !important;
     z-index:30 !important;
