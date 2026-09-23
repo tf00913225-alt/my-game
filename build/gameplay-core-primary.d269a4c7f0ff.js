@@ -12946,11 +12946,19 @@
         },options||{});
     }
 
+    const STATUS_VISUAL_LAYERS=Object.freeze({
+        HARD_CONTROL_BASE:"hard-control-base",
+        ROTATING:"rotating",
+        HUD:"hud"
+    });
+
     function statusVisual(src,mode,collection,options){
+        const resolvedMode=mode||"static";
         return Object.assign({
             src:src||"",
-            mode:mode||"static",
+            mode:resolvedMode,
             collection:collection||"statusEffects",
+            visualLayer:resolvedMode==="icon"?STATUS_VISUAL_LAYERS.HUD:STATUS_VISUAL_LAYERS.ROTATING,
             cropColumns:1,
             cropRows:1,
             renderer:"dom-status-visual"
@@ -13065,7 +13073,7 @@
         burn:statusVisual("assets/vfx/status/burn.webp","pulse","statusEffects",{label:"燃燒",statusName:"燃燒",iconSrc:"assets/vfx/status/burn.webp"}),
         rage:statusVisual("assets/vfx/status/rage.webp","pulse","activeBuffs",{label:"怒火",statusName:"怒火",iconSrc:"assets/vfx/status/rage-icon.webp"}),
         frostbite:statusVisual("","icon","statusEffects",{label:"凍傷",statusName:"凍傷",iconSrc:"assets/vfx/status/frostbite-icon.webp"}),
-        freeze:statusVisual("assets/vfx/status/freeze.webp","static","statusEffects",{label:"冰封",statusName:"冰封",iconSrc:"assets/vfx/status/freeze.webp"}),
+        freeze:statusVisual("assets/vfx/status/freeze.webp","static","statusEffects",{label:"冰封",statusName:"冰封",iconSrc:"assets/vfx/status/freeze.webp",visualLayer:STATUS_VISUAL_LAYERS.HARD_CONTROL_BASE}),
         agilityDown:statusVisual("","icon","statusEffects",{label:"重力",statusName:"重力",iconSrc:"assets/vfx/status/gravity-icon.webp"}),
         damageDown:statusVisual("","icon","statusEffects",{label:"殤風",statusName:"殤風",iconSrc:"assets/vfx/status/damage-down-icon.webp"}),
         stun:statusVisual("assets/vfx/status/stun.webp","pulse","statusEffects",{label:"暈眩",statusName:"暈眩",iconSrc:"assets/vfx/status/stun-icon.webp"}),
@@ -13074,7 +13082,7 @@
         dinghaishenzhen:statusVisual("assets/vfx/status/calm-mind.webp","pulse","activeBuffs",{label:"氣定神閒",statusName:"氣定神閒",iconSrc:"assets/vfx/status/calm-mind.webp"}),
         defenseDown:statusVisual("","icon","statusEffects",{label:"破防",statusName:"破防",iconSrc:"assets/vfx/status/defense-down-icon.webp"}),
         shield:statusVisual("assets/vfx/status/shield.webp","static","activeBuffs",{label:"護盾",statusName:"岩盾",iconSrc:"assets/vfx/status/shield.webp"}),
-        petrify:statusVisual("assets/vfx/status/petrify.webp","static","statusEffects",{label:"石化",statusName:"石化",iconSrc:"assets/vfx/status/petrify.webp"}),
+        petrify:statusVisual("assets/vfx/status/petrify.webp","static","statusEffects",{label:"石化",statusName:"石化",iconSrc:"assets/vfx/status/petrify.webp",visualLayer:STATUS_VISUAL_LAYERS.HARD_CONTROL_BASE}),
         earthShield:statusVisual("assets/vfx/status/earth-shield.webp","static","activeBuffs",{label:"萬象土盾",statusName:"萬象土盾",iconSrc:"assets/vfx/status/earth-shield.webp"}),
         rockWall:statusVisual("assets/vfx/status/rock-wall.webp","static","activeBuffs",{label:"岩石壁壘",statusName:"岩石壁壘",iconSrc:"assets/vfx/status/rock-wall.webp"}),
         barrier:statusVisual("assets/vfx/status/barrier.webp","static","activeBuffs",{label:"結界",statusName:"結界",iconSrc:"assets/vfx/status/barrier.webp"}),
@@ -13467,9 +13475,12 @@
 
     function createBodyStatusVisual(type,spec){
         const node=document.createElement("i");
-        node.className="v143-status-visual v143-status-visual-"+type+" v143-status-visual--"+spec.mode;
+        node.className="v143-status-visual v143-status-visual-"+type+
+            " v143-status-visual--"+spec.mode+
+            " v143-status-visual--layer-"+spec.visualLayer;
         node.dataset.statusType=type;
         node.dataset.statusMode=spec.mode;
+        node.dataset.statusLayer=spec.visualLayer;
         node.dataset.renderer="dom-status-visual";
         if(typeof node.setAttribute==="function"){ node.setAttribute("aria-hidden","true"); }
         node.style.backgroundImage='url("'+String(spec.src).replace(/"/g,"%22")+'")';
@@ -13480,9 +13491,10 @@
 
     function createStatusIcon(type,spec){
         const node=document.createElement("i");
-        node.className="v143-status-icon v143-status-icon-"+type;
+        node.className="v143-status-icon v143-status-icon-"+type+" v143-status-icon--layer-hud";
         node.dataset.statusType=type;
         node.dataset.statusMode="icon";
+        node.dataset.statusLayer=STATUS_VISUAL_LAYERS.HUD;
         node.dataset.renderer="dom-status-icon";
         const source=String(spec.iconSrc||spec.src||"");
         if(source){
@@ -13499,6 +13511,7 @@
     const STATUS_ROTATION_MS=2000;
     let statusRotationTimer=null;
     const statusRotationByUnit=new Map();
+    const hardControlContractViolationByUnit=new Map();
 
     function syncStatusVisual(side,index,type,showBody){
         const spec=STATUS_VISUALS[type];
@@ -13550,34 +13563,69 @@
         node.style.height=Math.round(height)+"px";
     }
 
-    function syncStatusVisualsForUnit(side,index,advanceRotation){
-        const entity=entityFor(side,index);
-        const bodyTypes=entity?Object.keys(RAW_STATUS_VISUALS).filter(type=>{
+    function activeBodyStatusTypesForLayer(entity,side,index,visualLayer){
+        if(!entity){ return []; }
+        return Object.keys(RAW_STATUS_VISUALS).filter(type=>{
             const spec=RAW_STATUS_VISUALS[type];
             return !!(
                 spec&&spec.mode!=="icon"&&spec.src&&
+                spec.visualLayer===visualLayer&&
                 hasTimedEffect(entity,type)&&
                 !deferredStatusDuringCast(side,index,type)
             );
-        }):[];
+        });
+    }
+
+    function reportHardControlVisualContractViolation(side,index,types){
+        const key=side+":"+index;
+        const signature=types.join("|");
+        if(types.length<=1){
+            hardControlContractViolationByUnit.delete(key);
+            return;
+        }
+        if(hardControlContractViolationByUnit.get(key)===signature){ return; }
+        hardControlContractViolationByUnit.set(key,signature);
+        if(typeof console!=="undefined"&&typeof console.error==="function"){
+            console.error(
+                "[FourSymbols] Hard Control contract violation: Freeze and Petrify coexist.",
+                {side:side,index:index,statusTypes:types.slice()}
+            );
+        }
+    }
+
+    function syncStatusVisualsForUnit(side,index,advanceRotation){
+        const entity=entityFor(side,index);
+        const baseBodyTypes=activeBodyStatusTypesForLayer(
+            entity,side,index,STATUS_VISUAL_LAYERS.HARD_CONTROL_BASE
+        );
+        const rotatingBodyTypes=activeBodyStatusTypesForLayer(
+            entity,side,index,STATUS_VISUAL_LAYERS.ROTATING
+        );
+        reportHardControlVisualContractViolation(side,index,baseBodyTypes);
+
         const rotationKey=side+":"+index;
-        const signature=bodyTypes.join("|");
+        const signature=rotatingBodyTypes.join("|");
         let rotation=statusRotationByUnit.get(rotationKey);
-        if(!bodyTypes.length){
+        if(!rotatingBodyTypes.length){
             statusRotationByUnit.delete(rotationKey);
             rotation=null;
         }else if(!rotation||rotation.signature!==signature){
             rotation={signature:signature,index:0};
             statusRotationByUnit.set(rotationKey,rotation);
-        }else if(advanceRotation===true&&bodyTypes.length>1){
-            rotation.index=(rotation.index+1)%bodyTypes.length;
+        }else if(advanceRotation===true&&rotatingBodyTypes.length>1){
+            rotation.index=(rotation.index+1)%rotatingBodyTypes.length;
         }
-        const activeBodyType=rotation&&bodyTypes.length
-            ?bodyTypes[rotation.index%bodyTypes.length]
+        const activeRotatingBodyType=rotation&&rotatingBodyTypes.length
+            ?rotatingBodyTypes[rotation.index%rotatingBodyTypes.length]
             :null;
-        Object.keys(RAW_STATUS_VISUALS).forEach(type=>
-            syncStatusVisual(side,index,type,type===activeBodyType)
-        );
+
+        Object.keys(RAW_STATUS_VISUALS).forEach(type=>{
+            const spec=RAW_STATUS_VISUALS[type];
+            const showBody=spec&&spec.visualLayer===STATUS_VISUAL_LAYERS.HARD_CONTROL_BASE
+                ?baseBodyTypes.includes(type)
+                :type===activeRotatingBodyType;
+            syncStatusVisual(side,index,type,showBody);
+        });
     }
 
     function syncStatusVisualEffects(advanceRotation){
@@ -13593,8 +13641,10 @@
             document.querySelectorAll(selector).forEach(node=>node.remove())
         );
         statusRotationByUnit.clear();
+        hardControlContractViolationByUnit.clear();
     }
     window.v143SyncStatusVisualEffects=syncStatusVisualEffects;
+    window.v143StatusVisualLayers=STATUS_VISUAL_LAYERS;
 
     function ensureStatusRotationTimer(){
         if(statusRotationTimer||typeof window==="undefined"||typeof window.setInterval!=="function"){ return; }
