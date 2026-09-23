@@ -1051,6 +1051,7 @@ test("final support passives and front/back Freeze behavior are exact",()=>{
         Object.assign(player,{id:"水角",element:"water",hp:100,statusEffects:[{type:"burn",turnsLeft:2}]});
         player2=null;player3=null;battleActive=true;
         getSkillLevel=function(_key,id){ return id==="waterEX"?1:0; };
+        updateUI=function(){};
         Math.random=function(){ return 0; };
         const column=getSkillTargets(1,"column");
         tickStatusEffects();
