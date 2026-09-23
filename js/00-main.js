@@ -5693,7 +5693,10 @@ function closeCustomDropdown(selectId){
 
 document.addEventListener(
     "click",
-    ()=>{
+    event=>{
+        if(event&&event.target&&typeof event.target.closest==="function"&&event.target.closest("#battlePage")){
+            return;
+        }
 
         Object.keys(
             customDropdownRegistry
