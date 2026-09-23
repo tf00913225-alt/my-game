@@ -45,7 +45,7 @@ test("CSS advances the formal 4x3 sheet once without Canvas or per-target travel
     assert.doesNotMatch(css,/data-skill="waterBall"[\s\S]*?v166-water-cast-sprite/);
 });
 
-test("the published build label is V173.71",()=>{
+test("the published build label is V173.72",()=>{
     assert.equal((loader.match(/const V_ASSET_VERSION="([^"]+)"/)||[])[1],releaseMeta.cacheVersion);
     assert.ok(index.includes('aria-label="目前版本 V'+releaseMeta.version+'"'));
     assert.ok(index.includes(">V"+releaseMeta.version+"</div>"));
