@@ -2191,6 +2191,17 @@ function getPlayerDefenseDownPercent(character){
     return Math.max(0,getMonsterDebuffValue(character,"defenseDown"));
 }
 
+function getPlayerEvasionBaseAgility(character,equipmentBonus){
+    if(!character){ return 0; }
+    const base=(Number(character.agility)||0)+(Number(equipmentBonus&&equipmentBonus.agility)||0);
+    const statDown=getStatDownPercentFor(character,"agility");
+    return Math.max(0,base*(1-statDown/100));
+}
+
+function getPlayerFinalEvasionReductionPercent(character){
+    return Math.max(0,getMonsterDebuffValue(character,"agilityDown"));
+}
+
 const FINAL_EVASION_RATE_CAP=85;
 const FROSTBITE_FINAL_PERCENT_POINT_PENALTY=25;
 
@@ -2295,7 +2306,7 @@ function getMainCharacterStats(){
         1+(defenseBuffPercent+defensePassivePercent)/100
     );
 
-    const rawEvasion=effectiveAgility*0.6;
+    const rawEvasion=getPlayerEvasionBaseAgility(player,bonus)*0.6;
 
     return {
         /* 暫時六圍減益不動態壓縮最大HP/SP；詳見上方統一規則。 */
@@ -2336,6 +2347,7 @@ function getMainCharacterStats(){
             rawEvasion,
             evasionBuffPercent,
             evasionPassivePercent,
+            -getPlayerFinalEvasionReductionPercent(player),
             -getFrostbiteFinalPercentPointPenalty(player)
         ]),
 
@@ -2455,7 +2467,7 @@ function getAdditionalCharacterBattleStats(character,characterKey){
     const buffedDefense=rawDefense*(
         1+(defenseBuffPercent+defensePassivePercent)/100
     );
-    const rawEvasion=effectiveAgility*0.6;
+    const rawEvasion=getPlayerEvasionBaseAgility(character,bonus)*0.6;
 
     return {
         maxHP:
@@ -2495,6 +2507,7 @@ function getAdditionalCharacterBattleStats(character,characterKey){
             rawEvasion,
             evasionBuffPercent,
             evasionPassivePercent,
+            -getPlayerFinalEvasionReductionPercent(character),
             -getFrostbiteFinalPercentPointPenalty(character)
         ]),
 
