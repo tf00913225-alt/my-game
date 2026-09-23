@@ -4225,3 +4225,19 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 - 解決「圖片已存在，但仍因 planned／retired／batch manifest 流程而長時間卡在正式接線」。
 - 避免只看檔案存在就誤判完成；正式導入仍以 `status=existing` 且 Runtime owner 可解析為準。
 - 快速導入工具只處理本子系統，不修改戰鬥玩法、UI、怪物數值或 main。
+
+
+## 2026-09-23 — Battle UI / Hit / Status Owner Convergence（VERIFIED candidate）
+
+- Base：`dev@ae535061883029d12e9ca951e2c23b5f791fbf86`；工作分支 `fix/battle-ui-hit-status-owner-convergence-20260923`；PR #533；`main` 全程未修改。
+- 一般命中唯一 Owner 收斂至 `js/00-main.js::calculateHitChancePercent()/rollHitChance()`：`clamp(95 + accuracy×0.15 + finalAccuracyBonus - targetFinalEvasion - finalHitReduction, 70, 99)`。普通怪物未明確指定 evasion 時使用 `min(10, level×0.1)`；多個閃躲來源改以最終百分點直接加減。
+- 異常／Hard Control 唯一 Owner 收斂至 `calculateStatusEffectChance()/rollStatusEffectHit()`：技能基礎成功率＋主屬性×0.05%＋最終異常命中加成－目標 Spirit×0.05%－最終抗性。物理異常讀有效 Attack Points、法術異常讀 Intelligence；移除 level factor、sqrt(attribute)、硬控專屬 Spirit coefficient 與 V140/V158/V149/V169 舊公式 Wrapper。Hard Control 上限：Regular 90%、Elite 75%、Boss 60%、enemy-to-player 60%。
+- 凍傷正式為 Soft Debuff：傷害 -25%、最終閃躲 -25 個百分點、最終異常抗性 -25 個百分點，不禁止技能；舊「無法使用技能」戰鬥狀態文字已清除。
+- 技能說明 Owner 補齊火系物理追擊、烈焰龍捲必定燃燒、火鳳天鳴鳳威、凍傷完整效果、焚血免費追擊不耗 Charge、淨心訣不可清除項目與四元素 EX；未復活 V149/V169 舊文字 Owner。
+- 怒火等 Buff 仍由 `FourSymbolsDurationLifecycle` 依 action-finished 扣除，0 回合移除後立即同步 V143 Status Visual；不新增 timer／polling。
+- 巡怪人物不再先顯示 legacy `patrol-character.png`；正式 WebP decode/load 完成後才顯示。巡怪 `#mapBattleInfo` 與正式 Battle Info Drawer 樣式 Owner 分離。
+- Battle UI：唯一金色 Target Reticle；怪物名稱透明；24px 狀態 Icon HUD 高於 HP/SP；選目標時倒數框與 Target Prompt 使用正式不重疊幾何；Battle Info 外殼透明、只保留小 Tab／展開正文黑底；Tab 拖曳改為 pointerdown 一次量測＋rAF/translate3d；操作面板改用透明素材投影。
+- 施工期間 Browser QA 抓到一個真啟動順序問題：`makeZoneMonster()` 在 App Shell 頂層建怪時早於後置的 default evasion const 初始化，會造成 TDZ 並中止 App Shell。正式 Default Monster Evasion Owner 已移到 zone roster 建立之前，並新增 boot-order regression。
+- Production build commit：`7567aa216fba3f32e92792ea9dac317ff9f8d942`。Verified source candidate：`1596ea0a36e564facca92432376775d9728bc0fe`。
+- GitHub Actions Repository checks run `35866039901`：SUCCESS。包含 Syntax、Battle Runtime Architecture Guard、專項／既有 battle regressions、production build synchronization、Fixed Slot 9:16 mobile browser QA、exact-candidate real battle mobile browser QA、Adventure mobile QA、static resources、release gate 與 `git diff --check` 全部通過。
+- Requirement Batch：`release/requirement-batches/2026-09-23-battle-ui-hit-status-owner-convergence.json` 已升級為 VERIFIED。

@@ -830,7 +830,7 @@
                 buff.originalEvasion=monster.evasion;
                 monster.evasion=typeof window.v173CombineEvasionRates==="function"
                     ?window.v173CombineEvasionRates([buff.originalEvasion,amount])
-                    :Math.min(85,Number(monster.evasion)||0);
+                    :Math.min(85,(Number(buff.originalEvasion)||0)+(Number(amount)||0));
             }
             const displayBuff={
                 type:type==="rage"?"rage":"v141TeamBuff",
@@ -971,7 +971,7 @@
         }else if(skillId==="dodgeSkill"){
             const evasion=levelValue(skill.evasionBonusPercentByLevel,skill.evasionBonusPercent||0);
             applyTimedMonsterBuff(allies,"dodge",3,evasion);
-            addBattleLog(monster.name+"施放閃躲術，敵方全體閃躲提升"+evasion+"%，持續3回合。");
+            addBattleLog(monster.name+"施放閃躲術，敵方全體最終閃躲提升"+evasion+"個百分點，持續3回合。");
         }
         updateUI(); finishPlayerAction();
         return true;

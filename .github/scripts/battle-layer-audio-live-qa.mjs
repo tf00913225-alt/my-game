@@ -34,7 +34,13 @@ async function waitForJson(url,timeoutMs=15000){
 }
 
 class CdpClient{
-    constructor(url){ this.url=url; this.nextId=1; this.pending=new Map(); this.socket=null; }
+    constructor(url){
+        this.url=url;
+        this.nextId=1;
+        this.pending=new Map();
+        this.socket=null;
+        this.events=[];
+    }
     async connect(){
         this.socket=new WebSocket(this.url);
         await new Promise((resolve,reject)=>{
@@ -46,7 +52,32 @@ class CdpClient{
             let raw=event.data;
             if(raw&&typeof raw!=="string"&&typeof raw.text==="function"){ raw=await raw.text(); }
             const message=JSON.parse(String(raw));
-            if(!message.id){ return; }
+            if(!message.id){
+                if(message.method==="Runtime.exceptionThrown"){
+                    const details=message.params&&message.params.exceptionDetails;
+                    this.events.push({
+                        method:message.method,
+                        text:details&&(
+                            details.exception&&details.exception.description||
+                            details.text
+                        )||"Runtime exception",
+                        url:details&&details.url||null,
+                        lineNumber:details&&details.lineNumber,
+                        columnNumber:details&&details.columnNumber
+                    });
+                }else if(message.method==="Runtime.consoleAPICalled"){
+                    const type=message.params&&message.params.type;
+                    if(type==="error"||type==="warning"){
+                        this.events.push({
+                            method:message.method,
+                            type,
+                            args:(message.params.args||[]).map(arg=>arg.value!==undefined?arg.value:arg.description)
+                        });
+                    }
+                }
+                if(this.events.length>50){ this.events.splice(0,this.events.length-50); }
+                return;
+            }
             const request=this.pending.get(message.id);
             if(!request){ return; }
             this.pending.delete(message.id);
@@ -86,6 +117,12 @@ async function waitFor(client,expression,label,timeoutMs=30000){
         }catch(error){ last=error.message; }
         await sleep(180);
     }
+    if(label==="App Shell character/save owners"){
+        throw new Error(
+            `Timed out waiting for ${label}. Last result: ${String(last)}. `+
+            `Recent runtime events: ${JSON.stringify(client.events.slice(-12))}`
+        );
+    }
     throw new Error(`Timed out waiting for ${label}. Last result: ${String(last)}`);
 }
 
@@ -110,13 +147,64 @@ async function prepareAccountFirstRuntime(client,features){
     }
     await client.eval(`Promise.all(${JSON.stringify(features)}.map(feature=>FourSymbolsFeatures.ensure(feature,"live-browser-qa")))`);
     if(state==="NEED_CHARACTER"){
-        const created=await client.eval(`(()=>{
+        const creationAttempt=await client.eval(`(()=>{
             const input=document.getElementById('creationId');
-            if(!input||typeof createCharacter!=='function'){return false;}
+            if(!input||typeof createCharacter!=='function'){return {created:false,errors:["creation input/function unavailable"]};}
             input.value='QA俠客';
-            return createCharacter()===true;
+            const errors=[];
+            const originalError=console.error;
+            console.error=function(){
+                try{
+                    errors.push(Array.from(arguments).map(value=>{
+                        if(value instanceof Error){ return value.name+":"+value.message+(value.code?(" code="+value.code):""); }
+                        if(value&&typeof value==="object"){
+                            try{return JSON.stringify(value);}catch(_){return String(value);}
+                        }
+                        return String(value);
+                    }).join(" | "));
+                }catch(_){}
+                return originalError.apply(this,arguments);
+            };
+            try{
+                return {created:createCharacter()===true,errors};
+            }finally{
+                console.error=originalError;
+            }
         })()`);
-        if(!created){ throw new Error("Live anonymous account could not complete the formal character-creation flow"); }
+        if(!creationAttempt.created){
+            const diagnostics=await client.eval(`(()=>{
+                let targetSlot=null;
+                try{ targetSlot=typeof creationTargetSlot!=="undefined"?creationTargetSlot:null; }catch(_){}
+                let persisted=null;
+                try{
+                    const repo=window.FourSymbolsAccountSave;
+                    const uid=repo&&repo.getActiveUid&&repo.getActiveUid();
+                    const read=uid&&repo.readForUid?repo.readForUid(uid):null;
+                    persisted={
+                        uid:uid||null,
+                        saveKey:uid&&repo.saveKey?repo.saveKey(uid):null,
+                        readStatus:read&&read.status||null,
+                        savedPlayerId:read&&read.save&&read.save.player&&read.save.player.id||null
+                    };
+                }catch(error){ persisted={error:String(error&&error.message||error)}; }
+                return {
+                    startupState:window.FourSymbolsStartupPolicy&&FourSymbolsStartupPolicy.getState(),
+                    canCreate:Boolean(window.FourSymbolsStartupPolicy&&FourSymbolsStartupPolicy.canCreateCharacter()),
+                    targetSlot,
+                    inputValue:document.getElementById('creationId')?.value||null,
+                    creationVisible:getComputedStyle(document.getElementById('creationPage')).display,
+                    playerId:typeof player!=="undefined"?player.id:null,
+                    saveOwner:persisted,
+                    guarded:Boolean(window.createCharacter&&window.createCharacter.__v174PersistedPrimaryGuard),
+                    creationErrors:${JSON.stringify(creationAttempt.errors)}
+                };
+            })()`);
+            throw new Error(
+                "Live anonymous account could not complete the formal character-creation flow: "+
+                JSON.stringify(diagnostics)+
+                " CDP="+JSON.stringify(client.events.slice(-20))
+            );
+        }
         await waitFor(client,"FourSymbolsStartupPolicy.getState()==='READY'&&getComputedStyle(document.getElementById('gameInterface')).display!=='none'","anonymous character creation completion",30000);
         state="READY";
     }
@@ -150,7 +238,22 @@ try{
     const accountState=await prepareAccountFirstRuntime(client,["abyss","boss-tower"]);
     evidence.checks.accountState=accountState;
     await waitFor(client,"window.__v174TwoTierAbyssInstalled===true&&typeof window.v174AbyssBuildRoster==='function'","two-tier Abyss runtime");
-    await waitFor(client,"typeof window.v132LaunchDungeonBattle==='function'&&window.v141Audio&&typeof window.v141Audio.playSkill==='function'","battle/audio runtime");
+    try{
+        await waitFor(client,"typeof window.v132LaunchDungeonBattle==='function'&&window.v141Audio&&typeof window.v141Audio.playSkill==='function'","battle/audio runtime");
+    }catch(error){
+        const diagnostics=await client.eval(`(()=>({
+            gameplayCoreReady:window.FourSymbolsFeatures?.isReady?.("gameplay-core")??null,
+            battleFeatureReady:window.FourSymbolsFeatures?.isReady?.("battle")??null,
+            v132Type:typeof window.v132LaunchDungeonBattle,
+            v141AudioType:typeof window.v141Audio,
+            v141PlaySkillType:typeof window.v141Audio?.playSkill,
+            scripts:[...document.querySelectorAll("script[data-feature-bundle]")].map(script=>({
+                bundle:script.dataset.featureBundle||null,
+                src:script.src
+            }))
+        }))()`);
+        throw new Error(error.message+" diagnostics="+JSON.stringify(diagnostics)+" CDP="+JSON.stringify(client.events.slice(-25)));
+    }
 
     await client.eval(`(()=>{
         if(typeof showPage==='function'){showPage('home');}
@@ -437,13 +540,25 @@ try{
         const region=document.querySelector('#battlePage .battle-info-region');
         const button=document.getElementById('battleInfoToggle');
         const info=document.getElementById('battleInfo');
-        if(!region||!button||!info||typeof toggleBattleInfoPanel!=='function'){return null;}
+        const turn=document.getElementById('battleTurnIndicator');
+        if(!region||!button||!info||!turn||typeof toggleBattleInfoPanel!=='function'){return null;}
         region.style.transition='none';
         const rect=node=>{const value=node.getBoundingClientRect();return {top:value.top,bottom:value.bottom,height:value.height};};
+        const snapshot=()=>({
+            region:rect(region),
+            info:rect(info),
+            aria:button.getAttribute('aria-expanded'),
+            className:region.className,
+            label:button.textContent.trim(),
+            regionBackground:getComputedStyle(region).backgroundColor,
+            buttonBackground:getComputedStyle(button).backgroundColor,
+            infoBackground:getComputedStyle(info).backgroundColor,
+            turnOpacity:getComputedStyle(turn).opacity
+        });
         toggleBattleInfoPanel();
-        const expanded={region:rect(region),info:rect(info),aria:button.getAttribute('aria-expanded'),className:region.className,label:button.textContent.trim(),background:getComputedStyle(region).backgroundColor};
+        const expanded=snapshot();
         toggleBattleInfoPanel();
-        const collapsed={region:rect(region),info:rect(info),aria:button.getAttribute('aria-expanded'),className:region.className,label:button.textContent.trim(),background:getComputedStyle(region).backgroundColor};
+        const collapsed=snapshot();
         region.style.removeProperty('transition');
         return {expanded,collapsed};
     })()`);
@@ -455,7 +570,14 @@ try{
     assert.ok(infoDrawer.expanded.info.top<layout.regions.wrap.bottom,"Expanded battle info must slide into the battlefield viewport");
     assert.equal(infoDrawer.collapsed.aria,"false","Tapping again must collapse battle info");
     assert.equal(infoDrawer.collapsed.label,"戰鬥資訊","Collapsed battle info handle must restore 戰鬥資訊");
-    assert.match(infoDrawer.collapsed.background,/rgba?\(0, 0, 0(?:, 0\.92)?\)/,"Collapsed battle info must retain a black backing");
+    assert.equal(infoDrawer.collapsed.regionBackground,"rgba(0, 0, 0, 0)","Collapsed battle-info drawer shell must stay transparent");
+    assert.equal(infoDrawer.expanded.regionBackground,"rgba(0, 0, 0, 0)","Expanded battle-info drawer shell must stay transparent");
+    assert.notEqual(infoDrawer.collapsed.buttonBackground,"rgba(0, 0, 0, 0)","Collapsed 戰鬥資訊 tab must retain its own backing");
+    assert.notEqual(infoDrawer.expanded.buttonBackground,"rgba(0, 0, 0, 0)","Expanded 返回 tab must retain its own backing");
+    assert.equal(infoDrawer.collapsed.infoBackground,"rgba(0, 0, 0, 0)","Collapsed battle log body must remain transparent/off-canvas");
+    assert.notEqual(infoDrawer.expanded.infoBackground,"rgba(0, 0, 0, 0)","Expanded battle log body alone owns the black backing");
+    assert.equal(infoDrawer.collapsed.turnOpacity,"1","Collapsed drawer keeps the current round visible");
+    assert.equal(infoDrawer.expanded.turnOpacity,"1","Expanded drawer keeps the current round visible");
     assert.doesNotMatch(infoDrawer.collapsed.className,/is-expanded/);
     assert.ok(infoDrawer.collapsed.info.top>=layout.regions.wrap.bottom-1,"Collapsed battle info must return below the battlefield viewport");
 
@@ -1030,7 +1152,7 @@ try{
     assert.equal(/(?:^|\\s)(?:red-hit|hit)(?:\\s|$)/.test(bossMode.healFeedback.className),false,"Damage must not add a root red-hit card state");
     assert.equal(/(?:^|\\s)(?:red-hit|hit)(?:\\s|$)/.test(bossMode.bossFeedback.className),false,"Heal must not add a red damage state");
     assert.equal(bossMode.healFeedback.reticleBorder,"3px","Destructible Boss objects must expose the formal target reticle");
-    assert.match(bossMode.healFeedback.reticleAnimation,/v174TargetReticlePulse/);
+    assert.equal(bossMode.healFeedback.reticleAnimation,"none","Formal shared target reticle stays static");
     assert.ok(Math.abs(bossMode.footprint.left-bossMode.bossCard.left)<=1&&Math.abs(bossMode.footprint.right-bossMode.bossCard.right)<=1&&Math.abs(bossMode.footprint.top-bossMode.bossCard.top)<=1&&Math.abs(bossMode.footprint.bottom-bossMode.bossCard.bottom)<=1,"One Boss hit area must fill the central six-Slot visual footprint");
     assert.equal(bossMode.bossHud.hpPosition,"absolute","Boss HP must remain on its absolute HUD anchor");
     assert.equal(bossMode.bossHud.spPosition,"absolute","Boss SP must remain on its absolute HUD anchor");

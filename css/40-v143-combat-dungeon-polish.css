@@ -83,30 +83,11 @@
     transform:scaleX(.94);
 }
 
-/* Ally targeting is interaction feedback, not a skill VFX renderer. */
+/* Ally target cursor remains semantic only; Fixed Slot V2 owns the one reticle. */
 #game-stage > #app > #game-content #battlePage .battle-player.ally-targetable{
     cursor:crosshair;
     outline:none !important;
-    box-shadow:0 0 10px rgba(255,216,77,.62) !important;
-}
-
-#game-stage > #app > #game-content #battlePage .battle-player.ally-targetable::after{
-    content:"";
-    position:absolute;
-    left:50%;
-    top:50%;
-    z-index:60;
-    width:60px;
-    height:60px;
-    border-radius:50%;
-    pointer-events:none;
-    transform:translate(-50%,-50%);
-    background:
-        linear-gradient(#ffd84d,#ffd84d) center/3px 100% no-repeat,
-        linear-gradient(90deg,#ffd84d,#ffd84d) center/100% 3px no-repeat,
-        radial-gradient(circle at center,transparent 0 26%,#ffd84d 29% 34%,transparent 37% 100%);
-    filter:drop-shadow(0 0 4px rgba(255,216,77,.9));
-    animation:battleTargetReticleFlash .38s ease-in-out infinite;
+    box-shadow:none !important;
 }
 
 /* Caster label stays text-only. It does not render or substitute skill art. */
@@ -229,7 +210,7 @@
 #game-stage #battlePage{
     --v143-status-layer-hard-control-base:4;
     --v143-status-layer-rotating:5;
-    --v143-status-layer-hud:20;
+    --v143-status-layer-hud:34;
 }
 
 #game-stage #battlePage .v143-status-visual{

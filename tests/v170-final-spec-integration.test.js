@@ -421,14 +421,14 @@ test("Burn, Frostbite, Freeze and every other final status definition are exact"
         floodBeast:{frostbiteChance:35,frostbiteDuration:2},
         iceArrowRain:{frostbiteChance:35,frostbiteDuration:2},
         freeze:{freezeChance:90,freezeDuration:3},
-        stormFist:{agilityDownChance:50,agilityDownByLevel:[30,40,50,60,70],agilityDownDuration:1},
+        stormFist:{agilityDownChance:50,agilityDownByLevel:[5,7,9,11,13,15,17,19,22,25],agilityDownDuration:1},
         stormFlurry:{damageDownChance:50,damageDownByLevel:[10,20,30,40,50],damageDownDuration:2},
         windCrossSlash:{damageDownChance:65,damageDownByLevel:[20,30,35,40,50],damageDownDuration:1},
-        dizzyFist:{stunChance:65,missBonusByLevel:[15,20,25,30,35],stunDuration:5},
-        windSpell:{agilityDownChance:50,agilityDownByLevel:[10,20,30,40,50],agilityDownDuration:1},
+        dizzyFist:{stunChance:65,missBonusByLevel:[5,7,9,11,13,15,17,19,22,25],stunDuration:5},
+        windSpell:{agilityDownChance:50,agilityDownByLevel:[5,7,9,11,13,15,17,19,22,25],agilityDownDuration:1},
         stormCircle:{damageDownChance:55,damageDownByLevel:[15,18,21,25,30],damageDownDuration:1},
         windHowlLightning:{damageDownChance:65,damageDownByLevel:[15,20,25,30,35],damageDownDuration:1},
-        stormRain:{stunChance:35,missBonusByLevel:[15,20,25,30,35],stunDuration:1},
+        stormRain:{stunChance:35,missBonusByLevel:[5,7,9,11,13,15,17,19,22,25],stunDuration:1},
         stoneSlash:{defenseDownChance:65,defenseDownByLevel:[10,20,30,40,50],defenseDownDuration:1},
         stoneThrow:{defenseDownChance:65,defenseDownByLevel:[10,20,30,40,50],defenseDownDuration:1},
         sandWind:{defenseDownChance:65,defenseDownByLevel:[10,20,30,40,50],defenseDownDuration:1},
@@ -453,42 +453,48 @@ test("Burn, Frostbite, Freeze and every other final status definition are exact"
     assert.equal(skills.dustStorm.defenseDownChance,undefined);
 });
 
-test("final normal hit and status-effect bounds override the historical floors",()=>{
+test("final hit, evasion and status chances use one percentage-point model",()=>{
     assert.match(mainSource,/const STATUS_RESIST_PER_SPIRIT_POINT = 0\.05;/);
-    assert.match(mainSource,/const LEVEL_DIFF_FACTOR_PER_LEVEL_PHYSICAL = 0\.01;/);
-    assert.match(mainSource,/const LEVEL_DIFF_FACTOR_MIN_PHYSICAL = 0\.85;/);
-    assert.match(mainSource,/const LEVEL_DIFF_FACTOR_MAX_PHYSICAL = 1\.15;/);
-    assert.match(mainSource,/const HIT_CHANCE_MIN_PERCENT = 50;/);
-    assert.doesNotMatch(mainSource,/STATUS_HIT_INT_COEFFICIENT|HIT_CHANCE_MIN_PERCENT = 60/);
+    assert.match(mainSource,/const STATUS_OFFENSE_ATTRIBUTE_COEFFICIENT = 0\.05;/);
+    assert.match(mainSource,/const HIT_CHANCE_ACCURACY_COEFFICIENT = 0\.15;/);
+    assert.match(mainSource,/const HIT_CHANCE_MIN_PERCENT = 70;/);
+    assert.match(mainSource,/const DEFAULT_MONSTER_EVASION_PER_LEVEL = 0\.1;/);
+    assert.match(mainSource,/const DEFAULT_MONSTER_EVASION_CAP = 10;/);
+    assert.doesNotMatch(v140Source,/Math\.sqrt\(power\)|GENERAL_STATUS_COEFFICIENT|LOCKDOWN_STATUS_COEFFICIENT/);
+    assert.doesNotMatch(v140Source,/rollHitChance\s*=\s*function|calculateStatusEffectChance\s*=\s*function/);
+    assert.doesNotMatch(v158Source,/v158GetHitChancePercent|rollHitChance\s*=\s*function/);
+
     const runtime=loadFinalRuntime();
-    const hit=runtime.context.v158GetHitChancePercent;
+    const hit=runtime.context.v173GetHitChancePercent;
     assert.deepEqual(
-        [hit(0,0,0),hit(10,0,0),hit(0,10,0),hit(0,1000,0),hit(0,1000,50),hit(1000,0,0)],
-        [95,98,85.5,14.250000000000002,1,99]
+        [hit(0,0,0,0),hit(10,0,0,0),hit(0,10,0,0),hit(0,1000,0,0),hit(0,1000,50,0),hit(1000,0,0,0)],
+        [95,96.5,85,70,70,99]
     );
-    const status=runtime.context.v140CalculateStatusEffectChance;
-    assert.equal(status(50,10,10,100,20,false,"regular",0,"physical"),54);
-    assert.equal(status(50,10,10,100,20,false,"regular",0,"magic"),54);
-    assert.equal(status(50,10,10,100,100,false,"regular",7,"physical"),43);
-    assert.equal(status(50,10,10,100,100,false,"regular",7,"magic"),43);
-    assert.equal(status(30,10,10,100,20,true,"regular",0,"physical"),26);
-    assert.equal(status(30,10,10,100,20,true,"regular",0,"magic"),26);
+    assert.equal(hit(0,15,5,10),85,"95 + 10 - 15 - 5 must equal 85 percentage points");
+
+    const status=runtime.context.calculateStatusEffectChance;
+    assert.equal(status(50,10,10,100,20,false,"regular",0),54);
+    assert.equal(status(50,10,10,100,100,false,"regular",7),43);
+    assert.equal(status(30,10,10,200,0,true,"boss",20),20,
+        "30 base + INT 200×0.05 - Boss resistance 20 = 20");
     assert.deepEqual(
-        ["regular","elite","boss"].map(rank=>status(90,10,10,100,0,true,rank,0,"magic")),
-        [80,60,40]
+        ["regular","elite","boss"].map(rank=>status(90,10,10,100,0,true,rank,0)),
+        [90,75,60]
     );
-    const levelCases=[[0,1],[5,1.1],[10,1.2],[15,1.3],[30,1.3],[-5,.9],[-10,.8],[-15,.7],[-30,.7]];
+    const levelCases=[0,5,10,15,30,-5,-10,-15,-30];
     assert.deepEqual(
-        levelCases.map(([difference])=>status(40,50+difference,50,0,0,false,"regular",0,"magic")),
-        [40,44,48,52,52,36,32,28,28]
+        levelCases.map(difference=>status(40,50+difference,50,0,0,false,"regular",0)),
+        levelCases.map(()=>40),
+        "status chance must no longer contain a hidden level-difference factor"
     );
     assert.deepEqual(
-        levelCases.map(([difference])=>status(40,50+difference,50,0,0,true,"regular",0,"magic")),
-        [40,44,48,52,52,36,32,28,28]
+        levelCases.map(difference=>status(40,50+difference,50,0,0,true,"regular",0)),
+        levelCases.map(()=>40),
+        "hard control must use the same attribute/resistance conversion before rank cap"
     );
-    runtime.context.Math.random=()=>.5;
+
     assert.deepEqual(
-        levelCases.map(([difference])=>runtime.context.calculateDamage(100,0,50+difference,50,"fire","fire")),
+        levelCases.map(difference=>runtime.context.calculateDamage(100,0,50+difference,50,"fire","fire")),
         [100,105,110,115,115,95,90,85,85]
     );
 });
@@ -789,7 +795,7 @@ test("reflection uses actual HP loss and cannot reflect absorbed or overkill dam
     assert.deepEqual(result,{playerHp:0,attackerHp:995});
 });
 
-test("evasion sources multiply to 83.75%, cap at 85%, and Barrier spends once per skill cast",()=>{
+test("evasion sources add as final percentage points, cap at 85%, and Barrier spends once per skill cast",()=>{
     const runtime=loadFinalRuntime();
     const result=evaluateJson(runtime.context,`(function(){
         const target={activeBuffs:[{
@@ -804,7 +810,7 @@ test("evasion sources multiply to 83.75%, cap at 85%, and Barrier spends once pe
             blocked:blocked,remaining:target.activeBuffs[0].remainingBlocks
         };
     })()`);
-    assert.deepEqual(result,{combined:83.75,capped:85,blocked:[true,true,true],remaining:4});
+    assert.deepEqual(result,{combined:85,capped:85,blocked:[true,true,true],remaining:4});
 });
 
 test("player agility and default monster level retain the final evasion rules",()=>{
@@ -825,7 +831,7 @@ test("player agility and default monster level retain the final evasion rules",(
             custom:custom.evasion,missing:missing.evasion
         };
     })()`);
-    assert.deepEqual(result,{player:60,level40:12,level200:30,custom:24,missing:30});
+    assert.deepEqual(result,{player:60,level40:4,level200:10,custom:24,missing:10});
 });
 
 test("multi-target buffs resolve same-name MISS independently without replacing existing values",()=>{
@@ -983,11 +989,16 @@ test("final support passives and front/back Freeze behavior are exact",()=>{
     const runtime=loadFinalRuntime();
     const skills=runtime.skills;
     assert.deepEqual(
-        [skills.rage.duration,skills.dodgeSkill.evasionBonusPercent,skills.dodgeSkill.duration,
-            skills.stealthSkill.duration,skills.dinghaishenzhen.statusResistBonus,
-            skills.dinghaishenzhen.accuracyBonusPercent,skills.windEX.evasionBonusPercent],
-        [3,75,3,3,65,50,35]
+        [skills.rage.duration,skills.dodgeSkill.duration,skills.stealthSkill.duration,
+            skills.windEX.evasionBonusPercent],
+        [3,3,3,10]
     );
+    assert.deepEqual(Array.from(skills.dodgeSkill.evasionBonusPercentByLevel),[5,10,15,20,25]);
+    assert.deepEqual(Array.from(skills.dinghaishenzhen.statusResistBonusByLevel),[5,8,10,12,15]);
+    assert.deepEqual(Array.from(skills.dinghaishenzhen.accuracyBonusPercentByLevel),[5,10,15,20,25]);
+    assert.equal(skills.dodgeSkill.evasionBonusPercent,undefined);
+    assert.equal(skills.dinghaishenzhen.statusResistBonus,undefined);
+    assert.equal(skills.dinghaishenzhen.accuracyBonusPercent,undefined);
     assert.deepEqual(
         [skills.earthShield.reflectPercent,skills.earthShield.duration,
             skills.rockWall.defenseBonusPercent,skills.rockWall.duration,
@@ -1235,7 +1246,7 @@ test("Extreme Emperor carries only Yuan Zu Blessing and settles its final behavi
     assert.deepEqual(
         [data.yuanZuBlessing.spCost,data.yuanZuBlessing.baseHeal,data.yuanZuBlessing.baseHealSP,
             data.yuanZuBlessing.cleanseChance,data.yuanZuBlessing.evasionBonusPercent,data.yuanZuBlessing.duration],
-        [45,100,100,35,35,2]
+        [45,100,100,35,15,2]
     );
     assert.equal(data.yuanZuBlessing.agilityBonusPercent,undefined);
 });

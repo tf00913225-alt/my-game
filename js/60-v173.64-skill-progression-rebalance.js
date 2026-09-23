@@ -31,10 +31,11 @@
     const FREEZE_CHANCE_BY_LEVEL=Object.freeze([55,65,75,85,95]);
     const FREEZE_DURATION_BY_LEVEL=Object.freeze([3,3,3,4,5]);
     const PURIFY_TARGET_COUNT_BY_LEVEL=Object.freeze([1,1,3]);
-    const DODGE_BY_LEVEL=Object.freeze([30,40,50,60,70]);
+    const FINAL_POINT_DAMAGE_LEVELS=Object.freeze([5,7,9,11,13,15,17,19,22,25]);
+    const DODGE_BY_LEVEL=Object.freeze([5,10,15,20,25]);
     const STEALTH_DURATION_BY_LEVEL=Object.freeze([2,3,4]);
-    const CALM_RESIST_BY_LEVEL=Object.freeze([25,35,45,55,65]);
-    const CALM_ACCURACY_BY_LEVEL=Object.freeze([10,20,30,40,50]);
+    const CALM_RESIST_BY_LEVEL=Object.freeze([5,8,10,12,15]);
+    const CALM_ACCURACY_BY_LEVEL=Object.freeze([5,10,15,20,25]);
     const ROCK_WALL_BY_LEVEL=Object.freeze([15,20,25,30,35]);
     const EARTH_SHIELD_BY_LEVEL=Object.freeze([20,30,35,40,50]);
     const EARTH_SHIELD_DURATION_BY_LEVEL=Object.freeze([3,3,3,4,5]);
@@ -125,14 +126,26 @@
         },
         waterEX:{learnLevel:50,learnCost:20,maxLevel:1,progressionGroup:"ex"},
 
-        stormFist:{learnLevel:1,learnCost:2,progressionGroup:"physical"},
+        stormFist:{
+            learnLevel:1,learnCost:2,progressionGroup:"physical",
+            agilityDownByLevel:FINAL_POINT_DAMAGE_LEVELS.slice()
+        },
         stormFlurry:{learnLevel:7,learnCost:6,progressionGroup:"physical"},
         windCrossSlash:{learnLevel:14,learnCost:10,progressionGroup:"physical"},
-        dizzyFist:{learnLevel:30,learnCost:16,progressionGroup:"physical"},
-        windSpell:{learnLevel:1,learnCost:2,progressionGroup:"magic"},
+        dizzyFist:{
+            learnLevel:30,learnCost:16,progressionGroup:"physical",
+            missBonusByLevel:FINAL_POINT_DAMAGE_LEVELS.slice()
+        },
+        windSpell:{
+            learnLevel:1,learnCost:2,progressionGroup:"magic",
+            agilityDownByLevel:FINAL_POINT_DAMAGE_LEVELS.slice()
+        },
         stormCircle:{learnLevel:7,learnCost:6,progressionGroup:"magic"},
         windHowlLightning:{learnLevel:14,learnCost:10,progressionGroup:"magic"},
-        stormRain:{learnLevel:30,learnCost:16,progressionGroup:"magic"},
+        stormRain:{
+            learnLevel:30,learnCost:16,progressionGroup:"magic",
+            missBonusByLevel:FINAL_POINT_DAMAGE_LEVELS.slice()
+        },
         dodgeSkill:{
             learnLevel:18,learnCost:10,maxLevel:5,progressionGroup:"tactical",
             evasionBonusPercentByLevel:DODGE_BY_LEVEL.slice()
@@ -147,7 +160,10 @@
             statusResistBonusByLevel:CALM_RESIST_BY_LEVEL.slice(),
             accuracyBonusPercentByLevel:CALM_ACCURACY_BY_LEVEL.slice()
         },
-        windEX:{learnLevel:50,learnCost:20,maxLevel:1,progressionGroup:"ex"},
+        windEX:{
+            learnLevel:50,learnCost:20,maxLevel:1,progressionGroup:"ex",
+            evasionBonusPercent:10
+        },
 
         stoneSlash:{learnLevel:1,learnCost:2,progressionGroup:"physical"},
         petrifyFist:{learnLevel:7,learnCost:6,progressionGroup:"physical"},
@@ -215,13 +231,17 @@
         const parts=[];
         const lv=clampLevel(level,skill&&skill.maxLevel||1);
         if(numeric(skill&&skill.burnChance)>0&&Array.isArray(skill.burnPercentByLevel)){
-            parts.push("燃燒："+numeric(skill.burnChance)+"%基礎機率，"+
+            const burnLead=skill.guaranteedBurn===true
+                ?"燃燒：必定生效"
+                :"燃燒："+numeric(skill.burnChance)+"%基礎機率";
+            parts.push(burnLead+"，"+
                 levelValue(skill.burnPercentByLevel,lv,0)+"%最大HP／回合，"+
                 Math.max(1,numeric(skill.burnDuration)||1)+"回合");
         }
         if(numeric(skill&&skill.frostbiteChance)>0){
             parts.push("凍傷："+numeric(skill.frostbiteChance)+"%基礎機率，"+
-                Math.max(1,numeric(skill.frostbiteDuration)||1)+"回合");
+                Math.max(1,numeric(skill.frostbiteDuration)||1)+
+                "回合；期間傷害-25%、最終閃躲-25個百分點、最終異常狀態抗性-25個百分點");
         }
         if(Array.isArray(skill&&skill.lifestealPercentByLevel)){
             parts.push("吸血："+levelValue(skill.lifestealPercentByLevel,lv,0)+"%實際傷害回復自身HP");
@@ -237,13 +257,14 @@
                 Math.max(1,numeric(skill.damageDownDuration)||1)+"回合");
         }
         if(Array.isArray(skill&&skill.agilityDownByLevel)){
+            const value=levelValue(skill.agilityDownByLevel,lv,0);
             parts.push("重力："+numeric(skill.agilityDownChance)+"%基礎機率，敏捷-"+
-                levelValue(skill.agilityDownByLevel,lv,0)+"%，"+
+                value+"%、最終閃躲-"+value+"個百分點，"+
                 Math.max(1,numeric(skill.agilityDownDuration)||1)+"回合");
         }
         if(Array.isArray(skill&&skill.missBonusByLevel)){
-            parts.push("暈眩："+numeric(skill.stunChance)+"%基礎機率，命中降低"+
-                levelValue(skill.missBonusByLevel,lv,0)+"%，"+
+            parts.push("暈眩："+numeric(skill.stunChance)+"%基礎機率，最終命中率-"+
+                levelValue(skill.missBonusByLevel,lv,0)+"個百分點，"+
                 Math.max(1,numeric(skill.stunDuration)||1)+"回合");
         }
         if(Array.isArray(skill&&skill.petrifyChanceByLevel)){
@@ -258,6 +279,19 @@
             parts.push("我方護盾："+levelValue(skill.allyShieldByLevel,lv,0)+"，"+
                 Math.max(1,numeric(skill.shieldDuration)||1)+"回合");
         }
+        if(skill&&skill.followUpOnCriticalOrDefeat){
+            const maxCasts=Math.max(1,Math.floor(numeric(skill.followUpMaxCasts,1)));
+            parts.push("追擊：爆擊或擊敗目標時免費再施放，最多額外"+
+                maxCasts+"次；免費追擊不消耗SP");
+        }
+        if(skill&&skill.id==="phoenixCry"){
+            parts.push("鳳威：本次實際新增燃燒少於"+
+                Math.max(1,Math.floor(numeric(skill.burnBonusThreshold,3)))+
+                "名時，施法者獲得"+
+                Math.max(1,Math.floor(numeric(skill.nextRoundDamageBonusDuration,1)))+
+                "回合鳳威，所有傷害+"+
+                Math.max(0,numeric(skill.nextRoundDamageBonusPercent,30))+"%");
+        }
         return parts;
     }
 
@@ -271,7 +305,8 @@
         if(skill.id==="bloodBurnArt"){
             return "消耗最大HP "+levelValue(skill.hpCostPercentByLevel,lv,0)+
                 "%；接下來3次成功施放的火系直接攻擊傷害+"+
-                levelValue(skill.directDamageBonusByLevel,lv,0)+"%；不強化DoT與免費追擊";
+                levelValue(skill.directDamageBonusByLevel,lv,0)+
+                "%；不強化DoT與免費追擊，免費追擊也不消耗3次有效施放次數";
         }
         if(skill.id==="healSpell"){
             return "恢復"+levelValue(skill.healHpByLevel,lv,0)+" HP，並恢復目標最大SP的"+
@@ -287,17 +322,19 @@
                 levelValue(skill.freezeDurationByLevel,lv,0)+"回合；完全無法行動，受硬控命中上限與冰封／石化互斥限制";
         }
         if(skill.id==="purifyMind"){
-            return "立即清除所有可解除的臨時Buff、Debuff、Shield、Barrier與異常狀態";
+            return "立即清除所有可解除的臨時Buff、Debuff、Shield、Barrier與異常狀態；"+
+                "不清除永久被動、EX、裝備效果、Boss固有機制、HP／SP或死亡狀態";
         }
         if(skill.id==="dodgeSkill"){
-            return "閃躲率+"+levelValue(skill.evasionBonusPercentByLevel,lv,0)+"%，持續3回合";
+            return "最終閃躲+"+levelValue(skill.evasionBonusPercentByLevel,lv,0)+"個百分點，持續3回合";
         }
         if(skill.id==="stealthSkill"){
             return "隱身"+levelValue(skill.durationByLevel,lv,2)+"回合；無法被單體技能選中，仍受範圍技能影響";
         }
         if(skill.id==="dinghaishenzhen"){
-            return "異常狀態抗性+"+levelValue(skill.statusResistBonusByLevel,lv,0)+
-                "%、命中+"+levelValue(skill.accuracyBonusPercentByLevel,lv,0)+"%，持續3回合";
+            return "最終異常狀態抗性+"+levelValue(skill.statusResistBonusByLevel,lv,0)+
+                "個百分點、最終命中率+"+levelValue(skill.accuracyBonusPercentByLevel,lv,0)+
+                "個百分點，持續3回合";
         }
         if(skill.id==="rockWall"){
             return "防禦+"+levelValue(skill.defenseBonusPercentByLevel,lv,0)+"%，持續4回合";
@@ -309,6 +346,24 @@
         if(skill.id==="barrier"){
             return "抵擋"+levelValue(skill.barrierBlockCountByLevel,lv,3)+"次直接傷害，最長"+
                 levelValue(skill.durationByLevel,lv,3)+"回合；DoT不抵擋且不消耗次數";
+        }
+        if(skill.id==="fireEX"){
+            return "永久提升火元素傷害"+numeric(skill.damageBonusPercent)+
+                "%、爆擊率"+numeric(skill.critChanceBonusPercent)+
+                "%、爆擊傷害"+numeric(skill.critDamageBonusPercent)+
+                "%；對有異常狀態的目標傷害再+"+numeric(skill.statusTargetDamageBonusPercent)+"%";
+        }
+        if(skill.id==="waterEX"){
+            return "永久提升水元素傷害"+numeric(skill.damageBonusPercent)+
+                "%、回復類技能HP恢復量"+numeric(skill.healBonusPercent)+
+                "%；每回合開始前有"+numeric(skill.turnStartCleanseChance)+
+                "%機率解除自身所有可解除負面狀態";
+        }
+        if(skill.id==="windEX"){
+            return "永久提升最終閃躲"+numeric(skill.evasionBonusPercent)+"個百分點";
+        }
+        if(skill.id==="earthEX"){
+            return "永久提升防禦力"+numeric(skill.defenseBonusPercent)+"%";
         }
         if(skill.id==="rage"&&Array.isArray(skill.critBonusByLevel)){
             const chance=levelValue(skill.critChanceBonusByLevel||skill.critBonusByLevel,lv,0);
@@ -330,7 +385,10 @@
         }else{
             parts.push(...damageStatusParts(skill,level));
         }
-        if(skill.category==="passive"&&skill.description){ parts.push(skill.description); }
+        if(skill.category==="passive"){
+            const passive=supportEffectText(skill,level);
+            if(passive){ parts.push(passive); }
+        }
         return parts.filter(Boolean).join("｜");
     }
 
@@ -421,7 +479,7 @@
             dodge.evasionBonusPercentByLevel=DODGE_BY_LEVEL.slice();
             dodge.targetType="allyTri"; dodge.duration=3; dodge.spCost=20;
             delete dodge.evasionBonusPercent;
-            dodge.description="我方中、左、右最多3名存活角色閃躲率提升30%/40%/50%/60%/70%，持續3回合。SP 20。";
+            dodge.description="我方中、左、右最多3名存活角色最終閃躲提升5/10/15/20/25個百分點，持續3回合。SP 20。";
         }
         const stealth=skillDatabase.stealthSkill;
         if(stealth){
@@ -435,7 +493,7 @@
             calm.accuracyBonusPercentByLevel=CALM_ACCURACY_BY_LEVEL.slice();
             calm.targetType="allyAll"; calm.duration=3; calm.spCost=77;
             delete calm.statusResistBonus; delete calm.accuracyBonusPercent;
-            calm.description="我方全體異常狀態抗性提升25%/35%/45%/55%/65%，命中提升10%/20%/30%/40%/50%，持續3回合。SP 77。";
+            calm.description="我方全體最終異常狀態抗性提升5/8/10/12/15個百分點、最終命中率提升5/10/15/20/25個百分點，持續3回合。SP 77。";
         }
         const wall=skillDatabase.rockWall;
         if(wall){
@@ -464,7 +522,8 @@
             if(!skill||!skill.id){ return; }
             if(PLAYER_DAMAGE_SKILL_ID_SET.has(skill.id)||[
                 "rage","fireSoulResonance","bloodBurnArt","healSpell","revive","freeze","purifyMind",
-                "dodgeSkill","stealthSkill","dinghaishenzhen","rockWall","earthShield","barrier"
+                "dodgeSkill","stealthSkill","dinghaishenzhen","rockWall","earthShield","barrier",
+                "fireEX","waterEX","windEX","earthEX"
             ].includes(skill.id)){
                 skill.description=descriptionFor(skill);
             }
@@ -1139,6 +1198,9 @@
                 expireActionStatus(action.entity,effect);
             }
         });
+        if(typeof window.v143SyncStatusVisualEffects==="function"){
+            window.v143SyncStatusVisualEffects(false);
+        }
     }
     if(window.FourSymbolsBattleFlow&&typeof window.FourSymbolsBattleFlow.subscribeBeforeCombatant==="function"){
         window.FourSymbolsBattleFlow.subscribeBeforeCombatant(beginDurationAction);

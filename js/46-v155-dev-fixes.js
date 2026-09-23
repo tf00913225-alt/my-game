@@ -36,9 +36,9 @@
     });
     patchSkill("yuanZuBlessing",{
         targetType:"allyAll",baseHeal:100,baseHealSP:100,
-        cleanseChance:35,evasionBonusPercent:35,
+        cleanseChance:35,evasionBonusPercent:15,
         duration:2,
-        description:"對我方全體施放祝福，每個目標獨立有35%機率解除身上負面狀態，恢復100 HP、100 SP，並增加閃避35%，持續2回合。"
+        description:"對我方全體施放祝福，每個目標獨立有35%機率解除身上負面狀態，恢復100 HP、100 SP，並使最終閃躲+15個百分點，持續2回合。"
     });
     if(typeof skillDatabase!=="undefined"&&skillDatabase.yuanZuBlessing){
         delete skillDatabase.yuanZuBlessing.agilityBonusPercent;
@@ -171,10 +171,10 @@
         if(typeof window.v173CombineEvasionRates==="function"){
             return window.v173CombineEvasionRates(sources);
         }
-        const remaining=(sources||[]).reduce((chance,source)=>
-            chance*(1-Math.max(0,Math.min(100,numeric(source)))/100),1
-        );
-        return Math.min(85,(1-remaining)*100);
+        return Math.min(85,(sources||[]).reduce(
+            (sum,source)=>sum+numeric(source),
+            0
+        ));
     }
 
     function ensureV155EvasionBase(monster){

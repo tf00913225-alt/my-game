@@ -107,6 +107,8 @@ jobs:
           node tests/v150-ice-arrow-rain-vfx.test.js
           node tests/v173.23-wind-vfx.test.js
           node tests/battle-runtime-hot-path-convergence-20260923.test.js
+          node tests/battle-ui-status-vfx-followup-20260922.test.js
+          node tests/hit-evasion-final-percent-status-formula-20260923.test.js
 
       - name: Run skill and relic owner convergence regressions
         run: |

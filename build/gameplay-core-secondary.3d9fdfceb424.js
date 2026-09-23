@@ -3395,11 +3395,11 @@
 
     if(typeof applySkillDebuffEffects==="function"){
         const previousApplySkillDebuffs=applySkillDebuffEffects;
-        applySkillDebuffEffects=function(skill,level,monster,index,casterLevel,casterIntelligence){
+        applySkillDebuffEffects=function(skill,level,monster,index,casterLevel,casterOffensiveAttribute){
             const result=previousApplySkillDebuffs.apply(this,arguments);
             if(!skill||!numeric(skill.frostbiteChance)||!monster||!monster.alive){ return result; }
             const args=[
-                skill.frostbiteChance,casterLevel,monster.level,casterIntelligence,
+                skill.frostbiteChance,casterLevel,monster.level,casterOffensiveAttribute,
                 typeof getMonsterEffectiveSpiritPoints==="function"?getMonsterEffectiveSpiritPoints(monster):numeric(monster.spiritPoints),
                 false,typeof getMonsterRank==="function"?getMonsterRank(monster):"regular"
             ];
@@ -3410,7 +3410,7 @@
                 const duration=skill.frostbiteDuration||2;
                 applyFrostbite(monster,duration);
                 playFrostbiteEffect("monster",index);
-                if(typeof addBattleLog==="function"){ addBattleLog(monster.name+"陷入凍傷，"+duration+"回合內無法使用技能。"); }
+                if(typeof addBattleLog==="function"){ addBattleLog(monster.name+"陷入凍傷，"+duration+"回合內傷害、閃躲、異常狀態抗性降低25%。"); }
             }else if(!roll.duplicate&&typeof addBattleLog==="function"){
                 addBattleLog("（凍傷效果被"+monster.name+"抵抗了）");
             }
@@ -3420,13 +3420,13 @@
 
     if(typeof applySkillDebuffEffectsToPlayer==="function"){
         const previousApplySkillDebuffsToPlayer=applySkillDebuffEffectsToPlayer;
-        applySkillDebuffEffectsToPlayer=function(skill,level,target,index,casterLevel,casterIntelligence){
+        applySkillDebuffEffectsToPlayer=function(skill,level,target,index,casterLevel,casterOffensiveAttribute){
             const result=previousApplySkillDebuffsToPlayer.apply(this,arguments);
             if(!skill||!numeric(skill.frostbiteChance)||!target||numeric(target.hp)<=0){ return result; }
             const spirit=typeof getFinalBattleSpiritForPlayerTarget==="function"
                 ?getFinalBattleSpiritForPlayerTarget(target,index):numeric(target.spirit);
             const resist=typeof getPlayerStatusResistBonus==="function"?getPlayerStatusResistBonus(target):0;
-            const args=[skill.frostbiteChance,casterLevel,target.level,casterIntelligence,spirit,false,"regular",resist];
+            const args=[skill.frostbiteChance,casterLevel,target.level,casterOffensiveAttribute,spirit,false,"regular",resist];
             const roll=typeof window.v173RollNamedPersistentStatusEffect==="function"
                 ?window.v173RollNamedPersistentStatusEffect(target,"frostbite",args,"player",index,skill.name)
                 :{duplicate:false,hit:typeof rollStatusEffectHit==="function"&&rollStatusEffectHit.apply(null,args)};
@@ -3434,7 +3434,7 @@
                 const duration=skill.frostbiteDuration||2;
                 applyFrostbite(target,duration);
                 playFrostbiteEffect("player",index);
-                if(typeof addBattleLog==="function"){ addBattleLog((target.id||"角色")+"陷入凍傷，"+duration+"回合內無法使用技能。"); }
+                if(typeof addBattleLog==="function"){ addBattleLog((target.id||"角色")+"陷入凍傷，"+duration+"回合內傷害、閃躲、異常狀態抗性降低25%。"); }
             }else if(!roll.duplicate&&typeof addBattleLog==="function"){
                 addBattleLog("（凍傷效果被"+(target.id||"角色")+"抵抗了）");
             }
@@ -3505,17 +3505,6 @@
         }
     }
 
-    function withGuaranteedBurn(skill,callback){
-        const previousStatusRoll=typeof rollStatusEffectHit==="function"?rollStatusEffectHit:null;
-        if(!skill||!skill.guaranteedBurn||!previousStatusRoll){ return callback(); }
-        rollStatusEffectHit=function(baseChance){
-            if(numeric(baseChance)===numeric(skill.burnChance)){ return true; }
-            return previousStatusRoll.apply(this,arguments);
-        };
-        try{ return callback(); }
-        finally{ rollStatusEffectHit=previousStatusRoll; }
-    }
-
     /* Every qualifying Fire physical skill reuses this one owner. */
     function firstLivingMonsterIndex(){
         const indexes=livingMonsterIndexes();
@@ -3580,9 +3569,7 @@
         }
         try{
             result=withPlayerSkillContext(options.context,()=>{
-                const invoke=()=>withGuaranteedBurn(
-                    options.skill,()=>options.previous.apply(options.that,options.args)
-                );
+                const invoke=()=>options.previous.apply(options.that,options.args);
                 const formal=window.FourSymbolsSkillSpec;
                 return formal&&typeof formal.withPlayerDirectSkillCast==="function"
                     ?formal.withPlayerDirectSkillCast(
@@ -3652,7 +3639,7 @@
             if(!skill||!skill.followUpOnCriticalOrDefeat){
                 const that=this;
                 return withPlayerSkillContext(context,()=>{
-                    const invoke=()=>withGuaranteedBurn(skill,()=>previous.apply(that,args));
+                    const invoke=()=>previous.apply(that,args);
                     const formal=window.FourSymbolsSkillSpec;
                     return formal&&typeof formal.withPlayerDirectSkillCast==="function"&&skill
                         ?formal.withPlayerDirectSkillCast(characterIndex,skill.id,{freeCast:false},invoke)
@@ -3806,7 +3793,6 @@
             const originalChance=monster.skillChance;
             const originalHit=typeof showPlayerHit==="function"?showPlayerHit:null;
             const originalLog=typeof addBattleLog==="function"?addBattleLog:null;
-            const originalStatusRoll=typeof rollStatusEffectHit==="function"?rollStatusEffectHit:null;
             const previousRepeatAttacker=currentReflectAttacker;
             const livingBefore=livingPartyIndexes().map(index=>({
                 character:getPartyCharacterByIndex(index),
@@ -3837,12 +3823,6 @@
                     return originalLog.apply(this,arguments);
                 };
             }
-            if(originalStatusRoll&&options.skill.guaranteedBurn){
-                rollStatusEffectHit=function(baseChance){
-                    if(numeric(baseChance)===numeric(options.skill.burnChance)){ return true; }
-                    return originalStatusRoll.apply(this,arguments);
-                };
-            }
             const previousDamageActor=window.v149CurrentDamageActor;
             window.v149CurrentDamageActor=monster;
             try{
@@ -3862,7 +3842,6 @@
                 releaseFinishCapture();
                 if(originalHit){ showPlayerHit=originalHit; }
                 if(originalLog){ addBattleLog=originalLog; }
-                if(originalStatusRoll){ rollStatusEffectHit=originalStatusRoll; }
                 currentReflectAttacker=previousRepeatAttacker;
                 window.v149CurrentDamageActor=previousDamageActor;
                 options.skill.spCost=originalCost;
@@ -3902,7 +3881,6 @@
             const previousBadge=typeof showMonsterSkillNameBadge==="function"?showMonsterSkillNameBadge:null;
             const previousHit=typeof showPlayerHit==="function"?showPlayerHit:null;
             const previousLog=typeof addBattleLog==="function"?addBattleLog:null;
-            const previousStatusRoll=typeof rollStatusEffectHit==="function"?rollStatusEffectHit:null;
             const livingBefore=livingPartyIndexes().map(index=>({
                 character:getPartyCharacterByIndex(index),alive:true
             }));
@@ -3933,13 +3911,6 @@
                     return previousLog.apply(this,arguments);
                 };
             }
-            if(previousStatusRoll){
-                rollStatusEffectHit=function(baseChance){
-                    const skill=castSkillId&&typeof skillDatabase!=="undefined"?skillDatabase[castSkillId]:null;
-                    if(skill&&skill.guaranteedBurn&&numeric(baseChance)===numeric(skill.burnChance)){ return true; }
-                    return previousStatusRoll.apply(this,arguments);
-                };
-            }
             const previousAttacker=currentReflectAttacker;
             const previousDamageActor=window.v149CurrentDamageActor;
             currentReflectAttacker=monsterIndex;
@@ -3953,7 +3924,6 @@
                 if(previousBadge){ showMonsterSkillNameBadge=previousBadge; }
                 if(previousHit){ showPlayerHit=previousHit; }
                 if(previousLog){ addBattleLog=previousLog; }
-                if(previousStatusRoll){ rollStatusEffectHit=previousStatusRoll; }
             }
             const repeatSkill=castSkillId&&skillDatabase[castSkillId];
             const livingTargets=livingPartyIndexes();
@@ -5063,9 +5033,9 @@
     });
     patchSkill("yuanZuBlessing",{
         targetType:"allyAll",baseHeal:100,baseHealSP:100,
-        cleanseChance:35,evasionBonusPercent:35,
+        cleanseChance:35,evasionBonusPercent:15,
         duration:2,
-        description:"對我方全體施放祝福，每個目標獨立有35%機率解除身上負面狀態，恢復100 HP、100 SP，並增加閃避35%，持續2回合。"
+        description:"對我方全體施放祝福，每個目標獨立有35%機率解除身上負面狀態，恢復100 HP、100 SP，並使最終閃躲+15個百分點，持續2回合。"
     });
     if(typeof skillDatabase!=="undefined"&&skillDatabase.yuanZuBlessing){
         delete skillDatabase.yuanZuBlessing.agilityBonusPercent;
@@ -5198,10 +5168,10 @@
         if(typeof window.v173CombineEvasionRates==="function"){
             return window.v173CombineEvasionRates(sources);
         }
-        const remaining=(sources||[]).reduce((chance,source)=>
-            chance*(1-Math.max(0,Math.min(100,numeric(source)))/100),1
-        );
-        return Math.min(85,(1-remaining)*100);
+        return Math.min(85,(sources||[]).reduce(
+            (sum,source)=>sum+numeric(source),
+            0
+        ));
     }
 
     function ensureV155EvasionBase(monster){
@@ -5971,34 +5941,15 @@
         return Math.max(min,Math.min(max,value));
     }
 
-    function hitChancePercent(casterAccuracy,targetEvasion,directChanceReductionPercent){
-        const directReduction=Math.max(0,numeric(directChanceReductionPercent));
-        const rawAccuracyChance=
-            95+
-            numeric(casterAccuracy)*0.3;
-        const accuracyChance=clamp(rawAccuracyChance,50,99);
-        const evasionRate=clamp(numeric(targetEvasion),0,85);
-        const evasionAdjustedChance=accuracyChance*(1-evasionRate/100);
-        return clamp(evasionAdjustedChance-directReduction,1,99);
-    }
-
-    window.v158GetHitChancePercent=hitChancePercent;
-
-    if(typeof rollHitChance==="function"){
-        rollHitChance=function(casterAccuracy,targetEvasion,directChanceReductionPercent){
-            return Math.random()*100<hitChancePercent(
-                casterAccuracy,
-                targetEvasion,
-                directChanceReductionPercent
-            );
-        };
-    }
+    /* Hit chance is owned by js/00-main.js. V158 must not override it. */
 
     function normalizeMonsterDefaultEvasion(monster){
         if(!monster){ return monster; }
         const level=Math.max(1,numeric(monster.level)||1);
         if(monster.evasion===undefined){
-            monster.evasion=Math.min(30,level*0.3);
+            monster.evasion=typeof window.v173GetDefaultMonsterEvasion==="function"
+                ?window.v173GetDefaultMonsterEvasion(level)
+                :Math.min(10,level*0.1);
         }
         return monster;
     }
@@ -6173,15 +6124,8 @@
     }
     window.v158PrepareBattleRender=v158PrepareBattleRender;
 
-    if(typeof getMonsterEvasion==="function"){
-        const previousGetMonsterEvasion=getMonsterEvasion;
-        getMonsterEvasion=function(monster){
-            return previousGetMonsterEvasion.call(
-                this,
-                normalizeMonsterDefaultEvasion(monster)
-            );
-        };
-    }
+    /* getMonsterEvasion() remains the single core owner; no late V158 wrapper. */
+
 
     function castTriFreeze(characterIndex,skillId,centerIndex,legacyPlayer2){
         const skill=typeof skillDatabase!=="undefined"?skillDatabase[skillId]:null;
@@ -6358,8 +6302,8 @@
                 const note=document.querySelector("#inventoryCharacterDetailStats .inventory-character-detail-note");
                 if(note){
                     note.innerHTML=
-                        "命中先依95%＋命中×0.3計算（50%～99%），再乘上(1－目標最終閃躲率)。<br>"+
-                        "所有閃躲來源採乘算，最終閃躲率最高85%；一般異常每1精神降低0.05個百分點命中率，硬控維持原公式。";
+                        "最終命中率＝95%＋命中×0.15%＋最終命中加成－目標最終閃躲－最終命中下降，最後限制70%～99%。<br>"+
+                        "所有命中／閃躲／異常抗性技能百分比都以最終百分點加減；異常主屬性與目標精神每1點各換算0.05個百分點。";
                 }
             }
             return result;
@@ -6892,69 +6836,12 @@
         };
     }
 
-    /* Evasion -25% for monsters and all three player stat owners. */
-    if(typeof window.getMonsterEvasion==="function"){
-        const previousMonsterEvasion=window.getMonsterEvasion;
-        window.getMonsterEvasion=function(monster){
-            const value=numeric(previousMonsterEvasion.apply(this,arguments));
-            return activeFrostbite(monster)?value*FROSTBITE_REMAINING_RATE:value;
-        };
-    }
-
-    function wrapPlayerEvasionStats(functionName,characterGetter){
-        const previous=window[functionName];
-        if(typeof previous!=="function"){ return; }
-        window[functionName]=function(){
-            const stats=previous.apply(this,arguments);
-            const character=characterGetter();
-            if(!stats||!activeFrostbite(character)){ return stats; }
-            return Object.assign({},stats,{evasion:numeric(stats.evasion)*FROSTBITE_REMAINING_RATE});
-        };
-    }
-    wrapPlayerEvasionStats("getMainCharacterStats",()=>typeof player!=="undefined"?player:null);
-    wrapPlayerEvasionStats("getPlayer2BattleStats",()=>typeof player2!=="undefined"?player2:null);
-    wrapPlayerEvasionStats("getPlayer3BattleStats",()=>typeof player3!=="undefined"?player3:null);
-
-    /* Status resistance -25%. Spirit-derived and explicit player bonus
-       resistance are reduced at their existing authoritative inputs. */
-    if(typeof window.getMonsterEffectiveSpiritPoints==="function"){
-        const previousMonsterSpirit=window.getMonsterEffectiveSpiritPoints;
-        window.getMonsterEffectiveSpiritPoints=function(monster){
-            const value=numeric(previousMonsterSpirit.apply(this,arguments));
-            return activeFrostbite(monster)?value*FROSTBITE_REMAINING_RATE:value;
-        };
-    }
-    if(typeof window.getFinalBattleSpiritForPlayerTarget==="function"){
-        const previousPlayerSpirit=window.getFinalBattleSpiritForPlayerTarget;
-        window.getFinalBattleSpiritForPlayerTarget=function(target){
-            const value=numeric(previousPlayerSpirit.apply(this,arguments));
-            return activeFrostbite(target)?value*FROSTBITE_REMAINING_RATE:value;
-        };
-    }
-    if(typeof window.getPlayerStatusResistBonus==="function"){
-        const previousPlayerResistBonus=window.getPlayerStatusResistBonus;
-        window.getPlayerStatusResistBonus=function(target){
-            const value=numeric(previousPlayerResistBonus.apply(this,arguments));
-            return activeFrostbite(target)?value*FROSTBITE_REMAINING_RATE:value;
-        };
-    }
-
-    /* V149's old application log mentioned a skill prohibition. Keep the
-       application itself and rewrite only that obsolete explanatory sentence. */
-    if(typeof window.addBattleLog==="function"){
-        const previousAddBattleLog=window.addBattleLog;
-        window.addBattleLog=function(message){
-            let text=String(message==null?"":message);
-            if(text.includes("陷入凍傷")&&text.includes("無法使用技能")){
-                text=text.replace(/，\d+回合內無法使用技能。/,"，期間傷害、閃避、異常狀態抗性降低25%。");
-            }
-            return previousAddBattleLog.call(this,text);
-        };
-    }
-
-    /* Freeze targeting and all player-facing skill text are now owned by
-       the canonical V158/V173.64 runtime and FourSymbolsSkillSpec. V169 keeps
-       only Water-specific Frostbite mechanics and its historical data bridge. */
+    /*
+       Frostbite 的傷害降低仍由 Water Runtime 負責。
+       閃躲與異常抗性已改成「最終百分點 -25」並收斂到
+       js/00-main.js 的正式 Evasion / Status Resistance Owner，
+       本層不再 wrapper getMonsterEvasion、玩家 stats、Spirit 或 Log。
+    */
 
     window.v169WaterSkillRules=Object.freeze({
         version:VERSION,
@@ -9768,10 +9655,11 @@ ensureFunctionalStyles();runRepairs();
     const FREEZE_CHANCE_BY_LEVEL=Object.freeze([55,65,75,85,95]);
     const FREEZE_DURATION_BY_LEVEL=Object.freeze([3,3,3,4,5]);
     const PURIFY_TARGET_COUNT_BY_LEVEL=Object.freeze([1,1,3]);
-    const DODGE_BY_LEVEL=Object.freeze([30,40,50,60,70]);
+    const FINAL_POINT_DAMAGE_LEVELS=Object.freeze([5,7,9,11,13,15,17,19,22,25]);
+    const DODGE_BY_LEVEL=Object.freeze([5,10,15,20,25]);
     const STEALTH_DURATION_BY_LEVEL=Object.freeze([2,3,4]);
-    const CALM_RESIST_BY_LEVEL=Object.freeze([25,35,45,55,65]);
-    const CALM_ACCURACY_BY_LEVEL=Object.freeze([10,20,30,40,50]);
+    const CALM_RESIST_BY_LEVEL=Object.freeze([5,8,10,12,15]);
+    const CALM_ACCURACY_BY_LEVEL=Object.freeze([5,10,15,20,25]);
     const ROCK_WALL_BY_LEVEL=Object.freeze([15,20,25,30,35]);
     const EARTH_SHIELD_BY_LEVEL=Object.freeze([20,30,35,40,50]);
     const EARTH_SHIELD_DURATION_BY_LEVEL=Object.freeze([3,3,3,4,5]);
@@ -9862,14 +9750,26 @@ ensureFunctionalStyles();runRepairs();
         },
         waterEX:{learnLevel:50,learnCost:20,maxLevel:1,progressionGroup:"ex"},
 
-        stormFist:{learnLevel:1,learnCost:2,progressionGroup:"physical"},
+        stormFist:{
+            learnLevel:1,learnCost:2,progressionGroup:"physical",
+            agilityDownByLevel:FINAL_POINT_DAMAGE_LEVELS.slice()
+        },
         stormFlurry:{learnLevel:7,learnCost:6,progressionGroup:"physical"},
         windCrossSlash:{learnLevel:14,learnCost:10,progressionGroup:"physical"},
-        dizzyFist:{learnLevel:30,learnCost:16,progressionGroup:"physical"},
-        windSpell:{learnLevel:1,learnCost:2,progressionGroup:"magic"},
+        dizzyFist:{
+            learnLevel:30,learnCost:16,progressionGroup:"physical",
+            missBonusByLevel:FINAL_POINT_DAMAGE_LEVELS.slice()
+        },
+        windSpell:{
+            learnLevel:1,learnCost:2,progressionGroup:"magic",
+            agilityDownByLevel:FINAL_POINT_DAMAGE_LEVELS.slice()
+        },
         stormCircle:{learnLevel:7,learnCost:6,progressionGroup:"magic"},
         windHowlLightning:{learnLevel:14,learnCost:10,progressionGroup:"magic"},
-        stormRain:{learnLevel:30,learnCost:16,progressionGroup:"magic"},
+        stormRain:{
+            learnLevel:30,learnCost:16,progressionGroup:"magic",
+            missBonusByLevel:FINAL_POINT_DAMAGE_LEVELS.slice()
+        },
         dodgeSkill:{
             learnLevel:18,learnCost:10,maxLevel:5,progressionGroup:"tactical",
             evasionBonusPercentByLevel:DODGE_BY_LEVEL.slice()
@@ -9884,7 +9784,10 @@ ensureFunctionalStyles();runRepairs();
             statusResistBonusByLevel:CALM_RESIST_BY_LEVEL.slice(),
             accuracyBonusPercentByLevel:CALM_ACCURACY_BY_LEVEL.slice()
         },
-        windEX:{learnLevel:50,learnCost:20,maxLevel:1,progressionGroup:"ex"},
+        windEX:{
+            learnLevel:50,learnCost:20,maxLevel:1,progressionGroup:"ex",
+            evasionBonusPercent:10
+        },
 
         stoneSlash:{learnLevel:1,learnCost:2,progressionGroup:"physical"},
         petrifyFist:{learnLevel:7,learnCost:6,progressionGroup:"physical"},
@@ -9952,13 +9855,17 @@ ensureFunctionalStyles();runRepairs();
         const parts=[];
         const lv=clampLevel(level,skill&&skill.maxLevel||1);
         if(numeric(skill&&skill.burnChance)>0&&Array.isArray(skill.burnPercentByLevel)){
-            parts.push("燃燒："+numeric(skill.burnChance)+"%基礎機率，"+
+            const burnLead=skill.guaranteedBurn===true
+                ?"燃燒：必定生效"
+                :"燃燒："+numeric(skill.burnChance)+"%基礎機率";
+            parts.push(burnLead+"，"+
                 levelValue(skill.burnPercentByLevel,lv,0)+"%最大HP／回合，"+
                 Math.max(1,numeric(skill.burnDuration)||1)+"回合");
         }
         if(numeric(skill&&skill.frostbiteChance)>0){
             parts.push("凍傷："+numeric(skill.frostbiteChance)+"%基礎機率，"+
-                Math.max(1,numeric(skill.frostbiteDuration)||1)+"回合");
+                Math.max(1,numeric(skill.frostbiteDuration)||1)+
+                "回合；期間傷害-25%、最終閃躲-25個百分點、最終異常狀態抗性-25個百分點");
         }
         if(Array.isArray(skill&&skill.lifestealPercentByLevel)){
             parts.push("吸血："+levelValue(skill.lifestealPercentByLevel,lv,0)+"%實際傷害回復自身HP");
@@ -9974,13 +9881,14 @@ ensureFunctionalStyles();runRepairs();
                 Math.max(1,numeric(skill.damageDownDuration)||1)+"回合");
         }
         if(Array.isArray(skill&&skill.agilityDownByLevel)){
+            const value=levelValue(skill.agilityDownByLevel,lv,0);
             parts.push("重力："+numeric(skill.agilityDownChance)+"%基礎機率，敏捷-"+
-                levelValue(skill.agilityDownByLevel,lv,0)+"%，"+
+                value+"%、最終閃躲-"+value+"個百分點，"+
                 Math.max(1,numeric(skill.agilityDownDuration)||1)+"回合");
         }
         if(Array.isArray(skill&&skill.missBonusByLevel)){
-            parts.push("暈眩："+numeric(skill.stunChance)+"%基礎機率，命中降低"+
-                levelValue(skill.missBonusByLevel,lv,0)+"%，"+
+            parts.push("暈眩："+numeric(skill.stunChance)+"%基礎機率，最終命中率-"+
+                levelValue(skill.missBonusByLevel,lv,0)+"個百分點，"+
                 Math.max(1,numeric(skill.stunDuration)||1)+"回合");
         }
         if(Array.isArray(skill&&skill.petrifyChanceByLevel)){
@@ -9995,6 +9903,19 @@ ensureFunctionalStyles();runRepairs();
             parts.push("我方護盾："+levelValue(skill.allyShieldByLevel,lv,0)+"，"+
                 Math.max(1,numeric(skill.shieldDuration)||1)+"回合");
         }
+        if(skill&&skill.followUpOnCriticalOrDefeat){
+            const maxCasts=Math.max(1,Math.floor(numeric(skill.followUpMaxCasts,1)));
+            parts.push("追擊：爆擊或擊敗目標時免費再施放，最多額外"+
+                maxCasts+"次；免費追擊不消耗SP");
+        }
+        if(skill&&skill.id==="phoenixCry"){
+            parts.push("鳳威：本次實際新增燃燒少於"+
+                Math.max(1,Math.floor(numeric(skill.burnBonusThreshold,3)))+
+                "名時，施法者獲得"+
+                Math.max(1,Math.floor(numeric(skill.nextRoundDamageBonusDuration,1)))+
+                "回合鳳威，所有傷害+"+
+                Math.max(0,numeric(skill.nextRoundDamageBonusPercent,30))+"%");
+        }
         return parts;
     }
 
@@ -10008,7 +9929,8 @@ ensureFunctionalStyles();runRepairs();
         if(skill.id==="bloodBurnArt"){
             return "消耗最大HP "+levelValue(skill.hpCostPercentByLevel,lv,0)+
                 "%；接下來3次成功施放的火系直接攻擊傷害+"+
-                levelValue(skill.directDamageBonusByLevel,lv,0)+"%；不強化DoT與免費追擊";
+                levelValue(skill.directDamageBonusByLevel,lv,0)+
+                "%；不強化DoT與免費追擊，免費追擊也不消耗3次有效施放次數";
         }
         if(skill.id==="healSpell"){
             return "恢復"+levelValue(skill.healHpByLevel,lv,0)+" HP，並恢復目標最大SP的"+
@@ -10024,17 +9946,19 @@ ensureFunctionalStyles();runRepairs();
                 levelValue(skill.freezeDurationByLevel,lv,0)+"回合；完全無法行動，受硬控命中上限與冰封／石化互斥限制";
         }
         if(skill.id==="purifyMind"){
-            return "立即清除所有可解除的臨時Buff、Debuff、Shield、Barrier與異常狀態";
+            return "立即清除所有可解除的臨時Buff、Debuff、Shield、Barrier與異常狀態；"+
+                "不清除永久被動、EX、裝備效果、Boss固有機制、HP／SP或死亡狀態";
         }
         if(skill.id==="dodgeSkill"){
-            return "閃躲率+"+levelValue(skill.evasionBonusPercentByLevel,lv,0)+"%，持續3回合";
+            return "最終閃躲+"+levelValue(skill.evasionBonusPercentByLevel,lv,0)+"個百分點，持續3回合";
         }
         if(skill.id==="stealthSkill"){
             return "隱身"+levelValue(skill.durationByLevel,lv,2)+"回合；無法被單體技能選中，仍受範圍技能影響";
         }
         if(skill.id==="dinghaishenzhen"){
-            return "異常狀態抗性+"+levelValue(skill.statusResistBonusByLevel,lv,0)+
-                "%、命中+"+levelValue(skill.accuracyBonusPercentByLevel,lv,0)+"%，持續3回合";
+            return "最終異常狀態抗性+"+levelValue(skill.statusResistBonusByLevel,lv,0)+
+                "個百分點、最終命中率+"+levelValue(skill.accuracyBonusPercentByLevel,lv,0)+
+                "個百分點，持續3回合";
         }
         if(skill.id==="rockWall"){
             return "防禦+"+levelValue(skill.defenseBonusPercentByLevel,lv,0)+"%，持續4回合";
@@ -10046,6 +9970,24 @@ ensureFunctionalStyles();runRepairs();
         if(skill.id==="barrier"){
             return "抵擋"+levelValue(skill.barrierBlockCountByLevel,lv,3)+"次直接傷害，最長"+
                 levelValue(skill.durationByLevel,lv,3)+"回合；DoT不抵擋且不消耗次數";
+        }
+        if(skill.id==="fireEX"){
+            return "永久提升火元素傷害"+numeric(skill.damageBonusPercent)+
+                "%、爆擊率"+numeric(skill.critChanceBonusPercent)+
+                "%、爆擊傷害"+numeric(skill.critDamageBonusPercent)+
+                "%；對有異常狀態的目標傷害再+"+numeric(skill.statusTargetDamageBonusPercent)+"%";
+        }
+        if(skill.id==="waterEX"){
+            return "永久提升水元素傷害"+numeric(skill.damageBonusPercent)+
+                "%、回復類技能HP恢復量"+numeric(skill.healBonusPercent)+
+                "%；每回合開始前有"+numeric(skill.turnStartCleanseChance)+
+                "%機率解除自身所有可解除負面狀態";
+        }
+        if(skill.id==="windEX"){
+            return "永久提升最終閃躲"+numeric(skill.evasionBonusPercent)+"個百分點";
+        }
+        if(skill.id==="earthEX"){
+            return "永久提升防禦力"+numeric(skill.defenseBonusPercent)+"%";
         }
         if(skill.id==="rage"&&Array.isArray(skill.critBonusByLevel)){
             const chance=levelValue(skill.critChanceBonusByLevel||skill.critBonusByLevel,lv,0);
@@ -10067,7 +10009,10 @@ ensureFunctionalStyles();runRepairs();
         }else{
             parts.push(...damageStatusParts(skill,level));
         }
-        if(skill.category==="passive"&&skill.description){ parts.push(skill.description); }
+        if(skill.category==="passive"){
+            const passive=supportEffectText(skill,level);
+            if(passive){ parts.push(passive); }
+        }
         return parts.filter(Boolean).join("｜");
     }
 
@@ -10158,7 +10103,7 @@ ensureFunctionalStyles();runRepairs();
             dodge.evasionBonusPercentByLevel=DODGE_BY_LEVEL.slice();
             dodge.targetType="allyTri"; dodge.duration=3; dodge.spCost=20;
             delete dodge.evasionBonusPercent;
-            dodge.description="我方中、左、右最多3名存活角色閃躲率提升30%/40%/50%/60%/70%，持續3回合。SP 20。";
+            dodge.description="我方中、左、右最多3名存活角色最終閃躲提升5/10/15/20/25個百分點，持續3回合。SP 20。";
         }
         const stealth=skillDatabase.stealthSkill;
         if(stealth){
@@ -10172,7 +10117,7 @@ ensureFunctionalStyles();runRepairs();
             calm.accuracyBonusPercentByLevel=CALM_ACCURACY_BY_LEVEL.slice();
             calm.targetType="allyAll"; calm.duration=3; calm.spCost=77;
             delete calm.statusResistBonus; delete calm.accuracyBonusPercent;
-            calm.description="我方全體異常狀態抗性提升25%/35%/45%/55%/65%，命中提升10%/20%/30%/40%/50%，持續3回合。SP 77。";
+            calm.description="我方全體最終異常狀態抗性提升5/8/10/12/15個百分點、最終命中率提升5/10/15/20/25個百分點，持續3回合。SP 77。";
         }
         const wall=skillDatabase.rockWall;
         if(wall){
@@ -10201,7 +10146,8 @@ ensureFunctionalStyles();runRepairs();
             if(!skill||!skill.id){ return; }
             if(PLAYER_DAMAGE_SKILL_ID_SET.has(skill.id)||[
                 "rage","fireSoulResonance","bloodBurnArt","healSpell","revive","freeze","purifyMind",
-                "dodgeSkill","stealthSkill","dinghaishenzhen","rockWall","earthShield","barrier"
+                "dodgeSkill","stealthSkill","dinghaishenzhen","rockWall","earthShield","barrier",
+                "fireEX","waterEX","windEX","earthEX"
             ].includes(skill.id)){
                 skill.description=descriptionFor(skill);
             }
@@ -10876,6 +10822,9 @@ ensureFunctionalStyles();runRepairs();
                 expireActionStatus(action.entity,effect);
             }
         });
+        if(typeof window.v143SyncStatusVisualEffects==="function"){
+            window.v143SyncStatusVisualEffects(false);
+        }
     }
     if(window.FourSymbolsBattleFlow&&typeof window.FourSymbolsBattleFlow.subscribeBeforeCombatant==="function"){
         window.FourSymbolsBattleFlow.subscribeBeforeCombatant(beginDurationAction);
@@ -12178,7 +12127,7 @@ ensureFunctionalStyles();runRepairs();
         if(def.id==="relic_tiangang_banner"){ return "對敵方全體造成 "+valueFor(def,"damageMultiplier",level).toFixed(2)+"×秘寶威力"+(level>=10?"並降攻"+Math.round(valueFor(def,"attackDown",level))+"%":"")+"。"; }
         if(def.id==="relic_nine_dragon_fire"){ return "對敵方全體造成 "+valueFor(def,"damageMultiplier",level).toFixed(2)+"×火屬性秘寶傷害"+(level>=10?"，燃燒機率"+Math.round(valueFor(def,"burnChance",level)*100)+"%":"")+(level>=20?"，對燃燒目標額外+15%":"")+"。"; }
         if(def.id==="relic_cold_spring_jade"){ return "急救目標 "+valueFor(def,"healHpPercent",level).toFixed(1).replace(/\.0$/,"")+"%最大HP"+(level>=10?"並淨化1個一般負面":"")+(level>=20?"、恢復4%最大SP":"")+"；HP由35%以上降至35%以下時觸發，每場最多2次，冷卻3回合。"; }
-        if(def.id==="relic_qinglan_feather"){ return "全隊閃避+"+Math.round(valueFor(def,"evasionBonus",level))+"%、異常抗性+"+Math.round(valueFor(def,"resistanceBonus",level))+"%，持續"+Math.round(valueFor(def,"duration",level))+"回合。"; }
+        if(def.id==="relic_qinglan_feather"){ return "全隊最終閃躲+"+Math.round(valueFor(def,"evasionBonus",level))+"個百分點、最終異常抗性+"+Math.round(valueFor(def,"resistanceBonus",level))+"個百分點，持續"+Math.round(valueFor(def,"duration",level))+"回合。"; }
         if(def.id==="relic_rock_mountain_seal"){ return "開場防禦+"+Math.round(valueFor(def,"defenseBonus",level))+"%持續3回合；受擊計數觸發時獲得"+Math.round(valueFor(def,"shieldPercent",level))+"%最大HP護盾"+(level>=20?"；Lv20護盾後準備一次18%秘寶威力反震，作用於下一名實際攻擊者":"")+"。"; }
         if(def.id==="relic_returning_wheel"){ return "阻止本場第一次死亡，保留1HP後恢復"+Math.round(valueFor(def,"healHpPercent",level))+"%最大HP並獲得"+Math.round(valueFor(def,"shieldPercent",level))+"%護盾。"; }
         return def.description;

@@ -1810,42 +1810,9 @@ button:disabled{
     box-shadow:0 0 7px rgba(250,204,21,.6);
 }
 
-/* V99 — 手動選擇攻擊目標時的準星放大為原本 2 倍。
-   只改視覺尺寸，不改可選目標、命中或攻擊判定。 */
+/* Target reticle presentation is owned only by Fixed Slot V2. */
 .battle-monster.targetable{
     cursor:crosshair;
-}
-
-.battle-monster.targetable::after{
-    content:"";
-    position:absolute;
-    left:50%;
-    top:50%;
-    width:60px;
-    height:60px;
-    transform:translate(-50%,-50%);
-    border-radius:50%;
-    pointer-events:none;
-    z-index:40;
-    background:
-        linear-gradient(#ffd84d,#ffd84d) center/3px 100% no-repeat,
-        linear-gradient(90deg,#ffd84d,#ffd84d) center/100% 3px no-repeat,
-        radial-gradient(circle at center,transparent 0 26%,#ffd84d 29% 34%,transparent 37% 100%);
-    filter:drop-shadow(0 0 4px rgba(255,216,77,.9));
-    animation:battleTargetReticleFlash .38s ease-in-out infinite;
-}
-
-@keyframes battleTargetReticleFlash{
-    0%,100%{
-        opacity:1;
-        transform:translate(-50%,-50%) scale(1);
-        filter:drop-shadow(0 0 4px rgba(255,216,77,.9));
-    }
-    50%{
-        opacity:.35;
-        transform:translate(-50%,-50%) scale(1.14);
-        filter:drop-shadow(0 0 7px rgba(255,235,120,1));
-    }
 }
 
 .battle-monster.dying{
@@ -3136,6 +3103,23 @@ button:active{
     line-height:18px;
 
     color:#e8ddc7;
+}
+
+/* Patrol log is a separate UI owner from the formal battle drawer.
+   It is always a fixed black record panel and never inherits drawer chrome. */
+#mapBattleInfo{
+    flex:0 0 96px;
+    min-height:96px;
+    height:96px;
+    margin:0;
+    padding:8px 10px;
+    overflow-y:auto;
+    pointer-events:auto;
+    color:#e8ddc7;
+    background:rgba(0,0,0,.88);
+    border:1px solid rgba(138,106,58,.58);
+    border-radius:6px;
+    box-shadow:none;
 }
 
 /* V96 — 戰鬥資訊頂列：元素匣取代底部大型自動戰鬥面板。 */
@@ -6898,10 +6882,10 @@ html, body{
     bottom:0;
     z-index:1;
     pointer-events:none;
-    background-image:url("../assets/battle/battle-command-panel.jpg");
+    background-image:url("../assets/battle/battle-command-panel-transparent.svg");
     background-repeat:no-repeat;
     background-position:center center;
-    background-size:100% auto;
+    background-size:100% 100%;
 }
 
 #mainBattleMenu > .menu-button{

@@ -211,69 +211,12 @@
         };
     }
 
-    /* Evasion -25% for monsters and all three player stat owners. */
-    if(typeof window.getMonsterEvasion==="function"){
-        const previousMonsterEvasion=window.getMonsterEvasion;
-        window.getMonsterEvasion=function(monster){
-            const value=numeric(previousMonsterEvasion.apply(this,arguments));
-            return activeFrostbite(monster)?value*FROSTBITE_REMAINING_RATE:value;
-        };
-    }
-
-    function wrapPlayerEvasionStats(functionName,characterGetter){
-        const previous=window[functionName];
-        if(typeof previous!=="function"){ return; }
-        window[functionName]=function(){
-            const stats=previous.apply(this,arguments);
-            const character=characterGetter();
-            if(!stats||!activeFrostbite(character)){ return stats; }
-            return Object.assign({},stats,{evasion:numeric(stats.evasion)*FROSTBITE_REMAINING_RATE});
-        };
-    }
-    wrapPlayerEvasionStats("getMainCharacterStats",()=>typeof player!=="undefined"?player:null);
-    wrapPlayerEvasionStats("getPlayer2BattleStats",()=>typeof player2!=="undefined"?player2:null);
-    wrapPlayerEvasionStats("getPlayer3BattleStats",()=>typeof player3!=="undefined"?player3:null);
-
-    /* Status resistance -25%. Spirit-derived and explicit player bonus
-       resistance are reduced at their existing authoritative inputs. */
-    if(typeof window.getMonsterEffectiveSpiritPoints==="function"){
-        const previousMonsterSpirit=window.getMonsterEffectiveSpiritPoints;
-        window.getMonsterEffectiveSpiritPoints=function(monster){
-            const value=numeric(previousMonsterSpirit.apply(this,arguments));
-            return activeFrostbite(monster)?value*FROSTBITE_REMAINING_RATE:value;
-        };
-    }
-    if(typeof window.getFinalBattleSpiritForPlayerTarget==="function"){
-        const previousPlayerSpirit=window.getFinalBattleSpiritForPlayerTarget;
-        window.getFinalBattleSpiritForPlayerTarget=function(target){
-            const value=numeric(previousPlayerSpirit.apply(this,arguments));
-            return activeFrostbite(target)?value*FROSTBITE_REMAINING_RATE:value;
-        };
-    }
-    if(typeof window.getPlayerStatusResistBonus==="function"){
-        const previousPlayerResistBonus=window.getPlayerStatusResistBonus;
-        window.getPlayerStatusResistBonus=function(target){
-            const value=numeric(previousPlayerResistBonus.apply(this,arguments));
-            return activeFrostbite(target)?value*FROSTBITE_REMAINING_RATE:value;
-        };
-    }
-
-    /* V149's old application log mentioned a skill prohibition. Keep the
-       application itself and rewrite only that obsolete explanatory sentence. */
-    if(typeof window.addBattleLog==="function"){
-        const previousAddBattleLog=window.addBattleLog;
-        window.addBattleLog=function(message){
-            let text=String(message==null?"":message);
-            if(text.includes("陷入凍傷")&&text.includes("無法使用技能")){
-                text=text.replace(/，\d+回合內無法使用技能。/,"，期間傷害、閃避、異常狀態抗性降低25%。");
-            }
-            return previousAddBattleLog.call(this,text);
-        };
-    }
-
-    /* Freeze targeting and all player-facing skill text are now owned by
-       the canonical V158/V173.64 runtime and FourSymbolsSkillSpec. V169 keeps
-       only Water-specific Frostbite mechanics and its historical data bridge. */
+    /*
+       Frostbite 的傷害降低仍由 Water Runtime 負責。
+       閃躲與異常抗性已改成「最終百分點 -25」並收斂到
+       js/00-main.js 的正式 Evasion / Status Resistance Owner，
+       本層不再 wrapper getMonsterEvasion、玩家 stats、Spirit 或 Log。
+    */
 
     window.v169WaterSkillRules=Object.freeze({
         version:VERSION,

@@ -88,18 +88,13 @@ test("V158 combat tuning no longer overwrites final skill data",()=>{
     assert.deepEqual(Array.from(result.healSpell.requires),["iceArrowRain","iceSpin"]);
 });
 
-test("stun final hit reduction applies after capped accuracy and evasion",()=>{
+test("V158 does not override the canonical hit formula",()=>{
     const context=load();
-    assert.equal(context.v158GetHitChancePercent(0,0,0),95);
-    assert.equal(context.v158GetHitChancePercent(10,0,0),98);
-    assert.equal(context.v158GetHitChancePercent(0,10,0),85.5);
-    assert.equal(context.v158GetHitChancePercent(0,1000,0),14.250000000000002);
-    assert.equal(context.v158GetHitChancePercent(0,1000,50),1);
-    assert.equal(context.v158GetHitChancePercent(1000,0,0),99);
-    assert.ok(Math.abs(context.v158GetHitChancePercent(1000,10,15)-74.1)<Number.EPSILON*100);
+    assert.equal(context.v158GetHitChancePercent,undefined);
+    assert.doesNotMatch(source,/rollHitChance\s*=\s*function|v158GetHitChancePercent/);
 });
 
-test("default monster evasion is level times 0.3 capped at 30 without replacing any custom evasion",()=>{
+test("default monster evasion is level times 0.1 capped at 10 without replacing any custom evasion",()=>{
     const missing={level:20,agilityPoints:12};
     const formerGeneratedValue={level:20,agilityPoints:12,evasion:24};
     const custom={level:20,agilityPoints:12,evasion:37};
@@ -107,12 +102,12 @@ test("default monster evasion is level times 0.3 capped at 30 without replacing 
         monsters:[missing,formerGeneratedValue,custom],
         zoneConfig:{desert:{monsters:()=>[missing,formerGeneratedValue,custom]}}
     });
-    assert.equal(missing.evasion,6);
+    assert.equal(missing.evasion,2);
     assert.equal(formerGeneratedValue.evasion,24);
     assert.equal(custom.evasion,37);
-    assert.equal(context.getMonsterEvasion({level:30}),9);
-    assert.equal(context.makeZoneMonster("測試怪",40).evasion,12);
-    assert.equal(context.makeZoneMonster("高等測試怪",200).evasion,30);
+    assert.equal(context.v158NormalizeMonsterDefaultEvasion({level:30}).evasion,3);
+    assert.equal(context.makeZoneMonster("測試怪",40).evasion,4);
+    assert.equal(context.makeZoneMonster("高等測試怪",200).evasion,10);
 });
 
 test("V158 leaves the shared damage formula owned by the core runtime",()=>{

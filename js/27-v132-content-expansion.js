@@ -834,7 +834,10 @@
         }
 
         if(definition.talismanEffect==="freeze"&&targetMonster){
-            const baseChance=Math.max(0,Number(skill&&skill.freezeChance)||0);
+            const skillLevel=Math.max(1,Math.floor(Number(definition.talismanSkillLevel)||1));
+            const baseChance=Array.isArray(skill&&skill.freezeChanceByLevel)
+                ?Math.max(0,Number(skill.freezeChanceByLevel[Math.min(skill.freezeChanceByLevel.length-1,skillLevel-1)])||0)
+                :Math.max(0,Number(skill&&skill.freezeChance)||0);
             const intelligence=Number(stats.intelligence!==undefined?stats.intelligence:character.intelligence)||0;
             const targetSpirit=typeof getMonsterEffectiveSpiritPoints==="function"
                 ?Number(getMonsterEffectiveSpiritPoints(targetMonster))||0
@@ -851,7 +854,10 @@
         // 隱身／結界是友方符術，不拿友軍閃避懲罰施放者；使用角色自身命中值。
         const accuracy=Number(stats.accuracy);
         if(Number.isFinite(accuracy)&&typeof rollHitChance==="function"){
-            return rollHitChance(accuracy,0,0);
+            const finalAccuracyBonus=typeof window.v173GetActiveAccuracyBonusPercent==="function"
+                ?window.v173GetActiveAccuracyBonusPercent(character)
+                :0;
+            return rollHitChance(accuracy,0,0,finalAccuracyBonus);
         }
         const intelligence=Number(stats.intelligence!==undefined?stats.intelligence:character.intelligence)||0;
         if(typeof rollStatusEffectHit==="function"){
