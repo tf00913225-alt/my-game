@@ -70,13 +70,13 @@ function makeRuntime(options={}){
     const actionFinishedObservers=[];
     const context={
         console,Math,Number,Object,Array,String,Set,Map,Date,JSON,
-        skillDatabase,characterSkillLoadouts,currentSkillCharacter:options.key||"fire",activeBattleCharacterIndex:0,
+        skillDatabase,characterSkillLoadouts,currentSkillCharacter:options.key||"fire",activeBattleCharacterIndex:0,turn:1,
         player:owners.fire,player2:owners.player2,player3:null,
         getSkillCharacterObject:key=>owners[key],
         getPartyCharacterByIndex:index=>index===1?owners.player2:owners.fire,
         getPartyCharacterKey:index=>index===1?"player2":"fire",
         getCharacterSkillKey:actor=>actor===owners.player2?"player2":"fire",
-        getPartyBattleStats:()=>({maxHP:1000}),
+        getPartyBattleStats:()=>({maxHP:1000,maxSP:1000}),
         renderSkillLoadout(){},updateUI(){},saveGame(){},alert(message){ context.lastAlert=message; },
         learnSkill(){},upgradeSkill(){},
         rollCritical(){ return {isCrit:critShouldHit}; },
@@ -108,11 +108,22 @@ function makeRuntime(options={}){
     context.window=context;
     vm.createContext(context);
     vm.runInContext(source,context,{filename:"js/60-v173.64-skill-progression-rebalance.js"});
+    const rawCastDamageSkill=context.castDamageSkill;
+    context.castDamageSkill=function(skillId){
+        return context.FourSymbolsSkillSpec.withPlayerDirectSkillCast(
+            0,skillId,{freeCast:false},()=>rawCastDamageSkill.call(context,skillId)
+        );
+    };
     return {
         context,owners,loadouts:characterSkillLoadouts,skills:skillDatabase,
         setBurn(value){ burnShouldAdd=value; },setCrit(value){ critShouldHit=value; },
         observedBonus:()=>observedBonus,observedSupport:()=>observedSupport,finished:()=>finished,
-        beginAction(entry){ beforeCombatantObservers.forEach(observer=>observer({token:1,turn:1,index:0,queue:[entry]})); },
+        freeCast(skillId){
+            return context.FourSymbolsSkillSpec.withPlayerDirectSkillCast(
+                0,skillId,{freeCast:true},()=>rawCastDamageSkill.call(context,skillId)
+            );
+        },
+        beginAction(entry){ beforeCombatantObservers.forEach(observer=>observer({token:1,turn:context.turn,index:0,queue:[entry]})); },
         finishAction(){ actionFinishedObservers.forEach(observer=>observer()); }
     };
 }
