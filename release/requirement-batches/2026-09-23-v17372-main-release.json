@@ -33,7 +33,7 @@
     },
     {
       "id": "REL-03",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "建立 V173.72 Game/Cache Version、玩家公告、CHANGELOG 與 deterministic production build，並通過 release gate、完整 CI 與版本同步檢查。",
       "evidence": [
         "release/release.json",
@@ -41,7 +41,11 @@
         "release/requirements.json",
         "CHANGELOG.md",
         "js/20-anonymous-20.js",
-        "index.html"
+        "index.html",
+        "deterministic build commit 90fb2bf30a8f6c2c58b8355f6574fa872804a62c",
+        "final release-prep head 4699d0d18fb1ef0b47fc06cd50fa970da81132d3",
+        "candidate CI run 35881597305 SUCCESS",
+        "npm run build:check / Release Gate / mobile browser QA / git diff checks PASS"
       ]
     },
     {
@@ -62,12 +66,12 @@
     "2026-09-23-freeze-petrify-exclusive-status-layer",
     "2026-09-23-skill-relic-runtime-owner-convergence"
   ],
-  "automatedVerification": "Source dev@9993440390c752419a16cf612acedd003fa246af passed CI run 35879220843, exact-SHA Cloudflare dev deployment and deployed battle live QA. V173.72 release metadata/build verification is in progress on the release-prep branch.",
+  "automatedVerification": "Source dev@9993440390c752419a16cf612acedd003fa246af passed CI run 35879220843, exact-SHA Cloudflare dev deployment and deployed battle live QA. V173.72 deterministic production build was synchronized at 90fb2bf30a8f6c2c58b8355f6574fa872804a62c; final release-prep head 4699d0d18fb1ef0b47fc06cd50fa970da81132d3 passed CI run 35881597305.",
   "visualVerification": "Project owner explicitly requested promotion to main; deployed battle live QA passed on the exact dev source SHA.",
   "verifiedSourceCommit": "9993440390c752419a16cf612acedd003fa246af",
   "mergedDevCommit": null,
   "mergedMainCommit": null,
-  "candidateCiRun": null,
+  "candidateCiRun": 35881597305,
   "devPushCiRun": 35879220843,
   "devDeployJob": 107243537924
 }
