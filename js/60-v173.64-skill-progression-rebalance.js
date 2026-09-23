@@ -481,7 +481,7 @@
         if(numeric(skill.maxLevel,1)>1){
             upgradeText=next
                 ?getUpgradeCostForTargetLevel(skill,next)+" 技能點"
-                :"Lv2 1・Lv3 2・Lv4 3・Lv5 4 技能點";
+                :"每次升級固定 1 技能點";
         }
         const rows=[
             ["最低學習等級","Lv"+skill.learnLevel],
@@ -589,7 +589,17 @@
                 return notify("炎魂共鳴仍在持續中，無法重複施放或刷新。");
             }
             actor.sp=numeric(actor.sp)-cost;
-            addNamedBuff(actor,"fireSoulResonance",actorIndex,"炎魂共鳴",3,{skillLevel:level});
+            const resolvedLevel=clampLevel(level,5);
+            const resonance=addNamedBuff(actor,"fireSoulResonance",actorIndex,"炎魂共鳴",3,{
+                skillLevel:resolvedLevel,extensionCount:0,lastExtendedRound:null
+            });
+            if(resonance){
+                addNamedBuff(actor,"fireMomentum",actorIndex,"炎勢",3,{
+                    skillLevel:resolvedLevel,
+                    bonusPercent:FIRE_MOMENTUM_BY_LEVEL[resolvedLevel-1],
+                    resonanceLinked:true
+                });
+            }
             announceSkill(actorIndex,skill);finishTacticalAction();return true;
         }
         if(skillId==="bloodBurnArt"){
@@ -600,62 +610,63 @@
             if(!canAddNamedBuff(actor,"bloodBurn",actorIndex,"焚血")){
                 return notify("焚血尚未消耗，無法重複施放或刷新。");
             }
-            const hpCost=Math.max(1,Math.round(maxHp*(BLOOD_BURN_BY_LEVEL[clampLevel(level,5)-1]/100)));
+            const resolvedLevel=clampLevel(level,5);
+            const hpCost=Math.max(1,Math.round(maxHp*(BLOOD_BURN_HP_COST_BY_LEVEL[resolvedLevel-1]/100)));
             if(numeric(actor.hp)<=hpCost){ return notify("目前HP不足以承受焚血訣的生命消耗。"); }
             actor.sp=numeric(actor.sp)-cost;
             actor.hp=numeric(actor.hp)-hpCost;
-            addNamedBuff(actor,"bloodBurn",actorIndex,"焚血",3,{skillLevel:level,hpCost,remainingFireActions:3});
+            addNamedBuff(actor,"bloodBurn",actorIndex,"焚血",3,{
+                skillLevel:resolvedLevel,hpCost,remainingFireActions:3
+            });
             announceSkill(actorIndex,skill);finishTacticalAction();return true;
         }
         return false;
-    }
-
-    const SCALED_SUPPORT={
-        dodgeSkill:{field:"evasionBonusPercent",values:DODGE_BY_LEVEL},
-        rockWall:{field:"defenseBonusPercent",values:ROCK_WALL_BY_LEVEL},
-        earthShield:{field:"reflectPercent",values:EARTH_SHIELD_BY_LEVEL}
-    };
-    let scaledSupportDepth=0;
-    function withScaledSupport(actorIndex,skillId,invoke){
-        const config=SCALED_SUPPORT[skillId];
-        const skill=skillById(skillId);
-        if(!config||!skill||scaledSupportDepth>0){ return invoke(); }
-        const level=clampLevel(partySkillLevel(actorIndex,skillId),skill.maxLevel);
-        const had=Object.prototype.hasOwnProperty.call(skill,config.field);
-        const old=skill[config.field];
-        skill[config.field]=config.values[level-1];
-        scaledSupportDepth++;
-        try{ return invoke(); }
-        finally{
-            scaledSupportDepth--;
-            if(had){ skill[config.field]=old; }else{ delete skill[config.field]; }
-        }
     }
 
     let fireCastContext=null;
     function isPlayerFireDirectSkill(skill){
         return !!(skill&&skill.element==="fire"&&(skill.category==="physical"||skill.category==="magic"));
     }
-    function createMomentum(actor,index,resonance){
-        if(!resonance||activeBuff(actor,"fireMomentum")){ return null; }
-        const level=clampLevel(resonance.skillLevel,5);
-        return addNamedBuff(actor,"fireMomentum",index,"炎勢",Number.MAX_SAFE_INTEGER,{skillLevel:level,bonusPercent:FIRE_MOMENTUM_BY_LEVEL[level-1],oneShot:true});
+    function formalRound(){
+        return typeof turn!=="undefined"?Math.max(1,Math.floor(numeric(turn,1))):1;
     }
-    function withFireActiveCast(actorIndex,skillId,invoke){
+    function extendResonanceOncePerRound(actor,resonance,momentum){
+        if(!resonance||clampLevel(resonance.skillLevel,5)<5){ return false; }
+        const round=formalRound();
+        const maxExtensions=Math.max(0,numeric(skillById("fireSoulResonance")?.maxExtensionRounds,3));
+        if(numeric(resonance.extensionCount)>=maxExtensions||numeric(resonance.lastExtendedRound)===round){
+            return false;
+        }
+        resonance.extensionCount=numeric(resonance.extensionCount)+1;
+        resonance.lastExtendedRound=round;
+        resonance.turnsLeft=Math.max(1,numeric(resonance.turnsLeft,1))+1;
+        if(momentum){
+            momentum.turnsLeft=Math.max(1,numeric(momentum.turnsLeft,1))+1;
+        }
+        return true;
+    }
+    function withPlayerDirectSkillCast(actorIndex,skillId,options,invoke){
         const skill=skillById(skillId);
         if(!isPlayerFireDirectSkill(skill)||fireCastContext){ return invoke(); }
         const actor=actorByPartyIndex(actorIndex);
         if(!actor){ return invoke(); }
+        const freeCast=!!(options&&options.freeCast);
         const resonance=activeBuff(actor,"fireSoulResonance");
         const momentum=activeBuff(actor,"fireMomentum");
         const blood=activeBuff(actor,"bloodBurn");
-        const bonus=numeric(momentum&&momentum.bonusPercent)+
-            (blood?BLOOD_BURN_BY_LEVEL[clampLevel(blood.skillLevel,5)-1]:0);
+        const resonanceBonus=numeric(momentum&&momentum.bonusPercent);
+        const bloodBonus=!freeCast&&blood
+            ?BLOOD_BURN_BY_LEVEL[clampLevel(blood.skillLevel,5)-1]
+            :0;
+        const bonus=resonanceBonus+bloodBonus;
         const hadDamageBonus=Object.prototype.hasOwnProperty.call(skill,"damageBonusPercent");
         const previousDamageBonus=skill.damageBonusPercent;
         if(bonus){ skill.damageBonusPercent=numeric(previousDamageBonus)+bonus; }
         const beforeSp=numeric(actor.sp);
-        const context={actor,actorIndex,skillId,resonance,momentum,blood,critical:false,burnAdded:false,finished:false};
+        const context={
+            actor,actorIndex,skillId,resonance,momentum,blood,freeCast,
+            critical:false,burnAdded:false,finished:false
+        };
         fireCastContext=context;
         let result;
         try{ result=invoke(); }
@@ -666,16 +677,15 @@
                 else{ delete skill.damageBonusPercent; }
             }
         }
-        const succeeded=context.finished||numeric(actor.sp)<beforeSp;
-        if(succeeded){
-            if(momentum){ removeBuff(actor,momentum); }
+        const succeeded=freeCast||context.finished||numeric(actor.sp)<beforeSp;
+        if(succeeded&&!freeCast){
             if(blood){
                 blood.remainingFireActions=Math.max(0,numeric(blood.remainingFireActions,3)-1);
                 blood.turnsLeft=blood.remainingFireActions;
                 if(blood.remainingFireActions<=0){ removeBuff(actor,blood); }
             }
-            if(!momentum&&resonance&&(context.critical||context.burnAdded)&&activeBuff(actor,"fireSoulResonance")){
-                createMomentum(actor,actorIndex,resonance);
+            if(resonance&&(context.critical||context.burnAdded)){
+                extendResonanceOncePerRound(actor,resonance,momentum);
             }
         }
         return result;
@@ -717,7 +727,7 @@
     const ACTION_DURATION_STATUS_TYPES=new Set([
         "freeze","petrify","frostbite","agilityDown","statDown","damageDown","defenseDown","stun"
     ]);
-    const ACTION_DURATION_EXCLUDED_BUFFS=new Set(["fireMomentum","phoenixMight","bloodBurn"]);
+    const ACTION_DURATION_EXCLUDED_BUFFS=new Set(["phoenixMight","bloodBurn"]);
     let durationAction=null;
     window.v175DurationLifecycleActive=true;
 
