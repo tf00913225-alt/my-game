@@ -803,7 +803,8 @@
     }
     window.v141GetMonsterAllyTriTargets=getMonsterAllyTriTargets;
 
-    function applyTimedMonsterBuff(monstersToBuff,type,turns,amount){
+    function applyTimedMonsterBuff(monstersToBuff,type,turns,amount,options){
+        const opts=options&&typeof options==="object"?options:{};
         monstersToBuff.forEach(monster=>{
             if(!monster||!monster.alive){ return; }
             const monsterIndex=typeof monsters!=="undefined"?monsters.indexOf(monster):-1;
@@ -823,7 +824,7 @@
                 buff.critChanceBonusPercent=25;
                 buff.critDamageBonusPercent=50;
             }else if(type==="resistance"){
-                buff.accuracyBonusPercent=50;
+                buff.accuracyBonusPercent=Math.max(0,Number(opts.accuracyBonusPercent)||0);
                 monster.resistance=(Number(monster.resistance)||0)+amount;
             }else if(type==="dodge"){
                 buff.originalEvasion=monster.evasion;
@@ -913,10 +914,20 @@
         if(monster.sp<(skill.spCost||0)){ return false; }
         monster.sp-=skill.spCost||0;
         showMonsterSkillNameBadge(skill.name,skill.element||monster.element,monsterIndex);
+        const level=Math.max(1,Math.min(
+            Number(skill.maxLevel)||1,
+            Number(monster.v141ForceSkillLevel||monster.v141SkillLevel)||1
+        ));
+        const levelValue=(values,fallback)=>{
+            if(!Array.isArray(values)||!values.length){ return Number(fallback)||0; }
+            return Number(values[Math.max(0,Math.min(values.length-1,level-1))])||0;
+        };
         if(skillId==="healSpell"){
-            const level=Math.max(1,Math.min(Number(skill.maxLevel)||1,Number(monster.v141ForceSkillLevel||monster.v141SkillLevel)||1));
-            const hpAmount=(Number(skill.baseHeal)||0)+(Number(skill.healPerLevel)||0)*(level-1);
-            const spAmount=(Number(skill.baseHealSP)||0)+(Number(skill.healSPPerLevel)||0)*(level-1);
+            const hpAmount=levelValue(
+                skill.healHpByLevel,
+                (Number(skill.baseHeal)||0)+(Number(skill.healPerLevel)||0)*(level-1)
+            );
+            const spPercent=levelValue(skill.spRestorePercentByLevel,0);
             let hpTotal=0;
             let spTotal=0;
             let cleansedTotal=0;
@@ -924,11 +935,17 @@
                 const ally=entry.monster;
                 const healed=window.v141HealMonsterPreservingShield(ally,hpAmount);
                 const beforeSP=Math.max(0,Number(ally.sp)||0);
+                const spAmount=entry.index===monsterIndex
+                    ?0
+                    :Math.floor(Math.max(0,Number(ally.maxSP)||0)*spPercent/100);
                 ally.sp=Math.min(Math.max(beforeSP,Number(ally.maxSP)||0),beforeSP+spAmount);
                 const restoredSP=ally.sp-beforeSP;
                 if(skill.cleanseAll&&Array.isArray(ally.statusEffects)){
-                    cleansedTotal+=ally.statusEffects.length;
-                    ally.statusEffects=[];
+                    const before=ally.statusEffects.length;
+                    ally.statusEffects=ally.statusEffects.filter(effect=>
+                        effect&&(effect.dispellable===false||effect.uncleansable===true)
+                    );
+                    cleansedTotal+=before-ally.statusEffects.length;
                 }
                 hpTotal+=healed;
                 spTotal+=restoredSP;
@@ -936,20 +953,25 @@
                 if(typeof window.v141PlayCardEffect==="function"){ window.v141PlayCardEffect("monster",entry.index,"heal"); }
             });
             addBattleLog(monster.name+"施放治療術，為同排最多"+healTargets.length+"名友方共回復"+
-                hpTotal+" HP、"+spTotal+" SP"+(skill.cleanseAll?"，並解除"+cleansedTotal+"個負面狀態":"")+"。");
+                hpTotal+" HP、"+spTotal+" SP"+(skill.cleanseAll?"，並解除"+cleansedTotal+"個可解除負面狀態":"")+"。");
         }else if(skillId==="barrier"){
-            window.v141ApplyMonsterShield(target,999999,4);
+            const duration=Math.max(1,Math.floor(levelValue(skill.durationByLevel,skill.duration||3)));
+            const blocks=Math.max(1,Math.floor(levelValue(skill.barrierBlockCountByLevel,skill.barrierBlockCount||3)));
+            window.v141ApplyMonsterShield(target,999999,duration,blocks);
             target.v141Shield.isBarrier=true;
-            addBattleLog(monster.name+"為"+target.name+"施放結界，完全防護4回合。");
+            addBattleLog(monster.name+"為"+target.name+"施放結界，可抵擋"+blocks+"次直接傷害，最多持續"+duration+"回合。");
         }else if(skillId==="rage"){
             applyTimedMonsterBuff(allies,"rage",3,0);
             addBattleLog(monster.name+"施放怒火，敵方全體爆擊率與爆擊傷害提升3回合。");
         }else if(skillId==="dinghaishenzhen"){
-            applyTimedMonsterBuff(allies,"resistance",3,65);
-            addBattleLog(monster.name+"施放氣定神閒，敵方全體抗性提升3回合。");
+            const resist=levelValue(skill.statusResistBonusByLevel,skill.statusResistBonus||0);
+            const accuracy=levelValue(skill.accuracyBonusPercentByLevel,skill.accuracyBonusPercent||0);
+            applyTimedMonsterBuff(allies,"resistance",3,resist,{accuracyBonusPercent:accuracy});
+            addBattleLog(monster.name+"施放氣定神閒，敵方全體異常抗性提升"+resist+"%、命中提升"+accuracy+"%，持續3回合。");
         }else if(skillId==="dodgeSkill"){
-            applyTimedMonsterBuff(allies,"dodge",3,75);
-            addBattleLog(monster.name+"施放閃躲術，敵方全體閃躲提升3回合。");
+            const evasion=levelValue(skill.evasionBonusPercentByLevel,skill.evasionBonusPercent||0);
+            applyTimedMonsterBuff(allies,"dodge",3,evasion);
+            addBattleLog(monster.name+"施放閃躲術，敵方全體閃躲提升"+evasion+"%，持續3回合。");
         }
         updateUI(); finishPlayerAction();
         return true;
