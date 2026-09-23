@@ -322,6 +322,11 @@
         return {};
     }
 
+    function selectedSupportPrimary(characterIndex,queued,targets){
+        const selected=queued&&Number.isInteger(queued.targetAlly)?queued.targetAlly:characterIndex;
+        return targets.includes(selected)?selected:targets[0];
+    }
+
     function resolvePartyBuff(characterIndex,queued,skill,state){
         const requested=requestedBuffTargets(characterIndex,queued,skill);
         if(!requested.length){ return finishSupport(skill.name+"目前沒有有效目標。"); }
@@ -334,7 +339,8 @@
             return !activeBuff(target,skill.id);
         });
 
-        animateSupportCast(state,characterIndex,skill,requested[0],requested,"player");
+        const primaryTarget=selectedSupportPrimary(characterIndex,queued,requested);
+        animateSupportCast(state,characterIndex,skill,primaryTarget,requested,"player");
         const extra=buffFields(skill,state.level);
         eligible.forEach(index=>{
             const target=getPartyCharacterByIndex(index);
@@ -404,7 +410,8 @@
     function resolvePartyHeal(characterIndex,queued,skill,state){
         const targets=requestedBuffTargets(characterIndex,queued,skill);
         if(!targets.length){ return finishSupport(skill.name+"目前沒有可治療的存活目標。"); }
-        animateSupportCast(state,characterIndex,skill,targets[0],targets,"player");
+        const primaryTarget=selectedSupportPrimary(characterIndex,queued,targets);
+        animateSupportCast(state,characterIndex,skill,primaryTarget,targets,"player");
         let hpTotal=0;
         let spTotal=0;
         let cleansedTotal=0;
@@ -1380,6 +1387,10 @@
         if(typeof document==="undefined"){ return; }
         const page=document.getElementById("dungeonPage");
         const app=document.getElementById("app");
+        const patrolNav=document.getElementById("mapPageNav");
+        if(patrolNav){
+            renderContextNav(patrolNav,"leaveMap()","patrol");
+        }
         const gameplayPageId=activeGameplayPageId();
         const dungeonActive=!!(page&&page.classList&&page.classList.contains("active"));
         const gameplayActive=!!gameplayPageId;

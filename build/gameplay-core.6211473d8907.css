@@ -8964,11 +8964,11 @@ body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scro
     transform:none !important;
     transition:opacity .16s ease-out;
     pointer-events:none;
-    z-index:90;
+    z-index:18070 !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion > .turn-target-row.skill-picker-open,
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion > .turn-target-row.battle-item-open{
-    opacity:.25;
+    opacity:1;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion.target-selecting > .turn-target-row{
     top:auto;
@@ -9053,14 +9053,11 @@ body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scro
     font-weight:900;
     white-space:nowrap;
     transform:none;
-    touch-action:none;
+    touch-action:manipulation;
     user-select:none;
     -webkit-user-select:none;
-    cursor:ew-resize;
+    cursor:pointer;
     pointer-events:auto;
-}
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleInfoToggle.battle-info-toggle.is-dragging{
-    filter:brightness(1.18);
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region #battleTurnIndicator{
     position:absolute;

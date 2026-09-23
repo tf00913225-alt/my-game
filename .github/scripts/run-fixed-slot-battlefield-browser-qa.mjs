@@ -164,8 +164,8 @@ function runViewport(chrome,width,height){
     assert.equal(data.expandedDrawer.turnOpacity,"1","expanded drawer keeps the current round visible");
     assert.equal(data.turnUi.normal.opacity,"1");
     assert.equal(data.turnUi.normal.pointerEvents,"none","turn timer must never block target selection");
-    assert.equal(data.turnUi.skillPicker.opacity,"0.25");
-    assert.equal(data.turnUi.itemPicker.opacity,"0.25");
+    assert.equal(data.turnUi.skillPicker.opacity,"1");
+    assert.equal(data.turnUi.itemPicker.opacity,"1");
     assert.equal(data.turnUi.targetSelecting.opacity,"1");
     assert.equal(data.turnUi.targetSelecting.pointerEvents,"none");
     close(data.turnUi.normal.rect.bottom,baseline.commandVisualTop,"turn timer bottom aligns with command art visual top",.8);

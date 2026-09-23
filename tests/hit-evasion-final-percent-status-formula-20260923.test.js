@@ -135,7 +135,7 @@ function formulaRuntime(){
     assert.match(progression,/鳳威/);
     assert.match(progression,/免費追擊也不消耗3次有效施放次數/);
     assert.match(progression,/不清除永久被動、EX、裝備效果、Boss固有機制、HP／SP或死亡狀態/);
-    assert.match(progression,/凍傷：[\s\S]*?傷害-25%[\s\S]*?最終閃躲-25個百分點[\s\S]*?最終異常狀態抗性-25個百分點/);
+    assert.match(progression,/凍傷：[\s\S]*?傷害-25%[\s\S]*?最終閃躲-25%[\s\S]*?最終異常狀態抗性-25%/);
 }
 
 {
@@ -166,11 +166,9 @@ function formulaRuntime(){
 }
 
 {
-    const drag=sourceFunction(main,"installBattleInfoHandleDrag");
-    assert.match(drag,/requestAnimationFrame\(paintDrag\)/);
-    assert.match(drag,/translate3d\(/);
-    assert.doesNotMatch(drag,/pointermove[\s\S]*?clientWidth|pointermove[\s\S]*?offsetWidth/);
-    assert.doesNotMatch(drag,/setTimeout/);
+    assert.doesNotMatch(main,/installBattleInfoHandleDrag|__battleInfoHandleDragInstalled|__suppressNextBattleInfoClick/);
+    assert.doesNotMatch(fixedCss,/battle-info-toggle\.is-dragging|cursor:ew-resize/);
+    assert.match(fixedCss,/#battleInfoToggle\.battle-info-toggle\{[\s\S]*?touch-action:manipulation;[\s\S]*?cursor:pointer/);
 }
 
 console.log("Hit/evasion/status formula + battle UI owner convergence: PASS");

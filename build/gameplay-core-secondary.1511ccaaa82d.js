@@ -1857,6 +1857,11 @@
         return {};
     }
 
+    function selectedSupportPrimary(characterIndex,queued,targets){
+        const selected=queued&&Number.isInteger(queued.targetAlly)?queued.targetAlly:characterIndex;
+        return targets.includes(selected)?selected:targets[0];
+    }
+
     function resolvePartyBuff(characterIndex,queued,skill,state){
         const requested=requestedBuffTargets(characterIndex,queued,skill);
         if(!requested.length){ return finishSupport(skill.name+"目前沒有有效目標。"); }
@@ -1869,7 +1874,8 @@
             return !activeBuff(target,skill.id);
         });
 
-        animateSupportCast(state,characterIndex,skill,requested[0],requested,"player");
+        const primaryTarget=selectedSupportPrimary(characterIndex,queued,requested);
+        animateSupportCast(state,characterIndex,skill,primaryTarget,requested,"player");
         const extra=buffFields(skill,state.level);
         eligible.forEach(index=>{
             const target=getPartyCharacterByIndex(index);
@@ -1939,7 +1945,8 @@
     function resolvePartyHeal(characterIndex,queued,skill,state){
         const targets=requestedBuffTargets(characterIndex,queued,skill);
         if(!targets.length){ return finishSupport(skill.name+"目前沒有可治療的存活目標。"); }
-        animateSupportCast(state,characterIndex,skill,targets[0],targets,"player");
+        const primaryTarget=selectedSupportPrimary(characterIndex,queued,targets);
+        animateSupportCast(state,characterIndex,skill,primaryTarget,targets,"player");
         let hpTotal=0;
         let spTotal=0;
         let cleansedTotal=0;
@@ -2915,6 +2922,10 @@
         if(typeof document==="undefined"){ return; }
         const page=document.getElementById("dungeonPage");
         const app=document.getElementById("app");
+        const patrolNav=document.getElementById("mapPageNav");
+        if(patrolNav){
+            renderContextNav(patrolNav,"leaveMap()","patrol");
+        }
         const gameplayPageId=activeGameplayPageId();
         const dungeonActive=!!(page&&page.classList&&page.classList.contains("active"));
         const gameplayActive=!!gameplayPageId;
@@ -9865,7 +9876,7 @@ ensureFunctionalStyles();runRepairs();
         if(numeric(skill&&skill.frostbiteChance)>0){
             parts.push("凍傷："+numeric(skill.frostbiteChance)+"%基礎機率，"+
                 Math.max(1,numeric(skill.frostbiteDuration)||1)+
-                "回合；期間傷害-25%、最終閃躲-25個百分點、最終異常狀態抗性-25個百分點");
+                "回合；期間傷害-25%、最終閃躲-25%、最終異常狀態抗性-25%");
         }
         if(Array.isArray(skill&&skill.lifestealPercentByLevel)){
             parts.push("吸血："+levelValue(skill.lifestealPercentByLevel,lv,0)+"%實際傷害回復自身HP");
@@ -9883,12 +9894,12 @@ ensureFunctionalStyles();runRepairs();
         if(Array.isArray(skill&&skill.agilityDownByLevel)){
             const value=levelValue(skill.agilityDownByLevel,lv,0);
             parts.push("重力："+numeric(skill.agilityDownChance)+"%基礎機率，敏捷-"+
-                value+"%、最終閃躲-"+value+"個百分點，"+
+                value+"%、最終閃躲-"+value+"%，"+
                 Math.max(1,numeric(skill.agilityDownDuration)||1)+"回合");
         }
         if(Array.isArray(skill&&skill.missBonusByLevel)){
             parts.push("暈眩："+numeric(skill.stunChance)+"%基礎機率，最終命中率-"+
-                levelValue(skill.missBonusByLevel,lv,0)+"個百分點，"+
+                levelValue(skill.missBonusByLevel,lv,0)+"%，"+
                 Math.max(1,numeric(skill.stunDuration)||1)+"回合");
         }
         if(Array.isArray(skill&&skill.petrifyChanceByLevel)){
@@ -9950,15 +9961,15 @@ ensureFunctionalStyles();runRepairs();
                 "不清除永久被動、EX、裝備效果、Boss固有機制、HP／SP或死亡狀態";
         }
         if(skill.id==="dodgeSkill"){
-            return "最終閃躲+"+levelValue(skill.evasionBonusPercentByLevel,lv,0)+"個百分點，持續3回合";
+            return "最終閃躲+"+levelValue(skill.evasionBonusPercentByLevel,lv,0)+"%，持續3回合";
         }
         if(skill.id==="stealthSkill"){
             return "隱身"+levelValue(skill.durationByLevel,lv,2)+"回合；無法被單體技能選中，仍受範圍技能影響";
         }
         if(skill.id==="dinghaishenzhen"){
             return "最終異常狀態抗性+"+levelValue(skill.statusResistBonusByLevel,lv,0)+
-                "個百分點、最終命中率+"+levelValue(skill.accuracyBonusPercentByLevel,lv,0)+
-                "個百分點，持續3回合";
+                "%、最終命中率+"+levelValue(skill.accuracyBonusPercentByLevel,lv,0)+
+                "%，持續3回合";
         }
         if(skill.id==="rockWall"){
             return "防禦+"+levelValue(skill.defenseBonusPercentByLevel,lv,0)+"%，持續4回合";
@@ -9984,7 +9995,7 @@ ensureFunctionalStyles();runRepairs();
                 "%機率解除自身所有可解除負面狀態";
         }
         if(skill.id==="windEX"){
-            return "永久提升最終閃躲"+numeric(skill.evasionBonusPercent)+"個百分點";
+            return "永久提升最終閃躲"+numeric(skill.evasionBonusPercent)+"%";
         }
         if(skill.id==="earthEX"){
             return "永久提升防禦力"+numeric(skill.defenseBonusPercent)+"%";
@@ -10103,7 +10114,7 @@ ensureFunctionalStyles();runRepairs();
             dodge.evasionBonusPercentByLevel=DODGE_BY_LEVEL.slice();
             dodge.targetType="allyTri"; dodge.duration=3; dodge.spCost=20;
             delete dodge.evasionBonusPercent;
-            dodge.description="我方中、左、右最多3名存活角色最終閃躲提升5/10/15/20/25個百分點，持續3回合。SP 20。";
+            dodge.description="我方中、左、右最多3名存活角色最終閃躲提升5/10/15/20/25%，持續3回合。SP 20。";
         }
         const stealth=skillDatabase.stealthSkill;
         if(stealth){
@@ -10117,7 +10128,7 @@ ensureFunctionalStyles();runRepairs();
             calm.accuracyBonusPercentByLevel=CALM_ACCURACY_BY_LEVEL.slice();
             calm.targetType="allyAll"; calm.duration=3; calm.spCost=77;
             delete calm.statusResistBonus; delete calm.accuracyBonusPercent;
-            calm.description="我方全體最終異常狀態抗性提升5/8/10/12/15個百分點、最終命中率提升5/10/15/20/25個百分點，持續3回合。SP 77。";
+            calm.description="我方全體最終異常狀態抗性提升5/8/10/12/15%、最終命中率提升5/10/15/20/25%，持續3回合。SP 77。";
         }
         const wall=skillDatabase.rockWall;
         if(wall){

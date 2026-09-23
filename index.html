@@ -38,7 +38,7 @@
 <link rel="preload" as="image" href="assets/ui/startup-logo.4631c0bc3f2b.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="assets/ui/startup-main-city.d43e67af1c1c.jpg" fetchpriority="high">
 <!-- build:critical-style -->
-<link id="boot-core-style" data-critical-style="true" rel="stylesheet" href="build/boot-core.cf3b9604b9fb.css">
+<link id="boot-core-style" data-critical-style="true" rel="stylesheet" href="build/boot-core.54b38f5940ad.css">
 <!-- /build:critical-style -->
 </head>
 
@@ -1292,17 +1292,6 @@
 
 </div>
 
-<!-- V115：返回移至巡怪畫面右上角，從下方導覽列移除。 -->
-<button
-    id="mapPageReturnFloat"
-    class="map-page-return-float"
-    onclick="leaveMap()"
-    aria-label="返回"
->
-    <img src="assets/ui/map-return.png" alt="" aria-hidden="true" loading="lazy" decoding="async">
-    <span class="nav-sr-only">返回</span>
-</button>
-
 
 <!--
     ★ 修正（依照使用者要求，「橘色部分
@@ -2380,68 +2369,8 @@
 
 </div>
 
-<!--
-    ★ 新增（依照使用者要求）：
-    進入練功區/巡怪地圖頁面時，底部導覽列
-    換成專屬的3個按鈕（角色/任務/返回），
-    跟主城那套5個按鈕的導覽列是兩個獨立的
-    元素，用CSS依照#app身上的class互相
-    切換顯示，不會同時出現。
-
-    「角色」「任務」直接呼叫跟主城完全
-    相同的openHomeFeature()彈出視窗
-    （不會離開地圖頁面本身，彈窗蓋在
-    地圖畫面上面）；「返回」呼叫既有的
-    leaveMap()，回到練功區地區清單。
--->
-
-<div
-    id="mapPageNav"
-    class="bottom-nav map-page-nav"
->
-
-<button
-    class="nav-button nav-art-button-wrap"
-    onclick="openHomeFeature('character')"
-    aria-label="角色"
->
-<img class="nav-art-button" src="assets/ui/nav-character.png" alt="" aria-hidden="true" loading="eager" decoding="async">
-<span class="nav-sr-only">角色</span>
-</button>
-
-<button
-    class="nav-button nav-art-button-wrap"
-    onclick="openMapInventoryOverlay()"
-    aria-label="背包"
->
-<img class="nav-art-button" src="assets/ui/nav-backpack.png" alt="" aria-hidden="true" loading="eager" decoding="async">
-<span class="nav-sr-only">背包</span>
-</button>
-
-<button
-    class="nav-button nav-art-button-wrap"
-    onclick="openHomeFeature('relic')"
-    aria-label="秘寶"
->
-<img class="nav-art-button" src="assets/ui/nav-relic-v175.webp" alt="" aria-hidden="true" loading="eager" decoding="async">
-<span class="nav-sr-only">秘寶</span>
-</button>
-
-<button
-    class="nav-button nav-art-button-wrap"
-    onclick="openHomeFeature('autoBattleSettings')"
-    aria-label="元素匣"
->
-<img class="nav-art-button" src="assets/ui/nav-element-box.png" alt="" aria-hidden="true" loading="eager" decoding="async">
-<span class="nav-sr-only">元素匣／自動戰鬥設定</span>
-</button>
-
-<button class="nav-button nav-art-button-wrap" onclick="leaveMap()" aria-label="返回">
-<img class="nav-art-button" src="assets/ui/map-return.png" alt="" aria-hidden="true" loading="eager" decoding="async">
-<span class="nav-sr-only">返回</span>
-</button>
-
-</div>
+<!-- 巡怪底部導覽由 js/42-v148-combat-dungeon-fixes.js 的 context navigation owner 投影。 -->
+<div id="mapPageNav" class="bottom-nav map-page-nav"></div>
 
 <!--
    ★ 修正（真的抓到「角色/任務按鈕沒反應」
