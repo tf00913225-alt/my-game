@@ -91,6 +91,13 @@ test("support skill final arrays and runtime owners match the formal spec",()=>{
   assert.doesNotMatch(water,/withFinalFreezeTargets|wrapSecondaryFreeze/);
 });
 
+test("formal Heal and Purify runtime keeps robust fallbacks and the selected primary target",()=>{
+  assert.match(support,/typeof calculateSPHealingAmount==="function"[\s\S]*?legacySpBase/);
+  assert.match(support,/const selectedPrimary=targetSide==="monster"[\s\S]*?\?enemyIndex/);
+  assert.match(support,/const primaryTarget=targets\.includes\(selectedPrimary\)\?selectedPrimary:targets\[0\]/);
+  assert.match(support,/animateSupportCast\(state,characterIndex,skill,primaryTarget,targets,targetSide\)/);
+});
+
 test("Lv5 resonance extension and three-cast Blood Burn exclude free follow-ups",()=>{
   assert.match(progression,/maxExtensionRounds:3,maxExtensionsPerRound:1/);
   assert.match(progression,/lastExtendedRound/);
