@@ -474,65 +474,118 @@
         return finishSupport();
     }
 
-    function clearEnemyPositiveStates(enemy){
-        (enemy&&Array.isArray(enemy.v141TeamBuffs)?enemy.v141TeamBuffs:[]).forEach(buff=>{
-            if(!buff){ return; }
-            if(buff.type==="rage"){
-                if(Number.isFinite(Number(buff.originalAttack))){ enemy.attack=Number(buff.originalAttack); }
-                if(Number.isFinite(Number(buff.originalMagicAttack))){ enemy.magicAttack=Number(buff.originalMagicAttack); }
-            }else if(buff.type==="resistance"){
-                enemy.resistance=Math.max(0,numeric(enemy.resistance)-numeric(buff.amount));
-            }else if(buff.type==="dodge"&&Number.isFinite(Number(buff.originalEvasion))){
-                enemy.evasion=Number(buff.originalEvasion);
-            }
-        });
-        if(enemy){
-            enemy.v141TeamBuffs=[];
-            enemy.activeBuffs=[];
-            if(enemy.v141Shield){ enemy.v141Shield=null; }
+    function restoreRemovedMonsterTeamBuff(enemy,buff){
+        if(!enemy||!buff){ return; }
+        if(buff.type==="rage"){
+            if(Number.isFinite(Number(buff.originalAttack))){ enemy.attack=Number(buff.originalAttack); }
+            if(Number.isFinite(Number(buff.originalMagicAttack))){ enemy.magicAttack=Number(buff.originalMagicAttack); }
+        }else if(buff.type==="resistance"){
+            enemy.resistance=Math.max(0,numeric(enemy.resistance)-numeric(buff.amount));
+        }else if(buff.type==="dodge"&&Number.isFinite(Number(buff.originalEvasion))){
+            enemy.evasion=Number(buff.originalEvasion);
         }
+    }
+
+    function clearRemovableEntityStates(entity,side){
+        if(!entity){ return 0; }
+        let removed=removeRemovableStatusEffects(entity);
+
+        if(side==="monster"&&typeof window.v155ClearRemovableCombatStates==="function"){
+            removed+=Math.max(0,numeric(window.v155ClearRemovableCombatStates(entity)));
+        }
+
+        if(Array.isArray(entity.v141TeamBuffs)){
+            const kept=[];
+            entity.v141TeamBuffs.forEach(buff=>{
+                if(isRemovableTemporaryState(buff)){
+                    restoreRemovedMonsterTeamBuff(entity,buff);
+                    removed++;
+                }else{
+                    kept.push(buff);
+                }
+            });
+            entity.v141TeamBuffs=kept;
+        }
+
+        if(Array.isArray(entity.activeBuffs)){
+            const before=entity.activeBuffs.length;
+            entity.activeBuffs=entity.activeBuffs.filter(buff=>!isRemovableTemporaryState(buff));
+            removed+=before-entity.activeBuffs.length;
+        }
+
+        if(entity.v141Shield&&isRemovableTemporaryState(entity.v141Shield)){
+            entity.v141Shield=null;
+            removed++;
+        }
+        return removed;
+    }
+
+    function purifyEnemyTargets(centerIndex,skillLevel){
+        const targetCount=Math.max(1,Math.floor(levelValue(
+            skillDatabase.purifyMind&&skillDatabase.purifyMind.targetCountByLevel,
+            skillLevel,
+            1
+        )));
+        if(targetCount<3||typeof getSkillTargets!=="function"){
+            return monsterAlive(centerIndex)?[centerIndex]:[];
+        }
+        return getSkillTargets(centerIndex,"tri").filter(monsterAlive).slice(0,3);
+    }
+
+    function purifyAllyTargets(characterIndex,queued,skillLevel){
+        const skill=skillDatabase.purifyMind;
+        const targetCount=Math.max(1,Math.floor(levelValue(skill&&skill.targetCountByLevel,skillLevel,1)));
+        const selected=Number.isInteger(queued.targetAlly)?queued.targetAlly:characterIndex;
+        if(targetCount<3){
+            const target=getPartyCharacterByIndex(selected);
+            return target&&numeric(target.hp)>0?[selected]:[];
+        }
+        return requestedBuffTargets(
+            characterIndex,
+            Object.assign({},queued,{targetAlly:selected}),
+            Object.assign({},skill,{targetType:"allyTri"})
+        ).slice(0,3);
     }
 
     function resolvePartyStateClear(characterIndex,queued,skill,state){
         const enemyIndex=skill.id==="purifyMind"&&Number.isInteger(queued.target)&&!Number.isInteger(queued.targetAlly)
             ?queued.target:null;
-        if(enemyIndex!==null){
-            const enemy=typeof monsters!=="undefined"?monsters[enemyIndex]:null;
-            const isCurrent=typeof currentBattleMonsters!=="undefined"&&currentBattleMonsters.includes(enemyIndex);
-            if(!enemy||!isCurrent||enemy.alive===false||numeric(enemy.hp)<=0){
-                return finishSupport(skill.name+"目前沒有有效目標。");
-            }
-            animateSupportCast(state,characterIndex,skill,enemyIndex,[enemyIndex],"monster");
-            clearEnemyPositiveStates(enemy);
-            if(typeof window.v141PlayCardEffect==="function"){
-                window.v141PlayCardEffect("monster",enemyIndex,"buff");
-            }
-            return finishSupport(
-                (state.character.id||"角色")+"施放"+skill.name+"，解除"+
-                (enemy.name||("敵人"+(enemyIndex+1)))+"身上所有增益狀態；負面狀態保留。"
-            );
-        }
+        const targetSide=enemyIndex!==null?"monster":"player";
+        const targets=targetSide==="monster"
+            ?purifyEnemyTargets(enemyIndex,state.level)
+            :purifyAllyTargets(characterIndex,queued,state.level);
 
-        const targetIndex=Number.isInteger(queued.targetAlly)?queued.targetAlly:characterIndex;
-        const target=getPartyCharacterByIndex(targetIndex);
-        if(!target||numeric(target.hp)<=0){ return finishSupport(skill.name+"目前沒有有效目標。"); }
-        animateSupportCast(state,characterIndex,skill,targetIndex,[targetIndex],"player");
-        const negativeCount=Array.isArray(target.statusEffects)?target.statusEffects.length:0;
-        const buffCount=Array.isArray(target.activeBuffs)?target.activeBuffs.length:0;
-        target.statusEffects=[];
-        target.activeBuffs=[];
-        if(target.v141Shield){ target.v141Shield=null; }
-        if(typeof window.v141PlayCardEffect==="function"){
-            window.v141PlayCardEffect("player",targetIndex,"buff");
-        }
+        if(!targets.length){ return finishSupport(skill.name+"目前沒有有效目標。"); }
+        animateSupportCast(state,characterIndex,skill,targets[0],targets,targetSide);
+
+        let removed=0;
+        targets.forEach(index=>{
+            const entity=targetSide==="monster"
+                ?(typeof monsters!=="undefined"?monsters[index]:null)
+                :getPartyCharacterByIndex(index);
+            if(!entity){ return; }
+            removed+=clearRemovableEntityStates(entity,targetSide);
+            if(typeof window.v141PlayCardEffect==="function"){
+                window.v141PlayCardEffect(targetSide,index,"buff");
+            }
+        });
+
         return finishSupport(
-            (state.character.id||"角色")+"施放"+skill.name+"，解除"+
-            (target.id||("角色"+(targetIndex+1)))+"身上"+(negativeCount+buffCount)+"個增益／異常狀態。"
+            (state.character.id||"角色")+"施放"+skill.name+"，清除"+
+            targets.length+"名"+(targetSide==="monster"?"敵方":"我方")+"目標共"+
+            removed+"個可解除臨時戰鬥狀態。"
         );
     }
 
     function resolveSupportAction(characterIndex,queued,skill){
         if(typeof activeBattleCharacterIndex!=="undefined"){ activeBattleCharacterIndex=characterIndex; }
+        if(
+            (skill.id==="fireSoulResonance"||skill.id==="bloodBurnArt")&&
+            window.FourSymbolsSkillSpec&&
+            typeof window.FourSymbolsSkillSpec.castFireTactical==="function"
+        ){
+            return window.FourSymbolsSkillSpec.castFireTactical(characterIndex,skill.id);
+        }
         const state=validateSupportCaster(characterIndex,skill);
         if(state.error){ return finishSupport(state.error); }
         if(skill.removeAllStates){ return resolvePartyStateClear(characterIndex,queued,skill,state); }
