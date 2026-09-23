@@ -13,7 +13,7 @@
 ## 唯一資料真相
 
 - `js/relic-summary-catalog.js`：主城 First Screen 必要的秘寶 `id / name / triggerText` 唯一靜態來源；必須保持小型、無戰鬥／VFX／Boss 依賴。
-- `relicCatalog`：完整秘寶靜態定義，從上述摘要資料橋取得 `name / triggerText`，再組合分類、稀有度、Trigger、Effect、等級成長與 `iconPath`；完整 Catalog 仍屬 lazy `feature-boss-relic`。
+- `relicCatalog`：完整秘寶靜態定義，從上述摘要資料橋取得 `name / triggerText`，再組合分類、稀有度、Trigger、Effect、等級成長與 `iconPath`；完整 Catalog 與 Team Relic Trigger Engine 屬 `feature-relic-runtime`。Boss／Tower 與秘寶養成 UI 仍由 `feature-boss-relic` 透過正式 dependency 載入。
 - `playerRelics`：玩家實際擁有狀態，只保存解鎖、等級、EXP／養成與已查看狀態。
 - `teamLoadout.relicId`：目前隊伍唯一裝備真相。禁止在每件秘寶資料內複製 `equipped=true`。
 - 秘寶持久化必須寫入目前正式 `SAVE_KEY` 的同一份存檔文件；禁止建立秘寶專屬 localStorage save key。
@@ -38,13 +38,15 @@
 - 秘寶傷害使用獨立 `relicPower`，不得直接借某名角色技能傷害；預設不能暴擊、追擊、吸血或觸發角色技能被動。
 - 平衡常數集中在 `RELIC_BALANCE_CONFIG`；BOSS 傷害／Debuff 效率等修正不得散落在各秘寶函式。
 - 戰鬥開始時鎖定本場裝備秘寶；戰鬥進行中禁止 hot swap。
+- `feature-relic-runtime` 是所有正式 Battle feature 的前置依賴。一般巡怪、一般戰鬥、每日副本、Boss、Tower、深淵、Adventure 等入口都必須在自身 feature ready 前先 execute 同一份 `js/60-team-relic-system.js` Trigger Engine；不得依賴玩家曾開過秘寶頁、背景 prefetch、戰鬥開始後才補載或 `setTimeout`／`MutationObserver` 補救。
+- `runtimeReady:false` 的秘寶不得進入 `teamLoadout.relicId` 正式有效值；舊存檔 hydrate、裝備 action、合成／強化 UI 都必須 fail closed。玩家只顯示「效果尚未覺醒／能力尚未開放」等遊戲語言，不得顯示假的下一級或工程 metadata。
 
 ## UI / 稀有度
 
 - 稀有度沿用正式六階：白階 → 藍階 → 紫階 → 橙階 → 桃紅階 → 四象階。禁止新增 SSR／UR／傳說／神話等第二套制度。
 - 秘寶頁手機優先、滿版、兩欄 Grid、內部垂直捲動；分類列可橫向滑動。
 - 主城左側新增「秘寶」、右側連到既有「元素匣」 owner；不得複製第二套元素匣。
-- 主城隊伍秘寶摘要是 app-shell First Screen UI：固定 shell 先存在，再從正式存檔 `teamLoadout.relicId`／`playerRelics` 填入名稱、Lv、觸發摘要；不得為摘要 execute 完整 `feature-boss-relic`，也不得複製第二份裝備狀態。
+- 主城隊伍秘寶摘要是 app-shell First Screen UI：固定 shell 先存在，再從正式存檔 `teamLoadout.relicId`／`playerRelics` 填入名稱、Lv、觸發摘要；不得為摘要 execute `feature-relic-runtime` 或完整 `feature-boss-relic`，也不得複製第二份裝備狀態。
 - `RELIC_CATALOG_LIST[].iconPath` 是 List／Detail／Current Equipment／background prefetch 唯一正式 icon path。Runtime Ready 不等於 Visual Ready；首次開頁先顯示局部 loading，等必要 icon decode、字型與 live render paint 完成後才一次顯示完整內容。
 - 玩家可見秘寶列表／詳情／目前隊伍秘寶只能使用正式「裝備／已裝備／卸下／詳情」語言；`runtimeReady`、能力階段、DEV preview 等工程 metadata 可保留於內部，但不得成為玩家 UI 文案或第二份 loadout state。
 - 即使在 DEV host 驗收，裝備動作也必須寫入正式 `teamLoadout.relicId`；禁止 `devPreviewRelicId` 或其他平行配裝鏡像。尚未具正式 Trigger／Effect 的秘寶不得因此假裝已有戰鬥效果，既有已實裝秘寶仍依正式 `runtimeReady`／Trigger engine 執行。
