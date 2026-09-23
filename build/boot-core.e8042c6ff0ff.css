@@ -2425,6 +2425,10 @@ button:active{
     z-index:3;
 }
 
+.skill-quick-button .sq-sp-block[hidden]{
+    display:none;
+}
+
 .skill-quick-button .sq-name{
     display:block;
     width:100%;

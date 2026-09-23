@@ -33039,6 +33039,7 @@ function setBattleInfoExpanded(expanded){
 
     const next=!!expanded;
     region.classList.toggle("is-expanded",next);
+    toggle.textContent=next?"返回":"戰鬥資訊";
     toggle.setAttribute("aria-expanded",next?"true":"false");
     toggle.setAttribute("aria-label",next?"收合戰鬥資訊":"展開戰鬥資訊");
     syncBattleUiPriorityLayer();

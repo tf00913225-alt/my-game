@@ -37,8 +37,10 @@ test("battle information handles and turn timer follow the requested interaction
   assert.match(js,/function syncBattleUiPriorityLayer\(\)/);
   assert.match(js,/function installBattleInfoHandleDrag\(\)/);
   assert.match(css,/\.battle-info-toggle\{[\s\S]*?border:1px solid rgba\(210,158,64,\.9\);[\s\S]*?box-shadow:none;[\s\S]*?touch-action:none;[\s\S]*?cursor:ew-resize/);
-  assert.match(css,/\.battle-info-region:not\(\.is-expanded\)\{[\s\S]*?background:transparent;[\s\S]*?box-shadow:none/);
+  assert.match(css,/\.battle-info-region:not\(\.is-expanded\)\{[\s\S]*?background:rgba\(0,0,0,\.92\);[\s\S]*?box-shadow:none/);
+  assert.match(js,/toggle\.textContent=next\?"返回":"戰鬥資訊"/);
   const mainCss=read("css/00-main.css");
+  assert.match(mainCss,/\.skill-quick-button \.sq-sp-block\[hidden\]\{[\s\S]*?display:none;/);
   assert.match(mainCss,/#battlePage\{[\s\S]*?--battle-command-row-height:66px;[\s\S]*?--battle-command-art-overhang:34px;[\s\S]*?--battle-command-visual-height:calc\(var\(--battle-command-row-height\) \+ var\(--battle-command-art-overhang\)\);/);
   assert.doesNotMatch(mainCss,/--battle-center-min-height/);
   assert.doesNotMatch(css,/--battle-command-row-height:66px|--battle-command-art-overhang:34px/);
@@ -56,7 +58,7 @@ test("interactive battlefield overlays outrank detached VFX and damage popups",(
   assert.match(statsCss,/z-index:18072/);
   assert.match(vfxCss,/\.battle-status-detail-modal\{[\s\S]*?z-index:18120/);
   assert.match(vfxCss,/body\.v174-battle-reading-open > \.v143-skill-stage,[\s\S]*?visibility:hidden !important;[\s\S]*?opacity:0 !important/);
-  assert.match(fixedCss,/\.battle-info-region\{[\s\S]*?background:transparent;[\s\S]*?box-shadow:none/);
+  assert.match(fixedCss,/\.battle-info-region:not\(\.is-expanded\)\{[\s\S]*?background:rgba\(0,0,0,\.92\);[\s\S]*?box-shadow:none/);
   assert.match(fixedCss,/\.battle-info-region\.is-expanded\{[\s\S]*?background:rgba\(8,8,8,\.96\);[\s\S]*?box-shadow:none/);
 });
 

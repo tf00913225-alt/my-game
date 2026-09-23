@@ -404,6 +404,35 @@ try{
         assert.equal(count,0,`Normal attack click unexpectedly invoked ${name}`)
     );
     assert.ok(normalAttackPerformance.maxLongTaskDuration<120,`Normal attack generated a long task of ${normalAttackPerformance.maxLongTaskDuration}ms`);
+
+    const spQuickBar=await client.eval(`(()=>{
+        const bar=document.getElementById('skillQuickBarGrid');
+        if(!bar||typeof ensureSkillQuickBarButtons!=='function'||typeof syncSkillQuickBarButton!=='function'){return null;}
+        const buttons=ensureSkillQuickBarButtons(bar);
+        const button=buttons[0];
+        const skill=typeof skillDatabase!=='undefined'&&(skillDatabase.waterBall||Object.values(skillDatabase).find(item=>item&&item.spCost!==undefined));
+        if(!button||!skill){return null;}
+        const skillId=skill.id||'waterBall';
+        const cost=Number(skill.spCost!==undefined?skill.spCost:skill.cost)||0;
+        syncSkillQuickBarButton(button,skillId,skill,1,cost,true);
+        const block=button.querySelector('.sq-sp-block');
+        const state={
+            skillId,cost,
+            disabled:button.disabled,
+            insufficient:button.classList.contains('sp-insufficient'),
+            blockHidden:block?block.hidden:null,
+            blockDisplay:block?getComputedStyle(block).display:null
+        };
+        if(typeof populateSkillQuickBar==='function'){populateSkillQuickBar();}
+        return state;
+    })()`);
+    evidence.checks.spQuickBar=spQuickBar;
+    assert.ok(spQuickBar,"Canonical quick-bar sufficient-SP state must be testable");
+    assert.equal(spQuickBar.disabled,false,`${spQuickBar.skillId} should be enabled when enoughSP is true`);
+    assert.equal(spQuickBar.insufficient,false,`${spQuickBar.skillId} must not keep the insufficient-SP class when enoughSP is true`);
+    assert.equal(spQuickBar.blockHidden,true,`${spQuickBar.skillId} insufficient-SP overlay should be semantically hidden`);
+    assert.equal(spQuickBar.blockDisplay,"none",`${spQuickBar.skillId} insufficient-SP overlay must be visually hidden`);
+
     const infoDrawer=await client.eval(`(()=>{
         const region=document.querySelector('#battlePage .battle-info-region');
         const button=document.getElementById('battleInfoToggle');
@@ -412,18 +441,21 @@ try{
         region.style.transition='none';
         const rect=node=>{const value=node.getBoundingClientRect();return {top:value.top,bottom:value.bottom,height:value.height};};
         toggleBattleInfoPanel();
-        const expanded={region:rect(region),info:rect(info),aria:button.getAttribute('aria-expanded'),className:region.className};
+        const expanded={region:rect(region),info:rect(info),aria:button.getAttribute('aria-expanded'),className:region.className,label:button.textContent.trim(),background:getComputedStyle(region).backgroundColor};
         toggleBattleInfoPanel();
-        const collapsed={region:rect(region),info:rect(info),aria:button.getAttribute('aria-expanded'),className:region.className};
+        const collapsed={region:rect(region),info:rect(info),aria:button.getAttribute('aria-expanded'),className:region.className,label:button.textContent.trim(),background:getComputedStyle(region).backgroundColor};
         region.style.removeProperty('transition');
         return {expanded,collapsed};
     })()`);
     evidence.checks.battleInfoDrawer=infoDrawer;
     assert.ok(infoDrawer,"Live battle must expose the formal battle-info drawer owner");
     assert.equal(infoDrawer.expanded.aria,"true","Tapping the handle must expand battle info");
+    assert.equal(infoDrawer.expanded.label,"返回","Expanded battle info handle must become 返回");
     assert.match(infoDrawer.expanded.className,/is-expanded/);
     assert.ok(infoDrawer.expanded.info.top<layout.regions.wrap.bottom,"Expanded battle info must slide into the battlefield viewport");
     assert.equal(infoDrawer.collapsed.aria,"false","Tapping again must collapse battle info");
+    assert.equal(infoDrawer.collapsed.label,"戰鬥資訊","Collapsed battle info handle must restore 戰鬥資訊");
+    assert.match(infoDrawer.collapsed.background,/rgba?\(0, 0, 0(?:, 0\.92)?\)/,"Collapsed battle info must retain a black backing");
     assert.doesNotMatch(infoDrawer.collapsed.className,/is-expanded/);
     assert.ok(infoDrawer.collapsed.info.top>=layout.regions.wrap.bottom-1,"Collapsed battle info must return below the battlefield viewport");
 
@@ -898,6 +930,8 @@ try{
     assert.ok(resultModalReadability?.shown,"Detailed battle result modal must open from the final snapshot");
     assert.equal(resultModalReadability.parentId,"game-content","Battle result modal must use the legacy game-content coordinate owner");
     assert.equal(resultModalReadability.hidden,false,"Detailed battle result modal must be visible while inspected");
+    assert.equal(resultModalReadability.titleFont,"22px","Detailed result title should use normal mobile typography");
+    assert.equal(resultModalReadability.valueFont,"19px","Detailed result values should not dominate the panel");
     assert.ok(resultModalReadability.title?.height>=24,`Battle result title is too small on mobile: ${resultModalReadability.title?.height}`);
     assert.ok(resultModalReadability.label?.height>=13,`Battle result label is too small on mobile: ${resultModalReadability.label?.height}`);
     assert.ok(resultModalReadability.value?.height>=18,`Battle result value is too small on mobile: ${resultModalReadability.value?.height}`);
