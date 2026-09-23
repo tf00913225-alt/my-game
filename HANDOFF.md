@@ -1,3 +1,15 @@
+## 2026-09-23 — 冰封／石化互斥硬控與 Body Status Base Layer 收斂（candidate）
+
+- Base：`dev@8bab02b38197824ac47f3ba2269ba6e19cbfd52f`；工作分支：`fix/freeze-petrify-exclusive-status-layer-20260923`；`main`／`dev` 均未直接修改。
+- Gameplay Hard Control Owner 維持 `js/00-main.js` 的 Persistent State Gate。Freeze／Petrify 現為同一 Exclusive Hard Control Group：同名與跨名都會在機率骰點與正式寫入前以「狀態MISS」阻止；既有狀態不覆蓋、不刷新、不延長。
+- `applyFreezeEffect()` 與 `applyMonsterDebuff()` 也接回同一 Gate，避免玩家技能、怪物、Boss／深淵、符咒或其他直接 mutation caller 繞過互斥規則。跨名 Log 會同時指出既有狀態與新的失敗狀態。
+- Persistent Body Status Visual Owner 仍為 `js/39-v143-skill-animation.js`。新增語意層 `hard-control-base`／`rotating`／`hud`；Freeze／Petrify 固定在 Base Cover，不呼吸、不閃爍、不加入 2 秒 Body Rotation；其他 Body Status 保持原 2 秒嚴格循序輪播。
+- CSS 由 `css/40-v143-combat-dungeon-polish.css` 只呈現上述正式語意層；已移除 Freeze／Petrify／Abyss 的同層 z-index 特例，不以 `z-index:99999 !important` 類補丁處理。
+- Runtime 若觀察到同一 entity 同時存在 Freeze + Petrify，V143 只回報 Hard Control Contract violation，不替資料層隱藏／正規化其中一個。
+- Regression 已覆蓋：同名／跨名 MISS、剩餘回合不變、解除後另一硬控可重新施加、正式「狀態MISS」文案、玩家／一般怪／Boss／深淵共用 Gate、Freeze 固定底層＋一般狀態輪播、死亡／解除立即清理、Cast deferred lifecycle。
+- Requirement Batch：`release/requirement-batches/2026-09-23-freeze-petrify-exclusive-status-layer.json`；目前 IMPLEMENTED，待 PR GitHub Actions／Build／Repository checks 完成後升級 VERIFIED。
+- `DATA_SECURITY_CONTRACTS.md` 在本次最新 dev 仍為 404；本次未修改帳號／雲端存檔／安全資料流程，未自行補寫不存在的契約。
+
 ## 2026-09-22 — 戰鬥狀態輪播／抽屜圖層／倒數框／三技能 VFX Follow-up（candidate）
 
 - Base：`dev@d55410bd88590b9a9052b1b4d714a27b3cc9a411`；工作分支：`fix/battle-status-carousel-drawers-vfx-20260922`；`main`／`dev` 均未直接修改。
