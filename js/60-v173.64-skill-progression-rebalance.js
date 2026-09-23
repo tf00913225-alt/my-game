@@ -31,10 +31,11 @@
     const FREEZE_CHANCE_BY_LEVEL=Object.freeze([55,65,75,85,95]);
     const FREEZE_DURATION_BY_LEVEL=Object.freeze([3,3,3,4,5]);
     const PURIFY_TARGET_COUNT_BY_LEVEL=Object.freeze([1,1,3]);
-    const DODGE_BY_LEVEL=Object.freeze([30,40,50,60,70]);
+    const FINAL_POINT_DAMAGE_LEVELS=Object.freeze([5,7,9,11,13,15,17,19,22,25]);
+    const DODGE_BY_LEVEL=Object.freeze([5,10,15,20,25]);
     const STEALTH_DURATION_BY_LEVEL=Object.freeze([2,3,4]);
-    const CALM_RESIST_BY_LEVEL=Object.freeze([25,35,45,55,65]);
-    const CALM_ACCURACY_BY_LEVEL=Object.freeze([10,20,30,40,50]);
+    const CALM_RESIST_BY_LEVEL=Object.freeze([5,8,10,12,15]);
+    const CALM_ACCURACY_BY_LEVEL=Object.freeze([5,10,15,20,25]);
     const ROCK_WALL_BY_LEVEL=Object.freeze([15,20,25,30,35]);
     const EARTH_SHIELD_BY_LEVEL=Object.freeze([20,30,35,40,50]);
     const EARTH_SHIELD_DURATION_BY_LEVEL=Object.freeze([3,3,3,4,5]);
@@ -125,14 +126,26 @@
         },
         waterEX:{learnLevel:50,learnCost:20,maxLevel:1,progressionGroup:"ex"},
 
-        stormFist:{learnLevel:1,learnCost:2,progressionGroup:"physical"},
+        stormFist:{
+            learnLevel:1,learnCost:2,progressionGroup:"physical",
+            agilityDownByLevel:FINAL_POINT_DAMAGE_LEVELS.slice()
+        },
         stormFlurry:{learnLevel:7,learnCost:6,progressionGroup:"physical"},
         windCrossSlash:{learnLevel:14,learnCost:10,progressionGroup:"physical"},
-        dizzyFist:{learnLevel:30,learnCost:16,progressionGroup:"physical"},
-        windSpell:{learnLevel:1,learnCost:2,progressionGroup:"magic"},
+        dizzyFist:{
+            learnLevel:30,learnCost:16,progressionGroup:"physical",
+            missBonusByLevel:FINAL_POINT_DAMAGE_LEVELS.slice()
+        },
+        windSpell:{
+            learnLevel:1,learnCost:2,progressionGroup:"magic",
+            agilityDownByLevel:FINAL_POINT_DAMAGE_LEVELS.slice()
+        },
         stormCircle:{learnLevel:7,learnCost:6,progressionGroup:"magic"},
         windHowlLightning:{learnLevel:14,learnCost:10,progressionGroup:"magic"},
-        stormRain:{learnLevel:30,learnCost:16,progressionGroup:"magic"},
+        stormRain:{
+            learnLevel:30,learnCost:16,progressionGroup:"magic",
+            missBonusByLevel:FINAL_POINT_DAMAGE_LEVELS.slice()
+        },
         dodgeSkill:{
             learnLevel:18,learnCost:10,maxLevel:5,progressionGroup:"tactical",
             evasionBonusPercentByLevel:DODGE_BY_LEVEL.slice()
@@ -147,7 +160,10 @@
             statusResistBonusByLevel:CALM_RESIST_BY_LEVEL.slice(),
             accuracyBonusPercentByLevel:CALM_ACCURACY_BY_LEVEL.slice()
         },
-        windEX:{learnLevel:50,learnCost:20,maxLevel:1,progressionGroup:"ex"},
+        windEX:{
+            learnLevel:50,learnCost:20,maxLevel:1,progressionGroup:"ex",
+            evasionBonusPercent:10
+        },
 
         stoneSlash:{learnLevel:1,learnCost:2,progressionGroup:"physical"},
         petrifyFist:{learnLevel:7,learnCost:6,progressionGroup:"physical"},
@@ -241,13 +257,14 @@
                 Math.max(1,numeric(skill.damageDownDuration)||1)+"回合");
         }
         if(Array.isArray(skill&&skill.agilityDownByLevel)){
+            const value=levelValue(skill.agilityDownByLevel,lv,0);
             parts.push("重力："+numeric(skill.agilityDownChance)+"%基礎機率，敏捷-"+
-                levelValue(skill.agilityDownByLevel,lv,0)+"%，"+
+                value+"%、最終閃躲-"+value+"個百分點，"+
                 Math.max(1,numeric(skill.agilityDownDuration)||1)+"回合");
         }
         if(Array.isArray(skill&&skill.missBonusByLevel)){
-            parts.push("暈眩："+numeric(skill.stunChance)+"%基礎機率，命中降低"+
-                levelValue(skill.missBonusByLevel,lv,0)+"%，"+
+            parts.push("暈眩："+numeric(skill.stunChance)+"%基礎機率，最終命中率-"+
+                levelValue(skill.missBonusByLevel,lv,0)+"個百分點，"+
                 Math.max(1,numeric(skill.stunDuration)||1)+"回合");
         }
         if(Array.isArray(skill&&skill.petrifyChanceByLevel)){
