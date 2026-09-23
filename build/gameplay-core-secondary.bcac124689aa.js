@@ -1925,12 +1925,14 @@
             ?Math.floor(hpBase*multiplier)
             :Math.floor(calculateHealingAmount(hpBase,state.stats.intelligence)*multiplier);
         const spPercent=levelValue(skill.spRestorePercentByLevel,state.level,0);
+        const legacySpBase=numeric(skill.baseHealSP)+numeric(skill.healSPPerLevel)*(state.level-1);
         const sp=isFlatPartyHeal&&Array.isArray(skill.spRestorePercentByLevel)
             ?Math.floor(numeric(targetStats.maxSP)*spPercent/100)
-            :Math.floor(calculateSPHealingAmount(
-                numeric(skill.baseHealSP)+numeric(skill.healSPPerLevel)*(state.level-1),
-                state.stats.intelligence
-            ));
+            :Math.floor(
+                typeof calculateSPHealingAmount==="function"
+                    ?calculateSPHealingAmount(legacySpBase,state.stats.intelligence)
+                    :legacySpBase
+            );
         return {hp:Math.max(0,hp),sp:Math.max(0,sp),maxHP:numeric(targetStats.maxHP),maxSP:numeric(targetStats.maxSP)};
     }
 
@@ -2091,7 +2093,11 @@
             :purifyAllyTargets(characterIndex,queued,state.level);
 
         if(!targets.length){ return finishSupport(skill.name+"目前沒有有效目標。"); }
-        animateSupportCast(state,characterIndex,skill,targets[0],targets,targetSide);
+        const selectedPrimary=targetSide==="monster"
+            ?enemyIndex
+            :(Number.isInteger(queued.targetAlly)?queued.targetAlly:targets[0]);
+        const primaryTarget=targets.includes(selectedPrimary)?selectedPrimary:targets[0];
+        animateSupportCast(state,characterIndex,skill,primaryTarget,targets,targetSide);
 
         let removed=0;
         targets.forEach(index=>{
