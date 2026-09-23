@@ -50,6 +50,7 @@ jobs:
           BRANCH: ${{ github.event.pull_request.head.ref }}
         run: |
           node <<'NODE'
+          (async()=>{
           const fs=require("node:fs");
           const cp=require("node:child_process");
           const token=process.env.GH_TOKEN;
@@ -117,4 +118,5 @@ jobs:
             body:{sha:commit.sha,force:false}
           });
           console.log("Created build commit "+commit.sha);
+          })().catch(error=>{ console.error(error); process.exit(1); });
           NODE
