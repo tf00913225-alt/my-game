@@ -2191,24 +2191,44 @@ function getPlayerDefenseDownPercent(character){
     return Math.max(0,getMonsterDebuffValue(character,"defenseDown"));
 }
 
+function getPlayerEvasionBaseAgility(character,equipmentBonus){
+    if(!character){ return 0; }
+    const base=(Number(character.agility)||0)+(Number(equipmentBonus&&equipmentBonus.agility)||0);
+    const statDown=getStatDownPercentFor(character,"agility");
+    return Math.max(0,base*(1-statDown/100));
+}
+
+function getPlayerFinalEvasionReductionPercent(character){
+    return Math.max(0,getMonsterDebuffValue(character,"agilityDown"));
+}
+
 const FINAL_EVASION_RATE_CAP=85;
+const FROSTBITE_FINAL_PERCENT_POINT_PENALTY=25;
 
 /*
-   閃躲來源採獨立機率乘算，不再直接相加或拿去放大敏捷閃躲值。
-   例如風元素EX 35%與風行75%：1-(1-.35)*(1-.75)=83.75%。
+   閃躲來源一律以最終百分點相加／相減。
+   玩家看到「閃躲 +10%」就是最終閃躲 +10 個百分點；
+   「凍傷：閃躲 -25%」就是最終閃躲 -25 個百分點。
+   不再把多個閃躲來源逐層乘算。
 */
 function combineEvasionRates(sources){
-    const remainingChance=(Array.isArray(sources)?sources:[]).reduce(
-        (remaining,source)=>{
-            const rate=Math.max(0,Math.min(100,Number(source)||0))/100;
-            return remaining*(1-rate);
-        },
-        1
+    const total=(Array.isArray(sources)?sources:[]).reduce(
+        (sum,source)=>sum+(Number(source)||0),
+        0
     );
-    return Math.min(FINAL_EVASION_RATE_CAP,(1-remainingChance)*100);
+    return Math.max(0,Math.min(FINAL_EVASION_RATE_CAP,total));
+}
+
+function getFrostbiteFinalPercentPointPenalty(entity){
+    return entity&&Array.isArray(entity.statusEffects)&&entity.statusEffects.some(effect=>
+        effect&&effect.type==="frostbite"&&Number(effect.turnsLeft)>0
+    )
+        ?FROSTBITE_FINAL_PERCENT_POINT_PENALTY
+        :0;
 }
 
 window.v173CombineEvasionRates=combineEvasionRates;
+window.v173FrostbiteFinalPercentPointPenalty=FROSTBITE_FINAL_PERCENT_POINT_PENALTY;
 
 /* 氣定神閒的命中加成同時供玩家與怪物共用。鏡像顯示紀錄
    可能同時存在於 activeBuffs / v141TeamBuffs，因此取最高值而不相加。 */
@@ -2286,7 +2306,7 @@ function getMainCharacterStats(){
         1+(defenseBuffPercent+defensePassivePercent)/100
     );
 
-    const rawEvasion=effectiveAgility*0.6;
+    const rawEvasion=getPlayerEvasionBaseAgility(player,bonus)*0.6;
 
     return {
         /* 暫時六圍減益不動態壓縮最大HP/SP；詳見上方統一規則。 */
@@ -2326,7 +2346,9 @@ function getMainCharacterStats(){
         evasion:combineEvasionRates([
             rawEvasion,
             evasionBuffPercent,
-            evasionPassivePercent
+            evasionPassivePercent,
+            -getPlayerFinalEvasionReductionPercent(player),
+            -getFrostbiteFinalPercentPointPenalty(player)
         ]),
 
         vitality:effectiveVitality,
@@ -2445,7 +2467,7 @@ function getAdditionalCharacterBattleStats(character,characterKey){
     const buffedDefense=rawDefense*(
         1+(defenseBuffPercent+defensePassivePercent)/100
     );
-    const rawEvasion=effectiveAgility*0.6;
+    const rawEvasion=getPlayerEvasionBaseAgility(character,bonus)*0.6;
 
     return {
         maxHP:
@@ -2484,7 +2506,9 @@ function getAdditionalCharacterBattleStats(character,characterKey){
         evasion:combineEvasionRates([
             rawEvasion,
             evasionBuffPercent,
-            evasionPassivePercent
+            evasionPassivePercent,
+            -getPlayerFinalEvasionReductionPercent(character),
+            -getFrostbiteFinalPercentPointPenalty(character)
         ]),
 
         vitality:effectiveVitality,
@@ -3424,7 +3448,7 @@ function makeZoneMonster(
             calculateAntiCritPercent(points.spirit),
 
         evasion:
-            Math.min(30,Math.max(0,Number(level)||0)*0.3),
+            getDefaultMonsterEvasion(level),
 
         agility:
             points.agility,
@@ -12649,21 +12673,32 @@ function calculateDamage(
 }
 
 /* =====================================================
-   ★ 命中判定（新增）
+   命中／閃躲唯一正式公式 Owner
 
-   基礎命中率 = clamp(95 + 命中×0.3, 50%, 99%)。
-   最終命中率 = clamp(基礎命中率 × (1 - 最終閃躲率) - 最終命中率降低, 1%, 99%)。
-   玩家基礎閃躲為有效敏捷×0.6%；普通怪物預設閃躲為
-   min(30%, 等級×0.3%)，特殊怪物明確指定的 evasion 保留。
+   最終命中率 =
+   95 + 命中×0.15 + 最終命中加成
+   - 目標最終閃躲 - 最終命中下降。
+
+   所有百分比效果皆是「最終百分點」加減，不再先封頂命中後
+   乘上 (1 - 閃躲率)。最後統一限制在 70%～99%。
+   普通怪物未明確指定 evasion 時，使用 min(10%, 等級×0.1%)。
 ===================================================== */
 
 const HIT_CHANCE_BASE = 95;
-
-const HIT_CHANCE_ACCURACY_COEFFICIENT = 0.3;
-
-const HIT_CHANCE_MIN_PERCENT = 50;
-
+const HIT_CHANCE_ACCURACY_COEFFICIENT = 0.15;
+const HIT_CHANCE_MIN_PERCENT = 70;
 const HIT_CHANCE_MAX_PERCENT = 99;
+const DEFAULT_MONSTER_EVASION_PER_LEVEL = 0.1;
+const DEFAULT_MONSTER_EVASION_CAP = 10;
+
+function getDefaultMonsterEvasion(level){
+    return Math.min(
+        DEFAULT_MONSTER_EVASION_CAP,
+        Math.max(0,Number(level)||0)*DEFAULT_MONSTER_EVASION_PER_LEVEL
+    );
+}
+
+window.v173GetDefaultMonsterEvasion=getDefaultMonsterEvasion;
 
 
 /*
@@ -12696,32 +12731,22 @@ const HIT_CHANCE_MAX_PERCENT = 99;
 
 function getMonsterEvasion(monster){
 
-    const base=
+    if(!monster){ return 0; }
 
-        monster.evasion!==undefined
-        ? monster.evasion
-        : Math.min(30,Math.max(0,Number(monster.level)||0)*0.3);
+    const base=monster.evasion!==undefined
+        ?Number(monster.evasion)||0
+        :getDefaultMonsterEvasion(monster.level);
 
+    const agilityDown=getMonsterDebuffValue(monster,"agilityDown");
+    const statDown=getStatDownPercentFor(monster,"agility");
+    const frostbitePenalty=getFrostbiteFinalPercentPointPenalty(monster);
 
-    const agilityDown=
-        getMonsterDebuffValue(
-            monster,
-            "agilityDown"
-        );
-
-    const statDown=
-        getStatDownPercentFor(
-            monster,
-            "agility"
-        );
-
-
-    return Math.max(
-        0,
-        base*
-        (1-agilityDown/100)*
-        (1-statDown/100)
-    );
+    return combineEvasionRates([
+        base,
+        -agilityDown,
+        -statDown,
+        -frostbitePenalty
+    ]);
 
 }
 
@@ -12764,9 +12789,7 @@ function getMonsterAccuracy(monster){
 
     return Math.max(
         0,
-        base*
-        (1-statDown/100)*
-        (1+getActiveAccuracyBonusPercent(monster)/100)
+        base*(1-statDown/100)
     );
 
 }
@@ -13641,64 +13664,46 @@ function resolveQueuedPlayerAction(characterIndex,token){
 
 
 /*
-   ★ 修正（依照使用者要求，暈眩猛擊重新
-   設計）：新增第3個參數
-   directChanceReductionPercent，代表「最終命中率
-   下降幾個百分點」。先依命中值算出50%～99%的
-   基礎命中率，再套用目標最終閃躲率，最後才直接
-   扣除暈眩等效果。這樣技能寫「最終命中率降低15%」
-   時，實戰就會真的在最後結果扣15個百分點；最低
-   仍保留1%命中率，避免降到負數。
-   不傳這個參數（大部分呼叫的地方都不需要）
-   的話效果跟以前完全一樣，只有monster
-   出手攻擊玩家、且monster身上真的有stun
-   這個減益時才會傳進來。
+   命中判定的所有加減效果都在最後以百分點結算。
+   directChanceReductionPercent 是最終命中下降，
+   directChanceBonusPercent 是最終命中提升。
+   目標閃躲同樣直接扣除百分點，最後才統一 clamp 70%～99%。
 */
+
+function calculateHitChancePercent(
+    casterAccuracy,
+    targetEvasion,
+    directChanceReductionPercent,
+    directChanceBonusPercent
+){
+    const chance=
+        HIT_CHANCE_BASE+
+        Math.max(0,Number(casterAccuracy)||0)*HIT_CHANCE_ACCURACY_COEFFICIENT+
+        (Number(directChanceBonusPercent)||0)-
+        Math.max(0,Number(targetEvasion)||0)-
+        Math.max(0,Number(directChanceReductionPercent)||0);
+
+    return Math.max(
+        HIT_CHANCE_MIN_PERCENT,
+        Math.min(HIT_CHANCE_MAX_PERCENT,chance)
+    );
+}
 
 function rollHitChance(
     casterAccuracy,
     targetEvasion,
-    directChanceReductionPercent
+    directChanceReductionPercent,
+    directChanceBonusPercent
 ){
-
-    const rawAccuracyChance =
-        HIT_CHANCE_BASE+
-        casterAccuracy*
-        HIT_CHANCE_ACCURACY_COEFFICIENT;
-
-    const accuracyChance =
-        Math.max(
-            HIT_CHANCE_MIN_PERCENT,
-            Math.min(
-                HIT_CHANCE_MAX_PERCENT,
-                rawAccuracyChance
-            )
-        );
-
-    const evasionRate=Math.max(
-        0,
-        Math.min(FINAL_EVASION_RATE_CAP,Number(targetEvasion)||0)
+    return Math.random()*100<calculateHitChancePercent(
+        casterAccuracy,
+        targetEvasion,
+        directChanceReductionPercent,
+        directChanceBonusPercent
     );
-
-    const evasionAdjustedChance=
-        accuracyChance*(1-evasionRate/100);
-
-    const chance=Math.max(
-        1,
-        Math.min(
-            HIT_CHANCE_MAX_PERCENT,
-            evasionAdjustedChance-
-            Math.max(0,Number(directChanceReductionPercent)||0)
-        )
-    );
-
-
-    return (
-        Math.random()*100<
-        chance
-    );
-
 }
+
+window.v173GetHitChancePercent=calculateHitChancePercent;
 
 
 /* =====================================================
@@ -13785,8 +13790,7 @@ function calculateSkillDamage(skillOrOptions,statBonus,monster,casterLevel,caste
    5%~95%，不受影響。
 ===================================================== */
 
-const GENERAL_STATUS_OFFENSE_COEFFICIENT = 0.05;
-const LOCKDOWN_STATUS_SPIRIT_COEFFICIENT = 0.3;
+const STATUS_OFFENSE_ATTRIBUTE_COEFFICIENT = 0.05;
 
 /*
    一般異常每1點精神降低0.05個百分點命中率；
@@ -13825,12 +13829,12 @@ const LOCKDOWN_HIT_BOUNDS = {
 
     elite:{
         min:5,
-        max:80
+        max:75
     },
 
     boss:{
         min:5,
-        max:70
+        max:60
     },
 
     /* Enemy-to-player hard control never inherits monster rank. */
@@ -14025,6 +14029,7 @@ function getPlayerStatusResistBonus(character){
         bonus+=Number(skillDatabase.waterEX.statusResistBonus)||0;
     }
 
+    bonus-=getFrostbiteFinalPercentPointPenalty(character);
     return bonus;
 }
 
@@ -14032,107 +14037,51 @@ function calculateStatusEffectChance(
     baseChancePercent,
     casterLevel,
     targetLevel,
-    casterIntelligence,
+    offensiveAttribute,
     targetSpirit,
     isLockdown,
     targetRank,
-    targetBonusResistancePercent
+    targetBonusResistancePercent,
+    finalStatusBonusPercent
 ){
-
-    const levelDiff =
-        casterLevel-
-        targetLevel;
-
-
-    const levelFactor =
-        Math.max(
-            LEVEL_DIFF_FACTOR_MIN,
-            Math.min(
-                LEVEL_DIFF_FACTOR_MAX,
-                1+
-                levelDiff*
-                LEVEL_DIFF_FACTOR_PER_LEVEL
-            )
-        );
-
-
     /*
-       ★ 修正：鎖死行動類技能（isLockdown為
-       true）的智力加成改用開根號，一般
-       debuff（燃燒/削弱類）維持原本線性
-       公式，兩者互不影響。
+       最終異常／硬控成功率 =
+       技能基礎成功率
+       + 施放者主屬性×0.05%
+       + 最終異常命中加成
+       - 目標精神×0.05%
+       - 其他最終異常抗性。
+
+       casterLevel / targetLevel 保留在參數列只為相容既有 caller，
+       正式公式不再使用等級差倍率、sqrt 屬性公式或硬控專屬精神係數。
     */
+    void casterLevel;
+    void targetLevel;
 
     const attributeBonus=
+        Math.max(0,Number(offensiveAttribute)||0)*
+        STATUS_OFFENSE_ATTRIBUTE_COEFFICIENT;
 
-        isLockdown
-        ?
-        Math.sqrt(casterIntelligence)*
-        LOCKDOWN_INT_COEFFICIENT
-        :
-        casterIntelligence*
-        GENERAL_STATUS_OFFENSE_COEFFICIENT;
-
-
-    const targetResistancePercent =
+    const spiritResistance=
         Math.max(0,Number(targetSpirit)||0)*
-        (isLockdown
-            ?LOCKDOWN_STATUS_SPIRIT_COEFFICIENT
-            :STATUS_RESIST_PER_SPIRIT_POINT);
+        STATUS_RESIST_PER_SPIRIT_POINT;
 
-    const rawChance =
-        baseChancePercent*
-        levelFactor+
-        attributeBonus-
-        targetResistancePercent-
-        (Number(targetBonusResistancePercent)||0);
-
-
-    /*
-       ★ 修正（依照使用者要求，「限制行動的
-       異常狀態常數修改」）：
-       鎖死類技能不再只有一組固定上下限，
-       改成依targetRank（野怪/精英怪/BOSS）
-       去LOCKDOWN_HIT_BOUNDS裡查對應的
-       min/max，沒傳rank的話預設當野怪
-       （最寬鬆那組），保留舊呼叫方式的
-       相容性。
-    */
-
-    const lockdownBounds=
-
-        LOCKDOWN_HIT_BOUNDS[
-            targetRank
-        ]||
-        LOCKDOWN_HIT_BOUNDS.regular;
-
-
-    const minPercent=
-
-        isLockdown
-        ?
-        lockdownBounds.min
-        :
-        STATUS_HIT_MIN_PERCENT;
-
-
-    const maxPercent=
-
-        isLockdown
-        ?
-        lockdownBounds.max
-        :
-        STATUS_HIT_MAX_PERCENT;
-
-
-    return Math.max(
-        minPercent,
-        Math.min(
-            maxPercent,
-            rawChance
-        )
+    const targetResistancePercent=Math.max(
+        0,
+        spiritResistance+(Number(targetBonusResistancePercent)||0)
     );
 
+    const rawChance=
+        (Number(baseChancePercent)||0)+
+        attributeBonus+
+        (Number(finalStatusBonusPercent)||0)-
+        targetResistancePercent;
+
+    const bounds=isLockdown
+        ?(LOCKDOWN_HIT_BOUNDS[targetRank]||LOCKDOWN_HIT_BOUNDS.regular)
+        :{min:STATUS_HIT_MIN_PERCENT,max:STATUS_HIT_MAX_PERCENT};
+
+    return Math.max(bounds.min,Math.min(bounds.max,rawChance));
 }
 
 
@@ -14160,30 +14109,27 @@ function rollStatusEffectHit(
     baseChancePercent,
     casterLevel,
     targetLevel,
-    casterIntelligence,
+    offensiveAttribute,
     targetSpirit,
     isLockdown,
     targetRank,
-    targetBonusResistancePercent
+    targetBonusResistancePercent,
+    finalStatusBonusPercent
 ){
 
-    const chance =
-        calculateStatusEffectChance(
-            baseChancePercent,
-            casterLevel,
-            targetLevel,
-            casterIntelligence,
-            targetSpirit,
-            isLockdown,
-            targetRank,
-            targetBonusResistancePercent
-        );
-
-
-    return (
-        Math.random()*100<
-        chance
+    const chance=calculateStatusEffectChance(
+        baseChancePercent,
+        casterLevel,
+        targetLevel,
+        offensiveAttribute,
+        targetSpirit,
+        isLockdown,
+        targetRank,
+        targetBonusResistancePercent,
+        finalStatusBonusPercent
     );
+
+    return Math.random()*100<chance;
 
 }
 
@@ -14555,11 +14501,13 @@ function getMonsterTimedStatusResistanceBonus(monster){
     const teamBuff=(monster.v141TeamBuffs||[]).find(buff=>
         buff&&buff.type==="resistance"&&Number(buff.turnsLeft)>0
     );
-    if(teamBuff){ return Math.max(0,Number(teamBuff.amount)||0); }
     const directBuff=(monster.activeBuffs||[]).find(buff=>
         buff&&buff.type==="dinghaishenzhen"&&Number(buff.turnsLeft)>0
     );
-    return directBuff?Math.max(0,Number(directBuff.resistBonus)||0):0;
+    const positive=teamBuff
+        ?Math.max(0,Number(teamBuff.amount)||0)
+        :(directBuff?Math.max(0,Number(directBuff.resistBonus)||0):0);
+    return positive-getFrostbiteFinalPercentPointPenalty(monster);
 }
 
 function rollNamedPersistentStatusEffect(
@@ -14960,7 +14908,7 @@ function applySkillDebuffEffects(
     monster,
     index,
     casterLevel,
-    casterIntelligence
+    casterOffensiveAttribute
 ){
 
     if(!monster||!monster.alive){
@@ -14976,7 +14924,7 @@ function applySkillDebuffEffects(
         const hit=rollNamedPersistentStatusEffect(
             monster,"agilityDown",[
                 skill.agilityDownChance,casterLevel,monster.level,
-                casterIntelligence,getMonsterEffectiveSpiritPoints(monster)
+                casterOffensiveAttribute,getMonsterEffectiveSpiritPoints(monster)
             ],"monster",index,skill.name
         ).hit;
 
@@ -15012,7 +14960,7 @@ function applySkillDebuffEffects(
         const hit=rollNamedPersistentStatusEffect(
             monster,"statDown",[
                 skill.statDownChance,casterLevel,monster.level,
-                casterIntelligence,getMonsterEffectiveSpiritPoints(monster)
+                casterOffensiveAttribute,getMonsterEffectiveSpiritPoints(monster)
             ],"monster",index,skill.name
         ).hit;
 
@@ -15049,7 +14997,7 @@ function applySkillDebuffEffects(
         const hit=rollNamedPersistentStatusEffect(
             monster,"damageDown",[
                 skill.damageDownChance,casterLevel,monster.level,
-                casterIntelligence,getMonsterEffectiveSpiritPoints(monster)
+                casterOffensiveAttribute,getMonsterEffectiveSpiritPoints(monster)
             ],"monster",index,skill.name
         ).hit;
 
@@ -15085,7 +15033,7 @@ function applySkillDebuffEffects(
         const hit=rollNamedPersistentStatusEffect(
             monster,"defenseDown",[
                 skill.defenseDownChance,casterLevel,monster.level,
-                casterIntelligence,getMonsterEffectiveSpiritPoints(monster)
+                casterOffensiveAttribute,getMonsterEffectiveSpiritPoints(monster)
             ],"monster",index,skill.name
         ).hit;
 
@@ -15121,7 +15069,7 @@ function applySkillDebuffEffects(
         const hit=rollNamedPersistentStatusEffect(
             monster,"stun",[
                 skill.stunChance,casterLevel,monster.level,
-                casterIntelligence,getMonsterEffectiveSpiritPoints(monster)
+                casterOffensiveAttribute,getMonsterEffectiveSpiritPoints(monster)
             ],"monster",index,skill.name
         ).hit;
 
@@ -15161,7 +15109,7 @@ function applySkillDebuffEffects(
 
         const hit=rollNamedPersistentStatusEffect(
             monster,"petrify",[
-                chance,casterLevel,monster.level,casterIntelligence,
+                chance,casterLevel,monster.level,casterOffensiveAttribute,
                 getMonsterEffectiveSpiritPoints(monster),true,getMonsterRank(monster)
             ],"monster",index,skill.name
         ).hit;
@@ -15242,7 +15190,7 @@ function applySkillDebuffEffectsToPlayer(
     targetCharacter,
     targetIndex,
     casterLevel,
-    casterIntelligence
+    casterOffensiveAttribute
 ){
 
     if(
@@ -15272,7 +15220,7 @@ function applySkillDebuffEffectsToPlayer(
         const hit=rollNamedPersistentStatusEffect(
             targetCharacter,"agilityDown",[
                 skill.agilityDownChance,casterLevel,targetCharacter.level,
-                casterIntelligence,targetFinalSpirit,false,"regular",
+                casterOffensiveAttribute,targetFinalSpirit,false,"regular",
                 getPlayerStatusResistBonus(targetCharacter)
             ],"player",targetIndex,skill.name
         ).hit;
@@ -15308,7 +15256,7 @@ function applySkillDebuffEffectsToPlayer(
         const hit=rollNamedPersistentStatusEffect(
             targetCharacter,"statDown",[
                 skill.statDownChance,casterLevel,targetCharacter.level,
-                casterIntelligence,targetFinalSpirit,false,"regular",
+                casterOffensiveAttribute,targetFinalSpirit,false,"regular",
                 getPlayerStatusResistBonus(targetCharacter)
             ],"player",targetIndex,skill.name
         ).hit;
@@ -15345,7 +15293,7 @@ function applySkillDebuffEffectsToPlayer(
         const hit=rollNamedPersistentStatusEffect(
             targetCharacter,"damageDown",[
                 skill.damageDownChance,casterLevel,targetCharacter.level,
-                casterIntelligence,targetFinalSpirit,false,"regular",
+                casterOffensiveAttribute,targetFinalSpirit,false,"regular",
                 getPlayerStatusResistBonus(targetCharacter)
             ],"player",targetIndex,skill.name
         ).hit;
@@ -15381,7 +15329,7 @@ function applySkillDebuffEffectsToPlayer(
         const hit=rollNamedPersistentStatusEffect(
             targetCharacter,"defenseDown",[
                 skill.defenseDownChance,casterLevel,targetCharacter.level,
-                casterIntelligence,targetFinalSpirit,false,"regular",
+                casterOffensiveAttribute,targetFinalSpirit,false,"regular",
                 getPlayerStatusResistBonus(targetCharacter)
             ],"player",targetIndex,skill.name
         ).hit;
@@ -15417,7 +15365,7 @@ function applySkillDebuffEffectsToPlayer(
         const hit=rollNamedPersistentStatusEffect(
             targetCharacter,"stun",[
                 skill.stunChance,casterLevel,targetCharacter.level,
-                casterIntelligence,targetFinalSpirit,false,"regular",
+                casterOffensiveAttribute,targetFinalSpirit,false,"regular",
                 getPlayerStatusResistBonus(targetCharacter)
             ],"player",targetIndex,skill.name
         ).hit;
@@ -15450,7 +15398,7 @@ function applySkillDebuffEffectsToPlayer(
         const hit=rollNamedPersistentStatusEffect(
             targetCharacter,"freeze",[
                 skill.freezeChance,casterLevel,targetCharacter.level,
-                casterIntelligence,targetFinalSpirit,true,"player",
+                casterOffensiveAttribute,targetFinalSpirit,true,"player",
                 getPlayerStatusResistBonus(targetCharacter)
             ],"player",targetIndex,skill.name
         ).hit;
@@ -15481,7 +15429,7 @@ function applySkillDebuffEffectsToPlayer(
 
         const hit=rollNamedPersistentStatusEffect(
             targetCharacter,"petrify",[
-                chance,casterLevel,targetCharacter.level,casterIntelligence,
+                chance,casterLevel,targetCharacter.level,casterOffensiveAttribute,
                 targetFinalSpirit,true,"player",getPlayerStatusResistBonus(targetCharacter)
             ],"player",targetIndex,skill.name
         ).hit;
@@ -15525,7 +15473,7 @@ function applySkillDebuffEffectsToPlayer(
         const burnHit=rollNamedPersistentStatusEffect(
             targetCharacter,"burn",[
                 skill.burnChance,casterLevel,targetCharacter.level,
-                casterIntelligence,targetFinalSpirit,false,"regular",
+                casterOffensiveAttribute,targetFinalSpirit,false,"regular",
                 getPlayerStatusResistBonus(targetCharacter)
             ],"player",targetIndex,skill.name,skill.guaranteedBurn===true
         ).hit;
@@ -16516,7 +16464,8 @@ function castDamageSkill(skillId){
                 getMonsterDebuffValue(
                     player,
                     "stun"
-                )
+                ),
+                getActiveAccuracyBonusPercent(player)
             );
 
 
@@ -16711,7 +16660,7 @@ function castDamageSkill(skillId){
             monster,
             index,
             player.level,
-            stats.intelligence
+            skill.category==="physical"?stats.attackPoints:stats.intelligence
         );
 
 
@@ -17621,10 +17570,11 @@ function normalAttack(){
                 monster
             ),
             getMonsterDebuffValue(
-                player,
-                "stun"
-            )
-        );
+                    player,
+                    "stun"
+                ),
+                getActiveAccuracyBonusPercent(player)
+            );
 
 
     if(!hit){
@@ -18472,7 +18422,8 @@ function processSingleMonsterAttack(monsterIndex,token){
                     getMonsterDebuffValue(
                         monster,
                         "stun"
-                    )
+                    ),
+                    getActiveAccuracyBonusPercent(monster)
                 );
 
 
@@ -18832,7 +18783,10 @@ function processSingleMonsterAttack(monsterIndex,token){
                     targetCharacter,
                     targetIndex,
                     monster.level,
-                    getMonsterEffectiveAbilityPoints(monster,"intelligence")
+                    getMonsterEffectiveAbilityPoints(
+                        monster,
+                        castSkillData.category==="physical"?"attack":"intelligence"
+                    )
                 );
 
             }
@@ -22039,7 +21993,8 @@ function secondaryCharacterNormalAttack(characterIndex,index){
     const hit=rollHitChance(
         stats.accuracy,
         getMonsterEvasion(monster),
-        getMonsterDebuffValue(character,"stun")
+        getMonsterDebuffValue(character,"stun"),
+        getActiveAccuracyBonusPercent(character)
     );
 
     if(!hit){
@@ -22186,8 +22141,9 @@ function castSecondaryCharacterSkill(characterIndex,skillId,centerIndex){
         const hit=rollHitChance(
             stats.accuracy,
             getMonsterEvasion(monster),
-            getMonsterDebuffValue(character,"stun")
-        );
+            getMonsterDebuffValue(character,"stun"),
+        getActiveAccuracyBonusPercent(character)
+    );
 
         if(!hit){
             showMissEffect(false,index,"MISS");
@@ -22262,7 +22218,8 @@ function castSecondaryCharacterSkill(characterIndex,skillId,centerIndex){
         }
 
         applySkillDebuffEffects(
-            skill,level,monster,index,character.level,stats.intelligence
+            skill,level,monster,index,character.level,
+            skill.category==="physical"?stats.attackPoints:stats.intelligence
         );
 
         if(skill.lifestealPercentByLevel){ totalLifesteal+=actualDamageDealt; }
@@ -22385,10 +22342,11 @@ function player2NormalAttack(index){
                 monster
             ),
             getMonsterDebuffValue(
-                player2,
-                "stun"
-            )
-        );
+                    player2,
+                    "stun"
+                ),
+                getActiveAccuracyBonusPercent(player2)
+            );
 
 
     if(!hit){
@@ -22803,7 +22761,8 @@ function castPlayer2Skill(skillId,centerIndex){
                 getMonsterDebuffValue(
                     player2,
                     "stun"
-                )
+                ),
+                getActiveAccuracyBonusPercent(player2)
             );
 
 
@@ -22980,7 +22939,7 @@ function castPlayer2Skill(skillId,centerIndex){
             monster,
             index,
             player2.level,
-            stats2.intelligence
+            skill.category==="physical"?stats2.attackPoints:stats2.intelligence
         );
 
 
@@ -33105,11 +33064,12 @@ function setBattleInfoExpanded(expanded){
 
 }
 
-function clampBattleInfoHandleRight(toggle,page,value){
-    const pageWidth=Math.max(1,Number(page&&page.clientWidth)||420);
-    const handleWidth=Math.max(1,Number(toggle&&toggle.offsetWidth)||96);
+function clampBattleInfoHandleRight(value,pageWidth,handleWidth){
     const minRight=4;
-    const maxRight=Math.max(minRight,pageWidth-handleWidth-4);
+    const maxRight=Math.max(
+        minRight,
+        Math.max(1,Number(pageWidth)||420)-Math.max(1,Number(handleWidth)||96)-4
+    );
     return Math.max(minRight,Math.min(maxRight,Number(value)||minRight));
 }
 
@@ -33118,46 +33078,97 @@ function installBattleInfoHandleDrag(){
     const page=$("battlePage");
     if(!toggle||!page||toggle.__battleInfoHandleDragInstalled){ return; }
     toggle.__battleInfoHandleDragInstalled=true;
+
     let drag=null;
+
+    function paintDrag(){
+        if(!drag){ return; }
+        drag.frameId=null;
+        const translateX=drag.startRight-drag.pendingRight;
+        toggle.style.transform="translate3d("+translateX+"px,0,0)";
+    }
+
+    function schedulePaint(){
+        if(!drag||drag.frameId!==null){ return; }
+        drag.frameId=requestAnimationFrame(paintDrag);
+    }
 
     function finishDrag(event){
         if(!drag){ return; }
-        if(event&&event.pointerId!==undefined&&drag.pointerId!==undefined&&event.pointerId!==drag.pointerId){ return; }
-        const moved=drag.moved;
+        if(
+            event&&event.pointerId!==undefined&&
+            drag.pointerId!==undefined&&
+            event.pointerId!==drag.pointerId
+        ){ return; }
+
+        const state=drag;
         drag=null;
+
+        if(state.frameId!==null&&typeof cancelAnimationFrame==="function"){
+            cancelAnimationFrame(state.frameId);
+        }
+
+        toggle.style.transform="none";
+        toggle.style.right=state.pendingRight+"px";
         toggle.classList.remove("is-dragging");
-        if(moved){
+
+        if(state.moved){
+            /* The click generated by this pointer sequence is consumed once
+               by toggleBattleInfoPanel(); no timer/polling reset is needed. */
             toggle.__suppressNextBattleInfoClick=true;
-            setTimeout(()=>{ toggle.__suppressNextBattleInfoClick=false; },0);
         }
     }
 
     toggle.addEventListener("pointerdown",event=>{
         if(event.button!==undefined&&event.button!==0){ return; }
-        const rect=page.getBoundingClientRect();
-        const pageWidth=Math.max(1,Number(page.clientWidth)||rect.width||420);
+
+        /* Layout is measured exactly once at drag start. */
+        const pageRect=page.getBoundingClientRect();
+        const toggleRect=toggle.getBoundingClientRect();
+        const pageWidth=Math.max(1,Number(page.clientWidth)||pageRect.width||420);
+        const handleWidth=Math.max(1,Number(toggle.offsetWidth)||toggleRect.width||96);
         const computedRight=parseFloat(getComputedStyle(toggle).right);
+        const startRight=clampBattleInfoHandleRight(
+            Number.isFinite(computedRight)?computedRight:4,
+            pageWidth,
+            handleWidth
+        );
+
         drag={
             pointerId:event.pointerId,
             startClientX:Number(event.clientX)||0,
-            startRight:clampBattleInfoHandleRight(toggle,page,Number.isFinite(computedRight)?computedRight:4),
-            scaleX:rect.width>0?pageWidth/rect.width:1,
-            moved:false
+            startRight:startRight,
+            pendingRight:startRight,
+            pageWidth:pageWidth,
+            handleWidth:handleWidth,
+            scaleX:pageRect.width>0?pageWidth/pageRect.width:1,
+            moved:false,
+            frameId:null
         };
+
         toggle.classList.add("is-dragging");
         if(typeof toggle.setPointerCapture==="function"&&event.pointerId!==undefined){
             try{ toggle.setPointerCapture(event.pointerId); }catch(_){ }
         }
         event.preventDefault();
     });
+
     toggle.addEventListener("pointermove",event=>{
         if(!drag||event.pointerId!==drag.pointerId){ return; }
+
         const delta=((Number(event.clientX)||0)-drag.startClientX)*drag.scaleX;
         if(!drag.moved&&Math.abs(delta)>=3){ drag.moved=true; }
         if(!drag.moved){ return; }
-        toggle.style.right=clampBattleInfoHandleRight(toggle,page,drag.startRight-delta)+"px";
+
+        drag.pendingRight=clampBattleInfoHandleRight(
+            drag.startRight-delta,
+            drag.pageWidth,
+            drag.handleWidth
+        );
+        schedulePaint();
         event.preventDefault();
     });
+
     toggle.addEventListener("pointerup",finishDrag);
     toggle.addEventListener("pointercancel",finishDrag);
 }
