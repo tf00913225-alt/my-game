@@ -20,6 +20,9 @@ const V_ASSET_VERSION="173.71";
         {pattern:/battle/i,feature:"battle",label:"戰鬥"}
     ];
     function target(event){ return event.target&&event.target.closest&&event.target.closest("button,a,[data-feature]"); }
+    function isBattleRuntimeInteraction(element){
+        return !!(element&&element.closest&&element.closest("#battlePage"));
+    }
     function isExpPoolInteraction(element){
         return !!(element&&element.closest&&element.closest("#homeExpPoolCard"));
     }
@@ -81,11 +84,13 @@ const V_ASSET_VERSION="173.71";
         }).finally(()=>{ expPoolPrimePromise=null; });
     }
     function prefetch(event){
-        const element=target(event); const info=descriptor(element); const api=loader();
+        const element=target(event); if(isBattleRuntimeInteraction(element)){ return; }
+        const info=descriptor(element); const api=loader();
         if(info&&api&&!api.isReady(info.feature)){ void api.prefetch(info.feature,event.type); }
     }
     function enter(event){
-        const element=target(event); const info=descriptor(element); const api=loader();
+        const element=target(event); if(isBattleRuntimeInteraction(element)){ return; }
+        const info=descriptor(element); const api=loader();
         if(!info||!api||api.isReady(info.feature)||element.dataset.featureReplay==="1"){ return; }
         event.preventDefault(); event.stopImmediatePropagation();
         if(element.dataset.featureLoading==="1"){ return; }
