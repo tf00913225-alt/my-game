@@ -537,7 +537,7 @@
     box-shadow:0 0 0 2px rgba(42,27,10,.8),0 0 12px rgba(245,207,114,.9) !important;
     transform:translate(-50%,-50%) !important;
     pointer-events:none !important;
-    animation:v174TargetReticlePulse .72s ease-in-out infinite alternate !important;
+    animation:none !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn > .v174-battle-art,
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.target > .v174-battle-art{
