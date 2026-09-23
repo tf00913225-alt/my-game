@@ -156,55 +156,16 @@
     }
     patchSkillData();
 
-    /* 舊預覽仍會自行補上智力係數與「施放者不回SP」文字；本次治療術
-       已改為明確固定值，因此詳細頁也必須使用同一份最終規格。 */
-    if(typeof getSkillEffectPreviewText==="function"){
-        const previousSkillEffectPreview=getSkillEffectPreviewText;
-        getSkillEffectPreviewText=function(skill,level){
-            if(skill&&skill.id==="healSpell"){
-                const lv=Math.max(1,Math.min(5,Math.floor(numeric(level)||1)));
-                return "我方全體回復 "+(350+30*(lv-1))+" HP、"+(35+30*(lv-1))+" SP";
-            }
-            if(skill&&skill.id==="dinghaishenzhen"){
-                return "我方全體異常狀態抗性 +65%、命中 +50%，持續3回合";
-            }
-            return previousSkillEffectPreview.apply(this,arguments);
-        };
-    }
-
-    if(typeof buildSkillLevelBreakdownHTML==="function"){
-        const previousSkillLevelBreakdown=buildSkillLevelBreakdownHTML;
-        buildSkillLevelBreakdownHTML=function(skill){
-            if(skill&&skill.id==="healSpell"){
-                return Array.from({length:5},(_,index)=>{
-                    const level=index+1;
-                    return '<div style="display:flex;gap:6px;padding:3px 0;border-bottom:1px solid rgba(240,180,41,.12);"><span style="flex:0 0 40px;color:#f0b429;font-weight:bold;">Lv.'+level+'</span><span style="flex:1;">我方全體回復 '+(350+30*index)+' HP、'+(35+30*index)+' SP</span></div>';
-                }).join("");
-            }
-            if(skill&&skill.id==="dinghaishenzhen"){
-                return '<div style="display:flex;gap:6px;padding:3px 0;border-bottom:1px solid rgba(240,180,41,.12);"><span style="flex:0 0 40px;color:#f0b429;font-weight:bold;">Lv.1</span><span style="flex:1;">我方全體異常狀態抗性 +65%、命中 +50%，持續3回合</span></div>';
-            }
-            return previousSkillLevelBreakdown.apply(this,arguments);
-        };
-    }
-
-    if(typeof getSkillPreviewSummary==="function"){
-        const previousSkillPreviewSummary=getSkillPreviewSummary;
-        getSkillPreviewSummary=function(skill){
-            if(skill&&skill.id==="dinghaishenzhen"){
-                return "支援我方全體；提升異常狀態抗性與命中。";
-            }
-            return previousSkillPreviewSummary.apply(this,arguments);
-        };
-    }
+    /* Player-facing skill text is owned by FourSymbolsSkillSpec after the
+       gameplay bundle finishes loading. V144 no longer overrides previews. */
 
     /* 氣定神閒的命中提升要進入實際戰鬥能力，而不只停在描述。 */
     function accuracyMultiplier(character){
         if(!character||!Array.isArray(character.activeBuffs)){ return 1; }
-        const active=character.activeBuffs.some(buff=>
+        const active=character.activeBuffs.find(buff=>
             buff&&buff.type==="dinghaishenzhen"&&numeric(buff.turnsLeft)>0
         );
-        return active?1+(numeric(skillDatabase.dinghaishenzhen&&skillDatabase.dinghaishenzhen.accuracyBonusPercent)||50)/100:1;
+        return active?1+Math.max(0,numeric(active.accuracyBonusPercent))/100:1;
     }
 
     function wrapAccuracyStats(name,characterFromArgs){
