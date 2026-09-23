@@ -30,6 +30,39 @@
         return Number.isInteger(value)?value:0;
     }
     let selectedIndex=readSelection();
+    const decodedSources=new Set();
+    const decodePromises=new Map();
+    let artApplyGeneration=0;
+
+    function decodeSource(source){
+        if(!source){ return Promise.resolve(false); }
+        if(decodedSources.has(source)){ return Promise.resolve(true); }
+        if(decodePromises.has(source)){ return decodePromises.get(source); }
+        const promise=new Promise(resolve=>{
+            const probe=new Image();
+            probe.decoding="async";
+            const done=ok=>{
+                if(ok){ decodedSources.add(source); }
+                resolve(ok);
+            };
+            probe.addEventListener("load",()=>done(true),{once:true});
+            probe.addEventListener("error",()=>done(false),{once:true});
+            probe.src=source;
+            if(typeof probe.decode==="function"){
+                probe.decode().then(()=>done(true)).catch(()=>{});
+            }
+        }).finally(()=>decodePromises.delete(source));
+        decodePromises.set(source,promise);
+        return promise;
+    }
+
+    function preloadCharacterArt(character){
+        if(!character){ return Promise.resolve(false); }
+        return Promise.all([
+            decodeSource(artFor(character,"front")),
+            decodeSource(artFor(character,"back"))
+        ]).then(results=>results.every(Boolean));
+    }
 
     function indexes(){
         if(typeof getExistingPartyIndexes==="function"){
@@ -59,13 +92,30 @@
         const character=getCharacter(index);
         if(!character){ return; }
         const facing=facingBack?"back":"front";
-        image.classList.add("v131-patrol-q-art");
-        image.style.removeProperty("width");
-        image.style.removeProperty("height");
-        image.src=artFor(character,facing);
-        image.alt=(character.id||("角色"+(index+1)))+"巡怪形象";
-        image.dataset.v131PatrolCharacter=String(index);
-        image.dataset.v131Facing=facing;
+        const source=artFor(character,facing);
+        const generation=++artApplyGeneration;
+        const reveal=()=>{
+            if(generation!==artApplyGeneration){ return; }
+            image.classList.add("v131-patrol-q-art");
+            image.style.removeProperty("width");
+            image.style.removeProperty("height");
+            image.src=source;
+            image.alt=(character.id||("角色"+(index+1)))+"巡怪形象";
+            image.dataset.v131PatrolCharacter=String(index);
+            image.dataset.v131Facing=facing;
+            image.dataset.v131PatrolReady="1";
+            image.style.visibility="visible";
+        };
+
+        if(decodedSources.has(source)){
+            reveal();
+            return;
+        }
+
+        image.style.visibility="hidden";
+        decodeSource(source).then(ok=>{
+            if(ok){ reveal(); }
+        });
     }
     window.v131ApplyPatrolArt=applyPatrolArt;
 
@@ -135,6 +185,11 @@
             return result;
         };
     }
-    function boot(){ normalize(); installSwitcher(); applyPatrolArt(false); }
+    function boot(){
+        normalize();
+        installSwitcher();
+        const character=getCharacter(selectedIndex);
+        preloadCharacterArt(character).finally(()=>applyPatrolArt(false));
+    }
     if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",boot,{once:true}); }else{ boot(); }
 })();
