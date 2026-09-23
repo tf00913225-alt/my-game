@@ -1,0 +1,58 @@
+name: TEMP V173.72 Full Node Suite
+
+on:
+  push:
+    branches:
+      - fix/v17372-stale-battle-status-tests-20260923
+
+permissions:
+  contents: read
+
+jobs:
+  full-node:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/v17372-stale-battle-status-tests-20260923
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Install existing asset-test dependency
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends imagemagick
+      - name: Run every Node suite and collect all failures
+        run: |
+          node <<'NODE'
+          const fs=require("fs");
+          const path=require("path");
+          const {spawnSync}=require("child_process");
+          const files=[];
+          function walk(dir){
+            for(const entry of fs.readdirSync(dir,{withFileTypes:true})){
+              const full=path.join(dir,entry.name);
+              if(entry.isDirectory()) walk(full);
+              else if(/\.test\.(?:js|cjs|mjs)$/.test(entry.name)) files.push(full.split(path.sep).join("/"));
+            }
+          }
+          walk("tests");
+          files.sort();
+          let passed=0;
+          const failures=[];
+          for(const file of files){
+            const result=spawnSync(process.execPath,[file],{stdio:"inherit"});
+            if(result.status!==0){
+              console.error("FAILED:",file);
+              failures.push(file);
+              continue;
+            }
+            passed++;
+          }
+          console.log("PASS:",passed,"of",files.length,"Node suites");
+          if(failures.length){
+            console.error("FAILURE SUITES:",failures.join(", "));
+            process.exit(1);
+          }
+          NODE
