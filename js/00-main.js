@@ -2972,6 +2972,25 @@ function rollBeginnerForestNormalAttackDamage(){
         );
 }
 
+/* =====================================================
+   怪物預設閃躲唯一 Owner
+   forestMonsters / desertMonsters 等區域 roster 會在 App Shell 頂層
+   立即呼叫 makeZoneMonster()，因此常數必須在第一個 roster 建立前
+   完成初始化。正式值：level×0.1%，最高10%。
+===================================================== */
+const DEFAULT_MONSTER_EVASION_PER_LEVEL = 0.1;
+const DEFAULT_MONSTER_EVASION_CAP = 10;
+
+function getDefaultMonsterEvasion(level){
+    return Math.min(
+        DEFAULT_MONSTER_EVASION_CAP,
+        Math.max(0,Number(level)||0)*DEFAULT_MONSTER_EVASION_PER_LEVEL
+    );
+}
+
+window.v173GetDefaultMonsterEvasion=getDefaultMonsterEvasion;
+
+
 const forestMonsters = [
 
     makeZoneMonster("哥布林",3,"fire"),
@@ -3086,7 +3105,7 @@ const iceMountainMonsters = [
    法術攻擊  = 10  + 智力×8
    命中 = 精神×2
    一般異常抗性 = 精神×0.05（百分點）
-   預設閃避 = min(30%, 等級×0.3%)
+   預設閃避 = min(10%, 等級×0.1%)
    速度(行動順序用) = 敏捷（原始點數，不額外乘）
 */
 
@@ -3347,24 +3366,6 @@ function getMonsterSkillPoolForLevel(
         });
 
 }
-
-
-/* =====================================================
-   怪物預設閃躲唯一 Owner
-   必須在頂層建立 zone monster 之前完成初始化，避免早期 App Shell
-   建怪時讀到後置 const 的 TDZ。正式值：level×0.1%，最高10%。
-===================================================== */
-const DEFAULT_MONSTER_EVASION_PER_LEVEL = 0.1;
-const DEFAULT_MONSTER_EVASION_CAP = 10;
-
-function getDefaultMonsterEvasion(level){
-    return Math.min(
-        DEFAULT_MONSTER_EVASION_CAP,
-        Math.max(0,Number(level)||0)*DEFAULT_MONSTER_EVASION_PER_LEVEL
-    );
-}
-
-window.v173GetDefaultMonsterEvasion=getDefaultMonsterEvasion;
 
 
 function makeZoneMonster(
