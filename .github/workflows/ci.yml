@@ -208,6 +208,7 @@ jobs:
             artifacts/browser-qa/battle-layer-audio-live-qa.json
             artifacts/browser-qa/battle-layout-wind-flame-mobile.png
             artifacts/browser-qa/battle-layer-element-box-mobile.png
+            artifacts/browser-qa/battle-result-modal-mobile.png
             artifacts/browser-qa/boss-target-entity-live-412x915.png
           if-no-files-found: error
           retention-days: 90
