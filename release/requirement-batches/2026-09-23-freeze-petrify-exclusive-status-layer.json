@@ -74,9 +74,9 @@
     }
   ],
   "verification": {
-    "focusedTests": "PENDING — GitHub Actions PR checks",
-    "build": "PENDING — GitHub Actions PR checks",
-    "repositoryChecks": "PENDING — GitHub Actions PR checks",
-    "diffCheck": "PENDING — GitHub Actions PR checks"
+    "focusedTests": "PASS — CI run 35820871917 completed all targeted and full Node/integration suites before build synchronization.",
+    "build": "SYNCED — deterministic production build committed as cd04433925b5925aba4678bce366515aeb16739c; fresh PR CI pending.",
+    "repositoryChecks": "PENDING — fresh PR CI after build synchronization.",
+    "diffCheck": "PENDING — fresh PR CI after build synchronization."
   }
 }
