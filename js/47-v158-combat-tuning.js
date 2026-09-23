@@ -368,6 +368,14 @@
 
     window.v158CastTriFreeze=castTriFreeze;
 
+    if(typeof castDamageSkill==="function"){
+        const previousCastDamageSkill=castDamageSkill;
+        castDamageSkill=function(skillId,centerIndex){
+            if(skillId==="freeze"&&castTriFreeze(0,skillId,centerIndex,false)){ return; }
+            return previousCastDamageSkill.apply(this,arguments);
+        };
+    }
+
     if(typeof castSecondaryCharacterSkill==="function"){
         const previousCastSecondaryCharacterSkill=castSecondaryCharacterSkill;
         castSecondaryCharacterSkill=function(characterIndex,skillId,centerIndex){
