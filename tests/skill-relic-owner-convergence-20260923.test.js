@@ -120,15 +120,14 @@ test("formal skill owner is part of gameplay-core and owns player-facing project
   assert.doesNotMatch(water,/buildWaterSkillLevelBreakdown|waterSupportEffectText/);
 });
 
-test("Team Relic runtime is a pre-battle feature dependency, not a Boss-only side effect",()=>{
-  assert.match(build,/const relicRuntimeScripts=\["js\/60-team-relic-system\.js"\]/);
-  assert.match(build,/relicRuntime:target\("feature-relic-runtime"/);
+test("Team Relic runtime is guaranteed by gameplay-core, not a Boss-only side effect",()=>{
+  assert.match(build,/gameplayScripts=\[[\s\S]*?"js\/60-v173\.64-skill-progression-rebalance\.js",[\s\S]*?"js\/60-team-relic-system\.js"/);
+  assert.match(build,/gameplayStyles=\[[\s\S]*?"css\/55-team-relic-system\.css"/);
   assert.match(build,/const bossRelicScripts=\["js\/gameplay-boss-tower-system\.js"\]/);
-  assert.ok(manifest.bundles["feature-relic-runtime"]);
-  assert.deepEqual(manifest.bundles["feature-relic-runtime"].dependencies,["gameplay-core"]);
-  assert.equal(manifest.features.battle,"feature-relic-runtime");
+  assert.doesNotMatch(build,/feature-relic-runtime|relicRuntime:target/);
+  assert.equal(manifest.features.battle,"gameplay-core");
   ["feature-patrol","feature-abyss","feature-adventure","feature-boss-relic"].forEach(name=>
-    assert.ok(manifest.bundles[name].dependencies.includes("feature-relic-runtime"),name)
+    assert.ok(manifest.bundles[name].dependencies.includes("gameplay-core"),name)
   );
 });
 
