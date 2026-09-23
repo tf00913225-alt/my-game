@@ -15,9 +15,6 @@
     --battle-ally-region-track:42fr;
     --battle-info-panel-height:150px;
     --battle-info-handle-height:34px;
-    --battle-command-row-height:66px;
-    --battle-command-art-overhang:34px;
-    --battle-command-visual-height:calc(var(--battle-command-row-height) + var(--battle-command-art-overhang));
     --battle-region-gap:4px;
     --battle-title-height:20px;
     --battle-enemy-zone-height:100%;
@@ -45,7 +42,7 @@
     display:grid !important;
     grid-template-rows:
         minmax(0,var(--battle-enemy-region-track))
-        minmax(0,var(--battle-center-region-track))
+        minmax(var(--battle-center-min-height),var(--battle-center-region-track))
         minmax(0,var(--battle-ally-region-track)) !important;
     gap:var(--battle-region-gap) !important;
     min-height:0 !important;
@@ -97,12 +94,12 @@
     right:0;
     bottom:var(--battle-command-visual-height);
     align-self:center;
-    flex:0 0 36px;
+    flex:0 0 var(--battle-turn-row-height);
     width:max-content;
     min-width:112px;
-    height:36px;
-    min-height:36px;
-    max-height:36px;
+    height:var(--battle-turn-row-height);
+    min-height:var(--battle-turn-row-height);
+    max-height:var(--battle-turn-row-height);
     margin:0 auto;
     opacity:1;
     transform:none !important;
