@@ -18,5 +18,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: lts/*
+      - name: Install existing asset-test dependency
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends imagemagick
       - name: Run complete Node unit and integration suite
         run: node .github/scripts/ci.mjs tests
