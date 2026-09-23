@@ -11,8 +11,9 @@ const css=fs.readFileSync("css/55-team-relic-system.css","utf8");
 const build=fs.readFileSync("scripts/build-production.mjs","utf8");
 const manifest=JSON.parse(fs.readFileSync("asset-manifest.json","utf8"));
 
-assert.match(build,/const bossRelicScripts=\["js\/gameplay-boss-tower-system\.js","js\/60-team-relic-system\.js"\]/);
-assert.match(build,/"css\/55-team-relic-system\.css"/);
+assert.match(build,/const relicRuntimeScripts=\["js\/60-team-relic-system\.js"\]/);
+assert.match(build,/const bossRelicScripts=\["js\/gameplay-boss-tower-system\.js"\]/);
+assert.match(build,/const relicRuntimeStyles=\["css\/55-team-relic-system\.css"\]/);
 assert.match(build,/const abyssScripts=\["js\/59-abyss-two-tier-runtime\.js"\]/);
 assert.equal(manifest.featureManifest.features.relic,"feature-boss-relic");
 assert.equal(manifest.featureManifest.features["boss-tower"],"feature-boss-relic");
