@@ -10,6 +10,7 @@
 8. **凡涉及新增、替換、轉檔或正式導入任何點陣圖片資產，必須先完整閱讀 `docs/IMAGE_ASSET_SPEC.md`。該文件是圖片格式、WebP 轉換、無損驗證、透明度、尺寸、Sprite Sheet／VFX 幀資料與正式引用流程的最高權威來源。**
 9. **凡屬修復、fix、failure、test failure、CI failure、fixture、test harness、stale contract 或既有修復分支續修任務，若使用者未在當次任務另行指定不同模式，必須先完整閱讀根目錄 `AUTONOMOUS_REPAIR_CONTRACT.md`，並以該文件作為受控自主修復的唯一正式契約來源；不得依舊對話摘要自行擴張授權。**
 10. **凡涉及怪物／精英／BOSS／日常副本／天兵立繪導入，必須先讀 `MONSTER_PORTRAIT_SPEC.md` 與 `docs/MONSTER_PORTRAIT_SPEC_V1.md`。若素材已經生成並完成正式 WebP 落位，預設使用 `npm run portrait:import -- --keys=<portraitKey,...>` 快速導入；不得為已完成素材重新建立生成 batch、重跑生成或重做母圖搜尋。尚未生成的素材才使用既有 batch 流程。**
+11. **Boss 術語永久統一：`大 Boss` 僅指世界 Boss、個人 Boss；`小 Boss` 指深淵等一般首領，例如五帝天尊。`大／小` 只表示立繪／資產尺寸分類，不表示戰力、難度、稀有度、劇情地位或玩法階級。涉及立繪、需求、PR、文件與回報時，禁止把兩者混稱；單寫 `Boss` 而尺寸語意重要時，必須改寫為 `大 Boss` 或 `小 Boss`。既有程式 ID、路徑或 legacy 名稱不得只為術語統一而無必要重命名。**
 
 ## 《四象江湖傳》專案開發、QA 與外部研究固定規則
 
