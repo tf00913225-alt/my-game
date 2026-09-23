@@ -773,13 +773,13 @@
         }
         if(type==="frostbite"){ return "傷害 -25%、最終閃躲 -25個百分點、最終異常狀態抗性 -25個百分點"; }
         if(type==="freeze"){ return "無法行動"; }
-        if(type==="agilityDown"){ return "敏捷降低 "+value+"%"; }
+        if(type==="agilityDown"){ return "敏捷降低 "+value+"%、最終閃躲降低 "+value+"個百分點"; }
         if(type==="damageDown"){ return "造成傷害降低 "+value+"%"; }
-        if(type==="stun"){ return "最終命中率降低 "+value+"%"; }
+        if(type==="stun"){ return "最終命中率降低 "+value+"個百分點"; }
         if(type==="dodgeSkill"){
             const percent=statusPercent(entry,"percent","bonusPercent")||
                 Number(typeof skillDatabase!=="undefined"&&skillDatabase.dodgeSkill&&skillDatabase.dodgeSkill.evasionBonusPercent)||0;
-            return "閃躲率提升 "+percent+"%";
+            return "最終閃躲提升 "+percent+"個百分點";
         }
         if(type==="stealthSkill"){ return "無法被單體技能選中，仍會受到範圍技能"; }
         if(type==="dinghaishenzhen"){
@@ -788,8 +788,8 @@
             const accuracy=Number(entry&&entry.accuracyBonusPercent)||
                 Number(typeof skillDatabase!=="undefined"&&skillDatabase.dinghaishenzhen&&skillDatabase.dinghaishenzhen.accuracyBonusPercent)||0;
             const parts=[];
-            if(resist){ parts.push("異常狀態抗性 +"+resist+"%"); }
-            if(accuracy){ parts.push("命中率 +"+accuracy+"%"); }
+            if(resist){ parts.push("最終異常狀態抗性 +"+resist+"個百分點"); }
+            if(accuracy){ parts.push("最終命中率 +"+accuracy+"個百分點"); }
             return parts.join("、")||"異常狀態抗性提升";
         }
         if(type==="defenseDown"){ return "防禦降低 "+value+"%"; }
@@ -815,7 +815,7 @@
         if(type==="yuanZuBlessing"){
             const percent=statusPercent(entry,"bonusPercent","evasionBonusPercent")||
                 Number(typeof skillDatabase!=="undefined"&&skillDatabase.yuanZuBlessing&&skillDatabase.yuanZuBlessing.evasionBonusPercent)||0;
-            return "閃躲率提升 "+percent+"%";
+            return "最終閃躲提升 "+percent+"個百分點";
         }
         if(type==="fireMomentum"){
             const percent=Number(entry&&entry.bonusPercent)||0;
