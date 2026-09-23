@@ -209,20 +209,17 @@ test("learning milestones use the selected character own level, prerequisites an
     resetForLearn(r,"player2",10); r.loadouts.player2.skillLevels.healSpell=1; assert.equal(r.context.learnSkill("revive"),false,"第二角色不能借第一角色等級");
 });
 
-test("five-level upgrades require both character境界 and increasing point cost",()=>{
+test("Lv10 upgrades keep the established character gates and charge one point every time",()=>{
     const r=makeRuntime();
-    const cases=[[14,1,false],[15,1,true],[29,2,false],[30,2,true],[49,3,false],[50,3,true],[79,4,false],[80,4,true]];
+    const cases=[[14,1,false],[15,1,true],[29,2,false],[30,2,true],[49,3,false],[50,3,true],[79,4,false],[80,4,true],[80,5,true],[80,6,true],[80,7,true],[80,8,true],[80,9,true]];
     for(const [level,current,expected] of cases){
         resetForLearn(r,"fire",level,999);r.loadouts.fire.skillLevels.flameSlash=current;
         assert.equal(r.context.upgradeSkill("flameSlash"),expected,`flameSlash char ${level} skill ${current}`);
     }
-    for(const [level,current,expected] of [[30,1,false],[37,1,false],[38,1,true],[47,2,false],[48,2,true],[59,3,false],[60,3,true],[79,4,false],[80,4,true]]){
-        resetForLearn(r,"fire",level,999);r.loadouts.fire.skillLevels.dragonSlash=current;
-        assert.equal(r.context.upgradeSkill("dragonSlash"),expected,`dragon char ${level} skill ${current}`);
-    }
     resetForLearn(r,"fire",30,1);r.loadouts.fire.skillLevels.flameSlash=2;
-    assert.equal(r.context.upgradeSkill("flameSlash"),false,"Lv3 needs 2 points");
-    assert.equal(r.owners.fire.skillPoints,1);
+    assert.equal(r.context.upgradeSkill("flameSlash"),true,"Lv2→Lv3 costs exactly one point");
+    assert.equal(r.owners.fire.skillPoints,0);
+    assert.equal(r.loadouts.fire.skillLevels.flameSlash,3);
 });
 
 test("revive keeps 20/40/60/80/100 battle values and uses 20/28/38/50/80 gates",()=>{
@@ -231,68 +228,84 @@ test("revive keeps 20/40/60/80/100 battle values and uses 20/28/38/50/80 gates",
     assert.deepEqual([1,2,3,4,5].map(level=>r.context.v17364GetRequiredCharacterLevelForSkillLevel(r.skills.revive,level)),[20,28,38,50,80]);
 });
 
-test("fire resonance works for crit warrior and newly-added-burn mage without stacking or refreshing momentum",()=>{
+test("Fire Soul Resonance grants persistent momentum and Lv5 extends at most once per formal round",()=>{
     const r=makeRuntime();
-    r.loadouts.fire.skillLevels.fireSoulResonance=1;
+    r.loadouts.fire.skillLevels.fireSoulResonance=5;
     r.loadouts.fire.skillLevels.flameSlash=1;
     assert.equal(r.context.v17364CastNewFireTactical(0,"fireSoulResonance"),true);
-    r.setCrit(true);r.setBurn(false);
-    r.context.castDamageSkill("flameSlash",0);
-    let momentum=r.owners.fire.activeBuffs.find(buff=>buff.type==="fireMomentum");
-    assert.ok(momentum);assert.equal(momentum.bonusPercent,12);
-    const originalMomentum=momentum;
-    r.context.castDamageSkill("flameSlash",0);
-    assert.equal(r.observedBonus(),12,"next player-active main cast receives the additive bucket");
-    assert.equal(r.owners.fire.activeBuffs.some(buff=>buff.type==="fireMomentum"),false,"consumed momentum is not refreshed by same cast crit");
+    const resonance=r.owners.fire.activeBuffs.find(buff=>buff.type==="fireSoulResonance");
+    const momentum=r.owners.fire.activeBuffs.find(buff=>buff.type==="fireMomentum");
+    assert.ok(resonance);assert.ok(momentum);
+    assert.equal(momentum.bonusPercent,25);
+    assert.equal(resonance.turnsLeft,3);assert.equal(momentum.turnsLeft,3);
 
-    r.setCrit(false);r.setBurn(true);
+    r.context.turn=1;r.setCrit(true);r.setBurn(false);
     r.context.castDamageSkill("flameSlash",0);
-    momentum=r.owners.fire.activeBuffs.find(buff=>buff.type==="fireMomentum");
-    assert.ok(momentum,"successful newly-added burn can grant momentum");
-    const turns=momentum.turnsLeft;
-    r.setCrit(true);r.setBurn(true);
+    assert.equal(r.observedBonus(),25);
+    assert.equal(resonance.extensionCount,1);
+    assert.equal(resonance.turnsLeft,4);
+    assert.equal(momentum.turnsLeft,4);
+
     r.context.castDamageSkill("flameSlash",0);
-    assert.notEqual(momentum,originalMomentum);
-    assert.equal(momentum.turnsLeft,turns,"existing momentum is not refreshed before consumption");
+    assert.equal(resonance.extensionCount,1,"same formal round cannot extend twice");
+
+    r.context.turn=2;r.setCrit(false);r.setBurn(true);
+    r.context.castDamageSkill("flameSlash",0);
+    assert.equal(resonance.extensionCount,2,"new Burn may extend on a later round");
+
+    r.context.turn=3;r.setCrit(true);r.setBurn(true);
+    r.context.castDamageSkill("flameSlash",0);
+    assert.equal(resonance.extensionCount,3);
+    r.context.turn=4;r.context.castDamageSkill("flameSlash",0);
+    assert.equal(resonance.extensionCount,3,"whole cast cannot extend beyond +3 rounds");
 });
 
-test("existing burn does not grant resonance momentum",()=>{
+test("Lv1-Lv4 resonance never uses the Lv5 extension rule",()=>{
     const r=makeRuntime();
-    r.loadouts.fire.skillLevels.fireSoulResonance=1;
+    r.loadouts.fire.skillLevels.fireSoulResonance=4;
     r.loadouts.fire.skillLevels.fireRocket=1;
     r.context.v17364CastNewFireTactical(0,"fireSoulResonance");
-    r.setCrit(false);r.setBurn(false);
+    const resonance=r.owners.fire.activeBuffs.find(buff=>buff.type==="fireSoulResonance");
+    const momentum=r.owners.fire.activeBuffs.find(buff=>buff.type==="fireMomentum");
+    assert.ok(momentum);assert.equal(momentum.bonusPercent,21);
+    r.setCrit(true);r.setBurn(true);
     r.context.castDamageSkill("fireRocket",0);
-    assert.equal(r.owners.fire.activeBuffs.some(buff=>buff.type==="fireMomentum"),false);
+    assert.equal(resonance.extensionCount,0);
+    assert.equal(resonance.turnsLeft,3);
 });
 
-test("blood burn pays each level's max-HP cost and buffs exactly three player-active fire casts",()=>{
+test("Blood Burn pays each level's max-HP cost and buffs exactly three non-free fire casts",()=>{
     const r=makeRuntime();
     r.loadouts.fire.skillLevels.flameSlash=1;
-    for(const [level,cost,bonus] of [[1,50,5],[2,100,10],[3,150,15],[4,200,20],[5,250,25]]){
+    for(const [level,cost,bonus] of [[1,50,5],[2,100,10],[3,150,15],[4,200,20],[5,250,35]]){
         r.owners.fire.activeBuffs=[];r.owners.fire.hp=1000;r.owners.fire.sp=1000;
         r.loadouts.fire.skillLevels.bloodBurnArt=level;
         assert.equal(r.context.v17364CastNewFireTactical(0,"bloodBurnArt"),true,`Lv${level} can cast`);
         assert.equal(r.owners.fire.hp,1000-cost,`Lv${level} pays exact max-HP percentage`);
+        r.freeCast("flameSlash");
+        assert.equal(r.observedBonus(),0,`Lv${level} free follow-up receives no Blood Burn bonus`);
+        assert.equal(r.owners.fire.activeBuffs.find(buff=>buff.type==="bloodBurn")?.remainingFireActions,3,"free follow-up does not consume a charge");
         for(let cast=1;cast<=3;cast++){
             r.context.castDamageSkill("flameSlash",0);
             assert.equal(r.observedBonus(),bonus,`Lv${level} fire cast ${cast} is buffed`);
         }
-        assert.equal(r.owners.fire.activeBuffs.some(buff=>buff.type==="bloodBurn"),false,`Lv${level} ends after the third fire cast`);
+        assert.equal(r.owners.fire.activeBuffs.some(buff=>buff.type==="bloodBurn"),false,`Lv${level} ends after the third valid fire cast`);
         r.context.castDamageSkill("flameSlash",0);
         assert.equal(r.observedBonus(),0,`Lv${level} fourth fire cast is not buffed`);
     }
 });
 
-test("momentum and blood burn add in the same damage bonus bucket instead of multiplying",()=>{
+test("resonance and Blood Burn add in one direct-damage bonus bucket",()=>{
     const r=makeRuntime();
-    r.loadouts.fire.skillLevels.fireSoulResonance=1;r.loadouts.fire.skillLevels.bloodBurnArt=1;r.loadouts.fire.skillLevels.flameSlash=1;
+    r.loadouts.fire.skillLevels.fireSoulResonance=1;
+    r.loadouts.fire.skillLevels.bloodBurnArt=1;
+    r.loadouts.fire.skillLevels.flameSlash=1;
     r.context.v17364CastNewFireTactical(0,"fireSoulResonance");
-    r.setCrit(true);r.context.castDamageSkill("flameSlash",0);
-    r.setCrit(false);r.context.v17364CastNewFireTactical(0,"bloodBurnArt");
+    r.context.v17364CastNewFireTactical(0,"bloodBurnArt");
+    r.setCrit(false);r.setBurn(false);
     r.context.castDamageSkill("flameSlash",0);
     assert.equal(r.observedBonus(),17);
-    assert.equal(r.skills.flameSlash.damageBonusPercent,undefined,"temporary bucket contribution is restored after the main cast");
+    assert.equal(r.skills.flameSlash.damageBonusPercent,undefined,"temporary bucket contribution is restored after the cast");
 });
 
 test("duration lifecycle counts effective actions, blocked actions and never consumes a newly-cast buff",()=>{
