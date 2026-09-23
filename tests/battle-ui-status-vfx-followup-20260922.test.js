@@ -6,19 +6,31 @@ const path=require("node:path");
 const ROOT=path.resolve(__dirname,"..");
 const read=relative=>fs.readFileSync(path.join(ROOT,relative),"utf8");
 
-test("persistent body status visuals rotate one at a time every two seconds",()=>{
+test("persistent body status owner keeps hard-control base fixed under the two-second rotating layer",()=>{
   const js=read("js/39-v143-skill-animation.js");
   const css=read("css/40-v143-combat-dungeon-polish.css");
   assert.match(js,/const STATUS_ROTATION_MS=2000/);
   assert.match(js,/const statusRotationByUnit=new Map\(\)/);
-  assert.match(js,/rotation\.index=\(rotation\.index\+1\)%bodyTypes\.length/);
+  assert.match(js,/HARD_CONTROL_BASE:"hard-control-base"/);
+  assert.match(js,/ROTATING:"rotating"/);
+  assert.match(js,/HUD:"hud"/);
+  assert.match(js,/freeze:statusVisual\([\s\S]*?visualLayer:STATUS_VISUAL_LAYERS\.HARD_CONTROL_BASE/);
+  assert.match(js,/petrify:statusVisual\([\s\S]*?visualLayer:STATUS_VISUAL_LAYERS\.HARD_CONTROL_BASE/);
+  assert.match(js,/const rotatingBodyTypes=activeBodyStatusTypesForLayer\([\s\S]*?STATUS_VISUAL_LAYERS\.ROTATING/);
+  assert.match(js,/rotation\.index=\(rotation\.index\+1\)%rotatingBodyTypes\.length/);
+  assert.match(js,/baseBodyTypes\.includes\(type\)/);
+  assert.match(js,/type===activeRotatingBodyType/);
   assert.match(js,/syncStatusVisualEffects\(true\)/);
-  assert.doesNotMatch(js,/Math\.floor\(Date\.now\(\)\/STATUS_ROTATION_MS\)%bodyTypes\.length/);
-  assert.match(js,/syncStatusVisual\(side,index,type,type===activeBodyType\)/);
+  assert.doesNotMatch(js,/Math\.floor\(Date\.now\(\)\/STATUS_ROTATION_MS\)/);
   assert.match(js,/stun:statusVisual\("assets\/vfx\/status\/stun\.webp","pulse"/);
+  assert.match(css,/--v143-status-layer-hard-control-base:4/);
+  assert.match(css,/--v143-status-layer-rotating:5/);
+  assert.match(css,/--v143-status-layer-hud:20/);
+  assert.match(css,/\.v143-status-visual--layer-hard-control-base\{[\s\S]*?z-index:var\(--v143-status-layer-hard-control-base\)/);
   assert.match(css,/\.v143-status-icon\{[\s\S]*?width:24px;[\s\S]*?height:24px;/);
   assert.match(css,/\.v143-status-visual--pulse\{[\s\S]*?animation:v143StatusImageBreath 2s ease-in-out infinite/);
-  assert.match(css,/@keyframes v143StatusImageBreath\{[\s\S]*?50%\{opacity:1\}/);
+  assert.match(css,/\.v143-status-visual-freeze\{[\s\S]*?animation:none/);
+  assert.match(css,/\.v143-status-visual-petrify\{[\s\S]*?animation:none/);
 });
 
 test("battle information handles and turn timer follow the requested interaction contract",()=>{
