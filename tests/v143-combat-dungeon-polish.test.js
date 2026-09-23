@@ -12,6 +12,7 @@ const dungeon=fs.readFileSync("js/36-v141-content-systems.js","utf8");
 const system=fs.readFileSync("js/38-v143-system-fixes.js","utf8");
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const css=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");
+const fixedSlotCss=fs.readFileSync("css/fixed-slot-battlefield-rendering-v2.css","utf8");
 
 let passed=0;
 function test(name,fn){ fn(); passed++; console.log("✓ "+name); }
@@ -175,7 +176,8 @@ test("earth shield is raster-owned while ally targeting and Barrier rules remain
     assert.doesNotMatch(system,/v143-earth-shield-effect|effect\.innerHTML=.*象/);
     assert.doesNotMatch(css,/v143-earth-shield-effect|v143EarthCornerBreath/);
     assert.match(animation,/earthShield:statusVisual\("assets\/vfx\/status\/earth-shield\.webp","static","activeBuffs"/);
-    assert.match(css,/\.battle-player\.ally-targetable::after/);
+    assert.match(fixedSlotCss,/\.battle-player\.v174-cardless-unit\.ally-targetable::after/);
+    assert.match(fixedSlotCss,/\.battle-player\.v174-cardless-unit\.ally-targetable::before/);
     assert.match(system,/targetAlly:index/);
     assert.match(system,/monster\.v141Shield\.remainingBlocks=5/);
     assert.match(system,/DOT bypasses Barrier without consuming a block/);

@@ -35,8 +35,7 @@ html,body{margin:0;width:390px;height:844px;background:#050505;overflow:hidden}
 #goldTest{position:absolute;left:4px;top:70px;z-index:20;background:rgb(238,196,92);color:rgb(35,23,5);text-shadow:0 2px 2px #000}
 #creationPage{display:none!important}
 </style></head><body><div id="game-stage">
-<div id="allSkillsList"><div class="skill-row"><div></div><div class="skill-row-text">技能說明必須保留主要寬度</div><button class="skill-action-card"><span class="skill-action-card-label">角色 Lv43 可升至技能 Lv3</span></button></div></div>
-<button id="goldTest">黃底黑字</button>
+<div id="allSkillsList"><div class="skill-row"><div></div><div class="skill-row-text">技能說明必須保留主要寬度</div><button class="skill-action-card"><span class="skill-action-card-label">角色 Lv43 可升至技能 Lv3</span></button></div><button id="goldTest">黃底黑字</button></div>
 <div id="homeFeatureModal" class="home-feature-modal show team-relic-modal team-relic-mode"><section class="home-feature-modal-box wide"><div id="homeFeatureModalBody"><div id="characterTabContent"><div style="height:1000px">角色頁</div></div></div></section></div>
 </div><pre id="result"></pre>
 <script>window.requestAnimationFrame=function(cb){return setTimeout(cb,0)};</script>
