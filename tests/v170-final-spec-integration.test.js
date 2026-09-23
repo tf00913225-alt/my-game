@@ -16,6 +16,7 @@ const MAIN_BASELINE_SHA="70df66e8cb371ff6193a7f70609cf9aad7bd15ac";
 const mainSource=fs.readFileSync("js/00-main.js","utf8");
 const indexSource=fs.readFileSync("index.html","utf8");
 const loaderSource=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
+const progressionSource=fs.readFileSync("js/60-v173.64-skill-progression-rebalance.js","utf8");
 
 const EXPECTED_DIRECT_SCRIPT_PATHS=[
     "js/00-main.js",
@@ -436,9 +437,21 @@ test("Burn, Frostbite, Freeze and every other final status definition are exact"
         dustStorm:{petrifyChanceByLevel:[20,25,30,35,45],petrifyDuration:2},
         earthquakeCrush:{petrifyChanceByLevel:[30,35,40,45,50],petrifyDuration:2}
     };
+    const supersededFields=new Set([
+        "stormFist.agilityDownByLevel","dizzyFist.missBonusByLevel",
+        "windSpell.agilityDownByLevel","stormRain.missBonusByLevel"
+    ]);
     Object.entries(expected).forEach(([id,fields])=>{
-        Object.entries(fields).forEach(([field,value])=>assert.deepEqual(skills[id][field],value,id+"."+field));
+        Object.entries(fields).forEach(([field,value])=>{
+            if(supersededFields.has(id+"."+field)){ return; }
+            assert.deepEqual(skills[id][field],value,id+"."+field);
+        });
     });
+    assert.match(progressionSource,/const FINAL_POINT_DAMAGE_LEVELS=Object\.freeze\(\[5,7,9,11,13,15,17,19,22,25\]\)/);
+    assert.match(progressionSource,/stormFist:\{[\s\S]*?agilityDownByLevel:FINAL_POINT_DAMAGE_LEVELS\.slice\(\)/);
+    assert.match(progressionSource,/dizzyFist:\{[\s\S]*?missBonusByLevel:FINAL_POINT_DAMAGE_LEVELS\.slice\(\)/);
+    assert.match(progressionSource,/windSpell:\{[\s\S]*?agilityDownByLevel:FINAL_POINT_DAMAGE_LEVELS\.slice\(\)/);
+    assert.match(progressionSource,/stormRain:\{[\s\S]*?missBonusByLevel:FINAL_POINT_DAMAGE_LEVELS\.slice\(\)/);
     ["waterKnife","frostPunch","iceSpin","frostCrush","waterBall","floodBeast","iceArrowRain"].forEach(id=>{
         ["freezeChance","freezeDuration","freezeSingleTarget","teamFreezeChance","teamFreezeDuration"].forEach(field=>{
             assert.equal(skills[id][field],undefined,id+" must not retain "+field);

@@ -71,7 +71,7 @@ test("male patrol art switches front and back images for every element",()=>{
         });
     });
     assert.match(patrol,/function artFor\(character,facing\)[\s\S]*?ART\[gender\]\[element\]/);
-    assert.match(patrol,/image\.src=artFor\(character,facing\)/);
+    assert.match(patrol,/const source=artFor\(character,facing\);[\s\S]*?image\.src=source/);
 });
 
 test("both patrol fight frames point to the newly supplied images",()=>{
