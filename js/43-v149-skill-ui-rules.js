@@ -281,11 +281,11 @@
 
     if(typeof applySkillDebuffEffects==="function"){
         const previousApplySkillDebuffs=applySkillDebuffEffects;
-        applySkillDebuffEffects=function(skill,level,monster,index,casterLevel,casterIntelligence){
+        applySkillDebuffEffects=function(skill,level,monster,index,casterLevel,casterOffensiveAttribute){
             const result=previousApplySkillDebuffs.apply(this,arguments);
             if(!skill||!numeric(skill.frostbiteChance)||!monster||!monster.alive){ return result; }
             const args=[
-                skill.frostbiteChance,casterLevel,monster.level,casterIntelligence,
+                skill.frostbiteChance,casterLevel,monster.level,casterOffensiveAttribute,
                 typeof getMonsterEffectiveSpiritPoints==="function"?getMonsterEffectiveSpiritPoints(monster):numeric(monster.spiritPoints),
                 false,typeof getMonsterRank==="function"?getMonsterRank(monster):"regular"
             ];
@@ -296,7 +296,7 @@
                 const duration=skill.frostbiteDuration||2;
                 applyFrostbite(monster,duration);
                 playFrostbiteEffect("monster",index);
-                if(typeof addBattleLog==="function"){ addBattleLog(monster.name+"陷入凍傷，"+duration+"回合內無法使用技能。"); }
+                if(typeof addBattleLog==="function"){ addBattleLog(monster.name+"陷入凍傷，"+duration+"回合內傷害、閃躲、異常狀態抗性降低25%。"); }
             }else if(!roll.duplicate&&typeof addBattleLog==="function"){
                 addBattleLog("（凍傷效果被"+monster.name+"抵抗了）");
             }
@@ -306,13 +306,13 @@
 
     if(typeof applySkillDebuffEffectsToPlayer==="function"){
         const previousApplySkillDebuffsToPlayer=applySkillDebuffEffectsToPlayer;
-        applySkillDebuffEffectsToPlayer=function(skill,level,target,index,casterLevel,casterIntelligence){
+        applySkillDebuffEffectsToPlayer=function(skill,level,target,index,casterLevel,casterOffensiveAttribute){
             const result=previousApplySkillDebuffsToPlayer.apply(this,arguments);
             if(!skill||!numeric(skill.frostbiteChance)||!target||numeric(target.hp)<=0){ return result; }
             const spirit=typeof getFinalBattleSpiritForPlayerTarget==="function"
                 ?getFinalBattleSpiritForPlayerTarget(target,index):numeric(target.spirit);
             const resist=typeof getPlayerStatusResistBonus==="function"?getPlayerStatusResistBonus(target):0;
-            const args=[skill.frostbiteChance,casterLevel,target.level,casterIntelligence,spirit,false,"regular",resist];
+            const args=[skill.frostbiteChance,casterLevel,target.level,casterOffensiveAttribute,spirit,false,"regular",resist];
             const roll=typeof window.v173RollNamedPersistentStatusEffect==="function"
                 ?window.v173RollNamedPersistentStatusEffect(target,"frostbite",args,"player",index,skill.name)
                 :{duplicate:false,hit:typeof rollStatusEffectHit==="function"&&rollStatusEffectHit.apply(null,args)};
@@ -320,7 +320,7 @@
                 const duration=skill.frostbiteDuration||2;
                 applyFrostbite(target,duration);
                 playFrostbiteEffect("player",index);
-                if(typeof addBattleLog==="function"){ addBattleLog((target.id||"角色")+"陷入凍傷，"+duration+"回合內無法使用技能。"); }
+                if(typeof addBattleLog==="function"){ addBattleLog((target.id||"角色")+"陷入凍傷，"+duration+"回合內傷害、閃躲、異常狀態抗性降低25%。"); }
             }else if(!roll.duplicate&&typeof addBattleLog==="function"){
                 addBattleLog("（凍傷效果被"+(target.id||"角色")+"抵抗了）");
             }
