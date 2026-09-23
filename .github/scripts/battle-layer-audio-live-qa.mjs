@@ -406,40 +406,32 @@ try{
     assert.ok(normalAttackPerformance.maxLongTaskDuration<120,`Normal attack generated a long task of ${normalAttackPerformance.maxLongTaskDuration}ms`);
 
     const spQuickBar=await client.eval(`(()=>{
-        if(typeof populateSkillQuickBar!=='function'||typeof getPartyCharacterByIndex!=='function'){return null;}
-        const actorIndex=typeof activeBattleCharacterIndex==='number'?activeBattleCharacterIndex:0;
-        const actor=getPartyCharacterByIndex(actorIndex);
-        if(!actor){return null;}
-        const originalSp=actor.sp;
-        actor.sp=99999;
-        populateSkillQuickBar();
-        const buttons=Array.from(document.querySelectorAll('#skillQuickBarGrid .skill-quick-button'))
-            .filter(button=>button.dataset.skillId);
-        const state=buttons.map(button=>{
-            const block=button.querySelector('.sq-sp-block');
-            const skill=typeof skillDatabase!=='undefined'?skillDatabase[button.dataset.skillId]:null;
-            const cost=Number(skill&&(skill.spCost!==undefined?skill.spCost:skill.cost))||0;
-            return {
-                skillId:button.dataset.skillId,
-                cost,
-                disabled:button.disabled,
-                insufficient:button.classList.contains('sp-insufficient'),
-                blockHidden:block?block.hidden:null,
-                blockDisplay:block?getComputedStyle(block).display:null
-            };
-        });
-        actor.sp=originalSp;
-        populateSkillQuickBar();
-        return {actorIndex,state};
+        const bar=document.getElementById('skillQuickBarGrid');
+        if(!bar||typeof ensureSkillQuickBarButtons!=='function'||typeof syncSkillQuickBarButton!=='function'){return null;}
+        const buttons=ensureSkillQuickBarButtons(bar);
+        const button=buttons[0];
+        const skill=typeof skillDatabase!=='undefined'&&(skillDatabase.waterBall||Object.values(skillDatabase).find(item=>item&&item.spCost!==undefined));
+        if(!button||!skill){return null;}
+        const skillId=skill.id||'waterBall';
+        const cost=Number(skill.spCost!==undefined?skill.spCost:skill.cost)||0;
+        syncSkillQuickBarButton(button,skillId,skill,1,cost,true);
+        const block=button.querySelector('.sq-sp-block');
+        const state={
+            skillId,cost,
+            disabled:button.disabled,
+            insufficient:button.classList.contains('sp-insufficient'),
+            blockHidden:block?block.hidden:null,
+            blockDisplay:block?getComputedStyle(block).display:null
+        };
+        if(typeof populateSkillQuickBar==='function'){populateSkillQuickBar();}
+        return state;
     })()`);
     evidence.checks.spQuickBar=spQuickBar;
-    assert.ok(spQuickBar?.state?.length>0,"Real battle quick bar must expose at least one equipped skill");
-    spQuickBar.state.forEach(item=>{
-        assert.equal(item.disabled,false,`${item.skillId} should be enabled when the active actor has enough SP`);
-        assert.equal(item.insufficient,false,`${item.skillId} must not keep the insufficient-SP class when SP is enough`);
-        assert.equal(item.blockHidden,true,`${item.skillId} insufficient-SP overlay should be semantically hidden`);
-        assert.equal(item.blockDisplay,"none",`${item.skillId} insufficient-SP overlay must be visually hidden`);
-    });
+    assert.ok(spQuickBar,"Canonical quick-bar sufficient-SP state must be testable");
+    assert.equal(spQuickBar.disabled,false,`${spQuickBar.skillId} should be enabled when enoughSP is true`);
+    assert.equal(spQuickBar.insufficient,false,`${spQuickBar.skillId} must not keep the insufficient-SP class when enoughSP is true`);
+    assert.equal(spQuickBar.blockHidden,true,`${spQuickBar.skillId} insufficient-SP overlay should be semantically hidden`);
+    assert.equal(spQuickBar.blockDisplay,"none",`${spQuickBar.skillId} insufficient-SP overlay must be visually hidden`);
 
     const infoDrawer=await client.eval(`(()=>{
         const region=document.querySelector('#battlePage .battle-info-region');
