@@ -110,13 +110,31 @@ async function prepareAccountFirstRuntime(client,features){
     }
     await client.eval(`Promise.all(${JSON.stringify(features)}.map(feature=>FourSymbolsFeatures.ensure(feature,"live-browser-qa")))`);
     if(state==="NEED_CHARACTER"){
-        const created=await client.eval(`(()=>{
+        const creationAttempt=await client.eval(`(()=>{
             const input=document.getElementById('creationId');
-            if(!input||typeof createCharacter!=='function'){return false;}
+            if(!input||typeof createCharacter!=='function'){return {created:false,errors:["creation input/function unavailable"]};}
             input.value='QA俠客';
-            return createCharacter()===true;
+            const errors=[];
+            const originalError=console.error;
+            console.error=function(){
+                try{
+                    errors.push(Array.from(arguments).map(value=>{
+                        if(value instanceof Error){ return value.name+":"+value.message+(value.code?(" code="+value.code):""); }
+                        if(value&&typeof value==="object"){
+                            try{return JSON.stringify(value);}catch(_){return String(value);}
+                        }
+                        return String(value);
+                    }).join(" | "));
+                }catch(_){}
+                return originalError.apply(this,arguments);
+            };
+            try{
+                return {created:createCharacter()===true,errors};
+            }finally{
+                console.error=originalError;
+            }
         })()`);
-        if(!created){
+        if(!creationAttempt.created){
             const diagnostics=await client.eval(`(()=>{
                 let targetSlot=null;
                 try{ targetSlot=typeof creationTargetSlot!=="undefined"?creationTargetSlot:null; }catch(_){}
@@ -140,7 +158,8 @@ async function prepareAccountFirstRuntime(client,features){
                     creationVisible:getComputedStyle(document.getElementById('creationPage')).display,
                     playerId:typeof player!=="undefined"?player.id:null,
                     saveOwner:persisted,
-                    guarded:Boolean(window.createCharacter&&window.createCharacter.__v174PersistedPrimaryGuard)
+                    guarded:Boolean(window.createCharacter&&window.createCharacter.__v174PersistedPrimaryGuard),
+                    creationErrors:${JSON.stringify(creationAttempt.errors)}
                 };
             })()`);
             throw new Error("Live anonymous account could not complete the formal character-creation flow: "+JSON.stringify(diagnostics));
