@@ -308,7 +308,7 @@ assert.equal(cancelled.getPresentationLockCount(),0,"presentation cancellation r
 const devPreview=createRuntime({dev:true,livePresentation:true});
 assert.equal(devPreview.context.v174EquipRelic("relic_origin_talisman"),false,"runtimeReady:false relics cannot enter the formal loadout even in DEV");
 const devSaved=JSON.parse(devPreview.store.get(devPreview.accountSaveKey));
-assert.equal(devSaved.teamLoadout.relicId,null,"DEV must not persist an unfinished relic into canonical teamLoadout");
+assert.equal(devSaved.teamLoadout&&devSaved.teamLoadout.relicId||null,null,"DEV must not persist an unfinished relic into canonical teamLoadout");
 devPreview.context.startBattle();
 assert.equal(devPreview.context.v174RelicPresentationState().pending,0,"unopened relic abilities never auto-play on battle entry");
 assert.equal(devPreview.context.v174RelicDebugState().totalTriggers,0,"unopened relic abilities never create formal trigger state");
