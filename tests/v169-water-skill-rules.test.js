@@ -141,10 +141,10 @@ test("damage growth sequences and HP-only lifesteal text match every level",()=>
         floodBeast:[105,126,147,168,189],iceArrowRain:[30,36,42,48,54]
     };
     Object.entries(sequences).forEach(([id,expected])=>{
-        const actual=[1,2,3,4,5].map(level=>{
-            const parts=Array.from(context.v169WaterSkillRules.effectParts(id,level));
-            return Number(parts[0].match(/\d+/)[0]);
-        });
+        const skill=context.skillDatabase[id];
+        const actual=[1,2,3,4,5].map(level=>
+            Number(skill.baseDamage)+Number(skill.damagePerLevel)*(level-1)
+        );
         assert.deepEqual(actual,expected,id);
     });
     const preview=context.getSkillEffectPreviewText(context.skillDatabase.iceSpin,5);

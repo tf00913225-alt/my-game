@@ -8,6 +8,7 @@ const fs=require("node:fs");
 const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const index=fs.readFileSync("index.html","utf8");
 const balance=fs.readFileSync("js/33-v140-four-element-balance.js","utf8");
+const core=fs.readFileSync("js/00-main.js","utf8");
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const finalWater=fs.readFileSync("js/50-v169-water-skill-rules.js","utf8");
 const recovery=fs.readFileSync("js/45-v154-dev-fixes.js","utf8");
@@ -27,10 +28,11 @@ test("Ice Arrow Rain follows the current thirty-five percent Frostbite for two r
     assert.match(finalWater,/35%基礎機率【凍傷】2回合/);
 });
 
-test("hard-control caps end at regular eighty, elite sixty and boss forty",()=>{
-    assert.match(balance,/regular:\{min:5,max:80\}/);
-    assert.match(balance,/elite:\{min:5,max:60\}/);
-    assert.match(balance,/boss:\{min:5,max:40\}/);
+test("current hard-control caps are owned by the core directional bounds",()=>{
+    assert.match(core,/regular:\{\s*min:5,\s*max:90/);
+    assert.match(core,/elite:\{\s*min:5,\s*max:75/);
+    assert.match(core,/boss:\{\s*min:5,\s*max:60/);
+    assert.match(core,/player:\{\s*min:5,\s*max:60/);
 });
 
 test("Fixed Slot range detection cannot mistake Rage tri-target for all targets",()=>{
