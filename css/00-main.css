@@ -6858,6 +6858,15 @@ html, body{
      技能／普通攻擊／背包(既有物品功能)／防禦／逃脫。
    - 技能快捷列仍以較高 z-index 覆蓋此面板，原戰鬥函式不變。
 ===================================================== */
+#battlePage{
+    --battle-command-row-height:66px;
+    --battle-command-art-overhang:34px;
+    --battle-command-visual-height:calc(var(--battle-command-row-height) + var(--battle-command-art-overhang));
+    --battle-turn-row-height:36px;
+    --battle-center-vertical-padding:6px;
+    --battle-center-min-height:calc(var(--battle-command-visual-height) + var(--battle-turn-row-height) + var(--battle-center-vertical-padding));
+}
+
 #mainBattleMenu{
     position:relative !important;
     display:block !important;
@@ -6876,9 +6885,6 @@ html, body{
     --battle-command-defend-width:17.05%;
     --battle-command-run-left:75.85%;
     --battle-command-run-width:17.75%;
-    --battle-command-row-height:66px;
-    --battle-command-art-overhang:34px;
-    --battle-command-visual-height:calc(var(--battle-command-row-height) + var(--battle-command-art-overhang));
 }
 
 #mainBattleMenu::before{
