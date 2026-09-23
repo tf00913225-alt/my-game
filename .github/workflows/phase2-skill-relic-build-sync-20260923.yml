@@ -1,0 +1,34 @@
+name: Phase2 Skill Relic Build Sync 20260923
+
+on:
+  push:
+    branches:
+      - fix/skill-relic-runtime-owner-convergence-20260923
+    paths:
+      - ".github/workflows/phase2-skill-relic-build-sync-20260923.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/skill-relic-runtime-owner-convergence-20260923
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+      - name: Regenerate deterministic production build
+        run: npm run build
+      - name: Commit exact build and remove one-time workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A -- asset-manifest.json build index.html config/feature-manifest.json
+          git rm .github/workflows/phase2-skill-relic-build-sync-20260923.yml
+          git commit -m "build: sync skill relic owner candidate bundles"
+          git push origin HEAD:fix/skill-relic-runtime-owner-convergence-20260923
