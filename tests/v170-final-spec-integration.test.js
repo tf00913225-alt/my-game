@@ -453,42 +453,48 @@ test("Burn, Frostbite, Freeze and every other final status definition are exact"
     assert.equal(skills.dustStorm.defenseDownChance,undefined);
 });
 
-test("final normal hit and status-effect bounds override the historical floors",()=>{
+test("final hit, evasion and status chances use one percentage-point model",()=>{
     assert.match(mainSource,/const STATUS_RESIST_PER_SPIRIT_POINT = 0\.05;/);
-    assert.match(mainSource,/const LEVEL_DIFF_FACTOR_PER_LEVEL_PHYSICAL = 0\.01;/);
-    assert.match(mainSource,/const LEVEL_DIFF_FACTOR_MIN_PHYSICAL = 0\.85;/);
-    assert.match(mainSource,/const LEVEL_DIFF_FACTOR_MAX_PHYSICAL = 1\.15;/);
-    assert.match(mainSource,/const HIT_CHANCE_MIN_PERCENT = 50;/);
-    assert.doesNotMatch(mainSource,/STATUS_HIT_INT_COEFFICIENT|HIT_CHANCE_MIN_PERCENT = 60/);
+    assert.match(mainSource,/const STATUS_OFFENSE_ATTRIBUTE_COEFFICIENT = 0\.05;/);
+    assert.match(mainSource,/const HIT_CHANCE_ACCURACY_COEFFICIENT = 0\.15;/);
+    assert.match(mainSource,/const HIT_CHANCE_MIN_PERCENT = 70;/);
+    assert.match(mainSource,/const DEFAULT_MONSTER_EVASION_PER_LEVEL = 0\.1;/);
+    assert.match(mainSource,/const DEFAULT_MONSTER_EVASION_CAP = 10;/);
+    assert.doesNotMatch(v140Source,/Math\.sqrt\(power\)|GENERAL_STATUS_COEFFICIENT|LOCKDOWN_STATUS_COEFFICIENT/);
+    assert.doesNotMatch(v140Source,/rollHitChance\s*=\s*function|calculateStatusEffectChance\s*=\s*function/);
+    assert.doesNotMatch(v158Source,/v158GetHitChancePercent|rollHitChance\s*=\s*function/);
+
     const runtime=loadFinalRuntime();
-    const hit=runtime.context.v158GetHitChancePercent;
+    const hit=runtime.context.v173GetHitChancePercent;
     assert.deepEqual(
-        [hit(0,0,0),hit(10,0,0),hit(0,10,0),hit(0,1000,0),hit(0,1000,50),hit(1000,0,0)],
-        [95,98,85.5,14.250000000000002,1,99]
+        [hit(0,0,0,0),hit(10,0,0,0),hit(0,10,0,0),hit(0,1000,0,0),hit(0,1000,50,0),hit(1000,0,0,0)],
+        [95,96.5,85,70,70,99]
     );
-    const status=runtime.context.v140CalculateStatusEffectChance;
-    assert.equal(status(50,10,10,100,20,false,"regular",0,"physical"),54);
-    assert.equal(status(50,10,10,100,20,false,"regular",0,"magic"),54);
-    assert.equal(status(50,10,10,100,100,false,"regular",7,"physical"),43);
-    assert.equal(status(50,10,10,100,100,false,"regular",7,"magic"),43);
-    assert.equal(status(30,10,10,100,20,true,"regular",0,"physical"),26);
-    assert.equal(status(30,10,10,100,20,true,"regular",0,"magic"),26);
+    assert.equal(hit(0,15,5,10),85,"95 + 10 - 15 - 5 must equal 85 percentage points");
+
+    const status=runtime.context.calculateStatusEffectChance;
+    assert.equal(status(50,10,10,100,20,false,"regular",0),54);
+    assert.equal(status(50,10,10,100,100,false,"regular",7),43);
+    assert.equal(status(30,10,10,200,0,true,"boss",20),20,
+        "30 base + INT 200×0.05 - Boss resistance 20 = 20");
     assert.deepEqual(
-        ["regular","elite","boss"].map(rank=>status(90,10,10,100,0,true,rank,0,"magic")),
-        [80,60,40]
+        ["regular","elite","boss"].map(rank=>status(90,10,10,100,0,true,rank,0)),
+        [90,75,60]
     );
-    const levelCases=[[0,1],[5,1.1],[10,1.2],[15,1.3],[30,1.3],[-5,.9],[-10,.8],[-15,.7],[-30,.7]];
+    const levelCases=[0,5,10,15,30,-5,-10,-15,-30];
     assert.deepEqual(
-        levelCases.map(([difference])=>status(40,50+difference,50,0,0,false,"regular",0,"magic")),
-        [40,44,48,52,52,36,32,28,28]
+        levelCases.map(difference=>status(40,50+difference,50,0,0,false,"regular",0)),
+        levelCases.map(()=>40),
+        "status chance must no longer contain a hidden level-difference factor"
     );
     assert.deepEqual(
-        levelCases.map(([difference])=>status(40,50+difference,50,0,0,true,"regular",0,"magic")),
-        [40,44,48,52,52,36,32,28,28]
+        levelCases.map(difference=>status(40,50+difference,50,0,0,true,"regular",0)),
+        levelCases.map(()=>40),
+        "hard control must use the same attribute/resistance conversion before rank cap"
     );
-    runtime.context.Math.random=()=>.5;
+
     assert.deepEqual(
-        levelCases.map(([difference])=>runtime.context.calculateDamage(100,0,50+difference,50,"fire","fire")),
+        levelCases.map(difference=>runtime.context.calculateDamage(100,0,50+difference,50,"fire","fire")),
         [100,105,110,115,115,95,90,85,85]
     );
 });
