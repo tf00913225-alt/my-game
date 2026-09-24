@@ -4255,12 +4255,12 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 - Production build commit：`7567aa216fba3f32e92792ea9dac317ff9f8d942`。Verified source candidate：`1596ea0a36e564facca92432376775d9728bc0fe`。
 - GitHub Actions Repository checks run `35866039901`：SUCCESS。包含 Syntax、Battle Runtime Architecture Guard、專項／既有 battle regressions、production build synchronization、Fixed Slot 9:16 mobile browser QA、exact-candidate real battle mobile browser QA、Adventure mobile QA、static resources、release gate 與 `git diff --check` 全部通過。
 - Requirement Batch：`release/requirement-batches/2026-09-23-battle-ui-hit-status-owner-convergence.json` 已升級為 VERIFIED。
-## 2026-09-24 — Cloud Save Phase 2 Server-owned Envelope（5/6 VERIFIED；live 驗收待完成）
+## 2026-09-24 — Cloud Save Phase 2 Server-owned Envelope（COMPLETE / 6/6 VERIFIED）
 
 - Base：最新 `dev@e9a2f481d5a318050991d475201f359d694871cc`；工作分支：`feature/cloud-save-phase2-envelope-20260924`；`main`／`dev` 均未直接修改。
 - Phase 1 Single Active Session 維持 5/5 VERIFIED。Phase 2 唯一 Envelope owner 新增於 `functions/src/cloud-save-envelope.js`；public `users/{uid}/saves/current` 使用 schema Version 2、server-owned Revision、server timestamps 與嚴格狀態驗證。
 - `bootstrapCloudSave`：新 envelope 從 Revision 1 建立；重複呼叫不亂增 Revision／updatedAt；既有 Phase 1 Version 1／Revision 0 精確骨架受控升級。任意 owner/schema/revision/timestamp/status 損壞一律 fail closed。
 - `submitLegacyMigrationCandidate`：仍只保存 `trusted:false` candidate；metadata 改變與 active Session 驗證同一 transaction，`serverRevision` 原子遞增。Phase 2 不產生正式 gameplay payload、不升格本機資料。
 - PR #553 已合併 `dev@195acb63d4acd36ceada31ed95b5f50e448d297f`。PR CI `35987380366`／Session `35987380024`、merged dev CI＋DEV deploy `35987880895`、Session emulator＋Firebase deploy `35987880460` 均 SUCCESS；正式 deploy job `107595824436` SUCCESS。
-- 最小 live 驗收 bridge 為 `FourSymbolsFirebase.bootstrapCloudSave()`；不自動呼叫、不改 first-use read owner、不傳 local gameplay save。Requirement Batch 現為 5/6 VERIFIED；真實 DEV 帳號需驗證 Version 2、Revision 1 與重複 bootstrap idempotency 後，才可改為 Phase 2 COMPLETE。Phase 3–10 未開始。
-- 為無電腦的真實裝置驗收，DEV 帳號面板新增手動「驗證雲端存檔骨架」按鈕；它連續 bootstrap 兩次並讀回 envelope，只顯示 Schema／Revision 結果，不顯示 credential、不送 local save。合併部署後仍須由真實 DEV 帳號點擊成功，才把 Requirement Batch 改為 6/6 VERIFIED。
+- 最小 live 驗收 bridge 為 `FourSymbolsFirebase.bootstrapCloudSave()`；不自動呼叫、不改 first-use read owner、不傳 local gameplay save。真實 Google 帳號已在手機 Chrome 驗證 Version 2、Revision 1 與重複 bootstrap idempotency；Requirement Batch 現為 COMPLETE / 6/6 VERIFIED。Phase 3–10 未開始。
+- 為無電腦的真實裝置驗收，DEV 帳號面板新增手動「驗證雲端存檔骨架」按鈕；它連續 bootstrap 兩次並讀回 envelope，只顯示 Schema／Revision 結果，不顯示 credential、不送 local save。使用者已以原 Google 帳號在完整手機 Chrome 取得 `Schema V2、Revision 1` 成功結果；ChatGPT 內建瀏覽器的 Google OAuth 未完成不視為後端失敗。PR #555 合併 `dev@b037ced9dad9d1cf67d9aacccb4e064c74a135e1`；merged dev CI `35992274605`、Session Authority／Firebase deploy `35992274447` attempt 2 均 SUCCESS。
