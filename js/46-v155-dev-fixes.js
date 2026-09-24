@@ -206,7 +206,7 @@
         const existing=monster.v155EvasionBlessing;
         if(
             existing&&existing.battleToken===currentBattleToken()&&
-            currentRound()<numeric(existing.expiresTurn)
+            numeric(existing.displayBuff&&existing.displayBuff.turnsLeft)>0
         ){
             if(typeof window.v173CanApplyNamedPersistentState==="function"){
                 window.v173CanApplyNamedPersistentState(
@@ -250,7 +250,7 @@
             numeric(entry.monster.sp)<numeric(entry.monster.maxSP));
         const needsBlessing=allies.some(entry=>!(entry.monster.v155EvasionBlessing&&
             entry.monster.v155EvasionBlessing.battleToken===currentBattleToken()&&
-            currentRound()<numeric(entry.monster.v155EvasionBlessing.expiresTurn)));
+            numeric(entry.monster.v155EvasionBlessing.displayBuff&&entry.monster.v155EvasionBlessing.displayBuff.turnsLeft)>0));
         const skillId=forcedSkillId||((hasNegative||needsHeal||needsBlessing)?"yuanZuBlessing":null);
         const skill=skillId&&typeof skillDatabase!=="undefined"?skillDatabase[skillId]:null;
         if(skillId!=="yuanZuBlessing"||!skill||numeric(monster.sp)<numeric(skill.spCost)){ return false; }
@@ -654,37 +654,39 @@
     }
     window.v155ClearRemovableCombatStates=clearRemovableCombatStates;
 
-    function tickV155TimedStates(){
+    if(
+        window.FourSymbolsDurationLifecycle&&
+        typeof window.FourSymbolsDurationLifecycle.registerBuffExpiryHandler==="function"
+    ){
+        window.FourSymbolsDurationLifecycle.registerBuffExpiryHandler(({entity,buff})=>{
+            if(!entity||!buff){ return false; }
+            if(entity.v155EvasionBlessing&&entity.v155EvasionBlessing.displayBuff===buff){
+                removeEvasionBlessing(entity);
+                return true;
+            }
+            if(entity.v155WindDodge&&entity.v155WindDodge.displayBuff===buff){
+                removeWindDodge(entity);
+                return true;
+            }
+            if(entity.v155RockWall&&entity.v155RockWall.displayBuff===buff){
+                removeRockWall(entity);
+                return true;
+            }
+            return false;
+        });
+    }
+
+    function tickV155RoundStates(){
         const token=currentBattleToken();
         const round=currentRound();
         if(typeof monsters!=="undefined"&&Array.isArray(monsters)){
             monsters.forEach(monster=>{
-                const blessing=monster&&monster.v155EvasionBlessing;
-                if(blessing){
-                    if(blessing.battleToken!==token||round>=numeric(blessing.expiresTurn)){ removeEvasionBlessing(monster); }
-                    else{ blessing.displayBuff.turnsLeft=Math.max(1,numeric(blessing.expiresTurn)-round); }
-                }
-                const dodge=monster&&monster.v155WindDodge;
-                if(dodge){
-                    if(dodge.battleToken!==token||round>=numeric(dodge.expiresTurn)){ removeWindDodge(monster); }
-                    else{
-                        dodge.turnsLeft=Math.max(1,numeric(dodge.expiresTurn)-round);
-                        dodge.displayBuff.turnsLeft=dodge.turnsLeft;
-                    }
-                }
-                const wall=monster&&monster.v155RockWall;
-                if(wall){
-                    if(wall.battleToken!==token||round>=numeric(wall.expiresTurn)){ removeRockWall(monster); }
-                    else{ wall.displayBuff.turnsLeft=Math.max(1,numeric(wall.expiresTurn)-round); }
-                }
                 if(monster&&Array.isArray(monster.activeBuffs)){
                     monster.activeBuffs=monster.activeBuffs.filter(buff=>{
                         if(!buff||buff.type!=="phoenixMight"){ return true; }
                         const active=buff.battleToken===token&&round<numeric(buff.expiresTurn);
                         if(active){ buff.turnsLeft=Math.max(1,numeric(buff.expiresTurn)-round); }
-                        else if(typeof addBattleLog==="function"){
-                            addBattleLog("⏳鳳威效果已結束。");
-                        }
+                        else if(typeof addBattleLog==="function"){ addBattleLog("⏳鳳威效果已結束。"); }
                         return active;
                     });
                 }
@@ -692,15 +694,14 @@
         }
     }
 
-    if(typeof startTurn==="function"){
-        const previousStartTurn=startTurn;
-        startTurn=function(){
-            tickV155TimedStates();
-            return previousStartTurn.apply(this,arguments);
-        };
+    if(
+        window.FourSymbolsBattleFlow&&
+        typeof window.FourSymbolsBattleFlow.subscribeRoundStart==="function"
+    ){
+        window.FourSymbolsBattleFlow.subscribeRoundStart(tickV155RoundStates);
     }
 
-    let phoenixCastContext=null;
+    let phoenixCastContext=null;    let phoenixCastContext=null;
     let damageActorContext=null;
     let monsterReflectContext=null;
 
