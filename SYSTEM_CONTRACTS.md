@@ -5,6 +5,8 @@
 ## 戰鬥目標契約
 
 - 一般戰鬥維持 `single / tri / row / column / all` 的 Fixed Slot（固定格位）規則。
+- `FourSymbolsBattleSkillTargeting` 是技能 Target Shape（目標形狀）與 hostile primary eligibility（敵對主要目標可選性）的唯一協調入口；玩家→敵方、敵方→玩家、手動、自動與支援技能都必須使用同一份正式 Skill Data／effective target type，再交由 `FourSymbolsBattlefieldSlots` 解析幾何。禁止同一 Skill ID 因施放方不同而硬寫第二份目標人數或範圍。
+- Stealth（隱身）只禁止成為 hostile primary target（敵對主要選定目標）：普通攻擊與任何需要指定 primary 的 `single / tri / row / column` 都不得選中隱身單位；但 `tri / row / column / all` 已由其他合法 primary／全體範圍解析出的波及名單仍可包含隱身單位。
 - Boss（頭目）專屬模式內，Boss、援軍、圖騰、戰旗、法器與技能召喚物都是獨立的數字索引 target entity（目標單位）。
 - Boss 模式中，除 `all / enemyAll` 外，所有技能只結算 primary target（主要目標）。視覺範圍與傷害目標數量彼此獨立。
 - Boss 是單一 entity（單位）；中央 `B2/B3/B4/F2/F3/F4` 六格只構成 visual footprint（視覺佔位）、點擊面積與 VFX（視覺特效）錨點，不得複製六份生命或傷害判定。
@@ -23,6 +25,7 @@
 - 玩家與普通敵方共用資源條高度與 HUD 錨點；Boss 可使用自己的大型 HP／Shield HUD。
 - Target Reticle（目標準星）由 Fixed Slot V2 唯一投影；敵方、我方、Boss、援軍與可破壞 Boss object 共用同一金色準星。歷史 `::after` 準星不得與正式 `::before` 準星並存。
 - Status Icon（狀態圖示）HUD 必須位於 HP／SP 資源條之上，正式 24px Icon 不得被塞入低於自身高度的容器或被資源條 z-index 蓋住。
+- Stealth（隱身）有效期間只將 combatant artwork（戰鬥立繪本體）投影為 `opacity: 0.35`；HP／SP、名稱、Status Icon、Target/VFX 錨點不得一起變透明。狀態解除或死亡後必須在正式狀態同步時移除半透明呈現。
 - 正式 Battle Info Drawer（戰鬥資訊抽屜）外殼永遠透明；收合／展開都保留左側回合文字，只有右側「戰鬥資訊／返回」小 Tab 與展開後的紀錄正文可有黑底。巡怪 `#mapBattleInfo` 是獨立固定黑色紀錄框，不得再共享正式 Drawer 外觀 owner。
 - Battle Info Tab 固定錨定於戰鬥畫面右下；不可拖曳、不可自由定位。展開／收合只允許改變 Drawer（抽屜）狀態，不得改變 Tab 錨點。
 - 巡怪頁底部導覽與副本／Gameplay 共用 `js/42-v148-combat-dungeon-fixes.js` 的 context navigation owner；順序固定為「角色／背包／秘寶／元素匣／返回」。巡怪頁不得再建立右上角第二顆返回鈕或自行硬寫另一套底部按鈕 markup。
@@ -67,6 +70,7 @@
 - 所有可升級技能 Lv2～Max 每次固定消耗 1 技能點。初次學習成本仍由正式技能階級／資料 owner 決定，不得拿升級成本覆蓋學習成本。
 - `js/60-v173.64-skill-progression-rebalance.js` 是正式玩家技能 Final Data／Progression／玩家說明 projection owner，並隨 `gameplay-core` 固定載入；V144／V169 等舊層不得再各自覆寫技能詳細文字或另算下一級傷害。
 - 技能列表、詳細頁、Lv1～Max 明細與下一級傷害必須由正式 Skill Data 與 `getSkillDamageAtLevel()` 投影。禁止在 UI 寫第二份 10 級傷害表、舊「最高5級」或用「每級+X」假裝完整描述 Lv5/Lv10 突破。
+- Battle Quick Bar（戰鬥技能快捷列）必須驗證每格的 canonical structure（正式結構），並由正式 Skill Data／`FourSymbolsSkillSpec` 投影技能名稱、SP、目標範圍與效果說明；只檢查「有四顆按鈕」不得視為結構有效，缺少內部節點時必須重建正式結構。
 - 輔助技能 Runtime 必須讀正式 `...ByLevel`／duration／target 欄位；不得在施放前暫時 mutation `skill.xxx` 再還原作為等級縮放。敵方／深淵同名支援技能也必須讀同一份正式數值與 Targeting owner。
 
 ## Team Relic Runtime 載入契約

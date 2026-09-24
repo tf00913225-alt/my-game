@@ -787,9 +787,12 @@
         let bestScore=-1;
         living.forEach(centerEntry=>{
             const center=centerEntry.index;
-            const indexes=owner&&snapshot&&typeof owner.resolveEnemyTargets==="function"
-                ?owner.resolveEnemyTargets(snapshot,center,"tri",index=>livingByIndex.has(index))
-                :[center];
+            const targetingOwner=window.FourSymbolsBattleSkillTargeting;
+            const indexes=targetingOwner&&typeof targetingOwner.resolveTargets==="function"
+                ?targetingOwner.resolveTargets("monster",center,"allyTri",{hostilePrimary:false})
+                :(owner&&snapshot&&typeof owner.resolveEnemyTargets==="function"
+                    ?owner.resolveEnemyTargets(snapshot,center,"tri",index=>livingByIndex.has(index))
+                    :[center]);
             const trio=indexes.map(index=>livingByIndex.get(index)).filter(Boolean);
             const score=trio.reduce((sum,entry)=>{
                 const ally=entry.monster;
@@ -995,44 +998,8 @@
         return true;
     };
 
-    let lastAbyssBuffTick="";
-    if(typeof startTurn==="function"){
-        const originalStartTurn=startTurn;
-        startTurn=function(token){
-            const key=token+":"+turn;
-            if(key!==lastAbyssBuffTick){
-                lastAbyssBuffTick=key;
-                currentBattleMonsters.forEach(index=>{
-                    const monster=monsters[index];
-                    if(!monster||!monster.v141Abyss||!monster.v141TeamBuffs){ return; }
-                    monster.v141TeamBuffs.forEach(buff=>{
-                        if(turn>1){ buff.turnsLeft--; }
-                        if(buff.displayBuff){ buff.displayBuff.turnsLeft=buff.turnsLeft; }
-                        if(buff.turnsLeft>0){ return; }
-                        if(buff.type==="rage"){
-                            monster.attack=buff.originalAttack; monster.magicAttack=buff.originalMagicAttack;
-                        }else if(buff.type==="resistance"){
-                            monster.resistance=Math.max(0,(Number(monster.resistance)||0)-buff.amount);
-                        }else if(buff.type==="dodge"){
-                            monster.evasion=buff.originalEvasion;
-                        }
-                    });
-                    monster.v141TeamBuffs=monster.v141TeamBuffs.filter(buff=>buff.turnsLeft>0);
-                    monster.activeBuffs=(monster.activeBuffs||[]).filter(buff=>{
-                        if(!buff||buff.turnsLeft<=0){ return false; }
-                        if(buff.type==="v141TeamBuff"){
-                            return monster.v141TeamBuffs.some(team=>team.displayBuff===buff);
-                        }
-                        if(buff.type==="rage"){
-                            return monster.v141TeamBuffs.some(team=>team.displayBuff===buff);
-                        }
-                        return true;
-                    });
-                });
-            }
-            return originalStartTurn.apply(this,arguments);
-        };
-    }
+    /* Timed support buffs consume on each affected monster's formal
+       action boundary through FourSymbolsDurationLifecycle. */
 
     function bossPosition(){ return [61,21]; }
     const ABYSS_DIALOGUE={

@@ -604,27 +604,21 @@
         };
     }
 
-    let lastShieldTickKey="";
-    if(typeof startTurn==="function"){
-        const originalStartTurn=startTurn;
-        startTurn=function(token){
-            const key=String(token)+":"+String(turn);
-            if(key!==lastShieldTickKey){
-                lastShieldTickKey=key;
-                currentBattleMonsters.forEach(index=>{
-                    const monster=monsters[index];
-                    const shield=monster&&monster.v141Shield;
-                    if(!shield){ return; }
-                    if(turn>1){ shield.turnsLeft--; }
-                    if(shield.turnsLeft<=0){ removeMonsterShield(monster); }
-                    else{ syncMonsterShield(monster); }
-                });
+    if(
+        window.FourSymbolsDurationLifecycle&&
+        typeof window.FourSymbolsDurationLifecycle.registerBuffExpiryHandler==="function"
+    ){
+        window.FourSymbolsDurationLifecycle.registerBuffExpiryHandler(({entity,buff})=>{
+            if(entity&&entity.v141Shield===buff){
+                removeMonsterShield(entity);
+                return true;
             }
-            return originalStartTurn.apply(this,arguments);
-        };
+            return false;
+        });
     }
 
     /* =====================================================
+       Elite single-roll drops + quest progress    /* =====================================================
        Elite single-roll drops + quest progress
     ===================================================== */
     function addEliteSpecialDrop(monster){

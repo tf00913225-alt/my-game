@@ -8663,27 +8663,21 @@
         };
     }
 
-    let lastShieldTickKey="";
-    if(typeof startTurn==="function"){
-        const originalStartTurn=startTurn;
-        startTurn=function(token){
-            const key=String(token)+":"+String(turn);
-            if(key!==lastShieldTickKey){
-                lastShieldTickKey=key;
-                currentBattleMonsters.forEach(index=>{
-                    const monster=monsters[index];
-                    const shield=monster&&monster.v141Shield;
-                    if(!shield){ return; }
-                    if(turn>1){ shield.turnsLeft--; }
-                    if(shield.turnsLeft<=0){ removeMonsterShield(monster); }
-                    else{ syncMonsterShield(monster); }
-                });
+    if(
+        window.FourSymbolsDurationLifecycle&&
+        typeof window.FourSymbolsDurationLifecycle.registerBuffExpiryHandler==="function"
+    ){
+        window.FourSymbolsDurationLifecycle.registerBuffExpiryHandler(({entity,buff})=>{
+            if(entity&&entity.v141Shield===buff){
+                removeMonsterShield(entity);
+                return true;
             }
-            return originalStartTurn.apply(this,arguments);
-        };
+            return false;
+        });
     }
 
     /* =====================================================
+       Elite single-roll drops + quest progress    /* =====================================================
        Elite single-roll drops + quest progress
     ===================================================== */
     function addEliteSpecialDrop(monster){
@@ -10965,9 +10959,12 @@
         let bestScore=-1;
         living.forEach(centerEntry=>{
             const center=centerEntry.index;
-            const indexes=owner&&snapshot&&typeof owner.resolveEnemyTargets==="function"
-                ?owner.resolveEnemyTargets(snapshot,center,"tri",index=>livingByIndex.has(index))
-                :[center];
+            const targetingOwner=window.FourSymbolsBattleSkillTargeting;
+            const indexes=targetingOwner&&typeof targetingOwner.resolveTargets==="function"
+                ?targetingOwner.resolveTargets("monster",center,"allyTri",{hostilePrimary:false})
+                :(owner&&snapshot&&typeof owner.resolveEnemyTargets==="function"
+                    ?owner.resolveEnemyTargets(snapshot,center,"tri",index=>livingByIndex.has(index))
+                    :[center]);
             const trio=indexes.map(index=>livingByIndex.get(index)).filter(Boolean);
             const score=trio.reduce((sum,entry)=>{
                 const ally=entry.monster;
@@ -11173,44 +11170,8 @@
         return true;
     };
 
-    let lastAbyssBuffTick="";
-    if(typeof startTurn==="function"){
-        const originalStartTurn=startTurn;
-        startTurn=function(token){
-            const key=token+":"+turn;
-            if(key!==lastAbyssBuffTick){
-                lastAbyssBuffTick=key;
-                currentBattleMonsters.forEach(index=>{
-                    const monster=monsters[index];
-                    if(!monster||!monster.v141Abyss||!monster.v141TeamBuffs){ return; }
-                    monster.v141TeamBuffs.forEach(buff=>{
-                        if(turn>1){ buff.turnsLeft--; }
-                        if(buff.displayBuff){ buff.displayBuff.turnsLeft=buff.turnsLeft; }
-                        if(buff.turnsLeft>0){ return; }
-                        if(buff.type==="rage"){
-                            monster.attack=buff.originalAttack; monster.magicAttack=buff.originalMagicAttack;
-                        }else if(buff.type==="resistance"){
-                            monster.resistance=Math.max(0,(Number(monster.resistance)||0)-buff.amount);
-                        }else if(buff.type==="dodge"){
-                            monster.evasion=buff.originalEvasion;
-                        }
-                    });
-                    monster.v141TeamBuffs=monster.v141TeamBuffs.filter(buff=>buff.turnsLeft>0);
-                    monster.activeBuffs=(monster.activeBuffs||[]).filter(buff=>{
-                        if(!buff||buff.turnsLeft<=0){ return false; }
-                        if(buff.type==="v141TeamBuff"){
-                            return monster.v141TeamBuffs.some(team=>team.displayBuff===buff);
-                        }
-                        if(buff.type==="rage"){
-                            return monster.v141TeamBuffs.some(team=>team.displayBuff===buff);
-                        }
-                        return true;
-                    });
-                });
-            }
-            return originalStartTurn.apply(this,arguments);
-        };
-    }
+    /* Timed support buffs consume on each affected monster's formal
+       action boundary through FourSymbolsDurationLifecycle. */
 
     function bossPosition(){ return [61,21]; }
     const ABYSS_DIALOGUE={
@@ -11962,159 +11923,9 @@
     };
 
 
-    function emperorAllies(){
-        if(typeof currentBattleMonsters==="undefined"||typeof monsters==="undefined"){ return []; }
-        return currentBattleMonsters.map(index=>monsters[index]).filter(monster=>monster&&monster.alive);
-    }
-    function baseMaxHp(monster){
-        return monster&&monster.v141Shield
-            ?Number(monster.v141Shield.baseMaxHP)||Number(monster.maxHP)||0
-            :Number(monster&&monster.maxHP)||0;
-    }
-    function baseHp(monster){
-        const shield=monster&&monster.v141Shield?Math.max(0,Number(monster.v141Shield.remaining)||0):0;
-        return Math.max(0,(Number(monster&&monster.hp)||0)-shield);
-    }
-    function restoreSp(monster,amount){
-        const max=Math.max(0,Number(monster&&monster.maxSP)||Number(monster&&monster.sp)||0);
-        const before=Math.max(0,Number(monster&&monster.sp)||0);
-        monster.sp=Math.min(max,before+amount);
-        return monster.sp-before;
-    }
-    function clearNegativeStates(monster){
-        const removed=Array.isArray(monster&&monster.statusEffects)?monster.statusEffects.length:0;
-        if(monster){ monster.statusEffects=[]; }
-        return removed;
-    }
-    function applyBlessing(monster){
-        if(!monster||!monster.alive){ return; }
-        let blessing=monster.v142AgilityBlessing;
-        if(!blessing){
-            const original=Math.max(0,Number(monster.agility)||0);
-            const display={type:"v141TeamBuff",v141BuffType:"agility",turnsLeft:2,statusName:"元祖賜福"};
-            blessing={originalAgility:original,turnsLeft:2,displayBuff:display};
-            monster.v142AgilityBlessing=blessing;
-            monster.agility=Math.round(original*1.75);
-            monster.activeBuffs=monster.activeBuffs||[];
-            monster.activeBuffs.push(display);
-        }else{
-            blessing.turnsLeft=2;
-            blessing.displayBuff.turnsLeft=2;
-        }
-    }
-
-    function castExtremeEmperorSkill(monsterIndex,forcedSkillId){
-        const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
-        if(!monster||!monster.alive||monster.name!=="極帝天尊"){ return false; }
-        if(
-            (typeof isMonsterFrozen==="function"&&isMonsterFrozen(monster))||
-            (typeof isMonsterPetrified==="function"&&isMonsterPetrified(monster))
-        ){ return false; }
-        const allies=emperorAllies();
-        if(!allies.length){ return false; }
-
-        const anyNegative=allies.some(ally=>Array.isArray(ally.statusEffects)&&ally.statusEffects.length);
-        const anyInjured=allies.some(ally=>baseHp(ally)<baseMaxHp(ally));
-        const anySpGap=allies.some(ally=>Math.max(0,(Number(ally.maxSP)||0)-(Number(ally.sp)||0))>=95);
-        const anyShieldless=allies.some(ally=>!(ally.v141Shield&&Number(ally.v141Shield.remaining)>0));
-        const allBlessed=allies.every(ally=>ally.v142AgilityBlessing&&ally.v142AgilityBlessing.turnsLeft>0);
-
-        let skillId=forcedSkillId||null;
-        if(!skillId){
-            if(anyNegative){ skillId="yuanZuBlessing"; }
-            else if(anyInjured||anySpGap){ skillId="yuanXiangGuangMing"; }
-            else if(anyShieldless){ skillId="yuanGuangShield"; }
-            else if(!allBlessed){ skillId="yuanZuBlessing"; }
-            else{ return false; }
-        }
-        const skill=typeof skillDatabase!=="undefined"?skillDatabase[skillId]:null;
-        if(!skill){ return false; }
-        const cost=Math.max(0,Number(skill.spCost)||0);
-        if((Number(monster.sp)||0)<cost){ return false; }
-        monster.sp=Math.max(0,(Number(monster.sp)||0)-cost);
-        if(typeof showMonsterSkillNameBadge==="function"){
-            showMonsterSkillNameBadge(skill.name,skill.element||"light",monsterIndex);
-        }
-
-        if(skillId==="yuanXiangGuangMing"){
-            let hpTotal=0,spTotal=0;
-            allies.forEach(ally=>{
-                const healed=typeof window.v141HealMonsterPreservingShield==="function"
-                    ?window.v141HealMonsterPreservingShield(ally,350)
-                    :(function(){
-                        const before=Number(ally.hp)||0;
-                        ally.hp=Math.min(Number(ally.maxHP)||before,before+350);
-                        return ally.hp-before;
-                    })();
-                hpTotal+=healed;
-                spTotal+=restoreSp(ally,95);
-            });
-            if(typeof addBattleLog==="function"){
-                addBattleLog(monster.name+"施放元相光明，我方全體回復350 HP、95 SP（實際 "+hpTotal+" HP／"+spTotal+" SP）。");
-            }
-        }else if(skillId==="yuanGuangShield"){
-            allies.forEach(ally=>{
-                if(typeof window.v141ApplyMonsterShield==="function"){ window.v141ApplyMonsterShield(ally,200,2); }
-                else{
-                    ally.v141Shield={remaining:200,turnsLeft:2,baseMaxHP:ally.maxHP,baseHp:ally.hp};
-                    ally.hp=(Number(ally.hp)||0)+200;
-                }
-            });
-            if(typeof addBattleLog==="function"){
-                addBattleLog(monster.name+"施放元光護體，我方全體獲得200護盾，持續2回合。");
-            }
-        }else if(skillId==="yuanZuBlessing"){
-            let removed=0;
-            allies.forEach(ally=>{ removed+=clearNegativeStates(ally); applyBlessing(ally); });
-            if(typeof addBattleLog==="function"){
-                addBattleLog(monster.name+"施放元祖賜福，我方全體解除"+removed+"個負面狀態並提升75%敏捷，持續2回合。");
-            }
-        }else{
-            return false;
-        }
-
-        if(typeof updateUI==="function"){ updateUI(); }
-        if(typeof finishPlayerAction==="function"){ finishPlayerAction(); }
-        return true;
-    }
-
-    window.v142ResolveExtremeEmperorAction=castExtremeEmperorSkill;
-
-    if(typeof window.v141TryMonsterSpecialAction==="function"){
-        const previous=window.v141TryMonsterSpecialAction;
-        window.v141TryMonsterSpecialAction=function(monsterIndex){
-            const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
-            if(monster&&monster.name==="極帝天尊"){
-                monster.v141SupportSkillIds=Array.from(new Set((monster.v141SupportSkillIds||[]).concat([
-                    "yuanXiangGuangMing","yuanGuangShield","yuanZuBlessing"
-                ])));
-                if(castExtremeEmperorSkill(monsterIndex)){ return true; }
-            }
-            return previous.apply(this,arguments);
-        };
-    }
-
-    let lastBlessingTick="";
-    if(typeof startTurn==="function"){
-        const previous=startTurn;
-        startTurn=function(token){
-            const key=String(token)+":"+String(typeof turn!=="undefined"?turn:"");
-            if(key!==lastBlessingTick){
-                lastBlessingTick=key;
-                emperorAllies().forEach(monster=>{
-                    const blessing=monster.v142AgilityBlessing;
-                    if(!blessing){ return; }
-                    if(typeof turn!=="undefined"&&turn>1){ blessing.turnsLeft--; }
-                    blessing.displayBuff.turnsLeft=blessing.turnsLeft;
-                    if(blessing.turnsLeft>0){ return; }
-                    monster.agility=blessing.originalAgility;
-                    monster.activeBuffs=(monster.activeBuffs||[]).filter(buff=>buff!==blessing.displayBuff);
-                    delete monster.v142AgilityBlessing;
-                });
-            }
-            return previous.apply(this,arguments);
-        };
-    }
+    /* V142 is visual-lifecycle only. Legacy Extreme Emperor heal/shield/buff
+       gameplay dispatch and round ticking were retired; formal enemy support
+       skills are owned by V141/V155 and FourSymbolsDurationLifecycle. */
 
     if(typeof checkBattleEnd==="function"){
         const previous=checkBattleEnd;
@@ -13501,6 +13312,15 @@
 
     function syncStatusVisualsForUnit(side,index,advanceRotation){
         const entity=entityFor(side,index);
+        const card=cardFor(side,index);
+        const stealthActive=!!(
+            entity&&Number(entity.hp)>0&&
+            (side!=="monster"||entity.alive!==false)&&
+            hasTimedEffect(entity,"stealthSkill")
+        );
+        if(card&&card.classList&&typeof card.classList.toggle==="function"){
+            card.classList.toggle("v143-unit-stealthed",stealthActive);
+        }
         const baseBodyTypes=activeBodyStatusTypesForLayer(
             entity,side,index,STATUS_VISUAL_LAYERS.HARD_CONTROL_BASE
         );
@@ -13545,6 +13365,9 @@
         if(typeof document==="undefined"||typeof document.querySelectorAll!=="function"){ return; }
         [".v143-status-visual",".v143-status-icon"].forEach(selector=>
             document.querySelectorAll(selector).forEach(node=>node.remove())
+        );
+        document.querySelectorAll(".v143-unit-stealthed").forEach(node=>
+            node.classList.remove("v143-unit-stealthed")
         );
         statusRotationByUnit.clear();
         hardControlContractViolationByUnit.clear();

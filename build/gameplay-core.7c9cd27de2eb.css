@@ -3651,6 +3651,25 @@ body.quest-scroll-active,
 }
 
 
+.skill-quick-button .sq-description{
+    display:-webkit-box;
+    width:100%;
+    min-height:0;
+    color:#d8d0c2;
+    font-size:9px;
+    line-height:11px;
+    text-align:center;
+    white-space:normal;
+    overflow:hidden;
+    overflow-wrap:anywhere;
+    -webkit-box-orient:vertical;
+    -webkit-line-clamp:2;
+}
+.skill-quick-button.sp-insufficient .sq-description{
+    color:#766f67;
+}
+
+
 /* bundled source: css/37-v139-rested-experience.css */
 /* V139 — 休息經驗；沿用既有主城彈窗，不新增第二層捲動容器。 */
 .v139-rested-exp-panel{
@@ -5523,6 +5542,14 @@ body.v174-battle-reading-open > .damage-popup,
 body.v174-battle-reading-open > .skill-name-badge.v143-caster-skill-label{
     visibility:hidden !important;
     opacity:0 !important;
+}
+
+
+/* Stealth changes only the combatant artwork. HUD, bars, names and status
+   indicators remain fully readable and range skills may still hit the slot. */
+#game-stage #battlePage .battle-player.v143-unit-stealthed > .v174-battle-art,
+#game-stage #battlePage .battle-monster.v143-unit-stealthed > .v174-battle-art{
+    opacity:.35 !important;
 }
 
 
