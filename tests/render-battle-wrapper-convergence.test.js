@@ -50,7 +50,8 @@ assert.ok(
 assert.match(v131,/function v131AfterBattleRender\(\)[\s\S]*?applyBattleFormation\(\);[\s\S]*?applyAllyBattleFormation\(\);[\s\S]*?applyPlayerElementFrames\(\);/);
 assert.match(v131,/window\.v131AfterBattleRender=v131AfterBattleRender;/);
 
-assert.match(v141,/function v141PrepareBattleRender\(\)[\s\S]*?v141RollWildMonsterRanks[\s\S]*?rebalanceDungeonElements\(\);[\s\S]*?battleSnapshot=\{/);
+assert.doesNotMatch(v141,/rebalanceDungeonElements/);
+assert.match(v141,/function v141PrepareBattleRender\(\)[\s\S]*?const activeDungeonRun=window\.v132ActiveDungeonRun\|\|null[\s\S]*?v141RollWildMonsterRanks[\s\S]*?battleSnapshot=\{[\s\S]*?dungeonMode:activeDungeonRun&&activeDungeonRun\.mode\|\|null/);
 assert.match(v141,/function v141AfterBattleRender\(\)[\s\S]*?decorateBattleCards\(\);[\s\S]*?v141-preparing-entry/);
 assert.match(v141,/window\.v141PrepareBattleRender=v141PrepareBattleRender;/);
 assert.match(v141,/window\.v141AfterBattleRender=v141AfterBattleRender;/);
