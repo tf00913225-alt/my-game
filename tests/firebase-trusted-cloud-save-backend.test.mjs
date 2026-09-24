@@ -106,6 +106,17 @@ test("trusted backend does not wrap the existing local save owner",()=>{
     assert.doesNotMatch(functionsIndex,/localStorage/);
 });
 
+test("Phase 4 preferences remain session protected, revision checked, and separate from gameplay",()=>{
+    assert.match(functionsIndex,/exports\.saveCloudPreferences\s*=\s*onCall/);
+    assert.match(functionsIndex,/sessions\.runProtected\(request,async transaction=>/);
+    assert.match(functionsIndex,/envelope\.serverRevision!==expectedRevision/);
+    assert.match(functionsIndex,/transaction\.update\(saveRef,\{\s*preferencesVersion:/);
+    assert.doesNotMatch(read("js/firebase/firebase-cloud-save.js"),/\bsetDoc\b|\bupdateDoc\b/);
+    assert.match(read("js/firebase/firebase-auth-ui.js"),/id="firebaseCloudPreferencesTestButton"/);
+    assert.match(read("js/firebase/firebase-auth-ui.js"),/id="firebaseCloudPreferencesRestoreButton"/);
+    assert.match(read("js/00-main.js"),/restoreAutoBattlePreferences:\(uid,preferences\)/);
+});
+
 test("Cloudflare deploy is isolated from Firebase backend sources",()=>{
     assert.match(deployWorkflow,/--exclude='functions\/'/);
     assert.match(deployWorkflow,/--exclude='\.firebaserc'/);

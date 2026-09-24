@@ -4277,3 +4277,10 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 - PR #553 已合併 `dev@195acb63d4acd36ceada31ed95b5f50e448d297f`。PR CI `35987380366`／Session `35987380024`、merged dev CI＋DEV deploy `35987880895`、Session emulator＋Firebase deploy `35987880460` 均 SUCCESS；正式 deploy job `107595824436` SUCCESS。
 - 最小 live 驗收 bridge 為 `FourSymbolsFirebase.bootstrapCloudSave()`；不自動呼叫、不改 first-use read owner、不傳 local gameplay save。真實 Google 帳號已在手機 Chrome 驗證 Version 2、Revision 1 與重複 bootstrap idempotency；Requirement Batch 現為 COMPLETE / 6/6 VERIFIED。Phase 3–10 未開始。
 - 為無電腦的真實裝置驗收，DEV 帳號面板新增手動「驗證雲端存檔骨架」按鈕；它連續 bootstrap 兩次並讀回 envelope，只顯示 Schema／Revision 結果，不顯示 credential、不送 local save。使用者已以原 Google 帳號在完整手機 Chrome 取得 `Schema V2、Revision 1` 成功結果；ChatGPT 內建瀏覽器的 Google OAuth 未完成不視為後端失敗。PR #555 合併 `dev@b037ced9dad9d1cf67d9aacccb4e064c74a135e1`；merged dev CI `35992274605`、Session Authority／Firebase deploy `35992274447` attempt 2 均 SUCCESS。
+## 2026-09-24 — Cloud Save Phase 4 一般進度遷移啟動（IN PROGRESS / 0/6 VERIFIED）
+
+- 最新基準 `dev@d8986afa62f0c1f2646fad1f4d1ca73b2be389f6`，工作分支 `feature/cloud-save-phase4-general-progress-20260924`；`main` 禁止修改。
+- `docs/CLOUD_SAVE_PHASE4_CONTRACT.md` 先記錄現有 owner、存檔欄位獎勵耦合、revision／session／UID 保護、衝突與驗收條件；Requirement Batch `release/requirement-batches/2026-09-24-cloud-save-phase4-general-progress.json` 為 TODO / 0/6 VERIFIED。
+- 初始設計盤點時沒有修改 Firebase callable、Firestore rules、Gameplay save／Boot owner，也沒有上傳、刪除或重寫任何玩家存檔；當時未建立 PR、未部署、未作真手機驗收。**Phase 4 NOT COMPLETE**。
+- 本輪後續使用者同意保守方向，工作分支草稿 PR #559 已建立；候選實作新增 `functions/src/cloud-preferences.js` 白名單、`functions/index.js::saveCloudPreferences` Session＋revision 交易、`js/firebase/firebase-cloud-save.js` 的 UID 本機設定提取、帳號面板 DEV 手動驗證／取回、`js/00-main.js::restoreAutoBattlePreferences` 同 UID／同角色 ID 恢復。僅設定，不含金幣／角色／獎勵；此為新增候選狀態，前一行記錄的是 PR 建立前的起點。未部署、未實機驗收，仍 **NOT COMPLETE**。
+- 下一步先完成逐欄獎勵審核；可信的局部一般進度才可在受保護後端交易提交／恢復。`gameplayProgress` 的 Boss 首通與四象塔已領獎紀錄不可當一般無害資料直接上傳；無法在 Phase 4 獨立判定的欄位保留至 Phase 5，不得以客戶端整包存檔填入權威 envelope。

@@ -9,7 +9,7 @@
 | 1 | Single Active Session（單一有效工作階段權威） | COMPLETE / 5/5 VERIFIED |
 | 2 | Cloud Save Skeleton（雲端存檔骨架） | COMPLETE / 6/6 VERIFIED |
 | 3 | UID Local Isolation / Login Loading（本機隔離／登入載入） | COMPLETE / 6/6 VERIFIED |
-| 4 | General Progress Migration（一般進度遷移） | NOT STARTED |
+| 4 | General Progress Migration（一般進度遷移） | IN PROGRESS / 0/6 VERIFIED |
 | 5 | High-value Data Backend Authority（高價值資料後端權威） | NOT STARTED |
 | 6 | Operation ID / Idempotency / Atomic Transaction | NOT STARTED |
 | 7 | Audit / Economy Ledger（稽核／經濟帳本） | NOT STARTED |
@@ -24,6 +24,8 @@
 - Phase 1 — Single Active Session Authority：**COMPLETE / 5/5 VERIFIED**。
 - Phase 2 — Cloud Save Skeleton：**COMPLETE / 6/6 VERIFIED**。PR #553／#554／#555 已依序合併 `dev`；最新驗收部署為 `dev@b037ced9dad9d1cf67d9aacccb4e064c74a135e1`。Repository checks、Java 21 emulator、DEV exact-SHA、Firebase deploy 與真實 Google 帳號手機 live envelope 驗證均 SUCCESS。
 - Phase 3 — UID Local Isolation / Login Loading：**COMPLETE / 6/6 VERIFIED**。PR #557 Repository checks run `35999834624` SUCCESS，合併 `dev@eed8dec359eff34727381adfbfa50b7c2ea09bd3`；DEV release manifest 與 hashed Boot Core 已讀回同一 SHA／Phase 3 owner。使用者以真實手機完成 Google → 訪客 → Google 驗收：訪客未看見 Google 角色／資料，重新登入 Google 後原角色／資料正常恢復。
+- Phase 4 — General Progress Migration：**IN PROGRESS / 0/6 VERIFIED**。2026-09-24 從 `dev@d8986afa62f0c1f2646fad1f4d1ca73b2be389f6` 建立 `feature/cloud-save-phase4-general-progress-20260924`。先固定欄位分類、安全遷移及驗收契約；沒有把本機資料上傳或寫入正式雲端，沒有開啟完整存檔同步。詳見 `docs/CLOUD_SAVE_PHASE4_CONTRACT.md` 及本階段 Requirement Batch。
+- Phase 4 候選實作（未部署）：僅限 UID＋角色 ID 綁定的三組自動戰鬥設定，新增受保護偏好寫入、serverRevision 衝突拒絕、明確手動上傳／取回；不寫入任何角色、金幣、背包、秘寶或獎勵，仍非跨裝置完整角色恢復。自動化、PR CI／Firebase 部署及手機驗收需分別核對，無法據此宣稱 COMPLETE。
 - 起始基準：GitHub 最新 `dev@7dd60dcddc9334902e058123a6084a93353e5943`，2026-09-19 重新 fetch 核對。
 - 原實作分支：`feature/cloud-session-authority-phase1-20260919`，當時只整合 `dev`。本次結案分支：`docs/cloud-session-phase1-closeout-20260919`，基準為重新核對的 `dev@342ef104fa2897f5ae5c3249e0c75c9efca3e762`；使用者已授權完成結案後經受保護 PR 發布 main。禁止直接修改 dev／main、rebase、force push。
 - 官方版本／cache version 維持 `173.65`，沒有升版。
@@ -161,7 +163,7 @@
 1. Phase 1 功能驗收已完成；本次結案文件仍須 PR → Repository checks SUCCESS → merge dev，然後核對最新 dev 的 CI、DEV deployment、Session Authority emulator 與 Firebase deploy，逐一記錄實際 SHA。
 2. 使用者已授權 dev → main 發布；只有上述最新 dev 驗證成功，且 main←dev 比較無獨立修復、素材分支混入或機密，才可建立及合併受保護發布 PR。正式部署、登入及無 DEV 測試區亦須獨立驗證。完成結果寫入[結案 PR #341](https://github.com/tf00913225-alt/my-game/pull/341) 永久發布記錄，不預填成功。
 3. Artifact Registry 清理政策本身仍有非阻塞警告，保留維運追蹤；不以 Deploy complete 推定政策設定成功。
-4. Phase 3 已完成；Phase 4–10 仍全部 NOT STARTED。Phase 4 才處理正式 gameplay payload 與一般進度遷移；高價值資料、operationId、帳本、快照與付款仍屬後續獨立階段。
+4. Phase 3 已完成；Phase 4 已開始欄位與安全契約盤點（0/6 VERIFIED，未部署）；Phase 5–10 仍 NOT STARTED。Phase 4 不能整包採納本機 gameplay payload；高價值資料、operationId、帳本、快照與付款仍屬後續獨立階段。
 
 ## E. Architecture Decisions（永久決策）
 
@@ -237,7 +239,7 @@ Wire callable 名稱是 `protectedTest`（本文 protected-test 的正式 Fireba
 3. [結案 PR #341](https://github.com/tf00913225-alt/my-game/pull/341) 先以 CI 全綠合併 dev，再核對該最新 SHA 的 Repository checks、DEV 與 Firebase 部署；把最終 dev SHA／run／job 記錄於結案 PR。
 4. 比較 main←dev，完成受保護 PR 與正式部署驗證；把 main SHA、production deployment 及登入／DEV 測試區隔離結果記入永久發布記錄。任一發布環節未完成，整次任務仍回報 NOT COMPLETE。
 5. Phase 2 已以真實 Google 帳號在手機 Chrome 完成 Version 2／Revision 1／重複 bootstrap 不增 Revision／無 gameplay payload 驗證。ChatGPT 內建瀏覽器曾使 Google OAuth 不完整，不作為後端失敗證據；後續登入驗收必須使用完整瀏覽器或正式 App Auth surface。
-6. Phase 3 已完成自動與真實手機隔離驗收。下一階段若獲授權，從最新 dev 另開 Phase 4 工作分支，設計一般 gameplay progress migration；不得把本機存檔直接升格為雲端權威或整包覆蓋 Phase 2 Envelope。
+6. Phase 3 已完成自動與真實手機隔離驗收。Phase 4 工作分支與安全契約已建立；接下來逐欄審核並實作可信一般進度，不得把本機存檔直接升格為雲端權威或整包覆蓋 Phase 2 Envelope。
 7. 不修改戰鬥／VFX／UI、經濟／背包／秘寶、支付或 gameplay save owner，禁止 local overwrite 與無關 refactor。禁止直接修改 main／dev。
 
 官方技術依據：[Callable 身分驗證](https://firebase.google.com/docs/functions/callable)、[Firebase auth_time／撤銷檢查](https://firebase.google.com/docs/auth/admin/manage-sessions)、[Firestore 原子交易與重跑](https://firebase.google.com/docs/firestore/manage-data/transactions)。

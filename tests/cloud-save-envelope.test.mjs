@@ -4,6 +4,7 @@ import test from "node:test";
 
 const require=createRequire(import.meta.url);
 const envelope=require("../functions/src/cloud-save-envelope.js");
+const preferences=require("../functions/src/cloud-preferences.js");
 const timestamp=value=>({toMillis:()=>value});
 
 function empty(overrides={}){
@@ -73,4 +74,16 @@ test("validates candidate metadata without trusting candidate gameplay",()=>{
         status:"migration_candidate_received",
         migrationCandidateStatus:"received"
     }),"uid-a"),/migration metadata is invalid/);
+});
+
+test("only allowlisted preference fields may appear in a non-authoritative envelope",()=>{
+    const auto={enabled:false,skill:"normal",hp:50,sp:25,returnToCityWhenEmpty:false};
+    const value={characterIds:["hero",null,null],autoConfig:auto,autoConfig2:auto,autoConfig3:auto};
+    assert.deepEqual(preferences.normalizePreferences(value),value);
+    assert.equal(envelope.inspectExistingEnvelope(empty({preferencesVersion:1,preferences:value}),"uid-a").serverRevision,1);
+    assert.throws(()=>preferences.normalizePreferences({...value,gold:100}),/Only character-bound/);
+    assert.throws(()=>preferences.normalizePreferences({...value,characterIds:["other",null]}),/identities are invalid/);
+    assert.throws(()=>preferences.normalizePreferences({...value,autoConfig:{...auto,inventoryItems:[]}}),/invalid preference/);
+    assert.throws(()=>preferences.normalizePreferences({...value,autoConfig:{...auto,hp:Infinity}}),/invalid preference/);
+    assert.throws(()=>envelope.inspectExistingEnvelope(empty({preferencesVersion:1,preferences:{...value,gold:1}}),"uid-a"),/preferences are invalid/);
 });

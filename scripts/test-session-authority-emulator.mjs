@@ -90,9 +90,25 @@ assert.equal(repeatedBootstrap.created,false); assert.equal(repeatedBootstrap.se
 const repeatedSave=await db.doc(`users/${x}/saves/current`).get();
 assert.equal(repeatedSave.get("serverRevision"),1);
 assert.equal(repeatedSave.get("updatedAt").toMillis(),firstEnvelopeUpdate);
+const config={enabled:false,skill:"normal",hp:50,sp:25,returnToCityWhenEmpty:false};
+const preferences={characterIds:["session-emulator-test",null,null],autoConfig:config,autoConfig2:config,autoConfig3:config};
+await rejected("saveCloudPreferences",a.idToken,{uid:x,session:sessionA,expectedRevision:1,preferences},"SESSION_REVOKED");
+await rejected("saveCloudPreferences",b.idToken,{uid:x,session:sessionB,expectedRevision:1,preferences:{...preferences,gold:999}},"INVALID_ARGUMENT");
+assert.equal((await db.doc(`users/${x}/saves/current`).get()).get("serverRevision"),1);
+const prefWrite=await invoke("saveCloudPreferences",b.idToken,{uid:x,session:sessionB,expectedRevision:1,preferences});
+assert.equal(prefWrite.serverRevision,2);assert.equal(prefWrite.unchanged,false);
+const prefSnapshot=await db.doc(`users/${x}/saves/current`).get();
+assert.deepEqual(prefSnapshot.get("preferences"),preferences);
+assert.equal(prefSnapshot.get("authoritativeStateReady"),false);
+assert.equal(prefSnapshot.get("gameSave"),undefined);
+assert.equal((await invoke("saveCloudPreferences",b.idToken,{uid:x,session:sessionB,expectedRevision:2,preferences})).unchanged,true);
+assert.equal((await db.doc(`users/${x}/saves/current`).get()).get("serverRevision"),2);
+await rejected("saveCloudPreferences",b.idToken,{uid:x,session:sessionB,expectedRevision:1,preferences},"CLOUD_REVISION_CONFLICT");
+await rejected("saveCloudPreferences",b.idToken,{uid:x,session:sessionB,expectedRevision:2,preferences:{...preferences,autoConfig:{...config,skill:"x",gold:10}}},"INVALID_ARGUMENT");
+assert.equal((await db.doc(`users/${x}/saves/current`).get()).get("serverRevision"),2);
 await invoke("submitLegacyMigrationCandidate",b.idToken,{uid:x,session:sessionB,save:candidate});
 assert.equal((await db.doc(`users/${x}/saves/current`).get()).get("authoritativeStateReady"),false);
-assert.equal((await db.doc(`users/${x}/saves/current`).get()).get("serverRevision"),2);
+assert.equal((await db.doc(`users/${x}/saves/current`).get()).get("serverRevision"),3);
 await rejected("protectedTest",b.idToken,{uid:x,session:{...sessionB,credential:"z".repeat(43)}},"SESSION_INVALID");
 const yUser=await login("accounts:signUp",{email:"session-y@example.test",password});
 const y=yUser.localId,sessionY=await invoke("createGameSession",yUser.idToken,{uid:y});
@@ -117,6 +133,7 @@ async function rulesRequest(path,token,method="GET"){
 assert.equal(await rulesRequest(`users/${x}/saves/current`,b.idToken),200);
 assert.equal(await rulesRequest(`users/${x}/saves/current`,yUser.idToken),403);
 assert.equal(await rulesRequest(`users/${x}/saves/current`,b.idToken,"PATCH"),403);
+await rejected("saveCloudPreferences",yUser.idToken,{uid:x,session:sessionB,expectedRevision:3,preferences},"SESSION_INVALID");
 for(const path of [`serverUsers/${x}/sessionAuthority/current`,`serverUsers/${x}/sessions/${sessionB.sessionId}`]){
     assert.equal(await rulesRequest(path,b.idToken),403);
     assert.equal(await rulesRequest(path,b.idToken,"PATCH"),403);

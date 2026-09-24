@@ -7,6 +7,7 @@ const {FieldValue,Timestamp,getFirestore}=require("firebase-admin/firestore");
 const {setGlobalOptions}=require("firebase-functions/v2");
 const {HttpsError,onCall}=require("firebase-functions/v2/https");
 const {createSessionAuthority}=require("./src/session-authority");
+const {CloudPreferencesError,PREFERENCES_SCHEMA_VERSION,normalizePreferences}=require("./src/cloud-preferences");
 const {
     CLOUD_SAVE_ENVELOPE_SCHEMA_VERSION,
     CloudSaveEnvelopeError,
@@ -65,7 +66,7 @@ function authProvider(request){
 
 function asHttpsError(error){
     if(error instanceof HttpsError){ return error; }
-    if(error instanceof CloudSavePolicyError||error instanceof CloudSaveEnvelopeError){
+    if(error instanceof CloudSavePolicyError||error instanceof CloudSaveEnvelopeError||error instanceof CloudPreferencesError){
         return new HttpsError(error.code||"invalid-argument",error.message);
     }
     console.error("Trusted Firebase backend failed:",error);
@@ -395,4 +396,42 @@ exports.submitLegacyMigrationCandidate=onCall(CALLABLE_OPTIONS,async(request)=>{
     }catch(error){
         throw asHttpsError(error);
     }
+});
+
+/* Preferences are not authoritative gameplay. They never create a playable
+ * character, award resources, or alter the full-save migration status. */
+exports.saveCloudPreferences=onCall(CALLABLE_OPTIONS,async request=>{
+    request=await verifyGameIdentity(request);
+    const uid=requireUid(request);
+    try{
+        const preferences=normalizePreferences(request.data?.preferences);
+        const expectedRevision=request.data?.expectedRevision;
+        if(!Number.isSafeInteger(expectedRevision)||expectedRevision<1){
+            throw new CloudPreferencesError("An expected server revision is required.");
+        }
+        const saveRef=publicSaveRef(getFirestore(),uid);
+        const result=await sessions.runProtected(request,async transaction=>{
+            const snapshot=await transaction.get(saveRef);
+            if(!snapshot.exists){
+                throw new HttpsError("failed-precondition","Bootstrap the account before saving preferences.");
+            }
+            const envelope=inspectExistingEnvelope(snapshot.data(),uid);
+            if(envelope.kind!=="current"){
+                throw new HttpsError("failed-precondition","Upgrade the cloud-save envelope first.");
+            }
+            if(envelope.serverRevision!==expectedRevision){
+                throw new HttpsError("aborted","CLOUD_REVISION_CONFLICT",{code:"CLOUD_REVISION_CONFLICT"});
+            }
+            const unchanged=envelope.data.preferencesVersion===PREFERENCES_SCHEMA_VERSION&&
+                JSON.stringify(normalizePreferences(envelope.data.preferences))===JSON.stringify(preferences);
+            if(unchanged){ return {serverRevision:envelope.serverRevision,unchanged:true}; }
+            const serverRevision=nextRevision(envelope);
+            transaction.update(saveRef,{
+                preferencesVersion:PREFERENCES_SCHEMA_VERSION,preferences,serverRevision,
+                updatedAt:FieldValue.serverTimestamp()
+            });
+            return {serverRevision,unchanged:false};
+        });
+        return {ok:true,uid,preferencesVersion:PREFERENCES_SCHEMA_VERSION,...result};
+    }catch(error){ throw asHttpsError(error); }
 });

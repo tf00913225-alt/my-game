@@ -1,5 +1,7 @@
 "use strict";
 
+const {PREFERENCES_SCHEMA_VERSION,normalizePreferences}=require("./cloud-preferences");
+
 const CLOUD_SAVE_ENVELOPE_SCHEMA_VERSION=2;
 const LEGACY_ENVELOPE_SCHEMA_VERSION=1;
 const EMPTY_STATUS="awaiting_authoritative_migration";
@@ -36,6 +38,13 @@ function requireBaseState(data){
     }
     if(data.gameSave!==undefined||data.save!==undefined||data.authoritativeSave!==undefined){
         fail("Non-authoritative envelope must not contain gameplay state.");
+    }
+    if(data.preferences!==undefined||data.preferencesVersion!==undefined){
+        if(data.preferencesVersion!==PREFERENCES_SCHEMA_VERSION){
+            fail("Cloud-save preferences version is unsupported.","failed-precondition");
+        }
+        try{ normalizePreferences(data.preferences); }
+        catch(_){ fail("Cloud-save preferences are invalid."); }
     }
     if(data.status===EMPTY_STATUS){
         if(data.migrationCandidateStatus!=="none"){
