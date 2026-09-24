@@ -96,6 +96,22 @@
 - Drawer 必須列出目前所有存活 Boss object，而非只列第一張；名稱、效果、觸發來源、目前狀態、倒數／剩餘回合全部從 `FourSymbolsBossBattle`／active battle context（當前戰鬥上下文）讀取。
 - 功能物件生成、被破壞、倒數、退休時必須同步 inspector（檢視器）；沒有存活功能物件時紅色「！」必須消失。
 
+## Enemy Runtime Identity／Element Owner 契約
+
+- `window.v132ActiveDungeonRun` 只代表「共用 Dungeon Battle Runtime 正在使用」，不得再等同某一玩法。正式入口必須在 `v132LaunchDungeonBattle(..., options)` 提供 `mode`：Daily=`daily`、四象塔=`tower`、個人／世界 Boss=`boss`（另以 `gameplayMode` 區分 personal/world）、Adventure=`adventure`、Abyss=`abyss`；舊私有入口未遷移前只可標示 `legacy-dungeon`。
+- 四象塔 `monster.element`、`skillIds`、`v141SupportSkillIds` 的唯一玩法 Owner 是 `js/gameplay-boss-tower-system.js::buildTowerRoster()`／`configureBossSkills()`。Tower monster 一旦帶有 `v132FixedSkillLoadout=true`，共用 Dungeon／Battle 初始化不得重抽元素或技能。
+- `js/40-v144-rules-and-abyss.js` 是敵方技能元素合法性的唯一 Guard Owner。一般元素怪物只有 `skill.element === monster.element` 的實際攜帶技能可進 Attack／Support／Heal／Buff／Debuff／Hard Control AI；缺少 element、舊殘留 ID 或非攜帶技能一律 fail closed。
+- 真正跨元素的 Emperor／Abyss／Boss 特例必須以明確 `v144CrossElementSkillIds` metadata allowlist 宣告；禁止依怪物中文名稱偷偷追加另一元素技能。
+- 敵方 AI 只能從 Guard 後的 `monster.skillIds`／`monster.v141SupportSkillIds` 選招；Forced Skill ID 也必須仍在合法攜帶清單內。
+
+## Four-Symbol Tower Formation／Small Boss 契約
+
+- 四象塔一般層固定 6 名：`B2/B3/B4 + F2/F3/F4`。第 5 層倍數的精英／特殊層與第 10 層倍數的 Boss 層固定 10 名：`B1...B5 + F1...F5`。
+- 10 人 Boss 層 `ENEMY_B3` 永遠是唯一 Tower Boss；沒有 Boss 的 10 人特殊層，`ENEMY_B3` 優先為 Elite。死亡後 Slot 不重排、不補位。
+- Tower Boss gameplay `rank="boss"`，但不是 Large Boss entity：固定單格 `ENEMY_B3`、`unitKind="tower-boss"`、不啟用 `FourSymbolsBossBattle` 的中央六格 footprint、B1/B5 援軍、F1/F5 Boss objects、Boss Shield／Mechanism Inspector。
+- Large Boss 架構只保留 Personal Boss 與 World Boss；Abyss 仍使用自己的正式編成 Owner。
+- Tower Boss portrait `sizeClass="standard"`，正式規格 1024×1536、2:3；`rank` 與 portrait `sizeClass` 不得混為同一語意。
+
 ## Element Tower（元素塔）自動續戰契約
 
 - 「自動挑戰下一層」屬 `gameplay-boss-tower-system.js` 的正式 Tower lifecycle（塔生命週期），不是戰鬥核心第二套迴圈。
