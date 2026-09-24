@@ -4590,7 +4590,6 @@ function battleStatisticsRecordDamageDealtByActor(character,value){
 }
 
 function notifyBattleActionFinished(){
-    finishBattleDurationAction();
     battleActionFinishObservers.forEach(observer=>{
         try{ observer(); }
         catch(error){ console.error("戰鬥行動完成觀察器失敗：",error); }
@@ -17779,6 +17778,11 @@ function finishPlayerAction(){
     if(interceptBattleActionFinish()){
         return;
     }
+
+    /* Duration consumption belongs to the one real queue advance. Intercepted
+       follow-up casts are still part of the same formal action and must not
+       consume extra turns. */
+    finishBattleDurationAction();
 
     if(!battleActive){
         return;
