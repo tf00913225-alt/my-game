@@ -1998,6 +1998,10 @@
         }
 
         window.v132ActiveDungeonRun={
+            identityVersion:1,
+            mode:String(opts.mode||"legacy-dungeon"),
+            gameplayMode:opts.gameplayMode?String(opts.gameplayMode):null,
+            dailyDungeonType:opts.dailyDungeonType?String(opts.dailyDungeonType):null,
             previousMonsters:monsters,
             previousZone:currentZone,
             onComplete:onComplete,
