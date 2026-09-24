@@ -194,19 +194,19 @@
         "decode": true
       },
       {
-        "path": "build/boot-core.54b38f5940ad.css",
-        "sha256": "54b38f5940ad",
-        "bytes": 220421,
-        "priority": "P0",
-        "type": "style",
-        "decode": false
-      },
-      {
         "path": "build/boot-core.42ed3ecd042a.js",
         "sha256": "42ed3ecd042a",
         "bytes": 59146,
         "priority": "P0",
         "type": "script",
+        "decode": false
+      },
+      {
+        "path": "build/boot-core.54b38f5940ad.css",
+        "sha256": "54b38f5940ad",
+        "bytes": 220421,
+        "priority": "P0",
+        "type": "style",
         "decode": false
       },
       {
@@ -802,7 +802,7 @@
         "decode": false
       }
     ],
-    "manifestHash": "a8281f8c06bc",
+    "manifestHash": "70b76017bdc2",
     "totalBytes": 21619124,
     "totalResources": 78
   },
