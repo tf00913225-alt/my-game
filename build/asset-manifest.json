@@ -102,7 +102,7 @@
       },
       "feature-boss-relic": {
         "scripts": [
-          "build/feature-boss-relic.90b00e03fc7c.js",
+          "build/feature-boss-relic.4b0d70e615c0.js",
           "build/feature-relic-progression.87f6a83606ad.js"
         ],
         "styles": [
@@ -930,6 +930,10 @@
     "assets/ui/startup-main-city.d43e67af1c1c.jpg": {
       "sha256": "d43e67af1c1c",
       "bytes": 363193
+    },
+    "build/feature-boss-relic.4b0d70e615c0.js": {
+      "sha256": "4b0d70e615c0",
+      "bytes": 84743
     }
   }
 }
