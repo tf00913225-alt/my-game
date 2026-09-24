@@ -930,6 +930,7 @@ let introTimer=0;
 let citySceneShown=false;
 let openingPresentationComplete=false;
 let creationRenderPromise=null;
+let accountTransitionReloading=false;
 function mark(name){
 try{ if(global.performance&&typeof global.performance.mark==="function"){ global.performance.mark(name); } }catch(_){ }
 }
@@ -1190,28 +1191,35 @@ showLoader(); status("啟動失敗",message);
 if(firebase){ accountUi("ERROR",message+" "+String(error&&error.message||""),true); }
 emit("four-symbols:startup-error",{error,message});
 }
+function reloadForAccountTransition(reason){
+if(accountTransitionReloading){ return; }
+accountTransitionReloading=true;
+++transitionToken;
+activeUser=null; resolvedUid=null; saveResolved=false; cloudResult=null; lastError=null;
+if(global.FourSymbolsGameSave){ global.FourSymbolsGameSave.deactivate(); }
+else{ global.FourSymbolsAccountSave.deactivate(); }
+try{ global.sessionStorage.removeItem("sixiang_startup_session_ready_v1"); }catch(_){ }
+if(creation){ creation.style.display="none"; creation.setAttribute("aria-hidden","true"); }
+if(game){ game.style.display="none"; }
+showLoader();
+status("切換帳號","正在清除上一個 UID 的執行狀態並重新載入");
+emit("four-symbols:account-transition",{reason:String(reason||"account-change")});
+global.location.reload();
+}
 function onAuth(detail){
 const user=detail&&detail.user; const error=detail&&detail.error;
 if(error){ fail(error,"Firebase 身份解析失敗；不會顯示創角。"); return; }
 if(!user){
 if(activeUser){
-++transitionToken;
-activeUser=null; resolvedUid=null; saveResolved=false; cloudResult=null; lastError=null;
-if(global.FourSymbolsGameSave){ global.FourSymbolsGameSave.deactivate(); }else{ global.FourSymbolsAccountSave.deactivate(); }
-if(state!==STATES.AUTH_REQUIRED){ transition(STATES.AUTH_REQUIRED,{reason:"account-switch"}); }
-status("帳號服務已就緒","請選擇登入或綁定的帳號");
-accountUi("AUTH_REQUIRED","請選擇登入、建立帳號或使用訪客開始遊戲。");
+reloadForAccountTransition("signed-out");
 return;
 }
 if(state===STATES.AUTH_RESOLVING){ requireAuth(); }
 return;
 }
 if(activeUser&&activeUser.uid!==user.uid){
-++transitionToken;
-if(global.FourSymbolsGameSave){ global.FourSymbolsGameSave.deactivate(); }else{ global.FourSymbolsAccountSave.deactivate(); }
-activeUser=null; resolvedUid=null; saveResolved=false; cloudResult=null; lastError=null;
-if(state!==STATES.AUTH_REQUIRED){ transition(STATES.AUTH_REQUIRED,{reason:"account-switch"}); }
-void resolveSaveFor(user); return;
+reloadForAccountTransition("uid-changed");
+return;
 }
 if(state===STATES.AUTH_RESOLVING||state===STATES.AUTH_REQUIRED){ void resolveSaveFor(user); }
 }

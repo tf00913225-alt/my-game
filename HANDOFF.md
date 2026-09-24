@@ -1,4266 +1,331 @@
-## 2026-09-24 — 四象塔 Element Owner／6・10 人陣形／Small Boss 收斂（VERIFIED candidate）
-
-- Base：最新 `dev@ae3bfba3d75c7c40bb4eea07860f525351ffd658`；工作分支：`fix/tower-element-formation-small-boss-20260924`；PR #552 → `dev`；`main` 全程未修改。
-- 四象塔元素／固定技能唯一玩法 Owner 收斂於 `js/gameplay-boss-tower-system.js`；V141 `rebalanceDungeonElements()` 已退休，Daily／Tower／Boss／Adventure／Abyss 共用 launcher 以正式 `v132ActiveDungeonRun.mode` 區分身分。
-- V144 為 Monster Skill Element Guard 唯一 Owner：一般元素怪 Attack／Support／Heal／Buff／Debuff／Hard Control 只能從本元素正式攜帶 ID 選招；Abyss 真正跨元素例外以 `v144CrossElementSkillIds` 明確 allowlist。
-- Tower 一般層固定 6 名（B2/B3/B4 + F2/F3/F4）；5 的倍數特殊層與 10 的倍數 Boss 層固定 10 名。Boss 層 B3 是唯一 Tower Boss；非 Boss 特殊層 B3 優先 Elite；死亡後 Slot 不重排。
-- Tower Boss gameplay rank 保留 `boss`，但為 `unitKind="tower-boss"`／單格 B3；不進 Personal／World 的 Large Boss footprint、B1/B5 援軍、F1/F5 object、Shield／Mechanism lifecycle。
-- `config/monster-portrait-registry.json` 的 8 個 `tower-boss` target 保留 rank=boss，sizeClass 改 standard（1024×1536、2:3）；素材目前仍是 planned，本次未產圖、未建假檔。
-- 技術債已移除：V141 broad element rebalance、Tower large-boss object/summon plan、V152 極帝名稱式技能 dispatcher、V152 全域 monster loadout mutation；V149 追擊與 V158 Daily solo protection 僅保留 action-scoped 暫存/還原用途，不是永久 Owner。
-- 專項 `tests/tower-element-formation-small-boss-20260924.test.js` 已加入 PR→dev 必跑 CI；PR CI run `35978931166` 的 source candidate `a7ba91b90debd18ee246eca142c447363509a5ad` Repository checks SUCCESS，包含專項、Boss/Abyss/Fixed Slot/battle/VFX targeted regressions、deterministic build:check、Fixed Slot 9:16、exact-candidate real battle、Adventure mobile QA、resources、loader、Release Gate 與 git diff。
-- Full Node Suite：PR→dev workflow 依契約跳過；不得誤報為已跑。必跑 targeted Node／integration suites 全部 PASS。
-- Requirement Batch：`release/requirement-batches/2026-09-24-tower-element-formation-small-boss.json` 已 VERIFIED。
-- `DATA_SECURITY_CONTRACTS.md` 在本次 Base 仍不存在；本次未修改帳號、Cloud Save 或安全資料 schema。
-
-## 2026-09-23 — Lv10 技能／輔助技能／秘寶 Runtime Owner 收斂（VERIFIED candidate）
-
-- Base：`dev@9d32e8cb022ff824e83d5dc3022f2e0a24c8d58a`；工作分支：`fix/skill-relic-runtime-owner-convergence-20260923`；`main` 未修改。
-- 31 個玩家直接傷害技能改為 Lv10。唯一 Damage Curve owner 為 `js/00-main.js::getSkillDamageAtLevel()`：Lv2～4 線性、Lv5=Lv4×1.5、Lv6～9 線性、Lv10=Lv9×1.5，與正式 `calculateDamage()` 一致使用 `Math.round`。
-- `js/60-v173.64-skill-progression-rebalance.js` 現為 Final Skill Data／Progression／玩家說明 projection owner，並固定進 `gameplay-core`；所有可升級技能每級固定 1 技能點，既有 `skillLevels` 不遷移／不重置。
-- 火系：炎魂共鳴 SP45、炎勢 12/15/18/21/25%，Lv5 爆擊／成功新增燃燒每正式回合最多延長1、整次最多+3，免費追擊不延長；焚血訣 SP35、HP成本5/10/15/20/25%，接下來3次非免費火系直接施放 +5/10/15/20/35%，DoT／免費追擊不使用也不消耗。
-- 水／風／土支援技能均改讀正式 ByLevel 欄位；冰封 Lv5 才由 column 升為 tri；淨心訣 Lv3 才升3目標且雙方都清除所有可解除臨時戰鬥狀態；結界只擋直接傷害並依 3/3/3/4/5 次與回合數。
-- 敵方岩石壁壘已由全體 `currentAbyssEntries()` 改回正式 `allyTriTargets()`，最多3名；V144 反向 `requires:["barrier"]`／`allyAll` 舊資料已退休。
-- Team Relic Trigger Engine 已從 `feature-boss-relic` 拆出並固定放入 `gameplay-core` 最末端；所有正式戰鬥入口因此在可執行前已同步取得同一 `js/60-team-relic-system.js`。Boss／Tower／養成仍 lazy，沒有塞回 Critical Boot，也沒有新增 Battle Start 非同步補載。
-- 10 件 `runtimeReady:false` 秘寶 hydrate／equip／progression 全部 fail closed；玩家只見「效果尚未覺醒／能力尚未開放」。寒泉玉珮、九龍神火罩、岩岳鎮印、烈陽神珠說明已同步實際 Trigger／Scalar。
-- 專項測試：`tests/skill-relic-owner-convergence-20260923.test.js`；既有 `tests/skill-progression-rebalance.test.js` 同步新規格，兩者已加入 dev PR 必跑 CI。
-- Requirement Batch：`release/requirement-batches/2026-09-23-skill-relic-runtime-owner-convergence.json` 已 VERIFIED。PR #532 最終 source candidate `e52a7f78eb02978bdfe4ab4423b6cb4ddf629515`；deterministic build commit `0a3405fdb53e125fd9d0024709239e5b45f0e37c`；PR CI Run `35837276372` Repository checks SUCCESS，包含技能／秘寶專項、Battle/Relic regressions、build:check、exact-candidate real battle mobile QA、resources、Release Gate、git diff。
-- 額外 Full Node audit 曾發現並修復兩個本次相關點：淨心訣 Lv3 擴展3目標時仍保留玩家點選目標為 VFX primary；Heal Spell 在 legacy/test data 缺少新 SP 欄位時不依賴不存在的 helper。Audit 另揭露施工 Base 已存在的 `battle-status-info-assets-20260922.test.js`／`ui-critical-regressions-mobile-browser.test.js` stale UI failure，以及 V143/V144/V155/V169 歷史 snapshot 仍寫死舊技能數值；本次未為追求歷史綠燈而把正式規格改回舊值。
-- 唯一仍待產品規格定案：支援技能沒有明確 Tier 對應，因此初次學習成本暫保留既有正式值；有明確 Tier 的四元素直接傷害技能已使用 2／6／10／16，所有技能的『升級』則固定每級 1 點。
-- `DATA_SECURITY_CONTRACTS.md` 在施工 Base 仍不存在；本次沒有修改 Cloud Save／帳號安全 schema。
-
-## 2026-09-23 — 冰封／石化互斥硬控與 Body Status Base Layer 收斂（VERIFIED candidate）
-
-- Base：`dev@8bab02b38197824ac47f3ba2269ba6e19cbfd52f`；工作分支：`fix/freeze-petrify-exclusive-status-layer-20260923`；`main`／`dev` 均未直接修改。
-- Gameplay Hard Control Owner 維持 `js/00-main.js` 的 Persistent State Gate。Freeze／Petrify 現為同一 Exclusive Hard Control Group：同名與跨名都會在機率骰點與正式寫入前以「狀態MISS」阻止；既有狀態不覆蓋、不刷新、不延長。
-- `applyFreezeEffect()` 與 `applyMonsterDebuff()` 也接回同一 Gate，避免玩家技能、怪物、Boss／深淵、符咒或其他直接 mutation caller 繞過互斥規則。跨名 Log 會同時指出既有狀態與新的失敗狀態。
-- Persistent Body Status Visual Owner 仍為 `js/39-v143-skill-animation.js`。新增語意層 `hard-control-base`／`rotating`／`hud`；Freeze／Petrify 固定在 Base Cover，不呼吸、不閃爍、不加入 2 秒 Body Rotation；其他 Body Status 保持原 2 秒嚴格循序輪播。
-- CSS 由 `css/40-v143-combat-dungeon-polish.css` 只呈現上述正式語意層；已移除 Freeze／Petrify／Abyss 的同層 z-index 特例，不以 `z-index:99999 !important` 類補丁處理。
-- Runtime 若觀察到同一 entity 同時存在 Freeze + Petrify，V143 只回報 Hard Control Contract violation，不替資料層隱藏／正規化其中一個。
-- Regression 已覆蓋：同名／跨名 MISS、剩餘回合不變、解除後另一硬控可重新施加、正式「狀態MISS」文案、玩家／一般怪／Boss／深淵共用 Gate、Freeze 固定底層＋一般狀態輪播、死亡／解除立即清理、Cast deferred lifecycle。
-- Requirement Batch：`release/requirement-batches/2026-09-23-freeze-petrify-exclusive-status-layer.json` 已 VERIFIED。PR #531：完整 Node／整合回歸於 Run `35820871917` 通過；deterministic production build 已同步；Run `35821205754` Repository checks SUCCESS。
-- `DATA_SECURITY_CONTRACTS.md` 在本次最新 dev 仍為 404；本次未修改帳號／雲端存檔／安全資料流程，未自行補寫不存在的契約。
-
-## 2026-09-22 — 戰鬥狀態輪播／抽屜圖層／倒數框／三技能 VFX Follow-up（candidate）
-
-- Base：`dev@d55410bd88590b9a9052b1b4d714a27b3cc9a411`；工作分支：`fix/battle-status-carousel-drawers-vfx-20260922`；`main`／`dev` 均未直接修改。
-- Persistent Status Visual Owner 維持 `js/39-v143-skill-animation.js`。狀態 Icon 由 14px 放大至 17px；Body 狀態圖由約 68%×72% 放大至約 82%×86%；多個 Body 狀態改為每 1 秒只顯示一種並輪播，Icon 仍可同時保留作資訊列。呼吸最大透明度改為 100%。
-- 暈眩正式 Body 狀態圖接為 `assets/vfx/status/stun.webp`。原始素材實際為 1774×887 單張圖，不是 4×3 Sprite Sheet；因此未做錯誤裁幀。
-- 戰鬥資訊底部入口改為橫向「戰鬥資訊」；左側統計入口／Drawer 改名「戰鬥數據」。底部抽屜收合時顯示目前回合，展開時隱藏該重複回合文字。
-- `syncBattleUiPriorityLayer()` 為互動資訊圖層協調入口：戰鬥資訊、戰鬥數據、Boss 功能卡或狀態資訊視窗打開時，`#game-stage` 暫時提升到技能 VFX（16000）與 detached damage popup（17020）之上；關閉後恢復一般戰場繪製順序。Drawer 仍為 non-blocking observer，不取得 BattleFlow pause lock。
-- 手動回合倒數框已移入 `#battleActionRegion`，固定於操作面板上方；技能／物品選擇及目標選擇時透明度降為 25%，且 `pointer-events:none`，不攔截玩家選擇目標。
-- Lag 根因之一為密集戰場每張角色／怪物立繪永久執行 idle transform + filter compositor 工作。現在待機立繪靜止；實際攻擊 lunge 與 target reticle 仍保留動畫；每單位腳下 blur filter 已移除。
-- 三個技能正式新素材：淨心訣、炎魂共鳴、焚血訣各自新增裁切正方形 lossless WebP Icon，以及保留完整 4×3 畫布的 lossless WebP cast VFX。VFX 尺寸均為 1448×1086。所有轉檔使用 `cwebp -lossless -exact`，反解碼後尺寸一致且 AE=0。
-- 有效資產轉檔 Run：`35730204057` SUCCESS；生成／Build commit：`563d1608ac04ba62908ff91444d27daad800c94f`。一次性資產 Workflow 已從工作分支移除。
-- Requirement Batch：`release/requirement-batches/2026-09-22-battle-status-carousel-drawers-vfx-followup.json` 目前 IMPLEMENTED；待 PR Repository checks／mobile browser QA／DEV exact-SHA deployment 後再升級 VERIFIED。
-
-## 2026-09-22 — 戰鬥狀態 Icon／卡牌資訊視窗／正式狀態圖（DEV candidate）
-
-- Base：最新 `dev@c496d98d6ee373a4f0d31bc299cdd648d3be5da5`；工作分支：`fix/battle-status-info-assets-20260922`；`main` 未修改。
-- Render Owner 保持 `js/00-main.js::renderBattle()` 唯一控制來源；本次沒有新增 renderBattle wrapper。卡牌點擊只有在 Idle（未選技能／物品／目標）時開啟資訊視窗，既有敵方／我方 targetable 選取優先。
-- Persistent Status Visual Owner 仍為 `js/39-v143-skill-animation.js`：狀態 Icon 固定顯示於 HP/SP 上方，不再呼吸；單張呼吸／固定圖仍保留角色本體視覺，但寬度／高度限制在自身卡牌約 68%／72% 範圍並使用 contain，避免蓋到左右卡牌。
-- 卡牌資訊視窗顯示元素、名稱、HP、SP、增益狀態、負面狀態；每筆狀態顯示正式 Icon、效果文字與剩餘回合／觸發後消失。無對應狀態時顯示「無」。
-- 正式狀態清單依目前 Runtime 對應，不重新導入已退休的「全屬性下降」。新火系持續狀態 `炎魂共鳴／焚血／炎勢` 與 `元祖賜福` 已補入正式 Persistent State 名稱表；未修改技能數值、命中率、持續回合或結算公式。
-- 從 `assets-library/assets/inbox/技能icon/[戰鬥狀態圖與icon]` 導入目前 Runtime 實際使用的 22 張狀態圖至 `assets/vfx/status/`。全部使用 lossless WebP；轉檔流程逐張驗證像素 AE=0、尺寸一致與 RIFF/WEBP signature。未將沒有獨立 Runtime 狀態 Owner 的通用 Icon 強行接入正式遊戲。
-- 一次性資產轉檔 Workflow 只存在於施工過程；完成 asset commit 後已自動刪除，最終分支不保留臨時 Workflow。
-- 專項 `tests/battle-status-info-assets-20260922.test.js` PASS；`npm run build` PASS；`npm run build:check` PASS。資產轉檔有效 Run #4：`35718725670` SUCCESS；生成資產／同步 Build commit：`4a32bcd7ef0d032bcd688bd57be085cbf5395a32`。
-- Requirement Batch：`release/requirement-batches/2026-09-22-battle-status-info-assets.json` 已升級為 VERIFIED。PR #515 exact-candidate CI run `35719594516` SUCCESS；Battle/VFX regressions、Fixed Slot 9:16 mobile QA、exact-candidate real battle mobile QA、resources、loader、Release Gate、git diff 全部通過。
-
-## 2026-09-22 — 全域捲軸視覺隱藏（DEV candidate）
-
-- Base：最新 `dev@cfde7fda6041b0e53e34c614351e40ff3aafa0c0`；工作分支：`feature/hide-scrollbars-global-20260922`；`main` 未修改。
-- 全域 Scrollbar（捲軸）視覺唯一 owner 為 `css/00-main.css`：所有 `#game-stage` 內既有與未來捲動容器保留原本 `overflow`、`touch-action`、慣性捲動與手勢行為，只隱藏瀏覽器繪製的 scrollbar track/thumb。
-- Firefox 使用 `scrollbar-width:none`；Blink／WebKit 使用 `::-webkit-scrollbar` 隱藏。未修改 scroll whitelist、內容高度、捲動方向、戰鬥／存檔／數值／玩法。
-- 已移除 `css/46-v154-dev-fixes.css` 深淵戰鬥紀錄與 `css/38-v141-system-expansion.css` 重鑄橫向列表的舊 `scrollbar-width:thin` 覆蓋，避免後層重新顯示可見捲軸。
-
-## 2026-09-22 — renderBattle Owner P1 收斂完成（DEV）
-
-- 正式 `main` 仍為 V173.70：`0b62be5944ff7a440682bfae28b3ccc43ee2fe91`；本次 renderBattle Owner 重構**尚未發布到 main**。
-- 最新 `dev`：`07ce72ac6fc602ac4a31809c26d7e4e531d4d1b1`。
-- PR #507 已合併 dev；`js/00-main.js::renderBattle()` 現為唯一正式 Render Owner。
-- 原正式 Runtime 共 6 層 renderBattle Wrapper（V131／V141／V143／V154／V158／Fixed Slot adapter）已全部移除，改為固定順序 named hooks；Production Runtime 不再允許新增 renderBattle wrapper。
-- Before-render 順序固定：V158 日常副本正規化 → V141 野怪／副本 lifecycle；After-render 順序固定：V131 Formation → V141 Battle UI／entry → V143 enemy decoration／RAF／V144 hook → V154 Abyss UI／Portrait → Fixed Slot reconcile。
-- 原正式行為保持：Formation、Monster Portrait、Abyss 五帝、Dungeon／Wild／Boss、Fixed Slot、Status／Skill VFX、Battle Statistics、Boss Drawer、回合順序與 Action cadence 均未改規格；`POST_ACTION_DELAY_MS` 未修改。
-- PR #507 candidate CI run `35697256998`：SUCCESS；包含 syntax、build:check、Fixed Slot、battle layout/timing/VFX、relic/battle-input、resources、HTML IDs、loader、Release Gate、git diff 與 exact-candidate real battle mobile browser QA。
-- Full Node Suite 以 CI-only Draft PR #508 驗證：run `35697472769`，**203 / 203 PASS**；PR #508 已關閉且未合併 main。
-- dev push CI run `35697890251`：SUCCESS；Dev deployment gate／exact-SHA verification／Game+Cache verification／deployed battle layout & VFX Live QA 全部 SUCCESS。
-- 收尾時 Open PR：0；Open Issue：0。
-- 目前 `dev` behind `main` = 0；dev 已因 V173.70 發布後的文件收尾與已驗證 dev-only renderBattle 重構而領先 main。這不代表 V173.70 Release Lifecycle 失敗，也不代表需要重發舊版本。
-- 本次未修改技能數值、傷害公式、Boss AI、掉落／經濟、玩家存檔 Schema、Firebase 正式資料行為或其他 UI。
-
-## 2026-09-22 — V173.70 正式發布完成／main-dev 收斂完成
-
-- 正式版本：V173.70。
-- V173.70 功能發布 SHA：`25c34a2dbbfce4600691df959cc2823eff80aeab`。
-- 最新 `main`：`0b62be5944ff7a440682bfae28b3ccc43ee2fe91`。
-- V173.70 Release Lifecycle 收斂當時的 `dev`：`9a2bbc31604331fb0fe97843b25036b3cbd5a5c1`；後續 dev 進度以本文件最上方最新區塊為準。
-- PR #503：V173.70 正式發布成功。
-- PR #504：CHECK_REPORT 發布後文件收尾成功。
-- PR #505：main→dev 歷史收斂成功。
-- main CI：SUCCESS（run 35683542056）。
-- GitHub Pages：SUCCESS（run 35683540344）。
-- dev CI：SUCCESS。
-- Full Node Suite：203 / 203 PASS。
-- Game / Cache Version：173.70 / 173.70。
-- Open PR：0；Open Issue：0。
-- 在 V173.70 Release Lifecycle 結案當下，`main`／`dev` 實際檔案內容一致、`dev` behind `main` = 0，且 dev 僅多 1 個 main→dev 收斂 Merge Commit；這是歷史結案快照，不代表後續 dev 永遠不得前進。
-- V173.70 Release Lifecycle（發布生命週期）已正式結案。
-- **Historical Record（歷史紀錄）註記：下方 V173.69 與舊 V173.70 候選內容只保留作歷史脈絡，不得再被 AI／代理當成目前正式狀態或下一步發布指示。**
-
-## 2026-09-21 — 目前正式狀態／V173.70 候選結案
-
-- 正式 `main`：V173.69，Game／Cache Version 為 `173.69`；目前 SHA：`f747717493da6e2a7f259079a9d1fc0afeb9b5c0`。正式 CI 與 Pages deployment 均已成功。
-- 最新 `dev`：`ce40dfe0a619b86b5910060ec6e003d9d3acb475`；本輪文件更新以此為基準，未直接修改 `dev` 或 `main`。
-- 原 V173.70 候選 PR #423 已關閉且未合併：候選 CI 被四個無效日常副本 WebP 阻塞，圖片修復工作已由專案負責人明確結案；後續不得把該候選 SHA 當成可發布版本。
-- 下一次發布必須重新以最新 `main`／最新 `dev` 建立候選，重新跑完整 CI、DEV exact-SHA deployment 與 S23 Ultra 實機驗收。未完成前不得推送 `main`。
-- 目前仍保留的非阻斷技術債：戰鬥核心多層 `renderBattle()` wrapper 尚未收斂；真機驗收仍不能由模擬尺寸 CI 取代。以下較早的 NOT COMPLETE／待驗收紀錄均為歷史紀錄，不代表目前正式狀態。
-
-## 2026-09-21 — 持續狀態視覺 Owner 收斂（4/4 VERIFIED／PR #426）
-
-- Base：`dev@2da319ad7d90cc56f56967a787d0f4ef87e2df5c`；工作分支：`fix/status-visual-owner-cleanup-20260921`；`main` 未修改，未 rebase／force push。
-- 持續狀態視覺唯一 owner 收斂到 `js/39-v143-skill-animation.js`：只保留 `pulse`（單張呼吸）、`static`（固定單圖）、`iconPulse`（Icon 呼吸）三種低動態模式；持續狀態不再使用逐幀 Sprite loop／Front-Back clock。技能施放瞬間的 12 幀 Cast VFX 保持不變。
-- `js/00-main.js` 的戰鬥狀態列只保留 host，不再自行畫燃燒／冰封／重力／破防等第二套 badge；舊燃燒／冰封 card overlay 已移除。`js/35-v141-ui-battle.js` 的 retired Card Effect renderer 已刪除，只保留相容呼叫面。
-- 分類：燃燒／怒火／風行／氣定神閒／元祖賜福等使用單圖呼吸；護盾／萬象土盾／岩石壁壘／結界／冰封／石化／隱身使用固定圖；凍傷／重力／殤風／暈眩／破防／全屬性降低／炎勢／鳳威使用 Icon 呼吸。
-- `release/deprecated-code.json` 新增 DEP-006，禁止 `v143StatusRasterFrames`、`.v153-status-vfx`、舊 Status Sprite API 與舊 burn/freeze card overlay 回歸。Fixed Slot geometry 仍是人物身上狀態圖唯一定位來源。
-- 未修改傷害／治療公式、狀態命中、持續回合、回合扣除、Boss AI、技能數值或存檔。V142 仍保留 Timing Gate；其歷史 gameplay resolver 技術債本次不擴大處理。
-- Requirement Batch：`release/requirement-batches/2026-09-21-status-visual-owner-cleanup.json`，4/4 VERIFIED。候選 CI run `35593978289` 的 Repository checks SUCCESS，包含 battle/VFX regressions、deterministic build、Fixed Slot 9:16 mobile QA、exact-candidate real battle mobile QA、resources、loader、deprecated-code Release Gate 與 git-diff。
-
-## 2026-09-20 — Lv40 深淵 Owner 收斂／五帝立繪／商店與主城 Header（IMPLEMENTED／PR CI 與 dev 實機驗收待完成）
-
-- Base：最新 `origin/dev@bd084a1f200dc527ca101436b68b4d150a52cb3a`；工作分支：`fix/abyss-lv40-skill-owner-five-emperor-portrait-20260920`；`main` 未修改，未 rebase／force push。
-- Lv40 最終五帝正式技能唯一 owner 為 `js/59-abyss-two-tier-runtime.js::FINAL_TRUE_REALM_LOADOUTS`；`js/40` 舊 final roster patch、`js/46` 舊 roster override 與三組未接線角色 handler 已退休。V141／V155 只從實際 `skillIds`／`v141SupportSkillIds` 進入 Skill-ID dispatcher；北帝未攜帶 `revive` 時不會復活。
-- `js/45-v154-dev-fixes.js::resolveMonsterPortraitRecord()` 已改為專屬圖／Registry／正式 Abyss mapping 優先，Boss placeholder 只作最後 fallback；五帝 Registry existing 各自解析 floor5 portrait。V159 只保留 timing bridge。
-- V173.51 shop QA runtime 已改為 inert，正式商店回到 `js/equipment-progression.js::replaceEquipmentShop`；`css/53` 舊兩列覆寫移除。主城隊伍 Header 由正式 Grid 欄位 owner 分隔隊伍數、金幣與佈陣。
-- 已新增 owner convergence、五帝 portrait、production bundle/cascade、390／412 Header browser 與商店 browser regression guard；目前本機沒有 Chrome，兩個 browser suite 只會 skip，不能視為實機 VERIFIED。
-- 本地 source／runtime、deterministic build、build:check、syntax、loader、resources、HTML IDs、Release Gate 均通過；待 commit／push／PR → `dev`、required CI、DEV deployment 與使用者 390／412 實機確認後再升為 VERIFIED。Game／Cache Version 維持 V173.69，`main` 禁止修改。
-
-## 2026-09-20 — 背包／商店金幣／主城金幣／離線廣告／客服／登入六項修復（6/6 VERIFIED／V173.69 發布中）
-
-- Base：最新 dev@5b7d1052579e4bbce13291c63b9d7cc28fbb0964；工作分支：fix/backpack-shop-homegold-offline-auth-20260920-v2；main 未修改。舊分支因施工途中 dev 前進且同時修改商店 CSS，已保留但不再作整合候選；本分支從新 dev 重新套用，避免覆蓋最新數量欄字級修正。
-- 50% 藥水：正式背包篩選 owner js/00-main.js::getFilteredInventoryItems() 排除 hpPotion50/spPotion50；舊 definition 暫留只為安全解析既有存檔，不做破壞性存檔遷移。Adventure V1 寶箱／商人停止再產出 50% 藥水，改用正式 30% hpPotion30/spPotion30。
-- 裝備商店金幣：Runtime 原本已有 wallet markup，真正根因是 css/49-v169-rpg-ui.css one-screen 幾何把 .v17345-equipment-wallet 設為 display:none；已在同一 owner 恢復 32px compact row，V169 與 equipment-progression 兩個既有 renderer 都顯示「目前金幣」。
-- 主城紅圈位置：js/16-stage-v54-main-city-runtime.js::ensureHomeRosterShell() 在冒險隊伍 header 加入總金幣；js/00-main.js::updateGoldDisplay() 新增同一 DOM sink，因此獲得／消費金幣沿用既有同步 owner，不新增 timer／observer。
-- 離線經驗：Compact UI 曾呼叫不存在的 watchOfflineExpAd()，所以按鈕無反應；已改回核心既有 claimOfflineExpWithAd() → showRewardedAd() → claimOfflineExp(true)，不建立第二套廣告流程。
-- 客服信箱：Critical Boot 唯一 owner js/startup/support-contact.js 與 privacy.html 統一為 foursymbols.support@gmail.com；Firebase/Cloud Save 現行文件與 responsive/support 測試同步。
-- Facebook：只從 js/firebase/firebase-auth-ui.js 移除 Web 登入按鈕、import/bind；firebase-auth.js 的 provider/core、既有 Facebook 身分相容與 Android native handoff 均保留，符合「暫時不開放」而非永久刪除帳號能力。
-- Requirement Batch：release/requirement-batches/2026-09-20-backpack-shop-homegold-offline-auth.json；6/6 VERIFIED。dev@29544c8035136462d52475be56bbe770beb8d896 的 CI run 35491059103 與 DEV exact-SHA deployment 已 SUCCESS，Session Authority run 35491058808 SUCCESS；專案負責人已明確指示推到 main。正式發布版本為 V173.69，需完成 release branch → dev → protected dev→main PR、main CI 與 production SHA 驗證後才可結案。
-
-## 2026-09-20 — Battle Statistics／正式秘寶配裝／Boss 戰況抽屜／元素塔自動續戰（VERIFIED／main 未修改）
-
-- 工作分支：`feature/battle-stats-relic-ui-tower-auto-20260920`；PR #355；最新基準已合併 `dev@48bca3e4672591b67a1fbc75d8a67c6b7a66eae9`，未 rebase／force push，`main` 全程未修改。
-- 主城隊伍秘寶根因：First Screen（首屏）摘要與 lazy Relic（秘寶）runtime 的刷新時序不同。正式修法維持 `teamLoadout.relicId` 為唯一裝備真相，主城從同一 UID 正式存檔讀取摘要；主城本身成為唯一垂直 scroll owner，底部預留固定導覽列＋Safe Area（安全區域）。
-- 符咒合成巨大圖根因：92×138 的符咒預覽規則原本誤放在 Abyss（深淵）lazy CSS，單獨開合成頁不一定載入。材料與目標兩張圖本來就是兩個正式格位，沒有重複 Render（渲染）；尺寸規則已移回 synthesis owner 並固定 `object-fit:contain`。
-- 秘寶卡片不再顯示 DEV／Runtime Ready／Presentation Only 等工程分類；DEV 驗收也使用正式「裝備／已裝備／卸下／詳情」與 `teamLoadout.relicId`，不再保留 `devPreviewRelicId` 第二套配裝狀態。尚未具正式 Trigger／Effect 的秘寶仍不虛構技能效果或數值。
-- 新增 `FourSymbolsBattleStatistics`：每場建立一份 combatant-ID Map，欄位固定為實際總傷害、有效治療、實際承傷、真正暴擊次數；戰鬥結束凍結同一份 snapshot，Boss／深淵結算不重新計算。資料型別已預留 `playerCharacter / heroNpc / reinforcement`，未來 Hero NPC 只需註冊進同一 owner。
-- Auto Battle（自動戰鬥）每個正式新回合在第一個宣告／行動前顯示 0.5 秒「第 X 回合」。左側「詳細戰況」與右側 Boss 功能物件 Drawer 共用 `FourSymbolsBattleFlow` pause/presentation lock；開啟時停止後續自動行動，關閉後由同一 lifecycle 恢復。
-- Boss 紅色「！」只投影目前存活的正式 Boss object entity（F1／F5 功能物件），不復活已退役的 `MECH_*` 系統；Drawer 會列出全部存活物件的名稱、效果、觸發、狀態與剩餘回合。
-- 個人 Boss、世界 Boss、深淵正式戰鬥使用同一 Battle Statistics frozen snapshot 顯示手動關閉的詳細結算；一般巡怪與每日副本仍走原快速結束流程。
-- 元素塔新增「自動挑戰下一層」checkbox；勝利後由單一受管理 timeout owner 顯示 3→2→1，再啟動正式下一層。戰敗、最高層、獎勵 gate、不符進入條件、launcher 失敗、玩家取消或真正離開 Tower 都會取消，不會失敗重試或背景殘留。
-- 既定 `POST_ACTION_DELAY_MS=1150`、角色／秘寶技能數值、Boss 數值、AI、EXP、金幣、掉落與獎勵均未修改。
-- Requirement Batch：`release/requirement-batches/2026-09-20-battle-stats-relic-ui-tower-auto.json`，10/10 VERIFIED。PR #355 candidate CI run `35466343921` 的 Repository checks 已 SUCCESS，包含 focused regression、relic lifecycle、deterministic build:check、exact-candidate real battle mobile browser QA、Adventure mobile QA、resources、loader／Release Gate／git-diff。
-
-
-## 2026-09-19 — DEV 正式版本公告視覺預覽（VERIFIED／main 未修改）
-
-## 2026-09-19 — V173.66 DEV 發布驗證（REL-01～04 VERIFIED／main PENDING）
-
-- V173.66 release candidate PR #349 的候選 CI runs `35453776605`、`35454779325` 已 SUCCESS。
-- 候選合併後 `dev@7d8a7180afc2c054b5966048e172f171a2fe5a8b`，push CI run `35454884505` SUCCESS；Repository checks job `105928300907`、Dev deployment gate job `105928430038` 均 SUCCESS。
-- DEV 部署 job 已逐步通過：仍為 dev HEAD、Release Gate、immutable static site、Cloudflare deploy、部署後 Commit SHA／Game Version／Cache Version 驗證、deployed battle/VFX live QA。
-- 正式版本：Game Version `V173.66`，Cache Version `173.66`；正式公告 `release-v17366` 已依實際 main...dev 玩家可感知差異整理。
-- Requirement Batch：`release/requirement-batches/2026-09-19-v17366-main-release.json`。REL-01～04 VERIFIED；REL-05 等待 protected `dev → main` PR、main CI 與 production SHA 驗證。
-- 本文件收尾 PR 只記錄 DEV 發布證據，不修改玩法／數值／runtime。
-
-
-## 2026-09-19 — Release Update 每次登入公告 + 今日不再提醒（3/3 VERIFIED）
-
-- Base：`dev@d2dfc01045ddead0e6ca71888334dc9c8eddccf7`；工作分支：`feature/release-update-daily-login-reminder-20260919`；`main` 不修改。
-- 唯一 runtime owner 仍是 `js/release-update-notification.js`，重用既有 `#homeFeatureModal` 與跑馬燈；沒有第二套公告系統。
-- 當前正式版本公告改為：每次新的登入工作階段進入主城後，自動顯示一次。既有 `last-seen-version`／`last-seen-notice` 只保留已讀／通知語意，不再永久阻止下次登入公告。
-- 公告底部新增小型 checkbox：「今日不再跳出提醒」。勾選後只在 per-UID localStorage sidecar 保存 `noticeId + 玩家裝置當地日期`；同日同公告不再自動跳出，隔日重新顯示；同日若新 `noticeId` 上線，新公告仍顯示。
-- 今日抑制只影響登入自動 Modal，不關閉跑馬燈、新版本偵測、forced update、安全 reload，也不寫入 Cloud Save。
-- CSS owner 仍為 `css/release-update-notification.css`；勾選文字 13px、checkbox 18px，位於發布時間與「我知道了」按鈕之間。
-- Targeted regression 已更新：驗證已讀仍新登入顯示、同一登入只顯示一次、今日抑制、隔日恢復、新 noticeId 繞過舊抑制、原有 normal/forced/update/polling 行為維持。
-- Requirement Batch：`release/requirement-batches/2026-09-19-release-update-daily-login-reminder.json`。目前 3/3 VERIFIED。PR #348 CI run `35452586346` 已全綠：targeted regression、deterministic build:check、Release Update mobile browser QA、Fixed Slot mobile QA、exact-candidate real battle QA、Adventure mobile QA、resources、loader integrity、Release Gate、git-diff 均 SUCCESS。
-- Game／Cache Version 維持 173.65；本輪不修改 `release/release-update.json` 公告內容，正式發布文案仍由既有 dev → main Diff 契約產生。
-
-
-## 2026-09-19 — Mobile lifecycle／Shop／Element Box／Adventure／Home First Screen 七項根因修復（7/7 VERIFIED）
-
-- Base：`dev@ccf587d0feec8d4790d17834a11b67a6d05bc55f`；工作分支：`fix/mobile-lifecycle-shop-elementbox-adventure-home-hud-20260919`；`main` 全程禁止修改。Requirement Batch：`release/requirement-batches/2026-09-19-mobile-lifecycle-shop-elementbox-adventure-home-hud.json`。
-- Screen Wake Lock 唯一 owner 仍為 `js/startup/screen-wake-lock-runtime.js`：system release 可見時重取、request 失敗只有有限節流 retry、hidden/pagehide 取消 retry 並 release；`FourSymbolsScreenWakeLock.getDiagnostics()` 提供 supported／held／failure／acquire／release 診斷，不阻塞 Startup。
-- Mobile resume owner 仍在 `js/00-main.js`：visibility hidden／pagehide／freeze 即時 `saveGame()`；`FourSymbolsMobileLifecycleDiagnostics` 記錄 `document.wasDiscarded`、navigation type、pageshow persisted、freeze/resume。普通 pageshow/resume 不重跑 Startup；reload/discard 後仍由 account-first Auth／UID save resolution／hydrate 恢復，不以本機 resume state 覆蓋 Cloud Save。
-- 商店數量規則收斂到 V133 `normalizeShopPurchaseQuantity()`，最大 999；V141 已移除會被 V144 覆蓋的舊 render／buy wrapper。V144 是最終補品 render／buy owner，V146 即時計價會直接把輸入框 >999 改回 999；V169 成功提示仍只依實際背包差額顯示。
-- 元素匣仍由 `js/45-v154-dev-fixes.js::finishAutoRecovery()`：Element Box active 時 HP=0 可進 HP 補品候選，必須真扣補品；若 HP 未成功恢復，SP path 不執行；一般 Battle heal 規則未改。
-- Patrol 正式離場 hook 為 `js/00-main.js::FourSymbolsPatrolLifecycle.exit()`，重用既有 `stopMonsterMovement()`／`stopAutoPatrol()`。Adventure `returnFromPatrol()` 只呼叫此 owner，不複製 timer/state；Fight Animation callback 以 lifecycle generation + map active + autoPatrolEnabled 三重確認，離場後失效。
-- NT$99 30天免廣告資訊在 `js/16-stage-v54-main-city-runtime.js` 改為 manual-only；已移除 startup／pageshow／MutationObserver auto-show 生命週期，保留 `openAdFreeServiceInfoModal()` 手動能力；ECPay／獎勵廣告未改。
-- Main City First Screen：`js/16-stage-v54-main-city-runtime.js` 在 app-shell 先建立固定 `#v146HomeRoster`、三格角色 placeholder 與 `.team-relic-loadout-slot`；hydrate 後只填內容。新增小型 `js/relic-summary-catalog.js` 作 `id/name/triggerText` 唯一摘要資料橋；完整 `feature-boss-relic` 仍 lazy，`js/60-team-relic-system.js` 不再建立首頁摘要 DOM。
-- 受影響 production build 已重建新 content-hashed Boot/App/Gameplay/Relic/Adventure bundles，`asset-manifest.json`／`build/asset-manifest.json`／`index.html` 已同步；Game／Cache Version 維持 173.65。
-- Targeted tests 已新增／更新：`tests/screen-wake-lock.test.js`、`tests/mobile-lifecycle-shop-elementbox-adventure-home-hud-20260919.test.js`、Adventure／ad-free／V146 shop／main-city／team relic save/runtime 既有測試。
-- PR #347 CI run `35450909260` 已 SUCCESS：syntax、Release Update、Adventure、Fixed Slot、battle/VFX、relic lifecycle、deterministic `build:check`、Release Update mobile browser QA、Fixed Slot mobile QA、exact-candidate real battle QA、Adventure mobile QA、static resources、HTML IDs、loader integrity、Release Gate、git-diff 全部通過。Requirement Batch 已 7/7 VERIFIED。
-
-
-- 工作分支：`feature/release-update-dev-preview-20260919`，PR [#345](https://github.com/tf00913225-alt/my-game/pull/345) 已在 CI run `35446496532` 全綠後合併為 `dev@fff36cf702a92638f812698049015537001345b0`；DEV deployment run `35446584392` 也已全綠並核對 exact SHA。main 禁止修改。`js/release-update-notification.js` 是唯一 owner，沒有新建公告、跑馬燈或 Modal。
-- DEV／本機驗收網址使用同一份 `release/release-update.json`：`?releaseUpdatePreview=marquee` 顯示正式跑馬燈，點擊後開正式更新視窗；`?releaseUpdatePreview=modal` 直接開同一視窗。只允許 `dev.four-symbols-dev.pages.dev`、`localhost`、`127.0.0.1`、`::1`，main host 必須忽略 query。
-- Preview 僅供版面、文案與內容驗收：不得改 loaded／正式 release version、不得寫 `last-seen` localStorage、不得 reload。更新視窗維持正式 normal／forced 樣式；preview 中的行動按鈕安全地只關閉視窗。
-- 直接測試必須覆蓋：DEV 現行版本仍可顯示跑馬燈與內容、按立即更新不 reload／不寫已讀、main 帶相同 query 不顯示 preview。
-
-## 2026-09-19 — Release Update Notification System（VERIFIED／main 未修改）
-
-- 工作分支：`feature/release-update-notification-system-20260919`，基準為最新 `origin/dev@af7d0f6b132ebbaeb5f594133db1338d2545861c`；本輪只會 PR 回 `dev`，不得直接修改或發布 `main`。
-- 正式玩家版本公告唯一資料為 `release/release-update.json`，與 `release/release.json` 的 Game／Cache Version 對齊；`release-manifest.json` 仍只供部署 SHA 驗證。`js/release-update-notification.js` 為 runtime owner，重用 `#game-overlay-layer` 跑馬燈和 `#homeFeatureModal`，不可另建 Modal／公告系統。
-- Runtime 在 startup ready、每 4 分鐘、visibility 回前景與 online 恢復時，節流讀取 cache-busted `release/release-update.json`；正常更新只通知，強制更新待安全狀態再鎖定。安全 reload 唯一入口為 `canSafelyReloadForUpdate()`，且已接上 battle／presentation／reward、背包交易與 account save write critical operation。
-- 永久 dev → main Release Contract 已補入 `AGENTS.md`、`SYSTEM_CONTRACTS.md`、`ARCHITECTURE_RULES.md` 與 `docs/RELEASE_VERIFICATION_RULES.md`：除非專案負責人明確說「本次不公告」，每次發布 owner 必須從完整 main...dev 實際 diff 自行整理所有玩家可感知變更到同一份 manifest；不可要求另給公告文案，也不可對玩家顯示檔名、函式、SHA、CI 或 debug 用語。`npm run release:update-diff -- --base origin/main --head HEAD` 是內部差異規劃 helper。
-- 實際驗證：PR [#344](https://github.com/tf00913225-alt/my-game/pull/344) 只目標 `dev`；GitHub Actions CI [run 35445108483](https://github.com/tf00913225-alt/my-game/actions/runs/35445108483) 已全綠。它完成 targeted Case A–J、deterministic build／build check、Release Gate、360×800／390×844／412×915 更新通知 browser QA、既有戰鬥與資源／loader 檢查；更新通知截圖與 JSON 證據已上傳為該 run artifact。`main` 仍未修改；最終 `dev` SHA 以 PR 合併結果為準。
-
-## 2026-09-19 — Phase 1 main 發布檢查：Firebase 模組數過期測試修正
-
-- 發布 PR #342 的 CI run `35441331170` 實際發現 `tests/critical-feature-budget.test.js` 仍要求 5 個 Firebase 模組；Phase 1 正式建置 owner 已明確包含 `session-client.js` 與 `firebase-session.js`，共 7 個。分類為 stale test contract，非正式程式錯誤；自主失敗額度 1/4、修正 1 次。
-- 從最新 `dev@10a2decd213cc061e8820fbfd5b01e4ad4d386f4` 建 `fix/cloud-session-phase1-release-gate-20260919`；只將既有模組數斷言對齊 7，不放寬 bytes、hash 或 feature boundary 檢查。本機同一測試先重現 7 !== 5，再修正為 PASS。
-- 結案文件與既有 Session Authority workflow 的文件連結註解同步；workflow 所有執行定義、後端／客戶端程式、遊戲與 Cache Version 均不變。修復必須 PR 回 dev、CI 通過後合併，再驗證最新 dev／Firebase／DEV 與 main PR；最新發布狀態和 SHA 以 [結案 PR #341](https://github.com/tf00913225-alt/my-game/pull/341) 永久記錄為準。Phase 1 仍為 5/5 VERIFIED，Phase 2 未開始。
-
-## 2026-09-19 — Cloud Account Phase 1 正式驗收結案（COMPLETE / 5/5 VERIFIED）
-
-- 本節取代下方歷史「Phase 1 BLOCKED / Firebase 403」作為目前狀態；歷史紀錄保留。長期進度唯一來源仍是 `docs/CLOUD_SAVE_IMPLEMENTATION_PROGRESS.md`，Phase 2–10 全部尚未開始。
-- 結案基準為重新核對的 `dev@342ef104fa2897f5ae5c3249e0c75c9efca3e762`；Firebase run `35438044543`／deploy job `105884400094` 成功，七支 Functions 全部更新，Firestore Rules 編譯與發布成功。部署服務帳號：`github-firebase-deployer@four-symbols-jianghu.iam.gserviceaccount.com`。Rules IAM 403 已解除；Artifact Registry 清理政策警告已不阻擋部署，但未冒稱政策本身已設定成功。
-- 同 UID 真實雙手機：舊手機畫面顯示 `SESSION_REVOKED` 與「這台裝置已被另一台裝置取代」；後登入手機 SUCCESS 由使用者於本次對話明確回報，成功截圖已刪除。使用者後續澄清已完成實測、沒有問題；不把先前簡短回覆誤記成雙手機均失效。不同 UID 隔離由同 SHA 的 HTTP emulator job `105883976742` 實際通過，未冒稱有不同 UID 真機截圖。
-- 同一基準的 Repository checks、DEV deployment 與部署 SHA 核對由 run `35438044719` 成功。收尾 PR 合併後必須另外記錄最新 dev 的檢查、Firebase／DEV 部署及正式 main 發布證據，不能用本段基準成功冒充最後發布 SHA。
-- DEV 測試區仍由 `js/firebase/firebase-auth-ui.js` 的精確 hostname allowlist 控制，只允許 `dev.four-symbols-dev.pages.dev`、`localhost`、`127.0.0.1`。不改正式權限 owner、UI、玩法或存檔；Game／Cache Version 維持 `173.65`。`DATA_SECURITY_CONTRACTS.md` 仍不存在。
-- 使用者已授權本次文件 PR → dev → 受保護 main PR 發布；最終 SHA 與發布結果記錄於[結案 PR #341](https://github.com/tf00913225-alt/my-game/pull/341) 的永久發布證據，不預填未執行結果。Phase 1 功能驗收已完成；整次發布仍須完成既有 Release Gate 與正式部署驗證才可回報完成。
-
-## 2026-09-19 — Cloud Account Phase 1：Single Active Session（歷史 BLOCKED 紀錄）
-
-- 基準 `dev@7dd60dcddc9334902e058123a6084a93353e5943`；分支 `feature/cloud-session-authority-phase1-20260919`，只整合 `dev`，`main` 禁止修改。
-- 長期進度唯一來源：[docs/CLOUD_SAVE_IMPLEMENTATION_PROGRESS.md](docs/CLOUD_SAVE_IMPLEMENTATION_PROGRESS.md)。後續每個 Cloud Save Phase 必須更新；內含 14 項稽核、十階段狀態、永久決策、風險與下一步。基準缺少 `DATA_SECURITY_CONTRACTS.md`，已如實記錄。
-- 新 owner：`functions/src/session-authority.js`；新增 `createGameSession`／`revokeGameSession`／`protectedTest`。兩支既有存檔 callable 在同一 Firestore transaction 內驗證 active session 與寫入；native auth handoff 加 source authTime 防繞過，仍只做身分交換。
-- Client owner：`js/firebase/session-client.js`＋`firebase-session.js`；auth/bootstrap／readonly cloud-save 接入，不包裝 gameplay save、不搬玩家資料、不改 UI 版面；所有 error 明確且不自動重試寫入／搶回 session。
-- 程式 PR #335 已於 CI 全綠後合併 `dev@b105f5329d95874820202b6ade78254712200d5e`；精準測試、HTTP emulator A/B／UID／rules／併發驗收、account boot browser QA 與 DEV 前端部署／SHA 驗證均通過。Game／Cache version 維持 `173.65`。
-- **NOT COMPLETE，Requirements 4/5 VERIFIED：** Firebase deploy run `35430858389`／job `105865475494` 於 Rules API test 回覆 403；Secret 與登入成功，部署權限不足。七支 Functions／Rules 尚未完成部署，真正雲端雙裝置驗收未做；線上不能宣稱已具本次 authority。
-- 下一步：專案管理者處理既有部署身分的 Rules IAM 權限，再從最新 dev 部署七支 Functions＋Rules、完成 A→B takeover／UID 隔離驗收並更新長期進度。純文件合併不觸發 Firebase 部署，不能重跑舊 SHA 冒充最新部署；詳細命令與證據見長期文件。Phase 1 驗收前不開始 Phase 2。
-
-## 2026-09-18 — 20 件秘寶 4×3 VFX WebP 與戰鬥演出整合
-
-- 工作分支：`feature/relic-vfx-animation-20260918`；基準為 `dev@d91687cb09d04519766d8303c331945508bde3a5`，`main` 不修改。
-- 20 張母圖來源固定為 `assets-library/assets/inbox/秘寶icon/秘寶技能VFX/`；正式 runtime 只使用 `assets/vfx/relic/*.webp`。依 `docs/IMAGE_ASSET_SPEC.md` 保留 1448×1086 完整畫布、4×3／12 幀、362×362 單格與 Alpha，不 trim／crop／resize；PNG 僅留素材庫。
-- VFX 唯一 raster owner 仍是 `js/39-v143-skill-animation.js`：`relicSheet()` 與 `RAW_MANIFEST` 登錄 20 件秘寶素材與 reviewed hit frame；使用既有 `v143RasterCastFrames`，未建立第二 renderer。秘寶素材採 lazy preflight，僅裝備中的秘寶由 `v143PreloadBattleVfxAsset()` 預載。
-- 秘寶觸發／效果唯一 owner 仍是 `js/60-team-relic-system.js`：`relicVfxTarget()` 依既有 Trigger／Effect 決定 enemy all、ally all、single ally 或 single enemy；`queueRelicPresentation()` 呼叫正式 V142/V143 動畫管線。已開放 10 件立即使用；其餘 `runtimeReady:false` 的 10 件只預先登錄 VFX，不因此開放技能或取得。
-- 既有 1.15 秒出手後節奏 owner `js/00-main.js::POST_ACTION_DELAY_MS` 不修改。秘寶 VFX 採 0.78–0.98 秒並保留 120ms lead gap，避免在下一個正式行動開始時被截斷。致命傷保命仍先同步結算，再播放 `回天寶輪` 視覺，不能為了動畫延後死亡攔截。
-- 檔名勘誤映射：`玄冰淨心vfx.png` → 正式 `玄冰鏡心`；`赤宵戰紋vfx.png` → 正式 `赤霄戰紋`。兩者只修正 runtime 命名映射，不修改素材內容。
-
-## 2026-09-18 — 秘寶碎片背包黑圖／詳情穿圖修復（VERIFIED）
-
-- Base: `dev@d9c6d2d2beb78a0a944af171ca20eeb92f02abaa`; branch: `fix/relic-fragment-inventory-image-fit-20260918`; `main` 不修改。
-- 實機截圖顯示秘寶碎片在背包格內只看到黑色／局部畫面，點開道具詳情後則以原始大圖尺寸穿出 modal。
-- 根因在 `js/relic-progression-drop-system.js::fragmentIconMarkup()`：上一輪 WebP 導入使用裸 `<img>`，繞過既有背包與 itemModal 的 `.v169-item-art > img` 幾何 owner。
-- 修正只把碎片 icon markup 收斂回既有 `v169-item-art` 包裝；沿用 `css/38-v141-system-expansion.css` 已有的尺寸與 `object-fit:contain`。沒有新增 CSS override、runtime wrapper、素材轉檔或玩法／掉落／合成變更。
-- Requirement batch: `release/requirement-batches/2026-09-18-relic-fragment-inventory-image-fit.json`。PR #315 Repository checks run `35364121111` 已通過，包含 build sync、9:16 mobile QA、exact-candidate real battle QA、Adventure mobile QA 與 release gates。
-
-## 2026-09-18 — Battle presentation follow-up: Boss HUD, cardless enemy feedback, drawer and reinforcement spacing (IMPLEMENTED / QA PENDING)
-
-- Base: latest GitHub `dev@394d4a6baba1aa6e7061d60390201bf1925c4a1e`; branch: `fix/battle-presentation-boss-hud-slots-20260918`. `main` remains excluded.
-- User video `1000070405.mp4` and screenshots `1000070400.jpg`／`1000070404.jpg` show the Boss footprint still inheriting a legacy elemental card border, enemy red HP popup feedback, a missing Boss HP bar, a stale Frostbite skill-prohibition label, a centered drawer handle, a perceived enemy/player bar-height mismatch and B1 reinforcement artwork touching the Boss portrait.
-- Existing owners only: `css/fixed-slot-battlefield-rendering-v2.css` now applies the cardless root reset to every enemy entity, suppresses enemy red HP popup paint, shares an 11px player/enemy resource-bar token and anchors the drawer handle at bottom-right with a translucent black background. No new stylesheet or late runtime patch was added.
-- `css/gameplay-boss-tower.css` now gives the Boss HUD explicit visibility/height priority over older shared battle styles, reserves 12px beyond the outer enemy columns for the Boss footprint and insets B1/B5/F1/F5 artwork so reinforcements/objects do not touch the central Boss portrait.
-- Frostbite is formally converged to its V169 soft-debuff rule: `js/43`, `js/44`, `js/50` and `css/45` no longer contain player/monster skill-lock wrappers, disabled-control classes or the obsolete prohibition text. Damage, evasion and status resistance penalties remain owned by V169. Deprecated-code gate prevents those retired tokens from returning.
-- Requirement batch: `release/requirement-batches/2026-09-18-battle-presentation-followup.json`. Status remains IMPLEMENTED / QA PENDING until focused tests, deterministic build check, mobile browser geometry and Repository checks pass.
-
-## 2026-09-18 — Boss target-entity convergence, cardless battlefield and queue-owner cleanup (IMPLEMENTED / QA PENDING)
-
-- Base: latest GitHub `dev@1142ba9c0cc0dac9200772326ba920d5b1a07fed`; branch: `fix/boss-battle-architecture-convergence-20260918`. `main` is excluded.
-- This entry supersedes every older function-card／Mechanism design below. Boss is one target entity with one HP/SP/status identity; `B2/B3/B4/F2/F3/F4` are one visual footprint only. Reinforcements use `B1/B5`; destructible Boss objects use `F1/F5`, normal numeric enemy identities, `canAct=false` and no ordinary rewards.
-- 金剛護體 is now Boss Shield. The old `MECH_*`, `mechanism:*`, mandatory mechanism target, mechanism-specific settlement and mechanism VFX paths are removed from production owners.
-- Boss mode isolates non-all damage to the selected target; `all/enemyAll` hits every living Boss-side entity. General battles retain their existing single／tri／row／column／all Fixed Slot rules. Boss tri VFX keeps authored group size even though damage settles one target.
-- `00-main.js` is the sole `finishPlayerAction`／`processNextCombatant` owner. V142 exposes remaining visual time only; dungeon, relic and Fire follow-up modules no longer Promise-gate or replace queue functions. Fire follow-up uses the core `FourSymbolsBattleFlow` removable interceptor.
-- Cardless presentation is source CSS plus immediate `FourSymbolsBattlePresentation.applyUnit()` at DOM creation. The 300ms presentation poll and `.red-hit` root-card feedback are retired; Heal has independent positive feedback.
-- Fixed Slot CSS owns 42／14／44 enemy-center-ally tracks, equal 10px player/enemy bars, bottom information drawer, 66px Element Box and the raised 64×32 gold drawer handle. The center-region borders were the two residual gold lines and are now removed at their source.
-- Existing V131 Formation remains the only editor and persists through `saveGame({source:"ally-formation"})`; no fake modal was added.
-- System contract: `SYSTEM_CONTRACTS.md`. Focused regression: `tests/boss-battle-architecture-convergence-20260918.test.js`. Requirement batch: `release/requirement-batches/2026-09-18-boss-battle-architecture-convergence.json`.
-- Status remains IMPLEMENTED / QA PENDING until 412×915 Browser QA, full repository checks, commit/push and PR to dev complete.
-
-## 2026-09-18 — Battle target contract, four-track layout, Formation entry and flow recovery (VERIFIED)
-
-- Base is the latest GitHub `dev@30c8253713fa0fee76ceea597521d7e9a314a9a0`; branch is `fix/battle-vfx-layout-formation-freeze-20260918`. `main` is excluded. The requested `SYSTEM_CONTRACTS.md` does not exist in the base or reachable history, so no substitute contract was invented.
-- User video `1000070339.mp4` ends after Water's Ice Arrow Rain with an unchanged battle frame. Source tracing found the systemic deadlock boundary: initiative ultimately relied on VFX/DOM completion, while the combat owner had no bounded final recovery.
-- Target ownership is now combat → immutable `battle-target-contract-v1` → V142 timing gate → V143 raster renderer. V143 no longer reads `queuedPlayerActions`, `selectedMonster`, hit order or survivor bounds. Player/enemy damage actions pass explicit targets; V148 support actions pass explicit target side and ids, including enemy-target Purify Mind.
-- Fixed Slot remains the only geometry owner. Single uses card center, tri/row/column use fixed semantic shape size centered on the explicit primary card, all uses the whole side, and trajectory starts at caster Slot center and ends at primary Slot center. Stale stages are purged and render errors release the gate.
-- `index.html` and the canonical fixed-slot stylesheet now own four tracks: enemy cards, middle turn/actions, ally cards, bottom battle info. The element-box button is restored to 66×66; enemy/ally HUD rows sit below art; ally rows use a real 8px gap with no negative overlap. The adapter accepts six ally Slots.
-- The existing V131 Formation editor remains the only editor. The home button now declares `data-feature="gameplay-core"`, allowing the first click to load that real owner before `openHomeFeature('formation')` renders it.
-- `processNextCombatant()` now arms a 7-second final action watchdog and catches player/enemy settlement exceptions. It completes any active V142 gate and advances exactly once; ordinary V142/V143 deadlines remain the primary cleanup path.
-- Exact-candidate PR CI Run `35259234890` (`#1832`) passed. The 412×915 real browser run opened and moved/restored the Formation editor, launched eight-enemy combat, verified four structural regions and fixed VFX footprints, advanced a formally declared Fire action, completed the dungeon handoff and left zero V143 stages. The separate Fixed Slot browser suite passed 412×915, 393×873 and 360×800 including six occupied ally Slots.
-- Requirement batch: `release/requirement-batches/2026-09-18-battle-system-integration.json` is VERIFIED / COMPLETE. Detailed analysis: `docs/qa/battle-system-integration-20260918.md`.
-
-## 2026-09-17 — Battle three-region layout, range VFX footprint and action-gate repair (NOT COMPLETE)
-
-- Base is `dev@b38411944c8c01b56faa6308f41d969644d82b25`; branch is `fix/battle-layout-vfx-runtime-20260917`. Severity is P1 because the reported Ice Arrow Rain path can block the core battle loop. `main` is explicitly excluded.
-- User evidence `1000070338.mp4` shows a stopped battle after Ice Arrow Rain, undersized single-card-like area VFX and crowded/tiny battle units. Screenshot `1000070335.jpg` is treated only as a three-region proportion concept.
-- Root causes: V142 omitted its safety deadline for V143's `render:false` timing call; V143 shrank complete-side/group geometry through square contain fitting and 0.72/0.62 factors; final skill target types could drift from authored manifest placement; the battle DOM lacked explicit enemy/operation/ally region ownership; and a failed raster render could leave a stale stage before the next Wind Flame cast.
-- Existing owners were repaired: `index.html` now exposes enemy / operation-status / ally regions; `css/fixed-slot-battlefield-rendering-v2.css` owns 34fr / 31fr / 35fr tracks and centralized equal slot/card/art/name/bar sizing; V142 always releases the action gate by deadline; V143 derives range placement from `config.targetType`, preserves three-target/full-side footprints, permits visual overflow and purges stale stages. Fixed Slot geometry adapters and combat/target/damage data remain unchanged.
-- Focused coverage audits all four elements' representative single/tri/all skills, Ice Arrow Rain after casualties, Ice Spin and Wind Flame survivor-independent group geometry, one Wind Flame raster node, unclipped cards/VFX and render-failure gate release. `npm run build` was used only after `build:check` identified a stale manifest; synchronized bundles retain V173.65/cache 173.65.
-- Detailed evidence: `docs/qa/battle-layout-vfx-runtime-20260917.md`. Requirement batch `2026-09-17-battle-layout-vfx-runtime` remains IMPLEMENTED / NOT COMPLETE until Repository checks pass, the candidate is merged to `dev`, the exact SHA is deployed, and fully loaded portrait-mobile combat confirms progression/layout/range VFX. No dev → main promotion is authorized.
-
-## 2026-09-17 — Function-card spread isolation and primary-target VFX anchor (NOT COMPLETE)
-
-- Follow-up base is `dev@a21736f3ea1f92b2e7da9e48870dce705c4c5cc4`; working branch is `fix/battle-tri-mechanism-vfx-anchor-20260917`. `main` is not part of this repair.
-- Real DEV confirmation completed the prior three battle-formation requirements. The new report exposed two separate defects: a player three-target skill aimed at a BOSS function card also damaged the two rear reinforcements, and enemy single/three-target VFX stayed at the front-row center instead of the actual attacked card. Full-field VFX must remain formation-centered.
-- Root causes remain in existing owners. `resolveMechanismAction()` damaged the mechanism and then retargeted spread skills into the normal monster resolver; enemy `processSingleMonsterAttack()` started the badge before target selection; V142 carried no target metadata; V143 centered group geometry on the row.
-- Repair keeps one settlement path and one VFX owner: mechanism-targeted skills pay once, damage only the mechanism and finish; monster selection passes primary/target indexes through the badge and V142; V143 keeps fixed-shape sizing but centers non-battlefield group VFX on the explicit primary card. Battlefield/all-target VFX still use the whole-side center.
-- Focused regressions: Gameplay/BOSS/Tower runtime proves BOSS and both reinforcements retain HP, the skill cost is paid once and normal monster settlement is never entered; primary-target VFX regression proves enemy single and tri use the selected non-center ally while all-target keeps the complete formation center.
-- Requirement batch `2026-09-17-battle-formation-targeting` is **3/5 VERIFIED — NOT COMPLETE**. The two new items remain IMPLEMENTED until the deployed dev runtime confirms (1) a three-target mechanism hit leaves the BOSS/reinforcements untouched and (2) enemy single/tri/all VFX use the required centers. Game/Cache Version remains 173.65.
-
-## 2026-09-17 — Real runtime follow-up: BOSS mechanism front-lane collision (NOT COMPLETE)
-
-- User mobile DEV recording `1000070330.mp4` verifies the ally projection: the water character is behind the two front allies. Requirement batch `2026-09-17-battle-formation-targeting` is now 1/3 VERIFIED.
-- The same real recording disproves the first BOSS mechanism placement as complete: the mechanism card occupies the same visual band and covers the center BOSS／reinforcement unit.
-- Root cause is in the existing BOSS owner, not another CSS cascade: `seedBossBattlefieldSnapshot()` and `BOSS_REINFORCEMENT_SLOTS` still placed the BOSS trio at `ENEMY_F3/F2/F4`, while the independent `MECH_*` zone now correctly owns the enemy front plane.
-- Follow-up branch `fix/boss-mechanism-front-lane-runtime-20260917` starts from `dev@167486c627e57fde9d1f9baabf7185d455c423ed`. It reserves `ENEMY_B3/B2/B4` for every Gameplay BOSS and its two reinforcements, then asks the existing fixed-slot geometry adapter to reconcile the live DOM immediately. No new wrapper, CSS priority patch, skill-number change, VFX change or save change.
-- The recording only shows enemy single-target casts (`冰霜拳`, `洪水猛獸`). It does not validate `tri`／`row`; range targeting remains IMPLEMENTED but not VERIFIED until a real enemy range cast is captured.
-
-## 2026-09-17 — Battle runtime P1 repair candidate (NOT COMPLETE)
-
-- Base `acc6419b72ee3a31a6314a6833ded3f81a3fd219`; branch `fix/battle-runtime-portraits-vfx-20260917`.
-- Scope only portraits and VFX geometry. Actual deployed normal battle confirmed legacy 122px/100px unit heights overriding 86px/92px slots; user video plus source trace identifies same-token BOSS reinforcement redraw reapplying entry hiding/translation.
-- Existing owners edited: V141 `renderBattle` / `startTurn` entry-token lifecycle; fixed-slot canonical CSS host namespace; V146 legacy zone translation; V143 `applySpriteBox` size factors. No added runtime wrapper or temporary patch.
-- `docs/qa/battle-runtime-p1-20260917.md` distinguishes actual observations, source diagnosis and supplementary tests. Requirement batch `2026-09-17-battle-runtime-p1` remains 0/2 VERIFIED. Version/cache remain 173.65.
-- Runtime source was connector-published as `a486e4bc6d2b1580cb50b796b112caa5b2646af8`; Draft PR #263 targets `dev`. CI Run #1799 (`35219995186`) passed, including Repository checks and the existing isolated 9:16 browser gate; the Draft PR dev deployment gate was skipped. These are supplementary only and do not change 0/2 VERIFIED.
-- Browser native DEV resource alert blocked further real-game inspection. Candidate BOSS reinforcement and VFX captures remain required. Never treat isolated QA or CI success as completion; no merge/deployment authorized by the autonomous validation contract.
-
-## 2026-09-12 Facebook Android 原生登入 PoC（工作分支，未合併）
-
-- 工作分支 `feature/android-native-facebook-login-poc-20260912`，基準為已重新核對的 GitHub `dev@f4fc2f78d704a6019252b52345cb6f66a74133ce`；`main` 沒有修改、沒有建立 promotion。
-- 實際掃描 repository 後確認：現有遊戲沒有 Android、Capacitor、Cordova、TWA、WebView 或其他原生 host。既有唯一 Web Auth owner 仍為 `js/firebase/firebase-auth.js::signInWithFacebook()`，維持 Firebase Web `signInWithPopup()`；本輪完全沒有修改它，也沒有再新增 Web OAuth workaround。
-- 新增獨立 owner `android/facebook-login-poc/app/src/main/java/com/foursymbols/jianghu/authpoc/MainActivity.kt`。它只走 Meta Android `LoginManager`／`CallbackManager` → Facebook AccessToken → Firebase Android `FacebookAuthProvider.getCredential()` → `FirebaseAuth.signInWithCredential()`，最後只顯示 Firebase UID。沒有 WebView、Firestore、localStorage、遊戲存檔、UID ownership、角色、migration 或 bridge 實作。
-- 固定 PoC package 為 `com.foursymbols.jianghu.authpoc`，Default Activity 為 `com.foursymbols.jianghu.authpoc.MainActivity`，Meta App ID 為 `1712957419809925`。Manifest 包含 FacebookActivity、CustomTab callback scheme 與 Android package visibility；Meta App Secret／client secret 沒有寫入程式、文件或 Git。
-- `android/facebook-login-poc/app/google-services.json`、簽章檔與 local properties 被 `.gitignore` 排除。PoC 在缺少 Google Services config 時會明確停用登入；配置檔必須由 Firebase `four-symbols-jianghu` 註冊同一 Android package 後下載並僅放在本機。README 已列出 Meta/Firebase Console 精確欄位、debug/release Key Hash 命令、APK 建置與 S23 Ultra 驗收。
-- 安全橋接僅記錄設計選項，未實作：原生 Firebase session 不會自動共享到 Web SDK；建議未來使用 trusted backend 驗證 native ID token，再給同源網頁一次性 handoff/custom token。禁止把 Facebook token、UID query 或 localStorage 當 bridge。
-- 驗證：`node --test tests/android-facebook-native-poc.test.mjs` 6/6 PASS；Gradle 8.9 `:app:tasks` PASS；含一次性 synthetic non-secret `google-services.json` 的 `:app:processDebugGoogleServices` PASS，測後已刪除 synthetic config。嘗試 `:app:assembleDebug` 的唯一失敗是此執行環境沒有 Android SDK（`SDK location not found`），因此尚無可聲稱的 debug APK／S23 實測。
-- Requirement batch：`release/requirement-batches/2026-09-12-android-native-facebook-login-poc.json`；4/5 VERIFIED，最後一項保留為 Meta/Firebase Console 設定、實際 APK 與 Samsung S23 Ultra（Facebook App 支援連結保持開啟）驗證。Game/Cache Version 維持 V173.65／173.65。
-
-## 2026-09-12 Facebook 登入 owner 收斂：移除 DEV direct OAuth
-
-- 工作分支 `fix/facebook-login-standard-flow-20260912`，基準為當時最新 `dev@fb316e564fb72e521df3d363b8bde81445c2dc15`；`main` 不修改。
-- Android 實機確認：玩家保留 Facebook App 正常「開啟支援連結」時，DEV direct `location.assign(facebook.com)` 會被外部 Facebook App 接管並停在 `Error Facebook`；只有關閉支援連結、由 Chrome 接手時才可完成 OAuth。因此問題不是玩家手機需額外設定，而是 DEV TEMP direct-OAuth/full-page navigation 不可作為正式玩家流程。
-- 唯一 Auth owner `js/firebase/firebase-auth.js` 已移除整套 `FACEBOOK_DIAGNOSTIC_*`、`location.assign()`、manual access-token callback、`signInWithCredential()` 與 mobile `signInWithRedirect()` 分支；不得再疊第三層 workaround。
-- `signInWithFacebook()` 現在單一路徑使用 Firebase `FacebookAuthProvider` + `signInWithPopup()`，並設定 `display=popup`，讓手機與桌機都維持瀏覽器 popup 流程；初始化僅保留 `getRedirectResult()` 以相容修正前已啟動但尚未結束的舊 redirect session。
-- `js/firebase/firebase-auth-ui.js` 移除已不存在的 DEV diagnostic 錯誤文案；`docs/FIREBASE_AUTH_CLOUD_SAVE.md` 與 Auth regression test 同步改為 popup contract。
-- 不修改 UID ownership、存檔 schema、Firestore Rules、Startup State Machine、Game/Cache Version。實機驗收條件：Facebook App 保持正常支援連結設定，不要求玩家關閉 App link；點「Facebook 登入」不得再出現舊 DEV direct-OAuth `Error Facebook`。
-
-## 2026-09-11 Facebook UID 存檔 hydration 修正
-
-- 症狀：Facebook OAuth 已成功取得 Firebase UID，但 Account UI 顯示 `Account save passed resolution but gameplay hydration failed.`。
-- 根因：Startup State Machine 已在 `resolveSaveFor()` 解析出該 UID 的確切 save payload，`enterReady(save)` 卻忽略參數並再次呼叫 `FourSymbolsGameSave.load()` 重讀 repository；第二次讀取可能與已解析狀態不同步而回傳 false。
-- 修正：`FourSymbolsGameSave` 新增 `hydrate(save)`，沿用既有 `loadGame()` hydration/normalization 邏輯但直接使用已解析 payload；一般 `load()` 行為維持原本從 active UID repository 讀取。真正 verified-empty UID 仍只走 `enterCreation()`，不會誤進 READY。
-- 不修改 save schema、UID ownership、Firestore Rules、Game/Cache Version；`main` 不修改。
-
-## 2026-09-11 三分支手機 UI／BOSS 秘寶／無卡牌戰鬥安全整合（DEV VERIFIED）
-
-- 整合前 GitHub `dev@34c5603b2ac7c062813489d5ddd1fef95fb20590`、`main@4989000c1034a6ca05a26dbdcf1ff36ed92e7d37`；三條遠端 tip 都精確等於指定 SHA。實際順序為既存 mobile UI／EXP guards → BOSS／四象塔平衡、玩法封面、技能預覽與 Lv20 秘寶 → 無卡牌戰鬥呈現。
-- `fix/mobile-ui-exp-guards-20260911@1dcff7dbfcad1837ce8399857861a41909eaf523` 已是起始 dev merge `34c5603b2ac7c062813489d5ddd1fef95fb20590` 的第二 parent，因此沒有重複合併；既有 PR #165 與 run `34575775811` 已成功，後續回歸測試仍通過。
-- `feature/boss-balance-gameplay-cover-skill-preview-relic-20260911@7751692d9df4afba08a5ce7058661ca3ede682c4` 以雙親 source merge `548e3a76697810af91c27f8c748eff694f50c393` 經 PR #172 合入 `dev@6de0d00d413362fd5e860698b1fa0ec76addc55d`。衝突為兩份 manifest、app-shell／feature-boss-relic hashed build rename、`css/56-v174-critical-ui-regressions.css` 與 `tests/ui-typography-battle-preservation.test.js`；人工保留較新 dev 的 4:3 BOSS／機關 owner、mobile guards 與 battle baseline，同時加入玩法 16:9、元素克制、BOSS／援軍與秘寶需求，再由 combined source 重建 generated assets。
-- `fix/battle-cardless-motion-ui@d802f846d80301fe96b97dea1c6055a1e13377c4` 以雙親 source merge `3e98aace46d86f1dab73f25856b4d92801fe60a7` 經 PR #173 合入 `dev@d7ce985768399eb4b3071976e86805ee3f8b8fba`。衝突只在兩份 manifest 與 gameplay-core hashed build rename，均以 combined source deterministic rebuild 解決；`js/54-v173.51-battle-qa.js` 只擴充既有單一 observer callback，沒有第二 observer／listener／state owner，V142/V143 技能 VFX、戰鬥席位、action／turn UI owner 均未改。
-- 交叉稽核另發現前一工作分支留下的 BOSS／機關 9:16 舊註解與會跨 CSS rule 誤匹配的過寬 regex；已改成精確鎖定目前 dev 核准的 4:3 owning rule，避免假陽性與舊規格回流。
-- 分支 2：PR run `34578585776`、dev run `34578810848` SUCCESS；BOSS/Tower 13/13、relic、mechanism、typography、mobile guards 與 390×844／412×915／420×747 Chrome suites 通過，Cloudflare exact-SHA deployment 與 live QA 成功。
-- 分支 3：PR run `34580597818`、dev run `34580804490` SUCCESS；228/228 JS syntax、152/152 Node/browser suites、299 resources、242 static IDs、22 deterministic build assets、release／loader／git-diff gates 全數通過。Chrome 的 cardless battle 360×800／412×915、玩法封面、mobile guards、boot／skill／relic QA，以及部署後 account-first、Abyss、battle-layer/audio live QA 全部 PASS。
-- Cloudflare `https://dev.four-symbols-dev.pages.dev` 已驗證部署 manifest exact SHA `d7ce985768399eb4b3071976e86805ee3f8b8fba`，Game／Cache Version 刻意維持 V173.65／173.65。額外 signed-out 實頁檢查無 broken image、水平 overflow 或 app-origin console warning/error；未建立匿名訪客帳號。
-- Requirement Batch：`release/requirement-batches/2026-09-11-three-branch-dev-integration.json`，7/7 VERIFIED。全程沒有以 `main` 為 base 的 PR、merge 或 push；完成 feature deployment 後 `main` 仍為 `4989000c1034a6ca05a26dbdcf1ff36ed92e7d37`。
-
-## 2026-09-11 Facebook public_profile DEV 診斷（TEMP）
-
-- 工作分支 `fix/facebook-public-profile-diagnostic`，基準為當時最新 `dev@8e1a2d9cf5f2a0f6b4551b2d42fddae419eb505f`。Android DEV 已反覆重現 Meta `Invalid Scopes: email` 與 `Error Facebook / 無法載入`；Firebase Authorized Domains、Meta App Domains、Firebase handler redirect、App ID、管理員角色，以及 Firebase mobile redirect 均已逐項排除。
-- 官方 Firebase JS SDK 原始碼顯示 `FacebookAuthProvider` 本身不預載 `email` scope，`BaseOAuthProvider` scopes 預設為空；專案也沒有 `addScope('email')`。因此診斷目標是隔離 Firebase hosted Facebook OAuth 下游是否額外要求 `email`。
-- 最終診斷不載入 Meta JavaScript SDK、不新增外部 runtime script、不放寬 production manifest/release gate。僅 `https://dev.four-symbols-dev.pages.dev/` 由唯一 Auth owner `js/firebase/firebase-auth.js` 直接導向 Meta OAuth dialog，明確只要求 `public_profile` 與 `response_type=token`；callback 使用 `sessionStorage` 隨機 state 驗證、防 CSRF，取得 token 後立刻清除 URL fragment，再以 Firebase 官方 `FacebookAuthProvider.credential(token)` + `signInWithCredential()` 回到既有同一 Firebase UID owner。
-- DEV 直接 OAuth callback 固定為 `https://dev.four-symbols-dev.pages.dev/`，Meta → Facebook 登入 → 設定 →「有效的 OAuth 重新導向 URI」必須額外加入這個完整網址；原 Firebase handler `https://four-symbols-jianghu.firebaseapp.com/__/auth/handler` 保留不刪。
-- 這是明確 TEMP patch：若 public_profile-only 實機成功，根因集中到 Firebase hosted Facebook OAuth / email scope；下一輪必須選擇正式修正 Meta/Firebase scope 或將已驗證 token exchange 收斂成正式 owner。若仍失敗，移除此診斷並把根因集中到 Meta App/OAuth 層。禁止再往 `signInWithFacebook()` 疊第三層 workaround。
-- 不修改 `saveGame()` / `loadGame()`、UID ownership、Firestore Rules、雲端/本機 schema、Game/Cache Version；`main` 不修改。
-
-## 2026-09-11 多對話 dev 分支稽核與 ancestry 收斂
-
-- 稽核基準為 GitHub `dev@fa21dc23971909556d65357c4e8e012c97b413d9`、`main@3d3e529e8e74dcced3dfcf8f82bac772a588d4a7`；稽核時遠端共有 100 個 branch heads，其中 76 個工作／整合分支已是 dev ancestor，沒有任何 branch 是建立在最新 dev 之上的未合併 descendant。
-- 2026-09-11 同時多對話產生的有效工作已依序存在於同一條 dev：冷啟動創角 lifecycle、創角第 2 步底部 actions、兩幕 boot intro 與 compact auth overlay、privacy policy，以及 Facebook mobile redirect；最新 dev 的 Repository checks 與 Cloudflare exact-SHA deployment 均為 SUCCESS，不存在三套互相競爭的程式碼。
-- 唯一需要收斂的是 protected main release merges 的 ancestry。`git merge-tree --write-tree dev main` 產生 tree `8d06fde7d9442b8f0c14562822ec7fef421a055e`，與合併前 dev tree 完全相同；整合 commit `6ae1b494f5c24858bed329cabe4a33eacc5983a6` 因此只增加 main parent，不改任何遊戲、UI、build、release metadata、Firebase、存檔或玩家資料。
-- 舊草稿 PR #146／`fix/ui-equipment-gameplay-city-polish` 已由 `fix/ui-equipment-gameplay-city-polish-continued@26a67473128674c91fa363cefbd33e5f3f1c8034` 的安全 owner-converged 版本取代，並早已透過 `2f3dc7d13df8e3c629b0544b52c494416a6f6ab1` 合入 dev；PR #146 已留下 superseded 說明後關閉，禁止再次合入舊 manifest／build。
-- `feature/facebook-login` 的 branch aggregate patch 與 dev integration commit `2d713dd08bee8efa7abf0ad18b61c950c9af9fa8` patch-id 完全相同，後續 mobile redirect 亦已在 dev；此舊分支不需再 merge。`noop`／`noop3`／`noop4` 只新增占位檔，`assets-library` 仍為素材專用，其餘 divergent branches 均是已取代的舊基底或歷史 release／verification branch，皆不得直接合入目前 dev。
-- 本次只以 PR #162 整理 ancestry 與本交接紀錄；Game／Cache Version 維持 V173.65／173.65，`main` 不修改。Repository checks 成功且 PR 合入後，必須再次確認 dev HEAD、Cloudflare deployed manifest SHA 與版本一致，才可回報完成。
-
-## 2026-09-10 四分支安全整合：Boss 9:16 手機版面（dev integration）
-
-- 指定工作分支 `fix/boss-ui-9x16-mobile-20260910@0865bbaef3e8c1ee5f054bf4774bc800db9f7ec2` 的 Boss 與機制卡 9:16 CSS 已整合到正式 owner `css/gameplay-boss-tower.css`。
-- 與秘寶分支共同修改 `asset-manifest.json`、`build/asset-manifest.json` 與 `feature-boss-relic` bundle；人工整合保留 Boss CSS 新版、秘寶標籤／雜湊素材、以及其後載入的 `feature-relic-progression` CSS/JS。
-- Boss 分支建立於舊 dev；未帶回舊 manifest、舊資源路徑或其他 runtime。測試涵蓋 360×800、393×873、412×915，並使用長 HP `5601 / 5601` 驗證卡片不溢位。
-- CSS 品質檢查先移除註解再掃描全檔 `!important` 宣告；註解中的詞彙不會造成誤判，實際 Boss owner 仍無優先權補丁。
-
-## 2026-09-10 Facebook Firebase 登入補齊（PR #152）
-
-- 工作分支 `feature/facebook-login`；整合基準收斂到 `dev@2f3dc7d13df8e3c629b0544b52c494416a6f6ab1`。Firebase Console 已啟用 Email/Password、Google、Facebook、Anonymous；本次補齊既有 Authentication owner 缺少的 Facebook provider。
-- `js/firebase/firebase-auth.js` 新增 `FacebookAuthProvider` / `signInWithFacebook()`；`js/firebase/firebase-auth-ui.js` 在既有 account-first responsive dialog 加入「Facebook 登入」、busy/error handling；`js/firebase/firebase-bootstrap.js` 透過既有 `FourSymbolsFirebaseLifecycle` 暴露同一登入方法。沒有新增第二套 Auth owner、modal wrapper 或 runtime patch。
-- deterministic build 已重新產生 content-hashed Firebase/Boot assets 與 manifests；`.github/scripts/run-boot-architecture-browser-qa.mjs` 的 Firebase Auth test double 同步補 `signInWithFacebook()`，並擴充 Auth source contract 與 390×844、360×640、844×390 responsive fixture。
-- 不修改 `saveGame()` / `loadGame()`、UID local ownership、Startup State Machine、Firestore browser write policy、雲端/本機存檔 schema、Game/Cache Version；`main` 不在本工作修改。
-- Meta live 前提：Valid OAuth Redirect URIs 必須包含 `https://four-symbols-jianghu.firebaseapp.com/__/auth/handler`。合入 dev 後仍需手機實測 Facebook popup、Firebase UID 與同 UID 存檔解析。
-
-## 2026-09-10 四分支安全整合：Screen Wake Lock owner 收斂（dev integration）
-
-- 指定工作分支 `feature/screen-wake-lock-runtime-20260910@55054cb18c93d319653922541b343079cc41eb19` 的可見頁面常亮需求保留；整合時移除 `index.html` 內未登記的 inline runtime，改由 `js/startup/screen-wake-lock-runtime.js` 作唯一 owner，並納入既有單一 hashed Boot Core。它只安裝生命週期並 fire-and-forget 呼叫 Wake Lock API，不等待、不阻塞 Auth／存檔／首個可操作畫面。
-- `visibilitychange` hidden 與 `pagehide` 會主動釋放；visible／`pageshow` 會恢復。`requestGeneration` 使 release 後才完成的 pending request 失效並立即釋放，避免頁面已離開仍重新持鎖；全域 guard 保證不會重複安裝 listener。公開診斷仍為 `window.FourSymbolsScreenWakeLock`。
-- `tests/screen-wake-lock.test.js` 覆蓋 unsupported／拒絕、重複 acquire、hidden release、pageshow/pagehide、pending race 與重複安裝；`tests/boot-architecture.test.js` 永久禁止 `index.html` 再出現未登記 inline executable script。正式裝置是否確實不休眠仍需在 HTTPS dev 與支援 Screen Wake Lock 的手機驗證。
-
-## 2026-09-10 V173.65 登入自適應與共用客服信箱（MAIN RELEASED）
-
-- 基準為 `dev@2bd79fb3c0133101caa3ba7a0345b7e39277f94d`，工作分支 `fix/v17365-auth-responsive-support`。使用者回報 Android／內嵌瀏覽器的未登入畫面只露出 1080×1920 stage 右下角，並要求登入頁、系統頁與免廣告服務資訊統一顯示客服信箱 `tf00913225@gmail.com`。
-- 根因是 `js/firebase/firebase-auth-ui.js` 在使用者尚未登入、`app-shell`／`js/00-main.js` stage scaler 尚未載入時，就把 account overlay 掛入固定 `#game-stage`。登入 UI 現改掛 `document.body`；`css/firebase-auth.css` 以 fixed real viewport、`100dvh`、safe-area、clamp 字級、內部垂直 scroll 與窄幅／橫向 breakpoint 負責自適應，不再依賴登入後 runtime 才縮放。
-- `js/startup/support-contact.js` 是唯一客服資料與共用聯絡視窗 owner，納入 Critical Boot，固定信箱為 `tf00913225@gmail.com`。登入頁的「聯絡客服」與系統頁的「客服信箱／查看信箱」呼叫同一 `FourSymbolsSupport.show()`；免廣告服務資訊亦讀取同一 owner，不再出現「客服 Email：尚未設定」。
-- 新增 `tests/v174-auth-responsive-support.test.js`，固定 390×844、360×640、844×390 三種 viewport 的 auth overlay／dialog 邊界、水平 overflow、共用客服視窗與 email；同步擴充 Firebase、ad-free regression。Requirement Batch：`release/requirement-batches/2026-09-10-responsive-auth-support-contact.json`，3/3 已 VERIFIED。
-- PR #136（head `72cfd90b8377a51ad391e90dbf63d11fdb3c6df3`）Repository checks run `34440677556` 重跑成功後合入 `dev@ed0aaab9d8f1d0f39edab5cbe6bdf02089cd6f66`；dev run `34441228608` 的 Repository checks 與 Cloudflare deployment 均成功，deployed manifest SHA 亦精確吻合。實頁 `https://dev.four-symbols-dev.pages.dev/` 顯示 V173.65，登入 overlay 為 `BODY` 下的 fixed viewport surface、dialog 完整位於 viewport 內；點擊「聯絡客服」顯示 `tf00913225@gmail.com`。本機完整驗證：Node tests 140/140、JavaScript syntax 214/214、static resources 303、HTML IDs 249，加上 deterministic build、loader、release、git diff gates 全數通過。Game／Cache Version 維持 V173.65／173.65。使用者於 2026-09-10 明確同意以受保護 PR 推進 `main`。
-- 核准紀錄 PR #138 的 Repository checks run `34443468268` SUCCESS，合入最終 `dev@3512dc1273acbcd4b6836ffbfa32b7fb83c1a563`；dev push run `34443625297` 的 Repository checks、Cloudflare exact-SHA deployment 與 live QA 全部 SUCCESS。受保護 promotion PR #139 的 Repository checks run `34444001508` SUCCESS 後合入 `main@0ab586409b9d50a8b46a6436d9a82bf59f07fb52`，main tree `57a588bac0af491715d2ab286e9c356ba68cc7d3` 與核准 dev tree 完全一致。main CI run `34444120869` SUCCESS；GitHub Pages run `34444119929` 的 build／deploy／report 全部 SUCCESS，artifact `10139005197` 與 `pages_build_version` 均綁定同一 main SHA。正式網址 `https://tf00913225-alt.github.io/my-game/` 已讀回標題 V173.65、`build/boot-core.5c427ac9f8a4.js` 與 `build/boot-core.ebcef3e27424.css`；登入 overlay 實測掛於 `BODY`、position fixed、完整位於 viewport，點擊「聯絡客服」顯示 `tf00913225@gmail.com` 與 `mailto:tf00913225@gmail.com`。正式頁面無 app-origin console error；V173.65 本批發布完成。
-
-## 2026-09-10 V173.65 battle/audio live QA race follow-up（MAIN RELEASED）
-
-- Work branches：`fix/v17365-battle-live-qa-race` 與 `fix/v17365-battle-live-qa-cast-race`，基準鏈自 release merge 後的 `dev@1783d3847ef7e2835915d763c4d517268e5a6098` 開始；PR #129、#131 與最終紀錄 PR #132 均在 Repository checks 成功後合入，最終核准 tip 為 `dev@6cb25539a87891161168970ee9b4d4dc0c278b87`。受保護 promotion PR #133 的 Repository checks run `34436151522` SUCCESS 後合入 `main@389765910b32b1de498b74fd9b58dcb7dbef4234`。
-- Release merge 的 Actions run `34430685287` 已通過 Repository checks、Cloudflare exact-SHA／V173.65 驗證、live account-first cold-start 與 live Abyss QA；唯一失敗為 `.github/scripts/battle-layer-audio-live-qa.mjs` 的 V143／元素匣疊層檢查。原始 attempt 在開 modal 後讀到已結束的 stage，重跑 attempt 2 則在開 modal 前等待測試 stage 時已被下一個真實戰鬥動作 supersede，證明失敗來自跨 CDP round-trip 的 live battle 時序競態，不是正式疊層或 VFX owner 回歸。
-- QA owner 改為兩個各自 atomic 的 browser task：第一個在正式 `castDamageSkill('explosiveFlurry')` 返回前立即擷取其 V143 raster stage，證明真實戰鬥施放會到達 V143；第二個依序呼叫正式 `v142SkillAnimationDirector.play()`、取得 stage、呼叫正式 `openHomeFeature('autoBattleSettings')` wrapper chain，並立即驗證前後為同一 DOM node、stage 仍 mounted、presentation 已 hidden／opacity 0、modal ownership 與 audio scale 正確。
-- `js/37-v142-skill-animation.js`（gate／supersede）、`js/39-v143-skill-animation.js`（raster stage lifecycle）、`js/45-v154-dev-fixes.js` 與 `css/46-v154-dev-fixes.css`（元素匣 focus／presentation suppression）均未修改；沒有暫停戰鬥、延長正式動畫、保留 idle stage、增加 wrapper 或新增 runtime patch。
-- `tests/v174-battle-layer-audio-fixes.test.js` 新增 regression，固定正式 cast 證據與 modal overlap 證據各自在單一 atomic browser snapshot 內完成，涵蓋 production cast、director、正式元素匣 opener 與 stage identity，禁止恢復會與持續戰鬥競速的等待式檢查。
-- 本機已通過：139/139 Node suites、212/212 JavaScript syntax、303 static resources、249 unique HTML IDs、deterministic build、loader、V173.65 release gate（10/10）、git-diff／conflict-marker gates。Game／Cache Version 維持 V173.65／173.65。
-- GitHub Actions push run `34434007783` 的 Repository checks 與 Dev deployment gate 全部 SUCCESS：Cloudflare 已讀回 exact SHA `1a3b5a35942e9821f3fad2c933afe198126597b0`，live account-first auth UI 1253.6 ms（5 秒目標達成），live Abyss 與修正後 battle/audio mobile QA 均 PASS。
-- 後續純文件 deploy run `34434554334` 揭露正式 Fire Flurry cast 的證據仍跨越 wait/read CDP round-trip，1.45 秒 stage 在讀值前合法結束而得到 `skill:null`；PR #131 將這一段也改為 atomic snapshot。修正後 push run `34435227337` 全數 SUCCESS：Cloudflare exact SHA `e47a0ca8d1d39363640abb4e9d4755f73c809a73`、live account-first auth UI 2014.9 ms、live Abyss 與 live battle/audio mobile QA 全數 PASS。最終文件 merge 後的 dev push run `34435831671` 再次全數 SUCCESS：exact SHA `6cb25539a87891161168970ee9b4d4dc0c278b87`、V173.65／cache 173.65、10/10 VERIFIED、auth UI 897.5 ms、Abyss 與 battle/audio 均 PASS。
-- 正式 main push run `34436296299` 的首次 Chrome fixture 在 `ui-critical-regressions-mobile-browser` 遇到一次性 RAF／timer 排程抖動；合併 tree 與已驗證 dev tree 完全相同，該測試同份 tree 本機連跑 20/20 PASS，官方 failed-job rerun 隨後 Repository checks SUCCESS。GitHub Pages run `34436294497` 的 build／deploy 全部 SUCCESS，artifact `10136282359` 與 deployment 均綁定 exact main SHA `389765910b32b1de498b74fd9b58dcb7dbef4234`；正式網址 `https://tf00913225-alt.github.io/my-game/` 已讀回頁面標題 V173.65、`build/boot-core.46539aba8ff7.js`、`build/boot-core.83625fb1541f.css` 與可見 account-first 登入入口。V173.65 正式發布完成。
-
-## 2026-09-10 V173.65 Account-first Boot Architecture（DEV VERIFIED／已授權推進 main）
-
-- 基準為 GitHub `dev@70df66e8cb371ff6193a7f70609cf9aad7bd15ac`；原工作分支 `perf/cold-start-auth-boot-architecture` 經 PR #123 合入 dev，後續僅以 PR #124～#127 修復部署 header 與既有 Live QA 對新 lazy owner 的舊假設。使用者已明確授權依序完成 dev preview 後推進 main。
-- `js/startup/startup-contract.js` + `js/52-v173.20-startup-loader.js` 是唯一 StartupStateMachine owner。正式狀態為 `BOOT_LOADING / AUTH_RESOLVING / AUTH_REQUIRED / SAVE_LOADING / MIGRATION_REQUIRED / NEED_CHARACTER / READY / OFFLINE_READY / ERROR`；創角只有 `NEED_CHARACTER` 且 Auth UID/resolved UID/active UID 一致時可見。
-- `js/startup/account-save-repository.js` 是 UID local ownership 與 legacy migration owner。Canonical key 為 `four_symbols_save:{uid}`，metadata 與 sidecar 亦依 UID 隔離；`battle_full_version_save_v5` 不自動綁定，migration 必須確認、先備份、衝突 fail closed。
-- `scripts/build-production.mjs` 產生 deterministic content-hashed boot/app/gameplay/feature bundles；`asset-manifest.json` 是實際 Critical/Feature deploy manifest。Execution order 固定在 bundle source list，網路 preparation 並行，不再用大量 sequential HTTP request 維持 wrapper 順序。
-- `js/startup/feature-loader.js` 是唯一動態 script owner；`js/20-anonymous-20.js` 只負責 pointer/touch prefetch、feature-local loading 與 idle preload，不再有 32-runtime 全域 input lock。已有帳號到主城只等 app shell；gameplay/patrol/abyss/skill/boss/relic 等不阻塞 Auth／創角／主城。
-- 61 個 `v131-patrol-sprite-*.js` chunk 已刪除；`js/26-v131-patrol-appearance.js` 改用 16 個 `assets/characters/patrol/*.webp` content-hashed 正常資產。Critical logo 亦改為 `assets/ui/startup-logo.4631c0bc3f2b.jpg`。
-- Firebase 正式順序改為 identity → UID → cloud/local read → destination；訪客使用 Anonymous Auth。正式帳號 UI 已移除「先使用本機存檔」。Firestore browser write 仍禁止，trusted-backend-only policy 未放寬。
-- 永久規格見 `docs/BOOT_ARCHITECTURE.md`；before static baseline 與實測 browser evidence 見 `docs/BOOT_PERFORMANCE_BASELINE.md`。新增 account/auth/boot/feature/budget Node gates、controlled mobile Chrome QA 與 deployed live cold-start QA。
-- DEV verification commit `08d23ecbf38ab74a6b1ef4ced43fefcded02901a`、Actions run `34428020728`：139/139 Node suites、controlled account-first browser QA、Cloudflare exact-SHA deploy、live auth-first cold boot、Abyss 與 battle/audio mobile QA 全數 SUCCESS。Live signed-out auth UI 693.3 ms、first paint 448 ms、10 requests／356,374 B；controlled warm existing-user city interactive 475 ms。
-- Requirement Batch：`release/requirement-batches/2026-09-09-cold-start-auth-boot-architecture.json`，12/12 VERIFIED；發布候選 V173.65。正式 main promotion 仍須受保護 PR、main CI、GitHub Pages deploy 與 production exact-SHA/version 驗證後才能宣稱完成。
-
-## 2026-09-08 三分支 gameplay／秘寶方形圖／全域非戰鬥字級安全整合（dev）
-
-- 整合前 GitHub `dev` 為 `39767ce2b9dbfa59650b7c5fd4d52a57a2642ea5`；三條遠端 branch tip 均精確等於使用者指定 SHA，且 merge base 都是該 dev、0 behind，沒有互相包含。實際順序依 owner／視覺層級為 gameplay regressions → relic square art → global non-battle typography。
-- `fix/gameplay-ui-battle-regressions-20260908@4a592dd4c41d7efb1a4849fbfe0cbf68598121bf` 以 merge commit `035845aa703a7a72c053ae9d0945b9f1f75d4be2` 合入；`js/01-stage-v8-touch-lock.js`、`js/41-v146-system-polish.js`、`js/53-v173.50-inventory-qol.js` 仍是觸控、地下城導航與背包 stack identity owner。CI run `34238583523` SUCCESS。
-- `fix/ui-relic-square-art@1788efe7bd20492014b75f1311ab2badde0e7ba0` 以 merge commit `9fae60e148f39782e3b09b71b4ade604243fea65` 合入；秘寶 current/list/detail 統一 1:1 `aspect-ratio`、`object-fit:contain`，保留單一 `def.iconPath` runtime 資料流。CI run `34239750357` SUCCESS。
-- `fix/global-ui-font-size-standard@58dfa219269c8d8a5f31675adbeceb5c920e5bfe` 以 merge commit `1ee3cc8fbfbced873080f21b0cc4c64f1f670875` 合入。只在 `css/52-v173.50-inventory-qol.css` 與 `css/55-team-relic-system.css` 發生 Git conflict；沒有 JS 函式、listener、state 或 runtime owner 衝突。
-- `css/52` 人工保留 gameplay 分支的黑金／danger 批量操作外觀，並合入 typography 分支的 15px 與 36～38px 控制尺寸；`css/55` 同時保留 gameplay 分支的入口 WebP／`pan-x pan-y`、square-art 分支的 1:1 圖區與 detail grid、typography 分支的 13～18px 層級及 390px responsive 高度。未使用整檔 ours/theirs，沒有重複 selector owner 或舊規則回退。
-- typography 的 battle-preservation 測試原本把整合前 dev 當唯一 BOSS 基準，會誤擋第一分支核准的 mechanism lifecycle 與 9px／charge 10px 修正；merge resolution 改為精確保護指定 gameplay commit。首次 CI run `34242410904` 另揭露 `fetch-depth:2` 缺少兩個固定歷史 tree，故由 `.github/workflows/ci.yml` 在既有 comparison-base step 精準 fetch，follow-up `ff5db2efabfff533a39724b16850a2169031f4f7` 修正；淺層 clone 重現與修復均已驗證。
-- 功能樹最終 CI run `34243622829` SUCCESS：250/250 JavaScript syntax、125/125 Node suites、467 static resources、291 unique HTML IDs、108 loader dependencies／26 ordered runtimes、Release Gate 10/10、git-diff、skill progression mobile Chrome、live Abyss 與 battle/audio 全部通過；部署 SHA 精確驗證為 `ff5db2efabfff533a39724b16850a2169031f4f7`，Game／Cache Version 維持 V173.64／173.64。
-- DEV Cloud Browser 實測：秘寶 20 卡、兩欄、current/list/detail 方形圖區 ratio=1、卡片 overflow=0、modal body 0→527、tabs 0→121、detail hero 無 overflow、返回列表正常；56 stylesheets、broken image 0、app-origin console error/warning 0。三張新增 UI WebP 均 HTTP 200／`image/webp`。
-- 三個工作分支指定 SHA 都是最終 dev 的 ancestor；本輪沒有新增 listener、沒有重複 inventory identity 函式、沒有失效 import/path。`main` 未 merge、未 push、未建立修改 main 的 PR；仍須明確授權才可把本輪推進 main。
-- 本輪 Requirement Batch：`release/requirement-batches/2026-09-08-three-branch-dev-integration.json`（8/8 VERIFIED）。
-
-## 2026-09-08 V173.64 玩法中心／BOSS／四象塔／深淵正式發布候選
-
-- 功能基準為 `dev` `75cf90774d1d8a63818f65de999d044603e21a09`，實作 tip `6d7d136608711b616a02db726085bf9817a4068a` 已由使用者明確授權快轉至 `dev`；GitHub Actions run `34205400669` 的 Repository checks 與 Dev deployment gate 全數 SUCCESS，官方 DEV manifest exact SHA 與 `dev` 一致。
-- `js/gameplay-boss-tower-system.js` 是玩法中心、個人／世界 BOSS、五種機制卡與四象塔設定／進度的正式 owner；BOSS 與塔共用既有 `v132BuildDungeonMonster`／`v132LaunchDungeonBattle` 戰鬥 owner，機制卡使用不進入一般怪物陣列的 battle sidecar 專屬槽。
-- `index.html` 與 `css/gameplay-boss-tower.css` 建立獨立玩法中心、BOSS 雙標籤頁與四象塔固定大面板；底部保留五顆按鈕與 `bossNav` 相容 id，但玩家可見文字、aria、title、入口與 icon 均正式改為「玩法」。
-- 附件原圖經實際檢視後，只移除與畫面邊界連通的黑色背景；圖示 RGB 本體未重畫。輸出 `assets/ui/nav-gameplay.png` 為 320×320 RGBA 真透明 PNG，四角 alpha 均為 0，舊 `assets/ui/nav-boss.png` 保留。
-- 個人 BOSS 固定 Lv20～100、可不限次再戰且特殊首通獎勵只發一次；世界 BOSS 為永久單人四階段討伐，逐階勝利立即存檔，失敗不回退。護盾會阻擋 BOSS 點選、單體／三體／全體新直接效果與新異常，同一技能破盾後剩餘段數仍維持該次 shield snapshot；auto 依護盾→蓄力→回復→增幅→封鎖處理。
-- 四象塔共 100 層，Lv30 開放，UTC 週一沿用現有日期基準，以火→土→水→風循環；週內樓層／首通 claims 保存，跨週只清週資料，歷史最高與已取得資產保留。第 50 層使用目前正式四件元素秘寶自選資料。
-- 深淵玩家入口已自副本頁移到玩法中心；`js/59-abyss-two-tier-runtime.js` 仍是 Lv20／Lv40、地圖、五帝、寶箱、傳送、戰鬥與進度 owner。新增永久 `firstClearClaims`，再戰跳過已領首通寶箱／最終特殊獎勵；所有退出／完成路徑回玩法中心。
-- 已通過：244/244 JavaScript syntax、119/119 Node suites、464 resources、291 unique HTML IDs、108 loader dependencies／26 ordered runtimes、Release Gate 10/10、git diff，以及 PNG RGBA／四角 alpha 自動檢查。Gameplay／BOSS／Tower 13/13、Abyss 15/15 均包含 reload 與防重複獎勵 regression。
-- 官方 DEV 實際操作已確認：底部玩法 icon／入口、玩法中心、BOSS 雙標籤、個人 BOSS 正式開戰、護盾機制卡生成、受保護 BOSS 點擊提示、四象塔首頁／樓層一覽／戰鬥及失敗返回均正常；固定 stage 無橫向 overflow、broken image 或新增 app-origin console error。遠端 mobile Chrome 與 live Abyss／battle-audio QA 同步通過。
-- 本批 `release/requirement-batches/2026-09-08-gameplay-boss-tower-hub.json` 已達 12/12 VERIFIED。使用者於 2026-09-08 明確要求推進 `main`，Game／Cache Version 正式推進 V173.64；發布須繼續走受保護 PR、main Repository checks、GitHub Pages deploy 與 production SHA 驗證。
-
-## 2026-09-08 六分支安全整合、最終 QA 與正式發布
-
-- 使用者於整合驗證完成後明確授權推進正式版；受保護 PR #96（`dev` → `main`）在 PR Repository checks run `34154431926` SUCCESS 後，以 merge commit `253962c539bdb62deaa1f80e4212bc306469ab0f` 合併。合併 tree `b257175b2cdaf13fc57a13f2767414d76236aa17` 與核准的 `dev` tree 完全相同，沒有衝突或額外功能差異。
-- 正式 `main` Repository checks run `34154526744` SUCCESS；GitHub Pages run `34154525713` 的 build／deploy 全部 SUCCESS，deployment `6314784680` 綁定同一 main SHA，正式網址 `https://tf00913225-alt.github.io/my-game/` 已讀回 V173.63 與本輪關鍵資源。Game／Cache Version 維持 173.63。
-- 起始 GitHub `dev` 為 `cb269fef7f28e54161b9abda9cfcb66bfbfbe74f`；逐條順序為 EXP 成長曲線 → 裝備副本寶箱 → 深淵前置編隊 → 技能成長 → 隊伍秘寶 → 黑金視窗。六條遠端分支 tip 均與指定 SHA 完全一致。
-- 唯一 merge conflict 位於 `js/19-stage-v78-character-inventory-runtime.js`。人工保留 Abyss → skill progression → team relic 的唯一 late-runtime chain；team relic 最後掛接正式 battle/save/showPage owner，沒有整份選 ours/theirs，也沒有重複 load/error listener。
-- 深淵改為正式 8 名（5+3）後，舊 live battle QA 仍硬寫 10 名；由 `b650978e` 更新 QA owner 後通過。不得把舊 10 名 assertion 恢復。
-- DEV Cloud Browser 找出並修正三個秘寶整合 owner 問題：`051aa7ed` 提高 `#homeFeatureModalBody` scroll owner specificity；`ee384218` 讓核心 `saveGame()` 在 late relic runtime 尚未載入時保留既有 `playerRelics/teamLoadout`；`f337d70e` 讓橫跨主城整列的透明 `.team-relic-home-tools` 不再攔截系統／離線經驗，只讓兩顆實際 utility button 接收 pointer。
-- 最終功能狀態 `f337d70ee6b9dbce3750a4cc60a990ca9c2edfe7` 已通過 CI run 34151818800、115/115 Node suites、239/239 JS syntax、462 resources、285 IDs、loader/release/git-diff、390×844／412×915 Chrome、live Abyss 與 battle/audio QA。DEV manifest exact SHA、V173.63／cache 173.63 相符。
-- 最終實際瀏覽器：青嵐羽符裝備後連續完整重載仍保留；20 卡兩欄；modal body 0→520、tabs 0→50；系統／離線經驗／秘寶／元素匣 hit target 與開啟均正常；app-origin console error/warning 0、broken image 0。
-- 本輪 Requirement Batch：`release/requirement-batches/2026-09-08-multi-branch-dev-integration.json`（9/9 VERIFIED）。官方 Game/Cache Version 維持 V173.63。`main` 全程維持 `d0b666e4eeae4cff8bb21dd877f4b95414b367d9`，禁止把本輪內容推入 main，除非使用者另行明確要求。
-
-## 2026-09-07 全遊戲手勢／圖片長按／技能 VFX owner 收斂（dev）
-- `js/01-stage-v8-touch-lock.js` 是全遊戲瀏覽器手勢唯一 owner：既有單指 scroll whitelist 保留，但兩指以上在任何 `#game-stage` 內位置一律阻止瀏覽器 pinch zoom；非文字輸入 UI 的 contextmenu／dragstart／selectstart 亦全域阻止。
-- `css/00-main.css` 是圖片／SVG／Canvas 原生長按與拖曳的基礎 CSS owner；不使用 `pointer-events:none`，避免破壞正常遊戲點擊。
-- `index.html` 的直接 touch-lock 載入已跟現行 Cache Version 173.62 對齊，`release/release.json` 將該檔納入 managed cache references，避免之後修改 touch owner 卻仍載入舊 query。
-- 技能演出仍由 `js/37-v142-skill-animation.js`（gate／時序）＋ `js/39-v143-skill-animation.js`（Sprite/VFX renderer）唯一負責。`js/54-v173.51-battle-qa.js` 與 `css/53-v173.51-qa.css` 不再碰 `#v143-skill-stage` visibility，避免終結一擊時 battleActive 先切換而把尚未結束的 VFX 藏掉。
-- Game/Cache Version 維持 173.62；本批需經 Repository checks、DEV deployed SHA 驗證與手機實機長按／pinch／VFX 驗收後才可標 VERIFIED。
-
-## 2026-09-07 合成首次開頁 Icon 時序修復（dev）
-- 使用者實機確認裝備／符咒 icon 在首次打開合成頁仍需點一下才顯示。根因是 `js/36-v141-content-systems.js` 的合成入口直接呼叫 closure `renderSynthesis()`，繞過 V143/V146/V173.63 的最終 public renderer。
-- 合成入口改為優先呼叫 `window.v141RenderSynthesis()`；`js/58-v173.63-functional-fixes.js` 在正式 render 前先同步 equipment/static item presentation，render 後立即 repair picker，不再把首次 icon 顯示依賴點擊或下一次 rerender。
-- owner：`js/36-v141-content-systems.js`（合成入口）＋ `js/58-v173.63-functional-fixes.js`（最終 presentation/render wrapper）；不新增 runtime patch。
-- Game/Cache Version 維持 V173.62，待 DEV 手機實機確認首次打開裝備與符咒均直接顯示 icon 後才能標 VERIFIED。
-
-## V173.61 返回圖示／道具圖／副本預覽／音效／常亮省電／任務即時領取（目前 dev）
-- V173.60 已通過受保護 Repository checks 並由 PR #70 正式合併 main；本輪新修改只在 dev。
-- `css/00-main.css` 是共用返回按鈕視覺 owner：所有實際使用 `assets/ui/map-return.png` 的入口統一補 `#050505` 圓形黑底。
-- 素材分支的「礦石.png」「副本與背包的寶箱.png」已導入 `assets/items/materials/ore.png`、`assets/items/chests/dungeon-chest.png`；既有背包礦石／材料寶箱也會同步新圖示。
-- 一般副本獎勵預覽由 `js/42` + `css/43` 改為圖片優先；裝備副本由既有 `js/equipment-progression.js` 同步改成實際裝備圖＋正式階級框。
-- 戰鬥程序音效 `js/34` master gain 0.22→0.30；`js/35` 移除 `v141-once-*` CSS flash，但保留 Canvas particles；`js/39` Sprite/VFX 時序仍是現行技能動畫 owner。
-- 一般模式在首次使用者操作後嘗試 Screen Wake Lock；巡怪新增「省電 OFF/ON」，省電 ON 釋放 Wake Lock，頁面隱藏時也會釋放。
-- 每日／委託正式加入一鍵領取；背景任務進度變化時只刷新已開啟的任務內容與完成度，保留目前分頁／捲動位置。成就既有一鍵領取保留。
-- 版本與 live cache key 同步 V173.61。
-
-## V173.60 正式物品階級／符咒判定重構（目前 dev）
-- 正式一般物品階級統一為：白階（white）→藍階（blue）→紫階（purple）→橙階（orange）→桃紅階（pink）→四象階（four-symbol）；固定色號依 `docs/ITEM_RARITY_UI_SPEC.md`。
-- 符咒為正式例外：冰封符／隱身符／結界符只到白、藍、紫、橙四階；畫符啟動率固定 35%／55%／75%／100%。舊 `*TalismanLow/Mid/High/Perfect` id 保留只為舊存檔／舊掉落相容，玩家資料 `tierKey` 與名稱改為正式階級。
-- 符咒改為兩段判定：先以符咒階級擲「畫符」；失敗固定顯示「畫符失敗」。成功後再用施放角色素質走對應滿級技能命中規則；橙階 100% 不等於控制／符術必中。
-- `js/27-v132-content-expansion.js` 是符咒／礦石／設計圖與符咒結算 owner；`js/36-v141-content-systems.js` 是合成／冶煉階級數值 owner；`js/equipment-progression.js` 是普通裝備品質／生成 owner。`js/33` 與 `js/50` 僅保留既有技能資料晚覆蓋同步，不新增第三層 runtime。
-- 礦石、設計圖、裝備資料結構已預留桃紅與四象；本輪不擅自設定尚未提供的高階數值／價格／掉落來源，因此兩階目前 `available:false`、普通裝備掉落 chance=0，材料寶箱仍只出白／藍／紫／橙。
-- 舊 `low/mid/high/perfect` 僅作資料兼容映射為 white/blue/purple/orange，不再作玩家可見正式階級。
-- 版本與快取同步 V173.60；僅修改 dev，main 不動。
-
-## V173.45 戰鬥／副本／商店／深淵維修（目前 dev）
-- 水元素【淨心訣】手動施放時可自由選擇我方或敵方：我方解除所有增益與異常；敵方解除所有正面增益（含結界、護盾等）但保留敵方既有負面狀態。
-- 金幣副本勝利結算補回正式金幣獎勵函式，修正 undefined 例外造成的勝利畫面卡死；同時複核經驗／材料副本仍走各自既有有效結算入口。
-- 三輪日常副本換場的 360ms 銜接期間維持 battleActive，元素匣不再把換場誤判成戰鬥外而自動補血。
-- 元素匣戰鬥外補品通知改為畫面上方約 1/4 的純文字六行佇列；只顯示「[角色使用補品 恢復xxHP/SP]」，超過六行由最舊訊息往上移除，不再寫入下一場戰鬥資訊。
-- 合成介面移除「裝備合成」分頁，只保留裝備冶煉、符咒合成、碎片合成；既有舊存檔相容函式保留但不再提供裝備合成入口。
-- 商店新增「補品／裝備」雙頁；裝備頁目前先完成六格版面與每日刷新框架：前5次免費、總上限10次；第6～10次金幣刷新價格與裝備售價尚未定案，因此本輪只顯示待設定狀態、不擅自扣款。
-- 任務紅點拆分每日／委託來源；主入口仍顯示任一可領獎勵，任務頁內則由各自分頁顯示自己的紅點。
-- 深淵戰鬥資訊加入全域 touch-lock 捲動白名單並保留原生 pan-y；守關帝王／寶箱／接近點統一移到上方平台約 x61%、y21%，對齊本輪參考圖紅圈位置。
-- 僅修改 dev，main 不動；完整載入／快取版本同步 V173.45。
-
-## V173.44 維修收斂（目前 dev）
-- 三個正式日常副本統一為任一角色 Lv10 可進；經驗副本獎勵直接進共用經驗池，不再指定角色。
-- 第二／第三角色新建時固定從 Lv1 開始；Lv20 前只保留既有 EXP 追趕倍率，不再強制跳到 Lv10。
-- 水元素【洪水猛獸】維持正式規格：需先學水球術、初學 15 技能點；學習流程讀取目前選中角色的實際 skillPoints，鎖定按鈕直接顯示缺少的前置技能。
-- 主城 HUD、index 載入版本與 V_ASSET_VERSION 已同步 V173.44；主城 UHD 背景使用 home-background-v17344.png。
-- dev 預覽固定由 Cloudflare Pages 自動發布：`https://four-symbols-dev.pages.dev`；不再使用 GitHack／RawCDN 作為測試站。
-- 僅修改 dev，main 不動。
-
-## V173.42 玩家流程／元素匣／深淵資訊／收益調整
-- 背包補品詳情新增「使用」，作用對象固定為背包當前切換角色。
-- 元素匣啟動中鎖定所有設定並提示「先停止元素匣，才能設定」；HP/SP補品門檻與補品耗盡回主城改為三名角色共用區塊，自動行動仍各角色獨立。
-- 元素匣啟動後即使未進戰鬥，也每秒檢查一次補品門檻；補品使用資訊會進戰鬥資訊，非戰鬥期間產生的訊息會帶入下一場戰鬥資訊一次。
-- 深淵地圖底部新增戰鬥資訊區；封面維持 supplied 864×1536（9:16）比例，進入按鈕移到封面圖之外。
-- 經驗池足以讓任一未滿級角色升級時，角色入口與 HUD 經驗池亮紅點。
-- 離線經驗移至成就下方、系統移至公告下方，改用與其他六個側邊功能一致的 80×82 黑金卡。
-- 一般戰鬥現有 EXP ×3；怪物金幣掉落 ×5；經驗副本 11%→33%；離線 EXP ×3；任務/委託/成就/完成度獎勵 EXP×3、金幣×5；深淵最終寶箱 EXP×3、金幣×5。
-- 新手森林取消「1隻/3隻同一份固定EXP」，改依實際擊敗怪物數與rank權重計算，再套本輪全域EXP×3。
-- 僅修改 dev，未修改 main。
-
-## V173.41 手機背景恢復／啟動動畫工作階段
-- 同一個瀏覽器分頁工作階段首次完成12～15秒啟動並點擊進入後，以 sessionStorage 記錄已進入；同分頁後續因 Android/Chrome renderer 回收而重載時，`js/00-main.js` 會立即隱藏 startup loader，不再要求等待完整啟動動畫。
-- `visibilitychange -> hidden` 與 `pagehide` 會立即呼叫現有 `saveGame()`，降低 Android 背景回收造成的未存進度風險。
-- 關閉分頁／新的瀏覽器工作階段仍會正常播放首次啟動動畫；沒有使用 Wake Lock、假音訊、reload 攔截或 runtime patch。
-- 本輪只修改 dev，不修改 main。
-
-## V173.40 新手森林生存／EXP與巡怪打架圖方向
-- 新手森林六隻怪物的敏捷與敏捷點數固定為0。
-- 新手森林普通攻擊（非技能）不爆擊，未防禦／未被盾吸收前固定10～15傷害。
-- 一般新手森林勝利EXP依目前Lv1→10正式曲線反推為約20場；目前基準690 EXP/場。元素匣70%與休息EXP×2沿用既有規則。
-- 巡怪進戰鬥前的patrol-fight-1/2顯示時統一順時針90°；走路／待機恢復0°。
-- 土／風三人、全體與冰霜箭雨固定範圍VFX規則未改，新增回歸保護。
-# 專案進度交接表
-
-這份文件是這個專案唯一的「目前狀態」真相來源。使用者會輪流用不同的 AI
-工具（Claude Code / ChatGPT 等）開發這個專案，**每一次開始工作前都必須先讀完這份文件，
-結束工作前都必須更新這份文件**，否則下一個接手的人（不管是人還是 AI）會在不知情的狀況下
-重做、改壞、或誤判目前的狀態。
-
----
-
-## V173.39 土／風範圍技能與冰霜箭雨 VFX 定位修正（目前 dev）
-
-- `js/39-v143-skill-animation.js` 繼續作為 Sprite VFX 幾何 owner，未新增 runtime patch。
-- 土／風 `tri`／`allyTri` 共用固定三站位視覺框：實際存活／命中數只決定傷害與狀態，不再參與 Sprite 尺寸；玩家選定的施放目標是固定視覺中心。
-- 土／風 `all`／`allyAll` battlefield 技能維持完整陣地幾何，死亡或剩餘人數不會縮小或把動畫拉向倖存者。
-- 水元素 `iceArrowRain`（冰霜箭雨）改為 `fixedFormation`：永遠使用完整 `battleMonsterArea` 作為敵方 10 人陣地範圍與中心，不再使用 `living-targets` 邊界。
-- 傷害、技能目標判定、狀態命中、SP、AI、角色資料與存檔規則均未修改。
-- 回歸測試覆蓋：風三人技 3→1 存活尺寸／中心不變、風全體技存活數變化不影響範圍、土三人 Sprite 全數固定站位、冰霜箭雨 3→1 存活仍保持完整敵方陣地尺寸與中心。
-
-## V173.39 主城 UI 最後微調（目前 dev）
-
-> 本輪只調整主城既有三個視覺區塊，不重構、不新增 UI、不修改功能事件或遊戲邏輯。
-
-- `css/00-main.css` 仍是主城 HUD 與入口尺寸 owner：四象主城字級由 8px 調為 10px、身份區略右移並維持垂直置中；金幣、經驗池、DEV 結構與大小未改。
-- `index.html` 既有 `home-version-badge` 內嵌樣式仍是版本徽章 owner：字級由 7px 調為 9px，僅同步放大既有徽章，不新增任何 HUD 資訊。
-- `css/00-main.css` 的離線經驗／系統維持完整底板與金框：86×40 調為 100×47，icon 與文字同比放大，兩顆按鈕各向外微移，中央城門保留約 60px 設計通道；角色／商店與左右六個功能入口尺寸完全不動。
-- `css/42-v146-system-polish.css` 仍是冒險隊伍視覺 owner：容器下移 7px，垂直 padding 由 2px 微增至 3px，每列由 44px 微增至 46px；角色排列、45×45 頭像與 HP/SP 規則不變。
-- `js/41-v146-system-polish.js` 的 `renderHomeRoster()` 未修改；底部導航、背景、事件、角色資料、金幣／經驗邏輯、DEV、戰鬥、技能與存檔皆未修改。
-- 已以 Chromium 實際驗證 1080×1920 核心直向比例與 390×844 手機直向比例：三人隊伍狀態無重疊、無裁切、無使用者捲動，兩顆次級按鈕之間保留中央城門中軸。
-
-## V173.39 土／光元素 Sprite VFX（目前 dev）
-
-> **目前 VFX 整合入口。** V173.38 的正式傷害模型完全保留；本輪只把 assets-library 已完成的
-> 土元素與極帝天尊【元祖賜福】Sprite Sheet 接入既有 V142/V143 動畫 owner。
-
-- `js/37-v142-skill-animation.js` 仍是技能演出時間唯一 owner；土石斬／石盾拳／石破天驚／
-  地裂重拳／落石術／滾石術／飛沙瞬擊／地牛猛襲／萬象土盾／岩石壁壘／結界與元祖賜福
-  已依成品 Sprite Sheet 的 1.1～2.0 秒節奏校準。
-- `js/39-v143-skill-animation.js` 仍是 Sprite 播放與狀態循環唯一 owner；12 幀技能圖統一用
-  `canvas-crop + naturalGrid` 按 4×3、384×384 逐格裁切，8 幀狀態圖按 4×2、256×256
-  無縫循環，不建立每幀獨立 PNG，也不新增 runtime。
-- 正式 production assets 放在 `assets/vfx/earth/` 與 `assets/vfx/light/`；來源保留在
-  `assets-library/assets/inbox/`。技能對應包含單體、同排三人、全場與我方增益定位；元祖賜福
-  依極帝現有 `yuanZuBlessing`／`statusName:"元祖賜福"` 狀態 owner 顯示。
-- 新增持續狀態 Sprite：破防、岩盾、石化、萬象土盾、岩石壁壘、結界、元祖賜福。
-  石盾拳／石破天驚的岩盾屬於施術者自身，V143 會等施放 Sprite 結束後才顯示持續岩盾；
-  元祖賜福則以正式 `statusName` 對應極帝的 `v141TeamBuff` 顯示資料。
-- `js/38-v143-system-fixes.js` 只收斂萬象土盾舊的「四角＋象字」程序特效：當新的 Sprite
-  status owner 存在時不再疊加舊效果；反傷規則、結界次數 UI、狀態資料與戰鬥數值皆不改。
-- 本輪只發布 `dev`，不修改／合併 `main`。
-
-## V173.38 正式傷害模型（目前 dev）
-
-> **目前唯一傷害規格入口。** 本節與 `tests/v170-final-spec-integration.test.js` 代表
-> 完整載入後的 V173.38 戰鬥傷害規則；下方 V173.37 與更早段落僅保留歷史基線。
-
-- `js/00-main.js` 是 `calculateDamage()`、`calculateSkillDamage()` 與 `damageRole` 的單一權威 owner；
-  V149、V155、V169 的下游傷害覆寫已移除，既有元素、狀態、爆擊與技能分類仍保留。
-- 玩家與怪物統一採「30＋等級成長＋有效六圍」尺度；五種正式 damageRole、曲線防禦、
-  0.85～1.15 等級差、1.20／1.00／0.85 元素倍率均依 V173.38 規格校準。
-- 元素 EX、套裝、異常增傷、一般技能與未來詞條進入同一普通增傷加算桶，上限 1.50；
-  爆擊最終上限 2.25，技能可選 `damageBudgetMultiplier`，未指定時為 1.00。
-- 怪物對玩家才套敵方壓力：普通／精英／BOSS 加成 0%／10%／20%，日常副本另加 5%，
-  深淵另加 15%；玩家攻擊怪物固定不套。副本與深淵建怪不再以 rank 放大攻擊／魔攻。
-- 深淵第 1～4 層技能等級改依怪物等級分段；第 5 層十人陣容與技能配置不變，全員 Lv5。
-- 直接影響回歸共 33 項通過，涵蓋 Lv20／50／80／100、五種傷害角色、等級／元素、
-  九種敵方壓力、加算桶、爆擊上限、數值安全、代表情境快照與第五層十人配置。
-- 本輪僅更新 `dev`，不合併 `main`，不改存檔格式、UI、技能成本、狀態、裝備數值或經濟。
-
-## V173.37 最終正式規格（歷史基線）
-
-> 本節、`tests/v170-final-spec-integration.test.js` 與 `tests/v173.18-final-request.test.js`
-> 記錄 V173.37 的完整載入狀態；目前傷害數值請以上方 V173.38 為準。
-
-### 目前最終值
-
-- 正式 `main` 目前仍是 V173.24（SHA `5256564115b613c0ea4bab1d97506a5734aff8ee`）；
-  V173.25～V173.37 目前只存在 `dev`。本輪依使用者明確要求只提交／推送 `dev`，不合併 main。
-- 真實載入是 `index.html` 的 24 支同步 classic script（`js/23` → `js/52` 開場 loader → `js/00` →
-  `js/01`～`js/20` → `js/24`），再由 `js/20-anonymous-20.js` 依 `load/error → next`
-  嚴格串行載入 26 支正式 runtime：`js/25` → `js/27`～`js/51`。巡怪素材鏈最後的
-  `js/26` 與正式 gameplay runtime 鏈並行，只管外觀，不能插進平衡補丁順序。
-- `tests/v170-final-spec-integration.test.js` 會在同一個 `vm.Context` 真正依上述順序
-  執行 50 支 JavaScript，再檢查最終資料與行為；V173.34 另鎖定同名狀態先判定、正式狀態名、
-  必定燃燒、鳳威、追擊、吸血、硬控、反傷、岩盾、結界、乘算閃躲、敵我支援技能，以及
-  32 招正式傷害技能的 damageRole、動態防禦、六圍尺度與各層副本代表傷害；V173.36 再鎖定
-  深淵第五關固定十人站位、五帝／五精英精確技能、全員最高技能等級、北帝復活優先級、
-  東帝／天帝支援行為、極帝單一元祖賜福，以及風天兵天將只使用閃躲術而非隱身。
-  `tests/v173.18-final-request.test.js` 繼續鎖定符咒格線、深淵戰後回程與最終 owner。
-- 下表的「傷害」欄是為相容舊程式、預覽與歷史測試而保留的 `baseDamage／damagePerLevel`；
-  V173.34 已遷移的正式直接傷害不再以該欄為主傷害，而是使用表後的 damageRole 倍率。
-  其餘格式為「SP；目標；初學／升級／最高；前置」，前置有兩項時代表任一項即可。
-
-| 元素 | 技能 | 傷害 | SP | 目標 | 技能點（初學／升級／最高） | 前置 |
-|---|---|---:|---:|---|---|---|
-| 火 | 火焰斬 | 30／+6 | 10 | 單體 | 2／1／5 | 無 |
-| 火 | 會心一擊 | 45／+9 | 28 | 單體 | 10／1／5 | 火焰斬 |
-| 火 | 火爆亂擊 | 50／+10 | 47 | 同排最多3人 | 20／1／5 | 會心一擊 |
-| 火 | 霸龍裂天斬 | 165／+33 | 65 | 單體 | 35／1／5 | 火爆亂擊 |
-| 火 | 火箭 | 13／+4 | 10 | 同排最多3人 | 2／1／5 | 無 |
-| 火 | 烈火術 | 45／+9 | 28 | 單體 | 10／1／5 | 火箭 |
-| 火 | 烈焰龍捲 | 150／+30 | 47 | 單體 | 30／1／5 | 烈火術 |
-| 火 | 火鳳天鳴 | 28／+6 | 60 | 敵方全體 | 35／1／5 | 烈焰龍捲 |
-| 火 | 怒火 | — | 50 | 我方同排最多3人 | 25／1／5 | 火爆亂擊或烈焰龍捲 |
-| 火 | 火元素EX | — | — | 被動 | 25／—／1 | 無 |
-| 水 | 水刀斬 | 21／+5 | 6 | 單體 | 2／1／5 | 無 |
-| 水 | 冰霜拳 | 32／+7 | 17 | 單體 | 10／1／5 | 水刀斬 |
-| 水 | 冰旋一閃 | 35／+7 | 45 | 同排最多3人 | 20／1／5 | 冰霜拳 |
-| 水 | 冰封重擊 | 116／+24 | 60 | 單體 | 30／1／5 | 冰旋一閃 |
-| 水 | 水球術 | 10／+2 | 8 | 同排最多3人 | 2／1／5 | 無 |
-| 水 | 洪水猛獸 | 105／+21 | 35 | 單體 | 15／1／5 | 水球術 |
-| 水 | 冰霜箭雨 | 20／+4 | 75 | 敵方全體 | 20／1／5 | 洪水猛獸 |
-| 水 | 冰封 | — | 32 | 同列前後最多2人 | 25／—／1 | 冰霜箭雨 |
-| 水 | 治療術 | — | 45 | 我方同排最多3人 | 20／1／5 | 冰霜箭雨或冰旋一閃 |
-| 水 | 復活術 | — | 45 | 死亡友方單體 | 20／1／5 | 治療術 |
-| 水 | 水元素EX | — | — | 被動 | 25／—／1 | 無 |
-| 風 | 暴風拳 | 26／+6 | 7 | 單體 | 2／1／5 | 無 |
-| 風 | 暴風亂擊 | 13／+3 | 20 | 同排最多3人 | 10／1／5 | 暴風拳 |
-| 風 | 風旋十字斬 | 128／+26 | 39 | 單體 | 15／1／5 | 暴風亂擊 |
-| 風 | 暈眩猛擊 | 141／+29 | 55 | 單體 | 30／1／5 | 暴風亂擊 |
-| 風 | 狂風術 | 12／+3 | 9 | 同排最多3人 | 2／1／5 | 無 |
-| 風 | 風焰術 | 14／+4 | 18 | 同排最多3人 | 10／1／5 | 狂風術 |
-| 風 | 風哮電擊 | 128／+26 | 55 | 單體 | 15／1／5 | 風焰術 |
-| 風 | 風起雲湧 | 24／+5 | 75 | 敵方全體 | 30／1／5 | 風哮電擊 |
-| 風 | 閃躲術 | — | 20 | 我方同排最多3人 | 10／—／1 | 風旋十字斬或風哮電擊 |
-| 風 | 隱身術 | — | 45 | 友方單體 | 15／—／1 | 閃躲術 |
-| 風 | 氣定神閒 | — | 77 | 我方全體 | 20／—／1 | 隱身術 |
-| 風 | 風元素EX | — | — | 被動 | 25／—／1 | 無 |
-| 土 | 土石斬 | 26／+6 | 7 | 單體 | 2／1／5 | 無 |
-| 土 | 石盾拳 | 13／+3 | 26 | 同排最多3人 | 10／1／5 | 土石斬 |
-| 土 | 石破天驚 | 128／+26 | 42 | 單體 | 15／1／5 | 石盾拳 |
-| 土 | 地裂重拳 | 47／+9 | 55 | 同排最多3人 | 30／1／5 | 石破天驚 |
-| 土 | 落石術 | 12／+3 | 7 | 同排最多3人 | 2／1／5 | 無 |
-| 土 | 滾石術 | 14／+4 | 19 | 同排最多3人 | 10／1／5 | 落石術 |
-| 土 | 飛沙瞬擊 | 24／+5 | 55 | 敵方全體 | 15／1／5 | 滾石術 |
-| 土 | 地牛猛襲 | 140／+28 | 65 | 單體 | 30／1／5 | 飛沙瞬擊 |
-| 土 | 萬象土盾 | — | 66 | 我方同排最多3人 | 10／—／1 | 石破天驚或飛沙瞬擊 |
-| 土 | 岩石壁壘 | — | 45 | 我方同排最多3人 | 15／—／1 | 結界 |
-| 土 | 結界 | — | 40 | 友方單體 | 20／—／1 | 萬象土盾 |
-| 土 | 土元素EX | — | — | 被動 | 25／—／1 | 無 |
-
-V173.34 正式傷害模型：
-
-- 物理技能 `rawAttack = effectiveAttack × effectivePower + effectiveFlatDamage`；法術技能把
-  `effectiveAttack` 換成 `effectiveMagicAttack`。`effectivePower = powerMultiplier +
-  powerPerLevel × (skillLevel - 1)`；固定傷害同樣依 `flatDamage + flatDamagePerLevel ×
-  (skillLevel - 1)` 計算。已有新版欄位時必走倍率制，尚未遷移者才回退舊固定傷害；
-  `baseDamage／damagePerLevel` 暫不刪除。
-- 共用核心再依序套入既有等級差、元素、防禦、爆擊、Buff／Debuff 與 95%～105% 浮動。
-  防禦尺度為 `K = 250 + 目標等級×15`、`defenseFactor = K/(K+DEF)`，最低傷害1；
-  物攻為 `10 + 攻擊點×8`、魔攻為 `10 + 智力點×8`、防禦為 `10 + 體質點×6`、
-  HP 維持 `100 + 體質點×50 + 既有升級／裝備加成`。玩家與怪物共用換算尺度。
-
-| damageRole | Lv1倍率 | 每級 | 固定傷害 | 正式技能 |
-|---|---:|---:|---:|---|
-| single_low | 1.40 | +0.05 | 0 | 火焰斬、水刀斬、暴風拳、土石斬 |
-| single_normal | 1.75 | +0.075 | 10 | 會心一擊、冰霜拳、洪水猛獸、風旋十字斬、暈眩猛擊、風哮電擊、石破天驚 |
-| single_burst | 2.10 | +0.10 | 20 | 霸龍裂天斬、冰封重擊 |
-| tri_damage | 1.35 | +0.05 | 5 | 火爆亂擊、冰旋一閃、水球術、暴風亂擊、狂風術、風焰術、石盾拳、落石術、滾石術 |
-| aoe_damage | 1.10 | +0.05 | 0 | 冰霜箭雨、風起雲湧、暴風術、飛沙瞬擊 |
-| single_control | 1.35 | +0.05 | 0 | 地牛猛襲 |
-| tri_control | 1.20 | +0.04 | 0 | 地裂重拳 |
-| aoe_control | 0.95 | +0.04 | 0 | 目前無正式直接傷害技能，保留共用 profile |
-| single_dot | 1.50 | +0.06 | 5 | 烈火術、烈焰龍捲 |
-| tri_dot | 1.15 | +0.04 | 0 | 火箭 |
-| aoe_dot | 0.95 | +0.04 | 0 | 火鳳天鳴 |
-
-`flatDamagePerLevel` 目前全部為0。暈眩猛擊／風起雲湧的現行「暈眩」是提高 MISS、不是禁止
-行動，因此依實際狀態效果歸入 damage 類；冰封純控不造成直接傷害，沒有 damageRole。
-
-狀態與高風險行為的目前最終值：
-
-- 所有持續性 Buff、Debuff、DOT、控制、護盾、反傷與結界先按正式「狀態名稱」檢查。
-  目標已有同名狀態時，新狀態直接 MISS，不擲機率、不疊加、不覆蓋、不刷新、不補滿數值或
-  次數；直接傷害、吸血、立即治療與 SP 回復仍正常結算。多人技能逐目標獨立判定。
-  正式名稱為燃燒、怒火、鳳威、凍傷、冰封、重力、殤風、暈眩、風行、隱身、氣定神閒、
-  破防、岩盾、石化、萬象土盾、岩石壁壘、結界。
-- 傷害、一般異常與硬控共用等級差倍率 `clamp(1 + 等級差×0.02, 0.70, 1.30)`；一般異常物理公式為
-  `基礎機率×倍率 + 物攻×0.05 - 精神×0.05 - 額外抗性`，法術把物攻項改為智力×0.05，
-  最終沿用既有 5%～95% 上下限。冰封／石化等硬控把屬性項改成 `sqrt(物攻或智力)×0.2`，
-  普通／精英／BOSS 上限分別為 80%／60%／40%，其餘既有規則不變。
-- 玩家基礎閃躲為有效敏捷×0.6%；普通怪物預設基礎閃躲為
-  `min(30%, 等級×0.3%)`，明確自訂 `evasion` 不覆蓋。基礎命中率為
-  `clamp(95 + 命中×0.3 - 直接命中率降低, 50%, 99%)`，最終再乘
-  `(1 - 最終閃躲率)` 並限制 1%～99%。風行75%、風元素EX35%、元祖賜福35%等額外來源
-  維持獨立乘算，最終閃躲上限85%。
-- 火：火焰斬、會心一擊、火爆亂擊在目標死亡或任一爆擊時免費追擊一次；霸龍裂天斬最多
-  追擊兩次。火箭 25% 燃燒2回合、每回合最大 HP `[1,1,2,2,3]%`；烈火術 30%／2回合／
-  `[1,2,3,4,5]%`；烈焰龍捲必定燃燒1回合／`[3,4,5,6,7]%`；火鳳天鳴 40%／2回合／
-  `[5,7,9,11,13]%`，本次實際新增燃燒少於3人時施法者取得【鳳威】，下一回合所有直接傷害
-  與由施法者造成的燃燒傷害 +30%，且同名鳳威不刷新。怒火3回合的爆擊率為
-  `[5,10,15,20,25]%`、爆傷為 `[10,20,30,40,50]%`。火元素EX為火傷+10%、爆率+5%、
-  爆傷+5%，對異常目標傷害+5%。
-- 水：水刀斬／冰霜拳／冰旋一閃／冰封重擊／水球術／洪水猛獸／冰霜箭雨的凍傷基礎機率
-  依序為 10／15／20／25／10／15／20%，均只禁止技能1回合；吸血依各技能表為
-  `[4,5,6,7,8]`、`[4,5,6,7,8]`、`[3,4,5,6,7]`、`[4,5,6,7,8]`、
-  `[3,4,5,6,7]`、`[4,5,6,7,8]`、`[1,2,3,4,5]%`。冰封為同列前後最多2人、90%基礎
-  機率、3回合、純控制。治療術 Lv1 為我方同排3人各 550 HP／固定35 SP，只有 HP 每級+30，
-  並解除全部可解除負面；施法者不吃自己的 SP 回復。復活術恢復
-  `[20,40,60,80,100]%` HP、不回復 SP。水元素EX
-  為水傷+5%、回復+10%，回合開始前30%解除自身全部負面。
-- 風：暴風拳降低敏捷 `[30,40,50,60,70]%` 1回合；暴風亂擊、風旋十字斬、風焰術、
-  風哮電擊依技能資料降低傷害；暈眩猛擊5回合與風起雲湧1回合的 MISS 增幅均為
-  `[30,45,50,55,65]%`。閃躲術給同排3人【風行】75%共3回合；隱身3回合；氣定神閒為全隊
-  異常抗性+65%、命中+50%共3回合；風元素EX永久閃躲35%。所有閃躲來源採
-  `1 - Π(1 - 各來源)` 乘算，最終上限85%。
-- 土：土石斬／落石術／滾石術／飛沙瞬擊依技能資料降低防禦；石盾拳與石破天驚給自身
-  `[100,125,150,175,200]` 護盾2回合；地裂重拳石化率 `[30,35,40,45,50]%`、地牛猛襲
-  `[20,25,30,35,45]%`，均2回合。萬象土盾為同排3人反傷50%共3回合；岩石壁壘為同排3人
-  防禦+35%共4回合；岩盾只吸收直接傷害，同名岩盾不補滿；結界按「一次技能施放」擋5次
-  直接傷害技能、最多5回合，多段同一技能只扣1次，DOT／反傷穿透。萬象土盾只按實際 HP
-  直接傷害反傷50%，岩盾／結界吸收、DOT、反傷本身均不觸發。土元素EX永久防禦+35%。
-- 深淵第五關固定前排「東帝／天帝／極帝／北帝／南帝」、後排「水／土／火／風／水」五名
-  同名天兵天將，十名敵人全部使用最高技能等級。指定技能為：東帝「地牛猛襲／石破天驚／
-  萬象土盾」、天帝「風哮電擊／風起雲湧／氣定神閒」、極帝僅「元祖賜福」、北帝「冰霜箭雨／
-  復活術／治療術」、南帝「怒火／霸龍裂天斬／烈焰龍捲」；水／土／火／風精英依序只帶
-  治療術／石破天驚／烈焰龍捲／閃躲術，第二名水精英同樣只帶治療術。風精英不帶隱身術。
-- 極帝天尊的唯一技能由 V155 resolver 結算：元祖賜福對存活我方全體逐目標獨立進行35%
-  淨化判定，每個目標同時立即恢復100 HP與100 SP，並對尚未持有同名祝福者增加35%閃避、
-  持續2回合（成本45）。立即回復與淨化即使同名持續狀態已存在仍會結算；閃避狀態不疊加、
-  不覆蓋、不刷新，且與風行按正式乘算、最終上限85%。
-
-### 歷史版本紀錄與 owner 邊界
-
-- V140～V173.17 的舊技能斷言只代表歷史快照；不得再為了讓舊數值斷言通過而改回正式值。
-  V173.18 已刪除 `js/44`、`js/46`、`js/47` 的下游資料覆蓋：火／風／土唯一資料 owner 是
-  `js/43-v149-skill-ui-rules.js`，水是 `js/50-v169-water-skill-rules.js`，異常公式是 `js/33`，
-  權威目標解析與治療／支援結算是 `js/42`；V173.19 的共用同名狀態、直接傷害、反傷與能力
-  查詢入口在 `js/00`，怪物結界／岩盾相容層在 `js/38`，鳳威在 `js/46`，最終水技能在 `js/50`。
-- `skillDatabase.yuanXiangGuangMing`／`yuanGuangShield` 的歷史欄位仍保留供舊紀錄相容，但
-  V173.36 的第五關配置不再把兩招交給極帝天尊。`js/46-v155-dev-fixes.js` 是第五關最終編隊、
-  強制技能等級及五帝／風精英專屬支援行為的唯一最下游 owner；不得再由舊 V142／V144 resolver
-  覆蓋，也不得把風精英改接隱身術。
-- V173.34 的 `calculateDamage()`、`calculateSkillDamage()`、damageRole profile 與六圍換算唯一 owner
-  是 `js/00-main.js`；`js/47` 不再重寫傷害公式，`js/43`／`js/50` 只在各自技能資料完成後套入
-  共用 profile。本輪沒有另建臨時 runtime 或平行 owner，避免下游再次覆蓋。
-
----
-
-## 給接手 AI 的規則（務必先讀）
-
-1. **`main` 分支永遠是唯一的正式狀態**，也是 GitHub Pages 實際上線的來源
-   （`https://tf00913225-alt.github.io/my-game/`）。不要假設有其他「更新」的分支，
-   開工前先 `git fetch` 確認 `main` 的最新 commit。
-2. **改完、驗證過之後，直接想辦法合併回 `main`**，不要留著長期分支或未合併的 PR。
-   兩個 AI 工具輪流接手時，只看得懂 `main` 現在長怎樣，看不懂對方留在別的分支上的半成品。
-3. **任何一次工作結束前，一定要更新本文件的「最新進度」段落**：
-   - 這次做了什麼（含檔案路徑）
-   - 怎麼驗證過的（語法檢查／邏輯追蹤／實際跑過）
-   - 有沒有已知限制或還沒做完的地方
-   - 沒有更新這份文件就結束工作 = 交接失敗，下一個人會迷路。
-4. **改動前，先搞懂下面「系統架構重點」，尤其是動態載入器那段**——這個專案的載入機制
-   不是單純看 `index.html` 的 `<script>` 標籤就能判斷完的，之前有一次連 Claude 自己
-   都誤判過，多花了一輪工才發現搞錯。
-5. 這個專案已有 GitHub Actions CI（`.github/workflows/ci.yml`，正式 required check 名稱為
-   `Repository checks`），會自動執行語法、Node suites、資源、HTML ID、版本／Loader 與
-   Git 差異格式檢查；V137 起另有一組針對高風險回歸的 Node 測試
-   `tests/v137-regressions.test.js`，V138 另有需求驗收
-   `tests/v138-feature-requirements.test.js`，V139 新增經濟／休息經驗驗收
-   `tests/v139-economy-rested-exp.test.js`，V140 新增四元素技能定案驗收
-   `tests/v140-four-element-balance.test.js`，V141 新增系統擴充驗收
-   `tests/v141-system-expansion.test.js`，V142 新增技能動畫／行動閘門驗收
-   `tests/v142-skill-animation.test.js`，V143 新增戰鬥／副本／合成修正驗收
-   `tests/v143-combat-dungeon-polish.test.js`，V144 新增商店／怪物技能／深淵定案驗收
-   `tests/v144-rules-and-abyss.test.js`，V146 新增最後一輪手機／戰鬥／套裝驗收
-   `tests/v146-system-polish.test.js`，V148 新增戰鬥目標／副本流程驗收
-   `tests/v148-combat-dungeon-fixes.test.js`，V149 新增技能定案／介面規則驗收
-   `tests/v149-skill-ui-rules.test.js`，V150 新增冰霜箭雨 VFX 驗收
-   `tests/v150-ice-arrow-rain-vfx.test.js`，V152 新增本輪技能／副本／戰鬥介面驗收
-   `tests/v152-dev-fixes.test.js`，V153 新增火元素施放／持續狀態正式圖驗收
-   `tests/v153-fire-vfx.test.js`，V154 新增本輪戰鬥／元素匣／深淵／版面驗收
-   `tests/v154-current-request.test.js`，V155 新增硬控節奏／深淵第五關／火系終階技能驗收
-   `tests/v155-current-request.test.js`，V156 新增深淵地圖立繪／點擊熱區與元素匣狀態不同步驗收
-   `tests/v156-deep-trace-fixes.test.js`，V157 新增深淵地圖立繪尺寸與直接點擊驗收
-   `tests/v157-abyss-map-tap-fix.test.js`，V158 新增技能／命中／傷害與深淵立繪驗收
-   `tests/v158-combat-tuning.test.js`，V159 新增深淵戰鬥立繪載入時序驗收
-   `tests/v159-abyss-battle-portraits.test.js`，V160 新增技能數值／目標、元素匣與火系動畫驗收
-   `tests/v160-current-request.test.js`，V161 新增火焰斬正式 Sprite VFX 驗收
-   `tests/v161-flame-slash-vfx.test.js`。V162 的燃燒同步、元素匣層級與深淵戰鬥立繪
-   驗收則補強在 `tests/v153-fire-vfx.test.js` 與 `tests/v154-current-request.test.js`；V163 新增
-   inbox 原始 PNG 校正驗收 `tests/v163-flame-slash-source.test.js`；V165 新增怒火／霸龍裂天斬
-   圖片與火箭移動落點驗收 `tests/v165-fire-vfx-fixes.test.js`；V166 新增水元素十招施放、
-   兩種狀態循環、逐目標投射與整區 AOE 驗收 `tests/v166-water-vfx.test.js`；V169 新增
-   RPG 視窗／角色與商店介面、元素匣逐角色設定、水技能最終規則及深淵資產／流程四套驗收：
-   `tests/v169-rpg-ui.test.js`、`tests/v169-element-box-settings.test.js`、
-   `tests/v169-water-skill-rules.test.js`、`tests/v169-abyss-assets-flow.test.js`；V170 新增唯一代表
-   完整正式載入後最終值的整合驗收 `tests/v170-final-spec-integration.test.js`。驗證至少要包含：
-   V171 另新增怒火／水球術／洪水猛獸／冰霜箭雨定位與單體凍傷範圍驗收
-   `tests/v171-combat-vfx-fixes.test.js`；V172 新增水球術多目標分層播放與原圖保留驗收
-   `tests/v172-water-orb-vfx.test.js`；V173 新增水球術雙向旋轉飛行、完整命中畫格與版本標示驗收
-   `tests/v173-water-orb-direction-vfx.test.js`；V173.16 新增深淵對話縮放定位、可視邊界與三段對話
-   進戰鬥驗收 `tests/v173.16-abyss-dialogue-visibility.test.js`；V173.17 新增物品視窗、裝備副本
-   抽獎券版面、舊存檔展示資料修復與手機縮圖驗收 `tests/v173.17-item-ui-assets.test.js`；V173.18
-   新增符咒格線、深淵勝敗回圖與下游不得覆蓋最終技能 owner 驗收
-   `tests/v173.18-final-request.test.js`；V173.23 新增 11 招風系施放、6 種持續狀態、逐格裁切、
-   實際目標定位、單次命中同步與狀態生命週期驗收 `tests/v173.23-wind-vfx.test.js`。
-   - `node --check 檔案.js` 確認語法沒錯
-   - `node tests/v137-regressions.test.js` 跑既有高風險回歸
-   - 追程式邏輯（讀 code，不是用猜的）確認行為符合需求
-   - 如果有辦法起瀏覽器，實際操作一次最準
-   不要在沒驗證過的情況下宣稱「做完了」。
-6. **任何 UI、CSS、版面、美術圖片、背包、裝備、技能、戰鬥介面等修改前，
-   都必須先完整閱讀 `UI_GUIDELINES.md`。** UI 規範不得只依賴聊天記憶；
-   `AGENTS.md` 與 `CLAUDE.md` 只提供入口，本體以 `UI_GUIDELINES.md` 為準。
-7. **每次對外更新都必須升一個版本號**，同步更新 loader cache、`index.html` 直載 query
-   與主頁封面右下角的版本標示；交付時也必須明確告知使用者本次版本號。若前面的整數
-   主版號不變，必須改用小數修訂號依序遞增，例如 `V173 → V173.1 → V173.2`，不得重複
-   使用同一個顯示版號。
-8. **發現問題時優先定位根因。** 能修正既有原始邏輯時，不新增平行邏輯、重複判斷
-   或覆蓋式補丁；維持最小修改，不進行無關重構。
-
----
-
-## 目前狀態（截至 2026-09-02，V173.37 dev）
-
-- 專案是純前端網頁 RPG，用 GitHub Pages 直接serve `index.html` + `css/` + `js/` +
-  `assets/`，沒有 build step、沒有 bundler。
-- V173.20 新增 12～15 秒隨機雙圖開場載入動畫：Logo 四元素依序發光後切換主城空景，
-  100% 時停留並閃爍提示，必須由玩家點擊或鍵盤確認才會揭露已在下層初始化的遊戲。
-- V173.21 讓新創角色在 Lv1 取得 2 點技能點，既有升級每級 +2 不變；新手森林最終怪物
-  維持 Lv2～Lv3，且只套用 `makeZoneMonster()` 基礎值 ×0.75，不再疊加一般練功區 ×1.30。
-  該版當時離開新手森林後仍為 ×1.30，已由 V173.32 正式十區曲線取代；Lv1～10 野怪仍只
-  使用普通攻擊。
-- V173.21 同步加入 11 張風系技能 icon、日常完成度寶箱已領／未領狀態、四元素男角巡怪
-  正背面新立繪及兩張巡怪戰鬥圖。
-- V173.22 補上狂風術 icon，並依火／水／土／風與刀、鎧甲、靴、盔、護腕五個部位接入
-  20 張攻擊套裝 icon；該版法術套裝仍使用原本圖示。既有存檔的背包與已穿戴套裝會依穩定 ID
-  同步新圖，不更動存檔格式、裝備數值或套裝規則；法術套裝已於 V173.24 補齊正式圖。
-- V173.23 將 11 招風系施放與重力、殤風、暈眩、風行、隱身、氣定神閒 6 種持續狀態接入
-  專案現有共用 Sprite VFX renderer、圖片快取、定位與戰鬥行動佇列；施放圖只播放一次，
-  狀態圖逐角色循環，同名狀態再次 MISS 不重啟。技能數值、結算、機率與回合數未改。
-- V173.24 將本輪 20 張法師裝備素材依火／水／土／風與法扇、法袍、法鞋、法冠、法環接入
-  正式套裝 icon；玩家基礎閃躲改為有效敏捷×0.6%，普通怪物預設閃躲改為等級×0.3%且最高
-  30%，一般異常的物攻／智力／精神係數統一為0.05。硬控、技能基礎機率與必定施加規則不變。
-- V173.25 修正裝備詳細視窗裁切、能力明細關閉鍵、能力頁黑色
-  留白、兌換券完整預覽與二層裝備明細；凍傷技能封鎖改為純文字，技能名稱依各技能動畫總長
-  顯示 2/3，戰鬥異常文字移到卡牌下方並完整顯示 1 秒。
-- V173.26 補正 V173.25 實機回報：移除後載 V131 仍殘留的
-  110px 能力頁底部空白；自訂下拉統一以原生字串值同步，切換角色不再殘留上一角色的假
-  100% 補品門檻；凍傷回合結束後立即同步移除狀態 Sprite；異常文字再下移至卡牌高度 86%。
-- V173.27 確認黑色空區不是能力值頁內容，而是角色頁共用
-  外框被 V78 runtime 與 V131 CSS 固定撐到 94%～96% 高度。共用外框現改為依分頁內容自然
-  收合、最高仍限制在 96%；短的能力值／經驗池頁不再留下黑色尾區，長的技能頁仍由既有
-  `#characterTabContent` 單一容器捲動。V173.25～V173.27 已於 2026-09-02 一併發布至 `main`。
-- V173.28（僅 `dev`，待使用者實機驗收）將主城首頁改為東方武俠 RPG Lobby：頂部為角色／
-  資源 HUD，角色與商店為兩個主要入口，六個次要入口沿左右側排列保留中央城門，離線經驗與
-  系統降為低權重橫向入口；三人冒險隊伍改為直列隊伍卡。所有原 ID、onclick、圖片與背景均
-  保留，DEV 金幣／經驗快捷鍵縮入 HUD，未修改任何遊戲資料或戰鬥邏輯。
-- V173.29（僅 `dev`）修正 V173.28 在 Githack／手機快取下出現「新 HTML 搭配舊 CSS／JS」的
-  混版問題：`css/00-main.css`、V54 主城相容 CSS 與 runtime 均改由 `index.html` 使用同一
-  發布版 query 載入，CI 也會強制檢查這三個主城 owner。版面結構、事件、素材及遊戲邏輯未改。
-- V173.30（`dev`，遠端 commit `707f3678f995f8d2af37017b740a6f5ba0e1ed90`）在 V173.29
-  Lobby 基礎上完成第二輪精修：角色／商店主卡
-  高度縮小 12.5%，六個次要入口改為逐列向中央收束的階梯位置，離線經驗／系統改為同列小型
-  橫向入口，功能區總高減少 22 個邏輯像素，使冒險隊伍在目前手機比例上自然上移約 27.6px。
-  金幣與經驗池共用中文簡寫 formatter，主要數值不再以省略號截斷；事件、資料、底部導航、
-  戰鬥、技能與存檔均未修改。
-- V173.31（`dev`，內容 commit `e194b680d495601cae29103226a6e4345c16a73f`）完成主城第三輪
-  精準版面重構：HUD 由既有角色資料動態顯示 1～3 名真實角色，只含小頭像、名稱與等級；
-  金幣／經驗池改用 `萬`、`億` 簡寫且不再出現省略號。角色／商店為 46% 寬、78px 高的細金框
-  圖像入口；六個次功能以每層 34px 向中央收束，離線經驗／系統為 108×40px 小膠囊；三列隊伍
-  卡縮為 38px 高、頭像向外突出並降低容器不透明度。既有十組入口事件、底部導航、背景、角色
-  與資源資料、戰鬥、技能及存檔 owner 均未修改。
-- V173.32（`dev`）完成同輪戰鬥平衡：十區野怪倍率依序為
-  `0.75／0.90／0.95／1.00／1.05／1.10／1.15／1.20／1.25／1.30`，每隻只套一次；傷害、一般
-  異常與硬控的正式等級差統一為 `clamp(1 + 等級差×0.02, 0.70, 1.30)`，命中／閃躲／爆擊不受
-  等級差影響。裝備副本固定 `1 BOSS + 4 精英`，使用專用 rank 倍率，BOSS Tier4 Lv3、精英
-  Tier3 Lv2；深淵 1～4 層固定 Lv1～Lv4，第5層 BOSS Lv5、精英 Lv4，額外 HP 不變。第五層
-  十人站位與指定技能已校正，北帝與水天兵的治療術只作用同排最多3名；元祖賜福逐目標獨立
-  25% 淨化並增加35%閃避2回合。金幣、藥價、EXP、玩家技能、獎勵與存檔均未修改。
-- V173.33（`dev`）依使用者提供的參考圖只取版面比例與主次層級，完成主城第四輪厚實化：HUD
-  至少70px高並保留1～3名動態角色，兩張主入口為內層46%寬、90px高；左右六個入口改為
-  90×95px完整金框方形按鈕；離線經驗／系統為98×46px完整橫向按鈕；隊伍列改為48px高、
-  頭像49px、HP／SP條10px。底部導航、背景、入口事件、角色資料與所有遊戲邏輯均未修改。
-- V173.34（`dev`）重構底層傷害模型：32 招四元素正式傷害技能改用固定 damageRole 倍率，
-  玩家與怪物技能統一走 `calculateSkillDamage()`，再共用 `calculateDamage()`；舊固定傷害欄位
-  僅保留相容回退。防禦改為 `K=250+目標等級×15` 的動態軟上限，玩家與怪物的攻／魔攻／防
-  六圍換算統一為每點 +8／+8／+6，HP 每點體質 +50 不變。裝備副本、深淵倍率、技能配置、
-  AI、狀態、SP、UI、存檔與地圖均未修改。
-- V173.35（`dev`）在 V173.33 厚實 Lobby 基礎上完成第五輪精修與資訊去重：上方 HUD 移除
-  三名角色頭像／名稱／等級，只保留主城／版本、金幣、經驗池與兩個 DEV 捷徑；下方冒險隊伍
-  成為唯一完整角色資訊區。六個次功能與兩個低頻入口各縮小約10%～15%，低頻入口移到中央
-  通道兩側；角色／商店維持90px主卡，只把28px文字底板縮為19px。隊伍卡列與頭像約縮小
-  8%～10%，背景、入口事件、角色／資源／戰鬥資料、底部導航與存檔均未修改。
-- V173.36（`dev`）依最終戰新規格重設深淵第五關：十名敵人維持既有前五帝、後水土火風水
-  固定站位，五名精英名稱統一為天兵天將，十人技能全部鎖定最高等級。五帝與精英只攜帶本輪
-  指定技能；極帝僅能施放元祖賜福，逐目標獨立35%淨化、HP／SP各回100並增加35%閃避2回合；
-  北帝會優先以最高級復活術救援死亡友方，東帝／天帝支援技能使用正式萬象土盾／氣定神閒
-  數值。風屬天兵天將固定使用閃躲術（風行75%、3回合），已移除第五關舊有隱身攔截與單體
-  禁選邏輯；一般玩家隱身術本身未修改。
-- V173.37（`dev`）只微調 V173.36 主城三處既有 CSS owner：主城名稱與版本在原 HUD 高度內
-  明確垂直置中並右移4px；離線經驗／系統各向外移6px，中央通道由48px增至60px；冒險隊伍
-  外框、內發光與角色列框線降低亮度。角色／商店、左右六功能、低頻按鈕尺寸、隊伍高度、
-  頭像、HP／SP、底部導航、背景與全部功能／資料／戰鬥 owner 均未修改。
-- 母版歷史：V120（單一巨大 index.html，全部 inline）→ V121_SPLIT（拆成外部檔案，
-  行為完全不變，過程見 `CHECK_REPORT.txt` / `README_*.txt`）→ 之後陸續疊加 V123～V131
-  各種 stage patch，一路疊到現在。
-- 最新一批大改動是 **V131**（`js/25-v131-fix-batch.js` + `js/26-v131-patrol-appearance.js`
-  + `css/31`、`css/32` + `js/v131-patrol-sprite-*.js`），對應使用者提出的 17 項需求
-  （戰鬥節奏、怪物編隊、技能命中邏輯、元素匣、經驗池預覽、商店黑底、EXP ×3.5 等）。
-  詳細清單見下面「已完成功能記錄」。
-- 在 V131 之後，又補上了**男角 Q 版巡怪立繪**（火/水/風/土四元素），跟原本只有女角的
-  巡怪系統整合在一起，依角色的 `gender` 欄位自動切換。
-- V138 完成戰鬥 1.6 秒出手／2 秒換回合、BOSS／精英置中優先、元素外框與
-  怪物強度名稱色、三副本進場確認、裝備副本依玩家數配置 BOSS、經驗副本
-  全隊 `expNext` 平均、寶箱／抽獎券自主開啟與機率預覽、技能點與學習成本
-  強化，以及副本精英／BOSS 最新 HP、SP 倍率。
-- V139 把升級曲線改為依各練功區實際平均 EXP 反推，Lv.1→100 約
-  69,760 場有效戰鬥、Lv.99→100 約 4,000 場；經驗副本改為全隊當級
-  升級需求平均值的 11%，新增最多 300 場的休息經驗，並校正商店藥水
-  價格與永久模組化道具美術規範。
-- V140 將物理技能附帶異常改讀最終物理攻擊力（一般×0.2、硬控
-  `sqrt(物攻)×0.2`），法術維持智力一般×0.3、硬控`sqrt(智力)×0.2`；
-  水系七招吸血改為只恢復 HP，並依完整定案校正三招直接
-  傷害、兩招燃燒百分比、怒火、暴風拳、治療術與結界；最終命中率下限
-  為 50%。其餘技能點、SP、傷害、前置與效果均已逐項核對未誤改。
-- V141 完成背包五頁、戰鬥卡牌／狀態特效、巡怪移動與任務追蹤、日常副本封面架構、
-  深淵五層、合成／冶煉／符咒／碎片系統、怪物 rank／技能／掉落、程序化戰鬥音效、
-  離線 EXP 等級倍率與大量不捲動介面調整。核心檔案為 `js/34-v141-core-systems.js`、
-  `js/35-v141-ui-battle.js`、`js/36-v141-content-systems.js`、
-  `css/38-v141-system-expansion.css`，快取版本已升至 141。
-- V142 新增可重用技能動畫控制器：普通攻擊維持 520ms 表現，初階／中階／高階／
-  終極技能分別依實際 `animationDuration`／`resolveDuration` 完成後才允許推進；
-  V138 既有 1.6 秒出手與 2 秒換回合節奏保留，短動畫不額外加時，長動畫只補足
-  尚未播放完的部分。玩家、怪物與自動戰鬥共用同一個一次性 Promise 行動閘門。
-  極帝天尊同步補齊元相光明（全體 350 HP／95 SP）、元光護體（全體 200 護盾
-  2 回合）與元祖賜福（全體淨化＋敏捷 75% 兩回合）。
-- V143 將技能主效果搬回戰場：每個已知技能 ID 都有獨立的元素、移動路徑、
-  命中與衝擊組合，技能名稱只在施術者上方短暫提示，傷害／MISS／死亡與狀態
-  皆延後至各目標實際命中幀；下一位角色必須等待整段演出完成。另完成敵方卡牌
-  字級、萬象土盾四色角光、雙方結界擋傷、我方物品跨角色選擇與準星、三招技能
-  定案、硬控上限、脫逃黑畫面、深淵地圖／對話、副本導航及隨機普通裝備合成。
-- V144 將商店藥水收斂為 HP／SP 10%、20%、30% 六項，怪物依遭遇固定抽取
-  1～3 招合法技能並依等級帶 Lv1～5（深淵排除）；硬控玩家於宣告階段直接跳過，
-  轉場字樣統一。治療術、閃躲術、隱身術、氣定神閒、萬象土盾依新定案重設，
-  深淵第五關最終十人站位、精英技能與帝尊專屬 AI 也已完整改為指定版本。
-- V146 收斂最新 18 項修正：戰鬥動畫略過死亡卡牌、技能名稱改描邊、普通攻擊白字、
-  全範圍技能打亂陣形後歸位、最後動畫完成前不開手動指令；技能資料依最新定案重設，
-  補上受控／治療／異常狀態命中提示與龍鳳弓箭岩石等具象演出。深淵改為介紹圖→全螢幕
-  巡怪地圖→靠近 NPC 點擊對話→戰鬥，並限制單次移動及連點；另完成背包每頁 18 格、
-  商店即時計價、主城隊伍資訊、普通裝備合成、四元素套裝數值／元素限制與戰敗慢退場。
-- V147 完成新商店圖示資產更新：把使用者提供但實際為無透明層 JPEG 的正方形圖，
-  僅去除圓形徽章外黑底並輸出透明 PNG，再縮放為 512×512 手機版資產；主城與副本
-  導覽的三個商店入口全部改用 `assets/ui/home-shop-v147.png`，快取版本升至 147。
-- V148 修正相鄰三人技能目標、單體增益與死亡卡牌特效、萬象土盾反傷、復活選取、
-  日常／深淵副本導覽與移動、戰鬥死亡後續出手、巡怪路徑與精英名稱色，並統一限制
-  同增益續回合、硬控並存及治療者 SP 回復；導覽列商店使用 V147 新圖，主城保留舊圖。
-- V149 依最新規格重設火／水／風／土共 45 招技能，補齊凍傷、增益互斥、結界四角層數、
-  技能名稱逐字圓圈、復活怪物亮度、精英／BOSS 名稱色與萬象土盾反傷提示；商店版面
-  同步校正。版本 149 僅作為 `dev` 測試版，不合併至 `main`。
-- V150 將「冰霜箭雨」4×3、12 幀正式 Sprite Sheet 接入既有 V143/V142 技能動畫導演；
-  特效依實際存活目標卡牌中心播放一次，第 7～8 幀同步命中與傷害數字，完整 12 幀
-  播完才解除行動閘門。素材位於 `assets/vfx/water/ice-arrow-rain.png`，快取版本升至 150；
-  本輪只發布到 `dev` 供實機測試，未合併 `main`。
-- V151 修正 V149 逐字圓圈包裝器覆蓋正式 Sprite 動畫的載入衝突；已有 Sprite metadata
-  的技能保留原動畫 ID 與既有 VFX 播放器，快取版本升至 151，只發布 `dev`。
-- V152 依最新需求校正角色獨立技能點顯示、移除誤植火系技能、四元素技能與異常命中、
-  怒火、極帝天尊三招、凍傷禁用技能、自動回復、戰鬥資訊及副本／巡怪介面；加入日常
-  副本封面與深淵一至四關立繪，並修正傷害字層級、怪物文字、指令熱區與戰鬥獎勵框。
-  快取版本升至 152；依使用者要求只發布 `dev`，不得合併或推送 `main`。
-- V153 將本次收到的 8 張火元素施放動畫與 2 張持續狀態動畫接入 V142／V143 共用
-  Sprite Sheet 播放器：單體依實際目標卡中央、同排技能依實際目標合併範圍且主動畫
-  只播一次、火鳳天鳴全場只播一隻、火箭涵蓋施放者至目標群組；第 8 幀同步傷害／MISS／
-  命中／成功狀態，完整 12 幀後才解除行動閘門。燃燒 0.8 秒與怒火 1 秒循環不阻擋回合，
-  並依既有狀態資料移除。快取版本升至 153，只發布 `dev`；本批沒有收到
-  `flame-slash-cast.png`，火焰斬當時仍沿用舊通用演出；V161 已用後續補交的正式素材完成接入。
-- V154 修正戰鬥動畫交棒、元素匣自動補品與主按鈕、怒火逐卡動畫、能力值捲動、裝備
-  副本封面、深淵一至五關立繪及資訊遮擋；只發布 `dev`，未合併 `main`。
-- V155 將冰封／石化不能行動的交棒固定為 0.3 秒；第五關五帝與五名天兵天將改用本輪
-  指定技能，五帝固定最高等級、精英固定最低等級。元祖賜福改為 20% 全淨化與閃避
-  +30% 兩回合；霸龍裂天斬與火鳳天鳴依本輪數值及追加／未燃燒補償規則定案。
-  快取版本升至 155，只發布 `dev`，不得合併或推送 `main`。
-- V156 深追確認前版只把深淵立繪接到戰鬥卡牌，地圖守關者仍是文字按鈕，且 V154 CSS
-  把其最小寬高歸零；現改為 1～5 關各自的大型 3:4 立繪挑戰按鈕。元素匣補品原先被
-  角色個別 `enabled` 旗標誤擋，現以元素匣實際啟動狀態授權全隊補給，保留原門檻、
-  補品與死亡角色規則。快取版本升至 156，只發布 `dev`，不得合併或推送 `main`。
-- V157 依使用者手機錄影確認深淵守關立繪 200×280 過大，已縮為 120×168；錄影中的
-  點擊高亮證實事件有進入，但 V146 的距離限制攔下挑戰，而警告文字又被精簡版面隱藏，
-  因此視覺上完全無反應。現移除守關立繪的距離攔截，保留原按鈕、對話與戰鬥流程，
-  快取版本升至 157，只發布 `dev`，不得合併或推送 `main`。
-- V158 將怒火改為 4 回合／65 SP、冰封改為同排中左右三目標／66 SP、治療術改為
-  全體 550 HP／65 SP、45 SP 消耗且施放者仍不回 SP；一般命中下限提高為 80%，只有
-  降低命中 Debuff 可降至 60%，怪物預設閃避改為等級×0.5，傷害浮動改為 95%～105%
-  並四捨五入。深淵地圖立繪移除外框、卡片黑底與陰影，保留 V157 尺寸及直接點擊。
-  快取版本升至 158，只發布 `dev`，不得合併或推送 `main`。
-- V159 修正 Githack 冷載入時可能先建立深淵戰鬥卡、後完成 V154 runtime，導致戰鬥立繪
-  沒有補掛的時序問題；同時把最終同步排在 V152 的舊 UI 更新之後，避免第五關圖片路徑
-  被舊層再次移除。進入副本戰鬥、補丁延後載入與每次 UI 更新都會重掛既有立繪資料。
-  快取版本升至 159，只發布 `dev`，不得合併或推送 `main`。
-- V160 將冰霜箭雨最終冰封率改為 20%，硬控上限改為普通 80%／精英 60%／BOSS 40%；
-  修正 `allyTri` 被動畫層誤當全體、元素匣補品被第一人優先耗盡、火焰斬缺少命中斬擊與
-  火箭 Sprite 過度放大。快取版本升至 160，不新增 runtime，只發布 `dev`，不得合併或推送 `main`。
-- V161 將補交的 `flame-slash-cast.png` 校正為真正透明 RGBA PNG，依 4×3、12 幀接入既有
-  V142／V143 播放器；只在有效單體目標中央播放一次、總長 0.76 秒，第 8 幀同步傷害與命中反應。
-  V160 的臨時 CSS 斬擊已移除，快取版本升至 161，只發布 `dev`，不得合併或推送 `main`。
-- V162 補回燃燒狀態 Sprite：狀態寫入後會依本次實際目標的命中幀同步啟動，不會提前跑到其他
-  卡牌。元素匣設定開啟期間會把遊戲舞台提升到技能與狀態特效之上，關閉後立即復原；深淵
-  1～5 關戰鬥卡牌改為插入實際立繪 `<img>` 圖層，不再只依賴容易被覆寫的背景樣式。
-  快取版本升至 162，只發布 `dev`，不得合併或推送 `main`。
-- V163 確認 assets-library inbox 的 `flame-slash-cast.png` 本身是 1448×1086、8-bit RGBA
-  透明 PNG；將 12 格 362×362 原始像素逐格置中補透明邊為 384×384，未縮放、拉伸或重繪，
-  並替換 V161 由聊天附件轉出的版本。既有單體定位、0.76 秒與第 8 幀命中設定完全不變；
-  快取版本升至 163，只發布 `dev`，不得合併或推送 `main`。
-- V164 驗證 assets-library inbox 新增的其餘 10 張火元素動畫均為 8-bit RGBA 真 PNG，
-  依原檔名更新會心一擊、火爆亂擊、霸龍裂天斬、火箭、烈火術、烈焰龍捲、火鳳天鳴、
-  怒火、燃燒與怒火持續狀態圖。來源為 3×2／4×3／4×2 的圖依既有 metadata 正規化成
-  4×3／4×2；所有技能秒數、位置、目標與第 8 幀命中設定均未修改，火焰斬圖片也保持
-  V163 完全不變。快取版本升至 164，只發布 `dev`，不得合併或推送 `main`。
-- V165 修正 V164 將怒火與霸龍裂天斬的 1536×1024 原圖誤判為 3×2：兩張原圖實際皆為
-  4×3、12 個獨立畫格，現以 384px 四欄及 341／342／341px 三列逐格原像素複製，僅補成
-  384×384 透明格，沒有縮放或重繪。火箭正式 Sprite 改為前 3 幀停在施放者、中間 3 幀
-  移向本次實際目標群中心、第 7 幀起固定在目標卡牌前播放爆炸；正反向施放都依當次卡牌
-  座標計算，第 8 幀命中、0.9 秒總長及既有傷害／目標規則不變。新增 V165 圖片雜湊、
-  12 格唯一性、透明補邊、Alpha 統計、CSS 移動及雙向定位測試；快取版本升至 165，
-  只發布 `dev`，不得合併或推送 `main`。本輪已完成全部 JS／測試語法檢查、24 套共
-  208 項 Node 驗收及 `git diff --check`；本機未做實際手機瀏覽器操作，仍需在 `dev`
-  以真機確認最終視覺比例與爆炸前後景感。
-- V166 確認 assets-library inbox 的 12 張水／冰動畫全為可完整解碼的 8-bit RGBA 真透明 PNG；
-  10 張施放圖正規化為 4×3、12 幀，凍傷／冰封狀態圖正規化為 4×2、8 幀，僅逐格置中補透明邊，
-  未縮放或重繪。水刀斬、冰霜拳、冰封重擊、冰封、治療與復活依每張實際卡牌定位；冰旋一閃
-  依 1／2／3 個實際目標各自定位且同步命中；水球術與洪水猛獸由施放卡移動到各自實際目標；
-  冰霜箭雨固定覆蓋完整敵方戰鬥區，即使僅一名敵人也不縮成單體。十招均依指定總長並在第 8 幀
-  同步數字／命中反應，復活的 HP 與站起時點也延至第 8 幀。凍傷 1.0 秒、冰封 1.1 秒只讀既有
-  `statusEffects` 循環，施放圖結束後才接續，解除立即移除且不觸發 DOT／控制結算。V158 最終
-  `freeze=tri`、`healSpell=allyAll` 與 Frostbite 非 DOT 的正式戰鬥規則均保留；快取升至 166，
-  只發布 `dev`，不得合併或推送 `main`。
-- V169 以遠端 V166 `dev` 為唯一基底，逐 hunk 移植本輪施工，不合併 `main`。角色能力值／經驗池
-  改為固定不捲動的緊湊排版，技能頁保留自身捲動；原生 alert／confirm 改為排隊式 RPG 主題視窗；
-  商店固定 HP 左欄、SP 右欄並在購買成功後顯示收據；副本背包提升至導覽列之上。元素匣逐角色即時
-  保存設定，啟動中仍可編輯並另設停止鍵。七項水技能由 `js/50-v169-water-skill-rules.js` 定案；
-  深淵重新進入顯示進度，玩家／守關者固定位置，1～4 層新增寶箱與上方傳送點流程。15 張 inbox PNG
-  直接使用原檔，11 張深淵人物 WebP 只移除黑色外背景；Android 合成層的永久陰影／技能卡
-  `will-change` 已靜態化。快取與直載 query 升至 169。
-- V141 保留 V139 較新的經濟定案：野怪 EXP 原倍率 ×3.5、精英 EXP ×1.5、
-  精英金幣 ×2、BOSS EXP ×3、BOSS 金幣 ×5；同時套用一般地圖精英 10% 獨立生成與
-  精英 19% 單一特殊掉落表。這是需求 #34 與後列 #36 發生倍率衝突時，以後列規格為準的
-  明確決策，不可再誤改回精英 EXP ×3／金幣 ×3。
-- 已建立 `UI_GUIDELINES.md` 作為永久 UI 規範；所有後續 UI／CSS／版面／
-  美術修改都必須先閱讀，採逐頁整理與共用元件化，不得藉 UI 任務夾帶修改
-  戰鬥、存檔、數值或掉落邏輯。
-
----
-
-## 系統架構重點（踩過的坑，務必看完）
-
-### 1. V131 不是靠 `index.html` 的 `<script>` 標籤載入的
-
-`index.html` 本身**沒有**直接引用 `js/25-v131-fix-batch.js`、`js/26-v131-patrol-appearance.js`、
-`css/31-*.css`、`css/32-*.css`、或任何 `js/v131-patrol-sprite-*.js`。
-
-這些檔案是由 **`js/20-anonymous-20.js`** 在執行期動態注入的。巡怪 sprite
-與外觀 runtime 仍由 `loadV131PatrolAppearanceAssets()` 依來源陣列依序載入；
-V131～V136 的邏輯 patch 則在 V137 改由
-`loadVersionedRuntimePatchesInOrder()` 嚴格按版本逐支載入，前一支觸發
-`load`／`error` 後才插入下一支。所有注入點都有
-`document.getElementById(id)` 防重複判斷。
-
-**不要把 V131～V136 runtime 改回各自獨立 append。** 動態插入的 script
-原本會以 async 行為競速；這些檔案又會一層層包裝相同全域函式，載入順序
-改變就會改變實際行為。V137 已把順序固定；V170 正式 gameplay runtime 完整順序為
-`js/25` → `js/27` → `js/28` → `js/29` → `js/30` → `js/31` → `js/32` → `js/33`
-→ `js/34` → `js/35` → `js/36` → `js/37` → `js/38` → `js/39` → `js/40` → `js/41`
-→ `js/42` → `js/43` → `js/44` → `js/45` → `js/46` → `js/47` → `js/48`
-→ `js/49` → `js/50` → `js/51`。`js/26` 屬巡怪素材鏈，與這條 gameplay chain 並行。
-
-**如果你在 `index.html` 裡直接看到「這幾個檔案好像沒被載入」而想手動加 `<script>` 標籤，
-先住手、去讀 `js/20-anonymous-20.js`**——手動加標籤幾乎一定會造成重複載入，
-V131 的所有 override（`finishPlayerAction`、`getSkillTargets`、`learnSkill`、
-`renderExpDistributeList`、`confirmAutoBattleSettings`、`winBattle`、`showExpToast` 等）
-都是用「讀舊函式、包一層新邏輯、蓋回同一個全域變數名」的寫法，被載入兩次會造成
-效果疊加兩次（例如 1.3 秒延遲變 2.6 秒）、`setInterval` 開兩個、事件被觸發兩次等等。
-
-要新增巡怪 sprite 相關的資源檔（例如以後補男角背面圖），記得同步更新
-`js/20-anonymous-20.js` 的 `sources` 陣列（在 `loadV131PatrolAppearanceAssets` 裡），
-把新檔案排在 `js/26-v131-patrol-appearance.js` **之前**，不然 `js/26` 執行時
-還讀不到新的 chunk 資料。
-
-### 1.2 ★★★ `?v=` 版本號沒有跟著每次改動同步遞增，等於瀏覽器一直在用快取的舊檔案 ★★★
-
-這是 2026-08-25 第三輪修復時發現的重大問題，**幾乎可以解釋這整個專案好幾輪
-「明明修好了、使用者卻說沒生效／變得更小／又跑掉了」的回報**：
-
-`js/00-main.js`（`index.html` 裡的 `<script src="js/00-main.js?v=XXX">`）、
-`js/25-v131-fix-batch.js`、`css/31-v131-fix-batch.css`、
-`js/26-v131-patrol-appearance.js`、`css/32-v131-patrol-appearance.css`
-（這五個檔案都是在 `js/20-anonymous-20.js` 裡用帶 `?v=數字` 的網址動態載入的）
-這種「網址帶版本號」的寫法，目的是讓瀏覽器把這個網址當成「內容不會變的
-固定版本」放心快取很久——**但前提是每次真的改了檔案內容，就要跟著把
-`?v=` 後面的數字改掉**，不然瀏覽器（尤其手機瀏覽器的長效快取）會一直
-serve舊內容，網址完全沒變過，瀏覽器根本不知道要重新抓。
-
-實際稽核發現：`js/00-main.js?v=130` 這個版本號，從很早以前（`77583cd`那個
-commit之前）就沒再變過，但這之後好幾輪修改（`elementSkillIconMap`、
-`switchCharacterTab`、自動戰鬥設定的padding/max-height……）全部都是改
-`js/00-main.js`本體，`?v=130`卻原封不動。`css/31-v131-fix-batch.css?v=131`、
-`js/25-v131-fix-batch.js?v=131`也是同樣狀況——從V131第一批修正到現在
-好幾輪，版本號都固定寫死`131`，即使內容改了很多次。
-
-**這代表使用者實機測試時，很可能一直看到的是舊版（甚至是好幾輪前）的
-程式碼/樣式，不是Claude/GPT剛剛推上去的版本**，這完全可以解釋「字級
-明明就改大了，使用者卻說變更小了」這種矛盾回報——使用者看到的搞不好
-根本是更早一輪、還沒放大過的快取版本。
-
-**這次的修法**：把 `index.html` 裡的 `js/00-main.js?v=130` 改成
-`?v=132`，`js/20-anonymous-20.js` 裡的 `css/31-v131-fix-batch.css`、
-`js/25-v131-fix-batch.js`、`css/32-v131-patrol-appearance.css`、
-`js/26-v131-patrol-appearance.js` 全部統一改成 `?v=132`。
-
-**★ 以後的規則（務必遵守）**：只要改了這五個檔案裡任何一個的內容，
-**當次收工前一定要把該檔案的 `?v=` 數字往上加**（找 `index.html` 的
-`<script src="js/00-main.js?v=...">` 那一行，跟 `js/20-anonymous-20.js`
-裡對應那個檔案的 `?v=...`），沒改版本號 = 使用者的瀏覽器很可能繼續看到
-舊版，等於這次的修改在使用者端形同沒發生過。
-
----
-
-#### ★★★ 2026-08-26 更新：這個坑又踩了 4 輪，已經改成「單一常數」機制 ★★★
-
-即使上面整段警告就寫在這裡，**從 PR #15 之後還是又連續 4 個 PR
-（#17／#18／#19／#20）改了 `js/25`／`js/27`／`css/33`，版本號卻一次都
-沒動**，全部卡在 `?v=132`。結果使用者整整 4 輪都在跑 PR #15 時代的舊
-程式碼，回報了一堆「已經修好卻還在發生」的問題（副本次數沒解除、
-戰鬥節奏沒改善……），實際上那些修正他根本沒收到。
-
-**根本問題是「版本號散在 4 個 loader 裡各寫各的字面值」**，只要有一個
-忘記改就破功——光靠文件提醒顯然沒用（這段警告本來就在，還是漏了 4 次）。
-
-**現在的做法**：`js/20-anonymous-20.js` 檔案最上面有唯一的一行
-
-```js
-const V_ASSET_VERSION="134";
-function vAssetUrl(path){ return path+"?v="+V_ASSET_VERSION; }
-```
-
-4 個 loader 全部改用 `vAssetUrl("css/31-....css")` 這種寫法。
-**以後改任何被這些 loader 載入的檔案，只要把 `V_ASSET_VERSION`
-那一個數字加一就好。**
-
-還有兩個例外要記得：
-1. `js/00-main.js` 的 `?v=` 寫在 `index.html`（不經過 loader），
-   改那個檔案要另外去 `index.html` 更新。
-2. `js/v131-patrol-sprite-*.js` 那 61 個 sprite chunk 是純 base64
-   圖片、體積很大、內容也很久沒變，**刻意維持釘死在舊版本號**
-   （`?v=131f` / `?v=131c`），不跟著 `V_ASSET_VERSION` 走，避免改
-   一行邏輯就害使用者重新下載一整包圖片。真的換圖時再手動改。
-
-另外這次也順手把 `css/08-stage-v14-character-scroll-fix.css`
-（原本是 `index.html` 裡連 `?v=` 都沒有的靜態 `<link>`，但 PR #16
-改過它）補上了 `?v=134`。
-
-#### ★★★ 2026-08-26 V136 補充：loader 自己也必須有版本號 ★★★
-
-上面的單一常數只能更新「由 loader 動態載入的子資源」，但原本
-`index.html` 是用沒有 query string 的 `js/20-anonymous-20.js` 載入 loader
-本身。如果手機快取的是舊 loader，它根本看不到新的 `V_ASSET_VERSION`，
-也不會知道後來新增的 patch 檔存在。這正是版本機制最外層仍然缺一環的地方。
-
-V136 已把入口改成：
-
-```html
-<script src="js/20-anonymous-20.js?v=136"></script>
-```
-
-**以後每次調高 `V_ASSET_VERSION`，`index.html` 這一行的版本也必須一起
-調高。** 兩者必須相同；只改 loader 內的常數、沒改 loader 自己的 URL，
-仍可能讓手機永遠停在舊版。
-
-至於沒有版本號、用純靜態 `<link>`/`<script>` 標籤載入的檔案（例如
-`css/00-main.css`、`css/22-stage-v78-character-inventory-core.css`）——
-這些沒有辦法用改版本號的方式強制刷新，只能依賴 GitHub Pages 預設的
-快取時間（通常較短，會自然過期重新抓取），風險比上面那五個「版本號寫死
-沒跟著動」的檔案低很多，不用特別處理，但如果同一批修改剛好也動到這類
-檔案，還是可以在說明裡提醒一下「這個部分可能要等快取自然過期或使用者
-強制重新整理」。
-
-### 1.3 ★ 改`#allElementSkillPreviewModal`（全屬性技能預覽）的font-size，數字要乘上約2.57倍才會是螢幕上實際看到的大小
-
-`#allElementSkillPreviewModal`（技能頁面裡「全屬性技能預覽」那個彈窗）
-活在 `#game-stage` 的 `transform:scale()` 座標系底下——整個遊戲畫面先在
-1080寬的設計稿座標畫好，再用CSS transform整體縮小貼合手機實際螢幕寬度。
-用Playwright在420px寬viewport量到的縮放比例是 `0.388889`
-（`getComputedStyle(document.getElementById('game-stage')).transform`
-= `matrix(0.388889,...)`），這個比例不會因為手機型號差很多（因為設計稿
-1080寬、手機大概380~430寬，比例都在0.35~0.40左右），可以放心當通用值。
-
-2026-08-25~26這幾輪一路把這個彈窗的文字從13.5px加大到22px，使用者卻
-一直反映「還是很小」——真正原因是**這裡寫的font-size會再被那層scale
-乘上0.389**，22px實際顯示在螢幕上只剩約8.6px，每一輪的「加大」在螢幕上
-的實際效果都被吃掉六成多，難怪感覺沒什麼用。2026-08-26最後一輪
-（`css/31-v131-fix-batch.css`裡`.skill-preview-card`那幾條規則）已經
-改成寫90px（希望螢幕上看到35px的話，就要寫35÷0.388889≈90px），已用
-`getBoundingClientRect()`實測確認換算後數值正確。
-
-**以後如果要再調這個彈窗（或任何確認過活在`#game-stage`縮放座標系底下
-的其他元素）的字級/尺寸，記得先用類似方法量一次目前的縮放比例
-（比較`getBoundingClientRect().height`跟`offsetHeight`兩個值的比例），
-再回推「螢幕上想要的實際px值 ÷ 縮放比例」寫進CSS，不要直接把使用者說的
-數字原封不動寫進去。**
-
-V173.16 又確認一個同類陷阱：即使 JavaScript 已把 viewport 座標正確換回 map-local
-邏輯座標，最終 CSS 的 `inset:auto !important` 仍會把 inline `left/top` 當成無效，
-造成元素的 `style.left/top` 看似有值、實際 `getBoundingClientRect()` 卻仍落在畫面外。
-深淵對話目前由 `js/36-v141-content-systems.js` 計算座標並寫入 CSS custom properties，
-再由 `css/50-v169-abyss-flow.css` 的最終 `left/top:var(...) !important` 消費；檢查這類問題
-不能只讀 `element.style`，必須同時量 computed style、元素 rect 與容器 rect。
-
-反過來，`#homeFeatureModal`（角色/技能列表、狀態頁那個彈窗）已經在
-更早一輪（`js/19-stage-v78-character-inventory-runtime.js`那次修正）
-證實是1:1顯示、沒有被這層縮放影響，同一個技巧不適用在那個彈窗上——
-不同彈窗、不同容器，套用縮放與否可能不一樣，改之前務必個別實測，
-不要憑印象套用。
-
-### 1.5 有辦法的話，一定要實際跑起來測試，不要只靠讀程式碼判斷
-
-2026-08-25 這一輪修了 7 個回報的 bug（技能欄/經驗池無法捲動、巡怪立繪變白色空白方塊、
-技能icon配錯、學習升級框太大、文字太小、形象切換按鈕太小畫質差），全部都是「讀程式碼
-看起來沒問題，但實際渲染出來是錯的」——例如：
-
-- 捲動失效的根本原因是 `js/19-stage-v78-character-inventory-runtime.js` 用
-  `getBoundingClientRect()` 量出來的螢幕座標，除以一個「這個彈窗其實根本沒有在用」
-  的 `#game-stage` 縮放係數，把可用高度誤算成快3倍大——這種bug光看程式碼邏輯完全
-  看不出問題（公式本身沒有語法錯誤，數學上也「看起來合理」），只有實際量測
-  `clientHeight` vs `getBoundingClientRect().height` 才發現兩者其實是1:1，
-  不需要換算。
-- 巡怪空白方塊是 Chromium 的一個渲染怪癖：`<img>` 只要 `src` 是一張能成功解碼的圖片
-  （就算是1x1透明GIF），疊加的CSS `background-image` 大部分區域就會被畫成白色，
-  這完全沒辦法從程式碼邏輯推論出來，只能實際渲染出來看、然後用最小重現案例
-  （同樣的CSS套在`<div>`上 vs 套在`<img>`上比較）才能鎖定問題。
-
-**環境裡已經有 Chromium + Playwright 可以用**（`/opt/pw-browsers/chromium-1194/`，
-Node.js 版playwright套件需要自己`npm install playwright`一次，
-用`PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1`避免它重新下載瀏覽器）。用
-`python3 -m http.server` 把整個專案資料夾serve起來，配合Playwright寫小腳本
-（開頁面→跑完創角流程→操作到出問題的頁面→screenshot / 讀computed style /
-讀scrollTop等），是目前這個專案唯一可靠的驗證方式。**純讀程式碼、純推理
-「這樣應該會動」是不夠的**，尤其是這種疊了30幾層CSS/JS override、彼此互相
-用`!important`蓋來蓋去的架構，光用眼睛看很容易漏掉真正生效的是哪一條規則。
-
-### 2. 大部分核心遊戲邏輯在 `js/00-main.js`（很大，約 750KB）
-
-角色/戰鬥/技能/裝備/存檔等系統的本體都在這裡，函式名稱直接沿用（`getMainCharacterStats`、
-`castDamageSkill`、`checkLevelUp`、`saveGame`/`loadGame`……）。這一支不要整支改寫，
-後續修改一律走「疊 patch」的模式（讀舊函式、包一層、蓋回同名全域變數），
-跟 V131 那批的寫法一致——這是這個專案從 V120 就定下來的規則（見 `README_*.txt`）：
-**不要把 21 支 script 合併成一支 game.js**，因為會改變例外邊界跟頂層 `let`/`const`
-初始化時機。新的 patch 檔一樣照這個規則來，不要圖方便直接改 `00-main.js`。
-
-### 3. 圖片資源命名慣例：base64 → 外部檔 → chunk 拆檔
-
-`assets/` 底下是真正的圖片檔（png/jpg/webp）。如果某個資源必須內嵌在 JS 裡
-（例如巡怪的透明 sprite，需要在 runtime 用 CSS `background-position` 做四方向切換），
-慣例是：
-
-1. 用 PIL 之類的工具把圖片組成一張 sprite sheet（webp，需要透明背景就用 lossless）
-2. base64 編碼
-3. 切成多個 `js/v131-patrol-sprite-*.js`（或類似命名）小檔，每個檔案內容固定格式：
-   ```js
-   window.SOME_GLOBAL_CHUNKS=window.SOME_GLOBAL_CHUNKS||[];
-   window.SOME_GLOBAL_CHUNKS[i]="....(base64 片段)....";
-   ```
-4. 消費端（例如 `js/26-v131-patrol-appearance.js`）檢查陣列長度/完整性，
-   不完整就安全降級（fallback 到舊行為），不要讓載入失敗直接把整支 script 炸掉。
-5. **一定要驗證 byte-for-byte 還原**（decode 所有 chunk、組回二進位、跟原始檔案比對
-   hash）再提交，這是這個專案唯一能保證「切檔沒切壞資料」的方法。
-
-現有範例：`js/v131-patrol-sprite-0.js` ~ `9.js`（女角 Q 版，3x3 grid，
-每格對應一個元素的正/背面，2026-08-25第二輪用更高畫質來源重建過，
-chunk數從6個增加到10個）、`js/v131-patrol-sprite-male-0.js` ~ `17.js`
-（男角 Q 版，4x2 grid，正背面皆有）。
-
-**換掉chunk內容但檔名／數量不變時，記得把 `js/20-anonymous-20.js` 裡
-對應的 `?v=131x` query string 版本號往後遞增**（例如`131a`→`131e`），
-不然使用者瀏覽器可能還快取著舊版base64內容，看起來像是「換圖沒生效」。
-如果chunk數量本身變多／變少，`sources`陣列也要同步增減對應的檔案清單。
-
-### 4. 角色系統：`player`／`player2`／`player3`
-
-三個角色是平行結構（不是陣列），輔助函式 `getPartyCharacterByIndex(index)`／
-`getExistingPartyIndexes()` 統一處理「不管哪個角色，只要存在就處理」的邏輯，
-新程式碼盡量呼叫這兩個輔助函式，不要自己寫 `index===0?player:index===1?player2:player3`
-這種三元判斷（雖然舊程式碼裡到處都是，但新增的部分盡量別再加）。
-
-`character.gender`（`"male"`/`"female"`）跟 `character.element`
-（`"fire"`/`"water"`/`"wind"`/`"earth"`）是兩個獨立欄位，立繪/Q版素材要同時看這兩個
-欄位才能選到正確的圖（見 `getCharacterArtworkPath()` 在 `js/00-main.js`）。
-
-### 5. `#game-stage` 裡新增任何需要手指捲動的容器，記得加進觸控鎖白名單
-
-`js/01-stage-v8-touch-lock.js` 有一個全域的 `touchmove` 監聽，只要觸控目標在
-`#game-stage` 裡面、又不在它自己維護的 `allowedSelector` 白名單覆蓋的可捲動容器內，
-就會 `preventDefault()` 整個擋掉，防止手指誤滑到遊戲背景造成非預期的頁面捲動/縮放。
-
-**這代表：任何新增的、預期要能讓玩家手指滑動捲動的容器（新彈窗、新列表……），
-如果沒有把它自己的 class/id 加進這份白名單，程式化設定 `scrollTop` 會正常運作
-（因為那不經過touchmove事件），但玩家真的用手指滑的時候會完全沒反應**——這正是
-2026-08-26「全屬性技能預覽」彈窗「不能捲動」回報的根本原因，`.skill-preview-body`
-從這個功能一開始做出來就沒被加進白名單，只是內容夠短、從來不需要真的捲動，才一直
-沒被發現。之前好幾輪单純用`scrollTop`/`getBoundingClientRect()`驗證捲動「看起來沒問題」，
-其實都沒有測到真正的手指觸控路徑，都是不夠準的驗證方式。
-
-**以後只要新增/發現任何「這裡應該要能捲動」的容器，驗證方式要用模擬真實觸控滑動
-（Playwright的`Input.dispatchTouchEvent`，`touchStart`→`touchMove`→`touchEnd`），
-不能只測`scrollTop`賦值或`overflow-y:auto`的computed style，這兩種都測不出
-觸控鎖擋住手勢這種問題。**
-
----
-
-## 已完成功能記錄（新的加在最上面）
-
-### 2026-09-02 — V173.37：主城 HUD、中央通道與隊伍框線最終微調（dev）
-
-- 本輪沒有重構、沒有新增 runtime／wrapper／暫時補丁。HUD 與低頻入口直接修改正式 owner
-  `css/00-main.css`：`.home-hud-identity` 保持原 grid 欄位與 HUD 48px 最小高度，改為在整列中
-  垂直置中並向右4px；金幣／經驗池、DEV 尺寸與內容不變。`.home-utility-actions` 只把水平
-  padding 由88px改為82px，因此離線經驗向左、系統向右各6px，按鈕仍維持86×40px完整樣式，
-  實際中央空隙由48px增加為60px。
-- 冒險隊伍直接修改既有 owner `css/42-v146-system-polish.css`：外框金線 alpha 由.76降至.54、
-  內發光由.07降至.04，角色列框線由.58降至.38、內線由.035降至.02。邊框仍為1px，因此
-  隊伍總高、44px角色列、45px頭像、9px HP／SP條、文字與排列方式完全不變；
-  `js/41-v146-system-polish.js` 的角色／HP／SP資料渲染未修改。
-- 以遠端精確 UI SHA `509b5e3390f5078a9f4e470a29d5e022abb77a26` 在 Chrome 實際載入三角色存檔並
-  目視 9:16 直向畫面。設計面實測比例0.562508（9/16為0.5625），HUD高60.17px、資源列高
-  26.33px、主入口112.82px、六功能102.79px、低頻入口50.14px、角色列55.16px及底部導航
-  105.30px均與 V173.36 等效縮放尺寸一致；中央實際可視空隙由60.17px增至75.21px，所有區塊
-  均在設計面內，body／html scroll 尺寸等於 viewport，無重疊、裁切或捲動。遊戲來源沒有
-  console error；雲端瀏覽器擴充元件自身的 metadata 訊息不屬於遊戲頁。
-- 乾淨 worktree 完整 Repository checks 通過：JavaScript語法166／166、Node suites 52／52、
-  靜態資源383、HTML ID 285、版本／loader（24支直載、108個相依資源、26支 ordered runtimes）
-  及 Git 空白／衝突標記皆正常。工作區既有未提交的 `assets/inbox/暈眩-狀態循環圖.png` 已保留，
-  未覆寫、未暫存、未提交；只發布 `dev`，不合併、不推送 `main`。
-
-### 2026-09-02 — V173.36：深淵第五關最終十人技能與風天兵閃躲術（dev）
-
-- 沿用既有第五關編隊、立繪、戰鬥與資料 owner，不新增 runtime。最下游第五關 owner
-  `js/46-v155-dev-fixes.js` 已固定前排東帝／天帝／極帝／北帝／南帝、後排水／土／火／風／水
-  五名同名「天兵天將」；五帝與五名精英的 `v141ForceSkillLevel`、`v141SkillLevel`、
-  `v144SkillLevel` 全部改為5。技能表只保留本輪指定項目：東帝地牛猛襲／石破天驚／萬象土盾，
-  天帝風哮電擊／風起雲湧／氣定神閒，極帝元祖賜福，北帝冰霜箭雨／復活術／治療術，南帝
-  怒火／霸龍裂天斬／烈焰龍捲；精英為水治療、土石破、火烈焰龍捲、風閃躲、水治療。
-- 元祖賜福改為存活敵方全體逐目標獨立35%淨化、立即各恢復100 HP／100 SP，再為尚未持有
-  同名祝福者增加35%閃避2回合。重施時立即回復與各自淨化仍結算，但同名持續閃避不疊加、
-  不刷新；與風行共同存在時使用共用乘算並正確各自到期。北帝新增最高級復活優先流程；東帝
-  萬象土盾與天帝氣定神閒依正式目標／數值結算，敵方萬象土盾只按玩家實際造成的 HP 損失
-  反傷，護盾吸收與過量傷害不多算。
-- 風屬天兵天將的第五關專屬行為已由舊 `v155ResolveWindEliteStealth` 完整替換為
-  `v155ResolveWindEliteDodge`：對同排最多3名友方套用【風行】75%閃躲3回合，沒有隱身狀態，
-  也不再改寫玩家單體選取／排隊目標。玩家既有「隱身術」技能與其他關卡資料完全未修改。
-- `tests/v155-current-request.test.js` 與 `tests/v170-final-spec-integration.test.js` 已鎖定精確十人
-  技能／等級、元祖賜福兩次施放、北帝復活優先、東帝／天帝支援、風兵只閃躲不隱身及敵方
-  反傷實際 HP 損失。`node --check js/46-v155-dev-fixes.js` 通過；52 支 Node suite 全數通過。
-  工作區另有使用者未提交的 `assets/inbox/暈眩-狀態循環圖.png`，本輪未覆寫、未暫存、未提交；
-  其素材雜湊測試以 `HEAD` 原檔隔離執行後通過。
-- 顯示版本、首頁標示、直載 query 與 loader cache 已同步升為 V173.36；只發布 `dev`，不合併、
-  不推送 `main`。
-
-### 2026-09-02 — V173.35：主城第五輪精修與角色資訊去重（dev）
-
-- 延續 V173.33 的厚實 RPG Lobby，不重做版面、不恢復九宮格，也不新增小 icon 或平行 owner。
-  正式 owner 仍是 `index.html`、`css/00-main.css`、`js/41-v146-system-polish.js` 與
-  `css/42-v146-system-polish.css`。上方 HUD 已移除三名角色的頭像、名稱與 Lv. DOM／CSS／渲染
-  路徑，只保留四象主城、V173.35、金幣、經驗池與兩個 DEV 捷徑；下方冒險隊伍是唯一完整
-  角色資訊區。金幣／經驗池改為等寬雙欄，HUD 最小高度由70px降為48px，沒有留下左側空洞。
-- 角色／商店仍是46%寬、90px高的兩個最大入口，圖片、金框與暗紅漸層皆保留；只把文字底板
-  由28px降為19px（-32.1%）。左右六個完整功能按鈕由90×95px降為80×82px，寬／高分別
-  縮小11.1%／13.7%，圖片區59px、文字區21px，仍有完整底板、金框、圖片與文字。
-- 離線經驗／系統由98×46px降為86×40px，寬／高縮小12.2%／13.0%；改為功能區左右對稱定位，
-  中央保留72個邏輯像素的無按鈕通道，不再正壓城門／主街道中軸。冒險隊伍每列由48px降為
-  44px、頭像49px降為45px、HP／SP條10px降為9px並向內縮2px；三角色滿列高度預算由176px
-  降為159px（-9.7%），名稱、Lv.與兩條數值仍完整保留。
-- 十組既有 `openHomeFeature(...)` 事件、五項底部導航及所有背景、圖片、角色／HP／SP、金幣、
-  經驗池、DEV、戰鬥、技能與存檔 owner 均未修改。`tests/v173.28-main-city-lobby.test.js` 已更新
-  為12項 V173.35 專項驗收；完整 Repository checks 通過：JavaScript語法166／166、Node suites
-  52／52、靜態資源383、HTML ID 285、版本／Loader（24支直載、108個相依資源、26支 ordered
-  runtimes）及 Git 空白／衝突標記皆正常；遠端 GitHub Actions run #98 亦成功。
-- 已嘗試以精確遠端 SHA 進行9:16手機直向渲染，但雲端瀏覽器工作階段在連線重置時持續無回應，
-  本機也沒有 Chromium，官方 Playwright Chromium 下載端點回傳502／逾時。因此本輪只能確認
-  9:16高度預算、中央72px通道、無水平／垂直溢位契約與完整三角色靜態幾何測試，尚未取得
-  V173.35 最終瀏覽器截圖；交付時不得宣稱已完成 Android 實機目視驗收。
-
-### 2026-09-02 — V173.34：底層傷害模型倍率化與動態防禦尺度（dev）
-
-- `js/00-main.js` 成為唯一核心傷害公式 owner：正式技能以
-  `有效攻／魔攻×effectivePower+effectiveFlatDamage` 建立 rawAttack，再只套一次等級差、元素與
-  `K/(K+DEF)`；`K=250+目標等級×15`，最低傷害1。`js/47-v158-combat-tuning.js` 已停止覆寫
-  `calculateDamage()`，`js/46-v155-dev-fixes.js` 的鳳威效果 wrapper 與 `js/50` 冰封局部攔截保留。
-- 正式 damageRole 對照共32招，固定 profile 由 `js/00-main.js` 提供，火／風／土正式 owner
-  `js/43-v149-skill-ui-rules.js` 與水系 owner `js/50-v169-water-skill-rules.js` 在最終資料落定後套用。
-  純冰封不造成傷害所以不遷移；舊 `baseDamage／damagePerLevel` 全數保留，僅供尚未遷移流程
-  回退。`js/43` 的火元素EX wrapper 已兼容新版 options 呼叫，`js/46` 的深淵強制技能等級會同步
-  折算 `powerMultiplier／flatDamage`，避免第五層仍誤用Lv1倍率或重複套用。
-- 玩家與怪物的數值換算統一：物攻 `10+攻擊點×8`、魔攻 `10+智力點×8`、防禦
-  `10+體質點×6`；HP維持 `100+體質點×50+既有加成`。主角、第二／第三角色、背包預覽與
-  `makeZoneMonster()` 已同步，裝備詞條、Buff／Debuff、rank 與既有被動繼續在原入口生效。
-- 同級、中位浮動、無爆擊／無剋制、合理20%體質配置的實際驗算：Lv20／50／80／100野怪普攻
-  分別為66／143／246／318，佔玩家最大HP 3.95%／3.51%／3.80%／3.94%。各級 role 比例均符合
-  單體低階 < 一般 < 爆發，三人／全體單目標低於一般／爆發，控制低於純爆發。
-- 裝備副本Lv60實際驗算：精英普攻261（5.36% HP）、Tier3 Lv2代表技能484（9.94%）；BOSS
-  普攻295（6.06%）、Tier4 Lv3代表技能378（7.76%）。原專用rank倍率與固定1王4精英未改。
-  深淵Lv100第1～5層BOSS普攻皆為525（6.51%）；代表技能依Lv1～5為709（8.79%）、
-  1170（14.50%）、1005（12.45%）、1044（12.94%）、1327（16.44%）。不同技能Role不強制
-  單調，但同一Role會隨技能等級提升；第五層霸龍裂天斬落在15%～25%強單體目標區間。
-- 驗證更新於 `tests/v170-final-spec-integration.test.js` 與歷史 owner 測試
-  `tests/v158-combat-tuning.test.js`：鎖定32招無遺漏、Role固定值、新舊公式分流、動態K、六圍、
-  玩家／怪物共用入口、裝備／深淵代表傷害及第五層倍率只折算一次。發布版本同步更新
-  `index.html`、`js/20-anonymous-20.js` 與版本驗收。尚待人工實玩確認不同配點、裝備、元素剋制、
-  爆擊與Buff疊加下的長期體感；本輪沒有改副本倍率、AI、技能數量、狀態機率、UI、VFX或存檔。
-
-### 2026-09-02 — V173.33：主城第四輪厚實 RPG 版面重構（dev）
-
-- 參考圖只用於比例、按鈕尺寸、HUD厚度、隊伍卡厚度與層級；沒有複製或重新生成角色、美術、
-  配色、圖案或主城背景。正式 owner 仍是 `index.html`、`css/00-main.css`、
-  `js/41-v146-system-polish.js` 與 `css/42-v146-system-polish.css`，沒有新增 runtime、CSS owner
-  或臨時 wrapper；十組既有 `openHomeFeature(...)` 事件與底部五項導航完全保留。
-- `css/00-main.css` 將 HUD 由64px提高至至少70px，角色頭像由12px提高至17px，每名角色保留
-  名稱與 Lv.；金幣／經驗池各自使用20px高的實心金框面板，沿用既有 `萬`／`億` formatter，
-  不會產生 `...`。兩張角色／商店主入口由78px提高至90px，內層欄寬仍為46%，圖片與28px
-  暗紅金字文字區明確分開。
-- 六個次功能取消34／68px階梯位移，改為左右兩條固定直欄；每顆為90×95px完整按鈕，上方
-  67px圖片區、下方26px暗色文字區，並有金框、底板與陰影。中央前兩列保持202px邏輯寬度的
-  無大型 UI 通道，城門中軸仍可見。離線經驗／系統改為98×46px完整橫向按鈕，置於第三列
-  中央通道且不另外增加版面高度。
-- `css/42-v146-system-polish.css` 將每張隊伍卡由38px提高至48px（+26.3%），頭像由39px提高
-  至49px（+25.6%），名稱／Lv.字級提高10%～11%，HP／SP條由8px加粗至10px；隊伍外框與
-  各列底色提高不透明度，三列以獨立金框與3px間距分隔。三人最滿版面高度預算為630px，低於
-  固定主城可用630.67px，且未改用 `transform:scale()` 假縮放。
-- `tests/v173.28-main-city-lobby.test.js` 擴充為12項 V173.33 驗收，鎖定完整HUD、三角色資料、
-  資源無省略號、兩張最大主入口、六個90×95px完整方形按鈕、兩個98×46px橫向按鈕、隊伍卡
-  與頭像增幅、630px高度預算、十組事件及底部導航 owner 不變。完整 Repository checks 通過：
-  JavaScript語法166／166、Node suites 52／52、靜態資源383、HTML ID 288、版本／Loader
-  （24支直載、108個相依資源、26支 ordered runtimes）及 Git 空白／衝突標記皆正常。
-- 瀏覽器檢查環境在連線階段立即因必要模組缺失停止，沒有超過3分鐘，也沒有改用其他渲染器
-  冒充實際截圖。因此本輪尚未取得 V173.33 真實手機截圖或瀏覽器 Console 結果；Android
-  實機仍須確認最終視覺重量、中央城門可見度與不同名稱長度，交付時不得宣稱已完成目視驗收。
-
-### 2026-09-02 — V173.32：野怪曲線、等級差、裝備副本與深淵難度分層（dev）
-
-- `js/25-v131-fix-batch.js` 與 `js/34-v141-core-systems.js` 將十區野怪倍率正式改為
-  `0.75／0.90／0.95／1.00／1.05／1.10／1.15／1.20／1.25／1.30`；既有
-  `_v131StrengthApplied` 單次旗標保留，新補入的風／土怪也直接取所屬區倍率。倍率只作用於
-  maxHP、maxSP、attack、magicAttack、defense；新手森林仍只有 Lv2～3 普攻怪。
-- `js/00-main.js`、`js/33-v140-four-element-balance.js`、`js/47-v158-combat-tuning.js`
-  把傷害、一般異常與冰封／石化等硬控的等級差統一為
-  `clamp(1 + (施法者等級 - 目標等級)×0.02, 0.70, 1.30)`。命中、閃躲、爆擊、SP、
-  防禦與裝備需求沒有加入等級差；一般異常 5%～95% 與硬控普通／精英／BOSS
-  80%／60%／40% 上限不變。同名持續狀態仍在擲機率前直接 MISS。
-- `js/27-v132-content-expansion.js` 的裝備副本固定為 1 BOSS + 4 精英，無論玩家 1～3 名皆
-  共5怪；全部使用 `getDungeonMonsterLevel()`，BOSS 不再額外×1.15等級。另設且只套一次的
-  裝備副本專用 rank 倍率：精英 HP×1.80、攻／魔攻×1.15、防×1.10；BOSS HP×2.80、
-  攻／魔攻×1.30、防×1.20；SP 不作 rank 加成。共用深淵 rank 倍率完全未改。BOSS 固定
-  Tier4／70%／Lv3，精英固定 Tier3／70%／Lv2；`js/40-v144-rules-and-abyss.js` 會保留這份
-  鎖定配置，不再依怪物等級重抽或升到 Lv4／Lv5。
-- `js/36-v141-content-systems.js`、`js/40-v144-rules-and-abyss.js`、
-  `js/46-v155-dev-fixes.js` 固定深淵1～4層為 1 BOSS + 4精英，技能等級依序全員
-  Lv1／Lv2／Lv3／Lv4，額外 HP 仍是 BOSS +5000、精英 +2500；第5層固定5 BOSS +5精英，
-  BOSS Lv5／+10000 HP、精英 Lv4／+3500 HP。第五層前排順序為東帝、天帝、極帝、北帝、
-  南帝，後排為水／土／火／風／水天兵天將；五帝與精英均使用本輪指定技能。
-- 敵方治療術的根因是怪物支援 resolver 直接遍歷全體。現在北帝與一般水系支援怪都先從固定
-  站位挑選一組同排、最多3名的治療目標；第五層兩名水天兵因此不再產生全體治療。極帝的
-  元相光明固定全體 +150 HP／+55 SP，元光護體固定全體100護盾2回合，元祖賜福則逐目標
-  獨立25%淨化並增加35%閃避2回合，同名祝福不刷新也不重新擲淨化。
-- 經濟只做公式驗算，未修改任何金幣／藥價。驗算情境為3名同級、平均配點與正常裝備角色，
-  普攻搭配第一／第二階同排技能，第三階只在精英或快速清場使用；平均金幣含10%精英期望值與
-  既有±15%掉落浮動，SP為三人合計的保守輪轉估值。補品占比以補回同量SP的30% SP藥，另加
-  每10場1瓶30% HP藥計算：
-
-  | 玩家等級 | 平均怪數 | 一般練功技能階 | 估計SP／場 | 平均金幣／場 | 估計補品占收入 |
-  |---:|---:|---|---:|---:|---:|
-  | 20 | 2.0 | 一階 | 24 | 75.4 | 29% |
-  | 40 | 4.5 | 一～二階 | 72 | 356.6 | 13% |
-  | 60 | 4.5 | 一～二階 | 84 | 554.6 | 12% |
-  | 80 | 4.5 | 二階；精英可選三階 | 96 | 752.6 | 11% |
-  | 100 | 4.5 | 二階；精英可選三階 | 108 | 950.6 | 10% |
-
-  依此情境不需頻繁補SP，長期補品成本沒有超過收入40%；Lv20安全空間最小，若實機需要30%
-  HP藥頻率高於約每5場1瓶，才可能接近或超過40%，目前只列風險、不調經濟。
-- `tests/v170-final-spec-integration.test.js` 擴充至24項正式整合驗收，涵蓋十區單次倍率、等級差
-  九個檢查點、一般異常／硬控、裝備副本三種隊伍人數、專用倍率與技能鎖、深淵五層、第五層
-  站位／技能／HP及敵方三人治療；相依歷史測試同步改讀本輪正式規格。全部50個 Node 測試檔
-  已通過，正式50支 runtime 依 production 順序載入無例外，`git diff --check` 通過。可選瀏覽器
-  smoke 在0.2秒內因環境沒有 Chromium 略過；尚需 Android 實機確認實際戰鬥手感與瀏覽器
-  console。版本 title、首頁 badge、直載 query 與動態 loader cache 同步升為 V173.32。
-
-### 2026-09-02 — V173.31：主城第三輪精準版面重構與三角色實測（dev）
-
-- `index.html` 的 HUD 保留原首列相容 ID，新增唯一 `#homeHudCharacterList`；既有
-  `js/41-v146-system-polish.js` owner 以 `getExistingPartyIndexes().slice(0,3)` 同步實際已建立角色，
-  不生成空槽，並讓同一份角色索引同時驅動 HUD 與冒險隊伍。三名角色實測為「版面測試 Lv.50」、
-  「測試二 Lv.50」、「測試三 Lv.1」，HUD 與隊伍均顯示 3／3。
-- 金幣與經驗池沿用同一 formatter：12,485,243 → `1248萬`、104,852,430 → `1.05億`、
-  1,248,524,300 → `12.5億`；完整值只留在 `title`／`aria-label`。三角色畫面實際顯示
-  `9.29億`，沒有 `...`；DEV 兩鍵仍為原事件，僅以 16px 高度置於資源下方降低權重。
-- `css/00-main.css` 將兩張主入口定為每欄 46%、78px 高；526.5×936 的 9:16 舞台實測各為
-  201.6×97.8px，寬高比 2.06:1。六個次入口維持原功能順序但採 0／34／68px 邏輯位移，實測
-  每層向中央 42.6px，中央城門軸線沒有大型按鈕或黑框；兩個工具膠囊為 108×40px 邏輯尺寸，
-  實測 135.4×50.1px。
-- `css/42-v146-system-polish.css` 將冒險隊伍改為半透明單一外容器與三張 38px 緊湊隊伍列，列間
-  保留 5px，39px 圓形頭像向左突出 4px；名稱／Lv. 與 HP／SP 保留但外框、底色及陰影降低。
-  三角色實測容器高 194.3px、每列 47.6px，後方街道仍清楚可見，三列無重疊。
-- 雲端 Chrome 已在 V173.31 immutable `dev` 預覽以完整三角色存檔實際操作：舞台
-  526.5×936、HUD 高 80.2px、頁面與內容 `scrollY/scrollTop` 均為 0，內容
-  `clientHeight=scrollHeight=747`；十個主城入口逐一點開皆顯示正確功能視窗並可返回，應用程式
-  console 無錯誤。五個底部導航按鈕操作前後的 x／y／寬／高完全一致，未移位。
-- `tests/v173.28-main-city-lobby.test.js` 共 11 項 V173.31 主城驗收通過；完整 Repository checks
-  亦全數通過：JavaScript 語法 `166/166`、Node suites `52/52`、靜態資源 `383`、HTML ID
-  `288`、版本／Loader（24 支直載、108 個相依資源、26 支 ordered runtimes）及 Git
-  空白／衝突標記均正常。內容 commit 已推至遠端 `dev`
-  `e194b680d495601cae29103226a6e4345c16a73f`；`main` 未修改。
-
-### 2026-09-02 — V173.30：新版主城第二輪視覺層級精修（dev）
-
-- 版面 owner 仍只修改既有 `css/00-main.css`：角色／商店主卡由 96px 降至 84px（12.5%）；
-  休息／合成、任務／圖鑑、成就／公告維持兩欄三列，但左右入口依序向中央收束 0／14／28px，
-  icon 保留 32px 點擊辨識度並縮短文字間距；沒有恢復九宮格、沒有新增圖片或大面積面板。
-- 離線經驗與系統改為置中的 116px／88px 同列小入口，高度由 36px 降至 30px，降低邊框、底色
-  與陰影權重。主功能區合計縮短 22 個邏輯像素；以已上線同結構版在 526.5×936 手機直向舞台
-  的 1.2536 倍縮放量測，冒險隊伍會自然上移約 27.6px，底部導航固定位置及中央城門／天空留白
-  均不變。
-- `js/41-v146-system-polish.js` 的既有 `renderHomeRoster()` 新增單一 HUD 資源格式入口，金幣與
-  經驗池共用規則：10,485,243 顯示 `1048萬`，108,500,000 顯示 `1.08億`；完整數字保留在
-  `title` 與 `aria-label`，並移除 HUD 資源的 ellipsis。金幣／EXP 實際資料及增減邏輯未改。
-- `tests/v173.28-main-city-lobby.test.js` 擴充至 11 項驗收，鎖定主卡高度、三列階梯位移、低權重
-  工具入口、10 組原 `onclick` 合約、非九宮格結構與兩種資源共用簡寫。版本 title、HUD badge、
-  loader cache 與直載 query 同步升至 V173.30；沒有修改角色、隊伍資料、底部導航、戰鬥、技能
-  或存檔 owner。
-- 完整本機 Repository checks 全數通過：JavaScript 語法 `166/166`、Node suites `52/52`、
-  靜態資源 `383`、HTML ID `287`、版本／Loader（24 支直載、108 個相依資源、26 支 ordered
-  runtimes）及 Git 空白／衝突標記均正常。雲端 Chrome 已實測 V173.29 同結構基準為
-  526.5×936、文件無捲動、隊伍與固定導航完整；純靜態 repo 無法由 Sites preview 啟動，且
-  Cloud Browser 安全政策阻擋本機 data URL，因此推送前候選只能完成 CSS 幾何／事件合約驗收。
-  V173.30 已以非強制方式推至遠端 `dev` commit
-  `707f3678f995f8d2af37017b740a6f5ba0e1ed90`；GitHub Actions CI
-  `33590261317` 成功，最終 Android 真機手感仍留待使用者在 `dev` 驗收。
-
-### 2026-09-02 — V173.29：主城 Githack／手機快取混版根因修正（dev）
-
-- 使用者實機截圖中的直欄破版不是 V173.28 正式 CSS 的排版結果，而是分支網址載入新版
-  `index.html` 後，仍從無 query 的固定網址取得舊 `css/00-main.css`、舊 V54 CSS 與舊 V54
-  runtime。舊 runtime 會把所有入口重新寫成同一字級，舊 CSS 又只認舊九宮格結構，因而形成
-  大型 DEV 按鈕、功能直欄與底部導覽遮擋。
-- 唯一版面 owner 仍是 `index.html` 與 `css/00-main.css`；V54 只保留相容橋接，V146
-  `renderHomeRoster()` 仍只同步 HUD／隊伍資料。本輪沒有新增補丁檔、wrapper 或第二套版面。
-- `index.html` 現以 `?v=173.29` 載入 `css/00-main.css`、
-  `css/19-stage-v54-main-city-moderate-native-scale.css` 與
-  `js/16-stage-v54-main-city-runtime.js`；`.github/scripts/ci.mjs` 把三者加入正式 release entry
-  一致性檢查，之後任何一項漏掉或版本不一致都會令 Repository checks 失敗。
-- 遠端 V173.29 commit `3275d5a34dee375772bfd5cd5b7203ed9a21f3dc` 與帶版本參數的
-  `dev/index.html?v=173.29` 均已在雲端 Chrome 實際載入：標題及三個主城 owner query 都是
-  V173.29；526.5×936 遊戲畫面內可見兩個主要入口、六個次要入口、兩個工具入口與五個固定
-  底部導航，文件高度同為 936px、無頁面捲動。既有瀏覽器若仍快取無版本參數的舊 `dev` HTML，
-  須改開上述帶版本參數網址或重新整理一次，之後主城 CSS／runtime 會由新 query 隔離舊快取。
-- 本機 Repository checks 全數通過：JavaScript 語法 `166/166`、Node suites `52/52`、靜態
-  資源 `383`、HTML ID `287`、版本／Loader（24 支直載、108 個相依資源、26 支 ordered
-  runtimes）及 Git 空白／衝突標記均正常。本機遊戲 commit 為 `2c888f8`；遠端 `dev` 內容
-  commit 為 `3275d5a34dee375772bfd5cd5b7203ed9a21f3dc`，GitHub Actions CI
-  `33583378303` 成功，`main` 完全未修改。
-
-### 2026-09-02 — V173.28：主城首頁 RPG Lobby 視覺層級重整（dev）
-
-- 施工前先將已驗收 V173.27 透過 PR #35 發布到 `main`；required check `Repository checks`
-  通過，正式 merge SHA 為 `024b2c7c34c14db7b4ee2ba4be3b7addcabac414`，GitHub Pages 標題
-  已確認為 `四象江湖傳 V173.27`。V173.28 全程只在原 `dev` 工作，未建立分支、未 merge
-  `main`、未 reset／force push／動 stash。
-- 主城既有 owner 原地調整：`index.html` 建立精簡 HUD、兩個主入口、左右次要入口及低權重
-  工具列；`css/00-main.css` 建立深黑／暗紅／古金 Lobby 層級並保留中央城門留白；
-  `js/41-v146-system-polish.js` 與 `css/42-v146-system-polish.css` 只擴充既有隊伍 renderer，
-  同步 HUD 現有角色／金幣／經驗池資料並將三人資訊改為緊湊直列隊伍卡；V54 歷史橋接只移除
-  會把所有入口重新壓成同一字級的舊 inline-important 行為。沒有新增平行 runtime 或 CSS owner。
-- 角色、商店、休息、合成、任務、圖鑑、成就、公告、離線經驗、系統的 10 組既有 icon ID 與
-  `openHomeFeature(...)` 合約逐一保留；測試金幣／經驗池按鈕仍直接呼叫原函式。底部五項導航
-  結構與事件完全未改，版本標題、首頁 badge、直載 query 與 loader cache 升至 V173.28。
-- 雲端瀏覽器以正式 420 邏輯內容區／1080×1920 虛擬舞台同倍率掛載候選 HTML/CSS，在
-  526.5×936 的實際 9:16 畫面完成視覺與幾何驗證：文件與主城內層 X/Y overflow 均為 0，
-  三名隊員完整顯示，隊伍區不遮底部導航且保留 108.6px 街景，10 個正式入口實際觸控高度為
-  45.1～120.3px，所有主城／導航圖片均載入。未發布 raw 預覽的 JavaScript 會被服務沙盒阻擋，
-  因此候選功能合約另由 Node 回歸測試鎖定；Android 真機手感仍留待使用者在 `dev` 驗收。
-- 新增 `tests/v173.28-main-city-lobby.test.js`，鎖定 HUD、三層入口、10 組事件／ID、DEV 工具、
-  V54 owner、三人隊伍與非捲動 9:16 結構。完整本地 Repository checks 已通過：JavaScript
-  語法 `166/166`、Node suites `52/52`、靜態資源 `383`、HTML ID `287`、版本／Loader
-  （24 支直載、108 個相依資源、26 支 ordered runtimes）及 Git 空白／衝突標記均通過；遠端
-  `dev` CI 結果以本輪最終 push 紀錄為準。
-
-### 2026-09-01 — V173.27：角色頁共用外框黑色尾區根因修正（dev）
-
-- 正式站瀏覽器實測確認問題橫跨整個角色頁：能力值分頁的固定共用內容區比實際內容多出約
-  152px，經驗池分頁多出超過 370px；因此黑色區塊不是能力卡或單一分頁的 padding，而是
-  `.home-feature-modal-box.wide`、`#homeFeatureModalBody` 與 `#characterTabContent` 被共同
-  強制填滿接近整個視窗。
-- 根因 owner 是 `js/19-stage-v78-character-inventory-runtime.js` 的 `applyNow()`，其將外框
-  高度固定為 96%，再以量測結果固定內容區高度；後載 `css/31-v131-fix-batch.css` 又以 94%
-  外框及 `height:0 + flex:1` 延續填滿行為。V173.27 直接修正這些既有 owner，改為內容自然
-  高度與可收縮 flex，保留 96% 可視上限、長分頁內層捲動及背包既有專用捲動，不新增補丁檔
-  或第二套 layout runtime。
-- `css/22-stage-v78-character-inventory-core.css` 同步改為共用外框自然收合；V154 的舊固定高度
-  歷史期待已更新，新增 `tests/v173.27-character-shell.test.js` 鎖定短分頁收合、後載 V131 不得
-  恢復固定黑尾、長技能頁仍保留單一捲動 owner，以及版本升至 V173.27。
-- 本地 Repository checks 為 JavaScript 語法 `165/165`、Node suites `51/51`、靜態資源
-  `383`、HTML ID `283`、版本／Loader（24 支直載、108 個相依資源、26 支 ordered runtimes）
-  及 Git 空白／衝突標記全數通過。雲端瀏覽器已在正式 V173.24 重現並量測根因，但無法載入
-  未發布的 dev 候選，因此 V173.27 最終顯示仍依要求留待使用者在 dev 實機驗收。
-
-### 2026-09-01 — V173.26：實機回報之角色頁、元素匣與狀態顯示補正（dev）
-
-- 深追能力值頁黑框後確認 V173.25 只移除了 `css/22-stage-v78-character-inventory-core.css`
-  的舊 160px 留白，但後載 `css/31-v131-fix-batch.css` 仍有同選擇器、同為 `!important` 的
-  110px 留白。V173.26 直接將這個最終生效 owner 歸零，不新增更晚的覆寫規則；技能頁仍保留
-  自己的 240px 專用底部空間，背包頁也維持既有頁內 padding。實機後續確認固定高度共用外框
-  仍會形成更大的黑色尾區，該層根因已由 V173.27 修正。
-- `js/00-main.js` 的 `makeSelectValueReactive()` 原先把程式寫入的數字 `50`／`25` 與 option
-  的字串 `"50"`／`"25"` 嚴格比較，沒有任何選項命中時，假下拉標籤就沿用上一角色的
-  `100%`，但實際 config 仍是 50／25，形成「看似 100% 卻不補」的假畫面。現在 setter
-  比照原生 select 將值統一轉成字串後再選取與重畫；每角色 config、V135／V136／V169 儲存
-  包裝及 V154 戰後補給公式均未另建或修改。
-- `js/43-v149-skill-ui-rules.js` 的凍傷倒數位於基底 `tickStatusEffects()` 呼叫 `updateUI()`
-  之後，且 `tickPlayerBuffs()` 還會再移除風行等增益；過去 `js/39-v143-skill-animation.js` 的
-  Sprite 同步早於這兩段最終清理，殘影便要等下一次操作才消失。現改在 `js/00-main.js`
-  `startTurn()` 中，待 `tickStatusEffects()` 與 `tickPlayerBuffs()` 都完成後只同步一次共用
-  `v143SyncStatusSpriteEffects()`，同時涵蓋一般異常、凍傷與增益，不增加第二個回合計時器或
-  狀態資料來源。
-- `js/41-v146-system-polish.js` 將異常狀態文字從卡牌高度 68% 再下移至 86%；既有 1.25 秒
-  動畫、10%～90% 完全可見（1 秒）與 1.3 秒 DOM 清理均維持。
-- 新增 `tests/v173.26-followup-fixes.test.js`，並補強 V146／V149／V173.25 既有測試，鎖定
-  數字門檻切換為正確角色 50%／25%、後載 padding 歸零、狀態與增益同 tick 清除 Sprite 與
-  86% 定位。版本標題、首頁 badge、直載 query 與 runtime cache 升至 V173.26；本地 Repository
-  checks 為 JavaScript 語法 `164/164`、Node suites `50/50`、靜態資源 `383`、HTML ID `283`、
-  版本／Loader（24 支直載、108 個相依資源、26 支 ordered runtimes）及 Git 空白／衝突標記
-  全數通過。
-- 控制瀏覽器在正式 V173.24 頁面實際量得 `#characterTabContent` 的 160px 合成 padding 與
-  按鈕下方空白，確認黑框確由共用容器底部留白造成；另在真實 9:16 戰鬥卡量得 86% 狀態
-  文字中心與 26% HP 傷害中心相距 78～90px，且仍留在卡牌下緣內。雲端瀏覽器無法存取
-  localhost，且安全規則禁止載入 raw.githack 的未發布 dev 候選，因此 V173.26 候選仍需
-  使用者在 dev 實機驗收。
-
-### 2026-09-01 — V173.25：手機裝備／能力／票券與戰鬥提示 UI（dev）
-
-- `css/00-main.css` 讓「穿戴／脫下」與「售出」共用完全相同的啟用漸層、字色；裝備大圖改成
-  明確的響應式正方形，移除物品文字區的二重裁切／捲動，圖片、能力文字、三顆動作鍵與返回鍵
-  都由同一個彈窗高度管理。
-- 背包放大鏡能力明細改成「外框 flex、能力格線單一捲動、關閉鍵固定」；能力值頁先移除
-  `css/22-stage-v78-character-inventory-core.css` 的 160px 底部留白，但實機後續確認後載
-  `css/31-v131-fix-batch.css` 仍殘留 110px，完整根因與最終修正已於 V173.26 補齊。
-- 凍傷禁止技能不再建立或顯示禁止符號，主技能鍵直接顯示「凍傷禁止使用技能」，並把遮罩內容
-  往右校正。舊符號節點若仍殘留也會在同步狀態時清掉。
-- 裝備兌換券固定為 2 欄×5 列、整頁不捲動；十件裝備均改為可操作按鈕，點擊後重用正式
-  `openEquippedItem()` 詳細資料介面，只隱藏在預覽情境不成立的穿戴、售出、使用、分解動作，
-  關閉二層明細會準確回到原兌換券預覽。
-- 移除 V134／V143 的固定 1000ms／650ms 技能名稱移除計時；玩家與敵人現在都由 V142 唯一
-  動畫設定查出該技能總秒數，名稱顯示時間為 `round(animationDuration × 2/3)`，CSS 動畫與
-  DOM 移除使用同一個值。
-- 異常狀態文字從角色卡高度 32% 下移到 68%，避開上方 HP 傷害數字；動畫改為 1.25 秒，
-  10%～90% 保持完全可見，恰為 1 秒，1.3 秒後清理節點。
-- 版本標題、首頁 badge、直載 query 與 runtime cache 已升至 V173.25。JavaScript 語法
-  `163/163`、Node suites `49/49`、`git diff --check` 全數通過。控制瀏覽器已在正式站重現並
-  量測能力頁 160px 黑色留白的真正生效來源；遠端候選提交的 63 個檔案與本機 blob/tree
-  雜湊逐一相符。雲端瀏覽器安全規則禁止載入 `raw.githack.com` 的未發布候選網址，因此
-  V173.25 候選畫面無法在該瀏覽器直接開啟，手機實際顯示仍依本輪要求留待使用者驗收。
-
-### 2026-09-01 — V173.24：法師套裝 icon、閃躲與一般異常公式（main）
-
-- 將本輪 20 張透明 PNG 依火／水／土／風與法扇、法袍、法鞋、法冠、法環逐張辨識，統一
-  轉為 512×512 透明 lossless WebP，放入 `assets/equipment/sets/`。映射落在既有
-  `js/27-v132-content-expansion.js` `equipmentSetIcon()`；`js/41-v146-system-polish.js`
-  繼續依穩定物品 ID 同步既有背包與已穿戴裝備，未修改裝備數值、套裝規則或存檔格式。
-- `js/00-main.js` 將玩家基礎閃躲統一為有效敏捷×0.6%，怪物建立與缺省回退統一為
-  `min(30%, 等級×0.3%)`；`js/47-v158-combat-tuning.js` 只補缺少 `evasion` 的怪物，任何
-  明確自訂值均保留。風行75%、風元素EX35%、元祖賜福30%等額外來源仍經既有
-  `combineEvasionRates()` 獨立乘算並限制85%。命中維持95＋命中×0.3、基礎50%～99%，再乘
-  最終閃躲且限制1%～99%的唯一正式架構。
-- `js/33-v140-four-element-balance.js` 將所有非硬控異常的物攻／智力／精神係數統一為0.05；
-  `js/00-main.js` 的基底常數與說明同步，不保留舊0.2／0.3一般異常公式。冰封、石化仍使用
-  `sqrt(物攻或智力)×0.2` 與普通／精英／BOSS 80%／60%／40%上限。技能基礎機率、傷害、
-  SP、持續回合、效果均未修改；冰霜箭雨仍逐目標獨立20%凍傷1回合，烈焰龍捲仍必定燃燒。
-- 同名狀態前置判定仍不擲機率、不覆蓋、不疊加、不刷新；畫面提示改為「狀態MISS」，戰鬥
-  紀錄維持「已有【狀態】，新的【狀態】MISS。」，並以完整施放測試確認已命中的直接傷害
-  不會被取消。攻擊未命中仍顯示「MISS」，異常判定失敗維持既有「抵抗」提示。
-- 版本標題、首頁 badge、直載 query、runtime cache 與 V173.23 風系圖資 query 同步升至
-  V173.24。Repository checks 本地全數通過：JavaScript 語法 `162/162`、Node suites
-  `48/48`、靜態資源 `383`、HTML ID `283`、版本／Loader（24 支直載、108 個相依資源、
-  26 支 ordered runtimes）、空白與衝突標記皆正常。控制瀏覽器無法存取本機 localhost，
-  因此未執行 Playwright browser smoke；20 張最終 WebP 已以合成預覽逐張檢查元素與部位。
-
-### 2026-09-01 — V173.23：風系施放與持續狀態 Sprite VFX（main）
-
-- 沿用 `js/39-v143-skill-animation.js` 現有 VFX renderer、預載圖片快取、目標註冊、命中延遲
-  與 action gate，接入 11 張風系施放 PNG。單體依實際卡牌中央定位，三人技能只在目標列
-  播放一份內含三路的圖，全體技能只覆蓋實際目標隊伍區域一份；玩家與敵方施放共用同一套
-  動態定位。第 7 幀只釋放既有結算結果一次，第 8 幀不再次結算。
-- 接入重力、殤風、暈眩、風行、隱身、氣定神閒 6 張循環 PNG。只有狀態實際成功套用後才
-  顯示；同名狀態再次施加 MISS 時保留原節點、不重啟或刷新；到期、解除、死亡、卡牌移除
-  或戰鬥結束會清除。增益施放不加傷害、受擊震動或範圍震動。
-- 風系正式 Sprite 路徑會略過原程序化 charge／flight／field／impact 節點，並刪除兩條舊的
-  風系技能專屬 CSS 圖形規則。`js/37-v142-skill-animation.js` 只依指定值調整動畫時長；
-  `js/41-v146-system-polish.js` 只同步正式狀態名與多目標同幀提示。技能數值、傷害、目標、
-  狀態機率與回合數均未修改。
-- 17 張 `assets/inbox/` 原檔未重新生成、修改、裁切、重新命名或轉碼，SHA-256 已由新測試
-  鎖定。實際施放圖尺寸為 1448×1086，另有暴風拳／風焰術為 1536×1024；狀態圖皆為
-  1774×887，與需求文字中的 1536×1152／1024×512 不同。renderer 因此按圖片實際尺寸除以
-  4×3／4×2 動態取來源格，再繪入 384×384／256×256 目的格，沒有改動來源素材。
-- 版本標題、首頁 badge、直載 query 與 runtime cache 同步升至 V173.23。Repository checks
-  全數通過：JavaScript 語法 `162/162`、Node suites `48/48`、靜態資源 `363`、HTML ID `283`、
-  版本／Loader（24 支直載、108 個相依資源、26 支 ordered runtimes）、空白與衝突標記檢查
-  皆正常。環境沒有 Chromium，因此 Playwright browser smoke 與真機視覺對位／流暢度仍需
-  人工確認。遠端 `dev` 遊戲 commit `432c801baef7267f0932029eb84f4cd71c813c2f` 的 push CI #75
-  與 PR #33 CI #76 均成功；相同遊戲檔案樹已進入 `main` commit
-  `e0c0c780d6f72dcb2af5581c2cb501c3a141b260`，PR #33 另補齊本筆正式發布紀錄並觸發
-  `main` CI／Pages。
-
-### 2026-09-01 — V173.22：狂風術與四元素攻擊套裝 icon（main）
-
-- `js/00-main.js` 的既有 `elementSkillIconMap` 補上 `windSpell`，技能列表與詳情共用
-  `assets/skills/wind-gale-spell.jpg`，沒有新增第二份技能 icon owner。
-- 將本輪 20 張裝備素材依元素色與部位整理為 512×512 透明 lossless WebP，放在
-  `assets/equipment/sets/`；火／水／土／風各自對應刀、鎧甲、靴、盔、護腕。只有五個攻擊
-  variant 使用新圖，扇、袍、履、冠、法環五個法術 variant 保持既有 SVG。
-- `js/27-v132-content-expansion.js` 在原本 `equipmentSetIcon()` owner 內加入攻擊裝路徑表，
-  沿用既有 `rasterItemIcon()` 與 `.v169-item-art` 顯示，不新增 CSS。`js/41-v146-system-polish.js`
-  的既有 `syncSetDefinitions()` 會把 canonical icon 回填到舊背包與已穿戴物品，ID、數值、
-  元素限制、套裝效果與存檔 schema 均未改。
-- 版本標題、首頁 badge、直載 query 與 runtime cache 同步升至 V173.22。新增
-  `tests/v173.22-skill-equipment-icons.test.js`，鎖定狂風術映射、20 張 512×512 WebP、攻擊／
-  法術 variant 邊界，以及舊存檔與已穿戴裝備圖示同步。
-- 本機 Repository checks 全數通過：JavaScript 語法 `161/161`、Node suites `47/47`、
-  靜態資源 `346`、HTML ID `283`、版本／Loader（24 支直載、108 個相依資源、26 支 ordered
-  runtimes）、空白與衝突標記檢查皆正常。環境沒有 Chromium，因此 Playwright browser smoke
-  未執行；20 張成品已用聯絡表逐張人工檢視。遠端 `dev` 程式 commit
-  `175bfd33394b69e227480edc3eb68f343f3a35f9` 已透過 PR #32 發布；正式 `main` merge commit
-  為 `2a2cbe86d1719c722007d2f28fe65b0f05bade3a`，Repository checks 與 Pages 均成功。
-
-### 2026-09-01 — V173.21：新手期平衡與素材更新（main）
-
-- 新角色技能點的唯一建立流程已改為 Lv1 初始 2 點，涵蓋主角色、第二／第三角色與舊版第二
-  角色入口；`player` 預設模板仍保留 0，避免讀取缺欄位舊存檔時無條件補發。既有升級流程
-  `checkLevelUp()` 的每級 +2 完全未改。
-- 一般野怪強化仍由既有 `strengthenMonster()`／`strengthenNewWildMonster()` 負責；只為
-  新手森林傳入 ×0.75，其他一般練功區仍使用 V131 ×1.30，並沿用既有已套用旗標避免重複
-  強化。新手森林後加的風／土怪物由 Lv4 校正為 Lv3，使完整載入後全區都維持 Lv2～Lv3。
-  精英、BOSS、副本與 Lv1～10 野怪普通攻擊規則均未改動。
-- 風系技能表加入 11 張對應 icon；上傳檔沒有「狂風術」同名圖，因此保留空白，未誤配素材。
-  上傳的「分身術」依畫面內容接到既有「閃躲術」。技能列表與技能詳情共用同一份既有
-  `elementSkillIconMap` owner。
-- 日常副本完成度獎勵改用寶箱 icon：未領取顯示明亮的關閉寶箱，領取後改為開啟寶箱並
-  降低飽和度與亮度。男性巡怪依玩家元素切換火／水／風／土四套新正背面立繪；女性流程
-  保持原狀。兩張巡怪戰鬥圖亦換成最新素材。新圖僅另存為最佳化 WebP／JPEG，沒有覆蓋
-  上傳原檔。
-- 版本標題、首頁 badge、直載 query 與 runtime cache 同步升至 V173.21。新增／擴充測試
-  鎖定 Lv1 初始點數、升級 +2、舊存檔預設、新手森林完整最終數值、其他練功區 ×1.30、
-  無技能野怪，以及各素材 owner 與 UI 狀態。
-- 本機 Repository checks 全數通過：JavaScript 語法 `160/160`、Node suites `46/46`、
-  靜態資源 `325`、HTML ID `283`、版本／Loader（24 支直載、108 個相依資源、26 支 ordered
-  runtimes）、空白與衝突標記檢查皆正常。此環境沒有 Chromium，因此 Playwright browser
-  smoke 未執行；素材本身與整合後聯絡表已人工檢視，仍建議在真實 Android 直式畫面複驗。
-  原遠端 `dev` 程式 commit 為 `011dd6a89005afc54d78eb954ac3df97bfcd11ae`。後續連同 V173.20
-  透過 PR #31 合併為 `main` commit `2f8dbc2a389464aecc3b9375f422fc9cc3fbc93a`；main CI #68 與
-  Pages build/deploy #63 均成功。
-
-### 2026-09-01 — V173.20：雙圖開場載入動畫（dev）
-
-- 使用者提供的 Logo 與主城空景原檔實際皆為 JPEG 864×1536；未覆蓋附件，改以正確副檔名
-  保存為 `assets/ui/startup-logo-v173.20.jpg` 與
-  `assets/ui/startup-main-city-v173.20.jpg`。兩張圖均以 9:16 原比例鋪滿 1080×1920 native
-  stage，Logo 為第一幕、主城空景為第二幕。
-- 新增唯一開場 owner `js/52-v173.20-startup-loader.js` 與
-  `css/51-v173.20-startup-loader.css`；`index.html` 只負責資源 preload、DOM、樣式與 runtime
-  入口。開場層置於 `#game-stage` 最上層，既有 `loadGame()` 與 26 支正式 gameplay runtime
-  仍在下層照原順序初始化；沒有包裝既有函式、沒有新增 gameplay override 或臨時補丁。
-- 每次開啟會抽出合計 12～15 秒總時長，Logo 約佔 36%～43% 後淡入主城；載入文字會在必要
-  文件、資源驗證、角色資料、四元素核心、存檔、戰鬥模組、場景渲染、行動裝置校準等階段
-  切換，百分比以不等距小幅跳動且在總時長前最高只到99%。到時強制第二幕與100%，不會
-  自動進遊戲；持續閃爍 `〔點擊空白處 進入遊戲〕`，完成後點擊／觸控或 Enter／Space 才淡出。
-- Logo 四象位置各有獨立 screen blend 光暈，依火紅、水藍、風綠、土金的延遲順序循環亮起；
-  同時保留輕微呼吸與主城景深推近，未改動原始圖像像素。
-- 版本標題、首頁 badge、直載 query 與 runtime cache 同步升至 V173.20。新增
-  `tests/v173.20-startup-loader.test.js`，以假時鐘覆蓋 12 秒與15秒邊界、提前點擊無效、
-  100% 不自動進入、點擊後淡出與事件送出；並把整合載入順序納入正式測試。
-- 本機 Repository checks 全數通過：JavaScript 語法 `159/159`、Node suites `45/45`、
-  靜態資源 `304`、HTML ID `283`、版本／Loader（24 支直載、26 支 ordered runtimes）、空白與
-  衝突標記檢查皆正常。此環境沒有 Chromium，因此 Playwright browser smoke 未執行；仍需在
-  真實 Android 直式畫面確認最終光暈位置與閱讀手感。遠端 `dev` commit 為
-  `38c955cd55139c42799c95212b4dd49b740e93f8`；未合併 `main`。
-
-### 2026-09-01 — V173.19：四元素技能完整正式規格（dev）
-
-- 依使用者指定順序，先將已驗證的 V173.18 透過 PR #29 非強制合併到 `main`；正式
-  merge commit 為 `cef7b2766786ce5db03ce35b7d6415d76bdd3705`。之後才開始 V173.19，
-  沒有 force push、沒有改寫歷史，也沒有把尚未驗證的新規格混進該次正式發布。
-- `js/00-main.js` 新增唯一的正式同名狀態核心：所有持續 Buff／Debuff／DOT／控制／護盾／
-  反傷／結界先以狀態名稱檢查；已有同名狀態即直接 MISS，不擲機率、不疊加、不覆蓋、
-  不刷新，也不補滿護盾值或次數。直接傷害、吸血、治療、SP 恢復等即時效果照常結算；
-  多人技能逐目標獨立處理。怪物、玩家、符咒與支援技能均接入同一規則。
-- 火／風／土資料唯一 owner `js/43-v149-skill-ui-rules.js` 與水資料 owner
-  `js/50-v169-water-skill-rules.js` 已依本文件頂端 V173.19 表格更新。正式結算分工維持既有
-  owner：一般／硬控公式與結界在 `js/33`，目標、隊伍增益、治療／復活在 `js/42`，怪物
-  護盾相容層在 `js/38`，鳳威在 `js/46`；沒有新增臨時 runtime 或第二套覆蓋資料。
-- 完成火系免費追擊與死亡換目標、火鳳天鳴實際新增燃燒少於3人取得下一回合【鳳威】、
-  水系依實際 HP 傷害吸血、冰封3回合、治療固定35 SP、風系乘算閃躲且上限85%、隱身
-  單體目標排除、土系岩盾不得補滿、結界同一多段技能只扣1次，以及只按實際 HP 直接傷害
-  觸發反傷。DOT 與反傷會穿透結界且不觸發反傷連鎖。
-- 一般異常與硬控公式均依正式規格落實；普通／精英／BOSS 的硬控命中上限為
-  80%／60%／40%。氣定神閒的抗性65%、命中50%，怒火的爆率／爆傷與敵我結算亦使用
-  正式欄位。
-- `tests/v170-final-spec-integration.test.js` 擴為17項完整載入整合驗收，另更新各歷史 suite
-  的目前版本與已被正式規格取代的期望值。版本、首頁標示、直載 query 與 loader cache
-  同步升至 V173.19。本機 Repository checks 全數通過：JavaScript 語法 `157/157`、Node
-  suites `44/44`、靜態資源 `300`、HTML ID `272`、版本／Loader、空白與衝突標記檢查皆正常。
-  遠端 `dev` 程式 commit `d31f4cd63c460db9e7c05da1d7e0ff5359fa098a` 的 GitHub Actions
-  run #56（`33493617136`）成功；未經使用者另行指示，不合併 `main`。
-
-### 2026-09-01 — V173.18：符咒格線、深淵戰後回圖與四元素技能最終定案（main）
-
-- 本輪先依使用者要求把已驗證的 V173.17 透過 PR #28 正式合併到 `main`，之後才開始
-  V173.18；沒有 force push、沒有改寫歷史、沒有覆蓋原圖，也沒有另開平行分支。
-- 反覆失效的根因是 loader 順序：先前修正技能資料後，較晚載入的 `js/44`、`js/46`、
-  `js/47` 又把部分火／水／風／土數值改回歷史值。V173.18 刪除這些下游覆蓋，火／風／土
-  資料集中於 `js/43-v149-skill-ui-rules.js`，水集中於 `js/50-v169-water-skill-rules.js`；
-  `js/33-v140-four-element-balance.js` 保留唯一異常命中公式，`js/42-v148-combat-dungeon-fixes.js`
-  保留同排／同列目標與治療結算。火系死亡／爆擊追擊也收斂為玩家一個 wrapper、怪物一個
-  wrapper，不再逐招重疊包裝。四元素全部傷害、成長、SP、技能點、前置、目標、狀態、增益與
-  EX 被動均依本文件頂端 V173.18 表格定案。
-- 深淵戰後誤回封面的根因是 `showPage("dungeon")` 先觸發頁面切換並清掉
-  `abyssMapEntered`；`js/36-v141-content-systems.js` 現在於勝利與失敗回呼切回深淵分頁前，
-  明確恢復已進地圖狀態，因此兩條路徑都直接回目前深淵地圖。沒有新增第二套 Boss 元素或
-  觸發器。
-- 符咒超格的根因是 `.v169-item-art` 在背包格內仍可沿用展示大圖尺寸；`css/38` 讓唯一
-  `.inventory-icon` owner 成為 `100%×100%`、`min-width/min-height:0`、`overflow:hidden` 的
-  grid，`css/50` 把其直接子 `.v169-item-art` 限制為寬高與最大寬高皆100%。原始素材與
-  V173.17 手機縮圖均未覆蓋。
-- 版本與快取同步升至 V173.18。本機驗證：JavaScript 語法 `157/157`、Node suites
-  `44/44`、`git diff --check` 全數通過；遠端 `dev` code commit `8572adb` 的 GitHub Actions
-  CI run #51 成功。不可變頁面以雲端 Chrome 實測標題為 V173.18，完整走過深淵封面→地圖→
-  東帝三段對話→戰鬥→敗北，確認直接回到含東帝按鈕的深淵地圖，遊戲來源 console error 為0。
-  勝利回圖由動態回呼測試另行覆蓋。
-- 雲端手機舞台實測為 `526.5×936`；背包格與 icon owner 分別約 `62.84×62.84`、
-  `52.81×52.81`，正式頁面載入的符咒直接子規則為寬／高／最大寬／最大高皆100%。測試存檔
-  當下沒有符咒，故無法在該次雲端 session 量到真實符咒節點 rect；已由 CSS owner 與
-  `tests/v173.18-final-request.test.js` 鎖定，仍建議使用者在原 Android 存檔做最後視覺複驗。
-  後續經 PR #29 正式合併到 `main`，merge commit 為
-  `cef7b2766786ce5db03ce35b7d6415d76bdd3705`；合併前 PR CI run #53 成功。
-
-### 2026-09-01 — V173.17：正式發布（main）
-
-- 使用者明確要求「此版本先推到 main」；PR #28 以非強制合併把 V173.17 發布到 `main`，
-  merge commit 為 `7b2239be41ebedd0fbf07a85ac4d0a577455465c`。PR CI run `33479755762`
-  與合併後 `main` CI run `33480061202` 均成功。
-- 本次發布只將先前已驗證的 V173.17 UI／破圖／穿圖／返回鍵修正升為正式版；後續符咒、
-  深淵回程與技能規格全部另列 V173.18，沒有混進 V173.17 的 main 發布。
-
-### 2026-09-01 — V173.17：物品／裝備副本彈窗、破圖與返回鍵修正（dev）
-
-- 根因不是單一圖片壞掉：`js/27-v132-content-expansion.js` 仍把 2.3～2.9 MB 的原始抽獎券／符咒 PNG 直接放進背包與彈窗；`css/50-v169-abyss-flow.css` 又把抽獎券內圖固定成 `58×58`，超出 `css/33-v132-content-expansion.css` 當時的 `40×40` 父框，因而和名稱穿疊；舊存檔則保留建立當下的空白／舊 `icon`，V170 只補過四張券，其他符咒、礦石、設計圖仍會顯示菱形或舊圖。裝備副本成功彈窗本身也沒有離開按鈕，物品詳情則允許大圖與內容把最下方按鈕推離可視範圍。
-- 原始圖全部保留、沒有覆蓋；另建四張 `assets/items/tickets/*-icon.png`（384×256）與三張 `assets/items/talismans/*-icon.png`（384×576）供手機 UI 使用。圖片解碼失敗會隱藏壞掉的 `<img>` 並顯示「券／符／圖」文字後備，不再露出瀏覽器破圖符號。
-- 唯一內容 owner 維持 `js/27-v132-content-expansion.js`，沒有新增 wrapper：舊存檔只依穩定 id 同步白名單內的名稱、圖示、類型與展示欄位，不碰數量；裝備副本獎券改為固定圖片列／名稱列並新增「返回」。`css/33`／`css/38`／`css/50` 收斂彈窗高度、圖片框與捲動，`js/01-stage-v8-touch-lock.js` 將 `#itemModalStats` 納入真實觸控捲動白名單；物品詳情底部文字統一為「返回」。
-- 版本與快取升至 `V173.17`。本機 Repository checks 全數通過：JavaScript `156/156`、Node suites `43/43`、靜態資源 `300`、HTML ID `272`、版本／Loader／Git 差異皆正常；遠端 `dev` code commit `77ea395` 的 GitHub Actions run #46 亦成功。
-- 不可變 `dev` 頁面以雲端 Chrome 實測：七張手機圖均 `complete=true` 且自然尺寸正確，物品詳情的框體完整留在 overlay 內、底部「返回」可見且點擊後確實關閉；裝備副本獎勵預覽的「返回」亦可點擊關閉，遊戲來源 console error 為 0。雲端瀏覽器固定舞台為約 526×936，無法切成回報截圖的精確 Android viewport；因此最終 Android 真機的字級／手感仍應由使用者複驗。未修改或合併 `main`。
-
-### 2026-09-01 — V173.16：正式發布（main）
-
-- 使用者在 V173.16 的 `dev` CI 成功後明確指示升正式版；以已驗證的 `dev` commit `31927bc` 為遊戲內容基準，採非強制 fast-forward 推進 `main`，不改寫歷史、不覆蓋既有檔案。
-- 本次發布除本交接紀錄外，不再修改遊戲程式、素材、測試或版本字樣；發布前 `main` commit `7646154` 是 `dev` 的直接祖先，兩分支沒有分岔。
-
-### 2026-09-01 — V173.16：深淵守關者對話可視定位與完整點擊流程（dev）
-
-- 根因鏈：V173.13 把深淵 Boss 對話 owner 從 `js/38-v143-system-fixes.js` 收斂回 `js/36-v141-content-systems.js` 時，漏帶 V173.6 已驗證的縮放座標換算；補回換算後，真實瀏覽器又確認 `css/50-v169-abyss-flow.css` 的 `inset:auto !important` 仍會覆蓋一般 inline `left/top`，因此程式碼看似已有座標，但對話 rect 仍完整位於地圖上緣外。
-- 唯一 owner 維持 `js/36-v141-content-systems.js`：Boss 按鈕、capture `pointerup/click` 與地圖 bounds fallback 都進同一個 `v141HandleAbyssBossInteraction()`／`openAbyssBossDialogue()`／`launchAbyssBossBattle()` 流程；`js/38` 不再覆寫挑戰函式，`js/41`／`js/42` 只保留既有地圖移動 wrapper，沒有新增 runtime patch 或第二套 Boss 元素。
-- `positionAbyssBossDialogue()` 以地圖 `offsetWidth/Height` 對照實際 rect，將守關者 viewport 座標換回 map-local 邏輯座標，並依對話實際寬高限制在地圖四邊內；既有對話再次觸發時也會重新定位。最終座標以 CSS custom properties 交給 `css/50-v169-abyss-flow.css` 的權威 `left/top !important` 使用，保留 legacy `inset:0 !important` 的右／下清除但不再蓋掉定位。
-- 新增 `tests/v173.16-abyss-dialogue-visibility.test.js`，動態驗證縮放座標、完整可視邊界、唯一 owner，以及點守關者後三段對話可連續點擊並正式進戰鬥；發布與所有現行快取斷言同步升至 `V173.16`。
-- 完整 Repository checks 通過：JavaScript 語法 `155/155`、Node suites `42/42`、本地資源 `300`、HTML ID `272`、版本／Loader 與 Git 差異檢查全數正常。不可變 `dev` commit `6542718` 的雲端 Chrome 實測：點東帝後對話 rect 完整位於地圖 rect 內（`fullyVisible=true`），三次點擊依序顯示三句並進入東帝＋四名天兵戰鬥；無遊戲來源 console error。未修改或合併 `main`，仍待使用者在原 Android 裝置做最後手感確認。
-
-### 2026-09-01 — V173.14：水球術固定 4×3 Sprite Sheet 校正（dev）
-
-- 水球術的唯一 owner 仍是 `js/39-v143-skill-animation.js`：既有 `drawCanvasCropSprite()` 與 `placeSprite()` 已使用單一 `group` Canvas node、固定 `384×384` source crop、存活目標群組中心與第 7～8 幀命中；本輪沒有新增 wrapper 或平行播放路徑。
-- 根因：`assets-library/assets/inbox/water-orb.png` 與 `frost-arrow-rain.png` 原始檔均為 `1448×1086`（固定 4×3、每格 `362×362`），卻被直接覆蓋到正式 `assets/vfx/water/`；Canvas renderer 已依 384px 格讀取，造成來源與裁切座標不一致。
-- 兩張正式 VFX 均依固定格座標處理：每格來源 `x=(frameIndex % 4)×362`、`y=floor(frameIndex / 4)×362`，不做透明邊界偵測、不縮放、不重繪；每個 362px 格僅置中補 11px 透明邊，輸出為 `1536×1152`、4×3、每格 `384×384` 的 RGBA PNG。12 格逐一像素比對原內容均為差異 0。
-- 發布／資產快取同步升至 `V173.14`，包括首頁、直載入口、Loader、兩張水系 Canvas 素材 URL 與現行版本回歸；三個歷史靜態測試（V157、V169、V173.11）僅放寬為驗證目前直接 owner／允許格式換行，未回填已移除的 legacy runtime patch。
-- 直接驗證通過：水球術、冰霜箭雨、V166 水系、V171、V172、V173 與 Canvas／深淵輸入共 44 項直接斷言。完整 CI 已通過：JavaScript 語法 `154/154`、Node 測試 `41/41`、本地資源 `300`、HTML ID／版本／Loader／`git diff --check`；Browser smoke 因本機未安裝 Playwright/Chromium 未執行。未修改 `main`、技能數值、傷害、存檔或目標規則，仍待 Android 實機視覺驗收。
-
-### 2026-09-01 — V173.13：深淵守關者點擊與水系 Canvas Sprite Sheet 收斂（dev）
-
-- 深淵守關者的唯一 owner 收斂回 `js/36-v141-content-systems.js`：對話與進戰鬥流程不再由 `js/38-v143-system-fixes.js` wrapper 覆蓋；守關立繪、地圖 click 與 capture-phase `pointerup/click` 都進入同一個直接對話入口。既有 `js/41-v146-system-polish.js`／`js/42-v148-combat-dungeon-fixes.js` 只保留地圖移動事件的原始座標傳遞。
-- 從 `assets-library/assets/inbox/` 選擇性複製 `water-orb.png` 與 `frost-arrow-rain.png` 到既有 `assets/vfx/water/` 對應路徑；未合併或修改 `assets-library`。
-- 水球術與冰霜箭雨的唯一 VFX owner 仍是 `js/39-v143-skill-animation.js`。兩招改用既有 VFX node／生命週期中的 Canvas crop renderer：每次僅以固定 384×384 source cell 繪製第 0～11 幀，再以既有目標群組或存活敵方 bounding box 決定顯示範圍；舊 CSS background-sheet 播放路徑已只對這兩招移除。
-- 水球術維持 1.4 秒、單一 live-target-group instance；冰霜箭雨維持單一 all-living-targets AOE instance。兩者均保留第 7～8 幀命中時機、死亡目標排除與既有動畫結束清理，不修改技能數值、傷害、存檔或其他水系技能。
-- 新增／更新直接回歸：Canvas 固定裁切、兩項新素材尺寸、群組／AOE 定位、深淵直接對話入口、版本／Loader 一致性。Repository checks 與真機點擊、動畫驗證待此 dev commit 完成後執行。
-
-### 2026-08-31 — V173.9：P0 恢復已驗證技能動畫觸發鏈（dev）
-
-- 以 V173.4 main 為正確基準，恢復 `js/37-v142-skill-animation.js` 的原始 `showSkillNameBadge()`／`showMonsterSkillNameBadge()` wrapper 與一次性初始化守衛。
-- 移除 V173.6～V173.8 新增但未能實際觸發的直接 badge hook；保留 V173.5 的水球素材與演出、凍傷處理，以及 `js/38-v143-system-fixes.js` 的深淵對話縮放修正。
-- owner：`js/37-v142-skill-animation.js`；本次沒有暫時補丁。
-- 頁面、Loader 與動畫素材快取版本升為 V173.9；CI 與 dev 手動測試待本次提交後確認。
-
-### 2026-08-31 — V173.8：P0 技能動畫初始化完整性（dev）
-
-- V142 僅在既有 director 與新版直接觸發器都存在時才略過初始化；舊快取只留下部分 runtime 狀態時，會重新建立同一個動畫 owner。
-- 不新增 runtime patch，不改戰鬥、技能數值、素材或存檔；深淵立繪對話縮放修正維持不變。
-- 頁面、Loader 與動畫素材快取版本升為 V173.8；Repository checks 已成功，dev 手動測試請使用不可變 commit URL，避免 raw.githack 的 dev 快取。
-
-### 2026-08-31 — V173.8：P0 技能動畫直接觸發收斂（dev）
-
-- 技能動畫的唯一觸發點收斂為 `js/00-main.js` 既有的 `showSkillNameBadge()` 與 `showMonsterSkillNameBadge()`；兩者在既有 badge 建立後直接呼叫 `js/37-v142-skill-animation.js` 匯出的 `v142PlaySkillAnimationFromBadge()`。
-- 移除 V142 以 wrapper 攔截 badge 的依賴，避免後續 runtime wrapper 順序造成所有技能演出失效；不改技能數值、傷害、回合、素材或存檔。
-- 深淵立繪對話的縮放座標修正維持於 `js/38-v143-system-fixes.js`，本次未改動其他深淵規則。
-- 頁面、Loader 與動畫素材快取版本升為 V173.8；CI 與 dev 實測待本次提交後確認。
-
-### 2026-08-31 — V173.6：P0 動畫 runtime 與深淵對話定位修復（dev）
-
-- 技能動畫 owner 為 `js/37-v142-skill-animation.js`：若前一輪載入只留下 `__v142SkillAnimationInstalled` 旗標卻沒有建立控制器，現在會安全重建控制器；`js/39-v143-skill-animation.js` 的所有 Sprite 動畫可再次掛入既有 director。
-- 深淵對話目前由 `js/38-v143-system-fixes.js` 產生；對話定位改以地圖的實際縮放比例轉回邏輯座標，避免泡泡被渲染到畫面上方而不可見。
-- 實際 dev 隔離瀏覽器已重現：修正前深淵對話按鈕的 computed top 為負值，且水球術施放後沒有任何 `#v143-skill-stage`。
-- 本次僅處理 P0 動畫 runtime 與深淵對話；不修改技能數值、存檔、掉落、素材內容或 UI 版面。完整 CI 與 dev 實測待本輪提交後執行。
-- 頁面與 Loader 快取版本升為 V173.6。
-
-### 2026-08-31 — V173.5：深淵、掉落互動與水／火 VFX 修正（dev）
-
-- 深淵地圖守關立繪改為直接開啟對話：權威位置為 `js/38-v143-system-fixes.js` 的 `v141ChallengeAbyssBoss`；不再經過會讓手機點擊看似無反應的接近移動閘門。
-- 野怪戰鬥獎勵 toast 的隱藏狀態恢復 `pointer-events:none`，只在 `.show` 時接收點擊；權威樣式為 `css/45-v152-dev-fixes.css`，不會再留下透明攔截區塊。
-- `assets-review/assets/inbox/water-orb.png` 已覆蓋為 `assets/vfx/water/water-orb-vfx.png`；`js/39-v143-skill-animation.js` 的水球術保留既有 4×3／12 幀、三目標軌跡與命中時機，僅更新素材快取為 `v=173.5`。
-- 火鳳天鳴與冰霜箭雨在 `js/39-v143-skill-animation.js` 統一改為單張、固定敵／我方戰區中央的全場 Sprite，不隨剩餘目標數縮小，也不再拆成多張 tile。
-- 凍傷加入 `js/00-main.js` 的 `tickStatusEffects()` 正式回合倒數，時間結束後資料與狀態動畫會隨既有 UI 同步移除；不變更凍傷機率、回合數或其他技能數值。
-- 新增 `tests/v173.5-bugfixes.test.js`，並更新相關水系／全場 VFX 回歸。完整 CI 同等檢查已通過：151/151 JavaScript 語法、38/38 Node suites、300 個靜態資源、272 個 HTML ID、Loader／版本一致性與 Git 格式皆正常。
-- 發布、Loader、頁面與快取版本升為 V173.5。
-
-### 2026-08-31 — 永久架構規則已啟用（dev）
-
-- 新增 `ARCHITECTURE_RULES.md` 作為永久架構規則唯一來源；完整規則只保留於該文件，避免在交接日誌重複而產生版本分歧。
-- `AGENTS.md` 與 `CLAUDE.md` 已要求任何程式、CSS、UI、戰鬥、存檔、技能、掉落、動畫或資產整合修改前，完整閱讀 `HANDOFF.md`、`UI_GUIDELINES.md` 與 `ARCHITECTURE_RULES.md`；並須先回報 owner 檔案、主要函式、既有 wrapper／後續覆蓋點與暫時補丁需求。
-- 本次僅變更規範文件；未修改遊戲程式、CSS、資產、測試、版本號、快取或 Pages 設定。
-
-### 2026-08-31 — V173.4：P2 第三階段元素匣本次上線金幣統計（dev）
-
-- 以 `origin/dev=a2d99b4b05d4c5f5c3f421bf7dc1d1c1c017404d` 為唯一施工基礎；本機
-  `dev` 已依使用者明確授權重設至該 SHA。未建立分支、未修改或合併 `main`。
-- `js/25-v131-fix-batch.js` 移除元素匣以戰鬥前後全域 `gold` 差額累計的路徑；改為包裝
-  `awardMonsterGoldDrop()`，在既有原函式已成功將怪物掉落入帳並回傳實際 `amount` 後，
-  僅於元素匣有效的一般巡怪累加該筆 amount。真正副本（`v132ActiveDungeonRun`）排除；
-  V141 野外精英的短暫掉落隔離旗標仍視為既有一般巡怪，避免少算精英掉落。
-- `elementBoxSession.gold` 保持「本次上線」暫存，重新載入仍歸零；帳號共用 `gold`、怪物
-  掉落公式、副本獎勵與存檔結構均未改動。舊存檔 `autoConfig.skill="normal"` 不讀、不寫、
-  不提示也不還原。
-- 新增 `tests/v173.4-element-box-gold.test.js`，涵蓋逐筆入帳、未啟用、既有／非怪物金幣、
-  中途停止、時數耗盡、切換角色、重新載入、副本排除、野外精英與 legacy normal 不變。
-- 發布／快取同步升為 V173.4：`index.html` 首頁標示與 release entry query、
-  `js/20-anonymous-20.js` 的 `V_ASSET_VERSION`、現行發布版測試斷言。
-- 本機完整 CI 同等檢查通過：`node --check .github/scripts/ci.mjs`、JavaScript 150／150、
-  Node suites 37／37、300 個靜態資源、272 個 HTML ID、V173.4 Loader／entry 及 Git
-  whitespace／conflict marker 全數通過。`tests/v138-browser-smoke.js` 未執行／未計入；
-  本輪未做手機真機或 Playwright／Chromium 視覺驗證。
-
-**本輪刻意未處理**：舊存檔 `autoConfig.skill="normal"` 無法可靠判別，維持不動；怒火、
-水球術、洪水猛獸、冰霜箭雨保留待獨立修正。燃燒素材 `burn-loop.png` 仍只在具名 stash
-`pre-v173.4-burn-loop-local-20260831`，不得納入本版。
-
-### 2026-08-31 — V173.3：P2 第一階段專案基線整理（dev）
-
-- 開工前確認遠端 `main=8c7ceea1643a519b110ffab95a50d2de3cb69adf`，原 `dev`
-  `1d695f2868e77e7ce62bb0ccf59b0610661b0880` 是其直接祖先且沒有分歧；已用非強制
-  fast-forward 將 `dev` 安全同步到相同基線，未建立新分支、未修改 `main`。
-- `CHECK_REPORT.txt` 已由 V121 拆檔快照改為 V173.3 現行基線：記錄 1 HTML、50 CSS、
-  112 支正式 JavaScript、37 支 tests JavaScript、142 個資產、272 個靜態 HTML ID、
-  23 支 index 直載腳本、108 個 Loader 相依檔與 26 支 ordered runtime；V121 原報告仍保留為
-  歷史附錄，明確不代表目前專案。
-- `index.html` 過期 title 由「戰鬥完整版 V129 SPLIT」改為「四象江湖傳 V173.3」；首頁
-  版本標示、相關 CSS／JavaScript query、`js/20-anonymous-20.js` 的 `V_ASSET_VERSION` 及
-  現行發布版測試斷言同步為 V173.3。歷史釘死快取鍵與舊版測試檔名均保留。
-- 本輪只更新基線文件、title 與發布／快取版本；未修改戰鬥、技能、數值、存檔、掉落、
-  動畫、角色能力、美術資產或 JavaScript 補丁架構，也未修改 V170 最終技能規格。
-- 本機完整 CI 同等檢查：`.github/scripts/ci.mjs` 語法、JavaScript 149／149、Node suites
-  36／36、300 個靜態資源目標、272 個 HTML ID、V173.3 release／Loader 完整性及 Git
-  whitespace／conflict marker 全數通過。
-
-**本輪刻意未處理、留待獨立修正的既有戰鬥演出問題**：怒火 Buff 顯示、水球術定位、
-洪水猛獸定位與尺寸、冰霜箭雨演出。
-
-**驗證限制**：V173.3 未執行手機真機或完整 Playwright／Chromium 視覺與操作驗證；
-`tests/v138-browser-smoke.js` 未納入 36 套 Node suite，不得把未執行／skip 當成瀏覽器通過。
-
-### 2026-08-31 — V173.2：創角手機觸控尺寸與技能詳細捲動（dev）
-
-- 只修正已確認的 UI 根因：native 創角能力值加減按鈕由 `72px` 改為真實
-  `136×136px`（含 `min-width`／`min-height`），並調整同列間距與卡片最小高度；
-  1080px 舞台縮放至 360px 手機時，按鈕實際為約 `45.3×45.3px`，390px／412px
-  寬度則約為 `49.1px`／`51.9px`。第一、第二、第三角色均共用這套 native 創角頁。
-- `js/01-stage-v8-touch-lock.js` 只新增真正捲動 owner
-  `.creation-skill-detail-levels` 至既有白名單；保留 `scrollHeight > clientHeight`
-  判定與其餘 `#game-stage` 觸控鎖，不放寬背景、彈窗外區域或其他介面。
-- 新增 `tests/v173.2-mobile-touch-scroll.test.js`：驗證各目標手機尺寸的實際縮放下限、
-  每顆能力值按鈕僅一個 action path、技能詳細清單能通過 touchmove／pointermove，
-  且 modal 背景仍會被鎖住。
-- 快取同步：首頁版本標示、三個 release entry、直接載入的創角 CSS 與觸控鎖腳本、
-  `V_ASSET_VERSION` 全部升為 `V173.2`。本輪不修改戰鬥、技能、存檔、掉落或動畫。
-- 瀏覽器限制：雲端瀏覽器對本機與 CDN URL 回報 `ERR_BLOCKED_BY_CLIENT`，而本機雖有
-  Playwright 套件但沒有 Chromium 執行檔；未下載瀏覽器或等待重試。因此實機／Chromium
-  視覺驗證仍須在可用瀏覽器環境補做，不能以 Node 回歸測試冒充完成。
-
-### 2026-08-31 — V173.1：版本辨識與小數修訂號規則（dev）
-
-- 依使用者指定，主版號 173 不變時改用小數修訂號；本次由 `V173` 升為 `V173.1`，
-  後續若仍維持 173 主版號，依序使用 `V173.2`、`V173.3`，方便辨識是否已更新。
-- `index.html` 同步更新首頁右下版本標示、無障礙標籤、樣式 ID，以及 `js/00-main.js`、
-  `js/19-stage-v78-character-inventory-runtime.js`、`js/20-anonymous-20.js` 三個直載 query；
-  `js/20-anonymous-20.js` 的 `V_ASSET_VERSION` 同步升為 `173.1`。
-- 只同步 30 份既有測試內的「目前發布版號」斷言；V173 水球術的歷史檔名、CSS／keyframe
-  識別與功能規格均保留。未修改任何遊戲數值、技能、戰鬥公式、UI 版面或動畫邏輯。
-- 驗證：JavaScript 語法 `148/148`、Node suite `35/35`、靜態資源 300 項、HTML ID 272 項、
-  23 支直載腳本／108 個 loader 依賴／26 支正式 runtime、Git 空白與衝突標記檢查全數通過；
-  loader 一致性確認目前正式顯示為 `V173.1`。瀏覽器 smoke 仍因未安裝 Chromium 未執行，
-  也未列入 35 套 Node 測試數量。
-
-### 2026-08-31 — V170 最終規格收斂與完整載入整合測試（dev；遊戲版本仍 V173）
-
-- 以遠端 `main=9115b66988feb992822826eb5397e9515b4d795e` 的 V170 為規格基準，未修改
-  gameplay runtime、CSS、HTML、數值、公式、存檔、UI 或動畫；本輪只更新測試與本文件，
-  因此不升 loader cache 或主頁 V173 版本標示，也不合併／修改 `main`。
-- 新增 `tests/v170-final-spec-integration.test.js`：從 `index.html` 鎖定 23 支直載腳本，從
-  `js/20-anonymous-20.js` 解析並鎖定 26 支正式 runtime，在同一個 `vm.Context` 依真實順序
-  執行全部 49 支 JavaScript，再檢查四元素 45 招的傷害、SP、目標、技能點與前置。
-- 整合測試另實際走完整 wrapper stack：10 名敵人的洪水猛獸只能傷害／凍傷選定單體，
-  冰霜箭雨傷害全體且只套凍傷；並驗證燃燒、冰封、石化、其他降益、命中上下限、治療術
-  施法者不回自身 SP，以及極帝天尊三招的 V155 最終結算。
-- V140、V142、V143、V144、V146、V148、V149、V152、V155、V158、V160、V166 與
-  V169 水系 suite 保留原斷言作版本紀錄，但檔頭已標示為 `HISTORICAL SPEC SNAPSHOT`；
-  不再把各自單層 fixture 誤稱為 V170 最終狀態。
-- 驗證結果：`tests/*.test.js` 共 35 份 suite 全數通過，其中新 V170 suite 9 項全數通過；
-  `js/`／`tests/` 共 148 支 JavaScript 全數通過 `node --check`。
-
-**仍存在但本輪依要求未修改的規格債**：元相光明資料物件仍有 V144 歷史欄位，但正式 V155
-resolver 不讀；V170 main 的洪水猛獸全隊冰封 wrapper 為失效死碼，V169 最終欄位會令條件為
-false，且 dev V171 已物理移除；1 回合凍傷在回合開頭倒數的既存時序仍有語義歧義。詳細內容
-見文件頂部「V170 最終正式規格」。
-
-### 2026-08-31 — V173：水球術旋轉飛行與完整命中修正（dev）
-
-- 依使用者影片逐段檢查水球術：V172 第 5～7 幀雖已複製至實際目標，卻仍保持原始橫向；
-  第 9～12 幀也沿用只顯示下半張的裁切，造成三個命中特效互相連成藍色長條。
-- 不修改、不重製也不重新編碼 `assets/vfx/water/water-orb-vfx.png`；原圖實際只有 4×3、
-  共 12 幀，因此需求中的第 13 幀以既有第 12 幀作為動畫收尾，不讀取不存在的畫格。
-- 水球術改用獨立 `v173WaterOrbTargetTravel`：第 1～4 幀仍只顯示一顆共同聚集；第 5～7 幀
-  依本次 1／2／3 個實際有效目標建立對應副本，玩家往敵方飛行時旋轉 `+90deg`，敵方往玩家
-  飛行時旋轉 `-90deg`，並從施術卡移動至各自目標卡中心。
-- 第 8 幀先在各目標位置播放原圖下半部主要水爆，第 9～12 幀改用完整畫格於各自目標附近
-  爆炸、消散；三名有效目標維持同步命中。洪水猛獸仍使用原有時間軸，沒有被此修正影響。
-- 快取、直載 query 與主頁右下版本標示同步升為 `V173`；新增
-  `tests/v173-water-orb-direction-vfx.test.js`，並更新 V172 與既有 cache-bust 驗收。
-- 驗證結果：`node --test tests/*.test.js` 共 34 份 suite 全數通過；異動 loader 與全部測試檔
-  均通過 `node --check`，`git diff --check` 通過，原始水球 PNG SHA-256 保持不變。另以未移動
-  分支的候選 commit 在雲端 Chrome 載入實際 CSS 與 PNG 慢速預覽，確認聚集期只有一顆、
-  飛行期三顆依不同目標座標旋轉移動，命中期三個完整水爆分別鎖定三張目標卡牌。
-
-### 2026-08-31 — V172：水球術多目標動畫分層修正（dev）
-
-- 保留 `assets/vfx/water/water-orb-vfx.png` 原始透明 PNG，不修改、不重製也不重新編碼；
-  修正先前每個目標都各自播放完整 12 幀 Sprite，導致共同聚集疊成大型光團、飛行途中又夾帶
-  提前爆裂圖塊的問題。
-- 第 1～4 幀只顯示一個共同水球聚集；第 5～7 幀依每個實際有效目標分別移動畫格上半部的
-  水球，抵達對應卡牌後才於第 7～8 幀切換為畫格下半部命中特效，第 8～12 幀留在目標附近
-  完成水爆消散。水球術尺寸同步縮為 1.25 倍、110～165px。
-- 上述分層、裁切及尺寸只套用於 `waterBall`；洪水猛獸沿用完整畫格與原定位、尺寸，不受影響。
-  快取與直載 query 升至 172，新增 `tests/v172-water-orb-vfx.test.js`。
-- 驗證結果：`node --test tests/*.test.js` 共 33 份 suite 全數通過；瀏覽器實戰已建立並裝備
-  水球術角色，確認三名實際目標在同一命中時點各自受到傷害。
-- 主頁封面右下安全區新增小型金框 `V172` 版本標示，方便手機測試時直接辨認是否載入本版；
-  標示不攔截觸控，也不壓住角色隊伍資訊或底部導覽。
-
-### 2026-08-31 — V171：怒火、水球／洪水與冰霜箭雨定位修正（dev）
-
-- 怒火的施放 Sprite 由過小的 0.82 倍、64～108px 調整為 1.08 倍、96～148px，貼近實際
-  受益卡牌邊緣；玩家 `activeBuffs` 與敵方 `v141TeamBuffs` 均建立持續 loop。另覆寫深淵
-  立繪卡的高權重 `position:relative`，避免敵方怒火／其他狀態圖被推離卡牌。
-- 水球術與洪水猛獸改為先寫入施術者及各實際目標的 `left/top`，再掛上 Sprite 動畫 class；
-  33.333%～58.332% 由施術卡移動到目標卡中心，修正部分 Android／WebView 把 fallback
-  座標快照成 0、動畫停在自己位置的問題。洪水猛獸同步縮為 1.85 倍、175～250px。
-- 冰霜箭雨不再以敵我區域較長邊建立正方形後置中裁切；現在以完整目標方戰鬥區為 clipping
-  rectangle，依短邊建立同步 Sprite tiles。玩家施放只覆蓋敵方區，敵方施放只覆蓋我方區；
-  傷害數字仍逐張卡牌顯示。
-- 移除 V149 遺留的 `teamFreezeChance` 與雙方全隊冰封迴圈。影片中洪水猛獸命中一人卻讓
-  10 名敵人各自出現冰封／抵抗，根因即為這段舊邏輯；V169 最終規則維持只對實際命中單體
-  進行 40% 凍傷判定、持續 1 回合。另加單體技能晚到 callback 防護，不能擴張到其他卡牌。
-- 快取版本升至 171；修改 `js/39-v143-skill-animation.js`、
-  `css/40-v143-combat-dungeon-polish.css`、`js/43-v149-skill-ui-rules.js`、loader 與相關回歸。
-  沒有修改、重製或重新編碼任何 PNG。
-- 驗證結果：`node --test tests/*.test.js` 共 32 份 suite 全數通過；三支異動 JavaScript
-  通過 `node --check`，`git diff --check` 通過。另以雲端 Chrome 載入未移動分支的候選 commit，
-  實際從主城建立／升級角色、學習並裝備怒火，再進入 5～6 敵人戰鬥；敵方水球術由敵方命中
-  實際我方卡牌，怒火成功套用且戰鬥 DOM 顯示「怒火生效中」。
-
-**已知限制**：自動測試與瀏覽器桌面戰鬥 smoke 均通過；動畫最終大小與手機 GPU 合成效果仍應
-由使用者在 `dev` 的目標 Android 裝置實測手感，確認後再決定是否升版至 `main`。
-
-### 2026-08-30 — V170：創角返回、抽獎券圖示與上一版版面回復（dev）
-
-- 第二、第三角色共用創角流程的第一頁新增「返回角色頁」；返回後會回到主城角色視窗。
-  角色 ID 以去除首尾空白、NFKC 正規化及不分大小寫比較，三名角色均不可重複。
-- 主城測試工具的共用經驗池按鈕由每次 1,000 萬改為每次 10 億，顯示、實際加值、存檔
-  與提示數字一致。
-- 舊存檔中的赤炎／寒泉／岩岳／青嵐裝備抽獎券會依穩定 ID 補回本輪已上傳的 PNG；新增券
-  疊入既有堆疊時也會同步圖示，深淵寶箱獎勵提示會顯示對應券圖。十件套裝本體仍使用各部位
-  自己的裝備圖示，不會誤套抽獎券圖。
-- 角色頁回復 V169 前的自然捲動與原有比例，只移除黑色尾端空塊；商店回復原本 flat 兩欄卡片，
-  每列維持 HP 在左、SP 在右；副本背包保留高層級但避開底部導覽。深淵續關頁回復上一版密度，
-  寶箱／傳送點縮回較小足跡；RPG 視窗、購買提示、元素匣、深淵流程與閃爍修正均保留。
-- 快取版本升至 170；新增 `tests/v167-character-creation-exp.test.js` 與
-  `tests/v169-ticket-icon-paths.test.js`，並更新角色／商店／深淵版面回歸驗收。
-- 驗證結果：31 份 Node test suite 共 264 項全數通過；`js/`／`tests/` 共 144 支
-  JavaScript 通過 `node --check`，`git diff --check` 通過。
-
-**當時限制（已於 V173.24 完全解除）**：V169 收到的四張 inbox PNG 是四元素「裝備抽獎券」
-圖，不是套裝本體。V173.22 已補齊四套各五個攻擊部位的新圖，V173.24 再補齊五個法術部位。
-
-### 2026-08-30 — V169：RPG 視窗、角色／商店、元素匣、水技能與深淵流程（dev）
-
-- 以遠端 `dev=a325b1c` 為唯一基底，逐 hunk 移植 `9014748` 本輪實際修改；未 merge `main`，
-  未整檔覆蓋衝突檔案。V167／V168 測試及其前置施工不屬於本次 commit，沒有夾帶。
-- `js/51-v169-rpg-ui.js`／`css/49-v169-rpg-ui.css` 新增排隊式 RPG alert／confirm；角色能力值
-  與經驗池固定於可視高度，技能頁保留自身捲動。商店重排為 HP 左、SP 右且成功購買才顯示收據；
-  副本頁背包沿用真實背包 DOM，並提升至副本導覽之上。
-- `js/49-v169-element-box-settings.js`／`css/48-v169-element-box-settings.css` 讓行動、HP、SP、
-  回城門檻、切換角色與關閉都保存目前角色；元素匣啟動中可繼續編輯，另有獨立停止鍵。
-- `js/50-v169-water-skill-rules.js` 定案冰霜拳、冰旋一閃、冰封重擊、水球術、洪水猛獸、
-  冰霜箭雨與冰封的學習／升級成本、SP、傷害、吸血、目標與前置；凍傷只禁止技能，
-  冰封為單體 90%／5 回合純控制。
-- `js/27-v132-content-expansion.js`、`js/36-v141-content-systems.js`、
-  `js/38-v143-system-fixes.js` 與 `css/50-v169-abyss-flow.css` 接入符咒、抽獎券、設計圖、
-  開／關寶箱與傳送點共 15 張原始 PNG；深淵加入進度入口、固定地圖位置、局部 Boss 對話、
-  1～4 層寶箱／對應元素券／傳送點流程。11 張人物立繪只將黑色外背景轉透明。
-- 彈窗永久呼吸陰影與技能卡 `will-change` 已靜態化，降低 Android 合成層矩形穿透。
-  `V_ASSET_VERSION`、`js/00-main.js`、`js/19...` 與外層 loader query 升至 169。
-- 驗證結果：29 份 Node test suite 共 254 項全數通過；另有瀏覽器 smoke 因缺少 Chromium
-  自動略過。共有 142 支 `js/`／`tests/` JavaScript 通過 `node --check`，
-  `git diff --check` 通過。
-
-**已知限制**：Android／Samsung 合成層問題無法在目前無 Chromium 的環境重現；仍需同一台手機
-將角色／元素匣／技能詳細視窗各保持開啟約 10 秒確認。
-
-### 2026-08-30 — V166：水元素正式 Sprite Sheet VFX（dev）
-
-- 依使用者要求接續既有 `dev`，未建立新分支，未修改、合併或推送 `main`。
-- 從 `origin/assets-library` 的 `assets/inbox/` 取用 12 張本次素材；全部通過 PNG chunk、zlib、
-  8-bit RGBA、透明與半透明 Alpha 檢查。九張 1448×1086 來源以 362×362 格置中補至 384×384；
-  `tidal-beast.png` 依 384px 四欄及 341／342／341px 三列補成正方格；兩張 1774×887 狀態圖
-  依 444／443px 邊界切為八格再補至 444×444。正式輸出的 136 個影格與各自來源內容區逐像素
-  比對差異皆為 0，沒有縮放、拉伸或重繪。
-- `js/37-v142-skill-animation.js`、`js/39-v143-skill-animation.js` 與
-  `css/40-v143-combat-dungeon-polish.css` 接入十招指定檔名與 0.80／0.90／1.00／1.15／1.10／
-  1.35／0.95／1.25／1.80／1.60 秒時序，統一第 8 幀命中。單卡、實際 1～3 卡、每目標獨立
-  投射、完整敵方區 AOE 均由當次 DOM 座標計算；停用舊冰旋投射，避免重疊播放。
-- 凍傷與冰封狀態圖只鏡射 canonical `statusEffects`，循環頻率不會觸發 HP／DOT／控制邏輯；
-  一次性施放圖完成後才建立 loop，狀態解除或角色倒下立即移除。舊生成式冰封覆蓋層已由正式
-  Frozen loop 取代。
-- `js/42-v148-combat-dungeon-fixes.js` 將復活 HP、卡牌站起、數字與復活反應統一排到第 8 幀；
-  治療仍保留 V158 的全體規則，冰封仍保留 V158 的同排最多三人規則，冰封重擊／冰旋一閃沿用
-  正式 Frostbite 規則，沒有藉動畫工作改動平衡數值或新增 DOT。
-- `V_ASSET_VERSION` 與外層 loader 升至 166；重寫 V150 全區冰霜箭雨驗收、新增 V166 端到端
-  動畫驗收並補強 V148 第 8 幀復活測試。最終 25 份 Node suite、224 項全數通過；`js/`／
-  `tests/` 共 135 支 JavaScript 通過 `node --check`，`git diff --check` 通過。
-
-**已知限制**：環境沒有 Chromium，未做本機瀏覽器／手機視覺測試；需在 `dev` 真機確認各張
-正式圖的最終顯示比例、混色與遮擋感。
-
-### 2026-08-30 — V163：火焰斬原始透明 PNG 校正（dev）
-
-- 依使用者要求接續既有 `dev`，未建立新分支，未修改、合併或推送 `main`。
-- 從 `origin/assets-library` 的 `assets/inbox/flame-slash-cast.png` 取用本次素材；已確認原檔為
-  1448×1086、8-bit RGBA 透明 PNG，4×3 共 12 幀，每格實際 362×362。
-- 將每格原始像素置中補 11px 透明邊為 384×384，再組成 1536×1152 Sprite Sheet；12 格逐像素
-  比對差異皆為 0，未縮放、拉伸、重繪或加入底色。正式檔案覆蓋
-  `assets/vfx/fire/flame-slash-cast.png`。
-- V161 既有 `flameSlash` 綁定維持不變：只在本次有效單體目標中央播放一次、總長 760ms、
-  第 8 幀開始顯示傷害與命中反應，完整 12 幀後才解除行動閘門。
-- `V_ASSET_VERSION` 與外層 loader 升至 163；新增 `tests/v163-flame-slash-source.test.js`
-  驗證正式素材雜湊、RGBA／尺寸、技能設定與快取發布。
-- 驗證結果為 23 份 Node suite、204 項全數通過；`js/`／`tests/` 共 133 支 JavaScript
-  全部通過 `node --check`，`git diff --check` 通過，正式輸出與 inbox 原圖的 12 格逐像素
-  比對差異皆為 0。
-
-**已知限制**：環境沒有 Chromium，未做本機瀏覽器視覺測試；需由使用者在 `dev` 手機確認實際動畫尺寸。
-
-### 2026-08-30 — V162：燃燒特效、元素匣層級與深淵戰鬥立繪（dev）
-
-- 依使用者要求接續既有 `dev`，未建立新分支，未修改、合併或推送 `main`。
-- `js/39-v143-skill-animation.js` 在燃燒狀態成功寫入後，依實際受影響卡牌及本次命中幀同步
-  `burn-loop.png`，並保留死亡目標不顯示與狀態結束自動移除的既有規則。
-- `js/45-v154-dev-fixes.js`、`css/46-v154-dev-fixes.css` 只在元素匣設定開啟期間提升其層級，
-  關閉任一路徑都會復原；深淵第 1～5 關每張敵方卡牌都會插入對應的實際立繪圖片圖層，
-  保留名稱、HP／SP、狀態與傷害特效在圖片上方。
-- `V_ASSET_VERSION` 與外層 loader 升至 162；補強 V153／V154 動態驗收並同步所有快取回歸。
-  驗證結果為 22 份 Node suite、201 項全數通過；`js/`／`tests/` 共 132 支 JavaScript 全部
-  通過 `node --check`，`git diff --check` 通過。
-
-**已知限制**：環境沒有 Chromium，未做本機瀏覽器視覺測試；需由使用者在 `dev` 手機確認實際呈現。
-
-### 2026-08-30 — V161：火焰斬正式 Sprite Sheet VFX（dev）
-
-- 依使用者要求接續既有 `dev`，未建立新分支，未修改、合併或推送 `main`。
-- 上傳的 1536×1152 素材實際為無 Alpha 的 JPEG；只將黑色合成底還原為透明／半透明 Alpha，
-  未重繪或改動 4×3、12 幀內容，輸出為 `assets/vfx/fire/flame-slash-cast.png` 的 8-bit RGBA PNG。
-- `js/39-v143-skill-animation.js` 將 `flameSlash` 接到既有 V143 Sprite renderer：單體定位、
-  4×3、12 幀、`hitFrame:7`，動畫只在本次有效目標卡牌中央產生一次；既有 V142 時長 760ms
-  保持不變，第 8 幀開始同步傷害、MISS 與卡牌命中反應。
-- `js/43-v149-skill-ui-rules.js` 會依既有 Sprite metadata 保留正式動畫 ID；移除 V160 在
-  `css/44-v149-skill-ui-rules.css` 的臨時月牙斬，避免正式素材與替代特效重疊。
-- `V_ASSET_VERSION` 與外層 loader 升至 161；新增 `tests/v161-flame-slash-vfx.test.js` 5 項驗收，
-  並加強 V149／V153／V160 回歸。驗證結果為 22 份 Node suite、199 項全數通過；`js/`／`tests/`
-  共 132 支 JavaScript 全部通過 `node --check`，`git diff --check` 通過。
-
-**已知限制**：環境沒有 Chromium，未做本機瀏覽器視覺測試；需由使用者在 `dev` 手機確認實際動畫尺寸。
-
-### 2026-08-30 — V160：技能數值／目標、元素匣與火系動畫修正（dev）
-
-- 依使用者要求接續既有 `dev`，未建立新分支，未修改、合併或推送 `main`。
-- `js/44-v152-dev-fixes.js` 將冰霜箭雨最終冰封率改為 20% 並同步說明；
-  `js/33-v140-four-element-balance.js` 與 `js/38-v143-system-fixes.js` 將硬控上限統一為
-  普通 80%／精英 60%／BOSS 40%。
-- `js/39-v143-skill-animation.js` 改為只把精確 `all`／`allyAll` 當全體，敵方怒火等待實際
-  三個解析目標才逐卡播放；火箭保留原軌跡並將 Sprite 限制在 180～280px。
-- `js/43-v149-skill-ui-rules.js` 與 `css/44-v149-skill-ui-rules.css` 保留火焰斬三個字圈，命中時追加
-  緊湊火焰月牙斬擊；`js/45-v154-dev-fixes.js` 將元素匣 HP／SP 補品改為可用角色輪流使用，
-  避免有限補品全被玩家 1 耗完。
-- `V_ASSET_VERSION` 與外層 loader 升至 160；新增 `tests/v160-current-request.test.js` 5 項驗收，
-  並加強 V140／V143／V149／V152／V153／V156 相關回歸。驗證結果為 21 份 Node suite、193 項全數通過；
-  `js/`／`tests/` 共 131 支 JavaScript 全部通過 `node --check`，`git diff --check` 通過。
-
-**已知限制**：環境沒有 Chromium，未做本機瀏覽器視覺測試；需由使用者在 `dev` 實機確認動畫尺寸與手感。
-
-### 2026-08-30 — V159：深淵戰鬥立繪載入時序修正（dev）
-
-- 依使用者實機截圖深追：素材與 V154 立繪映射都存在，但動態 runtime 若在戰鬥卡建立後
-  才載入，V154 安裝時沒有主動同步已存在卡牌；第五關每次 `updateUI()` 結束時，V152 舊層
-  還會在 V154 之後移除圖片變數，因此會只剩黑色卡底。
-- 新增 `js/48-v159-abyss-battle-portraits.js`，不重做素材映射，只在 runtime 安裝完成、
-  `v132LaunchDungeonBattle()` 建立卡牌後與最終 `updateUI()` 後重新呼叫既有 V154 同步入口；
-  同步補一個 animation frame 與 120ms DOM 穩定點，涵蓋 Githack 冷載入及已開戰畫面。
-- `V_ASSET_VERSION` 與外層 loader 升至 159，V159 runtime 排在 V158 後；新增
-  `tests/v159-abyss-battle-portraits.test.js` 4 項載入時序／開戰／舊層覆蓋驗收，舊測試快取
-  與 runtime 數量斷言同步更新。
-- 驗證：20 份 Node suite 共 187 項全數通過；`js/`／`tests/` 共 130 支 JavaScript
-  全部通過 `node --check`，`git diff --check` 通過。環境沒有 Chromium，修正後仍需使用者
-  由 Githack `dev` 實機確認立繪呈現。
-
-**已知限制**：本輪沒有已知未完成功能；無本機瀏覽器可做最後視覺截圖。
-
-### 2026-08-30 — V158：技能、命中／傷害與深淵地圖立繪定案（dev）
-
-- 依使用者要求接續既有 `dev`，未建立新分支，未修改、合併或推送 `main`。
-- 新增 `js/47-v158-combat-tuning.js` 作為最終資料與戰鬥規則層：怒火為 4 回合／65 SP；
-  冰封為同排中、左、右最多三名目標、80% 基礎機率、4 回合／66 SP，並補齊所有角色的
-  三目標實際結算；治療術為全體 550 HP／65 SP、每級各 +30、消耗 45 SP，施放者不回 SP。
-- 命中維持 95% 基礎與命中／閃避各 0.3 係數，一般上下限改為 80%～99%，只有傳入降低
-  命中的 Debuff 才使用 60% 下限；怪物既有預設閃避資料與備援值統一為等級×0.5，保留
-  自訂閃避及敏捷降低效果。共用傷害浮動改為 95%～105%，最終值使用四捨五入。
-- 新增 `css/47-v158-combat-tuning.css`，深淵地圖守關立繪保留 120×168 與整張按鈕點擊區，
-  移除卡框、黑底、圓角及陰影；原圖內黑色合成底以畫面混合呈現為地圖背景，不改立繪資產。
-- `V_ASSET_VERSION` 與外層 loader 升至 158，新增 V158 CSS／runtime 並排在 V155 後；
-  `tests/v158-combat-tuning.test.js` 新增 7 項驗收，舊測試快取斷言與 runtime 數量同步更新。
-- 驗證：19 份 Node suite 共 183 項全數通過；`js/`／`tests/` 共 128 支 JavaScript
-  全部通過 `node --check`，`git diff --check` 通過。環境沒有 Chromium，未做本機實際畫面點擊，需由使用者在 `dev`
-  實機確認混色後的立繪觀感。
-
-**已知限制**：本輪三項需求沒有已知未完成功能；深淵立繪外觀仍需使用者實機確認。
-
-### 2026-08-29 — V156：深淵地圖立繪／點擊熱區與元素匣補品深追修正（dev）
-
-- 依使用者要求只沿用既有 `dev`，未建立新分支，未修改、合併或推送 `main`。
-- 深追確認 V152／V154 只在戰鬥卡片套用深淵立繪；地圖仍由 `js/36-v141-content-systems.js`
-  產生純文字 `.v141-abyss-boss`，而 V154 CSS 又把其 `min-width`／`min-height` 設成 0，
-  因此地圖沒有立繪且實機點擊區極小。`css/46-v154-dev-fixes.css` 現在依樓層接入東／南／
-  天／北帝與第五關極帝立繪，保持 `contain` 比例，並將整個既有語意按鈕擴為 200×280。
-- 深追確認 V154 自動補品只接受角色個別 `config.enabled=true`；元素匣實際已啟動但舊存檔
-  角色旗標不同步時會直接略過。`js/45-v154-dev-fixes.js` 現以
-  `v131GetElementBoxState().active` 作為全隊共用授權，仍依每名角色原 HP／SP 門檻持續吃藥，
-  元素匣未啟動時不會繞過角色設定；頁面載入時若元素匣已啟動也會立即完成一次補給。
-- `V_ASSET_VERSION` 與外層 loader 提升至 156；新增
-  `tests/v156-deep-trace-fixes.test.js`，覆蓋先前漏測的「元素匣啟動、角色旗標為 false」、
-  未啟動不得越權、五層地圖立繪與大型點擊區。
-- 驗證：17 份 Node suite 共 173 項全數通過；`js/`／`tests/` 共 125 支 JavaScript
-  全部通過 `node --check`，`git diff --check`、五張地圖立繪 1152×1536 WebP 與 loader
-  版本檢查通過。雲端瀏覽器被預覽站安全中繼頁攔截，本機亦無 Chromium，browser smoke
-  依既有規則略過。
-
-**已知限制**：本輪無可用瀏覽器做真實觸控截圖驗收；新增的 VM 回歸已直接重現並覆蓋
-元素匣狀態不同步路徑，實機視覺與點擊手感仍需使用者在 `dev` 確認。
-
-### 2026-08-29 — V155：硬控快跳、深淵第五關技能與火系終階技能定案（dev）
-
-- 依使用者要求沿用既有 `dev` 分支，未建立新分支，未修改、合併或推送 `main`。
-- `js/25-v131-fix-batch.js` 與 `js/37-v142-skill-animation.js` 新增一次性的行動交棒延遲
-  override；`js/46-v155-dev-fixes.js` 只在角色／怪物因冰封或石化不能行動時指定 300ms，
-  一般出手 1.6 秒與回合交接規則維持不變。
-- 深淵第五關維持既有十人站位與立繪，只替換指定技能：東／天／極／北／南帝使用各自
-  三招並固定最高技能等級；五名精英統一名為天兵天將，依序使用水冰封重擊、土落石術、
-  火火爆一擊、風隱身術、水冰封重擊並固定最低技能等級。火爆一擊僅供怪物直接查找，
-  不會出現在玩家技能清單；天帝不再施放氣定神閒，北帝不再攜帶復活術。
-- 極帝三招定案為全體 150 HP／55 SP、100 護盾兩回合、20% 全淨化＋閃避 30% 兩回合；
-  風精英隱身期間不能被單體技能選中，但仍會受到範圍技能波及。
-- `js/43-v149-skill-ui-rules.js` 將霸龍裂天斬改為首次追加若爆擊或擊敗目標可再追加一次，
-  玩家與怪物都只扣一次 SP 且最多追加兩次；V155 最終資料為 Lv1 165 傷、每級 +25、
-  SP65、追加率 5%／10%／20%／30%／40%。火鳳天鳴定案為全體 Lv1 60 傷、每級 +18、
-  SP68、70% 燃燒兩回合與最大 HP 5%／7%／9%／11%／13%；本次零燃燒目標時，下一回合
-  的火鳳天鳴傷害提升 50%，只保留一回合。
-- 載入器新增 `js/46-v155-dev-fixes.js` 並升級 `V_ASSET_VERSION`／`index.html` loader 至 155；
-  新增 `tests/v155-current-request.test.js`，並把霸龍條件式第二次追加加入 V149 回歸測試。
-- 驗證：全部 16 份 Node suite 共 168 項全數通過；所有 JS `node --check` 與
-  `git diff --check` 通過。`tests/v138-browser-smoke.js` 因本環境沒有 Chromium，依既有規則略過。
-
-**已知限制**：本輪沒有可用 Chromium，因此未執行本機瀏覽器實際點擊；無已知未完成的功能項目。
-
-### 2026-08-29 — V154：戰鬥交棒、元素匣、怒火動畫與深淵立繪／介面修正（dev）
-
-- 依使用者要求只在既有 `dev` 分支施工，未建立新分支、未合併或修改 `main`。
-- 戰鬥中途停住：`js/37-v142-skill-animation.js` 的動畫交棒完成識別加入回合序號，避免
-  無動畫／沿用上一個 gate 的後續回合被誤判成已處理，並在 V142 測試加入跨回合重用
-  gate 的回歸情境。
-- 元素匣：新增 `js/45-v154-dev-fixes.js`，上方主按鈕在未啟動時直接「套用並啟動」，
-  下方重複操作列由 `css/46-v154-dev-fixes.css` 收起；自動恢復會持續使用可用補品，直到
-  HP／SP 高於各角色設定門檻或庫存耗盡。
-- 怒火：`js/39-v143-skill-animation.js` 改成每個實際受影響卡牌各自一張小型 Sprite Sheet
-  動畫，不再用戰場中央的群組大動畫；持續狀態循環維持原本逐卡行為。
-- 能力值頁：`js/19-stage-v78-character-inventory-runtime.js` 改用 `characterTabContent` 起點
-  到 modal body 底部的真正剩餘高度，保留它作為單一縱向捲動容器，修正下方被裁切。
-- 日常裝備副本：V154 CSS 以同等 specificity 覆寫 V148 遺留的 `background-size:auto 84%`，
-  讓 V152 裝備封面真正填滿卡片。
-- 深淵：1～4 關取消脆弱的 roster 數量限制並保留既有東／南／天／北帝與天兵圖；第 5 關
-  接入使用者提供的綠、白、黑、紅、金及男天兵六張立繪，轉成
-  `assets/dungeons/abyss/floor5-*.webp`（皆 1152×1536），按完整怪物名稱固定對應。
-  戰鬥卡片維持原尺寸與 HP／SP 資訊，立繪鋪滿 3:4 框且技能 VFX 仍以卡片即時矩形定位。
-- 深淵入口只保留底部行動按鈕，地圖樓層資訊改成小型浮層、收起重複提示／玩家標籤並縮小
-  守關者按鈕，降低遮擋美術圖的面積。
-- 載入：`V_ASSET_VERSION` 與 `index.html` loader 提升到 154，新增 V154 CSS／runtime 並
-  保持既有順序載入；V78 直載腳本另加 `?v=154`。
-- 驗證：所有 JS `node --check`、`git diff --check`、六張新圖格式／尺寸檢查通過；執行
-  `tests/*.js` 共 158 項全數通過。`tests/v138-browser-smoke.js` 因執行環境沒有本機
-  Chromium 依既有規則略過；遠端 dev 預覽另被 raw.githack 安全中繼頁攔截，因此本輪
-  視覺校準以使用者兩張實機截圖、原始美術與 DOM/CSS 尺寸檢查完成。
-
-### 2026-08-29 — V153：火元素正式 Sprite Sheet VFX（dev）
-
-1. 把本次收到的 10 張流水號素材核對並輸出為 `assets/vfx/fire/` 下的正式 RGBA PNG：
-   `fire-critical-cast.png`、`explosive-flurry-cast.png`、`dragon-slash-cast.png`、
-   `fire-rocket-cast.png`、`blaze-spell-cast.png`、`flame-tornado-cast.png`、
-   `phoenix-cry-cast.png`、`rage-cast.png`、`rage-buff-loop.png`、`burn-loop.png`。
-   上傳檔實際是無 Alpha 的 JPEG；只將黑色合成底還原成透明／半透明 Alpha，未重繪。
-   兩張 1536×1024 的 12 幀素材逐格置中補成 384×384 透明畫布，未拉伸內容。
-2. `js/39-v143-skill-animation.js` 沿用既有 V143 導演與 Sprite Sheet renderer，新增單體、
-   目標群組、施放者到目標群組三種定位；所有座標均取實際卡牌矩形與既有 target 結果。
-   火爆亂擊／火箭／怒火每次只產生一個主動畫，火鳳天鳴無論幾個有效目標都只有一隻鳳凰；
-   死亡／無效目標排除，傷害、MISS、爆擊視覺與增益／燃燒成功反應統一在第 8 幀開始點。
-3. `rage-buff-loop.png` 與 `burn-loop.png` 由同一份狀態 Sprite metadata 驅動，分別以 1 秒／
-   0.8 秒在每張實際有效卡牌循環；只讀既有 `activeBuffs`／`statusEffects`，不重判機率、
-   不建立 action gate，狀態結束、清除、死亡或戰鬥結束即移除。
-4. `css/40-v143-combat-dungeon-polish.css` 新增共用 4×3 一次性幀序與 4×2 持續幀序；
-   `js/37-v142-skill-animation.js` 明確略過被動／`targetType:none` 的技能名稱動畫，確保
-   `fireEX` 不施放、不占回合。火箭舊大型飛行主特效在正式 Sprite 播放時停用，小型卡牌
-   命中、傷害數字與狀態提示保留。霸龍裂天斬的既有逐級追擊機率與目標仍完全由現行
-   戰鬥邏輯決定，第一段 2.8 秒 gate 結束後才開始第二段，VFX 未抽取機率或改選目標。
-5. 快取鍵同步升至 153；新增 `tests/v153-fire-vfx.test.js` 驗收 RGBA／尺寸／幀序、精準
-   目標、單主動畫、第 8 幀、完整 gate、火箭去重、狀態循環及 Fire EX 被動規則。
-
-**已知限制（V161 已解決）**：本批當時沒有 `flame-slash-cast.png`；後續補交素材已於 V161
-接入 `flameSlash`，其餘收到的 10 張素材維持原設定。
-
-**驗證**：全部 V137～V153 共 14 份、150 項 Node 測試通過；`node --check`、
-`git diff --check` 與 10 張素材的 PNG 8-bit sRGBA／透明及半透明 Alpha 驗收通過。
-本輪只提交並發布 `dev`，不合併 `main`。
-
-### 2026-08-29 — V152：技能、戰鬥與副本最新定案（dev）
-
-1. 角色技能點維持逐角色獨立儲存與扣除，補正技能頁切換角色後的點數顯示；移除誤植的
-   `fireBurstStrike`，並依本輪定案調整火／水／風／土技能、異常狀態公式與硬控上限。
-2. 補正怒火實際爆擊率／爆擊傷害、凍傷手動禁用技能、霸龍裂天斬逐級追擊率、傷害文字
-   最上層、怪物文字置中、技能指令邊界、巡怪獎勵點擊關閉、任務追蹤移除與進圖自動回復。
-3. 極帝天尊的元相光明、元光護體、元祖賜福改為本輪指定數值與機率；深淵戰鬥補上戰鬥
-   資訊框，日常／深淵副本導覽版面修正並接入日常三張封面、深淵封面與一至四關帝君／
-   天兵天將立繪。主要新增 `js/44-v152-dev-fixes.js`、`css/45-v152-dev-fixes.css`、
-   `tests/v152-dev-fixes.test.js` 與 `assets/dungeons/`。
-4. loader 與資產快取版本升至 152；本輪依使用者明確要求只發布 `dev`，不合併 `main`。
-
-**驗證**：全部 JavaScript 語法檢查通過，V137～V152 共 13 份、143 項 Node 回歸測試
-與 `git diff --check` 全部通過；雲端瀏覽器攔截本機 localhost，無法執行雲端手機互動走查。
-
-### 2026-08-29 — V151：冰霜箭雨正式 VFX 載入修正（dev）
-
-1. 實機回報「冰霜箭雨」無特效後，確認後載入的 V149 逐字圓圈導演會把所有非普通技能
-   改成臨時動畫 ID，因此 V150 的 `iceArrowRain` Sprite metadata 沒有被使用。
-2. `js/43-v149-skill-ui-rules.js` 只對已有 Sprite metadata 的正式動畫保留原 ID；其他技能
-   的逐字圓圈演出不變，冰霜箭雨傷害、SP、範圍、目標判定與戰鬥數值均未修改。
-3. loader 快取版本升至 151，並在 V149 驗收加入正式 Sprite 不得被臨時動畫取代的回歸。
-
-**驗證**：全部 JavaScript 通過 `node --check`，V137～V150 共 12 份、132 項 Node
-測試全部通過；`git diff --check` 通過。本輪只發布 `dev`，不合併 `main`。
-
-### 2026-08-29 — V150：冰霜箭雨正式 12 幀 Sprite Sheet VFX（dev）
-
-1. 使用者提供的 `1000065660.png` 實際檔案為 1536×1152、4×3 排列的 JPEG，沒有
-   Alpha；依 V147 同類素材處理方式，只把黑色合成底恢復為透明／半透明 Alpha，沒有
-   重繪或重排任何一幀，輸出為真正 RGBA PNG：
-   `assets/vfx/water/ice-arrow-rain.png`。每格精確 384×384，排列與播放順序維持
-   左→右、上→下。
-2. `js/39-v143-skill-animation.js` 在既有共用動畫導演內新增 Sprite Sheet metadata
-   與共用渲染路徑，沒有建立第二套戰鬥或 VFX 系統。「冰霜箭雨」依施放當下存活的
-   實際目標快照與卡牌 `getBoundingClientRect()` 中心定位；已死亡／無效卡牌不建立
-   VFX，被本次攻擊擊倒的原有效目標仍正常完成命中演出。
-3. `css/40-v143-combat-dungeon-polish.css` 依 4 欄×3 列精確切換 12 幀，只播放一次；
-   第 8 幀開始點（整段 58.333%）作為主要命中點，所有範圍目標同步顯示卡牌命中、
-   傷害數字與既有狀態效果。總長沿用冰霜箭雨既有 2500ms，高階技能 Promise 行動
-   閘門在第 12 幀完成前不會交給下一位角色。
-4. 沒有修改冰霜箭雨或其他技能的傷害、SP、範圍、冰封機率、目標判定與戰鬥數值。
-   `V_ASSET_VERSION` 與外層 loader 快取鍵升至 150；新增
-   `tests/v150-ice-arrow-rain-vfx.test.js`，並同步舊驗收的快取版本預期。
-
-**驗證**：ImageMagick 確認素材為 1536×1152、8-bit sRGBA PNG，Alpha 範圍 0～1；
-全部 `js/`／`tests/` 通過 `node --check`，`git diff --check` 通過。V137～V150
-共 12 份 Node 測試、132 項斷言全部通過；V150 另以 VM 模擬三張目標卡，確認兩張
-存活卡各自只生成一個 Sprite、死亡卡不生成、位置精確落在卡牌中心、傷害數字延至約
-1458ms、完整 2500ms 才完成。`tests/v138-browser-smoke.js` 因環境沒有 Chromium
-依設計略過；本輪依使用者要求只發布至 `dev`，不合併 `main`。
-
-### 2026-08-29 — V148／V149：戰鬥目標、副本流程、四元素技能與介面規則定案
-
-1. V148 完成相鄰三人目標、單體增益特效、死亡目標特效排除、萬象土盾 50% 反傷、
-   死亡友方復活選取、日常副本捲動、深淵下方返回與途中改向、怪物全滅即停手、
-   自動巡怪路徑、精英名稱色、同增益不續期、硬控互斥、治療者不回 SP 與商店圖示更新。
-2. V149 依使用者最新完整表逐項重設火／水／風／土 45 招技能的學習點、前置、SP、
-   目標、傷害、成長、機率、回合與效果，並補齊凍傷限制、火元素 EX 異常增傷、
-   洪水猛獸群體冰封及霸龍裂天斬原目標追擊。
-3. 修正商店手機版面與主城／導覽列商店圖示混用；怪物復活後立即恢復卡牌亮度，
-   精英／BOSS 名稱分別恢復橘色／桃紅色。
-4. 結界與萬象土盾、隱身、閃躲互斥，衝突施放顯示 MISS 且不扣 SP；結界不再顯示
-   白色護盾條與中央「界」，改為深黃色四角框及四角剩餘層數。萬象土盾反傷顯示
-   `反傷HP-XXX`。
-5. 全技能改為依技能顯示名稱逐字產生元素色圓圈，每一字一圈，維持飛行速度並拉開間距；
-   實際目標與死亡卡牌規則沿用 V148 校正結果。主要新增檔案為
-   `js/42-v148-combat-dungeon-fixes.js`、`css/43-v148-combat-dungeon-fixes.css`、
-   `js/43-v149-skill-ui-rules.js`、`css/44-v149-skill-ui-rules.css`，loader 快取升至 149。
-
-**驗證**：所有相關 JavaScript 通過 `node --check`，`git diff --check` 通過；V137～V149
-共 11 份 Node 測試、126 項斷言全部通過。雲端瀏覽器會攔截本機 localhost，無法完成
-本輪手機實機視覺走查；推送後仍需在 `dev` 確認商店版面、結界四角與逐字技能動畫。
-本輪只發布 `dev` 測試版，不合併或推送 `main`。
-
-### 2026-08-28 — V147：新商店圖示透明化與快取更新
-
-1. 使用者補交的 `1000065524.png` 經實際檔案檢查，內容雖以 `.png` 命名，實際是
-   1536×1536、三通道、無 alpha 的 JPEG；外圍黑色不是透明顯示。使用內建影像編修
-   做背景擷取，只移除圓形商店徽章外側黑底，保留商店場景、寶箱、金幣、武器、藥水、
-   中文文字與圓形金紅外框，再以無損 alpha 輸出並縮放為 512×512 RGBA PNG。
-2. 新增 `assets/ui/home-shop-v147.png`，不覆寫舊 `home-shop.png`；`index.html`、
-   `js/38-v143-system-fixes.js`、`js/41-v146-system-polish.js` 三個實際入口全部改用新檔名。
-3. `V_ASSET_VERSION` 與 `index.html` loader 快取鍵升至 147，V137～V146 驗收同步更新；
-   V146 測試另直接檢查三個入口、新資產存在及 PNG IHDR color type 6（RGBA）。
-
-**驗證**：`identify` 確認新圖為 512×512、RGBA、含透明通道、465,735 bytes；
-`node --check`、`git diff --check` 及 V137～V146 全套 103 項測試全部通過。
-`assets-library/assets/inbox/` 四張測試圖僅以唯讀方式下載暫存副本逐張觀看，本次未修改、
-移動、重新命名或提交該分支任何檔案。
-已發布至 `dev`（`367e633`）與 `main`（`77effbd`），兩分支檔案樹一致；GitHub Pages
-正式網址、`home-shop-v147.png`、V147 loader 與 V146 polish script 均回傳 HTTP 200，
-線上內容已確認載入透明商店圖與快取版本 147。
-
-### 2026-08-28 — V146：戰鬥演出、深淵流程與手機介面最終修正
-
-1. `js/39-v143-skill-animation.js` 與 `js/37-v142-skill-animation.js` 完成最後一位
-   行動動畫閘門，手動指令必須等目前整招演完；飛行、命中及範圍目標只接受存活卡牌，
-   技能依 ID 使用風起雲湧四字、冰箭群、火龍、火鳳、飛沙、岩石等具象 SVG／粒子，
-   命中定位改到卡牌正中央，全體技能令目標八方向震動後回到原位。技能提示只保留
-   透明底描邊文字，普通攻擊強制白字；敵方卡牌下移但不增加兩排間距。
-2. `js/40-v144-rules-and-abyss.js` 同步最新技能表：岩石壁壘、萬象土盾、水元素 EX、
-   治療術、冰封重擊、冰霜箭雨、怒火、火鳳天鳴的前置、技能點、SP、目標數、傷害、
-   回復、吸血、控制、燃燒與等級成長均已重設。冰霜箭雨改成每一個存活目標各自判定
-   冰封；敵方治療會在每名受眾卡牌顯示實際 HP／SP 回復量。
-3. 新增 `js/41-v146-system-polish.js`：藥水輸入數量即時計算總價；開啟自動戰鬥時立即
-   執行戰後自動補給；第一次成功附加燃燒／冰封／石化／降敏／降防／暈眩等會跳出名稱；
-   深淵 NPC 需走近才可對話，單次移動最多 24% 且走路中忽略快速連點。深淵使用四鍵
-   導覽與右上返回，普通副本為五鍵；主城新增最多三名玩家的頭像、ID、等級、HP、SP
-   與金幣資訊；合成只保留 icon 選擇且永遠產出普通裝備。
-4. 四元素攻／法套裝共 40 件依最新表重設數值、名稱與等級 20 限制，非同元素角色不可
-   穿戴；三件全能力 +1、五件對應元素技能傷害 +2%，且攻／法件數分開計算，不允許混穿
-   誤觸套裝效果。背包改為每頁 18 格、六欄三列及左右箭頭。
-5. `css/42-v146-system-polish.css` 補齊上述手機版面、全螢幕深淵、中央大字對話、穩定
-   副本導覽、主城資訊卡、商店總價與慢速戰鬥離場；`js/35-v141-ui-battle.js` 將失敗
-   文字固定為「戰鬥失敗」，先保留死亡演出再逐步暗場，避免仍有血時畫面先消失。
-6. loader 以固定順序在 V144 後載入 `js/41` 與 `css/42`；`V_ASSET_VERSION` 及
-   `index.html` 外層快取鍵升為 146。新增 `tests/v146-system-polish.test.js` 8 項並同步
-   更新 V137～V144 的版本／最新規則預期。
-
-**驗證**：`node --check`、`git diff --check` 及 V137～V146 全套測試通過：V137 9/9、
-V138 10/10、V139 7/7、V140 14/14、V141 18/18、V142 14/14、V143 12/12、
-V144 11/11、V146 8/8，共 103 項。`tests/v138-browser-smoke.js` 已執行，但本環境
-沒有 Chromium，腳本依設計略過；仍需正式手機實機走一次深淵與十怪大型技能。
-2026-08-28 經使用者再次明確確認目的地後，已將 V146 發布至 `dev`
-（`3659625`）與 `main`（`bcc2304`）。`main` 使用雙親合併提交保留外部 V145
-（`845c955`）歷史，但整份檔案樹精確採用 V146，不包含 V145 的 wrapper loader、
-`js/20-anonymous-20-v144-original.js` 或 `js/41-v145-wind-skill-icons.js`。GitHub Pages
-正式網址回傳 HTTP 200，線上 `index.html` 已確認載入 `?v=146`，`js/20`、`js/41`
-與 `css/42` 均回傳 HTTP 200 且內容／SHA 與本機 V146 一致。
-
-### 2026-08-28 — V144：商店藥水、怪物攜帶技能、硬控流程與深淵第五關定案
-
-1. 新增 `js/40-v144-rules-and-abyss.js`，商店只上架 HP／SP 各 10%、20%、30%
-   六種藥水；HP 基礎售價為 20／45／75，SP 為 25／55／90，再沿用既有「最高已建
-   角色等級」倍率公式（×1～×4.5）。舊 50%／100% 藥水不再販售，但已持有品項
-   仍保留定義及使用能力，避免破壞舊存檔。
-2. 一般怪物生成時先依元素、等級與既有 Tier 限制建立合法技能池，再按 Lv1～20／
-   21～40／41+ 隨機抽取最多 1／2／3 招；本場技能組合固定，下次遭遇才重抽。
-   技能等級依 Lv1～20／21～40／41～60／61～80／81+ 固定為 1／2／3／4／5，
-   且不超過技能 `maxLevel`。野怪、精英、一般／日常副本及一般 BOSS 共用；深淵
-   以 `v141Abyss` 明確排除並維持獨立規則。日常副本在既有元素重配完成後才抽技能。
-3. 玩家被冰封或石化時，`beginCharacterTurn` 在動作選單出現前就標記並直接完成該
-   行動，不再容許手動選擇。進場、勝利、失敗轉場文字固定為「進入戰場」「勝利」
-   「失敗」，並由 `css/41-v144-rules-and-abyss.css` 調整提示框寬度以容納完整文字。
-4. 治療術重設為全體固定回復 HP 95＋每級 15、SP 15＋每級 15，含施術者自身；
-   閃躲術為全體閃躲 +60% 兩回合；隱身術為單體兩回合，只避開單體選取而仍承受
-   範圍技能；氣定神閒為全體異常抗性 +45%、命中 +50% 三回合；萬象土盾為全體
-   50% 反傷三回合。五招的前置、初學點數、SP 與最高等級均依定案同步到資料、
-   預覽與實際結算；氣定神閒的命中增益也真正進入玩家命中屬性計算。
-5. 深淵第五關最終戰固定為前排東帝／天帝／極帝／北帝／南帝，後排水／土／火／
-   風／水天兵天將。五帝與五名精英均只攜帶指定技能且強制最高級。極帝「元相光明」
-   全體回復 450 HP／95 SP、清除負面並加敏捷 75% 兩回合，「元光護體」全體護盾
-   200 兩回合；北帝復活／治療、天帝氣定神閒及風系精英閃躲皆有對應怪物端實際 AI，
-   原本額外的元祖賜福不再於最終戰施放。
-6. loader 在 V143 後載入 `js/40` 與 `css/41`；`V_ASSET_VERSION`、`index.html`
-   loader 與 V137～V143 驗收快取鍵全部升為 144。新增
-   `tests/v144-rules-and-abyss.test.js` 共 11 項，動態驗證商店、技能抽取穩定／重抽、
-   深淵排除、技能等級、硬控跳過、轉場、五招資料與結算、最終站位及帝尊 AI。
-
-**驗證**：`node --check`、`git diff --check` 與 V137～V144 全套測試通過：V137 9/9、
-V138 10/10、V139 7/7、V140 14/14、V141 18/18、V142 14/14、V143 12/12、
-V144 11/11，共 95 項。執行環境沒有 Chromium，雲端瀏覽器也禁止連入本機預覽，
-所以尚未完成真實手機視覺／點擊驗收。2026-08-28 經使用者明確同意發布後，已將
-`dev` 快進合併至 `main`；GitHub Pages 的 build／deploy／report 三個工作全部成功，
-正式網址回傳 HTTP 200，且線上 `index.html` 與 loader 均確認載入快取版本 144、
-`js/40-v144-rules-and-abyss.js` 及 `css/41-v144-rules-and-abyss.css`。後續仍應以手機
-實機檢查十敵卡牌、商店、硬控跳過與深淵第五關完整流程。
-
-### 2026-08-28 — V143：卡牌可讀性、逐招戰場動畫、副本／合成與戰鬥規則修正
-
-1. 新增 `js/38-v143-system-fixes.js`，一次收斂本輪規則與流程修正：
-   - 風起雲湧、冰霜箭雨、冰封的技能點、前置、SP、傷害、等級成長、暈眩／
-     冰封與吸血資料已依定案重設；冰霜箭雨只對全體傷害後抽一個目標判定冰封。
-   - 硬控最終命中上限改為普通 80%、精英 45%、BOSS 30%。
-   - 雙方結界統一為五次直接傷害完全阻擋，DOT 穿透且不消耗次數；怪物端不再
-     以假性 999999 護盾值呈現。萬象土盾另有專屬「象」字與紅黃綠藍四角呼吸光。
-   - 物品可由任一出手角色指定任一有效我方角色；選擇中的我方卡牌使用與怪物
-     目標相同的閃爍準星，庫存預留／取消／套用及藥水特效都跟著實際接受者。
-   - 副本脫逃直接清理計時器、動畫與 run 狀態並還原原地圖，避免頁面切換後黑屏；
-     深淵改用完整畫面移動範圍，BOSS 對話置中放大且每次點擊才進下一句。
-   - 副本頂部返回鍵移除，底部固定為角色／背包／商店／元素匣／返回五項；導航
-     搬回縮放容器內，避免副本頁變形。
-   - 合成改成 icon 優先的選擇與預覽；裝備合成隨機產生普通部位／階級裝備，
-     不再生成或選擇四大套裝，合成結果不帶 `setId`。
-2. 新增 `js/39-v143-skill-animation.js`，覆寫 V142 的中央大型通用演出。所有現有
-   戰鬥技能依技能 ID 建立各自的 choreography（元素、攻擊方式、glyph、軌跡、
-   命中特效、脈衝與展開方式）；未知後續技能也以 ID／名稱穩定生成不共用的組合。
-   演出依施術者卡牌座標飛向各目標，技能名只在施術者上方以小字顯示 0.4～0.7 秒，
-   傷害、MISS、死亡與狀態特效在各自 hit frame 才顯示。普通攻擊仍為約 520ms，
-   大型技能則由 Promise action gate 等完整動畫結束後才交棒；每次結束立即移除
-   DOM、timer、class 與 Canvas 粒子，並依裝置能力限制總粒子量。
-3. 新增 `css/40-v143-combat-dungeon-polish.css`：敵方名稱＋等級合併成同列 16px
-   粗體置中，JS 僅在實際超寬時逐步縮到最小 12px；HP／SP 為 12px 粗體且置中於
-   既有血條，卡牌寬高與兩排間距不增加。CSS 同時包含戰場軌跡／衝擊、我方準星、
-   土盾四色角光、深淵對話、副本五鍵導航與合成 icon 版面。
-4. loader 嚴格在 V142 後依序載入 `js/38`、`js/39`，並加入 `css/40`；
-   `V_ASSET_VERSION`、`index.html` 最外層 loader 及所有驗收中的快取鍵均升為 143。
-5. 新增 `tests/v143-combat-dungeon-polish.test.js`，並更新 V137～V142 對 loader、
-   版本與新定案的預期。此次依使用者既定工作流程只提交至 `dev`，不合併 `main`。
-
-**驗證**：`node --check js/38-v143-system-fixes.js js/39-v143-skill-animation.js`
-與 `git diff --check` 通過；V137 9/9、V138 10/10、V139 7/7、V140 14/14、
-V141 18/18、V142 14/14、V143 12/12，共 84 項自動回歸全部通過。專屬測試另以
-動態 VM 驗證技能資料、冰霜箭雨單一冰封抽選與怪物結界逐擊消耗。可選的本機
-Playwright smoke 因缺少 Chromium 略過；雲端瀏覽器又禁止連入 `127.0.0.1`，因此
-這一版尚未做真實手機／瀏覽器點擊與視覺驗收，合併 `main` 前應在 `dev` 實機確認。
-
-### 2026-08-27 — V142：共用技能動畫控制器、行動完成閘門與極帝天尊三技能
-
-1. 新增 `js/37-v142-skill-animation.js`，為每個技能集中提供
-   `animationDuration`、`resolveDuration`、演出分級與效果風格。普通攻擊為
-   520ms；初階約 720～980ms、中型約 1.05～1.7 秒、高階約 1.85～2.5 秒，
-   霸龍裂天斬／火鳳天鳴等終極技能為 2.65～3.2 秒。沒有修改任何技能傷害、
-   SP、命中、Buff／Debuff 或自動戰鬥選招。
-2. 玩家與怪物的技能名稱入口共用同一個動畫 director；視覺由 CSS 動畫、
-   SVG 劍氣／能量環與一張重用 Canvas 的自適應粒子組成。火龍、火鳳、
-   冰晶、水浪、暴風、雷光、巨石、地裂、護盾、治療／復活及光系支援均
-   以同一套 renderer 狀態組合，不再每招各寫一套推進計時器。
-3. V138 既有戰鬥節奏完整保留：一般結算仍以 1.6 秒為基準、換回合仍為
-   0.4＋1.6 秒。V142 只在動畫比既有排程更長時等待 animation Promise；
-   短動畫不額外加時，大招則在實際 `animationend`／Promise resolve 後才
-   進入下一個 initiative。
-4. 每次 `finishPlayerAction` 只簽發一張含 battle token、phase 與 index 的
-   行動票；`beginCharacterTurn`／`processNextCombatant` 只能消耗一次。
-   animationend、fallback timer、背景恢復重複觸發時，gate 的 once guard
-   與既有 processed-index 防護共同阻止重複攻擊、跳人或連跳兩回合。
-5. 效能採一個持久舞台＋一張持久 Canvas：每招結束會取消 RAF、清 timer、
-   清粒子、移除卡牌 class 與 visibility listener。依 `deviceMemory`、
-   `hardwareConcurrency` 及 reduced-motion 降低粒子、陰影品質，但不取消
-   技能主動畫；另保留 renderer 註冊介面供未來少數大招接 WebGL／Shader。
-6. 極帝天尊技能更新：元相光明為存活我方全體回復 350 HP／95 SP；
-   元光護體為全體 200 護盾、2 回合；新增元祖賜福，清除全體
-   `statusEffects` 並使敏捷提高 75%、持續 2 回合，結束後恢復原敏捷。
-   支援 AI 會依負面狀態、HP／SP 缺口、護盾及賜福狀態選招；被冰封／石化
-   時仍沿用既有不能行動規則。
-7. 新增 `css/39-v142-skill-animation.css` 與
-   `tests/v142-skill-animation.test.js`；loader 嚴格接在 `js/36` 後，
-   `V_ASSET_VERSION` 與最外層 loader URL 同步升為 142。
-
-**驗證**：全部 JavaScript 通過 `node --check`，`git diff --check` 通過。
-V137 9/9、V138 10/10、V139 7/7、V140 14/14、V141 18/18、V142 14/14，
-共 72 項自動回歸全部通過。V142 專屬測試涵蓋普通／小／大技能時間、
-既有 1.6 秒節奏、自動戰鬥宣告階段、長動畫阻擋 initiative、重複完成、
-切背景恢復、200 次長戰鬥清理，以及極帝天尊三招。環境沒有 Chromium，
-所以 `tests/v138-browser-smoke.js` 明確略過。GitHub Pages 第 46 次部署已於
-2026-08-27 成功，正式 `main` 提交為 `de2e5f2a5096848f376f5be84818c0002ddf76a5`；
-線上 `?audit=142` 已確認外層 loader、V131～V142 共 12 個依序載入的版本補丁、
-`js/37-v142-skill-animation.js?v=142` 與
-`css/39-v142-skill-animation.css?v=142` 全部載入，沒有任何 runtime 標記失敗。
-線上頁面沒有新增遊戲來源的 console error／warning；檢查環境顯示的兩筆 error
-來自 Chrome 擴充套件，不屬於遊戲程式。
-
-### 2026-08-27 — V141：36 項遊戲系統、戰鬥表現、深淵與合成整合
-
-**載入與檔案：**
-
-- 新增 `js/34-v141-core-systems.js`：rank、野怪、技能、掉落、護盾、音效、離線 EXP、
-  成就／任務資料與裝備冶煉能力橋接。
-- 新增 `js/35-v141-ui-battle.js`：背包、戰鬥卡牌與特效、進退場、獎勵提示、巡怪移動、
-  任務追蹤、紅點、日常副本封面／導航與各類緊湊介面。
-- 新增 `js/36-v141-content-systems.js`：完整合成四分頁與深淵五層地圖流程。
-- 新增 `css/38-v141-system-expansion.css`；由 `js/20-anonymous-20.js` 依序載入，
-  `index.html`、loader 與全部動態資源快取鍵已升至 `?v=141`。
-
-**背包、UI 與巡怪：**
-
-- 背包容量改 120 格，每頁固定 24 格、共 5 頁；隱藏格數字、禁用拖曳，角色箭頭循環，
-  物品預覽圖示縮小、文字至少 15px，放大鏡內容改為不需內捲動的乾淨排版。
-- 經驗池、元素匣、商店、離線經驗、成就、任務、圖鑑、系統、公告等介面調整字級與版面；
-  元素匣只保留剩餘時間與「觀看廣告 +8 小時」，最多累積 32 小時。
-- 巡怪角色支援點地平滑移動；左側新增可收合、可沿左邊上下拖曳且不覆蓋戰鬥資訊的任務框；
-  全頁點擊回饋、未領／未完成／未讀紅點已加入。
-- 男角舊 56×84 巡怪圖以高品質 Canvas 放大到 140×210，減少原本最近鄰造成的鋸齒；
-  但原圖細節無法憑插值真正增加，若要原生高畫質仍需補新美術（規格見 UI 指南）。
-
-**戰鬥與技能：**
-
-- 怪物長名稱／血條不再裁切；玩家名稱移到卡牌外緊貼下方；土元素行動框提高亮度與閃爍。
-- 怪物護盾技能現在具備可吸收傷害的白色護盾量條，不再只是文字／buff；護盾到期會正確移除。
-- 卡牌內新增燃燒、暈眩、冰封、石化、護盾、結界、降防、降敏、補血、復活、補品、符咒等
-  CSS＋Canvas 特效；程式化 Web Audio 依技能效果組合揮砍、命中、暴擊、元素與增減益音色。
-- 所有我方角色都能手動施放治療、復活與 buff，不再被「僅支援攻擊技能」擋住。
-- 戰鬥開始先 1 秒遮罩轉場，再由玩家下方／怪物上方進場；結束時勝方連同已死亡卡牌退場，
-  戰敗方留場，退場後才回地圖並以黑金提示顯示 EXP、金幣、物品。黃色 EXP 倍率提示已移除。
-
-**怪物、副本、數值與獎勵：**
-
-- 一般地圖怪物改明確 `rank`；每次生成獨立 10% 精英、90% 一般，絕不隨機 BOSS；
-  日常副本與深淵配置隔離。精英使用單次骰的 19% 特殊池，一次最多一項且不再掉一般低階池。
-- 怪物技能數量上限依等級為 1／2／3，技能等級依 Lv.1～20 至 Lv.81+ 固定為 Lv.1～5；
-  深淵完全排除。既有施放率、SP 與不足時普攻流程保留。
-- 一般區每區補風／土怪；日常副本元素平均錯開，BOSS 優先不同；裝備副本多 5 精英、
-  經驗副本第三場為 10 精英。日常次數限制重新啟用。
-- 離線 EXP 以帳號最高角色套用 Lv.1～10 ×1.0 至 Lv.51+ ×2.0，時間上限與共用經驗池不變。
-- EXP 曲線仍為 V139 反推曲線：總計約 69,760 場；元素匣 70%、每分鐘 5 場、每日 8 小時，
-  Lv.1→100 約 41.52 天。休息經驗維持最多 300 場，且元素匣不消耗。
-
-**日常副本、深淵與合成：**
-
-- 三個日常副本加入 16:9 封面架構、獎勵預覽／挑戰／剩餘次數與巡怪同款底部導航；
-  美術請上傳 1280×720 WebP 至 `assets/dungeons/covers/exp.webp`、`material.webp`、
-  `equipment.webp`，未補圖前以黑金漸層正常顯示。
-- 深淵共五層：點地移動、BOSS 點擊後隨機 1～3 句台詞、完整指定技能／元素／額外 HP，
-  前四層勝利後出現傳送點，第五層極帝天尊固定前排中央並優先治療／護盾；勝利後必須走到
-  深淵寶箱並點擊，才正式領取獎勵。
-- 合成頁含裝備合成、裝備冶煉、符咒合成、碎片合成四頁；材料／金幣、階級限制、詞條範圍、
-  單峰 10%、雙峰 5%、冶煉新舊結果選擇與不可累積、批量合成及系列分解均已落實。
-  圖紙資料補齊 5 部位×4 階×4 系列共 80 種；舊存檔無系列圖紙仍可選擇系列後使用。
-
-**驗證：**
-
-- `node --check` 已通過所有 V141 新增／修改 JS。
-- `tests/v137-regressions.test.js` 9 項、`v138` 10 項、`v139` 7 項、`v140` 14 項、
-  新增 `tests/v141-system-expansion.test.js` 18 項，共 58 項全部通過。
-- `git diff --check` 通過。正式 GitHub Pages 已完成部署驗證：`index.html` 正確載入
-  `js/00-main.js?v=141`、V141 三個 runtime 與 `css/38-v141-system-expansion.css`；
-  Console 沒有遊戲來源的 error／warning（僅雲端瀏覽器擴充套件自身訊息）。
-
-**已知限制：**
-
-- 原生 Canvas 2D／CSS／Web Audio 能做可辨識且輕量的特效與音效，但不是手工 Shader／音檔的
-  最終美術品質；架構已集中，可在不改戰鬥邏輯下逐步替換素材。
-- 男角 Q 版原始圖只有 56×84，現在只能高品質插值；真正改善細節必須換原生 140×210 以上素材。
-
-### 2026-08-27 — V140：四元素技能平衡定案
-
-1. 新增 `js/33-v140-four-element-balance.js`，依 patch 架構最後載入，沒有
-   直接修改 `js/00-main.js`。物理技能附帶的一般異常使用
-   `基礎機率×等級差倍率＋最終物理攻擊力×0.2－目標精神×0.3`；法術仍為
-   `基礎機率×等級差倍率＋智力×0.3－目標精神×0.3`。主角、第二／第三
-   角色與怪物施放四元素技能時都會建立正確的施法屬性上下文。
-2. 冰封／石化硬控的屬性加成分別為物理 `sqrt(最終物攻)×0.2`、法術
-   `sqrt(智力)×0.2`。既有等級差0.5～1.5、精神與額外異常抗性、一般異常
-   5%～95%，以及普通／精英／BOSS硬控5%～75%／45%／15%全部保留；
-   沒有修改冰封、石化本身的基礎機率。
-3. 水刀斬、冰霜拳、冰旋一閃、冰封重擊、水球術、洪水猛獸、冰霜箭雨的
-   吸血比例依定案更新為4～8%、4～8%、3～7%、4～8%、3～7%、4～8%、
-   1～5%，只恢復 HP。主角、第二／第三角色與怪物原有的 SP 吸取結果均
-   被阻止，戰鬥紀錄、技能列表、技能詳細與創角技能說明也改為只寫 HP。
-   吸血仍直接累加暴擊與減傷結算後的實際最終傷害，沒有另建傷害公式。
-4. 只有三招直接傷害改動：火箭17＋每級8（17/25/33/41/49）、冰霜拳
-   30＋每級8（30/38/46/54/62）、石破天驚65＋每級9
-   （65/74/83/92/101）。三招 SP 仍為8／17／42，所有技能學習點數不變。
-5. 烈焰龍捲每回合燃燒改為最大HP的3/4/5/6/8%，火鳳天鳴改為
-   5/7/9/11/13%；機率仍為30%/50%、持續2回合。暴風拳降敏改為
-   30/40/50/60/70%，其餘風系數值不變。
-6. 怒火不再用同一組數值同時加兩項：爆擊率為5/10/15/20/25%，
-   爆擊傷害為10/20/30/40/50%。戰鬥擲骰、背包詳情、技能預覽與
-   創角說明均同步。
-7. 治療術保留HP40/SP15、每級+5、既有智力與水EX加成；玩家
-   最終更正規格為「施放者本人不回SP」，對自己施放只回HP且
-   仍正常支付SP30。技能說明、預覽與等級明細均保留此限制文字。
-8. 技能結界的SP由28改為40，最多5回合、只格擋接下來5次直接
-   傷害；第6次會正常命中。燃燒等DOT會穿透且不消耗次數。結界符
-   也共用同一套效果；冰封符／隱身符的持續回合同樣改為直接讀取
-   對應技能，符咒階級本身的生效機率則保留。
-9. `rollHitChance()` 保留 `95＋命中×0.3－閃避×0.3－既有技能扣值`，只把
-   最終下限60%改成50%，上限仍99%。沒有修改敏捷、精神、其他BUFF、
-   怪物屬性或戰鬥回合。
-10. `js/20-anonymous-20.js` 將 `js/33` 接在 `js/32` 後，
-   `V_ASSET_VERSION` 與 `index.html` 的外層 loader URL 同步升為140。
-   舊版 V137～V139 測試中的快取版本與 runtime 數量斷言也同步更新。
-
-**驗證**：`tests/v140-four-element-balance.test.js` 14/14、V137 9/9、
-V138 10/10、V139 7/7 通過；所有異動 JavaScript 通過 `node --check`，
-`git diff --check` 通過。專屬測試逐項對照完整45招技能的學習點、SP、
-範圍、前置與效果，並涵蓋精確傷害／燃燒序列、七組吸血比例、三種
-硬控上限、主角／第二／第三角色／怪物吸血只回HP、怒火、治療術不回自己SP、
-結界5次直傷／DOT／符咒共用、物理／法術屬性來源、50%～99%命中範圍及
-最終傷害吸血順序。本機 Playwright 冒煙腳本因沒有 Chromium 自動略過；
-正式 GitHub Pages 已於 2026-08-27 完成部署驗證：`index.html` 正確載入
-`js/20-anonymous-20.js?v=140`，V131→V140 runtime 依序載入且 `js/33` 標記為
-完成，創角首頁可正常渲染，console 沒有新增遊戲程式錯誤。治療術自身不回SP與
-符咒共用技能效果則由上述 V140 專屬回歸測試覆蓋。
-
-### 2026-08-27 — V139：區域產出反推 EXP 曲線、休息經驗與經濟規格定案
-
-1. `js/28-v133-economy-rebalance.js` 不再使用 `400×Lv^2.5`，改以
-   「該級練功區實際平均每場 EXP × 該級目標場數」計算 `expNext`。
-   平均值直接讀 `zoneConfig` 的目前怪物編成，套用每隻怪物等級×10、
-   普通×1／精英×1.5／BOSS×3、現有總 EXP×3.5，以及前兩區平均2隻、
-   其餘區平均4.5隻的真實遭遇數。只有在資料尚未初始化的測試環境才
-   使用同一份 main 資料預算出的 fallback。
-2. 每級目標場數以少量錨點線性插值，前期快、中期漸慢、後期明顯變慢；
-   Lv.1→100 合計 **69,760 場有效戰鬥**。主要檢查點：
-   - Lv.10：2,625 EXP，約15場（區域平均175 EXP／場）
-   - Lv.30：452,800 EXP，約100場（區域平均4,528 EXP／場）
-   - Lv.50：3,328,400 EXP，約400場（區域平均8,321 EXP／場）
-   - Lv.70：10,796,400 EXP，約900場（區域平均11,996 EXP／場）
-   - Lv.80：14,112,000 EXP，約1,200場（區域平均11,760 EXP／場）
-   - Lv.90：22,669,500 EXP，約1,700場（區域平均13,335 EXP／場）
-   - Lv.99：59,640,000 EXP，約4,000場（區域平均14,910 EXP／場）
-3. 元素匣維持 70% EXP、每分鐘5場、每天8小時且不計副本／休息加成時，
-   約需99,657場實際掛機戰鬥、**41.52天**升到 Lv.100。
-4. `js/32-v139-rested-experience.js` 新增休息經驗：離線／背景每2分鐘
-   累積1場，最多300場；一般練功勝利消耗1場並把該場 EXP 變成2倍。
-   元素匣啟用期間不累積，元素匣與副本也不使用、不消耗。狀態放在獨立
-   `v139_rested_exp_state`，沒有改既有主存檔 schema；刪除所有角色後
-   重新載入會自動清除這個側邊狀態。
-5. `js/27-v132-content-expansion.js` 把經驗副本基礎獎勵改為全隊目前
-   `expNext` 平均值的11%，位於指定10～12%區間；既有廣告雙倍仍為22%。
-6. 既有野怪 EXP×3.5、普通／精英／BOSS EXP×1／1.5／3、元素匣金幣／
-   材料／掉落100%、金幣 `等級×2+3` 加±15%與普通／精英／BOSS×1／2／5
-   全數保留。商店仍只看帳號內最高角色的8階價格倍率。
-7. 一般商店只允許指定的六個藥水 ID，基礎價定案為 HP
-   10/30/50%=20/50/80、SP 10/30/50%=25/65/100；不是用「低於100%」
-   的寬鬆條件，未來新增其他恢復比例也不會意外上架。100% HP/SP 藥水仍
-   保留完整道具資料但不在一般商店顯示，可供 BOSS／副本／任務／成就等
-   稀有來源使用。
-8. `UI_GUIDELINES.md` 增加永久的模組化道具 Icon 規則：一般材料、藥水、
-   圖紙、票券、寶箱使用「分類基底＋元素標誌＋稀有度框＋特效層」，
-   重要裝備、BOSS、技能、劇情物品才優先使用獨立 PNG；100個一般道具的
-   新增素材目標控制在10～20個基礎素材。
-9. 新增 `css/37-v139-rested-experience.css`，只在既有離線經驗彈窗附加
-   休息狀態，沒有新增巢狀捲動或重做舊 UI。`V_ASSET_VERSION` 與最外層
-   loader URL 同步升為139，`js/32` 依序接在 `js/31` 後。
-10. 明確沒有修改 `js/00-main.js` 的玩家能力、技能傷害、野怪／副本怪物
-    強度、裝備屬性、戰鬥回合與既有存檔資料結構。
-
-**驗證**：所有異動 JS 與新測試通過 `node --check`；
-`tests/v139-economy-rested-exp.test.js` 7/7、V137 9/9、V138 10/10 通過，
-`git diff --check` 通過。V139 測試會直接解析目前 `js/00-main.js` 的十區
-怪物陣列後再反推，不是複製一份假設資料。當前工作環境沒有提供瀏覽器控制
-介面，因此本輪不能宣稱完成真實手機點擊回歸；休息面板的 DOM 內容、載入
-順序、狀態持久化與元素匣排除已由 Node 模擬環境驗證。
-
-### 2026-08-27 — 建立永久 UI 開發規範與雙 AI 必讀入口（文件限定）
-
-1. 新增 `UI_GUIDELINES.md`，完整記錄手機 9:16 核心安全區、圖片比例、
-   UI 元件化／狀態／tokens、降低網頁方塊感、nine-slice、技術分工、動畫、
-   效能、響應式、安全區、底部導航、美術系列一致性、UI／遊戲邏輯分離、
-   漸進整理順序及每次 UI 修改後的 12 項驗收清單。
-2. 專案原本沒有 `AGENTS.md` 或 `CLAUDE.md`；本輪各新增一份最小入口，
-   讓 GPT／Codex 與 Claude 在任何 UI、CSS、版面、美術、背包、裝備、技能、
-   戰鬥介面修改前都先閱讀 `UI_GUIDELINES.md`。規範正文不重複複製，避免
-   三份文件日後分歧。
-3. `HANDOFF.md` 的接手規則與目前狀態同步加入相同強制規則，確保即使工具
-   沒有自動載入專屬入口，也能從專案唯一交接來源看到要求。
-4. 本輪只新增／修改 Markdown 規範文件；沒有修改 HTML、CSS、JavaScript、
-   圖片、遊戲邏輯或資源版本號，也沒有開始任何 UI 重構。
-5. 初步盤點後，第一批最適合抽成共用元件的是：以同一個 `SlotBase` 衍生
-   `EquipmentSlot`／`ItemSlot`／`SkillSlot`，先在角色／裝備頁小範圍驗證；
-   接著整理 `Button` 狀態、`Panel`＋`TitleBar`＋`Dialog`、`Tab`、
-   `ProgressBar`。`BottomNav` 雖然也應共用，但牽涉兩套導覽與多層定位，
-   不適合當第一個重構試點。
-6. 目前最高維護風險是：36 份 CSS 中約 1,630 個 `!important` 形成嚴重
-   specificity／載入順序競爭；1080×1920 固定舞台外加多層 scale 座標系；
-   modal／overlay 被拆成多套容器與 runtime 搬移；角色／技能／背包樣式散在
-   `css/00`、`08`、`09`、`21`～`24`、`30`、`31`、`35`；兩套底部導航又被
-   五份 CSS 覆寫；以及 `#game-stage` 捲動區必須同步維護全域觸控白名單。
-   這些都只能逐元件收斂，不能一次全域取代。
-
-**驗證**：確認三個入口都精確引用 `UI_GUIDELINES.md`，Markdown 結構完整，
-`git diff --check` 通過；因沒有 runtime 異動，不需要提高 V138 快取版本。
-
-### 2026-08-27 — V138：戰鬥節奏、怪物編隊、副本獎勵與技能／套裝資訊
-
-本輪把使用者兩批重疊需求依後出規格整合，寶箱／抽獎券只保留「開啟／預覽」；
-副本精英最終在既有倍率上再加 HP 100%、SP 100%，BOSS 再加 HP 50%、SP 100%。
-
-1. `js/25-v131-fix-batch.js` 把有效角色／怪物的出手間隔改成 1.6 秒；一輪
-   最後一位出手至下一輪第一位出手固定總計 2 秒（0.4 秒交接＋1.6 秒首位
-   出手）。死亡角色／怪物會在排程前一次略過，不再每個空位多等 1.6 秒。
-2. 怪物編隊先依 BOSS＞精英＞普通排序，再由每排中心向兩側配置；五怪時
-   多名 BOSS 會先占中央位置。tri／row 技能仍以同一份實際編隊計算目標。
-3. 戰鬥角色與怪物卡外框改依火／水／風／土元素著色，當前角色閃框也沿用
-   元素色；怪物名稱則固定以普通白、精英橘、BOSS 桃粉識別強度。
-4. `js/27-v132-content-expansion.js` 的裝備副本固定五隻怪，BOSS 數量等於
-   當前實際玩家數，其餘全為精英；原有至少兩名 Lv.20 的開放條件不變。
-5. 經驗／材料／裝備三個已實作副本都在通過等級與背包檢查後再顯示進場
-   確認，取消不會開始戰鬥或改動副本狀態。
-6. 經驗副本基礎獎勵改為全隊每名角色目前 `expNext` 加總除以玩家數；例如
-   50,000＋60,000 的兩人隊伍會得到 55,000 EXP，不再乘舊版 10% 比例。
-7. 材料副本領獎只把材料寶箱放入背包，裝備副本只把所選抽獎券放入背包；
-   兩者均由玩家之後自行開啟。既有 all-or-nothing 容量預檢與 transaction
-   rollback 保留，背包滿時不扣箱／券、不部分塞入獎勵。
-8. 寶箱與抽獎券物品詳細只顯示「開啟／預覽」，隱藏穿戴、售出與售價。
-   寶箱預覽逐項列出 4 種礦石與 20 種設計圖的實際數量／機率；套裝券列出
-   10 件可能裝備及各 10% 機率。
-9. 副本精英相對副本普通怪的最終倍率為 HP×3.20、SP×2.00；BOSS 為
-   HP×4.50、SP×2.00。攻擊、魔攻、防禦沿用既有精英／BOSS 倍率。
-10. 技能頁的剩餘技能點改為高對比資訊條與 22px 數字；未學習技能不用先
-    開詳細視窗，即可在列表直接看到「學習需要 N 技能點」。
-11. 點擊背包或已穿戴的套裝裝備會直接顯示 `[套裝]件數/5`、三件／五件
-    效果及 `[已啟動]`／`[未啟動]`，已啟動明亮、未啟動黯淡。
-12. `V_ASSET_VERSION` 與最外層 loader URL 同步升為 138，確保手機取得
-    `js/25`、`js/27`、`css/31`、`css/33` 的新內容。
-
-**驗證**：所有 `js/` 與 `tests/` JavaScript 均通過 `node --check`；
-`tests/v137-regressions.test.js` 9/9、`tests/v138-feature-requirements.test.js`
-10/10 通過，`git diff --check` 通過。另新增 `tests/v138-browser-smoke.js`，
-涵蓋實際 DOM 樣式、物品按鈕／預覽、套裝資訊、副本確認與五怪編隊；目前
-執行環境沒有 Chromium，因此該測試明確標記 skipped，不能宣稱完成本機
-畫面點擊回歸。發布後已從正式站直接確認 `index.html`、`js/20`、`js/25`、
-`js/27` 均為 V138；雲端瀏覽器實際完成創角、進主城、開角色／技能頁，
-剩餘技能點 computed style 為 22px 金色高對比膠囊，10 筆未學技能都直接
-顯示學習成本，且未出現遊戲本身的 console error。後續要用內建加速功能
-升到副本門檻時，雲端瀏覽器控制通道持續逾時，因此寶箱／副本完整點擊流程
-仍只由邏輯測試覆蓋，不能宣稱已完成整套線上 UI 回歸。
-
-### 2026-08-27 — V137：Claude 接手範圍完整稽核與高風險回歸修復
-
-稽核範圍為 V130 基準 `77583cd` 到 Claude 最後一版 V135 `6ad4af4`，並把
-GPT 後續 V136 自動技能修復一起納入相容性驗證。V131～V135 大部分需求確實
-有落地，視覺資源引用也完整，但跨 patch 的載入順序、元素匣授權、副本結算、
-背包滿格交易與等級曲線有多個只有在邊界狀態才會出現的實質 bug。本輪修正：
-
-1. `js/20-anonymous-20.js` 把 V131～V136 runtime 改成嚴格循序載入，消除
-   async 競速造成 wrapper 順序不固定、一般戰鬥 EXP 誤套進副本等風險。
-2. `js/25-v131-fix-batch.js` 的經驗預覽改用 V133 的 `400×Lv^2.5` 曲線；
-   不再用舊的每級 ×1.2 估算，也不能預覽超過 Lv.100。
-3. `js/28-v133-economy-rebalance.js` 真正實作 Lv.100 上限，讀檔、升級與
-   分配入口都會封頂；舊版只有 Lv.1～100 曲線，實際仍能升到 101 以上。
-4. 元素匣會從存檔恢復「有剩餘時數＋自動設定已開」的 active 狀態；沒有
-   時數時，戰鬥 HUD 直接切換、重新整理後自動開戰、副本開戰三條旁路都會
-   停止自動戰鬥，不再出現不扣時數卻拿 100% EXP 的情況。
-5. `js/00-main.js` 修正第三角色升級時誤讀 `player2` 裝備，並在讀檔時一併
-   正規化第二／第三角色 HP、SP，避免舊存檔先顯示 NaN 或超過新上限。
-6. 自動 tri／row／column／all 技能不再用整份怪物陣列的中點當目標，而是
-   逐一比較實際命中數，選能命中最多存活怪物的位置。
-7. 材料／裝備副本的開放條件改成「任兩名實際角色都達 Lv.20」，不再只看
-   隊伍人數加主角等級；介面文案同步修正。
-8. 副本日期改用玩家本地日期，不再以 UTC 日期提早／延後跨日。
-9. 副本勝利不再於領獎前標記已完成；只有獎勵成功放入背包後才完成結算，
-   背包不足時保留領獎視窗，不會同時吞掉次數與獎勵。
-10. 通用背包加入改成 all-or-nothing 容量預檢；抽獎券、材料寶箱開啟使用
-    transaction rollback，滿 102 格時不會先扣券／寶箱、只塞一半獎勵。
-11. 進材料／裝備副本前先檢查最低獎勵空間；廣告雙倍若空間不足仍可退回
-    直接領取，不會形成無法關閉也無法領取的死局。
-12. 副本戰敗不再呼叫一般 `loseBattle()` 的延遲回地圖流程，修掉 2.2 秒後
-    被舊 timeout 從副本頁踢回巡怪地圖的問題。
-13. 經驗副本多階段／其他副本開戰不再每場免費補滿第二、第三角色；三名
-    角色都保留當前 HP/SP，只依最新上限夾值。
-14. 移除四個早已不存在的舊自動設定 DOM 綁定，瀏覽器 console 不再每次
-    開啟遊戲都印出假錯誤，避免掩蓋真正的 runtime 問題。
-
-新增 `tests/v137-regressions.test.js`，目前 9 項測試涵蓋循序 loader、V133
-EXP 預覽與 Lv.100、防背包部分寫入、本地日期、雙 Lv.20、副本與角色關鍵
-路徑、六怪 tri 選位、第三角色裝備，以及 V136「SP 足夠卻錯排普通攻擊時
-校正回已選技能」。所有 JS 與測試通過 `node --check`，測試 9/9 通過，
-`git diff --check` 通過；另以實際瀏覽器檢查角色／技能頁與全屬性技能預覽，
-未重現持續性的疊字、破圖或返回鍵消失。
-
-**仍需留意**：更新前已經只剩 `autoConfig.skill="normal"`、且沒有保存過
-`v136LastSkill` 的舊存檔，無法安全猜回玩家以前選哪個技能，仍需玩家重新
-選一次。全屬性技能預覽的特定手機慣性捲動破圖仍未能重現，若再出現需要
-螢幕錄影與機型／瀏覽器版本。
-
-### 2026-08-26 — V136：自動技能立即存檔、阻止設定被洗回普攻、補齊最外層快取失效
-
-新增 `js/31-v136-auto-battle-fix.js`，並接進 `js/20-anonymous-20.js`；
-`V_ASSET_VERSION` 升到 `136`，同時把 `index.html` 載入 loader 的網址改成
-`js/20-anonymous-20.js?v=136`。這一輪沒有修改 `js/00-main.js`。
-
-1. **修掉 loader 自己沒有版本號的根本快取漏洞**：V134/V135 雖然已經讓
-   loader 內部的子資源統一跟著 `V_ASSET_VERSION`，但 loader 本身仍是
-   無版本網址。手機只要快取舊 loader，就永遠看不到新常數與新 patch。
-   V136 從 `index.html` 最外層強制刷新 loader，確保實機能真正拿到修正。
-2. **自動行動選擇改為當下立即存檔**：玩家在自訂下拉選單點到技能時，
-   立刻同步 `autoConfig` 並呼叫 `saveGame()`，不再只等最後的「套用並啟動」。
-   套用按鈕另加 capture 階段保險，因此元素匣時數／廣告 wrapper 提前 return
-   時，已選的技能也不會整筆消失。
-3. **記錄玩家明確意圖**：每個角色會保存 `v136ActionIntent`（普通攻擊／
-   防禦／技能）與 `v136LastSkill`。舊版 `populateAutoSkillOptions()` 同步若把
-   一個仍然已裝備、已學會且可自動施放的技能誤洗成 `normal`，V136 會恢復
-   玩家最後明確選過的技能；玩家若明確選普通攻擊，絕不會被自動改成技能。
-4. **以實際排入行動佇列的結果做最後校正**：只有在技能存在、已裝備、
-   已學會、類型允許且目前 SP 足夠時，若舊引擎仍排入 `normal`，才把
-   `queuedPlayerActions` 校正回玩家選的技能。任何合法限制都不會被繞過。
-   同時補上舊引擎缺少的「仍在裝備欄」檢查，避免殘留設定反過來施放未裝備
-   的技能。
-5. **所有普通攻擊都有可辨識原因**：設定本身是普通攻擊時會明確提示
-   「SP充足不會自動改放技能」；SP不足會顯示目前值／技能消耗；未裝備、
-   未學會、資料遺失、類型不支援也各有獨立訊息。`js/30-v135-fixes.js`
-   在 V136 存在時會停止舊回饋層，避免相同訊息重複兩次。
-
-**驗證**：異動的三支 JS 全部通過 `node --check`，`git diff --check`通過；
-另用 Node 最小戰鬥環境逐項執行真正的 V136 wrapper，確認：(a) SP 足夠但
-舊引擎錯排普攻時會校正成技能、(b) SP 5／消耗15時維持普攻並印出5/15、
-(c) 玩家明確選普通攻擊時不擅自換招、(d) 舊同步把有效技能洗成 normal
-時會恢復、(e) 下拉選技能當下立即落盤、(f) 未裝備技能被阻擋。這個執行
-環境沒有可用 Chromium，因此本輪沒有宣稱做過完整畫面點擊回歸。
-
-**既有存檔限制**：如果舊版已經把設定永久存成 `normal`，而存檔裡完全沒有
-留下先前選過哪個技能，程式無法安全猜測玩家原本想選哪招（因為也有人會
-刻意選普通攻擊）。更新到 V136 後需在元素匣重新選一次技能；從這次開始
-會記住明確意圖，不會再發生同一種資料遺失。
-
-### 2026-08-26 — V135：自動戰鬥回饋改「看結果」、技能作用對象標示、護盾滿血顯示、節奏統一1.25秒
-
-新增 `js/30-v135-fixes.js` ＋ `css/36-v135-fixes.css`（已接進 loader，
-`V_ASSET_VERSION` 一併升到 `135`）。
-
-1. **「我很確定有SP，自動戰鬥還是使用普通攻擊」**：⚠️ **在乾淨環境下
-   重現不出來**。試過四種情境（單角色、第二角色、走真正的元素匣面板
-   設定、存檔→重新載入的往返）全部都正常放技能，`syncBattleAutoSettings()`
-   也沒有把設定洗掉。
-
-   **但這一輪找到了 V134 做法本身的缺陷並修好**：V134 是在原函式跑
-   「之前」自己複製一份引擎的四個判斷條件去**預測**會不會退回普攻。
-   只要引擎因為某個沒被複製到的理由退回，預判就會全部通過、什麼都
-   不印——玩家看到的還是莫名其妙的普攻。使用者這次的回報正是這種
-   對不上的情況（SP 明明夠，所以 SP 判斷不會觸發）。
-   V135 改成**完全以實際結果為準**：先記下玩家設定的技能，讓原函式
-   照常跑，跑完直接看 `queuedPlayerActions` 裡實際排進去的行動是什麼。
-   只要「設定的是技能、實際排進去的卻是普通攻擊」就一定會印說明——
-   能對上已知原因就印具體原因，四個都對不上就明講**「原因不明」並
-   附上等級／SP／類型等判斷數值**，請使用者把那一行回報回來。
-   這樣不管引擎為什麼退回，都不會再有靜默失敗。
-   （V134 那段預測式的邏輯已從 `js/29` 整段移除，避免兩份同時印重複訊息。）
-
-2. **技能要顯示作用對象與數量**：新增 `getSkillTargetScopeLabel()`，
-   對照 `js/25` 的 `getSkillTargets()` 實際行為（那才是真正決定打到誰
-   的地方）產生標籤：`single`→敵方一人、`tri`→敵方三人・同排左中右、
-   `row`→敵方整排、`all`→敵方全體、`ally`→我方一人、`allyAll`→我方全體、
-   `deadAlly`→我方陣亡一人、`none`→自身。三個地方都補上：
-   - 手動戰鬥的技能格（`populateSkillQuickBar` 包一層，在消耗SP上面加一行）
-   - 自動戰鬥設定的技能下拉（選項文字後面加註記）
-   - 選好技能跳到選目標時的提示列（`setBattleTargetSelectionMode` /
-     `setBattleAllyTargetSelectionMode` 包一層）
-   符咒也一併支援（它們不在 `skillDatabase` 裡，所以 `js/27` 多暴露了
-   一個 `window.v132GetTalismanDefinition` 給這邊查）。
-   **踩到的坑**：`#autoSettingsActionSelect` 這幾個 `<select>` 開場就被
-   `initCustomDropdown()`/`makeSelectValueReactive()`（`js/00-main.js:4326`）
-   換成了自訂的假下拉，畫面上看得到的是另外渲染的那份清單，而它**只有
-   在 `.value` 被設定時才會重新渲染**——只改 `<option>` 的文字完全不會
-   反映到畫面上，必須在改完文字後重新指派一次 `.value` 觸發重繪。
-   另外標籤刻意不用括號寫「（同排左中右）」而是用中點，否則在下拉裡會
-   變成「冰旋一閃（敵方三人（同排左中右））」這種巢狀括號很難讀。
-   註：存檔存的是 `<option>` 的 value（技能id）不是顯示文字，所以加註記
-   不會影響存檔或 `stillValid` 判斷。
-
-3. **護盾在滿血時看不到**：根因是 `updateSingleCharacterBars()`
-   （`js/00-main.js:22793`）把血條寬度算成 `hp/maxHP`，護盾則是
-   `left=hpPercent`、`width=shield/maxHP`，兩者共用同一個 maxHP 基準
-   而且護盾是「接在血條右邊」畫的——滿血時 `hpPercent` 正好 100，
-   護盾起點被推到血條最右緣之外，又因為 `.hp-bar` 是 `overflow:hidden`，
-   整段白色護盾直接被裁掉。依使用者指定的做法修：血條和護盾改成放進
-   同一個「總長度」按比例分配（總長 = maxHP + 護盾量），滿血時血條會
-   往左縮、空出的位置正好塞下等值護盾，兩段加起來剛好填滿整條。
-   沒有護盾時分母就是 maxHP，行為跟原本完全一樣。
-   實測：maxHP 1100、滿血、護盾 550 → 血條 66.67%、護盾 left 66.67%
-   寬 33.33%；沒護盾且剩 40% 血 → 血條 40%、護盾 0%（維持原樣）。
-
-4. **所有出手／回合間隔統一 1.25 秒**：`V131_RESOLVE_DELAY_MS`
-   1500→1250，技能名稱徽章壽命跟著 1200→1000（必須小於間隔，否則上一位
-   的特效會跨到下一位出手）。
-   **另外修好一個原本就存在、這次量測才發現的不一致**：只把那個常數
-   改掉還不夠準——宣告階段本身也會花時間（每個自動角色會經過
-   `beginCharacterTurn` 的 150ms 自動出手延遲，加上 `finishPlayerAction`
-   宣告分支的 `BATTLE_DECLARE_ADVANCE_MS` 90ms），所以「回合開始→第一位
-   出手」實際上會變成 1250+240≈1500ms，跟其他每步對不齊（實測第一步
-   1507ms、後面每步 1255ms）。改成以「這一回合開始的時間點」為錨：
-   等待時間 = 1250 −（宣告階段已花掉的時間），不足就不再等。
-   實測修好後整場每一步都是 1252~1257ms，完全一致；宣告階段若本身就
-   超過 1.25 秒（手動角色思考很久），等待會變成 0，玩家一按完就立刻
-   結算，不會再無謂多等。
-
-**驗證**：`node --check` 全部通過、Playwright 全程零 `pageerror`；
-上述每一項都有實測數字（見各項說明）；並且回歸驗證了 V134 的四項行為
-（手動角色指令列會顯示、符咒動畫落在各自卡片 `[0,1]`、庫存預留、
-背包返回鍵三條路徑）都沒有被這次改動破壞。
-
-**已知限制**：第 1 點沒有真正重現，只是把「靜默失敗」變成「一定會說明
-原因」。需要使用者清快取後再跑一次，把戰鬥紀錄裡那行 ⚠️ 回報回來才能
-定位。（也有可能上次回報時使用者仍在跑 V133 的舊快取，因為 V134 的
-版本號修正正是那一輪才合併的。）
-
-### 2026-08-26 — V134：修復 6 項回報問題（其中 2 項的真正原因是快取版本號忘了加）
-
-使用者回報 6 個問題。**調查後發現其中至少 2 項根本不是新 bug，而是使用者
-的瀏覽器從來沒拿到先前已經合併的修正**——詳見上方「系統架構重點」1.2 節
-新增的那段。這次除了修 bug，也把版本號機制化（單一常數）避免再犯。
-
-1. **刪除角色後副本次數沒有重置**：副本每日次數存在**獨立的 localStorage
-   key**（`v132_daily_dungeon_state`），而刪角色用的 `resetGame()`
-   （`js/00-main.js:6907`）只清 `SAVE_KEY` 跟兩個舊版存檔 key，從來沒碰過
-   這個 key。修法刻意**不去包 `resetGame()`**（它是先 `confirm()` 再
-   `location.reload()`，包在外面會變成「使用者按取消、資料卻已被清掉」），
-   改成在 `js/27` 載入時判斷「目前完全沒有任何角色」（reload 後 `loadGame()`
-   找不到存檔，`player.id` 是空字串）就順手清掉這個 key 跟
-   `v131_element_box_state`。
-2. **副本次數限制要維持關閉**：上一版只在「寫入」端（`markDungeonUsed`）
-   擋了 `DUNGEON_DAILY_LIMIT_ENABLED` 旗標，**「讀取」端（`isDungeonAvailable`
-   跟 `dungeonEntryCard`）沒擋**——所以旗標關掉之前就已經存進去的
-   `used:true` 會繼續讓按鈕永久 disabled 到隔天。新增 `isDungeonUsedToday()`
-   讓讀寫兩端都看旗標，並把畫面底部那行寫死的「每日只能挑戰1次」也改成
-   跟著旗標切換文案（關閉時顯示「⚙️ 測試模式」），不再自相矛盾。順手把
-   經驗副本卡片上還寫著舊公式「50%」的說明更新成 V133 的實際值（10%）。
-3. **戰鬥「空拍很久」**：真正原因是 `updateActionHudVisibility()`
-   （`00-main.js:31898`）**從來沒有被 `beginCharacterTurn()` 呼叫過**——
-   全專案只有 `startTurn`（此時 index 恆為 0）、`startResolutionPhase`、
-   `toggleAutoBattle` 三處會呼叫。所以只要 0 號自動、1／2 號手動，指令列
-   在回合一開始就被判定隱藏，之後整個宣告階段都不再更新：輪到手動角色時
-   玩家**看不到任何按鈕**、什麼都不能做，只能乾等 `beginCharacterTurn`
-   裡那個 20 秒倒數跑完才跳「⏰ 時間到」。一個手動角色 20 秒、兩個就 40 秒。
-   修法是包一層 `beginCharacterTurn()`，在原函式跑完後補呼叫一次
-   `updateActionHudVisibility()`。依使用者決定 **20 秒倒數本身保留不動**。
-   另外把技能名稱徽章壽命從 2200ms 收到 1200ms——原本比每步 1500ms 還長，
-   上一位的特效會跨到下一位出手，看起來會「疊在一起、怪怪的」。
-4. **符咒沒問目標、三個人用卻只有一個人在用**：三個獨立的 bug。
-   (a) `useTalisman()` 跳過了遊戲既有的選目標流程，直接寫死
-   `{target:null}`，`applyTalismanEffect()` 則是冰封符**隨機**挑一隻怪、
-   隱身/結界符寫死只給施法者自己。依使用者決定「完全比照技能」，改成接上
-   既有的 `setBattleTargetSelectionMode`／`selectBattleTarget`（選怪）與
-   `setBattleAllyTargetSelectionMode`／`selectBattleAllyTarget`（選我方），
-   不自己造一套 UI。**踩到的相容性坑**：`selectBattleTarget()` 完全不查
-   `skillDatabase`，所以選怪那條路直接就能用符咒 id；但選我方那條路
-   （`setBattleAllyTargetSelectionMode`／`selectBattleAllyTarget`）跟
-   `getBattleActionDisplayName()` 都會查 `skillDatabase[actionType]` 並
-   要求 `targetType` 是 ally，符咒 id 查不到就整個失效——所以額外覆寫了
-   這三個函式，遇到符咒 id 時改用一個「長得像技能」的合成物件走同一套判斷。
-   (b) **「只有一個人在用」的真正原因是動畫打錯卡片**：
-   `lungePlayerCard()` 跟 `showSkillNameBadge()` 的最後一個參數都是
-   `characterIndex`（內部 `$("battlePlayerCard"+(characterIndex||0))`），
-   原本兩個呼叫都**沒有傳**，所以不管誰施放，特效永遠演在 0 號卡片上。
-   二三號角色其實有正常結算（log 有印、buff 有上），只是畫面看起來像沒用。
-   （同一個函式裡的 `showMissEffect()` 本來就有正確傳，所以「畫符失敗」
-   反而一直演在對的卡片上，剛好是對照組。）
-   (c) 庫存沒有預留：宣告時只檢查不扣、結算才扣，只有 1 張符咒時三個人
-   都能宣告，結果先手用掉、後面兩位白白浪費回合。改成宣告時把「這回合
-   其他角色已經預定的數量」也算進去。
-   (d) 背包裡點符咒會跳出一顆**騙人的「穿戴」按鈕**（按了因為
-   `getInventoryEquipmentSlot("talisman")` 查不到欄位而靜默失敗）——
-   依使用者決定「符咒不能在戰鬥外使用」，只把這顆按鈕藏掉。
-5. **元素匣設定出招卻一直普通攻擊**：`autoActionForCharacter()`
-   （`00-main.js:20239-20249`）有 4 個條件會把設定好的技能默默丟掉退回
-   普攻，而且**一行戰鬥紀錄都不寫**。其中最常見的是 **SP 不足**——自動
-   戰鬥路徑已經把喝藥邏輯整個移除，戰鬥中完全沒有任何 SP 回復，
-   `applyPostBattleAutoRecovery()` 又只在戰鬥結束後且身上有藥水才補，
-   所以 SP 一見底就永遠退回普攻。對照組：手動路徑的 `castDamageSkill()`
-   **會**印「SP不足，改用普通攻擊。」，只有自動路徑是靜默的。
-   依使用者決定 **不自動喝藥、只把原因寫出來**，現在會印出例如
-   「⚠️ 主角ASP不足（5/15），無法使用「會心一擊」，改用普通攻擊。」
-   （並且用 lastReason 去重，長時間掛機不會洗版）。
-   **另外查證推翻了一個原本以為要修的東西**：本來以為
-   `populateAutoSkillOptions()` 少濾 heal/revive 是個 bug，實際 grep 發現
-   它操作的 `#autoSkillHome`／`#autoSkillBattle`／`#autoEnabled` 在現在的
-   `index.html` 裡**根本不存在**（這也正是 console 一直在印「找不到元素：
-   autoSkillHome」的原因），是舊版主城面板的殘留死程式碼；玩家真正在用的
-   `#autoSettingsActionSelect` 由 `switchCharacterTab`/`switchAutoSettingsCharacter`
-   填充，**本來就有**正確濾掉 heal/revive。所以沒有加多餘的修正，只在
-   `js/29` 留下註解說明查證結果。
-6. **背包沒有返回鍵**：`#inventoryPage` 唯一的關閉鍵
-   `#mapInventoryOverlayClose` 被 CSS（`css/00-main.css:5604`）綁死只在
-   `.map-inventory-overlay-open` 這個 class 存在時顯示，而那個 class
-   **只有 `openMapInventoryOverlay()` 會加**。背包有三種進入方式，只有
-   「從地圖頁」那種會加——使用者截圖是從**下方導覽列**進去的，那條路徑
-   完全沒有任何返回控制項。（這也解釋了上一輪我「找不到、無法重現」——
-   當時只測了地圖覆蓋層那條路徑。）修法：CSS 改成在 `#inventoryPage` 一律
-   顯示（視覺完全沿用原本那組），JS 依使用者決定「返回上一個頁面」，包一層
-   `showPage()` 記錄前一頁，按鈕行為改成三選一：覆蓋層開著→關覆蓋層／
-   背包被借進角色彈窗→關彈窗／否則→回上一頁。**這裡踩到一個坑**：
-   一開始「有沒有被借進彈窗」是用「彈窗是不是可見」判斷，太寬鬆——只要
-   畫面上剛好有任何 home-feature 彈窗開著（即使跟背包無關），按返回就只會
-   關掉那個不相干的彈窗、背包頁留在原地（實測重現）。改成用
-   `homeFeatureModalBody.contains(inventoryPage)` 檢查真正的父子關係才精準。
-
-**新增檔案**：`js/29-v134-fixes.js`、`css/35-v134-fixes.css`
-（已接進 `js/20-anonymous-20.js` 的 loader）。
-
-**驗證方式**（全部 Playwright 實測，零 `pageerror`）：
-- 版本號：確認 4 個 loader 注入的 script/link 全部帶 `?v=134`，
-  sprite chunk 正確維持釘死舊版本，`js/00-main.js?v=132` 確認內容真的
-  沒變過所以不用動
-- 副本次數：先把 `v132_daily_dungeon_state` 寫成三個都 `used:true` 再
-  reload，確認三張卡片都沒有「今日已完成／今日已挑戰」、`disabled` 數為 0、
-  有「測試模式」字樣；再用**真正的 `resetGame()`**（不是手動刪 key——
-  手動刪會被 unload 時的自動存檔重新寫回去，這點也踩過）確認刪角色後
-  兩個側邊 key 都被清乾淨
-- 戰鬥空拍：0 號自動、1 號手動，實測輪到 1 號時
-  `battleCommandRow.classList.contains("battle-hud-hidden")` 為 **false**
-  （修好前會是 true → 乾等 20 秒）
-- 符咒：冰封符進入選怪模式（提示正確顯示「選擇 [極品冰封符]」而不是
-  原始 id、3 隻怪都可選）→ 指定第 3 隻 → 結算後**只有那隻**被冰封、
-  另外兩隻沒有；結界符進入選我方模式 → 副手B 指定給 主角A → 結算後
-  buff 正確落在 主角A 身上而不是施法者；動畫參數實測為 `[0,1]`
-  （修好前是 `[undefined,undefined]` 全部落在 0 號卡）；只剩 1 張符咒時
-  第二個人被正確擋下並提示「剩下的數量已經被這回合其他角色預定了」
-- 自動出招：SP 不足／未學會／治療類三種情境都會印出對應的 ⚠️ 說明，
-  SP 足夠且已學會時不會印、且技能正確進入 `queuedPlayerActions`
-- 背包返回鍵：下方導覽列路徑有返回鍵且回到上一頁（training）；地圖覆蓋層
-  路徑仍正常關閉覆蓋層並留在 mapPage；借進角色彈窗時正確關閉彈窗
-- 回合節奏回歸：重新量 `addBattleLog()` 時間戳，連續 3 回合每一步都穩定
-  落在 ~1.5 秒，確認這次的 `beginCharacterTurn` 包裝沒有破壞既有節奏
-
-**已知限制**：`console` 仍會印「找不到元素： autoSkillHome / autoEnabled /
-hpUsePctHome / spUsePctHome」這幾行——那是上面第 5 點查到的舊版主城自動
-面板殘留死程式碼在找已經不存在的元素，無害，這次沒有動它（清理它屬於
-獨立的技術債整理，不在這輪範圍）。
-
-### 2026-08-26 — V133：經濟／養成全面重新設計（升級曲線、掛機EXP效率、經驗副本、精英/BOSS倍率、商店價格階級、藥水配置）
-
-使用者這輪給了非常precise的12點規格，核心目標是「滿等約3個月掛機量＋
-自動掛機EXP 70%＋經驗副本一天約10%一級＋商店看最高角色等級＋移除
-常態100%補品」。新增`js/28-v133-economy-rebalance.js`（+
-`css/34-v133-economy-rebalance.css`）承載大部分改動，`js/25`/`js/27`
-各自小幅擴充既有相關函式，**完全沒有動到**玩家戰鬥能力公式、技能
-傷害、野怪強度公式、副本怪物強度、裝備屬性、材料/裝備掉率、戰鬥
-回合邏輯這些明確禁止的範圍。
-
-1. **Lv.1~100升級曲線重做**：原本`checkLevelUp()`裡`expNext`是
-   「複利×1.20」，換掉不用，改成純次方曲線`expNext(Lv)=
-   round(400×Lv^2.5)`（`js/28`的`getExpNextForLevel()`）。用「正常
-   練功一場戰鬥平均EXP≈105×怪物等級」（3隻怪×等級×10×既有3.5倍
-   加成）反推，全程Lv.1→100總場數≈150,481場，跟使用者要求的
-   150,000場幾乎精確吻合，各區間場數分布（1~20約2,898、21~40約
-   13,006、41~60約27,476、61~80約45,214、81~100約61,886）本身就
-   自然呈現「前期快、後期非常慢」，81~100單一區間就佔了超過4成的
-   總場數。腳本載入當下會立刻依照角色「目前等級」重算一次
-   `expNext`（不管是舊存檔還是新角色都會校正，不會動到exp/金幣/
-   裝備等其他任何欄位），之後每次真的升級，覆寫`checkLevelUp()`
-   讓它照舊跑完全部原本的邏輯（attributePoints/skillPoints/
-   bonusHP/bonusSP/升級提示完全不變）之後，只把`expNext`蓋成用
-   新公式重算的值。
-2. **元素匣（自動掛機）EXP降為70%**：`js/25`的`winBattle()` override
-   新增`ELEMENT_BOX_EXP_RATIO=0.70`，只影響最終灌進`sharedExp`的
-   EXP，金幣/掉落/材料是完全獨立的函式，這裡沒有動到，維持100%。
-3. **精英/BOSS戰鬥EXP倍率**：`js/25`新增
-   `getMonsterExpRankMultiplier()`（普通×1／精英×1.5／BOSS×3），
-   跟既有3.5倍加成疊乘（不是額外多加一次3.5，使用者明確要求3.5
-   保留不能再疊加）。
-4. **經驗副本EXP降為約10%**：`js/27`的`getExpDungeonRewardExp()`
-   新增`EXP_DUNGEON_REWARD_RATIO=0.10`，原本「隊伍平均expNext」
-   （單人隊伍等於100%）乘上這個比例，廣告雙倍沿用既有×2邏輯，
-   兩個相乘正好是「正常≈10%、雙倍≈20%」。
-5. **金幣掉落rank倍率調整**：`js/28`覆寫`getMonsterGoldDrop()`，
-   精英倍率3→2、BOSS倍率8→5，基礎公式（等級×2+3，±15%浮動）
-   完全沒改。
-6. **商店價格改用「帳號內已建立角色的最高等級」**：新增
-   `getHighestCreatedCharacterLevel()`（掃過`player`/`player2`/
-   `player3`取最高`.level`），`getShopPriceTier()`依這個等級對應
-   8個級距（Lv.1~30×1、31~40×1.5、41~50×2、51~60×2.5、61~70×3、
-   71~80×3.5、81~90×4、91~100×4.5），全部乘完四捨五入成整數。
-   完全覆寫`renderShopContent()`／`buyShopItem()`（因為原本
-   `const shopItems=potionDefinitions`是同一個陣列參照，沒辦法從
-   外面重新賦值成過濾後的新陣列，只能整個蓋掉這兩個函式），畫面上
-   補一行「目前商店階級：LvX～Y（價格×N）」。
-7. **藥水重新整理**：`potionDefinitions`陣列（`const`但可變）
-   push進兩個新的30%階（`hpPotion30`/`spPotion30`），價格用10%跟
-   50%基礎價格的「每%單價」線性內插算出中間值再湊整到5的倍數
-   （HP：20/10=2.0與80/50=1.6內插出30%≈1.8→55；SP：25/10=2.5與
-   100/50=2.0內插出30%≈2.25→70），單位價格10%>30%>50%、單瓶價格
-   10%<30%<50%，符合「大容量藥水單位有優惠、但單瓶最貴」的要求。
-   `renderShopContent()`/`buyShopItem()`改成只列出
-   `recoveryPercent<100`的項目，`hpPotion100`/`spPotion100`這兩個
-   道具定義完全沒有從`potionDefinitions`刪除（之後BOSS掉落／副本
-   獎勵／任務獎勵／成就獎勵等系統要發放這兩個id一樣能正常運作），
-   只是玩家沒辦法在商店直接花錢買到；城鎮／休息功能是另一套獨立
-   邏輯（直接灌滿HP/SP，不經過potionDefinitions），完全沒有被動到。
-8. **預留未來金幣消耗系統**：新增`v133SpendGoldForFutureSystem(amount)`
-   （扣錢＋防呆＋存檔的共用工具函式），之後要加裝備強化/製作/洗鍊/
-   合成/材料升階這些玩法，直接呼叫這個就好，這次不實作實際玩法
-   本身。
-
-**驗證方式**（全部用Playwright實際呼叫真正的遊戲函式量出來，不是
-純理論算式）：
-- `node --check`全部改動檔案語法通過
-- 升級曲線checkpoint（真的從遊戲裡的`v133GetExpNextForLevel()`
-  讀出來）：
-
-  | 等級 | 升級所需EXP | 約需場數（該等級） |
-  |---|---|---|
-  | Lv.1 | 400 | 4 |
-  | Lv.10 | 126,491 | 120 |
-  | Lv.30 | 1,971,801 | 626 |
-  | Lv.50 | 7,071,068 | 1,347 |
-  | Lv.70 | 16,398,537 | 2,231 |
-  | Lv.80 | 22,897,336 | 2,726 |
-  | Lv.90 | 30,737,339 | 3,253 |
-  | Lv.99 | 39,007,487 | 3,753 |
-
-  全程總場數≈150,481場；換算天數（1分鐘5場＋元素匣70%效率＋
-  每天掛8小時）≈**89.6天**，幾乎精確命中使用者要求的「約90天」；
-  24小時極端掛機≈29.9天（約1個月，明確超過「一兩週」下限）；
-  純手動100%效率、每天8小時≈62.7天（比掛機快，符合「手動比掛機
-  有效率」的合理設計）。
-- `checkLevelUp()`實測：Lv.1角色灌好剛好升1級的EXP，升級後
-  `expNext`正確變成`getExpNextForLevel(2)=2263`，跟新公式完全一致。
-- 精英/BOSS戰鬥EXP實測：Lv.20怪物，普通拿700、精英拿1050
-  （精確1.5倍）、BOSS拿2100（精確3倍）。
-- 元素匣70%EXP實測：透過真實UI流程（點浮動元素匣按鈕→套用並
-  啟動）啟動元素匣後打贏一場戰鬥，正常怪拿到490（700×0.7精確
-  等於490，過程中抓到並修正一個真的存在的浮點數誤差——
-  `700*0.7`在JavaScript裡運算結果是`489.999999...`，原本用
-  `Math.floor`會誤扣1點變成489，改用`Math.round`後精確拿到490）。
-- 金幣掉落rank倍率實測：Lv.20怪物（固定variance=1.0排除隨機浮動）
-  普通43、精英86（精確2倍）、BOSS215（精確5倍）。
-- 商店階級實測：Lv.30角色顯示「Lv.1～30（價格×1）」、Lv.71角色
-  顯示「Lv.71～80（價格×3.5）」；雙角色Lv.80+Lv.10混合隊伍，商店
-  正確顯示「Lv.71～80（價格×3.5）」（`v133GetHighestCreatedCharacterLevel()`
-  回傳80，不是平均或目前選中角色），確認不會被低等角色拖累價格。
-- 購買實測：Lv.71角色（×3.5階級）買2瓶HP10%藥水，實際扣款140
-  金幣，精確等於`20×3.5×2`。
-- 藥水配置實測：商店同時列出HP/SP的30%階（`回復30%HP藥水`/
-  `回復30%SP藥水`都在），完全沒有列出100%階（`回復所有HP`/
-  `回復所有SP`都不在畫面裡）；`potionDefinitions`陣列本身
-  `hpPotion100`/`spPotion100`兩個道具定義都還在（`.some()`確認
-  存在），只是商店渲染時被過濾掉，陣列長度正確是8（原本6個+
-  新增2個30%階）。
-
-**已知限制**：這次只驗證了各項改動點本身的數值正確性，沒有重新
-跑一次完整的長時間掛機模擬（不可能真的模擬89天遊戲時間），89.6天
-這個數字是用實際遊戲公式算出來的推算值，不是實測值；也沒有測試
-「BOSS掉落/副本獎勵/任務獎勵/成就獎勵」實際發放100%藥水的流程
-（這次規格只要求道具資料保留，沒有要求新增這些發放來源本身）。
-
-### 2026-08-26 — 寶箱改自主開啟、經驗副本公式修正、套裝顯示、回合節奏補完整、副本次數暫關
-
-使用者這輪一次提出6點（第4點沒有實際內容）：
-
-1. **副本寶箱領取時不應該直接開啟，要放進背包給玩家自己開**：材料副本
-   原本「直接領取」按下去就會馬上骰完材料塞進背包。改成`v132ClaimMaterialDungeonReward()`
-   只把「材料寶箱」這個新物品（`type:"chest"`，可堆疊）放進背包，真正
-   骰礦石/設計圖紙階級延後到玩家自己在背包點開、按「開啟」才進行
-   （`openSingleMaterialChestFromInventory()`，內部重用`rollMaterialChestRewards()`
-   跟原本`openMaterialChests()`同一套機率邏輯，只是改成一次開一個）。
-   裝備副本原本就已經是這個行為（`v132ClaimEquipmentDungeonReward()`本來
-   就只是把抽獎券放進背包，`useEquipmentTicket()`才是真正開），這次沒動。
-2. **寶箱/抽獎券點開要有「開啟／預覽／出售」三顆按鈕**：擴充`openItemModal()`
-   的覆寫，`item.type`是`chest`或`ticket`時把「穿戴」按鈕整個藏起來
-   （`style.display="none"`），額外插入「開啟」（呼叫既有的
-   `useEquipmentTicket()`/新的`openSingleMaterialChestFromInventory()`）
-   跟新的「預覽」按鈕（`showItemPreview()`，重用`v132ShowRewardModal()`
-   彈窗顯示可能開出的內容跟機率，不用另外做一整套新UI）；「售出」是
-   物品彈窗本來就有的通用按鈕，不用額外處理。
-3. **經驗副本結算公式重寫**：原本用一個這個專案裡根本不存在的
-   `getExpToNextLevel()`（永遠落到備援值「等級×100」），乘0.5當獎勵。
-   使用者指出這個數字其實已經存在角色物件的`character.expNext`欄位裡
-   （`js/00-main.js`的`checkLevelUp()`每次升級都會更新這個值，代表
-   「升下一級還需要多少經驗」）。新公式：`getExpDungeonRewardExp()`＝
-   隊伍每個角色的`expNext`加總、除以角色人數，不再乘0.5。
-4. **套裝效果要在點擊裝備時顯示**：`openItemModal()`/`openEquippedItem()`
-   都補上`appendEquipmentSetInfo()`，只要點到的物品有`setId`（不管穿在
-   身上還是還在背包裡），就在物品詳細彈窗stats區塊後面附加「[套裝名]
-   目前件數/5」跟兩行套裝加成說明，達成門檻的那行用`.v132-set-bonus.active`
-   （亮色+粗體+「[已啟動]」），沒達成用`.v132-set-bonus.inactive`
-   （暗色+「[未啟動]」），跟使用者給的範例格式完全對齊。
-5. **副本每日次數限制暫時關閉**（方便使用者頻繁測試）：新增
-   `DUNGEON_DAILY_LIMIT_ENABLED=false`常數，`markDungeonUsed()`在關閉時
-   直接跳過（不寫入`dungeonState.used`），連鎖讓UI的「今日已挑戰」
-   停用樣式也不會出現，之後要恢復每日限制只要把這個常數改回`true`，
-   不用動其他地方。
-6. **怪物之間的出手間隔也要固定1.5秒，包含「進入戰鬥→第一下出手」跟
-   「下一回合開始→第一下出手」這兩個原本被漏掉的節點**：根因是
-   `startResolutionPhase()`宣告階段一結束，會馬上同步呼叫
-   `processNextCombatant()`開始結算第一位角色，中間完全沒有停頓
-   （跟其他每一位角色出手之間、由`finishPlayerAction()`負責的1.5秒
-   完全不一樣）。修法：在`js/25-v131-fix-batch.js`新增一組標記式覆寫
-   ——`startResolutionPhase()`被呼叫、而且這次真的會執行（比照原本
-   函式自己的`resolutionPhaseStarted`防重複判斷）時，架一個旗標；
-   `processNextCombatant()`只在偵測到這個旗標時，才把「真正執行」包進
-   `setTimeout(...,1500ms)`延後，消費掉旗標後不影響同一回合裡後面
-   正常的呼叫。**這裡踩了一個量測方法的坑，記錄下來給下一個人參考**：
-   一開始直接量測「連續兩次`processNextCombatant`呼叫之間的時間差」，
-   結果看起來像是「某些地方變成雙倍延遲（~3秒）、某些地方完全沒延遲
-   （~250ms）」，一度以為修法本身有bug——後來改成量測`addBattleLog()`
-   實際寫入戰鬥紀錄的時間點（也就是玩家「真正看到」動作發生的時刻）
-   才發現：因為新的延遲是「呼叫當下就return、setTimeout到時間才真正
-   執行」，呼叫時間點本身沒有意義，量呼叫間隔會被延遲的先後順序搞亂；
-   量真正可見的動作時間點，節奏完全正確（見下方驗證）。
-
-**驗證方式**：
-- `node --check`全部改動檔案語法通過
-- 材料副本：領取後背包多3個「材料寶箱」，礦石/設計圖紙總量不變
-  （沒有被自動開啟）；開啟1個寶箱後，寶箱庫存-1、礦石/設計圖紙+2種
-  （各自對應階級的數量）
-- 寶箱物品彈窗：穿戴鍵隱藏、開啟/預覽/出售三顆都在，預覽彈窗正確
-  顯示低/中/高/極品礦石與設計圖紙的40%/30%/20%/10%機率；抽獎券物品
-  彈窗預覽正確列出對應套裝全部10個部位跟圖示；點完寶箱/抽獎券之後
-  再點一般裝備/藥水，穿戴鍵正確恢復顯示、開啟/預覽鍵正確恢復隱藏，
-  沒有殘留狀態
-- 經驗副本：`player.expNext=50000`、`player2.expNext=60000`，副本彈窗
-  正確顯示「55,000」，實際入帳`sharedExp`增加量也是55000
-- 每日次數：claim完經驗副本後立刻再呼叫`v132BeginExpDungeon()`，沒有
-  跳出「今天已經挑戰過了」、正常開新一場
-- 套裝顯示：裝備3件[岩岳]套裝後點其中一件，彈窗正確顯示
-  「[岩岳]3/5」、「裝備三件 全能力+1 [已啟動]」（active樣式）、
-  「裝備五件 土元素技能傷害+2% [未啟動]」（inactive樣式）
-- 回合節奏：實際攔截`addBattleLog()`印出時間戳，連續3個回合的完整
-  時間軸——每一行間隔都精確落在1.5秒上下（1502~1756ms，declare階段
-  本身的極短處理時間也算在內），包含「回合開始log」到「玩家1出手log」
-  跟「最後一隻怪出手」到「下一回合開始log」這兩個原本被漏掉的節點，
-  完全符合使用者給的節奏規格
-
-**已知限制**：這次沒有重新測試每個副本完整走一次（win/lose雙路徑）
-的回歸，只針對這6點各自的改動點做針對性驗證，比照使用者本人「不需要
-跑整個網站完整回歸」的指示。
-
-### 2026-08-26 — 副本怪物強度第二輪重調（等級公式改成「最高70%＋平均30%」＋普通/精英/BOSS分級倍率）
-
-使用者上一輪反應「副本的怪物感覺太弱了」，我補上了讓副本怪打平一般野怪的
-+30%（`DUNGEON_MONSTER_STRENGTH`），但使用者這輪明確指出還是偏弱，並給了
-非常precise的規格，要求重新設計副本等級公式跟分級強度，同時**明確禁止**：
-不能重做戰鬥系統、不能動一般野怪數值/`getMonsterRank()`、既有的+30%不能
-被重複套用第二次。全部改動都在`js/27-v132-content-expansion.js`裡完成，
-`js/00-main.js`跟`js/25-v131-fix-batch.js`完全沒有動。
-
-1. **副本基準等級公式重做**：原本「所有已建立角色等級總和÷角色數量」
-   在高等主力帶低等角色時會被平均得很低（Lv.50+Lv.20+Lv.10只算出約
-   Lv.27）。改成`round(隊伍最高等級×0.70 + 隊伍平均等級×0.30)`
-   （`getDungeonMonsterLevel()`），單一角色時最高=平均=角色等級，
-   結果不變。
-
-2. **副本怪物三層強度疊加**，新的唯一建構入口
-   `buildDungeonMonster(name,level,element,rank)`固定跑三步（一般怪
-   只會經過前兩步）：
-   - `applyDungeonMonsterStrength()`——沿用既有`DUNGEON_MONSTER_STRENGTH
-     =1.30`，完全沒改，只套用一次
-   - `applyDungeonNormalBonus()`（新增，×1.10，含SP）——讓「副本普通怪」
-     基準本身就比野外普通怪再強一截（1.30×1.10≈1.43倍）
-   - `applyDungeonRankStrength()`（新增，讀`monster.rank`）——精英
-     （`maxHP×1.60/attack×1.30/magicAttack×1.30/defense×1.25`）、
-     BOSS（`maxHP×3.00/attack×1.50/magicAttack×1.50/defense×1.40`）
-     都是在「副本普通怪」的完整數值上再疊加，不是從裸數值重算；兩者
-     都刻意不動SP，維持在跟副本普通怪同一水準，避免精英/BOSS技能
-     頻率暴增。裝備副本BOSS原本的「基準等級×1.15」保留不動。
-
-3. **5個副本怪物建構呼叫點全部改用`buildDungeonMonster()`**（經驗副本
-   10隻小兵、材料副本5精英+5普通、裝備副本1BOSS+4精英），取代原本
-   各自寫`applyDungeonMonsterStrength(makeZoneMonster(...))`的寫法，
-   降低之後漏加某一步驟的風險。技能階級/機率設定（`setMonsterSkillTier`/
-   `setMonsterMaxTierSkills`）完全沒動。
-
-**驗證數字**（用Playwright實際呼叫`v132BeginExpDungeon()`/
-`v132BeginMaterialDungeon()`/`v132BeginEquipmentDungeon()`產生的真實
-怪物物件讀出來的，不是手算）：
-
-等級公式（4組隊伍全部精確符合使用者給的期望值）：
-| 隊伍 | 等級組成 | 期望 | 實際 |
-|---|---|---|---|
-| A | 20 | 20 | 20 |
-| B | 50+50 | 50 | 50 |
-| C | 50+20 | ≈46 | 46 |
-| D | 50+20+10 | ≈43 | 43 |
-
-Lv.20（雙角色都Lv.20，副本基準等級=20）：
-| 類型 | HP | SP | 攻擊 | 防禦 | 魔攻 |
-|---|---|---|---|---|---|
-| 野外普通怪 | 300 | 200 | 60 | 70 | 50 |
-| 副本普通怪 | 429 | 286 | 86 | 100 | 72 |
-| 副本精英怪 | 686 | 286 | 112 | 125 | 94 |
-| 副本BOSS（等級23＝20×1.15） | 1503 | 308 | 141 | 171 | 119 |
-
-Lv.50（雙角色都Lv.50，副本基準等級=50）：
-| 類型 | HP | SP | 攻擊 | 防禦 | 魔攻 |
-|---|---|---|---|---|---|
-| 野外普通怪 | 550 | 365 | 115 | 145 | 105 |
-| 副本普通怪 | 787 | 523 | 165 | 208 | 151 |
-| 副本精英怪 | 1259 | 523 | 215 | 260 | 196 |
-| 副本BOSS（等級57≈50×1.15） | 2790 | 586 | 279 | 351 | 248 |
-
-兩個等級都明確成立「野外普通 < 副本普通 < 副本精英 < 副本BOSS」，且手算
-驗證過副本普通怪數值＝野外原始值×1.30×1.10（例如Lv.20的429＝
-300×1.30×1.10四捨五入，不是被套了兩次1.30的300×1.30×1.30＝507），精英/
-BOSS的SP都跟副本普通怪一致（例如Lv.20精英/普通SP都是286），確認沒有
-誤觸精英/BOSS的SP額外倍率。另外確認：`node --check`語法通過、三個副本
-都能正常呼叫並產生正確數量的怪物（經驗10隻、材料5+5、裝備1+4）、
-rank欄位正確、`js/00-main.js`/`js/25-v131-fix-batch.js`完全沒有改動
-（一般野怪數值/`getMonsterRank()`不受影響）。勝負結算流程（`winBattle`/
-`loseBattle`/`launchDungeonBattle`）這輪完全沒有改動，沿用上一輪已經
-驗證過的邏輯，這次沒有重新跑一次完整勝負流程回歸（使用者本人也明確
-表示不需要跑整個網站完整回歸）。
-
-### 2026-08-26 — 「套用並啟動」真的會啟動自動戰鬥、副本怪物補回30%強化、回合間隔問題排查
-
-使用者這輪提出4點（第4點訊息被截斷，沒有內容）：
-
-1. **「戰鬥中開啟元素匣，套用啟動才是沒反應」**——根因找到了：
-   `confirmAutoBattleSettings()`（按鈕文字被`ensureElementBoxStatsUI()`改成
-   「套用並啟動」）原本只會呼叫既有的存檔邏輯（存角色/技能/HP-SP門檻設定），
-   從頭到尾沒有真的把`autoBattle`打開，跟按鈕文字承諾的行為對不起來——
-   玩家設定存好了、視窗也關了，但畫面上什麼都沒變（因為根本沒進入自動
-   模式），感覺就像「沒反應」。修法：`js/25-v131-fix-batch.js`的
-   `confirmAutoBattleSettings`覆寫裡，存完設定之後，如果`autoBattle`還沒
-   打開，呼叫既有的`toggleAutoBattle()`（跟面板最上面「啟動」按鈕同一套
-   邏輯，`autoConfig`/`autoConfig2`/`autoConfig3`、UI、戰鬥紀錄都會一起
-   正確同步），如果已經開著則不會誤觸發關閉。用Playwright在真實戰鬥
-   狀態下實測：點浮動元素匣按鈕→點套用（含元素匣時數為0時要先過廣告
-   確認彈窗那條路徑）→確認`autoBattle`變成true；另外測過「已經是開著的
-   狀態下再點一次套用」確認不會被誤關掉。
-
-2. **「回合之間銜接間隔越來越長」**——⚠️ 花了大量時間排查，**沒有在受控
-   測試中重現**。分兩階段查：(a) 直接量測連續多回合`processNextCombatant`
-   的實際間隔（25秒自動戰鬥），全程穩定落在~1.5秒，沒有任何成長趨勢；
-   同時監控每一次`setTimeout`/`setInterval`呼叫，`pendingCount`全程維持
-   個位數，沒有計時器堆積。(b) 一度以為找到DOM節點持續增加的證據
-   （80秒測試`domNodeCount`從1490長到1607），但用`MutationObserver`
-   追蹤「淨增加的節點」細分之後發現：增加的節點幾乎全部是`battle-line`
-   （戰鬥紀錄的每一行，本來就有80行上限，只是80秒測試視窗還沒觸頂，
-   看起來像持續增加，其實會停在上限）、技能名稱徽章/傷害彈字（本來就有
-   1.8~2.2秒後自動移除的計時器，只是量測當下剛好有幾個還在飛行中）——
-   這些全部都是預期內、有上限的行為，不是洩漏。目前排除了「計時器
-   累積」跟「DOM洩漏」這兩個最可能的邏輯根因，已經跟使用者要更具體的
-   重現方式（單場戰鬥內回合數增加時才變慢？還是長時間開著遊戲、跨多場
-   戰鬥才變慢？大概幾回合/幾分鐘會發現？哪個裝置），目前還在等回覆，
-   沒有做任何改動。
-
-3. **副本怪物強度資料**——使用者要參考資料，同時反應「副本的怪物感覺
-   太弱了」。提供了`makeZoneMonster()`的完整換算公式（總點數/敏捷/體質/
-   隨機池分配/技能分級門檻，全部在`js/00-main.js`的
-   `generateMonsterAttributePoints()`/`getMonsterSkillTierAndChance()`）
-   給使用者參考，同時發現一個實際落差：一般練功區域的怪物在
-   `js/25-v131-fix-batch.js`裡會再套用`V131_MONSTER_STRENGTH=1.30`
-   （HP/SP/攻擊/防禦/魔攻各×1.3），但這次新增的副本怪物是直接用
-   `makeZoneMonster()`的裸數值、沒有套用這條強化——換算下來同等級的
-   副本怪物比一般練功怪物弱了整整30%，這極可能就是使用者感覺到的落差
-   來源。已在`js/27-v132-content-expansion.js`新增
-   `applyDungeonMonsterStrength()`（跟`strengthenMonster()`完全同一套
-   ×1.30倍率），接到全部5個副本怪物建構點（經驗副本10隻小兵、材料副本
-   5精英+5普通、裝備副本1BOSS+4精英），讓副本怪物至少打平一般練功區域
-   同等級的怪物（副本本身已經用更高等級公式/更多精英-BOSS堆疊難度，
-   不需要同等級數值本身還打折）。用Playwright驗證：25級怪物原始
-   `maxHP=350/attack=70`，套用後變成`maxHP=455/attack=91`，跟手動算的
-   ×1.30結果完全一致，且透過真正呼叫`v132BeginExpDungeon()`產生的
-   實際副本怪物陣列逐一核對數值正確。
-
-**已知限制**：第2點（回合間隔問題）尚未解決，需要使用者提供更具體的
-重現條件才能繼續查；使用者訊息裡的第4點內容是空的，還沒有得到後續回覆。
-
-### 2026-08-26 — 自動戰鬥設定：拆掉雙層框、拿掉多餘的內部捲動
-
-使用者回報自動戰鬥設定視窗「不用又有一個內框，直接一個框就好，然後把框放大，
-讓所有按鈕文字一次就呈現，無需捲動」（附截圖：外層`.home-feature-modal-box`
-裡面還套了一層有自己金色邊框/底色的`#autoBattleSettingsPanel`，內層框自己
-被截斷、下面還有一段捲軸，內容被裁掉一部分）。
-
-**根因**：`css/08-stage-v14-character-scroll-fix.css`裡有一條舊規則
-`#homeFeatureModal .auto-settings-expanded{ max-height:70dvh; overflow-y:auto !important; }`，
-把這個面板單獨鎖在比外層`.home-feature-modal-box`（`max-height:96dvh`）矮很多
-的高度上，造成「外層框其實還有空間、內層框卻先被截斷、還要自己捲動」的雙框
-＋內部捲動怪象。這條規則是V14那一輪為了修捲動問題加的，後來`.dock-bottom`
-被拿掉、外層框的max-height也已經放寬到96dvh，這條70dvh的舊規則卻沒有跟著
-拿掉，變成技術債。
-
-**修法**：
-1. 拿掉這個面板自己的`max-height:70dvh`跟`overflow-y:auto !important`，
-   改成`overflow:visible !important; max-height:none !important;`，讓它
-   單純隨內容長高，捲動完全交給外層`.home-feature-modal-box`一個人負責
-   （本來就有`overflow-y:auto`＋`96dvh`）。
-2. 新增`#homeFeatureModal #autoBattleSettingsPanel.auto-settings-expanded{border:0;background:transparent;border-radius:0;box-shadow:none;padding:0;}`，
-   拿掉面板自己的視覺框（原本`.auto-settings-expanded`基礎樣式在
-   `00-main.css`裡有自己的金框/深底/圓角/10px padding），只留外層那一個
-   框，外層本來就有16px padding，內容不會貼邊。
-
-**驗證方式**：Playwright量測`getBoundingClientRect`/`getComputedStyle`，
-確認：內層面板`border`/`background`/`padding`都歸零、`max-height:none`、
-`overflow-y:visible`；在900px高的視窗下外層框（663px）完全不需要捲動就能
-裝下全部內容（含最下面「套用並啟動」按鈕）；把視窗高度模擬降到700px甚至
-600px時，也只有外層框一個捲軸（不再是雙層框各自截斷），符合預期的優雅
-降級行為。截圖比對確認視覺上真的變成單一個框、所有卡片與按鈕一次顯示。
-另外用Playwright實際點擊「啟動」按鈕確認`autoBattle`狀態正常切換，
-確認這次改動沒有動到任何點擊事件邏輯。
-
-**已知限制**：`css/08-stage-v14-character-scroll-fix.css`目前沒有被納入
-`?v=`快取版本號機制（原本就是用純`<link>`標籤靜態載入，不像V131/V132那幾個
-檔案有動態載入器＋版本號），這次修改如果使用者瀏覽器快取了舊版CSS，可能
-需要手動清一次快取或強制重新整理才會看到效果。
-
-### 2026-08-26 — V132：新增符咒／材料／裝備套裝／抽獎券／三個日常副本（第四輪大改動）
-
-使用者這輪提出一次大型內容擴充需求（不是回報bug）：新增3種符咒（冰封/隱身/結界，各4階，
-命中機率＝階級固定機率＋角色智力加成）、礦石與裝備設計圖紙材料、一般練功4種低階道具各5%
-獨立掉落、3個日常副本（經驗/材料/裝備，各每日1次、失敗不扣次數）、4元素裝備套裝（赤炎/
-寒泉/岩岳/青嵐，各10件、3件6圍全+1／5件對應元素技能傷害+2%）、抽獎券開套裝機制，外加
-把回合間空拍從1.3秒調到1.5秒。全部新增邏輯放在新檔案：
-
-- **`js/27-v132-content-expansion.js`**（新檔）：整包內容邏輯，用同一個IIFE、「讀舊函式→
-  包一層→呼叫原函式→加新邏輯→塞回同名全域變數」的既有override手法接進
-  `killMonster`/`winBattle`/`loseBattle`/`resolveQueuedPlayerAction`/`getEquipmentBonus`/
-  `getElementDamagePassiveMultiplier`/`equipSelectedItem`/`renderBattleItemMenu`/
-  `renderDungeonTabContent`/`openItemModal`/`openEquippedItem` 這些既有函式，沒有改動任何
-  一行`js/00-main.js`本體。副本怪物借用`monsters`全域陣列本來就可以整包替換的既有慣例
-  （`launchDungeonBattle()`借完整份`monsters`/`currentZone`，結束後完整還原）。
-- **`css/33-v132-content-expansion.css`**（新檔）：獎勵彈窗、副本清單卡片、抽獎券選擇按鈕
-  的最小可用樣式，跟遊戲既有深色系配色一致。
-- **`js/20-anonymous-20.js`**：比照V131的動態載入器模式，新增`loadV132ContentExpansion()`，
-  在`DOMContentLoaded`後動態插入上面兩個新檔案（`?v=132`）。
-- **`js/25-v131-fix-batch.js`**：`V131_RESOLVE_DELAY_MS` 從1300改成1500（回合間空拍1.5秒）。
-
-**過程中發現並修正的2個真bug**（都是先寫程式碼再用Playwright實際跑過才抓到的）：
-
-1. 一開始寫talisman結算的dispatch override時猜錯了`js/00-main.js`裡「宣告後結算」那個
-   函式的名字（猜成`resolveQueuedActionForCharacter`），實際上是`resolveQueuedPlayerAction`
-   （`characterIndex,token`兩個參數）。已用`grep`實際確認函式名稱並修正，不然符咒在戰鬥中
-   會完全沒有結算效果（原本的程式碼有`console.warn`防呆，但如果沒特別去看console log
-   很容易漏掉這個問題，之後接手的人寫override前務必先grep確認函式名稱存在）。
-2. 4元素裝備套裝裡武器部位（刀/扇）的物品`type`原本寫成`"hand"`，但`js/00-main.js`裡
-   實際決定「這個type能不能被穿到哪個裝備欄」的`getInventoryEquipmentSlot()`只認
-   `"weapon"`這個type字串（`"hand"`不在對照表裡，會導致穿裝失敗但不會報錯，
-   `equipSelectedItem()`只是靜默return）。這個bug在headless瀏覽器裡實際測試「裝備套裝
-   3件加成」時才發現（穿裝之後套裝計數一直卡在2，湊不滿3件）。已修正成`type:"weapon"`。
-   `js/00-main.js`本身這裡有個既有的不一致（`isEquipmentInventoryType()`把`"hand"`也算
-   進去、但`getInventoryEquipmentSlot()`不認），這次沒有動`00-main.js`去修這個不一致，
-   只是確保新增的物品定義用對的type值。
-
-**驗證方式**：用本機 `python3 -m http.server 8899` + Playwright headless Chromium，全程繞過
-UI表單直接呼叫`createCharacter()`/`createAdditionalCharacter()`建立測試角色（等級直接改
-`player.level`），逐一實際跑過以下流程並確認資料/DOM狀態正確、全程零`pageerror`：
-- 一般練功掉落：強制RNG必中，確認4種低階道具（3符咒+1礦石）各自獨立判定、能正確加入背包
-- 符咒戰鬥使用：冰封符命中（怪物正確拿到`{type:"freeze",turnsLeft:4}`狀態、庫存正確扣1）、
-  未命中（畫版失敗log、不消耗額外庫存）、`renderBattleItemMenu()`在符咒分頁正確渲染出
-  可點擊按鈕（含「生效機率35%」文字、`onclick="useTalisman(...)"`）
-- 裝備套裝：等級門檻（<20阻擋並跳alert、≥20放行）、3件6圍+1加成（數值逐項核對正確）、
-  5件對應元素傷害+2%（用`player`本人跟`player2`分別驗證只有元素/套裝都符合的角色才吃到）
-- 抽獎券開套裝：消耗1張券、正確拿到1件對應套裝的隨機部位
-- 三個日常副本完整跑過（用真實的`winBattle()`/`loseBattle()`/`checkBattleEnd()`結算，不是
-  另外模擬）：經驗副本3場車輪戰完整跑完、獎勵彈窗、直接領取後`sharedExp`正確增加、
-  今日已完成後二次挑戰被正確擋下；材料副本依回合數判斷寶箱數量、開箱正確拿到材料；
-  裝備副本boss+4精英、抽獎券選擇彈窗、直接領取跟看廣告雙倍領取（`showRewardedAd`）兩條
-  路徑都測過；戰敗路徑確認`monsters`/`currentZone`會正確還原、當日挑戰次數不會被扣掉、
-  可以立刻重新挑戰
-- 每日重置：把`localStorage`裡`v132_daily_dungeon_state`的日期改成很久以前，重新整理頁面
-  （模擬跨日）後確認`used`狀態正確重置、副本重新可挑戰
-- 物品詳細彈窗SVG圖示渲染修正：確認`openItemModal()`裡的圖示元素`innerHTML`真的長出
-  `<svg>` DOM節點，不是被當成一整串文字印出來
-
-**已知限制**：
-- 只做了資料/邏輯層跟最小可用的CSS/inline SVG視覺（依使用者明確指示「先暫時用
-  CSS/JavaScript動畫+Canvas/SVG做出來，後期再用美術更改」），沒有做逐畫面UI走查
-  （例如真的用滑鼠點過副本清單頁的排版、抽獎券選擇按鈕在小螢幕的實際觸感），這次全部
-  驗證都是直接呼叫底層函式/操作DOM狀態，不是模擬真實手指點擊整個流程。
-- 沒有測試三個角色（`player3`）情境下的套裝加成/副本開放條件，目前雙角色門檻只用
-  `player`+`player2`驗證過。
-- `js/27-v132-content-expansion.js`裡裝備副本的雙倍領取流程（`v132ClaimEquipmentDungeonReward`
-  裡的`grant2`巢狀函式）寫法稍微繞，邏輯正確但之後如果要再擴充建議順手整理成跟
-  `v132ClaimMaterialDungeonReward`/`v132ClaimExpDungeonReward`一致的寫法。
-
-### 2026-08-26 — 按鈕洩漏到其他視窗、護盾扣血提示重複、技能預覽捲動破圖調查
-
-使用者這輪回報4個問題，附了5張截圖：
-
-1. **「全屬性技能預覽」按鈕洩漏到自動戰鬥設定視窗上**（使用者截圖裡自動戰鬥
-   設定視窗右上角多了一顆不該出現的「全屬性技能預覽」按鈕，UI因此變得
-   雜亂）— 根因跟`statusHelpButton`是同一種bug：`skillPreviewHeaderButton`
-   只有在`switchCharacterTab()`切分頁時被設定顯示/隱藏，但`closeHomeFeature()`
-   關閉視窗時沒有把它重置回隱藏（`statusHelpButton`當時有重置、這顆漏掉了），
-   只要玩家進過一次技能分頁，這顆按鈕的`display:inline-block`就會一直殘留，
-   之後開任何其他視窗（自動戰鬥設定、商店……）都會看到它。已補上跟
-   `statusHelpButton`一樣的重置。「套用並啟動按鈕在戰鬥中沒反應」用
-   Playwright實測（含真的在戰鬤中、元素匣有剩餘時數的情境）沒有重現，
-   懷疑是同一個按鈕洩漏造成的版面錯位間接影響到點擊，這次一起修掉了，
-   如果還有問題需要使用者再回報。
-2. **護盾扣血提示邏輯**：護盾完全擋下這次攻擊（`damage`被扣到0）時，原本
-   還是會呼叫`showPlayerHit(0,"hp",...)`，跳出沒有意義的「-0HP」紅字跟
-   卡片震動。改成只有`damage>0`（護盾沒完全擋住、真的有扣血）才呼叫，
-   已用Playwright實測驗證：巨大護盾情境下全程0次紅字HP彈出、只有白色
-   護盾扣除數字；小護盾（會被打穿）情境下第一擊護盾+HP兩個彈出都出現、
-   之後護盾耗盡只剩紅字HP彈出，符合「除非護盾剩餘承受量小於傷害才一起
-   顯示」的需求。
-3. **技能預覽頁「破圖」（截圖顯示捲動時文字疊字/亂碼）**：⚠️ 沒有修好，
-   用真實觸控滑動模擬（含快速連續滑動、滑動中間截圖、切分頁後滑動）
-   反覆嘗試都無法重現截圖裡那種疊字畫面。截圖裡出現不屬於任何真實技能
-   名稱的亂碼文字（例如「水對象手」），比較像是手機在捲動慣性還沒完全
-   合成好新畫面的那一瞬間被截圖截到，不是持續性的頁面狀態錯誤——這種
-   時序問題沒辦法從程式邏輯上直接「修好」，只能做常見的手機捲動效能
-   優化（`.skill-preview-card`加上`contain:content`跟`will-change:
-   transform`，讓每張卡片各自獨立合成，降低捲動時整體重繪量），降低
-   發生機率。如果之後還是常常發生，需要使用者提供**螢幕錄影**（不是
-   截圖）才有機會抓到真正的畫面時序、確認是不是同一種情況。
-4. **背包介面返回鍵不見了**：⚠️ 沒有找到、也沒有重現。用Playwright檢查了
-   背包的兩個進入路徑（下方導覽列的`#inventoryPage`、地圖頁裡
-   `openMapInventoryOverlay()`開的覆蓋層版本），關閉/返回按鈕在兩邊都
-   正常顯示、正常運作。這次使用者附的5張截圖裡沒有一張是背包畫面，
-   缺乏視覺線索比對，下一個接手的人如果要繼續查，需要先跟使用者要
-   一張實際看到「返回鍵不見了」那個畫面的截圖，才好判斷到底是哪個
-   背包相關畫面、哪個按鈕。
-
-### 2026-08-26 — 全屬性技能預覽：真正修好捲動 + 字級調到舒服大小
-
-上一輪把文字加大到90px（螢幕上約35px）之後，使用者回報「不能捲動，下面看不到」，
-而且35px確實太大。這次兩個問題一起修：
-
-1. **捲動bug的真正根因**：`js/01-stage-v8-touch-lock.js`的全域觸控鎖白名單
-   一直沒有把`.skill-preview-body`加進去，手指真的滑動時被完全擋掉（程式化
-   `scrollTop`賦值不受影響，所以之前用這個方法驗證「看起來沒問題」其實沒測到
-   真正的問題）。加進白名單後，用Playwright模擬真實觸控滑動
-   （`Input.dispatchTouchEvent`）驗證過`scrollTop`真的會跟著改變。詳細原理見
-   上方「系統架構重點」第5節，以後任何新增的可捲動容器都要記得檢查這份白名單。
-2. **字級調到舒服大小**：90px降到標題49px（螢幕約19px）、屬性分頁按鈕39px
-   （螢幕約15px）、技能名稱44px（螢幕約17px）、分類標籤33px（螢幕約13px）、
-   說明文字39px（螢幕約15px），都是用0.388889縮放比例換算，數值在
-   `css/31-v131-fix-batch.css`裡`#allElementSkillPreviewModal`那幾條規則。
-
-### 2026-08-26 — 全屬性技能預覽文字真正的根因修正（PR #9）
-
-第三輪修完後，使用者又反映「全屬性技能預覽」文字還是很小、直接要求
-加到35px。這次沒有再單純把數字往上調，而是實測發現這個彈窗活在
-`#game-stage`的scale座標系底下（縮放比例0.388889），前幾輪一路加大的
-13.5→22px全部被這層縮放吃掉六成多，難怪使用者一直覺得沒變。改成寫
-90px（35÷0.388889換算回來的補償值），讓螢幕上實際顯示出來才是使用者
-要的35px。詳細原理跟換算方法寫進了上方「系統架構重點」1.3節，以後
-再調這個彈窗或任何confirmed活在game-stage縮放座標系底下的元素，都要
-先實測縮放比例再回推數值，不能直接把使用者說的px數字原封不動寫進去。
-
-### 2026-08-26 — 第三輪修復 11 項回報問題
-
-使用者這次回報11個問題，同樣全部用Playwright + headless Chromium逐一驗證：
-
-1. **戰鬥資訊框/人物卡牌高度應固定（不管1排或2排怪物）** —
-   `#battleMonsterArea.v131-formation`原本`min-height`只夠1排（90px），
-   1排怪物時容器變矮，靠剩餘空間伸縮的回合資訊框跟著變高、人物卡牌
-   位置跟著跑動。改成固定`min-height:189px`（2排怪物+排間距+容器
-   padding），不管實際幾排怪物都保留這個高度。
-2. **爆擊文字太大** — `.damage-popup.critical-popup`原本27px、動畫
-   峰值再乘1.62倍（實際峰值43.7px），縮小成17px+動畫峰值1.25倍
-   （峰值約21px）。
-3. **土皇戰鬥沒有金色外框 + 玩家立繪去背** — 根因找到：
-   `css/11-stage-v41-cast-text-and-player-alpha.css`裡一個V41年代
-   的`#battlePlayerCard0{border:0 !important;...}`規則，因為是ID
-   選擇器，specificity比V131後來加的`.battle-player`金色外框規則高，
-   不管load順序、兩邊都是`!important`，ID選擇器還是贏，導致「隊伍
-   第一位」角色（不分哪個元素）永遠沒有外框。拿掉這條規則裡的
-   border/outline/box-shadow三行即可。去背部分：用rembg把8張
-   `assets/characters/性別_元素.jpg`去背存成專屬的
-   `assets/characters/battle_性別_元素.png`，新增
-   `getCharacterBattleArtworkPath()`只給戰鬥卡片用，跟角色創建預覽/
-   背包立繪頁面共用的`getCharacterArtworkPath()`分開，不影響那兩個
-   地方仍顯示原本帶場景背景的版本。
-4. **巡怪立繪正背面顏色不一致 + 解析度太低** — 用像素比對抓出根因：
-   上一輪重建女角sprite時，水/風/土三個「背面」來源圖被循環錯位
-   （風背面誤用了土的圖、土背面誤用了水的圖、水背面誤用了風的圖），
-   已重新用正確對應關係建置。解析度部分：sprite cell從56x84放大到
-   140x210（跟顯示尺寸70x105等比例放大2倍，手機retina螢幕更清晰），
-   男角sprite維持原本56x84不變（沒有新素材可換），`js/26-v131-patrol-
-   appearance.js`的裁切函式改成依sheet分別建立各自尺寸的canvas。
-   形象切換按鈕從76px縮小成68px，跟正上方返回鍵（68px）統一。
-5. **背包角色切換箭頭與關閉按鈕重疊** — 根因是`.inventory-character-
-   switch`原本用grid撐滿整列寬度，右箭頭被推到最右緣、卡進絕對定位
-   貼右上角的關閉按鈕下面。改成flex置中、箭頭貼齊角色名稱兩側；
-   角色名稱較長時，另外針對「從地圖頁開啟的覆蓋層版本」（唯一會出現
-   關閉按鈕的情境）加了`padding-right:64px`，確保置中範圍主動避開
-   關閉按鈕，不管名字多長都不會再撞在一起。
-6. **全屬性技能預覽文字仍然太小** — 這是第三次加大請求，數值從
-   17/19/20px加大到19/21/22px；同時發現並修正了1.2節那個版本號沒有
-   遞增的根本問題（`css/31-v131-fix-batch.css?v=131`從第一輪到現在
-   沒變過），使用者先前看到的字級很可能根本是瀏覽器快取的舊版本，
-   不是這幾輪的修改真的沒生效。
-7. **能力值/技能詳細/全屬性技能預覽頁面「破圖頻繁閃爍」** —
-   ⚠️ **這項沒有修**：用MutationObserver監測5秒沒有發現任何`<img>`
-   的src被反覆改動、用網路監聽沒有發現任何圖片資源404、用連續截圖
-   像素比對也沒有偵測到明顯的視覺跳動（跟這三個頁面共用的
-   `.home-feature-modal-box`邊框呼吸動畫`borderGlowBreathe`吻合的
-   3.6秒週期性效果只有極輕微的glow變化，不是「破圖」）。在目前這個
-   headless Chromium測試環境完全無法重現使用者描述的症狀，比較合理
-   的懷疑方向是使用者實際裝置的GPU/瀏覽器版本特有的渲染問題（類似
-   之前抓到的「img+background-image」Chromium渲染bug，那次也是
-   在別的環境完全正常、只有特定版本才會出現）。已經在回覆裡明確告知
-   使用者這項沒有修好、需要更多線索（例如螢幕錄影、是不是特定機型）
-   才能繼續往下查，避免不確定的情況下亂猜亂改。
-8. **導覽列野怪區icon沒去背** — 唯一一個還是RGB（不透明）、而且解析度
-   異常大（1536x1404，其他都是~320px的RGBA透明PNG）的nav icon，
-   確認是這格素材沒有跟其他icon一樣走過去背流程。用rembg去背+
-   縮小到跟其他icon一致的~320px，直接覆蓋`assets/ui/nav-training.png`。
-9. **背包裝備部位「肩甲」改「護腕」** — `js/00-main.js`的
-   `renderEquipment()`裡`slots`陣列，純文字修改。
-10. **自動戰鬥設定頁面應固定置中、放大避免捲動** — 這是對更早一輪
-    使用者自己要求的「dock-bottom貼底顯示」的明確反悔（「有時候置中
-    有時候靠下面」正是因為戰鬥中/非戰鬥中切換dock-bottom造成的），
-    這次改成完全不再加`dock-bottom`這個class，兩種情境都維持
-    `.home-feature-modal`預設的置中顯示；視窗`max-height`不分情境
-    統一用96dvh（原本戰鬥中還是卡在80dvh）。
-11. **護盾視覺效果**（HP條增加等值白色色塊、吸收傷害顯示白色扣除
-    動畫）— 底層的護盾傷害吸收邏輯（`min(傷害,護盾剩餘)`吸收、
-    超過的部分才真的扣血）其實早就是對的，這次純粹是補視覺呈現：
-    HP bar新增`.hp-bar-shield-overlay`白色色塊（`left`=目前HP%，
-    `width`=護盾剩餘/maxHP%，緊接在紅色血量後面），`updateSingle
-    CharacterBars()`裡同步計算更新；新增`showShieldAbsorb()`跳出
-    白色（非紅色）的傷害數字（`.damage-popup.shield-popup`），
-    在燃燒傷害吸收跟一般攻擊傷害吸收兩處各呼叫一次。
-
-**已知限制／未完成**：第7項（破圖閃爍）沒有修，需要使用者提供更多
-線索才能繼續排查，詳見上方第7點說明。
-
-### 2026-08-25 — 第二輪修復 7 項回報問題（PR #6，已合併）
-
-延續上一輪的7項修復，使用者再次實際操作後回報7個新問題，全部用 Playwright +
-headless Chromium 逐一驗證後修復：
-
-1. **形象切換按鈕圖片畫質太差** — 使用者這次提供的不是角色素材，而是一張專屬的
-   「形象切換」功能徽章圖（固定圖案，跟角色/元素無關）。`js/26-v131-patrol-appearance.js`
-   的 `updateSwitchIcon()` 改成套用這張靜態高畫質圖（存成
-   `assets/ui/patrol-appearance-switch-icon.png`），不再動態套用「目前選中角色」
-   裁切出來的低解析度sprite小圖。上一輪「已知限制」裡提到的畫質問題已解決。
-2. **技能正確名稱** — 用像素比對找出真正的根因：`js/00-main.js` 的
-   `elementSkillIconMap` 裡 `dustStorm`（真實名稱「地牛猛襲」）跟 `rockWall`
-   （真實名稱「岩石壁壘」）兩個技能的icon檔案內容被對調了（這個bug在更早一輪就存在，
-   不是這次才introduce的，只是這次使用者提供的兩張標籤參考圖才讓它被抓出來）。
-   直接對調 `assets/skills/earth-dust-storm.jpg` 跟 `earth-rock-wall.jpg`
-   兩個檔案的內容（不用改 `elementSkillIconMap`，key跟檔名本來就是對的，
-   錯的是檔案內容本身）。同時使用者重新提供「萬象土盾」的專用圖，補回
-   `earth-shield.jpg`（上一輪拿掉後的已知限制，這次解決）。
-3. **重新上傳高畫質Q版女生立繪** — 使用者提供8張新的火/水/風/土（各正/背面）
-   高解析度立繪（1024x1536，比例剛好等於sprite cell的56:84），整組重新組成
-   3x3 sprite sheet（`/tmp/new_female_sheet.png`→webp），改用10個base64 chunk
-   （原本6個chunk放不下，`js/v131-patrol-sprite-0.js`~`9.js`），並在
-   `js/20-anonymous-20.js` 的 `sources` 陣列補上新的4個chunk檔案、
-   把版本query string從`?v=131a`改成`?v=131e`避免瀏覽器快取舊sprite。
-   已驗證新sprite視覺品質明顯提升。
-4. **全技能預覽文字太小** — 上一輪已經加大過一次（13.5/14.5/15px），使用者反映
-   還是太小，這次大幅加大到17/19/20px（`css/31-v131-fix-batch.css`）。
-5. **全技能預覽按鈕位置** — 原本跟「技能配裝」標題並排在技能頁面內部，使用者
-   要求移到「返回」按鈕正下方。改法：把共用彈窗header（`.home-feature-modal-title`
-   右側原本只有？/返回兩顆按鈕的區塊）從單排改成兩排的flex column，新增
-   `id="skillPreviewHeaderButton"`放在第二排，預設隱藏，`switchCharacterTab()`
-   切到`"skill"`分頁時才顯示（跟`statusHelpButton`同一套邏輯），技能頁面內部
-   原本那顆按鈕直接移除，不留重複按鈕。
-6. **自動戰鬥設定頁面無法捲動** — 這次的根因跟上一輪`characterTabContent`那個
-   bug不一樣：捲動機制本身其實沒壞（程式化`scrollTop`賦值、模擬觸控滑動都能
-   捲到底），真正原因是`.home-feature-modal.dock-bottom{padding-bottom:172px}`
-   （原本是為了貼齊戰鬥中的戰鬥資訊框設計的）不管是不是真的在戰鬥中都套用，
-   加上`.home-feature-modal-box`自己`max-height:80dvh`的硬上限，兩者疊加導致
-   非戰鬥中開啟這個設定頁時可用高度被過度壓縮。`js/00-main.js`裡開啟這個彈窗
-   的地方改成：`padding-bottom`跟`max-height`都依`battleActive`動態設定
-   （戰鬥中維持172px/80dvh，非戰鬥中降到24px/96dvh）。已驗證：一般420x900
-   viewport下可用高度剛好等於內容高度（完全不用捲）；就算故意縮到390x660
-   這種比任何真實手機都短的極端viewport，剩餘的一點點內容也能透過捲動
-   （程式化與真實觸控滑動皆測試過）完整看到。
-7. **技能升級沒有防呆/成功提示** — 上一輪只幫`learnSkill`加了`confirm()`/
-   `alert()`包裝，`upgradeSkill`當時沒有同步處理。`js/25-v131-fix-batch.js`
-   補上結構相同的`upgradeSkill`包裝，已驗證確認對話框跟成功提示都正常
-   跳出，技能等級也確實從1升到2。
-
-### 2026-08-25 — 修復 7 項回報問題（用實機瀏覽器測試逐一驗證）
-
-使用者實際在手機/截圖上回報的 7 個問題，這次全部用本機 Playwright + headless
-Chromium 架設測試環境，實際操作到出問題的畫面、量測 computed style / DOM
-結構，而不是只憑讀程式碼判斷，逐一根因排查後修復：
-
-1. **技能欄／經驗池頁面無法捲動** — 根因見上方「系統架構重點」第1.5節，
-   `js/19-stage-v78-character-inventory-runtime.js` 的 `applyNow()` 改成直接用
-   `body.clientHeight` 設定 `#characterTabContent` 高度，不再用
-   `getBoundingClientRect()` 除以一個不適用的縮放係數。已驗證捲動可以
-   到底（`scrollTop+clientHeight>=scrollHeight`）。
-2. **巡怪 Q 版立繪變白色空白方塊** — 根因是 Chromium 的 `<img src=非空>` +
-   CSS `background-image` 疊圖渲染 bug（跟 object-fit、素材都無關，已用
-   最小重現案例確認）。`js/26-v131-patrol-appearance.js` 改用 canvas
-   （`drawImage`+`toDataURL`）把sprite sheet裡需要的那一格實際「裁」成
-   獨立圖片再設定 `img.src`，不再疊CSS背景。這個bug其實從最早的女角版本
-   就存在，這次順便一起修掉，不是只修男角。
-3. **技能圖示配錯** — 使用者提供帶名稱標籤的參考圖，用像素比對（不是肉眼）
-   抓出5個實際配錯/遺漏的技能圖示並修正，細節見 `js/00-main.js` 裡
-   `elementSkillIconMap` 上方的註解。`earthShield` 因為它原本用的圖被證實
-   其實是 `sandWind` 的，這次拿掉了、暫時沒有圖。
-4. **技能物理/法術標籤沒顯示、學習升級框太大** — 根因是
-   `js/25-v131-fix-batch.js` 的 `decorateSkillRows()` 跟 `css/31` 的按鈕
-   縮小規則，原本鎖定的是 `.learned-skill`/`.learnable-skill` 這兩個
-   **目前版本技能頁根本不存在的 class**（真正的是 `.skill-row` /
-   `.skill-action-card`），從PR#1那次開始就沒真的生效過。已改成正確的
-   selector，技能icon的id（`skillIcon_xxx`）現在也拿來當作抓skillId的
-   主要依據，比原本猜onclick字串可靠。
-5. **技能預覽/能力值/技能列表文字太小** — 原本只在 `#characterTabContent`
-   這個祖層設font-size，但底下 `.status-row`、`.skill-row-desc`、
-   `.skill-preview-card` 這些元素各自都有自己的font-size，繼承鏈在那裡
-   就斷了。改成直接對這些真正決定畫面文字大小的class加大，沒有動任何
-   寬高。
-6. **形象切換按鈕太小、畫質差** — 按鈕從58px放大到76px；icon改成即時顯示
-   「目前真正選中的角色」裁切出來的圖（原本是寫死套用女角），畫質受限於
-   sprite sheet本身56x84的解析度，這部分沒有從根本解決，見下方已知限制。
-
-### 2026-08-25 — 男角 Q 版巡怪背面 + 土系技能 icon
-
-- **男角 Q 版巡怪背面**：使用者補上了火/水/風/土四元素的男角背面立繪。
-  把原本只有正面的 2x2 sprite（`js/v131-patrol-sprite-male-0.js`~`8.js`，共9個chunk）
-  換成 4 欄（元素）× 2 列（正/背面）的 4x2 sprite（改名沿用同樣的檔名，
-  現在是 `js/v131-patrol-sprite-male-0.js`~`17.js`，共18個chunk），
-  已驗證 byte-for-byte 還原正確。`js/26-v131-patrol-appearance.js` 的
-  `maleSpriteCells` 改成跟女角一樣的 `{element:{front:[...],back:[...]}}`
-  結構，`applyPatrolArt()` 對男角也會依 `facingBack` 切換正背面了
-  （不再固定顯示正面，這個限制已經解除）。
-- **土系技能 icon**：使用者上傳了11張候選圖，比對 `js/00-main.js` 裡
-  技能資料庫中（搜尋 `element:"earth"` 可以找到全部12個）土系技能的
-  名稱/描述後，配對了其中10個（`petrifyFist`、`stoneBreakSky`、
-  `earthquakeCrush`、`stoneThrow`、`sandWind`、`flyingSandStrike`、`dustStorm`、
-  `earthShield`、`rockWall`、`barrier`），存進 `assets/skills/earth-*.jpg`
-  （120x120，跟火/水系icon同規格），並在 `js/00-main.js` 的
-  `elementSkillIconMap` 補上對應項目（含配對理由註解）。
-  **`stoneSlash`（入門單體技能）跟 `earthEX`（被動）這兩個沒有配對**，
-  因為上傳的圖裡沒有明顯對應的畫面（`earthEX` 需要的是類似
-  `fire-ex.jpg`/`water-ex.jpg` 那種圖上直接寫「EX」字樣的專用icon，
-  這次沒有提供這款）。另外有1張候選圖（岩石尖塔+光環，跟其他候選圖
-  區分度太低）這次也沒用上。這些都是刻意留白，不是遺漏——如果之後
-  要補這兩個技能的icon或想調整某個配對，直接改
-  `js/00-main.js` 裡 `elementSkillIconMap` 那個物件就好。
-
-### 2026-08-25 — 男角 Q 版巡怪立繪（PR #2，已合併）
-
-- 來源：使用者上傳 4 張男角 Q 版立繪（火/水/風/土，只有正面）
-- 用 `rembg`（Python，U2Net 模型）做真正的透明背景去背，不是 CSS 遮色片
-- 組成 2x2 透明 WebP sprite sheet，切成 9 個 base64 chunk
-  （`js/v131-patrol-sprite-male-0.js` ~ `8.js`），已驗證 byte-for-byte 還原正確
-- `js/26-v131-patrol-appearance.js`：新增 `isMaleCharacter()` / `maleSpriteCells` /
-  `maleBackgroundPosition()`，`applyPatrolArt()` 依 `character.gender` 分流；
-  男角 sprite 資料不完整時自動退回女角那組，不影響既有行為
-- `js/20-anonymous-20.js`：`loadV131PatrolAppearanceAssets()` 的 `sources` 陣列
-  補上 9 個新 chunk，順序排在 `js/26-v131-patrol-appearance.js` 之前
-- **已知限制**：只有正面圖，沒有背面。男角巡怪時不會因為往上走切換背面顯示
-  （固定顯示正面）。之後若拿到男角背面圖，可以直接比照女角那組
-  `spriteCells={element:{front:[...],back:[...]}}` 的結構擴充。
-- 驗證方式：`node --check` 全部異動檔案語法通過；base64 還原 hash 比對通過；
-  沒有實機瀏覽器測試（環境限制，見下方「尚未驗證」）。
-
-### 2026-08-25 — V131：17 項需求修正批次（PR #1，已合併）
-
-對應使用者一次提出的 17 項需求，全部已在程式碼層級逐項追蹤驗證（不是只看 PR 說明文字），
-細節與對應程式碼位置：
-
-1. 每位角色/怪物出手後等 1.3 秒才輪下一位 —
-   `js/25-v131-fix-batch.js` 的 `V131_RESOLVE_DELAY_MS=1300`，
-   包在共用的 `finishPlayerAction`（玩家與怪物回合都共用同一個結束函式）
-2. 戰鬥/野怪 icon 去背、玩家卡統一補金色外框 — 圖片本身已用真透明背景處理
-   （不是 CSS 遮色片），CSS 統一補 `.battle-player` 邊框
-3. 怪物兩排編隊（1–5 同排／6=3+3／7–10=5+置中補滿）—
-   `getFormationRows()`，CSS `.v131-monster-row{justify-content:center}` 做置中
-4. tri／row 技能依固定站位判定，死亡不補位 — 新版 `getSkillTargets()` 用陣列固定
-   index 取相鄰站位、事後才過濾存活
-5. 技能選單捲動範圍修正 — CSS `overflow-y:auto` + padding
-6. 元素匣：單一返回鍵、按鈕改「套用並啟動」、廣告 8 小時時數門檻、統計面板
-   （啟動總時數／戰鬥次數／EXP／金幣／剩餘時數）— `confirmAutoBattleSettings` 攔截，
-   接既有的 `showRewardedAd()`
-7. 野怪強度 +30%（HP/SP/攻/防/魔攻）— `V131_MONSTER_STRENGTH=1.30`，
-   涵蓋所有已定義區域怪物陣列
-8. 背包立繪依角色形象（性別＋元素）套用 — `getCharacterArtworkPath()`
-   （`js/00-main.js`）+ `syncInventoryPortrait()`
-9. 二三角色創建免關頁即時刷新 + 紅點提示 — `syncCharacterCreationAvailability()`
-10. 技能預覽移到最上層 + 可捲動 — DOM 搬進 overlay 容器，z-index 9800
-11. 技能學習/升級按鈕縮小 + 防呆確認 + 成功提示 — `learnSkill` 包一層
-    `confirm()`/`alert()`
-12. 技能列表先顯示物理/法術標籤（不用點開詳細資料）— `decorateSkillRows()`
-13. 經驗池：純名字顯示、預覽升級、確定/返回流程 — `renderExpDistributeList` 整個改寫
-14. 技能/能力值/經驗頁文字放大（框體尺寸不變）— CSS font-size 調整
-15. 巡怪 Q 版立繪依角色元素切換（正反面隨移動方向），新增「形象切換」按鈕
-    — `js/26-v131-patrol-appearance.js`（當時只有女角素材，男角部分見上面
-    2026-08-25 的另一筆記錄）
-16. 商店改黑底 — `.v131-shop-open` class 切換純黑背景
-17. 戰鬥 EXP ×3.5 — `winBattle` 額外加算 `finalExp - baseExp`
-
-**過程更正紀錄**：處理這批需求時，Claude 一度誤判「`index.html` 沒有實際載入這些檔案」
-而多加了重複的 `<script>` 標籤，後來發現 `js/20-anonymous-20.js` 本身已經有動態載入器，
-已撤銷那次誤改。詳見上方「系統架構重點」第 1 點，避免下一個人重蹈覆轍。
-
----
-
-## 已知限制 / 待辦事項
-
-- [x] ~~男角 Q 版巡怪立繪缺背面圖~~ 2026-08-25 已補上，見上方記錄
-- [x] ~~土系技能 `stoneSlash`、`earthEX` 沒有icon~~ 2026-08-25 已補上
-      （分別用使用者標籤確認的圖 + 新提供的EX專用圖）
-- [x] ~~土系技能 `earthShield`（萬象土盾）沒有icon~~ 2026-08-25第二輪已補上
-      （使用者重新提供專用圖，見上方記錄）
-- [x] ~~形象切換按鈕畫質差~~ 2026-08-25第二輪已解決：改用使用者提供的專用
-      靜態徽章圖，不再依賴56x84的低解析度角色sprite裁切
-- [x] ~~V131這幾批修正的瀏覽器快取風險~~ 2026-08-26第三輪找到具體根因並修正：
-      `js/00-main.js`/`js/25-v131-fix-batch.js`/`css/31-v131-fix-batch.css`/
-      `js/26-v131-patrol-appearance.js`/`css/32-v131-patrol-appearance.css`
-      這五個檔案的`?v=`版本號好幾輪都沒有跟著內容變動遞增，這次已經統一
-      bump到`?v=132`。**這不是一次性修好就沒事了——之後每次改這五個檔案
-      裡任何一個，都要記得手動把對應的`?v=`數字往上加一**，詳見上方
-      「系統架構重點」1.2節，這是目前最容易被忽略、後果卻最嚴重的坑。
-- [x] ~~目前仍沒有 CI~~ V173.1 已建立 GitHub Actions `Repository checks`；V137 的
-      `tests/v137-regressions.test.js` 有 9 項高風險
-      回歸，V138 的 `tests/v138-feature-requirements.test.js` 另有 10 項需求驗收，
-      V139 的 `tests/v139-economy-rested-exp.test.js` 有 7 項經濟／休息經驗驗收，
-      V140 的 `tests/v140-four-element-balance.test.js` 有 14 項技能定案驗收，
-      V141 的 `tests/v141-system-expansion.test.js` 有 18 項系統擴充驗收，
-      V142 的 `tests/v142-skill-animation.test.js` 有 15 項動畫／行動閘門驗收，
-      V143 的 `tests/v143-combat-dungeon-polish.test.js` 有 12 項本輪需求驗收，
-      V144 的 `tests/v144-rules-and-abyss.test.js` 有 11 項商店／怪物技能／深淵驗收，
-      V146 的 `tests/v146-system-polish.test.js` 有 8 項戰鬥／深淵／手機介面驗收，
-      V148 的 `tests/v148-combat-dungeon-fixes.test.js` 有 13 項戰鬥目標／副本驗收，
-      V149 的 `tests/v149-skill-ui-rules.test.js` 有 13 項技能／介面規則驗收，
-      V150 的 `tests/v150-ice-arrow-rain-vfx.test.js` 有 6 項正式 Sprite VFX 驗收，
-      V152 的 `tests/v152-dev-fixes.test.js` 有 11 項技能／副本／戰鬥介面驗收，
-      V153 的 `tests/v153-fire-vfx.test.js` 有 12 項火元素正式 Sprite VFX 驗收，
-      V154 的 `tests/v154-current-request.test.js` 有 7 項本輪需求驗收，
-      V155 的 `tests/v155-current-request.test.js` 有 8 項本輪需求驗收，
-      V156 的 `tests/v156-deep-trace-fixes.test.js` 有 5 項深淵地圖／元素匣驗收，V157 的
-      `tests/v157-abyss-map-tap-fix.test.js` 有 3 項立繪尺寸／直接點擊驗收，V158 的
-      `tests/v158-combat-tuning.test.js` 有 7 項技能／命中／傷害／立繪驗收，V159 的
-      `tests/v159-abyss-battle-portraits.test.js` 有 4 項立繪載入時序驗收，V160 的
-      `tests/v160-current-request.test.js` 有 5 項本輪數值／目標／補給／動畫驗收，V161 的
-      `tests/v161-flame-slash-vfx.test.js` 有 5 項火焰斬正式 Sprite VFX 驗收，V163 的
-      `tests/v163-flame-slash-source.test.js` 有 3 項來源校正驗收，V165 的
-      `tests/v165-fire-vfx-fixes.test.js` 有 3 項火系圖與火箭落點驗收，V166 的
-      `tests/v166-water-vfx.test.js` 有 15 項水／冰正式 Sprite VFX 驗收，V169 四套測試
-      合計 30 項 RPG UI／元素匣／水技能／深淵資產流程驗收，並保留可選的
-      `tests/v138-browser-smoke.js`。本輪環境沒有 Chromium executable，所以完整戰鬥／
-      副本 UI 點擊流程仍未納入自動測試；之後修改 loader、經驗
-      曲線、背包交易、自動戰鬥或多人角色邏輯時，必須同步擴充並執行測試。
-- [x] ~~V146 暫時沿用舊商店 icon~~ 2026-08-28 已由 V147 使用使用者補交圖完成透明化、
-      手機尺寸優化與三入口替換，採新檔 `assets/ui/home-shop-v147.png` 避免覆寫舊資產。
-- [ ] 元素匣的「金幣」統計目前跟著既有的 `gold` 全域變數走，沒有另外檢查這個變數
-      本身的來源/正確性是否符合預期（超出這次需求範圍，沒有深入查證）。
-- [ ] **角色／元素匣／技能視窗的 Android 合成層破圖需真機複驗**：V169 已確認底層頁面
-      會以矩形 tile 穿透仍開啟的視窗；最可能原因是 transform／paint containment 內的彈窗
-      永久 `box-shadow` 動畫與每張技能卡 `will-change:transform` 同時建立大量合成層。
-      V169 已將前者 `animation:none`、後者改為 `will-change:auto`。目前缺少 Chromium，
-      需在同款 Android 裝置把角色、元素匣與技能詳細視窗各保持開啟約 10 秒複驗。
-- [x] ~~**背包介面「返回鍵」不見了**~~ V173.17 由使用者截圖確認問題畫面其實是
-      `#itemModal` 物品詳情，而不是背包主頁或地圖背包覆蓋層；物品圖與內容會把原本最下方
-      的關閉鍵推出可視範圍。現已限制圖片／內容高度、允許內容區捲動，按鈕文字改為「返回」，
-      並以線上瀏覽器實際點擊確認可見、可關閉。
-- [ ] **V136 舊存檔若早已只剩 `autoConfig.skill="normal"`，無法反推出原本
-      選過的技能**：更新後需要玩家在元素匣重新選一次；之後會由
-      `v136ActionIntent`／`v136LastSkill`保護，不再被舊同步靜默洗掉。
-
----
-
-## 更新守則（下一個接手的人，不管是誰，請照做）
-
-每次工作結束前：
-
-1. 在上面「已完成功能記錄」新增一筆，日期 + 標題 + 做了什麼 + 怎麼驗證的 + 已知限制
-2. 如果解決了「已知限制 / 待辦事項」裡的項目，打勾或刪掉那一行
-3. 如果發現新的架構陷阱（像「V131 不是用 script 標籤載入」那種），
-   補進「系統架構重點」，不要只留在對話紀錄裡，之後不同工具、不同視窗看不到那段對話
-4. 確認 `main` 分支已經是最新、可運作的狀態才算工作結束
-
-
-## 2026-09-07 — Synthesis / Dungeon / Equipment UI bugfix batch
-
-- Work branch: `bugfix/synthesis-dungeon-equipment-ui`, based on dev `ed1cd126d60f01fb7554b71e6fe54968adddd83b`. `main` untouched.
-- Official version/cache remain `173.62`; this batch is intentionally unversioned until every requirement is VERIFIED.
-- Reforge material tier layout owner remains `css/38-v141-system-expansion.css`; its tier picker is now a touch-whitelisted horizontal rail.
-- Dungeon text reward preview frame is body-mounted; the matching CSS owner is `css/33-v132-content-expansion.css`, not a `#game-stage`-prefixed selector.
-- Backpack equipment comparison owner remains `js/55-v173.51-inventory-qa.js` + `css/53-v173.51-qa.css`. Canonical equipment slots are `head / hand / shoulder / armor / shoes`; item type `weapon` maps to equipment slot `hand`.
-- Material synthesis remains owned by `js/58-v173.63-functional-fixes.js`; player-visible native browser selects are replaced with in-game listbox controls and the material artwork is compacted.
-- Initial synthesis equipment art is resolved by `js/38-v143-system-fixes.js` directly from `assetPath` on first picker render, rather than waiting for a later repair pass.
-- Permanent UI rule: player-visible native `<select>/<option>` menus are forbidden; see `UI_GUIDELINES.md`.
-- Batch checklist: `release/requirement-batches/2026-09-07-synthesis-dungeon-equipment-ui.json`. Status remains IMPLEMENTED pending CI + dev visual verification; do not claim COMPLETE or bump version yet.
-
-
-## 2026-09-07 — Cloudflare DEV branch alias
-
-- Cloudflare 已由實際 deployment 證實：`dev` 分支固定 alias 為 `https://dev.four-symbols-dev.pages.dev`。
-- 現行 DEV 實機測試、release manifest 與 commit SHA read-back 一律使用此 branch alias；較早文件中出現的 `https://four-symbols-dev.pages.dev` 僅為歷史 root URL，不得再作為目前 `dev` SHA 驗證來源。
-- `.github/workflows/deploy-dev-cloudflare.yml` 已明確使用 `--branch=dev`，且部署後會從上述 branch alias 驗證 commit SHA、Game Version 與 Cache Version。
-
-
-## 2026-09-07 合成內頁垂直捲動 follow-up（dev）
-- 使用者手機驗收確認裝備冶煉與材料合成內容仍會在底部裁切；真正垂直 scroll owner 為 `.v141-synthesis-body`，不是外層 `#homeFeatureModalBody`。
-- `css/38-v141-system-expansion.css` 改為 `.v141-synthesis-body` 原生 `overflow-y:auto` + `touch-action:pan-y`，長內容卡片改 `height:auto; min-height:100%`；冶煉階級橫向 rail 允許 pan-x/pan-y。
-- `js/58-v173.63-functional-fixes.js` 的 `maximizeSynthesisPanel()` 同步把真正內容 body 設為垂直 scroll owner；`js/01-stage-v8-touch-lock.js` 白名單加入 `.v141-synthesis-body`。
-- 版本仍維持 V173.62；需等 DEV 實機確認兩頁都能滑到底後才可把本 follow-up 標成 VERIFIED。
-
-
-## 2026-09-07 — EXP 成長曲線正式收斂
-
-本段為目前 EXP／成長規則的最新正式 owner 規格；若前文歷史版本敘述與本段衝突，以本段與實際 runtime owner 為準。
-
-- 升級需求唯一長期 owner：`js/28-v133-economy-rebalance.js` 的 `v133GetExpNextForLevel()`。
-- Lv1→20：新手快速期，保留既有 newcomer bonus／新手森林／新手任務節奏，正常流程目標約 20～30 分鐘到 Lv20。`v133GetExpNextForLevel(1..19)` 維持既有新手靜態需求。
-- 從 Lv20→21 開始：`expNext = 該等級練功區正式平均標準巡怪 EXP × TARGET_BATTLE_ANCHORS`，不得再用另一套高等級靜態 EXP anchors 覆蓋。
-- `TARGET_BATTLE_ANCHORS` 正式控制 expNext：Lv20=45、Lv30=100、Lv40=250、Lv50=400、Lv60=650、Lv70=900、Lv80=1200、Lv90=1700、Lv95=2600、Lv98=3500、Lv99=4000；中間等級平滑插值。
-- 一般巡怪正式 EXP owner：`js/25-v131-fix-batch.js`。Lv20+ 標準巡怪 = 怪物基礎 EXP（等級×10）× rank（普通1／精英1.5／BOSS3）× 練功倍率3.5；V173.42 全域 EXP ×3 僅保留 Lv1～19 快速期，不得在 Lv20+ 再疊加。
-- 元素匣：同條件正式巡怪 EXP 的 70%；不吃休息經驗。
-- 休息經驗：一般巡怪同條件 200%；每約離線2分鐘累積1場、最多300場；元素匣與休息經驗禁止疊加。
-- 自然充能：Lv20+ 仍依 `expNext × levelsPerDay`，既有 levels/day 意圖不重做（Lv20約1.30、Lv50約1.00、Lv99約0.32）。
-- 每日 Growth EXP：仍依新 `expNext × levelsPerDay` 動態計算，不得硬寫舊 EXP，也不得再額外乘全域 ×3。
-- 經驗副本：維持全隊當級 `expNext` 平均 ×33%，廣告雙倍約66%；`DUNGEON_DAILY_LIMIT_ENABLED=false` 是目前 DEV QA 刻意設定，禁止當成 Bug 恢復次數限制。
-- 傳統離線 EXP：仍由 `js/00-main.js` 基礎 10 EXP/分鐘（最多480分鐘）＋`js/34-v141-core-systems.js` 最高角色等級倍率與 V173.42 ×3 計算；本次評估相對新長期 expNext 並未破壞定位，因此不修改。廣告領取仍為雙倍。
-- EXP 場數健檢必須走真正 runtime：實際怪物／rank → 戰鬥 EXP → mode（手動／元素匣／休息）→ `expNext`，不得只比較 UI、註解、anchor array。
-- 回歸 owner：`tests/v170-final-spec-integration.test.js` 驗證完整最終 runtime；`tests/v139-economy-rested-exp.test.js` 驗證曲線與休息經驗；`tests/v173.43-growth-charge.test.js` 驗證自然充能／每日 Growth／新手期。
-
-
-## 2026-09-09 — 戰鬥 VFX 單一 owner 收斂
-- `js/39-v143-skill-animation.js` 是巡怪、日常／深淵副本、玩法／活動與 BOSS 戰鬥的唯一技能 VFX 與持續狀態 Sprite Sheet owner。
-- 正式戰鬥視覺只允許 PNG／WebP Sprite Sheet 與狀態循環圖；V142 僅保留 action gate／時序相容，不再繪製視覺。
-- 禁止 CSS／JavaScript 程序式技能替代動畫、Canvas、SVG、WebGL／Shader fallback；正式素材缺失時只記錄 missing visual，不得退回舊 renderer。
-- `js/43-v149-skill-ui-rules.js`、`js/46-v155-dev-fixes.js`、`js/59-abyss-two-tier-runtime.js` 等後載入規則／副本模組不得改寫 `v143SkillAnimationManifest` 或 `v142SkillAnimationDirector.play`。
-- 萬象土盾、結界與其他 Buff／Debuff 視覺由 V143 `RAW_STATUS_SPRITES` 正式循環圖呈現，不再建立舊四角／粒子 CSS 視覺。
-
-
-## 2026-09-09 — 兩條 UI 維修分支安全整合（dev only）
-
-- 整合前遠端 `dev`：`29b9668057846164a941fbf6617d2458d9af5476`；整合前及收尾前遠端 `main` 均為 `bcaaf0dfff1bbfbcddeb08bd1e4a712738bb4bfe`。本批未對 `main` 建立 merge、push 或更新 ref。
-- 實際順序依 runtime owner 判定：先合入 `fix/character-inventory-skill-relic-ui-20260909@27e905ee9a9280a3dc520a3487bc2aa4f464d2af`（merge `5479368c19c044ceb985772d305237866f4a314c`），完成獨立 CI／部署驗證後，再以已含第一條的最新 `dev` 合入 `fix/boss-mechanism-card-detail-ui@ac6c89bde325e37b49d0518fa132657886ac9387`（merge `6f387ea1fc9183b4e476db281558923627fe3d32`）。
-- 兩條分支都存在且指定 SHA 就是遠端分支 tip；兩者相對初始 `dev` 都不落後。唯一共同檔案是 `js/19-stage-v78-character-inventory-runtime.js`，但第一條只改 `releaseCharacterLayoutOwnership()`／`applyNow`，第二條只改 Gameplay BOSS CSS／JS 動態載入 URL，沒有同函式、selector、listener、state、資料結構或 runtime owner 重疊；兩次實際 merge 都沒有 conflict。
-- 第一條合入後，live Abyss QA 暴露初始 `dev` 已存在的過時 Canvas assertion；正式 runtime 已由 `js/39-v143-skill-animation.js` 擁有 DOM raster Sprite。修復 `.github/scripts/run-abyss-live-browser-qa.mjs` 與 `tests/v174-raster-only-combat-vfx-owner.test.js` 的真正 QA owner，commit `c5885c2486f29738947dc642d60162be0bdd24d7`；GitHub Actions run `34344546671` 的 Repository checks、精確 SHA 部署與 live mobile QA 全部 SUCCESS。
-- 第二條合入後，push checkout depth 2 未包含其 typography regression 寫死的初始基準 SHA；`.github/workflows/ci.yml` 已明確抓取 `29b9668057846164a941fbf6617d2458d9af5476`，commit `aae6b2d9a095ecb00329a24e7f068f3f37f945dd`。GitHub Actions run `34345787199` 的 Repository checks、精確 SHA 部署、live Abyss 與 battle/audio QA 全部 SUCCESS。
-- 最終本機 `node .github/scripts/ci.mjs tests`：131/131 suites 通過；語法、靜態資源、重複 HTML ID、loader、V173.64 release gate、whitespace／conflict marker，以及重複函式／listener／CSS owner 稽核均通過。
-- `https://dev.four-symbols-dev.pages.dev` 實際瀏覽器 QA：完成男性水系創角與配點，開啟角色技能、背包、秘寶；確認背包 `pan-y`、秘寶內容垂直捲動與分類橫向捲動。另以 DEV 工具升至 Lv20，實際進入熾焰狼王戰鬥；第二回合生成「金剛護體」9:16 卡，BOSS battle title 只在該 runtime 隱藏，紅色 `!` 可開啟 9:16 詳情、顯示完整效果並由「返回」收合。頁面來源沒有 console error；觀察到的 error 只來自測試瀏覽器的 `chrome-extension://` metadata extension。
-- Requirement batch：`release/requirement-batches/2026-09-09-two-branch-dev-integration.json`，全部標記 VERIFIED。Game／Cache Version 刻意維持 V173.64；沒有 main promotion approval。
-- 尚未做實體 Android 裝置 QA；既有 Android 合成層真機待驗項目仍保留。本批已用 390×844／412×915 CI Chrome、live mobile QA 與實際雲端瀏覽器交叉驗證，未發現兩分支互相覆蓋。
-
-
-## 2026-09-09 — 兩條 UI 維修分支 main promotion 授權
-
-- 使用者於 2026-09-09 明確要求「推到 dev 再推到 main」，取代上一段當時尚未取得 main promotion approval 的狀態；本批 promotion approval 已記錄於 `release/requirement-batches/2026-09-09-two-branch-dev-integration.json`。
-- Promotion 前重新讀取遠端：`dev=ade22629ddaa7f8451dc3aaa8b4696f8d67cc92b`、`main=bcaaf0dfff1bbfbcddeb08bd1e4a712738bb4bfe`。兩者 history 因歷次 main promotion commit 分岔，但 main tree `80baa9b133252950283ff37ea95b32e0911de63d` 與本輪整合前 `dev@29b9668057846164a941fbf6617d2458d9af5476` tree 完全相同。
-- 已建立 ancestry reconciliation commit `6d9273d014ca7c2c746bccbc453eeb1b00a86780`，雙親為已驗證 dev 與現行 main，tree 保持 dev `686eec88a0d9ac2a08f0631876e68f1d1e47baa5` 不變；這只收斂歷史，不回退或覆蓋任何 runtime／CSS／測試內容。
-- 後續固定走 `dev CI／精確 SHA 部署 → dev-to-main PR → main Repository checks → merge → production Pages SHA 核對`，禁止 force-push main。
-
-## 2026-09-10 — 秘寶養成／掉落系統安全整合（dev only）
-
-- 指定來源為 `feature/relic-progression-drop-system@7125580afa5d1c89d6cae0a2d986c71a6f22d916`；本次僅整合至 `dev`，`main` 受保護且不得修改。
-- `js/relic-progression-drop-system.js` 是碎片合成、通用碎片替代、秘寶精華／突破石、Boss 定向掉落、塔里程碑自選箱與 pending receipt 的唯一 owner；狀態沿用 UID 主存檔內的 `player.relicProgression` 與既有 inventory transaction，不建立 sidecar storage。
-- Loader 順序必須維持 `feature-boss-relic` 基礎 runtime 在前、`feature-relic-progression` 在後。singleton installed flag 只可在 `v174RelicSystem`、`GameplaySystem`、`FourSymbolsAccountSave` 三個 owner 都存在後設定，避免依賴順序異常時永久停用且無法重試。
-- 本 owner 不得接管 `winBattle`、`loseBattle`、`v132LaunchDungeonBattle` 或 `saveGame`；它只包裝公開 Boss／塔入口並依既有進度 state 對帳 exact-once receipt。理論上的同 ID 並行物品異動、UTC 跨週邊界與滿 120 格選擇箱仍需列為已知邊界，不得以 CI 綠燈宣稱已消除。
-- Game／Cache Version 維持 V173.65；本批最終驗證與未驗證項目統一記錄於 `release/requirement-batches/2026-09-10-four-branch-dev-integration.json`。
-
-## 2026-09-10 — 裝備／玩法／主城 UI owner 收斂（dev only）
-
-- 指定來源為 `fix/ui-equipment-gameplay-city-polish-continued@26a67473128674c91fa363cefbd33e5f3f1c8034`；本次只允許進入 `dev`，不得修改 `main`。
-- 原分支的 `body #game-stage .v17361-reward-preview` 與 `body #game-stage #allElementSkillPreviewModal` 都不符合正式 DOM：reward modal 與全元素技能 modal 會直接掛在 `document.body`。整合時改由 `js/equipment-progression.js` 產生正式文字預覽、`css/33-v132-content-expansion.css` 持有 body modal 版面，並直接調整 `css/56-v174-critical-ui-regressions.css` 的 body selector。
-- 固定「返回主城」控制直接由 `index.html#gameplayPage` 持有；不保留 `js/62-v174-current-ui-fixes.js`、永久 `four-symbols:feature-ready` listener 或 app-ui-fixes bundle。
-- 裝備格、短螢幕隊伍 HUD、秘寶／元素匣標籤分別收斂至 `css/38-v141-system-expansion.css`、`css/42-v146-system-polish.css`、`css/55-team-relic-system.css`。未保留含大量 `!important` 的 `css/57-v174-current-ui-fixes.css`。
-- 新秘寶主城圖使用 content-hashed 路徑 `assets/ui/home-relic-v174.eed14e806044.webp`；舊無 hash URL 不覆寫，避免既有客戶端快取沿用錯誤內容。
-- 裝備副本品階機率由 `EQUIPMENT_CHEST_DROP_TABLE` 經 `equipmentChestOddsText()` 產生，不再把 40/40/10/10 複製到 CSS 偽元素。
-- CI 的窄螢幕 fixture 證實文字獎勵框原本仍可因 392px 上限溢出；正式 owner 已改用 `calc(100vw - 32px)`／`calc(100dvh - 32px)`。QA 以明確 390×844／412×915 overlay surface 驗證四邊 containment，不把 CI Chrome 的 500px 最小 `innerWidth` 誤稱為手機 viewport。
-
-
-## 2026-09-11 — Cold-start 創角 Native lifecycle 修復（PR #157）
-
-- 基準：`dev@29f83030d6427f2641952745243291b35731659a`；工作分支 `fix/cold-start-character-creation-lifecycle-20260911`。`main` 未修改。
-- 根因：account-first Startup State Machine 在 `NEED_CHARACTER` 直接把 `#creationPage` 設成 `display:block`，繞過 `FourSymbolsGameSave.showCreation()` 與 `js/24-v125-character-creation-native-runtime.js` 的 Native 啟用流程；Android Chrome 因而可能在第一個可見 frame 缺少 `creation-fixed-active` / `creation-native-active`，讓 legacy `#app` / overlay 仍參與 paint/compositing。
-- 修正：`js/52-v173.20-startup-loader.js` 新增 fail-closed 的 `showCharacterCreationSurface()`，只透過 canonical `FourSymbolsGameSave.showCreation()` 進入創角，並在 startup loader 尚覆蓋舞台時先完成 Native layer migration / isolation，再淡出 loader。禁止再由 startup owner 直接 `display:block`。
-- 清理：production `app-shell` 不再打包退役的 `js/22-v124-character-creation-native-runtime.js` 與 `css/28-v124-character-creation-native.css`；保留 `js/23` bootstrap + `js/24` runtime + critical `css/29` 為目前創角 owner，避免舊版 `overflow-y:auto` / `touch-action:pan-y` / isolation 規則在新版固定 canvas 後方重新覆寫。
-- Browser QA：390×844、DPR 3、touch emulation 的 account-first 新 UID 冷啟動現在必須驗證 `#creationPage` 位於 `#game-overlay-layer`、`native-creation-page`、`creation-fixed-active`、`creation-native-active`、legacy `#app` inert 且不 paint、創角 canvas `overflow-y:clip` / `touch-action:none`，並以 `elementFromPoint()` 驗證「下一步」按鈕右側沒有被其他 layer 蓋住；Boot QA 不再強制 `--disable-gpu`。
-- Production build 仍由 `scripts/build-production.mjs` 產生 content-hash bundle / manifest；本輪不得用 query version 或臨時 CSS/JS patch 規避 owner。
-
-
-## 2026-09-11 — 創角第二頁底部操作列裁切修復
-
-- 基準：`dev@daf724a10802b6074fdcce3f0f9bee2e7f404ac4`；工作分支 `fix/creation-step2-bottom-actions-20260911`，`main` 不修改。
-- `css/29-v125-character-creation-native.css` 仍是固定 1080×1920 創角版面 owner；`js/24-v125-character-creation-native-runtime.js::applyCreationStep()` 只負責步驟切換，不新增 wrapper。
-- 根因：第二頁 `.creation-action-row` 是 fixed canvas 內的 flex child，但未鎖定 shrink；在真機字體／可用高度吃滿時，action row 可被壓縮到接近 0，而其 124～132px 子按鈕又被 `.creation-step{overflow:clip}` 裁掉，畫面只剩按鈕上緣。
-- 修正：step two 預留 154px 底部安全區，操作列改為在 step 內 `position:absolute; bottom:0`，並保留至少 132px row 高度；不開放整頁捲動、不改配點／建角邏輯。
-- 390×844、DPR 3、touch QA 會實際切到第二頁，驗證「上一步／開始冒險」高度至少 44px、完整落在 step/stage 內，且左右 hit-test 都由按鈕本身取得。
-
-
-## 2026-09-11 — 雙段啟動畫面＋第二幕登入覆蓋
-
-- 基準 `dev@f859f747301941f346f4d2b9590d3f3d87a06cd8`，分支 `feature/boot-intro-auth-overlay-20260911`；`main` 不修改。
-- 本輪兩張附件與既有 V173.20 使用者啟動素材位元組一致；Logo=`assets/ui/startup-logo.4631c0bc3f2b.jpg`，第二幕新增 content-addressed alias `assets/ui/startup-main-city.d43e67af1c1c.jpg`，沒有重新生成圖片。
-- `js/52-v173.20-startup-loader.js` 仍是唯一 StartupStateMachine owner；900ms 僅控制 Logo→第二幕，真實 Firebase/Auth/save 全程並行且 readiness 不等待動畫。
-- `css/firebase-auth.css` 將登入框縮至最多 390px、縮小文字但保留 44px 觸控高度，登入背景持續使用第二幕慢推。兩張圖均進 Critical preload/immutable cache；非必要 gameplay 資產仍維持 lazy。
-
-
-## 2026-09-11 隱私權政策同意 gate
-
-- `privacy-consent.html` 是隱私權政策首次同意與後續查看的唯一 owner；正式政策本文仍由 `privacy.html` 單一維護。
-- `index.html` 只掛一個最高層級同源 iframe gate，不新增第二套 Auth／Startup State Machine。首次未同意時必須把政策滑到底才開始 5 秒倒數，倒數完畢才可按「我同意」；同意版本以 `four_symbols_privacy_consent_version` 儲存在同源 localStorage。
-- 「不同意」先嘗試關閉視窗；因一般瀏覽器通常禁止網頁自行關閉使用者開啟的分頁，失敗時改導向 `privacy-declined.html` 並終止遊戲介面。
-- 同意 gate 持續以隱藏 iframe 作 owner，動態為登入頁插入「隱私權政策」入口，並在主城「系統」的客服列後插入同一入口；兩者皆重新開啟相同政策 viewer，不複製政策本文。
-- 本功能不修改 Firebase UID、登入 provider、存檔、角色資料、戰鬥、掉落或遊戲數值。
-## 2026-09-12 怪物立繪基礎與首次遊玩手機修復整合（待 DEV CI）
-
-- 使用者授權整合 `feature/monster-portrait-pipeline-v1-20260911@bfab950abc32726d72c65eb75006475e499c4148` 與 `fix/mobile-first-play-ui-vfx-20260911@b22065175f514ea1f93ecb020cbb0c3ae2d38b25` 到最新 `dev@7d5f841f237c5dc02e79767972f95516df575e3f`；整合分支為 `integrate/monster-portrait-mobile-first-play-20260912`，`main` 未修改。
-- 巡怪形象切換／角色圖 owner 維持 `js/26-v131-patrol-appearance.js` + `css/32-v131-patrol-appearance.css`；首次遊玩兩幕與創角預備 owner 維持 `js/52-v173.20-startup-loader.js`；卡牌立繪／火箭方向的既有最終 CSS owner 為 `css/56-v174-critical-ui-regressions.css`。本輪未新增 runtime wrapper。
-- 怪物立繪基礎 owner 為 `config/monster-portrait-registry.json`、`js/45-v154-dev-fixes.js` resolver 與 `js/48-v159-abyss-battle-portraits.js` 同步橋接。四張已合入但損毀的天兵 PNG 已以既有透明母圖重新置入 1024×1536 RGBA 檔，非重新生成。
-- 已通過 monster audit（13 existing／94 planned，4 張 generated assets 均可解碼）、專項測試、124/124 非瀏覽器 Node suites、233/233 JS syntax、build deterministic、resources／IDs／loader／release gate／git diff。此環境沒有 Chromium；29 個既有瀏覽器測試留待 GitHub Actions 驗證後才可標示完整完成。
-## 2026-09-15 出城冒險地圖 footer 可見性修復（DEV PR 待 CI）
-
-- 工作分支 `fix/adventure-map-footer-visibility-20260915` 從當時最新 `dev@cca990ec6cf34cffc82501d888d909ae2af69181` 建立；本輪禁止修改或推送 `main`。
-- Adventure 唯一地圖版面 owner 仍為 `css/adventure-v1-20260915.css`。原 `.adventure-view` 以預估的 `clamp(66px,9vh,92px)` 扣除高度；實際 header 含瀏海安全區時可比預估值高，造成視窗末端與 footer 的可見區不可靠。現把既有 `#adventurePage` 收斂為 flex column，由實際 header 佔位，`.adventure-view` 維持唯一 `overflow-y:auto` scroll owner，並保留 footer 所需的 bottom safe-area padding；沒有新增第二個 scroll container 或縮小文字。
-- `js/01-stage-v8-touch-lock.js` 的既有全域 scroll whitelist 已加入 `.adventure-view`，使同一個既有 scroll owner 在手機手勢下不會被 touch lock 擋住。未改 Adventure 玩法、章節資料、事件、戰鬥、背包、主城或其他 UI。
-- 新增最小回歸：`tests/adventure-node-system-v1.test.js` 鎖定 flex owner、禁止猜測 header 高度與 touch whitelist；`.github/scripts/run-adventure-browser-qa.mjs` 會在 360×800、390×844、412×915 逐一捲到最底，驗證 footer 完整可見且地圖只有一個垂直 scroll owner。
-- 本機已通過 targeted Adventure regression、build、build check、release gate、syntax 與 `git diff --check`；PR #241 的 Repository checks run `34958900612` 已通過，並實際完成三尺寸 Adventure Chrome QA／evidence upload。Requirement Batch `release/requirement-batches/2026-09-15-adventure-map-footer-visibility.json` 已更新為 2/2 VERIFIED；僅待最後的驗證紀錄 CI 與 dev 部署 SHA 核對。
-## 2026-09-17 — Battle formation / BOSS mechanism / monster range repair candidate (NOT COMPLETE)
-
-- Base `dev@f4cd11ff8e9a4ba51edf64ec37c0db711140616a`; branch `fix/battle-formation-targeting-20260917`. Scope is limited to front/back visual projection, BOSS mechanism-card visual plane, and monster range target resolution. Do not change VFX, skill numbers, normal target rules, save data, or unrelated gameplay.
-- Root cause 1: `js/battlefield-slot-owner.js` correctly kept `ALLY_F*` semantic front slots and `ALLY_B*` back slots, but `css/fixed-slot-battlefield-rendering-v2.css` displayed them opposite the enemy-relative definition. The canonical CSS now projects ally front at the top (nearest enemies) and ally back at the bottom.
-- Root cause 2: `js/gameplay-boss-tower-system.js::renderMechanisms()` created separate mechanism targets after the absolute enemy rows, and `css/gameplay-boss-tower.css` left their container in normal flow at the enemy-zone top. The renderer now marks the independent mechanism zone synchronously; the canonical fixed-slot stylesheet places it in the enemy front plane. Mechanisms remain outside enemy unit geometry and target resolution.
-- Root cause 3: `js/00-main.js::processSingleMonsterAttack()` converted `tri` / `row` directly to all living party members. It now reuses `FourSymbolsBattlefieldSlots.resolveAllyTargets()` for `tri` / `row` / `column`, retaining explicit `all` and existing single-target stealth behavior.
-- Regression coverage is supplementary only: `tests/fixed-battlefield-ally-formation.test.js` locks a split two-front/one-back party; `tests/fixed-slot-battlefield-rendering-v2.test.js` locks ally projection and mechanism front plane. Requirement batch `release/requirement-batches/2026-09-17-battle-formation-targeting.json` remains 0/3 VERIFIED pending fully loaded dev gameplay evidence.
-## 2026-09-18 — Boss HUD width / World reinforcement live snapshot / enemy hit feedback / integrated Shield (IMPLEMENTED / QA PENDING)
-
-- Base: latest GitHub `dev@9e0ba369925e3c857bc6a8c619fcd071c87d94bc`; branch: `fix/boss-hud-world-reinforcement-hit-shield-20260918`. `main` remains excluded.
-- The prior two repairs (#297/#298) fixed Boss HUD visibility, height and vertical order, but neither removed the shared V143 `width: var(--v143-monster-bar-width,68px) !important` owner. The Boss appeared visible while still measuring as a normal 68px monster bar.
-- `css/40-v143-combat-dungeon-polish.css` now scopes that width owner to non-Boss enemies. `css/gameplay-boss-tower.css` remains the only Boss HUD geometry owner, so its left/right insets determine both HP and SP width.
-- World-only reinforcement overlap was a snapshot identity split: the Boss context preferred its startup snapshot even if runtime rendering had already replaced the active Fixed Slot snapshot. Summons could be assigned to stale data while the adapter painted a live natural formation. `bossBattlefieldSnapshot()` now adopts the active snapshot containing the Boss before any dynamic assignment; Personal Boss behavior is covered separately.
-- `showMonsterHit()` is now the enemy HP feedback owner: HP damage creates no red popup for any enemy entity. `shakeArtForPopup()` also refuses enemy cards so a legacy/reparented popup cannot reintroduce `v174-hit-shake`. Player-side hit feedback is untouched.
-- The old extra Boss shield HUD is retired. `syncBossShieldHud()` now maintains one white `.boss-hp-shield-overlay` inside `.monster-hp`, using the formal player owner proportion `maxHP + currentShield`; HP text remains `currentHP / maxHP`. Damage settlement remains Shield → HP overflow and heal resyncs the same owner.
-- Focused Boss runtime tests and `build:check` pass locally. The local full Node suite is blocked only because this workspace lacks Chrome required by the existing browser test. Requirement batch: `release/requirement-batches/2026-09-18-boss-hud-world-reinforcement-hit-shield.json` remains IMPLEMENTED until CI, deployed SHA and 412×915 real Runtime QA pass.
-## 2026-09-19 — 秘寶 Trigger Lifecycle、正式回合邊界、HUD Lock、操作 Hitbox 與快速點擊效能（VERIFIED）
-
-- Base: latest GitHub `dev@7c1a074c45a2426b78901cad1ec1cbfbe7623649`; branch: `fix/relic-trigger-lifecycle-battle-input-ui-20260919`; `main` 不修改。
-- `js/00-main.js` 的 `FourSymbolsBattleFlow` 新增唯一 `round_start`／`round_end` subscriber 與 core-owned presentation lock。`processNextCombatant()` 在 `turn++` 前同步派送 round end；`startTurn()` 派送 round start；boundary key 由 battle token＋round 去重。Feature module 不再由 before-combatant 推測上一回合，也不接管 `turn++`、`finishPlayerAction()` 或 `processNextCombatant()`。
-- `js/60-team-relic-system.js` 將 10 件 `runtimeReady:true` 秘寶統一改成 `canTrigger → triggerMatches → markTriggered → resolveEffects` 同步 Gameplay 結算，再排 cinematic presentation。回天寶輪不再是唯一特例；演出取消、generation reset、battle end 或 VFX failure 都不會回滾已成立效果。反震也改為先傷害結算、後視覺。
-- 後 10 件仍維持 `runtimeReady:false`。DEV 可暫時配裝，但進戰鬥不再自動播放；卡片與詳情清楚標示 `Runtime Ready（正式功能已完成）`／`Presentation Only（僅演出預覽）`，只有 `v174RelicDevPreviewPresentation()`／戰鬥中的「DEV 演出預覽」可手動排入視覺佇列。
-- `updateActionHudVisibility()` 納入 core presentation lock；演出期間 battle command、skill quick bar、item menu 與 target-selecting UI 全部不可操作，最後一個 presentation lock 釋放後才由 Core 恢復原宣告流程。
-- 戰鬥指令 Hitbox 幾何收斂回 `css/00-main.css`，依 1536×559 `battle-command-panel.jpg` 五顆視覺中心設定百分比邊界；五區互不重疊。`css/45-v152-dev-fixes.css` 的 Skill 21.5% priority overlap 已移除。
-- 全域 tap ripple 在 `#battlePage` 停用；其他頁面共用單一 DOM node，動畫由 width／height／margin 改為 transform＋opacity，快速點擊不再累積 20 個高 z-index animated nodes。
-- Focused Node tests、10 件秘寶 runtime、正式回合路徑、HUD Lock、VFX/cinematic regressions、V141/V142/V152 與 deterministic build 均 PASS。PR #332 Repository checks run 35424956704 SUCCESS；390×844／412×915 hitbox 與 20 次 pointerdown browser QA 均通過。
-- Requirement batch: `release/requirement-batches/2026-09-19-relic-trigger-lifecycle-battle-input-ui.json`。
-
-## 2026-09-20 — 商店補品重排與主城秘寶 HUD 壓縮（IMPLEMENTED / 實機 QA 待確認）
-
-- Base：最新 GitHub `dev`；工作分支 `fix/shop-potion-home-relic-layout-20260920`；`main` 不修改。
-- 商店補品版面唯一後層 owner 維持 `css/49-v169-rpg-ui.css`；正式資料／購買 owner 仍為 `js/40-v144-rules-and-abyss.js`，HP/SP 交錯排序 owner 仍為 `js/51-v169-rpg-ui.js::arrangeShopColumns()`。本次不新增 late CSS 檔或 runtime wrapper；六張補品卡維持 2×3，但改成明確 Header／Icon+文字／數量+價格／購買按鈕分區，避免內容互相重疊。
-- 主城隊伍秘寶摘要 First Screen owner 維持 `js/16-stage-v54-main-city-runtime.js` + `css/19-stage-v54-main-city-moderate-native-scale.css`。不載入完整秘寶 feature；只在既有 slot 隱藏次要 trigger 說明，將列高 58px→44px、按鈕視覺高 34px→30px，保留名稱、Lv 與更換操作。
-- Requirement batch：`release/requirement-batches/2026-09-20-shop-potion-home-relic-layout.json`。目前兩項均為 IMPLEMENTED，待 dev 實際部署與手機視覺確認後才可升為 VERIFIED。
-## 2026-09-20 — Persistent Effect Duration Lifecycle 與焚血訣（dev 整合前）
-
-- 正式 duration owner 為 `js/00-main.js` 的 round/status sweep 加上 `js/60-v173.64-skill-progression-rebalance.js::FourSymbolsDurationLifecycle` 的 initiative action snapshot。舊全域 round-start sweep 不再扣除 Freeze／Petrify／凍傷與一般 soft Debuff；增益也不再因施放或無關大回合少算有效行動。
-- `deferFirstTick` 不再寫入凍傷。Freeze／Petrify 仍在本次受控單位的行動時阻擋行動，然後由 action-finished boundary 扣除一次，因此 N 回合必定阻擋 N 次；Burn 保留獨立 round-start Status Tick，套用時不立即跳傷害，N 回合產生 N 次 DoT。
-- 焚血訣 owner 仍是 `js/60-v173.64-skill-progression-rebalance.js`：Lv1–5 改為消耗最大 HP 5/10/15/20/25%，接下來三次玩家主動火系直接傷害各提升同樣百分比；燃燒 DoT、免費追擊不使用。施放本身不消耗這三次，第四次火系直接傷害不再加成。
-- 回歸 owner：`tests/skill-progression-rebalance.test.js`。已覆蓋焚血 Lv1–5 的精確 HP 成本、三次加成與第四次失效，以及 Buff／Freeze／Frostbite 的有效／阻擋行動扣除與當回合新 Buff 不預扣。
-
-## 2026-09-20 — Cold Start Visual Ready／主城首屏 Gate／背景 UI 預抓
-
-- 根因：資料 hydrate、detached Blob decode 與兩次 paint 不等於 live 主城 DOM 已可繪製；startup-ready listener 另有一次 roster 重建競態。
-- 修復：`prepareFirstScreenVisuals()` gate 實際 `<img>`、CSS background、必要字型與 paint；`hideLoader()` 只能在 visual-ready 後執行。首屏失敗沿用正式 Startup Retry。
-- 三層模型：Level 1 首屏完整後曝光；Level 2 主城可操作後由唯一 Feature Loader、idle、concurrency 1 背景預抓；Level 3 大型玩法維持按需 Lazy Load。
-- Relic 首次開啟先顯示正式局部 loading，20 icon 只由 `RELIC_CATALOG_LIST[].iconPath` 衍生並在 visual-ready 後一次呈現；背景不 execute Boss／Tower／Relic runtime。
-- 工作分支：`fix/cold-start-visual-ready-background-prefetch-20260920`；以最新 `dev` 為基準，main 不修改。待 GitHub 認證後依保護流程推送、CI、PR 合併。
-
-
-## 2026-09-22 — Monster Portrait Fast Import（已生成怪物立繪快速導入）
-
-### 永久 Owner
-- 已生成且已落正式路徑的怪物立繪，正式快速導入 owner：`scripts/import-monster-portraits.mjs`。
-- CLI alias：`npm run portrait:import -- ...`。
-- Registry owner 仍為 `config/monster-portrait-registry.json`。
-- Runtime resolver owner 仍為 `js/45-v154-dev-fixes.js` 的 `resolveMonsterPortraitRecord()`；V159 僅同步時序，不新增 wrapper。
-
-### 固定流程
-1. 母圖／待處理素材仍依 `docs/IMAGE_ASSET_SPEC.md` 完成無損 WebP 與透明／尺寸驗證。
-2. 核准 WebP 放到 registry 指定的 `assets/monsters/` 正式路徑。
-3. 已生成素材不再要求建立 monster portrait batch manifest；直接使用：
-   `npm run portrait:import -- --keys=<portraitKey,...>`
-4. `planned` 通過檢查後升為 `existing`。
-5. `retired` 預設禁止重新啟用；只有專案負責人明確授權時使用 `--reactivate-retired`。
-6. 工具必須驗證 WebP 解碼、sizeClass 尺寸、Alpha／透明像素、V154 resolver 契約與既有 monster portrait runtime test；若 registry 還是舊 `.png/.jpg/.jpeg` path，但同 stem 正式 WebP 已存在，工具會自動收斂成 `.webp`。
-7. 未生成素材仍維持既有 batch generate/finalize/strict audit 流程。
-
-### 收斂目的
-- 解決「圖片已存在，但仍因 planned／retired／batch manifest 流程而長時間卡在正式接線」。
-- 避免只看檔案存在就誤判完成；正式導入仍以 `status=existing` 且 Runtime owner 可解析為準。
-- 快速導入工具只處理本子系統，不修改戰鬥玩法、UI、怪物數值或 main。
-
-
-## 2026-09-23 — Battle UI / Hit / Status Owner Convergence（VERIFIED candidate）
-
-- Base：`dev@ae535061883029d12e9ca951e2c23b5f791fbf86`；工作分支 `fix/battle-ui-hit-status-owner-convergence-20260923`；PR #533；`main` 全程未修改。
-- 一般命中唯一 Owner 收斂至 `js/00-main.js::calculateHitChancePercent()/rollHitChance()`：`clamp(95 + accuracy×0.15 + finalAccuracyBonus - targetFinalEvasion - finalHitReduction, 70, 99)`。普通怪物未明確指定 evasion 時使用 `min(10, level×0.1)`；多個閃躲來源改以最終百分點直接加減。
-- 異常／Hard Control 唯一 Owner 收斂至 `calculateStatusEffectChance()/rollStatusEffectHit()`：技能基礎成功率＋主屬性×0.05%＋最終異常命中加成－目標 Spirit×0.05%－最終抗性。物理異常讀有效 Attack Points、法術異常讀 Intelligence；移除 level factor、sqrt(attribute)、硬控專屬 Spirit coefficient 與 V140/V158/V149/V169 舊公式 Wrapper。Hard Control 上限：Regular 90%、Elite 75%、Boss 60%、enemy-to-player 60%。
-- 凍傷正式為 Soft Debuff：傷害 -25%、最終閃躲 -25 個百分點、最終異常抗性 -25 個百分點，不禁止技能；舊「無法使用技能」戰鬥狀態文字已清除。
-- 技能說明 Owner 補齊火系物理追擊、烈焰龍捲必定燃燒、火鳳天鳴鳳威、凍傷完整效果、焚血免費追擊不耗 Charge、淨心訣不可清除項目與四元素 EX；未復活 V149/V169 舊文字 Owner。
-- 怒火等 Buff 仍由 `FourSymbolsDurationLifecycle` 依 action-finished 扣除，0 回合移除後立即同步 V143 Status Visual；不新增 timer／polling。
-- 巡怪人物不再先顯示 legacy `patrol-character.png`；正式 WebP decode/load 完成後才顯示。巡怪 `#mapBattleInfo` 與正式 Battle Info Drawer 樣式 Owner 分離。
-- Battle UI：唯一金色 Target Reticle；怪物名稱透明；24px 狀態 Icon HUD 高於 HP/SP；選目標時倒數框與 Target Prompt 使用正式不重疊幾何；Battle Info 外殼透明、只保留小 Tab／展開正文黑底；Tab 拖曳改為 pointerdown 一次量測＋rAF/translate3d；操作面板改用透明素材投影。
-- 施工期間 Browser QA 抓到一個真啟動順序問題：`makeZoneMonster()` 在 App Shell 頂層建怪時早於後置的 default evasion const 初始化，會造成 TDZ 並中止 App Shell。正式 Default Monster Evasion Owner 已移到 zone roster 建立之前，並新增 boot-order regression。
-- Production build commit：`7567aa216fba3f32e92792ea9dac317ff9f8d942`。Verified source candidate：`1596ea0a36e564facca92432376775d9728bc0fe`。
-- GitHub Actions Repository checks run `35866039901`：SUCCESS。包含 Syntax、Battle Runtime Architecture Guard、專項／既有 battle regressions、production build synchronization、Fixed Slot 9:16 mobile browser QA、exact-candidate real battle mobile browser QA、Adventure mobile QA、static resources、release gate 與 `git diff --check` 全部通過。
-- Requirement Batch：`release/requirement-batches/2026-09-23-battle-ui-hit-status-owner-convergence.json` 已升級為 VERIFIED。
-## 2026-09-24 — Cloud Save Phase 2 Server-owned Envelope（COMPLETE / 6/6 VERIFIED）
-
-- Base：最新 `dev@e9a2f481d5a318050991d475201f359d694871cc`；工作分支：`feature/cloud-save-phase2-envelope-20260924`；`main`／`dev` 均未直接修改。
-- Phase 1 Single Active Session 維持 5/5 VERIFIED。Phase 2 唯一 Envelope owner 新增於 `functions/src/cloud-save-envelope.js`；public `users/{uid}/saves/current` 使用 schema Version 2、server-owned Revision、server timestamps 與嚴格狀態驗證。
-- `bootstrapCloudSave`：新 envelope 從 Revision 1 建立；重複呼叫不亂增 Revision／updatedAt；既有 Phase 1 Version 1／Revision 0 精確骨架受控升級。任意 owner/schema/revision/timestamp/status 損壞一律 fail closed。
-- `submitLegacyMigrationCandidate`：仍只保存 `trusted:false` candidate；metadata 改變與 active Session 驗證同一 transaction，`serverRevision` 原子遞增。Phase 2 不產生正式 gameplay payload、不升格本機資料。
-- PR #553 已合併 `dev@195acb63d4acd36ceada31ed95b5f50e448d297f`。PR CI `35987380366`／Session `35987380024`、merged dev CI＋DEV deploy `35987880895`、Session emulator＋Firebase deploy `35987880460` 均 SUCCESS；正式 deploy job `107595824436` SUCCESS。
-- 最小 live 驗收 bridge 為 `FourSymbolsFirebase.bootstrapCloudSave()`；不自動呼叫、不改 first-use read owner、不傳 local gameplay save。真實 Google 帳號已在手機 Chrome 驗證 Version 2、Revision 1 與重複 bootstrap idempotency；Requirement Batch 現為 COMPLETE / 6/6 VERIFIED。Phase 3–10 未開始。
-- 為無電腦的真實裝置驗收，DEV 帳號面板新增手動「驗證雲端存檔骨架」按鈕；它連續 bootstrap 兩次並讀回 envelope，只顯示 Schema／Revision 結果，不顯示 credential、不送 local save。使用者已以原 Google 帳號在完整手機 Chrome 取得 `Schema V2、Revision 1` 成功結果；ChatGPT 內建瀏覽器的 Google OAuth 未完成不視為後端失敗。PR #555 合併 `dev@b037ced9dad9d1cf67d9aacccb4e064c74a135e1`；merged dev CI `35992274605`、Session Authority／Firebase deploy `35992274447` attempt 2 均 SUCCESS。
+Y��x-���jם��i��+��j[h��ܢ��׎��d赩h��n�X�z�H�����LKL�8�%��Y�]�H\�H�RQ9�+9�g�f�:f��#��n�aiz/"yai{�"STSQS�Q�[�Y]{�"B��H�\�{�&�]�XM؍������L��L��M�̘M�ML�،�LX;�&�m�y/g9b!��+��&��X]\�K���Y\�]�K\\�L�]ZY[��[Z\��][ۋL���L�;�&�XZ[�9aj9�"��y�h�/빥.x� ��H9�'��h��.yf�9.#y�+��[�ۚX�[�]�H�^{�&�..�kf9��9m칧"HRQ�[Y\�X�H:"!�X�]�KURQܚ]H�X\�;�&�h�:f��g*9d#9. ��[Y[�9��9��y���RQ9�`��#^Y\��#�[��[�ܞ{�#�\]Z\Y[�9�bH[�[H�ؘ[�:"!�i&�`"�\\�[��[Y\^H�YX�\��^H9.�y��yk��bcy. RQ8� ��H�\�\�]HXX�[�H���L�]�M�ˌ�\�\�\[�Y\����9��9h��e+�. �[�Y�ܐX���[��[��][ۊ
+X;�&�]]9�n�a%�RQ9�.z+���`��#9ab9/g9n�""�\�[���\��][۸� YXX�]�]H�]�H�ۙ\�� y���fi9."�. 9n,�&g���\��[ۈ�\�[YHX\��\�� zf�z%��bmz)��#��[Y\^{�#9a�yk�9�m�[�Y8� �����[Y[�9�cz)����9��RQ9.)�a�y��9n�����`9�"H�YX�\��ۙ\�� ��H9.#y��9h���]�Hܘ\\�� y�+9.�9ie��\�\�ۙ\�9�%��]�;�&�X���[�\�]�K\�\��]ܞK���8� X��\��[X����[YT�]�X8� Q�\�\�ܙH�XYۛH�XY\�:"!�\�H�[��[�H9.#y�.x� �**�k��,����y.#z!�b�yd"9/mz!������{�#�[XZ[;�&�Y�X�HZYܘ][ۈ9.�yc�a`z*,y�#�讹论*�x� ��H9��9h��\�����Y\�]�K\\�L�]ZY[��[Z\��][ۋ�\����;�#9.)�"!�X���[��ۙ\��\8� X]]X�Y�ܙKXܙX][ۈ9b�9aiH����]�9o�z-�H�{�&��蹧"H��������\�PH9m�am�RQx����n�a��RQ�9k�9�m:f�:f蹨b9/���#9l!�/g\�YY�[�Y]H:!�b�z+by��� ��H9�+9�g�\�H��#��ۙ\��\;�#�]]X�Y�ܙKXܙX][ۻ�#؛��;�#��\�\;�#ՌM�ˍ�H]]�Yܙ\��[ۜ�9aj9�nT���&�]\�Z[�\�X��Z[:"!��Z[��X��T���#�]Y��KX�X��T��� �k�9�m�H\�9g*L�̌L�9�`�c�f��[��\�9�(H���YK����Z][H9`g9�h��&��*�a���,H�[�Z]H:`&�`c��#�����\�PH9�fyo�H��x� ��H�\]Z\�[Y[��]�;�&��[X\�Kܙ\]Z\�[Y[�X�]�\�̌��LKL�X��Y\�]�K\\�L�]ZY[��[Z\��][ۋ���ۘ;�#9��bcH�͈STSQS�Q8� �.�yo�H��x� QU�^X�T�H:`�9�l�c�d#:(�y�k��'�k�n,�&g�b!����je��-��&��*�`e9�$9bcy��9�b�ஈ����TUx� ��HUW��P�T�UW��ӕ�P�˛Y9.�y.#ykf9g*;�&��+9�(yc�/�y�蹧"H���;�#��\�[{�#���Y��ܙ\��9idy�!9��ym�{�#9�*�!�(c9`a�`(9�.�i,yidy�!8� ��������LKL�8�%9f��,hyhe[[Y[��ۙ\��#͸���L9.��fh�oh��#��X[����9�-�����"�T�Q�QQ�[�Y]{�"B��H�\�{�&�� 9��]�YLؙ��L��X�����YXL���L�L�LY���N;�&�m�y/g9b!��+��&��^���\�Y[[Y[�Y�ܛX][ۋ\�X[X����L���L�;�&���ML�8���]�;�&�XZ[�9aj9�"��*�/빥.x� ��H9f��,hyhe9a`��(;�#�f�k����: �ye+�. 9�y��H�ۙ\�9�-����������[Y\^KX����]��\�\�\�[K���;�&ՌMH�X�[[��Q[��[ۑ[[Y[��
+X9m�` 9/${�#Z[{�#���\��#Л����#�Y�[�\�{�#�X�\��9aly�*][��\�9.�y�h�o#��L̐X�]�Q[��[۔�[��[�X9c`9b!�.��b!�� ��H�M9ஈ[ۜ�\���[[[Y[��X\�9e+�. �ۙ\��&�. :"+9a`��(9�*�]X���#��\ܝ;�#�X[;�#НY���#�X�Y���#�\��۝��9c� �yo���+9a`��(9�h�o#��'9n-�Q:`n9����&�X�\��9�'��h�-�9a`��(9/��i%�.�H�Mܛ���[[Y[���[Y�9�#�讈[��\�8� ��H��\�9. :"+9li9f�k���9d#{�"��Ќ�Ѝ
+���ь�э;�"{�&�H9�9`#y�n9�ny���li:"!�L9�9`#y�n����9li9f�k��L9d#x� �����9li��9�+�e+�. ��\������&�gg�����9�ny���li��9a*�ab[]{�&��n�.�yo���9.#za�y���� ��H��\������[Y\^H�[��9/�y�fH����;�#9/a�ஈ[�]�[�H���\�X���Ș;�#�e���/���&�.#z`,�\��ۘ[;�#��ܛ9�\��H��������[�8� P�KЍH9��:.�x� Q�KэHؚ�X�8� T�Y[;�#�YX�[�\�HY�X�X�x� ��H�ۙ�Y��[ۜ�\�\ܝ�Z]\�Y�\��K���ۘ9�9`"���\�X����\��]9/�y�fH�[��X�����#�^�P�\��9�.H�[�\�;�"L�0��ML͸� L����"{�&��(9�d9��bcy.�y�+�[��Y;�#9�+9�(y�*��(�g%�� y�*�n�`a���8� ��H9��:(d�`�ym����fi;�&��MH���Y[[Y[��X�[[��x� U��\�\��KX����ؚ�X���[[[ۈ[�� U�ML�9�myn'yd#y�,yo#���: �H\�]�\�� U�ML�9aj9g��[ۜ�\��Y�]]]][ۻ�&ՌMH:/�y��"!��MNZ[H�����X�[ۈ9`�y/�y�fHX�[ۋ\���Y9���kf�`�9c���*:`%;�#9.#y�+��.9.aH�ۙ\�� ��H9l":h!H\�����\�Y[[Y[�Y�ܛX][ۋ\�X[X����L���L��\����9m�b�9aiH����]�9o�z-�H�{�&���H�[��NM�L�LM��9���\��H�[�Y]HMؘNLX�LX�NYL��X�LM���͌�LXMXY�\��]ܞH�X����P��T���#9c!yd*�l":h!x� P�����X�\��њ^Y��ؘ]KՑ�\��]Y�Yܙ\��[ۜ�� Y]\�Z[�\�X��Z[��X��� Q�^Y��N�M�� Y^X�X�[�Y]H�X[�]x� PY�[�\�H[ؚ[HPx� \�\��\��\�� [�Y\�� T�[X\�H�]H:"!��]Y��� ��H�[��H�Z]{�&�����]��ܚٛ��9/�yidy�!:-��`c��&�.#yo��*�9h,yஹm�-�x� �o�z-�H\��]Y��{�#�[�Yܘ][ۈ�Z]\�9aj:`�T��� ��H�\]Z\�[Y[��]�;�&��[X\�Kܙ\]Z\�[Y[�X�]�\�̌��LKL�]��\�Y[[Y[�Y�ܛX][ۋ\�X[X���˚��ۘ9m��T�Q�QQ8� ��HUW��P�T�UW��ӕ�P�˛Y9g*9�+9�(H�\�H9.�y.#ykf9g*;�&��+9�(y�*�/빥.yn,�&g�� P��Y�]�H9�%�k�yaj:,����H��[Xx� ��������LKL��8�%�L9��: �{�#�/%9b�y��: �{�#���9k��[�[YH�ۙ\�9�-�����"�T�Q�QQ�[�Y]{�"B��H�\�{�&�]�Y̙N،�����N�Y������LL��NX;�&�m�y/g9b!��+��&��^���[\�[X�\�[�[YK[�ۙ\�X�۝�\��[��KL���L��;�&�XZ[�9�*�/빥.x� ��H�H9`"��yk����9��y`��k����: �y�.yஈ�L8� �e+�. [XY�H�\��H�ۙ\�9ஈ���[XZ[���Ύ��]��[[XY�P]]�[
+
+X;�&����g�9�湠)�� S�OS�0��K�x� S���g�H9�湠)�� S�LS�p��K�{�#:"!��h�o#��[�[]Q[XY�J
+X9. :!�9/o��*X]���[�8� ��H��͌]�M�ˍ�\��[\��ܙ\��[ۋ\�X�[[��K���9��ஈ�[�[��[]{�#���ܙ\��[ۻ�#��yk��*���#��ڙX�[ۈ�ۙ\��#9.)�f�k��`,��[Y\^KX�ܙX;�&��`9�"yc��ca��&���: �y����&�f�k��H9��: �zn��#9�蹧"H��[]�[�9.#z`m�����#�.#za�y�k�� ��H9�j�����&�ࣺk`�alzl��x� yࣹb�L��MK�N̌K̍I{�#�H9�!����#��$9b����9h������乫���h�o#�f�d"9� 9i&�n��em�x� y�m9�(y� 9i&����#9acz,��/�y��.#yn��em��&��&�(`:*(���x� R9�$9�+K�L�MǨ̍I{�#9��y."�/����(zgg�acz,���j������9��y��y�/�
+�K�L�MǨ��I{�#�;�#�acz,��/�y��.#y/o��*9.g�.#y��: %�� ��H9�-;�#�h�;�#�g'��+���9��: �yga��.z+�9�h�o#��S]�[9�!9/c{�&�a�9l H�H9�cy�,H��[[�9ca�ஈ�{�&���9o��*(���9�cyca���빪&y.%:f�y��z`�y�!zfi9�`9�"yc��)��fi:!�9�`��,:k)y��9�b��&��d9�c9c깤����9��y`��k��.)�/�H�������H9�(z"!�f�d"9�n8� ��H9�my��yl�y���h�yh�9m��,yaj:j��\��[�X�\��[��Y\�
+X9�.yf繫h�o#�[U�U\��]�
+X;�#9� 9i&��d#{�&ՌM9c�yd$H�\]Z\�\ΖȘ�\��Y\��X;�#�[P[:""�,����ym�` 9/$x� ��HX[H�[X��Y��\�[��[�H9m�o���X]\�KX����\�[X�9��a�.)�f�k���/�aiH�[Y\^KX�ܙX9� 9�*�����&��`9�"y�h�o#��,:k)yaiyc��f�9�i9g*9c��g��(c9bcym�d#9�iyc�o��d#9. ��͌]X[K\�[X�\�\�[K���8� ������#���\��#�i"��$9.�H^�{�#9����"yhg�f�ܚ]X�[���;�#9.g�����"y��9h���]H�\�:gg�d#9�iz(�:/"x� ��HL9.��[�[YT�XYN��[�X9��9k�Y�]{�#�\]Z\;�#���ܙ\��[ۈ9aj:`��Z[���Y;�&��yk��c�)���#9�b9��9l&��*�)��a���#� �yb��l&��*�e���/��#x� �k乬�y�y��� y.gzo�y�g��j��jx� yl�yl��c��cl8� y��:foy�g���:*���#�m�d#9�iyk�f���Y��\��#���[\�� ��H9l":h!y�+:*i��&�\�����[\�[X�[�ۙ\�X�۝�\��[��KL���L�˝\����;�&��蹧"H\�����[\��ܙ\��[ۋ\�X�[[��K�\����9d#9�iy��:)���/;�#9ajz !ym�b�9aiH]��9o�z-�H�x� ��H�\]Z\�[Y[��]�;�&��[X\�Kܙ\]Z\�[Y[�X�]�\�̌��LKL��\��[\�[X�\�[�[YK[�ۙ\�X�۝�\��[��K���ۘ9m��T�Q�QQ8� ���L̈9� 9�`���\��H�[�Y]HML�Mٍ�X��M���MX��؍�؍���MLMX;�&�]\�Z[�\�X��Z[��[Z]L�Y��L�LL�Y�Y��L��YMX�Y�L���;�&���H�[��N�̍͌�̘�\��]ܞH�X����P��T���#9c!yd*���: �{�#���9k��l":h!x� P�]Kԙ[X��Yܙ\��[ۜ�� X�Z[��X��� Y^X�X�[�Y]H�X[�]H[ؚ[HPx� \�\��\��\�� T�[X\�H�]x� Y�]Y��� ��H:hcyi%��[��H]Y]9���o9��.)�/�o�yajy`"��+9�(y��:e�:n��&���9o��*(���9��9leL��빪&y�`�.�y/�y�fy�yk��n�`n9�빪&yஈ���[X\�{�&�X[�[9g*Y�X�K�\�]H9�.�l$y���9�!9/cy�`�.#y/�z,�9.#ykf9g*9�[\�� �]Y]9c鹣�zg,���ym�H�\�H9m�kf9g*9��]K\�]\�Z[���X\��]�L���L���\����;�#�ZKXܚ]X�[\�Yܙ\��[ۜ�[[ؚ[KX�����\��\�����[HRH�Z[\�{�#9.�yc��M�ՌMՌMMKՌM�H9�m�c�ۘ\��9.�yk���n�""���: �y�n9`/;�&��+9�(y�*�஺/�y�`��m�c���9��: #9����h�o#�)���/9�.yf�""�`/8� ��H9e+�. 9.�yo�y�(�d�z)���/9k���b;�&��+���9��: �y����"y�#�讈Y\�9l#y��{�#9f�9�i9b'y�(ykn9�乢$9�+9���/�y�fy�蹧"y�h�o#�`/;�&��"y�#�讈Y\�9�9f��a`��(9��9��y`��k����: �ym�/o��*��#ͻ�#�L;�#�M��#9�`9�"y��: �y�8�#�ca��&��#�ba�f�k������&�H:n�� ��HUW��P�T�UW��ӕ�P�˛Y9g*9��ym�H�\�H9.�y.#ykf9g*;�&��+9�(y����"y/빥.H��Y�]�{�#�n,�&g�k�yaj��[Xx� ��������LKL��8�%9a�9l {�#����c%�.����y�k9���"!���H�]\��\�H^Y\�9�-�����"�T�Q�QQ�[�Y]{�"B��H�\�{�&�]��X����NM��X�ٌؘL���X�M�LNXؙ�L��;�&�m�y/g9b!��+��&��^ٜ�Y^�K\]�Y�KY^�\�]�K\�]\�[^Y\�L���L��;�&�XZ[�;�#�]�9ga��*���9��y/빥.x� ��H�[Y\^H\��۝���ۙ\�9��y� H���[XZ[����9�\��\�[��]H�]x� ���Y^�{�#�]�Y�H9��ஹd#9. ^�\�]�H\��۝��ܛ�\;�&�d#9d#z"!�-�9d#z`�y� �g*9�g���j�:n�"!��h�o#�k��aiybcy.�x�#9��9�b�RT���#zf.��h��&��蹧"y��9�b�.#z)��$��� y.#yb-���8� y.#yn��em�� ��H\Q��Y^�QY��X�
+
+X:"!�\S[ۜ�\�X�Y��
+X9.g���yf�d#9. �]{�#:`o�acy�yk����: �x� y�*��jx� P�����#���y��x� y�)�d���%�am�.���9��H]]][ۈ�[\�9�g�`c�.����z)��ba�� �-�9d#H��9� �d#9�`��!�a蹧"y��9�b�"!���9�9i,y�e���9�b�� ��H\��\�[���H�]\��\�X[�ۙ\�9.�yஈ����K]�M�\��[X[�[X][ۋ���8� ���9h��*���#�li\�X�۝��X�\�X;�#���][��;�#�Y;�&ќ�Y^�{�#�]�Y�H9f�k��g*�\�H�ݙ\��#9.#ydo9d.8� y.#ze���#x� y.#yb�9aiH�9����H��][ۻ�&�am�.���H�]\�9/�y� yc���9��f�9�/9o��n��/*���x� ��H���9�,H����]�M�X��X�]Y[��[ۋ\�\�����9c�db9��."�/�9�h�o#�*���#�li;�&�m����fi��Y^�{�#�]�Y�{�#�X�\��9�9d#9li�Z[�^9�ny/���#9.#y.�H�Z[�^�NNNNHZ[\ܝ[�:hg�(�9. z&ey�!�� ��H�[�[YH:"�z)�9k��b,9d#9. [�]H9d#9�`�kf9g*��Y^�H
+�]�Y�{�#�M�9c�f�h,H\��۝���۝�X��[�][ۻ�#9.#y���,����yli:f�z%���#��h�)��c%�am�.+y. 9`"�� ��H�Yܙ\��[ۈ9m�)��$���&�d#9d#{�#�-�9d#HRT��� ybjzi&9f�d"9.#z+��� z)��fi9o�9c�. 9�k9���c��a�y��9��yb�8� y�h�o#��#9��9�b�RT���#y����b8� y�yk���#�. :"+9�*��#Л����#���y��yaly�*�]x� Q��Y^�H9f�k��n�yli;�"�. :"+9��9�b�/*���x� y�n�.�{�#�)��fi9���cl��!y�!�� P�\�Y�\��YY�X�X�x� ��H�\]Z\�[Y[��]�;�&��[X\�Kܙ\]Z\�[Y[�X�]�\�̌��LKL��Y��Y^�K\]�Y�KY^�\�]�K\�]\�[^Y\����ۘ9m��T�Q�QQ8� ���L�{�&�k�9�m��{�#��m9d"9f繫n9���[��N��NLM�:`&�`c��&�]\�Z[�\�X���X�[ۈ�Z[9m�d#9�i{�&ԝ[��N�L�M�M�\��]ܞH�X����P��T��� ��HUW��P�T�UW��ӕ�P�˛Y9g*9�+9�(y� 9��]�9.�yஈ;�&��+9�(y�*�/빥.yn,�&g��#�f����kf9��;�#�k�yaj:,����y�`y�"��#9�*�!�(c:(�9k��.#ykf9g*9�9idy�!8� ��������LKL��8�%9�,:k)y��9�b�/*���{�#���ylg9g%�li;�#�`$��n9�a��#�."y��: �H������]\;�"�[�Y]{�"B��H�\�{�&�]�MML�NL�XNLL��X��ML�،���XMLX;�&�m�y/g9b!��+��&��^ؘ]K\�]\�X�\��\�[Y�]�\��]��L���L��;�&�XZ[�;�#�]�9ga��*���9��y/빥.x� ��H\��\�[��]\��\�X[�ۙ\�9��y� H����K]�M�\��[X[�[X][ۋ���8� ���9�b�X�ۈ9�,HM9�/�i)�!��M�;�&Л�H9��9�b�g%��,y�!�	p��̉H9�/�i)�!���!�p���{�&�i&�`"���H9��9�b��.yஹ���H9��c�hk��.�. 9�+�.)�/*���{�#X�ۈ9.�yc��d#9�`�/�y�fy/g:,��*"�b%�� �do9d.9� 9i)�`#��#�n���.yஈL	x� ��H9��9�*y�h�o#���H9��9�b�g%���yஈ\��]�ݙ���]\���[���X�8� �c��i���(9�d9k�f��ஈM��0���9e��o-yg%��#9.#y�+�0�����]H�Y];�&�f�9�i9�*�`f�c+�*�:(�yn`8� ��H9�,:k)z,��*"�n�z`�9aiyc���.yஹ�j�d$x�#9�,:k)z,��*"��#{�&�m�`m9�lz*"9aiyc���#��]�\�9�.yd#x�#9�,:k)y�n9���#x� �n�z`�9��ylg9�-�d"9�`�hk��.���bcyf�d";�#9leze���`�f�z%��*l�a�z)!�f�d"9���ke�� ��H�[�И]UZT�[ܚ]S^Y\�
+X9ஹ.��b�z,��*"�g%�li9ce:*��aiyc���&��,:k)z,��*"�� y�,:k)y�n9��� P����9b�� �ychy�%���9�b�,��*"�)�����d�e���`��#��[YK\�Y�X9����`���9ca�b,9��: �H��;�"M�;�"z"!�]X�Y[XY�H�\;�"M��;�"y.b�."��&�e�:e�yo�9�h�o�y. :"+9�,9h-9�j�(�zh!�n��� ��]�\�9.�yஈ�ۋX����[��؜�\��\��#9.#yc�o���]Q���]\�H���� ��H9�b�b�yf�d"9`$��n9�a�m����aiHؘ]PX�[۔�Y�[ۘ;�#9f�k����9��y/g:gh��o�."���{�&���: �{�#��jyd�z`n9���c��빪&z`n9����`�`#��#�n��fcyஈ�I{�#9.%�[�\�Y]�[�Λ�ۙX;�#9.#y�%9�*��yk��`n9����빪&x� ��HY�9�.yf�9.b�. 9ஹk�fṢ,9h-9���o-z)�"l��#��*��jy����j��.9.ayg��(cYH�[�ٛܛH
+��[\���\��]܈9m�y/g8� ���g*9o�y�g�����j�gg9�h��&�k�f���.���[��H:"!�\��]�]X�H9.�y/�y�fyb�y�j��&����e��/cz!l�."��\��[\�9m����fi8� ��H9."y`"���: �y�h�o#���9�(9�d;�&���9o��*(�� yࣺk`�alzl�8� y�&�(`:*(�d!:!깥�9h��(�yb!��h���yoh����\���X�X�ۻ�#9.�yc�/�y�fyk�9�m0���9�j�n �����\���X��\���8� ���9l.�k�9ga�ஈM0��L�� ��`9�"z/by��9/o��*��X�[���\��Y^X�;�#9c�z)���9o�9l.�k�9. :!�9.%QOL8� ��H9�"y�b:,���(�/by���[��&��M���M��P��T���&��'��$;�#НZ[��[Z];�&�M��M�X��M��L��LM��XY�M�8� �. 9�(y�)�,���(��ܚٛ��9m�o��m�y/g9b!��+����fi8� ��H�\]Z\�[Y[��]�;�&��[X\�Kܙ\]Z\�[Y[�X�]�\�̌��LKL��X�]K\�]\�X�\��\�[Y�]�\��]��Y����\���ۘ9��bcHSTSQS�Q;�&�o�H��\��]ܞH�X����#�[ؚ[H�����\�P{�#�U�^X�T�H\�[Y[�9o�9a�yca��&��T�Q�QQ8� ��������LKL��8�%9�,:k)y��9�b�X�ۻ�#�chy�c:,��*"�)�����#��h�o#���9�b�g%��"U��[�Y]{�"B��H�\�{�&�� 9��]��M�N�YL���M��X�̎NX��ؙMYMX;�&�m�y/g9b!��+��&��^ؘ]K\�]\�Z[���X\��]�L���L��;�&�XZ[�9�*�/빥.x� ��H�[�\��ۙ\�9/�y� H���[XZ[���Ύ��[�\��]J
+X9e+�. 9���b-�/����;�&��+9�(y����"y��9h���[�\��]Hܘ\\�� �chy�c:n繤�c깧"yg*Y{�"9�*�`n9��: �{�#��jyd�{�#��빪&{�"y�`�e��eg�,��*"�)�����#9�蹧"y�my��{�#��$y��H\��]X�H:`n9c�a*�ab8� ��H\��\�[��]\��\�X[�ۙ\�9.�yஈ����K]�M�\��[X[�[X][ۋ���;�&���9�b�X�ۈ9f�k��hk��.�����9."���{�#9.#ya�ydo9d.;�&�e��o-ydo9d.;�#�f�k��g%�.�y/�y�fz)�"l��+:j�:)��)���#9/a�k�9n���#�j�9n��fd9b-�g*:!�.��chy�c9�!�	{�#�̉H9��9g#y.)�/o��*�۝Z[��#:`o�acz$��b,9m�c��chy�c8� ��H9chy�c:,��*"�)����hk��.�a`��(8� yd#y�,x� R8� T�8� yh������9�b�� z,�:gh���9�b��&�����a���9�b�hk��.��h�o#�X�۸� y�b9��9���ke�"!�bjzi&9f�d";�#�)�9�o9o�9��9i,x� ��(yl#y��y��9�b��`�hk��.��#9�(x�#x� ��H9�h�o#���9�b��!ye��/�y��bcH�[�[YH9l#y��{�#9.#za�y��9l#�aiym�` 9/$y�8�#9aj9lk9�)�."�fcx�#x� ���9�j����� y�9��9�b�9ࣺk`�alzl�;�#��&�(`;�#�ࣹb�:"!�9a`��e�,�9��9m�(�9aiy�h�o#�\��\�[��]H9d#y�,z(j;�&��*�/빥.y��: �y�n9`/8� ydoy.+y��� y� y�9f�d"9�%��d9��ak9o#�� ��H9o��\��]�[X��\�K�\��]��[������: �ZX�ۋ���,:k)y��9�b�g%�"!�X�ۗX9l#�aiy��bcH�[�[YH9k�f��/o��*9���9o-y��9�b�g%�!��\��]�ݙ���]\��8� �aj:`�9/o��*���\���X�;�&�/by��9�`y�"�`$9o-zje�+by`���(QOL8� yl.�k�9. :!�:"!��Q����P��Yۘ]\�x� ��*�l!�����"y�j9����[�[YH9��9�b��ۙ\�9�:`&��*X�ۈ9o-�(c9��yaiy�h�o#�`b��,�� ��H9. 9�(y�)�,���(�/by���ܚٛ��9c�kf9g*9��9��ym�z`c��"��&�k�9�$\��]��[Z]9o�9m�!�b�yb*�fi;�#9� 9�`�b!��+�.#y/�y�fz!�9�`��ܚٛ��� ��H9l":h!H\��ؘ]K\�]\�Z[���X\��]�L���L���\����T���&��H�[��Z[T���&��H�[��Z[��X��T��� �,���(�/by��9�"y�b�[��;�&��M�N̍M���P��T���&��'��$:,���(��#�d#9�iH�Z[��[Z];�&�L̘���Y�̘����MؙLXؙ�L�MXL̘8� ��H�\]Z\�[Y[��]�;�&��[X\�Kܙ\]Z\�[Y[�X�]�\�̌��LKL��X�]K\�]\�Z[���X\��]˚��ۘ9m�ca��&�ஈ�T�Q�QQ8� ���LMH^X�X�[�Y]H�H�[��M�NMNMLM��P��T���&И]KՑ��Yܙ\��[ۜ�� Q�^Y��N�M�[ؚ[HPx� Y^X�X�[�Y]H�X[�]H[ؚ[HPx� \�\��\��\�� [�Y\�� T�[X\�H�]x� Y�]Y��9aj:`�:`&�`c�� ��������LKL��8�%9aj9g���l�.�:)��)��f�z%���"U��[�Y]{�"B��H�\�{�&�� 9��]�ٙMٙM�X�ML�L�͌M�LYM���XY�L�;�&�m�y/g9b!��+��&��X]\�K�YK\�ܛ��\��Y�ؘ[L���L��;�&�XZ[�9�*�/빥.x� ��H9aj9g���ܛ��\��"9�l�.�;�"z)��)��e+�. �ۙ\�9ஈ����[XZ[�����;�&��`9�"H��[YK\�Y�X9ai��蹧"z"!��*�/���l�b�yk�yfj9/�y�fyc���+ݙ\����8� X�X�XX�[ۘ8� y�h��)��l�b�z"!��b�b�(c9஻�#9c�f�z%���#�)�yfj9�j�(�y��ܛ��\��X���[X�� ��H�\�Y��9/o��*�ܛ��\�]�Y��ۙX;�&Л[���#��X��]9/o��*��]�X��]\�ܛ��\�:f�z%��� ��*�/빥.H�ܛ��][\�8� yai�k�zj�9n��� y�l�b�y��yd$x� y�,:k){�#�kf9��;�#��n9`/;�#��y��x� ��H9m����fi�����]�MMY]�Y�^\˘���9��y��y�,:k)y� :c!:"!������]�MK\�\�[KY^[��[ۋ����:a�zda9�j�d$yb%�(j9�:""��ܛ��\�]�Y�[�:)��$���#:`o�acyo�9li:a�y��:hk��.�c��)���l�.�8� ��������LKL��8�%�[�\��]H�ۙ\�H9�-����k�9�$;�"U��"B��H9�h�o#�XZ[�9.�yஈ�M�ˍ�;�&�����MNM���M����YL�������YL��NLX;�&��+9�(H�[�\��]H�ۙ\�:a�y��ʊ�l&��*��o9n �b,XZ[���� ��H9� 9��]�;�&���M̘X͙�͌�X�L�NX̍��MML�YX�X8� ��H��L�9m�d"9/mH]��&����[XZ[���Ύ��[�\��]J
+X9��ஹe+�. 9�h�o#��[�\��ۙ\�� ��H9c���h�o#��[�[YH9alH�9li�[�\��]Hܘ\\��"�L�{�#ՌM{�#ՌM��#ՌMM;�#ՌMN;�#њ^Y��Y\\��"ym�aj:`�9���fi;�#9�.yஹf�k��h!�n���[YY�����&���X�[ۈ�[�[YH9.#ya�ya`z*,y��9h���[�\��]Hܘ\\�� ��H�Y�ܙK\�[�\�:h!�n��f�k���&��MN9��yn.9bk��+9�h�)��c%�8����MH:a㹠*��#�bk��+Y�X�X�{�&�Y�\�\�[�\�:h!�n��f�k���&��L�H�ܛX][ۈ8����MH�]HR{�#�[��H8����M�[�[^HX�ܘ][ۻ�#ԐQ��#ՌM���8����MMX�\��R{�#�ܝ�Z]8����^Y���X�ۘ�[x� ��H9c���h�o#�(c9ஹ/�y� {�&��ܛX][۸� S[ۜ�\�ܝ�Z]8� PX�\��9.�9n'x� Q[��[ۻ�#��[;�#Л���� Q�^Y��8� T�]\��#���[��8� P�]H�]\�X��� P�����]�\�� yf�d":h!�n��"!�X�[ۈ�Y[��H9ga��*��.z)���/;�&����P�Sӗ�SVW�T�9�*�/빥.x� ��H��L��[�Y]H�H�[��M�M̍M�NN;�&��P��T���&�c!yd*��[�^8� X�Z[��X��� Q�^Y��8� X�]H^[�]�[Z[��Ց�8� \�[X�ؘ]KZ[�]8� \�\��\��\�� RSQ�� [�Y\�� T�[X\�H�]x� Y�]Y��:"!�^X�X�[�Y]H�X[�]H[ؚ[H�����\�Px� ��H�[��H�Z]H9.�H�K[ۛH�Y���L:je�+b{�&��[��M�M�͎̍X;�#
+�������T�ʊ��&���L9m�e�:e�y.%9�*�d"9/mHXZ[�� ��H]�\��H�[��M�M�L�LX;�&��P��T���&�]�\�[Y[��]{�#�^X�T�H�\�Y�X�][ۻ�#��[YJ��X�H�\�Y�X�][ۻ�#�\�YY�]H^[�]	���]�HPH9aj:`��P��T��� ��H9�-�l/��`��[���&�;�&��[�\��Y{�&�8� ��H9��bcH]��Z[�XZ[�H;�&�]�9m�f��M�ˍ�9�o9n �o�9�9���.���-�l/�"!�m�je�+bH]�[ۛH�[�\��]H:a�y��� #:h&9abXZ[�� �`&y.#y.��(j�M�ˍ��[X\�HY�X�X�H9i,y�e��#9.g�.#y.��(j:g :)�za�y�o:""��b9�+8� ��H9�+9�(y�*�/빥.y��: �y�n9`/8� y`��k��ak9o#�� P����Rx� y��z$/{�#�������� y�yk��kf9����[Xx� Q�\�X�\�H9�h�o#�,����z(c9ஹ�%�am�.�Rx� ��������LKL��8�%�M�ˍ�9�h�o#��o9n �k�9�$;�#�XZ[�Y]�9�-����k�9�$��H9�h�o#��b9�+;�&��M�ˍ�8� ��H�M�ˍ�9b�� �y�o9n ��{�&��X��L�����M��LY�MNX�̎��Y��YXX�8� ��H9� 9��XZ[�;�&�����MNM���M����YL�������YL��NLX8� ��H�M�ˍ��[X\�HY�X�X�H9�-�����m��`��]�;�&�XL�����M���Y���NM�،�L͘��ؙXMX�X;�&�o�9�]�:`,�n��.�y�+9���.��� 9."���y� 9��9c`9hb�ஹ���� ��H��L��&��M�ˍ�9�h�o#��o9n ��$9b��� ��H��L;�&��P��ԑTԕ9�o9n �o�9���.���-�l/��$9b��� ��H��L{�&�XZ[����]�9�m�c칥-�����$9b��� ��HXZ[��{�&��P��T���"�[��M��M�M��"x� ��H�]X�Y�\��&��P��T���"�[��M��M�;�"x� ��H]��{�&��P��T��� ��H�[��H�Z]{�&������T��� ��H�[YH��X�H�\��[ۻ�&�M�ˍ��M�ˍ�8� ��H�[���&�;�&��[�\��Y{�&�8� ��H9g*�M�ˍ��[X\�HY�X�X�H9�d9�b9�m�."��#XZ[�;�#�]�9k�f����9�b9ai�k�y. :!�8� X]��Z[�XZ[�H;�#9.%]�9`�yi&�H9`"�XZ[����]�9�-����Y\��H��[Z];�&�`&y�+��m�c��d9�b9o���i��#9.#y.��(j9o�9�]�9�.:`h9.#yo��bcz`,�� ��H�M�ˍ��[X\�HY�X�X�{�"9�o9n ��'�doz`,y�'��"ym칫h�o#��d9�b8� ��H
+��\�ܚX�[�X�ܙ;�"9�m�c�� :c!;�"z*.�*&;�&�."���H�M�ˍ�H:"!�""��M�ˍ�9`&z`n9ai�k�yc�/�y�fy/g9�m�c�!"9�h{�#9.#yo��a�z(��R{�#�.���!��m��$9��bcy�h�o#���9�b��%�."�. 9�iy�o9n ��!��.�� ����������LKL�H8�%9��bcy�h�o#���9�b��#ՌM�ˍ�9`&z`n9�d9�b��H9�h�o#�XZ[�;�&��M�ˍ�{�#�[Y{�#��X�H�\��[ۈ9ஈM�ˍ�X;�&���bcH�{�&�����M�L�M�L�Mٌ�NL�XNYY��Y�X�X�X�8� ��h�o#��H:"!�Y�\�\�[Y[�9ga�m칢$9b��� ��H9� 9��]�;�&��M�LM�NX���NLL�X͙L�Y�X؍�X;�&��+:/*����.����9��9.�y�i9ஹg���#9�*���9��y/빥.H]�9�%�XZ[�8� ��H9c���M�ˍ�9`&z`n����9m�e�:e�y.%9�*�d"9/m{�&�`&z`n�H:(��f��`"��(y�b9��yn.9bk��+�X�:f.�hg��#9g%��a�/�o�ym�y/g9m��,yl"9�b:,�:,�9.���#�讹�d9�b;�&�o�9�9.#yo�����*l�`&z`n�H9�m��$9c���o9n ��b9�+8� ��H9."�. 9�(y�o9n �o�zh":a�y��9.�y� 9��XZ[�;�#�� 9��]�9n����`&z`n;�#:a�y��:-�yk�9�m�x� QU�^X�T�H\�[Y[�:"!�̌�[�H9k鹪g�je��-�� ��*�k�9�$9bcy.#yo����:` HXZ[�8� ��H9��bcy.�y/�y�fy�:gg�f.������:(d�`�{�&��,:k)y�.9o��i&�li�[�\��]J
+Xܘ\\�9l&��*��-�����&��'��g�je��-�.�y.#z �y�,y�(y��9l.�k��H9c�.��� �.�y."�/ ���y�����TU{�#�o�zje��-�� :c!9ga�ஹ�m�c�� :c!;�#9.#y.��(j9��bcy�h�o#���9�b�� ��������LKL�H8�%9� y�9��9�b�)��)���ۙ\�9�-�����"��T�Q�QQ;�#������"B��H�\�{�&�]��L�NXY�L��M��M�M��M���Y��L��X�;�&�m�y/g9b!��+��&��^��]\�]�\�X[[�ۙ\�X�X[�\L���L�X;�&�XZ[�9�*�/빥.{�#9�*��X�\�{�#ٛܘ�H\�8� ��H9� y�9��9�b�)��)��e+�. �ۙ\�9�-����b,����K]�M�\��[X[�[X][ۋ���;�&�c�/�y�fH[�X;�"9e��o-ydo9d.;�"x� X�]X�;�"9f�k��e��g%��"x� XX�۔[�X;�"X�ۈ9do9d.;�"y."y�+�/c�b�y�b��(yo#��&�� y�9��9�b�.#ya�y/o��*:`$9n`��]H��;�#ќ�۝P�X������� ���: �y��y�/��:e���L�9n`�\���9/�y� y.#z+��� ��H���[XZ[����9�9�,:k)y��9�b�b%�c�/�y�fH��;�#9.#ya�z!�(c9�j�������#�a�9l {�#�a�yb���#��-:f,��by�+9.�9ie��Y�{�&�""�������#�a�9l H�\�ݙ\�^H9m����fi8� �����K]�MK]ZKX�]K���9��]\�Y�\�Y��X��[�\�\�9m�b*�fi;�#9c�/�y�fy��9k�ydo9c��gh�� ��H9b!�hg��&�������#��$��j��#�h�:(c;�#��(�k���g�e���#�a`��e�,�9���by/o��*9e��g%�do9d.;�&�+m����#�$+:,hyg'����#�l�y���h�yh�;�#��d9�c;�#�a�9l {�#����c%��#�f�z.��/o��*9f�k��g%��&�a�y`���#�a�yb���#���:h�;�#���9�*{�#��-:f,��#�aj9lk9�)�fcy/c��#�ࣹb��#�l��j y/o��*X�ۈ9do9d.8� ��H�[X\�K�\�X�]YX��K���ۘ9��9h��TL��#9�y�h��M��]\Ԙ\�\���[Y\�8� X��ML�\�]\�]��8� z""��]\���]HTH:"!�""��\��ٜ�Y^�H�\�ݙ\�^H9f繫n8� ��^Y���[�Y]�H9.�y�+�.���jz.��."���9�b�g%�e+�. 9k��/cy/����8� ��H9�*�/빥.y`��k���#�����`�ak9o#�� y��9�b�doy.+x� y� y�9f�d"8� yf�d"9�h�fi8� P����Rx� y��: �y�n9`/9�%�kf9��8� ��M�9.�y/�y�fH[Z[���]{�&�am��m�c��[Y\^H�\���\�9��:(d�`�y�+9�(y.#y��9i)�&ey�!�� ��H�\]Z\�[Y[��]�;�&��[X\�Kܙ\]Z\�[Y[�X�]�\�̌��LKL�K\�]\�]�\�X[[�ۙ\�X�X[�\���ۘ;�#��T�Q�QQ8� �`&z`n�H�[��MNL�M��X9��\��]ܞH�X����P��T���#9c!yd*��]KՑ��Yܙ\��[ۜ�� Y]\�Z[�\�X��Z[8� Q�^Y��N�M�[ؚ[HPx� Y^X�X�[�Y]H�X[�]H[ؚ[HPx� \�\��\��\�� [�Y\�� Y\�X�]YX��H�[X\�H�]H:"!��]YY��� ��������LKL�8�%�9��y��H�ۙ\�9�-�����#�.�9n'y����j��#�ea�n��"!�..�g�XY\��"STSQS�Q;�#���H:"!�]�9k鹪g�je��-�o�yk�9�$;�"B��H�\�{�&�� 9��ܚY�[��]��LY���L���LLM͘���MLML�،�X;�&�m�y/g9b!��+��&��^�X�\��[�\��[[�ۙ\�Y�]�KY[\\�܋\ܝ�Z]L���L�;�&�XZ[�9�*�/빥.{�#9�*��X�\�{�#ٛܘ�H\�8� ��H�9� 9�`�.�9n'y�h�o#���: �ye+�. �ۙ\�9ஈ���NKXX�\��]��]Y\�\�[�[YK��Ύ��S�S��QWԑPSW��Q�U�;�&����:""��[�[���\�]�8� X����:""����\�ݙ\��YH:"!�."y�a9�*���y��)�"l�[�\�9m�` 9/$x� ��M{�#ՌMMH9c�o��k�f����[Y�;�#��MT�\ܝ��[Y�:`,�aiH��[RQ\�]�\��&�c%�n'y�*��'9n-��]�]�X9�`�.#y� �o�y�.�� ��H���K]�MMY]�Y�^\˚�Ύ��\���S[ۜ�\�ܝ�Z]�X�ܙ
+
+X9m칥.yஹl"9lk9g%��#ԙY�\��{�#��h�o#�X�\��X\[��9a*�ab;�#����X�Z�\�9c�/g9� 9o��[�X���&�.�9n'H�Y�\��H^\�[��9d!:!�)������܍Hܝ�Z]8� ��MNH9c�/�y�fH[Z[����Y�x� ��H�M�ˍLH��PH�[�[YH9m칥.yஈ[�\�;�#9�h�o#�ea�n��f�b,���\]Z\Y[�\��ܙ\��[ۋ��Ύ��\X�Q\]Z\Y[���;�&�����L�:""�ajyb%�)��k�����fi8� �..�g�f��/#HXY\�9�,y�h�o#�ܚY9�!9/cH�ۙ\�9b!�f�:f��/#y�n8� za�ynh�"!�/b:fh�� ��H9m칥�9h���ۙ\��۝�\��[��x� y.�9n'Hܝ�Z]8� \��X�[ۈ�[�K��\��Yx� L�L;�#�L�XY\������\�:"!�ea�n�������\��Yܙ\��[ۈ�X\�;�&���bcy�+9�g�����"H���Y{�#9ajy`"������\��Z]H9c깧 ���\;�#9.#z �z)��ஹk鹪g��T�Q�QQ8� ��H9�+9g,��\��{�#ܝ[�[Yx� Y]\�Z[�\�X��Z[8� X�Z[��X��� \�[�^8� [�Y\�� \�\��\��\�� RSQ�� T�[X\�H�]H9ga�`&�`c��&�o�H��[Z];�#�\�;�#��8���]�8� \�\]Z\�Y�x� QU�\�[Y[�:"!�/o��*: !H�L;�#�L�9k鹪g�论*�yo�9a�yca�ஈ�T�Q�QQ8� ��[Y{�#��X�H�\��[ۈ9��y� H�M�ˍ�{�#XZ[�9�y�h�/빥.x� ��������LKL�8�%: �9c!{�#�ea�n��a�ynh��#�..�g�a�ynh��#�f���n��db��#�k���#{�#��n�aiyakzh!y/�o�{�"�͈�T�Q�QQ;�#ՌM�ˍ�H9�o9n �.+{�"B��H�\�{�&�� 9��]�X��LL�M�YM���LL̎LX͌؎Y��̎���M�;�&�m�y/g9b!��+��&��^ؘX��X��\��Z�YY��[ٙ�[�KX]]L���L�]���&�XZ[�9�*�/빥.x� �""�b!��+�f�9��ym�z`%9.+H]�9bcz`,�.%9d#9�`�/빥.yea�n������#9m�/�y�fy/a�.#ya�y/g9�m9d"9`&z`n;�&��+9b!��+�o����]�:a�y��9ie��*;�#:`o�acz)��$��� 9��9�n:a���!9ke��&�/빫h�� ��HL	H:%�y�-;�&��h�o#� �9c!y��z`n�ۙ\����[XZ[���Ύ��]�[\�Y[��[�ܞR][\�
+H9���fi�[ۍL���[ۍL;�&�""�Y�[�][ۈ9����fyc�ஹk�yaj:)����9�蹧"ykf9��;�#9.#y`f��-9h繠)�kf9��:`m����� �Y�[�\�H�H9k���{�#�ea�.��`g9�h�a�y�(�a�L	H:%�y�-;�#9�.y�*9�h�o#��	H�[ی����[ی�8� ��H:(�y`�yea�n��a�ynh��&��[�[YH9c���+9m칧"H�[]X\��\;�#9�'��h��.yf�9�+�����K]�M�K\��]ZK����ۙK\�ܙY[�9no�/ey�����M��KY\]Z\Y[�]�[]:*+yஈ\�^N��ۙ{�&�m�g*9d#9. �ۙ\�9�h�o�H̜��\X�����#�M�H:"!�\]Z\Y[�\��ܙ\��[ۈ9ajy`"��蹧"H�[�\�\�:`�zhk��.��#9��bcza�ynh��#x� ��H9..�g��!yg"9/cy�k��&����M�\�Y�K]�M[XZ[�X�]K\�[�[YK��Ύ�[��\�R�YT���\��[
+
+H9g*9a��f��f��/#HXY\�9b�9aiy�/za�ynh��&ڜ��[XZ[���Ύ�\]Q��\�^J
+H9��9h��d#9. �H�[���#9f�9�i9�l�o���#���:,��a�ynh�����*9�蹧"yd#9�iH�ۙ\��#9.#y��9h��[Y\��#�؜�\��\�� ��H:f������je��&���\X�RH9��do9c��.#ykf9g*9��]�ٙ�[�Q^Y
+
+{�#9�`9.�y�"zb%y�(yc�y��{�&�m칥.yf繨.9o���蹧"H�Z[Sٙ�[�Q^�]Y
+
+H8�����ԙ]�\�YY
+
+H8����Z[Sٙ�[�Q^
+�YJ{�#9.#yn�����+9.�9ie�n��db��`y�"�� ��H9k���#y/�y�{�&�ܚ]X�[���9e+�. �ۙ\�����\�\��\ܝX�۝X����:"!��]�X�K�[9�ly. 9ஈ��\��[X��˜�\ܝ�XZ[���{�&њ\�X�\�K���Y�]�H9��(c9���.��"!��\�ۜ�]�K��\ܝ9�+:*i�d#9�ix� ��H�X�X�����&�c�o����ٚ\�X�\�Kٚ\�X�\�KX]]]ZK���9���fi�X�9�n�aiy�"zb%x� Z[\ܝؚ[�;�&ٚ\�X�\�KX]]���9��ݚY\���ܙx� y�蹧"H�X�X����:.��b!���9k�z"!�[���Y�]]�H[�ٙ�9ga�/�y�f{�#9�)�d"8�#9����`�.#ze���/��#z #:gg��.9.ayb*�fi9n,�&g� �yb��� ��H�\]Z\�[Y[��]�;�&��[X\�Kܙ\]Z\�[Y[�X�]�\�̌��LKL�X�X��X��\��Z�YY��[ٙ�[�KX]]���ۻ�&͈͋�T�Q�QQ8� �]��MM��LL͍��L��X�MM���M���X�M�9��H�[��MLLNLL�:"!�U�^X�T�H\�[Y[�9m��P��T���#�\��[ۈ]]ܚ]H�[��MLLN�P��T���&�l"9�b:,�:,�9.��m칦#�讹�!��.���9b,XZ[�� ��h�o#��o9n ��b9�+9ஈ�M�ˍ�{�#:g 9k�9�$�[X\�H��[��8���]�8�����X�Y]����XZ[��� [XZ[��H:"!���X�[ۈ�H:je�+byo�9�cyc���d9�b8� ��������LKL�8�%�]H�]\�X���#��h�o#���9k��acz(�{�#Л���9�,9��y��ylg;�#�a`��(9he:!�b�y�9�,;�"�T�Q�QQ;�#�XZ[�9�*�/빥.{�"B��H9m�y/g9b!��+��&��X]\�Kؘ]K\�]�\�[X�]ZK]��\�X]]�L���L�;�&����M{�&�� 9��9g��m�d"9/mH]���L�M�̍NLX���LY����YM��͘��M��XYNX;�#9�*��X�\�{�#ٛܘ�H\�;�#XZ[�9aj9�"��*�/빥.x� ��H9..�g�f��/#y��9k���.yf�;�&��\���ܙY[��":i��lc��"y�f:)�z"!�^�H�[X��"9��9k���"\�[�[YH9�9b-���9�`�n��.#yd#8� ��h�o#�/빬�y��y� HX[S�Y�]��[X�Y9ஹe+�. :(�y`�y�'���;�#9..�g�o��d#9. RQ9�h�o#�kf9��:+�9c幤f:)�{�&�..�g㹧+:.���$9ஹe+�. 9g�����ܛ��ۙ\��#9n�z`�:h$9�fyf�k��l#�)�yb%��"��Y�H\�X{�"9k�yaj9c`9g���"x� ��H9�)�d��d"9�$9m�9i)�g%��.yf�;�&�L���L�9�9�)�d��h$:)�z)��ba�c���+:*�9�/�g*X�\���"9��y��{�"[^�H����#9e���j:e��d"9�$:h y.#y. 9k��/"yaix� ��d9��z"!��빪&yajyo-yg%��+9/��l,y�+�ajy`"��h�o#��/9/c{�#9����"za�z)!��[�\��"9�,�����"{�&�l.�k�:)��ba�m����f��[�\�\��ۙ\�9.)�f�k��ؚ�X�Y�]��۝Z[�8� ��H9��9k��chy�a�.#ya�zhk��.�U��#ԝ[�[YH�XY{�#��\�[�][ۈۛH9�bym�y�"�b!�hg��&�U�:je��-�.g�/o��*9�h�o#��#:(�y`�{�#�m�(�y`�{�#�cn9."��#�*l���x�#z"!�X[S�Y�]��[X�Y;�#9.#ya�y/�y�fH]��]�Y]ԙ[X�Y9�+9.�9ie�acz(�y��9�b�� �l&��*�am��h�o#��Y��\��#�Y��X�9�9��9k��.�y.#z&f������: �y�b9��9�%��n9`/8� ��H9��9h����\��[X��И]T�]\�X��;�&����h-9n����. 9.�H��X�][�RQX\;�#9�!9/cyf�k��ஹk�f���/y`��k��� y�"y�b9����`�� yk�f���o�`��� y�'��h���9�⹫(y�n;�&��,:k)y�d9�g�a�y�d9d#9. 9.�Hۘ\��;�#�����#���y��y�d9��.#za�y��:*"9��� �,����yg��b)ym�h$9�fH^Y\��\�X�\��\�Ӝ���Z[��ܘ�[Y[�;�#9�*�/��\����9c�g :*.�a��`,�d#9. �ۙ\�� ��H]]��]{�":!�b�y�,:k){�"y���`"��h�o#���9f�d"9g*9�+9. 9`"�k��db��#�(c9b�ybczhk��.��H9���#9�+9f�d"8�#x� �m�`m8�#:*l��,9�,9��x�#z"!�c��`m����9b�� �y�jy.��]�\�9aly�*��\��[X��И]Q���]\�K��\�[�][ۈ����&�e��eg��`�`g9�h�o�9�:!�b�z(c9b�{�#:e�:e�yo�9�,yd#9. Y�X�X�H9�h�o�x� ��H����9�!z"l��#;� x�#yc깢�yoly��bcykf9�.��9�h�o#�����ؚ�X�[�]{�"�{�#эH9b�� �y�jy.���"{�#9.#yo�y�.�m�` 9ony�QP�ʘ9����l{�&��]�\�9� �b%�a�aj:`�9kf9�.��jy.���9d#y�,x� y�b9��8� z)�9�o8� y��9�b�"!�bjzi&9f�d"8� ��H9`"�.������� y.%��c����� y��y��y�h�o#��,:k)y/o��*9d#9. �]H�]\�X����ޙ[�ۘ\��:hk��.��b�b�ze�:e�y�:*l��,9�d9���&�. :"+9m�y�*�"!������ybk��+9.�z-l9c��o��`'��d9�g��`y�"�� ��H9a`��(9he9��9h���#:!�b�y�$y�,9."�. 9li8�#X�X�؛�;�&�b�yb*yo�9�,ye��. 9c���y�!�[Y[�]�ۙ\�:hk��.���������{�#9a�yeg�b�y�h�o#�."�. 9li8� ��,9�e�� y� :j�9li8� y�c�b�H�]x� y.#y�)�`,�aiy��y.��� [][��\�9i,y�e�� y�yk��c幭�9�%��'��h�f�e����\�:`�y� �c幭�;�#9.#y� �i,y�e�a�z*i��%� �9�k���9�fx� ��H9��k�����P�Sӗ�SVW�T�LLML8� z)�"l��#���9k����: �y�n9`/8� P����9�n9`/8� PRx� QV8� za�ynh�� y��z$/z"!��c�b�yga��*�/빥.x� ��H�\]Z\�[Y[��]�;�&��[X\�Kܙ\]Z\�[Y[�X�]�\�̌��LKL�X�]K\�]�\�[X�]ZK]��\�X]]˚��ۘ;�#L�L�T�Q�QQ8� ����MH�[�Y]H�H�[��M����L�X9��\��]ܞH�X���9m��P��T���#9c!yd*����\�Y�Yܙ\��[۸� \�[X�Y�X�X�x� Y]\�Z[�\�X��Z[��X��� Y^X�X�[�Y]H�X[�]H[ؚ[H�����\�Px� PY�[�\�H[ؚ[HPx� \�\��\��\�� [�Y\��#ԙ[X\�H�]{�#��]YY��� ���������LKLNH8�%U�9�h�o#��b9�+9ak9db�)��)��h$:)�{�"�T�Q�QQ;�#�XZ[�9�*�/빥.{�"B�������LKLNH8�%�M�ˍ��U�9�o9n �je�+b{�"�SL{�g��T�Q�QQ;�#�XZ[�S�S���"B��H�M�ˍ���[X\�H�[�Y]H���H9�9`&z`n�H�[���ML��͍�X8� X�MM��L̍X9m��P��T��� ��H9`&z`n9d"9/myo�]��M�NY�̘�M�NM��LM̙�M�XL��MXN�;�#\��H�[��MMLX�P��T���&ԙ\��]ܞH�X����؈LNL��L�8� Q]�\�[Y[��]H�؈LNL���9ga��P��T��� ��HU�:`�9�l��؈9m�`$9�iz`&�`c��&�.�yஈ]�PQ8� T�[X\�H�]x� Z[[]]X�H�]X��]x� P��Y�\�H\�x� z`�9�l�o���[Z]�{�#��[YH�\��[ۻ�#��X�H�\��[ۈ:je�+bx� Y\�YY�]KՑ�]�HPx� ��H9�h�o#��b9�+;�&��[YH�\��[ۈ�M�ˍ��;�#�X�H�\��[ۈM�ˍ��;�&��h�o#�ak9db��[X\�K]�M�͍�9m�/�yk�f��XZ[����]�9�yk��c���'���ym��l9�m9�!�� ��H�\]Z\�[Y[��]�;�&��[X\�Kܙ\]Z\�[Y[�X�]�\�̌��LKLNK]�M�͍�[XZ[�\�[X\�K���ۘ8� ��SL{�g��T�Q�QQ;�&ԑSLH9�byo�H��X�Y]�8���XZ[��� [XZ[��H:"!���X�[ۈ�H:je�+bx� ��H9�+9���.���-�l/��9c�*&:c!U�9�o9n �+by���#9.#y/빥.y�y��{�#��n9`/;�#ܝ[�[Yx� ���������LKLNH8�%�[X\�H\]H9����(y�n�aiyak9db�
+�9.⹥�y.#ya�y��:a���"����T�Q�QQ;�"B��H�\�{�&�]����LYXYM��M�N���X�Y�ٍ�;�&�m�y/g9b!��+��&��X]\�Kܙ[X\�K]\]KYZ[K[��[�\�[Z[�\�L���LNX;�&�XZ[�9.#y/빥.x� ��H9e+�. �[�[YH�ۙ\�9.�y�+���ܙ[X\�K]\]K[��Y�X�][ۋ���;�#:a�y�*9�蹧"H��YQ�X]\�S[�[:"!�-�zi�9��;�&�����"y�+9.�9ie�ak9db�����lx� ��H9�m�bcy�h�o#��b9�+9ak9db��.y஻�&�����(y��9�9�n�aiym�y/g:f����z`,�aiy..�g�o�;�#:!�b�zhk��.�. 9�(x� ��蹧"H\�\�Y[�]�\��[ۘ;�#�\�\�Y[�[��X�X9c�/�y�fym�+�;�#�`&���z*���#��#9.#ya�y�.9.azf.��h�."��(y�n�aiyak9db�� ��H9ak9db�n�z`�9��9h��l#�g���X�؛�;�&��#9.⹥�y.#ya�z-��a�:a���#x� �b�`n9o�9c�g*\�URQ��[�ܘY�H�YX�\�9/�ykf��X�RY
+�9�yk��(�y�k��m�g,9��y�'�;�&�d#9��yd#9ak9db�.#ya�z!�b�z-��a��#:f�9��za�y��:hk��.��&�d#9��z"�y����X�RY9."����#9��9ak9db�.�zhk��.�� ��H9.⹥�y��yb-�c�olzg���n�aiz!�b�H[�[;�#9.#ze�:e�z-�zi�9��8� y��9�b9�+9`my�+8� Y�ܘ�Y\]x� yk�yaj�[�Y;�#9.g�.#yk��aiH��Y�]�x� ��H����ۙ\�9.�yஈ���ܙ[X\�K]\]K[��Y�X�][ۋ����;�&�b�`n9���ke�L�8� X�X�؛�N;�#9/cy��9�o9n ��`�e��"!��#9�$y��z`d�.���#y�"zb%y.b�e��� ��H\��]Y�Yܙ\��[ۈ9m칦�9��;�&�je�+bym�+�9.�y��9�n�aizhk��.�� yd#9. 9�n�aiyc�hk��.�. 9�(x� y.⹥�y��yb-�� zf�9��y�h�o�x� y����X�RY9�g�`c�""���yb-�� yc���"H�ܛX[ٛܘ�Y�\]K��[��:(c9ஹ��y� x� ��H�\]Z\�[Y[��]�;�&��[X\�Kܙ\]Z\�[Y[�X�]�\�̌��LKLNK\�[X\�K]\]KYZ[K[��[�\�[Z[�\����ۘ8� ���bcH����T�Q�QQ8� �����H�[��ML�N���9m�aj9��;�&�\��]Y�Yܙ\��[۸� Y]\�Z[�\�X��Z[��X��� T�[X\�H\]H[ؚ[H�����\�Px� Q�^Y��[ؚ[HPx� Y^X�X�[�Y]H�X[�]HPx� PY�[�\�H[ؚ[HPx� \�\��\��\�� [�Y\�[�Yܚ]x� T�[X\�H�]x� Y�]YY��9ga��P��T��� ��H�[Y{�#��X�H�\��[ۈ9��y� HM�ˍ�{�&��+:/*�.#y/빥.H�[X\�Kܙ[X\�K]\]K���ۘ9ak9db�ai�k�{�#9�h�o#��o9n �����b9.�y�,y�蹧"H]�8���XZ[�Y��9idy�!9�(��'�� ���������LKLNH8�%[ؚ[HY�X�X�{�#���;�#�[[Y[���;�#�Y�[�\�{�#��YH�\���ܙY[�9. �h!y�.yf�9/�o�{�"����T�Q�QQ;�"B��H�\�{�&�]��ٍN��YX��LM��LLX���M�X��MY�;�&�m�y/g9b!��+��&��^�[ؚ[K[Y�X�X�K\��Y[[Y[���XY�[�\�KZ�YKZYL���LNX;�&�XZ[�9aj9�"��y�h�/빥.x� ��\]Z\�[Y[��]�;�&��[X\�Kܙ\]Z\�[Y[�X�]�\�̌��LKLNK[[ؚ[K[Y�X�X�K\��Y[[Y[���XY�[�\�KZ�YKZY���ۘ8� ��H�ܙY[��Z�H���9e+�. �ۙ\�9.�yஈ����\�\��ܙY[�]�Z�K[���\�[�[YK���;�&��\�[H�[X\�H9c��)���`�a�yc�� \�\]Y\�9i,y�e�c깧"y�"zfd9��9�`H�]�x� ZY[��Y�ZYH9c幭��]�H9.)��[X\�{�&���\��[X����ܙY[��Z�S��˙�]XYۛ��X��
+X9��9/���\ܝY;�#�[;�#٘Z[\�{�#�X�]Z\�{�#ܙ[X\�H:*.�����#9.#zf.�hg��\�\8� ��H[ؚ[H�\�[YH�ۙ\�9.�yg*���[XZ[����;�&��\�X�[]HY[��#�Y�ZY{�#ٜ�Y^�H9cl��`��]�Q�[YJ
+X;�&���\��[X���[ؚ[SY�X�X�QXYۛ��X��:*&:c!��[Y[���\�\��\�Y8� [�]�Y�][ۈ\x� \Y�\���\��\�Y8� Y��Y^�Kܙ\�[Yx� ��k�`&�Y�\���ܙ\�[YH9.#za�z-�H�\�\;�&ܙ[�Y�\��\�9o�9.�y�,HX���[�Y�\��]];�#�RQ�]�H�\��][ۻ�#�Y�]H9�h�o�{�#9.#y.�y�+9�g��\�[YH�]H:)��$����Y�]�x� ��H9ea�n���n:a��)��ba��-����b,�L���ܛX[^�T��\��\�T]X[�]J
+X;�#9� 9i)�NN{�&ՌMH9m����fi9� �(���M:)��$���:""��[�\��#؝^Hܘ\\�� ��M9�+�� 9�`�(�9d�H�[�\��#؝^H�ۙ\��#�M�9cl��`�*"9`�y� ���9��y���/.9aiy�a��NNH9�.yf�NN{�&ՌM�H9�$9b����9�.�.�yc�/�yk�f�� �9c!ym�hczhk��.�� ��H9a`��(9c(�.�y�,H���K]�MMY]�Y�^\˚�Ύ��[�\�]]ԙX�ݙ\�J
+X;�&�[[Y[���X�]�H9�`�L9c��`,�:(�9d�y`&z`n;�#9o�zh"9�'��h�(�9d�{�&�"�H9�*��$9b���h�o�{�#�]9.#yg��(c;�&�. :"+�]HX[:)��ba��*��.x� ��H]��9�h�o#�f�h-���9ஈ���[XZ[���Ύ���\��[X���]��Y�X�X�K�^]
+
+X;�#:a�y�*9�蹧"H��[ۜ�\�[ݙ[Y[�
+
+X;�#���]]�]��
+
+X8� �Y�[�\�H�]\�����T]��
+
+X9c�do9c���i�ۙ\��#9.#z)!�(�H[Y\���]{�&њY�[�[X][ۈ�[�X��9.�HY�X�X�H�[�\�][ۈ
+�X\X�]�H
+�]]�]��[�X�Y9."za�y论*�{�#:f�h-9o�9i,y�b8� ��H�	NH�9i*yacyn��db�,��*"�g*���M�\�Y�K]�M[XZ[�X�]K\�[�[YK���9�.yஈX[�X[[ۛ{�&�m����fi�\�\;�#�Y�\����#�]]][ۓ؜�\��\�]]�\���9�'�doz`,y�'��#9/�y�fH�[�Y��YT�\��X�R[���[�[
+
+X9�b�b�z �yb���&�P�^{�#��c�b�yn��db��*��.x� ��HXZ[��]H�\���ܙY[��&����M�\�Y�K]�M[XZ[�X�]K\�[�[YK���9g*\\�[9ab9n����f�k��݌M��YT���\�8� y."y�/:)�"l�X�Z�\�:"!��X[K\�[X�[�Y�]\��;�&�Y�]H9o�9c�hj�ai�k�x� ���9h��l#�g����ܙ[X�\�[[X\�KX�][�˚��9/gYۘ[YK��Y��\�^9e+�. 9�f:)�z,����y�b��&�k�9�m�X]\�KX����\�[X�9.�H^�{�#��͌]X[K\�[X�\�\�[K���9.#ya�yn����i��h y�f:)�H�x� ��H9c��olzg����X�[ۈ�Z[9m�a�yn��۝[�Z\�Y����\��[Y\^Kԙ[X��Y�[�\�H�[�\��#\��][X[�Y�\����ۘ;�#��Z[�\��][X[�Y�\����ۘ;�#�[�^�[9m�d#9�i{�&��[Y{�#��X�H�\��[ۈ9��y� HM�ˍ�x� ��H\��]Y\��9m칥�9h���#���9��;�&�\����ܙY[�]�Z�K[��˝\����8� X\���[ؚ[K[Y�X�X�K\��Y[[Y[���XY�[�\�KZ�YKZYL���LNK�\����8� PY�[�\�{�#�YY��Y{�#ՌM���;�#�XZ[�X�]{�#�X[H�[X��]�Kܝ[�[YH9�蹧"y�+:*i�� ��H�����H�[��MLLL��9m��P��T���&��[�^8� T�[X\�H\]x� PY�[�\�x� Q�^Y��8� X�]KՑ�8� \�[X�Y�X�X�x� Y]\�Z[�\�X��Z[��X��8� T�[X\�H\]H[ؚ[H�����\�Px� Q�^Y��[ؚ[HPx� Y^X�X�[�Y]H�X[�]HPx� PY�[�\�H[ؚ[HPx� \�]X��\��\��\�� RSQ�� [�Y\�[�Yܚ]x� T�[X\�H�]x� Y�]YY��9aj:`�:`&�`c�� ��\]Z\�[Y[��]�9m�����T�Q�QQ8� ����H9m�y/g9b!��+��&��X]\�Kܙ[X\�K]\]KY]�\�]�Y]�L���LNX;�#����WJ΋���]X����K��LĽ�KX[�^KY�[YK�[��JH9m�g*�H�[��M�M�L̘9aj9��9o�9d"9/myஈ]����ٍ͘��NL����L��NLMML��L�X�;�&�U�\�[Y[��[��M�N�L�9.g�m�aj9��9.)��.9l#H^X��x� �XZ[�9�y�h�/빥.x� ���ܙ[X\�K]\]K[��Y�X�][ۋ���9�+�e+�. �ۙ\��#9����"y��9n�ak9db�� z-�zi�9��9�%�[�[8� ��HU��#��+9�g�je��-����g`9/o��*9d#9. 9.�H�[X\�Kܙ[X\�K]\]K���ۘ;�&�ܙ[X\�U\]T�]�Y]�[X\�]YYX:hk��.��h�o#�-�zi�9��;�#:n繤�o�:e���h�o#���9��:)�����&�ܙ[X\�U\]T�]�Y]�[[�[9��9��ze��d#9. :)����� �c�a`z*,H]����\�\�[X���Y]��Y�\˙]�8� X��[��8� XL�ˌ��X8� X��X;�#XZ[���9o�zh"9o�y�iH]Y\�x� ��H�]�Y]�9`�y/���b:gh�� y����b:"!�ai�k�zje��-��&�.#yo���.H�YY;�#��h�o#��[X\�H�\��[۸� y.#yo��k��\�\�Y[���[�ܘY�x� y.#yo���[�Y8� ���9��:)������y� y�h�o#��ܛX[;�#ٛܘ�Y9�(�o#��&��]�Y]�9.+y�:(c9b�y�"zb%yk�yaj9g,9c�e�:e�z)����� ��H9��9��y�+:*i�o�zh":)��$���&�U�9��(c9�b9�+9.�yc��hk��.�-�zi�9��:"!�ai�k�x� y�"y���cl���9��9.#H�[�Y;�#�.#yk��m�+�8� [XZ[�9n-���9d#]Y\�H9.#zhk��.��]�Y]�� ��������LKLNH8�%�[X\�H\]H��Y�X�][ۈ�\�[{�"�T�Q�QQ;�#�XZ[�9�*�/빥.{�"B��H9m�y/g9b!��+��&��X]\�Kܙ[X\�K]\]K[��Y�X�][ۋ\�\�[KL���LNX;�#9g��ஹ� 9��ܚY�[��]�Y�����L̙X��YX�Y�NML���L���MN�X�;�&��+:/*�c깧 ��9f�]�;�#9.#yo����9��y/빥.y�%��o9n �XZ[�8� ��H9�h�o#��yk���b9�+9ak9db�e+�. :,����yஈ�[X\�Kܙ[X\�K]\]K���ۘ;�#:"!��[X\�Kܙ[X\�K���ۘ9��[Y{�#��X�H�\��[ۈ9l#zob��&��[X\�K[X[�Y�\����ۘ9.�yc�/��`�9�l��H:je�+bx� ���ܙ[X\�K]\]K[��Y�X�][ۋ���9ஈ�[�[YH�ۙ\��#:a�y�*��[YK[ݙ\�^K[^Y\�:-�zi�9��9d���YQ�X]\�S[�[;�#9.#yc��c�n�[�[;�#�ak9db�����lx� ��H�[�[YH9g*�\�\�XYx� y���9b!�d&8� ]�\�X�[]H9f�bcy�k�"!�ۛ[�H9�h�o�y�`��#9��9�`z+�9c��X�KX�\�Y�[X\�Kܙ[X\�K]\]K���ۘ;�&��h�n.9��9��9c�`&���{�#9o-�b-���9��9o�yk�yaj9��9�b�a�zc��k��� �k�yaj�[�Y9e+�. 9aiyc��ஈ�[��Y�[T�[�Y�ܕ\]J
+X;�#9.%9m칣�y."��]{�#��\�[�][ۻ�#ܙ]�\�8� z �9c!y.�9�$�"!�X���[��]�Hܚ]Hܚ]X�[�\�][۸� ��H9�.9.aH]�8���XZ[��[X\�H�۝�X�9m�(�9aiHQ�S�˛Y8� X�T�SW��ӕ�P�˛Y8� XT��UP�T�WԕST˛Y:"!����ԑSPT�WՑT�Q�P�USӗԕST˛Y;�&�fi:gg�l"9�b:,�:,�9.���#�论*���#9�+9�(y.#yak9db��#{�#9����(y�o9n ��ۙ\�9o�zh"9o��k�9�mXZ[����]�9k�f��Y��:!�(c9�m9�!��`9�"y�yk��c���'���z+����9b,9d#9. 9.�HX[�Y�\�;�&�.#yc��)�y�`�c��i�ak9db�����b;�#9.g�.#yc��l#y�yk��hk��.���9d#x� ya�yo#�� T�x� P�H9�%�X�Y�9�*:*��� ��H�[��[X\�N�\]KYY��KHKX�\�HܚY�[��XZ[�KZXYPQ9�+�ai�`�9m��l:)��b��[\�� ��H9k�f��je�+b{�&�����J΋���]X����K��LĽ�KX[�^KY�[YK�[��
+H9c��빪&H]�;�&��]X�X�[ۜ��Hܝ[��MLL�J΋���]X����K��LĽ�KX[�^KY�[YK�X�[ۜ�ܝ[����MLL�H9m�aj9��8� �k��k�9�$\��]Y�\�Hx�$Ҹ� Y]\�Z[�\�X��Z[;�#؝Z[�X��� T�[X\�H�]x� L͌0��;�#��L0��;�#�L���LMH9��9��:`&���H�����\�Px� y�蹧"y�,:k)z"!�,����;�#��Y\�9�����{�&���9��:`&���y�*�g%�"!���ӈ:+by��m�."�`��஺*l��[�\�Y�X�8� �XZ[�9.�y�*�/빥.{�&�� 9�`�]��H9.�H�9d"9/my�d9��9ஹ���� ��������LKLNH8�%\�HHXZ[�9�o9n ������{�&��\�X�\�H9�(y�a9�n:`c��'��+:*i�/빫h�H9�o9n �����9��H�[��ML��LM�9k�f���o9��\���ܚ]X�[Y�X]\�KX�Y�]�\����9.�z)�y�`�H9`"��\�X�\�H9�(y�a;�&�\�HH9�h�o#�n��k��ۙ\�9m칦#�讹c!yd*��\��[ۋX�Y[����:"!��\�X�\�K\�\��[ۋ���;�#9alH�9`"�� �b!�hg�ஈ�[H\��۝�X�;�#:gg��h�o#��"�o#�c+�*�;�&�!�..�i,y�e�hcyn��K�8� y/빫h�H9�(x� ��H9o��� 9��]�LL�X��L����YN����X�YMY���9n��^���Y\�\��[ۋ\\�LK\�[X\�KY�]KL���LNX;�&�c�l!��蹧"y�(y�a9�n9���* 9l#zob���#9.#y�/�k��]\�� Z\�9�%��X]\�H��[�\�H9�����x� ��+9�g�d#9. 9�+:*i�ab:a�y���OOH{�#9a�y/빫h�ஈT��� ��H9�d9�b9���.��"!��蹧"H�\��[ۈ]]ܚ]H�ܚٛ��9�9���.��`(��d:*.�)��d#9�i{�&��ܚٛ��9�`9�"yg��(c9k���x� yo�9����#�k���-�����"�o#�� z`b��,�"!��X�H�\��[ۈ9ga�.#z+��� �/�o�yo�zh"�9f�]�� P�H:`&�`c�o�9d"9/m{�#9a�zje�+by� 9��]��#њ\�X�\�{�#�U�:"!�XZ[���&�� 9��9�o9n ���9�b�d��H9.�H��d9�b���WJ΋���]X����K��LĽ�KX[�^KY�[YK�[��JH9�.9.az*&:c!9ஹ���� �\�HH9.�yஈK�H�T�Q�QQ;�#\�H�9�*�e��i��� ��������LKLNH8�%��YX���[�\�HH9�h�o#�je��-��d9�b;�"��TUH�K�H�T�Q�QQ;�"B��H9�+9��9c�.��."���y�m�c��#\�HH����Q��\�X�\�H��#y/g9ஹ��bcy��9�b��&��m�c�� :c!9/�y�fx� �em��'�`,�n��e+�. 9/����9.�y�+�������Q��U�W�STSQS�USӗ���ԑT�˛Y;�#\�H��$�L9aj:`�9l&��*�e��i��� ��H9�d9�b9g��஺a�y��9�.9l#y�]���Y�L�L�MٍXYMX�̍YL��X�YY��L�M͌�;�&њ\�X�\�H�[��M�M�;�#�\�H�؈LNM9�$9b���#9. ��+��[��[ۜ�9aj:`�9��9��;�#�\�\�ܙH�[\�9��:+k�"!��o9n ��$9b��� �`�9�l��#yb�yn,�&g��&��]X�Y�\�X�\�KY\�Y\���\�\�[X���Z�X[��K�X[K���\��X�XX���[����X8� ��[\�PSH�9m�)��fi;�&�\�Y�X��Y�\��H9�!y�!��/��e�+i�db�m�.#zf.����`�9�l��#9/a��*�a���,y�/��e��+:.��m�*+yk���$9b��� ��H9d#RQ9�'�k�f�y�b��g��&�""��b��g��j�gh�hk��.��T��SӗԑU���Q:"!��#:`&yc�:(�y�k�m�(��c�. 9c�:(�y�k�c�.���#{�&�o�9�n�aiy�b��g��P��T��9�,y/o��*: !y��9�+9�(yl#z*ly�#�讹f�h,{�#9�$9b���*�g%�m�b*�fi8� �/o��*: !yo�9�9��9�!ym�k�9�$9k鹮+8� y����"yec�hc;�&�.#y���ab9bcy�(y��yf�)��*�:*&9�$:f�y�b��g�ga�i,y�b8� �.#yd#RQ:f�:f��,yd#�H9�[][]܈�؈LN�M͍��9k�f��`&�`c��#9�*�a���,y�"y.#yd#RQ9�'��g��*�g%�� ��H9d#9. 9g����\��]ܞH�X���� QU�\�[Y[�:"!�`�9�l��H9�.9l#y�,H�[��M��NX9�$9b��� ��-�l/��9d"9/myo�9o�zh"9c�i%�*&:c!9� 9��]�9�9�����x� Q�\�X�\�{�#�U�:`�9�l�c⹫h�o#�XZ[�9�o9n �+by���#9.#z �y�*9�+9��yg���$9b��a��aay� 9o�9�o9n ��x� ��HU�9�+:*i�c`9.�y�,H��ٚ\�X�\�Kٚ\�X�\�KX]]]ZK���9�9쯹讈���[YH[��\�9���b-��#9c�a`z*,H]����\�\�[X���Y]��Y�\˙]�8� X��[��8� XL�ˌ��X8� �.#y�.y�h�o#��"�fd�ۙ\�� URx� y�y��y�%�kf9��;�&��[Y{�#��X�H�\��[ۈ9��y� HM�ˍ�X8� �UW��P�T�UW��ӕ�P�˛Y9.�y.#ykf9g*8� ��H9/o��*: !ym칣�9�"��+9�(y���.��8���]�8���9c��/�z+m�XZ[��9�o9n ��&�� 9�`��H:"!��o9n ��d9��:*&:c!9����d9�b���WJ΋���]X����K��LĽ�KX[�^KY�[YK�[��JH9�9�.9.ay�o9n �+by���#9.#zh$9hj��*�g��(c9�d9��8� �\�HH9b�� �zje��-�m�k�9�$;�&��m9�(y�o9n �.�zh"9k�9�$9�蹧"H�[X\�H�]H:"!��h�o#�`�9�l�je�+by�cyc��f�h,yk�9�$8� ��������LKLNH8�%��YX���[�\�H{�&��[��HX�]�H�\��[ۻ�"9�m�c�����Q9� :c!;�"B��H9g��]�����L��L�LNL��M�NL��L�MNM�;�&�b!��+��X]\�K���Y\�\��[ۋX]]ܚ]K\\�LKL���LNX;�#9c깥m9d"]�;�#XZ[�9�y�h�/빥.x� ��H:em��'�`,�n��e+�. 9/����;�&��������Q��U�W�STSQS�USӗ���ԑT�˛YJ������Q��U�W�STSQS�USӗ���ԑT�˛Y
+x� �o�9�9���`"���Y�]�H\�H9o�zh"9��9��;�&�ai�d*�M:h!y�/y�.8� yc`zf����y��9�b�� y�.9.ay�n��e�� zh�:f��"!�."�. 9�ix� �g���.�l$HUW��P�T�UW��ӕ�P�˛Y;�#9m�i��k�*&:c!8� ��H9���ۙ\��&��[��[ۜ��ܘ���\��[ۋX]]ܚ]K���;�&���9h��ܙX]Q�[YT�\��[ۘ;�#��]���Q�[YT�\��[ۘ;�#���X�Y\�8� �ajy�+��蹧"ykf9���[X�H9g*9d#9. �\�\�ܙH�[��X�[ۈ9ai�je�+bHX�]�H�\��[ۈ:"!�k��ai{�&ۘ]]�H]][�ٙ�9b���\��H]][YH:f,��g�`c��#9.�yc�`f�.��b!�.�9���� ��H�Y[��ۙ\��&���ٚ\�X�\�K��\��[ۋX�Y[����;�"��\�X�\�K\�\��[ۋ���;�&�]]؛����\;�#ܙXYۛH��Y\�]�H9��yai{�#9.#yc!z(�H�[Y\^H�]�x� y.#y�+9�yk��,����x� y.#y�.HRH9�b:gh��&��`9�"H\��܈9�#�讹.%9.#z!�b�za�z*i�k��ai{�#��-�f��\��[۸� ��H9�"�o#�����H9m칥��H9aj9��9o�9d"9/mH]��LY�L̎YMN������YM��M�L��YX;�&�쯹����+:*i�� R[][]܈Kл�#�RQ;�#ܝ[\��#�/my�o:je��-�� XX���[���������\�PH:"!�U�9bcy���`�9�l��#��H:je�+byga�`&�`c�� ��[Y{�#��X�H�\��[ۈ9��y� HM�ˍ�X8� ��H
+������TU{�#�\]Z\�[Y[���H�T�Q�QQ;�&����\�X�\�H\�H�[��M�N�X;�#ڛ؈LN�M�MM9���[\�TH\�9f�)����&��Xܙ]:"!��n�aiy�$9b���#:`�9�l��"�fd9.#z-��� �. ��+��[��[ۜ��#ԝ[\�9l&��*�k�9�$:`�9�l��#9�'��h�f����f�z(�y�k�je��-��*�`f��&���."�.#z �yk���,ym�am��+9�(H]]ܚ]x� ��H9."�. 9�i{�&�l"9�b9�y�!� !z&ey�!��蹧"z`�9�l�.��b!���[\�PSH9�"�fd;�#9a�yo��� 9��]�:`�9�l�. ��+��[��[ۜ��"ԝ[\�� yk�9�$x����Z�[ݙ\��#�RQ:f�:f�je��-�.)���9��:em��'�`,�n��� ��%9���.��d"9/my.#z)�9�o�\�X�\�H:`�9�l��#9.#z �za�z-�z""��H9a��aay� 9��:`�9�l��&�*l��,9doy.�:"!�+by��)��em��'����.��� �\�HH:je��-�bcy.#ze��i��\�H�� ��������LKLN8�%�9.����9k�0������X�:"!��,:k)y�%9am9d"��H9m�y/g9b!��+��&��X]\�Kܙ[X�]��X[�[X][ۋL���LN;�&�g��ஈ]�LM��،YLNM͍������NMML�L�MX;�#XZ[�9.#y/빥.x� ��H�9o-y��yg%�/����9f�k��ஈ\��]�[X��\�K�\��]��[������9k�X�ۋ���9k����: �U���;�&��h�o#��[�[YH9c�/o��*\��]�ݙ�ܙ[X�ʋ��X�8� �/�H����SPQ�W�T��U��P˛Y9/�y�fHM0��L�9k�9�m9�j�n �� M0����#�L�9n`8� L͌���͌�9e���/:"!�[{�#9.#H�[{�#�ܛ�;�#ܙ\�^�{�&���9`�y�fy�(9�d9n��� ��H��9e+�. �\�\��ۙ\�9.�y�+�����K]�M�\��[X[�[X][ۋ���;�&��[X��Y]
+
+X:"!��U��PS�Q�T�9�n�c!�9.����9k���(9�d:"!��]�Y]�Y]��[Y{�&�/o��*9�蹧"H�MԘ\�\��\���[Y\�;�#9�*�n�����+9.��[�\�\�� ���9k���(9�d9��H^�H�Y�Y�;�#9`�z(�y`�y.+y�9��9k���,H�M��[�Y�]U��\��]
+
+X:h$:/"x� ��H9��9k��)�9�o;�#��b9��9e+�. �ۙ\�9.�y�+���͌]X[K\�[X�\�\�[K���;�&��[Xՙ�\��]
+
+X9/�y�蹧"H�Y��\��#�Y��X�9�n�k��[�[^H[8� X[H[8� \�[��H[H9�%��[��H[�[^{�&�]Y]YT�[X��\�[�][ۊ
+X9do9c���h�o#��M�ՌM�9b�y�j��y��� �m�e���/�L9.�����cl�/o��*;�&�am�i&�[�[YT�XYN��[�X9�L9.��c�h$9ab9�n�c!��;�#9.#yf�9�i:e���/���: �y�%�c�o��� ��H9�蹧"HK�MH9��ab�o�9��9ic��ۙ\����[XZ[���Ύ����P�Sӗ�SVW�T�9.#y/빥.x� ���9k���9��H��8�$��N9��.)�/�y�fHL�\�XY�\;�#:`o�acyg*9."�. 9`"��h�o#�(c9b�ze��i���`�(���*����� �!�9doy`��/�ydoy.�yab9d#9�iy�d9���#9a�y��y�/�9f�i*yk��/*�:)��)���#9.#z �yஹ.��b�y�j�n��o�9�n�.�y�%9�*�� ��H9��9d#yb�:*�9�(9l!;�&�9�9a�9��9o�ݙ����8���9�h�o#�9�9a�:c�yo��;�&�:-i9k�y�,9�"ݙ����8���9�h�o#�:-i:g!9�,9�"�8� �ajz !yc�/빫h��[�[YH9doyd#y�(9l!;�#9.#y/빥.y�(9�d9ai�k�x� ��������LKLN8�%9��9k��裹�a� �9c!zn�yg%��#�*l���y�o�g%�/�o�{�"�T�Q�QQ;�"B��H�\�N�]�X͙���X��LNMY�M�X�L�YX�L���X�XX���[����^ܙ[X�Y��Y�Y[�Z[��[�ܞKZ[XY�KY�]L���LN�XZ[�9.#y/빥.x� ��H9k鹪g��*�g%�hk��.���9k��裹�a�g*: �9c!y�/9ai�c��"�b,:n�z"l��#�l`:`�9�j�gh��#:n�e��`d�am�*l���yo�9ba�.�yc��i��i)�g%�l.�k�9�o�a�[�[8� ��H9�.yf�9g*��ܙ[X�\��ܙ\��[ۋY��\�\�[K��Ύ���Y�Y[�X�ۓX\��\
+
+X;�&�."�. :/*��X�9l#�aiy/o��*:(�[YϘ;�#9�g�`c��蹧"z �9c!z"!�][S[�[9���M�KZ][KX\��[Y�9no�/eH�ۙ\�� ��H9/빫h�c깢��裹�a�X�ۈX\��\9�-����f繥蹧"H�M�KZ][KX\�9c!z(�{�&�����*�����]�MK\�\�[KY^[��[ۋ����9m칧"y�9l.�k�:"!�ؚ�X�Y�]��۝Z[�8� �����"y��9h�����ݙ\��Yx� \�[�[YHܘ\\�� y�(9�d:/by��9�%��y��{�#���z$/{�#�d"9�$:+����8� ��H�\]Z\�[Y[��]���[X\�Kܙ\]Z\�[Y[�X�]�\�̌��LKLN\�[X�Y��Y�Y[�Z[��[�ܞKZ[XY�KY�]���ۘ8� ����MH�\��]ܞH�X����[��L͍L�LLLX9m�`&�`c��#9c!yd*��Z[�[��� NN�M�[ؚ[HPx� Y^X�X�[�Y]H�X[�]HPx� PY�[�\�H[ؚ[HPH:"!��[X\�H�]\�� ��������LKLN8�%�]H�\�[�][ۈ����]\�����Q�\�\��[�[^H�YY�X���]�\�[��Z[��ܘ�[Y[��X�[��
+STSQS�Q�PHS�S��B��H�\�N�]\��]X�]��MM��X�LXXM�M��Y��L�X��NL�X�LYX���[����^ؘ]K\�\�[�][ۋX����ZY\���L���LN�XZ[��[XZ[��^�YY��H\�\��Y[�L�K�\[��ܙY[����L����;�#�L�������H��������[��[[�\�][��HY�X�H[[Y[�[�\��ܙ\�[�[^H�Y�\�YY�X��HZ\��[�������\�H�[H�����]H��[\��X�][ۈX�[H�[�\�Y�]�\�[�KH\��Z]�Y[�[^K�^Y\��\�ZZY�Z\�X]�[��H�Z[��ܘ�[Y[�\��ܚ��X�[��H����ܝ�Z]��H^\�[���ۙ\��ۛN����ٚ^Y\��X�]Y�Y[\�[�\�[��]���������\Y\�H�\�\������\�]�]�\�H[�[^H[�]K�\�\��\�[�[^H�Y�\Z[��\�\�[�L\^Y\��[�[^H�\��\��KX�\���[�[�[��ܜ�H�]�\�[�H]���K\�Y��]H�[��X�[��X���X��ܛ�[�����]��[\�Y]܈]H�[�[YH]��\�YY��H�����[Y\^KX����]��\���������]�\�H����Q^X�]�\�X�[]K�ZY��[ܚ]Hݙ\��\��\�Y�]H�[\��\�\��\�L��^[ۙH�]\�[�[^H��[[���܈H��������[�[�[��]��KЍKьKэH\��ܚ����Z[��ܘ�[Y[���ؚ�X������X�H�[��[����ܝ�Z]��H�����]H\��ܛX[H�۝�\��Y�]��M�H�ٝYX�Y���[N�����������L[�����X��ۙ�\��۝Z[�^Y\��[ۜ�\���[[���ܘ\\��\�X�YX�۝���\��\�܈H؜��]H��X�][ۈ^�[XY�K]�\�[ۈ[��]\��\�\�[��H[�[Y\��[XZ[��ۙY�H�M�K�\�X�]YX��H�]H�]�[����H�]\�Y��[�����H�]\��[�˂�H�\]Z\�[Y[��]���[X\�Kܙ\]Z\�[Y[�X�]�\�̌��LKLNX�]K\�\�[�][ۋY����\���ۘ��]\��[XZ[��STSQS�Q�PHS�S��[�[���\�Y\��]\�Z[�\�X��Z[�X��[ؚ[H�����\��[�Y]�H[��\��]ܞH�X���\�˂�������LKLN8�%����\��]Y[�]H�۝�\��[��K�\�\���]Y�Y[[�]Y]YK[�ۙ\��X[�\
+STSQS�Q�PHS�S��B��H�\�N�]\��]X�]�LM��NX���X�L��̌̍��NL�X�XLٙY���[����^؛���X�]KX\��]X�\�KX�۝�\��[��KL���LN�XZ[�\�^�YY��H\�[��H�\\��Y\�]�\�H�\��[��[ۋX�\�;�#�YX�[�\�H\�Yۈ�[�ˈ����\�ۙH\��][�]H�]ۙH����]\�Y[�]N���Ќ�Ѝь�ь�э\�HۙH�\�X[����[�ۛK��Z[��ܘ�[Y[��\�H�KЍX�\��X�X�H����ؚ�X��\�H�KэX�ܛX[�[Y\�X�[�[^HY[�]Y\��[�X�Y�[�X[���ܙ[�\�H�]�\�˂�H:a�ybf�+m�j�\���������Y[�H�QP�ʘYX�[�\�N��X[�]ܞHYX�[�\�H\��]YX�[�\�K\�X�Y�X��][Y[�[�YX�[�\�H��]�\�H�[[ݙY���H��X�[ۈ�ۙ\�˂�H����[�H\��]\��ۋX[[XY�H�H�[X�Y\��]�[�[�[^P[]�]�\�H]�[������\�YH[�]K��[�\�[�]\��]Z[�Z\�^\�[���[��{�#��{�#ܛ���#���[[��#�[�^Y���[\ˈ�����H���Y\�]]ܙYܛ�\�^�H]�[��Y�[XY�H�]\�ۙH\��]��H[XZ[����\�H��H�[�\�^Y\�X�[ۘ;�#����\�ә^��X�][��ۙ\���M�^��\��[XZ[�[���\�X[[YHۛN�[��[ۋ�[X�[��\�H����]\[�[\���ۙ�\���Z\�KY�]H܈�\X�H]Y]YH�[��[ۜˈ�\�H����]\\�\�H�ܙH��\��[X��И]Q����[[ݘX�H[�\��\܋��H�\�\���\�[�][ۈ\���\��H���\�[[YYX]H��\��[X��И]T�\�[�][ۋ�\U[�]
+
+X]�HܙX][ۋ�H�\��\�[�][ۈ�[���YZ]���X�\��YY�X��\�H�]\�Y�X[\�[�\[�[���]]�H�YY�X�˂�H�^Y������ۜ���#�M;�#�[�[^KX�[�\�X[H�X���\]X[L^Y\��[�[^H�\�����H[��ܛX][ۈ�]�\���[[Y[���[�H�Z\�Y�0��̈���]�\�[�K�H�[�\�\�Y�[ۈ�ܙ\���\�HH���\�YX[��[�\�[�\�H����[[ݙY]Z\���\��K��H^\�[���L�H�ܛX][ۈ�[XZ[��HۛHY]܈[�\��\����Y��]�Q�[YJ���\��N��[KY�ܛX][ۈ�JX����Z�H[�[�\�YY��H�\�[H�۝�X���T�SW��ӕ�P�˛Y����\�Y�Yܙ\��[ێ�\��؛���X�]KX\��]X�\�KX�۝�\��[��KL���LN�\������\]Z\�[Y[��]���[X\�Kܙ\]Z\�[Y[�X�]�\�̌��LKLNX����X�]KX\��]X�\�KX�۝�\��[��K���ۘ��H�]\��[XZ[��STSQS�Q�PHS�S��[�[L���LMH�����\�PK�[�\��]ܞH�X�����[Z]�\�[���]���\]K��������LKLN8�%�]H\��]�۝�X���\�]�X��^[�]�ܛX][ۈ[��H[�����X�ݙ\�H
+�T�Q�QQ
+B��H�\�H\�H]\��]X�]����L��L٘L�YM͘�YXMNM�L�Y�NXL�MNXL���[��\��^ؘ]K]��[^[�]Y�ܛX][ۋY��Y^�KL���LN�XZ[�\�^�YY�H�\]Y\�Y�T�SW��ӕ�P�˛Y�\���^\�[�H�\�H܈�XX�X�H\�ܞK�����X��]]H�۝�X��\�[��[�Y��H\�\��Y[�L���K�\[��Y�\��]\���X�H\�����Z[��][�[��[��Y�]H��[YK���\��H�X�[����[�H�\�[ZX�XY�����[�\�N�[�]X]]�H[[X][H�[YYۈ����H��\][ۋ�[HH��X�]�ۙ\�Y����[�Y�[�[�X�ݙ\�K��H\��]�ۙ\��\\������X�]8���[[]]X�H�]K]\��]X�۝�X�]�X8����M�[Z[���]H8����M��\�\��[�\�\���M���ۙ�\��XY�]Y]YY^Y\�X�[ۜ��[X�Y[ۜ�\�]ܙ\�܈�\��]�܈��[�ˈ^Y\��[�[^H[XY�HX�[ۜ�\��^X�]\��]���M�\ܝX�[ۜ�\��^X�]\��]�YH[�Y�[��Y[��[�[^K]\��]\�Y�HZ[���H�^Y���[XZ[��HۛH�[�Y]�H�ۙ\���[��H\�\��\��[�\��Kܛ�����[[�\�H�^Y�[X[�X��\H�^�H�[�\�YۈH^X�]�[X\�H�\�[\�\�H��H�YK[��Z�X�ܞH�\��]�\�\����[�\�[�[��]�[X\�H���[�\���[H�Y�\�\�H\��Y[��[�\�\��ܜ��[X\�HH�]K��H[�^�[[�H�[�ۚX�[�^Y\���[\�Y]����ۈ��\��X��Έ[�[^H�\��ZYH\���X�[ۜ�[H�\�����H�]H[��ˈH[[Y[�X���]ۈ\��\�ܙY����͍��[�[^K�[HQ�����]�[��\��[H����\�HH�X[�\�]���Y�]]�Hݙ\�\�HY\\�X��\��^[H��˂�HH^\�[���L�H�ܛX][ۈY]܈�[XZ[��HۛHY]܋�H�YH�]ۈ���X�\�\�]KY�X]\�OH��[Y\^KX�ܙH�[��[��H�\���X����Y]�X[�ۙ\��Y�ܙH�[��YQ�X]\�J	ٛܛX][ۉ�X�[�\��]��H���\�ә^��X�][�
+
+X���\�\�H�\�X�ۙ�[�[X�[ۈ�]���[��]�\�^Y\��[�[^H�][Y[�^�\[ۜˈ]��\]\�[�HX�]�H�M��]H[�Y�[��\�^X�Hۘ�N�ܙ[�\�H�M�ՌM�XY[�\��[XZ[�H�[X\�H�X[�\]��H^X�X�[�Y]H��H�[��L�NL��L
+�N̘
+H\��Y�HL���LMH�X[�����\��[��[�Y[�[ݙYܙ\�ܙYH�ܛX][ۈY]܋][��YZY�Y[�[^H��X�]�\�Y�YY��\���X�\�[�Y�[ۜ�[��^Y������[��Y�[��YH�ܛX[HX�\�Y�\�HX�[ۋ��\]YH[��[ۈ[�ٙ�[�Y��\���M��Y�\ˈH�\\�]H�^Y�������\��Z]H\��YL���LMK�L�����[�͌0��[��Y[���^���\YY[H��˂�H�\]Z\�[Y[��]���[X\�Kܙ\]Z\�[Y[�X�]�\�̌��LKLNX�]K\�\�[KZ[�Yܘ][ۋ���ۘ\��T�Q�QQ���TUK�]Z[Y[�[\�\Έ����XKؘ]K\�\�[KZ[�Yܘ][ۋL���LN�Y��������LKLM�8�%�]H�YK\�Y�[ۈ^[�]�[��H������[�[�X�[ۋY�]H�\Z\�
+����TUJB��H�\�H\�]���LNM��X�M��XM���YM�M����X���[��\��^ؘ]K[^[�]]��\�[�[YKL���LM���]�\�]H\�H�X�]\�HH�\ܝYX�H\�����Z[�]�[�����H�ܙH�]H���XZ[�\�^X�]H^�YY��H\�\�]�Y[��HL����\����H��Y�]HY�\�X�H\�����Z[�[�\��^�Y�[��KX�\�[Z�H\�XH��[�ܛ��Y�[�H�]H[�]ˈ�ܙY[���L���K���\��X]YۛH\�H�YK\�Y�[ۈ��ܝ[ۈ�ۘ�\��H����]\�\Έ�M��Z]Y]��Y�]HXY[�H�܈�M����[�\���[�X[Z[���[��M���[����\]K\�YK�ܛ�\�[�Y]�H��Y��]X\�H�۝Z[��][��[��̋�����X�ܜ���[�[��[\��]\\���[�Y����H]]ܙYX[�Y�\�X�[Y[��H�]H�HX��Y^X�][�[^K��\�][ۋ�[H�Y�[ۈ�ۙ\��\�[�H�Z[Y�\�\��[�\���[X]�HH�[H�Y�H�Y�ܙHH�^�[��[YH�\���H^\�[���ۙ\���\�H�\Z\�Y�[�^�[���^��\�[�[^H��\�][ۋ\�]\��[H�Y�[ۜ�����ٚ^Y\��X�]Y�Y[\�[�\�[��]�������ۜ������Y����Y���X���[��[��[^�Y\]X[����\��\�ۘ[YKؘ\��^�[����M�[�^\��[X\�\�HX�[ۈ�]H�HXY[�N��M�\�]�\��[��HX�[Y[����H�ۙ�Y˝\��]\X�\�\��\��YK]\��]ٝ[\�YH����[��\�Z]��\�X[ݙ\����[�\��\��[H�Y�\ˈ�^Y���[�Y]�HY\\��[���X�]�\��]�[XY�H]H�[XZ[�[��[��Y��H���\�Y�ݙ\�Y�H]Y]�[��\�[[Y[����\�\�[�]]�H�[��K��K�[��[�X�H\�����Z[�Y�\��\�X[Y\�X�H�[�[��[��[YH�\��]�܋Z[�\[�[�ܛ�\�[�Y]�KۙH�[��[YH�\�\���K[��\Y�\��Ց�[��[�\�Y�Z[\�H�]H�[X\�K��H�[��Z[�\�\�YۛHY�\��Z[��X��Y[�Y�YYH�[HX[�Y�\���[���ۚ^�Y�[�\��]Z[��M�ˍ�K��X�HM�ˍ�K��H]Z[Y]�Y[��N�����XKؘ]K[^[�]]��\�[�[YKL���LM˛Y��\]Z\�[Y[��]����LKLM�X�]K[^[�]]��\�[�[YX�[XZ[��STSQS�Q�����TUH[�[�\��]ܞH�X���\��H�[�Y]H\�Y\��Y�]�H^X��H\�\�YY[��[H�YYܝ�Z][[ؚ[H��X�]�ۙ�\�\���ܙ\��[ۋ�^[�]ܘ[��H�����]�8���XZ[���[�[ۈ\�]]ܚ^�Y��������LKLM�8�%�[��[ۋX�\���XY\��][ۈ[��[X\�K]\��]��[��܈
+����TUJB��H����]\�\�H\�]�L�M�͙��XLY�L���M�NYM��M�X��X����ܚ�[����[��\��^ؘ]K]�K[YX�[�\�K]��X[��܋L���LM��XZ[�\���\�و\��\Z\���H�X[U��ۙ�\�X][ۈ��\]YH�[܈�YH�]KY�ܛX][ۈ�\]Z\�[Y[�ˈH�]��\ܝ^��Y���\\�]HY�X�ΈH^Y\��YK]\��]��[Z[YY]H�����[��[ۈ�\�[��[XY�YH���X\��Z[��ܘ�[Y[��[�[�[^H�[��K��YK]\��]���^YY]H��۝\����[�\�[��XYوHX�X[]X��Y�\���[Y�Y[��]\��[XZ[��ܛX][ۋX�[�\�Y��H����]\�\��[XZ[�[�^\�[���ۙ\�ˈ�\���SYX�[�\�PX�[ۊ
+X[XY�YHYX�[�\�H[�[��]\��]Y��XY��[�[��H�ܛX[[ۜ�\��\���\��[�[^H���\���[��S[ۜ�\�]X��
+X�\�YH�Y�H�Y�ܙH\��]�[X�[ێ��M��\��YY��\��]Y]Y]N��M��[�\�Yܛ�\�[�Y]�HۈH��˂�H�\Z\��Y\�ۙH�][Y[�][�ۙH���ۙ\��YX�[�\�K]\��]Y��[�^Hۘ�K[XY�HۛHHYX�[�\�H[��[�\��[ۜ�\��[X�[ۈ\��\��[X\�K�\��][�^\���Y�H�Y�H[��M���M��Y\��^Y\�\H�^�[���]�[�\���ۋX�]Y�Y[ܛ�\��ۈH^X�]�[X\�H�\���]Y�Y[�[]\��]���[\�HH��K\�YH�[�\���H���\�Y�Yܙ\��[ۜΈ�[Y\^KГ������\��[�[YH�ݙ\�����[����Z[��ܘ�[Y[���]Z[�H��[���\�ZYۘ�H[��ܛX[[ۜ�\��][Y[�\��]�\�[�\�Y��[X\�K]\��]���Yܙ\��[ۈ�ݙ\�[�[^H�[��H[��H\�HH�[X�Y�ۋX�[�\�[H�[H[]\��]�Y\�H��\]H�ܛX][ۈ�[�\���H�\]Z\�[Y[��]����LKLM�X�]KY�ܛX][ۋ]\��][��\�
+����H�T�Q�QQ8�%����TUJ���H���]�][\��[XZ[�STSQS�Q[�[H\�YY]��[�[YH�ۙ�\�\�
+JHH�YK]\��]YX�[�\�H]X]�\�H����ܙZ[��ܘ�[Y[��[��X�Y[�
+�H[�[^H�[��K��K�[��\�HH�\]Z\�Y�[�\�ˈ�[YK��X�H�\��[ۈ�[XZ[��M�ˍ�K��������LKLM�8�%�X[�[�[YH����]\�����YX�[�\�H��۝[[�H��\�[ۈ
+����TUJB��H\�\�[ؚ[HU��X�ܙ[��L����\�\�Y�Y\�H[H�ڙX�[ێ�H�]\��\�X�\�\��Z[�H����۝[Y\ˈ�\]Z\�[Y[��]����LKLM�X�]KY�ܛX][ۋ]\��][��\����K���T�Q�QQ��HH�[YH�X[�X�ܙ[��\��ݙ\�H�\������YX�[�\�HX�[Y[�\���\]N�HYX�[�\�H�\����\Y\�H�[YH�\�X[�[�[��ݙ\��H�[�\������#ܙZ[��ܘ�[Y[�[�]��H����]\�H\�[�H^\�[�������ۙ\���[��\�����\��YN��YY���И]Y�Y[ۘ\��
+
+X[�����ԑRS��Ԑ�SQS������[X�YH�����[�]S�SVWь�ь�э�[HH[�\[�[�QP�ʘ�ۙH����ܜ�X�H�ۜ�H[�[^H��۝[�K��H����]\��[���^؛���[YX�[�\�KY��۝[[�K\�[�[YKL���LM��\�����H]�M���͌��MMٙNYY�X�XX���NYMX���Y�]�\�\��\�S�SVWЌ�Ќ�Ѝ�܈]�\�H�[Y\^H����[�]����Z[��ܘ�[Y[��[�\���H^\�[���^Y\���[�Y]�HY\\���X�ۘ�[HH]�H�H[[YYX][K����]�ܘ\\�����[ܚ]H]���[[�[X�\��[��K���[��H܈�]�H�[��K��HH�X�ܙ[��ۛH����[�[^H�[��K]\��]�\��
+9a�:g'9���9�*��-9�&��n
+K�]�\����[Y]H�X;�#������[��H\��][���[XZ[��STSQS�Q�]���T�Q�QQ[�[H�X[[�[^H�[��H�\�\��\\�Y��������LKLM�8�%�]H�[�[YHH�\Z\��[�Y]H
+����TUJB��H�\�HX�͍NX�̙YL�L�XM��MM���YَXLٙ�NX���[���^ؘ]K\�[�[YK\ܝ�Z]�]��L���LM���H���HۛHܝ�Z]�[����[�Y]�K�X�X[\�YY�ܛX[�]H�ۙ�\�YYY�X�HL���L[�]ZY��ݙ\��Y[����L�����\�\��Y[�\���\��H�X�HY[�Y�Y\��[YK]��[������Z[��ܘ�[Y[��Y�]��X\Z[��[��HY[����[��][ۋ��H^\�[���ۙ\��Y]Y��MH�[�\��]X��\�\��[��K]��[�Y�X�X�N��^Y\���[�ۚX�[������[Y\�X�N��M�Y�X�H�ۙH�[��][ێ��M�\T��]P���^�H�X�ܜˈ��YY�[�[YHܘ\\�܈[\ܘ\�H]���H����XKؘ]K\�[�[YK\KL���LM˛Y\�[��Z\�\�X�X[؜�\��][ۜ���\��HXYۛ��\�[��\[Y[�\�H\�ˈ�\]Z\�[Y[��]����LKLM�X�]K\�[�[YK\X�[XZ[��̈�T�Q�QQ��\��[ۋ��X�H�[XZ[�M�ˍ�K��H�[�[YH��\��H�\��ۛ�X�܋\X�\�Y\�M�M�͙��MN؍L��M��LL��XMX����Y���Y��̍��\��]�]���H�[��M�NH
+�L�NNNMLN�
+H\��Y[��Y[���\��]ܞH�X���[�H^\�[��\��]YN�M������\��]N�H�Y��]�\�[Y[��]H�\���\Y�\�H\�H�\[Y[�\�HۛH[�����[��H̈�T�Q�QQ��H�����\��]]�HU��\��\��H[\�����Y�\�\��X[Y�[YH[��X�[ۋ��[�Y]H�����Z[��ܘ�[Y[�[����\\�\��[XZ[��\]Z\�Y��]�\��X]\��]YPH܈�H�X��\��\���\][ێ���Y\��K�\�[Y[�]]ܚ^�Y�HH]]ۛ�[�\��[Y][ۈ�۝�X���������LKLL��X�X����[���Y9c���'��n�aiH���"9m�y/g9b!��+��#9�*�d"9/m{�"B��H9m�y/g9b!��+��X]\�K�[���Y[�]]�KY�X�X����[��[�\��L���LL�;�#9g��ஹm�a�y��9�.9l#y��]X�]���̙���M�NL�L��L��X؍����M�L���X;�&�XZ[�9����"y/빥.x� y����"yn������[�[۸� ��H9k�f���������\��]ܞH9o�9论*�{�&��﹧"z`b��,�����"H[���Y8� P�\X�]ܸ� P�ܙݘx� U�x� U�X��Y]�9�%�am�.�c���'���8� ��蹧"ye+�. �X�]]�ۙ\�9.�yஈ��ٚ\�X�\�Kٚ\�X�\�KX]]��Ύ��Yے[��]�X�X����
+X;�#9��y� H�\�X�\�H�X��Yے[��]�\
+
+X;�&��+:/*�k�9aj9����"y/빥.yk���#9.g�����"ya�y��9h���X��]]�ܚ�\��[�8� ��H9��9h���j9����ۙ\�[���Y٘X�X����[��[�\���\�ܘ��XZ[�ژ]�K���Kٛ�\��[X���ښX[��K�]]���XZ[�X�]�]K��8� �k��c�-lY]H[���Y��[�X[�Y�\�;�#��[�X��X[�Y�\�8����X�X����X��\����[�8����\�X�\�H[���Y�X�X����]]�ݚY\���]ܙY[�X[
+
+X8����\�X�\�P]]��Yے[��]ܙY[�X[
+
+X;�#9� 9o�9c�hk��.��\�X�\�HRQ8� �����"H�X��Y]�� Q�\�\�ܙx� [��[�ܘY�x� z`b��,�kf9��8� URQ�ۙ\��\8� z)�"l�� [ZYܘ][ۈ9�%���Y�H9k�/g8� ��H9f�k����X��Y�H9ஈ��K���\��[X��˚�X[��K�]]��;�#Y�][X�]�]H9ஈ��K���\��[X��˚�X[��K�]]�˓XZ[�X�]�]X;�#Y]H\Q9ஈM�L�MM�NNNL�X8� �X[�Y�\�9c!yd*��X�X����X�]�]x� P�\��UX��[�X����[YH:"!�[���YX��Y�H�\�X�[]{�&�Y]H\�Xܙ];�#��Y[��Xܙ]9����"yk��aiy�"�o#�� y���.���%��]8� ��H[���Y٘X�X����[��[�\���\�����K\�\��X�\˚��ۘ8� y�/y��9��:"!���[��\�Y\�:(����]YۛܙX9���fi8� ���9g*9�.�l$H����H�\��X�\��ۙ�Y�9�`�� ��#�讹`g9�*9�n�ai{�&�acy�k���9o�zh"9�,H�\�X�\�H��\�\�[X���Z�X[��X:*.�a��d#9. [���YX��Y�H9o�9."�/"y.)�`�y�/�g*9�+9�g�� ��PQQH9m�b%�a�Y]Kњ\�X�\�H�ۜ��H9쯹讹�!9/cx� YX�Y�ܙ[X\�H�^H\�9doy.�8� PT�9n��k�"!�̌�[�H:je��-�� ��H9k�yaj9�b���y`�z*&:c!:*+z*":`n:h!{�#9�*�k�/g;�&�c���'��\�X�\�H�\��[ۈ9.#y� �!�b�yaly.��b,�X����&�n�+l9�*�/��/o��*�\�Y�X��[�:je�+bH�]]�HQ��[��#9a�y�i�d#9��9���h y. 9�(y�)�[�ٙ���\��H��[�� ��y�h�����X�X������[�� URQ]Y\�H9�%���[�ܘY�H9�m���Y�x� ��H:je�+b{�&���HK]\�\���[���YY�X�X����[�]]�K\�˝\��Z���͈T���&�ܘYH�H�\�\���T���&�d*�. 9�(y�)��[�]X��ۋ\�Xܙ]����K\�\��X�\˚��ۘ9��\����\��X�Y�����T�\��X�\�T���#9�+9o�9m�b*�fi�[�]X��ۙ�Y�� �f%�*i��\�\��[X�QX�Y�9�9e+�. 9i,y�e��+��i9g��(c9�9h������"H[���Y���"����][ۈ����[�;�"{�#9f�9�i9l&��(yc�� l��,y�X�Y�T��#�̌�9k鹮+8� ��H�\]Z\�[Y[��]�;�&��[X\�Kܙ\]Z\�[Y[�X�]�\�̌��LKLL�X[���Y[�]]�KY�X�X����[��[�\�˚��ۘ;�&��H�T�Q�QQ;�#9� 9o�9. :h!y/�y�fyஈY]Kњ\�X�\�H�ۜ��H:*+yk��� yk�f��T�:"!��[\�[��̌�[�{�"�X�X����\9�+���:`(��d9/�y� ze��eg��"zje�+bx� ��[YK��X�H�\��[ۈ9��y� H�M�ˍ�{�#�M�ˍ�x� ��������LKLL��X�X����9�n�aiH�ۙ\�9�-�����&����fiU�\�X��]]��H9m�y/g9b!��+��^٘X�X����[��[�\�[�\�Y���L���LL�;�#9g��ஹ�m��`�� 9��]����M�MM���̙ML�Y��͌؎�NMX̙�MX;�&�XZ[�9.#y/빥.x� ��H[���Y9k鹪g�论*�{�&��yk��/�y�fH�X�X����\9�h�n.8�#:e��eg��+���:`(��d8�#y�`��#U�\�X���][ۋ�\��Yۊ�X�X���˘��JX9� �(��i%�`��X�X����\9��y�y.)�`g9g*\��܈�X�X����;�&�c깧"ze�:e�y�+���:`(��d8� y�,H���YH9��y�b��`��cyc��k�9�$�]]8� �f�9�i9ec�hc9.#y�+��yk���b��g�g :hcyi%�*+yk���#: #9�+�U�ST\�X�S�]]ٝ[\Y�H�]�Y�][ۈ9.#yc��/g9ஹ�h�o#��yk���`y�"�� ��H9e+�. ]]�ۙ\���ٚ\�X�\�Kٚ\�X�\�KX]]���9m����fi9�m9ie��P�P�����PQӓ��P�ʘ8� X��][ۋ�\��Yۊ
+X8� [X[�X[X��\��]��[��[�X��� X�Yے[��]ܙY[�X[
+
+X:"!�[ؚ[H�Yے[��]�Y\�X�
+
+X9b!��+��&�.#yo��a�y墹�+9."yli�ܚ�\��[�8� ��H�Yے[��]�X�X����
+X9��g*9e��. :-��o�y/o��*�\�X�\�H�X�X����]]�ݚY\�
+��Yے[��]�\
+
+X;�#9.)�*+yk��\�^O\�\;�#:+���b��g�"!��c9�g�`�y��y� y�#�)�yfj�\9�`y�"��&�b'yi��c%�`�y/�y�fH�]�Y\�X��\�[
+
+X9.�y��9k�y/빫h�bcym�eg�b�y/a�l&��*��d9�g��:""��Y\�X��\��[۸� ��H��ٚ\�X�\�Kٚ\�X�\�KX]]]ZK���9���fi9m�.#ykf9g*9�U�XYۛ��X�:c+�*�9����b;�&����ђT�P�T�W�UU���Q��U�K�Y:"!�]]�Yܙ\��[ۈ\�9d#9�iy�.yஈ�\�۝�X�8� ��H9.#y/빥.HRQ�ۙ\��\8� ykf9����[Xx� Q�\�\�ܙH�[\�� T�\�\�]HXX�[�x� Q�[YK��X�H�\��[۸� �k鹪g�je��-���y.���&��X�X����\9/�y� y�h�n.9�+���:`(��d:*+yk���#9.#z)�y�`��yk��e�:e�H\[���&�n��#�X�X����9�n�aix�#y.#yo��a�ya���""�U�\�X�S�]]\��܈�X�X����8� ��������LKLLH�X�X����RQ9kf9��Y�][ۈ9/빫h�H9�����;�&��X�X�����]]9m칢$9b��c�o���\�X�\�HRQ;�#9/a�X���[�RH:hk��.�X���[��]�H\��Y�\��][ۈ�]�[Y\^HY�][ۈ�Z[Y�8� ��H9�.yf�;�&��\�\�]HXX�[�H9m�g*�\���T�]�Q�܊
+X:)����9a�*l�RQ9�9讹b!��]�H^[�Y;�#[�\��XYJ�]�JX9cn�o�y�iyc���n9.)�a�y�(ydo9c����\��[X����[YT�]�K��Y
+
+X:a�z+��\��]ܞ{�&��+9.�9�(z+�9c�c�� �z"!�m�)����9��9�b�.#yd#9�iz #9f�`���[�x� ��H9/빫h��&���\��[X����[YT�]�X9��9h��Y�]J�]�JX;�#9����*9�蹧"H�Y�[YJ
+XY�][ۋۛܛX[^�][ۈ:`��/+�/a���9��y/o��*9m�)����^[�Y;�&�. :"+�Y
+
+X:(c9ஹ��y� yc���+9o��X�]�HRQ�\��]ܞH:+�9c�� ��'��h��\�Y�YYY[\HRQ9.�yc�-l[�\�ܙX][ۊ
+X;�#9.#y� �*�:`,��PQx� ��H9.#y/빥.H�]�H��[Xx� URQ�ۙ\��\8� Q�\�\�ܙH�[\�� Q�[YK��X�H�\��[ۻ�&�XZ[�9.#y/빥.x� ��������LKLLH9."yb!��+��b��g�R{�#Г���9��9k���#��(ychy�c9�,:k)yk�yaj9�m9d";�"U��T�Q�QQ;�"B��H9�m9d"9bcH�]X�]���M�،�X�����L�YYY�Y�MY���NL8� XXZ[�NL�L�M��LXL���ٌY��͙YL�M���;�&�."y��z`h9���\:`�y쯹讹�by��9�!�k���x� �k�f��h!�n��ஹ��kf[ؚ[HR{�#�V�X\��8��������#�f��,hyhe9nl�(hx� y�y��yl zgh�� y��: �zh$:)�z"!���9��9k�8���9�(ychy�c9�,:k)ydb9��� ��H�^�[ؚ[K]ZKY^Y�X\��L���LLPYٙ�����YN���N�NNM��XMNLYXY�L��9m칦+�-m�i��]�Y\��H��M�،�X�����L�YYY�Y�MY���NL9�9�+9.�\�[�;�#9f�9�i9����"za�z)!�d"9/m{�&��蹧"H��M�H:"!��[��M�M��NLX9m칢$9b���#9o�9�9f繫n9�+:*i�.�z`&�`c�� ��H�X]\�K؛���X�[[��KY�[Y\^KX�ݙ\�\��[\�]�Y]�\�[X�L���LLP��LM�L�Y�Y��LMX�M�N��X�L�YM���9.�zf�z)����\��HY\��HML�M͍�M�LY�LXَ̍��Y���M�L��L�9�����M̈9d"9aiH]��LL�͌��YN��N�Y�LX�͘Y�MY8� �(gy�yஹajy.�HX[�Y�\�8� X\\�[;�#ٙX]\�KX����\�[X�\�Y�Z[�[�[Yx� X����M�]�M�Xܚ]X�[]ZK\�Yܙ\��[ۜ˘���:"!�\���ZK]\�ܘ\KX�]K\�\�\��][ۋ�\����;�&�.��m�y/�y�fz/ ���]�9��������#��g�e��ۙ\�� [[ؚ[H�X\��:"!��]H�\�[[�{�#9d#9�`�b�9aiy�y��HM��x� ya`��(9ab�b-�� P�����#���:.�z"!���9k��g 9�`��#9a�y�,H��X�[�Y��\��H:a�yn��[�\�]Y\��]�� ��H�^ؘ]KX�\�\��[[�[ۋ]ZP����Y�NM��M�XLX͌MXLYLL�����9.�zf�z)����\��HY\��H�NNXX�M���YX��ٌ�NM��L�Y�M�M�9�����M��9d"9aiH]���NNM͎�NYX����NM͙N�YYLَ���X8� �(gy�yc�g*9ajy.�HX[�Y�\�:"!��[Y\^KX�ܙH\�Y�Z[�[�[Y{�#9ga�.�H��X�[�Y��\��H]\�Z[�\�X��X�Z[:)���n��&����M]�M�ˍLKX�]K\XK���9c깤�9aay�蹧"ye��. ؜�\��\��[�X���#9����"y�+9.�؜�\��\��#�\�[�\��#��]H�ۙ\��#�M�ՌM�9��: �H��8� y�,:k)yn+y/cx� XX�[ۻ�#�\��RH�ۙ\�9ga��*��.x� ��H9.�9c�y�/y�.9c��o9��bcy. 9m�y/g9b!��+��fy."�������#��g�e�N�M�:""�*.�)��"!�� �-�����[H:*�9c.zacy�:`c�k��Y�^;�&�m칥.y�$9쯹论c��k����bcH]�9�.9a�����ۚ[���[{�#:`o�acy`a�foy�)�"!�""�)���/9f繭`x� ��H9b!��+���&���[��M�NM�͘8� Y]��[��M�L�P��T���&Г������\�L��L�� \�[X�� [YX�[�\�x� ]\�ܘ\x� [[ؚ[H�X\��:"!��L0��;�#�L���LM{�#��0�������YH�Z]\�:`&�`c��#��Y�\�H^X�T�H\�[Y[�:"!�]�HPH9�$9b��� ��H9b!��+���&���[��NNM�N8� Y]��[��NL�P��T���&̌�̌����[�^8� LML��ML���K؜����\��Z]\�� L�NH�\��\��\�� L���]X�Q�� L��]\�Z[�\�X��Z[\��]�� \�[X\�{�#��Y\��#��]YY���]\�9aj9�n:`&�`c�� ����YH9��\�\���]H͌0��;�#�L���LMx� y�y��yl zgh�� [[ؚ[H�X\��� X���;�#���[;�#ܙ[X�P{�#9.�yc�`�9�l�o�X���[�Y�\��8� PX�\��� X�]K[^Y\��]Y[�]�HPH9aj:`�T��� ��H��Y�\�H΋��]����\�\�[X���Y]��Y�\˙]�9m�je�+bz`�9�l�X[�Y�\�^X��H��NNM͎�NYX����NM͙N�YYLَ���X;�#�[Y{�#��X�H�\��[ۈ9b.��#���y� H�M�ˍ�{�#�M�ˍ�x� �hcyi%��YۙY[�]9k�h y�����y�(H����[�[XY�x� y�-9nl�ݙ\����9�%�\[ܚY�[��ۜ��H�\��[���\��ܻ�&��*�n����c/�d#z**�k��n,�&g�� ��H�\]Z\�[Y[��]�;�&��[X\�Kܙ\]Z\�[Y[�X�]�\�̌��LKLLK]�YKX��[��Y]�Z[�Yܘ][ۋ���ۘ;�#����T�Q�QQ8� �aj9�"�����"y.�HXZ[�9ஈ�\�H9��� [Y\��H9�%�\�;�&�k�9�$�X]\�H\�[Y[�9o�XZ[�9.�yஈNL�L�M��LXL���ٌY��͙YL�M���8� ��������LKLLH�X�X����X�X���ٚ[HU�:*.�����"ST;�"B��H9m�y/g9b!��+��^٘X�X����\X�X�\�ٚ[KYXYۛ��X�;�#9g��ஹ�m��`�� 9��]�LXL�XٍY��L���MLX����YMNYX�LY�8� �[���YU�9m�c�z)��a�y��Y]H[��[Y���\Έ[XZ[:"!�\��܈�X�X�����9�(y��z/"yaiX;�&њ\�X�\�H]]ܚ^�Y�XZ[��� SY]H\�XZ[��� Q�\�X�\�H[�\��Y\�X�8� P\Q8� y�y�!�d�z)�"l��#9.�yc��\�X�\�H[ؚ[H�Y\�X�9ga�m�`$:h!y���fi8� ��H9k�9��H�\�X�\�H����9c��i���:hk��.��X�X����]]�ݚY\�9�+:.��.#zh$:/"H[XZ[���{�#�\�S�]]�ݚY\����\�:h$:*+yஹ�n��&�l"9�b9.g�����"HY���J	�[XZ[	�X8� �f�9�i:*.�����빪&y�+�f�:f��\�X�\�H��Y�X�X�����]]9."��.9�+�d)�hcyi%�)�y�`�[XZ[8� ��H9� 9�`�*.����.#z/"yaiHY]H�]�T�ܚ\��� y.#y��9h��i%�`��[�[YH�ܚ\8� y.#y�/�k���X�[ۈX[�Y�\�ܙ[X\�H�]x� �`�H΋��]����\�\�[X���Y]��Y�\˙]��9�,ye+�. ]]�ۙ\���ٚ\�X�\�Kٚ\�X�\�KX]]���9��9��yl#�d$HY]H�]]X[���#9�#�讹c�)�y�`�X�X���ٚ[X:"!��\�ۜ�W�\O]��[�;�&��[�X��9/o��*�\��[۔�ܘY�X:f�9�g��]H:je�+bx� zf,��ԑ��#9c�o����[�9o�9���b.��!zfiT���Y�Y[�;�#9a�y.�H�\�X�\�H9k�9��H�X�X����]]�ݚY\��ܙY[�X[
+��[�X
+��Yے[��]ܙY[�X[
+
+X9f�b,9�蹧"yd#9. �\�X�\�HRQ�ۙ\�� ��HU�9��9��H�]]�[�X��9f�k��ஈ΋��]����\�\�[X���Y]��Y�\˙]��;�#Y]H8����X�X����9�n�aiH8���:*+yk��8����#9�"y�b9��]]:a�y��9l#�d$HT�x�#yo�zh":hcyi%�b�9aiz`&y`"�k�9�m9���g`;�&�c���\�X�\�H[�\�΋�ٛ�\�\�[X���Z�X[��K��\�X�\�X\���K����]]�[�\�9/�y�fy.#yb*�� ��H:`&y�+��#�讈ST]�;�&�"�HX�X���ٚ[K[ۛH9k鹪g��$9b���#9�.yf�:f�.+yb,�\�X�\�H��Y�X�X�����]]�[XZ[���{�&�."�. :/*�o�zh":`n9����h�o#�/빫h�Y]Kњ\�X�\�H���H9�%�l!�m�je�+bH��[�^�[��H9�-�����$9�h�o#��ۙ\�� �"�y.�yi,y�e��#9���fi9�i:*.����.)�����.yf�:f�.+yb,Y]H\��]]9li8� ��y�h�a�yo��Yے[��]�X�X����
+X9墹�+9."yli�ܚ�\��[�8� ��H9.#y/빥.H�]�Q�[YJ
+X��Y�[YJ
+X8� URQ�ۙ\��\8� Q�\�\�ܙH�[\�� zf������+9�g���[Xx� Q�[YK��X�H�\��[ۻ�&�XZ[�9.#y/빥.x� ��������LKLLH9i&�l#z*lH]�9b!��+��/y�.:"!�[��\��H9�-������H9�/y�.9g��ஈ�]X�]��L�Y̌�M�NLMMM��L�M��NLL��M؍L�X8� XXZ[���ML�YNM���Y��َ���X��̘MNM�;�&��/y�.9�`�`h9���aly�"HL9`"���[��XY��#9am�.+H͈9`"�m�y/g;�#��m9d"9b!��+�m칦+�]�[��\�ܻ�#9����"y.��/eH��[��9�+�n����g*9� 9��]�9.b�."��9�*�d"9/mH\��[�[�8� ��H���LKLLH9d#9�`�i&�l#z*ly�(��'��9�"y�b9m�y/g9m�/�yn��kf9g*9��9d#9. 9��H]��&�a��eg�b�ybmz)�Y�X�X�x� ybmz)��+�9�iyn�z`�X�[ۜ�� yajyneH���[���:"!���\X�]]ݙ\�^x� \�]�X�H�X�{�#9.�yc��X�X����[ؚ[H�Y\�X�;�&�� 9��]�9��\��]ܞH�X���:"!���Y�\�H^X�T�H\�[Y[�9ga�ஈ�P��T���#9.#ykf9g*9."yie�.����9����+y�9�"�o#��8� ��H9e+�. :g :)�y�-�����9�+���X�YXZ[��[X\�HY\��\�9�[��\��x� ��]Y\��K]�YHK]ܚ]K]�YH]�XZ[�9�(��'��YH��M�M����MM����X�ٙY��XLMYX;�#:"!�d"9/mybcH]��YH9k�9aj9��9d#;�&��m9d"��[Z]�YLX�M�X̍N�Y̎X�X�ML��XX��NN�M�9f�9�i9c�h��b�XZ[�\�[�;�#9.#y�.y.��/ez`b��,�� URx� X�Z[8� \�[X\�HY]Y]x� Q�\�X�\�x� ykf9��9�%��yk��,����x� ��H:""�#by�/���M��#��^�ZKY\]Z\Y[�Y�[Y\^KX�]K\�\�9m��,H�^�ZKY\]Z\Y[�Y�[Y\^KX�]K\�\�X�۝[�YY��M����L����LY�L͌��Y����MY�ٌX��9�9k�yaj�ۙ\�X�۝�\��Y9�b9�+9c�.���#9.)���ym�`#�`c������L��L�͌�X�M�L��MM�M���X�X9d"9aiH]��&���M�9m��fy."��\\��YY:*���#�o�:e�:e�{�#9�y�h�a�y�(yd"9aiz""�X[�Y�\�;�#؝Z[8� ��H�X]\�K٘X�X����[��[�9���[��Y�ܙY�]H]�:"!�]�[�Yܘ][ۈ��[Z]��L��YNY�M�X��YN��X�ML�XY�Y�N]�ZY9k�9aj9��9d#;�#9o�9�[ؚ[H�Y\�X�9.��m�g*]��&��i:""�b!��+�.#zg 9a�HY\��x� ����;�#�����;�#����9c깥�9h��ch9/cy��;�#\��]�[X��\�X9.�yஹ�(9�d9l"9�*;�#9am�i&]�\��[���[��\�9ga��+�m�c�.���:""�g�n�y�%��m�c��[X\�{�#ݙ\�Y�X�][ۈ��[��;�#9桹.#yo����9��yd"9aiy��bcH]�� ��H9�+9�(yc�.�H��M��9�m9�!�[��\��H:"!��+9.�9��y� :c!;�&��[Y{�#��X�H�\��[ۈ9��y� H�M�ˍ�{�#�M�ˍ�{�#XZ[�9.#y/빥.x� ��\��]ܞH�X���9�$9b��.%�9d"9aiyo�;�#9o�zh"9a�y�(y论*�H]�PQ8� P��Y�\�H\�YYX[�Y�\��H:"!��b9�+9. :!�;�#9�cyc��f�h,yk�9�$8� ��������LKLL9f��b!��+�k�yaj9�m9d";�&�����N�M�9�b��g��b:gh��"]�[�Yܘ][ۻ�"B��H9�!�k��m�y/g9b!��+��^؛���]ZKN^M�[[ؚ[KL���LL�X��YY��N�YYMY�M�������Y��X̘9�����:"!��g�b-�chHN�M����9m칥m9d"9b,9�h�o#��ۙ\������[Y\^KX����]��\�����8� ��H:"!���9k��b!��+�alyd#9/빥.H\��][X[�Y�\����ۘ8� X�Z[�\��][X[�Y�\����ۘ:"!��X]\�KX����\�[X��[�{�&�.��m�y�m9d"9/�y�fH�������9��9�b8� y��9k���&y�i;�#�f�9�b��(9�d8� y.�yc�am�o�:/"yaiy��X]\�K\�[X�\��ܙ\��[ۘ���Ҕ�� ��H����9b!��+�n������:""�]��&��*�n-�f�""�X[�Y�\�8� z""�,����:-��o�y�%�am�.��[�[Yx� ��+:*i���z$��͌0��8� L�L������ ML���LM{�#9.)�/o��*:em�M�H�M�X:je�+bychy�a�.#y���/cx� ��H���9d�z,깪����yab9���fi:*.�)��a�y������aj9��Z[\ܝ[�9k��db��&�*.�)��.+y�:=�6����k�w��Y[���[�][S[�[��[�\]Z\Y][X:`&y.���蹧"ya�yo#��#9����"y�.yb�y.��/eB�9. :(c���[XZ[����9�+:j�8� �bk��+9�*��jy`'��*[ۜ�\��9aj9g��fh�b%��+9/��l,yc��.�y�m9c!y�������9�蹧"y�h�/�;�"][��[��[ې�]J
+X9`'�k�9�m9.�X[ۜ�\����\��[��ۙX;�#9�d9�g�o�9k�9�m:`�9c���"x� ��H
+��������]�L̋X�۝[�Y^[��[ۋ����
+���"9��9��;�"{�&��c�b�yob9��� ybk��+9�!ye��chy�a�� y��y�c�b.:`n9����"zb%B�9�9� 9l#�c���*9�(�o#��#:-��`b��,��蹧"y��z"l����acz"l�. :!�8� ��H
+����̌X[�۞[[�\�L����
+���&���9�iՌL�y�9b�y�b�/"yaiyfj9�(yo#��#9��9h���Y�L̐�۝[�^[��[ۊ
+X;�#�9g*�P�۝[��YY9o�9b�y�b���aiy."�gh�ajy`"���9��9�b;�"ݏLL̘;�"x� ��H
+����̍K]�L�KY�^X�]����
+���&��L�WԑT���W�SVW�T�9o��L�9�.y�$ML;�"9f�d":e���n���LK�y���"x� �����`c��"�.+y�o9��.)�/빫h���`"��'؝Yʊ��":`�y�+�ab9k���"�o#��9a�y�*^]ܚY�9k�f��-�z`c��cy���b,9�;�"{�&���K�9. :e��i��k��[\�X[��d9���\�]�ݙ\��Yy�`��':c+�.�����[XZ[����:(�x�#9k��db�o�9�d9���#z`��`"9a�yo#��9d#yke��"9�'9�$�\���T]Y]YYX�[ۑ�ܐ�\�X�\�;�"{�#9k�f��."��+��\���T]Y]YY^Y\�X�[ۘ�;�"�\�X�\�[�^��[�9ajy`"�c���n;�"x� �m��*ܙ\9k�f��论*�ya�yo#�d#y�,y.)�/빫h��#9.#y�-��)�d��g*9�,:k)y.+B�9� �k�9aj9����"y�d9���b9��;�"9c���+9�9�"�o#��9�"X�ۜ��K��\��:f,�da��#9/a�i����9����nyb)yc���"��ۜ��H�9o�9k�y�$��#���z`&y`"�ec�hc;�#9.b�o�9��y�b��9.��k��ݙ\��Yybcyb�yo�yabܙ\9论*�ya�yo#�d#y�,ykf9g*;�"x� ����9a`��(:(�y`�yie�(�z(�y�i�fj:`�9/c{�"9b ��a��"y�9�jyd�X\X9c���+9k���$�[��;�#9/a����[XZ[����:(�B�9k�f���n�k���#:`&y`"�\z �y.#z �z(���o�b,9d�`"�(�y`�y�!8�#y��][��[�ܞQ\]Z\Y[���
+
+X9c�*�B���X\ۈ�:`&y`"�\yke�.,��"�[��9.#yg*9l#y�i�(j:(�{�#9� �l#�!�9�o�(�yi,y�e�/a�.#y� �h,zc+��#�\]Z\�[X�Y][J
+X9c깦+�gg:n��]\���"x� �`&y`"؝Y�g*XY\���#�)�yfj:(�yk�f���+:*i��#:(�y`�yie�(�B��.��b�9�$8�#y�`��cy�o9���"9�o�(�y.b�o�9ie�(�z*"9�n9. 9��9chyg*��#9�b�.#y����.���"x� �m�/빫h��$\N���X\ۈ�8� �����[XZ[����9�+:.��`&z(�y�"y`"��蹧"y�9.#y. :!�;�"\�\]Z\Y[�[��[�ܞU\J
+X9����[��9.g��:`,�c��� y/a��][��[�ܞQ\]Z\Y[���
+
+X9.#z*�{�"{�#:`&y�(y����"yb�X[XZ[����9c��/�`&y`"�.#y. :!�;�#�9c깦+�讹/�y��9h���9�jyd�yk���y�*9l#y�\y`/8� �����je�+by��yo#ʊ��&��*9�+9�g�]ی�[H��\��\�NX
+�^]ܚY�XY\�����Z][{�#9aj9�"��g�`c��Rz(j9e����9��ydo9c��ܙX]P�\�X�\�
+X�ܙX]PY][ۘ[�\�X�\�
+X9n�����+:*i�)�"l��"9�by�&���9��y�.B�^Y\��]�[;�"{�#:`$9. 9k�f��-�z`c�.�y."��`y�"�.)�论*�z,����K��y��9�b��h�许� yaj9�"�f�Y�Y\��ܘ;�&��H9. :"+9��9b����z$/{�&�o-�b-����o�y.+{�#9论*�M9�+�/c�f��`d�am��"��)�d���y�)�����"yd!:!��j9���b)9k��� z �y�h�讹b�9aiz �9c!B�H9�)�d���,:k)y/o��*;�&�a�9l y�)�doy.+{�"9�*��jy�h�讹���b,�\N����Y^�H�\���Y��X9��9�b�� yn��kf9�h�讹�h�{�"x� B�9�*�doy.+{�"9�j��b9i,y�e���� y.#y��: %�hcyi%�n��kf;�"x� X�[�\��]R][SY[�J
+X9g*9�)�d��b!�h y�h�讹�,����a9c��n繤⹣"zb%{�"9d*��#9�'��b9�g����Ix�#y���ke�� Xۘ�X��H�\�U[\�X[����H�;�"B�H:(�y`�yie�(�{�&��by�&�e�9����"�:f.����.)�-��[\�8� x�iL�9�/�(c;�"x� L�.퍹g#J�yb�9�$;�"9�n9`/:`$:h!y�.9l#y�h�讻�"x� B�y.��l#y��ya`��(9`��k��̉{�"9�*^Y\�9�+9.��-��^Y\��9b!�b)zje�+byc깧"ya`��(�ie�(�z`�y�)�d"9�:)�"l��cyd �b,;�"B�H9��y�c�b.:e��ie�(�{�&���: %�yo-yb.8� y�h�讹���b,y.��l#y��yie�(�y�:f�9�g�`�9/cB�H9."y`"���yn.9bk��+9k�9�m:-�z`c��"9�*9�'�k���[��]J
+X���P�]J
+X��X�И]Q[�
+
+X9�d9���#9.#y�+9c�i%��(y��;�"{�&����je�bk��+�h-:.�/*��,9k�9�m:-�yk�8� y�c�b�yob9��� y��9��zh&9c�o��\�Y^9�h�讹h��b�8� B�9.⹥�ym�k�9�$9o�9.�9�(y�$y�,:(���h�讹���."��&��d9��ybk��+9/�yf�d"9�n9b)9���k���y�n:a��� ze���y�h�讹���b,9�d9��{�&:(�y`�ybk��+�����9쯺"�x� y��y�c�b.:`n9���ob9��� y��9��zh&9c�-���"�n��db�f�y`#zh&9c��"��ԙ]�\�YY;�"yajy��B�:-��o�z`�y�+:`c��&��,9�e�-��o�y论*�X[ۜ�\����\��[��ۙX9� ��h�论`�9c��� y�m���y�$y�,9�(y�n9.#y� �(���h���x� B�9c��.�y���b.�a�y��9�$y�,�H9�����za�y�k��&������[�ܘY�X:(�X�L̗�Z[W�[��[ۗ��]X9�9��y�'��.y�$9o�9.ay.�ybc{�#:a�y��9�m9�!�h zgh��;�"9�(y��:-�9��{�"yo�9论*�X\�Y9��9�b��h�论a�y�k�� ybk��+:a�y��9c���$y�,�H9�jyd�z*l��,9ob9��Ց�g%��.��,����/빫h��&�论*�X�[�][S[�[
+
+X:(�y�9g%��.�a`��([��\�S9�'��:em�aݙϘ�y��:n��#9.#y�+�(���m��$9. 9�m9.,����ke�cl9a�/������m���zfd9b-����&��H9c�`f�.��,����K�`��/+�li:-��� 9l#�c���*9�����[�[�HՑ�)��)���"9/�y/o��*: !y�#�讹�!��.��#9ab9����`��*����Ҙ]�T�ܚ\9b�y�j���[��\��Ց�`f�a�/���#9o�9�'�a�y�*9(d���9�.x�#{�"{�#9����"y`f�`$9�j�gh�Rz-l9��B�;�"9/��i���'��9�*9��zo(:n�`c�bk��+9�!ye��h y�9����b8� y��y�c�b.:`n9����"zb%yg*9l#�'��ney�9k�f��)�9�'��"{�#:`&y�(yaj:`��:je�+bz`�y�+���9��ydo9c��n�yli9a�yo#����y/g�y��9�b��#9.#y�+��(y��9�'�k鹢b��!�n繤⹥m9`"��`y�"�� ��H9����"y�+:*i�."y`"�)�"l��"^Y\��;�"y��yh��."��9ie�(�yb�9�$�bk��+:e���/���y.���#9��bczf�z)�"l�e�9���c��*�^Y\�
+�^Y\��:je�+bz`c�� ��H��̍�]�L̋X�۝[�Y^[��[ۋ���:(�z(�y`�ybk��+9�:f�y`#zh&9c幭`y�"��"�L̐�Z[Q\]Z\Y[�[��[۔�]�\��:(�y�ܘ[��9m���9a�yo#��"yk����y�#yo���g��#:`��/+��h�讹/a�.b�o�9i����:)�ya�y��9aayn�+l:h!��b��m9�!��$:-��L̐�Z[SX]\�X[[��[۔�]�\���L̐�Z[Q^[��[۔�]�\�9. :!�9�9k����x� ���������LL��8�%9�"zb%y�*y�#�b,9am�.�)����� z+m��﹢h�(`9��9�.�a�z)!�� y��: �zh$:)�y�l�b�y�-9g%�*����B��/o��*: !z`&z/*�f�h,M9`"�ec�hc;�#:fa9.��yo-y�*�g%��&���K�
+���#9aj9lk9�)���: �zh$:)�x�#y�"zb%y�*y�#�b,:!�b�y�,:k)z*+yk��)����."����"9/o��*: !y�*�g%�(�z!�b�y�,:k)B�:*+yk��)����c��."�)�i&�.��. :ha�.#z*l�a����8�#9aj9lk9�)���: �zh$:)�x�#y�"zb%{�#Ryf�9�i:+��o�:f�9.���"x�%9�.yf�:-���]\�[�]ۘ9�+�d#9. 9�+��Y��&���[�]�Y]�XY\��]ۘ�9c깧"yg*��]��\�X�\�X�
+X9b!�b!�h y�`�(��*+yk��hk��.��f�z%���#9/a����R�YQ�X]\�J
+X�:e�:e�z)�����`�����"y���k��a�y�k�f�f�z%���"�]\�[�]ۘ9�m��`��"za�y�k�� z`&zha��#���y.���"{�#�9c�)�y�yk��`,�`c�. 9�(y��: �yb!�h {�#:`&zha��"zb%y�\�^N�[�[�KX����9l,y� �. 9��9��9�f{�#�9.b�o�:e��.��/eyam�.�)�����":!�b�y�,:k)z*+yk��� yea�n���)��)��"z`�y� ��"�b,9k��� �m�(�9."�-��]\�[�]ۘ9. 9�(��:a�y�k�� ��#9ie��*9.)�eg�b�y�"zb%yg*9�,:k)y.+y���c�y��x�#y�*�^]ܚY�9k鹮+;�"9d*��'��9g*9�,:k)9.+x� ya`��(9c(��"ybjzi&9�`��n9�9��yh���"y����"za�y���#�9����y�+�d#9. 9`"��"zb%y�*y�#�`(9�$9�9�b:gh�c+�/cze����yolzg��b,:n繤��#:`&y�(y. :-m�/빣�y.���#�9i����:`�9�"yec�hc:g :)�y/o��*: !ya�yf�h,x� ����
+��+m��﹢h�(`9��9�.�`��/+ʊ��&�+m���k�9aj9���."�`&y�(y�.����"[XY�X:(���h�b,;�"y�`��#9c���+�:`�9�+�� �do9c�����^Y\�]
+�����X;�#:-��a���"y�#��y�8�#L8�#y�!yke�-�9chy�a�g!�b�x� ��.y�$9c깧"X[XY�O�;�":+m��﹬��k�9aj9���/c�� y�'��9�"y�h�(`;�"y�cydo9c���#�9m��*^]ܚY�9k鹮+:je�+b{�&�m�9i)�+m��﹠�yh��."�aj9�"�9�(y�!yke�9ob9a�� yc깧"y�oz"l��:+m��﹢h�fi9�n9ke��&�l#�+m����"9� �(���d��o��"y��yh��."��+9. 9��+m����9ajy`"�ob9a�`�ya���� B�9.b�o�:+m��� %���yc�bjy�!yke�9ob9a��#9�)�d"8�#:fi:gg�+m���bjzi&9�o�c��a��l#���9`��k���cy. :-m:hk��.��#y�:g 9�`�� ��ˈ
+����: �zh$:)�zh x�#9�-9g%��#{�"9�*�g%�hk��.��l�b�y�`����ke�墹ke��.���;�"J���&���;�#�9����"y/�io{�#�9�*9�'�k�)�9�����yb�y�(y��;�"9d*�o��`'�`(��9��yb�x� y��yb�y.+ze���*�g%�� yb!�b!�h yo�9��yb�{�"B�9c�z)��f%�*i�`�y�(y��za�y�﹢*�g%�(�z`���+�墹ke��j�gh�� ��*�g%�(�ya���.#ylk9��9.��/ey�'�k鹢�: �B�9d#y�,y�9.���9���ke��"9/��i���#9�-9l#z,hy�b��#{�"{�#9��:/ �`���+��b��g�g*9�l�b�y�h��)�`�9���k�9aj�9d"9�$9ioy��9�j�gh��:`��. 9�:e��(���*�g%��*�b,;�#9.#y�+�� y�9�)��:h zgh���9�b�c+�*�8�%8�%:`&y�+��9�`�n��ec�hc9���/����yo���"�o#�`��/+�."���9��x�#9/�iox�#{�#9c� �y`f�n.:)���9�b��g��l�b�y�b: �B�9a*�c%��"���[\�]�Y]�X�\�9b�9."��۝Z[���۝[�:-���[X�[��N���[�ٛܛX;�#:+�����o-ychy�a�d!:!��j9���d"9�$;�#:fcy/c��l�b�y�`��m:j�:a�y�j�a���"{�#:fcy/c��9�o9�'��g���� �i����9.b�o�:`�9�+�n.9n.9�o9�'��#:g :)�y/o��*: !y��9/�ʊ�'��nezc!9olJ���"9.#y�+9�*�g%��"y�cy�"y�g�� ����b,9�'��h��9�j�gh��`�n��� y论*�y�+�.#y�+�d#9. 9�+���y��x� ���
+�� �9c!y.��gh�/�9f�cmy.#z)��.�����&���;�#�9����"y�o�b,8� y.g�����"za�y��� ��*^]ܚY�9�����y.���: �9c!y�9ajy`"�`,�aiz-��o�{�"9."���yl#�)�yb%���[��[�ܞTY�X8� yg,9g%�h z(�B��[�X\[��[�ܞSݙ\�^J
+X:e���:)��$��li9�b9�+;�"{�#:e�:e�K�/�9f繣"zb%yg*9ajz`��`�B�9�h�n.:hk��.�� y�h�n.:`b�/g8� �`&y�(y/o��*: !zfa9�yo-y�*�g%�(�y����"y. 9o-y�+� �9c!y�j�gh��#�9�.�.c�)��)�����(���9l#{�#9."�. 9`"���y�b��9.��i����:)�y�o9�9��{�#:g :)�yab:-��/o��*: !z)�B�9. 9o-yk�f���"�b,8�#:/�9f�cmy.#z)��.���#z`��`"��j�gh��9�*�g%��#9�cyioyb)9���b,9n�y�+�d�`": �9c!y��:e�9�j�gh�� yd�`"��"zb%x� ���������LL��8�%9aj9lk9�)���: �zh$:)�{�&��'��h�/�ioy�l�b�H
+�9ke��&�*��b,:"$��#yi)�l#�."�. :/*�������ke�b�9i)�b,L;�":'��ney."��!�\;�"y.b�o�;�#9/o��*: !yf�h,x�#9.#z �y�l�b�{�#9."�gh��"�.#yb,8�#{�#� #9.%�\9讹k�i*�i)�� �`&y�(yajy`"�ec�hc9. :-m�/��&���K�
+���l�b�X�Y��9�'��h��.yf�
+���&����K\�Y�K]�]�X�[��˚��9�9aj9g��)�9���c���oyd#ye���9. 9��9����"y������[\�]�Y]�X��X9b�:`,�c���#9�b��!��'��9��yb�y�`�(��k�9aj9�����{�"9�"�o#�c%���ܛ��:,�`/9.#yc��olzg���#9�`9.�y.b�bcy�*:`&y`"���y��zje�+bx�#9�"�-m�/�����ec�hc8�#yam�k鹬���+9b,�9�'��h��9ec�hc;�"x� �b�:`,��oyd#ye��o�;�#9�*^]ܚY�9�(y��9�'�k�)�9�����yb�B�;�"[�]�\�]��X�]�[�;�"zje�+bz`c��ܛ��9�'��9� �-��$e��.z+��� �*l��,9c���!�)�9."���x�#9����ly������a�zn��#y�+y��;�#9.�yo�9.��/ey��9h���9c���l�b�yk�yfj:`�z)�z*&9o�������z`&y.�y�oyd#ye��� ����
+��ke��&�*��b,:"$��#yi)�l#ʊ��&�L:fcyb,9�&zhc\;�":'��ney�!N\;�"x� ylk9�)�b!�h y�"zb%L�\�;�":'��ney�!M\;�"x� y��: �yd#y�,M;�":'��ney�!M�;�"x� yb!�hg��&y�i��;�":'��ney�!L�;�"x� B�:*���#����ke��\;�":'��ney�!M\;�"{�#:`�y�+��*��y�+��/���9/��������#9�n9`/9g*������K]�L�KY�^X�]�����:(�X�[[[Y[���[�]�Y]�[�[:`��no���z)��ba�� ���������LL��8�%9aj9lk9�)���: �zh$:)�y���ke��'��h��9�.yf�9/빫h��"��{�"B���+9."z/*�/�k�9o�;�#9/o��*: !yc�9c�y�(8�#9aj9lk9�)���: �zh$:)�x�#y���ke�`�9�+�o�9l#�� y��9��z)�y�`��b�9b,�\8� �`&y�(y����"ya�ye���%9����n9ke�o�9."�*���#: #9�+�k鹮+9�o9��`&y`"�ob9���.�g*���[YK\�Y�X9���[yn���&y���n�y."��"9�+��/���9/����{�"{�#9bcyno�/*�. :-��b�9i)���Lˍx�����9aj:`�:(��`&yli9�+��/�d ���yaky�$9i&��#:f���*�/o��*: !y. 9��:)��o�����+��� ��.y�$9k�L;�"�p����y�����f�/���:(�9a'�`/;�"{�#:+��'��ney."�k�f��hk��.�a�/���cy�+�/o��*: !B�)�y��\8� �*l��,9c���!�-���������y��yk��`,�.��."���x�#9����ly������a�zn��#LK����;�#9.�yo��a�z*��`&y`"�ob9���%�.��/eX�ۙ�\�YY9�.�g*�[YK\�Y�y�+��/�n���&y���n�y."��9a`��(;�#:`�z)�B�ab9k鹮+9�+��/���9/��a�yf繣�9�n9`/;�#9.#z �y��9��y���/o��*: !z*���9�n9ke�c��l y.#yb�yk��`,�c��� ���������LL��8�%9�+9."z/*�/�o�HLH:h!yf�h,yec�hc��/o��*: !z`&y�(yf�h,LLy`"�ec�hc;�#9d#9�(�aj:`�9�*^]ܚY�
+�XY\�����Z][z`$9. :je�+b{�&���K�
+���,:k)z,��*"��a��.���jychy�c:j�9n����yf�k���"9.#y�Ly����%������*��j{�"J��8�%�ؘ]S[ۜ�\�\�XK��L�KY�ܛX][ۘ9c���+Z[�ZZY�9c�i(y����"L;�"{�#�y����*��jy�`�k�yfj:+�����#:gh9bjzi&9�n�e��/.9�+��9f�d":,��*"��a�-��$e�+��j�8� y.���jychy�c�9/cy�k�-��$e�-�yb�x� ��.y�$9f�k��Z[�ZZY��N\;�"�����*��jJ����e��-�J�k�yfj�Y[���"{�#9.#y�yk�f��no�����*��jz`�y/�y�fz`&y`"�j�9n��� ����
+���!��⹥��ke�i*�i)ʊ�8�%�[XY�K\�\�ܚ]X�[\�\9c���+��8� yb�y�j9l�9`/9a�y.fK���`#{�"9k�f��l�9`/ˍ�;�"{�#9�+�l#��$M�
+�b�y�j�l�9`/K��y`#B�;�"9l�9`/9�!�\;�"x� ��ˈ
+��g'����,:k)y����"za�z"l�i%��a�
+�9�yk������j�c�� �
+��8�%9�.yf�9�o�b,;�&������LK\�Y�K]�KX�\�]^X[�\^Y\�X[K����:(�y. 9`"Սynm9.�9�ؘ]T^Y\��\�؛ܙ\��Z[\ܝ[�ˋ��X:)��ba��#9f�9ஹ�+�Q�:`n9���fj;�#�X�Y�X�]y���L�yo�9/��b�9���]K\^Y\�:a�z"l�i%��a�)��ba�j�;�#�9.#y�[�Y:h!�n��� yajz`��`�y�+�Z[\ܝ[�;�#Q:`n9���fj:`�9�+�-#��#9l#�!�8�#:f��/#B�9�+9. 9/cx�#z)�"l��"9.#yb!�d�`"�a`��(;�"y�.:`h9����"yi%��a�� ������z`&y��z)��ba�(�y���ܙ\���][�K؛�\�Y��."z(c9cl�c��� �c�� �:`�9b!��&��*�[X�����9o-B�\��]���\�X�\����)�b)W�a`��(���9c�� �9kf9�$9l"9lk9��\��]���\�X�\��ؘ]W��)�b)W�a`��(���;�#9��9h����]�\�X�\��]P\��ܚ�]
+
+X9c��i��,:k)ychy�a��*;�#:-��)�"l�bmyn�h$:)�K: �9c!y����j�h zgh�aly�*9��]�\�X�\�\��ܚ�]
+
+X9b!�e���#9.#yolzg��`��ajy`"9g,9��y.�zhk��.�c���+9n-�h-9�k� �9�k��9�b9�+8� ���
+��m�y�*�����j��h� �:gh�hc�"l�.#y. :!�
+�:)����9n��i*�/c���8�%9�*9`���(9��9l#y���a.yf�;�&��9."�. :/*�a�yn�il�)���]y�`��#9�-�h��g'�."y`"��#: �:gh��#y/����9g%�(��o���:c+�/cB�;�":h�: �:gh�*�9�*9.��g'��9g%�� yg'� �:gh�*�9�*9.���-9�9g%�� y�-: �:gh�*�9�*9.��h�9�9g%��"{�#�9m�a�y��9�*9�h�讹l#y��ze�9/�n��k�� �)����9n��`�9b!��&���]H�[9o��M�9�/�i)�b,�M�L;�":-��hk��.�l.�k��Ly�by��9/���/�i)̹`#{�#9�b��gܙ][�z'��ney��9�!y�l;�"{�#�9�-�)���]y��y� yc���+M�9.#z+���"9����"y��9�(9�d9c������"{�#��̍�]�L�K\]��B�\X\�[��K���9�:(�yb!�a�yo#��.y�$9/�\�Y]9b!�b)yn����d!:!�l.�k�9��[��\�� ��9oh�,hyb!�����"zb%yo��͜9�+�l#��$�;�#:-���h�."���z/�9f�cm{�"�;�"y�ly. 8� ��K�
+�� �9c!z)�"l�b!�����zh+z"!�e�:e�y�"zb%za�y墊��8�%9�.yf�9�+��[��[�ܞKX�\�X�\�B���]�9c���+9�*ܚY9��9����m9b%�k�9n���#9c���zh+z(����9b,9� 9c������ ychz`,��eyl#yk��/cB�:,�9c��."�)��:e�:e�y�"zb%y."�gh�� ��.y�$�^9�k�.+x� y�zh+z,�:ob�)�"l�d#y�,yajy`m;�&:)�"l�d#y�,z/ �em��`��#9c�i%�a�yl#x�#9o��g,9g%�h ze��eg��:)��$��li9�b9�+8�#{�"9e+�. 9� �a��:e�:e�y�"zb%y�9��yh���"yb�9.��Y[��\�Y���;�#9讹/�y�k�.+y��9g#y..�b�z`o�e�:e�:e�y�"zb%{�#9.#y�yd#yke�i&�em�`�y.#y� �a�y���g*9. :-m�� ����
+��aj9lk9�)���: �zh$:)�y���ke�.�y�-�i*�l#ʊ�8�%:`&y�+��+9."y�(yb�9i)�*���`��#9�n9`/9o���M��NǨ9b�9i)�b,NǨǨ�;�&�d#9�`��o9��.)�/빫h�.��K����:`��`"��b9�+:&g�����"B�:`g�h���9�.y�+9ec�hc;�"�����K]�L�KY�^X�]�����ݏLL�X9o���+9. :/*�b,9��g*�9���+��`c��"{�#9/o��*: !yab9bcy�"�b,9�9ke��&�o�9c�� �y�.y�+9�+��#�)�yfj9o��c��:""��b9�+;�#�9.#y�+�`&yno�/*��9/빥.y�'��9����'��b8� ��ˈ
+�� �yb��`/���: �z*l��,�aj9lk9�)���: �zh$:)�zh zgh��#9�-9g%�h.��`ze���#x�#J��8�%�8��;�#�
+��`&zh!y����"y/늊��&��*]]][ۓ؜�\��\�����+y�乬���"y�o9��.��/eX[YϘ�9�ܘ�(��c�z)���.yb�x� y�*9���-����� oy����"y�o9��.��/eyg%��a�,����8� y�*:`(��9�*�g%��9`���(9��9l#y.g�����"y`my�+9b,9�#�hk��:)��)��-��b�{�":-��`&y."y`"�h zgh�aly�*9����YKY�X]\�K[[�[X��:`���a�do9d.9b�y�j��ܙ\���М�X]X9d.�d"9��ˍ���`,y�'��)��b9��9c깧"y�mz/%yo������+��c%��#9.#y�+��#9�-9g%��#{�"x� �g*9��bcz`&y`"XY\�����Z][y�+:*i��9h��k�9aj9�(y��za�y��/o��*: !y���/�9�9�����;�#9��:/ �d"9�!��9�9����y��yd$y�+�/o��*: !yk�f��(�y�k���K��#�)�yfj9�b9�+9�ny�"y�9�,����ec�hc;�":hg�//�9.b�bcy���b,9�8�#[Y�ؘX��ܛ�[�Z[XY�x�#P���Z][y�,���؝Y��#:`���(y.g��+9g*9b)y�9�9h��k�9aj9�h�n.8� yc깧"y�nyk���b9�+9�cy� �a����"x� �m����g*9f�)��(�y�#�讹db���B�9/o��*: !z`&zh!y����"y/�iox� zg :)�y��9i&����(��"9/��i��'��nezc!9olx� y�+�.#y�+��nyk���g�g���"B�9�cz �y�o9�9o�9."���{�#:`o�acy.#y讹k���9��y��y."�.���'9.���.x� ���
+��l#�)�yb%�a㹠*�c`X�۹���c�� �
+��8�%9e+�. 9. 9`"�`�9�+ԑл�"9.#z`#��#��"x� z #9.%:)����9n���9�l9n.9i)��"ML͞M;�#9am�.�`�y�+ߌ̌9��Аz`#��#����"y��]�X�ۻ�#�9论*�y�+�`&y�/9�(9�d9����"z-��am�.�X�۹. 9�(�-l:`c�c�� �9�`y�"�� ��*�[X��c�� �
+9�+�l#�b,:-��am�.�X�۹. :!�9��̌;�#9��9��z)��$��\��]��ZKۘ]�]�Z[�[�˜��8� ��K�
+�� �9c!z(�y`�z`�9/cx�#: �y�,��#y�.x�#:+m�!ex�#J��8�%���[XZ[����9���[�\�\]Z\Y[�
+
+X:(�X���:fh�b%��#9�%9���ke�/빥.x� ��L�
+��!�b�y�,:k)z*+yk��h zgh���yf�k���k�.+x� y�/�i)�`o�acy�l�b�J��8�%:`&y�+�l#y��9��y. :/*��9/o��*: !z!�m�z)�y�`��8�#���X���z,�9n�zhk��.��#y�9�#�讹c�y��;�"8�#9�"y�`�`&y�k�.+B�9�"y�`�`&zgh9."�gh��#y�h��+�f�9ஹ�,:k)y.+K�gg��,:k)y.+yb!�������X���z`(9�$9�;�"{�#�:`&y�(y�.y�$9k�9aj9.#ya�yb����X���X:`&y`"��\���#9ajy�+���yh��`�y��y� B���YKY�X]\�K[[�[:h$:*+y�9�k�.+zhk��.��&�)����X^ZZY�9.#yb!���yh�9�ly. 9�*M��;�"9c���+9�,:k)y.+z`�9�+�chyg*�;�"x� ��LK�
+��+m���)��)���b9��
+���"9��yh��b�9�by`/9�oz"l�"l�hb�� yd.9�-�`��k��hk��.��oz"l��h�fi�9b�y�j��"x�%9n�yli9�:+m���`��k��d.9�-�`��/+��"Z[�9`��k��:+m���bjzi&
+X9d.9�-�� B�:-�z`c��:`�9b!��cy�'��9�h�(`;�"yam�k鹥�yl,y�+�l#y�;�#:`&y�(y�%9�y�+�(�:)��)��db9���&���\���9h���X�\�\�Y[[ݙ\�^X9�oz"l�"l�hb��"Y�y��bcR	{�#��Yz+m���bjzi&�X^	{�#9�⹣�yg*9�!z"l�(`:a��o�:gh��"{�#\]T�[��B��\�X�\��\��
+X:(�yd#9�iz*"9����9��;�&���9h������Y[X��ܘ�
+X:-��a9�oz"l��":gg��!z"l��"y�9`��k���n9ke��"�[XY�K\�\��Y[\�\;�"{�#�9g*9�����`��k��d.9�-�-��. :"+9�.���`��k��d.9�-�ajz&eyd!9do9c��. 9�(x� �����m���zfd9b-��#��*�k�9�$
+���&��+�h!{�"9�-9g%�e���#{�"y����"y/��#:g :)�y/o��*: !y��9/����9i&�����(��cz �y�o9�9�����{�#:*l�)��."���y�+�n�*���#�� ���������LL�H8�%9�+9.�:/*�/�o�H�:h!yf�h,yec�hc;�"�ͻ�#9m�d"9/m{�"B��n���9."�. :/*���h!y/�o�{�#9/o��*: !ya�y�(yk�f����y/g9o�9f�h,M�`"���9ec�hc;�#9aj:`�9�*^]ܚY�
+XY\�����Z][H:`$9. :je�+byo�9/�o�{�&���K�
+��oh�,hyb!�����"zb%yg%��a��j�,�i*�m늊�8�%9/o��*: !z`&y�(y��9/���9.#y�+�)�"l��(9�d;�#: #9�+�. 9o-yl"9lk9��8�#9oh�,hyb!�����#yb�� �yo�y��9g%��"9f�k��g%��b;�#:-��)�"l��a`��(9�(ze�;�"x� ���̍�]�L�K\]��X\X\�[��K����9�\]T��]�X�ۊ
+X9�.y�$9ie��*:`&yo-zgg9�b�j�9�j�,�g%��"9kf9�$�\��]��ZK�]��X\X\�[��K\��]�ZX�ۋ���;�"{�#9.#ya�yb�y�b�ie��*8�#9��bcz`n9.+z)�"l��#B�:(�yb!�a�/���9/c�)����9n����]yl#�g%�� �."�. :/*��#9m���zfd9b-��#z(�y��9b,9�9�j�,�ec�hc9m�)���n�� ����
+����: �y�h�讹d#y�,J��8�%9�*9`���(9��9l#y�o�a��'��h��9�.yf�;�&����[XZ[����9��[[Y[���[X�ۓX\:(�H\��ܛX;�"9�'�k�d#y�,x�#9g,9�f��&�)l��#{�"z-�������[�;�"9�'�k�d#y�,x�#9l�y���h�yh�8�#{�"yajy`"���: �y�X�۹��9�b9ai�k�z(��l#z*��.���":`&y`"؝Y�g*9��9��y. :/*�l,ykf9g*;�#�9.#y�+�`&y�(y�cZ[���X�y�;�#9c깦+�`&y�(y/o��*: !y��9/���9ajyo-y�&y�i9c��  �g%��cz+��k��(�����a�/���"x� ��9��9��yl#z*��\��]����[��X\�Y\�\�ܛK���:-��X\�\����]�[����9ajy`"���9�b9�9ai�k�{�"9.#y�*9�.H[[Y[���[X�ۓX\;�#�^z-����9d#y�+9/��l,y�+�l#y�;�#�:c+��9�+���9�b9ai�k�y�+:.���"x� �d#9�`�/o��*: !za�y��9��9/���#:$+:,hyg'����#y�9l"9�*9g%��#:(�9f炈X\�\�Y[���;�"9."�. :/*������yo�9�9m���zfd9b-��#:`&y�(z)���n��"x� ��ˈ
+��a�y��9."�`��j�9�j�,�y�b9il��'�����j���8�%9/o��*: !y��9/��9o-y��9�9�j���-�h��g'��"9d!9�h�� �:gh��"B�:j�:)����9n������j��"L�MLͻ�#9��9/��bf�ioy�by����]H�[9�M��;�"{�#9�m9�a:a�y��9�a9�$�����]H�Y];�"�\ۙ]�ٙ[X[W��Y]���8����X�;�"{�#9�.y�*L9`"ؘ\�M��[�;�"9c���+�`"��[���/�.#y."��#��݌L�K\]��\��]KL����K���;�"{�#9.)�g*���̌X[�۞[[�\�L����9���\��\�:fh�b%�(�9."���9�9`"��[����9�b8� B�9����b9�+]Y\�H��[��o��ݏLL�XX9�.y�$ݏLL�YX:`o�acy�#�)�yfj9o��c�""���]x� ��9m�je�+by����]z)��)��d�z,깦#�hk���9ca�� ���
+��aj9��: �zh$:)�y���ke�i*�l#ʊ�8�%9."�. :/*�m����b�9i)�`c�. 9�({�"LˍK�M�K�M\;�"{�#9/o��*: !yc�y�(�:`�9�+�i*�l#��#:`&y�(yi)�nayb�9i)�b,M��NǨ;�"�����K]�L�KY�^X�]�����;�"x� ��K�
+��aj9��: �zh$:)�y�"zb%y/cy�k���8�%9c���+:-���#9��: �zacz(�x�#y�&zhc9.)����g*9��: �zh zgh�ai�`�;�#9/o��*: !B�:)�y�`����b,8�#:/�9f��#y�"zb%y�h�."���x� ��.y��{�&����aly�*9ob9��XY\��"��YKY�X]\�K[[�[]]X�9c��`m9c���+9c깧"{�'��/�9f�ajzha��"zb%y�9c`9hb��"yo��e������.y�$9ajy�����^��[[��#9��9h���YH���[�]�Y]�XY\��]ۈ�9�/�g*9�+9.�9����#:h$:*+zf�z%���#��]��\�X�\�X�
+X�9b!�b,���[�9b!�h y�`��czhk��.��":-���]\�[�]ۘ9d#9. 9ie�`��/+��"{�#9��: �zh zgh�ai�`��9c���+:`��ha��"zb%y��9��y���fi;�#9.#y�fza�z)!��"zb%x� ����
+��!�b�y�,:k)z*+yk��h zgh��(y��y�l�b�J��8�%:`&y�(y�9�.yf�:-��."�. :/*��\�X�\�X��۝[�:`��`"�Y�.#y. 9�(��&��l�b�y�g�b-��+:.��am�k鹬��h��"9�"�o#�c%��ܛ��:,�`/8� y�(y��:)�9�����yb�z`�z �B�9�l�b,9n�{�"{�#9�'��h�c��f�9�+���YKY�X]\�K[[�[����X���^�Y[��X���N�M̜X�;�"9c���+9�+�ஹ.��,�:ob��,:k)y.+y�9�,:k)z,��*"��a�*+z*"9�;�"y.#y�y�+�.#y�+��'��9g*9�,:k)y.+z`�yie��*;�#�9b�9."���YKY�X]\�K[[�[X��:!�m�XX^ZZY���9�9�k9."�fd;�#9ajz !y墹b�9l#�!��:gg��,:k)y.+ze��eg�`&y`"�*+yk��h y�`�c���*:j�9n��(��`c�n��h���+�� ����[XZ[����:(�ze��eg�`&y`"�ob9�9�9g,9��y�.y�$;�&�Y[��X���X:-��X^ZZY�:`�y/�X�]PX�]�X9b�y�b�*+yk���;�"9�,:k)y.+y��y� LM̜��;�#:gg��,:k)y.+zfcyb,��M��;�"x� �m�je�+b{�&�. :"+�L��Y]�ܝ9."�c���*:j�9n��bf�ioy�by��9ai�k�zj�9n���"9k�9aj9.#y�*9�l��"{�&�l,y���ay�#��+�b,�L���:`&y�+���9.��/ey�'�k鹢b��g�`�y��y�9�my��ݚY]�ܝ;�#9bjzi&9�9. :n�n�ai�k�y.g� �z`#�`c��l�b�B�;�"9�"�o#�c%�"!��'�k�)�9�����yb�y桹�+:*i�`c��"yk�9�m9�"�b,8� ��ˈ
+����: �yca��&�����"zf,�da���$9b����9�.���8�%9."�. :/*�c�nj�X\����[9b�9.���ۙ�\�J
+X[\�
+
+X9c!z(�{�#\ܘYT��[9�m��`�����"yd#9�iz&ey�!�� ���̍K]�L�KY�^X�]�����:(�9."��d9�����9d#9�\ܘYT��[9c!z(�{�#9m�je�+by论*�yl#z*ly�a�-���$9b����9�.�`�y�h�n.�:-��a��#9��: �y�by�&�.g�讹k�o��yca�b,�� ���������LL�H8�%9/�o�H�:h!yf�h,yec�hc;�"9�*9k鹪g��#�)�yfj9�+:*i�`$9. :je�+b{�"B��/o��*: !yk�f��g*9�b��g���*�g%�."�f�h,y��9`"�ec�hc;�#:`&y�(yaj:`�9�*9�+9�g�^]ܚY�
+�XY\����Z][H9���*+y�+:*i��9h���#9k�f����y/g9b,9a�ec�hc9�9�j�gh�� za���+��\]Y�[H��B��d9����#: #9.#y�+�c깡�z+�9�"�o#��9b)9����#:`$9. 9�.yf�9�����yo�9/�o�{�&���K�
+����: �y�!;�#����je��h:h zgh��(y��y�l�b�J��8�%9�.yf�:)��."���x�#9����ly������a�zn��#y�+K�y��;�#����NK\�Y�K]��X�\�X�\�Z[��[�ܞK\�[�[YK���9�\S���
+X9�.y�$9��9��y�*���K��Y[�ZY�:*+yk����\�X�\�X��۝[�:j�9n���#9.#ya�y�*��]��[�[���Y[��X�
+
+X:fi9.�y. 9`"�.#z`jy�*9�9�+��/�/๥n8� �m�je�+by�l�b�yc��.�B�9b,9n�{�"�ܛ��
+��Y[�ZY��\�ܛ�ZY�;�"x� ����
+��m�y�*�H9�b9����j�+���oz"l��n��oy��yhb���8�%9�.yf�9�+����Z][H9�[Y�ܘ�zgg��n��
+����X��ܛ�[�Z[XY�X9墹g%��,�����Y��":-��ؚ�X�Y�]8� y�(9�d:`�y�(ze�;�#9m��*�9� 9l#�a�y�﹨b9/��论*�{�"x� ���̍�]�L�K\]��X\X\�[��K���9�.y�*�[��\;�"�]�[XY�X
+��]UT�;�"y�����]H�Y]:(�zg :)�y�:`��. 9�/9k�f���#:(�x�#y�$�9�j9���g%��a�a�z*+yk��[Y˜ܘ�;�#9.#ya�y墐��� �9�k�� �`&y`"؝Y�am�k�o��� 9��y�9il�)��b9�+�9l,ykf9g*;�#:`&y�(zh!�/��. :-m�/빣�{�#9.#y�+�c�/��-�)�� ��ˈ
+����: �yg%��.�aczc+ʊ�8�%9/o��*: !y��9/��n-�d#y�,y�&y�i9�9c��  �g%��#9�*9`���(9��9l#{�"9.#y�+� �y�/;�"B�9���a�y`"�k�f��aczc+��`n��#��9��: �yg%��.�.)�/빫h��#9�,9��:)�����[XZ[����:(�B�[[Y[���[X�ۓX\9."���y�:*.�)��� �X\��Y[9f�9ஹk��c���+9�*9�9g%�(��+byk邈9am�k鹦+��[��[�9�;�#:`&y�(y�����y.��� y����`�����"yg%�� ���
+����: �y�jy�!����z(d��&y�i9���hk��.�� ykn9��ca��&��a�i*�i)ʊ�8�%9�.yf�9�+��̍K]�L�KY�^X�]����9�X�ܘ]T��[����
+X:-�������X9�9�"zb%B�9�+�l#�)��ba��#9c���+:c��k���9�+��X\��Y\��[��X\��X�K\��[:`&yajy`"
+����bcy�b9�+9��: �zh y�.y�+9.#ykf9g*9��\�ʊ��"9�'��h��9�+����[\������[XX�[ۋX�\�;�"{�#9o����z`���(ze��i��l,y����'��9�'��b:`c�� �m칥.y�$9�h�讹���[X�ܻ�#9��: �ZX�۹�Y;�"��[X�ۗ�;�"y��g*9.g����/���m�/g9�����[Y9��9..�)�y/�y���#9��9c���+9�'ۘ�X��ke�.,�c��gh8� ��K�
+����: �zh$:)�K� �yb��`/���: �yb%�(j9���ke�i*�l#ʊ�8�%9c���+9c�g*��\�X�\�X��۝[��:`&y`"��e�li:*+Y�۝\�^�{�#9/a�n�y."���]\�\���8� X���[\���Y\��8� B����[\�]�Y]�X�\�:`&y.��a`��(9d!:!�`�y�"z!�m�y��۝\�^�{�#9�o9�o�c�9g*:`��(�B�9l,y���.��� ��.y�$9��9��yl#z`&y.���'��h��n�k���j�gh����ke�i)�l#���\��b�9i)��#9����"yb�y.��/eB�9k�:j�8� ����
+��oh�,hyb!�����"zb%yi*�l#�� y�j�,�m늊�8�%9�"zb%yo��N9�/�i)�b,͜;�&�X�۹�.y�$9cl��`�hk��.��8�#9��bcy�'��h�`n9.+y�:)�"l��#z(�yb!�a�/���9g%��"9c���+9�+�k���n�ie��*9il�)��"{�#9�j�,�c��fd9�����]H�Y]9�+:.��M�9�:)����9n���#:`&z`�9b!�����"yo���.y�+:)���n��#:)��."���ym���zfd9b-�� ���������LL�H8�%9�-�)�H9�b9m�y�*� �:gh�
+�9g'������: �HX�ۂ��H
+���-�)�H9�b9m�y�*� �:gh����&�/o��*: !z(�9."�.���j���-�h��g'�f��a`��(9�9�-�)� �:gh�����j�� ��9���c���+9c깧"y�h�gh������]{�"��݌L�K\]��\��]K[X[KL�������;�#9alNy`"��[���"B�9����$9�!;�"9a`��(;�"p���9b%��"9�h�� �:gh��"y����]{�"9�.yd#y����*9d#9�(��9��9d#{�#�9��g*9�+���݌L�K\]��\��]K[X[KL����M˚��;�#9alLN9`"��[���"{�#�9m�je�+bH�]KY�܋X�]H:`�9c���h�许� ���̍�]�L�K\]��X\X\�[��K���9��X[T��]P�[�9�.y�$:-��il�)�. 9�(���[[Y[��ٜ�۝�ˋ��K�X�Ζˋ��__X�9�d9����#\T]��\�
+
+X9l#y�-�)�.g�� �/�H�X�[�ИX��9b!�����h� �:gh�.���;�"9.#ya�yf�k��hk��.��h�gh��#:`&y`"�fd9b-�m����)��fi;�"x� ��H
+��g'������: �HX�ۊ���&�/o��*: !y."�`��.��Lyo-y`&z`n9g%��#9��9l#H���[XZ[����:(�B�9��: �z,����yn��.+{�"9�'9l"�[[Y[���X\��9c��.�y�o�b,9aj:`�L�`"��"yg'������: �y��9d#y�,K����/�9o�;�#:acyl#y.��am�.+LL9`"��"]�Y�Q�\�8� X�ۙP��XZ���X8� B�X\�]XZ�Pܝ\�8� X�ۙU���8� X�[��[�8� X�Z[���[���Z�X8� X\��ܛX8� B�X\��Y[8� X�����[8� X�\��Y\�;�"{�#9kf:`,�\��]����[��X\�J�����;�"L�L�;�#:-���j���-9���X�۹d#:)���/;�"{�#9.)�g*���[XZ[����9��[[Y[���[X�ۓX\:(�9."�l#y��zh!y���"9d*�acyl#y�!��,z*.�)���"x� ��
+���ۙT�\�;�"9aize�9e��j�9��: �{�"z-��X\�V;�":(��b�{�"z`&yajy`"�����"zacyl#J���#�9f�9ஹ."�`���9g%�(�y����"y�#�hk�l#y��y�9�j�gh��"X\�V:g :)�y�9�+�hg�//��\�KY^�����]\�Y^���:`���+�g%�."���9��yk���#V8�#yke��(��9l"9�*X�ۻ�#�:`&y�(y����"y��9/��`&y�/��"x� �c�i%��"Lyo-y`&z`n9g%��"9l�y���l%�he
+�aby�;�#:-��am�.�`&z`n9g%��9c`9b!�n��i*�/c��"z`&y�(y.g�����*9."�� �`&y.��`�y�+�b.��#��fy�o{�#9.#y�+�`n��#��%8�%9i����9.b�o��:)�z(�:`&yajy`"���: �y�X�۹�%����*���m9��9`"�acyl#{�#9��9��y�.B����[XZ[����:(�H[[Y[���[X�ۓX\:`��`"��jy.��l,yiox� ���������LL�H8�%9�-�)�H9�b9m�y�*�����j��"�̻�#9m�d"9/m{�"B��H9/����;�&�/o��*: !y."�`��9o-y�-�)�H9�b9����j��"9�j���-�h��g'��#9c깧"y�h�gh��"B�H9�*�[X��;�"]ۻ�#L��]9�(yg���"y`f��'��h��:`#��#� �9�k�c�� �;�#9.#y�+����:`k�"l��aH9�a9�$��:`#��#��X���]H�Y];�#9b!��$H9`"��\�M��[�;�"��݌L�K\]��\��]K[X[KL�������;�"{�#9m�je�+bH�]KY�܋X�]H:`�9c���h�讂�H��̍�]�L�K\]��X\X\�[��K���;�&���9h��\�X[P�\�X�\�
+X�X[T��]P�[�X[P�X��ܛ�[���][ۊ
+X;�#\T]��\�
+
+X9/�H�\�X�\���[�\�9b!��`{�&9�-�)���]H:,����y.#yk�9�m9�`�!�b�z` 9f�il�)�`���a;�#9.#yolzg���蹧"z(c9ஂ�H��̌X[�۞[[�\�L����;�&��Y�L�T]��\X\�[��P\��]�
+X9���\��\�:fh�b%:(�9."�H9`"����[���#:h!�n�����g*��̍�]�L�K\]��X\X\�[��K���9.b�bcB�H
+��m���zfd9b-����&�c깧"y�h�gh�g%��#9����"z �:gh�� ��-�)�m�y�*��`�.#y� �f�9ஹo�9."�-l9b!���� �:gh�hk��.��;�"9f�k��hk��.��h�gh��"x� �.b�o�:"�y���b,9�-�)� �:gh�g%��#9c��.�y��9��y��9�i�il�)�`���a���]P�[�^�[[Y[��ٜ�۝�ˋ��K�X�Ζˋ��__X9�9�d9�����9aax� ��H:je�+by��yo#��&���HKX�X��9aj:`�9�l9b�y��9�b:*����z`&�`c��&ؘ\�M�:`�9c��\�9��9l#z`&�`c��&9����"yk鹪g��#�)�yfj9�+:*i��"9�9h��fd9b-��#:)��."���x�#9l&��*�je�+bx�#{�"x� ���������LL�H8�%�L�{�&�M�:h!zg 9�`�/빫h��ny�({�"��{�#9m�d"9/m{�"B��l#y��y/o��*: !y. 9�(y��9a��M�:h!zg 9�`��#9aj:`�9m�g*9�"�o#��9li9�&�`$:h!z/�z.i:je�+b{�"9.#y�+�c��"��:*���#����ke��"{�#��,9��:"!�l#y��y�"�o#��9/cy�k��&���K�9���/cz)�"l���*��jyab�o�9�bHK��9�乢cz/*�."�. 9/cH8�%���̍K]�L�KY�^X�]����9��L�WԑT���W�SVW�T�LL�;�#�9c!yg*9aly�*9��[�\�^Y\�X�[ۘ;�"9�yk��"!��*��jyf�d":`�yaly�*9d#9. 9`"��d9�g�a�yo#��"B���9�,:k)K�a㹠*�X�ۈ9c�� �8� y�yk��chy�ly. :(�:a�z"l�i%��a�8�%9g%��a��+:.��m��*9�'�`#��#� �9�k�&ey�!��;�"9.#y�+����:`k�"l��a��"{�#���9�ly. :(���]K\^Y\�:`���a��ˈ9�*��jyajy�����:f���"x�$�H9d#9����#͏L����#���$�LMJ��k�.+z(�9����"x�%��]�ܛX][۔����
+X;�#�����L�K[[ۜ�\�\���ڝ\�Y�KX�۝[���[�\�X9`f��k�.+B���{�#ܛ��9��: �y/�yf�k����y/cyb)9k���#9�n�.�y.#z(�9/cH8�%9��9�b�]��[\��]�
+X9�*:fh�b%�f�k���[�^9c���:a,9��y/cx� y.��o�9�cz`c���kf9�.K�9��: �z`n9e���l�b�y��9g#y/빫h�8�%���ݙ\����^N�]]�
+�Y[���9a`��(9c(��&�e��. :/�9f�cmx� y�"zb%y�.x�#9ie��*9.)�eg�b�x�#x� yn��db�9l#��`��`��n:e�9���� y�lz*":gh��o;�"9eg�b�y�/y�`��n;�#��,:k)y�(y�n;�#�V;�#�a�ynh��#�bjzi&9�`��n;�"x�%�ۙ�\�P]]И]T�][���9�%9�*��#�9��y�蹧"y���ԙ]�\�YY
+
+X�ˈ:a㹠*�o-�n��
+��	{�"����.��f,��ke9�.��"x�%�L�W�SӔ�T����S��LK��;�#�9��z$���`9�"ym�k���yc`9g���*��jzfh�b%�: �9c!y����j�/�z)�"l�oh�,h{�"9�)�b){�"�a`��(;�"yie��*8�%�]�\�X�\�\��ܚ�]
+
+X�;�"���[XZ[����;�"J��[��[��[�ܞTܝ�Z]
+
+X�K�9.�9."z)�"l�bmyn�acze�:h ycl��`�b-���
+�9�!zn繣�9�.�8�%�[���\�X�\�ܙX][ې]�Z[X�[]J
+X�L�9��: �zh$:)�y���b,9� 9."�li
+�9c���l�b�H8�%�H9�+:`,�ݙ\�^H9k�yfj;�#�Z[�^N�LK�9��: �ykn9���ca��&��"zb%y�+�l#�
+�:f,�da�论*�H
+�9�$9b����9�.�8�%X\����[9c!y. 9li��ۙ�\�J
+X�[\�
+
+X�L��9��: �yb%�(j9ab:hk��.��jy�!����z(d��&y�i;�"9.#y�*:n�e��*l��,:,����{�"x�%X�ܘ]T��[����
+X�Lˈ9���je��h;�&��%9d#yke�hk��.�� zh$:)�yca��&�� y讹k���/�9f繭`y�"�8�%�[�\�^\��X�]S\�9�m9`"��.yk�M�9��: �K� �yb��`/����je�h y���ke��/�i)��"9�a�j�9l.�k�9.#z+���"x�%����۝\�^�H:*���m�MK�9m�y�*�H9�b9����j�/�z)�"l�a`��(9b!�����"9�h�c�zgh�f�9���b�y��yd${�"{�#9��9h���#9oh�,hyb!�����#y�"zb%B�8�%��̍�]�L�K\]��X\X\�[��K���;�"9�m��`�c깧"yil�)��(9�d;�#9�-�)�`�9b!�)��."�gh�����LL�H9�9c�. 9�a�*&:c!;�"B�M��9ea�n���.zn�yn�H8�%��L�K\��[�[��\��9b!�����%:n�z �9�kMˈ9�,:k)HV0��ˍH8�%�[��]X:hcyi%�b�9���[�[^H�\�Q^����`c��"���9�h�� :c!
+���&�&ey�!�`&y�nzg 9�`��`��#�]YH9. 9n��*�9b)8�#[�^�[9����"yk�f��/"yaiz`&y.����9�b8�#B� #9i&�b�9.��a�z)!���ܚ\�9�&y�i;�#9o�9/���o9����̌X[�۞[[�\�L����9�+:.��m�����"yb�y�b�/"yaiyfj;�#�m칤�:b��`���(z*�9�.x� �*l�)��."���x�#9����ly������a�zn��#y�+H:n��#:`o�acy."�. 9`"�.��a�z.b:)��/cx� ���KKB����9m���zfd9b-��9o�z/��.��h!B��H�H���-�)�H9�b9m�y�*�����j��.� �:gh�g%������LL�H9m�(�9."��#:)��."���z*&:c!�H�H��g'������: �H�ۙT�\�8� XX\�V9����"ZX�۟�����LL�H9m�(�9."��;�"9b!�b)y�*9/o��*: !y�&y�i9论*�y�9g%�
+�9��9��9/���V9l"9�*9g%��"B�H�H��g'������: �HX\��Y[;�":$+:,hyg'����"y����"ZX�۟�����LL�y�+9.�:/*�m�(�9."��;�"9/o��*: !za�y��9��9/��l"9�*9g%��#:)��."���z*&:c!;�"B�H�H��oh�,hyb!�����"zb%y�j�,�m럟����LL�y�+9.�:/*�m�)���n��&��.y�*9/o��*: !y��9/���9l"9�*�:gg9�b�o�y��9g%��#9.#ya�y/�z,�M�9�9/c�)����9n��)�"l���]z(�yb!H�H���L�z`&yno��ny/빫h��9�#�)�yfj9o��c�h�:f�������LL���+9."z/*��o�b,9am�j�9�.yf�9.)�/빫h��&�����[XZ[�������̍K]�L�KY�^X�]����������K]�L�KY�^X�]�������̍�]�L�K\]��X\X\�[��K��������̋]�L�K\]��X\X\�[��K�����:`&y.�9`"���9�b9�ݏX9�b9�+:&g�ioyno�/*�`�y����"z-��$e�ai�k�z+��b�z`g�h���#:`&y�(ym�����ly. ��[\9b,ݏLL̘8� ���`&y.#y�+�. 9�(y�)�/�ioyl,y���.��.���%8�%9.b�o�9����(y�.z`&y.�9`"���9�b�:(�y.��/ey. 9`"��#:`�z)�z*&9o���b�b�y���l#y��y�ݏX9�n9ke�o�9."�b�9. 
+���#:*l�)��."���B�8�#9����ly������a�zn��#LK����;�#:`&y�+���bcy� 9k�y�$�(��o�y�ix� yo�9��9cn�� 9f�:a�y�9gdx� ��H�H����bcy.�y����"H�_���M�ˌH9m�n�����]X�X�[ۜ��\��]ܞH�X���;�&ՌL��9��\��݌L��\�Yܙ\��[ۜ˝\����9�"HH:h!zj�:h�:f���9f繫n;�#�L�9�\��݌L�Y�X]\�K\�\]Z\�[Y[�˝\����9c鹧"HL:h!zg 9�`�je��-��#��L�H9�\��݌L�KYX�ۛ�^K\�\�YY^�\����9�"H�:h!y�������#�/$y�k����je�je��-��#��M9�\��݌MY��\�Y[[Y[�X�[[��K�\����9�"HM:h!y��: �yk���b:je��-��#��MH9�\��݌MK\�\�[KY^[��[ۋ�\����9�"HN:h!y����ly��9aazje��-��#��M�9�\��݌M�\��[X[�[X][ۋ�\����9�"HMH:h!yb�y�j��#�(c9b�ze�:e�:je��-��#��M�9�\��݌M�X��X�]Y[��[ۋ\�\��\����9�"HL�:h!y�+:/*�g 9�`�je��-��#��M9�\��݌M\�[\�X[�XX�\�˝\����9�"HLH:h!yea�n���#��*��jy��: �{�#���y��zje��-��#��M�9�\��݌M�\�\�[K\�\��\����9�"H:h!y�,:k){�#���y��{�#��b��g�.��gh�je��-��#��M9�\��݌MX��X�]Y[��[ۋY�^\˝\����9�"HL�:h!y�,:k)y�빪&{�#�bk��+:je��-��#��MH9�\��݌MK\��[]ZK\�[\˝\����9�"HL�:h!y��: �{�#�.��gh�)��ba�je��-��#��ML9�\��݌MLZX�KX\����\�Z[�]���\����9�"H�:h!y�h�o#���]H��:je��-��#��ML�9�\��݌ML�Y]�Y�^\˝\����9�"HLH:h!y��: �{�#�bk��+;�#��,:k)y.��gh�je��-��#��ML�9�\��݌ML�Y�\�K]���\����9�"HL�:h!y�j�a`��(9�h�o#���]H��:je��-��#��MM9�\��݌MMX�\��[�\�\]Y\��\����9�"H�:h!y�+:/*�g 9�`�je��-��#��MMH9�\��݌MMKX�\��[�\�\]Y\��\����9�"H:h!y�+:/*�g 9�`�je��-��#��MM�9�\��݌MM�YY\]�X�KY�^\˝\����9�"HH:h!y��y��yg,9g%��#�a`��(9c(�je��-��#�MM�9��\��݌MM�XX�\��[X\]\Y�^�\����9�"H�:h!y����j�l.�k�;�#���9��zn繤�je��-��#�MN9��\��݌MNX��X�]][�[�˝\����9�"H�:h!y��: �{�#�doy.+{�#�`��k���#�����j�je��-��#�MNH9��\��݌MNKXX�\��X�]K\ܝ�Z]˝\����9�"H:h!y����j�/"yaiy�`�n��je��-��#�M�9��\��݌M�X�\��[�\�\]Y\��\����9�"HH:h!y�+:/*��n9`/;�#��빪&{�#�(�9�i��#�b�y�j�je��-��#�M�H9��\��݌M�KY�[YK\�\�]���\����9�"HH:h!y�j��,9��9�h�o#���]H��:je��-��#�M��9��\��݌M��Y�[YK\�\�\��\��K�\����9�"H�:h!y/����9�(y�h�je��-��#�M�H9��\��݌M�KY�\�K]��Y�^\˝\����9�"H�:h!y�j����g%�"!��j��z$/zn�je��-��#�M��9��\��݌M��]�]\�]���\����9�"HMH:h!y�-;�#�a�9�h�o#���]H��:je��-��#�M�H9f��ie��+:*i��9d":*"�:h!H��R{�#�a`��(9c(��#��-9��: �{�#���y��z,���(��`y�"�je��-��#9.)�/�y�fyc��`n9��\��݌L�X�����\�\�[��K���8� ��+:/*��9h������"H���Z][H^X�]X�{�#9�`9.�yk�9�m9�,:k){�#9bk��+RH:n繤⹭`y�"�.�y�*��#yaiz!�b�y�+:*i��&�.b�o�9/빥.H�Y\�� y���je9����� z �9c!y.�9�$�� z!�b�y�,:k)y�%�i&�.��)�"l�`��/+��`��#9o�zh"9d#9�iy��9aay.)�g��(c9�+:*i�� ��H�H���M�9����`�����*:""�ea�n��X�۟�����LL�9m��,H�M�9/o��*9/o��*: !z(�9.�9g%�k�9�$:`#��#�c%�� B�9�b��g�l.�k�9a*�c%�"!�."yaiyc���������#9��y��9��\��]��ZK��YK\��]�M˜��:`o�acz)��k��""�,���(�� ��H�H9a`��(9c(��8�#:a�ynh��#y�lz*"9��bcz-��$e��蹧"y���9aj9g��+���n:-l;�#9����"yc�i%������z`&y`"�+���n�9�+:.���9/������h�讹�)��+�d)��)�d":h$9�'��":-�ya�`&y�(zg 9�`���9g#{�#9����"y��yaiy��z+b{�"x� ��H�H
+��)�"l��#�a`��(9c(��#���: �z)�����[���Y9d"9�$9li9�-9g%�g 9�'��g�)!�jeʊ��&��M�H9m�论*�yn�yli:h zgh��9� �.�y��yoh�[H9�o�`#�.�ze��eg��:)�����&�� 9c�� �yc��f�9�+��[�ٛܛ{�#�Z[��۝Z[�Y[�9ai��9ob9�9�.9.aH��\�Y��9b�y�j�"!����o-y��: �ychH�[X�[��N��[�ٛܛX9d#9�`�n����i)�a��d"9�$9li8� ���M�H9m�l!�bcz !H[�[X][ێ��ۙX8� yo�: !y�.yஈ�[X�[��N�]]�8� ���bcy�.�l$H���Z][{�#�:g 9g*9d#9�/�[���Y:(�y�k����)�"l�� ya`��(9c(�"!���: �z*l��,:)����d!9/�y� ze��eg��!L9��)!�je�� ��H�H���� �9c!y.��gh��#:/�9f�cmx�#y.#z)��.�������M�ˌM�9�,y/o��*: !y�*�g%�论*�yec�hc9�j�gh�am�k鹦+�][S[�[9�jyd�z*l���{�#: #9.#y�+� �9c!y..�h y�%�g,9g%� �9c!z)��$��li;�&��jyd�yg%�"!�ai�k�y� ����c���+9� 9."���B�9�:e�:e�zcmy��9a�c��)����9g#x� ���m�fd9b-�g%��a��#�ai�k�zj�9n��� ya`z*,yai�k�yc`9�l�b�{�#9�"zb%y���ke��.yஸ�#:/�9f��#{�#�9.)�.�y��."��#�)�yfj9k�f��n繤�论*�yc��)��� yc��e�:e�x� ��H�H
+���L͈:""�kf9��:"�y��ym�c�bjH]]��ۙ�Y˜��[H��ܛX[�;�#9�(y��yc�y��9a�c���+�:`n:`c��9��: �J���&���9��9o�:g :)�y�yk��g*9a`��(9c(�a�y��:`n9. 9�({�&�.b�o�9� ��,B��L͐X�[ے[�[�;�#��L͓\���[9/�z+m��#9.#ya�z(��""�d#9�izgg:n�9�%���x� ���KKB����9��9��9k�9ba��"9."�. 9`"���y�b��9.���#9.#y�y�+�*�;�#:*���i�`f��"B������(ym�y/g9�d9�g�bc{�&���K�9g*9."�gh��#9m�k�9�$9b�� �z*&:c!8�#y��9h��. 9�a��#9��y�'�
+�9�&zhc
+�9`f�.��.�:n�
+�9�#�n�:je�+by�
+�9m���zfd9b-����9i����:)���n�.���#9m���zfd9b-��9o�z/��.��h!x�#z(�y�:h!y���#9�d�b﹢%�b*���z`��. :(c�ˈ9i����9�o9�﹥�9�9������fm�f,{�"9`���#�L�H9.#y�+��*�ܚ\9�&y�i:/"yaix�#z`���+��"{�#�:(�:`,��#9����ly������a�zn��#{�#9.#z)�yc��fyg*9l#z*ly� :c!:(�{�#9.b�o�9.#yd#9m�yam�� y.#yd#:)�����"�.#yb,:`����yl#z*lB��9论*�HXZ[�9b!��+�m�����+�� 9��8� yc��`b�/g9�9��9�b��cy��m�y/g9�d9�g�������LKL�8�%�[�\�\��[��[ۈ�\]Z\Y[�RH�Yٚ^�]���H�ܚ���[����Yٚ^��[�\�\�Y[��[ۋY\]Z\Y[�]ZX�\�Yۈ]�YX�L����Y���MM��YM��MMM�Yؘ�XZ[�[��X�Y��Hٙ�X�X[�\��[ۋ��X�H�[XZ[�M�ˍ���\��]�\�[�[�[ۘ[H[��\��[ۙY[�[]�\�H�\]Z\�[Y[�\��T�Q�QQ��H�Y�ܙ�HX]\�X[Y\�^[�]�ۙ\��[XZ[�������]�MK\�\�[KY^[��[ۋ�����]�Y\�X��\�\����H�X�]�][\�Yܚ^�۝[�Z[��H[��[ۈ^�]�\��]�Y]���[YH\���K[[�[�Y�HX]�[������ۙ\�\�������]�L̋X�۝[�Y^[��[ۋ������H��[YK\�Y�X\�Y�^Y�[X�܋��H�X��X��\]Z\Y[���\\�\�ۈ�ۙ\��[XZ[�����MK]�M�ˍLKZ[��[�ܞK\XK���
+�����L�]�M�ˍLK\XK������[�ۚX�[\]Z\Y[����\�HXY�[����[\��\�[܈���\��][H\H�X\ۘX\��\]Z\Y[���[���HX]\�X[�[�\�\��[XZ[���ۙY�H���N]�M�ˍ��Y�[��[ۘ[Y�^\˚���^Y\�]�\�X�H�]]�H�����\��[X��\�H�\X�Y�][�Y�[YH\����۝���[�HX]\�X[\��ܚ�\���\X�Y��H[�]X[�[�\�\�\]Z\Y[�\�\��\���Y�H����]�M�\�\�[KY�^\˚��\�X�H���H\��]]ۈ�\��X��\��[�\��]\�[��Z][���܈H]\��\Z\�\�˂�H\�X[�[�RH�[N�^Y\�]�\�X�H�]]�H�[X����[ۏ�Y[�\�\�H�ܘ�Y[���YHRW��RQSS�T˛Y��H�]��X��\���[X\�Kܙ\]Z\�[Y[�X�]�\�̌��LKL�\�[�\�\�Y[��[ۋY\]Z\Y[�]ZK���ۘ��]\��[XZ[��STSQS�Q[�[���H
+�]��\�X[�\�Y�X�][ێ�����Z[H��TUH܈�[\�\��[ۈY]���������LKL�8�%��Y�\�HU���[��[X\�H��Y�\�H9m��,yk�f��\�[Y[�:+byk��&�]�9b!��+�f�k��[X\�9ஈ΋��]����\�\�[X���Y]��Y�\˙]�8� ��H9��(cU�9k鹪g��+:*i�� \�[X\�HX[�Y�\�:"!���[Z]�H�XYX�X��9. 9o��/o��*9�i��[��[X\��&�/ ���y���.��.+ya����΋�ٛ�\�\�[X���Y]��Y�\˙]�9`�yஹ�m�c����T�;�#9.#yo��a�y/g9ஹ��bcH]��H:je�+by/����8� ��H��]X���ܚٛ����\�KY]�X��Y�\�K�[[9m칦#�讹/o��*KX��[��Y]�;�#9.%:`�9�l�o�9� �o��."�/���[��[X\�:je�+bH��[Z]�x� Q�[YH�\��[ۈ:"!��X�H�\��[۸� ���������LKL�9d"9�$9ai�h yg����9�l�b�H����]\;�"]��"B�H9/o��*: !y�b��g�je��-�论*�z(�y`�ya���bz"!��d9��yd"9�$9ai�k�y.�y� �g*9n�z`�:(�yb!��&��'��h�g�����ܛ��ۙ\�9ஈ��MK\�[�\�\�X��X;�#9.#y�+�i%�li��YQ�X]\�S[�[��X8� ��H�����]�MK\�\�[KY^[��[ۋ����9�.yஈ��MK\�[�\�\�X��X9c���'�ݙ\����^N�]]�
+��X�XX�[ێ�[�^X;�#:em�ai�k�ychy�a��.HZY��]]��Z[�ZZY��L	X;�&�a���bzf���&��j�d$H�Z[9a`z*,H[�^�[�^x� ��H���N]�M�ˍ��Y�[��[ۘ[Y�^\˚��9�X^[Z^�T�[�\�\�[�[
+
+X9d#9�iy����'��h�ai�k�H��H:*+yஹg�����ܛ��ۙ\��&����K\�Y�K]�]�X�[��˚��9�oyd#ye��b�9aiH��MK\�[�\�\�X��X8� ��H9�b9�+9.�y��y� H�M�ˍ���&�g 9�bHU�9k鹪g�论*�yajzh z`�z �y��yb,9n�yo�9�cyc������+����]\9�&y�$�T�Q�QQ8� ���������LKL�8�%V9�$:em����湫h�o#��-�������+9��yஹ��bcHV;�#��$:em�)��ba��9� 9��9�h�o#��ۙ\�:)���/;�&�"�ybcy����m�c��b9�+9�f:/�:"!��+9��z(gy�{�#9.�y�+9��z"!�k�f���[�[YH�ۙ\�9ஹ���� ���H9ca��&�g 9�`�e+�. :em��'��ۙ\��&���̎]�L��YX�ۛ�^K\�X�[[��K���9��L���]^�^�ܓ]�[
+
+X8� ��H�x����;�&���9�b�o��`'��'��#9/�y�fy�蹧"H�]���Y\��۝\��#���9�b��빧���#���9�b�.��b�y��9ic��#9�h�n.9�`y�"��빪&y�!�;�g��9b!�d&9b,��8� ��L���]^�^�ܓ]�[
+K��NJX9��y� y�蹧"y��9�b�gg9�b�g 9�`�� ��H9o����8����H:e��i���&�^�^H:*l��by�&���9b��c`9�h�o#�nl�ga��&y���m�y�*�V0��T��UАUW�S��Ԕ�;�#9.#yo��a�y�*9c�. 9ie�j�9�by�&�gg9�b�V[��ܜ�:)��$��� ��HT��UАUW�S��Ԕ�9�h�o#����b-�^�^;�&���Mx� S��LL8� S�L�L8� S�LM8� S��M�L8� S��NL8� S�LL�8� S�LLM�8� S�MOL��8� S�NL�L8� S�NOM;�&�.+ze���by�&�nl���y��`/8� ��H9. :"+9m�y�*��h�o#�V�ۙ\��&���̍K]�L�KY�^X�]����8� ���
+�9�&y���m�y�*�H9�*��jyg��#�V;�"9�by�&���L;�"p���[���"9�k�`&�{�#�쯺"�LK�{�#Г�����"p��9��9b��`#y��ˍ{�&ՌM�ˍ�9aj9g��V0���9`�y/�y�fH�{�g�NH9o��`'��'��#9.#yo��g*��
+�9a�y墹b�8� ��H9a`��(9c(��&�d#9��y.���h�o#�m�y�*�V9��	{�&�.#yd �/$y�k����je�� ��H9/$y�k����je��&�. :"+9m�y�*�d#9��y.��	{�&�����!:f��挹b!�d&9�+��cLyh-8� y� 9i&��9h-;�&�a`��(9c(�"!�/$y�k����je��y�h�墹b�8� ��H:!��-�aaz �{�&���
+�9.�y/�H^�^0��]�[�\�^X;�#9�蹧"H]�[��^H9�#�g%�.#za�y`f��"��9�!K��8� S�L9�!K�8� S�Ny�!�̻�"x� ��H9�����Hܛ��V;�&�.�y/�y��^�^0��]�[�\�^X9b�y�b�*"9���#9.#yo���k9k��""�V;�#9.g�.#yo��a�zhcyi%�.f9aj9g��0���� ��H9���je�bk��+;�&���y� yaj:f���m��&�^�^9nl�ga�0����{�#9n��db�f�y`#y�!��{�&�S��Sӗ�RSW�SRU�S�P�QY�[�X9�+���bcHU�PH9b.��#�*+yk���#9�y�h��m��$�Y�9�h�o�y�(y�n:fd9b-�� ��H9`���lzf���V;�&�.�y�,H���[XZ[����9g��#�LV�b!�d&;�"9� 9i&�9b!�d&;�"{�"�����]�MKX�ܙK\�\�[\˚��9� :j�:)�"l��by�&�`#y��"!��M�ˍ�0���:*"9���&��+9�(z*ey/,9��9l#y��:em��'�^�^9.)��*��-9h�k��/c{�#9f�9�i9.#y/빥.x� �n��db�h&9c�.�y஺f�y`#x� ��HV9h-9�n9`iy���o�zh":-l9�'��h��[�[Y{�&�k�f���*��j{�#ܘ[��8���9�,:k)HV8���[�{�"9�b�b�{�#�a`��(9c(��#�/$y�k��"x���^�^;�#9.#yo��c깫�:/ �Rx� z*.�)��� X[��܈\��^x� ��H9f繫n�ۙ\��&�\��݌M�Y�[�[\�X�Z[�Yܘ][ۋ�\����:je�+byk�9�m9� 9�`��[�[Y{�&�\��݌L�KYX�ۛ�^K\�\�YY^�\����:je�+by����"!�/$y�k����je��&�\��݌M�ˍ�Yܛ��X�\��K�\����:je�+bz!��-�aaz �{�#������Hܛ��;�#���9�b��'�� ���������LKLH8�%9�,:k)H��9e��. �ۙ\�9�-�����H����K]�M�\��[X[�[X][ۋ���9�+�m�y�*�� y��yn.;�#���y��ybk��+8� y�y��{�#��.�b�z"!�����9�,:k)y�9e+�. 9��: �H��:"!�� y�9��9�b���]H�Y]�ۙ\�� ��H9�h�o#��,:k)z)��)��c�a`z*,H���#��X���]H�Y]:"!���9�b�o���9g%��&ՌM�9`�y/�y�fHX�[ۈ�]{�#��`�n����9k�{�#9.#ya�y�j�(�z)��)��� ��H9�y�h�����#Ҙ]�T�ܚ\9�"�n��o#���: �y���.��b�y�j�� P�[��\�� TՑ�� U�X��;�#��Y\��[�X���&��h�o#��(9�d9�.�i,y�`�c�*&:c!Z\��[���\�X[;�#9.#yo��` 9f�""��[�\�\�� ��H����]�MK\��[]ZK\�[\˚��8� X����]�MMKY]�Y�^\˚��8� X���NKXX�\��]��]Y\�\�[�[YK���9�byo�:/"yaiz)��ba��#�bk��+9�(y�a9.#yo���.yk���M���[[�[X][ۓX[�Y�\�9�%��M���[[�[X][ۑ\�X�܋�^X8� ��H:$+:,hyg'���� y�d9�c:"!�am�.��Y���#�X�Y��:)��)���,H�M��U���UT����UT�9�h�o#�o���9g%�db9���#9.#ya�yn����""�f��)��#�줹kd���:)��)��� ���������LKLH8�%9ajy��HRH9��y/�b!��+�k�yaj9�m9d";�"]�ۛ{�"B��H9�m9d"9bcz`h9���]�;�&��X�M��M��M�NMY�����M��NXY�M͘;�&��m9d"9bcyc⹥-�l/�bcz`h9���XZ[�9ga�ஈ��XY����X�����X��YMM�L�������X8� ��+9�ny�*�l#HXZ[�9n����Y\��x� \\�9�%���9���Y�� ��H9k�f��h!�n��/�H�[�[YH�ۙ\�9b)9k���&�ab9d"9aiH�^��\�X�\�Z[��[�ܞK\��[\�[X�]ZKL���LP��NLYYNXNL�L��L�L�ؘ̘XM���Y�;�"Y\��HM�L͎�NX��X�NM�̙�L������L�M�;�"{�#9k�9�$9�j9����{�#�`�9�l�je�+byo�;�#9a�y.�ym�d*��+9. 9��y�9� 9��]�9d"9aiH�^؛���[YX�[�\�KX�\�Y]Z[]ZPX͘�X�L̍YL�؍YLN�LL̍�M��X�L��;�"Y\��H����XLY��LN؍M͙��MMNL�͌�ٙL�̘;�"x� ��H9ajy��yb!��+�`�ykf9g*9.%9�!�k���H9l,y�+�`h9���b!��+�\;�&�ajz !y��9l#yb'yi��]�:`�y.#z$/yo�8� �e+�. 9alyd#9��9�b9�+����NK\�Y�K]��X�\�X�\�Z[��[�ܞK\�[�[YK���;�#9/a��+9. 9��yc깥.H�[X\�P�\�X�\�^[�]�ۙ\��\
+
+X;�#�\S���;�#9�+9.�9��yc깥.H�[Y\^H��������#Ҕ�9b�y�b�/"yaiHT�;�#9����"yd#9a�yo#�� \�[X�ܸ� [\�[�\�� \�]x� z,����y�d9����%��[�[YH�ۙ\�:a�y墻�&�ajy�(yk�f��Y\��H:`�y����"H�ۙ�X�8� ��H9�+9. 9��yd"9aiyo�;�#]�HX�\��PH9��:g,�b'yi��]�9m�kf9g*9�:`c��`��[��\�\��\�[ۻ�&��h�o#��[�[YH9m��,H����K]�M�\��[X[�[X][ۋ���9��y�"H�H�\�\���]x� �/�o�H��]X���ܚ\�ܝ[�XX�\��[]�KX�����\�\XK�Z��:"!�\��݌M�\�\�\�[ۛKX��X�]]��[�ۙ\��\����9�9�'��h�PH�ۙ\��#��[Z]�NX̍���M��M�͍��M���L���;�&��]X�X�[ۜ��[���M���X9��\��]ܞH�X���� y쯹讈�H:`�9�l�"!�]�H[ؚ[HPH9aj:`��P��T��� ��H9�+9.�9��yd"9aiyo�;�#\��X���]\�9�*�c!yd*�am�\�ܘ\H�Yܙ\��[ۈ9k���n��9b'yi��g���{�&���]X���ܚٛ�����K�[[9m칦#�讹���c��X�M��M��M�NMY�����M��NXY�M͘;�#��[Z]XYM���XLMYX،̎XL�Mٌ��ٌ�َMY8� ��]X�X�[ۜ��[���M��NNX9��\��]ܞH�X���� y쯹讈�H:`�9�l�� []�HX�\��:"!��]K�]Y[�PH9aj:`��P��T��� ��H9� 9�`��+9�g���H��]X���ܚ\���K�Z��\��;�&�L�K�L�H�Z]\�:`&�`c��&�*����x� zgg9�b�,����8� za�z)!�SQ8� [�Y\�� U�M�ˍ��[X\�H�]x� ]�]\�X�{�#��ۙ�X�X\��\��#9.�yc�a�z)!�a�yo#��#�\�[�\��#�����ۙ\�9�/y�.9ga�`&�`c�� ��H΋��]����\�\�[X���Y]��Y�\˙]�9k�f���#�)�yfjP{�&�k�9�$9�-��)��-9���bmz)�"!�aczn��#:e��eg�)�"l���: �x� z �9c!x� y��9k���&�论*�z �9c!H[�^X8� y��9k��ai�k�yg����9�l�b�z"!�b!�hg��j�d$y�l�b�x� �c�.�HU�9m�yam�ca�!����;�#9k�f��`,�aiy᯹�,9��9���,:k){�&��+9.�9f�d"9�'��$8�#:a�ybf�+m�j�8�#NN�M�9ch{�#�����]H]H9c�g*:*l��[�[YH:f�z%���#9�!z"l�X9c��e��eg�N�M�:*l���x� zhk��.�k�9�m9�b9��9.)��,x�#:/�9f��#y�-�d"8� �h zgh�/����9����"H�ۜ��H\��ܻ�&�)�9k��b,9�\��܈9c�/��!깮+:*i��#�)�yfj9����YKY^[��[ێ���Y]Y]H^[��[۸� ��H�\]Z\�[Y[��]�;�&��[X\�Kܙ\]Z\�[Y[�X�]�\�̌��LKLK]��X��[��Y]�Z[�Yܘ][ۋ���ۘ;�#9aj:`�9�&z*&�T�Q�QQ8� ��[Y{�#��X�H�\��[ۈ9b.��#���y� H�M�ˍ�;�&�����"HXZ[���[�[ۈ\�ݘ[8� ��H9l&��*�`f�k�j�[���Y:(�y�k�P{�&��蹧"H[���Y9d"9�$9li9�'��g�o�zje�h!y��.�y/�y�fx� ��+9�nym��*�L0��;�#�L���LMH�H���Yx� []�H[ؚ[HPH:"!�k�f��f�����#�)�yfj9.�9c�zje�+b{�#9�*��o9��ajyb!��+�.����:)��$��� ���������LKLH8�%9ajy��HRH9��y/�b!��+�XZ[���[�[ۈ9��9�"���H9/o��*: !y�����LKLH9�#�论)�y�`��#9��9b,]�9a�y��9b,XZ[��#{�#9c�.��."�. 9��y�m��`�l&��*�c�o��XZ[���[�[ۈ\�ݘ[9�9��9�b��&��+9�nH��[�[ۈ\�ݘ[9m�*&:c!9���[X\�Kܙ\]Z\�[Y[�X�]�\�̌��LKLK]��X��[��Y]�Z[�Yܘ][ۋ���ۘ8� ��H��[�[ۈ9bcza�y��:+�9c�`h9����&�]�XYL����YXMَLY��XXN��M������L��8� XXZ[�X��XY����X�����X��YMM�L�������X8� �ajz !H\�ܞH9f�9�m��(HXZ[���[�[ۈ��[Z]9b!�l�;�#9/a�XZ[��YH�XNX�L�̍L�ML�ٙ���XNMX�̙LLLYM��:"!��+:/*��m9d"9bcH]��X�M��M��M�NMY�����M��NXY�M͘�YH9k�9aj9��9d#8� ��H9m�n����[��\��H�X�ۘ�[X][ۈ��[Z]�L���M�M�̘�����ؘ�L�YX�X�N��;�#:f�z)��ஹm�je�+bH]�:"!���(cXZ[��#�YH9/�y� H]���YX�LXX̘L���N͙M��YYMؘXMX9.#z+���&�`&yc깥-�����m�c��#9.#yf�` 9�%�)��$��.��/eH�[�[Y{�#�����#��+:*i�ai�k�x� ��H9o�9�9f�k��-l]��{�#�쯹讈�H:`�9�l�8���]�]�[XZ[��8���XZ[��\��]ܞH�X���8���Y\��H8�����X�[ۈY�\��H9�.9l#X;�#9�y�h��ܘ�K\\�XZ[�� ��������LKLL8�%9��9k��i"��$;�#���z$/y����lyk�yaj9�m9d";�"]�ۛ{�"B��H9�!�k��/����9ஈ�X]\�Kܙ[X�\��ܙ\��[ۋY��\�\�[P�L�MNY�MYX�Y��YLL�N���XM����LM�;�&��+9�(y`�y�m9d":!��]�;�#XZ[�9c��/�z+m�.%9.#yo��/빥.x� ��H��ܙ[X�\��ܙ\��[ۋY��\�\�[K���9�+�裹�a�d"9�$8� z`&��*9裹�a����.��� y��9k��쯺#���#��y�-9���� P����9k��d$y��z$/x� yhe:a�9�"��z!�`n9�z"!�[�[���X�Z\9�9e+�. �ۙ\��&���9�b�����*RQ9..�kf9��9ai��^Y\���[X���ܙ\��[ۘ:"!��蹧"H[��[�ܞH�[��X�[ۻ�#9.#yn�����YX�\��ܘY�x� ��H�Y\�:h!�n��o�zh"9��y� H�X]\�KX����\�[X�9g��#��[�[YH9g*9bcx� X�X]\�K\�[X�\��ܙ\��[ۘ9g*9o�8� ��[��]ۈ[��[Y�Y�9c�c��g*�M��[X��\�[X8� X�[Y\^T�\�[X8� X��\��[X���X���[��]�X9."y`"��ۙ\�:`�ykf9g*9o�:*+yk���#:`o�acy/�z,�:h!�n���l9n.9�`��.9.ay`g9�*9.%9�(y��za�z*i�� ��H9�+�ۙ\�9.#yo����y�H�[��]X8� X��P�]X8� X�L̓][��[��[ې�]X9�%��]�Q�[YX;�&�k��c�c!z(�yak:e�������#�he9aiyc��.)�/�y�蹧"z`,�n���]H9l#yn,�^X�[ۘ�H�X�Z\8� ��!�*�."��9d#Q9.)�(c9�jyd�y�l9b�x� UU�:-�:`,z`���c:"!����L�9�/:`n9����y.�zg 9b%�ஹm���z`���c;�#9.#yo��.�H�H9��9��9k���,ym칭�:fi8� ��H�[Y{�#��X�H�\��[ۈ9��y� H�M�ˍ�{�&��+9�ny� 9�`�je�+bz"!��*�je�+bzh!y���ly. :*&:c!9���[X\�Kܙ\]Z\�[Y[�X�]�\�̌��LKLLY��\�X��[��Y]�Z[�Yܘ][ۋ���ۘ8� ��������LKLL8�%:(�y`�{�#��y��{�#�..�g�RH�ۙ\�9�-�����"]�ۛ{�"B��H9�!�k��/����9ஈ�^�ZKY\]Z\Y[�Y�[Y\^KX�]K\�\�X�۝[�YY��M����L����LY�L͌��Y����MY�ٌX��;�&��+9�(yc�a`z*,z`,�aiH]�;�#9.#yo��/빥.HXZ[�8� ��H9c��b!��+����H��[YK\�Y�H��M�͌K\�]�\�\�]�Y]�:"!���H��[YK\�Y�H�[[[Y[���[�]�Y]�[�[:`�y.#y�)�d"9�h�o#��{�&��]�\�[�[:"!�aj9a`��(9��: �H[�[9� ���9��y���g*��[Y[����X8� ��m9d"9�`��.y�,H���\]Z\Y[�\��ܙ\��[ۋ���9�(��'��h�o#����ke�h$:)�x� X������]�L̋X�۝[�Y^[��[ۋ����9� y�"H��H[�[9�b:gh��#9.)���9��z*���m����M�]�M�Xܚ]X�[]ZK\�Yܙ\��[ۜ˘���9���H�[X�ܸ� ��H9f�k���#:/�9f�..�g��#y���b-���9��y�,H[�^�[��[Y\^TY�X9� y�"{�&�.#y/�y�fH��͌�]�M�X�\��[�]ZKY�^\˚��8� y�.9.aH��\�\�[X��Ι�X]\�K\�XYX\�[�\�9�%�\]ZKY�^\��[�x� ��H:(�y`�y�/8� y��z'��nezf��/#HQ8� y��9k���#�a`��(9c(��&y�i9b!�b)y�-����!�������]�MK\�\�[KY^[��[ۋ����8� X�����]�M�\�\�[K\�\�����8� X����MK]X[K\�[X�\�\�[K����8� ��*�/�y�fyd*�i)�a��Z[\ܝ[�9�����M�]�M�X�\��[�]ZKY�^\˘���8� ��H9��9��9k��..�g�g%�/o��*�۝[�Z\�Y:-��o�H\��]��ZK��YK\�[X�]�M��YYMN���X�;�&�""��(H\�T�9.#z)��k���#:`o�acy�蹧"yk���-����o��c幬���*:c+�*�9ai�k�x� ��H:(�y`�ybk��+9d�zf���g����,HTURTQS���T�����P�X9���\]Z\Y[��\���^
+
+X9�(��'��#9.#ya�y�����L�L:)!�(�yb,���9`oya`��(8� ��H�H9�9�:'��neH�^\�H:+byk鹥��ke��c�b�y�a�c���+9.�yc��f��L�9."�fd9���a��&��h�o#��ۙ\�9m칥.y�*�[�L��H̜
+X;�#��[�L�H̜
+X8� �PH9.�y�#�讈�L0��;�#�L���LMHݙ\�^H�\��X�H:je�+byf��`���۝Z[�Y[�;�#9.#y����H���YH9�L9� 9l#�[��\��Y:*�9�,yஹ�b��g��Y]�ܝ8� ���������LKLLH8�%��\�\�9bmz)��]]�HY�X�X�H9/�o�{�"��MM��"B��H9g���&�]��Y�����ٌ��NML��L�̎LX��M��M�NXX;�&�m�y/g9b!��+��^���\�\�X�\�X�\�XܙX][ۋ[Y�X�X�KL���LLX8� �XZ[�9�*�/빥.x� ��H9�.yf�;�&�X���[�Y�\���\�\�]HXX�[�H9g*�QQ��T�P�T�9��9��y����ܙX][۔Y�X:*+y�$\�^N�����;�#9�g�`c���\��[X����[YT�]�K����ܙX][ۊ
+X:"!���̍]�L�KX�\�X�\�XܙX][ۋ[�]]�K\�[�[YK���9��]]�H9eg��*9�`y�"��&�[���Y���YH9f�: #9c�� �yg*9�+9. 9`"�c��)����[YH9�.�l$HܙX][ۋY�^YXX�]�X�ܙX][ۋ[�]]�KXX�]�X;�#:+��Y�X�H�\�ݙ\�^H9.�yc��"!�Z[����\��][��� ��H9/빫h��&����L�]�M�ˌ�\�\�\[�Y\����9��9h���Z[X���Y9�����\�X�\�ܙX][۔�\��X�J
+X;�#9c�`#�`c��[�ۚX�[��\��[X����[YT�]�K����ܙX][ۊ
+X:`,�aiybmz)��#9.)�g*�\�\�Y\�9l&�)��$��"'�c�9�`�ab9k�9�$�]]�H^Y\�ZYܘ][ۈ�\��][ۻ�#9a�y��ya��Y\�� ��y�h�a�y�,H�\�\�ۙ\�9��9��H\�^N�����8� ��H9�!y�!��&���X�[ۈ\\�[9.#ya�y�d�c!z` 9ony���̌�]�L�X�\�X�\�XܙX][ۋ[�]]�K\�[�[YK���:"!����̎]�L�X�\�X�\�XܙX][ۋ[�]]�K����;�&�/�y�fH��̌������\
+���̍�[�[YH
+�ܚ]X�[���̎X9ஹ��bcybmz)��ۙ\��#:`o�acz""��bݙ\����^N�]]���X�XX�[ێ�[�^X�\��][ۈ:)��ba�g*9��9�b9f�k���[��\�9o�9��za�y��:)��k��� ��H�����\�P{�&��L0��8� Q��� ]�X�[][][ۈ9�X���[�Y�\��9��RQ9a��eg�b�y��g*9o�zh":je�+bH�ܙX][۔Y�X9/cy����[YK[ݙ\�^K[^Y\�8� X�]]�KXܙX][ۋ\Y�X8� XܙX][ۋY�^YXX�]�X8� XܙX][ۋ[�]]�KXX�]�X8� [Y�X�H�\[�\�9.%9.#HZ[�8� ybmz)��[��\�ݙ\����^N��\��X�XX�[ێ��ۙX;�#9.)�.�H[[Y[����T�[�
+
+X:je�+bx�#9."�. 9�ix�#y�"zb%yc��`m9����"z(��am�.�^Y\�:$��/c��&Л��PH9.#ya�yo-�b-�KY\�X�KY�X8� ��H��X�[ۈ�Z[9.�y�,H�ܚ\�؝Z[\��X�[ۋ�Z��9�(��'��۝[�Z\��[�H�X[�Y�\�;�&��+:/*�.#yo���*]Y\�H�\��[ۈ9�%�!�9�`����Ҕ�]�:)��`o��ۙ\�� ���������LKLLH8�%9bmz)��+9.�:h yn�z`�9��y/g9b%�(�yb!�/�o�B��H9g���&�]�Y�̍LL�������Lٌ�X�YL�MٍX�;�&�m�y/g9b!��+��^�ܙX][ۋ\�\�X���KXX�[ۜ�L���LLX;�#XZ[�9.#y/빥.x� ��H���̎K]�L�KX�\�X�\�XܙX][ۋ[�]]�K����9.�y�+�f�k��L0��NL�9bmz)��b:gh��ۙ\��&���̍]�L�KX�\�X�\�XܙX][ۋ[�]]�K\�[�[YK��Ύ�\PܙX][۔�\
+
+X9c�,�:,�9�izjg�b!�����#9.#y��9h��ܘ\\�� ��H9�.yf�;�&��+9.�:h H�ܙX][ۋXX�[ۋ\���9�+��^Y�[��\�9ai���^�[;�#9/a��*�c��k����[���&�g*9�'��g�ke�j�;�#�c���*:j�9n��d �����`��#X�[ۈ���9c��(��h���+�b,9��z/�H;�#: #9am�L�;�g�L̜9kd9�"zb%yc�:(���ܙX][ۋ\�\�ݙ\���Θ�\X:(�y��{�#9�j�gh�c�bjy�"zb%y."����� ��H9/빫h��&��\��:h$9�fHMM9n�z`�9k�yaj9c`;�#9��y/g9b%��.yஹg*�\9ai���][ێ�X���]N����N�;�#9.)�/�y�fz!��l$HL̜���:j�9n���&�.#ze���/��m:h y�l�b�x� y.#y�.zaczn��#�n�)�`��/+�� ��H�L0��8� Q��� ]�X�PH9� �k�f��b!�b,9�+9.�:h {�#:je�+bx�#9."�. 9�i{�#�e��i��a��f���#zj�9n��!��l$H8� yk�9�m:$/yg*�\��Y�H9ai��#9.%9m�c��]]\�:`�y�,y�"zb%y�+:.��c�o��� ���������LKLLH8�%:f�y��yeg�b�y�j�gh��"��+9.�9ney�n�aiz)��$��H9g��]��NY����NMY������MNLٌ��L��;�#9b!��+��X]\�K؛��Z[���X]][ݙ\�^KL���LLX;�&�XZ[�9.#y/빥.x� ��H9�+:/*�ajyo-zfa9.��"!��蹧"H�M�ˌ�9/o��*: !yeg�b�y�(9�d9/cya`��a9. :!�;�&����X\��]��ZK��\�\[��ˍ��X���ٌ�����;�#9�+9.�9ney��9h���۝[�XY�\��Y[X\�\��]��ZK��\�\[XZ[�X�]K��M��Y�X�X˚��;�#9����"za�y��9�'��$9g%��a�� ��H���L�]�M�ˌ�\�\�\[�Y\����9.�y�+�e+�. �\�\�]SXX�[�H�ۙ\��&�L\�9`�y���b-��������+9.�9ne{�#9�'�k��\�X�\�K�]]��]�H9aj9�"�.)�(c9.%�XY[�\��9.#y�byo�yb�y�j�� ��H���ٚ\�X�\�KX]]����9l!��n�aiy�a��+�!��� 9i&��L8� y�+�l#����ke�/a�/�y�fH:)�9���j�9n���#9�n�aiz �9�k�� y�9/o��*9�+9.�9ney�h���8� �ajyo-yg%�ga�`,�ܚ]X�[�[�Y�[[]]X�H�X�{�&�gg�o�z)�H�[Y\^H:,���(�.�y��y� H^�x� ���������LKLLH:f�y��y�"��/��e�d#9�#��]B��H�]�X�KX�ۜ�[��[9�+�f�y��y�"��/��e�i���(yd#9�#�"!�o�9�9��y�"��9e+�. �ۙ\��&��h�o#��/��e��+9���.�y�,H�]�X�K�[9e��. 9��z+m�� ��H[�^�[9c깣��. 9`"�� :j�9li9�&�d#9��Y��[YH�]{�#9.#y��9h���+9.�9ie�]];�#��\�\�]HXX�[�x� �i���(y�*�d#9�#��`�o�zh"9����/��e���yb,9n�y�cze��i��H9��`$��n;�#9`$��n9k�9�h��cyc���"x�#9�$yd#9�#��#{�&�d#9�#��b9�+9.�H��\���[X�����]�X�W��ۜ�[�ݙ\��[ۘ9a,�kf9g*9d#9����[�ܘY�x� ��H8�#9.#yd#9�#��#yab9f%�*i�e�:e�z)�����&�f�9. :"+9�#�)�yfj:`&�n.9�y�h����h z!�(c:e�:e�y/o��*: !ze��eg��9b!�h {�#9i,y�e��`��.yl#�d$H�]�X�KYX�[�Y�[9.)��`��h�`b��,�.��gh�� ��H9d#9�#��]H9� y�9.�zf�z%��Y��[YH9/g�ۙ\��#9b�y�b�ஹ�n�aizh y��aix�#:f�y��y�"��/��e��#yaiyc���#9.)�g*9..�g��#9����lx�#y�9k���#yb%�o�9��aiyd#9. 9aiyc���&�ajz !y桺a�y��:e��eg���9d#9�/��e��Y]�\��#9.#z)!�(�y�/��e��+9���� ��H9�+9b�� �y.#y/빥.H�\�X�\�HRQ8� y�n�aiH�ݚY\�� ykf9��8� z)�"l�,����x� y�,:k)x� y��z$/y�%�`b��,��n9`/8� �������LKLL�9�*��jy����j�g��#�"!�i���(z`b��y�b��g�/�o�y�m9d";�"9o�HU��{�"B��H9/o��*: !y��9�"��m9d"�X]\�K�[ۜ�\�\ܝ�Z]\\[[�K]�KL���LLP��X�MLX��̍̍�̘͍YX��L��YMNX�M:"!��^�[ؚ[KY�\��\^K]ZK]��L���LLP����LM�Y�LMXLY�L�X،�ؘ���YL����X9b,9� 9��]��Y�Y�����Y��M�M͍�M̙�MMLM��M�YL٘;�&��m9d"9b!��+�ஈ[�Yܘ]K�[ۜ�\�\ܝ�Z][[ؚ[KY�\��\^KL���LL�;�#XZ[�9�*�/빥.x� ��H9m�y�*�oh�,hyb!�����#�)�"l�g%��ۙ\�9��y� H��̍�]�L�K\]��X\X\�[��K���
+�����̋]�L�K\]��X\X\�[��K����;�&�i���(z`b��yajynez"!�bmz)�h$9`�H�ۙ\�9��y� H���L�]�M�ˌ�\�\�\[�Y\����;�&�chy�c9����j��#��j��y��yd$y�9�蹧"y� 9�`�����ۙ\�9ஈ����M�]�M�Xܚ]X�[]ZK\�Yܙ\��[ۜ˘���8� ��+:/*��*���9h���[�[YHܘ\\�� ��H9�*��jy����j�g��#��ۙ\�9ஈ�ۙ�Y��[ۜ�\�\ܝ�Z]\�Y�\��K���ۘ8� X���K]�MMY]�Y�^\˚���\���\�:"!����]�MNKXX�\��X�]K\ܝ�Z]˚��9d#9�iy�b���x� �f��o-ym�d"9aiy/a��#y��9�9i*yamH��9m�.�y�蹧"z`#��#���yg%�a�y��9�k�aiHL�0��ML͈�АH9��;�#:gg�a�y��9�'��$8� ��H9m�`&�`c�[ۜ�\�]Y];�"L�^\�[���#�M[��Y;�#9o-H�[�\�]Y\��]�9ga�c��)���;�"x� yl":h!y�+:*i�� LL��L�:gg��#�)�yfj��H�Z]\�� L���̌�����[�^8� X�Z[]\�Z[�\�X�� \�\��\��\��#�Q��#��Y\��#ܙ[X\�H�]{�#��]Y��� ��i9�9h������"H���Z][{�&̎H9`"��蹧"y�#�)�yfj9�+:*i��fyo�H�]X�X�[ۜ�:je�+byo�9�cyc���&y�.�k�9�m9k�9�$8� �������LKLMH9a�g�a��f��g,9g%����\�9c��)���)�/�o�{�"U��9o�H�{�"B��H9m�y/g9b!��+��^�Y�[�\�K[X\Y���\�]�\�X�[]KL���LMX9o���m��`�� 9��]���NNLXٌ͘�ٙ���LYLXYL�Y��LNX9n�����&��+:/*��y�h�/빥.y�%���:` HXZ[�8� ��HY�[�\�H9e+�. 9g,9g%��b:gh��ۙ\�9.�yஈ����Y�[�\�K]�KL���LMK����8� �c���Y�[�\�K]�Y]�9.�zh$9/,9��[\
+��]�L�
+X9�h�fi:j�9n���&�k�f��XY\�9d*��#��m�k�yaj9c`9�`�c����:h$9/,9`/:j�;�#:`(9�$:)�����*����"!����\�9�9c��)��c`9.#yc��gh8� ��﹢���蹧"H�Y�[�\�TY�X9�-����ஈ�^��[[��#9�,yk�f��XY\�9/e9/c{�#�Y�[�\�K]�Y]�9��y� ye+�. ݙ\����^N�]]��ܛ��ۙ\��#9.)�/�y�fH���\�9�`:g 9����H�Y�KX\�XHY[���&�����"y��9h���+9.�9`"��ܛ��۝Z[�\�9�%��+�l#����ke�� ��H���K\�Y�K]�]�X�[��˚��9�9�蹧"yaj9g���ܛ��][\�9m�b�9aiH�Y�[�\�K]�Y]�;�#9/o�d#9. 9`"��蹧"H�ܛ��ۙ\�9g*9�b��g��b�b�."�.#y� �(���X����9���/c�� ��*��.HY�[�\�H9�y��x� y��9��:,����x� y.��.��� y�,:k)x� z �9c!x� y..�g㹢%�am�.�Rx� ��H9��9h��� 9l#�f繫n;�&�\���Y�[�\�K[��K\�\�[K]�K�\����:c��k���^�ۙ\�� y�y�h��'9�+XY\�:j�9n��"!��X��][\�;�&���]X���ܚ\�ܝ[�XY�[�\�KX�����\�\XK�Z��9� �g*͌0��8� L�L0��8� ML���LMH:`$9. 9�l�b,9� 9n�{�#:je�+bH���\�9k�9�m9c��)��.%9g,9g%�c깧"y. 9`"�g�����ܛ��ۙ\�� ��H9�+9�g�m�`&�`c�\��]YY�[�\�H�Yܙ\��[۸� X�Z[8� X�Z[�X��� \�[X\�H�]x� \�[�^:"!��]Y��KX�X��;�&��̍H9��\��]ܞH�X����[��MNL�L�9m�`&�`c��#9.)�k�f��k�9�$9."yl.�k�Y�[�\�H���YHP{�#�]�Y[��H\�Y8� ��\]Z\�[Y[��]��[X\�Kܙ\]Z\�[Y[�X�]�\�̌��LKLMKXY�[�\�K[X\Y���\�]�\�X�[]K���ۘ9m칦�9��9ஈ�̈�T�Q�QQ;�&�`�yo�y� 9o�9�:je�+by� :c!�H:"!�]�:`�9�l��H9�.9l#x� �������LKLM�8�%�]H�ܛX][ۈ�����YX�[�\�H�[ۜ�\��[��H�\Z\��[�Y]H
+����TUJB��H�\�H]���LY��NXM�MLYY��X������LLM�M�X���[���^ؘ]KY�ܛX][ۋ]\��][��L���LM�����H\�[Z]Y���۝ؘX���\�X[�ڙX�[ۋ����YX�[�\�KX�\��\�X[[�K[�[ۜ�\��[��H\��]�\��][ۋ�����[��H����[�[X�\���ܛX[\��]�[\��]�H]K܈[��[]Y�[Y\^K��H����]\�HN���ؘ]Y�Y[\��[�ۙ\�����ܜ�X�H�\SWъ��[X[�X���۝���[�SWЊ��X������]���ٚ^Y\��X�]Y�Y[\�[�\�[��]������\�^YY[H���]HH[�[^K\�[]]�HY�[�][ۋ�H�[�ۚX�[�������ڙX��[H��۝]H�
+�X\�\�[�[ZY\�H[�[H�X��]H���K��H����]\�H������[Y\^KX����]��\�\�\�[K��Ύ��[�\�YX�[�\�\�
+XܙX]Y�\\�]HYX�[�\�H\��]�Y�\�HX���]H[�[^H����[������[Y\^KX����]��\�����Y�Z\��۝Z[�\�[��ܛX[���]H[�[^K^�ۙH��H�[�\�\����X\���H[�\[�[�YX�[�\�H�ۙH�[���ۛ�\�N�H�[�ۚX�[�^Y\���[\�Y]X�\�][�H[�[^H��۝[�K�YX�[�\�\��[XZ[��]�YH[�[^H[�]�[�Y]�H[�\��]�\��][ۋ��H����]\�HΈ���[XZ[���Ύ����\���[��S[ۜ�\�]X��
+X�۝�\�Y�X����\�X�H�[]�[��\�HY[X�\�ˈ]����]\�\���\��[X��И]Y�Y[��˜�\���P[U\��]�
+X�܈�X�������[[��]Z[�[��^X�][[�^\�[���[��K]\��]�X[�Z]�[܋��H�Yܙ\��[ۈ�ݙ\�Y�H\��\[Y[�\�HۛN�\��ٚ^YX�]Y�Y[X[KY�ܛX][ۋ�\��������H�]��Y��۝�ۙKX�X��\�N�\��ٚ^Y\��X�]Y�Y[\�[�\�[��]���\��������[H�ڙX�[ۈ[�YX�[�\�H��۝[�K��\]Z\�[Y[��]��[X\�Kܙ\]Z\�[Y[�X�]�\�̌��LKLM�X�]KY�ܛX][ۋ]\��][�˚��ۘ�[XZ[�����T�Q�QQ[�[���[H�YY]��[Y\^H]�Y[��K�������LKLN8�%����Q�Y��ܛ�Z[��ܘ�[Y[�]�Hۘ\���[�[^H]�YY�X���[�Yܘ]Y�Y[
+STSQS�Q�PHS�S��B��H�\�N�]\��]X�]�YL�L͎NL�YL��Mؘ͘N͌NY���X��M�����[����^؛���ZY]�ܛ\�Z[��ܘ�[Y[�Z]\�Y[L���LN�XZ[��[XZ[��^�YY��HH�[܈���\Z\��
+̎M��̎N
+H�^Y����Q�\�X�[]KZY�[��\�X�[ܙ\��]�Z]\��[[ݙYH�\�Y�M��Y��\�K]�M�[[ۜ�\�X�\�]�Y�
+HZ[\ܝ[��ۙ\��H����\X\�Y�\�X�H�[H�[YX\�\�[��\�H�ܛX[�[ۜ�\��\���H����]�M�X��X�]Y[��[ۋ\�\�����������\�]�Y�ۙ\���ۋP����[�[ZY\ˈ�����[Y\^KX����]��\������[XZ[��HۛH����Q�[�Y]�H�ۙ\���]�Y�ܚY�[��]�]\�Z[�H��[���Y��H�ܛ[ۛH�Z[��ܘ�[Y[�ݙ\�\�\�Hۘ\��Y[�]H�]�H�����۝^�Y�\��Y]��\�\ۘ\��]�[�Y��[�[YH�[�\�[��Y[�XYH�\X�YHX�]�H�^Y��ۘ\����[[[ۜ���[�H\��YۙY��[H]H�[HHY\\�Z[�YH]�H�]\�[�ܛX][ۋ����И]Y�Y[ۘ\��
+
+X���Y��HX�]�Hۘ\���۝Z[�[��H�����Y�ܙH[�H[�[ZX�\��YۛY[��\��ۘ[�����Z]�[܈\��ݙ\�Y�\\�][K��H���[ۜ�\�]
+
+X\����H[�[^H�YY�X���ۙ\��[XY�HܙX]\����Y�\�܈[�H[�[^H[�]K��Z�P\��ܔ�\
+
+X[���Y�\�\�[�[^H�\����HY�X�Kܙ\\�[�Y�\�[����Z[���X�H�M�Z]\�Z�X�^Y\�\�YH]�YY�X��\�[��X�Y��HH�^�H�����Y[Q\��]\�Y��[�Л����Y[Y
+
+X���XZ[�Z[��ۙH�]H�����Z\�Y[[ݙ\�^X[��YH�[ۜ�\�Z\�[��H�ܛX[^Y\��ۙ\���ܝ[ۈX^
+��\��[��Y[�^�[XZ[���\��[��X^�[XY�H�][Y[��[XZ[���Y[8���ݙ\����[�X[�\�[���H�[YH�ۙ\���H���\�Y�����[�[YH\��[��Z[��X��\����[K�H��[�[��H�Z]H\�����YۛH�X�]\�H\��ܚ��X�HX������YH�\]Z\�Y�HH^\�[�������\�\���\]Z\�[Y[��]���[X\�Kܙ\]Z\�[Y[�X�]�\�̌��LKLNX����ZY]�ܛ\�Z[��ܘ�[Y[�Z]\�Y[���ۘ�[XZ[��STSQS�Q[�[�K\�YY�H[�L���LMH�X[�[�[YHPH\�˂������LKLNH8�%9��9k��Y��\�Y�X�X�x� y�h�o#�f�d":`���c8� RQ���� y��y/g]��:"!�o��`'�n繤⹥b: �{�"�T�Q�QQ;�"B��H�\�N�]\��]X�]���XL��XL�����LX�YYX�Xؙ��M͌�͍X���[����^ܙ[X�]�Y��\�[Y�X�X�KX�]KZ[�]]ZKL���LNX�XZ[�9.#y/빥.x� ��H���[XZ[����9���\��[X��И]Q���9��9h��e+�. ��[���\�;�#���[��[��X��ܚX�\�:"!��ܙK[�ۙY�\�[�][ۈ���� ����\�ә^��X�][�
+
+X9g*\����9bcyd#9�iy�/�` H��[�[�;�&��\�\��
+X9�/�` H��[��\�;�&؛�[�\�H�^H9�,H�]H��[��"ܛ�[�9c��a�x� ��X]\�H[�[H9.#ya�y�,H�Y�ܙKX��X�][�9��9�+9."�. 9f�d";�#9.g�.#y��y�H\����8� X�[�\�^Y\�X�[ۊ
+X9�%����\�ә^��X�][�
+
+X8� ��H��͌]X[K\�[X�\�\�[K���9l!�L9.��[�[YT�XYN��YX9��9k���ly. 9�.y�$�[��Y��\�8����Y��\�X]�\�8���X\���Y��\�Y8����\���QY��X��9d#9�iH�[Y\^H9�d9���#9a�y����[�[X]X��\�[�][۸� �f�i*yk��/*�.#ya�y�+�e+�. 9�ny/���&��%9a�c幭�8� Y�[�\�][ۈ�\�]8� X�]H[�9�%����Z[\�H:`�y.#y� �f繮�m칢$9����b9��8� �c�zg!�.g��.yஹab9`��k���d9��� yo�:)��)��� ��H9o�L9.��.�y��y� H�[�[YT�XYN��[�X8� �U�9c������`�acz(�{�#9/a�`,��,:k)y.#ya�z!�b�y��y�/��&�chy�a�"!�*l���y�!y�f��&y�.��[�[YH�XY{�"9�h�o#�b�� �ym�k�9�$;�"X;�#��\�[�][ۈۛ{�"9`�y�%9a�h$:)�{�"X;�#9c깧"H�M��[X�]��]�Y]��\�[�][ۊ
+X;�#��,:k)y.+y�8�#U�9�%9a�h$:)�x�#yc���b�b�y���aiz)��)��/a�b%�� ��H\]PX�[ےY�\�X�[]J
+X9�#yaiH�ܙH�\�[�][ۈ����&��%9a'�e���]H��[X[�8� \��[]ZX���\�� Z][HY[�H:"!�\��]\�[X�[��RH9aj:`�9.#yc����y/g;�#9� 9o�9. 9`"��\�[�][ۈ���:a���/�o�9�cy�,H�ܙH9�h�o�yc��k��db��`y�"�� ��H9�,:k)y�!�.�]��9no�/ey�-����f�����[XZ[�����;�#9/�HMLͰ��MNH�]KX��[X[�\[�[���9.�:ha�)��)��.+yo��*+yk���o�b!���:`���c;�&�.�9c`9.��.#za�y墸� �����K]�ML�Y]�Y�^\˘���9���[�K�IH�[ܚ]Hݙ\�\9m����fi8� ��H9aj9g��\�\H9g*ؘ]TY�X9`g9�*;�&�am�.�h zgh�aly�*9e��. �H��{�#9b�y�j��,H�Y;�#�ZY�;�#�X\��[�9�.yஈ�[�ٛܛ{�"��X�]{�#9o��`'�n繤�.#ya�y�+��cH�9`"�j��Z[�^[�[X]Y��\�� ��H���\�Y��H\��� LL9.����9k��[�[Yx� y�h�o#�f�d":-��o�x� RQ���� U����[�[X]X��Yܙ\��[ۜ�� U�MKՌM�ՌML�:"!�]\�Z[�\�X��Z[9ga�T��� ����̈�\��]ܞH�X����[��M�MM���P��T���&��L0��;�#�L���LMH]��:"!��9�(H�[�\��ۈ�����\�PH9ga�`&�`c�� ��H�\]Z\�[Y[��]���[X\�Kܙ\]Z\�[Y[�X�]�\�̌��LKLNK\�[X�]�Y��\�[Y�X�X�KX�]KZ[�]]ZK���ۘ8� ��������LKL�8�%9ea�n��(�9d�za�y���"!�..�g���9k�Q9h���+��"STSQS�Q�9k鹪g�PH9o�y论*�{�"B��H�\�{�&�� 9���]X�]�;�&�m�y/g9b!��+��^���\�[ۋZ�YK\�[X�[^[�]L���L�;�&�XZ[�9.#y/빥.x� ��H9ea�n��(�9d�y�b:gh�e+�. 9o�9li�ۙ\�9��y� H����K]�M�K\��]ZK����;�&��h�o#�,����{�#�,�:,���ۙ\�9.�yஈ���]�M\�[\�X[�XX�\�˚��;�#��9.�:c+����n���ۙ\�9.�yஈ���LK]�M�K\��]ZK��Ύ�\��[��T����[[��
+X8� ��+9�(y.#y��9h��]H���9��9�%��[�[YHܘ\\��&�akyo-z(�9d�ychy��y� H�����#9/a��.y�$9�#�讈XY\��#�X�ۊ����ke��#��n:a���`�y�/;�#�,�:,���"zb%yb!�c`;�#:`o�acyai�k�y.����:a�y墸� ��H9..�g�f��/#y��9k���f:)�H�\���ܙY[��ۙ\�9��y� H���M�\�Y�K]�M[XZ[�X�]K\�[�[YK���
+�����NK\�Y�K]�M[XZ[�X�]K[[�\�]K[�]]�K\��[K����8� �.#z/"yaiyk�9�m9��9k��X]\�{�&�c�g*9�蹧"H��:f�z%���(z)�H�Y��\�:*���#��#9l!�b%�j�N8���8� y�"zb%z)��)��j��8����;�#9/�y�fyd#y�,x� S�:"!���9�����y/g8� ��H�\]Z\�[Y[��]�;�&��[X\�Kܙ\]Z\�[Y[�X�]�\�̌��LKL�\��\�[ۋZ�YK\�[X�[^[�]���ۘ8� ���bcyajzh!yga�ஈSTSQS�Q;�#9o�H]�9k�f��`�9�l�"!��b��g�)��)��论*�yo�9�cyc��ca�ஈ�T�Q�QQ8� �������LKL�8�%\��\�[�Y��X�\�][ۈY�X�X�H:"!��&�(`:*(��"]�9�m9d"9bc{�"B��H9�h�o#�\�][ۈ�ۙ\�9ஈ���[XZ[����9���[���]\���Y\9b�9."���͌]�M�ˍ�\��[\��ܙ\��[ۋ\�X�[[��K��Ύ���\��[X���\�][ۓY�X�X�X9�[�]X]]�HX�[ۈۘ\��8� �""�aj9g����[�\�\���Y\9.#ya�y�h�fi��Y^�{�#�]�Y�{�#�a�y`��"!�. :"+�ٝX�Y���&�h����.g�.#ya�yf�9��y�/��%��(ze�9i)�f�d"9l$y���"y�b:(c9b�x� ��HY�\��\��X��9.#ya�yk��aiya�y`��� ���Y^�{�#�]�Y�H9.�yg*9�+9�(yc�����e��/cy�:(c9b�y�`�f.����(c9b�{�#9�-�o�9�,HX�[ۋY�[�\�Y��[�\�H9�h�fi9. 9�({�#9f�9�i�9f�d"9o�yk��f.�����9�({�&Н\��9/�y�fy�j9�����[�\�\��]\�X���#9ie��*9�`�.#y���cl�-��`��k���#�9f�d"9�(��'��9�(H�8� ��H9�&�(`:*(��ۙ\�9.�y�+���͌]�M�ˍ�\��[\��ܙ\��[ۋ\�X�[[��K���;�&��x�$�H9�.yஹ��: %�� 9i)�K�L�MǨ̍I{�#9��y."�/��."y�(y�yk��..�b�y�j������9��y`��k��d!9��9ca�d#9�(��o�b!���;�&�������8� yacz,��/�y��.#y/o��*8� ���y�/��+:.��.#y��: %�`&y."y�({�#9�+9f���(y�j������9��y`��k��.#ya�yb�9�$8� ��H9f繫n�ۙ\��&�\�����[\��ܙ\��[ۋ\�X�[[��K�\����8� �m�)��$���&�(`�x�$�H9�9쯹讈9�$9�+8� y."y�(yb�9�$:"!��+9f���(yi,y�b;�#9.�yc��Y���#ќ�Y^�{�#ќ����]H9�9�"y�b;�#�f.����(c9b�y�h�fi:"!��m�f�d"9���Y��9.#zh$9�h�� ��������LKL�8�%���\��\�X[�XY{�#�..�g�i��lc��]{�#� �9�k�RH:h$9���H9�.yf�;�&�,����HY�]x� Y]X�Y�؈X��H:"!�ajy�(HZ[�9.#y�by��]�H9..�g��H9m�c���j�(�{�&��\�\\�XYH\�[�\�9c鹧"y. 9�(H���\�:a�yn�����b�� ��H9/�o�{�&��\\�Q�\���ܙY[��\�X[�
+X�]H9k�f��[YϘ8� P����X��ܛ�[�8� yo�z)�yke�g��"!�Z[�;�&�YS�Y\�
+X9c� �yg*�\�X[\�XYH9o�9g��(c8� �i��lc�i,y�e�����*9�h�o#��\�\�]�x� ��H9."yli9�(yg���&�]�[H:i��lc�k�9�m9o�9��yab{�&�]�[�9..�g�c����y/g9o�9�,ye+�. �X]\�H�Y\�� ZYx� X�ۘ�\��[��HH: �9�k�h$9����&�]�[�9i)�g���y��y��y� y�"zg ^�H�Y8� ��H�[X�:i���(ze��eg�ab:hk��.��h�o#�l`:`��Y[���#�X�ۈ9c��,H�SP���US���T��K�X�۔]:(cy�'�.)�g*�\�X[\�XYH9o�9. 9�(ydb9���&� �9�k�.#H^X�]H�����#���\��#ԙ[X��[�[Yx� ��H9m�y/g9b!��+��&��^���\�\�]�\�X[\�XYKX�X��ܛ�[�\�Y�]�L���L�;�&�.�y� 9��]�9ஹg���#XZ[�9.#y/빥.x� �o�H�]X�:*�z+byo�9/�y/�z+m��`y�"���:` x� P�x� T�9d"9/mx� ���������LKL��8�%[ۜ�\�ܝ�Z]�\�[\ܝ;�"9m��'��$9�*��jy����j�o��`'�l#�ai{�"B�����9�.9.aH�ۙ\��H9m��'��$9.%9m�$/y�h�o#�-��o�y�9�*��jy����j��#9�h�o#�o��`'�l#�aiH�ۙ\��&��ܚ\��[\ܝ[[ۜ�\�\ܝ�Z]˛Z��8� ��H�H[X\��&��H�[�ܝ�Z]�[\ܝKH���8� ��H�Y�\��H�ۙ\�9.�yஈ�ۙ�Y��[ۜ�\�\ܝ�Z]\�Y�\��K���ۘ8� ��H�[�[YH�\���\��ۙ\�9.�yஈ���K]�MMY]�Y�^\˚��9��\���S[ۜ�\�ܝ�Z]�X�ܙ
+
+X;�&ՌMNH9`�yd#9�iy�`�n���#9.#y��9h��ܘ\\�� ������9f�k���`y�"K�9��yg%��#�o�z&ey�!��(9�d9.�y/�H����SPQ�W�T��U��P˛Y9k�9�$9�(y�#H�X�:"!�`#��#��#�l.�k�:je�+bx� ����9�.9a��X�9�/�b,�Y�\��H9�!�k���\��]��[ۜ�\���9�h�o#�-��o�x� ��ˈ9m��'��$9�(9�d9.#ya�z)�y�`�n����[ۜ�\�ܝ�Z]�]�X[�Y�\�;�&���9��y/o��*;�&���H�[�ܝ�Z]�[\ܝKHKZ�^\�Oܝ�Z]�^K������[��Y:`&�`c������yo�9ca�ஈ^\�[��8� ��K��]\�Y:h$:*+y�y�h�a�y��9eg��*;�&�c깧"yl"9�b:,�:,�9.���#�讹��9�"��`�/o��*K\�XX�]�]K\�]\�Y8� ����9m�yam�o�zh":je�+bH�X�:)���8� \�^�P�\��9l.�k�8� P[{�#�`#��#�`���(8� U�MM�\���\�9idy�!:"!��蹧"H[ۜ�\�ܝ�Z]�[�[YH\�;�&�"�H�Y�\��H:`�9�+�""����˚��˚�Y�];�#9/a�d#�[H9�h�o#��X�9m�kf9g*;�#9m�yam�� �!�b�y�-�����$��X�8� ��ˈ9�*��'��$9�(9�d9.�y��y� y�蹧"H�]��[�\�]Kٚ[�[^�K���X�]Y]9�`y�"�� ������9�-��������H:)���n��#9g%��a�m�kf9g*;�#9/a�.�yf�[��Y;�#ܙ]\�Y;�#ؘ]�X[�Y�\�9�`y�"� #:em��`�e��chyg*9�h�o#���y���#x� ��H:`o�acyc��"���9�b9kf9g*9l,z*�9b)9k�9�$;�&��h�o#�l#�aiy.�y.�H�]\�Y^\�[��9.%�[�[YH�ۙ\�9c��)����9ஹ���� ��H9o��`'�l#�aiym�yam�c�&ey�!��+9kd9����l{�#9.#y/빥.y�,:k)y�y��x� URx� y�*��jy�n9`/9�%�XZ[�� ���������LKL��8�%�]HRH�]��]\��ۙ\��۝�\��[��{�"�T�Q�QQ�[�Y]{�"B��H�\�{�&�]�YML�L�N��YL�NX�NMLYL�̌؍Y��LY����;�&�m�y/g9b!��+��^ؘ]K]ZKZ]\�]\�[�ۙ\�X�۝�\��[��KL���L��;�&���L���&�XZ[�9aj9�"��*�/빥.x� ��H9. :"+9doy.+ye+�. �ۙ\�9�-����!�����[XZ[���Ύ��[�[]R]�[��T\��[�
+
+Kܛ�]�[��J
+X;�&��[\
+MH
+�X��\�X�p���MH
+��[�[X��\�X�P�۝\�H\��]�[�[]�\�[ۈH�[�[]�YX�[ۋ�NJX8� ��k�`&��*��jy�*��#�讹�!�k��]�\�[ۈ9�`�/o��*Z[�L]�[0���JX;�&�i&�`"�e��.��/����9�.y.�y� 9�`��o�b!�n���9��yb�9�&�� ��H9�l9n.;�#�\��۝��9e+�. �ۙ\�9�-����!���[�[]T�]\�Y��X��[��J
+Kܛ��]\�Y��X�]
+
+X;�&���: �yg��#��$9b�����"�..�lk9�)����I{�"�� 9�`��l9n.9doy.+yb�9�$;�#y�빪&H�\�]0���I{�#y� 9�`�����)�� ��jy�!��l9n.:+�9�"y�b]X���[��� y��z(d��l9n.:+�[�[Y�[��{�&����fi]�[�X�ܸ� \�\�
+]�X�]Jx� y�k9���l"9lk�\�]��Y��X�Y[�:"!��MՌMNՌMKՌM�H:""�ak9o#�ܘ\\�� �\��۝��9."�fd;�&��Y�[\�L	x� Q[]H�Ix� P�����	x� Y[�[^K]�\^Y\��	x� ��H9a�y`���h�o#�ஈ�ٝX�Y���&�`��k��L�Ix� y� 9�`�e��.��L�H9`"��o�b!�n�� y� 9�`��l9n.9����)�L�H9`"��o�b!�n��#9.#y�y�h���: �{�&�""��#9�(y��y/o��*9��: �x�#y�,:k)y��9�b����ke�m칮!zfi8� ��H9��: �z*���#��ۙ\�:(�:ob��j�����jy�!�/�y��� y��9�,:o�y�l�o�yk�������� y�j�l��i*zl�:l��j x� ya�y`��k�9�m9�b9��8� y�&�(`9acz,��/�y��.#z %��\��x� y��9o��*(�.#yc���!zfi:h!y��"!�f��a`��(V;�&��*�o�y�.��MKՌM�H:""����ke��ۙ\�� ��H9�$��j��bH�Y��9.�y�,H��\��[X���\�][ۓY�X�X�X9/�HX�[ۋY�[�\�Y9�h�fi;�#9f�d"9���fi9o�9���cl�d#9�iH�M��]\��\�X[;�&�.#y��9h��[Y\��#��[��� ��H9m�y�*�.���jy.#ya�yab:hk��.�Y�X�H]��X�\�X�\����;�&��h�o#��X�X��K��Y9k�9�$9o�9�czhk��.�� �m�y�*��X\�]R[���:"!��h�o#��]H[����]�\�9�(�o#��ۙ\�9b!�f�� ��H�]HR{�&�e+�. :a�z"l�\��]�]X�{�&��*��jyd#y�,z`#��#��&̍9��9�b�X�ۈQ:j�9����;�&�`n9�빪&y�`�`$��n9�a�"!�\��]��\9/o��*9�h�o#�.#za�y墹no�/e{�&И]H[���9i%���:`#��#�� yc�/�y�fyl#�X��#�leze���h����n�yn�{�&�X�9�幦���.yஈ�[�\��ۈ9. 9�(za���+;�"ܐQ���[��]L�;�&���y/g:gh��o��.y�*:`#��#��(9�d9��yolx� ��H9��ym�y�'�e�������\�PH9���b,9. 9`"��'�eg�b�zh!�n��ec�hc;�&�XZ�V�ۙS[ۜ�\�
+X9g*\�[:h �li9n*��`���y��9o�9�k��Y�][]�\�[ۈ�ۜ�9b'yi��c%��#9� �`(9�$�9.)�.+y�h�\�[8� ��h�o#�Y�][[ۜ�\�]�\�[ۈ�ۙ\�9m����b,�ۙH���\�9n����.b�bc{�#9.)���9h�����[ܙ\��Yܙ\��[۸� ��H��X�[ۈ�Z[��[Z];�&��M��XL�M���Lٌ̙NL��L�XNYX��Mٙ�Y�M�8� ��\�Y�YY��\��H�[�Y]{�&�MNM�XLL͙MM��X��NL�̌�͍��YM̎���X8� ��H�]X�X�[ۜ��\��]ܞH�X����[��N���NLX;�&��P��T��� �c!yd*��[�^8� P�]H�[�[YH\��]X�\�H�X\�8� yl":h!{�#��蹧"H�]H�Yܙ\��[ۜ�� \��X�[ۈ�Z[�[���ۚ^�][۸� Q�^Y��N�M�[ؚ[H�����\�Px� Y^X�X�[�Y]H�X[�]H[ؚ[H�����\�Px� PY�[�\�H[ؚ[HPx� \�]X��\��\��\�� \�[X\�H�]H:"!��]Y��KX�X��9aj:`�:`&�`c�� ��H�\]Z\�[Y[��]�;�&��[X\�Kܙ\]Z\�[Y[�X�]�\�̌��LKL��X�]K]ZKZ]\�]\�[�ۙ\�X�۝�\��[��K���ۘ9m�ca��&�ஈ�T�Q�QQ8� �������LKL�8�%��Y�]�H\�H��\��\�[�ۙY[��[�{�"��TUH��͈�T�Q�QQ;�"B��H�\�{�&�� 9��]�NXL��YXL�NLNLY�L�Y��NY�M�X��;�&�m�y/g9b!��+��&��X]\�K���Y\�]�K\\�L�Y[��[�KL���L�;�&�XZ[�;�#�]�9ga��*���9��y/빥.x� ��H\�HH�[��HX�]�H�\��[ۈ9��y� HK�H�T�Q�QQ8� �\�H�9e+�. [��[�H�ۙ\�9��9h�����[��[ۜ��ܘ����Y\�]�KY[��[�K���;�&�X�X�\�\����ZYK��]�\���\��[�9/o��*��[XH�\��[ۈ�� \�\��\�[�ۙY�]�\�[۸� \�\��\�[Y\�[\�:"!�f�9�/9��9�b�je�+bx� ��H�����\��Y�]�X;�&���[��[�H9o���]�\�[ۈH9n�����&�a�z)!�do9c��.#y.��h���]�\�[ۻ�#�\]Y];�&��蹧"H\�HH�\��[ۈ{�#ԙ]�\�[ۈ9쯹论j�9���c�����ca��&�� �.���#��ۙ\����[XKܙ]�\�[ۋ�[Y\�[\��]\�9�#yh�. 9o���Z[���Y8� ��H�X�Z]Y�X�SZYܘ][ې�[�Y]X;�&�.�yc�/�ykf�\�Y��[�X�[�Y]{�&�Y]Y]H9�.z+��"!�X�]�H�\��[ۈ:je�+byd#9. �[��X�[ۻ�#�\��\��]�\�[ۘ9c��kd:`g�h��� �\�H�9.#y�(��'��h�o#��[Y\^H^[�Y8� y.#yca��/9�+9�g�,����x� ��H��ML�9m�d"9/mH]�NMXX؍��X�͘�XYL�YYMX�Y�LM�M٘8� ���H�NN��͍�;�#��\��[ۈ�NN���8� [Y\��Y]��{�"�U�\�H�NN�MX8� T�\��[ۈ[][]ܻ�"њ\�X�\�H\�H�NN��9ga��P��T���&��h�o#�\�H�؈L�NMN�͘�P��T��� ��H9� 9l#�]�H:je��-���Y�H9ஈ��\��[X��њ\�X�\�K������\��Y�]�J
+X;�&�.#z!�b�ydo9c��� y.#y�.H�\��]\�H�XY�ۙ\�� y.#y`����[�[Y\^H�]�x� ��'�k�����H9n,�&g�m�g*9�b��g����YH:je�+bH�\��[ۈ�� T�]�\�[ۈH:"!�a�z)!������\Y[\�[��{�&ԙ\]Z\�[Y[��]�9��ஈ��TUH��͈�T�Q�QQ8� �\�H��$�L9�*�e��i��� ��H9ஹ�(zf��!i��9�'�k�(�y�k�je��-��#U�9n,�&g�gh��o���9h���b�b�x�#:je�+bzf����kf9��:j�9����#y�"zb%{�&�k��`(�������\9ajy�(y.)�+�9f�[��[�{�#9c�hk��.���[X{�#ԙ]�\�[ۈ9�d9��;�#9.#zhk��.�ܙY[�X[8� y.#z` H��[�]�x� �/o��*: !ym�.�yc������H9n,�&g�g*9k�9�m9�b��g����YH9c�o����[XH��� T�]�\�[ۈX9�$9b���d9��;�&��]�9ai�n��#�)�yfj9�����H�]]9�*�k�9�$9.#z)��ஹo�9���i,y�e�� ���MMH9d"9/mH]�����YYYYXٍ��XXX��؍L���LL�YLX;�&�Y\��Y]��H�NNL����X8� T�\��[ۈ]]ܚ]{�#њ\�X�\�H\�H�NNL����][\�9ga��P��T��� �
