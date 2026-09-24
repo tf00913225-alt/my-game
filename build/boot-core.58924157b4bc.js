@@ -1,4 +1,4 @@
-window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.72","firebaseBootstrap":"build/firebase/firebase-bootstrap.28cbec0c77c8.js"});
+window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.72","firebaseBootstrap":"build/firebase/firebase-bootstrap.39bbb79f8025.js"});
 (function installFourSymbolsSupportContact(global){
 "use strict";
 if(!global||global.FourSymbolsSupport){ return; }
