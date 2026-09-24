@@ -5,48 +5,52 @@
   "baseSha": "d8986afa62f0c1f2646fad1f4d1ca73b2be389f6",
   "workBranch": "feature/cloud-save-phase4-general-progress-20260924",
   "title": "Cloud Save Phase 4 — General Progress Migration",
-  "status": "IMPLEMENTED",
+  "status": "TODO",
   "requirements": [
     {
       "id": "CLOUD-P4-FIELDS-01",
-      "status": "IMPLEMENTED",
+      "status": "TODO",
       "requirement": "逐欄盤點一般進度和獎勵／經濟耦合，僅允許經審核欄位進入 Phase 4 權威資料。",
       "evidence": [
         "docs/CLOUD_SAVE_PHASE4_CONTRACT.md",
         "functions/src/cloud-preferences.js",
-        "tests/cloud-save-envelope.test.mjs"
+        "tests/cloud-save-envelope.test.mjs",
+        "docs/CLOUD_CHARACTER_AUTHORITY_MIGRATION_DESIGN.md: 2026-09-24 source audit; existing evidence is preference-only and does not satisfy full-character requirement"
       ]
     },
     {
       "id": "CLOUD-P4-SERVER-02",
-      "status": "IMPLEMENTED",
+      "status": "TODO",
       "requirement": "後端以有效 session、UID、schema、expected serverRevision 在單一交易中驗證與寫入，拒絕整包本機值及跨 UID／衝突提交。",
       "evidence": [
         "functions/index.js::saveCloudPreferences",
         "functions/src/session-authority.js::runProtected",
-        "scripts/test-session-authority-emulator.mjs"
+        "scripts/test-session-authority-emulator.mjs",
+        "docs/CLOUD_CHARACTER_AUTHORITY_MIGRATION_DESIGN.md: 2026-09-24 source audit; existing evidence is preference-only and does not satisfy full-character requirement"
       ]
     },
     {
       "id": "CLOUD-P4-CLIENT-03",
-      "status": "IMPLEMENTED",
+      "status": "TODO",
       "requirement": "同 UID 本機候選與雲端讀取分離；登入、登出、離線與回線均不靜默覆蓋現有資料。",
       "evidence": [
         "js/firebase/firebase-cloud-save.js::saveLocalAutoBattlePreferences",
         "js/firebase/firebase-auth-ui.js",
-        "tests/firebase-trusted-cloud-save-backend.test.mjs"
+        "tests/firebase-trusted-cloud-save-backend.test.mjs",
+        "docs/CLOUD_CHARACTER_AUTHORITY_MIGRATION_DESIGN.md: 2026-09-24 source audit; existing evidence is preference-only and does not satisfy full-character requirement"
       ]
     },
     {
       "id": "CLOUD-P4-RESTORE-04",
-      "status": "IMPLEMENTED",
+      "status": "TODO",
       "requirement": "已驗證的允許欄位能在 DEV 重新登入後安全恢復，局部資料絕不偽裝為完整可玩角色。",
       "evidence": [
         "js/00-main.js::restoreAutoBattlePreferences",
         "js/firebase/firebase-auth-ui.js::restoreCloudPreferences",
         "tests/cloud-save-phase4-preferences.test.mjs",
         "tests/cloud-save-phase4-restore-confirm.test.mjs (confirm, cancel, UID switch, revision race)",
-        "2026-09-24 phone Chrome: post-fix manual preference restore success message at Revision 7; full cross-phone character recovery unverified"
+        "2026-09-24 phone Chrome: post-fix manual preference restore success message at Revision 7; full cross-phone character recovery unverified",
+        "docs/CLOUD_CHARACTER_AUTHORITY_MIGRATION_DESIGN.md: 2026-09-24 source audit; existing evidence is preference-only and does not satisfy full-character requirement"
       ]
     },
     {
@@ -69,6 +73,7 @@
   "verification": {
     "repositoryChecks": "PR #561 36021711282 SUCCESS; merged dev 36022298612 Repository checks SUCCESS; Session Authority 36022298060 SUCCESS",
     "devDeploy": "dev@01c543564498400b38dd8778acccb9d76777131f run 36022298612 SUCCESS, exact deployment SHA verified, Game/Cache 173.72",
-    "liveValidation": "Phone Chrome upload/readback and post-fix manual preference restore confirmed (Revision 7, success message); new button labels and second-device/offline/reward checks PENDING"
+    "liveValidation": "Phone Chrome upload/readback and post-fix manual preference restore confirmed (Revision 7, success message); new button labels and second-device/offline/reward checks PENDING",
+    "characterAuthority": "NOT IMPLEMENTED: no trusted gameplay writer, no historical legacy acceptance policy, no full-character restore; Phase 4 0/6 VERIFIED"
   }
 }
