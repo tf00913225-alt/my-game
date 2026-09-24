@@ -6,7 +6,7 @@
   "currentMain": "852a857120bc6c486812c820b17971acf9176e55",
   "officialVersion": "173.72",
   "officialVersionBumpAllowed": true,
-  "overallStatus": "IMPLEMENTED",
+  "overallStatus": "VERIFIED",
   "requirements": [
     {
       "id": "REL-01",
@@ -51,23 +51,42 @@
     {
       "id": "REL-04",
       "status": "VERIFIED",
-      "requirement": "PR #540 合併 dev 後，V173.72 最終 dev HEAD 再次通過 Repository checks、DEV exact-SHA deployment、版本核對與 deployed Battle live QA。",
+      "requirement": "V173.72 最終 dev HEAD 通過 Repository checks、DEV exact-SHA deployment、版本核對與 deployed Battle live QA。",
       "evidence": [
-        "dev@6ef30c38ecba00d059547d119fc6fec06365f9e6",
-        "PR #540 merged; stale/full-suite convergence complete",
-        "Full Node Suite 209 / 209 PASS before merge (TEMP run 35925831192; only temporary workflow cleanup followed)",
-        "dev push CI run 35939891769 Repository checks SUCCESS",
-        "DEV deployment job 107445532893 SUCCESS",
-        "exact deployed SHA 6ef30c38ecba00d059547d119fc6fec06365f9e6",
-        "Game / Cache Version 173.72 / 173.72 verified by deployment gate",
-        "deployed Battle layer/audio live mobile QA PASS"
+        "dev@b0658abdda6a54315243643a2e8d9577ad244165",
+        "final dev push CI run 35940760548 SUCCESS",
+        "DEV exact-SHA deployment job 107448173532 SUCCESS",
+        "exact deployed SHA b0658abdda6a54315243643a2e8d9577ad244165",
+        "Game / Cache Version 173.72 / 173.72 verified",
+        "deployed Battle layer/audio live mobile QA PASS",
+        "dev release tree 2bd6186bb9bb5fe970574c1dce03c4d7adeea5d3"
       ]
     },
     {
       "id": "REL-05",
-      "status": "TODO",
+      "status": "VERIFIED",
       "requirement": "以 protected dev → main 正式發布 PR 推進 main；main CI、production Pages deployment、production SHA、Game Version、Cache Version 全部驗證成功。",
-      "evidence": []
+      "evidence": [
+        "PR #537 merged to main@871e7ff9cb3219ee6ce499eedbed95a89af35431",
+        "final main candidate CI run 35940764204 SUCCESS",
+        "final main candidate Node Suite 209 / 209 PASS",
+        "final main candidate exact-candidate Battle Browser QA PASS",
+        "main push CI run 35941657759 SUCCESS",
+        "main push Node Suite 209 / 209 PASS",
+        "main push JavaScript syntax 298 / 298 PASS",
+        "main push static resources 400 / 400 PASS",
+        "main push HTML IDs 251 unique PASS",
+        "main push deterministic production build 31 assets PASS",
+        "Release source coherence V173.72 / cache 173.72",
+        "Requirements 11 / 11 VERIFIED",
+        "GitHub Pages run 35941650616 SUCCESS",
+        "Pages deployment build version 871e7ff9cb3219ee6ce499eedbed95a89af35431",
+        "production URL https://tf00913225-alt.github.io/my-game/",
+        "production live QA run 35942239371 SUCCESS",
+        "production metadata version 173.72 / cache 173.72 / notice V173.72",
+        "production Battle layer/audio live mobile QA PASS",
+        "production Battle QA artifact 10785715762"
+      ]
     }
   ],
   "includedRequirementBatches": [
@@ -75,12 +94,12 @@
     "2026-09-23-freeze-petrify-exclusive-status-layer",
     "2026-09-23-skill-relic-runtime-owner-convergence"
   ],
-  "automatedVerification": "V173.72 release-prep PR #535 and verification PR #536 were previously merged. PR #539 aligned the battle-info browser fixture, and PR #540 converged the remaining stale full-suite contracts plus confirmed Runtime regressions. The final dev merge is dev@6ef30c38ecba00d059547d119fc6fec06365f9e6. Dev push CI run 35939891769 and exact-SHA deployment job 107445532893 both succeeded; deployment verified SHA 6ef30c38ecba00d059547d119fc6fec06365f9e6, Game/Cache 173.72, and deployed Battle live QA PASS. Protected dev → main PR #537 remains pending final candidate CI.",
-  "visualVerification": "Final dev exact-SHA deployment at 6ef30c38ecba00d059547d119fc6fec06365f9e6 passed deployed Battle layer/audio live mobile QA.",
-  "verifiedSourceCommit": "6ef30c38ecba00d059547d119fc6fec06365f9e6",
-  "mergedDevCommit": "6ef30c38ecba00d059547d119fc6fec06365f9e6",
-  "mergedMainCommit": null,
-  "candidateCiRun": 35881984862,
-  "devPushCiRun": 35939891769,
-  "devDeployJob": 107445532893
+  "automatedVerification": "V173.72 final dev was dev@b0658abdda6a54315243643a2e8d9577ad244165. Dev push CI 35940760548 and exact-SHA deployment job 107448173532 succeeded with deployed Battle live QA PASS. PR #537 candidate CI 35940764204 then passed the full 209/209 Node Suite and exact-candidate browser QA before merging to main@871e7ff9cb3219ee6ce499eedbed95a89af35431. Main push CI 35941657759 and GitHub Pages run 35941650616 both succeeded. Production QA run 35942239371 verified Game/Cache 173.72, V173.72 release notice, and production Battle layer/audio live mobile QA PASS.",
+  "visualVerification": "Final dev deployed Battle live QA PASS at b0658abdda6a54315243643a2e8d9577ad244165; final main candidate exact-candidate Battle Browser QA PASS; production Battle layer/audio live QA PASS in run 35942239371 (artifact 10785715762).",
+  "verifiedSourceCommit": "b0658abdda6a54315243643a2e8d9577ad244165",
+  "mergedDevCommit": "b0658abdda6a54315243643a2e8d9577ad244165",
+  "mergedMainCommit": "871e7ff9cb3219ee6ce499eedbed95a89af35431",
+  "candidateCiRun": 35940764204,
+  "devPushCiRun": 35940760548,
+  "devDeployJob": 107448173532
 }
