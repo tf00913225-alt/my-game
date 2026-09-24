@@ -680,6 +680,13 @@
 
     function syncStatusVisualsForUnit(side,index,advanceRotation){
         const entity=entityFor(side,index);
+        const card=cardFor(side,index);
+        const stealthActive=!!(
+            entity&&Number(entity.hp)>0&&
+            (side!=="monster"||entity.alive!==false)&&
+            hasTimedEffect(entity,"stealthSkill")
+        );
+        if(card&&card.classList){ card.classList.toggle("v143-unit-stealthed",stealthActive); }
         const baseBodyTypes=activeBodyStatusTypesForLayer(
             entity,side,index,STATUS_VISUAL_LAYERS.HARD_CONTROL_BASE
         );
@@ -724,6 +731,9 @@
         if(typeof document==="undefined"||typeof document.querySelectorAll!=="function"){ return; }
         [".v143-status-visual",".v143-status-icon"].forEach(selector=>
             document.querySelectorAll(selector).forEach(node=>node.remove())
+        );
+        document.querySelectorAll(".v143-unit-stealthed").forEach(node=>
+            node.classList.remove("v143-unit-stealthed")
         );
         statusRotationByUnit.clear();
         hardControlContractViolationByUnit.clear();
