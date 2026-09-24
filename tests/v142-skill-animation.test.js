@@ -296,49 +296,10 @@ function createContext(options={}){
         assert.doesNotMatch(css,/@keyframes|animation\s*:|v142ActionClock|data-style=/);
     });
 
-    await test("元相光明 heals 350 HP and restores 95 SP to every living ally",()=>{
-        const {context}=createContext({battleActive:false});
-        const emperor={name:"極帝天尊",alive:true,hp:1000,maxHP:1000,sp:300,maxSP:500,agility:100,statusEffects:[]};
-        const ally={name:"天兵",alive:true,hp:100,maxHP:1000,sp:20,maxSP:200,agility:80,statusEffects:[]};
-        context.monsters=[emperor,ally];
-        context.currentBattleMonsters=[0,1];
-        assert.equal(context.v142ResolveExtremeEmperorAction(0,"yuanXiangGuangMing"),true);
-        assert.equal(ally.hp,450);
-        assert.equal(ally.sp,115);
-        assert.equal(emperor.sp,360,"caster pays 35 SP, then receives the shared 95 SP heal");
-    });
-
-    await test("元光護體 gives all allies a 200 shield for two turns",()=>{
-        const {context}=createContext({battleActive:false});
-        const emperor={name:"極帝天尊",alive:true,hp:1000,maxHP:1000,sp:300,maxSP:500,agility:100,statusEffects:[]};
-        const ally={name:"天兵",alive:true,hp:700,maxHP:1000,sp:100,maxSP:200,agility:80,statusEffects:[]};
-        context.monsters=[emperor,ally];
-        context.currentBattleMonsters=[0,1];
-        assert.equal(context.v142ResolveExtremeEmperorAction(0,"yuanGuangShield"),true);
-        assert.equal(emperor.v141Shield.remaining,200);
-        assert.equal(ally.v141Shield.remaining,200);
-        assert.equal(ally.v141Shield.turnsLeft,2);
-    });
-
-    await test("元祖賜福 cleanses all debuffs and applies/restores 75% agility for two turns",()=>{
-        const {context}=createContext({battleActive:false});
-        const emperor={name:"極帝天尊",alive:true,hp:1000,maxHP:1000,sp:300,maxSP:500,agility:100,statusEffects:[{type:"burn"}],activeBuffs:[]};
-        const ally={name:"天兵",alive:true,hp:700,maxHP:1000,sp:100,maxSP:200,agility:80,statusEffects:[{type:"freeze"},{type:"defenseDown"}],activeBuffs:[]};
-        context.monsters=[emperor,ally];
-        context.currentBattleMonsters=[0,1];
-        assert.equal(context.v142ResolveExtremeEmperorAction(0,"yuanZuBlessing"),true);
-        assert.equal(emperor.statusEffects.length,0);
-        assert.equal(ally.statusEffects.length,0);
-        assert.equal(emperor.agility,175);
-        assert.equal(ally.agility,140);
-        assert.equal(ally.v142AgilityBlessing.turnsLeft,2);
-        context.turn=2;
-        context.startTurn(7);
-        assert.equal(ally.v142AgilityBlessing.turnsLeft,1);
-        context.turn=3;
-        context.startTurn(7);
-        assert.equal(ally.agility,80);
-        assert.equal(ally.v142AgilityBlessing,undefined);
+    await test("V142 stays visual-lifecycle only and owns no combat support gameplay",()=>{
+        assert.doesNotMatch(source,/v142ResolveExtremeEmperorAction|castExtremeEmperorSkill|v142AgilityBlessing/);
+        assert.doesNotMatch(source,/turnsLeft--/);
+        assert.doesNotMatch(source,/startTurn=function\(token\)[\s\S]*?blessing/);
     });
 
     console.log("\nV142 skill animation suite: "+passed+" tests passed.");
