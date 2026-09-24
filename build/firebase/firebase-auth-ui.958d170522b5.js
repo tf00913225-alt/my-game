@@ -15,7 +15,7 @@ let resumeGraceUsed=false;
 let resumeActive=false;
 let resumeDeadline=0;
 let resumeInterval=0;
-let state={mode:"AUTH_RESOLVING",user:null,message:"正在初始化 Firebase Authentication…",error:false,migration:null,sessionTest:""};
+let state={mode:"AUTH_RESOLVING",user:null,message:"正在初始化 Firebase Authentication…",error:false,migration:null,sessionTest:"",cloudEnvelopeTest:""};
 
 const byId=id=>document.getElementById(id);
 function errorText(error){
@@ -88,10 +88,14 @@ function markup(){
             <div id="firebaseCloudState" class="firebase-auth-cloud-state"></div>
           </div>
           <div id="firebaseSessionTestPanel" class="firebase-auth-account-card" hidden>
-            <div class="firebase-auth-account-name">開發版登入權限測試</div>
+            <div class="firebase-auth-account-name">開發版雲端驗證</div>
             <div id="firebaseSessionTestResult" class="firebase-auth-cloud-state" role="status" aria-live="polite">按下按鈕即可確認這台裝置是否仍擁有雲端操作權限。</div>
             <div class="firebase-auth-actions">
               <button id="firebaseSessionTestButton" class="firebase-auth-button secondary" type="button">測試目前裝置權限</button>
+            </div>
+            <div id="firebaseCloudEnvelopeTestResult" class="firebase-auth-cloud-state" role="status" aria-live="polite">按下按鈕驗證 Phase 2 雲端存檔骨架。</div>
+            <div class="firebase-auth-actions">
+              <button id="firebaseCloudEnvelopeTestButton" class="firebase-auth-button secondary" type="button">驗證雲端存檔骨架</button>
             </div>
           </div>
           <div id="firebaseMigrationPanel" hidden>
@@ -111,7 +115,7 @@ function markup(){
 }
 function setBusy(value){
     busy=value===true;
-    ["firebaseGoogleButton","firebaseGuestButton","firebaseEmailSignInButton","firebaseEmailCreateButton","firebaseMigrationConfirmButton","firebaseRetryButton","firebaseSignOutButton","firebaseAuthBackButton","firebaseSwitchAccountButton","firebaseSessionTestButton"].forEach(id=>{ const button=byId(id); if(button){ button.disabled=busy; } });
+    ["firebaseGoogleButton","firebaseGuestButton","firebaseEmailSignInButton","firebaseEmailCreateButton","firebaseMigrationConfirmButton","firebaseRetryButton","firebaseSignOutButton","firebaseAuthBackButton","firebaseSwitchAccountButton","firebaseSessionTestButton","firebaseCloudEnvelopeTestButton"].forEach(id=>{ const button=byId(id); if(button){ button.disabled=busy; } });
 }
 function renderResumeCountdown(){
     if(!resumeActive){ return; }
@@ -144,6 +148,10 @@ function render(){
     const sessionTestResult=byId("firebaseSessionTestResult");
     if(sessionTestResult){
         sessionTestResult.textContent=state.sessionTest||"按下按鈕即可確認這台裝置是否仍擁有雲端操作權限。";
+    }
+    const cloudEnvelopeTestResult=byId("firebaseCloudEnvelopeTestResult");
+    if(cloudEnvelopeTestResult){
+        cloudEnvelopeTestResult.textContent=state.cloudEnvelopeTest||"按下按鈕驗證 Phase 2 雲端存檔骨架。";
     }
     const migration=byId("firebaseMigrationPanel");
     migration.hidden=state.mode!=="MIGRATION_REQUIRED";
@@ -200,6 +208,46 @@ async function testCurrentDeviceSession(){
         render();
     }
 }
+async function testCloudSaveEnvelope(){
+    if(busy||!DEV_SESSION_TEST_ENABLED){ return; }
+    setBusy(true);
+    state={...state,cloudEnvelopeTest:"正在建立並讀回 Phase 2 雲端存檔骨架…"};
+    render();
+    try{
+        const api=window.FourSymbolsFirebase;
+        if(!api||typeof api.bootstrapCloudSave!=="function"||typeof api.resolveCloudSave!=="function"||typeof api.getUser!=="function"){
+            throw new Error("CLOUD_ENVELOPE_TEST_UNAVAILABLE");
+        }
+        const user=api.getUser();
+        if(!user||!user.uid){ throw new Error("AUTH_REQUIRED"); }
+        const first=await api.bootstrapCloudSave();
+        const second=await api.bootstrapCloudSave();
+        const cloud=await api.resolveCloudSave(user);
+        const data=cloud&&cloud.data;
+        const revision=data&&data.serverRevision;
+        const hasGameplayPayload=data&&(
+            Object.prototype.hasOwnProperty.call(data,"gameSave")||
+            Object.prototype.hasOwnProperty.call(data,"save")||
+            Object.prototype.hasOwnProperty.call(data,"authoritativeSave")
+        );
+        const valid=first&&first.ok===true&&second&&second.ok===true&&cloud&&cloud.exists===true&&data&&
+            data.ownerUid===user.uid&&data.schemaVersion===2&&Number.isSafeInteger(revision)&&revision>=1&&
+            first.envelopeSchemaVersion===2&&second.envelopeSchemaVersion===2&&
+            first.serverRevision===revision&&second.serverRevision===revision&&
+            data.authoritativeStateReady===false&&!hasGameplayPayload;
+        if(!valid){ throw new Error("CLOUD_ENVELOPE_VALIDATION_FAILED"); }
+        state={...state,cloudEnvelopeTest:`✅ Phase 2 驗證成功：Schema V2、Revision ${revision}；重複操作未增加 Revision，也未建立正式遊戲進度。`};
+    }catch(error){
+        console.error("Firebase cloud-save envelope test failed:",error);
+        const sessionMessage=sessionTestFailureText(error);
+        state={...state,cloudEnvelopeTest:sessionMessage.startsWith("⚠️ 無法確認")
+            ?"⚠️ 雲端存檔骨架驗證失敗；未修改本機角色資料，請稍後再試。"
+            :sessionMessage};
+    }finally{
+        setBusy(false);
+        render();
+    }
+}
 function clearResumeTimer(){
     if(resumeInterval){ window.clearInterval(resumeInterval); resumeInterval=0; }
 }
@@ -245,6 +293,8 @@ function bind(){
     byId("firebaseRetryButton").addEventListener("click",()=>dispatchAction("retry"));
     const sessionTestButton=byId("firebaseSessionTestButton");
     if(sessionTestButton){ sessionTestButton.addEventListener("click",()=>{ void testCurrentDeviceSession(); }); }
+    const cloudEnvelopeTestButton=byId("firebaseCloudEnvelopeTestButton");
+    if(cloudEnvelopeTestButton){ cloudEnvelopeTestButton.addEventListener("click",()=>{ void testCloudSaveEnvelope(); }); }
     byId("firebaseSupportButton").addEventListener("click",()=>window.FourSymbolsSupport.show());
     byId("firebaseAuthBackButton").addEventListener("click",()=>{
         if(!state.user||(state.mode!=="READY"&&state.mode!=="OFFLINE_READY")){ return; }

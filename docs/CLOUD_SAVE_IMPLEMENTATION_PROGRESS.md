@@ -92,6 +92,7 @@
 - 本機精準測試 21/21 PASS、`npm run build:check` PASS、`git diff --check` PASS。當前 runner 僅 Java 17，Firebase CLI 15.30.0 要求 Java 21，因此本機 emulator 明確 BLOCKED；`.github/workflows/session-authority.yml` 已固定安裝 Java 21 並新增 Phase 2 unit／backend gate，遠端結果尚待 PR。
 - PR #553 已合併 `dev@195acb63d4acd36ceada31ed95b5f50e448d297f`。PR Repository checks `35987380366`、PR Session Authority `35987380024`、merged dev Repository checks／DEV deploy `35987880895`、merged dev Session Authority／Firebase deploy `35987880460` 全部 SUCCESS；正式 Firebase deploy job `107595824436` SUCCESS。
 - `js/firebase/firebase-bootstrap.js` 公開最小 `FourSymbolsFirebase.bootstrapCloudSave()` bridge，僅呼叫既有 Session-protected callable，不自動執行、不影響 first-use read resolution、不上傳本機 gameplay save。此入口只供最後 live 驗證與未來受控帳號流程使用。
+- DEV 帳號面板提供手機可點擊的「驗證雲端存檔骨架」按鈕：連續 bootstrap 兩次後讀回 envelope，僅在 owner、Version 2、相同有效 Revision、`authoritativeStateReady:false` 且無 gameplay payload 時顯示成功；不顯示 credential、不提交 legacy／本機存檔，且不在正式網域出現。
 - Requirement Batch：`release/requirement-batches/2026-09-24-cloud-save-phase2-envelope.json`，目前 5/6 VERIFIED；live DEV 帳號驗證前不能宣稱 Phase 2 完成。
 
 ### Session Authority owner
@@ -201,7 +202,7 @@ npx --yes firebase-tools@15.30.0 deploy --project four-symbols-jianghu --non-int
 
 Cloudflare 的靜態部署不部署 Firebase。獨立部署明列三支新 session、兩支既有 save、兩支必要的 native handoff guard，共七支函式；禁止 `--force` 刪除其他函式。部署鎖沿用既有 native-auth backend concurrency group，避免兩個部署互相覆蓋。若需回退，不可部署回沒有 session check 的 protected writer 或沒有 source epoch 的 token issuer；應先停止受保護寫入並保留資料，再另修。
 
-在 DEV 頁面登入後，可於自己的開發工具呼叫（不要貼出 raw credential／ID Token）：
+在 DEV 頁面登入後，可直接於帳號面板點「驗證雲端存檔骨架」。沒有電腦時以手機完成即可；按鈕不會上傳本機角色資料。開發工具仍可用來診斷（不要貼出 raw credential／ID Token）：
 
 ```js
 FourSymbolsFirebase.getUser().uid
@@ -221,7 +222,7 @@ Wire callable 名稱是 `protectedTest`（本文 protected-test 的正式 Fireba
 2. 看 `functions/src/session-authority.js`、`functions/index.js`、`js/firebase/session-client.js`、`firebase-session.js`、兩個 Firebase client owners 與 `firestore.rules`。
 3. [結案 PR #341](https://github.com/tf00913225-alt/my-game/pull/341) 先以 CI 全綠合併 dev，再核對該最新 SHA 的 Repository checks、DEV 與 Firebase 部署；把最終 dev SHA／run／job 記錄於結案 PR。
 4. 比較 main←dev，完成受保護 PR 與正式部署驗證；把 main SHA、production deployment 及登入／DEV 測試區隔離結果記入永久發布記錄。任一發布環節未完成，整次任務仍回報 NOT COMPLETE。
-5. Phase 2 工作分支須先完成 PR Repository checks 與 Java 21 emulator；合併 dev 後只由 exact latest dev workflow 部署既有受保護 Functions＋Rules，並驗證 live bootstrap 的 Version 2／Revision 1 與重複 bootstrap idempotency，才可改為 COMPLETE / VERIFIED。
+5. Phase 2 手機驗證按鈕的工作分支須先完成 PR Repository checks；合併 dev 後只由 exact latest dev workflow 部署。以真實 DEV 帳號按下按鈕並看到 Version 2、相同 Revision 與無 gameplay payload 的成功結果後，才可改為 COMPLETE / VERIFIED。
 6. Phase 3 另行處理 UID local isolation／login loading；Phase 4 才開始一般 gameplay progress migration。禁止把 Phase 2 envelope 誤稱完整雲端存檔。
 7. 不修改戰鬥／VFX／UI、經濟／背包／秘寶、支付或 gameplay save owner，禁止 local overwrite 與無關 refactor。禁止直接修改 main／dev。
 
