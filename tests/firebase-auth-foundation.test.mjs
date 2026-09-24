@@ -57,6 +57,7 @@ test("bootstrap exposes the narrow Firebase bridge and cloud-read events", ()=>{
     assert.match(bootstrap, /four-symbols:firebase-cloud-save-read/);
     assert.match(bootstrap, /openAuth:\s*openFirebaseAuthUi/);
     assert.match(bootstrap, /cloudSaveWritePolicy:\s*CLOUD_SAVE_WRITE_POLICY/);
+    assert.match(bootstrap, /bootstrapCloudSave:bootstrapTrustedCloudSave/);
 });
 
 test("authentication UI exposes Google, email and Firebase anonymous identity while Facebook remains backend-only", ()=>{

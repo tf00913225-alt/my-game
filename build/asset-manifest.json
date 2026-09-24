@@ -4,7 +4,7 @@
   "generatedAt": "deterministic",
   "critical": {
     "scripts": [
-      "build/boot-core.3161e77e1e98.js"
+      "build/boot-core.492f59b55b2f.js"
     ],
     "styles": [
       "build/boot-core.54b38f5940ad.css"
@@ -13,7 +13,7 @@
       "assets/ui/startup-logo.4631c0bc3f2b.jpg",
       "assets/ui/startup-main-city.d43e67af1c1c.jpg"
     ],
-    "firebaseBootstrap": "build/firebase/firebase-bootstrap.0128f5b3761e.js"
+    "firebaseBootstrap": "build/firebase/firebase-bootstrap.a7064beda8ee.js"
   },
   "featureManifest": {
     "schemaVersion": 1,
@@ -194,8 +194,8 @@
         "decode": true
       },
       {
-        "path": "build/boot-core.3161e77e1e98.js",
-        "sha256": "3161e77e1e98",
+        "path": "build/boot-core.492f59b55b2f.js",
+        "sha256": "492f59b55b2f",
         "bytes": 59088,
         "priority": "P0",
         "type": "script",
@@ -226,9 +226,9 @@
         "decode": false
       },
       {
-        "path": "build/firebase/firebase-bootstrap.0128f5b3761e.js",
-        "sha256": "0128f5b3761e",
-        "bytes": 5126,
+        "path": "build/firebase/firebase-bootstrap.a7064beda8ee.js",
+        "sha256": "a7064beda8ee",
+        "bytes": 5197,
         "priority": "P0",
         "type": "script",
         "decode": false
@@ -802,13 +802,13 @@
         "decode": false
       }
     ],
-    "manifestHash": "3bc4e25383ee",
-    "totalBytes": 21604842,
+    "manifestHash": "bce77652f583",
+    "totalBytes": 21604913,
     "totalResources": 78
   },
   "assets": {
-    "build/boot-core.3161e77e1e98.js": {
-      "sha256": "3161e77e1e98",
+    "build/boot-core.492f59b55b2f.js": {
+      "sha256": "492f59b55b2f",
       "bytes": 59088
     },
     "build/app-shell.4d29fcfa7eb3.js": {
@@ -919,9 +919,9 @@
       "sha256": "db1bc127701d",
       "bytes": 16837
     },
-    "build/firebase/firebase-bootstrap.0128f5b3761e.js": {
-      "sha256": "0128f5b3761e",
-      "bytes": 5126
+    "build/firebase/firebase-bootstrap.a7064beda8ee.js": {
+      "sha256": "a7064beda8ee",
+      "bytes": 5197
     },
     "assets/ui/startup-logo.4631c0bc3f2b.jpg": {
       "sha256": "4631c0bc3f2b",

@@ -5,7 +5,7 @@ import {
     installFirebaseSessionHooks
 } from "./firebase-auth.6a269762828f.js";
 import {
-    CLOUD_FUNCTIONS_REGION,CLOUD_SAVE_WRITE_POLICY,readCurrentCloudSave,
+    bootstrapTrustedCloudSave,CLOUD_FUNCTIONS_REGION,CLOUD_SAVE_WRITE_POLICY,readCurrentCloudSave,
     submitLegacyMigrationCandidate
 } from "./firebase-cloud-save.791dd91d8027.js";
 import {closeFirebaseAuthUi,installFirebaseAuthUi,openFirebaseAuthUi,setFirebaseAuthUiState} from "./firebase-auth-ui.db1bc127701d.js";
@@ -83,7 +83,7 @@ async function resolveCloudSave(user){
 const api=Object.freeze({
     initialize:initializeLifecycle,resolveIdentity,resolveCloudSave,getUser:getSignedInUser,
     signInWithGoogle,signInWithFacebook,signInWithEmail,createAccountWithEmail,signInAsAnonymous,signOut:signOutFirebase,
-    submitLegacyMigrationCandidate,protectedTest,getGameSessionState,
+    bootstrapCloudSave:bootstrapTrustedCloudSave,submitLegacyMigrationCandidate,protectedTest,getGameSessionState,
     openAuth:openFirebaseAuthUi,closeAuth:closeFirebaseAuthUi,
     setUiState:setFirebaseAuthUiState,cloudSaveWritePolicy:CLOUD_SAVE_WRITE_POLICY,
     cloudFunctionsRegion:CLOUD_FUNCTIONS_REGION,dispose:()=>{ if(unsubscribe){ unsubscribe(); unsubscribe=null; } }
