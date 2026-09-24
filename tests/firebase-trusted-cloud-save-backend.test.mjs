@@ -6,6 +6,7 @@ import test from "node:test";
 
 const require=createRequire(import.meta.url);
 const policy=require("../functions/src/cloud-save-policy.js");
+const envelope=require("../functions/src/cloud-save-envelope.js");
 const read=path=>fs.readFileSync(new URL(`../${path}`,import.meta.url),"utf8");
 
 const functionsIndex=read("functions/index.js");
@@ -49,6 +50,16 @@ test("trusted Functions source parses and uses Firebase v2 callable owners",()=>
     assert.match(functionsIndex,/exports\.submitLegacyMigrationCandidate\s*=\s*onCall/);
     assert.match(functionsIndex,/requireUid\(request\)/);
     assert.match(functionsIndex,/serverUsers/);
+    assert.match(functionsIndex,/inspectExistingEnvelope/);
+    assert.match(functionsIndex,/const serverRevision=nextRevision\(envelope\)/);
+    assert.match(functionsIndex,/serverRevision,/);
+});
+
+test("Phase 2 cloud-save envelope has a distinct server-owned schema",()=>{
+    assert.equal(envelope.CLOUD_SAVE_ENVELOPE_SCHEMA_VERSION,2);
+    assert.equal(envelope.createEmptyEnvelope("uid-test",{serverTimestamp:true}).serverRevision,1);
+    assert.match(functionsIndex,/transaction\.create\(saveRef,createEmptyEnvelope\(uid,now\)\)/);
+    assert.doesNotMatch(functionsIndex,/serverRevision:\s*0/);
 });
 
 test("Functions runtime is pinned to the intended supported Node line",()=>{

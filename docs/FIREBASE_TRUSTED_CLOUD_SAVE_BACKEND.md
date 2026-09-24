@@ -1,6 +1,6 @@
 # Firebase Trusted Cloud Save Backend
 
-> 2026-09-19 Phase 1 update: both save-writing callables below now also require
+> 2026-09-24 Phase 2 update: both save-writing callables below require
 > the current game Session Credential. Firebase Auth alone is insufficient.
 > The permanent roadmap, transaction boundary, deployment and acceptance status
 > are maintained in [CLOUD_SAVE_IMPLEMENTATION_PROGRESS.md](CLOUD_SAVE_IMPLEMENTATION_PROGRESS.md).
@@ -12,6 +12,7 @@ This phase introduces the trusted server boundary for cloud-save migration witho
 Authoritative owners:
 
 - `functions/index.js`: Firebase Cloud Functions v2 callable entry points.
+- `functions/src/cloud-save-envelope.js`: sole owner of the public save envelope schema, revision and integrity policy.
 - `functions/src/cloud-save-policy.js`: validation and trust policy for legacy local-save migration candidates.
 - `js/firebase/firebase-cloud-save.js`: browser cloud-save client. It may read owner-visible Firestore data and call trusted Functions, but must not write official Firestore progression directly.
 - `firestore.rules`: web-client Firestore policy. Signed-in users may read their own `/users/{uid}` tree; browser create/update/delete stays denied.
@@ -21,7 +22,7 @@ Authoritative owners:
 
 ### `bootstrapCloudSave`
 
-Requires Firebase Authentication. The function creates or repairs the server-owned account/save metadata for the authenticated UID. The public player-visible path is:
+Requires Firebase Authentication and the current game Session Credential. The function creates the server-owned account/save envelope for the authenticated UID. It only performs the explicit Phase 1 skeleton migration; arbitrary corrupt documents fail closed instead of being silently repaired. The public player-visible path is:
 
 `/users/{uid}/saves/current`
 
@@ -30,6 +31,8 @@ Server-private metadata is stored under:
 `/serverUsers/{uid}`
 
 The browser cannot read or write `serverUsers` through Firestore Rules.
+
+The Phase 2 public envelope is schema Version 2. New envelopes begin at server-owned Revision 1. Repeating bootstrap is idempotent and does not touch the envelope timestamp or Revision. A trusted metadata mutation advances `serverRevision` inside the same transaction as the active Session check.
 
 ### `submitLegacyMigrationCandidate`
 

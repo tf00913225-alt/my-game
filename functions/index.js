@@ -7,6 +7,14 @@ const {FieldValue,Timestamp,getFirestore}=require("firebase-admin/firestore");
 const {setGlobalOptions}=require("firebase-functions/v2");
 const {HttpsError,onCall}=require("firebase-functions/v2/https");
 const {createSessionAuthority}=require("./src/session-authority");
+const {
+    CLOUD_SAVE_ENVELOPE_SCHEMA_VERSION,
+    CloudSaveEnvelopeError,
+    createEmptyEnvelope,
+    inspectExistingEnvelope,
+    nextRevision,
+    upgradeLegacyEnvelopePatch
+}=require("./src/cloud-save-envelope");
 
 const {
     CLOUD_SAVE_SCHEMA_VERSION,
@@ -57,7 +65,7 @@ function authProvider(request){
 
 function asHttpsError(error){
     if(error instanceof HttpsError){ return error; }
-    if(error instanceof CloudSavePolicyError){
+    if(error instanceof CloudSavePolicyError||error instanceof CloudSaveEnvelopeError){
         return new HttpsError(error.code||"invalid-argument",error.message);
     }
     console.error("Trusted Firebase backend failed:",error);
@@ -221,14 +229,10 @@ exports.bootstrapCloudSave=onCall(CALLABLE_OPTIONS,async(request)=>{
                 transaction.get(privateRef)
             ]);
 
-            if(saveSnapshot.exists){
-                const existingOwner=saveSnapshot.get("ownerUid");
-                if(existingOwner && existingOwner!==uid){
-                    throw new HttpsError("failed-precondition","Cloud-save owner mismatch.");
-                }
-            }
-
             const now=FieldValue.serverTimestamp();
+            const existingEnvelope=saveSnapshot.exists
+                ? inspectExistingEnvelope(saveSnapshot.data(),uid)
+                : null;
 
             transaction.set(userRef,{
                 schemaVersion:CLOUD_SAVE_SCHEMA_VERSION,
@@ -238,23 +242,9 @@ exports.bootstrapCloudSave=onCall(CALLABLE_OPTIONS,async(request)=>{
             },{merge:true});
 
             if(!saveSnapshot.exists){
-                transaction.set(saveRef,{
-                    schemaVersion:CLOUD_SAVE_SCHEMA_VERSION,
-                    ownerUid:uid,
-                    status:"awaiting_authoritative_migration",
-                    authoritativeStateReady:false,
-                    authoritativeStateVersion:0,
-                    serverRevision:0,
-                    migrationCandidateStatus:"none",
-                    createdAt:now,
-                    updatedAt:now
-                });
-            }else{
-                transaction.set(saveRef,{
-                    schemaVersion:CLOUD_SAVE_SCHEMA_VERSION,
-                    ownerUid:uid,
-                    updatedAt:now
-                },{merge:true});
+                transaction.create(saveRef,createEmptyEnvelope(uid,now));
+            }else if(existingEnvelope.kind==="legacy-phase1"){
+                transaction.update(saveRef,{...upgradeLegacyEnvelopePatch(),updatedAt:now});
             }
 
             transaction.set(privateRef,{
@@ -283,7 +273,11 @@ exports.bootstrapCloudSave=onCall(CALLABLE_OPTIONS,async(request)=>{
                     : false,
                 migrationCandidateStatus:saveSnapshot.exists
                     ? (saveSnapshot.get("migrationCandidateStatus")||"none")
-                    : "none"
+                    : "none",
+                envelopeSchemaVersion:CLOUD_SAVE_ENVELOPE_SCHEMA_VERSION,
+                serverRevision:existingEnvelope?.kind==="current"
+                    ? existingEnvelope.serverRevision
+                    : 1
             };
         });
 
@@ -327,17 +321,7 @@ exports.submitLegacyMigrationCandidate=onCall(CALLABLE_OPTIONS,async(request)=>{
                 );
             }
 
-            const existingOwner=saveSnapshot.get("ownerUid");
-            if(existingOwner && existingOwner!==uid){
-                throw new HttpsError("failed-precondition","Cloud-save owner mismatch.");
-            }
-
-            if(saveSnapshot.get("authoritativeStateReady")===true){
-                throw new HttpsError(
-                    "failed-precondition",
-                    "Authoritative cloud state already exists; legacy migration is closed."
-                );
-            }
+            const envelope=inspectExistingEnvelope(saveSnapshot.data(),uid);
 
             if(candidateSnapshot.exists){
                 const submittedAt=candidateSnapshot.get("submittedAt");
@@ -356,6 +340,7 @@ exports.submitLegacyMigrationCandidate=onCall(CALLABLE_OPTIONS,async(request)=>{
                 ? Number(candidateSnapshot.get("revision")||0)
                 : 0;
             const revision=Math.max(0,Math.floor(previousRevision))+1;
+            const serverRevision=nextRevision(envelope);
             const now=FieldValue.serverTimestamp();
 
             transaction.set(candidateRef,{
@@ -388,10 +373,11 @@ exports.submitLegacyMigrationCandidate=onCall(CALLABLE_OPTIONS,async(request)=>{
                 migrationCandidateFingerprint:candidate.fingerprint,
                 migrationCandidateGameSaveVersion:candidate.gameSaveVersion,
                 migrationCandidateByteLength:candidate.byteLength,
+                serverRevision,
                 updatedAt:now
             },{merge:true});
 
-            return {revision};
+            return {revision,serverRevision};
         });
 
         return {
@@ -403,7 +389,8 @@ exports.submitLegacyMigrationCandidate=onCall(CALLABLE_OPTIONS,async(request)=>{
             byteLength:candidate.byteLength,
             gameSaveVersion:candidate.gameSaveVersion,
             clientVersion,
-            revision:result.revision
+            revision:result.revision,
+            serverRevision:result.serverRevision
         };
     }catch(error){
         throw asHttpsError(error);

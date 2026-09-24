@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-24-cloud-save-phase2-envelope",
+  "baseBranch": "dev",
+  "baseSha": "e9a2f481d5a318050991d475201f359d694871cc",
+  "workBranch": "feature/cloud-save-phase2-envelope-20260924",
+  "title": "Cloud Save Phase 2 — Server-owned Save Envelope",
+  "status": "IMPLEMENTED",
+  "requirements": [
+    {
+      "id": "CLOUD-P2-SCHEMA-01",
+      "status": "IMPLEMENTED",
+      "requirement": "Cloud Save Envelope 由單一後端模組管理 ownerUid、schemaVersion、serverRevision、server timestamps 與狀態一致性。",
+      "evidence": ["functions/src/cloud-save-envelope.js", "tests/cloud-save-envelope.test.mjs"]
+    },
+    {
+      "id": "CLOUD-P2-BOOTSTRAP-02",
+      "status": "IMPLEMENTED",
+      "requirement": "bootstrapCloudSave 在同一 Session-protected transaction 建立 Revision 1 空 envelope；重複 bootstrap 不改 Revision，既有 Phase 1 精確骨架受控升級。",
+      "evidence": ["functions/index.js", "scripts/test-session-authority-emulator.mjs"]
+    },
+    {
+      "id": "CLOUD-P2-REVISION-03",
+      "status": "IMPLEMENTED",
+      "requirement": "migration candidate metadata 只在可信後端交易中變更，並原子遞增 serverRevision；Browser timestamp 不決定正式先後。",
+      "evidence": ["functions/index.js", "functions/src/session-authority.js", "scripts/test-session-authority-emulator.mjs"]
+    },
+    {
+      "id": "CLOUD-P2-FAIL-CLOSED-04",
+      "status": "IMPLEMENTED",
+      "requirement": "owner/schema/revision/timestamp/status 或 payload 邊界損壞時 fail closed；Phase 2 不接受 authoritative gameplay state，也不從本機覆蓋雲端。",
+      "evidence": ["functions/src/cloud-save-envelope.js", "tests/cloud-save-envelope.test.mjs", "tests/firebase-trusted-cloud-save-backend.test.mjs"]
+    },
+    {
+      "id": "CLOUD-P2-DEPLOY-05",
+      "status": "IMPLEMENTED",
+      "requirement": "專屬 CI 必跑 Envelope unit、trusted backend 與 Auth/Firestore/Functions emulator；只有 dev exact SHA 與 Repository checks 成功後才能部署既有受保護 Functions 與 Rules。",
+      "evidence": [".github/workflows/session-authority.yml", "scripts/test-session-authority-emulator.mjs"]
+    }
+  ],
+  "verification": {
+    "focusedTests": "PASS locally — 21/21 cloud envelope, trusted backend and session-client tests.",
+    "build": "PASS locally — npm run build:check.",
+    "emulator": "BLOCKED locally — runner only has Java 17; Firebase CLI 15.30.0 requires Java 21. The repository workflow installs Java 21 and must provide the authoritative emulator result.",
+    "repositoryChecks": "PENDING",
+    "firebaseDeploy": "PENDING — must deploy from merged latest dev SHA only.",
+    "browserQA": "NOT REQUIRED — no UI or startup behavior changed.",
+    "diffCheck": "PASS locally — git diff --check."
+  }
+}

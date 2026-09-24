@@ -80,12 +80,31 @@ const candidate={version:6,player:{id:"session-emulator-test",level:1},gold:0,sh
 await rejected("bootstrapCloudSave",a.idToken,{uid:x,session:sessionA},"SESSION_REVOKED");
 await rejected("submitLegacyMigrationCandidate",a.idToken,{uid:x,session:sessionA,save:candidate},"SESSION_REVOKED");
 assert.equal((await db.doc(`users/${x}/saves/current`).get()).exists,false);
-await invoke("bootstrapCloudSave",b.idToken,{uid:x,session:sessionB});
+const bootstrap=await invoke("bootstrapCloudSave",b.idToken,{uid:x,session:sessionB});
+assert.equal(bootstrap.envelopeSchemaVersion,2); assert.equal(bootstrap.serverRevision,1);
+const bootstrappedSave=await db.doc(`users/${x}/saves/current`).get();
+assert.equal(bootstrappedSave.get("schemaVersion"),2); assert.equal(bootstrappedSave.get("serverRevision"),1);
+const firstEnvelopeUpdate=bootstrappedSave.get("updatedAt").toMillis();
+const repeatedBootstrap=await invoke("bootstrapCloudSave",b.idToken,{uid:x,session:sessionB});
+assert.equal(repeatedBootstrap.created,false); assert.equal(repeatedBootstrap.serverRevision,1);
+const repeatedSave=await db.doc(`users/${x}/saves/current`).get();
+assert.equal(repeatedSave.get("serverRevision"),1);
+assert.equal(repeatedSave.get("updatedAt").toMillis(),firstEnvelopeUpdate);
 await invoke("submitLegacyMigrationCandidate",b.idToken,{uid:x,session:sessionB,save:candidate});
 assert.equal((await db.doc(`users/${x}/saves/current`).get()).get("authoritativeStateReady"),false);
+assert.equal((await db.doc(`users/${x}/saves/current`).get()).get("serverRevision"),2);
 await rejected("protectedTest",b.idToken,{uid:x,session:{...sessionB,credential:"z".repeat(43)}},"SESSION_INVALID");
 const yUser=await login("accounts:signUp",{email:"session-y@example.test",password});
 const y=yUser.localId,sessionY=await invoke("createGameSession",yUser.idToken,{uid:y});
+await db.doc(`users/${y}/saves/current`).set({
+    schemaVersion:1,ownerUid:y,status:"awaiting_authoritative_migration",
+    authoritativeStateReady:false,authoritativeStateVersion:0,serverRevision:0,
+    migrationCandidateStatus:"none",createdAt:Timestamp.now(),updatedAt:Timestamp.now()
+});
+const upgraded=await invoke("bootstrapCloudSave",yUser.idToken,{uid:y,session:sessionY});
+assert.equal(upgraded.created,false); assert.equal(upgraded.envelopeSchemaVersion,2); assert.equal(upgraded.serverRevision,1);
+const upgradedSave=await db.doc(`users/${y}/saves/current`).get();
+assert.equal(upgradedSave.get("schemaVersion"),2); assert.equal(upgradedSave.get("serverRevision"),1);
 await rejected("protectedTest",yUser.idToken,{uid:x,session:sessionB},"SESSION_INVALID");
 await rejected("protectedTest",yUser.idToken,{uid:y,session:{...sessionB,uid:y}},"SESSION_INVALID");
 assert.equal((await invoke("protectedTest",yUser.idToken,{uid:y,session:sessionY})).uid,y);
