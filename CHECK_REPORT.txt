@@ -1,80 +1,85 @@
 《my-game 專案檢查報告》
 
-版本：V173.70
-更新日期：2026-09-22
+版本：V173.72
+更新日期：2026-09-24
 正式發布分支：main
-V173.70 正式發布 SHA：25c34a2dbbfce4600691df959cc2823eff80aeab
-正式發布 Tree：94aa752b41b914c0710f6dda0ebe73942b2256e3
-Game / Cache Version：V173.70 / 173.70
+V173.72 功能正式發布 SHA：871e7ff9cb3219ee6ce499eedbed95a89af35431
+正式發布 Tree：2bd6186bb9bb5fe970574c1dce03c4d7adeea5d3
+Game / Cache Version：V173.72 / 173.72
 
-本文件是 V173.70 正式發布後的健康基線。後續若只有純文件收尾提交，不得把文件提交 SHA 誤當成 V173.70 功能發布 SHA；正式功能發布證據仍以 PR #503 與 main@25c34a2dbbfce4600691df959cc2823eff80aeab 為準。
+本文件是 V173.72 正式發布後的健康基線。後續純文件 Closeout、main→dev 回流或其他不含 Runtime 的提交不得被誤認為新的 V173.72 功能發布 SHA；本次功能發布證據固定以 PR #537 與 main@871e7ff9cb3219ee6ce499eedbed95a89af35431 為準。
 
 一、正式 main CI 實際驗證
 
-- GitHub Actions CI run：35683542056，SUCCESS。
-- JavaScript syntax：292 / 292 通過。
-- Node unit／integration suites：203 / 203 通過。
-- Static resources：383 個本機資源目標全部存在。
-- HTML IDs：252 個，無重複。
-- Deterministic production build：32 個 build 產物全部通過內容雜湊核對。
-- Release source coherence：V173.70 / cache 173.70。
-- Requirements：11 / 11 VERIFIED。
-- Release Update Notification mobile browser QA：通過。
-- Fixed Slot battlefield 9:16 mobile browser QA：通過。
-- Adventure V1 mobile browser QA：通過。
-- Account-first cold／warm mobile browser QA：通過。
-- Skill progression mobile browser QA：通過。
-- Relic progression mobile browser QA：通過。
-- main CI 的 exact-candidate real battle mobile browser QA 步驟為 skipped，不得記為 PASS。
-- Git whitespace 與 unresolved conflict markers：通過。
+- dev → main Release PR：#537，MERGED / CLOSED。
+- Final main candidate CI run：35940764204，SUCCESS。
+- main push CI run：35941657759，SUCCESS。
+- Node unit／integration suites：209 / 209 PASS。
+- production build synchronization：SUCCESS。
+- Release Update Notification mobile browser QA：SUCCESS。
+- Fixed Slot battlefield 9:16 mobile browser QA：SUCCESS。
+- Adventure V1 mobile browser QA：SUCCESS。
+- Account-first cold／warm mobile browser QA：SUCCESS。
+- Skill progression mobile browser QA：SUCCESS。
+- Relic progression mobile browser QA：SUCCESS。
+- Static resources、duplicate HTML IDs、release-loader integrity、Release Gate、Git whitespace：SUCCESS。
+- main push 的 exact-candidate real battle mobile browser QA 步驟為 skipped；不得把該 skipped 步驟記為獨立 PASS。
 
-二、DEV 精確 SHA 與線上驗證
+二、DEV 精確 SHA 與戰鬥 Live QA
 
-- 發布前最新 dev：bc3313ad396b934bc0972531d1ebbf6178cac548。
-- dev Tree：94aa752b41b914c0710f6dda0ebe73942b2256e3，與正式 main V173.70 Tree 完全一致。
-- DEV CI／部署 run：35682973128，SUCCESS。
-- exact-SHA deployment：SUCCESS。
-- deployed Game Version / Cache Version verification：SUCCESS。
-- deployed Battle Layout / VFX Live QA：SUCCESS。
-- 因 main 正式 CI 的 real-battle 步驟為 skipped，本段 DEV 線上 Live QA 是戰鬥／VFX 的可執行部署證據；不得把 skipped 誤寫成 main PASS。
+- PR #540 已 MERGED / CLOSED，stale/full-suite contract 與確認的 Runtime regression 已完成收斂。
+- PR #540 merge 後 Runtime dev SHA：6ef30c38ecba00d059547d119fc6fec06365f9e6。
+- dev push CI run：35939891769，SUCCESS。
+- DEV exact-SHA deployment job：107445532893，SUCCESS。
+- exact deployed SHA：6ef30c38ecba00d059547d119fc6fec06365f9e6。
+- deployed Game Version / Cache Version：173.72 / 173.72。
+- deployed Battle layer/audio live mobile QA：PASS。
+- PR #544 只修改 release/requirement-batches/2026-09-23-v17372-main-release.json，沒有修改 Runtime。
+- Final dev：b0658abdda6a54315243643a2e8d9577ad244165。
+- Final dev Tree：2bd6186bb9bb5fe970574c1dce03c4d7adeea5d3，與 V173.72 功能正式發布 main Tree 完全一致。
 
-三、正式 Pages 部署
+三、正式 GitHub Pages production 部署
 
-- GitHub Pages run：35683540344，SUCCESS。
-- build：SUCCESS。
-- deploy：SUCCESS。
-- 正式部署來源：main@25c34a2dbbfce4600691df959cc2823eff80aeab。
-- 正式 release/release.json：version 173.70、cacheVersion 173.70、status READY。
-- release/release-update.json 已為 V173.70 正式玩家公告來源。
+- GitHub Pages run：35941650616，SUCCESS。
+- build job：107450616897，SUCCESS。
+- deploy job：107450848001，SUCCESS。
+- report-build-status job：107450848039，SUCCESS。
+- Pages deploy payload 的 pages_build_version：871e7ff9cb3219ee6ce499eedbed95a89af35431。
+- Pages deployment：Created deployment for 871e7ff9cb3219ee6ce499eedbed95a89af35431，後續 Reported success。
+- 正式 production URL：https://tf00913225-alt.github.io/my-game/
+- 正式部署來源與 V173.72 功能 main HEAD 完全一致。
+- release/release.json：version 173.72、cacheVersion 173.72、status READY。
+- release/release-update.json：releaseVersion V173.72、publicNotice true。
+- 本環境未另做一份獨立 production 登入／實戰瀏覽器 traversal；production Battle 基本驗證採「精確 production SHA + 與已通過 deployed Battle Live QA 的 Runtime 內容一致 + main Fixed Slot browser QA SUCCESS」作為證據，並明確保留 main exact-candidate real-battle step 為 skipped。
 
-四、本次發布阻塞與修復結果
+四、V173.72 Release Requirement 結果
 
-- 先前 main 候選依 Full Node Suite 逐步暴露多個過期版本測試契約；皆屬 tests-only stale release metadata contract，未藉由放寬測試掩蓋 production runtime 錯誤。
-- V173.16、V173.17、V173.2 與其餘殘留 V173.69 版本斷言已收斂為讀取 release/release.json 或目前正式 V173.70。
-- 最終 main CI 已實際完成 203 / 203 Node suites；目前沒有 V173.70 發布阻塞。
-- 四個已永久退休的損壞怪物 WebP 維持退休，不列為本次阻塞。
-- 未來金幣副本三張尚未正式提供 file_id 的立繪不列為本次阻塞。
+- REL-01：VERIFIED。
+- REL-02：VERIFIED。
+- REL-03：VERIFIED。
+- REL-04：VERIFIED。
+- REL-05：VERIFIED。
+- overallStatus：VERIFIED。
+- mergedMainCommit：871e7ff9cb3219ee6ce499eedbed95a89af35431。
+- V173.72 Release Requirement：5 / 5 VERIFIED。
 
-五、發布後分支收尾規則
+五、Repository Closeout 基準
 
-1. main／dev 的版本、測試與資源數字必須以最新實際 CI／build 輸出更新。
-2. CI skipped 只能記為未執行，不得寫成 PASS。
-3. 正式發布完成後，必須依既有 Release Contract 將 main 發布歷史回流到 dev；不得留下 dev／main 長期 diverged。
-4. 回流只能走 PR／既有保護流程，不得直接改寫 dev、rebase 或 force push。
-5. assets raw file count、怪物立繪 queue 數量與規劃數量不可互相混用。
-6. 戰鬥核心 renderBattle 多層 wrapper 技術債已於 dev PR #507 收斂完成：`js/00-main.js::renderBattle()` 為唯一 Owner，其餘責任改為固定順序 hook；main V173.70 尚未包含此 dev-only 重構，後續不得重新新增 renderBattle wrapper。
-7. Chrome 模擬尺寸 QA 不取代 S23 Ultra 實機驗收。
+- PR #537：MERGED / CLOSED。
+- PR #540：MERGED / CLOSED。
+- PR #544：MERGED / CLOSED。
+- fix/v17372-stale-battle-status-tests-20260923 對 dev ahead_by = 0，沒有獨立有效 commit；可安全清理。
+- release/v17372-final-dev-verification-20260924 對 dev ahead_by = 0，沒有獨立有效 commit；可安全清理。
+- V173.72 功能發布當下 main Tree 與 dev Tree 均為 2bd6186bb9bb5fe970574c1dce03c4d7adeea5d3，有效內容收斂。
+- 本次 post-release documentation-only PR 若合入 main，必須再以受控 PR 回流 dev；禁止 rebase、force push 或直接覆寫 main/dev。
+- main、dev、assets-library 永久保留。
 
 結論：
-- 正式版本：V173.70。
-- V173.70 正式發布 SHA：25c34a2dbbfce4600691df959cc2823eff80aeab。
-- Game / Cache Version：V173.70 / 173.70。
-- Requirements：11 / 11 VERIFIED。
-- 正式 main CI：292 / 292 syntax、203 / 203 Node suites、383 resources、252 HTML IDs、32 deterministic build assets。
-- 正式 main CI 與 GitHub Pages deployment 均 SUCCESS。
-- PR #505 已完成 V173.70 發布當下的 main→dev 回流。
-- V173.70 Release Lifecycle（發布生命週期）正式結案，此結論不因後續 dev 開發而改變。
-- 後續 dev 已完成 renderBattle Owner P1：PR #507 合併後 dev@07ce72ac6fc602ac4a31809c26d7e4e531d4d1b1。
-- renderBattle P1 Full Node Suite：203 / 203 PASS；PR #507 candidate CI、dev push CI、DEV exact-SHA deployment 與 deployed battle/VFX Live QA 均 SUCCESS。
-- 目前 dev behind main = 0；dev 已領先 main，main / dev 實際檔案內容不再相同，原因是 V173.70 發布後已有文件收尾與已驗證 dev-only 重構。
-- 正式 main 仍為 V173.70；不得把 dev-only renderBattle P1 誤寫成已發布 main。
+- V173.72 功能正式發布 SHA：871e7ff9cb3219ee6ce499eedbed95a89af35431。
+- production deployment SHA：871e7ff9cb3219ee6ce499eedbed95a89af35431，已由 GitHub Pages deploy job 直接驗證。
+- Game / Cache Version：V173.72 / 173.72。
+- Release Notice：V173.72。
+- Full Node Suite：209 / 209 PASS。
+- REL-01 ～ REL-05：5 / 5 VERIFIED。
+- overallStatus：VERIFIED。
+- V173.72 production release verification 已完成；剩餘動作僅為本文件與 Requirement Batch 的 documentation-only PR、受控 main→dev 文件回流，以及已完成臨時分支的安全清理。
