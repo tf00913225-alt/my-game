@@ -142,8 +142,9 @@ function formulaRuntime(){
     const statusText=sourceFunction(statusVfx,"statusEffectText");
     assert.doesNotMatch(statusText,/凍傷.*無法使用技能/);
     assert.match(statusText,/frostbite[\s\S]*?傷害 -25%[\s\S]*?最終閃躲 -25個百分點[\s\S]*?最終異常狀態抗性 -25個百分點/);
-    const finishDuration=sourceFunction(progression,"finishDurationAction");
+    const finishDuration=sourceFunction(main,"finishBattleDurationAction");
     assert.match(finishDuration,/v143SyncStatusVisualEffects\("?(?:false)?"?\)|v143SyncStatusVisualEffects\(false\)/);
+    assert.doesNotMatch(progression,/finishDurationAction|FourSymbolsDurationLifecycle=Object\.freeze/);
 }
 
 {
