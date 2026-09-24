@@ -139,40 +139,9 @@ test("Rage supplies separate critical chance and critical-damage values to the l
     assert.deepEqual([result.chance,result.multiplier],[20,1.9]);
 });
 
-function emperorContext(statuses=[{type:"burn",turnsLeft:2}]){
-    const boss={name:"極帝天尊",alive:true,hp:300,maxHP:500,sp:200,maxSP:200,agility:100,statusEffects:statuses.slice(),v141Abyss:true};
-    const ally={name:"天兵天將",alive:true,hp:100,maxHP:500,sp:10,maxSP:200,agility:80,statusEffects:statuses.slice(),v141Abyss:true};
-    const shields=[];
-    const context=load({
-        monsters:[boss,ally],currentBattleMonsters:[0,1],
-        v141HealMonsterPreservingShield(monster,amount){ const before=monster.hp; monster.hp=Math.min(monster.maxHP,monster.hp+amount); return monster.hp-before; },
-        v141ApplyMonsterShield(monster,amount,turns){ monster.v141Shield={remaining:amount,turnsLeft:turns,baseMaxHP:monster.maxHP}; shields.push([monster.name,amount,turns]); },
-        showMonsterSkillNameBadge(){},showMonsterHit(){},addBattleLog(){},updateUI(){},finishPlayerAction(){},
-        v141PlayCardEffect(){},document:bareDocument()
-    });
-    return {context,boss,ally,shields};
-}
-
-test("Extreme Emperor's three Light skills use the exact final values",()=>{
-    let state=emperorContext([]);
-    assert.equal(state.context.v152ResolveExtremeEmperorAction(0,"yuanXiangGuangMing"),true);
-    assert.equal(state.ally.hp,250);
-    assert.equal(state.ally.sp,65);
-
-    state=emperorContext([]);
-    assert.equal(state.context.v152ResolveExtremeEmperorAction(0,"yuanGuangShield"),true);
-    assert.deepEqual(state.shields,[["極帝天尊",100,2],["天兵天將",100,2]]);
-
-    state=emperorContext();
-    assert.equal(state.context.v152ResolveExtremeEmperorAction(0,"yuanZuBlessing",false),true);
-    assert.equal(state.ally.statusEffects.length,1);
-    assert.equal(state.ally.agility,120);
-    assert.equal(state.ally.v142AgilityBlessing.turnsLeft,2);
-
-    state=emperorContext();
-    assert.equal(state.context.v152ResolveExtremeEmperorAction(0,"yuanZuBlessing",true),true);
-    assert.equal(state.ally.statusEffects.length,0);
-    assert.equal(state.ally.agility,120);
+test("V152 no longer mutates or dispatches Extreme Emperor skills",()=>{
+    assert.doesNotMatch(source,/v152ResolveExtremeEmperorAction|function resolveExtremeEmperorAction/);
+    assert.doesNotMatch(source,/v141SupportSkillIds=Array\.from|monster\.name==="極帝天尊"/);
 });
 
 test("Frostbite no longer adds a stale Skill-command prohibition",()=>{
