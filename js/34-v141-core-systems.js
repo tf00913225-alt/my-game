@@ -169,7 +169,10 @@
             const skill=typeof skillDatabase!=="undefined" ? skillDatabase[id] : null;
             return !!(
                 skill &&
-                (skill.category==="physical" || skill.category==="magic")
+                (skill.category==="physical" || skill.category==="magic") &&
+                (typeof window.v144IsMonsterSkillElementLegal==="function"
+                    ?window.v144IsMonsterSkillElementLegal(monster,id)
+                    :!!skill.element&&skill.element===monster.element)
             );
         });
         const limit=getMonsterSkillCarryLimit(monster.level);
@@ -537,10 +540,16 @@
             const max=ally.v141Shield?ally.v141Shield.baseMaxHP:ally.maxHP;
             return Math.max(0,ally.hp-shield)<max;
         });
-        const healSkill=skillDatabase.yuanXiangGuangMing;
-        const shieldSkill=skillDatabase.yuanGuangShield;
+        const supportIds=typeof window.v144GetLegalMonsterSkillIds==="function"
+            ?window.v144GetLegalMonsterSkillIds(monster,"support")
+            :(monster.v141SupportSkillIds||[]).filter(id=>{
+                const skill=skillDatabase[id];
+                return !!(skill&&skill.element&&skill.element===monster.element);
+            });
+        const healSkill=supportIds.includes("yuanXiangGuangMing")?skillDatabase.yuanXiangGuangMing:null;
+        const shieldSkill=supportIds.includes("yuanGuangShield")?skillDatabase.yuanGuangShield:null;
 
-        if(injured.length>0 && monster.sp>=healSkill.spCost){
+        if(healSkill&&injured.length>0 && monster.sp>=healSkill.spCost){
             monster.sp-=healSkill.spCost;
             showMonsterSkillNameBadge(healSkill.name,"light",monsterIndex);
             let total=0;
@@ -551,7 +560,7 @@
             return true;
         }
 
-        if(allies.some(ally=>getMonsterShieldRemaining(ally)<=0) && monster.sp>=shieldSkill.spCost){
+        if(shieldSkill&&allies.some(ally=>getMonsterShieldRemaining(ally)<=0) && monster.sp>=shieldSkill.spCost){
             monster.sp-=shieldSkill.spCost;
             showMonsterSkillNameBadge(shieldSkill.name,"light",monsterIndex);
             allies.forEach(ally=>applyMonsterShield(ally,200,2));
@@ -567,8 +576,11 @@
         const originalProcessSingleMonsterAttack=processSingleMonsterAttack;
         processSingleMonsterAttack=function(monsterIndex,token){
             const monster=monsters[monsterIndex];
+            if(monster&&typeof window.v144NormalizeMonsterSkillLoadout==="function"){
+                window.v144NormalizeMonsterSkillLoadout(monster);
+            }
             if(
-                monster&&monster.v141Abyss&&
+                monster&&Array.isArray(monster.v141SupportSkillIds)&&monster.v141SupportSkillIds.length>0&&
                 typeof window.v141TryMonsterSpecialAction==="function"
             ){
                 const handled=window.v141TryMonsterSpecialAction(monsterIndex,token);
