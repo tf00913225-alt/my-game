@@ -9,7 +9,7 @@
 | 1 | Single Active Session（單一有效工作階段權威） | COMPLETE / 5/5 VERIFIED |
 | 2 | Cloud Save Skeleton（雲端存檔骨架） | COMPLETE / 6/6 VERIFIED |
 | 3 | UID Local Isolation / Login Loading（本機隔離／登入載入） | COMPLETE / 6/6 VERIFIED |
-| 4 | General Progress Migration（一般進度遷移） | NOT STARTED |
+| 4 | General Progress Migration（一般進度遷移） | IN PROGRESS / 0/6 VERIFIED |
 | 5 | High-value Data Backend Authority（高價值資料後端權威） | NOT STARTED |
 | 6 | Operation ID / Idempotency / Atomic Transaction | NOT STARTED |
 | 7 | Audit / Economy Ledger（稽核／經濟帳本） | NOT STARTED |
@@ -24,6 +24,7 @@
 - Phase 1 — Single Active Session Authority：**COMPLETE / 5/5 VERIFIED**。
 - Phase 2 — Cloud Save Skeleton：**COMPLETE / 6/6 VERIFIED**。PR #553／#554／#555 已依序合併 `dev`；最新驗收部署為 `dev@b037ced9dad9d1cf67d9aacccb4e064c74a135e1`。Repository checks、Java 21 emulator、DEV exact-SHA、Firebase deploy 與真實 Google 帳號手機 live envelope 驗證均 SUCCESS。
 - Phase 3 — UID Local Isolation / Login Loading：**COMPLETE / 6/6 VERIFIED**。PR #557 Repository checks run `35999834624` SUCCESS，合併 `dev@eed8dec359eff34727381adfbfa50b7c2ea09bd3`；DEV release manifest 與 hashed Boot Core 已讀回同一 SHA／Phase 3 owner。使用者以真實手機完成 Google → 訪客 → Google 驗收：訪客未看見 Google 角色／資料，重新登入 Google 後原角色／資料正常恢復。
+- Phase 4 — General Progress Migration：**IN PROGRESS / 0/6 VERIFIED**。2026-09-24 從 `dev@d8986afa62f0c1f2646fad1f4d1ca73b2be389f6` 建立 `feature/cloud-save-phase4-general-progress-20260924`。先固定欄位分類、安全遷移及驗收契約；沒有把本機資料上傳或寫入正式雲端，沒有開啟完整存檔同步。詳見 `docs/CLOUD_SAVE_PHASE4_CONTRACT.md` 及本階段 Requirement Batch。
 - 起始基準：GitHub 最新 `dev@7dd60dcddc9334902e058123a6084a93353e5943`，2026-09-19 重新 fetch 核對。
 - 原實作分支：`feature/cloud-session-authority-phase1-20260919`，當時只整合 `dev`。本次結案分支：`docs/cloud-session-phase1-closeout-20260919`，基準為重新核對的 `dev@342ef104fa2897f5ae5c3249e0c75c9efca3e762`；使用者已授權完成結案後經受保護 PR 發布 main。禁止直接修改 dev／main、rebase、force push。
 - 官方版本／cache version 維持 `173.65`，沒有升版。
