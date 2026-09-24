@@ -10,7 +10,7 @@
     {"id":"CLOUD-P4-FIELDS-01","status":"IMPLEMENTED","requirement":"逐欄盤點一般進度和獎勵／經濟耦合，僅允許經審核欄位進入 Phase 4 權威資料。","evidence":["docs/CLOUD_SAVE_PHASE4_CONTRACT.md","functions/src/cloud-preferences.js","tests/cloud-save-envelope.test.mjs"]},
     {"id":"CLOUD-P4-SERVER-02","status":"IMPLEMENTED","requirement":"後端以有效 session、UID、schema、expected serverRevision 在單一交易中驗證與寫入，拒絕整包本機值及跨 UID／衝突提交。","evidence":["functions/index.js::saveCloudPreferences","functions/src/session-authority.js::runProtected","scripts/test-session-authority-emulator.mjs"]},
     {"id":"CLOUD-P4-CLIENT-03","status":"IMPLEMENTED","requirement":"同 UID 本機候選與雲端讀取分離；登入、登出、離線與回線均不靜默覆蓋現有資料。","evidence":["js/firebase/firebase-cloud-save.js::saveLocalAutoBattlePreferences","js/firebase/firebase-auth-ui.js","tests/firebase-trusted-cloud-save-backend.test.mjs"]},
-    {"id":"CLOUD-P4-RESTORE-04","status":"IMPLEMENTED","requirement":"已驗證的允許欄位能在 DEV 重新登入後安全恢復，局部資料絕不偽裝為完整可玩角色。","evidence":["js/00-main.js::restoreAutoBattlePreferences","js/firebase/firebase-auth-ui.js::restoreCloudPreferences"]},
+    {"id":"CLOUD-P4-RESTORE-04","status":"IMPLEMENTED","requirement":"已驗證的允許欄位能在 DEV 重新登入後安全恢復，局部資料絕不偽裝為完整可玩角色。","evidence":["js/00-main.js::restoreAutoBattlePreferences","js/firebase/firebase-auth-ui.js::restoreCloudPreferences","tests/cloud-save-phase4-preferences.test.mjs"]},
     {"id":"CLOUD-P4-QA-05","status":"TODO","requirement":"emulator、既有 Boot browser QA 及手機 DEV 覆蓋重複操作、兩裝置 revision 衝突、不同 UID、離線與獎勵不可重領。","evidence":[]},
     {"id":"CLOUD-P4-CLOSEOUT-06","status":"TODO","requirement":"PR→dev、必要 CI／後端部署、DEV exact SHA 與 Game／Cache 一致並完成真手機驗收；main 不修改。","evidence":[]}
   ],
