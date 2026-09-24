@@ -314,9 +314,14 @@ async function restoreCloudPreferences(){
         if(!cloud.exists||cloud.data?.ownerUid!==user.uid||cloud.data.preferencesVersion!==1||!cloud.data.preferences){
             throw new Error("此 UID 尚無可取回的自動戰鬥設定。");
         }
-        if(!window.confirm("只以雲端的自動戰鬥設定取代本機三名角色的對應設定；角色、金幣、背包和獎勵保持原樣。確定嗎？")){
+        if(typeof window.rpgConfirm!=="function"){ throw new Error("CONFIRM_UNAVAILABLE"); }
+        const confirmed=await window.rpgConfirm("只以雲端的自動戰鬥設定取代本機三名角色的對應設定；角色、金幣、背包和獎勵保持原樣。確定嗎？",{title:"取回雲端設定",confirmText:"取回",cancelText:"返回"});
+        if(!confirmed){
             state={...state,cloudPreferencesTest:"已取消取回；本機設定未修改。"};
             return;
+        }
+        if(api.getUser?.()?.uid!==user.uid||state.mode!=="READY"&&state.mode!=="OFFLINE_READY"){
+            throw new Error("ACCOUNT_CHANGED");
         }
         const latest=await api.resolveCloudSave(user);
         if(latest.data?.serverRevision!==cloud.data.serverRevision||latest.data?.ownerUid!==user.uid){
