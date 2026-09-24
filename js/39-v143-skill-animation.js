@@ -686,7 +686,9 @@
             (side!=="monster"||entity.alive!==false)&&
             hasTimedEffect(entity,"stealthSkill")
         );
-        if(card&&card.classList){ card.classList.toggle("v143-unit-stealthed",stealthActive); }
+        if(card&&card.classList&&typeof card.classList.toggle==="function"){
+            card.classList.toggle("v143-unit-stealthed",stealthActive);
+        }
         const baseBodyTypes=activeBodyStatusTypesForLayer(
             entity,side,index,STATUS_VISUAL_LAYERS.HARD_CONTROL_BASE
         );
