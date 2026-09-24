@@ -68,6 +68,8 @@ Game / Cache Version：V173.72 / 173.72
 - PR #537：MERGED / CLOSED。
 - PR #540：MERGED / CLOSED。
 - PR #544：MERGED / CLOSED。
+- PR #546：MERGED / CLOSED，完成 V173.72 post-release documentation closeout。
+- PR #547：MERGED / CLOSED，已將 Closeout 文件受控回流 dev。
 - fix/v17372-stale-battle-status-tests-20260923 對 dev ahead_by = 0，沒有獨立有效 commit；可安全清理。
 - release/v17372-final-dev-verification-20260924 對 dev ahead_by = 0，沒有獨立有效 commit；可安全清理。
 - V173.72 功能發布當下 main Tree 與 dev Tree 均為 2bd6186bb9bb5fe970574c1dce03c4d7adeea5d3，有效內容收斂。
@@ -76,10 +78,13 @@ Game / Cache Version：V173.72 / 173.72
 
 結論：
 - V173.72 功能正式發布 SHA：871e7ff9cb3219ee6ce499eedbed95a89af35431。
-- production deployment SHA：871e7ff9cb3219ee6ce499eedbed95a89af35431，已由 GitHub Pages deploy job 直接驗證。
+- V173.72 功能 production deployment SHA：871e7ff9cb3219ee6ce499eedbed95a89af35431，已由 GitHub Pages deploy job 直接驗證。
+- Production live QA run 35942239371：SUCCESS；直接 checkout exact main@871e7ff9cb3219ee6ce499eedbed95a89af35431，正式 URL 的 Game / Cache 173.72 / 173.72、Release Notice V173.72 與 Battle layer/audio live mobile QA 全部 PASS；artifact 10785715762。
 - Game / Cache Version：V173.72 / 173.72。
 - Release Notice：V173.72。
 - Full Node Suite：209 / 209 PASS。
 - REL-01 ～ REL-05：5 / 5 VERIFIED。
 - overallStatus：VERIFIED。
-- V173.72 production release verification 已完成；剩餘動作僅為本文件與 Requirement Batch 的 documentation-only PR、受控 main→dev 文件回流，以及已完成臨時分支的安全清理。
+- V173.72 production release verification、post-release documentation PR 與 main→dev 文件回流均已完成。
+- PR #545 的 production live QA 證據已完整吸收到正式 Closeout 文件；其 Runtime 變更為 0，可在確認本 follow-up 合併後安全關閉。
+- 已完成臨時分支均已證明 ahead_by = 0／無獨立有效內容；Git ref 實際刪除屬 Repository Hygiene，禁止因此改寫 main/dev 或重跑 V173.72 功能發布。
