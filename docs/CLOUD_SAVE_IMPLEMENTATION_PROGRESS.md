@@ -8,7 +8,7 @@
 | --- | --- | --- |
 | 1 | Single Active Session（單一有效工作階段權威） | COMPLETE / 5/5 VERIFIED |
 | 2 | Cloud Save Skeleton（雲端存檔骨架） | COMPLETE / 6/6 VERIFIED |
-| 3 | UID Local Isolation / Login Loading（本機隔離／登入載入） | IN PROGRESS / 6/6 IMPLEMENTED |
+| 3 | UID Local Isolation / Login Loading（本機隔離／登入載入） | COMPLETE / 6/6 VERIFIED |
 | 4 | General Progress Migration（一般進度遷移） | NOT STARTED |
 | 5 | High-value Data Backend Authority（高價值資料後端權威） | NOT STARTED |
 | 6 | Operation ID / Idempotency / Atomic Transaction | NOT STARTED |
@@ -23,7 +23,7 @@
 
 - Phase 1 — Single Active Session Authority：**COMPLETE / 5/5 VERIFIED**。
 - Phase 2 — Cloud Save Skeleton：**COMPLETE / 6/6 VERIFIED**。PR #553／#554／#555 已依序合併 `dev`；最新驗收部署為 `dev@b037ced9dad9d1cf67d9aacccb4e064c74a135e1`。Repository checks、Java 21 emulator、DEV exact-SHA、Firebase deploy 與真實 Google 帳號手機 live envelope 驗證均 SUCCESS。
-- Phase 3 — UID Local Isolation / Login Loading：**IN PROGRESS / 6/6 IMPLEMENTED**。工作分支 `feature/cloud-save-phase3-uid-local-isolation-20260924` 基於 `dev@9a7b702303d22a20f80a20ca732a6953003b38a1`；尚待 PR Repository checks、DEV exact-SHA 部署與同裝置 UID A→登出→UID B 實際驗收，未標記 COMPLETE。
+- Phase 3 — UID Local Isolation / Login Loading：**COMPLETE / 6/6 VERIFIED**。PR #557 Repository checks run `35999834624` SUCCESS，合併 `dev@eed8dec359eff34727381adfbfa50b7c2ea09bd3`；DEV release manifest 與 hashed Boot Core 已讀回同一 SHA／Phase 3 owner。使用者以真實手機完成 Google → 訪客 → Google 驗收：訪客未看見 Google 角色／資料，重新登入 Google 後原角色／資料正常恢復。
 - 起始基準：GitHub 最新 `dev@7dd60dcddc9334902e058123a6084a93353e5943`，2026-09-19 重新 fetch 核對。
 - 原實作分支：`feature/cloud-session-authority-phase1-20260919`，當時只整合 `dev`。本次結案分支：`docs/cloud-session-phase1-closeout-20260919`，基準為重新核對的 `dev@342ef104fa2897f5ae5c3249e0c75c9efca3e762`；使用者已授權完成結案後經受保護 PR 發布 main。禁止直接修改 dev／main、rebase、force push。
 - 官方版本／cache version 維持 `173.65`，沒有升版。
@@ -83,14 +83,17 @@
 
 ## C. Completed Work（已實作／驗證證據）
 
-### Phase 3 UID Local Isolation / Login Loading（2026-09-24，IN PROGRESS / 6/6 IMPLEMENTED）
+### Phase 3 UID Local Isolation / Login Loading（2026-09-24，COMPLETE / 6/6 VERIFIED）
 
 - Startup State Machine 新增唯一帳號轉換入口 `reloadForAccountTransition()`。登出或 Auth observer 發現 UID 改變時，先遞增 `transitionToken` 丟棄舊 save resolution、解除 active save owner、移除 session resume marker、隱藏創角與 gameplay，最後完整 reload。
 - 完整 reload 是既有 sidecar 初始化模型的正式收斂方式：`element-box-state`、daily dungeon、EXP、progress、announcement、task、abyss、shop 與 bulk-sell 等模組會在新 document 依當前 active UID 重建 key，不在舊 UID runtime 內直接 hydrate 新帳號。
 - Canonical save 與 metadata 仍由 `account-save-repository.js` 驗證 `ownerUid`；只有 active UID 可寫。Cloud read 失敗只在該 Firebase UID 的 `readForUid()` 回傳完整 ready save 時進 `OFFLINE_READY`，否則維持 ERROR。
 - Anonymous 訪客 UID 不會自動搬到 Google／Email UID；唯一 legacy migration 仍要求使用者明確確認。本階段沒有一般 gameplay cloud write、Envelope schema 變更、版本升級、經濟或戰鬥修改。
 - 新增 `tests/cloud-save-phase3-uid-local-isolation.test.js`，並把它連同 account ownership／auth-before-creation 加入 PR→dev 必跑 CI；既有 Boot browser QA 的 UID A→登出→UID B 流程將驗證 reload 後角色、金幣、EXP、背包、裝備及 metadata 均屬 UID B，UID A 資料保持不變。
-- Requirement Batch：`release/requirement-batches/2026-09-24-cloud-save-phase3-uid-local-isolation.json`。目前只標記 IMPLEMENTED；尚未取得 PR CI、DEV deployment 與真實手機帳號切換證據，不得宣稱 VERIFIED／COMPLETE。
+- PR #557 已以 candidate `9ad52534cf154d4f3a470afc8f71eb17a8c19371` 通過 Repository checks run `35999834624`，包含 Phase 3 targeted regressions 與既有 account-first Boot browser UID A→登出→UID B 隔離案例；合併 SHA 為 `eed8dec359eff34727381adfbfa50b7c2ea09bd3`。
+- DEV `release-manifest.json` 已讀回 exact merge SHA、Game／Cache V173.72；部署 HTML 使用 `build/boot-core.d8fbf40b153e.js`，且 deployed bundle 包含 `reloadForAccountTransition`／`signed-out`／`uid-changed`。
+- 真實手機驗收 PASS：Google 帳號進入後登出改用 Firebase 訪客，訪客沒有看到 Google 的角色與進度；再次登出並登入 Google，原 Google 角色／資料正常恢復。
+- Requirement Batch：`release/requirement-batches/2026-09-24-cloud-save-phase3-uid-local-isolation.json`，6/6 VERIFIED；Phase 3 正式 COMPLETE。
 
 ### Phase 2 Cloud Save Envelope（2026-09-24，COMPLETE / 6/6 VERIFIED）
 
@@ -158,7 +161,7 @@
 1. Phase 1 功能驗收已完成；本次結案文件仍須 PR → Repository checks SUCCESS → merge dev，然後核對最新 dev 的 CI、DEV deployment、Session Authority emulator 與 Firebase deploy，逐一記錄實際 SHA。
 2. 使用者已授權 dev → main 發布；只有上述最新 dev 驗證成功，且 main←dev 比較無獨立修復、素材分支混入或機密，才可建立及合併受保護發布 PR。正式部署、登入及無 DEV 測試區亦須獨立驗證。完成結果寫入[結案 PR #341](https://github.com/tf00913225-alt/my-game/pull/341) 永久發布記錄，不預填成功。
 3. Artifact Registry 清理政策本身仍有非阻塞警告，保留維運追蹤；不以 Deploy complete 推定政策設定成功。
-4. Phase 3 已進入 IN PROGRESS；Phase 4–10 仍全部 NOT STARTED。本階段不做正式 gameplay payload schema、一般進度／高價值資料遷移、operationId、帳本、快照或付款，亦不把 local progress 升格為正式雲端資料。
+4. Phase 3 已完成；Phase 4–10 仍全部 NOT STARTED。Phase 4 才處理正式 gameplay payload 與一般進度遷移；高價值資料、operationId、帳本、快照與付款仍屬後續獨立階段。
 
 ## E. Architecture Decisions（永久決策）
 
@@ -227,14 +230,14 @@ Wire callable 名稱是 `protectedTest`（本文 protected-test 的正式 Fireba
 
 ## G. Next Safe Step（每次結束必更新）
 
-**Phase 1 功能驗收 COMPLETE / 5/5 VERIFIED；Phase 2 為 COMPLETE / 6/6 VERIFIED；Phase 3 為 IN PROGRESS / 6/6 IMPLEMENTED。**
+**Phase 1 功能驗收 COMPLETE / 5/5 VERIFIED；Phase 2 為 COMPLETE / 6/6 VERIFIED；Phase 3 為 COMPLETE / 6/6 VERIFIED。**
 
 1. 先讀本文件、`AGENTS.md`、`ARCHITECTURE_RULES.md`、`SYSTEM_CONTRACTS.md`、`docs/BOOT_ARCHITECTURE.md`、本次 Requirement Batch。
 2. 看 `functions/src/session-authority.js`、`functions/index.js`、`js/firebase/session-client.js`、`firebase-session.js`、兩個 Firebase client owners 與 `firestore.rules`。
 3. [結案 PR #341](https://github.com/tf00913225-alt/my-game/pull/341) 先以 CI 全綠合併 dev，再核對該最新 SHA 的 Repository checks、DEV 與 Firebase 部署；把最終 dev SHA／run／job 記錄於結案 PR。
 4. 比較 main←dev，完成受保護 PR 與正式部署驗證；把 main SHA、production deployment 及登入／DEV 測試區隔離結果記入永久發布記錄。任一發布環節未完成，整次任務仍回報 NOT COMPLETE。
 5. Phase 2 已以真實 Google 帳號在手機 Chrome 完成 Version 2／Revision 1／重複 bootstrap 不增 Revision／無 gameplay payload 驗證。ChatGPT 內建瀏覽器曾使 Google OAuth 不完整，不作為後端失敗證據；後續登入驗收必須使用完整瀏覽器或正式 App Auth surface。
-6. Phase 3 工作分支先完成 PR checks、DEV exact-SHA 部署，再以同一手機實測 UID A→登出→UID B：B 不得看到 A 的角色／金幣／背包／裝備／進度，切回 A 仍須還原 A；完成後才能把 Requirement Batch 升級 VERIFIED。Phase 4 才開始一般 gameplay progress migration。
+6. Phase 3 已完成自動與真實手機隔離驗收。下一階段若獲授權，從最新 dev 另開 Phase 4 工作分支，設計一般 gameplay progress migration；不得把本機存檔直接升格為雲端權威或整包覆蓋 Phase 2 Envelope。
 7. 不修改戰鬥／VFX／UI、經濟／背包／秘寶、支付或 gameplay save owner，禁止 local overwrite 與無關 refactor。禁止直接修改 main／dev。
 
 官方技術依據：[Callable 身分驗證](https://firebase.google.com/docs/functions/callable)、[Firebase auth_time／撤銷檢查](https://firebase.google.com/docs/auth/admin/manage-sessions)、[Firestore 原子交易與重跑](https://firebase.google.com/docs/firestore/manage-data/transactions)。
