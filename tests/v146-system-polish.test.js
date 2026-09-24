@@ -11,6 +11,7 @@ const ui=fs.readFileSync("js/35-v141-ui-battle.js","utf8");
 const timing=fs.readFileSync("js/37-v142-skill-animation.js","utf8");
 const fixes=fs.readFileSync("js/38-v143-system-fixes.js","utf8");
 const rules=fs.readFileSync("js/40-v144-rules-and-abyss.js","utf8");
+const progression=fs.readFileSync("js/60-v173.64-skill-progression-rebalance.js","utf8");
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const source=fs.readFileSync("js/41-v146-system-polish.js","utf8");
 const finalNavSource=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");
@@ -60,16 +61,17 @@ test("V146 remains ordered before V149 under the current cache key",()=>{
 test("latest skill table contains every exact requested value",()=>{
     [
         /baseHeal:350,healPerLevel:30,baseHealSP:35,healSPPerLevel:30/,
-        /defenseBonusPercent:30,requires:\["barrier"\]/,
-        /reflectPercent:50,requires:\["stoneBreakSky","flyingSandStrike"\]/,
         /damageBonusPercent:5,healBonusPercent:10,statusResistBonus:10/,
         /baseDamage:100,damagePerLevel:15,spCost:50/,
-        /freezeChance:75,freezeDuration:2,lifestealPercentByLevel:\[4,5,6,7,8\]/,
-        /freezeChance:50,freezeDuration:2,freezeSingleTarget:false/,
         /critChanceBonusByLevel:\[5,10,15,20,25\]/,
         /critDamageBonusByLevel:\[10,20,30,40,50\]/,
         /burnChance:70,burnDuration:2,burnPercentByLevel:\[5,7,9,11,13\]/
     ].forEach(pattern=>assert.match(rules,pattern));
+    assert.match(progression,/const FREEZE_CHANCE_BY_LEVEL=Object\.freeze\(\[55,65,75,85,95\]\)/);
+    assert.match(progression,/const ROCK_WALL_BY_LEVEL=Object\.freeze\(\[15,20,25,30,35\]\)/);
+    assert.match(progression,/const EARTH_SHIELD_BY_LEVEL=Object\.freeze\(\[20,30,35,40,50\]\)/);
+    assert.match(progression,/rockWall:\{[\s\S]*?requires:\["petrifyFist","sandWind"\]/);
+    assert.match(progression,/earthShield:\{[\s\S]*?requires:\["rockWall"\]/);
 });
 
 test("visual timing, dead-target filtering and raster-only choreography are enforced",()=>{

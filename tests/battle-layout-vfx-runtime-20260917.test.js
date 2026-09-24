@@ -106,7 +106,8 @@ assert.match(layoutCss,/\.battle-element-box-button\{[\s\S]*width:66px !importan
 assert.match(layoutCss,/\.v-fixed-ally-slot\{[\s\S]*overflow:visible !important/,"unit artwork must not be clipped by its slot");
 assert.match(layoutCss,/\.v143-skill-stage\[data-geometry-owner="fixed-slot"\]\{[\s\S]*overflow:visible !important/,"VFX stage must not clip at a card or region boundary");
 
-assert.match(vfx,/function placementFor\(config,sprite\)/);
+assert.match(vfx,/function placementFor\(config,sprite,targetTypeOverride\)/);
+assert.match(vfx,/targetTypeOverride\|\|config&&config\.targetType/);
 assert.match(vfx,/applySpriteBox\(node,width,height,sprite,"cover"\)/,"range VFX must preserve source-frame aspect while covering its semantic geometry");
 assert.doesNotMatch(vfx,/applySpriteBox\(node,width,height,sprite,"stretch"\)/,"range VFX must never flatten source frames");
 assert.doesNotMatch(vfx,/mechanism:|MECH_L|MECH_C|MECH_R/,"VFX must use normal numeric target entities only");
@@ -123,10 +124,10 @@ assert.doesNotMatch(bossSystem,/blockingShield|mandatoryMechanismTarget|resolveM
 /* Relic cinematic target stacking shares the canonical battle/VFX geometry. */
 assert.match(legacyBattleCss,/#battlePage > \.battle-wrap\{[\s\S]*z-index:1 !important;/,
     "the historical battle-wrap stacking context is the regression root");
-assert.match(relicRuntime,/battlePage\.querySelector\("\.battle-wrap"\)[\s\S]*host\.appendChild\(node\)/,
-    "relic cinematic must render inside the existing battle-wrap stacking context");
-assert.match(relicCss,/\.team-relic-battle-presentation\{[^}]*position:fixed[^}]*inset:0/,
-    "relic dim layer must cover the complete transformed battle surface, not only battle-wrap content box");
+assert.match(relicRuntime,/const host=battlePage\|\|null[\s\S]*host\.appendChild\(node\)/,
+    "relic cinematic must render against the complete battle page surface");
+assert.match(relicCss,/\.team-relic-battle-presentation\{[^}]*position:absolute[^}]*inset:0/,
+    "relic dim layer must cover the complete battle page surface");
 assert.match(relicRuntime,/RELIC_IDENTITY_HOLD_MS=1150/);
 assert.match(relicRuntime,/RELIC_IDENTITY_EXIT_MS=420/);
 assert.match(relicRuntime,/waitMs\(RELIC_IDENTITY_REVEAL_MS\)[\s\S]*waitMs\(RELIC_IDENTITY_HOLD_MS\)[\s\S]*classList\.add\("identity-exiting"\)[\s\S]*Promise\.all\(\[[\s\S]*waitMs\(RELIC_IDENTITY_EXIT_MS\)[\s\S]*revealRelicTargets\(target\)/,
@@ -134,17 +135,19 @@ assert.match(relicRuntime,/waitMs\(RELIC_IDENTITY_REVEAL_MS\)[\s\S]*waitMs\(RELI
 assert.match(relicRuntime,/function relicTargetLayer\(card\)[\s\S]*\.v-fixed-enemy-slot,\.v-fixed-ally-slot,\.v-fixed-boss-footprint/,
     "enemy, ally and Boss target entities must elevate their real Fixed Slot carrier");
 assert.match(relicRuntime,/relicFocusedTargetLayers=Array\.from\(new Set\(relicFocusedTargetCards\.map\(relicTargetLayer\)\.filter\(Boolean\)\)\)/);
-assert.match(relicCss,/\.v-fixed-enemy-slot\.team-relic-battle-target-layer,[\s\S]*\.v-fixed-ally-slot\.team-relic-battle-target-layer,[\s\S]*\.v-fixed-boss-footprint\.team-relic-battle-target-layer\{z-index:6105!important;\}/);
+assert.match(relicCss,/\.v-fixed-enemy-slot\.team-relic-battle-target-layer,[\s\S]*\.v-fixed-ally-slot\.team-relic-battle-target-layer,[\s\S]*\.v-fixed-boss-footprint\.team-relic-battle-target-layer\{z-index:18110!important;\}/);
 const relicDimZ=Number((relicCss.match(/team-relic-battle-dim\{[^}]*z-index:(\d+)/)||[])[1]);
 const relicTargetZ=Number((relicCss.match(/team-relic-battle-target-layer\{z-index:(\d+)!important/ )||[])[1]);
 const relicIdentityZ=Number((relicCss.match(/team-relic-battle-cutin\{[^}]*z-index:(\d+)/)||[])[1]);
 const formalVfxZ=Number((v143Css.match(/\.v143-skill-stage\{[^}]*z-index:(\d+)/)||[])[1]);
-assert.equal(relicDimZ,6090);
-assert.equal(relicTargetZ,6105);
-assert.equal(relicIdentityZ,6120);
+const activeRelicVfxZ=Number((relicCss.match(/team-relic-cinematic-active > \.v143-skill-stage\{z-index:(\d+)!important/ )||[])[1]);
+assert.equal(relicDimZ,18090);
+assert.equal(relicTargetZ,18110);
+assert.equal(relicIdentityZ,18120);
 assert.equal(formalVfxZ,16000);
-assert.ok(relicDimZ<relicTargetZ&&relicTargetZ<relicIdentityZ&&relicTargetZ<formalVfxZ,
-    "target units must paint above dim but below relic identity and formal V143 VFX");
+assert.equal(activeRelicVfxZ,18130);
+assert.ok(relicDimZ<relicTargetZ&&relicTargetZ<relicIdentityZ&&relicIdentityZ<activeRelicVfxZ,
+    "relic presentation must paint dim, focused targets, identity, then formal V143 VFX");
 
 const relicPresentation=relicRuntime.slice(
     relicRuntime.indexOf("const RELIC_VFX_PRESENTATION=Object.freeze({"),

@@ -83,7 +83,7 @@ test("V155 preserves the final Fire owner while retaining Emperor support data",
     assert.deepEqual(array(s.phoenixCry.burnPercentByLevel),[5,7,9,11,13]);
     assert.deepEqual(
         [s.yuanZuBlessing.baseHeal,s.yuanZuBlessing.baseHealSP,s.yuanZuBlessing.cleanseChance,s.yuanZuBlessing.evasionBonusPercent,s.yuanZuBlessing.duration],
-        [100,100,35,35,2]
+        [100,100,35,15,2]
     );
     assert.equal(s.yuanZuBlessing.agilityBonusPercent,undefined);
 });
@@ -101,8 +101,8 @@ test("V155 no longer owns a final-roster patch",()=>{
 test("enemy AI keeps 70/30 category selection and hard-control caps directional",()=>{
     assert.match(coreSource,/Number\(randomValue\)<\.70\?"attack":"buff"/);
     assert.match(coreSource,/regular:\{\s*min:5,\s*max:90/);
-    assert.match(coreSource,/elite:\{\s*min:5,\s*max:80/);
-    assert.match(coreSource,/boss:\{\s*min:5,\s*max:70/);
+    assert.match(coreSource,/elite:\{\s*min:5,\s*max:75/);
+    assert.match(coreSource,/boss:\{\s*min:5,\s*max:60/);
     assert.match(coreSource,/player:\{\s*min:5,\s*max:60/);
     assert.match(coreSource,/targetFinalSpirit,true,"player"/);
     const v143=fs.readFileSync("js/38-v143-system-fixes.js","utf8");
@@ -145,7 +145,7 @@ test("Extreme Emperor uses only Yuan Zu Blessing with independent cleanse and in
 test("North Emperor cannot revive without revive in its carried support list",()=>{
     let finishes=0;
     const north={name:"北帝天尊",v141Abyss:true,v141SupportSkillIds:["healSpell"],alive:true,hp:500,maxHP:500,sp:500,maxSP:500,v141ForceSkillLevel:5,activeBuffs:[],statusEffects:[]};
-    const ally={name:"盟友",rank:"boss",v141Abyss:true,alive:false,hp:0,maxHP:1000,sp:10,maxSP:500,activeBuffs:[],statusEffects:[]};
+    const ally={name:"盟友",rank:"boss",v141Abyss:true,alive:false,hp:0,maxHP:1000,sp:10,maxSP:500,activeBuffs:[],statusEffects:[{type:"burn",turnsLeft:2}]};
     const context=load({
         monsters:[north,ally],currentBattleMonsters:[0,1],
         isMonsterFrozen:()=>false,isMonsterPetrified:()=>false,
@@ -159,7 +159,8 @@ test("North Emperor cannot revive without revive in its carried support list",()
     ally.hp=10;
     assert.equal(context.v155ResolveNorthHeal(0,true),true);
     assert.equal(ally.hp,480);
-    assert.equal(ally.sp,165);
+    assert.equal(ally.sp,10,"V155-only fixture has no later SP-percent progression owner");
+    assert.deepEqual(array(ally.statusEffects),[{type:"burn",turnsLeft:2}],"enemy Heal must not cleanse debuffs");
     assert.equal(finishes,1);
 });
 
@@ -175,7 +176,7 @@ test("wind elite uses Dodge, never Stealth",()=>{
     assert.equal(context.v155ResolveWindEliteDodge(0,true),true);
     assert.deepEqual(array(context.getSkillTargets(0,"single")),[0]);
     assert.deepEqual(array(context.getSkillTargets(0,"all")),[0]);
-    assert.equal(elite.evasion,80);
+    assert.equal(elite.evasion,85);
     assert.deepEqual(
         [elite.v155WindDodge.statusName,elite.v155WindDodge.bonusPercent,elite.v155WindDodge.expiresTurn],
         ["風行",75,4]

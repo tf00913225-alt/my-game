@@ -19,7 +19,7 @@ for(const targetType of ["tri","row","column"]){
     assert.match(resolver,/return alive\.includes\(primaryIndex\)\?\[primaryIndex\]:\[\]/,
         targetType+" must settle only the selected Boss-mode entity");
 }
-assert.match(vfx,/const targetType=String\(current\.config&&current\.config\.targetType\|\|"single"\)/);
+assert.match(vfx,/const targetType=String\(current\.targetType\|\|current\.config&&current\.config\.targetType\|\|"single"\)/);
 assert.match(vfx,/getGeometryRectFromShape\(current\.targetSide,primarySlot,shape\)/,
     "tri/row/column visual geometry remains authored independently of one-target damage settlement");
 

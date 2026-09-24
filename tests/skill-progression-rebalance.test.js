@@ -162,6 +162,14 @@ test("final progression data standardizes Lv10 damage skills, EX and support str
     assert.deepEqual(Array.from(r.skills.freeze.freezeChanceByLevel),[55,65,75,85,95]);
     assert.deepEqual(Array.from(r.skills.freeze.freezeDurationByLevel),[3,3,3,4,5]);
     assert.deepEqual(Array.from(r.skills.purifyMind.targetCountByLevel),[1,1,3]);
+    assert.match(
+        r.context.FourSymbolsSkillSpec.descriptionFor(r.skills.freeze),
+        /範圍：同一直列前、後最多2名敵人。滿級範圍：敵方中、左、右最多3名/
+    );
+    assert.match(
+        r.context.FourSymbolsSkillSpec.descriptionFor(r.skills.purifyMind),
+        /範圍：我方或敵方1名。滿級範圍：我方或敵方中、左、右最多3名/
+    );
     assert.deepEqual([r.skills.dodgeSkill.maxLevel,r.skills.stealthSkill.maxLevel,r.skills.dinghaishenzhen.maxLevel],[5,3,5]);
     assert.deepEqual(Array.from(r.skills.dodgeSkill.evasionBonusPercentByLevel),[5,10,15,20,25]);
     assert.deepEqual(Array.from(r.skills.stealthSkill.durationByLevel),[2,3,4]);

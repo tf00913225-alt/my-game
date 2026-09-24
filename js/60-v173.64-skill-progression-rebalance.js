@@ -395,7 +395,12 @@
     function descriptionFor(skill){
         if(!skill){ return ""; }
         const max=Math.max(1,Math.floor(numeric(skill.maxLevel,1)));
-        const parts=["範圍："+targetLabel(skill,1)];
+        const firstTarget=targetLabel(skill,1);
+        const finalTarget=targetLabel(skill,max);
+        const parts=["範圍："+firstTarget];
+        if(max>1&&finalTarget!==firstTarget){
+            parts.push("滿級範圍："+finalTarget);
+        }
         if(PLAYER_DAMAGE_SKILL_ID_SET.has(skill.id)){
             parts.push("Lv1傷害 "+skillDamageValue(skill,1));
             parts.push("Lv5突破 "+skillDamageValue(skill,5));
@@ -843,7 +848,9 @@
         return Math.max(1,max);
     }
     function announceSkill(actorIndex,skill){
-        if(typeof showSkillNameBadge==="function"){ showSkillNameBadge(skill.name,"fire",actorIndex); }
+        if(typeof showSkillNameBadge==="function"){
+            showSkillNameBadge(skill.name,skill.element||"fire",actorIndex,actorIndex,[actorIndex],"player","self");
+        }
         if(typeof addBattleLog==="function"){ addBattleLog((actorByPartyIndex(actorIndex)?.id||"角色")+"施放「"+skill.name+"」。"); }
     }
     function finishTacticalAction(){

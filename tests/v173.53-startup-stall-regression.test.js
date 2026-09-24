@@ -8,11 +8,9 @@ const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("sc
 const qol=fs.readFileSync("js/53-v173.50-inventory-qol.js","utf8");
 const index=fs.readFileSync("index.html","utf8");
 const build=fs.readFileSync("scripts/build-production.mjs","utf8");
-assert.doesNotMatch(battle,/observer\.observe\(document\.body,\{subtree:true,childList:true,attributes:true/);
-assert.match(battle,/observer\.observe\(document\.body,\{subtree:true,childList:true\}\)/);
+assert.doesNotMatch(battle,/MutationObserver|observer\.observe\(/);
 assert.doesNotMatch(battle,/stage\.style\.visibility/);
-assert.doesNotMatch(inventory,/obs\.observe\(document\.body,\{subtree:true,childList:true,attributes:true/);
-assert.match(inventory,/obs\.observe\(document\.body,\{subtree:true,childList:true\}\)/);
+assert.doesNotMatch(inventory,/MutationObserver|obs\.observe\(/);
 assert.match(inventory,/classList\.contains\("v17351-inventory-fullscreen"\)!==open/);
 assert.equal((loader.match(/const V_ASSET_VERSION="([^"]+)"/)||[])[1],releaseMeta.cacheVersion);
 for(const name of ["54-v173.51-battle-qa.js","55-v173.51-inventory-qa.js","57-v173.51-quest-qa.js"]){

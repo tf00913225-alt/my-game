@@ -343,6 +343,9 @@
         clearRelicTargetFocus();
         const node=relicCutinNode||(typeof document!=="undefined"&&document.getElementById?document.getElementById("teamRelicBattlePresentation"):null);
         if(node&&typeof node.remove==="function"){ node.remove(); }
+        if(typeof document!=="undefined"&&document.body&&document.body.classList){
+            document.body.classList.remove("team-relic-cinematic-active");
+        }
         relicCutinNode=null;
     }
     function relicTargetCard(side,index){
@@ -373,7 +376,7 @@
         if(!hasLiveBattlePresentationHost()||!def){ return Promise.resolve(null); }
         cleanupRelicCutin();
         const battlePage=document.getElementById("battlePage");
-        const host=battlePage&&typeof battlePage.querySelector==="function"?battlePage.querySelector(".battle-wrap"):null;
+        const host=battlePage||null;
         if(!host){ return Promise.resolve(null); }
         const node=document.createElement("div");
         node.id="teamRelicBattlePresentation";
@@ -384,6 +387,7 @@
             '<img src="'+esc(def.battleIconPath||def.iconPath||"")+'" alt=""></span>'+
             '<span class="team-relic-battle-cutin-copy"><strong>'+esc(def.name)+'</strong></span></div>';
         host.appendChild(node);
+        if(document.body&&document.body.classList){ document.body.classList.add("team-relic-cinematic-active"); }
         relicCutinNode=node;
         const dim=()=>{ if(node===relicCutinNode){ node.classList.add("dim-visible"); } };
         if(typeof requestAnimationFrame==="function"){ requestAnimationFrame(dim); }else{ dim(); }

@@ -125,21 +125,13 @@ const V_ASSET_VERSION="173.72";
         primeExpPoolSafety();
     },{once:true});
 
-    function installExpPoolVisibilityObserver(){
-        const pool=document.getElementById("homeExpPoolCard");
-        const root=document.getElementById("homePage")||pool;
-        if(!root||typeof MutationObserver==="undefined"){ primeExpPoolSafety(); return; }
-        const observer=new MutationObserver(()=>{
-            if(expPoolSafetyUiReady){ observer.disconnect(); return; }
-            primeExpPoolSafety();
-        });
-        observer.observe(root,{subtree:true,childList:true,attributes:true,attributeFilter:["class","style","hidden"]});
+    function primeExpPoolSafetyWhenDomReady(){
         primeExpPoolSafety();
     }
     if(document.readyState==="loading"){
-        document.addEventListener("DOMContentLoaded",installExpPoolVisibilityObserver,{once:true});
+        document.addEventListener("DOMContentLoaded",primeExpPoolSafetyWhenDomReady,{once:true});
     }else{
-        installExpPoolVisibilityObserver();
+        primeExpPoolSafetyWhenDomReady();
     }
 })();
 

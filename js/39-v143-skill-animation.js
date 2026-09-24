@@ -411,7 +411,7 @@
         const owner=geometryOwner();
         if(!owner||!current){ return null; }
         const seed=geometrySeedIndexes(current,indexes);
-        const targetType=String(current.config&&current.config.targetType||"single");
+        const targetType=String(current.targetType||current.config&&current.config.targetType||"single");
         if(placement==="battlefield"||targetType==="all"||targetType==="allyAll"){
             const rect=typeof owner.getSideRect==="function"?owner.getSideRect(current.targetSide):null;
             if(rect){ rect.id=current.targetSide==="monster"?"fixed-enemy-zone":"fixed-ally-zone"; }
@@ -442,9 +442,9 @@
         return rect;
     }
 
-    function placementFor(config,sprite){
+    function placementFor(config,sprite,targetTypeOverride){
         const authored=String(sprite&&sprite.placement||"single");
-        const targetType=String(config&&config.targetType||"single");
+        const targetType=String(targetTypeOverride||config&&config.targetType||"single");
         if(/^(all|enemyAll|allyAll)$/i.test(targetType)){ return "battlefield"; }
         if(/^(tri|allyTri|row|column|horizontal-3)$/i.test(targetType)){
             return authored==="trajectory"?"trajectory":"group";
@@ -1015,7 +1015,7 @@
 
     function placeSprite(current,node,index,target){
         const sprite=current.model.sprite;
-        const placement=placementFor(current.config,sprite);
+        const placement=placementFor(current.config,sprite,current.targetType);
         node.dataset.placement=placement;
 
         if(placement==="single"){
@@ -1106,7 +1106,7 @@
     function addSprite(current,index,target){
         const sprite=current.model.sprite;
         if(!sprite||!target||!state.stage){ return; }
-        const placement=placementFor(current.config,sprite);
+        const placement=placementFor(current.config,sprite,current.targetType);
         const key=placement==="single"||placement==="targetTrajectory"?String(index):"main";
         let node=current.spriteNodes.get(key);
         if(!node){
@@ -1198,7 +1198,7 @@
     function registerTarget(targetSide,index,allowDefeated){
         const current=state.current;
         if(!current||current.done||current.targetSide!==targetSide){ return null; }
-        const single=String(current.config.targetType||"")==="single";
+        const single=String(current.targetType||current.config.targetType||"")==="single";
         if(single&&current.targetIndexes.length&&current.targetIndexes.indexOf(index)<0){ return null; }
         if(!current.validTargets.has(index)){ current.validTargets.add(index); }
         emitSprite(current,index,allowDefeated===true);
@@ -1239,10 +1239,12 @@
         purgeStaleRasterStages();
 
         const model=modelFor(config);
-        const contractedSide=meta&&meta.targetContract&&meta.targetContract.version==="battle-target-contract-v1"
-            ?meta.targetContract.targetSide:meta&&meta.targetSide;
+        const contract=meta&&meta.targetContract&&meta.targetContract.version==="battle-target-contract-v1"
+            ?meta.targetContract:null;
+        const contractedSide=contract?contract.targetSide:meta&&meta.targetSide;
         const targetSide=contractedSide==="player"||contractedSide==="monster"
             ?contractedSide:targetSideFor(config,meta.side||"player");
+        const targetType=String(contract&&contract.targetType||config&&config.targetType||"single");
         const duration=Math.max(520,Number(config.duration)||520);
         const validTargets=new Set(activeCards(targetSide,config).map(entry=>entry.index));
         const explicitTargets=Array.isArray(meta.targetIds)
@@ -1259,7 +1261,7 @@
             side:meta.side||"player",actorIndex:Number.isInteger(meta.actorIndex)?meta.actorIndex:0,
             targetId:meta.targetId!==undefined?meta.targetId:null,
             targetIds:Array.isArray(meta.targetIds)?meta.targetIds.slice():null,
-            targetSide:targetSide,targetIndexes:[],emitted:new Set(),validTargets:validTargets,
+            targetSide:targetSide,targetType:targetType,targetIndexes:[],emitted:new Set(),validTargets:validTargets,
             spriteNodes:new Map(),confirmedTargets:new Set(),deferredStatusTargets:new Map(),statusAtStart:snapshotTimedEffects(model),
             actorCard:cardFor(meta.side||"player",Number.isInteger(meta.actorIndex)?meta.actorIndex:0),
             startedAt:Date.now(),visualStartedAt:0,firstVisibleFrameAt:0,

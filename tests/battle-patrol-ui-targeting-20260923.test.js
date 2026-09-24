@@ -11,8 +11,8 @@ test("self target contract and allyTri animation primary anchor stay canonical",
   const dungeon=read("js/42-v148-combat-dungeon-fixes.js");
   assert.match(main,/if\(targetType==="self"\)\{[\s\S]*?primary=actorIndex;[\s\S]*?ids=\[actorIndex\];[\s\S]*?\}/);
   assert.match(dungeon,/function selectedSupportPrimary\(characterIndex,queued,targets\)\{[\s\S]*?queued\.targetAlly[\s\S]*?targets\.includes\(selected\)\?selected:targets\[0\]/);
-  assert.match(dungeon,/const primaryTarget=selectedSupportPrimary\(characterIndex,queued,requested\);[\s\S]*?animateSupportCast\(state,characterIndex,skill,primaryTarget,requested,"player"\)/);
-  assert.match(dungeon,/const primaryTarget=selectedSupportPrimary\(characterIndex,queued,targets\);[\s\S]*?animateSupportCast\(state,characterIndex,skill,primaryTarget,targets,"player"\)/);
+  assert.match(dungeon,/const primaryTarget=selectedSupportPrimary\(characterIndex,queued,requested\);[\s\S]*?animateSupportCast\(state,characterIndex,skill,primaryTarget,requested,"player",skill\.targetType\)/);
+  assert.match(dungeon,/const primaryTarget=selectedSupportPrimary\(characterIndex,queued,targets\);[\s\S]*?animateSupportCast\(state,characterIndex,skill,primaryTarget,targets,"player",skill\.targetType\)/);
 });
 
 test("skill descriptions use percent symbols instead of 個百分點",()=>{
@@ -27,7 +27,8 @@ test("battle info tab is fixed and turn countdown remains fully visible",()=>{
   assert.doesNotMatch(css,/battle-info-toggle\.is-dragging|cursor:ew-resize/);
   assert.match(css,/#battleInfoToggle\.battle-info-toggle\{[\s\S]*?right:4px;[\s\S]*?touch-action:manipulation;[\s\S]*?cursor:pointer/);
   assert.match(css,/#battleActionRegion > \.turn-target-row\{[\s\S]*?z-index:18070 !important/);
-  assert.match(css,/\.turn-target-row\.skill-picker-open,[\s\S]*?\.turn-target-row\.battle-item-open\{[\s\S]*?opacity:1/);
+  assert.match(css,/\.turn-target-row\.skill-picker-open\{[\s\S]*?bottom:calc\(var\(--battle-command-visual-height\) \+ 44px\);[\s\S]*?opacity:1/);
+  assert.match(css,/\.turn-target-row\.battle-item-open\{[\s\S]*?opacity:1/);
   assert.match(css,/#battleActionRegion\.target-selecting > \.turn-target-row\{[\s\S]*?opacity:1/);
 });
 

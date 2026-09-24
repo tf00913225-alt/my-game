@@ -10954,13 +10954,14 @@
         return Math.max(1,Number(shield&&shield.baseMaxHP)||Number(monster&&monster.maxHP)||1);
     }
 
-    function getMonsterAllyTriTargets(casterIndex,entries){
+    function getMonsterAllyTriTargeting(casterIndex,entries){
         const living=(entries||currentBattleMonsters.map(index=>({index:index,monster:monsters[index]})))
             .filter(entry=>entry&&entry.monster&&entry.monster.alive!==false&&Number(entry.monster.hp)>0);
         const livingByIndex=new Map(living.map(entry=>[entry.index,entry]));
         const owner=window.FourSymbolsBattlefieldSlots||null;
         const snapshot=owner&&typeof owner.getActiveEnemySnapshot==="function"?owner.getActiveEnemySnapshot():null;
         let best=[];
+        let bestPrimary=null;
         let bestScore=-1;
         living.forEach(centerEntry=>{
             const center=centerEntry.index;
@@ -10975,10 +10976,24 @@
                 const spNeed=(maxSP-Math.max(0,Number(ally.sp)||0))/maxSP;
                 return sum+Math.max(0,hpNeed)+Math.max(0,spNeed);
             },0)+(trio.some(entry=>entry.index===casterIndex)?0.0001:0);
-            if(score>bestScore){ best=trio; bestScore=score; }
+            if(score>bestScore){ best=trio; bestPrimary=center; bestScore=score; }
         });
-        return best.slice(0,3);
+        return {entries:best.slice(0,3),primaryIndex:Number.isInteger(bestPrimary)?bestPrimary:(best[0]?best[0].index:null)};
     }
+    function getMonsterAllyTriTargets(casterIndex,entries){
+        return getMonsterAllyTriTargeting(casterIndex,entries).entries;
+    }
+    function getMonsterSupportTargeting(skill,casterIndex,entries){
+        const targetType=String(skill&&skill.targetType||"allyAll");
+        if(targetType==="allyTri"){ return getMonsterAllyTriTargeting(casterIndex,entries); }
+        const living=(entries||[]).filter(entry=>entry&&entry.monster&&entry.monster.alive!==false&&Number(entry.monster.hp)>0);
+        if(targetType==="ally"){
+            const self=living.find(entry=>entry.index===casterIndex)||living[0]||null;
+            return {entries:self?[self]:[],primaryIndex:self?self.index:null};
+        }
+        return {entries:living,primaryIndex:null};
+    }
+    window.v141GetMonsterAllyTriTargeting=getMonsterAllyTriTargeting;
     window.v141GetMonsterAllyTriTargets=getMonsterAllyTriTargets;
 
     function applyTimedMonsterBuff(monstersToBuff,type,turns,amount,options){
@@ -11047,12 +11062,14 @@
             &&skillDatabase[forcedSupportSkillId]?forcedSupportSkillId:null;
         let target=null;
         let healTargets=[];
+        let supportTargeting=null;
         const allAlliesNeedHealing=allyEntries.some(entry=>
             monsterBaseHp(entry.monster)<monsterBaseMaxHp(entry.monster)*.70
         );
         const healSkill=skillDatabase.healSpell;
         if(!skillId&&supportIds.includes("healSpell")&&allAlliesNeedHealing&&healSkill&&monster.sp>=(healSkill.spCost||0)){
-            healTargets=getMonsterAllyTriTargets(monsterIndex,allyEntries);
+            supportTargeting=getMonsterAllyTriTargeting(monsterIndex,allyEntries);
+            healTargets=supportTargeting.entries;
             if(healTargets.length){ skillId="healSpell"; }
         }
         const affordableAttacks=(monster.skillIds||[]).filter(id=>{
@@ -11090,8 +11107,17 @@
         }
         const skill=skillDatabase[skillId];
         if(monster.sp<(skill.spCost||0)){ return false; }
+        if(!supportTargeting){
+            if(skillId==="barrier"&&target){
+                const entry=allyEntries.find(item=>item.monster===target)||null;
+                supportTargeting={entries:entry?[entry]:[],primaryIndex:entry?entry.index:null};
+            }else{
+                supportTargeting=getMonsterSupportTargeting(skill,monsterIndex,allyEntries);
+            }
+        }
+        const supportTargetIds=(supportTargeting.entries||[]).map(entry=>entry.index);
         monster.sp-=skill.spCost||0;
-        showMonsterSkillNameBadge(skill.name,skill.element||monster.element,monsterIndex);
+        showMonsterSkillNameBadge(skill.name,skill.element||monster.element,monsterIndex,supportTargeting.primaryIndex,supportTargetIds,"monster",skill.targetType);
         const level=Math.max(1,Math.min(
             Number(skill.maxLevel)||1,
             Number(monster.v141ForceSkillLevel||monster.v141SkillLevel)||1
@@ -11108,7 +11134,6 @@
             const spPercent=levelValue(skill.spRestorePercentByLevel,0);
             let hpTotal=0;
             let spTotal=0;
-            let cleansedTotal=0;
             healTargets.forEach(entry=>{
                 const ally=entry.monster;
                 const healed=window.v141HealMonsterPreservingShield(ally,hpAmount);
@@ -11118,20 +11143,12 @@
                     :Math.floor(Math.max(0,Number(ally.maxSP)||0)*spPercent/100);
                 ally.sp=Math.min(Math.max(beforeSP,Number(ally.maxSP)||0),beforeSP+spAmount);
                 const restoredSP=ally.sp-beforeSP;
-                if(skill.cleanseAll&&Array.isArray(ally.statusEffects)){
-                    const before=ally.statusEffects.length;
-                    ally.statusEffects=ally.statusEffects.filter(effect=>
-                        effect&&(effect.dispellable===false||effect.uncleansable===true)
-                    );
-                    cleansedTotal+=before-ally.statusEffects.length;
-                }
                 hpTotal+=healed;
                 spTotal+=restoredSP;
                 if(healed>0&&typeof showMonsterHit==="function"){ showMonsterHit(entry.index,healed,"heal"); }
                 if(typeof window.v141PlayCardEffect==="function"){ window.v141PlayCardEffect("monster",entry.index,"heal"); }
             });
-            addBattleLog(monster.name+"施放治療術，為同排最多"+healTargets.length+"名友方共回復"+
-                hpTotal+" HP、"+spTotal+" SP"+(skill.cleanseAll?"，並解除"+cleansedTotal+"個可解除負面狀態":"")+"。");
+            addBattleLog(monster.name+"施放治療術，為同排最多"+healTargets.length+"名友方共回復"+hpTotal+" HP、"+spTotal+" SP。");
         }else if(skillId==="barrier"){
             const duration=Math.max(1,Math.floor(levelValue(skill.durationByLevel,skill.duration||3)));
             const blocks=Math.max(1,Math.floor(levelValue(skill.barrierBlockCountByLevel,skill.barrierBlockCount||3)));
@@ -11139,17 +11156,18 @@
             target.v141Shield.isBarrier=true;
             addBattleLog(monster.name+"為"+target.name+"施放結界，可抵擋"+blocks+"次直接傷害，最多持續"+duration+"回合。");
         }else if(skillId==="rage"){
-            applyTimedMonsterBuff(allies,"rage",3,0);
+            applyTimedMonsterBuff((supportTargeting.entries||[]).map(entry=>entry.monster),"rage",3,0);
             addBattleLog(monster.name+"施放怒火，敵方全體爆擊率與爆擊傷害提升3回合。");
         }else if(skillId==="dinghaishenzhen"){
             const resist=levelValue(skill.statusResistBonusByLevel,skill.statusResistBonus||0);
             const accuracy=levelValue(skill.accuracyBonusPercentByLevel,skill.accuracyBonusPercent||0);
-            applyTimedMonsterBuff(allies,"resistance",3,resist,{accuracyBonusPercent:accuracy});
+            applyTimedMonsterBuff((supportTargeting.entries||[]).map(entry=>entry.monster),"resistance",3,resist,{accuracyBonusPercent:accuracy});
             addBattleLog(monster.name+"施放氣定神閒，敵方全體異常抗性提升"+resist+"%、命中提升"+accuracy+"%，持續3回合。");
         }else if(skillId==="dodgeSkill"){
             const evasion=levelValue(skill.evasionBonusPercentByLevel,skill.evasionBonusPercent||0);
-            applyTimedMonsterBuff(allies,"dodge",3,evasion);
-            addBattleLog(monster.name+"施放閃躲術，敵方全體最終閃躲提升"+evasion+"個百分點，持續3回合。");
+            const dodgeTargets=(supportTargeting.entries||[]).map(entry=>entry.monster);
+            applyTimedMonsterBuff(dodgeTargets,"dodge",3,evasion);
+            addBattleLog(monster.name+"施放閃躲術，同排最多"+dodgeTargets.length+"名友方最終閃躲提升"+evasion+"個百分點，持續3回合。");
         }
         updateUI(); finishPlayerAction();
         return true;
@@ -13214,7 +13232,7 @@
         const owner=geometryOwner();
         if(!owner||!current){ return null; }
         const seed=geometrySeedIndexes(current,indexes);
-        const targetType=String(current.config&&current.config.targetType||"single");
+        const targetType=String(current.targetType||current.config&&current.config.targetType||"single");
         if(placement==="battlefield"||targetType==="all"||targetType==="allyAll"){
             const rect=typeof owner.getSideRect==="function"?owner.getSideRect(current.targetSide):null;
             if(rect){ rect.id=current.targetSide==="monster"?"fixed-enemy-zone":"fixed-ally-zone"; }
@@ -13245,9 +13263,9 @@
         return rect;
     }
 
-    function placementFor(config,sprite){
+    function placementFor(config,sprite,targetTypeOverride){
         const authored=String(sprite&&sprite.placement||"single");
-        const targetType=String(config&&config.targetType||"single");
+        const targetType=String(targetTypeOverride||config&&config.targetType||"single");
         if(/^(all|enemyAll|allyAll)$/i.test(targetType)){ return "battlefield"; }
         if(/^(tri|allyTri|row|column|horizontal-3)$/i.test(targetType)){
             return authored==="trajectory"?"trajectory":"group";
@@ -13818,7 +13836,7 @@
 
     function placeSprite(current,node,index,target){
         const sprite=current.model.sprite;
-        const placement=placementFor(current.config,sprite);
+        const placement=placementFor(current.config,sprite,current.targetType);
         node.dataset.placement=placement;
 
         if(placement==="single"){
@@ -13909,7 +13927,7 @@
     function addSprite(current,index,target){
         const sprite=current.model.sprite;
         if(!sprite||!target||!state.stage){ return; }
-        const placement=placementFor(current.config,sprite);
+        const placement=placementFor(current.config,sprite,current.targetType);
         const key=placement==="single"||placement==="targetTrajectory"?String(index):"main";
         let node=current.spriteNodes.get(key);
         if(!node){
@@ -14001,7 +14019,7 @@
     function registerTarget(targetSide,index,allowDefeated){
         const current=state.current;
         if(!current||current.done||current.targetSide!==targetSide){ return null; }
-        const single=String(current.config.targetType||"")==="single";
+        const single=String(current.targetType||current.config.targetType||"")==="single";
         if(single&&current.targetIndexes.length&&current.targetIndexes.indexOf(index)<0){ return null; }
         if(!current.validTargets.has(index)){ current.validTargets.add(index); }
         emitSprite(current,index,allowDefeated===true);
@@ -14042,10 +14060,12 @@
         purgeStaleRasterStages();
 
         const model=modelFor(config);
-        const contractedSide=meta&&meta.targetContract&&meta.targetContract.version==="battle-target-contract-v1"
-            ?meta.targetContract.targetSide:meta&&meta.targetSide;
+        const contract=meta&&meta.targetContract&&meta.targetContract.version==="battle-target-contract-v1"
+            ?meta.targetContract:null;
+        const contractedSide=contract?contract.targetSide:meta&&meta.targetSide;
         const targetSide=contractedSide==="player"||contractedSide==="monster"
             ?contractedSide:targetSideFor(config,meta.side||"player");
+        const targetType=String(contract&&contract.targetType||config&&config.targetType||"single");
         const duration=Math.max(520,Number(config.duration)||520);
         const validTargets=new Set(activeCards(targetSide,config).map(entry=>entry.index));
         const explicitTargets=Array.isArray(meta.targetIds)
@@ -14062,7 +14082,7 @@
             side:meta.side||"player",actorIndex:Number.isInteger(meta.actorIndex)?meta.actorIndex:0,
             targetId:meta.targetId!==undefined?meta.targetId:null,
             targetIds:Array.isArray(meta.targetIds)?meta.targetIds.slice():null,
-            targetSide:targetSide,targetIndexes:[],emitted:new Set(),validTargets:validTargets,
+            targetSide:targetSide,targetType:targetType,targetIndexes:[],emitted:new Set(),validTargets:validTargets,
             spriteNodes:new Map(),confirmedTargets:new Set(),deferredStatusTargets:new Map(),statusAtStart:snapshotTimedEffects(model),
             actorCard:cardFor(meta.side||"player",Number.isInteger(meta.actorIndex)?meta.actorIndex:0),
             startedAt:Date.now(),visualStartedAt:0,firstVisibleFrameAt:0,

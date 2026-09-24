@@ -83,11 +83,15 @@ test("support skill final arrays and runtime owners match the formal spec",()=>{
   ].forEach(pattern=>assert.match(progression,pattern));
   assert.match(progression,/fireSoulResonance:[\s\S]*?spCost:45/);
   assert.match(progression,/bloodBurnArt:[\s\S]*?spCost:35/);
+  assert.match(progression,/function announceSkill\(actorIndex,skill\)[\s\S]*?showSkillNameBadge\(skill\.name,skill\.element\|\|"fire",actorIndex,actorIndex,\[actorIndex\],"player","self"\)/);
   assert.match(support,/spRestorePercentByLevel/);
   assert.match(support,/removeRemovableStatusEffects/);
   assert.match(support,/targetCountByLevel/);
-  assert.match(freezeOwner,/freezeChanceByLevel/);
-  assert.match(freezeOwner,/targetTypeAtMaxLevel/);
+  assert.match(progression,/freeze:\{[\s\S]*?targetType:"column",targetTypeAtMaxLevel:"tri"[\s\S]*?freezeChanceByLevel:FREEZE_CHANCE_BY_LEVEL\.slice\(\)[\s\S]*?freezeDurationByLevel:FREEZE_DURATION_BY_LEVEL\.slice\(\)/);
+  assert.match(main,/function getEffectiveSkillTargetType\(skill,level\)/);
+  assert.match(main,/function getSkillFreezeChanceAtLevel\(skill,level\)/);
+  assert.match(main,/function getSkillFreezeDurationAtLevel\(skill,level\)/);
+  assert.doesNotMatch(freezeOwner,/castTriFreeze|v158CastTriFreeze|previousCastDamageSkill|previousCastSecondaryCharacterSkill|previousCastPlayer2Skill/);
   assert.doesNotMatch(water,/withFinalFreezeTargets|wrapSecondaryFreeze/);
 });
 
@@ -95,7 +99,7 @@ test("formal Heal and Purify runtime keeps robust fallbacks and the selected pri
   assert.match(support,/typeof calculateSPHealingAmount==="function"[\s\S]*?legacySpBase/);
   assert.match(support,/const selectedPrimary=targetSide==="monster"[\s\S]*?\?enemyIndex/);
   assert.match(support,/const primaryTarget=targets\.includes\(selectedPrimary\)\?selectedPrimary:targets\[0\]/);
-  assert.match(support,/animateSupportCast\(state,characterIndex,skill,primaryTarget,targets,targetSide\)/);
+  assert.match(support,/const presentationTargetType=targets\.length>1[\s\S]*?animateSupportCast\(state,characterIndex,skill,primaryTarget,targets,targetSide,presentationTargetType\)/);
 });
 
 test("Lv5 resonance extension and three-cast Blood Burn exclude free follow-ups",()=>{
@@ -109,7 +113,7 @@ test("Lv5 resonance extension and three-cast Blood Burn exclude free follow-ups"
 });
 
 test("enemy Rock Wall shares tri-target owner and formal level data",()=>{
-  assert.match(abyss,/function resolveRockWall[\s\S]*?const targets=allyTriTargets\(monsterIndex\)/);
+  assert.match(abyss,/function resolveRockWall[\s\S]*?const targeting=allyTriTargeting\(monsterIndex\)[\s\S]*?const requestedTargets=targeting\.entries[\s\S]*?const targets=requestedTargets\.filter/);
   assert.match(abyss,/defenseBonusPercentByLevel/);
   assert.match(abyss,/同排最多/);
   assert.doesNotMatch(abyss,/function resolveRockWall[\s\S]{0,700}?const targets=currentAbyssEntries\(\)/);
