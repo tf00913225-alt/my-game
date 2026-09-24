@@ -1001,7 +1001,7 @@
     /* Timed support buffs consume on each affected monster's formal
        action boundary through FourSymbolsDurationLifecycle. */
 
-    function bossPosition(){    function bossPosition(){ return [61,21]; }
+    function bossPosition(){ return [61,21]; }
     const ABYSS_DIALOGUE={
         1:["凡人也敢踏入帝境？","黃沙會埋葬你的名字。","先過天兵這一關再說！"],
         2:["烈火會把你的勇氣燒光。","再向前一步，便是灰燼。","你撐不過南天之焰！"],
