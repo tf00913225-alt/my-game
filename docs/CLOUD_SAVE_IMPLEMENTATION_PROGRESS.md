@@ -7,7 +7,7 @@
 | Phase | 範圍 | 狀態 |
 | --- | --- | --- |
 | 1 | Single Active Session（單一有效工作階段權威） | COMPLETE / 5/5 VERIFIED |
-| 2 | Cloud Save Skeleton（雲端存檔骨架） | IN PROGRESS / 5/6 VERIFIED |
+| 2 | Cloud Save Skeleton（雲端存檔骨架） | COMPLETE / 6/6 VERIFIED |
 | 3 | UID Local Isolation / Login Loading（本機隔離／登入載入） | NOT STARTED |
 | 4 | General Progress Migration（一般進度遷移） | NOT STARTED |
 | 5 | High-value Data Backend Authority（高價值資料後端權威） | NOT STARTED |
@@ -22,7 +22,7 @@
 ## B. Current Phase（目前階段）
 
 - Phase 1 — Single Active Session Authority：**COMPLETE / 5/5 VERIFIED**。
-- Phase 2 — Cloud Save Skeleton：**IN PROGRESS / 5/6 VERIFIED**。PR #553 已合併 `dev@195acb63d4acd36ceada31ed95b5f50e448d297f`；PR CI、Java 21 emulator、最新 dev Repository checks、DEV exact-SHA 與 Firebase deploy 均 SUCCESS。只剩真實 DEV 帳號的 live envelope bootstrap／read-back 驗證。
+- Phase 2 — Cloud Save Skeleton：**COMPLETE / 6/6 VERIFIED**。PR #553／#554／#555 已依序合併 `dev`；最新驗收部署為 `dev@b037ced9dad9d1cf67d9aacccb4e064c74a135e1`。Repository checks、Java 21 emulator、DEV exact-SHA、Firebase deploy 與真實 Google 帳號手機 live envelope 驗證均 SUCCESS。
 - 起始基準：GitHub 最新 `dev@7dd60dcddc9334902e058123a6084a93353e5943`，2026-09-19 重新 fetch 核對。
 - 原實作分支：`feature/cloud-session-authority-phase1-20260919`，當時只整合 `dev`。本次結案分支：`docs/cloud-session-phase1-closeout-20260919`，基準為重新核對的 `dev@342ef104fa2897f5ae5c3249e0c75c9efca3e762`；使用者已授權完成結案後經受保護 PR 發布 main。禁止直接修改 dev／main、rebase、force push。
 - 官方版本／cache version 維持 `173.65`，沒有升版。
@@ -82,7 +82,7 @@
 
 ## C. Completed Work（已實作／驗證證據）
 
-### Phase 2 Cloud Save Envelope（2026-09-24，待遠端驗證）
+### Phase 2 Cloud Save Envelope（2026-09-24，COMPLETE / 6/6 VERIFIED）
 
 - 新增唯一 Envelope owner：`functions/src/cloud-save-envelope.js`。正式 public envelope schema 為 Version 2，固定包含 `ownerUid`、`schemaVersion`、server-owned `serverRevision`、`createdAt`、`updatedAt`、authoritative readiness 與 migration metadata 狀態。
 - `bootstrapCloudSave` 仍在 Session Authority 的同一 Firestore transaction 內執行：新帳號建立 Revision 1；重複 bootstrap 不變更 envelope Revision／updatedAt；Phase 1 的精確 Version 1／Revision 0 骨架可受控升級為 Version 2／Revision 1。
@@ -93,7 +93,8 @@
 - PR #553 已合併 `dev@195acb63d4acd36ceada31ed95b5f50e448d297f`。PR Repository checks `35987380366`、PR Session Authority `35987380024`、merged dev Repository checks／DEV deploy `35987880895`、merged dev Session Authority／Firebase deploy `35987880460` 全部 SUCCESS；正式 Firebase deploy job `107595824436` SUCCESS。
 - `js/firebase/firebase-bootstrap.js` 公開最小 `FourSymbolsFirebase.bootstrapCloudSave()` bridge，僅呼叫既有 Session-protected callable，不自動執行、不影響 first-use read resolution、不上傳本機 gameplay save。此入口只供最後 live 驗證與未來受控帳號流程使用。
 - DEV 帳號面板提供手機可點擊的「驗證雲端存檔骨架」按鈕：連續 bootstrap 兩次後讀回 envelope，僅在 owner、Version 2、相同有效 Revision、`authoritativeStateReady:false` 且無 gameplay payload 時顯示成功；不顯示 credential、不提交 legacy／本機存檔，且不在正式網域出現。
-- Requirement Batch：`release/requirement-batches/2026-09-24-cloud-save-phase2-envelope.json`，目前 5/6 VERIFIED；live DEV 帳號驗證前不能宣稱 Phase 2 完成。
+- 2026-09-24 真實裝置驗收：使用者以原 Google 帳號在手機 Chrome 的 DEV 頁面取得 `Schema V2、Revision 1` 成功結果；按鈕連續 bootstrap 未增加 Revision，且未建立正式 gameplay state。先前從 ChatGPT 內建瀏覽器開啟時 Google 流程未完成，改用完整 Chrome 後成功，故判定為嵌入式瀏覽器 OAuth 限制而非 Session Authority 或 Envelope 失敗。PR #555 合併 SHA `b037ced9dad9d1cf67d9aacccb4e064c74a135e1`；merged dev CI `35992274605`、Session Authority／Firebase deploy `35992274447` attempt 2 均 SUCCESS。
+- Requirement Batch：`release/requirement-batches/2026-09-24-cloud-save-phase2-envelope.json`，目前 COMPLETE / 6/6 VERIFIED。
 
 ### Session Authority owner
 
@@ -216,13 +217,13 @@ Wire callable 名稱是 `protectedTest`（本文 protected-test 的正式 Fireba
 
 ## G. Next Safe Step（每次結束必更新）
 
-**Phase 1 功能驗收 COMPLETE / 5/5 VERIFIED；Phase 2 為 IN PROGRESS / 5/6 VERIFIED，已部署但尚缺真實 DEV 帳號 live envelope 驗收。**
+**Phase 1 功能驗收 COMPLETE / 5/5 VERIFIED；Phase 2 為 COMPLETE / 6/6 VERIFIED。**
 
 1. 先讀本文件、`AGENTS.md`、`ARCHITECTURE_RULES.md`、`SYSTEM_CONTRACTS.md`、`docs/BOOT_ARCHITECTURE.md`、本次 Requirement Batch。
 2. 看 `functions/src/session-authority.js`、`functions/index.js`、`js/firebase/session-client.js`、`firebase-session.js`、兩個 Firebase client owners 與 `firestore.rules`。
 3. [結案 PR #341](https://github.com/tf00913225-alt/my-game/pull/341) 先以 CI 全綠合併 dev，再核對該最新 SHA 的 Repository checks、DEV 與 Firebase 部署；把最終 dev SHA／run／job 記錄於結案 PR。
 4. 比較 main←dev，完成受保護 PR 與正式部署驗證；把 main SHA、production deployment 及登入／DEV 測試區隔離結果記入永久發布記錄。任一發布環節未完成，整次任務仍回報 NOT COMPLETE。
-5. Phase 2 手機驗證按鈕的工作分支須先完成 PR Repository checks；合併 dev 後只由 exact latest dev workflow 部署。以真實 DEV 帳號按下按鈕並看到 Version 2、相同 Revision 與無 gameplay payload 的成功結果後，才可改為 COMPLETE / VERIFIED。
+5. Phase 2 已以真實 Google 帳號在手機 Chrome 完成 Version 2／Revision 1／重複 bootstrap 不增 Revision／無 gameplay payload 驗證。ChatGPT 內建瀏覽器曾使 Google OAuth 不完整，不作為後端失敗證據；後續登入驗收必須使用完整瀏覽器或正式 App Auth surface。
 6. Phase 3 另行處理 UID local isolation／login loading；Phase 4 才開始一般 gameplay progress migration。禁止把 Phase 2 envelope 誤稱完整雲端存檔。
 7. 不修改戰鬥／VFX／UI、經濟／背包／秘寶、支付或 gameplay save owner，禁止 local overwrite 與無關 refactor。禁止直接修改 main／dev。
 
