@@ -537,6 +537,8 @@
         monster.vGameplayTowerFloor=floor;
         monster.vGameplayTowerRole="boss";
         monster.vGameplayBossId=definition.id;
+        monster.portraitKey="tower-boss."+definition.element+"."+(floor>=80?"venerable":"envoy");
+        monster.vGameplayPortraitSizeClass="standard";
         configureBossSkills(monster,definition.element,stage);
         applyTowerElementProfile(monster,definition.element);
         return monster;
