@@ -58,3 +58,11 @@ test("local save failure restores in-memory settings",()=>{
     assert.throws(()=>setup.restore("uid-a",preferences()),/Failed to save/);
     assert.equal(setup.context.autoConfig.skill,"normal");
 });
+
+test("offline Boot QA cloud double exports the Phase 4 bridge but never writes",async()=>{
+    const qa=fs.readFileSync(new URL("../.github/scripts/run-boot-architecture-browser-qa.mjs",import.meta.url),"utf8");
+    const match=qa.match(/const fakeCloud=String\.raw`([\s\S]*?)`;/);
+    assert.ok(match,"Boot QA cloud module double must exist");
+    const stub=await import("data:text/javascript,"+encodeURIComponent(match[1]));
+    await assert.rejects(stub.saveLocalAutoBattlePreferences(),/QA never performs a cloud write/);
+});
