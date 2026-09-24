@@ -541,7 +541,7 @@
     /* Legacy V144 timed-buff round ticking is retired. Persistent durations
        are owned by FourSymbolsDurationLifecycle in the battle core. */
 
-    window.v144RuleDiagnostics=function(){    window.v144RuleDiagnostics=function(){
+    window.v144RuleDiagnostics=function(){
         return {
             version:VERSION,
             shopPotionIds:SHOP_POTION_IDS.slice(),
