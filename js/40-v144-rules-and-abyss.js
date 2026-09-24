@@ -304,6 +304,42 @@
         return lv<=10?0:lv<=40?1:lv<=70?2:3;
     }
 
+    function isMonsterSkillElementLegal(monster,skillId){
+        if(!monster||!skillId||typeof skillDatabase==="undefined"){ return false; }
+        const skill=skillDatabase[skillId];
+        if(!skill){ return false; }
+        const explicit=Array.isArray(monster.v144CrossElementSkillIds)
+            ?monster.v144CrossElementSkillIds:[];
+        if(explicit.includes(skillId)){ return true; }
+        const skillElement=String(skill.element||"");
+        const monsterElement=String(monster.element||"");
+        return !!skillElement&&!!monsterElement&&skillElement===monsterElement;
+    }
+
+    function legalCarriedMonsterSkillIds(monster,kind){
+        if(!monster){ return []; }
+        const source=kind==="support"?monster.v141SupportSkillIds:monster.skillIds;
+        return Array.from(new Set(Array.isArray(source)?source:[]))
+            .filter(id=>isMonsterSkillElementLegal(monster,id));
+    }
+
+    function normalizeMonsterSkillLoadout(monster){
+        if(!monster){ return monster; }
+        monster.skillIds=legalCarriedMonsterSkillIds(monster,"attack");
+        monster.v141SupportSkillIds=legalCarriedMonsterSkillIds(monster,"support");
+        if(Array.isArray(monster.v144LegalSkillPool)){
+            monster.v144LegalSkillPool=Array.from(new Set(monster.v144LegalSkillPool))
+                .filter(id=>isMonsterSkillElementLegal(monster,id));
+        }
+        if(monster.v175ForcedAttackSkillId&&!monster.skillIds.includes(monster.v175ForcedAttackSkillId)){
+            delete monster.v175ForcedAttackSkillId;
+        }
+        if(monster.v175ForcedSupportSkillId&&!monster.v141SupportSkillIds.includes(monster.v175ForcedSupportSkillId)){
+            delete monster.v175ForcedSupportSkillId;
+        }
+        return monster;
+    }
+
     function legalMonsterSkillPool(monster){
         if(!monster||monster.v141Abyss||typeof skillDatabase==="undefined"){ return []; }
         const maxTier=tierLimit(monster.level);
@@ -327,8 +363,12 @@
 
     let encounterSequence=0;
     function configureEncounterSkills(monster,encounterId){
-        if(!monster||monster.v141Abyss){ return monster; }
+        if(!monster){ return monster; }
+        if(monster.v141Abyss){
+            return normalizeMonsterSkillLoadout(monster);
+        }
         if(monster.v132FixedSkillLoadout){
+            normalizeMonsterSkillLoadout(monster);
             const forcedLevel=Math.max(1,Math.floor(numeric(monster.v141ForceSkillLevel)||1));
             monster.v144LegalSkillPool=(monster.skillIds||[]).slice();
             monster.v141SkillLevel=forcedLevel;
@@ -342,9 +382,12 @@
         monster.v141SkillLevel=monsterSkillLevel(monster.level);
         monster.v144SkillLevel=monster.v141SkillLevel;
         monster.v144SkillEncounter=encounterId||("generated-"+(++encounterSequence));
-        return monster;
+        return normalizeMonsterSkillLoadout(monster);
     }
 
+    window.v144IsMonsterSkillElementLegal=isMonsterSkillElementLegal;
+    window.v144GetLegalMonsterSkillIds=legalCarriedMonsterSkillIds;
+    window.v144NormalizeMonsterSkillLoadout=normalizeMonsterSkillLoadout;
     window.v144GetMonsterSkillCarryLimit=monsterCarryLimit;
     window.v144GetMonsterFixedSkillLevel=monsterSkillLevel;
     window.v144GetMonsterLegalSkillPool=legalMonsterSkillPool;
@@ -500,24 +543,22 @@
     if(typeof window.v132LaunchDungeonBattle==="function"){
         const previousLaunchDungeonBattle=window.v132LaunchDungeonBattle;
         window.v132LaunchDungeonBattle=function(roster){
-            if(!(Array.isArray(roster)&&roster.some(monster=>monster&&monster.v174TrueRealmFinal))){
-                const encounterId="dungeon-"+(++encounterSequence);
-                (roster||[]).forEach(monster=>configureEncounterSkills(monster,encounterId));
-            }
+            const options=arguments[2]&&typeof arguments[2]==="object"?arguments[2]:{};
+            const encounterId=String(options.mode||"dungeon")+"-"+(++encounterSequence);
+            (roster||[]).forEach(monster=>configureEncounterSkills(monster,encounterId));
             return previousLaunchDungeonBattle.apply(this,arguments);
         };
     }
 
-    /* 日常副本的舊啟動器保留在 V132 私有閉包內；在真正 renderBattle
-       完成元素平均化後再鎖定一次，涵蓋所有副本入口且不會每回合重抽。 */
+    /* 共用 Dungeon launcher 會被 Daily/Tower/Boss/Adventure/Abyss 重用。
+       Render 後只再次驗證正式攜帶技能，不再改寫 monster.element。 */
     let configuredDungeonBattleToken=null;
     function configureDungeonBattleSkillsAfterRender(){
         const roster=typeof monsters!=="undefined"?monsters:null;
         const token=typeof battleToken!=="undefined"?battleToken:null;
         if(
             window.v132ActiveDungeonRun&&
-            token!==configuredDungeonBattleToken&&
-            !(Array.isArray(roster)&&roster.some(monster=>monster&&monster.v174TrueRealmFinal))
+            token!==configuredDungeonBattleToken
         ){
             configuredDungeonBattleToken=token;
             const encounterId="dungeon-render-"+(++encounterSequence);
