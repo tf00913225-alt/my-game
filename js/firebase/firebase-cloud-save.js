@@ -112,6 +112,28 @@ export async function bootstrapTrustedCloudSave(){
     return callTrustedFunction("bootstrapCloudSave", {});
 }
 
+/* Explicit, same-UID preference upload. Never sends the character save,
+ * and never runs as part of saveGame, login or offline replay. */
+export async function saveLocalAutoBattlePreferences(expectedRevision){
+    const uid=requireSignedInUid();
+    const repository=window.FourSymbolsAccountSave;
+    if(!repository||repository.getActiveUid()!==uid){
+        const error=new Error("The active local save belongs to another account.");
+        error.code="ACCOUNT_CHANGED";
+        throw error;
+    }
+    const local=repository.readForUid(uid);
+    if(local.status!=="ready"){
+        const error=new Error("No verified local character save is available.");
+        error.code="LOCAL_SAVE_REQUIRED";
+        throw error;
+    }
+    const {player,player2,player3,autoConfig,autoConfig2,autoConfig3}=local.save;
+    const characterIds=[player,player2,player3].map(character=>character?.id||null);
+    const preferences=JSON.parse(JSON.stringify({characterIds,autoConfig,autoConfig2,autoConfig3}));
+    return callTrustedFunction("saveCloudPreferences",{preferences,expectedRevision});
+}
+
 export async function submitLegacyMigrationCandidate(options={}){
     const save = readLegacyLocalSave();
     const clientVersion = String(options.clientVersion || "").trim() || null;

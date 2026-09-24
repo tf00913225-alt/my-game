@@ -1,6 +1,6 @@
 # Cloud Save Phase 4：一般進度遷移契約（施工中）
 
-狀態：IN PROGRESS；尚無正式 gameplay cloud write、部署或手機驗收。基準 `dev@d8986afa62f0c1f2646fad1f4d1ca73b2be389f6`，工作分支 `feature/cloud-save-phase4-general-progress-20260924`。`main` 禁止修改。
+狀態：IN PROGRESS；偏好欄位已有 candidate 實作，尚未部署或手機驗收，正式角色 gameplay cloud write 仍未開啟。基準 `dev@d8986afa62f0c1f2646fad1f4d1ca73b2be389f6`，工作分支 `feature/cloud-save-phase4-general-progress-20260924`。`main` 禁止修改。
 
 ## 現有 owner 與風險
 
@@ -26,3 +26,10 @@
 5. 以 emulator 與既有 Boot browser QA 驗證舊版 envelope 升級、同 UID 重複提交、兩裝置 revision 競態、UID／session 變動、未驗證獎勵及離線衝突；真手機 DEV 驗收後才宣稱 Phase 4 完成。
 
 Phase 4 的可交付面需能真正恢復**允許範圍**內的資料，並明示未涵蓋的角色／資產。沒有後端驗證的領獎狀態不能因為名稱含「進度」就放行；若與高價值資料不可分割，必須保留為待 Phase 5 處理並明確標示範圍，不能為達成階段數字而靜默承認不可信存檔。
+
+## 本輪候選實作（待 CI／DEV／實機驗收）
+
+- 第一批只含三名角色的 `autoConfig`／`autoConfig2`／`autoConfig3`，加上三個角色 ID 作恢復綁定；後端只接受每組固定五個設定欄位、拒絕任何額外欄位或金幣／物品。`allyFormation` 與 `bestiaryData` 尚未通過獎勵／戰力審核，不在這輪寫入。
+- `saveCloudPreferences` 使用 Phase 1 session 保護的同一 Firestore transaction，比對 expected `serverRevision`，版本不符拒絕；相同設定不增加 revision，更新只用 server timestamp。無 envelope 必須先 bootstrap，且 `authoritativeStateReady:false` 保持不變。
+- DEV 帳號面板有手動「驗證自動戰鬥設定上雲」與「取回雲端自動戰鬥設定」按鈕。上傳只讀 UID 本機主存檔的上述欄位；取回先要求明確確認，再核對相同 UID、角色 ID 和 revision，在 gameplay save owner 中只套用自動設定並走既有本機存檔流程。沒有登入時自動同步，也沒有以局部設定觸發創角或恢復完整角色。
+- 這是有限的偏好同步，不等於跨手機恢復角色／背包／金幣或 Phase 4 整體結案。正式 gameplay／獎勵權威後端仍待後續工程；真手機驗收前不得標記 COMPLETE。

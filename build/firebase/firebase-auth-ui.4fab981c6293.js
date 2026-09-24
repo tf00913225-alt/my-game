@@ -15,7 +15,7 @@ let resumeGraceUsed=false;
 let resumeActive=false;
 let resumeDeadline=0;
 let resumeInterval=0;
-let state={mode:"AUTH_RESOLVING",user:null,message:"正在初始化 Firebase Authentication…",error:false,migration:null,sessionTest:"",cloudEnvelopeTest:""};
+let state={mode:"AUTH_RESOLVING",user:null,message:"正在初始化 Firebase Authentication…",error:false,migration:null,sessionTest:"",cloudEnvelopeTest:"",cloudPreferencesTest:""};
 
 const byId=id=>document.getElementById(id);
 function errorText(error){
@@ -97,6 +97,11 @@ function markup(){
             <div class="firebase-auth-actions">
               <button id="firebaseCloudEnvelopeTestButton" class="firebase-auth-button secondary" type="button">驗證雲端存檔骨架</button>
             </div>
+            <div id="firebaseCloudPreferencesTestResult" class="firebase-auth-cloud-state" role="status" aria-live="polite">只上傳目前 UID 的自動戰鬥設定；不傳角色、金幣、背包或獎勵。</div>
+            <div class="firebase-auth-actions">
+              <button id="firebaseCloudPreferencesTestButton" class="firebase-auth-button secondary" type="button">驗證自動戰鬥設定上雲</button>
+              <button id="firebaseCloudPreferencesRestoreButton" class="firebase-auth-button secondary" type="button">取回雲端自動戰鬥設定</button>
+            </div>
           </div>
           <div id="firebaseMigrationPanel" hidden>
             <p id="firebaseMigrationMessage" class="firebase-auth-subtitle"></p>
@@ -115,7 +120,7 @@ function markup(){
 }
 function setBusy(value){
     busy=value===true;
-    ["firebaseGoogleButton","firebaseGuestButton","firebaseEmailSignInButton","firebaseEmailCreateButton","firebaseMigrationConfirmButton","firebaseRetryButton","firebaseSignOutButton","firebaseAuthBackButton","firebaseSwitchAccountButton","firebaseSessionTestButton","firebaseCloudEnvelopeTestButton"].forEach(id=>{ const button=byId(id); if(button){ button.disabled=busy; } });
+    ["firebaseGoogleButton","firebaseGuestButton","firebaseEmailSignInButton","firebaseEmailCreateButton","firebaseMigrationConfirmButton","firebaseRetryButton","firebaseSignOutButton","firebaseAuthBackButton","firebaseSwitchAccountButton","firebaseSessionTestButton","firebaseCloudEnvelopeTestButton","firebaseCloudPreferencesRestoreButton"].forEach(id=>{ const button=byId(id); if(button){ button.disabled=busy; } });
 }
 function renderResumeCountdown(){
     if(!resumeActive){ return; }
@@ -152,6 +157,10 @@ function render(){
     const cloudEnvelopeTestResult=byId("firebaseCloudEnvelopeTestResult");
     if(cloudEnvelopeTestResult){
         cloudEnvelopeTestResult.textContent=state.cloudEnvelopeTest||"按下按鈕驗證 Phase 2 雲端存檔骨架。";
+    }
+    const cloudPreferencesTestResult=byId("firebaseCloudPreferencesTestResult");
+    if(cloudPreferencesTestResult){
+        cloudPreferencesTestResult.textContent=state.cloudPreferencesTest||"只上傳目前 UID 的自動戰鬥設定；不傳角色、金幣、背包或獎勵。";
     }
     const migration=byId("firebaseMigrationPanel");
     migration.hidden=state.mode!=="MIGRATION_REQUIRED";
@@ -248,6 +257,70 @@ async function testCloudSaveEnvelope(){
         render();
     }
 }
+async function testCloudPreferences(){
+    if(busy||!DEV_SESSION_TEST_ENABLED){ return; }
+    setBusy(true);
+    state={...state,cloudPreferencesTest:"正在驗證目前 UID 的自動戰鬥設定…"};
+    render();
+    try{
+        const api=window.FourSymbolsFirebase;
+        if(!api||!api.getUser||!api.resolveCloudSave||!api.bootstrapCloudSave||!api.saveLocalAutoBattlePreferences){
+            throw new Error("CLOUD_PREFERENCES_TEST_UNAVAILABLE");
+        }
+        const user=api.getUser();
+        if(!user?.uid){ throw new Error("AUTH_REQUIRED"); }
+        await api.bootstrapCloudSave();
+        const before=await api.resolveCloudSave(user);
+        if(!before.exists||before.data?.ownerUid!==user.uid){ throw new Error("CLOUD_PREFERENCES_OWNER_MISMATCH"); }
+        const write=await api.saveLocalAutoBattlePreferences(before.data.serverRevision);
+        const after=await api.resolveCloudSave(user);
+        if(!write.ok||write.uid!==user.uid||after.data?.ownerUid!==user.uid||
+           write.serverRevision!==after.data.serverRevision||after.data.preferencesVersion!==1||
+           after.data.authoritativeStateReady!==false||
+           !after.data.preferences?.autoConfig||!after.data.preferences?.autoConfig2||!after.data.preferences?.autoConfig3){
+            throw new Error("CLOUD_PREFERENCES_VALIDATION_FAILED");
+        }
+        state={...state,cloudPreferencesTest:`✅ 設定已讀回（Revision ${write.serverRevision}）；未建立完整角色雲端存檔。`};
+    }catch(error){
+        console.error("Firebase cloud preferences test failed:",error);
+        state={...state,cloudPreferencesTest:sessionTestFailureText(error).startsWith("⚠️ 無法確認")
+            ?"⚠️ 設定驗證未完成；手機原存檔未修改。若另一裝置已更新，請重新確認後再操作。"
+            :sessionTestFailureText(error)};
+    }finally{ setBusy(false); render(); }
+}
+async function restoreCloudPreferences(){
+    if(busy||!DEV_SESSION_TEST_ENABLED){ return; }
+    if(state.mode!=="READY"&&state.mode!=="OFFLINE_READY"){
+        state={...state,cloudPreferencesTest:"請先完成此 UID 的角色載入，再取回設定。"};
+        render();
+        return;
+    }
+    setBusy(true);
+    try{
+        const api=window.FourSymbolsFirebase;
+        const user=api?.getUser?.();
+        if(!user?.uid||!api.resolveCloudSave){ throw new Error("AUTH_REQUIRED"); }
+        const cloud=await api.resolveCloudSave(user);
+        if(!cloud.exists||cloud.data?.ownerUid!==user.uid||cloud.data.preferencesVersion!==1||!cloud.data.preferences){
+            throw new Error("此 UID 尚無可取回的自動戰鬥設定。");
+        }
+        if(!window.confirm("只以雲端的自動戰鬥設定取代本機三名角色的對應設定；角色、金幣、背包和獎勵保持原樣。確定嗎？")){
+            state={...state,cloudPreferencesTest:"已取消取回；本機設定未修改。"};
+            return;
+        }
+        const latest=await api.resolveCloudSave(user);
+        if(latest.data?.serverRevision!==cloud.data.serverRevision||latest.data?.ownerUid!==user.uid){
+            throw new Error("雲端資料已變更，請重新確認後再操作。");
+        }
+        const owner=window.FourSymbolsGameSave;
+        if(!owner?.restoreAutoBattlePreferences){ throw new Error("請等角色載入完成後再取回設定。"); }
+        owner.restoreAutoBattlePreferences(user.uid,latest.data.preferences);
+        state={...state,cloudPreferencesTest:"✅ 此 UID 的自動戰鬥設定已取回並儲存在本機；未改動其他角色資料。"};
+    }catch(error){
+        console.error("Firebase cloud preferences restore failed:",error);
+        state={...state,cloudPreferencesTest:"⚠️ 未能取回設定；請確認原帳號與本機角色，或稍後再試。"};
+    }finally{ setBusy(false); render(); }
+}
 function clearResumeTimer(){
     if(resumeInterval){ window.clearInterval(resumeInterval); resumeInterval=0; }
 }
@@ -295,6 +368,10 @@ function bind(){
     if(sessionTestButton){ sessionTestButton.addEventListener("click",()=>{ void testCurrentDeviceSession(); }); }
     const cloudEnvelopeTestButton=byId("firebaseCloudEnvelopeTestButton");
     if(cloudEnvelopeTestButton){ cloudEnvelopeTestButton.addEventListener("click",()=>{ void testCloudSaveEnvelope(); }); }
+    const cloudPreferencesTestButton=byId("firebaseCloudPreferencesTestButton");
+    if(cloudPreferencesTestButton){ cloudPreferencesTestButton.addEventListener("click",()=>{ void testCloudPreferences(); }); }
+    const cloudPreferencesRestoreButton=byId("firebaseCloudPreferencesRestoreButton");
+    if(cloudPreferencesRestoreButton){ cloudPreferencesRestoreButton.addEventListener("click",()=>{ void restoreCloudPreferences(); }); }
     byId("firebaseSupportButton").addEventListener("click",()=>window.FourSymbolsSupport.show());
     byId("firebaseAuthBackButton").addEventListener("click",()=>{
         if(!state.user||(state.mode!=="READY"&&state.mode!=="OFFLINE_READY")){ return; }

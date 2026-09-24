@@ -292,6 +292,7 @@ window.FourSymbolsGameSave=Object.freeze({
     load:()=>loadGame(),
     hydrate:save=>loadGame(save),
     save:options=>saveGame(options),
+    restoreAutoBattlePreferences:(uid,preferences)=>restoreAutoBattlePreferences(uid,preferences),
     showCreation:()=>showCreation()
 });
 
@@ -4885,6 +4886,53 @@ const autoConfig3 = {
     returnToCityWhenEmpty:false
 
 };
+
+/* The only Phase 4 local restore owner: explicit, same-UID preferences only.
+ * Never hydrate a partial cloud record as a full gameplay save. */
+function restoreAutoBattlePreferences(uid,preferences){
+    const repository=window.FourSymbolsAccountSave;
+    if(!repository||!uid||repository.getActiveUid()!==uid||SAVE_KEY!==repository.saveKey(uid)){
+        throw new Error("Cloud preferences cannot be applied to a different UID.");
+    }
+    const local=repository.readForUid(uid);
+    if(local.status!=="ready"||!local.save?.player?.id||player.id!==local.save.player.id){
+        throw new Error("A verified local character is required to restore preferences.");
+    }
+    const keys=["autoConfig","autoConfig2","autoConfig3"];
+    const fields=["enabled","skill","hp","sp","returnToCityWhenEmpty"];
+    if(!preferences||typeof preferences!=="object"||Array.isArray(preferences)||
+       Object.keys(preferences).length!==keys.length+1||Object.keys(preferences).some(key=>key!=="characterIds"&&!keys.includes(key))||
+       !Array.isArray(preferences.characterIds)||preferences.characterIds.length!==3||
+       [local.save.player,local.save.player2,local.save.player3].some((character,index)=>
+           (character?.id||null)!==preferences.characterIds[index])){
+        throw new Error("Cloud preferences contain unsupported fields.");
+    }
+    const snapshot={};
+    for(const key of keys){
+        const value=preferences[key];
+        if(!value||typeof value!=="object"||Array.isArray(value)||
+           Object.keys(value).length!==fields.length||Object.keys(value).some(field=>!fields.includes(field))||
+           typeof value.enabled!=="boolean"||typeof value.returnToCityWhenEmpty!=="boolean"||
+           typeof value.skill!=="string"||!/^[A-Za-z][A-Za-z0-9_-]{0,63}$/.test(value.skill)||
+           !Number.isInteger(value.hp)||value.hp<0||value.hp>100||
+           !Number.isInteger(value.sp)||value.sp<0||value.sp>100){
+            throw new Error("Cloud preferences are invalid.");
+        }
+        snapshot[key]=Object.fromEntries(fields.map(field=>[field,value[field]]));
+    }
+    const targets={autoConfig,autoConfig2,autoConfig3};
+    const previous=Object.fromEntries(keys.map(key=>[key,{...targets[key]}]));
+    try{
+        for(const key of keys){ Object.assign(targets[key],snapshot[key]); }
+        if(saveGame({source:"cloud-preferences-restore"})!==true){
+            throw new Error("Failed to save the restored preferences locally.");
+        }
+        return true;
+    }catch(error){
+        for(const key of keys){ Object.assign(targets[key],previous[key]); }
+        throw error;
+    }
+}
 
 
 /* V111：HP／SP 自動補給門檻統一為 25／50／75／90／100%。
