@@ -831,9 +831,9 @@
       "sha256": "2a7c37a8ece6",
       "bytes": 50619
     },
-    "build/feature-boss-relic.90b00e03fc7c.js": {
-      "sha256": "90b00e03fc7c",
-      "bytes": 84590
+    "build/feature-boss-relic.4b0d70e615c0.js": {
+      "sha256": "4b0d70e615c0",
+      "bytes": 84743
     },
     "build/feature-relic-progression.87f6a83606ad.js": {
       "sha256": "87f6a83606ad",
@@ -930,10 +930,6 @@
     "assets/ui/startup-main-city.d43e67af1c1c.jpg": {
       "sha256": "d43e67af1c1c",
       "bytes": 363193
-    },
-    "build/feature-boss-relic.4b0d70e615c0.js": {
-      "sha256": "4b0d70e615c0",
-      "bytes": 84743
     }
   }
 }
