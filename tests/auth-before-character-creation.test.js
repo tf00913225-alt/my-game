@@ -31,8 +31,8 @@ assert.match(startup,/function showCharacterCreationSurface\(\)[\s\S]*?saveOwner
 assert.match(startup,/safeCloudEmpty\(cloud,user\.uid\)[\s\S]*?enterCreation\(token\)/);
 assert.match(startup,/result&&result\.exists===false&&result\.uid===uid/,
     "a successful same-UID missing-document read is a proven empty account");
-assert.doesNotMatch(firebaseBootstrap,/bootstrapTrustedCloudSave/,
-    "first-use read resolution must not depend on an optional trusted write deployment");
+assert.doesNotMatch(firebaseBootstrap,/await bootstrapTrustedCloudSave|bootstrapTrustedCloudSave\(\)/,
+    "first-use read resolution must not invoke or depend on an optional trusted write deployment");
 assert.match(startup,/catch\(error\)\{[\s\S]*?禁止創角/);
 assert.doesNotMatch(startup,/async function enterReady[\s\S]{0,160}\+\+transitionToken/,
     "destination hydration must retain the active save-resolution token");

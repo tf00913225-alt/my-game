@@ -7,7 +7,7 @@
 | Phase | 範圍 | 狀態 |
 | --- | --- | --- |
 | 1 | Single Active Session（單一有效工作階段權威） | COMPLETE / 5/5 VERIFIED |
-| 2 | Cloud Save Skeleton（雲端存檔骨架） | IN PROGRESS / 5/5 IMPLEMENTED |
+| 2 | Cloud Save Skeleton（雲端存檔骨架） | IN PROGRESS / 5/6 VERIFIED |
 | 3 | UID Local Isolation / Login Loading（本機隔離／登入載入） | NOT STARTED |
 | 4 | General Progress Migration（一般進度遷移） | NOT STARTED |
 | 5 | High-value Data Backend Authority（高價值資料後端權威） | NOT STARTED |
@@ -22,7 +22,7 @@
 ## B. Current Phase（目前階段）
 
 - Phase 1 — Single Active Session Authority：**COMPLETE / 5/5 VERIFIED**。
-- Phase 2 — Cloud Save Skeleton：**IN PROGRESS / 5/5 IMPLEMENTED**。工作分支 `feature/cloud-save-phase2-envelope-20260924`，基準 `dev@e9a2f481d5a318050991d475201f359d694871cc`；須等 PR CI、Java 21 emulator、合併後最新 dev Firebase deploy 與 live envelope 驗證後才能改為 COMPLETE / VERIFIED。
+- Phase 2 — Cloud Save Skeleton：**IN PROGRESS / 5/6 VERIFIED**。PR #553 已合併 `dev@195acb63d4acd36ceada31ed95b5f50e448d297f`；PR CI、Java 21 emulator、最新 dev Repository checks、DEV exact-SHA 與 Firebase deploy 均 SUCCESS。只剩真實 DEV 帳號的 live envelope bootstrap／read-back 驗證。
 - 起始基準：GitHub 最新 `dev@7dd60dcddc9334902e058123a6084a93353e5943`，2026-09-19 重新 fetch 核對。
 - 原實作分支：`feature/cloud-session-authority-phase1-20260919`，當時只整合 `dev`。本次結案分支：`docs/cloud-session-phase1-closeout-20260919`，基準為重新核對的 `dev@342ef104fa2897f5ae5c3249e0c75c9efca3e762`；使用者已授權完成結案後經受保護 PR 發布 main。禁止直接修改 dev／main、rebase、force push。
 - 官方版本／cache version 維持 `173.65`，沒有升版。
@@ -90,7 +90,9 @@
 - 既有 envelope 的 UID、schema、Revision、server timestamps、status／migration metadata 不一致，或非權威 envelope 混入 gameplay payload 時一律 fail closed；不再以 merge 靜默修補任意損壞文件。
 - 本階段不包裝 `saveGame()`／`loadGame()`，不遷移一般進度或高價值資料，不新增付款、operationId、帳本、快照或 Phase 3 的 account switching owner。
 - 本機精準測試 21/21 PASS、`npm run build:check` PASS、`git diff --check` PASS。當前 runner 僅 Java 17，Firebase CLI 15.30.0 要求 Java 21，因此本機 emulator 明確 BLOCKED；`.github/workflows/session-authority.yml` 已固定安裝 Java 21 並新增 Phase 2 unit／backend gate，遠端結果尚待 PR。
-- Requirement Batch：`release/requirement-batches/2026-09-24-cloud-save-phase2-envelope.json`，目前 5/5 IMPLEMENTED，不能宣稱完成或已部署。
+- PR #553 已合併 `dev@195acb63d4acd36ceada31ed95b5f50e448d297f`。PR Repository checks `35987380366`、PR Session Authority `35987380024`、merged dev Repository checks／DEV deploy `35987880895`、merged dev Session Authority／Firebase deploy `35987880460` 全部 SUCCESS；正式 Firebase deploy job `107595824436` SUCCESS。
+- `js/firebase/firebase-bootstrap.js` 公開最小 `FourSymbolsFirebase.bootstrapCloudSave()` bridge，僅呼叫既有 Session-protected callable，不自動執行、不影響 first-use read resolution、不上傳本機 gameplay save。此入口只供最後 live 驗證與未來受控帳號流程使用。
+- Requirement Batch：`release/requirement-batches/2026-09-24-cloud-save-phase2-envelope.json`，目前 5/6 VERIFIED；live DEV 帳號驗證前不能宣稱 Phase 2 完成。
 
 ### Session Authority owner
 
@@ -213,7 +215,7 @@ Wire callable 名稱是 `protectedTest`（本文 protected-test 的正式 Fireba
 
 ## G. Next Safe Step（每次結束必更新）
 
-**Phase 1 功能驗收 COMPLETE / 5/5 VERIFIED；Phase 2 為 IN PROGRESS / 5/5 IMPLEMENTED，尚未部署驗收。**
+**Phase 1 功能驗收 COMPLETE / 5/5 VERIFIED；Phase 2 為 IN PROGRESS / 5/6 VERIFIED，已部署但尚缺真實 DEV 帳號 live envelope 驗收。**
 
 1. 先讀本文件、`AGENTS.md`、`ARCHITECTURE_RULES.md`、`SYSTEM_CONTRACTS.md`、`docs/BOOT_ARCHITECTURE.md`、本次 Requirement Batch。
 2. 看 `functions/src/session-authority.js`、`functions/index.js`、`js/firebase/session-client.js`、`firebase-session.js`、兩個 Firebase client owners 與 `firestore.rules`。
