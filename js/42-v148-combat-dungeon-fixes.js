@@ -259,31 +259,45 @@
     }
 
     function requestedBuffTargets(characterIndex,queued,skill){
-        const owner=battlefieldSlots();
         const all=partyIndexes();
         const living=index=>{
             const target=getPartyCharacterByIndex(index);
             return !!(target&&numeric(target.hp)>0);
         };
+        const targetingOwner=window.FourSymbolsBattleSkillTargeting;
+        const selected=Number.isInteger(queued.targetAlly)?queued.targetAlly:characterIndex;
+
+        if(targetingOwner&&typeof targetingOwner.resolveTargets==="function"){
+            if(skill.targetType==="allyAll"){
+                return targetingOwner.resolveTargets(
+                    "player",null,"allyAll",{hostilePrimary:false}
+                ).filter(living);
+            }
+            return targetingOwner.resolveTargets(
+                "player",
+                selected,
+                skill.targetType==="allyTri"?"allyTri":"ally",
+                {hostilePrimary:false}
+            ).filter(living);
+        }
+
+        const owner=battlefieldSlots();
         if(owner&&typeof owner.ensureAllyFormation==="function"&&typeof owner.resolveAllyTargets==="function"){
             const formation=owner.ensureAllyFormation(all);
             if(skill.targetType==="allyAll"){
                 return owner.resolveAllyTargets(formation,null,"all",living);
             }
             if(skill.targetType==="allyTri"){
-                const preferred=Number.isInteger(queued.targetAlly)?queued.targetAlly:characterIndex;
-                return owner.resolveAllyTargets(formation,preferred,"allyTri",living);
+                return owner.resolveAllyTargets(formation,selected,"allyTri",living);
             }
-            const selected=Number.isInteger(queued.targetAlly)?queued.targetAlly:characterIndex;
             return owner.resolveAllyTargets(formation,selected,"ally",living);
         }
         if(skill.targetType==="allyAll"){ return livingPartyIndexes(); }
-        const selected=Number.isInteger(queued.targetAlly)?queued.targetAlly:characterIndex;
         const target=getPartyCharacterByIndex(selected);
         return target&&numeric(target.hp)>0?[selected]:[];
     }
 
-    function buffDuration(skill,level){
+    function buffDuration(skill,level){    function buffDuration(skill,level){
         return Math.max(1,Math.floor(
             levelValue(skill.durationByLevel,level,numeric(skill.duration)||2)
         ));
