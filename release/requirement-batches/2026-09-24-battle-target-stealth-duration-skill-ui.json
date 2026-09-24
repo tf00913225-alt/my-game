@@ -42,7 +42,8 @@
     "repositoryChecks": "PENDING",
     "build": "PENDING",
     "browserQA": "PENDING",
-    "diffCheck": "PENDING"
+    "diffCheck": "PENDING",
+    "candidateHead": "336ac5e51aece9fd47145f008f63c611c5aebbff"
   },
   "notes": [
     "main is not modified by this work branch.",
