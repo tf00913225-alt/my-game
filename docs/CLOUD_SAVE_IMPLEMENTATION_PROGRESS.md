@@ -24,8 +24,8 @@
 - Phase 1 — Single Active Session Authority：**COMPLETE / 5/5 VERIFIED**。
 - Phase 2 — Cloud Save Skeleton：**COMPLETE / 6/6 VERIFIED**。PR #553／#554／#555 已依序合併 `dev`；最新驗收部署為 `dev@b037ced9dad9d1cf67d9aacccb4e064c74a135e1`。Repository checks、Java 21 emulator、DEV exact-SHA、Firebase deploy 與真實 Google 帳號手機 live envelope 驗證均 SUCCESS。
 - Phase 3 — UID Local Isolation / Login Loading：**COMPLETE / 6/6 VERIFIED**。PR #557 Repository checks run `35999834624` SUCCESS，合併 `dev@eed8dec359eff34727381adfbfa50b7c2ea09bd3`；DEV release manifest 與 hashed Boot Core 已讀回同一 SHA／Phase 3 owner。使用者以真實手機完成 Google → 訪客 → Google 驗收：訪客未看見 Google 角色／資料，重新登入 Google 後原角色／資料正常恢復。
-- Phase 4 — General Progress Migration：**IN PROGRESS / 0/6 VERIFIED**。受保護的自動戰鬥偏好讀寫已經 PR #559／#560／#561 合入 `dev` 並部署；手機已證實上傳和雲端讀回，確認視窗修復通過 CI／DEV 部署，但修復後的手機取回結果尚未回報。這只是偏好設定測試；等級、EXP、金幣、背包、裝備、任務及領獎資料仍在 UID 本機存檔，不能宣稱換手機能取回角色。詳見 `docs/CLOUD_SAVE_PHASE4_CONTRACT.md` 及本階段 Requirement Batch。
-- Phase 4 已部署的有限範圍：僅 UID＋角色 ID 綁定的三組自動戰鬥設定；受保護寫入核對 `serverRevision`，手動上傳／取回不會建立完整角色。PR #561 修正自訂非同步確認視窗被 `window.confirm` 包裝器一律當作取消的問題，測試涵蓋確認、取消、UID 切換與 revision 變動；合併 `dev@01c543564498400b38dd8778acccb9d76777131f`，merged Repository checks／DEV deploy run `36022298612` SUCCESS，部署 SHA 核對一致、Game／Cache 均 `173.72`，Session Authority run `36022298060` SUCCESS。手機上傳、雲端骨架與 Revision 讀回有使用者截圖；修復後的手機取回、第二台裝置、離線與獎勵驗收仍待完成，不把 CI 當成實機驗收。
+- Phase 4 — General Progress Migration：**IN PROGRESS / 0/6 VERIFIED**。受保護的自動戰鬥偏好讀寫已經 PR #559／#560／#561 合入 `dev` 並部署；手機已證實上傳、雲端讀回與修復後手動取回成功；使用者指出彈窗的「返回／取回」字樣易混淆，改為「取消／套用雲端設定」。這只是偏好設定測試；等級、EXP、金幣、背包、裝備、任務及領獎資料仍在 UID 本機存檔，不能宣稱換手機能取回角色。詳見 `docs/CLOUD_SAVE_PHASE4_CONTRACT.md` 及本階段 Requirement Batch。
+- Phase 4 已部署的有限範圍：僅 UID＋角色 ID 綁定的三組自動戰鬥設定；受保護寫入核對 `serverRevision`，手動上傳／取回不會建立完整角色。PR #561 修正自訂非同步確認視窗被 `window.confirm` 包裝器一律當作取消的問題，測試涵蓋確認、取消、UID 切換與 revision 變動；合併 `dev@01c543564498400b38dd8778acccb9d76777131f`，merged Repository checks／DEV deploy run `36022298612` SUCCESS，部署 SHA 核對一致、Game／Cache 均 `173.72`，Session Authority run `36022298060` SUCCESS。手機上傳、雲端骨架與 Revision 讀回有使用者截圖；修復後使用者再以手機 Chrome 操作「取回」，看到「此 UID 的自動戰鬥設定已取回並儲存在本機」且 Revision 7，確認窗的操作通過實機驗證。第二台裝置、離線與獎勵驗收仍待完成；UI 成功訊息未單獨證明跨手機角色還原。
 - 起始基準：GitHub 最新 `dev@7dd60dcddc9334902e058123a6084a93353e5943`，2026-09-19 重新 fetch 核對。
 - 原實作分支：`feature/cloud-session-authority-phase1-20260919`，當時只整合 `dev`。本次結案分支：`docs/cloud-session-phase1-closeout-20260919`，基準為重新核對的 `dev@342ef104fa2897f5ae5c3249e0c75c9efca3e762`；使用者已授權完成結案後經受保護 PR 發布 main。禁止直接修改 dev／main、rebase、force push。
 - 官方版本／cache version 維持 `173.65`，沒有升版。
@@ -163,7 +163,7 @@
 1. Phase 1 功能驗收已完成；本次結案文件仍須 PR → Repository checks SUCCESS → merge dev，然後核對最新 dev 的 CI、DEV deployment、Session Authority emulator 與 Firebase deploy，逐一記錄實際 SHA。
 2. 使用者已授權 dev → main 發布；只有上述最新 dev 驗證成功，且 main←dev 比較無獨立修復、素材分支混入或機密，才可建立及合併受保護發布 PR。正式部署、登入及無 DEV 測試區亦須獨立驗證。完成結果寫入[結案 PR #341](https://github.com/tf00913225-alt/my-game/pull/341) 永久發布記錄，不預填成功。
 3. Artifact Registry 清理政策本身仍有非阻塞警告，保留維運追蹤；不以 Deploy complete 推定政策設定成功。
-4. Phase 3 已完成；Phase 4 偏好設定試驗已部署但整批仍 0/6 VERIFIED，手機取回與跨裝置 QA 未完成；Phase 5–10 仍 NOT STARTED。真正的換機角色恢復需要後端對等級、EXP、金幣、背包、裝備與領獎狀態建立可信權威與遷移策略；不能整包採納本機 gameplay payload 或把偏好測試當作正式角色存檔。
+4. Phase 3 已完成；Phase 4 偏好設定試驗已部署但整批仍 0/6 VERIFIED，手機取回確認操作已通過，跨裝置 QA 未完成；Phase 5–10 仍 NOT STARTED。真正的換機角色恢復需要後端對等級、EXP、金幣、背包、裝備與領獎狀態建立可信權威與遷移策略；不能整包採納本機 gameplay payload 或把偏好測試當作正式角色存檔。
 
 ## E. Architecture Decisions（永久決策）
 
@@ -239,7 +239,7 @@ Wire callable 名稱是 `protectedTest`（本文 protected-test 的正式 Fireba
 3. [結案 PR #341](https://github.com/tf00913225-alt/my-game/pull/341) 先以 CI 全綠合併 dev，再核對該最新 SHA 的 Repository checks、DEV 與 Firebase 部署；把最終 dev SHA／run／job 記錄於結案 PR。
 4. 比較 main←dev，完成受保護 PR 與正式部署驗證；把 main SHA、production deployment 及登入／DEV 測試區隔離結果記入永久發布記錄。任一發布環節未完成，整次任務仍回報 NOT COMPLETE。
 5. Phase 2 已以真實 Google 帳號在手機 Chrome 完成 Version 2／Revision 1／重複 bootstrap 不增 Revision／無 gameplay payload 驗證。ChatGPT 內建瀏覽器曾使 Google OAuth 不完整，不作為後端失敗證據；後續登入驗收必須使用完整瀏覽器或正式 App Auth surface。
-6. Phase 3 已完成自動與真實手機隔離驗收。Phase 4 下一步先在手機 Chrome 的固定 DEV 網址用同一 Google UID 驗證修復後「取回」與「返回」各自結果；另一台裝置上不得為了測試局部偏好而建立／覆蓋角色。接著設計並實作可信角色／資產後端與舊存檔遷移，先確定首次採納與衝突策略，再做跨手機角色恢復測試；不得把本機存檔直接升格為雲端權威或整包覆蓋 Phase 2 Envelope。
+6. Phase 3 已完成自動與真實手機隔離驗收。Phase 4 下一步手機 Chrome 同一 Google UID 的「取回」已顯示成功，彈窗改為「取消／套用雲端設定」並待新標籤上線確認；另一台裝置上不得為了測試局部偏好而建立／覆蓋角色。接著設計並實作可信角色／資產後端與舊存檔遷移，先確定首次採納與衝突策略，再做跨手機角色恢復測試；不得把本機存檔直接升格為雲端權威或整包覆蓋 Phase 2 Envelope。
 7. 不修改戰鬥／VFX／UI、經濟／背包／秘寶、支付或 gameplay save owner，禁止 local overwrite 與無關 refactor。禁止直接修改 main／dev。
 
 官方技術依據：[Callable 身分驗證](https://firebase.google.com/docs/functions/callable)、[Firebase auth_time／撤銷檢查](https://firebase.google.com/docs/auth/admin/manage-sessions)、[Firestore 原子交易與重跑](https://firebase.google.com/docs/firestore/manage-data/transactions)。
