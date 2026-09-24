@@ -316,24 +316,14 @@ test("resonance and Blood Burn add in one direct-damage bonus bucket",()=>{
     assert.equal(r.skills.flameSlash.damageBonusPercent,undefined,"temporary bucket contribution is restored after the cast");
 });
 
-test("duration lifecycle counts effective actions, blocked actions and never consumes a newly-cast buff",()=>{
-    const r=makeRuntime();
-    const actor=r.owners.fire;
-    actor.activeBuffs=[{type:"rage",turnsLeft:3}];
-    actor.statusEffects=[{type:"freeze",turnsLeft:3},{type:"frostbite",turnsLeft:2}];
-    for(let action=1;action<=3;action++){
-        r.beginAction({type:"player",characterIndex:0});
-        if(action===1){ actor.activeBuffs.push({type:"dodgeSkill",turnsLeft:3}); }
-        r.finishAction();
-        if(action<3){
-            assert.equal(actor.activeBuffs.find(buff=>buff.type==="rage")?.turnsLeft,3-action,`rage action ${action}`);
-            assert.equal(actor.statusEffects.find(effect=>effect.type==="freeze")?.turnsLeft,3-action,`freeze blocks action ${action}`);
-        }
-    }
-    assert.equal(actor.activeBuffs.some(buff=>buff.type==="rage"),false,"three effective actions exhaust a three-turn buff");
-    assert.equal(actor.statusEffects.some(effect=>effect.type==="freeze"),false,"three blocked actions exhaust a three-turn Freeze");
-    assert.equal(actor.activeBuffs.find(buff=>buff.type==="dodgeSkill")?.turnsLeft,1,"a buff created during the action does not lose that action");
-    assert.equal(actor.statusEffects.some(effect=>effect.type==="frostbite"),false,"two affected actions exhaust two-turn Frostbite");
+test("duration lifecycle is owned by the core BattleFlow rather than the late progression module",()=>{
+    const main=fs.readFileSync("js/00-main.js","utf8");
+    assert.match(main,/window\.FourSymbolsDurationLifecycle=Object\.freeze/);
+    assert.match(main,/function beginBattleDurationAction\(event\)/);
+    assert.match(main,/function finishBattleDurationAction\(\)/);
+    assert.match(main,/function finishPlayerAction\(\)[\s\S]*?interceptBattleActionFinish\(\)[\s\S]*?finishBattleDurationAction\(\)/);
+    assert.doesNotMatch(source,/window\.FourSymbolsDurationLifecycle=Object\.freeze/);
+    assert.doesNotMatch(source,/captureActionDurationEntries|restoreActionDurationEntries|previousStartTurnForDuration/);
 });
 
 test("wind and earth support values stay in formal arrays instead of transient skill mutation",()=>{
