@@ -3,10 +3,10 @@
   "batchId": "2026-09-23-v17372-main-release",
   "baseBranch": "dev",
   "baseCommit": "9993440390c752419a16cf612acedd003fa246af",
-  "currentMain": "852a857120bc6c486812c820b17971acf9176e55",
+  "currentMain": "871e7ff9cb3219ee6ce499eedbed95a89af35431",
   "officialVersion": "173.72",
   "officialVersionBumpAllowed": true,
-  "overallStatus": "IMPLEMENTED",
+  "overallStatus": "VERIFIED",
   "requirements": [
     {
       "id": "REL-01",
@@ -65,9 +65,22 @@
     },
     {
       "id": "REL-05",
-      "status": "TODO",
+      "status": "VERIFIED",
       "requirement": "以 protected dev → main 正式發布 PR 推進 main；main CI、production Pages deployment、production SHA、Game Version、Cache Version 全部驗證成功。",
-      "evidence": []
+      "evidence": [
+        "PR #537 merged and closed",
+        "V173.72 functional release main@871e7ff9cb3219ee6ce499eedbed95a89af35431",
+        "final main candidate CI run 35940764204 SUCCESS",
+        "main push CI run 35941657759 SUCCESS",
+        "Full Node Suite 209 / 209 PASS",
+        "GitHub Pages run 35941650616 SUCCESS",
+        "production Pages pages_build_version 871e7ff9cb3219ee6ce499eedbed95a89af35431; deployment reported SUCCESS",
+        "production URL https://tf00913225-alt.github.io/my-game/",
+        "Game Version 173.72",
+        "Cache Version 173.72",
+        "Release Notice V173.72",
+        "production Battle basic verification PASS by exact Runtime-content equivalence with deployed Battle live-QA source dev@6ef30c38ecba00d059547d119fc6fec06365f9e6 plus successful main Fixed Slot browser QA; main push exact-candidate real-battle step was skipped and is not counted as an independent PASS"
+      ]
     }
   ],
   "includedRequirementBatches": [
@@ -75,12 +88,12 @@
     "2026-09-23-freeze-petrify-exclusive-status-layer",
     "2026-09-23-skill-relic-runtime-owner-convergence"
   ],
-  "automatedVerification": "V173.72 release-prep PR #535 and verification PR #536 were previously merged. PR #539 aligned the battle-info browser fixture, and PR #540 converged the remaining stale full-suite contracts plus confirmed Runtime regressions. The final dev merge is dev@6ef30c38ecba00d059547d119fc6fec06365f9e6. Dev push CI run 35939891769 and exact-SHA deployment job 107445532893 both succeeded; deployment verified SHA 6ef30c38ecba00d059547d119fc6fec06365f9e6, Game/Cache 173.72, and deployed Battle live QA PASS. Protected dev → main PR #537 remains pending final candidate CI.",
-  "visualVerification": "Final dev exact-SHA deployment at 6ef30c38ecba00d059547d119fc6fec06365f9e6 passed deployed Battle layer/audio live mobile QA.",
+  "automatedVerification": "V173.72 completed protected dev → main promotion via PR #537. Final main candidate CI run 35940764204 succeeded at dev@b0658abdda6a54315243643a2e8d9577ad244165. The functional release is main@871e7ff9cb3219ee6ce499eedbed95a89af35431; main push CI run 35941657759 succeeded with Full Node Suite 209/209 and release/browser gates. GitHub Pages run 35941650616 succeeded, and its deploy job created production with pages_build_version 871e7ff9cb3219ee6ce499eedbed95a89af35431 and reported success. release/release.json is Game/Cache 173.72/173.72 and release/release-update.json is Release Notice V173.72. PR #544 changed only this release requirement evidence after the deployed Battle live-QA source dev@6ef30c38ecba00d059547d119fc6fec06365f9e6; final dev and functional-release main share tree 2bd6186bb9bb5fe970574c1dce03c4d7adeea5d3. The main push exact-candidate real-battle browser step was skipped and is not counted as a separate PASS.",
+  "visualVerification": "Deployed Battle layer/audio live mobile QA passed on dev@6ef30c38ecba00d059547d119fc6fec06365f9e6. PR #544 then changed only this release evidence file; final dev@b0658abdda6a54315243643a2e8d9577ad244165 and functional-release main@871e7ff9cb3219ee6ce499eedbed95a89af35431 have the same tree. Main Fixed Slot 9x16 mobile browser QA also passed. No skipped main real-battle step is represented as an independent PASS.",
   "verifiedSourceCommit": "6ef30c38ecba00d059547d119fc6fec06365f9e6",
-  "mergedDevCommit": "6ef30c38ecba00d059547d119fc6fec06365f9e6",
-  "mergedMainCommit": null,
-  "candidateCiRun": 35881984862,
+  "mergedDevCommit": "b0658abdda6a54315243643a2e8d9577ad244165",
+  "mergedMainCommit": "871e7ff9cb3219ee6ce499eedbed95a89af35431",
+  "candidateCiRun": 35940764204,
   "devPushCiRun": 35939891769,
   "devDeployJob": 107445532893
 }
