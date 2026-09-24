@@ -19,6 +19,12 @@
 
 既有 UID local repository、唯讀 cloud reader、migration candidate 等是前置實作，**不代表 Phase 2–10 已驗收完成**。Phase 1 使用交易不代表 Phase 6 全部完成。
 
+## 2026-09-24 character-authority audit (next engineering gate)
+
+- At `dev@567375aea927495e0f16c04b836d8d414bd05bff`, audited core save, startup, Firebase backend and representative battle/quest/tower/abyss/relic reward writers. See `docs/CLOUD_CHARACTER_AUTHORITY_MIGRATION_DESIGN.md` for the field-to-writer map, trusted operation contract and legacy migration gates. `DATA_SECURITY_CONTRACTS.md` is absent at this baseline.
+- Corrected the Phase 4 Requirement Batch: its former `IMPLEMENTED` labels described only the deployed preference test, while the written requirements cover character, economy, claims and cross-device recovery. All six remain unverified and full-character implementation remains TODO. This is a documentation/safety gate, not a character cloud deployment.
+- Existing locally earned historical assets cannot be independently authenticated from a client save alone; a separately approved, auditable first-migration acceptance policy is required before treating those values as cloud authority. No second-phone character test should begin yet.
+
 ## B. Current Phase（目前階段）
 
 - Phase 1 — Single Active Session Authority：**COMPLETE / 5/5 VERIFIED**。
