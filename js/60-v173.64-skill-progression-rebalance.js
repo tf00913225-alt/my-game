@@ -996,7 +996,7 @@
     /* Persistent-effect duration is owned by js/00-main.js BattleFlow.
        This module only owns final skill data/projection and tactical effects. */
 
-    if(typeof document!=="undefined"&&!document.getElementById("v17364-skill-progression-style")){    if(typeof document!=="undefined"&&!document.getElementById("v17364-skill-progression-style")){
+    if(typeof document!=="undefined"&&!document.getElementById("v17364-skill-progression-style")){
         const style=document.createElement("style");
         style.id="v17364-skill-progression-style";
         style.textContent=
