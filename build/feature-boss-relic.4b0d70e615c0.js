@@ -434,7 +434,7 @@
     function compatibleSkillIds(element,ids){
         return (ids||[]).filter(id=>{
             const skill=typeof skillDatabase!=="undefined"&&skillDatabase?skillDatabase[id]:null;
-            return !skill||!skill.element||skill.element===element;
+            return !!(skill&&skill.element&&skill.element===element);
         });
     }
     function configureBossSkills(monster,element,stage){
@@ -454,7 +454,7 @@
     }
     function buildBossMonster(definition,options){
         const profile=options||{};
-        const mode=profile.mode||(String(definition.id||"").indexOf("world-")===0?"world":(String(definition.id||"").indexOf("tower-")===0?"tower":"personal"));
+        const mode=profile.mode||(String(definition.id||"").indexOf("world-")===0?"world":"personal");
         const balance=bossBalanceProfile(definition.level,mode,profile.stage);
         const monster=buildBaseMonster(definition.name,definition.level,definition.element,"boss");
         const hpMultiplier=balance.hpMultiplier*numeric(profile.hpFactor,1);
@@ -496,44 +496,81 @@
         return map[element]||"四象尊";
     }
     function towerMonsterLevel(floor){ return clamp(Math.round(29+floor*.71),30,100); }
-    function towerObjectPlan(floor){
-        if(floor===100){ return [{round:2,type:"shield"},{round:4,type:"charge"},{round:7,type:"heal"},{hpBelow:.3,type:"amplify"}]; }
-        if(floor>=70&&floor%10===0){ return [{round:2,type:"heal"},{round:5,type:"amplify"}]; }
-        if(floor>=50&&floor%10===0){ return [{round:2,type:"shield"},{round:5,type:"amplify"}]; }
-        if(floor>=40&&floor%10===0){ return [{round:2,type:"shield"}]; }
-        if(floor>=30&&floor%10===0){ return [{round:2,type:"charge"}]; }
-        if(floor%10===0){ return [{round:3,type:"charge"}]; }
-        return [];
+    function applyTowerElementProfile(monster,element){
+        if(element==="fire"){
+            monster.skillChance=Math.min(.82,numeric(monster.skillChance,.48)+.08);
+            monster.critChance=numeric(monster.critChance,5)+8;
+        }
+        if(element==="water"){
+            monster.v141SupportSkillIds=compatibleSkillIds(element,ELEMENTS.water.supports);
+            if(monster.v141SupportSkillIds.length){ monster.v141AbyssAi="support"; }
+        }
+        if(element==="wind"){
+            monster.evasion=numeric(monster.evasion,0)+8;
+            monster.agility=numeric(monster.agility,1)*1.12;
+        }
+        if(element==="earth"){
+            monster.defense=Math.round(numeric(monster.defense,1)*1.18);
+            monster.maxHP=Math.round(numeric(monster.maxHP,1)*1.12);
+            monster.hp=monster.maxHP;
+        }
+        return monster;
     }
-    function towerSummonPlan(floor){
-        if(floor===100){ return {hpBelow:.6}; }
-        if(floor>=70&&floor%10===0){ return {round:4}; }
-        if(floor>=50&&floor%10===0){ return {hpBelow:.5}; }
-        return null;
+    function buildTowerTroop(level,element,rank,floor){
+        const monster=buildBaseMonster("天兵天將",level,element,rank||"regular");
+        monster.vGameplayTower=true;
+        monster.vGameplayTowerFloor=floor;
+        monster.vGameplayTowerRole=rank==="elite"?"elite":"regular";
+        configureBossSkills(monster,element,Math.ceil(floor/30));
+        applyTowerElementProfile(monster,element);
+        return monster;
+    }
+    function buildTowerBossMonster(definition,floor){
+        const stage=floor===100?4:(floor>=70?3:(floor>=40?2:1));
+        const balance=bossBalanceProfile(definition.level,"tower",stage);
+        const monster=buildBaseMonster(definition.name,definition.level,definition.element,"boss");
+        monster.maxHP=Math.max(1,Math.round(numeric(monster.maxHP,1)*balance.hpMultiplier));
+        monster.hp=monster.maxHP;
+        monster.attack=Math.max(1,Math.round(numeric(monster.attack,1)*balance.attackMultiplier));
+        monster.magicAttack=Math.max(1,Math.round(numeric(monster.magicAttack,monster.attack)*balance.attackMultiplier));
+        monster.unitKind="tower-boss";
+        monster.vGameplayTower=true;
+        monster.vGameplayTowerBoss=true;
+        monster.vGameplayTowerFloor=floor;
+        monster.vGameplayTowerRole="boss";
+        monster.vGameplayBossId=definition.id;
+        monster.portraitKey="tower-boss."+definition.element+"."+(floor>=80?"venerable":"envoy");
+        monster.vGameplayPortraitSizeClass="standard";
+        configureBossSkills(monster,definition.element,stage);
+        applyTowerElementProfile(monster,definition.element);
+        return monster;
     }
     function buildTowerRoster(floor){
         const element=state.tower.element,level=towerMonsterLevel(floor);
+        const special=floor%5===0;
+        if(!special){
+            return Array.from({length:6},()=>buildTowerTroop(level,element,"regular",floor));
+        }
+        const roster=[];
         if(floor%10===0){
             const definition={id:"tower-"+floor,name:towerBossName(element,floor),level:level,element:element};
-            const stage=floor===100?4:(floor>=70?3:(floor>=40?2:1));
-            const boss=buildBossMonster(definition,{stage:stage,mode:"tower"});
-            return [boss];
+            roster.push(buildTowerBossMonster(definition,floor));
         }
-        const elite=floor%5===0,count=elite?2:Math.min(4,2+Math.floor(floor/35));
-        return Array.from({length:count},()=>{
-            const monster=buildBaseMonster("天兵天將",level,element,elite?"elite":"regular");
-            monster.vGameplayTower=true;monster.vGameplayTowerFloor=floor;
-            configureBossSkills(monster,element,Math.ceil(floor/30));
-            if(element==="fire"){ monster.skillChance=Math.min(.82,monster.skillChance+.08);monster.critChance=numeric(monster.critChance,5)+8; }
-            if(element==="water"){ monster.v141SupportSkillIds=compatibleSkillIds(element,ELEMENTS.water.supports);monster.v141AbyssAi="support"; }
-            if(element==="wind"){ monster.evasion=numeric(monster.evasion,0)+8;monster.agility=numeric(monster.agility,1)*1.12; }
-            if(element==="earth"){ monster.defense=Math.round(numeric(monster.defense,1)*1.18);monster.maxHP=Math.round(numeric(monster.maxHP,1)*1.12);monster.hp=monster.maxHP; }
-            return monster;
-        });
+        const eliteCount=2;
+        for(let i=0;i<eliteCount;i++){
+            roster.push(buildTowerTroop(level,element,"elite",floor));
+        }
+        while(roster.length<10){
+            roster.push(buildTowerTroop(level,element,"regular",floor));
+        }
+        return roster;
     }
 
+    function isLargeBossContext(){
+        return !!(activeBattleContext&&(activeBattleContext.mode==="personal"||activeBattleContext.mode==="world"));
+    }
     function activeBoss(){
-        return activeBattleContext&&activeBattleContext.boss&&activeBattleContext.boss.alive!==false
+        return isLargeBossContext()&&activeBattleContext.boss&&activeBattleContext.boss.alive!==false
             ?activeBattleContext.boss:null;
     }
 
@@ -547,7 +584,7 @@
     function battlefieldSlotOwner(){ return window.FourSymbolsBattlefieldSlots||null; }
     function bossIndex(){
         const context=activeBattleContext;
-        if(!context||typeof monsters==="undefined"){ return null; }
+        if(!isLargeBossContext()||!context||typeof monsters==="undefined"){ return null; }
         const index=Number.isInteger(context.bossIndex)?context.bossIndex:monsters.indexOf(context.boss);
         return index>=0?index:null;
     }
@@ -1161,7 +1198,11 @@
         const boss=buildBossMonster(definition,{stage:stage,mode:mode,hpFactor:stageProfile.hpFactor,attackFactor:stageProfile.attackFactor});
         activeBattleContext={mode:mode,definitionId:definition.id,stage:stage,combatPhase:1,totalPhases:world?1:definition.phases,boss:boss,bossIndex:null,expectedPartySize:balance.expectedPartySize,supportCount:0,summonPlan:stageProfile.summon,summonsCreated:false,objectIndexes:[],objectPlan:(world?stageProfile.objects:definition.objects).map(item=>Object.assign({},item)),spawnedPlans:{}};
         battleStarting=true;
-        const started=window.v132LaunchDungeonBattle([boss],outcome=>world?completeWorldStage(definition,stage,outcome):completePersonalBoss(definition,outcome));
+        const started=window.v132LaunchDungeonBattle(
+            [boss],
+            outcome=>world?completeWorldStage(definition,stage,outcome):completePersonalBoss(definition,outcome),
+            {mode:"boss",gameplayMode:mode}
+        );
         battleStarting=false;
         if(!started){ cleanupBossBattlePresentation();activeBattleContext=null;return false; }
         seedBossBattlefieldSnapshot();
@@ -1188,7 +1229,8 @@
         }else{
             cancelTowerAutoAdvance(true);
         }
-        cleanupBossBattlePresentation();
+        const slotOwner=battlefieldSlotOwner();
+        if(slotOwner&&typeof slotOwner.clearActiveEnemySnapshot==="function"){ slotOwner.clearActiveEnemySnapshot(); }
         activeBattleContext=null;
         if(typeof showPage==="function"){ showPage("tower"); }
         renderTowerPage();
@@ -1210,14 +1252,22 @@
         ensureCurrentTowerWeek();
         const target=clamp(Math.floor(numeric(floor,state.tower.completedFloor+1)),1,TOWER_FLOORS);
         if(battleStarting||highestCharacterLevel()<TOWER_UNLOCK_LEVEL||state.tower.pendingRelicChoice||target>state.tower.completedFloor+1){ return false; }
-        const roster=buildTowerRoster(target),boss=target%10===0?roster[0]:null;
-        const towerPhases=boss?(target===100?4:(target>=70?3:(target>=40?2:1))):1;
-        const balance=boss?bossBalanceProfile(boss.level,"tower",towerPhases):null;
-        activeBattleContext={mode:"tower",floor:target,boss:boss,bossIndex:null,combatPhase:1,totalPhases:towerPhases,expectedPartySize:balance?balance.expectedPartySize:expectedPartySizeForLevel(towerMonsterLevel(target)),supportCount:0,summonPlan:boss?towerSummonPlan(target):null,summonsCreated:false,objectIndexes:[],objectPlan:boss?towerObjectPlan(target):[],spawnedPlans:{}};
-        battleStarting=true;const started=window.v132LaunchDungeonBattle(roster,outcome=>completeTowerFloor(target,outcome));
+        const roster=buildTowerRoster(target);
+        const towerBoss=roster.find(monster=>monster&&monster.vGameplayTowerBoss===true)||null;
+        activeBattleContext={
+            mode:"tower",
+            floor:target,
+            towerBoss:towerBoss,
+            expectedPartySize:expectedPartySizeForLevel(towerMonsterLevel(target))
+        };
+        battleStarting=true;
+        const started=window.v132LaunchDungeonBattle(
+            roster,
+            outcome=>completeTowerFloor(target,outcome),
+            {mode:"tower"}
+        );
         battleStarting=false;
-        if(!started){ cleanupBossBattlePresentation();activeBattleContext=null;return false; }
-        if(boss){ seedBossBattlefieldSnapshot(); }
+        if(!started){ activeBattleContext=null;return false; }
         return true;
     }
     function chooseTowerRelic(id){

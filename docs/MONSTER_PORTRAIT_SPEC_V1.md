@@ -57,7 +57,11 @@ runtime 不得把怪物中文名稱直接轉成檔名，也不得靠「王／皇
 Boss（修行教頭、礦脈統領、金庫總管）不得套用大型 Boss 尺寸，也不得為了
 符合舊規則放大、重製或 resize。
 
-### 3.2 個人 BOSS／世界 BOSS／四象塔 BOSS／深淵帝王
+四象塔 Boss 雖然 gameplay `rank="boss"`，視覺規格固定為 Small Boss：
+`sizeClass="standard"`，使用 **1024 × 1536、2:3**。戰鬥階級與立繪尺寸
+是兩個獨立語意，不得因 `rank="boss"` 自動升級成大型 Boss 尺寸。
+
+### 3.2 個人 BOSS／世界 BOSS／深淵帝王
 
 - Library 母檔：**1536 × 2048 px 透明 PNG**。
 - 正式 runtime 資產：**1536 × 2048 px 無損 WebP**。
@@ -163,6 +167,10 @@ assets/monsters/soldiers/heavenly-soldier-earth.png
 ### 6.4 四象塔 BOSS
 
 低階「鎮塔使」與高階「鎮天尊」是兩個不同 portrait target；火／水／風／土各自獨立，共 8 個 BOSS target。
+
+四象塔 BOSS 固定為 Small Boss 視覺契約：`rank="boss"`、`sizeClass="standard"`，
+正式 runtime 使用 **1024 × 1536、2:3** 透明無損 WebP。不得使用個人／世界 Boss
+的 1536 × 2048 Large Boss 視覺尺寸，也不得使用中央六格 Boss footprint。
 
 ### 6.5 天兵天將
 

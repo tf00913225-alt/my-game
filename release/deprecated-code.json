@@ -100,6 +100,17 @@
         "freezeOverlayShimmer",
         "burnOverlayFlicker"
       ]
+    },
+    {
+      "id": "DEP-007-tower-element-large-boss-legacy-owners",
+      "description": "四象塔元素重洗、Tower 大型 Boss object/summon plan 與 V152 極帝名稱式技能 dispatcher 已退休；正式 Runtime 必須使用 Tower Owner、V144 Element Guard 與 Personal/World Large Boss 邊界。",
+      "enabled": true,
+      "forbidden": [
+        "rebalanceDungeonElements",
+        "towerObjectPlan",
+        "towerSummonPlan",
+        "v152ResolveExtremeEmperorAction"
+      ]
     }
   ]
 }

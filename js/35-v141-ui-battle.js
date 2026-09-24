@@ -534,38 +534,8 @@
     }
 
     /* =====================================================
-       Dungeon element balancing and battle rendering
+       Dungeon battle rendering
     ===================================================== */
-    function rebalanceDungeonElements(){
-        if(!window.v132ActiveDungeonRun){ return; }
-        const roster=currentBattleMonsters.map(index=>monsters[index]).filter(Boolean);
-        if(roster.some(monster=>monster.v141Abyss)){ return; }
-        const elements=["fire","water","earth","wind"];
-        for(let i=elements.length-1;i>0;i--){
-            const j=Math.floor(Math.random()*(i+1));
-            [elements[i],elements[j]]=[elements[j],elements[i]];
-        }
-        const bosses=roster.filter(monster=>getMonsterRank(monster)==="boss");
-        bosses.forEach((monster,index)=>{ monster.element=elements[index%elements.length]; });
-        let cursor=bosses.length;
-        roster.filter(monster=>getMonsterRank(monster)!=="boss").forEach(monster=>{
-            monster.element=elements[cursor++%elements.length];
-        });
-        roster.forEach(monster=>{
-            const oldSkills=(monster.skillIds||[]).map(id=>skillDatabase[id]).filter(Boolean);
-            const tier=Math.max(0,...oldSkills.map(skill=>Number(skill.tier)||0));
-            const pool=Object.keys(skillDatabase).filter(id=>{
-                const skill=skillDatabase[id];
-                return skill&&skill.element===monster.element&&
-                    (skill.category==="physical"||skill.category==="magic")&&
-                    (!tier||skill.tier===tier);
-            });
-            if(typeof window.v141ConfigureMonsterSkills==="function"){
-                window.v141ConfigureMonsterSkills(monster,{pool:pool});
-            }
-        });
-    }
-
     function applyFixedAbyssFormation(){
         const area=document.getElementById("battleMonsterArea");
         if(!area){ return; }
@@ -619,21 +589,21 @@
     const startedEntryTokens=new Set();
 
     function v141PrepareBattleRender(){
-        const isDungeon=!!window.v132ActiveDungeonRun;
+        const activeDungeonRun=window.v132ActiveDungeonRun||null;
+        const isDungeon=!!activeDungeonRun;
         if(!isDungeon && lastWildRankToken!==battleToken){
             lastWildRankToken=battleToken;
             if(typeof window.v141RollWildMonsterRanks==="function"){
                 window.v141RollWildMonsterRanks(currentBattleMonsters);
             }
         }
-        if(isDungeon){ rebalanceDungeonElements(); }
-
         battleSnapshot={
             token:battleToken,
             gold:Math.max(0,Number(gold)||0),
             exp:Math.max(0,Number(sharedExp)||0),
             items:getItemCounts(),
-            dungeon:isDungeon
+            dungeon:isDungeon,
+            dungeonMode:activeDungeonRun&&activeDungeonRun.mode||null
         };
     }
 

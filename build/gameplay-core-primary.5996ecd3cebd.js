@@ -4267,6 +4267,10 @@
         }
 
         window.v132ActiveDungeonRun={
+            identityVersion:1,
+            mode:String(opts.mode||"legacy-dungeon"),
+            gameplayMode:opts.gameplayMode?String(opts.gameplayMode):null,
+            dailyDungeonType:opts.dailyDungeonType?String(opts.dailyDungeonType):null,
             previousMonsters:monsters,
             previousZone:currentZone,
             onComplete:onComplete,
@@ -8228,7 +8232,10 @@
             const skill=typeof skillDatabase!=="undefined" ? skillDatabase[id] : null;
             return !!(
                 skill &&
-                (skill.category==="physical" || skill.category==="magic")
+                (skill.category==="physical" || skill.category==="magic") &&
+                (typeof window.v144IsMonsterSkillElementLegal==="function"
+                    ?window.v144IsMonsterSkillElementLegal(monster,id)
+                    :!!skill.element&&skill.element===monster.element)
             );
         });
         const limit=getMonsterSkillCarryLimit(monster.level);
@@ -8596,10 +8603,16 @@
             const max=ally.v141Shield?ally.v141Shield.baseMaxHP:ally.maxHP;
             return Math.max(0,ally.hp-shield)<max;
         });
-        const healSkill=skillDatabase.yuanXiangGuangMing;
-        const shieldSkill=skillDatabase.yuanGuangShield;
+        const supportIds=typeof window.v144GetLegalMonsterSkillIds==="function"
+            ?window.v144GetLegalMonsterSkillIds(monster,"support")
+            :(monster.v141SupportSkillIds||[]).filter(id=>{
+                const skill=skillDatabase[id];
+                return !!(skill&&skill.element&&skill.element===monster.element);
+            });
+        const healSkill=supportIds.includes("yuanXiangGuangMing")?skillDatabase.yuanXiangGuangMing:null;
+        const shieldSkill=supportIds.includes("yuanGuangShield")?skillDatabase.yuanGuangShield:null;
 
-        if(injured.length>0 && monster.sp>=healSkill.spCost){
+        if(healSkill&&injured.length>0 && monster.sp>=healSkill.spCost){
             monster.sp-=healSkill.spCost;
             showMonsterSkillNameBadge(healSkill.name,"light",monsterIndex);
             let total=0;
@@ -8610,7 +8623,7 @@
             return true;
         }
 
-        if(allies.some(ally=>getMonsterShieldRemaining(ally)<=0) && monster.sp>=shieldSkill.spCost){
+        if(shieldSkill&&allies.some(ally=>getMonsterShieldRemaining(ally)<=0) && monster.sp>=shieldSkill.spCost){
             monster.sp-=shieldSkill.spCost;
             showMonsterSkillNameBadge(shieldSkill.name,"light",monsterIndex);
             allies.forEach(ally=>applyMonsterShield(ally,200,2));
@@ -8626,8 +8639,11 @@
         const originalProcessSingleMonsterAttack=processSingleMonsterAttack;
         processSingleMonsterAttack=function(monsterIndex,token){
             const monster=monsters[monsterIndex];
+            if(monster&&typeof window.v144NormalizeMonsterSkillLoadout==="function"){
+                window.v144NormalizeMonsterSkillLoadout(monster);
+            }
             if(
-                monster&&monster.v141Abyss&&
+                monster&&Array.isArray(monster.v141SupportSkillIds)&&monster.v141SupportSkillIds.length>0&&
                 typeof window.v141TryMonsterSpecialAction==="function"
             ){
                 const handled=window.v141TryMonsterSpecialAction(monsterIndex,token);
@@ -9408,38 +9424,8 @@
     }
 
     /* =====================================================
-       Dungeon element balancing and battle rendering
+       Dungeon battle rendering
     ===================================================== */
-    function rebalanceDungeonElements(){
-        if(!window.v132ActiveDungeonRun){ return; }
-        const roster=currentBattleMonsters.map(index=>monsters[index]).filter(Boolean);
-        if(roster.some(monster=>monster.v141Abyss)){ return; }
-        const elements=["fire","water","earth","wind"];
-        for(let i=elements.length-1;i>0;i--){
-            const j=Math.floor(Math.random()*(i+1));
-            [elements[i],elements[j]]=[elements[j],elements[i]];
-        }
-        const bosses=roster.filter(monster=>getMonsterRank(monster)==="boss");
-        bosses.forEach((monster,index)=>{ monster.element=elements[index%elements.length]; });
-        let cursor=bosses.length;
-        roster.filter(monster=>getMonsterRank(monster)!=="boss").forEach(monster=>{
-            monster.element=elements[cursor++%elements.length];
-        });
-        roster.forEach(monster=>{
-            const oldSkills=(monster.skillIds||[]).map(id=>skillDatabase[id]).filter(Boolean);
-            const tier=Math.max(0,...oldSkills.map(skill=>Number(skill.tier)||0));
-            const pool=Object.keys(skillDatabase).filter(id=>{
-                const skill=skillDatabase[id];
-                return skill&&skill.element===monster.element&&
-                    (skill.category==="physical"||skill.category==="magic")&&
-                    (!tier||skill.tier===tier);
-            });
-            if(typeof window.v141ConfigureMonsterSkills==="function"){
-                window.v141ConfigureMonsterSkills(monster,{pool:pool});
-            }
-        });
-    }
-
     function applyFixedAbyssFormation(){
         const area=document.getElementById("battleMonsterArea");
         if(!area){ return; }
@@ -9493,21 +9479,21 @@
     const startedEntryTokens=new Set();
 
     function v141PrepareBattleRender(){
-        const isDungeon=!!window.v132ActiveDungeonRun;
+        const activeDungeonRun=window.v132ActiveDungeonRun||null;
+        const isDungeon=!!activeDungeonRun;
         if(!isDungeon && lastWildRankToken!==battleToken){
             lastWildRankToken=battleToken;
             if(typeof window.v141RollWildMonsterRanks==="function"){
                 window.v141RollWildMonsterRanks(currentBattleMonsters);
             }
         }
-        if(isDungeon){ rebalanceDungeonElements(); }
-
         battleSnapshot={
             token:battleToken,
             gold:Math.max(0,Number(gold)||0),
             exp:Math.max(0,Number(sharedExp)||0),
             items:getItemCounts(),
-            dungeon:isDungeon
+            dungeon:isDungeon,
+            dungeonMode:activeDungeonRun&&activeDungeonRun.mode||null
         };
     }
 
@@ -11048,7 +11034,12 @@
 
     window.v141TryMonsterSpecialAction=function(monsterIndex){
         const monster=monsters[monsterIndex];
-        const supportIds=monster&&monster.v141SupportSkillIds||[];
+        const supportIds=monster&&typeof window.v144GetLegalMonsterSkillIds==="function"
+            ?window.v144GetLegalMonsterSkillIds(monster,"support")
+            :(monster&&monster.v141SupportSkillIds||[]).filter(id=>{
+                const skill=skillDatabase[id];
+                return !!(skill&&skill.element&&skill.element===monster.element);
+            });
         if(!monster||!monster.alive||!supportIds.length){ return false; }
         const allyEntries=currentBattleMonsters.map(index=>({index:index,monster:monsters[index]}))
             .filter(entry=>entry.monster&&entry.monster.alive);
@@ -11069,7 +11060,13 @@
             healTargets=supportTargeting.entries;
             if(healTargets.length){ skillId="healSpell"; }
         }
-        const affordableAttacks=(monster.skillIds||[]).filter(id=>{
+        const carriedAttacks=typeof window.v144GetLegalMonsterSkillIds==="function"
+            ?window.v144GetLegalMonsterSkillIds(monster,"attack")
+            :(monster.skillIds||[]).filter(id=>{
+                const skill=skillDatabase[id];
+                return !!(skill&&skill.element&&skill.element===monster.element);
+            });
+        const affordableAttacks=carriedAttacks.filter(id=>{
             const skill=skillDatabase[id];
             return !!(skill&&monster.sp>=(skill.spCost||0));
         });
@@ -11420,7 +11417,7 @@
                     ?abyssFloors[floor].boss+"已退場。請開啟寶箱，再使用上方傳送點。"
                     :"五帝聯軍消失，深淵寶箱已出現。";
                 persistAbyss(); switchDungeonTab("abyss");
-            });
+            },{mode:"abyss"});
             if(!started){ abyssBattleStarting=false; }
         },180);
         return true;

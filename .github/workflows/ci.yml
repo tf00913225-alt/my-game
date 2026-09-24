@@ -104,6 +104,7 @@ jobs:
           node tests/battle-status-info-assets-20260922.test.js
           node tests/boss-battle-architecture-convergence-20260918.test.js
           node tests/gameplay-boss-tower-system.test.js
+          node tests/tower-element-formation-small-boss-20260924.test.js
           node tests/battle-stats-relic-tower-auto-20260920.test.js
           node tests/v142-skill-animation.test.js
           node tests/v150-ice-arrow-rain-vfx.test.js

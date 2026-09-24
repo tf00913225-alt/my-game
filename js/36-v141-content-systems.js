@@ -876,7 +876,12 @@
 
     window.v141TryMonsterSpecialAction=function(monsterIndex){
         const monster=monsters[monsterIndex];
-        const supportIds=monster&&monster.v141SupportSkillIds||[];
+        const supportIds=monster&&typeof window.v144GetLegalMonsterSkillIds==="function"
+            ?window.v144GetLegalMonsterSkillIds(monster,"support")
+            :(monster&&monster.v141SupportSkillIds||[]).filter(id=>{
+                const skill=skillDatabase[id];
+                return !!(skill&&skill.element&&skill.element===monster.element);
+            });
         if(!monster||!monster.alive||!supportIds.length){ return false; }
         const allyEntries=currentBattleMonsters.map(index=>({index:index,monster:monsters[index]}))
             .filter(entry=>entry.monster&&entry.monster.alive);
@@ -897,7 +902,13 @@
             healTargets=supportTargeting.entries;
             if(healTargets.length){ skillId="healSpell"; }
         }
-        const affordableAttacks=(monster.skillIds||[]).filter(id=>{
+        const carriedAttacks=typeof window.v144GetLegalMonsterSkillIds==="function"
+            ?window.v144GetLegalMonsterSkillIds(monster,"attack")
+            :(monster.skillIds||[]).filter(id=>{
+                const skill=skillDatabase[id];
+                return !!(skill&&skill.element&&skill.element===monster.element);
+            });
+        const affordableAttacks=carriedAttacks.filter(id=>{
             const skill=skillDatabase[id];
             return !!(skill&&monster.sp>=(skill.spCost||0));
         });
@@ -1248,7 +1259,7 @@
                     ?abyssFloors[floor].boss+"已退場。請開啟寶箱，再使用上方傳送點。"
                     :"五帝聯軍消失，深淵寶箱已出現。";
                 persistAbyss(); switchDungeonTab("abyss");
-            });
+            },{mode:"abyss"});
             if(!started){ abyssBattleStarting=false; }
         },180);
         return true;

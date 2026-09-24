@@ -661,7 +661,7 @@
                 equipmentDungeonRunning=false;
                 equipmentDungeonWaveIndex=-1;
                 showEquipmentReward();
-            });
+            },{mode:"daily",dailyDungeonType:"gold"});
             if(started===false){ equipmentDungeonRunning=false; equipmentDungeonWaveIndex=-1; }
         };
         launch(0);

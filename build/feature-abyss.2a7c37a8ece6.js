@@ -83,7 +83,7 @@
     const FINAL_TRUE_REALM_LOADOUTS=Object.freeze({
         "東帝天尊":Object.freeze({element:"earth",skills:Object.freeze(["dustStorm","flyingSandStrike"]),supports:Object.freeze(["rockWall"])}),
         "天帝天尊":Object.freeze({element:"wind",skills:Object.freeze(["windHowlLightning","stormRain"]),supports:Object.freeze(["stealthSkill"])}),
-        "極帝天尊":Object.freeze({element:"light",skills:Object.freeze(["flyingSandStrike","phoenixCry"]),supports:Object.freeze(["yuanZuBlessing"])}),
+        "極帝天尊":Object.freeze({element:"light",skills:Object.freeze(["flyingSandStrike","phoenixCry"]),supports:Object.freeze(["yuanZuBlessing"]),crossElementSkillIds:Object.freeze(["flyingSandStrike","phoenixCry"])}),
         "北帝天尊":Object.freeze({element:"water",skills:Object.freeze(["iceArrowRain","iceSpin"]),supports:Object.freeze(["healSpell"])}),
         "南帝天尊":Object.freeze({element:"fire",skills:Object.freeze(["dragonSlash","phoenixCry"]),supports:Object.freeze(["rage"])})
     });
@@ -373,13 +373,21 @@
         if(boss){
             monster.skillIds=(loadout?loadout.skills:region.bossSkills).slice();
             monster.v141SupportSkillIds=(loadout?loadout.supports:region.bossSupports).slice();
-            if(loadout){ monster.element=loadout.element; }
+            if(loadout){
+                monster.element=loadout.element;
+                monster.v144CrossElementSkillIds=Array.isArray(loadout.crossElementSkillIds)
+                    ?loadout.crossElementSkillIds.slice():[];
+            }
             monster.skillChance=region.id==="extreme"?0.78:0.72;
             if(region.id==="extreme"){ monster.v141AbyssAi="support"; }
         }else{
             monster.skillIds=(loadout?loadout.skills:monster.skillIds||[]).slice();
             monster.v141SupportSkillIds=(loadout?loadout.supports:[]).slice();
-            if(loadout){ monster.element=loadout.element; }
+            if(loadout){
+                monster.element=loadout.element;
+                monster.v144CrossElementSkillIds=Array.isArray(loadout.crossElementSkillIds)
+                    ?loadout.crossElementSkillIds.slice():[];
+            }
         }
         return monster;
     }
@@ -628,7 +636,7 @@
                 onClose:finish
             });
             if(!shown){ finish(); }
-        });
+        },{mode:"abyss"});
         if(!started){ battleStarting=false; }return !!started;
     }
     function confirmBossAndLaunch(){

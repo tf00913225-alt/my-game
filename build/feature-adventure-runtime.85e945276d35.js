@@ -572,7 +572,7 @@
                 window.FourSymbolsAdventureUI.show({battleOutcome:outcome&&outcome.result||"lose",focusNodeId:node.id});
             }
             render();
-        },{normalizeFailureResources:false});
+        },{mode:"adventure",normalizeFailureResources:false});
         if(!started){
             stopBattleResourceMonitor();
             runtime.activeAdventureBattle=null;

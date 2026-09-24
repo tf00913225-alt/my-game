@@ -578,10 +578,18 @@
     function chooseFinalAbyssAction(monster){
         const living=currentAbyssEntries();
         const attacks=(monster&&monster.skillIds||[]).filter(id=>{
-            const skill=skillDatabase[id]; return !!(skill&&numeric(monster.sp)>=numeric(skill.spCost));
+            const skill=skillDatabase[id];
+            const legal=typeof window.v144IsMonsterSkillElementLegal==="function"
+                ?window.v144IsMonsterSkillElementLegal(monster,id)
+                :!!(skill&&skill.element&&skill.element===monster.element);
+            return !!(legal&&skill&&numeric(monster.sp)>=numeric(skill.spCost));
         });
         const supports=(monster&&monster.v141SupportSkillIds||[]).filter(id=>{
-            const skill=skillDatabase[id]; return !!(skill&&numeric(monster.sp)>=numeric(skill.spCost));
+            const skill=skillDatabase[id];
+            const legal=typeof window.v144IsMonsterSkillElementLegal==="function"
+                ?window.v144IsMonsterSkillElementLegal(monster,id)
+                :!!(skill&&skill.element&&skill.element===monster.element);
+            return !!(legal&&skill&&numeric(monster.sp)>=numeric(skill.spCost));
         });
         const healNeeded=living.some(entry=>monsterBaseHp(entry.monster)<monsterBaseMaxHp(entry.monster)*.70);
         if(healNeeded&&supports.includes("healSpell")){ return {kind:"heal",skillId:"healSpell"}; }
