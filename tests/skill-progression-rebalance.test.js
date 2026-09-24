@@ -521,4 +521,3 @@ test("Stealth presentation dims only combatant artwork to 35 percent",()=>{
     assert.match(css,/\.battle-player\.v143-unit-stealthed > \.v174-battle-art[\s\S]*?opacity:\.35 !important/);
     assert.match(css,/\.battle-monster\.v143-unit-stealthed > \.v174-battle-art[\s\S]*?opacity:\.35 !important/);
 });
-
