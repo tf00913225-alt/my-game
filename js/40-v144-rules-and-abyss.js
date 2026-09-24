@@ -538,36 +538,10 @@
     /* V144 no longer owns an enemy support dispatcher. The shared Skill-ID
        dispatcher in V141/V155 is the sole runtime owner. */
 
-    let v144AbyssBuffTick="";
-    if(typeof startTurn==="function"){
-        const previousStartTurnForBuffs=startTurn;
-        startTurn=function(token){
-            const key=String(token)+":"+String(typeof turn!=="undefined"?turn:"");
-            if(key!==v144AbyssBuffTick){
-                v144AbyssBuffTick=key;
-                abyssAllies().forEach(entry=>{
-                    const monster=entry.monster;
-                    if(!monster||!monster.v141Abyss){ return; }
-                    ["v144CalmBuff","v144DodgeBuff"].forEach(prop=>{
-                        const buff=monster[prop];
-                        if(!buff){ return; }
-                        if(typeof turn!=="undefined"&&turn>1){ buff.turnsLeft--; }
-                        buff.display.turnsLeft=buff.turnsLeft;
-                        if(buff.turnsLeft>0){ return; }
-                        if(prop==="v144CalmBuff"){
-                            monster.accuracy=buff.originalAccuracy;
-                            monster.resistance=buff.originalResistance;
-                        }else{ monster.evasion=buff.originalEvasion; }
-                        monster.activeBuffs=(monster.activeBuffs||[]).filter(item=>item!==buff.display);
-                        delete monster[prop];
-                    });
-                });
-            }
-            return previousStartTurnForBuffs.apply(this,arguments);
-        };
-    }
+    /* Legacy V144 timed-buff round ticking is retired. Persistent durations
+       are owned by FourSymbolsDurationLifecycle in the battle core. */
 
-    window.v144RuleDiagnostics=function(){
+    window.v144RuleDiagnostics=function(){    window.v144RuleDiagnostics=function(){
         return {
             version:VERSION,
             shopPotionIds:SHOP_POTION_IDS.slice(),
