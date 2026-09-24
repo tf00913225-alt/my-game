@@ -60,8 +60,13 @@ function storage(){
     };
 }
 
-function load(){
+function load(options={}){
     const localStorage=storage();
+    const fixedNow=options.now===undefined?null:new Date(options.now).getTime();
+    const RuntimeDate=fixedNow===null?Date:class extends Date{
+        constructor(...args){ super(...(args.length?args:[fixedNow])); }
+        static now(){ return fixedNow; }
+    };
     const noop=()=>{};
     const document={
         readyState:"complete",getElementById:()=>null,querySelector:()=>null,querySelectorAll:()=>[],
@@ -70,7 +75,7 @@ function load(){
     };
     let context;
     context={
-        window:null,globalThis:null,console,JSON,Math:Object.create(Math),Date,Number,String,Boolean,Object,Array,Set,Map,Promise,RegExp,Error,TypeError,
+        window:null,globalThis:null,console,JSON,Math:Object.create(Math),Date:RuntimeDate,Number,String,Boolean,Object,Array,Set,Map,Promise,RegExp,Error,TypeError,
         parseInt,parseFloat,isNaN,localStorage,document,setTimeout:fn=>{ if(fn){ fn(); }return 1; },clearTimeout:noop,
         requestAnimationFrame:fn=>{ if(fn){ fn(); }return 1; },
         player:{id:"塔測試者",element:"fire",level:100,hp:10000,sp:2000,activeBuffs:[],statusEffects:[]},
@@ -158,7 +163,9 @@ function assertLegalSkills(context,monster){
 }
 
 for(const element of ["fire","water","earth","wind"]){
-    const context=load();
+    const probe=load();
+    const fixedDate=towerDateFor(probe,element).date;
+    const context=load({now:fixedDate});
     setTowerProgress(context,element,0);
     const roster=Array.from(context.GameplaySystem.buildTowerRoster(1));
     assert.equal(roster.length,6);
@@ -181,7 +188,9 @@ for(const element of ["fire","water","earth","wind"]){
 }
 
 {
-    const context=load();
+    const probe=load();
+    const fixedDate=towerDateFor(probe,"wind").date;
+    const context=load({now:fixedDate});
     setTowerProgress(context,"wind",0);
     const roster=Array.from(context.GameplaySystem.buildTowerRoster(5));
     assert.equal(roster.length,10);
@@ -197,7 +206,9 @@ for(const element of ["fire","water","earth","wind"]){
 }
 
 {
-    const context=load();
+    const probe=load();
+    const fixedDate=towerDateFor(probe,"fire").date;
+    const context=load({now:fixedDate});
     setTowerProgress(context,"fire",0);
     const roster=Array.from(context.GameplaySystem.buildTowerRoster(10));
     assert.equal(roster.length,10);
@@ -234,8 +245,8 @@ for(const element of ["fire","water","earth","wind"]){
 }
 
 {
-    const context=load();
     const now=new Date();
+    const context=load({now});
     const week=context.GameplaySystem.getWeekInfo(now);
     context.GameplaySystem.debugReloadState({
         tower:{
