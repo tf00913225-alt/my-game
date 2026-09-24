@@ -162,7 +162,7 @@
 1. Phase 1 功能驗收已完成；本次結案文件仍須 PR → Repository checks SUCCESS → merge dev，然後核對最新 dev 的 CI、DEV deployment、Session Authority emulator 與 Firebase deploy，逐一記錄實際 SHA。
 2. 使用者已授權 dev → main 發布；只有上述最新 dev 驗證成功，且 main←dev 比較無獨立修復、素材分支混入或機密，才可建立及合併受保護發布 PR。正式部署、登入及無 DEV 測試區亦須獨立驗證。完成結果寫入[結案 PR #341](https://github.com/tf00913225-alt/my-game/pull/341) 永久發布記錄，不預填成功。
 3. Artifact Registry 清理政策本身仍有非阻塞警告，保留維運追蹤；不以 Deploy complete 推定政策設定成功。
-4. Phase 3 已完成；Phase 4–10 仍全部 NOT STARTED。Phase 4 才處理正式 gameplay payload 與一般進度遷移；高價值資料、operationId、帳本、快照與付款仍屬後續獨立階段。
+4. Phase 3 已完成；Phase 4 已開始欄位與安全契約盤點（0/6 VERIFIED，未部署）；Phase 5–10 仍 NOT STARTED。Phase 4 不能整包採納本機 gameplay payload；高價值資料、operationId、帳本、快照與付款仍屬後續獨立階段。
 
 ## E. Architecture Decisions（永久決策）
 
@@ -238,7 +238,7 @@ Wire callable 名稱是 `protectedTest`（本文 protected-test 的正式 Fireba
 3. [結案 PR #341](https://github.com/tf00913225-alt/my-game/pull/341) 先以 CI 全綠合併 dev，再核對該最新 SHA 的 Repository checks、DEV 與 Firebase 部署；把最終 dev SHA／run／job 記錄於結案 PR。
 4. 比較 main←dev，完成受保護 PR 與正式部署驗證；把 main SHA、production deployment 及登入／DEV 測試區隔離結果記入永久發布記錄。任一發布環節未完成，整次任務仍回報 NOT COMPLETE。
 5. Phase 2 已以真實 Google 帳號在手機 Chrome 完成 Version 2／Revision 1／重複 bootstrap 不增 Revision／無 gameplay payload 驗證。ChatGPT 內建瀏覽器曾使 Google OAuth 不完整，不作為後端失敗證據；後續登入驗收必須使用完整瀏覽器或正式 App Auth surface。
-6. Phase 3 已完成自動與真實手機隔離驗收。下一階段若獲授權，從最新 dev 另開 Phase 4 工作分支，設計一般 gameplay progress migration；不得把本機存檔直接升格為雲端權威或整包覆蓋 Phase 2 Envelope。
+6. Phase 3 已完成自動與真實手機隔離驗收。Phase 4 工作分支與安全契約已建立；接下來逐欄審核並實作可信一般進度，不得把本機存檔直接升格為雲端權威或整包覆蓋 Phase 2 Envelope。
 7. 不修改戰鬥／VFX／UI、經濟／背包／秘寶、支付或 gameplay save owner，禁止 local overwrite 與無關 refactor。禁止直接修改 main／dev。
 
 官方技術依據：[Callable 身分驗證](https://firebase.google.com/docs/functions/callable)、[Firebase auth_time／撤銷檢查](https://firebase.google.com/docs/auth/admin/manage-sessions)、[Firestore 原子交易與重跑](https://firebase.google.com/docs/firestore/manage-data/transactions)。
