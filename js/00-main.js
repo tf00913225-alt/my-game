@@ -21381,7 +21381,7 @@ function player2AutoAction(token){
     return autoActionForCharacter(1,token);
 }
 
-function player3AutoAction(token){function player3AutoAction(token){
+function player3AutoAction(token){
     return autoActionForCharacter(2,token);
 }
 
