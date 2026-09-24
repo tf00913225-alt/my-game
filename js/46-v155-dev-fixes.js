@@ -701,7 +701,7 @@
         window.FourSymbolsBattleFlow.subscribeRoundStart(tickV155RoundStates);
     }
 
-    let phoenixCastContext=null;    let phoenixCastContext=null;
+    let phoenixCastContext=null;
     let damageActorContext=null;
     let monsterReflectContext=null;
 
