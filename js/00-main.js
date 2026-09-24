@@ -4189,6 +4189,127 @@ let battleAutoActionResume=null;
 let battleRoundPromptTimeoutId=null;
 let battleRoundPromptRelease=null;
 let activeBattleStatisticsAction=null;
+/*
+ * Persistent Effect Duration Lifecycle
+ *
+ * BattleFlow owns action boundaries, so duration consumption lives here rather
+ * than in a late skill module. A snapshot is captured immediately before the
+ * combatant acts and consumed once by the matching action-finished signal.
+ * Effects created during that action are not present in the snapshot and do
+ * not lose a turn immediately. Burn and explicitly charge/round-owned states
+ * stay outside this action lifecycle.
+ */
+const BATTLE_ACTION_DURATION_STATUS_TYPES=new Set([
+    "freeze","petrify","frostbite","agilityDown","statDown","damageDown","defenseDown","stun"
+]);
+const BATTLE_ACTION_DURATION_EXCLUDED_BUFFS=new Set(["phoenixMight","bloodBurn"]);
+const battleDurationBuffExpiryHandlers=new Set();
+let battleDurationAction=null;
+
+function battleDurationNumber(value){
+    const number=Number(value);
+    return Number.isFinite(number)?number:0;
+}
+function battleDurationEntityForEntry(entry){
+    if(!entry){ return null; }
+    if(entry.type==="player"){ return getPartyCharacterByIndex(entry.characterIndex); }
+    if(entry.type==="monster"&&Array.isArray(monsters)){ return monsters[entry.monsterIndex]||null; }
+    return null;
+}
+function snapshotBattleActionDuration(entity){
+    return {
+        buffs:new Set((entity&&Array.isArray(entity.activeBuffs)?entity.activeBuffs:[]).filter(buff=>
+            buff&&battleDurationNumber(buff.turnsLeft)>0&&!buff.oneShot&&!BATTLE_ACTION_DURATION_EXCLUDED_BUFFS.has(buff.type)
+        )),
+        statuses:new Set((entity&&Array.isArray(entity.statusEffects)?entity.statusEffects:[]).filter(effect=>
+            effect&&battleDurationNumber(effect.turnsLeft)>0&&BATTLE_ACTION_DURATION_STATUS_TYPES.has(effect.type)
+        ))
+    };
+}
+function runBattleDurationBuffExpiryHandlers(entity,buff,mirrored){
+    battleDurationBuffExpiryHandlers.forEach(handler=>{
+        try{ handler({entity:entity,buff:buff,mirrored:mirrored||null}); }
+        catch(error){ console.error("持續增益到期處理器失敗：",error); }
+    });
+}
+function expireBattleActionBuff(entity,buff){
+    if(!entity||!buff||!Array.isArray(entity.activeBuffs)){ return; }
+    buff.turnsLeft=Math.max(0,battleDurationNumber(buff.turnsLeft)-1);
+    const mirrored=Array.isArray(entity.v141TeamBuffs)
+        ?entity.v141TeamBuffs.find(item=>item&&item.displayBuff===buff):null;
+    if(mirrored){ mirrored.turnsLeft=buff.turnsLeft; }
+    if(buff.turnsLeft>0){ return; }
+
+    entity.activeBuffs=entity.activeBuffs.filter(item=>item!==buff);
+    if(mirrored){
+        entity.v141TeamBuffs=entity.v141TeamBuffs.filter(item=>item!==mirrored);
+        if(mirrored.type==="rage"){
+            entity.attack=mirrored.originalAttack;
+            entity.magicAttack=mirrored.originalMagicAttack;
+        }else if(mirrored.type==="resistance"){
+            entity.resistance=Math.max(0,battleDurationNumber(entity.resistance)-battleDurationNumber(mirrored.amount));
+        }else if(mirrored.type==="dodge"){
+            entity.evasion=mirrored.originalEvasion;
+        }
+    }
+
+    runBattleDurationBuffExpiryHandlers(entity,buff,mirrored);
+    if(typeof addBattleLog==="function"){
+        addBattleLog("⏳"+(buff.statusName||buff.type)+"效果已結束。");
+    }
+}
+function expireBattleActionStatus(entity,effect){
+    if(!entity||!effect||!Array.isArray(entity.statusEffects)){ return; }
+    effect.turnsLeft=Math.max(0,battleDurationNumber(effect.turnsLeft)-1);
+    if(effect.turnsLeft>0){ return; }
+    entity.statusEffects=entity.statusEffects.filter(item=>item!==effect);
+    if(typeof addBattleLog==="function"){
+        const name=effect.type==="freeze"?"冰封":effect.type==="petrify"?"石化":effect.type==="frostbite"?"凍傷":effect.type;
+        addBattleLog((entity.id||entity.name||"目標")+"的"+name+"效果已解除。");
+    }
+}
+function beginBattleDurationAction(event){
+    const entry=event&&event.queue&&event.queue[event.index];
+    const entity=battleDurationEntityForEntry(entry);
+    if(!entity||battleDurationNumber(entity.hp)<=0){ battleDurationAction=null; return; }
+    const snapshot=snapshotBattleActionDuration(entity);
+    battleDurationAction={
+        token:event.token,index:event.index,entry:entry,entity:entity,
+        buffs:snapshot.buffs,statuses:snapshot.statuses
+    };
+}
+function finishBattleDurationAction(){
+    const action=battleDurationAction;
+    battleDurationAction=null;
+    if(!action){ return; }
+    action.buffs.forEach(buff=>{
+        if(Array.isArray(action.entity.activeBuffs)&&action.entity.activeBuffs.includes(buff)){
+            expireBattleActionBuff(action.entity,buff);
+        }
+    });
+    action.statuses.forEach(effect=>{
+        if(Array.isArray(action.entity.statusEffects)&&action.entity.statusEffects.includes(effect)){
+            expireBattleActionStatus(action.entity,effect);
+        }
+    });
+    if(typeof window!=="undefined"&&typeof window.v143SyncStatusVisualEffects==="function"){
+        window.v143SyncStatusVisualEffects(false);
+    }
+}
+if(typeof window!=="undefined"){
+    window.v175DurationLifecycleActive=true;
+    window.FourSymbolsDurationLifecycle=Object.freeze({
+        beginAction:beginBattleDurationAction,
+        finishAction:finishBattleDurationAction,
+        snapshotFor:entity=>snapshotBattleActionDuration(entity),
+        registerBuffExpiryHandler(handler){
+            if(typeof handler!=="function"){ return function(){}; }
+            battleDurationBuffExpiryHandlers.add(handler);
+            return function(){ battleDurationBuffExpiryHandlers.delete(handler); };
+        }
+    });
+}
+
 if(typeof window!=="undefined"){
     window.FourSymbolsBattleFlow=Object.freeze({
         subscribeActionFinished(observer){
@@ -4469,6 +4590,7 @@ function battleStatisticsRecordDamageDealtByActor(character,value){
 }
 
 function notifyBattleActionFinished(){
+    finishBattleDurationAction();
     battleActionFinishObservers.forEach(observer=>{
         try{ observer(); }
         catch(error){ console.error("戰鬥行動完成觀察器失敗：",error); }
@@ -4485,8 +4607,10 @@ function interceptBattleActionFinish(){
     return false;
 }
 function notifyBeforeCombatant(token){
+    const event={token:token,turn:turn,index:initiativeIndex,queue:initiativeQueue};
+    beginBattleDurationAction(event);
     battleBeforeCombatantObservers.forEach(observer=>{
-        try{ observer({token:token,turn:turn,index:initiativeIndex,queue:initiativeQueue}); }
+        try{ observer(event); }
         catch(error){ console.error("戰鬥佇列觀察器失敗：",error); }
     });
 }
@@ -11547,9 +11671,21 @@ if(typeof window!=="undefined"&&!window.FourSymbolsBattleRuntimeMetrics){
     };
 }
 
+function isCanonicalSkillQuickBarButton(button){
+    if(!button||!button.classList||!button.classList.contains("skill-quick-button")){ return false; }
+    return [
+        ".sq-icon-wrap",".sq-icon-image",".sq-icon-fallback",".sq-sp-block",
+        ".sq-name",".sq-cost",".v135-sq-scope",".sq-description"
+    ].every(selector=>!!button.querySelector(selector));
+}
+
 function ensureSkillQuickBarButtons(bar){
     let buttons=Array.from(bar.children).filter(node=>node.classList&&node.classList.contains("skill-quick-button"));
-    if(bar.children.length===4&&buttons.length===4){
+    if(
+        bar.children.length===4&&
+        buttons.length===4&&
+        buttons.every(isCanonicalSkillQuickBarButton)
+    ){
         return buttons;
     }
 
@@ -11564,12 +11700,11 @@ function ensureSkillQuickBarButtons(bar){
             '<span class="sq-icon-wrap"><span class="sq-icon-image"></span><span class="sq-icon-fallback"></span><span class="sq-sp-block" hidden>SP不足</span></span>'+
             '<span class="sq-name"></span>'+
             '<span class="sq-cost"></span>'+
-            '<span class="v135-sq-scope"></span>';
+            '<span class="v135-sq-scope"></span>'+
+            '<span class="sq-description"></span>';
         button.onclick=()=>{
             const skillId=button.dataset.skillId||"";
-            if(skillId&&!button.disabled){
-                prepareAction(skillId);
-            }
+            if(skillId&&!button.disabled){ prepareAction(skillId); }
         };
         bar.appendChild(button);
     }
@@ -11586,34 +11721,28 @@ function syncSkillQuickBarButton(button,skillId,skill,skillLevel,spCost,enoughSP
     const nameNode=button.querySelector(".sq-name");
     const costNode=button.querySelector(".sq-cost");
     const scopeNode=button.querySelector(".v135-sq-scope");
+    const descriptionNode=button.querySelector(".sq-description");
 
     button.dataset.skillId=skillId||"";
 
     if(!skillId||!skill){
         button.disabled=true;
         button.classList.remove("sp-insufficient");
-        if(iconImage){
-            iconImage.style.backgroundImage="";
-            iconImage.hidden=true;
-        }
-        if(iconFallback){
-            iconFallback.innerHTML="";
-            iconFallback.hidden=false;
-        }
+        if(iconImage){ iconImage.style.backgroundImage=""; iconImage.hidden=true; }
+        if(iconFallback){ iconFallback.innerHTML=""; iconFallback.hidden=false; }
         if(spBlock){ spBlock.hidden=true; }
         if(nameNode){ nameNode.textContent=skillId?"資料錯誤":"（空）"; }
         if(costNode){ costNode.textContent="—"; }
         if(scopeNode){ scopeNode.textContent=""; }
+        if(descriptionNode){ descriptionNode.textContent=""; }
         return;
     }
 
     button.disabled=!enoughSP;
     button.classList.toggle("sp-insufficient",!enoughSP);
 
-    const iconBackground=
-        typeof getSkillIconBackgroundImage==="function"
-        ?getSkillIconBackgroundImage(skillId)
-        :"";
+    const iconBackground=typeof getSkillIconBackgroundImage==="function"
+        ?getSkillIconBackgroundImage(skillId):"";
 
     if(iconImage){
         iconImage.hidden=!iconBackground;
@@ -11623,11 +11752,9 @@ function syncSkillQuickBarButton(button,skillId,skill,skillLevel,spCost,enoughSP
             iconImage.style.backgroundImage="";
         }
     }
-
     if(iconFallback){
         const fallback=!iconBackground&&typeof getElementIconHTML==="function"
-            ?getElementIconHTML(skill.element)
-            :"";
+            ?getElementIconHTML(skill.element):"";
         iconFallback.hidden=!!iconBackground;
         if(iconFallback.innerHTML!==fallback){ iconFallback.innerHTML=fallback; }
     }
@@ -11641,11 +11768,20 @@ function syncSkillQuickBarButton(button,skillId,skill,skillLevel,spCost,enoughSP
         const text="消耗 "+spCost+" SP";
         if(costNode.textContent!==text){ costNode.textContent=text; }
     }
+
+    const formalSpec=typeof window!=="undefined"?window.FourSymbolsSkillSpec:null;
     if(scopeNode){
-        const targetLabel=typeof window!=="undefined"&&typeof window.v135GetSkillTargetScopeLabel==="function"
-            ?window.v135GetSkillTargetScopeLabel(skill)
-            :"";
+        const targetLabel=formalSpec&&typeof formalSpec.targetLabel==="function"
+            ?formalSpec.targetLabel(skill,Math.max(1,skillLevel||1))
+            :(typeof window!=="undefined"&&typeof window.v135GetSkillTargetScopeLabel==="function"
+                ?window.v135GetSkillTargetScopeLabel(skill):"");
         if(scopeNode.textContent!==targetLabel){ scopeNode.textContent=targetLabel; }
+    }
+    if(descriptionNode){
+        const explanation=formalSpec&&typeof formalSpec.effectText==="function"
+            ?formalSpec.effectText(skill,Math.max(1,skillLevel||1))
+            :String(skill.description||"");
+        if(descriptionNode.textContent!==explanation){ descriptionNode.textContent=explanation; }
     }
 }
 
@@ -11786,48 +11922,29 @@ function getBattleActionDisplayName(actionType){
 }
 
 
-function setBattleTargetSelectionMode(actionType){
-
-    const region=
-        $("battleActionRegion");
-
-    const promptAction=
-        $("battleTargetPromptAction");
-
-    if(region){
-        region.classList.add(
-            "target-selecting"
-        );
-    }
-
-    if(promptAction){
-        promptAction.textContent=
-            "選擇 ["+
-            getBattleActionDisplayName(actionType)+
-            "]";
-    }
-
-    currentBattleMonsters.forEach(index=>{
-        const monster=monsters[index];
-        const card=$("battleMonster"+index);
-
-        if(card){
-            card.classList.toggle(
-                "targetable",
-                !!(monster && monster.alive)
-            );
-        }
-    });
-
-    const targetText=
-        $("battleTarget");
-
-    if(targetText){
-        targetText.textContent=
-            "目標：請選擇";
-    }
+function getBattleActionTargetType(actionType,characterIndex){
+    if(actionType==="normal"){ return "single"; }
+    const skill=skillDatabase[actionType];
+    if(!skill){ return "single"; }
+    const key=getPartyCharacterKey(characterIndex);
+    const level=key?getSkillLevel(key,actionType):1;
+    return normalizeBattleTargetType(getEffectiveSkillTargetType(skill,Math.max(1,level||1)));
 }
 
+function setBattleTargetSelectionMode(actionType){
+    const region=$("battleActionRegion");
+    const promptAction=$("battleTargetPromptAction");
+    const targetType=getBattleActionTargetType(actionType,activeBattleCharacterIndex);
+
+    if(region){ region.classList.add("target-selecting"); }
+    if(promptAction){ promptAction.textContent="選擇 ["+getBattleActionDisplayName(actionType)+"]"; }
+    currentBattleMonsters.forEach(index=>{
+        const card=$("battleMonster"+index);
+        if(card){ card.classList.toggle("targetable",canSelectHostileBattlePrimary("monster",index,targetType)); }
+    });
+    const targetText=$("battleTarget");
+    if(targetText){ targetText.textContent="目標：請選擇"; }
+}
 
 function clearBattleTargetSelectionMode(){
 
@@ -12263,18 +12380,28 @@ function prepareAction(type){
     }
 
 
-    actionReady=true;
+    const hostileTargetType=getBattleActionTargetType(type,activeBattleCharacterIndex);
 
-    pendingAction=type;
+    if(hostileTargetType==="all"){
+        queuedPlayerActions[activeBattleCharacterIndex]={action:type,target:null};
+        closeMenus();
+        updateUI();
+        finishPlayerAction();
+        return;
+    }
 
-    closeMenus();
-
-    /* V95：選好普攻／傷害技能後立即把戰鬥選項收起，
-       原位置顯示兩行選目標提示，同時讓所有存活敵人
-       出現閃爍準星。傷害與技能結算規則完全不改。 */
-    setBattleTargetSelectionMode(
-        type
+    const hasSelectablePrimary=currentBattleMonsters.some(index=>
+        canSelectHostileBattlePrimary("monster",index,hostileTargetType)
     );
+    if(!hasSelectablePrimary){
+        addBattleLog("目前沒有可被"+getBattleActionDisplayName(type)+"選中的目標。");
+        return;
+    }
+
+    actionReady=true;
+    pendingAction=type;
+    closeMenus();
+    setBattleTargetSelectionMode(type);
 
 }
 
@@ -12283,12 +12410,16 @@ function selectBattleTarget(index){
 
     if(
         !battleActive ||
+        !actionReady ||
+        !pendingAction ||
         !monsters[index] ||
         !monsters[index].alive
     ){
         return;
     }
 
+    const targetType=getBattleActionTargetType(pendingAction,activeBattleCharacterIndex);
+    if(!canSelectHostileBattlePrimary("monster",index,targetType)){ return; }
 
     selectedMonster=index;
 
@@ -14298,7 +14429,6 @@ function getSkillLevelArrayValue(values,level,fallback){
     const index=Math.max(0,Math.min(values.length-1,Math.floor(Number(level)||1)-1));
     return Number(values[index])||0;
 }
-
 function getEffectiveSkillTargetType(skill,level){
     const base=String(skill&&skill.targetType||"single");
     if(!skill||!skill.targetTypeAtMaxLevel){ return base; }
@@ -14306,79 +14436,102 @@ function getEffectiveSkillTargetType(skill,level){
     const resolvedLevel=Math.max(1,Math.floor(Number(level)||1));
     return resolvedLevel>=maxLevel?String(skill.targetTypeAtMaxLevel):base;
 }
-
 function getSkillFreezeChanceAtLevel(skill,level){
     return Math.max(0,getSkillLevelArrayValue(skill&&skill.freezeChanceByLevel,level,skill&&skill.freezeChance));
 }
-
 function getSkillFreezeDurationAtLevel(skill,level){
     return Math.max(1,Math.floor(getSkillLevelArrayValue(skill&&skill.freezeDurationByLevel,level,skill&&skill.freezeDuration||1)));
 }
+function normalizeBattleTargetType(targetType){
+    const value=String(targetType||"single");
+    if(value==="allyTri"||value==="horizontal-3"){ return "tri"; }
+    if(value==="allyAll"||value==="enemyAll"){ return "all"; }
+    if(value==="ally"||value==="normal"){ return "single"; }
+    return value;
+}
+function getBattleTargetEntity(targetSide,index){
+    if(targetSide==="player"){ return getPartyCharacterByIndex(index); }
+    return Array.isArray(monsters)?monsters[index]||null:null;
+}
+function isBattleTargetAlive(targetSide,index){
+    const entity=getBattleTargetEntity(targetSide,index);
+    return !!(entity&&Number(entity.hp)>0&&(targetSide!=="monster"||entity.alive!==false));
+}
+function isBattleTargetStealthed(entity){
+    if(!entity){ return false; }
+    if(typeof hasNamedPersistentState==="function"&&hasNamedPersistentState(entity,"stealthSkill")){ return true; }
+    return []
+        .concat(Array.isArray(entity.activeBuffs)?entity.activeBuffs:[])
+        .concat(Array.isArray(entity.v141TeamBuffs)?entity.v141TeamBuffs:[])
+        .some(buff=>buff&&Number(buff.turnsLeft)>0&&(
+            buff.type==="stealthSkill"||buff.v141BuffType==="stealthSkill"||buff.statusName==="隱身"
+        ));
+}
+function canSelectHostileBattlePrimary(targetSide,index,targetType){
+    const normalized=normalizeBattleTargetType(targetType);
+    if(normalized==="all"||!isBattleTargetAlive(targetSide,index)){ return false; }
+    return !isBattleTargetStealthed(getBattleTargetEntity(targetSide,index));
+}
+function resolveBattlefieldTargets(targetSide,primaryIndex,targetType,options){
+    const normalized=normalizeBattleTargetType(targetType);
+    const config=options&&typeof options==="object"?options:{};
+    const indexes=targetSide==="player"?getExistingPartyIndexes():currentBattleMonsters.filter(Number.isInteger);
+    const alive=index=>isBattleTargetAlive(targetSide,index);
 
-window.FourSymbolsBattleSkillTargeting=Object.freeze({
-    effectiveTargetType:getEffectiveSkillTargetType,
-    freezeChanceAtLevel:getSkillFreezeChanceAtLevel,
-    freezeDurationAtLevel:getSkillFreezeDurationAtLevel
-});
+    if(normalized==="all"){ return indexes.filter(alive); }
+    if(!Number.isInteger(primaryIndex)||!alive(primaryIndex)){ return []; }
+    if(config.hostilePrimary!==false&&!canSelectHostileBattlePrimary(targetSide,primaryIndex,normalized)){ return []; }
 
+    const owner=typeof window!=="undefined"?window.FourSymbolsBattlefieldSlots:null;
+    if(owner){
+        if(targetSide==="monster"&&typeof owner.getActiveEnemySnapshot==="function"&&typeof owner.resolveEnemyTargets==="function"){
+            const snapshot=owner.getActiveEnemySnapshot();
+            if(snapshot){ return owner.resolveEnemyTargets(snapshot,primaryIndex,normalized,alive); }
+        }
+        if(targetSide==="player"&&typeof owner.ensureAllyFormation==="function"&&typeof owner.resolveAllyTargets==="function"){
+            const formation=owner.ensureAllyFormation(indexes);
+            return owner.resolveAllyTargets(formation,primaryIndex,normalized,alive);
+        }
+    }
+
+    const position=indexes.indexOf(primaryIndex);
+    if(position<0){ return []; }
+    if(normalized==="single"){ return [primaryIndex]; }
+    if(normalized==="tri"||normalized==="row"){
+        const width=3;
+        const start=Math.floor(position/width)*width;
+        const row=indexes.slice(start,start+width).filter(alive);
+        if(normalized==="row"){ return row; }
+        const centerPosition=position-start;
+        return row.filter(index=>Math.abs((indexes.indexOf(index)-start)-centerPosition)<=1);
+    }
+    if(normalized==="column"){
+        const width=3;
+        const column=position%width;
+        return indexes.filter((index,slotPosition)=>slotPosition%width===column&&alive(index));
+    }
+    return [primaryIndex];
+}
+if(typeof window!=="undefined"){
+    window.FourSymbolsBattleSkillTargeting=Object.freeze({
+        effectiveTargetType:getEffectiveSkillTargetType,
+        freezeChanceAtLevel:getSkillFreezeChanceAtLevel,
+        freezeDurationAtLevel:getSkillFreezeDurationAtLevel,
+        normalizeTargetType:normalizeBattleTargetType,
+        isStealthed:isBattleTargetStealthed,
+        canSelectHostilePrimary:canSelectHostileBattlePrimary,
+        resolveTargets:resolveBattlefieldTargets
+    });
+}
 function getSkillTargets(centerIndex,targetType){
-
+    const normalized=normalizeBattleTargetType(targetType);
     const bossOwner=typeof window!=="undefined"?window.FourSymbolsBossBattle:null;
     if(bossOwner&&typeof bossOwner.isActive==="function"&&bossOwner.isActive()&&
        typeof bossOwner.resolveEnemyDamageTargets==="function"){
-        return bossOwner.resolveEnemyDamageTargets(centerIndex,targetType);
+        if(normalized!=="all"&&!canSelectHostileBattlePrimary("monster",centerIndex,normalized)){ return []; }
+        return bossOwner.resolveEnemyDamageTargets(centerIndex,normalized);
     }
-
-    const slotOwner=typeof window!=="undefined"?window.FourSymbolsBattlefieldSlots:null;
-    const snapshot=slotOwner&&typeof slotOwner.getActiveEnemySnapshot==="function"
-        ?slotOwner.getActiveEnemySnapshot():null;
-    if(slotOwner&&snapshot&&typeof slotOwner.resolveEnemyTargets==="function"&&
-       ["single","tri","row","column","all"].includes(targetType)){
-        return slotOwner.resolveEnemyTargets(
-            snapshot,
-            centerIndex,
-            targetType,
-            index=>!!(monsters[index]&&monsters[index].alive!==false&&Number(monsters[index].hp)>0)
-        );
-    }
-
-    const alive=currentBattleMonsters.filter(
-        i=>monsters[i] && monsters[i].alive
-    );
-
-    if(targetType==="single"){
-        return alive.includes(centerIndex) ? [centerIndex] : [];
-    }
-
-    /*
-       V119：敵方固定每3個「場上位置」為一橫排。
-       不能用 alive 陣列重新排位置，否則前排有人死亡後，
-       後排會被錯誤補進前排，橫排技能就會跨排命中。
-    */
-    if(targetType==="tri" || targetType==="row"){
-        const formationPosition=currentBattleMonsters.indexOf(centerIndex);
-        if(formationPosition<0){ return []; }
-
-        const rowStart=Math.floor(formationPosition/3)*3;
-        return currentBattleMonsters
-            .slice(rowStart,rowStart+3)
-            .filter(i=>monsters[i] && monsters[i].alive);
-    }
-
-    if(targetType==="column"){
-        const formationPosition=currentBattleMonsters.indexOf(centerIndex);
-        if(formationPosition<0){ return []; }
-        const column=formationPosition%3;
-        return currentBattleMonsters.filter((index,position)=>
-            position%3===column&&monsters[index]&&monsters[index].alive
-        );
-    }
-
-    if(targetType==="all"){
-        return alive;
-    }
-
-    return alive.includes(centerIndex) ? [centerIndex] : [];
+    return resolveBattlefieldTargets("monster",centerIndex,normalized,{hostilePrimary:true});
 }
 
 
@@ -14652,11 +14805,7 @@ function applyFreezeEffect(monster,duration){
         !effect||effect.type!=="freeze"||Number(effect.turnsLeft)>0
     );
 
-    const deferredForPlayer=
-        typeof getPartyCharacterIndex==="function"&&getPartyCharacterIndex(monster)>=0;
-
     const freezeState={type:"freeze",turnsLeft:duration};
-    if(deferredForPlayer){ freezeState.deferFirstTick=true; }
     monster.statusEffects.push(markPersistentStateName(freezeState,"freeze"));
 
     return true;
@@ -14727,14 +14876,10 @@ function applyMonsterDebuff(
         !effect||effect.type!==type||Number(effect.turnsLeft)>0
     );
 
-    const deferredForPlayer=
-        typeof getPartyCharacterIndex==="function"&&getPartyCharacterIndex(monster)>=0;
-
     const state=Object.assign(
         {type:type,turnsLeft:duration,value:value},
         extraFields||{}
     );
-    if(deferredForPlayer){ state.deferFirstTick=true; }
     monster.statusEffects.push(markPersistentStateName(state,type));
 
     return true;
@@ -15613,48 +15758,7 @@ function tickStatusEffects(){
                             effect.type==="freeze"||
                             effect.type==="petrify"
                         ){
-
-                            /*
-                               冰封/石化本身不扣血，
-                               這裡只負責倒數回合數，
-                               真正「跳過攻擊」的判斷
-                               在monsterTurn()裡處理。
-                            */
-
-                            effect.turnsLeft--;
-
-
-                            if(
-                                effect.turnsLeft<=0
-                            ){
-
-                                addBattleLog(
-                                    (
-                                        effect.type==="freeze"
-                                        ?
-                                        ""
-                                        :
-                                        ""
-                                    )+
-                                    monster.name+
-                                    "的"+
-                                    (
-                                        effect.type==="freeze"
-                                        ?
-                                        "冰封"
-                                        :
-                                        "石化"
-                                    )+
-                                    "效果已解除。"
-                                );
-
-                            }
-
-
-                            return (
-                                effect.turnsLeft>0
-                            );
-
+                            return Number(effect.turnsLeft)>0;
                         }
 
 
@@ -15663,32 +15767,7 @@ function tickStatusEffects(){
                                 effect.type
                             ]
                         ){
-
-                            effect.turnsLeft--;
-
-
-                            if(
-                                effect.turnsLeft<=0
-                            ){
-
-                                addBattleLog(
-
-                                    simpleDebuffLabels[
-                                        effect.type
-                                    ]+
-                                    "效果已從"+
-                                    monster.name+
-                                    "身上解除。"
-
-                                );
-
-                            }
-
-
-                            return (
-                                effect.turnsLeft>0
-                            );
-
+                            return Number(effect.turnsLeft)>0;
                         }
 
 
@@ -15837,37 +15916,7 @@ function tickStatusEffects(){
                             effect.type==="freeze"||
                             effect.type==="petrify"
                         ){
-
-                            if(effect.deferFirstTick){
-                                effect.deferFirstTick=false;
-                                return true;
-                            }
-
-                            effect.turnsLeft--;
-
-
-                            if(effect.turnsLeft<=0){
-
-                                addBattleLog(
-                                    (character.id||"你")+
-                                    "的"+
-                                    (
-                                        effect.type==="freeze"
-                                        ?
-                                        "冰封"
-                                        :
-                                        "石化"
-                                    )+
-                                    "效果已解除。"
-                                );
-
-                            }
-
-
-                            return (
-                                effect.turnsLeft>0
-                            );
-
+                            return Number(effect.turnsLeft)>0;
                         }
 
 
@@ -15876,33 +15925,7 @@ function tickStatusEffects(){
                                 effect.type
                             ]
                         ){
-
-                            if(effect.deferFirstTick){
-                                effect.deferFirstTick=false;
-                                return true;
-                            }
-
-                            effect.turnsLeft--;
-
-
-                            if(effect.turnsLeft<=0){
-
-                                addBattleLog(
-                                    simpleDebuffLabels[
-                                        effect.type
-                                    ]+
-                                    "效果已從"+
-                                    (character.id||"你")+
-                                    "身上解除。"
-                                );
-
-                            }
-
-
-                            return (
-                                effect.turnsLeft>0
-                            );
-
+                            return Number(effect.turnsLeft)>0;
                         }
 
 
@@ -16310,20 +16333,19 @@ function castDamageSkill(skillId){
     }
 
 
-    const centerIndex =
-        resolveAttackTargetIndex();
+    const effectiveTargetType=getEffectiveSkillTargetType(skill,level);
+    const centerIndex=normalizeBattleTargetType(effectiveTargetType)==="all"
+        ?null
+        :resolveAttackTargetIndex(effectiveTargetType);
 
+    if(normalizeBattleTargetType(effectiveTargetType)!=="all"&&centerIndex===null){ return; }
 
-    if(centerIndex===null){
+    const targets=getSkillTargets(centerIndex,effectiveTargetType);
+    if(!targets.length){
+        addBattleLog(skill.name+"目前沒有有效目標。");
+        finishPlayerAction();
         return;
     }
-
-    const effectiveTargetType=getEffectiveSkillTargetType(skill,level);
-    const targets =
-        getSkillTargets(
-            centerIndex,
-            effectiveTargetType
-        );
 
 
     player.sp -=
@@ -17363,30 +17385,9 @@ function tickBuffsForCharacter(character){
                     return false;
                 }
 
-                buff.turnsLeft--;
-
-
-                if(buff.turnsLeft<=0){
-
-                    addBattleLog(
-
-                        "⏳"+
-                        (
-                            BUFF_EXPIRE_LABELS[
-                                buff.type
-                            ]||
-                            buff.type
-                        )+
-                        "效果已結束。"
-
-                    );
-
-                    return false;
-
-                }
-
-
-                return true;
+                /* Timed buffs consume on this character's formal action
+                   boundary through FourSymbolsDurationLifecycle. */
+                return Number(buff.turnsLeft)>0;
 
             }
         );
@@ -17467,63 +17468,27 @@ function tickPlayerBuffs(){
    任何既有戰鬥數值機制。
 */
 
-function findAliveTargetIndex(preferredIndex){
-
-    if(
-        preferredIndex!==null &&
-        preferredIndex!==undefined &&
-        monsters[preferredIndex] &&
-        monsters[preferredIndex].alive
-    ){
+function findAliveTargetIndex(preferredIndex,targetType){
+    const resolvedTargetType=normalizeBattleTargetType(targetType||"single");
+    if(resolvedTargetType==="all"){ return null; }
+    if(Number.isInteger(preferredIndex)&&canSelectHostileBattlePrimary("monster",preferredIndex,resolvedTargetType)){
         return preferredIndex;
     }
-
-
-    const fallbackIndex =
-        currentBattleMonsters.find(
-            i=>
-                monsters[i] &&
-                monsters[i].alive
-        );
-
-
-    return (
-        fallbackIndex===undefined
-        ?
-        null
-        :
-        fallbackIndex
+    const fallbackIndex=currentBattleMonsters.find(index=>
+        canSelectHostileBattlePrimary("monster",index,resolvedTargetType)
     );
-
+    return fallbackIndex===undefined?null:fallbackIndex;
 }
-
-
-function resolveAttackTargetIndex(){
-
-    const index =
-        findAliveTargetIndex(
-            selectedMonster
-        );
-
-
-    if(index===null){
-
-        finishPlayerAction();
-
-        return null;
-
-    }
-
-
-    selectedMonster=
-        index;
-
+function resolveAttackTargetIndex(targetType){
+    const index=findAliveTargetIndex(selectedMonster,targetType||"single");
+    if(index===null){ finishPlayerAction(); return null; }
+    selectedMonster=index;
     return index;
-
 }
 
 
 /* =====================================================
+   普通攻擊/* =====================================================
    普通攻擊
 ===================================================== */
 
@@ -17535,7 +17500,7 @@ function normalAttack(){
 
 
     const index =
-        resolveAttackTargetIndex();
+        resolveAttackTargetIndex("single");
 
 
     if(index===null){
@@ -18101,10 +18066,9 @@ function processSingleMonsterAttack(monsterIndex,token){
        普通攻擊」是同一種行為。
     */
 
-    const hasVisibleSingleTarget=getExistingPartyIndexes().some(index=>{
-        const character=getPartyCharacterByIndex(index);
-        return character&&character.hp>0&&!hasActiveBuff(character,"stealthSkill");
-    });
+    const hasVisibleHostilePrimary=getExistingPartyIndexes().some(index=>
+        canSelectHostileBattlePrimary("player",index,"single")
+    );
 
     const affordableSkillIds=
 
@@ -18117,11 +18081,18 @@ function processSingleMonsterAttack(monsterIndex,token){
                     skillDatabase[skillId];
 
 
-                return (
-                    data &&
-                    monster.sp>=data.spCost&&
-                    (data.targetType!=="single"||hasVisibleSingleTarget)
+                if(!data||monster.sp<data.spCost){ return false; }
+                const dataLevel=Math.min(
+                    data.maxLevel||1,
+                    Math.max(
+                        1,
+                        Number.isFinite(Number(monster.v141ForceSkillLevel))
+                            ?Math.floor(Number(monster.v141ForceSkillLevel))
+                            :Math.round(monster.level/8)
+                    )
                 );
+                const targetType=normalizeBattleTargetType(getEffectiveSkillTargetType(data,dataLevel));
+                return targetType==="all"||hasVisibleHostilePrimary;
 
             }
         )
@@ -18265,13 +18236,14 @@ function processSingleMonsterAttack(monsterIndex,token){
         }))
         .filter(entry=>entry.character && entry.character.hp>0);
 
-    /* 隱身只阻止單體／普通攻擊選中；範圍技能仍會波及。 */
-    const selectableSingleTargets=livingTargets.filter(
-        entry=>!hasActiveBuff(entry.character,"stealthSkill")
+    /* Stealth blocks primary selection for every targeted hostile shape.
+       Range skills still include stealthed units when they are collateral. */
+    const selectablePrimaryTargets=livingTargets.filter(entry=>
+        canSelectHostileBattlePrimary("player",entry.index,skillTargetType)
     );
 
-    if(!isRangeSkill && selectableSingleTargets.length===0){
-        addBattleLog(monster.name+"找不到可被單體攻擊選中的目標。");
+    if(skillTargetType!=="all"&&selectablePrimaryTargets.length===0){
+        addBattleLog(monster.name+"找不到可被此攻擊選中的目標。");
         updateUI();
         finishPlayerAction();
         return;
@@ -18282,40 +18254,17 @@ function processSingleMonsterAttack(monsterIndex,token){
 
     if(skillTargetType==="all"){
         attackTargets=livingTargets;
-    }else if(isRangeSkill){
-        /* The formal formation is already the owner for allyTri and player
-           targeting. Monster range skills must resolve through that same Slot
-           geometry, including a party member placed in the back row. */
-        const battlefieldSlots=typeof window!=="undefined"
-            ? window.FourSymbolsBattlefieldSlots
-            : null;
-        const primary=livingTargets[
-            Math.floor(Math.random()*livingTargets.length)
+    }else{
+        const primary=selectablePrimaryTargets[
+            Math.floor(Math.random()*selectablePrimaryTargets.length)
         ];
         primaryTargetIndex=primary?primary.index:null;
-        const formation=battlefieldSlots&&typeof battlefieldSlots.ensureAllyFormation==="function"
-            ? battlefieldSlots.ensureAllyFormation(getExistingPartyIndexes())
-            : null;
-        const targetIndexes=primary&&formation&&typeof battlefieldSlots.resolveAllyTargets==="function"
-            ? battlefieldSlots.resolveAllyTargets(
-                formation,
-                primary.index,
-                skillTargetType,
-                index=>{
-                    const character=getPartyCharacterByIndex(index);
-                    return !!(character&&character.hp>0);
-                }
-            )
-            : [];
+        const targetIndexes=primary
+            ?resolveBattlefieldTargets("player",primary.index,skillTargetType,{hostilePrimary:true})
+            :[];
         attackTargets=targetIndexes.map(index=>
             livingTargets.find(entry=>entry.index===index)
         ).filter(Boolean);
-    }else{
-        const primary=selectableSingleTargets[
-            Math.floor(Math.random()*selectableSingleTargets.length)
-        ];
-        primaryTargetIndex=primary?primary.index:null;
-        attackTargets=[primary];
     }
 
     if(attackTargets.length===0){
@@ -21363,632 +21312,76 @@ function confirmAutoBattleSettings(){
 /* Automatic combat only declares combat actions. HP/SP recovery is handled
    once after victory by applyPostBattleAutoRecovery(). */
 function autoActionForCharacter(characterIndex,token){
-
     const character=getPartyCharacterByIndex(characterIndex);
     const config=getPartyAutoConfig(characterIndex);
-    const autoOn=characterIndex===0 ? autoBattle : config.enabled;
+    const autoOn=characterIndex===0?autoBattle:config.enabled;
 
-    if(
-        !battleActive ||
-        !character ||
-        character.hp<=0 ||
-        !autoOn ||
-        token!==battleToken
-    ){
-        return;
-    }
+    if(!battleActive||!character||character.hp<=0||!autoOn||token!==battleToken){ return; }
 
     if(config.skill==="defend"){
         queuedPlayerActions[characterIndex]={action:"defend",target:null};
-        updateUI();
-        finishPlayerAction();
-        return;
+        updateUI(); finishPlayerAction(); return;
     }
 
-    const aliveInBattle=currentBattleMonsters.filter(
-        index=>monsters[index] && monsters[index].alive
-    );
+    const aliveInBattle=currentBattleMonsters.filter(index=>isBattleTargetAlive("monster",index));
+    if(aliveInBattle.length===0){ checkBattleEnd(); return; }
 
-    if(aliveInBattle.length===0){
-        checkBattleEnd();
-        return;
-    }
-
-    const skill=skillDatabase[config.skill];
+    let action=config.skill||"normal";
+    let skill=action!=="normal"?skillDatabase[action]:null;
     const skillKey=getPartyCharacterKey(characterIndex);
-    const skillLevel=skill?getSkillLevel(skillKey,config.skill):0;
-    const effectiveTargetType=skill?getEffectiveSkillTargetType(skill,skillLevel):"single";
-    const spreads=skill && ["tri","row","column","all"].includes(effectiveTargetType);
-    let target=aliveInBattle[0];
+    if(action!=="normal"&&(
+        !skill||
+        getSkillLevel(skillKey,action)<=0||
+        character.sp<(skill.spCost!==undefined?skill.spCost:(skill.cost||0))||
+        ["buff","passive","heal","revive"].includes(skill.category)
+    )){
+        action="normal";
+        skill=null;
+    }
 
-    /*
-       V137：怪物擴充到最多10隻、並分成兩排之後，「整份存活清單的
-       中間」不再等於「技能能打最多人的中心」。例如6隻怪時舊算法
-       會選第一排最右邊，tri技能只打到2隻。逐一用真正的
-       getSkillTargets()評估候選中心，選命中數最多的那一個，row／
-       tri技能才會依目前陣形與死亡缺口正確選位。
-    */
-    if(spreads && typeof getSkillTargets==="function"){
+    const skillLevel=skill?getSkillLevel(skillKey,action):0;
+    const targetType=skill
+        ?normalizeBattleTargetType(getEffectiveSkillTargetType(skill,skillLevel))
+        :"single";
+
+    if(targetType==="all"){
+        queuedPlayerActions[characterIndex]={action:action,target:null};
+        updateUI(); finishPlayerAction(); return;
+    }
+
+    const candidates=aliveInBattle.filter(index=>
+        canSelectHostileBattlePrimary("monster",index,targetType)
+    );
+    if(!candidates.length){
+        queuedPlayerActions[characterIndex]={action:"defend",target:null};
+        addBattleLog((character.id||"角色")+"找不到可被單體／指定範圍攻擊選中的目標，改為防禦。");
+        updateUI(); finishPlayerAction(); return;
+    }
+
+    let target=candidates[0];
+    if(skill&&["tri","row","column"].includes(targetType)){
         let bestCount=-1;
-        aliveInBattle.forEach(candidate=>{
-            const hitCount=getSkillTargets(candidate,effectiveTargetType).length;
-            if(hitCount>bestCount){
-                bestCount=hitCount;
-                target=candidate;
-            }
+        candidates.forEach(candidate=>{
+            const hitCount=getSkillTargets(candidate,targetType).length;
+            if(hitCount>bestCount){ bestCount=hitCount; target=candidate; }
         });
     }
 
-    let action=config.skill||"normal";
-
-    if(
-        action!=="normal" &&
-        (
-            !skill ||
-            getSkillLevel(skillKey,action)<=0 ||
-            character.sp<(skill.spCost!==undefined ? skill.spCost : (skill.cost||0)) ||
-            ["buff","passive","heal","revive"].includes(skill.category)
-        )
-    ){
-        action="normal";
-    }
-
-    queuedPlayerActions[characterIndex]={
-        action:action,
-        target:target
-    };
-
+    queuedPlayerActions[characterIndex]={action:action,target:target};
     updateUI();
     finishPlayerAction();
 }
-
 
 function autoAction(token){
-
     return autoActionForCharacter(0,token);
-
-    if(
-        !battleActive ||
-        !autoBattle ||
-        token!==battleToken
-    ){
-        return;
-    }
-
-
-    /*
-       ★ 修正（重要，依照使用者明確指正）：
-       自動戰鬥之前是「輪到自己就立刻執行」，
-       完全跳過宣告/結算機制，
-       等於自動角色永遠無視敏捷排序、
-       永遠是宣告階段那一刻就出手。
-
-       現在改成：自動戰鬥只負責「決定要做什麼」
-       （防禦/藥水/技能+目標），
-       決定好之後一樣存進queuedPlayerActions，
-       真正的執行留到結算階段，
-       跟手動操作的角色用同一套規則、
-       同樣要看敏捷順序，不再有特例。
-    */
-
-    if(autoConfig.skill==="defend"){
-
-        queuedPlayerActions[0]={
-
-            action:"defend",
-
-            target:null
-
-        };
-
-
-        updateUI();
-
-        finishPlayerAction();
-
-        return;
-
-    }
-
-
-    const stats =
-        getMainCharacterStats();
-
-
-    const hpPercent =
-        player.hp/
-        stats.maxHP*
-        100;
-
-
-    const autoHpPotionId=
-        getAutoPotionId("hp");
-
-
-    if(
-        hpPercent<=autoConfig.hp &&
-        autoHpPotionId
-    ){
-
-        queuedPlayerActions[0]={
-
-            action:"potion",
-            potionId:autoHpPotionId,
-            target:null
-
-        };
-
-
-        updateUI();
-
-        finishPlayerAction();
-
-        return;
-
-    }
-
-
-    const spPercent =
-        player.sp/
-        stats.maxSP*
-        100;
-
-
-    const autoSpPotionId=
-        getAutoPotionId("sp");
-
-
-    if(
-        spPercent<=autoConfig.sp &&
-        autoSpPotionId
-    ){
-
-        queuedPlayerActions[0]={
-
-            action:"potion",
-            potionId:autoSpPotionId,
-            target:null
-
-        };
-
-
-        updateUI();
-
-        finishPlayerAction();
-
-        return;
-
-    }
-
-
-    /*
-       ★ 重新設計自動戰鬥選怪邏輯：
-
-       之前不管用什麼技能，都用同一套固定優先順序選目標，
-       導致範圍技能（火箭：中左右三人）
-       常常選到只能打到1~2隻的位置，
-       完全沒有「盡量炸到最多隻」的邏輯，這是主要的怪異之處。
-
-       現在改成：
-       - 範圍技能（目前是火箭）：
-         選「目前戰鬥中還活著的怪物」正中間那一隻，
-         因為火箭是「以選定目標為中心，向左右擴散」，
-         打中間才能盡量涵蓋最多隻。
-         由於一場戰鬥最多只有1~3隻怪，
-         這樣做出來的效果自然就是：
-         3隻都活著 → 全部打到；
-         剩2隻 → 兩隻都打到；
-         剩1隻 → 單體命中。
-         正好符合「優先三連、其次兩連、最後單隻」的邏輯，
-         不需要額外判斷「怪物是否連在一起」，
-         因為現在整場戰鬥的怪物本來就都算「連在一起」。
-       - 單體技能（普通攻擊、會心一擊）：
-         直接打目前還活著的第一隻就好，
-         單體技能本來就不需要考慮誰在中間。
-    */
-
-    const aliveInBattle =
-        currentBattleMonsters
-        .filter(
-            i=>
-                monsters[i] &&
-                monsters[i].alive
-        );
-
-
-    /*
-       ★ 判斷目前選定的自動技能是不是「範圍系」，
-       範圍系（tri/row/all）就挑中間的怪，
-       盡量炸到最多隻；
-       單體技能或普通攻擊，直接打第一隻活著的就好。
-       這裡改成從skillDatabase動態查詢，
-       之後新增技能不用再回來改這段。
-    */
-
-    const autoSkillData =
-        skillDatabase[
-            autoConfig.skill
-        ];
-
-
-    const isSpreadSkill =
-        autoSkillData &&
-        (
-            autoSkillData.targetType==="tri"||
-            autoSkillData.targetType==="row"||
-            autoSkillData.targetType==="column"||
-            autoSkillData.targetType==="all"
-        );
-
-
-    let target;
-
-
-    if(
-        isSpreadSkill &&
-        aliveInBattle.length>0
-    ){
-
-        const midPosition =
-            Math.floor(
-                (
-                    aliveInBattle.length-1
-                )/2
-            );
-
-
-        target =
-            aliveInBattle[
-                midPosition
-            ];
-
-    }
-    else{
-
-        target =
-            aliveInBattle[0];
-
-    }
-
-
-    if(target===undefined){
-
-        checkBattleEnd();
-
-        return;
-
-    }
-
-
-    /*
-       ★ buff類（怒火）不需要選目標，
-       直接宣告「要用怒火」就好。
-    */
-
-    if(
-        autoSkillData &&
-        autoSkillData.category==="buff"
-    ){
-
-        queuedPlayerActions[0]={
-
-            action:
-                autoConfig.skill,
-
-            target:null
-
-        };
-
-
-        updateUI();
-
-        finishPlayerAction();
-
-        return;
-
-    }
-
-
-    let chosenAction=
-        autoConfig.skill;
-
-
-    if(autoSkillData){
-
-        const spCost =
-            autoSkillData.spCost!==undefined
-            ?
-            autoSkillData.spCost
-            :
-            autoSkillData.cost;
-
-
-        if(player.sp<spCost){
-
-            addBattleLog(
-                "SP不足，改用普通攻擊。"
-            );
-
-
-            chosenAction=
-                "normal";
-
-        }
-
-    }
-
-
-    queuedPlayerActions[0]={
-
-        action:chosenAction,
-
-        target:target
-
-    };
-
-
-    updateUI();
-
-    finishPlayerAction();
-
 }
 
-
-/* =====================================================
-   ★ 第二角色自動戰鬥（新增）
-
-   player2沒有手動操作介面，
-   每回合玩家的行動結束之後，
-   會自動用他自己裝備的技能/自動設定
-   （autoConfig2）打一次，
-   邏輯盡量跟autoAction()對稱，
-   但完全獨立運作，不會動到第一角色的任何狀態。
-===================================================== */
-
+/* Additional party members share the same declaration owner. */
 function player2AutoAction(token){
-
     return autoActionForCharacter(1,token);
-
-    if(
-        !battleActive ||
-        !player2 ||
-        player2.hp<=0 ||
-        token!==battleToken
-    ){
-        return;
-    }
-
-
-    /*
-       ★ 修正（重要，依照使用者明確指正）：
-       第二角色的自動戰鬥之前也是「輪到自己
-       就立刻執行」，一樣違反了「所有行動都要
-       照敏捷順序結算」的要求。
-       改成跟player1的autoAction()一樣，
-       只負責「決定要做什麼」並存進
-       queuedPlayerActions，真正執行留到
-       結算階段，並且這裡自己負責呼叫
-       finishPlayerAction()（不再依賴
-       beginCharacterTurn()那邊額外呼叫一次，
-       避免重複推進）。
-    */
-
-    if(autoConfig2.skill==="defend"){
-
-        queuedPlayerActions[1]={
-
-            action:"defend",
-
-            target:null
-
-        };
-
-
-        updateUI();
-
-        finishPlayerAction();
-
-        return;
-
-    }
-
-
-    const stats2=
-        getPlayer2BattleStats();
-
-
-    const hpPercent2=
-        player2.hp/
-        stats2.maxHP*
-        100;
-
-
-    const autoHpPotionId2=
-        getAutoPotionId("hp");
-
-
-    if(
-        hpPercent2<=autoConfig2.hp &&
-        autoHpPotionId2
-    ){
-
-        queuedPlayerActions[1]={
-
-            action:"potion",
-            potionId:autoHpPotionId2,
-            target:null
-
-        };
-
-
-        updateUI();
-
-        finishPlayerAction();
-
-        return;
-
-    }
-
-
-    const spPercent2=
-        player2.sp/
-        stats2.maxSP*
-        100;
-
-
-    const autoSpPotionId2=
-        getAutoPotionId("sp");
-
-
-    if(
-        spPercent2<=autoConfig2.sp &&
-        autoSpPotionId2
-    ){
-
-        queuedPlayerActions[1]={
-
-            action:"potion",
-            potionId:autoSpPotionId2,
-            target:null
-
-        };
-
-
-        updateUI();
-
-        finishPlayerAction();
-
-        return;
-
-    }
-
-
-    const aliveInBattle=
-        currentBattleMonsters.filter(
-            i=>
-                monsters[i] &&
-                monsters[i].alive
-        );
-
-
-    if(aliveInBattle.length===0){
-
-        finishPlayerAction();
-
-        return;
-
-    }
-
-
-    const autoSkillData=
-        skillDatabase[
-            autoConfig2.skill
-        ];
-
-
-    const isSpreadSkill=
-        autoSkillData &&
-        (
-            autoSkillData.targetType==="tri"||
-            autoSkillData.targetType==="row"||
-            autoSkillData.targetType==="column"||
-            autoSkillData.targetType==="all"
-        );
-
-
-    let target;
-
-
-    if(
-        isSpreadSkill &&
-        aliveInBattle.length>0
-    ){
-
-        const midPosition=
-            Math.floor(
-                (
-                    aliveInBattle.length-1
-                )/2
-            );
-
-
-        target=
-            aliveInBattle[
-                midPosition
-            ];
-
-    }
-    else{
-
-        target=
-            aliveInBattle[0];
-
-    }
-
-
-    if(target===undefined){
-
-        finishPlayerAction();
-
-        return;
-
-    }
-
-
-    let chosenAction=
-        autoConfig2.skill;
-
-
-    if(
-        autoSkillData &&
-        autoSkillData.category!=="buff"&&
-        autoSkillData.category!=="passive"&&
-        autoSkillData.category!=="heal"&&
-        autoSkillData.category!=="revive"
-    ){
-
-        const spCost=
-            autoSkillData.spCost!==undefined
-            ?
-            autoSkillData.spCost
-            :
-            autoSkillData.cost;
-
-
-        if(player2.sp<spCost){
-
-            addBattleLog(
-                ""+
-                player2.id+
-                "SP不足，改用普通攻擊。"
-            );
-
-
-            chosenAction=
-                "normal";
-
-        }
-
-    }
-
-
-    queuedPlayerActions[1]={
-
-        action:chosenAction,
-
-        target:target
-
-    };
-
-
-    updateUI();
-
-    finishPlayerAction();
-
 }
 
-
-function player3AutoAction(token){
+function player3AutoAction(token){function player3AutoAction(token){
     return autoActionForCharacter(2,token);
 }
 
@@ -21998,7 +21391,7 @@ function secondaryCharacterNormalAttack(characterIndex,index){
     const character=getPartyCharacterByIndex(characterIndex);
     const stats=getPartyBattleStats(characterIndex);
 
-    index=findAliveTargetIndex(index);
+    index=findAliveTargetIndex(index,"single");
 
     if(!character || !stats || index===null){
         finishPlayerAction();
@@ -22087,15 +21480,21 @@ function castSecondaryCharacterSkill(characterIndex,skillId,centerIndex){
         return;
     }
 
-    centerIndex=findAliveTargetIndex(centerIndex);
+    const effectiveTargetType=getEffectiveSkillTargetType(skill,level);
+    centerIndex=normalizeBattleTargetType(effectiveTargetType)==="all"
+        ?null
+        :findAliveTargetIndex(centerIndex,effectiveTargetType);
 
-    if(centerIndex===null){
+    if(normalizeBattleTargetType(effectiveTargetType)!=="all"&&centerIndex===null){
         finishPlayerAction();
         return;
     }
 
-    const effectiveTargetType=getEffectiveSkillTargetType(skill,level);
     const targets=getSkillTargets(centerIndex,effectiveTargetType);
+    if(!targets.length){
+        finishPlayerAction();
+        return;
+    }
 
     character.sp-=spCost;
     lungePlayerCard(characterIndex);
@@ -22558,15 +21957,21 @@ function castPlayer2Skill(skillId,centerIndex){
     }
 
 
-    centerIndex=findAliveTargetIndex(centerIndex);
+    const effectiveTargetType=getEffectiveSkillTargetType(skill,level);
+    centerIndex=normalizeBattleTargetType(effectiveTargetType)==="all"
+        ?null
+        :findAliveTargetIndex(centerIndex,effectiveTargetType);
 
-    if(centerIndex===null){
+    if(normalizeBattleTargetType(effectiveTargetType)!=="all"&&centerIndex===null){
         finishPlayerAction();
         return;
     }
 
-    const effectiveTargetType=getEffectiveSkillTargetType(skill,level);
     const targets=getSkillTargets(centerIndex,effectiveTargetType);
+    if(!targets.length){
+        finishPlayerAction();
+        return;
+    }
 
     player2.sp-=spCost;
 
