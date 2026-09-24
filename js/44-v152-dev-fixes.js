@@ -65,17 +65,6 @@
                 if(config&&config.skill==="fireBurstStrike"){ config.skill="normal"; }
             });
         }
-        if(typeof monsters!=="undefined"&&Array.isArray(monsters)){
-            monsters.forEach(monster=>{
-                if(!monster){ return; }
-                if(Array.isArray(monster.skillIds)){
-                    monster.skillIds=monster.skillIds.map(id=>id==="fireBurstStrike"?"fireCritical":id);
-                }
-                if(Array.isArray(monster.v141SupportSkillIds)){
-                    monster.v141SupportSkillIds=monster.v141SupportSkillIds.filter(id=>id!=="fireBurstStrike");
-                }
-            });
-        }
     }
     cleanAccidentalFireSkill();
 
