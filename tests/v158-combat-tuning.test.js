@@ -88,18 +88,13 @@ test("V158 combat tuning no longer overwrites final skill data",()=>{
     assert.deepEqual(Array.from(result.healSpell.requires),["iceArrowRain","iceSpin"]);
 });
 
-test("stun final hit reduction applies after capped accuracy and evasion",()=>{
+test("V158 does not override the canonical hit formula",()=>{
     const context=load();
-    assert.equal(context.v158GetHitChancePercent(0,0,0),95);
-    assert.equal(context.v158GetHitChancePercent(10,0,0),98);
-    assert.equal(context.v158GetHitChancePercent(0,10,0),85.5);
-    assert.equal(context.v158GetHitChancePercent(0,1000,0),14.250000000000002);
-    assert.equal(context.v158GetHitChancePercent(0,1000,50),1);
-    assert.equal(context.v158GetHitChancePercent(1000,0,0),99);
-    assert.ok(Math.abs(context.v158GetHitChancePercent(1000,10,15)-74.1)<Number.EPSILON*100);
+    assert.equal(context.v158GetHitChancePercent,undefined);
+    assert.doesNotMatch(source,/rollHitChance\s*=\s*function|v158GetHitChancePercent/);
 });
 
-test("default monster evasion is level times 0.3 capped at 30 without replacing any custom evasion",()=>{
+test("default monster evasion is level times 0.1 capped at 10 without replacing any custom evasion",()=>{
     const missing={level:20,agilityPoints:12};
     const formerGeneratedValue={level:20,agilityPoints:12,evasion:24};
     const custom={level:20,agilityPoints:12,evasion:37};
@@ -107,12 +102,12 @@ test("default monster evasion is level times 0.3 capped at 30 without replacing 
         monsters:[missing,formerGeneratedValue,custom],
         zoneConfig:{desert:{monsters:()=>[missing,formerGeneratedValue,custom]}}
     });
-    assert.equal(missing.evasion,6);
+    assert.equal(missing.evasion,2);
     assert.equal(formerGeneratedValue.evasion,24);
     assert.equal(custom.evasion,37);
-    assert.equal(context.getMonsterEvasion({level:30}),9);
-    assert.equal(context.makeZoneMonster("測試怪",40).evasion,12);
-    assert.equal(context.makeZoneMonster("高等測試怪",200).evasion,30);
+    assert.equal(context.v158NormalizeMonsterDefaultEvasion({level:30}).evasion,3);
+    assert.equal(context.makeZoneMonster("測試怪",40).evasion,4);
+    assert.equal(context.makeZoneMonster("高等測試怪",200).evasion,10);
 });
 
 test("V158 leaves the shared damage formula owned by the core runtime",()=>{
@@ -122,31 +117,12 @@ test("V158 leaves the shared damage formula owned by the core runtime",()=>{
     assert.equal(context.calculateDamage(),321);
 });
 
-test("secondary Freeze resolves all three selected formation targets",()=>{
-    const partyMember={id:"水系角色",level:50,sp:100};
-    const targets=[0,1,2].map(index=>({name:"目標"+index,level:50,hp:100,alive:true,rank:"regular"}));
-    let finishes=0;
-    const context=load({
-        monsters:targets,selectedMonster:1,
-        getPartyCharacterByIndex:()=>partyMember,
-        getPartyCharacterKey:()=>"player2",
-        getPartyBattleStats:()=>({intelligence:80}),
-        getSkillLevel:()=>1,
-        findAliveTargetIndex:index=>index,
-        getSkillTargets:()=>[0,1,2],
-        getMonsterEffectiveSpiritPoints:()=>0,
-        getMonsterRank:monster=>monster.rank,
-        rollStatusEffectHit:()=>true,
-        applyFreezeEffect:(monster,duration)=>{ monster.frozenFor=duration; },
-        lungePlayerCard(){},showSkillNameBadge(){},showPlayerSpPopup(){},
-        addBattleLog(){},showMissEffect(){},updateUI(){},
-        finishPlayerAction(){ finishes++; },
-        castSecondaryCharacterSkill(){ throw new Error("old single-target path must not run"); }
-    });
-    context.castSecondaryCharacterSkill(1,"freeze",1);
-    assert.deepEqual(targets.map(target=>target.frozenFor),[4,4,4]);
-    assert.equal(partyMember.sp,78);
-    assert.equal(finishes,1);
+test("V158 leaves player Freeze execution on the core battle owner",()=>{
+    const originalSecondary=function(){ return "core-freeze"; };
+    const context=load({castSecondaryCharacterSkill:originalSecondary});
+    assert.equal(context.castSecondaryCharacterSkill,originalSecondary);
+    assert.equal(context.v158CastTriFreeze,undefined);
+    assert.doesNotMatch(source,/castTriFreeze|v158CastTriFreeze|previousCastSecondaryCharacterSkill|previousCastPlayer2Skill/);
 });
 
 test("Abyss map portraits have no frame or black card background",()=>{

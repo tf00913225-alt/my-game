@@ -49,7 +49,7 @@ test("patrol artwork stays upright and returns to the selected appearance owner"
     assert.doesNotMatch(main,/img\.style\.transform=\s*"rotate\(90deg\)"/);
     assert.match(main,/function playPatrolFightAnimation\(callback\)[\s\S]*?PATROL_FIGHT1_B64[\s\S]*?PATROL_FIGHT2_B64[\s\S]*?applyPatrolCharacterArtwork\([\s\S]*?false[\s\S]*?if\(callback\)/);
     assert.match(patrolAppearance,/function artFor\(character,facing\)[\s\S]*?character\.gender[\s\S]*?character\.element/);
-    assert.match(patrolAppearance,/image\.src=artFor\(character,facing\)/);
+    assert.match(patrolAppearance,/const source=artFor\(character,facing\);[\s\S]*?image\.src=source/);
     assert.doesNotMatch(functionalFixes,/patrol-back\.png/);
 });
 

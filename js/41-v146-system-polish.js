@@ -346,8 +346,14 @@
     }
 
     function syncDefeatedCards(){
-        if(typeof monsters!=="undefined"&&Array.isArray(monsters)){
-            monsters.forEach((monster,index)=>{
+        if(
+            typeof monsters!=="undefined"&&
+            Array.isArray(monsters)&&
+            typeof currentBattleMonsters!=="undefined"&&
+            Array.isArray(currentBattleMonsters)
+        ){
+            currentBattleMonsters.forEach(index=>{
+                const monster=monsters[index];
                 const card=document.getElementById("battleMonster"+index);
                 if(card){ card.classList.toggle("v146-defeated",!monster||monster.alive===false||numeric(monster.hp)<=0); }
             });
@@ -890,27 +896,6 @@
         };
     }
 
-    if(typeof updateUI==="function"){
-        const previousUpdateUI=updateUI;
-        updateUI=function(){
-            const result=previousUpdateUI.apply(this,arguments);
-            renderHomeRoster();
-            syncDefeatedCards();
-            syncShopTotals();
-            syncCharacterAttentionDots();
-            return result;
-        };
-    }
-
-    if(typeof updateMonsterUI==="function"){
-        const previousUpdateMonsterUI=updateMonsterUI;
-        updateMonsterUI=function(){
-            const result=previousUpdateMonsterUI.apply(this,arguments);
-            syncDefeatedCards();
-            return result;
-        };
-    }
-
     if(typeof updateGoldDisplay==="function"){
         const previousUpdateGoldDisplay=updateGoldDisplay;
         updateGoldDisplay=function(){
@@ -928,7 +913,6 @@
         syncShopTotals();
         syncDungeonShell();
         polishSynthesis();
-        syncDefeatedCards();
         syncCharacterAttentionDots();
     }
     if(typeof MutationObserver!=="undefined"){
@@ -937,7 +921,12 @@
             mutationQueued=true;
             requestAnimationFrame(syncDynamicDom);
         });
-        const startObserver=()=>observer.observe(document.body,{childList:true,subtree:true});
+        const startObserver=()=>{
+            [
+                document.getElementById("homeFeatureModal"),
+                document.getElementById("dungeonPage")
+            ].filter(Boolean).forEach(root=>observer.observe(root,{childList:true,subtree:true,attributes:true,attributeFilter:["class"]}));
+        };
         if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",startObserver,{once:true}); }
         else{ startObserver(); }
     }

@@ -207,8 +207,50 @@ test("persistent earth states and Yuan Zu blessing bind to their real combat sta
     assert.ok(runtime.cards.battleMonster1.querySelector(".v143-status-visual-barrier"));
     assert.ok(runtime.cards.battleMonster2.querySelector(".v143-status-visual-yuanZuBlessing"));
     assert.equal(runtime.cards.battleMonster0.querySelector(".v143-status-visual-petrify").dataset.statusMode,"static");
+    assert.equal(runtime.cards.battleMonster0.querySelector(".v143-status-visual-petrify").dataset.statusLayer,"hard-control-base");
     assert.equal(runtime.cards.battlePlayerCard1.querySelector(".v143-status-visual-earthShield").dataset.statusMode,"static");
+    assert.equal(runtime.cards.battlePlayerCard1.querySelector(".v143-status-visual-earthShield").dataset.statusLayer,"rotating");
     assert.equal(runtime.cards.battleMonster2.querySelector(".v143-status-visual-yuanZuBlessing").dataset.statusMode,"pulse");
+});
+
+test("Freeze stays fixed while ordinary body statuses rotate in strict two-second order",()=>{
+    const runtime=statusRuntime();
+    const monster=runtime.monsters[0];
+    monster.statusEffects.push({type:"freeze",turnsLeft:3});
+    monster.statusEffects.push({type:"burn",turnsLeft:3,percent:3});
+    monster.activeBuffs.push({type:"rage",turnsLeft:3});
+
+    runtime.context.v143SyncStatusVisualEffects(false);
+    let card=runtime.cards.battleMonster0;
+    assert.ok(card.querySelector(".v143-status-visual-freeze"),"Freeze base cover must render immediately");
+    assert.ok(card.querySelector(".v143-status-visual-burn"),"first rotating status renders immediately");
+    assert.equal(card.querySelector(".v143-status-visual-rage"),null);
+    assert.equal(card.querySelector(".v143-status-visual-freeze").dataset.statusLayer,"hard-control-base");
+
+    runtime.context.v143SyncStatusVisualEffects(true);
+    assert.ok(card.querySelector(".v143-status-visual-freeze"),"Freeze must survive rotation advance");
+    assert.equal(card.querySelector(".v143-status-visual-burn"),null);
+    assert.ok(card.querySelector(".v143-status-visual-rage"),"second rotating status follows first");
+
+    runtime.context.v143SyncStatusVisualEffects(true);
+    assert.ok(card.querySelector(".v143-status-visual-freeze"),"Freeze remains continuous with no blank period");
+    assert.ok(card.querySelector(".v143-status-visual-burn"),"rotation wraps back to first status");
+    assert.equal(card.querySelector(".v143-status-visual-rage"),null);
+
+    monster.hp=0;
+    monster.alive=false;
+    runtime.context.v143SyncStatusVisualEffects(false);
+    assert.equal(card.querySelector(".v143-status-visual-freeze"),null,"death removes base cover immediately");
+
+    monster.hp=100;
+    monster.alive=true;
+    monster.statusEffects=[{type:"petrify",turnsLeft:2}];
+    monster.activeBuffs=[];
+    runtime.context.v143SyncStatusVisualEffects(false);
+    assert.ok(card.querySelector(".v143-status-visual-petrify"),"Petrify base cover renders without waiting for rotation");
+    monster.statusEffects=[];
+    runtime.context.v143SyncStatusVisualEffects(false);
+    assert.equal(card.querySelector(".v143-status-visual-petrify"),null,"formal removal clears base cover immediately");
 });
 
 test("rock shield on the attacking caster is deferred until its cast sheet finishes",()=>{

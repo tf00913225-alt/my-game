@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-23-v17372-main-release",
+  "baseBranch": "dev",
+  "baseCommit": "9993440390c752419a16cf612acedd003fa246af",
+  "currentMain": "852a857120bc6c486812c820b17971acf9176e55",
+  "officialVersion": "173.72",
+  "officialVersionBumpAllowed": true,
+  "overallStatus": "IMPLEMENTED",
+  "requirements": [
+    {
+      "id": "REL-01",
+      "status": "VERIFIED",
+      "requirement": "確認 V173.72 來源為最新 dev，並完成 Repository checks、DEV exact-SHA deployment 與戰鬥 live mobile QA；專案負責人已明確要求推進 main。",
+      "evidence": [
+        "dev@9993440390c752419a16cf612acedd003fa246af",
+        "CI run 35879220843 SUCCESS",
+        "DEV deployment gate job 107243537924 SUCCESS",
+        "Cloudflare exact deployed SHA 9993440390c752419a16cf612acedd003fa246af",
+        "Battle layer/audio live mobile QA PASS"
+      ]
+    },
+    {
+      "id": "REL-02",
+      "status": "VERIFIED",
+      "requirement": "依 current main...dev 完整累積差異盤點玩家可感知變更，並整理 V173.72 玩家公告與 CHANGELOG。",
+      "evidence": [
+        "main@852a857120bc6c486812c820b17971acf9176e55",
+        "dev@9993440390c752419a16cf612acedd003fa246af",
+        "verified integration PRs #529 #531 #532 #533 #534",
+        "2026-09-23 三個功能 Requirement Batch 均 VERIFIED"
+      ]
+    },
+    {
+      "id": "REL-03",
+      "status": "VERIFIED",
+      "requirement": "建立 V173.72 Game/Cache Version、玩家公告、CHANGELOG 與 deterministic production build，並通過 release gate、完整 CI 與版本同步檢查。",
+      "evidence": [
+        "release/release.json",
+        "release/release-update.json",
+        "release/requirements.json",
+        "CHANGELOG.md",
+        "js/20-anonymous-20.js",
+        "index.html",
+        "deterministic build commit 90fb2bf30a8f6c2c58b8355f6574fa872804a62c",
+        "final release-prep head 4699d0d18fb1ef0b47fc06cd50fa970da81132d3",
+        "candidate CI run 35881597305 SUCCESS",
+        "npm run build:check / Release Gate / mobile browser QA / git diff checks PASS"
+      ]
+    },
+    {
+      "id": "REL-04",
+      "status": "VERIFIED",
+      "requirement": "PR #540 合併 dev 後，V173.72 最終 dev HEAD 再次通過 Repository checks、DEV exact-SHA deployment、版本核對與 deployed Battle live QA。",
+      "evidence": [
+        "dev@6ef30c38ecba00d059547d119fc6fec06365f9e6",
+        "PR #540 merged; stale/full-suite convergence complete",
+        "Full Node Suite 209 / 209 PASS before merge (TEMP run 35925831192; only temporary workflow cleanup followed)",
+        "dev push CI run 35939891769 Repository checks SUCCESS",
+        "DEV deployment job 107445532893 SUCCESS",
+        "exact deployed SHA 6ef30c38ecba00d059547d119fc6fec06365f9e6",
+        "Game / Cache Version 173.72 / 173.72 verified by deployment gate",
+        "deployed Battle layer/audio live mobile QA PASS"
+      ]
+    },
+    {
+      "id": "REL-05",
+      "status": "TODO",
+      "requirement": "以 protected dev → main 正式發布 PR 推進 main；main CI、production Pages deployment、production SHA、Game Version、Cache Version 全部驗證成功。",
+      "evidence": []
+    }
+  ],
+  "includedRequirementBatches": [
+    "2026-09-23-battle-ui-hit-status-owner-convergence",
+    "2026-09-23-freeze-petrify-exclusive-status-layer",
+    "2026-09-23-skill-relic-runtime-owner-convergence"
+  ],
+  "automatedVerification": "V173.72 release-prep PR #535 and verification PR #536 were previously merged. PR #539 aligned the battle-info browser fixture, and PR #540 converged the remaining stale full-suite contracts plus confirmed Runtime regressions. The final dev merge is dev@6ef30c38ecba00d059547d119fc6fec06365f9e6. Dev push CI run 35939891769 and exact-SHA deployment job 107445532893 both succeeded; deployment verified SHA 6ef30c38ecba00d059547d119fc6fec06365f9e6, Game/Cache 173.72, and deployed Battle live QA PASS. Protected dev → main PR #537 remains pending final candidate CI.",
+  "visualVerification": "Final dev exact-SHA deployment at 6ef30c38ecba00d059547d119fc6fec06365f9e6 passed deployed Battle layer/audio live mobile QA.",
+  "verifiedSourceCommit": "6ef30c38ecba00d059547d119fc6fec06365f9e6",
+  "mergedDevCommit": "6ef30c38ecba00d059547d119fc6fec06365f9e6",
+  "mergedMainCommit": null,
+  "candidateCiRun": 35881984862,
+  "devPushCiRun": 35939891769,
+  "devDeployJob": 107445532893
+}

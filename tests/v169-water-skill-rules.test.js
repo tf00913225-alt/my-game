@@ -8,6 +8,7 @@ const fs=require("node:fs");
 const vm=require("node:vm");
 
 const source=fs.readFileSync("js/50-v169-water-skill-rules.js","utf8");
+const progression=fs.readFileSync("js/60-v173.64-skill-progression-rebalance.js","utf8");
 
 let passed=0;
 function test(name,handler){
@@ -141,31 +142,28 @@ test("damage growth sequences and HP-only lifesteal text match every level",()=>
         floodBeast:[105,126,147,168,189],iceArrowRain:[30,36,42,48,54]
     };
     Object.entries(sequences).forEach(([id,expected])=>{
-        const actual=[1,2,3,4,5].map(level=>{
-            const parts=Array.from(context.v169WaterSkillRules.effectParts(id,level));
-            return Number(parts[0].match(/\d+/)[0]);
-        });
+        const skill=context.skillDatabase[id];
+        const actual=[1,2,3,4,5].map(level=>
+            Number(skill.baseDamage)+Number(skill.damagePerLevel)*(level-1)
+        );
         assert.deepEqual(actual,expected,id);
     });
-    const preview=context.getSkillEffectPreviewText(context.skillDatabase.iceSpin,5);
-    assert.match(preview,/63/);
-    assert.match(preview,/35%基礎機率凍傷2回合/);
-    assert.match(preview,/傷害-25%、閃避-25%、異常狀態抗性-25%/);
-    assert.match(preview,/吸取實際傷害7%（只恢復自身HP）/);
-    assert.doesNotMatch(preview,/HP\/SP|冰封/);
-    const freeze=context.getSkillEffectPreviewText(context.skillDatabase.freeze,1);
-    assert.match(freeze,/90%基礎機率冰封3回合/);
-    assert.match(freeze,/不造成傷害/);
+    assert.equal(context.getSkillEffectPreviewText(context.skillDatabase.iceSpin,5),"legacy");
+    assert.equal(context.buildSkillLevelBreakdownHTML(context.skillDatabase.iceSpin),"legacy");
+    assert.doesNotMatch(source,/getSkillEffectPreviewText\s*=|buildSkillLevelBreakdownHTML\s*=/);
+    assert.match(progression,/frostbiteChance[\s\S]*?傷害-25%、最終閃躲-25%、最終異常狀態抗性-25%/);
+    assert.match(progression,/lifestealPercentByLevel[\s\S]*?實際傷害回復自身HP/);
+    assert.match(progression,/if\(skill\.id==="freeze"\)[\s\S]*?基礎機率冰封/);
 });
 
 test("secondary and legacy player-two Freeze resolve the front/back column",()=>{
     const observed=[];
     const context=load({
         castSecondaryCharacterSkill(characterIndex,skillId,centerIndex){
-            observed.push(["secondary",Array.from(this.getSkillTargets(centerIndex,"tri"))]);
+            observed.push(["secondary",Array.from(this.getSkillTargets(centerIndex,this.skillDatabase[skillId].targetType))]);
         },
         castPlayer2Skill(skillId,centerIndex){
-            observed.push(["player2",Array.from(this.getSkillTargets(centerIndex,"tri"))]);
+            observed.push(["player2",Array.from(this.getSkillTargets(centerIndex,this.skillDatabase[skillId].targetType))]);
         }
     });
     context.castSecondaryCharacterSkill(2,"freeze",4);
@@ -197,10 +195,10 @@ test("Frostbite is a soft debuff and never blocks skills or monster special acti
     assert.equal(context.prepareAction("waterKnife"),"skill-ok");
     assert.equal(context.processSingleMonsterAttack(0),"monster-skill-ok");
     assert.equal(context.getOutgoingDamageDownPercent(frostbitten),25);
-    assert.equal(context.getMonsterEvasion(frostbitten),30);
-    assert.equal(context.getMonsterEffectiveSpiritPoints(frostbitten),60);
-    assert.equal(context.getFinalBattleSpiritForPlayerTarget(frostbitten),75);
-    assert.equal(context.getPlayerStatusResistBonus(frostbitten),15);
+    assert.equal(context.getMonsterEvasion(frostbitten),40,"V169 must not wrap core evasion");
+    assert.equal(context.getMonsterEffectiveSpiritPoints(frostbitten),80,"V169 must not wrap Spirit");
+    assert.equal(context.getFinalBattleSpiritForPlayerTarget(frostbitten),100,"V169 must not wrap player Spirit");
+    assert.equal(context.getPlayerStatusResistBonus(frostbitten),20,"V169 must not wrap core status resistance");
     assert.equal(context.v169WaterSkillRules.frostbitePenaltyPercent,25);
     assert.equal(context.v169WaterSkillRules.isFrostbitten(frostbitten),true);
 });
@@ -213,38 +211,24 @@ test("monster Freeze pure-control damage is owned by the authoritative core",()=
     assert.match(main,/if\(damage>0 && hasBarrier\)/);
 });
 
-test("all final UI description entry points expose current Frostbite and HP-only recovery",()=>{
-    const description={textContent:""};
-    const levels={innerHTML:""};
+test("V169 leaves player-facing description entry points to the later progression owner",()=>{
     let creationCalls=0;
     const context=load({
-        document:bareDocument({
-            creationSkillDetailDescription:description,
-            creationSkillDetailLevels:levels
-        }),
         getSkillPreviewSummary(){ return "legacy-summary"; },
         getSkillEffectPreviewText(){ return "legacy-effect"; },
         buildSkillLevelBreakdownHTML(){ return "legacy-levels"; },
         showCreationSkillDetail(){ creationCalls++; }
     });
     const skill=context.skillDatabase.iceArrowRain;
-    const summary=context.getSkillPreviewSummary(skill);
-    const effect=context.getSkillEffectPreviewText(skill,3);
-    const breakdown=context.buildSkillLevelBreakdownHTML(skill);
+    assert.equal(context.getSkillPreviewSummary(skill),"legacy-summary");
+    assert.equal(context.getSkillEffectPreviewText(skill,3),"legacy-effect");
+    assert.equal(context.buildSkillLevelBreakdownHTML(skill),"legacy-levels");
     context.showCreationSkillDetail("iceArrowRain");
-
-    assert.match(summary,/敵方全體/);
-    assert.match(summary,/凍傷：傷害、閃避、異常抗性各降低25%/);
-    assert.match(summary,/恢復自身HP/);
-    assert.match(effect,/42/);
-    assert.match(effect,/35%基礎機率凍傷2回合/);
-    assert.match(breakdown,/Lv\.5/);
-    assert.match(breakdown,/54/);
-    assert.match(breakdown,/只恢復自身HP/);
     assert.equal(creationCalls,1);
-    assert.equal(description.textContent,skill.description);
-    assert.match(levels.innerHTML,/凍傷2回合/);
-    assert.doesNotMatch(levels.innerHTML,/HP\/SP|冰封/);
+    assert.doesNotMatch(source,/getSkillPreviewSummary\s*=|getSkillEffectPreviewText\s*=|buildSkillLevelBreakdownHTML\s*=|showCreationSkillDetail\s*=/);
+    assert.match(progression,/window\.getSkillPreviewSummary=function/);
+    assert.match(progression,/getSkillEffectPreviewText=function/);
+    assert.match(progression,/buildSkillLevelBreakdownHTML=function/);
 });
 
 console.log("\nV169 Water skill rules suite: "+passed+" tests passed.");

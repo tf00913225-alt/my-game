@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-23-battle-ui-hit-status-owner-convergence",
+  "baseBranch": "dev",
+  "baseSha": "ae535061883029d12e9ca951e2c23b5f791fbf86",
+  "workBranch": "fix/battle-ui-hit-status-owner-convergence-20260923",
+  "title": "戰鬥／巡怪 UI Owner 收斂＋命中／閃躲／異常百分點公式統一＋技能／狀態說明修復",
+  "status": "VERIFIED",
+  "requirements": [
+    {
+      "id": "HIT-01",
+      "status": "VERIFIED",
+      "requirement": "一般命中統一為 95 + accuracy×0.15 + 最終命中加成 - 目標最終閃躲 - 最終命中下降，最後 clamp 70%～99%；不得再乘算閃躲。",
+      "evidence": [
+        "js/00-main.js",
+        "tests/hit-evasion-final-percent-status-formula-20260923.test.js"
+      ]
+    },
+    {
+      "id": "EVASION-02",
+      "status": "VERIFIED",
+      "requirement": "未明確指定 evasion 的怪物使用 level×0.1%、上限10%；多個閃躲來源以最終百分點加減，V158/V169 不得再覆寫核心閃躲公式。",
+      "evidence": [
+        "js/00-main.js",
+        "js/47-v158-combat-tuning.js",
+        "js/50-v169-water-skill-rules.js"
+      ]
+    },
+    {
+      "id": "STATUS-03",
+      "status": "VERIFIED",
+      "requirement": "一般異常與硬控統一為 base + 主屬性×0.05 + 最終異常命中加成 - Spirit×0.05 - 最終抗性；移除 level factor、sqrt 與硬控專屬 Spirit coefficient。",
+      "evidence": [
+        "js/00-main.js",
+        "js/33-v140-four-element-balance.js",
+        "tests/v170-final-spec-integration.test.js"
+      ]
+    },
+    {
+      "id": "HARD-CONTROL-04",
+      "status": "VERIFIED",
+      "requirement": "Hard Control 最終上限 regular 90%、elite 75%、boss 60%、enemy-to-player 60%，Freeze/Petrify 繼續使用正式互斥 Gate。",
+      "evidence": [
+        "js/00-main.js",
+        "SYSTEM_CONTRACTS.md"
+      ]
+    },
+    {
+      "id": "FROSTBITE-05",
+      "status": "VERIFIED",
+      "requirement": "凍傷為 Soft Debuff：傷害-25%、最終閃躲-25個百分點、最終異常抗性-25個百分點，不禁止技能；技能頁、戰鬥狀態與 Log 不得顯示舊規格。",
+      "evidence": [
+        "js/39-v143-skill-animation.js",
+        "js/43-v149-skill-ui-rules.js",
+        "js/50-v169-water-skill-rules.js"
+      ]
+    },
+    {
+      "id": "SKILL-TEXT-06",
+      "status": "VERIFIED",
+      "requirement": "正式技能說明補齊火系物理免費追擊、烈焰龍捲必定燃燒、火鳳天鳴鳳威、凍傷完整效果、焚血免費追擊不耗 Charge、淨心訣不可清項目與四元素 EX 正式文字。",
+      "evidence": [
+        "js/60-v173.64-skill-progression-rebalance.js",
+        "tests/skill-relic-owner-convergence-20260923.test.js"
+      ]
+    },
+    {
+      "id": "DURATION-07",
+      "status": "VERIFIED",
+      "requirement": "怒火等持續 Buff 在正式 action-finished Duration Lifecycle 扣除，0回合移除後立即同步 Status Visual，不靠輪詢或 timer。",
+      "evidence": [
+        "js/60-v173.64-skill-progression-rebalance.js",
+        "tests/skill-progression-rebalance.test.js"
+      ]
+    },
+    {
+      "id": "PATROL-UI-08",
+      "status": "VERIFIED",
+      "requirement": "巡怪角色不再先顯示 legacy patrol-character.png；依玩家角色/性別/元素解析正式 WebP，decode/load 後才顯示。mapBattleInfo 與正式 Battle Drawer 外觀 owner 分離。",
+      "evidence": [
+        "index.html",
+        "js/26-v131-patrol-appearance.js",
+        "css/00-main.css"
+      ]
+    },
+    {
+      "id": "BATTLE-UI-09",
+      "status": "VERIFIED",
+      "requirement": "Fixed Slot 唯一金色 Target Reticle；怪物名稱透明、狀態 Icon 高於 HP/SP、選目標時回合倒數移到正式幾何位置；Battle Info 外殼透明且正文／Tab 才有黑底。",
+      "evidence": [
+        "css/fixed-slot-battlefield-rendering-v2.css",
+        "css/40-v143-combat-dungeon-polish.css"
+      ]
+    },
+    {
+      "id": "PERF-ASSET-10",
+      "status": "VERIFIED",
+      "requirement": "戰鬥資訊 Tab 拖曳改成一次量測＋requestAnimationFrame/translate3d；操作面板使用透明背景素材投影，不用末端 CSS 蓋黑底。",
+      "evidence": [
+        "js/00-main.js",
+        "assets/battle/battle-command-panel-transparent.svg",
+        "css/00-main.css"
+      ]
+    },
+    {
+      "id": "OWNER-11",
+      "status": "VERIFIED",
+      "requirement": "V140/V158/V149/V169 舊公式 Wrapper 退休；符咒也走同一 Hit/Status Owner；不得新增第二套公式、setTimeout／MutationObserver／polling 補救。",
+      "evidence": [
+        "js/27-v132-content-expansion.js",
+        "js/33-v140-four-element-balance.js",
+        "js/43-v149-skill-ui-rules.js",
+        "js/47-v158-combat-tuning.js",
+        "SYSTEM_CONTRACTS.md"
+      ]
+    }
+  ],
+  "verification": {
+    "focusedTests": "PASS",
+    "build": "PASS",
+    "repositoryChecks": "SUCCESS",
+    "browserQA": "PASS",
+    "diffCheck": "PASS",
+    "verifiedRunId": 35866039901,
+    "verifiedSourceHeadSha": "1596ea0a36e564facca92432376775d9728bc0fe",
+    "buildCommitSha": "7567aa216fba3f32e92792ea9dac317ff9f8d942",
+    "notes": [
+      "Fixed Slot battlefield 9x16 mobile browser QA PASS.",
+      "Exact-candidate real battle mobile browser QA PASS.",
+      "Adventure V1 mobile browser QA PASS.",
+      "Production build synchronization PASS.",
+      "Temporary production build synchronizer removed before the verified candidate."
+    ]
+  }
+}

@@ -34,7 +34,13 @@ async function waitForJson(url,timeoutMs=15000){
 }
 
 class CdpClient{
-    constructor(url){ this.url=url; this.nextId=1; this.pending=new Map(); this.socket=null; }
+    constructor(url){
+        this.url=url;
+        this.nextId=1;
+        this.pending=new Map();
+        this.socket=null;
+        this.events=[];
+    }
     async connect(){
         this.socket=new WebSocket(this.url);
         await new Promise((resolve,reject)=>{
@@ -46,7 +52,32 @@ class CdpClient{
             let raw=event.data;
             if(raw&&typeof raw!=="string"&&typeof raw.text==="function"){ raw=await raw.text(); }
             const message=JSON.parse(String(raw));
-            if(!message.id){ return; }
+            if(!message.id){
+                if(message.method==="Runtime.exceptionThrown"){
+                    const details=message.params&&message.params.exceptionDetails;
+                    this.events.push({
+                        method:message.method,
+                        text:details&&(
+                            details.exception&&details.exception.description||
+                            details.text
+                        )||"Runtime exception",
+                        url:details&&details.url||null,
+                        lineNumber:details&&details.lineNumber,
+                        columnNumber:details&&details.columnNumber
+                    });
+                }else if(message.method==="Runtime.consoleAPICalled"){
+                    const type=message.params&&message.params.type;
+                    if(type==="error"||type==="warning"){
+                        this.events.push({
+                            method:message.method,
+                            type,
+                            args:(message.params.args||[]).map(arg=>arg.value!==undefined?arg.value:arg.description)
+                        });
+                    }
+                }
+                if(this.events.length>50){ this.events.splice(0,this.events.length-50); }
+                return;
+            }
             const request=this.pending.get(message.id);
             if(!request){ return; }
             this.pending.delete(message.id);
@@ -86,6 +117,12 @@ async function waitFor(client,expression,label,timeoutMs=30000){
         }catch(error){ last=error.message; }
         await sleep(180);
     }
+    if(label==="App Shell character/save owners"){
+        throw new Error(
+            `Timed out waiting for ${label}. Last result: ${String(last)}. `+
+            `Recent runtime events: ${JSON.stringify(client.events.slice(-12))}`
+        );
+    }
     throw new Error(`Timed out waiting for ${label}. Last result: ${String(last)}`);
 }
 
@@ -110,13 +147,64 @@ async function prepareAccountFirstRuntime(client,features){
     }
     await client.eval(`Promise.all(${JSON.stringify(features)}.map(feature=>FourSymbolsFeatures.ensure(feature,"live-browser-qa")))`);
     if(state==="NEED_CHARACTER"){
-        const created=await client.eval(`(()=>{
+        const creationAttempt=await client.eval(`(()=>{
             const input=document.getElementById('creationId');
-            if(!input||typeof createCharacter!=='function'){return false;}
+            if(!input||typeof createCharacter!=='function'){return {created:false,errors:["creation input/function unavailable"]};}
             input.value='QA俠客';
-            return createCharacter()===true;
+            const errors=[];
+            const originalError=console.error;
+            console.error=function(){
+                try{
+                    errors.push(Array.from(arguments).map(value=>{
+                        if(value instanceof Error){ return value.name+":"+value.message+(value.code?(" code="+value.code):""); }
+                        if(value&&typeof value==="object"){
+                            try{return JSON.stringify(value);}catch(_){return String(value);}
+                        }
+                        return String(value);
+                    }).join(" | "));
+                }catch(_){}
+                return originalError.apply(this,arguments);
+            };
+            try{
+                return {created:createCharacter()===true,errors};
+            }finally{
+                console.error=originalError;
+            }
         })()`);
-        if(!created){ throw new Error("Live anonymous account could not complete the formal character-creation flow"); }
+        if(!creationAttempt.created){
+            const diagnostics=await client.eval(`(()=>{
+                let targetSlot=null;
+                try{ targetSlot=typeof creationTargetSlot!=="undefined"?creationTargetSlot:null; }catch(_){}
+                let persisted=null;
+                try{
+                    const repo=window.FourSymbolsAccountSave;
+                    const uid=repo&&repo.getActiveUid&&repo.getActiveUid();
+                    const read=uid&&repo.readForUid?repo.readForUid(uid):null;
+                    persisted={
+                        uid:uid||null,
+                        saveKey:uid&&repo.saveKey?repo.saveKey(uid):null,
+                        readStatus:read&&read.status||null,
+                        savedPlayerId:read&&read.save&&read.save.player&&read.save.player.id||null
+                    };
+                }catch(error){ persisted={error:String(error&&error.message||error)}; }
+                return {
+                    startupState:window.FourSymbolsStartupPolicy&&FourSymbolsStartupPolicy.getState(),
+                    canCreate:Boolean(window.FourSymbolsStartupPolicy&&FourSymbolsStartupPolicy.canCreateCharacter()),
+                    targetSlot,
+                    inputValue:document.getElementById('creationId')?.value||null,
+                    creationVisible:getComputedStyle(document.getElementById('creationPage')).display,
+                    playerId:typeof player!=="undefined"?player.id:null,
+                    saveOwner:persisted,
+                    guarded:Boolean(window.createCharacter&&window.createCharacter.__v174PersistedPrimaryGuard),
+                    creationErrors:${JSON.stringify(creationAttempt.errors)}
+                };
+            })()`);
+            throw new Error(
+                "Live anonymous account could not complete the formal character-creation flow: "+
+                JSON.stringify(diagnostics)+
+                " CDP="+JSON.stringify(client.events.slice(-20))
+            );
+        }
         await waitFor(client,"FourSymbolsStartupPolicy.getState()==='READY'&&getComputedStyle(document.getElementById('gameInterface')).display!=='none'","anonymous character creation completion",30000);
         state="READY";
     }
@@ -150,7 +238,22 @@ try{
     const accountState=await prepareAccountFirstRuntime(client,["abyss","boss-tower"]);
     evidence.checks.accountState=accountState;
     await waitFor(client,"window.__v174TwoTierAbyssInstalled===true&&typeof window.v174AbyssBuildRoster==='function'","two-tier Abyss runtime");
-    await waitFor(client,"typeof window.v132LaunchDungeonBattle==='function'&&window.v141Audio&&typeof window.v141Audio.playSkill==='function'","battle/audio runtime");
+    try{
+        await waitFor(client,"typeof window.v132LaunchDungeonBattle==='function'&&window.v141Audio&&typeof window.v141Audio.playSkill==='function'","battle/audio runtime");
+    }catch(error){
+        const diagnostics=await client.eval(`(()=>({
+            gameplayCoreReady:window.FourSymbolsFeatures?.isReady?.("gameplay-core")??null,
+            battleFeatureReady:window.FourSymbolsFeatures?.isReady?.("battle")??null,
+            v132Type:typeof window.v132LaunchDungeonBattle,
+            v141AudioType:typeof window.v141Audio,
+            v141PlaySkillType:typeof window.v141Audio?.playSkill,
+            scripts:[...document.querySelectorAll("script[data-feature-bundle]")].map(script=>({
+                bundle:script.dataset.featureBundle||null,
+                src:script.src
+            }))
+        }))()`);
+        throw new Error(error.message+" diagnostics="+JSON.stringify(diagnostics)+" CDP="+JSON.stringify(client.events.slice(-25)));
+    }
 
     await client.eval(`(()=>{
         if(typeof showPage==='function'){showPage('home');}
@@ -323,26 +426,158 @@ try{
     assert.ok(layout.hud.length>=9,"The real Abyss battle must expose one ally and eight enemy card HUDs");
     assert.ok(layout.hud.every(entry=>entry.name&&entry.hp&&entry.sp),"Every live combatant must keep its name, HP and SP visible");
 
+    const normalAttackPerformance=await client.eval(`(async()=>{
+        const metrics=window.FourSymbolsBattleRuntimeMetrics;
+        const page=document.getElementById('battlePage');
+        const normalButton=Array.from(document.querySelectorAll('#mainBattleMenu > .menu-button')).find(button=>
+            String(button.getAttribute('onclick')||'').includes("prepareAction('normal')")
+        );
+        if(!metrics||!page||!normalButton){return {available:false};}
+
+        const originalAuto=typeof autoBattle!=='undefined'?autoBattle:false;
+        const originalIndex=typeof activeBattleCharacterIndex!=='undefined'?activeBattleCharacterIndex:0;
+        const originalActionReady=typeof actionReady!=='undefined'?actionReady:false;
+        const originalPending=typeof pendingAction!=='undefined'?pendingAction:null;
+        if(typeof autoBattle!=='undefined'){autoBattle=false;}
+        if(typeof activeBattleCharacterIndex!=='undefined'){activeBattleCharacterIndex=0;}
+        if(typeof actionReady!=='undefined'){actionReady=false;}
+        if(typeof pendingAction!=='undefined'){pendingAction=null;}
+        if(typeof clearBattleTargetSelectionMode==='function'){clearBattleTargetSelectionMode();}
+
+        const repairHooks=['v17351SyncInventoryQa','v17351PreviewQuestMilestones','v17363SyncFunctionalFixes','v78ApplyCharacterInventoryLayout'];
+        const originals={};
+        const repairCalls={};
+        repairHooks.forEach(name=>{
+            repairCalls[name]=0;
+            if(typeof window[name]==='function'){
+                originals[name]=window[name];
+                window[name]=function(){repairCalls[name]++;return originals[name].apply(this,arguments);};
+            }
+        });
+
+        let mutationCount=0;
+        const mutationObserver=new MutationObserver(records=>{mutationCount+=records.length;});
+        mutationObserver.observe(page,{subtree:true,childList:true,attributes:true,characterData:true});
+
+        const longTasks=[];
+        let longTaskObserver=null;
+        if(typeof PerformanceObserver==='function'&&PerformanceObserver.supportedEntryTypes?.includes('longtask')){
+            longTaskObserver=new PerformanceObserver(list=>{
+                list.getEntries().forEach(entry=>longTasks.push({duration:entry.duration,startTime:entry.startTime}));
+            });
+            longTaskObserver.observe({type:'longtask',buffered:false});
+        }
+
+        metrics.enabled=true;
+        metrics.reset();
+        const started=performance.now();
+        normalButton.click();
+        const syncDuration=performance.now()-started;
+        await new Promise(resolve=>setTimeout(resolve,120));
+        const counters=metrics.snapshot();
+        const targetSelecting=page.querySelector('#battleActionRegion')?.classList.contains('target-selecting')||false;
+        mutationObserver.disconnect();
+        if(longTaskObserver){longTaskObserver.disconnect();}
+        metrics.enabled=false;
+
+        repairHooks.forEach(name=>{if(originals[name]){window[name]=originals[name];}});
+        if(typeof actionReady!=='undefined'){actionReady=originalActionReady;}
+        if(typeof pendingAction!=='undefined'){pendingAction=originalPending;}
+        if(typeof activeBattleCharacterIndex!=='undefined'){activeBattleCharacterIndex=originalIndex;}
+        if(typeof autoBattle!=='undefined'){autoBattle=originalAuto;}
+        if(typeof clearBattleTargetSelectionMode==='function'){clearBattleTargetSelectionMode();}
+        if(typeof closeMenus==='function'){closeMenus();}
+        if(typeof updateActionHudVisibility==='function'){updateActionHudVisibility();}
+
+        return {
+            available:true,syncDuration,mutationCount,targetSelecting,counters,repairCalls,
+            longTaskCount:longTasks.length,
+            maxLongTaskDuration:longTasks.reduce((max,item)=>Math.max(max,item.duration),0)
+        };
+    })()`);
+    evidence.checks.normalAttackPerformance=normalAttackPerformance;
+    assert.equal(normalAttackPerformance.available,true,"Normal-attack performance instrumentation must be available");
+    assert.equal(normalAttackPerformance.targetSelecting,true,"Normal attack click must immediately enter target selection");
+    assert.ok(normalAttackPerformance.syncDuration<100,`Normal attack synchronous click path is too slow: ${normalAttackPerformance.syncDuration}ms`);
+    assert.ok(normalAttackPerformance.mutationCount<80,`Normal attack produced excessive DOM mutations: ${normalAttackPerformance.mutationCount}`);
+    assert.equal(normalAttackPerformance.counters.syncMonsterPortraits,0,"Normal attack click must not rescan monster portraits");
+    assert.equal(normalAttackPerformance.counters.quickBarRebuild,0,"Normal attack click must not rebuild the skill quick bar");
+    assert.equal(normalAttackPerformance.counters.repairScheduler,0,"Normal attack click must not invoke a repair scheduler");
+    Object.entries(normalAttackPerformance.repairCalls).forEach(([name,count])=>
+        assert.equal(count,0,`Normal attack click unexpectedly invoked ${name}`)
+    );
+    assert.ok(normalAttackPerformance.maxLongTaskDuration<120,`Normal attack generated a long task of ${normalAttackPerformance.maxLongTaskDuration}ms`);
+
+    const spQuickBar=await client.eval(`(()=>{
+        const bar=document.getElementById('skillQuickBarGrid');
+        if(!bar||typeof ensureSkillQuickBarButtons!=='function'||typeof syncSkillQuickBarButton!=='function'){return null;}
+        const buttons=ensureSkillQuickBarButtons(bar);
+        const button=buttons[0];
+        const skill=typeof skillDatabase!=='undefined'&&(skillDatabase.waterBall||Object.values(skillDatabase).find(item=>item&&item.spCost!==undefined));
+        if(!button||!skill){return null;}
+        const skillId=skill.id||'waterBall';
+        const cost=Number(skill.spCost!==undefined?skill.spCost:skill.cost)||0;
+        syncSkillQuickBarButton(button,skillId,skill,1,cost,true);
+        const block=button.querySelector('.sq-sp-block');
+        const state={
+            skillId,cost,
+            disabled:button.disabled,
+            insufficient:button.classList.contains('sp-insufficient'),
+            blockHidden:block?block.hidden:null,
+            blockDisplay:block?getComputedStyle(block).display:null
+        };
+        if(typeof populateSkillQuickBar==='function'){populateSkillQuickBar();}
+        return state;
+    })()`);
+    evidence.checks.spQuickBar=spQuickBar;
+    assert.ok(spQuickBar,"Canonical quick-bar sufficient-SP state must be testable");
+    assert.equal(spQuickBar.disabled,false,`${spQuickBar.skillId} should be enabled when enoughSP is true`);
+    assert.equal(spQuickBar.insufficient,false,`${spQuickBar.skillId} must not keep the insufficient-SP class when enoughSP is true`);
+    assert.equal(spQuickBar.blockHidden,true,`${spQuickBar.skillId} insufficient-SP overlay should be semantically hidden`);
+    assert.equal(spQuickBar.blockDisplay,"none",`${spQuickBar.skillId} insufficient-SP overlay must be visually hidden`);
+
     const infoDrawer=await client.eval(`(()=>{
         const region=document.querySelector('#battlePage .battle-info-region');
         const button=document.getElementById('battleInfoToggle');
         const info=document.getElementById('battleInfo');
-        if(!region||!button||!info||typeof toggleBattleInfoPanel!=='function'){return null;}
+        const turn=document.getElementById('battleTurnIndicator');
+        if(!region||!button||!info||!turn||typeof toggleBattleInfoPanel!=='function'){return null;}
         region.style.transition='none';
         const rect=node=>{const value=node.getBoundingClientRect();return {top:value.top,bottom:value.bottom,height:value.height};};
+        const snapshot=()=>({
+            region:rect(region),
+            info:rect(info),
+            aria:button.getAttribute('aria-expanded'),
+            className:region.className,
+            label:button.textContent.trim(),
+            regionBackground:getComputedStyle(region).backgroundColor,
+            buttonBackground:getComputedStyle(button).backgroundColor,
+            infoBackground:getComputedStyle(info).backgroundColor,
+            turnOpacity:getComputedStyle(turn).opacity
+        });
         toggleBattleInfoPanel();
-        const expanded={region:rect(region),info:rect(info),aria:button.getAttribute('aria-expanded'),className:region.className};
+        const expanded=snapshot();
         toggleBattleInfoPanel();
-        const collapsed={region:rect(region),info:rect(info),aria:button.getAttribute('aria-expanded'),className:region.className};
+        const collapsed=snapshot();
         region.style.removeProperty('transition');
         return {expanded,collapsed};
     })()`);
     evidence.checks.battleInfoDrawer=infoDrawer;
     assert.ok(infoDrawer,"Live battle must expose the formal battle-info drawer owner");
     assert.equal(infoDrawer.expanded.aria,"true","Tapping the handle must expand battle info");
+    assert.equal(infoDrawer.expanded.label,"返回","Expanded battle info handle must become 返回");
     assert.match(infoDrawer.expanded.className,/is-expanded/);
     assert.ok(infoDrawer.expanded.info.top<layout.regions.wrap.bottom,"Expanded battle info must slide into the battlefield viewport");
     assert.equal(infoDrawer.collapsed.aria,"false","Tapping again must collapse battle info");
+    assert.equal(infoDrawer.collapsed.label,"戰鬥資訊","Collapsed battle info handle must restore 戰鬥資訊");
+    assert.equal(infoDrawer.collapsed.regionBackground,"rgba(0, 0, 0, 0)","Collapsed battle-info drawer shell must stay transparent");
+    assert.equal(infoDrawer.expanded.regionBackground,"rgba(0, 0, 0, 0)","Expanded battle-info drawer shell must stay transparent");
+    assert.notEqual(infoDrawer.collapsed.buttonBackground,"rgba(0, 0, 0, 0)","Collapsed 戰鬥資訊 tab must retain its own backing");
+    assert.notEqual(infoDrawer.expanded.buttonBackground,"rgba(0, 0, 0, 0)","Expanded 返回 tab must retain its own backing");
+    assert.equal(infoDrawer.collapsed.infoBackground,"rgba(0, 0, 0, 0)","Collapsed battle log body must remain transparent/off-canvas");
+    assert.notEqual(infoDrawer.expanded.infoBackground,"rgba(0, 0, 0, 0)","Expanded battle log body alone owns the black backing");
+    assert.equal(infoDrawer.collapsed.turnOpacity,"1","Collapsed drawer keeps the current round visible");
+    assert.equal(infoDrawer.expanded.turnOpacity,"1","Expanded drawer keeps the current round visible");
     assert.doesNotMatch(infoDrawer.collapsed.className,/is-expanded/);
     assert.ok(infoDrawer.collapsed.info.top>=layout.regions.wrap.bottom-1,"Collapsed battle info must return below the battlefield viewport");
 
@@ -455,6 +690,25 @@ try{
     assert.equal(iceArrowRain.stageOverflow,"visible","The VFX owner must not clip full-range animation paint");
     assert.equal(iceArrowRain.emitted,"true","Ice Arrow Rain must emit a visible production sprite");
 
+    const statusInspectionDuringVfx=await client.eval(`(()=>{
+        if(typeof clearBattleTargetSelectionMode==='function'){clearBattleTargetSelectionMode();}
+        const playerOpened=typeof openBattleStatusDetailModal==='function'&&openBattleStatusDetailModal('player',0)===true;
+        const playerModal=document.getElementById('battleStatusDetailModal');
+        const playerVisible=!!(playerModal&&!playerModal.hidden&&playerModal.getAttribute('aria-hidden')==='false');
+        if(typeof closeBattleStatusDetailModal==='function'){closeBattleStatusDetailModal();}
+        const monsterIndex=(typeof currentBattleMonsters!=='undefined'?currentBattleMonsters:[]).find(index=>monsters[index]?.alive);
+        const monsterOpened=Number.isInteger(monsterIndex)&&typeof openBattleStatusDetailModal==='function'&&openBattleStatusDetailModal('monster',monsterIndex)===true;
+        const monsterModal=document.getElementById('battleStatusDetailModal');
+        const monsterVisible=!!(monsterModal&&!monsterModal.hidden&&monsterModal.getAttribute('aria-hidden')==='false');
+        if(typeof closeBattleStatusDetailModal==='function'){closeBattleStatusDetailModal();}
+        return {playerOpened,playerVisible,monsterIndex,monsterOpened,monsterVisible,stageStillMounted:!!document.getElementById('v143-skill-stage')};
+    })()`);
+    evidence.checks.statusInspectionDuringVfx=statusInspectionDuringVfx;
+    assert.equal(statusInspectionDuringVfx.playerOpened,true,"Read-only player status must open during active VFX");
+    assert.equal(statusInspectionDuringVfx.playerVisible,true,"Player status modal must become visible during active VFX");
+    assert.equal(statusInspectionDuringVfx.monsterOpened,true,"Read-only enemy status must open during active VFX");
+    assert.equal(statusInspectionDuringVfx.monsterVisible,true,"Enemy status modal must become visible during active VFX");
+    assert.equal(statusInspectionDuringVfx.stageStillMounted,true,"Read-only status inspection must not destroy the active VFX lifecycle");
     await sleep(1350);
     const iceGate=await client.eval(`(()=>{
         const gate=window.__battleLayoutIceGate;
@@ -775,6 +1029,38 @@ try{
     assert.ok(endTransition.activePage,"Battle-end callback must hand control to a non-battle page");
     assert.equal(endTransition.stageCount,0,"Battle-end path must leave no V143 stage behind");
 
+    const resultModalReadability=await client.eval(`(()=>{
+        const api=window.FourSymbolsBattleStatistics;
+        if(!api||typeof api.showResultDetails!=='function'){return null;}
+        const shown=api.showResultDetails({title:'戰鬥詳細結算',subtitle:'Browser QA'});
+        const modal=document.getElementById('battleStatisticsResultModal');
+        const panel=modal?.querySelector('.battle-statistics-result-panel');
+        const title=modal?.querySelector('[data-title]');
+        const label=modal?.querySelector('.battle-stat-grid span');
+        const value=modal?.querySelector('.battle-stat-grid b');
+        const close=modal?.querySelector('[data-close]');
+        const rect=node=>{const r=node?.getBoundingClientRect();return r?{width:r.width,height:r.height}:null;};
+        const result={
+            shown,parentId:modal?.parentElement?.id||null,hidden:modal?.hidden??true,
+            panel:rect(panel),title:rect(title),label:rect(label),value:rect(value),close:rect(close),
+            titleFont:getComputedStyle(title).fontSize,labelFont:getComputedStyle(label).fontSize,
+            valueFont:getComputedStyle(value).fontSize,closeFont:getComputedStyle(close).fontSize
+        };
+        return result;
+    })()`);
+    evidence.checks.resultModalReadability=resultModalReadability;
+    assert.ok(resultModalReadability?.shown,"Detailed battle result modal must open from the final snapshot");
+    assert.equal(resultModalReadability.parentId,"game-content","Battle result modal must use the legacy game-content coordinate owner");
+    assert.equal(resultModalReadability.hidden,false,"Detailed battle result modal must be visible while inspected");
+    assert.equal(resultModalReadability.titleFont,"22px","Detailed result title should use normal mobile typography");
+    assert.equal(resultModalReadability.valueFont,"19px","Detailed result values should not dominate the panel");
+    assert.ok(resultModalReadability.title?.height>=24,`Battle result title is too small on mobile: ${resultModalReadability.title?.height}`);
+    assert.ok(resultModalReadability.label?.height>=13,`Battle result label is too small on mobile: ${resultModalReadability.label?.height}`);
+    assert.ok(resultModalReadability.value?.height>=18,`Battle result value is too small on mobile: ${resultModalReadability.value?.height}`);
+    assert.ok(resultModalReadability.close?.height>=50,`Battle result close button is too small on mobile: ${resultModalReadability.close?.height}`);
+    const resultScreenshot=await client.send("Page.captureScreenshot",{format:"png",fromSurface:true});
+    if(resultScreenshot.data){ fs.writeFileSync(path.join(artifactDir,"battle-result-modal-mobile.png"),Buffer.from(resultScreenshot.data,"base64")); }
+    await client.eval("window.FourSymbolsBattleStatistics?.hideResultDetails(false);true");
     const bossBootstrap=await client.eval(`(()=>{
         if(typeof player!=='undefined'&&player){
             player.level=100;
@@ -866,7 +1152,7 @@ try{
     assert.equal(/(?:^|\\s)(?:red-hit|hit)(?:\\s|$)/.test(bossMode.healFeedback.className),false,"Damage must not add a root red-hit card state");
     assert.equal(/(?:^|\\s)(?:red-hit|hit)(?:\\s|$)/.test(bossMode.bossFeedback.className),false,"Heal must not add a red damage state");
     assert.equal(bossMode.healFeedback.reticleBorder,"3px","Destructible Boss objects must expose the formal target reticle");
-    assert.match(bossMode.healFeedback.reticleAnimation,/v174TargetReticlePulse/);
+    assert.equal(bossMode.healFeedback.reticleAnimation,"none","Formal shared target reticle stays static");
     assert.ok(Math.abs(bossMode.footprint.left-bossMode.bossCard.left)<=1&&Math.abs(bossMode.footprint.right-bossMode.bossCard.right)<=1&&Math.abs(bossMode.footprint.top-bossMode.bossCard.top)<=1&&Math.abs(bossMode.footprint.bottom-bossMode.bossCard.bottom)<=1,"One Boss hit area must fill the central six-Slot visual footprint");
     assert.equal(bossMode.bossHud.hpPosition,"absolute","Boss HP must remain on its absolute HUD anchor");
     assert.equal(bossMode.bossHud.spPosition,"absolute","Boss SP must remain on its absolute HUD anchor");

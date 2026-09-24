@@ -15,8 +15,8 @@ const touch=read("js/01-stage-v8-touch-lock.js");
 assert.match(water,/purifyMind:\{[\s\S]*?targetType:"ally",enemyTargetAllowed:true/);
 assert.ok(water.includes("對敵方解除所有增益狀態（包含結界、護盾等）"));
 assert.match(battle,/function markPurifyMindDualTargets\(\)[\s\S]*?classList\.toggle\("targetable"[\s\S]*?classList\.add\("ally-targetable"\)/);
-assert.match(battle,/function clearEnemyPositiveStates\(enemy\)[\s\S]*?enemy\.activeBuffs=\[\][\s\S]*?enemy\.v141Shield=null/);
-assert.ok(battle.includes("負面狀態保留"));
+assert.match(battle,/function clearRemovableEntityStates\(entity,side\)[\s\S]*?entity\.activeBuffs=entity\.activeBuffs\.filter[\s\S]*?entity\.v141Shield=null/);
+assert.match(battle,/targetSide==="monster"[\s\S]*?clearRemovableEntityStates\(entity,targetSide\)/);
 
 // 2. Gold dungeon has a concrete settlement value instead of an undefined call.
 assert.ok(battle.includes("function goldDungeonReward(level)"));

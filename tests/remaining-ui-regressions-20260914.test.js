@@ -48,7 +48,7 @@ assert.match(legacyNav,/v148SyncDungeonShell/);
 assert.match(finalNav,/function contextNavMatches\(nav,returnAction\)/);
 assert.match(finalNav,/\["秘寶","assets\/ui\/nav-relic-v175\.webp","v148OpenContextRelic\(\)"\]/);
 assert.match(finalNav,/buttons\.push\(\["返回","assets\/ui\/map-return\.png",returnAction\]\)/);
-assert.match(finalNav,/const mode=gameplayActive&&!dungeonActive[\s\S]*?"gameplay:"\+gameplayPageId[\s\S]*?"abyss-map"[\s\S]*?"abyss-selection"[\s\S]*?"daily"/);
+assert.match(finalNav,/const mode=trainingActive[\s\S]*?\?"training"[\s\S]*?"gameplay:"\+gameplayPageId[\s\S]*?"abyss-map"[\s\S]*?"abyss-selection"[\s\S]*?"daily"/);
 assert.match(finalNav,/window\.v148SyncContextNavigation=syncContextNavigation/);
 assert.doesNotMatch(finalNav,/\["商店","assets\/ui\/home-shop-v147\.png"/);
 console.log("✓ remaining UI regressions guarded");

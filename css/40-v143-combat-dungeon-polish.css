@@ -83,30 +83,11 @@
     transform:scaleX(.94);
 }
 
-/* Ally targeting is interaction feedback, not a skill VFX renderer. */
+/* Ally target cursor remains semantic only; Fixed Slot V2 owns the one reticle. */
 #game-stage > #app > #game-content #battlePage .battle-player.ally-targetable{
     cursor:crosshair;
     outline:none !important;
-    box-shadow:0 0 10px rgba(255,216,77,.62) !important;
-}
-
-#game-stage > #app > #game-content #battlePage .battle-player.ally-targetable::after{
-    content:"";
-    position:absolute;
-    left:50%;
-    top:50%;
-    z-index:60;
-    width:60px;
-    height:60px;
-    border-radius:50%;
-    pointer-events:none;
-    transform:translate(-50%,-50%);
-    background:
-        linear-gradient(#ffd84d,#ffd84d) center/3px 100% no-repeat,
-        linear-gradient(90deg,#ffd84d,#ffd84d) center/100% 3px no-repeat,
-        radial-gradient(circle at center,transparent 0 26%,#ffd84d 29% 34%,transparent 37% 100%);
-    filter:drop-shadow(0 0 4px rgba(255,216,77,.9));
-    animation:battleTargetReticleFlash .38s ease-in-out infinite;
+    box-shadow:none !important;
 }
 
 /* Caster label stays text-only. It does not render or substitute skill art. */
@@ -223,15 +204,20 @@
     }
 }
 
-/* Persistent status visuals are intentionally low-motion.
-   Cast VFX keep their raster Sprite Sheet animation; persistent states use
-   one body image at a time with a two-second opacity breath or a fixed image.
-   Status icons stay static above the resource bars and never breathe. */
+/* Persistent status visual planes are semantic, not per-effect z-index patches.
+   Hard-control body covers are fixed below the rotating body-status plane.
+   HUD status icons remain above both body planes with the resource HUD. */
+#game-stage #battlePage{
+    --v143-status-layer-hard-control-base:4;
+    --v143-status-layer-rotating:5;
+    --v143-status-layer-hud:34;
+}
+
 #game-stage #battlePage .v143-status-visual{
     position:absolute;
     left:50%;
     top:44%;
-    z-index:4;
+    z-index:var(--v143-status-layer-rotating);
     display:block;
     box-sizing:border-box;
     background-position:0 0;
@@ -252,11 +238,18 @@
     opacity:.9;
 }
 
+#game-stage #battlePage .v143-status-visual--layer-hard-control-base{
+    z-index:var(--v143-status-layer-hard-control-base);
+}
+#game-stage #battlePage .v143-status-visual--layer-rotating{
+    z-index:var(--v143-status-layer-rotating);
+}
+
 #game-stage #battlePage .v143-status-icon{
     display:inline-block;
-    width:17px;
-    height:17px;
-    flex:0 0 17px;
+    width:24px;
+    height:24px;
+    flex:0 0 24px;
     border:0;
     border-radius:2px;
     background-color:transparent;
@@ -270,6 +263,10 @@
     pointer-events:none;
     transform:none;
 }
+#game-stage #battlePage .v143-status-icon--layer-hud{
+    position:relative;
+    z-index:var(--v143-status-layer-hud);
+}
 
 #game-stage #battlePage .v143-status-icon--pulse{
     animation:none !important;
@@ -281,36 +278,35 @@
     filter:drop-shadow(0 0 7px rgba(255,79,23,.82));
 }
 #game-stage #battlePage .v143-status-visual-rage{
-    z-index:5;
     filter:drop-shadow(0 0 8px rgba(255,35,20,.9));
 }
 #game-stage #battlePage .v143-status-visual-freeze{
-    z-index:5;
+    animation:none;
     opacity:.94;
     filter:drop-shadow(0 0 10px rgba(178,238,255,.96));
 }
 #game-stage #battlePage .v143-status-visual-dodgeSkill,
 #game-stage #battlePage .v143-status-visual-stealthSkill,
 #game-stage #battlePage .v143-status-visual-dinghaishenzhen{
-    z-index:5;
     filter:drop-shadow(0 0 9px rgba(127,255,205,.92));
 }
 #game-stage #battlePage .v143-status-visual-shield,
-#game-stage #battlePage .v143-status-visual-petrify,
 #game-stage #battlePage .v143-status-visual-earthShield,
 #game-stage #battlePage .v143-status-visual-rockWall,
 #game-stage #battlePage .v143-status-visual-barrier{
-    z-index:5;
+    filter:drop-shadow(0 0 9px rgba(222,178,90,.92));
+}
+#game-stage #battlePage .v143-status-visual-petrify{
+    animation:none;
+    opacity:.94;
     filter:drop-shadow(0 0 9px rgba(222,178,90,.92));
 }
 #game-stage #battlePage .v143-status-visual-yuanZuBlessing{
-    z-index:5;
     filter:drop-shadow(0 0 10px rgba(255,232,135,.94));
 }
 
 #game-stage #battlePage .battle-monster.v152-abyss-portrait > .v143-status-visual{
     position:absolute !important;
-    z-index:5 !important;
 }
 
 #battlePage .v146-defeated > .v143-status-visual,

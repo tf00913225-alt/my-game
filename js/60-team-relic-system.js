@@ -188,7 +188,7 @@
         },
         {
             id:"relic_cold_spring_jade",category:"recovery",tags:["water","emergency","element"],rarity:"purple",maxLevel:20,iconPath:"assets/relics/icons/relic_cold_spring_jade.webp",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
-            description:"任一隊友首次跌破35%最大HP時進行急救。",
+            description:"任一隊友HP由35%以上降至35%以下時進行急救。",
             scalars:{healHpPercent:[[1,12],[10,15],[20,18]],spPercent:[[1,0],[19,0],[20,4]]},
             triggers:[trigger("hp_below_35","ally_hp_below",{hpThreshold:.35,maxTriggersPerBattle:2,cooldownRounds:3},[
                 effect("heal_single_ally",{percentKey:"healHpPercent"}),effect("cleanse_single",{minLevel:10,count:1}),effect("restore_sp_single",{minLevel:20,percentKey:"spPercent"})
@@ -343,6 +343,9 @@
         clearRelicTargetFocus();
         const node=relicCutinNode||(typeof document!=="undefined"&&document.getElementById?document.getElementById("teamRelicBattlePresentation"):null);
         if(node&&typeof node.remove==="function"){ node.remove(); }
+        if(typeof document!=="undefined"&&document.body&&document.body.classList){
+            document.body.classList.remove("team-relic-cinematic-active");
+        }
         relicCutinNode=null;
     }
     function relicTargetCard(side,index){
@@ -373,7 +376,7 @@
         if(!hasLiveBattlePresentationHost()||!def){ return Promise.resolve(null); }
         cleanupRelicCutin();
         const battlePage=document.getElementById("battlePage");
-        const host=battlePage&&typeof battlePage.querySelector==="function"?battlePage.querySelector(".battle-wrap"):null;
+        const host=battlePage||null;
         if(!host){ return Promise.resolve(null); }
         const node=document.createElement("div");
         node.id="teamRelicBattlePresentation";
@@ -384,6 +387,7 @@
             '<img src="'+esc(def.battleIconPath||def.iconPath||"")+'" alt=""></span>'+
             '<span class="team-relic-battle-cutin-copy"><strong>'+esc(def.name)+'</strong></span></div>';
         host.appendChild(node);
+        if(document.body&&document.body.classList){ document.body.classList.add("team-relic-cinematic-active"); }
         relicCutinNode=node;
         const dim=()=>{ if(node===relicCutinNode){ node.classList.add("dim-visible"); } };
         if(typeof requestAnimationFrame==="function"){ requestAnimationFrame(dim); }else{ dim(); }
@@ -666,7 +670,8 @@
     }
     function normalizeLoadout(raw){
         const id=raw&&typeof raw.relicId==="string"?raw.relicId:null;
-        return {relicId:id&&relicCatalog[id]?id:null,subRelicId:null};
+        const def=id&&relicCatalog[id];
+        return {relicId:def&&def.runtimeReady===true?id:null,subRelicId:null};
     }
     function readSaveDocument(){
         try{
@@ -1233,16 +1238,19 @@
     function filterMatch(def){ return currentFilter==="all"||def.category===currentFilter||(def.tags||[]).includes(currentFilter); }
     function nextMilestone(def,level){ const keys=Object.keys(def.nextText||{}).map(Number).sort((a,b)=>a-b); return keys.find(value=>value>level)||null; }
     function currentEffectText(def,level){
-        if(!def.runtimeReady){ return def.description; }
+        if(!def.runtimeReady){ return "秘寶能力尚未開放。"; }
         if(def.id==="relic_qiankun_flask"){ return "恢復全隊 "+valueFor(def,"healHpPercent",level).toFixed(1).replace(/\.0$/,"")+"%最大HP"+(level>=10?"，並恢復"+valueFor(def,"spPercent",level).toFixed(1).replace(/\.0$/,"")+"%最大SP":"")+"。"; }
-        if(def.id==="relic_sun_orb"){ return "對敵方全體造成 "+valueFor(def,"damageMultiplier",level).toFixed(2)+"×秘寶威力；燃燒目標額外+"+Math.round(valueFor(def,"burnBonus",level)*100)+"%。"; }
+        if(def.id==="relic_sun_orb"){
+            const bonus=Math.round(valueFor(def,"burnBonus",level)*100);
+            return "對敵方全體造成 "+valueFor(def,"damageMultiplier",level).toFixed(2)+"×秘寶威力"+(bonus>0?"；燃燒目標額外+"+bonus+"%":"")+"。";
+        }
         if(def.id==="relic_xuanwu_seal"){ return "全隊獲得最大HP "+valueFor(def,"shieldPercent",level).toFixed(1).replace(/\.0$/,"")+"%護盾，持續2回合"+(level>=20?"，並獲得8%減傷1回合":"")+"。"; }
         if(def.id==="relic_soul_bell"){ return "敵方全體攻擊-"+Math.round(valueFor(def,"attackDown",level))+"%"+(level>=10?"、命中-"+Math.round(valueFor(def,"accuracyDown",level))+"%":"")+"，持續1回合。"; }
         if(def.id==="relic_tiangang_banner"){ return "對敵方全體造成 "+valueFor(def,"damageMultiplier",level).toFixed(2)+"×秘寶威力"+(level>=10?"並降攻"+Math.round(valueFor(def,"attackDown",level))+"%":"")+"。"; }
-        if(def.id==="relic_nine_dragon_fire"){ return "對敵方全體造成 "+valueFor(def,"damageMultiplier",level).toFixed(2)+"×火屬性秘寶傷害"+(level>=10?"，燃燒機率"+Math.round(valueFor(def,"burnChance",level)*100)+"%":"")+"。"; }
-        if(def.id==="relic_cold_spring_jade"){ return "急救目標 "+valueFor(def,"healHpPercent",level).toFixed(1).replace(/\.0$/,"")+"%最大HP"+(level>=10?"並淨化1個一般負面":"")+(level>=20?"、恢復4%最大SP":"")+"。"; }
-        if(def.id==="relic_qinglan_feather"){ return "全隊閃避+"+Math.round(valueFor(def,"evasionBonus",level))+"%、異常抗性+"+Math.round(valueFor(def,"resistanceBonus",level))+"%，持續"+Math.round(valueFor(def,"duration",level))+"回合。"; }
-        if(def.id==="relic_rock_mountain_seal"){ return "開場防禦+"+Math.round(valueFor(def,"defenseBonus",level))+"%持續3回合；受擊計數觸發時獲得"+Math.round(valueFor(def,"shieldPercent",level))+"%最大HP護盾。"; }
+        if(def.id==="relic_nine_dragon_fire"){ return "對敵方全體造成 "+valueFor(def,"damageMultiplier",level).toFixed(2)+"×火屬性秘寶傷害"+(level>=10?"，燃燒機率"+Math.round(valueFor(def,"burnChance",level)*100)+"%":"")+(level>=20?"，對燃燒目標額外+15%":"")+"。"; }
+        if(def.id==="relic_cold_spring_jade"){ return "急救目標 "+valueFor(def,"healHpPercent",level).toFixed(1).replace(/\.0$/,"")+"%最大HP"+(level>=10?"並淨化1個一般負面":"")+(level>=20?"、恢復4%最大SP":"")+"；HP由35%以上降至35%以下時觸發，每場最多2次，冷卻3回合。"; }
+        if(def.id==="relic_qinglan_feather"){ return "全隊最終閃躲+"+Math.round(valueFor(def,"evasionBonus",level))+"個百分點、最終異常抗性+"+Math.round(valueFor(def,"resistanceBonus",level))+"個百分點，持續"+Math.round(valueFor(def,"duration",level))+"回合。"; }
+        if(def.id==="relic_rock_mountain_seal"){ return "開場防禦+"+Math.round(valueFor(def,"defenseBonus",level))+"%持續3回合；受擊計數觸發時獲得"+Math.round(valueFor(def,"shieldPercent",level))+"%最大HP護盾"+(level>=20?"；Lv20護盾後準備一次18%秘寶威力反震，作用於下一名實際攻擊者":"")+"。"; }
         if(def.id==="relic_returning_wheel"){ return "阻止本場第一次死亡，保留1HP後恢復"+Math.round(valueFor(def,"healHpPercent",level))+"%最大HP並獲得"+Math.round(valueFor(def,"shieldPercent",level))+"%護盾。"; }
         return def.description;
     }
@@ -1250,7 +1258,7 @@
     function equipmentAllowed(){ return !(typeof battleActive!=="undefined"&&battleActive); }
     function equipRelic(id){
         const def=relicCatalog[id],owned=statusOf(id);
-        if(!def||!owned.unlocked||!equipmentAllowed()){ return false; }
+        if(!def||def.runtimeReady!==true||!owned.unlocked||!equipmentAllowed()){ return false; }
         preloadRelicVfx(id);
         teamLoadout.relicId=id;
         if(playerRelics[id]){ playerRelics[id].seen=true; }
@@ -1281,15 +1289,17 @@
     }
     function cardMarkup(def){
         const owned=statusOf(def.id),equipped=effectiveLoadoutRelicId()===def.id;
-        const canEquip=owned.unlocked&&equipmentAllowed();
+        const canEquip=def.runtimeReady===true&&owned.unlocked&&equipmentAllowed();
         return '<div class="team-relic-card '+rarityClass(def)+(owned.unlocked?' unlocked':' locked')+(equipped?' equipped':'')+'">'+
             '<button type="button" class="team-relic-card-open-overlay" aria-label="查看'+esc(def.name)+'詳情" onclick="v174OpenRelicDetail(\''+esc(def.id)+'\')"></button>'+
             '<span class="team-relic-card-art">'+relicIconMarkup(def,false)+'</span>'+
             '<span class="team-relic-card-name">'+esc(def.name)+'</span>'+
-            '<span class="team-relic-card-meta">'+(owned.unlocked?'Lv.'+owned.level:'尚未獲得')+'・'+esc(CATEGORY_LABELS[def.category]||def.category)+'</span>'+
-            (owned.unlocked
-                ?'<button type="button" class="team-relic-equip" '+(canEquip?'':'disabled')+' onclick="event.stopPropagation();v174EquipRelic(\''+esc(def.id)+'\')">'+(equipped?'已裝備':'裝備')+'</button>'
-                :'<button type="button" class="team-relic-equip" disabled>尚未獲得</button>')+
+            '<span class="team-relic-card-meta">'+(def.runtimeReady!==true?'效果尚未覺醒':(owned.unlocked?'Lv.'+owned.level:'尚未獲得'))+'・'+esc(CATEGORY_LABELS[def.category]||def.category)+'</span>'+
+            (def.runtimeReady!==true
+                ?'<button type="button" class="team-relic-equip" disabled>能力尚未開放</button>'
+                :owned.unlocked
+                    ?'<button type="button" class="team-relic-equip" '+(canEquip?'':'disabled')+' onclick="event.stopPropagation();v174EquipRelic(\''+esc(def.id)+'\')">'+(equipped?'已裝備':'裝備')+'</button>'
+                    :'<button type="button" class="team-relic-equip" disabled>尚未獲得</button>')+
             (equipped?'<em>已裝備</em>':'')+
         '</div>';
     }
@@ -1306,14 +1316,18 @@
     function detailMarkup(def){
         const owned=statusOf(def.id),level=owned.level,next=nextMilestone(def,level),cost=RELIC_BALANCE_CONFIG.upgradeGoldBase+RELIC_BALANCE_CONFIG.upgradeGoldPerLevel*level;
         const equipped=effectiveLoadoutRelicId()===def.id;
+        const unavailable=def.runtimeReady!==true;
         return '<div class="team-relic-detail"><button class="team-relic-detail-back" onclick="v174OpenRelicPage()">‹ 返回秘寶列表</button><div class="team-relic-detail-hero '+rarityClass(def)+'">'+
-            '<div class="team-relic-detail-art">'+relicIconMarkup(def,true)+'</div><h2>'+esc(def.name)+'</h2><p>'+esc(RARITY_LABELS[def.rarity]||def.rarity)+'・Lv.'+level+' / 20</p><strong>'+esc(CATEGORY_LABELS[def.category]||def.category)+(def.tags&&def.tags.length?' / '+esc(def.tags.join('・')):'')+'</strong></div>'+
-            '<section><h3>觸發條件</h3><p>'+esc(def.triggerText||"尚未定義")+'</p></section><section><h3>秘寶效果</h3><p>'+esc(currentEffectText(def,level))+'</p></section><section><h3>觸發限制</h3><p>'+esc(def.limitText||"依秘寶設定。")+'</p></section>'+
-            '<section><h3>下一強化</h3><p>'+(level>=20?'已達最高等級。':next?'Lv.'+next+'：'+esc(def.nextText[next]):'下一級提升效果數值。')+'</p></section>'+
-            '<section class="team-relic-upgrade"><h3>強化</h3><p>目前 Lv.'+level+' → '+(level>=20?'MAX':'Lv.'+(level+1))+'</p><p>依目前正式秘寶養成規則消耗對應素材。</p><b>金幣 '+cost.toLocaleString("zh-TW")+'</b></section>'+
+            '<div class="team-relic-detail-art">'+relicIconMarkup(def,true)+'</div><h2>'+esc(def.name)+'</h2><p>'+esc(RARITY_LABELS[def.rarity]||def.rarity)+(unavailable?'・效果尚未覺醒':'・Lv.'+level+' / 20')+'</p><strong>'+esc(CATEGORY_LABELS[def.category]||def.category)+(def.tags&&def.tags.length?' / '+esc(def.tags.join('・')):'')+'</strong></div>'+
+            (unavailable
+                ?'<section><h3>秘寶能力</h3><p>秘寶能力尚未開放。正式 Trigger、Effect 與成長數值尚未定案，因此目前不可裝備或強化。</p></section>'
+                :'<section><h3>觸發條件</h3><p>'+esc(def.triggerText||"尚未定義")+'</p></section><section><h3>秘寶效果</h3><p>'+esc(currentEffectText(def,level))+'</p></section><section><h3>觸發限制</h3><p>'+esc(def.limitText||"依秘寶設定。")+'</p></section>'+
+                 '<section><h3>下一強化</h3><p>'+(level>=20?'已達最高等級。':next?'Lv.'+next+'：'+esc(def.nextText[next]):'下一個里程碑尚未到達；實際目前效果以本頁數值為準。')+'</p></section>'+
+                 '<section class="team-relic-upgrade"><h3>強化</h3><p>目前 Lv.'+level+' → '+(level>=20?'MAX':'Lv.'+(level+1))+'</p><p>依目前正式秘寶養成規則消耗對應素材。</p><b>金幣 '+cost.toLocaleString("zh-TW")+'</b></section>')+
             '<div class="team-relic-detail-actions">'+
-            (owned.unlocked&&def.runtimeReady&&level<20?'<button onclick="v174UpgradeRelic(\''+esc(def.id)+'\')">強化</button>':'')+
-            (owned.unlocked?'<button onclick="v174EquipRelic(\''+esc(def.id)+'\')">'+(equipped?'已裝備':'裝備')+'</button>':'<button disabled>尚未獲得</button>')+
+            (unavailable?'<button disabled>能力尚未開放</button>':
+                (owned.unlocked&&level<20?'<button onclick="v174UpgradeRelic(\''+esc(def.id)+'\')">強化</button>':'')+
+                (owned.unlocked?'<button onclick="v174EquipRelic(\''+esc(def.id)+'\')">'+(equipped?'已裝備':'裝備')+'</button>':'<button disabled>尚未獲得</button>'))+
             '</div></div>';
     }
 
@@ -1366,9 +1380,6 @@
     if(typeof closeHomeFeature==="function"){
         const previous=closeHomeFeature;
         closeHomeFeature=function(){ const modal=document.getElementById("homeFeatureModal"); if(modal){modal.classList.remove("team-relic-modal"); const box=modal.querySelector(".home-feature-modal-box");if(box){box.classList.remove("wide");}} currentDetailId=null; return previous.apply(this,arguments); };
-    }
-    if(typeof updateUI==="function"){
-        const previous=updateUI; updateUI=function(){ const result=previous.apply(this,arguments); syncHomeRelicUi(); return result; };
     }
     if(typeof showPage==="function"){
         const previous=showPage; showPage=function(page){ const result=previous.apply(this,arguments); if(page==="home"){setTimeout(syncHomeRelicUi,0);} return result; };

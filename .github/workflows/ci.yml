@@ -61,9 +61,23 @@ jobs:
           node --check .github/scripts/run-fixed-slot-battlefield-browser-qa.mjs
           node --check .github/scripts/run-release-update-notification-browser-qa.mjs
           node --check .github/scripts/battle-layer-audio-live-qa.mjs
+          node --check .github/scripts/battle-runtime-architecture-guard.mjs
 
       - name: Check all project JavaScript syntax
         run: node .github/scripts/ci.mjs syntax
+
+      - name: Enforce Battle Runtime architecture guard
+        id: battle_architecture
+        run: node .github/scripts/battle-runtime-architecture-guard.mjs --write
+
+      - name: Upload Battle Runtime architecture evidence
+        if: always() && steps.battle_architecture.outcome != 'skipped'
+        uses: actions/upload-artifact@v4
+        with:
+          name: battle-runtime-architecture-${{ github.sha }}
+          path: artifacts/architecture/battle-runtime-architecture.json
+          if-no-files-found: error
+          retention-days: 90
 
       - name: Run Release Update Notification targeted regression
         run: node tests/release-update-notification-system.test.js
@@ -86,12 +100,22 @@ jobs:
           node tests/ui-panel-browser-layout.test.js
           node tests/main-city-roster-header-browser.test.js
           node tests/battle-layout-vfx-runtime-20260917.test.js
+          node tests/battle-presentation-followup-browser.test.js
+          node tests/battle-status-info-assets-20260922.test.js
           node tests/boss-battle-architecture-convergence-20260918.test.js
           node tests/gameplay-boss-tower-system.test.js
           node tests/battle-stats-relic-tower-auto-20260920.test.js
           node tests/v142-skill-animation.test.js
           node tests/v150-ice-arrow-rain-vfx.test.js
           node tests/v173.23-wind-vfx.test.js
+          node tests/battle-runtime-hot-path-convergence-20260923.test.js
+          node tests/battle-ui-status-vfx-followup-20260922.test.js
+          node tests/hit-evasion-final-percent-status-formula-20260923.test.js
+
+      - name: Run skill and relic owner convergence regressions
+        run: |
+          node tests/skill-progression-rebalance.test.js
+          node tests/skill-relic-owner-convergence-20260923.test.js
 
       - name: Run relic lifecycle and battle input regressions
         run: |
@@ -141,12 +165,12 @@ jobs:
         run: |
           npm run build
           mkdir -p artifacts/build-sync
+          cp index.html artifacts/build-sync/index.html
           cp asset-manifest.json artifacts/build-sync/asset-manifest.json
-          cp build/asset-manifest.json artifacts/build-sync/build-asset-manifest.json
-          cp build/gameplay-core.*.js artifacts/build-sync/
-          cp build/gameplay-core.*.css artifacts/build-sync/
-          git diff -- asset-manifest.json config/feature-manifest.json scripts/build-production.mjs 'build/feature-adventure-*' 'build/gameplay-core.*' > artifacts/build-sync/build-sync.diff || true
-          find build -maxdepth 1 -type f \( -name 'feature-adventure-*' -o -name 'gameplay-core.*' \) -print | sort > artifacts/build-sync/build-files.txt
+          cp config/feature-manifest.json artifacts/build-sync/feature-manifest.json
+          cp -R build artifacts/build-sync/build
+          git diff -- index.html asset-manifest.json config/feature-manifest.json build > artifacts/build-sync/build-sync.diff || true
+          find build -type f -print | sort > artifacts/build-sync/build-files.txt
 
       - name: Upload build synchronization evidence
         if: failure() && steps.build_sync.outcome == 'failure'
@@ -193,6 +217,7 @@ jobs:
             artifacts/browser-qa/battle-layer-audio-live-qa.json
             artifacts/browser-qa/battle-layout-wind-flame-mobile.png
             artifacts/browser-qa/battle-layer-element-box-mobile.png
+            artifacts/browser-qa/battle-result-modal-mobile.png
             artifacts/browser-qa/boss-target-entity-live-412x915.png
           if-no-files-found: error
           retention-days: 90

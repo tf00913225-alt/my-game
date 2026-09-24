@@ -57,14 +57,15 @@ test("dungeon launch resynchronizes after the battle cards are created",()=>{
     assert.ok(context.syncCount()>=before+3);
 });
 
-test("the final update layer restores portraits after older UI wrappers run",()=>{
+test("V159 no longer late-wraps updateUI after the later cardless presentation owner",()=>{
     let portraitState="unapplied";
     const context=load({
         updateUI(){ portraitState="cleared-by-v152"; return "updated"; },
         v154SyncAbyssPortraits(){ portraitState="visible"; }
     });
     assert.equal(context.updateUI(),"updated");
-    assert.equal(portraitState,"visible");
+    assert.equal(portraitState,"cleared-by-v152");
+    assert.doesNotMatch(source,/updateUI\s*=\s*function/);
 });
 
 console.log("\nV159 Abyss battle portrait suite: "+passed+" tests passed.");

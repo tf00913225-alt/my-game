@@ -174,18 +174,13 @@
         }
     }
     window.v143AfterBattleRender=v143AfterBattleRender;
-    if(typeof updateMonsterUI==="function"){
-        const previousUpdateMonsterUI=updateMonsterUI;
-        updateMonsterUI=function(index){
-            const result=previousUpdateMonsterUI.apply(this,arguments);
-            decorateEnemyCard(index);
-            syncEarthShieldEffects();
-            syncMonsterBarrierText(index);
-            const card=document.getElementById("battleMonster"+index);
-            if(card){ fitEnemyBars(card); }
-            return result;
-        };
+    function v143SystemAfterMonsterUiUpdate(index){
+        decorateEnemyCard(index);
+        syncMonsterBarrierText(index);
+        const card=document.getElementById("battleMonster"+index);
+        if(card){ fitEnemyBars(card); }
     }
+    window.v143SystemAfterMonsterUiUpdate=v143SystemAfterMonsterUiUpdate;
 
     /* ----- 7. Wanxiang Earth Shield owns a four-corner elemental frame. ----- */
     function hasActiveBuffType(entity,type){
@@ -210,7 +205,7 @@
     }
     window.v143SyncEarthShieldEffects=syncEarthShieldEffects;
 
-    /* ----- 10. Both sides use five direct blocks / five rounds for Barrier. ----- */
+    /* ----- 10. Barrier blocks direct damage only; count/duration come from the formal skill level. ----- */
     function isMonsterBarrier(monster){
         return !!(monster&&monster.v141Shield&&monster.v141Shield.isBarrier);
     }
@@ -226,7 +221,7 @@
 
     if(typeof window.v141ApplyMonsterShield==="function"){
         const previousApplyMonsterShield=window.v141ApplyMonsterShield;
-        window.v141ApplyMonsterShield=function(monster,amount,turns){
+        window.v141ApplyMonsterShield=function(monster,amount,turns,barrierBlocks){
             const barrier=numeric(amount)>=999999;
             const stateType=barrier?"barrier":"shield";
             const monsterIndex=typeof monsters!=="undefined"?monsters.indexOf(monster):-1;
@@ -239,12 +234,14 @@
             ){
                 return 0;
             }
-            const result=previousApplyMonsterShield.call(this,monster,barrier?1:amount,barrier?5:turns);
+            const resolvedTurns=barrier?Math.max(1,Math.floor(numeric(turns)||3)):turns;
+            const resolvedBlocks=barrier?Math.max(1,Math.floor(numeric(barrierBlocks)||3)):0;
+            const result=previousApplyMonsterShield.call(this,monster,barrier?1:amount,resolvedTurns);
             if(monster&&monster.v141Shield){
                 if(barrier){
                     monster.v141Shield.isBarrier=true;
-                    monster.v141Shield.turnsLeft=5;
-                    monster.v141Shield.remainingBlocks=5;
+                    monster.v141Shield.turnsLeft=resolvedTurns;
+                    monster.v141Shield.remainingBlocks=resolvedBlocks;
                     monster.v141Shield.barrierRule="shared";
                 }
                 if(typeof window.v173MarkPersistentStateName==="function"){
@@ -324,7 +321,7 @@
                 if(directPlayerBarrierContext){
                     directPlayerBarrierContext.blocked.set(monster,shield);
                 }
-                shield.remainingBlocks=Math.max(0,(numeric(shield.remainingBlocks)||5)-1);
+                shield.remainingBlocks=Math.max(0,(numeric(shield.remainingBlocks)||3)-1);
                 const card=document.getElementById("battleMonster"+index);
                 if(card&&typeof showDamagePopup==="function"){ showDamagePopup(card,"格擋 "+shield.remainingBlocks,"shield"); }
                 if(typeof window.v141PlayCardEffect==="function"){ window.v141PlayCardEffect("monster",index,"barrier"); }
@@ -345,7 +342,7 @@
         const monster=typeof monsters!=="undefined"?monsters[index]:null;
         if(!isMonsterBarrier(monster)){ return; }
         const shield=monster.v141Shield;
-        if(!Number.isFinite(Number(shield.remainingBlocks))){ shield.remainingBlocks=5; }
+        if(!Number.isFinite(Number(shield.remainingBlocks))){ shield.remainingBlocks=3; }
         const text=document.getElementById("battleMonsterHPText"+index);
         if(text){ text.textContent=Math.floor(numeric(shield.baseHp))+"/"+Math.floor(numeric(shield.baseMaxHP))+" 結界"+shield.remainingBlocks; }
     }
@@ -357,7 +354,7 @@
             if(previousLog){
                 addBattleLog=function(message){
                     const args=Array.prototype.slice.call(arguments);
-                    args[0]=String(message).replace("完全防護4回合","抵擋5次直接傷害，最多5回合");
+                    args[0]=String(message);
                     return previousLog.apply(this,args);
                 };
             }
@@ -649,17 +646,6 @@
         }
     }
 
-    if(typeof MutationObserver!=="undefined"){
-        const observer=new MutationObserver(()=>{
-            if(document.querySelector(".v141-synthesis")&&!document.querySelector(".v141-synthesis.v143-synthesis")){
-                requestAnimationFrame(decorateSynthesis);
-            }
-        });
-        const startObserver=()=>observer.observe(document.body,{childList:true,subtree:true});
-        if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",startObserver,{once:true}); }
-        else{ startObserver(); }
-    }
-
     if(typeof window.v141RenderSynthesis==="function"){
         const previousRenderSynthesis=window.v141RenderSynthesis;
         window.v141RenderSynthesis=function(){
@@ -679,15 +665,6 @@
             return result;
         };
     }
-    if(typeof updateUI==="function"){
-        const previousUpdateUI=updateUI;
-        updateUI=function(){
-            const result=previousUpdateUI.apply(this,arguments);
-            decorateEnemyCards(); syncEarthShieldEffects();
-            return result;
-        };
-    }
-
     function boot(){
         fixDungeonNavigation();
         decorateEnemyCards();

@@ -228,6 +228,7 @@ test("auto tri-targeting chooses the center that hits three of six monsters",()=
         getPartyAutoConfig:()=>({enabled:true,skill:"triSkill"}),
         getPartyCharacterKey:()=>"fire",
         getSkillLevel:()=>1,
+        getEffectiveSkillTargetType:skill=>skill.targetType,
         getSkillTargets:center=>{
             const row=center<3 ? [0,1,2] : [3,4,5];
             const position=row.indexOf(center);

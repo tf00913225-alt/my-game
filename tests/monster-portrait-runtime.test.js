@@ -166,7 +166,10 @@ assert.match(battlefieldCss,/\.v174-battle-art\{[\s\S]*background-size:contain !
     "the canonical Fixed Slot stylesheet owns no-crop portrait geometry");
 assert.equal((source.match(/renderBattle=function/g)||[]).length,0);
 assert.match(source,/window\.v154AfterBattleRender=v154AfterBattleRender/);
-assert.equal((source.match(/updateMonsterUI=function/g)||[]).length,1);
+assert.equal((source.match(/updateMonsterUI=function/g)||[]).length,0,
+    "portrait owner must not wrap the per-monster HP/SP hot path");
+assert.doesNotMatch(timingSource,/\bupdateUI\s*=\s*function/,
+    "V159 portrait bridge must not wrap global updateUI");
 assert.match(timingSource,/v154SyncMonsterPortraits/);
 
 console.log("Monster portrait runtime tests passed.");

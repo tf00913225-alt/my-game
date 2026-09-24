@@ -1,3 +1,31 @@
+## 2026-09-23 — Lv10 技能／輔助技能／秘寶 Runtime Owner 收斂（VERIFIED candidate）
+
+- Base：`dev@9d32e8cb022ff824e83d5dc3022f2e0a24c8d58a`；工作分支：`fix/skill-relic-runtime-owner-convergence-20260923`；`main` 未修改。
+- 31 個玩家直接傷害技能改為 Lv10。唯一 Damage Curve owner 為 `js/00-main.js::getSkillDamageAtLevel()`：Lv2～4 線性、Lv5=Lv4×1.5、Lv6～9 線性、Lv10=Lv9×1.5，與正式 `calculateDamage()` 一致使用 `Math.round`。
+- `js/60-v173.64-skill-progression-rebalance.js` 現為 Final Skill Data／Progression／玩家說明 projection owner，並固定進 `gameplay-core`；所有可升級技能每級固定 1 技能點，既有 `skillLevels` 不遷移／不重置。
+- 火系：炎魂共鳴 SP45、炎勢 12/15/18/21/25%，Lv5 爆擊／成功新增燃燒每正式回合最多延長1、整次最多+3，免費追擊不延長；焚血訣 SP35、HP成本5/10/15/20/25%，接下來3次非免費火系直接施放 +5/10/15/20/35%，DoT／免費追擊不使用也不消耗。
+- 水／風／土支援技能均改讀正式 ByLevel 欄位；冰封 Lv5 才由 column 升為 tri；淨心訣 Lv3 才升3目標且雙方都清除所有可解除臨時戰鬥狀態；結界只擋直接傷害並依 3/3/3/4/5 次與回合數。
+- 敵方岩石壁壘已由全體 `currentAbyssEntries()` 改回正式 `allyTriTargets()`，最多3名；V144 反向 `requires:["barrier"]`／`allyAll` 舊資料已退休。
+- Team Relic Trigger Engine 已從 `feature-boss-relic` 拆出並固定放入 `gameplay-core` 最末端；所有正式戰鬥入口因此在可執行前已同步取得同一 `js/60-team-relic-system.js`。Boss／Tower／養成仍 lazy，沒有塞回 Critical Boot，也沒有新增 Battle Start 非同步補載。
+- 10 件 `runtimeReady:false` 秘寶 hydrate／equip／progression 全部 fail closed；玩家只見「效果尚未覺醒／能力尚未開放」。寒泉玉珮、九龍神火罩、岩岳鎮印、烈陽神珠說明已同步實際 Trigger／Scalar。
+- 專項測試：`tests/skill-relic-owner-convergence-20260923.test.js`；既有 `tests/skill-progression-rebalance.test.js` 同步新規格，兩者已加入 dev PR 必跑 CI。
+- Requirement Batch：`release/requirement-batches/2026-09-23-skill-relic-runtime-owner-convergence.json` 已 VERIFIED。PR #532 最終 source candidate `e52a7f78eb02978bdfe4ab4423b6cb4ddf629515`；deterministic build commit `0a3405fdb53e125fd9d0024709239e5b45f0e37c`；PR CI Run `35837276372` Repository checks SUCCESS，包含技能／秘寶專項、Battle/Relic regressions、build:check、exact-candidate real battle mobile QA、resources、Release Gate、git diff。
+- 額外 Full Node audit 曾發現並修復兩個本次相關點：淨心訣 Lv3 擴展3目標時仍保留玩家點選目標為 VFX primary；Heal Spell 在 legacy/test data 缺少新 SP 欄位時不依賴不存在的 helper。Audit 另揭露施工 Base 已存在的 `battle-status-info-assets-20260922.test.js`／`ui-critical-regressions-mobile-browser.test.js` stale UI failure，以及 V143/V144/V155/V169 歷史 snapshot 仍寫死舊技能數值；本次未為追求歷史綠燈而把正式規格改回舊值。
+- 唯一仍待產品規格定案：支援技能沒有明確 Tier 對應，因此初次學習成本暫保留既有正式值；有明確 Tier 的四元素直接傷害技能已使用 2／6／10／16，所有技能的『升級』則固定每級 1 點。
+- `DATA_SECURITY_CONTRACTS.md` 在施工 Base 仍不存在；本次沒有修改 Cloud Save／帳號安全 schema。
+
+## 2026-09-23 — 冰封／石化互斥硬控與 Body Status Base Layer 收斂（VERIFIED candidate）
+
+- Base：`dev@8bab02b38197824ac47f3ba2269ba6e19cbfd52f`；工作分支：`fix/freeze-petrify-exclusive-status-layer-20260923`；`main`／`dev` 均未直接修改。
+- Gameplay Hard Control Owner 維持 `js/00-main.js` 的 Persistent State Gate。Freeze／Petrify 現為同一 Exclusive Hard Control Group：同名與跨名都會在機率骰點與正式寫入前以「狀態MISS」阻止；既有狀態不覆蓋、不刷新、不延長。
+- `applyFreezeEffect()` 與 `applyMonsterDebuff()` 也接回同一 Gate，避免玩家技能、怪物、Boss／深淵、符咒或其他直接 mutation caller 繞過互斥規則。跨名 Log 會同時指出既有狀態與新的失敗狀態。
+- Persistent Body Status Visual Owner 仍為 `js/39-v143-skill-animation.js`。新增語意層 `hard-control-base`／`rotating`／`hud`；Freeze／Petrify 固定在 Base Cover，不呼吸、不閃爍、不加入 2 秒 Body Rotation；其他 Body Status 保持原 2 秒嚴格循序輪播。
+- CSS 由 `css/40-v143-combat-dungeon-polish.css` 只呈現上述正式語意層；已移除 Freeze／Petrify／Abyss 的同層 z-index 特例，不以 `z-index:99999 !important` 類補丁處理。
+- Runtime 若觀察到同一 entity 同時存在 Freeze + Petrify，V143 只回報 Hard Control Contract violation，不替資料層隱藏／正規化其中一個。
+- Regression 已覆蓋：同名／跨名 MISS、剩餘回合不變、解除後另一硬控可重新施加、正式「狀態MISS」文案、玩家／一般怪／Boss／深淵共用 Gate、Freeze 固定底層＋一般狀態輪播、死亡／解除立即清理、Cast deferred lifecycle。
+- Requirement Batch：`release/requirement-batches/2026-09-23-freeze-petrify-exclusive-status-layer.json` 已 VERIFIED。PR #531：完整 Node／整合回歸於 Run `35820871917` 通過；deterministic production build 已同步；Run `35821205754` Repository checks SUCCESS。
+- `DATA_SECURITY_CONTRACTS.md` 在本次最新 dev 仍為 404；本次未修改帳號／雲端存檔／安全資料流程，未自行補寫不存在的契約。
+
 ## 2026-09-22 — 戰鬥狀態輪播／抽屜圖層／倒數框／三技能 VFX Follow-up（candidate）
 
 - Base：`dev@d55410bd88590b9a9052b1b4d714a27b3cc9a411`；工作分支：`fix/battle-status-carousel-drawers-vfx-20260922`；`main`／`dev` 均未直接修改。
@@ -4197,3 +4225,19 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 - 解決「圖片已存在，但仍因 planned／retired／batch manifest 流程而長時間卡在正式接線」。
 - 避免只看檔案存在就誤判完成；正式導入仍以 `status=existing` 且 Runtime owner 可解析為準。
 - 快速導入工具只處理本子系統，不修改戰鬥玩法、UI、怪物數值或 main。
+
+
+## 2026-09-23 — Battle UI / Hit / Status Owner Convergence（VERIFIED candidate）
+
+- Base：`dev@ae535061883029d12e9ca951e2c23b5f791fbf86`；工作分支 `fix/battle-ui-hit-status-owner-convergence-20260923`；PR #533；`main` 全程未修改。
+- 一般命中唯一 Owner 收斂至 `js/00-main.js::calculateHitChancePercent()/rollHitChance()`：`clamp(95 + accuracy×0.15 + finalAccuracyBonus - targetFinalEvasion - finalHitReduction, 70, 99)`。普通怪物未明確指定 evasion 時使用 `min(10, level×0.1)`；多個閃躲來源改以最終百分點直接加減。
+- 異常／Hard Control 唯一 Owner 收斂至 `calculateStatusEffectChance()/rollStatusEffectHit()`：技能基礎成功率＋主屬性×0.05%＋最終異常命中加成－目標 Spirit×0.05%－最終抗性。物理異常讀有效 Attack Points、法術異常讀 Intelligence；移除 level factor、sqrt(attribute)、硬控專屬 Spirit coefficient 與 V140/V158/V149/V169 舊公式 Wrapper。Hard Control 上限：Regular 90%、Elite 75%、Boss 60%、enemy-to-player 60%。
+- 凍傷正式為 Soft Debuff：傷害 -25%、最終閃躲 -25 個百分點、最終異常抗性 -25 個百分點，不禁止技能；舊「無法使用技能」戰鬥狀態文字已清除。
+- 技能說明 Owner 補齊火系物理追擊、烈焰龍捲必定燃燒、火鳳天鳴鳳威、凍傷完整效果、焚血免費追擊不耗 Charge、淨心訣不可清除項目與四元素 EX；未復活 V149/V169 舊文字 Owner。
+- 怒火等 Buff 仍由 `FourSymbolsDurationLifecycle` 依 action-finished 扣除，0 回合移除後立即同步 V143 Status Visual；不新增 timer／polling。
+- 巡怪人物不再先顯示 legacy `patrol-character.png`；正式 WebP decode/load 完成後才顯示。巡怪 `#mapBattleInfo` 與正式 Battle Info Drawer 樣式 Owner 分離。
+- Battle UI：唯一金色 Target Reticle；怪物名稱透明；24px 狀態 Icon HUD 高於 HP/SP；選目標時倒數框與 Target Prompt 使用正式不重疊幾何；Battle Info 外殼透明、只保留小 Tab／展開正文黑底；Tab 拖曳改為 pointerdown 一次量測＋rAF/translate3d；操作面板改用透明素材投影。
+- 施工期間 Browser QA 抓到一個真啟動順序問題：`makeZoneMonster()` 在 App Shell 頂層建怪時早於後置的 default evasion const 初始化，會造成 TDZ 並中止 App Shell。正式 Default Monster Evasion Owner 已移到 zone roster 建立之前，並新增 boot-order regression。
+- Production build commit：`7567aa216fba3f32e92792ea9dac317ff9f8d942`。Verified source candidate：`1596ea0a36e564facca92432376775d9728bc0fe`。
+- GitHub Actions Repository checks run `35866039901`：SUCCESS。包含 Syntax、Battle Runtime Architecture Guard、專項／既有 battle regressions、production build synchronization、Fixed Slot 9:16 mobile browser QA、exact-candidate real battle mobile browser QA、Adventure mobile QA、static resources、release gate 與 `git diff --check` 全部通過。
+- Requirement Batch：`release/requirement-batches/2026-09-23-battle-ui-hit-status-owner-convergence.json` 已升級為 VERIFIED。

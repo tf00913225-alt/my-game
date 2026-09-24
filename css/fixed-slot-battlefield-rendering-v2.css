@@ -15,6 +15,8 @@
     --battle-ally-region-track:42fr;
     --battle-info-panel-height:150px;
     --battle-info-handle-height:34px;
+    --battle-target-prompt-height:60px;
+    --battle-target-select-gap:6px;
     --battle-region-gap:4px;
     --battle-title-height:20px;
     --battle-enemy-zone-height:100%;
@@ -92,25 +94,69 @@
     position:absolute;
     left:0;
     right:0;
-    bottom:78px;
+    bottom:var(--battle-command-visual-height);
     align-self:center;
-    flex:0 0 36px;
+    flex:0 0 var(--battle-turn-row-height);
     width:max-content;
     min-width:112px;
-    height:36px;
-    min-height:36px;
-    max-height:36px;
+    height:var(--battle-turn-row-height);
+    min-height:var(--battle-turn-row-height);
+    max-height:var(--battle-turn-row-height);
     margin:0 auto;
     opacity:1;
     transform:none !important;
     transition:opacity .16s ease-out;
     pointer-events:none;
-    z-index:90;
+    z-index:18070 !important;
 }
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion > .turn-target-row.skill-picker-open,
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion > .turn-target-row.battle-item-open,
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion > .turn-target-row.skill-picker-open{
+    bottom:calc(var(--battle-command-visual-height) + 44px);
+    opacity:1;
+}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion > .turn-target-row.battle-item-open{
+    opacity:1;
+}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar.skill-quick-bar{
+    left:14px;
+    right:14px;
+    top:-24px;
+    bottom:10px;
+    z-index:18065 !important;
+    gap:3px;
+}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar .skill-quick-close{
+    flex-basis:28px;
+    height:28px;
+    line-height:26px;
+}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar .skill-quick-grid{gap:4px;}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar .skill-quick-button{
+    min-height:62px;
+    padding:4px 2px;
+}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar .skill-quick-button .sq-icon-wrap{
+    width:34px;
+    height:34px;
+    flex-basis:34px;
+}
+
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion.target-selecting > .turn-target-row{
-    opacity:.25;
+    top:auto;
+    bottom:calc(var(--battle-target-prompt-height) + var(--battle-target-select-gap));
+    opacity:1;
+}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion.target-selecting > .battle-target-prompt{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:0;
+    width:max-content;
+    height:var(--battle-target-prompt-height);
+    min-height:var(--battle-target-prompt-height);
+    margin:0 auto;
+    padding:4px 11px 4px 15px;
+    box-sizing:border-box;
+    transform:none !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region{
     position:absolute !important;
@@ -125,20 +171,25 @@
     height:var(--battle-info-panel-height) !important;
     padding:0 4px 4px;
     overflow:visible !important;
-    border-top:1px solid rgba(210,158,64,.9);
-    background:linear-gradient(180deg,rgba(23,18,12,.99),rgba(7,7,6,.99));
-    box-shadow:0 -8px 22px rgba(0,0,0,.68);
+    border:0;
+    background:transparent;
+    box-shadow:none;
     pointer-events:none;
     transform:translateY(calc(100% - var(--battle-info-handle-height)));
     transition:transform .26s ease;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region:not(.is-expanded){
     background:transparent;
+    border:0;
     box-shadow:none;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region.is-expanded{
     pointer-events:auto;
     transform:translateY(0);
+    border:0;
+    border-radius:0;
+    background:transparent;
+    box-shadow:none;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region > .battle-info-header-row{
     position:relative;
@@ -147,7 +198,7 @@
     margin:0;
     pointer-events:none;
 }
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-toggle{
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleInfoToggle.battle-info-toggle{
     position:absolute;
     left:auto;
     right:4px;
@@ -164,21 +215,19 @@
     border-bottom:0;
     border-radius:10px 10px 0 0;
     color:#f5cf72;
-    background:rgba(0,0,0,.62);
+    background-color:rgba(0,0,0,.82) !important;
+    background-image:none !important;
     box-shadow:none;
     font-size:14px;
     line-height:26px;
     font-weight:900;
     white-space:nowrap;
     transform:none;
-    touch-action:none;
+    touch-action:manipulation;
     user-select:none;
     -webkit-user-select:none;
-    cursor:ew-resize;
+    cursor:pointer;
     pointer-events:auto;
-}
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-toggle.is-dragging{
-    filter:brightness(1.18);
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region #battleTurnIndicator{
     position:absolute;
@@ -193,7 +242,7 @@
     transition:opacity .16s ease;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region.is-expanded #battleTurnIndicator{
-    opacity:0;
+    opacity:1;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region > #battleInfo{
     min-height:0 !important;
@@ -204,6 +253,16 @@
     overflow-y:auto !important;
     box-sizing:border-box !important;
     pointer-events:auto;
+    background:transparent !important;
+    border:0 !important;
+    border-radius:0 !important;
+    box-shadow:none !important;
+}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-info-region.is-expanded > #battleInfo{
+    background:rgba(0,0,0,.92) !important;
+    border:1px solid rgba(138,106,58,.68) !important;
+    border-bottom:0 !important;
+    border-radius:8px 8px 0 0 !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-ally-region{
     display:block;
@@ -399,6 +458,10 @@
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .battle-monster-name{
     bottom:0 !important;
+    background:none !important;
+    border:0 !important;
+    border-radius:0 !important;
+    box-shadow:none !important;
     height:var(--battle-name-row-height) !important;
     min-height:var(--battle-name-row-height) !important;
     max-height:var(--battle-name-row-height) !important;
@@ -451,12 +514,12 @@
     position:absolute !important;
     left:0 !important;
     right:0 !important;
-    bottom:37px !important;
+    bottom:40px !important;
     width:auto !important;
-    min-height:14px !important;
-    max-height:14px !important;
+    min-height:24px !important;
+    max-height:24px !important;
     overflow:visible !important;
-    z-index:9 !important;
+    z-index:32 !important;
 }
 
 /* Presentation-only state effects formerly co-located with V173.51 geometry. */
@@ -486,21 +549,23 @@
     box-shadow:none !important;
 }
 
-/* Target selection used to start one fast filter animation per selectable
-   unit. Ten enemies meant ten simultaneous compositor loops exactly when the
-   player pressed an action button. Keep the reticle visible but static. */
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.targetable::after,
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.ally-targetable::after{
+/* Fixed Slot owns the only selectable-target reticle. Retire all historical
+   ::after reticles so allies, enemies, Bosses and reinforcements can never
+   display two crosshairs at once. */
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.targetable::after,
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.ally-targetable::after{
+    content:none !important;
+    display:none !important;
     animation:none !important;
-    filter:none !important;
-    opacity:.9 !important;
 }
 
-/* Formal target feedback is a compact reticle over the artwork, never a card
-   outline. The same owner covers normal enemies, Boss, reinforcements and
-   destructible Boss objects as soon as they enter the Unit pipeline. */
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.ally-targetable::before,
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.target::before{
+/* Formal target feedback is one shared gold reticle over the artwork.
+   battlePage is migrated into the native V20 battle shell on real mobile,
+   so this owner must survive reparenting and must not depend on #app/#game-content.
+   targetable = selectable candidate; target = formally selected enemy. */
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.ally-targetable::before,
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.targetable::before,
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.target::before{
     content:"" !important;
     position:absolute !important;
     z-index:30 !important;
@@ -516,7 +581,7 @@
     box-shadow:0 0 0 2px rgba(42,27,10,.8),0 0 12px rgba(245,207,114,.9) !important;
     transform:translate(-50%,-50%) !important;
     pointer-events:none !important;
-    animation:v174TargetReticlePulse .72s ease-in-out infinite alternate !important;
+    animation:none !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn > .v174-battle-art,
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.target > .v174-battle-art{

@@ -77,14 +77,5 @@
         migrateBottomNav();
     }
 
-    const observer = new MutationObserver(function(){
-        migrateBottomNav();
-    });
-
-    observer.observe(document.body, {
-        childList:true,
-        subtree:true
-    });
-
     window.migrateBottomNavToNative1080 = migrateBottomNav;
 })();

@@ -10,7 +10,7 @@
         ["relic_soul_bell","鎮魂古鐘","每第4回合開始時"],
         ["relic_tiangang_banner","天罡戰旗","我方累積受到6次敵方有效攻擊後"],
         ["relic_nine_dragon_fire","九龍神火罩","敵方累積完成7次有效行動後"],
-        ["relic_cold_spring_jade","寒泉玉珮","任一我方角色在傷害結算後低於35%最大HP時"],
+        ["relic_cold_spring_jade","寒泉玉珮","任一我方角色HP由35%以上降至35%以下時"],
         ["relic_qinglan_feather","青嵐羽符","戰鬥開始時"],
         ["relic_rock_mountain_seal","岩岳鎮印","開場；另於我方累積受8次有效攻擊時"],
         ["relic_returning_wheel","回天寶輪","本場第一次有我方角色將受到致命傷害時"],

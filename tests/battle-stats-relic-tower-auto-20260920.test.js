@@ -89,8 +89,9 @@ assert.match(
 assert.match(statsSource,/function installStatsEdgeDrag\(edge,root\)/);
 assert.match(statsCss,/\.battle-stats-edge-button[\s\S]*touch-action:none/);
 assert.match(statsCss,/\.battle-insight-drawer\{[\s\S]*z-index:18072/);
-assert.match(statsCss,/\.battle-statistics-result-panel\{[\s\S]*width:min\(900px,calc\(100% - 24px\)\)/);
-assert.match(statsCss,/\.battle-statistics-result-panel \.battle-stat-grid b\{font-size:22px/);
+assert.match(statsCss,/\.battle-statistics-result-panel\{[\s\S]*width:min\(780px,calc\(100% - 56px\)\)/);
+assert.match(statsCss,/\.battle-statistics-result-panel > header h2\{[\s\S]*font-size:22px/);
+assert.match(statsCss,/\.battle-statistics-result-panel \.battle-stat-grid b\{font-size:19px/);
 
 assert.match(boss,/function bossMechanismInspectorCards\(\)/);
 assert.match(boss,/getActiveMechanisms:function\(\)/);

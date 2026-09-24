@@ -52,10 +52,11 @@ assert.match(timing,/meta\.targetContract=contract/);
 assert.match(timing,/meta\.targetSide=contract\.targetSide/);
 assert.doesNotMatch(vfx,/queuedPlayerActions|selectedMonster|getSkillTargets/,
     "the VFX runtime must never infer combat targets");
-assert.match(vfx,/meta\.targetContract\.targetSide/);
-assert.match(support,/showSkillNameBadge\(skill\.name,skill\.element,characterIndex,targetId,targetIds,targetSide\)/);
-assert.match(support,/animateSupportCast\(state,characterIndex,skill,enemyIndex,\[enemyIndex\],"monster"\)/,
-    "Purify Mind must preserve an explicitly selected enemy target");
+assert.match(vfx,/const contract=meta&&meta\.targetContract&&meta\.targetContract\.version==="battle-target-contract-v1"/);
+assert.match(vfx,/const contractedSide=contract\?contract\.targetSide:meta&&meta\.targetSide/);
+assert.match(support,/showSkillNameBadge\(skill\.name,skill\.element,characterIndex,targetId,targetIds,targetSide,targetTypeOverride\)/);
+assert.match(support,/const selectedPrimary=targetSide==="monster"[\s\S]*?\?enemyIndex[\s\S]*?const primaryTarget=targets\.includes\(selectedPrimary\)\?selectedPrimary:targets\[0\][\s\S]*?const presentationTargetType=targets\.length>1[\s\S]*?animateSupportCast\(state,characterIndex,skill,primaryTarget,targets,targetSide,presentationTargetType\)/,
+    "Purify Mind must preserve its selected primary anchor and resolved target shape");
 
 // Fixed geometry is occupancy-independent: tri uses a fixed shape, all uses a side rect.
 assert.match(vfx,/getGeometryRectFromShape\(current\.targetSide,primarySlot,shape\)/);

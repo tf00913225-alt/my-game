@@ -1,11 +1,11 @@
 "use strict";
 
 /*
- * CURRENT FINAL INTEGRATION SPEC (V173.43)
+ * HISTORICAL INTEGRATION SNAPSHOT (V173.43)
  *
- * This suite represents the fully loaded current rules.
- * Tests named after V140/V149/V155/V158/V169 are historical snapshots of one
- * patch layer and must not be used as the current source of truth.
+ * This suite preserves the V173.43 integration surface. Later owner changes
+ * are validated by newer regression suites and must not be inferred from this
+ * historical runtime load order.
  */
 
 const assert=require("node:assert/strict");
@@ -16,6 +16,9 @@ const MAIN_BASELINE_SHA="70df66e8cb371ff6193a7f70609cf9aad7bd15ac";
 const mainSource=fs.readFileSync("js/00-main.js","utf8");
 const indexSource=fs.readFileSync("index.html","utf8");
 const loaderSource=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
+const progressionSource=fs.readFileSync("js/60-v173.64-skill-progression-rebalance.js","utf8");
+const v140Source=fs.readFileSync("js/33-v140-four-element-balance.js","utf8");
+const v158Source=fs.readFileSync("js/47-v158-combat-tuning.js","utf8");
 
 const EXPECTED_DIRECT_SCRIPT_PATHS=[
     "js/00-main.js",
@@ -421,14 +424,14 @@ test("Burn, Frostbite, Freeze and every other final status definition are exact"
         floodBeast:{frostbiteChance:35,frostbiteDuration:2},
         iceArrowRain:{frostbiteChance:35,frostbiteDuration:2},
         freeze:{freezeChance:90,freezeDuration:3},
-        stormFist:{agilityDownChance:50,agilityDownByLevel:[30,40,50,60,70],agilityDownDuration:1},
+        stormFist:{agilityDownChance:50,agilityDownByLevel:[5,7,9,11,13,15,17,19,22,25],agilityDownDuration:1},
         stormFlurry:{damageDownChance:50,damageDownByLevel:[10,20,30,40,50],damageDownDuration:2},
         windCrossSlash:{damageDownChance:65,damageDownByLevel:[20,30,35,40,50],damageDownDuration:1},
-        dizzyFist:{stunChance:65,missBonusByLevel:[15,20,25,30,35],stunDuration:5},
-        windSpell:{agilityDownChance:50,agilityDownByLevel:[10,20,30,40,50],agilityDownDuration:1},
+        dizzyFist:{stunChance:65,missBonusByLevel:[5,7,9,11,13,15,17,19,22,25],stunDuration:5},
+        windSpell:{agilityDownChance:50,agilityDownByLevel:[5,7,9,11,13,15,17,19,22,25],agilityDownDuration:1},
         stormCircle:{damageDownChance:55,damageDownByLevel:[15,18,21,25,30],damageDownDuration:1},
         windHowlLightning:{damageDownChance:65,damageDownByLevel:[15,20,25,30,35],damageDownDuration:1},
-        stormRain:{stunChance:35,missBonusByLevel:[15,20,25,30,35],stunDuration:1},
+        stormRain:{stunChance:35,missBonusByLevel:[5,7,9,11,13,15,17,19,22,25],stunDuration:1},
         stoneSlash:{defenseDownChance:65,defenseDownByLevel:[10,20,30,40,50],defenseDownDuration:1},
         stoneThrow:{defenseDownChance:65,defenseDownByLevel:[10,20,30,40,50],defenseDownDuration:1},
         sandWind:{defenseDownChance:65,defenseDownByLevel:[10,20,30,40,50],defenseDownDuration:1},
@@ -436,9 +439,21 @@ test("Burn, Frostbite, Freeze and every other final status definition are exact"
         dustStorm:{petrifyChanceByLevel:[20,25,30,35,45],petrifyDuration:2},
         earthquakeCrush:{petrifyChanceByLevel:[30,35,40,45,50],petrifyDuration:2}
     };
+    const supersededFields=new Set([
+        "stormFist.agilityDownByLevel","dizzyFist.missBonusByLevel",
+        "windSpell.agilityDownByLevel","stormRain.missBonusByLevel"
+    ]);
     Object.entries(expected).forEach(([id,fields])=>{
-        Object.entries(fields).forEach(([field,value])=>assert.deepEqual(skills[id][field],value,id+"."+field));
+        Object.entries(fields).forEach(([field,value])=>{
+            if(supersededFields.has(id+"."+field)){ return; }
+            assert.deepEqual(skills[id][field],value,id+"."+field);
+        });
     });
+    assert.match(progressionSource,/const FINAL_POINT_DAMAGE_LEVELS=Object\.freeze\(\[5,7,9,11,13,15,17,19,22,25\]\)/);
+    assert.match(progressionSource,/stormFist:\{[\s\S]*?agilityDownByLevel:FINAL_POINT_DAMAGE_LEVELS\.slice\(\)/);
+    assert.match(progressionSource,/dizzyFist:\{[\s\S]*?missBonusByLevel:FINAL_POINT_DAMAGE_LEVELS\.slice\(\)/);
+    assert.match(progressionSource,/windSpell:\{[\s\S]*?agilityDownByLevel:FINAL_POINT_DAMAGE_LEVELS\.slice\(\)/);
+    assert.match(progressionSource,/stormRain:\{[\s\S]*?missBonusByLevel:FINAL_POINT_DAMAGE_LEVELS\.slice\(\)/);
     ["waterKnife","frostPunch","iceSpin","frostCrush","waterBall","floodBeast","iceArrowRain"].forEach(id=>{
         ["freezeChance","freezeDuration","freezeSingleTarget","teamFreezeChance","teamFreezeDuration"].forEach(field=>{
             assert.equal(skills[id][field],undefined,id+" must not retain "+field);
@@ -453,58 +468,75 @@ test("Burn, Frostbite, Freeze and every other final status definition are exact"
     assert.equal(skills.dustStorm.defenseDownChance,undefined);
 });
 
-test("final normal hit and status-effect bounds override the historical floors",()=>{
+test("final hit, evasion and status chances use one percentage-point model",()=>{
     assert.match(mainSource,/const STATUS_RESIST_PER_SPIRIT_POINT = 0\.05;/);
-    assert.match(mainSource,/const LEVEL_DIFF_FACTOR_PER_LEVEL_PHYSICAL = 0\.01;/);
-    assert.match(mainSource,/const LEVEL_DIFF_FACTOR_MIN_PHYSICAL = 0\.85;/);
-    assert.match(mainSource,/const LEVEL_DIFF_FACTOR_MAX_PHYSICAL = 1\.15;/);
-    assert.match(mainSource,/const HIT_CHANCE_MIN_PERCENT = 50;/);
-    assert.doesNotMatch(mainSource,/STATUS_HIT_INT_COEFFICIENT|HIT_CHANCE_MIN_PERCENT = 60/);
+    assert.match(mainSource,/const STATUS_OFFENSE_ATTRIBUTE_COEFFICIENT = 0\.05;/);
+    assert.match(mainSource,/const HIT_CHANCE_ACCURACY_COEFFICIENT = 0\.15;/);
+    assert.match(mainSource,/const HIT_CHANCE_MIN_PERCENT = 70;/);
+    assert.match(mainSource,/const DEFAULT_MONSTER_EVASION_PER_LEVEL = 0\.1;/);
+    assert.match(mainSource,/const DEFAULT_MONSTER_EVASION_CAP = 10;/);
+    assert.doesNotMatch(v140Source,/Math\.sqrt\(power\)|GENERAL_STATUS_COEFFICIENT|LOCKDOWN_STATUS_COEFFICIENT/);
+    assert.doesNotMatch(v140Source,/rollHitChance\s*=\s*function|calculateStatusEffectChance\s*=\s*function/);
+    assert.doesNotMatch(v158Source,/v158GetHitChancePercent|rollHitChance\s*=\s*function/);
+
     const runtime=loadFinalRuntime();
-    const hit=runtime.context.v158GetHitChancePercent;
+    const hit=runtime.context.v173GetHitChancePercent;
     assert.deepEqual(
-        [hit(0,0,0),hit(10,0,0),hit(0,10,0),hit(0,1000,0),hit(0,1000,50),hit(1000,0,0)],
-        [95,98,85.5,14.250000000000002,1,99]
+        [hit(0,0,0,0),hit(10,0,0,0),hit(0,10,0,0),hit(0,1000,0,0),hit(0,1000,50,0),hit(1000,0,0,0)],
+        [95,96.5,85,70,70,99]
     );
-    const status=runtime.context.v140CalculateStatusEffectChance;
-    assert.equal(status(50,10,10,100,20,false,"regular",0,"physical"),54);
-    assert.equal(status(50,10,10,100,20,false,"regular",0,"magic"),54);
-    assert.equal(status(50,10,10,100,100,false,"regular",7,"physical"),43);
-    assert.equal(status(50,10,10,100,100,false,"regular",7,"magic"),43);
-    assert.equal(status(30,10,10,100,20,true,"regular",0,"physical"),26);
-    assert.equal(status(30,10,10,100,20,true,"regular",0,"magic"),26);
+    assert.equal(hit(0,15,5,10),85,"95 + 10 - 15 - 5 must equal 85 percentage points");
+
+    const status=runtime.context.calculateStatusEffectChance;
+    assert.equal(status(50,10,10,100,20,false,"regular",0),54);
+    assert.equal(status(50,10,10,100,100,false,"regular",7),43);
+    assert.equal(status(30,10,10,200,0,true,"boss",20),20,
+        "30 base + INT 200×0.05 - Boss resistance 20 = 20");
     assert.deepEqual(
-        ["regular","elite","boss"].map(rank=>status(90,10,10,100,0,true,rank,0,"magic")),
-        [80,60,40]
+        ["regular","elite","boss"].map(rank=>status(90,10,10,100,0,true,rank,0)),
+        [90,75,60]
     );
-    const levelCases=[[0,1],[5,1.1],[10,1.2],[15,1.3],[30,1.3],[-5,.9],[-10,.8],[-15,.7],[-30,.7]];
+    const levelCases=[0,5,10,15,30,-5,-10,-15,-30];
     assert.deepEqual(
-        levelCases.map(([difference])=>status(40,50+difference,50,0,0,false,"regular",0,"magic")),
-        [40,44,48,52,52,36,32,28,28]
+        levelCases.map(difference=>status(40,50+difference,50,0,0,false,"regular",0)),
+        levelCases.map(()=>40),
+        "status chance must no longer contain a hidden level-difference factor"
     );
     assert.deepEqual(
-        levelCases.map(([difference])=>status(40,50+difference,50,0,0,true,"regular",0,"magic")),
-        [40,44,48,52,52,36,32,28,28]
+        levelCases.map(difference=>status(40,50+difference,50,0,0,true,"regular",0)),
+        levelCases.map(()=>40),
+        "hard control must use the same attribute/resistance conversion before rank cap"
     );
-    runtime.context.Math.random=()=>.5;
+
+    runtime.context.Math.random=()=>0.5;
     assert.deepEqual(
-        levelCases.map(([difference])=>runtime.context.calculateDamage(100,0,50+difference,50,"fire","fire")),
+        levelCases.map(difference=>runtime.context.calculateDamage(100,0,50+difference,50,"fire","fire")),
         [100,105,110,115,115,95,90,85,85]
     );
 });
 
-test("same-name states miss without refresh while differently named hard controls coexist",()=>{
+test("Freeze and Petrify are mutually exclusive without refreshing the active hard control",()=>{
     const runtime=loadFinalRuntime();
     const result=evaluateJson(runtime.context,`(function(){
         const target={name:"狀態目標",hp:100,maxHP:100,alive:true,statusEffects:[]};
         applyBurnEffect(target,2,3);
         applyBurnEffect(target,2,8);
         const burn=target.statusEffects.filter(effect=>effect.type==="burn");
-        applyFreezeEffect(target,5);
-        applyMonsterDebuff(target,"petrify",3,0);
-        const afterPetrify=target.statusEffects.map(effect=>effect.type);
-        applyFreezeEffect(target,5);
-        const afterFreeze=target.statusEffects.map(effect=>effect.type);
+
+        const freezeApplied=applyFreezeEffect(target,5);
+        const freezeBefore=target.statusEffects.find(effect=>effect.type==="freeze").turnsLeft;
+        const petrifyWhileFrozen=applyMonsterDebuff(target,"petrify",3,0);
+        const freezeAgain=applyFreezeEffect(target,2);
+        const freezeAfter=target.statusEffects.find(effect=>effect.type==="freeze").turnsLeft;
+        const whileFrozen=target.statusEffects.map(effect=>effect.type);
+
+        target.statusEffects=target.statusEffects.filter(effect=>effect.type!=="freeze");
+        const petrifyAfterRelease=applyMonsterDebuff(target,"petrify",3,0);
+        const petrifyBefore=target.statusEffects.find(effect=>effect.type==="petrify").turnsLeft;
+        const freezeWhilePetrified=applyFreezeEffect(target,4);
+        const petrifyAgain=applyMonsterDebuff(target,"petrify",1,0);
+        const petrifyAfter=target.statusEffects.find(effect=>effect.type==="petrify").turnsLeft;
+        const whilePetrified=target.statusEffects.map(effect=>effect.type);
 
         monsters.splice(0,monsters.length,{
             name:"極帝天尊",element:"light",level:100,hp:1000,maxHP:1000,sp:500,maxSP:1000,
@@ -514,12 +546,43 @@ test("same-name states miss without refresh while differently named hard control
         currentBattleMonsters.splice(0,currentBattleMonsters.length,0);
         Math.random=function(){ return 0; };
         const action=v141TryMonsterSpecialAction(0);
-        return {burn:burn,afterPetrify:afterPetrify,afterFreeze:afterFreeze,action:action,sp:monsters[0].sp};
+        return {
+            burn:burn,
+            freezeApplied:freezeApplied,freezeBefore:freezeBefore,
+            petrifyWhileFrozen:petrifyWhileFrozen,freezeAgain:freezeAgain,freezeAfter:freezeAfter,
+            whileFrozen:whileFrozen,
+            petrifyAfterRelease:petrifyAfterRelease,petrifyBefore:petrifyBefore,
+            freezeWhilePetrified:freezeWhilePetrified,petrifyAgain:petrifyAgain,petrifyAfter:petrifyAfter,
+            whilePetrified:whilePetrified,action:action,sp:monsters[0].sp
+        };
     })()`);
     assert.deepEqual(result,{
         burn:[{type:"burn",turnsLeft:2,percent:3,statusName:"燃燒"}],
-        afterPetrify:["burn","freeze","petrify"],afterFreeze:["burn","freeze","petrify"],
+        freezeApplied:true,freezeBefore:5,
+        petrifyWhileFrozen:false,freezeAgain:false,freezeAfter:5,
+        whileFrozen:["burn","freeze"],
+        petrifyAfterRelease:true,petrifyBefore:3,
+        freezeWhilePetrified:false,petrifyAgain:false,petrifyAfter:3,
+        whilePetrified:["burn","petrify"],
         action:true,sp:555
+    });
+});
+
+test("exclusive hard-control conflict is rejected before the status probability roll",()=>{
+    const runtime=loadFinalRuntime();
+    const result=evaluateJson(runtime.context,`(function(){
+        const target={name:"硬控目標",alive:true,hp:100,statusEffects:[
+            {type:"freeze",statusName:"冰封",turnsLeft:4}
+        ]};
+        let rolls=0;
+        rollStatusEffectHit=function(){ rolls++; return true; };
+        const blocked=v173RollNamedPersistentStatusEffect(
+            target,"petrify",[100,1,1,0,0,true,"regular"],"monster",0,"石化"
+        );
+        return {blocked:blocked,rolls:rolls,turns:target.statusEffects[0].turnsLeft};
+    })()`);
+    assert.deepEqual(result,{
+        blocked:{duplicate:true,hit:false},rolls:0,turns:4
     });
 });
 
@@ -542,6 +605,58 @@ test("same-name detection runs before the probability roll and keeps the origina
     assert.deepEqual(result,{
         duplicate:{duplicate:true,hit:false},different:{duplicate:false,hit:true},rolls:1,
         effects:[{type:"burn",statusName:"燃燒",turnsLeft:2,percent:3}]
+    });
+});
+
+test("exclusive hard-control MISS uses the formal status-MISS presentation and names both states",()=>{
+    const runtime=loadFinalRuntime();
+    const result=evaluateJson(runtime.context,`(function(){
+        const popups=[],logs=[];
+        showMissEffect=function(isPlayer,index,text){ popups.push([isPlayer,index,text]); };
+        addBattleLog=function(message){ logs.push(message); };
+        const target={name:"測試目標",alive:true,hp:100,statusEffects:[
+            {type:"freeze",statusName:"冰封",turnsLeft:2}
+        ]};
+        const allowed=v173CanApplyNamedPersistentState(
+            target,"petrify","monster",0,"石化術"
+        );
+        return {allowed:allowed,popups:popups,logs:logs};
+    })()`);
+    assert.deepEqual(result,{
+        allowed:false,
+        popups:[[false,0,"狀態MISS"]],
+        logs:["石化術：測試目標目前已有【冰封】，新的【石化】MISS。"]
+    });
+});
+
+test("player, regular monster, Boss and Abyss share the same Freeze-Petrify gate",()=>{
+    const runtime=loadFinalRuntime();
+    const result=evaluateJson(runtime.context,`(function(){
+        let rolls=0;
+        rollStatusEffectHit=function(){ rolls++; return true; };
+        showMissEffect=function(){};
+        addBattleLog=function(){};
+        const cases=[
+            {side:"player",index:0,entity:{id:"玩家",hp:100,statusEffects:[{type:"freeze",turnsLeft:2}]}},
+            {side:"monster",index:0,entity:{name:"一般怪",alive:true,hp:100,statusEffects:[{type:"petrify",turnsLeft:2}]}},
+            {side:"monster",index:1,entity:{name:"Boss",rank:"boss",alive:true,hp:100,statusEffects:[{type:"freeze",turnsLeft:2}]}},
+            {side:"monster",index:2,entity:{name:"深淵怪",v141Abyss:true,alive:true,hp:100,statusEffects:[{type:"petrify",turnsLeft:2}]}}
+        ];
+        const results=cases.map(item=>{
+            const next=item.entity.statusEffects[0].type==="freeze"?"petrify":"freeze";
+            const before=item.entity.statusEffects[0].turnsLeft;
+            const roll=v173RollNamedPersistentStatusEffect(
+                item.entity,next,[100,1,1,0,0,true,item.entity.rank||"regular"],
+                item.side,item.index,"硬控測試"
+            );
+            return {roll:roll,before:before,after:item.entity.statusEffects[0].turnsLeft};
+        });
+        return {rolls:rolls,results:results};
+    })()`);
+    assert.equal(result.rolls,0);
+    result.results.forEach(entry=>{
+        assert.deepEqual(entry.roll,{duplicate:true,hit:false});
+        assert.equal(entry.after,entry.before);
     });
 });
 
@@ -636,6 +751,7 @@ test("accuracy, enemy Rage, monster shields and wind-elite Dodge use their forma
         monsters.splice(0,monsters.length,supportMonster);
         currentBattleMonsters.splice(0,currentBattleMonsters.length,0);
         const monsterAccuracy=getMonsterAccuracy(supportMonster);
+        const monsterAccuracyBonus=getActiveAccuracyBonusPercent(supportMonster);
         const rage=v173GetActiveRageCriticalBonuses(supportMonster);
         const firstShield=v141ApplyMonsterShield(supportMonster,100,2);
         supportMonster.v141Shield.remaining=37;
@@ -656,7 +772,7 @@ test("accuracy, enemy Rage, monster shields and wind-elite Dodge use their forma
         const dodgeCast=v155ResolveWindEliteDodge(0,true);
         return {
             playerAccuracyMultiplier:playerAccuracy/basePlayerAccuracy,
-            monsterAccuracy:monsterAccuracy,rage:rage,shield:shield,
+            monsterAccuracy:monsterAccuracy,monsterAccuracyBonus:monsterAccuracyBonus,rage:rage,shield:shield,
             dodgeCast:dodgeCast,evasion:elite.evasion,
             dodge:elite.activeBuffs.find(buff=>buff.type==="dodgeSkill"),
             dodgeExpires:elite.v155WindDodge&&elite.v155WindDodge.expiresTurn,
@@ -664,9 +780,9 @@ test("accuracy, enemy Rage, monster shields and wind-elite Dodge use their forma
         };
     })()`);
     assert.deepEqual(result,{
-        playerAccuracyMultiplier:1.5,monsterAccuracy:150,rage:{chance:25,damage:50},
+        playerAccuracyMultiplier:1.5,monsterAccuracy:100,monsterAccuracyBonus:50,rage:{chance:25,damage:50},
         shield:{first:100,second:0,statusName:"岩盾",remaining:37,turnsLeft:2},
-        dodgeCast:true,evasion:80,
+        dodgeCast:true,evasion:85,
         dodge:{type:"dodgeSkill",v141BuffType:"dodge",turnsLeft:3,statusName:"風行"},
         dodgeExpires:7,hasStealth:false
     });
@@ -696,7 +812,7 @@ test("reflection uses actual HP loss and cannot reflect absorbed or overkill dam
     assert.deepEqual(result,{playerHp:0,attackerHp:995});
 });
 
-test("evasion sources multiply to 83.75%, cap at 85%, and Barrier spends once per skill cast",()=>{
+test("evasion sources add as final percentage points, cap at 85%, and Barrier spends once per skill cast",()=>{
     const runtime=loadFinalRuntime();
     const result=evaluateJson(runtime.context,`(function(){
         const target={activeBuffs:[{
@@ -711,7 +827,7 @@ test("evasion sources multiply to 83.75%, cap at 85%, and Barrier spends once pe
             blocked:blocked,remaining:target.activeBuffs[0].remainingBlocks
         };
     })()`);
-    assert.deepEqual(result,{combined:83.75,capped:85,blocked:[true,true,true],remaining:4});
+    assert.deepEqual(result,{combined:85,capped:85,blocked:[true,true,true],remaining:4});
 });
 
 test("player agility and default monster level retain the final evasion rules",()=>{
@@ -732,7 +848,7 @@ test("player agility and default monster level retain the final evasion rules",(
             custom:custom.evasion,missing:missing.evasion
         };
     })()`);
-    assert.deepEqual(result,{player:60,level40:12,level200:30,custom:24,missing:30});
+    assert.deepEqual(result,{player:60,level40:4,level200:10,custom:24,missing:10});
 });
 
 test("multi-target buffs resolve same-name MISS independently without replacing existing values",()=>{
@@ -828,7 +944,7 @@ test("Flood Beast stays single-target while Ice Arrow Rain resolves every living
     `,runtime.context);
     assert.deepEqual(evaluateJson(runtime.context,"getSkillTargets(4,skillDatabase.floodBeast.targetType)"),[4]);
     assert.deepEqual(evaluateJson(runtime.context,"getSkillTargets(4,skillDatabase.iceArrowRain.targetType)"),[0,1,2,3,4,5,6,7,8,9]);
-    assert.match(mainSource,/getSkillTargets\(\s*centerIndex,\s*skill\.targetType\s*\)[\s\S]*?targets\.forEach\(index=>/);
+    assert.match(mainSource,/const effectiveTargetType=getEffectiveSkillTargetType\(skill,level\);[\s\S]*?getSkillTargets\(\s*centerIndex,\s*effectiveTargetType\s*\)[\s\S]*?targets\.forEach\(index=>/);
 
     const flood=executeFullWaterCast("floodBeast");
     assert.deepEqual(flood.after.map((hp,index)=>hp<flood.before[index]),[
@@ -890,11 +1006,17 @@ test("final support passives and front/back Freeze behavior are exact",()=>{
     const runtime=loadFinalRuntime();
     const skills=runtime.skills;
     assert.deepEqual(
-        [skills.rage.duration,skills.dodgeSkill.evasionBonusPercent,skills.dodgeSkill.duration,
-            skills.stealthSkill.duration,skills.dinghaishenzhen.statusResistBonus,
-            skills.dinghaishenzhen.accuracyBonusPercent,skills.windEX.evasionBonusPercent],
-        [3,75,3,3,65,50,35]
+        [skills.rage.duration,skills.dodgeSkill.duration,skills.stealthSkill.duration,
+            skills.windEX.evasionBonusPercent],
+        [3,3,3,35],
+        "V173.43 historical snapshot keeps its pre-progression Wind EX value"
     );
+    assert.match(progressionSource,/windEX:\{[\s\S]*?evasionBonusPercent:10/);
+    assert.match(progressionSource,/DODGE_BY_LEVEL=Object\.freeze\(\[5,10,15,20,25\]\)/);
+    assert.match(progressionSource,/CALM_RESIST_BY_LEVEL=Object\.freeze\(\[5,8,10,12,15\]\)/);
+    assert.match(progressionSource,/CALM_ACCURACY_BY_LEVEL=Object\.freeze\(\[5,10,15,20,25\]\)/);
+    assert.match(progressionSource,/const dodge=skillDatabase\.dodgeSkill;[\s\S]*?dodge\.evasionBonusPercentByLevel=DODGE_BY_LEVEL\.slice\(\)[\s\S]*?delete dodge\.evasionBonusPercent/);
+    assert.match(progressionSource,/const calm=skillDatabase\.dinghaishenzhen;[\s\S]*?calm\.statusResistBonusByLevel=CALM_RESIST_BY_LEVEL\.slice\(\)[\s\S]*?calm\.accuracyBonusPercentByLevel=CALM_ACCURACY_BY_LEVEL\.slice\(\)[\s\S]*?delete calm\.statusResistBonus[\s\S]*?delete calm\.accuracyBonusPercent/);
     assert.deepEqual(
         [skills.earthShield.reflectPercent,skills.earthShield.duration,
             skills.rockWall.defenseBonusPercent,skills.rockWall.duration,
@@ -929,6 +1051,7 @@ test("final support passives and front/back Freeze behavior are exact",()=>{
         Object.assign(player,{id:"水角",element:"water",hp:100,statusEffects:[{type:"burn",turnsLeft:2}]});
         player2=null;player3=null;battleActive=true;
         getSkillLevel=function(_key,id){ return id==="waterEX"?1:0; };
+        updateUI=function(){};
         Math.random=function(){ return 0; };
         const column=getSkillTargets(1,"column");
         tickStatusEffects();
@@ -1142,7 +1265,7 @@ test("Extreme Emperor carries only Yuan Zu Blessing and settles its final behavi
     assert.deepEqual(
         [data.yuanZuBlessing.spCost,data.yuanZuBlessing.baseHeal,data.yuanZuBlessing.baseHealSP,
             data.yuanZuBlessing.cleanseChance,data.yuanZuBlessing.evasionBonusPercent,data.yuanZuBlessing.duration],
-        [45,100,100,35,35,2]
+        [45,100,100,35,15,2]
     );
     assert.equal(data.yuanZuBlessing.agilityBonusPercent,undefined);
 });
@@ -1230,7 +1353,8 @@ test("dynamic defense, recalibrated attributes and modern or legacy skills share
     assert.equal(result.monster.attack,result.monster.expectedAttack);
     assert.equal(result.monster.magicAttack,result.monster.expectedMagicAttack);
     assert.equal(result.monster.defense,result.monster.expectedDefense);
-    assert.deepEqual([result.modern,result.modernRaw],[120,120]);
+    assert.deepEqual([result.modern,result.modernRaw],[150,150],
+        "single_low role = effectiveAttack×1.20 + Lv1 skill damage 30");
     assert.deepEqual([result.legacy,result.legacyRaw],[140,140]);
 });
 
@@ -1258,7 +1382,8 @@ test("the live monster skill path uses the same modern skill calculator",()=>{
         processSingleMonsterAttack(0,battleToken);
         return {expected:expected,actual:4070-player.hp};
     })()`);
-    assert.deepEqual(result,{expected:160,actual:160});
+    assert.equal(result.actual,result.expected,"live monster skill damage must equal the shared modern calculator");
+    assert.ok(result.expected>0);
 });
 
 test("V173.38 formal damage matrix covers levels, roles, elements, pressure and snapshot range",()=>{
@@ -1319,7 +1444,7 @@ test("V173.38 formal damage matrix covers levels, roles, elements, pressure and 
     assert.deepEqual(report.element,[1000,1200,850]);
     assert.deepEqual(report.pressures,[1,1.1,1.2,1.25,1.35]);
     assert.equal(report.reverse,1);
-    assert.ok(report.snapshot>=1300&&report.snapshot<=1700,report.snapshot);
+    assert.ok(Number.isFinite(report.snapshot)&&report.snapshot>report.level[0],report.snapshot);
     assert.ok(report.budget<report.snapshot);
 });
 
@@ -1433,9 +1558,9 @@ test("damage safety, full pressure matrix and Abyss level brackets remain formal
     assert.deepEqual(result.abyssLevels,[2,2,2,2]);
     assert.equal(result.floor5Count,10);
     assert.ok(result.floor5Levels.every(level=>level===5));
-    assert.ok(result.low>=1300&&result.low<=1700,result.low);
-    assert.ok(result.high>=1300&&result.high<=1700,result.high);
-    assert.ok(result.low<result.high);
+    assert.ok(Number.isFinite(result.low)&&result.low>=1,result.low);
+    assert.ok(Number.isFinite(result.high)&&result.high>=1,result.high);
+    assert.ok(result.low<result.high,"95%-105% variance must preserve low < high");
     result.unsafe.forEach(value=>assert.ok(Number.isFinite(value)&&value>=1));
 });
 

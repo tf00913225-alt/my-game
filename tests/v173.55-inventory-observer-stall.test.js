@@ -10,8 +10,9 @@ const build=fs.readFileSync("scripts/build-production.mjs","utf8");
 assert.match(inv,/if\(b\.textContent!==text\)b\.textContent=text/);
 assert.match(inv,/if\(meta\.textContent!==text\)meta\.textContent=text/);
 assert.match(inv,/let inventorySyncQueued=false/);
-assert.match(inv,/new MutationObserver\(scheduleInventorySync\)/);
-assert.doesNotMatch(inv,/new MutationObserver\(\(\)=>\{fullscreen\(\);picker\(\);syncSellUi\(\)\}\)/);
+assert.match(inv,/window\.v17351SyncInventoryQa=scheduleInventorySync/);
+assert.doesNotMatch(inv,/MutationObserver|setInterval\s*\(/,
+    "inventory QA must be lifecycle-driven in production, not observer/polling-driven");
 assert.equal((loader.match(/const V_ASSET_VERSION="([^"]+)"/)||[])[1],releaseMeta.cacheVersion);
 for(const name of ["54-v173.51-battle-qa.js","55-v173.51-inventory-qa.js","57-v173.51-quest-qa.js"]){assert.ok(build.includes('"js/'+name+'"'));}
 assert.doesNotMatch(build,/"js\/56-v173\.51-shop-qa\.js"/,

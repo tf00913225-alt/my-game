@@ -680,7 +680,7 @@
         return document.getElementById("battlePage");
     }
     function appRoot(){
-        return document.getElementById("app")||document.getElementById("game-content")||document.body;
+        return document.getElementById("game-content")||document.getElementById("app")||document.body;
     }
     function clampEdgeTop(edge,root,value){
         const height=Math.max(1,Number(root&&root.clientHeight)||0);
@@ -3103,7 +3103,10 @@
         }
 
         if(definition.talismanEffect==="freeze"&&targetMonster){
-            const baseChance=Math.max(0,Number(skill&&skill.freezeChance)||0);
+            const skillLevel=Math.max(1,Math.floor(Number(definition.talismanSkillLevel)||1));
+            const baseChance=Array.isArray(skill&&skill.freezeChanceByLevel)
+                ?Math.max(0,Number(skill.freezeChanceByLevel[Math.min(skill.freezeChanceByLevel.length-1,skillLevel-1)])||0)
+                :Math.max(0,Number(skill&&skill.freezeChance)||0);
             const intelligence=Number(stats.intelligence!==undefined?stats.intelligence:character.intelligence)||0;
             const targetSpirit=typeof getMonsterEffectiveSpiritPoints==="function"
                 ?Number(getMonsterEffectiveSpiritPoints(targetMonster))||0
@@ -3120,7 +3123,10 @@
         // 隱身／結界是友方符術，不拿友軍閃避懲罰施放者；使用角色自身命中值。
         const accuracy=Number(stats.accuracy);
         if(Number.isFinite(accuracy)&&typeof rollHitChance==="function"){
-            return rollHitChance(accuracy,0,0);
+            const finalAccuracyBonus=typeof window.v173GetActiveAccuracyBonusPercent==="function"
+                ?window.v173GetActiveAccuracyBonusPercent(character)
+                :0;
+            return rollHitChance(accuracy,0,0,finalAccuracyBonus);
         }
         const intelligence=Number(stats.intelligence!==undefined?stats.intelligence:character.intelligence)||0;
         if(typeof rollStatusEffectHit==="function"){
@@ -6359,44 +6365,9 @@
     }
     window.v135GetSkillTargetScopeLabel=getSkillTargetScopeLabel;
 
-    /* --- 2a. 手動戰鬥的技能格：在技能名稱下面補一行作用對象 --- */
-    if(typeof populateSkillQuickBar==="function"){
-        const originalPopulateSkillQuickBar=populateSkillQuickBar;
-        populateSkillQuickBar=function(){
-            const result=originalPopulateSkillQuickBar.apply(this,arguments);
-
-            try{
-                const bar=document.getElementById("skillQuickBarGrid");
-                if(!bar){ return result; }
-
-                const characterId=getPartyCharacterKey(activeBattleCharacterIndex);
-                const loadout=characterSkillLoadouts[characterId];
-                if(!loadout){ return result; }
-
-                Array.from(bar.children).forEach((button,i)=>{
-                    const skillId=loadout.equippedSkills[i];
-                    const skill=skillId ? skillDatabase[skillId] : null;
-                    const label=getSkillTargetScopeLabel(skill);
-                    if(!label){ return; }
-                    if(button.querySelector(".v135-sq-scope")){ return; }
-
-                    const costEl=button.querySelector(".sq-cost");
-                    const scope=document.createElement("span");
-                    scope.className="v135-sq-scope";
-                    scope.textContent=label;
-                    if(costEl && costEl.parentElement){
-                        costEl.parentElement.insertBefore(scope,costEl);
-                    }else{
-                        button.appendChild(scope);
-                    }
-                });
-            }catch(error){
-                console.error("V135 技能格作用對象標示失敗：",error);
-            }
-
-            return result;
-        };
-    }
+    /* --- 2a. 手動戰鬥技能格已由 js/00-main.js Canonical Owner 直接
+       以 v135GetSkillTargetScopeLabel() 做 Diff Update，不再包裝
+       populateSkillQuickBar()。 */
 
     /* --- 2b. 自動戰鬥設定的技能下拉：選項文字後面補作用對象 --- */
     function decorateAutoSettingsSkillOptions(){
@@ -7219,20 +7190,6 @@
 (function applyV140FourElementBalance(){
     "use strict";
 
-    const GENERAL_STATUS_BOUNDS={min:5,max:95};
-    const LOCKDOWN_STATUS_BOUNDS={
-        regular:{min:5,max:80},
-        elite:{min:5,max:60},
-        boss:{min:5,max:40}
-    };
-    const LEVEL_FACTOR_PER_LEVEL=0.02;
-    const LEVEL_FACTOR_MIN=0.70;
-    const LEVEL_FACTOR_MAX=1.30;
-    const GENERAL_STATUS_COEFFICIENT=0.05;
-    const LOCKDOWN_STATUS_COEFFICIENT=0.2;
-    const GENERAL_STATUS_SPIRIT_COEFFICIENT=0.05;
-    const LOCKDOWN_STATUS_SPIRIT_COEFFICIENT=0.3;
-
     const LIFESTEAL_BY_SKILL={
         waterKnife:[4,5,6,7,8],
         frostPunch:[4,5,6,7,8],
@@ -7242,8 +7199,6 @@
         floodBeast:[4,5,6,7,8],
         iceArrowRain:[1,2,3,4,5]
     };
-
-    let statusSkillContext=null;
 
     function numeric(value){
         const result=Number(value);
@@ -7370,129 +7325,10 @@
     );
 
     /*
-       純計算入口同時供正式判定與回歸測試使用。
-       等級差、精神、額外抗性及既有上下限完整保留；
-       一般異常的物理攻擊／智力與目標精神統一使用0.05；
-       硬控仍維持開根號屬性加成與原本精神係數。
+       命中／異常機率公式已收斂回 js/00-main.js 唯一 Owner。
+       V140 只保留四元素資料與歷史相容行為，不再覆寫
+       calculateStatusEffectChance() 或 rollHitChance()。
     */
-    function calculateV140StatusChance(
-        baseChancePercent,
-        casterLevel,
-        targetLevel,
-        offensivePower,
-        targetSpirit,
-        isLockdown,
-        targetRank,
-        targetBonusResistancePercent,
-        skillCategory
-    ){
-        const levelFactor=clamp(
-            1+(numeric(casterLevel)-numeric(targetLevel))*LEVEL_FACTOR_PER_LEVEL,
-            LEVEL_FACTOR_MIN,
-            LEVEL_FACTOR_MAX
-        );
-
-        const power=Math.max(0,numeric(offensivePower));
-        const attributeBonus=isLockdown
-            ? Math.sqrt(power)*LOCKDOWN_STATUS_COEFFICIENT
-            : power*GENERAL_STATUS_COEFFICIENT;
-        const spiritCoefficient=isLockdown
-            ? LOCKDOWN_STATUS_SPIRIT_COEFFICIENT
-            : GENERAL_STATUS_SPIRIT_COEFFICIENT;
-
-        const rawChance=
-            numeric(baseChancePercent)*levelFactor+
-            attributeBonus-
-            Math.max(0,numeric(targetSpirit))*spiritCoefficient-
-            numeric(targetBonusResistancePercent);
-
-        const bounds=isLockdown
-            ? (LOCKDOWN_STATUS_BOUNDS[targetRank]||LOCKDOWN_STATUS_BOUNDS.regular)
-            : GENERAL_STATUS_BOUNDS;
-
-        return clamp(rawChance,bounds.min,bounds.max);
-    }
-
-    window.v140CalculateStatusEffectChance=calculateV140StatusChance;
-
-    const previousCalculateStatusEffectChance=calculateStatusEffectChance;
-    calculateStatusEffectChance=function(
-        baseChancePercent,
-        casterLevel,
-        targetLevel,
-        casterIntelligence,
-        targetSpirit,
-        isLockdown,
-        targetRank,
-        targetBonusResistancePercent
-    ){
-        const context=statusSkillContext;
-        const category=context&&context.skill
-            ? context.skill.category
-            : "magic";
-        const offensivePower=context&&context.skill
-            ? (category==="physical"
-                ? context.physicalAttack
-                : context.intelligence)
-            : casterIntelligence;
-
-        return calculateV140StatusChance(
-            baseChancePercent,
-            casterLevel,
-            targetLevel,
-            offensivePower,
-            targetSpirit,
-            isLockdown,
-            targetRank,
-            targetBonusResistancePercent,
-            category
-        );
-    };
-
-    /*
-       命中先依既有命中值算出基礎命中率，再套用正式閃躲率。
-       暈眩等「最終命中率降低」效果最後才直接扣除百分點；
-       閃躲來源本身已在角色能力端用乘算合併，最終上限85%。
-    */
-    function getV140HitChancePercent(
-        casterAccuracy,
-        targetEvasion,
-        directChanceReductionPercent
-    ){
-        const rawAccuracyChance=
-            95+
-            casterAccuracy*0.3;
-
-        const accuracyChance=clamp(
-            rawAccuracyChance,
-            50,
-            99
-        );
-        const evasionRate=clamp(targetEvasion,0,85);
-        const evasionAdjustedChance=
-            accuracyChance*(1-evasionRate/100);
-
-        return clamp(
-            evasionAdjustedChance-
-            Math.max(0,numeric(directChanceReductionPercent)),
-            1,
-            99
-        );
-    }
-
-    window.v140GetHitChancePercent=getV140HitChancePercent;
-
-    rollHitChance=function(
-        casterAccuracy,
-        targetEvasion,
-        directChanceReductionPercent
-    ){
-        return Math.random()*100<getV140HitChancePercent(
-            casterAccuracy,
-            targetEvasion,
-            directChanceReductionPercent
-        );
-    };
 
     /*
        怒火改為兩組獨立數值。舊函式一次只讀 bonusPercent，
@@ -7894,14 +7730,12 @@
             return execute();
         }
 
-        const previousContext=statusSkillContext;
         const context={
             skill:skill,
             physicalAttack:numeric(stats.attack),
             intelligence:numeric(stats.intelligence),
             spAfterCost:null
         };
-        statusSkillContext=context;
 
         const isLifesteal=Array.isArray(skill.lifestealPercentByLevel);
         const previousLog=typeof addBattleLog==="function"?addBattleLog:null;
@@ -7934,8 +7768,6 @@
             if(isLifesteal&&previousLog){
                 addBattleLog=previousLog;
             }
-            statusSkillContext=previousContext;
-
             if(
                 isLifesteal&&
                 context.spAfterCost!==null&&
@@ -8040,7 +7872,6 @@
             return previousProcessSingleMonsterAttack.apply(this,arguments);
         }
 
-        const previousContext=statusSkillContext;
         const previousBarrierContext=directBarrierCastContext;
         directBarrierCastContext={blockedCharacters:new Set()};
         const context={
@@ -8049,7 +7880,6 @@
             intelligence:getMonsterIntelligence(monster),
             spAfterCost:null
         };
-        statusSkillContext=context;
 
         const previousBadge=typeof showMonsterSkillNameBadge==="function"
             ? showMonsterSkillNameBadge
@@ -8091,7 +7921,6 @@
             if(previousBadge){ showMonsterSkillNameBadge=previousBadge; }
             if(previousLog){ addBattleLog=previousLog; }
             hasActiveBuff=previousHasActiveBuff;
-            statusSkillContext=previousContext;
             directBarrierCastContext=previousBarrierContext;
 
             if(
@@ -8222,8 +8051,8 @@
         }));
     };
 
-    /* 保留舊函式參照供除錯；正式流程已由上方覆蓋。 */
-    window.v140PreviousCalculateStatusEffectChance=previousCalculateStatusEffectChance;
+    /* Hit / Status formulas are owned by js/00-main.js.
+       V140 deliberately exports no previous/alternate formula reference. */
 })();
 
 
@@ -9504,44 +9333,41 @@
         return true;
     }
 
-    if(typeof updateMonsterUI==="function"){
-        const originalUpdateMonsterUI=updateMonsterUI;
-        updateMonsterUI=function(index){
-            if(typeof window.v141SyncMonsterShield==="function"){
-                window.v141SyncMonsterShield(monsters[index]);
-            }
-            const result=originalUpdateMonsterUI.apply(this,arguments);
-            const monster=monsters[index];
-            if(monster){
-                const normalBar=document.getElementById("battleMonsterBar"+index);
-                const shieldBar=document.getElementById("battleMonsterShieldBar"+index);
-                const hpText=document.getElementById("battleMonsterHPText"+index);
-                const shield=monster.v141Shield;
-                const remaining=shield?Math.max(0,Number(shield.remaining)||0):0;
-                if(shield&&remaining>0){
-                    const baseMax=shield.baseMaxHP;
-                    const baseHp=Math.max(0,monster.hp-remaining);
-                    const visibleShield=shield.isBarrier?baseMax:remaining;
-                    const total=Math.max(1,baseMax+visibleShield);
-                    if(normalBar){ normalBar.style.width=(baseHp/total*100)+"%"; }
-                    if(shieldBar){
-                        shieldBar.style.left=(baseHp/total*100)+"%";
-                        shieldBar.style.width=(visibleShield/total*100)+"%";
-                    }
-                    if(hpText){
-                        hpText.textContent=shield.isBarrier
-                            ?Math.floor(baseHp)+"/"+baseMax+"　結界"
-                            :Math.floor(baseHp)+"/"+baseMax+" +"+Math.floor(remaining);
-                    }
-                }else if(shieldBar){
-                    shieldBar.style.left="0";
-                    shieldBar.style.width="0";
-                }
-            }
-            return result;
-        };
+    function v141BeforeMonsterUiUpdate(index,monster){
+        if(typeof window.v141SyncMonsterShield==="function"&&monster){
+            window.v141SyncMonsterShield(monster);
+        }
     }
 
+    function v141AfterMonsterUiUpdate(index,monster){
+        if(!monster){ return; }
+        const normalBar=document.getElementById("battleMonsterBar"+index);
+        const shieldBar=document.getElementById("battleMonsterShieldBar"+index);
+        const hpText=document.getElementById("battleMonsterHPText"+index);
+        const shield=monster.v141Shield;
+        const remaining=shield?Math.max(0,Number(shield.remaining)||0):0;
+        if(shield&&remaining>0){
+            const baseMax=shield.baseMaxHP;
+            const baseHp=Math.max(0,monster.hp-remaining);
+            const visibleShield=shield.isBarrier?baseMax:remaining;
+            const total=Math.max(1,baseMax+visibleShield);
+            if(normalBar){ normalBar.style.width=(baseHp/total*100)+"%"; }
+            if(shieldBar){
+                shieldBar.style.left=(baseHp/total*100)+"%";
+                shieldBar.style.width=(visibleShield/total*100)+"%";
+            }
+            if(hpText){
+                hpText.textContent=shield.isBarrier
+                    ?Math.floor(baseHp)+"/"+baseMax+"　結界"
+                    :Math.floor(baseHp)+"/"+baseMax+" +"+Math.floor(remaining);
+            }
+        }else if(shieldBar){
+            shieldBar.style.left="0";
+            shieldBar.style.width="0";
+        }
+    }
+    window.v141BeforeMonsterUiUpdate=v141BeforeMonsterUiUpdate;
+    window.v141AfterMonsterUiUpdate=v141AfterMonsterUiUpdate;
 
     if(typeof resolveQueuedPlayerAction==="function"){
         const originalResolveQueuedPlayerAction=resolveQueuedPlayerAction;
@@ -10298,20 +10124,7 @@
             }
             if(page==="map"){
                 installPatrolClickMovement();
-                installTaskTracker();
-                renderTaskTracker();
-                requestAnimationFrame(clampTaskTracker);
             }
-            updateNotificationDots();
-            return result;
-        };
-    }
-
-    if(typeof updateUI==="function"){
-        const originalUpdateUI=updateUI;
-        updateUI=function(){
-            const result=originalUpdateUI.apply(this,arguments);
-            renderTaskTracker();
             updateNotificationDots();
             return result;
         };
@@ -11141,13 +10954,14 @@
         return Math.max(1,Number(shield&&shield.baseMaxHP)||Number(monster&&monster.maxHP)||1);
     }
 
-    function getMonsterAllyTriTargets(casterIndex,entries){
+    function getMonsterAllyTriTargeting(casterIndex,entries){
         const living=(entries||currentBattleMonsters.map(index=>({index:index,monster:monsters[index]})))
             .filter(entry=>entry&&entry.monster&&entry.monster.alive!==false&&Number(entry.monster.hp)>0);
         const livingByIndex=new Map(living.map(entry=>[entry.index,entry]));
         const owner=window.FourSymbolsBattlefieldSlots||null;
         const snapshot=owner&&typeof owner.getActiveEnemySnapshot==="function"?owner.getActiveEnemySnapshot():null;
         let best=[];
+        let bestPrimary=null;
         let bestScore=-1;
         living.forEach(centerEntry=>{
             const center=centerEntry.index;
@@ -11162,13 +10976,28 @@
                 const spNeed=(maxSP-Math.max(0,Number(ally.sp)||0))/maxSP;
                 return sum+Math.max(0,hpNeed)+Math.max(0,spNeed);
             },0)+(trio.some(entry=>entry.index===casterIndex)?0.0001:0);
-            if(score>bestScore){ best=trio; bestScore=score; }
+            if(score>bestScore){ best=trio; bestPrimary=center; bestScore=score; }
         });
-        return best.slice(0,3);
+        return {entries:best.slice(0,3),primaryIndex:Number.isInteger(bestPrimary)?bestPrimary:(best[0]?best[0].index:null)};
     }
+    function getMonsterAllyTriTargets(casterIndex,entries){
+        return getMonsterAllyTriTargeting(casterIndex,entries).entries;
+    }
+    function getMonsterSupportTargeting(skill,casterIndex,entries){
+        const targetType=String(skill&&skill.targetType||"allyAll");
+        if(targetType==="allyTri"){ return getMonsterAllyTriTargeting(casterIndex,entries); }
+        const living=(entries||[]).filter(entry=>entry&&entry.monster&&entry.monster.alive!==false&&Number(entry.monster.hp)>0);
+        if(targetType==="ally"){
+            const self=living.find(entry=>entry.index===casterIndex)||living[0]||null;
+            return {entries:self?[self]:[],primaryIndex:self?self.index:null};
+        }
+        return {entries:living,primaryIndex:null};
+    }
+    window.v141GetMonsterAllyTriTargeting=getMonsterAllyTriTargeting;
     window.v141GetMonsterAllyTriTargets=getMonsterAllyTriTargets;
 
-    function applyTimedMonsterBuff(monstersToBuff,type,turns,amount){
+    function applyTimedMonsterBuff(monstersToBuff,type,turns,amount,options){
+        const opts=options&&typeof options==="object"?options:{};
         monstersToBuff.forEach(monster=>{
             if(!monster||!monster.alive){ return; }
             const monsterIndex=typeof monsters!=="undefined"?monsters.indexOf(monster):-1;
@@ -11188,13 +11017,13 @@
                 buff.critChanceBonusPercent=25;
                 buff.critDamageBonusPercent=50;
             }else if(type==="resistance"){
-                buff.accuracyBonusPercent=50;
+                buff.accuracyBonusPercent=Math.max(0,Number(opts.accuracyBonusPercent)||0);
                 monster.resistance=(Number(monster.resistance)||0)+amount;
             }else if(type==="dodge"){
                 buff.originalEvasion=monster.evasion;
                 monster.evasion=typeof window.v173CombineEvasionRates==="function"
                     ?window.v173CombineEvasionRates([buff.originalEvasion,amount])
-                    :Math.min(85,Number(monster.evasion)||0);
+                    :Math.min(85,(Number(buff.originalEvasion)||0)+(Number(amount)||0));
             }
             const displayBuff={
                 type:type==="rage"?"rage":"v141TeamBuff",
@@ -11233,12 +11062,14 @@
             &&skillDatabase[forcedSupportSkillId]?forcedSupportSkillId:null;
         let target=null;
         let healTargets=[];
+        let supportTargeting=null;
         const allAlliesNeedHealing=allyEntries.some(entry=>
             monsterBaseHp(entry.monster)<monsterBaseMaxHp(entry.monster)*.70
         );
         const healSkill=skillDatabase.healSpell;
         if(!skillId&&supportIds.includes("healSpell")&&allAlliesNeedHealing&&healSkill&&monster.sp>=(healSkill.spCost||0)){
-            healTargets=getMonsterAllyTriTargets(monsterIndex,allyEntries);
+            supportTargeting=getMonsterAllyTriTargeting(monsterIndex,allyEntries);
+            healTargets=supportTargeting.entries;
             if(healTargets.length){ skillId="healSpell"; }
         }
         const affordableAttacks=(monster.skillIds||[]).filter(id=>{
@@ -11276,45 +11107,67 @@
         }
         const skill=skillDatabase[skillId];
         if(monster.sp<(skill.spCost||0)){ return false; }
+        if(!supportTargeting){
+            if(skillId==="barrier"&&target){
+                const entry=allyEntries.find(item=>item.monster===target)||null;
+                supportTargeting={entries:entry?[entry]:[],primaryIndex:entry?entry.index:null};
+            }else{
+                supportTargeting=getMonsterSupportTargeting(skill,monsterIndex,allyEntries);
+            }
+        }
+        const supportTargetIds=(supportTargeting.entries||[]).map(entry=>entry.index);
         monster.sp-=skill.spCost||0;
-        showMonsterSkillNameBadge(skill.name,skill.element||monster.element,monsterIndex);
+        showMonsterSkillNameBadge(skill.name,skill.element||monster.element,monsterIndex,supportTargeting.primaryIndex,supportTargetIds,"monster",skill.targetType);
+        const level=Math.max(1,Math.min(
+            Number(skill.maxLevel)||1,
+            Number(monster.v141ForceSkillLevel||monster.v141SkillLevel)||1
+        ));
+        const levelValue=(values,fallback)=>{
+            if(!Array.isArray(values)||!values.length){ return Number(fallback)||0; }
+            return Number(values[Math.max(0,Math.min(values.length-1,level-1))])||0;
+        };
         if(skillId==="healSpell"){
-            const level=Math.max(1,Math.min(Number(skill.maxLevel)||1,Number(monster.v141ForceSkillLevel||monster.v141SkillLevel)||1));
-            const hpAmount=(Number(skill.baseHeal)||0)+(Number(skill.healPerLevel)||0)*(level-1);
-            const spAmount=(Number(skill.baseHealSP)||0)+(Number(skill.healSPPerLevel)||0)*(level-1);
+            const hpAmount=levelValue(
+                skill.healHpByLevel,
+                (Number(skill.baseHeal)||0)+(Number(skill.healPerLevel)||0)*(level-1)
+            );
+            const spPercent=levelValue(skill.spRestorePercentByLevel,0);
             let hpTotal=0;
             let spTotal=0;
-            let cleansedTotal=0;
             healTargets.forEach(entry=>{
                 const ally=entry.monster;
                 const healed=window.v141HealMonsterPreservingShield(ally,hpAmount);
                 const beforeSP=Math.max(0,Number(ally.sp)||0);
+                const spAmount=entry.index===monsterIndex
+                    ?0
+                    :Math.floor(Math.max(0,Number(ally.maxSP)||0)*spPercent/100);
                 ally.sp=Math.min(Math.max(beforeSP,Number(ally.maxSP)||0),beforeSP+spAmount);
                 const restoredSP=ally.sp-beforeSP;
-                if(skill.cleanseAll&&Array.isArray(ally.statusEffects)){
-                    cleansedTotal+=ally.statusEffects.length;
-                    ally.statusEffects=[];
-                }
                 hpTotal+=healed;
                 spTotal+=restoredSP;
                 if(healed>0&&typeof showMonsterHit==="function"){ showMonsterHit(entry.index,healed,"heal"); }
                 if(typeof window.v141PlayCardEffect==="function"){ window.v141PlayCardEffect("monster",entry.index,"heal"); }
             });
-            addBattleLog(monster.name+"施放治療術，為同排最多"+healTargets.length+"名友方共回復"+
-                hpTotal+" HP、"+spTotal+" SP"+(skill.cleanseAll?"，並解除"+cleansedTotal+"個負面狀態":"")+"。");
+            addBattleLog(monster.name+"施放治療術，為同排最多"+healTargets.length+"名友方共回復"+hpTotal+" HP、"+spTotal+" SP。");
         }else if(skillId==="barrier"){
-            window.v141ApplyMonsterShield(target,999999,4);
+            const duration=Math.max(1,Math.floor(levelValue(skill.durationByLevel,skill.duration||3)));
+            const blocks=Math.max(1,Math.floor(levelValue(skill.barrierBlockCountByLevel,skill.barrierBlockCount||3)));
+            window.v141ApplyMonsterShield(target,999999,duration,blocks);
             target.v141Shield.isBarrier=true;
-            addBattleLog(monster.name+"為"+target.name+"施放結界，完全防護4回合。");
+            addBattleLog(monster.name+"為"+target.name+"施放結界，可抵擋"+blocks+"次直接傷害，最多持續"+duration+"回合。");
         }else if(skillId==="rage"){
-            applyTimedMonsterBuff(allies,"rage",3,0);
+            applyTimedMonsterBuff((supportTargeting.entries||[]).map(entry=>entry.monster),"rage",3,0);
             addBattleLog(monster.name+"施放怒火，敵方全體爆擊率與爆擊傷害提升3回合。");
         }else if(skillId==="dinghaishenzhen"){
-            applyTimedMonsterBuff(allies,"resistance",3,65);
-            addBattleLog(monster.name+"施放氣定神閒，敵方全體抗性提升3回合。");
+            const resist=levelValue(skill.statusResistBonusByLevel,skill.statusResistBonus||0);
+            const accuracy=levelValue(skill.accuracyBonusPercentByLevel,skill.accuracyBonusPercent||0);
+            applyTimedMonsterBuff((supportTargeting.entries||[]).map(entry=>entry.monster),"resistance",3,resist,{accuracyBonusPercent:accuracy});
+            addBattleLog(monster.name+"施放氣定神閒，敵方全體異常抗性提升"+resist+"%、命中提升"+accuracy+"%，持續3回合。");
         }else if(skillId==="dodgeSkill"){
-            applyTimedMonsterBuff(allies,"dodge",3,75);
-            addBattleLog(monster.name+"施放閃躲術，敵方全體閃躲提升3回合。");
+            const evasion=levelValue(skill.evasionBonusPercentByLevel,skill.evasionBonusPercent||0);
+            const dodgeTargets=(supportTargeting.entries||[]).map(entry=>entry.monster);
+            applyTimedMonsterBuff(dodgeTargets,"dodge",3,evasion);
+            addBattleLog(monster.name+"施放閃躲術，同排最多"+dodgeTargets.length+"名友方最終閃躲提升"+evasion+"個百分點，持續3回合。");
         }
         updateUI(); finishPlayerAction();
         return true;
@@ -12454,18 +12307,13 @@
         }
     }
     window.v143AfterBattleRender=v143AfterBattleRender;
-    if(typeof updateMonsterUI==="function"){
-        const previousUpdateMonsterUI=updateMonsterUI;
-        updateMonsterUI=function(index){
-            const result=previousUpdateMonsterUI.apply(this,arguments);
-            decorateEnemyCard(index);
-            syncEarthShieldEffects();
-            syncMonsterBarrierText(index);
-            const card=document.getElementById("battleMonster"+index);
-            if(card){ fitEnemyBars(card); }
-            return result;
-        };
+    function v143SystemAfterMonsterUiUpdate(index){
+        decorateEnemyCard(index);
+        syncMonsterBarrierText(index);
+        const card=document.getElementById("battleMonster"+index);
+        if(card){ fitEnemyBars(card); }
     }
+    window.v143SystemAfterMonsterUiUpdate=v143SystemAfterMonsterUiUpdate;
 
     /* ----- 7. Wanxiang Earth Shield owns a four-corner elemental frame. ----- */
     function hasActiveBuffType(entity,type){
@@ -12490,7 +12338,7 @@
     }
     window.v143SyncEarthShieldEffects=syncEarthShieldEffects;
 
-    /* ----- 10. Both sides use five direct blocks / five rounds for Barrier. ----- */
+    /* ----- 10. Barrier blocks direct damage only; count/duration come from the formal skill level. ----- */
     function isMonsterBarrier(monster){
         return !!(monster&&monster.v141Shield&&monster.v141Shield.isBarrier);
     }
@@ -12506,7 +12354,7 @@
 
     if(typeof window.v141ApplyMonsterShield==="function"){
         const previousApplyMonsterShield=window.v141ApplyMonsterShield;
-        window.v141ApplyMonsterShield=function(monster,amount,turns){
+        window.v141ApplyMonsterShield=function(monster,amount,turns,barrierBlocks){
             const barrier=numeric(amount)>=999999;
             const stateType=barrier?"barrier":"shield";
             const monsterIndex=typeof monsters!=="undefined"?monsters.indexOf(monster):-1;
@@ -12519,12 +12367,14 @@
             ){
                 return 0;
             }
-            const result=previousApplyMonsterShield.call(this,monster,barrier?1:amount,barrier?5:turns);
+            const resolvedTurns=barrier?Math.max(1,Math.floor(numeric(turns)||3)):turns;
+            const resolvedBlocks=barrier?Math.max(1,Math.floor(numeric(barrierBlocks)||3)):0;
+            const result=previousApplyMonsterShield.call(this,monster,barrier?1:amount,resolvedTurns);
             if(monster&&monster.v141Shield){
                 if(barrier){
                     monster.v141Shield.isBarrier=true;
-                    monster.v141Shield.turnsLeft=5;
-                    monster.v141Shield.remainingBlocks=5;
+                    monster.v141Shield.turnsLeft=resolvedTurns;
+                    monster.v141Shield.remainingBlocks=resolvedBlocks;
                     monster.v141Shield.barrierRule="shared";
                 }
                 if(typeof window.v173MarkPersistentStateName==="function"){
@@ -12604,7 +12454,7 @@
                 if(directPlayerBarrierContext){
                     directPlayerBarrierContext.blocked.set(monster,shield);
                 }
-                shield.remainingBlocks=Math.max(0,(numeric(shield.remainingBlocks)||5)-1);
+                shield.remainingBlocks=Math.max(0,(numeric(shield.remainingBlocks)||3)-1);
                 const card=document.getElementById("battleMonster"+index);
                 if(card&&typeof showDamagePopup==="function"){ showDamagePopup(card,"格擋 "+shield.remainingBlocks,"shield"); }
                 if(typeof window.v141PlayCardEffect==="function"){ window.v141PlayCardEffect("monster",index,"barrier"); }
@@ -12625,7 +12475,7 @@
         const monster=typeof monsters!=="undefined"?monsters[index]:null;
         if(!isMonsterBarrier(monster)){ return; }
         const shield=monster.v141Shield;
-        if(!Number.isFinite(Number(shield.remainingBlocks))){ shield.remainingBlocks=5; }
+        if(!Number.isFinite(Number(shield.remainingBlocks))){ shield.remainingBlocks=3; }
         const text=document.getElementById("battleMonsterHPText"+index);
         if(text){ text.textContent=Math.floor(numeric(shield.baseHp))+"/"+Math.floor(numeric(shield.baseMaxHP))+" 結界"+shield.remainingBlocks; }
     }
@@ -12637,7 +12487,7 @@
             if(previousLog){
                 addBattleLog=function(message){
                     const args=Array.prototype.slice.call(arguments);
-                    args[0]=String(message).replace("完全防護4回合","抵擋5次直接傷害，最多5回合");
+                    args[0]=String(message);
                     return previousLog.apply(this,args);
                 };
             }
@@ -12929,17 +12779,6 @@
         }
     }
 
-    if(typeof MutationObserver!=="undefined"){
-        const observer=new MutationObserver(()=>{
-            if(document.querySelector(".v141-synthesis")&&!document.querySelector(".v141-synthesis.v143-synthesis")){
-                requestAnimationFrame(decorateSynthesis);
-            }
-        });
-        const startObserver=()=>observer.observe(document.body,{childList:true,subtree:true});
-        if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",startObserver,{once:true}); }
-        else{ startObserver(); }
-    }
-
     if(typeof window.v141RenderSynthesis==="function"){
         const previousRenderSynthesis=window.v141RenderSynthesis;
         window.v141RenderSynthesis=function(){
@@ -12959,15 +12798,6 @@
             return result;
         };
     }
-    if(typeof updateUI==="function"){
-        const previousUpdateUI=updateUI;
-        updateUI=function(){
-            const result=previousUpdateUI.apply(this,arguments);
-            decorateEnemyCards(); syncEarthShieldEffects();
-            return result;
-        };
-    }
-
     function boot(){
         fixDungeonNavigation();
         decorateEnemyCards();
@@ -13022,11 +12852,19 @@
         },options||{});
     }
 
+    const STATUS_VISUAL_LAYERS=Object.freeze({
+        HARD_CONTROL_BASE:"hard-control-base",
+        ROTATING:"rotating",
+        HUD:"hud"
+    });
+
     function statusVisual(src,mode,collection,options){
+        const resolvedMode=mode||"static";
         return Object.assign({
             src:src||"",
-            mode:mode||"static",
+            mode:resolvedMode,
             collection:collection||"statusEffects",
+            visualLayer:resolvedMode==="icon"?STATUS_VISUAL_LAYERS.HUD:STATUS_VISUAL_LAYERS.ROTATING,
             cropColumns:1,
             cropRows:1,
             renderer:"dom-status-visual"
@@ -13141,7 +12979,7 @@
         burn:statusVisual("assets/vfx/status/burn.webp","pulse","statusEffects",{label:"燃燒",statusName:"燃燒",iconSrc:"assets/vfx/status/burn.webp"}),
         rage:statusVisual("assets/vfx/status/rage.webp","pulse","activeBuffs",{label:"怒火",statusName:"怒火",iconSrc:"assets/vfx/status/rage-icon.webp"}),
         frostbite:statusVisual("","icon","statusEffects",{label:"凍傷",statusName:"凍傷",iconSrc:"assets/vfx/status/frostbite-icon.webp"}),
-        freeze:statusVisual("assets/vfx/status/freeze.webp","static","statusEffects",{label:"冰封",statusName:"冰封",iconSrc:"assets/vfx/status/freeze.webp"}),
+        freeze:statusVisual("assets/vfx/status/freeze.webp","static","statusEffects",{label:"冰封",statusName:"冰封",iconSrc:"assets/vfx/status/freeze.webp",visualLayer:STATUS_VISUAL_LAYERS.HARD_CONTROL_BASE}),
         agilityDown:statusVisual("","icon","statusEffects",{label:"重力",statusName:"重力",iconSrc:"assets/vfx/status/gravity-icon.webp"}),
         damageDown:statusVisual("","icon","statusEffects",{label:"殤風",statusName:"殤風",iconSrc:"assets/vfx/status/damage-down-icon.webp"}),
         stun:statusVisual("assets/vfx/status/stun.webp","pulse","statusEffects",{label:"暈眩",statusName:"暈眩",iconSrc:"assets/vfx/status/stun-icon.webp"}),
@@ -13150,7 +12988,7 @@
         dinghaishenzhen:statusVisual("assets/vfx/status/calm-mind.webp","pulse","activeBuffs",{label:"氣定神閒",statusName:"氣定神閒",iconSrc:"assets/vfx/status/calm-mind.webp"}),
         defenseDown:statusVisual("","icon","statusEffects",{label:"破防",statusName:"破防",iconSrc:"assets/vfx/status/defense-down-icon.webp"}),
         shield:statusVisual("assets/vfx/status/shield.webp","static","activeBuffs",{label:"護盾",statusName:"岩盾",iconSrc:"assets/vfx/status/shield.webp"}),
-        petrify:statusVisual("assets/vfx/status/petrify.webp","static","statusEffects",{label:"石化",statusName:"石化",iconSrc:"assets/vfx/status/petrify.webp"}),
+        petrify:statusVisual("assets/vfx/status/petrify.webp","static","statusEffects",{label:"石化",statusName:"石化",iconSrc:"assets/vfx/status/petrify.webp",visualLayer:STATUS_VISUAL_LAYERS.HARD_CONTROL_BASE}),
         earthShield:statusVisual("assets/vfx/status/earth-shield.webp","static","activeBuffs",{label:"萬象土盾",statusName:"萬象土盾",iconSrc:"assets/vfx/status/earth-shield.webp"}),
         rockWall:statusVisual("assets/vfx/status/rock-wall.webp","static","activeBuffs",{label:"岩石壁壘",statusName:"岩石壁壘",iconSrc:"assets/vfx/status/rock-wall.webp"}),
         barrier:statusVisual("assets/vfx/status/barrier.webp","static","activeBuffs",{label:"結界",statusName:"結界",iconSrc:"assets/vfx/status/barrier.webp"}),
@@ -13394,7 +13232,7 @@
         const owner=geometryOwner();
         if(!owner||!current){ return null; }
         const seed=geometrySeedIndexes(current,indexes);
-        const targetType=String(current.config&&current.config.targetType||"single");
+        const targetType=String(current.targetType||current.config&&current.config.targetType||"single");
         if(placement==="battlefield"||targetType==="all"||targetType==="allyAll"){
             const rect=typeof owner.getSideRect==="function"?owner.getSideRect(current.targetSide):null;
             if(rect){ rect.id=current.targetSide==="monster"?"fixed-enemy-zone":"fixed-ally-zone"; }
@@ -13425,9 +13263,9 @@
         return rect;
     }
 
-    function placementFor(config,sprite){
+    function placementFor(config,sprite,targetTypeOverride){
         const authored=String(sprite&&sprite.placement||"single");
-        const targetType=String(config&&config.targetType||"single");
+        const targetType=String(targetTypeOverride||config&&config.targetType||"single");
         if(/^(all|enemyAll|allyAll)$/i.test(targetType)){ return "battlefield"; }
         if(/^(tri|allyTri|row|column|horizontal-3)$/i.test(targetType)){
             return authored==="trajectory"?"trajectory":"group";
@@ -13543,9 +13381,12 @@
 
     function createBodyStatusVisual(type,spec){
         const node=document.createElement("i");
-        node.className="v143-status-visual v143-status-visual-"+type+" v143-status-visual--"+spec.mode;
+        node.className="v143-status-visual v143-status-visual-"+type+
+            " v143-status-visual--"+spec.mode+
+            " v143-status-visual--layer-"+spec.visualLayer;
         node.dataset.statusType=type;
         node.dataset.statusMode=spec.mode;
+        node.dataset.statusLayer=spec.visualLayer;
         node.dataset.renderer="dom-status-visual";
         if(typeof node.setAttribute==="function"){ node.setAttribute("aria-hidden","true"); }
         node.style.backgroundImage='url("'+String(spec.src).replace(/"/g,"%22")+'")';
@@ -13556,9 +13397,10 @@
 
     function createStatusIcon(type,spec){
         const node=document.createElement("i");
-        node.className="v143-status-icon v143-status-icon-"+type;
+        node.className="v143-status-icon v143-status-icon-"+type+" v143-status-icon--layer-hud";
         node.dataset.statusType=type;
         node.dataset.statusMode="icon";
+        node.dataset.statusLayer=STATUS_VISUAL_LAYERS.HUD;
         node.dataset.renderer="dom-status-icon";
         const source=String(spec.iconSrc||spec.src||"");
         if(source){
@@ -13575,6 +13417,7 @@
     const STATUS_ROTATION_MS=2000;
     let statusRotationTimer=null;
     const statusRotationByUnit=new Map();
+    const hardControlContractViolationByUnit=new Map();
 
     function syncStatusVisual(side,index,type,showBody){
         const spec=STATUS_VISUALS[type];
@@ -13612,45 +13455,83 @@
         if(!anchor){ return; }
         const cardRect=typeof card.getBoundingClientRect==="function"?card.getBoundingClientRect():anchor.rect;
         const regularEnemy=side==="monster"&&!isBossIndexForVfx(index);
+        const shellStatus=type==="shield"||type==="barrier"||type==="earthShield"||type==="rockWall";
+        const widthScale=(regularEnemy?1.45:1.40)*(shellStatus?1.08:1);
+        const heightScale=(regularEnemy?1.36:1.34)*(shellStatus?1.08:1);
         const width=regularEnemy
-            ?Math.max(60,Math.min(anchor.rect.width*1.20,cardRect.width*1.20))
-            :Math.max(44,Math.min(anchor.rect.width*1.16,cardRect.width*1.16));
+            ?Math.max(72,Math.min(anchor.rect.width*widthScale,cardRect.width*widthScale))
+            :Math.max(62,Math.min(anchor.rect.width*widthScale,cardRect.width*widthScale));
         const height=regularEnemy
-            ?Math.max(58,Math.min(anchor.rect.height*1.16,cardRect.height*1.16))
-            :Math.max(52,Math.min(anchor.rect.height*1.14,cardRect.height*1.14));
+            ?Math.max(68,Math.min(anchor.rect.height*heightScale,cardRect.height*heightScale))
+            :Math.max(64,Math.min(anchor.rect.height*heightScale,cardRect.height*heightScale));
         node.dataset.slot=anchor.slot;
         node.style.width=Math.round(width)+"px";
         node.style.height=Math.round(height)+"px";
     }
 
-    function syncStatusVisualsForUnit(side,index,advanceRotation){
-        const entity=entityFor(side,index);
-        const bodyTypes=entity?Object.keys(RAW_STATUS_VISUALS).filter(type=>{
+    function activeBodyStatusTypesForLayer(entity,side,index,visualLayer){
+        if(!entity){ return []; }
+        return Object.keys(RAW_STATUS_VISUALS).filter(type=>{
             const spec=RAW_STATUS_VISUALS[type];
             return !!(
                 spec&&spec.mode!=="icon"&&spec.src&&
+                spec.visualLayer===visualLayer&&
                 hasTimedEffect(entity,type)&&
                 !deferredStatusDuringCast(side,index,type)
             );
-        }):[];
+        });
+    }
+
+    function reportHardControlVisualContractViolation(side,index,types){
+        const key=side+":"+index;
+        const signature=types.join("|");
+        if(types.length<=1){
+            hardControlContractViolationByUnit.delete(key);
+            return;
+        }
+        if(hardControlContractViolationByUnit.get(key)===signature){ return; }
+        hardControlContractViolationByUnit.set(key,signature);
+        if(typeof console!=="undefined"&&typeof console.error==="function"){
+            console.error(
+                "[FourSymbols] Hard Control contract violation: Freeze and Petrify coexist.",
+                {side:side,index:index,statusTypes:types.slice()}
+            );
+        }
+    }
+
+    function syncStatusVisualsForUnit(side,index,advanceRotation){
+        const entity=entityFor(side,index);
+        const baseBodyTypes=activeBodyStatusTypesForLayer(
+            entity,side,index,STATUS_VISUAL_LAYERS.HARD_CONTROL_BASE
+        );
+        const rotatingBodyTypes=activeBodyStatusTypesForLayer(
+            entity,side,index,STATUS_VISUAL_LAYERS.ROTATING
+        );
+        reportHardControlVisualContractViolation(side,index,baseBodyTypes);
+
         const rotationKey=side+":"+index;
-        const signature=bodyTypes.join("|");
+        const signature=rotatingBodyTypes.join("|");
         let rotation=statusRotationByUnit.get(rotationKey);
-        if(!bodyTypes.length){
+        if(!rotatingBodyTypes.length){
             statusRotationByUnit.delete(rotationKey);
             rotation=null;
         }else if(!rotation||rotation.signature!==signature){
             rotation={signature:signature,index:0};
             statusRotationByUnit.set(rotationKey,rotation);
-        }else if(advanceRotation===true&&bodyTypes.length>1){
-            rotation.index=(rotation.index+1)%bodyTypes.length;
+        }else if(advanceRotation===true&&rotatingBodyTypes.length>1){
+            rotation.index=(rotation.index+1)%rotatingBodyTypes.length;
         }
-        const activeBodyType=rotation&&bodyTypes.length
-            ?bodyTypes[rotation.index%bodyTypes.length]
+        const activeRotatingBodyType=rotation&&rotatingBodyTypes.length
+            ?rotatingBodyTypes[rotation.index%rotatingBodyTypes.length]
             :null;
-        Object.keys(RAW_STATUS_VISUALS).forEach(type=>
-            syncStatusVisual(side,index,type,type===activeBodyType)
-        );
+
+        Object.keys(RAW_STATUS_VISUALS).forEach(type=>{
+            const spec=RAW_STATUS_VISUALS[type];
+            const showBody=spec&&spec.visualLayer===STATUS_VISUAL_LAYERS.HARD_CONTROL_BASE
+                ?baseBodyTypes.includes(type)
+                :type===activeRotatingBodyType;
+            syncStatusVisual(side,index,type,showBody);
+        });
     }
 
     function syncStatusVisualEffects(advanceRotation){
@@ -13666,8 +13547,10 @@
             document.querySelectorAll(selector).forEach(node=>node.remove())
         );
         statusRotationByUnit.clear();
+        hardControlContractViolationByUnit.clear();
     }
     window.v143SyncStatusVisualEffects=syncStatusVisualEffects;
+    window.v143StatusVisualLayers=STATUS_VISUAL_LAYERS;
 
     function ensureStatusRotationTimer(){
         if(statusRotationTimer||typeof window==="undefined"||typeof window.setInterval!=="function"){ return; }
@@ -13709,15 +13592,15 @@
             const damage=statusPercent(entry,"critDamageBonusPercent","bonusPercent");
             return "爆擊率 +"+chance+"%，爆擊傷害 +"+damage+"%";
         }
-        if(type==="frostbite"){ return "無法使用技能"; }
+        if(type==="frostbite"){ return "傷害 -25%、最終閃躲 -25個百分點、最終異常狀態抗性 -25個百分點"; }
         if(type==="freeze"){ return "無法行動"; }
-        if(type==="agilityDown"){ return "敏捷降低 "+value+"%"; }
+        if(type==="agilityDown"){ return "敏捷降低 "+value+"%、最終閃躲降低 "+value+"個百分點"; }
         if(type==="damageDown"){ return "造成傷害降低 "+value+"%"; }
-        if(type==="stun"){ return "最終命中率降低 "+value+"%"; }
+        if(type==="stun"){ return "最終命中率降低 "+value+"個百分點"; }
         if(type==="dodgeSkill"){
             const percent=statusPercent(entry,"percent","bonusPercent")||
                 Number(typeof skillDatabase!=="undefined"&&skillDatabase.dodgeSkill&&skillDatabase.dodgeSkill.evasionBonusPercent)||0;
-            return "閃躲率提升 "+percent+"%";
+            return "最終閃躲提升 "+percent+"個百分點";
         }
         if(type==="stealthSkill"){ return "無法被單體技能選中，仍會受到範圍技能"; }
         if(type==="dinghaishenzhen"){
@@ -13726,8 +13609,8 @@
             const accuracy=Number(entry&&entry.accuracyBonusPercent)||
                 Number(typeof skillDatabase!=="undefined"&&skillDatabase.dinghaishenzhen&&skillDatabase.dinghaishenzhen.accuracyBonusPercent)||0;
             const parts=[];
-            if(resist){ parts.push("異常狀態抗性 +"+resist+"%"); }
-            if(accuracy){ parts.push("命中率 +"+accuracy+"%"); }
+            if(resist){ parts.push("最終異常狀態抗性 +"+resist+"個百分點"); }
+            if(accuracy){ parts.push("最終命中率 +"+accuracy+"個百分點"); }
             return parts.join("、")||"異常狀態抗性提升";
         }
         if(type==="defenseDown"){ return "防禦降低 "+value+"%"; }
@@ -13753,11 +13636,11 @@
         if(type==="yuanZuBlessing"){
             const percent=statusPercent(entry,"bonusPercent","evasionBonusPercent")||
                 Number(typeof skillDatabase!=="undefined"&&skillDatabase.yuanZuBlessing&&skillDatabase.yuanZuBlessing.evasionBonusPercent)||0;
-            return "閃躲率提升 "+percent+"%";
+            return "最終閃躲提升 "+percent+"個百分點";
         }
         if(type==="fireMomentum"){
             const percent=Number(entry&&entry.bonusPercent)||0;
-            return "下一次主動火系直接傷害提升 "+percent+"%";
+            return "火系直接攻擊傷害提升 "+percent+"%";
         }
         if(type==="phoenixMight"){
             const percent=Number(entry&&entry.bonusPercent)||0;
@@ -13767,7 +13650,8 @@
             const level=Math.max(1,Math.min(5,Number(entry&&entry.skillLevel)||1));
             const values=typeof skillDatabase!=="undefined"&&skillDatabase.fireSoulResonance&&skillDatabase.fireSoulResonance.momentumBonusByLevel;
             const percent=Array.isArray(values)?Number(values[level-1])||0:0;
-            return "火系技能爆擊或新增燃燒時獲得炎勢"+(percent?"（傷害 +"+percent+"%）":"");
+            return "炎勢使火系直接攻擊傷害提升"+(percent?" "+percent+"%":"")+
+                "；Lv5爆擊或成功新增燃燒可延長持續回合";
         }
         if(type==="bloodBurn"){
             const level=Math.max(1,Math.min(5,Number(entry&&entry.skillLevel)||1));
@@ -13952,7 +13836,7 @@
 
     function placeSprite(current,node,index,target){
         const sprite=current.model.sprite;
-        const placement=placementFor(current.config,sprite);
+        const placement=placementFor(current.config,sprite,current.targetType);
         node.dataset.placement=placement;
 
         if(placement==="single"){
@@ -14043,7 +13927,7 @@
     function addSprite(current,index,target){
         const sprite=current.model.sprite;
         if(!sprite||!target||!state.stage){ return; }
-        const placement=placementFor(current.config,sprite);
+        const placement=placementFor(current.config,sprite,current.targetType);
         const key=placement==="single"||placement==="targetTrajectory"?String(index):"main";
         let node=current.spriteNodes.get(key);
         if(!node){
@@ -14135,7 +14019,7 @@
     function registerTarget(targetSide,index,allowDefeated){
         const current=state.current;
         if(!current||current.done||current.targetSide!==targetSide){ return null; }
-        const single=String(current.config.targetType||"")==="single";
+        const single=String(current.targetType||current.config.targetType||"")==="single";
         if(single&&current.targetIndexes.length&&current.targetIndexes.indexOf(index)<0){ return null; }
         if(!current.validTargets.has(index)){ current.validTargets.add(index); }
         emitSprite(current,index,allowDefeated===true);
@@ -14176,10 +14060,12 @@
         purgeStaleRasterStages();
 
         const model=modelFor(config);
-        const contractedSide=meta&&meta.targetContract&&meta.targetContract.version==="battle-target-contract-v1"
-            ?meta.targetContract.targetSide:meta&&meta.targetSide;
+        const contract=meta&&meta.targetContract&&meta.targetContract.version==="battle-target-contract-v1"
+            ?meta.targetContract:null;
+        const contractedSide=contract?contract.targetSide:meta&&meta.targetSide;
         const targetSide=contractedSide==="player"||contractedSide==="monster"
             ?contractedSide:targetSideFor(config,meta.side||"player");
+        const targetType=String(contract&&contract.targetType||config&&config.targetType||"single");
         const duration=Math.max(520,Number(config.duration)||520);
         const validTargets=new Set(activeCards(targetSide,config).map(entry=>entry.index));
         const explicitTargets=Array.isArray(meta.targetIds)
@@ -14196,7 +14082,7 @@
             side:meta.side||"player",actorIndex:Number.isInteger(meta.actorIndex)?meta.actorIndex:0,
             targetId:meta.targetId!==undefined?meta.targetId:null,
             targetIds:Array.isArray(meta.targetIds)?meta.targetIds.slice():null,
-            targetSide:targetSide,targetIndexes:[],emitted:new Set(),validTargets:validTargets,
+            targetSide:targetSide,targetType:targetType,targetIndexes:[],emitted:new Set(),validTargets:validTargets,
             spriteNodes:new Map(),confirmedTargets:new Set(),deferredStatusTargets:new Map(),statusAtStart:snapshotTimedEffects(model),
             actorCard:cardFor(meta.side||"player",Number.isInteger(meta.actorIndex)?meta.actorIndex:0),
             startedAt:Date.now(),visualStartedAt:0,firstVisibleFrameAt:0,
@@ -14424,51 +14310,35 @@
         };
     }
 
-    if(typeof updateMonsterUI==="function"){
-        const previous=updateMonsterUI;
-        updateMonsterUI=function(index){
-            const wait=existingTargetDelay("monster",index);
-            if(wait>8){
-                const key="monster:"+index;
-                if(!state.pendingUpdates.has(key)){
-                    const args=arguments;
-                    state.pendingUpdates.set(key,true);
-                    setTimer(()=>{
-                        state.pendingUpdates.delete(key);
-                        previous.apply(this,args);
-                        syncStatusVisualsForUnit("monster",Number(index));
-                    },wait);
-                }
-                return;
+    function scheduleStatusOwnedUiUpdate(side,index,keyPrefix,callback){
+        if(typeof callback!=="function"){ return; }
+        const wait=existingTargetDelay(side,index);
+        if(wait>8){
+            const key=keyPrefix+":"+index;
+            if(!state.pendingUpdates.has(key)){
+                state.pendingUpdates.set(key,true);
+                setTimer(()=>{
+                    state.pendingUpdates.delete(key);
+                    callback();
+                },wait);
             }
-            const result=previous.apply(this,arguments);
-            syncStatusVisualsForUnit("monster",Number(index));
-            return result;
-        };
+            return;
+        }
+        return callback();
     }
 
-    if(typeof updateSingleCharacterStatusBadge==="function"){
-        const previous=updateSingleCharacterStatusBadge;
-        updateSingleCharacterStatusBadge=function(index){
-            const wait=existingTargetDelay("player",index);
-            if(wait>8){
-                const key="player-status:"+index;
-                if(!state.pendingUpdates.has(key)){
-                    const args=arguments;
-                    state.pendingUpdates.set(key,true);
-                    setTimer(()=>{
-                        state.pendingUpdates.delete(key);
-                        previous.apply(this,args);
-                        syncStatusVisualsForUnit("player",Number(index));
-                    },wait);
-                }
-                return;
-            }
-            const result=previous.apply(this,arguments);
-            syncStatusVisualsForUnit("player",Number(index));
-            return result;
-        };
-    }
+    window.v143ScheduleMonsterUiUpdate=function(index,callback){
+        return scheduleStatusOwnedUiUpdate("monster",Number(index),"monster",callback);
+    };
+    window.v143StatusAfterMonsterUiUpdate=function(index){
+        syncStatusVisualsForUnit("monster",Number(index));
+    };
+    window.v143SchedulePlayerStatusUiUpdate=function(index,callback){
+        return scheduleStatusOwnedUiUpdate("player",Number(index),"player-status",callback);
+    };
+    window.v143StatusAfterPlayerUiUpdate=function(index){
+        syncStatusVisualsForUnit("player",Number(index));
+    };
 
     function wrapBadge(name){
         const previous=window[name];

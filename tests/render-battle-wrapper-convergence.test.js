@@ -37,7 +37,7 @@ assert.equal(reassignmentCount,0,"production runtime must not install renderBatt
 assert.doesNotMatch(runtimeSources.map(entry=>entry.source).join("\n"),/\brenderBattle(?:2|Final|Fix|V2)\b/);
 
 assert.match(core,/before:Object\.freeze\(\[\s*"v158PrepareBattleRender",\s*"v141PrepareBattleRender"\s*\]\)/);
-assert.match(core,/after:Object\.freeze\(\[\s*"v131AfterBattleRender",\s*"v141AfterBattleRender",\s*"v143AfterBattleRender",\s*"v154AfterBattleRender",\s*"vFixedSlotAfterBattleRender"\s*\]\)/);
+assert.match(core,/after:Object\.freeze\(\[\s*"v131AfterBattleRender",\s*"v141AfterBattleRender",\s*"v143AfterBattleRender",\s*"v154AfterBattleRender",\s*"v17351AfterBattleRender",\s*"vFixedSlotAfterBattleRender"\s*\]\)/);
 assert.ok(
     core.indexOf('runBattleRenderHooks("before",this,arguments);')<core.indexOf('const area ='),
     "pre-render hooks must run before canonical DOM rendering"

@@ -1078,7 +1078,9 @@
         }
         const upgrade=detail.querySelector(".team-relic-upgrade");
         if(upgrade){
-            if(!owned.unlocked){
+            if(def.runtimeReady!==true){
+                upgrade.innerHTML='<h3>秘寶能力</h3><p>效果尚未覺醒；正式能力與成長數值尚未開放。</p><b>目前不可合成、裝備或強化。</b>';
+            }else if(!owned.unlocked){
                 upgrade.innerHTML='<h3>合成</h3><p>固定需要 100 個等效專屬碎片；通用碎片 2 個可替代 1 個，但最多替代 50 個。</p><b>'+esc(status.reason||replacementText)+'</b>';
             }else if(cost.current>=cost.max){
                 upgrade.innerHTML='<h3>強化</h3><p>目前 Lv.'+cost.current+' / '+cost.max+'</p><b>已達目前秘寶等級上限。</b>';

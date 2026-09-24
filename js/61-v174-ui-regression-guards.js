@@ -101,7 +101,7 @@
     }
 
     function normalizeGoldButtonTextShadows(){
-        document.querySelectorAll("#game-stage button, #creationPage button").forEach(button=>{
+        document.querySelectorAll("#homeFeatureModal button, #allSkillsList button, #v169RpgDialogLayer button, #creationPage button").forEach(button=>{
             const style=window.getComputedStyle(button);
             const textColor=colorTriples(style.color)[0];
             const backgroundColors=colorTriples(style.backgroundColor+" "+style.backgroundImage);
@@ -218,17 +218,25 @@
         });
     }
 
-    const observer=new MutationObserver(schedule);
-    observer.observe(document.body,{
-        childList:true,
-        subtree:true,
-        characterData:true,
-        attributes:true,
-        attributeFilter:["class","style","disabled"]
-    });
+    const roots=[
+        document.getElementById("homeFeatureModal"),
+        document.getElementById("allSkillsList"),
+        document.getElementById("creationPage"),
+        document.getElementById("v169RpgDialogLayer")
+    ].filter(Boolean);
+    if(typeof MutationObserver!=="undefined"&&roots.length){
+        const observer=new MutationObserver(schedule);
+        roots.forEach(root=>observer.observe(root,{
+            childList:true,
+            subtree:true,
+            characterData:true,
+            attributes:true,
+            attributeFilter:["class","style","disabled"]
+        }));
+    }
 
-    document.addEventListener("click",interceptSystemAction,true);
-    document.addEventListener("click",schedule,{passive:true});
+    const systemRoot=document.getElementById("homeFeatureModal");
+    if(systemRoot){ systemRoot.addEventListener("click",interceptSystemAction,true); }
     document.addEventListener("v173:runtime-ready",schedule,{passive:true});
     window.addEventListener("resize",schedule,{passive:true});
 

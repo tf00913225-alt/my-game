@@ -553,17 +553,11 @@ button:disabled{
     display:none;
 }
 
-/*
-   ★ 修正（依照使用者要求，「把自動戰鬥
-   放進下面導覽列最右邊」）：
-   從3個按鈕（角色/任務/返回）變成4個
-   （角色/任務/返回/自動戰鬥），
-   grid-template-columns改成4欄。
-*/
+/* 巡怪頁底部導覽固定為五鍵；實際按鈕由共用 context navigation owner 投影。 */
 
 #app.on-map-page #mapPageNav{
     display:grid;
-    grid-template-columns:repeat(4,1fr);
+    grid-template-columns:repeat(5,1fr);
 }
 
 .player-name{
@@ -1810,42 +1804,9 @@ button:disabled{
     box-shadow:0 0 7px rgba(250,204,21,.6);
 }
 
-/* V99 — 手動選擇攻擊目標時的準星放大為原本 2 倍。
-   只改視覺尺寸，不改可選目標、命中或攻擊判定。 */
+/* Target reticle presentation is owned only by Fixed Slot V2. */
 .battle-monster.targetable{
     cursor:crosshair;
-}
-
-.battle-monster.targetable::after{
-    content:"";
-    position:absolute;
-    left:50%;
-    top:50%;
-    width:60px;
-    height:60px;
-    transform:translate(-50%,-50%);
-    border-radius:50%;
-    pointer-events:none;
-    z-index:40;
-    background:
-        linear-gradient(#ffd84d,#ffd84d) center/3px 100% no-repeat,
-        linear-gradient(90deg,#ffd84d,#ffd84d) center/100% 3px no-repeat,
-        radial-gradient(circle at center,transparent 0 26%,#ffd84d 29% 34%,transparent 37% 100%);
-    filter:drop-shadow(0 0 4px rgba(255,216,77,.9));
-    animation:battleTargetReticleFlash .38s ease-in-out infinite;
-}
-
-@keyframes battleTargetReticleFlash{
-    0%,100%{
-        opacity:1;
-        transform:translate(-50%,-50%) scale(1);
-        filter:drop-shadow(0 0 4px rgba(255,216,77,.9));
-    }
-    50%{
-        opacity:.35;
-        transform:translate(-50%,-50%) scale(1.14);
-        filter:drop-shadow(0 0 7px rgba(255,235,120,1));
-    }
 }
 
 .battle-monster.dying{
@@ -2423,6 +2384,10 @@ button:active{
     font-weight:900;
     text-shadow:0 1px 2px #000;
     z-index:3;
+}
+
+.skill-quick-button .sq-sp-block[hidden]{
+    display:none;
 }
 
 .skill-quick-button .sq-name{
@@ -3120,9 +3085,9 @@ button:active{
 
     margin-top:0;
 
-    background:#100e0b;
-    border:1px solid #8a6a3a;
-    border-radius:8px;
+    background:transparent;
+    border:0;
+    border-radius:0;
 
     padding:8px 10px;
 
@@ -3132,6 +3097,23 @@ button:active{
     line-height:18px;
 
     color:#e8ddc7;
+}
+
+/* Patrol log is a separate UI owner from the formal battle drawer.
+   It is always a fixed black record panel and never inherits drawer chrome. */
+#mapBattleInfo{
+    flex:0 0 96px;
+    min-height:96px;
+    height:96px;
+    margin:0;
+    padding:8px 10px;
+    overflow-y:auto;
+    pointer-events:auto;
+    color:#e8ddc7;
+    background:rgba(0,0,0,.88);
+    border:1px solid rgba(138,106,58,.58);
+    border-radius:6px;
+    box-shadow:none;
 }
 
 /* V96 — 戰鬥資訊頂列：元素匣取代底部大型自動戰鬥面板。 */
@@ -5415,47 +5397,14 @@ body.skill-detail-scroll-active,
 
 
 /* =====================================================
-   V115 — 巡怪頁導覽 UI
-   下方固定：角色 / 背包 / 任務 / 元素匣
-   返回：右上角獨立透明 PNG 按鈕
+   巡怪頁底部導覽
+   角色 / 背包 / 秘寶 / 元素匣 / 返回
+   內容由 js/42-v148-combat-dungeon-fixes.js 的 context navigation owner 投影
 ===================================================== */
 #app.on-map-page #mapPageNav{
-    grid-template-columns:repeat(4,1fr) !important;
+    grid-template-columns:repeat(5,1fr) !important;
 }
 
-.map-page-return-float{
-    position:fixed;
-    top:10px;
-    right:10px;
-    z-index:55;
-    width:68px;
-    height:68px;
-    padding:0;
-    margin:0;
-    border:0;
-    background:transparent;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    line-height:0;
-    -webkit-tap-highlight-color:transparent;
-    -webkit-touch-callout:none;
-}
-.map-page-return-float img{
-    display:block;
-    width:68px;
-    height:68px;
-    object-fit:contain;
-    pointer-events:none;
-    user-select:none;
-    -webkit-user-drag:none;
-    filter:drop-shadow(0 2px 5px rgba(0,0,0,.55));
-    transition:transform .12s ease,filter .12s ease;
-}
-.map-page-return-float:active img{
-    transform:scale(.92);
-    filter:brightness(1.12) drop-shadow(0 2px 6px rgba(0,0,0,.65));
-}
 
 /* =====================================================
    V115 — 巡怪頁背包改為頁內浮層 + 左上快捷鈕放大
@@ -6858,6 +6807,13 @@ html, body{
      技能／普通攻擊／背包(既有物品功能)／防禦／逃脫。
    - 技能快捷列仍以較高 z-index 覆蓋此面板，原戰鬥函式不變。
 ===================================================== */
+#battlePage{
+    --battle-command-row-height:66px;
+    --battle-command-art-overhang:34px;
+    --battle-command-visual-height:calc(var(--battle-command-row-height) + var(--battle-command-art-overhang));
+    --battle-turn-row-height:36px;
+}
+
 #mainBattleMenu{
     position:relative !important;
     display:block !important;
@@ -6883,19 +6839,19 @@ html, body{
     position:absolute;
     left:0;
     right:0;
-    top:-34px;
+    top:calc(-1 * var(--battle-command-art-overhang,34px));
     bottom:0;
     z-index:1;
     pointer-events:none;
-    background-image:url("../assets/battle/battle-command-panel.jpg");
+    background-image:url("../assets/battle/battle-command-panel-transparent.svg");
     background-repeat:no-repeat;
     background-position:center center;
-    background-size:100% auto;
+    background-size:100% 100%;
 }
 
 #mainBattleMenu > .menu-button{
     position:absolute !important;
-    top:-34px !important;
+    top:calc(-1 * var(--battle-command-art-overhang,34px)) !important;
     bottom:0 !important;
     width:20% !important;
     height:auto !important;

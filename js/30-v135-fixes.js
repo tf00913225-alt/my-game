@@ -157,44 +157,9 @@
     }
     window.v135GetSkillTargetScopeLabel=getSkillTargetScopeLabel;
 
-    /* --- 2a. 手動戰鬥的技能格：在技能名稱下面補一行作用對象 --- */
-    if(typeof populateSkillQuickBar==="function"){
-        const originalPopulateSkillQuickBar=populateSkillQuickBar;
-        populateSkillQuickBar=function(){
-            const result=originalPopulateSkillQuickBar.apply(this,arguments);
-
-            try{
-                const bar=document.getElementById("skillQuickBarGrid");
-                if(!bar){ return result; }
-
-                const characterId=getPartyCharacterKey(activeBattleCharacterIndex);
-                const loadout=characterSkillLoadouts[characterId];
-                if(!loadout){ return result; }
-
-                Array.from(bar.children).forEach((button,i)=>{
-                    const skillId=loadout.equippedSkills[i];
-                    const skill=skillId ? skillDatabase[skillId] : null;
-                    const label=getSkillTargetScopeLabel(skill);
-                    if(!label){ return; }
-                    if(button.querySelector(".v135-sq-scope")){ return; }
-
-                    const costEl=button.querySelector(".sq-cost");
-                    const scope=document.createElement("span");
-                    scope.className="v135-sq-scope";
-                    scope.textContent=label;
-                    if(costEl && costEl.parentElement){
-                        costEl.parentElement.insertBefore(scope,costEl);
-                    }else{
-                        button.appendChild(scope);
-                    }
-                });
-            }catch(error){
-                console.error("V135 技能格作用對象標示失敗：",error);
-            }
-
-            return result;
-        };
-    }
+    /* --- 2a. 手動戰鬥技能格已由 js/00-main.js Canonical Owner 直接
+       以 v135GetSkillTargetScopeLabel() 做 Diff Update，不再包裝
+       populateSkillQuickBar()。 */
 
     /* --- 2b. 自動戰鬥設定的技能下拉：選項文字後面補作用對象 --- */
     function decorateAutoSettingsSkillOptions(){

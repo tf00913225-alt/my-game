@@ -8,6 +8,7 @@ const vm=require("node:vm");
 const index=fs.readFileSync("index.html","utf8");
 const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const source=fs.readFileSync("js/40-v144-rules-and-abyss.js","utf8");
+const progressionSource=fs.readFileSync("js/60-v173.64-skill-progression-rebalance.js","utf8");
 const v143Source=fs.readFileSync("js/38-v143-system-fixes.js","utf8");
 const css=fs.readFileSync("css/41-v144-rules-and-abyss.css","utf8");
 
@@ -221,25 +222,13 @@ test("battle transition wording is entry, victory and defeat instead of one gene
     assert.match(css,/data-v144-kind="lose"/);
 });
 
-test("the five revised player skills expose the exact costs, targets and effects",()=>{
-    const player={activeBuffs:[{type:"dinghaishenzhen",turnsLeft:3}]};
-    const context=run(baseContext({
-        player,getMainCharacterStats:()=>({accuracy:100}),
-        getSkillEffectPreviewText:()=>"legacy",buildSkillLevelBreakdownHTML:()=>"legacy",
-        getSkillPreviewSummary:()=>"legacy"
-    }));
-    const db=context.skillDatabase;
-    assert.deepEqual([db.healSpell.baseHeal,db.healSpell.baseHealSP,db.healSpell.healPerLevel,db.healSpell.healSPPerLevel,db.healSpell.spCost],[350,35,30,30,40]);
-    assert.equal(db.healSpell.targetType,"allyAll");
-    assert.deepEqual(JSON.parse(JSON.stringify(db.healSpell.requires)),["iceArrowRain","iceSpin"]);
-    assert.equal(db.dodgeSkill.evasionBonusPercent,60);
-    assert.equal(db.stealthSkill.spCost,45);
-    assert.deepEqual([db.dinghaishenzhen.statusResistBonus,db.dinghaishenzhen.accuracyBonusPercent,db.dinghaishenzhen.spCost],[45,50,77]);
-    assert.deepEqual([db.earthShield.targetType,db.earthShield.reflectPercent,db.earthShield.spCost],["allyAll",50,66]);
-    assert.equal(context.getMainCharacterStats().accuracy,150,"氣定神閒 must affect real accuracy");
-    assert.equal(context.getSkillEffectPreviewText(db.healSpell,5),"我方全體回復 470 HP、155 SP");
-    assert.match(context.buildSkillLevelBreakdownHTML(db.healSpell),/Lv\.5[\s\S]*470 HP、155 SP/);
-    assert.match(context.getSkillEffectPreviewText(db.dinghaishenzhen,1),/抗性 \+65%、命中 \+50%/);
+test("later skill progression owner supersedes the V144 player-skill snapshot",()=>{
+    assert.match(progressionSource,/healSpell:\{[\s\S]*?targetType:"allyTri"[\s\S]*?healHpByLevel:HEAL_HP_BY_LEVEL\.slice\(\)[\s\S]*?cleanseAll:true/);
+    assert.match(progressionSource,/freeze:\{[\s\S]*?targetType:"column",targetTypeAtMaxLevel:"tri"[\s\S]*?freezeChanceByLevel:FREEZE_CHANCE_BY_LEVEL\.slice\(\)/);
+    assert.match(progressionSource,/dodge\.targetType="allyTri"; dodge\.duration=3; dodge\.spCost=20/);
+    assert.match(progressionSource,/calm\.statusResistBonusByLevel=CALM_RESIST_BY_LEVEL\.slice\(\)/);
+    assert.match(progressionSource,/shield\.targetType="allyTri"; shield\.spCost=66/);
+    assert.doesNotMatch(source,/getMainCharacterStats\s*=\s*function[\s\S]*accuracyBonusPercent/);
 });
 
 test("Heal Spell restores its exact level-scaled HP and SP to every living ally",()=>{

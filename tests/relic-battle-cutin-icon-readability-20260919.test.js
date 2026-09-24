@@ -51,8 +51,8 @@ assert.match(relic,/function cleanupRelicCutin\(\)[\s\S]*clearRelicTargetFocus\(
 
 assert.match(css,/\.team-relic-battle-presentation\.dim-visible \.team-relic-battle-dim\{opacity:\.75;\}/,
   "battlefield must dim to roughly 75 percent");
-assert.match(css,/\.team-relic-battle-presentation\{[^}]*position:fixed[^}]*inset:0/,
-  "relic dim presentation must cover the complete transformed 420x746 battle surface, including battlePage padding");
+assert.match(css,/\.team-relic-battle-presentation\{[^}]*position:absolute[^}]*inset:0/,
+  "relic dim presentation must cover the complete battlePage surface");
 assert.match(css,/\.team-relic-battle-cutin\{[^}]*width:min\(72vw,280px\)/,
   "relic identity group must be visibly larger");
 assert.match(css,/\.team-relic-battle-cutin-icon\{[^}]*width:clamp\(140px,44vw,210px\)[^}]*height:clamp\(140px,44vw,210px\)/,
@@ -69,7 +69,7 @@ assert.match(css,/\.team-relic-battle-cutin-icon\{[^}]*border:0[^}]*background:n
   "battle icon itself must have no box");
 assert.match(css,/\.team-relic-battle-cutin-copy\{[^}]*border:0[^}]*background:none[^}]*box-shadow:none[^}]*text-align:center/,
   "relic name must be centered under the icon with no box");
-assert.match(css,/\.battle-player\.team-relic-battle-target-focus,[\s\S]*\.battle-monster\.team-relic-battle-target-focus\{[^}]*z-index:6105!important[^}]*opacity:\.30!important[^}]*filter:brightness\(\.24\)/,
+assert.match(css,/\.battle-player\.team-relic-battle-target-focus,[\s\S]*\.battle-monster\.team-relic-battle-target-focus\{[^}]*z-index:18110!important[^}]*opacity:\.30!important[^}]*filter:brightness\(\.24\)/,
   "real target roots must rise above the dim layer from a dark starting state");
 assert.match(css,/team-relic-battle-target-focus-visible\{[^}]*opacity:1!important[^}]*brightness\(1\.08\)/,
   "target roots must gradually brighten to full readable artwork/HUD");

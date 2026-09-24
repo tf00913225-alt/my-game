@@ -71,7 +71,7 @@
         return document.getElementById("battlePage");
     }
     function appRoot(){
-        return document.getElementById("app")||document.getElementById("game-content")||document.body;
+        return document.getElementById("game-content")||document.getElementById("app")||document.body;
     }
     function clampEdgeTop(edge,root,value){
         const height=Math.max(1,Number(root&&root.clientHeight)||0);

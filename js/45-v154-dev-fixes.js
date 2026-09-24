@@ -241,6 +241,11 @@
 
     function syncMonsterPortraits(){
         if(typeof document==="undefined"){ return; }
+        if(typeof window.bumpBattleRuntimeMetric==="function"){ window.bumpBattleRuntimeMetric("syncMonsterPortraits"); }
+        else if(window.FourSymbolsBattleRuntimeMetrics&&window.FourSymbolsBattleRuntimeMetrics.enabled===true){
+            const counters=window.FourSymbolsBattleRuntimeMetrics.counters||{};
+            counters.syncMonsterPortraits=(Number(counters.syncMonsterPortraits)||0)+1;
+        }
         installMonsterPortraitPresentationStyle();
         const roster=currentAbyssRoster();
         const finalFloor=isFinalAbyssRoster(roster);
@@ -290,15 +295,6 @@
         syncMonsterPortraits();
     }
     window.v154AfterBattleRender=v154AfterBattleRender;
-    if(typeof updateMonsterUI==="function"){
-        const previousUpdateMonsterUI=updateMonsterUI;
-        updateMonsterUI=function(){
-            const result=previousUpdateMonsterUI.apply(this,arguments);
-            syncMonsterPortraits();
-            return result;
-        };
-    }
-
     function isElementBoxRecoveryActive(){
         if(typeof window.v131GetElementBoxState==="function"){
             try{

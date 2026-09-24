@@ -1,5 +1,5 @@
 /* Critical/feature boundary owner. No global input lock and no network-order patch chain. */
-const V_ASSET_VERSION="173.71";
+const V_ASSET_VERSION="173.72";
 
 (function installFeatureIntentBoundary(){
     "use strict";
@@ -7,7 +7,7 @@ const V_ASSET_VERSION="173.71";
     window.__fourSymbolsFeatureIntentInstalled=true;
 
     const rules=[
-        {pattern:/showPage\(['"]map|openMap|patrol/i,feature:"patrol",label:"巡怪"},
+        {pattern:/showPage\(['"]map|enterZone|enterMap|openMap|patrol/i,feature:"patrol",label:"巡怪"},
         {pattern:/showPage\(['"]inventory|open.*inventory|backpack/i,feature:"inventory",label:"背包"},
         {pattern:/equipment|reforge/i,feature:"equipment",label:"裝備"},
         {pattern:/showPage\(['"]dungeon|dungeon/i,feature:"dungeon",label:"副本"},
@@ -20,6 +20,9 @@ const V_ASSET_VERSION="173.71";
         {pattern:/battle/i,feature:"battle",label:"戰鬥"}
     ];
     function target(event){ return event.target&&event.target.closest&&event.target.closest("button,a,[data-feature]"); }
+    function isBattleRuntimeInteraction(element){
+        return !!(element&&element.closest&&element.closest("#battlePage"));
+    }
     function isExpPoolInteraction(element){
         return !!(element&&element.closest&&element.closest("#homeExpPoolCard"));
     }
@@ -81,11 +84,13 @@ const V_ASSET_VERSION="173.71";
         }).finally(()=>{ expPoolPrimePromise=null; });
     }
     function prefetch(event){
-        const element=target(event); const info=descriptor(element); const api=loader();
+        const element=target(event); if(isBattleRuntimeInteraction(element)){ return; }
+        const info=descriptor(element); const api=loader();
         if(info&&api&&!api.isReady(info.feature)){ void api.prefetch(info.feature,event.type); }
     }
     function enter(event){
-        const element=target(event); const info=descriptor(element); const api=loader();
+        const element=target(event); if(isBattleRuntimeInteraction(element)){ return; }
+        const info=descriptor(element); const api=loader();
         if(!info||!api||api.isReady(info.feature)||element.dataset.featureReplay==="1"){ return; }
         event.preventDefault(); event.stopImmediatePropagation();
         if(element.dataset.featureLoading==="1"){ return; }
@@ -108,7 +113,6 @@ const V_ASSET_VERSION="173.71";
     document.addEventListener("pointerdown",prefetch,{capture:true,passive:true});
     document.addEventListener("touchstart",prefetch,{capture:true,passive:true});
     document.addEventListener("click",enter,true);
-    document.addEventListener("click",()=>setTimeout(primeExpPoolSafety,0),true);
     document.addEventListener("four-symbols:startup-ready",()=>{
         const api=loader();
         if(api){
@@ -121,19 +125,13 @@ const V_ASSET_VERSION="173.71";
         primeExpPoolSafety();
     },{once:true});
 
-    function installExpPoolVisibilityObserver(){
-        if(!document.body||typeof MutationObserver==="undefined"){ return; }
-        const observer=new MutationObserver(()=>{
-            if(expPoolSafetyUiReady){ return; }
-            primeExpPoolSafety();
-        });
-        observer.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:["class","style","hidden"]});
+    function primeExpPoolSafetyWhenDomReady(){
         primeExpPoolSafety();
     }
     if(document.readyState==="loading"){
-        document.addEventListener("DOMContentLoaded",installExpPoolVisibilityObserver,{once:true});
+        document.addEventListener("DOMContentLoaded",primeExpPoolSafetyWhenDomReady,{once:true});
     }else{
-        installExpPoolVisibilityObserver();
+        primeExpPoolSafetyWhenDomReady();
     }
 })();
 

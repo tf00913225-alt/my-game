@@ -530,7 +530,8 @@ test("persistent status visuals start only on success, survive duplicate MISS, a
 test("wind casts remain Sprite Sheets while persistent states use noninteractive low-motion visuals",()=>{
     assert.doesNotMatch(css,/data-skill="windCrossSlash"/);
     assert.doesNotMatch(css,/data-skill="stormRain"/);
-    assert.match(css,/#game-stage #battlePage \.v143-status-visual\{[\s\S]*?z-index:4;[\s\S]*?pointer-events:none;/);
+    assert.match(css,/#game-stage #battlePage \.v143-status-visual\{[\s\S]*?z-index:var\(--v143-status-layer-rotating\);[\s\S]*?pointer-events:none;/);
+    assert.match(css,/\.v143-status-visual--layer-hard-control-base\{[\s\S]*?z-index:var\(--v143-status-layer-hard-control-base\)/);
     assert.match(css,/@keyframes v143StatusImageBreath/);
     assert.match(css,/\.v143-status-icon--pulse\{[\s\S]*?animation:none !important/);
     assert.doesNotMatch(css,/v143StatusRasterFrames/);
@@ -541,8 +542,8 @@ test("wind casts remain Sprite Sheets while persistent states use noninteractive
 });
 
 test("the development cache release is V173.39",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.71"/);
-    assert.match(index,/<title>四象江湖傳 V173\.71<\/title>/);
+    assert.match(loader,/const V_ASSET_VERSION="173\.72"/);
+    assert.match(index,/<title>四象江湖傳 V173\.72<\/title>/);
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
 

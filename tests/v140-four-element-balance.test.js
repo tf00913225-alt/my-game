@@ -424,38 +424,12 @@ test("water lifesteal uses final damage and restores HP only on every actor path
     assert.doesNotMatch(context.battleLogs.at(-1),/SP/);
 });
 
-test("physical and magic abnormal hit formulas use their specified offensive stats",()=>{
+test("V140 no longer owns hit or status chance formulas",()=>{
     const context=makeContext();
-    const calculate=(...args)=>context.v140CalculateStatusEffectChance(...args);
-    assert.equal(calculate(50,10,10,100,20,false,"regular",0,"physical"),54);
-    assert.equal(calculate(50,10,10,100,20,false,"regular",0,"magic"),54);
-    assert.equal(calculate(40,30,10,0,0,false,"regular",10,"magic"),42);
-    assert.equal(calculate(40,1,30,0,0,false,"regular",0,"magic"),28);
-});
-
-test("hard-control square-root scaling and rank caps stay exact",()=>{
-    const context=makeContext();
-    const calculate=rank=>context.v140CalculateStatusEffectChance(
-        90,10,10,100,0,true,rank,0,"physical"
-    );
-    assert.equal(calculate("regular"),80);
-    assert.equal(calculate("elite"),60);
-    assert.equal(calculate("boss"),40);
-    assert.equal(context.v140CalculateStatusEffectChance(
-        30,10,10,100,20,true,"regular",0,"physical"
-    ),26);
-    assert.equal(context.v140CalculateStatusEffectChance(
-        30,10,10,100,20,true,"regular",0,"magic"
-    ),26);
-});
-
-test("real actor wrappers feed physical attack or intelligence to abnormal rolls",()=>{
-    const context=makeContext();
-    vm.runInContext("castDamageSkill('frostPunch')",context);
-    assert.equal(context.lastPlayerStatusChance,54);
-    context.player.sp=100;
-    vm.runInContext("castDamageSkill('fireRocket')",context);
-    assert.equal(context.lastPlayerStatusChance,50);
+    assert.equal(context.v140CalculateStatusEffectChance,undefined);
+    assert.equal(context.v140GetHitChancePercent,undefined);
+    assert.doesNotMatch(patchSource,/calculateStatusEffectChance\s*=\s*function|rollHitChance\s*=\s*function/);
+    assert.doesNotMatch(patchSource,/Math\.sqrt\(power\)|LOCKDOWN_STATUS_COEFFICIENT|GENERAL_STATUS_COEFFICIENT/);
 });
 
 test("rage applies separate critical chance and critical-damage bonuses",()=>{
@@ -558,11 +532,10 @@ test("skill UI text matches HP-only lifesteal, split rage values, and no self SP
     assert.match(breakdown("healSpell"),/施放者本人不回復SP/);
 });
 
-test("final hit reduction applies after capped accuracy and evasion",()=>{
-    const context=makeContext();
-    assert.equal(context.v140GetHitChancePercent(0,1000,0),14.250000000000002);
-    assert.equal(context.v140GetHitChancePercent(1000,0,0),99);
-    assert.ok(Math.abs(context.v140GetHitChancePercent(100,80,10)-9.8)<Number.EPSILON*100);
+test("final hit chance remains outside the V140 patch layer",()=>{
+    assert.doesNotMatch(patchSource,/v140GetHitChancePercent|rollHitChance\s*=\s*function/);
+    assert.match(mainSource,/function calculateHitChancePercent\(/);
+    assert.match(mainSource,/const HIT_CHANCE_ACCURACY_COEFFICIENT = 0\.15;/);
 });
 
 test("existing lifesteal paths still accumulate post-critical final damage",()=>{

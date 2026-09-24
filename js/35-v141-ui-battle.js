@@ -453,44 +453,41 @@
         return true;
     }
 
-    if(typeof updateMonsterUI==="function"){
-        const originalUpdateMonsterUI=updateMonsterUI;
-        updateMonsterUI=function(index){
-            if(typeof window.v141SyncMonsterShield==="function"){
-                window.v141SyncMonsterShield(monsters[index]);
-            }
-            const result=originalUpdateMonsterUI.apply(this,arguments);
-            const monster=monsters[index];
-            if(monster){
-                const normalBar=document.getElementById("battleMonsterBar"+index);
-                const shieldBar=document.getElementById("battleMonsterShieldBar"+index);
-                const hpText=document.getElementById("battleMonsterHPText"+index);
-                const shield=monster.v141Shield;
-                const remaining=shield?Math.max(0,Number(shield.remaining)||0):0;
-                if(shield&&remaining>0){
-                    const baseMax=shield.baseMaxHP;
-                    const baseHp=Math.max(0,monster.hp-remaining);
-                    const visibleShield=shield.isBarrier?baseMax:remaining;
-                    const total=Math.max(1,baseMax+visibleShield);
-                    if(normalBar){ normalBar.style.width=(baseHp/total*100)+"%"; }
-                    if(shieldBar){
-                        shieldBar.style.left=(baseHp/total*100)+"%";
-                        shieldBar.style.width=(visibleShield/total*100)+"%";
-                    }
-                    if(hpText){
-                        hpText.textContent=shield.isBarrier
-                            ?Math.floor(baseHp)+"/"+baseMax+"　結界"
-                            :Math.floor(baseHp)+"/"+baseMax+" +"+Math.floor(remaining);
-                    }
-                }else if(shieldBar){
-                    shieldBar.style.left="0";
-                    shieldBar.style.width="0";
-                }
-            }
-            return result;
-        };
+    function v141BeforeMonsterUiUpdate(index,monster){
+        if(typeof window.v141SyncMonsterShield==="function"&&monster){
+            window.v141SyncMonsterShield(monster);
+        }
     }
 
+    function v141AfterMonsterUiUpdate(index,monster){
+        if(!monster){ return; }
+        const normalBar=document.getElementById("battleMonsterBar"+index);
+        const shieldBar=document.getElementById("battleMonsterShieldBar"+index);
+        const hpText=document.getElementById("battleMonsterHPText"+index);
+        const shield=monster.v141Shield;
+        const remaining=shield?Math.max(0,Number(shield.remaining)||0):0;
+        if(shield&&remaining>0){
+            const baseMax=shield.baseMaxHP;
+            const baseHp=Math.max(0,monster.hp-remaining);
+            const visibleShield=shield.isBarrier?baseMax:remaining;
+            const total=Math.max(1,baseMax+visibleShield);
+            if(normalBar){ normalBar.style.width=(baseHp/total*100)+"%"; }
+            if(shieldBar){
+                shieldBar.style.left=(baseHp/total*100)+"%";
+                shieldBar.style.width=(visibleShield/total*100)+"%";
+            }
+            if(hpText){
+                hpText.textContent=shield.isBarrier
+                    ?Math.floor(baseHp)+"/"+baseMax+"　結界"
+                    :Math.floor(baseHp)+"/"+baseMax+" +"+Math.floor(remaining);
+            }
+        }else if(shieldBar){
+            shieldBar.style.left="0";
+            shieldBar.style.width="0";
+        }
+    }
+    window.v141BeforeMonsterUiUpdate=v141BeforeMonsterUiUpdate;
+    window.v141AfterMonsterUiUpdate=v141AfterMonsterUiUpdate;
 
     if(typeof resolveQueuedPlayerAction==="function"){
         const originalResolveQueuedPlayerAction=resolveQueuedPlayerAction;
@@ -1247,20 +1244,7 @@
             }
             if(page==="map"){
                 installPatrolClickMovement();
-                installTaskTracker();
-                renderTaskTracker();
-                requestAnimationFrame(clampTaskTracker);
             }
-            updateNotificationDots();
-            return result;
-        };
-    }
-
-    if(typeof updateUI==="function"){
-        const originalUpdateUI=updateUI;
-        updateUI=function(){
-            const result=originalUpdateUI.apply(this,arguments);
-            renderTaskTracker();
             updateNotificationDots();
             return result;
         };

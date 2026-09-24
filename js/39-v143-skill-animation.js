@@ -31,11 +31,19 @@
         },options||{});
     }
 
+    const STATUS_VISUAL_LAYERS=Object.freeze({
+        HARD_CONTROL_BASE:"hard-control-base",
+        ROTATING:"rotating",
+        HUD:"hud"
+    });
+
     function statusVisual(src,mode,collection,options){
+        const resolvedMode=mode||"static";
         return Object.assign({
             src:src||"",
-            mode:mode||"static",
+            mode:resolvedMode,
             collection:collection||"statusEffects",
+            visualLayer:resolvedMode==="icon"?STATUS_VISUAL_LAYERS.HUD:STATUS_VISUAL_LAYERS.ROTATING,
             cropColumns:1,
             cropRows:1,
             renderer:"dom-status-visual"
@@ -150,7 +158,7 @@
         burn:statusVisual("assets/vfx/status/burn.webp","pulse","statusEffects",{label:"燃燒",statusName:"燃燒",iconSrc:"assets/vfx/status/burn.webp"}),
         rage:statusVisual("assets/vfx/status/rage.webp","pulse","activeBuffs",{label:"怒火",statusName:"怒火",iconSrc:"assets/vfx/status/rage-icon.webp"}),
         frostbite:statusVisual("","icon","statusEffects",{label:"凍傷",statusName:"凍傷",iconSrc:"assets/vfx/status/frostbite-icon.webp"}),
-        freeze:statusVisual("assets/vfx/status/freeze.webp","static","statusEffects",{label:"冰封",statusName:"冰封",iconSrc:"assets/vfx/status/freeze.webp"}),
+        freeze:statusVisual("assets/vfx/status/freeze.webp","static","statusEffects",{label:"冰封",statusName:"冰封",iconSrc:"assets/vfx/status/freeze.webp",visualLayer:STATUS_VISUAL_LAYERS.HARD_CONTROL_BASE}),
         agilityDown:statusVisual("","icon","statusEffects",{label:"重力",statusName:"重力",iconSrc:"assets/vfx/status/gravity-icon.webp"}),
         damageDown:statusVisual("","icon","statusEffects",{label:"殤風",statusName:"殤風",iconSrc:"assets/vfx/status/damage-down-icon.webp"}),
         stun:statusVisual("assets/vfx/status/stun.webp","pulse","statusEffects",{label:"暈眩",statusName:"暈眩",iconSrc:"assets/vfx/status/stun-icon.webp"}),
@@ -159,7 +167,7 @@
         dinghaishenzhen:statusVisual("assets/vfx/status/calm-mind.webp","pulse","activeBuffs",{label:"氣定神閒",statusName:"氣定神閒",iconSrc:"assets/vfx/status/calm-mind.webp"}),
         defenseDown:statusVisual("","icon","statusEffects",{label:"破防",statusName:"破防",iconSrc:"assets/vfx/status/defense-down-icon.webp"}),
         shield:statusVisual("assets/vfx/status/shield.webp","static","activeBuffs",{label:"護盾",statusName:"岩盾",iconSrc:"assets/vfx/status/shield.webp"}),
-        petrify:statusVisual("assets/vfx/status/petrify.webp","static","statusEffects",{label:"石化",statusName:"石化",iconSrc:"assets/vfx/status/petrify.webp"}),
+        petrify:statusVisual("assets/vfx/status/petrify.webp","static","statusEffects",{label:"石化",statusName:"石化",iconSrc:"assets/vfx/status/petrify.webp",visualLayer:STATUS_VISUAL_LAYERS.HARD_CONTROL_BASE}),
         earthShield:statusVisual("assets/vfx/status/earth-shield.webp","static","activeBuffs",{label:"萬象土盾",statusName:"萬象土盾",iconSrc:"assets/vfx/status/earth-shield.webp"}),
         rockWall:statusVisual("assets/vfx/status/rock-wall.webp","static","activeBuffs",{label:"岩石壁壘",statusName:"岩石壁壘",iconSrc:"assets/vfx/status/rock-wall.webp"}),
         barrier:statusVisual("assets/vfx/status/barrier.webp","static","activeBuffs",{label:"結界",statusName:"結界",iconSrc:"assets/vfx/status/barrier.webp"}),
@@ -403,7 +411,7 @@
         const owner=geometryOwner();
         if(!owner||!current){ return null; }
         const seed=geometrySeedIndexes(current,indexes);
-        const targetType=String(current.config&&current.config.targetType||"single");
+        const targetType=String(current.targetType||current.config&&current.config.targetType||"single");
         if(placement==="battlefield"||targetType==="all"||targetType==="allyAll"){
             const rect=typeof owner.getSideRect==="function"?owner.getSideRect(current.targetSide):null;
             if(rect){ rect.id=current.targetSide==="monster"?"fixed-enemy-zone":"fixed-ally-zone"; }
@@ -434,9 +442,9 @@
         return rect;
     }
 
-    function placementFor(config,sprite){
+    function placementFor(config,sprite,targetTypeOverride){
         const authored=String(sprite&&sprite.placement||"single");
-        const targetType=String(config&&config.targetType||"single");
+        const targetType=String(targetTypeOverride||config&&config.targetType||"single");
         if(/^(all|enemyAll|allyAll)$/i.test(targetType)){ return "battlefield"; }
         if(/^(tri|allyTri|row|column|horizontal-3)$/i.test(targetType)){
             return authored==="trajectory"?"trajectory":"group";
@@ -552,9 +560,12 @@
 
     function createBodyStatusVisual(type,spec){
         const node=document.createElement("i");
-        node.className="v143-status-visual v143-status-visual-"+type+" v143-status-visual--"+spec.mode;
+        node.className="v143-status-visual v143-status-visual-"+type+
+            " v143-status-visual--"+spec.mode+
+            " v143-status-visual--layer-"+spec.visualLayer;
         node.dataset.statusType=type;
         node.dataset.statusMode=spec.mode;
+        node.dataset.statusLayer=spec.visualLayer;
         node.dataset.renderer="dom-status-visual";
         if(typeof node.setAttribute==="function"){ node.setAttribute("aria-hidden","true"); }
         node.style.backgroundImage='url("'+String(spec.src).replace(/"/g,"%22")+'")';
@@ -565,9 +576,10 @@
 
     function createStatusIcon(type,spec){
         const node=document.createElement("i");
-        node.className="v143-status-icon v143-status-icon-"+type;
+        node.className="v143-status-icon v143-status-icon-"+type+" v143-status-icon--layer-hud";
         node.dataset.statusType=type;
         node.dataset.statusMode="icon";
+        node.dataset.statusLayer=STATUS_VISUAL_LAYERS.HUD;
         node.dataset.renderer="dom-status-icon";
         const source=String(spec.iconSrc||spec.src||"");
         if(source){
@@ -584,6 +596,7 @@
     const STATUS_ROTATION_MS=2000;
     let statusRotationTimer=null;
     const statusRotationByUnit=new Map();
+    const hardControlContractViolationByUnit=new Map();
 
     function syncStatusVisual(side,index,type,showBody){
         const spec=STATUS_VISUALS[type];
@@ -621,45 +634,83 @@
         if(!anchor){ return; }
         const cardRect=typeof card.getBoundingClientRect==="function"?card.getBoundingClientRect():anchor.rect;
         const regularEnemy=side==="monster"&&!isBossIndexForVfx(index);
+        const shellStatus=type==="shield"||type==="barrier"||type==="earthShield"||type==="rockWall";
+        const widthScale=(regularEnemy?1.45:1.40)*(shellStatus?1.08:1);
+        const heightScale=(regularEnemy?1.36:1.34)*(shellStatus?1.08:1);
         const width=regularEnemy
-            ?Math.max(60,Math.min(anchor.rect.width*1.20,cardRect.width*1.20))
-            :Math.max(44,Math.min(anchor.rect.width*1.16,cardRect.width*1.16));
+            ?Math.max(72,Math.min(anchor.rect.width*widthScale,cardRect.width*widthScale))
+            :Math.max(62,Math.min(anchor.rect.width*widthScale,cardRect.width*widthScale));
         const height=regularEnemy
-            ?Math.max(58,Math.min(anchor.rect.height*1.16,cardRect.height*1.16))
-            :Math.max(52,Math.min(anchor.rect.height*1.14,cardRect.height*1.14));
+            ?Math.max(68,Math.min(anchor.rect.height*heightScale,cardRect.height*heightScale))
+            :Math.max(64,Math.min(anchor.rect.height*heightScale,cardRect.height*heightScale));
         node.dataset.slot=anchor.slot;
         node.style.width=Math.round(width)+"px";
         node.style.height=Math.round(height)+"px";
     }
 
-    function syncStatusVisualsForUnit(side,index,advanceRotation){
-        const entity=entityFor(side,index);
-        const bodyTypes=entity?Object.keys(RAW_STATUS_VISUALS).filter(type=>{
+    function activeBodyStatusTypesForLayer(entity,side,index,visualLayer){
+        if(!entity){ return []; }
+        return Object.keys(RAW_STATUS_VISUALS).filter(type=>{
             const spec=RAW_STATUS_VISUALS[type];
             return !!(
                 spec&&spec.mode!=="icon"&&spec.src&&
+                spec.visualLayer===visualLayer&&
                 hasTimedEffect(entity,type)&&
                 !deferredStatusDuringCast(side,index,type)
             );
-        }):[];
+        });
+    }
+
+    function reportHardControlVisualContractViolation(side,index,types){
+        const key=side+":"+index;
+        const signature=types.join("|");
+        if(types.length<=1){
+            hardControlContractViolationByUnit.delete(key);
+            return;
+        }
+        if(hardControlContractViolationByUnit.get(key)===signature){ return; }
+        hardControlContractViolationByUnit.set(key,signature);
+        if(typeof console!=="undefined"&&typeof console.error==="function"){
+            console.error(
+                "[FourSymbols] Hard Control contract violation: Freeze and Petrify coexist.",
+                {side:side,index:index,statusTypes:types.slice()}
+            );
+        }
+    }
+
+    function syncStatusVisualsForUnit(side,index,advanceRotation){
+        const entity=entityFor(side,index);
+        const baseBodyTypes=activeBodyStatusTypesForLayer(
+            entity,side,index,STATUS_VISUAL_LAYERS.HARD_CONTROL_BASE
+        );
+        const rotatingBodyTypes=activeBodyStatusTypesForLayer(
+            entity,side,index,STATUS_VISUAL_LAYERS.ROTATING
+        );
+        reportHardControlVisualContractViolation(side,index,baseBodyTypes);
+
         const rotationKey=side+":"+index;
-        const signature=bodyTypes.join("|");
+        const signature=rotatingBodyTypes.join("|");
         let rotation=statusRotationByUnit.get(rotationKey);
-        if(!bodyTypes.length){
+        if(!rotatingBodyTypes.length){
             statusRotationByUnit.delete(rotationKey);
             rotation=null;
         }else if(!rotation||rotation.signature!==signature){
             rotation={signature:signature,index:0};
             statusRotationByUnit.set(rotationKey,rotation);
-        }else if(advanceRotation===true&&bodyTypes.length>1){
-            rotation.index=(rotation.index+1)%bodyTypes.length;
+        }else if(advanceRotation===true&&rotatingBodyTypes.length>1){
+            rotation.index=(rotation.index+1)%rotatingBodyTypes.length;
         }
-        const activeBodyType=rotation&&bodyTypes.length
-            ?bodyTypes[rotation.index%bodyTypes.length]
+        const activeRotatingBodyType=rotation&&rotatingBodyTypes.length
+            ?rotatingBodyTypes[rotation.index%rotatingBodyTypes.length]
             :null;
-        Object.keys(RAW_STATUS_VISUALS).forEach(type=>
-            syncStatusVisual(side,index,type,type===activeBodyType)
-        );
+
+        Object.keys(RAW_STATUS_VISUALS).forEach(type=>{
+            const spec=RAW_STATUS_VISUALS[type];
+            const showBody=spec&&spec.visualLayer===STATUS_VISUAL_LAYERS.HARD_CONTROL_BASE
+                ?baseBodyTypes.includes(type)
+                :type===activeRotatingBodyType;
+            syncStatusVisual(side,index,type,showBody);
+        });
     }
 
     function syncStatusVisualEffects(advanceRotation){
@@ -675,8 +726,10 @@
             document.querySelectorAll(selector).forEach(node=>node.remove())
         );
         statusRotationByUnit.clear();
+        hardControlContractViolationByUnit.clear();
     }
     window.v143SyncStatusVisualEffects=syncStatusVisualEffects;
+    window.v143StatusVisualLayers=STATUS_VISUAL_LAYERS;
 
     function ensureStatusRotationTimer(){
         if(statusRotationTimer||typeof window==="undefined"||typeof window.setInterval!=="function"){ return; }
@@ -718,15 +771,15 @@
             const damage=statusPercent(entry,"critDamageBonusPercent","bonusPercent");
             return "爆擊率 +"+chance+"%，爆擊傷害 +"+damage+"%";
         }
-        if(type==="frostbite"){ return "無法使用技能"; }
+        if(type==="frostbite"){ return "傷害 -25%、最終閃躲 -25個百分點、最終異常狀態抗性 -25個百分點"; }
         if(type==="freeze"){ return "無法行動"; }
-        if(type==="agilityDown"){ return "敏捷降低 "+value+"%"; }
+        if(type==="agilityDown"){ return "敏捷降低 "+value+"%、最終閃躲降低 "+value+"個百分點"; }
         if(type==="damageDown"){ return "造成傷害降低 "+value+"%"; }
-        if(type==="stun"){ return "最終命中率降低 "+value+"%"; }
+        if(type==="stun"){ return "最終命中率降低 "+value+"個百分點"; }
         if(type==="dodgeSkill"){
             const percent=statusPercent(entry,"percent","bonusPercent")||
                 Number(typeof skillDatabase!=="undefined"&&skillDatabase.dodgeSkill&&skillDatabase.dodgeSkill.evasionBonusPercent)||0;
-            return "閃躲率提升 "+percent+"%";
+            return "最終閃躲提升 "+percent+"個百分點";
         }
         if(type==="stealthSkill"){ return "無法被單體技能選中，仍會受到範圍技能"; }
         if(type==="dinghaishenzhen"){
@@ -735,8 +788,8 @@
             const accuracy=Number(entry&&entry.accuracyBonusPercent)||
                 Number(typeof skillDatabase!=="undefined"&&skillDatabase.dinghaishenzhen&&skillDatabase.dinghaishenzhen.accuracyBonusPercent)||0;
             const parts=[];
-            if(resist){ parts.push("異常狀態抗性 +"+resist+"%"); }
-            if(accuracy){ parts.push("命中率 +"+accuracy+"%"); }
+            if(resist){ parts.push("最終異常狀態抗性 +"+resist+"個百分點"); }
+            if(accuracy){ parts.push("最終命中率 +"+accuracy+"個百分點"); }
             return parts.join("、")||"異常狀態抗性提升";
         }
         if(type==="defenseDown"){ return "防禦降低 "+value+"%"; }
@@ -762,11 +815,11 @@
         if(type==="yuanZuBlessing"){
             const percent=statusPercent(entry,"bonusPercent","evasionBonusPercent")||
                 Number(typeof skillDatabase!=="undefined"&&skillDatabase.yuanZuBlessing&&skillDatabase.yuanZuBlessing.evasionBonusPercent)||0;
-            return "閃躲率提升 "+percent+"%";
+            return "最終閃躲提升 "+percent+"個百分點";
         }
         if(type==="fireMomentum"){
             const percent=Number(entry&&entry.bonusPercent)||0;
-            return "下一次主動火系直接傷害提升 "+percent+"%";
+            return "火系直接攻擊傷害提升 "+percent+"%";
         }
         if(type==="phoenixMight"){
             const percent=Number(entry&&entry.bonusPercent)||0;
@@ -776,7 +829,8 @@
             const level=Math.max(1,Math.min(5,Number(entry&&entry.skillLevel)||1));
             const values=typeof skillDatabase!=="undefined"&&skillDatabase.fireSoulResonance&&skillDatabase.fireSoulResonance.momentumBonusByLevel;
             const percent=Array.isArray(values)?Number(values[level-1])||0:0;
-            return "火系技能爆擊或新增燃燒時獲得炎勢"+(percent?"（傷害 +"+percent+"%）":"");
+            return "炎勢使火系直接攻擊傷害提升"+(percent?" "+percent+"%":"")+
+                "；Lv5爆擊或成功新增燃燒可延長持續回合";
         }
         if(type==="bloodBurn"){
             const level=Math.max(1,Math.min(5,Number(entry&&entry.skillLevel)||1));
@@ -961,7 +1015,7 @@
 
     function placeSprite(current,node,index,target){
         const sprite=current.model.sprite;
-        const placement=placementFor(current.config,sprite);
+        const placement=placementFor(current.config,sprite,current.targetType);
         node.dataset.placement=placement;
 
         if(placement==="single"){
@@ -1052,7 +1106,7 @@
     function addSprite(current,index,target){
         const sprite=current.model.sprite;
         if(!sprite||!target||!state.stage){ return; }
-        const placement=placementFor(current.config,sprite);
+        const placement=placementFor(current.config,sprite,current.targetType);
         const key=placement==="single"||placement==="targetTrajectory"?String(index):"main";
         let node=current.spriteNodes.get(key);
         if(!node){
@@ -1144,7 +1198,7 @@
     function registerTarget(targetSide,index,allowDefeated){
         const current=state.current;
         if(!current||current.done||current.targetSide!==targetSide){ return null; }
-        const single=String(current.config.targetType||"")==="single";
+        const single=String(current.targetType||current.config.targetType||"")==="single";
         if(single&&current.targetIndexes.length&&current.targetIndexes.indexOf(index)<0){ return null; }
         if(!current.validTargets.has(index)){ current.validTargets.add(index); }
         emitSprite(current,index,allowDefeated===true);
@@ -1185,10 +1239,12 @@
         purgeStaleRasterStages();
 
         const model=modelFor(config);
-        const contractedSide=meta&&meta.targetContract&&meta.targetContract.version==="battle-target-contract-v1"
-            ?meta.targetContract.targetSide:meta&&meta.targetSide;
+        const contract=meta&&meta.targetContract&&meta.targetContract.version==="battle-target-contract-v1"
+            ?meta.targetContract:null;
+        const contractedSide=contract?contract.targetSide:meta&&meta.targetSide;
         const targetSide=contractedSide==="player"||contractedSide==="monster"
             ?contractedSide:targetSideFor(config,meta.side||"player");
+        const targetType=String(contract&&contract.targetType||config&&config.targetType||"single");
         const duration=Math.max(520,Number(config.duration)||520);
         const validTargets=new Set(activeCards(targetSide,config).map(entry=>entry.index));
         const explicitTargets=Array.isArray(meta.targetIds)
@@ -1205,7 +1261,7 @@
             side:meta.side||"player",actorIndex:Number.isInteger(meta.actorIndex)?meta.actorIndex:0,
             targetId:meta.targetId!==undefined?meta.targetId:null,
             targetIds:Array.isArray(meta.targetIds)?meta.targetIds.slice():null,
-            targetSide:targetSide,targetIndexes:[],emitted:new Set(),validTargets:validTargets,
+            targetSide:targetSide,targetType:targetType,targetIndexes:[],emitted:new Set(),validTargets:validTargets,
             spriteNodes:new Map(),confirmedTargets:new Set(),deferredStatusTargets:new Map(),statusAtStart:snapshotTimedEffects(model),
             actorCard:cardFor(meta.side||"player",Number.isInteger(meta.actorIndex)?meta.actorIndex:0),
             startedAt:Date.now(),visualStartedAt:0,firstVisibleFrameAt:0,
@@ -1433,51 +1489,35 @@
         };
     }
 
-    if(typeof updateMonsterUI==="function"){
-        const previous=updateMonsterUI;
-        updateMonsterUI=function(index){
-            const wait=existingTargetDelay("monster",index);
-            if(wait>8){
-                const key="monster:"+index;
-                if(!state.pendingUpdates.has(key)){
-                    const args=arguments;
-                    state.pendingUpdates.set(key,true);
-                    setTimer(()=>{
-                        state.pendingUpdates.delete(key);
-                        previous.apply(this,args);
-                        syncStatusVisualsForUnit("monster",Number(index));
-                    },wait);
-                }
-                return;
+    function scheduleStatusOwnedUiUpdate(side,index,keyPrefix,callback){
+        if(typeof callback!=="function"){ return; }
+        const wait=existingTargetDelay(side,index);
+        if(wait>8){
+            const key=keyPrefix+":"+index;
+            if(!state.pendingUpdates.has(key)){
+                state.pendingUpdates.set(key,true);
+                setTimer(()=>{
+                    state.pendingUpdates.delete(key);
+                    callback();
+                },wait);
             }
-            const result=previous.apply(this,arguments);
-            syncStatusVisualsForUnit("monster",Number(index));
-            return result;
-        };
+            return;
+        }
+        return callback();
     }
 
-    if(typeof updateSingleCharacterStatusBadge==="function"){
-        const previous=updateSingleCharacterStatusBadge;
-        updateSingleCharacterStatusBadge=function(index){
-            const wait=existingTargetDelay("player",index);
-            if(wait>8){
-                const key="player-status:"+index;
-                if(!state.pendingUpdates.has(key)){
-                    const args=arguments;
-                    state.pendingUpdates.set(key,true);
-                    setTimer(()=>{
-                        state.pendingUpdates.delete(key);
-                        previous.apply(this,args);
-                        syncStatusVisualsForUnit("player",Number(index));
-                    },wait);
-                }
-                return;
-            }
-            const result=previous.apply(this,arguments);
-            syncStatusVisualsForUnit("player",Number(index));
-            return result;
-        };
-    }
+    window.v143ScheduleMonsterUiUpdate=function(index,callback){
+        return scheduleStatusOwnedUiUpdate("monster",Number(index),"monster",callback);
+    };
+    window.v143StatusAfterMonsterUiUpdate=function(index){
+        syncStatusVisualsForUnit("monster",Number(index));
+    };
+    window.v143SchedulePlayerStatusUiUpdate=function(index,callback){
+        return scheduleStatusOwnedUiUpdate("player",Number(index),"player-status",callback);
+    };
+    window.v143StatusAfterPlayerUiUpdate=function(index){
+        syncStatusVisualsForUnit("player",Number(index));
+    };
 
     function wrapBadge(name){
         const previous=window[name];

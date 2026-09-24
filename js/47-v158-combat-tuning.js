@@ -16,34 +16,15 @@
         return Math.max(min,Math.min(max,value));
     }
 
-    function hitChancePercent(casterAccuracy,targetEvasion,directChanceReductionPercent){
-        const directReduction=Math.max(0,numeric(directChanceReductionPercent));
-        const rawAccuracyChance=
-            95+
-            numeric(casterAccuracy)*0.3;
-        const accuracyChance=clamp(rawAccuracyChance,50,99);
-        const evasionRate=clamp(numeric(targetEvasion),0,85);
-        const evasionAdjustedChance=accuracyChance*(1-evasionRate/100);
-        return clamp(evasionAdjustedChance-directReduction,1,99);
-    }
-
-    window.v158GetHitChancePercent=hitChancePercent;
-
-    if(typeof rollHitChance==="function"){
-        rollHitChance=function(casterAccuracy,targetEvasion,directChanceReductionPercent){
-            return Math.random()*100<hitChancePercent(
-                casterAccuracy,
-                targetEvasion,
-                directChanceReductionPercent
-            );
-        };
-    }
+    /* Hit chance is owned by js/00-main.js. V158 must not override it. */
 
     function normalizeMonsterDefaultEvasion(monster){
         if(!monster){ return monster; }
         const level=Math.max(1,numeric(monster.level)||1);
         if(monster.evasion===undefined){
-            monster.evasion=Math.min(30,level*0.3);
+            monster.evasion=typeof window.v173GetDefaultMonsterEvasion==="function"
+                ?window.v173GetDefaultMonsterEvasion(level)
+                :Math.min(10,level*0.1);
         }
         return monster;
     }
@@ -218,99 +199,8 @@
     }
     window.v158PrepareBattleRender=v158PrepareBattleRender;
 
-    if(typeof getMonsterEvasion==="function"){
-        const previousGetMonsterEvasion=getMonsterEvasion;
-        getMonsterEvasion=function(monster){
-            return previousGetMonsterEvasion.call(
-                this,
-                normalizeMonsterDefaultEvasion(monster)
-            );
-        };
-    }
+    /* getMonsterEvasion() remains the single core owner; no late V158 wrapper. */
 
-    function castTriFreeze(characterIndex,skillId,centerIndex,legacyPlayer2){
-        const skill=typeof skillDatabase!=="undefined"?skillDatabase[skillId]:null;
-        const character=legacyPlayer2
-            ?(typeof player2!=="undefined"?player2:null)
-            :(typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(characterIndex):null);
-        const characterKey=legacyPlayer2
-            ?"player2"
-            :(typeof getPartyCharacterKey==="function"?getPartyCharacterKey(characterIndex):null);
-        const stats=legacyPlayer2
-            ?(typeof getPlayer2BattleStats==="function"?getPlayer2BattleStats():null)
-            :(typeof getPartyBattleStats==="function"?getPartyBattleStats(characterIndex):null);
-        const level=skill&&characterKey&&typeof getSkillLevel==="function"
-            ?getSkillLevel(characterKey,skillId)
-            :0;
-        const spCost=skill&&skill.spCost!==undefined?numeric(skill.spCost):numeric(skill&&skill.cost);
-
-        if(!skill||!character||!stats||level<=0||numeric(character.sp)<spCost){ return false; }
-
-        const resolvedIndex=typeof findAliveTargetIndex==="function"
-            ?findAliveTargetIndex(centerIndex)
-            :centerIndex;
-        if(resolvedIndex===null||resolvedIndex===undefined){
-            if(!legacyPlayer2&&typeof finishPlayerAction==="function"){ finishPlayerAction(); }
-            return true;
-        }
-
-        character.sp=Math.max(0,numeric(character.sp)-spCost);
-        if(typeof selectedMonster!=="undefined"){ selectedMonster=resolvedIndex; }
-        if(typeof lungePlayerCard==="function"){ lungePlayerCard(characterIndex); }
-        if(typeof showSkillNameBadge==="function"){
-            showSkillNameBadge(skill.name,skill.element,characterIndex);
-        }
-        if(typeof setTimeout==="function"&&typeof showPlayerSpPopup==="function"){
-            setTimeout(()=>showPlayerSpPopup(spCost,characterIndex),500);
-        }
-
-        const targets=typeof getSkillTargets==="function"
-            ?getSkillTargets(resolvedIndex,"tri")
-            :[resolvedIndex];
-
-        targets.forEach(index=>{
-            const monster=typeof monsters!=="undefined"?monsters[index]:null;
-            if(!monster||monster.alive===false||numeric(monster.hp)<=0){ return; }
-            const rollArguments=[
-                skill.freezeChance,
-                character.level,
-                monster.level,
-                stats.intelligence,
-                typeof getMonsterEffectiveSpiritPoints==="function"
-                    ?getMonsterEffectiveSpiritPoints(monster)
-                    :numeric(monster.spiritPoints),
-                true,
-                typeof getMonsterRank==="function"?getMonsterRank(monster):monster.rank
-            ];
-            const statusResult=typeof window.v173RollNamedPersistentStatusEffect==="function"
-                ?window.v173RollNamedPersistentStatusEffect(
-                    monster,"freeze",rollArguments,"monster",index,skill.name
-                )
-                :{
-                    duplicate:false,
-                    hit:typeof rollStatusEffectHit==="function"&&
-                        rollStatusEffectHit.apply(null,rollArguments)
-                };
-
-            if(statusResult.hit){
-                if(typeof applyFreezeEffect==="function"){
-                    applyFreezeEffect(monster,skill.freezeDuration);
-                }
-                if(typeof addBattleLog==="function"){
-                    addBattleLog(monster.name+"被冰封了！");
-                }
-            }else if(!statusResult.duplicate){
-                if(typeof showMissEffect==="function"){ showMissEffect(false,index,"抵抗"); }
-                if(typeof addBattleLog==="function"){
-                    addBattleLog(skill.name+"對"+monster.name+"沒有生效（抵抗）。");
-                }
-            }
-        });
-
-        if(typeof updateUI==="function"){ updateUI(); }
-        if(!legacyPlayer2&&typeof finishPlayerAction==="function"){ finishPlayerAction(); }
-        return true;
-    }
 
     /* Solo Lv1-20 formal daily protection: wave 1 is normal-attack only.
        From wave 2 onward skills are allowed at a reduced rate; a BOSS that just
@@ -355,23 +245,8 @@
         };
     }
 
-    window.v158CastTriFreeze=castTriFreeze;
-
-    if(typeof castSecondaryCharacterSkill==="function"){
-        const previousCastSecondaryCharacterSkill=castSecondaryCharacterSkill;
-        castSecondaryCharacterSkill=function(characterIndex,skillId,centerIndex){
-            if(skillId==="freeze"&&castTriFreeze(characterIndex,skillId,centerIndex,false)){ return; }
-            return previousCastSecondaryCharacterSkill.apply(this,arguments);
-        };
-    }
-
-    if(typeof castPlayer2Skill==="function"){
-        const previousCastPlayer2Skill=castPlayer2Skill;
-        castPlayer2Skill=function(skillId,centerIndex){
-            if(skillId==="freeze"&&castTriFreeze(1,skillId,centerIndex,true)){ return; }
-            return previousCastPlayer2Skill.apply(this,arguments);
-        };
-    }
+    /* Freeze/Hard Control execution is owned by js/00-main.js.
+       V158 keeps only combat tuning and must not wrap player skill casts. */
 
     if(typeof openInventoryCharacterDetail==="function"){
         const previousOpenInventoryCharacterDetail=openInventoryCharacterDetail;
@@ -390,8 +265,8 @@
                 const note=document.querySelector("#inventoryCharacterDetailStats .inventory-character-detail-note");
                 if(note){
                     note.innerHTML=
-                        "命中先依95%＋命中×0.3計算（50%～99%），再乘上(1－目標最終閃躲率)。<br>"+
-                        "所有閃躲來源採乘算，最終閃躲率最高85%；一般異常每1精神降低0.05個百分點命中率，硬控維持原公式。";
+                        "最終命中率＝95%＋命中×0.15%＋最終命中加成－目標最終閃躲－最終命中下降，最後限制70%～99%。<br>"+
+                        "所有命中／閃躲／異常抗性技能百分比都以最終百分點加減；異常主屬性與目標精神每1點各換算0.05個百分點。";
                 }
             }
             return result;
