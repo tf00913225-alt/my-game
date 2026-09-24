@@ -85,6 +85,12 @@ jobs:
       - name: Run Adventure V1 targeted regression
         run: node tests/adventure-node-system-v1.test.js
 
+      - name: Run Cloud Save Phase 3 UID isolation regressions
+        run: |
+          node tests/cloud-save-phase3-uid-local-isolation.test.js
+          node tests/account-save-ownership.test.js
+          node tests/auth-before-character-creation.test.js
+
       - name: Run Fixed Slot battlefield rendering regression
         run: node tests/fixed-slot-battlefield-rendering-v2.test.js
 

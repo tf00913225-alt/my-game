@@ -1,3 +1,14 @@
+## 2026-09-24 — Cloud Save Phase 3 UID 本機隔離／登入載入（IMPLEMENTED candidate）
+
+- Base：`dev@9a7b702303d22a20f80a20ca732a6953003b38a1`；工作分支：`feature/cloud-save-phase3-uid-local-isolation-20260924`；`main` 全程禁止修改。
+- 真正根因不是 canonical save key：主存檔已有 UID namespace 與 active-UID write guard；風險在同一 document 直接換 UID 時，player／inventory／equipment 等 module globals 與多個 app-shell/gameplay sidecar key 仍綁定前一 UID。
+- Startup State Machine `js/52-v173.20-startup-loader.js` 新增唯一 `reloadForAccountTransition()`：Auth 登出或 UID 改變時，先作廢舊 async resolution、deactivate save owner、移除上一帳號的 session resume marker、隱藏創角／gameplay，再完整 reload。新 document 才解析新 UID 並重新建立所有 sidecar owner。
+- 不新增 save wrapper、第二套 Startup owner 或 vXXX patch；`account-save-repository.js`、`FourSymbolsGameSave`、Firestore readonly reader 與 Phase 2 Envelope 不改。訪客資料不自動合併至 Google／Email；legacy migration 仍只允許明確確認。
+- 新增 `tests/cloud-save-phase3-uid-local-isolation.test.js`，並與 account ownership、auth-before-creation 加入 PR→dev 必跑 CI；既有 Boot browser QA 已具 UID A→登出→UID B 完整隔離案例，將作 deployed candidate 自動證據。
+- 本機 Phase 3／ownership／auth-before-creation／boot／startup／V173.65 auth regressions 全數 PASS；deterministic build 與 `build:check` PASS，`git diff --check` PASS。完整 `npm test` 在 12/212 時只因 runner 無 Chrome/Chromium 停止；未冒稱 full suite 通過，browser QA 留待 PR CI。
+- Requirement Batch：`release/requirement-batches/2026-09-24-cloud-save-phase3-uid-local-isolation.json`，目前 6/6 IMPLEMENTED。仍待 PR CI、DEV exact-SHA 部署及同裝置真實帳號切換驗收；未達成前狀態為 NOT COMPLETE。
+- `DATA_SECURITY_CONTRACTS.md` 仍不存在；本次只依既有 Boot／System／Cloud progress 契約施工，未自行假造缺失契約。
+
 ## 2026-09-24 — 四象塔 Element Owner／6・10 人陣形／Small Boss 收斂（VERIFIED candidate）
 
 - Base：最新 `dev@ae3bfba3d75c7c40bb4eea07860f525351ffd658`；工作分支：`fix/tower-element-formation-small-boss-20260924`；PR #552 → `dev`；`main` 全程未修改。

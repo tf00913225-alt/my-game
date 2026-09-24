@@ -32,8 +32,10 @@ const auth=read("js/firebase/firebase-auth-ui.js"),startup=read("js/52-v173.20-s
 assert.match(auth,/Array\.isArray\(user\.providerIds\)/);
 assert.match(auth,/使用 Google 登入中/);
 assert.match(auth,/使用 \"\+user\.email\+\" 信箱登入中/);
-assert.doesNotMatch(startup,/activeUser\)\{[\s\S]{0,180}location\.reload\(\)/);
-assert.match(startup,/reason:"account-switch"/);
+assert.match(startup,/function reloadForAccountTransition\(reason\)[\s\S]*?FourSymbolsGameSave\.deactivate\(\)[\s\S]*?location\.reload\(\)/,
+    "account transitions must rebuild UID-bound runtime state");
+assert.match(startup,/reloadForAccountTransition\("signed-out"\)/);
+assert.match(startup,/reloadForAccountTransition\("uid-changed"\)/);
 assert.match(startup,/v54RenderHomeRoster/);
 
 const relicJs=read("js/60-team-relic-system.js"),relicCss=read("css/55-team-relic-system.css");
