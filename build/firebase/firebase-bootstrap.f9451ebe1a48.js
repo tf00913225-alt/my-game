@@ -8,7 +8,7 @@ import {
     bootstrapTrustedCloudSave,CLOUD_FUNCTIONS_REGION,CLOUD_SAVE_WRITE_POLICY,readCurrentCloudSave,
     submitLegacyMigrationCandidate
 } from "./firebase-cloud-save.791dd91d8027.js";
-import {closeFirebaseAuthUi,installFirebaseAuthUi,openFirebaseAuthUi,setFirebaseAuthUiState} from "./firebase-auth-ui.db1bc127701d.js";
+import {closeFirebaseAuthUi,installFirebaseAuthUi,openFirebaseAuthUi,setFirebaseAuthUiState} from "./firebase-auth-ui.958d170522b5.js";
 import {synchronizeGameSession,revokeGameSession,protectedTest,getGameSessionState} from "./firebase-session.cb0907b5ca79.js";
 
 const AUTH_EVENT="four-symbols:firebase-auth-state";

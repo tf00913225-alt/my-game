@@ -41,7 +41,7 @@
       "id": "CLOUD-P2-LIVE-06",
       "status": "IMPLEMENTED",
       "requirement": "DEV 登入後可透過正式 Firebase bridge 建立／讀回自己的 Version 2 envelope，重複 bootstrap 維持同一 serverRevision；不得暴露 credential 或上傳本機 gameplay save。",
-      "evidence": ["js/firebase/firebase-bootstrap.js", "js/firebase/firebase-cloud-save.js", "tests/firebase-auth-foundation.test.mjs"]
+      "evidence": ["js/firebase/firebase-bootstrap.js", "js/firebase/firebase-cloud-save.js", "js/firebase/firebase-auth-ui.js", "tests/firebase-auth-foundation.test.mjs"]
     }
   ],
   "verification": {
@@ -50,8 +50,8 @@
     "emulator": "PASS — Java 21 Auth/Firestore/Functions emulator, PR run 35987380024 and merged dev run 35987880460.",
     "repositoryChecks": "PASS — PR run 35987380366 and merged dev run 35987880895.",
     "firebaseDeploy": "PASS — latest dev 195acb63d4acd36ceada31ed95b5f50e448d297f, Session Authority run 35987880460, deploy job 107595824436.",
-    "liveValidation": "PENDING — public bridge added; requires one real DEV account bootstrap/read-back before Phase 2 COMPLETE.",
-    "browserQA": "NOT REQUIRED — no UI or startup behavior changed.",
+    "liveValidation": "PENDING — DEV mobile tap validation added; requires one real DEV account success result before Phase 2 COMPLETE.",
+    "browserQA": "REQUIRED — DEV-only account UI gained a manual Phase 2 validation button; static contract test added and deployed mobile tap remains pending.",
     "diffCheck": "PASS locally — git diff --check."
   }
 }

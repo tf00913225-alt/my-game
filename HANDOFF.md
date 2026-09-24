@@ -4263,3 +4263,4 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 - `submitLegacyMigrationCandidate`：仍只保存 `trusted:false` candidate；metadata 改變與 active Session 驗證同一 transaction，`serverRevision` 原子遞增。Phase 2 不產生正式 gameplay payload、不升格本機資料。
 - PR #553 已合併 `dev@195acb63d4acd36ceada31ed95b5f50e448d297f`。PR CI `35987380366`／Session `35987380024`、merged dev CI＋DEV deploy `35987880895`、Session emulator＋Firebase deploy `35987880460` 均 SUCCESS；正式 deploy job `107595824436` SUCCESS。
 - 最小 live 驗收 bridge 為 `FourSymbolsFirebase.bootstrapCloudSave()`；不自動呼叫、不改 first-use read owner、不傳 local gameplay save。Requirement Batch 現為 5/6 VERIFIED；真實 DEV 帳號需驗證 Version 2、Revision 1 與重複 bootstrap idempotency 後，才可改為 Phase 2 COMPLETE。Phase 3–10 未開始。
+- 為無電腦的真實裝置驗收，DEV 帳號面板新增手動「驗證雲端存檔骨架」按鈕；它連續 bootstrap 兩次並讀回 envelope，只顯示 Schema／Revision 結果，不顯示 credential、不送 local save。合併部署後仍須由真實 DEV 帳號點擊成功，才把 Requirement Batch 改為 6/6 VERIFIED。

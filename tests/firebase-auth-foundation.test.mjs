@@ -60,6 +60,20 @@ test("bootstrap exposes the narrow Firebase bridge and cloud-read events", ()=>{
     assert.match(bootstrap, /bootstrapCloudSave:bootstrapTrustedCloudSave/);
 });
 
+test("DEV account UI provides a tap-only Phase 2 envelope validation without local-save upload", ()=>{
+    assert.match(ui, /SESSION_TEST_HOSTS=new Set\(\["dev\.four-symbols-dev\.pages\.dev","localhost","127\.0\.0\.1"\]\)/);
+    assert.match(ui, /id="firebaseCloudEnvelopeTestButton"[^>]*>驗證雲端存檔骨架<\/button>/);
+    assert.match(ui, /const first=await api\.bootstrapCloudSave\(\)/);
+    assert.match(ui, /const second=await api\.bootstrapCloudSave\(\)/);
+    assert.match(ui, /const cloud=await api\.resolveCloudSave\(user\)/);
+    assert.match(ui, /data\.schemaVersion===2/);
+    assert.match(ui, /first\.serverRevision===revision&&second\.serverRevision===revision/);
+    assert.match(ui, /data\.authoritativeStateReady===false&&!hasGameplayPayload/);
+    assert.doesNotMatch(ui, /submitLegacyMigrationCandidate/);
+    assert.doesNotMatch(ui, /localStorage/);
+    assert.match(ui, /cloudEnvelopeTestButton\.addEventListener\("click"/);
+});
+
 test("authentication UI exposes Google, email and Firebase anonymous identity while Facebook remains backend-only", ()=>{
     assert.match(auth, /FacebookAuthProvider/);
     assert.match(auth, /export async function signInWithFacebook\(\)/);
