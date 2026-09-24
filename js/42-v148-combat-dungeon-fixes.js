@@ -297,7 +297,7 @@
         return target&&numeric(target.hp)>0?[selected]:[];
     }
 
-    function buffDuration(skill,level){    function buffDuration(skill,level){
+    function buffDuration(skill,level){
         return Math.max(1,Math.floor(
             levelValue(skill.durationByLevel,level,numeric(skill.duration)||2)
         ));
