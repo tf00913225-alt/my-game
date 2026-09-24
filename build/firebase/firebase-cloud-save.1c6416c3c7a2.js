@@ -128,9 +128,31 @@ export async function saveLocalAutoBattlePreferences(expectedRevision){
         error.code="LOCAL_SAVE_REQUIRED";
         throw error;
     }
-    const {player,player2,player3,autoConfig,autoConfig2,autoConfig3}=local.save;
+    const {player,player2,player3}=local.save;
     const characterIds=[player,player2,player3].map(character=>character?.id||null);
-    const preferences=JSON.parse(JSON.stringify({characterIds,autoConfig,autoConfig2,autoConfig3}));
+    /* Old UID saves may contain only some of these fields. Project the five
+     * approved settings with gameplay defaults; never forward other save data. */
+    const projectConfig=(value)=>{
+        if(value!==undefined&&value!==null&&(typeof value!=="object"||Array.isArray(value))){
+            const error=new Error("Local auto-battle settings are invalid.");
+            error.code="LOCAL_PREFERENCES_INVALID";
+            throw error;
+        }
+        const config=value||{};
+        return {
+            enabled:config.enabled??false,
+            skill:config.skill??"normal",
+            hp:config.hp??50,
+            sp:config.sp??25,
+            returnToCityWhenEmpty:config.returnToCityWhenEmpty??false
+        };
+    };
+    const preferences={
+        characterIds,
+        autoConfig:projectConfig(local.save.autoConfig),
+        autoConfig2:projectConfig(local.save.autoConfig2),
+        autoConfig3:projectConfig(local.save.autoConfig3)
+    };
     return callTrustedFunction("saveCloudPreferences",{preferences,expectedRevision});
 }
 

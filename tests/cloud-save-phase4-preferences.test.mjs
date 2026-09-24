@@ -2,6 +2,10 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import vm from "node:vm";
 import test from "node:test";
+import {createRequire} from "node:module";
+
+const require=createRequire(import.meta.url);
+const {normalizePreferences}=require("../functions/src/cloud-preferences.js");
 
 const source=fs.readFileSync(new URL("../js/00-main.js",import.meta.url),"utf8");
 const start=source.indexOf("function restoreAutoBattlePreferences(uid,preferences){");
@@ -65,4 +69,58 @@ test("offline Boot QA cloud double exports the Phase 4 bridge but never writes",
     assert.ok(match,"Boot QA cloud module double must exist");
     const stub=await import("data:text/javascript,"+encodeURIComponent(match[1]));
     await assert.rejects(stub.saveLocalAutoBattlePreferences(),/QA never performs a cloud write/);
+});
+
+test("older UID saves project only approved preference fields before upload",async()=>{
+    const client=fs.readFileSync(new URL("../js/firebase/firebase-cloud-save.js",import.meta.url),"utf8");
+    const start=client.indexOf("export async function saveLocalAutoBattlePreferences(expectedRevision){");
+    const end=client.indexOf("export async function submitLegacyMigrationCandidate",start);
+    assert.ok(start>=0&&end>start);
+    const raw={
+        player:{id:"hero-a"},player2:null,player3:null,gold:9000,
+        autoConfig:{enabled:true,skill:"normal",hp:50,inventoryItems:[{id:"ore"}]},
+        autoConfig2:{skill:"normal"}
+    };
+    const writes=[];
+    const context={
+        requireSignedInUid:()=>"uid-a",
+        window:{FourSymbolsAccountSave:{getActiveUid:()=>"uid-a",readForUid:()=>({status:"ready",save:raw})}},
+        callTrustedFunction:async(name,payload)=>{writes.push({name,payload});return {ok:true};}
+    };
+    vm.runInNewContext(client.slice(start,end).replace("export async function","async function"),context);
+    assert.equal((await context.saveLocalAutoBattlePreferences(1)).ok,true);
+    assert.equal(writes.length,1);
+    assert.equal(writes[0].name,"saveCloudPreferences");
+    assert.equal(writes[0].payload.expectedRevision,1);
+    const serialized=JSON.parse(JSON.stringify(writes[0].payload.preferences));
+    assert.deepEqual(serialized.characterIds,["hero-a",null,null]);
+    assert.deepEqual(serialized.autoConfig,{enabled:true,skill:"normal",hp:50,sp:25,returnToCityWhenEmpty:false});
+    assert.deepEqual(serialized.autoConfig2,{enabled:false,skill:"normal",hp:50,sp:25,returnToCityWhenEmpty:false});
+    assert.deepEqual(serialized.autoConfig3,serialized.autoConfig2);
+    assert.deepEqual(normalizePreferences(serialized),serialized);
+    assert.ok(!JSON.stringify(serialized).includes("gold"));
+    assert.ok(!JSON.stringify(serialized).includes("inventoryItems"));
+    assert.equal(raw.autoConfig.sp,undefined,"source save must not be rewritten");
+});
+
+test("ambiguous upload response does not claim cloud data was unchanged",async()=>{
+    const ui=fs.readFileSync(new URL("../js/firebase/firebase-auth-ui.js",import.meta.url),"utf8");
+    const start=ui.indexOf("async function testCloudPreferences(){");
+    const end=ui.indexOf("async function restoreCloudPreferences(){",start);
+    assert.ok(start>=0&&end>start);
+    const context={
+        busy:false,DEV_SESSION_TEST_ENABLED:true,state:{},setBusy:()=>{},render:()=>{},
+        sessionTestFailureText:()=>"⚠️ 無法確認目前權限，請稍後再試。",
+        console:{error:()=>{}},
+        window:{FourSymbolsFirebase:{
+            getUser:()=>({uid:"uid-a"}),bootstrapCloudSave:async()=>({ok:true}),
+            resolveCloudSave:async()=>({exists:true,data:{ownerUid:"uid-a",serverRevision:1}}),
+            saveLocalAutoBattlePreferences:async()=>{throw new Error("response lost after write");}
+        }}
+    };
+    vm.runInNewContext(ui.slice(start,end),context);
+    await context.testCloudPreferences();
+    assert.match(context.state.cloudPreferencesTest,/結果尚未確認/);
+    assert.match(context.state.cloudPreferencesTest,/請勿重複上傳/);
+    assert.doesNotMatch(context.state.cloudPreferencesTest,/雲端未修改/);
 });

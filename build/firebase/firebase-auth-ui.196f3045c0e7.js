@@ -259,6 +259,7 @@ async function testCloudSaveEnvelope(){
 }
 async function testCloudPreferences(){
     if(busy||!DEV_SESSION_TEST_ENABLED){ return; }
+    let stage="bootstrap";
     setBusy(true);
     state={...state,cloudPreferencesTest:"正在驗證目前 UID 的自動戰鬥設定…"};
     render();
@@ -270,9 +271,12 @@ async function testCloudPreferences(){
         const user=api.getUser();
         if(!user?.uid){ throw new Error("AUTH_REQUIRED"); }
         await api.bootstrapCloudSave();
+        stage="initial-read";
         const before=await api.resolveCloudSave(user);
         if(!before.exists||before.data?.ownerUid!==user.uid){ throw new Error("CLOUD_PREFERENCES_OWNER_MISMATCH"); }
+        stage="upload";
         const write=await api.saveLocalAutoBattlePreferences(before.data.serverRevision);
+        stage="readback";
         const after=await api.resolveCloudSave(user);
         if(!write.ok||write.uid!==user.uid||after.data?.ownerUid!==user.uid||
            write.serverRevision!==after.data.serverRevision||after.data.preferencesVersion!==1||
@@ -283,9 +287,15 @@ async function testCloudPreferences(){
         state={...state,cloudPreferencesTest:`✅ 設定已讀回（Revision ${write.serverRevision}）；未建立完整角色雲端存檔。`};
     }catch(error){
         console.error("Firebase cloud preferences test failed:",error);
-        state={...state,cloudPreferencesTest:sessionTestFailureText(error).startsWith("⚠️ 無法確認")
-            ?"⚠️ 設定驗證未完成；手機原存檔未修改。若另一裝置已更新，請重新確認後再操作。"
-            :sessionTestFailureText(error)};
+        const sessionMessage=sessionTestFailureText(error);
+        const knownSession=!sessionMessage.startsWith("⚠️ 無法確認");
+        const localError=["LOCAL_SAVE_REQUIRED","LOCAL_PREFERENCES_INVALID","ACCOUNT_CHANGED"].includes(error?.code);
+        const message=knownSession?sessionMessage
+            :localError?"⚠️ 本機角色或自動戰鬥設定無法通過檢查；請確認仍是原帳號、角色已載入。手機原存檔未修改。"
+            :stage==="upload"||stage==="readback"
+                ?"⚠️ 雲端設定結果尚未確認；手機原存檔未修改。請勿重複上傳，先核對雲端資料。"
+                :"⚠️ 雲端骨架讀取未完成；手機原存檔未修改。請先驗證雲端存檔骨架。";
+        state={...state,cloudPreferencesTest:message};
     }finally{ setBusy(false); render(); }
 }
 async function restoreCloudPreferences(){
