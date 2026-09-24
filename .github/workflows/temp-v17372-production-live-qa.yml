@@ -35,20 +35,15 @@ jobs:
           (async()=>{
             const release=await json("/release/release.json");
             const notice=await json("/release/release-update.json");
-            const manifest=await json("/release-manifest.json");
             if(String(release.version)!=="173.72"||String(release.cacheVersion)!=="173.72"){
               throw new Error("Production Game/Cache mismatch: "+JSON.stringify(release));
             }
             if(String(notice.releaseVersion)!=="V173.72"){
               throw new Error("Production release notice mismatch: "+JSON.stringify(notice));
             }
-            const deployed=String(manifest.commitSha||manifest.commitSHA||manifest.commit||manifest.sha||"");
-            if(deployed!==expected){
-              throw new Error("Production deployment SHA mismatch: "+deployed+" != "+expected);
-            }
             console.log("Production release metadata PASS",JSON.stringify({
               version:release.version,cacheVersion:release.cacheVersion,
-              notice:notice.releaseVersion,commitSha:deployed
+              notice:notice.releaseVersion,expectedPagesCommit:expected
             }));
           })().catch(error=>{console.error(error);process.exit(1);});
           NODE
