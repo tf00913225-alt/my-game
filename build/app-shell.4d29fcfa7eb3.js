@@ -12409,16 +12409,20 @@ function selectBattleTarget(index){
 
     if(
         !battleActive ||
-        !actionReady ||
-        !pendingAction ||
         !monsters[index] ||
         !monsters[index].alive
     ){
         return;
     }
 
-    const targetType=getBattleActionTargetType(pendingAction,activeBattleCharacterIndex);
-    if(!canSelectHostileBattlePrimary("monster",index,targetType)){ return; }
+    /* During a real hostile-target declaration, Stealth and the formal
+       Target Shape gate primary selection. Outside declaration mode this
+       helper may still project an already-resolved/programmatic target
+       (Boss objects, QA, replay/presentation) without inventing an action. */
+    if(actionReady&&pendingAction){
+        const targetType=getBattleActionTargetType(pendingAction,activeBattleCharacterIndex);
+        if(!canSelectHostileBattlePrimary("monster",index,targetType)){ return; }
+    }
 
     selectedMonster=index;
 
