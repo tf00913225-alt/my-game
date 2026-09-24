@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-24-tower-element-formation-small-boss",
+  "baseBranch": "dev",
+  "baseSha": "ae3bfba3d75c7c40bb4eea07860f525351ffd658",
+  "workBranch": "fix/tower-element-formation-small-boss-20260924",
+  "title": "四象塔 Element Owner＋Monster Skill Element Guard＋6/10 Formation＋Small Boss＋Legacy Dungeon Rebalance 收斂",
+  "status": "IMPLEMENTED",
+  "requirements": [
+    {
+      "id": "TOWER-ELEMENT-01",
+      "status": "IMPLEMENTED",
+      "requirement": "四象塔 monster.element 與 fixed loadout 由 gameplay-boss-tower-system 唯一擁有；V141 legacy rebalanceDungeonElements 退休。",
+      "evidence": [
+        "js/gameplay-boss-tower-system.js",
+        "js/35-v141-ui-battle.js",
+        "tests/gameplay-boss-tower-system.test.js"
+      ]
+    },
+    {
+      "id": "RUNTIME-ID-02",
+      "status": "IMPLEMENTED",
+      "requirement": "共用 v132 Dungeon launcher 以 mode 明確區分 daily/tower/boss/adventure/abyss，不再以 ActiveDungeonRun truthy 推論玩法。",
+      "evidence": [
+        "js/27-v132-content-expansion.js",
+        "js/42-v148-combat-dungeon-fixes.js",
+        "js/59-abyss-two-tier-runtime.js",
+        "js/adventure/adventure-runtime-v1-20260915.js"
+      ]
+    },
+    {
+      "id": "SKILL-GUARD-03",
+      "status": "IMPLEMENTED",
+      "requirement": "V144 為敵方技能元素合法性唯一 Gate；一般元素怪 attack/support 均同元素，特殊跨元素僅明確 Skill ID allowlist。",
+      "evidence": [
+        "js/40-v144-rules-and-abyss.js",
+        "js/34-v141-core-systems.js",
+        "js/36-v141-content-systems.js",
+        "js/46-v155-dev-fixes.js",
+        "tests/v144-rules-and-abyss.test.js"
+      ]
+    },
+    {
+      "id": "FORMATION-04",
+      "status": "IMPLEMENTED",
+      "requirement": "Tower 普通層固定6人3前3後；特殊/精英/Boss層固定10人5前5後，B3 為核心且死亡不補位。",
+      "evidence": [
+        "js/gameplay-boss-tower-system.js",
+        "js/battlefield-slot-owner.js",
+        "tests/tower-element-formation-small-boss-20260924.test.js"
+      ]
+    },
+    {
+      "id": "SMALL-BOSS-05",
+      "status": "IMPLEMENTED",
+      "requirement": "Tower Boss rank 仍為 boss，但只占 B3 單格，Portrait sizeClass=standard 1024×1536，與 Large Boss footprint/援軍/object/shield/inspector 解耦。",
+      "evidence": [
+        "js/gameplay-boss-tower-system.js",
+        "config/monster-portrait-registry.json",
+        "docs/MONSTER_PORTRAIT_SPEC_V1.md",
+        "tests/gameplay-boss-tower-system.test.js"
+      ]
+    },
+    {
+      "id": "LARGE-BOSS-06",
+      "status": "IMPLEMENTED",
+      "requirement": "Personal/World Boss 仍保留大型 footprint、B1/B5 援軍、F1/F5 objects、Shield 與 Boss mechanisms。",
+      "evidence": [
+        "js/gameplay-boss-tower-system.js",
+        "tests/gameplay-boss-tower-system.test.js",
+        "tests/boss-battle-architecture-convergence-20260918.test.js"
+      ]
+    },
+    {
+      "id": "DEBT-07",
+      "status": "IMPLEMENTED",
+      "requirement": "退休 broad element rebalance、Tower large-boss plan 與 V152 極帝名稱式技能注入；deprecated-code gate 禁止回歸。",
+      "evidence": [
+        "release/deprecated-code.json",
+        "js/44-v152-dev-fixes.js",
+        "tests/tower-element-formation-small-boss-20260924.test.js"
+      ]
+    }
+  ],
+  "verification": {
+    "focusedTests": "PENDING",
+    "build": "PENDING",
+    "repositoryChecks": "PENDING",
+    "browserQA": "PENDING",
+    "diffCheck": "PENDING"
+  }
+}
