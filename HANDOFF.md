@@ -1,3 +1,15 @@
+## 2026-09-24 — 四象塔 Element Owner／6・10 人陣形／Small Boss 收斂（IMPLEMENTED candidate）
+
+- Base：最新 `dev@ae3bfba3d75c7c40bb4eea07860f525351ffd658`；工作分支：`fix/tower-element-formation-small-boss-20260924`；`main` 未修改。
+- 四象塔元素／固定技能唯一玩法 Owner 收斂於 `js/gameplay-boss-tower-system.js`；V141 `rebalanceDungeonElements()` 已退休，Daily／Tower／Boss／Adventure／Abyss 共用 launcher 以正式 `v132ActiveDungeonRun.mode` 區分身分。
+- V144 新增 Monster Skill Element Guard：一般元素怪 Attack／Support／Heal／Buff／Debuff／Hard Control 只能從本元素正式攜帶 ID 選招；Abyss 真正跨元素例外以 `v144CrossElementSkillIds` 明確 allowlist。
+- Tower 一般層固定 6 名（B2/B3/B4 + F2/F3/F4）；5 的倍數特殊層與 10 的倍數 Boss 層固定 10 名。Boss 層 B3 是唯一 Tower Boss；非 Boss 特殊層 B3 優先 Elite；死亡後 Slot 不重排。
+- Tower Boss gameplay rank 保留 `boss`，但改為 `unitKind="tower-boss"`／單格 B3；不再進 Personal／World 的 Large Boss footprint、B1/B5 援軍、F1/F5 object、Shield／Mechanism lifecycle。
+- `config/monster-portrait-registry.json` 的 8 個 `tower-boss` target 保留 rank=boss，sizeClass 改 standard（1024×1536、2:3）；素材仍為 planned，本次不產圖、不建假檔。
+- 已新增專項 `tests/tower-element-formation-small-boss-20260924.test.js`，並更新 V141/V144/V152/Boss 既有 owner regression；Requirement Batch：`release/requirement-batches/2026-09-24-tower-element-formation-small-boss.json`。
+- `DATA_SECURITY_CONTRACTS.md` 在本次 Base 仍不存在；本次未修改帳號、Cloud Save 或安全資料 schema。
+- 狀態：Source IMPLEMENTED；Repository checks／deterministic build／browser QA／git diff 待 PR CI 後升級 VERIFIED。
+
 ## 2026-09-23 — Lv10 技能／輔助技能／秘寶 Runtime Owner 收斂（VERIFIED candidate）
 
 - Base：`dev@9d32e8cb022ff824e83d5dc3022f2e0a24c8d58a`；工作分支：`fix/skill-relic-runtime-owner-convergence-20260923`；`main` 未修改。
