@@ -757,7 +757,9 @@
         const previousMonsterSpecial=window.v141TryMonsterSpecialAction;
         window.v141TryMonsterSpecialAction=function(monsterIndex){
             const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
-            const supports=monster&&monster.v141SupportSkillIds||[];
+            const supports=monster&&typeof window.v144GetLegalMonsterSkillIds==="function"
+                ?window.v144GetLegalMonsterSkillIds(monster,"support")
+                :(monster&&monster.v141SupportSkillIds||[]);
             if(supports.includes("rage")){ return tryMonsterRage(monsterIndex); }
             return previousMonsterSpecial.apply(this,arguments);
         };
@@ -1146,7 +1148,7 @@
             }else{
                 showDailyGoldReward(goldDungeonReward(active.level));
             }
-        });
+        },{mode:"daily",dailyDungeonType:type});
         if(started===false){ dailyDungeonSequence=null; }
         else if(window.v132ActiveDungeonRun){
             window.v132ActiveDungeonRun.partySize=sequence.partySize;
