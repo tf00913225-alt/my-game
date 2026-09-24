@@ -1,6 +1,6 @@
 # Cloud Save Phase 4：一般進度遷移契約（施工中）
 
-狀態：IN PROGRESS / 0/6 VERIFIED。偏好欄位已在 PR #559／#560／#561 合入 dev，最新 `dev@01c543564498400b38dd8778acccb9d76777131f` 已通過 CI 與 DEV exact-SHA 部署（Game／Cache 173.72）。手機曾驗證上傳和讀回；修復確認視窗後的手機取回尚待回報。正式角色 gameplay cloud write 仍未開啟；`main` 禁止修改。
+狀態：IN PROGRESS / 0/6 VERIFIED。偏好欄位已在 PR #559／#560／#561 合入 dev，最新 `dev@01c543564498400b38dd8778acccb9d76777131f` 已通過 CI 與 DEV exact-SHA 部署（Game／Cache 173.72）。手機已驗證上傳、讀回及修復確認視窗後的手動取回成功（Revision 7）；「返回／取回」易混淆，改為「取消／套用雲端設定」。跨裝置完整角色恢復仍未開啟。正式角色 gameplay cloud write 仍未開啟；`main` 禁止修改。
 
 ## 現有 owner 與風險
 

@@ -315,7 +315,7 @@ async function restoreCloudPreferences(){
             throw new Error("此 UID 尚無可取回的自動戰鬥設定。");
         }
         if(typeof window.rpgConfirm!=="function"){ throw new Error("CONFIRM_UNAVAILABLE"); }
-        const confirmed=await window.rpgConfirm("只以雲端的自動戰鬥設定取代本機三名角色的對應設定；角色、金幣、背包和獎勵保持原樣。確定嗎？",{title:"取回雲端設定",confirmText:"取回",cancelText:"返回"});
+        const confirmed=await window.rpgConfirm("只以雲端的自動戰鬥設定取代本機三名角色的對應設定；角色、金幣、背包和獎勵保持原樣。確定嗎？",{title:"取回雲端設定",confirmText:"套用雲端設定",cancelText:"取消",primary:true});
         if(!confirmed){
             state={...state,cloudPreferencesTest:"已取消取回；本機設定未修改。"};
             return;

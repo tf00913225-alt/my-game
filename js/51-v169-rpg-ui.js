@@ -94,6 +94,7 @@
                 (kind==="confirm"?"確定":"知道了")
             ),
             cancelText:String(supplied.cancelText||"返回"),
+            primary:supplied.primary===true,
             tone:supplied.danger?"danger":String(supplied.tone||"normal")
         };
     }
@@ -114,7 +115,7 @@
         elements.cancelButton.textContent=options.cancelText;
         elements.confirmButton.textContent=options.confirmText;
         elements.cancelButton.hidden=activeDialog.kind!=="confirm";
-        elements.confirmButton.classList.toggle("primary",options.tone==="danger");
+        elements.confirmButton.classList.toggle("primary",options.primary||options.tone==="danger");
         elements.confirmButton.classList.toggle("danger",options.tone==="danger");
 
         elements.layer.classList.add("show");
