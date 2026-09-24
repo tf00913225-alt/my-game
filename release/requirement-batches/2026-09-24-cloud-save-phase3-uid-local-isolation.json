@@ -5,11 +5,11 @@
   "baseSha": "9a7b702303d22a20f80a20ca732a6953003b38a1",
   "workBranch": "feature/cloud-save-phase3-uid-local-isolation-20260924",
   "title": "Cloud Save Phase 3 — UID Local Isolation / Login Loading",
-  "status": "IMPLEMENTED",
+  "status": "VERIFIED",
   "requirements": [
     {
       "id": "CLOUD-P3-TRANSITION-01",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "登出或 Firebase UID 改變時，先解除目前存檔 owner、作廢進行中的載入，再以完整頁面重建所有 gameplay 與 sidecar runtime。",
       "evidence": [
         "js/52-v173.20-startup-loader.js::reloadForAccountTransition",
@@ -18,7 +18,7 @@
     },
     {
       "id": "CLOUD-P3-LOCAL-02",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "Canonical save、metadata 與 account sidecar 維持 UID namespace；只有 active UID 可寫入，owner mismatch 一律 fail closed。",
       "evidence": [
         "js/startup/account-save-repository.js",
@@ -28,7 +28,7 @@
     },
     {
       "id": "CLOUD-P3-LOADING-03",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "身份與同 UID 存檔解析完成前不得顯示創角或 gameplay；UID 轉換期間隱藏兩者並丟棄舊非同步結果。",
       "evidence": [
         "js/52-v173.20-startup-loader.js",
@@ -39,7 +39,7 @@
     },
     {
       "id": "CLOUD-P3-OFFLINE-04",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "Cloud read 失敗時，只允許 metadata ownerUid 等於目前 Firebase UID 的完整 local save 進入 OFFLINE_READY；其他情況維持 ERROR。",
       "evidence": [
         "js/52-v173.20-startup-loader.js::resolveSaveFor",
@@ -49,7 +49,7 @@
     },
     {
       "id": "CLOUD-P3-GUEST-05",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "Firebase Anonymous 訪客 UID 不得自動合併或搬移到 Google／Email UID；legacy 搬移仍只允許明確確認的 migration action。",
       "evidence": [
         "js/52-v173.20-startup-loader.js",
@@ -59,7 +59,7 @@
     },
     {
       "id": "CLOUD-P3-SCOPE-06",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "requirement": "Phase 3 不新增一般 gameplay cloud write、不修改 Cloud Save Envelope、經濟、戰鬥或正式版本號。",
       "evidence": [
         "git diff --check",
@@ -70,10 +70,10 @@
   "verification": {
     "focusedTests": "PASS — Phase 3, account ownership, auth-before-creation, boot architecture, startup loader and V173.65 auth regression tests.",
     "build": "PASS — deterministic production build generated and npm run build:check succeeded.",
-    "repositoryChecks": "PENDING",
-    "devDeploy": "PENDING",
-    "liveValidation": "PENDING — same-device guest/Google or two-account switch validation required before VERIFIED",
-    "browserQA": "LOCAL BLOCKED — runner has no Chrome/Chromium; GitHub Repository checks own the existing Boot browser account-switch QA.",
+    "repositoryChecks": "PASS — PR #557 run 35999834624; Repository checks completed SUCCESS, including Phase 3 targeted regressions and account-first Boot browser QA.",
+    "devDeploy": "PASS — merged dev eed8dec359eff34727381adfbfa50b7c2ea09bd3 was read back from https://dev.four-symbols-dev.pages.dev/release-manifest.json with Game/Cache V173.72; deployed HTML references boot-core.d8fbf40b153e.js containing the Phase 3 transition owner.",
+    "liveValidation": "PASS — user validated on a real mobile browser that Google → guest did not expose the Google character/data, and returning guest → Google restored the original Google account character/data.",
+    "browserQA": "PASS — GitHub Repository checks ran the existing account-first UID A → sign-out → UID B Boot browser isolation case; real-phone validation also passed.",
     "diffCheck": "PASS — git diff --check"
   }
 }
