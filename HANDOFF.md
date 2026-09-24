@@ -4255,3 +4255,11 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 - Production build commit：`7567aa216fba3f32e92792ea9dac317ff9f8d942`。Verified source candidate：`1596ea0a36e564facca92432376775d9728bc0fe`。
 - GitHub Actions Repository checks run `35866039901`：SUCCESS。包含 Syntax、Battle Runtime Architecture Guard、專項／既有 battle regressions、production build synchronization、Fixed Slot 9:16 mobile browser QA、exact-candidate real battle mobile browser QA、Adventure mobile QA、static resources、release gate 與 `git diff --check` 全部通過。
 - Requirement Batch：`release/requirement-batches/2026-09-23-battle-ui-hit-status-owner-convergence.json` 已升級為 VERIFIED。
+## 2026-09-24 — Cloud Save Phase 2 Server-owned Envelope（IMPLEMENTED candidate）
+
+- Base：最新 `dev@e9a2f481d5a318050991d475201f359d694871cc`；工作分支：`feature/cloud-save-phase2-envelope-20260924`；`main`／`dev` 均未直接修改。
+- Phase 1 Single Active Session 維持 5/5 VERIFIED。Phase 2 唯一 Envelope owner 新增於 `functions/src/cloud-save-envelope.js`；public `users/{uid}/saves/current` 使用 schema Version 2、server-owned Revision、server timestamps 與嚴格狀態驗證。
+- `bootstrapCloudSave`：新 envelope 從 Revision 1 建立；重複呼叫不亂增 Revision／updatedAt；既有 Phase 1 Version 1／Revision 0 精確骨架受控升級。任意 owner/schema/revision/timestamp/status 損壞一律 fail closed。
+- `submitLegacyMigrationCandidate`：仍只保存 `trusted:false` candidate；metadata 改變與 active Session 驗證同一 transaction，`serverRevision` 原子遞增。Phase 2 不產生正式 gameplay payload、不升格本機資料。
+- 本機 21/21 精準測試、syntax、build:check、diff check PASS。本 runner 只有 Java 17，Firebase CLI 15.30.0 需要 Java 21，故完整 emulator 交由已固定 Java 21 的 PR workflow；目前不得標成 VERIFIED／deployed。
+- Requirement Batch：`release/requirement-batches/2026-09-24-cloud-save-phase2-envelope.json`，5/5 IMPLEMENTED。下一步：PR→dev CI/emulator，合併後 exact dev Firebase deploy＋live envelope 驗證，再更新長期進度為 Phase 2 COMPLETE。Phase 3–10 未開始。

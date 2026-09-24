@@ -7,7 +7,7 @@
 | Phase | 範圍 | 狀態 |
 | --- | --- | --- |
 | 1 | Single Active Session（單一有效工作階段權威） | COMPLETE / 5/5 VERIFIED |
-| 2 | Cloud Save Skeleton（雲端存檔骨架） | NOT STARTED |
+| 2 | Cloud Save Skeleton（雲端存檔骨架） | IN PROGRESS / 5/5 IMPLEMENTED |
 | 3 | UID Local Isolation / Login Loading（本機隔離／登入載入） | NOT STARTED |
 | 4 | General Progress Migration（一般進度遷移） | NOT STARTED |
 | 5 | High-value Data Backend Authority（高價值資料後端權威） | NOT STARTED |
@@ -21,7 +21,8 @@
 
 ## B. Current Phase（目前階段）
 
-- Phase 1 — Single Active Session Authority：**COMPLETE / 5/5 VERIFIED**。Phase 2 尚未開始。
+- Phase 1 — Single Active Session Authority：**COMPLETE / 5/5 VERIFIED**。
+- Phase 2 — Cloud Save Skeleton：**IN PROGRESS / 5/5 IMPLEMENTED**。工作分支 `feature/cloud-save-phase2-envelope-20260924`，基準 `dev@e9a2f481d5a318050991d475201f359d694871cc`；須等 PR CI、Java 21 emulator、合併後最新 dev Firebase deploy 與 live envelope 驗證後才能改為 COMPLETE / VERIFIED。
 - 起始基準：GitHub 最新 `dev@7dd60dcddc9334902e058123a6084a93353e5943`，2026-09-19 重新 fetch 核對。
 - 原實作分支：`feature/cloud-session-authority-phase1-20260919`，當時只整合 `dev`。本次結案分支：`docs/cloud-session-phase1-closeout-20260919`，基準為重新核對的 `dev@342ef104fa2897f5ae5c3249e0c75c9efca3e762`；使用者已授權完成結案後經受保護 PR 發布 main。禁止直接修改 dev／main、rebase、force push。
 - 官方版本／cache version 維持 `173.65`，沒有升版。
@@ -81,6 +82,16 @@
 
 ## C. Completed Work（已實作／驗證證據）
 
+### Phase 2 Cloud Save Envelope（2026-09-24，待遠端驗證）
+
+- 新增唯一 Envelope owner：`functions/src/cloud-save-envelope.js`。正式 public envelope schema 為 Version 2，固定包含 `ownerUid`、`schemaVersion`、server-owned `serverRevision`、`createdAt`、`updatedAt`、authoritative readiness 與 migration metadata 狀態。
+- `bootstrapCloudSave` 仍在 Session Authority 的同一 Firestore transaction 內執行：新帳號建立 Revision 1；重複 bootstrap 不變更 envelope Revision／updatedAt；Phase 1 的精確 Version 1／Revision 0 骨架可受控升級為 Version 2／Revision 1。
+- `submitLegacyMigrationCandidate` 仍只接受 `trusted:false` candidate；public metadata 變更時把 `serverRevision` 原子遞增。它不會建立 `gameSave`、不會設定 `authoritativeStateReady:true`，也不會把本機 timestamp 當成雲端先後依據。
+- 既有 envelope 的 UID、schema、Revision、server timestamps、status／migration metadata 不一致，或非權威 envelope 混入 gameplay payload 時一律 fail closed；不再以 merge 靜默修補任意損壞文件。
+- 本階段不包裝 `saveGame()`／`loadGame()`，不遷移一般進度或高價值資料，不新增付款、operationId、帳本、快照或 Phase 3 的 account switching owner。
+- 本機精準測試 21/21 PASS、`npm run build:check` PASS、`git diff --check` PASS。當前 runner 僅 Java 17，Firebase CLI 15.30.0 要求 Java 21，因此本機 emulator 明確 BLOCKED；`.github/workflows/session-authority.yml` 已固定安裝 Java 21 並新增 Phase 2 unit／backend gate，遠端結果尚待 PR。
+- Requirement Batch：`release/requirement-batches/2026-09-24-cloud-save-phase2-envelope.json`，目前 5/5 IMPLEMENTED，不能宣稱完成或已部署。
+
 ### Session Authority owner
 
 - `functions/src/session-authority.js`：唯一 session policy／transaction owner。
@@ -133,7 +144,7 @@
 1. Phase 1 功能驗收已完成；本次結案文件仍須 PR → Repository checks SUCCESS → merge dev，然後核對最新 dev 的 CI、DEV deployment、Session Authority emulator 與 Firebase deploy，逐一記錄實際 SHA。
 2. 使用者已授權 dev → main 發布；只有上述最新 dev 驗證成功，且 main←dev 比較無獨立修復、素材分支混入或機密，才可建立及合併受保護發布 PR。正式部署、登入及無 DEV 測試區亦須獨立驗證。完成結果寫入[結案 PR #341](https://github.com/tf00913225-alt/my-game/pull/341) 永久發布記錄，不預填成功。
 3. Artifact Registry 清理政策本身仍有非阻塞警告，保留維運追蹤；不以 Deploy complete 推定政策設定成功。
-4. Phase 2–10 全部 NOT STARTED。本次不做正式 game save schema、一般進度／高價值資料遷移、operationId、帳本、快照或付款，亦不把 local progress 升格為正式雲端資料。
+4. Phase 2 已進入 IN PROGRESS；Phase 3–10 仍全部 NOT STARTED。本階段不做正式 gameplay payload schema、一般進度／高價值資料遷移、operationId、帳本、快照或付款，亦不把 local progress 升格為正式雲端資料。
 
 ## E. Architecture Decisions（永久決策）
 
@@ -202,13 +213,14 @@ Wire callable 名稱是 `protectedTest`（本文 protected-test 的正式 Fireba
 
 ## G. Next Safe Step（每次結束必更新）
 
-**Phase 1 功能驗收 COMPLETE / 5/5 VERIFIED；本次只完成其發布鏈，Phase 2 尚未開始。**
+**Phase 1 功能驗收 COMPLETE / 5/5 VERIFIED；Phase 2 為 IN PROGRESS / 5/5 IMPLEMENTED，尚未部署驗收。**
 
 1. 先讀本文件、`AGENTS.md`、`ARCHITECTURE_RULES.md`、`SYSTEM_CONTRACTS.md`、`docs/BOOT_ARCHITECTURE.md`、本次 Requirement Batch。
 2. 看 `functions/src/session-authority.js`、`functions/index.js`、`js/firebase/session-client.js`、`firebase-session.js`、兩個 Firebase client owners 與 `firestore.rules`。
 3. [結案 PR #341](https://github.com/tf00913225-alt/my-game/pull/341) 先以 CI 全綠合併 dev，再核對該最新 SHA 的 Repository checks、DEV 與 Firebase 部署；把最終 dev SHA／run／job 記錄於結案 PR。
 4. 比較 main←dev，完成受保護 PR 與正式部署驗證；把 main SHA、production deployment 及登入／DEV 測試區隔離結果記入永久發布記錄。任一發布環節未完成，整次任務仍回報 NOT COMPLETE。
-5. Phase 2 必須另行開始；後續若獲授權，才處理 server-owned save envelope（ownerUid、schemaVersion、revision、server timestamps）等。本次保持 NOT STARTED。
-6. 不修改戰鬥／VFX／UI、經濟／背包／秘寶、支付或存檔，禁止 local overwrite 與無關 refactor。只透過 PR 發布已驗證 dev，禁止直接修改 main。
+5. Phase 2 工作分支須先完成 PR Repository checks 與 Java 21 emulator；合併 dev 後只由 exact latest dev workflow 部署既有受保護 Functions＋Rules，並驗證 live bootstrap 的 Version 2／Revision 1 與重複 bootstrap idempotency，才可改為 COMPLETE / VERIFIED。
+6. Phase 3 另行處理 UID local isolation／login loading；Phase 4 才開始一般 gameplay progress migration。禁止把 Phase 2 envelope 誤稱完整雲端存檔。
+7. 不修改戰鬥／VFX／UI、經濟／背包／秘寶、支付或 gameplay save owner，禁止 local overwrite 與無關 refactor。禁止直接修改 main／dev。
 
 官方技術依據：[Callable 身分驗證](https://firebase.google.com/docs/functions/callable)、[Firebase auth_time／撤銷檢查](https://firebase.google.com/docs/auth/admin/manage-sessions)、[Firestore 原子交易與重跑](https://firebase.google.com/docs/firestore/manage-data/transactions)。
