@@ -139,9 +139,10 @@ test("Rage supplies separate critical chance and critical-damage values to the l
     assert.deepEqual([result.chance,result.multiplier],[20,1.9]);
 });
 
-test("V152 no longer mutates or dispatches Extreme Emperor skills",()=>{
+test("V152 no longer mutates monster loadouts or dispatches Extreme Emperor skills",()=>{
     assert.doesNotMatch(source,/v152ResolveExtremeEmperorAction|function resolveExtremeEmperorAction/);
     assert.doesNotMatch(source,/v141SupportSkillIds=Array\.from|monster\.name==="極帝天尊"/);
+    assert.doesNotMatch(source,/monster\.skillIds=monster\.skillIds\.map|monster\.v141SupportSkillIds=monster\.v141SupportSkillIds\.filter/);
 });
 
 test("Frostbite no longer adds a stale Skill-command prohibition",()=>{
