@@ -96,9 +96,9 @@ function load(options={}){
         v141ShowBlackGoldReward:noop,
         v174RelicDevUnlock:id=>{ (context.relicUnlocks||(context.relicUnlocks=[])).push(id);return true; }
     };
-    context.v132LaunchDungeonBattle=(roster,onComplete)=>{
+    context.v132LaunchDungeonBattle=(roster,onComplete,options)=>{
         context.monsters=roster;context.currentBattleMonsters=roster.map((_,index)=>index);
-        context.battleActive=true;context.lastBattleCallback=onComplete;return true;
+        context.battleActive=true;context.lastBattleCallback=onComplete;context.lastBattleOptions=options||{};return true;
     };
     context.window=context;context.globalThis=context;
     vm.createContext(context);
@@ -357,6 +357,26 @@ test("a destroyed healing object stops its persistent effect immediately",()=>{
     context.turn=3;
     context.GameplaySystem.debugProcessBossRound();
     assert.equal(boss.hp,afterSecondHit);
+});
+
+test("Tower uses normal Fixed Slot geometry while Personal/World keep Large Boss mode",()=>{
+    const {context}=load();
+    const now=new Date("2026-09-24T00:00:00Z");
+    const week=context.GameplaySystem.getWeekInfo(now);
+    context.GameplaySystem.debugReloadState({tower:{weekKey:week.key,completedFloor:9,highestThisWeek:9,historicalHighest:9,claimedFloors:{},pendingRelicChoice:false}},now);
+    assert.equal(context.vGameplaySelectTowerBand(10),true);
+    assert.equal(context.lastBattleOptions.mode,"tower");
+    assert.equal(context.currentBattleMonsters.length,10);
+    const towerBoss=context.monsters.find(monster=>monster&&monster.vGameplayTowerBoss===true);
+    assert.ok(towerBoss);
+    assert.equal(towerBoss.unitKind,"tower-boss");
+    assert.equal(context.FourSymbolsBossBattle.isActive(),false);
+
+    context.battleActive=false;
+    assert.equal(context.vGameplayStartBoss("personal","personal-30"),true);
+    assert.equal(context.lastBattleOptions.mode,"boss");
+    assert.equal(context.lastBattleOptions.gameplayMode,"personal");
+    assert.equal(context.FourSymbolsBossBattle.isActive(),true);
 });
 
 test("weekly and reward state remains persistent",()=>{
