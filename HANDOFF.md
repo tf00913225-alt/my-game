@@ -1,4 +1,4 @@
-## 2026-09-24 — 四象塔 Element Owner／6・10 人陣形／Small Boss 收斂（IMPLEMENTED candidate）
+## 2026-09-24 — 四象塔 Element Owner／6・10 人陣形／Small Boss 收斂（VERIFIED source candidate）
 
 - Base：最新 `dev@ae3bfba3d75c7c40bb4eea07860f525351ffd658`；工作分支：`fix/tower-element-formation-small-boss-20260924`；`main` 未修改。
 - 四象塔元素／固定技能唯一玩法 Owner 收斂於 `js/gameplay-boss-tower-system.js`；V141 `rebalanceDungeonElements()` 已退休，Daily／Tower／Boss／Adventure／Abyss 共用 launcher 以正式 `v132ActiveDungeonRun.mode` 區分身分。
@@ -8,7 +8,7 @@
 - `config/monster-portrait-registry.json` 的 8 個 `tower-boss` target 保留 rank=boss，sizeClass 改 standard（1024×1536、2:3）；素材仍為 planned，本次不產圖、不建假檔。
 - 已新增專項 `tests/tower-element-formation-small-boss-20260924.test.js`，並更新 V141/V144/V152/Boss 既有 owner regression；Requirement Batch：`release/requirement-batches/2026-09-24-tower-element-formation-small-boss.json`。
 - `DATA_SECURITY_CONTRACTS.md` 在本次 Base 仍不存在；本次未修改帳號、Cloud Save 或安全資料 schema。
-- 狀態：Source IMPLEMENTED；Repository checks／deterministic build／browser QA／git diff 待 PR CI 後升級 VERIFIED。
+- Source candidate `a7ba91b90debd18ee246eca142c447363509a5ad` 已由 PR #552 CI run `35978931166` 驗證：targeted Tower/Boss/Abyss/Battle regressions、deterministic build:check、Fixed Slot 9:16、exact-candidate real battle mobile QA、Adventure mobile QA、resources、loader、deprecated-code/Release Gate 與 git diff 全部 SUCCESS。Requirement Batch 已 8/8 VERIFIED；本段文件證據更新後仍需 final PR head CI 綠燈才可審核合併。
 
 ## 2026-09-24 — 四象塔 Element Owner／6・10 人陣形／Small Boss 收斂（IMPLEMENTED candidate）
 
