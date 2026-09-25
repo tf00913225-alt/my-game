@@ -9176,7 +9176,7 @@ ensureFunctionalStyles();runRepairs();
         },
         windEX:{
             learnLevel:50,learnCost:20,maxLevel:1,progressionGroup:"ex",
-            evasionBonusPercent:10
+            evasionBonusPercent:15,accuracyBonusPercent:15
         },
 
         stoneSlash:{learnLevel:1,learnCost:2,progressionGroup:"physical"},
@@ -9246,8 +9246,8 @@ ensureFunctionalStyles();runRepairs();
         rage:{critChanceBonusByLevel:[10,15,20,25,30],critDamageBonusByLevel:[15,25,35,45,55],critBonusByLevel:[10,15,20,25,30]},
         fireSoulResonance:{momentumBonusByLevel:[12,15,18,21,25]},
         fireEX:{damageBonusPercent:10,critChanceBonusPercent:5,critDamageBonusPercent:25,statusTargetDamageBonusPercent:5},
-        waterEX:{damageBonusPercent:5,healBonusPercent:15,turnStartCleanseChance:35,statusResistBonus:null},
-        windEX:{evasionBonusPercent:10,accuracyBonusPercent:10},
+        waterEX:{lifestealMultiplier:1.2,spDrainMultiplier:1.2,healBonusPercent:15,turnStartCleanseChance:35,statusResistBonus:null},
+        windEX:{evasionBonusPercent:15,accuracyBonusPercent:15,lowHpFinalHitCapPercent:50},
         earthEX:{defenseBonusPercent:35,maxHpMultiplier:1.2}
     });
 
@@ -9410,19 +9410,19 @@ ensureFunctionalStyles();runRepairs();
                 "但不免疫狀態、硬控或淨心訣";
         }
         if(skill.id==="fireEX"){
-            return "永久提升火元素傷害"+numeric(skill.damageBonusPercent)+
+            return "火元素角色傷害 +"+numeric(skill.damageBonusPercent)+
                 "%、爆擊率"+numeric(skill.critChanceBonusPercent)+
                 "%、爆擊傷害"+numeric(skill.critDamageBonusPercent)+
                 "%；對有異常狀態的目標傷害再+"+numeric(skill.statusTargetDamageBonusPercent)+"%";
         }
         if(skill.id==="waterEX"){
-            return "永久提升水元素傷害"+numeric(skill.damageBonusPercent)+
-                "%、回復類技能HP恢復量"+numeric(skill.healBonusPercent)+
+            return "吸血效果 +20%、吸 SP 效果 +20%、回復類技能HP恢復量 +"+numeric(skill.healBonusPercent)+
                 "%；每回合開始前有"+numeric(skill.turnStartCleanseChance)+
                 "%機率解除自身所有可解除負面狀態";
         }
         if(skill.id==="windEX"){
-            return "永久提升最終閃躲"+numeric(skill.evasionBonusPercent)+"%";
+            return "最終閃躲 +"+numeric(skill.evasionBonusPercent)+"%，最終命中 +"+
+                numeric(skill.accuracyBonusPercent)+"%；自身 HP 低於 25% 時，敵方對自己的最終命中率最高為 50%。";
         }
         if(skill.id==="earthEX"){
             return "永久提升防禦力"+numeric(skill.defenseBonusPercent)+"%、最大HP +"+
@@ -9702,6 +9702,7 @@ ensureFunctionalStyles();runRepairs();
         });
         return changed;
     }
+    window.v173NormalizeCrossElementEquips=normalizeAllCrossElementEquips;
     function prerequisiteMet(levels,skill){
         const required=Array.isArray(skill&&skill.requires)?skill.requires.filter(Boolean):[];
         if(!required.length){ return true; }

@@ -2282,8 +2282,9 @@ function getMainCharacterStats(){
     const evasionBuffPercent=getActiveBuffPercent(player,"dodgeSkill");
     const defenseBuffPercent=getActiveBuffPercent(player,"rockWall");
 
-    const windEXLevel=getSkillLevel("fire","windEX");
-    const earthEXLevel=getSkillLevel("fire","earthEX");
+    const characterKey=getCharacterSkillKey(player);
+    const windEXLevel=characterKey?getSkillLevel(characterKey,"windEX"):0;
+    const earthEXLevel=characterKey?getSkillLevel(characterKey,"earthEX"):0;
 
     const evasionPassivePercent=windEXLevel>0
         ? (skillDatabase.windEX.evasionBonusPercent||0)
@@ -2341,7 +2342,7 @@ function getMainCharacterStats(){
             BASE_MAGIC_ATTACK+
             Math.max(1,Number(player.level)||1)*MAGIC_ATTACK_PER_LEVEL+
             effectiveIntelligence*MAGIC_ATTACK_PER_POINT,
-        accuracy:effectiveSpirit*2,
+        accuracy:effectiveSpirit*2+(getLearnedElementEX(player,"wind")?Number(skillDatabase.windEX.accuracyBonusPercent)||0:0),
         resistance:calculateStatusResistancePercent(effectiveSpirit),
         antiCrit:calculateAntiCritPercent(effectiveSpirit),
         speed:effectiveAgility,
@@ -2505,7 +2506,7 @@ function getAdditionalCharacterBattleStats(character,characterKey){
             BASE_MAGIC_ATTACK+
             Math.max(1,Number(character.level)||1)*MAGIC_ATTACK_PER_LEVEL+
             effectiveIntelligence*MAGIC_ATTACK_PER_POINT,
-        accuracy:effectiveSpirit*2,
+        accuracy:effectiveSpirit*2+(getLearnedElementEX(character,"wind")?Number(skillDatabase.windEX.accuracyBonusPercent)||0:0),
         resistance:calculateStatusResistancePercent(effectiveSpirit),
         antiCrit:calculateAntiCritPercent(effectiveSpirit),
         speed:effectiveAgility,
@@ -12859,7 +12860,9 @@ function calculateDamage(
     const safeAttack=Math.max(0,Number(attack)||0);
     const safeDefense=Math.max(0,Number(defense)||0);
     const levelFactor=getDamageLevelMultiplier(casterLevel,targetLevel);
-    const elementFactor=getElementalDamageMultiplier(casterElement,targetElement);
+    /* Element counter is character DNA, never the skill visual identity. */
+    const attacker=getDamageContextAttacker(options);
+    const elementFactor=getElementalDamageMultiplier((attacker&&attacker.element)||casterElement,targetElement);
     const formulaConstant=getDamageFormulaConstant(targetLevel);
     const defenseFactor=formulaConstant/(formulaConstant+safeDefense);
     const ordinaryFactor=getOrdinaryDamageMultiplier(options);
@@ -12867,7 +12870,6 @@ function calculateDamage(
     const criticalFactor=Number.isFinite(requestedCrit)
         ?Math.max(1,Math.min(FINAL_CRITICAL_MULTIPLIER_MAX,requestedCrit))
         :1;
-    const attacker=getDamageContextAttacker(options);
     const pressureFactor=getEnemyPressureMultiplier(attacker,options.target||null);
     const bossOwner=typeof window!=="undefined"?window.FourSymbolsBossBattle:null;
     const bossDamageFactor=bossOwner&&typeof bossOwner.getOutgoingDamageMultiplier==="function"
@@ -13872,7 +13874,8 @@ function calculateHitChancePercent(
     casterAccuracy,
     targetEvasion,
     directChanceReductionPercent,
-    directChanceBonusPercent
+    directChanceBonusPercent,
+    targetCharacter
 ){
     const chance=
         HIT_CHANCE_BASE+
@@ -13881,23 +13884,31 @@ function calculateHitChancePercent(
         Math.max(0,Number(targetEvasion)||0)-
         Math.max(0,Number(directChanceReductionPercent)||0);
 
-    return Math.max(
+    const normalFinalChance=Math.max(
         HIT_CHANCE_MIN_PERCENT,
         Math.min(HIT_CHANCE_MAX_PERCENT,chance)
     );
+    const windEx=targetCharacter&&targetCharacter.element==="wind"
+        ?getLearnedElementEX(targetCharacter,"wind"):null;
+    const lowHp=targetCharacter&&Number(targetCharacter.hp)<Number(getPartyBattleStats(getPartyCharacterIndex(targetCharacter))?.maxHP)*0.25;
+    return windEx&&lowHp
+        ?Math.min(normalFinalChance,Number(windEx.lowHpFinalHitCapPercent)||50)
+        :normalFinalChance;
 }
 
 function rollHitChance(
     casterAccuracy,
     targetEvasion,
     directChanceReductionPercent,
-    directChanceBonusPercent
+    directChanceBonusPercent,
+    targetCharacter
 ){
     return Math.random()*100<calculateHitChancePercent(
         casterAccuracy,
         targetEvasion,
         directChanceReductionPercent,
-        directChanceBonusPercent
+        directChanceBonusPercent,
+        targetCharacter
     );
 }
 
@@ -16130,12 +16141,19 @@ function getCharacterSkillKey(character){
 }
 
 function getLearnedElementEX(character,element){
+    if(!character||character.element!==element){ return null; }
     const key=getCharacterSkillKey(character);
     if(!key){ return null; }
     const exId=element+"EX";
     const ex=skillDatabase[exId];
     if(!ex || getSkillLevel(key,exId)<=0){ return null; }
     return ex;
+}
+
+function getWaterExAbsorbPercent(character,basePercent,kind){
+    const ex=getLearnedElementEX(character,"water");
+    const multiplier=ex&&(kind==="sp"?ex.spDrainMultiplier:ex.lifestealMultiplier);
+    return Math.max(0,Number(basePercent)||0)*(Number(multiplier)||1);
 }
 
 function getElementDamagePassiveMultiplier(character){
@@ -16791,7 +16809,7 @@ function castDamageSkill(skillId){
         const lifestealAmount =
             Math.floor(
                 totalLifestealDamage*
-                lifestealPercent/
+                getWaterExAbsorbPercent(player,lifestealPercent,"hp")/
                 100
             );
 
@@ -17172,8 +17190,9 @@ function castHealSkill(skillId,targetIndex){
     const targetStats=getPartyBattleStats(resolvedTargetIndex);
 
     const exSkill=skillDatabase.waterEX;
-    const exLevel=getSkillLevel("fire","waterEX");
-    const healBonusMultiplier=(exSkill && exLevel>0 && exSkill.healBonusPercent)
+    const casterKey=getCharacterSkillKey(player);
+    const exLevel=casterKey?getSkillLevel(casterKey,"waterEX"):0;
+    const healBonusMultiplier=(getLearnedElementEX(player,"water") && exSkill && exLevel>0 && exSkill.healBonusPercent)
         ? 1+exSkill.healBonusPercent/100
         : 1;
     const bossOwner=typeof window!=="undefined"?window.FourSymbolsBossBattle:null;
@@ -17349,10 +17368,7 @@ function castReviveSkill(skillId,targetIndex){
     setTimeout(()=>{ showPlayerSpPopup(skill.spCost); },500);
 
     const exSkill=skillDatabase.waterEX;
-    const exLevel=getSkillLevel("fire","waterEX");
-    const healBonusMultiplier=(exSkill && exLevel>0 && exSkill.healBonusPercent)
-        ? 1+exSkill.healBonusPercent/100
-        : 1;
+    /* Water EX deliberately does not modify revive HP. */
 
     const revivePercent=skill.reviveHealPercentByLevel[level-1];
     const targetStats=getPartyBattleStats(targetIndexResolved);
@@ -18455,6 +18471,7 @@ function processSingleMonsterAttack(monsterIndex,token){
                         "stun"
                     ),
                     getActiveAccuracyBonusPercent(monster)
+                    ,targetCharacter
                 );
 
 
@@ -21693,7 +21710,7 @@ function castSecondaryCharacterSkill(characterIndex,skillId,centerIndex){
 
     if(skill.lifestealPercentByLevel && totalLifesteal>0){
         const amount=Math.floor(
-            totalLifesteal*skill.lifestealPercentByLevel[level-1]/100
+            totalLifesteal*getWaterExAbsorbPercent(character,skill.lifestealPercentByLevel[level-1],"hp")/100
         );
         character.hp=Math.min(stats.maxHP,character.hp+amount);
         character.sp=Math.min(stats.maxSP,character.sp+amount);

@@ -129,7 +129,8 @@ function formulaRuntime(){
     assert.match(progression,/DODGE_BY_LEVEL=Object\.freeze\(\[5,10,15,20,25\]\)/);
     assert.match(progression,/CALM_RESIST_BY_LEVEL=Object\.freeze\(\[5,8,10,12,15\]\)/);
     assert.match(progression,/CALM_ACCURACY_BY_LEVEL=Object\.freeze\(\[5,10,15,20,25\]\)/);
-    assert.match(progression,/windEX:\{[\s\S]*?evasionBonusPercent:10/);
+    assert.match(progression,/windEX:\{[\s\S]*?evasionBonusPercent:15,accuracyBonusPercent:15/);
+    assert.match(progression,/lowHpFinalHitCapPercent:50/);
     assert.match(progression,/followUpOnCriticalOrDefeat/);
     assert.match(progression,/免費再施放/);
     assert.match(progression,/鳳威/);

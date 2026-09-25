@@ -65,6 +65,11 @@
 
 ## 技能成長與說明契約
 
+- Character Element = Element DNA：`character.element` 唯一負責元素克制、EX 身份與本命元素身份；普通攻擊與所有玩家技能（包括跨修）均以施放角色 DNA 對目標元素結算克制。
+- Skill Element = Skill Identity：`skill.element` 只負責 VFX、Icon、技能／狀態類型與視覺身份，不得改寫角色 DNA 或元素克制。Skill Category 唯一負責 Physical／Magic 與 Attack／Intelligence 公式。
+- Cross Element：需已學至少一招本命技能；跨修免 `requires`、初學成本 ×2、後續升級仍 1 點；每名角色最多裝備 1 招跨元素技能，存檔／自動配裝／戰鬥 Ready Gate 都必須保留欄位順序中的第一招並自動卸下其餘跨修技能。EX 永遠本命限定。
+- Wind EX：Final Evasion +15 個百分點、Final Accuracy +15 個百分點；自身 HP <25% 時，正式一般命中公式完成後，對該角色套用 `finalHitChance = min(finalHitChance, 50)`。這是 Special Final Cap，不受一般 70% 最低命中重新拉高；HP >=25% 立即失效，且不適用 DoT、Reflect、純 Status Formula、Skill HP Cost 或明確不可閃避機制。
+
 - 玩家四元素「主要效果包含直接傷害」技能的正式傷害曲線唯一 owner 為 `js/00-main.js::getSkillDamageAtLevel()`。Lv1 使用 `baseDamage`；Lv2～4 依 `damagePerLevel` 線性增加；Lv5 = Lv4 × 1.5；Lv6～9 再依固定成長增加；Lv10 = Lv9 × 1.5。突破與最終傷害取整統一使用正式戰鬥 `Math.round` 語意。
 - 玩家直接傷害技能正式上限為 Lv10；純 Buff／Heal／Revive／Control／Support／EX 不得因本規則被誤升 Lv10。既有玩家已學等級必須原值保留，Max Lv 提升不得重置、退點、自動補滿或重複扣點。
 - 所有可升級技能 Lv2～Max 每次固定消耗 1 技能點。初次學習成本仍由正式技能階級／資料 owner 決定，不得拿升級成本覆蓋學習成本。
