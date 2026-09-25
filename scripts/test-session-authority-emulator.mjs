@@ -106,9 +106,26 @@ assert.equal((await db.doc(`users/${x}/saves/current`).get()).get("serverRevisio
 await rejected("saveCloudPreferences",b.idToken,{uid:x,session:sessionB,expectedRevision:1,preferences},"CLOUD_REVISION_CONFLICT");
 await rejected("saveCloudPreferences",b.idToken,{uid:x,session:sessionB,expectedRevision:2,preferences:{...preferences,autoConfig:{...config,skill:"x",gold:10}}},"INVALID_ARGUMENT");
 assert.equal((await db.doc(`users/${x}/saves/current`).get()).get("serverRevision"),2);
-await invoke("submitLegacyMigrationCandidate",b.idToken,{uid:x,session:sessionB,save:candidate});
+const firstCandidate=await invoke("submitLegacyMigrationCandidate",b.idToken,{uid:x,session:sessionB,save:candidate});
+assert.equal(firstCandidate.revision,1);assert.equal(firstCandidate.unchanged,false);
+const candidateRoot=`serverUsers/${x}/migrationCandidates`;
+const original=(await db.doc(`${candidateRoot}/1`).get()).data();
+assert.equal(original.trusted,false);assert.deepEqual(original.snapshot,candidate);
+assert.equal((await db.doc(`${candidateRoot}/latest`).get()).get("fingerprint"),original.fingerprint);
+const retry=await invoke("submitLegacyMigrationCandidate",b.idToken,{uid:x,session:sessionB,save:candidate});
+assert.equal(retry.unchanged,true);assert.equal(retry.revision,1);assert.equal(retry.serverRevision,firstCandidate.serverRevision);
+assert.equal((await db.doc(`users/${x}/saves/current`).get()).get("serverRevision"),firstCandidate.serverRevision);
+await rejected("submitLegacyMigrationCandidate",b.idToken,{uid:x,session:sessionB,save:{...candidate,gold:1}},"resource-exhausted");
+assert.equal((await db.doc(`${candidateRoot}/2`).get()).exists,false);
+// Emulator-only time shift avoids waiting through the production rate limit.
+await db.doc(`${candidateRoot}/latest`).update({submittedAt:Timestamp.fromMillis(1)});
+const secondCandidate=await invoke("submitLegacyMigrationCandidate",b.idToken,{uid:x,session:sessionB,save:{...candidate,gold:1}});
+assert.equal(secondCandidate.revision,2);assert.equal(secondCandidate.unchanged,false);
+assert.deepEqual((await db.doc(`${candidateRoot}/1`).get()).data().snapshot,candidate);
+assert.equal((await db.doc(`${candidateRoot}/2`).get()).get("snapshot.gold"),1);
+assert.equal((await db.doc(`${candidateRoot}/2`).get()).get("trusted"),false);
 assert.equal((await db.doc(`users/${x}/saves/current`).get()).get("authoritativeStateReady"),false);
-assert.equal((await db.doc(`users/${x}/saves/current`).get()).get("serverRevision"),3);
+assert.equal((await db.doc(`users/${x}/saves/current`).get()).get("serverRevision"),4);
 await rejected("protectedTest",b.idToken,{uid:x,session:{...sessionB,credential:"z".repeat(43)}},"SESSION_INVALID");
 const yUser=await login("accounts:signUp",{email:"session-y@example.test",password});
 const y=yUser.localId,sessionY=await invoke("createGameSession",yUser.idToken,{uid:y});

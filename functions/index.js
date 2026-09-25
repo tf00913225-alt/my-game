@@ -323,8 +323,24 @@ exports.submitLegacyMigrationCandidate=onCall(CALLABLE_OPTIONS,async(request)=>{
             }
 
             const envelope=inspectExistingEnvelope(saveSnapshot.data(),uid);
+            if(!candidateSnapshot.exists && envelope.data.migrationCandidateStatus==="received"){
+                throw new HttpsError("data-loss","Migration candidate record is missing.");
+            }
 
             if(candidateSnapshot.exists){
+                const previousRevision=candidateSnapshot.get("revision");
+                if(candidateSnapshot.get("ownerUid")!==uid ||
+                   candidateSnapshot.get("trusted")!==false ||
+                   !Number.isSafeInteger(previousRevision) || previousRevision<1 ||
+                   envelope.data.migrationCandidateRevision!==previousRevision ||
+                   envelope.data.migrationCandidateFingerprint!==candidateSnapshot.get("fingerprint")){
+                    throw new HttpsError("data-loss","Migration candidate metadata is inconsistent.");
+                }
+                // An ambiguous response can be retried without replacing a
+                // candidate or consuming another server revision.
+                if(candidateSnapshot.get("fingerprint")===candidate.fingerprint){
+                    return {revision:previousRevision,serverRevision:envelope.serverRevision,unchanged:true};
+                }
                 const submittedAt=candidateSnapshot.get("submittedAt");
                 const submittedMillis=submittedAt && typeof submittedAt.toMillis==="function"
                     ? submittedAt.toMillis()
@@ -341,10 +357,13 @@ exports.submitLegacyMigrationCandidate=onCall(CALLABLE_OPTIONS,async(request)=>{
                 ? Number(candidateSnapshot.get("revision")||0)
                 : 0;
             const revision=Math.max(0,Math.floor(previousRevision))+1;
+            if(!Number.isSafeInteger(revision)){
+                throw new HttpsError("failed-precondition","Migration candidate revision is exhausted.");
+            }
             const serverRevision=nextRevision(envelope);
             const now=FieldValue.serverTimestamp();
 
-            transaction.set(candidateRef,{
+            const candidateRecord={
                 schemaVersion:CLOUD_SAVE_SCHEMA_VERSION,
                 ownerUid:uid,
                 trustLevel:"client-migration-candidate",
@@ -358,7 +377,11 @@ exports.submitLegacyMigrationCandidate=onCall(CALLABLE_OPTIONS,async(request)=>{
                 snapshot:candidate.snapshot,
                 submittedAt:now,
                 updatedAt:now
-            });
+            };
+            // Preserve each untrusted original separately. `latest` remains
+            // compatible with existing readers; it is only a moving pointer.
+            transaction.create(privateRef.collection("migrationCandidates").doc(String(revision)),candidateRecord);
+            transaction.set(candidateRef,candidateRecord);
 
             transaction.set(privateRef,{
                 migrationStatus:"candidate_received",
@@ -378,7 +401,7 @@ exports.submitLegacyMigrationCandidate=onCall(CALLABLE_OPTIONS,async(request)=>{
                 updatedAt:now
             },{merge:true});
 
-            return {revision,serverRevision};
+            return {revision,serverRevision,unchanged:false};
         });
 
         return {
@@ -391,7 +414,8 @@ exports.submitLegacyMigrationCandidate=onCall(CALLABLE_OPTIONS,async(request)=>{
             gameSaveVersion:candidate.gameSaveVersion,
             clientVersion,
             revision:result.revision,
-            serverRevision:result.serverRevision
+            serverRevision:result.serverRevision,
+            unchanged:result.unchanged
         };
     }catch(error){
         throw asHttpsError(error);
