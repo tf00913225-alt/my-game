@@ -2,17 +2,23 @@
 
 本文件是長期工程進度來源。**每個 Phase 結束都必須更新本文件**；聊天、Commit、PR、CI 或部署成功不能取代驗收紀錄。
 
-## 2026-09-25 — Original-device immutable backup primitive (candidate)
+## 2026-09-25 — Historical reward-claim proof gate (candidate)
+
+- `functions/src/legacy-reward-claim-audit.js` is a pure, fail-closed parser for the five claim-bearing main-save areas: daily quests, commissions, achievements, tower floors and Abyss first-clear/chest records. A structurally valid historical `claimed` entry is classified only as `block_historical_claims_only`; it is never a grant entitlement, balance change or accepted cloud state. Missing, malformed or contradictory records receive a source-specific `*_CLAIM_RECORD_INVALID` blocker.
+- The read-only `screenLegacyMigrationCandidate` preflight includes that audit without exposing the candidate snapshot or writing a migration marker. It remains `readyForAcceptance:false`, has no character/economy write path and still reports `SIDECAR_BACKUP_MISSING` until a complete independently preserved sidecar bundle can be verified.
+- Pure cloud-save tests currently pass locally. This is not the one-time acceptance transaction, does not upload any phone data, and does not make a cloud character playable or recoverable on another device. Phase 4 remains **IN PROGRESS / 0/6 VERIFIED**.
+
+## 2026-09-25 — Original-device immutable backup primitive
 
 - `js/startup/account-save-repository.js::createMigrationBackup(uid)` is the sole local backup owner. It requires the active UID and complete UID-owned save, records original main-save bytes, metadata bytes and all registered UID sidecars as present/missing, then writes a fingerprint-addressed immutable local record. It never deletes, rewrites or uploads gameplay state.
 - `js/firebase/firebase-cloud-save.js::createLocalMigrationBackup()` exposes only that explicit original-device preparation. It rejects UID changes and does not call Firebase, `saveGame()`, `loadGame()` or a restore path.
-- This is a preservation prerequisite, not admission: private server backup upload, claim-record validation, one-time acceptance transaction, authoritative character writing and second-device restore remain unimplemented. Phase 4 remains **IN PROGRESS / 0/6 VERIFIED**.
+- This is a preservation prerequisite, not admission: private server backup upload, one-time acceptance transaction, authoritative character writing and second-device restore remain unimplemented. PR #573 was merged to `dev@0cfd6d994fd598a05677a7c770faf975725a2020`; its Repository checks, Session Authority/Firebase deployment and exact DEV SHA verification succeeded. Phase 4 remains **IN PROGRESS / 0/6 VERIFIED**.
 
-## 2026-09-25 — Private legacy candidate screening (candidate)
+## 2026-09-25 — Private legacy candidate screening
 
 - `functions/src/legacy-candidate-screening.js` owns a read-only preflight for the latest private migration candidate; `functions/index.js::screenLegacyMigrationCandidate` requires Firebase identity and the active single-device session in `runProtected()`. It compares the requested cloud revision and candidate revision, checks UID/trust metadata and stored candidate structure, then reports blocker codes without returning the save snapshot.
 - A main save by itself cannot prove historical rewards or provide a complete backed-up sidecar bundle. Screening always reports `readyForAcceptance:false`; malformed character, inventory, equipment and claim fields add specific blockers. It does not write a review approval, migration marker, character state, economy value or revision. Old candidate revisions cannot be screened as the current candidate.
-- Emulator and pure screening tests are pending PR CI. No phone data has been submitted, no cloud character is playable, and Phase 4 remains IN PROGRESS / 0/6 VERIFIED. This gate does not replace the complete future reward operations, sidecar backup or owner-confirmed migration acceptance.
+- PR #572 was merged before the backup gate. No phone data has been submitted, no cloud character is playable, and Phase 4 remains IN PROGRESS / 0/6 VERIFIED. This gate does not replace the complete future reward operations, sidecar backup or owner-confirmed migration acceptance.
 
 ## 2026-09-25 — One-time historical baseline policy and authoritative startup guard
 
