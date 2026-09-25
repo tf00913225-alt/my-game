@@ -2,6 +2,12 @@
 
 本文件是長期工程進度來源。**每個 Phase 結束都必須更新本文件**；聊天、Commit、PR、CI 或部署成功不能取代驗收紀錄。
 
+## 2026-09-25 — Legacy candidate revision history (candidate; pending CI/deploy)
+
+- Backend owner `functions/index.js::submitLegacyMigrationCandidate()` now creates a private `migrationCandidates/{revision}` record in the existing protected transaction, while keeping `latest` for compatibility. Each record remains `trusted:false`; it is a server-side record of a client-supplied candidate, **not** a trusted character backup or accepted cloud save. Historical revisions submitted before this change cannot be reconstructed from an overwritten `latest` record.
+- Identical fingerprint retries return the existing receipt and do not increment the envelope revision, including when the first response was lost. A different candidate retains the existing rate limit; the previous revision remains accessible to trusted backend administrators. Inconsistent `latest`/envelope metadata fails closed. Emulator tests cover a second candidate, repeat retry, rate limit, and no authoritative gameplay state.
+- This does not upload the original phone's save automatically, alter local storage, provide a restore button, or enable character recovery. Phase 4 remains IN PROGRESS / 0/6 VERIFIED; Phase 5 remains NOT STARTED. Production Firebase deployment and exact dev SHA still require verification after merging the PR.
+
 ## A. Overall Architecture Status（整體架構狀態）
 
 | Phase | 範圍 | 狀態 |
