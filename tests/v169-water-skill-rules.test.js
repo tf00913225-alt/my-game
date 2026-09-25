@@ -1,66 +1,24 @@
 "use strict";
 
-/* CURRENT WATER SPEC: V169 remains the authoritative Water owner and is kept
-   aligned with the latest V173.43 design values. */
-
+/* V169 is a Water-runtime compatibility layer. V173.64 is the only player
+   Skill Data Owner; this test protects that boundary as well as Frostbite. */
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const vm=require("node:vm");
 
 const source=fs.readFileSync("js/50-v169-water-skill-rules.js","utf8");
 const progression=fs.readFileSync("js/60-v173.64-skill-progression-rebalance.js","utf8");
-
 let passed=0;
-function test(name,handler){
-    handler();
-    passed++;
-    console.log("\u2713 "+name);
-}
-
-function clone(value){ return JSON.parse(JSON.stringify(value)); }
-
-function staleSkills(){
-    const common={
-        element:"water",targetType:"tri",learnCost:999,maxLevel:9,upgradeCost:7,
-        baseDamage:1,damagePerLevel:1,spCost:1,
-        freezeChance:77,freezeDuration:7,freezeSingleTarget:false,
-        teamFreezeChance:88,teamFreezeDuration:8,
-        frostbiteChance:66,frostbiteDuration:6,
-        lifestealPercentByLevel:[9,9,9,9,9],requires:["wrong"]
-    };
-    return {
-        waterKnife:Object.assign({id:"waterKnife",name:"水刀斬",category:"physical"},clone(common)),
-        frostPunch:Object.assign({id:"frostPunch",name:"冰霜拳",category:"physical"},clone(common)),
-        iceSpin:Object.assign({id:"iceSpin",name:"冰旋一閃",category:"physical"},clone(common)),
-        frostCrush:Object.assign({id:"frostCrush",name:"冰封重擊",category:"physical"},clone(common)),
-        waterBall:Object.assign({id:"waterBall",name:"水球術",category:"magic"},clone(common)),
-        floodBeast:Object.assign({id:"floodBeast",name:"洪水猛獸",category:"magic"},clone(common)),
-        iceArrowRain:Object.assign({id:"iceArrowRain",name:"冰霜箭雨",category:"magic"},clone(common)),
-        freeze:Object.assign({id:"freeze",name:"冰封",category:"magic"},clone(common)),
-        healSpell:{id:"healSpell",name:"治療術",category:"heal",statusResistBonus:99},
-        revive:{id:"revive",name:"復活術",category:"revive"},
-        waterEX:{id:"waterEX",name:"水元素EX",category:"passive",statusResistBonus:99},
-        unrelated:{id:"unrelated",freezeChance:73,frostbiteChance:64}
-    };
-}
-
-function bareDocument(nodes={}){
-    return {
-        getElementById(id){ return nodes[id]||null; },
-        querySelector(){ return null; },
-        querySelectorAll(){ return []; }
-    };
-}
+function test(name,handler){ handler(); passed++; console.log("✓ "+name); }
 
 function load(overrides={}){
+    const skills={
+        waterKnife:{id:"waterKnife",element:"water",learnCost:999,frostbiteChance:66},
+        unrelated:{id:"unrelated",freezeChance:73}
+    };
     const context=Object.assign({
         window:null,console,Math:Object.create(Math),Number,Object,Array,Set,Map,Promise,
-        skillDatabase:staleSkills(),monsters:[],document:bareDocument(),
-        getSkillTargets(centerIndex,targetType){
-            if(targetType==="tri"){ return [centerIndex-1,centerIndex,centerIndex+1]; }
-            if(targetType==="column"){ return [centerIndex-3,centerIndex]; }
-            return [centerIndex];
-        }
+        skillDatabase:skills,monsters:[],document:{getElementById(){return null;},querySelector(){return null;},querySelectorAll(){return [];}}
     },overrides);
     context.window=context;
     vm.createContext(context);
@@ -68,167 +26,51 @@ function load(overrides={}){
     return context;
 }
 
-function fields(skill){
-    return {
-        category:skill.category,targetType:skill.targetType,
-        learnCost:skill.learnCost,maxLevel:skill.maxLevel,upgradeCost:skill.upgradeCost,
-        baseDamage:skill.baseDamage,damagePerLevel:skill.damagePerLevel,spCost:skill.spCost,
-        lifestealPercentByLevel:skill.lifestealPercentByLevel&&Array.from(skill.lifestealPercentByLevel),
-        requires:skill.requires&&Array.from(skill.requires),
-        frostbiteChance:skill.frostbiteChance,frostbiteDuration:skill.frostbiteDuration,
-        freezeChance:skill.freezeChance,freezeDuration:skill.freezeDuration
-    };
-}
-
-test("the eight offensive and control Water skill definitions are exact",()=>{
-    const skills=load().skillDatabase;
-    const expected={
-        waterKnife:{category:"physical",targetType:"single",learnCost:2,maxLevel:5,upgradeCost:1,baseDamage:21,damagePerLevel:5,spCost:6,lifestealPercentByLevel:[4,5,6,7,8],requires:[],frostbiteChance:30,frostbiteDuration:1,freezeChance:undefined,freezeDuration:undefined},
-        frostPunch:{category:"physical",targetType:"single",learnCost:10,maxLevel:5,upgradeCost:1,baseDamage:32,damagePerLevel:7,spCost:17,lifestealPercentByLevel:[4,5,6,7,8],requires:["waterKnife"],frostbiteChance:35,frostbiteDuration:2,freezeChance:undefined,freezeDuration:undefined},
-        iceSpin:{category:"physical",targetType:"tri",learnCost:20,maxLevel:5,upgradeCost:1,baseDamage:35,damagePerLevel:7,spCost:45,lifestealPercentByLevel:[3,4,5,6,7],requires:["frostPunch"],frostbiteChance:35,frostbiteDuration:2,freezeChance:undefined,freezeDuration:undefined},
-        frostCrush:{category:"physical",targetType:"single",learnCost:30,maxLevel:5,upgradeCost:1,baseDamage:116,damagePerLevel:24,spCost:60,lifestealPercentByLevel:[4,5,6,7,8],requires:["iceSpin"],frostbiteChance:45,frostbiteDuration:2,freezeChance:undefined,freezeDuration:undefined},
-        waterBall:{category:"magic",targetType:"tri",learnCost:2,maxLevel:5,upgradeCost:1,baseDamage:10,damagePerLevel:2,spCost:8,lifestealPercentByLevel:[3,4,5,6,7],requires:[],frostbiteChance:30,frostbiteDuration:1,freezeChance:undefined,freezeDuration:undefined},
-        floodBeast:{category:"magic",targetType:"single",learnCost:15,maxLevel:5,upgradeCost:1,baseDamage:105,damagePerLevel:21,spCost:35,lifestealPercentByLevel:[4,5,6,7,8],requires:["waterBall"],frostbiteChance:35,frostbiteDuration:2,freezeChance:undefined,freezeDuration:undefined},
-        iceArrowRain:{category:"magic",targetType:"all",learnCost:20,maxLevel:5,upgradeCost:1,baseDamage:30,damagePerLevel:6,spCost:75,lifestealPercentByLevel:[1,2,3,4,5],requires:["floodBeast"],frostbiteChance:35,frostbiteDuration:2,freezeChance:undefined,freezeDuration:undefined},
-        freeze:{category:"magic",targetType:"column",learnCost:20,maxLevel:1,upgradeCost:undefined,baseDamage:undefined,damagePerLevel:undefined,spCost:32,lifestealPercentByLevel:undefined,requires:["frostPunch","floodBeast"],frostbiteChance:undefined,frostbiteDuration:undefined,freezeChance:90,freezeDuration:3}
-    };
-    Object.entries(expected).forEach(([id,value])=>assert.deepEqual(fields(skills[id]),value,id));
+test("V169 no longer mutates the player Skill Database",()=>{
+    const context=load();
+    assert.equal(context.skillDatabase.waterKnife.learnCost,999);
+    assert.equal(context.skillDatabase.waterKnife.frostbiteChance,66);
+    assert.equal(context.skillDatabase.unrelated.freezeChance,73);
+    assert.equal(context.v169WaterSkillRules.skillIds.length,12);
+    assert.doesNotMatch(source,/Object\.keys\(finalData\)\.forEach/);
+    assert.match(source,/V173\.64 is the sole author of player skill fields/);
+    assert.match(progression,/function applyFinalProgressionData\(\)/);
 });
 
-test("legacy Freeze and Frostbite conflict fields are deleted without touching unrelated skills",()=>{
-    const skills=load().skillDatabase;
-    ["waterKnife","frostPunch","iceSpin","frostCrush","waterBall","floodBeast","iceArrowRain","freeze"].forEach(id=>{
-        assert.equal(skills[id].freezeSingleTarget,undefined,id+" freezeSingleTarget");
-        assert.equal(skills[id].teamFreezeChance,undefined,id+" teamFreezeChance");
-        assert.equal(skills[id].teamFreezeDuration,undefined,id+" teamFreezeDuration");
-    });
-    assert.deepEqual(
-        [skills.floodBeast.freezeChance,skills.iceArrowRain.freezeChance,skills.freeze.frostbiteChance],
-        [undefined,undefined,undefined]
-    );
-    assert.deepEqual([skills.unrelated.freezeChance,skills.unrelated.frostbiteChance],[73,64]);
-    assert.equal(skills.waterEX.statusResistBonus,undefined);
-});
-
-test("Water support, cleanse, revive and EX passive are owned by the same final layer",()=>{
-    const skills=load().skillDatabase;
-    assert.deepEqual(
-        [skills.healSpell.targetType,skills.healSpell.learnCost,skills.healSpell.baseHeal,skills.healSpell.healPerLevel,
-            skills.healSpell.baseHealSP,skills.healSpell.healSPPerLevel,skills.healSpell.spCost,skills.healSpell.cleanseAll],
-        ["allyTri",16,550,30,35,0,45,true]
-    );
-    assert.deepEqual(Array.from(skills.healSpell.requires),["frostPunch","floodBeast"]);
-    assert.deepEqual([skills.revive.learnCost,Array.from(skills.revive.reviveHealPercentByLevel),skills.revive.spCost],[18,[20,40,60,80,100],45]);
-    assert.deepEqual(
-        [skills.purifyMind.name,skills.purifyMind.targetType,skills.purifyMind.learnCost,skills.purifyMind.spCost,skills.purifyMind.removeAllStates],
-        ["淨心訣","ally",1,22,true]
-    );
-    assert.deepEqual(Array.from(skills.purifyMind.requires),["frostPunch","floodBeast"]);
-    assert.deepEqual(
-        [skills.waterEX.damageBonusPercent,skills.waterEX.healBonusPercent,skills.waterEX.turnStartCleanseChance,skills.waterEX.statusResistBonus],
-        [5,10,30,undefined]
-    );
-    assert.equal(load().v169WaterSkillRules.skillIds.length,12);
-});
-
-test("damage growth sequences and HP-only lifesteal text match every level",()=>{
-    const context=load({
-        getSkillEffectPreviewText(){ return "legacy"; },
-        buildSkillLevelBreakdownHTML(){ return "legacy"; }
-    });
-    const sequences={
-        waterKnife:[21,26,31,36,41],frostPunch:[32,39,46,53,60],iceSpin:[35,42,49,56,63],
-        frostCrush:[116,140,164,188,212],waterBall:[10,12,14,16,18],
-        floodBeast:[105,126,147,168,189],iceArrowRain:[30,36,42,48,54]
-    };
-    Object.entries(sequences).forEach(([id,expected])=>{
-        const skill=context.skillDatabase[id];
-        const actual=[1,2,3,4,5].map(level=>
-            Number(skill.baseDamage)+Number(skill.damagePerLevel)*(level-1)
-        );
-        assert.deepEqual(actual,expected,id);
-    });
-    assert.equal(context.getSkillEffectPreviewText(context.skillDatabase.iceSpin,5),"legacy");
-    assert.equal(context.buildSkillLevelBreakdownHTML(context.skillDatabase.iceSpin),"legacy");
-    assert.doesNotMatch(source,/getSkillEffectPreviewText\s*=|buildSkillLevelBreakdownHTML\s*=/);
-    assert.match(progression,/frostbiteChance[\s\S]*?傷害-25%、最終閃躲-25%、最終異常狀態抗性-25%/);
-    assert.match(progression,/lifestealPercentByLevel[\s\S]*?實際傷害回復自身HP/);
-    assert.match(progression,/if\(skill\.id==="freeze"\)[\s\S]*?基礎機率冰封/);
-});
-
-test("secondary and legacy player-two Freeze resolve the front/back column",()=>{
-    const observed=[];
-    const context=load({
-        castSecondaryCharacterSkill(characterIndex,skillId,centerIndex){
-            observed.push(["secondary",Array.from(this.getSkillTargets(centerIndex,this.skillDatabase[skillId].targetType))]);
-        },
-        castPlayer2Skill(skillId,centerIndex){
-            observed.push(["player2",Array.from(this.getSkillTargets(centerIndex,this.skillDatabase[skillId].targetType))]);
-        }
-    });
-    context.castSecondaryCharacterSkill(2,"freeze",4);
-    context.castPlayer2Skill("freeze",7);
-    context.castSecondaryCharacterSkill(2,"iceSpin",4);
-    assert.deepEqual(observed,[
-        ["secondary",[1,4]],["player2",[4,7]],["secondary",[3,4,5]]
-    ]);
-});
-
-test("Frostbite is a soft debuff and never blocks skills or monster special actions",()=>{
+test("Frostbite remains a soft runtime debuff with the final 30 percent damage penalty",()=>{
     const frostbitten={name:"測試",statusEffects:[{type:"frostbite",turnsLeft:2}]};
-    const clean={name:"正常",statusEffects:[]};
     let specials=0;
     const context=load({
-        player:frostbitten,monsters:[frostbitten,clean],activeBattleCharacterIndex:0,
-        getPartyCharacterByIndex:()=>frostbitten,
+        player:frostbitten,activeBattleCharacterIndex:0,getPartyCharacterByIndex:()=>frostbitten,
         v141TryMonsterSpecialAction(){ specials++; return true; },
-        prepareAction(){ return "skill-ok"; },
-        processSingleMonsterAttack(){ return "monster-skill-ok"; },
-        getOutgoingDamageDownPercent(){ return 0; },
-        getMonsterEvasion(){ return 40; },
-        getMonsterEffectiveSpiritPoints(){ return 80; },
-        getPlayerStatusResistBonus(){ return 20; },
+        prepareAction(){ return "skill-ok"; }, processSingleMonsterAttack(){ return "monster-skill-ok"; },
+        getOutgoingDamageDownPercent(){ return 0; }, getMonsterEvasion(){ return 40; },
+        getMonsterEffectiveSpiritPoints(){ return 80; }, getPlayerStatusResistBonus(){ return 20; },
         getFinalBattleSpiritForPlayerTarget(){ return 100; }
     });
     assert.equal(context.v141TryMonsterSpecialAction(0),true);
     assert.equal(specials,1);
     assert.equal(context.prepareAction("waterKnife"),"skill-ok");
     assert.equal(context.processSingleMonsterAttack(0),"monster-skill-ok");
-    assert.equal(context.getOutgoingDamageDownPercent(frostbitten),25);
-    assert.equal(context.getMonsterEvasion(frostbitten),40,"V169 must not wrap core evasion");
-    assert.equal(context.getMonsterEffectiveSpiritPoints(frostbitten),80,"V169 must not wrap Spirit");
-    assert.equal(context.getFinalBattleSpiritForPlayerTarget(frostbitten),100,"V169 must not wrap player Spirit");
-    assert.equal(context.getPlayerStatusResistBonus(frostbitten),20,"V169 must not wrap core status resistance");
-    assert.equal(context.v169WaterSkillRules.frostbitePenaltyPercent,25);
-    assert.equal(context.v169WaterSkillRules.isFrostbitten(frostbitten),true);
+    assert.equal(context.getOutgoingDamageDownPercent(frostbitten),30);
+    assert.equal(context.getMonsterEvasion(frostbitten),40);
+    assert.equal(context.getMonsterEffectiveSpiritPoints(frostbitten),80);
+    assert.equal(context.getPlayerStatusResistBonus(frostbitten),20);
+    assert.equal(context.getFinalBattleSpiritForPlayerTarget(frostbitten),100);
+    assert.equal(context.v169WaterSkillRules.frostbitePenaltyPercent,30);
 });
 
-test("monster Freeze pure-control damage is owned by the authoritative core",()=>{
-    const main=fs.readFileSync("js/00-main.js","utf8");
-    assert.doesNotMatch(source,/window\.calculateDamage\s*=/);
-    assert.match(main,/const isPureControlSkill=[\s\S]*?castSkillData\.id==="freeze"/);
-    assert.match(main,/let damage=[\s\S]*?isPureControlSkill[\s\S]*?\?0/);
-    assert.match(main,/if\(damage>0 && hasBarrier\)/);
-});
-
-test("V169 leaves player-facing description entry points to the later progression owner",()=>{
-    let creationCalls=0;
+test("Water UI descriptions are left to the formal progression owner",()=>{
     const context=load({
         getSkillPreviewSummary(){ return "legacy-summary"; },
         getSkillEffectPreviewText(){ return "legacy-effect"; },
-        buildSkillLevelBreakdownHTML(){ return "legacy-levels"; },
-        showCreationSkillDetail(){ creationCalls++; }
+        buildSkillLevelBreakdownHTML(){ return "legacy-levels"; }
     });
-    const skill=context.skillDatabase.iceArrowRain;
-    assert.equal(context.getSkillPreviewSummary(skill),"legacy-summary");
-    assert.equal(context.getSkillEffectPreviewText(skill,3),"legacy-effect");
-    assert.equal(context.buildSkillLevelBreakdownHTML(skill),"legacy-levels");
-    context.showCreationSkillDetail("iceArrowRain");
-    assert.equal(creationCalls,1);
-    assert.doesNotMatch(source,/getSkillPreviewSummary\s*=|getSkillEffectPreviewText\s*=|buildSkillLevelBreakdownHTML\s*=|showCreationSkillDetail\s*=/);
+    assert.equal(context.getSkillPreviewSummary(context.skillDatabase.waterKnife),"legacy-summary");
+    assert.equal(context.getSkillEffectPreviewText(context.skillDatabase.waterKnife,1),"legacy-effect");
+    assert.equal(context.buildSkillLevelBreakdownHTML(context.skillDatabase.waterKnife),"legacy-levels");
+    assert.doesNotMatch(source,/getSkillPreviewSummary\s*=|getSkillEffectPreviewText\s*=|buildSkillLevelBreakdownHTML\s*=/);
     assert.match(progression,/window\.getSkillPreviewSummary=function/);
-    assert.match(progression,/getSkillEffectPreviewText=function/);
-    assert.match(progression,/buildSkillLevelBreakdownHTML=function/);
 });
 
-console.log("\nV169 Water skill rules suite: "+passed+" tests passed.");
+console.log("\nV169 Water runtime compatibility suite: "+passed+" tests passed.");

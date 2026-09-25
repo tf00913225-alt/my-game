@@ -36,27 +36,18 @@
     }
 
     function setDamageSkill(skillId,baseDamage,damagePerLevel,description){
-        const skill=skillDatabase[skillId];
-        if(!skill){ return; }
-        skill.baseDamage=baseDamage;
-        skill.damagePerLevel=damagePerLevel;
-        skill.description=description;
+        /* Retired data writer. V173.64 owns player skill values. */
+        void skillId; void baseDamage; void damagePerLevel; void description;
     }
 
     function setLifestealSkill(skillId,values,description){
-        const skill=skillDatabase[skillId];
-        if(!skill){ return; }
-        skill.lifestealPercentByLevel=values.slice();
-        skill.description=description;
+        /* Retired data writer. Runtime lifesteal reads the formal spec. */
+        void skillId; void values; void description;
     }
 
     function setSkillFields(skillId,fields){
-        const skill=skillDatabase[skillId];
-        if(!skill){ return; }
-        Object.keys(fields).forEach(key=>{
-            const value=fields[key];
-            skill[key]=Array.isArray(value)?value.slice():value;
-        });
+        /* Retired data writer. Keep call sites as migration documentation. */
+        void skillId; void fields;
     }
 
     setDamageSkill(
@@ -258,47 +249,16 @@
     }
 
     let directBarrierCastContext=null;
-
     function consumeV140DirectBarrier(character){
-        if(
-            directBarrierCastContext&&
-            directBarrierCastContext.blockedCharacters.has(character)
-        ){
-            return true;
-        }
-
-        const buffs=character&&Array.isArray(character.activeBuffs)
-            ? character.activeBuffs
-            : [];
-        const barrier=buffs.find(isV140SkillBarrier);
-        if(!barrier){ return false; }
-
-        if(!Number.isFinite(Number(barrier.remainingBlocks))){
-            barrier.remainingBlocks=numeric(skillDatabase.barrier.barrierBlockCount)||5;
-        }
-
-        const remaining=Math.max(0,numeric(barrier.remainingBlocks));
-        if(remaining<=0){
-            character.activeBuffs=buffs.filter(buff=>buff!==barrier);
-            return false;
-        }
-
-        barrier.remainingBlocks=remaining-1;
-        if(directBarrierCastContext){
-            directBarrierCastContext.blockedCharacters.add(character);
-        }
-        if(barrier.remainingBlocks<=0){
-            character.activeBuffs=buffs.filter(buff=>buff!==barrier);
-        }
-        return true;
+        /* V173.64 owns Barrier as duration-based full protection.  Keep this
+           historical export only for callers that have not migrated yet. */
+        return isV140SkillBarrier(character&&Array.isArray(character.activeBuffs)
+            ?character.activeBuffs.find(isV140SkillBarrier):null);
     }
 
     window.v140ConsumeDirectBarrier=consumeV140DirectBarrier;
     window.v173WithDirectBarrierCast=function(callback){
-        const previousContext=directBarrierCastContext;
-        directBarrierCastContext={blockedCharacters:new Set()};
-        try{ return callback(); }
-        finally{ directBarrierCastContext=previousContext; }
+        return callback();
     };
 
     /* 讓技能施放後的 buff 帶有新規格需要的獨立欄位。 */
@@ -334,12 +294,6 @@
                         rageValues.chance+"%、爆擊傷害提升"+
                         rageValues.damage+"%，持續"+skill.duration+"回合。";
                 }
-                else if(skillId==="barrier"&&String(message).includes("獲得結界")){
-                    args[0]=String(message).replace(
-                        /可抵擋所有傷害，持續\d+回合。/,
-                        "可抵擋接下來5次直接傷害，最多持續5回合。"
-                    );
-                }
                 return previousLog.apply(this,args);
             };
         }
@@ -349,7 +303,7 @@
             result=previousCastBuffSkill.apply(this,arguments);
         }finally{
             if(previousBadge){ showSkillNameBadge=previousBadge; }
-            if(previousLog&&(skillId==="rage"||skillId==="barrier")){
+            if(previousLog&&skillId==="rage"){
                 addBattleLog=previousLog;
             }
         }
@@ -365,20 +319,6 @@
                 buff.critChanceBonusPercent=rageValues.chance;
                 buff.critDamageBonusPercent=rageValues.damage;
             });
-        }
-        else if(skillId==="barrier"){
-            const target=typeof getBattleCharacterByIndex==="function"
-                ? getBattleCharacterByIndex(
-                    targetIndex===null||targetIndex===undefined?0:targetIndex
-                )
-                : null;
-            const buff=target&&(target.activeBuffs||[])
-                .find(entry=>entry.type==="barrier"&&entry.turnsLeft>0);
-            if(buff){
-                buff.sourceSkill="barrier";
-                buff.barrierRule="shared";
-                buff.remainingBlocks=numeric(skill.barrierBlockCount)||5;
-            }
         }
 
         return result;
@@ -400,11 +340,7 @@
                 skillId:"stealthSkill",
                 duration:numeric(skillDatabase.stealthSkill&&skillDatabase.stealthSkill.duration)
             },
-            barrier:{
-                skillId:"barrier",
-                duration:numeric(skillDatabase.barrier&&skillDatabase.barrier.duration),
-                blockCount:numeric(skillDatabase.barrier&&skillDatabase.barrier.barrierBlockCount)
-            }
+            barrier:{skillId:"barrier",duration:numeric(skillDatabase.barrier&&skillDatabase.barrier.duration)}
         };
         const tiers=["Low","Mid","High","Perfect"];
 
@@ -455,24 +391,11 @@
             }
 
             const previousLog=typeof addBattleLog==="function"?addBattleLog:null;
-            if(previousLog&&definition.talismanEffect==="barrier"){
-                addBattleLog=function(message){
-                    const args=Array.prototype.slice.call(arguments);
-                    args[0]=String(message).replace(
-                        /獲得結界，可抵擋所有傷害，持續\d+回合。/,
-                        "獲得結界，可抵擋接下來5次直接傷害，最多持續5回合。"
-                    );
-                    return previousLog.apply(this,args);
-                };
-            }
-
             let result;
             try{
                 result=previousResolveQueuedPlayerAction.apply(this,arguments);
             }finally{
-                if(previousLog&&definition.talismanEffect==="barrier"){
-                    addBattleLog=previousLog;
-                }
+                if(previousLog){ addBattleLog=previousLog; }
             }
 
             if(target&&definition.talismanEffect==="barrier"){
@@ -483,8 +406,7 @@
                 );
                 if(buff){
                     buff.turnsLeft=numeric(skillDatabase.barrier.duration)||5;
-                    buff.remainingBlocks=
-                        numeric(skillDatabase.barrier.barrierBlockCount)||5;
+                    delete buff.remainingBlocks;
                     buff.sourceTalisman=definition.id;
                     buff.barrierRule="shared";
                 }
@@ -673,23 +595,8 @@
             .find(skill=>skill&&skill.name===name)||null;
     }
 
-    /* 技能與結界符共用規則：DOT 不抵擋、也不消耗次數。 */
-    const previousTickStatusEffects=tickStatusEffects;
-    tickStatusEffects=function(){
-        const previousHasActiveBuff=hasActiveBuff;
-        hasActiveBuff=function(character,buffType){
-            if(buffType!=="barrier"){
-                return previousHasActiveBuff.apply(this,arguments);
-            }
-            return false;
-        };
-
-        try{
-            return previousTickStatusEffects.apply(this,arguments);
-        }finally{
-            hasActiveBuff=previousHasActiveBuff;
-        }
-    };
+    /* DoT protection is now part of the canonical Barrier rule; V140 no
+       longer bypasses it with a temporary hasActiveBuff override. */
 
     const previousProcessSingleMonsterAttack=processSingleMonsterAttack;
     processSingleMonsterAttack=function(monsterIndex){

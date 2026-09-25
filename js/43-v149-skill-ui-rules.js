@@ -1,5 +1,6 @@
 /* =====================================================
-   V149 — final four-element rules, shop alignment and combat feedback
+   V149 — battle/presentation compatibility.
+   V173.64 owns the player Skill Spec and all player skill values.
 ===================================================== */
 (function installV149SkillUiRules(){
     "use strict";
@@ -13,194 +14,6 @@
         return Number.isFinite(result)?result:0;
     }
 
-    function copyValue(value){ return Array.isArray(value)?value.slice():value; }
-
-    const SKILL_CLEANUP_FIELDS={
-        flameSlash:["repeatChance","repeatChanceByLevel","repeatMaxCasts"],
-        fireCritical:["repeatChance","repeatChanceByLevel","repeatMaxCasts"],
-        explosiveFlurry:["repeatChance","repeatChanceByLevel","repeatMaxCasts"],
-        dragonSlash:["repeatChance","repeatChanceByLevel","repeatMaxCasts"],
-        petrifyFist:["allyShieldByLevel"],
-        stoneBreakSky:["allyShieldByLevel"],
-        earthquakeCrush:["selfShieldByLevel"],
-        flyingSandStrike:["petrifyChanceByLevel","petrifyDuration"],
-        dustStorm:["defenseDownChance","defenseDownByLevel","defenseDownDuration"]
-    };
-
-    function patchSkill(id,fields){
-        if(typeof skillDatabase==="undefined"||!skillDatabase[id]){ return; }
-        (SKILL_CLEANUP_FIELDS[id]||[]).forEach(key=>{ delete skillDatabase[id][key]; });
-        Object.keys(fields).forEach(key=>{ skillDatabase[id][key]=copyValue(fields[key]); });
-    }
-
-    const SKILLS={
-        flameSlash:{
-            learnCost:2,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:30,damagePerLevel:6,spCost:10,
-            followUpOnCriticalOrDefeat:true,followUpMaxCasts:1,
-            description:"初次學習需2技能點。對單體造成30點傷害，消耗10 SP；目標死亡或爆擊時免費再施放1次。最高5級，每升1級消耗1技能點，傷害+6。"
-        },
-        fireCritical:{
-            learnCost:10,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:45,damagePerLevel:9,spCost:28,
-            followUpOnCriticalOrDefeat:true,followUpMaxCasts:1,requires:["flameSlash"],
-            description:"需先學習火焰斬。初次學習需10技能點，對單體造成45點傷害，消耗28 SP；目標死亡或爆擊時免費再施放1次。最高5級，每升1級消耗1技能點，傷害+9。"
-        },
-        explosiveFlurry:{
-            learnCost:20,maxLevel:5,upgradeCost:1,targetType:"tri",baseDamage:50,damagePerLevel:10,spCost:47,
-            followUpOnCriticalOrDefeat:true,followUpMaxCasts:1,requires:["fireCritical"],
-            description:"需先學習會心一擊。初次學習需20技能點，對同排中、左、右最多3名目標各造成50點傷害，消耗47 SP；任一目標死亡或爆擊時免費再施放1次。最高5級，每升1級消耗1技能點，傷害+10。"
-        },
-        dragonSlash:{
-            learnCost:35,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:165,damagePerLevel:33,spCost:65,
-            followUpOnCriticalOrDefeat:true,followUpMaxCasts:2,requires:["explosiveFlurry"],
-            description:"需先學習火爆亂擊。初次學習需35技能點，對單體造成165點傷害，消耗65 SP；目標死亡或爆擊時免費追擊，最多額外追擊2次。追擊不消耗SP，原目標死亡時自動改選存活敵人。最高5級，每升1級消耗1技能點，傷害+33。"
-        },
-        fireRocket:{
-            learnCost:2,maxLevel:5,upgradeCost:1,targetType:"tri",baseDamage:13,damagePerLevel:4,spCost:10,
-            burnChance:25,burnDuration:2,burnPercentByLevel:[1,1,2,2,3],
-            description:"初次學習需2技能點。對同排中、左、右最多3名目標各造成13點傷害，消耗10 SP；25%基礎機率燃燒2回合，每回合造成目標最大HP的1%/1%/2%/2%/3%。最高5級，每升1級消耗1技能點，傷害+4。"
-        },
-        blazeSpell:{
-            learnCost:10,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:45,damagePerLevel:9,spCost:28,
-            burnChance:30,burnDuration:2,burnPercentByLevel:[1,2,3,4,5],requires:["fireRocket"],
-            description:"需先學習火箭。初次學習需10技能點，對單體造成45點傷害，消耗28 SP；30%基礎機率燃燒2回合，每回合造成目標最大HP的1%/2%/3%/4%/5%。最高5級，每升1級消耗1技能點，傷害+9。"
-        },
-        flameTornado:{
-            learnCost:30,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:150,damagePerLevel:30,spCost:47,
-            burnChance:100,guaranteedBurn:true,burnDuration:1,burnPercentByLevel:[3,4,5,6,7],requires:["blazeSpell"],
-            description:"需先學習烈火術。初次學習需30技能點，對單一目標造成150點傷害，消耗47 SP；必定燃燒1回合，每回合造成目標最大HP的3%/4%/5%/6%/7%。最高5級，每升1級消耗1技能點，傷害+30。"
-        },
-        phoenixCry:{
-            learnCost:35,maxLevel:5,upgradeCost:1,targetType:"all",baseDamage:28,damagePerLevel:6,spCost:60,
-            burnChance:40,burnDuration:2,burnPercentByLevel:[5,7,9,11,13],
-            burnBonusThreshold:3,nextRoundDamageBonusPercent:30,nextRoundDamageBonusDuration:1,requires:["flameTornado"],
-            description:"需先學習烈焰龍捲。初次學習需35技能點，對敵方全體各造成28點傷害，消耗60 SP；各目標有40%基礎機率獲得【燃燒】2回合。每回合燃燒傷害為目標最大HP的5%/7%/9%/11%/13%。本次實際新增燃燒少於3人時，施法者獲得【鳳威】1回合，造成的所有傷害+30%。最高5級，每升1級消耗1技能點，傷害+6。"
-        },
-        rage:{
-            learnCost:25,maxLevel:5,upgradeCost:1,targetType:"allyTri",spCost:50,duration:3,
-            critBonusByLevel:[5,10,15,20,25],critChanceBonusByLevel:[5,10,15,20,25],
-            critDamageBonusByLevel:[10,20,30,40,50],requires:["explosiveFlurry","flameTornado"],
-            description:"需先學習火爆亂擊或烈焰龍捲其一。初次學習需25技能點，提高我方中、左、右3人的爆擊率5%/10%/15%/20%/25%與爆擊傷害10%/20%/30%/40%/50%，持續3回合，消耗50 SP。最高5級，每升1級消耗1技能點。"
-        },
-        fireEX:{
-            learnCost:25,maxLevel:1,targetType:"none",damageBonusPercent:10,critChanceBonusPercent:5,critDamageBonusPercent:5,
-            statusTargetDamageBonusPercent:5,
-            description:"永久提升火元素傷害10%、爆擊率5%、爆擊傷害5%；對有異常狀態的目標傷害再提升5%。"
-        },
-
-        stormFist:{
-            learnCost:2,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:26,damagePerLevel:6,spCost:7,
-            agilityDownChance:50,agilityDownByLevel:[30,40,50,60,70],agilityDownDuration:1,
-            description:"初次學習需2技能點。對單體造成26點傷害，消耗7 SP；50%基礎機率降低目標敏捷30%/40%/50%/60%/70%，持續1回合。最高5級，每升1級消耗1技能點，傷害+6。"
-        },
-        stormFlurry:{
-            learnCost:10,maxLevel:5,upgradeCost:1,targetType:"tri",baseDamage:13,damagePerLevel:3,spCost:20,
-            damageDownChance:50,damageDownByLevel:[10,20,30,40,50],damageDownDuration:2,requires:["stormFist"],
-            description:"需先學習暴風拳。初次學習需10技能點，對同排中、左、右最多3名目標各造成13點傷害，消耗20 SP；50%基礎機率降低目標造成的傷害10%/20%/30%/40%/50%，持續2回合。最高5級，每升1級消耗1技能點，傷害+3。"
-        },
-        windCrossSlash:{
-            learnCost:15,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:128,damagePerLevel:26,spCost:39,
-            damageDownChance:65,damageDownByLevel:[20,30,35,40,50],damageDownDuration:1,requires:["stormFlurry"],
-            description:"需先學習暴風亂擊。初次學習需15技能點，對單體造成128點傷害，消耗39 SP；65%基礎機率降低目標造成的傷害20%/30%/35%/40%/50%，持續1回合。最高5級，每升1級消耗1技能點，傷害+26。"
-        },
-        dizzyFist:{
-            learnCost:30,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:141,damagePerLevel:29,spCost:55,
-            stunChance:65,missBonusByLevel:[15,20,25,30,35],stunDuration:5,requires:["stormFlurry"],
-            description:"需先學習暴風亂擊。初次學習需30技能點，對單體造成141點傷害，消耗55 SP；65%基礎機率使目標暈眩5回合，使目標最終命中率降低15%/20%/25%/30%/35%。最高5級，每升1級消耗1技能點，傷害+29。"
-        },
-        windSpell:{
-            learnCost:2,maxLevel:5,upgradeCost:1,targetType:"tri",baseDamage:12,damagePerLevel:3,spCost:9,
-            agilityDownChance:50,agilityDownByLevel:[10,20,30,40,50],agilityDownDuration:1,
-            description:"初次學習需2技能點。對同排中、左、右最多3名目標各造成12點傷害，消耗9 SP；50%基礎機率降低目標敏捷10%/20%/30%/40%/50%，持續1回合。最高5級，每升1級消耗1技能點，傷害+3。"
-        },
-        stormCircle:{
-            learnCost:10,maxLevel:5,upgradeCost:1,targetType:"tri",baseDamage:14,damagePerLevel:4,spCost:18,
-            damageDownChance:55,damageDownByLevel:[15,18,21,25,30],damageDownDuration:1,requires:["windSpell"],
-            description:"需先學習狂風術。初次學習需10技能點，對同排中、左、右最多3名目標各造成14點傷害，消耗18 SP；55%基礎機率降低目標造成的傷害15%/18%/21%/25%/30%，持續1回合。最高5級，每升1級消耗1技能點，傷害+4。"
-        },
-        windHowlLightning:{
-            learnCost:15,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:128,damagePerLevel:26,spCost:55,
-            damageDownChance:65,damageDownByLevel:[15,20,25,30,35],damageDownDuration:1,requires:["stormCircle"],
-            description:"需先學習風焰術。初次學習需15技能點，對單體造成128點傷害，消耗55 SP；65%基礎機率降低目標造成的傷害15%/20%/25%/30%/35%，持續1回合。最高5級，每升1級消耗1技能點，傷害+26。"
-        },
-        stormRain:{
-            learnCost:30,maxLevel:5,upgradeCost:1,targetType:"all",baseDamage:24,damagePerLevel:5,spCost:75,
-            stunChance:35,missBonusByLevel:[15,20,25,30,35],stunDuration:1,requires:["windHowlLightning"],
-            description:"需先學習風哮電擊。初次學習需30技能點，對敵方全體各造成24點傷害，消耗75 SP；35%基礎機率附加【暈眩】1回合，使目標最終命中率降低15%/20%/25%/30%/35%。最高5級，每升1級消耗1技能點，傷害+5。"
-        },
-        dodgeSkill:{
-            learnCost:10,maxLevel:1,targetType:"allyTri",spCost:20,duration:3,evasionBonusPercent:75,
-            requires:["windCrossSlash","windHowlLightning"],description:"需先學習風旋十字斬或風哮電擊其一。初次學習需10技能點，使我方中、左、右3人閃躲率提升75%，持續3回合，消耗20 SP。最高1級。"
-        },
-        stealthSkill:{
-            learnCost:15,maxLevel:1,targetType:"ally",spCost:45,duration:3,requires:["dodgeSkill"],
-            description:"需先學習閃躲術。初次學習需15技能點，使我方1人隱身3回合；期間無法被單體技能選中，但仍會受到範圍技能波及，消耗45 SP。最高1級。"
-        },
-        dinghaishenzhen:{
-            learnCost:20,maxLevel:1,targetType:"allyAll",spCost:77,duration:3,statusResistBonus:65,accuracyBonusPercent:50,
-            requires:["stealthSkill"],description:"需先學習隱身術。初次學習需20技能點，使我方全體異常狀態抗性提升65%、命中提升50%，持續3回合，消耗77 SP。最高1級。"
-        },
-        windEX:{
-            learnCost:25,maxLevel:1,targetType:"none",evasionBonusPercent:35,description:"初次學習需25技能點，最大1級；永久提升風元素角色的閃躲率35%。"
-        },
-
-        stoneSlash:{
-            learnCost:2,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:26,damagePerLevel:6,spCost:7,
-            defenseDownChance:65,defenseDownByLevel:[10,20,30,40,50],defenseDownDuration:1,
-            description:"初次學習需2技能點。對單體造成26點傷害，消耗7 SP；65%基礎機率降低目標防禦10%/20%/30%/40%/50%，持續1回合。最高5級，每升1級消耗1技能點，傷害+6。"
-        },
-        petrifyFist:{
-            learnCost:10,maxLevel:5,upgradeCost:1,targetType:"tri",baseDamage:13,damagePerLevel:3,spCost:26,
-            selfShieldByLevel:[100,125,150,175,200],shieldDuration:2,requires:["stoneSlash"],
-            description:"需先學習土石斬。初次學習需10技能點，對同排中、左、右最多3名目標各造成13點傷害，消耗26 SP；並使自身獲得100/125/150/175/200點護盾2回合。最高5級，每升1級消耗1技能點，傷害+3。"
-        },
-        stoneBreakSky:{
-            learnCost:15,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:128,damagePerLevel:26,spCost:42,
-            selfShieldByLevel:[100,125,150,175,200],shieldDuration:2,requires:["petrifyFist"],
-            description:"需先學習石盾拳。初次學習需15技能點，對單體造成128點傷害，消耗42 SP；並使自身獲得100/125/150/175/200點護盾2回合。最高5級，每升1級消耗1技能點，傷害+26。"
-        },
-        earthquakeCrush:{
-            learnCost:30,maxLevel:5,upgradeCost:1,targetType:"tri",baseDamage:47,damagePerLevel:9,spCost:55,
-            petrifyChanceByLevel:[30,35,40,45,50],petrifyDuration:2,requires:["stoneBreakSky"],
-            description:"需先學習石破天驚。初次學習需30技能點，對同排中、左、右最多3名目標各造成47點傷害，消耗55 SP；依等級有30%/35%/40%/45%/50%基礎機率石化目標2回合。最高5級，每升1級消耗1技能點，傷害+9。"
-        },
-        stoneThrow:{
-            learnCost:2,maxLevel:5,upgradeCost:1,targetType:"tri",baseDamage:12,damagePerLevel:3,spCost:7,
-            defenseDownChance:65,defenseDownByLevel:[10,20,30,40,50],defenseDownDuration:1,
-            description:"初次學習需2技能點。對同排中、左、右最多3名目標各造成12點傷害，消耗7 SP；65%基礎機率降低目標防禦10%/20%/30%/40%/50%，持續1回合。最高5級，每升1級消耗1技能點，傷害+3。"
-        },
-        sandWind:{
-            learnCost:10,maxLevel:5,upgradeCost:1,targetType:"tri",baseDamage:14,damagePerLevel:4,spCost:19,
-            defenseDownChance:65,defenseDownByLevel:[10,20,30,40,50],defenseDownDuration:1,requires:["stoneThrow"],
-            description:"需先學習落石術。初次學習需10技能點，對同排中、左、右最多3名目標各造成14點傷害，消耗19 SP；65%基礎機率降低目標防禦10%/20%/30%/40%/50%，持續1回合。最高5級，每升1級消耗1技能點，傷害+4。"
-        },
-        flyingSandStrike:{
-            learnCost:15,maxLevel:5,upgradeCost:1,targetType:"all",baseDamage:24,damagePerLevel:5,spCost:55,
-            defenseDownChance:60,defenseDownByLevel:[10,15,20,25,35],defenseDownDuration:2,requires:["sandWind"],
-            description:"需先學習滾石術。初次學習需15技能點，對敵方全體各造成24點傷害，消耗55 SP；60%基礎機率附加【破防】2回合，降低防禦10%/15%/20%/25%/35%。最高5級，每升1級消耗1技能點，傷害+5。"
-        },
-        dustStorm:{
-            learnCost:30,maxLevel:5,upgradeCost:1,targetType:"single",baseDamage:140,damagePerLevel:28,spCost:65,
-            petrifyChanceByLevel:[20,25,30,35,45],petrifyDuration:2,requires:["flyingSandStrike"],
-            description:"需先學習飛沙瞬擊。初次學習需30技能點，對單體造成140點傷害，消耗65 SP；依等級有20%/25%/30%/35%/45%基礎機率石化目標2回合。最高5級，每升1級消耗1技能點，傷害+28。"
-        },
-        earthShield:{
-            learnCost:10,maxLevel:1,targetType:"allyTri",spCost:66,duration:3,reflectPercent:50,
-            requires:["stoneBreakSky","flyingSandStrike"],description:"需先學習石破天驚或飛沙瞬擊其一。初次學習需10技能點，使我方中、左、右3人獲得50%反傷土盾，持續3回合，消耗66 SP。最高1級。"
-        },
-        rockWall:{
-            learnCost:15,maxLevel:1,targetType:"allyTri",spCost:45,duration:4,defenseBonusPercent:35,requires:["barrier"],
-            description:"需先學習結界。初次學習需15技能點，使我方中、左、右3人防禦力提升35%，持續4回合，消耗45 SP。最高1級。"
-        },
-        barrier:{
-            learnCost:20,maxLevel:1,targetType:"ally",spCost:40,duration:5,barrierBlockCount:5,requires:["earthShield"],
-            description:"需先學習萬象土盾。使我方1人獲得結界，完全抵擋接下來5次直接傷害，最多存在5回合；燃燒、毒等持續傷害不抵擋且不消耗次數，消耗40 SP。"
-        },
-        earthEX:{
-            learnCost:25,maxLevel:1,targetType:"none",defenseBonusPercent:35,description:"初次學習需25技能點，最大1級；永久提升土元素角色的防禦力35%。"
-        }
-    };
-
-    Object.keys(SKILLS).forEach(id=>patchSkill(id,SKILLS[id]));
 
     const FINAL_FIRE_WIND_EARTH_DAMAGE_SKILL_IDS=[
         "flameSlash","fireCritical","explosiveFlurry","dragonSlash",
@@ -296,7 +109,7 @@
                 const duration=skill.frostbiteDuration||2;
                 applyFrostbite(monster,duration);
                 playFrostbiteEffect("monster",index);
-                if(typeof addBattleLog==="function"){ addBattleLog(monster.name+"陷入凍傷，"+duration+"回合內傷害、閃躲、異常狀態抗性降低25%。"); }
+                if(typeof addBattleLog==="function"){ addBattleLog(monster.name+"陷入凍傷，"+duration+"回合內傷害降低30%、閃躲與異常狀態抗性降低25%。"); }
             }else if(!roll.duplicate&&typeof addBattleLog==="function"){
                 addBattleLog("（凍傷效果被"+monster.name+"抵抗了）");
             }
@@ -320,7 +133,7 @@
                 const duration=skill.frostbiteDuration||2;
                 applyFrostbite(target,duration);
                 playFrostbiteEffect("player",index);
-                if(typeof addBattleLog==="function"){ addBattleLog((target.id||"角色")+"陷入凍傷，"+duration+"回合內傷害、閃躲、異常狀態抗性降低25%。"); }
+                if(typeof addBattleLog==="function"){ addBattleLog((target.id||"角色")+"陷入凍傷，"+duration+"回合內傷害降低30%、閃躲與異常狀態抗性降低25%。"); }
             }else if(!roll.duplicate&&typeof addBattleLog==="function"){
                 addBattleLog("（凍傷效果被"+(target.id||"角色")+"抵抗了）");
             }

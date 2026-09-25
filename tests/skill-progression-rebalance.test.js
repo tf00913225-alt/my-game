@@ -6,6 +6,7 @@ const fs=require("node:fs");
 const vm=require("node:vm");
 
 const source=fs.readFileSync("js/60-v173.64-skill-progression-rebalance.js","utf8");
+const main=fs.readFileSync("js/00-main.js","utf8");
 
 const names={
     flameSlash:"火焰斬",fireCritical:"會心一擊",explosiveFlurry:"火爆亂擊",dragonSlash:"霸龍裂天斬",
@@ -78,13 +79,13 @@ function makeRuntime(options={}){
         getCharacterSkillKey:actor=>actor===owners.player2?"player2":"fire",
         getPartyBattleStats:()=>({maxHP:1000,maxSP:1000}),
         renderSkillLoadout(){},updateUI(){},saveGame(){},alert(message){ context.lastAlert=message; },
-        learnSkill(){},upgradeSkill(){},
+        learnSkill(){},upgradeSkill(){},equipSkill(){},
         rollCritical(){ return {isCrit:critShouldHit}; },
         applyBurnEffect(){ return burnShouldAdd; },
         finishPlayerAction(){ finished++; },
         showSkillNameBadge(){},addBattleLog(){},
         castDamageSkill(skillId){
-            observedBonus=Number(skillDatabase[skillId].damageBonusPercent)||0;
+            observedBonus=Number(this.FourSymbolsSkillDamageContext&&this.FourSymbolsSkillDamageContext.directSkillBonusPercent)||0;
             context.rollCritical();
             context.applyBurnEffect({});
             owners.fire.sp-=10;
@@ -136,6 +137,26 @@ function resetForLearn(runtime,key,level,points=999){
     runtime.context.lastAlert="";
 }
 
+test("cross-element learning uses the formal native gate, doubled initial cost, EX ban and one equipped slot",()=>{
+    const r=makeRuntime({key:"water",level:7,points:30});
+    assert.equal(r.context.learnSkill("fireCritical"),false);
+    assert.match(r.context.lastAlert,/本命元素技能/);
+    r.loadouts.water.skillLevels.waterKnife=1;
+    const before=r.owners.water.skillPoints;
+    assert.equal(r.context.learnSkill("fireCritical"),true);
+    assert.equal(r.loadouts.water.skillLevels.fireCritical,1);
+    assert.equal(r.owners.water.skillPoints,before-12);
+    assert.equal(r.context.upgradeSkill("fireCritical"),false,"Lv2 still observes its character-level gate");
+    r.owners.water.level=50;
+    assert.equal(r.context.learnSkill("fireEX"),false);
+    assert.match(r.context.lastAlert,/本命元素限定/);
+    r.loadouts.water.equippedSkills=[];
+    assert.equal(r.context.equipSkill("fireCritical"),true);
+    r.loadouts.water.skillLevels.stormFist=1;
+    assert.equal(r.context.equipSkill("stormFist"),false);
+    assert.match(r.context.lastAlert,/最多攜帶 1 招跨元素/);
+});
+
 test("final progression data standardizes Lv10 damage skills, EX and support structure",()=>{
     const r=makeRuntime();
     const expected={
@@ -154,8 +175,8 @@ test("final progression data standardizes Lv10 damage skills, EX and support str
     assert.deepEqual([r.skills.fireSoulResonance.learnLevel,r.skills.fireSoulResonance.learnCost,r.skills.fireSoulResonance.maxLevel,r.skills.fireSoulResonance.spCost],[25,14,5,45]);
     assert.deepEqual(Array.from(r.skills.fireSoulResonance.momentumBonusByLevel),[12,15,18,21,25]);
     assert.deepEqual([r.skills.bloodBurnArt.learnLevel,r.skills.bloodBurnArt.learnCost,r.skills.bloodBurnArt.maxLevel,r.skills.bloodBurnArt.spCost],[35,18,5,35]);
-    assert.deepEqual(Array.from(r.skills.bloodBurnArt.hpCostPercentByLevel),[5,10,15,20,25]);
-    assert.deepEqual(Array.from(r.skills.bloodBurnArt.directDamageBonusByLevel),[5,10,15,20,35]);
+    assert.deepEqual(Array.from(r.skills.bloodBurnArt.hpCostPercentByLevel),[20,25,30,35,40]);
+    assert.deepEqual(Array.from(r.skills.bloodBurnArt.directDamageBonusByLevel),[20,25,30,35,50]);
     assert.deepEqual([r.skills.healSpell.maxLevel,r.skills.freeze.maxLevel,r.skills.purifyMind.maxLevel],[5,5,3]);
     assert.deepEqual(Array.from(r.skills.healSpell.healHpByLevel),[550,580,610,640,670]);
     assert.deepEqual(Array.from(r.skills.healSpell.spRestorePercentByLevel),[0,0,5,10,15]);
@@ -176,14 +197,27 @@ test("final progression data standardizes Lv10 damage skills, EX and support str
     assert.deepEqual(Array.from(r.skills.dinghaishenzhen.statusResistBonusByLevel),[5,8,10,12,15]);
     assert.deepEqual(Array.from(r.skills.dinghaishenzhen.accuracyBonusPercentByLevel),[5,10,15,20,25]);
     assert.deepEqual(Array.from(r.skills.rockWall.defenseBonusPercentByLevel),[15,20,25,30,35]);
-    assert.deepEqual(Array.from(r.skills.earthShield.reflectPercentByLevel),[20,30,35,40,50]);
-    assert.deepEqual(Array.from(r.skills.earthShield.durationByLevel),[3,3,3,4,5]);
-    assert.deepEqual([r.skills.barrier.maxLevel,...Array.from(r.skills.barrier.barrierBlockCountByLevel)],[5,3,3,3,4,5]);
+    assert.deepEqual(Array.from(r.skills.earthShield.reflectPercentByLevel),[20,40,60,80,100]);
+    assert.deepEqual(Array.from(r.skills.earthShield.durationByLevel),[3,3,3,3,4]);
+    assert.equal(r.skills.barrier.barrierBlockCountByLevel,undefined,"Barrier is duration-owned, not charge-owned");
     assert.deepEqual(Array.from(r.skills.barrier.durationByLevel),[3,3,3,4,5]);
     assert.deepEqual(Array.from(r.skills.rockWall.requires),["petrifyFist","sandWind"]);
     assert.deepEqual(Array.from(r.skills.earthShield.requires),["rockWall"]);
     assert.deepEqual(Array.from(r.skills.barrier.requires),["earthShield"]);
     assert.equal(r.skills.stormSpell.learnLevel,undefined,"monster-only 暴風術不進玩家 progression");
+});
+
+test("the formal owner supplies every direct skill base value without V149 data writes",()=>{
+    const r=makeRuntime();
+    const expected={
+        flameSlash:[30,6,10],fireCritical:[45,9,28],explosiveFlurry:[50,10,47],dragonSlash:[165,33,65],fireRocket:[13,4,10],blazeSpell:[45,9,28],flameTornado:[150,30,47],phoenixCry:[28,6,60],
+        waterKnife:[21,5,6],frostPunch:[32,7,17],iceSpin:[35,7,45],frostCrush:[116,24,60],waterBall:[10,2,8],floodBeast:[105,21,35],iceArrowRain:[30,6,75],
+        stormFist:[26,6,7],stormFlurry:[13,3,20],windCrossSlash:[128,26,39],dizzyFist:[141,29,55],windSpell:[12,3,9],stormCircle:[14,4,18],windHowlLightning:[128,26,55],stormRain:[24,5,75],
+        stoneSlash:[26,6,7],petrifyFist:[13,3,26],stoneBreakSky:[128,26,42],earthquakeCrush:[47,9,55],stoneThrow:[12,3,7],sandWind:[14,4,19],flyingSandStrike:[24,5,55],dustStorm:[140,28,65]
+    };
+    Object.entries(expected).forEach(([id,values])=>{
+        assert.deepEqual([r.skills[id].baseDamage,r.skills[id].damagePerLevel,r.skills[id].spCost],values,id);
+    });
 });
 
 test("shared level formula preserves gates while every upgrade costs one point",()=>{
@@ -282,22 +316,22 @@ test("Lv1-Lv4 resonance never uses the Lv5 extension rule",()=>{
     assert.equal(resonance.turnsLeft,3);
 });
 
-test("Blood Burn pays each level's max-HP cost and buffs exactly three non-free fire casts",()=>{
+test("Blood Burn pays each level's max-HP cost and buffs exactly four direct casts",()=>{
     const r=makeRuntime();
     r.loadouts.fire.skillLevels.flameSlash=1;
-    for(const [level,cost,bonus] of [[1,50,5],[2,100,10],[3,150,15],[4,200,20],[5,250,35]]){
+    for(const [level,cost,bonus] of [[1,200,20],[2,250,25],[3,300,30],[4,350,35],[5,400,50]]){
         r.owners.fire.activeBuffs=[];r.owners.fire.hp=1000;r.owners.fire.sp=1000;
         r.loadouts.fire.skillLevels.bloodBurnArt=level;
         assert.equal(r.context.v17364CastNewFireTactical(0,"bloodBurnArt"),true,`Lv${level} can cast`);
         assert.equal(r.owners.fire.hp,1000-cost,`Lv${level} pays exact max-HP percentage`);
         r.freeCast("flameSlash");
-        assert.equal(r.observedBonus(),0,`Lv${level} free follow-up receives no Blood Burn bonus`);
-        assert.equal(r.owners.fire.activeBuffs.find(buff=>buff.type==="bloodBurn")?.remainingFireActions,3,"free follow-up does not consume a charge");
-        for(let cast=1;cast<=3;cast++){
+        assert.equal(r.observedBonus(),bonus,`Lv${level} free follow-up uses the original cast bonus`);
+        assert.equal(r.owners.fire.activeBuffs.find(buff=>buff.type==="bloodBurn")?.remainingFireActions,4,"free follow-up does not consume a charge");
+        for(let cast=1;cast<=4;cast++){
             r.context.castDamageSkill("flameSlash",0);
             assert.equal(r.observedBonus(),bonus,`Lv${level} fire cast ${cast} is buffed`);
         }
-        assert.equal(r.owners.fire.activeBuffs.some(buff=>buff.type==="bloodBurn"),false,`Lv${level} ends after the third valid fire cast`);
+        assert.equal(r.owners.fire.activeBuffs.some(buff=>buff.type==="bloodBurn"),false,`Lv${level} ends after the fourth valid direct cast`);
         r.context.castDamageSkill("flameSlash",0);
         assert.equal(r.observedBonus(),0,`Lv${level} fourth fire cast is not buffed`);
     }
@@ -312,8 +346,8 @@ test("resonance and Blood Burn add in one direct-damage bonus bucket",()=>{
     r.context.v17364CastNewFireTactical(0,"bloodBurnArt");
     r.setCrit(false);r.setBurn(false);
     r.context.castDamageSkill("flameSlash",0);
-    assert.equal(r.observedBonus(),17);
-    assert.equal(r.skills.flameSlash.damageBonusPercent,undefined,"temporary bucket contribution is restored after the cast");
+    assert.equal(r.observedBonus(),32);
+    assert.equal(r.skills.flameSlash.damageBonusPercent,undefined,"global skill data is never mutated by a cast bonus");
 });
 
 test("duration lifecycle is owned by the core BattleFlow rather than the late progression module",()=>{
@@ -332,9 +366,11 @@ test("wind and earth support values stay in formal arrays instead of transient s
     assert.equal(r.skills.dodgeSkill.evasionBonusPercent,undefined);
     assert.deepEqual(Array.from(r.skills.rockWall.defenseBonusPercentByLevel),[15,20,25,30,35]);
     assert.equal(r.skills.rockWall.defenseBonusPercent,undefined);
-    assert.deepEqual(Array.from(r.skills.earthShield.reflectPercentByLevel),[20,30,35,40,50]);
+    assert.deepEqual(Array.from(r.skills.earthShield.reflectPercentByLevel),[20,40,60,80,100]);
     assert.equal(r.skills.earthShield.reflectPercent,undefined);
-    assert.deepEqual(Array.from(r.skills.barrier.barrierBlockCountByLevel),[3,3,3,4,5]);
+    assert.equal(r.skills.barrier.barrierBlockCountByLevel,undefined,"Barrier has no charge lifecycle");
+    assert.equal(r.skills.earthEX.maxHpMultiplier,1.2,"Earth EX applies Max HP after base sources");
+    assert.match(main,/\)\*maxHpPassiveMultiplier\)/,"both player stat owners apply Earth EX after base Max HP");
 });
 
 test("legacy learned skills remain intact while the next upgrade obeys the new gate",()=>{

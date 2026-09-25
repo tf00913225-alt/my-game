@@ -53,47 +53,8 @@
 
     /* ----- 11 / 12. Skill data and hard-control caps are one ruleset. ----- */
     function applySkillRuleChanges(){
-        if(typeof skillDatabase==="undefined"){ return; }
-        const storm=skillDatabase.stormRain;
-        if(storm){
-            storm.learnCost=30;
-            storm.maxLevel=5;
-            storm.baseDamage=48;
-            storm.damagePerLevel=14;
-            storm.spCost=75;
-            storm.stunChance=35;
-            storm.stunDuration=1;
-            storm.missBonusByLevel=[15,20,25,30,35];
-            storm.requires=["windHowlLightning"];
-            storm.description="對敵方全體各造成48點基礎法術傷害；35%基礎機率暈眩1回合，使目標最終命中率降低15%/20%/25%/30%/35%。";
-        }
-        const rain=skillDatabase.iceArrowRain;
-        if(rain){
-            rain.learnCost=20;
-            rain.maxLevel=5;
-            rain.baseDamage=30;
-            rain.damagePerLevel=12;
-            rain.spCost=75;
-            /* Ice Arrow Rain is Frostbite, not the hard-control Freeze state. */
-            delete rain.freezeChance;
-            delete rain.freezeDuration;
-            delete rain.freezeSingleTarget;
-            rain.frostbiteChance=50;
-            rain.frostbiteDuration=2;
-            rain.lifestealPercentByLevel=[1,2,3,4,5];
-            rain.requires=["floodBeast"];
-            rain.description="對敵方全體各造成30點基礎法術傷害；吸取實際傷害的1%/2%/3%/4%/5%恢復自身HP；每個命中目標各有50%基礎機率凍傷2回合。";
-        }
-        const freeze=skillDatabase.freeze;
-        if(freeze){
-            freeze.learnCost=25;
-            freeze.maxLevel=1;
-            freeze.spCost=22;
-            freeze.freezeChance=80;
-            freeze.freezeDuration=4;
-            freeze.requires=["iceArrowRain"];
-            freeze.description="80%基礎機率冰封單一目標，使其無法行動4回合；純控場技能，不造成傷害。";
-        }
+        /* Retired data patch: V173.64 exclusively authors player Skill Spec. */
+        return;
     }
     applySkillRuleChanges();
 

@@ -2291,6 +2291,9 @@ function getMainCharacterStats(){
     const defensePassivePercent=earthEXLevel>0
         ? (skillDatabase.earthEX.defenseBonusPercent||0)
         : 0;
+    const maxHpPassiveMultiplier=earthEXLevel>0
+        ? Math.max(1,Number(skillDatabase.earthEX.maxHpMultiplier)||1)
+        : 1;
 
     const defenseDownPercent=getPlayerDefenseDownPercent(player);
 
@@ -2309,11 +2312,12 @@ function getMainCharacterStats(){
 
     return {
         /* 暫時六圍減益不動態壓縮最大HP/SP；詳見上方統一規則。 */
-        maxHP:
+        maxHP:Math.round((
             100+
             (player.vitality+(Number(bonus.vitality)||0))*HP_PER_VITALITY_POINT+
             player.bonusHP+
-            (Number(bonus.maxHP)||0),
+            (Number(bonus.maxHP)||0)
+        )*maxHpPassiveMultiplier),
 
         maxSP:
             50+
@@ -2452,6 +2456,9 @@ function getAdditionalCharacterBattleStats(character,characterKey){
     const defensePassivePercent=earthEXLevel>0
         ? (skillDatabase.earthEX.defenseBonusPercent||0)
         : 0;
+    const maxHpPassiveMultiplier=earthEXLevel>0
+        ? Math.max(1,Number(skillDatabase.earthEX.maxHpMultiplier)||1)
+        : 1;
 
     const evasionBuffPercent=getActiveBuffPercent(character,"dodgeSkill");
     const defenseBuffPercent=getActiveBuffPercent(character,"rockWall");
@@ -2469,11 +2476,12 @@ function getAdditionalCharacterBattleStats(character,characterKey){
     const rawEvasion=getPlayerEvasionBaseAgility(character,bonus)*0.6;
 
     return {
-        maxHP:
+        maxHP:Math.round((
             100+
             (character.vitality+(Number(bonus.vitality)||0))*HP_PER_VITALITY_POINT+
             (Number(character.bonusHP)||0)+
-            (Number(bonus.maxHP)||0),
+            (Number(bonus.maxHP)||0)
+        )*maxHpPassiveMultiplier),
 
         maxSP:
             50+
@@ -7794,6 +7802,9 @@ function loadGame(){
 
 
         normalizeHydratedRetiredSkillReferences();
+        if(typeof window!=="undefined"&&typeof window.v17364NormalizeCrossElementEquips==="function"){
+            window.v17364NormalizeCrossElementEquips();
+        }
 
 
         /*
@@ -12311,11 +12322,19 @@ function prepareAction(type){
     const skill =
         skillDatabase[type];
 
+    const activeSkillKey=getPartyCharacterKey(activeBattleCharacterIndex);
+    const activeLoadout=characterSkillLoadouts[activeSkillKey];
+
 
     if(
         type!=="normal"&&
         skill
     ){
+        if(!activeLoadout||!(activeLoadout.skillLevels&&Number(activeLoadout.skillLevels[type])>0)||
+            !Array.isArray(activeLoadout.equippedSkills)||!activeLoadout.equippedSkills.includes(type)){
+            addBattleLog("尚未學會或裝備「"+skill.name+"」。");
+            return;
+        }
 
         const spCost =
             skill.spCost!==undefined
@@ -12766,6 +12785,11 @@ function getOrdinaryDamageBonusPercent(options){
     }
     if(skill&&Number.isFinite(Number(skill.damageBonusPercent))){
         total+=Number(skill.damageBonusPercent);
+    }
+    if(attacker&&typeof window!=="undefined"&&window.FourSymbolsSkillDamageContext&&
+        window.FourSymbolsSkillDamageContext.attacker===attacker&&
+        window.FourSymbolsSkillDamageContext.skill===skill){
+        total+=Number(window.FourSymbolsSkillDamageContext.directSkillBonusPercent)||0;
     }
 
     const extras=Array.isArray(resolved.ordinaryDamageBonusPercent)
@@ -13750,7 +13774,6 @@ function resolveQueuedPlayerAction(characterIndex,token){
 
             }
             else{
-
                 castSecondaryCharacterSkill(
                     characterIndex,
                     queued.action,
@@ -17162,12 +17185,17 @@ function castHealSkill(skillId,targetIndex){
         calculateHealingAmount(baseHealHP,casterStats.intelligence)*healBonusMultiplier*bossHealingMultiplier
     );
 
-    const potentialHealSP=Math.floor(
-        calculateSPHealingAmount(
-            skill.baseHealSP+(skill.healSPPerLevel||0)*(level-1),
-            casterStats.intelligence
-        )*healBonusMultiplier*bossHealingMultiplier
-    );
+    const spRestorePercent=Array.isArray(skill.spRestorePercentByLevel)
+        ?Number(skill.spRestorePercentByLevel[Math.max(0,Math.min(skill.spRestorePercentByLevel.length-1,level-1))])||0
+        :null;
+    const potentialHealSP=spRestorePercent!==null
+        ?Math.floor(targetStats.maxSP*spRestorePercent/100*healBonusMultiplier*bossHealingMultiplier)
+        :Math.floor(
+            calculateSPHealingAmount(
+                skill.baseHealSP+(skill.healSPPerLevel||0)*(level-1),
+                casterStats.intelligence
+            )*healBonusMultiplier*bossHealingMultiplier
+        );
 
     const actualHealHP=Math.max(
         0,
@@ -18547,6 +18575,8 @@ function processSingleMonsterAttack(monsterIndex,token){
                     "barrier"
                 );
 
+            let earthShieldReduction=0;
+
 
             if(damage>0 && hasBarrier){
 
@@ -18561,6 +18591,19 @@ function processSingleMonsterAttack(monsterIndex,token){
 
             }
             else{
+
+                const earthShieldBuff=(targetCharacter.activeBuffs||[]).find(buff=>
+                    buff&&buff.type==="earthShield"&&Number(buff.turnsLeft)>0&&Number(buff.remainingBlocks)>0
+                );
+                if(damage>0&&earthShieldBuff){
+                    const percent=Math.max(0,Math.min(100,Number(earthShieldBuff.percent)||0));
+                    earthShieldReduction=Math.max(0,Math.floor(damage*percent/100));
+                    damage=Math.max(0,damage-earthShieldReduction);
+                    earthShieldBuff.remainingBlocks=Math.max(0,Number(earthShieldBuff.remainingBlocks)-1);
+                    if(earthShieldBuff.remainingBlocks<=0){
+                        targetCharacter.activeBuffs=targetCharacter.activeBuffs.filter(buff=>buff!==earthShieldBuff);
+                    }
+                }
 
                 const shieldBuff=
 
@@ -18632,29 +18675,9 @@ function processSingleMonsterAttack(monsterIndex,token){
                擋下的部分也被誤算進反傷裡。
             */
 
-            const reflectPercent=
+            if(earthShieldReduction>0){
 
-                getActiveBuffPercent(
-                    targetCharacter,
-                    "earthShield"
-                );
-
-
-            if(
-                reflectPercent>0 &&
-                actualHpDamage>0
-            ){
-
-                const reflectDamage=
-
-                    Math.max(
-                        1,
-                        Math.floor(
-                            actualHpDamage*
-                            reflectPercent/
-                            100
-                        )
-                    );
+                const reflectDamage=earthShieldReduction;
 
 
                 const hpBeforeReflect=Math.max(0,Number(monster.hp)||0);
@@ -29600,16 +29623,10 @@ function renderSkillLoadout(){
                 skillDatabase[skillId];
 
 
-            return (
-                skill &&
-                skill.element===
-                (
-                    skillOwner
-                    ?
-                    skillOwner.element
-                    :
-                    currentSkillCharacter
-                )
+            return !!(
+                skill && skill.element &&
+                Object.prototype.hasOwnProperty.call(skill,"learnLevel") &&
+                skill.category!=="monster"
             );
 
         });

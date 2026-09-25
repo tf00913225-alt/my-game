@@ -316,7 +316,10 @@
             return {percent:levelValue(skill.defenseBonusPercentByLevel,level,skill.defenseBonusPercent)};
         }
         if(skill.id==="earthShield"){
-            return {percent:levelValue(skill.reflectPercentByLevel,level,skill.reflectPercent)};
+            return {
+                percent:levelValue(skill.reflectPercentByLevel,level,skill.reflectPercent),
+                remainingBlocks:Math.max(1,Math.floor(levelValue(skill.remainingBlocksByLevel,level,2)))
+            };
         }
         if(skill.id==="dinghaishenzhen"){
             return {
@@ -325,13 +328,7 @@
             };
         }
         if(skill.id==="barrier"){
-            return {
-                sourceSkill:"barrier",barrierRule:"shared",
-                remainingBlocks:Math.max(
-                    1,
-                    Math.floor(levelValue(skill.barrierBlockCountByLevel,level,skill.barrierBlockCount||3))
-                )
-            };
+            return {sourceSkill:"barrier",barrierRule:"duration"};
         }
         return {};
     }

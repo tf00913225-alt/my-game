@@ -65,8 +65,8 @@ test("all 31 player direct-damage skills are Lv10 and every upgrade target costs
 test("support skill final arrays and runtime owners match the formal spec",()=>{
   [
     /FIRE_MOMENTUM_BY_LEVEL=Object\.freeze\(\[12,15,18,21,25\]\)/,
-    /BLOOD_BURN_HP_COST_BY_LEVEL=Object\.freeze\(\[5,10,15,20,25\]\)/,
-    /BLOOD_BURN_BY_LEVEL=Object\.freeze\(\[5,10,15,20,35\]\)/,
+    /BLOOD_BURN_HP_COST_BY_LEVEL=Object\.freeze\(\[20,25,30,35,40\]\)/,
+    /BLOOD_BURN_BY_LEVEL=Object\.freeze\(\[20,25,30,35,50\]\)/,
     /HEAL_HP_BY_LEVEL=Object\.freeze\(\[550,580,610,640,670\]\)/,
     /HEAL_SP_PERCENT_BY_LEVEL=Object\.freeze\(\[0,0,5,10,15\]\)/,
     /FREEZE_CHANCE_BY_LEVEL=Object\.freeze\(\[55,65,75,85,95\]\)/,
@@ -76,9 +76,8 @@ test("support skill final arrays and runtime owners match the formal spec",()=>{
     /CALM_RESIST_BY_LEVEL=Object\.freeze\(\[5,8,10,12,15\]\)/,
     /CALM_ACCURACY_BY_LEVEL=Object\.freeze\(\[5,10,15,20,25\]\)/,
     /ROCK_WALL_BY_LEVEL=Object\.freeze\(\[15,20,25,30,35\]\)/,
-    /EARTH_SHIELD_BY_LEVEL=Object\.freeze\(\[20,30,35,40,50\]\)/,
-    /EARTH_SHIELD_DURATION_BY_LEVEL=Object\.freeze\(\[3,3,3,4,5\]\)/,
-    /BARRIER_BLOCKS_BY_LEVEL=Object\.freeze\(\[3,3,3,4,5\]\)/,
+    /EARTH_SHIELD_BY_LEVEL=Object\.freeze\(\[20,40,60,80,100\]\)/,
+    /EARTH_SHIELD_DURATION_BY_LEVEL=Object\.freeze\(\[3,3,3,3,4\]\)/,
     /BARRIER_DURATION_BY_LEVEL=Object\.freeze\(\[3,3,3,4,5\]\)/
   ].forEach(pattern=>assert.match(progression,pattern));
   assert.match(progression,/fireSoulResonance:[\s\S]*?spCost:45/);
@@ -102,13 +101,13 @@ test("formal Heal and Purify runtime keeps robust fallbacks and the selected pri
   assert.match(support,/const presentationTargetType=targets\.length>1[\s\S]*?animateSupportCast\(state,characterIndex,skill,primaryTarget,targets,targetSide,presentationTargetType\)/);
 });
 
-test("Lv5 resonance extension and three-cast Blood Burn exclude free follow-ups",()=>{
+test("Lv5 resonance extension and four-cast Blood Burn share the cast bonus with free follow-ups",()=>{
   assert.match(progression,/maxExtensionRounds:3,maxExtensionsPerRound:1/);
   assert.match(progression,/lastExtendedRound/);
   assert.match(progression,/extensionCount/);
   assert.match(progression,/if\(succeeded&&!freeCast\)/);
-  assert.match(progression,/const bloodBonus=!freeCast&&blood/);
-  assert.match(progression,/remainingFireActions:3/);
+  assert.match(progression,/const bloodBonus=blood/);
+  assert.match(progression,/remainingFireActions:4/);
   assert.match(progression,/blood\.remainingFireActions=Math\.max\(0/);
 });
 

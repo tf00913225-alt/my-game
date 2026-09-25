@@ -133,15 +133,16 @@ function formulaRuntime(){
     assert.match(progression,/followUpOnCriticalOrDefeat/);
     assert.match(progression,/免費再施放/);
     assert.match(progression,/鳳威/);
-    assert.match(progression,/免費追擊也不消耗3次有效施放次數/);
+    assert.match(progression,/fireActionCharges:4/);
+    assert.match(progression,/免費追擊沿用本次加成但不額外消耗次數/);
     assert.match(progression,/不清除永久被動、EX、裝備效果、Boss固有機制、HP／SP或死亡狀態/);
-    assert.match(progression,/凍傷：[\s\S]*?傷害-25%[\s\S]*?最終閃躲-25%[\s\S]*?最終異常狀態抗性-25%/);
+    assert.match(progression,/凍傷：[\s\S]*?傷害-30%[\s\S]*?最終閃躲-25%[\s\S]*?最終異常狀態抗性-25%/);
 }
 
 {
     const statusText=sourceFunction(statusVfx,"statusEffectText");
     assert.doesNotMatch(statusText,/凍傷.*無法使用技能/);
-    assert.match(statusText,/frostbite[\s\S]*?傷害 -25%[\s\S]*?最終閃躲 -25個百分點[\s\S]*?最終異常狀態抗性 -25個百分點/);
+    assert.match(statusText,/frostbite[\s\S]*?傷害 -30%[\s\S]*?最終閃躲 -25個百分點[\s\S]*?最終異常狀態抗性 -25個百分點/);
     const finishDuration=sourceFunction(main,"finishBattleDurationAction");
     assert.match(finishDuration,/v143SyncStatusVisualEffects\("?(?:false)?"?\)|v143SyncStatusVisualEffects\(false\)/);
     assert.doesNotMatch(progression,/finishDurationAction|FourSymbolsDurationLifecycle=Object\.freeze/);
