@@ -10,8 +10,11 @@ test("historical main save cannot pass screening without sidecar and reward prov
         player:{id:"first",element:"fire",level:3,exp:4,skillPoints:2},
         player2:null,player3:null,
         inventoryItems:[{id:"potion",count:2}],characterEquipment:{fire:{}},
-        dailyQuestState:{},commissionQuestState:{},achievementState:{},
-        gameplayProgress:{},abyssProgress:{}
+        dailyQuestState:{date:"2026-09-25",progress:{checkin:0},claimed:{checkin:false}},
+        commissionQuestState:{date:"2026-09-25",progress:{winBattle:0},claimed:{winBattle:false}},
+        achievementState:{},
+        gameplayProgress:{tower:{claimedFloors:{}}},
+        abyssProgress:{runs:{20:{rewardClaims:{},firstClearClaims:{}}}}
     };
     const review=screenLegacyCandidateSnapshot(save);
     assert.equal(review.status,"blocked");
