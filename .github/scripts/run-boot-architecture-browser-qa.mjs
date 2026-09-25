@@ -497,7 +497,12 @@ try{
     const freshDeviceTimeOrigin=await client.eval(`performance.timeOrigin`);
     await client.send("Page.reload",{ignoreCache:false});
     await waitFor(client,`performance.timeOrigin!==${JSON.stringify(freshDeviceTimeOrigin)}&&document.readyState==='complete'`,"fresh-device reload",15000);
+    await waitFor(client,"window.FourSymbolsStartupPolicy?.getState()==='AUTH_REQUIRED'||window.FourSymbolsStartupPolicy?.getState()==='READY'","fresh-device identity",15000);
+    if(await client.eval(`FourSymbolsStartupPolicy.getState()==='AUTH_REQUIRED'`)){
+        await client.eval(`(()=>{document.getElementById("firebaseEmailInput").value="b@example.test";document.getElementById("firebasePasswordInput").value="123456";document.getElementById("firebaseEmailSignInButton").click();})()`);
+    }
     await waitFor(client,"window.FourSymbolsStartupPolicy?.getState()==='READY'&&window.FourSymbolsStartupPolicy?.getUid()==='uid-B'&&performance.getEntriesByName('four-symbols:main-city-interactive').length>0","warm account restore",15000);
+    assert.equal(await client.eval(`localStorage.getItem("__qa_candidate_backup_uid_B")`),candidateAfterReload,"Fresh-device restore removed the original QA candidate backup");
     evidence.performance.warmExisting=await metrics(client,"four-symbols:main-city-interactive");
     assert.ok(evidence.performance.warmExisting.readyMs>=9800&&evidence.performance.warmExisting.readyMs<=15000,"Warm returning main city did not respect the deliberate 5s + 5s brand opening");
     evidence.checks.warmRestore=await client.eval(`(()=>({uid:FourSymbolsStartupPolicy.getUid(),playerId:player.id,creation:getComputedStyle(document.getElementById("creationPage")).display,game:getComputedStyle(document.getElementById("gameInterface")).display}))()`);
