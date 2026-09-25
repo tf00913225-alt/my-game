@@ -100,17 +100,12 @@ test("skill names are brief caster labels and hit numbers wait for the target fr
     assert.doesNotMatch(animation,/font-size","72px/);
 });
 
-test("the three revised skills retain their current status identities",()=>{
-    assert.match(system,/storm\.spCost=75/);
-    assert.match(system,/rain\.spCost=75/);
-    assert.match(system,/rain\.frostbiteChance=50/);
-    assert.match(system,/rain\.frostbiteDuration=2/);
-    assert.match(system,/delete rain\.freezeChance/);
-    assert.match(system,/freeze\.freezeChance=80/);
-    assert.match(system,/freeze\.freezeDuration=4/);
+test("V143 retains no player Skill Data owner",()=>{
+    assert.match(system,/Retired data patch: V173\.64 exclusively authors player Skill Spec/);
+    assert.doesNotMatch(system,/storm\.spCost=75|rain\.frostbiteChance=50|freeze\.freezeChance=80/);
 });
 
-test("V143 rule patch applies the requested skill metadata at runtime",()=>{
+test("V143 runtime snapshot does not manufacture legacy skill metadata",()=>{
     const context={
         window:null,console,Math,Date,Event:function(){},
         setTimeout:callback=>{ callback(); return 1; },clearTimeout(){},
@@ -127,11 +122,10 @@ test("V143 rule patch applies the requested skill metadata at runtime",()=>{
     vm.runInContext(system,context);
     const snapshot=context.v143CombatRuleSnapshot();
     assert.deepEqual(JSON.parse(JSON.stringify(snapshot.lockdownCaps)),{regular:90,elite:80,boss:70,player:60});
-    assert.equal(snapshot.stormRain.spCost,75);
-    assert.equal(snapshot.iceArrowRain.spCost,75);
-    assert.equal(snapshot.iceArrowRain.frostbiteChance,50);
-    assert.equal(snapshot.iceArrowRain.freezeChance,undefined);
-    assert.equal(snapshot.freeze.freezeChance,80);
+    assert.equal(snapshot.stormRain.spCost,undefined);
+    assert.equal(snapshot.iceArrowRain.spCost,undefined);
+    assert.equal(snapshot.iceArrowRain.frostbiteChance,undefined);
+    assert.equal(snapshot.freeze.freezeChance,undefined);
 });
 
 test("Ice Arrow Rain has no legacy per-target Freeze wrapper",()=>{

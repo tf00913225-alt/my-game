@@ -75,7 +75,8 @@ const EXPECTED_RUNTIME_PATHS=[
     "js/49-v169-element-box-settings.js",
     "js/50-v169-water-skill-rules.js",
     "js/51-v169-rpg-ui.js",
-    "js/59-abyss-two-tier-runtime.js"
+    "js/60-v173.64-skill-progression-rebalance.js",
+    "js/59-abyss-two-tier-runtime.js",
 ];
 
 /* damage, growth, SP, target, learn, upgrade, max, prerequisites */
@@ -401,59 +402,59 @@ test("wild zones keep the one-pass curve while the beginner forest applies the f
     assert.match(tuningSource,/rollBeginnerForestNormalAttackDamage=function\(\)\{[\s\S]*?return 5\+Math\.floor\(Math\.random\(\)\*4\);/);
 });
 
-test("the complete four-element core table is final after every patch",()=>{
+test("the current four-element owner loads after every historical compatibility module",()=>{
     const skills=loadFinalRuntime().skills;
-    assert.equal(Object.keys(FINAL_FOUR_ELEMENT_CORE).length,46);
-    Object.entries(FINAL_FOUR_ELEMENT_CORE).forEach(([id,expected])=>{
-        assert.deepEqual(normalizedCore(skills[id]),expected,id);
+    const direct={
+        flameSlash:[30,6,10],dragonSlash:[165,33,65],
+        frostCrush:[116,24,60],dizzyFist:[141,29,55],
+        earthquakeCrush:[47,9,55]
+    };
+    Object.entries(direct).forEach(([id,expected])=>{
+        assert.deepEqual([skills[id].baseDamage,skills[id].damagePerLevel,skills[id].spCost],expected,id);
+        assert.equal(skills[id].maxLevel,10,id+" max level");
+        assert.equal(skills[id].upgradeCost,1,id+" upgrade cost");
     });
+    assert.deepEqual(skills.revive.requires,["healSpell","frostCrush"]);
+    assert.deepEqual(skills.purifyMind.requires,["healSpell","frostCrush"]);
+    assert.equal(skills.earthShield.spCost,45);
+    assert.equal(skills.barrier.remainingBlocksByLevel,undefined);
 });
 
-test("Burn, Frostbite, Freeze and every other final status definition are exact",()=>{
+test("the current owner supplies the rebalanced status definitions",()=>{
     const skills=loadFinalRuntime().skills;
     const expected={
-        fireRocket:{burnChance:25,burnDuration:2,burnPercentByLevel:[1,1,2,2,3]},
-        blazeSpell:{burnChance:30,burnDuration:2,burnPercentByLevel:[1,2,3,4,5]},
-        flameTornado:{burnChance:100,guaranteedBurn:true,burnDuration:1,burnPercentByLevel:[3,4,5,6,7]},
-        phoenixCry:{burnChance:40,burnDuration:2,burnPercentByLevel:[5,7,9,11,13],burnBonusThreshold:3,nextRoundDamageBonusPercent:30,nextRoundDamageBonusDuration:1},
-        waterKnife:{frostbiteChance:30,frostbiteDuration:1},
-        frostPunch:{frostbiteChance:35,frostbiteDuration:2},
+        fireRocket:{burnChance:40,burnDuration:2,burnPercentByLevel:[2,2,2,2,3,3,3,3,3,4]},
+        blazeSpell:{burnChance:45,burnDuration:2,burnPercentByLevel:[3,3,3,3,4,4,4,4,4,6]},
+        flameTornado:{burnChance:60,burnDuration:2,burnPercentByLevel:[4,4,4,4,5,5,5,5,5,7]},
+        phoenixCry:{burnChance:50,burnDuration:2,burnPercentByLevel:[5,5,5,5,7,7,7,7,7,9],burnBonusThreshold:3,nextRoundDamageBonusPercent:30,nextRoundDamageBonusDuration:1},
+        waterKnife:{frostbiteChance:50,frostbiteDuration:3,lifestealPercentByLevel:[4,4,4,4,7,7,7,7,7,10],spStealPercentByLevel:[4,4,4,4,7,7,7,7,7,10]},
+        frostPunch:{frostbiteChance:40,frostbiteDuration:2},
         iceSpin:{frostbiteChance:35,frostbiteDuration:2},
         frostCrush:{frostbiteChance:45,frostbiteDuration:2},
-        waterBall:{frostbiteChance:30,frostbiteDuration:1},
-        floodBeast:{frostbiteChance:35,frostbiteDuration:2},
+        waterBall:{frostbiteChance:50,frostbiteDuration:2},
+        floodBeast:{frostbiteChance:40,frostbiteDuration:2},
         iceArrowRain:{frostbiteChance:35,frostbiteDuration:2},
-        freeze:{freezeChance:90,freezeDuration:3},
-        stormFist:{agilityDownChance:50,agilityDownByLevel:[5,7,9,11,13,15,17,19,22,25],agilityDownDuration:1},
-        stormFlurry:{damageDownChance:50,damageDownByLevel:[10,20,30,40,50],damageDownDuration:2},
-        windCrossSlash:{damageDownChance:65,damageDownByLevel:[20,30,35,40,50],damageDownDuration:1},
+        freeze:{freezeChanceByLevel:[55,65,75,85,95],freezeDurationByLevel:[3,3,3,4,5]},
+        stormFist:{agilityDownChance:50,agilityDownByLevel:[10,15,20,25,30,30,35,35,40,45],agilityDownDuration:1},
+        stormFlurry:{damageDownChance:50,damageDownByLevel:[10,15,20,25,30,35,40,45,50,55],damageDownDuration:2},
+        windCrossSlash:{damageDownChance:65,damageDownByLevel:[20,20,20,20,30,30,30,30,40,50],damageDownDuration:1},
         dizzyFist:{stunChance:65,missBonusByLevel:[5,7,9,11,13,15,17,19,22,25],stunDuration:5},
-        windSpell:{agilityDownChance:50,agilityDownByLevel:[5,7,9,11,13,15,17,19,22,25],agilityDownDuration:1},
-        stormCircle:{damageDownChance:55,damageDownByLevel:[15,18,21,25,30],damageDownDuration:1},
-        windHowlLightning:{damageDownChance:65,damageDownByLevel:[15,20,25,30,35],damageDownDuration:1},
+        windSpell:{agilityDownChance:50,agilityDownByLevel:[10,15,20,25,30,30,35,35,40,45],agilityDownDuration:1},
+        stormCircle:{damageDownChance:55,damageDownByLevel:[10,15,25,30,40,40,40,40,40,50],damageDownDuration:1},
+        windHowlLightning:{damageDownChance:65,damageDownByLevel:[10,15,25,30,40,50,50,50,55,60],damageDownDuration:1},
         stormRain:{stunChance:35,missBonusByLevel:[5,7,9,11,13,15,17,19,22,25],stunDuration:1},
-        stoneSlash:{defenseDownChance:65,defenseDownByLevel:[10,20,30,40,50],defenseDownDuration:1},
-        stoneThrow:{defenseDownChance:65,defenseDownByLevel:[10,20,30,40,50],defenseDownDuration:1},
-        sandWind:{defenseDownChance:65,defenseDownByLevel:[10,20,30,40,50],defenseDownDuration:1},
-        flyingSandStrike:{defenseDownChance:60,defenseDownByLevel:[10,15,20,25,35],defenseDownDuration:2},
-        dustStorm:{petrifyChanceByLevel:[20,25,30,35,45],petrifyDuration:2},
-        earthquakeCrush:{petrifyChanceByLevel:[30,35,40,45,50],petrifyDuration:2}
+        stoneSlash:{defenseDownChance:75,defenseDownByLevel:[10,20,25,30,40,40,45,55,65,70],defenseDownDuration:1},
+        stoneThrow:{defenseDownChance:75,defenseDownByLevel:[10,20,25,30,40,40,45,55,65,70],defenseDownDuration:1},
+        sandWind:{defenseDownChance:65,defenseDownByLevel:[15,20,25,30,30,40,50,55,55,60],defenseDownDuration:1},
+        flyingSandStrike:{defenseDownChance:60,defenseDownByLevel:[10,15,20,25,35,35,35,35,35,35],defenseDownDuration:2},
+        dustStorm:{petrifyChanceByLevel:[15,20,25,30,35,40,45,50,55,60],petrifyDuration:2},
+        earthquakeCrush:{petrifyChanceByLevel:[30,33,36,39,45,48,51,54,57,65],petrifyDuration:2}
     };
-    const supersededFields=new Set([
-        "stormFist.agilityDownByLevel","dizzyFist.missBonusByLevel",
-        "windSpell.agilityDownByLevel","stormRain.missBonusByLevel"
-    ]);
     Object.entries(expected).forEach(([id,fields])=>{
         Object.entries(fields).forEach(([field,value])=>{
-            if(supersededFields.has(id+"."+field)){ return; }
             assert.deepEqual(skills[id][field],value,id+"."+field);
         });
     });
-    assert.match(progressionSource,/const FINAL_POINT_DAMAGE_LEVELS=Object\.freeze\(\[5,7,9,11,13,15,17,19,22,25\]\)/);
-    assert.match(progressionSource,/stormFist:\{[\s\S]*?agilityDownByLevel:FINAL_POINT_DAMAGE_LEVELS\.slice\(\)/);
-    assert.match(progressionSource,/dizzyFist:\{[\s\S]*?missBonusByLevel:FINAL_POINT_DAMAGE_LEVELS\.slice\(\)/);
-    assert.match(progressionSource,/windSpell:\{[\s\S]*?agilityDownByLevel:FINAL_POINT_DAMAGE_LEVELS\.slice\(\)/);
-    assert.match(progressionSource,/stormRain:\{[\s\S]*?missBonusByLevel:FINAL_POINT_DAMAGE_LEVELS\.slice\(\)/);
     ["waterKnife","frostPunch","iceSpin","frostCrush","waterBall","floodBeast","iceArrowRain"].forEach(id=>{
         ["freezeChance","freezeDuration","freezeSingleTarget","teamFreezeChance","teamFreezeDuration"].forEach(field=>{
             assert.equal(skills[id][field],undefined,id+" must not retain "+field);
@@ -462,8 +463,8 @@ test("Burn, Frostbite, Freeze and every other final status definition are exact"
     assert.equal(skills.freeze.baseDamage,undefined);
     assert.equal(skills.freeze.frostbiteChance,undefined);
     assert.equal(skills.earthquakeCrush.selfShieldByLevel,undefined);
-    assert.deepEqual(skills.petrifyFist.selfShieldByLevel,[100,125,150,175,200]);
-    assert.deepEqual(skills.stoneBreakSky.selfShieldByLevel,[100,125,150,175,200]);
+    assert.deepEqual(skills.petrifyFist.selfShieldByLevel,[100,125,150,175,200,300,400,500,600,750]);
+    assert.deepEqual(skills.stoneBreakSky.selfShieldByLevel,[100,125,150,175,200,250,300,350,400,500]);
     assert.equal(skills.flyingSandStrike.petrifyChanceByLevel,undefined);
     assert.equal(skills.dustStorm.defenseDownChance,undefined);
 });
@@ -782,7 +783,7 @@ test("accuracy, enemy Rage, monster shields and wind-elite Dodge use their forma
     assert.deepEqual(result,{
         playerAccuracyMultiplier:1.5,monsterAccuracy:100,monsterAccuracyBonus:50,rage:{chance:25,damage:50},
         shield:{first:100,second:0,statusName:"岩盾",remaining:37,turnsLeft:2},
-        dodgeCast:true,evasion:85,
+        dodgeCast:true,evasion:45,
         dodge:{type:"dodgeSkill",v141BuffType:"dodge",turnsLeft:3,statusName:"風行"},
         dodgeExpires:7,hasStealth:false
     });
@@ -827,7 +828,7 @@ test("evasion sources add as final percentage points, cap at 85%, and Barrier sp
             blocked:blocked,remaining:target.activeBuffs[0].remainingBlocks
         };
     })()`);
-    assert.deepEqual(result,{combined:85,capped:85,blocked:[true,true,true],remaining:4});
+    assert.deepEqual(result,{combined:85,capped:85,blocked:[true,true,true],remaining:5});
 });
 
 test("player agility and default monster level retain the final evasion rules",()=>{
@@ -880,8 +881,8 @@ test("multi-target buffs resolve same-name MISS independently without replacing 
         sp:50,
         buffs:[
             [{type:"rage",statusName:"怒火",turnsLeft:2,chance:5,damage:10}],
-            [{type:"rage",statusName:"怒火",turnsLeft:3,chance:25,damage:50}],
-            [{type:"rage",statusName:"怒火",turnsLeft:3,chance:25,damage:50}]
+            [{type:"rage",statusName:"怒火",turnsLeft:3,chance:30,damage:55}],
+            [{type:"rage",statusName:"怒火",turnsLeft:3,chance:30,damage:55}]
         ]
     });
 });
@@ -992,13 +993,13 @@ test("Heal Spell restores allies but never refunds the caster's own SP",()=>{
             caster:{hp:player.hp,sp:player.sp},
             ally:{hp:player2.hp,sp:player2.sp},statuses:[player.statusEffects,player2.statusEffects],
             data:{baseHeal:skillDatabase.healSpell.baseHeal,healPerLevel:skillDatabase.healSpell.healPerLevel,
-                baseHealSP:skillDatabase.healSpell.baseHealSP,healSPPerLevel:skillDatabase.healSpell.healSPPerLevel,
+                spRestorePercentByLevel:skillDatabase.healSpell.spRestorePercentByLevel,
                 spCost:skillDatabase.healSpell.spCost,targetType:skillDatabase.healSpell.targetType}
         };
     })()`);
     assert.deepEqual(result,{
-        settled:true,caster:{hp:650,sp:55},ally:{hp:750,sp:45},statuses:[[],[]],
-        data:{baseHeal:550,healPerLevel:30,baseHealSP:35,healSPPerLevel:0,spCost:45,targetType:"allyTri"}
+        settled:true,caster:{hp:650,sp:55},ally:{hp:750,sp:10},statuses:[[],[]],
+        data:{baseHeal:550,healPerLevel:30,spRestorePercentByLevel:[0,0,5,10,15],spCost:45,targetType:"allyTri"}
     });
 });
 
@@ -1008,8 +1009,8 @@ test("final support passives and front/back Freeze behavior are exact",()=>{
     assert.deepEqual(
         [skills.rage.duration,skills.dodgeSkill.duration,skills.stealthSkill.duration,
             skills.windEX.evasionBonusPercent],
-        [3,3,3,35],
-        "V173.43 historical snapshot keeps its pre-progression Wind EX value"
+        [3,3,2,10],
+        "current progression owner supplies support durations and Wind EX"
     );
     assert.match(progressionSource,/windEX:\{[\s\S]*?evasionBonusPercent:10/);
     assert.match(progressionSource,/DODGE_BY_LEVEL=Object\.freeze\(\[5,10,15,20,25\]\)/);
@@ -1017,21 +1018,20 @@ test("final support passives and front/back Freeze behavior are exact",()=>{
     assert.match(progressionSource,/CALM_ACCURACY_BY_LEVEL=Object\.freeze\(\[5,10,15,20,25\]\)/);
     assert.match(progressionSource,/const dodge=skillDatabase\.dodgeSkill;[\s\S]*?dodge\.evasionBonusPercentByLevel=DODGE_BY_LEVEL\.slice\(\)[\s\S]*?delete dodge\.evasionBonusPercent/);
     assert.match(progressionSource,/const calm=skillDatabase\.dinghaishenzhen;[\s\S]*?calm\.statusResistBonusByLevel=CALM_RESIST_BY_LEVEL\.slice\(\)[\s\S]*?calm\.accuracyBonusPercentByLevel=CALM_ACCURACY_BY_LEVEL\.slice\(\)[\s\S]*?delete calm\.statusResistBonus[\s\S]*?delete calm\.accuracyBonusPercent/);
-    assert.deepEqual(
-        [skills.earthShield.reflectPercent,skills.earthShield.duration,
-            skills.rockWall.defenseBonusPercent,skills.rockWall.duration,
-            skills.barrier.barrierBlockCount,skills.barrier.duration,skills.earthEX.defenseBonusPercent],
-        [50,3,35,4,5,5,35]
-    );
+    assert.deepEqual(skills.earthShield.reflectPercentByLevel,[20,40,60,80,100]);
+    assert.deepEqual(skills.earthShield.durationByLevel,[3,3,3,3,4]);
+    assert.deepEqual(skills.earthShield.remainingBlocksByLevel,[2,2,2,2,3]);
+    assert.deepEqual(skills.barrier.durationByLevel,[3,3,3,4,5]);
+    assert.equal(skills.barrier.remainingBlocksByLevel,undefined);
     assert.deepEqual(
         [skills.waterEX.damageBonusPercent,skills.waterEX.healBonusPercent,
             skills.waterEX.turnStartCleanseChance,skills.waterEX.statusResistBonus],
-        [5,10,30,undefined]
+        [5,15,35,undefined]
     );
     assert.deepEqual(
         [skills.fireEX.damageBonusPercent,skills.fireEX.critChanceBonusPercent,
             skills.fireEX.critDamageBonusPercent,skills.fireEX.statusTargetDamageBonusPercent],
-        [10,5,5,5]
+        [10,5,25,5]
     );
     ["flameSlash","fireCritical","explosiveFlurry"].forEach(id=>{
         assert.deepEqual([skills[id].followUpOnCriticalOrDefeat,skills[id].followUpMaxCasts],[true,1],id);
@@ -1461,7 +1461,7 @@ test("forced final-Abyss skill levels fold the modern scaling fields exactly onc
         return {before:before,during:during,after:after};
     })()`);
     assert.deepEqual(result,{
-        before:[5,1.75,.1,0,0],during:[1,2.15,0,0,0],after:[5,1.75,.1,0,0]
+        before:[10,1.75,.1,0,0],during:[1,2.15,0,0,0],after:[10,1.75,.1,0,0]
     });
 });
 

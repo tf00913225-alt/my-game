@@ -24,8 +24,8 @@
     ]);
     const PLAYER_DAMAGE_SKILL_ID_SET=new Set(PLAYER_DAMAGE_SKILL_IDS);
     const FIRE_MOMENTUM_BY_LEVEL=Object.freeze([12,15,18,21,25]);
-    const BLOOD_BURN_HP_COST_BY_LEVEL=Object.freeze([5,10,15,20,25]);
-    const BLOOD_BURN_BY_LEVEL=Object.freeze([5,10,15,20,35]);
+    const BLOOD_BURN_HP_COST_BY_LEVEL=Object.freeze([20,25,30,35,40]);
+    const BLOOD_BURN_BY_LEVEL=Object.freeze([20,25,30,35,50]);
     const HEAL_HP_BY_LEVEL=Object.freeze([550,580,610,640,670]);
     const HEAL_SP_PERCENT_BY_LEVEL=Object.freeze([0,0,5,10,15]);
     const FREEZE_CHANCE_BY_LEVEL=Object.freeze([55,65,75,85,95]);
@@ -37,9 +37,9 @@
     const CALM_RESIST_BY_LEVEL=Object.freeze([5,8,10,12,15]);
     const CALM_ACCURACY_BY_LEVEL=Object.freeze([5,10,15,20,25]);
     const ROCK_WALL_BY_LEVEL=Object.freeze([15,20,25,30,35]);
-    const EARTH_SHIELD_BY_LEVEL=Object.freeze([20,30,35,40,50]);
-    const EARTH_SHIELD_DURATION_BY_LEVEL=Object.freeze([3,3,3,4,5]);
-    const BARRIER_BLOCKS_BY_LEVEL=Object.freeze([3,3,3,4,5]);
+    const EARTH_SHIELD_BY_LEVEL=Object.freeze([20,40,60,80,100]);
+    const EARTH_SHIELD_DURATION_BY_LEVEL=Object.freeze([3,3,3,3,4]);
+    const EARTH_SHIELD_BLOCKS_BY_LEVEL=Object.freeze([2,2,2,2,3]);
     const BARRIER_DURATION_BY_LEVEL=Object.freeze([3,3,3,4,5]);
     const GROUP_ORDER=Object.freeze({physical:0,magic:1,tactical:2,ex:3});
 
@@ -85,7 +85,8 @@
         blazeSpell:{learnLevel:7,learnCost:6,progressionGroup:"magic"},
         flameTornado:{learnLevel:14,learnCost:10,progressionGroup:"magic"},
         phoenixCry:{learnLevel:30,learnCost:16,progressionGroup:"magic"},
-        rage:{learnLevel:18,learnCost:10,maxLevel:5,progressionGroup:"tactical"},
+        rage:{learnLevel:18,learnCost:10,maxLevel:5,upgradeCost:1,progressionGroup:"tactical",
+            targetType:"allyTri",spCost:50,duration:3,requires:["explosiveFlurry","flameTornado"]},
         fireSoulResonance:{
             id:"fireSoulResonance",name:"炎魂共鳴",element:"fire",category:"buff",targetType:"self",
             learnLevel:25,learnCost:14,maxLevel:5,spCost:45,duration:3,requires:["rage"],progressionGroup:"tactical",
@@ -96,7 +97,7 @@
             id:"bloodBurnArt",name:"焚血訣",element:"fire",category:"buff",targetType:"self",
             learnLevel:35,learnCost:18,maxLevel:5,spCost:35,duration:3,requires:["fireSoulResonance"],progressionGroup:"tactical",
             hpCostPercentByLevel:BLOOD_BURN_HP_COST_BY_LEVEL.slice(),
-            directDamageBonusByLevel:BLOOD_BURN_BY_LEVEL.slice(),fireActionCharges:3,icon:"血",
+            directDamageBonusByLevel:BLOOD_BURN_BY_LEVEL.slice(),fireActionCharges:4,icon:"血",
             iconAssetPath:null,vfxAssetPath:null
         },
         fireEX:{learnLevel:50,learnCost:20,maxLevel:1,progressionGroup:"ex"},
@@ -113,14 +114,14 @@
             targetType:"allyTri",spCost:45,baseHeal:550,healPerLevel:30,
             healHpByLevel:HEAL_HP_BY_LEVEL.slice(),spRestorePercentByLevel:HEAL_SP_PERCENT_BY_LEVEL.slice(),cleanseAll:true
         },
-        revive:{learnLevel:20,learnCost:10,maxLevel:5,upgradeCost:1,requires:["healSpell"],progressionGroup:"tactical"},
+        revive:{learnLevel:20,learnCost:10,maxLevel:5,upgradeCost:1,requires:["healSpell","frostCrush"],progressionGroup:"tactical"},
         freeze:{
             learnLevel:25,learnCost:14,maxLevel:5,upgradeCost:1,requires:["iceSpin","iceArrowRain"],progressionGroup:"tactical",
             targetType:"column",targetTypeAtMaxLevel:"tri",spCost:32,
             freezeChanceByLevel:FREEZE_CHANCE_BY_LEVEL.slice(),freezeDurationByLevel:FREEZE_DURATION_BY_LEVEL.slice()
         },
         purifyMind:{
-            learnLevel:35,learnCost:18,maxLevel:3,upgradeCost:1,requires:["healSpell"],progressionGroup:"tactical",
+            learnLevel:35,learnCost:18,maxLevel:3,upgradeCost:1,requires:["healSpell","frostCrush"],progressionGroup:"tactical",
             targetType:"ally",enemyTargetAllowed:true,spCost:22,removeAllStates:true,
             targetCountByLevel:PURIFY_TARGET_COUNT_BY_LEVEL.slice()
         },
@@ -179,16 +180,63 @@
         },
         earthShield:{
             learnLevel:25,learnCost:14,maxLevel:5,upgradeCost:1,requires:["rockWall"],progressionGroup:"tactical",
-            targetType:"allyTri",spCost:66,reflectPercentByLevel:EARTH_SHIELD_BY_LEVEL.slice(),
-            durationByLevel:EARTH_SHIELD_DURATION_BY_LEVEL.slice()
+            targetType:"self",spCost:45,reflectPercentByLevel:EARTH_SHIELD_BY_LEVEL.slice(),
+            durationByLevel:EARTH_SHIELD_DURATION_BY_LEVEL.slice(),remainingBlocksByLevel:EARTH_SHIELD_BLOCKS_BY_LEVEL.slice()
         },
         barrier:{
             learnLevel:35,learnCost:18,maxLevel:5,upgradeCost:1,requires:["earthShield"],progressionGroup:"tactical",
-            targetType:"ally",spCost:40,barrierBlockCountByLevel:BARRIER_BLOCKS_BY_LEVEL.slice(),
+            targetType:"ally",spCost:40,
             durationByLevel:BARRIER_DURATION_BY_LEVEL.slice()
         },
         earthEX:{learnLevel:50,learnCost:20,maxLevel:1,progressionGroup:"ex"}
     };
+
+    /* This is the only final-value table.  Historical V140/V149/V169 modules may
+       provide compatibility helpers, but must not become a second balance source. */
+    const FINAL_REBALANCE_DATA=Object.freeze({
+        flameSlash:{baseDamage:30,damagePerLevel:6,spCost:10,targetType:"single",requires:[],followUpOnCriticalOrDefeat:true,followUpMaxCasts:1},
+        fireCritical:{baseDamage:45,damagePerLevel:9,spCost:28,targetType:"single",requires:["flameSlash"],followUpOnCriticalOrDefeat:true,followUpMaxCasts:1},
+        explosiveFlurry:{baseDamage:50,damagePerLevel:10,spCost:47,targetType:"tri",requires:["fireCritical"],followUpOnCriticalOrDefeat:true,followUpMaxCasts:1},
+        dragonSlash:{baseDamage:165,damagePerLevel:33,spCost:65,targetType:"single",requires:["explosiveFlurry"],followUpOnCriticalOrDefeat:true,followUpMaxCasts:2},
+        fireRocket:{baseDamage:13,damagePerLevel:4,spCost:10,targetType:"tri",requires:[],
+            burnChance:40,burnDuration:2,burnPercentByLevel:[2,2,2,2,3,3,3,3,3,4]},
+        blazeSpell:{baseDamage:45,damagePerLevel:9,spCost:28,targetType:"single",requires:["fireRocket"],
+            burnChance:45,burnDuration:2,burnPercentByLevel:[3,3,3,3,4,4,4,4,4,6]},
+        flameTornado:{baseDamage:150,damagePerLevel:30,spCost:47,targetType:"single",requires:["blazeSpell"],
+            burnChance:60,guaranteedBurn:false,burnDuration:2,burnPercentByLevel:[4,4,4,4,5,5,5,5,5,7]},
+        phoenixCry:{baseDamage:28,damagePerLevel:6,spCost:60,targetType:"all",requires:["flameTornado"],
+            burnChance:50,burnDuration:2,burnPercentByLevel:[5,5,5,5,7,7,7,7,7,9],
+            burnBonusThreshold:3,nextRoundDamageBonusPercent:30,nextRoundDamageBonusDuration:1},
+        waterKnife:{baseDamage:21,damagePerLevel:5,spCost:6,targetType:"single",requires:[],frostbiteChance:50,frostbiteDuration:3,lifestealPercentByLevel:[4,4,4,4,7,7,7,7,7,10],spStealPercentByLevel:[4,4,4,4,7,7,7,7,7,10]},
+        frostPunch:{baseDamage:32,damagePerLevel:7,spCost:17,targetType:"single",requires:["waterKnife"],frostbiteChance:40,frostbiteDuration:2,lifestealPercentByLevel:[5,5,5,5,6,6,6,6,6,7]},
+        iceSpin:{baseDamage:35,damagePerLevel:7,spCost:45,targetType:"tri",requires:["frostPunch"],frostbiteChance:35,frostbiteDuration:2,lifestealPercentByLevel:[6,6,6,6,7,7,7,7,7,8]},
+        frostCrush:{baseDamage:116,damagePerLevel:24,spCost:60,targetType:"single",requires:["iceSpin"],frostbiteChance:45,frostbiteDuration:2,lifestealPercentByLevel:[5,5,5,5,6,6,6,6,8,9]},
+        waterBall:{baseDamage:10,damagePerLevel:2,spCost:8,targetType:"tri",requires:[],frostbiteChance:50,frostbiteDuration:2,lifestealPercentByLevel:[3,3,3,3,4,4,4,4,4,6]},
+        floodBeast:{baseDamage:105,damagePerLevel:21,spCost:35,targetType:"single",requires:["waterBall"],frostbiteChance:40,frostbiteDuration:2,lifestealPercentByLevel:[6,6,6,6,7,7,7,7,7,9],spStealPercentByLevel:[4,4,4,4,7,7,7,7,7,9]},
+        iceArrowRain:{baseDamage:30,damagePerLevel:6,spCost:75,targetType:"all",requires:["floodBeast"],frostbiteChance:35,frostbiteDuration:2,lifestealPercentByLevel:[4,4,4,4,5,5,5,5,5,6]},
+        stormFist:{baseDamage:26,damagePerLevel:6,spCost:7,targetType:"single",requires:[],agilityDownChance:50,agilityDownDuration:1,agilityDownByLevel:[10,15,20,25,30,30,35,35,40,45]},
+        stormFlurry:{baseDamage:13,damagePerLevel:3,spCost:20,targetType:"tri",requires:["stormFist"],damageDownChance:50,damageDownDuration:2,damageDownByLevel:[10,15,20,25,30,35,40,45,50,55]},
+        windCrossSlash:{baseDamage:128,damagePerLevel:26,spCost:39,targetType:"single",requires:["stormFlurry"],damageDownChance:65,damageDownDuration:1,damageDownByLevel:[20,20,20,20,30,30,30,30,40,50]},
+        dizzyFist:{baseDamage:141,damagePerLevel:29,spCost:55,targetType:"single",requires:["stormFlurry"],stunChance:65,stunDuration:5,missBonusByLevel:FINAL_POINT_DAMAGE_LEVELS.slice()},
+        windSpell:{baseDamage:12,damagePerLevel:3,spCost:9,targetType:"tri",requires:[],agilityDownChance:50,agilityDownDuration:1,agilityDownByLevel:[10,15,20,25,30,30,35,35,40,45]},
+        stormCircle:{baseDamage:14,damagePerLevel:4,spCost:18,targetType:"tri",requires:["windSpell"],damageDownChance:55,damageDownDuration:1,damageDownByLevel:[10,15,25,30,40,40,40,40,40,50]},
+        windHowlLightning:{baseDamage:128,damagePerLevel:26,spCost:55,targetType:"single",requires:["stormCircle"],damageDownChance:65,damageDownDuration:1,damageDownByLevel:[10,15,25,30,40,50,50,50,55,60]},
+        stormRain:{baseDamage:24,damagePerLevel:5,spCost:75,targetType:"all",requires:["windHowlLightning"],stunChance:35,stunDuration:1,missBonusByLevel:FINAL_POINT_DAMAGE_LEVELS.slice()},
+        stoneSlash:{baseDamage:26,damagePerLevel:6,spCost:7,targetType:"single",requires:[],defenseDownChance:75,defenseDownDuration:1,defenseDownByLevel:[10,20,25,30,40,40,45,55,65,70]},
+        petrifyFist:{baseDamage:13,damagePerLevel:3,spCost:26,targetType:"tri",requires:["stoneSlash"],selfShieldByLevel:[100,125,150,175,200,300,400,500,600,750]},
+        stoneBreakSky:{baseDamage:128,damagePerLevel:26,spCost:42,targetType:"single",requires:["petrifyFist"],selfShieldByLevel:[100,125,150,175,200,250,300,350,400,500]},
+        earthquakeCrush:{baseDamage:47,damagePerLevel:9,spCost:55,targetType:"tri",requires:["stoneBreakSky"],petrifyChanceByLevel:[30,33,36,39,45,48,51,54,57,65],petrifyDuration:2,selfShieldByLevel:null},
+        stoneThrow:{baseDamage:12,damagePerLevel:3,spCost:7,targetType:"tri",requires:[],defenseDownChance:75,defenseDownDuration:1,defenseDownByLevel:[10,20,25,30,40,40,45,55,65,70]},
+        sandWind:{baseDamage:14,damagePerLevel:4,spCost:19,targetType:"tri",requires:["stoneThrow"],defenseDownChance:65,defenseDownDuration:1,defenseDownByLevel:[15,20,25,30,30,40,50,55,55,60]},
+        flyingSandStrike:{baseDamage:24,damagePerLevel:5,spCost:55,targetType:"all",requires:["sandWind"],defenseDownChance:60,defenseDownDuration:2,defenseDownByLevel:[10,15,20,25,35,35,35,35,35,35]},
+        dustStorm:{baseDamage:140,damagePerLevel:28,spCost:65,targetType:"single",requires:["flyingSandStrike"],petrifyChanceByLevel:[15,20,25,30,35,40,45,50,55,60],petrifyDuration:2},
+        rage:{critChanceBonusByLevel:[10,15,20,25,30],critDamageBonusByLevel:[15,25,35,45,55],critBonusByLevel:[10,15,20,25,30]},
+        fireSoulResonance:{momentumBonusByLevel:[12,15,18,21,25]},
+        fireEX:{damageBonusPercent:10,critChanceBonusPercent:5,critDamageBonusPercent:25,statusTargetDamageBonusPercent:5},
+        waterEX:{damageBonusPercent:5,healBonusPercent:15,turnStartCleanseChance:35,statusResistBonus:null},
+        windEX:{evasionBonusPercent:10,accuracyBonusPercent:10},
+        earthEX:{defenseBonusPercent:35,maxHpMultiplier:1.2}
+    });
 
     function extendLevelArrayToTen(values){
         if(!Array.isArray(values)||!values.length){ return values; }
@@ -241,7 +289,7 @@
         if(numeric(skill&&skill.frostbiteChance)>0){
             parts.push("凍傷："+numeric(skill.frostbiteChance)+"%基礎機率，"+
                 Math.max(1,numeric(skill.frostbiteDuration)||1)+
-                "回合；期間傷害-25%、最終閃躲-25%、最終異常狀態抗性-25%");
+                "回合；期間傷害-30%、最終閃躲-25%、最終異常狀態抗性-25%");
         }
         if(Array.isArray(skill&&skill.lifestealPercentByLevel)){
             parts.push("吸血："+levelValue(skill.lifestealPercentByLevel,lv,0)+"%實際傷害回復自身HP");
@@ -299,14 +347,14 @@
         if(!skill){ return ""; }
         const lv=clampLevel(level,skill.maxLevel||1);
         if(skill.id==="fireSoulResonance"){
-            return "炎勢使火系直接攻擊傷害+"+levelValue(skill.momentumBonusByLevel,lv,0)+
+            return "炎魂共鳴使直接攻擊技能傷害+"+levelValue(skill.momentumBonusByLevel,lv,0)+
                 "%，基礎3回合"+(lv>=5?"；爆擊或成功新增燃燒時每回合最多延長1回合、整次最多+3回合":"");
         }
         if(skill.id==="bloodBurnArt"){
             return "消耗最大HP "+levelValue(skill.hpCostPercentByLevel,lv,0)+
-                "%；接下來3次成功施放的火系直接攻擊傷害+"+
+                "%；接下來4次成功施放的直接攻擊技能傷害+"+
                 levelValue(skill.directDamageBonusByLevel,lv,0)+
-                "%；不強化DoT與免費追擊，免費追擊也不消耗3次有效施放次數";
+                "%；不強化DoT；免費追擊沿用本次加成但不額外消耗次數";
         }
         if(skill.id==="healSpell"){
             return "恢復"+levelValue(skill.healHpByLevel,lv,0)+" HP，並恢復目標最大SP的"+
@@ -340,12 +388,13 @@
             return "防禦+"+levelValue(skill.defenseBonusPercentByLevel,lv,0)+"%，持續4回合";
         }
         if(skill.id==="earthShield"){
-            return "反傷"+levelValue(skill.reflectPercentByLevel,lv,0)+"%，持續"+
+            return "直接傷害減少並反射"+levelValue(skill.reflectPercentByLevel,lv,0)+"%，可觸發"+
+                levelValue(skill.remainingBlocksByLevel,lv,2)+"次，持續"+
                 levelValue(skill.durationByLevel,lv,3)+"回合；同名不可疊加或刷新";
         }
         if(skill.id==="barrier"){
-            return "抵擋"+levelValue(skill.barrierBlockCountByLevel,lv,3)+"次直接傷害，最長"+
-                levelValue(skill.durationByLevel,lv,3)+"回合；DoT不抵擋且不消耗次數";
+            return "持續"+levelValue(skill.durationByLevel,lv,3)+"回合；免疫一般直接傷害、DoT與反傷，"+
+                "但不免疫狀態、硬控或淨心訣";
         }
         if(skill.id==="fireEX"){
             return "永久提升火元素傷害"+numeric(skill.damageBonusPercent)+
@@ -363,7 +412,8 @@
             return "永久提升最終閃躲"+numeric(skill.evasionBonusPercent)+"%";
         }
         if(skill.id==="earthEX"){
-            return "永久提升防禦力"+numeric(skill.defenseBonusPercent)+"%";
+            return "永久提升防禦力"+numeric(skill.defenseBonusPercent)+"%、最大HP +"+
+                Math.round((numeric(skill.maxHpMultiplier,1)-1)*100)+"%";
         }
         if(skill.id==="rage"&&Array.isArray(skill.critBonusByLevel)){
             const chance=levelValue(skill.critChanceBonusByLevel||skill.critBonusByLevel,lv,0);
@@ -430,6 +480,15 @@
 
     function applyFinalProgressionData(){
         if(typeof skillDatabase==="undefined"||!skillDatabase){ return false; }
+        /* Some older save-era bases never declared Purify in the initial table.
+           Its canonical definition belongs here with the final progression data,
+           rather than relying on the retired V169 data patch to create it. */
+        if(!skillDatabase.purifyMind){
+            skillDatabase.purifyMind={
+                id:"purifyMind",name:"淨心訣",element:"water",category:"buff",targetType:"ally",
+                description:"解除目標所有可解除的臨時 Buff、Debuff、Shield、Barrier 與異常狀態。"
+            };
+        }
         Object.entries(FINAL_PROGRESSION).forEach(([skillId,fields])=>{
             if(!skillDatabase[skillId]){
                 if(skillId!=="fireSoulResonance"&&skillId!=="bloodBurnArt"){ return; }
@@ -511,17 +570,40 @@
         if(shield){
             shield.reflectPercentByLevel=EARTH_SHIELD_BY_LEVEL.slice();
             shield.durationByLevel=EARTH_SHIELD_DURATION_BY_LEVEL.slice();
-            shield.targetType="allyTri"; shield.spCost=66; shield.requires=["rockWall"];
+            shield.remainingBlocksByLevel=EARTH_SHIELD_BLOCKS_BY_LEVEL.slice();
+            shield.targetType="self"; shield.spCost=45; shield.requires=["rockWall"];
             delete shield.reflectPercent;
-            shield.description="我方中、左、右最多3名存活角色獲得萬象土盾，反傷20%/30%/35%/40%/50%，持續3/3/3/4/5回合；同名不可疊加或刷新。SP 66。";
+            shield.description="我方1人獲得萬象土盾；直接傷害減少並反射20%/40%/60%/80%/100%，可觸發2/2/2/2/3次，持續3/3/3/3/4回合。SP 45。";
         }
         const barrier=skillDatabase.barrier;
         if(barrier){
-            barrier.barrierBlockCountByLevel=BARRIER_BLOCKS_BY_LEVEL.slice();
             barrier.durationByLevel=BARRIER_DURATION_BY_LEVEL.slice();
             barrier.targetType="ally"; barrier.spCost=40; barrier.requires=["earthShield"];
-            delete barrier.barrierBlockCount; delete barrier.duration;
-            barrier.description="我方1人獲得結界，抵擋3/3/3/4/5次直接傷害，最長持續3/3/3/4/5回合；燃燒、毒等DoT不抵擋且不消耗次數。SP 40。";
+            delete barrier.barrierBlockCountByLevel; delete barrier.barrierBlockCount; delete barrier.duration;
+            barrier.description="我方1人獲得結界，持續3/3/3/4/5回合；免疫一般直接傷害、DoT與反傷，但不免疫狀態、硬控或淨心訣。SP 40。";
+        }
+        Object.entries(FINAL_REBALANCE_DATA).forEach(([skillId,fields])=>{
+            const skill=skillDatabase[skillId];
+            if(!skill){ return; }
+            Object.entries(fields).forEach(([key,value])=>{
+                if(value===null){ delete skill[key]; }
+                else{ skill[key]=copyArray(value); }
+            });
+        });
+        /* The final Water Warrior data uses Frostbite, not the retired per-skill
+           Freeze payloads that older modules attached to these attacks. */
+        ["waterKnife","frostPunch","iceSpin","frostCrush","waterBall","floodBeast","iceArrowRain"].forEach(skillId=>{
+            const skill=skillDatabase[skillId];
+            if(!skill){ return; }
+            ["freezeChance","freezeDuration","freezeSingleTarget","teamFreezeChance","teamFreezeDuration"].forEach(field=>delete skill[field]);
+        });
+        if(skillDatabase.flyingSandStrike){ delete skillDatabase.flyingSandStrike.petrifyChanceByLevel; }
+        if(skillDatabase.dustStorm){ delete skillDatabase.dustStorm.defenseDownChance; delete skillDatabase.dustStorm.defenseDownByLevel; }
+        if(skillDatabase.earthShield){
+            skillDatabase.earthShield.description="我方1人獲得萬象土盾；直接傷害減少並反射20%/40%/60%/80%/100%，每次成功抵擋消耗2/2/2/2/3次中的1次，持續3/3/3/3/4回合。DoT不觸發。SP 45。";
+        }
+        if(skillDatabase.barrier){
+            skillDatabase.barrier.description="我方1人獲得結界，持續3/3/3/4/5回合；免疫一般直接傷害、DoT與反傷，但不免疫狀態、硬控或淨心訣。SP 40。";
         }
         Object.values(skillDatabase).forEach(skill=>{
             if(!skill||!skill.id){ return; }
@@ -566,6 +648,47 @@
     function learnedLevel(context,skillId){
         return Math.max(0,Math.floor(numeric(context&&context.loadout&&context.loadout.skillLevels&&context.loadout.skillLevels[skillId])));
     }
+    function isCrossElementSkill(character,skill){
+        return !!(character&&skill&&character.element&&skill.element&&character.element!==skill.element);
+    }
+    function hasLearnedNativeSkill(context){
+        const levels=context&&context.loadout&&context.loadout.skillLevels||{};
+        return Object.keys(levels).some(id=>numeric(levels[id])>0&&skillById(id)&&skillById(id).element===context.character.element);
+    }
+    function crossLearnGate(context,skill){
+        if(!isCrossElementSkill(context.character,skill)){ return {ok:true,cross:false}; }
+        if(/EX$/.test(String(skill.id||""))||skill.category==="passive"){
+            return {ok:false,cross:true,reason:"本命元素限定"};
+        }
+        if(!hasLearnedNativeSkill(context)){
+            return {ok:false,cross:true,reason:"需先學會至少 1 招本命元素技能"};
+        }
+        return {ok:true,cross:true};
+    }
+    function initialLearnCost(context,skill){
+        return Math.max(0,Math.floor(numeric(skill&&skill.learnCost)))*(isCrossElementSkill(context&&context.character,skill)?2:1);
+    }
+    function normalizeCrossElementEquip(loadout,character){
+        if(!loadout||!character||!Array.isArray(loadout.equippedSkills)){ return false; }
+        let seen=false,changed=false;
+        loadout.equippedSkills=loadout.equippedSkills.filter(skillId=>{
+            const skill=skillById(skillId);
+            if(!skill||!isCrossElementSkill(character,skill)){ return true; }
+            if(!seen){ seen=true; return true; }
+            changed=true; return false;
+        }).slice(0,4);
+        return changed;
+    }
+    function normalizeAllCrossElementEquips(){
+        if(typeof characterSkillLoadouts==="undefined"||!characterSkillLoadouts){ return false; }
+        let changed=false;
+        Object.keys(characterSkillLoadouts).forEach(key=>{
+            const loadout=characterSkillLoadouts[key];
+            const character=typeof getSkillCharacterObject==="function"?getSkillCharacterObject(key):null;
+            if(normalizeCrossElementEquip(loadout,character)){ changed=true; }
+        });
+        return changed;
+    }
     function prerequisiteMet(levels,skill){
         const required=Array.isArray(skill&&skill.requires)?skill.requires.filter(Boolean):[];
         if(!required.length){ return true; }
@@ -583,6 +706,11 @@
     }
 
     applyFinalProgressionData();
+    if(typeof window.v173ApplyFormalDamageRoleProfiles==="function"){
+        /* Re-project after every final data field is installed.  V169 loads
+           before the role helper, so Water cannot rely on a historical call. */
+        window.v173ApplyFormalDamageRoleProfiles(PLAYER_DAMAGE_SKILL_IDS);
+    }
 
     if(typeof learnSkill==="function"){
         learnSkill=function(skillId){
@@ -594,14 +722,16 @@
             const characterLevel=Math.max(1,Math.floor(numeric(context.character.level,1)));
             const requiredLevel=getRequiredCharacterLevelForSkillLevel(skill,1);
             const levels=context.loadout.skillLevels;
-            const prereqOk=prerequisiteMet(levels,skill);
+            const cross=crossLearnGate(context,skill);
+            const prereqOk=cross.cross?true:prerequisiteMet(levels,skill);
             if(characterLevel<requiredLevel){
                 return notify(prereqOk
                     ?("角色 Lv"+requiredLevel+" 才能學習「"+skill.name+"」。")
                     :("需要 Lv"+requiredLevel+"・前置："+prerequisiteLabel(skill)));
             }
+            if(!cross.ok){ return notify(cross.reason); }
             if(!prereqOk){ return notify("需要前置："+prerequisiteLabel(skill)); }
-            const learnCost=Math.max(0,Math.floor(numeric(skill.learnCost)));
+            const learnCost=initialLearnCost(context,skill);
             const points=Math.max(0,Math.floor(numeric(context.character.skillPoints)));
             if(points<learnCost){ return notify("技能點不足，需要"+learnCost+"點。"); }
             context.character.skillPoints=points-learnCost;
@@ -632,6 +762,25 @@
             if(points<cost){ return notify("技能點不足，升至技能 Lv"+target+"需要"+cost+"點。"); }
             context.character.skillPoints=points-cost;
             context.loadout.skillLevels[skillId]=target;
+            finalizeSkillMutation();
+            return true;
+        };
+    }
+
+    if(typeof equipSkill==="function"){
+        equipSkill=function(skillId){
+            const skill=skillById(skillId),context=getSkillContext();
+            if(!skill||!context.character||!context.loadout||learnedLevel(context,skillId)<=0){ return false; }
+            normalizeCrossElementEquip(context.loadout,context.character);
+            const equipped=context.loadout.equippedSkills=context.loadout.equippedSkills||[];
+            if(equipped.includes(skillId)){ return true; }
+            if(isCrossElementSkill(context.character,skill)&&equipped.some(id=>{
+                const equippedSkill=skillById(id); return equippedSkill&&isCrossElementSkill(context.character,equippedSkill);
+            })){ return notify("每名角色最多攜帶 1 招跨元素技能。"); }
+            if(equipped.length>=4){ return notify("每個角色最多只能攜帶4個技能。"); }
+            equipped.push(skillId);
+            if(typeof populateAutoSkillOptions==="function"){ populateAutoSkillOptions(); }
+            if(typeof populateAutoSkillOptions2==="function"){ populateAutoSkillOptions2(); }
             finalizeSkillMutation();
             return true;
         };
@@ -679,17 +828,20 @@
             const points=Math.max(0,Math.floor(numeric(context.character.skillPoints)));
             const card=actionCardForRow(row);
             const levels=context.loadout.skillLevels;
+            const cross=crossLearnGate(context,skill);
             if(current<=0){
-                const prereqOk=prerequisiteMet(levels,skill);
+                const prereqOk=cross.cross?true:prerequisiteMet(levels,skill);
                 const levelOk=level>=skill.learnLevel;
-                const costOk=points>=numeric(skill.learnCost);
-                if(levelOk&&prereqOk&&costOk){
-                    setActionCard(card,true,"學習・"+skill.learnCost+"點","learnSkill('"+skillId+"')");
+                const cost=initialLearnCost(context,skill);
+                const costOk=points>=cost;
+                if(levelOk&&cross.ok&&prereqOk&&costOk){
+                    setActionCard(card,true,(cross.cross?"跨修學習・":"學習・")+cost+"點","learnSkill('"+skillId+"')");
                 }else{
                     const reasons=[];
                     if(!levelOk){ reasons.push("Lv"+skill.learnLevel+" 解鎖"); }
-                    if(!prereqOk){ reasons.push("前置："+prerequisiteLabel(skill)); }
-                    if(levelOk&&prereqOk&&!costOk){ reasons.push("需要 "+skill.learnCost+" 技能點"); }
+                    if(!cross.ok){ reasons.push(cross.reason); }
+                    if(!cross.cross&&!prereqOk){ reasons.push("前置："+prerequisiteLabel(skill)); }
+                    if(levelOk&&cross.ok&&prereqOk&&!costOk){ reasons.push("需要 "+cost+" 技能點"); }
                     setActionCard(card,false,reasons.join("・"),"");
                 }
             }else if(current<numeric(skill.maxLevel,1)){
@@ -736,6 +888,8 @@
     if(typeof renderSkillLoadout==="function"){
         const previousRenderSkillLoadout=renderSkillLoadout;
         renderSkillLoadout=function(){
+            const context=getSkillContext();
+            if(context.loadout&&context.character){ normalizeCrossElementEquip(context.loadout,context.character); }
             const result=previousRenderSkillLoadout.apply(this,arguments);
             decorateSkillProgressionUi();
             return result;
@@ -765,9 +919,10 @@
             ["最低學習等級","Lv"+skill.learnLevel],
             ["目前技能等級",current>0?"Lv"+current:"尚未學習"],
             ["下一級角色需求",next?"角色 Lv"+getRequiredCharacterLevelForSkillLevel(skill,next):"—"],
-            ["學習成本",skill.learnCost+" 技能點"],
+            ["技能元素",skill.element||"—"],
+            ["學習成本",initialLearnCost(context,skill)+" 技能點"+(isCrossElementSkill(context.character,skill)?"（跨修）":"")],
             ["升級成本",upgradeText],
-            ["前置技能",prerequisiteLabel(skill)]
+            ["前置技能",isCrossElementSkill(context.character,skill)?"跨修免前置":prerequisiteLabel(skill)]
         ];
         rows.forEach(([label,value])=>{
             const row=document.createElement("div");
@@ -896,7 +1051,7 @@
             actor.sp=numeric(actor.sp)-cost;
             actor.hp=numeric(actor.hp)-hpCost;
             addNamedBuff(actor,"bloodBurn",actorIndex,"焚血",3,{
-                skillLevel:resolvedLevel,hpCost,remainingFireActions:3
+                skillLevel:resolvedLevel,hpCost,remainingFireActions:4
             });
             announceSkill(actorIndex,skill);finishTacticalAction();return true;
         }
@@ -904,8 +1059,8 @@
     }
 
     let fireCastContext=null;
-    function isPlayerFireDirectSkill(skill){
-        return !!(skill&&skill.element==="fire"&&(skill.category==="physical"||skill.category==="magic"));
+    function isPlayerDirectSkill(skill){
+        return !!(skill&&(skill.category==="physical"||skill.category==="magic"));
     }
     function formalRound(){
         return typeof turn!=="undefined"?Math.max(1,Math.floor(numeric(turn,1))):1;
@@ -927,7 +1082,7 @@
     }
     function withPlayerDirectSkillCast(actorIndex,skillId,options,invoke){
         const skill=skillById(skillId);
-        if(!isPlayerFireDirectSkill(skill)||fireCastContext){ return invoke(); }
+        if(!isPlayerDirectSkill(skill)||fireCastContext){ return invoke(); }
         const actor=actorByPartyIndex(actorIndex);
         if(!actor){ return invoke(); }
         const freeCast=!!(options&&options.freeCast);
@@ -935,33 +1090,27 @@
         const momentum=activeBuff(actor,"fireMomentum");
         const blood=activeBuff(actor,"bloodBurn");
         const resonanceBonus=numeric(momentum&&momentum.bonusPercent);
-        const bloodBonus=!freeCast&&blood
+        const bloodBonus=blood
             ?BLOOD_BURN_BY_LEVEL[clampLevel(blood.skillLevel,5)-1]
             :0;
         const bonus=resonanceBonus+bloodBonus;
-        const hadDamageBonus=Object.prototype.hasOwnProperty.call(skill,"damageBonusPercent");
-        const previousDamageBonus=skill.damageBonusPercent;
-        if(bonus){ skill.damageBonusPercent=numeric(previousDamageBonus)+bonus; }
         const beforeSp=numeric(actor.sp);
         const context={
             actor,actorIndex,skillId,resonance,momentum,blood,freeCast,
             critical:false,burnAdded:false,finished:false
         };
         fireCastContext=context;
+        window.FourSymbolsSkillDamageContext={attacker:actor,skill,directSkillBonusPercent:bonus};
         let result;
         try{ result=invoke(); }
         finally{
             fireCastContext=null;
-            if(bonus){
-                if(hadDamageBonus){ skill.damageBonusPercent=previousDamageBonus; }
-                else{ delete skill.damageBonusPercent; }
-            }
+            window.FourSymbolsSkillDamageContext=null;
         }
         const succeeded=freeCast||context.finished||numeric(actor.sp)<beforeSp;
         if(succeeded&&!freeCast){
             if(blood){
-                blood.remainingFireActions=Math.max(0,numeric(blood.remainingFireActions,3)-1);
-                blood.turnsLeft=blood.remainingFireActions;
+                blood.remainingFireActions=Math.max(0,numeric(blood.remainingFireActions,4)-1);
                 if(blood.remainingFireActions<=0){ removeBuff(actor,blood); }
             }
             if(resonance&&(context.critical||context.burnAdded)){
@@ -1028,6 +1177,7 @@
     window.v17364ApplyFinalProgressionData=applyFinalProgressionData;
     window.v17364CastNewFireTactical=castNewFireTactical;
     window.v17364DecorateSkillProgressionUi=decorateSkillProgressionUi;
+    window.v17364NormalizeCrossElementEquips=normalizeAllCrossElementEquips;
     window.v17364SkillProgression={
         version:"173.64",upgradeCosts:SKILL_UPGRADE_COST_BY_TARGET_LEVEL,
         fireMomentumByLevel:FIRE_MOMENTUM_BY_LEVEL,bloodBurnByLevel:BLOOD_BURN_BY_LEVEL,
@@ -1036,5 +1186,6 @@
         castNewFireTactical,decorateSkillProgressionUi
     };
 
+    normalizeAllCrossElementEquips();
     if(typeof renderSkillLoadout==="function"){ renderSkillLoadout(); }
 })();

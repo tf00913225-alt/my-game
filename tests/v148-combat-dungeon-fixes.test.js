@@ -273,6 +273,31 @@ test("Earth Shield visibly and actually reflects fifty percent",()=>{
     assert.deepEqual(hits,[50]);
 });
 
+test("Purify removes temporary Earth Shield and Barrier without touching permanent state",()=>{
+    const party=[{
+        id:"水使",hp:500,sp:100,activeBuffs:[
+            {type:"earthShield",turnsLeft:3,remainingBlocks:2,percent:60},
+            {type:"barrier",turnsLeft:4},
+            {type:"permanentAura",permanent:true,dispellable:false}
+        ],statusEffects:[{type:"frostbite",turnsLeft:2},{type:"bossMark",dispellable:false}]
+    }];
+    const context=baseContext({
+        getExistingPartyIndexes:()=>[0],getPartyCharacterByIndex:index=>party[index],
+        getPartyCharacterKey:()=>"water",getSkillLevel:(key,id)=>id==="purifyMind"?1:0,
+        getPartyBattleStats:()=>({maxHP:500,maxSP:200,intelligence:80}),
+        lungePlayerCard(){},showSkillNameBadge(){},showPlayerSpPopup(){},addBattleLog(){},updateUI(){},finishPlayerAction(){},
+        v141PlayCardEffect(){}
+    });
+    context.skillDatabase.purifyMind={
+        id:"purifyMind",name:"淨心訣",element:"water",category:"buff",targetType:"ally",spCost:22,
+        removeAllStates:true,targetCountByLevel:[1,1,3]
+    };
+    context.v148ResolveSupportAction(0,{action:"purifyMind",targetAlly:0},context.skillDatabase.purifyMind);
+    assert.deepEqual(party[0].activeBuffs.map(buff=>buff.type),["permanentAura"]);
+    assert.deepEqual(party[0].statusEffects.map(effect=>effect.type),["bossMark"]);
+    assert.equal(party[0].sp,78);
+});
+
 test("a queued second player never acts after the enemy team reaches zero HP",()=>{
     let legacyActions=0;
     const monsters=[{name:"敵人",alive:true,hp:0}];
