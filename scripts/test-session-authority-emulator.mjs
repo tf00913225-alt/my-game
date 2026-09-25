@@ -126,6 +126,24 @@ assert.equal((await db.doc(`${candidateRoot}/2`).get()).get("snapshot.gold"),1);
 assert.equal((await db.doc(`${candidateRoot}/2`).get()).get("trusted"),false);
 assert.equal((await db.doc(`users/${x}/saves/current`).get()).get("authoritativeStateReady"),false);
 assert.equal((await db.doc(`users/${x}/saves/current`).get()).get("serverRevision"),4);
+const screenIntent={uid:x,session:sessionB,candidateRevision:2,expectedRevision:4};
+await rejected("screenLegacyMigrationCandidate",a.idToken,{...screenIntent,session:sessionA},"SESSION_REVOKED");
+await rejected("screenLegacyMigrationCandidate",b.idToken,{...screenIntent,gold:10},"INVALID_ARGUMENT");
+await rejected("screenLegacyMigrationCandidate",b.idToken,{...screenIntent,expectedRevision:3},"CLOUD_REVISION_CONFLICT");
+await rejected("screenLegacyMigrationCandidate",b.idToken,{...screenIntent,candidateRevision:1},"FAILED_PRECONDITION");
+const screened=await invoke("screenLegacyMigrationCandidate",b.idToken,screenIntent);
+assert.equal(screened.readyForAcceptance,false);
+assert.equal(screened.status,"blocked");
+assert.equal(screened.characterCount,1);
+assert.ok(screened.blockers.includes("SIDECAR_BACKUP_MISSING"));
+assert.ok(screened.blockers.includes("HISTORICAL_REWARDS_UNVERIFIED"));
+assert.equal(screened.serverRevision,4);
+assert.equal((await db.doc(`users/${x}/saves/current`).get()).get("gameSave"),undefined);
+assert.equal((await db.doc(`users/${x}/saves/current`).get()).get("serverRevision"),4);
+assert.equal((await db.doc(`${candidateRoot}/2`).get()).get("reviewStatus"),"pending_server_validation");
+await db.doc(`${candidateRoot}/2`).update({fingerprint:"0".repeat(64)});
+await rejected("screenLegacyMigrationCandidate",b.idToken,screenIntent,"DATA_LOSS");
+await db.doc(`${candidateRoot}/2`).update({fingerprint:secondCandidate.fingerprint});
 const grantId="server_grant_emulator_001",operationId="reserve_operation_001";
 const grantRef=db.doc(`serverUsers/${x}/pendingGrants/${grantId}`);
 const intent={uid:x,session:sessionB,grantId,operationId,expectedRevision:4};
@@ -159,6 +177,7 @@ assert.equal(upgradedSave.get("schemaVersion"),2); assert.equal(upgradedSave.get
 await rejected("protectedTest",yUser.idToken,{uid:x,session:sessionB},"SESSION_INVALID");
 await rejected("protectedTest",yUser.idToken,{uid:y,session:{...sessionB,uid:y}},"SESSION_INVALID");
 assert.equal((await invoke("protectedTest",yUser.idToken,{uid:y,session:sessionY})).uid,y);
+await rejected("screenLegacyMigrationCandidate",yUser.idToken,{...screenIntent,uid:y,session:sessionY},"FAILED_PRECONDITION");
 async function rulesRequest(path,token,method="GET"){
     const response=await fetch(`http://127.0.0.1:18080/v1/projects/${project}/databases/(default)/documents/${path}`,{
         method,headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/json"},

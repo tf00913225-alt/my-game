@@ -8,6 +8,7 @@ const {setGlobalOptions}=require("firebase-functions/v2");
 const {HttpsError,onCall}=require("firebase-functions/v2/https");
 const {createSessionAuthority}=require("./src/session-authority");
 const {createTrustedGrantLedger}=require("./src/trusted-grant-ledger");
+const {createLegacyCandidateScreening}=require("./src/legacy-candidate-screening");
 const {CloudPreferencesError,PREFERENCES_SCHEMA_VERSION,normalizePreferences}=require("./src/cloud-preferences");
 const {
     CLOUD_SAVE_ENVELOPE_SCHEMA_VERSION,
@@ -30,6 +31,10 @@ const sessions=createSessionAuthority({db:getFirestore(),FieldValue,HttpsError})
 const trustedGrantLedger=createTrustedGrantLedger({
     db:getFirestore(),FieldValue,HttpsError,runProtected:sessions.runProtected,
     inspectExistingEnvelope,nextRevision
+});
+const legacyCandidateScreening=createLegacyCandidateScreening({
+    db:getFirestore(),HttpsError,runProtected:sessions.runProtected,
+    inspectExistingEnvelope,validateLegacySaveCandidate
 });
 
 const REGION="us-central1";
@@ -129,6 +134,12 @@ exports.protectedTest=onCall(CALLABLE_OPTIONS,async request=>{
 // for a future authoritative character transaction without changing gameplay.
 exports.reserveTrustedGrant=onCall(CALLABLE_OPTIONS,async request=>{
     try{ return await trustedGrantLedger.reserve(await verifyGameIdentity(request)); }
+    catch(error){ throw asHttpsError(error); }
+});
+// Reads a private candidate and returns blockers; never approves or copies it
+// into the public cloud-save envelope.
+exports.screenLegacyMigrationCandidate=onCall(CALLABLE_OPTIONS,async request=>{
+    try{ return await legacyCandidateScreening.screen(await verifyGameIdentity(request)); }
     catch(error){ throw asHttpsError(error); }
 });
 

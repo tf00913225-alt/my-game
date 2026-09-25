@@ -2,6 +2,12 @@
 
 本文件是長期工程進度來源。**每個 Phase 結束都必須更新本文件**；聊天、Commit、PR、CI 或部署成功不能取代驗收紀錄。
 
+## 2026-09-25 — Private legacy candidate screening (candidate)
+
+- `functions/src/legacy-candidate-screening.js` owns a read-only preflight for the latest private migration candidate; `functions/index.js::screenLegacyMigrationCandidate` requires Firebase identity and the active single-device session in `runProtected()`. It compares the requested cloud revision and candidate revision, checks UID/trust metadata and stored candidate structure, then reports blocker codes without returning the save snapshot.
+- A main save by itself cannot prove historical rewards or provide a complete backed-up sidecar bundle. Screening always reports `readyForAcceptance:false`; malformed character, inventory, equipment and claim fields add specific blockers. It does not write a review approval, migration marker, character state, economy value or revision. Old candidate revisions cannot be screened as the current candidate.
+- Emulator and pure screening tests are pending PR CI. No phone data has been submitted, no cloud character is playable, and Phase 4 remains IN PROGRESS / 0/6 VERIFIED. This gate does not replace the complete future reward operations, sidecar backup or owner-confirmed migration acceptance.
+
 ## 2026-09-25 — One-time historical baseline policy and authoritative startup guard
 
 - The owner agreed to a guarded **one-time** acceptance of old local progress as a clearly marked, historically unverifiable baseline, followed by backend-verified new earnings. The exact admission conditions, full main-save/sidecar backup, anomaly/claim checks, unique migration marker, UID/session/revision transaction and post-migration reward receipts are recorded in `docs/CLOUD_CHARACTER_AUTHORITY_MIGRATION_DESIGN.md`. Agreement to the policy does not authorize silently uploading a player's phone save.
