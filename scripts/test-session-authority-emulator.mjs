@@ -115,7 +115,7 @@ assert.equal((await db.doc(`${candidateRoot}/latest`).get()).get("fingerprint"),
 const retry=await invoke("submitLegacyMigrationCandidate",b.idToken,{uid:x,session:sessionB,save:candidate});
 assert.equal(retry.unchanged,true);assert.equal(retry.revision,1);assert.equal(retry.serverRevision,firstCandidate.serverRevision);
 assert.equal((await db.doc(`users/${x}/saves/current`).get()).get("serverRevision"),firstCandidate.serverRevision);
-await rejected("submitLegacyMigrationCandidate",b.idToken,{uid:x,session:sessionB,save:{...candidate,gold:1}},"resource-exhausted");
+await rejected("submitLegacyMigrationCandidate",b.idToken,{uid:x,session:sessionB,save:{...candidate,gold:1}},"RESOURCE_EXHAUSTED");
 assert.equal((await db.doc(`${candidateRoot}/2`).get()).exists,false);
 // Emulator-only time shift avoids waiting through the production rate limit.
 await db.doc(`${candidateRoot}/latest`).update({submittedAt:Timestamp.fromMillis(1)});
