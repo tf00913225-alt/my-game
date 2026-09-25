@@ -80,8 +80,6 @@
 #battlePage .v146-defeated .v141-effect{display:none !important;}
 #battlePage .v146-defeated{pointer-events:none !important;}
 
-#game-stage #inventoryPage .inventory-grid-scroll{flex:0 0 auto !important;overflow:hidden !important;touch-action:none !important;}
-#game-stage #inventoryPage .inventory-grid-classic{grid-template-columns:repeat(6,minmax(0,1fr)) !important;grid-template-rows:repeat(3,minmax(0,1fr)) !important;align-content:start !important;overflow:hidden !important;}
 #game-stage #inventoryPage .v141-inventory-pager{grid-template-columns:44px minmax(62px,auto) 44px !important;}
 #game-stage #inventoryPage .v141-inventory-pager button{font-family:Arial,sans-serif !important;font-size:24px !important;line-height:29px !important;}
 

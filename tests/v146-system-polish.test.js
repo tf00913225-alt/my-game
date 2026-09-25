@@ -17,6 +17,7 @@ const source=fs.readFileSync("js/41-v146-system-polish.js","utf8");
 const finalNavSource=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");
 const eagerSource=fs.readFileSync("js/16-stage-v54-main-city-runtime.js","utf8");
 const css=fs.readFileSync("css/42-v146-system-polish.css","utf8");
+const inventoryCss=fs.readFileSync("css/22-stage-v78-character-inventory-core.css","utf8");
 
 let passed=0;
 function test(name,fn){ fn(); passed++; console.log("✓ "+name); }
@@ -208,7 +209,7 @@ test("inventory, home, synthesis, nav and slow exit all use the latest mobile co
     assert.match(ui,/const INVENTORY_PAGE_SIZE=18/);
     assert.match(ui,/←/); assert.match(ui,/→/);
     assert.match(ui,/\},2700\)/);
-    assert.match(css,/grid-template-rows:repeat\(3,minmax\(0,1fr\)\)/);
+    assert.match(inventoryCss,/grid-template-rows:repeat\(3,minmax\(0,1fr\)\)/);
     assert.match(eagerSource,/v146-home-roster/);
     assert.match(source,/root\.querySelectorAll\("\.v141-blueprint-series"\).*remove/);
     assert.match(source,/v148SyncContextNavigation/);

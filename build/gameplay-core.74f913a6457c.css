@@ -668,6 +668,10 @@
     display:flex !important;
     flex-direction:column !important;
     gap:10px !important;
+    border:1px solid rgba(198,154,69,.48) !important;
+    border-radius:10px !important;
+    background:linear-gradient(180deg,rgba(24,18,11,.96),rgba(9,8,6,.98)) !important;
+    box-shadow:0 8px 18px rgba(0,0,0,.34) !important;
     box-sizing:border-box !important;
 }
 
@@ -870,10 +874,10 @@
     max-width:none !important;
     margin:0 !important;
     padding:10px !important;
-    border:1px solid rgba(200,154,72,.18) !important;
-    border-radius:12px !important;
-    background:linear-gradient(155deg,rgba(28,21,13,.58),rgba(8,7,5,.74)) !important;
-    box-shadow:inset 0 1px 0 rgba(255,238,196,.025) !important;
+    border:0 !important;
+    border-radius:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
     box-sizing:border-box !important;
 }
 #game-stage #inventoryPage .inventory-category-tabs{
@@ -928,8 +932,12 @@
     display:grid !important;
     grid-template-columns:repeat(6,minmax(0,1fr)) !important;
     gap:6px !important;
+    grid-template-rows:repeat(3,minmax(0,1fr)) !important;
+    grid-auto-rows:auto !important;
+    align-content:start !important;
     width:100% !important;
     margin:0 !important;
+    overflow:visible !important;
 }
 #game-stage #inventoryPage .inventory-item-classic{
     width:100% !important;
@@ -947,6 +955,25 @@
 #game-stage #inventoryPage .inventory-item-classic .inventory-icon{
     font-size:clamp(17px,3vw,28px) !important;
 }
+#game-stage #inventoryPage .inventory-grid-classic .inventory-item-classic .inventory-icon > .v169-item-art{
+    display:grid !important;
+    place-items:center !important;
+    width:100% !important;
+    height:100% !important;
+    max-width:100% !important;
+    max-height:100% !important;
+    overflow:hidden !important;
+    box-sizing:border-box !important;
+}
+#game-stage #inventoryPage .inventory-grid-classic .inventory-item-classic .inventory-icon > .v169-item-art > img{
+    display:block !important;
+    width:100% !important;
+    height:100% !important;
+    max-width:100% !important;
+    max-height:100% !important;
+    object-fit:contain !important;
+    object-position:center !important;
+}
 #game-stage #inventoryPage .inventory-item-classic .inventory-count{
     right:3px !important;
     bottom:2px !important;
@@ -963,6 +990,28 @@
     justify-content:center !important;
     gap:14px !important;
     margin:8px 0 2px !important;
+}
+
+/* Backpack Layout Owner: the wrapper is not a scroll or flex shrink owner. */
+#game-stage #inventoryPage .inventory-grid-scroll{
+    display:block !important;
+    width:100% !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    flex:0 0 auto !important;
+    overflow:visible !important;
+    padding:0 !important;
+    scrollbar-gutter:auto !important;
+    touch-action:auto !important;
+}
+
+/* Backpack Visual Owner: quiet chrome, item rarity remains visible. */
+#game-stage #inventoryPage .inventory-pagination,
+#game-stage #inventoryPage .v141-inventory-pager{
+    border:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
 }
 #game-stage #inventoryPage .inventory-pagination button{
     width:42px !important;
@@ -996,8 +1045,9 @@
 }
 #game-stage #inventoryPage .inventory-stats-panel,
 #game-stage #inventoryPage .inventory-right-panel{
-    border:2px solid #8a6a3a !important;
-    background:linear-gradient(180deg,rgba(36,28,18,.90),rgba(12,9,6,.96)) !important;
+    border:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
 }
 
 
@@ -1361,10 +1411,10 @@ body.inventory-scroll-active,
 
 #game-stage #app.on-inventory-page #inventoryPage{
     width:100% !important;
-    height:100% !important;
+    height:auto !important;
     min-height:0 !important;
     max-height:none !important;
-    overflow:hidden !important;
+    overflow:visible !important;
     touch-action:pan-y !important;
     transform:none !important;
     will-change:auto !important;
@@ -1373,12 +1423,12 @@ body.inventory-scroll-active,
 }
 
 #game-stage #app.on-inventory-page #inventoryPage .inventory-classic-shell{
-    height:100% !important;
+    height:auto !important;
     min-height:0 !important;
     display:flex !important;
     flex-direction:column !important;
     gap:8px !important;
-    overflow:hidden !important;
+    overflow:visible !important;
 }
 
 #game-stage #app.on-inventory-page #inventoryPage .inventory-character-panel{
@@ -1386,22 +1436,16 @@ body.inventory-scroll-active,
     min-height:0 !important;
 }
 
-#game-stage #app.on-inventory-page #inventoryPage .inventory-character-stage{
-    height:240px !important;
-    min-height:240px !important;
-    max-height:240px !important;
-}
-
 #game-stage #app.on-inventory-page #inventoryPage .inventory-equipment-icon{
     font-size:clamp(15px,2.8vw,25px) !important;
 }
 
 #game-stage #app.on-inventory-page #inventoryPage .inventory-right-panel{
-    flex:1 1 auto !important;
+    flex:0 0 auto !important;
     min-height:0 !important;
     display:flex !important;
     flex-direction:column !important;
-    overflow:hidden !important;
+    overflow:visible !important;
     padding:8px 10px 10px !important;
 }
 
@@ -1435,15 +1479,14 @@ body.inventory-scroll-active,
 }
 
 #game-stage #app.on-inventory-page #inventoryPage .inventory-grid-scroll{
-    flex:1 1 auto !important;
+    flex:0 0 auto !important;
     min-height:0 !important;
-    overflow-y:auto !important;
-    overflow-x:hidden !important;
+    overflow:visible !important;
     -webkit-overflow-scrolling:touch !important;
     overscroll-behavior-y:contain !important;
-    touch-action:pan-y !important;
+    touch-action:auto !important;
     padding:0 1px 8px !important;
-    scrollbar-gutter:stable !important;
+    scrollbar-gutter:auto !important;
 }
 
 #game-stage #app.on-inventory-page #inventoryPage .inventory-grid-classic{
@@ -3943,22 +3986,6 @@ body.quest-scroll-active,
 #game-stage .system-panel-row small{font-size:13px;line-height:1.55;}
 
 /* ----- Backpack: exactly 18 visible slots, seven cyclic pages ----- */
-#game-stage #inventoryPage .inventory-grid-scroll{
-    flex:0 0 auto !important;
-    height:auto !important;
-    min-height:0 !important;
-    max-height:none !important;
-    overflow:hidden !important;
-    touch-action:none !important;
-}
-
-#game-stage #inventoryPage .inventory-grid-classic{
-    grid-template-columns:repeat(6,minmax(0,1fr)) !important;
-    grid-template-rows:repeat(3,minmax(0,1fr)) !important;
-    gap:5px !important;
-    overflow:hidden !important;
-}
-
 #game-stage #inventoryPage .inventory-item-classic{
     cursor:pointer;
     user-select:none;
@@ -5668,8 +5695,6 @@ body.v174-battle-reading-open > .skill-name-badge.v143-caster-skill-label{
 #battlePage .v146-defeated .v141-effect{display:none !important;}
 #battlePage .v146-defeated{pointer-events:none !important;}
 
-#game-stage #inventoryPage .inventory-grid-scroll{flex:0 0 auto !important;overflow:hidden !important;touch-action:none !important;}
-#game-stage #inventoryPage .inventory-grid-classic{grid-template-columns:repeat(6,minmax(0,1fr)) !important;grid-template-rows:repeat(3,minmax(0,1fr)) !important;align-content:start !important;overflow:hidden !important;}
 #game-stage #inventoryPage .v141-inventory-pager{grid-template-columns:44px minmax(62px,auto) 44px !important;}
 #game-stage #inventoryPage .v141-inventory-pager button{font-family:Arial,sans-serif !important;font-size:24px !important;line-height:29px !important;}
 
@@ -7740,7 +7765,7 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 }
 
 #game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open .inventory-grid-scroll{
-    scrollbar-gutter:stable !important;
+    scrollbar-gutter:auto !important;
 }
 
 /* Backpack character presentation follows the same black-gold language as the panel. */
@@ -8328,7 +8353,7 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 #game-stage > #app.v141-dungeon-active > #game-content #inventoryPage.map-inventory-overlay-open.v169-dungeon-inventory-overlay .inventory-classic-shell{
     width:100% !important;
     max-width:none !important;
-    min-height:100% !important;
+    min-height:0 !important;
     margin:0 !important;
 }
 
@@ -8354,7 +8379,6 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 
 #game-stage .home-feature-modal-box,
 #game-stage .item-modal-box,
-#game-stage .inventory-classic-shell,
 #game-stage .creation-skill-detail-box,
 #game-stage .modal-box,
 .v169-rpg-dialog,
@@ -8600,14 +8624,14 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     align-items:center;
     gap:5px 6px;
     width:calc(100% - 20px);
-    min-height:66px;
-    margin:5px 10px 6px;
-    padding:6px 7px;
+    min-height:42px;
+    margin:5px 0 6px;
+    padding:3px 0;
     box-sizing:border-box;
-    border:1px solid rgba(185,136,61,.62);
-    border-radius:9px;
-    background:linear-gradient(155deg,rgba(35,23,12,.95),rgba(9,8,6,.96));
-    box-shadow:inset 0 0 0 1px rgba(255,225,157,.035),0 3px 10px rgba(0,0,0,.32);
+    border:0;
+    border-radius:0;
+    background:transparent;
+    box-shadow:none;
     color:#eadcbd;
 }
 #game-stage #inventoryPage .v17350-bulk-sell-bar[hidden]{display:none !important;}
@@ -8797,12 +8821,6 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 #game-stage #inventoryPage .v17351-quality-menu button{display:grid!important;grid-template-columns:14px 1fr!important;gap:7px!important;align-items:center!important;width:100%!important;min-height:38px!important;padding:7px 8px!important;border:1px solid transparent!important;border-radius:6px!important;background:transparent!important;color:#d7c6a4!important;font-size:15px!important;font-weight:800!important;text-align:left!important}
 #game-stage #inventoryPage .v17351-quality-menu button.selected{border-color:#8d6932!important;background:rgba(167,116,37,.16)!important;color:#ffe09a!important}
 #game-stage #inventoryPage .v17351-quality-menu i{width:10px!important;height:10px!important;border-radius:50%!important;border:1px solid rgba(255,255,255,.35)!important}.v17351-quality-menu i.white{background:#d8d8d8!important}.v17351-quality-menu i.blue{background:#42a5ff!important}.v17351-quality-menu i.purple{background:#b05cff!important}.v17351-quality-menu i.orange{background:#ff9f38!important}
-
-body.v17351-inventory-fullscreen #bottomNav,body.v17351-inventory-fullscreen .native-bottom-nav-layer{display:none!important;visibility:hidden!important;pointer-events:none!important}
-body.v17351-inventory-fullscreen #game-stage #game-content>.content,body.v17351-inventory-fullscreen #game-stage #game-content .content{bottom:0!important;height:100%!important;max-height:100%!important;padding-bottom:0!important}
-body.v17351-inventory-fullscreen #game-stage #characterPage,body.v17351-inventory-fullscreen #game-stage #characterModal,body.v17351-inventory-fullscreen #game-stage #characterTabContent{bottom:0!important;max-height:none!important;min-height:0!important}
-body.v17351-inventory-fullscreen #game-stage #inventoryPage,body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-classic-shell{height:100%!important;max-height:none!important;min-height:0!important}
-body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scroll{flex:1 1 auto!important;min-height:0!important;max-height:none!important}
 
 #game-stage #homeFeatureModal .v17351-shop-image{position:relative!important;display:grid!important;place-items:center!important;width:100%!important;height:100%!important;overflow:hidden!important}
 #game-stage #homeFeatureModal .v17351-shop-image img{position:relative!important;z-index:2!important;width:100%!important;height:100%!important;object-fit:contain!important}

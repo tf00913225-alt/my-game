@@ -40,8 +40,10 @@ assert.match(inventory,/equipment\(i\)&&!locked\(i\)/);
 assert.match(inventory,/v17351BulkQualityPicker/);
 assert.match(css,/#game-stage #inventoryPage #v17350BulkSellQuality\{display:none/);
 assert.match(css,/v17351-quality-menu/);
-assert.match(css,/v17351-inventory-fullscreen \.native-bottom-nav-layer\{display:none/);
-assert.match(css,/game-content>\.content[\s\S]*height:100%/);
+assert.doesNotMatch(css,/v17351-inventory-fullscreen/,
+    "inventory QA must not own a second fullscreen geometry path");
+assert.doesNotMatch(inventory,/requestAnimationFrame|setTimeout\(/,
+    "inventory QA must not repair geometry on a later frame");
 
 assert.match(shop,/V173\.51 shop QA runtime retired/);
 assert.doesNotMatch(shop,/MutationObserver|setInterval|setTimeout|innerHTML/);

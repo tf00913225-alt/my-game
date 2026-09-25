@@ -5455,12 +5455,12 @@ body.skill-detail-scroll-active,
 
 #game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open .inventory-classic-shell{
     position:relative !important;
-    height:100% !important;
+    height:auto !important;
     min-height:0 !important;
     display:flex !important;
     flex-direction:column !important;
     gap:8px !important;
-    overflow:hidden !important;
+    overflow:visible !important;
 }
 
 #game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open .inventory-character-panel{
@@ -5485,16 +5485,16 @@ body.skill-detail-scroll-active,
     padding-right:64px !important;
 }
 #game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open .inventory-character-stage{
-    height:220px !important;
-    min-height:220px !important;
-    max-height:220px !important;
+    height:var(--inventory-stage-height,240px) !important;
+    min-height:var(--inventory-stage-height,240px) !important;
+    max-height:var(--inventory-stage-height,240px) !important;
 }
 #game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open .inventory-right-panel{
-    flex:1 1 auto !important;
+    flex:0 0 auto !important;
     min-height:0 !important;
     display:flex !important;
     flex-direction:column !important;
-    overflow:hidden !important;
+    overflow:visible !important;
     padding:8px 10px 10px !important;
 }
 #game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open .inventory-wallet-bar,
@@ -5502,14 +5502,12 @@ body.skill-detail-scroll-active,
     flex:0 0 auto !important;
 }
 #game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open .inventory-grid-scroll{
-    flex:1 1 auto !important;
+    flex:0 0 auto !important;
     min-height:0 !important;
-    overflow-y:auto !important;
-    overflow-x:hidden !important;
-    -webkit-overflow-scrolling:touch !important;
-    overscroll-behavior-y:contain !important;
-    touch-action:pan-y !important;
-    padding:0 1px 8px !important;
+    overflow:visible !important;
+    overflow-x:visible !important;
+    touch-action:auto !important;
+    padding:0 !important;
 }
 
 .map-inventory-overlay-close{

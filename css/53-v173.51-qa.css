@@ -38,12 +38,6 @@
 #game-stage #inventoryPage .v17351-quality-menu button.selected{border-color:#8d6932!important;background:rgba(167,116,37,.16)!important;color:#ffe09a!important}
 #game-stage #inventoryPage .v17351-quality-menu i{width:10px!important;height:10px!important;border-radius:50%!important;border:1px solid rgba(255,255,255,.35)!important}.v17351-quality-menu i.white{background:#d8d8d8!important}.v17351-quality-menu i.blue{background:#42a5ff!important}.v17351-quality-menu i.purple{background:#b05cff!important}.v17351-quality-menu i.orange{background:#ff9f38!important}
 
-body.v17351-inventory-fullscreen #bottomNav,body.v17351-inventory-fullscreen .native-bottom-nav-layer{display:none!important;visibility:hidden!important;pointer-events:none!important}
-body.v17351-inventory-fullscreen #game-stage #game-content>.content,body.v17351-inventory-fullscreen #game-stage #game-content .content{bottom:0!important;height:100%!important;max-height:100%!important;padding-bottom:0!important}
-body.v17351-inventory-fullscreen #game-stage #characterPage,body.v17351-inventory-fullscreen #game-stage #characterModal,body.v17351-inventory-fullscreen #game-stage #characterTabContent{bottom:0!important;max-height:none!important;min-height:0!important}
-body.v17351-inventory-fullscreen #game-stage #inventoryPage,body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-classic-shell{height:100%!important;max-height:none!important;min-height:0!important}
-body.v17351-inventory-fullscreen #game-stage #inventoryPage .inventory-grid-scroll{flex:1 1 auto!important;min-height:0!important;max-height:none!important}
-
 #game-stage #homeFeatureModal .v17351-shop-image{position:relative!important;display:grid!important;place-items:center!important;width:100%!important;height:100%!important;overflow:hidden!important}
 #game-stage #homeFeatureModal .v17351-shop-image img{position:relative!important;z-index:2!important;width:100%!important;height:100%!important;object-fit:contain!important}
 #game-stage #homeFeatureModal .v17351-shop-fallback{position:absolute!important;inset:0!important;z-index:1!important;display:grid!important;place-items:center!important;color:#dcb65f!important;font-size:20px!important;font-weight:900!important}.v17351-shop-image:not(.image-failed) .v17351-shop-fallback{opacity:.08!important}

@@ -1,0 +1,18 @@
+{
+  "id": "2026-09-25-backpack-ui-owner-convergence",
+  "baseSha": "856c9de6d32112dc801dc5f20c53f4df54b2e41b",
+  "workBranch": "fix/backpack-ui-owner-convergence-20260925",
+  "targetBranch": "dev",
+  "status": "IMPLEMENTED",
+  "requirements": {
+    "single-layout-owner": "IMPLEMENTED",
+    "six-by-three-eighteen-slots": "IMPLEMENTED",
+    "adaptive-height-and-pagination": "IMPLEMENTED",
+    "quiet-shell-visual-hierarchy": "IMPLEMENTED",
+    "runtime-dom-deduplication": "IMPLEMENTED",
+    "first-frame-stability": "IMPLEMENTED",
+    "regression-tests": "IMPLEMENTED",
+    "browser-qa-390-412-420": "BLOCKED"
+  },
+  "browserQaBlocker": "No Chrome or Chromium executable is available in the execution environment; static owner and geometry gates are covered by v173.74."
+}

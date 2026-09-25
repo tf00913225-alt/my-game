@@ -1,0 +1,32 @@
+"use strict";
+const assert=require("node:assert/strict");
+const fs=require("node:fs");
+const read=name=>fs.readFileSync(name,"utf8");
+const core=read("css/22-stage-v78-character-inventory-core.css");
+const legacyGrid=read("css/24-stage-v85-inventory-inner-grid-scroll-root.css");
+const oldGrid=read("css/38-v141-system-expansion.css");
+const polish=read("css/42-v146-system-polish.css");
+const windowSkin=read("css/49-v169-rpg-ui.css");
+const bulk=read("css/52-v173.50-inventory-qol.css");
+const inventory=read("js/35-v141-ui-battle.js");
+const qa=read("js/55-v173.51-inventory-qa.js");
+const main=read("js/00-main.js");
+
+assert.match(inventory,/const INVENTORY_PAGE_SIZE=18/);
+assert.match(inventory,/for\(let index=0;index<INVENTORY_PAGE_SIZE;index\+\+\)/);
+assert.match(core,/grid-template-columns:repeat\(6,minmax\(0,1fr\)\) !important/);
+assert.match(core,/grid-template-rows:repeat\(3,minmax\(0,1fr\)\) !important/);
+assert.match(core,/aspect-ratio:1 \/ 1 !important/);
+assert.match(core,/\.inventory-grid-scroll\{[\s\S]*?overflow:visible !important/);
+assert.match(core,/\.inventory-classic-shell\{[\s\S]*?border:1px solid/);
+assert.match(core,/\.inventory-right-panel\{[\s\S]*?border:0 !important/);
+assert.match(core,/\.v169-item-art > img\{[\s\S]*?object-fit:contain/);
+assert.doesNotMatch(legacyGrid,/overflow-y:auto !important/);
+assert.doesNotMatch(oldGrid,/\.inventory-grid-scroll\{/);
+assert.doesNotMatch(polish,/\.inventory-grid-scroll\{/);
+assert.doesNotMatch(windowSkin,/\.inventory-classic-shell,\n/,
+    "shared window skin must not own the backpack shell frame");
+assert.match(bulk,/\.v17350-bulk-sell-bar\{[\s\S]*?border:0;[\s\S]*?box-shadow:none/);
+assert.doesNotMatch(qa,/v17351-inventory-fullscreen|requestAnimationFrame|setTimeout\(/);
+assert.doesNotMatch(main,/v17351SyncInventoryQa/);
+console.log("✓ V173.74 backpack owner convergence: 18 slots, one layout owner, no delayed fullscreen geometry");

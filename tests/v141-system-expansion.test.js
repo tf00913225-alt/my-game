@@ -16,6 +16,7 @@ const statusSource=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const finalNavSource=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");
 const contentSource=fs.readFileSync("js/36-v141-content-systems.js","utf8");
 const cssSource=fs.readFileSync("css/38-v141-system-expansion.css","utf8");
+const inventoryCss=fs.readFileSync("css/22-stage-v78-character-inventory-core.css","utf8");
 const indexSource=fs.readFileSync("index.html","utf8");
 
 function extractFunction(source,name){
@@ -95,7 +96,7 @@ test("backpack is 120 slots rendered as seven cyclic pages of 18 without drag or
     assert.match(uiSource,/inventoryPageIndex=\(inventoryPageIndex\+Number\(direction\)\+INVENTORY_PAGE_COUNT\)%INVENTORY_PAGE_COUNT/);
     assert.match(uiSource,/box\.draggable=false/);
     assert.doesNotMatch(uiSource,/inventory-slot-number/);
-    assert.match(cssSource,/grid-template-rows:repeat\(3,minmax\(0,1fr\)\)/);
+    assert.match(inventoryCss,/grid-template-rows:repeat\(3,minmax\(0,1fr\)\)/);
     assert.match(cssSource,/\.inventory-slot-number\{\s*display:none/);
 });
 
