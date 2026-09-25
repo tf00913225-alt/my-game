@@ -19,12 +19,16 @@ test("persistent status icons are static while body states stay pulse/static",()
   const js=read("js/39-v143-skill-animation.js");
   const css=read("css/40-v143-combat-dungeon-polish.css");
   assert.match(js,/frostbite:statusVisual\("","icon","statusEffects"/);
-  assert.match(js,/fireMomentum:statusVisual\("","icon","activeBuffs"/);
+  assert.match(js,/fireMomentum:statusVisual\("","none","activeBuffs"/,
+    "炎勢保留正式狀態資料與詳情，但不產生 HUD icon");
+  assert.match(js,/stealthSkill:statusVisual\("","none","activeBuffs"/,
+    "隱身只由角色立繪透明度呈現，不建立 Body Status Visual");
   assert.match(js,/burn:statusVisual\("assets\/vfx\/status\/burn\.webp","pulse"/);
   assert.match(js,/freeze:statusVisual\("assets\/vfx\/status\/freeze\.webp","static"/);
   assert.doesNotMatch(js,/statDown:statusVisual/);
   assert.match(css,/\.v143-status-icon--pulse\{[\s\S]*?animation:none !important;/);
   assert.match(css,/\.v143-status-visual--pulse\{[\s\S]*?v143StatusImageBreath/);
+  assert.match(css,/@keyframes v143StatusImageBreath\{\s*0%,100%\{opacity:0\}\s*50%\{opacity:1\}/);
 });
 
 test("status body art can reach card edges and remains larger than the old footprint",()=>{
@@ -95,7 +99,9 @@ test("battle skill owners keep target scope, duration and presentation aligned",
   assert.match(relicCss,/team-relic-battle-dim\{[\s\S]*?z-index:18090/);
   assert.match(relicCss,/team-relic-cinematic-active > \.v143-skill-stage\{z-index:18130/);
   assert.match(fixedCss,/turn-target-row\.skill-picker-open\{[\s\S]*?bottom:calc\(var\(--battle-command-visual-height\) \+ 44px\)/);
-  assert.match(fixedCss,/#skillQuickBar\.skill-quick-bar\{[\s\S]*?top:-24px[\s\S]*?bottom:10px/);
+  assert.match(fixedCss,/#skillQuickBar\.skill-quick-bar\{[\s\S]*?top:-46px[\s\S]*?bottom:10px/,
+    "canonical quick-bar geometry reserves lines for name, SP and target scope");
+  assert.match(fixedCss,/\.v135-sq-scope\{[\s\S]*?display:block !important/);
   assert.doesNotMatch(featureBoundary,/MutationObserver/);
   assert.match(v148,/trainingActive[\s\S]*?\?"training"/);
 });
