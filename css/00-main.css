@@ -2308,11 +2308,17 @@ button:active{
     display:grid;
     grid-template-columns:1fr 1fr 1fr 1fr;
     gap:6px;
+    overflow:hidden;
+    align-items:stretch;
 }
 
 .skill-quick-button{
-    min-height:80px;
-    padding:6px 3px 5px;
+    min-width:0;
+    min-height:0;
+    height:100%;
+    box-sizing:border-box;
+    overflow:hidden;
+    padding:3px 2px;
     border:1px solid #8a6a3a;
     border-radius:6px;
     background:#000;
@@ -2408,6 +2414,28 @@ button:active{
     line-height:14px;
     color:#9fd4ff;
     white-space:nowrap;
+}
+
+.skill-quick-button .v135-sq-scope,
+.skill-quick-button .sq-description{
+    display:block;
+    width:100%;
+    min-width:0;
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+    line-height:12px;
+}
+
+.skill-quick-button .v135-sq-scope{
+    color:#f6d27a;
+    font-size:9px;
+    font-weight:800;
+}
+
+.skill-quick-button .sq-description{
+    color:#aaa39a;
+    font-size:9px;
 }
 
 .skill-quick-button.sp-insufficient .sq-cost{
@@ -4653,7 +4681,7 @@ button:active{
 
 .skill-element-tabs{
     display:grid;
-    grid-template-columns:repeat(5,minmax(0,1fr));
+    grid-template-columns:repeat(4,minmax(0,1fr));
     gap:4px;
     margin-top:10px;
 }
@@ -4671,7 +4699,6 @@ button:active{
     white-space:nowrap;
 }
 .skill-element-tab.active{box-shadow:inset 0 -3px 0 #f6c14d,0 0 10px rgba(246,193,77,.24);color:#fff4cd;}
-.skill-element-tab.learn{border-color:#f28b3c;background:#3c2111;}
 .skill-element-tab.fire{border-color:#d94b46;background:#3b1517;}
 .skill-element-tab.water{border-color:#4d91e8;background:#102541;}
 .skill-element-tab.wind{border-color:#72b96a;background:#142d1c;}
@@ -4682,6 +4709,34 @@ button:active{
     color:#f6b95d;
     font-size:12px;
     font-weight:800;
+}
+
+.skill-section{
+    display:grid;
+    gap:6px;
+}
+
+.skill-section + .skill-section{
+    margin-top:10px;
+}
+
+.skill-section-divider{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin:2px 0 0;
+    color:#9b8b70;
+    font-size:12px;
+    line-height:18px;
+    font-weight:800;
+}
+
+.skill-section-divider::before,
+.skill-section-divider::after{
+    content:"";
+    flex:1 1 auto;
+    height:1px;
+    background:rgba(200,154,72,.32);
 }
 
 /* =====================================================

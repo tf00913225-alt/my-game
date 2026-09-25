@@ -29447,7 +29447,6 @@ function getSkillCharacterObject(characterId){
 let selectedSkillElementTab="";
 let selectedSkillElementCharacterKey="";
 const SKILL_ELEMENT_TAB_META=Object.freeze({
-    learn:{label:"學習技能",element:null,className:"learn"},
     fire:{label:"火元素",element:"fire",className:"fire"},
     water:{label:"水元素",element:"water",className:"water"},
     wind:{label:"風元素",element:"wind",className:"wind"},
@@ -29477,8 +29476,7 @@ function renderSkillElementTabs(character,skillOwner){
     host.innerHTML=Object.keys(SKILL_ELEMENT_TAB_META).map(key=>{
         const meta=SKILL_ELEMENT_TAB_META[key];
         const active=key===selectedSkillElementTab;
-        const native=key!=="learn"&&meta.element===nativeElement;
-        return '<button type="button" role="tab" class="skill-element-tab '+meta.className+(active?' active':'')+'" aria-selected="'+(active?'true':'false')+'" onclick="selectSkillElementTab(\''+key+'\')">'+meta.label+(native?' ［本命］':'')+'</button>';
+        return '<button type="button" role="tab" class="skill-element-tab '+meta.className+(active?' active':'')+'" aria-selected="'+(active?'true':'false')+'" onclick="selectSkillElementTab(\''+key+'\')">'+meta.label+'</button>';
     }).join("");
 }
 
@@ -29699,7 +29697,7 @@ function renderSkillLoadout(){
                 skill && skill.element &&
                 Object.prototype.hasOwnProperty.call(skill,"learnLevel") &&
                 skill.category!=="monster" &&
-                (selectedSkillElementTab==="learn" || skill.element===selectedSkillElementTab)
+                skill.element===selectedSkillElementTab
             );
 
         });
@@ -29981,7 +29979,7 @@ function renderSkillLoadout(){
        虛線+文字，單純視覺上區隔兩組。
     */
 
-    function buildSkillSectionDivider(label){
+    function buildSkillSectionDivider(label,sectionClass){
 
         const divider=
             document.createElement(
@@ -29989,19 +29987,8 @@ function renderSkillLoadout(){
             );
 
 
-        divider.style.cssText=
-
-            "text-align:center;"+
-            "font-size:11px;"+
-            "color:#8a7a5c;"+
-            "margin:10px 0 4px;";
-
-
-        divider.textContent=
-
-            "─────"+
-            label+
-            "─────";
+        divider.className="skill-section-divider "+(sectionClass||"");
+        divider.textContent=label;
 
 
         return divider;
@@ -30010,45 +29997,33 @@ function renderSkillLoadout(){
 
 
     if(learnedIds.length>0){
-
-        allList.appendChild(
-            buildSkillSectionDivider(
-                "已學習"
-            )
-        );
+        const learnedSection=document.createElement("section");
+        learnedSection.className="skill-section skill-section-learned";
+        learnedSection.appendChild(buildSkillSectionDivider("已學習","learned"));
 
 
         learnedIds.forEach(skillId=>{
 
-            allList.appendChild(
-                buildSkillRowElement(
-                    skillId
-                )
-            );
+            learnedSection.appendChild(buildSkillRowElement(skillId));
 
         });
+        allList.appendChild(learnedSection);
 
     }
 
 
     if(unlearnedIds.length>0){
-
-        allList.appendChild(
-            buildSkillSectionDivider(
-                "未學習"
-            )
-        );
+        const unlearnedSection=document.createElement("section");
+        unlearnedSection.className="skill-section skill-section-unlearned";
+        unlearnedSection.appendChild(buildSkillSectionDivider("未學習","unlearned"));
 
 
         unlearnedIds.forEach(skillId=>{
 
-            allList.appendChild(
-                buildSkillRowElement(
-                    skillId
-                )
-            );
+            unlearnedSection.appendChild(buildSkillRowElement(skillId));
 
         });
+        allList.appendChild(unlearnedSection);
 
     }
 

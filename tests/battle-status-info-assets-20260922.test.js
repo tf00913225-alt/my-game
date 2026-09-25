@@ -95,7 +95,7 @@ test("battle skill owners keep target scope, duration and presentation aligned",
   assert.match(relicCss,/team-relic-battle-dim\{[\s\S]*?z-index:18090/);
   assert.match(relicCss,/team-relic-cinematic-active > \.v143-skill-stage\{z-index:18130/);
   assert.match(fixedCss,/turn-target-row\.skill-picker-open\{[\s\S]*?bottom:calc\(var\(--battle-command-visual-height\) \+ 44px\)/);
-  assert.match(fixedCss,/#skillQuickBar\.skill-quick-bar\{[\s\S]*?top:-24px[\s\S]*?bottom:10px/);
+  assert.match(fixedCss,/#skillQuickBar\.skill-quick-bar\{[\s\S]*?top:-54px[\s\S]*?bottom:0/);
   assert.doesNotMatch(featureBoundary,/MutationObserver/);
   assert.match(v148,/trainingActive[\s\S]*?\?"training"/);
 });
