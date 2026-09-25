@@ -9477,7 +9477,7 @@ ensureFunctionalStyles();runRepairs();
         blazeSpell:{learnLevel:7,learnCost:6,progressionGroup:"magic"},
         flameTornado:{learnLevel:14,learnCost:10,progressionGroup:"magic"},
         phoenixCry:{learnLevel:30,learnCost:16,progressionGroup:"magic"},
-        rage:{learnLevel:18,learnCost:10,maxLevel:5,progressionGroup:"tactical"},
+        rage:{learnLevel:18,learnCost:10,maxLevel:5,upgradeCost:1,targetType:"allyTri",spCost:50,duration:3,critBonusByLevel:[5,10,15,20,25],critChanceBonusByLevel:[5,10,15,20,25],critDamageBonusByLevel:[10,20,30,40,50],requires:["explosiveFlurry","flameTornado"],progressionGroup:"tactical"},
         fireSoulResonance:{
             id:"fireSoulResonance",name:"炎魂共鳴",element:"fire",category:"buff",targetType:"self",
             learnLevel:25,learnCost:14,maxLevel:5,spCost:45,duration:3,requires:["rage"],progressionGroup:"tactical",
@@ -9505,7 +9505,7 @@ ensureFunctionalStyles();runRepairs();
             targetType:"allyTri",spCost:45,baseHeal:550,healPerLevel:30,
             healHpByLevel:HEAL_HP_BY_LEVEL.slice(),spRestorePercentByLevel:HEAL_SP_PERCENT_BY_LEVEL.slice(),cleanseAll:true
         },
-        revive:{learnLevel:20,learnCost:10,maxLevel:5,upgradeCost:1,requires:["healSpell"],progressionGroup:"tactical"},
+        revive:{learnLevel:20,learnCost:10,maxLevel:5,upgradeCost:1,targetType:"deadAlly",spCost:45,reviveHealPercentByLevel:[20,40,60,80,100],requires:["healSpell","frostCrush"],progressionGroup:"tactical"},
         freeze:{
             learnLevel:25,learnCost:14,maxLevel:5,upgradeCost:1,requires:["iceSpin","iceArrowRain"],progressionGroup:"tactical",
             targetType:"column",targetTypeAtMaxLevel:"tri",spCost:32,
@@ -9513,10 +9513,10 @@ ensureFunctionalStyles();runRepairs();
         },
         purifyMind:{
             learnLevel:35,learnCost:18,maxLevel:3,upgradeCost:1,requires:["healSpell"],progressionGroup:"tactical",
-            targetType:"ally",enemyTargetAllowed:true,spCost:22,removeAllStates:true,
+            targetType:"ally",enemyTargetAllowed:true,spCost:22,removeAllStates:true,requires:["healSpell","frostCrush"],
             targetCountByLevel:PURIFY_TARGET_COUNT_BY_LEVEL.slice()
         },
-        waterEX:{learnLevel:50,learnCost:20,maxLevel:1,progressionGroup:"ex"},
+        waterEX:{learnLevel:50,learnCost:20,maxLevel:1,targetType:"none",damageBonusPercent:5,healBonusPercent:10,turnStartCleanseChance:30,progressionGroup:"ex"},
 
         stormFist:{
             learnLevel:1,learnCost:2,progressionGroup:"physical",
@@ -9579,8 +9579,45 @@ ensureFunctionalStyles();runRepairs();
             targetType:"ally",spCost:40,barrierBlockCountByLevel:BARRIER_BLOCKS_BY_LEVEL.slice(),
             durationByLevel:BARRIER_DURATION_BY_LEVEL.slice()
         },
-        earthEX:{learnLevel:50,learnCost:20,maxLevel:1,progressionGroup:"ex"}
+        earthEX:{learnLevel:50,learnCost:20,maxLevel:1,targetType:"none",defenseBonusPercent:35,progressionGroup:"ex"}
     };
+
+    /* Canonical player attack data.  This is intentionally data, not a
+       late runtime patch: UI and battle use getSkillDamageAtLevel() against
+       these same entries.  Lv5/Lv10 remain calculated breakthroughs. */
+    const FOUR_ELEMENT_DAMAGE_SPEC=Object.freeze({
+        flameSlash:{baseDamage:30,damagePerLevel:6,spCost:10,targetType:"single",followUpOnCriticalOrDefeat:true,followUpMaxCasts:1},
+        fireCritical:{baseDamage:45,damagePerLevel:9,spCost:28,targetType:"single",followUpOnCriticalOrDefeat:true,followUpMaxCasts:1,requires:["flameSlash"]},
+        explosiveFlurry:{baseDamage:50,damagePerLevel:10,spCost:47,targetType:"tri",followUpOnCriticalOrDefeat:true,followUpMaxCasts:1,requires:["fireCritical"]},
+        dragonSlash:{baseDamage:165,damagePerLevel:33,spCost:65,targetType:"single",followUpOnCriticalOrDefeat:true,followUpMaxCasts:2,requires:["explosiveFlurry"]},
+        fireRocket:{baseDamage:13,damagePerLevel:4,spCost:10,targetType:"tri",burnChance:25,burnDuration:2,burnPercentByLevel:[1,1,2,2,3,3,3,3,3,3]},
+        blazeSpell:{baseDamage:45,damagePerLevel:9,spCost:28,targetType:"single",burnChance:30,burnDuration:2,burnPercentByLevel:[1,2,3,4,5,5,5,5,5,5],requires:["fireRocket"]},
+        flameTornado:{baseDamage:150,damagePerLevel:30,spCost:47,targetType:"single",burnChance:100,guaranteedBurn:true,burnDuration:1,burnPercentByLevel:[3,4,5,6,7,7,7,7,7,7],requires:["blazeSpell"]},
+        phoenixCry:{baseDamage:28,damagePerLevel:6,spCost:60,targetType:"all",burnChance:40,burnDuration:2,burnPercentByLevel:[5,7,9,11,13,13,13,13,13,13],burnBonusThreshold:3,nextRoundDamageBonusPercent:30,nextRoundDamageBonusDuration:1,requires:["flameTornado"]},
+        waterKnife:{baseDamage:21,damagePerLevel:5,spCost:6,targetType:"single",frostbiteChance:30,frostbiteDuration:1,lifestealPercentByLevel:[4,5,6,7,8,8,8,8,8,8]},
+        frostPunch:{baseDamage:32,damagePerLevel:7,spCost:17,targetType:"single",frostbiteChance:35,frostbiteDuration:2,lifestealPercentByLevel:[4,5,6,7,8,8,8,8,8,8],requires:["waterKnife"]},
+        iceSpin:{baseDamage:35,damagePerLevel:7,spCost:45,targetType:"tri",frostbiteChance:35,frostbiteDuration:2,lifestealPercentByLevel:[3,4,5,6,7,7,7,7,7,7],requires:["frostPunch"]},
+        frostCrush:{baseDamage:116,damagePerLevel:24,spCost:60,targetType:"single",frostbiteChance:45,frostbiteDuration:2,lifestealPercentByLevel:[4,5,6,7,8,8,8,8,8,8],requires:["iceSpin"]},
+        waterBall:{baseDamage:10,damagePerLevel:2,spCost:8,targetType:"tri",frostbiteChance:30,frostbiteDuration:1,lifestealPercentByLevel:[3,4,5,6,7,7,7,7,7,7]},
+        floodBeast:{baseDamage:105,damagePerLevel:21,spCost:35,targetType:"single",frostbiteChance:35,frostbiteDuration:2,lifestealPercentByLevel:[4,5,6,7,8,8,8,8,8,8],requires:["waterBall"]},
+        iceArrowRain:{baseDamage:30,damagePerLevel:6,spCost:75,targetType:"all",frostbiteChance:35,frostbiteDuration:2,lifestealPercentByLevel:[1,2,3,4,5,5,5,5,5,5],requires:["floodBeast"]},
+        stormFist:{baseDamage:26,damagePerLevel:6,spCost:7,targetType:"single",agilityDownChance:50,agilityDownDuration:1,agilityDownByLevel:FINAL_POINT_DAMAGE_LEVELS.slice()},
+        stormFlurry:{baseDamage:13,damagePerLevel:3,spCost:20,targetType:"tri",damageDownChance:50,damageDownDuration:2,damageDownByLevel:[10,20,30,40,50,50,50,50,50,50],requires:["stormFist"]},
+        windCrossSlash:{baseDamage:128,damagePerLevel:26,spCost:39,targetType:"single",damageDownChance:65,damageDownDuration:1,damageDownByLevel:[20,30,35,40,50,50,50,50,50,50],requires:["stormFlurry"]},
+        dizzyFist:{baseDamage:141,damagePerLevel:29,spCost:55,targetType:"single",stunChance:65,stunDuration:5,missBonusByLevel:FINAL_POINT_DAMAGE_LEVELS.slice(),requires:["stormFlurry"]},
+        windSpell:{baseDamage:12,damagePerLevel:3,spCost:9,targetType:"tri",agilityDownChance:50,agilityDownDuration:1,agilityDownByLevel:FINAL_POINT_DAMAGE_LEVELS.slice()},
+        stormCircle:{baseDamage:14,damagePerLevel:4,spCost:18,targetType:"tri",damageDownChance:55,damageDownDuration:1,damageDownByLevel:[15,18,21,25,30,30,30,30,30,30],requires:["windSpell"]},
+        windHowlLightning:{baseDamage:128,damagePerLevel:26,spCost:55,targetType:"single",damageDownChance:65,damageDownDuration:1,damageDownByLevel:[15,20,25,30,35,35,35,35,35,35],requires:["stormCircle"]},
+        stormRain:{baseDamage:24,damagePerLevel:5,spCost:75,targetType:"all",stunChance:35,stunDuration:1,missBonusByLevel:FINAL_POINT_DAMAGE_LEVELS.slice(),requires:["windHowlLightning"]},
+        stoneSlash:{baseDamage:26,damagePerLevel:6,spCost:7,targetType:"single",defenseDownChance:65,defenseDownDuration:1,defenseDownByLevel:[10,20,30,40,50,50,50,50,50,50]},
+        petrifyFist:{baseDamage:13,damagePerLevel:3,spCost:26,targetType:"tri",selfShieldByLevel:[100,125,150,175,200,200,200,200,200,200],shieldDuration:2,requires:["stoneSlash"]},
+        stoneBreakSky:{baseDamage:128,damagePerLevel:26,spCost:42,targetType:"single",selfShieldByLevel:[100,125,150,175,200,200,200,200,200,200],shieldDuration:2,requires:["petrifyFist"]},
+        earthquakeCrush:{baseDamage:47,damagePerLevel:9,spCost:55,targetType:"tri",petrifyChanceByLevel:[30,35,40,45,50,50,50,50,50,50],petrifyDuration:2,requires:["stoneBreakSky"]},
+        stoneThrow:{baseDamage:12,damagePerLevel:3,spCost:7,targetType:"tri",defenseDownChance:65,defenseDownDuration:1,defenseDownByLevel:[10,20,30,40,50,50,50,50,50,50]},
+        sandWind:{baseDamage:14,damagePerLevel:4,spCost:19,targetType:"tri",defenseDownChance:65,defenseDownDuration:1,defenseDownByLevel:[10,20,30,40,50,50,50,50,50,50],requires:["stoneThrow"]},
+        flyingSandStrike:{baseDamage:24,damagePerLevel:5,spCost:55,targetType:"all",defenseDownChance:60,defenseDownDuration:2,defenseDownByLevel:[10,15,20,25,35,35,35,35,35,35],requires:["sandWind"]},
+        dustStorm:{baseDamage:140,damagePerLevel:28,spCost:65,targetType:"single",petrifyChanceByLevel:[20,25,30,35,45,45,45,45,45,45],petrifyDuration:2,requires:["flyingSandStrike"]}
+    });
 
     function extendLevelArrayToTen(values){
         if(!Array.isArray(values)||!values.length){ return values; }
@@ -9848,6 +9885,14 @@ ensureFunctionalStyles();runRepairs();
                 delete skill.upgradeCostByTargetLevel;
             }
             skill.description=sanitizeDescription(skill.description);
+        });
+        Object.entries(FOUR_ELEMENT_DAMAGE_SPEC).forEach(([skillId,fields])=>{
+            const skill=skillDatabase[skillId];
+            if(!skill){ return; }
+            Object.entries(fields).forEach(([key,value])=>{ skill[key]=copyArray(value); });
+            skill.maxLevel=10;
+            skill.upgradeCost=1;
+            skill.upgradeCostByTargetLevel=SKILL_UPGRADE_COST_BY_TARGET_LEVEL;
         });
 
         const heal=skillDatabase.healSpell;
@@ -10693,7 +10738,15 @@ ensureFunctionalStyles();runRepairs();
     let relicVisualReadyPromise=null;
     function nextVisualPaint(){ return new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))); }
     function decodeRelicIcon(path){
-        return new Promise((resolve,reject)=>{const image=new Image();image.decoding="async";image.onload=()=>typeof image.decode==="function"?image.decode().then(resolve,reject):resolve();image.onerror=()=>reject(new Error("秘寶圖片無法載入："+path));image.src=path;});
+        return new Promise((resolve,reject)=>{const image=new Image();image.decoding="async";image.onload=()=>{const ready=()=>image.complete&&image.naturalWidth>0?resolve({path:path,image:image}):reject(new Error("秘寶圖片解碼失敗："+path));if(typeof image.decode==="function"){image.decode().then(ready,reject);}else{ready();}};image.onerror=()=>reject(new Error("秘寶圖片無法載入："+path));image.src=path;});
+    }
+    function resolveBattleIdentityIcon(def){
+        const candidates=[def&&def.battleIconPath,def&&def.iconPath].filter((path,index,all)=>path&&all.indexOf(path)===index);
+        const next=index=>{
+            if(index>=candidates.length){ return Promise.reject(new Error("秘寶 Identity 圖示無法載入："+(def&&def.id||"unknown"))); }
+            return decodeRelicIcon(candidates[index]).catch(()=>next(index+1));
+        };
+        return next(0);
     }
     function prepareRelicVisuals(){
         if(relicVisualReadyPromise){return relicVisualReadyPromise;}
@@ -10809,17 +10862,20 @@ ensureFunctionalStyles();runRepairs();
     }
     function beginRelicCinematic(def,target){
         if(!hasLiveBattlePresentationHost()||!def){ return Promise.resolve(null); }
+        /* The identity clock starts only after a real decoded image exists.
+           A path-string fallback is not enough on cold cache. */
+        return resolveBattleIdentityIcon(def).then(identity=>{
         cleanupRelicCutin();
         const battlePage=document.getElementById("battlePage");
         const host=battlePage||null;
-        if(!host){ return Promise.resolve(null); }
+        if(!host){ return null; }
         const node=document.createElement("div");
         node.id="teamRelicBattlePresentation";
         node.className="team-relic-battle-presentation";
         node.setAttribute("aria-label","秘寶發動："+def.name);
         node.innerHTML='<span class="team-relic-battle-dim" aria-hidden="true"></span>'+
             '<div class="team-relic-battle-cutin"><span class="team-relic-battle-cutin-icon">'+
-            '<img src="'+esc(def.battleIconPath||def.iconPath||"")+'" alt=""></span>'+
+            '<img src="'+esc(identity.path)+'" alt=""></span>'+
             '<span class="team-relic-battle-cutin-copy"><strong>'+esc(def.name)+'</strong></span></div>';
         host.appendChild(node);
         if(document.body&&document.body.classList){ document.body.classList.add("team-relic-cinematic-active"); }
@@ -10844,6 +10900,10 @@ ensureFunctionalStyles();runRepairs();
                     revealRelicTargets(target)
                 ]).then(()=>node);
             });
+        }).catch(error=>{
+            console.error("秘寶 Identity Ready Gate 失敗：",error);
+            return null;
+        });
     }
     function enterRelicVfxPhase(node){
         if(node&&node===relicCutinNode){ node.classList.add("vfx-running"); }

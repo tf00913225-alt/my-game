@@ -461,25 +461,25 @@ const elementDatabase = {
 
     fire:{
         name:"火",
-        icon:"",
+        icon:"assets/items/potions/hp-potion-10-huichun.webp",
         character:"火法師"
     },
 
     wind:{
         name:"風",
-        icon:"",
+        icon:"assets/items/potions/sp-potion-10-ningqi.webp",
         character:"風弓手"
     },
 
     earth:{
         name:"土",
-        icon:"",
+        icon:"assets/items/potions/hp-potion-20-yangming.webp",
         character:"土騎士"
     },
 
     water:{
         name:"水",
-        icon:"",
+        icon:"assets/items/potions/sp-potion-20-juqi.webp",
         character:"水戰士"
     }
 
@@ -1213,7 +1213,7 @@ const potionDefinitions=[
         id:"hpPotion10",
         name:"回復10%HP藥水",
         shortName:"HP 10%",
-        icon:"",
+        icon:"assets/items/potions/hp-potion-30-dahuan.webp",
         type:"potion",
         resource:"hp",
         recoveryPercent:10,
@@ -1224,7 +1224,7 @@ const potionDefinitions=[
         id:"spPotion10",
         name:"回復10%SP藥水",
         shortName:"SP 10%",
-        icon:"",
+        icon:"assets/items/potions/sp-potion-30-guiyuan.webp",
         type:"potion",
         resource:"sp",
         recoveryPercent:10,
@@ -1731,7 +1731,7 @@ function renderBattleItemMenu(){
                     onclick="usePotion('${definition.id}')"
                     title="${definition.name}"
                 >
-                    <span class="battle-item-badge">${resourceLabel}</span>
+                    <img class="battle-item-icon" src="${definition.icon}" alt="" aria-hidden="true">
                     <span class="battle-item-name">${definition.shortName}</span>
                     <span class="battle-item-effect">${effectLabel}</span>
                     <span class="battle-item-count">×${count}</span>
@@ -1776,7 +1776,7 @@ function renderBattleItemMenu(){
                 disabled
                 title="${item.name||item.id}"
             >
-                <span class="battle-item-badge">符</span>
+                ${item.icon?`<img class="battle-item-icon" src="${item.icon}" alt="" aria-hidden="true">`:""}
                 <span class="battle-item-name">${item.name||item.id}</span>
                 <span class="battle-item-effect">${skillLabel}</span>
                 <span class="battle-item-count">×${item.count}</span>
@@ -4276,6 +4276,10 @@ function beginBattleDurationAction(event){
     };
 }
 function finishBattleDurationAction(){
+    /* Duration is round-owned.  Keep the action hook as a compatibility
+       notification only; consuming here would double-decrement states. */
+    battleDurationAction=null;
+    return;
     const action=battleDurationAction;
     battleDurationAction=null;
     if(!action){ return; }
@@ -4292,6 +4296,29 @@ function finishBattleDurationAction(){
     if(typeof window!=="undefined"&&typeof window.v143SyncStatusVisualEffects==="function"){
         window.v143SyncStatusVisualEffects(false);
     }
+}
+function finishBattleRoundDurations(){
+    if(!battleActive){ return; }
+    /* Burn has one authoritative Round-End tick here; its existing tick
+       implementation also consumes its turnsLeft. */
+    tickStatusEffects();
+    const entities=[];
+    getExistingPartyIndexes().forEach(index=>{ const entity=getPartyCharacterByIndex(index); if(entity){ entities.push(entity); } });
+    currentBattleMonsters.forEach(index=>{ const entity=monsters[index]; if(entity){ entities.push(entity); } });
+    entities.forEach(entity=>{
+        (Array.isArray(entity.activeBuffs)?entity.activeBuffs.slice():[]).forEach(buff=>{
+            if(Number(buff&&buff.turnsLeft)>0){ expireBattleActionBuff(entity,buff); }
+        });
+        if(Array.isArray(entity.statusEffects)){
+            entity.statusEffects=entity.statusEffects.filter(effect=>{
+                if(!effect||effect.type==="burn"){ return !!effect&&Number(effect.turnsLeft)>0; }
+                effect.turnsLeft=Math.max(0,battleDurationNumber(effect.turnsLeft)-1);
+                return effect.turnsLeft>0;
+            });
+        }
+    });
+    if(typeof window!=="undefined"&&typeof window.v143SyncStatusVisualEffects==="function"){ window.v143SyncStatusVisualEffects(false); }
+    updateUI();
 }
 if(typeof window!=="undefined"){
     window.v175DurationLifecycleActive=true;
@@ -4620,6 +4647,7 @@ function notifyBattleRoundBoundary(type,token){
         try{ observer({token:token,turn:roundNumber,type:type}); }
         catch(error){ console.error("戰鬥回合邊界觀察器失敗：",error); }
     });
+    if(type==="round_end"){ finishBattleRoundDurations(); }
     return true;
 }
 function getBattleAdvanceDelay(phase){
@@ -11276,14 +11304,10 @@ function startTurn(token){
        結束的話就不要再往下開新回合。
     */
 
-    tickStatusEffects();
-
-    tickPlayerBuffs();
-
-    if(
-        typeof window!=="undefined" &&
-        typeof window.v143SyncStatusVisualEffects==="function"
-    ){
+    /* Timed states are consumed by finishBattleRoundDurations() at the
+       previous Round-End boundary.  Round Start only projects that formal
+       state and must never apply a second tick. */
+    if(typeof window!=="undefined"&&typeof window.v143SyncStatusVisualEffects==="function"){
         window.v143SyncStatusVisualEffects();
     }
 
@@ -12414,14 +12438,6 @@ function prepareAction(type){
 
 
     const hostileTargetType=getBattleActionTargetType(type,activeBattleCharacterIndex);
-
-    if(hostileTargetType==="all"){
-        queuedPlayerActions[activeBattleCharacterIndex]={action:type,target:null};
-        closeMenus();
-        updateUI();
-        finishPlayerAction();
-        return;
-    }
 
     const hasSelectablePrimary=currentBattleMonsters.some(index=>
         canSelectHostileBattlePrimary("monster",index,hostileTargetType)
@@ -14504,7 +14520,10 @@ function isBattleTargetStealthed(entity){
 }
 function canSelectHostileBattlePrimary(targetSide,index,targetType){
     const normalized=normalizeBattleTargetType(targetType);
-    if(normalized==="all"||!isBattleTargetAlive(targetSide,index)){ return false; }
+    /* An all-target manual cast still needs a legal, visible enemy as its
+       declaration anchor.  resolveBattlefieldTargets keeps all enemies as
+       the actual result, so this does not turn all into a single-target hit. */
+    if(!isBattleTargetAlive(targetSide,index)){ return false; }
     return !isBattleTargetStealthed(getBattleTargetEntity(targetSide,index));
 }
 function resolveBattlefieldTargets(targetSide,primaryIndex,targetType,options){
