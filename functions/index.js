@@ -7,6 +7,7 @@ const {FieldValue,Timestamp,getFirestore}=require("firebase-admin/firestore");
 const {setGlobalOptions}=require("firebase-functions/v2");
 const {HttpsError,onCall}=require("firebase-functions/v2/https");
 const {createSessionAuthority}=require("./src/session-authority");
+const {createTrustedGrantLedger}=require("./src/trusted-grant-ledger");
 const {CloudPreferencesError,PREFERENCES_SCHEMA_VERSION,normalizePreferences}=require("./src/cloud-preferences");
 const {
     CLOUD_SAVE_ENVELOPE_SCHEMA_VERSION,
@@ -26,6 +27,10 @@ const {
 
 initializeApp();
 const sessions=createSessionAuthority({db:getFirestore(),FieldValue,HttpsError});
+const trustedGrantLedger=createTrustedGrantLedger({
+    db:getFirestore(),FieldValue,HttpsError,runProtected:sessions.runProtected,
+    inspectExistingEnvelope,nextRevision
+});
 
 const REGION="us-central1";
 const PUBLIC_SAVE_PATH_SEGMENTS=["saves","current"];
@@ -118,6 +123,12 @@ exports.revokeGameSession=onCall(CALLABLE_OPTIONS,async request=>{
 });
 exports.protectedTest=onCall(CALLABLE_OPTIONS,async request=>{
     try{ return await sessions.protectedTest(await verifyGameIdentity(request)); }
+    catch(error){ throw asHttpsError(error); }
+});
+// No browser grant issuer exists. This reserves a server-issued entitlement
+// for a future authoritative character transaction without changing gameplay.
+exports.reserveTrustedGrant=onCall(CALLABLE_OPTIONS,async request=>{
+    try{ return await trustedGrantLedger.reserve(await verifyGameIdentity(request)); }
     catch(error){ throw asHttpsError(error); }
 });
 
