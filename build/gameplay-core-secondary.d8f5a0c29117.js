@@ -2893,10 +2893,6 @@
 
     window.v148OpenContextInventory=function(){
         if(typeof document==="undefined"||typeof openMapInventoryOverlay!=="function"){ return false; }
-        const dungeonPage=document.getElementById("dungeonPage");
-        const dungeonActive=!!(dungeonPage&&dungeonPage.classList&&dungeonPage.classList.contains("active"));
-        const gameplayPageId=activeGameplayPageId();
-        if(dungeonActive||!gameplayPageId){ return openMapInventoryOverlay(); }
         if(typeof battleActive!=="undefined"&&battleActive){ return false; }
 
         const mapPage=document.getElementById("mapPage");
@@ -9060,6 +9056,11 @@ ensureFunctionalStyles();runRepairs();
         const number=Number(value);
         return Number.isFinite(number)?number:(fallback===undefined?0:fallback);
     }
+    window.v173GetInitialLearnCost=function(character,skill){
+        const base=Math.max(0,Math.floor(numeric(skill&&skill.learnCost)));
+        const cross=!!(character&&skill&&character.element&&skill.element&&character.element!==skill.element);
+        return base*(cross?2:1);
+    };
     function clampLevel(value,maxLevel){
         return Math.max(1,Math.min(Math.max(1,numeric(maxLevel,1)),Math.floor(numeric(value,1))));
     }

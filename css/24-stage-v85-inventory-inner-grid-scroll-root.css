@@ -25,6 +25,15 @@
     z-index:200 !important;
 }
 
+#game-stage > #app.inventory-overlay-open > #game-content #bottomNav,
+#game-stage > #app.inventory-overlay-open > #game-content #mapPageNav,
+#game-stage > #app.inventory-overlay-open > #game-content #v141DungeonNav,
+#game-stage > #app.on-inventory-page > #game-content #bottomNav,
+#game-stage > #app.on-inventory-page > #game-content #mapPageNav,
+#game-stage > #app.on-inventory-page > #game-content #v141DungeonNav{
+    display:none !important;
+}
+
 html.inventory-scroll-active,
 body.inventory-scroll-active,
 #game-viewport.inventory-scroll-active,
@@ -33,7 +42,7 @@ body.inventory-scroll-active,
 }
 
 #game-stage #app.on-inventory-page .content{
-    bottom:84px !important;
+    bottom:0 !important;
     overflow:hidden !important;
     touch-action:pan-y !important;
     padding:0 !important;

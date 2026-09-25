@@ -4651,6 +4651,39 @@ button:active{
     white-space:nowrap;
 }
 
+.skill-element-tabs{
+    display:grid;
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    gap:4px;
+    margin-top:10px;
+}
+.skill-element-tab{
+    min-width:0;
+    min-height:42px;
+    padding:4px 2px;
+    border:1px solid rgba(210,158,64,.6);
+    border-radius:7px;
+    background:#201811;
+    color:#d8c6a0;
+    font-size:13px;
+    font-weight:900;
+    line-height:1.2;
+    white-space:nowrap;
+}
+.skill-element-tab.active{box-shadow:inset 0 -3px 0 #f6c14d,0 0 10px rgba(246,193,77,.24);color:#fff4cd;}
+.skill-element-tab.learn{border-color:#f28b3c;background:#3c2111;}
+.skill-element-tab.fire{border-color:#d94b46;background:#3b1517;}
+.skill-element-tab.water{border-color:#4d91e8;background:#102541;}
+.skill-element-tab.wind{border-color:#72b96a;background:#142d1c;}
+.skill-element-tab.earth{border-color:#9b7654;background:#2e2017;}
+.skill-row-cost{
+    display:block;
+    margin-top:3px;
+    color:#f6b95d;
+    font-size:12px;
+    font-weight:800;
+}
+
 /* =====================================================
    背包
 ===================================================== */
@@ -5427,7 +5460,7 @@ body.skill-detail-scroll-active,
 #game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open{
     display:block !important;
     position:absolute !important;
-    inset:8px 8px 76px 8px !important;
+    inset:8px 8px 8px 8px !important;
     width:auto !important;
     height:auto !important;
     min-height:0 !important;
@@ -5536,6 +5569,19 @@ body.skill-detail-scroll-active,
 #inventoryPage.map-inventory-overlay-open .map-inventory-overlay-close:active{
     transform:scale(.95);
     filter:brightness(1.12);
+}
+
+#game-stage > #app.inventory-overlay-open > #game-content #bottomNav,
+#game-stage > #app.inventory-overlay-open > #game-content #mapPageNav,
+#game-stage > #app.inventory-overlay-open > #game-content #v141DungeonNav,
+#game-stage > #app.on-inventory-page > #game-content #bottomNav,
+#game-stage > #app.on-inventory-page > #game-content #mapPageNav,
+#game-stage > #app.on-inventory-page > #game-content #v141DungeonNav{
+    display:none !important;
+}
+#game-stage > #app.on-inventory-page > #game-content .content{
+    bottom:0 !important;
+    padding-bottom:8px !important;
 }
 
 /* =====================================================

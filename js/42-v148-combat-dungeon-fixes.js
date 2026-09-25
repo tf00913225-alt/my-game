@@ -1343,10 +1343,6 @@
 
     window.v148OpenContextInventory=function(){
         if(typeof document==="undefined"||typeof openMapInventoryOverlay!=="function"){ return false; }
-        const dungeonPage=document.getElementById("dungeonPage");
-        const dungeonActive=!!(dungeonPage&&dungeonPage.classList&&dungeonPage.classList.contains("active"));
-        const gameplayPageId=activeGameplayPageId();
-        if(dungeonActive||!gameplayPageId){ return openMapInventoryOverlay(); }
         if(typeof battleActive!=="undefined"&&battleActive){ return false; }
 
         const mapPage=document.getElementById("mapPage");

@@ -47,6 +47,11 @@
         const number=Number(value);
         return Number.isFinite(number)?number:(fallback===undefined?0:fallback);
     }
+    window.v173GetInitialLearnCost=function(character,skill){
+        const base=Math.max(0,Math.floor(numeric(skill&&skill.learnCost)));
+        const cross=!!(character&&skill&&character.element&&skill.element&&character.element!==skill.element);
+        return base*(cross?2:1);
+    };
     function clampLevel(value,maxLevel){
         return Math.max(1,Math.min(Math.max(1,numeric(maxLevel,1)),Math.floor(numeric(value,1))));
     }
