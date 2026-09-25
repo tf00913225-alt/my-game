@@ -499,6 +499,7 @@ try{
     await waitFor(client,`performance.timeOrigin!==${JSON.stringify(freshDeviceTimeOrigin)}&&document.readyState==='complete'`,"fresh-device reload",15000);
     await waitFor(client,"window.FourSymbolsStartupPolicy?.getState()==='AUTH_REQUIRED'||window.FourSymbolsStartupPolicy?.getState()==='READY'","fresh-device identity",15000);
     if(await client.eval(`FourSymbolsStartupPolicy.getState()==='AUTH_REQUIRED'`)){
+        await waitFor(client,"performance.getEntriesByName('four-symbols:auth-ui-interactive').length>0&&document.getElementById('firebaseEmailSignInButton')?.disabled===false","fresh-device sign-in surface",15000);
         await client.eval(`(()=>{document.getElementById("firebaseEmailInput").value="b@example.test";document.getElementById("firebasePasswordInput").value="123456";document.getElementById("firebaseEmailSignInButton").click();})()`);
     }
     await waitFor(client,"window.FourSymbolsStartupPolicy?.getState()==='READY'&&window.FourSymbolsStartupPolicy?.getUid()==='uid-B'&&performance.getEntriesByName('four-symbols:main-city-interactive').length>0","warm account restore",15000);
