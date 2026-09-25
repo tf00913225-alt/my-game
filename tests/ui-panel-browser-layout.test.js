@@ -135,7 +135,7 @@ try{
     ],{encoding:"utf8",timeout:30000,maxBuffer:8*1024*1024});
     assert.equal(run.status,0,run.stderr||"Chrome layout fixture failed");
     const match=run.stdout.match(/<pre id="result">([\s\S]*?)<\/pre>/);
-    assert.ok(match,"browser layout result missing");
+    assert.ok(match,"browser layout result missing; stdout="+run.stdout.slice(-1200)+"; stderr="+String(run.stderr||"").slice(-1200));
     const snapshots=JSON.parse(match[1].replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"'));
     assert.equal(snapshots.length,5);
 
