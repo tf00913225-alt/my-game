@@ -107,4 +107,20 @@ function code(expected){ return error=>error&&error.code===expected; }
     assert.equal(store.getItem(repo.saveKey("uid-atomic")),null,"failed two-key commit rolls back its data key");
 }
 
+{
+    const {repo,store}=repository();
+    repo.activate("uid-backup");
+    repo.writeForUid("uid-backup",{version:6,player:{id:"原機角色"},inventoryItems:[]},{source:"gameplay"});
+    store.setItem(repo.accountKey("progress","uid-backup"),JSON.stringify({bossClaims:{one:true}}));
+    const first=repo.createMigrationBackup("uid-backup");
+    const second=repo.createMigrationBackup("uid-backup");
+    assert.equal(first.unchanged,false);
+    assert.equal(second.unchanged,true,"same original data must reuse, not overwrite, its immutable backup");
+    assert.equal(first.sidecars.progress.status,"present");
+    assert.equal(first.sidecars["abyss-state"].status,"missing");
+    assert.equal(JSON.parse(store.getItem(first.backupKey)).mainRaw,store.getItem(repo.saveKey("uid-backup")));
+    repo.activate("uid-other");
+    assert.throws(()=>repo.createMigrationBackup("uid-backup"),code("account-not-active"));
+}
+
 console.log("✓ account-aware local ownership, switching, corruption and migration safety");

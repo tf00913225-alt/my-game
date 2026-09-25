@@ -2,6 +2,12 @@
 
 本文件是長期工程進度來源。**每個 Phase 結束都必須更新本文件**；聊天、Commit、PR、CI 或部署成功不能取代驗收紀錄。
 
+## 2026-09-25 — Original-device immutable backup primitive (candidate)
+
+- `js/startup/account-save-repository.js::createMigrationBackup(uid)` is the sole local backup owner. It requires the active UID and complete UID-owned save, records original main-save bytes, metadata bytes and all registered UID sidecars as present/missing, then writes a fingerprint-addressed immutable local record. It never deletes, rewrites or uploads gameplay state.
+- `js/firebase/firebase-cloud-save.js::createLocalMigrationBackup()` exposes only that explicit original-device preparation. It rejects UID changes and does not call Firebase, `saveGame()`, `loadGame()` or a restore path.
+- This is a preservation prerequisite, not admission: private server backup upload, claim-record validation, one-time acceptance transaction, authoritative character writing and second-device restore remain unimplemented. Phase 4 remains **IN PROGRESS / 0/6 VERIFIED**.
+
 ## 2026-09-25 — Private legacy candidate screening (candidate)
 
 - `functions/src/legacy-candidate-screening.js` owns a read-only preflight for the latest private migration candidate; `functions/index.js::screenLegacyMigrationCandidate` requires Firebase identity and the active single-device session in `runProtected()`. It compares the requested cloud revision and candidate revision, checks UID/trust metadata and stored candidate structure, then reports blocker codes without returning the save snapshot.

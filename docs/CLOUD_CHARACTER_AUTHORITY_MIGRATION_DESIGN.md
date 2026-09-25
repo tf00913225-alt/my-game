@@ -41,6 +41,10 @@ This inventory is a starting map, not an assertion that every reward path has be
 4. Only after the selected policy and all future earning/claim operations are implemented: commit a one-time migration marker, initial ledger and complete snapshot in one server transaction, with a UID-unique migration operation ID, expected revision, active session and backup reference. Subsequent migration attempts return the same receipt and never add rewards twice. Preserve the original local backup after acceptance.
 5. Switch `resolveSaveFor()` only after server round-trip schema and dependent-state validation, conflict UI and cache backup pass tests. On second phone, read and render the full snapshot; it must not manufacture missing sidecars or claim rewards again.
 
+### Implemented preservation boundary (not admission)
+
+`FourSymbolsAccountSave.createMigrationBackup(uid)` creates a local immutable, fingerprint-addressed record containing exact UID main-save bytes, metadata bytes and registered UID sidecars. It requires the active UID and rejects corrupt sidecars or a conflicting pre-existing record. It is local-only: no candidate is uploaded, no server revision changes, no acceptance marker is written and no save becomes playable in the cloud.
+
 ### Approved first-migration policy: guarded historical baseline
 
 - Only a logged-in UID's original device may explicitly present and confirm a complete candidate. Retain an immutable local main-save **and sidecar** backup before submission; keep the original local keys. A private server candidate remains `trusted:false` and is never a playable payload. A subsequent new phone with an empty local cache cannot propose a replacement baseline.

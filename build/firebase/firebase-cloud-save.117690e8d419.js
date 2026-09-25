@@ -164,3 +164,16 @@ export async function submitLegacyMigrationCandidate(options={}){
         clientVersion
     });
 }
+
+/* Creates an explicit immutable UID backup before any future migration
+ * consent. It does not upload, promote or restore gameplay state. */
+export function createLocalMigrationBackup(){
+    const uid=requireSignedInUid();
+    const repository=window.FourSymbolsAccountSave;
+    if(!repository||repository.getActiveUid()!==uid){
+        const error=new Error("The active local save belongs to another account.");
+        error.code="ACCOUNT_CHANGED";
+        throw error;
+    }
+    return repository.createMigrationBackup(uid);
+}
