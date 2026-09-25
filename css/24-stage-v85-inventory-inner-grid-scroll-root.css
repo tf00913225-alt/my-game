@@ -41,10 +41,10 @@ body.inventory-scroll-active,
 
 #game-stage #app.on-inventory-page #inventoryPage{
     width:100% !important;
-    height:100% !important;
+    height:auto !important;
     min-height:0 !important;
     max-height:none !important;
-    overflow:hidden !important;
+    overflow:visible !important;
     touch-action:pan-y !important;
     transform:none !important;
     will-change:auto !important;
@@ -53,12 +53,12 @@ body.inventory-scroll-active,
 }
 
 #game-stage #app.on-inventory-page #inventoryPage .inventory-classic-shell{
-    height:100% !important;
+    height:auto !important;
     min-height:0 !important;
     display:flex !important;
     flex-direction:column !important;
     gap:8px !important;
-    overflow:hidden !important;
+    overflow:visible !important;
 }
 
 #game-stage #app.on-inventory-page #inventoryPage .inventory-character-panel{
@@ -66,22 +66,16 @@ body.inventory-scroll-active,
     min-height:0 !important;
 }
 
-#game-stage #app.on-inventory-page #inventoryPage .inventory-character-stage{
-    height:240px !important;
-    min-height:240px !important;
-    max-height:240px !important;
-}
-
 #game-stage #app.on-inventory-page #inventoryPage .inventory-equipment-icon{
     font-size:clamp(15px,2.8vw,25px) !important;
 }
 
 #game-stage #app.on-inventory-page #inventoryPage .inventory-right-panel{
-    flex:1 1 auto !important;
+    flex:0 0 auto !important;
     min-height:0 !important;
     display:flex !important;
     flex-direction:column !important;
-    overflow:hidden !important;
+    overflow:visible !important;
     padding:8px 10px 10px !important;
 }
 
@@ -115,15 +109,14 @@ body.inventory-scroll-active,
 }
 
 #game-stage #app.on-inventory-page #inventoryPage .inventory-grid-scroll{
-    flex:1 1 auto !important;
+    flex:0 0 auto !important;
     min-height:0 !important;
-    overflow-y:auto !important;
-    overflow-x:hidden !important;
+    overflow:visible !important;
     -webkit-overflow-scrolling:touch !important;
     overscroll-behavior-y:contain !important;
-    touch-action:pan-y !important;
+    touch-action:auto !important;
     padding:0 1px 8px !important;
-    scrollbar-gutter:stable !important;
+    scrollbar-gutter:auto !important;
 }
 
 #game-stage #app.on-inventory-page #inventoryPage .inventory-grid-classic{

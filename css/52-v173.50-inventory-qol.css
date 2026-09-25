@@ -19,14 +19,14 @@
     align-items:center;
     gap:5px 6px;
     width:calc(100% - 20px);
-    min-height:66px;
-    margin:5px 10px 6px;
-    padding:6px 7px;
+    min-height:42px;
+    margin:5px 0 6px;
+    padding:3px 0;
     box-sizing:border-box;
-    border:1px solid rgba(185,136,61,.62);
-    border-radius:9px;
-    background:linear-gradient(155deg,rgba(35,23,12,.95),rgba(9,8,6,.96));
-    box-shadow:inset 0 0 0 1px rgba(255,225,157,.035),0 3px 10px rgba(0,0,0,.32);
+    border:0;
+    border-radius:0;
+    background:transparent;
+    box-shadow:none;
     color:#eadcbd;
 }
 #game-stage #inventoryPage .v17350-bulk-sell-bar[hidden]{display:none !important;}

@@ -61,7 +61,7 @@ function block(source,startToken,endToken){
     assert.doesNotMatch(v55,/MutationObserver|setInterval\s*\(/);
     assert.doesNotMatch(v57,/MutationObserver|setInterval\s*\(/);
     assert.doesNotMatch(v58,/\.observe\s*\(\s*document\.body|document\.addEventListener\s*\(\s*["'](?:click|change)["']\s*,\s*scheduleRepairs/);
-    assert.match(v55,/window\.v17351SyncInventoryQa=scheduleInventorySync/);
+    assert.doesNotMatch(v55,/window\.v17351SyncInventoryQa|scheduleInventorySync/);
     assert.match(v57,/window\.v17351PreviewQuestMilestones=previewChests/);
     assert.match(v58,/window\.v17363SyncFunctionalFixes=runRepairs/);
 }

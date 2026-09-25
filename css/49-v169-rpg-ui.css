@@ -649,7 +649,7 @@
 }
 
 #game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open .inventory-grid-scroll{
-    scrollbar-gutter:stable !important;
+    scrollbar-gutter:auto !important;
 }
 
 /* Backpack character presentation follows the same black-gold language as the panel. */
@@ -1237,7 +1237,7 @@
 #game-stage > #app.v141-dungeon-active > #game-content #inventoryPage.map-inventory-overlay-open.v169-dungeon-inventory-overlay .inventory-classic-shell{
     width:100% !important;
     max-width:none !important;
-    min-height:100% !important;
+    min-height:0 !important;
     margin:0 !important;
 }
 
@@ -1263,7 +1263,6 @@
 
 #game-stage .home-feature-modal-box,
 #game-stage .item-modal-box,
-#game-stage .inventory-classic-shell,
 #game-stage .creation-skill-detail-box,
 #game-stage .modal-box,
 .v169-rpg-dialog,

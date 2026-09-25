@@ -997,8 +997,7 @@ function showRewardedAd(
            ★ 模擬廣告播放（目前狀態）：
            顯示提示、等1.5秒、直接視為
            看完成功。純粹是為了讓「雙倍
-           獎勵」這類邏輯現在就能測試，
-           不是真的廣告。
+           獎勵」這類邏輯現在就能測試，           不是真的廣告。
         */
 
         addBattleLog(
@@ -1997,8 +1996,7 @@ function getBaseStats(){
             player.bonusSP,
 
         attack:
-            BASE_PHYSICAL_ATTACK+
-            Math.max(1,Number(player.level)||1)*ATTACK_PER_LEVEL+
+            BASE_PHYSICAL_ATTACK+            Math.max(1,Number(player.level)||1)*ATTACK_PER_LEVEL+
             player.attack*ATTACK_PER_POINT,
 
         defense:
@@ -2997,8 +2995,7 @@ const forestMonsters = [
     makeZoneMonster("哥布林",3,"fire"),
     makeZoneMonster("史萊姆",2,"water"),
     makeZoneMonster("哥布林",3,"fire"),
-    makeZoneMonster("史萊姆",2,"water"),
-    makeZoneMonster("哥布林",3,"fire"),
+    makeZoneMonster("史萊姆",2,"water"),    makeZoneMonster("哥布林",3,"fire"),
     makeZoneMonster("史萊姆",2,"water")
 
 ];
@@ -3997,8 +3994,7 @@ const characterSkillLoadouts = {
 };
 
 
-/* =====================================================
-   角色
+/* =====================================================   角色
 ===================================================== */
 
 const characters = [
@@ -4998,8 +4994,6 @@ function getStatusCharacterObject(){
     return player;
 
 }
-
-
 let currentSkillCharacter =
     "fire";
 
@@ -5998,7 +5992,6 @@ function creationAdd(stat,amount){
         creationStats[stat]++;
 
         creationPoints--;
-
     }
     else{
 
@@ -6999,7 +6992,6 @@ function saveGame(options={}){
 
             commissionQuestState:
                 commissionQuestState,
-
             bestiaryData:
                 bestiaryData,
 
@@ -7998,8 +7990,7 @@ function loadGame(){
            導覽列、真的觸發一次showPage()，
            標題列才會消失。這裡補上，讀檔
            成功、遊戲畫面顯示出來的同時，
-           就正確套用一次。
-        */
+           就正確套用一次。        */
 
         showPage(
             "home"
@@ -8998,8 +8989,7 @@ function updateTrainingZoneLocks(){
 
     const lockableZones=[
 
-        {key:"desert",itemId:"trainingZoneItem_desert"},
-        {key:"ice",itemId:"trainingZoneItem_ice"},
+        {key:"desert",itemId:"trainingZoneItem_desert"},        {key:"ice",itemId:"trainingZoneItem_ice"},
         {key:"zone4",itemId:"trainingZoneItem_zone4"},
         {key:"zone5",itemId:"trainingZoneItem_zone5"},
         {key:"zone6",itemId:"trainingZoneItem_zone6"},
@@ -9997,10 +9987,8 @@ function runAutoPatrolCheck(){
                         transitionGeneration!==patrolLifecycleGeneration ||
                         !autoPatrolEnabled ||
                         !isPatrolMapActive()
-                    ){
-                        return;
+                    ){                        return;
                     }
-
 
                     /*
                        ★ 修正（依照使用者回報，
@@ -11001,7 +10989,6 @@ function startBattle(triggerIndex){
 
     }
 
-
     /*
        ★ 隨機決定這場戰鬥捲入幾隻怪物（1～3隻），
        觸發的那隻一定在裡面，
@@ -12000,7 +11987,6 @@ function clearBattleTargetSelectionMode(){
     if(region){
         region.classList.remove("target-selecting");
     }
-
     document
         .querySelectorAll(
             ".battle-monster.targetable, .battle-monster.target, "+
@@ -12999,7 +12985,6 @@ function getMonsterAgility(monster){
             monster,
             "agilityDown"
         );
-
     const statDown=
         getStatDownPercentFor(
             monster,
@@ -14000,7 +13985,6 @@ const STATUS_HIT_MAX_PERCENT = 95;
    分三個等級各自的上下限）：
    鎖死行動類技能（冰封/石化）依目標怪物
    稀有度使用普通80%、精英60%、BOSS40%的上限。
-
    怎麼判斷一隻怪物是「野怪」還是「精英怪」：
    看getMonsterRank()——目前規則很單純，
    名字結尾是「王」就算精英怪，其餘都算
@@ -14998,10 +14982,8 @@ function applyOutgoingDamageReduction(damage,attacker){
     if(numericDamage<=0){
         return 0;
     }
-
     const downPercent=getOutgoingDamageDownPercent(attacker);
-    if(downPercent<=0){
-        return Math.floor(numericDamage);
+    if(downPercent<=0){        return Math.floor(numericDamage);
     }
 
     return Math.max(
@@ -16000,8 +15982,7 @@ function tickStatusEffects(){
                                     targetStats.maxHP*
                                     effect.percent/
                                     100*
-                                    burnMultiplier
-                                )
+                                    burnMultiplier                                )
                             );
 
 
@@ -17001,7 +16982,6 @@ function getActivePlayerCharacters(){
 
 
 function castBuffSkill(skillId,targetIndex){
-
     const skill=skillDatabase[skillId];
 
     if(!battleActive || !skill){ return; }
@@ -18000,8 +17980,7 @@ function finishPlayerAction(){
    ★ 修正（敏捷排序系統）：
    原本的monsterTurn()是「一次把所有怪物
    都打過一輪」的批次處理函式，
-   跟現在「玩家、怪物混在同一份行動順序清單裡
-   輪流行動」的架構不相容了。
+   跟現在「玩家、怪物混在同一份行動順序清單裡   輪流行動」的架構不相容了。
    改寫成processSingleMonsterAttack()，
    一次只處理「這一隻」怪物的攻擊，
    打完呼叫finishPlayerAction()
@@ -19002,7 +18981,6 @@ function winBattle(){
 
     battleToken++;
 
-
     /*
        ★ 新增（依照使用者要求，每日任務
        「打贏1場戰鬥」）：勝利結算這裡是
@@ -19997,12 +19975,10 @@ function useDefend(){
 
     /*
        ★ 修正（重要，依照使用者明確指正）：
-       防禦之前是「按了就立刻生效」，
-       跳過宣告/結算流程。
+       防禦之前是「按了就立刻生效」，       跳過宣告/結算流程。
        現在改成跟其他行動一樣先宣告、
        等結算階段照敏捷順序才真正生效——
-       雖然防禦本身「保護的是接下來受到的傷害」，
-       不太受順序影響，但玩家明確要求
+       雖然防禦本身「保護的是接下來受到的傷害」，       不太受順序影響，但玩家明確要求
        「所有行動都要遵循同一套宣告/結算機制」，
        不要有防禦這種特例，這裡就照做。
     */
@@ -21001,8 +20977,7 @@ function closeAutoBattleSettings(){
            關閉的時候搬回battlePage裡原本的
            位置，並把floating-modal這個class
            拿掉，恢復成原本在戰鬥頁面裡
-           的定位方式。不這樣做的話，面板會
-           永遠留在body底下，下次在戰鬥頁面
+           的定位方式。不這樣做的話，面板會           永遠留在body底下，下次在戰鬥頁面
            裡打開時，版面會跑掉。
         */
 
@@ -22003,7 +21978,6 @@ function castPlayer2Skill(skillId,centerIndex){
         :
         skill.cost;
 
-
     if(player2.sp<spCost){
 
         finishPlayerAction();
@@ -23001,7 +22975,6 @@ function renderBattle(){
 
 
     renderPlayers();
-
     const bossPresentationOwner=typeof window!=="undefined"?window.FourSymbolsBossBattle:null;
     if(bossPresentationOwner&&typeof bossPresentationOwner.syncHud==="function"){
         bossPresentationOwner.syncHud();
@@ -24001,7 +23974,6 @@ function spawnFireSparkBurst(
     const sparkCount=
         8;
 
-
     for(
         let i=0;
         i<sparkCount;
@@ -24997,13 +24969,11 @@ function checkLevelUp(targetCharacter){
     if(levels>0){
 
         /*
-           ★ 修正：
-           這裡跟之前戰鬥勝利補血是同一種問題——
+           ★ 修正：           這裡跟之前戰鬥勝利補血是同一種問題——
            升級當下直接把HP/SP強制補滿，
            跟你設定的「HP低於X%/SP低於X%」
            自動補藥水門檻完全無關，
-           難怪你會覺得「明明還沒到門檻，
-           它自己就補了」。
+           難怪你會覺得「明明還沒到門檻，           它自己就補了」。
 
            拿掉強制補滿，只重新計算一次
            current hp/sp的上限夾住（避免超過新的maxHP/maxSP），
@@ -26002,7 +25972,6 @@ function closeHomeFeature(){
 
     const releaseUpdate=
         window.FourSymbolsReleaseUpdate;
-
     if(
         releaseUpdate&&
         typeof releaseUpdate.shouldPreventSharedModalClose==="function"&&
@@ -27002,8 +26971,7 @@ function formatQuestReward(reward){
     if(reward.gold){
         parts.push(
             "金幣 "+reward.gold
-        );
-    }
+        );    }
 
     if(reward.exp){
         parts.push(
@@ -28001,7 +27969,6 @@ function claimAchievement(achievementId){
             achievement.reward.gold;
 
     }
-
 
     updateGoldDisplay();
 
@@ -29002,8 +28969,7 @@ function updateStatusPreview(){
        跟主城、背包頁看到的邏輯一致。
     */
 
-    const equipmentBonus =
-        getEquipmentBonus(
+    const equipmentBonus =        getEquipmentBonus(
             getPartyCharacterKey(
                 getPartyCharacterIndex(targetCharacter)
             )
@@ -29998,13 +29964,11 @@ function renderSkillLoadout(){
        選單都會自動跟上，不用每個呼叫renderSkillLoadout()
        的地方都各自記得再呼叫一次。
     */
-
     populateAutoSkillOptions();
 
     populateAutoSkillOptions2();
 
 }
-
 
 /*
    組出技能目前等級的效果文字說明，
@@ -31003,8 +30967,7 @@ function renderInventoryItems(){
 
         if(item){
             box.innerHTML+=`<div class="inventory-icon">${item.icon || "◆"}</div><div class="inventory-count">${item.count>1 ? "×"+item.count : ""}</div>`;
-            const realIndex=inventoryItems.indexOf(item);
-            box.onclick=()=>openItemModal(realIndex);
+            const realIndex=inventoryItems.indexOf(item);            box.onclick=()=>openItemModal(realIndex);
         }else{
             box.innerHTML+='<div class="inventory-empty-dot">·</div>';
         }
@@ -31017,10 +30980,7 @@ function renderInventoryItems(){
         tab.setAttribute("aria-selected",active ? "true" : "false");
     });
 
-    if(typeof window!=="undefined"){
-        if(typeof window.v17351SyncInventoryQa==="function"){ window.v17351SyncInventoryQa(); }
-        if(typeof window.v17363SyncFunctionalFixes==="function"){ window.v17363SyncFunctionalFixes(); }
-    }
+    if(typeof window!=="undefined"&&typeof window.v17363SyncFunctionalFixes==="function"){ window.v17363SyncFunctionalFixes(); }
 }
 
 function renderInventory(){
@@ -32005,7 +31965,6 @@ async function sellSelectedItem(){
        是空頭支票。現在真的有gold這個共用
        資源了，這裡補上真正的加值。
     */
-
     gold=
         gold+
         price;
@@ -33005,8 +32964,7 @@ function applyMapZoneBackground(zoneKey){
 
 
     if(!bgLayer){
-        return;
-    }
+        return;    }
 
 
     const imageUrl=
@@ -34005,8 +33963,7 @@ try{
 
     startAutoSave();
 
-}
-catch(error){
+}catch(error){
 
     console.error(
         "自動存檔啟動失敗：",

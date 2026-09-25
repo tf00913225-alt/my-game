@@ -2,7 +2,7 @@
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const read=p=>fs.readFileSync(p,"utf8");
-const inventoryCss=read("css/38-v141-system-expansion.css");
+const inventoryCss=read("css/22-stage-v78-character-inventory-core.css");
 const abyssCss=read("css/50-v169-abyss-flow.css");
 const inventoryJs=read("js/35-v141-ui-battle.js");
 const battle=read("js/54-v173.51-battle-qa.js");
