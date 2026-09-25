@@ -1395,6 +1395,15 @@
     z-index:200 !important;
 }
 
+#game-stage > #app.inventory-overlay-open > #game-content #bottomNav,
+#game-stage > #app.inventory-overlay-open > #game-content #mapPageNav,
+#game-stage > #app.inventory-overlay-open > #game-content #v141DungeonNav,
+#game-stage > #app.on-inventory-page > #game-content #bottomNav,
+#game-stage > #app.on-inventory-page > #game-content #mapPageNav,
+#game-stage > #app.on-inventory-page > #game-content #v141DungeonNav{
+    display:none !important;
+}
+
 html.inventory-scroll-active,
 body.inventory-scroll-active,
 #game-viewport.inventory-scroll-active,
@@ -1403,7 +1412,7 @@ body.inventory-scroll-active,
 }
 
 #game-stage #app.on-inventory-page .content{
-    bottom:84px !important;
+    bottom:0 !important;
     overflow:hidden !important;
     touch-action:pan-y !important;
     padding:0 !important;
@@ -9025,21 +9034,48 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     bottom:10px;
     z-index:18065 !important;
     gap:3px;
+    overflow:visible !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar .skill-quick-close{
     flex-basis:28px;
     height:28px;
     line-height:26px;
 }
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar .skill-quick-grid{gap:4px;}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar .skill-quick-grid{
+    gap:4px;
+    overflow:visible !important;
+}
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar .skill-quick-button{
-    min-height:62px;
+    min-height:82px;
     padding:4px 2px;
+    overflow:visible !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar .skill-quick-button .sq-icon-wrap{
     width:34px;
     height:34px;
     flex-basis:34px;
+}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar .skill-quick-button .sq-name{
+    display:block !important;
+    min-height:15px !important;
+    font-size:11px !important;
+    line-height:15px !important;
+    overflow:visible !important;
+    text-overflow:clip !important;
+}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar .skill-quick-button .sq-cost{
+    display:block !important;
+    min-height:14px !important;
+    font-size:10px !important;
+    line-height:14px !important;
+}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar .skill-quick-button .v135-sq-scope{
+    display:block !important;
+    min-height:13px !important;
+    color:#f6d58a !important;
+    font-size:10px !important;
+    line-height:13px !important;
+    white-space:nowrap !important;
 }
 
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion.target-selecting > .turn-target-row{
