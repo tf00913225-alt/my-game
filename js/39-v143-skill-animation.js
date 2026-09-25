@@ -783,7 +783,7 @@
             const damage=statusPercent(entry,"critDamageBonusPercent","bonusPercent");
             return "爆擊率 +"+chance+"%，爆擊傷害 +"+damage+"%";
         }
-        if(type==="frostbite"){ return "傷害 -25%、最終閃躲 -25個百分點、最終異常狀態抗性 -25個百分點"; }
+        if(type==="frostbite"){ return "傷害 -30%、最終閃躲 -25個百分點、最終異常狀態抗性 -25個百分點"; }
         if(type==="freeze"){ return "無法行動"; }
         if(type==="agilityDown"){ return "敏捷降低 "+value+"%、最終閃躲降低 "+value+"個百分點"; }
         if(type==="damageDown"){ return "造成傷害降低 "+value+"%"; }

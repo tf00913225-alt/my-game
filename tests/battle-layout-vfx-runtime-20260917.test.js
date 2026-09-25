@@ -8,8 +8,7 @@ const index=fs.readFileSync("index.html","utf8");
 const layoutCss=fs.readFileSync("css/fixed-slot-battlefield-rendering-v2.css","utf8");
 const vfx=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const timing=fs.readFileSync("js/37-v142-skill-animation.js","utf8");
-const fireWindEarthRules=fs.readFileSync("js/43-v149-skill-ui-rules.js","utf8");
-const waterRules=fs.readFileSync("js/50-v169-water-skill-rules.js","utf8");
+const finalSkillData=fs.readFileSync("js/60-v173.64-skill-progression-rebalance.js","utf8");
 const bossSystem=fs.readFileSync("js/gameplay-boss-tower-system.js","utf8");
 const relicRuntime=fs.readFileSync("js/60-team-relic-system.js","utf8");
 const relicCss=fs.readFileSync("css/55-team-relic-system.css","utf8");
@@ -17,7 +16,9 @@ const legacyBattleCss=fs.readFileSync("css/12-stage-v45-battle-black-overlay-ski
 const v143Css=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");
 
 function sourceTargetType(source,id){
-    const start=source.indexOf(id+":{");
+    const ownerStart=source.indexOf("const FINAL_REBALANCE_DATA");
+    assert.ok(ownerStart>=0,"missing formal Skill Data Owner");
+    const start=source.indexOf(id+":{",ownerStart);
     assert.ok(start>=0,"missing final rule for "+id);
     const block=source.slice(start,start+700);
     const match=block.match(/targetType:"([^"]+)"/);
@@ -61,7 +62,9 @@ const ELEMENT_DAMAGE_SKILLS={
 };
 
 for(const [element,groups] of Object.entries(ELEMENT_DAMAGE_SKILLS)){
-    const rules=element==="water"?waterRules:fireWindEarthRules;
+    // V173.64 is the sole player Skill Data Owner; V149/V169 only retain
+    // compatibility runtime and must never be treated as a data source.
+    const rules=finalSkillData;
     for(const id of groups.single){
         const targetType=sourceTargetType(rules,id);
         assert.equal(targetType,"single",id+" final target type");
