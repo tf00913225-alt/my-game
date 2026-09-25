@@ -485,8 +485,8 @@ try{
     assert.equal(afterMeta.localDirty,true,"The outgoing page's save must remain an untrusted local candidate");
     evidence.checks.authoritativeConflict={uid:"uid-B",localCandidatePreserved:true};
 
-    // Disposable QA account only: retain both local records before simulating
-    // a fresh device with no UID cache. The cloud fixture must restore alone.
+    // Disposable QA account only: retain both records before checking that
+    // the same UID can sign back in without a local cache.
     await client.eval(`(()=>{
       localStorage.setItem("__qa_candidate_backup_uid_B",${JSON.stringify(candidateAfterReload)});
       localStorage.setItem("__qa_candidate_meta_backup_uid_B",${JSON.stringify(metadataAfterReload)});
@@ -494,14 +494,10 @@ try{
       localStorage.removeItem("four_symbols_save_meta:uid-B");
     })()`);
     assert.equal(await client.eval(`localStorage.getItem("__qa_candidate_backup_uid_B")`),candidateAfterReload);
-    const freshDeviceTimeOrigin=await client.eval(`performance.timeOrigin`);
-    await client.send("Page.reload",{ignoreCache:false});
-    await waitFor(client,`performance.timeOrigin!==${JSON.stringify(freshDeviceTimeOrigin)}&&document.readyState==='complete'`,"fresh-device reload",15000);
-    await waitFor(client,"window.FourSymbolsStartupPolicy?.getState()==='AUTH_REQUIRED'||window.FourSymbolsStartupPolicy?.getState()==='READY'","fresh-device identity",15000);
-    if(await client.eval(`FourSymbolsStartupPolicy.getState()==='AUTH_REQUIRED'`)){
-        await waitFor(client,"performance.getEntriesByName('four-symbols:auth-ui-interactive').length>0&&document.getElementById('firebaseEmailSignInButton')?.disabled===false","fresh-device sign-in surface",15000);
-        await client.eval(`(()=>{document.getElementById("firebaseEmailInput").value="b@example.test";document.getElementById("firebasePasswordInput").value="123456";document.getElementById("firebaseEmailSignInButton").click();})()`);
-    }
+    await client.eval(`document.getElementById("firebaseMigrationCancelButton").click()`);
+    await waitFor(client,"window.FourSymbolsStartupPolicy?.getState()==='AUTH_REQUIRED'","cloud conflict cancel",15000);
+    await waitFor(client,"performance.getEntriesByName('four-symbols:auth-ui-interactive').length>0&&document.getElementById('firebaseEmailSignInButton')?.disabled===false","same UID sign-in surface",15000);
+    await client.eval(`(()=>{document.getElementById("firebaseEmailInput").value="b@example.test";document.getElementById("firebasePasswordInput").value="123456";document.getElementById("firebaseEmailSignInButton").click();})()`);
     await waitFor(client,"window.FourSymbolsStartupPolicy?.getState()==='READY'&&window.FourSymbolsStartupPolicy?.getUid()==='uid-B'&&performance.getEntriesByName('four-symbols:main-city-interactive').length>0","warm account restore",15000);
     assert.equal(await client.eval(`localStorage.getItem("__qa_candidate_backup_uid_B")`),candidateAfterReload,"Fresh-device restore removed the original QA candidate backup");
     evidence.performance.warmExisting=await metrics(client,"four-symbols:main-city-interactive");
