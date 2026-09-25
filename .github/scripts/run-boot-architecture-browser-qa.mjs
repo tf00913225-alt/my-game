@@ -480,8 +480,9 @@ try{
     delete beforeSave.lastSaveTimestamp;delete afterSave.lastSaveTimestamp;
     assert.deepEqual(afterSave,beforeSave,"Conflict changed the locally held character, inventory or progress");
     const beforeMeta=JSON.parse(metadataBeforeReload),afterMeta=JSON.parse(metadataAfterReload);
-    delete beforeMeta.updatedAt;delete afterMeta.updatedAt;
-    assert.deepEqual(afterMeta,beforeMeta,"Conflict changed the local UID or cloud-base provenance");
+    assert.equal(afterMeta.ownerUid,beforeMeta.ownerUid,"Conflict changed the local UID");
+    assert.equal(afterMeta.cloudBaseFingerprint,beforeMeta.cloudBaseFingerprint,"Conflict changed cloud-base provenance");
+    assert.equal(afterMeta.localDirty,true,"The outgoing page's save must remain an untrusted local candidate");
     evidence.checks.authoritativeConflict={uid:"uid-B",localCandidatePreserved:true};
 
     // Disposable QA account only: retain both local records before simulating
