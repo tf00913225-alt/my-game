@@ -21,6 +21,10 @@ function damage(base,growth,level){ let result=base; for(let lv=2;lv<=level;lv++
 assert.match(spec,/const FOUR_ELEMENT_DAMAGE_SPEC=Object\.freeze/);
 assert.match(spec,/Object\.entries\(FOUR_ELEMENT_DAMAGE_SPEC\)/);
 assert.match(spec,/maxLevel=10/);
+assert.match(spec,/revive:\{[\s\S]*?requires:\["healSpell","frostCrush"\]/,
+    "water physical route can unlock revive");
+assert.match(spec,/purifyMind:\{[\s\S]*?requires:\["healSpell","frostCrush"\]/,
+    "water physical route can unlock purify");
 assert.match(main,/if\(!isBattleTargetAlive\(targetSide,index\)\)\{ return false; \}/);
 assert.doesNotMatch(main,/if\(hostileTargetType==="all"\)\{\s*queuedPlayerActions/);
 assert.match(main,/function finishBattleRoundDurations\(\)/);

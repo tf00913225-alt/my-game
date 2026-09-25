@@ -9505,7 +9505,7 @@ ensureFunctionalStyles();runRepairs();
             targetType:"allyTri",spCost:45,baseHeal:550,healPerLevel:30,
             healHpByLevel:HEAL_HP_BY_LEVEL.slice(),spRestorePercentByLevel:HEAL_SP_PERCENT_BY_LEVEL.slice(),cleanseAll:true
         },
-        revive:{learnLevel:20,learnCost:10,maxLevel:5,upgradeCost:1,targetType:"deadAlly",spCost:45,reviveHealPercentByLevel:[20,40,60,80,100],requires:["healSpell"],progressionGroup:"tactical"},
+        revive:{learnLevel:20,learnCost:10,maxLevel:5,upgradeCost:1,targetType:"deadAlly",spCost:45,reviveHealPercentByLevel:[20,40,60,80,100],requires:["healSpell","frostCrush"],progressionGroup:"tactical"},
         freeze:{
             learnLevel:25,learnCost:14,maxLevel:5,upgradeCost:1,requires:["iceSpin","iceArrowRain"],progressionGroup:"tactical",
             targetType:"column",targetTypeAtMaxLevel:"tri",spCost:32,
@@ -9513,7 +9513,7 @@ ensureFunctionalStyles();runRepairs();
         },
         purifyMind:{
             learnLevel:35,learnCost:18,maxLevel:3,upgradeCost:1,requires:["healSpell"],progressionGroup:"tactical",
-            targetType:"ally",enemyTargetAllowed:true,spCost:22,removeAllStates:true,
+            targetType:"ally",enemyTargetAllowed:true,spCost:22,removeAllStates:true,requires:["healSpell","frostCrush"],
             targetCountByLevel:PURIFY_TARGET_COUNT_BY_LEVEL.slice()
         },
         waterEX:{learnLevel:50,learnCost:20,maxLevel:1,targetType:"none",damageBonusPercent:5,healBonusPercent:10,turnStartCleanseChance:30,progressionGroup:"ex"},
