@@ -177,11 +177,13 @@ async function createQaServer(){
     const server=http.createServer(async(request,response)=>{
         try{
             const url=new URL(request.url,"http://127.0.0.1");
-            // Preload requests can arrive without Sec-Fetch-Dest: script and
-            // otherwise cache the real hashed module for the next navigation.
-            if(url.pathname===authPath){response.writeHead(200,{"content-type":"text/javascript; charset=utf-8","cache-control":"no-store"});response.end(fakeAuth);return;}
-            if(url.pathname===cloudPath){response.writeHead(200,{"content-type":"text/javascript; charset=utf-8","cache-control":"no-store"});response.end(fakeCloud);return;}
-            if(url.pathname===sessionPath){response.writeHead(200,{"content-type":"text/javascript; charset=utf-8","cache-control":"no-store"});response.end(fakeSession);return;}
+            const fetchDest=String(request.headers["sec-fetch-dest"]||"");
+            const qaModule=url.pathname===authPath||url.pathname===cloudPath||url.pathname===sessionPath;
+            // Resource integrity checks need the real bytes. Do not cache them:
+            // a warm navigation must execute the mock, not the checked asset.
+            if(url.pathname===authPath&&fetchDest==="script"){response.writeHead(200,{"content-type":"text/javascript; charset=utf-8","cache-control":"no-store"});response.end(fakeAuth);return;}
+            if(url.pathname===cloudPath&&fetchDest==="script"){response.writeHead(200,{"content-type":"text/javascript; charset=utf-8","cache-control":"no-store"});response.end(fakeCloud);return;}
+            if(url.pathname===sessionPath&&fetchDest==="script"){response.writeHead(200,{"content-type":"text/javascript; charset=utf-8","cache-control":"no-store"});response.end(fakeSession);return;}
             const relative=decodeURIComponent(url.pathname==="/"?"index.html":url.pathname.slice(1));
             if(relative==="index.html"){ activeScenario=url.searchParams.get("scenario")||""; injected404=false; }
             // resource-404 is injected in-page so retry behavior is deterministic per navigation.
@@ -195,7 +197,7 @@ async function createQaServer(){
                 body=Buffer.from(body.toString("utf8").replace("<!-- build:critical-script -->",qaPrelude()+"\n<!-- build:critical-script -->"));
             }
             const immutable=/\.[0-9a-f]{12}\.(?:js|css|webp)$/.test(relative);
-            response.writeHead(200,{"content-type":mime(file),"cache-control":immutable?"public, max-age=31536000, immutable":"no-cache"});
+            response.writeHead(200,{"content-type":mime(file),"cache-control":qaModule?"no-store":immutable?"public, max-age=31536000, immutable":"no-cache"});
             response.end(body);
         }catch(error){response.writeHead(500);response.end(String(error&&error.stack||error));}
     });
