@@ -612,6 +612,13 @@
             return;
         }
 
+        /* Some formal states deliberately have gameplay/detail data without a
+           battlefield visual (stealth and fire momentum). */
+        if(spec.mode==="none"){
+            removeStatusVisual(card,side,index,type);
+            return;
+        }
+
         const host=statusIconHost(side,index,card);
         const existingIcon=statusIconNode(host,type);
         if(spec.mode==="icon"){

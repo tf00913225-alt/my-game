@@ -33,7 +33,7 @@ const STATUSES={
     damageDown:{file:"damage-down-loop.png",runtimeFile:"damage-down-icon.webp",mode:"icon",collection:"statusEffects",hash:"25e984ef5973616bc6f37cfc5842d445ff484f981a98902894febca59a92ae34"},
     stun:{file:"stun-loop.png",runtimeFile:"stun.webp",mode:"pulse",collection:"statusEffects",hash:"45903df26e32ddc265d45217639211bb9966fb69b3a02389f07afa0500d53071"},
     dodgeSkill:{file:"dodge-skill-loop.png",runtimeFile:"windwalk.webp",mode:"pulse",collection:"activeBuffs",hash:"397338dc6fc01967de860e285c1f65febe5248f0a111c01f789dfb676c141c5b"},
-    stealthSkill:{file:"stealth-skill-loop.png",runtimeFile:"stealth.webp",mode:"static",collection:"activeBuffs",hash:"58523f3066068e2d7a784c309fe072c3cbb92361a0d703ed8b4d9b1da4a0a02b"},
+    stealthSkill:{file:"stealth-skill-loop.png",runtimeFile:"",mode:"none",collection:"activeBuffs",hash:"58523f3066068e2d7a784c309fe072c3cbb92361a0d703ed8b4d9b1da4a0a02b"},
     dinghaishenzhen:{file:"dinghaishenzhen-loop.png",runtimeFile:"calm-mind.webp",mode:"pulse",collection:"activeBuffs",hash:"3607d280f4ff4092d80b8ead216e410425815a4996b22437af556bf28673f31b"}
 };
 
@@ -322,7 +322,7 @@ test("all eleven casts keep Sprite timing while six persistent states use low-mo
         assert.deepEqual(Array.from([visual.cropColumns,visual.cropRows]),[1,1],type);
         assert.equal(
             visual.src,
-            spec.mode==="icon"?"":"assets/vfx/status/"+spec.runtimeFile,
+            spec.mode==="icon"||spec.mode==="none"?"":"assets/vfx/status/"+spec.runtimeFile,
             type
         );
         assert.equal(visual.frames,undefined,type+" must not own a persistent frame loop");
@@ -521,7 +521,8 @@ test("persistent status visuals start only on success, survive duplicate MISS, a
 
     applied.party[1].activeBuffs.push({type:"stealthSkill",turnsLeft:2});
     applied.context.v143SyncStatusVisualEffects();
-    assert.ok(applied.cards.battlePlayerCard1.querySelector(".v143-status-visual-stealthSkill"));
+    assert.equal(applied.cards.battlePlayerCard1.querySelector(".v143-status-visual-stealthSkill"),null,
+        "stealth state has no Body Status Visual; artwork opacity is its sole battle presentation");
     applied.context.v142SkillAnimationDirector.dispose();
     assert.equal(applied.body.querySelectorAll(".v143-status-visual").length,0,"battle disposal clears body visuals");
     assert.equal(applied.body.querySelectorAll(".v143-status-icon").length,0,"battle disposal clears status icons");
