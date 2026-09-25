@@ -494,8 +494,9 @@ try{
       localStorage.removeItem("four_symbols_save_meta:uid-B");
     })()`);
     assert.equal(await client.eval(`localStorage.getItem("__qa_candidate_backup_uid_B")`),candidateAfterReload);
+    const conflictTimeOrigin=await client.eval(`performance.timeOrigin`);
     await client.eval(`document.getElementById("firebaseMigrationCancelButton").click()`);
-    await waitFor(client,"window.FourSymbolsStartupPolicy?.getState()==='AUTH_REQUIRED'","cloud conflict cancel",15000);
+    await waitFor(client,`performance.timeOrigin!==${JSON.stringify(conflictTimeOrigin)}&&window.FourSymbolsStartupPolicy?.getState()==='AUTH_REQUIRED'`,"cloud conflict cancel and signed-out reload",20000);
     await waitFor(client,"performance.getEntriesByName('four-symbols:auth-ui-interactive').length>0&&document.getElementById('firebaseEmailSignInButton')?.disabled===false","same UID sign-in surface",15000);
     await client.eval(`(()=>{document.getElementById("firebaseEmailInput").value="b@example.test";document.getElementById("firebasePasswordInput").value="123456";document.getElementById("firebaseEmailSignInButton").click();})()`);
     await waitFor(client,"window.FourSymbolsStartupPolicy?.getState()==='READY'&&window.FourSymbolsStartupPolicy?.getUid()==='uid-B'&&performance.getEntriesByName('four-symbols:main-city-interactive').length>0","warm account restore",15000);
