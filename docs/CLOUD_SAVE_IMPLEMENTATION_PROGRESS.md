@@ -2,6 +2,27 @@
 
 本文件是長期工程進度來源。**每個 Phase 結束都必須更新本文件**；聊天、Commit、PR、CI 或部署成功不能取代驗收紀錄。
 
+## 2026-09-26 — architecture hardening work branch (not yet verified)
+
+- Start base `dev@727279ee0653803c07179e0ff43a1a1b2cb992f8`; discovered Architecture Contract Drift: `DATA_SECURITY_CONTRACTS.md` absent at base. Current branch adds the contract and a 34-entry persisted-state inventory with CI guard; PR, emulator, merge and deployment status must be recorded after execution.
+- Candidate source at base was `battle_full_version_save_v5` while the immutable copy came from `four_symbols_save:<UID>`. Candidate submission is being changed to an explicit sealed backup ID and raw bundle with SHA-256 consistency checks. Previously submitted unbundled history remains untrusted and blocked; this does not accept a character. The backup inventory also adds the previously omitted `patrol-character-index` preference.
+- Old Phase 1–3 acceptance evidence remains historical. Phase 4 remains **IN PROGRESS / 0/6 VERIFIED**. The grant reservation candidate is a partial prerequisite, not an awarded balance and not Phase 5–7 completion. A passing CI or Firebase deploy cannot certify full character restore.
+
+### Dependency order (preserving original Phase 4–10 history above)
+
+1. Foundation A: persisted-state registry, sealed backup manifest and source unification.
+2. Foundation B: canonical server character schema and materialized playable snapshot design.
+3. Foundation C: operation ID, idempotency, receipt, ledger, expected revision and transaction implemented **together with the first balance/EXP/item mutation**. Old Phase 6/7 cannot wait until after old Phase 5 award writes.
+4. Foundation D: server-issued run/attempt and reward settlement sources.
+5. Foundation E: durable server backup, recovery points and audited restore (old Phase 8 moves ahead of migration acceptance).
+6. Foundation F: one-time local-history acceptance with explicit owner confirmation and claim blocking.
+7. Foundation G: complete schema and claims gate `authoritativeStateReady:true` only after restore rehearsal.
+8. Foundation H: fresh-device full-character recovery acceptance (old Phase 4 success gate).
+9. Foundation I: payment/refund entitlements (old Phase 9).
+10. Foundation J: destructive/disaster/multi-device tests throughout and final release gate (old Phase 10).
+
+`docs/OFFLINE_AUTHORITY_POLICY.md` and `docs/CLOUD_CANONICAL_SCHEMA_AND_RECOVERY.md` specify the provisional offline paths and restoration gates. Firestore region/PITR/scheduled backup, App Check enforcement, Google guest linking and WIF are unimplemented; an anonymous→Google UID-switch guard is implemented but link/merge remains unavailable.
+
 ## 2026-09-25 — Historical reward-claim proof gate (candidate)
 
 - `functions/src/legacy-reward-claim-audit.js` is a pure, fail-closed parser for the five claim-bearing main-save areas: daily quests, commissions, achievements, tower floors and Abyss first-clear/chest records. A structurally valid historical `claimed` entry is classified only as `block_historical_claims_only`; it is never a grant entitlement, balance change or accepted cloud state. Missing, malformed or contradictory records receive a source-specific `*_CLAIM_RECORD_INVALID` blocker.

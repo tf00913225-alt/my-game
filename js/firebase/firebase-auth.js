@@ -104,6 +104,11 @@ export function getSignedInUser(){
 
 export async function signInWithGoogle(){
     const { auth } = await initializeFirebaseAuth();
+    if(auth.currentUser?.isAnonymous){
+        // signInWithPopup would switch to another UID, hiding the guest's
+        // character. Provider linking requires an explicit conflict flow.
+        throw Object.assign(new Error("Guest account linking is not ready."),{code:"auth/guest-link-required"});
+    }
     const provider = new GoogleAuthProvider();
     const credential = await signInWithPopup(auth, provider);
     return completedSignIn(credential);

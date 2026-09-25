@@ -77,8 +77,24 @@ await rejected("createGameSession",a.idToken,{uid:x},"SESSION_REAUTH_REQUIRED");
 const replaced=(await db.doc(`serverUsers/${x}/sessions/${sessionA.sessionId}`).get()).data();
 assert.equal(replaced.status,"revoked"); assert.ok(replaced.revokedAt.toMillis()>=recordA.createdAt.toMillis());
 const candidate={version:6,player:{id:"session-emulator-test",level:1},gold:0,sharedExp:0};
+const sidecarNames=["element-box-state","daily-dungeon-state","exp-pool-growth-state",
+    "rested-exp-state","progress","announcement-read","quest-milestones",
+    "task-tracker","legacy-abyss-state","equipment-shop-daily","bulk-sell-quality",
+    "equipment-shop-purchases","abyss-state","patrol-character-index"];
+const digest=value=>createHash("sha256").update(value,"utf8").digest("hex");
+function sealedBackup(save){
+    const sidecars=Object.fromEntries(sidecarNames.map(name=>[name,{status:"missing",raw:null}]));
+    const mainRaw=JSON.stringify(save),metadataRaw=JSON.stringify({ownerUid:x});
+    const mainFingerprint="v1:1:"+"a".repeat(32),sidecarManifestFingerprint="v1:1:"+"b".repeat(32);
+    return {schemaVersion:2,ownerUid:x,
+        backupId:`four_symbols_migration_backup:${x}:${mainFingerprint}:${sidecarManifestFingerprint}`,
+        mainFingerprint,sidecarManifestFingerprint,mainRaw,metadataRaw,sidecars,
+        sidecarManifestSha256:digest(JSON.stringify(sidecars)),
+        backupSha256:digest(JSON.stringify({ownerUid:x,mainRaw,metadataRaw,sidecars}))};
+}
+
 await rejected("bootstrapCloudSave",a.idToken,{uid:x,session:sessionA},"SESSION_REVOKED");
-await rejected("submitLegacyMigrationCandidate",a.idToken,{uid:x,session:sessionA,save:candidate},"SESSION_REVOKED");
+await rejected("submitLegacyMigrationCandidate",a.idToken,{uid:x,session:sessionA,expectedRevision:1,backup:sealedBackup(candidate)},"SESSION_REVOKED");
 assert.equal((await db.doc(`users/${x}/saves/current`).get()).exists,false);
 const bootstrap=await invoke("bootstrapCloudSave",b.idToken,{uid:x,session:sessionB});
 assert.equal(bootstrap.envelopeSchemaVersion,2); assert.equal(bootstrap.serverRevision,1);
@@ -106,20 +122,24 @@ assert.equal((await db.doc(`users/${x}/saves/current`).get()).get("serverRevisio
 await rejected("saveCloudPreferences",b.idToken,{uid:x,session:sessionB,expectedRevision:1,preferences},"CLOUD_REVISION_CONFLICT");
 await rejected("saveCloudPreferences",b.idToken,{uid:x,session:sessionB,expectedRevision:2,preferences:{...preferences,autoConfig:{...config,skill:"x",gold:10}}},"INVALID_ARGUMENT");
 assert.equal((await db.doc(`users/${x}/saves/current`).get()).get("serverRevision"),2);
-const firstCandidate=await invoke("submitLegacyMigrationCandidate",b.idToken,{uid:x,session:sessionB,save:candidate});
+await rejected("submitLegacyMigrationCandidate",b.idToken,{uid:x,session:sessionB,save:candidate,expectedRevision:2},"INVALID_ARGUMENT");
+const firstCandidate=await invoke("submitLegacyMigrationCandidate",b.idToken,{uid:x,session:sessionB,expectedRevision:2,backup:sealedBackup(candidate)});
 assert.equal(firstCandidate.revision,1);assert.equal(firstCandidate.unchanged,false);
 const candidateRoot=`serverUsers/${x}/migrationCandidates`;
 const original=(await db.doc(`${candidateRoot}/1`).get()).data();
+assert.equal(original.backup.mainRaw,JSON.stringify(candidate));
+assert.equal(original.backupSha256,sealedBackup(candidate).backupSha256);
 assert.equal(original.trusted,false);assert.deepEqual(original.snapshot,candidate);
 assert.equal((await db.doc(`${candidateRoot}/latest`).get()).get("fingerprint"),original.fingerprint);
-const retry=await invoke("submitLegacyMigrationCandidate",b.idToken,{uid:x,session:sessionB,save:candidate});
+const retry=await invoke("submitLegacyMigrationCandidate",b.idToken,{uid:x,session:sessionB,expectedRevision:2,backup:sealedBackup(candidate)});
 assert.equal(retry.unchanged,true);assert.equal(retry.revision,1);assert.equal(retry.serverRevision,firstCandidate.serverRevision);
 assert.equal((await db.doc(`users/${x}/saves/current`).get()).get("serverRevision"),firstCandidate.serverRevision);
-await rejected("submitLegacyMigrationCandidate",b.idToken,{uid:x,session:sessionB,save:{...candidate,gold:1}},"RESOURCE_EXHAUSTED");
+await rejected("submitLegacyMigrationCandidate",b.idToken,{uid:x,session:sessionB,expectedRevision:firstCandidate.serverRevision,backup:sealedBackup({...candidate,gold:1})},"RESOURCE_EXHAUSTED");
 assert.equal((await db.doc(`${candidateRoot}/2`).get()).exists,false);
 // Emulator-only time shift avoids waiting through the production rate limit.
 await db.doc(`${candidateRoot}/latest`).update({submittedAt:Timestamp.fromMillis(1)});
-const secondCandidate=await invoke("submitLegacyMigrationCandidate",b.idToken,{uid:x,session:sessionB,save:{...candidate,gold:1}});
+await rejected("submitLegacyMigrationCandidate",b.idToken,{uid:x,session:sessionB,expectedRevision:1,backup:sealedBackup({...candidate,gold:1})},"CLOUD_REVISION_CONFLICT");
+const secondCandidate=await invoke("submitLegacyMigrationCandidate",b.idToken,{uid:x,session:sessionB,expectedRevision:firstCandidate.serverRevision,backup:sealedBackup({...candidate,gold:1})});
 assert.equal(secondCandidate.revision,2);assert.equal(secondCandidate.unchanged,false);
 assert.deepEqual((await db.doc(`${candidateRoot}/1`).get()).data().snapshot,candidate);
 assert.equal((await db.doc(`${candidateRoot}/2`).get()).get("snapshot.gold"),1);

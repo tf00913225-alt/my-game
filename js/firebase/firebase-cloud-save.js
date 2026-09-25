@@ -56,33 +56,10 @@ function requireSignedInUid(){
     return uid;
 }
 
-function readLegacyLocalSave(){
-    let raw;
-    try{
-        raw = window.localStorage.getItem(LEGACY_LOCAL_SAVE_KEY);
-    }catch(error){
-        error.code = error.code || "firebase/local-save-unavailable";
-        throw error;
-    }
-
-    if(!raw){
-        const error = new Error("No current local save exists to submit for migration review.");
-        error.code = "firebase/local-save-missing";
-        throw error;
-    }
-
-    try{
-        const parsed = JSON.parse(raw);
-        if(!parsed || typeof parsed !== "object" || Array.isArray(parsed)){
-            throw new Error("Local save is not an object.");
-        }
-        return parsed;
-    }catch(cause){
-        const error = new Error("Current local save is not valid JSON.");
-        error.code = "firebase/local-save-invalid";
-        error.cause = cause;
-        throw error;
-    }
+async function sha256(raw){
+    const bytes=new TextEncoder().encode(raw);
+    const digest=await window.crypto.subtle.digest("SHA-256",bytes);
+    return [...new Uint8Array(digest)].map(byte=>byte.toString(16).padStart(2,"0")).join("");
 }
 
 async function callTrustedFunction(name, payload){
@@ -157,10 +134,35 @@ export async function saveLocalAutoBattlePreferences(expectedRevision){
 }
 
 export async function submitLegacyMigrationCandidate(options={}){
-    const save = readLegacyLocalSave();
+    const uid=requireSignedInUid();
+    const repository=window.FourSymbolsAccountSave;
+    if(!repository||repository.getActiveUid()!==uid){
+        throw Object.assign(new Error("Active UID changed."),{code:"ACCOUNT_CHANGED"});
+    }
+    // The caller selects a previously sealed backup. No live gameplay or legacy
+    // key is read between owner confirmation and the protected callable.
+    const backup=repository.verifyMigrationBackup(uid,options.backupKey);
+    const sidecarManifest=JSON.stringify(backup.sidecars);
+    const [backupDigest,manifestDigest]=await Promise.all([
+        sha256(JSON.stringify({ownerUid:uid,mainRaw:backup.mainRaw,
+            metadataRaw:backup.metadataRaw,sidecars:backup.sidecars})),
+        sha256(sidecarManifest)
+    ]);
+    if(requireSignedInUid()!==uid||repository.getActiveUid()!==uid){
+        throw Object.assign(new Error("Account changed during backup verification."),{code:"ACCOUNT_CHANGED"});
+    }
     const clientVersion = String(options.clientVersion || "").trim() || null;
+    if(!Number.isSafeInteger(options.expectedRevision)||options.expectedRevision<1){
+        throw Object.assign(new Error("A current cloud revision is required."),{code:"CLOUD_REVISION_REQUIRED"});
+    }
     return callTrustedFunction("submitLegacyMigrationCandidate", {
-        save,
+        expectedRevision:options.expectedRevision,
+        backup:{schemaVersion:backup.schemaVersion,backupId:backup.backupKey,
+            ownerUid:uid,mainFingerprint:backup.mainFingerprint,
+            sidecarManifestFingerprint:backup.sidecarManifestFingerprint,
+            mainRaw:backup.mainRaw,metadataRaw:backup.metadataRaw,
+            sidecars:backup.sidecars,sidecarManifestSha256:manifestDigest,
+            backupSha256:backupDigest},
         clientVersion
     });
 }

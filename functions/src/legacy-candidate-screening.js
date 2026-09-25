@@ -8,7 +8,7 @@ const CHARACTER_KEYS=["player","player2","player3"];
 const CLAIM_FIELDS=["dailyQuestState","commissionQuestState","achievementState","gameplayProgress","abyssProgress"];
 const {auditLegacyRewardClaims}=require("./legacy-reward-claim-audit.js");
 
-function screenLegacyCandidateSnapshot(save){
+function screenLegacyCandidateSnapshot(save,sidecars=null){
     const blockers=new Set();
     const characters=CHARACTER_KEYS.map(key=>save[key]).filter(value=>value!==null&&value!==undefined);
     const ids=new Set();
@@ -43,9 +43,12 @@ function screenLegacyCandidateSnapshot(save){
     }
     const rewardAudit=auditLegacyRewardClaims(save);
     rewardAudit.blockers.forEach(blocker=>blockers.add(blocker));
-    // A main-save candidate has no complete, independently backed-up sidecar
-    // bundle. Missing or ambiguous claims must never default to claimable.
-    blockers.add("SIDECAR_BACKUP_MISSING");
+    const claimSidecars=["daily-dungeon-state","progress","quest-milestones",
+        "task-tracker","legacy-abyss-state","equipment-shop-daily",
+        "equipment-shop-purchases","abyss-state"];
+    if(!sidecars||claimSidecars.some(key=>sidecars[key]?.status!=="present")){
+        blockers.add("SIDECAR_BACKUP_MISSING");
+    }
     return Object.freeze({
         status:"blocked",readyForAcceptance:false,
         characterCount:characters.length,
@@ -54,7 +57,7 @@ function screenLegacyCandidateSnapshot(save){
     });
 }
 
-function createLegacyCandidateScreening({db,HttpsError,runProtected,inspectExistingEnvelope,validateLegacySaveCandidate}){
+function createLegacyCandidateScreening({db,HttpsError,runProtected,inspectExistingEnvelope,validateLegacySaveCandidate,validateMigrationBackup}){
     const fail=(code,message)=>{ throw new HttpsError(code,message); };
     async function screen(request){
         const data=request.data||{};
@@ -101,10 +104,21 @@ function createLegacyCandidateScreening({db,HttpsError,runProtected,inspectExist
                candidate.gameSaveVersion!==record.gameSaveVersion){
                 fail("data-loss","Candidate content differs from its submitted fingerprint.");
             }
+            if(record.backup){
+                let checked;
+                try{ checked=validateMigrationBackup(record.backup,uid); }
+                catch(_){ fail("data-loss","Stored backup differs from its immutable bytes or manifest."); }
+                if(checked.backupSha256!==record.backupSha256||
+                   checked.backupId!==record.backupId||
+                   checked.fingerprint!==candidate.fingerprint||
+                   checked.mainRaw!==record.backup.mainRaw){
+                    fail("data-loss","Candidate and backup are inconsistent.");
+                }
+            }
             return {
                 candidateRevision,serverRevision:envelope.serverRevision,
                 fingerprint:candidate.fingerprint,
-                ...screenLegacyCandidateSnapshot(candidate.snapshot)
+                ...screenLegacyCandidateSnapshot(candidate.snapshot,record.backup?.sidecars)
             };
         });
     }

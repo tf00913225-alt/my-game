@@ -3,13 +3,13 @@ import {
     createAccountWithEmail,getFirebaseAuthConfigStatus,getSignedInUser,initializeFirebaseAuth,
     observeFirebaseAuthState,signInAsAnonymous,signInWithEmail,signInWithFacebook,signInWithGoogle,signOutFirebase,
     installFirebaseSessionHooks
-} from "./firebase-auth.6a269762828f.js";
+} from "./firebase-auth.f756f769b4e4.js";
 import {
     bootstrapTrustedCloudSave,CLOUD_FUNCTIONS_REGION,CLOUD_SAVE_WRITE_POLICY,readCurrentCloudSave,saveLocalAutoBattlePreferences,createLocalMigrationBackup,
     submitLegacyMigrationCandidate
-} from "./firebase-cloud-save.117690e8d419.js";
-import {closeFirebaseAuthUi,installFirebaseAuthUi,openFirebaseAuthUi,setFirebaseAuthUiState} from "./firebase-auth-ui.8e0c70132175.js";
-import {synchronizeGameSession,revokeGameSession,protectedTest,getGameSessionState} from "./firebase-session.cb0907b5ca79.js";
+} from "./firebase-cloud-save.abe0d4819556.js";
+import {closeFirebaseAuthUi,installFirebaseAuthUi,openFirebaseAuthUi,setFirebaseAuthUiState} from "./firebase-auth-ui.683d4e78cea2.js";
+import {synchronizeGameSession,revokeGameSession,protectedTest,getGameSessionState} from "./firebase-session.fe006c0f84a7.js";
 
 const AUTH_EVENT="four-symbols:firebase-auth-state";
 let lifecyclePromise=null;
