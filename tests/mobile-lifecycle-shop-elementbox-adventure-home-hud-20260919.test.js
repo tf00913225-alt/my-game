@@ -48,6 +48,7 @@ test("mobile lifecycle diagnostics distinguish reload/discard metadata while bac
     const sessionStorage={value:"1",getItem(){return this.value;},setItem(_k,v){this.value=v;}};
     const window={
         document,sessionStorage,
+        FourSymbolsStartupPolicy:{getState:()=>"READY"},
         performance:{getEntriesByType:type=>type==="navigation"?[{type:"reload"}]:[]},
         addEventListener:(type,fn)=>windowEvents.on(type,fn)
     };

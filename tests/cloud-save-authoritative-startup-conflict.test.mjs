@@ -52,3 +52,24 @@ test("an unrelated local save also blocks without overwriting either copy",()=>{
     assert.equal(writes.length,0);
     assert.equal(conflicts.length,1);
 });
+
+test("suspend cannot overwrite a local candidate while startup is blocked",()=>{
+    const main=readFileSync(new URL("../js/00-main.js",import.meta.url),"utf8");
+    const start=main.indexOf("    function persistBeforeSuspend(reason){");
+    const end=main.indexOf("    if(lifecycleDiagnostics.sessionPreviouslyEntered)",start);
+    assert.ok(start>=0 && end>start);
+    const calls=[];
+    let state="MIGRATION_REQUIRED";
+    const lifecycleDiagnostics={backgroundSaveCount:0};
+    const make=new Function("window","saveGame","lifecycleDiagnostics",
+        `${main.slice(start,end)}\nreturn persistBeforeSuspend;`);
+    const persist=make({FourSymbolsStartupPolicy:{getState:()=>state}},value=>{calls.push(value);return true;},lifecycleDiagnostics);
+    for(const blocked of ["MIGRATION_REQUIRED","SAVE_LOADING","ERROR","NEED_CHARACTER"]){
+        state=blocked;persist("pagehide");
+    }
+    assert.equal(calls.length,0);
+    state="READY";persist("pagehide");
+    state="OFFLINE_READY";persist("pagehide");
+    assert.equal(calls.length,2);
+    assert.equal(lifecycleDiagnostics.backgroundSaveCount,2);
+});
