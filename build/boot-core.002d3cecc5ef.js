@@ -1146,11 +1146,12 @@ if(localFingerprint===cloudFingerprint){
 if(localBase!==cloudFingerprint||local.metadata.localDirty!==false){
 repo.writeForUid(user.uid,local.save,{source:"authoritative-cloud-read",cloudBaseFingerprint:cloudFingerprint,localDirty:false});
 }
-selectedSave=local.save;
-}else if(localBase===cloudFingerprint){
-selectedSave=local.save;
 }else{
-return migration("雲端角色與此 UID 的本機角色沒有共同的已驗證基底。系統禁止靜默選邊或覆寫。",true);
+// A matching base only proves where a local candidate began.
+// It cannot authorize unverified gameplay changes as cloud state.
+return migration(localBase===cloudFingerprint
+? "此裝置保留了雲端角色之後的本機變更。尚未由後端確認，禁止直接當作正式進度或覆寫；原本機資料會保留。"
+: "雲端角色與此 UID 的本機角色沒有共同的已驗證基底。系統禁止靜默選邊或覆寫；原本機資料會保留。",true);
 }
 }catch(error){ return fail(error,"無法驗證雲端與本機存檔的來源關係；未覆寫任何資料。",token); }
 }

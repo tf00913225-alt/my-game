@@ -2,6 +2,12 @@
 
 本文件是長期工程進度來源。**每個 Phase 結束都必須更新本文件**；聊天、Commit、PR、CI 或部署成功不能取代驗收紀錄。
 
+## 2026-09-25 — One-time historical baseline policy and authoritative startup guard
+
+- The owner agreed to a guarded **one-time** acceptance of old local progress as a clearly marked, historically unverifiable baseline, followed by backend-verified new earnings. The exact admission conditions, full main-save/sidecar backup, anomaly/claim checks, unique migration marker, UID/session/revision transaction and post-migration reward receipts are recorded in `docs/CLOUD_CHARACTER_AUTHORITY_MIGRATION_DESIGN.md`. Agreement to the policy does not authorize silently uploading a player's phone save.
+- `js/52-v173.20-startup-loader.js::resolveSaveFor()` no longer treats `localBase===cloudFingerprint` as authority for a changed local save. If a future complete cloud character differs from the local copy, boot keeps the local copy intact and blocks with a conflict message; only an identical cache may be loaded from the cloud snapshot. Targeted tests exercise identical cache, locally modified shared base and unrelated save.
+- The guard does not create an authoritative character, accept a migration candidate, install reward writers, or restore another device. No second-phone test yet. Phase 4 remains **IN PROGRESS / 0/6 VERIFIED**, Game/Cache `173.72`, `main` untouched. PR, CI, merged SHA and deployment results must be checked separately.
+
 ## 2026-09-25 — Server-issued grant reservation candidate
 
 - `functions/src/trusted-grant-ledger.js` is the sole grant reservation owner; `functions/index.js::reserveTrustedGrant` verifies Firebase identity and calls the Phase 1 `runProtected` transaction. A grant must already exist in private `serverUsers/{uid}/pendingGrants/{grantId}` with a server-issued source. Browser Firestore rules deny creation. The request accepts an ID, operation ID and expected revision, never a gold amount.
