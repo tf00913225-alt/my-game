@@ -258,7 +258,15 @@
     let relicVisualReadyPromise=null;
     function nextVisualPaint(){ return new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))); }
     function decodeRelicIcon(path){
-        return new Promise((resolve,reject)=>{const image=new Image();image.decoding="async";image.onload=()=>typeof image.decode==="function"?image.decode().then(resolve,reject):resolve();image.onerror=()=>reject(new Error("秘寶圖片無法載入："+path));image.src=path;});
+        return new Promise((resolve,reject)=>{const image=new Image();image.decoding="async";image.onload=()=>{const ready=()=>image.complete&&image.naturalWidth>0?resolve({path:path,image:image}):reject(new Error("秘寶圖片解碼失敗："+path));if(typeof image.decode==="function"){image.decode().then(ready,reject);}else{ready();}};image.onerror=()=>reject(new Error("秘寶圖片無法載入："+path));image.src=path;});
+    }
+    function resolveBattleIdentityIcon(def){
+        const candidates=[def&&def.battleIconPath,def&&def.iconPath].filter((path,index,all)=>path&&all.indexOf(path)===index);
+        const next=index=>{
+            if(index>=candidates.length){ return Promise.reject(new Error("秘寶 Identity 圖示無法載入："+(def&&def.id||"unknown"))); }
+            return decodeRelicIcon(candidates[index]).catch(()=>next(index+1));
+        };
+        return next(0);
     }
     function prepareRelicVisuals(){
         if(relicVisualReadyPromise){return relicVisualReadyPromise;}
@@ -374,17 +382,20 @@
     }
     function beginRelicCinematic(def,target){
         if(!hasLiveBattlePresentationHost()||!def){ return Promise.resolve(null); }
+        /* The identity clock starts only after a real decoded image exists.
+           A path-string fallback is not enough on cold cache. */
+        return resolveBattleIdentityIcon(def).then(identity=>{
         cleanupRelicCutin();
         const battlePage=document.getElementById("battlePage");
         const host=battlePage||null;
-        if(!host){ return Promise.resolve(null); }
+        if(!host){ return null; }
         const node=document.createElement("div");
         node.id="teamRelicBattlePresentation";
         node.className="team-relic-battle-presentation";
         node.setAttribute("aria-label","秘寶發動："+def.name);
         node.innerHTML='<span class="team-relic-battle-dim" aria-hidden="true"></span>'+
             '<div class="team-relic-battle-cutin"><span class="team-relic-battle-cutin-icon">'+
-            '<img src="'+esc(def.battleIconPath||def.iconPath||"")+'" alt=""></span>'+
+            '<img src="'+esc(identity.path)+'" alt=""></span>'+
             '<span class="team-relic-battle-cutin-copy"><strong>'+esc(def.name)+'</strong></span></div>';
         host.appendChild(node);
         if(document.body&&document.body.classList){ document.body.classList.add("team-relic-cinematic-active"); }
@@ -409,6 +420,10 @@
                     revealRelicTargets(target)
                 ]).then(()=>node);
             });
+        }).catch(error=>{
+            console.error("秘寶 Identity Ready Gate 失敗：",error);
+            return null;
+        });
     }
     function enterRelicVfxPhase(node){
         if(node&&node===relicCutinNode){ node.classList.add("vfx-running"); }

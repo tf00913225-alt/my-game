@@ -317,7 +317,7 @@
 }
 
 @keyframes v143StatusImageBreath{
-    0%,100%{opacity:.42}
+    0%,100%{opacity:0}
     50%{opacity:1}
 }
 
