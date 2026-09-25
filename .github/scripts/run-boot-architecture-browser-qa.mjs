@@ -93,6 +93,7 @@ export async function readCurrentCloudSave(){
 export async function bootstrapTrustedCloudSave(){return {status:"qa-no-write"};}
 export async function saveLocalAutoBattlePreferences(){throw new Error("QA never performs a cloud write");}
 export async function submitLegacyMigrationCandidate(){throw new Error("QA never performs a cloud write");}
+export function createLocalMigrationBackup(){throw new Error("QA never creates a migration backup");}
 `;
 
 /* Boot QA is offline: a missing session backend must never bypass auth or
