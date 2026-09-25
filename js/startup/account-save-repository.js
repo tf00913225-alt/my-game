@@ -25,6 +25,8 @@
         v17351_equipment_shop_purchases:"equipment-shop-purchases",
         v174_abyss_state_v2:"abyss-state"
     });
+    const BACKUP_SIDECARS=Object.freeze([...new Set([...Object.values(LEGACY_SIDECARS),"patrol-character-index"])]);
+    const PLAIN_SIDECARS=new Set(["announcement-read","bulk-sell-quality","patrol-character-index"]);
 
     function storage(){
         if(!global.localStorage){ throw coded("local-storage-unavailable","Local storage is unavailable."); }
@@ -184,12 +186,51 @@
     }
     function migrationBackupKey(uid){ return BACKUP_PREFIX+validUid(uid)+":"+Date.now(); }
     /* Original-device safety copy only.  This is never a cloud authority. */
-    function migrationBackupKeyFor(uid,mainFingerprint){
+    function migrationBackupKeyFor(uid,mainFingerprint,manifestFingerprint){
         uid=validUid(uid);
         if(!/^v1:[0-9a-f]+:[0-9a-f]{32}$/.test(mainFingerprint||"")){
             throw coded("migration-backup-fingerprint-invalid","Migration backup requires a verified main-save fingerprint.");
         }
-        return MIGRATION_BACKUP_PREFIX+uid+":"+mainFingerprint;
+        return MIGRATION_BACKUP_PREFIX+uid+":"+mainFingerprint+(manifestFingerprint?":"+manifestFingerprint:"");
+    }
+    function verifyMigrationBackup(uid,backupKey){
+        uid=validUid(uid);
+        if(getActiveUid()!==uid){ throw coded("account-not-active","Backup owner is not active."); }
+        if(typeof backupKey!=="string"||!backupKey.startsWith(MIGRATION_BACKUP_PREFIX+uid+":")){
+            throw coded("migration-backup-owner-mismatch","Backup does not belong to this UID.");
+        }
+        let backup;
+        try{ backup=JSON.parse(storage().getItem(backupKey)); }
+        catch(_){ throw coded("migration-backup-corrupt","Backup is corrupt."); }
+        if(!backup||backup.schemaVersion!==2||backup.ownerUid!==uid||
+           !backup.mainRaw||!backup.metadataRaw||!backup.sidecars){
+            throw coded("migration-backup-corrupt","Backup is incomplete.");
+        }
+        const main=parseSave(backup.mainRaw,"migration-backup-corrupt");
+        const metadata=parseSave(backup.metadataRaw,"migration-backup-corrupt");
+        if(metadata.ownerUid!==uid||fingerprint(main)!==backup.mainFingerprint){
+            throw coded("migration-backup-corrupt","Backup ownership or main fingerprint changed.");
+        }
+        const keys=Object.keys(backup.sidecars).sort();
+        if(keys.join("|")!==[...BACKUP_SIDECARS].sort().join("|")){
+            throw coded("migration-backup-corrupt","Backup sidecar inventory is incomplete.");
+        }
+        for(const suffix of keys){
+            const item=backup.sidecars[suffix];
+            if(!item||!(["present","missing"].includes(item.status))||
+               (item.status==="missing"?item.raw!==null:typeof item.raw!=="string")){
+                throw coded("migration-backup-corrupt","Backup sidecar record is invalid.");
+            }
+            if(item.status==="present"&&!PLAIN_SIDECARS.has(suffix)){
+                parseSave(item.raw,"migration-backup-sidecar-corrupt");
+            }
+        }
+        const manifestFingerprint=fingerprint(backup.sidecars);
+        if(manifestFingerprint!==backup.sidecarManifestFingerprint||
+           migrationBackupKeyFor(uid,backup.mainFingerprint,manifestFingerprint)!==backupKey){
+            throw coded("migration-backup-corrupt","Backup manifest changed.");
+        }
+        return Object.freeze({...backup,backupKey});
     }
     function createMigrationBackup(uid){
         uid=validUid(uid);
@@ -199,34 +240,31 @@
         const mainRaw=storage().getItem(saveKey(uid));
         const metadataRaw=storage().getItem(metadataKey(uid));
         const mainFingerprint=fingerprint(local.save);
-        const backupKey=migrationBackupKeyFor(uid,mainFingerprint);
-        const existing=storage().getItem(backupKey);
-        if(existing){
-            try{
-                const parsed=JSON.parse(existing);
-                if(parsed&&parsed.ownerUid===uid&&parsed.mainFingerprint===mainFingerprint&&
-                   parsed.mainRaw===mainRaw&&parsed.metadataRaw===metadataRaw){
-                    return Object.freeze({...parsed,backupKey,unchanged:true});
-                }
-            }catch(_){ }
-            throw coded("migration-backup-conflict","An existing migration backup cannot be verified.");
-        }
         const sidecars={};
-        for(const suffix of Object.values(LEGACY_SIDECARS)){
+        for(const suffix of BACKUP_SIDECARS){
             const key=accountKey(suffix,uid);
             const raw=storage().getItem(key);
             if(raw===null){ sidecars[suffix]={status:"missing",raw:null}; continue; }
-            try{ parseSave(raw,"migration-backup-sidecar-corrupt"); }
-            catch(error){ throw error; }
+            if(!PLAIN_SIDECARS.has(suffix)){ parseSave(raw,"migration-backup-sidecar-corrupt"); }
             sidecars[suffix]={status:"present",raw};
         }
+        const sidecarManifestFingerprint=fingerprint(sidecars);
+        const backupKey=migrationBackupKeyFor(uid,mainFingerprint,sidecarManifestFingerprint);
+        const existing=storage().getItem(backupKey);
+        if(existing){
+            const verified=verifyMigrationBackup(uid,backupKey);
+            if(verified.mainRaw!==mainRaw||verified.metadataRaw!==metadataRaw){
+                throw coded("migration-backup-conflict","An existing migration backup cannot be verified.");
+            }
+            return Object.freeze({...verified,unchanged:true});
+        }
         const backup=Object.freeze({
-            schemaVersion:1,ownerUid:uid,mainFingerprint,mainRaw,metadataRaw,
+            schemaVersion:2,ownerUid:uid,mainFingerprint,sidecarManifestFingerprint,mainRaw,metadataRaw,
             sidecars,createdAt:Date.now()
         });
         try{ storage().setItem(backupKey,JSON.stringify(backup)); }
         catch(error){ throw coded("migration-backup-write-failed","The immutable migration backup could not be stored.",error); }
-        return Object.freeze({...backup,backupKey,unchanged:false});
+        return Object.freeze({...verifyMigrationBackup(uid,backupKey),unchanged:false});
     }
     function migrateLegacyToUid(uid,options={}){
         uid=validUid(uid);
@@ -279,6 +317,6 @@
         SCHEMA_VERSION,LEGACY_KEY,ACTIVE_UID_KEY,activate,deactivate,getActiveUid,
         saveKey,metadataKey,readForUid,readActive,writeForUid,inspectLegacy,
         migrateLegacyToUid,removeActive,accountKey,fingerprint,LEGACY_SIDECARS,
-        migrationBackupKeyFor,createMigrationBackup
+        migrationBackupKeyFor,createMigrationBackup,verifyMigrationBackup,BACKUP_SIDECARS
     });
 })(typeof window!=="undefined"?window:globalThis);

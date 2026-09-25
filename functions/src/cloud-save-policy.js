@@ -184,6 +184,61 @@ function validateLegacySaveCandidate(candidate){
     });
 }
 
+// The caller supplies an untrusted copy of a sealed local backup. Digests
+// establish byte consistency, never historical truth or reward entitlement.
+function validateMigrationBackup(bundle,uid){
+    if(!isPlainObject(bundle)||bundle.schemaVersion!==2||bundle.ownerUid!==uid||
+       typeof bundle.mainRaw!=="string"||typeof bundle.metadataRaw!=="string"||
+       !isPlainObject(bundle.sidecars)||
+       !/^v1:[a-f0-9]+:[a-f0-9]{32}$/.test(bundle.mainFingerprint||"")||
+       !/^v1:[a-f0-9]+:[a-f0-9]{32}$/.test(bundle.sidecarManifestFingerprint||"")||
+       bundle.backupId!==`four_symbols_migration_backup:${uid}:${bundle.mainFingerprint}:${bundle.sidecarManifestFingerprint}`){
+        fail("invalid-argument","A complete UID-owned backup reference is required.");
+    }
+    const sha=value=>createHash("sha256").update(value,"utf8").digest("hex");
+    const keys=Object.keys(bundle.sidecars).sort();
+    const expected=["element-box-state","daily-dungeon-state","exp-pool-growth-state",
+        "rested-exp-state","progress","announcement-read","quest-milestones",
+        "task-tracker","legacy-abyss-state","equipment-shop-daily",
+        "bulk-sell-quality","equipment-shop-purchases","abyss-state","patrol-character-index"].sort();
+    if(keys.join("|")!==expected.join("|")){
+        fail("invalid-argument","Backup sidecar inventory is incomplete.");
+    }
+    for(const suffix of keys){
+        const sidecar=bundle.sidecars[suffix];
+        if(!isPlainObject(sidecar)||!(["present","missing"].includes(sidecar.status))||
+           (sidecar.status==="missing"?sidecar.raw!==null:typeof sidecar.raw!=="string")){
+            fail("invalid-argument","Backup sidecar is invalid.");
+        }
+        if(sidecar.status==="present"&&!new Set(["announcement-read","bulk-sell-quality","patrol-character-index"]).has(suffix)){
+            try{ validateJsonValue(JSON.parse(sidecar.raw),`sidecars.${suffix}`,0); }
+            catch(_){ fail("invalid-argument","Backup sidecar JSON is invalid."); }
+        }
+    }
+    const manifestRaw=JSON.stringify(bundle.sidecars);
+    const backupRaw=JSON.stringify({ownerUid:uid,mainRaw:bundle.mainRaw,
+        metadataRaw:bundle.metadataRaw,sidecars:bundle.sidecars});
+    if(Buffer.byteLength(backupRaw,"utf8")>MAX_CANDIDATE_BYTES ||
+       sha(manifestRaw)!==bundle.sidecarManifestSha256||
+       sha(backupRaw)!==bundle.backupSha256){
+        fail("invalid-argument","Backup bytes or SHA-256 digest do not match.");
+    }
+    let save,metadata;
+    try{ save=JSON.parse(bundle.mainRaw); metadata=JSON.parse(bundle.metadataRaw); }
+    catch(_){ fail("invalid-argument","Backup main save or ownership metadata is corrupt."); }
+    if(!isPlainObject(metadata)||metadata.ownerUid!==uid){
+        fail("invalid-argument","Backup metadata owner is invalid.");
+    }
+    const candidate=validateLegacySaveCandidate(save);
+    if(Buffer.byteLength(JSON.stringify({backup:bundle,snapshot:candidate.snapshot}),"utf8")>800*1024){
+        fail("invalid-argument","Candidate exceeds the safe Firestore document budget.");
+    }
+    // Preserve original bytes for later review, including their key order.
+    return Object.freeze({...candidate,backupId:bundle.backupId,
+        backupSha256:bundle.backupSha256,sidecarManifestSha256:bundle.sidecarManifestSha256,
+        backup:{...bundle},mainRaw:bundle.mainRaw});
+}
+
 function normalizeClientVersion(value){
     const version=String(value||"").trim();
     if(!version){ return null; }
@@ -199,5 +254,6 @@ module.exports={
     CloudSavePolicyError,
     MAX_CANDIDATE_BYTES,
     normalizeClientVersion,
-    validateLegacySaveCandidate
+    validateLegacySaveCandidate,
+    validateMigrationBackup
 };

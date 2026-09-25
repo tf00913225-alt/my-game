@@ -23,7 +23,7 @@ const {
     CLOUD_SAVE_SCHEMA_VERSION,
     CloudSavePolicyError,
     normalizeClientVersion,
-    validateLegacySaveCandidate
+    validateLegacySaveCandidate,validateMigrationBackup
 }=require("./src/cloud-save-policy");
 
 initializeApp();
@@ -34,7 +34,7 @@ const trustedGrantLedger=createTrustedGrantLedger({
 });
 const legacyCandidateScreening=createLegacyCandidateScreening({
     db:getFirestore(),HttpsError,runProtected:sessions.runProtected,
-    inspectExistingEnvelope,validateLegacySaveCandidate
+    inspectExistingEnvelope,validateLegacySaveCandidate,validateMigrationBackup
 });
 
 const REGION="us-central1";
@@ -323,7 +323,13 @@ exports.submitLegacyMigrationCandidate=onCall(CALLABLE_OPTIONS,async(request)=>{
         const data=request && request.data && typeof request.data==="object"
             ? request.data
             : {};
-        const candidate=validateLegacySaveCandidate(data.save);
+        if(Object.keys(data).some(key=>!["backup","clientVersion","expectedRevision","uid","session"].includes(key))){
+            throw new HttpsError("invalid-argument","Only a sealed backup may be submitted.");
+        }
+        if(!Number.isSafeInteger(data.expectedRevision)||data.expectedRevision<1){
+            throw new HttpsError("invalid-argument","Current expectedRevision is required.");
+        }
+        const candidate=validateMigrationBackup(data.backup,uid);
         const clientVersion=normalizeClientVersion(data.clientVersion);
         const db=getFirestore();
         const saveRef=publicSaveRef(db,uid);
@@ -358,9 +364,19 @@ exports.submitLegacyMigrationCandidate=onCall(CALLABLE_OPTIONS,async(request)=>{
                    envelope.data.migrationCandidateFingerprint!==candidateSnapshot.get("fingerprint")){
                     throw new HttpsError("data-loss","Migration candidate metadata is inconsistent.");
                 }
+                if(candidateSnapshot.get("backup")){
+                    let stored;
+                    try{ stored=validateMigrationBackup(candidateSnapshot.get("backup"),uid); }
+                    catch(_){ throw new HttpsError("data-loss","Stored migration backup is corrupt."); }
+                    if(stored.backupSha256!==candidateSnapshot.get("backupSha256")||
+                       stored.fingerprint!==candidateSnapshot.get("fingerprint")){
+                        throw new HttpsError("data-loss","Stored migration backup differs from its candidate.");
+                    }
+                }
                 // An ambiguous response can be retried without replacing a
                 // candidate or consuming another server revision.
-                if(candidateSnapshot.get("fingerprint")===candidate.fingerprint){
+                if(candidateSnapshot.get("backupSha256")===candidate.backupSha256&&
+                   candidateSnapshot.get("backupId")===candidate.backupId){
                     return {revision:previousRevision,serverRevision:envelope.serverRevision,unchanged:true};
                 }
                 const submittedAt=candidateSnapshot.get("submittedAt");
@@ -373,6 +389,10 @@ exports.submitLegacyMigrationCandidate=onCall(CALLABLE_OPTIONS,async(request)=>{
                         "Please wait before submitting another migration candidate."
                     );
                 }
+            }
+
+            if(envelope.serverRevision!==data.expectedRevision){
+                throw new HttpsError("aborted","CLOUD_REVISION_CONFLICT",{code:"CLOUD_REVISION_CONFLICT"});
             }
 
             const previousRevision=candidateSnapshot.exists
@@ -396,6 +416,10 @@ exports.submitLegacyMigrationCandidate=onCall(CALLABLE_OPTIONS,async(request)=>{
                 clientVersion,
                 byteLength:candidate.byteLength,
                 fingerprint:candidate.fingerprint,
+                backupId:candidate.backupId,
+                backupSha256:candidate.backupSha256,
+                sidecarManifestSha256:candidate.sidecarManifestSha256,
+                backup:candidate.backup,
                 snapshot:candidate.snapshot,
                 submittedAt:now,
                 updatedAt:now

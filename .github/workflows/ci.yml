@@ -66,6 +66,9 @@ jobs:
       - name: Check all project JavaScript syntax
         run: node .github/scripts/ci.mjs syntax
 
+      - name: Reject unregistered persistent state
+        run: node scripts/check-persisted-state-registry.mjs --self-test
+
       - name: Enforce Battle Runtime architecture guard
         id: battle_architecture
         run: node .github/scripts/battle-runtime-architecture-guard.mjs --write

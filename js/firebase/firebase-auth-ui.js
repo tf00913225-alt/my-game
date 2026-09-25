@@ -25,6 +25,7 @@ function errorText(error){
         "auth/popup-blocked":"瀏覽器阻擋了登入視窗，請允許彈出式視窗後再試。",
         "auth/operation-not-allowed":"Firebase Console 尚未啟用這個登入方式。",
         "auth/account-exists-with-different-credential":"這個 Email 已使用其他登入方式建立帳號，請改用原本的登入方式。",
+        "auth/guest-link-required":"訪客角色尚不能直接綁定 Google。請保留此訪客帳號與手機資料；切換登入不會自動搬移角色。",
         "auth/invalid-credential":"Email 或密碼不正確。",
         "auth/email-already-in-use":"這個 Email 已註冊，請直接登入。",
         "auth/invalid-email":"Email 格式不正確。",

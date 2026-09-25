@@ -1,6 +1,6 @@
 /* Firebase adapter for the single game-session client owner. No game save IO. */
 import {getFunctions,httpsCallable} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-functions.js";
-import {getFirebaseApp,getFirebaseAuth,initializeFirebaseAuth} from "./firebase-auth.6a269762828f.js";
+import {getFirebaseApp,getFirebaseAuth,initializeFirebaseAuth} from "./firebase-auth.f756f769b4e4.js";
 import {createGameSessionClient,sessionError} from "./session-client.235aa8b1f47e.js";
 
 export const CLOUD_FUNCTIONS_REGION="us-central1";

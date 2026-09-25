@@ -163,6 +163,20 @@
         "verification": "targeted A–J、production build/build check、Release Gate，以及 PR #344 CI 的 360×800／390×844／412×915 mobile browser QA",
         "result": "GitHub Actions CI run 35445108483 已通過；同一 run 完成更新通知 browser QA、既有戰鬥 QA、靜態資源、loader 與 Release Gate 檢查。"
       }
+    },
+    {
+      "id": "REQ-CLOUD-HARDEN-20260926",
+      "title": "雲端存檔架構強化：封存候選來源與持久狀態登記",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "release/requirement-batches/2026-09-26-cloud-save-architecture-hardening.json",
+          "config/persisted-state-registry.json",
+          "DATA_SECURITY_CONTRACTS.md"
+        ],
+        "verification": "PR checks、Firebase emulator、Boot browser QA、dev merge/deploy SHA 尚待完成",
+        "result": "Phase 4 仍為 0/6 VERIFIED；不可進行第二手機完整角色恢復"
+      }
     }
   ]
 }

@@ -36,7 +36,7 @@ The Phase 2 public envelope is schema Version 2. New envelopes begin at server-o
 
 ### `submitLegacyMigrationCandidate`
 
-Requires Firebase Authentication and an already bootstrapped account. The browser may submit the current legacy local save for migration review, but the server stores it only as an **untrusted migration candidate** under the authenticated UID.
+Requires Firebase Authentication, an active game session and an already bootstrapped account. New submissions require an explicit UID-owned immutable backup ID, exact main-save/metadata/sidecar bytes and matching SHA-256 digests. The client must not reread `battle_full_version_save_v5` for this submission. The server stores the bundle only as an **untrusted migration candidate** under the authenticated UID. Older unbundled candidate revisions remain historically untrusted and cannot be promoted by this change.
 
 The candidate is validated for:
 
@@ -48,7 +48,7 @@ The candidate is validated for:
 - JSON-only data;
 - nesting, array, object-key, string-length and total-byte limits;
 - forbidden prototype-pollution keys;
-- SHA-256 fingerprinting.
+- SHA-256 fingerprinting and exact raw backup/sidecar byte consistency; digests do not authenticate historical gameplay claims.
 
 A submitted candidate is explicitly stored with:
 
