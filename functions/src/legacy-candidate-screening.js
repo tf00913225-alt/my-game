@@ -6,6 +6,7 @@
 const ELEMENTS=new Set(["fire","water","wind","earth"]);
 const CHARACTER_KEYS=["player","player2","player3"];
 const CLAIM_FIELDS=["dailyQuestState","commissionQuestState","achievementState","gameplayProgress","abyssProgress"];
+const {auditLegacyRewardClaims}=require("./legacy-reward-claim-audit.js");
 
 function screenLegacyCandidateSnapshot(save){
     const blockers=new Set();
@@ -40,13 +41,15 @@ function screenLegacyCandidateSnapshot(save){
             blockers.add("CLAIM_PROGRESS_MISSING");
         }
     }
+    const rewardAudit=auditLegacyRewardClaims(save);
+    rewardAudit.blockers.forEach(blocker=>blockers.add(blocker));
     // A main-save candidate has no complete, independently backed-up sidecar
     // bundle. Missing or ambiguous claims must never default to claimable.
     blockers.add("SIDECAR_BACKUP_MISSING");
-    blockers.add("HISTORICAL_REWARDS_UNVERIFIED");
     return Object.freeze({
         status:"blocked",readyForAcceptance:false,
         characterCount:characters.length,
+        historicalRewardClaims:rewardAudit,
         blockers:Object.freeze([...blockers].sort())
     });
 }
