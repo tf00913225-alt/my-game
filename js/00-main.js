@@ -362,6 +362,10 @@ const STARTUP_SESSION_READY_KEY="sixiang_startup_session_ready_v1";
 
     function persistBeforeSuspend(reason){
         try{
+            const startupState=window.FourSymbolsStartupPolicy?.getState?.();
+            if(startupState!=="READY"&&startupState!=="OFFLINE_READY"){
+                return;
+            }
             if(typeof saveGame==="function"){
                 const saved=saveGame({source:"mobile-"+String(reason||"background")});
                 if(saved!==false){ lifecycleDiagnostics.backgroundSaveCount++; }

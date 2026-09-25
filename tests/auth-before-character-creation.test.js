@@ -46,8 +46,10 @@ assert.match(startup,/async function enterCreation\(token=transitionToken\)[\s\S
     "new-character persistence must bind the gameplay save owner before creation is exposed");
 assert.match(startup,/async function enterCreation\(token=transitionToken\)[\s\S]{0,420}showCharacterCreationSurface\(\)/,
     "the first visible creation frame must pass through native creation activation");
-assert.match(startup,/localBase===cloudFingerprint[\s\S]{0,220}selectedSave=local\.save/,
-    "same-UID local progress may resume only while its verified cloud base is unchanged");
+assert.match(startup,/return migration\(localBase===cloudFingerprint[\s\S]{0,300},true\)/,
+    "a matching cloud base must leave changed local progress in conflict rather than grant it cloud authority");
+assert.doesNotMatch(startup,/selectedSave=local\.save/,
+    "the authoritative cloud character must not be replaced by a browser-editable local candidate");
 assert.doesNotMatch(startup,/JSON\.stringify\(authoritative\)!==JSON\.stringify\(local\.save\)/,
     "normalized same-origin saves must not be treated as conflicts by raw JSON comparison");
 assert.match(startup,/action==="cancel-migration"[\s\S]*?firebase\.signOut\(\)/);

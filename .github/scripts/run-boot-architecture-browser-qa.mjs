@@ -35,6 +35,13 @@ function chromeBinary(){
 const fakeAuth=String.raw`
 const listeners=new Set();
 const scenario=new URL(location.href).searchParams.get("scenario")||"signed-out";
+function qaTrace(action){
+  try{
+    const history=JSON.parse(localStorage.getItem("__qa_auth_trace")||"[]");
+    history.push({action,at:Date.now(),url:location.search,stack:new Error().stack?.split("\n").slice(1,5).join(" | ")||""});
+    localStorage.setItem("__qa_auth_trace",JSON.stringify(history.slice(-20)));
+  }catch(_){}
+}
 function publicUser(uid){return uid?Object.freeze({uid,email:uid+"@qa.invalid",displayName:"QA "+uid,photoURL:null,isAnonymous:uid==="uid-guest",providerIds:Object.freeze(uid==="uid-guest"?[]:["password"])}):null;}
 let current=null;
 try{
@@ -52,13 +59,13 @@ export function installFirebaseSessionHooks(){}
 export function getFirebaseAuth(){return {currentUser:current};}
 export function getSignedInUser(){return current;}
 export async function observeFirebaseAuthState(listener){listeners.add(listener);queueMicrotask(()=>{if(scenario==="auth-error"){const error=new Error("simulated auth network failure");error.code="auth/network-request-failed";listener(null,error);}else{listener(current,null);}});return ()=>listeners.delete(listener);}
-function remember(uid){try{localStorage.setItem("__qa_auth_uid",uid);localStorage.removeItem("__qa_signed_out");}catch(_){}const user=publicUser(uid);publish(user);return user;}
+function remember(uid){qaTrace("sign-in:"+uid);try{localStorage.setItem("__qa_auth_uid",uid);localStorage.removeItem("__qa_signed_out");}catch(_){}const user=publicUser(uid);publish(user);return user;}
 export async function signInAsAnonymous(){return remember("uid-guest");}
 export async function signInWithGoogle(){return remember("uid-google");}
 export async function signInWithFacebook(){return remember("uid-facebook");}
 export async function signInWithEmail(email){return remember(String(email).toLowerCase().startsWith("b")?"uid-B":"uid-A");}
 export async function createAccountWithEmail(email){return signInWithEmail(email);}
-export async function signOutFirebase(){try{localStorage.removeItem("__qa_auth_uid");localStorage.setItem("__qa_signed_out","1");}catch(_){}publish(null);}
+export async function signOutFirebase(){qaTrace("sign-out");try{localStorage.removeItem("__qa_auth_uid");localStorage.setItem("__qa_signed_out","1");}catch(_){}publish(null);}
 `;
 
 const fakeCloud=String.raw`
@@ -171,6 +178,9 @@ async function createQaServer(){
         try{
             const url=new URL(request.url,"http://127.0.0.1");
             const fetchDest=String(request.headers["sec-fetch-dest"]||"");
+            const qaModule=url.pathname===authPath||url.pathname===cloudPath||url.pathname===sessionPath;
+            // Resource integrity checks need the real bytes. Do not cache them:
+            // a warm navigation must execute the mock, not the checked asset.
             if(url.pathname===authPath&&fetchDest==="script"){response.writeHead(200,{"content-type":"text/javascript; charset=utf-8","cache-control":"no-store"});response.end(fakeAuth);return;}
             if(url.pathname===cloudPath&&fetchDest==="script"){response.writeHead(200,{"content-type":"text/javascript; charset=utf-8","cache-control":"no-store"});response.end(fakeCloud);return;}
             if(url.pathname===sessionPath&&fetchDest==="script"){response.writeHead(200,{"content-type":"text/javascript; charset=utf-8","cache-control":"no-store"});response.end(fakeSession);return;}
@@ -187,7 +197,7 @@ async function createQaServer(){
                 body=Buffer.from(body.toString("utf8").replace("<!-- build:critical-script -->",qaPrelude()+"\n<!-- build:critical-script -->"));
             }
             const immutable=/\.[0-9a-f]{12}\.(?:js|css|webp)$/.test(relative);
-            response.writeHead(200,{"content-type":mime(file),"cache-control":immutable?"public, max-age=31536000, immutable":"no-cache"});
+            response.writeHead(200,{"content-type":mime(file),"cache-control":qaModule?"no-store":immutable?"public, max-age=31536000, immutable":"no-cache"});
             response.end(body);
         }catch(error){response.writeHead(500);response.end(String(error&&error.stack||error));}
     });
@@ -242,6 +252,7 @@ async function browserDiagnostic(client){
           featureScripts:[...document.querySelectorAll("script[data-feature-bundle]")].map(script=>({src:script.src,bundle:script.dataset.featureBundle})),
           featureLinks:[...document.querySelectorAll("link[data-feature-style],link[data-feature-preload]")].map(link=>({rel:link.rel,href:link.href,style:link.dataset.featureStyle||null,preload:link.dataset.featurePreload||null})),
           localKeys:Object.keys(localStorage),
+          qaAuthTrace:(()=>{try{return JSON.parse(localStorage.getItem("__qa_auth_trace")||"[]");}catch(_){return [];}})(),
           lastError:(()=>{const value=window.FourSymbolsStartupPolicy?.getLastError?.();return value?{name:value.name||null,code:value.code||null,message:value.message||String(value),stack:value.stack||null}:null;})(),
           marks:performance.getEntriesByType("mark").map(entry=>({name:entry.name,startTime:entry.startTime})),
           resources:performance.getEntriesByType("resource").map(entry=>({name:entry.name,initiatorType:entry.initiatorType,transferSize:entry.transferSize}))
@@ -464,14 +475,50 @@ try{
     await client.eval(`FourSymbolsStartupPolicy.openAccountManager();document.getElementById("firebaseSignOutButton").click()`);
     await waitFor(client,"window.FourSymbolsStartupPolicy?.getState()==='AUTH_REQUIRED'","signed-out state after account A",15000);
     await client.eval(`(()=>{document.getElementById("firebaseEmailInput").value="b@example.test";document.getElementById("firebasePasswordInput").value="123456";document.getElementById("firebaseEmailSignInButton").click();})()`);
+    await sleep(250);
+    evidence.checks.sameUidReauth=await client.eval(`(()=>({state:FourSymbolsStartupPolicy.getState(),mockUid:window.__qaAuthUser?.uid||null,persistedUid:localStorage.getItem("__qa_auth_uid"),signedOut:localStorage.getItem("__qa_signed_out"),status:document.getElementById("firebaseAuthStatus")?.textContent||"",buttonDisabled:document.getElementById("firebaseEmailSignInButton")?.disabled}))()`);
     await waitFor(client,"window.FourSymbolsStartupPolicy?.getState()==='READY'&&window.FourSymbolsStartupPolicy?.getUid()==='uid-B'","account B main city",20000);
     const accountB=await client.eval(`(()=>({uid:FourSymbolsStartupPolicy.getUid(),activeUid:FourSymbolsAccountSave.getActiveUid(),playerId:player.id,gold:gold,sharedExp:sharedExp,item:inventoryItems[0]?.id,equipment:characterEquipment.fire.hand?.id,saveA:JSON.parse(localStorage.getItem("four_symbols_save:uid-A")).player.id,saveB:JSON.parse(localStorage.getItem("four_symbols_save:uid-B")).player.id,metaA:JSON.parse(localStorage.getItem("four_symbols_save_meta:uid-A")).ownerUid,metaB:JSON.parse(localStorage.getItem("four_symbols_save_meta:uid-B")).ownerUid}))()`);
     assert.deepEqual(accountB,{uid:"uid-B",activeUid:"uid-B",playerId:"角色-B",gold:2222,sharedExp:222,item:"qa-token-B",equipment:"qa-blade-B",saveA:"角色-A",saveB:"角色-B",metaA:"uid-A",metaB:"uid-B"});evidence.checks.accountSwitch=accountB;
 
     const warmPreviousTimeOrigin=await client.eval(`performance.timeOrigin`);
+    const candidateBeforeReload=await client.eval(`localStorage.getItem("four_symbols_save:uid-B")`);
+    const metadataBeforeReload=await client.eval(`localStorage.getItem("four_symbols_save_meta:uid-B")`);
     await client.send("Network.setCacheDisabled",{cacheDisabled:false});await client.send("Page.reload",{ignoreCache:false});
     await waitFor(client,`performance.timeOrigin!==${JSON.stringify(warmPreviousTimeOrigin)}&&document.readyState==='complete'`,"warm reload new document",15000);
+    await waitFor(client,"window.FourSymbolsStartupPolicy?.getState()==='MIGRATION_REQUIRED'&&window.FourSymbolsStartupPolicy?.getUid()==='uid-B'","changed local save conflict",15000);
+    const candidateAfterReload=await client.eval(`localStorage.getItem("four_symbols_save:uid-B")`);
+    const metadataAfterReload=await client.eval(`localStorage.getItem("four_symbols_save_meta:uid-B")`);
+    const beforeSave=JSON.parse(candidateBeforeReload),afterSave=JSON.parse(candidateAfterReload);
+    delete beforeSave.lastSaveTimestamp;delete afterSave.lastSaveTimestamp;
+    assert.deepEqual(afterSave,beforeSave,"Conflict changed the locally held character, inventory or progress");
+    const beforeMeta=JSON.parse(metadataBeforeReload),afterMeta=JSON.parse(metadataAfterReload);
+    assert.equal(afterMeta.ownerUid,beforeMeta.ownerUid,"Conflict changed the local UID");
+    assert.equal(afterMeta.cloudBaseFingerprint,beforeMeta.cloudBaseFingerprint,"Conflict changed cloud-base provenance");
+    assert.equal(afterMeta.localDirty,true,"The outgoing page's save must remain an untrusted local candidate");
+    evidence.checks.authoritativeConflict={uid:"uid-B",localCandidatePreserved:true};
+
+    // Disposable QA account only: retain both records before checking that
+    // the same UID can sign back in without a local cache.
+    await client.eval(`(()=>{
+      localStorage.setItem("__qa_candidate_backup_uid_B",${JSON.stringify(candidateAfterReload)});
+      localStorage.setItem("__qa_candidate_meta_backup_uid_B",${JSON.stringify(metadataAfterReload)});
+      localStorage.removeItem("four_symbols_save:uid-B");
+      localStorage.removeItem("four_symbols_save_meta:uid-B");
+    })()`);
+    assert.equal(await client.eval(`localStorage.getItem("__qa_candidate_backup_uid_B")`),candidateAfterReload);
+    const conflictTimeOrigin=await client.eval(`performance.timeOrigin`);
+    await client.eval(`document.getElementById("firebaseMigrationCancelButton").click()`);
+    await waitFor(client,`performance.timeOrigin!==${JSON.stringify(conflictTimeOrigin)}&&window.FourSymbolsStartupPolicy?.getState()==='AUTH_REQUIRED'`,"cloud conflict cancel and signed-out reload",20000);
+    await waitFor(client,"performance.getEntriesByName('four-symbols:auth-ui-interactive').length>0&&document.getElementById('firebaseEmailSignInButton')?.disabled===false","same UID sign-in surface",15000);
+    assert.equal(await client.eval(`Object.prototype.hasOwnProperty.call(window,"__qaAuthUser")`),true,"Warm restore loaded a non-mocked Firebase Auth module");
+    evidence.checks.restoreSignInBefore=await client.eval(`(()=>({timeOrigin:performance.timeOrigin,state:FourSymbolsStartupPolicy.getState(),signedOut:localStorage.getItem("__qa_signed_out"),buttonConnected:document.getElementById("firebaseEmailSignInButton")?.isConnected,buttonDisabled:document.getElementById("firebaseEmailSignInButton")?.disabled,panelHidden:document.getElementById("firebaseSignedOutPanel")?.hidden,trace:localStorage.getItem("__qa_auth_trace")}))()`);
+    await client.eval(`(()=>{document.getElementById("firebaseEmailInput").value="b@example.test";document.getElementById("firebasePasswordInput").value="123456";document.getElementById("firebaseEmailSignInButton").click();})()`);
+    await sleep(250);
+    evidence.checks.restoreSignInAfter=await client.eval(`(()=>({timeOrigin:performance.timeOrigin,state:FourSymbolsStartupPolicy.getState(),mockUid:window.__qaAuthUser?.uid||null,persistedUid:localStorage.getItem("__qa_auth_uid"),signedOut:localStorage.getItem("__qa_signed_out"),buttonDisabled:document.getElementById("firebaseEmailSignInButton")?.disabled,status:document.getElementById("firebaseAuthStatus")?.textContent||"",trace:localStorage.getItem("__qa_auth_trace")}))()`);
+    assert.equal(evidence.checks.restoreSignInAfter.persistedUid,"uid-B","QA account sign-in button did not invoke mocked Firebase Auth after conflict cancel");
     await waitFor(client,"window.FourSymbolsStartupPolicy?.getState()==='READY'&&window.FourSymbolsStartupPolicy?.getUid()==='uid-B'&&performance.getEntriesByName('four-symbols:main-city-interactive').length>0","warm account restore",15000);
+    assert.equal(await client.eval(`localStorage.getItem("__qa_candidate_backup_uid_B")`),candidateAfterReload,"Fresh-device restore removed the original QA candidate backup");
     evidence.performance.warmExisting=await metrics(client,"four-symbols:main-city-interactive");
     assert.ok(evidence.performance.warmExisting.readyMs>=9800&&evidence.performance.warmExisting.readyMs<=15000,"Warm returning main city did not respect the deliberate 5s + 5s brand opening");
     evidence.checks.warmRestore=await client.eval(`(()=>({uid:FourSymbolsStartupPolicy.getUid(),playerId:player.id,creation:getComputedStyle(document.getElementById("creationPage")).display,game:getComputedStyle(document.getElementById("gameInterface")).display}))()`);
