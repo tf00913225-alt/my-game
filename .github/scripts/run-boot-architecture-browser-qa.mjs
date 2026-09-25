@@ -177,10 +177,11 @@ async function createQaServer(){
     const server=http.createServer(async(request,response)=>{
         try{
             const url=new URL(request.url,"http://127.0.0.1");
-            const fetchDest=String(request.headers["sec-fetch-dest"]||"");
-            if(url.pathname===authPath&&fetchDest==="script"){response.writeHead(200,{"content-type":"text/javascript; charset=utf-8","cache-control":"no-store"});response.end(fakeAuth);return;}
-            if(url.pathname===cloudPath&&fetchDest==="script"){response.writeHead(200,{"content-type":"text/javascript; charset=utf-8","cache-control":"no-store"});response.end(fakeCloud);return;}
-            if(url.pathname===sessionPath&&fetchDest==="script"){response.writeHead(200,{"content-type":"text/javascript; charset=utf-8","cache-control":"no-store"});response.end(fakeSession);return;}
+            // Preload requests can arrive without Sec-Fetch-Dest: script and
+            // otherwise cache the real hashed module for the next navigation.
+            if(url.pathname===authPath){response.writeHead(200,{"content-type":"text/javascript; charset=utf-8","cache-control":"no-store"});response.end(fakeAuth);return;}
+            if(url.pathname===cloudPath){response.writeHead(200,{"content-type":"text/javascript; charset=utf-8","cache-control":"no-store"});response.end(fakeCloud);return;}
+            if(url.pathname===sessionPath){response.writeHead(200,{"content-type":"text/javascript; charset=utf-8","cache-control":"no-store"});response.end(fakeSession);return;}
             const relative=decodeURIComponent(url.pathname==="/"?"index.html":url.pathname.slice(1));
             if(relative==="index.html"){ activeScenario=url.searchParams.get("scenario")||""; injected404=false; }
             // resource-404 is injected in-page so retry behavior is deterministic per navigation.
@@ -508,6 +509,7 @@ try{
     await client.eval(`document.getElementById("firebaseMigrationCancelButton").click()`);
     await waitFor(client,`performance.timeOrigin!==${JSON.stringify(conflictTimeOrigin)}&&window.FourSymbolsStartupPolicy?.getState()==='AUTH_REQUIRED'`,"cloud conflict cancel and signed-out reload",20000);
     await waitFor(client,"performance.getEntriesByName('four-symbols:auth-ui-interactive').length>0&&document.getElementById('firebaseEmailSignInButton')?.disabled===false","same UID sign-in surface",15000);
+    assert.equal(await client.eval(`Object.prototype.hasOwnProperty.call(window,"__qaAuthUser")`),true,"Warm restore loaded a non-mocked Firebase Auth module");
     evidence.checks.restoreSignInBefore=await client.eval(`(()=>({timeOrigin:performance.timeOrigin,state:FourSymbolsStartupPolicy.getState(),signedOut:localStorage.getItem("__qa_signed_out"),buttonConnected:document.getElementById("firebaseEmailSignInButton")?.isConnected,buttonDisabled:document.getElementById("firebaseEmailSignInButton")?.disabled,panelHidden:document.getElementById("firebaseSignedOutPanel")?.hidden,trace:localStorage.getItem("__qa_auth_trace")}))()`);
     await client.eval(`(()=>{document.getElementById("firebaseEmailInput").value="b@example.test";document.getElementById("firebasePasswordInput").value="123456";document.getElementById("firebaseEmailSignInButton").click();})()`);
     await sleep(250);
