@@ -118,4 +118,4 @@ jobs:
         shell: bash
         run: |
           test "$(git ls-remote origin refs/heads/dev | cut -f1)" = "$GITHUB_SHA"
-          npx --yes firebase-tools@15.30.0 deploy --project four-symbols-jianghu --non-interactive --force --only 'functions:createGameSession,functions:revokeGameSession,functions:protectedTest,functions:bootstrapCloudSave,functions:submitLegacyMigrationCandidate,functions:saveCloudPreferences,functions:reserveTrustedGrant,functions:createNativeAuthHandoff,functions:redeemNativeAuthHandoff,firestore:rules'
+          npx --yes firebase-tools@15.30.0 deploy --project four-symbols-jianghu --non-interactive --force --only 'functions:createGameSession,functions:revokeGameSession,functions:protectedTest,functions:bootstrapCloudSave,functions:submitLegacyMigrationCandidate,functions:screenLegacyMigrationCandidate,functions:saveCloudPreferences,functions:reserveTrustedGrant,functions:createNativeAuthHandoff,functions:redeemNativeAuthHandoff,firestore:rules'
