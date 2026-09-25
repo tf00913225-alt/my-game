@@ -35,6 +35,13 @@ function chromeBinary(){
 const fakeAuth=String.raw`
 const listeners=new Set();
 const scenario=new URL(location.href).searchParams.get("scenario")||"signed-out";
+function qaTrace(action){
+  try{
+    const history=JSON.parse(localStorage.getItem("__qa_auth_trace")||"[]");
+    history.push({action,at:Date.now(),url:location.search,stack:new Error().stack?.split("\n").slice(1,5).join(" | ")||""});
+    localStorage.setItem("__qa_auth_trace",JSON.stringify(history.slice(-20)));
+  }catch(_){}
+}
 function publicUser(uid){return uid?Object.freeze({uid,email:uid+"@qa.invalid",displayName:"QA "+uid,photoURL:null,isAnonymous:uid==="uid-guest",providerIds:Object.freeze(uid==="uid-guest"?[]:["password"])}):null;}
 let current=null;
 try{
@@ -52,13 +59,13 @@ export function installFirebaseSessionHooks(){}
 export function getFirebaseAuth(){return {currentUser:current};}
 export function getSignedInUser(){return current;}
 export async function observeFirebaseAuthState(listener){listeners.add(listener);queueMicrotask(()=>{if(scenario==="auth-error"){const error=new Error("simulated auth network failure");error.code="auth/network-request-failed";listener(null,error);}else{listener(current,null);}});return ()=>listeners.delete(listener);}
-function remember(uid){try{localStorage.setItem("__qa_auth_uid",uid);localStorage.removeItem("__qa_signed_out");}catch(_){}const user=publicUser(uid);publish(user);return user;}
+function remember(uid){qaTrace("sign-in:"+uid);try{localStorage.setItem("__qa_auth_uid",uid);localStorage.removeItem("__qa_signed_out");}catch(_){}const user=publicUser(uid);publish(user);return user;}
 export async function signInAsAnonymous(){return remember("uid-guest");}
 export async function signInWithGoogle(){return remember("uid-google");}
 export async function signInWithFacebook(){return remember("uid-facebook");}
 export async function signInWithEmail(email){return remember(String(email).toLowerCase().startsWith("b")?"uid-B":"uid-A");}
 export async function createAccountWithEmail(email){return signInWithEmail(email);}
-export async function signOutFirebase(){try{localStorage.removeItem("__qa_auth_uid");localStorage.setItem("__qa_signed_out","1");}catch(_){}publish(null);}
+export async function signOutFirebase(){qaTrace("sign-out");try{localStorage.removeItem("__qa_auth_uid");localStorage.setItem("__qa_signed_out","1");}catch(_){}publish(null);}
 `;
 
 const fakeCloud=String.raw`
@@ -242,6 +249,7 @@ async function browserDiagnostic(client){
           featureScripts:[...document.querySelectorAll("script[data-feature-bundle]")].map(script=>({src:script.src,bundle:script.dataset.featureBundle})),
           featureLinks:[...document.querySelectorAll("link[data-feature-style],link[data-feature-preload]")].map(link=>({rel:link.rel,href:link.href,style:link.dataset.featureStyle||null,preload:link.dataset.featurePreload||null})),
           localKeys:Object.keys(localStorage),
+          qaAuthTrace:(()=>{try{return JSON.parse(localStorage.getItem("__qa_auth_trace")||"[]");}catch(_){return [];}})(),
           lastError:(()=>{const value=window.FourSymbolsStartupPolicy?.getLastError?.();return value?{name:value.name||null,code:value.code||null,message:value.message||String(value),stack:value.stack||null}:null;})(),
           marks:performance.getEntriesByType("mark").map(entry=>({name:entry.name,startTime:entry.startTime})),
           resources:performance.getEntriesByType("resource").map(entry=>({name:entry.name,initiatorType:entry.initiatorType,transferSize:entry.transferSize}))
