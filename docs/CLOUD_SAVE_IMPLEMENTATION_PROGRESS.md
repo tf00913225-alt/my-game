@@ -2,6 +2,12 @@
 
 本文件是長期工程進度來源。**每個 Phase 結束都必須更新本文件**；聊天、Commit、PR、CI 或部署成功不能取代驗收紀錄。
 
+## 2026-09-25 — Server-issued grant reservation candidate
+
+- `functions/src/trusted-grant-ledger.js` is the sole grant reservation owner; `functions/index.js::reserveTrustedGrant` verifies Firebase identity and calls the Phase 1 `runProtected` transaction. A grant must already exist in private `serverUsers/{uid}/pendingGrants/{grantId}` with a server-issued source. Browser Firestore rules deny creation. The request accepts an ID, operation ID and expected revision, never a gold amount.
+- One transaction checks active session, UID, envelope revision and grant eligibility, reserves a grant, writes an immutable operation receipt and advances the envelope revision. Same operation ID retries return the receipt; a second ID cannot reserve the same grant. This is **not a gold award**: the receipt explicitly says `creditedToCharacter:false`, and no local save, character payload, inventory or `authoritativeStateReady` changes. No grant issuer or client button is provided.
+- This isolated backend prerequisite still needs PR CI, emulator, merge and deployment verification. Phase 4 remains IN PROGRESS / 0/6 VERIFIED; the Phase 5 economy backend remains incomplete. A server-validated gameplay event source, complete character state and legacy adoption policy are still required for actual cross-device recovery.
+
 ## 2026-09-25 — Legacy candidate revision history (candidate; pending CI/deploy)
 
 - Backend owner `functions/index.js::submitLegacyMigrationCandidate()` now creates a private `migrationCandidates/{revision}` record in the existing protected transaction, while keeping `latest` for compatibility. Each record remains `trusted:false`; it is a server-side record of a client-supplied candidate, **not** a trusted character backup or accepted cloud save. Historical revisions submitted before this change cannot be reconstructed from an overwritten `latest` record.
