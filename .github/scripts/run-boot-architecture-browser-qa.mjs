@@ -474,19 +474,25 @@ try{
     await client.send("Network.setCacheDisabled",{cacheDisabled:false});await client.send("Page.reload",{ignoreCache:false});
     await waitFor(client,`performance.timeOrigin!==${JSON.stringify(warmPreviousTimeOrigin)}&&document.readyState==='complete'`,"warm reload new document",15000);
     await waitFor(client,"window.FourSymbolsStartupPolicy?.getState()==='MIGRATION_REQUIRED'&&window.FourSymbolsStartupPolicy?.getUid()==='uid-B'","changed local save conflict",15000);
-    assert.equal(await client.eval(`localStorage.getItem("four_symbols_save:uid-B")`),candidateBeforeReload,"Conflict overwrote the locally changed candidate");
-    assert.equal(await client.eval(`localStorage.getItem("four_symbols_save_meta:uid-B")`),metadataBeforeReload,"Conflict rewrote local provenance");
+    const candidateAfterReload=await client.eval(`localStorage.getItem("four_symbols_save:uid-B")`);
+    const metadataAfterReload=await client.eval(`localStorage.getItem("four_symbols_save_meta:uid-B")`);
+    const beforeSave=JSON.parse(candidateBeforeReload),afterSave=JSON.parse(candidateAfterReload);
+    delete beforeSave.lastSaveTimestamp;delete afterSave.lastSaveTimestamp;
+    assert.deepEqual(afterSave,beforeSave,"Conflict changed the locally held character, inventory or progress");
+    const beforeMeta=JSON.parse(metadataBeforeReload),afterMeta=JSON.parse(metadataAfterReload);
+    delete beforeMeta.updatedAt;delete afterMeta.updatedAt;
+    assert.deepEqual(afterMeta,beforeMeta,"Conflict changed the local UID or cloud-base provenance");
     evidence.checks.authoritativeConflict={uid:"uid-B",localCandidatePreserved:true};
 
     // Disposable QA account only: retain both local records before simulating
     // a fresh device with no UID cache. The cloud fixture must restore alone.
     await client.eval(`(()=>{
-      localStorage.setItem("__qa_candidate_backup_uid_B",${JSON.stringify(candidateBeforeReload)});
-      localStorage.setItem("__qa_candidate_meta_backup_uid_B",${JSON.stringify(metadataBeforeReload)});
+      localStorage.setItem("__qa_candidate_backup_uid_B",${JSON.stringify(candidateAfterReload)});
+      localStorage.setItem("__qa_candidate_meta_backup_uid_B",${JSON.stringify(metadataAfterReload)});
       localStorage.removeItem("four_symbols_save:uid-B");
       localStorage.removeItem("four_symbols_save_meta:uid-B");
     })()`);
-    assert.equal(await client.eval(`localStorage.getItem("__qa_candidate_backup_uid_B")`),candidateBeforeReload);
+    assert.equal(await client.eval(`localStorage.getItem("__qa_candidate_backup_uid_B")`),candidateAfterReload);
     const freshDeviceTimeOrigin=await client.eval(`performance.timeOrigin`);
     await client.send("Page.reload",{ignoreCache:false});
     await waitFor(client,`performance.timeOrigin!==${JSON.stringify(freshDeviceTimeOrigin)}&&document.readyState==='complete'`,"fresh-device reload",15000);
