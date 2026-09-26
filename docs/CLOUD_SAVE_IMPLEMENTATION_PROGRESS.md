@@ -2,6 +2,11 @@
 
 本文件是長期工程進度來源。**每個 Phase 結束都必須更新本文件**；聊天、Commit、PR、CI 或部署成功不能取代驗收紀錄。
 
+## 2026-09-26 — Foundation C reservation receipt consistency and settlement gate (candidate)
+
+- `functions/src/trusted-grant-ledger.js` now rejects an inconsistent **existing** reservation receipt if grant amount, status, UID/source, receipt type, credited flag or revision diverges. Emulator regression corrupts each critical field, verifies a retry fails with `DATA_LOSS`, restores the fixture and confirms no extra revision or award. The grant remains only reserved: `creditedToCharacter:false`.
+- `docs/CLOUD_OPERATION_SETTLEMENT_CONTRACT.md` gates the first real reward credit on one transaction containing server-owned eligibility/calculation, canonical delta, expected revision, operation ID, unique claim, idempotent receipt and ledger. No such credit writer or source issuer is added here. This does not complete Foundation C or Phase 4; `authoritativeStateReady:false` and Phase 4 **0/6 VERIFIED** remain.
+
 ## 2026-09-26 — Foundation B canonical schema and recovery contract (design only)
 
 - `docs/CLOUD_CANONICAL_SCHEMA_AND_RECOVERY.md` now specifies the planned server-owned account/character/economy/inventory/equipment/relic/progress/claim/operation/ledger records, a bounded materialized playable snapshot, revision and digest consistency gate, and a separate recovery point manifest. A valid player may have one or two created characters; unused slots remain explicitly empty.
