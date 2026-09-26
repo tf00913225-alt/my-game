@@ -90,11 +90,10 @@ test("visual timing, dead-target filtering and raster-only choreography are enfo
     assert.match(css,/background:transparent !important/);
     assert.match(css,/\.badge-normal[\s\S]*color:#fff !important/);
     assert.match(css,/@keyframes v146AreaImpact/);
-    assert.match(css,/\.v146-status-popup/);
-    assert.match(source,/rect\.top\+rect\.height\*\.86/);
-    assert.match(source,/setTimeout\(\(\)=>popup\.remove\(\),1300\)/);
-    assert.match(css,/animation:v146StatusPopup 1\.25s ease-out both/);
-    assert.match(css,/10%,90%\{opacity:1/);
+    assert.doesNotMatch(css,/\.v146-status-popup/);
+    assert.doesNotMatch(source,/rect\.top\+rect\.height\*\.86/);
+    assert.match(source,/FourSymbolsBattleFloatingFeedback/);
+    assert.match(source,/feedback\.emitAtImpact/);
 });
 
 test("shop quantity calculates and disables against the live total",()=>{
