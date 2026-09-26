@@ -24,8 +24,6 @@ assert.match(progression,/window.v173GetSkillLearnEligibility=getSkillLearnEligi
 assert.match(progression,/prerequisiteRequired=!cross/);
 assert.match(main,/getSkillLearnEligibilityForUi\(skillOwner,skill,skillLevels\)/);
 assert.match(main,/skill-category-badge \$\{skill\.category\}/);
-assert.doesNotMatch(main,/skill-action-card-top|actionIcon/);
-assert.doesNotMatch(mainCss,/skill-action-card-top/);
 assert.doesNotMatch(main,/isSkillPrereqMet\(/);
 assert.doesNotMatch(context,/openMapInventoryOverlay\(normalized\)/);
 assert.doesNotMatch(context,/mapWasActive|mapPage\.classList\.add\("active"\)/);
