@@ -1,0 +1,19 @@
+# First authoritative reward settlement — implementation gate
+
+Status: design and prerequisite hardening only. No gold, EXP, item, claim or playable character mutation is deployed by this contract. `reserveTrustedGrant()` is a pre-migration reservation with `creditedToCharacter:false`; its `grantOperations` receipt is **not** an economy ledger entry or a spendable balance. Do not turn its response into a local award.
+
+## Trusted source and request
+
+The first real reward writer must have a server-owned event/attempt or verified provider record identifying UID, reward source, unique reward key and period, eligibility, canonical reward calculation and expiry/consumption state. A browser may submit only an allowed intent: `operationId`, source reference, expected server revision and active session. The backend derives UID from Auth, checks the current session in the same transaction and computes the reward; reject any client amount, EXP, item list, target balance, `claimed` flag or local timestamp. Start with one enumerated reward path and explicitly reject unsupported sources. Client battle animation or simulated result alone is not proof of eligibility.
+
+## One atomic operation
+
+Within the protected Firestore transaction, read the current envelope, canonical character/economy/inventory state, source record, source-period claim key and `operations/{operationId}`. For a new operation require an exact expected revision, valid source and unclaimed key. Compute the result from server-owned inputs, then write the next canonical revision, bounded playable projection or its fenced rebuild marker, immutable operation receipt, immutable claim record and append-only ledger delta together. If a complete projection cannot be published at the same revision, leave `authoritativeStateReady:false`; never expose a partial character. No external side effects may occur inside a transaction callback.
+
+Receipt identity is UID-scoped and binds `operationId`, operation type, source/key/period, input revision, output revision, result and canonical delta digest. A retry of **the same intent** returns that stored result even when the caller's expected revision is now stale; a different intent reusing the ID fails closed. Another operation ID for the same unique source/key/period cannot award again. A stale *new* operation is rejected. Verify receipt/claim/ledger consistency before responding to retry; missing or contradictory records are `data-loss`, not permission to reissue a reward. Lost responses use receipt lookup and identical retry. Replaced sessions cannot read or retry protected operations.
+
+The ledger records immutable provenance and signed deltas with balance-before/after or asset ownership references; restoration uses a new audited revision and does not delete later receipts, reopen claims or duplicate payment rights. The server enforces bounded document sizes and partitions history by period; the snapshot only contains the compact claim checkpoint needed at startup. If Firestore transaction limits prevent a complete atomic result, redesign the data layout or defer the operation instead of making a partial credit.
+
+## Emulator acceptance before a credit writer
+
+Test identical retry after a lost response, same ID with different intent, different ID for a claimed source, concurrent stale revisions, cross-UID source, revoked session, malformed source, corrupt/missing receipt or claim or ledger, oversized result and an interrupted snapshot build. Assert both the balance/asset delta and exactly one receipt/claim/ledger entry, and that rejected cases change no authoritative document. Payment/refund and offline tickets need their own trusted source checks; this contract alone does not enable them. Require a separately verified server backup/recovery point before `authoritativeStateReady:true` or fresh-device restore.

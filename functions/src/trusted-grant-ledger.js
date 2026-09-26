@@ -36,10 +36,18 @@ function createTrustedGrantLedger({db,FieldValue,HttpsError,runProtected,inspect
             }
             if(receiptSnapshot.exists){
                 const receipt=receiptSnapshot.data();
+                const grant=grantSnapshot.exists?grantSnapshot.data():null;
                 if(receipt.schemaVersion!==GRANT_SCHEMA_VERSION||receipt.ownerUid!==uid||
                    receipt.grantId!==grantId||receipt.operationId!==operationId||
                    !Number.isSafeInteger(receipt.serverRevision)||receipt.serverRevision<1||
-                   !grantSnapshot.exists||grantSnapshot.get("claimedByOperationId")!==operationId){
+                   receipt.serverRevision>envelope.serverRevision||
+                   receipt.kind!=="gold"||receipt.creditedToCharacter!==false||
+                   !receipt.createdAt||typeof receipt.createdAt.toMillis!=="function"||
+                   !grant||grant.schemaVersion!==GRANT_SCHEMA_VERSION||grant.ownerUid!==uid||
+                   grant.kind!=="gold"||grant.source!=="server-event"||
+                   !Number.isSafeInteger(grant.amount)||grant.amount<1||grant.amount>100000||
+                   grant.amount!==receipt.amount||grant.status!=="reserved"||
+                   grant.claimedByOperationId!==operationId){
                     fail("data-loss","Grant receipt is inconsistent.");
                 }
                 return {grantId,operationId,serverRevision:receipt.serverRevision,
