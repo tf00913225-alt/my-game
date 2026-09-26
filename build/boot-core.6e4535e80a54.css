@@ -4607,13 +4607,8 @@ button:active{
 .skill-category-badge.passive{color:#d3a8ff;}
 .skill-row-prerequisite{color:#f59e0b;}
 
-/*
-   ★ 學習/升級方框，刻意做成跟主城
-   .home-card同一種「上面圖示格、下面
-   紅底標籤」的兩層結構，只是尺寸縮小、
-   整塊當作可點擊的按鈕使用，延續同一套
-   視覺語言。
-*/
+/* Skill action cards are text-only canonical actions. Icons are not part of
+   the current action-card contract, so the card must not reserve an icon row. */
 
 .skill-action-card{
     flex:0 0 auto;
@@ -4622,7 +4617,8 @@ button:active{
     max-width:112px;
     min-height:44px;
     display:flex;
-    flex-direction:column;
+    align-items:center;
+    justify-content:center;
     border-radius:7px;
     overflow:hidden;
     border:1px solid rgba(200,154,72,.38);
@@ -4640,20 +4636,10 @@ button:active{
     pointer-events:none;
 }
 
-.skill-action-card-top{
-    flex:1 1 auto;
-
-    background:var(--theme-box-bg);
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    font-size:13px;
-}
-
 .skill-action-card-label{
     flex:0 0 auto;
+    width:100%;
+    box-sizing:border-box;
 
     padding:7px 8px;
 
