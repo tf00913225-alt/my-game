@@ -2,10 +2,10 @@
 
 本文件是長期工程進度來源。**每個 Phase 結束都必須更新本文件**；聊天、Commit、PR、CI 或部署成功不能取代驗收紀錄。
 
-## 2026-09-26 — Legacy character identity screening (candidate; pending CI)
+## 2026-09-26 — Legacy character identity screening (deployed; no admission)
 
-- Migration policy requires a literal, nonblank string character ID; numeric IDs no longer pass by implicit string coercion. The read-only candidate screening reports `CHARACTER_SLOT_GAP` when slot 3 exists without slot 2. A one-character or two-character party remains valid because the game creates those slots progressively.
-- This strengthens structural screening of untrusted historical candidates only. It does not accept a baseline, create canonical state, enable `authoritativeStateReady`, provide server backup or allow second-device character restore. Targeted local tests pass; PR emulator, merged dev and Firebase deployment remain to be checked separately.
+- Migration policy requires a literal, nonblank string character ID; numeric IDs no longer pass by implicit string coercion. It rejects a new candidate if slot 3 exists without slot 2; the read-only screening reports `CHARACTER_SLOT_GAP` for previously stored candidates. A one-character or two-character party remains valid because the game creates those slots progressively.
+- PR #588 merged as `dev@49ca985fd80be20ec0647e1c4e8b5ff277339d2f`. Targeted local tests passed (38); PR Repository CI run `36232442006` and Session Authority emulator run `36232441874` succeeded. Merged dev CI run `36232695973` succeeded, including DEV deployment; merged Session Authority run `36232695823` passed the emulator and Firebase deployment for the exact SHA. The deployment log shows `submitLegacyMigrationCandidate` and `screenLegacyMigrationCandidate` updated in `us-central1` and Firestore deny-write rules released. This strengthens structural screening of untrusted historical candidates only; it does not accept a baseline, create canonical state, enable `authoritativeStateReady`, provide server backup or allow second-device character restore.
 
 ## 2026-09-26 — architecture hardening work branch (not yet verified)
 
