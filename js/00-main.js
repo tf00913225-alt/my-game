@@ -18955,7 +18955,8 @@ function winBattle(){
     battleAdvanceScheduled=false;
 
 
-    battleToken++;\n    clearTransientBattlePresentation();
+    battleToken++;
+    clearTransientBattlePresentation();
 
     /*
        ★ 新增（依照使用者要求，每日任務
@@ -19221,7 +19222,8 @@ function loseBattle(){
     battleAdvanceScheduled=false;
 
 
-    battleToken++;\n    clearTransientBattlePresentation();
+    battleToken++;
+    clearTransientBattlePresentation();
 
 
     /*
