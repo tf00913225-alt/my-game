@@ -6,7 +6,64 @@
 const ELEMENTS=new Set(["fire","water","wind","earth"]);
 const CHARACTER_KEYS=["player","player2","player3"];
 const CLAIM_FIELDS=["dailyQuestState","commissionQuestState","achievementState","gameplayProgress","abyssProgress"];
+const EQUIPMENT_SLOT_BY_TYPE=Object.freeze({
+    weapon:"hand",hand:"hand",helmet:"head",head:"head",shoulder:"shoulder",
+    armor:"armor",shoes:"shoes",accessory:"ring",ring:"ring"
+});
+const EQUIPMENT_SLOT_BY_KEY=Object.freeze({
+    head:"head",helmet:"head",hand:"hand",weapon:"hand",shoulder:"shoulder",
+    armor:"armor",shoes:"shoes",ring:"ring",accessory:"ring"
+});
 const {auditLegacyRewardClaims}=require("./legacy-reward-claim-audit.js");
+
+function auditLegacyEquipment(save,blockers){
+    const seenUids=new Set();
+    const recordUid=item=>{
+        if(!item||typeof item!=="object"||Array.isArray(item)){ return; }
+        if(item.v141Uid===undefined||item.v141Uid===null){ return; }
+        if(typeof item.v141Uid!=="string"||!item.v141Uid.trim()){
+            blockers.add("EQUIPMENT_IDENTITY_INVALID");
+        }else if(seenUids.has(item.v141Uid)){
+            blockers.add("EQUIPMENT_IDENTITY_DUPLICATE");
+        }else{ seenUids.add(item.v141Uid); }
+    };
+    if(Array.isArray(save.inventoryItems)){
+        save.inventoryItems.forEach(item=>{
+            if(item&&EQUIPMENT_SLOT_BY_TYPE[item.type]&&item.count!==1){
+                blockers.add("EQUIPMENT_STRUCTURE_INVALID");
+            }
+            if(item&&(EQUIPMENT_SLOT_BY_TYPE[item.type]||item.v141Uid!=null)){ recordUid(item); }
+        });
+    }
+    const equipment=save.characterEquipment;
+    if(!equipment||typeof equipment!=="object"||Array.isArray(equipment)){ return; }
+    for(const [owner,slots] of Object.entries(equipment)){
+        if(!slots||typeof slots!=="object"||Array.isArray(slots)){
+            blockers.add("EQUIPMENT_STRUCTURE_INVALID");
+            continue;
+        }
+        const occupiedSlots=new Set();
+        for(const [slot,item] of Object.entries(slots)){
+            if(item===null){ continue; }
+            const canonicalSlot=EQUIPMENT_SLOT_BY_KEY[slot];
+            if(!canonicalSlot||occupiedSlots.has(canonicalSlot)||
+               !item||typeof item!=="object"||Array.isArray(item)||
+               typeof item.id!=="string"||!item.id.trim()||
+               EQUIPMENT_SLOT_BY_TYPE[item.type]!==canonicalSlot||item.count!==1){
+                blockers.add("EQUIPMENT_STRUCTURE_INVALID");
+                continue;
+            }
+            occupiedSlots.add(canonicalSlot);
+            // The runtime removes equipped objects from inventoryItems. Audit
+            // their identities across both locations, not a bag reference.
+            recordUid(item);
+            if(owner!=="fire"&&(owner!=="player2"||save.player2==null)&&
+               (owner!=="player3"||save.player3==null)){
+                blockers.add("EQUIPMENT_OWNER_UNMAPPED");
+            }
+        }
+    }
+}
 
 function screenLegacyCandidateSnapshot(save,sidecars=null){
     const blockers=new Set();
@@ -38,6 +95,7 @@ function screenLegacyCandidateSnapshot(save,sidecars=null){
        Array.isArray(save.characterEquipment)){
         blockers.add("EQUIPMENT_STRUCTURE_INVALID");
     }
+    auditLegacyEquipment(save,blockers);
     for(const field of CLAIM_FIELDS){
         if(!save[field]||typeof save[field]!=="object"){
             blockers.add("CLAIM_PROGRESS_MISSING");

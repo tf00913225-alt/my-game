@@ -38,3 +38,35 @@ test("historical main save cannot pass screening without sidecar and reward prov
         player3:{id:"third",element:"earth",level:50,exp:0,skillPoints:0}});
     assert.equal(contiguous.blockers.includes("CHARACTER_SLOT_GAP"),false);
 });
+
+test("equipped legacy gear is an owned object outside the bag, with one identity across both",()=>{
+    const base={player:{id:"first",element:"fire",exp:0,skillPoints:0},
+        player2:null,player3:null,inventoryItems:[{id:"potion",type:"potion",count:2}],
+        characterEquipment:{fire:{hand:{id:"ironSword",type:"weapon",count:1,v141Uid:"gear-1"}}}};
+    const review=screenLegacyCandidateSnapshot(base);
+    assert.equal(review.blockers.includes("EQUIPMENT_STRUCTURE_INVALID"),false);
+    assert.equal(review.blockers.includes("EQUIPMENT_IDENTITY_DUPLICATE"),false);
+
+    const duplicate=screenLegacyCandidateSnapshot({...base,inventoryItems:[...base.inventoryItems,
+        {id:"ironSword",type:"weapon",count:1,v141Uid:"gear-1"}]});
+    assert.ok(duplicate.blockers.includes("EQUIPMENT_IDENTITY_DUPLICATE"));
+    const disguised=screenLegacyCandidateSnapshot({...base,inventoryItems:[...base.inventoryItems,
+        {id:"ironSword",type:"potion",count:1,v141Uid:"gear-1"}]});
+    assert.ok(disguised.blockers.includes("EQUIPMENT_IDENTITY_DUPLICATE"));
+    const stacked=screenLegacyCandidateSnapshot({...base,inventoryItems:[...base.inventoryItems,
+        {id:"ironSword",type:"weapon",count:2}]});
+    assert.ok(stacked.blockers.includes("EQUIPMENT_STRUCTURE_INVALID"));
+    const wrongSlot=screenLegacyCandidateSnapshot({...base,
+        characterEquipment:{fire:{ring:{id:"ironSword",type:"weapon",count:1}}}});
+    assert.ok(wrongSlot.blockers.includes("EQUIPMENT_STRUCTURE_INVALID"));
+    const orphan=screenLegacyCandidateSnapshot({...base,
+        characterEquipment:{fire:{},player2:{hand:{id:"ironSword",type:"weapon",count:1}}}});
+    assert.ok(orphan.blockers.includes("EQUIPMENT_OWNER_UNMAPPED"));
+    const legacyAlias=screenLegacyCandidateSnapshot({...base,
+        characterEquipment:{fire:{weapon:{id:"ironSword",type:"weapon",count:1}}}});
+    assert.equal(legacyAlias.blockers.includes("EQUIPMENT_STRUCTURE_INVALID"),false);
+    const ambiguous=screenLegacyCandidateSnapshot({...base,
+        characterEquipment:{fire:{weapon:{id:"ironSword",type:"weapon",count:1},
+            hand:{id:"woodStaff",type:"weapon",count:1}}}});
+    assert.ok(ambiguous.blockers.includes("EQUIPMENT_STRUCTURE_INVALID"));
+});

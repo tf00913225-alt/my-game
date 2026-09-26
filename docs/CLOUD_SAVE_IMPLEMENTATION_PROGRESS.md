@@ -2,6 +2,11 @@
 
 本文件是長期工程進度來源。**每個 Phase 結束都必須更新本文件**；聊天、Commit、PR、CI 或部署成功不能取代驗收紀錄。
 
+## 2026-09-26 — Legacy equipped-object migration screening (candidate)
+
+- Runtime audit found that `equipSelectedItem()` moves the entire item object from `inventoryItems` into `characterEquipment`; an equipped item is legitimately absent from the bag. The first character's current owner key is `fire`, later characters use `player2`/`player3`, and legacy alias slots exist. A future canonical conversion must take the union, allocate new server-issued ownership IDs and retain any unmapped item for review.
+- The existing read-only candidate screening now reports blockers for duplicate `v141Uid` across bag/equipment, mismatched or ambiguous equipment slots, malformed equipped items and nonempty orphaned owners. An equipped item absent from the bag is not itself a blocker. Legacy marker consistency is only structural; no item entitlement is trusted, no candidate is accepted, and Phase 4 remains **0/6 VERIFIED**.
+
 ## 2026-09-26 — Foundation C reservation receipt consistency and settlement gate (candidate)
 
 - `functions/src/trusted-grant-ledger.js` now rejects an inconsistent **existing** reservation receipt if grant amount, status, UID/source, receipt type, credited flag or revision diverges. Emulator regression corrupts each critical field, verifies a retry fails with `DATA_LOSS`, restores the fixture and confirms no extra revision or award. The grant remains only reserved: `creditedToCharacter:false`.
