@@ -352,6 +352,9 @@
 
     function registerMonsterTeamBuff(monster,buff,display){
         buff.displayBuff=display;
+        ["bonusPercent","percent","evasionBonusPercent","resistBonus","accuracyBonusPercent","defenseBonusPercent","reflectPercent","amount","value","skillLevel"].forEach(key=>{
+            if(display&&display[key]===undefined&&buff&&buff[key]!==undefined){ display[key]=buff[key]; }
+        });
         monster.v141TeamBuffs=monster.v141TeamBuffs||[];
         monster.v141TeamBuffs.push(buff);
         monster.activeBuffs=monster.activeBuffs||[];
@@ -551,7 +554,7 @@
             const ally=entry.monster;
             if(!canApplyNamedState(ally,"dodgeSkill",entry.index,skill.name)){ return; }
             ensureV155EvasionBase(ally);
-            const display={type:"dodgeSkill",v141BuffType:"dodge",turnsLeft:duration};
+            const display={type:"dodgeSkill",v141BuffType:"dodge",turnsLeft:duration,bonusPercent:percent};
             const state={
                 type:"dodgeSkill",turnsLeft:duration,bonusPercent:percent,displayBuff:display,
                 battleToken:currentBattleToken(),expiresTurn:currentRound()+duration
