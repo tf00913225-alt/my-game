@@ -143,7 +143,8 @@ function formulaRuntime(){
 {
     const statusText=sourceFunction(statusVfx,"statusEffectText");
     assert.doesNotMatch(statusText,/凍傷.*無法使用技能/);
-    assert.match(statusText,/frostbite[\s\S]*?傷害 -30%[\s\S]*?最終閃躲 -25個百分點[\s\S]*?最終異常狀態抗性 -25個百分點/);
+    assert.match(statusText,/frostbite[\s\S]*?傷害 -30%[\s\S]*?最終閃躲 -25%[\s\S]*?最終異常狀態抗性 -25%/);
+assert.doesNotMatch(statusText,/個百分點/,"player-visible status text must use % syntax");
     const finishDuration=sourceFunction(main,"finishBattleDurationAction");
     assert.match(finishDuration,/v143SyncStatusVisualEffects\("?(?:false)?"?\)|v143SyncStatusVisualEffects\(false\)/);
     assert.doesNotMatch(progression,/finishDurationAction|FourSymbolsDurationLifecycle=Object\.freeze/);
