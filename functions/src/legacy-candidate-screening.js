@@ -19,6 +19,7 @@ const CLAIM_SIDECARS=["daily-dungeon-state","progress","quest-milestones",
     "task-tracker","legacy-abyss-state","equipment-shop-daily",
     "equipment-shop-purchases","abyss-state"];
 const {auditLegacyRewardClaims}=require("./legacy-reward-claim-audit.js");
+const {buildCanonicalCharacterReviewPlan}=require("./canonical-character-review-plan.js");
 const {LEGACY_BACKUP_SIDECARS}=require("./cloud-save-policy.js");
 const RETAINED_MAIN_FIELDS=["version","bestiaryData","lastSaveTimestamp",
     "selectedCreationElement","autoConfig","autoConfig2","autoConfig3"];
@@ -151,6 +152,7 @@ function screenLegacyCandidateSnapshot(save,sidecars=null){
     const characters=CHARACTER_KEYS.map(key=>save[key]).filter(value=>value!==null&&value!==undefined);
     const ids=new Set();
     // One or two characters are legitimate; slot 3 cannot precede slot 2.
+    if(save.player==null){ blockers.add("CHARACTER_SLOT_MISSING"); }
     if(save.player3!=null&&save.player2==null){ blockers.add("CHARACTER_SLOT_GAP"); }
     for(const character of characters){
         if(!character||typeof character!=="object"||Array.isArray(character)){
@@ -293,15 +295,19 @@ function createLegacyCandidateScreening({db,HttpsError,runProtected,inspectExist
             }
             const review=screenLegacyCandidateSnapshot(candidate.snapshot,record.backup?.sidecars);
             const draft=prepareLegacyCharacterDraft(candidate.snapshot,record.backup?.sidecars,review);
+            // IDs in this review plan are ephemeral. Admission must allocate
+            // fresh IDs inside its own future protected transaction.
+            const plan=draft?buildCanonicalCharacterReviewPlan(uid,draft):null;
             return {
                 candidateRevision,serverRevision:envelope.serverRevision,
                 fingerprint:candidate.fingerprint,
                 ...review,
-                conversionReview:draft?{
+                conversionReview:plan?{
                     status:"prepared-untrusted",
-                    characterSlots:draft.slots.length,
-                    inventoryObjects:draft.inventory.length,
-                    equippedObjects:draft.equipment.length,
+                    characterSlots:plan.account.slots.length,
+                    characterRecords:plan.characters.length,
+                    ownedItemObjects:plan.ownedItems.length,
+                    equippedObjects:plan.equipmentRefs.length,
                     retainedSidecarSources:LEGACY_BACKUP_SIDECARS.length,
                     claimHistoryBlocked:true
                 }:{status:"blocked"}
