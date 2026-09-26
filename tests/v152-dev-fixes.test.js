@@ -8,6 +8,8 @@ const {execFileSync}=require("child_process");
 
 const source=fs.readFileSync("js/44-v152-dev-fixes.js","utf8");
 const css=fs.readFileSync("css/45-v152-dev-fixes.css","utf8");
+const feedbackOwner=fs.readFileSync("js/battle-floating-feedback-owner.js","utf8");
+const feedbackCss=fs.readFileSync("css/battle-floating-feedback-owner.css","utf8");
 const mainCss=fs.readFileSync("css/00-main.css","utf8");
 const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const index=fs.readFileSync("index.html","utf8");
@@ -193,17 +195,15 @@ test("entering a map immediately runs configured auto recovery exactly once",()=
     assert.equal(abyssRecovered,2);
 });
 
-test("HP popups are reparented above the full-screen skill stage",()=>{
-    const popup={classList:classList(["damage-popup","hp-popup"]),style:{setProperty(){}},parentNode:null};
-    const appended=[];
-    const element={offsetWidth:76,popup:null,getBoundingClientRect(){ return {left:20,top:30,width:152,height:200}; },querySelectorAll(){ return this.popup?[this.popup]:[]; }};
-    const document=bareDocument({body:{appendChild(node){ appended.push(node); node.parentNode=this; }}});
-    const context=load({document,showDamagePopup(target){ target.popup=popup; }});
-    context.showDamagePopup(element,"HP-100","hp");
-    assert.equal(appended[0],popup);
-    assert.equal(popup.classList.contains("v152-top-damage"),true);
-    assert.match(css,/z-index:2147483646/);
+test("V152 no longer owns popup DOM relocation or font geometry",()=>{
+    assert.doesNotMatch(source,/previousShowDamagePopup|v152-top-damage/);
+    assert.doesNotMatch(css,/damage-popup\.v152-top-damage|z-index:2147483646/);
+    assert.match(feedbackOwner,/window\.FourSymbolsBattleFloatingFeedback=api/);
+    assert.match(feedbackOwner,/getUnitGeometry\(side,index\)/);
+    assert.match(feedbackOwner,/function nextLane\(context\)/);
+    assert.match(feedbackCss,/\.battle-floating-feedback/);
 });
+
 
 test("legacy abnormal formula owner is retired while Ice Arrow Rain Frostbite remains authoritative",()=>{
     assert.doesNotMatch(v140,/GENERAL_STATUS_COEFFICIENT|LOCKDOWN_STATUS_COEFFICIENT|Math\.sqrt\(power\)/);
