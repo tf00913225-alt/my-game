@@ -37,6 +37,8 @@ test("historical main save cannot pass screening without sidecar and reward prov
     const gap=screenLegacyCandidateSnapshot({...save,
         player3:{id:"third",element:"earth",level:50,exp:0,skillPoints:0}});
     assert.ok(gap.blockers.includes("CHARACTER_SLOT_GAP"));
+    assert.ok(screenLegacyCandidateSnapshot({...save,player:null}).blockers.includes(
+        "CHARACTER_SLOT_MISSING"));
     const contiguous=screenLegacyCandidateSnapshot({...save,
         player2:{id:"second",element:"water",level:10,exp:0,skillPoints:0},
         player3:{id:"third",element:"earth",level:50,exp:0,skillPoints:0}});
