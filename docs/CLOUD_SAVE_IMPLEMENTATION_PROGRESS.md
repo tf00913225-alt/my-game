@@ -2,6 +2,11 @@
 
 本文件是長期工程進度來源。**每個 Phase 結束都必須更新本文件**；聊天、Commit、PR、CI 或部署成功不能取代驗收紀錄。
 
+## 2026-09-26 — complete legacy source retention in read-only draft (candidate)
+
+- The internal draft now retains all 23 allowlisted main-save fields through explicit conversion or present/missing markers and every one of the 14 registered sidecar sources with exact raw bytes or a missing marker. The server backup policy owns the sidecar inventory; the screening owner reuses it. Historical `equipment-shop-purchases` absence remains blocked and is never treated as unclaimed. Claim blockers remain even when character data can be translated for review.
+- This is source preservation for a later canonical admission, not a verified claim, authoritative character write, backup/recovery point or playable snapshot. Targeted local tests and PR/merged deployment evidence must be recorded separately. Phase 4 remains **IN PROGRESS / 0/6 VERIFIED**.
+
 ## 2026-09-26 — read-only legacy character conversion draft (candidate)
 
 - `functions/src/legacy-candidate-screening.js::prepareLegacyCharacterDraft()` converts a structurally screened legacy candidate into a private review draft: three explicit character slots, economy, distinct bag/equipped objects with source paths, skill/relic sources, progress and parsed claim-bearing sidecars. It never issues canonical IDs or writes character state. The callable returns only conversion status and object counts, not the draft. Missing/corrupt claim sidecars, missing created-character skill loadouts or an unowned equipped relic block the draft; historical rewards remain unverified even for a prepared draft.

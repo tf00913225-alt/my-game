@@ -19,6 +19,9 @@ const CLAIM_SIDECARS=["daily-dungeon-state","progress","quest-milestones",
     "task-tracker","legacy-abyss-state","equipment-shop-daily",
     "equipment-shop-purchases","abyss-state"];
 const {auditLegacyRewardClaims}=require("./legacy-reward-claim-audit.js");
+const {LEGACY_BACKUP_SIDECARS}=require("./cloud-save-policy.js");
+const RETAINED_MAIN_FIELDS=["version","bestiaryData","lastSaveTimestamp",
+    "selectedCreationElement","autoConfig","autoConfig2","autoConfig3"];
 
 // An internal, read-only translation of the exact legacy sources. References
 // here are source paths, never server-owned item or character identifiers.
@@ -26,7 +29,14 @@ const {auditLegacyRewardClaims}=require("./legacy-reward-claim-audit.js");
 // send this draft to a client as a playable character.
 function prepareLegacyCharacterDraft(save,sidecars,screening=null){
     const review=screening||screenLegacyCandidateSnapshot(save,sidecars);
-    if(review.blockers.some(code=>code!=="HISTORICAL_REWARDS_UNVERIFIED")){
+    if(review.blockers.some(code=>!["HISTORICAL_REWARDS_UNVERIFIED",
+        "SIDECAR_BACKUP_MISSING","SIDECAR_CLAIM_RECORD_INVALID"].includes(code))||
+       !sidecars||Object.keys(sidecars).sort().join("|")!==LEGACY_BACKUP_SIDECARS.join("|")||
+       LEGACY_BACKUP_SIDECARS.some(key=>{
+           const entry=sidecars[key];
+           return !entry||!(entry.status==="present"&&typeof entry.raw==="string"||
+               entry.status==="missing"&&entry.raw===null);
+       })){
         return null;
     }
     const copy=value=>JSON.parse(JSON.stringify(value));
@@ -42,8 +52,14 @@ function prepareLegacyCharacterDraft(save,sidecars,screening=null){
                 source:`characterEquipment.${owner}.${key}`,item:copy(item)}); }
         }
     }
-    const claimSidecars={};
-    for(const key of CLAIM_SIDECARS){ claimSidecars[key]=JSON.parse(sidecars[key].raw); }
+    const retainedMainFields=Object.fromEntries(RETAINED_MAIN_FIELDS.map(key=>[key,
+        Object.prototype.hasOwnProperty.call(save,key)
+            ? {status:"present",value:copy(save[key])}:{status:"missing"}]));
+    // Keep the exact raw source and its missing marker. A missing purchase or
+    // claim record is unresolved history, never a claimable default.
+    const retainedSidecars=Object.fromEntries(LEGACY_BACKUP_SIDECARS.map(key=>[
+        key,{status:sidecars[key].status,raw:sidecars[key].raw}
+    ]));
     return {
         source:"untrusted-legacy-review-only",slots,
         economy:{gold:save.gold,sharedExp:save.sharedExp},
@@ -52,7 +68,9 @@ function prepareLegacyCharacterDraft(save,sidecars,screening=null){
         relics:copy(save.playerRelics),relicLoadout:copy(save.teamLoadout),
         formation:save.allyFormation==null?null:copy(save.allyFormation),
         progress:Object.fromEntries(CLAIM_FIELDS.map(key=>[key,copy(save[key])])),
-        claimSidecars,historicalRewardClaims:review.historicalRewardClaims
+        retainedMainFields,retainedSidecars,
+        historicalRewardClaims:review.historicalRewardClaims,
+        claimHistoryBlocked:true
     };
 }
 
@@ -197,7 +215,9 @@ function screenLegacyCandidateSnapshot(save,sidecars=null){
     rewardAudit.blockers.forEach(blocker=>blockers.add(blocker));
     if(!sidecars||CLAIM_SIDECARS.some(key=>sidecars[key]?.status!=="present")){
         blockers.add("SIDECAR_BACKUP_MISSING");
-    }else if(CLAIM_SIDECARS.some(key=>{
+    }
+    if(sidecars&&CLAIM_SIDECARS.some(key=>{
+        if(sidecars[key]?.status!=="present"){ return false; }
         try{
             const value=JSON.parse(sidecars[key].raw);
             return !value||typeof value!=="object"||Array.isArray(value);
@@ -281,7 +301,9 @@ function createLegacyCandidateScreening({db,HttpsError,runProtected,inspectExist
                     status:"prepared-untrusted",
                     characterSlots:draft.slots.length,
                     inventoryObjects:draft.inventory.length,
-                    equippedObjects:draft.equipment.length
+                    equippedObjects:draft.equipment.length,
+                    retainedSidecarSources:LEGACY_BACKUP_SIDECARS.length,
+                    claimHistoryBlocked:true
                 }:{status:"blocked"}
             };
         });
