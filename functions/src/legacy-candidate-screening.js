@@ -15,7 +15,46 @@ const EQUIPMENT_SLOT_BY_KEY=Object.freeze({
     armor:"armor",shoes:"shoes",ring:"ring",accessory:"ring"
 });
 const ALLY_SLOTS=new Set(["ALLY_F1","ALLY_F2","ALLY_F3","ALLY_B1","ALLY_B2","ALLY_B3"]);
+const CLAIM_SIDECARS=["daily-dungeon-state","progress","quest-milestones",
+    "task-tracker","legacy-abyss-state","equipment-shop-daily",
+    "equipment-shop-purchases","abyss-state"];
 const {auditLegacyRewardClaims}=require("./legacy-reward-claim-audit.js");
+
+// An internal, read-only translation of the exact legacy sources. References
+// here are source paths, never server-owned item or character identifiers.
+// Callers must keep the historical claim gate blocked and must not persist or
+// send this draft to a client as a playable character.
+function prepareLegacyCharacterDraft(save,sidecars,screening=null){
+    const review=screening||screenLegacyCandidateSnapshot(save,sidecars);
+    if(review.blockers.some(code=>code!=="HISTORICAL_REWARDS_UNVERIFIED")){
+        return null;
+    }
+    const copy=value=>JSON.parse(JSON.stringify(value));
+    const slots=CHARACTER_KEYS.map(key=>save[key]==null?null:copy(save[key]));
+    const inventory=save.inventoryItems.map((item,index)=>({
+        source:`inventoryItems[${index}]`,item:copy(item)
+    }));
+    const equipment=[];
+    for(const [owner,items] of Object.entries(save.characterEquipment)){
+        const slotIndex={fire:0,player2:1,player3:2}[owner];
+        for(const [key,item] of Object.entries(items)){
+            if(item!=null){ equipment.push({slotIndex,slot:EQUIPMENT_SLOT_BY_KEY[key],
+                source:`characterEquipment.${owner}.${key}`,item:copy(item)}); }
+        }
+    }
+    const claimSidecars={};
+    for(const key of CLAIM_SIDECARS){ claimSidecars[key]=JSON.parse(sidecars[key].raw); }
+    return {
+        source:"untrusted-legacy-review-only",slots,
+        economy:{gold:save.gold,sharedExp:save.sharedExp},
+        inventory,equipment,
+        skills:copy(save.characterSkillLoadouts),
+        relics:copy(save.playerRelics),relicLoadout:copy(save.teamLoadout),
+        formation:save.allyFormation==null?null:copy(save.allyFormation),
+        progress:Object.fromEntries(CLAIM_FIELDS.map(key=>[key,copy(save[key])])),
+        claimSidecars,historicalRewardClaims:review.historicalRewardClaims
+    };
+}
 
 function auditLegacyFormation(save,blockers){
     const formation=save.allyFormation;
@@ -130,12 +169,24 @@ function screenLegacyCandidateSnapshot(save,sidecars=null){
     if(!save.characterSkillLoadouts||typeof save.characterSkillLoadouts!=="object"||
        Array.isArray(save.characterSkillLoadouts)){
         blockers.add("SKILL_SOURCE_MISSING");
+    }else if(["fire",...(save.player2!=null?["player2"]:[]),
+        ...(save.player3!=null?["player3"]:[])].some(key=>{
+        const value=save.characterSkillLoadouts[key];
+        return !value||typeof value!=="object"||Array.isArray(value)||
+            !value.skillLevels||typeof value.skillLevels!=="object"||
+            Array.isArray(value.skillLevels)||!Array.isArray(value.equippedSkills);
+    })){
+        blockers.add("SKILL_SOURCE_INVALID");
     }
     if(!save.playerRelics||typeof save.playerRelics!=="object"||
        Array.isArray(save.playerRelics)||
        !save.teamLoadout||typeof save.teamLoadout!=="object"||
        Array.isArray(save.teamLoadout)){
         blockers.add("RELIC_SOURCE_MISSING");
+    }else if(save.teamLoadout.relicId!=null&&
+        (typeof save.teamLoadout.relicId!=="string"||
+         save.playerRelics[save.teamLoadout.relicId]?.unlocked!==true)){
+        blockers.add("RELIC_REFERENCE_INVALID");
     }
     for(const field of CLAIM_FIELDS){
         if(!save[field]||typeof save[field]!=="object"){
@@ -144,11 +195,15 @@ function screenLegacyCandidateSnapshot(save,sidecars=null){
     }
     const rewardAudit=auditLegacyRewardClaims(save);
     rewardAudit.blockers.forEach(blocker=>blockers.add(blocker));
-    const claimSidecars=["daily-dungeon-state","progress","quest-milestones",
-        "task-tracker","legacy-abyss-state","equipment-shop-daily",
-        "equipment-shop-purchases","abyss-state"];
-    if(!sidecars||claimSidecars.some(key=>sidecars[key]?.status!=="present")){
+    if(!sidecars||CLAIM_SIDECARS.some(key=>sidecars[key]?.status!=="present")){
         blockers.add("SIDECAR_BACKUP_MISSING");
+    }else if(CLAIM_SIDECARS.some(key=>{
+        try{
+            const value=JSON.parse(sidecars[key].raw);
+            return !value||typeof value!=="object"||Array.isArray(value);
+        }catch(_){ return true; }
+    })){
+        blockers.add("SIDECAR_CLAIM_RECORD_INVALID");
     }
     return Object.freeze({
         status:"blocked",readyForAcceptance:false,
@@ -216,14 +271,23 @@ function createLegacyCandidateScreening({db,HttpsError,runProtected,inspectExist
                     fail("data-loss","Candidate and backup are inconsistent.");
                 }
             }
+            const review=screenLegacyCandidateSnapshot(candidate.snapshot,record.backup?.sidecars);
+            const draft=prepareLegacyCharacterDraft(candidate.snapshot,record.backup?.sidecars,review);
             return {
                 candidateRevision,serverRevision:envelope.serverRevision,
                 fingerprint:candidate.fingerprint,
-                ...screenLegacyCandidateSnapshot(candidate.snapshot,record.backup?.sidecars)
+                ...review,
+                conversionReview:draft?{
+                    status:"prepared-untrusted",
+                    characterSlots:draft.slots.length,
+                    inventoryObjects:draft.inventory.length,
+                    equippedObjects:draft.equipment.length
+                }:{status:"blocked"}
             };
         });
     }
     return Object.freeze({screen});
 }
 
-module.exports={createLegacyCandidateScreening,screenLegacyCandidateSnapshot};
+module.exports={createLegacyCandidateScreening,screenLegacyCandidateSnapshot,
+    prepareLegacyCharacterDraft};
