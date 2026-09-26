@@ -888,37 +888,22 @@
         ));
     }
 
-    function statusHitDelay(location){
-        const current=window.v143SkillAnimationState&&window.v143SkillAnimationState.current;
-        if(!current||current.done||current.targetSide!==location.side){ return 30; }
-        const position=Math.max(0,current.targetIndexes.indexOf(location.index));
-        const stagger=current.model&&current.model.sprite
-            ?0
-            :(current.targetIndexes.length>1?Math.min(210,position*55):0);
-        const hitAt=Math.min(
-            current.startedAt+current.duration-140,
-            current.startedAt+current.duration*numeric(current.model&&current.model.hit)+stagger
-        );
-        return Math.max(30,hitAt-Date.now()+115);
-    }
-
     function showStatusPopup(entity,type){
         const label=STATUS_LABELS[type];
         const location=locateEntity(entity);
-        if(!label||!location||typeof document==="undefined"){ return; }
-        setTimeout(()=>{
-            const card=document.getElementById(location.side==="monster"
-                ?"battleMonster"+location.index:"battlePlayerCard"+location.index);
-            if(!card||card.offsetParent===null){ return; }
-            const rect=card.getBoundingClientRect();
-            const popup=document.createElement("strong");
-            popup.className="v146-status-popup status-"+type;
-            popup.textContent=label;
-            popup.style.left=(rect.left+rect.width/2)+"px";
-            popup.style.top=(rect.top+rect.height*.86)+"px";
-            document.body.appendChild(popup);
-            setTimeout(()=>popup.remove(),1300);
-        },statusHitDelay(location));
+        const feedback=window.FourSymbolsBattleFloatingFeedback;
+        if(!label||!location||!feedback||typeof feedback.emitAtImpact!=="function"){ return; }
+        const emit=()=>feedback.emitAtImpact({
+            side:location.side,index:location.index,kind:"status",text:label,source:"status"
+        });
+        if(
+            window.__fourSymbolsBattleEffectSource==="relic"&&
+            typeof window.v174QueueRelicVisual==="function"
+        ){
+            window.v174QueueRelicVisual(emit);
+            return;
+        }
+        emit();
     }
 
     function wrapSimpleStatus(functionName,type){
@@ -3931,24 +3916,8 @@
        js/59-abyss-two-tier-runtime.js + js/46-v155-dev-fixes.js.
        V152 no longer mutates monster skill loadouts or dispatches by name. */
 
-    if(typeof showDamagePopup==="function"){
-        const previousShowDamagePopup=showDamagePopup;
-        showDamagePopup=function(element){
-            const result=previousShowDamagePopup.apply(this,arguments);
-            if(!element||typeof document==="undefined"||!document.body||!element.querySelectorAll){ return result; }
-            const popups=element.querySelectorAll(":scope > .damage-popup.hp-popup");
-            const popup=popups.length?popups[popups.length-1]:null;
-            if(!popup||typeof element.getBoundingClientRect!=="function"){ return result; }
-            const rect=element.getBoundingClientRect();
-            const visualScale=Math.max(.8,Math.min(3,rect.width/Math.max(1,numeric(element.offsetWidth)||rect.width)));
-            popup.classList.add("v152-top-damage");
-            popup.style.setProperty("left",(rect.left+rect.width/2)+"px","important");
-            popup.style.setProperty("top",(rect.top+rect.height*.26)+"px","important");
-            popup.style.setProperty("font-size",Math.round(18*visualScale)+"px","important");
-            document.body.appendChild(popup);
-            return result;
-        };
-    }
+    /* Battle Floating Feedback Owner now owns popup DOM, viewport anchoring and font sizing.
+       V152's HP-only relocation wrapper was retired to avoid a second geometry owner. */
 
     function dismissRewardToast(toast){
         if(!toast){ return; }
@@ -4706,7 +4675,7 @@
         targetType:"allyAll",baseHeal:100,baseHealSP:100,
         cleanseChance:35,evasionBonusPercent:15,
         duration:2,
-        description:"對我方全體施放祝福，每個目標獨立有35%機率解除身上負面狀態，恢復100 HP、100 SP，並使最終閃躲+15個百分點，持續2回合。"
+        description:"對我方全體施放祝福，每個目標獨立有35%機率解除身上負面狀態，恢復100 HP、100 SP，並使最終閃躲+15%，持續2回合。"
     });
     if(typeof skillDatabase!=="undefined"&&skillDatabase.yuanZuBlessing){
         delete skillDatabase.yuanZuBlessing.agilityBonusPercent;
@@ -5020,6 +4989,9 @@
 
     function registerMonsterTeamBuff(monster,buff,display){
         buff.displayBuff=display;
+        ["bonusPercent","percent","evasionBonusPercent","resistBonus","accuracyBonusPercent","defenseBonusPercent","reflectPercent","amount","value","skillLevel"].forEach(key=>{
+            if(display&&display[key]===undefined&&buff&&buff[key]!==undefined){ display[key]=buff[key]; }
+        });
         monster.v141TeamBuffs=monster.v141TeamBuffs||[];
         monster.v141TeamBuffs.push(buff);
         monster.activeBuffs=monster.activeBuffs||[];
@@ -5868,7 +5840,7 @@
                 if(note){
                     note.innerHTML=
                         "最終命中率＝95%＋命中×0.15%＋最終命中加成－目標最終閃躲－最終命中下降，最後限制70%～99%。<br>"+
-                        "所有命中／閃躲／異常抗性技能百分比都以最終百分點加減；異常主屬性與目標精神每1點各換算0.05個百分點。";
+                        "命中／閃躲／異常抗性的玩家介面統一使用 % 顯示；內部仍以最終百分點加減，異常主屬性與目標精神每1點各換算0.05%的最終機率修正。";
                 }
             }
             return result;
@@ -8011,10 +7983,90 @@ function syncBattlePresentation(){
     document.querySelectorAll("#battlePage .battle-monster").forEach(card=>syncUnitArtwork(card,"monster"));
     syncResourceNumbers();
 }
+let activeEscapePresentation=null;
+function escapeGeometry(characterIndex){
+    const geometry=window.FourSymbolsBattlefieldRenderGeometry;
+    if(!geometry||typeof geometry.getUnitGeometry!=="function"){ return null; }
+    const unit=geometry.getUnitGeometry("player",characterIndex);
+    const overlay=typeof geometry.getBattlefieldOverlayGeometry==="function"
+        ?geometry.getBattlefieldOverlayGeometry()
+        :null;
+    return unit&&unit.unitRect?{unit:unit,overlay:overlay}:null;
+}
+function acquireBattlePresentationLock(owner){
+    const flow=window.FourSymbolsBattleFlow;
+    return flow&&typeof flow.acquirePresentationLock==="function"
+        ?flow.acquirePresentationLock(owner)
+        :function(){};
+}
+function cleanupEscapePresentation(){
+    const state=activeEscapePresentation;
+    activeEscapePresentation=null;
+    if(!state){ return; }
+    if(state.animation&&typeof state.animation.cancel==="function"){
+        try{ state.animation.cancel(); }catch(_){}
+    }
+    if(state.card){
+        state.card.classList.remove("v174-escape-presenting","v174-escape-success","v174-escape-failure");
+        state.card.style.removeProperty("transform");
+        state.card.style.removeProperty("opacity");
+        state.card.style.removeProperty("will-change");
+    }
+    if(typeof state.release==="function"){ state.release(); }
+}
+function playEscapePresentation(characterIndex,succeeded){
+    cleanupEscapePresentation();
+    const index=Number(characterIndex)||0;
+    const card=document.getElementById("battlePlayerCard"+index);
+    const geometry=escapeGeometry(index);
+    if(!card||!geometry){ return Promise.resolve(false); }
+    const unitRect=geometry.unit.unitRect;
+    const overlayRect=geometry.overlay&&geometry.overlay.rect;
+    const surfaceBottom=overlayRect?overlayRect.bottom:Math.max(unitRect.bottom,window.innerHeight||unitRect.bottom);
+    const fullDistance=Math.max(unitRect.height*2.1,surfaceBottom-unitRect.top+unitRect.height*.35);
+    const halfDistance=Math.max(unitRect.height*.8,Math.min(unitRect.height*1.55,fullDistance*.42));
+    const release=acquireBattlePresentationLock("escape-presentation");
+    card.classList.add("v174-escape-presenting",succeeded?"v174-escape-success":"v174-escape-failure");
+    card.style.setProperty("will-change","transform,opacity");
+    const frames=succeeded
+        ?[
+            {transform:"translateY(0)",opacity:1,offset:0},
+            {transform:"translateY("+Math.round(fullDistance)+"px)",opacity:.12,offset:.9},
+            {transform:"translateY("+Math.round(fullDistance)+"px)",opacity:0,offset:1}
+        ]
+        :[
+            {transform:"translateY(0)",opacity:1,offset:0},
+            {transform:"translateY("+Math.round(halfDistance)+"px)",opacity:1,offset:.42},
+            {transform:"translateY("+Math.round(halfDistance)+"px)",opacity:1,offset:.62},
+            {transform:"translateY(0)",opacity:1,offset:1}
+        ];
+    const duration=succeeded?760:820;
+    const animation=typeof card.animate==="function"
+        ?card.animate(frames,{duration:duration,easing:succeeded?"cubic-bezier(.35,.04,.7,.3)":"cubic-bezier(.25,.7,.3,1)",fill:succeeded?"forwards":"none"})
+        :null;
+    const state={card:card,animation:animation,release:release,succeeded:!!succeeded};
+    activeEscapePresentation=state;
+    const completed=animation&&animation.finished
+        ?animation.finished.catch(()=>{})
+        :new Promise(resolve=>setTimeout(resolve,duration));
+    return Promise.resolve(completed).then(()=>{
+        if(activeEscapePresentation!==state){ return false; }
+        if(!succeeded){
+            cleanupEscapePresentation();
+        }
+        return true;
+    }).catch(()=>{
+        if(activeEscapePresentation===state){ cleanupEscapePresentation(); }
+        return false;
+    });
+}
+
 window.FourSymbolsBattlePresentation=Object.freeze({
-    version:"cardless-presentation-v2",
+    version:"cardless-presentation-v3",
     applyUnit:syncUnitArtwork,
-    sync:syncBattlePresentation
+    sync:syncBattlePresentation,
+    playEscape:playEscapePresentation,
+    cleanupEscape:cleanupEscapePresentation
 });
 /* V173.51: keep EXP row metadata stable after legacy list rerenders. */
 function decorateExpRows(){
@@ -8810,82 +8862,96 @@ ensureFunctionalStyles();runRepairs();
         };
     }
 
-    function popupKind(popup,args){
-        if(popup&&popup.classList&&popup.classList.contains("miss-popup")){ return "miss"; }
-        const text=String((popup&&popup.textContent)||"");
-        const type=String((args&&args[2])||"").toLowerCase();
-        if(type.includes("heal")||text.startsWith("+")){ return "heal"; }
-        if(type.includes("shield")){ return "shield"; }
-        if(type.includes("buff")||type.includes("debuff")||type.includes("status")){ return "status"; }
-        if(args&&args[3]===true){ return "critical"; }
-        return "damage";
+    function plainRect(rect){
+        if(!rect){ return null; }
+        const left=Number(rect.left)||0,top=Number(rect.top)||0;
+        const width=Math.max(0,Number(rect.width)||0),height=Math.max(0,Number(rect.height)||0);
+        return {left:left,top:top,right:left+width,bottom:top+height,width:width,height:height};
     }
 
-    function applyPopupAnchor(popup,slot,kind){
-        if(!popup||!slot){ return false; }
-        const anchor=anchorForSlot(slot,kind);
-        if(!anchor){ return false; }
-        popup.dataset.slot=slot;
-        popup.dataset.geometryOwner="fixed-slot";
-        popup.dataset.popupKind=kind||"damage";
-        popup.classList.add("v-fixed-slot-popup");
-        popup.style.setProperty("position","fixed","important");
-        popup.style.setProperty("left",anchor.x+"px","important");
-        popup.style.setProperty("top",anchor.y+"px","important");
-        popup.style.setProperty("font-size",kind==="critical"?"20px":"18px","important");
-        popup.style.setProperty("transform","translate(-50%,-50%)","important");
-        if(document.body&&popup.parentNode!==document.body){ document.body.appendChild(popup); }
-        return true;
+    function battlefieldOverlayGeometry(){
+        if(typeof document==="undefined"){ return null; }
+        const host=document.getElementById("game-stage")||document.getElementById("battlePage");
+        if(!host||typeof host.getBoundingClientRect!=="function"){ return null; }
+        const raw=plainRect(host.getBoundingClientRect());
+        if(!raw){ return null; }
+        const viewportWidth=Math.max(0,Number(window.innerWidth)||raw.right);
+        const viewportHeight=Math.max(0,Number(window.innerHeight)||raw.bottom);
+        const left=Math.max(0,raw.left),top=Math.max(0,raw.top);
+        const right=Math.min(viewportWidth,raw.right),bottom=Math.min(viewportHeight,raw.bottom);
+        const rect={
+            left:left,top:top,right:Math.max(left,right),bottom:Math.max(top,bottom),
+            width:Math.max(0,right-left),height:Math.max(0,bottom-top)
+        };
+        return {owner:"fixed-slot",rect:rect,center:{x:rect.left+rect.width/2,y:rect.top+rect.height/2}};
     }
 
-    function newestPopup(before,selector,scope){
-        const candidates=[];
-        if(scope&&scope.querySelectorAll){ candidates.push(...scope.querySelectorAll(selector)); }
-        if(document.body&&document.body.querySelectorAll){ candidates.push(...document.body.querySelectorAll(selector)); }
-        for(let index=candidates.length-1;index>=0;index--){
-            if(!before.has(candidates[index])){ return candidates[index]; }
+    function unitGeometry(side,index){
+        const targetSide=side==="monster"?"monster":"player";
+        const unitIndex=Number(index);
+        if(!Number.isInteger(unitIndex)){ return null; }
+        const card=document.getElementById((targetSide==="monster"?"battleMonster":"battlePlayerCard")+unitIndex);
+        if(!card||typeof card.getBoundingClientRect!=="function"){ return null; }
+        const slot=slotForElement(card);
+        const slotRect=slot?plainRect(slots.getSlotRect(slot)):null;
+        const carrier=typeof card.closest==="function"
+            ?card.closest(".v-fixed-boss-footprint,.v-fixed-enemy-slot,.v-fixed-ally-slot")
+            :null;
+        const carrierRect=carrier&&typeof carrier.getBoundingClientRect==="function"
+            ?plainRect(carrier.getBoundingClientRect())
+            :null;
+        const cardRect=plainRect(card.getBoundingClientRect());
+        const isBossFootprint=!!(carrier&&carrier.classList&&carrier.classList.contains("v-fixed-boss-footprint"));
+        const unitRect=isBossFootprint?(carrierRect||cardRect):(slotRect||carrierRect||cardRect);
+        if(!unitRect){ return null; }
+
+        const art=card.querySelector(".v174-battle-art,img.v162-abyss-battle-portrait-art,.battle-monster-icon,.battle-player-icon");
+        const portraitRect=art&&typeof art.getBoundingClientRect==="function"
+            ?plainRect(art.getBoundingClientRect())
+            :unitRect;
+        const hudNodes=Array.from(card.querySelectorAll(
+            ".monster-hp,.monster-sp,.hp-bar,.sp-bar,.battle-monster-name,.battle-player-id,.monster-status-badges"
+        ));
+        const hudRects=hudNodes
+            .map(node=>typeof node.getBoundingClientRect==="function"?plainRect(node.getBoundingClientRect()):null)
+            .filter(rect=>rect&&rect.width>0&&rect.height>0);
+        const hudTop=hudRects.length?Math.min(...hudRects.map(rect=>rect.top)):unitRect.bottom;
+        const hudBottom=hudRects.length?Math.max(...hudRects.map(rect=>rect.bottom)):unitRect.bottom;
+        const safeHudTop=Math.max(unitRect.top,Math.min(unitRect.bottom,hudTop));
+        const hudSafeRect={
+            left:unitRect.left,top:safeHudTop,right:unitRect.right,
+            bottom:Math.max(safeHudTop,Math.min(unitRect.bottom,hudBottom)),
+            width:unitRect.width,height:Math.max(0,Math.min(unitRect.bottom,hudBottom)-safeHudTop)
+        };
+
+        let feedbackTop=Math.max(unitRect.top+6,Math.min(unitRect.bottom-24,portraitRect.top+6));
+        let feedbackBottom=Math.min(unitRect.bottom-6,safeHudTop-8);
+        if(feedbackBottom-feedbackTop<26){
+            feedbackTop=unitRect.top+6;
+            feedbackBottom=Math.min(unitRect.bottom-6,Math.max(feedbackTop+26,safeHudTop-4));
         }
-        return null;
-    }
+        if(feedbackBottom<=feedbackTop){
+            feedbackBottom=Math.min(unitRect.bottom-4,feedbackTop+24);
+        }
+        const feedbackSafeRect={
+            left:unitRect.left+4,top:feedbackTop,right:unitRect.right-4,bottom:feedbackBottom,
+            width:Math.max(0,unitRect.width-8),height:Math.max(0,feedbackBottom-feedbackTop)
+        };
 
-    function wrapDamagePopup(){
-        if(typeof window.showDamagePopup!=="function"||window.showDamagePopup.__fixedSlotPopupOwner){ return; }
-        const previous=window.showDamagePopup;
-        const wrapped=function(element){
-            const args=Array.prototype.slice.call(arguments);
-            const slot=slotForElement(element);
-            const before=new Set(document.querySelectorAll(".damage-popup"));
-            const result=previous.apply(this,args);
-            const popup=newestPopup(before,".damage-popup",element);
-            if(popup){
-                const kind=popupKind(popup,args);
-                applyPopupAnchor(popup,slot,kind);
+        return {
+            owner:"fixed-slot",side:targetSide,index:unitIndex,slot:slot,
+            unitRect:unitRect,portraitRect:portraitRect,hudSafeRect:hudSafeRect,
+            feedbackSafeRect:feedbackSafeRect,
+            center:{x:unitRect.left+unitRect.width/2,y:unitRect.top+unitRect.height/2},
+            feedbackAnchor:{
+                x:unitRect.left+unitRect.width/2,
+                y:Math.max(feedbackSafeRect.top+11,feedbackSafeRect.bottom-12)
+            },
+            highlightRect:{
+                left:Math.max(0,unitRect.left-3),top:Math.max(0,unitRect.top-3),
+                width:unitRect.width+6,height:unitRect.height+6
             }
-            return result;
         };
-        wrapped.__fixedSlotPopupOwner=true;
-        wrapped.__previous=previous;
-        window.showDamagePopup=wrapped;
-        try{ showDamagePopup=wrapped; }catch(_){ }
-    }
-
-    function wrapMissPopup(){
-        if(typeof window.showMissEffect!=="function"||window.showMissEffect.__fixedSlotPopupOwner){ return; }
-        const previous=window.showMissEffect;
-        const wrapped=function(isPlayerTarget,index){
-            const side=isPlayerTarget?"player":"monster";
-            const slot=slots.getSlotForCombatant(side,Number(index)||0,{enemySnapshot:slots.getActiveEnemySnapshot()});
-            const target=document.getElementById((isPlayerTarget?"battlePlayerCard":"battleMonster")+(Number(index)||0));
-            const before=new Set(document.querySelectorAll(".damage-popup.miss-popup"));
-            const result=previous.apply(this,arguments);
-            const popup=newestPopup(before,".damage-popup.miss-popup",target);
-            if(popup){ applyPopupAnchor(popup,slot,"miss"); }
-            return result;
-        };
-        wrapped.__fixedSlotPopupOwner=true;
-        wrapped.__previous=previous;
-        window.showMissEffect=wrapped;
-        try{ showMissEffect=wrapped; }catch(_){ }
     }
 
     function geometryForVfx(targetSide,primarySlot,shape){
@@ -8917,6 +8983,8 @@ ensureFunctionalStyles();runRepairs();
         getSlotForElement:slotForElement,
         getAnchorForSlot:anchorForSlot,
         getVfxGeometry:geometryForVfx,
+        getUnitGeometry:unitGeometry,
+        getBattlefieldOverlayGeometry:battlefieldOverlayGeometry,
         neutralizeLegacyPresentationGeometry:neutralizeLegacyPresentationGeometry
     });
     window.FourSymbolsBattlefieldRenderGeometry=api;
@@ -8924,14 +8992,296 @@ ensureFunctionalStyles();runRepairs();
     window.vFixedSlotAfterBattleRender=reconcile;
 
     neutralizeLegacyPresentationGeometry();
-    wrapDamagePopup();
-    wrapMissPopup();
 
     /* renderBattle() and explicit battle lifecycle hooks are the geometry authority.
-       Dynamic damage/miss popups are already anchored by wrapDamagePopup()/wrapMissPopup();
-       no document.body observer is required in the battle hot path. */
+       This adapter publishes geometry only. Battle Floating Feedback is the sole
+       DOM/queue/typography owner for transient combat text. */
 
     reconcile();
+})();
+
+
+/* bundled source: js/battle-floating-feedback-owner.js */
+/* =====================================================
+   Battle Floating Feedback Owner
+   - Sole DOM/queue/typography owner for transient battle text.
+   - V143 owns impact timing only.
+   - Fixed Slot adapter owns all unit geometry.
+===================================================== */
+(function installBattleFloatingFeedbackOwner(){
+    "use strict";
+    if(typeof window==="undefined"||window.__battleFloatingFeedbackOwnerInstalled){ return; }
+    window.__battleFloatingFeedbackOwnerInstalled=true;
+
+    const MAX_LANES=4;
+    const LANE_PITCH_PX=25;
+    const LANE_RENDER_HEIGHT_PX=23;
+    const LANE_BOTTOM_INSET_PX=6;
+    const DEFAULT_DURATION=980;
+    const contexts=new Map();
+    let sequence=0;
+
+    function numeric(value,fallback){
+        const parsed=Number(value);
+        return Number.isFinite(parsed)?parsed:(fallback||0);
+    }
+    function geometryOwner(){ return window.FourSymbolsBattlefieldRenderGeometry||null; }
+    function unitKey(side,index){ return (side==="monster"?"monster":"player")+":"+String(Number(index)||0); }
+    function identifyUnit(element){
+        if(!element){ return null; }
+        const id=String(element.id||"");
+        let match=/^battleMonster(\d+)$/.exec(id);
+        if(match){ return {side:"monster",index:Number(match[1])}; }
+        match=/^battlePlayerCard(\d+)$/.exec(id);
+        if(match){ return {side:"player",index:Number(match[1])}; }
+        if(typeof element.closest==="function"){
+            const unit=element.closest('[id^="battleMonster"],[id^="battlePlayerCard"]');
+            if(unit&&unit!==element){ return identifyUnit(unit); }
+        }
+        return null;
+    }
+    function currentGeometry(side,index){
+        const owner=geometryOwner();
+        if(!owner||typeof owner.getUnitGeometry!=="function"){ return null; }
+        return owner.getUnitGeometry(side,index)||null;
+    }
+    function contextFor(side,index){
+        const key=unitKey(side,index);
+        let context=contexts.get(key);
+        if(!context){
+            context={key:key,side:side,index:index,active:new Map(),queue:[]};
+            contexts.set(key,context);
+        }
+        return context;
+    }
+    function semanticKind(kind){
+        const value=String(kind||"damage").toLowerCase();
+        if(value==="heal"||value==="hp-recovery"){ return "heal"; }
+        if(value==="sp"||value==="sp-recovery"){ return "sp"; }
+        if(value==="shield"){ return "shield"; }
+        if(value==="miss"||value==="resist"){ return "miss"; }
+        if(value==="status"||value==="buff"||value==="debuff"){ return value; }
+        if(value==="escape"||value==="escape-fail"){ return "escape"; }
+        return "damage";
+    }
+    function timingFor(options){
+        if(options&&options.skipImpactTiming){ return {delayMs:0,critical:false}; }
+        const resolver=window.v143ResolveBattleFeedbackTiming;
+        if(typeof resolver!=="function"){ return {delayMs:0,critical:false}; }
+        try{
+            const timing=resolver(
+                options.side==="monster"?"monster":"player",
+                Number(options.index)||0,
+                semanticKind(options.kind)
+            )||{};
+            return {
+                delayMs:Math.max(0,numeric(timing.delayMs,0)),
+                critical:timing.critical===true
+            };
+        }catch(_){
+            return {delayMs:0,critical:false};
+        }
+    }
+    function makeHandle(request){
+        let resolvePromise;
+        const promise=new Promise(resolve=>{ resolvePromise=resolve; });
+        request.resolve=resolvePromise;
+        request.cancelled=false;
+        return Object.freeze({
+            id:request.id,
+            promise:promise,
+            cancel:function(){ cancelRequest(request); }
+        });
+    }
+    function finishRequest(request,reason){
+        if(!request||request.finished){ return; }
+        request.finished=true;
+        if(request.delayTimer){ clearTimeout(request.delayTimer); request.delayTimer=null; }
+        if(request.removeTimer){ clearTimeout(request.removeTimer); request.removeTimer=null; }
+        if(request.node&&request.node.parentNode){ request.node.remove(); }
+        if(typeof request.resolve==="function"){ request.resolve(reason||"done"); }
+    }
+    function cancelRequest(request){
+        if(!request||request.finished){ return; }
+        request.cancelled=true;
+        const context=request.context;
+        if(context){
+            context.queue=context.queue.filter(item=>item!==request);
+            if(context.active.has(request.id)){ context.active.delete(request.id); }
+        }
+        finishRequest(request,"cancelled");
+        if(context){ pump(context); }
+    }
+    function laneMetrics(context){
+        const geometry=currentGeometry(context.side,context.index);
+        if(!geometry||!geometry.feedbackSafeRect){ return null; }
+        const safe=geometry.feedbackSafeRect;
+        const anchor=geometry.feedbackAnchor||{
+            x:safe.left+safe.width/2,
+            y:safe.bottom-LANE_BOTTOM_INSET_PX
+        };
+        const baseline=Math.min(
+            numeric(anchor.y,safe.bottom-LANE_BOTTOM_INSET_PX),
+            safe.bottom-LANE_BOTTOM_INSET_PX
+        );
+        const upwardRoom=Math.max(0,baseline-safe.top-LANE_RENDER_HEIGHT_PX);
+        const capacity=Math.max(1,Math.min(
+            MAX_LANES,
+            Math.floor(upwardRoom/LANE_PITCH_PX)+1
+        ));
+        return {geometry:geometry,safe:safe,anchor:anchor,baseline:baseline,capacity:capacity};
+    }
+    function freeLane(context,metrics){
+        const resolved=metrics||laneMetrics(context);
+        if(!resolved){ return -1; }
+        const used=new Set(Array.from(context.active.values()).map(request=>request.lane));
+        for(let lane=0;lane<resolved.capacity;lane++){ if(!used.has(lane)){ return lane; } }
+        return -1;
+    }
+    function formatCritical(text){
+        const value=String(text==null?"":text);
+        if(/^爆擊\s/.test(value)){ return value; }
+        const match=value.match(/\d+(?:\.\d+)?/);
+        return "爆擊 "+(match?match[0]:value);
+    }
+    function spawn(context,request,lane){
+        if(request.cancelled||request.finished){ return false; }
+        const metrics=laneMetrics(context);
+        if(!metrics||!metrics.geometry.unitRect){
+            finishRequest(request,"missing-geometry");
+            return false;
+        }
+        const anchor=metrics.anchor;
+        const laneY=metrics.baseline-lane*LANE_PITCH_PX;
+        const critical=request.critical===true;
+        const node=document.createElement("div");
+        node.className="battle-floating-feedback battle-floating-feedback-"+request.kind+(critical?" is-critical":"");
+        node.dataset.feedbackOwner="battle-floating-feedback";
+        node.dataset.feedbackSide=context.side;
+        node.dataset.feedbackIndex=String(context.index);
+        node.dataset.feedbackLane=String(lane);
+        node.dataset.feedbackKind=request.kind;
+        node.dataset.feedbackSource=request.source;
+        node.dataset.feedbackSequence=String(request.id);
+        node.textContent=critical?formatCritical(request.text):String(request.text==null?"":request.text);
+        node.style.setProperty("--battle-feedback-x",anchor.x+"px");
+        node.style.setProperty("--battle-feedback-y",laneY+"px");
+        node.style.setProperty("--battle-feedback-duration",request.duration+"ms");
+        document.body.appendChild(node);
+        request.node=node;
+        request.lane=lane;
+        request.context=context;
+        context.active.set(request.id,request);
+        request.removeTimer=setTimeout(()=>{
+            context.active.delete(request.id);
+            finishRequest(request,"done");
+            pump(context);
+        },request.duration+70);
+        return true;
+    }
+    function pump(context){
+        if(!context){ return; }
+        while(context.queue.length){
+            const metrics=laneMetrics(context);
+            const lane=freeLane(context,metrics);
+            if(lane<0){ break; }
+            const request=context.queue.shift();
+            if(!request||request.cancelled||request.finished){ continue; }
+            if(!spawn(context,request,lane)){ continue; }
+        }
+        if(!context.active.size&&!context.queue.length){ contexts.delete(context.key); }
+    }
+    function enqueue(request){
+        if(request.cancelled||request.finished){ return; }
+        const context=contextFor(request.side,request.index);
+        request.context=context;
+        context.queue.push(request);
+        pump(context);
+    }
+    function emit(options){
+        if(typeof document==="undefined"||!document.body){ return null; }
+        const input=Object.assign({},options||{});
+        const request={
+            id:++sequence,
+            side:input.side==="monster"?"monster":"player",
+            index:Number.isInteger(Number(input.index))?Number(input.index):0,
+            kind:semanticKind(input.kind),
+            text:String(input.text==null?"":input.text),
+            duration:Math.max(500,Math.min(1800,numeric(input.duration,DEFAULT_DURATION))),
+            critical:input.critical===true,
+            source:String(input.source||"battle")
+        };
+        const timing=timingFor(request);
+        request.critical=request.critical||timing.critical;
+        const handle=makeHandle(request);
+        if(timing.delayMs>8){
+            request.delayTimer=setTimeout(()=>{ request.delayTimer=null;enqueue(request); },timing.delayMs);
+        }else{
+            enqueue(request);
+        }
+        return handle;
+    }
+    function emitAtImpact(options){ return emit(options); }
+    function emitStatus(side,index,text,options){
+        return emit(Object.assign({},options||{},{
+            side:side,index:index,kind:"status",text:text,source:"status"
+        }));
+    }
+    function emitEscapeFailure(index){
+        return emit({
+            side:"player",index:Number(index)||0,kind:"escape",text:"逃脫失敗",
+            source:"escape",skipImpactTiming:true,duration:760
+        });
+    }
+    function clear(){
+        Array.from(contexts.values()).forEach(context=>{
+            context.queue.slice().forEach(request=>finishRequest(request,"teardown"));
+            Array.from(context.active.values()).forEach(request=>finishRequest(request,"teardown"));
+            context.queue=[];
+            context.active.clear();
+        });
+        contexts.clear();
+        document.querySelectorAll&&document.querySelectorAll(".battle-floating-feedback").forEach(node=>node.remove());
+    }
+    function debugSnapshot(){
+        return Array.from(contexts.values()).map(context=>{
+            const metrics=laneMetrics(context);
+            return {
+                key:context.key,
+                capacity:metrics?metrics.capacity:0,
+                active:Array.from(context.active.values()).map(request=>({id:request.id,lane:request.lane,kind:request.kind})),
+                queued:context.queue.map(request=>({id:request.id,kind:request.kind}))
+            };
+        });
+    }
+
+    const api=Object.freeze({
+        version:"battle-floating-feedback-v2",
+        emit:emit,
+        emitAtImpact:emitAtImpact,
+        emitStatus:emitStatus,
+        emitEscapeFailure:emitEscapeFailure,
+        clear:clear,
+        identifyUnit:identifyUnit,
+        getContextCount:()=>contexts.size,
+        debugSnapshot:debugSnapshot
+    });
+    window.FourSymbolsBattleFloatingFeedback=api;
+
+    /* Legacy callers keep their function name, but the sole implementation is
+       this owner. No caller may create/position a second popup DOM node. */
+    function ownedShowDamagePopup(element,text,type,isCrit){
+        const unit=identifyUnit(element);
+        if(!unit){ return null; }
+        if(isCrit&&typeof triggerCriticalImpact==="function"){ triggerCriticalImpact(element); }
+        return emit({
+            side:unit.side,index:unit.index,
+            kind:type==="heal"?"heal":type==="sp"?"sp":type==="miss"?"miss":type==="shield"?"shield":"damage",
+            text:text,critical:!!isCrit,source:"legacy-entry"
+        });
+    }
+    try{ showDamagePopup=ownedShowDamagePopup; }catch(_){}
+    window.showDamagePopup=ownedShowDamagePopup;
 })();
 
 
@@ -10374,8 +10724,6 @@ ensureFunctionalStyles();runRepairs();
     let relicFinishHeld=false;
     let relicFinishRetryTimer=0;
     let relicCutinNode=null;
-    let relicFocusedTargetCards=[];
-    let relicFocusedTargetLayers=[];
     const relicPresentationLockReleases=new Set();
 
     function numeric(value){ const n=Number(value); return Number.isFinite(n)?n:0; }
@@ -10392,7 +10740,18 @@ ensureFunctionalStyles();runRepairs();
         if(typeof window.v173HasNamedPersistentState==="function"){ try{return !!window.v173HasNamedPersistentState(entity,type);}catch(_){ } }
         return !!(entity&&Array.isArray(entity.statusEffects)&&entity.statusEffects.some(s=>s&&s.type===type&&numeric(s.turnsLeft)>0));
     }
-    function withSource(type,callback){ const previous=sourceContext; sourceContext={sourceType:type}; try{return callback();}finally{sourceContext=previous;} }
+    function withSource(type,callback){
+        const previous=sourceContext;
+        const previousGlobal=window.__fourSymbolsBattleEffectSource;
+        sourceContext={sourceType:type};
+        window.__fourSymbolsBattleEffectSource=type;
+        try{return callback();}
+        finally{
+            sourceContext=previous;
+            if(previousGlobal===undefined){ delete window.__fourSymbolsBattleEffectSource; }
+            else{ window.__fourSymbolsBattleEffectSource=previousGlobal; }
+        }
+    }
     function waitMs(ms){ return new Promise(resolve=>setTimeout(resolve,Math.max(0,Math.floor(numeric(ms))))); }
     function isRelicDevTestingEnvironment(){
         if(typeof window==="undefined"||!window.location){ return false; }
@@ -10406,25 +10765,12 @@ ensureFunctionalStyles();runRepairs();
         return typeof document!=="undefined"&&typeof document.getElementById==="function"&&!!document.getElementById("battlePage");
     }
     function clearRelicTargetFocus(){
-        const cards=relicFocusedTargetCards.slice();
-        const layers=relicFocusedTargetLayers.slice();
-        relicFocusedTargetCards=[];
-        relicFocusedTargetLayers=[];
-        cards.forEach(card=>{
-            if(card&&card.classList){
-                card.classList.remove("team-relic-battle-target-focus","team-relic-battle-target-focus-visible");
-            }
-        });
-        layers.forEach(layer=>{
-            if(layer&&layer.classList){ layer.classList.remove("team-relic-battle-target-layer"); }
-        });
         if(typeof document!=="undefined"&&typeof document.querySelectorAll==="function"){
-            document.querySelectorAll(".team-relic-battle-target-focus,.team-relic-battle-target-focus-visible").forEach(card=>{
-                card.classList.remove("team-relic-battle-target-focus","team-relic-battle-target-focus-visible");
-            });
-            document.querySelectorAll(".team-relic-battle-target-layer").forEach(layer=>{
-                layer.classList.remove("team-relic-battle-target-layer");
-            });
+            document.querySelectorAll(".team-relic-battle-target-outline").forEach(node=>node.remove());
+            const presentation=document.getElementById("teamRelicBattlePresentation");
+            const holes=presentation&&presentation.querySelector(".team-relic-mask-holes");
+            if(holes){ holes.replaceChildren(); }
+            if(presentation){ presentation.classList.remove("targets-visible"); }
         }
     }
     function cleanupRelicCutin(){
@@ -10436,54 +10782,115 @@ ensureFunctionalStyles();runRepairs();
         }
         relicCutinNode=null;
     }
-    function relicTargetCard(side,index){
-        if(typeof document==="undefined"||!Number.isInteger(index)){ return null; }
-        return document.getElementById(side==="monster"?"battleMonster"+index:"battlePlayerCard"+index);
+    function relicGeometryOwner(){
+        return typeof window!=="undefined"?window.FourSymbolsBattlefieldRenderGeometry:null;
     }
-    function relicTargetLayer(card){
-        if(!card){ return null; }
-        if(typeof card.closest==="function"){
-            return card.closest(".v-fixed-enemy-slot,.v-fixed-ally-slot,.v-fixed-boss-footprint")||card;
+    function relicOverlayGeometry(){
+        const owner=relicGeometryOwner();
+        if(!owner||typeof owner.getBattlefieldOverlayGeometry!=="function"){ return null; }
+        const geometry=owner.getBattlefieldOverlayGeometry();
+        return geometry&&geometry.rect&&geometry.rect.width>0&&geometry.rect.height>0?geometry:null;
+    }
+    function relicTargetGeometry(side,index){
+        const geometry=relicGeometryOwner();
+        if(geometry&&typeof geometry.getUnitGeometry==="function"){
+            const resolved=geometry.getUnitGeometry(side,index);
+            if(resolved&&resolved.highlightRect){ return resolved.highlightRect; }
+            if(resolved&&resolved.unitRect){ return resolved.unitRect; }
         }
-        return card;
+        return null;
+    }
+    function relativeRelicRect(rect,overlayRect){
+        if(!rect||!overlayRect){ return null; }
+        const left=Math.max(0,numeric(rect.left)-numeric(overlayRect.left));
+        const top=Math.max(0,numeric(rect.top)-numeric(overlayRect.top));
+        const right=Math.min(numeric(overlayRect.width),numeric(rect.left)+numeric(rect.width)-numeric(overlayRect.left));
+        const bottom=Math.min(numeric(overlayRect.height),numeric(rect.top)+numeric(rect.height)-numeric(overlayRect.top));
+        return {left:left,top:top,width:Math.max(0,right-left),height:Math.max(0,bottom-top)};
+    }
+    function syncRelicPresentationGeometry(node){
+        if(!node){ return null; }
+        const overlay=relicOverlayGeometry();
+        const rect=overlay&&overlay.rect;
+        if(!rect){ return null; }
+        node.style.left=numeric(rect.left)+"px";
+        node.style.top=numeric(rect.top)+"px";
+        node.style.width=Math.max(1,numeric(rect.width))+"px";
+        node.style.height=Math.max(1,numeric(rect.height))+"px";
+        node.__relicOverlayRect={
+            left:numeric(rect.left),top:numeric(rect.top),
+            width:Math.max(1,numeric(rect.width)),height:Math.max(1,numeric(rect.height))
+        };
+        return node.__relicOverlayRect;
     }
     function revealRelicTargets(target){
         clearRelicTargetFocus();
-        const cards=target&&Array.isArray(target.targetIds)
-            ?target.targetIds.map(index=>relicTargetCard(target.targetSide,index)).filter(Boolean)
-            :[];
-        relicFocusedTargetCards=Array.from(new Set(cards));
-        relicFocusedTargetLayers=Array.from(new Set(relicFocusedTargetCards.map(relicTargetLayer).filter(Boolean)));
-        relicFocusedTargetLayers.forEach(layer=>layer.classList.add("team-relic-battle-target-layer"));
-        relicFocusedTargetCards.forEach(card=>card.classList.add("team-relic-battle-target-focus"));
-        const show=()=>relicFocusedTargetCards.forEach(card=>card.classList.add("team-relic-battle-target-focus-visible"));
+        if(!relicCutinNode||!target||!Array.isArray(target.targetIds)){ return waitMs(RELIC_TARGET_REVEAL_MS); }
+        const overlayRect=syncRelicPresentationGeometry(relicCutinNode)||relicCutinNode.__relicOverlayRect;
+        const holes=relicCutinNode.querySelector(".team-relic-mask-holes");
+        const focusLayer=relicCutinNode.querySelector(".team-relic-battle-target-focus-layer");
+        const namespace="http://www.w3.org/2000/svg";
+        target.targetIds.forEach(index=>{
+            const absolute=relicTargetGeometry(target.targetSide,index);
+            const rect=relativeRelicRect(absolute,overlayRect);
+            if(!rect||rect.width<=0||rect.height<=0){ return; }
+            if(holes){
+                const hole=document.createElementNS(namespace,"rect");
+                hole.setAttribute("x",String(rect.left));
+                hole.setAttribute("y",String(rect.top));
+                hole.setAttribute("width",String(Math.max(1,rect.width)));
+                hole.setAttribute("height",String(Math.max(1,rect.height)));
+                hole.setAttribute("rx","8");
+                hole.setAttribute("fill","black");
+                holes.appendChild(hole);
+            }
+            if(focusLayer){
+                const outline=document.createElement("span");
+                outline.className="team-relic-battle-target-outline";
+                outline.style.left=rect.left+"px";
+                outline.style.top=rect.top+"px";
+                outline.style.width=Math.max(1,rect.width)+"px";
+                outline.style.height=Math.max(1,rect.height)+"px";
+                focusLayer.appendChild(outline);
+            }
+        });
+        const show=()=>{ if(relicCutinNode){ relicCutinNode.classList.add("targets-visible"); } };
         if(typeof requestAnimationFrame==="function"){ requestAnimationFrame(show); }else{ show(); }
         return waitMs(RELIC_TARGET_REVEAL_MS);
     }
     function beginRelicCinematic(def,target){
-        if(!hasLiveBattlePresentationHost()||!def){ return Promise.resolve(null); }
+        if(!hasLiveBattlePresentationHost()||!def||!document.body){ return Promise.resolve(null); }
         cleanupRelicCutin();
-        const battlePage=document.getElementById("battlePage");
-        const host=battlePage||null;
-        if(!host){ return Promise.resolve(null); }
         const node=document.createElement("div");
+        const overlay=relicOverlayGeometry();
+        const overlayRect=overlay&&overlay.rect;
+        if(!overlayRect||overlayRect.width<=0||overlayRect.height<=0){ return Promise.resolve(null); }
+        const width=Math.max(1,numeric(overlayRect.width));
+        const height=Math.max(1,numeric(overlayRect.height));
+        const maskId="teamRelicViewportMask-"+String(currentBattleToken())+"-"+String(++relicVfxSequence);
         node.id="teamRelicBattlePresentation";
         node.className="team-relic-battle-presentation";
         node.setAttribute("aria-label","秘寶發動："+def.name);
-        node.innerHTML='<span class="team-relic-battle-dim" aria-hidden="true"></span>'+
+        node.innerHTML='<svg class="team-relic-battle-dim" aria-hidden="true" viewBox="0 0 '+width+' '+height+'" preserveAspectRatio="none">'+
+            '<defs><mask id="'+maskId+'" maskUnits="userSpaceOnUse" x="0" y="0" width="'+width+'" height="'+height+'">'+
+            '<rect x="0" y="0" width="'+width+'" height="'+height+'" fill="white"></rect>'+
+            '<g class="team-relic-mask-holes"></g></mask></defs>'+
+            '<rect class="team-relic-battle-dim-fill" x="0" y="0" width="'+width+'" height="'+height+'" fill="#000" mask="url(#'+maskId+')"></rect></svg>'+
+            '<div class="team-relic-battle-target-focus-layer" aria-hidden="true"></div>'+
             '<div class="team-relic-battle-cutin"><span class="team-relic-battle-cutin-icon">'+
             '<img src="'+esc(def.battleIconPath||def.iconPath||"")+'" alt=""></span>'+
             '<span class="team-relic-battle-cutin-copy"><strong>'+esc(def.name)+'</strong></span></div>';
-        host.appendChild(node);
-        if(document.body&&document.body.classList){ document.body.classList.add("team-relic-cinematic-active"); }
+        document.body.appendChild(node);
         relicCutinNode=node;
-        const dim=()=>{ if(node===relicCutinNode){ node.classList.add("dim-visible"); } };
-        if(typeof requestAnimationFrame==="function"){ requestAnimationFrame(dim); }else{ dim(); }
-        return waitMs(RELIC_DIM_IN_MS)
+        syncRelicPresentationGeometry(node);
+        document.body.classList.add("team-relic-cinematic-active");
+        const identity=()=>{ if(node===relicCutinNode){ node.classList.add("identity-visible"); } };
+        if(typeof requestAnimationFrame==="function"){ requestAnimationFrame(identity); }else{ identity(); }
+        return waitMs(RELIC_IDENTITY_REVEAL_MS)
             .then(()=>{
                 if(node!==relicCutinNode){ return null; }
-                node.classList.add("identity-visible");
-                return waitMs(RELIC_IDENTITY_REVEAL_MS);
+                node.classList.add("dim-visible");
+                return waitMs(RELIC_DIM_IN_MS);
             })
             .then(()=>{
                 if(node!==relicCutinNode){ return null; }
@@ -10658,6 +11065,7 @@ ensureFunctionalStyles();runRepairs();
         if(relicVisualCollector){ relicVisualCollector.push(callback); return; }
         callback();
     }
+    window.v174QueueRelicVisual=function(callback){ return queueRelicVisual(callback); };
     function flushRelicVisuals(list){ (list||[]).forEach(callback=>{ try{callback();}catch(error){console.error("秘寶視覺效果失敗：",error);} }); }
     function queueRelicPresentation(def,onStart,visualContext){
         if(!hasLiveBattlePresentationHost()){
@@ -11337,7 +11745,7 @@ ensureFunctionalStyles();runRepairs();
         if(def.id==="relic_tiangang_banner"){ return "對敵方全體造成 "+valueFor(def,"damageMultiplier",level).toFixed(2)+"×秘寶威力"+(level>=10?"並降攻"+Math.round(valueFor(def,"attackDown",level))+"%":"")+"。"; }
         if(def.id==="relic_nine_dragon_fire"){ return "對敵方全體造成 "+valueFor(def,"damageMultiplier",level).toFixed(2)+"×火屬性秘寶傷害"+(level>=10?"，燃燒機率"+Math.round(valueFor(def,"burnChance",level)*100)+"%":"")+(level>=20?"，對燃燒目標額外+15%":"")+"。"; }
         if(def.id==="relic_cold_spring_jade"){ return "急救目標 "+valueFor(def,"healHpPercent",level).toFixed(1).replace(/\.0$/,"")+"%最大HP"+(level>=10?"並淨化1個一般負面":"")+(level>=20?"、恢復4%最大SP":"")+"；HP由35%以上降至35%以下時觸發，每場最多2次，冷卻3回合。"; }
-        if(def.id==="relic_qinglan_feather"){ return "全隊最終閃躲+"+Math.round(valueFor(def,"evasionBonus",level))+"個百分點、最終異常抗性+"+Math.round(valueFor(def,"resistanceBonus",level))+"個百分點，持續"+Math.round(valueFor(def,"duration",level))+"回合。"; }
+        if(def.id==="relic_qinglan_feather"){ return "全隊最終閃躲+"+Math.round(valueFor(def,"evasionBonus",level))+"%、最終異常抗性+"+Math.round(valueFor(def,"resistanceBonus",level))+"%，持續"+Math.round(valueFor(def,"duration",level))+"回合。"; }
         if(def.id==="relic_rock_mountain_seal"){ return "開場防禦+"+Math.round(valueFor(def,"defenseBonus",level))+"%持續3回合；受擊計數觸發時獲得"+Math.round(valueFor(def,"shieldPercent",level))+"%最大HP護盾"+(level>=20?"；Lv20護盾後準備一次18%秘寶威力反震，作用於下一名實際攻擊者":"")+"。"; }
         if(def.id==="relic_returning_wheel"){ return "阻止本場第一次死亡，保留1HP後恢復"+Math.round(valueFor(def,"healHpPercent",level))+"%最大HP並獲得"+Math.round(valueFor(def,"shieldPercent",level))+"%護盾。"; }
         return def.description;

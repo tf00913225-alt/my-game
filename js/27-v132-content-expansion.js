@@ -2099,6 +2099,30 @@
         currentZone=run.previousZone;
     }
 
+    function abortDungeonBattle(reason){
+        const run=window.v132ActiveDungeonRun;
+        if(!run){ return false; }
+        battleActive=false;
+        clearBattleRoundPrompt();
+        finishBattleStatisticsSession(String(reason||"escape"));
+        autoBattle=false;
+        actionReady=false;
+        pendingAction=null;
+        clearInterval(timerId);
+        timerId=null;
+        if(battleAdvanceTimeoutId){ clearTimeout(battleAdvanceTimeoutId); battleAdvanceTimeoutId=null; }
+        battleAdvanceScheduled=false;
+        battleToken++;
+        closeMenus();
+        restoreDungeonMonsters();
+        window.v132ActiveDungeonRun=null;
+        updateUI();
+        saveGame();
+        if(run.onComplete){ run.onComplete({result:String(reason||"escape"),turnsUsed:turn}); }
+        return true;
+    }
+    window.v132AbortDungeonBattle=abortDungeonBattle;
+
     if(typeof winBattle==="function"){
         const originalWinBattle=winBattle;
         winBattle=function(){
@@ -2224,7 +2248,7 @@
             }
 
             showExpDungeonRewardModal(rewardExp);
-        });
+        },{mode:"daily",dailyDungeonType:"exp"});
     }
 
     /*
@@ -2364,7 +2388,7 @@
             }
             const chestCount=outcome.turnsUsed<5 ? 3 : (outcome.turnsUsed<10 ? 2 : 1);
             showMaterialDungeonRewardModal(chestCount);
-        });
+        },{mode:"daily",dailyDungeonType:"material"});
     }
     window.v132BeginMaterialDungeon=beginMaterialDungeon;
 
@@ -2572,7 +2596,7 @@
                 return;
             }
             showEquipmentDungeonRewardModal();
-        });
+        },{mode:"daily",dailyDungeonType:"equipment"});
     }
     window.v132BeginEquipmentDungeon=beginEquipmentDungeon;
 

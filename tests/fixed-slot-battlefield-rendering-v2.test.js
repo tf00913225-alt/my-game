@@ -11,6 +11,8 @@ const ownerSource=read("js/battlefield-slot-owner.js");
 const adapterSource=read("js/battlefield-render-geometry-adapter.js");
 const vfxSource=read("js/39-v143-skill-animation.js");
 const qaSource=read("js/54-v173.51-battle-qa.js");
+const feedbackSource=read("js/battle-floating-feedback-owner.js");
+const feedbackCss=read("css/battle-floating-feedback-owner.css");
 const css=read("css/fixed-slot-battlefield-rendering-v2.css");
 const build=read("scripts/build-production.mjs");
 
@@ -36,12 +38,17 @@ assert.match(adapterSource,/baseWidth:rect\.width/);
 assert.match(adapterSource,/baseHeight:rect\.height/);
 assert.match(adapterSource,/getGeometryRectFromShape\(targetSide,primarySlot,contract\.shape\)/);
 assert.match(adapterSource,/getSideRect\(targetSide\)/);
-assert.match(adapterSource,/applyPopupAnchor/);
+assert.match(adapterSource,/getUnitGeometry:unitGeometry/);
+assert.match(adapterSource,/getBattlefieldOverlayGeometry:battlefieldOverlayGeometry/);
 assert.match(adapterSource,/slots\.getSlotRect\(slot\)/);
-assert.match(adapterSource,/wrapDamagePopup/);
-assert.match(adapterSource,/wrapMissPopup/);
-assert.match(adapterSource,/kind==="critical"\?"20px":"18px"/);
-assert.doesNotMatch(adapterSource,/rect\.width\s*\/\s*element\.offsetWidth|visualScale/,"popup scale must not be based on card bounds");
+assert.doesNotMatch(adapterSource,/applyPopupAnchor|wrapDamagePopup|wrapMissPopup/,
+    "geometry adapter must publish geometry only; floating feedback owns popup DOM and lanes");
+assert.match(feedbackSource,/FourSymbolsBattleFloatingFeedback/);
+assert.match(feedbackSource,/const MAX_LANES=4/);
+assert.match(feedbackSource,/geometry\.feedbackSafeRect/);
+assert.match(feedbackSource,/context\.queue\.push\(request\)/);
+assert.doesNotMatch(feedbackSource,/getBoundingClientRect\(\).*\.26|visualScale/,
+    "floating feedback must use the canonical unit geometry contract, not legacy card-percentage anchors");
 
 assert.match(vfxSource,/getGeometryRectFromShape/);
 assert.match(vfxSource,/getSideRect/);
@@ -64,7 +71,9 @@ assert.match(css,/\.v-fixed-enemy-slot > \.battle-monster,[\s\S]*\.v-fixed-ally-
 assert.match(css,/\.v174-battle-art\{[\s\S]*background-size:contain !important;[\s\S]*overflow:visible !important;/);
 assert.match(css,/\.v143-status-visual\{[\s\S]*left:50% !important;[\s\S]*top:42% !important;[\s\S]*transform:translate\(-50%,-50%\) !important;/,"status VFX must stay Slot-relative");
 assert.match(css,/\.v143-skill-stage\[data-geometry-owner="fixed-slot"\]\{[\s\S]*overflow:visible !important;[\s\S]*contain:none !important;/);
-assert.match(css,/\.v-fixed-slot-popup\{[\s\S]*position:fixed !important;/);
+assert.match(feedbackCss,/body > \.battle-floating-feedback\{[\s\S]*position:fixed;/);
+assert.match(feedbackCss,/-webkit-text-stroke:\.85px #fff/);
+assert.doesNotMatch(feedbackCss,/0 0 (?:7|8|10|14|16)px/,"canonical popup typography must not restore neon glow");
 assert.match(css,/@keyframes v174BattleLungeUp/);
 assert.doesNotMatch(css,/@media \(max-width:380px\)/,"fixed Slot geometry must not have a one-phone geometry override");
 
@@ -134,8 +143,11 @@ assert.ok(!pageClasses.has("v141-preparing-entry"));
 
 assert.match(build,/"js\/battlefield-slot-owner\.js"/);
 assert.match(build,/"js\/battlefield-render-geometry-adapter\.js"/);
+assert.match(build,/"js\/battle-floating-feedback-owner\.js"/);
 assert.ok(build.indexOf('"js/battlefield-render-geometry-adapter.js"')>build.indexOf('"js/54-v173.51-battle-qa.js"'),"adapter must install after legacy presentation wrappers");
+assert.ok(build.indexOf('"js/battle-floating-feedback-owner.js"')>build.indexOf('"js/battlefield-render-geometry-adapter.js"'),"feedback owner must install after canonical geometry");
 assert.match(build,/"css\/fixed-slot-battlefield-rendering-v2\.css"/);
+assert.match(build,/"css\/battle-floating-feedback-owner\.css"/);
 
 const rects={};
 const enemySlots=["ENEMY_B1","ENEMY_B2","ENEMY_B3","ENEMY_B4","ENEMY_B5","ENEMY_F1","ENEMY_F2","ENEMY_F3","ENEMY_F4","ENEMY_F5"];

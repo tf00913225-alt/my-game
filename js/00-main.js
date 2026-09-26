@@ -10759,6 +10759,14 @@ function ensureAutoPatrolInterval(){
    開始戰鬥
 ===================================================== */
 
+function clearTransientBattlePresentation(){
+    if(typeof window==="undefined"){ return; }
+    const feedback=window.FourSymbolsBattleFloatingFeedback;
+    if(feedback&&typeof feedback.clear==="function"){ feedback.clear(); }
+    const presentation=window.FourSymbolsBattlePresentation;
+    if(presentation&&typeof presentation.cleanupEscape==="function"){ presentation.cleanupEscape(); }
+}
+
 function startBattle(triggerIndex){
 
     if(
@@ -10806,6 +10814,7 @@ function startBattle(triggerIndex){
     mapCooldown=true;
 
     battleToken++;
+    clearTransientBattlePresentation();
     battleRoundBoundaryKeys=new Set();
     battlePresentationLocks.clear();
     battleInputResumeToken=null;
@@ -18947,6 +18956,7 @@ function winBattle(){
 
 
     battleToken++;
+    clearTransientBattlePresentation();
 
     /*
        ★ 新增（依照使用者要求，每日任務
@@ -19213,6 +19223,7 @@ function loseBattle(){
 
 
     battleToken++;
+    clearTransientBattlePresentation();
 
 
     /*
@@ -19380,93 +19391,82 @@ function attemptEscape(){
 function resolveEscapeAttempt(characterIndex){
 
     clearInterval(timerId);
+    timerId=null;
 
+    const alive=currentBattleMonsters.map(i=>monsters[i]).filter(m=>m&&m.alive);
+    if(alive.length===0){ checkBattleEnd(); return; }
 
-    const alive =
-        currentBattleMonsters
-        .map(
-            i=>monsters[i]
-        )
-        .filter(
-            m=>m.alive
-        );
-
-
-    if(alive.length===0){
-
-        checkBattleEnd();
-
-        return;
-
-    }
-
-
-    const highestLevel =
-        Math.max(
-            ...alive.map(
-                m=>m.level
-            )
-        );
-
-
+    const highestLevel=Math.max(...alive.map(m=>m.level));
     const escapingCharacter=getPartyCharacterByIndex(characterIndex)||player;
+    const chance=Math.max(10,Math.min(95,50+(escapingCharacter.level-highestLevel)*5));
+    const succeeded=Math.random()*100<chance;
+    const presentationOwner=typeof window!=="undefined"?window.FourSymbolsBattlePresentation:null;
+    const feedbackOwner=typeof window!=="undefined"?window.FourSymbolsBattleFloatingFeedback:null;
+    const motion=presentationOwner&&typeof presentationOwner.playEscape==="function"
+        ?presentationOwner.playEscape(characterIndex,succeeded)
+        :Promise.resolve(true);
 
-    const chance =
-        Math.max(
-            10,
-            Math.min(
-                95,
-                50+
-                (
-                    escapingCharacter.level-
-                    highestLevel
-                )*5
-            )
-        );
+    actionReady=false;
+    pendingAction=null;
 
-
-    if(
-        Math.random()*100<
-        chance
-    ){
-
-        battleActive=false;
-
-        autoBattle=false;
-
-        battleToken++;
-
-
-        addBattleLog(
-            "成功逃脫！"
-        );
-
-
-        setTimeout(()=>{
-
-            showPage("map");
-
-            setMapCooldown(3000);
-
-
-            startMonsterMovement();
-
-            ensureAutoPatrolInterval();
-
-        },1400);
-
-    }
-    else{
-
-        addBattleLog(
-            "逃脫失敗！"
-        );
-
-
-        finishPlayerAction();
-
+    if(!succeeded){
+        addBattleLog("逃脫失敗！");
+        Promise.resolve(motion).then(()=>{
+            const feedback=feedbackOwner&&typeof feedbackOwner.emitEscapeFailure==="function"
+                ?feedbackOwner.emitEscapeFailure(characterIndex)
+                :null;
+            return feedback&&feedback.promise?feedback.promise:Promise.resolve();
+        }).then(()=>{
+            if(typeof battleActive==="undefined"||battleActive){ finishPlayerAction(); }
+        }).catch(()=>{
+            if(typeof battleActive==="undefined"||battleActive){ finishPlayerAction(); }
+        });
+        return;
     }
 
+    addBattleLog("成功逃脫！");
+    Promise.resolve(motion).then(()=>{
+        const finishEscapeRoute=()=>{
+            if(window.v132ActiveDungeonRun&&typeof window.v132AbortDungeonBattle==="function"){
+                window.v132AbortDungeonBattle("escape");
+            }else{
+                battleActive=false;
+                autoBattle=false;
+                actionReady=false;
+                pendingAction=null;
+                clearBattleRoundPrompt();
+                clearInterval(timerId);
+                timerId=null;
+                if(battleAdvanceTimeoutId){
+                    clearTimeout(battleAdvanceTimeoutId);
+                    battleAdvanceTimeoutId=null;
+                }
+                clearBattleActionWatchdog();
+                battleAdvanceScheduled=false;
+                battleToken++;
+                if(typeof finishBattleStatisticsSession==="function"){ finishBattleStatisticsSession("escape"); }
+                closeMenus();
+                if(window.v142SkillAnimationDirector){ window.v142SkillAnimationDirector.dispose(); }
+                if(feedbackOwner&&typeof feedbackOwner.clear==="function"){ feedbackOwner.clear(); }
+                showPage("map");
+                setMapCooldown(3000);
+                startMonsterMovement();
+                ensureAutoPatrolInterval();
+            }
+            if(presentationOwner&&typeof presentationOwner.cleanupEscape==="function"){
+                presentationOwner.cleanupEscape();
+            }
+            return true;
+        };
+        if(typeof window.v141PlayEscapeBattleExit==="function"){
+            return window.v141PlayEscapeBattleExit(finishEscapeRoute);
+        }
+        return finishEscapeRoute();
+    }).catch(()=>{
+        if(presentationOwner&&typeof presentationOwner.cleanupEscape==="function"){
+            presentationOwner.cleanupEscape();
+        }
+    });
 }
 
 
@@ -23462,109 +23462,42 @@ function triggerCriticalImpact(element){
 
 function showDamagePopup(element,text,type,isCrit){
 
-    if(!element){
-        return;
+    const feedback=typeof window!=="undefined"
+        ?window.FourSymbolsBattleFloatingFeedback
+        :null;
+
+    if(!feedback||typeof feedback.emit!=="function"||!element){
+        return null;
     }
 
+    const unit=typeof feedback.identifyUnit==="function"
+        ?feedback.identifyUnit(element)
+        :null;
 
-    const popup =
-        document.createElement(
-            "div"
-        );
-
-
-    popup.className =
-        /*
-           ★ 修正（依照使用者回報，「損失
-           血量顯示變成在血條下面」）：
-           真正原因找到了——這裡少打了
-           空格，"damage-popup"直接接
-           "hp-popup"變成
-           "damage-popuphp-popup"這種
-           class屬性根本不存在的字串，
-           .damage-popup那組CSS（position:
-           absolute;top:26%……原本設計
-           成飄在卡片中段、技能名稱跟血條
-           中間）完全沒套用到，popup變成
-           一個沒有任何定位樣式的普通
-           <div>，只能乖乖排在appendChild()
-           放進去的地方，也就是卡片最下面、
-           血條/SP條/名稱都排完之後。
-           每個class之間都補上空格，
-           跟前面「技能按鈕整個不能點」
-           是同一種typo，這已經是這個
-           檔案裡第三次抓到同樣的漏字
-           bug了。
-        */
-
-        "damage-popup "+
-        (
-            type==="sp"
-            ?
-            "sp-popup"
-            :
-            type==="heal"
-            ?
-            "heal-popup"
-            :
-            type==="miss"
-            ?
-            "miss-popup"
-            :
-            type==="shield"
-            ?
-            "shield-popup"
-            :
-            "hp-popup"
-        )+
-        (
-            isCrit
-            ?
-            " critical-popup"
-            :
-            ""
-        );
-
-
-    if(isCrit){
-        /* V100：爆擊浮字只保留「爆擊 + 傷害數字」。
-           showPlayerHit/showMonsterHit 傳進來的 text 可能含 -、HP/SP，
-           這裡只抽出數字做顯示；不影響實際傷害值。 */
-        const criticalNumberMatch =
-            String(text).match(/\d+(?:\.\d+)?/);
-
-        popup.textContent =
-            "爆擊 "+
-            (criticalNumberMatch ? criticalNumberMatch[0] : String(text));
-    }else{
-        popup.textContent = text;
+    if(!unit){
+        return null;
     }
 
-
-    if(isCrit){
+    if(isCrit&&typeof triggerCriticalImpact==="function"){
         triggerCriticalImpact(element);
     }
 
-
-    element.appendChild(
-        popup
-    );
-
-
-    setTimeout(()=>{
-
-        if(
-            popup &&
-            popup.parentNode
-        ){
-
-            popup.parentNode.removeChild(
-                popup
-            );
-
-        }
-
-    },1800);
+    return feedback.emit({
+        side:unit.side,
+        index:unit.index,
+        kind:type==="heal"
+            ?"heal"
+            :type==="sp"
+                ?"sp"
+                :type==="miss"
+                    ?"miss"
+                    :type==="shield"
+                        ?"shield"
+                        :"damage",
+        text:text,
+        critical:!!isCrit,
+        source:"core-entry"
+    });
 
 }
 

@@ -91,8 +91,10 @@ test("battle skill owners keep target scope, duration and presentation aligned",
   assert.match(v155,/function resolveWindEliteDodge[\s\S]*?allyTriTargeting/);
   assert.doesNotMatch(v148,/snapshotActivePartyBuffs|restoreActivePartyBuffs/);
 
-  assert.match(relic,/const host=battlePage\|\|null/);
-  assert.match(relicCss,/team-relic-battle-dim\{[\s\S]*?z-index:18090/);
+  assert.match(relic,/document\.body\.appendChild\(node\)/);
+  assert.match(relic,/function relicOverlayGeometry\(\)[\s\S]*?getBattlefieldOverlayGeometry/);
+  assert.match(relic,/function relicTargetGeometry\(side,index\)[\s\S]*?getUnitGeometry/);
+  assert.match(relicCss,/body > \.team-relic-battle-presentation\{[\s\S]*?z-index:18090/);
   assert.match(relicCss,/team-relic-cinematic-active > \.v143-skill-stage\{z-index:18130/);
   assert.match(fixedCss,/turn-target-row\.skill-picker-open\{[\s\S]*?bottom:calc\(var\(--battle-command-visual-height\) \+ 44px\)/);
   assert.match(fixedCss,/#skillQuickBar\.skill-quick-bar\{[\s\S]*?top:-82px[\s\S]*?bottom:0/);

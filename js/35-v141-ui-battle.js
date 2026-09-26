@@ -766,6 +766,36 @@
         },2700);
     }
 
+    window.v141PlayEscapeBattleExit=function(onCovered){
+        if(transitionRunning){ return Promise.resolve(false); }
+        transitionRunning=true;
+        const overlay=ensureBattleTransitionOverlay();
+        const label=overlay&&overlay.querySelector("b");
+        if(label){ label.textContent="撤離"; }
+        if(overlay){
+            overlay.dataset.v144Kind="escape";
+            overlay.classList.add("show");
+        }
+        return new Promise(resolve=>{
+            setTimeout(()=>{
+                let result;
+                try{
+                    result=typeof onCovered==="function"?onCovered():true;
+                }finally{
+                    setTimeout(()=>{
+                        if(overlay){
+                            overlay.classList.remove("show");
+                            delete overlay.dataset.v144Kind;
+                        }
+                        if(label){ label.textContent="戰"; }
+                        transitionRunning=false;
+                        resolve(result);
+                    },120);
+                }
+            },460);
+        });
+    };
+
     if(typeof winBattle==="function"){
         const originalWinBattle=winBattle;
         let exitingWin=false;
