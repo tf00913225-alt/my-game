@@ -211,7 +211,7 @@ function screenLegacyCandidateSnapshot(save,sidecars=null){
             blockers.add("CLAIM_PROGRESS_MISSING");
         }
     }
-    const rewardAudit=auditLegacyRewardClaims(save);
+    const rewardAudit=auditLegacyRewardClaims(save,sidecars);
     rewardAudit.blockers.forEach(blocker=>blockers.add(blocker));
     if(!sidecars||CLAIM_SIDECARS.some(key=>sidecars[key]?.status!=="present")){
         blockers.add("SIDECAR_BACKUP_MISSING");
