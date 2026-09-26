@@ -79,10 +79,90 @@ function syncBattlePresentation(){
     document.querySelectorAll("#battlePage .battle-monster").forEach(card=>syncUnitArtwork(card,"monster"));
     syncResourceNumbers();
 }
+let activeEscapePresentation=null;
+function escapeGeometry(characterIndex){
+    const geometry=window.FourSymbolsBattlefieldRenderGeometry;
+    if(!geometry||typeof geometry.getUnitGeometry!=="function"){ return null; }
+    const unit=geometry.getUnitGeometry("player",characterIndex);
+    const overlay=typeof geometry.getBattlefieldOverlayGeometry==="function"
+        ?geometry.getBattlefieldOverlayGeometry()
+        :null;
+    return unit&&unit.unitRect?{unit:unit,overlay:overlay}:null;
+}
+function acquireBattlePresentationLock(owner){
+    const flow=window.FourSymbolsBattleFlow;
+    return flow&&typeof flow.acquirePresentationLock==="function"
+        ?flow.acquirePresentationLock(owner)
+        :function(){};
+}
+function cleanupEscapePresentation(){
+    const state=activeEscapePresentation;
+    activeEscapePresentation=null;
+    if(!state){ return; }
+    if(state.animation&&typeof state.animation.cancel==="function"){
+        try{ state.animation.cancel(); }catch(_){}
+    }
+    if(state.card){
+        state.card.classList.remove("v174-escape-presenting","v174-escape-success","v174-escape-failure");
+        state.card.style.removeProperty("transform");
+        state.card.style.removeProperty("opacity");
+        state.card.style.removeProperty("will-change");
+    }
+    if(typeof state.release==="function"){ state.release(); }
+}
+function playEscapePresentation(characterIndex,succeeded){
+    cleanupEscapePresentation();
+    const index=Number(characterIndex)||0;
+    const card=document.getElementById("battlePlayerCard"+index);
+    const geometry=escapeGeometry(index);
+    if(!card||!geometry){ return Promise.resolve(false); }
+    const unitRect=geometry.unit.unitRect;
+    const overlayRect=geometry.overlay&&geometry.overlay.rect;
+    const surfaceBottom=overlayRect?overlayRect.bottom:Math.max(unitRect.bottom,window.innerHeight||unitRect.bottom);
+    const fullDistance=Math.max(unitRect.height*2.1,surfaceBottom-unitRect.top+unitRect.height*.35);
+    const halfDistance=Math.max(unitRect.height*.8,Math.min(unitRect.height*1.55,fullDistance*.42));
+    const release=acquireBattlePresentationLock("escape-presentation");
+    card.classList.add("v174-escape-presenting",succeeded?"v174-escape-success":"v174-escape-failure");
+    card.style.setProperty("will-change","transform,opacity");
+    const frames=succeeded
+        ?[
+            {transform:"translateY(0)",opacity:1,offset:0},
+            {transform:"translateY("+Math.round(fullDistance)+"px)",opacity:.12,offset:.9},
+            {transform:"translateY("+Math.round(fullDistance)+"px)",opacity:0,offset:1}
+        ]
+        :[
+            {transform:"translateY(0)",opacity:1,offset:0},
+            {transform:"translateY("+Math.round(halfDistance)+"px)",opacity:1,offset:.42},
+            {transform:"translateY("+Math.round(halfDistance)+"px)",opacity:1,offset:.62},
+            {transform:"translateY(0)",opacity:1,offset:1}
+        ];
+    const duration=succeeded?760:820;
+    const animation=typeof card.animate==="function"
+        ?card.animate(frames,{duration:duration,easing:succeeded?"cubic-bezier(.35,.04,.7,.3)":"cubic-bezier(.25,.7,.3,1)",fill:succeeded?"forwards":"none"})
+        :null;
+    const state={card:card,animation:animation,release:release,succeeded:!!succeeded};
+    activeEscapePresentation=state;
+    const completed=animation&&animation.finished
+        ?animation.finished.catch(()=>{})
+        :new Promise(resolve=>setTimeout(resolve,duration));
+    return Promise.resolve(completed).then(()=>{
+        if(activeEscapePresentation!==state){ return false; }
+        if(!succeeded){
+            cleanupEscapePresentation();
+        }
+        return true;
+    }).catch(()=>{
+        if(activeEscapePresentation===state){ cleanupEscapePresentation(); }
+        return false;
+    });
+}
+
 window.FourSymbolsBattlePresentation=Object.freeze({
-    version:"cardless-presentation-v2",
+    version:"cardless-presentation-v3",
     applyUnit:syncUnitArtwork,
-    sync:syncBattlePresentation
+    sync:syncBattlePresentation,
+    playEscape:playEscapePresentation,
+    cleanupEscape:cleanupEscapePresentation
 });
 /* V173.51: keep EXP row metadata stable after legacy list rerenders. */
 function decorateExpRows(){
