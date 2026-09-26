@@ -17,11 +17,11 @@ assert.match(inventory,/for\(let index=0;index<INVENTORY_PAGE_SIZE;index\+\+\)/)
 assert.match(core,/grid-template-columns:repeat\(6,minmax\(0,1fr\)\) !important/);
 assert.match(core,/grid-template-rows:repeat\(3,minmax\(0,1fr\)\) !important/);
 assert.match(core,/aspect-ratio:1 \/ 1 !important/);
-assert.match(core,/\.inventory-grid-scroll\{[\s\S]*?overflow:visible !important/);
+assert.match(core,/\.inventory-grid-scroll\{[\s\S]*?overflow-y:auto !important/);
 assert.match(core,/\.inventory-classic-shell\{[\s\S]*?border:1px solid/);
 assert.match(core,/\.inventory-right-panel\{[\s\S]*?border:0 !important/);
 assert.match(core,/\.v169-item-art > img\{[\s\S]*?object-fit:contain/);
-assert.doesNotMatch(legacyGrid,/overflow-y:auto !important/);
+assert.match(legacyGrid,/overflow-y:auto !important/);
 assert.doesNotMatch(oldGrid,/\.inventory-grid-scroll\{/);
 assert.doesNotMatch(polish,/\.inventory-grid-scroll\{/);
 assert.doesNotMatch(windowSkin,/\.inventory-classic-shell,\n/,

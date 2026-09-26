@@ -583,10 +583,10 @@
             if(!skill||skill.element!==character.element){ return; }
             const level=Math.max(0,numeric(levels[skillId]));
             if(level<=0){
-                const prereqMet=typeof isSkillPrereqMet==="function"
-                    ?!!isSkillPrereqMet(levels,skill)
-                    :(skill.requires||[]).every(requiredId=>numeric(levels[requiredId])>0);
-                if(prereqMet&&points>=Math.max(0,numeric(skill.learnCost))){ canSpend=true; }
+                const eligibility=typeof getSkillLearnEligibilityForUi==="function"
+                    ?getSkillLearnEligibilityForUi(character,skill,levels)
+                    :null;
+                if(eligibility&&eligibility.allowed){ canSpend=true; }
             }else if(level<Math.max(1,numeric(skill.maxLevel)||1)&&points>=1){
                 canSpend=true;
             }
@@ -727,10 +727,10 @@
             });
             let canSpend=false;
             if(level<=0){
-                const prereqMet=typeof isSkillPrereqMet==="function"
-                    ?!!isSkillPrereqMet(levels,skill)
-                    :(skill.requires||[]).every(requiredId=>numeric(levels[requiredId])>0);
-                canSpend=prereqMet&&points>=Math.max(0,numeric(skill.learnCost));
+                const eligibility=typeof getSkillLearnEligibilityForUi==="function"
+                    ?getSkillLearnEligibilityForUi(character,skill,levels)
+                    :null;
+                canSpend=!!(eligibility&&eligibility.allowed);
             }else{
                 canSpend=level<Math.max(1,numeric(skill.maxLevel)||1)&&points>=1;
             }

@@ -3905,70 +3905,6 @@ function getSkillIconBackgroundImage(skillId){
    的案例，用一種格式就夠。
 */
 
-function isSkillPrereqMet(skillLevels,skill){
-
-    if(
-        !skill ||
-        !skill.requires ||
-        skill.requires.length===0
-    ){
-        return true;
-    }
-
-
-    return skill.requires.some(
-        reqId=>
-            (skillLevels[reqId]||0)>0
-    );
-
-}
-
-
-/*
-   ★ 新增：把requires陣列轉成給玩家看的
-   中文提示，例如「需先學習：會心一擊」
-   或「需先學習：火爆亂擊或烈焰龍捲其一」，
-   抓不到技能名稱時保底顯示id本身，
-   避免整段消失讓玩家一頭霧水。
-*/
-
-function getSkillPrereqLabel(skill){
-
-    if(
-        !skill ||
-        !skill.requires ||
-        skill.requires.length===0
-    ){
-        return "";
-    }
-
-
-    const names=
-        skill.requires.map(
-            reqId=>
-                (
-                    skillDatabase[reqId]&&
-                    skillDatabase[reqId].name
-                )||
-                reqId
-        );
-
-
-    return (
-        "需先學習："+
-        names.join("或")+
-        (
-            names.length>1
-            ?
-            "其一"
-            :
-            ""
-        )
-    );
-
-}
-
-
 const characterSkillLoadouts = {
 
     fire:{
@@ -8118,7 +8054,6 @@ async function resetGame(){
    V115 — 巡怪頁內背包浮層
    只改開啟方式；背包資料、裝備、物品詳情、出售等仍沿用原函式。
 ===================================================== */
-let mapInventoryOverlayOpen=false;
 let inventoryOpenContext=null;
 
 function inventoryContextSnapshot(context){
@@ -8133,12 +8068,12 @@ function inventoryContextSnapshot(context){
 function openInventoryContext(context){
     if(typeof battleActive!=="undefined"&&battleActive){ return false; }
     const normalized=inventoryContextSnapshot(context);
-    if(normalized.sourcePage==="inventory"){
-        inventoryOpenContext=normalized;
-        showPage("inventory");
-        return true;
-    }
-    return openMapInventoryOverlay(normalized);
+    showPage("inventory");
+    inventoryOpenContext=normalized;
+    const app=document.getElementById("app");
+    if(app){ app.classList.add("inventory-context-open"); app.classList.remove("inventory-overlay-open"); }
+    setMapInventoryScrollGate(true);
+    return true;
 }
 window.openInventoryContext=openInventoryContext;
 
@@ -8156,44 +8091,15 @@ function setMapInventoryScrollGate(enabled){
 }
 
 function openMapInventoryOverlay(context){
-    const inventoryPage=$("inventoryPage");
-
-    if(
-        battleActive ||
-        !inventoryPage
-    ){
-        return false;
-    }
-
-    inventoryOpenContext=inventoryContextSnapshot(context);
-    mapInventoryOverlayOpen=true;
-    const app=document.getElementById("app");
-    if(app){ app.classList.add("inventory-overlay-open"); }
-    inventoryPage.classList.add("map-inventory-overlay-open");
-    setMapInventoryScrollGate(true);
-
-    if(typeof renderInventory==="function"){
-        renderInventory();
-    }
-
-    const scroller=$("inventoryGridScroll");
-    if(scroller){
-        scroller.scrollTop=0;
-    }
-    return true;
+    return openInventoryContext(context);
 }
 
 function closeMapInventoryOverlay(){
-    const inventoryPage=$("inventoryPage");
-
-    mapInventoryOverlayOpen=false;
+    const context=inventoryOpenContext||inventoryContextSnapshot({sourcePage:"inventory"});
     inventoryOpenContext=null;
     const app=document.getElementById("app");
-    if(app){ app.classList.remove("inventory-overlay-open"); }
-
-    if(inventoryPage){
-        inventoryPage.classList.remove("map-inventory-overlay-open");
-    }
+    if(app){ app.classList.remove("inventory-context-open","inventory-overlay-open"); }
+    const inventoryPage=$("inventoryPage");
 
     if(typeof closeItemModal==="function"){
         closeItemModal();
@@ -8202,12 +8108,15 @@ function closeMapInventoryOverlay(){
         closeInventoryCharacterDetail();
     }
 
-    /* 若不是正式背包頁，才關閉祖層 pan-y 放行。 */
-    const directInventoryActive=
-        inventoryPage && inventoryPage.classList.contains("active");
-
-    if(!directInventoryActive){
-        setMapInventoryScrollGate(false);
+    if(context.sourcePage==="map"&&typeof leaveMap==="function"){
+        leaveMap();
+    }else if(["dungeon","gameplay","gameplayPage","boss","bossPage","tower","towerPage","training","trainingPage"].includes(context.sourcePage)){
+        if(typeof showPage==="function"){
+            const pageMap={dungeon:"gameplay",gameplay:"gameplay",gameplayPage:"gameplay",boss:"boss",bossPage:"boss",tower:"tower",towerPage:"tower",training:"training",trainingPage:"training"};
+            showPage(pageMap[context.sourcePage]);
+        }
+    }else if(typeof showPage==="function"){
+        showPage("home");
     }
 }
 
@@ -8217,15 +8126,8 @@ function closeMapInventoryOverlay(){
 
 function showPage(page){
 
-    if(page==="inventory"){
+    if(page==="inventory"&&!inventoryOpenContext){
         inventoryOpenContext=inventoryContextSnapshot({sourcePage:"inventory",closeBehavior:"navigation"});
-    }
-
-    if(
-        page!=="map" &&
-        mapInventoryOverlayOpen
-    ){
-        closeMapInventoryOverlay();
     }
 
     if(
@@ -11755,7 +11657,7 @@ function isCanonicalSkillQuickBarButton(button){
     if(!button||!button.classList||!button.classList.contains("skill-quick-button")){ return false; }
     return [
         ".sq-icon-wrap",".sq-icon-image",".sq-icon-fallback",".sq-sp-block",
-        ".sq-name",".sq-cost",".v135-sq-scope",".sq-description"
+        ".sq-name",".sq-cost",".v135-sq-scope"
     ].every(selector=>!!button.querySelector(selector));
 }
 
@@ -11780,8 +11682,7 @@ function ensureSkillQuickBarButtons(bar){
             '<span class="sq-icon-wrap"><span class="sq-icon-image"></span><span class="sq-icon-fallback"></span><span class="sq-sp-block" hidden>SP不足</span></span>'+
             '<span class="sq-name"></span>'+
             '<span class="sq-cost"></span>'+
-            '<span class="v135-sq-scope"></span>'+
-            '<span class="sq-description"></span>';
+            '<span class="v135-sq-scope"></span>';
         button.onclick=()=>{
             const skillId=button.dataset.skillId||"";
             if(skillId&&!button.disabled){ prepareAction(skillId); }
@@ -11801,7 +11702,6 @@ function syncSkillQuickBarButton(button,skillId,skill,skillLevel,spCost,enoughSP
     const nameNode=button.querySelector(".sq-name");
     const costNode=button.querySelector(".sq-cost");
     const scopeNode=button.querySelector(".v135-sq-scope");
-    const descriptionNode=button.querySelector(".sq-description");
 
     button.dataset.skillId=skillId||"";
 
@@ -11814,7 +11714,6 @@ function syncSkillQuickBarButton(button,skillId,skill,skillLevel,spCost,enoughSP
         if(nameNode){ nameNode.textContent=skillId?"資料錯誤":"（空）"; }
         if(costNode){ costNode.textContent="—"; }
         if(scopeNode){ scopeNode.textContent=""; }
-        if(descriptionNode){ descriptionNode.textContent=""; }
         return;
     }
 
@@ -11856,12 +11755,6 @@ function syncSkillQuickBarButton(button,skillId,skill,skillLevel,spCost,enoughSP
             :(typeof window!=="undefined"&&typeof window.v135GetSkillTargetScopeLabel==="function"
                 ?window.v135GetSkillTargetScopeLabel(skill):"");
         if(scopeNode.textContent!==targetLabel){ scopeNode.textContent=targetLabel; }
-    }
-    if(descriptionNode){
-        const explanation=formalSpec&&typeof formalSpec.effectText==="function"
-            ?formalSpec.effectText(skill,Math.max(1,skillLevel||1))
-            :String(skill.description||"");
-        if(descriptionNode.textContent!==explanation){ descriptionNode.textContent=explanation; }
     }
 }
 
@@ -29488,6 +29381,17 @@ function getSkillLearnCostForUi(character,skill){
     return Math.max(0,Math.floor(Number(skill&&skill.learnCost)||0));
 }
 
+function getSkillLearnEligibilityForUi(character,skill,levels){
+    if(typeof window!=="undefined"&&typeof window.v173GetSkillLearnEligibility==="function"){
+        return window.v173GetSkillLearnEligibility(character,skill,levels);
+    }
+    return {
+        allowed:false,isCrossElement:false,isNativeElement:true,levelOk:false,
+        prerequisiteRequired:false,prerequisiteOk:false,learnCost:0,pointsOk:false,
+        crossGateOk:false,reason:"技能規則載入中"
+    };
+}
+
 function renderSkillElementTabs(character,skillOwner){
     const host=$("skillElementTabs");
     if(!host){ return; }
@@ -29779,8 +29683,9 @@ function renderSkillLoadout(){
             (skill.maxLevel||1);
 
 
-        const learnCost=getSkillLearnCostForUi(skillOwner,skill);
-        const canAfford=availableSkillPoints>=learnCost;
+        const eligibility=getSkillLearnEligibilityForUi(skillOwner,skill,skillLevels);
+        const learnCost=eligibility.learnCost;
+        const canAfford=eligibility.pointsOk;
 
 
         const box =
@@ -29799,11 +29704,7 @@ function renderSkillLoadout(){
         let actionDisabled;
 
 
-        const prereqMet =
-            isSkillPrereqMet(
-                skillLevels,
-                skill
-            );
+        const prereqMet=eligibility.prerequisiteOk;
 
 
         if(!isLearned){
@@ -29826,25 +29727,14 @@ function renderSkillLoadout(){
                樣式其實從來沒真的生效過）。
             */
 
-            actionLabel=
-                !prereqMet
-                ?
-                "🔒 "+getSkillPrereqLabel(skill)
-                :
-                (
-                    canAfford
-                    ?
-                    "學習・"+learnCost+"點"
-                    :
-                    "需要"+learnCost+"點"
-                );
+            actionLabel=eligibility.allowed
+                ?"學習・"+learnCost+"點"
+                :eligibility.reason;
 
             actionOnclick=
                 "learnSkill('"+skillId+"')";
 
-            actionDisabled=
-                !prereqMet ||
-                !canAfford;
+            actionDisabled=!eligibility.allowed;
 
         }
         else if(isMaxLevel){
@@ -29902,6 +29792,7 @@ function renderSkillLoadout(){
 
         <div class="skill-row-text">
             <b>${skill.name}</b>
+            <span class="skill-category-badge ${skill.category}">${getSkillCategoryLabel(skill.category)}</span>
             ${
             isLearned
                 ?
@@ -29922,12 +29813,12 @@ function renderSkillLoadout(){
             </span>
             ${
                 !isLearned &&
-                !prereqMet
+                !prereqMet&&eligibility.prerequisiteRequired
                 ?
                 `
                 <br>
                 <span style="color:#f59e0b;">
-                    🔒 ${getSkillPrereqLabel(skill)}
+                    🔒 ${eligibility.reason}
                 </span>
                 `
                 :
@@ -30031,23 +29922,23 @@ function renderSkillLoadout(){
 function getSkillCategoryLabel(category){
 
     if(category==="physical"){
-        return"物理主動";
+        return"物理";
     }
 
     if(category==="magic"){
-        return"法術主動";
+        return"法術";
     }
 
     if(category==="buff"){
-        return"增益主動";
+        return"增益";
     }
 
     if(category==="heal"){
-        return"治療主動";
+        return"治療";
     }
 
     if(category==="revive"){
-        return"復活主動";
+        return"復活";
     }
 
     if(category==="passive"){
@@ -30390,18 +30281,17 @@ function learnSkill(skillId){
        後端一樣要擋住，不能只靠前端。
     */
 
-    if(
-        !isSkillPrereqMet(
-            character.skillLevels,
-            skill
-        )
-    ){
+    const eligibility=getSkillLearnEligibilityForUi(
+        owner,
+        skill,
+        character.skillLevels
+    );
+
+    if(!eligibility.allowed){
 
         alert(
-            getSkillPrereqLabel(skill)+
-            "，才能學習「"+
-            skill.name+
-            "」。"
+            eligibility.reason+
+            "，才能學習「"+skill.name+"」。"
         );
 
         return;
@@ -30409,7 +30299,7 @@ function learnSkill(skillId){
     }
 
 
-    const learnCost=Math.max(0,Number(skill.learnCost)||0);
+    const learnCost=eligibility.learnCost;
     const availablePoints=Math.max(0,Number(owner.skillPoints)||0);
 
     if(availablePoints<learnCost){
@@ -36740,7 +36630,10 @@ window.v78ApplyCharacterInventoryLayout=
             meta.push("消耗 "+spCost+" SP");
         }
         if(skill.learnCost!==undefined){
-            meta.push("學習需要 "+skill.learnCost+" 技能點");
+            const baseLearnCost=typeof window.v173GetInitialLearnCost==="function"
+                ?window.v173GetInitialLearnCost(null,skill)
+                :skill.learnCost;
+            meta.push("學習需要 "+baseLearnCost+" 技能點");
         }
         if(Array.isArray(skill.requires) && skill.requires.length){
             meta.push(
@@ -37157,8 +37050,7 @@ const V_ASSET_VERSION="173.72";
 /* =====================================================
    V174 — dynamic UI regression guards
    Owner for cross-cutting UI invariants created by multiple late runtimes:
-   1) skill learn/upgrade action cards must stay compact;
-   2) dark text on bright gold/yellow buttons must not have a text shadow;
+   1) dark text on bright gold/yellow buttons must not have a text shadow;
    3) system save/delete subflows must always offer an explicit return path.
 
    No gameplay, save, battle, skill-cost or equipment business rules live here.
@@ -37172,59 +37064,6 @@ const V_ASSET_VERSION="173.72";
     window.__v174UiRegressionGuardsInstalled=true;
 
     let rafId=0;
-
-    function compactSkillActionLabel(source){
-        const text=String(source||"").replace(/\s+/g," ").trim();
-        if(!text){ return text; }
-
-        let match=text.match(/^角色\s*Lv\s*(\d+)\s*可升至技能\s*Lv\s*(\d+)/i);
-        if(match){ return "Lv"+match[1]+" 解鎖"; }
-
-        match=text.match(/^升至\s*Lv\s*(\d+)\s*需要\s*(\d+)\s*技能點/i);
-        if(match){ return "需 "+match[2]+" 點"; }
-
-        match=text.match(/^升至\s*Lv\s*(\d+)\s*[・·]\s*(\d+)\s*點/i);
-        if(match){ return "升 Lv"+match[1]+"・"+match[2]+"點"; }
-
-        match=text.match(/^學習\s*[・·]\s*(\d+)\s*點/i);
-        if(match){ return "學習・"+match[1]+"點"; }
-
-        match=text.match(/Lv\s*(\d+)\s*解鎖/i);
-        if(match){ return "Lv"+match[1]+" 解鎖"; }
-
-        match=text.match(/需要\s*(\d+)\s*技能點/i);
-        if(match){ return "需 "+match[1]+" 點"; }
-
-        if(/前置[:：]/.test(text)){ return "需前置"; }
-        return text;
-    }
-
-    function normalizeSkillActionCards(){
-        const labels=document.querySelectorAll("#allSkillsList .skill-action-card .skill-action-card-label");
-        labels.forEach(label=>{
-            const card=label.closest(".skill-action-card");
-            if(!card){ return; }
-
-            const current=String(label.textContent||"").replace(/\s+/g," ").trim();
-            const previousCompact=label.dataset.v174CompactLabel||"";
-            if(current!==previousCompact){
-                const full=current;
-                const compact=compactSkillActionLabel(full);
-                label.dataset.v174FullLabel=full;
-                label.dataset.v174CompactLabel=compact;
-                if(compact!==full){ label.textContent=compact; }
-                card.title=full;
-                card.setAttribute("aria-label",full);
-            }
-
-            if(card.style.getPropertyValue("width")!=="104px"||card.style.getPropertyPriority("width")!=="important"){
-                card.style.setProperty("width","104px","important");
-                card.style.setProperty("max-width","104px","important");
-                card.style.setProperty("min-width","84px","important");
-                card.style.setProperty("flex-basis","104px","important");
-            }
-        });
-    }
 
     function colorTriples(value){
         const triples=[];
@@ -37360,7 +37199,6 @@ const V_ASSET_VERSION="173.72";
     }
 
     function apply(){
-        normalizeSkillActionCards();
         normalizeGoldButtonTextShadows();
         normalizeSystemDialogNavigation();
         ensureStylesheetLast();
@@ -37376,7 +37214,6 @@ const V_ASSET_VERSION="173.72";
 
     const roots=[
         document.getElementById("homeFeatureModal"),
-        document.getElementById("allSkillsList"),
         document.getElementById("creationPage"),
         document.getElementById("v169RpgDialogLayer")
     ].filter(Boolean);

@@ -260,8 +260,26 @@ jobs:
           retention-days: 90
 
       - name: Run skill progression mobile browser QA
-        if: github.ref == 'refs/heads/main' || github.base_ref == 'main'
+        id: skill_inventory_browser
+        if: success() && (github.event_name == 'pull_request' || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main')
         run: node .github/scripts/run-skill-progression-browser-qa.mjs
+
+      - name: Upload Skill / Inventory browser evidence
+        if: always() && steps.skill_inventory_browser.outcome != 'skipped'
+        uses: actions/upload-artifact@v4
+        with:
+          name: skill-inventory-semantic-browser-qa-${{ github.sha }}
+          path: |
+            artifacts/browser-qa/skill-inventory-semantic-browser-qa.json
+            artifacts/browser-qa/skill-360x800.png
+            artifacts/browser-qa/skill-393x873.png
+            artifacts/browser-qa/skill-412x915.png
+            artifacts/browser-qa/inventory-home-393x873.png
+            artifacts/browser-qa/inventory-map-393x873.png
+            artifacts/browser-qa/inventory-dungeon-393x873.png
+            artifacts/browser-qa/battle-picker-393x873.png
+          if-no-files-found: warn
+          retention-days: 90
 
       - name: Run relic progression mobile browser QA
         if: github.ref == 'refs/heads/main' || github.base_ref == 'main'

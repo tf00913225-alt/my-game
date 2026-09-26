@@ -2806,21 +2806,6 @@ html body .skill-preview-modal.v141-body-preview .skill-preview-body{
     white-space:pre-line;
 }
 
-/* The runtime shortens state labels. Keep the action column bounded so it can
-   no longer consume the skill-description column on narrow phones. */
-#game-stage #allSkillsList .skill-row .skill-action-card{
-    max-width:108px;
-}
-#game-stage #allSkillsList .skill-row .skill-action-card-label{
-    white-space:normal;
-    overflow-wrap:normal;
-    word-break:keep-all;
-    text-align:center;
-}
-#game-stage #allSkillsList .skill-row .skill-row-text{
-    min-width:0;
-}
-
 /* V174.1 mobile regression follow-up — scoped to the five reported regressions. */
 
 /* Main-city roster: preserve the three equal slots, but return enough horizontal
@@ -2862,27 +2847,6 @@ html body .skill-preview-modal.v141-body-preview .skill-preview-body{
     -webkit-overflow-scrolling:auto !important;
     overscroll-behavior-y:auto !important;
     scrollbar-gutter:auto !important;
-}
-
-/* Skill rows keep only the short summary/action state.  Long progression data
-   lives in the existing skill detail modal, so the right action column cannot
-   consume or escape the description column. */
-#game-stage #allSkillsList .skill-row{
-    grid-template-columns:minmax(42px,auto) minmax(0,1fr) minmax(84px,104px) !important;
-    min-width:0 !important;
-    max-width:100% !important;
-    overflow:hidden !important;
-}
-#game-stage #allSkillsList .skill-row .skill-row-text{
-    min-width:0 !important;
-    max-width:100% !important;
-    overflow:hidden !important;
-}
-#game-stage #allSkillsList .skill-row .skill-action-card{
-    width:104px !important;
-    min-width:84px !important;
-    max-width:104px !important;
-    overflow:hidden !important;
 }
 
 /* 2026-09-11 reported mobile regressions.

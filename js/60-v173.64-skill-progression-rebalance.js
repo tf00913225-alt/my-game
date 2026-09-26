@@ -708,6 +708,48 @@
         if(!required.length){ return "無"; }
         return required.map(skillLabel).join(" 或 ");
     }
+
+    /*
+       Canonical Skill Learn Eligibility（技能學習資格唯一來源）.
+       Renderer、指引紅點、詳細頁與 learnSkill() 必須讀同一份結果；
+       不再由各 UI 自己重算跨元素、前置與成本。
+    */
+    function getSkillLearnEligibility(character,skill,levels){
+        const safeCharacter=character||null;
+        const safeSkill=skill||null;
+        const safeLevels=levels||{};
+        const cross=isCrossElementSkill(safeCharacter,safeSkill);
+        const native=!cross;
+        const crossGate=crossLearnGate({character:safeCharacter,loadout:{skillLevels:safeLevels}},safeSkill);
+        const levelOk=!!(safeCharacter&&safeSkill&&
+            Math.max(1,Math.floor(numeric(safeCharacter.level,1)))>=
+            getRequiredCharacterLevelForSkillLevel(safeSkill,1));
+        const prerequisiteRequired=!cross;
+        const prerequisiteOk=!prerequisiteRequired||prerequisiteMet(safeLevels,safeSkill);
+        const learnCost=initialLearnCost({character:safeCharacter},safeSkill);
+        const points=Math.max(0,Math.floor(numeric(safeCharacter&&safeCharacter.skillPoints)));
+        const pointsOk=points>=learnCost;
+        const allowed=!!(safeSkill&&levelOk&&crossGate.ok&&prerequisiteOk&&pointsOk);
+        let reason="";
+        if(!safeSkill){ reason="技能資料不存在"; }
+        else if(!levelOk){ reason="Lv"+safeSkill.learnLevel+" 解鎖"; }
+        else if(!crossGate.ok){ reason=crossGate.reason; }
+        else if(!prerequisiteOk){ reason="需先學習："+prerequisiteLabel(safeSkill); }
+        else if(!pointsOk){ reason="需要"+learnCost+"點"; }
+        return Object.freeze({
+            isCrossElement:cross,
+            isNativeElement:native,
+            allowed,
+            levelOk,
+            prerequisiteRequired,
+            prerequisiteOk,
+            learnCost,
+            pointsOk,
+            crossGateOk:!!crossGate.ok,
+            reason
+        });
+    }
+    window.v173GetSkillLearnEligibility=getSkillLearnEligibility;
     function finalizeSkillMutation(){
         if(typeof saveGame==="function"){ saveGame(); }
         if(typeof renderSkillLoadout==="function"){ renderSkillLoadout(); }
@@ -731,16 +773,16 @@
             const characterLevel=Math.max(1,Math.floor(numeric(context.character.level,1)));
             const requiredLevel=getRequiredCharacterLevelForSkillLevel(skill,1);
             const levels=context.loadout.skillLevels;
-            const cross=crossLearnGate(context,skill);
-            const prereqOk=cross.cross?true:prerequisiteMet(levels,skill);
+            const eligibility=getSkillLearnEligibility(context.character,skill,levels);
+            const prereqOk=eligibility.prerequisiteOk;
             if(characterLevel<requiredLevel){
                 return notify(prereqOk
                     ?("角色 Lv"+requiredLevel+" 才能學習「"+skill.name+"」。")
                     :("需要 Lv"+requiredLevel+"・前置："+prerequisiteLabel(skill)));
             }
-            if(!cross.ok){ return notify(cross.reason); }
+            if(!eligibility.crossGateOk){ return notify(eligibility.reason); }
             if(!prereqOk){ return notify("需要前置："+prerequisiteLabel(skill)); }
-            const learnCost=initialLearnCost(context,skill);
+            const learnCost=eligibility.learnCost;
             const points=Math.max(0,Math.floor(numeric(context.character.skillPoints)));
             if(points<learnCost){ return notify("技能點不足，需要"+learnCost+"點。"); }
             context.character.skillPoints=points-learnCost;
@@ -793,81 +835,6 @@
             finalizeSkillMutation();
             return true;
         };
-    }
-
-    function actionCardForRow(row){
-        const cards=Array.from(row&&row.querySelectorAll?row.querySelectorAll(".skill-action-card"):[]);
-        return cards.find(card=>{
-            const onclick=String(card.getAttribute&&card.getAttribute("onclick")||"");
-            const label=card.querySelector&&card.querySelector(".skill-action-card-label");
-            const text=String(label&&label.textContent||"");
-            return /learnSkill|upgradeSkill/.test(onclick)||/學習|升級|技能點|滿級/.test(text);
-        })||cards[0]||null;
-    }
-    function setActionCard(card,enabled,label,onclick){
-        if(!card){ return; }
-        const target=card.querySelector(".skill-action-card-label");
-        if(target){ target.textContent=label; }
-        card.classList.toggle("disabled",!enabled);
-        card.setAttribute("aria-disabled",enabled?"false":"true");
-        if(enabled&&onclick){ card.setAttribute("onclick",onclick); }
-        else{ card.removeAttribute("onclick"); }
-    }
-    function rowSkillId(row){
-        const icon=row&&row.querySelector?row.querySelector("[id^='skillIcon_']"):null;
-        return icon?icon.id.slice("skillIcon_".length):"";
-    }
-    function decorateSkillProgressionUi(){
-        if(typeof document==="undefined"){ return; }
-        const list=document.getElementById("allSkillsList");
-        const context=getSkillContext();
-        if(!list||!context.character||!context.loadout){ return; }
-        context.loadout.skillLevels=context.loadout.skillLevels||{};
-        const rows=Array.from(list.querySelectorAll(".skill-row"));
-        rows.forEach(row=>{
-            const skillId=rowSkillId(row);
-            if(skillId==="stormSpell"){
-                row.remove();
-                return;
-            }
-            const skill=skillById(skillId);
-            if(!skill||!Object.prototype.hasOwnProperty.call(skill,"learnLevel")){ return; }
-            const current=learnedLevel(context,skillId);
-            const level=Math.max(1,Math.floor(numeric(context.character.level,1)));
-            const points=Math.max(0,Math.floor(numeric(context.character.skillPoints)));
-            const card=actionCardForRow(row);
-            const levels=context.loadout.skillLevels;
-            const cross=crossLearnGate(context,skill);
-            if(current<=0){
-                const prereqOk=cross.cross?true:prerequisiteMet(levels,skill);
-                const levelOk=level>=skill.learnLevel;
-                const cost=initialLearnCost(context,skill);
-                const costOk=points>=cost;
-                if(levelOk&&cross.ok&&prereqOk&&costOk){
-                    setActionCard(card,true,(cross.cross?"跨修學習・":"學習・")+cost+"點","learnSkill('"+skillId+"')");
-                }else{
-                    const reasons=[];
-                    if(!levelOk){ reasons.push("Lv"+skill.learnLevel+" 解鎖"); }
-                    if(!cross.ok){ reasons.push(cross.reason); }
-                    if(!cross.cross&&!prereqOk){ reasons.push("前置："+prerequisiteLabel(skill)); }
-                    if(levelOk&&cross.ok&&prereqOk&&!costOk){ reasons.push("需要 "+cost+" 技能點"); }
-                    setActionCard(card,false,reasons.join("・"),"");
-                }
-            }else if(current<numeric(skill.maxLevel,1)){
-                const target=current+1;
-                const required=getRequiredCharacterLevelForSkillLevel(skill,target);
-                const cost=getUpgradeCostForTargetLevel(skill,target);
-                if(level<required){
-                    setActionCard(card,false,"角色 Lv"+required+" 可升至技能 Lv"+target,"");
-                }else if(points<cost){
-                    setActionCard(card,false,"升至 Lv"+target+" 需要 "+cost+" 技能點","");
-                }else{
-                    setActionCard(card,true,"升至 Lv"+target+"・"+cost+"點","upgradeSkill('"+skillId+"')");
-                }
-            }
-        });
-        // Rendering and sort ownership belongs to renderSkillLoadout in 00-main.js.
-        // This helper is retained only for compatibility with old diagnostics.
     }
 
     if(typeof getSkillEffectPreviewText==="function"){
@@ -1166,14 +1133,13 @@
     window.v17364GetUpgradeCostForTargetLevel=getUpgradeCostForTargetLevel;
     window.v17364ApplyFinalProgressionData=applyFinalProgressionData;
     window.v17364CastNewFireTactical=castNewFireTactical;
-    window.v17364DecorateSkillProgressionUi=decorateSkillProgressionUi;
     window.v17364NormalizeCrossElementEquips=normalizeAllCrossElementEquips;
     window.v17364SkillProgression={
         version:"173.64",upgradeCosts:SKILL_UPGRADE_COST_BY_TARGET_LEVEL,
         fireMomentumByLevel:FIRE_MOMENTUM_BY_LEVEL,bloodBurnByLevel:BLOOD_BURN_BY_LEVEL,
         dodgeByLevel:DODGE_BY_LEVEL,rockWallByLevel:ROCK_WALL_BY_LEVEL,earthShieldByLevel:EARTH_SHIELD_BY_LEVEL,
         getRequiredCharacterLevelForSkillLevel,getUpgradeCostForTargetLevel,applyFinalProgressionData,
-        castNewFireTactical,decorateSkillProgressionUi
+        castNewFireTactical
     };
 
     normalizeAllCrossElementEquips();
