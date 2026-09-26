@@ -9,6 +9,7 @@ const {getAuth}=require("firebase-admin/auth");
 const {HttpsError}=require("firebase-functions/v2/https");
 const {createSessionAuthority}=require("../functions/src/session-authority.js");
 const {createCanonicalSourceWriter}=require("../functions/src/canonical-source-writer.js");
+const {createCanonicalGoldCredit}=require("../functions/src/canonical-gold-credit.js");
 const {inspectExistingEnvelope,nextRevision}=require("../functions/src/cloud-save-envelope.js");
 const project="demo-four-symbols-session";
 if(process.env.GCLOUD_PROJECT!==project||process.env.FIRESTORE_EMULATOR_HOST!=="127.0.0.1:18080"||
@@ -259,6 +260,44 @@ await assert.rejects(initialWriter.commitInitialSources({
     data:{uid:candidateUid,session:candidateSession}},
     {...initialArgs,expectedRevision:1}),error=>error.code==="failed-precondition");
 assert.equal((await db.doc(`serverUsers/${candidateUid}/account/current`).get()).exists,false);
+const grantIdForCharacter="grant-initial-character-0001";
+const goldOperation="credit-initial-character-0001";
+await db.doc(`serverUsers/${y}/pendingGrants/${grantIdForCharacter}`).set({
+    schemaVersion:1,ownerUid:y,kind:"gold",source:"server-event",amount:25,
+    status:"pending",claimedByOperationId:null,createdAt:Timestamp.now()
+});
+const reservedForCharacter=await invoke("reserveTrustedGrant",yUser.idToken,{
+    uid:y,session:sessionY,grantId:grantIdForCharacter,
+    operationId:goldOperation,expectedRevision:2});
+assert.equal(reservedForCharacter.serverRevision,3);
+let abortGoldCommit=false;
+const goldWriter=createCanonicalGoldCredit({db,FieldValue,HttpsError,
+    inspectExistingEnvelope,nextRevision,
+    runProtected:(request,operation)=>writerSessions.runProtected(request,async(tx,session)=>{
+        const result=await operation(tx,session);
+        if(abortGoldCommit){throw new Error("simulated gold credit rollback");}
+        return result;
+    })});
+const creditArgs={grantId:grantIdForCharacter,operationId:goldOperation,
+    expectedRevision:3};
+await assert.rejects(goldWriter.creditReservedGrant(yRequest,
+    {...creditArgs,expectedRevision:2}),error=>error.code==="aborted");
+abortGoldCommit=true;
+await assert.rejects(goldWriter.creditReservedGrant(yRequest,creditArgs),
+    /simulated gold credit rollback/);
+abortGoldCommit=false;
+assert.equal((await db.doc(`serverUsers/${y}/economy/current`).get()).get("gold"),0);
+assert.equal((await db.doc(`serverUsers/${y}/ledgerEntries/${goldOperation}`).get()).exists,false);
+assert.equal((await db.doc(`serverUsers/${y}/uniqueClaims/${grantIdForCharacter}`).get()).exists,false);
+const credited=await goldWriter.creditReservedGrant(yRequest,creditArgs);
+assert.equal(credited.creditRevision,4);
+assert.equal((await db.doc(`serverUsers/${y}/economy/current`).get()).get("gold"),25);
+assert.equal((await db.doc(`serverUsers/${y}/playableSnapshots/4`).get())
+    .get("readyForPublication"),false);
+assert.equal((await db.doc(`serverUsers/${y}/ledgerEntries/${goldOperation}`).get())
+    .get("balanceAfter"),25);
+assert.equal((await goldWriter.creditReservedGrant(yRequest,creditArgs)).unchanged,true);
+assert.equal((await db.doc(`users/${y}/saves/current`).get()).get("authoritativeStateReady"),false);
 await rejected("protectedTest",yUser.idToken,{uid:x,session:sessionB},"SESSION_INVALID");
 await rejected("protectedTest",yUser.idToken,{uid:y,session:{...sessionB,uid:y}},"SESSION_INVALID");
 assert.equal((await invoke("protectedTest",yUser.idToken,{uid:y,session:sessionY})).uid,y);
