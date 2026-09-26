@@ -785,19 +785,17 @@
         }
         if(type==="frostbite"){ return "傷害 -30%、最終閃躲 -25%、最終異常狀態抗性 -25%"; }
         if(type==="freeze"){ return "無法行動"; }
-        if(type==="agilityDown"){ return "敏捷降低 "+value+"%、最終閃躲降低 "+value+"%""; }
+        if(type==="agilityDown"){ return "敏捷降低 "+value+"%、最終閃躲降低 "+value+"%"; }
         if(type==="damageDown"){ return "造成傷害降低 "+value+"%"; }
-        if(type==="stun"){ return "最終命中率降低 "+value+"%""; }
+        if(type==="stun"){ return "最終命中率降低 "+value+"%"; }
         if(type==="dodgeSkill"){
             const percent=statusPercent(entry,"bonusPercent","percent");
             return "最終閃躲提升 "+percent+"%";
         }
         if(type==="stealthSkill"){ return "無法被單體技能選中，仍會受到範圍技能"; }
         if(type==="dinghaishenzhen"){
-            const resist=statusPercent(entry,"resistBonus","amount")||
-                Number(typeof skillDatabase!=="undefined"&&skillDatabase.dinghaishenzhen&&skillDatabase.dinghaishenzhen.statusResistBonus)||0;
-            const accuracy=Number(entry&&entry.accuracyBonusPercent)||
-                Number(typeof skillDatabase!=="undefined"&&skillDatabase.dinghaishenzhen&&skillDatabase.dinghaishenzhen.accuracyBonusPercent)||0;
+            const resist=statusPercent(entry,"resistBonus","amount");
+            const accuracy=Number(entry&&entry.accuracyBonusPercent)||0;
             const parts=[];
             if(resist){ parts.push("最終異常狀態抗性 +"+resist+"%"); }
             if(accuracy){ parts.push("最終命中率 +"+accuracy+"%"); }
@@ -810,13 +808,11 @@
         }
         if(type==="petrify"){ return "無法行動"; }
         if(type==="earthShield"){
-            const percent=statusPercent(entry,"percent","reflectPercent")||
-                Number(typeof skillDatabase!=="undefined"&&skillDatabase.earthShield&&skillDatabase.earthShield.reflectPercent)||0;
+            const percent=statusPercent(entry,"percent","reflectPercent");
             return "反彈受到傷害的 "+percent+"%";
         }
         if(type==="rockWall"){
-            const percent=statusPercent(entry,"percent","defenseBonusPercent")||
-                Number(typeof skillDatabase!=="undefined"&&skillDatabase.rockWall&&skillDatabase.rockWall.defenseBonusPercent)||0;
+            const percent=statusPercent(entry,"percent","defenseBonusPercent");
             return "防禦提升 "+percent+"%";
         }
         if(type==="barrier"){
@@ -824,8 +820,7 @@
             return blocks?"完全抵擋傷害，剩餘 "+blocks+" 次":"完全抵擋傷害";
         }
         if(type==="yuanZuBlessing"){
-            const percent=statusPercent(entry,"bonusPercent","evasionBonusPercent")||
-                Number(typeof skillDatabase!=="undefined"&&skillDatabase.yuanZuBlessing&&skillDatabase.yuanZuBlessing.evasionBonusPercent)||0;
+            const percent=statusPercent(entry,"bonusPercent","evasionBonusPercent");
             return "最終閃躲提升 "+percent+"%";
         }
         if(type==="fireMomentum"){
@@ -869,6 +864,17 @@
         });
     }
 
+    function authoritativeStatusBuffs(entity){
+        if(!entity){ return []; }
+        const entries=[];
+        if(Array.isArray(entity.v141TeamBuffs)){ entries.push(...entity.v141TeamBuffs); }
+        ["v155WindDodge","v155EvasionBlessing"].forEach(key=>{
+            const state=entity[key];
+            if(state&&Number(state.turnsLeft)>0){ entries.push(state); }
+        });
+        return entries;
+    }
+
     window.v143GetBattleStatusSummary=function(entity){
         const buffs=[],debuffs=[],seen=new Set();
         function collect(list,kind){
@@ -883,6 +889,9 @@
                 (kind==="buff"?buffs:debuffs).push(item);
             });
         }
+        /* Gameplay state is authoritative. Display-only activeBuffs are collected
+           only after real sidecars/team buffs and are de-duplicated by status ID. */
+        collect(authoritativeStatusBuffs(entity),"buff");
         collect(entity&&entity.activeBuffs,"buff");
         collect(entity&&entity.statusEffects,"debuff");
         if(entity&&entity.v141Shield&&Number(entity.v141Shield.turnsLeft)>0){
@@ -1380,60 +1389,26 @@
         return wait;
     };
 
-    if(typeof showMonsterHit==="function"){
-        const previous=showMonsterHit;
-        showMonsterHit=function(index){
-            const args=Array.prototype.slice.call(arguments);
-            const wait=delayFor("monster",index,true);
-            const current=state.current;
-            if(current&&!current.done&&current.config.id==="fireCritical"&&current.targetSide==="monster"){ args[3]=true; }
-            if(wait>8){
-                state.metrics.delayedNumbers++;
-                setTimer(()=>previous.apply(this,args),wait);
-                return;
-            }
-            return previous.apply(this,args);
-        };
-    }
-
-    if(typeof showPlayerHit==="function"){
-        const previous=showPlayerHit;
-        showPlayerHit=function(amount,type,index){
-            const args=Array.prototype.slice.call(arguments);
-            const wait=delayFor("player",Number(index)||0,true);
-            const current=state.current;
-            if(current&&!current.done&&current.config.id==="fireCritical"&&current.targetSide==="player"&&!args[3]){ args[4]=true; }
-            if(wait>8){
-                state.metrics.delayedNumbers++;
-                setTimer(()=>previous.apply(this,args),wait);
-                return;
-            }
-            return previous.apply(this,args);
-        };
-    }
+    /* V143 owns hit timing only. Battle Floating Feedback owns popup DOM,
+       geometry, collision lanes, typography and cleanup. */
+    window.v143ResolveBattleFeedbackTiming=function(targetSide,index,kind){
+        const side=targetSide==="monster"?"monster":"player";
+        const unitIndex=Number(index)||0;
+        const wait=delayFor(side,unitIndex,true);
+        const current=state.current;
+        const critical=String(kind||"")==="damage"&&!!(
+            current&&!current.done&&current.config&&current.config.id==="fireCritical"&&
+            current.targetSide===side
+        );
+        if(wait>8){ state.metrics.delayedNumbers++; }
+        return Object.freeze({delayMs:wait,critical:critical});
+    };
 
     if(typeof applySkillDebuffEffectsToPlayer==="function"){
         const previous=applySkillDebuffEffectsToPlayer;
         applySkillDebuffEffectsToPlayer=function(skill,level,target,index){
             registerTarget("player",Number(index)||0,true);
             return previous.apply(this,arguments);
-        };
-    }
-
-    if(typeof showMissEffect==="function"){
-        const previous=showMissEffect;
-        showMissEffect=function(isPlayerTarget,index,label){
-            const args=Array.prototype.slice.call(arguments);
-            const targetSide=isPlayerTarget?"player":"monster";
-            /* MISS is still an attempted cast. Register the resolved target through
-               the same formal V143 path so late-known monster/Boss targets get
-               their real Sprite Sheet while the MISS popup keeps hit timing. */
-            const wait=delayFor(targetSide,index,true);
-            const invoke=()=>{
-                return previous.apply(this,args);
-            };
-            if(wait>8){ setTimer(invoke,wait); return; }
-            return invoke();
         };
     }
 
