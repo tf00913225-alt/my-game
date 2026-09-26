@@ -19,7 +19,9 @@ function draft(count=1){
         skills:{fire:{skillLevels:{},equippedSkills:[]},
             player2:{skillLevels:{},equippedSkills:[]},
             player3:{skillLevels:{},equippedSkills:[]}},
-        economy:{gold:12,sharedExp:4},relics:{},relicLoadout:{relicId:null},
+        economy:{gold:12,sharedExp:4},
+        relics:{relicA:{unlocked:true,level:2,exp:3},relicB:{unlocked:false,level:1,exp:0}},
+        relicLoadout:{relicId:"relicA",subRelicId:null},
         formation:{version:1,characterIndexToSlot:{0:"ALLY_F1"}},
         progress:{abyssProgress:{runs:{}}},retainedMainFields:{version:{status:"missing"}},
         retainedSidecars:{"equipment-shop-purchases":{status:"missing",raw:null}},
@@ -43,6 +45,9 @@ test("review projection allocates distinct provisional character and item IDs wi
         assert.equal(plan.equipmentRefs[0].characterId,"new-1");
         assert.equal(plan.equipmentRefs[0].ownedItemId,`new-${count+2}`);
         assert.equal(plan.ownedItems[1].location,"equipped");
+        assert.deepEqual(plan.relicRecords.map(record=>[record.relicId,record.ownershipClaimed]),
+            [["relicA",true],["relicB",false]]);
+        assert.deepEqual(plan.activeRelicRef,{relicId:"relicA"});
         assert.deepEqual(plan.formation,source.formation);
         assert.equal(plan.retainedSidecars["equipment-shop-purchases"].status,"missing");
         assert.equal(plan.claimHistoryBlocked,true);
@@ -61,4 +66,6 @@ test("review projection rejects slot gaps, orphaned equipment and repeated alloc
     assert.throws(()=>buildCanonicalCharacterReviewPlan("uid-a",draft(),()=>"same"),/allocation failed/);
     assert.throws(()=>buildCanonicalCharacterReviewPlan("uid-b",{...draft(),claimHistoryBlocked:false}),
         /complete untrusted/);
+    const unowned=draft();unowned.relicLoadout.relicId="relicB";
+    assert.throws(()=>buildCanonicalCharacterReviewPlan("uid-a",unowned),/owned relic/);
 });
