@@ -22,7 +22,7 @@ body > .battle-floating-feedback{
     -webkit-text-stroke:.85px #fff;
     paint-order:stroke fill;
     text-shadow:1px 1px 0 #000;
-    transform:translate(-50%,0);
+    transform:translate(-50%,-100%);
     animation:battleFloatingFeedback var(--battle-feedback-duration,1100ms) ease-out both;
 }
 body > .battle-floating-feedback.is-critical{
