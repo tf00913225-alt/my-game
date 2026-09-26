@@ -228,11 +228,13 @@ function runViewport(chrome,width,height){
     assert.equal(data.feedback.monster2.length,2,"MISS + Status must share one target context");
     assert.equal(data.feedback.player0.length,2,"HP + SP recovery must share one target context");
     assert.equal(data.feedback.player1.length,2,"consecutive HP recovery must allocate separate lanes");
-    assert.equal(data.feedback.player2.length,4,"bounded lane owner must render only four simultaneous lanes");
     const queueContext=data.feedback.queueSnapshot.find(item=>item.key==="player:2");
     assert.ok(queueContext,"queue stress context must exist");
-    assert.equal(queueContext.active.length,4,"queue stress context must cap active lanes at four");
-    assert.equal(queueContext.queued.length,1,"fifth simultaneous feedback entry must wait in queue");
+    assert.ok(queueContext.capacity>=1&&queueContext.capacity<=4,"lane capacity must stay bounded by the formal maximum");
+    assert.equal(data.feedback.player2.length,queueContext.active.length,"rendered feedback must equal active lane count");
+    assert.equal(queueContext.active.length,queueContext.capacity,"queue stress must fill every geometry-safe lane");
+    assert.equal(queueContext.active.length+queueContext.queued.length,5,"all five stress events must remain active or queued");
+    assert.ok(queueContext.queued.length>=1,"overflow feedback must wait in queue instead of entering HUD space");
     [data.feedback.monster0,data.feedback.monster1,data.feedback.monster2,data.feedback.player0,data.feedback.player1,data.feedback.player2].forEach(function(group){
         separated(group,"battle feedback");
         assert.equal(new Set(group.map(item=>item.lane)).size,group.length,"each active feedback item must have a unique lane");
