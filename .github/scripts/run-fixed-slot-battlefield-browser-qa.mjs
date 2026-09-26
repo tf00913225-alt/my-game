@@ -100,6 +100,9 @@ window.showMissEffect=function(isPlayerTarget,index,label){var el=document.getEl
  [1,2,3,4,5,6].forEach(function(count){addCards(5,count,false);allyScenarios[count]={lower:lower(),unitRects:unitRects('.v-fixed-ally-slot'),hudRects:hudRects('.v-fixed-ally-slot'),slots:document.querySelectorAll('.v-fixed-ally-slot').length,assigned:Object.assign({},owner.ensureAllyFormation(window.__allyIndexes).characterIndexToSlot)};});
  addCards(5,3,true);var splitAlly={lower:lower(),assigned:Object.assign({},owner.ensureAllyFormation(window.__allyIndexes).characterIndexToSlot)};var artwork={player:artEvidence('#battlePlayerCard0'),regular:artEvidence('#battleMonster0'),elite:artEvidence('#battleMonster1'),boss:artEvidence('#battleMonster2'),abyss:artEvidence('#battleMonster4')};
  addCards(3,3,true);var beforeDeath={e1:rect('#battleMonster1'),e2:rect('#battleMonster2')};document.getElementById('battleMonster1').remove();var afterDeath={e2:rect('#battleMonster2')};var targetSlot=owner.getEnemySlotForMonster(owner.getActiveEnemySnapshot(),2),targetRect=owner.getSlotRect(targetSlot);
+ /* Restore the formal three-enemy DOM after the death-stability probe. Floating
+    feedback must never target a Unit that no longer exists in the battlefield. */
+ addCards(3,3,true);
  var feedback=window.FourSymbolsBattleFloatingFeedback;
  /* A/C: Relic damage + Burn status share the same target context without collision. */
  feedback.emit({side:'monster',index:0,kind:'damage',text:'-188HP',source:'relic',duration:1500,skipImpactTiming:true});
