@@ -12,7 +12,7 @@ assert.match(shared,/#game-content #inventoryPage\.map-inventory-overlay-open\{[
 assert.match(shared,/\.map-inventory-overlay-open \.inventory-classic-shell\{[\s\S]*?width:100% !important;[\s\S]*?margin:0 !important;/);
 assert.match(shared,/\.map-inventory-overlay-open \.map-inventory-overlay-close\{[\s\S]*?min-width:72px !important;[\s\S]*?height:42px !important;[\s\S]*?font-size:15px !important;/);
 assert.match(shared,/\.map-inventory-overlay-open \.inventory-grid-scroll\{[\s\S]*?scrollbar-gutter:auto !important;/);
-assert.match(shared,/\.v169-dungeon-inventory-overlay\{[\s\S]*?z-index:900 !important;/);
+assert.doesNotMatch(shared,/v169-dungeon-inventory-overlay/);
 assert.match(shared,/\.inventory-character-arrow\{[\s\S]*?width:44px !important;[\s\S]*?height:44px !important;[\s\S]*?border:1px solid #b88a42 !important;/);
 assert.match(shared,/#inventoryPortraitFrame \.v131-inventory-portrait\{[\s\S]*?object-fit:contain !important;[\s\S]*?object-position:center center !important;/);
 assert.match(shared,/#inventoryCharacterDetailButton::before\{[\s\S]*?content:"!" !important;/);

@@ -1747,12 +1747,7 @@
     min-height:20px !important;
 }
 
-/* Quick skill overlay */
-#game-stage > #app > #game-content #battlePage .skill-quick-button{
-    min-height:72px !important;
-    padding:5px 4px !important;
-    font-size:11px !important;
-}
+/* Quick skill overlay typography is owned by fixed-slot-battlefield-rendering-v2.css. */
 
 #game-stage > #app > #game-content #battlePage .skill-quick-button .sq-name{
     font-size:11px !important;

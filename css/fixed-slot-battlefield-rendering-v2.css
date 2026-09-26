@@ -119,12 +119,12 @@
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar.skill-quick-bar{
     left:14px;
     right:14px;
-    top:-54px;
+    top:-128px;
     bottom:0;
     z-index:18065 !important;
     gap:3px;
     box-sizing:border-box;
-    overflow:hidden !important;
+    overflow:visible !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar .skill-quick-close{
     flex-basis:28px;
@@ -134,15 +134,15 @@
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar .skill-quick-grid{
     gap:4px;
     min-height:0;
-    overflow:hidden !important;
+    overflow:visible !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar .skill-quick-button{
     min-width:0;
     min-height:0;
     height:100%;
     box-sizing:border-box;
-    padding:3px 2px;
-    overflow:hidden !important;
+    padding:4px 3px;
+    overflow:visible !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar .skill-quick-button .sq-icon-wrap{
     width:34px;
@@ -154,9 +154,8 @@
     min-height:0 !important;
     font-size:11px !important;
     line-height:15px !important;
-    overflow:hidden !important;
-    text-overflow:ellipsis !important;
-    white-space:nowrap !important;
+    overflow-wrap:anywhere !important;
+    white-space:normal !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar .skill-quick-button .sq-cost{
     display:block !important;
@@ -170,20 +169,18 @@
     color:#f6d58a !important;
     font-size:9px !important;
     line-height:12px !important;
-    white-space:nowrap !important;
-    overflow:hidden !important;
-    text-overflow:ellipsis !important;
+    white-space:normal !important;
+    overflow-wrap:anywhere !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar .skill-quick-button .sq-description{
     display:block !important;
     min-height:0 !important;
-    max-height:12px !important;
+    min-height:24px !important;
     color:#aaa39a !important;
     font-size:9px !important;
     line-height:12px !important;
-    white-space:nowrap !important;
-    overflow:hidden !important;
-    text-overflow:ellipsis !important;
+    white-space:normal !important;
+    overflow-wrap:anywhere !important;
 }
 
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion.target-selecting > .turn-target-row{
