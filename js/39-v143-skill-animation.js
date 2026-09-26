@@ -783,15 +783,14 @@
             const damage=statusPercent(entry,"critDamageBonusPercent","bonusPercent");
             return "爆擊率 +"+chance+"%，爆擊傷害 +"+damage+"%";
         }
-        if(type==="frostbite"){ return "傷害 -30%、最終閃躲 -25個百分點、最終異常狀態抗性 -25個百分點"; }
+        if(type==="frostbite"){ return "傷害 -30%、最終閃躲 -25%、最終異常狀態抗性 -25%"; }
         if(type==="freeze"){ return "無法行動"; }
-        if(type==="agilityDown"){ return "敏捷降低 "+value+"%、最終閃躲降低 "+value+"個百分點"; }
+        if(type==="agilityDown"){ return "敏捷降低 "+value+"%、最終閃躲降低 "+value+"%""; }
         if(type==="damageDown"){ return "造成傷害降低 "+value+"%"; }
-        if(type==="stun"){ return "最終命中率降低 "+value+"個百分點"; }
+        if(type==="stun"){ return "最終命中率降低 "+value+"%""; }
         if(type==="dodgeSkill"){
-            const percent=statusPercent(entry,"percent","bonusPercent")||
-                Number(typeof skillDatabase!=="undefined"&&skillDatabase.dodgeSkill&&skillDatabase.dodgeSkill.evasionBonusPercent)||0;
-            return "最終閃躲提升 "+percent+"個百分點";
+            const percent=statusPercent(entry,"bonusPercent","percent");
+            return "最終閃躲提升 "+percent+"%";
         }
         if(type==="stealthSkill"){ return "無法被單體技能選中，仍會受到範圍技能"; }
         if(type==="dinghaishenzhen"){
@@ -800,8 +799,8 @@
             const accuracy=Number(entry&&entry.accuracyBonusPercent)||
                 Number(typeof skillDatabase!=="undefined"&&skillDatabase.dinghaishenzhen&&skillDatabase.dinghaishenzhen.accuracyBonusPercent)||0;
             const parts=[];
-            if(resist){ parts.push("最終異常狀態抗性 +"+resist+"個百分點"); }
-            if(accuracy){ parts.push("最終命中率 +"+accuracy+"個百分點"); }
+            if(resist){ parts.push("最終異常狀態抗性 +"+resist+"%"); }
+            if(accuracy){ parts.push("最終命中率 +"+accuracy+"%"); }
             return parts.join("、")||"異常狀態抗性提升";
         }
         if(type==="defenseDown"){ return "防禦降低 "+value+"%"; }
@@ -827,7 +826,7 @@
         if(type==="yuanZuBlessing"){
             const percent=statusPercent(entry,"bonusPercent","evasionBonusPercent")||
                 Number(typeof skillDatabase!=="undefined"&&skillDatabase.yuanZuBlessing&&skillDatabase.yuanZuBlessing.evasionBonusPercent)||0;
-            return "最終閃躲提升 "+percent+"個百分點";
+            return "最終閃躲提升 "+percent+"%";
         }
         if(type==="fireMomentum"){
             const percent=Number(entry&&entry.bonusPercent)||0;
@@ -1431,20 +1430,7 @@
                their real Sprite Sheet while the MISS popup keeps hit timing. */
             const wait=delayFor(targetSide,index,true);
             const invoke=()=>{
-                const result=previous.apply(this,args);
-                const card=cardFor(targetSide,index);
-                if(card&&typeof card.querySelectorAll==="function"&&typeof document!=="undefined"&&document.body){
-                    const popups=card.querySelectorAll(":scope > .damage-popup.miss-popup");
-                    const popup=popups.length?popups[popups.length-1]:null;
-                    const rect=popup&&card.getBoundingClientRect?card.getBoundingClientRect():null;
-                    if(popup&&rect){
-                        popup.classList.add("v152-top-damage");
-                        popup.style.setProperty("left",(rect.left+rect.width/2)+"px","important");
-                        popup.style.setProperty("top",(rect.top+rect.height*.26)+"px","important");
-                        document.body.appendChild(popup);
-                    }
-                }
-                return result;
+                return previous.apply(this,args);
             };
             if(wait>8){ setTimer(invoke,wait); return; }
             return invoke();
