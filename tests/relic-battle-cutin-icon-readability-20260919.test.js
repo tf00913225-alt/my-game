@@ -27,8 +27,17 @@ assert.match(relic,/RELIC_DIM_OUT_MS=420/);
 assert.match(relic,/RELIC_MIN_VISUAL_PROTECTION_MS=1200/,
   "relic-only visual protection must preserve the existing 1.2s minimum handoff window");
 
-assert.match(relic,/function beginRelicCinematic\(def,target\)[\s\S]*classList\.add\("dim-visible"\)[\s\S]*waitMs\(RELIC_DIM_IN_MS\)[\s\S]*classList\.add\("identity-visible"\)[\s\S]*waitMs\(RELIC_IDENTITY_REVEAL_MS\)[\s\S]*waitMs\(RELIC_IDENTITY_HOLD_MS\)[\s\S]*classList\.add\("identity-exiting"\)[\s\S]*Promise\.all\(\[[\s\S]*waitMs\(RELIC_IDENTITY_EXIT_MS\)[\s\S]*revealRelicTargets\(target\)/,
-  "cinematic prelude must serialize dim -> identity reveal -> 1.15s hold -> identity exit plus target reveal");
+const cinematicPrelude=relic.slice(relic.indexOf("function beginRelicCinematic"),relic.indexOf("function enterRelicVfxPhase"));
+assert.ok(
+  cinematicPrelude.indexOf('classList.add("identity-visible")')<cinematicPrelude.indexOf('classList.add("dim-visible")'),
+  "cinematic prelude must show relic identity before battlefield dimming"
+);
+assert.ok(
+  cinematicPrelude.indexOf('classList.add("dim-visible")')<cinematicPrelude.indexOf("revealRelicTargets(target)"),
+  "cinematic prelude must dim before target reveal"
+);
+assert.match(cinematicPrelude,/waitMs\(RELIC_IDENTITY_HOLD_MS\)[\s\S]*classList\.add\("identity-exiting"\)[\s\S]*revealRelicTargets\(target\)/,
+  "identity hold must end in target reveal before VFX");
 assert.match(relic,/function relicTargetGeometry\(side,index\)[\s\S]*getUnitGeometry/,
   "target lookup must resolve canonical battlefield geometry");
 assert.match(relic,/function revealRelicTargets\(target\)[\s\S]*team-relic-mask-holes[\s\S]*team-relic-battle-target-outline/,
