@@ -149,11 +149,12 @@ function assembleCanonicalSnapshot(uid,revision,records){
     }
     for(const [key,entry] of Object.entries(records.progress.sidecars)){
         if(!object(entry)||!(entry.status==="present"&&typeof entry.raw==="string"||
-             entry.status==="missing"&&entry.raw===null)||
-           CLAIM_SIDECARS.has(key)&&entry.status!=="present"){
+             entry.status==="missing"&&entry.raw===null||
+             provenance==="server-created"&&entry.status==="not-applicable"&&entry.raw===null)||
+           CLAIM_SIDECARS.has(key)&&provenance!=="server-created"&&entry.status!=="present"){
             fail("claim-bearing sidecar missing or invalid");
         }
-        if(CLAIM_SIDECARS.has(key)){
+        if(CLAIM_SIDECARS.has(key)&&entry.status==="present"){
             let parsed;
             try{ parsed=JSON.parse(entry.raw); }catch(_){ fail("claim-bearing sidecar JSON"); }
             if(!object(parsed)){ fail("claim-bearing sidecar structure"); }
@@ -163,7 +164,8 @@ function assembleCanonicalSnapshot(uid,revision,records){
     if(!Array.isArray(records.claimRecords)||
        records.claimCheckpoint.claimCount!==records.claimRecords.length||
        records.claimCheckpoint.claimDigest!==digest(records.claimRecords)||
-       records.claimCheckpoint.historicalClaimsBlocked!==true){
+       records.claimCheckpoint.historicalClaimsBlocked!==
+           (provenance==="grandfathered-unverified-history")){
         fail("claim checkpoint");
     }
     const claimKeys=new Set();
