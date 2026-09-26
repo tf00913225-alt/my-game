@@ -21,7 +21,7 @@
 9. Foundation I: payment/refund entitlements (old Phase 9).
 10. Foundation J: destructive/disaster/multi-device tests throughout and final release gate (old Phase 10).
 
-`docs/OFFLINE_AUTHORITY_POLICY.md` and `docs/CLOUD_CANONICAL_SCHEMA_AND_RECOVERY.md` specify the provisional offline paths and restoration gates. Firestore region/PITR/scheduled backup, App Check enforcement, Google guest linking and WIF are unimplemented; an anonymous→Google UID-switch guard is implemented but link/merge remains unavailable.
+`docs/OFFLINE_AUTHORITY_POLICY.md` and `docs/CLOUD_CANONICAL_SCHEMA_AND_RECOVERY.md` specify the provisional offline paths and restoration gates. The owner-provided Google Cloud Console Disaster Recovery screenshot on 2026-09-26 (Asia/Taipei) shows PITR disabled, scheduled backups disabled and no displayed backups for `(default)`; no disaster restore has been rehearsed. Firestore region remains unverified. App Check enforcement, Google guest linking and WIF are unimplemented; an anonymous→Google UID-switch guard is implemented but link/merge remains unavailable.
 
 ## 2026-09-25 — Historical reward-claim proof gate (candidate)
 
