@@ -5,6 +5,7 @@ import test from "node:test";
 const require=createRequire(import.meta.url);
 const {screenLegacyCandidateSnapshot,prepareLegacyCharacterDraft}=
     require("../functions/src/legacy-candidate-screening.js");
+const {ALLOWED_SAVE_KEYS,LEGACY_BACKUP_SIDECARS}=require("../functions/src/cloud-save-policy.js");
 
 test("historical main save cannot pass screening without sidecar and reward provenance",()=>{
     const save={
@@ -116,9 +117,10 @@ test("read-only draft keeps empty slots and equipped objects separate from the b
         commissionQuestState:{date:"2026-09-26",progress:{},claimed:{}},
         achievementState:{},gameplayProgress:{tower:{claimedFloors:{}}},
         abyssProgress:{runs:{}}};
-    const keys=["daily-dungeon-state","progress","quest-milestones","task-tracker",
-        "legacy-abyss-state","equipment-shop-daily","equipment-shop-purchases","abyss-state"];
-    const sidecars=Object.fromEntries(keys.map(key=>[key,{status:"present",raw:"{}"}]));
+    save.bestiaryData={wolf:3};save.autoConfig={threshold:20};
+    const sidecars=Object.fromEntries(LEGACY_BACKUP_SIDECARS.map(key=>[
+        key,{status:"present",raw:key==="bulk-sell-quality"?"white":"{}"}
+    ]));
     const draft=prepareLegacyCharacterDraft(save,sidecars);
     assert.deepEqual(draft.slots,[save.player,null,null]);
     assert.deepEqual(draft.economy,{gold:42,sharedExp:7});
@@ -127,14 +129,29 @@ test("read-only draft keeps empty slots and equipped objects separate from the b
         source:"characterEquipment.fire.weapon",
         item:{id:"sword",type:"weapon",count:1}});
     assert.equal(draft.historicalRewardClaims.historicalGrantable,false);
+    assert.equal(draft.claimHistoryBlocked,true);
+    assert.deepEqual(Object.keys(draft.retainedSidecars).sort(),LEGACY_BACKUP_SIDECARS);
+    assert.deepEqual(draft.retainedMainFields.bestiaryData,{status:"present",value:{wolf:3}});
+    assert.deepEqual(draft.retainedMainFields.autoConfig,{status:"present",value:{threshold:20}});
+    assert.deepEqual(draft.retainedMainFields.autoConfig2,{status:"missing"});
+    const mappedMainKeys=new Set(["player","player2","player3","gold","sharedExp",
+        "inventoryItems","characterEquipment","characterSkillLoadouts","allyFormation",
+        "playerRelics","teamLoadout","dailyQuestState","commissionQuestState",
+        "achievementState","gameplayProgress","abyssProgress",
+        ...Object.keys(draft.retainedMainFields)]);
+    assert.deepEqual([...mappedMainKeys].sort(),[...ALLOWED_SAVE_KEYS].sort());
     draft.equipment[0].item.id="changed";
     assert.equal(save.characterEquipment.fire.weapon.id,"sword");
 
     const corrupt={...sidecars,"equipment-shop-purchases":{status:"present",raw:"not-json"}};
-    assert.equal(prepareLegacyCharacterDraft(save,corrupt),null);
+    assert.equal(prepareLegacyCharacterDraft(save,corrupt).retainedSidecars["equipment-shop-purchases"].raw,"not-json");
     assert.ok(screenLegacyCandidateSnapshot(save,corrupt).blockers.includes("SIDECAR_CLAIM_RECORD_INVALID"));
-    assert.equal(prepareLegacyCharacterDraft(save,{...sidecars,
-        "equipment-shop-purchases":{status:"missing",raw:null}}),null);
+    const missing={...sidecars,"equipment-shop-purchases":{status:"missing",raw:null}};
+    assert.deepEqual(prepareLegacyCharacterDraft(save,missing).retainedSidecars["equipment-shop-purchases"],
+        {status:"missing",raw:null});
+    assert.ok(screenLegacyCandidateSnapshot(save,missing).blockers.includes("SIDECAR_BACKUP_MISSING"));
+    const incomplete={...sidecars};delete incomplete["rested-exp-state"];
+    assert.equal(prepareLegacyCharacterDraft(save,incomplete),null);
     assert.equal(prepareLegacyCharacterDraft({...save,characterSkillLoadouts:{fire:{}}},sidecars),null);
     assert.equal(prepareLegacyCharacterDraft({...save,teamLoadout:{relicId:"absent"}},sidecars),null);
 });

@@ -40,6 +40,13 @@ const FORBIDDEN_OBJECT_KEYS=new Set([
     "prototype",
     "constructor"
 ]);
+const LEGACY_BACKUP_SIDECARS=Object.freeze([
+    "element-box-state","daily-dungeon-state","exp-pool-growth-state",
+    "rested-exp-state","progress","announcement-read","quest-milestones",
+    "task-tracker","legacy-abyss-state","equipment-shop-daily",
+    "bulk-sell-quality","equipment-shop-purchases","abyss-state",
+    "patrol-character-index"
+].sort());
 
 class CloudSavePolicyError extends Error{
     constructor(code,message){
@@ -200,11 +207,7 @@ function validateMigrationBackup(bundle,uid){
     }
     const sha=value=>createHash("sha256").update(value,"utf8").digest("hex");
     const keys=Object.keys(bundle.sidecars).sort();
-    const expected=["element-box-state","daily-dungeon-state","exp-pool-growth-state",
-        "rested-exp-state","progress","announcement-read","quest-milestones",
-        "task-tracker","legacy-abyss-state","equipment-shop-daily",
-        "bulk-sell-quality","equipment-shop-purchases","abyss-state","patrol-character-index"].sort();
-    if(keys.join("|")!==expected.join("|")){
+    if(keys.join("|")!==LEGACY_BACKUP_SIDECARS.join("|")){
         fail("invalid-argument","Backup sidecar inventory is incomplete.");
     }
     for(const suffix of keys){
@@ -253,6 +256,7 @@ function normalizeClientVersion(value){
 
 module.exports={
     ALLOWED_SAVE_KEYS,
+    LEGACY_BACKUP_SIDECARS,
     CLOUD_SAVE_SCHEMA_VERSION,
     CloudSavePolicyError,
     MAX_CANDIDATE_BYTES,
