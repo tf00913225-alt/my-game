@@ -345,6 +345,42 @@
         try{ showMissEffect=wrapped; }catch(_){ }
     }
 
+    function unitGeometry(side,index){
+        const targetSide=side==="monster"?"monster":"player";
+        const unitIndex=Number(index);
+        if(!Number.isInteger(unitIndex)){ return null; }
+        const card=document.getElementById((targetSide==="monster"?"battleMonster":"battlePlayerCard")+unitIndex);
+        if(!card){ return null; }
+        const slot=slotForElement(card);
+        const slotRect=slot?slots.getSlotRect(slot):null;
+        const unitRect=slotRect||card.getBoundingClientRect();
+        if(!unitRect){ return null; }
+        const art=card.querySelector(".v174-battle-art,img.v162-abyss-battle-portrait-art,.battle-monster-icon,.battle-player-icon");
+        const portraitRect=art&&art.getBoundingClientRect?art.getBoundingClientRect():unitRect;
+        const hudNodes=Array.from(card.querySelectorAll(".monster-hp,.monster-sp,.hp-bar,.sp-bar,.battle-monster-name,.battle-player-id,.monster-status-badges"));
+        const hudRects=hudNodes.map(node=>node.getBoundingClientRect()).filter(rect=>rect&&rect.width>=0&&rect.height>=0);
+        const hudTop=hudRects.length?Math.min(...hudRects.map(rect=>rect.top)):unitRect.bottom;
+        const hudBottom=hudRects.length?Math.max(...hudRects.map(rect=>rect.bottom)):unitRect.bottom;
+        const safeTop=Math.max(unitRect.top,Math.min(unitRect.bottom,hudTop));
+        const hudSafeRect={
+            left:unitRect.left,top:safeTop,right:unitRect.right,bottom:Math.max(safeTop,hudBottom),
+            width:unitRect.width,height:Math.max(0,Math.max(safeTop,hudBottom)-safeTop)
+        };
+        return {
+            owner:"fixed-slot",side:targetSide,index:unitIndex,slot:slot,
+            unitRect:unitRect,portraitRect:portraitRect,hudSafeRect:hudSafeRect,
+            center:{x:unitRect.left+unitRect.width/2,y:unitRect.top+unitRect.height/2},
+            feedbackAnchor:{
+                x:unitRect.left+unitRect.width/2,
+                y:Math.min(unitRect.top+unitRect.height*.46,safeTop-12)
+            },
+            highlightRect:{
+                left:Math.max(0,unitRect.left-3),top:Math.max(0,unitRect.top-3),
+                width:unitRect.width+6,height:unitRect.height+6
+            }
+        };
+    }
+
     function geometryForVfx(targetSide,primarySlot,shape){
         const contract=VFX_SCALE_CONTRACT[shape]||VFX_SCALE_CONTRACT.single;
         let rect=null;
@@ -374,6 +410,7 @@
         getSlotForElement:slotForElement,
         getAnchorForSlot:anchorForSlot,
         getVfxGeometry:geometryForVfx,
+        getUnitGeometry:unitGeometry,
         neutralizeLegacyPresentationGeometry:neutralizeLegacyPresentationGeometry
     });
     window.FourSymbolsBattlefieldRenderGeometry=api;
