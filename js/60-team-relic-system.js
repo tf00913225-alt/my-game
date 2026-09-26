@@ -349,13 +349,9 @@
     }
     function relicOverlayGeometry(){
         const owner=relicGeometryOwner();
-        if(owner&&typeof owner.getBattlefieldOverlayGeometry==="function"){
-            const geometry=owner.getBattlefieldOverlayGeometry();
-            if(geometry&&geometry.rect&&geometry.rect.width>0&&geometry.rect.height>0){ return geometry; }
-        }
-        const width=Math.max(1,window.innerWidth||document.documentElement.clientWidth||1);
-        const height=Math.max(1,window.innerHeight||document.documentElement.clientHeight||1);
-        return {owner:"viewport-fallback",rect:{left:0,top:0,right:width,bottom:height,width:width,height:height}};
+        if(!owner||typeof owner.getBattlefieldOverlayGeometry!=="function"){ return null; }
+        const geometry=owner.getBattlefieldOverlayGeometry();
+        return geometry&&geometry.rect&&geometry.rect.width>0&&geometry.rect.height>0?geometry:null;
     }
     function relicTargetGeometry(side,index){
         const geometry=relicGeometryOwner();
@@ -364,8 +360,7 @@
             if(resolved&&resolved.highlightRect){ return resolved.highlightRect; }
             if(resolved&&resolved.unitRect){ return resolved.unitRect; }
         }
-        const card=document.getElementById(side==="monster"?"battleMonster"+index:"battlePlayerCard"+index);
-        return card&&typeof card.getBoundingClientRect==="function"?card.getBoundingClientRect():null;
+        return null;
     }
     function relativeRelicRect(rect,overlayRect){
         if(!rect||!overlayRect){ return null; }
@@ -451,13 +446,13 @@
         relicCutinNode=node;
         syncRelicPresentationGeometry(node);
         document.body.classList.add("team-relic-cinematic-active");
-        const dim=()=>{ if(node===relicCutinNode){ node.classList.add("dim-visible"); } };
-        if(typeof requestAnimationFrame==="function"){ requestAnimationFrame(dim); }else{ dim(); }
-        return waitMs(RELIC_DIM_IN_MS)
+        const identity=()=>{ if(node===relicCutinNode){ node.classList.add("identity-visible"); } };
+        if(typeof requestAnimationFrame==="function"){ requestAnimationFrame(identity); }else{ identity(); }
+        return waitMs(RELIC_IDENTITY_REVEAL_MS)
             .then(()=>{
                 if(node!==relicCutinNode){ return null; }
-                node.classList.add("identity-visible");
-                return waitMs(RELIC_IDENTITY_REVEAL_MS);
+                node.classList.add("dim-visible");
+                return waitMs(RELIC_DIM_IN_MS);
             })
             .then(()=>{
                 if(node!==relicCutinNode){ return null; }
