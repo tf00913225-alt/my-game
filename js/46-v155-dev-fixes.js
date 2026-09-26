@@ -554,7 +554,7 @@
             const ally=entry.monster;
             if(!canApplyNamedState(ally,"dodgeSkill",entry.index,skill.name)){ return; }
             ensureV155EvasionBase(ally);
-            const display={type:"dodgeSkill",v141BuffType:"dodge",turnsLeft:duration,bonusPercent:percent};
+            const display={type:"dodgeSkill",v141BuffType:"dodge",turnsLeft:duration};
             const state={
                 type:"dodgeSkill",turnsLeft:duration,bonusPercent:percent,displayBuff:display,
                 battleToken:currentBattleToken(),expiresTurn:currentRound()+duration
