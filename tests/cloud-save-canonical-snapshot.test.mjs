@@ -63,6 +63,20 @@ test("complete server-owned sources assemble all created slots and preserve owne
     }
 });
 
+test("snapshot digest survives Firestore map key reordering",()=>{
+    const first=sources();
+    const second=structuredClone(first);
+    second.account=Object.fromEntries(Object.entries(second.account).reverse());
+    second.characters[0].state=Object.fromEntries(
+        Object.entries(second.characters[0].state).reverse());
+    const original=assembleCanonicalSnapshot("uid-a",7,first);
+    const reordered=assembleCanonicalSnapshot("uid-a",7,second);
+    assert.equal(reordered.sha256,original.sha256);
+    assert.equal(reordered.byteLength,original.byteLength);
+    assert.deepEqual(verifyCanonicalSnapshotAgainstSources(original,"uid-a",7,second),
+        original.snapshot);
+});
+
 test("stale, cross-UID and untrusted sources fail before any playable publication",()=>{
     const stale=sources();stale.characters[0].serverRevision=6;
     assert.throws(()=>assembleCanonicalSnapshot("uid-a",7,stale),/revision/);

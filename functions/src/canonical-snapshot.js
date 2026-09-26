@@ -21,7 +21,18 @@ const ID=/^[A-Za-z0-9_-]{1,128}$/;
 function fail(message){ throw new Error(`Canonical snapshot invalid: ${message}`); }
 function object(value){ return value!==null&&typeof value==="object"&&!Array.isArray(value); }
 function copy(value){ return JSON.parse(JSON.stringify(value)); }
+// Firestore may return map keys in a different order than the writer supplied.
+// Hash the logical record, while preserving array order and the exact byte
+// length check of the stored JSON projection separately.
+function stable(value){
+    if(Array.isArray(value)){return value.map(stable);}
+    if(object(value)){
+        return Object.fromEntries(Object.keys(value).sort().map(key=>[key,stable(value[key])]));
+    }
+    return value;
+}
 function digest(value){ return createHash("sha256").update(JSON.stringify(value),"utf8").digest("hex"); }
+function snapshotDigest(value){ return digest(stable(value)); }
 
 // The future protected writer supplies server-owned records at one revision.
 // This pure reader never reads a client candidate, changes Firestore, or
@@ -192,7 +203,7 @@ function assembleCanonicalSnapshot(uid,revision,records){
     const serialized=JSON.stringify(payload);
     const byteLength=Buffer.byteLength(serialized,"utf8");
     if(byteLength>MAX_SNAPSHOT_BYTES){ fail("snapshot exceeds internal size budget"); }
-    return Object.freeze({snapshot:payload,sha256:digest(payload),byteLength,
+    return Object.freeze({snapshot:payload,sha256:snapshotDigest(payload),byteLength,
         readyForPublication:false});
 }
 
@@ -202,7 +213,7 @@ function inspectCanonicalSnapshot(bundle,uid,revision){
        !/^[a-f0-9]{64}$/.test(bundle.sha256||"")||
        !Number.isSafeInteger(bundle.byteLength)||bundle.byteLength<1||
        Buffer.byteLength(JSON.stringify(bundle.snapshot),"utf8")!==bundle.byteLength||
-       digest(bundle.snapshot)!==bundle.sha256){
+       snapshotDigest(bundle.snapshot)!==bundle.sha256){
         fail("stored snapshot digest, size or owner");
     }
     return bundle.snapshot;

@@ -41,14 +41,38 @@ function createTrustedGrantLedger({db,FieldValue,HttpsError,runProtected,inspect
                    receipt.grantId!==grantId||receipt.operationId!==operationId||
                    !Number.isSafeInteger(receipt.serverRevision)||receipt.serverRevision<1||
                    receipt.serverRevision>envelope.serverRevision||
-                   receipt.kind!=="gold"||receipt.creditedToCharacter!==false||
+                   receipt.kind!=="gold"||
                    !receipt.createdAt||typeof receipt.createdAt.toMillis!=="function"||
                    !grant||grant.schemaVersion!==GRANT_SCHEMA_VERSION||grant.ownerUid!==uid||
                    grant.kind!=="gold"||grant.source!=="server-event"||
                    !Number.isSafeInteger(grant.amount)||grant.amount<1||grant.amount>100000||
-                   grant.amount!==receipt.amount||grant.status!=="reserved"||
+                   grant.amount!==receipt.amount||
                    grant.claimedByOperationId!==operationId){
                     fail("data-loss","Grant receipt is inconsistent.");
+                }
+                if(receipt.creditedToCharacter===true){
+                    const [claim,ledger]=await Promise.all([
+                        transaction.get(privateRef.collection("uniqueClaims").doc(grantId)),
+                        transaction.get(privateRef.collection("ledgerEntries").doc(operationId))
+                    ]);
+                    if(grant.status!=="credited"||!claim.exists||!ledger.exists||
+                       claim.get("ownerUid")!==uid||claim.get("operationId")!==operationId||
+                       claim.get("creditRevision")!==receipt.creditRevision||
+                       ledger.get("ownerUid")!==uid||ledger.get("grantId")!==grantId||
+                       ledger.get("operationId")!==operationId||
+                       ledger.get("amount")!==receipt.amount||
+                       ledger.get("creditRevision")!==receipt.creditRevision||
+                       ledger.get("snapshotSha256")!==receipt.snapshotSha256||
+                       !Number.isSafeInteger(receipt.creditRevision)||
+                       receipt.creditRevision>envelope.serverRevision){
+                        fail("data-loss","Credited grant receipt is inconsistent.");
+                    }
+                    return {grantId,operationId,serverRevision:receipt.serverRevision,
+                        currentServerRevision:envelope.serverRevision,unchanged:true,
+                        creditedToCharacter:true,creditRevision:receipt.creditRevision};
+                }
+                if(receipt.creditedToCharacter!==false||grant.status!=="reserved"){
+                    fail("data-loss","Grant reservation receipt is inconsistent.");
                 }
                 return {grantId,operationId,serverRevision:receipt.serverRevision,
                     currentServerRevision:envelope.serverRevision,unchanged:true,creditedToCharacter:false};
