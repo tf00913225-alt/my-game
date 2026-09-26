@@ -29698,7 +29698,6 @@ function renderSkillLoadout(){
             "skill-row";
 
 
-        let actionIcon;
         let actionLabel;
         let actionOnclick;
         let actionDisabled;
@@ -29708,9 +29707,6 @@ function renderSkillLoadout(){
 
 
         if(!isLearned){
-
-            actionIcon="";
-
 
             /*
                ★ 新增（依照使用者要求，「前置
@@ -29739,7 +29735,6 @@ function renderSkillLoadout(){
         }
         else if(isMaxLevel){
 
-            actionIcon="";
             actionLabel="已滿級";
 
             actionOnclick=
@@ -29750,8 +29745,6 @@ function renderSkillLoadout(){
 
         }
         else{
-
-            actionIcon="";
 
             actionLabel=
                 availableSkillPoints<1
@@ -29842,13 +29835,6 @@ function renderSkillLoadout(){
             }"
             onclick="${actionOnclick}"
         >
-            ${
-                actionIcon
-                ?
-                `<div class="skill-action-card-top">${actionIcon}</div>`
-                :
-                ""
-            }
             <div class="skill-action-card-label">
                 ${actionLabel}
             </div>
@@ -29868,7 +29854,6 @@ function renderSkillLoadout(){
                 }"
                 onclick="equipSkill('${skillId}')"
             >
-                
                 <div class="skill-action-card-label">
                     ${
                         equipped
