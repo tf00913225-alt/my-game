@@ -2,9 +2,15 @@
 
 本文件是長期工程進度來源。**每個 Phase 結束都必須更新本文件**；聊天、Commit、PR、CI 或部署成功不能取代驗收紀錄。
 
+## 2026-09-26 — read-only legacy character conversion draft (candidate)
+
+- `functions/src/legacy-candidate-screening.js::prepareLegacyCharacterDraft()` converts a structurally screened legacy candidate into a private review draft: three explicit character slots, economy, distinct bag/equipped objects with source paths, skill/relic sources, progress and parsed claim-bearing sidecars. It never issues canonical IDs or writes character state. The callable returns only conversion status and object counts, not the draft. Missing/corrupt claim sidecars, missing created-character skill loadouts or an unowned equipped relic block the draft; historical rewards remain unverified even for a prepared draft.
+- Targeted local verification and PR/merge/deploy evidence must be recorded separately. No baseline acceptance, award, authoritative writer, server recovery point or second-device restore exists. Phase 4 remains **IN PROGRESS / 0/6 VERIFIED**.
+
 ## 2026-09-26 — live formation field and canonical source screening (candidate)
 
 - `saveGame()` persists `allyFormation` but the candidate field allowlist previously omitted it. The backend now preserves that field; the read-only candidate screen blocks invalid/duplicate/orphaned formation slots and missing economy, skill or relic source fields. This closes a real save-schema drift without trusting client history or making a playable canonical projection.
+- PR #594 head `b7fa64138ae76509f81ae1fe6820359a803ac2d0` passed PR CI runs `36237149443` and `36237149229`, then merged to `dev@c5995ac04ca8a80704c5dfb1fce4eec2a4028d41`. Merged CI run `36237369357` passed Repository checks and exact-commit DEV preview deployment/version verification; Session Authority run `36237369203` passed the emulator and the Firebase deployment job for that same SHA. These are workflow results, not disaster-recovery or second-phone character acceptance.
 - No baseline acceptance, authoritative writer, server backup or second-device character restore is implemented. Phase 4 remains **IN PROGRESS / 0/6 VERIFIED**. PR, emulator, merge and exact deployment evidence are tracked separately.
 
 ## 2026-09-26 — Persisted-state owner drift and CI guard strengthening (candidate)
