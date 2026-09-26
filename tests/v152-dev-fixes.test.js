@@ -200,7 +200,8 @@ test("V152 no longer owns popup DOM relocation or font geometry",()=>{
     assert.doesNotMatch(css,/damage-popup\.v152-top-damage|z-index:2147483646/);
     assert.match(feedbackOwner,/window\.FourSymbolsBattleFloatingFeedback=api/);
     assert.match(feedbackOwner,/getUnitGeometry\(side,index\)/);
-    assert.match(feedbackOwner,/function nextLane\(context\)/);
+    assert.match(feedbackOwner,/function freeLane\(context\)/);
+    assert.match(feedbackOwner,/context\.queue\.push\(request\)/);
     assert.match(feedbackCss,/\.battle-floating-feedback/);
 });
 
