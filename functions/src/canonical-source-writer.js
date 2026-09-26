@@ -1,24 +1,30 @@
 "use strict";
 
 const {assembleCanonicalSnapshot}=require("./canonical-snapshot");
+const {makeInitialCharacterSources}=require("./initial-character-sources");
+const {createHash}=require("node:crypto");
 
 const OPERATION_ID=/^[A-Za-z0-9_-]{16,64}$/;
 
 // This is an internal transaction owner. No callable accepts source records.
-// A future trusted character-creation owner must construct the complete
-// server-created source set and call this with an already verified session.
+// Only validated creation choices can enter this internal writer.
 function createCanonicalSourceWriter({db,FieldValue,HttpsError,runProtected,
     inspectExistingEnvelope,nextRevision}){
     const fail=(code,message)=>{ throw new HttpsError(code,message); };
 
-    async function commitInitialSources(request,{operationId,expectedRevision,makeSources}){
+    async function commitInitialSources(request,{operationId,expectedRevision,selection}){
         if(!OPERATION_ID.test(operationId||"")||
-           !Number.isSafeInteger(expectedRevision)||expectedRevision<1||
-           typeof makeSources!=="function"){
+           !Number.isSafeInteger(expectedRevision)||expectedRevision<1){
             fail("invalid-argument","An internal source operation needs an ID and revision.");
         }
         return runProtected(request,async(transaction,session)=>{
             const uid=session.uid;
+            let choices;
+            try{ choices=makeInitialCharacterSources(uid,expectedRevision+1,
+                operationId,selection); }
+            catch(_){ fail("invalid-argument","Invalid initial character choices."); }
+            const selectionSha256=createHash("sha256").update(JSON.stringify(
+                choices.characters[0].state)).digest("hex");
             const root=db.collection("serverUsers").doc(uid);
             const envelopeRef=db.collection("users").doc(uid).collection("saves").doc("current");
             const accountRef=root.collection("account").doc("current");
@@ -37,6 +43,7 @@ function createCanonicalSourceWriter({db,FieldValue,HttpsError,runProtected,
                 const receipt=operationSnap.data();
                 if(!accountSnap.exists||receipt.ownerUid!==uid||
                    receipt.operationId!==operationId||receipt.kind!=="initial-character-sources"||
+                   receipt.selectionSha256!==selectionSha256||
                    receipt.sourceRevision!==accountSnap.get("serverRevision")||
                    receipt.snapshotSha256!==accountSnap.get("snapshotSha256")||
                    !Number.isSafeInteger(receipt.sourceRevision)||
@@ -55,9 +62,7 @@ function createCanonicalSourceWriter({db,FieldValue,HttpsError,runProtected,
                 fail("aborted","CLOUD_REVISION_CONFLICT");
             }
             const revision=nextRevision(envelope);
-            // makeSources is an internal, pure server-owned factory. Never pass
-            // request.data or a legacy candidate through this boundary.
-            const records=makeSources(uid,revision);
+            const records=makeInitialCharacterSources(uid,revision,operationId,selection);
             if(records?.account?.provenance!=="server-created"||
                records.claimRecords?.length!==0||records.characters?.length!==1||
                records.account.slots?.[1]!==null||records.account.slots?.[2]!==null||
@@ -104,6 +109,7 @@ function createCanonicalSourceWriter({db,FieldValue,HttpsError,runProtected,
             transaction.create(operationRef,{
                 schemaVersion:1,ownerUid:uid,kind:"initial-character-sources",
                 operationId,sourceRevision:revision,snapshotSha256:bundle.sha256,
+                selectionSha256,
                 authoritativeStateReady:false,createdAt:stamp
             });
             // The version-2 public envelope has no playable pointer. Keep the
