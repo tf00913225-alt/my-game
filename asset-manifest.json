@@ -195,8 +195,8 @@
       },
       {
         "path": "build/boot-core.87907162fbce.css",
-        "sha256": "6e4535e80a54",
-        "bytes": 219050,
+        "sha256": "87907162fbce",
+        "bytes": 219090,
         "priority": "P0",
         "type": "style",
         "decode": false
@@ -802,8 +802,8 @@
         "decode": false
       }
     ],
-    "manifestHash": "474d56cf19e5",
-    "totalBytes": 21576471,
+    "manifestHash": "28fa8255cf50",
+    "totalBytes": 21576511,
     "totalResources": 78
   },
   "assets": {
@@ -860,8 +860,8 @@
       "bytes": 25931
     },
     "build/boot-core.87907162fbce.css": {
-      "sha256": "6e4535e80a54",
-      "bytes": 219050
+      "sha256": "87907162fbce",
+      "bytes": 219090
     },
     "build/app-shell.4cb5ac72c2d5.css": {
       "sha256": "4cb5ac72c2d5",
