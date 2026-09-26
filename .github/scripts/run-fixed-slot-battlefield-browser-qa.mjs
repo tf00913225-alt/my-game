@@ -130,6 +130,14 @@ window.showMissEffect=function(isPlayerTarget,index,label){var el=document.getEl
  var player1Feedback=Array.from(document.querySelectorAll('.battle-floating-feedback[data-feedback-side="player"][data-feedback-index="1"]'));
  var player2Feedback=Array.from(document.querySelectorAll('.battle-floating-feedback[data-feedback-side="player"][data-feedback-index="2"]'));
  var feedbackQueueSnapshot=feedback.debugSnapshot();
+ /* Capture the geometry that actually owned these popups before later Boss
+    scenarios intentionally reassign the same Unit indexes to different Slots. */
+ var monster0FeedbackGeometry=adapter.getUnitGeometry('monster',0);
+ var monster1FeedbackGeometry=adapter.getUnitGeometry('monster',1);
+ var monster2FeedbackGeometry=adapter.getUnitGeometry('monster',2);
+ var player0FeedbackGeometry=adapter.getUnitGeometry('player',0);
+ var player1FeedbackGeometry=adapter.getUnitGeometry('player',1);
+ var player2FeedbackGeometry=adapter.getUnitGeometry('player',2);
  var stage=document.createElement('div');stage.className='v143-skill-stage';stage.dataset.geometryOwner='fixed-slot';document.body.appendChild(stage);
  var turnNode=document.getElementById('turnTargetRow'),actionRegion=document.getElementById('battleActionRegion');
  turnNode.style.transition='none';
@@ -164,8 +172,8 @@ window.showMissEffect=function(isPlayerTarget,index,label){var el=document.getEl
    player1:player1Feedback.map(function(node){var r=node.getBoundingClientRect();return {kind:node.dataset.feedbackKind,source:node.dataset.feedbackSource,lane:Number(node.dataset.feedbackLane),rect:{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height}};}),
    player2:player2Feedback.map(function(node){var r=node.getBoundingClientRect();return {kind:node.dataset.feedbackKind,source:node.dataset.feedbackSource,lane:Number(node.dataset.feedbackLane),rect:{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height}};}),
    queueSnapshot:feedbackQueueSnapshot,
-   monster0Geometry:adapter.getUnitGeometry('monster',0),monster1Geometry:adapter.getUnitGeometry('monster',1),monster2Geometry:adapter.getUnitGeometry('monster',2),
-   player0Geometry:adapter.getUnitGeometry('player',0),player1Geometry:adapter.getUnitGeometry('player',1),player2Geometry:adapter.getUnitGeometry('player',2)
+   monster0Geometry:monster0FeedbackGeometry,monster1Geometry:monster1FeedbackGeometry,monster2Geometry:monster2FeedbackGeometry,
+   player0Geometry:player0FeedbackGeometry,player1Geometry:player1FeedbackGeometry,player2Geometry:player2FeedbackGeometry
  },stageOverflow:getComputedStyle(stage).overflow,pageScroll:{width:document.documentElement.scrollWidth,height:document.documentElement.scrollHeight,clientWidth:document.documentElement.clientWidth,clientHeight:document.documentElement.clientHeight},enemySlots:document.querySelectorAll('.v-fixed-enemy-slot').length,allySlots:document.querySelectorAll('.v-fixed-ally-slot').length,legacyClasses:{enemy:document.getElementById('battleMonsterArea').className,ally:document.getElementById('battlePlayerRow').className}};document.getElementById('result').textContent=JSON.stringify(result);},40);
 })();
 </script></body></html>`;
