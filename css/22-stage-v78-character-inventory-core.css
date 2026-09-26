@@ -396,18 +396,19 @@
     margin:8px 0 2px !important;
 }
 
-/* Backpack Layout Owner: the wrapper is not a scroll or flex shrink owner. */
+/* The shared inventory grid is the only vertical scroll owner. */
 #game-stage #inventoryPage .inventory-grid-scroll{
     display:block !important;
     width:100% !important;
     height:auto !important;
     min-height:0 !important;
     max-height:none !important;
-    flex:0 0 auto !important;
-    overflow:visible !important;
+    flex:1 1 auto !important;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
     padding:0 !important;
     scrollbar-gutter:auto !important;
-    touch-action:auto !important;
+    touch-action:pan-y !important;
 }
 
 /* Backpack Visual Owner: quiet chrome, item rarity remains visible. */

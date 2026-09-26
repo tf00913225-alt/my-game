@@ -2317,7 +2317,7 @@ button:active{
     min-height:0;
     height:100%;
     box-sizing:border-box;
-    overflow:hidden;
+    overflow:visible;
     padding:3px 2px;
     border:1px solid #8a6a3a;
     border-radius:6px;
@@ -2402,9 +2402,8 @@ button:active{
     font-size:11px;
     line-height:15px;
     font-weight:900;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
+    white-space:normal;
+    overflow-wrap:anywhere;
 }
 
 .skill-quick-button .sq-cost{
@@ -2421,9 +2420,8 @@ button:active{
     display:block;
     width:100%;
     min-width:0;
-    overflow:hidden;
-    white-space:nowrap;
-    text-overflow:ellipsis;
+    overflow-wrap:anywhere;
+    white-space:normal;
     line-height:12px;
 }
 
@@ -4703,42 +4701,6 @@ button:active{
 .skill-element-tab.water{border-color:#4d91e8;background:#102541;}
 .skill-element-tab.wind{border-color:#72b96a;background:#142d1c;}
 .skill-element-tab.earth{border-color:#9b7654;background:#2e2017;}
-.skill-row-cost{
-    display:block;
-    margin-top:3px;
-    color:#f6b95d;
-    font-size:12px;
-    font-weight:800;
-}
-
-.skill-section{
-    display:grid;
-    gap:6px;
-}
-
-.skill-section + .skill-section{
-    margin-top:10px;
-}
-
-.skill-section-divider{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    margin:2px 0 0;
-    color:#9b8b70;
-    font-size:12px;
-    line-height:18px;
-    font-weight:800;
-}
-
-.skill-section-divider::before,
-.skill-section-divider::after{
-    content:"";
-    flex:1 1 auto;
-    height:1px;
-    background:rgba(200,154,72,.32);
-}
-
 /* =====================================================
    背包
 ===================================================== */
@@ -5543,12 +5505,12 @@ body.skill-detail-scroll-active,
 
 #game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open .inventory-classic-shell{
     position:relative !important;
-    height:auto !important;
+    height:100% !important;
     min-height:0 !important;
     display:flex !important;
     flex-direction:column !important;
     gap:8px !important;
-    overflow:visible !important;
+    overflow:hidden !important;
 }
 
 #game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open .inventory-character-panel{
@@ -5569,20 +5531,12 @@ body.skill-detail-scroll-active,
    寬度（56px按鈕+右邊5px留白+一點安全間距），
    右箭頭不管名稱多長都不會再跑到關閉按鈕底下。
 */
-#game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open .inventory-character-switch{
-    padding-right:64px !important;
-}
-#game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open .inventory-character-stage{
-    height:var(--inventory-stage-height,240px) !important;
-    min-height:var(--inventory-stage-height,240px) !important;
-    max-height:var(--inventory-stage-height,240px) !important;
-}
 #game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open .inventory-right-panel{
-    flex:0 0 auto !important;
+    flex:1 1 auto !important;
     min-height:0 !important;
     display:flex !important;
     flex-direction:column !important;
-    overflow:visible !important;
+    overflow:hidden !important;
     padding:8px 10px 10px !important;
 }
 #game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open .inventory-wallet-bar,
@@ -5590,11 +5544,11 @@ body.skill-detail-scroll-active,
     flex:0 0 auto !important;
 }
 #game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open .inventory-grid-scroll{
-    flex:0 0 auto !important;
+    flex:1 1 auto !important;
     min-height:0 !important;
-    overflow:visible !important;
-    overflow-x:visible !important;
-    touch-action:auto !important;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+    touch-action:pan-y !important;
     padding:0 !important;
 }
 

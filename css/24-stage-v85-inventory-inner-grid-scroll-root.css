@@ -50,10 +50,10 @@ body.inventory-scroll-active,
 
 #game-stage #app.on-inventory-page #inventoryPage{
     width:100% !important;
-    height:auto !important;
+    height:100% !important;
     min-height:0 !important;
     max-height:none !important;
-    overflow:visible !important;
+    overflow:hidden !important;
     touch-action:pan-y !important;
     transform:none !important;
     will-change:auto !important;
@@ -62,12 +62,12 @@ body.inventory-scroll-active,
 }
 
 #game-stage #app.on-inventory-page #inventoryPage .inventory-classic-shell{
-    height:auto !important;
+    height:100% !important;
     min-height:0 !important;
     display:flex !important;
     flex-direction:column !important;
     gap:8px !important;
-    overflow:visible !important;
+    overflow:hidden !important;
 }
 
 #game-stage #app.on-inventory-page #inventoryPage .inventory-character-panel{
@@ -80,11 +80,11 @@ body.inventory-scroll-active,
 }
 
 #game-stage #app.on-inventory-page #inventoryPage .inventory-right-panel{
-    flex:0 0 auto !important;
+    flex:1 1 auto !important;
     min-height:0 !important;
     display:flex !important;
     flex-direction:column !important;
-    overflow:visible !important;
+    overflow:hidden !important;
     padding:8px 10px 10px !important;
 }
 
@@ -118,12 +118,13 @@ body.inventory-scroll-active,
 }
 
 #game-stage #app.on-inventory-page #inventoryPage .inventory-grid-scroll{
-    flex:0 0 auto !important;
+    flex:1 1 auto !important;
     min-height:0 !important;
-    overflow:visible !important;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
     -webkit-overflow-scrolling:touch !important;
     overscroll-behavior-y:contain !important;
-    touch-action:auto !important;
+    touch-action:pan-y !important;
     padding:0 1px 8px !important;
     scrollbar-gutter:auto !important;
 }

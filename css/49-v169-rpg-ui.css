@@ -589,17 +589,6 @@
     padding:0 4px 4px;
 }
 
-/* The dungeon nav is z-index 790; its backpack must be above that layer. */
-#game-stage > #app.v141-dungeon-active > #game-content #inventoryPage.map-inventory-overlay-open.v169-dungeon-inventory-overlay{
-    display:block !important;
-    inset:8px 8px 76px 8px !important;
-    z-index:900 !important;
-}
-
-#game-stage > #app.v141-dungeon-active > #game-content #inventoryPage.map-inventory-overlay-open.v169-dungeon-inventory-overlay::before{
-    z-index:-1 !important;
-}
-
 /* ----- Backpack: standalone page and map/dungeon overlay share one A-level width. ----- */
 #game-stage #app.on-inventory-page #inventoryPage.inventory-page-classic:not(.map-inventory-overlay-open) .inventory-classic-shell{
     width:calc(100% - var(--ui-large-panel-safe-space)) !important;
@@ -618,25 +607,11 @@
     padding:10px !important;
 }
 
-#game-stage > #app.v141-dungeon-active > #game-content #inventoryPage.map-inventory-overlay-open.v169-dungeon-inventory-overlay{
-    left:50% !important;
-    right:auto !important;
-    top:12px !important;
-    bottom:82px !important;
-    width:calc(100% - var(--ui-large-panel-safe-space)) !important;
-    max-width:var(--ui-large-panel-max-width) !important;
-    transform:translateX(-50%) !important;
-}
-
 #game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open .inventory-classic-shell{
     width:100% !important;
     max-width:none !important;
     margin:0 !important;
     gap:var(--ui-large-panel-content-gap) !important;
-}
-
-#game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open .inventory-character-switch{
-    padding-right:86px !important;
 }
 
 #game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open .map-inventory-overlay-close{
@@ -1220,27 +1195,6 @@
     overscroll-behavior-y:contain !important;
     touch-action:pan-y !important;
 }
-#game-stage > #app.v141-dungeon-active > #game-content #inventoryPage.map-inventory-overlay-open.v169-dungeon-inventory-overlay{
-    inset:0 !important;
-    left:0 !important;
-    right:0 !important;
-    top:0 !important;
-    bottom:0 !important;
-    width:100% !important;
-    max-width:none !important;
-    height:100% !important;
-    max-height:none !important;
-    transform:none !important;
-    padding:8px !important;
-    box-sizing:border-box !important;
-}
-#game-stage > #app.v141-dungeon-active > #game-content #inventoryPage.map-inventory-overlay-open.v169-dungeon-inventory-overlay .inventory-classic-shell{
-    width:100% !important;
-    max-width:none !important;
-    min-height:0 !important;
-    margin:0 !important;
-}
-
 #game-stage .home-feature-modal-box .home-feature-close-btn{
     min-height:38px;
 }

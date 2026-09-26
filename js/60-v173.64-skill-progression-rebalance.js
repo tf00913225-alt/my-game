@@ -671,7 +671,10 @@
         return {ok:true,cross:true};
     }
     function initialLearnCost(context,skill){
-        return Math.max(0,Math.floor(numeric(skill&&skill.learnCost)))*(isCrossElementSkill(context&&context.character,skill)?2:1);
+        if(typeof window.v173GetInitialLearnCost==="function"){
+            return Math.max(0,Math.floor(numeric(window.v173GetInitialLearnCost(context&&context.character,skill))));
+        }
+        return Math.max(0,Math.floor(numeric(skill&&skill.learnCost)));
     }
     function normalizeCrossElementEquip(loadout,character){
         if(!loadout||!character||!Array.isArray(loadout.equippedSkills)){ return false; }
@@ -863,16 +866,8 @@
                 }
             }
         });
-        const sorted=Array.from(list.querySelectorAll(".skill-row")).sort((left,right)=>{
-            const a=skillById(rowSkillId(left))||{};
-            const b=skillById(rowSkillId(right))||{};
-            const ga=numeric(GROUP_ORDER[a.progressionGroup],9),gb=numeric(GROUP_ORDER[b.progressionGroup],9);
-            if(ga!==gb){ return ga-gb; }
-            const la=numeric(a.learnLevel,999),lb=numeric(b.learnLevel,999);
-            if(la!==lb){ return la-lb; }
-            return String(a.name||a.id||"").localeCompare(String(b.name||b.id||""),"zh-Hant");
-        });
-        sorted.forEach(row=>list.appendChild(row));
+        // Rendering and sort ownership belongs to renderSkillLoadout in 00-main.js.
+        // This helper is retained only for compatibility with old diagnostics.
     }
 
     if(typeof getSkillEffectPreviewText==="function"){
@@ -888,17 +883,6 @@
     if(typeof window.getSkillPreviewSummary==="function"){
         window.getSkillPreviewSummary=function(skill){
             return descriptionFor(skill);
-        };
-    }
-
-    if(typeof renderSkillLoadout==="function"){
-        const previousRenderSkillLoadout=renderSkillLoadout;
-        renderSkillLoadout=function(){
-            const context=getSkillContext();
-            if(context.loadout&&context.character){ normalizeCrossElementEquip(context.loadout,context.character); }
-            const result=previousRenderSkillLoadout.apply(this,arguments);
-            decorateSkillProgressionUi();
-            return result;
         };
     }
 

@@ -1342,17 +1342,16 @@
     };
 
     window.v148OpenContextInventory=function(){
-        if(typeof document==="undefined"||typeof openMapInventoryOverlay!=="function"){ return false; }
+        if(typeof document==="undefined"||typeof openInventoryContext!=="function"){ return false; }
         if(typeof battleActive!=="undefined"&&battleActive){ return false; }
-
-        const mapPage=document.getElementById("mapPage");
-        const mapWasActive=!!(mapPage&&mapPage.classList&&mapPage.classList.contains("active"));
-        if(mapPage&&!mapWasActive){ mapPage.classList.add("active"); }
-        try{
-            return openMapInventoryOverlay();
-        }finally{
-            if(mapPage&&!mapWasActive){ mapPage.classList.remove("active"); }
-        }
+        const sourcePage=(typeof activeGameplayPageId==="function"&&activeGameplayPageId())||
+            (document.getElementById("dungeonPage")?.classList.contains("active")?"dungeon":
+            document.getElementById("trainingPage")?.classList.contains("active")?"training":"map");
+        return openInventoryContext({
+            sourcePage,
+            returnAction:sourcePage==="map"?"leaveMap()":"v148ReturnFromGameplay()",
+            closeBehavior:"restore-source"
+        });
     };
 
     window.v148OpenContextRelic=function(){

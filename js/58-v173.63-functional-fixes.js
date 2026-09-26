@@ -105,16 +105,6 @@ function maximizeSynthesisPanel(){
     setImp(synthesisBody,"overscroll-behavior-y","contain");
     setImp(synthesisBody,"touch-action","pan-y");
 }
-function maximizeDungeonBackpack(){
-    const app=document.getElementById("app");
-    const page=document.getElementById("inventoryPage");
-    if(!app||!page||!app.classList.contains("v141-dungeon-active")||!page.classList.contains("map-inventory-overlay-open")){return;}
-    page.classList.add("v169-dungeon-inventory-overlay");
-    [["inset","0"],["left","0"],["right","0"],["top","0"],["bottom","0"],["width","100%"],["max-width","none"],["height","100%"],["max-height","none"],["transform","none"],["padding","8px"],["box-sizing","border-box"]].forEach(([k,v])=>setImp(page,k,v));
-    const shell=page.querySelector(".inventory-classic-shell");
-    setImp(shell,"width","100%");setImp(shell,"max-width","none");setImp(shell,"min-height","100%");setImp(shell,"margin","0");
-}
-
 /* ---------- 3 / 7. Canonical item icons and explicit rarity frames. ---------- */
 function canonicalDefinition(id){
     const content=defs();
@@ -394,7 +384,7 @@ function syncReturnIcons(){
 }
 
 function runRepairs(){
-    repairQueued=false;ensureFunctionalStyles();syncCanonicalItemArt();maximizeCharacterPanel();maximizeSynthesisPanel();maximizeDungeonBackpack();repairSynthesisIcons();ensureMaterialTab();syncReturnIcons();
+    repairQueued=false;ensureFunctionalStyles();syncCanonicalItemArt();maximizeCharacterPanel();maximizeSynthesisPanel();repairSynthesisIcons();ensureMaterialTab();syncReturnIcons();
 }
 function scheduleRepairs(){
     if(repairQueued){return;}repairQueued=true;

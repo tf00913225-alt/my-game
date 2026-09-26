@@ -8119,6 +8119,28 @@ async function resetGame(){
    只改開啟方式；背包資料、裝備、物品詳情、出售等仍沿用原函式。
 ===================================================== */
 let mapInventoryOverlayOpen=false;
+let inventoryOpenContext=null;
+
+function inventoryContextSnapshot(context){
+    const sourcePage=String(context&&context.sourcePage||"map");
+    return Object.freeze({
+        sourcePage,
+        returnAction:String(context&&context.returnAction||""),
+        closeBehavior:String(context&&context.closeBehavior||"restore-source")
+    });
+}
+
+function openInventoryContext(context){
+    if(typeof battleActive!=="undefined"&&battleActive){ return false; }
+    const normalized=inventoryContextSnapshot(context);
+    if(normalized.sourcePage==="inventory"){
+        inventoryOpenContext=normalized;
+        showPage("inventory");
+        return true;
+    }
+    return openMapInventoryOverlay(normalized);
+}
+window.openInventoryContext=openInventoryContext;
 
 function setMapInventoryScrollGate(enabled){
     [
@@ -8133,19 +8155,17 @@ function setMapInventoryScrollGate(enabled){
     });
 }
 
-function openMapInventoryOverlay(){
-    const mapPage=$("mapPage");
+function openMapInventoryOverlay(context){
     const inventoryPage=$("inventoryPage");
 
     if(
         battleActive ||
-        !mapPage ||
-        !mapPage.classList.contains("active") ||
         !inventoryPage
     ){
-        return;
+        return false;
     }
 
+    inventoryOpenContext=inventoryContextSnapshot(context);
     mapInventoryOverlayOpen=true;
     const app=document.getElementById("app");
     if(app){ app.classList.add("inventory-overlay-open"); }
@@ -8160,12 +8180,14 @@ function openMapInventoryOverlay(){
     if(scroller){
         scroller.scrollTop=0;
     }
+    return true;
 }
 
 function closeMapInventoryOverlay(){
     const inventoryPage=$("inventoryPage");
 
     mapInventoryOverlayOpen=false;
+    inventoryOpenContext=null;
     const app=document.getElementById("app");
     if(app){ app.classList.remove("inventory-overlay-open"); }
 
@@ -8194,6 +8216,10 @@ function closeMapInventoryOverlay(){
 ===================================================== */
 
 function showPage(page){
+
+    if(page==="inventory"){
+        inventoryOpenContext=inventoryContextSnapshot({sourcePage:"inventory",closeBehavior:"navigation"});
+    }
 
     if(
         page!=="map" &&
@@ -29457,8 +29483,9 @@ function getSkillLearnCostForUi(character,skill){
     if(typeof window!=="undefined"&&typeof window.v173GetInitialLearnCost==="function"){
         return Math.max(0,Math.floor(Number(window.v173GetInitialLearnCost(character,skill))||0));
     }
-    const cross=!!(character&&skill&&character.element&&skill.element&&character.element!==skill.element);
-    return Math.max(0,Math.floor(Number(skill&&skill.learnCost)||0))*(cross?2:1);
+    // The progression module owns the player-facing cost, including cross-element rules.
+    // Keep this fallback base-only so a missing module cannot create a second formula.
+    return Math.max(0,Math.floor(Number(skill&&skill.learnCost)||0));
 }
 
 function renderSkillElementTabs(character,skillOwner){
@@ -29703,20 +29730,21 @@ function renderSkillLoadout(){
         });
 
 
-    const learnedIds=
-
-        matchingSkillIds.filter(
-            skillId=>
-                (skillLevels[skillId]||0)>0
-        );
-
-
-    const unlearnedIds=
-
-        matchingSkillIds.filter(
-            skillId=>
-                !(skillLevels[skillId]>0)
-        );
+    const progressionOrder={physical:0,magic:1,tactical:2,ex:3};
+    matchingSkillIds.sort((a,b)=>{
+        const aSkill=skillDatabase[a]||{};
+        const bSkill=skillDatabase[b]||{};
+        const aLearned=(skillLevels[a]||0)>0;
+        const bLearned=(skillLevels[b]||0)>0;
+        if(aLearned!==bLearned){ return aLearned?-1:1; }
+        const aGroup=progressionOrder[String(aSkill.progressionGroup||"")]??99;
+        const bGroup=progressionOrder[String(bSkill.progressionGroup||"")]??99;
+        if(aGroup!==bGroup){ return aGroup-bGroup; }
+        const aLevel=Number(aSkill.learnLevel)||0;
+        const bLevel=Number(bSkill.learnLevel)||0;
+        if(aLevel!==bLevel){ return aLevel-bLevel; }
+        return String(aSkill.name||a).localeCompare(String(bSkill.name||b));
+    });
 
 
     /*
@@ -29875,7 +29903,7 @@ function renderSkillLoadout(){
         <div class="skill-row-text">
             <b>${skill.name}</b>
             ${
-                isLearned
+            isLearned
                 ?
                 "Lv."+level+
                 (
@@ -29886,19 +29914,12 @@ function renderSkillLoadout(){
                     ""
                 )
                 :
-                '<span style="color:#64748b;">未學習</span>'
+                ""
             }
             <br>
             <span class="skill-row-desc">
                 ${skill.description}
             </span>
-            ${
-                !isLearned
-                ?
-                '<span class="skill-row-cost">學習需要 '+learnCost+' 技能點</span>'
-                :
-                ""
-            }
             ${
                 !isLearned &&
                 !prereqMet
@@ -29973,59 +29994,9 @@ function renderSkillLoadout(){
     }
 
 
-    /*
-       ★ 分隔線用的純文字標籤，故意不用
-       任何框線/底色，只是一行置中的
-       虛線+文字，單純視覺上區隔兩組。
-    */
-
-    function buildSkillSectionDivider(label,sectionClass){
-
-        const divider=
-            document.createElement(
-                "div"
-            );
-
-
-        divider.className="skill-section-divider "+(sectionClass||"");
-        divider.textContent=label;
-
-
-        return divider;
-
-    }
-
-
-    if(learnedIds.length>0){
-        const learnedSection=document.createElement("section");
-        learnedSection.className="skill-section skill-section-learned";
-        learnedSection.appendChild(buildSkillSectionDivider("已學習","learned"));
-
-
-        learnedIds.forEach(skillId=>{
-
-            learnedSection.appendChild(buildSkillRowElement(skillId));
-
-        });
-        allList.appendChild(learnedSection);
-
-    }
-
-
-    if(unlearnedIds.length>0){
-        const unlearnedSection=document.createElement("section");
-        unlearnedSection.className="skill-section skill-section-unlearned";
-        unlearnedSection.appendChild(buildSkillSectionDivider("未學習","unlearned"));
-
-
-        unlearnedIds.forEach(skillId=>{
-
-            unlearnedSection.appendChild(buildSkillRowElement(skillId));
-
-        });
-        allList.appendChild(unlearnedSection);
-
-    }
+    matchingSkillIds.forEach(skillId=>{
+        allList.appendChild(buildSkillRowElement(skillId));
+    });
 
 
     /*
@@ -30038,6 +30009,9 @@ function renderSkillLoadout(){
     populateAutoSkillOptions();
 
     populateAutoSkillOptions2();
+    if(typeof window!=="undefined"&&typeof window.v152SyncSkillPointDisplay==="function"){
+        window.v152SyncSkillPointDisplay();
+    }
 
 }
 
@@ -31064,6 +31038,9 @@ function renderInventory(){
     renderInventoryCharacterTabs();
     renderEquipment();
     renderInventoryItems();
+    if(typeof window!=="undefined"&&typeof window.v131SyncInventoryPortrait==="function"){
+        window.v131SyncInventoryPortrait();
+    }
 }
 
 /* =====================================================
@@ -31669,7 +31646,7 @@ function showSkillDetail(skillId){
             ${
                 skill.learnCost
                 ?
-                "｜學習需要"+skill.learnCost+"技能點"
+                "｜首次學習需要"+getSkillLearnCostForUi(getSkillCharacterObject(currentSkillCharacter),skill)+"點"
                 :
                 ""
             }

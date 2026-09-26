@@ -11,9 +11,8 @@
     font-size:9px;
     line-height:12px;
     text-align:center;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
+    white-space:normal;
+    overflow-wrap:anywhere;
 }
 
 .skill-quick-button.sp-insufficient .v135-sq-scope{
@@ -30,10 +29,7 @@
     line-height:11px;
     text-align:center;
     white-space:normal;
-    overflow:hidden;
     overflow-wrap:anywhere;
-    -webkit-box-orient:vertical;
-    -webkit-line-clamp:2;
 }
 .skill-quick-button.sp-insufficient .sq-description{
     color:#766f67;

@@ -263,23 +263,6 @@
     box-shadow:0 0 10px rgba(255,224,138,.45) !important;
 }
 
-#game-stage #allSkillsList .v138-skill-learn-cost{
-    display:flex !important;
-    width:max-content !important;
-    max-width:100% !important;
-    margin-top:4px !important;
-    margin-right:6px !important;
-    padding:3px 7px !important;
-    border:1px solid #d88a32 !important;
-    border-radius:999px !important;
-    background:#301b0a !important;
-    color:#ffc46b !important;
-    font-size:13px !important;
-    line-height:1.35 !important;
-    font-weight:800 !important;
-    white-space:nowrap !important;
-}
-
 .v131-skill-kind{
     display:inline-flex;
     align-items:center;

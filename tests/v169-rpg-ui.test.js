@@ -226,15 +226,11 @@ test("successful potion purchases enqueue an RPG receipt only after inventory ch
     assert.match(uiSource,/window\.rpgAlert\([\s\S]*title:"購買成功"/);
 });
 
-test("dungeon backpack reuses the real inventory and fills the dungeon canvas",()=>{
-    assert.match(uiSource,/dungeonPage\.classList\.contains\("active"\)/);
-    assert.match(uiSource,/mapPage\.classList\.add\("active"\)/);
-    assert.match(uiSource,/previousOpenMapInventoryOverlay\.apply/);
-    assert.match(uiSource,/classList\.add\("v169-dungeon-inventory-overlay"\)/);
-    assert.match(css,/V173\.62 — character and dungeon backpack use the maximum mobile canvas/);
-    assert.match(css,/\.v169-dungeon-inventory-overlay\{[\s\S]*inset:0 !important/);
-    assert.match(css,/\.v169-dungeon-inventory-overlay\{[\s\S]*width:100% !important/);
-    assert.match(css,/\.v169-dungeon-inventory-overlay\{[\s\S]*z-index:900 !important/);
+test("dungeon backpack reuses the shared context-aware inventory lifecycle",()=>{
+    assert.match(mainSource,/function openInventoryContext\(context\)/);
+    assert.match(mainSource,/openMapInventoryOverlay\(normalized\)/);
+    assert.doesNotMatch(uiSource,/mapPage\.classList\.add\("active"\)|previousOpenMapInventoryOverlay|v169-dungeon-inventory-overlay/);
+    assert.doesNotMatch(css,/v169-dungeon-inventory-overlay|maximizeDungeonBackpack/);
 });
 
 test("character panel fills the mobile canvas while preserving internal scroll",()=>{
