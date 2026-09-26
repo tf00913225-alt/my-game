@@ -21,6 +21,7 @@ test("historical main save cannot pass screening without sidecar and reward prov
     assert.equal(review.readyForAcceptance,false);
     assert.equal(review.characterCount,1);
     assert.deepEqual(review.blockers,["HISTORICAL_REWARDS_UNVERIFIED","SIDECAR_BACKUP_MISSING"]);
+    assert.equal(review.blockers.includes("CHARACTER_SLOT_GAP"),false);
     const inconsistent=screenLegacyCandidateSnapshot({...save,
         player2:{...save.player,element:"other"},inventoryItems:[{id:"potion",count:0}],
         achievementState:null});
@@ -29,4 +30,11 @@ test("historical main save cannot pass screening without sidecar and reward prov
     assert.ok(inconsistent.blockers.includes("INVENTORY_STRUCTURE_INVALID"));
     assert.ok(inconsistent.blockers.includes("CLAIM_PROGRESS_MISSING"));
     assert.equal(inconsistent.readyForAcceptance,false);
+    const gap=screenLegacyCandidateSnapshot({...save,
+        player3:{id:"third",element:"earth",level:50,exp:0,skillPoints:0}});
+    assert.ok(gap.blockers.includes("CHARACTER_SLOT_GAP"));
+    const contiguous=screenLegacyCandidateSnapshot({...save,
+        player2:{id:"second",element:"water",level:10,exp:0,skillPoints:0},
+        player3:{id:"third",element:"earth",level:50,exp:0,skillPoints:0}});
+    assert.equal(contiguous.blockers.includes("CHARACTER_SLOT_GAP"),false);
 });

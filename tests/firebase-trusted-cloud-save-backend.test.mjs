@@ -89,6 +89,19 @@ test("migration policy rejects unsupported fields and impossible character level
     assert.throws(()=>policy.validateLegacySaveCandidate(badLevel),/integer from 1 to 100/);
 });
 
+test("migration candidate requires a string character identity without rejecting an unfinished party",()=>{
+    assert.equal(policy.validateLegacySaveCandidate(validSave()).snapshot.player2,null);
+    const numberId=validSave();
+    numberId.player.id=123;
+    assert.throws(()=>policy.validateLegacySaveCandidate(numberId),/save\.player\.id is invalid/);
+    const blankId=validSave();
+    blankId.player.id="   ";
+    assert.throws(()=>policy.validateLegacySaveCandidate(blankId),/save\.player\.id is invalid/);
+    const gap=validSave();
+    gap.player3={id:"third",level:50};
+    assert.throws(()=>policy.validateLegacySaveCandidate(gap),/save\.player3 cannot exist/);
+});
+
 test("browser Firestore remains read-only and server-private paths stay closed",()=>{
     assert.match(rules,/match \/users\/\{uid\}/);
     assert.match(rules,/allow create, update, delete: if false/);
