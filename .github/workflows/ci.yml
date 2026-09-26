@@ -121,6 +121,7 @@ jobs:
           node tests/battle-runtime-hot-path-convergence-20260923.test.js
           node tests/battle-ui-status-vfx-followup-20260922.test.js
           node tests/hit-evasion-final-percent-status-formula-20260923.test.js
+          node tests/battle-presentation-owner-convergence-20260926.test.js
 
       - name: Run skill and relic owner convergence regressions
         run: |
