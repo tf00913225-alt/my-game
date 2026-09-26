@@ -211,6 +211,146 @@ async function prepareAccountFirstRuntime(client,features){
     return state;
 }
 
+
+async function cleanupPresentationQaBattle(client){
+    await client.eval("(()=>{"+
+        "try{if(window.v174RelicPresentationState&&window.v174RelicPresentationState().active){return false;}}catch(_){}"+
+        "try{window.FourSymbolsBattleFloatingFeedback?.clear?.();}catch(_){}"+
+        "try{window.FourSymbolsBattlePresentation?.cleanupEscape?.();}catch(_){}"+
+        "try{window.v142SkillAnimationDirector?.dispose?.();}catch(_){}"+
+        "try{if(window.v132ActiveDungeonRun&&typeof window.v132AbortDungeonBattle==='function'){window.v132AbortDungeonBattle('qa-presentation');}}catch(_){}"+
+        "try{if(typeof battleActive!=='undefined'&&battleActive){battleActive=false;autoBattle=false;actionReady=false;pendingAction=null;clearInterval(timerId);timerId=null;if(typeof battleAdvanceTimeoutId!=='undefined'&&battleAdvanceTimeoutId){clearTimeout(battleAdvanceTimeoutId);battleAdvanceTimeoutId=null;}if(typeof battleAdvanceScheduled!=='undefined'){battleAdvanceScheduled=false;}battleToken++;}}catch(_){}"+
+        "try{if(window.__battlePresentationQaNormalBackup){monsters=window.__battlePresentationQaNormalBackup.monsters;currentZone=window.__battlePresentationQaNormalBackup.currentZone;mapCooldown=window.__battlePresentationQaNormalBackup.mapCooldown;delete window.__battlePresentationQaNormalBackup;}}catch(_){}"+
+        "try{window.FourSymbolsBattleStatistics?.hideResultDetails?.(false);}catch(_){}"+
+        "try{document.querySelectorAll('.team-relic-battle-presentation,.battle-floating-feedback').forEach(node=>node.remove());document.body.classList.remove('team-relic-cinematic-active');}catch(_){}"+
+        "try{if(typeof showPage==='function'){showPage('home');}}catch(_){}"+
+        "return true;})()");
+    await sleep(220);
+}
+
+async function launchPresentationQaMode(client,mode){
+    await cleanupPresentationQaBattle(client);
+    await client.eval("(()=>{"+
+        "[typeof player!=='undefined'?player:null,typeof player2!=='undefined'?player2:null,typeof player3!=='undefined'?player3:null].forEach(p=>{if(!p)return;p.level=Math.max(100,Number(p.level)||1);p.agility=Math.max(9999,Number(p.agility)||0);p.hp=Math.max(99999,Number(p.hp)||0);p.sp=Math.max(99999,Number(p.sp)||0);});"+
+        "window.v133GetHighestCreatedCharacterLevel=()=>100;"+
+        "return true;})()");
+    let started=false;
+    if(mode==="normal"){
+        started=await client.eval("(()=>{if(typeof startBattle!=='function'||typeof v132BuildDungeonMonster!=='function')return false;window.__battlePresentationQaNormalBackup={monsters:monsters,currentZone:currentZone,mapCooldown:mapCooldown};monsters=[v132BuildDungeonMonster('QA巡怪一',40,'fire','elite'),v132BuildDungeonMonster('QA巡怪二',40,'water','regular'),v132BuildDungeonMonster('QA巡怪三',40,'wind','regular')];currentZone='forest';mapCooldown=false;startBattle(0);return !!battleActive;})()");
+    }else if(mode==="daily"){
+        started=await client.eval("(()=>{if(typeof v132LaunchDungeonBattle!=='function'||typeof v132BuildDungeonMonster!=='function')return false;const elements=['fire','water','earth','wind'];const roster=Array.from({length:10},(_,i)=>v132BuildDungeonMonster('QA副本'+(i+1),40,elements[i%4],i<2?'elite':'regular'));return v132LaunchDungeonBattle(roster,()=>{}, {mode:'daily',dailyDungeonType:'exp'})===true;})()");
+    }else if(mode==="abyss"){
+        started=await client.eval("(()=>{if(typeof v174AbyssReset!=='function'||typeof v174AbyssStartEncounter!=='function')return false;v174AbyssReset(40);return v174AbyssStartEncounter()===true;})()");
+    }else if(mode==="tower"){
+        started=await client.eval("(()=>{if(typeof vGameplayContinueTower!=='function')return false;return vGameplayContinueTower()===true;})()");
+    }else if(mode==="personal"){
+        started=await client.eval("(()=>{if(typeof vGameplayStartBoss!=='function')return false;return vGameplayStartBoss('personal','personal-70')===true;})()");
+    }else if(mode==="world"){
+        started=await client.eval("(()=>{if(typeof vGameplayStartBoss!=='function')return false;return vGameplayStartBoss('world','world-40')===true;})()");
+    }
+    assert.equal(started,true,"Could not start formal battle presentation QA mode: "+mode);
+    await client.eval("(()=>{try{autoBattle=false;if(typeof updateAutoButton==='function')updateAutoButton();}catch(_){}return true;})()");
+    await waitFor(
+        client,
+        "(()=>{const p=document.getElementById('battlePage');return typeof battleActive!=='undefined'&&battleActive&&p?.classList.contains('active')&&document.querySelector('#battlePlayerRow .battle-player')&&document.querySelector('#battleMonsterArea .battle-monster');})()",
+        mode+" formal battle DOM",
+        15000
+    );
+    await waitFor(
+        client,
+        "(()=>{const p=document.getElementById('battlePage');return !p?.classList.contains('v141-preparing-entry')&&!p?.classList.contains('v141-entry-moving');})()",
+        mode+" battle entrance completion",
+        7000
+    );
+    const context=await client.eval("(()=>{const run=window.v132ActiveDungeonRun;return {mode:run?.mode||'normal',gameplayMode:run?.gameplayMode||null,dailyDungeonType:run?.dailyDungeonType||null,enemyCount:(typeof currentBattleMonsters!=='undefined'?currentBattleMonsters:[]).length,playerCount:document.querySelectorAll('#battlePlayerRow .battle-player').length};})()");
+    if(mode==="normal"){ assert.equal(context.mode,"normal"); }
+    if(mode==="daily"){ assert.equal(context.mode,"daily"); }
+    if(mode==="abyss"){ assert.equal(context.mode,"abyss"); }
+    if(mode==="tower"){ assert.equal(context.mode,"tower"); }
+    if(mode==="personal"){ assert.equal(context.mode,"boss");assert.equal(context.gameplayMode,"personal"); }
+    if(mode==="world"){ assert.equal(context.mode,"boss");assert.equal(context.gameplayMode,"world"); }
+    assert.ok(context.enemyCount>=1,mode+" must render at least one enemy");
+    assert.ok(context.playerCount>=1,mode+" must render at least one player");
+    return context;
+}
+
+async function captureRelicPresentationQa(client,relicId,targetKind){
+    const id=JSON.stringify(relicId);
+    const started=await client.eval("Boolean(window.v174RelicDevPreviewPresentation&&window.v174RelicDevPreviewPresentation("+id+"))");
+    assert.equal(started,true,"Relic DEV presentation did not start: "+relicId);
+    await waitFor(
+        client,
+        "(()=>{const n=document.getElementById('teamRelicBattlePresentation');const img=n?.querySelector('.team-relic-battle-cutin-icon img');return n?.classList.contains('identity-visible')&&img?.complete&&img.naturalWidth>0;})()",
+        relicId+" identity/icon",
+        8000
+    );
+    const identity=await client.eval("(()=>{const n=document.getElementById('teamRelicBattlePresentation');const r=n.getBoundingClientRect();const overlay=window.FourSymbolsBattlefieldRenderGeometry?.getBattlefieldOverlayGeometry?.();const img=n.querySelector('.team-relic-battle-cutin-icon img');return {parentIsBody:n.parentElement===document.body,name:n.querySelector('.team-relic-battle-cutin-copy strong')?.textContent||'',icon:img?.getAttribute('src')||'',rect:{left:r.left,top:r.top,width:r.width,height:r.height},overlay:overlay&&overlay.rect?{left:overlay.rect.left,top:overlay.rect.top,width:overlay.rect.width,height:overlay.rect.height}:null};})()");
+    assert.equal(identity.parentIsBody,true,relicId+" presentation must be document-level");
+    assert.ok(identity.name,relicId+" identity name missing");
+    assert.ok(identity.icon,relicId+" identity icon missing");
+    assert.ok(identity.overlay,relicId+" canonical overlay geometry missing");
+    assert.ok(Math.abs(identity.rect.left-identity.overlay.left)<=1&&Math.abs(identity.rect.top-identity.overlay.top)<=1&&Math.abs(identity.rect.width-identity.overlay.width)<=1&&Math.abs(identity.rect.height-identity.overlay.height)<=1,relicId+" mask host must match canonical battlefield overlay bounds");
+
+    await waitFor(
+        client,
+        "(()=>{const n=document.getElementById('teamRelicBattlePresentation');return n?.classList.contains('targets-visible')&&n?.classList.contains('vfx-running')&&document.querySelector('#v143-skill-stage .v143-vfx-sprite[data-skill="+id+"]');})()",
+        relicId+" target focus and VFX",
+        9000
+    );
+    const focus=await client.eval("(()=>{const n=document.getElementById('teamRelicBattlePresentation');const owner=window.FourSymbolsBattlefieldRenderGeometry;const state=window.v143SkillAnimationState?.current;const overlay=owner?.getBattlefieldOverlayGeometry?.()?.rect;const side=state?.targetSide||null;const indexes=Array.isArray(state?.targetIndexes)?state.targetIndexes.slice():[];const holes=[...n.querySelectorAll('.team-relic-mask-holes rect')].map(h=>({left:Number(h.getAttribute('x')),top:Number(h.getAttribute('y')),width:Number(h.getAttribute('width')),height:Number(h.getAttribute('height'))}));const expected=indexes.map(index=>{const g=owner?.getUnitGeometry?.(side,index);const r=g?.highlightRect||g?.unitRect;if(!r||!overlay)return null;return {left:r.left-overlay.left,top:r.top-overlay.top,width:r.width,height:r.height};}).filter(Boolean);const approx=(a,b)=>Math.abs(a-b)<=1.5;const matches=expected.length===holes.length&&expected.every((e,i)=>holes[i]&&approx(e.left,holes[i].left)&&approx(e.top,holes[i].top)&&approx(e.width,holes[i].width)&&approx(e.height,holes[i].height));const stage=document.getElementById('v143-skill-stage');const sprite=stage?.querySelector('.v143-vfx-sprite[data-skill="+id+"]');return {side,indexes,holes,outlineCount:n.querySelectorAll('.team-relic-battle-target-outline').length,geometryMatches:matches,stageOwner:stage?.dataset.geometryOwner||null,spriteOwner:sprite?.dataset.geometryOwner||null,spriteTargetSide:sprite?.dataset.targetSide||null,spriteTargetIndexes:sprite?.dataset.targetIndexes||'',presentationLock:window.FourSymbolsBattleFlow?.isPresentationActive?.()||false};})()");
+    assert.ok(focus.indexes.length>=1,relicId+" resolved no battle targets");
+    if(targetKind==="singleAlly"){ assert.equal(focus.side,"player");assert.equal(focus.indexes.length,1); }
+    if(targetKind==="allyAll"){ assert.equal(focus.side,"player"); }
+    if(targetKind==="enemyAll"||targetKind==="damageStatus"){ assert.equal(focus.side,"monster"); }
+    assert.equal(focus.holes.length,focus.indexes.length,relicId+" mask holes must equal resolved targets");
+    assert.equal(focus.outlineCount,focus.indexes.length,relicId+" focus outlines must equal resolved targets");
+    assert.equal(focus.geometryMatches,true,relicId+" target apertures must match canonical Unit geometry");
+    assert.equal(focus.stageOwner,"fixed-slot",relicId+" VFX stage must use Fixed Slot geometry");
+    assert.equal(focus.spriteOwner,"fixed-slot",relicId+" VFX sprite must use Fixed Slot geometry");
+    assert.equal(focus.spriteTargetSide,focus.side,relicId+" VFX target side drifted from focus side");
+    assert.equal(focus.presentationLock,true,relicId+" presentation lock must stay held during VFX");
+
+    await waitFor(
+        client,
+        "(()=>{const p=window.v174RelicPresentationState?.();return !p?.active&&!document.getElementById('teamRelicBattlePresentation')&&!document.getElementById('v143-skill-stage')&&!document.body.classList.contains('team-relic-cinematic-active')&&!window.FourSymbolsBattleFlow?.isPresentationActive?.();})()",
+        relicId+" complete presentation cleanup",
+        12000
+    );
+    const cleanup=await client.eval("(()=>({mask:!!document.getElementById('teamRelicBattlePresentation'),vfx:!!document.getElementById('v143-skill-stage'),focus:document.querySelectorAll('.team-relic-battle-target-outline').length,feedback:document.querySelectorAll('.battle-floating-feedback').length,bodyClass:document.body.classList.contains('team-relic-cinematic-active'),lock:window.FourSymbolsBattleFlow?.isPresentationActive?.()||false}))()");
+    assert.deepEqual(cleanup,{mask:false,vfx:false,focus:0,feedback:0,bodyClass:false,lock:false},relicId+" presentation must leave no transient residue");
+    return {relicId,targetKind,identity,focus,cleanup};
+}
+
+async function runRelicPresentationModeMatrix(client){
+    const modes=["normal","daily","abyss","tower","personal","world"];
+    const relics=[
+        ["relic_cold_spring_jade","singleAlly"],
+        ["relic_qiankun_flask","allyAll"],
+        ["relic_sun_orb","enemyAll"],
+        ["relic_nine_dragon_fire","damageStatus"]
+    ];
+    const matrix=[];
+    const identityBaseline=new Map();
+    for(const mode of modes){
+        const context=await launchPresentationQaMode(client,mode);
+        const presentations=[];
+        for(const [relicId,targetKind] of relics){
+            const snapshot=await captureRelicPresentationQa(client,relicId,targetKind);
+            presentations.push(snapshot);
+            const baseline=identityBaseline.get(relicId);
+            if(!baseline){ identityBaseline.set(relicId,{name:snapshot.identity.name,icon:snapshot.identity.icon}); }
+            else{
+                assert.equal(snapshot.identity.name,baseline.name,relicId+" name must be identical across battle modes");
+                assert.equal(snapshot.identity.icon,baseline.icon,relicId+" icon must be identical across battle modes");
+            }
+        }
+        matrix.push({mode,context,presentations});
+        await cleanupPresentationQaBattle(client);
+    }
+    return {passed:true,modes:matrix.map(entry=>entry.mode),relics:relics.map(entry=>entry[0]),matrix};
+}
+
+
 const evidence={status:"RUNNING",expectedSha,devUrl:baseUrl,checks:{}};
 const chrome=chromeBinary();
 const debugPort=9223;
@@ -1174,6 +1314,8 @@ try{
 
     const bossScreenshot=await client.send("Page.captureScreenshot",{format:"png",fromSurface:true});
     if(bossScreenshot.data){ fs.writeFileSync(path.join(artifactDir,"boss-target-entity-live-412x915.png"),Buffer.from(bossScreenshot.data,"base64")); }
+
+    evidence.checks.relicPresentationModeMatrix=await runRelicPresentationModeMatrix(client);
 
     evidence.status="PASS";
     evidence.finishedAt=new Date().toISOString();
