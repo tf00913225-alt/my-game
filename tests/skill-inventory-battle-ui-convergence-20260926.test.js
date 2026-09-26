@@ -26,6 +26,10 @@ assert.match(main,/getSkillLearnEligibilityForUi\(skillOwner,skill,skillLevels\)
 assert.match(main,/skill-category-badge \$\{skill\.category\}/);
 assert.doesNotMatch(main,/skill-action-card-top|actionIcon/);
 assert.doesNotMatch(mainCss,/skill-action-card-top/);
+const actionCardBlock=mainCss.slice(mainCss.indexOf(".skill-action-card{"),mainCss.indexOf("}",mainCss.indexOf(".skill-action-card{"))+1);
+assert.match(actionCardBlock,/align-self:center/);
+assert.match(actionCardBlock,/height:auto/);
+assert.doesNotMatch(actionCardBlock,/height:\s*100%/);
 assert.doesNotMatch(main,/isSkillPrereqMet\(/);
 assert.doesNotMatch(context,/openMapInventoryOverlay\(normalized\)/);
 assert.doesNotMatch(context,/mapWasActive|mapPage\.classList\.add\("active"\)/);
