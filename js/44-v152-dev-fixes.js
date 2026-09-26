@@ -77,14 +77,7 @@
         node.textContent=String(Math.max(0,Math.floor(numeric(owner&&owner.skillPoints))));
     }
 
-    if(typeof renderSkillLoadout==="function"){
-        const previousRenderSkillLoadout=renderSkillLoadout;
-        renderSkillLoadout=function(){
-            const result=previousRenderSkillLoadout.apply(this,arguments);
-            syncSkillPointDisplay();
-            return result;
-        };
-    }
+    window.v152SyncSkillPointDisplay=syncSkillPointDisplay;
 
     function partySkillLevel(characterIndex,skillId){
         if(typeof getSkillLevel!=="function"){ return 1; }

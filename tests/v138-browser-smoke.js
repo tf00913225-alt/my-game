@@ -95,7 +95,9 @@ async function seedParty(page){
         const skillUi=await page.evaluate(()=>{
             const summary=document.querySelector(".v138-skill-point-summary");
             const point=document.getElementById("skillPoints");
-            const costs=Array.from(document.querySelectorAll(".v138-skill-learn-cost"));
+            const costs=Array.from(document.querySelectorAll(".skill-action-card-label"))
+                .map(element=>element.textContent.trim())
+                .filter(text=>/學習|需要/.test(text));
             return {
                 label:summary ? summary.textContent.replace(/\s+/g," ").trim() : "",
                 pointText:point ? point.textContent : "",
@@ -107,7 +109,7 @@ async function seedParty(page){
         assert.equal(skillUi.pointText,"45");
         assert.ok(skillUi.pointFont>=22);
         assert.ok(skillUi.costs.length>=1);
-        assert.ok(skillUi.costs.every(text=>/^學習需要 \d+ 技能點$/.test(text)));
+        assert.ok(skillUi.costs.every(text=>!text.includes("學習需要")));
 
         const expReward=await page.evaluate(()=>window.v138GetExpDungeonRewardExp());
         assert.equal(expReward,18150);

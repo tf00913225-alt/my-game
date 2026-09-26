@@ -1444,14 +1444,7 @@
         img.alt=(character.id||"角色")+"立繪";
     }
 
-    if(typeof renderInventory==="function"){
-        const originalRenderInventory=renderInventory;
-        renderInventory=function(){
-            const result=originalRenderInventory.apply(this,arguments);
-            syncInventoryPortrait();
-            return result;
-        };
-    }
+    window.v131SyncInventoryPortrait=syncInventoryPortrait;
 
     function syncCharacterCreationAvailability(){
         const body=document.getElementById("homeFeatureModalBody");
@@ -1654,28 +1647,7 @@
                 loadout && loadout.skillLevels
                 ? Math.max(0,Number(loadout.skillLevels[skillId])||0)
                 : 0;
-            const textHost=row.querySelector(".skill-row-text");
-            if(
-                learnedLevel===0 &&
-                textHost &&
-                !textHost.querySelector(".v138-skill-learn-cost")
-            ){
-                const cost=document.createElement("span");
-                cost.className="v138-skill-learn-cost";
-                cost.textContent="學習需要 "+Math.max(0,Number(skill.learnCost)||0)+" 技能點";
-                const detailLink=textHost.querySelector(".skill-row-detail-link");
-                textHost.insertBefore(cost,detailLink||null);
-            }
         });
-    }
-
-    if(typeof renderSkillLoadout==="function"){
-        const originalRenderSkillLoadout=renderSkillLoadout;
-        renderSkillLoadout=function(){
-            const result=originalRenderSkillLoadout.apply(this,arguments);
-            decorateSkillRows();
-            return result;
-        };
     }
 
     const expPreviewCounts={0:0,1:0,2:0};

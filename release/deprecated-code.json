@@ -111,6 +111,21 @@
         "towerSummonPlan",
         "v152ResolveExtremeEmperorAction"
       ]
+    },
+    {
+      "id": "DEP-008-inventory-skill-battle-owner-convergence",
+      "description": "背包、技能頁與戰鬥技能選擇器不得回到已退休的多 Owner、重複成本、Dungeon 專用幾何或裁切文字模式。",
+      "enabled": true,
+      "forbidden": [
+        "v169-dungeon-inventory-overlay",
+        "maximizeDungeonBackpack",
+        "v138-skill-learn-cost",
+        "skill-section-learned",
+        "skill-section-unlearned",
+        "buildSkillSectionDivider",
+        "renderSkillLoadout=function",
+        "max-height:12px !important"
+      ]
     }
   ]
 }

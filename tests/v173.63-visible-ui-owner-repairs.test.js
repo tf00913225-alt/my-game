@@ -39,7 +39,7 @@ assert.doesNotMatch(
 );
 
 assert.doesNotMatch(functionalRepairs,/quickPowerSavingToggle|v17361-power-save-toggle|v17361TogglePowerSaving|v17361_patrol_power_saving|v17361RequestWakeLock/);
-assert.match(functionalRepairs,/v169-dungeon-inventory-overlay/);
+assert.doesNotMatch(functionalRepairs,/v169-dungeon-inventory-overlay|maximizeDungeonBackpack/);
 assert.match(functionalRepairs,/v148ShowDailyDungeonPreview/);
 /* V173.63 must no longer override equipment-dungeon rewards with materials. */
 assert.doesNotMatch(functionalRepairs,/v17346ShowEquipmentDungeonPreview|v17363ClaimEquipmentDungeon|EQUIPMENT_DROP_TIERS|grantEquipmentMaterials|oreQty=10\*multi|blueprintQty=20\*multi/);

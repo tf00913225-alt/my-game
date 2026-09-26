@@ -2892,17 +2892,16 @@
     };
 
     window.v148OpenContextInventory=function(){
-        if(typeof document==="undefined"||typeof openMapInventoryOverlay!=="function"){ return false; }
+        if(typeof document==="undefined"||typeof openInventoryContext!=="function"){ return false; }
         if(typeof battleActive!=="undefined"&&battleActive){ return false; }
-
-        const mapPage=document.getElementById("mapPage");
-        const mapWasActive=!!(mapPage&&mapPage.classList&&mapPage.classList.contains("active"));
-        if(mapPage&&!mapWasActive){ mapPage.classList.add("active"); }
-        try{
-            return openMapInventoryOverlay();
-        }finally{
-            if(mapPage&&!mapWasActive){ mapPage.classList.remove("active"); }
-        }
+        const sourcePage=(typeof activeGameplayPageId==="function"&&activeGameplayPageId())||
+            (document.getElementById("dungeonPage")?.classList.contains("active")?"dungeon":
+            document.getElementById("trainingPage")?.classList.contains("active")?"training":"map");
+        return openInventoryContext({
+            sourcePage,
+            returnAction:sourcePage==="map"?"leaveMap()":"v148ReturnFromGameplay()",
+            closeBehavior:"restore-source"
+        });
     };
 
     window.v148OpenContextRelic=function(){
@@ -3887,14 +3886,7 @@
         node.textContent=String(Math.max(0,Math.floor(numeric(owner&&owner.skillPoints))));
     }
 
-    if(typeof renderSkillLoadout==="function"){
-        const previousRenderSkillLoadout=renderSkillLoadout;
-        renderSkillLoadout=function(){
-            const result=previousRenderSkillLoadout.apply(this,arguments);
-            syncSkillPointDisplay();
-            return result;
-        };
-    }
+    window.v152SyncSkillPointDisplay=syncSkillPointDisplay;
 
     function partySkillLevel(characterIndex,skillId){
         if(typeof getSkillLevel!=="function"){ return 1; }
@@ -6622,59 +6614,6 @@
 
     /* equipment-progression follows this source inside gameplay-core's fixed execution order. */
 
-    /* ----- Dungeon backpack: reuse the one inventory DOM above the map. ----- */
-    if(typeof openMapInventoryOverlay==="function"){
-        const previousOpenMapInventoryOverlay=openMapInventoryOverlay;
-        openMapInventoryOverlay=function(){
-            const dungeonPage=document.getElementById("dungeonPage");
-            const mapPage=document.getElementById("mapPage");
-            const inventoryPage=document.getElementById("inventoryPage");
-            const fromDungeon=!!(
-                dungeonPage&&
-                dungeonPage.classList.contains("active")
-            );
-
-            if(!fromDungeon){
-                if(inventoryPage){
-                    inventoryPage.classList.remove("v169-dungeon-inventory-overlay");
-                }
-                return previousOpenMapInventoryOverlay.apply(this,arguments);
-            }
-
-            if(typeof battleActive!=="undefined"&&battleActive){ return; }
-            const mapWasActive=!!(
-                mapPage&&
-                mapPage.classList.contains("active")
-            );
-            if(mapPage&&!mapWasActive){ mapPage.classList.add("active"); }
-
-            let result;
-            try{
-                result=previousOpenMapInventoryOverlay.apply(this,arguments);
-            }finally{
-                if(mapPage&&!mapWasActive){ mapPage.classList.remove("active"); }
-            }
-
-            if(
-                inventoryPage&&
-                inventoryPage.classList.contains("map-inventory-overlay-open")
-            ){
-                inventoryPage.classList.add("v169-dungeon-inventory-overlay");
-            }
-            return result;
-        };
-    }
-
-    if(typeof closeMapInventoryOverlay==="function"){
-        const previousCloseMapInventoryOverlay=closeMapInventoryOverlay;
-        closeMapInventoryOverlay=function(){
-            const inventoryPage=document.getElementById("inventoryPage");
-            if(inventoryPage){
-                inventoryPage.classList.remove("v169-dungeon-inventory-overlay");
-            }
-            return previousCloseMapInventoryOverlay.apply(this,arguments);
-        };
-    }
 })();
 
 
@@ -8308,16 +8247,6 @@ function maximizeSynthesisPanel(){
     setImp(synthesisBody,"overscroll-behavior-y","contain");
     setImp(synthesisBody,"touch-action","pan-y");
 }
-function maximizeDungeonBackpack(){
-    const app=document.getElementById("app");
-    const page=document.getElementById("inventoryPage");
-    if(!app||!page||!app.classList.contains("v141-dungeon-active")||!page.classList.contains("map-inventory-overlay-open")){return;}
-    page.classList.add("v169-dungeon-inventory-overlay");
-    [["inset","0"],["left","0"],["right","0"],["top","0"],["bottom","0"],["width","100%"],["max-width","none"],["height","100%"],["max-height","none"],["transform","none"],["padding","8px"],["box-sizing","border-box"]].forEach(([k,v])=>setImp(page,k,v));
-    const shell=page.querySelector(".inventory-classic-shell");
-    setImp(shell,"width","100%");setImp(shell,"max-width","none");setImp(shell,"min-height","100%");setImp(shell,"margin","0");
-}
-
 /* ---------- 3 / 7. Canonical item icons and explicit rarity frames. ---------- */
 function canonicalDefinition(id){
     const content=defs();
@@ -8597,7 +8526,7 @@ function syncReturnIcons(){
 }
 
 function runRepairs(){
-    repairQueued=false;ensureFunctionalStyles();syncCanonicalItemArt();maximizeCharacterPanel();maximizeSynthesisPanel();maximizeDungeonBackpack();repairSynthesisIcons();ensureMaterialTab();syncReturnIcons();
+    repairQueued=false;ensureFunctionalStyles();syncCanonicalItemArt();maximizeCharacterPanel();maximizeSynthesisPanel();repairSynthesisIcons();ensureMaterialTab();syncReturnIcons();
 }
 function scheduleRepairs(){
     if(repairQueued){return;}repairQueued=true;
@@ -9680,7 +9609,10 @@ ensureFunctionalStyles();runRepairs();
         return {ok:true,cross:true};
     }
     function initialLearnCost(context,skill){
-        return Math.max(0,Math.floor(numeric(skill&&skill.learnCost)))*(isCrossElementSkill(context&&context.character,skill)?2:1);
+        if(typeof window.v173GetInitialLearnCost==="function"){
+            return Math.max(0,Math.floor(numeric(window.v173GetInitialLearnCost(context&&context.character,skill))));
+        }
+        return Math.max(0,Math.floor(numeric(skill&&skill.learnCost)));
     }
     function normalizeCrossElementEquip(loadout,character){
         if(!loadout||!character||!Array.isArray(loadout.equippedSkills)){ return false; }
@@ -9872,16 +9804,8 @@ ensureFunctionalStyles();runRepairs();
                 }
             }
         });
-        const sorted=Array.from(list.querySelectorAll(".skill-row")).sort((left,right)=>{
-            const a=skillById(rowSkillId(left))||{};
-            const b=skillById(rowSkillId(right))||{};
-            const ga=numeric(GROUP_ORDER[a.progressionGroup],9),gb=numeric(GROUP_ORDER[b.progressionGroup],9);
-            if(ga!==gb){ return ga-gb; }
-            const la=numeric(a.learnLevel,999),lb=numeric(b.learnLevel,999);
-            if(la!==lb){ return la-lb; }
-            return String(a.name||a.id||"").localeCompare(String(b.name||b.id||""),"zh-Hant");
-        });
-        sorted.forEach(row=>list.appendChild(row));
+        // Rendering and sort ownership belongs to renderSkillLoadout in 00-main.js.
+        // This helper is retained only for compatibility with old diagnostics.
     }
 
     if(typeof getSkillEffectPreviewText==="function"){
@@ -9897,17 +9821,6 @@ ensureFunctionalStyles();runRepairs();
     if(typeof window.getSkillPreviewSummary==="function"){
         window.getSkillPreviewSummary=function(skill){
             return descriptionFor(skill);
-        };
-    }
-
-    if(typeof renderSkillLoadout==="function"){
-        const previousRenderSkillLoadout=renderSkillLoadout;
-        renderSkillLoadout=function(){
-            const context=getSkillContext();
-            if(context.loadout&&context.character){ normalizeCrossElementEquip(context.loadout,context.character); }
-            const result=previousRenderSkillLoadout.apply(this,arguments);
-            decorateSkillProgressionUi();
-            return result;
         };
     }
 
