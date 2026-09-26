@@ -2,6 +2,11 @@
 
 本文件是長期工程進度來源。**每個 Phase 結束都必須更新本文件**；聊天、Commit、PR、CI 或部署成功不能取代驗收紀錄。
 
+## 2026-09-26 — Legacy character identity screening (candidate; pending CI)
+
+- Migration policy requires a literal, nonblank string character ID; numeric IDs no longer pass by implicit string coercion. The read-only candidate screening reports `CHARACTER_SLOT_GAP` when slot 3 exists without slot 2. A one-character or two-character party remains valid because the game creates those slots progressively.
+- This strengthens structural screening of untrusted historical candidates only. It does not accept a baseline, create canonical state, enable `authoritativeStateReady`, provide server backup or allow second-device character restore. Targeted local tests pass; PR emulator, merged dev and Firebase deployment remain to be checked separately.
+
 ## 2026-09-26 — architecture hardening work branch (not yet verified)
 
 - Start base `dev@727279ee0653803c07179e0ff43a1a1b2cb992f8`; discovered Architecture Contract Drift: `DATA_SECURITY_CONTRACTS.md` absent at base. Current branch adds the contract and a 34-entry persisted-state inventory with CI guard; PR, emulator, merge and deployment status must be recorded after execution.

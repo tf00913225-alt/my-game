@@ -12,6 +12,8 @@ function screenLegacyCandidateSnapshot(save,sidecars=null){
     const blockers=new Set();
     const characters=CHARACTER_KEYS.map(key=>save[key]).filter(value=>value!==null&&value!==undefined);
     const ids=new Set();
+    // One or two characters are legitimate; slot 3 cannot precede slot 2.
+    if(save.player3!=null&&save.player2==null){ blockers.add("CHARACTER_SLOT_GAP"); }
     for(const character of characters){
         if(!character||typeof character!=="object"||Array.isArray(character)){
             blockers.add("CHARACTER_STRUCTURE_INVALID");

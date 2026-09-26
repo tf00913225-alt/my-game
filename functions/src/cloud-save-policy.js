@@ -114,8 +114,7 @@ function validateCharacter(character,path,{required=false}={}){
         fail("invalid-argument",`${path} must be an object or null.`);
     }
 
-    const id=String(character.id||"").trim();
-    if(!id || id.length>64){
+    if(typeof character.id!=="string"||!character.id.trim()||character.id.trim().length>64){
         fail("invalid-argument",`${path}.id is invalid.`);
     }
 
@@ -152,6 +151,9 @@ function validateLegacySaveCandidate(candidate){
     validateCharacter(candidate.player,"save.player",{required:true});
     validateCharacter(candidate.player2,"save.player2");
     validateCharacter(candidate.player3,"save.player3");
+    if(candidate.player3!=null&&candidate.player2==null){
+        fail("invalid-argument","save.player3 cannot exist without save.player2.");
+    }
     validateNonNegativeNumber(candidate.gold,"save.gold",{integer:true,max:1_000_000_000_000});
     validateNonNegativeNumber(candidate.sharedExp,"save.sharedExp",{integer:true,max:10_000_000_000_000_000});
     validateNonNegativeNumber(candidate.lastSaveTimestamp,"save.lastSaveTimestamp",{integer:true,max:9_999_999_999_999});
