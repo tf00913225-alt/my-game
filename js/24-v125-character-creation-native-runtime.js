@@ -591,7 +591,10 @@
             meta.push("消耗 "+spCost+" SP");
         }
         if(skill.learnCost!==undefined){
-            meta.push("學習需要 "+skill.learnCost+" 技能點");
+            const baseLearnCost=typeof window.v173GetInitialLearnCost==="function"
+                ?window.v173GetInitialLearnCost(null,skill)
+                :skill.learnCost;
+            meta.push("學習需要 "+baseLearnCost+" 技能點");
         }
         if(Array.isArray(skill.requires) && skill.requires.length){
             meta.push(

@@ -410,15 +410,15 @@ function battleSourceBetween(sourceText,startToken,endToken){
     return sourceText.slice(start,end);
 }
 
-test("battle quickbar validates canonical structure and projects formal skill text",()=>{
+test("battle quickbar validates the compact canonical structure",()=>{
     const main=fs.readFileSync("js/00-main.js","utf8");
     const css=fs.readFileSync("css/36-v135-fixes.css","utf8");
     assert.match(main,/function isCanonicalSkillQuickBarButton\(button\)/);
     assert.match(main,/buttons\.every\(isCanonicalSkillQuickBarButton\)/);
-    assert.match(main,/class="sq-description"/);
+    assert.doesNotMatch(main,/class="sq-description"/);
     assert.match(main,/formalSpec\.targetLabel/);
-    assert.match(main,/formalSpec\.effectText/);
-    assert.match(css,/\.skill-quick-button \.sq-description\{/);
+    assert.doesNotMatch(main,/\.sq-description|descriptionNode|formalSpec\.effectText/);
+    assert.doesNotMatch(css,/\.skill-quick-button \.sq-description\{/);
 });
 
 test("one target owner handles both directions and Stealth only blocks hostile primary selection",()=>{

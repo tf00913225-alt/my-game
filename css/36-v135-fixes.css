@@ -18,19 +18,3 @@
 .skill-quick-button.sp-insufficient .v135-sq-scope{
     color:#6f7d8a;
 }
-
-
-.skill-quick-button .sq-description{
-    display:-webkit-box;
-    width:100%;
-    min-height:0;
-    color:#d8d0c2;
-    font-size:9px;
-    line-height:11px;
-    text-align:center;
-    white-space:normal;
-    overflow-wrap:anywhere;
-}
-.skill-quick-button.sp-insufficient .sq-description{
-    color:#766f67;
-}
