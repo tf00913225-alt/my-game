@@ -59,7 +59,7 @@
 - Status / Hard Control（異常／硬控）的唯一公式 owner 是 `js/00-main.js::calculateStatusEffectChance()`／`rollStatusEffectHit()`。正式公式在上限前為：`skillBaseChance + offensiveAttribute×0.05 + finalStatusBonus - targetSpirit×0.05 - finalStatusResistance`。不得再加入 level factor（等級差倍率）、`sqrt(attribute)`、硬控專屬 Spirit coefficient（精神係數）或第二套 Boss 乘算抗性。
 - 物理技能的異常主屬性使用有效 Attack Points（攻擊六圍點數）；法術技能使用有效 Intelligence（智力）。符咒、怪物技能、Boss／深淵技能與玩家技能必須走同一公式 owner，不得各自重算。
 - Hard Control 最終上限固定為：Regular 90%、Elite 75%、Boss 60%、Enemy-to-player 60%；上限只在同一套最終成功率公式最後套用一次。Freeze／Petrify 的互斥 Gate 仍先於正式寫入，禁止 Boss 額外再乘第二套隱藏抗性。
-- Frostbite（凍傷）是 Soft Debuff：造成傷害 -25%，最終閃躲 -25%、最終異常狀態抗性 -25%；不禁止使用技能。任何戰鬥狀態文字若再顯示「凍傷＝無法使用技能」都屬 Contract violation。
+- Frostbite（凍傷）是 Soft Debuff：造成傷害 -30%，最終閃躲 -25%、最終異常狀態抗性 -25%；不禁止使用技能。任何戰鬥狀態文字若再顯示「凍傷＝無法使用技能」都屬 Contract violation。
 - V140／V158／V169 等歷史模組不得再 override（覆寫）上述核心公式。Guaranteed Burn（必定燃燒）必須透過正式 `guaranteedHit` 參數，不得暫時替換全域 `rollStatusEffectHit()`。
 - 內部公式仍以 percentage point（百分點）做最終命中／閃躲／抗性加減；玩家可見 Buff／Debuff 一律顯示「最終…±N%」，禁止顯示「個百分點」。UI 的 `%` 是顯示語法，不改變內部百分點數學語意。
 
