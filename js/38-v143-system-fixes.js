@@ -437,49 +437,9 @@
         };
     }
 
-    /* ----- 3. Escaping a dungeon restores the dungeon owner before routing. ----- */
-    if(typeof resolveEscapeAttempt==="function"){
-        const previousEscape=resolveEscapeAttempt;
-        resolveEscapeAttempt=function(characterIndex){
-            const run=window.v132ActiveDungeonRun;
-            if(!run){ return previousEscape.apply(this,arguments); }
-            clearInterval(timerId);
-            timerId=null;
-            const alive=currentBattleMonsters.map(index=>monsters[index]).filter(monster=>monster&&monster.alive);
-            if(!alive.length){ checkBattleEnd(); return; }
-            const highest=Math.max.apply(null,alive.map(monster=>monster.level));
-            const character=getPartyCharacterByIndex(characterIndex)||player;
-            const chance=Math.max(10,Math.min(95,50+(numeric(character.level)-highest)*5));
-            if(Math.random()*100>=chance){ addBattleLog("逃脫失敗！"); finishPlayerAction(); return; }
-
-            battleActive=false;
-            autoBattle=false;
-            actionReady=false;
-            pendingAction=null;
-            battleToken++;
-            if(typeof battleAdvanceTimeoutId!=="undefined"&&battleAdvanceTimeoutId){
-                clearTimeout(battleAdvanceTimeoutId); battleAdvanceTimeoutId=null;
-            }
-            if(typeof battleAdvanceScheduled!=="undefined"){ battleAdvanceScheduled=false; }
-            closeMenus();
-            if(window.v142SkillAnimationDirector){ window.v142SkillAnimationDirector.dispose(); }
-            document.querySelectorAll("#v141BattleTransition,.v141-battle-transition").forEach(node=>node.classList.remove("show"));
-            const battlePage=document.getElementById("battlePage");
-            if(battlePage){ battlePage.classList.remove("preparing","v141-exiting"); }
-            monsters=run.previousMonsters;
-            currentZone=run.previousZone;
-            window.v132ActiveDungeonRun=null;
-            addBattleLog("成功從副本脫逃！");
-            if(typeof saveGame==="function"){ saveGame(); }
-            setTimeout(()=>{
-                if(typeof run.onComplete==="function"){ run.onComplete({result:"escape"}); }
-                else{
-                    showPage("dungeon");
-                    if(typeof switchDungeonTab==="function"){ switchDungeonTab("daily"); }
-                }
-            },260);
-        };
-    }
+    /* Escape routing/presentation is owned by core resolveEscapeAttempt() plus
+       v132AbortDungeonBattle() and FourSymbolsBattlePresentation. The former
+       Dungeon-only resolveEscapeAttempt wrapper is retired. */
 
     /* ----- 4 / 5. Larger Abyss, tap-to-advance dialogue and correct nav shell. ----- */
     function fixDungeonNavigation(){
