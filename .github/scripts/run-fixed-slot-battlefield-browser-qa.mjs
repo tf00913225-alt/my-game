@@ -101,18 +101,32 @@ window.showMissEffect=function(isPlayerTarget,index,label){var el=document.getEl
  addCards(5,3,true);var splitAlly={lower:lower(),assigned:Object.assign({},owner.ensureAllyFormation(window.__allyIndexes).characterIndexToSlot)};var artwork={player:artEvidence('#battlePlayerCard0'),regular:artEvidence('#battleMonster0'),elite:artEvidence('#battleMonster1'),boss:artEvidence('#battleMonster2'),abyss:artEvidence('#battleMonster4')};
  addCards(3,3,true);var beforeDeath={e1:rect('#battleMonster1'),e2:rect('#battleMonster2')};document.getElementById('battleMonster1').remove();var afterDeath={e2:rect('#battleMonster2')};var targetSlot=owner.getEnemySlotForMonster(owner.getActiveEnemySnapshot(),2),targetRect=owner.getSlotRect(targetSlot);
  var feedback=window.FourSymbolsBattleFloatingFeedback;
- window.showDamagePopup(document.getElementById('battleMonster2'),'-100HP','hp',false);
- window.showDamagePopup(document.getElementById('battleMonster2'),'-777HP','hp',true);
- feedback.emit({side:'monster',index:2,kind:'status',text:'燃燒',duration:1500});
- feedback.emit({side:'monster',index:2,kind:'shield',text:'-88',duration:1500});
- feedback.emit({side:'monster',index:2,kind:'miss',text:'MISS',duration:1500});
- feedback.emit({side:'player',index:0,kind:'heal',text:'+250HP',duration:1500});
- feedback.emit({side:'player',index:0,kind:'sp',text:'+40SP',duration:1500});
- feedback.emit({side:'player',index:1,kind:'heal',text:'+120HP',duration:1500});
- feedback.emit({side:'player',index:1,kind:'heal',text:'+90HP',duration:1500});
- var monsterFeedback=Array.from(document.querySelectorAll('.battle-floating-feedback[data-feedback-side="monster"][data-feedback-index="2"]'));
+ /* A/C: Relic damage + Burn status share the same target context without collision. */
+ feedback.emit({side:'monster',index:0,kind:'damage',text:'-188HP',source:'relic',duration:1500,skipImpactTiming:true});
+ feedback.emit({side:'monster',index:0,kind:'status',text:'燃燒',source:'relic-status',duration:1500,skipImpactTiming:true});
+ /* D: Shield + HP damage share another target context. */
+ feedback.emit({side:'monster',index:1,kind:'shield',text:'-88',source:'shield',duration:1500,skipImpactTiming:true});
+ feedback.emit({side:'monster',index:1,kind:'damage',text:'-100HP',source:'damage',duration:1500,skipImpactTiming:true});
+ /* E: MISS + Status share another target context. */
+ feedback.emit({side:'monster',index:2,kind:'miss',text:'MISS',source:'miss',duration:1500,skipImpactTiming:true});
+ feedback.emit({side:'monster',index:2,kind:'status',text:'破防',source:'status',duration:1500,skipImpactTiming:true});
+ /* B: HP + SP recovery share one player context. */
+ feedback.emit({side:'player',index:0,kind:'heal',text:'+250HP',source:'heal',duration:1500,skipImpactTiming:true});
+ feedback.emit({side:'player',index:0,kind:'sp',text:'+40SP',source:'sp',duration:1500,skipImpactTiming:true});
+ /* F: two consecutive HP recovery entries must allocate separate lanes. */
+ feedback.emit({side:'player',index:1,kind:'heal',text:'+120HP',source:'heal-1',duration:1500,skipImpactTiming:true});
+ feedback.emit({side:'player',index:1,kind:'heal',text:'+90HP',source:'heal-2',duration:1500,skipImpactTiming:true});
+ /* Queue stress: the fifth simultaneous entry is queued instead of escaping the HUD-safe area. */
+ ['Q1','Q2','Q3','Q4','Q5'].forEach(function(label){
+   feedback.emit({side:'player',index:2,kind:'status',text:label,source:'queue-stress',duration:1500,skipImpactTiming:true});
+ });
+ var monster0Feedback=Array.from(document.querySelectorAll('.battle-floating-feedback[data-feedback-side="monster"][data-feedback-index="0"]'));
+ var monster1Feedback=Array.from(document.querySelectorAll('.battle-floating-feedback[data-feedback-side="monster"][data-feedback-index="1"]'));
+ var monster2Feedback=Array.from(document.querySelectorAll('.battle-floating-feedback[data-feedback-side="monster"][data-feedback-index="2"]'));
  var player0Feedback=Array.from(document.querySelectorAll('.battle-floating-feedback[data-feedback-side="player"][data-feedback-index="0"]'));
  var player1Feedback=Array.from(document.querySelectorAll('.battle-floating-feedback[data-feedback-side="player"][data-feedback-index="1"]'));
+ var player2Feedback=Array.from(document.querySelectorAll('.battle-floating-feedback[data-feedback-side="player"][data-feedback-index="2"]'));
+ var feedbackQueueSnapshot=feedback.debugSnapshot();
  var stage=document.createElement('div');stage.className='v143-skill-stage';stage.dataset.geometryOwner='fixed-slot';document.body.appendChild(stage);
  var turnNode=document.getElementById('turnTargetRow'),actionRegion=document.getElementById('battleActionRegion');
  turnNode.style.transition='none';
@@ -140,10 +154,15 @@ window.showMissEffect=function(isPlayerTarget,index,label){var el=document.getEl
  var bossHp=bossCard.querySelector('.monster-hp'),bossSp=bossCard.querySelector('.monster-sp'),bossName=bossCard.querySelector('.battle-monster-name');
  var bossEvidence={footprint:rect('.v-fixed-boss-footprint'),card:rect('#battleMonster0'),art:rect('#battleMonster0 > .v174-battle-art'),hud:{hp:rect('#battleMonster0 > .monster-hp'),sp:rect('#battleMonster0 > .monster-sp'),name:rect('#battleMonster0 > .battle-monster-name'),hpPosition:getComputedStyle(bossHp).position,spPosition:getComputedStyle(bossSp).position,hpDisplay:getComputedStyle(bossHp).display,spDisplay:getComputedStyle(bossSp).display},bossCount:document.querySelectorAll('.v-fixed-boss-footprint > #battleMonster0').length,slots:bossFootprint&&bossFootprint.dataset.slots,reinforcements:['#battleMonster1','#battleMonster2'].map(function(selector){return {card:rect(selector),art:rect(selector+' > .v174-battle-art')};}),objects:['#battleMonster3','#battleMonster4'].map(function(selector){return {card:rect(selector),art:rect(selector+' > .v174-battle-art')};}),cardless:Array.from(document.querySelectorAll('.battle-monster')).every(function(card){return card.classList.contains('v174-cardless-unit');}),pointerEvents:getComputedStyle(bossCard).pointerEvents,background:getComputedStyle(bossCard).backgroundImage,reticles:{boss:{content:bossReticle.content,border:bossReticle.borderTopWidth,animation:bossReticle.animationName},object:{content:objectReticle.content,border:objectReticle.borderTopWidth,animation:objectReticle.animationName}}};
  setTimeout(function(){var legacyStyle=document.getElementById('v174-cardless-battle-style');var result={viewport:{width:${width},height:${height}},scenarios:scenarios,allyScenarios:allyScenarios,splitAlly:splitAlly,collapsedDrawer:collapsedDrawer,expandedDrawer:expandedDrawer,turnUi:turnUi,artwork:artwork,beforeDeath:beforeDeath,afterDeath:afterDeath,targetSlot:targetSlot,targetRect:targetRect,boss:bossEvidence,legacyStyle:{owner:legacyStyle&&legacyStyle.dataset.geometryOwner,textLength:legacyStyle?legacyStyle.textContent.length:-1},feedback:{
-   monster:monsterFeedback.map(function(node){var r=node.getBoundingClientRect(),s=getComputedStyle(node);return {kind:node.dataset.feedbackKind,lane:Number(node.dataset.feedbackLane),rect:{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height},color:s.color,stroke:s.webkitTextStroke,textShadow:s.textShadow,background:s.backgroundColor};}),
-   player0:player0Feedback.map(function(node){var r=node.getBoundingClientRect();return {kind:node.dataset.feedbackKind,lane:Number(node.dataset.feedbackLane),rect:{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height}};}),
-   player1:player1Feedback.map(function(node){var r=node.getBoundingClientRect();return {kind:node.dataset.feedbackKind,lane:Number(node.dataset.feedbackLane),rect:{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height}};}),
-   monsterGeometry:adapter.getUnitGeometry('monster',2),player0Geometry:adapter.getUnitGeometry('player',0),player1Geometry:adapter.getUnitGeometry('player',1)
+   monster0:monster0Feedback.map(function(node){var r=node.getBoundingClientRect(),s=getComputedStyle(node);return {kind:node.dataset.feedbackKind,source:node.dataset.feedbackSource,lane:Number(node.dataset.feedbackLane),rect:{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height},color:s.color,stroke:s.webkitTextStroke,textShadow:s.textShadow,background:s.backgroundColor};}),
+   monster1:monster1Feedback.map(function(node){var r=node.getBoundingClientRect(),s=getComputedStyle(node);return {kind:node.dataset.feedbackKind,source:node.dataset.feedbackSource,lane:Number(node.dataset.feedbackLane),rect:{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height},color:s.color,stroke:s.webkitTextStroke,textShadow:s.textShadow,background:s.backgroundColor};}),
+   monster2:monster2Feedback.map(function(node){var r=node.getBoundingClientRect(),s=getComputedStyle(node);return {kind:node.dataset.feedbackKind,source:node.dataset.feedbackSource,lane:Number(node.dataset.feedbackLane),rect:{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height},color:s.color,stroke:s.webkitTextStroke,textShadow:s.textShadow,background:s.backgroundColor};}),
+   player0:player0Feedback.map(function(node){var r=node.getBoundingClientRect();return {kind:node.dataset.feedbackKind,source:node.dataset.feedbackSource,lane:Number(node.dataset.feedbackLane),rect:{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height}};}),
+   player1:player1Feedback.map(function(node){var r=node.getBoundingClientRect();return {kind:node.dataset.feedbackKind,source:node.dataset.feedbackSource,lane:Number(node.dataset.feedbackLane),rect:{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height}};}),
+   player2:player2Feedback.map(function(node){var r=node.getBoundingClientRect();return {kind:node.dataset.feedbackKind,source:node.dataset.feedbackSource,lane:Number(node.dataset.feedbackLane),rect:{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height}};}),
+   queueSnapshot:feedbackQueueSnapshot,
+   monster0Geometry:adapter.getUnitGeometry('monster',0),monster1Geometry:adapter.getUnitGeometry('monster',1),monster2Geometry:adapter.getUnitGeometry('monster',2),
+   player0Geometry:adapter.getUnitGeometry('player',0),player1Geometry:adapter.getUnitGeometry('player',1),player2Geometry:adapter.getUnitGeometry('player',2)
  },stageOverflow:getComputedStyle(stage).overflow,pageScroll:{width:document.documentElement.scrollWidth,height:document.documentElement.scrollHeight,clientWidth:document.documentElement.clientWidth,clientHeight:document.documentElement.clientHeight},enemySlots:document.querySelectorAll('.v-fixed-enemy-slot').length,allySlots:document.querySelectorAll('.v-fixed-ally-slot').length,legacyClasses:{enemy:document.getElementById('battleMonsterArea').className,ally:document.getElementById('battlePlayerRow').className}};document.getElementById('result').textContent=JSON.stringify(result);},40);
 })();
 </script></body></html>`;
@@ -200,15 +219,30 @@ function runViewport(chrome,width,height){
     close(data.beforeDeath.e2.left,data.afterDeath.e2.left,"death must not move right unit");close(data.beforeDeath.e2.top,data.afterDeath.e2.top,"death must not move right unit vertically");
     for(const [kind,art] of Object.entries(data.artwork)){assert.equal(art.backgroundSize,"contain",`${kind} artwork must use contain`);assert.equal(art.overflow,"visible",`${kind} artwork overflow`);assert.equal(art.contain,"none",`${kind} artwork contain`);assert.equal(art.clipChain.some(entry=>/hidden|clip/.test(entry.overflow)||/hidden|clip/.test(entry.overflowX)||/hidden|clip/.test(entry.overflowY)),false,`${kind} artwork has clipping ancestor`);}
     function separated(items,label){for(let i=0;i<items.length;i++){for(let j=i+1;j<items.length;j++){const a=items[i].rect,b=items[j].rect;assert.ok(a.bottom<=b.top+.5||b.bottom<=a.top+.5||a.right<=b.left+.5||b.right<=a.left+.5,label+" overlap: "+JSON.stringify({a:items[i],b:items[j]}));}}}
-    assert.equal(data.feedback.monster.length,5,"damage + critical + status + shield + miss must share one target context");
+    assert.equal(data.feedback.monster0.length,2,"Relic damage + Burn status must share one target context");
+    assert.deepEqual(data.feedback.monster0.map(item=>item.source).sort(),["relic","relic-status"]);
+    assert.equal(data.feedback.monster1.length,2,"Shield + HP damage must share one target context");
+    assert.equal(data.feedback.monster2.length,2,"MISS + Status must share one target context");
     assert.equal(data.feedback.player0.length,2,"HP + SP recovery must share one target context");
     assert.equal(data.feedback.player1.length,2,"consecutive HP recovery must allocate separate lanes");
-    separated(data.feedback.monster,"monster feedback");separated(data.feedback.player0,"player0 feedback");separated(data.feedback.player1,"player1 feedback");
-    [data.feedback.monster,data.feedback.player0,data.feedback.player1].forEach(function(group){assert.equal(new Set(group.map(item=>item.lane)).size,group.length,"each active feedback item must have a unique lane");});
-    data.feedback.monster.forEach(function(item){assert.ok(item.rect.bottom<=data.feedback.monsterGeometry.hudSafeRect.top+.5,"monster feedback must stay above HUD safe area");});
-    data.feedback.player0.forEach(function(item){assert.ok(item.rect.bottom<=data.feedback.player0Geometry.hudSafeRect.top+.5,"player feedback must stay above HUD safe area");});
-    data.feedback.player1.forEach(function(item){assert.ok(item.rect.bottom<=data.feedback.player1Geometry.hudSafeRect.top+.5,"repeat heal feedback must stay above HUD safe area");});
-    data.feedback.monster.forEach(function(item){assert.equal(item.color,"rgb(227, 38, 38)");assert.match(item.stroke,/0\.85px rgb\(255, 255, 255\)/);assert.equal(item.background,"rgba(0, 0, 0, 0)");assert.doesNotMatch(item.textShadow,/8px|10px|14px|16px/);});
+    assert.equal(data.feedback.player2.length,4,"bounded lane owner must render only four simultaneous lanes");
+    const queueContext=data.feedback.queueSnapshot.find(item=>item.key==="player:2");
+    assert.ok(queueContext,"queue stress context must exist");
+    assert.equal(queueContext.active.length,4,"queue stress context must cap active lanes at four");
+    assert.equal(queueContext.queued.length,1,"fifth simultaneous feedback entry must wait in queue");
+    [data.feedback.monster0,data.feedback.monster1,data.feedback.monster2,data.feedback.player0,data.feedback.player1,data.feedback.player2].forEach(function(group){
+        separated(group,"battle feedback");
+        assert.equal(new Set(group.map(item=>item.lane)).size,group.length,"each active feedback item must have a unique lane");
+    });
+    [[data.feedback.monster0,data.feedback.monster0Geometry],[data.feedback.monster1,data.feedback.monster1Geometry],[data.feedback.monster2,data.feedback.monster2Geometry],[data.feedback.player0,data.feedback.player0Geometry],[data.feedback.player1,data.feedback.player1Geometry],[data.feedback.player2,data.feedback.player2Geometry]].forEach(function(pair){
+        pair[0].forEach(function(item){assert.ok(item.rect.bottom<=pair[1].hudSafeRect.top+.5,"feedback must stay above HUD safe area");});
+    });
+    data.feedback.monster0.concat(data.feedback.monster1,data.feedback.monster2).forEach(function(item){
+        assert.equal(item.color,"rgb(227, 38, 38)");
+        assert.match(item.stroke,/0\.85px rgb\(255, 255, 255\)/);
+        assert.equal(item.background,"rgba(0, 0, 0, 0)");
+        assert.doesNotMatch(item.textShadow,/8px|10px|14px|16px/);
+    });
     assert.equal(data.stageOverflow,"visible");
     close(data.boss.footprint.left,data.boss.card.left,"Boss card left fills six-Slot footprint");close(data.boss.footprint.right,data.boss.card.right,"Boss card right fills six-Slot footprint");close(data.boss.footprint.top,data.boss.card.top,"Boss card top fills six-Slot footprint");close(data.boss.footprint.bottom,data.boss.card.bottom,"Boss card bottom fills six-Slot footprint");
     assert.equal(data.boss.bossCount,1,"Boss must remain one DOM target");assert.equal(data.boss.slots,"ENEMY_B2 ENEMY_B3 ENEMY_B4 ENEMY_F2 ENEMY_F3 ENEMY_F4");assert.equal(data.boss.cardless,true,"Boss-side dynamic Units must be cardless immediately");assert.equal(data.boss.pointerEvents,"auto");assert.equal(data.boss.background,"none");
