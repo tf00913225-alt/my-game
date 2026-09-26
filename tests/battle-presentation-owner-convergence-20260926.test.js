@@ -2,6 +2,25 @@ const assert=require("node:assert/strict");
 const fs=require("node:fs");
 
 const read=file=>fs.readFileSync(file,"utf8");
+function sourceFunction(source,name){
+  const start=source.indexOf("function "+name+"(");
+  assert.ok(start>=0,name+" function missing");
+  const brace=source.indexOf("{",start);
+  let depth=0,inString=null,escape=false;
+  for(let index=brace;index<source.length;index++){
+    const char=source[index];
+    if(inString){
+      if(escape){ escape=false; continue; }
+      if(char==="\\"){ escape=true; continue; }
+      if(char===inString){ inString=null; }
+      continue;
+    }
+    if(char==="'"||char==='"'||char==="\`"){ inString=char; continue; }
+    if(char==="{"){ depth++; }
+    if(char==="}"&&--depth===0){ return source.slice(start,index+1); }
+  }
+  throw new Error(name+" function is unterminated");
+}
 
 const build=read("scripts/build-production.mjs");
 const core=read("js/00-main.js");
@@ -29,7 +48,7 @@ assert.ok(
   "floating feedback owner must be installed before relic runtime uses it"
 );
 
-const corePopup=core.slice(core.indexOf("function showDamagePopup("),core.indexOf("function playFireRocketAnimation",core.indexOf("function showDamagePopup(")));
+const corePopup=sourceFunction(core,"showDamagePopup");
 assert.match(corePopup,/FourSymbolsBattleFloatingFeedback/);
 assert.match(corePopup,/feedback\.emit\(/);
 assert.doesNotMatch(corePopup,/createElement\(/,"core popup entry must not create a second DOM implementation");
