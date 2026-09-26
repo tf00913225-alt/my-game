@@ -1,19 +1,19 @@
 {
   "id": "2026-09-26-inventory-skill-owner-convergence",
   "baseSha": "726a3541823b85c6f1368df0e762cb8e56f5bd0a",
-  "workBranch": "fix/inventory-skill-ui-owner-convergence-20260926",
+  "workBranch": "fix/inventory-skill-ui-owner-convergence-utf8-20260926",
   "targetBranch": "dev",
-  "status": "IMPLEMENTED",
+  "status": "VERIFIED",
   "requirements": {
-    "inventory-single-owner-and-context-lifecycle": "IMPLEMENTED",
-    "inventory-single-scroll-and-layout-owner": "IMPLEMENTED",
-    "skill-single-list-and-render-sort-owner": "IMPLEMENTED",
-    "skill-cost-single-source-of-truth": "IMPLEMENTED",
-    "battle-skill-picker-readable-four-column-layout": "IMPLEMENTED",
-    "legacy-patch-and-css-debt-retirement": "IMPLEMENTED",
+    "inventory-single-owner-and-context-lifecycle": "VERIFIED",
+    "inventory-single-scroll-and-layout-owner": "VERIFIED",
+    "skill-single-list-and-render-sort-owner": "VERIFIED",
+    "skill-cost-single-source-of-truth": "VERIFIED",
+    "battle-skill-picker-readable-four-column-layout": "VERIFIED",
+    "legacy-patch-and-css-debt-retirement": "VERIFIED",
     "targeted-regression-tests": "VERIFIED",
-    "mobile-browser-qa-360-393-412": "TODO",
-    "dev-ci-and-exact-sha-deployment": "TODO"
+    "mobile-browser-qa-360-393-412": "VERIFIED",
+    "dev-ci-and-exact-sha-deployment": "VERIFIED"
   },
   "scope": {
     "excluded": [
