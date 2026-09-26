@@ -289,37 +289,22 @@
         ));
     }
 
-    function statusHitDelay(location){
-        const current=window.v143SkillAnimationState&&window.v143SkillAnimationState.current;
-        if(!current||current.done||current.targetSide!==location.side){ return 30; }
-        const position=Math.max(0,current.targetIndexes.indexOf(location.index));
-        const stagger=current.model&&current.model.sprite
-            ?0
-            :(current.targetIndexes.length>1?Math.min(210,position*55):0);
-        const hitAt=Math.min(
-            current.startedAt+current.duration-140,
-            current.startedAt+current.duration*numeric(current.model&&current.model.hit)+stagger
-        );
-        return Math.max(30,hitAt-Date.now()+115);
-    }
-
     function showStatusPopup(entity,type){
         const label=STATUS_LABELS[type];
         const location=locateEntity(entity);
-        if(!label||!location||typeof document==="undefined"){ return; }
-        setTimeout(()=>{
-            const card=document.getElementById(location.side==="monster"
-                ?"battleMonster"+location.index:"battlePlayerCard"+location.index);
-            if(!card||card.offsetParent===null){ return; }
-            const rect=card.getBoundingClientRect();
-            const popup=document.createElement("strong");
-            popup.className="v146-status-popup status-"+type;
-            popup.textContent=label;
-            popup.style.left=(rect.left+rect.width/2)+"px";
-            popup.style.top=(rect.top+rect.height*.86)+"px";
-            document.body.appendChild(popup);
-            setTimeout(()=>popup.remove(),1300);
-        },statusHitDelay(location));
+        const feedback=window.FourSymbolsBattleFloatingFeedback;
+        if(!label||!location||!feedback||typeof feedback.emitAtImpact!=="function"){ return; }
+        const emit=()=>feedback.emitAtImpact({
+            side:location.side,index:location.index,kind:"status",text:label,source:"status"
+        });
+        if(
+            window.__fourSymbolsBattleEffectSource==="relic"&&
+            typeof window.v174QueueRelicVisual==="function"
+        ){
+            window.v174QueueRelicVisual(emit);
+            return;
+        }
+        emit();
     }
 
     function wrapSimpleStatus(functionName,type){
