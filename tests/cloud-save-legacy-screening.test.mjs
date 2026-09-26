@@ -164,4 +164,11 @@ test("read-only draft keeps empty slots and equipped objects separate from the b
         "ABYSS_SIDECAR_CLAIM_MIRROR_CONFLICT"));
     assert.equal(prepareLegacyCharacterDraft({...save,characterSkillLoadouts:{fire:{}}},sidecars),null);
     assert.equal(prepareLegacyCharacterDraft({...save,teamLoadout:{relicId:"absent"}},sidecars),null);
+    const badRelic={...save,playerRelics:{relicA:{unlocked:true,level:-1}}};
+    assert.ok(screenLegacyCandidateSnapshot(badRelic,sidecars).blockers.includes("RELIC_STATE_INVALID"));
+    assert.equal(prepareLegacyCharacterDraft(badRelic,sidecars),null);
+    const oldSecondSlot={...save,teamLoadout:{relicId:"relicA",subRelicId:"relicA"}};
+    assert.ok(screenLegacyCandidateSnapshot(oldSecondSlot,sidecars).blockers.includes(
+        "RELIC_LOADOUT_UNSUPPORTED"));
+    assert.equal(prepareLegacyCharacterDraft(oldSecondSlot,sidecars),null);
 });

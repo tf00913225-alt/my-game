@@ -48,10 +48,21 @@ function buildCanonicalCharacterReviewPlan(uid,draft,allocateId=randomUUID){
             legacyItem:copy(entry.item)});
         equipmentRefs.push({characterId:slots[entry.slotIndex],slot:entry.slot,ownedItemId});
     }
+    const relicRecords=Object.entries(draft.relics).map(([relicId,state])=>({
+        relicId,source:`playerRelics.${relicId}`,
+        ownershipClaimed:state.unlocked===true,legacyState:copy(state)
+    }));
+    const selectedRelicId=draft.relicLoadout.relicId;
+    if(draft.relicLoadout.subRelicId!=null||
+       selectedRelicId!=null&&(!relicRecords.some(record=>
+           record.relicId===selectedRelicId&&record.ownershipClaimed))){
+        throw new Error("Legacy relic loadout cannot be mapped to an owned relic.");
+    }
     return {
         ownerUid:uid,provenance:"untrusted-legacy-review-only",
         readyForAcceptance:false,authoritativeStateReady:false,claimHistoryBlocked:true,
-        account:{slots},characters,ownedItems,equipmentRefs,
+        account:{slots},characters,ownedItems,equipmentRefs,relicRecords,
+        activeRelicRef:selectedRelicId==null?null:{relicId:selectedRelicId},
         economy:copy(draft.economy),relics:copy(draft.relics),
         relicLoadout:copy(draft.relicLoadout),formation:copy(draft.formation),
         progress:copy(draft.progress),

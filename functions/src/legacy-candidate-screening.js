@@ -203,10 +203,24 @@ function screenLegacyCandidateSnapshot(save,sidecars=null){
        !save.teamLoadout||typeof save.teamLoadout!=="object"||
        Array.isArray(save.teamLoadout)){
         blockers.add("RELIC_SOURCE_MISSING");
-    }else if(save.teamLoadout.relicId!=null&&
-        (typeof save.teamLoadout.relicId!=="string"||
-         save.playerRelics[save.teamLoadout.relicId]?.unlocked!==true)){
-        blockers.add("RELIC_REFERENCE_INVALID");
+    }else{
+        if(Object.entries(save.playerRelics).some(([id,state])=>
+            !id.trim()||!state||typeof state!=="object"||Array.isArray(state)||
+            (state.unlocked!==undefined&&typeof state.unlocked!=="boolean")||
+            (state.level!==undefined&&(!Number.isSafeInteger(state.level)||state.level<1))||
+            (state.exp!==undefined&&(!Number.isSafeInteger(state.exp)||state.exp<0)))){
+            blockers.add("RELIC_STATE_INVALID");
+        }
+        if(save.teamLoadout.subRelicId!=null){
+            // The current runtime persists this slot as null. Retain its raw
+            // bytes but do not silently erase an older nonempty assignment.
+            blockers.add("RELIC_LOADOUT_UNSUPPORTED");
+        }
+        if(save.teamLoadout.relicId!=null&&
+           (typeof save.teamLoadout.relicId!=="string"||
+            save.playerRelics[save.teamLoadout.relicId]?.unlocked!==true)){
+            blockers.add("RELIC_REFERENCE_INVALID");
+        }
     }
     for(const field of CLAIM_FIELDS){
         if(!save[field]||typeof save[field]!=="object"){
@@ -308,6 +322,7 @@ function createLegacyCandidateScreening({db,HttpsError,runProtected,inspectExist
                     characterRecords:plan.characters.length,
                     ownedItemObjects:plan.ownedItems.length,
                     equippedObjects:plan.equipmentRefs.length,
+                    relicRecords:plan.relicRecords.length,
                     retainedSidecarSources:LEGACY_BACKUP_SIDECARS.length,
                     claimHistoryBlocked:true
                 }:{status:"blocked"}
