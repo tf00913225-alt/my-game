@@ -19381,92 +19381,41 @@ function resolveEscapeAttempt(characterIndex){
 
     clearInterval(timerId);
 
+    const alive=currentBattleMonsters.map(i=>monsters[i]).filter(m=>m.alive);
+    if(alive.length===0){ checkBattleEnd(); return; }
 
-    const alive =
-        currentBattleMonsters
-        .map(
-            i=>monsters[i]
-        )
-        .filter(
-            m=>m.alive
-        );
-
-
-    if(alive.length===0){
-
-        checkBattleEnd();
-
-        return;
-
-    }
-
-
-    const highestLevel =
-        Math.max(
-            ...alive.map(
-                m=>m.level
-            )
-        );
-
-
+    const highestLevel=Math.max(...alive.map(m=>m.level));
     const escapingCharacter=getPartyCharacterByIndex(characterIndex)||player;
+    const chance=Math.max(10,Math.min(95,50+(escapingCharacter.level-highestLevel)*5));
+    const succeeded=Math.random()*100<chance;
+    const feedback=typeof window!=="undefined"?window.FourSymbolsBattleFloatingFeedback:null;
+    const presentation=feedback&&typeof feedback.playEscape==="function"
+        ?feedback.playEscape(characterIndex,succeeded)
+        :Promise.resolve();
 
-    const chance =
-        Math.max(
-            10,
-            Math.min(
-                95,
-                50+
-                (
-                    escapingCharacter.level-
-                    highestLevel
-                )*5
-            )
-        );
-
-
-    if(
-        Math.random()*100<
-        chance
-    ){
-
-        battleActive=false;
-
-        autoBattle=false;
-
-        battleToken++;
-
-
-        addBattleLog(
-            "成功逃脫！"
-        );
-
-
-        setTimeout(()=>{
-
+    if(succeeded){
+        addBattleLog("成功逃脫！");
+        Promise.resolve(presentation).then(()=>{
+            if(window.v132ActiveDungeonRun&&typeof window.v132AbortDungeonBattle==="function"){
+                window.v132AbortDungeonBattle("escape");
+                return;
+            }
+            battleActive=false;
+            autoBattle=false;
+            battleToken++;
+            if(feedback&&typeof feedback.clear==="function"){ feedback.clear(); }
             showPage("map");
-
             setMapCooldown(3000);
-
-
             startMonsterMovement();
-
             ensureAutoPatrolInterval();
-
-        },1400);
-
-    }
-    else{
-
-        addBattleLog(
-            "逃脫失敗！"
-        );
-
-
-        finishPlayerAction();
-
+        });
+        return;
     }
 
+    addBattleLog("逃脫失敗！");
+    Promise.resolve(presentation).then(()=>{
+        if(typeof battleActive==="undefined"||battleActive){ finishPlayerAction(); }
+    });
 }
 
 
