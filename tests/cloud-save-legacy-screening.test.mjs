@@ -9,6 +9,8 @@ test("historical main save cannot pass screening without sidecar and reward prov
     const save={
         player:{id:"first",element:"fire",level:3,exp:4,skillPoints:2},
         player2:null,player3:null,
+        gold:100,sharedExp:0,characterSkillLoadouts:{fire:{skillLevels:{},equippedSkills:[]}},
+        playerRelics:{},teamLoadout:{relicId:null,subRelicId:null},
         inventoryItems:[{id:"potion",count:2}],characterEquipment:{fire:{}},
         dailyQuestState:{date:"2026-09-25",progress:{checkin:0},claimed:{checkin:false}},
         commissionQuestState:{date:"2026-09-25",progress:{winBattle:0},claimed:{winBattle:false}},
@@ -69,4 +71,34 @@ test("equipped legacy gear is an owned object outside the bag, with one identity
         characterEquipment:{fire:{weapon:{id:"ironSword",type:"weapon",count:1},
             hand:{id:"woodStaff",type:"weapon",count:1}}}});
     assert.ok(ambiguous.blockers.includes("EQUIPMENT_STRUCTURE_INVALID"));
+});
+
+test("formation screening retains valid party slots and blocks conflicting or orphaned slots",()=>{
+    const base={player:{id:"first",element:"fire",exp:0,skillPoints:0},
+        player2:null,player3:null,inventoryItems:[],characterEquipment:{fire:{}},
+        allyFormation:{version:1,characterIndexToSlot:{0:"ALLY_F2"}}};
+    assert.equal(screenLegacyCandidateSnapshot(base).blockers.includes("FORMATION_STRUCTURE_INVALID"),false);
+    const orphan={...base,allyFormation:{version:1,characterIndexToSlot:{1:"ALLY_F1"}}};
+    assert.ok(screenLegacyCandidateSnapshot(orphan).blockers.includes("FORMATION_STRUCTURE_INVALID"));
+    const repeated={...base,player2:{id:"second",element:"water",exp:0,skillPoints:0},
+        allyFormation:{version:1,characterIndexToSlot:{0:"ALLY_F1",1:"ALLY_F1"}}};
+    assert.ok(screenLegacyCandidateSnapshot(repeated).blockers.includes("FORMATION_STRUCTURE_INVALID"));
+    const badSlot={...base,allyFormation:{version:1,characterIndexToSlot:{0:"ENEMY_B1"}}};
+    assert.ok(screenLegacyCandidateSnapshot(badSlot).blockers.includes("FORMATION_STRUCTURE_INVALID"));
+});
+
+test("read-only screening blocks missing economy, skills or relic source without inventing defaults",()=>{
+    const save={player:{id:"first",element:"fire",exp:0,skillPoints:0},
+        player2:null,player3:null,inventoryItems:[],characterEquipment:{fire:{}},
+        gold:7,sharedExp:0,characterSkillLoadouts:{fire:{}},playerRelics:{},teamLoadout:{}};
+    const intact=screenLegacyCandidateSnapshot(save);
+    for(const code of ["ECONOMY_SOURCE_MISSING","SKILL_SOURCE_MISSING","RELIC_SOURCE_MISSING"]){
+        assert.equal(intact.blockers.includes(code),false);
+    }
+    const broken={...save,gold:undefined,characterSkillLoadouts:null,playerRelics:null};
+    const review=screenLegacyCandidateSnapshot(broken);
+    assert.ok(review.blockers.includes("ECONOMY_SOURCE_MISSING"));
+    assert.ok(review.blockers.includes("SKILL_SOURCE_MISSING"));
+    assert.ok(review.blockers.includes("RELIC_SOURCE_MISSING"));
+    assert.equal(review.readyForAcceptance,false);
 });

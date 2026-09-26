@@ -14,7 +14,31 @@ const EQUIPMENT_SLOT_BY_KEY=Object.freeze({
     head:"head",helmet:"head",hand:"hand",weapon:"hand",shoulder:"shoulder",
     armor:"armor",shoes:"shoes",ring:"ring",accessory:"ring"
 });
+const ALLY_SLOTS=new Set(["ALLY_F1","ALLY_F2","ALLY_F3","ALLY_B1","ALLY_B2","ALLY_B3"]);
 const {auditLegacyRewardClaims}=require("./legacy-reward-claim-audit.js");
+
+function auditLegacyFormation(save,blockers){
+    const formation=save.allyFormation;
+    // Older saves may predate formation persistence. A missing formation is
+    // not evidence of reward eligibility and never supplies a canonical ID.
+    if(formation===undefined||formation===null){ return; }
+    const map=formation.characterIndexToSlot;
+    if(!formation||typeof formation!=="object"||Array.isArray(formation)||
+       formation.version!==1||!map||typeof map!=="object"||Array.isArray(map)){
+        blockers.add("FORMATION_STRUCTURE_INVALID");
+        return;
+    }
+    const occupied=new Set();
+    for(const [index,slot] of Object.entries(map)){
+        if(!/^(0|1|2)$/.test(index)||
+           (index==="1"&&save.player2==null)||
+           (index==="2"&&save.player3==null)||
+           !ALLY_SLOTS.has(slot)||occupied.has(slot)){
+            blockers.add("FORMATION_STRUCTURE_INVALID");
+        }
+        occupied.add(slot);
+    }
+}
 
 function auditLegacyEquipment(save,blockers){
     const seenUids=new Set();
@@ -96,6 +120,23 @@ function screenLegacyCandidateSnapshot(save,sidecars=null){
         blockers.add("EQUIPMENT_STRUCTURE_INVALID");
     }
     auditLegacyEquipment(save,blockers);
+    auditLegacyFormation(save,blockers);
+    // A candidate is never an authoritative character. These source checks
+    // only prevent a future projection from silently inventing missing state.
+    if(!Number.isSafeInteger(save.gold)||save.gold<0||
+       !Number.isSafeInteger(save.sharedExp)||save.sharedExp<0){
+        blockers.add("ECONOMY_SOURCE_MISSING");
+    }
+    if(!save.characterSkillLoadouts||typeof save.characterSkillLoadouts!=="object"||
+       Array.isArray(save.characterSkillLoadouts)){
+        blockers.add("SKILL_SOURCE_MISSING");
+    }
+    if(!save.playerRelics||typeof save.playerRelics!=="object"||
+       Array.isArray(save.playerRelics)||
+       !save.teamLoadout||typeof save.teamLoadout!=="object"||
+       Array.isArray(save.teamLoadout)){
+        blockers.add("RELIC_SOURCE_MISSING");
+    }
     for(const field of CLAIM_FIELDS){
         if(!save[field]||typeof save[field]!=="object"){
             blockers.add("CLAIM_PROGRESS_MISSING");
