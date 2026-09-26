@@ -31,8 +31,19 @@ function inspect(file,source){
  for(const [,suffix] of source.matchAll(/accountKey\s*\(\s*['"]([^'"]+)['"]/g)){
   if(suffix==='release-update-')continue;
   if(!keys.has(`four_symbols_account:<UID>:${suffix}`))errors.push(`${file}: unregistered account sidecar ${suffix}`);
+  if(suffix==='equipment-shop-purchases'&&file!=='js/startup/account-save-repository.js'){
+   errors.push(`${file}: historical-only equipment-shop-purchases requires an owner and claim-policy review before runtime use`);
+  }
  }
- if(/\b(?:localStorage|sessionStorage)\s*\[\s*['"]setItem['"]\s*\]/.test(source))errors.push(`${file}: bracket storage writer requires review`);
+ if(file!=='js/startup/account-save-repository.js'){
+  for(const match of source.matchAll(/\baccountKey\s*\(\s*([^\s,)]+)/g)){
+   if(!/^['"]/.test(match[1]))errors.push(`${file}: dynamic accountKey suffix requires an explicit registry policy`);
+  }
+ }
+ for(const [,literal] of source.matchAll(/\b(?:localStorage|sessionStorage)\s*(?:\.|\?\.)\s*setItem\s*\(\s*['"]([^'"]+)['"]/g)){
+  if(!keys.has(literal))errors.push(`${file}: unregistered literal storage key ${literal}`);
+ }
+ if(/\b(?:localStorage|sessionStorage|storage)\s*\[\s*['"]setItem['"]\s*\]/.test(source))errors.push(`${file}: bracket storage writer requires review`);
 }
 function walk(dir){for(const item of fs.readdirSync(dir,{withFileTypes:true})){
  const full=path.join(dir,item.name);
@@ -50,7 +61,14 @@ if(process.argv.includes('--self-test')){
  const before=errors.length;
  inspect('js/new-gameplay-writer.js',`localStorage.setItem('newReward', '1');`);
  inspect('js/new-db.js',`indexedDB.open('new-db');`);
- if(errors.length!==before+2)throw Error('Registry guard did not reject unknown storage.');
+ inspect('js/25-v131-fix-batch.js',`localStorage.setItem('newReward', '1');`);
+ inspect('js/new-account-writer.js',`const key=accountKey(suffix);`);
+ inspect('js/new-historical-writer.js',`const key=accountKey('equipment-shop-purchases');`);
+ const probes=errors.slice(before).join('\n');
+ if(!probes.includes('newReward')||!probes.includes('IndexedDB')||
+    !probes.includes('dynamic accountKey')||!probes.includes('historical-only equipment-shop-purchases')){
+  throw Error('Registry guard did not reject unknown or historical-only storage.');
+ }
  errors.splice(before);
 }
 if(errors.length){console.error(errors.join('\n'));process.exitCode=1;}

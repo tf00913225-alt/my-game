@@ -377,7 +377,7 @@
     },
     {
       "key": "four_symbols_account:<UID>:equipment-shop-purchases",
-      "ownerModule": "js/51-v169-rpg-ui.js",
+      "ownerModule": "js/startup/account-save-repository.js",
       "storageType": "localStorage",
       "scope": "uid",
       "deviceOnly": false,
@@ -389,12 +389,12 @@
       "backupRequired": true,
       "migrationRequired": true,
       "authorityTier": "A",
-      "authoritativeSource": "future server validated state",
+      "authoritativeSource": "historical legacy translation only; future server claim authority",
       "schemaVersion": "legacy/unversioned",
-      "restoreOwner": "js/51-v169-rpg-ui.js",
+      "restoreOwner": "future server claim reconciliation (not implemented)",
       "deletionPolicy": "retain until owner-approved cleanup",
-      "corruptionBehavior": "block recovery/claim if gameplay critical",
-      "defaultBehavior": "safe default",
+      "corruptionBehavior": "block recovery and claim until reviewed",
+      "defaultBehavior": "block claim until reviewed",
       "missingDataBehavior": "block rewards and recovery"
     },
     {
