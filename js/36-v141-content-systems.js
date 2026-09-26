@@ -1003,7 +1003,7 @@
             const evasion=levelValue(skill.evasionBonusPercentByLevel,skill.evasionBonusPercent||0);
             const dodgeTargets=(supportTargeting.entries||[]).map(entry=>entry.monster);
             applyTimedMonsterBuff(dodgeTargets,"dodge",3,evasion);
-            addBattleLog(monster.name+"施放閃躲術，同排最多"+dodgeTargets.length+"名友方最終閃躲提升"+evasion+"個百分點，持續3回合。");
+            addBattleLog(monster.name+"施放閃躲術，同排最多"+dodgeTargets.length+"名友方最終閃躲提升"+evasion+"%，持續3回合。");
         }
         updateUI(); finishPlayerAction();
         return true;
