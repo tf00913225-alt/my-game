@@ -2,6 +2,12 @@
 
 本文件是長期工程進度來源。**每個 Phase 結束都必須更新本文件**；聊天、Commit、PR、CI 或部署成功不能取代驗收紀錄。
 
+## 2026-09-26 — Foundation B canonical schema and recovery contract (design only)
+
+- `docs/CLOUD_CANONICAL_SCHEMA_AND_RECOVERY.md` now specifies the planned server-owned account/character/economy/inventory/equipment/relic/progress/claim/operation/ledger records, a bounded materialized playable snapshot, revision and digest consistency gate, and a separate recovery point manifest. A valid player may have one or two created characters; unused slots remain explicitly empty.
+- The first real gold/EXP/item mutation still requires idempotent operation receipt, ledger, expected revision and transaction together. Migration candidates and original-phone immutable copies cannot serve as authoritative recovery points. Corruption, missing registered sources or UID mismatch must leave `authoritativeStateReady:false`.
+- This is a contract and future test skeleton, **not** a canonical writer, server backup, restore implementation, accepted legacy baseline or fresh-device acceptance. Phase 4 remains **IN PROGRESS / 0/6 VERIFIED**. The owner-observed `(default)` PITR and scheduled backup switches remain disabled; Firestore region remains unverified.
+
 ## 2026-09-26 — Legacy character identity screening (deployed; no admission)
 
 - Migration policy requires a literal, nonblank string character ID; numeric IDs no longer pass by implicit string coercion. It rejects a new candidate if slot 3 exists without slot 2; the read-only screening reports `CHARACTER_SLOT_GAP` for previously stored candidates. A one-character or two-character party remains valid because the game creates those slots progressively.
