@@ -31,6 +31,7 @@ function validSave(){
         selectedCreationElement:"fire",
         characterEquipment:{},
         characterSkillLoadouts:{},
+        allyFormation:{version:1,characterIndexToSlot:{0:"ALLY_F2"}},
         autoConfig:{},
         autoConfig2:{},
         autoConfig3:{},
@@ -87,6 +88,15 @@ test("migration policy rejects unsupported fields and impossible character level
     const badLevel=validSave();
     badLevel.player.level=101;
     assert.throws(()=>policy.validateLegacySaveCandidate(badLevel),/integer from 1 to 100/);
+});
+
+test("the live save owner's ally formation survives candidate validation without changing its bytes",()=>{
+    const save=validSave();
+    const result=policy.validateLegacySaveCandidate(save);
+    assert.deepEqual(result.snapshot.allyFormation,save.allyFormation);
+    assert.equal(result.byteLength,Buffer.byteLength(JSON.stringify(save),"utf8"));
+    const unknown={...save,serverGrantedGold:999};
+    assert.throws(()=>policy.validateLegacySaveCandidate(unknown),/unsupported top-level field/);
 });
 
 test("migration candidate requires a string character identity without rejecting an unfinished party",()=>{

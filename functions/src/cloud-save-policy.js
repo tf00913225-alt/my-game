@@ -24,6 +24,7 @@ const ALLOWED_SAVE_KEYS=new Set([
     "selectedCreationElement",
     "characterEquipment",
     "characterSkillLoadouts",
+    "allyFormation",
     "autoConfig",
     "autoConfig2",
     "autoConfig3",

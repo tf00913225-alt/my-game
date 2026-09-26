@@ -2,6 +2,11 @@
 
 本文件是長期工程進度來源。**每個 Phase 結束都必須更新本文件**；聊天、Commit、PR、CI 或部署成功不能取代驗收紀錄。
 
+## 2026-09-26 — live formation field and canonical source screening (candidate)
+
+- `saveGame()` persists `allyFormation` but the candidate field allowlist previously omitted it. The backend now preserves that field; the read-only candidate screen blocks invalid/duplicate/orphaned formation slots and missing economy, skill or relic source fields. This closes a real save-schema drift without trusting client history or making a playable canonical projection.
+- No baseline acceptance, authoritative writer, server backup or second-device character restore is implemented. Phase 4 remains **IN PROGRESS / 0/6 VERIFIED**. PR, emulator, merge and exact deployment evidence are tracked separately.
+
 ## 2026-09-26 — Persisted-state owner drift and CI guard strengthening (candidate)
 
 - Full runtime search found no active writer/reader for UID `equipment-shop-purchases`; it survives only as a historical legacy translation/backup key. The 39-entry registry now names that actual preservation owner, removes the false shop-UI writer claim and blocks missing/corrupt claim history pending review. No legacy key or backup is deleted.
