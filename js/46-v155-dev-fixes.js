@@ -38,7 +38,7 @@
         targetType:"allyAll",baseHeal:100,baseHealSP:100,
         cleanseChance:35,evasionBonusPercent:15,
         duration:2,
-        description:"對我方全體施放祝福，每個目標獨立有35%機率解除身上負面狀態，恢復100 HP、100 SP，並使最終閃躲+15個百分點，持續2回合。"
+        description:"對我方全體施放祝福，每個目標獨立有35%機率解除身上負面狀態，恢復100 HP、100 SP，並使最終閃躲+15%，持續2回合。"
     });
     if(typeof skillDatabase!=="undefined"&&skillDatabase.yuanZuBlessing){
         delete skillDatabase.yuanZuBlessing.agilityBonusPercent;
