@@ -10,6 +10,9 @@
     window.__battleFloatingFeedbackOwnerInstalled=true;
 
     const MAX_LANES=4;
+    const LANE_PITCH_PX=25;
+    const LANE_RENDER_HEIGHT_PX=23;
+    const LANE_BOTTOM_INSET_PX=6;
     const DEFAULT_DURATION=980;
     const contexts=new Map();
     let sequence=0;
@@ -105,9 +108,30 @@
         finishRequest(request,"cancelled");
         if(context){ pump(context); }
     }
-    function freeLane(context){
+    function laneMetrics(context){
+        const geometry=currentGeometry(context.side,context.index);
+        if(!geometry||!geometry.feedbackSafeRect){ return null; }
+        const safe=geometry.feedbackSafeRect;
+        const anchor=geometry.feedbackAnchor||{
+            x:safe.left+safe.width/2,
+            y:safe.bottom-LANE_BOTTOM_INSET_PX
+        };
+        const baseline=Math.min(
+            numeric(anchor.y,safe.bottom-LANE_BOTTOM_INSET_PX),
+            safe.bottom-LANE_BOTTOM_INSET_PX
+        );
+        const upwardRoom=Math.max(0,baseline-safe.top-LANE_RENDER_HEIGHT_PX);
+        const capacity=Math.max(1,Math.min(
+            MAX_LANES,
+            Math.floor(upwardRoom/LANE_PITCH_PX)+1
+        ));
+        return {geometry:geometry,safe:safe,anchor:anchor,baseline:baseline,capacity:capacity};
+    }
+    function freeLane(context,metrics){
+        const resolved=metrics||laneMetrics(context);
+        if(!resolved){ return -1; }
         const used=new Set(Array.from(context.active.values()).map(request=>request.lane));
-        for(let lane=0;lane<MAX_LANES;lane++){ if(!used.has(lane)){ return lane; } }
+        for(let lane=0;lane<resolved.capacity;lane++){ if(!used.has(lane)){ return lane; } }
         return -1;
     }
     function formatCritical(text){
@@ -118,19 +142,13 @@
     }
     function spawn(context,request,lane){
         if(request.cancelled||request.finished){ return false; }
-        const geometry=currentGeometry(context.side,context.index);
-        if(!geometry||!geometry.unitRect||!geometry.feedbackSafeRect){
+        const metrics=laneMetrics(context);
+        if(!metrics||!metrics.geometry.unitRect){
             finishRequest(request,"missing-geometry");
             return false;
         }
-        const safe=geometry.feedbackSafeRect;
-        const anchor=geometry.feedbackAnchor||{
-            x:safe.left+safe.width/2,
-            y:safe.bottom-10
-        };
-        const laneSpacing=Math.max(14,Math.min(24,safe.height/Math.max(1,MAX_LANES)));
-        const lowest=Math.min(anchor.y,safe.bottom-9);
-        const laneY=Math.max(safe.top+9,lowest-lane*laneSpacing);
+        const anchor=metrics.anchor;
+        const laneY=metrics.baseline-lane*LANE_PITCH_PX;
         const critical=request.critical===true;
         const node=document.createElement("div");
         node.className="battle-floating-feedback battle-floating-feedback-"+request.kind+(critical?" is-critical":"");
@@ -160,7 +178,8 @@
     function pump(context){
         if(!context){ return; }
         while(context.queue.length){
-            const lane=freeLane(context);
+            const metrics=laneMetrics(context);
+            const lane=freeLane(context,metrics);
             if(lane<0){ break; }
             const request=context.queue.shift();
             if(!request||request.cancelled||request.finished){ continue; }
@@ -221,11 +240,15 @@
         document.querySelectorAll&&document.querySelectorAll(".battle-floating-feedback").forEach(node=>node.remove());
     }
     function debugSnapshot(){
-        return Array.from(contexts.values()).map(context=>({
-            key:context.key,
-            active:Array.from(context.active.values()).map(request=>({id:request.id,lane:request.lane,kind:request.kind})),
-            queued:context.queue.map(request=>({id:request.id,kind:request.kind}))
-        }));
+        return Array.from(contexts.values()).map(context=>{
+            const metrics=laneMetrics(context);
+            return {
+                key:context.key,
+                capacity:metrics?metrics.capacity:0,
+                active:Array.from(context.active.values()).map(request=>({id:request.id,lane:request.lane,kind:request.kind})),
+                queued:context.queue.map(request=>({id:request.id,kind:request.kind}))
+            };
+        });
     }
 
     const api=Object.freeze({
