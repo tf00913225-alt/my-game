@@ -119,7 +119,9 @@ test("read-only draft keeps empty slots and equipped objects separate from the b
         abyssProgress:{runs:{}}};
     save.bestiaryData={wolf:3};save.autoConfig={threshold:20};
     const sidecars=Object.fromEntries(LEGACY_BACKUP_SIDECARS.map(key=>[
-        key,{status:"present",raw:key==="bulk-sell-quality"?"white":"{}"}
+        key,{status:"present",raw:key==="bulk-sell-quality"?"white":
+            key==="quest-milestones"?JSON.stringify({date:"2026-09-26",daily:{},commission:{}}):
+            key==="abyss-state"?JSON.stringify(save.abyssProgress):"{}"}
     ]));
     const draft=prepareLegacyCharacterDraft(save,sidecars);
     assert.deepEqual(draft.slots,[save.player,null,null]);
@@ -152,6 +154,12 @@ test("read-only draft keeps empty slots and equipped objects separate from the b
     assert.ok(screenLegacyCandidateSnapshot(save,missing).blockers.includes("SIDECAR_BACKUP_MISSING"));
     const incomplete={...sidecars};delete incomplete["rested-exp-state"];
     assert.equal(prepareLegacyCharacterDraft(save,incomplete),null);
+    const diverged={...sidecars,"abyss-state":{status:"present",raw:JSON.stringify({runs:{
+        20:{rewardClaims:{one:{status:"claimed"}},firstClearClaims:{}}
+    }})}};
+    assert.equal(prepareLegacyCharacterDraft(save,diverged),null);
+    assert.ok(screenLegacyCandidateSnapshot(save,diverged).blockers.includes(
+        "ABYSS_SIDECAR_CLAIM_MIRROR_CONFLICT"));
     assert.equal(prepareLegacyCharacterDraft({...save,characterSkillLoadouts:{fire:{}}},sidecars),null);
     assert.equal(prepareLegacyCharacterDraft({...save,teamLoadout:{relicId:"absent"}},sidecars),null);
 });

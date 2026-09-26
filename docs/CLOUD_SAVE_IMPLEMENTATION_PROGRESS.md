@@ -2,6 +2,11 @@
 
 本文件是長期工程進度來源。**每個 Phase 結束都必須更新本文件**；聊天、Commit、PR、CI 或部署成功不能取代驗收紀錄。
 
+## 2026-09-26 — historical claim source reconciliation (candidate)
+
+- Read-only reward audit now parses `quest-milestones` claimed thresholds with its recorded date and compares `abyss-state` claim entries against the mirrored main-save `abyssProgress`. Invalid milestone thresholds or contradictory Abyss claim mirrors block character draft preparation. Historical entries remain duplicate blocks only, never evidence of an unpaid reward. Earlier dates that the client no longer retains remain unverifiable.
+- No canonical character or reward writer, claim ledger, accepted baseline, durable server recovery point or second-device restore was introduced. Local targeted checks and PR/merge/deployment evidence are separate gates. Phase 4 remains **IN PROGRESS / 0/6 VERIFIED**.
+
 ## 2026-09-26 — complete legacy source retention in read-only draft (candidate)
 
 - The internal draft now retains all 23 allowlisted main-save fields through explicit conversion or present/missing markers and every one of the 14 registered sidecar sources with exact raw bytes or a missing marker. The server backup policy owns the sidecar inventory; the screening owner reuses it. Historical `equipment-shop-purchases` absence remains blocked and is never treated as unclaimed. Claim blockers remain even when character data can be translated for review.

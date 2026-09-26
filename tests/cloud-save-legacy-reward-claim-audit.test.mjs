@@ -35,3 +35,29 @@ test("missing or contradictory historical reward records fail closed",()=>{
     assert.ok(review.blockers.includes("DAILY_QUESTS_CLAIM_RECORD_INVALID"));
     assert.ok(review.blockers.includes("ABYSS_CLAIM_RECORD_INVALID"));
 });
+
+test("milestone and Abyss sidecars preserve blocked claims and reject conflicting mirrors",()=>{
+    const save=validSave();
+    const sidecars={
+        "quest-milestones":{status:"present",raw:JSON.stringify({
+            date:"2026-09-25",daily:{20:true,40:false},commission:{100:true}
+        })},
+        "abyss-state":{status:"present",raw:JSON.stringify(save.abyssProgress)}
+    };
+    const review=auditLegacyRewardClaims(save,sidecars);
+    assert.deepEqual(review.blockers,["HISTORICAL_REWARDS_UNVERIFIED"]);
+    assert.deepEqual(review.sources.find(x=>x.source==="quest_milestones").claimedKeys,
+        ["2026-09-25:commission:100","2026-09-25:daily:20"]);
+    assert.equal(review.sources.find(x=>x.source==="abyss_sidecar").disposition,
+        CLAIM_DISPOSITION);
+    assert.equal(review.historicalGrantable,false);
+
+    const changed=JSON.parse(sidecars["abyss-state"].raw);
+    changed.runs[20].firstClearClaims={};
+    const mismatch=auditLegacyRewardClaims(save,{...sidecars,
+        "abyss-state":{status:"present",raw:JSON.stringify(changed)}});
+    assert.ok(mismatch.blockers.includes("ABYSS_SIDECAR_CLAIM_MIRROR_CONFLICT"));
+    const malformed=auditLegacyRewardClaims(save,{...sidecars,
+        "quest-milestones":{status:"present",raw:JSON.stringify({date:"2026-09-25",daily:{30:true},commission:{}})}});
+    assert.ok(malformed.blockers.includes("QUEST_MILESTONES_CLAIM_RECORD_INVALID"));
+});

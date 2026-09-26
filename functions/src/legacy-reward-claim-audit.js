@@ -71,14 +71,70 @@ function auditAbyssState(value){
     return {source:"abyss",status:"blocked",claimedKeys:claimedKeys.sort(),disposition:CLAIM_DISPOSITION};
 }
 
-function auditLegacyRewardClaims(save){
+function parseSidecar(sidecars,key){
+    if(sidecars?.[key]?.status!=="present"){ return null; }
+    try{ return JSON.parse(sidecars[key].raw); }
+    catch(_){ return null; }
+}
+
+function auditMilestoneSidecar(sidecars){
+    if(sidecars?.["quest-milestones"]?.status!=="present"){ return null; }
+    const value=parseSidecar(sidecars,"quest-milestones");
+    if(!isPlainObject(value)||!/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(value.date||"")||
+       !isBooleanMap(value.daily)||!isBooleanMap(value.commission)||
+       [value.daily,value.commission].some(map=>Object.keys(map).some(key=>
+           !["20","40","60","80","100"].includes(key)))){
+        return {source:"quest_milestones",status:"blocked",blocker:"CLAIM_RECORD_INVALID"};
+    }
+    const claimedKeys=["daily","commission"].flatMap(type=>
+        Object.keys(value[type]).filter(key=>value[type][key])
+            .map(key=>`${value.date}:${type}:${key}`)).sort();
+    return {source:"quest_milestones",status:"blocked",claimedKeys,
+        disposition:CLAIM_DISPOSITION};
+}
+
+function claimEntries(value){
+    if(!isPlainObject(value)||!isPlainObject(value.runs)){ return null; }
+    const entries=[];
+    for(const [runId,run] of Object.entries(value.runs)){
+        if(!isPlainObject(run)||!isPlainObject(run.rewardClaims)||
+           !isPlainObject(run.firstClearClaims)){ return null; }
+        for(const field of ["rewardClaims","firstClearClaims"]){
+            for(const [key,claim] of Object.entries(run[field])){
+                if(!isPlainObject(claim)||!["granting","claimed"].includes(claim.status)){
+                    return null;
+                }
+                entries.push(`${runId}:${field}:${key}:${claim.status}`);
+            }
+        }
+    }
+    return entries.sort();
+}
+
+function auditAbyssSidecar(save,sidecars){
+    if(sidecars?.["abyss-state"]?.status!=="present"){ return null; }
+    const main=claimEntries(save.abyssProgress);
+    const mirrored=claimEntries(parseSidecar(sidecars,"abyss-state"));
+    if(!main||!mirrored){
+        return {source:"abyss_sidecar",status:"blocked",blocker:"CLAIM_RECORD_INVALID"};
+    }
+    if(JSON.stringify(main)!==JSON.stringify(mirrored)){
+        return {source:"abyss_sidecar",status:"blocked",blocker:"CLAIM_MIRROR_CONFLICT"};
+    }
+    return {source:"abyss_sidecar",status:"blocked",claimedKeys:mirrored,
+        disposition:CLAIM_DISPOSITION};
+}
+
+function auditLegacyRewardClaims(save,sidecars=null){
     const audits=[
         auditQuestState(save.dailyQuestState,"daily_quests"),
         auditQuestState(save.commissionQuestState,"commission_quests"),
         auditAchievementState(save.achievementState),
         auditTowerState(save.gameplayProgress),
-        auditAbyssState(save.abyssProgress)
-    ];
+        auditAbyssState(save.abyssProgress),
+        auditMilestoneSidecar(sidecars),
+        auditAbyssSidecar(save,sidecars)
+    ].filter(Boolean);
     const blockers=new Set(["HISTORICAL_REWARDS_UNVERIFIED"]);
     audits.filter(audit=>audit.blocker).forEach(audit=>blockers.add(`${audit.source.toUpperCase()}_${audit.blocker}`));
     return Object.freeze({
