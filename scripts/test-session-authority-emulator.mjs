@@ -297,6 +297,12 @@ assert.equal((await db.doc(`serverUsers/${y}/playableSnapshots/4`).get())
 assert.equal((await db.doc(`serverUsers/${y}/ledgerEntries/${goldOperation}`).get())
     .get("balanceAfter"),25);
 assert.equal((await goldWriter.creditReservedGrant(yRequest,creditArgs)).unchanged,true);
+const reserveReplay=await invoke("reserveTrustedGrant",yUser.idToken,{
+    uid:y,session:sessionY,grantId:grantIdForCharacter,
+    operationId:goldOperation,expectedRevision:2});
+assert.equal(reserveReplay.unchanged,true);
+assert.equal(reserveReplay.creditedToCharacter,true);
+assert.equal(reserveReplay.creditRevision,4);
 assert.equal((await db.doc(`users/${y}/saves/current`).get()).get("authoritativeStateReady"),false);
 await rejected("protectedTest",yUser.idToken,{uid:x,session:sessionB},"SESSION_INVALID");
 await rejected("protectedTest",yUser.idToken,{uid:y,session:{...sessionB,uid:y}},"SESSION_INVALID");
