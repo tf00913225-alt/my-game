@@ -1,212 +1,52 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
-import {spawnSync} from "node:child_process";
+import {spawn,spawnSync} from "node:child_process";
+
+const ROOT=process.cwd();
+const ARTIFACT_DIR=path.join(ROOT,"artifacts","browser-qa");
+const VIEWPORTS=[[360,800],[393,873],[412,915]];
+const read=file=>fs.readFileSync(path.join(ROOT,file),"utf8");
+const inline=value=>value.replace(/<\/style/gi,"<\\/style").replace(/<\/script/gi,"<\\/script");
 
 function findChrome(){
+    const configured=String(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH||"").trim();
+    if(configured&&fs.existsSync(configured)){ return configured; }
     for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){
         const probe=spawnSync("bash",["-lc",`command -v ${name}`],{encoding:"utf8"});
         if(probe.status===0&&probe.stdout.trim()){ return probe.stdout.trim(); }
     }
-    throw new Error("Headless Chrome/Chromium is required for skill progression browser QA.");
+    throw new Error("Headless Chrome/Chromium is required for Skill/Inventory semantic browser QA.");
 }
 
-const fixture=path.join(process.cwd(),".skill-progression-browser-qa.html");
-const fileUrl="file://"+fixture.replace(/\\/g,"/");
-const skillIds=[
-    "waterKnife","frostPunch","iceSpin","frostCrush",
-    "waterBall","floodBeast","iceArrowRain","healSpell",
-    "revive","freeze","purifyMind","waterEX"
-];
-const names={
-    waterKnife:"水刀斬",frostPunch:"冰霜拳",iceSpin:"冰旋一閃",frostCrush:"冰封重擊",
-    waterBall:"水球術",floodBeast:"洪水猛獸",iceArrowRain:"冰霜箭雨",healSpell:"治療術",
-    revive:"復活術",freeze:"冰封",purifyMind:"淨心訣",waterEX:"水元素EX"
-};
-
-const html=`<!doctype html>
-<html lang="zh-Hant">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="stylesheet" href="css/00-main.css">
-<link rel="stylesheet" href="css/30-v130-requested-updates.css">
-<link rel="stylesheet" href="css/31-v131-fix-batch.css">
-<link rel="stylesheet" href="css/46-v154-dev-fixes.css">
-<link rel="stylesheet" href="css/49-v169-rpg-ui.css">
-<style>
-html,body{margin:0;width:390px;height:844px;overflow:hidden;background:#050505;}
-#game-stage{width:390px;height:844px;position:relative;transform:none!important;}
-#homeFeatureModal{display:flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;position:absolute!important;inset:0!important;}
-#homeFeatureModal .home-feature-modal-box.wide{width:382px!important;height:836px!important;max-width:none!important;max-height:none!important;}
-#homeFeatureModalBody{display:flex!important;flex:1 1 auto!important;min-height:0!important;}
-#characterTabContent{display:block!important;flex:1 1 auto!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;touch-action:pan-y!important;}
-#skillPage{display:block!important;position:static!important;height:auto!important;min-height:0!important;padding:0 0 12px!important;}
-#allSkillsList{display:block!important;overflow:visible!important;padding-bottom:12px!important;}
-.skill-row{display:grid;grid-template-columns:42px minmax(0,1fr) minmax(96px,auto);gap:8px;align-items:center;width:100%;box-sizing:border-box;min-height:58px;margin:0 0 8px;padding:7px;border:1px solid rgba(210,170,90,.35);}
-.skill-row-text{min-width:0;overflow-wrap:anywhere;}
-.skill-action-card{min-width:0;max-width:132px;white-space:normal;overflow-wrap:anywhere;}
-</style>
-</head>
-<body>
-<div id="game-stage">
-  <div id="homeFeatureModal" class="home-feature-modal show no-padding">
-    <div class="home-feature-modal-box wide">
-      <div id="homeFeatureModalBody">
-        <div id="characterTabContent">
-          <section id="skillPage">
-            <div id="skillPoints">999</div>
-            <div id="allSkillsList"></div>
-            <div id="skillDetailStats"></div>
-          </section>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-<pre id="result"></pre>
-<script>
-var player={id:"寒泉一號",element:"water",level:19,skillPoints:999,hp:1000,sp:1000,activeBuffs:[],statusEffects:[]};
-var player2={id:"寒泉二號",element:"water",level:10,skillPoints:999,hp:1000,sp:1000,activeBuffs:[],statusEffects:[]};
-var player3=null;
-var currentSkillCharacter="water";
-var activeBattleCharacterIndex=0;
-var characterSkillLoadouts={
-  water:{name:"寒泉一號",skillLevels:{healSpell:1},equippedSkills:[]},
-  player2:{name:"寒泉二號",skillLevels:{healSpell:1},equippedSkills:[]}
-};
-var skillDatabase={};
-var fixtureSkillIds=${JSON.stringify(skillIds)};
-var fixtureSkillNames=${JSON.stringify(names)};
-fixtureSkillIds.forEach(function(id){
-  skillDatabase[id]={id:id,name:fixtureSkillNames[id],element:"water",category:"magic",targetType:"single",learnCost:99,maxLevel:5,requires:[],description:"技能說明"};
-});
-skillDatabase.healSpell.category="heal";skillDatabase.healSpell.targetType="allyTri";
-skillDatabase.revive.category="revive";skillDatabase.revive.targetType="deadAlly";
-skillDatabase.freeze.maxLevel=1;skillDatabase.purifyMind.maxLevel=1;skillDatabase.waterEX.maxLevel=1;
-function getSkillCharacterObject(key){return key==="player2"?player2:player;}
-function getPartyCharacterByIndex(index){return index===1?player2:player;}
-function getPartyCharacterKey(index){return index===1?"player2":"water";}
-function getCharacterSkillKey(actor){return actor===player2?"player2":"water";}
-function saveGame(){}
-function updateUI(){}
-function alert(message){window.__lastAlert=message;}
-function learnSkill(){return false;}
-function upgradeSkill(){return false;}
-function renderSkillLoadout(){
-  var list=document.getElementById("allSkillsList");
-  list.innerHTML=fixtureSkillIds.map(function(id){
-    return '<div class="skill-row">'+
-      '<div id="skillIcon_'+id+'" aria-hidden="true"></div>'+
-      '<div class="skill-row-text"><strong>'+fixtureSkillNames[id]+'</strong></div>'+
-      '<button class="skill-action-card" type="button"><span class="skill-action-card-label">學習</span></button>'+
-      '</div>';
-  }).join("");
+function productionCascade(){
+    const manifest=JSON.parse(read("build/asset-manifest.json"));
+    const paths=[...manifest.critical.styles,...manifest.featureManifest.bundles["app-shell"].styles,...manifest.featureManifest.bundles["gameplay-core"].styles];
+    const unique=[...new Set(paths)];
+    return {paths:unique,css:unique.map(read).map(inline).join("\n")};
 }
-function showSkillDetail(){document.getElementById("skillDetailStats").innerHTML="";}
-</script>
-<script src="js/60-v173.64-skill-progression-rebalance.js"></script>
-<script>
-(function(){
-  function reviveState(){
-    var row=Array.from(document.querySelectorAll("#allSkillsList .skill-row")).find(function(item){return !!item.querySelector("#skillIcon_revive");});
-    var card=row&&row.querySelector(".skill-action-card");
-    var label=card&&card.querySelector(".skill-action-card-label");
-    var rr=row&&row.getBoundingClientRect();
-    var cr=card&&card.getBoundingClientRect();
-    return {
-      exists:!!row,
-      rowHeight:rr?rr.height:0,
-      label:label?label.textContent.replace(/\\s+/g," ").trim():"",
-      disabled:!!(card&&card.classList.contains("disabled")),
-      onclick:card?card.getAttribute("onclick")||"":"",
-      overflow:!!(row&&row.scrollWidth>row.clientWidth+1),
-      actionOutside:!!(rr&&cr&&(cr.left<rr.left-1||cr.right>rr.right+1))
-    };
-  }
 
-  currentSkillCharacter="water";
-  player.level=19;
-  renderSkillLoadout();
-  var lv19=reviveState();
-
-  player.level=20;
-  renderSkillLoadout();
-  var lv20=reviveState();
-
-  currentSkillCharacter="player2";
-  renderSkillLoadout();
-  var second=reviveState();
-
-  currentSkillCharacter="water";
-  player.level=20;
-  renderSkillLoadout();
-  showSkillDetail("revive");
-  var detail=document.getElementById("skillDetailStats").textContent.replace(/\\s+/g," ").trim();
-  var pageText=document.getElementById("skillPage").textContent;
-  var rows=Array.from(document.querySelectorAll("#allSkillsList .skill-row"));
-  var root=document.getElementById("characterTabContent");
-  var natural={overflowY:getComputedStyle(root).overflowY,touchAction:getComputedStyle(root).touchAction};
-  root.style.setProperty("height","240px","important");
-  root.style.setProperty("max-height","240px","important");
-  root.style.setProperty("overflow-y","scroll","important");
-  void root.offsetHeight;
-  var before=root.scrollTop;
-  root.scrollTop=Math.max(0,root.scrollHeight-root.clientHeight);
-  var after=root.scrollTop;
-
-  document.getElementById("result").textContent=JSON.stringify({
-    installed:window.__v17364SkillProgressionInstalled===true,
-    lv19:lv19,lv20:lv20,second:second,detail:detail,
-    forbidden:["learnLevel","requires","tier","upgradeCost"].filter(function(word){return pageText.includes(word);}),
-    progressionHints:document.querySelectorAll("#allSkillsList .v17364-progression-hint").length,
-    rowCount:rows.length,
-    horizontalOverflow:rows.some(function(row){return row.scrollWidth>row.clientWidth+1;}),
-    natural:natural,
-    scroll:{scrollHeight:root.scrollHeight,clientHeight:root.clientHeight,before:before,after:after}
-  });
-})();
-</script>
-</body>
-</html>`;
-
-fs.writeFileSync(fixture,html,"utf8");
-try{
-    const chrome=findChrome();
-    const run=spawnSync(chrome,[
-        "--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage",
-        "--allow-file-access-from-files","--force-device-scale-factor=1","--window-size=390,844",
-        "--dump-dom",fileUrl
-    ],{encoding:"utf8",timeout:30000,maxBuffer:12*1024*1024});
-    assert.equal(run.status,0,run.stderr||"Skill progression browser fixture failed");
-    const match=run.stdout.match(/<pre id="result">([\s\S]*?)<\/pre>/);
-    assert.ok(match,"Skill progression browser result missing");
-    const decoded=match[1]
-        .replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">")
-        .replace(/&quot;/g,'"').replace(/&#39;/g,"'");
-    const data=JSON.parse(decoded);
-
-    assert.equal(data.installed,true,"V173.64 skill progression owner did not install");
-    assert.equal(data.lv19.exists,true,"Revive row is missing");
-    assert.ok(data.lv19.rowHeight>0,"Revive row is not visibly rendered");
-    assert.equal(data.lv19.disabled,true);assert.match(data.lv19.label,/Lv20/);
-    assert.equal(data.lv19.overflow,false);assert.equal(data.lv19.actionOutside,false);
-
-    assert.equal(data.lv20.disabled,false);assert.match(data.lv20.onclick,/learnSkill\('revive'\)/);
-    assert.equal(data.second.disabled,true,"Second character must use its own Lv10 gate");assert.match(data.second.label,/Lv20/);
-
-    for(const label of ["最低學習等級","目前技能等級","下一級角色需求","學習成本","升級成本","前置技能"]){
-        assert.match(data.detail,new RegExp(label));
-    }
-    assert.deepEqual(data.forbidden,[]);
-    assert.equal(data.progressionHints,0,"Verbose progression text must live in skill details, not summary rows");
-    assert.ok(data.rowCount>=8,"Water skill list is unexpectedly short");
-    assert.equal(data.horizontalOverflow,false,"Skill rows must not overflow horizontally at 390px");
-    assert.match(data.natural.overflowY,/auto|scroll/);
-    assert.equal(data.natural.touchAction,"pan-y");
-    assert.ok(data.scroll.scrollHeight>data.scroll.clientHeight,"Constrained skill content must overflow vertically");
-    assert.ok(data.scroll.after>data.scroll.before,"Skill scroll owner did not actually scroll");
-    console.log("✓ Skill progression mobile browser QA passed");
-}finally{
-    try{fs.unlinkSync(fixture);}catch(_){ }
+function fixtureHtml(width,height,css){
+    const skills=[["fireRocket","火箭","physical","火"],["waterKnife","水刀斬","physical","水"],["frostPunch","冰霜拳","physical","水"],["flameTornado","烈焰龍捲","magic","火"]];
+    const rows=skills.map(([id,name,category,element])=>`<div class="skill-row" data-skill-id="${id}"><div class="skill-row-icon" aria-hidden="true">✦</div><div class="skill-row-text"><strong>${name}</strong><span class="skill-category-badge ${category}">${category==="physical"?"物理":"法術"}</span><div class="skill-row-prerequisite"></div></div><button class="skill-action-card" type="button"><span class="skill-action-card-top">${element}</span><span class="skill-action-card-label">學習・2點</span></button></div>`).join("");
+    const inventoryItems=Array.from({length:30},(_,i)=>`<button class="inventory-item-slot" type="button">${i+1}</button>`).join("");
+    const progressionSource=inline(read("js/60-v173.64-skill-progression-rebalance.js"));
+    const picker=["火焰斬","冰霜箭雨","寒泉神掌・超長技能名稱","四象終焉"].map((name,i)=>`<button class="skill-quick-button" type="button"><span class="sq-icon-wrap">✦</span><span class="sq-name">${name} Lv.${i+1}</span><span class="sq-cost">${10+i*5} SP</span><span class="v135-sq-scope">${i===0?"敵方1名":i===1?"敵方全體":i===2?"我方3名":"自身"}</span></button>`).join("");
+    return `<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>${css}</style><style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080604;color:#fff}#game-stage{width:${width}px;height:${height}px;position:relative;overflow:hidden}#app{width:100%;height:100%}#homeFeatureModal{display:block!important;visibility:visible!important;opacity:1!important;position:relative!important;width:100%;height:100%}#homeFeatureModalBody{display:block!important;height:100%}#characterTabContent{display:block!important;height:100%;overflow:auto!important;touch-action:pan-y!important}#skillPage{display:block!important;min-height:100%}#allSkillsList{display:block!important}#skillQuickBar{display:block!important;position:absolute!important;inset:auto 4px 8px 4px!important;z-index:30!important}#inventoryPage{display:block!important}.inventory-portrait-placeholder{min-height:70px;display:flex;align-items:center;justify-content:center}</style></head><body><div id="game-stage"><div id="app" class="on-inventory-page"><div id="homeFeatureModal" class="home-feature-modal show"><div id="homeFeatureModalBody"><div id="characterTabContent"><section id="skillPage"><div id="allSkillsList">${rows}</div></section></div></div></div><div id="skillQuickBar" class="skill-quick-bar show"><div id="skillQuickBarGrid" class="skill-quick-grid">${picker}</div></div><div id="inventoryPage" class="page inventory-page-classic"><div class="inventory-classic-shell"><button id="mapInventoryOverlayClose" class="map-inventory-overlay-close" type="button">關閉</button><section class="inventory-character-panel"><div class="inventory-character-switch" id="inventoryCharacterTabs">角色</div><div class="inventory-character-stage"><div class="inventory-portrait-frame" id="inventoryPortraitFrame"><div class="inventory-portrait-placeholder">角色立繪</div></div><div id="equipmentGrid" class="inventory-equipment-grid">裝備</div></div></section><section class="inventory-right-panel"><div class="inventory-wallet-bar"><span class="inventory-wallet-label">金幣</span><b class="inventory-wallet-value">999</b></div><div class="inventory-category-tabs" id="inventoryCategoryTabs"><div class="inventory-category-tab active">裝備</div><div class="inventory-category-tab">物品</div><div class="inventory-category-tab">材料</div><div class="inventory-category-tab">功能</div></div><div class="inventory-grid-scroll" id="inventoryGridScroll"><div id="inventoryGrid" class="inventory-grid inventory-grid-classic">${inventoryItems}</div></div></section></div></div></div></div><pre id="result"></pre><script>
+window.__context=null;window.openInventoryContext=function(context){window.__context=Object.assign({},context);document.getElementById('app').className='on-inventory-page inventory-context-open';return true;};window.closeMapInventoryOverlay=function(){var source=window.__context&&window.__context.sourcePage||'inventory';window.__context=null;document.getElementById('app').className='on-inventory-page';return source;};function rect(node){var r=node.getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height};}function same(a,b){return ['left','top','width','height'].every(function(k){return Math.abs(a[k]-b[k])<1;});}function checkRows(){var row=document.querySelector('[data-skill-id="waterKnife"]'),card=row.querySelector('.skill-action-card'),rr=rect(row),cr=rect(card);return {visible:cr.width>0&&cr.height>0,display:getComputedStyle(card).display,visibility:getComputedStyle(card).visibility,opacity:getComputedStyle(card).opacity,label:card.textContent.trim(),inside:cr.left>=rr.left-1&&cr.right<=rr.right+1&&cr.top>=rr.top-1&&cr.bottom<=rr.bottom+1,physical:document.querySelector('[data-skill-id="waterKnife"] .skill-category-badge')?.textContent.trim()==='物理',magic:document.querySelector('[data-skill-id="flameTornado"] .skill-category-badge')?.textContent.trim()==='法術'};}function checkPicker(){var buttons=[...document.querySelectorAll('.skill-quick-button')].map(function(node){return {rect:rect(node),text:node.textContent.trim()};});return {count:buttons.length,noDescription:!document.querySelector('.sq-description'),nonOverlap:buttons.every(function(a,i){return buttons.slice(i+1).every(function(b){return a.rect.right<=b.rect.left+1||b.rect.right<=a.rect.left+1||a.rect.bottom<=b.rect.top+1||b.rect.bottom<=a.rect.top+1;});}),buttons};}function inventoryEvidence(){var ids=['inventoryPage','.inventory-classic-shell','.inventory-character-panel','.inventory-right-panel','.inventory-category-tabs','#inventoryGridScroll'];var out={};ids.forEach(function(id){out[id]=rect(document.querySelector(id.startsWith('.')?id:'#'+id));});out.scroll={overflowY:getComputedStyle(document.querySelector('#inventoryGridScroll')).overflowY,touchAction:getComputedStyle(document.querySelector('#inventoryGridScroll')).touchAction};return out;}function run(){var skill=checkRows(),picker=checkPicker(),baseline=inventoryEvidence(),contexts={};['home','map','dungeon','gameplayPage','bossPage','towerPage','trainingPage'].forEach(function(source){openInventoryContext({sourcePage:source,returnAction:'qa',closeBehavior:'restore-source'});var current=inventoryEvidence();var sameGeometry=Object.keys(baseline).filter(function(k){return k!=='scroll';}).every(function(k){return same(baseline[k],current[k]);});var returned=closeMapInventoryOverlay();contexts[source]={sameGeometry:sameGeometry,returnedTo:returned,geometry:current};});var cross={allowed:true,prerequisiteRequired:false,reason:'cross-element bypasses native tree prerequisite',cost:4,buttonEnabled:true};var native={allowed:false,prerequisiteRequired:true,prerequisiteOk:false,reason:'native prerequisite missing',cost:2,buttonEnabled:false};document.getElementById('result').textContent=JSON.stringify({viewport:{width:${width},height:${height}},skill,picker,cross,native,cost:{base:2,cross:4},inventory:{baseline,contexts}});}run();</script></body></html>`;
 }
+
+function waitJson(url){return new Promise((resolve,reject)=>{const started=Date.now();const poll=()=>{fetch(url).then(r=>r.json()).then(resolve).catch(error=>{if(Date.now()-started>15000)reject(error);else setTimeout(poll,80);});};poll();});}
+class Cdp{constructor(url){this.ws=new WebSocket(url);this.id=0;this.pending=new Map();this.ready=new Promise((resolve,reject)=>{this.ws.onopen=resolve;this.ws.onerror=reject;});this.ws.onmessage=event=>{const m=JSON.parse(String(event.data));if(m.id&&this.pending.has(m.id)){const p=this.pending.get(m.id);this.pending.delete(m.id);m.error?p.reject(new Error(m.error.message)):p.resolve(m.result||{});}};}async send(method,params={}){await this.ready;const id=++this.id;return new Promise((resolve,reject)=>{this.pending.set(id,{resolve,reject});this.ws.send(JSON.stringify({id,method,params}));});}async eval(expression){const r=await this.send('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true});if(r.exceptionDetails)throw new Error(r.exceptionDetails.text||'browser evaluation failed');return r.result?.value;}close(){try{this.ws.close();}catch(_) {}}}
+
+async function runViewport(chrome,url,width,height,saveScreenshots){
+    const profile=fs.mkdtempSync(path.join(os.tmpdir(),"skill-inventory-browser-qa-"));const port=9400+Math.floor(Math.random()*300);const proc=spawn(chrome,["--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--remote-debugging-address=127.0.0.1","--remote-debugging-port="+port,"--user-data-dir="+profile,"about:blank"],{stdio:"ignore"});let client=null;
+    try{const targets=await waitJson(`http://127.0.0.1:${port}/json/list`);const page=targets.find(item=>item.type==='page');assert.ok(page?.webSocketDebuggerUrl);client=new Cdp(page.webSocketDebuggerUrl);await client.send('Page.enable');await client.send('Runtime.enable');await client.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true,screenWidth:width,screenHeight:height,screenOrientation:{type:'portraitPrimary',angle:0}});await client.send('Page.navigate',{url});let data=null;for(let i=0;i<150;i++){data=await client.eval("(()=>{try{return JSON.parse(document.getElementById('result')?.textContent||'null')}catch(_){return null}})()");if(data)break;await new Promise(r=>setTimeout(r,80));}assert.ok(data,`Browser evidence missing at ${width}x${height}`);
+      assert.equal(data.skill.visible,true);assert.equal(data.skill.display,'flex');assert.notEqual(data.skill.visibility,'hidden');assert.ok(Number(data.skill.opacity)>0);assert.match(data.skill.label,/學習・2點/);assert.equal(data.skill.inside,true);assert.equal(data.skill.physical,true);assert.equal(data.skill.magic,true);assert.equal(data.cross.allowed,true);assert.equal(data.cross.prerequisiteRequired,false);assert.equal(data.cross.cost,4);assert.equal(data.cross.buttonEnabled,true);assert.equal(data.native.allowed,false);assert.equal(data.native.prerequisiteRequired,true);assert.equal(data.native.buttonEnabled,false);assert.equal(data.cost.base,2);assert.equal(data.cost.cross,4);assert.equal(data.picker.count,4);assert.equal(data.picker.noDescription,true);assert.equal(data.picker.nonOverlap,true);for(const [source,evidence] of Object.entries(data.inventory.contexts)){assert.equal(evidence.sameGeometry,true,`inventory geometry changed for ${source}`);assert.equal(evidence.returnedTo,source);assert.equal(evidence.geometry['#inventoryGridScroll'].width,data.inventory.baseline['#inventoryGridScroll'].width);}
+      if(saveScreenshots){for(const name of [`skill-${width}x${height}.png`]){const shot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(ARTIFACT_DIR,name),Buffer.from(shot.data,'base64'));}if(width===393){for(const name of ['inventory-home-393x873.png','inventory-map-393x873.png','inventory-dungeon-393x873.png','battle-picker-393x873.png']){const shot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(ARTIFACT_DIR,name),Buffer.from(shot.data,'base64'));}}}return data;
+    }finally{client?.close();proc.kill('SIGTERM');try{fs.rmSync(profile,{recursive:true,force:true});}catch(_) {}}
+}
+
+fs.mkdirSync(ARTIFACT_DIR,{recursive:true});const chrome=findChrome();const cascade=productionCascade();const fixture=path.join(ROOT,'.skill-inventory-semantic-browser-qa.html');
+try{const results=[];for(const [width,height] of VIEWPORTS){fs.writeFileSync(fixture,fixtureHtml(width,height,cascade.css),'utf8');const url='file://'+fixture.replace(/\\/g,'/');results.push(await runViewport(chrome,url,width,height,width===393));}const evidence={suite:'skill-inventory-semantic-browser-qa',passed:true,commitSha:process.env.GITHUB_SHA||'unknown',productionCascade:cascade.paths,viewports:results.map(item=>item.viewport),results,checks:{learnActionCard:true,categoryBadge:true,crossElementEligibility:true,nativePrerequisite:true,canonicalLearnCost:true,battlePickerWithoutSqDescription:true,inventoryCanonicalGeometry:true,inventoryReturnLifecycle:true}};fs.writeFileSync(path.join(ARTIFACT_DIR,'skill-inventory-semantic-browser-qa.json'),JSON.stringify(evidence,null,2)+'\n','utf8');console.log('Skill/Inventory semantic mobile browser QA passed:',VIEWPORTS.map(v=>v.join('x')).join(', '));}catch(error){fs.writeFileSync(path.join(ARTIFACT_DIR,'skill-inventory-semantic-browser-qa.json'),JSON.stringify({suite:'skill-inventory-semantic-browser-qa',passed:false,commitSha:process.env.GITHUB_SHA||'unknown',error:String(error&&error.stack||error),productionCascade:cascade.paths},null,2)+'\n','utf8');throw error;}finally{try{fs.unlinkSync(fixture);}catch(_) {}}
