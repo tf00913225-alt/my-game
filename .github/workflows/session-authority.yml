@@ -110,6 +110,22 @@ jobs:
         with:
           credentials_json: ${{ secrets.FIREBASE_DEPLOY_SERVICE_ACCOUNT_JSON }}
           project_id: four-symbols-jianghu
+      - uses: google-github-actions/setup-gcloud@v2
+        continue-on-error: true
+      - name: Inspect Firestore recovery readiness (read only)
+        shell: bash
+        run: |
+          echo "### Firestore (default) recovery readiness at $GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
+          if database_json="$(gcloud firestore databases describe --database='(default)' --project=four-symbols-jianghu --format=json 2>/dev/null)"; then
+            DB_JSON="$database_json" node -e 'const d=JSON.parse(process.env.DB_JSON);const region=d.locationId||"UNVERIFIED";const pitr=d.pointInTimeRecoveryEnablement||"UNVERIFIED";console.log(`Region: ${region}; PITR: ${pitr}`)' | tee -a "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'Region: UNVERIFIED; PITR: UNVERIFIED (database metadata query unavailable)' | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+          if schedules_json="$(gcloud firestore backups schedules list --database='(default)' --project=four-symbols-jianghu --format=json 2>/dev/null)"; then
+            SCHEDULES_JSON="$schedules_json" node -e 'const s=JSON.parse(process.env.SCHEDULES_JSON);if(!Array.isArray(s))throw Error("Unexpected backup schedule response");console.log(`Scheduled backup count: ${s.length}`);for(const v of s)console.log(`Schedule: ${v.name||"UNVERIFIED"}; retention: ${v.retention||"UNVERIFIED"}`)' | tee -a "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'Scheduled backups: UNVERIFIED (schedule query unavailable)' | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
