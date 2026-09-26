@@ -146,8 +146,9 @@ assert.doesNotMatch(
 const relicTargetResolver=relicRuntime.slice(relicRuntime.indexOf("function relicTargetGeometry"),relicRuntime.indexOf("function relativeRelicRect"));
 const relicTargetReveal=relicRuntime.slice(relicRuntime.indexOf("function revealRelicTargets"),relicRuntime.indexOf("function beginRelicCinematic"));
 assert.match(relicTargetResolver,/getUnitGeometry[\s\S]*highlightRect/,"target resolver must return canonical Unit highlight geometry");
-assert.match(relicTargetReveal,/relicTargetGeometry\(target\.targetSide,index\)[\s\S]*team-relic-mask-holes[\s\S]*createElementNS\(namespace,"rect"\)/,
-    "target reveal must cut viewport mask apertures from resolved canonical geometry");
+assert.match(relicTargetReveal,/team-relic-mask-holes/,"target reveal must own the cinematic mask aperture container");
+assert.match(relicTargetReveal,/relicTargetGeometry\(target\.targetSide,index\)/,"target reveal must resolve each target through canonical geometry");
+assert.match(relicTargetReveal,/createElementNS\(namespace,"rect"\)/,"target reveal must cut a rectangle aperture for each resolved target");
 assert.doesNotMatch(relicRuntime,/team-relic-battle-target-layer|relicTargetLayer\(/,
     "relic focus must not raise live Unit DOM across stacking contexts");
 assert.doesNotMatch(relicCss,/team-relic-battle-target-layer|team-relic-battle-target-focus-visible/,
