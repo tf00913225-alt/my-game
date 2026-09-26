@@ -29,10 +29,10 @@ assert.match(relic,/RELIC_MIN_VISUAL_PROTECTION_MS=1200/,
 
 assert.match(relic,/function beginRelicCinematic\(def,target\)[\s\S]*classList\.add\("dim-visible"\)[\s\S]*waitMs\(RELIC_DIM_IN_MS\)[\s\S]*classList\.add\("identity-visible"\)[\s\S]*waitMs\(RELIC_IDENTITY_REVEAL_MS\)[\s\S]*waitMs\(RELIC_IDENTITY_HOLD_MS\)[\s\S]*classList\.add\("identity-exiting"\)[\s\S]*Promise\.all\(\[[\s\S]*waitMs\(RELIC_IDENTITY_EXIT_MS\)[\s\S]*revealRelicTargets\(target\)/,
   "cinematic prelude must serialize dim -> identity reveal -> 1.15s hold -> identity exit plus target reveal");
-assert.match(relic,/function relicTargetCard\(side,index\)[\s\S]*battleMonster[\s\S]*battlePlayerCard/,
-  "target lookup must resolve the actual battle unit roots");
-assert.match(relic,/function revealRelicTargets\(target\)[\s\S]*relicTargetCard\(target\.targetSide,index\)[\s\S]*team-relic-battle-target-focus-visible/,
-  "target reveal must focus those real unit roots so artwork, name and resource HUD brighten together");
+assert.match(relic,/function relicTargetGeometry\(side,index\)[\s\S]*getUnitGeometry/,
+  "target lookup must resolve canonical battlefield geometry");
+assert.match(relic,/function revealRelicTargets\(target\)[\s\S]*team-relic-mask-holes[\s\S]*team-relic-battle-target-outline/,
+  "target reveal must cut apertures and outlines from canonical Unit geometry");
 assert.match(relic,/function queueRelicPresentation\(def,onStart,visualContext\)[\s\S]*beginRelicCinematic\(def,resolvedTarget\)[\s\S]*enterRelicVfxPhase\(node\)[\s\S]*playRelicVfx\([\s\S]*resolvedTarget[\s\S]*relicGate&&relicGate\.promise[\s\S]*endRelicCinematic\(node\)/,
   "formal relic VFX must start only after target reveal, and battlefield restore must wait for the V143 gate to finish");
 assert.match(relic,/function endRelicCinematic\(node\)[\s\S]*classList\.add\("releasing"\)[\s\S]*waitMs\(RELIC_DIM_OUT_MS\)/,
@@ -51,8 +51,8 @@ assert.match(relic,/function cleanupRelicCutin\(\)[\s\S]*clearRelicTargetFocus\(
 
 assert.match(css,/\.team-relic-battle-presentation\.dim-visible \.team-relic-battle-dim\{opacity:\.75;\}/,
   "battlefield must dim to roughly 75 percent");
-assert.match(css,/\.team-relic-battle-presentation\{[^}]*position:absolute[^}]*inset:0/,
-  "relic dim presentation must cover the complete battlePage surface");
+assert.match(css,/body > \.team-relic-battle-presentation\{[^}]*position:fixed;inset:0;z-index:18090/,
+  "relic dim presentation must cover the browser viewport outside battlePage stacking contexts");
 assert.match(css,/\.team-relic-battle-cutin\{[^}]*width:min\(72vw,280px\)/,
   "relic identity group must be visibly larger");
 assert.match(css,/\.team-relic-battle-cutin-icon\{[^}]*width:clamp\(140px,44vw,210px\)[^}]*height:clamp\(140px,44vw,210px\)/,
@@ -69,10 +69,12 @@ assert.match(css,/\.team-relic-battle-cutin-icon\{[^}]*border:0[^}]*background:n
   "battle icon itself must have no box");
 assert.match(css,/\.team-relic-battle-cutin-copy\{[^}]*border:0[^}]*background:none[^}]*box-shadow:none[^}]*text-align:center/,
   "relic name must be centered under the icon with no box");
-assert.match(css,/\.battle-player\.team-relic-battle-target-focus,[\s\S]*\.battle-monster\.team-relic-battle-target-focus\{[^}]*z-index:18110!important[^}]*opacity:\.30!important[^}]*filter:brightness\(\.24\)/,
-  "real target roots must rise above the dim layer from a dark starting state");
-assert.match(css,/team-relic-battle-target-focus-visible\{[^}]*opacity:1!important[^}]*brightness\(1\.08\)/,
-  "target roots must gradually brighten to full readable artwork/HUD");
+assert.match(css,/\.team-relic-battle-target-focus-layer\{[\s\S]*position:absolute;inset:0;z-index:20/,
+  "target focus must live inside the viewport cinematic layer");
+assert.match(css,/\.team-relic-battle-target-outline\{[\s\S]*opacity:0[\s\S]*transition:opacity \.42s ease/,
+  "target outlines must reveal gradually without altering live Unit opacity");
+assert.doesNotMatch(css,/team-relic-battle-target-layer|team-relic-battle-target-focus-visible/,
+  "legacy live-DOM target stacking must remain retired");
 assert.match(css,/\.team-relic-battle-presentation\.releasing \.team-relic-battle-dim\{opacity:0;transition-duration:\.42s;\}/,
   "the battlefield must fade back up instead of snapping bright");
 
