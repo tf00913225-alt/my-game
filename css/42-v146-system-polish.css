@@ -41,16 +41,7 @@
     79%{transform:translate(-3px,3px) rotate(-.5deg)}
 }
 
-.v146-status-popup{
-    position:fixed;z-index:17100;min-width:66px;padding:4px 9px;border:1px solid currentColor;border-radius:999px;
-    color:#fff3b1;background:rgba(7,6,5,.82);box-shadow:0 0 16px currentColor;font-family:"Noto Serif TC",serif;
-    font-size:14px;font-weight:900;line-height:1.2;text-align:center;white-space:nowrap;transform:translate(-50%,-50%);
-    pointer-events:none;animation:v146StatusPopup 1.25s ease-out both;
-}
-.v146-status-popup.status-burn{color:#ff8b54;}.v146-status-popup.status-freeze{color:#9fe8ff;}.v146-status-popup.status-petrify{color:#e0bf7c;}
-.v146-status-popup.status-agilityDown{color:#8beac1;}.v146-status-popup.status-defenseDown{color:#ffd17b;}.v146-status-popup.status-stun{color:#e9e6ff;}
-@keyframes v146StatusPopup{0%{opacity:0;transform:translate(-50%,-20%) scale(.82)}10%,90%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-88%) scale(.96)}}
-
+/* Status floating text is owned by css/battle-floating-feedback-owner.css. */
 /* Growth reminders use the same small breathing red dot as the additional-
    character creation reminder.  The target remains fully composited so the
    dot never inherits a disabled/inactive dimming layer. */
