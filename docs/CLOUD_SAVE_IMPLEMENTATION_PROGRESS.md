@@ -2,6 +2,11 @@
 
 本文件是長期工程進度來源。**每個 Phase 結束都必須更新本文件**；聊天、Commit、PR、CI 或部署成功不能取代驗收紀錄。
 
+## 2026-09-26 — Persisted-state owner drift and CI guard strengthening (candidate)
+
+- Full runtime search found no active writer/reader for UID `equipment-shop-purchases`; it survives only as a historical legacy translation/backup key. The 39-entry registry now names that actual preservation owner, removes the false shop-UI writer claim and blocks missing/corrupt claim history pending review. No legacy key or backup is deleted.
+- The CI guard now rejects an unregistered literal key even if the number of writes in an existing module stays unchanged, rejects unreviewed dynamic account suffixes and rejects a runtime reintroduction of the historical-only key without a claim-policy review. Its self-test exercises all three. This is registry coverage, not a new cloud reward authority. Phase 4 remains **0/6 VERIFIED**.
+
 ## 2026-09-26 — Legacy equipped-object migration screening (candidate)
 
 - Runtime audit found that `equipSelectedItem()` moves the entire item object from `inventoryItems` into `characterEquipment`; an equipped item is legitimately absent from the bag. The first character's current owner key is `fire`, later characters use `player2`/`player3`, and legacy alias slots exist. A future canonical conversion must take the union, allocate new server-issued ownership IDs and retain any unmapped item for review.
