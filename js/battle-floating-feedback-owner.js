@@ -139,6 +139,7 @@
         node.dataset.feedbackIndex=String(context.index);
         node.dataset.feedbackLane=String(lane);
         node.dataset.feedbackKind=request.kind;
+        node.dataset.feedbackSource=request.source;
         node.dataset.feedbackSequence=String(request.id);
         node.textContent=critical?formatCritical(request.text):String(request.text==null?"":request.text);
         node.style.setProperty("--battle-feedback-x",anchor.x+"px");
