@@ -1272,7 +1272,7 @@
         if(def.id==="relic_tiangang_banner"){ return "對敵方全體造成 "+valueFor(def,"damageMultiplier",level).toFixed(2)+"×秘寶威力"+(level>=10?"並降攻"+Math.round(valueFor(def,"attackDown",level))+"%":"")+"。"; }
         if(def.id==="relic_nine_dragon_fire"){ return "對敵方全體造成 "+valueFor(def,"damageMultiplier",level).toFixed(2)+"×火屬性秘寶傷害"+(level>=10?"，燃燒機率"+Math.round(valueFor(def,"burnChance",level)*100)+"%":"")+(level>=20?"，對燃燒目標額外+15%":"")+"。"; }
         if(def.id==="relic_cold_spring_jade"){ return "急救目標 "+valueFor(def,"healHpPercent",level).toFixed(1).replace(/\.0$/,"")+"%最大HP"+(level>=10?"並淨化1個一般負面":"")+(level>=20?"、恢復4%最大SP":"")+"；HP由35%以上降至35%以下時觸發，每場最多2次，冷卻3回合。"; }
-        if(def.id==="relic_qinglan_feather"){ return "全隊最終閃躲+"+Math.round(valueFor(def,"evasionBonus",level))+"個百分點、最終異常抗性+"+Math.round(valueFor(def,"resistanceBonus",level))+"個百分點，持續"+Math.round(valueFor(def,"duration",level))+"回合。"; }
+        if(def.id==="relic_qinglan_feather"){ return "全隊最終閃躲+"+Math.round(valueFor(def,"evasionBonus",level))+"%、最終異常抗性+"+Math.round(valueFor(def,"resistanceBonus",level))+"%，持續"+Math.round(valueFor(def,"duration",level))+"回合。"; }
         if(def.id==="relic_rock_mountain_seal"){ return "開場防禦+"+Math.round(valueFor(def,"defenseBonus",level))+"%持續3回合；受擊計數觸發時獲得"+Math.round(valueFor(def,"shieldPercent",level))+"%最大HP護盾"+(level>=20?"；Lv20護盾後準備一次18%秘寶威力反震，作用於下一名實際攻擊者":"")+"。"; }
         if(def.id==="relic_returning_wheel"){ return "阻止本場第一次死亡，保留1HP後恢復"+Math.round(valueFor(def,"healHpPercent",level))+"%最大HP並獲得"+Math.round(valueFor(def,"shieldPercent",level))+"%護盾。"; }
         return def.description;
