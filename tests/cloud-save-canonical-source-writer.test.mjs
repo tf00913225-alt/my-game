@@ -1,37 +1,17 @@
 import assert from "node:assert/strict";
-import {createHash} from "node:crypto";
 import {createRequire} from "node:module";
 import test from "node:test";
 
 const require=createRequire(import.meta.url);
 const {createCanonicalSourceWriter}=require("../functions/src/canonical-source-writer.js");
-const {LEGACY_BACKUP_SIDECARS}=require("../functions/src/cloud-save-policy.js");
-const digest=value=>createHash("sha256").update(JSON.stringify(value)).digest("hex");
 const stamp={toMillis:()=>1};
 const uid="uid-a";
 const save=`users/${uid}/saves/current`;
 const root=`serverUsers/${uid}`;
 const operationId="init-character-0001";
 
-function sources(owner,revision){
-    const base={schemaVersion:1,ownerUid:owner,serverRevision:revision,
-        provenance:"server-created"};
-    return {
-        account:{...base,slots:["character-0001",null,null],formation:null},
-        characters:[{...base,characterId:"character-0001",slotIndex:0,
-            displayName:"hero",element:"fire",
-            state:{id:"hero",element:"fire",level:1,exp:0},
-            skillLoadout:{skillLevels:{},equippedSkills:[]}}],
-        economy:{...base,gold:0,sharedExp:0},inventory:[],equipment:[],relics:[],
-        relicLoadout:{...base,relicId:null,subRelicId:null},
-        progress:{...base,dailyQuestState:{},commissionQuestState:{},
-            achievementState:{},gameplayProgress:{},abyssProgress:{},
-            sidecars:Object.fromEntries(LEGACY_BACKUP_SIDECARS.map(key=>[
-                key,{status:"not-applicable",raw:null}]))},
-        claimRecords:[],claimCheckpoint:{...base,claimCount:0,
-            claimDigest:digest([]),historicalClaimsBlocked:false}
-    };
-}
+const selection={displayName:"英雄",element:"fire",gender:"female",
+    attributes:{attack:3,vitality:2,energy:1,intelligence:2,spirit:1,agility:1}};
 
 function harness(candidate="none"){
     const data=new Map([[save,{schemaVersion:2,ownerUid:uid,
@@ -72,15 +52,18 @@ function harness(candidate="none"){
 test("initial server-owned character commits complete sources and receipt at one revision",async()=>{
     const h=harness();
     const request={};
-    const args={operationId,expectedRevision:4,makeSources:sources};
+    const args={operationId,expectedRevision:4,selection};
     const result=await h.writer.commitInitialSources(request,args);
     assert.equal(result.sourceRevision,5);
     assert.equal(result.authoritativeStateReady,false);
     assert.equal(h.data.get(save).serverRevision,5);
     assert.equal(h.data.get(save).authoritativeStateReady,false);
     assert.deepEqual(h.data.get(`${root}/account/current`).slots,
-        ["character-0001",null,null]);
-    assert.equal(h.data.get(`${root}/characters/character-0001`).ownerUid,uid);
+        [`character-${operationId}`,null,null]);
+    const character=h.data.get(`${root}/characters/character-${operationId}`);
+    assert.equal(character.ownerUid,uid);
+    assert.equal(character.state.skillPoints,2);
+    assert.equal(character.state.hp,200);
     assert.equal(h.data.get(`${root}/economy/current`).gold,0);
     assert.equal(h.data.get(`${root}/claimCheckpoints/current`).claimCount,0);
     assert.equal(h.data.get(`${root}/playableSnapshots/5`).readyForPublication,false);
@@ -96,40 +79,41 @@ test("initial server-owned character commits complete sources and receipt at one
 test("candidate, stale revision or incomplete source cannot create partial records",async()=>{
     const candidate=harness("received");
     await assert.rejects(candidate.writer.commitInitialSources({},
-        {operationId,expectedRevision:4,makeSources:sources}),/migration candidate/);
+        {operationId,expectedRevision:4,selection}),/migration candidate/);
     assert.equal(candidate.committed,0);
     const orphan=harness();
     orphan.data.set(`${root}/migrationCandidates/latest`,{trusted:false});
     await assert.rejects(orphan.writer.commitInitialSources({},
-        {operationId,expectedRevision:4,makeSources:sources}),/migration candidate/);
+        {operationId,expectedRevision:4,selection}),/migration candidate/);
     assert.equal(orphan.committed,0);
     const stale=harness();
     await assert.rejects(stale.writer.commitInitialSources({},
-        {operationId,expectedRevision:3,makeSources:sources}),/REVISION_CONFLICT/);
+        {operationId,expectedRevision:3,selection}),/REVISION_CONFLICT/);
     assert.equal(stale.committed,0);
     const corrupt=harness();
     await assert.rejects(corrupt.writer.commitInitialSources({},
-        {operationId,expectedRevision:4,makeSources:(owner,revision)=>{
-            const result=sources(owner,revision);
-            result.characters[0].ownerUid="another-user";
-            return result;
-        }}),/incomplete/);
+        {operationId,expectedRevision:4,selection:{...selection,
+            attributes:{...selection.attributes,attack:4}}}),/Invalid initial/);
     assert.equal(corrupt.committed,0);
     const paid=harness();
     await assert.rejects(paid.writer.commitInitialSources({},
-        {operationId,expectedRevision:4,makeSources:(owner,revision)=>{
-            const result=sources(owner,revision);result.economy.gold=100;
-            return result;
-        }}),/historical claims/);
+        {operationId,expectedRevision:4,selection:{...selection,gold:100}}),/Invalid initial/);
     assert.equal(paid.committed,0);
 });
 
 test("a missing receipt cannot repeat an already persisted initial character",async()=>{
     const h=harness();
     await h.writer.commitInitialSources({},
-        {operationId,expectedRevision:4,makeSources:sources});
+        {operationId,expectedRevision:4,selection});
     h.data.delete(`${root}/operations/${operationId}`);
     await assert.rejects(h.writer.commitInitialSources({},
-        {operationId:"init-character-0002",expectedRevision:5,makeSources:sources}),
+        {operationId:"init-character-0002",expectedRevision:5,selection}),
     /existing character/);
+});
+
+test("changed choices cannot replay the same operation receipt",async()=>{
+    const h=harness();
+    await h.writer.commitInitialSources({}, {operationId,expectedRevision:4,selection});
+    await assert.rejects(h.writer.commitInitialSources({}, {operationId,
+        expectedRevision:4,selection:{...selection,element:"water"}}),/inconsistent/);
 });

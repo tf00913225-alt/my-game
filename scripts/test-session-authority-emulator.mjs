@@ -4,8 +4,12 @@ import {createRequire} from "node:module";
 import {createHash,randomBytes} from "node:crypto";
 const require=createRequire(new URL("../functions/package.json",import.meta.url));
 const {initializeApp}=require("firebase-admin/app");
-const {getFirestore,Timestamp}=require("firebase-admin/firestore");
+const {getFirestore,Timestamp,FieldValue}=require("firebase-admin/firestore");
 const {getAuth}=require("firebase-admin/auth");
+const {HttpsError}=require("firebase-functions/v2/https");
+const {createSessionAuthority}=require("../functions/src/session-authority.js");
+const {createCanonicalSourceWriter}=require("../functions/src/canonical-source-writer.js");
+const {inspectExistingEnvelope,nextRevision}=require("../functions/src/cloud-save-envelope.js");
 const project="demo-four-symbols-session";
 if(process.env.GCLOUD_PROJECT!==project||process.env.FIRESTORE_EMULATOR_HOST!=="127.0.0.1:18080"||
    process.env.FIREBASE_AUTH_EMULATOR_HOST!=="127.0.0.1:19099"){
@@ -205,6 +209,56 @@ const upgraded=await invoke("bootstrapCloudSave",yUser.idToken,{uid:y,session:se
 assert.equal(upgraded.created,false); assert.equal(upgraded.envelopeSchemaVersion,2); assert.equal(upgraded.serverRevision,1);
 const upgradedSave=await db.doc(`users/${y}/saves/current`).get();
 assert.equal(upgradedSave.get("schemaVersion"),2); assert.equal(upgradedSave.get("serverRevision"),1);
+// Exercise the internal writer in real Firestore transactions and session checks.
+const writerSessions=createSessionAuthority({db,FieldValue,HttpsError});
+let abortInitialCommit=false;
+const initialWriter=createCanonicalSourceWriter({db,FieldValue,HttpsError,
+    inspectExistingEnvelope,nextRevision,
+    runProtected:(request,operation)=>writerSessions.runProtected(request,async(tx,session)=>{
+        const result=await operation(tx,session);
+        if(abortInitialCommit){throw new Error("simulated failure before commit");}
+        return result;
+    })});
+const choices={displayName:"英雄",element:"water",gender:"male",
+    attributes:{attack:2,vitality:2,energy:2,intelligence:2,spirit:1,agility:1}};
+const initialOperation="initial-character-emulator-0001";
+const yRequest={auth:{uid:y,token:claims(yUser.idToken)},
+    data:{uid:y,session:sessionY}};
+const initialArgs={operationId:initialOperation,expectedRevision:1,selection:choices};
+await assert.rejects(initialWriter.commitInitialSources(yRequest,
+    {...initialArgs,expectedRevision:9}),error=>error.code==="aborted");
+assert.equal((await db.doc(`serverUsers/${y}/account/current`).get()).exists,false);
+abortInitialCommit=true;
+await assert.rejects(initialWriter.commitInitialSources(yRequest,initialArgs),
+    /simulated failure before commit/);
+abortInitialCommit=false;
+assert.equal((await db.doc(`serverUsers/${y}/account/current`).get()).exists,false);
+assert.equal((await db.doc(`serverUsers/${y}/operations/${initialOperation}`).get()).exists,false);
+assert.equal((await db.doc(`users/${y}/saves/current`).get()).get("serverRevision"),1);
+const initialized=await initialWriter.commitInitialSources(yRequest,initialArgs);
+assert.equal(initialized.sourceRevision,2);
+assert.equal((await db.doc(`serverUsers/${y}/playableSnapshots/2`).get())
+    .get("readyForPublication"),false);
+assert.equal((await db.doc(`serverUsers/${y}/characters/character-${initialOperation}`).get())
+    .get("state.skillPoints"),2);
+assert.equal((await initialWriter.commitInitialSources(yRequest,initialArgs)).unchanged,true);
+await assert.rejects(initialWriter.commitInitialSources(yRequest,
+    {...initialArgs,selection:{...choices,element:"fire"}}),error=>error.code==="data-loss");
+await assert.rejects(initialWriter.commitInitialSources(yRequest,
+    {...initialArgs,operationId:"initial-character-emulator-0002",expectedRevision:2}),
+    error=>error.code==="failed-precondition");
+assert.equal((await db.doc(`users/${y}/saves/current`).get()).get("authoritativeStateReady"),false);
+const candidateUser=await login("accounts:signUp",{email:"session-candidate@example.test",password});
+const candidateUid=candidateUser.localId;
+const candidateSession=await invoke("createGameSession",candidateUser.idToken,{uid:candidateUid});
+await invoke("bootstrapCloudSave",candidateUser.idToken,
+    {uid:candidateUid,session:candidateSession});
+await db.doc(`serverUsers/${candidateUid}/migrationCandidates/latest`).set({trusted:false});
+await assert.rejects(initialWriter.commitInitialSources({
+    auth:{uid:candidateUid,token:claims(candidateUser.idToken)},
+    data:{uid:candidateUid,session:candidateSession}},
+    {...initialArgs,expectedRevision:1}),error=>error.code==="failed-precondition");
+assert.equal((await db.doc(`serverUsers/${candidateUid}/account/current`).get()).exists,false);
 await rejected("protectedTest",yUser.idToken,{uid:x,session:sessionB},"SESSION_INVALID");
 await rejected("protectedTest",yUser.idToken,{uid:y,session:{...sessionB,uid:y}},"SESSION_INVALID");
 assert.equal((await invoke("protectedTest",yUser.idToken,{uid:y,session:sessionY})).uid,y);
