@@ -132,13 +132,7 @@
         url("../assets/dungeons/abyss/abyss-cover.webp") center 35% / cover no-repeat !important;
 }
 
-/* HP loss always sits above the document-level skill stage. */
-body > .damage-popup.v152-top-damage{
-    position:fixed !important;
-    z-index:2147483646 !important;
-    margin:0 !important;
-    pointer-events:none !important;
-}
+/* Battle Floating Feedback Owner now owns popup layering. */
 
 /* Enemy identity is centered on its actual card width. */
 #game-stage > #app > #game-content #battlePage .battle-monster-name.v143-monster-identity{
@@ -216,7 +210,4 @@ body > .damage-popup.v152-top-damage{
 }
 
 @media (prefers-reduced-motion:reduce){
-    body > .damage-popup.v152-top-damage{
-        animation-duration:.01ms !important;
-    }
 }
