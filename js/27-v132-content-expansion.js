@@ -2248,7 +2248,7 @@
             }
 
             showExpDungeonRewardModal(rewardExp);
-        });
+        },{mode:"daily",dailyDungeonType:"exp"});
     }
 
     /*
@@ -2388,7 +2388,7 @@
             }
             const chestCount=outcome.turnsUsed<5 ? 3 : (outcome.turnsUsed<10 ? 2 : 1);
             showMaterialDungeonRewardModal(chestCount);
-        });
+        },{mode:"daily",dailyDungeonType:"material"});
     }
     window.v132BeginMaterialDungeon=beginMaterialDungeon;
 
@@ -2596,7 +2596,7 @@
                 return;
             }
             showEquipmentDungeonRewardModal();
-        });
+        },{mode:"daily",dailyDungeonType:"equipment"});
     }
     window.v132BeginEquipmentDungeon=beginEquipmentDungeon;
 
