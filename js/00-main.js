@@ -23460,109 +23460,42 @@ function triggerCriticalImpact(element){
 
 function showDamagePopup(element,text,type,isCrit){
 
-    if(!element){
-        return;
+    const feedback=typeof window!=="undefined"
+        ?window.FourSymbolsBattleFloatingFeedback
+        :null;
+
+    if(!feedback||typeof feedback.emit!=="function"||!element){
+        return null;
     }
 
+    const unit=typeof feedback.identifyUnit==="function"
+        ?feedback.identifyUnit(element)
+        :null;
 
-    const popup =
-        document.createElement(
-            "div"
-        );
-
-
-    popup.className =
-        /*
-           ★ 修正（依照使用者回報，「損失
-           血量顯示變成在血條下面」）：
-           真正原因找到了——這裡少打了
-           空格，"damage-popup"直接接
-           "hp-popup"變成
-           "damage-popuphp-popup"這種
-           class屬性根本不存在的字串，
-           .damage-popup那組CSS（position:
-           absolute;top:26%……原本設計
-           成飄在卡片中段、技能名稱跟血條
-           中間）完全沒套用到，popup變成
-           一個沒有任何定位樣式的普通
-           <div>，只能乖乖排在appendChild()
-           放進去的地方，也就是卡片最下面、
-           血條/SP條/名稱都排完之後。
-           每個class之間都補上空格，
-           跟前面「技能按鈕整個不能點」
-           是同一種typo，這已經是這個
-           檔案裡第三次抓到同樣的漏字
-           bug了。
-        */
-
-        "damage-popup "+
-        (
-            type==="sp"
-            ?
-            "sp-popup"
-            :
-            type==="heal"
-            ?
-            "heal-popup"
-            :
-            type==="miss"
-            ?
-            "miss-popup"
-            :
-            type==="shield"
-            ?
-            "shield-popup"
-            :
-            "hp-popup"
-        )+
-        (
-            isCrit
-            ?
-            " critical-popup"
-            :
-            ""
-        );
-
-
-    if(isCrit){
-        /* V100：爆擊浮字只保留「爆擊 + 傷害數字」。
-           showPlayerHit/showMonsterHit 傳進來的 text 可能含 -、HP/SP，
-           這裡只抽出數字做顯示；不影響實際傷害值。 */
-        const criticalNumberMatch =
-            String(text).match(/\d+(?:\.\d+)?/);
-
-        popup.textContent =
-            "爆擊 "+
-            (criticalNumberMatch ? criticalNumberMatch[0] : String(text));
-    }else{
-        popup.textContent = text;
+    if(!unit){
+        return null;
     }
 
-
-    if(isCrit){
+    if(isCrit&&typeof triggerCriticalImpact==="function"){
         triggerCriticalImpact(element);
     }
 
-
-    element.appendChild(
-        popup
-    );
-
-
-    setTimeout(()=>{
-
-        if(
-            popup &&
-            popup.parentNode
-        ){
-
-            popup.parentNode.removeChild(
-                popup
-            );
-
-        }
-
-    },1800);
+    return feedback.emit({
+        side:unit.side,
+        index:unit.index,
+        kind:type==="heal"
+            ?"heal"
+            :type==="sp"
+                ?"sp"
+                :type==="miss"
+                    ?"miss"
+                    :type==="shield"
+                        ?"shield"
+                        :"damage",
+        text:text,
+        critical:!!isCrit,
+        source:"core-entry"
+    });
 
 }
 
