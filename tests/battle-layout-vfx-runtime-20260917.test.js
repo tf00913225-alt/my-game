@@ -167,8 +167,8 @@ assert.ok(
 assert.match(relicCinematic,/revealRelicTargets\(target\)/,"target reveal remains part of the serialized relic cinematic");
 assert.match(geometry,/function unitGeometry\(side,index\)[\s\S]*hudSafeRect[\s\S]*feedbackAnchor[\s\S]*highlightRect/,
     "one geometry adapter must expose HUD-safe feedback and relic highlight bounds");
-assert.match(feedback,/function contextFor\(side,index\)[\s\S]*function freeLane\(context\)[\s\S]*context\.queue\.push\(request\)/,
-    "floating feedback must use a target-scoped bounded lane context plus queue");
+assert.match(feedback,/function contextFor\(side,index\)[\s\S]*function laneMetrics\(context\)[\s\S]*capacity:[\s\S]*function freeLane\(context,metrics\)[\s\S]*context\.queue\.push\(request\)/,
+    "floating feedback must size target-scoped lanes from canonical geometry and queue overflow");
 assert.match(feedback,/getUnitGeometry\(side,index\)/,
     "floating feedback must consume the same formal Unit geometry");
 assert.match(feedbackCss,/color:#e32626[\s\S]*-webkit-text-stroke:\.85px #fff[\s\S]*text-shadow:1px 1px 0 #000/,
