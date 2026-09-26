@@ -267,82 +267,28 @@
         };
     }
 
-    function popupKind(popup,args){
-        if(popup&&popup.classList&&popup.classList.contains("miss-popup")){ return "miss"; }
-        const text=String((popup&&popup.textContent)||"");
-        const type=String((args&&args[2])||"").toLowerCase();
-        if(type.includes("heal")||text.startsWith("+")){ return "heal"; }
-        if(type.includes("shield")){ return "shield"; }
-        if(type.includes("buff")||type.includes("debuff")||type.includes("status")){ return "status"; }
-        if(args&&args[3]===true){ return "critical"; }
-        return "damage";
+    function plainRect(rect){
+        if(!rect){ return null; }
+        const left=Number(rect.left)||0,top=Number(rect.top)||0;
+        const width=Math.max(0,Number(rect.width)||0),height=Math.max(0,Number(rect.height)||0);
+        return {left:left,top:top,right:left+width,bottom:top+height,width:width,height:height};
     }
 
-    function applyPopupAnchor(popup,slot,kind){
-        if(!popup||!slot){ return false; }
-        const anchor=anchorForSlot(slot,kind);
-        if(!anchor){ return false; }
-        popup.dataset.slot=slot;
-        popup.dataset.geometryOwner="fixed-slot";
-        popup.dataset.popupKind=kind||"damage";
-        popup.classList.add("v-fixed-slot-popup");
-        popup.style.setProperty("position","fixed","important");
-        popup.style.setProperty("left",anchor.x+"px","important");
-        popup.style.setProperty("top",anchor.y+"px","important");
-        popup.style.setProperty("font-size",kind==="critical"?"20px":"18px","important");
-        popup.style.setProperty("transform","translate(-50%,-50%)","important");
-        if(document.body&&popup.parentNode!==document.body){ document.body.appendChild(popup); }
-        return true;
-    }
-
-    function newestPopup(before,selector,scope){
-        const candidates=[];
-        if(scope&&scope.querySelectorAll){ candidates.push(...scope.querySelectorAll(selector)); }
-        if(document.body&&document.body.querySelectorAll){ candidates.push(...document.body.querySelectorAll(selector)); }
-        for(let index=candidates.length-1;index>=0;index--){
-            if(!before.has(candidates[index])){ return candidates[index]; }
-        }
-        return null;
-    }
-
-    function wrapDamagePopup(){
-        if(typeof window.showDamagePopup!=="function"||window.showDamagePopup.__fixedSlotPopupOwner){ return; }
-        const previous=window.showDamagePopup;
-        const wrapped=function(element){
-            const args=Array.prototype.slice.call(arguments);
-            const slot=slotForElement(element);
-            const before=new Set(document.querySelectorAll(".damage-popup"));
-            const result=previous.apply(this,args);
-            const popup=newestPopup(before,".damage-popup",element);
-            if(popup){
-                const kind=popupKind(popup,args);
-                applyPopupAnchor(popup,slot,kind);
-            }
-            return result;
+    function battlefieldOverlayGeometry(){
+        if(typeof document==="undefined"){ return null; }
+        const host=document.getElementById("game-stage")||document.getElementById("battlePage");
+        if(!host||typeof host.getBoundingClientRect!=="function"){ return null; }
+        const raw=plainRect(host.getBoundingClientRect());
+        if(!raw){ return null; }
+        const viewportWidth=Math.max(0,Number(window.innerWidth)||raw.right);
+        const viewportHeight=Math.max(0,Number(window.innerHeight)||raw.bottom);
+        const left=Math.max(0,raw.left),top=Math.max(0,raw.top);
+        const right=Math.min(viewportWidth,raw.right),bottom=Math.min(viewportHeight,raw.bottom);
+        const rect={
+            left:left,top:top,right:Math.max(left,right),bottom:Math.max(top,bottom),
+            width:Math.max(0,right-left),height:Math.max(0,bottom-top)
         };
-        wrapped.__fixedSlotPopupOwner=true;
-        wrapped.__previous=previous;
-        window.showDamagePopup=wrapped;
-        try{ showDamagePopup=wrapped; }catch(_){ }
-    }
-
-    function wrapMissPopup(){
-        if(typeof window.showMissEffect!=="function"||window.showMissEffect.__fixedSlotPopupOwner){ return; }
-        const previous=window.showMissEffect;
-        const wrapped=function(isPlayerTarget,index){
-            const side=isPlayerTarget?"player":"monster";
-            const slot=slots.getSlotForCombatant(side,Number(index)||0,{enemySnapshot:slots.getActiveEnemySnapshot()});
-            const target=document.getElementById((isPlayerTarget?"battlePlayerCard":"battleMonster")+(Number(index)||0));
-            const before=new Set(document.querySelectorAll(".damage-popup.miss-popup"));
-            const result=previous.apply(this,arguments);
-            const popup=newestPopup(before,".damage-popup.miss-popup",target);
-            if(popup){ applyPopupAnchor(popup,slot,"miss"); }
-            return result;
-        };
-        wrapped.__fixedSlotPopupOwner=true;
-        wrapped.__previous=previous;
-        window.showMissEffect=wrapped;
-        try{ showMissEffect=wrapped; }catch(_){ }
+        return {owner:"fixed-slot",rect:rect,center:{x:rect.left+rect.width/2,y:rect.top+rect.height/2}};
     }
 
     function unitGeometry(side,index){
@@ -350,29 +296,61 @@
         const unitIndex=Number(index);
         if(!Number.isInteger(unitIndex)){ return null; }
         const card=document.getElementById((targetSide==="monster"?"battleMonster":"battlePlayerCard")+unitIndex);
-        if(!card){ return null; }
+        if(!card||typeof card.getBoundingClientRect!=="function"){ return null; }
         const slot=slotForElement(card);
-        const slotRect=slot?slots.getSlotRect(slot):null;
-        const unitRect=slotRect||card.getBoundingClientRect();
+        const slotRect=slot?plainRect(slots.getSlotRect(slot)):null;
+        const carrier=typeof card.closest==="function"
+            ?card.closest(".v-fixed-boss-footprint,.v-fixed-enemy-slot,.v-fixed-ally-slot")
+            :null;
+        const carrierRect=carrier&&typeof carrier.getBoundingClientRect==="function"
+            ?plainRect(carrier.getBoundingClientRect())
+            :null;
+        const cardRect=plainRect(card.getBoundingClientRect());
+        const isBossFootprint=!!(carrier&&carrier.classList&&carrier.classList.contains("v-fixed-boss-footprint"));
+        const unitRect=isBossFootprint?(carrierRect||cardRect):(slotRect||carrierRect||cardRect);
         if(!unitRect){ return null; }
+
         const art=card.querySelector(".v174-battle-art,img.v162-abyss-battle-portrait-art,.battle-monster-icon,.battle-player-icon");
-        const portraitRect=art&&art.getBoundingClientRect?art.getBoundingClientRect():unitRect;
-        const hudNodes=Array.from(card.querySelectorAll(".monster-hp,.monster-sp,.hp-bar,.sp-bar,.battle-monster-name,.battle-player-id,.monster-status-badges"));
-        const hudRects=hudNodes.map(node=>node.getBoundingClientRect()).filter(rect=>rect&&rect.width>=0&&rect.height>=0);
+        const portraitRect=art&&typeof art.getBoundingClientRect==="function"
+            ?plainRect(art.getBoundingClientRect())
+            :unitRect;
+        const hudNodes=Array.from(card.querySelectorAll(
+            ".monster-hp,.monster-sp,.hp-bar,.sp-bar,.battle-monster-name,.battle-player-id,.monster-status-badges"
+        ));
+        const hudRects=hudNodes
+            .map(node=>typeof node.getBoundingClientRect==="function"?plainRect(node.getBoundingClientRect()):null)
+            .filter(rect=>rect&&rect.width>0&&rect.height>0);
         const hudTop=hudRects.length?Math.min(...hudRects.map(rect=>rect.top)):unitRect.bottom;
         const hudBottom=hudRects.length?Math.max(...hudRects.map(rect=>rect.bottom)):unitRect.bottom;
-        const safeTop=Math.max(unitRect.top,Math.min(unitRect.bottom,hudTop));
+        const safeHudTop=Math.max(unitRect.top,Math.min(unitRect.bottom,hudTop));
         const hudSafeRect={
-            left:unitRect.left,top:safeTop,right:unitRect.right,bottom:Math.max(safeTop,hudBottom),
-            width:unitRect.width,height:Math.max(0,Math.max(safeTop,hudBottom)-safeTop)
+            left:unitRect.left,top:safeHudTop,right:unitRect.right,
+            bottom:Math.max(safeHudTop,Math.min(unitRect.bottom,hudBottom)),
+            width:unitRect.width,height:Math.max(0,Math.min(unitRect.bottom,hudBottom)-safeHudTop)
         };
+
+        let feedbackTop=Math.max(unitRect.top+6,Math.min(unitRect.bottom-24,portraitRect.top+6));
+        let feedbackBottom=Math.min(unitRect.bottom-6,safeHudTop-8);
+        if(feedbackBottom-feedbackTop<26){
+            feedbackTop=unitRect.top+6;
+            feedbackBottom=Math.min(unitRect.bottom-6,Math.max(feedbackTop+26,safeHudTop-4));
+        }
+        if(feedbackBottom<=feedbackTop){
+            feedbackBottom=Math.min(unitRect.bottom-4,feedbackTop+24);
+        }
+        const feedbackSafeRect={
+            left:unitRect.left+4,top:feedbackTop,right:unitRect.right-4,bottom:feedbackBottom,
+            width:Math.max(0,unitRect.width-8),height:Math.max(0,feedbackBottom-feedbackTop)
+        };
+
         return {
             owner:"fixed-slot",side:targetSide,index:unitIndex,slot:slot,
             unitRect:unitRect,portraitRect:portraitRect,hudSafeRect:hudSafeRect,
+            feedbackSafeRect:feedbackSafeRect,
             center:{x:unitRect.left+unitRect.width/2,y:unitRect.top+unitRect.height/2},
             feedbackAnchor:{
                 x:unitRect.left+unitRect.width/2,
-                y:Math.min(unitRect.top+unitRect.height*.46,safeTop-12)
+                y:Math.max(feedbackSafeRect.top+11,feedbackSafeRect.bottom-12)
             },
             highlightRect:{
                 left:Math.max(0,unitRect.left-3),top:Math.max(0,unitRect.top-3),
@@ -411,6 +389,7 @@
         getAnchorForSlot:anchorForSlot,
         getVfxGeometry:geometryForVfx,
         getUnitGeometry:unitGeometry,
+        getBattlefieldOverlayGeometry:battlefieldOverlayGeometry,
         neutralizeLegacyPresentationGeometry:neutralizeLegacyPresentationGeometry
     });
     window.FourSymbolsBattlefieldRenderGeometry=api;
@@ -418,12 +397,10 @@
     window.vFixedSlotAfterBattleRender=reconcile;
 
     neutralizeLegacyPresentationGeometry();
-    wrapDamagePopup();
-    wrapMissPopup();
 
     /* renderBattle() and explicit battle lifecycle hooks are the geometry authority.
-       Dynamic damage/miss popups are already anchored by wrapDamagePopup()/wrapMissPopup();
-       no document.body observer is required in the battle hot path. */
+       This adapter publishes geometry only. Battle Floating Feedback is the sole
+       DOM/queue/typography owner for transient combat text. */
 
     reconcile();
 })();
