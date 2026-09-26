@@ -1,0 +1,52 @@
+/* Battle Floating Feedback Owner — canonical popup typography and lanes. */
+body > .battle-floating-feedback{
+    position:fixed;
+    left:var(--battle-feedback-x);
+    top:var(--battle-feedback-y);
+    z-index:2147483000;
+    margin:0;
+    padding:0;
+    border:0;
+    border-radius:0;
+    background:transparent;
+    color:#e32626;
+    box-shadow:none;
+    font-family:"Noto Sans TC",sans-serif;
+    font-size:18px;
+    font-weight:900;
+    line-height:1.05;
+    letter-spacing:.2px;
+    text-align:center;
+    white-space:nowrap;
+    pointer-events:none;
+    -webkit-text-stroke:.85px #fff;
+    paint-order:stroke fill;
+    text-shadow:1px 1px 0 #000;
+    transform:translate(-50%,0);
+    animation:battleFloatingFeedback var(--battle-feedback-duration,1100ms) ease-out both;
+}
+body > .battle-floating-feedback.is-critical{
+    font-size:18px;
+    letter-spacing:.45px;
+    animation-name:battleFloatingFeedbackCritical;
+}
+@keyframes battleFloatingFeedback{
+    0%{opacity:0;transform:translate(-50%,4px) scale(.88)}
+    12%{opacity:1;transform:translate(-50%,-3px) scale(1.08)}
+    72%{opacity:1;transform:translate(-50%,-10px) scale(1)}
+    100%{opacity:0;transform:translate(-50%,-22px) scale(1)}
+}
+@keyframes battleFloatingFeedbackCritical{
+    0%{opacity:0;transform:translate(-50%,7px) scale(.68) rotate(-4deg)}
+    14%{opacity:1;transform:translate(-50%,-7px) scale(1.18) rotate(3deg)}
+    34%{transform:translate(-50%,-6px) scale(1.04) rotate(-1deg)}
+    72%{opacity:1;transform:translate(-50%,-12px) scale(1)}
+    100%{opacity:0;transform:translate(-50%,-25px) scale(1)}
+}
+.battle-player.battle-escape-presenting{
+    will-change:transform,opacity;
+    pointer-events:none;
+}
+@media (prefers-reduced-motion:reduce){
+    body > .battle-floating-feedback{animation-duration:.01ms!important;}
+}
