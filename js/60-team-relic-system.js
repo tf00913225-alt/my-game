@@ -286,8 +286,6 @@
     let relicFinishHeld=false;
     let relicFinishRetryTimer=0;
     let relicCutinNode=null;
-    let relicFocusedTargetCards=[];
-    let relicFocusedTargetLayers=[];
     const relicPresentationLockReleases=new Set();
 
     function numeric(value){ const n=Number(value); return Number.isFinite(n)?n:0; }
@@ -329,12 +327,12 @@
         return typeof document!=="undefined"&&typeof document.getElementById==="function"&&!!document.getElementById("battlePage");
     }
     function clearRelicTargetFocus(){
-        relicFocusedTargetCards=[];
-        relicFocusedTargetLayers=[];
         if(typeof document!=="undefined"&&typeof document.querySelectorAll==="function"){
             document.querySelectorAll(".team-relic-battle-target-outline").forEach(node=>node.remove());
-            const holes=document.querySelector("#teamRelicBattlePresentation .team-relic-mask-holes");
+            const presentation=document.getElementById("teamRelicBattlePresentation");
+            const holes=presentation&&presentation.querySelector(".team-relic-mask-holes");
             if(holes){ holes.replaceChildren(); }
+            if(presentation){ presentation.classList.remove("targets-visible"); }
         }
     }
     function cleanupRelicCutin(){
@@ -346,8 +344,21 @@
         }
         relicCutinNode=null;
     }
+    function relicGeometryOwner(){
+        return typeof window!=="undefined"?window.FourSymbolsBattlefieldRenderGeometry:null;
+    }
+    function relicOverlayGeometry(){
+        const owner=relicGeometryOwner();
+        if(owner&&typeof owner.getBattlefieldOverlayGeometry==="function"){
+            const geometry=owner.getBattlefieldOverlayGeometry();
+            if(geometry&&geometry.rect&&geometry.rect.width>0&&geometry.rect.height>0){ return geometry; }
+        }
+        const width=Math.max(1,window.innerWidth||document.documentElement.clientWidth||1);
+        const height=Math.max(1,window.innerHeight||document.documentElement.clientHeight||1);
+        return {owner:"viewport-fallback",rect:{left:0,top:0,right:width,bottom:height,width:width,height:height}};
+    }
     function relicTargetGeometry(side,index){
-        const geometry=window.FourSymbolsBattlefieldRenderGeometry;
+        const geometry=relicGeometryOwner();
         if(geometry&&typeof geometry.getUnitGeometry==="function"){
             const resolved=geometry.getUnitGeometry(side,index);
             if(resolved&&resolved.highlightRect){ return resolved.highlightRect; }
@@ -356,19 +367,44 @@
         const card=document.getElementById(side==="monster"?"battleMonster"+index:"battlePlayerCard"+index);
         return card&&typeof card.getBoundingClientRect==="function"?card.getBoundingClientRect():null;
     }
+    function relativeRelicRect(rect,overlayRect){
+        if(!rect||!overlayRect){ return null; }
+        const left=Math.max(0,numeric(rect.left)-numeric(overlayRect.left));
+        const top=Math.max(0,numeric(rect.top)-numeric(overlayRect.top));
+        const right=Math.min(numeric(overlayRect.width),numeric(rect.left)+numeric(rect.width)-numeric(overlayRect.left));
+        const bottom=Math.min(numeric(overlayRect.height),numeric(rect.top)+numeric(rect.height)-numeric(overlayRect.top));
+        return {left:left,top:top,width:Math.max(0,right-left),height:Math.max(0,bottom-top)};
+    }
+    function syncRelicPresentationGeometry(node){
+        if(!node){ return null; }
+        const overlay=relicOverlayGeometry();
+        const rect=overlay&&overlay.rect;
+        if(!rect){ return null; }
+        node.style.left=numeric(rect.left)+"px";
+        node.style.top=numeric(rect.top)+"px";
+        node.style.width=Math.max(1,numeric(rect.width))+"px";
+        node.style.height=Math.max(1,numeric(rect.height))+"px";
+        node.__relicOverlayRect={
+            left:numeric(rect.left),top:numeric(rect.top),
+            width:Math.max(1,numeric(rect.width)),height:Math.max(1,numeric(rect.height))
+        };
+        return node.__relicOverlayRect;
+    }
     function revealRelicTargets(target){
         clearRelicTargetFocus();
         if(!relicCutinNode||!target||!Array.isArray(target.targetIds)){ return waitMs(RELIC_TARGET_REVEAL_MS); }
+        const overlayRect=syncRelicPresentationGeometry(relicCutinNode)||relicCutinNode.__relicOverlayRect;
         const holes=relicCutinNode.querySelector(".team-relic-mask-holes");
         const focusLayer=relicCutinNode.querySelector(".team-relic-battle-target-focus-layer");
         const namespace="http://www.w3.org/2000/svg";
         target.targetIds.forEach(index=>{
-            const rect=relicTargetGeometry(target.targetSide,index);
+            const absolute=relicTargetGeometry(target.targetSide,index);
+            const rect=relativeRelicRect(absolute,overlayRect);
             if(!rect||rect.width<=0||rect.height<=0){ return; }
             if(holes){
                 const hole=document.createElementNS(namespace,"rect");
-                hole.setAttribute("x",String(Math.max(0,rect.left)));
-                hole.setAttribute("y",String(Math.max(0,rect.top)));
+                hole.setAttribute("x",String(rect.left));
+                hole.setAttribute("y",String(rect.top));
                 hole.setAttribute("width",String(Math.max(1,rect.width)));
                 hole.setAttribute("height",String(Math.max(1,rect.height)));
                 hole.setAttribute("rx","8");
@@ -378,8 +414,8 @@
             if(focusLayer){
                 const outline=document.createElement("span");
                 outline.className="team-relic-battle-target-outline";
-                outline.style.left=Math.max(0,rect.left)+"px";
-                outline.style.top=Math.max(0,rect.top)+"px";
+                outline.style.left=rect.left+"px";
+                outline.style.top=rect.top+"px";
                 outline.style.width=Math.max(1,rect.width)+"px";
                 outline.style.height=Math.max(1,rect.height)+"px";
                 focusLayer.appendChild(outline);
@@ -393,8 +429,11 @@
         if(!hasLiveBattlePresentationHost()||!def||!document.body){ return Promise.resolve(null); }
         cleanupRelicCutin();
         const node=document.createElement("div");
-        const width=Math.max(1,window.innerWidth||document.documentElement.clientWidth||1);
-        const height=Math.max(1,window.innerHeight||document.documentElement.clientHeight||1);
+        const overlay=relicOverlayGeometry();
+        const overlayRect=overlay&&overlay.rect;
+        if(!overlayRect||overlayRect.width<=0||overlayRect.height<=0){ return Promise.resolve(null); }
+        const width=Math.max(1,numeric(overlayRect.width));
+        const height=Math.max(1,numeric(overlayRect.height));
         const maskId="teamRelicViewportMask-"+String(currentBattleToken())+"-"+String(++relicVfxSequence);
         node.id="teamRelicBattlePresentation";
         node.className="team-relic-battle-presentation";
@@ -409,8 +448,9 @@
             '<img src="'+esc(def.battleIconPath||def.iconPath||"")+'" alt=""></span>'+
             '<span class="team-relic-battle-cutin-copy"><strong>'+esc(def.name)+'</strong></span></div>';
         document.body.appendChild(node);
-        document.body.classList.add("team-relic-cinematic-active");
         relicCutinNode=node;
+        syncRelicPresentationGeometry(node);
+        document.body.classList.add("team-relic-cinematic-active");
         const dim=()=>{ if(node===relicCutinNode){ node.classList.add("dim-visible"); } };
         if(typeof requestAnimationFrame==="function"){ requestAnimationFrame(dim); }else{ dim(); }
         return waitMs(RELIC_DIM_IN_MS)
