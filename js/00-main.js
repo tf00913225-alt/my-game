@@ -10759,6 +10759,14 @@ function ensureAutoPatrolInterval(){
    開始戰鬥
 ===================================================== */
 
+function clearTransientBattlePresentation(){
+    if(typeof window==="undefined"){ return; }
+    const feedback=window.FourSymbolsBattleFloatingFeedback;
+    if(feedback&&typeof feedback.clear==="function"){ feedback.clear(); }
+    const presentation=window.FourSymbolsBattlePresentation;
+    if(presentation&&typeof presentation.cleanupEscape==="function"){ presentation.cleanupEscape(); }
+}
+
 function startBattle(triggerIndex){
 
     if(
@@ -10806,6 +10814,7 @@ function startBattle(triggerIndex){
     mapCooldown=true;
 
     battleToken++;
+    clearTransientBattlePresentation();
     battleRoundBoundaryKeys=new Set();
     battlePresentationLocks.clear();
     battleInputResumeToken=null;
@@ -18946,7 +18955,7 @@ function winBattle(){
     battleAdvanceScheduled=false;
 
 
-    battleToken++;
+    battleToken++;\n    clearTransientBattlePresentation();
 
     /*
        ★ 新增（依照使用者要求，每日任務
@@ -19212,7 +19221,7 @@ function loseBattle(){
     battleAdvanceScheduled=false;
 
 
-    battleToken++;
+    battleToken++;\n    clearTransientBattlePresentation();
 
 
     /*
@@ -19380,41 +19389,81 @@ function attemptEscape(){
 function resolveEscapeAttempt(characterIndex){
 
     clearInterval(timerId);
+    timerId=null;
 
-    const alive=currentBattleMonsters.map(i=>monsters[i]).filter(m=>m.alive);
+    const alive=currentBattleMonsters.map(i=>monsters[i]).filter(m=>m&&m.alive);
     if(alive.length===0){ checkBattleEnd(); return; }
 
     const highestLevel=Math.max(...alive.map(m=>m.level));
     const escapingCharacter=getPartyCharacterByIndex(characterIndex)||player;
     const chance=Math.max(10,Math.min(95,50+(escapingCharacter.level-highestLevel)*5));
     const succeeded=Math.random()*100<chance;
-    const feedback=typeof window!=="undefined"?window.FourSymbolsBattleFloatingFeedback:null;
-    const presentation=feedback&&typeof feedback.playEscape==="function"
-        ?feedback.playEscape(characterIndex,succeeded)
-        :Promise.resolve();
+    const presentationOwner=typeof window!=="undefined"?window.FourSymbolsBattlePresentation:null;
+    const feedbackOwner=typeof window!=="undefined"?window.FourSymbolsBattleFloatingFeedback:null;
+    const motion=presentationOwner&&typeof presentationOwner.playEscape==="function"
+        ?presentationOwner.playEscape(characterIndex,succeeded)
+        :Promise.resolve(true);
 
-    if(succeeded){
-        addBattleLog("成功逃脫！");
-        Promise.resolve(presentation).then(()=>{
-            if(window.v132ActiveDungeonRun&&typeof window.v132AbortDungeonBattle==="function"){
-                window.v132AbortDungeonBattle("escape");
-                return;
-            }
-            battleActive=false;
-            autoBattle=false;
-            battleToken++;
-            if(feedback&&typeof feedback.clear==="function"){ feedback.clear(); }
-            showPage("map");
-            setMapCooldown(3000);
-            startMonsterMovement();
-            ensureAutoPatrolInterval();
+    actionReady=false;
+    pendingAction=null;
+
+    if(!succeeded){
+        addBattleLog("逃脫失敗！");
+        Promise.resolve(motion).then(()=>{
+            const feedback=feedbackOwner&&typeof feedbackOwner.emitEscapeFailure==="function"
+                ?feedbackOwner.emitEscapeFailure(characterIndex)
+                :null;
+            return feedback&&feedback.promise?feedback.promise:Promise.resolve();
+        }).then(()=>{
+            if(typeof battleActive==="undefined"||battleActive){ finishPlayerAction(); }
+        }).catch(()=>{
+            if(typeof battleActive==="undefined"||battleActive){ finishPlayerAction(); }
         });
         return;
     }
 
-    addBattleLog("逃脫失敗！");
-    Promise.resolve(presentation).then(()=>{
-        if(typeof battleActive==="undefined"||battleActive){ finishPlayerAction(); }
+    addBattleLog("成功逃脫！");
+    Promise.resolve(motion).then(()=>{
+        const finishEscapeRoute=()=>{
+            if(window.v132ActiveDungeonRun&&typeof window.v132AbortDungeonBattle==="function"){
+                window.v132AbortDungeonBattle("escape");
+            }else{
+                battleActive=false;
+                autoBattle=false;
+                actionReady=false;
+                pendingAction=null;
+                clearBattleRoundPrompt();
+                clearInterval(timerId);
+                timerId=null;
+                if(battleAdvanceTimeoutId){
+                    clearTimeout(battleAdvanceTimeoutId);
+                    battleAdvanceTimeoutId=null;
+                }
+                clearBattleActionWatchdog();
+                battleAdvanceScheduled=false;
+                battleToken++;
+                if(typeof finishBattleStatisticsSession==="function"){ finishBattleStatisticsSession("escape"); }
+                closeMenus();
+                if(window.v142SkillAnimationDirector){ window.v142SkillAnimationDirector.dispose(); }
+                if(feedbackOwner&&typeof feedbackOwner.clear==="function"){ feedbackOwner.clear(); }
+                showPage("map");
+                setMapCooldown(3000);
+                startMonsterMovement();
+                ensureAutoPatrolInterval();
+            }
+            if(presentationOwner&&typeof presentationOwner.cleanupEscape==="function"){
+                presentationOwner.cleanupEscape();
+            }
+            return true;
+        };
+        if(typeof window.v141PlayEscapeBattleExit==="function"){
+            return window.v141PlayEscapeBattleExit(finishEscapeRoute);
+        }
+        return finishEscapeRoute();
+    }).catch(()=>{
+        if(presentationOwner&&typeof presentationOwner.cleanupEscape==="function"){
+            presentationOwner.cleanupEscape();
+        }
     });
 }
 
