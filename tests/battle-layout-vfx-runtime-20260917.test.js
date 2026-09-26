@@ -134,8 +134,15 @@ assert.match(relicRuntime,/document\.body\.appendChild\(node\)/,
     "relic cinematic must render on the document viewport, outside battle-wrap stacking contexts");
 assert.match(relicCss,/body > \.team-relic-battle-presentation\{[\s\S]*position:fixed;inset:0;z-index:18090/,
     "relic cinematic must own one fixed viewport presentation surface");
-assert.match(relicRuntime,/function relicTargetGeometry\(side,index\)[\s\S]*FourSymbolsBattlefieldRenderGeometry[\s\S]*getUnitGeometry/,
-    "relic focus must consume canonical battlefield geometry");
+assert.match(relicRuntime,/function relicGeometryOwner\(\)[\s\S]*FourSymbolsBattlefieldRenderGeometry/,
+    "relic cinematic must resolve the canonical battlefield geometry owner");
+assert.match(relicRuntime,/function relicTargetGeometry\(side,index\)[\s\S]*relicGeometryOwner\(\)[\s\S]*getUnitGeometry[\s\S]*highlightRect/,
+    "relic focus must consume canonical Unit highlight geometry");
+assert.doesNotMatch(
+    relicRuntime.slice(relicRuntime.indexOf("function relicTargetGeometry"),relicRuntime.indexOf("function relativeRelicRect")),
+    /getBoundingClientRect/,
+    "relic target focus must not fall back to local DOM bounds"
+);
 assert.match(relicRuntime,/team-relic-mask-holes[\s\S]*createElementNS\(namespace,"rect"\)[\s\S]*highlightRect/,
     "target focus must cut viewport mask apertures from resolved Unit geometry");
 assert.doesNotMatch(relicRuntime,/team-relic-battle-target-layer|relicTargetLayer\(/,
@@ -144,8 +151,16 @@ assert.doesNotMatch(relicCss,/team-relic-battle-target-layer|team-relic-battle-t
     "legacy target z-index/brightness owner must be retired");
 assert.match(relicRuntime,/RELIC_IDENTITY_HOLD_MS=1150/);
 assert.match(relicRuntime,/RELIC_IDENTITY_EXIT_MS=420/);
-assert.match(relicRuntime,/waitMs\(RELIC_IDENTITY_REVEAL_MS\)[\s\S]*waitMs\(RELIC_IDENTITY_HOLD_MS\)[\s\S]*classList\.add\("identity-exiting"\)[\s\S]*revealRelicTargets\(target\)/,
-    "relic identity -> target reveal -> VFX lifecycle must remain serialized");
+const relicCinematic=relicRuntime.slice(relicRuntime.indexOf("function beginRelicCinematic"),relicRuntime.indexOf("function enterRelicVfxPhase"));
+assert.ok(
+    relicCinematic.indexOf('classList.add("identity-visible")')<relicCinematic.indexOf('classList.add("dim-visible")'),
+    "relic identity must appear before battlefield dimming"
+);
+assert.ok(
+    relicCinematic.indexOf('classList.add("dim-visible")')<relicCinematic.indexOf("revealRelicTargets(target)"),
+    "battlefield dimming must precede target reveal"
+);
+assert.match(relicCinematic,/revealRelicTargets\(target\)/,"target reveal remains part of the serialized relic cinematic");
 assert.match(geometry,/function unitGeometry\(side,index\)[\s\S]*hudSafeRect[\s\S]*feedbackAnchor[\s\S]*highlightRect/,
     "one geometry adapter must expose HUD-safe feedback and relic highlight bounds");
 assert.match(feedback,/function contextFor\(side,index\)[\s\S]*function nextLane\(context\)/,
