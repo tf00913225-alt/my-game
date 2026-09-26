@@ -143,8 +143,11 @@ assert.doesNotMatch(
     /getBoundingClientRect/,
     "relic target focus must not fall back to local DOM bounds"
 );
-assert.match(relicRuntime,/team-relic-mask-holes[\s\S]*createElementNS\(namespace,"rect"\)[\s\S]*highlightRect/,
-    "target focus must cut viewport mask apertures from resolved Unit geometry");
+const relicTargetResolver=relicRuntime.slice(relicRuntime.indexOf("function relicTargetGeometry"),relicRuntime.indexOf("function relativeRelicRect"));
+const relicTargetReveal=relicRuntime.slice(relicRuntime.indexOf("function revealRelicTargets"),relicRuntime.indexOf("function beginRelicCinematic"));
+assert.match(relicTargetResolver,/getUnitGeometry[\s\S]*highlightRect/,"target resolver must return canonical Unit highlight geometry");
+assert.match(relicTargetReveal,/relicTargetGeometry\(target\.targetSide,index\)[\s\S]*team-relic-mask-holes[\s\S]*createElementNS\(namespace,"rect"\)/,
+    "target reveal must cut viewport mask apertures from resolved canonical geometry");
 assert.doesNotMatch(relicRuntime,/team-relic-battle-target-layer|relicTargetLayer\(/,
     "relic focus must not raise live Unit DOM across stacking contexts");
 assert.doesNotMatch(relicCss,/team-relic-battle-target-layer|team-relic-battle-target-focus-visible/,
