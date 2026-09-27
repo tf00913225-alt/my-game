@@ -2,6 +2,7 @@
 
 const {createHash}=require("node:crypto");
 const {LEGACY_BACKUP_SIDECARS}=require("./cloud-save-policy");
+const {newcomerExpNext}=require("./canonical-newcomer-exp");
 
 const STAT_KEYS=["attack","vitality","energy","intelligence","spirit","agility"];
 const ELEMENTS=new Set(["fire","water","wind","earth"]);
@@ -31,7 +32,7 @@ function makeInitialCharacterSources(uid,revision,operationId,selection){
         provenance:"server-created"};
     const attributes=selection.attributes;
     const state={id:selection.displayName,element:selection.element,
-        gender:selection.gender,level:1,exp:0,expNext:100,
+        gender:selection.gender,level:1,exp:0,expNext:newcomerExpNext(1),
         ...Object.fromEntries(STAT_KEYS.map(key=>[key,attributes[key]])),
         bonusHP:0,bonusSP:0,attributePoints:0,skillPoints:2,
         hp:100+attributes.vitality*50,sp:50+attributes.energy*15,

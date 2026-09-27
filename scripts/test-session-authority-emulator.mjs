@@ -360,10 +360,12 @@ await assert.rejects(expAllocator.allocateSharedExp(yRequest,allocationArgs),
     error=>error.code==="failed-precondition");
 assert.equal((await db.doc(`serverUsers/${y}/operations/${allocationOperation}`).get())
     .exists,false);
+assert.equal((await db.doc(`serverUsers/${y}/characters/character-${initialOperation}`)
+    .get()).get("state.expNext"),300);
 const moreExpGrant="grant-more-initial-exp-0001";
 const moreExpOperation="credit-more-initial-exp-0001";
 await db.doc(`serverUsers/${y}/pendingGrants/${moreExpGrant}`).set({
-    schemaVersion:1,ownerUid:y,kind:"exp",source:"server-event",amount:80,
+    schemaVersion:1,ownerUid:y,kind:"exp",source:"server-event",amount:280,
     status:"pending",claimedByOperationId:null,createdAt:Timestamp.now()
 });
 await invoke("reserveTrustedGrant",yUser.idToken,{uid:y,session:sessionY,
@@ -385,25 +387,26 @@ abortAllocation=true;
 await assert.rejects(rollbackAllocator.allocateSharedExp(yRequest,allocArgs),
     /simulated allocation rollback/);
 abortAllocation=false;
-assert.equal((await db.doc(`serverUsers/${y}/economy/current`).get()).get("sharedExp"),120);
+assert.equal((await db.doc(`serverUsers/${y}/economy/current`).get()).get("sharedExp"),320);
 assert.equal((await db.doc(`serverUsers/${y}/operations/${allocationOperation}`).get())
     .exists,false);
 const allocated=await expAllocator.allocateSharedExp(yRequest,allocArgs);
 assert.equal(allocated.allocatedRevision,9);
-assert.equal(allocated.cost,100);
+assert.equal(allocated.cost,300);
 assert.equal(allocated.levelAfter,2);
 const leveled=(await db.doc(`serverUsers/${y}/characters/character-${initialOperation}`)
     .get()).get("state");
-assert.equal(leveled.exp,0);assert.equal(leveled.expNext,120);
+assert.equal(leveled.exp,0);assert.equal(leveled.expNext,375);
 assert.equal(leveled.attributePoints,5);assert.equal(leveled.skillPoints,4);
 assert.equal(leveled.bonusHP,30);assert.equal(leveled.bonusSP,10);
 assert.equal(leveled.hp,200);assert.equal(leveled.sp,80);
 assert.equal((await db.doc(`serverUsers/${y}/economy/current`).get()).get("sharedExp"),20);
 assert.equal((await db.doc(`serverUsers/${y}/ledgerEntries/${allocationOperation}`).get())
-    .get("amount"),-100);
+    .get("amount"),-300);
 assert.equal((await db.doc(`serverUsers/${y}/playableSnapshots/9`).get())
     .get("readyForPublication"),false);
 assert.equal((await expAllocator.allocateSharedExp(yRequest,allocArgs)).unchanged,true);
+
 await assert.rejects(expAllocator.allocateSharedExp(yRequest,{
     operationId:goldOperation,expectedRevision:9}),
     error=>error.code==="failed-precondition");
@@ -451,6 +454,24 @@ await assert.rejects(expAllocator.allocateSharedExp(capRequest,{
 assert.equal((await capRoot.collection("operations").doc(capAttempt).get()).exists,false);
 assert.equal((await capRoot.collection("economy").doc("current").get()).get("sharedExp"),120);
 assert.equal((await db.doc(`users/${capUid}/saves/current`).get()).get("serverRevision"),2);
+// The static curve stops before the roster-dependent Lv.20 threshold.
+capRecords.characters[0].state.level=19;
+capRecords.characters[0].state.expNext=6900;
+const boundaryBundle=assembleCanonicalSnapshot(capUid,2,capRecords);
+await Promise.all([
+    capRoot.collection("characters").doc(capRecords.characters[0].characterId)
+        .update({state:capRecords.characters[0].state}),
+    capRoot.collection("account").doc("current")
+        .update({snapshotSha256:boundaryBundle.sha256}),
+    capRoot.collection("playableSnapshots").doc("2").set(boundaryBundle)
+]);
+await assert.rejects(expAllocator.allocateSharedExp(capRequest,{
+    operationId:"allocate-exp-at-curve-boundary-0001",expectedRevision:2}),
+    error=>error.code==="failed-precondition");
+assert.equal((await capRoot.collection("operations")
+    .doc("allocate-exp-at-curve-boundary-0001").get()).exists,false);
+assert.equal((await capRoot.collection("economy").doc("current").get()).get("sharedExp"),120);
+
 // The opposite order is fenced too: a reserved grant cannot become a new
 // character's operation receipt under the same UID.
 const collisionUser=await login("accounts:signUp",{
