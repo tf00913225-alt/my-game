@@ -82,10 +82,8 @@ assert.match(css,/\.team-relic-battle-cutin-icon\{[^}]*border:0[^}]*background:n
   "battle icon itself must have no box");
 assert.match(css,/\.team-relic-battle-cutin-copy\{[^}]*border:0[^}]*background:none[^}]*box-shadow:none[^}]*text-align:center/,
   "relic name must be centered under the icon with no box");
-assert.match(css,/\.team-relic-battle-target-focus-layer\{[\s\S]*position:absolute;inset:0;z-index:20/,
-  "target focus must live inside the viewport cinematic layer");
-assert.match(css,/\.team-relic-battle-target-outline\{[\s\S]*opacity:0[\s\S]*transition:opacity \.42s ease/,
-  "target outlines must reveal gradually without altering live Unit opacity");
+assert.doesNotMatch(css,/team-relic-battle-target-focus-layer|team-relic-battle-target-outline/,
+  "retired full-Unit target outline CSS must be removed");
 assert.doesNotMatch(css,/team-relic-battle-target-layer|team-relic-battle-target-focus-visible/,
   "legacy live-DOM target stacking must remain retired");
 assert.match(css,/\.team-relic-battle-presentation\.releasing \.team-relic-battle-dim\{opacity:0;transition-duration:\.42s;\}/,
