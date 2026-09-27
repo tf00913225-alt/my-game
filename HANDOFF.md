@@ -1,3 +1,9 @@
+## 2026-09-27 — Server-owned daily check-in grant source (candidate; Phase 4 0/6 VERIFIED)
+
+- Internal owner `functions/src/daily-checkin-grant.js::issue()` derives the `checkin` quest's existing 50 gold award and Taipei calendar day from the server clock. A protected transaction creates one UID-scoped `pendingGrants/daily-checkin-YYYYMMDD` record, or validates the same record on retry. A transaction retry keeps its original day; a corrupt duplicate fails closed. No browser day, reward amount, battle result, or local quest counter is accepted.
+- The existing `reserveTrustedGrant()` and `canonical-resource-credit.js::creditReservedGrant()` remain the only reservation and canonical settlement owners; the emulator exercises the new grant through both steps, claim record and unpublished snapshot. This issuer has no callable or gameplay hook, and is not a player-visible cloud reward. Kill/win quest rewards still lack a trusted battle source. No save wrapper or temporary patch is added.
+- PR, CI, merged-HEAD and deployment evidence must be recorded separately after verification. The playable pointer stays disabled; Phase 4 remains **0/6 VERIFIED**.
+
 ## 2026-09-27 — Canonical one-level EXP allocation (candidate; Phase 4 0/6 VERIFIED)
 
 - New internal owner `functions/src/canonical-exp-allocation.js::allocateSharedExp()` spends only the server-owned shared EXP pool for the first server-created character. One protected operation buys exactly one next level using the current game's cost and growth rules. It commits character/economy/source revisions, an unpublished snapshot, a UID-scoped operation receipt and a ledger entry atomically; retries return that receipt.
