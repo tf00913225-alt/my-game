@@ -9,7 +9,8 @@
 7. **不得自行把 `low / mid / high / perfect` 或「低階／中階／高階／完美」當成新的正式物品階級；正式六階與固定色號一律以 `docs/ITEM_RARITY_UI_SPEC.md` 為準。**
 8. **凡涉及新增、替換、轉檔或正式導入任何點陣圖片資產，必須先完整閱讀 `docs/IMAGE_ASSET_SPEC.md`。該文件是圖片格式、WebP 轉換、無損驗證、透明度、尺寸、Sprite Sheet／VFX 幀資料與正式引用流程的最高權威來源。**
 9. **凡屬修復、fix、failure、test failure、CI failure、fixture、test harness、stale contract 或既有修復分支續修任務，若使用者未在當次任務另行指定不同模式，必須先完整閱讀根目錄 `AUTONOMOUS_REPAIR_CONTRACT.md`，並以該文件作為受控自主修復的唯一正式契約來源；不得依舊對話摘要自行擴張授權。**
-10. **凡涉及怪物／精英／BOSS／日常副本／天兵立繪導入，必須先讀 `MONSTER_PORTRAIT_SPEC.md` 與 `docs/MONSTER_PORTRAIT_SPEC_V1.md`。若素材已經生成並完成正式 WebP 落位，預設使用 `npm run portrait:import -- --keys=<portraitKey,...>` 快速導入；不得為已完成素材重新建立生成 batch、重跑生成或重做母圖搜尋。尚未生成的素材才使用既有 batch 流程。**\n11. **所有新增、修改、替換、重構、UI／CSS、Gameplay、資料、狀態、Lifecycle 與 Bug 修復，施工前都必須完整閱讀 `docs/CHANGE_SAFETY_REPLACEMENT_CONTRACT.md`。使用者說「改成／換成／不要原本的」時預設為 Replacement（取代），代理必須自行完成舊 Owner／Contract／Lifecycle／Semantic State／Regression Test 的遷移與退場判定，不得只疊加新版，也不得把「舊的要不要刪」這類工程責任丟回給不懂程式的專案負責人。**
+10. **凡涉及怪物／精英／BOSS／日常副本／天兵立繪導入，必須先讀 `MONSTER_PORTRAIT_SPEC.md` 與 `docs/MONSTER_PORTRAIT_SPEC_V1.md`。若素材已經生成並完成正式 WebP 落位，預設使用 `npm run portrait:import -- --keys=<portraitKey,...>` 快速導入；不得為已完成素材重新建立生成 batch、重跑生成或重做母圖搜尋。尚未生成的素材才使用既有 batch 流程。**
+11. **所有新增、修改、替換、重構、UI／CSS、Gameplay、資料、狀態、Lifecycle 與 Bug 修復，施工前都必須完整閱讀 `docs/CHANGE_SAFETY_REPLACEMENT_CONTRACT.md`。使用者說「改成／換成／不要原本的」時預設為 Replacement（取代），代理必須自行完成舊 Owner／Contract／Lifecycle／Semantic State／Regression Test 的遷移與退場判定，不得只疊加新版，也不得把「舊的要不要刪」這類工程責任丟回給不懂程式的專案負責人。**
 
 ## 最高優先：Change Safety & Replacement Migration Gate（變更安全與取代遷移閘門）
 
@@ -21,10 +22,10 @@
 
 ## 《四象江湖傳》專案開發、QA 與外部研究固定規則
 
-本章為永久固定開發規範。除非專案負責人日後明確要求修改，所有程式開發、Bug 修正、功能新增／調整、程式重構、GitHub 操作、Pull Request、Repository checks、GitHub Actions、瀏覽器測試、QA、自動化測試、技術研究、除錯與程式碼搜尋，都必須遵守以下原則。既有第 1～9 條為本章的具體前置要求，內容重疊時合併理解，不重複建立第二套標準。
+本章為永久固定開發規範。除非專案負責人日後明確要求修改，所有程式開發、Bug 修正、功能新增／調整、程式重構、GitHub 操作、Pull Request、Repository checks、GitHub Actions、瀏覽器測試、QA、自動化測試、技術研究、除錯與程式碼搜尋，都必須遵守以下原則。既有第 1～11 條為本章的具體前置要求，內容重疊時合併理解，不重複建立第二套標準。
 
 ### 一、專案內部資料永遠優先
-- 所有判斷、修改與除錯，先依據目前 Repository 的正式規格、程式碼、資料結構、函式、模組、遊戲規則、共用工具、既有測試、GitHub Actions、Repository checks，以及 `AGENTS.md`、`CLAUDE.md`、`HANDOFF.md`、`ARCHITECTURE_RULES.md`、`UI_GUIDELINES.md`、`AUTONOMOUS_REPAIR_CONTRACT.md`、`CHECK_REPORT.txt` 等正式文件。
+- 所有判斷、修改與除錯，先依據目前 Repository 的正式規格、程式碼、資料結構、函式、模組、遊戲規則、共用工具、既有測試、GitHub Actions、Repository checks，以及 `AGENTS.md`、`CLAUDE.md`、`HANDOFF.md`、`ARCHITECTURE_RULES.md`、`UI_GUIDELINES.md`、`AUTONOMOUS_REPAIR_CONTRACT.md`、`docs/CHANGE_SAFETY_REPLACEMENT_CONTRACT.md`、`CHECK_REPORT.txt` 等正式文件。
 - 每次先確認：「本專案是不是已經有現成做法？」若已有，優先沿用，不得因外部案例看起來方便就擅自偏離現有架構。
 
 ### 二、禁止無關外部遊戲研究
