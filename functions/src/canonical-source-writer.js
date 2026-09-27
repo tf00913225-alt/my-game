@@ -2,6 +2,7 @@
 
 const {assembleCanonicalSnapshot,inspectCanonicalSnapshot}=require("./canonical-snapshot");
 const {makeInitialCharacterSources}=require("./initial-character-sources");
+const {createRecoveryArchive}=require("./canonical-recovery-archive");
 const {createHash}=require("node:crypto");
 
 const OPERATION_ID=/^[A-Za-z0-9_-]{16,64}$/;
@@ -140,6 +141,9 @@ function createCanonicalSourceWriter({db,FieldValue,HttpsError,runProtected,
                 withStamp(records.claimCheckpoint));
             transaction.create(root.collection("playableSnapshots").doc(String(revision)),{
                 ...bundle,createdAt:stamp
+            });
+            transaction.create(root.collection("recoveryArchives").doc(String(revision)),{
+                ...createRecoveryArchive(uid,revision,records,bundle),createdAt:stamp
             });
             transaction.create(operationRef,{
                 schemaVersion:1,ownerUid:uid,kind:"initial-character-sources",
