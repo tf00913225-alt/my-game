@@ -248,7 +248,19 @@ function runViewport(chrome,width,height){
         assert.equal(new Set(group.map(item=>item.lane)).size,group.length,"each active feedback item must have a unique lane");
     });
     [[data.feedback.monster0,data.feedback.monster0Geometry],[data.feedback.monster1,data.feedback.monster1Geometry],[data.feedback.monster2,data.feedback.monster2Geometry],[data.feedback.player0,data.feedback.player0Geometry],[data.feedback.player1,data.feedback.player1Geometry],[data.feedback.player2,data.feedback.player2Geometry]].forEach(function(pair){
-        pair[0].forEach(function(item){assert.ok(item.rect.bottom<=pair[1].hudSafeRect.top+.5,"feedback must stay above HUD safe area");});
+        pair[0].forEach(function(item){
+            assert.ok(
+                item.rect.bottom<=pair[1].hudSafeRect.top+.5,
+                "feedback must stay above HUD safe area: "+JSON.stringify({
+                    viewport:data.viewport,
+                    item:item,
+                    feedbackSafeRect:pair[1].feedbackSafeRect,
+                    feedbackAnchor:pair[1].feedbackAnchor,
+                    hudSafeRect:pair[1].hudSafeRect,
+                    unitRect:pair[1].unitRect
+                })
+            );
+        });
     });
     data.feedback.monster0.concat(data.feedback.monster1,data.feedback.monster2).forEach(function(item){
         assert.equal(item.color,"rgb(227, 38, 38)");
