@@ -17,6 +17,8 @@ const {createCanonicalAttributeAllocation}=
 const {makeInitialCharacterSources}=require("../functions/src/initial-character-sources.js");
 const {assembleCanonicalSnapshot}=require("../functions/src/canonical-snapshot.js");
 const {inspectRecoveryArchive}=require("../functions/src/canonical-recovery-archive.js");
+const {createCanonicalCurrentRecovery}=
+    require("../functions/src/canonical-current-recovery.js");
 const {inspectExistingEnvelope,nextRevision}=require("../functions/src/cloud-save-envelope.js");
 const project="demo-four-symbols-session";
 if(process.env.GCLOUD_PROJECT!==project||process.env.FIRESTORE_EMULATOR_HOST!=="127.0.0.1:18080"||
@@ -722,6 +724,70 @@ assert.equal((await attributeAllocator.allocateAttributePoint(ownedRequest,attri
 await assert.rejects(attributeAllocator.allocateAttributePoint(ownedRequest,{
     operationId:ownedCreditOperation,expectedRevision:6,stat:"vitality"}),
     error=>error.code==="failed-precondition");
+// An operator-approved same-head repair advances the canonical revision while
+// retaining unique claims, operation receipts and the immutable original.
+const recoveryOperation="recover-current-owned-source-0001";
+const recoveryArgs={operationId:recoveryOperation,expectedRevision:6};
+const recovery=createCanonicalCurrentRecovery({db,FieldValue,HttpsError,
+    inspectExistingEnvelope,nextRevision,runProtected:writerSessions.runProtected});
+await assert.rejects(recovery.restoreCurrent(ownedRequest,recoveryArgs),
+    error=>error.code==="permission-denied");
+const approvalRef=ownedRoot.collection("recoveryApprovals").doc(recoveryOperation);
+await approvalRef.set({schemaVersion:1,ownerUid:ownedUid,
+    operationId:recoveryOperation,status:"approved",sourceRevision:6,
+    sourceSha256:assignedArchive.get("sourceSha256"),
+    snapshotSha256:assignedArchive.get("snapshotSha256"),
+    approvedBy:"emulator-operator",expiresAt:Timestamp.fromMillis(Date.now()-1000)});
+await assert.rejects(recovery.restoreCurrent(ownedRequest,recoveryArgs),
+    error=>error.code==="permission-denied");
+await approvalRef.update({expiresAt:Timestamp.fromMillis(Date.now()+120000)});
+const oldArchive=assignedArchive.data();
+await assignedArchive.ref.update({"sourceRecords.economy.gold":999});
+await assert.rejects(recovery.restoreCurrent(ownedRequest,recoveryArgs),
+    error=>error.code==="data-loss");
+await assignedArchive.ref.set(oldArchive);
+const unexpectedClaim=ownedRoot.collection("claimRecords").doc("unexpected-recovery-claim");
+await unexpectedClaim.set({schemaVersion:1,ownerUid:ownedUid,serverRevision:6,
+    provenance:"server-created",claimKey:"unexpected-recovery-claim",status:"claimed"});
+await assert.rejects(recovery.restoreCurrent(ownedRequest,recoveryArgs),
+    error=>error.code==="data-loss");
+await unexpectedClaim.delete();
+const originalGold=(await ownedRoot.collection("economy").doc("current").get()).get("gold");
+await ownedRoot.collection("economy").doc("current").update({gold:999});
+await ownedItemRef.delete();
+let abortRecovery=true;
+const rollbackRecovery=createCanonicalCurrentRecovery({db,FieldValue,HttpsError,
+    inspectExistingEnvelope,nextRevision,
+    runProtected:(request,operation)=>writerSessions.runProtected(request,async(tx,session)=>{
+        const result=await operation(tx,session);
+        if(abortRecovery){throw new Error("simulated recovery rollback");}
+        return result;
+    })});
+await assert.rejects(rollbackRecovery.restoreCurrent(ownedRequest,recoveryArgs),
+    /simulated recovery rollback/);
+abortRecovery=false;
+assert.equal((await ownedRoot.collection("recoveryArchives").doc("7").get()).exists,false);
+assert.equal((await ownedRoot.collection("operations").doc(recoveryOperation).get()).exists,false);
+assert.equal((await approvalRef.get()).get("status"),"approved");
+const recovered=await recovery.restoreCurrent(ownedRequest,recoveryArgs);
+assert.equal(recovered.restoredRevision,7);
+assert.equal((await ownedItemRef.get()).get("serverRevision"),7);
+assert.equal((await ownedRoot.collection("economy").doc("current").get()).get("gold"),originalGold);
+assert.equal((await ownedRoot.collection("claimRecords").doc(ownedGrant).get())
+    .get("serverRevision"),7);
+assert.equal((await ownedRoot.collection("recoveryAudits").doc(recoveryOperation).get())
+    .get("sourceRevision"),6);
+assert.equal((await approvalRef.get()).get("status"),"used");
+await checkRecoveryArchive(ownedUid,7);
+assert.equal((await recovery.restoreCurrent(ownedRequest,recoveryArgs)).unchanged,true);
+assert.equal((await goldWriter.creditReservedGrant(ownedRequest,{
+    grantId:ownedGrant,operationId:ownedCreditOperation,expectedRevision:3}))
+    .unchanged,true);
+assert.equal((await attributeAllocator.allocateAttributePoint(ownedRequest,attributeArgs))
+    .unchanged,true);
+await assert.rejects(recovery.restoreCurrent(ownedRequest,{
+    operationId:"recover-current-owned-source-0002",expectedRevision:6}),
+    error=>error.code==="aborted");
 // The opposite order is fenced too: a reserved grant cannot become a new
 // character's operation receipt under the same UID.
 const collisionUser=await login("accounts:signUp",{
