@@ -132,9 +132,9 @@ for(const [name,block] of [["personal",personalCompletion],["world",worldComplet
 }
 
 assert.match(relic,/function relicOverlayGeometry\(\)[\s\S]*?getBattlefieldOverlayGeometry/);
-assert.match(relic,/function relicTargetGeometry\(side,index\)[\s\S]*?getUnitGeometry/);
+assert.match(relic,/function relicTargetGeometries\(side,index\)[\s\S]*?getUnitGeometry[\s\S]*?highlightRects/);
 assert.doesNotMatch(
-  relic.slice(relic.indexOf("function relicTargetGeometry"),relic.indexOf("function relativeRelicRect")),
+  relic.slice(relic.indexOf("function relicTargetGeometries"),relic.indexOf("function relativeRelicRect")),
   /getBoundingClientRect/,
   "Relic target geometry must not guess from local DOM"
 );
