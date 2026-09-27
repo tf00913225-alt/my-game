@@ -102,15 +102,25 @@
       },
       "feature-boss-relic": {
         "scripts": [
-          "build/feature-boss-relic.7d756d391c4e.js",
+          "build/feature-boss-relic.e0ac7e7dacb2.js",
           "build/feature-relic-progression.87f6a83606ad.js"
         ],
         "styles": [
-          "build/feature-boss-relic.3bd48f28774d.css",
+          "build/feature-boss-relic.9dfda8481ac1.css",
           "build/feature-relic-progression.8844d5eb6e81.css"
         ],
         "dependencies": [
           "gameplay-core"
+        ],
+        "assets": [
+          "assets/gameplay/covers/boss.webp",
+          "assets/gameplay/covers/tower.webp",
+          "assets/gameplay/covers/abyss.webp",
+          "assets/gameplay/covers/coming-soon.webp",
+          "assets/gameplay/tower/tower-fire-hero.webp",
+          "assets/gameplay/tower/tower-earth-hero.webp",
+          "assets/gameplay/tower/tower-water-hero.webp",
+          "assets/gameplay/tower/tower-wind-hero.webp"
         ]
       },
       "feature-adventure": {
@@ -831,9 +841,9 @@
       "sha256": "2a7c37a8ece6",
       "bytes": 50619
     },
-    "build/feature-boss-relic.7d756d391c4e.js": {
-      "sha256": "7d756d391c4e",
-      "bytes": 85452
+    "build/feature-boss-relic.e0ac7e7dacb2.js": {
+      "sha256": "e0ac7e7dacb2",
+      "bytes": 85503
     },
     "build/feature-relic-progression.87f6a83606ad.js": {
       "sha256": "87f6a83606ad",
@@ -879,9 +889,9 @@
       "sha256": "793114fc856d",
       "bytes": 25218
     },
-    "build/feature-boss-relic.3bd48f28774d.css": {
-      "sha256": "3bd48f28774d",
-      "bytes": 21670
+    "build/feature-boss-relic.9dfda8481ac1.css": {
+      "sha256": "9dfda8481ac1",
+      "bytes": 23107
     },
     "build/feature-relic-progression.8844d5eb6e81.css": {
       "sha256": "8844d5eb6e81",

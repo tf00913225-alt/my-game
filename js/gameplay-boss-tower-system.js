@@ -415,7 +415,7 @@
         const tower=state.tower,element=ELEMENTS[tower.element],level=highestCharacterLevel();
         const next=Math.min(TOWER_FLOORS,tower.completedFloor+1);
         content.innerHTML='<div class="tower-home">'+towerChoiceMarkup()+
-            '<section class="tower-element-hero" style="--tower-color:'+element.color+';--tower-glow:'+element.glow+'"><div><small>本週元素試煉</small><h3>'+escapeHtml(element.label)+'元素</h3><strong>'+tower.completedFloor+' / 100</strong><p>'+escapeHtml(element.style)+'</p></div></section>'+
+            '<section class="tower-element-hero" data-tower-element="'+escapeHtml(tower.element)+'" style="--tower-color:'+element.color+';--tower-glow:'+element.glow+'"><div><small>本週元素試煉</small><h3>'+escapeHtml(element.label)+'元素</h3><strong>'+tower.completedFloor+' / 100</strong><p>'+escapeHtml(element.style)+'</p></div></section>'+
             '<div class="tower-summary-grid"><div><small>本週最高</small><b>'+tower.highestThisWeek+' 層</b></div><div><small>歷史最高</small><b>'+tower.historicalHighest+' 層</b></div><div><small>下一層</small><b>第 '+next+' 層</b></div><div><small>下一重要獎勵</small><b>第 '+nextTowerRewardFloor(tower.completedFloor)+' 層</b></div></div>'+
             (level<TOWER_UNLOCK_LEVEL?'<div class="boss-overview-line"><span>四象塔於 Lv30 開放</span><b>目前 Lv.'+level+'</b></div>':'')+
             '<label class="tower-auto-advance"><input type="checkbox" '+(towerAutoAdvanceEnabled?'checked ':'')+(level<TOWER_UNLOCK_LEVEL||tower.pendingRelicChoice||tower.completedFloor>=TOWER_FLOORS?'disabled ':'')+'onchange="vGameplayToggleTowerAutoAdvance(this.checked)"><span>自動挑戰下一層</span></label>'+
