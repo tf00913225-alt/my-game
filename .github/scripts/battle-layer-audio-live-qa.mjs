@@ -238,7 +238,7 @@ async function launchPresentationQaMode(client,mode){
     if(mode==="normal"){
         started=await client.eval("(()=>{if(typeof startBattle!=='function'||typeof v132BuildDungeonMonster!=='function')return false;window.__battlePresentationQaNormalBackup={monsters:monsters,currentZone:currentZone,mapCooldown:mapCooldown};monsters=[v132BuildDungeonMonster('QA巡怪一',40,'fire','elite'),v132BuildDungeonMonster('QA巡怪二',40,'water','regular'),v132BuildDungeonMonster('QA巡怪三',40,'wind','regular')];currentZone='forest';mapCooldown=false;startBattle(0);return !!battleActive;})()");
     }else if(mode==="daily"){
-        started=await client.eval("(()=>{if(typeof v132LaunchDungeonBattle!=='function'||typeof v132BuildDungeonMonster!=='function')return false;const elements=['fire','water','earth','wind'];const roster=Array.from({length:10},(_,i)=>v132BuildDungeonMonster('QA副本'+(i+1),40,elements[i%4],i<2?'elite':'regular'));return v132LaunchDungeonBattle(roster,()=>{}, {mode:'daily',dailyDungeonType:'exp'})===true;})()");
+        started=await client.eval("(()=>{if(typeof v132LaunchDungeonBattle!=='function'||typeof v148BuildDailyDungeonWaves!=='function')return false;const built=v148BuildDailyDungeonWaves('exp');const roster=built&&built.waves&&built.waves[0];if(!Array.isArray(roster)||roster.length!==6)return false;const ok=v132LaunchDungeonBattle(roster,()=>{}, {mode:'daily',dailyDungeonType:'exp'})===true;if(ok&&window.v132ActiveDungeonRun){window.v132ActiveDungeonRun.partySize=built.partySize;window.v132ActiveDungeonRun.highestPartyLevel=built.highestPartyLevel;window.v132ActiveDungeonRun.dailyDungeonType='exp';}return ok;})()");
     }else if(mode==="abyss"){
         started=await client.eval("(()=>{if(typeof v174AbyssReset!=='function'||typeof v174AbyssStartEncounter!=='function')return false;v174AbyssReset(40);return v174AbyssStartEncounter()===true;})()");
     }else if(mode==="tower"){
@@ -264,7 +264,7 @@ async function launchPresentationQaMode(client,mode){
     );
     const context=await client.eval("(()=>{const run=window.v132ActiveDungeonRun;return {mode:run?.mode||'normal',gameplayMode:run?.gameplayMode||null,dailyDungeonType:run?.dailyDungeonType||null,enemyCount:(typeof currentBattleMonsters!=='undefined'?currentBattleMonsters:[]).length,playerCount:document.querySelectorAll('#battlePlayerRow .battle-player').length};})()");
     if(mode==="normal"){ assert.equal(context.mode,"normal"); }
-    if(mode==="daily"){ assert.equal(context.mode,"daily"); }
+    if(mode==="daily"){ assert.equal(context.mode,"daily");assert.equal(context.dailyDungeonType,"exp");assert.equal(context.enemyCount,6,"formal Daily Dungeon first wave must contain six enemies"); }
     if(mode==="abyss"){ assert.equal(context.mode,"abyss"); }
     if(mode==="tower"){ assert.equal(context.mode,"tower"); }
     if(mode==="personal"){ assert.equal(context.mode,"boss");assert.equal(context.gameplayMode,"personal"); }
