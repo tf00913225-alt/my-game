@@ -136,18 +136,18 @@ assert.match(relicCss,/body > \.team-relic-battle-presentation\{[\s\S]*position:
     "relic cinematic must own one fixed viewport presentation surface");
 assert.match(relicRuntime,/function relicGeometryOwner\(\)[\s\S]*FourSymbolsBattlefieldRenderGeometry/,
     "relic cinematic must resolve the canonical battlefield geometry owner");
-assert.match(relicRuntime,/function relicTargetGeometry\(side,index\)[\s\S]*relicGeometryOwner\(\)[\s\S]*getUnitGeometry[\s\S]*highlightRect/,
+assert.match(relicRuntime,/function relicTargetGeometries\(side,index\)[\s\S]*relicGeometryOwner\(\)[\s\S]*getUnitGeometry[\s\S]*highlightRects/,
     "relic focus must consume canonical Unit highlight geometry");
 assert.doesNotMatch(
-    relicRuntime.slice(relicRuntime.indexOf("function relicTargetGeometry"),relicRuntime.indexOf("function relativeRelicRect")),
+    relicRuntime.slice(relicRuntime.indexOf("function relicTargetGeometries"),relicRuntime.indexOf("function relativeRelicRect")),
     /getBoundingClientRect/,
     "relic target focus must not fall back to local DOM bounds"
 );
-const relicTargetResolver=relicRuntime.slice(relicRuntime.indexOf("function relicTargetGeometry"),relicRuntime.indexOf("function relativeRelicRect"));
+const relicTargetResolver=relicRuntime.slice(relicRuntime.indexOf("function relicTargetGeometries"),relicRuntime.indexOf("function relativeRelicRect"));
 const relicTargetReveal=relicRuntime.slice(relicRuntime.indexOf("function revealRelicTargets"),relicRuntime.indexOf("function beginRelicCinematic"));
-assert.match(relicTargetResolver,/getUnitGeometry[\s\S]*highlightRect/,"target resolver must return canonical Unit highlight geometry");
+assert.match(relicTargetResolver,/getUnitGeometry[\s\S]*highlightRects/,"target resolver must return canonical portrait/HP highlight geometry");
 assert.match(relicTargetReveal,/team-relic-mask-holes/,"target reveal must own the cinematic mask aperture container");
-assert.match(relicTargetReveal,/relicTargetGeometry\(target\.targetSide,index\)/,"target reveal must resolve each target through canonical geometry");
+assert.match(relicTargetReveal,/relicTargetGeometries\(target\.targetSide,index\)/,"target reveal must resolve each target through canonical geometry");
 assert.match(relicTargetReveal,/createElementNS\(namespace,"rect"\)/,"target reveal must cut a rectangle aperture for each resolved target");
 assert.doesNotMatch(relicRuntime,/team-relic-battle-target-layer|relicTargetLayer\(/,
     "relic focus must not raise live Unit DOM across stacking contexts");
@@ -165,7 +165,7 @@ assert.ok(
     "battlefield dimming must precede target reveal"
 );
 assert.match(relicCinematic,/revealRelicTargets\(target\)/,"target reveal remains part of the serialized relic cinematic");
-assert.match(geometry,/function unitGeometry\(side,index\)[\s\S]*hudSafeRect[\s\S]*feedbackAnchor[\s\S]*highlightRect/,
+assert.match(geometry,/function unitGeometry\(side,index\)[\s\S]*highlightRects[\s\S]*hudSafeRect[\s\S]*feedbackAnchor/,
     "one geometry adapter must expose HUD-safe feedback and relic highlight bounds");
 assert.match(feedback,/function contextFor\(side,index\)[\s\S]*function laneMetrics\(context\)[\s\S]*capacity:[\s\S]*function freeLane\(context,metrics\)[\s\S]*context\.queue\.push\(request\)/,
     "floating feedback must size target-scoped lanes from canonical geometry and queue overflow");
