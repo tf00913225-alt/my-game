@@ -38,7 +38,7 @@ assert.ok(
 );
 assert.match(cinematicPrelude,/waitMs\(RELIC_IDENTITY_HOLD_MS\)[\s\S]*classList\.add\("identity-exiting"\)[\s\S]*revealRelicTargets\(target\)/,
   "identity hold must end in target reveal before VFX");
-assert.match(relic,/function relicTargetGeometry\(side,index\)[\s\S]*getUnitGeometry/,
+assert.match(relic,/function relicTargetGeometries\(side,index\)[\s\S]*getUnitGeometry[\s\S]*highlightRects/,
   "target lookup must resolve canonical battlefield geometry");
 assert.ok(
   relic.includes("function revealRelicTargets(target)") &&
