@@ -3,6 +3,8 @@
 const {assembleCanonicalSnapshot,verifyCanonicalSnapshotAgainstSources}=
     require("./canonical-snapshot");
 const ID=/^[A-Za-z0-9_-]{16,64}$/;
+// js/28-v133-economy-rebalance.js owns the current game level ceiling.
+const MAX_CHARACTER_LEVEL=100;
 const source=data=>{
     const {createdAt,updatedAt,snapshotSha256,...record}=data;
     return record;
@@ -104,10 +106,14 @@ function createCanonicalExpAllocation({db,FieldValue,HttpsError,runProtected,
                 "bonusHP","bonusSP","hp","sp","vitality","energy"];
             if(character.characterId!==account.slots[0]||
                keys.some(key=>!Number.isSafeInteger(state[key])||state[key]<0)||
-               state.level<1||state.expNext<1||state.exp>=state.expNext||
+               state.level<1||state.level>MAX_CHARACTER_LEVEL||
+               state.expNext<1||state.exp>=state.expNext||
                state.hp>100+state.vitality*50+state.bonusHP||
                state.sp>50+state.energy*15+state.bonusSP){
                 fail("data-loss","Character EXP or resource state is invalid.");
+            }
+            if(state.level===MAX_CHARACTER_LEVEL){
+                fail("failed-precondition","Character has reached the level cap.");
             }
             const cost=state.expNext-state.exp;
             const nextExpNext=Math.max(state.expNext+1,Math.floor(state.expNext*1.2));
