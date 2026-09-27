@@ -297,6 +297,18 @@ assert.equal((await db.doc(`serverUsers/${y}/playableSnapshots/4`).get())
 assert.equal((await db.doc(`serverUsers/${y}/ledgerEntries/${goldOperation}`).get())
     .get("balanceAfter"),25);
 assert.equal((await goldWriter.creditReservedGrant(yRequest,creditArgs)).unchanged,true);
+// A lost creation response remains idempotent after later canonical writes.
+const creationReplay=await initialWriter.commitInitialSources(yRequest,initialArgs);
+assert.equal(creationReplay.unchanged,true);
+assert.equal(creationReplay.sourceRevision,2);
+assert.equal((await db.doc(`serverUsers/${y}/account/current`).get()).get("serverRevision"),4);
+const originalSnapshotRef=db.doc(`serverUsers/${y}/playableSnapshots/2`);
+const originalDigest=(await originalSnapshotRef.get()).get("sha256");
+await originalSnapshotRef.update({sha256:"0".repeat(64)});
+await assert.rejects(initialWriter.commitInitialSources(yRequest,initialArgs),
+    error=>error.code==="data-loss");
+await originalSnapshotRef.update({sha256:originalDigest});
+assert.equal((await initialWriter.commitInitialSources(yRequest,initialArgs)).unchanged,true);
 const reserveReplay=await invoke("reserveTrustedGrant",yUser.idToken,{
     uid:y,session:sessionY,grantId:grantIdForCharacter,
     operationId:goldOperation,expectedRevision:2});
