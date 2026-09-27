@@ -9421,14 +9421,20 @@ body > .team-relic-battle-presentation .team-relic-battle-cutin-copy strong{
 
 @media(max-width:390px){#game-stage .team-relic-current-card{grid-template-columns:68px minmax(0,1fr);padding:8px;}#game-stage .team-relic-current-art{width:68px;}#game-stage .team-relic-card{grid-template-columns:62px minmax(0,1fr);min-height:178px;padding:7px;gap:3px 7px;}#game-stage .team-relic-card-art{width:62px;}#game-stage .team-relic-detail-hero{grid-template-columns:minmax(92px,34%) minmax(0,1fr);gap:2px 9px;padding:12px 10px;}}
 
-/* Foreground Projection: projected transparent artwork and cloned HP only. */
+/* Foreground Projection: transparent artwork plus data-driven HP and SP bars. */
 .team-relic-battle-dim{position:absolute;inset:0;background:#000;opacity:0;transition:opacity var(--team-relic-dim-in,180ms) ease;pointer-events:none;}
 .team-relic-battle-presentation.dim-visible .team-relic-battle-dim{opacity:.78;}
 .team-relic-target-projection-layer{position:absolute;inset:0;z-index:2;opacity:0;pointer-events:none;transition:opacity 120ms ease;}
 .team-relic-battle-presentation.targets-visible .team-relic-target-projection-layer{opacity:1;}
-.team-relic-target-projection-art,.team-relic-target-projection-hp{position:absolute;box-sizing:border-box;pointer-events:none;}
+.team-relic-target-projection-art,.team-relic-target-projection-resource{position:absolute;box-sizing:border-box;pointer-events:none;}
 .team-relic-target-projection-art{background-color:transparent;}
-.team-relic-target-projection-hp>*{width:100%;height:100%;margin:0;}
+.team-relic-target-projection-resource{overflow:hidden;border-radius:5px;}
+.team-relic-target-projection-resource-fill{position:absolute;inset:0 auto 0 0;height:100%;transition:width .25s ease;}
+.team-relic-target-projection-hp{background:#3a1111;}
+.team-relic-target-projection-hp .team-relic-target-projection-resource-fill{background:linear-gradient(180deg,#f0605c,#c81e1e);}
+.team-relic-target-projection-sp{background:#101f45;}
+.team-relic-target-projection-sp .team-relic-target-projection-resource-fill{background:linear-gradient(180deg,#5b8fff,#2050c0);}
+.team-relic-target-projection-shield{position:absolute;top:0;bottom:0;background:rgba(255,255,255,.86);box-shadow:inset 0 0 2px rgba(0,0,0,.35);}
 
 
 /* bundled source: css/battle-floating-feedback-owner.css */
@@ -9446,7 +9452,7 @@ body > .battle-floating-feedback{
     color:#e32626;
     box-shadow:none;
     font-family:"Noto Sans TC",sans-serif;
-    font-size:18px;
+    font-size:var(--battle-feedback-font-size,18px);
     font-weight:900;
     line-height:1.05;
     letter-spacing:.2px;
@@ -9467,11 +9473,6 @@ body > .battle-floating-feedback[data-feedback-kind="status"]{min-height:19px;pa
 body > .battle-floating-feedback.is-critical{font-size:19px;font-weight:950;letter-spacing:.5px;-webkit-text-stroke:1.25px #fff;paint-order:stroke fill;animation-name:battleFloatingFeedbackCritical;}
 @keyframes battleFloatingFeedback{0%{opacity:0;transform:translate(-50%,calc(-100% + 4px)) scale(.88)}12%{opacity:1;transform:translate(-50%,calc(-100% - 3px)) scale(1.08)}72%{opacity:1;transform:translate(-50%,calc(-100% - 10px)) scale(1)}100%{opacity:0;transform:translate(-50%,calc(-100% - 22px)) scale(1)}}
 @keyframes battleFloatingFeedbackCritical{0%{opacity:0;transform:translate(-50%,calc(-100% + 7px)) scale(.62) rotate(-6deg)}16%{opacity:1;transform:translate(-50%,calc(-100% - 6px)) scale(1.24) rotate(5deg)}30%{transform:translate(calc(-50% - 4px),calc(-100% - 11px)) scale(1.06) rotate(-4deg)}42%{transform:translate(calc(-50% + 4px),calc(-100% - 15px)) scale(1.14) rotate(3deg)}56%{transform:translate(-50%,calc(-100% - 18px)) scale(1.04) rotate(0)}78%{opacity:1;transform:translate(-50%,calc(-100% - 25px)) scale(1)}100%{opacity:0;transform:translate(-50%,calc(-100% - 36px)) scale(1) rotate(0)}}
-    14%{opacity:1;transform:translate(-50%,calc(-100% - 7px)) scale(1.18) rotate(3deg)}
-    34%{transform:translate(-50%,calc(-100% - 6px)) scale(1.04) rotate(-1deg)}
-    72%{opacity:1;transform:translate(-50%,calc(-100% - 12px)) scale(1)}
-    100%{opacity:0;transform:translate(-50%,calc(-100% - 25px)) scale(1)}
-}
 .battle-player.battle-escape-presenting{
     will-change:transform,opacity;
     pointer-events:none;
@@ -9483,9 +9484,11 @@ body > .battle-floating-feedback.is-critical{font-size:19px;font-weight:950;lett
 
 /* bundled source: css/battle-skill-name-presentation-owner.css */
 /* Canonical skill-name presentation owner. Element identity comes only from Skill Data. */
-.skill-name-badge{position:absolute;z-index:16020;display:block;box-sizing:border-box;width:max-content;min-width:0;margin:0;padding:0;border:0;border-radius:0;background:transparent;color:#fff;font-size:19px;font-weight:900;line-height:1.05;letter-spacing:.1px;text-align:center;white-space:nowrap;overflow:visible;pointer-events:none;-webkit-text-stroke:1.15px #fff;paint-order:stroke fill;text-shadow:0 1px 2px #000,0 0 4px rgba(0,0,0,.72);transform:translate(-50%,-100%);animation:skillBadgePop var(--skill-name-display-duration,347ms) ease-out forwards;}
-.skill-name-badge[data-skill-element="fire"]{color:#e32626;}
-.skill-name-badge[data-skill-element="water"]{color:#3aaeff;}
-.skill-name-badge[data-skill-element="wind"]{color:#39c96b;}
-.skill-name-badge[data-skill-element="earth"]{color:#e0b833;}
-.skill-name-badge[data-skill-element="normal"]{color:#fff;}
+:root{--battle-feedback-font-size:18px;}
+body > .skill-name-badge{position:fixed;z-index:16020;display:block;box-sizing:border-box;width:max-content;min-width:0;margin:0;padding:0;border:0;border-radius:0;background:transparent;color:#fff;font-size:var(--battle-feedback-font-size);font-weight:900;line-height:1.05;letter-spacing:.1px;text-align:center;white-space:nowrap;overflow:visible;pointer-events:none;-webkit-text-stroke:1.15px #fff;paint-order:stroke fill;text-shadow:0 1px 2px #000,0 0 4px rgba(0,0,0,.72);transform:translate(-50%,-100%);animation:skillBadgePop var(--skill-name-display-duration,347ms) ease-out forwards;}
+body > .skill-name-badge[data-skill-element="fire"]{color:#e32626;}
+body > .skill-name-badge[data-skill-element="water"]{color:#3aaeff;}
+body > .skill-name-badge[data-skill-element="wind"]{color:#39c96b;}
+body > .skill-name-badge[data-skill-element="earth"]{color:#e0b833;}
+body > .skill-name-badge[data-skill-element="normal"]{color:#fff;}
+@keyframes skillBadgePop{0%{opacity:0;transform:translate(-50%,4px) scale(.7)}15%{opacity:1;transform:translate(-50%,-6px) scale(1.15)}30%{transform:translate(-50%,-4px) scale(1)}70%{opacity:1;transform:translate(-50%,-12px) scale(1)}100%{opacity:0;transform:translate(-50%,-22px) scale(1)}}

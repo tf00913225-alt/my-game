@@ -8884,6 +8884,29 @@ ensureFunctionalStyles();runRepairs();
         return {owner:"fixed-slot",rect:rect,center:{x:rect.left+rect.width/2,y:rect.top+rect.height/2}};
     }
 
+    function clampedRatio(value,maximum){
+        const max=Number(maximum), current=Number(value);
+        return Number.isFinite(current)&&Number.isFinite(max)&&max>0?Math.max(0,Math.min(1,current/max)):0;
+    }
+    function resourceStateFor(side,index){
+        if(side==="monster"){
+            const entity=typeof monsters!=="undefined"&&Array.isArray(monsters)?monsters[index]:null;
+            return entity?{hpRatio:clampedRatio(entity.hp,entity.maxHP),spRatio:clampedRatio(entity.sp,entity.maxSP),shieldRatio:0}:null;
+        }
+        const entity=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(index):null;
+        const stats=typeof getPartyBattleStats==="function"?getPartyBattleStats(index):null;
+        const shield=entity&&Array.isArray(entity.activeBuffs)?entity.activeBuffs.find(effect=>effect&&effect.type==="shield"&&Number(effect.turnsLeft)>0&&Number(effect.remaining)>0):null;
+        return entity&&stats?{
+            hpRatio:clampedRatio(entity.hp,stats.maxHP),
+            spRatio:clampedRatio(entity.sp,stats.maxSP),
+            shieldRatio:shield?clampedRatio(shield.remaining,stats.maxHP):0
+        }:null;
+    }
+    function projectionFor(node,ratio,shieldRatio){
+        const rect=node&&typeof node.getBoundingClientRect==="function"?plainRect(node.getBoundingClientRect()):null;
+        return rect&&rect.width>0&&rect.height>0?{rect:rect,ratio:ratio,shieldRatio:shieldRatio||0}:null;
+    }
+
     function unitGeometry(side,index){
         const targetSide=side==="monster"?"monster":"player";
         const unitIndex=Number(index);
@@ -8911,10 +8934,13 @@ ensureFunctionalStyles();runRepairs();
             ".monster-hp,.monster-sp,.hp-bar,.sp-bar,.battle-monster-name,.battle-player-id,.monster-status-badges"
         ));
         const hpNodes=Array.from(card.querySelectorAll(".monster-hp,.hp-bar,.battle-hp-bar,.player-hp-bar,[data-hud=\"hp\"],[data-stat=\"hp\"]"));
-        const hpRects=hpNodes.map(node=>typeof node.getBoundingClientRect==="function"?plainRect(node.getBoundingClientRect()):null).filter(rect=>rect&&rect.width>0&&rect.height>0);
-        const hpRect=hpRects.length?hpRects.reduce((acc,rect)=>({left:Math.min(acc.left,rect.left),top:Math.min(acc.top,rect.top),right:Math.max(acc.right,rect.right),bottom:Math.max(acc.bottom,rect.bottom),width:Math.max(acc.right,rect.right)-Math.min(acc.left,rect.left),height:Math.max(acc.bottom,rect.bottom)-Math.min(acc.top,rect.top)})):null;
+        const spNodes=Array.from(card.querySelectorAll(".monster-sp,.sp-bar,.battle-sp-bar,.player-sp-bar,[data-hud=\"sp\"],[data-stat=\"sp\"]"));
+        const resourceState=resourceStateFor(targetSide,unitIndex);
+        const hpProjection=projectionFor(hpNodes[0],resourceState&&resourceState.hpRatio,resourceState&&resourceState.shieldRatio);
+        const spProjection=projectionFor(spNodes[0],resourceState&&resourceState.spRatio,0);
+        const hpRect=hpProjection&&hpProjection.rect;
+        const spRect=spProjection&&spProjection.rect;
         const artworkProjection=art&&portraitRect?{rect:portraitRect,backgroundImage:String(art.style&&art.style.backgroundImage||window.getComputedStyle(art).backgroundImage||""),backgroundSize:String(art.style&&art.style.backgroundSize||window.getComputedStyle(art).backgroundSize||"contain"),backgroundPosition:String(art.style&&art.style.backgroundPosition||window.getComputedStyle(art).backgroundPosition||"center"),backgroundRepeat:String(art.style&&art.style.backgroundRepeat||window.getComputedStyle(art).backgroundRepeat||"no-repeat")} : null;
-        const hpProjection=hpNodes[0]&&hpRect?{rect:hpRect,html:String(hpNodes[0].outerHTML||"")} : null;
         const hudRects=hudNodes
             .map(node=>typeof node.getBoundingClientRect==="function"?plainRect(node.getBoundingClientRect()):null)
             .filter(rect=>rect&&rect.width>0&&rect.height>0);
@@ -8943,7 +8969,7 @@ ensureFunctionalStyles();runRepairs();
 
         return {
             owner:"fixed-slot",side:targetSide,index:unitIndex,slot:slot,
-            unitRect:unitRect,portraitRect:portraitRect,hpRect:hpRect,artworkProjection:artworkProjection,hpProjection:hpProjection,hudSafeRect:hudSafeRect,
+            unitRect:unitRect,portraitRect:portraitRect,hpRect:hpRect,spRect:spRect,artworkProjection:artworkProjection,hpProjection:hpProjection,spProjection:spProjection,hudSafeRect:hudSafeRect,
             feedbackSafeRect:feedbackSafeRect,
             center:{x:unitRect.left+unitRect.width/2,y:unitRect.top+unitRect.height/2},
             feedbackAnchor:{
@@ -9018,6 +9044,7 @@ ensureFunctionalStyles();runRepairs();
     const LANE_BOTTOM_INSET_PX=6;
     const DEFAULT_DURATION=980;
     const contexts=new Map();
+    const pendingImpactBatches=new Map();
     let sequence=0;
 
     function numeric(value,fallback){
@@ -9075,6 +9102,42 @@ ensureFunctionalStyles();runRepairs();
             return {delayMs:Math.max(0,numeric(timing.delayMs,0)),critical:timing.critical===true,impactId:timing.impactId||null,impactAt:Number.isFinite(Number(timing.impactAt))?Number(timing.impactAt):0,sequence:numeric(timing.sequence,0)};
         }catch(_){ return {delayMs:0,critical:false,impactId:null,impactAt:0,sequence:0}; }
     }
+    function impactBatchKey(request){ return unitKey(request.side,request.index)+"|"+String(request.impactId); }
+    function removeFromImpactBatch(request){
+        if(!request||!request.impactBatchKey){ return; }
+        const batch=pendingImpactBatches.get(request.impactBatchKey);
+        if(!batch){ request.impactBatchKey=null; return; }
+        batch.requests=batch.requests.filter(item=>item!==request);
+        request.impactBatchKey=null;
+        if(!batch.requests.length){
+            if(batch.timer){ clearTimeout(batch.timer); }
+            pendingImpactBatches.delete(batch.key);
+        }
+    }
+    function flushImpactBatch(key){
+        const batch=pendingImpactBatches.get(key);
+        if(!batch){ return; }
+        pendingImpactBatches.delete(key);
+        batch.timer=null;
+        const requests=batch.requests.slice().sort(compareRequests);
+        requests.forEach(request=>{ request.impactBatchKey=null; enqueue(request,true); });
+        const context=contextFor(batch.side,batch.index);
+        pump(context);
+    }
+    function registerImpactRequest(request,timing){
+        const key=impactBatchKey(request);
+        let batch=pendingImpactBatches.get(key);
+        if(!batch){
+            const dueAt=Number(request.impactAt)||Date.now()+Math.max(0,numeric(timing.delayMs,0));
+            batch={key:key,side:request.side,index:request.index,impactId:request.impactId,dueAt:dueAt,requests:[],timer:null};
+            pendingImpactBatches.set(key,batch);
+            /* A batch owns exactly one timer. Even a zero-delay impact defers to a
+               task boundary so all synchronous and microtask status producers can register. */
+            batch.timer=setTimeout(()=>flushImpactBatch(key),Math.max(0,dueAt-Date.now()));
+        }
+        request.impactBatchKey=key;
+        batch.requests.push(request);
+    }
     function makeHandle(request){
         let resolvePromise;
         const promise=new Promise(resolve=>{ resolvePromise=resolve; });
@@ -9089,7 +9152,7 @@ ensureFunctionalStyles();runRepairs();
     function finishRequest(request,reason){
         if(!request||request.finished){ return; }
         request.finished=true;
-        if(request.delayTimer){ clearTimeout(request.delayTimer); request.delayTimer=null; }
+        removeFromImpactBatch(request);
         if(request.removeTimer){ clearTimeout(request.removeTimer); request.removeTimer=null; }
         if(request.node&&request.node.parentNode){ request.node.remove(); }
         if(typeof request.resolve==="function"){ request.resolve(reason||"done"); }
@@ -9134,7 +9197,7 @@ ensureFunctionalStyles();runRepairs();
     function formatCritical(text){
         const value=String(text==null?"":text);
         const match=value.match(/\d+(?:\.\d+)?/);
-        return "〔💥〕 "+(match?match[0]:value);
+        return "💥 "+(match?match[0]:value);
     }
     function spawn(context,request,lane){
         if(request.cancelled||request.finished){ return false; }
@@ -9185,21 +9248,13 @@ ensureFunctionalStyles();runRepairs();
         }
         if(!context.active.size&&!context.queue.length){ contexts.delete(context.key); }
     }
-    function enqueue(request){
+    function enqueue(request,deferPump){
         if(request.cancelled||request.finished){ return; }
         const context=contextFor(request.side,request.index);
         request.context=context;
         context.queue.push(request);
         context.queue.sort(compareRequests);
-        /* Synthetic/settled callers have explicitly opted out of V143 impact
-           timing. Flush through this same queue owner now so the request is
-           immediately observable, while live impacts retain one microtask in
-           which matching damage/status phases can be ordered together. */
-        if(request.skipImpactTiming){
-            pump(context);
-            return;
-        }
-        queueMicrotask(()=>pump(context));
+        if(!deferPump){ pump(context); }
     }
     function emit(options){
         if(typeof document==="undefined"||!document.body){ return null; }
@@ -9221,8 +9276,8 @@ ensureFunctionalStyles();runRepairs();
         };
         request.critical=request.critical||timing.critical;
         const handle=makeHandle(request);
-        if(timing.delayMs>8){
-            request.delayTimer=setTimeout(()=>{ request.delayTimer=null;enqueue(request); },timing.delayMs);
+        if(request.impactId&&!request.skipImpactTiming){
+            registerImpactRequest(request,timing);
         }else{
             enqueue(request);
         }
@@ -9241,6 +9296,11 @@ ensureFunctionalStyles();runRepairs();
         });
     }
     function clear(){
+        Array.from(pendingImpactBatches.values()).forEach(batch=>{
+            if(batch.timer){ clearTimeout(batch.timer); }
+            batch.requests.slice().forEach(request=>finishRequest(request,"teardown"));
+        });
+        pendingImpactBatches.clear();
         Array.from(contexts.values()).forEach(context=>{
             context.queue.slice().forEach(request=>finishRequest(request,"teardown"));
             Array.from(context.active.values()).forEach(request=>finishRequest(request,"teardown"));
@@ -9271,6 +9331,7 @@ ensureFunctionalStyles();runRepairs();
         clear:clear,
         identifyUnit:identifyUnit,
         getContextCount:()=>contexts.size,
+        getPendingImpactBatchCount:()=>pendingImpactBatches.size,
         debugSnapshot:debugSnapshot
     });
     window.FourSymbolsBattleFloatingFeedback=api;
@@ -10800,20 +10861,41 @@ ensureFunctionalStyles();runRepairs();
         node.style.left=numeric(rect.left)+"px";node.style.top=numeric(rect.top)+"px";node.style.width=Math.max(1,numeric(rect.width))+"px";node.style.height=Math.max(1,numeric(rect.height))+"px";
         return node.__relicOverlayRect={left:numeric(rect.left),top:numeric(rect.top),width:Math.max(1,numeric(rect.width)),height:Math.max(1,numeric(rect.height))};
     }
+    function appendRelicResourceProjection(kind,projection,overlayRect){
+        const rect=projection&&relativeRelicRect(projection.rect,overlayRect);
+        if(!rect||rect.width<=0||rect.height<=0){ return null; }
+        const node=document.createElement("div"),fill=document.createElement("div");
+        node.className="team-relic-target-projection-resource "+(kind==="hp"?"team-relic-target-projection-hp":"team-relic-target-projection-sp");
+        node.style.left=rect.left+"px";node.style.top=rect.top+"px";node.style.width=rect.width+"px";node.style.height=rect.height+"px";
+        fill.className="team-relic-target-projection-resource-fill";
+        fill.style.width=Math.max(0,Math.min(1,Number(projection.ratio)||0))*100+"%";
+        node.appendChild(fill);
+        if(kind==="hp"&&Number(projection.shieldRatio)>0){
+            const shield=document.createElement("div");
+            shield.className="team-relic-target-projection-shield";
+            shield.style.left=Math.max(0,Math.min(1,Number(projection.ratio)||0))*100+"%";
+            shield.style.width=Math.max(0,Math.min(1,Number(projection.shieldRatio)||0))*100+"%";
+            node.appendChild(shield);
+        }
+        return node;
+    }
     function appendRelicProjection(layer,geometry,overlayRect){
-        const artwork=geometry.artworkProjection,hp=geometry.hpProjection,artRect=relativeRelicRect(artwork.rect,overlayRect),hpRect=relativeRelicRect(hp.rect,overlayRect);
-        if(!artRect||!hpRect||artRect.width<=0||artRect.height<=0||hpRect.width<=0||hpRect.height<=0){ return; }
-        const art=document.createElement("div"), hpNode=document.createElement("div");
+        const artwork=geometry.artworkProjection,artRect=artwork&&relativeRelicRect(artwork.rect,overlayRect);
+        if(!artRect||artRect.width<=0||artRect.height<=0){ return; }
+        const art=document.createElement("div");
         art.className="team-relic-target-projection-art";
         art.style.left=artRect.left+"px";art.style.top=artRect.top+"px";art.style.width=artRect.width+"px";art.style.height=artRect.height+"px";art.style.backgroundImage=artwork.backgroundImage;art.style.backgroundSize=artwork.backgroundSize;art.style.backgroundPosition=artwork.backgroundPosition;art.style.backgroundRepeat=artwork.backgroundRepeat;
-        hpNode.className="team-relic-target-projection-hp";hpNode.style.left=hpRect.left+"px";hpNode.style.top=hpRect.top+"px";hpNode.style.width=hpRect.width+"px";hpNode.style.height=hpRect.height+"px";hpNode.innerHTML=hp.html;
-        layer.append(art,hpNode);
+        const hp=appendRelicResourceProjection("hp",geometry.hpProjection,overlayRect);
+        const sp=appendRelicResourceProjection("sp",geometry.spProjection,overlayRect);
+        layer.append(art);
+        if(hp){ layer.append(hp); }
+        if(sp){ layer.append(sp); }
     }
     function revealRelicTargets(target){
         clearRelicTargetFocus();
         if(!relicCutinNode||!target||!Array.isArray(target.targetIds)){ return waitMs(RELIC_TARGET_REVEAL_MS); }
         const overlayRect=syncRelicPresentationGeometry(relicCutinNode)||relicCutinNode.__relicOverlayRect, layer=relicCutinNode.querySelector(".team-relic-target-projection-layer"), owner=relicGeometryOwner();
-        if(layer&&overlayRect&&owner&&typeof owner.getUnitGeometry==="function"){target.targetIds.forEach(index=>{const geometry=owner.getUnitGeometry(target.targetSide,index);if(geometry&&geometry.artworkProjection&&geometry.hpProjection){appendRelicProjection(layer,geometry,overlayRect);}});}
+        if(layer&&overlayRect&&owner&&typeof owner.getUnitGeometry==="function"){target.targetIds.forEach(index=>{const geometry=owner.getUnitGeometry(target.targetSide,index);if(geometry&&geometry.artworkProjection&&geometry.hpProjection&&geometry.spProjection){appendRelicProjection(layer,geometry,overlayRect);}});}
         const show=()=>{if(relicCutinNode){relicCutinNode.classList.add("targets-visible");}};
         if(typeof requestAnimationFrame==="function"){requestAnimationFrame(show);}else{show();}
         return waitMs(RELIC_TARGET_REVEAL_MS);
