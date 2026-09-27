@@ -11,6 +11,8 @@ const {createSessionAuthority}=require("../functions/src/session-authority.js");
 const {createCanonicalSourceWriter}=require("../functions/src/canonical-source-writer.js");
 const {createCanonicalResourceCredit}=require("../functions/src/canonical-resource-credit.js");
 const {createCanonicalExpAllocation}=require("../functions/src/canonical-exp-allocation.js");
+const {makeInitialCharacterSources}=require("../functions/src/initial-character-sources.js");
+const {assembleCanonicalSnapshot}=require("../functions/src/canonical-snapshot.js");
 const {inspectExistingEnvelope,nextRevision}=require("../functions/src/cloud-save-envelope.js");
 const project="demo-four-symbols-session";
 if(process.env.GCLOUD_PROJECT!==project||process.env.FIRESTORE_EMULATOR_HOST!=="127.0.0.1:18080"||
@@ -417,6 +419,38 @@ await rejected("reserveTrustedGrant",yUser.idToken,{uid:y,session:sessionY,
     "FAILED_PRECONDITION");
 assert.equal((await collisionRef.get()).get("status"),"pending");
 assert.equal((await db.doc(`users/${y}/saves/current`).get()).get("serverRevision"),9);
+// A valid max-level canonical source cannot spend EXP into level 101.
+const capUser=await login("accounts:signUp",{
+    email:"session-exp-cap@example.test",password});
+const capUid=capUser.localId;
+const capSession=await invoke("createGameSession",capUser.idToken,{uid:capUid});
+await invoke("bootstrapCloudSave",capUser.idToken,{uid:capUid,session:capSession});
+const capOperation="initial-exp-cap-character-0001";
+const capRequest={auth:{uid:capUid,token:claims(capUser.idToken)},
+    data:{uid:capUid,session:capSession}};
+await initialWriter.commitInitialSources(capRequest,{
+    operationId:capOperation,expectedRevision:1,selection:choices});
+const capRecords=makeInitialCharacterSources(capUid,2,capOperation,choices);
+capRecords.characters[0].state.level=100;
+capRecords.characters[0].state.exp=0;
+capRecords.characters[0].state.expNext=120;
+capRecords.economy.sharedExp=120;
+const capBundle=assembleCanonicalSnapshot(capUid,2,capRecords);
+const capRoot=db.collection("serverUsers").doc(capUid);
+await Promise.all([
+    capRoot.collection("characters").doc(capRecords.characters[0].characterId)
+        .update({state:capRecords.characters[0].state}),
+    capRoot.collection("economy").doc("current").update({sharedExp:120}),
+    capRoot.collection("account").doc("current").update({snapshotSha256:capBundle.sha256}),
+    capRoot.collection("playableSnapshots").doc("2").set(capBundle)
+]);
+const capAttempt="allocate-exp-at-level-cap-0001";
+await assert.rejects(expAllocator.allocateSharedExp(capRequest,{
+    operationId:capAttempt,expectedRevision:2}),
+    error=>error.code==="failed-precondition");
+assert.equal((await capRoot.collection("operations").doc(capAttempt).get()).exists,false);
+assert.equal((await capRoot.collection("economy").doc("current").get()).get("sharedExp"),120);
+assert.equal((await db.doc(`users/${capUid}/saves/current`).get()).get("serverRevision"),2);
 // The opposite order is fenced too: a reserved grant cannot become a new
 // character's operation receipt under the same UID.
 const collisionUser=await login("accounts:signUp",{
