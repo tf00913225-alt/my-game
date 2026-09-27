@@ -15,6 +15,8 @@
     const LANE_BOTTOM_INSET_PX=6;
     const DEFAULT_DURATION=980;
     const contexts=new Map();
+    const pendingImpacts=new Map();
+    const impactTimers=new Set();
     let sequence=0;
 
     function numeric(value,fallback){
@@ -86,7 +88,6 @@
     function finishRequest(request,reason){
         if(!request||request.finished){ return; }
         request.finished=true;
-        if(request.delayTimer){ clearTimeout(request.delayTimer); request.delayTimer=null; }
         if(request.removeTimer){ clearTimeout(request.removeTimer); request.removeTimer=null; }
         if(request.node&&request.node.parentNode){ request.node.remove(); }
         if(typeof request.resolve==="function"){ request.resolve(reason||"done"); }
@@ -131,7 +132,7 @@
     function formatCritical(text){
         const value=String(text==null?"":text);
         const match=value.match(/\d+(?:\.\d+)?/);
-        return "〔💥〕 "+(match?match[0]:value);
+        return "💥 "+(match?match[0]:value);
     }
     function spawn(context,request,lane){
         if(request.cancelled||request.finished){ return false; }
@@ -188,16 +189,38 @@
         request.context=context;
         context.queue.push(request);
         context.queue.sort(compareRequests);
-        /* Synthetic/settled callers have explicitly opted out of V143 impact
-           timing. Flush through this same queue owner now so the request is
-           immediately observable, while live impacts retain one microtask in
-           which matching damage/status phases can be ordered together. */
-        if(request.skipImpactTiming){
-            pump(context);
-            return;
-        }
         queueMicrotask(()=>pump(context));
     }
+    function impactKey(request){
+        return unitKey(request.side,request.index)+"|"+String(request.impactId);
+    }
+    function flushImpact(batch){
+        if(!batch||batch.flushed){ return; }
+        batch.flushed=true;
+        pendingImpacts.delete(batch.key);
+        if(batch.timer){ impactTimers.delete(batch.timer); batch.timer=null; }
+        const context=contextFor(batch.side,batch.index);
+        batch.requests.filter(request=>!request.cancelled&&!request.finished).forEach(request=>{
+            request.context=context;
+            context.queue.push(request);
+        });
+        context.queue.sort(compareRequests);
+        pump(context);
+    }
+    function registerImpact(request){
+        const key=impactKey(request);
+        let batch=pendingImpacts.get(key);
+        if(!batch){
+            batch={key:key,side:request.side,index:request.index,impactId:request.impactId,requests:[],timer:null,flushed:false};
+            pendingImpacts.set(key,batch);
+            const wait=Math.max(0,numeric(request.impactAt,Date.now())-Date.now());
+            batch.timer=setTimeout(()=>{ batch.timer=null; flushImpact(batch); },wait);
+            impactTimers.add(batch.timer);
+        }
+        batch.requests.push(request);
+        request.impactBatch=batch;
+    }
+
     function emit(options){
         if(typeof document==="undefined"||!document.body){ return null; }
         const input=Object.assign({},options||{});
@@ -218,10 +241,10 @@
         };
         request.critical=request.critical||timing.critical;
         const handle=makeHandle(request);
-        if(timing.delayMs>8){
-            request.delayTimer=setTimeout(()=>{ request.delayTimer=null;enqueue(request); },timing.delayMs);
-        }else{
+        if(request.skipImpactTiming||!request.impactId){
             enqueue(request);
+        }else{
+            registerImpact(request);
         }
         return handle;
     }
@@ -238,6 +261,13 @@
         });
     }
     function clear(){
+        Array.from(impactTimers).forEach(timer=>clearTimeout(timer));
+        impactTimers.clear();
+        Array.from(pendingImpacts.values()).forEach(batch=>{
+            batch.requests.forEach(request=>finishRequest(request,"teardown"));
+            batch.requests.length=0;
+        });
+        pendingImpacts.clear();
         Array.from(contexts.values()).forEach(context=>{
             context.queue.slice().forEach(request=>finishRequest(request,"teardown"));
             Array.from(context.active.values()).forEach(request=>finishRequest(request,"teardown"));
@@ -260,7 +290,7 @@
     }
 
     const api=Object.freeze({
-        version:"battle-floating-feedback-v2",
+        version:"battle-floating-feedback-v3-impact-batch",
         emit:emit,
         emitAtImpact:emitAtImpact,
         emitStatus:emitStatus,
