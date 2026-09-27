@@ -357,19 +357,35 @@
         return node.__relicOverlayRect={left:numeric(rect.left),top:numeric(rect.top),width:Math.max(1,numeric(rect.width)),height:Math.max(1,numeric(rect.height))};
     }
     function appendRelicProjection(layer,geometry,overlayRect){
-        const artwork=geometry.artworkProjection,hp=geometry.hpProjection,artRect=relativeRelicRect(artwork.rect,overlayRect),hpRect=relativeRelicRect(hp.rect,overlayRect);
-        if(!artRect||!hpRect||artRect.width<=0||artRect.height<=0||hpRect.width<=0||hpRect.height<=0){ return; }
-        const art=document.createElement("div"), hpNode=document.createElement("div");
+        const artwork=geometry&&geometry.artworkProjection, hp=geometry&&geometry.hpProjection, sp=geometry&&geometry.spProjection;
+        const artRect=artwork&&relativeRelicRect(artwork.rect,overlayRect), hpRect=hp&&relativeRelicRect(hp.rect,overlayRect), spRect=sp&&relativeRelicRect(sp.rect,overlayRect);
+        if(!artRect||!hpRect||!spRect||artRect.width<=0||artRect.height<=0||hpRect.width<=0||hpRect.height<=0||spRect.width<=0||spRect.height<=0){ return; }
+        const art=document.createElement("div");
         art.className="team-relic-target-projection-art";
-        art.style.left=artRect.left+"px";art.style.top=artRect.top+"px";art.style.width=artRect.width+"px";art.style.height=artRect.height+"px";art.style.backgroundImage=artwork.backgroundImage;art.style.backgroundSize=artwork.backgroundSize;art.style.backgroundPosition=artwork.backgroundPosition;art.style.backgroundRepeat=artwork.backgroundRepeat;
-        hpNode.className="team-relic-target-projection-hp";hpNode.style.left=hpRect.left+"px";hpNode.style.top=hpRect.top+"px";hpNode.style.width=hpRect.width+"px";hpNode.style.height=hpRect.height+"px";hpNode.innerHTML=hp.html;
-        layer.append(art,hpNode);
+        art.style.left=artRect.left+"px";art.style.top=artRect.top+"px";art.style.width=artRect.width+"px";art.style.height=artRect.height+"px";
+        art.style.backgroundImage=artwork.backgroundImage;art.style.backgroundSize=artwork.backgroundSize;art.style.backgroundPosition=artwork.backgroundPosition;art.style.backgroundRepeat=artwork.backgroundRepeat;
+        const makeResource=(kind,projection,rect)=>{
+            const resource=document.createElement("div"),fill=document.createElement("i");
+            resource.className="team-relic-target-projection-resource team-relic-target-projection-"+kind;
+            resource.style.left=rect.left+"px";resource.style.top=rect.top+"px";resource.style.width=rect.width+"px";resource.style.height=rect.height+"px";
+            fill.className="team-relic-target-projection-resource-fill";
+            fill.style.width=(Math.max(0,Math.min(1,Number(projection.ratio)||0))*100)+"%";
+            resource.appendChild(fill);
+            if(kind==="hp"&&Number(projection.shieldRatio)>0){
+                const shield=document.createElement("i");
+                shield.className="team-relic-target-projection-shield";
+                shield.style.width=(Math.max(0,Math.min(1,Number(projection.shieldRatio)||0))*100)+"%";
+                resource.appendChild(shield);
+            }
+            return resource;
+        };
+        layer.append(art,makeResource("hp",hp,hpRect),makeResource("sp",sp,spRect));
     }
     function revealRelicTargets(target){
         clearRelicTargetFocus();
         if(!relicCutinNode||!target||!Array.isArray(target.targetIds)){ return waitMs(RELIC_TARGET_REVEAL_MS); }
         const overlayRect=syncRelicPresentationGeometry(relicCutinNode)||relicCutinNode.__relicOverlayRect, layer=relicCutinNode.querySelector(".team-relic-target-projection-layer"), owner=relicGeometryOwner();
-        if(layer&&overlayRect&&owner&&typeof owner.getUnitGeometry==="function"){target.targetIds.forEach(index=>{const geometry=owner.getUnitGeometry(target.targetSide,index);if(geometry&&geometry.artworkProjection&&geometry.hpProjection){appendRelicProjection(layer,geometry,overlayRect);}});}
+        if(layer&&overlayRect&&owner&&typeof owner.getUnitGeometry==="function"){target.targetIds.forEach(index=>{const geometry=owner.getUnitGeometry(target.targetSide,index);if(geometry&&geometry.artworkProjection&&geometry.hpProjection&&geometry.spProjection){appendRelicProjection(layer,geometry,overlayRect);}});}
         const show=()=>{if(relicCutinNode){relicCutinNode.classList.add("targets-visible");}};
         if(typeof requestAnimationFrame==="function"){requestAnimationFrame(show);}else{show();}
         return waitMs(RELIC_TARGET_REVEAL_MS);
