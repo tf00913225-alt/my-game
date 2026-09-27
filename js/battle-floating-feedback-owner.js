@@ -191,6 +191,14 @@
         request.context=context;
         context.queue.push(request);
         context.queue.sort(compareRequests);
+        /* Synthetic/settled callers have explicitly opted out of V143 impact
+           timing. Flush through this same queue owner now so the request is
+           immediately observable, while live impacts retain one microtask in
+           which matching damage/status phases can be ordered together. */
+        if(request.skipImpactTiming){
+            pump(context);
+            return;
+        }
         queueMicrotask(()=>pump(context));
     }
     function emit(options){
@@ -208,7 +216,8 @@
             impactId:input.impactId||timing.impactId||null,impactAt:timing.impactAt||0,
             phase:String(input.phase||(kind==="status"?"status":"impact")),
             phaseOrder:Number.isFinite(Number(input.phaseOrder))?Number(input.phaseOrder):phaseOrder(kind),
-            timingSequence:timing.sequence||0
+            timingSequence:timing.sequence||0,
+            skipImpactTiming:input.skipImpactTiming===true
         };
         request.critical=request.critical||timing.critical;
         const handle=makeHandle(request);
@@ -271,7 +280,6 @@
     function ownedShowDamagePopup(element,text,type,isCrit){
         const unit=identifyUnit(element);
         if(!unit){ return null; }
-        if(isCrit&&typeof triggerCriticalImpact==="function"){ triggerCriticalImpact(element); }
         return emit({
             side:unit.side,index:unit.index,
             kind:type==="heal"?"heal":type==="sp"?"sp":type==="miss"?"miss":type==="shield"?"shield":"damage",
