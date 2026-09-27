@@ -3798,68 +3798,6 @@ button:active{
         1px 1px 0 #000;
 }
 
-/* V100 — 爆擊顯示保留紅色傷害字、白框字與加強彈跳動畫；
-   浮動文字格式統一為「爆擊 123」，不顯示驚嘆號與 HP/SP 字樣。
-
-   ★ 修正（依照使用者要求，「爆擊字體再縮小一點，超出
-   人物框一點點即可」）：
-   原本font-size:27px，加上damageFloatCrit動畫在10%那個
-   關鍵影格還會再放大到scale(1.62)，兩個疊乘起來瞬間
-   峰值等於43.7px，「爆擊 1234」這種7個字的文字實際
-   寬度遠超過人物/怪物卡片本身的寬度（76~116px），
-   多張卡片同時爆擊時，好幾組文字疊在一起看起來像
-   一坨誇張的巨大色塊。改成font-size:17px，動畫峰值
-   scale也一併調降（見下面damageFloatCrit），兩者疊乘
-   後峰值約21px，只會比卡片邊界略寬一點點，不會整團
-   蓋過旁邊的卡片。
-*/
-.damage-popup.critical-popup{
-    font-size:17px;
-    letter-spacing:.5px;
-    -webkit-text-stroke:1.1px #fff;
-    paint-order:stroke fill;
-    text-shadow:2px 2px 0 #000;
-    animation:damageFloatCrit 1.8s cubic-bezier(.16,.88,.25,1.15) forwards;
-}
-
-/* 爆擊命中時額外出現一次清楚的金白衝擊環。
-   使用獨立 ::before，不佔用卡片本身的 animation/transform，
-   不會跟攻擊前傾、受擊震動、當前角色黃框互相搶動畫屬性。 */
-.battle-monster.critical-impact::before,
-.battle-player.critical-impact::before{
-    content:"";
-    position:absolute;
-    left:50%;
-    top:45%;
-    width:24px;
-    height:24px;
-    border:4px solid #f5b51b;
-    border-radius:50%;
-    background:
-        linear-gradient(#fff,#fff) center/3px 100% no-repeat,
-        linear-gradient(90deg,#fff,#fff) center/100% 3px no-repeat;
-    transform:translate(-50%,-50%) scale(.35);
-    opacity:0;
-    pointer-events:none;
-    z-index:75;
-    animation:criticalImpactBurst .48s ease-out forwards;
-}
-
-@keyframes criticalImpactBurst{
-    0%{
-        opacity:1;
-        transform:translate(-50%,-50%) scale(.35) rotate(0deg);
-    }
-    45%{
-        opacity:1;
-        transform:translate(-50%,-50%) scale(2.2) rotate(18deg);
-    }
-    100%{
-        opacity:0;
-        transform:translate(-50%,-50%) scale(3.5) rotate(30deg);
-    }
-}
-
 /*
    ★ MISS／抵抗 文字：
    之前用灰白色，玩家反應太不明顯，

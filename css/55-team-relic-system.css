@@ -200,15 +200,6 @@ body > .team-relic-battle-presentation .team-relic-battle-dim{
 body > .team-relic-battle-presentation.dim-visible .team-relic-battle-dim{opacity:.75;}
 body > .team-relic-battle-presentation.releasing .team-relic-battle-dim{opacity:0;transition-duration:.42s;}
 body.team-relic-cinematic-active > .v143-skill-stage{z-index:18130!important;}
-body > .team-relic-battle-presentation .team-relic-battle-target-focus-layer{
-    position:absolute;inset:0;z-index:20;pointer-events:none;
-}
-body > .team-relic-battle-presentation .team-relic-battle-target-outline{
-    position:absolute;box-sizing:border-box;border:1px solid rgba(255,244,207,.82);border-radius:9px;
-    opacity:0;box-shadow:0 0 0 1px rgba(255,255,255,.14),0 0 9px rgba(255,232,176,.24);
-    transition:opacity .42s ease;
-}
-body > .team-relic-battle-presentation.targets-visible .team-relic-battle-target-outline{opacity:1;}
 body > .team-relic-battle-presentation .team-relic-battle-cutin{
     position:absolute;left:50%;top:50%;z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;
     width:min(72vw,280px);margin:0;padding:0;border:0;border-radius:0;background:none;box-shadow:none;opacity:0;

@@ -893,9 +893,7 @@
         const location=locateEntity(entity);
         const feedback=window.FourSymbolsBattleFloatingFeedback;
         if(!label||!location||!feedback||typeof feedback.emitAtImpact!=="function"){ return; }
-        const emit=()=>feedback.emitAtImpact({
-            side:location.side,index:location.index,kind:"status",text:label,source:"status"
-        });
+        const emit=()=>feedback.emitAtImpact({side:location.side,index:location.index,kind:"status",statusType:type,text:label,phase:"status",source:"status"});
         if(
             window.__fourSymbolsBattleEffectSource==="relic"&&
             typeof window.v174QueueRelicVisual==="function"
@@ -903,7 +901,7 @@
             window.v174QueueRelicVisual(emit);
             return;
         }
-        emit();
+        if(typeof queueMicrotask==="function"){ queueMicrotask(emit); }else{ emit(); }
     }
 
     function wrapSimpleStatus(functionName,type){
@@ -8912,6 +8910,11 @@ ensureFunctionalStyles();runRepairs();
         const hudNodes=Array.from(card.querySelectorAll(
             ".monster-hp,.monster-sp,.hp-bar,.sp-bar,.battle-monster-name,.battle-player-id,.monster-status-badges"
         ));
+        const hpNodes=Array.from(card.querySelectorAll(".monster-hp,.hp-bar,.battle-hp-bar,.player-hp-bar,[data-hud=\"hp\"],[data-stat=\"hp\"]"));
+        const hpRects=hpNodes.map(node=>typeof node.getBoundingClientRect==="function"?plainRect(node.getBoundingClientRect()):null).filter(rect=>rect&&rect.width>0&&rect.height>0);
+        const hpRect=hpRects.length?hpRects.reduce((acc,rect)=>({left:Math.min(acc.left,rect.left),top:Math.min(acc.top,rect.top),right:Math.max(acc.right,rect.right),bottom:Math.max(acc.bottom,rect.bottom),width:Math.max(acc.right,rect.right)-Math.min(acc.left,rect.left),height:Math.max(acc.bottom,rect.bottom)-Math.min(acc.top,rect.top)})):null;
+        const highlightRects=[portraitRect,hpRect].filter(rect=>rect&&rect.width>0&&rect.height>0);
+        const highlightRect=highlightRects.length?highlightRects.reduce((acc,rect)=>({left:Math.min(acc.left,rect.left),top:Math.min(acc.top,rect.top),right:Math.max(acc.right,rect.right),bottom:Math.max(acc.bottom,rect.bottom),width:Math.max(acc.right,rect.right)-Math.min(acc.left,rect.left),height:Math.max(acc.bottom,rect.bottom)-Math.min(acc.top,rect.top)})):portraitRect;
         const hudRects=hudNodes
             .map(node=>typeof node.getBoundingClientRect==="function"?plainRect(node.getBoundingClientRect()):null)
             .filter(rect=>rect&&rect.width>0&&rect.height>0);
@@ -8940,16 +8943,12 @@ ensureFunctionalStyles();runRepairs();
 
         return {
             owner:"fixed-slot",side:targetSide,index:unitIndex,slot:slot,
-            unitRect:unitRect,portraitRect:portraitRect,hudSafeRect:hudSafeRect,
+            unitRect:unitRect,portraitRect:portraitRect,hpRect:hpRect,highlightRects:highlightRects,highlightRect:highlightRect,hudSafeRect:hudSafeRect,
             feedbackSafeRect:feedbackSafeRect,
             center:{x:unitRect.left+unitRect.width/2,y:unitRect.top+unitRect.height/2},
             feedbackAnchor:{
                 x:unitRect.left+unitRect.width/2,
                 y:Math.max(feedbackSafeRect.top+11,feedbackSafeRect.bottom-12)
-            },
-            highlightRect:{
-                left:Math.max(0,unitRect.left-3),top:Math.max(0,unitRect.top-3),
-                width:unitRect.width+6,height:unitRect.height+6
             }
         };
     }
@@ -9018,6 +9017,7 @@ ensureFunctionalStyles();runRepairs();
     const LANE_RENDER_HEIGHT_PX=23;
     const LANE_BOTTOM_INSET_PX=6;
     const DEFAULT_DURATION=980;
+    const STATUS_PRESENTATION_SEMANTICS=Object.freeze({burn:Object.freeze({color:"#e32626",label:"burn"}),damageDown:Object.freeze({color:"#39c96b",label:"damageDown"}),agilityDown:Object.freeze({color:"#39c96b",label:"agilityDown"}),freeze:Object.freeze({color:"#62d9ff",label:"freeze"}),frostbite:Object.freeze({color:"#62d9ff",label:"frostbite"}),petrify:Object.freeze({color:"#d2a85c",label:"petrify"}),defenseDown:Object.freeze({color:"#d2a85c",label:"defenseDown"}),statDown:Object.freeze({color:"#d49cff",label:"statDown"}),stun:Object.freeze({color:"#ffd35a",label:"stun"}),shield:Object.freeze({color:"#f4f4f4",label:"shield"}),barrier:Object.freeze({color:"#f4f4f4",label:"barrier"}),default:Object.freeze({color:"#f4f4f4",label:"default"})});
     const contexts=new Map();
     let sequence=0;
 
@@ -9059,28 +9059,23 @@ ensureFunctionalStyles();runRepairs();
         if(value==="heal"||value==="hp-recovery"){ return "heal"; }
         if(value==="sp"||value==="sp-recovery"){ return "sp"; }
         if(value==="shield"){ return "shield"; }
-        if(value==="miss"||value==="resist"){ return "miss"; }
-        if(value==="status"||value==="buff"||value==="debuff"){ return value; }
+        if(value==="miss"){ return "miss"; }
+        if(value==="resist"){ return "resist"; }
+        if(value==="status"||value==="buff"||value==="debuff"){ return "status"; }
         if(value==="escape"||value==="escape-fail"){ return "escape"; }
-        return "damage";
+        return value==="criticaldamage"||value==="critical-damage"?"criticalDamage":"damage";
     }
+    function statusPresentation(statusType){ return STATUS_PRESENTATION_SEMANTICS[String(statusType||"default")]||STATUS_PRESENTATION_SEMANTICS.default; }
+    function phaseOrder(kind){ return kind==="shield"?10:(kind==="status"?30:20); }
+    function compareRequests(left,right){ return left.impactId&&right.impactId&&left.impactId===right.impactId ? (left.phaseOrder-right.phaseOrder)||(left.id-right.id) : left.id-right.id; }
     function timingFor(options){
-        if(options&&options.skipImpactTiming){ return {delayMs:0,critical:false}; }
+        if(options&&options.skipImpactTiming){ return {delayMs:0,critical:false,impactId:null,impactAt:0,sequence:0}; }
         const resolver=window.v143ResolveBattleFeedbackTiming;
-        if(typeof resolver!=="function"){ return {delayMs:0,critical:false}; }
+        if(typeof resolver!=="function"){ return {delayMs:0,critical:false,impactId:null,impactAt:0,sequence:0}; }
         try{
-            const timing=resolver(
-                options.side==="monster"?"monster":"player",
-                Number(options.index)||0,
-                semanticKind(options.kind)
-            )||{};
-            return {
-                delayMs:Math.max(0,numeric(timing.delayMs,0)),
-                critical:timing.critical===true
-            };
-        }catch(_){
-            return {delayMs:0,critical:false};
-        }
+            const timing=resolver(options.side==="monster"?"monster":"player",Number(options.index)||0,semanticKind(options.kind))||{};
+            return {delayMs:Math.max(0,numeric(timing.delayMs,0)),critical:timing.critical===true,impactId:timing.impactId||null,impactAt:Number.isFinite(Number(timing.impactAt))?Number(timing.impactAt):0,sequence:numeric(timing.sequence,0)};
+        }catch(_){ return {delayMs:0,critical:false,impactId:null,impactAt:0,sequence:0}; }
     }
     function makeHandle(request){
         let resolvePromise;
@@ -9155,7 +9150,7 @@ ensureFunctionalStyles();runRepairs();
         const laneY=metrics.baseline-lane*LANE_PITCH_PX;
         const critical=request.critical===true;
         const node=document.createElement("div");
-        node.className="battle-floating-feedback battle-floating-feedback-"+request.kind+(critical?" is-critical":"");
+        node.className="battle-floating-feedback battle-floating-feedback-"+request.kind+(critical?" is-critical":"")+(request.kind==="status"?" is-status-capsule":"");
         node.dataset.feedbackOwner="battle-floating-feedback";
         node.dataset.feedbackSide=context.side;
         node.dataset.feedbackIndex=String(context.index);
@@ -9163,6 +9158,8 @@ ensureFunctionalStyles();runRepairs();
         node.dataset.feedbackKind=request.kind;
         node.dataset.feedbackSource=request.source;
         node.dataset.feedbackSequence=String(request.id);
+        node.dataset.feedbackPhase=request.phase;
+        if(request.statusType){ node.dataset.feedbackStatusType=request.statusType; node.style.setProperty("--battle-feedback-status-color",statusPresentation(request.statusType).color); }
         node.textContent=critical?formatCritical(request.text):String(request.text==null?"":request.text);
         node.style.setProperty("--battle-feedback-x",anchor.x+"px");
         node.style.setProperty("--battle-feedback-y",laneY+"px");
@@ -9196,22 +9193,35 @@ ensureFunctionalStyles();runRepairs();
         const context=contextFor(request.side,request.index);
         request.context=context;
         context.queue.push(request);
-        pump(context);
+        context.queue.sort(compareRequests);
+        /* Synthetic/settled callers have explicitly opted out of V143 impact
+           timing. Flush through this same queue owner now so the request is
+           immediately observable, while live impacts retain one microtask in
+           which matching damage/status phases can be ordered together. */
+        if(request.skipImpactTiming){
+            pump(context);
+            return;
+        }
+        queueMicrotask(()=>pump(context));
     }
     function emit(options){
         if(typeof document==="undefined"||!document.body){ return null; }
         const input=Object.assign({},options||{});
+        const kind=semanticKind(input.kind);
+        const timing=timingFor(input);
         const request={
-            id:++sequence,
-            side:input.side==="monster"?"monster":"player",
-            index:Number.isInteger(Number(input.index))?Number(input.index):0,
-            kind:semanticKind(input.kind),
+            id:++sequence,side:input.side==="monster"?"monster":"player",
+            index:Number.isInteger(Number(input.index))?Number(input.index):0,kind:kind,
+            statusType:kind==="status"?String(input.statusType||input.effectType||"default"):null,
             text:String(input.text==null?"":input.text),
             duration:Math.max(500,Math.min(1800,numeric(input.duration,DEFAULT_DURATION))),
-            critical:input.critical===true,
-            source:String(input.source||"battle")
+            critical:input.critical===true,source:String(input.source||"battle"),
+            impactId:input.impactId||timing.impactId||null,impactAt:timing.impactAt||0,
+            phase:String(input.phase||(kind==="status"?"status":"impact")),
+            phaseOrder:Number.isFinite(Number(input.phaseOrder))?Number(input.phaseOrder):phaseOrder(kind),
+            timingSequence:timing.sequence||0,
+            skipImpactTiming:input.skipImpactTiming===true
         };
-        const timing=timingFor(request);
         request.critical=request.critical||timing.critical;
         const handle=makeHandle(request);
         if(timing.delayMs>8){
@@ -9273,7 +9283,6 @@ ensureFunctionalStyles();runRepairs();
     function ownedShowDamagePopup(element,text,type,isCrit){
         const unit=identifyUnit(element);
         if(!unit){ return null; }
-        if(isCrit&&typeof triggerCriticalImpact==="function"){ triggerCriticalImpact(element); }
         return emit({
             side:unit.side,index:unit.index,
             kind:type==="heal"?"heal":type==="sp"?"sp":type==="miss"?"miss":type==="shield"?"shield":"damage",
@@ -10766,7 +10775,6 @@ ensureFunctionalStyles();runRepairs();
     }
     function clearRelicTargetFocus(){
         if(typeof document!=="undefined"&&typeof document.querySelectorAll==="function"){
-            document.querySelectorAll(".team-relic-battle-target-outline").forEach(node=>node.remove());
             const presentation=document.getElementById("teamRelicBattlePresentation");
             const holes=presentation&&presentation.querySelector(".team-relic-mask-holes");
             if(holes){ holes.replaceChildren(); }
@@ -10791,14 +10799,15 @@ ensureFunctionalStyles();runRepairs();
         const geometry=owner.getBattlefieldOverlayGeometry();
         return geometry&&geometry.rect&&geometry.rect.width>0&&geometry.rect.height>0?geometry:null;
     }
-    function relicTargetGeometry(side,index){
+    function relicTargetGeometries(side,index){
         const geometry=relicGeometryOwner();
         if(geometry&&typeof geometry.getUnitGeometry==="function"){
             const resolved=geometry.getUnitGeometry(side,index);
-            if(resolved&&resolved.highlightRect){ return resolved.highlightRect; }
-            if(resolved&&resolved.unitRect){ return resolved.unitRect; }
+            if(resolved&&Array.isArray(resolved.highlightRects)&&resolved.highlightRects.length){ return resolved.highlightRects; }
+            if(resolved&&resolved.highlightRect){ return [resolved.highlightRect]; }
+            if(resolved&&resolved.unitRect){ return [resolved.unitRect]; }
         }
-        return null;
+        return [];
     }
     function relativeRelicRect(rect,overlayRect){
         if(!rect||!overlayRect){ return null; }
@@ -10828,31 +10837,22 @@ ensureFunctionalStyles();runRepairs();
         if(!relicCutinNode||!target||!Array.isArray(target.targetIds)){ return waitMs(RELIC_TARGET_REVEAL_MS); }
         const overlayRect=syncRelicPresentationGeometry(relicCutinNode)||relicCutinNode.__relicOverlayRect;
         const holes=relicCutinNode.querySelector(".team-relic-mask-holes");
-        const focusLayer=relicCutinNode.querySelector(".team-relic-battle-target-focus-layer");
         const namespace="http://www.w3.org/2000/svg";
         target.targetIds.forEach(index=>{
-            const absolute=relicTargetGeometry(target.targetSide,index);
-            const rect=relativeRelicRect(absolute,overlayRect);
-            if(!rect||rect.width<=0||rect.height<=0){ return; }
-            if(holes){
-                const hole=document.createElementNS(namespace,"rect");
-                hole.setAttribute("x",String(rect.left));
-                hole.setAttribute("y",String(rect.top));
-                hole.setAttribute("width",String(Math.max(1,rect.width)));
-                hole.setAttribute("height",String(Math.max(1,rect.height)));
-                hole.setAttribute("rx","8");
-                hole.setAttribute("fill","black");
-                holes.appendChild(hole);
-            }
-            if(focusLayer){
-                const outline=document.createElement("span");
-                outline.className="team-relic-battle-target-outline";
-                outline.style.left=rect.left+"px";
-                outline.style.top=rect.top+"px";
-                outline.style.width=Math.max(1,rect.width)+"px";
-                outline.style.height=Math.max(1,rect.height)+"px";
-                focusLayer.appendChild(outline);
-            }
+            relicTargetGeometries(target.targetSide,index).forEach(absolute=>{
+                const rect=relativeRelicRect(absolute,overlayRect);
+                if(!rect||rect.width<=0||rect.height<=0){ return; }
+                if(holes){
+                    const hole=document.createElementNS(namespace,"rect");
+                    hole.setAttribute("x",String(rect.left));
+                    hole.setAttribute("y",String(rect.top));
+                    hole.setAttribute("width",String(Math.max(1,rect.width)));
+                    hole.setAttribute("height",String(Math.max(1,rect.height)));
+                    hole.setAttribute("rx","8");
+                    hole.setAttribute("fill","black");
+                    holes.appendChild(hole);
+                }
+            });
         });
         const show=()=>{ if(relicCutinNode){ relicCutinNode.classList.add("targets-visible"); } };
         if(typeof requestAnimationFrame==="function"){ requestAnimationFrame(show); }else{ show(); }
@@ -10876,7 +10876,6 @@ ensureFunctionalStyles();runRepairs();
             '<rect x="0" y="0" width="'+width+'" height="'+height+'" fill="white"></rect>'+
             '<g class="team-relic-mask-holes"></g></mask></defs>'+
             '<rect class="team-relic-battle-dim-fill" x="0" y="0" width="'+width+'" height="'+height+'" fill="#000" mask="url(#'+maskId+')"></rect></svg>'+
-            '<div class="team-relic-battle-target-focus-layer" aria-hidden="true"></div>'+
             '<div class="team-relic-battle-cutin"><span class="team-relic-battle-cutin-icon">'+
             '<img src="'+esc(def.battleIconPath||def.iconPath||"")+'" alt=""></span>'+
             '<span class="team-relic-battle-cutin-copy"><strong>'+esc(def.name)+'</strong></span></div>';

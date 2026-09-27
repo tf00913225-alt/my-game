@@ -1401,7 +1401,7 @@
             current.targetSide===side
         );
         if(wait>8){ state.metrics.delayedNumbers++; }
-        return Object.freeze({delayMs:wait,critical:critical});
+        return Object.freeze({delayMs:wait,impactAt:Date.now()+wait,impactId:current&&!current.done?("v143:"+String(current.sequence)+":"+side+":"+String(unitIndex)):null,sequence:current&&!current.done?current.sequence:0,critical:critical});
     };
 
     if(typeof applySkillDebuffEffectsToPlayer==="function"){

@@ -38,14 +38,18 @@ assert.ok(
 );
 assert.match(cinematicPrelude,/waitMs\(RELIC_IDENTITY_HOLD_MS\)[\s\S]*classList\.add\("identity-exiting"\)[\s\S]*revealRelicTargets\(target\)/,
   "identity hold must end in target reveal before VFX");
-assert.match(relic,/function relicTargetGeometry\(side,index\)[\s\S]*getUnitGeometry/,
+assert.match(relic,/function relicTargetGeometries\(side,index\)[\s\S]*getUnitGeometry[\s\S]*highlightRects/,
   "target lookup must resolve canonical battlefield geometry");
-assert.match(relic,/function revealRelicTargets\(target\)[\s\S]*team-relic-mask-holes[\s\S]*team-relic-battle-target-outline/,
-  "target reveal must cut apertures and outlines from canonical Unit geometry");
-assert.match(relic,/function queueRelicPresentation\(def,onStart,visualContext\)[\s\S]*beginRelicCinematic\(def,resolvedTarget\)[\s\S]*enterRelicVfxPhase\(node\)[\s\S]*playRelicVfx\([\s\S]*resolvedTarget[\s\S]*relicGate&&relicGate\.promise[\s\S]*endRelicCinematic\(node\)/,
-  "formal relic VFX must start only after target reveal, and battlefield restore must wait for the V143 gate to finish");
-assert.match(relic,/function endRelicCinematic\(node\)[\s\S]*classList\.add\("releasing"\)[\s\S]*waitMs\(RELIC_DIM_OUT_MS\)/,
-  "battlefield must fade back in after the relic VFX lifecycle ends");
+assert.ok(
+  relic.includes("function revealRelicTargets(target)") &&
+  relic.includes("team-relic-mask-holes") &&
+  relic.includes('createElementNS(namespace,"rect")'),
+  "target reveal must cut portrait/HP apertures from canonical highlight geometry"
+);
+assert.match(relic,/highlightRect|highlightRects/,
+  "target reveal must consume canonical portrait/HP highlight geometry");
+assert.doesNotMatch(relic,/team-relic-battle-target-outline|team-relic-battle-target-focus-layer/,
+  "target reveal must not create a second full-Unit outline owner");
 const liveQueueSource=relic.slice(
   relic.indexOf("const generation=relicPresentationGeneration",relic.indexOf("function queueRelicPresentation")),
   relic.indexOf("function normalizeOwned")
@@ -78,10 +82,8 @@ assert.match(css,/\.team-relic-battle-cutin-icon\{[^}]*border:0[^}]*background:n
   "battle icon itself must have no box");
 assert.match(css,/\.team-relic-battle-cutin-copy\{[^}]*border:0[^}]*background:none[^}]*box-shadow:none[^}]*text-align:center/,
   "relic name must be centered under the icon with no box");
-assert.match(css,/\.team-relic-battle-target-focus-layer\{[\s\S]*position:absolute;inset:0;z-index:20/,
-  "target focus must live inside the viewport cinematic layer");
-assert.match(css,/\.team-relic-battle-target-outline\{[\s\S]*opacity:0[\s\S]*transition:opacity \.42s ease/,
-  "target outlines must reveal gradually without altering live Unit opacity");
+assert.doesNotMatch(css,/team-relic-battle-target-focus-layer|team-relic-battle-target-outline/,
+  "retired full-Unit target outline CSS must be removed");
 assert.doesNotMatch(css,/team-relic-battle-target-layer|team-relic-battle-target-focus-visible/,
   "legacy live-DOM target stacking must remain retired");
 assert.match(css,/\.team-relic-battle-presentation\.releasing \.team-relic-battle-dim\{opacity:0;transition-duration:\.42s;\}/,

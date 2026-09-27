@@ -5784,7 +5784,7 @@ body.v174-battle-reading-open > .skill-name-badge.v143-caster-skill-label{
     #game-stage .v146-shop-total{font-size:13px;}
 }
 @media (prefers-reduced-motion:reduce){
-    .v146-area-impact,.v146-status-popup,#game-stage .v141-abyss-map.v146-too-far,.v173-exp-charge-float{animation-duration:.01ms !important;animation-iteration-count:1 !important;}
+    .v146-area-impact,#game-stage .v141-abyss-map.v146-too-far,.v173-exp-charge-float{animation-duration:.01ms !important;animation-iteration-count:1 !important;}
 }
 
 
@@ -9594,15 +9594,6 @@ body > .team-relic-battle-presentation .team-relic-battle-dim{
 body > .team-relic-battle-presentation.dim-visible .team-relic-battle-dim{opacity:.75;}
 body > .team-relic-battle-presentation.releasing .team-relic-battle-dim{opacity:0;transition-duration:.42s;}
 body.team-relic-cinematic-active > .v143-skill-stage{z-index:18130!important;}
-body > .team-relic-battle-presentation .team-relic-battle-target-focus-layer{
-    position:absolute;inset:0;z-index:20;pointer-events:none;
-}
-body > .team-relic-battle-presentation .team-relic-battle-target-outline{
-    position:absolute;box-sizing:border-box;border:1px solid rgba(255,244,207,.82);border-radius:9px;
-    opacity:0;box-shadow:0 0 0 1px rgba(255,255,255,.14),0 0 9px rgba(255,232,176,.24);
-    transition:opacity .42s ease;
-}
-body > .team-relic-battle-presentation.targets-visible .team-relic-battle-target-outline{opacity:1;}
 body > .team-relic-battle-presentation .team-relic-battle-cutin{
     position:absolute;left:50%;top:50%;z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;
     width:min(72vw,280px);margin:0;padding:0;border:0;border-radius:0;background:none;box-shadow:none;opacity:0;
@@ -9665,6 +9656,11 @@ body > .battle-floating-feedback{
     transform:translate(-50%,-100%);
     animation:battleFloatingFeedback var(--battle-feedback-duration,1100ms) ease-out both;
 }
+body > .battle-floating-feedback[data-feedback-kind="heal"]{color:#20b857;}
+body > .battle-floating-feedback[data-feedback-kind="sp"]{color:#2c8de8;}
+body > .battle-floating-feedback[data-feedback-kind="shield"]{color:#f4f4f4;}
+body > .battle-floating-feedback[data-feedback-kind="miss"],body > .battle-floating-feedback[data-feedback-kind="resist"]{color:#ff5a5a;}
+body > .battle-floating-feedback[data-feedback-kind="status"]{min-height:19px;padding:2px 9px;border:1px solid rgba(255,255,255,.22);border-radius:999px;background:#0b0b0d;color:var(--battle-feedback-status-color,#f4f4f4);font-size:15px;line-height:19px;letter-spacing:.1px;-webkit-text-stroke:.35px #000;text-shadow:1px 1px 0 #000;box-shadow:0 1px 3px rgba(0,0,0,.45);}
 body > .battle-floating-feedback.is-critical{
     font-size:18px;
     letter-spacing:.45px;

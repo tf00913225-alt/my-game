@@ -317,6 +317,11 @@
         const hudNodes=Array.from(card.querySelectorAll(
             ".monster-hp,.monster-sp,.hp-bar,.sp-bar,.battle-monster-name,.battle-player-id,.monster-status-badges"
         ));
+        const hpNodes=Array.from(card.querySelectorAll(".monster-hp,.hp-bar,.battle-hp-bar,.player-hp-bar,[data-hud=\"hp\"],[data-stat=\"hp\"]"));
+        const hpRects=hpNodes.map(node=>typeof node.getBoundingClientRect==="function"?plainRect(node.getBoundingClientRect()):null).filter(rect=>rect&&rect.width>0&&rect.height>0);
+        const hpRect=hpRects.length?hpRects.reduce((acc,rect)=>({left:Math.min(acc.left,rect.left),top:Math.min(acc.top,rect.top),right:Math.max(acc.right,rect.right),bottom:Math.max(acc.bottom,rect.bottom),width:Math.max(acc.right,rect.right)-Math.min(acc.left,rect.left),height:Math.max(acc.bottom,rect.bottom)-Math.min(acc.top,rect.top)})):null;
+        const highlightRects=[portraitRect,hpRect].filter(rect=>rect&&rect.width>0&&rect.height>0);
+        const highlightRect=highlightRects.length?highlightRects.reduce((acc,rect)=>({left:Math.min(acc.left,rect.left),top:Math.min(acc.top,rect.top),right:Math.max(acc.right,rect.right),bottom:Math.max(acc.bottom,rect.bottom),width:Math.max(acc.right,rect.right)-Math.min(acc.left,rect.left),height:Math.max(acc.bottom,rect.bottom)-Math.min(acc.top,rect.top)})):portraitRect;
         const hudRects=hudNodes
             .map(node=>typeof node.getBoundingClientRect==="function"?plainRect(node.getBoundingClientRect()):null)
             .filter(rect=>rect&&rect.width>0&&rect.height>0);
@@ -345,16 +350,12 @@
 
         return {
             owner:"fixed-slot",side:targetSide,index:unitIndex,slot:slot,
-            unitRect:unitRect,portraitRect:portraitRect,hudSafeRect:hudSafeRect,
+            unitRect:unitRect,portraitRect:portraitRect,hpRect:hpRect,highlightRects:highlightRects,highlightRect:highlightRect,hudSafeRect:hudSafeRect,
             feedbackSafeRect:feedbackSafeRect,
             center:{x:unitRect.left+unitRect.width/2,y:unitRect.top+unitRect.height/2},
             feedbackAnchor:{
                 x:unitRect.left+unitRect.width/2,
                 y:Math.max(feedbackSafeRect.top+11,feedbackSafeRect.bottom-12)
-            },
-            highlightRect:{
-                left:Math.max(0,unitRect.left-3),top:Math.max(0,unitRect.top-3),
-                width:unitRect.width+6,height:unitRect.height+6
             }
         };
     }
