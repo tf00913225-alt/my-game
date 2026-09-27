@@ -117,6 +117,22 @@ QA、測試與 debug 工具不得為方便而永久改變正式戰鬥數值、�
 9. 每次建立新 PR／新分支前，應先確認是否已有相同目的且仍有效的工作分支／PR，避免重複建立 `runner2`、`runner3`、重複 release candidate 或同目的臨時分支。
 10. 不得為了達成「分支數變少」而犧牲可追溯性或刪除未吸收內容；**安全清理優先於數量清零。**
 
+### 十三之二、DEV MERGE LOCK（dev 合併鎖；永久強制規則）
+本節優先於一般工作生命週期中的自動結案／自動合併慣例。允許多個 ChatGPT／Agent／工作分支平行施工，但 **dev 永遠採序列整合，且任何代理不得自行決定合併 dev**。
+
+固定規則：
+1. 工作分支可以自行完成：讀取最新 dev、建立／更新分支、修改 Source、Commit、Push 工作分支、建立／更新 PR、Target Tests、Browser QA、Production Build、build:check、Repository checks／CI，以及修復工作分支上的 CI 問題。
+2. **沒有專案負責人的精確合併口令時，禁止 Merge PR 到 dev。** 唯一有效格式為：`MERGE-DEV PR #<PR_NUMBER>`，例如 `MERGE-DEV PR #620`。PR 編號必須與本次要合併的 PR 完全一致。
+3. 下列自然語句一律 **不構成 dev Merge 授權**：`繼續`、`繼續施工`、`接下來`、`做完`、`完成它`、`不要停`、`可以`、`好`、`依你建議`、`修好後繼續`，以及任何未包含精確 `MERGE-DEV PR #<PR_NUMBER>` 的同義表達。
+4. 沒有合併口令時，PR 完成、CI 全綠且可合併後，工作必須停在 **`READY_FOR_DEV_MERGE`**，並回報：PR number、head SHA、base SHA、current dev SHA、CI status，以及是否存在其他並行 Open PR／工作分支可能影響 dev。
+5. 收到精確 `MERGE-DEV PR #<PR_NUMBER>` 後，**不得直接按 Merge**。必須先重新讀取最新 dev HEAD、該 PR 的 base/head、目前相關 Open PR 與 CI 狀態。
+6. 若最新 dev HEAD 已不同於該 PR 最後完成驗證時的 base／同步點，禁止直接合併。必須先把最新 dev 以正常 merge／同步方式整合進工作分支；**禁止 rebase dev、force push、直接修改 dev 或改寫 dev 歷史**。
+7. 同步最新 dev 後，必須重新執行與本次修改風險相符的 relevant tests、必要 Browser QA、Production Build、`npm run build:check`、`git diff --check` 與 Repository checks／CI。重新全綠後才可 Merge。
+8. 即使 Source（來源碼）沒有 Git Conflict，只要另一個 PR 已先進 dev，追蹤中的 `index.html`、manifest、`build/*.js`、`build/*.css` 等 Production Build Output（正式建置產物）仍視為可能過期；需要時必須從同步後的最新 dev 重新 deterministic build（確定性建置），不得沿用舊 Build Output。
+9. 多條平行工程可以同時到達 `READY_FOR_DEV_MERGE`；**只有收到精確合併口令的那一條可以進 dev**。第一條合併後，其他 READY PR 在取得自己的合併口令前仍保持未合併；取得口令後也必須先依第 5～8 條重新驗證最新 dev。
+10. 本 Merge Lock 不授權任何 `main` 操作。`main` 仍依既有 dev → main Release Contract、Release Gate 與正式發布規則管理。
+11. 若其他文件、舊交接文字或先前對話摘要暗示「CI 綠燈即可自動合併 dev」，以本節為最高優先；除非專案負責人當次明確修改本節，否則不得繞過。
+12. Repository Closeout（程式庫收尾）仍是完成條件，但在 Merge Lock 下，「等待專案負責人提供 `MERGE-DEV PR #...`」屬合法保留原因；不得為了完成 Closeout 而自行越過合併鎖。
 週報／健康燈號固定判定：
 - **綠燈**：正式版與 dev 的必要 CI／部署健康，沒有會阻塞下一次發布的有效未吸收內容、實質 main/dev 內容分歧或高優先級阻塞。歷史已合併分支、已被取代且無獨立內容的舊 PR，本身不得把總燈號降成黃燈。
 - **黃燈**：存在會實際影響下一次 dev → main 的問題，例如必要 CI 失敗、有效 PR 衝突、main/dev 有實質有效內容分歧、舊 PR 仍含未吸收獨立內容、發布／部署 gate 未完成。
