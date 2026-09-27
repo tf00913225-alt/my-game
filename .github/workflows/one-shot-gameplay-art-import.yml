@@ -55,14 +55,7 @@ jobs:
           for src in assets/inbox/runtime-import/gameplay-art/cover-*.png; do
             dims="$(identify -format '%w %h' "$src")"
             read -r w h <<< "$dims"
-            python3 - "$w" "$h" <<'PY'
-import sys
-width=int(sys.argv[1])
-height=int(sys.argv[2])
-ratio=width/height
-target=16/9
-assert abs(ratio-target) < 0.002, f"cover ratio {width}x{height} is not near 16:9"
-PY
+            awk -v w="$w" -v h="$h" 'BEGIN{ratio=w/h; target=16/9; delta=ratio-target; if(delta<0)delta=-delta; if(delta>=0.002)exit 1}'
           done
 
           rm -rf assets/inbox/runtime-import/gameplay-art
