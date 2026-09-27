@@ -1,4 +1,5 @@
-
+���z��
+�)�֧u�ݢ�i��k�G��*^
 /* bundled source: css/00-main.css */
 /*
    ★ 新增（依照使用者要求，「所有遊戲框、
@@ -933,7 +934,8 @@ button:disabled{
 
 .home-hud-resources{
     display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
+    g���z��
+�)�֧u�ݢ�i��k�G��*^rid-template-columns:repeat(2,minmax(0,1fr));
     gap:5px;
 }
 
@@ -1230,8 +1232,7 @@ button:disabled{
 
     /*
        ★ 修正（依照使用者要求，統一色系）：
-       原���z��
-�)�֧u�ݢ�i��k�G��*^本是金色實心漸層，改成跟主城
+       原本是金色實心漸層，改成跟主城
        8大按鈕標籤同一種深紅漸層+金字。
     */
 
@@ -1967,7 +1968,8 @@ button:disabled{
 .battle-target-prompt{
     flex:0 0 auto;
     width:max-content;
-    max-width:calc(100% - 24px);
+    max-widt���z��
+�)�֧u�ݢ�i��k�G��*^h:calc(100% - 24px);
     min-height:56px;
     display:none;
     align-items:center;
@@ -3164,7 +3166,8 @@ button:active{
 
 /* V109：真正可重複拖曳的懸浮元素匣。
    直接掛在 #battlePage 底下，完全脫離 battle-info-header-row 的文件流。
-   Pointer 拖曳只綁定這顆按鈕；單擊才開設定，拖曳不觸發設定。 */
+   Pointer 拖曳只綁定這顆按鈕；單擊才開設定，拖浨�z��
+�)�֧u�ݢ�i��k�G��*^��不觸發設定。 */
 #battlePage > .battle-element-box-button{
     position:absolute !important;
     left:8px !important;
@@ -3887,7 +3890,8 @@ button:active{
    只是不用爆擊那個💥圖案，
    而且把「數字」換成「技能中文名稱」，
    顏色依元素區分：
-   火=紅、水=水藍、土=金黃、風=淡綠。
+   火=紅、水=水藵��z��
+�)�֧u�ݢ�i��k�G��*^�、土=金黃、風=淡綠。
    文字範圍可以稍微超出卡片邊界沒關係，
    停留時間也拉長一點，
    讓玩家看得更清楚是誰放了什麼技能。
@@ -4952,7 +4956,8 @@ button:active{
        （尤其Samsung Browser）網址列/
        下方工具列會動態顯示/隱藏，vh在
        很多手機瀏覽器上是抓「工具列全部
-       收起」時的最大可視高度去算，不是
+       收赵��z��
+�)�֧u�ݢ�i��k�G��*^�」時的最大可視高度去算，不是
        抓「當下實際看得到」的高度，所以
        80vh在網址列還顯示著的時候，實際
        上會比畫面真正可視範圍還要高，

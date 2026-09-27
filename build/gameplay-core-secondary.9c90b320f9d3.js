@@ -1,4 +1,5 @@
-
+���z��
+�)�֧u�ݢ�i��k�G��*^
 /* bundled source: js/40-v144-rules-and-abyss.js */
 /* =====================================================
    V144 — shop, carried monster skills, hard-control flow,
@@ -235,8 +236,7 @@
         return SHOP_POTION_IDS.map(id=>potionDefinitions.find(item=>item&&item.id===id)).filter(Boolean);
     }
 
-    if(typeof renderShopContent=���z��
-�)�֧u�ݢ�i��k�G��*^=="function"){
+    if(typeof renderShopContent==="function"){
         renderShopContent=function(){
             const tier=shopTier();
             const cards=shoppablePotions().map(item=>{
@@ -975,7 +975,9 @@
                     pointX>=bossRect.left&&pointX<=bossRect.right&&
                     pointY>=bossRect.top&&pointY<=bossRect.bottom)
             ));
-            if(bossHit){ return previousAbyssMove.apply(this,arguments); }
+            if(bossHit){ return previousAbyssMove.apply(this,arguments���z��
+�)�֧u�ݢ�i��k�G��*^���z��
+�)�֧u�ݢ�i��k�G��*^); }
             if(map.dataset.v146Moving==="1"){ return; }
             if(event&&event.target&&event.target.closest&&event.target.closest("button")){ return; }
             const rect=map.getBoundingClientRect();
@@ -1639,7 +1641,8 @@
     const REFERENCE_TARGET_ORDER_10=[7,2,6,1,5,10,4,9,3,8];
 
     function autoTargetPriority(indexes){
-        const ordered=(indexes||[]).filter(Number.isInteger);
+        const ordered=(indexes||[]).filte���z��
+�)�֧u�ݢ�i��k�G��*^r(Number.isInteger);
         const owner=battlefieldSlots();
         const snapshot=activeFormationSnapshot(ordered);
         if(owner&&snapshot){
@@ -1996,7 +1999,8 @@
         const target=Number.isInteger(targetIndex)?getPartyCharacterByIndex(targetIndex):null;
         if(!target||numeric(target.hp)>0){ return finishSupport("目前選擇的目標不需要復活。"); }
         const targetStats=getPartyBattleStats(targetIndex);
-        if(!targetStats){ return finishSupport("復活目標資料無法讀取。"); }
+        if(!targetStats){ return finishSupport("復活目標資料無法讀取。")���z��
+�)�֧u�ݢ�i��k�G��*^; }
 
         animateSupportCast(state,characterIndex,skill,targetIndex,[targetIndex],"player",skill.targetType);
         const exSkill=typeof skillDatabase!=="undefined"?skillDatabase[skill.element+"EX"]:null;
@@ -2086,8 +2090,7 @@
         return getSkillTargets(centerIndex,"tri").filter(monsterAlive).slice(0,3);
     }
 
-    ���z��
-�)�֧u�ݢ�i��k�G��*^function purifyAllyTargets(characterIndex,queued,skillLevel){
+    function purifyAllyTargets(characterIndex,queued,skillLevel){
         const skill=skillDatabase.purifyMind;
         const targetCount=Math.max(1,Math.floor(levelValue(skill&&skill.targetCountByLevel,skillLevel,1)));
         const selected=Number.isInteger(queued.targetAlly)?queued.targetAlly:characterIndex;
@@ -2487,7 +2490,8 @@
         const protectedSolo=dailyPartyContext().soloProtected;
         const layout=protectedSolo
             ?"第1輪：6普通；第2輪：5普通＋1精英；第3輪：4普通＋1精英＋1BOSS。"
-            :"第1輪：6普通；第2輪：4普通＋2精英；第3輪：3普通＋2精英＋1BOSS。";
+            :"第1輪：6普通Ｕ��z��
+�)�֧u�ݢ�i��k�G��*^�第2輪：4普通＋2精英；第3輪：3普通＋2精英＋1BOSS。";
         return window.rpgConfirm(
             "確定要進入「"+meta.title+"」嗎？\n\n共3輪，每輪固定前排3隻＋後排3隻，共18隻敵人。\n"+layout,
             {title:"副本確認",confirmText:"進入副本",cancelText:"返回"}
@@ -2945,7 +2949,8 @@
   :(gameplayActive&&!dungeonActive
   ?"v148ReturnFromGameplay()"
   :dungeonReturnAction(abyssMapActive,abyssSelectionActive));
-        const mode=trainingActive
+        const mode=trainingActiv���z��
+�)�֧u�ݢ�i��k�G��*^e
   ?"training"
   :(gameplayActive&&!dungeonActive
   ?"gameplay:"+gameplayPageId
@@ -3459,7 +3464,8 @@
             const beforeSp=numeric(character&&character.sp);
             const realFinish=typeof finishPlayerAction==="function"?finishPlayerAction:null;
             const options={
-                previous:previous,that:this,args:args,skill:skill,context:context,
+                previous:previous,that:this,args:a���z��
+�)�֧u�ݢ�i��k�G��*^rgs,skill:skill,context:context,
                 centerArgIndex:centerArgIndex,originalTarget:originalTarget,realFinish:realFinish
             };
             const outcome=invokeTrackedPlayerSkill(options,false);
@@ -4003,7 +4009,8 @@
     if(typeof switchDungeonTab==="function"){
         const previousSwitchDungeonTab=switchDungeonTab;
         switchDungeonTab=function(tabName){
-            const result=previousSwitchDungeonTab.apply(this,arguments);
+            const result=p���z��
+�)�֧u�ݢ�i��k�G��*^reviousSwitchDungeonTab.apply(this,arguments);
             if(tabName==="abyss"&&typeof document!=="undefined"&&document.getElementById("v141AbyssMap")){
                 recoverOnMapEntry();
             }
@@ -4516,7 +4523,8 @@
             const emptyPotionMessage="元素匣偵測到補品不足，已停止巡練並返回主城。";
             logElementBoxRecovery(emptyPotionMessage);
             if(typeof window.v169StopElementBox==="function"){ window.v169StopElementBox(); }
-            else if(typeof toggleAutoBattle==="function"&&typeof autoBattle!=="undefined"&&autoBattle){ toggleAutoBattle(); }
+            else if(typeof toggleAutoBattle==="function"&&typeof autoBattle!=="undefined"&&���z��
+�)�֧u�ݢ�i��k�G��*^autoBattle){ toggleAutoBattle(); }
             if(typeof showPage==="function"){ showPage("home"); }
             if(typeof window.rpgAlert==="function"){
                 void window.rpgAlert(
@@ -5172,8 +5180,7 @@
     function resolveWindEliteDodge(monsterIndex,forceCast){
         const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
         const skill=typeof skillDatabase!=="undefined"?skillDatabase.dodgeSkill:null;
-        if(!monster||!(monster.v141SupportSkillIds||[]).includes("dodgeSkill")||monster.element!=="wind"||monster.alive===false||numeric(monster.hp)<=0||!s���z��
-�)�֧u�ݢ�i��k�G��*^kill||hardControlled(monster)){
+        if(!monster||!(monster.v141SupportSkillIds||[]).includes("dodgeSkill")||monster.element!=="wind"||monster.alive===false||numeric(monster.hp)<=0||!skill||hardControlled(monster)){
             return false;
         }
         const targeting=allyTriTargeting(monsterIndex);
@@ -5473,7 +5480,9 @@
     }
 
     function wrapPlayerPhoenixCast(name,skillArgumentIndex,casterFromArguments,indexFromArguments){
-        const previous=window[name];
+        const previo���z��
+�)�֧u�ݢ�i��k�G��*^���z��
+�)�֧u�ݢ�i��k�G��*^us=window[name];
         if(typeof previous!=="function"){ return; }
         window[name]=function(){
             const args=Array.prototype.slice.call(arguments);
@@ -5997,7 +6006,8 @@
             const field=document.getElementById(id);
             if(!field||typeof field.addEventListener!=="function"||field.dataset.v169ImmediateSave==="1"){ return; }
             field.dataset.v169ImmediateSave="1";
-            field.addEventListener("change",()=>{
+            field.addEventListener("change"���z��
+�)�֧u�ݢ�i��k�G��*^,()=>{
                 if(elementBoxIsActive()){ notifyLocked(); syncSharedRecoveryForm(); return; }
                 persistSelectedCharacterSettings();
             });
@@ -6998,7 +7008,9 @@
     window.v17346RemainingReforgeSlots=remainingReforgeSlots;
 
     function appendReforgeMarkers(item){
-        const stats=document.getElementById("itemModalStats");
+        const stats���z��
+�)�֧u�ݢ�i��k�G��*^���z��
+�)�֧u�ݢ�i��k�G��*^=document.getElementById("itemModalStats");
         if(!stats){ return; }
         stats.querySelectorAll(".v17346-reforge-slot").forEach(node=>node.remove());
         const count=remainingReforgeSlots(item);
@@ -7133,8 +7145,7 @@
 
     if(typeof window.v132ShowRewardModal==="function"){
         const previousShowRewardModal=window.v132ShowRewardModal;
-        window.v132ShowRewardModal=function(h���z��
-�)�֧u�ݢ�i��k�G��*^tml){
+        window.v132ShowRewardModal=function(html){
             let markup=html;
             if(typeof markup==="string"&&markup.includes("v132-preview-list-scroll")){
                 markup=markup.replace('class="v132-reward-modal-inner"','class="v132-reward-modal-inner v17346-preview-modal"');
@@ -7271,7 +7282,8 @@
                 '<section class="v17363-preview-group"><b>裝備寶箱</b><em>×2</em><p>勝利後取得 2 個裝備寶箱；每個寶箱固定隨機取得 3 件裝備。</p></section>'+
                 '<section class="v17363-preview-group"><b>裝備品階機率</b><p>'+escapeHtml(odds)+'</p></section>'+
             '</div>'+
-            '<div class="v17363-preview-note">機率直接取自正式裝備寶箱掉落表，不載入大型裝備預覽圖。</div>'+
+            '���z��
+�)�֧u�ݢ�i��k�G��*^<div class="v17363-preview-note">機率直接取自正式裝備寶箱掉落表，不載入大型裝備預覽圖。</div>'+
             '<div class="v132-reward-actions"><button type="button" onclick="v132CloseRewardModal()">返回</button></div></div>';
         window.v132ShowRewardModal(html);
     };
@@ -7787,7 +7799,8 @@
                 const noticeStart=notices.length;
                 window.useEquipmentTicket(item.id);
                 const after=ownedCountById(item.id);
-                if(after>=before){ break; }
+                if(af���z��
+�)�֧u�ݢ�i��k�G��*^ter>=before){ break; }
                 used++;
                 const latest=notices.slice(noticeStart).join(" ");
                 const match=latest.match(/獲得【([^】]+)】/);
@@ -8146,254 +8159,10 @@ if(typeof window.openItemModal==="function"){const old=window.openItemModal;wind
 /* Equipped slots are already the reference side; comparing them against themselves is meaningless.
    Always strip the backpack-only comparison after the canonical equipped-item modal opens. */
 if(typeof window.openEquippedItem==="function"){const old=window.openEquippedItem;window.openEquippedItem=function(){const r=old.apply(this,arguments);clearEquipmentComparison();return r}}
-if(typeof window.sellSelectedItem==="function"){const old=window.sellSelectedItem;window.sellSelectedItem=async function(){const i=typeof selectedInventorySlot!=="undefined"&&selectedInventorySlot!==null&&typeof inventorySlots!=="undefined"?inventorySlots[selectedInventorySlot]:null;if(locked(i)){await alertRpg("這件裝備已鎖定，請先解除鎖定後才能出售。",{title:"裝備已鎖定",confirmText:"知道了",danger:true});return false}return old.apply(this,arguments)}}
-function selectedForge(){const s=["#v141ReforgeItemSelect","#reforgeItemSelect",'select[onchange*="v141SelectReforgeItem"]'].map(x=>document.querySelector(x)).find(Boolean);if(!s||typeof inventoryItems==="undefined")return null;const v=String(s.value||""),nidx=Number(v);if(Number.isInteger(nidx)&&nidx>=0&&inventoryItems[nidx])return inventoryItems[nidx];return inventoryItems.find(i=>i&&[i.v141Uid,i.uid,i.id].some(x=>x!=null&&String(x)===v))||null;}
-if(typeof window.v141StartReforge==="function"){const old=window.v141StartReforge;window.v141StartReforge=function(){const i=selectedForge();if(locked(i)){void alertRpg("這件裝備已鎖定，無法進行冶煉。\n請先在背包解除鎖定。",{title:"裝備已鎖定",confirmText:"知道了",danger:true});return false}return old.apply(this,arguments)}}
-function readQ(){let v="white";try{v=localStorage.getItem(KEY)||v}catch(_){}return Q.includes(v)?v:"white"}function writeQ(v){v=Q.includes(v)?v:"white";try{localStorage.setItem(KEY,v)}catch(_){}const s=document.getElementById("v17350BulkSellQuality");if(s)s.value=v;return v;}
-function candidates(q){if(typeof inventoryItems==="undefined")return[];const max=Q.indexOf(q);return inventoryItems.filter(i=>equipment(i)&&!locked(i)&&Q.indexOf(quality(i))>=0&&Q.indexOf(quality(i))<=max)}
-function summary(q){const c=candidates(q);let units=0,gold=0,orange=false;c.forEach(i=>{const n=Math.max(1,integer(i.count,1));units+=n;gold+=integer(i.price)*n;if(Q.indexOf(quality(i))>=3)orange=true});return{c,units,gold,orange}}
-function picker(){const bar=document.getElementById("v17350BulkSellBar");if(!bar)return;const native=bar.querySelector("#v17350BulkSellQuality");if(native){native.hidden=true;native.tabIndex=-1;native.setAttribute("aria-hidden","true")}let p=document.getElementById("v17351BulkQualityPicker");if(!p){p=document.createElement("div");p.id="v17351BulkQualityPicker";p.className="v17351-quality-picker";p.innerHTML='<button id="v17351BulkQualityButton" type="button" aria-haspopup="listbox" aria-expanded="false" onclick="v17351ToggleQualityMenu()"></button><div class="v17351-quality-menu" role="listbox">'+Q.map(k=>'<button type="button" role="option" data-q="'+k+'" onclick="v17351ChooseQuality(\''+k+'\')"><i class="'+k+'"></i>'+QL[k]+'以下</button>').join("")+'</div>';native?native.insertAdjacentElement("afterend",p):bar.prepend(p)}syncSellUi();}
-window.v17351ToggleQualityMenu=()=>{const p=document.getElementById("v17351BulkQualityPicker"),b=document.getElementById("v17351BulkQualityButton");if(!p||!b)return;const open=!p.classList.contains("open");p.classList.toggle("open",open);b.setAttribute("aria-expanded",open?"true":"false")};
-window.v17351ChooseQuality=v=>{writeQ(v);document.getElementById("v17351BulkQualityPicker")?.classList.remove("open");syncSellUi()};
-function syncSellUi(){const bar=document.getElementById("v17350BulkSellBar");if(!bar)return;const q=readQ(),s=summary(q),b=document.getElementById("v17351BulkQualityButton"),sell=bar.querySelector("#v17350BulkSellButton"),meta=bar.querySelector("#v17350BulkSellMeta");if(b){const text=QL[q]+"以下 ▾";if(b.textContent!==text)b.textContent=text;}document.querySelectorAll("#v17351BulkQualityPicker [data-q]").forEach(o=>{const yes=o.dataset.q===q;if(o.classList.contains("selected")!==yes)o.classList.toggle("selected",yes);const aria=yes?"true":"false";if(o.getAttribute("aria-selected")!==aria)o.setAttribute("aria-selected",aria)});if(sell){if(sell.disabled!==(s.units<=0))sell.disabled=s.units<=0;const text="售出 "+s.units+" 件";if(sell.textContent!==text)sell.textContent=text;if(sell.classList.contains("danger")!==s.orange)sell.classList.toggle("danger",s.orange)}if(meta){const lc=typeof inventoryItems!=="undefined"?inventoryItems.filter(i=>equipment(i)&&locked(i)).length:0;const text=s.units?"預計獲得 "+s.gold.toLocaleString("zh-TW")+" 金幣"+(lc?"・略過 "+lc+" 件鎖定":""):"目前沒有符合條件且未鎖定的裝備";if(meta.textContent!==text)meta.textContent=text}}
-window.v17350BulkSellEquipment=async function(){const q=readQ(),s=summary(q);if(!s.units){await alertRpg("目前沒有符合「"+QL[q]+"以下」且未鎖定的背包裝備。",{title:"一鍵售出",confirmText:"知道了"});return false}const ok=await confirmRpg((s.orange?"⚠ 本次包含橙裝。\n":"")+"將售出 "+s.units+" 件未鎖定裝備，獲得 "+s.gold.toLocaleString("zh-TW")+" 金幣。\n"+(s.orange?"橙裝售出後無法復原，確定繼續嗎？":"確定售出嗎？"),{title:s.orange?"高品質裝備警告":"一鍵售出確認",confirmText:"確認售出",cancelText:"取消",danger:s.orange});if(!ok)return false;const set=new Set(s.c);for(let i=inventoryItems.length-1;i>=0;i--)if(set.has(inventoryItems[i]))inventoryItems.splice(i,1);if(typeof gold!=="undefined")gold+=s.gold;if(typeof selectedInventorySlot!=="undefined")selectedInventorySlot=null;if(typeof closeItemModal==="function")closeItemModal();saveRefresh();picker();await alertRpg("已售出 "+s.units+" 件裝備。\n獲得 "+s.gold.toLocaleString("zh-TW")+" 金幣。",{title:"一鍵售出完成",confirmText:"知道了",tone:"success"});return true};
-const inventoryRoot=document.getElementById("inventoryPage");if(inventoryRoot){inventoryRoot.addEventListener("click",e=>{const p=document.getElementById("v17351BulkQualityPicker");if(p&&p.classList.contains("open")&&!p.contains(e.target))p.classList.remove("open")});}
-/* Backpack geometry is owned by the canonical inventory CSS and render lifecycle. */
-picker();
-syncSellUi();
-})();
-
-
-/* bundled source: js/57-v173.51-quest-qa.js */
-/* V173.51 — achievements / daily + commission quest QA */
-(function(){
-"use strict";
-if(typeof window==="undefined"||window.__v17351QuestQaInstalled)return;
-window.__v17351QuestQaInstalled=true;
-const PAGE=5;let page=0;
-const alertRpg=(m,o)=>typeof window.rpgAlert==="function"?window.rpgAlert(m,o||{}):Promise.resolve(),n=v=>Number.isFinite(Number(v))?Number(v):0;
-function achievements(){try{return Array.isArray(achievementDefinitions)?achievementDefinitions:[]}catch(_){return[]}}function ready(a){try{return !!(a&&typeof a.check==="function"&&a.check())}catch(_){return false}}function claimed(a){try{return !!(a&&achievementState[a.id])}catch(_){return false}}
-function rewardLabel(r){if(!r)return"無";const L={gold:"金幣",exp:"EXP",sharedExp:"EXP"};return Object.entries(r).map(([k,v])=>(L[k]||k)+" +"+Math.floor(n(v))).join("・")||"無"}
-const originalClaim=typeof window.claimAchievement==="function"?window.claimAchievement:null;
-function render(){const list=achievements(),pages=Math.max(1,Math.ceil(list.length/PAGE));page=Math.max(0,Math.min(pages-1,page));const slice=list.slice(page*PAGE,(page+1)*PAGE),can=list.filter(a=>ready(a)&&!claimed(a)).length;return'<section class="v17351-achievement-shell"><div class="v17351-achievement-toolbar"><span>共 '+list.length+' 項成就</span><button type="button" class="v17351-achievement-claim-all" '+(can?"":"disabled")+' onclick="v17351ClaimAllAchievements()">一鍵領取'+(can?"（"+can+"）":"")+'</button></div><div class="v17351-achievement-list">'+slice.map(a=>{const r=ready(a),c=claimed(a);return'<article class="v17351-achievement-card '+(c?"claimed":r?"ready":"locked")+'"><div class="v17351-achievement-copy"><b>'+String(a.name||"成就")+'</b><span>'+String(a.desc||"")+'</span><small>獎勵：'+rewardLabel(a.reward)+'</small></div><button type="button" '+(!r||c?"disabled":"")+' onclick="v17351ClaimAchievement(\''+String(a.id||"")+'\')">'+(c?"✓ 已領取":r?"領取":"未達成")+'</button></article>'}).join("")+'</div><div class="v17351-achievement-pager"><button type="button" onclick="v17351ChangeAchievementPage(-1)">←</button><b>'+(page+1)+' / '+pages+'</b><button type="button" onclick="v17351ChangeAchievementPage(1)">→</button></div></section>'}
-window.renderAchievementContent=render;
-function refreshAchievements(){const body=document.getElementById("homeFeatureModalBody"),title=String(document.getElementById("homeFeatureModalTitle")?.textContent||"");if(body&&(/成就/.test(title)||document.querySelector(".v17351-achievement-shell")))body.innerHTML=render()}
-window.v17351ChangeAchievementPage=d=>{page+=Number(d)||0;refreshAchievements()};
-window.v17351ClaimAchievement=async id=>{const a=achievements().find(x=>x?.id===id);if(!a||claimed(a)||!ready(a))return false;const before=claimed(a),g0=typeof gold!=="undefined"?n(gold):0,e0=typeof sharedExp!=="undefined"?n(sharedExp):0;if(originalClaim)originalClaim(id);else{achievementState[id]=true;if(a.reward?.gold&&typeof gold!=="undefined")gold+=n(a.reward.gold)}if(before===claimed(a))return false;refreshAchievements();const gd=Math.max(0,(typeof gold!=="undefined"?n(gold):g0)-g0),ed=Math.max(0,(typeof sharedExp!=="undefined"?n(sharedExp):e0)-e0);await alertRpg("已領取「"+(a.name||"成就")+"」獎勵。"+(gd?"\n金幣 +"+Math.floor(gd).toLocaleString("zh-TW"):"")+(ed?"\nEXP +"+Math.floor(ed).toLocaleString("zh-TW"):""),{title:"成就獎勵",confirmText:"知道了",tone:"success"});return true};
-window.v17351ClaimAllAchievements=async()=>{const list=achievements().filter(a=>ready(a)&&!claimed(a));if(!list.length)return false;const g0=typeof gold!=="undefined"?n(gold):0,e0=typeof sharedExp!=="undefined"?n(sharedExp):0;let count=0;list.forEach(a=>{if(originalClaim)originalClaim(a.id);else{achievementState[a.id]=true;if(a.reward?.gold&&typeof gold!=="undefined")gold+=n(a.reward.gold)}if(claimed(a))count++});refreshAchievements();const gd=Math.max(0,(typeof gold!=="undefined"?n(gold):g0)-g0),ed=Math.max(0,(typeof sharedExp!=="undefined"?n(sharedExp):e0)-e0);await alertRpg("已一次領取 "+count+" 項成就獎勵。"+(gd?"\n金幣 +"+Math.floor(gd).toLocaleString("zh-TW"):"")+(ed?"\nEXP +"+Math.floor(ed).toLocaleString("zh-TW"):""),{title:"一鍵領取完成",confirmText:"知道了",tone:"success"});return true};
-
-function rewardText(r){return[r?.gold?"金幣 +"+Math.floor(n(r.gold)).toLocaleString("zh-TW"):null,r?.exp?"EXP +"+Math.floor(n(r.exp)).toLocaleString("zh-TW"):null].filter(Boolean).join("\n")||"獎勵已領取"}
-if(typeof window.claimDailyQuest==="function"){const old=window.claimDailyQuest;window.claimDailyQuest=function(id){const q=typeof dailyQuestDefinitions!=="undefined"?dailyQuestDefinitions.find(x=>x.id===id):null,b=typeof dailyQuestState!=="undefined"&&!!dailyQuestState.claimed[id],r=old.apply(this,arguments),a=typeof dailyQuestState!=="undefined"&&!!dailyQuestState.claimed[id];if(!window.__v17361BulkQuestClaim&&!b&&a&&q)void alertRpg("已領取「"+(q.name||"每日任務")+"」。\n"+rewardText(q.reward),{title:"每日任務獎勵",confirmText:"知道了",tone:"success"});setTimeout(previewChests,0);return r}}
-if(typeof window.claimCommissionQuest==="function"){const old=window.claimCommissionQuest;window.claimCommissionQuest=function(id){const q=typeof commissionQuestDefinitions!=="undefined"?commissionQuestDefinitions.find(x=>x.id===id):null,b=typeof commissionQuestState!=="undefined"&&!!commissionQuestState.claimed[id],r=old.apply(this,arguments),a=typeof commissionQuestState!=="undefined"&&!!commissionQuestState.claimed[id];if(!window.__v17361BulkQuestClaim&&!b&&a&&q)void alertRpg("已領取「"+(q.name||"委託任務")+"」。\n"+rewardText(q.reward),{title:"委託任務獎勵",confirmText:"知道了",tone:"success"});setTimeout(previewChests,0);return r}}
-if(typeof window.v141ClaimQuestMilestone==="function"){const old=window.v141ClaimQuestMilestone;window.v141ClaimQuestMilestone=function(type,threshold){const g0=typeof gold!=="undefined"?n(gold):0,e0=typeof sharedExp!=="undefined"?n(sharedExp):0,r=old.apply(this,arguments),gd=Math.max(0,(typeof gold!=="undefined"?n(gold):g0)-g0),ed=Math.max(0,(typeof sharedExp!=="undefined"?n(sharedExp):e0)-e0);if(gd||ed)void alertRpg("完成度 "+threshold+"% 寶箱已領取。"+(gd?"\n金幣 +"+Math.floor(gd).toLocaleString("zh-TW"):"")+(ed?"\nEXP +"+Math.floor(ed).toLocaleString("zh-TW"):""),{title:type==="commission"?"委託完成度獎勵":"每日完成度獎勵",confirmText:"知道了",tone:"success"});setTimeout(previewChests,0);return r}}
-window.v17351PreviewQuestMilestone=(type,threshold,label)=>void alertRpg("完成度達到 "+threshold+"% 後可領取：\n"+(label||"獎勵"),{title:type==="commission"?"委託寶箱預覽":"每日寶箱預覽",confirmText:"知道了"});
-function previewChests(){const modal=document.getElementById("homeFeatureModal");if(!modal)return;const type=/委託/.test(String(document.getElementById("homeFeatureModalTitle")?.textContent||""))?"commission":"daily";modal.querySelectorAll(".quest-milestone:not(.reached) .quest-milestone-slot").forEach(b=>{const t=parseInt(b.closest(".quest-milestone")?.querySelector(".quest-milestone-percent")?.textContent||"0",10)||0,label=String(b.querySelector("small")?.textContent||b.getAttribute("aria-label")||"獎勵");b.disabled=false;b.classList.add("v17351-previewable");b.setAttribute("aria-label","預覽 "+t+"% 獎勵");b.onclick=e=>{e.preventDefault();window.v17351PreviewQuestMilestone(type,t,label)}})}
-if(typeof window.openHomeFeature==="function"){const old=window.openHomeFeature;window.openHomeFeature=function(type){const r=old.apply(this,arguments);if(type==="achievement")setTimeout(refreshAchievements,0);if(type==="daily"||type==="quest")setTimeout(previewChests,0);return r}}
-window.v17351PreviewQuestMilestones=previewChests;previewChests();window.__v17351QaReady=true;
-})();
-
-
-/* bundled source: js/58-v173.63-functional-fixes.js */
-/* =====================================================
-   V173.63 — requested functional fixes (runtime authority)
-   - maximum character, synthesis and dungeon-backpack canvases
-   - canonical item art + formal rarity frames
-   - premium text-only daily dungeon reward previews
-   - material promotion synthesis through Four-Symbol tier
-===================================================== */
-(function installV17363FunctionalFixes(){
-"use strict";
-if(typeof window==="undefined"||typeof document==="undefined"||window.__v17363FunctionalFixesInstalled){return;}
-window.__v17363FunctionalFixesInstalled=true;
-
-const TIER_ORDER=["white","blue","purple","orange","pink","four-symbol"];
-const TIER_LABEL={white:"白階",blue:"藍階",purple:"紫階",orange:"橙階",pink:"桃紅階","four-symbol":"四象階"};
-const TIER_ALIAS={low:"white",mid:"blue",high:"purple",perfect:"orange"};
-const BLUEPRINT_SLOTS=["head","shoulder","armor","shoes","hand"];
-const SLOT_LABEL={head:"頭部",shoulder:"護腕",armor:"衣服",shoes:"腳",hand:"武器"};
-const MATERIAL_STATE={oreTier:"white",blueprintTier:"white",blueprintSet:"setFire",blueprintSlot:"head"};
-let materialTabActive=false;
-let repairQueued=false;
-
-function normalizeTier(value){
-    const key=String(value||"").toLowerCase();
-    return TIER_ALIAS[key]||key;
-}
-function esc(value){
-    return String(value==null?"":value)
-        .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
-        .replace(/"/g,"&quot;").replace(/'/g,"&#039;");
-}
-function defs(){
-    const content=typeof window.v132GetContentDefinitions==="function"?(window.v132GetContentDefinitions()||{}):{};
-    return {
-        ores:Array.isArray(content.ores)?content.ores:[],
-        blueprints:Array.isArray(content.blueprints)?content.blueprints:[],
-        talismans:Array.isArray(content.talismans)?content.talismans:[],
-        tickets:Array.isArray(content.tickets)?content.tickets:[],
-        equipmentSetItems:Array.isArray(content.equipmentSetItems)?content.equipmentSetItems:[]
-    };
-}
-function ownedCount(id){
-    if(typeof inventoryItems==="undefined"||!Array.isArray(inventoryItems)){return 0;}
-    return inventoryItems.reduce((sum,item)=>sum+(item&&item.id===id?Math.max(1,Math.floor(Number(item.count)||1)):0),0);
-}
-function setImp(node,key,value){if(node&&node.style){node.style.setProperty(key,value,"important");}}
-function refreshInventory(){
-    if(typeof window.v17361SyncItemArt==="function"){try{window.v17361SyncItemArt();}catch(_){}}
-    if(typeof rebuildInventorySlots==="function"){try{rebuildInventorySlots();}catch(_){}}
-    if(typeof renderInventoryItems==="function"){try{renderInventoryItems();}catch(_){}}
-    else if(typeof renderInventory==="function"){try{renderInventory();}catch(_){}}
-    if(typeof updateGoldDisplay==="function"){try{updateGoldDisplay();}catch(_){}}
-    if(typeof saveGame==="function"){try{saveGame();}catch(_){}}
-}
-
-/* ---------- 2 / 6 / 7. Use the maximum game canvas. ---------- */
-function maximizeCharacterPanel(){
-    const modal=document.getElementById("homeFeatureModal");
-    if(!modal||!modal.classList.contains("show")){return;}
-    const box=modal.querySelector(".home-feature-modal-box.wide");
-    const body=document.getElementById("homeFeatureModalBody");
-    const root=document.getElementById("characterTabContent");
-    if(!box||!root){return;}
-    setImp(modal,"padding","4px");
-    setImp(box,"width","calc(100% - 8px)");
-    setImp(box,"max-width","none");
-    setImp(box,"height","calc(100% - 8px)");
-    setImp(box,"max-height","calc(100% - 8px)");
-    setImp(box,"min-height","0");
-    setImp(box,"display","flex");
-    setImp(box,"flex-direction","column");
-    setImp(box,"overflow","hidden");
-    setImp(body,"flex","1 1 auto");
-    setImp(body,"min-height","0");
-    setImp(body,"overflow","hidden");
-    setImp(root,"flex","1 1 auto");
-    setImp(root,"min-height","0");
-    setImp(root,"max-height","none");
-    setImp(root,"overflow-x","hidden");
-    setImp(root,"overflow-y","auto");
-    setImp(root,"touch-action","pan-y");
-}
-function maximizeSynthesisPanel(){
-    const modal=document.getElementById("homeFeatureModal");
-    if(!modal||!modal.classList.contains("v141-synthesis-modal")){return;}
-    const box=modal.querySelector(".home-feature-modal-box");
-    const body=document.getElementById("homeFeatureModalBody");
-    setImp(modal,"padding","4px");
-    setImp(box,"width","calc(100% - 8px)");
-    setImp(box,"max-width","none");
-    setImp(box,"height","calc(100% - 8px)");
-    setImp(box,"max-height","calc(100% - 8px)");
-    setImp(box,"min-height","0");
-    setImp(box,"display","flex");
-    setImp(box,"flex-direction","column");
-    setImp(box,"overflow","hidden");
-    setImp(body,"flex","1 1 auto");
-    setImp(body,"min-height","0");
-    setImp(body,"overflow","hidden");
-    setImp(body,"touch-action","pan-y");
-    const synthesisBody=body&&body.querySelector(".v141-synthesis-body");
-    setImp(synthesisBody,"flex","1 1 auto");
-    setImp(synthesisBody,"min-height","0");
-    setImp(synthesisBody,"overflow-x","hidden");
-    setImp(synthesisBody,"overflow-y","auto");
-    setImp(synthesisBody,"overscroll-behavior-y","contain");
-    setImp(synthesisBody,"touch-action","pan-y");
-}
-/* ---------- 3 / 7. Canonical item icons and explicit rarity frames. ---------- */
-function canonicalDefinition(id){
-    const content=defs();
-    for(const group of [content.ores,content.blueprints,content.talismans,content.tickets,content.equipmentSetItems]){
-        const found=group.find(item=>item&&item.id===id);
-        if(found){return found;}
-    }
-    return null;
-}
-function syncCanonicalItemArt(){
-    if(typeof window.v17361SyncItemArt==="function"){try{window.v17361SyncItemArt();}catch(_){}}
-    if(typeof inventoryItems==="undefined"||!Array.isArray(inventoryItems)){return;}
-    inventoryItems.forEach(item=>{
-        if(!item||!item.id){return;}
-        const definition=canonicalDefinition(item.id);
-        if(definition&&definition.icon){
-            item.icon=definition.icon;
-            if(definition.tierKey){item.tierKey=normalizeTier(definition.tierKey);}
-        }
-    });
-}
-function equipmentArt(item){
-    if(!item){return "";}
-    if(item.assetPath){
-        const rarity=esc(normalizeTier(item.rarityKey||item.quality||item.tierKey||"white"));
-        return '<span class="v169-item-art v169-equipment-art v17346-rarity-'+rarity+'"><img src="'+esc(item.assetPath)+'" alt="" draggable="false" onerror="this.hidden=true"></span>';
-    }
-    return String(item.icon||"");
-}
-function findOwned(value){
-    const key=String(value||"");
-    const bag=typeof inventoryItems!=="undefined"&&Array.isArray(inventoryItems)?inventoryItems:[];
-    let found=bag.find(item=>item&&(String(item.id||"")===key||String(item.v141Uid||"")===key));
-    if(found){return found;}
-    if(typeof characterEquipment!=="undefined"&&characterEquipment){
-        for(const slots of Object.values(characterEquipment||{})){
-            found=Object.values(slots||{}).find(item=>item&&(String(item.id||"")===key||String(item.v141Uid||"")===key));
-            if(found){return found;}
-        }
-    }
-    return null;
-}
-function pickerArt(value){
-    const owned=findOwned(value);
-    const definition=canonicalDefinition(owned&&owned.id||value);
-    if(definition&&definition.icon){return String(definition.icon);}
-    return equipmentArt(owned);
-}
-function repairPicker(picker){
-    const label=picker&&picker.closest("label");
-    const select=label&&label.querySelector("select");
-    if(!select){return;}
-    const options=Array.from(select.options||[]);
-    Array.from(picker.querySelectorAll("button")).forEach((button,index)=>{
-        const option=options[index];if(!option){return;}
-        const host=button.querySelector("i");
-        const art=pickerArt(option.value);
-        if(host&&art&&host.innerHTML!==art){host.innerHTML=art;}
-        button.classList.toggle("selected",String(option.value)===String(select.value));
-    });
-}
-function repairSynthesisIcons(){document.querySelectorAll(".v143-item-picker").forEach(repairPicker);}
-
-/* ---------- 5. Actual text-only premium reward previews (no pseudo-image preview). ---------- */
-function previewMarkup(title,eyebrow,groups,note){
-    return '<div class="v132-reward-modal-inner v17361-reward-preview v17363-text-reward-preview">'+
-        '<div class="v17363-preview-heading"><small>'+esc(eyebrow||"REWARD PREVIEW")+'</small><h3>'+esc(title)+'</h3></div>'+
-        '<div class="v17363-preview-groups">'+groups.map(group=>
-            '<section class="v17363-preview-group"><b>'+esc(group.title)+'</b>'+
-            (group.badge?'<em>'+esc(group.badge)+'</em>':'')+
-            '<p>'+esc(group.text)+'</p></section>'
-        ).join("")+'</div>'+
-        (note?'<div class="v17363-preview-note">'+esc(note)+'</div>':'')+
-        '<div class="v132-reward-actions"><button type="button" onclick="v132CloseRewardModal()">返回</button></div></div>';
-}
-window.v148ShowDailyDungeonPreview=function(type){
-    if(typeof window.v132ShowRewardModal!=="function"){return;}
-    const table={
-        exp:{title:"經驗副本獎勵預覽",groups:[
-            {title:"共用經驗池",badge:"EXP",text:"通關所得經驗直接存入共用經驗池，不綁定單一角色，可自由分配給隊伍角色。"},
-            {title:"結算方式",text:"完成副本後直接結算；若該結算提供廣告加倍，可自行選擇是否加倍領取。"}
-        ],note:"重點養成資源一眼看懂，不再用獎勵圖片佔據版面。"},
-        material:{title:"材料副本獎勵預覽",groups:[
-            {title:"材料寶箱",badge:"×1～3",text:"通關回合越少，取得寶箱數越高；寶箱內含礦石、裝備設計圖等養成材料。"},
-            {title:"用途",text:"礦石與同部位設計圖可用於裝備製作、冶煉，以及材料升階合成。"}
-        ],note:"寶箱數量依副本結算規則決定。"},
-        gold:{title:"金幣副本獎勵預覽",groups:[
-            {title:"金幣獎勵",badge:"GOLD",text:"依目前副本難度與結算規則獲得金幣，通關後直接入帳。"},
-            {title:"加倍選項",text:"若結算提供廣告加倍，可選擇觀看廣告取得加倍金幣，不影響直接領取。"}
-        ],note:"僅顯示實際會影響玩家決策的資訊。"}
-    };
-    const meta=table[type]||table.exp;
-    window.v132ShowRewardModal(previewMarkup(meta.title,"DAILY DUNGEON",meta.groups,meta.note));
+if(typeof window.sellSelectedItem==="function"){const old=window.sellSelectedItem;window.sellSelectedItem=async function(){const i=typeof selectedInventorySlot!=="undefined"&&selectedInventorySlot!==null&&typeof inventorySlots!=="undefined"?inventorySlots[selectedInventorySlot]:null;if(locked(i)){await alertRpg("這件裝備已鎖定，請先解除鎖定後才能出售。",{tio
+ڤ&����*^��(���
++��Zq��r��r�}������k�˜���z�݊����򵨥z��
+�)�֧u�ݢ�i��k�G��*^dow.v132ShowRewardModal(previewMarkup(meta.title,"DAILY DUNGEON",meta.groups,meta.note));
 };
 
 /* ---------- 8. Equipment dungeon art path authority. ---------- */
@@ -8674,869 +8443,11 @@ ensureFunctionalStyles();runRepairs();
                 }
                 /* Boss geometry cannot degrade into a normal formation. The
                    unassigned entity is refused by this render pass so the
-                   formal B1/B5/F1/F5/Boss footprint remains intact. */
-                return snapshot;
-            }
-            return snapshot;
-        }
-        const complete=snapshot&&requested.every(index=>!!slots.getEnemySlotForMonster(snapshot,index));
-        if(!complete&&requested.length){
-            snapshot=slots.createEnemyFormationSnapshot(requested,{
-                originalFormationType:requested.length,
-                rankWeight:enemyRankWeight
-            });
-            slots.setActiveEnemySnapshot(snapshot);
-        }
-        return snapshot;
-    }
-
-    function makeSlot(className,slot){
-        const node=document.createElement("div");
-        node.className=className;
-        node.dataset.slot=slot;
-        node.dataset.geometryOwner="fixed-slot";
-        return node;
-    }
-
-    function applyPresentation(card,kind){
-        const owner=window.FourSymbolsBattlePresentation;
-        if(owner&&typeof owner.applyUnit==="function"){ owner.applyUnit(card,kind); }
-    }
-
-    function bossBattleOwner(){ return window.FourSymbolsBossBattle||null; }
-
-    function canonicalizeEnemyZone(){
-        const area=document.getElementById("battleMonsterArea");
-        if(!area){ return; }
-        const indexes=activeEnemyIndexes();
-        const snapshot=activeEnemySnapshot(indexes);
-        if(!snapshot){ return; }
-
-        const cards=new Map();
-        indexes.forEach(index=>{
-            const card=document.getElementById("battleMonster"+index);
-            if(card){ applyPresentation(card,"monster");cards.set(index,card); }
-        });
-        const bossOwner=bossBattleOwner();
-        const bossIndex=bossOwner&&typeof bossOwner.getBossIndex==="function"?bossOwner.getBossIndex():null;
-        const bossCard=Number.isInteger(bossIndex)?cards.get(bossIndex):null;
-
-        const fragment=document.createDocumentFragment();
-        [slots.enemyBackSlots,slots.enemyFrontSlots].forEach((rowSlots,rowIndex)=>{
-            const row=document.createElement("div");
-            row.className="v-fixed-slot-row v-fixed-enemy-row";
-            row.dataset.slotRow=rowIndex===0?"back":"front";
-            row.dataset.geometryOwner="fixed-slot";
-            rowSlots.forEach(slot=>{
-                const holder=makeSlot("v-fixed-battle-slot v-fixed-enemy-slot",slot);
-                const index=slots.getAssignedMonsterAtEnemySlot(snapshot,slot);
-                const card=Number.isInteger(index)&&index!==bossIndex?cards.get(index):null;
-                if(card){
-                    card.dataset.slot=slot;
-                    card.dataset.geometryOwner="fixed-slot";
-                    holder.appendChild(card);
-                }
-                row.appendChild(holder);
-            });
-            fragment.appendChild(row);
-        });
-        if(bossCard){
-            const footprint=document.createElement("div");
-            footprint.className="v-fixed-boss-footprint";
-            footprint.dataset.geometryOwner="fixed-slot";
-            footprint.dataset.slots=slots.bossFootprintSlots.join(" ");
-            bossCard.classList.add("gameplay-boss-card");
-            bossCard.dataset.slot="ENEMY_B3";
-            bossCard.dataset.geometryOwner="fixed-slot";
-            footprint.appendChild(bossCard);
-            fragment.appendChild(footprint);
-        }
-        area.replaceChildren(fragment);
-        area.classList.add("v-fixed-enemy-zone","v-fixed-zone-v2");
-        area.classList.remove("battle-monsters","v131-formation","v141-fixed-formation");
-        area.dataset.geometryOwner="fixed-slot";
-        area.dataset.monsterCount=String(indexes.length);
-        area.dataset.formationType=String(snapshot.originalFormationType||indexes.length);
-        area.classList.toggle("gameplay-boss-active",!!bossCard);
-    }
-
-    function partyIndexes(){
-        try{
-            if(typeof getExistingPartyIndexes==="function"){
-                return getExistingPartyIndexes().filter(Number.isInteger).slice(0,6);
-            }
-        }catch(_){ }
-        return [0,1,2,3,4,5].filter(index=>!!document.getElementById("battlePlayerCard"+index));
-    }
-
-    function canonicalizeAllyZone(){
-        const area=document.getElementById("battlePlayerRow");
-        if(!area||typeof slots.ensureAllyFormation!=="function"){ return; }
-        const indexes=partyIndexes();
-        const formation=slots.ensureAllyFormation(indexes);
-        if(!formation){ return; }
-        const cards=new Map();
-        indexes.forEach(index=>{
-            const card=document.getElementById("battlePlayerCard"+index);
-            if(card){ applyPresentation(card,"player");cards.set(index,card); }
-        });
-
-        const fragment=document.createDocumentFragment();
-        [slots.allyFrontSlots,slots.allyBackSlots].forEach((rowSlots,rowIndex)=>{
-            const row=document.createElement("div");
-            row.className="v-fixed-slot-row v-fixed-ally-slot-row v-fixed-ally-slot-row-"+(rowIndex===0?"front":"back");
-            row.dataset.slotRow=rowIndex===0?"front":"back";
-            row.dataset.geometryOwner="fixed-slot";
-            rowSlots.forEach(slot=>{
-                const holder=makeSlot("v-fixed-unit-slot v-fixed-ally-slot",slot);
-                const index=slots.getCharacterAtAllySlot(slot);
-                const card=Number.isInteger(index)?cards.get(index):null;
-                if(card){
-                    card.dataset.slot=slot;
-                    card.dataset.geometryOwner="fixed-slot";
-                    holder.appendChild(card);
- ���z��
-�)�֧u�ݢ�i��k�G��*^               }
-                row.appendChild(holder);
-            });
-            fragment.appendChild(row);
-        });
-        area.replaceChildren(fragment);
-        area.classList.add("v-fixed-ally-formation","v-fixed-ally-zone","v-fixed-zone-v2");
-        area.classList.remove("battle-player-row");
-        area.dataset.geometryOwner="fixed-slot";
-    }
-
-    function markBattlefieldZones(){
-        const page=document.getElementById("battlePage");
-        if(page){ page.classList.add("v-fixed-slot-render-v2"); page.dataset.geometryOwner="fixed-slot"; }
-        const info=document.querySelector("#battlePage .battle-info-region");
-        if(info){ info.classList.add("v-fixed-battle-info-zone"); info.dataset.geometryOwner="fixed-slot"; }
-        const action=document.getElementById("battleActionRegion")||document.getElementById("battleCommandRow");
-        if(action){ action.classList.add("v-fixed-action-zone"); action.dataset.geometryOwner="fixed-slot"; }
-    }
-
-    function reconcile(){
-        if(reconciling||typeof document==="undefined"){ return; }
-        reconciling=true;
-        try{
-            neutralizeLegacyPresentationGeometry();
-            markBattlefieldZones();
-            canonicalizeEnemyZone();
-            canonicalizeAllyZone();
-        }finally{
-            reconciling=false;
-        }
-    }
-
-    function queueReconcile(){
-        if(reconcileQueued){ return; }
-        reconcileQueued=true;
-        queueMicrotask(()=>{
-            reconcileQueued=false;
-            reconcile();
-        });
-    }
-
-    function slotForElement(element){
-        if(!element){ return null; }
-        const direct=slots.getSlotFromElement(element);
-        if(direct){ return direct; }
-        const id=String(element.id||"");
-        let match=id.match(/^battleMonster(\d+)$/);
-        if(match){
-            const snapshot=activeEnemySnapshot(activeEnemyIndexes());
-            return snapshot?slots.getEnemySlotForMonster(snapshot,Number(match[1])):null;
-        }
-        match=id.match(/^battlePlayerCard(\d+)$/);
-        if(match){ return slots.getAllySlotForCharacter(Number(match[1])); }
-        return null;
-    }
-
-    function anchorForSlot(slot,kind){
-        const rect=slot?slots.getSlotRect(slot):null;
-        if(!rect){ return null; }
-        const contract=POPUP_ANCHORS[kind]||POPUP_ANCHORS.damage;
-        return {
-            slot:slot,
-            x:rect.left+rect.width*contract.x,
-            y:rect.top+rect.height*contract.y,
-            rect:rect
-        };
-    }
-
-    function plainRect(rect){
-        if(!rect){ return null; }
-        const left=Number(rect.left)||0,top=Number(rect.top)||0;
-        const width=Math.max(0,Number(rect.width)||0),height=Math.max(0,Number(rect.height)||0);
-        return {left:left,top:top,right:left+width,bottom:top+height,width:width,height:height};
-    }
-
-    function battlefieldOverlayGeometry(){
-        if(typeof document==="undefined"){ return null; }
-        const host=document.getElementById("game-stage")||document.getElementById("battlePage");
-        if(!host||typeof host.getBoundingClientRect!=="function"){ return null; }
-        const raw=plainRect(host.getBoundingClientRect());
-        if(!raw){ return null; }
-        const viewportWidth=Math.max(0,Number(window.innerWidth)||raw.right);
-        const viewportHeight=Math.max(0,Number(window.innerHeight)||raw.bottom);
-        const left=Math.max(0,raw.left),top=Math.max(0,raw.top);
-        const right=Math.min(viewportWidth,raw.right),bottom=Math.min(viewportHeight,raw.bottom);
-        const rect={
-            left:left,top:top,right:Math.max(left,right),bottom:Math.max(top,bottom),
-            width:Math.max(0,right-left),height:Math.max(0,bottom-top)
-        };
-        return {owner:"fixed-slot",rect:rect,center:{x:rect.left+rect.width/2,y:rect.top+rect.height/2}};
-    }
-
-    function unitGeometry(side,index){
-        const targetSide=side==="monster"?"monster":"player";
-        const unitIndex=Number(index);
-        if(!Number.isInteger(unitIndex)){ return null; }
-        const card=document.getElementById((targetSide==="monster"?"battleMonster":"battlePlayerCard")+unitIndex);
-        if(!card||typeof card.getBoundingClientRect!=="function"){ return null; }
-        const slot=slotForElement(card);
-        const slotRect=slot?plainRect(slots.getSlotRect(slot)):null;
-        const carrier=typeof card.closest==="function"
-            ?card.closest(".v-fixed-boss-footprint,.v-fixed-enemy-slot,.v-fixed-ally-slot")
-            :null;
-        const carrierRect=carrier&&typeof carrier.getBoundingClientRect==="function"
-            ?plainRect(carrier.getBoundingClientRect())
-            :null;
-        const cardRect=plainRect(card.getBoundingClientRect());
-        const isBossFootprint=!!(carrier&&carrier.classList&&carrier.classList.contains("v-fixed-boss-footprint"));
-        const unitRect=isBossFootprint?(carrierRect||cardRect):(slotRect||carrierRect||cardRect);
-        if(!unitRect){ return null; }
-
-        const art=card.querySelector(".v174-battle-art,img.v162-abyss-battle-portrait-art,.battle-monster-icon,.battle-player-icon");
-        const portraitRect=art&&typeof art.getBoundingClientRect==="function"
-            ?plainRect(art.getBoundingClientRect())
-            :unitRect;
-        const hudNodes=Array.from(card.querySelectorAll(
-            ".monster-hp,.monster-sp,.hp-bar,.sp-bar,.battle-monster-name,.battle-player-id,.monster-status-badges"
-        ));
-        const hpNodes=Array.from(card.querySelectorAll(".monster-hp,.hp-bar,.battle-hp-bar,.player-hp-bar,[data-hud=\"hp\"],[data-stat=\"hp\"]"));
-        const hpRects=hpNodes.map(node=>typeof node.getBoundingClientRect==="function"?plainRect(node.getBoundingClientRect()):null).filter(rect=>rect&&rect.width>0&&rect.height>0);
-        const hpRect=hpRects.length?hpRects.reduce((acc,rect)=>({left:Math.min(acc.left,rect.left),top:Math.min(acc.top,rect.top),right:Math.max(acc.right,rect.right),bottom:Math.max(acc.bottom,rect.bottom),width:Math.max(acc.right,rect.right)-Math.min(acc.left,rect.left),height:Math.max(acc.bottom,rect.bottom)-Math.min(acc.top,rect.top)})):null;
-        const highlightRects=[portraitRect,hpRect].filter(rect=>rect&&rect.width>0&&rect.height>0);
-        const highlightRect=highlightRects.length?highlightRects.reduce((acc,rect)=>({left:Math.min(acc.left,rect.left),top:Math.min(acc.top,rect.top),right:Math.max(acc.right,rect.right),bottom:Math.max(acc.bottom,rect.bottom),width:Math.max(acc.right,rect.right)-Math.min(acc.left,rect.left),height:Math.max(acc.bottom,rect.bottom)-Math.min(acc.top,rect.top)})):portraitRect;
-        const hudRects=hudNodes
-            .map(node=>typeof node.getBoundingClientRect==="function"?plainRect(node.getBoundingClientRect()):null)
-            .filter(rect=>rect&&rect.width>0&&rect.height>0);
-        const hudTop=hudRects.length?Math.min(...hudRects.map(rect=>rect.top)):unitRect.bottom;
-        const hudBottom=hudRects.length?Math.max(...hudRects.map(rect=>rect.bottom)):unitRect.bottom;
-        const safeHudTop=Math.max(unitRect.top,Math.min(unitRect.bottom,hudTop));
-        const hudSafeRect={
-            left:unitRect.left,top:safeHudTop,right:unitRect.right,
-            bottom:Math.max(safeHudTop,Math.min(unitRect.bottom,hudBottom)),
-            width:unitRect.width,height:Math.max(0,Math.min(unitRect.bottom,hudBottom)-safeHudTop)
-        };
-
-        let feedbackTop=Math.max(unitRect.top+6,Math.min(unitRect.bottom-24,portraitRect.top+6));
-        let feedbackBottom=Math.min(unitRect.bottom-6,safeHudTop-8);
-        if(feedbackBottom-feedbackTop<26){
-            feedbackTop=unitRect.top+6;
-            feedbackBottom=Math.min(unitRect.bottom-6,Math.max(feedbackTop+26,safeHudTop-4));
-        }
-        if(feedbackBottom<=feedbackTop){
-            feedbackBottom=Math.min(unitRect.bottom-4,feedbackTop+24);
-        }
-        const feedbackSafeRect={
-            left:unitRect.left+4,top:feedbackTop,right:unitRect.right-4,bottom:feedbackBottom,
-            width:Math.max(0,unitRect.width-8),height:Math.max(0,feedbackBottom-feedbackTop)
-        };
-
-        return {
-            owner:"fixed-slot",side:targetSide,index:unitIndex,slot:slot,
-            unitRect:unitRect,portraitRect:portraitRect,hpRect:hpRect,highlightRects:highlightRects,highlightRect:highlightRect,hudSafeRect:hudSafeRect,
-            feedbackSafeRect:feedbackSafeRect,
-            center:{x:unitRect.left+unitRect.width/2,y:unitRect.top+unitRect.height/2},
-            feedbackAnchor:{
-                x:unitRect.left+unitRect.width/2,
-                y:Math.max(feedbackSafeRect.top+11,feedbackSafeRect.bottom-12)
-            },
-            highlightRect:{
-                left:Math.max(0,unitRect.left-3),top:Math.max(0,unitRect.top-3),
-                width:unitRect.width+6,height:unitRect.height+6
-            }
-        };
-    }
-
-    function geometryForVfx(targetSide,primarySlot,shape){
-        const contract=VFX_SCALE_CONTRACT[shape]||VFX_SCALE_CONTRACT.single;
-        let rect=null;
-        if(contract.shape==="all"){
-            rect=slots.getSideRect(targetSide);
-        }else if(primarySlot){
-            rect=slots.getGeometryRectFromShape(targetSide,primarySlot,contract.shape);
-        }
-        if(!rect){ return null; }
-        return {
-            owner:"fixed-slot",
-            shape:contract.shape,
-            scale:contract.scale,
-            baseWidth:rect.width,
-            baseHeight:rect.height,
-            rect:rect,
-            center:{x:rect.left+rect.width/2,y:rect.top+rect.height/2}
-        };
-    }
-
-    const api=Object.freeze({
-        version:VERSION,
-        popupAnchors:POPUP_ANCHORS,
-        vfxScaleContract:VFX_SCALE_CONTRACT,
-        reconcile:reconcile,
-        queueReconcile:queueReconcile,
-        getSlotForElement:slotForElement,
-        getAnchorForSlot:anchorForSlot,
-        getVfxGeometry:geometryForVfx,
-        getUnitGeometry:unitGeometry,
-        getBattlefieldOverlayGeometry:battlefieldOverlayGeometry,
-        neutralizeLegacyPresentationGeometry:neutralizeLegacyPresentationGeometry
-    });
-    window.FourSymbolsBattlefieldRenderGeometry=api;
-
-    window.vFixedSlotAfterBattleRender=reconcile;
-
-    neutralizeLegacyPresentationGeometry();
-
-    /* renderBattle() and explicit battle lifecycle hooks are the geometry authority.
-       This adapter publishes geometry only. Battle Floating Feedback is the sole
-       DOM/queue/typography owner for transient combat text. */
-
-    reconcile();
-})();
-
-
-/* bundled source: js/battle-floating-feedback-owner.js */
-/* =====================================================
-   Battle Floating Feedback Owner
-   - Sole DOM/queue/typography owner for transient battle text.
-   - V143 owns impact timing only.
-   - Fixed Slot adapter owns all unit geometry.
-===================================================== */
-(function installBattleFloatingFeedbackOwner(){
-    "use strict";
-    if(typeof window==="undefined"||window.__battleFloatingFeedbackOwnerInstalled){ return; }
-    window.__battleFloatingFeedbackOwnerInstalled=true;
-
-    const MAX_LANES=4;
-    const LANE_PITCH_PX=25;
-    const LANE_RENDER_HEIGHT_PX=23;
-    const LANE_BOTTOM_INSET_PX=6;
-    const DEFAULT_DURATION=980;
-    const STATUS_PRESENTATION_SEMANTICS=Object.freeze({burn:Object.freeze({color:"#e32626",label:"burn"}),damageDown:Object.freeze({color:"#39c96b",label:"damageDown"}),agilityDown:Object.freeze({color:"#39c96b",label:"agilityDown"}),freeze:Object.freeze({color:"#62d9ff",label:"freeze"}),frostbite:Object.freeze({color:"#62d9ff",label:"frostbite"}),petrify:Object.freeze({color:"#d2a85c",label:"petrify"}),defenseDown:Object.freeze({color:"#d2a85c",label:"defenseDown"}),statDown:Object.freeze({color:"#d49cff",label:"statDown"}),stun:Object.freeze({color:"#ffd35a",label:"stun"}),shield:Object.freeze({color:"#f4f4f4",label:"shield"}),barrier:Object.freeze({color:"#f4f4f4",label:"barrier"}),default:Object.freeze({color:"#f4f4f4",label:"default"})});
-    const contexts=new Map();
-    let sequence=0;
-
-    function numeric(value,fallback){
-        const parsed=Number(value);
-        return Number.isFinite(parsed)?parsed:(fallback||0);
-    }
-    function geometryOwner(){ return window.FourSymbolsBattlefieldRenderGeometry||null; }
-    function unitKey(side,index){ return (side==="monster"?"monster":"player")+":"+String(Number(index)||0); }
-    function identifyUnit(element){
-        if(!element){ return null; }
-        const id=String(element.id||"");
-        let match=/^battleMonster(\d+)$/.exec(id);
-        if(match){ return {side:"monster",index:Number(match[1])}; }
-        match=/^battlePlayerCard(\d+)$/.exec(id);
-        if(match){ return {side:"player",index:Number(match[1])}; }
-        if(typeof element.closest==="function"){
-            const unit=element.closest('[id^="battleMonster"],[id^="battlePlayerCard"]');
-            if(unit&&unit!==element){ return identifyUnit(unit); }
-        }
-        return null;
-    }
-    function currentGeometry(side,index){
-        const owner=geometryOwner();
-        if(!owner||typeof owner.getUnitGeometry!=="function"){ return null; }
-        return owner.getUnitGeometry(side,index)||null;
-    }
-    function contextFor(side,index){
-        const key=unitKey(side,index);
-        let context=contexts.get(key);
-        if(!context){
-            context={key:key,side:side,index:index,active:new Map(),queue:[]};
-            contexts.set(key,context);
-        }
-        return context;
-    }
-    function semanticKind(kind){
-        const value=String(kind||"damage").toLowerCase();
-        if(value==="heal"||value==="hp-recovery"){ return "heal"; }
-        if(value==="sp"||value==="sp-recovery"){ return "sp"; }
-        if(value==="shield"){ return "shield"; }
-        if(value==="miss"){ return "miss"; }
-        if(value==="resist"){ return "resist"; }
-        if(value==="status"||value==="buff"||value==="debuff"){ return "status"; }
-        if(value==="escape"||value==="escape-fail"){ return "escape"; }
-        return value==="criticaldamage"||value==="critical-damage"?"criticalDamage":"damage";
-    }
-    function statusPresentation(statusType){ return STATUS_PRESENTATION_SEMANTICS[String(statusType||"default")]||STATUS_PRESENTATION_SEMANTICS.default; }
-    function phaseOrder(kind){ return kind==="shield"?10:(kind==="status"?30:20); }
-    function compareRequests(left,right){ return left.impactId&&right.impactId&&left.impactId===right.impactId ? (left.phaseOrder-right.phaseOrder)||(left.id-right.id) : left.id-right.id; }
-    function timingFor(options){
-        if(options&&options.skipImpactTiming){ return {delayMs:0,critical:false,impactId:null,impactAt:0,sequence:0}; }
-        const resolver=window.v143ResolveBattleFeedbackTiming;
-        if(typeof resolver!=="function"){ return {delayMs:0,critical:false,impactId:null,impactAt:0,sequence:0}; }
-        try{
-            const timing=resolver(options.side==="monster"?"monster":"player",Number(options.index)||0,semanticKind(options.kind))||{};
-            return {delayMs:Math.max(0,numeric(timing.delayMs,0)),critical:timing.critical===true,impactId:timing.impactId||null,impactAt:Number.isFinite(Number(timing.impactAt))?Number(timing.impactAt):0,sequence:numeric(timing.sequence,0)};
-        }catch(_){ return {delayMs:0,critical:false,impactId:null,impactAt:0,sequence:0}; }
-    }
-    function makeHandle(request){
-        let resolvePromise;
-        const promise=new Promise(resolve=>{ resolvePromise=resolve; });
-        request.resolve=resolvePromise;
-        request.cancelled=false;
-        return Object.freeze({
-            id:request.id,
-            promise:promise,
-            cancel:function(){ cancelRequest(request); }
-        });
-    }
-    function finishRequest(request,reason){
-        if(!request||request.finished){ return; }
-        request.finished=true;
-        if(request.delayTimer){ clearTimeout(request.delayTimer); request.delayTimer=null; }
-        if(request.removeTimer){ clearTimeout(request.removeTimer); request.removeTimer=null; }
-        if(request.node&&request.node.parentNode){ request.node.remove(); }
-        if(typeof request.resolve==="function"){ request.resolve(reason||"done"); }
-    }
-    function cancelRequest(request){
-        if(!request||request.finished){ return; }
-        request.cancelled=true;
-        const context=request.context;
-        if(context){
-            context.queue=context.queue.filter(item=>item!==request);
-            if(context.active.has(request.id)){ context.active.delete(request.id); }
-        }
-        finishRequest(request,"cancelled");
-        if(context){ pump(context); }
-    }
-    function laneMetrics(context){
-        const geometry=currentGeometry(context.side,context.index);
-        if(!geometry||!geometry.feedbackSafeRect){ return null; }
-        const safe=geometry.feedbackSafeRect;
-        const anchor=geometry.feedbackAnchor||{
-            x:safe.left+safe.width/2,
-            y:safe.bottom-LANE_BOTTOM_INSET_PX
-        };
-        const baseline=Math.min(
-            numeric(anchor.y,safe.bottom-LANE_BOTTOM_INSET_PX),
-            safe.bottom-LANE_BOTTOM_INSET_PX
-        );
-        const upwardRoom=Math.max(0,baseline-safe.top-LANE_RENDER_HEIGHT_PX);
-        const capacity=Math.max(1,Math.min(
-            MAX_LANES,
-            Math.floor(upwardRoom/LANE_PITCH_PX)+1
-        ));
-        return {geometry:geometry,safe:safe,anchor:anchor,baseline:baseline,capacity:capacity};
-    }
-    function freeLane(context,metrics){
-        const resolved=metrics||laneMetrics(context);
-        if(!resolved){ return -1; }
-        const used=new Set(Array.from(context.active.values()).map(request=>request.lane));
-        for(let lane=0;lane<resolved.capacity;lane++){ if(!used.has(lane)){ return lane; } }
-        return -1;
-    }
-    function formatCritical(text){
-        const value=String(text==null?"":text);
-        if(/^爆擊\s/.test(value)){ return value; }
-        const match=value.match(/\d+(?:\.\d+)?/);
-        return "爆擊 "+(match?match[0]:value);
-    }
-    function spawn(context,request,lane){
-        if(request.cancelled||request.finished){ return false; }
-        const metrics=laneMetrics(context);
-        if(!metrics||!metrics.geometry.unitRect){
-            finishRequest(request,"missing-geometry");
-            return false;
-        }
-        const anchor=metrics.anchor;
-        const laneY=metrics.baseline-lane*LANE_PITCH_PX;
-        const critical=request.critical===true;
-        const node=document.createElement("div");
-        node.className="battle-floating-feedback battle-floating-feedback-"+request.kind+(critical?" is-critical":"")+(request.kind==="status"?" is-status-capsule":"");
-        node.dataset.feedbackOwner="battle-floating-feedback";
-        node.dataset.feedbackSide=context.side;
-        node.dataset.feedbackIndex=String(context.index);
-        node.dataset.feedbackLane=String(lane);
-        node.dataset.feedbackKind=request.kind;
-        node.dataset.feedbackSource=request.source;
-        node.dataset.feedbackSequence=String(request.id);
-        node.dataset.feedbackPhase=request.phase;
-        if(request.statusType){ node.dataset.feedbackStatusType=request.statusType; node.style.setProperty("--battle-feedback-status-color",statusPresentation(request.statusType).color); }
-        node.textContent=critical?formatCritical(request.text):String(request.text==null?"":request.text);
-        node.style.setProperty("--battle-feedback-x",anchor.x+"px");
-        node.style.setProperty("--battle-feedback-y",laneY+"px");
-        node.style.setProperty("--battle-feedback-duration",request.duration+"ms");
-        document.body.appendChild(node);
-        request.node=node;
-        request.lane=lane;
-        request.context=context;
-        context.active.set(request.id,request);
-        request.removeTimer=setTimeout(()=>{
-            context.active.delete(request.id);
-            finishRequest(request,"done");
-            pump(context);
-        },request.duration+70);
-        return true;
-    }
-    function pump(context){
-        if(!context){ return; }
-        while(context.queue.length){
-            const metrics=laneMetrics(context);
-            const lane=freeLane(context,metrics);
-            if(lane<0){ break; }
-            const request=context.queue.shift();
-            if(!request||request.cancelled||request.finished){ continue; }
-            if(!spawn(context,request,lane)){ continue; }
-        }
-        if(!context.active.size&&!context.queue.length){ contexts.delete(context.key); }
-    }
-    function enqueue(request){
-        if(request.cancelled||request.finished){ return; }
-        const context=contextFor(request.side,request.index);
-        request.context=context;
-        context.queue.push(request);
-        context.queue.sort(compareRequests);
-        queueMicrotask(()=>pump(context));
-    }
-    function emit(options){
-        if(typeof document==="undefined"||!document.body){ return null; }
-        const input=Object.assign({},options||{});
-        const kind=semanticKind(input.kind);
-        const timing=timingFor(input);
-        const request={
-            id:++sequence,side:input.side==="monster"?"monster":"player",
-            index:Number.isInteger(Number(input.index))?Number(input.index):0,kind:kind,
-            statusType:kind==="status"?String(input.statusType||input.effectType||"default"):null,
-            text:String(input.text==null?"":input.text),
-            duration:Math.max(500,Math.min(1800,numeric(input.duration,DEFAULT_DURATION))),
-            critical:input.critical===true,source:String(input.source||"battle"),
-            impactId:input.impactId||timing.impactId||null,impactAt:timing.impactAt||0,
-            phase:String(input.phase||(kind==="status"?"status":"impact")),
-            phaseOrder:Number.isFinite(Number(input.phaseOrder))?Number(input.phaseOrder):phaseOrder(kind),
-            timingSequence:timing.sequence||0
-        };
-        request.critical=request.critical||timing.critical;
-        const handle=makeHandle(request);
-        if(timing.delayMs>8){
-            request.delayTimer=setTimeout(()=>{ request.delayTimer=null;enqueue(request); },timing.delayMs);
-        }else{
-            enqueue(request);
-        }
-        return handle;
-    }
-    function emitAtImpact(options){ return emit(options); }
-    function emitStatus(side,index,text,options){
-        return emit(Object.assign({},options||{},{
-            side:side,index:index,kind:"status",text:text,source:"status"
-        }));
-    }
-    function emitEscapeFailure(index){
-        return emit({
-            side:"player",index:Number(index)||0,kind:"escape",text:"逃脫失敗",
-            source:"escape",skipImpactTiming:true,duration:760
-        });
-    }
-    function clear(){
-        Array.from(contexts.values()).forEach(context=>{
-            context.queue.slice().forEach(request=>finishRequest(request,"teardown"));
-            Array.from(context.active.values()).forEach(request=>finishRequest(request,"teardown"));
-            context.queue=[];
-            context.active.clear();
-        });
-        contexts.clear();
-        document.querySelectorAll&&document.querySelectorAll(".battle-floating-feedback").forEach(node=>node.remove());
-    }
-    function debugSnapshot(){
-        return Array.from(contexts.values()).map(context=>{
-            const metrics=laneMetrics(context);
-            return {
-                key:context.key,
-                capacity:metrics?metrics.capacity:0,
-                active:Array.from(context.active.values()).map(request=>({id:request.id,lane:request.lane,kind:request.kind})),
-                queued:context.queue.map(request=>({id:request.id,kind:request.kind}))
-            };
-        });
-    }
-
-    const api=Object.freeze({
-        version:"battle-floating-feedback-v2",
-        emit:emit,
-        emitAtImpact:emitAtImpact,
-        emitStatus:emitStatus,
-        emitEscapeFailure:emitEscapeFailure,
-        clear:clear,
-        identifyUnit:identifyUnit,
-        getContextCount:()=>contexts.size,
-        debugSnapshot:debugSnapshot
-    });
-    window.FourSymbolsBattleFloatingFeedback=api;
-
-    /* Legacy callers keep their function name, but the sole implementation is
-       this owner. No caller may create/position a second popup DOM node. */
-    function ownedShowDamagePopup(element,text,type,isCrit){
-        const unit=identifyUnit(element);
-        if(!unit){ return null; }
-        if(isCrit&&typeof triggerCriticalImpact==="function"){ triggerCriticalImpact(element); }
-        return emit({
-            side:unit.side,index:unit.index,
-            kind:type==="heal"?"heal":type==="sp"?"sp":type==="miss"?"miss":type==="shield"?"shield":"damage",
-            text:text,critical:!!isCrit,source:"legacy-entry"
-        });
-    }
-    try{ showDamagePopup=ownedShowDamagePopup; }catch(_){}
-    window.showDamagePopup=ownedShowDamagePopup;
-})();
-
-
-/* bundled source: js/60-v173.64-skill-progression-rebalance.js */
-/* =====================================================
-   V173.64 — 四元素技能成長節奏正式 owner
-   玩家技能樹專用：學習資格、境界門檻、技能點成本、技能頁提示。
-   怪物／深淵／符咒不經過本層 learn/upgrade gate。
-===================================================== */
-(function installV17364SkillProgression(){
-    "use strict";
-
-    if(typeof window==="undefined"||window.__v17364SkillProgressionInstalled){ return; }
-    window.__v17364SkillProgressionInstalled=true;
-
-    const SKILL_UPGRADE_COST_BY_TARGET_LEVEL=Object.freeze({
-        2:1,3:1,4:1,5:1,6:1,7:1,8:1,9:1,10:1
-    });
-    const PLAYER_DAMAGE_SKILL_IDS=Object.freeze([
-        "flameSlash","fireCritical","explosiveFlurry","dragonSlash",
-        "fireRocket","blazeSpell","flameTornado","phoenixCry",
-        "waterKnife","frostPunch","iceSpin","frostCrush",
-        "waterBall","floodBeast","iceArrowRain",
-        "stormFist","stormFlurry","windCrossSlash","dizzyFist",
-        "windSpell","stormCircle","windHowlLightning","stormRain",
-        "stoneSlash","petrifyFist","stoneBreakSky","earthquakeCrush",
-        "stoneThrow","sandWind","flyingSandStrike","dustStorm"
-    ]);
-    const PLAYER_DAMAGE_SKILL_ID_SET=new Set(PLAYER_DAMAGE_SKILL_IDS);
-    const FIRE_MOMENTUM_BY_LEVEL=Object.freeze([12,15,18,21,25]);
-    const BLOOD_BURN_HP_COST_BY_LEVEL=Object.freeze([20,25,30,35,40]);
-    const BLOOD_BURN_BY_LEVEL=Object.freeze([20,25,30,35,50]);
-    const HEAL_HP_BY_LEVEL=Object.freeze([550,580,610,640,670]);
-    const HEAL_SP_PERCENT_BY_LEVEL=Object.freeze([0,0,5,10,15]);
-    const FREEZE_CHANCE_BY_LEVEL=Object.freeze([55,65,75,85,95]);
-    const FREEZE_DURATION_BY_LEVEL=Object.freeze([3,3,3,4,5]);
-    const PURIFY_TARGET_COUNT_BY_LEVEL=Object.freeze([1,1,3]);
-    const FINAL_POINT_DAMAGE_LEVELS=Object.freeze([5,7,9,11,13,15,17,19,22,25]);
-    const DODGE_BY_LEVEL=Object.freeze([5,10,15,20,25]);
-    const STEALTH_DURATION_BY_LEVEL=Object.freeze([2,3,4]);
-    const CALM_RESIST_BY_LEVEL=Object.freeze([5,8,10,12,15]);
-    const CALM_ACCURACY_BY_LEVEL=Object.freeze([5,10,15,20,25]);
-    const ROCK_WALL_BY_LEVEL=Object.freeze([15,20,25,30,35]);
-    const EARTH_SHIELD_BY_LEVEL=Object.freeze([20,40,60,80,100]);
-    const EARTH_SHIELD_DURATION_BY_LEVEL=Object.freeze([3,3,3,3,4]);
-    const EARTH_SHIELD_BLOCKS_BY_LEVEL=Object.freeze([2,2,2,2,3]);
-    const BARRIER_DURATION_BY_LEVEL=Object.freeze([3,3,3,4,5]);
-    const GROUP_ORDER=Object.freeze({physical:0,magic:1,tactical:2,ex:3});
-
-    function numeric(value,fallback){
-        const number=Number(value);
-        return Number.isFinite(number)?number:(fallback===undefined?0:fallback);
-    }
-    window.v173GetInitialLearnCost=function(character,skill){
-        const base=Math.max(0,Math.floor(numeric(skill&&skill.learnCost)));
-        const cross=!!(character&&skill&&character.element&&skill.element&&character.element!==skill.element);
-        return base*(cross?2:1);
-    };
-    function clampLevel(value,maxLevel){
-        return Math.max(1,Math.min(Math.max(1,numeric(maxLevel,1)),Math.floor(numeric(value,1))));
-    }
-    function levelValue(values,level,fallback){
-        if(!Array.isArray(values)||!values.length){ return numeric(fallback); }
-        const index=Math.max(0,Math.min(values.length-1,Math.floor(numeric(level,1))-1));
-        return numeric(values[index]);
-    }
-    function notify(message){
-        if(typeof alert==="function"){ alert(message); }
-        return false;
-    }
-    function copyArray(value){ return Array.isArray(value)?value.slice():value; }
-    function skillById(skillId){
-        return typeof skillDatabase!=="undefined"&&skillDatabase?skillDatabase[skillId]:null;
-    }
-    function skillLabel(skillId){
-        const skill=skillById(skillId);
-        return skill&&skill.name?skill.name:String(skillId||"");
-    }
-    function sanitizeDescription(value){
-        return String(value||"")
-            .replace(/初次學習需\s*\d+\s*技能點[。；，,]?/g,"")
-            .replace(/每升\s*1\s*級消耗\s*1\s*技能點[。；，,]?/g,"")
-            .replace(/最高\s*5\s*級，\s*(?=傷害|效果|$)/g,"最高5級，")
-            .replace(/\s{2,}/g," ")
-            .trim();
-    }
-
-    const FINAL_PROGRESSION={
-        flameSlash:{learnLevel:1,learnCost:2,progressionGroup:"physical"},
-        fireCritical:{learnLevel:7,learnCost:6,progressionGroup:"physical"},
-        explosiveFlurry:{learnLevel:14,learnCost:10,progressionGroup:"physical"},
-        dragonSlash:{learnLevel:30,learnCost:16,progressionGroup:"physical"},
-        fireRocket:{learnLevel:1,learnCost:2,progressionGroup:"magic"},
-        blazeSpell:{learnLevel:7,learnCost:6,progressionGroup:"magic"},
-        flameTornado:{learnLevel:14,learnCost:10,progressionGroup:"magic"},
-        phoenixCry:{learnLevel:30,learnCost:16,progressionGroup:"magic"},
-        rage:{learnLevel:18,learnCost:10,maxLevel:5,upgradeCost:1,progressionGroup:"tactical",
-            targetType:"allyTri",spCost:50,duration:3,requires:["explosiveFlurry","flameTornado"]},
-        fireSoulResonance:{
-            id:"fireSoulResonance",name:"炎魂共鳴",element:"fire",category:"buff",targetType:"self",
-            learnLevel:25,learnCost:14,maxLevel:5,spCost:45,duration:3,requires:["rage"],progressionGroup:"tactical",
-            momentumBonusByLevel:FIRE_MOMENTUM_BY_LEVEL.slice(),maxExtensionRounds:3,maxExtensionsPerRound:1,icon:"炎",
-            iconAssetPath:null,vfxAssetPath:null
-        },
-        bloodBurnArt:{
-            id:"bloodBurnArt",name:"焚血訣",element:"fire",category:"buff",targetType:"self",
-            learnLevel:35,learnCost:18,maxLevel:5,spCost:35,duration:3,requires:["fireSoulResonance"],progressionGroup:"tactical",
-            hpCostPercentByLevel:BLOOD_BURN_HP_COST_BY_LEVEL.slice(),
-            directDamageBonusByLevel:BLOOD_BURN_BY_LEVEL.slice(),fireActionCharges:4,icon:"血",
-            iconAssetPath:null,vfxAssetPath:null
-        },
-        fireEX:{learnLevel:50,learnCost:20,maxLevel:1,progressionGroup:"ex"},
-
-        waterKnife:{learnLevel:1,learnCost:2,progressionGroup:"physical"},
-        frostPunch:{learnLevel:7,learnCost:6,progressionGroup:"physical"},
-        iceSpin:{learnLevel:14,learnCost:10,progressionGroup:"physical"},
-        frostCrush:{learnLevel:30,learnCost:16,progressionGroup:"physical"},
-        waterBall:{learnLevel:1,learnCost:2,progressionGroup:"magic"},
-        floodBeast:{learnLevel:7,learnCost:6,progressionGroup:"magic"},
-        iceArrowRain:{learnLevel:14,learnCost:10,progressionGroup:"magic"},
-        healSpell:{
-            learnLevel:15,learnCost:8,maxLevel:5,upgradeCost:1,requires:["frostPunch","floodBeast"],progressionGroup:"tactical",
-            targetType:"allyTri",spCost:45,baseHeal:550,healPerLevel:30,
-            healHpByLevel:HEAL_HP_BY_LEVEL.slice(),spRestorePercentByLevel:HEAL_SP_PERCENT_BY_LEVEL.slice(),cleanseAll:true
-        },
-        revive:{learnLevel:20,learnCost:10,maxLevel:5,upgradeCost:1,requires:["healSpell","frostCrush"],progressionGroup:"tactical"},
-        freeze:{
-            learnLevel:25,learnCost:14,maxLevel:5,upgradeCost:1,requires:["iceSpin","iceArrowRain"],progressionGroup:"tactical",
-            targetType:"column",targetTypeAtMaxLevel:"tri",spCost:32,
-            freezeChanceByLevel:FREEZE_CHANCE_BY_LEVEL.slice(),freezeDurationByLevel:FREEZE_DURATION_BY_LEVEL.slice()
-        },
-        purifyMind:{
-            learnLevel:35,learnCost:18,maxLevel:3,upgradeCost:1,requires:["healSpell","frostCrush"],progressionGroup:"tactical",
-            targetType:"ally",enemyTargetAllowed:true,spCost:22,removeAllStates:true,
-            targetCountByLevel:PURIFY_TARGET_COUNT_BY_LEVEL.slice()
-        },
-        waterEX:{learnLevel:50,learnCost:20,maxLevel:1,progressionGroup:"ex"},
-
-        stormFist:{
-            learnLevel:1,learnCost:2,progressionGroup:"physical",
-            agilityDownByLevel:FINAL_POINT_DAMAGE_LEVELS.slice()
-        },
-        stormFlurry:{learnLevel:7,learnCost:6,progressionGroup:"physical"},
-        windCrossSlash:{learnLevel:14,learnCost:10,progressionGroup:"physical"},
-        dizzyFist:{
-            learnLevel:30,learnCost:16,progressionGroup:"physical",
-            missBonusByLevel:FINAL_POINT_DAMAGE_LEVELS.slice()
-        },
-        windSpell:{
-            learnLevel:1,learnCost:2,progressionGroup:"magic",
-            agilityDownByLevel:FINAL_POINT_DAMAGE_LEVELS.slice()
-        },
-        stormCircle:{learnLevel:7,learnCost:6,progressionGroup:"magic"},
-        windHowlLightning:{learnLevel:14,learnCost:10,progressionGroup:"magic"},
-        stormRain:{
-            learnLevel:30,learnCost:16,progressionGroup:"magic",
-            missBonusByLevel:FINAL_POINT_DAMAGE_LEVELS.slice()
-        },
-        dodgeSkill:{
-            learnLevel:18,learnCost:10,maxLevel:5,progressionGroup:"tactical",
-            evasionBonusPercentByLevel:DODGE_BY_LEVEL.slice()
-        },
-        stealthSkill:{
-            learnLevel:25,learnCost:14,maxLevel:3,upgradeCost:1,progressionGroup:"tactical",
-            targetType:"ally",spCost:45,durationByLevel:STEALTH_DURATION_BY_LEVEL.slice()
-        },
-        dinghaishenzhen:{
-            learnLevel:35,learnCost:18,maxLevel:5,upgradeCost:1,progressionGroup:"tactical",
-            targetType:"allyAll",spCost:77,duration:3,
-            statusResistBonusByLevel:CALM_RESIST_BY_LEVEL.slice(),
-            accuracyBonusPercentByLevel:CALM_ACCURACY_BY_LEVEL.slice()
-        },
-        windEX:{
-            learnLevel:50,learnCost:20,maxLevel:1,progressionGroup:"ex",
-            evasionBonusPercent:15,accuracyBonusPercent:15
-        },
-
-        stoneSlash:{learnLevel:1,learnCost:2,progressionGroup:"physical"},
-        petrifyFist:{learnLevel:7,learnCost:6,progressionGroup:"physical"},
-        stoneBreakSky:{learnLevel:14,learnCost:10,progressionGroup:"physical"},
-        earthquakeCrush:{learnLevel:30,learnCost:16,progressionGroup:"physical"},
-        stoneThrow:{learnLevel:1,learnCost:2,progressionGroup:"magic"},
-        sandWind:{learnLevel:7,learnCost:6,progressionGroup:"magic"},
-        flyingSandStrike:{learnLevel:14,learnCost:10,progressionGroup:"magic"},
-        dustStorm:{learnLevel:30,learnCost:16,progressionGroup:"magic"},
-        rockWall:{
-            learnLevel:18,learnCost:10,maxLevel:5,upgradeCost:1,requires:["petrifyFist","sandWind"],progressionGroup:"tactical",
-            targetType:"allyTri",spCost:45,duration:4,defenseBonusPercentByLevel:ROCK_WALL_BY_LEVEL.slice()
-        },
-        earthShield:{
-            learnLevel:25,learnCost:14,maxLevel:5,upgradeCost:1,requires:["rockWall"],progressionGroup:"tactical",
-            targetType:"self",spCost:45,reflectPercentByLevel:EARTH_SHIELD_BY_LEVEL.slice(),
-            durationByLevel:EARTH_SHIELD_DURATION_BY_LEVEL.slice(),remainingBlocksByLevel:EARTH_SHIELD_BLOCKS_BY_LEVEL.slice()
-        },
-        barrier:{
-            learnLevel:35,learnCost:18,maxLevel:5,upgradeCost:1,requires:["earthShield"],progressionGroup:"tactical",
-            targetType:"ally",spCost:40,
-            durationByLevel:BARRIER_DURATION_BY_LEVEL.slice()
-        },
-        earthEX:{learnLevel:50,learnCost:20,maxLevel:1,progressionGroup:"ex"}
-    };
-
-    /* This is the only final-value table.  Historical V140/V149/V169 modules may
-       provide compatibility helpers, but must not become a second balance source. */
-    const FINAL_REBALANCE_DATA=Object.freeze({
-        flameSlash:{baseDamage:30,damagePerLevel:6,spCost:10,targetType:"single",requires:[],followUpOnCriticalOrDefeat:true,followUpMaxCasts:1},
-        fireCritical:{baseDamage:45,damagePerLevel:9,spCost:28,targetType:"single",requires:["flameSlash"],followUpOnCriticalOrDefeat:true,followUpMaxCasts:1},
-        explosiveFlurry:{baseDamage:50,damagePerLevel:10,spCost:47,targetType:"tri",requires:["fireCritical"],followUpOnCriticalOrDefeat:true,followUpMaxCasts:1},
-        dragonSlash:{baseDamage:165,damagePerLevel:33,spCost:65,targetType:"single",requires:["explosiveFlurry"],followUpOnCriticalOrDefeat:true,followUpMaxCasts:2},
-        fireRocket:{baseDamage:13,damagePerLevel:4,spCost:10,targetType:"tri",requires:[],
-            burnChance:40,burnDuration:2,burnPercentByLevel:[2,2,2,2,3,3,3,3,3,4]},
-        blazeSpell:{baseDamage:45,damagePerLevel:9,spCost:28,targetType:"single",requires:["fireRocket"],
-            burnChance:45,burnDuration:2,burnPercentByLevel:[3,3,3,3,4,4,4,4,4,6]},
-        flameTornado:{baseDamage:150,damagePerLevel:30,spCost:47,targetType:"single",requires:["blazeSpell"],
-            burnChance:60,guaranteedBurn:false,burnDuration:2,burnPercentByLevel:[4,4,4,4,5,5,5,5,5,7]},
-        phoenixCry:{baseDamage:28,damagePerLevel:6,spCost:60,targetType:"all",requires:["flameTornado"],
-            burnChance:50,burnDuration:2,burnPercentByLevel:[5,5,5,5,7,7,7,7,7,9],
-            burnBonusThreshold:3,nextRoundDamageBonusPercent:30,nextRoundDamageBonusDuration:1},
-        waterKnife:{baseDamage:21,damagePerLevel:5,spCost:6,targetType:"single",requires:[],frostbiteChance:50,frostbiteDuration:3,lifestealPercentByLevel:[4,4,4,4,7,7,7,7,7,10],spStealPercentByLevel:[4,4,4,4,7,7,7,7,7,10]},
-        frostPunch:{baseDamage:32,damagePerLevel:7,spCost:17,targetType:"single",requires:["waterKnife"],frostbiteChance:40,frostbiteDuration:2,lifestealPercentByLevel:[5,5,5,5,6,6,6,6,6,7]},
-        iceSpin:{baseDamage:35,damagePerLevel:7,spCost:45,targetType:"tri",requires:["frostPunch"],frostbiteChance:35,frostbiteDuration:2,lifestealPercentByLevel:[6,6,6,6,7,7,7,7,7,8]},
-        frostCrush:{baseDamage:116,damagePerLevel:24,spCost:60���z��
-�)�֧u�ݢ�i��k�G��*^,targetType:"single",requires:["iceSpin"],frostbiteChance:45,frostbiteDuration:2,lifestealPercentByLevel:[5,5,5,5,6,6,6,6,8,9]},
-        waterBall:{baseDamage:10,damagePerLevel:2,spCost:8,targetType:"tri",requires:[],frostbiteChance:50,frostbiteDuration:2,lifestealPercentByLevel:[3,3,3,3,4,4,4,4,4,6]},
-        floodBeast:{baseDamage:105,damagePerLevel:21,spCost:35,targetType:"single",requires:["waterBall"],frostbiteChance:40,frostbiteDuration:2,lifestealPercentByLevel:[6,6,6,6,7,7,7,7,7,9],spStealPercentByLevel:[4,4,4,4,7,7,7,7,7,9]},
-        iceArrowRain:{baseDamage:30,damagePerLevel:6,spCost:75,targetType:"all",requires:["floodBeast"],frostbiteChance:35,frostbiteDuration:2,lifestealPercentByLevel:[4,4,4,4,5,5,5,5,5,6]},
-        stormFist:{baseDamage:26,damagePerLevel:6,spCost:7,targetType:"single",requires:[],agilityDownChance:50,agilityDownDuration:1,agilityDownByLevel:[10,15,20,25,30,30,35,35,40,45]},
-        stormFlurry:{baseDamage:13,damagePerLevel:3,spCost:20,targetType:"tri",requires:["stormFist"],damageDownChance:50,damageDownDuration:2,damageDownByLevel:[10,15,20,25,30,35,40,45,50,55]},
-        windCrossSlash:{baseDamage:128,damagePerLevel:26,spCost:39,targetType:"single",requires:["stormFlurry"],damageDownChance:65,damageDownDuration:1,damageDownByLevel:[20,20,20,20,30,30,30,30,40,50]},
-        dizzyFist:{baseDamage:141,damagePerLevel:29,spCost:55,targetType:"single",requires:["stormFlurry"],stunChance:65,stunDuration:5,missBonusByLevel:FINAL_POINT_DAMAGE_LEVELS.slice()},
-        windSpell:{baseDamage:12,damagePerLevel:3,spCost:9,targetType:"tri",requires:[],agilityDownChance:50,agilityDownDuration:1,agilityDownByLevel:[10,15,20,25,30,30,35,35,40,45]},
-        stormCircle:{baseDamage:14,damagePerLevel:4,spCost:18,targetType:"tri",requires:["windSpell"],damageDownChance:55,damageDownDuration:1,damageDownByLevel:[10,15,25,30,40,40,40,40,40,50]},
-        windHowlLightning:{baseDamage:128,damagePerLevel:26,spCost:55,targetType:"single",requires:["stormCircle"],damageDownChance:65,damageDownDuration:1,damageDownByLevel:[10,15,25,30,40,50,50,50,55,60]},
-        stormRain:{baseDamage:24,damagePerLevel:5,spCost:75,targetType:"all",requires:["windHowlLightning"],stunChance:35,stunDuration:1,missBonusByLevel:FINAL_POINT_DAMAGE_LEVELS.slice()},
-        stoneSlash:{baseDamage:26,damagePerLevel:6,spCost:7,targetType:"single",requires:[],defenseDownChance:75,defenseDownDuration:1,defenseDownByLevel:[10,20,25,30,40,40,45,55,65,70]},
-        petrifyFist:{baseDamage:13,damagePerLevel:3,spCost:26,targetType:"tri",requires:["stoneSlash"],selfShieldByLevel:[100,125,150,175,200,300,400,500,600,750]},
-        stoneBreakSky:{baseDamage:128,damagePerLevel:26,spCost:42,targetType:"single",requires:["petrifyFist"],selfShieldByLevel:[100,125,150,175,200,250,300,350,400,500]},
-        earthquakeCrush:{baseDamage:47,damagePerLevel:9,spCost:55,targetType:"tri",requires:["stoneBreakSky"],petrifyChanceByLevel:[30,33,36,39,45,48,51,54,57,65],petrifyDuration:2,selfShieldByLevel:null},
-        stoneThrow:{baseDamage:12,damagePerLevel:3,spCost:7,targetType:"tri",requires:[],defenseDownChance:75,defenseDownDuration:1,defenseDownByLevel:[10,20,25,30,40,40,45,55,65,70]},
-        sandWind:{baseDamage:14,damagePerLevel:4,spCost:19,targetType:"tri",requires:["stoneThrow"],defenseDownChance:65,defenseDownDuration:1,defenseDownByLevel:[15,20,25,30,30,40,50,55,55,60]},
-        flyingSandStrike:{baseDamage:24,damagePerLevel:5,spCost:55,targetType:"all",requires:["sandWind"],defenseDownChance:60,defenseDownDuration:2,defenseDownByLevel:[10,15,20,25,35,35,35,35,35,35]},
-        dustStorm:{baseDamage:140,damagePerLevel:28,spCost:65,targetType:"single",requires:["flyingSandStrike"],petrifyChanceByLevel:[15,20,25,30,35,40,45,50,55,60],petrifyDuration:2},
-        rage:{critChanceBonusByLevel:[10,15,20,25,30],critDamageBonusByLevel:[15,25,35,45,55],critBonusByLevel:[10,15,20,25,30]},
-        fireSoulResonance:{momentumBonusByLevel:[12,15,18,21,25]},
-        fireEX:{damageBonusPercent:10,critChanceBonusPercent:5,critDamageBonusPercent:25,statusTargetDamageBonusPercent:5},
+                   formal B1/B5/F1/F5/Boss footprint remains intact. */o
+ڤ&����*^��(���
++��Zq��r��r�}������k�˜���z�݊�����o
+ڤ&����*^��(���
++��Zq��r��r�}������k�˜���z�݊�����onusPercent:10,critChanceBonusPercent:5,critDamageBonusPercent:25,statusTargetDamageBonusPercent:5},
         waterEX:{lifestealMultiplier:1.2,spDrainMultiplier:1.2,healBonusPercent:15,turnStartCleanseChance:35,statusResistBonus:null},
         windEX:{evasionBonusPercent:15,accuracyBonusPercent:15,lowHpFinalHitCapPercent:50},
         earthEX:{defenseBonusPercent:35,maxHpMultiplier:1.2}
@@ -9652,7 +8563,8 @@ ensureFunctionalStyles();runRepairs();
         const lv=clampLevel(level,skill.maxLevel||1);
         if(skill.id==="fireSoulResonance"){
             return "炎魂共鳴使直接攻擊技能傷害+"+levelValue(skill.momentumBonusByLevel,lv,0)+
-                "%，基礎3回合"+(lv>=5?"；爆擊或成功新增燃燒時每回合最多延長1回合、整次最多+3回合":"");
+                "%，基礎3回合"+(lv>=5?"；爆擊或成功新增燃燒時每回合最多延镵��z��
+�)�֧u�ݢ�i��k�G��*^�1回合、整次最多+3回合":"");
         }
         if(skill.id==="bloodBurnArt"){
             return "消耗最大HP "+levelValue(skill.hpCostPercentByLevel,lv,0)+
@@ -9962,7 +8874,8 @@ ensureFunctionalStyles();runRepairs();
     function crossLearnGate(context,skill){
         if(!isCrossElementSkill(context.character,skill)){ return {ok:true,cross:false}; }
         if(/EX$/.test(String(skill.id||""))||skill.category==="passive"){
-            return {ok:false,cross:true,reason:"本命元素限定"};
+    ���z��
+�)�֧u�ݢ�i��k�G��*^        return {ok:false,cross:true,reason:"本命元素限定"};
         }
         if(!hasLearnedNativeSkill(context)){
             return {ok:false,cross:true,reason:"需先學會至少 1 招本命元素技能"};
@@ -10442,7 +9355,8 @@ ensureFunctionalStyles();runRepairs();
     };
 
     normalizeAllCrossElementEquips();
-    if(typeof renderSkillLoadout==="function"){ renderSkillLoadout(); }
+    if���z��
+�)�֧u�ݢ�i��k�G��*^(typeof renderSkillLoadout==="function"){ renderSkillLoadout(); }
 })();
 
 
@@ -10745,7 +9659,8 @@ ensureFunctionalStyles();runRepairs();
     function characterAt(index){ return typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(index):null; }
     function statsAt(index){ return typeof getPartyBattleStats==="function"?getPartyBattleStats(index):null; }
     function relicLevel(id){ return Math.max(1,Math.min(MAX_LEVEL,Math.floor(numeric(playerRelics[id]&&playerRelics[id].level)||1))); }
-    function valueFor(def,key,level){ return def&&def.scalars&&def.scalars[key]?scalar(def.scalars[key],level):0; }
+    function valueFor(def,key,level){ return def���z��
+�)�֧u�ݢ�i��k�G��*^&&def.scalars&&def.scalars[key]?scalar(def.scalars[key],level):0; }
     function isBoss(monster){ return typeof getMonsterRank==="function"?getMonsterRank(monster)==="boss":!!(monster&&(monster.rank==="boss"||monster.isBoss)); }
     function hasStatus(entity,type){
         if(typeof window.v173HasNamedPersistentState==="function"){ try{return !!window.v173HasNamedPersistentState(entity,type);}catch(_){ } }
