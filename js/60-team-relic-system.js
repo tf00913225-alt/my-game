@@ -328,7 +328,6 @@
     }
     function clearRelicTargetFocus(){
         if(typeof document!=="undefined"&&typeof document.querySelectorAll==="function"){
-            document.querySelectorAll(".team-relic-battle-target-outline").forEach(node=>node.remove());
             const presentation=document.getElementById("teamRelicBattlePresentation");
             const holes=presentation&&presentation.querySelector(".team-relic-mask-holes");
             if(holes){ holes.replaceChildren(); }
