@@ -36,6 +36,7 @@ const geometry=read("js/battlefield-render-geometry-adapter.js");
 const relic=read("js/60-team-relic-system.js");
 const progression=read("js/60-v173.64-skill-progression-rebalance.js");
 const contracts=read("SYSTEM_CONTRACTS.md");
+const bossRuntime=read("js/gameplay-boss-tower-system.js");
 
 assert.ok(
   build.indexOf('"js/battlefield-render-geometry-adapter.js"')<
@@ -98,6 +99,32 @@ assert.match(presentation,/version:"cardless-presentation-v3"/);
 assert.match(presentation,/playEscape:playEscapePresentation/);
 assert.match(presentation,/cleanupEscape:cleanupEscapePresentation/);
 assert.match(presentation,/fill:succeeded\?"forwards":"none"/);
+
+assert.match(
+  bossRuntime,
+  /function releaseBossBattleContext\(detail\)\{[\s\S]*?cleanupBossBattlePresentation\(\);[\s\S]*?activeBattleContext=null;/,
+  "Boss battle authority must release independently of result-modal dismissal"
+);
+const personalCompletion=bossRuntime.slice(
+  bossRuntime.indexOf("function completePersonalBoss"),
+  bossRuntime.indexOf("function completeWorldStage")
+);
+const worldCompletion=bossRuntime.slice(
+  bossRuntime.indexOf("function completeWorldStage"),
+  bossRuntime.indexOf("function startBoss")
+);
+for(const [name,block] of [["personal",personalCompletion],["world",worldCompletion]]){
+  assert.ok(
+    block.indexOf("releaseBossBattleContext(detail)")>=0&&
+    block.indexOf("releaseBossBattleContext(detail)")<block.indexOf("showBossBattleResult"),
+    name+" Boss context must release before result presentation"
+  );
+  assert.match(
+    block,
+    /if\(!isSettledBossOutcome\(outcome\)\)\{ finish\(\);return; \}/,
+    name+" Boss escape/abort must not be held by a lose-result modal"
+  );
+}
 
 assert.match(relic,/function relicOverlayGeometry\(\)[\s\S]*?getBattlefieldOverlayGeometry/);
 assert.match(relic,/function relicTargetGeometry\(side,index\)[\s\S]*?getUnitGeometry/);
