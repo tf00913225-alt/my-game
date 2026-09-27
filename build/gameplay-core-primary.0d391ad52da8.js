@@ -132,9 +132,7 @@
 
         rows.forEach(rowSlots=>{
             const remaining=ordered.length-cursor;
-            if(remaining<=0){ returntail: error writing 'standard output': Broken pipe
-tail: error writing 'standard output': Broken pipe
-; }
+            if(remaining<=0){ return; }
             const count=Math.min(rowSlots.length,remaining);
             const rowUnits=ordered.slice(cursor,cursor+count);
             cursor+=count;
@@ -412,8 +410,7 @@ tail: error writing 'standard output': Broken pipe
         return null;
     }
 
-    function resolveEnemyTargets(snapshot,primaryMonsterIndextail: error writing 'standard output': Broken pipe
-,shape,isAlive){
+    function resolveEnemyTargets(snapshot,primaryMonsterIndex,shape,isAlive){
         if(!snapshot){ return []; }
         const primarySlot=slotForMonster(snapshot,primaryMonsterIndex);
         if(!primarySlot){ return []; }
@@ -555,8 +552,7 @@ tail: error writing 'standard output': Broken pipe
         enemySlots:ENEMY_SLOTS,
         enemyBackSlots:ENEMY_BACK,
         enemyFrontSlots:ENEMY_FRONT,
-        altail: error writing 'standard output': Broken pipe
-lySlots:ALLY_SLOTS,
+        allySlots:ALLY_SLOTS,
         allyFrontSlots:ALLY_FRONT,
         allyBackSlots:ALLY_BACK,
         bossFootprintSlots:BOSS_FOOTPRINT,
@@ -693,9 +689,7 @@ lySlots:ALLY_SLOTS,
         const maxTop=Math.max(minTop,height-edgeHeight-8);
         return Math.max(minTop,Math.min(maxTop,Number(value)||minTop));
     }
-    function intail: error writing 'standard output': Broken pipe
-tail: error writing 'standard output': Broken pipe
-stallStatsEdgeDrag(edge,root){
+    function installStatsEdgeDrag(edge,root){
         if(!edge||!root||edge.__battleStatsEdgeDragInstalled){ return; }
         edge.__battleStatsEdgeDragInstalled=true;
         let drag=null;
@@ -821,8 +815,7 @@ stallStatsEdgeDrag(edge,root){
         if(!body){ return; }
         const snapshot=currentSnapshot();
         const combatants=snapshot&&Array.isArray(snapshot.combatants)?snapshot.combatants:[];
-        body.innerHTML=combatants.length?combatail: error writing 'standard output': Broken pipe
-tants.map(item=>
+        body.innerHTML=combatants.length?combatants.map(item=>
             '<article class="battle-stat-card">'+
                 '<div class="battle-stat-identity">'+
                     (item.portrait?'<img src="'+escapeHtml(item.portrait)+'" alt="">':'<span class="battle-stat-avatar-fallback" aria-hidden="true">◆</span>')+
@@ -1073,8 +1066,7 @@ tants.map(item=>
        舊版共用一個 1.25 秒常數，而且已死亡的佇列成員仍會逐個
        呼叫 finishPlayerAction()、每個再多等一次，尾端剛好有
        2～3 個死亡成員時就會累積成玩家感受到的 3～5 秒。
-       V138 會在排程前一次略過所有已死�tail: error writing 'standard output': Broken pipe
-�空位。2 秒總轉場由
+       V138 會在排程前一次略過所有已死亡空位。2 秒總轉場由
        0.4 秒的回合交接＋1.6 秒的首位出手等待組成，不會錯疊成
        2+1.6＝3.6 秒，也不會再隨死亡數量越拖越久。
     */
@@ -1204,9 +1196,142 @@ tants.map(item=>
             .filter(index=>Number.isInteger(index)).slice(0,10);
         if(!requested.length){ return null; }
         const existing=owner.getActiveEnemySnapshot();
-        contail: error writing 'standard output': Broken pipe
-bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-ion=ensureAllyFormationState();
+        const activeMatches=existing&&requested.every(index=>!!owner.getEnemySlotForMonster(existing,index));
+        if(activeMatches){ return existing; }
+        if(!requested.length){ return null; }
+        const snapshot=owner.createEnemyFormationSnapshot(requested,{
+            originalFormationType:requested.length,
+            rankWeight:getFormationRankWeight
+        });
+        owner.setActiveEnemySnapshot(snapshot);
+        return snapshot;
+    }
+
+    function getFormationRows(indexes){
+        const owner=fixedBattlefieldSlots();
+        const requested=(indexes||[]).filter(index=>Number.isInteger(index)).slice(0,10);
+        if(!owner){ return requested.length?[requested,[]]:[[],[]]; }
+        let snapshot=owner.getActiveEnemySnapshot();
+        const activeMatches=snapshot&&requested.every(index=>!!owner.getEnemySlotForMonster(snapshot,index));
+        if(!activeMatches){
+            snapshot=owner.createEnemyFormationSnapshot(requested,{
+                originalFormationType:Math.max(1,requested.length),
+                rankWeight:getFormationRankWeight
+            });
+        }
+        const rows=owner.getAssignedEnemyRows(snapshot);
+        while(rows.length<2){ rows.push([]); }
+        return rows;
+    }
+
+    function currentFormationRows(){
+        const snapshot=ensureEnemyFormationSnapshot(currentBattleMonsters);
+        const owner=fixedBattlefieldSlots();
+        if(snapshot&&owner){
+            const rows=owner.getAssignedEnemyRows(snapshot);
+            while(rows.length<2){ rows.push([]); }
+            return rows;
+        }
+        return getFormationRows(currentBattleMonsters);
+    }
+
+    window.v138EnsureEnemyFormationSnapshot=ensureEnemyFormationSnapshot;
+
+    function formatDuration(ms){
+        const safe=Math.max(0,Math.floor(Number(ms)||0));
+        const totalMinutes=Math.floor(safe/60000);
+        const hours=Math.floor(totalMinutes/60);
+        const minutes=totalMinutes%60;
+        return hours+"小時 "+minutes+"分鐘";
+    }
+
+    /* Queue advancement belongs exclusively to 00-main.js. Earlier pacing
+       wrappers duplicated finishPlayerAction/processNextCombatant and could
+       strand an initiative entry when a visual Promise completed out of order. */
+
+
+    function applyBattleFormation(){
+        const area=document.getElementById("battleMonsterArea");
+        const owner=fixedBattlefieldSlots();
+        if(!area||!owner){ return; }
+        const indexes=currentBattleMonsters.slice(0,10);
+        const snapshot=ensureEnemyFormationSnapshot(indexes);
+        if(!snapshot){ return; }
+        const cards=new Map();
+        indexes.forEach(index=>{
+            const card=document.getElementById("battleMonster"+index);
+            if(card){
+                const monster=monsters[index];
+                const rank=getMonsterRank(monster);
+                card.dataset.element=(monster&&monster.element)||"unknown";
+                card.dataset.rank=rank==="boss"?"boss":(rank==="elite"?"elite":"regular");
+                cards.set(index,card);
+            }
+        });
+        area.innerHTML="";
+        area.classList.add("v131-formation","v-fixed-enemy-zone");
+        area.dataset.monsterCount=String(indexes.length);
+        area.dataset.formationType=String(snapshot.originalFormationType);
+        [owner.enemyBackSlots,owner.enemyFrontSlots].forEach((rowSlots,rowIndex)=>{
+            const rowEl=document.createElement("div");
+            rowEl.className="v131-monster-row v131-monster-row-"+(rowIndex+1)+" v-fixed-enemy-row";
+            rowSlots.forEach(slot=>{
+                const slotEl=document.createElement("div");
+                slotEl.className="v-fixed-battle-slot v-fixed-enemy-slot";
+                slotEl.dataset.slot=slot;
+                const index=owner.getAssignedMonsterAtEnemySlot(snapshot,slot);
+                const card=Number.isInteger(index)?cards.get(index):null;
+                if(card){
+                    card.dataset.slot=slot;
+                    slotEl.appendChild(card);
+                }
+                rowEl.appendChild(slotEl);
+            });
+            area.appendChild(rowEl);
+        });
+    }
+
+    function ensureAllyFormationState(){
+        const owner=fixedBattlefieldSlots();
+        if(!owner||typeof owner.ensureAllyFormation!=="function"){ return null; }
+        return owner.ensureAllyFormation(getExistingPartyIndexes());
+    }
+
+    function applyAllyBattleFormation(){
+        const area=document.getElementById("battlePlayerRow");
+        const formation=ensureAllyFormationState();
+        if(!area||!formation){ return; }
+        const cards=new Map();
+        getExistingPartyIndexes().forEach(index=>{
+            const card=document.getElementById("battlePlayerCard"+index);
+            if(card){ cards.set(index,card); }
+        });
+        area.innerHTML="";
+        area.classList.add("v-fixed-ally-formation");
+        const owner=fixedBattlefieldSlots();
+        [owner.allyFrontSlots,owner.allyBackSlots].forEach((slots,rowIndex)=>{
+            const row=document.createElement("div");
+            row.className="v-fixed-ally-row v-fixed-ally-row-"+(rowIndex===0?"front":"back");
+            slots.forEach(slot=>{
+                const wrapper=document.createElement("div");
+                wrapper.className="v-fixed-unit-slot v-fixed-ally-slot";
+                wrapper.dataset.slot=slot;
+                const characterIndex=owner.getCharacterAtAllySlot(slot);
+                const card=Number.isInteger(characterIndex)?cards.get(characterIndex):null;
+                if(card){ wrapper.appendChild(card); }
+                row.appendChild(wrapper);
+            });
+            area.appendChild(row);
+        });
+    }
+
+    let vFixedFormationSelectedCharacter=null;
+    function formationSlotLabel(slot){
+        const labels={ALLY_F1:"前左",ALLY_F2:"前中",ALLY_F3:"前右",ALLY_B1:"後左",ALLY_B2:"後中",ALLY_B3:"後右"};
+        return labels[slot]||slot;
+    }
+    function renderAllyFormationContent(){
+        const formation=ensureAllyFormationState();
         if(!formation){ return '<div class="v-fixed-formation-empty">目前無法讀取佈陣資料。</div>'; }
         const renderRow=(label,slots)=>'<section class="v-fixed-formation-row"><header>'+label+'</header><div class="v-fixed-formation-slots">'+slots.map(slot=>{
             const index=fixedBattlefieldSlots().getCharacterAtAllySlot(slot);
@@ -1312,9 +1437,149 @@ ion=ensureAllyFormationState();
         let img=frame.querySelector(".v131-inventory-portrait");
         if(!img){
             img=document.createElement("img");
-            img.tail: error writing 'standard output': Broken pipe
-bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-||0)>0);
+            img.className="v131-inventory-portrait";
+            img.alt="角色立繪";
+            img.draggable=false;
+            frame.insertBefore(img,frame.firstChild);
+        }
+        img.src=getCharacterArtworkPath(character);
+        img.alt=(character.id||"角色")+"立繪";
+    }
+
+    window.v131SyncInventoryPortrait=syncInventoryPortrait;
+
+    function syncCharacterCreationAvailability(){
+        const body=document.getElementById("homeFeatureModalBody");
+        if(!body){ return; }
+        const title=document.getElementById("homeFeatureModalTitle");
+        if(title && String(title.textContent||"").trim()!=="角色"){ return; }
+        const legacyRow=body.firstElementChild;
+        const cardsBySlot=new Map();
+        Array.from(body.querySelectorAll('[onclick*="openCharacterCreation"]')).forEach(card=>{
+            const match=String(card.getAttribute("onclick")||"").match(/openCharacterCreation\(\s*(2|3)\s*\)/);
+            if(match){ cardsBySlot.set(Number(match[1]),card); }
+        });
+
+        [1,2].forEach(slotIndex=>{
+            const slotNumber=slotIndex+1;
+            const card=cardsBySlot.get(slotNumber) || (legacyRow&&legacyRow.children?legacyRow.children[slotIndex]:null);
+            if(!card){ return; }
+            const character=slotIndex===1 ? player2 : player3;
+            if(character){
+                card.classList.remove("v131-unlock-ready");
+                const oldDot=card.querySelector(".v131-unlock-dot");
+                if(oldDot){ oldDot.remove(); }
+                return;
+            }
+            const eligible=slotIndex===1
+                ? player.level>=10
+                : isThirdCharacterUnlocked();
+            if(!eligible){ return; }
+            card.style.opacity="1";
+            card.style.position="relative";
+            card.style.cursor="pointer";
+            card.classList.add("v131-unlock-ready");
+            card.onclick=function(){
+                closeHomeFeature();
+                openCharacterCreation(slotNumber);
+            };
+            const labels=card.querySelectorAll("div");
+            if(labels.length>=3){
+                labels[1].textContent="可創建";
+                labels[2].textContent="點擊創建";
+            }
+            if(!card.querySelector(".v131-unlock-dot")){
+                const dot=document.createElement("span");
+                dot.className="v131-unlock-dot";
+                dot.setAttribute("aria-label","有新角色可創建");
+                card.appendChild(dot);
+            }
+        });
+    }
+
+    if(typeof refreshCharacterAvatarLevels==="function"){
+        const originalRefreshAvatarLevels=refreshCharacterAvatarLevels;
+        refreshCharacterAvatarLevels=function(){
+            originalRefreshAvatarLevels.apply(this,arguments);
+            syncCharacterCreationAvailability();
+        };
+    }
+
+    function promoteSkillPreview(){
+        const modal=document.getElementById("allElementSkillPreviewModal");
+        const overlay=document.getElementById("game-overlay-layer") || document.getElementById("game-stage");
+        if(modal && overlay && modal.parentNode!==overlay){
+            overlay.appendChild(modal);
+        }
+    }
+    promoteSkillPreview();
+
+    const expPreviewCounts={0:0,1:0,2:0};
+    const originalDistributeExpToCharacter=
+        typeof distributeExpToCharacter==="function" ? distributeExpToCharacter : null;
+
+    function previewCostForCharacter(character,count){
+        if(!character || count<=0){ return 0; }
+        const maxLevel=Math.max(1,Number(window.v133MaxLevel)||Infinity);
+        const startLevel=Math.max(1,Math.floor(Number(character.level)||1));
+        if(startLevel+count>maxLevel){ return Infinity; }
+
+        let exp=Math.max(0,Number(character.exp)||0);
+        let expNext=Math.max(1,Number(character.expNext)||100);
+        let previewLevel=startLevel;
+        let total=0;
+        for(let i=0;i<count;i++){
+            const need=Math.max(1,expNext-exp);
+            total+=need;
+            exp=0;
+            previewLevel++;
+            expNext=typeof window.v133GetExpNextForLevel==="function"
+                ? window.v133GetExpNextForLevel(previewLevel)
+                : Math.max(expNext+1,Math.floor(expNext*1.2));
+        }
+        return total;
+    }
+    window.v131PreviewCostForCharacter=previewCostForCharacter;
+
+    function totalPreviewCost(){
+        return [0,1,2].reduce((sum,index)=>{
+            const character=getPartyCharacterByIndex(index);
+            return sum+previewCostForCharacter(character,expPreviewCounts[index]||0);
+        },0);
+    }
+
+    function hasExpPreview(){
+        return [0,1,2].some(index=>(expPreviewCounts[index]||0)>0);
+    }
+
+    function previewExpLevel(index){
+        const character=getPartyCharacterByIndex(index);
+        if(!character){ return; }
+        const current=expPreviewCounts[index]||0;
+        const maxLevel=Math.max(1,Number(window.v133MaxLevel)||Infinity);
+        if(character.level+current>=maxLevel){
+            alert("這名角色已達 Lv."+maxLevel+" 滿等。");
+            return;
+        }
+        const beforeCost=previewCostForCharacter(character,current);
+        const afterCost=previewCostForCharacter(character,current+1);
+        const extra=afterCost-beforeCost;
+        if(totalPreviewCost()+extra>sharedExp){
+            alert("經驗池不足，無法再預覽這一級。還需要 "+Math.max(0,totalPreviewCost()+extra-sharedExp)+" EXP。");
+            return;
+        }
+        expPreviewCounts[index]=current+1;
+        renderExpDistributeList();
+        syncCharacterPreviewLevels();
+    }
+
+    function syncCharacterPreviewLevels(){
+        [0,1,2].forEach(index=>{
+            const character=getPartyCharacterByIndex(index);
+            const el=document.getElementById("characterAvatarLevel"+index);
+            if(character && el){
+                el.textContent="Lv."+(character.level+(expPreviewCounts[index]||0));
+                el.classList.toggle("v131-preview-level",(expPreviewCounts[index]||0)>0);
             }
         });
     }
@@ -1459,9 +1724,145 @@ bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such fi
         if(hasAnyAutoBattleEnabled() && elementBoxState.remainingMs<=0){
             stopElementBoxWhenTimeEnds(
                 silent
-                    ? "�tail: error writing 'standard output': Broken pipe
-bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-鈕的文字被ensureElementBoxStatsUI()改成
+                    ? "元素匣沒有可用時數，自動戰鬥已停止。"
+                    : "元素匣沒有可用時數，自動戰鬥已停止；請先取得時數。"
+            );
+            return false;
+        }
+
+        elementBoxActive=
+            elementBoxState.remainingMs>0 &&
+            hasAnyAutoBattleEnabled();
+        elementBoxLastTick=Date.now();
+        persistElementBoxState();
+        return elementBoxActive;
+    }
+    window.v131SyncElementBoxForBattle=syncElementBoxForBattle;
+    window.v131GetElementBoxState=function(){
+        return {
+            active:elementBoxActive,
+            remainingMs:Math.max(0,Math.floor(elementBoxState.remainingMs))
+        };
+    };
+    window.v131GrantElementBoxHours=function(hours,maxHours){
+        const safeHours=Math.max(0,Number(hours)||0);
+        const capMs=Math.max(0,Number(maxHours)||32)*60*60*1000;
+        elementBoxState.remainingMs=Math.min(
+            capMs,
+            Math.max(0,elementBoxState.remainingMs)+safeHours*60*60*1000
+        );
+        persistElementBoxState();
+        updateElementBoxStatsUI();
+        return Math.max(0,Math.floor(elementBoxState.remainingMs));
+    };
+
+    function tickElementBoxClock(){
+        const now=Date.now();
+        const delta=Math.max(0,now-elementBoxLastTick);
+        elementBoxLastTick=now;
+        if(elementBoxActive && elementBoxState.remainingMs>0){
+            const used=Math.min(delta,elementBoxState.remainingMs);
+            elementBoxState.remainingMs-=used;
+            elementBoxSession.activeMs+=used;
+            if(elementBoxState.remainingMs<=0){
+                elementBoxState.remainingMs=0;
+                stopElementBoxWhenTimeEnds();
+            }
+        }
+        if(now-elementBoxLastPersist>=5000){
+            elementBoxLastPersist=now;
+            persistElementBoxState();
+        }
+        updateElementBoxStatsUI();
+    }
+
+    function ensureElementBoxStatsUI(){
+        const panel=document.getElementById("autoBattleSettingsPanel");
+        if(!panel){ return; }
+        panel.classList.add("v131-element-box-panel");
+        const saveBtn=panel.querySelector(".auto-save-btn");
+        if(saveBtn){ saveBtn.textContent="套用並啟動"; }
+        const cancelBtn=panel.querySelector(".auto-cancel-btn");
+        if(cancelBtn){ cancelBtn.style.display="none"; }
+        let stats=document.getElementById("v131ElementBoxStats");
+        if(!stats){
+            stats=document.createElement("section");
+            stats.id="v131ElementBoxStats";
+            stats.className="v131-element-box-stats";
+            stats.innerHTML=
+                '<div class="v131-element-box-title">本次上線元素匣紀錄</div>'+
+                '<div><span>啟動總時數</span><strong id="v131EbActiveTime">0小時 0分鐘</strong></div>'+
+                '<div><span>戰鬥次數</span><strong id="v131EbBattles">0</strong></div>'+
+                '<div><span>獲得經驗</span><strong id="v131EbExp">0</strong></div>'+
+                '<div><span>獲得金幣</span><strong id="v131EbGold">0</strong></div>'+
+                '<div class="remaining"><span>元素匣剩餘使用時間</span><strong id="v131EbRemaining">0小時 0分鐘</strong></div>';
+            const actions=panel.querySelector(".auto-settings-actions") || (saveBtn && saveBtn.parentElement);
+            if(actions){ panel.insertBefore(stats,actions); }
+            else{ panel.appendChild(stats); }
+        }
+        updateElementBoxStatsUI();
+    }
+
+    function updateElementBoxStatsUI(){
+        const pairs={
+            v131EbActiveTime:formatDuration(elementBoxSession.activeMs),
+            v131EbBattles:String(elementBoxSession.battles),
+            v131EbExp:Math.floor(elementBoxSession.exp).toLocaleString("zh-TW"),
+            v131EbGold:Math.floor(elementBoxSession.gold).toLocaleString("zh-TW"),
+            v131EbRemaining:formatDuration(elementBoxState.remainingMs)
+        };
+        Object.keys(pairs).forEach(id=>{
+            const el=document.getElementById(id);
+            if(el){ el.textContent=pairs[id]; }
+        });
+    }
+
+    /*
+       元素匣的「本次上線獲得金幣」只記錄一般巡怪中實際入帳的怪物掉落。
+       副本會設置 v132ActiveDungeonRun；V141 的野外精英掉落隔離旗標不是副本，
+       仍維持和既有巡怪戰鬥統計相同的涵蓋範圍。
+    */
+    function isElementBoxNormalPatrolGoldTrackingActive(){
+        const dungeonRun=window.v132ActiveDungeonRun;
+        return !!(
+            elementBoxActive &&
+            (!dungeonRun || dungeonRun.v141EliteDropIsolation===true)
+        );
+    }
+
+    function recordElementBoxMonsterGold(amount){
+        const safeAmount=Math.max(0,Math.floor(Number(amount)||0));
+        if(safeAmount<=0 || !isElementBoxNormalPatrolGoldTrackingActive()){
+            return;
+        }
+        elementBoxSession.gold+=safeAmount;
+        updateElementBoxStatsUI();
+    }
+
+    if(typeof awardMonsterGoldDrop==="function"){
+        const originalAwardMonsterGoldDrop=awardMonsterGoldDrop;
+        awardMonsterGoldDrop=function(){
+            const baseAmount=Math.max(0,Number(originalAwardMonsterGoldDrop.apply(this,arguments))||0);
+            const bonusAmount=Math.max(0,Math.floor(baseAmount*(V17342_GLOBAL_GOLD_REWARD_MULTIPLIER-1)));
+            if(bonusAmount>0){
+                gold+=bonusAmount;
+                if(typeof updateGoldDisplay==="function"){ updateGoldDisplay(); }
+            }
+            const amount=baseAmount+bonusAmount;
+            recordElementBoxMonsterGold(amount);
+            return amount;
+        };
+    }
+
+    const originalConfirmAutoBattleSettings=
+        typeof confirmAutoBattleSettings==="function" ? confirmAutoBattleSettings : null;
+
+    if(originalConfirmAutoBattleSettings){
+        confirmAutoBattleSettings=async function(){
+            /*
+               ★ 修正（依照使用者回報，「戰鬥中開啟元素匣，
+               套用啟動才是沒反應」）：
+               這顆按鈕的文字被ensureElementBoxStatsUI()改成
                「套用並啟動」，但這裡原本只呼叫
                originalConfirmAutoBattleSettings()儲存表單設定，
                從頭到尾沒有真的把autoBattle打開——玩家看到的
@@ -1594,9 +1995,7 @@ bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such fi
             if(!battleActive){ return originalWinBattle.apply(this,arguments); }
 
             /*
-               flattail: error writing 'standard output': Broken pipe
-tail: error writing 'standard output': Broken pipe
-ExpGain：跟原本winBattle()內部自己會算、
+               flatExpGain：跟原本winBattle()內部自己會算、
                直接加進sharedExp的數字完全一樣算法（等級×10，
                不含rank倍率、不含正式怪物 EXP 差額）——用來推算「原本
                函式這次會自己加多少」，才能正確算出還要「補多少
@@ -1722,8 +2121,7 @@ ExpGain：跟原本winBattle()內部自己會算、
       色塊圖示（依照使用者指示「先暫時用CSS/JavaScript
       動畫+Canvas/SVG/WebGL/Shader做出來，後期再用美術
       更改」），不做過度複雜的即時運算圖形，先求正確、
-      好�tail: error writing 'standard output': Broken pipe
-�護。
+      好維護。
 */
 (function installV132ContentExpansion(){
     "use strict";
@@ -1864,8 +2262,7 @@ ExpGain：跟原本winBattle()內部自己會算、
     };
 
     function rasterItemIcon(path,tier,kind){
-        const rarity=tier?" v169-rarity-"+tier:""tail: error writing 'standard output': Broken pipe
-;
+        const rarity=tier?" v169-rarity-"+tier:"";
         return '<span class="v169-item-art v169-'+kind+'-art'+rarity+'">'+
             '<img src="'+path+'" alt="" aria-hidden="true" draggable="false" decoding="async" onerror="this.hidden=true"></span>';
     }
@@ -1988,9 +2385,135 @@ ExpGain：跟原本winBattle()內部自己會算、
         }
         const c=SET_PALETTE[setId]||SET_PALETTE.setFire;
         const shapes={
-            blade:'<path d="M32 6 L38 40 L32 58 L26 40 Z" fill="'+c.main+'" stroke="'+c.glow+'" strokbwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-tail: error writing 'standard output': Broken pipe
-ier.planned===true,
+            blade:'<path d="M32 6 L38 40 L32 58 L26 40 Z" fill="'+c.main+'" stroke="'+c.glow+'" stroke-width="2"/>',
+            fan:'<path d="M32 58 L14 20 A22 22 0 0 1 50 20 Z" fill="'+c.main+'" stroke="'+c.glow+'" stroke-width="2"/>',
+            heavyArmor:'<path d="M16 14 L32 6 L48 14 L46 40 L32 58 L18 40 Z" fill="'+c.main+'" stroke="'+c.glow+'" stroke-width="2"/>',
+            robe:'<path d="M22 8 H42 L48 56 H16 Z" fill="'+c.main+'" stroke="'+c.glow+'" stroke-width="2"/>',
+            boots:'<path d="M22 6 H38 V34 L50 46 V58 H20 V40 H22 Z" fill="'+c.main+'" stroke="'+c.glow+'" stroke-width="2"/>',
+            shoes:'<path d="M18 10 H36 V30 L52 40 V54 H16 V20 Z" fill="'+c.main+'" stroke="'+c.glow+'" stroke-width="2"/>',
+            helm:'<path d="M32 6 A20 20 0 0 1 52 26 V38 H12 V26 A20 20 0 0 1 32 6 Z" fill="'+c.main+'" stroke="'+c.glow+'" stroke-width="2"/>',
+            crown:'<path d="M12 42 L16 18 L26 30 L32 12 L38 30 L48 18 L52 42 Z" fill="'+c.main+'" stroke="'+c.glow+'" stroke-width="2"/>',
+            wristguard:'<rect x="16" y="22" width="32" height="20" rx="6" fill="'+c.main+'" stroke="'+c.glow+'" stroke-width="2"/>',
+            focus:'<circle cx="32" cy="32" r="20" fill="none" stroke="'+c.main+'" stroke-width="4"/><circle cx="32" cy="32" r="8" fill="'+c.glow+'"/>'
+        };
+        return svgWrap(shapes[pieceKey]||shapes.blade,c.glow);
+    }
+
+
+    /* =====================================================
+       2. 正式階級與符咒（符咒固定只到橙階）
+       - 舊 Low/Mid/High/Perfect 僅保留在穩定 id，兼容舊存檔。
+       - 正式 tierKey 一律使用 white/blue/purple/orange/pink/four-symbol。
+    ===================================================== */
+
+    const FORMAL_ITEM_TIERS=[
+        {key:"white",label:"白階",legacyKey:"low",idSuffix:"Low",available:true},
+        {key:"blue",label:"藍階",legacyKey:"mid",idSuffix:"Mid",available:true},
+        {key:"purple",label:"紫階",legacyKey:"high",idSuffix:"High",available:true},
+        {key:"orange",label:"橙階",legacyKey:"perfect",idSuffix:"Perfect",available:true},
+        {key:"pink",label:"桃紅階",legacyKey:null,idSuffix:"Pink",available:false,planned:true},
+        {key:"four-symbol",label:"四象階",legacyKey:null,idSuffix:"FourSymbol",available:false,planned:true}
+    ];
+    const TALISMAN_ACTIVATION_CHANCES=[35,55,75,100];
+    const TALISMAN_TIERS=FORMAL_ITEM_TIERS.slice(0,4).map((tier,index)=>
+        Object.assign({},tier,{chance:TALISMAN_ACTIVATION_CHANCES[index]})
+    );
+    const RESOURCE_TIERS=FORMAL_ITEM_TIERS.slice();
+
+    window.v17360FormalItemTiers=FORMAL_ITEM_TIERS.map(tier=>Object.assign({},tier));
+
+    const TALISMAN_EFFECTS=[
+        {key:"freeze",label:"冰封符",duration:4},
+        {key:"stealth",label:"隱身符",duration:2},
+        {key:"barrier",label:"結界符",duration:4}
+    ];
+
+    const talismanDefinitions=[];
+    TALISMAN_EFFECTS.forEach(effect=>{
+        TALISMAN_TIERS.forEach(tier=>{
+            talismanDefinitions.push({
+                // Stable legacy id is intentional: old saves and old drop pools keep resolving.
+                id:effect.key+"Talisman"+tier.idSuffix,
+                name:tier.label+effect.label,
+                icon:talismanIcon(effect.key,tier.key),
+                type:"talisman",
+                talismanEffect:effect.key,
+                talismanDuration:effect.duration,
+                tierChance:tier.chance,
+                tierKey:tier.key,
+                legacyTierKey:tier.legacyKey,
+                price:0,
+                stats:{}
+            });
+        });
+    });
+
+    function getTalismanDefinition(id){
+        return talismanDefinitions.find(def=>def.id===id)||null;
+    }
+    window.v132GetTalismanDefinition=getTalismanDefinition;
+
+
+    /* =====================================================
+       3. 礦石材料（正式六階；桃紅／四象先規劃、不進目前掉落）
+    ===================================================== */
+
+    const oreDefinitions=RESOURCE_TIERS.map(tier=>({
+        id:"ore"+tier.idSuffix,
+        name:tier.label+"礦石",
+        icon:rasterItemIcon("assets/items/materials/ore.png",tier.key,"material"),
+        type:"material",
+        tierKey:tier.key,
+        legacyTierKey:tier.legacyKey,
+        available:tier.available!==false,
+        planned:tier.planned===true,
+        price:0,
+        stats:{}
+    }));
+
+    function getOreDefinition(id){
+        return oreDefinitions.find(def=>def.id===id)||null;
+    }
+    function getOreDefinitionByTier(tierKey){
+        return oreDefinitions.find(def=>def.tierKey===tierKey)||null;
+    }
+    window.v132GetOreDefinitionByTier=getOreDefinitionByTier;
+
+
+    /* =====================================================
+       4. 裝備設計圖紙（5部位 × 正式六階 × 4系列）
+       桃紅／四象先建立資料結構；目前材料寶箱不會抽到。
+    ===================================================== */
+
+    const BLUEPRINT_SLOTS=[
+        {key:"head",label:"頭部"},
+        {key:"shoulder",label:"護腕"},
+        {key:"shoes",label:"鞋子"},
+        {key:"hand",label:"武器"},
+        {key:"armor",label:"衣服"}
+    ];
+
+    const BLUEPRINT_SERIES=[
+        {id:"setFire",label:"赤炎"},
+        {id:"setWater",label:"寒泉"},
+        {id:"setEarth",label:"岩岳"},
+        {id:"setWind",label:"青嵐"}
+    ];
+
+    const blueprintDefinitions=[];
+    BLUEPRINT_SLOTS.forEach(slot=>{
+        RESOURCE_TIERS.forEach(tier=>{
+            BLUEPRINT_SERIES.forEach(series=>{
+                blueprintDefinitions.push({
+                    id:"blueprint"+series.id.replace("set","")+slot.key.charAt(0).toUpperCase()+slot.key.slice(1)+tier.idSuffix,
+                    name:series.label+tier.label+slot.label+"設計圖",
+                    icon:blueprintIcon(slot.key,tier.key),
+                    type:"material",
+                    blueprintSlot:slot.key,
+                    tierKey:tier.key,
+                    legacyTierKey:tier.legacyKey,
+                    available:tier.available!==false,
+                    planned:tier.planned===true,
                     setId:series.id,
                     price:0,
                     stats:{}
@@ -2298,13 +2821,562 @@ ier.planned===true,
         const needed=Math.max(1,Math.floor(Number(amount)||1));
         const owned=inventoryItems.reduce((sum,item)=>{
             if(!item || item.id!==itemId){ return sum; }
-            return sum+Math.max(0,Math.floor(Number(item.countail: error writing 'standard output': Broken pipe
-bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-tail: error writing 'standard output': Broken pipe
-ype="button" class="battle-item-card talisman" '+
+            return sum+Math.max(0,Math.floor(Number(item.count)||0));
+        },0);
+        if(owned<needed){ return false; }
+
+        let remaining=needed;
+        for(let index=inventoryItems.length-1;index>=0 && remaining>0;index--){
+            const item=inventoryItems[index];
+            if(!item || item.id!==itemId){ continue; }
+            const current=Math.max(0,Math.floor(Number(item.count)||0));
+            const take=Math.min(current,remaining);
+            if(current-take<=0){
+                inventoryItems.splice(index,1);
+            }else{
+                item.count=current-take;
+            }
+            remaining-=take;
+        }
+        return true;
+    }
+
+    /* V141 bridge：合成系統沿用同一套原子背包交易與扣除邏輯。 */
+    window.v132ConsumeStackItem=consumeStackItem;
+    window.v132RunInventoryTransaction=runInventoryTransaction;
+
+
+    /* =====================================================
+       8. 一般練功掉落：4種低階道具各5%（每隻怪物擊殺各自
+          獨立判定）
+    ===================================================== */
+
+    const NORMAL_DROP_POOL=[
+        ()=>getTalismanDefinition("freezeTalismanLow"),
+        ()=>getTalismanDefinition("stealthTalismanLow"),
+        ()=>getTalismanDefinition("barrierTalismanLow"),
+        ()=>getOreDefinition("oreLow")
+    ];
+
+    function awardMonsterMaterialDrop(monster){
+        /*
+           ★ 副本戰鬥不套用這組一般練功掉落——副本本身
+           有自己獨立的寶箱獎勵流程（見下方第11節），
+           兩邊各自負責各自的獎勵，不會疊加。
+        */
+        if(window.v132ActiveDungeonRun){ return; }
+
+        const gained=[];
+        NORMAL_DROP_POOL.forEach(getDef=>{
+            if(Math.random()*100>=5){ return; }
+            const definition=getDef();
+            if(!definition){ return; }
+            if(addItemToInventory(definition,1)){
+                gained.push(definition.name);
+            }
+        });
+
+        if(gained.length>0){
+            addBattleLog(
+                (monster && monster.name ? monster.name : "怪物")+
+                "掉落了"+gained.join("、")+"。"
+            );
+            rebuildInventorySlots();
+        }
+    }
+
+    if(typeof killMonster==="function"){
+        const originalKillMonster=killMonster;
+        killMonster=function(index){
+            const monster=monsters[index];
+            const result=originalKillMonster.apply(this,arguments);
+            if(monster){
+                awardMonsterMaterialDrop(monster);
+            }
+            return result;
+        };
+    }
+
+
+    /* =====================================================
+       9. 符咒使用：兩段判定
+       1) 階級只決定「畫符／生效啟動」機率：35/55/75/100%。
+       2) 畫符成功後，再以施放角色素質走對應滿級技能的命中規則。
+       橙階 100% 代表一定畫符成功，不代表控制／符術一定命中。
+    ===================================================== */
+
+    function getTalismanActivationChance(definition){
+        return Math.max(0,Math.min(100,Number(definition&&definition.tierChance)||0));
+    }
+
+    function getTalismanSharedSkill(definition){
+        if(!definition||typeof skillDatabase==="undefined"){ return null; }
+        const fallback={freeze:"freeze",stealth:"stealthSkill",barrier:"barrier"};
+        const skillId=definition.sharedSkillId||fallback[definition.talismanEffect];
+        return skillId?skillDatabase[skillId]||null:null;
+    }
+
+    function getTalismanCasterStats(characterIndex,character){
+        if(typeof getPartyBattleStats==="function"){
+            const stats=getPartyBattleStats(characterIndex);
+            if(stats){ return stats; }
+        }
+        if(characterIndex===0&&typeof getMainCharacterStats==="function"){
+            const stats=getMainCharacterStats();
+            if(stats){ return stats; }
+        }
+        return character||{};
+    }
+
+    function rollTalismanSkillHit(definition,characterIndex,targetMonster){
+        const character=getPartyCharacterByIndex(characterIndex);
+        if(!character){ return false; }
+        const stats=getTalismanCasterStats(characterIndex,character);
+        const skill=getTalismanSharedSkill(definition);
+        if(skill){
+            definition.talismanSkillLevel=Math.max(1,Math.floor(Number(skill.maxLevel)||1));
+        }
+
+        if(definition.talismanEffect==="freeze"&&targetMonster){
+            const skillLevel=Math.max(1,Math.floor(Number(definition.talismanSkillLevel)||1));
+            const baseChance=Array.isArray(skill&&skill.freezeChanceByLevel)
+                ?Math.max(0,Number(skill.freezeChanceByLevel[Math.min(skill.freezeChanceByLevel.length-1,skillLevel-1)])||0)
+                :Math.max(0,Number(skill&&skill.freezeChance)||0);
+            const intelligence=Number(stats.intelligence!==undefined?stats.intelligence:character.intelligence)||0;
+            const targetSpirit=typeof getMonsterEffectiveSpiritPoints==="function"
+                ?Number(getMonsterEffectiveSpiritPoints(targetMonster))||0
+                :Number(targetMonster.spiritPoints||targetMonster.spirit)||0;
+            const rank=typeof getMonsterRank==="function"?getMonsterRank(targetMonster):"regular";
+            if(typeof rollStatusEffectHit==="function"){
+                return rollStatusEffectHit(
+                    baseChance,Number(character.level)||1,Number(targetMonster.level)||1,
+                    intelligence,targetSpirit,true,rank,0
+                );
+            }
+        }
+
+        // 隱身／結界是友方符術，不拿友軍閃避懲罰施放者；使用角色自身命中值。
+        const accuracy=Number(stats.accuracy);
+        if(Number.isFinite(accuracy)&&typeof rollHitChance==="function"){
+            const finalAccuracyBonus=typeof window.v173GetActiveAccuracyBonusPercent==="function"
+                ?window.v173GetActiveAccuracyBonusPercent(character)
+                :0;
+            return rollHitChance(accuracy,0,0,finalAccuracyBonus);
+        }
+        const intelligence=Number(stats.intelligence!==undefined?stats.intelligence:character.intelligence)||0;
+        if(typeof rollStatusEffectHit==="function"){
+            return rollStatusEffectHit(100,Number(character.level)||1,Number(character.level)||1,intelligence,0,false,"regular",0);
+        }
+        return true;
+    }
+
+    window.v17360GetTalismanActivationChance=getTalismanActivationChance;
+    window.v17360RollTalismanSkillHit=rollTalismanSkillHit;
+
+    function getTalismanInventoryItems(){
+        const byId=new Map();
+        inventoryItems.forEach(item=>{
+            if(!item || item.type!=="talisman" || !item.id){ return; }
+            const count=Math.max(0,Math.floor(Number(item.count)||0));
+            if(count<=0){ return; }
+            if(!byId.has(item.id)){
+                byId.set(item.id,{...item,count:0});
+            }
+            byId.get(item.id).count+=count;
+        });
+        return Array.from(byId.values());
+    }
+
+    function consumeTalismanFromInventory(talismanId){
+        for(let index=inventoryItems.length-1;index>=0;index--){
+            const item=inventoryItems[index];
+            if(!item || item.id!==talismanId){ continue; }
+            const current=Math.max(0,Math.floor(Number(item.count)||0));
+            if(current<=1){
+                inventoryItems.splice(index,1);
+            }else{
+                item.count=current-1;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /*
+       ★ 新增（依照使用者要求，「點選符咒沒有問選擇目標」）：
+       符咒現在完全比照技能的選目標流程——冰封符要玩家自己點要冰封
+       哪一隻怪，隱身符/結界符要玩家自己點要給我方哪一位角色。
+
+       作法上刻意「不」自己造一套選目標UI，而是直接沿用遊戲既有的
+       那一整套（setBattleTargetSelectionMode/selectBattleTarget、
+       setBattleAllyTargetSelectionMode/selectBattleAllyTarget），
+       只把符咒id當成pendingAction傳進去。好處是提示文字、卡片高亮、
+       「返回」取消、結算階段讀queued.target/queued.targetAlly……
+       全部原本就是對的，不用重寫也不會跟技能的行為不一致。
+
+       ★ 已確認的相容性重點（讀過00-main.js確認）：
+       - selectBattleTarget()（11119）完全不查skillDatabase，只把
+         pendingAction原封不動存進queuedPlayerActions，所以「選怪物」
+         這條路徑不用改任何東西就能直接用符咒id。
+       - 「選我方」那條路徑不行：setBattleAllyTargetSelectionMode()
+         （10713）跟selectBattleAllyTarget()（10744）都會做
+         skillDatabase[actionType] 並要求 targetType 是 ally/deadAlly，
+         符咒id查不到就會整個當成無效。所以下面補了這兩個的覆寫，
+         遇到符咒id時改用一個「長得像技能」的合成物件走同一套判斷。
+       - getBattleActionDisplayName()（10609）查不到會直接回傳原始id，
+         提示會變成「選擇 [freezeTalismanLow]」這種醜東西，也一起覆寫。
+    */
+    function getTalismanTargetKind(definition){
+        if(!definition){ return null; }
+        return definition.talismanEffect==="freeze" ? "monster" : "ally";
+    }
+
+    /* 給既有的我方選目標流程用的「合成技能物件」——只需要
+       targetType 跟 name 這兩個欄位就能讓那套邏輯正常運作。 */
+    function makeTalismanPseudoSkill(definition){
+        return {
+            id:definition.id,
+            name:definition.name,
+            targetType:"ally",
+            category:"buff"
+        };
+    }
+
+    if(typeof getBattleActionDisplayName==="function"){
+        const originalGetBattleActionDisplayName=getBattleActionDisplayName;
+        getBattleActionDisplayName=function(actionType){
+            const definition=getTalismanDefinition(actionType);
+            if(definition){ return definition.name; }
+            return originalGetBattleActionDisplayName.apply(this,arguments);
+        };
+    }
+
+    if(typeof setBattleAllyTargetSelectionMode==="function"){
+        const originalSetBattleAllyTargetSelectionMode=setBattleAllyTargetSelectionMode;
+        setBattleAllyTargetSelectionMode=function(actionType){
+            const definition=getTalismanDefinition(actionType);
+            if(!definition){
+                return originalSetBattleAllyTargetSelectionMode.apply(this,arguments);
+            }
+
+            const pseudoSkill=makeTalismanPseudoSkill(definition);
+            const region=document.getElementById("battleActionRegion");
+            const promptAction=document.getElementById("battleTargetPromptAction");
+
+            if(region){ region.classList.add("target-selecting"); }
+            if(promptAction){
+                promptAction.textContent="選擇 ["+definition.name+"] 的我方目標";
+            }
+
+            currentBattleMonsters.forEach(index=>{
+                const card=document.getElementById("battleMonster"+index);
+                if(card){ card.classList.remove("targetable","target"); }
+            });
+
+            [0,1,2].forEach(index=>{
+                const character=getBattleCharacterByIndex(index);
+                const card=document.getElementById("battlePlayerCard"+index);
+                if(card){
+                    card.classList.toggle(
+                        "ally-targetable",
+                        isValidAllyTargetForSkill(pseudoSkill,character,index)
+                    );
+                }
+            });
+
+            const targetText=document.getElementById("battleTarget");
+            if(targetText){ targetText.textContent="目標：請選擇我方角色"; }
+        };
+    }
+
+    if(typeof selectBattleAllyTarget==="function"){
+        const originalSelectBattleAllyTarget=selectBattleAllyTarget;
+        selectBattleAllyTarget=function(index){
+            const definition=getTalismanDefinition(pendingAction);
+            if(!definition){
+                return originalSelectBattleAllyTarget.apply(this,arguments);
+            }
+
+            if(!battleActive || battlePhase!=="declare" || !actionReady || !pendingAction){
+                return;
+            }
+
+            const pseudoSkill=makeTalismanPseudoSkill(definition);
+            const character=getBattleCharacterByIndex(index);
+            if(!isValidAllyTargetForSkill(pseudoSkill,character,index)){ return; }
+
+            const action=pendingAction;
+            actionReady=false;
+            pendingAction=null;
+            clearBattleTargetSelectionMode();
+
+            queuedPlayerActions[activeBattleCharacterIndex]={
+                action:action,
+                target:null,
+                targetAlly:index
+            };
+
+            finishPlayerAction();
+        };
+    }
+
+    function useTalisman(talismanId){
+        const definition=getTalismanDefinition(talismanId);
+        if(!definition){ return; }
+
+        const autoOn=
+            activeBattleCharacterIndex===0
+            ? autoBattle
+            : getPartyAutoConfig(activeBattleCharacterIndex).enabled;
+
+        if(!battleActive || autoOn || actionReady){ return; }
+
+        const activeCharacter=getPartyCharacterByIndex(activeBattleCharacterIndex);
+        if(!activeCharacter || activeCharacter.hp<=0){ return; }
+
+        /*
+           ★ 修正（依照使用者回報「三個人都使用符咒，結果都是一個人
+           在使用」的第二個成因）：宣告階段要把「已經被其他角色預定
+           走的符咒」也算進去。原本只看背包剩幾張，三個角色可以同時
+           宣告同一張最後一張符咒，結算時先手用掉、後面兩位撞到
+           「已經沒有庫存了」白白浪費一整個回合。
+        */
+        const ownedCount=inventoryItems.reduce((sum,item)=>{
+            if(!item || item.id!==talismanId){ return sum; }
+            return sum+Math.max(0,Math.floor(Number(item.count)||0));
+        },0);
+
+        const reservedCount=Object.keys(queuedPlayerActions).reduce((sum,key)=>{
+            const queued=queuedPlayerActions[key];
+            if(!queued || Number(key)===activeBattleCharacterIndex){ return sum; }
+            return sum+(queued.action===talismanId ? 1 : 0);
+        },0);
+
+        if(ownedCount-reservedCount<=0){
+            addBattleLog(
+                definition.name+
+                (reservedCount>0
+                    ? "剩下的數量已經被這回合其他角色預定了。"
+                    : "目前沒有庫存。")
+            );
+            renderBattleItemMenu();
+            return;
+        }
+
+        /*
+           ★ 進入選目標階段（而不是直接宣告完畢）：符咒id直接當成
+           pendingAction，之後由既有的selectBattleTarget()／
+           selectBattleAllyTarget()負責寫進queuedPlayerActions。
+        */
+        actionReady=true;
+        pendingAction=talismanId;
+        closeMenus();
+
+        if(getTalismanTargetKind(definition)==="monster"){
+            setBattleTargetSelectionMode(talismanId);
+        }else{
+            setBattleAllyTargetSelectionMode(talismanId);
+        }
+
+        updateUI();
+    }
+    window.useTalisman=useTalisman;
+
+    function applyTalismanEffect(talismanId,characterIndex,queued){
+        const definition=getTalismanDefinition(talismanId);
+        const character=getPartyCharacterByIndex(characterIndex);
+
+        if(!definition || !character){
+            finishPlayerAction();
+            return;
+        }
+
+        if(!consumeTalismanFromInventory(talismanId)){
+            addBattleLog(definition.name+"已經沒有庫存了。");
+            finishPlayerAction();
+            return;
+        }
+        rebuildInventorySlots();
+
+        /*
+           ★ 修正（這就是使用者說「三個人都使用符咒，結果都是一個人
+           在使用」的真正原因）：lungePlayerCard()跟showSkillNameBadge()
+           的最後一個參數都是characterIndex，內部是
+           $("battlePlayerCard"+(characterIndex||0))——原本這兩個呼叫
+           都沒有傳，所以不管是誰施放，前傾動畫跟技能名稱都永遠演在
+           0號角色的卡片上。二三號角色其實有正常結算（戰鬥紀錄有印、
+           buff也有上），但畫面看起來就像「只有第一個人在用」。
+           （同一個函式下面的showMissEffect()本來就有正確傳，所以
+           「畫符失敗」反而一直是演在對的卡片上，剛好可以對照。）
+        */
+        lungePlayerCard(characterIndex);
+        showSkillNameBadge(
+            definition.name,
+            definition.talismanEffect==="freeze" ? "water" : "wind",
+            characterIndex
+        );
+
+        let targetIndex=null;
+        let targetMonster=null;
+        let allyIndex=null;
+        let allyCharacter=null;
+        let buffType=null;
+
+        if(definition.talismanEffect==="freeze"){
+            targetIndex=queued&&Number.isInteger(queued.target)?queued.target:null;
+            if(targetIndex===null||!monsters[targetIndex]||!monsters[targetIndex].alive){
+                const aliveTargets=currentBattleMonsters.filter(
+                    index=>monsters[index]&&monsters[index].alive
+                );
+                if(aliveTargets.length===0){
+                    addBattleLog(definition.name+"沒有可以生效的目標。");
+                    finishPlayerAction();
+                    return;
+                }
+                targetIndex=aliveTargets[Math.floor(Math.random()*aliveTargets.length)];
+            }
+            targetMonster=monsters[targetIndex];
+            if(
+                typeof window.v173CanApplyNamedPersistentState==="function"&&
+                !window.v173CanApplyNamedPersistentState(
+                    targetMonster,"freeze","monster",targetIndex,definition.name
+                )
+            ){
+                finishPlayerAction();
+                return;
+            }
+        }else{
+            allyIndex=queued&&Number.isInteger(queued.targetAlly)
+                ?queued.targetAlly
+                :characterIndex;
+            allyCharacter=getBattleCharacterByIndex(allyIndex);
+            if(!allyCharacter||allyCharacter.hp<=0){
+                allyIndex=characterIndex;
+                allyCharacter=character;
+            }
+            buffType=definition.talismanEffect==="stealth"?"stealthSkill":"barrier";
+            if(
+                typeof window.v173CanApplyNamedPersistentState==="function"&&
+                !window.v173CanApplyNamedPersistentState(
+                    allyCharacter,buffType,"player",allyIndex,definition.name
+                )
+            ){
+                finishPlayerAction();
+                return;
+            }
+        }
+
+        const activationChance=getTalismanActivationChance(definition);
+        if(Math.random()*100>=activationChance){
+            addBattleLog((character.id||"你")+"使用"+definition.name+"，畫符失敗！");
+            showMissEffect(true,characterIndex,"畫符失敗");
+            finishPlayerAction();
+            return;
+        }
+
+        if(!rollTalismanSkillHit(definition,characterIndex,targetMonster)){
+            if(definition.talismanEffect==="freeze"&&targetMonster){
+                addBattleLog(targetMonster.name+"抵抗了"+definition.name+"的冰封效果。");
+            }else{
+                addBattleLog((character.id||"你")+"的"+definition.name+"畫符成功，但符術未命中。");
+            }
+            showMissEffect(true,characterIndex,"MISS");
+            finishPlayerAction();
+            return;
+        }
+
+        if(definition.talismanEffect==="freeze"){
+            applyFreezeEffect(targetMonster,definition.talismanDuration);
+            addBattleLog(
+                (character.id||"你")+"使用"+definition.name+"，"+
+                targetMonster.name+"被冰封了！"
+            );
+        }
+        else{
+            /*
+               ★ 隱身符/結界符改成作用在玩家選的我方角色
+               （queued.targetAlly），沒有選或那位已經倒下時才退回
+               施法者自己。
+            */
+            allyCharacter.activeBuffs=allyCharacter.activeBuffs||[];
+            const buff={type:buffType,turnsLeft:definition.talismanDuration};
+            if(typeof window.v173MarkPersistentStateName==="function"){
+                window.v173MarkPersistentStateName(buff,buffType);
+            }
+            allyCharacter.activeBuffs.push(buff);
+
+            const allyName=allyIndex===characterIndex
+                ? (character.id||"你")
+                : (allyCharacter.id||("角色"+(allyIndex+1)));
+
+            addBattleLog(
+                definition.talismanEffect==="stealth"
+                    ? (character.id||"你")+"使用"+definition.name+"，"+allyName+
+                      "進入隱身，無法被單體攻擊選中，持續"+definition.talismanDuration+"回合。"
+                    : (character.id||"你")+"使用"+definition.name+"，"+allyName+
+                      "獲得結界，可抵擋所有傷害，持續"+definition.talismanDuration+"回合。"
+            );
+        }
+
+        updateUI();
+        finishPlayerAction();
+    }
+    window.applyTalismanEffect=applyTalismanEffect;
+
+    /*
+       ★ 接進既有的「宣告後結算」dispatch點——跟potion
+       同一個位置，找不到就代表這個版本的00-main.js結構
+       跟預期不同，主動印出警告方便之後排查，不要默默失效。
+    */
+    if(typeof resolveQueuedPlayerAction==="function"){
+        const originalResolveQueuedPlayerAction=resolveQueuedPlayerAction;
+        resolveQueuedPlayerAction=function(characterIndex,token){
+            const queued=queuedPlayerActions[characterIndex];
+
+            /*
+               ★ 改成用「queued.action本身是不是一個符咒id」來判斷。
+               以前是寫死 action==="talisman" 再另外存 talismanId，
+               但現在符咒要走既有的選目標流程，而那套流程
+               （selectBattleTarget/selectBattleAllyTarget）是把
+               pendingAction原封不動寫進queued.action的，沒辦法順便
+               多塞一個talismanId欄位——所以直接讓action帶符咒id，
+               這裡用getTalismanDefinition()反查即可。
+               同時把整個queued傳下去，讓結算端讀得到玩家選的
+               target／targetAlly。
+            */
+            const talismanId=queued && queued.action ? queued.action : null;
+            if(talismanId && getTalismanDefinition(talismanId)){
+                activeBattleCharacterIndex=characterIndex;
+                applyTalismanEffect(talismanId,characterIndex,queued);
+                return;
+            }
+
+            return originalResolveQueuedPlayerAction.apply(this,arguments);
+        };
+    }
+    else{
+        console.warn("V132：找不到resolveQueuedPlayerAction()，符咒可能無法在戰鬥中結算，需要人工檢查00-main.js的函式名稱。");
+    }
+
+    /* 啟用戰鬥符咒清單按鈕（原本disabled，只列清單）。 */
+    if(typeof renderBattleItemMenu==="function"){
+        const originalRenderBattleItemMenu=renderBattleItemMenu;
+        renderBattleItemMenu=function(){
+            const result=originalRenderBattleItemMenu.apply(this,arguments);
+
+            if(battleItemCategory!=="talisman"){ return result; }
+
+            const list=document.getElementById("battlePotionList");
+            if(!list){ return result; }
+
+            const talismans=getTalismanInventoryItems();
+            if(talismans.length===0){ return result; }
+
+            list.innerHTML=talismans.map(item=>{
+                const definition=getTalismanDefinition(item.id);
+                const chanceLabel=definition ? definition.tierChance+"%" : "";
+                return (
+                    '<button type="button" class="battle-item-card talisman" '+
                     'onclick="useTalisman(\''+item.id+'\')" title="'+escapeHtml(item.name)+'">'+
                     '<span class="battle-item-badge">符</span>'+
                     '<span class="battle-item-name">'+escapeHtml(item.name)+'</span>'+
@@ -2465,8 +3537,268 @@ ype="button" class="battle-item-card talisman" '+
     }
 
     function showItemPreview(item){
-        if(!itbwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
+        if(!item){ return; }
+        let html;
+
+        if(item.type==="chest"){
+            const oreRows=CHEST_TIER_WEIGHTS.map(tier=>{
+                const oreDef=getOreDefinitionByTier(tier.key);
+                const amount=tier.key==="orange" ? 5 : 10;
+                return oreDef ? previewRow(oreDef.icon,oreDef.name,amount,tier.weight) : "";
+            }).join("");
+            const blueprintRows=CHEST_TIER_WEIGHTS.map(tier=>{
+                const pool=getBlueprintDefinitionsByTier(tier.key);
+                const eachChance=pool.length ? tier.weight/pool.length : 0;
+                const amount=tier.key==="orange" ? 5 : 10;
+                return pool.map(definition=>
+                    previewRow(definition.icon,definition.name,amount,eachChance)
+                ).join("");
+            }).join("");
+            html=
+                '<div class="v132-reward-modal-inner">'+
+                '<h3>'+escapeHtml(item.name)+' 開啟預覽</h3>'+
+                '<p>每次開啟會各獲得1組礦石與1種裝備設計圖；兩類獎勵分開抽取。</p>'+
+                '<div class="v132-preview-section-title">可能獲得的礦石</div>'+
+                '<div class="v132-preview-list">'+oreRows+'</div>'+
+                '<div class="v132-preview-section-title">可能獲得的裝備設計圖</div>'+
+                '<div class="v132-preview-list v132-preview-list-scroll">'+blueprintRows+'</div>'+
+                '<div class="v132-reward-actions">'+
+                '<button type="button" onclick="v132CloseRewardModal()">關閉</button>'+
+                '</div></div>';
+        }
+        else if(item.type==="ticket"){
+            const ticketDef=getTicketDefinition(item.id);
+            const pieces=ticketDef ? getEquipmentSetItemDefinitions(ticketDef.setId) : [];
+            const chance=pieces.length ? 100/pieces.length : 0;
+            const grid=pieces.map(p=>
+                '<button type="button" class="v132-preview-item" data-item-id="'+escapeHtml(p.id)+'" '+
+                'aria-label="查看'+escapeHtml(p.name)+'詳細資料" '+
+                'onclick="v132OpenPreviewEquipmentDetail(this.dataset.itemId)">'+
+                '<span class="v132-preview-icon">'+p.icon+'</span>'+
+                '<span class="v132-preview-item-name">'+escapeHtml(p.name)+'</span>'+
+                '<b>'+formatPreviewProbability(chance)+'</b>'+
+                '</button>'
+            ).join("");
+            html=
+                '<div class="v132-reward-modal-inner v132-ticket-preview-modal">'+
+                '<h3>'+escapeHtml(item.name)+' 開啟預覽</h3>'+
+                '<p>開啟後，從以下10件['+(ticketDef ? getSetLabel(ticketDef.setId) : "")+']套裝部位中'+
+                '隨機獲得1件：</p>'+
+                '<div class="v132-preview-grid">'+grid+'</div>'+
+                '<div class="v132-reward-actions">'+
+                '<button type="button" onclick="v132CloseRewardModal()">關閉</button>'+
+                '</div></div>';
+        }
+        else{
+            return;
+        }
+
+        v132ShowRewardModal(html);
+    }
+    window.v132ShowItemPreview=showItemPreview;
+
+    function openPreviewEquipmentDetail(itemId){
+        const item=equipmentSetItemDefinitions.find(definition=>definition.id===String(itemId||""));
+        if(!item||typeof openEquippedItem!=="function"){ return; }
+
+        const rewardModal=document.getElementById("v132RewardModal");
+        if(rewardModal){ rewardModal.classList.add("v132-detail-paused"); }
+
+        openEquippedItem(item,"");
+
+        const modal=document.getElementById("itemModal");
+        if(!modal){
+            if(rewardModal){ rewardModal.classList.remove("v132-detail-paused"); }
+            return;
+        }
+
+        modal.classList.add("v132-ticket-preview-detail");
+
+        const title=document.getElementById("itemModalName");
+        if(title){ title.textContent=item.name; }
+
+        [
+            document.getElementById("itemEquipButton"),
+            modal.querySelector(".sell-button"),
+            document.getElementById("v132ItemUseButton"),
+            document.getElementById("v132ItemPreviewButton"),
+            document.getElementById("v141DecomposeButton")
+        ].forEach(button=>{ if(button){ button.style.display="none"; } });
+    }
+    window.v132OpenPreviewEquipmentDetail=openPreviewEquipmentDetail;
+
+    /*
+       ★ 物品詳細彈窗補上符咒/抽獎券/寶箱的「開啟」跟「預覽」
+       按鈕——這幾種東西不是藥水（不走usePotion()那條路）、
+       也不是裝備（不能穿戴），原本的itemEquipButton在這幾種
+       類型上只會被判成「不可裝備」整個鎖死但還是顯示著，這裡
+       依照 V138 最新規格，寶箱/抽獎券點開只顯示「開啟／預覽」
+       兩個物品動作；穿戴與售出都隱藏，避免零售價物品被誤售。
+    */
+    if(typeof openItemModal==="function"){
+        const afterOpenItemModal=openItemModal;
+        openItemModal=function(slotIndex){
+            const modal=document.getElementById("itemModal");
+            if(modal){ modal.classList.remove("v132-ticket-preview-detail"); }
+            const result=afterOpenItemModal.apply(this,arguments);
+
+            const item=inventorySlots[slotIndex];
+            const equipButton=document.getElementById("itemEquipButton");
+            const sellButton=document.querySelector("#itemModal .sell-button");
+            let useButton=document.getElementById("v132ItemUseButton");
+            let previewButton=document.getElementById("v132ItemPreviewButton");
+
+            if(!useButton && equipButton && equipButton.parentElement){
+                useButton=document.createElement("button");
+                useButton.id="v132ItemUseButton";
+                useButton.type="button";
+                useButton.className=equipButton.className;
+                equipButton.parentElement.insertBefore(useButton,equipButton.nextSibling);
+            }
+
+            if(!previewButton && useButton && useButton.parentElement){
+                previewButton=document.createElement("button");
+                previewButton.id="v132ItemPreviewButton";
+                previewButton.type="button";
+                previewButton.className=useButton.className;
+                useButton.parentElement.insertBefore(previewButton,useButton.nextSibling);
+            }
+
+            const isChestOrTicket=item && (item.type==="chest" || item.type==="ticket");
+
+            /*
+               ★ 修正（依照使用者回報）：符咒不是裝備，但原本的
+               openItemModal()只針對 type==="potion" 把「穿戴」鍵鎖住
+               （js/00-main.js:30447），符咒會落到else分支變成一顆
+               可以按的「穿戴」鍵——按下去因為
+               getInventoryEquipmentSlot("talisman")查不到對應欄位，
+               equipSelectedItem()只是靜默return，等於是一顆騙人的
+               死按鈕。依使用者決定「符咒不能在戰鬥外使用」，這裡
+               只把這顆錯誤的按鈕藏掉，不另外補「使用」鍵。
+            */
+            const isBattleOnlyItem=item && item.type==="talisman";
+
+            if(equipButton){
+                equipButton.style.display=
+                    (isChestOrTicket || isBattleOnlyItem) ? "none" : "";
+            }
+
+            if(sellButton){
+                sellButton.style.display=isChestOrTicket ? "none" : "";
+            }
+
+            if(isChestOrTicket){
+                const statsEl=document.getElementById("itemModalStats");
+                if(statsEl){
+                    Array.from(statsEl.children).forEach(child=>{
+                        if((child.textContent||"").includes("售價：")){
+                            child.remove();
+                        }
+                    });
+                }
+            }
+
+            if(useButton){
+                if(item && item.type==="ticket"){
+                    useButton.style.display="";
+                    useButton.textContent="開啟";
+                    useButton.onclick=function(){
+                        useEquipmentTicket(item.id);
+                        closeItemModal();
+                    };
+                }
+                else if(item && item.type==="chest"){
+                    useButton.style.display="";
+                    useButton.textContent="開啟";
+                    useButton.onclick=function(){
+                        const opened=openSingleMaterialChestFromInventory();
+                        closeItemModal();
+                        if(opened){
+                            alert("開啟"+item.name+"，獲得：\n"+opened.join("\n"));
+                        }
+                    };
+                }
+                else{
+                    useButton.style.display="none";
+                    useButton.onclick=null;
+                }
+            }
+
+            if(previewButton){
+                if(isChestOrTicket){
+                    previewButton.style.display="";
+                    previewButton.textContent="預覽";
+                    previewButton.onclick=function(){
+                        showItemPreview(item);
+                    };
+                }
+                else{
+                    previewButton.style.display="none";
+                    previewButton.onclick=null;
+                }
+            }
+
+            return result;
+        };
+    }
+
+    if(typeof openEquippedItem==="function"){
+        const afterOpenEquippedItemActions=openEquippedItem;
+        openEquippedItem=function(){
+            const modal=document.getElementById("itemModal");
+            if(modal){ modal.classList.remove("v132-ticket-preview-detail"); }
+            const result=afterOpenEquippedItemActions.apply(this,arguments);
+            const sellButton=document.querySelector("#itemModal .sell-button");
+            const useButton=document.getElementById("v132ItemUseButton");
+            const previewButton=document.getElementById("v132ItemPreviewButton");
+            if(sellButton){ sellButton.style.display=""; }
+            if(useButton){ useButton.style.display="none"; useButton.onclick=null; }
+            if(previewButton){ previewButton.style.display="none"; previewButton.onclick=null; }
+            return result;
+        };
+    }
+
+    if(typeof closeItemModal==="function"){
+        const afterCloseItemModal=closeItemModal;
+        closeItemModal=function(){
+            const modal=document.getElementById("itemModal");
+            const returningToTicketPreview=!!(
+                modal&&modal.classList.contains("v132-ticket-preview-detail")
+            );
+            const result=afterCloseItemModal.apply(this,arguments);
+            if(modal){ modal.classList.remove("v132-ticket-preview-detail"); }
+            if(returningToTicketPreview){
+                const rewardModal=document.getElementById("v132RewardModal");
+                if(rewardModal){ rewardModal.classList.remove("v132-detail-paused"); }
+            }
+            return result;
+        };
+    }
+
+
+    /* =====================================================
+       13. 日常副本：每日次數狀態（獨立存檔，格式跟
+           元素匣state同一套慣例，date跟今天不同就重置）
+    ===================================================== */
+
+    const DUNGEON_STATE_KEY=window.FourSymbolsAccountSave.accountKey("daily-dungeon-state");
+    const DUNGEON_TYPES=["exp","material","equipment"];
+
+    function loadDungeonState(){
+        try{
+            const parsed=JSON.parse(localStorage.getItem(DUNGEON_STATE_KEY)||"{}");
+            const state={date:parsed.date||todayString(),used:{}};
+            DUNGEON_TYPES.forEach(type=>{
+                state.used[type]=!!(parsed.used && parsed.used[type]);
+            });
+            return state;
+        }catch(_){
+            return {date:todayString(),used:{exp:false,material:false,equipment:false}};
+        }
+    }
+
+    let dungeonState=loadDungeonState();
+
     function persistDungeonState(){
         try{
             localStorage.setItem(DUNGEON_STATE_KEY,JSON.stringify(dungeonState));
@@ -2600,8 +3932,7 @@ bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such fi
         if(!monster){ return monster; }
         ["maxHP","maxSP","defense"].forEach(key=>{
             if(Number.isFinite(Number(monster[key]))){
-                monster[key]=Math.max(1,Math.round(Number(motail: error writing 'standard output': Broken pipe
-nster[key])*DUNGEON_MONSTER_STRENGTH));
+                monster[key]=Math.max(1,Math.round(Number(monster[key])*DUNGEON_MONSTER_STRENGTH));
             }
         });
         monster.hp=monster.maxHP;
@@ -2737,11 +4068,497 @@ nster[key])*DUNGEON_MONSTER_STRENGTH));
         const pool=Object.keys(skillDatabase).filter(skillId=>{
             const skill=skillDatabase[skillId];
             return (
-                skill.element===monster.elementail: error writing 'standard output': Broken pipe
-bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-oreTier);
+                skill.element===monster.element &&
+                (skill.category==="physical" || skill.category==="magic") &&
+                skill.tier===4
+            );
+        });
+        monster.skillIds=pool;
+        monster.skillChance=chance;
+    }
+
+    function lockDungeonSkillConfiguration(monster,skillLevel){
+        const level=Math.max(1,Math.floor(Number(skillLevel)||1));
+        monster.v132FixedSkillLoadout=true;
+        monster.v141ForceSkillLevel=level;
+        monster.v141SkillLevel=level;
+        monster.v144SkillLevel=level;
+        return monster;
+    }
+
+
+    /* =====================================================
+       15. 副本戰鬥啟動器（借用monsters整包替換的既有慣例，
+           結束後完整還原，不影響巡怪系統）
+    ===================================================== */
+
+    window.v132ActiveDungeonRun=null;
+
+    function launchDungeonBattle(monsterList,onComplete,options){
+        const opts=options&&typeof options==="object"?options:{};
+        if(battleActive){
+            alert("目前正在戰鬥中，無法開始副本。");
+            return false;
+        }
+
+        window.v132ActiveDungeonRun={
+            identityVersion:1,
+            mode:String(opts.mode||"legacy-dungeon"),
+            gameplayMode:opts.gameplayMode?String(opts.gameplayMode):null,
+            dailyDungeonType:opts.dailyDungeonType?String(opts.dailyDungeonType):null,
+            previousMonsters:monsters,
+            previousZone:currentZone,
+            onComplete:onComplete,
+            normalizeFailureResources:opts.normalizeFailureResources!==false,
+            startedAt:Date.now()
+        };
+
+        monsters=monsterList;
+        currentZone="dungeon";
+
+        battleActive=true;
+        battleToken++;
+        battleRoundBoundaryKeys=new Set();
+        battlePresentationLocks.clear();
+        battleInputResumeToken=null;
+        battleResolutionResumeToken=null;
+        battleAutoActionResume=null;
+        clearBattleRoundPrompt();
+        stopMonsterMovement();
+        clearInterval(timerId);
+        if(battleAdvanceTimeoutId){
+            clearTimeout(battleAdvanceTimeoutId);
+            battleAdvanceTimeoutId=null;
+        }
+        battleAdvanceScheduled=false;
+        closeMenus();
+
+        selectedMonster=0;
+        turn=1;
+        actionReady=false;
+        pendingAction=null;
+
+        /*
+           V137：副本舊版每次launch（經驗副本三個stage也各算一次）
+           都把第二、第三角色補滿，主角卻保留殘血，造成免費補血與
+           車輪戰難度失真。比照一般戰鬥，三名角色一律只夾在目前
+           上限內，不平白回復HP/SP。
+        */
+        getExistingPartyIndexes().forEach(characterIndex=>{
+            const character=getPartyCharacterByIndex(characterIndex);
+            const stats=getPartyBattleStats(characterIndex);
+            if(!character || !stats){ return; }
+            character.hp=Number.isFinite(Number(character.hp))
+                ? Math.max(0,Math.min(stats.maxHP,Number(character.hp)))
+                : stats.maxHP;
+            character.sp=Number.isFinite(Number(character.sp))
+                ? Math.max(0,Math.min(stats.maxSP,Number(character.sp)))
+                : stats.maxSP;
+            character.activeBuffs=[];
+            character.statusEffects=[];
+            character.isDefending=false;
+        });
+
+        currentBattleMonsters=monsterList.map((m,i)=>i);
+        currentBattleMonsters.forEach(i=>{
+            monsters[i].alive=true;
+            monsters[i].hp=monsters[i].maxHP;
+            monsters[i].sp=monsters[i].maxSP;
+            monsters[i].statusEffects=[];
+        });
+
+        renderBattle();
+        showPage("battle");
+
+        autoBattle=autoConfig.enabled;
+        if(typeof window.v131SyncElementBoxForBattle==="function"){
+            window.v131SyncElementBoxForBattle({silent:true});
+        }
+        syncBattleAutoSettings();
+        updateAutoButton();
+        beginBattleStatisticsSession();
+
+        selectBattleTarget(0);
+        clearBattleLog();
+        addBattleLog("副本戰鬥開始！");
+        addBattleLog("敵人共有"+currentBattleMonsters.length+"隻。");
+
+        startTurn(battleToken);
+        return true;
+    }
+    window.v132LaunchDungeonBattle=launchDungeonBattle;
+
+    /*
+       ★ winBattle()/loseBattle()是既有巡怪系統勝負結算
+       的唯一入口，副本借用同一套回合引擎，勝負當然也會
+       經過這裡——用window.v132ActiveDungeonRun這個旗標
+       判斷「這場是不是副本戰鬥」，是的話整段導去副本
+       專屬的結算流程，並且完整還原monsters/currentZone，
+       不執行巡怪那一套（重生怪物、回地圖……）。
+    */
+    function restoreDungeonMonsters(){
+        const run=window.v132ActiveDungeonRun;
+        if(!run){ return; }
+        monsters=run.previousMonsters;
+        currentZone=run.previousZone;
+    }
+
+    function abortDungeonBattle(reason){
+        const run=window.v132ActiveDungeonRun;
+        if(!run){ return false; }
+        battleActive=false;
+        clearBattleRoundPrompt();
+        finishBattleStatisticsSession(String(reason||"escape"));
+        autoBattle=false;
+        actionReady=false;
+        pendingAction=null;
+        clearInterval(timerId);
+        timerId=null;
+        if(battleAdvanceTimeoutId){ clearTimeout(battleAdvanceTimeoutId); battleAdvanceTimeoutId=null; }
+        battleAdvanceScheduled=false;
+        battleToken++;
+        closeMenus();
+        restoreDungeonMonsters();
+        window.v132ActiveDungeonRun=null;
+        updateUI();
+        saveGame();
+        if(run.onComplete){ run.onComplete({result:String(reason||"escape"),turnsUsed:turn}); }
+        return true;
+    }
+    window.v132AbortDungeonBattle=abortDungeonBattle;
+
+    if(typeof winBattle==="function"){
+        const originalWinBattle=winBattle;
+        winBattle=function(){
+            const run=window.v132ActiveDungeonRun;
+            if(!run){
+                return originalWinBattle.apply(this,arguments);
+            }
+
+            battleActive=false;
+            clearBattleRoundPrompt();
+            finishBattleStatisticsSession("win");
+            autoBattle=false;
+            actionReady=false;
+            pendingAction=null;
+            clearInterval(timerId);
+            timerId=null;
+            if(battleAdvanceTimeoutId){
+                clearTimeout(battleAdvanceTimeoutId);
+                battleAdvanceTimeoutId=null;
+            }
+            battleAdvanceScheduled=false;
+            battleToken++;
+            closeMenus();
+
+            addBattleLog("副本這一場戰鬥勝利！");
+
+            const turnsUsed=turn;
+            restoreDungeonMonsters();
+            window.v132ActiveDungeonRun=null;
+
+            applyPostBattleAutoRecovery();
+            saveGame();
+
+            if(run.onComplete){
+                run.onComplete({result:"win",turnsUsed:turnsUsed});
+            }
+        };
+    }
+
+    if(typeof loseBattle==="function"){
+        const originalLoseBattle=loseBattle;
+        loseBattle=function(){
+            const run=window.v132ActiveDungeonRun;
+            if(!run){
+                return originalLoseBattle.apply(this,arguments);
+            }
+
+            /*
+               不呼叫一般loseBattle()：它會排一個2.2秒後返回巡怪地圖的
+               timeout。舊版雖然先顯示副本頁，仍會被那個延遲回呼踢回
+               地圖。副本失敗在這裡完整收尾並補滿隊伍，再交給副本
+               callback回到日常副本頁。
+            */
+            battleActive=false;
+            clearBattleRoundPrompt();
+            finishBattleStatisticsSession("lose");
+            autoBattle=false;
+            actionReady=false;
+            pendingAction=null;
+            clearInterval(timerId);
+            timerId=null;
+            if(battleAdvanceTimeoutId){
+                clearTimeout(battleAdvanceTimeoutId);
+                battleAdvanceTimeoutId=null;
+            }
+            battleAdvanceScheduled=false;
+            battleToken++;
+            closeMenus();
+            addBattleLog("副本挑戰失敗……");
+            restoreDungeonMonsters();
+            window.v132ActiveDungeonRun=null;
+
+            if(run.normalizeFailureResources!==false){
+                getExistingPartyIndexes().forEach(characterIndex=>{
+                    const character=getPartyCharacterByIndex(characterIndex);
+                    const stats=getPartyBattleStats(characterIndex);
+                    if(!character || !stats){ return; }
+                    character.hp=stats.maxHP;
+                    character.sp=stats.maxSP;
+                });
+            }
+            updateUI();
+            saveGame();
+
+            if(run.onComplete){
+                run.onComplete({result:"lose"});
+            }
+        };
+    }
+
+
+    /* =====================================================
+       16. 經驗副本：單一角色10級開放，連續3場車輪戰
+    ===================================================== */
+
+    function startExpDungeonBattle(stage,rewardExp){
+        const level=getDungeonMonsterLevel();
+        const roster=[];
+        for(let i=0;i<10;i++){
+            const monster=buildDungeonMonster(
+                "經驗軍團兵",
+                level,
+                randomElement(),
+                stage===3 ? "elite" : "regular"
+            );
+            monster.v141DungeonStage=stage;
+            roster.push(monster);
+        }
+        roster.forEach(monster=>{ setMonsterSkillTier(monster,2,0.5); });
+
+        launchDungeonBattle(roster,function(outcome){
+            if(outcome.result!=="win"){
+                showPage("dungeon");
+                switchDungeonTab("daily");
+                return;
+            }
+
+            if(stage<3){
+                setTimeout(()=>{
+                    startExpDungeonBattle(stage+1,rewardExp);
+                },600);
+                return;
+            }
+
+            showExpDungeonRewardModal(rewardExp);
+        },{mode:"daily",dailyDungeonType:"exp"});
+    }
+
+    /*
+       V139經驗副本基礎獎勵固定為「目前全隊升級需求平均值的11%」，
+       正式維持「隊伍當級 expNext 平均 ×33%」；看廣告雙倍沿用既有
+       流程，因此一般領取約33%、雙倍領取約66%。
+    */
+    const EXP_DUNGEON_REWARD_RATIO=0.33;
+
+    function getExpDungeonRewardExp(){
+        const indexes=getExistingPartyIndexes();
+        if(indexes.length===0){ return 0; }
+        const total=indexes.reduce((sum,index)=>{
+            const character=getPartyCharacterByIndex(index);
+            if(!character){ return sum; }
+            return sum+Math.max(0,Number(character.expNext)||0);
+        },0);
+        return Math.floor((total/indexes.length)*EXP_DUNGEON_REWARD_RATIO);
+    }
+    window.v138GetExpDungeonRewardExp=getExpDungeonRewardExp;
+    window.v139GetExpDungeonRewardExp=getExpDungeonRewardExp;
+
+    function showExpDungeonRewardModal(rewardExp){
+        const html=
+            '<div class="v132-reward-modal-inner">'+
+            '<h3>經驗副本挑戰成功！</h3>'+
+            '<p>可獲得經驗值：<b>'+Math.floor(rewardExp).toLocaleString("zh-TW")+'</b></p>'+
+            '<div class="v132-reward-actions">'+
+            '<button type="button" onclick="v132ClaimExpDungeonReward(false)">直接領取</button>'+
+            '<button type="button" onclick="v132ClaimExpDungeonReward(true)">看廣告雙倍領取</button>'+
+            '</div></div>';
+        v132ShowRewardModal(html);
+    }
+
+    function confirmDungeonEntry(title,details){
+        if(typeof window.rpgConfirm!=="function"){
+            return Promise.resolve(false);
+        }
+        return window.rpgConfirm(
+            "確定要進入「"+title+"」嗎？\n\n"+
+            details+"\n\n"+
+            "進入後才會開始戰鬥；挑戰失敗不會扣除今日次數。",
+            {
+                title:"副本確認",
+                confirmText:"進入副本",
+                cancelText:"返回"
+            }
+        );
+    }
+
+    window.v132ClaimExpDungeonReward=function(doubled){
+        function grant(){
+            const rewardMultiplier=doubled ? 2 : 1;
+            const rewardExp=Math.floor(getExpDungeonRewardExp()*rewardMultiplier);
+            sharedExp+=rewardExp;
+            markDungeonUsed("exp");
+            addBattleLog("經驗副本結算，獲得"+rewardExp+"EXP，已存入經驗池。");
+            saveGame();
+            v132CloseRewardModal();
+            showPage("dungeon");
+            switchDungeonTab("daily");
+        }
+
+        if(doubled){
+            showRewardedAd(grant,function(){
+                alert("廣告未完成，未獲得雙倍獎勵。");
+            });
+        }else{
+            grant();
+        }
+    };
+
+    async function beginExpDungeon(){
+        if(!isDungeonAvailable("exp")){
+            alert("經驗副本今天已經挑戰過了。");
+            return;
+        }
+        const mainCharacter=getPartyCharacterByIndex(0);
+        if(!mainCharacter || (mainCharacter.level||1)<10){
+            alert("經驗副本需要主角色等級達到10級才能開啟。");
+            return;
+        }
+        if(!await confirmDungeonEntry(
+            "經驗副本",
+            "將連續進行3場戰鬥，基礎獎勵為目前全隊升級需求平均值的11%。"
+        )){
+            return;
+        }
+        const rewardExp=getExpDungeonRewardExp();
+        startExpDungeonBattle(1,rewardExp);
+    }
+    window.v132BeginExpDungeon=beginExpDungeon;
+
+
+    /* =====================================================
+       17. 材料副本：雙角色20級開放，5精英+5普通，寶箱獎勵
+    ===================================================== */
+
+    async function beginMaterialDungeon(){
+        if(!isDungeonAvailable("material")){
+            alert("材料副本今天已經挑戰過了。");
+            return;
+        }
+        if(!hasLevel10CharacterForDailyDungeon()){
+            alert("材料副本需要任一角色達到10級才能開啟。");
+            return;
+        }
+        if(!canAddItemToInventory(materialChestDefinition,3)){
+            alert("請先預留可放入3個材料寶箱的背包空間，再挑戰材料副本。");
+            return;
+        }
+        if(!await confirmDungeonEntry(
+            "材料副本",
+            "本場共有10隻怪物；通關後材料寶箱只會放進背包，不會自動開啟。"
+        )){
+            return;
+        }
+
+        const level=getDungeonMonsterLevel();
+        const roster=[];
+        for(let i=0;i<5;i++){
+            const monster=buildDungeonMonster("礦脈守衛精英",level,randomElement(),"elite");
+            setMonsterSkillTier(monster,3,0.7);
+            roster.push(monster);
+        }
+        for(let i=0;i<5;i++){
+            const monster=buildDungeonMonster("礦脈守衛",level,randomElement());
+            setMonsterSkillTier(monster,2,0.7);
+            roster.push(monster);
+        }
+
+        launchDungeonBattle(roster,function(outcome){
+            if(outcome.result!=="win"){
+                showPage("dungeon");
+                switchDungeonTab("daily");
+                return;
+            }
+            const chestCount=outcome.turnsUsed<5 ? 3 : (outcome.turnsUsed<10 ? 2 : 1);
+            showMaterialDungeonRewardModal(chestCount);
+        },{mode:"daily",dailyDungeonType:"material"});
+    }
+    window.v132BeginMaterialDungeon=beginMaterialDungeon;
+
+    /*
+       ★ 修正（依照使用者要求，「副本寶箱領取時，不應該直接
+       開啟，而是放進包包給玩家自主開起」）：
+       原本「材料副本挑戰成功」按「直接領取」就會馬上把寶箱
+       全部拆開、材料直接進背包，玩家完全沒有機會自己選時機
+       開。改成：領取只把「材料寶箱」這個新物品（可堆疊）
+       放進背包，真正的開箱（骰礦石/設計圖階級）延後到玩家
+       在背包裡點開這個物品、按下「開啟」的那一刻才進行。
+    */
+    const CHEST_TIER_WEIGHTS=[
+        {key:"white",label:"白階",weight:40},
+        {key:"blue",label:"藍階",weight:30},
+        {key:"purple",label:"紫階",weight:20},
+        {key:"orange",label:"橙階",weight:10}
+    ];
+
+    const materialChestDefinition={
+        id:"materialChest",
+        name:"材料寶箱",
+        icon:chestIcon(),
+        type:"chest",
+        price:0,
+        stats:{}
+    };
+
+    function syncV17361ItemArt(){
+        if(typeof inventoryItems==="undefined"||!Array.isArray(inventoryItems)){ return; }
+        inventoryItems.forEach(item=>{
+            if(!item||!item.id){ return; }
+            const ore=oreDefinitions.find(def=>def.id===item.id);
+            if(ore){ item.icon=ore.icon; return; }
+            if(item.id===materialChestDefinition.id){ item.icon=materialChestDefinition.icon; }
+        });
+    }
+    window.v17361SyncItemArt=syncV17361ItemArt;
+    syncV17361ItemArt();
+
+    function hydrateOwnedContentPresentation(){
+        hydrateOwnedTicketPresentation();
+        hydrateOwnedStaticContentPresentation();
+        inventoryItems.forEach(item=>{
+            if(item&&item.id===materialChestDefinition.id){
+                syncStaticContentPresentation(item,materialChestDefinition);
+            }
+        });
+    }
+    window.v132HydrateOwnedContentPresentation=hydrateOwnedContentPresentation;
+    hydrateOwnedContentPresentation();
+
+    function pickWeightedTier(){
+        const roll=Math.random()*100;
+        let acc=0;
+        for(const tier of CHEST_TIER_WEIGHTS){
+            acc+=tier.weight;
+            if(roll<acc){ return tier.key; }
+        }
+        return CHEST_TIER_WEIGHTS[CHEST_TIER_WEIGHTS.length-1].key;
+    }
+
+    /* 骰「開1個材料寶箱」會拿到的內容，純計算、不碰背包。 */
+    function rollMaterialChestRewards(){
+        const oreTier=pickWeightedTier();
+        const oreDef=getOreDefinitionByTier(oreTier);
         const oreAmount=oreTier==="orange" ? 5 : 10;
 
         const blueprintTier=pickWeightedTier();
@@ -2894,9 +4711,154 @@ oreTier);
             '<p>獲得高極裝備寶箱 ×1，請選擇1張抽獎券：</p>'+
             '<div class="v132-ticket-choices">'+
             ticketDefinitions.map(def=>
-                '<button type="button" class="v132-ticket-choice" onclick="v132Ctail: error writing 'standard output': Broken pipe
-bwrap: Can't find source path /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-iginalRenderDungeonTabContent.apply(this,arguments);
+                '<button type="button" class="v132-ticket-choice" onclick="v132ClaimEquipmentDungeonReward(\''+def.id+'\',false)">'+
+                '<span class="v132-ticket-icon">'+def.icon+'</span>'+
+                '<span class="v132-ticket-name">'+def.name+'</span>'+
+                '</button>'
+            ).join("")+
+            '</div>'+
+            '<div class="v132-reward-actions">'+
+            '<span class="v132-reward-note">選好之後可再選擇是否看廣告雙倍領取（雙倍＝同款抽獎券×2）</span>'+
+            '<button type="button" class="v132-reward-back" onclick="v132LeaveEquipmentReward()">返回</button>'+
+            '</div></div>';
+        v132ShowRewardModal(html);
+    }
+
+    window.v132LeaveEquipmentReward=function(){
+        v132CloseRewardModal();
+        showPage("dungeon");
+        switchDungeonTab("daily");
+    };
+
+    window.v132ClaimEquipmentDungeonReward=async function(ticketId,doubled){
+        function grant(amount){
+            const definition=getTicketDefinition(ticketId);
+            if(!definition){ return; }
+            if(!addItemToInventory(definition,amount)){
+                rebuildInventorySlots();
+                alert("背包空間不足，抽獎券尚未領取；請先整理背包後再試。");
+                return;
+            }
+            rebuildInventorySlots();
+            markDungeonUsed("equipment");
+            saveGame();
+            v132CloseRewardModal();
+            alert("獲得"+definition.name+"×"+amount+"！");
+            showPage("dungeon");
+            switchDungeonTab("daily");
+        }
+
+        if(doubled){
+            grant(2);
+            return;
+        }
+
+        if(!doubled){
+            const askDouble=
+                typeof window.rpgConfirm==="function" &&
+                await window.rpgConfirm(
+                    "要看廣告雙倍領取這張抽獎券嗎？",
+                    {
+                        title:"裝備副本獎勵",
+                        confirmText:"觀看廣告雙倍",
+                        cancelText:"直接領取"
+                    }
+                );
+            if(askDouble){
+                showRewardedAd(function(){ grant(2); },function(){
+                    alert("廣告未完成，改為直接領取。");
+                    grant(1);
+                });
+                return;
+            }
+        }
+        grant(1);
+    };
+
+
+    /* =====================================================
+       19. 通用獎勵彈窗（簡單覆蓋層，跟遊戲既有深色系一致）
+    ===================================================== */
+
+    function ensureRewardModalElement(){
+        let modal=document.getElementById("v132RewardModal");
+        if(modal){ return modal; }
+        modal=document.createElement("div");
+        modal.id="v132RewardModal";
+        modal.className="v132-reward-modal";
+        document.body.appendChild(modal);
+        return modal;
+    }
+
+    window.v132ShowRewardModal=function(innerHtml){
+        const modal=ensureRewardModalElement();
+        modal.innerHTML=innerHtml;
+        modal.classList.add("show");
+    };
+
+    window.v132CloseRewardModal=function(){
+        const modal=document.getElementById("v132RewardModal");
+        if(modal){ modal.classList.remove("show"); }
+    };
+
+
+    /* =====================================================
+       20. 日常副本頁面內容（接進既有renderDungeonTabContent
+           的「日常副本尚未設計完成」空殼）
+    ===================================================== */
+
+    function dungeonEntryCard(type,title,requirement,rewardPreview,onClick){
+        /* ★ 改用isDungeonUsedToday()，這樣每日次數旗標關閉時，
+           畫面也一定跟著顯示「可挑戰」，不會出現「按鈕是灰的、
+           但其實邏輯允許挑戰」這種自相矛盾的狀態。 */
+        const used=isDungeonUsedToday(type);
+        return (
+            '<div class="v132-dungeon-card">'+
+            '<div class="v132-dungeon-card-title">'+title+
+            (used ? '<span class="v132-dungeon-done">今日已完成</span>' : '')+
+            '</div>'+
+            '<div class="v132-dungeon-card-req">開放條件：'+requirement+'</div>'+
+            '<div class="v132-dungeon-card-reward">獎勵：'+rewardPreview+'</div>'+
+            '<button type="button" class="v132-dungeon-enter-btn" '+
+            (used ? "disabled" : 'onclick="'+onClick+'()"')+
+            '>'+(used ? "今日已挑戰" : "挑戰")+'</button>'+
+            '</div>'
+        );
+    }
+
+    function renderDailyDungeonList(){
+        return (
+            '<div class="v132-dungeon-list">'+
+            dungeonEntryCard(
+                "exp","經驗副本","單一角色達到10級",
+                "全隊升下一級所需總經驗平均值的11%（廣告可雙倍）","v132BeginExpDungeon"
+            )+
+            dungeonEntryCard(
+                "material","材料副本","任一角色達到10級",
+                "材料寶箱×1～3（依通關回合數）","v132BeginMaterialDungeon"
+            )+
+            dungeonEntryCard(
+                "equipment","裝備副本","任一角色達到10級",
+                "高極裝備寶箱×1（自選抽獎券）","v132BeginEquipmentDungeon"
+            )+
+            '<div style="font-size:11px;color:#7a6f5c;margin-top:6px;">'+
+            (DUNGEON_DAILY_LIMIT_ENABLED
+                ? '每個副本每日只能挑戰1次，挑戰失敗不會扣除次數，'+
+                  '領取獎勵之後才會計入今日已完成。'
+                : '⚙️ 測試模式：每日挑戰次數限制目前為關閉狀態，'+
+                  '所有副本都可以無限次重複挑戰。')+
+            '</div>'+
+            '</div>'
+        );
+    }
+
+    if(typeof renderDungeonTabContent==="function"){
+        const originalRenderDungeonTabContent=renderDungeonTabContent;
+        renderDungeonTabContent=function(tabName){
+            if(tabName==="daily"){
+                return renderDailyDungeonList();
+            }
+            return originalRenderDungeonTabContent.apply(this,arguments);
         };
     }
 
@@ -3017,8 +4979,7 @@ iginalRenderDungeonTabContent.apply(this,arguments);
         return Math.max(1,Math.round(average*profile.averageGroupSize));
     }
     function getTargetBattlesForLevel(level){
-        const safe=Math.min(99,Math.max(1,Math.flootail: error writing 'standard output': Broken pipe
-r(Number(level)||1)));
+        const safe=Math.min(99,Math.max(1,Math.floor(Number(level)||1)));
         if(safe<=TARGET_BATTLE_ANCHORS[0].level){ return TARGET_BATTLE_ANCHORS[0].battles; }
         for(let i=1;i<TARGET_BATTLE_ANCHORS.length;i++){
             const right=TARGET_BATTLE_ANCHORS[i];
@@ -3140,9 +5101,7 @@ r(Number(level)||1)));
         growthState.lastAt=0;
         growthState.noticeShown=false;
         growthState.lastCapped=false;
-        gtail: error writing 'standard output': Broken pipe
-tail: error writing 'standard output': Broken pipe
-rowthState.newcomerRewards={};
+        growthState.newcomerRewards={};
         persistGrowthState();
     }
     function showChargeUnlockNotice(){
@@ -3390,8 +5349,7 @@ rowthState.newcomerRewards={};
             scroller.scrollLeft=snapshot.left;
         };
         restore();
-        if(tail: error writing 'standard output': Broken pipe
-typeof requestAnimationFrame==="function"){
+        if(typeof requestAnimationFrame==="function"){
             requestAnimationFrame(function(){
                 restore();
                 requestAnimationFrame(restore);
@@ -3519,8 +5477,7 @@ typeof requestAnimationFrame==="function"){
         window.v141ClaimQuestMilestone=function(type,threshold){
             const before=Math.max(0,Number(sharedExp)||0);
             const result=previous.apply(this,arguments);
-            if(type==="daily"&&Numbtail: error writing 'standard output': Broken pipe
-er(threshold)===100&&Math.max(0,Number(sharedExp)||0)>before&&getHighestCreatedCharacterLevel()>=20){
+            if(type==="daily"&&Number(threshold)===100&&Math.max(0,Number(sharedExp)||0)>before&&getHighestCreatedCharacterLevel()>=20){
                 const bonus=getDailyGrowthRewardBreakdown(getHighestCreatedCharacterLevel()).chestExp;
                 if(bonus>0){
                     sharedExp+=bonus;
@@ -3637,9 +5594,7 @@ er(threshold)===100&&Math.max(0,Number(sharedExp)||0)>before&&getHighestCreatedC
             const averageBattleExp=getTrainingZoneAverageExpForLevel(level);
             const targetBattles=getTargetBattlesForLevel(level);
             const expNext=getExpNextForLevel(level);
-            const ttail: error writing 'standard output': Broken pipe
-tail: error writing 'standard output': Broken pipe
-heoreticalBattles=averageBattleExp>0?expNext/averageBattleExp:0;
+            const theoreticalBattles=averageBattleExp>0?expNext/averageBattleExp:0;
             const differencePercent=targetBattles>0?((theoreticalBattles-targetBattles)/targetBattles)*100:0;
             return {
                 level:level,averageBattleExp:averageBattleExp,targetBattles:targetBattles,expNext:expNext,
@@ -3754,8 +5709,7 @@ heoreticalBattles=averageBattleExp>0?expNext/averageBattleExp:0;
     if(typeof createCharacter==="function"){
         const originalCreateCharacter=createCharacter;
         createCharacter=function(){
-            const result=originalCreateCharactail: error writing 'standard output': Broken pipe
-ter.apply(this,arguments);
+            const result=originalCreateCharacter.apply(this,arguments);
             recalibrateCharacterExpNext(player);
             ensureExpPoolChargeUnlocked(Date.now(),false);
             return result;
@@ -3866,8 +5820,7 @@ ter.apply(this,arguments);
                 const buttonText=!hasPrice?"價格待定":`${displayPrice} 金幣`;
                 return `<div class="shop-potion-card ${shopItem.resource}">
                     <div class="shop-potion-card-head"><span class="shop-potion-type">${resourceLabel}</span><span class="shop-potion-stock">持有 ${count}</span></div>
-                    <div class="shop-potiontail: error writing 'standard output': Broken pipe
--name">${shopItem.name}</div><div class="shop-potion-effect">${effectText}</div>
+                    <div class="shop-potion-name">${shopItem.name}</div><div class="shop-potion-effect">${effectText}</div>
                     <div class="shop-potion-purchase-row"><label for="shopQuantity-${shopItem.id}">數量</label>
                     <input id="shopQuantity-${shopItem.id}" class="shop-potion-quantity" type="number" inputmode="numeric" min="1" max="999" step="1" value="1" oninput="v133NormalizeShopQuantityInput(this)" onblur="v133NormalizeShopQuantityInput(this,{commit:true})">
                     <button class="home-feature-buy-btn shop-potion-buy" ${disabled?"disabled":""} onclick="buyShopItem('${shopItem.id}',document.getElementById('shopQuantity-${shopItem.id}').value)">${buttonText}</button></div></div>`;
@@ -4110,8 +6063,7 @@ ter.apply(this,arguments);
         });
 
         /*
-           ★ 這裡一定要重新指派一次 .value：這幾個 <stail: error writing 'standard output': Broken pipe
-elect> 在開場時
+           ★ 這裡一定要重新指派一次 .value：這幾個 <select> 在開場時
            被 initCustomDropdown()/makeSelectValueReactive() 換成了自訂的
            假下拉（見 js/00-main.js:4326 起），畫面上真正看得到的是那份
            另外渲染的清單，而它只有在 .value 被設定時才會重新渲染。
@@ -4244,8 +6196,7 @@ elect> 在開場時
                 const hpPercent=hp/total*100;
                 const shieldPercent=shield/total*100;
 
-             tail: error writing 'standard output': Broken pipe
-   hpBar.style.width=hpPercent+"%";
+                hpBar.style.width=hpPercent+"%";
                 shieldBar.style.left=hpPercent+"%";
                 shieldBar.style.width=shieldPercent+"%";
             }catch(error){
@@ -4419,10 +6370,323 @@ elect> 在開場時
     }
 
     /*
-       catail: error writing 'standard output': Broken pipe
-bwrap: Can't bind mount /oldroot/workspace/scratch/2feca6ea11c3/.aws on /newroot/workspace/scratch/2feca6ea11c3/.aws: Unable to find "/newroot/workspace/scratch/2feca6ea11c3/.aws" in mount table
-bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-LES){
+       capture 階段先存一次，避免元素匣時數／廣告流程在外層 wrapper 提前
+       return 時，畫面上已選好的技能完全沒有落盤。
+    */
+    document.addEventListener("click",event=>{
+        const target=event.target;
+        const button=target && target.closest
+            ? target.closest("#autoBattleSettingsPanel .auto-save-btn")
+            : null;
+        if(button){
+            saveCurrentActionFromPanel();
+        }
+    },true);
+
+    /*
+       保護兩個舊版選單同步函式：只有在玩家最後明確選的是技能、而且該
+       技能現在仍已裝備且已學會時才恢復。玩家明確選「普通攻擊」或
+       「防禦」時絕不會被擅自改掉。
+    */
+    if(typeof populateAutoSkillOptions==="function"){
+        const originalPopulateAutoSkillOptions=populateAutoSkillOptions;
+        populateAutoSkillOptions=function(){
+            const result=originalPopulateAutoSkillOptions.apply(this,arguments);
+            if(restoreSkillAfterLegacySync(0) && typeof saveGame==="function"){
+                saveGame();
+            }
+            return result;
+        };
+    }
+
+    if(typeof populateAutoSkillOptions2==="function"){
+        const originalPopulateAutoSkillOptions2=populateAutoSkillOptions2;
+        populateAutoSkillOptions2=function(){
+            const result=originalPopulateAutoSkillOptions2.apply(this,arguments);
+            if(restoreSkillAfterLegacySync(1) && typeof saveGame==="function"){
+                saveGame();
+            }
+            return result;
+        };
+    }
+
+    function getAutoDecision(characterIndex){
+        const character=getPartyCharacterByIndex(characterIndex);
+        const config=getPartyAutoConfig(characterIndex);
+        const action=normalizeAction(config && config.skill);
+        const name=(character && character.id)||("角色"+(characterIndex+1));
+
+        if(action==="normal"){
+            return {
+                kind:"normal",
+                action,
+                message:name+"目前的自動行動設定是「普通攻擊」；SP充足不會自動改放技能，請在元素匣選擇要施放的技能。"
+            };
+        }
+
+        if(action==="defend"){
+            return {kind:"defend",action};
+        }
+
+        const skill=skillDatabase[action];
+        if(!skill){
+            return {
+                kind:"fallback",
+                action,
+                message:"找不到「"+action+"」的技能資料，已改用普通攻擊。"
+            };
+        }
+
+        const skillKey=getPartyCharacterKey(characterIndex);
+        const loadout=characterSkillLoadouts[skillKey];
+        if(
+            !loadout ||
+            !Array.isArray(loadout.equippedSkills) ||
+            !loadout.equippedSkills.includes(action)
+        ){
+            return {
+                kind:"fallback",
+                action,
+                message:name+"沒有裝備「"+skill.name+"」，已改用普通攻擊。"
+            };
+        }
+
+        const level=getSkillLevel(skillKey,action);
+        if(level<=0){
+            return {
+                kind:"fallback",
+                action,
+                message:name+"尚未學會「"+skill.name+"」，已改用普通攻擊。"
+            };
+        }
+
+        if(isUnsupportedAutoCategory(skill)){
+            return {
+                kind:"fallback",
+                action,
+                message:"「"+skill.name+"」不是自動戰鬥可施放的攻擊技能，已改用普通攻擊。"
+            };
+        }
+
+        const spCost=getSkillCost(skill);
+        const currentSP=character ? Number(character.sp)||0 : 0;
+        if(currentSP<spCost){
+            return {
+                kind:"fallback",
+                action,
+                message:name+"的SP不足（"+Math.floor(currentSP)+"/"+spCost+
+                    "），無法施放「"+skill.name+"」，已改用普通攻擊。"
+            };
+        }
+
+        return {kind:"skill",action,skill,spCost};
+    }
+
+    function addNoticeOnce(characterIndex,key,message){
+        if(lastNoticeByCharacter[characterIndex]===key){ return; }
+        lastNoticeByCharacter[characterIndex]=key;
+        addBattleLog("⚠️ "+message);
+    }
+
+    function getPriorityAutoTarget(){
+        const indexes=typeof currentBattleMonsters!=="undefined"&&Array.isArray(currentBattleMonsters)
+            ?currentBattleMonsters:[];
+        const priority=typeof window.v148GetAutoTargetPriority==="function"
+            ?window.v148GetAutoTargetPriority(indexes):indexes.slice();
+        return priority.find(index=>{
+            const monster=typeof monsters!=="undefined"?monsters[index]:null;
+            return !!(monster&&monster.alive!==false&&(Number(monster.hp)||0)>0);
+        });
+    }
+
+    function queuedActionTargetsEnemy(queued){
+        if(!queued){ return false; }
+        if(queued.action==="normal"){ return true; }
+        const skill=typeof skillDatabase!=="undefined"?skillDatabase[queued.action]:null;
+        return !!(skill&&(skill.category==="physical"||skill.category==="magic")&&skill.targetType!=="none");
+    }
+
+    function enforceAutoTargetPriority(queued){
+        if(!queuedActionTargetsEnemy(queued)){ return; }
+        queued.vFixedAutoEnemyPrimary=true;
+        const previewTarget=getPriorityAutoTarget();
+        if(Number.isInteger(previewTarget)){ queued.target=previewTarget; }
+    }
+
+    /*
+       最後一道保護：原引擎跑完後直接檢查實際 queued action。如果所有
+       合法條件都通過、卻仍被排成 normal，就把該筆佇列校正回玩家選的
+       技能。這一層只處理「已裝備、已學會、類型正確、SP足夠」的技能，
+       不會繞過任何合法限制。
+    */
+    if(typeof autoActionForCharacter==="function"){
+        const originalAutoActionForCharacter=autoActionForCharacter;
+
+        autoActionForCharacter=function(characterIndex,token){
+            if(
+                restoreSkillAfterLegacySync(characterIndex) &&
+                typeof saveGame==="function"
+            ){
+                saveGame();
+            }
+            const decision=getAutoDecision(characterIndex);
+            const result=originalAutoActionForCharacter.apply(this,arguments);
+
+            try{
+                const character=getPartyCharacterByIndex(characterIndex);
+                const config=getPartyAutoConfig(characterIndex);
+                const autoOn=characterIndex===0 ? autoBattle : config.enabled;
+
+                if(
+                    !battleActive ||
+                    !character ||
+                    character.hp<=0 ||
+                    !autoOn ||
+                    token!==battleToken
+                ){
+                    return result;
+                }
+
+                const queued=queuedPlayerActions[characterIndex];
+
+                if(decision.kind==="skill"){
+                    if(queued && queued.action==="normal"){
+                        queued.action=decision.action;
+                        addNoticeOnce(
+                            characterIndex,
+                            "corrected:"+decision.action,
+                            "偵測到「"+decision.skill.name+"」被錯誤排成普通攻擊，已自動校正並施放技能。"
+                        );
+                    }
+                    else if(queued && queued.action===decision.action){
+                        lastNoticeByCharacter[characterIndex]=null;
+                    }
+                }
+                else if(decision.kind==="fallback" && queued){
+                    /* 舊引擎沒有檢查「技能仍在裝備欄」；設定殘留時甚至可能
+                       反過來施放未裝備技能。V136 在同一個決策點一起收口。 */
+                    queued.action="normal";
+                    addNoticeOnce(
+                        characterIndex,
+                        "fallback:"+decision.action+":"+decision.message,
+                        decision.message
+                    );
+                }
+                else if(decision.kind==="normal" && queued && queued.action==="normal"){
+                    addNoticeOnce(
+                        characterIndex,
+                        "explicit-normal",
+                        decision.message
+                    );
+                }
+
+                /* Offensive auto actions share one stable position priority.
+                   They keep attacking target #1 while it lives, then advance
+                   #2 → #3 → #4 → #5 only after the earlier position dies. */
+                enforceAutoTargetPriority(queued);
+            }
+            catch(error){
+                console.error("V136 自動戰鬥校正失敗：",error);
+            }
+
+            return result;
+        };
+    }
+
+    /* 提供給瀏覽器測試／之後除錯，直接讀到引擎同一份判斷結果。 */
+    window.v136GetAutoBattleDecision=getAutoDecision;
+    window.v136GetPriorityAutoTarget=getPriorityAutoTarget;
+})();
+
+
+/* bundled source: js/32-v139-rested-experience.js */
+/*
+   V139 — 休息經驗
+
+   - 離線／切到背景每2分鐘累積1場，最多300場。
+   - 一般練功勝利消耗1場，該場EXP變成2倍。
+   - 元素匣啟用期間不累積；元素匣與副本也不使用、不消耗。
+   - 狀態存於獨立localStorage key，不改既有主存檔結構。
+*/
+(function installV139RestedExperience(){
+    "use strict";
+
+    const RESTED_EXP_STORAGE_KEY=window.FourSymbolsAccountSave.accountKey("rested-exp-state");
+    const RESTED_EXP_MAX_BATTLES=300;
+    const RESTED_EXP_MINUTES_PER_BATTLE=2;
+    const RESTED_EXP_MS_PER_BATTLE=RESTED_EXP_MINUTES_PER_BATTLE*60*1000;
+    const RESTED_EXP_HEARTBEAT_MS=30*1000;
+
+    function emptyRestedState(now){
+        return {
+            battles:0,
+            progressMs:0,
+            lastSeenAt:now,
+            blockedByElementBox:false
+        };
+    }
+
+    function hasCreatedCharacter(){
+        return typeof player!=="undefined" && !!(player && player.id);
+    }
+
+    function sanitizeRestedState(raw,now){
+        const source=raw && typeof raw==="object" ? raw : {};
+        return {
+            battles:Math.min(
+                RESTED_EXP_MAX_BATTLES,
+                Math.max(0,Math.floor(Number(source.battles)||0))
+            ),
+            progressMs:Math.max(
+                0,
+                Math.min(
+                    RESTED_EXP_MS_PER_BATTLE-1,
+                    Math.floor(Number(source.progressMs)||0)
+                )
+            ),
+            lastSeenAt:Number.isFinite(Number(source.lastSeenAt))
+                ? Math.min(now,Number(source.lastSeenAt))
+                : now,
+            blockedByElementBox:source.blockedByElementBox===true
+        };
+    }
+
+    function readRestedState(now){
+        if(!hasCreatedCharacter()){
+            try{ localStorage.removeItem(RESTED_EXP_STORAGE_KEY); }catch(_){ }
+            return emptyRestedState(now);
+        }
+        try{
+            const raw=JSON.parse(localStorage.getItem(RESTED_EXP_STORAGE_KEY)||"null");
+            return sanitizeRestedState(raw,now);
+        }catch(_){
+            return emptyRestedState(now);
+        }
+    }
+
+    let restedState=readRestedState(Date.now());
+
+    function persistRestedState(){
+        if(!hasCreatedCharacter()){
+            try{ localStorage.removeItem(RESTED_EXP_STORAGE_KEY); }catch(_){ }
+            return;
+        }
+        try{
+            localStorage.setItem(
+                RESTED_EXP_STORAGE_KEY,
+                JSON.stringify({
+                    battles:restedState.battles,
+                    progressMs:restedState.progressMs,
+                    lastSeenAt:restedState.lastSeenAt,
+                    blockedByElementBox:restedState.blockedByElementBox
+                })
+            );
+        }catch(_){ }
+    }
+
+    function accrueRestedMilliseconds(elapsedMs){
+        const safeElapsed=Math.max(0,Math.floor(Number(elapsedMs)||0));
+        if(safeElapsed<=0 || restedState.battles>=RESTED_EXP_MAX_BATTLES){
             if(restedState.battles>=RESTED_EXP_MAX_BATTLES){
                 restedState.progressMs=0;
             }
@@ -4591,10 +6855,157 @@ LES){
 
    以 2026-08-27 玩家提供的完整四元素技能表為準：
    1. 校正四元素技能數值與說明
-   2. 物理／法術技能的異常命中屬性來�tail: error writing 'standard output': Broken pipe
-bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-tail: error writing 'standard output': Broken pipe
-nt){
+   2. 物理／法術技能的異常命中屬性來源
+   3. 水系七招吸血只回復 HP
+   4. 怒火的爆擊率與爆擊傷害分開計算
+   5. 治療術只會為其他友方目標回復 SP，不補施放者本人 SP
+   6. 技能「結界」只擋 5 次直接傷害、最多 5 回合，DOT 穿透
+   7. 最終命中率下限 60% → 50%
+
+   不重構其他戰鬥系統，不改玩家能力、存檔結構，
+   符咒與對應技能共用同一套效果規則。
+===================================================== */
+(function applyV140FourElementBalance(){
+    "use strict";
+
+    const LIFESTEAL_BY_SKILL={
+        waterKnife:[4,5,6,7,8],
+        frostPunch:[4,5,6,7,8],
+        iceSpin:[3,4,5,6,7],
+        frostCrush:[4,5,6,7,8],
+        waterBall:[3,4,5,6,7],
+        floodBeast:[4,5,6,7,8],
+        iceArrowRain:[1,2,3,4,5]
+    };
+
+    function numeric(value){
+        const result=Number(value);
+        return Number.isFinite(result)?result:0;
+    }
+
+    function clamp(value,min,max){
+        return Math.max(min,Math.min(max,value));
+    }
+
+    function setDamageSkill(skillId,baseDamage,damagePerLevel,description){
+        /* Retired data writer. V173.64 owns player skill values. */
+        void skillId; void baseDamage; void damagePerLevel; void description;
+    }
+
+    function setLifestealSkill(skillId,values,description){
+        /* Retired data writer. Runtime lifesteal reads the formal spec. */
+        void skillId; void values; void description;
+    }
+
+    function setSkillFields(skillId,fields){
+        /* Retired data writer. Keep call sites as migration documentation. */
+        void skillId; void fields;
+    }
+
+    setDamageSkill(
+        "fireRocket",
+        17,
+        8,
+        "對同一橫排左、中、右最多3名目標各造成17點基礎法術傷害，最高5級，每升1級傷害+8。"
+    );
+
+    setSkillFields("flameTornado",{
+        burnPercentByLevel:[3,4,5,6,8],
+        description:"對任一橫排目標各造成40點基礎法術傷害；30%基礎機率燃燒2回合，每回合造成目標最大HP的3%/4%/5%/6%/8%傷害。"
+    });
+
+    setSkillFields("phoenixCry",{
+        burnPercentByLevel:[5,7,9,11,13],
+        description:"對敵方全體各造成53點基礎法術傷害；50%基礎機率燃燒2回合，每回合造成目標最大HP的5%/7%/9%/11%/13%傷害。"
+    });
+
+    setSkillFields("rage",{
+        /* 舊引擎仍讀 critBonusByLevel，讓它代表爆擊率以保留相容。 */
+        critBonusByLevel:[5,10,15,20,25],
+        critChanceBonusByLevel:[5,10,15,20,25],
+        critDamageBonusByLevel:[10,20,30,40,50],
+        description:"提高我方最多3名存活角色的爆擊率5%/10%/15%/20%/25%與爆擊傷害10%/20%/30%/40%/50%，持續2回合。"
+    });
+
+    setSkillFields("stormFist",{
+        agilityDownByLevel:[30,40,50,60,70],
+        description:"對單體造成14點基礎傷害；50%基礎機率降低敏捷1回合，降低30%/40%/50%/60%/70%。"
+    });
+
+    setSkillFields("healSpell",{
+        description:"擇一友方目標，恢復HP與SP。HP基礎40、SP基礎15，兩者每升1級基礎恢復量+5；保留既有智力與水元素EX回復加成，施放者本人不回復SP。"
+    });
+
+    setSkillFields("barrier",{
+        spCost:40,
+        duration:5,
+        barrierBlockCount:5,
+        description:"使我方單一目標獲得結界，完全抵擋接下來5次直接傷害，最多存在5回合；燃燒、毒等持續傷害不會被抵擋，也不消耗次數。"
+    });
+
+    setDamageSkill(
+        "frostPunch",
+        30,
+        8,
+        "對單體造成30點基礎傷害；吸取實際造成傷害的4%/5%/6%/7%/8%，只恢復自身HP。"
+    );
+
+    setDamageSkill(
+        "stoneBreakSky",
+        65,
+        9,
+        "對單體造成65點基礎傷害；為我方全體增加100/125/150/175/200點護盾，持續2回合。"
+    );
+
+    setLifestealSkill(
+        "waterKnife",
+        LIFESTEAL_BY_SKILL.waterKnife,
+        "對單體造成13點基礎傷害；吸取實際造成傷害的4%/5%/6%/7%/8%，只恢復自身HP。"
+    );
+    setLifestealSkill(
+        "frostPunch",
+        LIFESTEAL_BY_SKILL.frostPunch,
+        "對單體造成30點基礎傷害；吸取實際造成傷害的4%/5%/6%/7%/8%，只恢復自身HP。"
+    );
+    setLifestealSkill(
+        "iceSpin",
+        LIFESTEAL_BY_SKILL.iceSpin,
+        "對同一橫排左、中、右最多3名目標各造成25點基礎傷害；吸取實際造成傷害的3%/4%/5%/6%/7%，只恢復自身HP。"
+    );
+    setLifestealSkill(
+        "frostCrush",
+        LIFESTEAL_BY_SKILL.frostCrush,
+        "對單體造成100點基礎傷害；45%機率冰封1回合；吸取實際造成傷害的4%/5%/6%/7%/8%，只恢復自身HP。"
+    );
+    setLifestealSkill(
+        "waterBall",
+        LIFESTEAL_BY_SKILL.waterBall,
+        "對同一橫排左、中、右最多3名目標各造成17點基礎法術傷害；吸取實際造成傷害的3%/4%/5%/6%/7%，只恢復自身HP。"
+    );
+    setLifestealSkill(
+        "floodBeast",
+        LIFESTEAL_BY_SKILL.floodBeast,
+        "對單體造成35點基礎法術傷害；吸取實際造成傷害的4%/5%/6%/7%/8%，只恢復自身HP。"
+    );
+    setLifestealSkill(
+        "iceArrowRain",
+        LIFESTEAL_BY_SKILL.iceArrowRain,
+        "對敵方全體各造成30點基礎法術傷害；吸取實際造成傷害的1%/2%/3%/4%/5%，只恢復自身HP；並有50%基礎機率使隨機單一目標冰封2回合。"
+    );
+
+    /*
+       命中／異常機率公式已收斂回 js/00-main.js 唯一 Owner。
+       V140 只保留四元素資料與歷史相容行為，不再覆寫
+       calculateStatusEffectChance() 或 rollHitChance()。
+    */
+
+    /*
+       怒火改為兩組獨立數值。舊函式一次只讀 bonusPercent，
+       因此先以爆擊率加成讓舊函式完成擲骰，命中爆擊後
+       再只補上爆傷差額；其他自然爆擊、火EX與抗暴公式不變。
+    */
+    const previousRollCritical=rollCritical;
+    rollCritical=function(character,category,targetAntiCritPercent){
         const rageBuff=(character&&character.activeBuffs||[])
             .find(buff=>buff&&buff.type==="rage");
 
@@ -4917,9 +7328,174 @@ nt){
     function runPlayerSkillWithV140Context(skill,caster,stats,execute){
         if(!skill||!caster||!stats){
             return execute();
-      tail: error writing 'standard output': Broken pipe
-bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-    return previousLog.apply(this,args);
+        }
+
+        const context={
+            skill:skill,
+            physicalAttack:numeric(stats.attack),
+            intelligence:numeric(stats.intelligence),
+            spAfterCost:null
+        };
+
+        const isLifesteal=Array.isArray(skill.lifestealPercentByLevel);
+        const previousLog=typeof addBattleLog==="function"?addBattleLog:null;
+        const previousBadge=typeof showSkillNameBadge==="function"?showSkillNameBadge:null;
+
+        if(isLifesteal&&previousLog){
+            addBattleLog=function(message){
+                const args=Array.prototype.slice.call(arguments);
+                args[0]=hpOnlyBattleLogText(message);
+                return previousLog.apply(this,args);
+            };
+        }
+
+        if(isLifesteal&&previousBadge){
+            showSkillNameBadge=function(){
+                if(context.spAfterCost===null){
+                    context.spAfterCost=numeric(caster.sp);
+                }
+                return previousBadge.apply(this,arguments);
+            };
+        }
+
+        let result;
+        try{
+            result=execute();
+        }finally{
+            if(isLifesteal&&previousBadge){
+                showSkillNameBadge=previousBadge;
+            }
+            if(isLifesteal&&previousLog){
+                addBattleLog=previousLog;
+            }
+            if(
+                isLifesteal&&
+                context.spAfterCost!==null&&
+                numeric(caster.sp)>context.spAfterCost
+            ){
+                caster.sp=context.spAfterCost;
+                refreshUIAfterSpCorrection();
+            }
+        }
+        return result;
+    }
+
+    const previousCastDamageSkill=castDamageSkill;
+    castDamageSkill=function(skillId){
+        const skill=skillDatabase[skillId];
+        const stats=typeof getMainCharacterStats==="function"
+            ? getMainCharacterStats()
+            : null;
+        return runPlayerSkillWithV140Context(
+            skill,
+            typeof player!=="undefined"?player:null,
+            stats,
+            ()=>previousCastDamageSkill.apply(this,arguments)
+        );
+    };
+
+    const previousCastSecondaryCharacterSkill=castSecondaryCharacterSkill;
+    castSecondaryCharacterSkill=function(characterIndex,skillId){
+        const skill=skillDatabase[skillId];
+        const character=typeof getPartyCharacterByIndex==="function"
+            ? getPartyCharacterByIndex(characterIndex)
+            : null;
+        const stats=typeof getPartyBattleStats==="function"
+            ? getPartyBattleStats(characterIndex)
+            : null;
+        return runPlayerSkillWithV140Context(
+            skill,
+            character,
+            stats,
+            ()=>previousCastSecondaryCharacterSkill.apply(this,arguments)
+        );
+    };
+
+    const previousCastPlayer2Skill=castPlayer2Skill;
+    castPlayer2Skill=function(skillId){
+        const skill=skillDatabase[skillId];
+        const stats=typeof getPlayer2BattleStats==="function"
+            ? getPlayer2BattleStats()
+            : null;
+        return runPlayerSkillWithV140Context(
+            skill,
+            typeof player2!=="undefined"?player2:null,
+            stats,
+            ()=>previousCastPlayer2Skill.apply(this,arguments)
+        );
+    };
+
+    function getMonsterPhysicalAttack(monster){
+        if(!monster){ return 0; }
+        const reduction=typeof getStatDownPercentFor==="function"
+            ? numeric(getStatDownPercentFor(monster,"attack"))
+            : 0;
+        return Math.max(0,numeric(monster.attack)*(1-reduction/100));
+    }
+
+    function getMonsterIntelligence(monster){
+        if(!monster){ return 0; }
+        if(typeof getMonsterEffectiveAbilityPoints==="function"){
+            return numeric(getMonsterEffectiveAbilityPoints(monster,"intelligence"));
+        }
+        return numeric(monster.intelligencePoints);
+    }
+
+    function findSkillByName(name){
+        return Object.keys(skillDatabase)
+            .map(id=>skillDatabase[id])
+            .find(skill=>skill&&skill.name===name)||null;
+    }
+
+    /* DoT protection is now part of the canonical Barrier rule; V140 no
+       longer bypasses it with a temporary hasActiveBuff override. */
+
+    const previousProcessSingleMonsterAttack=processSingleMonsterAttack;
+    processSingleMonsterAttack=function(monsterIndex){
+        const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
+        if(!monster){
+            return previousProcessSingleMonsterAttack.apply(this,arguments);
+        }
+
+        const previousBarrierContext=directBarrierCastContext;
+        directBarrierCastContext={blockedCharacters:new Set()};
+        const context={
+            skill:null,
+            physicalAttack:getMonsterPhysicalAttack(monster),
+            intelligence:getMonsterIntelligence(monster),
+            spAfterCost:null
+        };
+
+        const previousBadge=typeof showMonsterSkillNameBadge==="function"
+            ? showMonsterSkillNameBadge
+            : null;
+        const previousLog=typeof addBattleLog==="function"?addBattleLog:null;
+        const previousHasActiveBuff=hasActiveBuff;
+
+        hasActiveBuff=function(character,buffType){
+            if(buffType==="barrier"&&consumeV140DirectBarrier(character)){
+                return true;
+            }
+            return previousHasActiveBuff.apply(this,arguments);
+        };
+
+        if(previousBadge){
+            showMonsterSkillNameBadge=function(skillName){
+                context.skill=findSkillByName(skillName);
+                if(context.skill&&context.skill.lifestealPercentByLevel){
+                    context.spAfterCost=numeric(monster.sp);
+                }
+                return previousBadge.apply(this,arguments);
+            };
+        }
+
+        if(previousLog){
+            addBattleLog=function(message){
+                const args=Array.prototype.slice.call(arguments);
+                if(context.skill&&context.skill.lifestealPercentByLevel){
+                    args[0]=hpOnlyBattleLogText(message);
+                }
+                return previousLog.apply(this,args);
             };
         }
 
@@ -5068,9 +7644,7 @@ bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such fi
 /* bundled source: js/34-v141-core-systems.js */
 /*
    V141 — core systems
-   - explicit monster rank + 10% wild elite preparation tail: error writing 'standard output': Broken pipe
-tail: error writing 'standard output': Broken pipe
-hooks
+   - explicit monster rank + 10% wild elite preparation hooks
    - monster carried-skill count/level rules
    - elite-only single-roll drop table
    - functional monster shields and support AI hook
@@ -5202,9 +7776,273 @@ hooks
     /* =====================================================
        Monster carried skills
     ===================================================== */
-    bwrap: Can't find source path /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-bwrap: Can't find source path /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-,volume:.26}); tone(92,.34,{to:35,wave:"square",volume:.18}); break;
+    function getMonsterSkillCarryLimit(level){
+        const lv=Math.max(1,Math.floor(Number(level)||1));
+        if(lv<=20){ return 1; }
+        if(lv<=40){ return 2; }
+        return 3;
+    }
+
+    function getMonsterFixedSkillLevel(level){
+        const lv=Math.max(1,Math.floor(Number(level)||1));
+        if(lv<=20){ return 1; }
+        if(lv<=40){ return 2; }
+        if(lv<=60){ return 3; }
+        if(lv<=80){ return 4; }
+        return 5;
+    }
+
+    function shuffledCopy(values){
+        const list=(values||[]).slice();
+        for(let i=list.length-1;i>0;i--){
+            const j=Math.floor(Math.random()*(i+1));
+            [list[i],list[j]]=[list[j],list[i]];
+        }
+        return list;
+    }
+
+    function configureMonsterSkills(monster,options){
+        if(!monster || monster.v141Abyss){ return monster; }
+        const settings=options||{};
+        const source=Array.isArray(settings.pool)
+            ? settings.pool
+            : Array.isArray(monster.skillIds)
+            ? monster.skillIds
+            : [];
+        const eligible=[...new Set(source)].filter(id=>{
+            const skill=typeof skillDatabase!=="undefined" ? skillDatabase[id] : null;
+            return !!(
+                skill &&
+                (skill.category==="physical" || skill.category==="magic") &&
+                (typeof window.v144IsMonsterSkillElementLegal==="function"
+                    ?window.v144IsMonsterSkillElementLegal(monster,id)
+                    :!!skill.element&&skill.element===monster.element)
+            );
+        });
+        const limit=getMonsterSkillCarryLimit(monster.level);
+        monster.skillIds=(settings.keepOrder ? eligible : shuffledCopy(eligible)).slice(0,limit);
+        monster.v141SkillLevel=getMonsterFixedSkillLevel(monster.level);
+        return monster;
+    }
+
+    window.v141GetMonsterSkillCarryLimit=getMonsterSkillCarryLimit;
+    window.v141GetMonsterFixedSkillLevel=getMonsterFixedSkillLevel;
+    window.v141ConfigureMonsterSkills=configureMonsterSkills;
+
+    if(typeof makeZoneMonster==="function"){
+        const originalMakeZoneMonster=makeZoneMonster;
+        makeZoneMonster=function(){
+            const monster=originalMakeZoneMonster.apply(this,arguments);
+            if(monster && !monster.rank){ monster.rank="regular"; }
+            return configureMonsterSkills(monster);
+        };
+    }
+
+    addWindAndEarthWildMonsters();
+    getWildZoneSpecs().forEach(([zone])=>zone.forEach(configureMonsterSkills));
+
+    /* V133早於本層載入；加入風／土怪與10%精英期望值後，立即用最終
+       地圖資料重算目前等級需求。既有等級、已累積EXP與其他存檔不動。 */
+    if(typeof window.v133GetExpNextForLevel==="function"){
+        getExistingPartyIndexes().forEach(index=>{
+            const character=getPartyCharacterByIndex(index);
+            if(character&&character.level<100){
+                character.expNext=window.v133GetExpNextForLevel(character.level);
+            }
+        });
+    }
+
+    window.v141RollWildMonsterRanks=function(indexes){
+        (indexes||[]).forEach(index=>{
+            const monster=typeof monsters!=="undefined" ? monsters[index] : null;
+            if(!monster){ return; }
+            monster.rank="regular";
+            monster.v141BattleRank=Math.random()<WILD_ELITE_RATE ? "elite" : "regular";
+            configureMonsterSkills(monster);
+        });
+    };
+
+    /* =====================================================
+       Functional monster shield
+    ===================================================== */
+    function getMonsterShieldRemaining(monster){
+        const shield=monster&&monster.v141Shield;
+        return shield ? Math.max(0,Math.floor(Number(shield.remaining)||0)) : 0;
+    }
+
+    function removeMonsterShield(monster){
+        const shield=monster&&monster.v141Shield;
+        if(!shield){ return; }
+        const remaining=getMonsterShieldRemaining(monster);
+        const baseHp=Math.max(0,(Number(monster.hp)||0)-remaining);
+        monster.maxHP=Math.max(1,Number(shield.baseMaxHP)||1);
+        monster.hp=Math.min(monster.maxHP,baseHp);
+        monster.v141Shield=null;
+        monster.activeBuffs=(monster.activeBuffs||[]).filter(buff=>buff!==shield&&buff.type!=="shield");
+    }
+
+    function syncMonsterShield(monster){
+        const shield=monster&&monster.v141Shield;
+        if(!shield){ return 0; }
+        shield.remaining=Math.max(
+            0,
+            Math.min(
+                Number(shield.amount)||0,
+                (Number(monster.hp)||0)-(Number(shield.baseHp)||0)
+            )
+        );
+        if(shield.remaining<=0){
+            const currentHp=Math.max(0,Number(monster.hp)||0);
+            monster.maxHP=Math.max(1,Number(shield.baseMaxHP)||1);
+            monster.hp=Math.min(monster.maxHP,currentHp);
+            monster.v141Shield=null;
+            monster.activeBuffs=(monster.activeBuffs||[]).filter(buff=>buff!==shield&&buff.type!=="shield");
+            return 0;
+        }
+        return shield.remaining;
+    }
+
+    function applyMonsterShield(monster,amount,turns){
+        if(!monster || !monster.alive){ return 0; }
+        if(monster.v141Shield){ removeMonsterShield(monster); }
+        const safeAmount=Math.max(1,Math.floor(Number(amount)||1));
+        const shield={
+            type:"shield",
+            amount:safeAmount,
+            remaining:safeAmount,
+            turnsLeft:Math.max(1,Math.floor(Number(turns)||2)),
+            baseMaxHP:Math.max(1,Number(monster.maxHP)||1),
+            baseHp:Math.max(0,Number(monster.hp)||0),
+            v141MonsterShield:true
+        };
+        monster.maxHP=shield.baseMaxHP+safeAmount;
+        monster.hp=shield.baseHp+safeAmount;
+        monster.v141Shield=shield;
+        monster.activeBuffs=(monster.activeBuffs||[]).filter(buff=>buff.type!=="shield");
+        monster.activeBuffs.push(shield);
+        return safeAmount;
+    }
+
+    function healMonsterPreservingShield(monster,amount){
+        if(!monster || !monster.alive){ return 0; }
+        const shieldRemaining=syncMonsterShield(monster);
+        const shield=monster.v141Shield;
+        const baseMax=shield ? shield.baseMaxHP : monster.maxHP;
+        const baseHp=shield
+            ? Math.max(0,monster.hp-shieldRemaining)
+            : Math.max(0,monster.hp);
+        const healed=Math.max(0,Math.min(Math.floor(Number(amount)||0),baseMax-baseHp));
+        monster.hp=baseHp+healed+shieldRemaining;
+        if(shield){ shield.baseHp=baseHp+healed; }
+        return healed;
+    }
+
+    window.v141GetMonsterShieldRemaining=getMonsterShieldRemaining;
+    window.v141SyncMonsterShield=syncMonsterShield;
+    window.v141ApplyMonsterShield=applyMonsterShield;
+    window.v141HealMonsterPreservingShield=healMonsterPreservingShield;
+
+    if(typeof skillDatabase!=="undefined"){
+        if(!skillDatabase.yuanXiangGuangMing){
+            skillDatabase.yuanXiangGuangMing={
+                id:"yuanXiangGuangMing",name:"元相光明",element:"light",
+                category:"heal",targetType:"allyAll",maxLevel:5,spCost:35,baseHeal:350,
+                description:"我方全體回復350 HP。"
+            };
+        }
+        if(!skillDatabase.yuanGuangShield){
+            skillDatabase.yuanGuangShield={
+                id:"yuanGuangShield",name:"元光護體",element:"light",
+                category:"buff",targetType:"allyAll",maxLevel:5,spCost:40,
+                shieldAmount:200,shieldDuration:2,
+                description:"我方全體獲得200護盾，持續2回合。"
+            };
+        }
+    }
+
+    let lastMonsterSkillByIndex=new Map();
+    const COMBAT_FEEDBACK_VOLUME_SCALE=2;
+
+    /* =====================================================
+       Procedural audio
+    ===================================================== */
+    const audioEngine=(function(){
+        let context=null;
+        let master=null;
+        const SKILL_VOLUME_SCALE=2;
+        const COMBAT_FEEDBACK_VOLUME_SCALE=2;
+        let playbackGainScale=1;
+
+        function ensure(){
+            if(context){
+                if(context.state==="suspended"){ context.resume().catch(()=>{}); }
+                return context;
+            }
+            const AudioContextCtor=window.AudioContext||window.webkitAudioContext;
+            if(!AudioContextCtor){ return null; }
+            context=new AudioContextCtor();
+            master=context.createGain();
+            master.gain.value=0.30;
+            master.connect(context.destination);
+            return context;
+        }
+
+        function tone(frequency,duration,options){
+            const ctx=ensure();
+            if(!ctx || !master){ return; }
+            const opts=options||{};
+            const now=ctx.currentTime+(Number(opts.delay)||0);
+            const osc=ctx.createOscillator();
+            const gain=ctx.createGain();
+            osc.type=opts.wave||"sine";
+            osc.frequency.setValueAtTime(Math.max(20,frequency),now);
+            if(opts.to){ osc.frequency.exponentialRampToValueAtTime(Math.max(20,opts.to),now+duration); }
+            gain.gain.setValueAtTime(0.0001,now);
+            gain.gain.exponentialRampToValueAtTime(Math.max(0.001,(Number(opts.volume)||0.16)*playbackGainScale),now+0.012);
+            gain.gain.exponentialRampToValueAtTime(0.0001,now+duration);
+            osc.connect(gain); gain.connect(master);
+            osc.start(now); osc.stop(now+duration+0.02);
+        }
+
+        function noise(duration,options){
+            const ctx=ensure();
+            if(!ctx || !master){ return; }
+            const opts=options||{};
+            const length=Math.max(1,Math.floor(ctx.sampleRate*duration));
+            const buffer=ctx.createBuffer(1,length,ctx.sampleRate);
+            const data=buffer.getChannelData(0);
+            for(let i=0;i<length;i++){
+                const envelope=1-i/length;
+                data[i]=(Math.random()*2-1)*envelope;
+            }
+            const source=ctx.createBufferSource();
+            const filter=ctx.createBiquadFilter();
+            const gain=ctx.createGain();
+            filter.type=opts.filter||"bandpass";
+            filter.frequency.value=Number(opts.frequency)||900;
+            filter.Q.value=Number(opts.q)||0.8;
+            gain.gain.value=(Number(opts.volume)||0.14)*playbackGainScale;
+            source.buffer=buffer;
+            source.connect(filter); filter.connect(gain); gain.connect(master);
+            source.start(ctx.currentTime+(Number(opts.delay)||0));
+        }
+
+        function play(kind,volumeScale){
+            const previousScale=playbackGainScale;
+            const requestedScale=Number(volumeScale);
+            playbackGainScale=Number.isFinite(requestedScale)&&requestedScale>0?requestedScale:1;
+            try{
+                switch(kind){
+                    case "swing": noise(.14,{frequency:1200,volume:.15}); tone(520,.13,{to:180,wave:"sawtooth",volume:.07}); break;
+                    case "hit": noise(.12,{frequency:260,volume:.22}); tone(110,.14,{to:55,wave:"triangle",volume:.18}); break;
+                    case "damage": noise(.15,{frequency:340,volume:.2}); tone(145,.18,{to:62,wave:"triangle",volume:.14}); break;
+                    case "heavy": noise(.28,{frequency:170,volume:.25}); tone(85,.32,{to:38,wave:"sine",volume:.25}); break;
+                    case "crit": tone(780,.12,{to:1560,wave:"square",volume:.12}); noise(.22,{frequency:1800,volume:.22,delay:.05}); break;
+                    case "block": tone(920,.11,{to:390,wave:"square",volume:.1}); noise(.13,{frequency:1900,volume:.13}); break;
+                    case "dodge": noise(.2,{filter:"highpass",frequency:2200,volume:.1}); tone(1050,.15,{to:520,wave:"sine",volume:.05}); break;
+                    case "magic": tone(240,.34,{to:920,wave:"sine",volume:.12}); tone(480,.28,{to:1280,wave:"triangle",volume:.08,delay:.04}); break;
+                    case "charge": tone(95,.55,{to:620,wave:"sawtooth",volume:.08}); break;
+                    case "explosion": noise(.38,{filter:"lowpass",frequency:480,volume:.26}); tone(92,.34,{to:35,wave:"square",volume:.18}); break;
                     case "fire": noise(.42,{frequency:620,volume:.18}); tone(120,.36,{to:45,wave:"sawtooth",volume:.12,delay:.06}); break;
                     case "ice": tone(1480,.25,{to:420,wave:"triangle",volume:.12}); noise(.25,{frequency:2300,volume:.16,delay:.06}); break;
                     case "water": noise(.48,{filter:"lowpass",frequency:1100,volume:.13}); tone(330,.42,{to:190,wave:"sine",volume:.09}); break;
@@ -5301,9 +8139,7 @@ bwrap: Can't find source path /workspace/scratch/2feca6ea11c3/.aws: No such file
         const originalShowMonsterHit=showMonsterHit;
         showMonsterHit=function(index,amount,type,isCrit){
             if(type==="hp"&&Number(amount)>0){ audioEngine.play(isCrit?"crit":"damage",COMBAT_FEEDBACK_VOLUME_SCALE); }
-            returntail: error writing 'standard output': Broken pipe
-tail: error writing 'standard output': Broken pipe
- originalShowMonsterHit.apply(this,arguments);
+            return originalShowMonsterHit.apply(this,arguments);
         };
     }
 
@@ -5535,8 +8371,7 @@ tail: error writing 'standard output': Broken pipe
         const originalEnsureDailyQuestsCurrent=ensureDailyQuestsCurrent;
         ensureDailyQuestsCurrent=function(){
             const result=originalEnsureDailyQuestsCurrent.apply(this,arguments);
-            dailyQuestDefinitions.forEatail: error writing 'standard output': Broken pipe
-ch(quest=>{
+            dailyQuestDefinitions.forEach(quest=>{
                 if(!Object.prototype.hasOwnProperty.call(dailyQuestState.progress,quest.id)){ dailyQuestState.progress[quest.id]=0; }
                 if(!Object.prototype.hasOwnProperty.call(dailyQuestState.claimed,quest.id)){ dailyQuestState.claimed[quest.id]=false; }
             });
@@ -5658,9 +8493,7 @@ ch(quest=>{
     const TASK_TRACKER_KEY=window.FourSymbolsAccountSave.accountKey("task-tracker");
     let inventoryPageIndex=0;
     let battleSnapshot=null;
-    let lastWtail: error writing 'standard output': Broken pipe
-tail: error writing 'standard output': Broken pipe
-ildRankToken=null;
+    let lastWildRankToken=null;
     let transitionRunning=false;
     let suppressLegacyExpToastUntil=0;
 
@@ -5919,9 +8752,131 @@ ildRankToken=null;
     if(typeof openEquippedItem==="function"){
         const originalOpenEquippedItem=openEquippedItem;
         openEquippedItem=function(item){
-            const result=origtail: error writing 'standard output': Broken pipe
-bwrap: Can't find source path /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-          extra={
+            const result=originalOpenEquippedItem.apply(this,arguments);
+            const icon=document.getElementById("itemModalIcon");
+            if(icon&&item){ icon.innerHTML=item.icon||"◆"; }
+            appendReforgeStatsToModal(item);
+            syncDecomposeButton(null,null);
+            syncInventoryPotionUseButton(null,null);
+            return result;
+        };
+    }
+
+    document.addEventListener("dragstart",event=>{
+        if(event.target&&event.target.closest&&event.target.closest("#inventoryPage,#itemModal")){
+            event.preventDefault();
+        }
+    });
+
+    /* =====================================================
+       Additional characters can manually cast support skills
+    ===================================================== */
+    if(typeof prepareAction==="function"){
+        const originalPrepareAction=prepareAction;
+        prepareAction=function(type){
+            const skill=skillDatabase[type];
+            if(
+                activeBattleCharacterIndex<=0 ||
+                !skill ||
+                !["buff","heal","revive"].includes(skill.category)
+            ){
+                return originalPrepareAction.apply(this,arguments);
+            }
+            const character=getPartyCharacterByIndex(activeBattleCharacterIndex);
+            const autoOn=getPartyAutoConfig(activeBattleCharacterIndex).enabled;
+            if(!battleActive||!character||character.hp<=0||autoOn||actionReady){ return; }
+            const spCost=skill.spCost!==undefined?skill.spCost:skill.cost;
+            if(character.sp<spCost){
+                addBattleLog("SP不足，無法使用"+skill.name);
+                return;
+            }
+
+            if(skill.targetType==="ally"||skill.targetType==="allyTri"||skill.targetType==="deadAlly"){
+                const hasTarget=[0,1,2].some(index=>isValidAllyTargetForSkill(
+                    skill,getBattleCharacterByIndex(index),index
+                ));
+                if(!hasTarget){
+                    addBattleLog(skill.targetType==="deadAlly"?"目前沒有陣亡的隊友可供復活。":"目前沒有可選擇的友方目標。");
+                    return;
+                }
+                actionReady=true;
+                pendingAction=type;
+                closeMenus();
+                setBattleAllyTargetSelectionMode(type);
+                return;
+            }
+
+            actionReady=true;
+            queuedPlayerActions[activeBattleCharacterIndex]={action:type,target:null,targetAlly:null};
+            closeMenus();
+            updateUI();
+            finishPlayerAction();
+        };
+    }
+
+    /* =====================================================
+       Card effects (legacy visual renderer retired; data/status only)
+    ===================================================== */
+    function cardFor(side,index){
+        return document.getElementById(side==="monster"?"battleMonster"+index:"battlePlayerCard"+index);
+    }
+
+    /* Persistent visual rendering is owned by V143. Keep only this stable
+       compatibility call surface because older support actions still invoke it
+       after their gameplay result is committed. */
+    window.v141PlayCardEffect=function(){ return false; };
+
+
+    function executeAdditionalSupportAction(characterIndex,queued,skill){
+        const character=getPartyCharacterByIndex(characterIndex);
+        const characterKey=getPartyCharacterKey(characterIndex);
+        const casterStats=getPartyBattleStats(characterIndex);
+        const level=Math.max(0,Number(getSkillLevel(characterKey,skill.id))||0);
+        const cost=Number(skill.spCost!==undefined?skill.spCost:skill.cost)||0;
+        const targetIndex=Number.isInteger(queued.targetAlly)?queued.targetAlly:characterIndex;
+        const target=getBattleCharacterByIndex(targetIndex);
+
+        function stop(message){
+            if(message){ addBattleLog(message); }
+            updateUI();
+            finishPlayerAction();
+            return true;
+        }
+
+        if(!character||!casterStats){ return stop("角色狀態無法讀取，本次行動已略過。"); }
+        if(level<=0){ return stop((character.id||"角色")+"尚未學習"+skill.name+"。"); }
+        if(character.sp<cost){ return stop((character.id||"角色")+"SP不足，無法使用"+skill.name+"。"); }
+        if(skill.category==="heal"&&(!target||target.hp<=0)){ return stop(skill.name+"的目標無法接受治療。"); }
+        if(skill.category==="revive"&&(!target||target.hp>0)){ return stop("目前選擇的目標不需要復活。"); }
+        if(skill.category==="buff"&&skill.targetType==="ally"&&(!target||target.hp<=0)){
+            return stop(skill.name+"的目標無法接受效果。");
+        }
+
+        character.sp-=cost;
+        lungePlayerCard(characterIndex);
+        showSkillNameBadge(skill.name,skill.element,characterIndex);
+        setTimeout(()=>showPlayerSpPopup(cost,characterIndex),500);
+
+        if(skill.category==="buff"){
+            const targets=skill.targetType==="allyAll"
+                ? getExistingPartyIndexes().map(getPartyCharacterByIndex).filter(item=>item&&item.hp>0)
+                : [target||character];
+            let extra={};
+            if(skill.id==="rage"){
+                const chance=(skill.critChanceBonusByLevel||skill.critBonusByLevel||[])[level-1]||0;
+                const damage=(skill.critDamageBonusByLevel||skill.critBonusByLevel||[])[level-1]||0;
+                extra={
+                    bonusPercent:chance,
+                    critChanceBonusPercent:chance,
+                    critDamageBonusPercent:damage
+                };
+            }
+            else if(skill.id==="dodgeSkill"){ extra={percent:skill.evasionBonusPercent}; }
+            else if(skill.id==="rockWall"){ extra={percent:skill.defenseBonusPercent}; }
+            else if(skill.id==="earthShield"){ extra={percent:skill.reflectPercent}; }
+            else if(skill.id==="dinghaishenzhen"){ extra={resistBonus:skill.statusResistBonus}; }
+            else if(skill.id==="barrier"){
+                extra={
                     sourceSkill:"barrier",
                     barrierRule:"shared",
                     remainingBlocks:Number(skill.barrierBlockCount)||5
@@ -6027,8 +8982,7 @@ bwrap: Can't find source path /workspace/scratch/2feca6ea11c3/.aws: No such file
                 if(queued.action==="potion"){
                     window.v141PlayCardEffect("player",characterIndex,"potion");
                 }else if(talisman){
-                    const side=talisman.talismtail: error writing 'standard output': Broken pipe
-anEffect==="freeze"?"monster":"player";
+                    const side=talisman.talismanEffect==="freeze"?"monster":"player";
                     const target=side==="monster"?queued.target:queued.targetAlly;
                     if(Number.isInteger(target)){ window.v141PlayCardEffect(side,target,"talisman"); }
                 }else if(skill){
@@ -6161,9 +9115,7 @@ anEffect==="freeze"?"monster":"player";
             if(!battleActive||startedEntryTokens.has(token)){
                 return originalStartTurn.apply(this,arguments);
             }
-            startail: error writing 'standard output': Broken pipe
-tail: error writing 'standard output': Broken pipe
-tedEntryTokens.add(token);
+            startedEntryTokens.add(token);
             const overlay=ensureBattleTransitionOverlay();
             const page=document.getElementById("battlePage");
             transitionRunning=true;
@@ -6429,8 +9381,7 @@ tedEntryTokens.add(token);
         if(!body){ return; }
         const daily=getTrackerQuest(dailyQuestDefinitions,dailyQuestState);
         const commission=getTrackerQuest(commissionQuestDefinitions,commissionQuestState);
-        const rows=[[tail: error writing 'standard output': Broken pipe
-"每日",daily,dailyQuestState],["委託",commission,commissionQuestState]]
+        const rows=[["每日",daily,dailyQuestState],["委託",commission,commissionQuestState]]
             .filter(entry=>entry[1])
             .map(([label,quest,state])=>{
                 const progress=Math.min(quest.goal,Number(state.progress[quest.id])||0);
@@ -6548,8 +9499,7 @@ tedEntryTokens.add(token);
             const display=Math.floor(percent);
             const milestones=QUEST_COMPLETION_MILESTONES.map(threshold=>{
                 const reached=percent>=threshold;
-     tail: error writing 'standard output': Broken pipe
-           const claimed=!!milestoneState[type][threshold];
+                const claimed=!!milestoneState[type][threshold];
                 const reward=milestoneRewards[type][threshold];
                 return '<div class="quest-milestone '+(reached?"reached ":"")+(claimed?"claimed":"")+'">'+
                     '<div class="quest-milestone-percent">'+threshold+'%</div>'+
@@ -6609,8 +9559,7 @@ tedEntryTokens.add(token);
         if(!panel||!stats){ return; }
         const state=window.v131GetElementBoxState?window.v131GetElementBoxState():{remainingMs:0};
         const totalMinutes=Math.floor(state.remainingMs/60000);
-        const text=Math.floor(totalMinutetail: error writing 'standard output': Broken pipe
-s/60)+"小時 "+(totalMinutes%60)+"分鐘";
+        const text=Math.floor(totalMinutes/60)+"小時 "+(totalMinutes%60)+"分鐘";
         stats.innerHTML=
             '<div class="v141-element-box-remaining"><span>元素匣剩餘時間</span><strong id="v131EbRemaining">'+text+'</strong></div>'+
             '<button type="button" class="v141-element-box-ad" onclick="v141WatchElementBoxAd()">觀看廣告 ＋8小時</button>'+
@@ -6643,8 +9592,7 @@ s/60)+"小時 "+(totalMinutes%60)+"分鐘";
     ===================================================== */
     const dungeonCoverData={
         exp:{title:"經驗副本",requirement:"任一角色達到10級",reward:"共用經驗池 EXP",action:"v132BeginExpDungeon"},
-        matertail: error writing 'standard output': Broken pipe
-ial:{title:"材料副本",requirement:"任一角色達到10級",reward:"材料寶箱 ×1～3",action:"v132BeginMaterialDungeon"},
+        material:{title:"材料副本",requirement:"任一角色達到10級",reward:"材料寶箱 ×1～3",action:"v132BeginMaterialDungeon"},
         equipment:{title:"裝備副本",requirement:"任一角色達到10級",reward:"自選系列裝備抽獎券",action:"v132BeginEquipmentDungeon"}
     };
 
@@ -6874,9 +9822,7 @@ ial:{title:"材料副本",requirement:"任一角色達到10級",reward:"材料�
 
     function definitions(){
         return window.v132GetContentDefinitions?window.v132GetContentDefinitions():{
-            talismans:[],ores:[],blueprints:[],tickets:[],equipmentSets:[],equipmentSettail: error writing 'standard output': Broken pipe
-tail: error writing 'standard output': Broken pipe
-Items:[]
+            talismans:[],ores:[],blueprints:[],tickets:[],equipmentSets:[],equipmentSetItems:[]
         };
     }
 
@@ -7107,8 +10053,7 @@ Items:[]
                 window.v132ShowRewardModal(
                     '<div class="v132-reward-modal-inner"><h3>'+escapeHtml(title)+'</h3>'+body+
                     '<div class="v132-reward-actions"><button type="button" onclick="v132CloseRewardModal()">確定</button></div></div>'
-   tail: error writing 'standard output': Broken pipe
-             );
+                );
             }
         },480);
     }
@@ -7193,9 +10138,7 @@ Items:[]
             compare='<div class="v141-reforge-compare"><section><small>目前冶煉效果</small>'+statsHtml(item.reforgeStats)+'</section><b>VS</b><section><small>本次新效果・'+pendingLabel+'材料</small>'+statsHtml(pending.stats)+'</section>'+
                 '<div><button onclick="v141ResolveReforge(false)">保留原效果</button><button onclick="v141ResolveReforge(true)">套用新效果</button></div></div>';
         }
-        const tierButtons=TIER_ORDER.tail: error writing 'standard output': Broken pipe
-tail: error writing 'standard output': Broken pipe
-map(key=>{
+        const tierButtons=TIER_ORDER.map(key=>{
             const info=reforgeMaterialInfo(key);
             const unavailable=info.meta.available===false;
             return '<button type="button" class="v17358-reforge-tier '+(key===tier?'active ':'')+(unavailable?'planned':'')+'" '+
@@ -7337,8 +10280,7 @@ map(key=>{
             const cost=meta.available===false?'尚未開放・數值待定':'金幣 '+meta.reforgeGold.toLocaleString('zh-TW');
             return '<div><b>'+meta.label+'材料</b>　'+reforgeRangeText(tier,2)+'　／　'+cost+'</div>';
         }).join('');
-        window.v132ShowRewardModal('<div class="v132-reward-modal-inner v141-affix-modal"><h3>冶煉規則</h3><p>裝備品質不限制材料階級。選用哪一階材料，本次重洗就使用哪一階的數值範圍。</p>'+lines+'<p>桃紅階、四象階已預留正式階級，但目前不開放數值與取得來源。</p><p>每次會重洗所有未鎖定的冶煉槽；已鎖定詞條保持原數值。冶煉次數不限。</p><p>消耗：未鎖定 50 張設計圖＋50 礦石；鎖 1 條各 100；鎖 2 條各 150。最多鎖 tail: error writing 'standard output': Broken pipe
-2 條，且至少保留 1 個槽位重洗。</p><p>單槽最高值固定10%；具副詞條範圍的材料，雙詞條同時最高固定5%。</p><div class="v132-reward-actions"><button onclick="v132CloseRewardModal()">返回</button></div></div>');
+        window.v132ShowRewardModal('<div class="v132-reward-modal-inner v141-affix-modal"><h3>冶煉規則</h3><p>裝備品質不限制材料階級。選用哪一階材料，本次重洗就使用哪一階的數值範圍。</p>'+lines+'<p>桃紅階、四象階已預留正式階級，但目前不開放數值與取得來源。</p><p>每次會重洗所有未鎖定的冶煉槽；已鎖定詞條保持原數值。冶煉次數不限。</p><p>消耗：未鎖定 50 張設計圖＋50 礦石；鎖 1 條各 100；鎖 2 條各 150。最多鎖 2 條，且至少保留 1 個槽位重洗。</p><p>單槽最高值固定10%；具副詞條範圍的材料，雙詞條同時最高固定5%。</p><div class="v132-reward-actions"><button onclick="v132CloseRewardModal()">返回</button></div></div>');
     };
 
     window.v141CraftEquipment=function(){
@@ -7432,8 +10374,7 @@ map(key=>{
         const ticket=definitions().tickets.find(item=>item.setId===setId);
         const qty=Math.max(1,synthesisState.fragmentQty[setId]||1);
         if(!fragment||!ticket||countItem(fragment.id)<qty*100||gold<qty*500){ alert("碎片或金幣不足。"); return; }
-        if(window.v132CanAddItemToInventory&&!window.v132CanAddItemToInventortail: error writing 'standard output': Broken pipe
-y(ticket,qty)){ alert("背包空間不足。"); return; }
+        if(window.v132CanAddItemToInventory&&!window.v132CanAddItemToInventory(ticket,qty)){ alert("背包空間不足。"); return; }
         const success=runInventoryTransaction(()=>window.v132ConsumeStackItem(fragment.id,qty*100)&&addItem(ticket,qty));
         if(!success){ alert("合成失敗，素材已自動還原。"); return; }
         gold-=qty*500; rebuildInventorySlots(); updateGoldDisplay(); saveGame(); renderSynthesis();
@@ -7538,8 +10479,7 @@ y(ticket,qty)){ alert("背包空間不足。"); return; }
         monster.hp=monster.maxHP;
         monster.v141Abyss=true;
         monster.v141ExtraHP=extraHp;
-        tail: error writing 'standard output': Broken pipe
-monster.v141ForceSkillLevel=forceLevel;
+        monster.v141ForceSkillLevel=forceLevel;
         monster.v141SkillLevel=forceLevel;
         monster.v144SkillLevel=forceLevel;
         monster.skillIds=(skills||[]).slice();
@@ -7651,8 +10591,7 @@ monster.v141ForceSkillLevel=forceLevel;
     window.v141GetMonsterAllyTriTargets=getMonsterAllyTriTargets;
 
     function applyTimedMonsterBuff(monstersToBuff,type,turns,amount,options){
-        const opts=options&&typeof options==="object"?opttail: error writing 'standard output': Broken pipe
-ions:{};
+        const opts=options&&typeof options==="object"?options:{};
         monstersToBuff.forEach(monster=>{
             if(!monster||!monster.alive){ return; }
             const monsterIndex=typeof monsters!=="undefined"?monsters.indexOf(monster):-1;
@@ -7762,9 +10701,7 @@ ions:{};
             target=allies.find(item=>!(item.v141Shield&&item.v141Shield.isBarrier));
             if(target){ skillId="barrier"; }
         }
-        if(!skillId&&supportIds.includes("rage")&&!allies.some(item=>item.v141TeamBuffs?.some(buff=>buff.type==="ragetail: error writing 'standard output': Broken pipe
-tail: error writing 'standard output': Broken pipe
-"&&buff.turnsLeft>0))){ skillId="rage"; }
+        if(!skillId&&supportIds.includes("rage")&&!allies.some(item=>item.v141TeamBuffs?.some(buff=>buff.type==="rage"&&buff.turnsLeft>0))){ skillId="rage"; }
         if(!skillId&&supportIds.includes("dinghaishenzhen")&&!allies.some(item=>item.v141TeamBuffs?.some(buff=>buff.type==="resistance"&&buff.turnsLeft>0))){ skillId="dinghaishenzhen"; }
         if(!skillId&&supportIds.includes("dodgeSkill")&&!allies.some(item=>item.v141TeamBuffs?.some(buff=>buff.type==="dodge"&&buff.turnsLeft>0))){ skillId="dodgeSkill"; }
         if(!skillId){
@@ -7854,7 +10791,7 @@ tail: error writing 'standard output': Broken pipe
     };
     function abyssProgressLabel(){
         const phaseLabels={boss:"等待挑戰",chest:"寶箱待開啟",portal:"寶箱已領取・傳送點已開啟"};
-        return "目前進度：第 "+abyssState.floor+" / 5 ��・"+(phaseLabels[abyssState.phase]||"挑戰進行中");
+        return "目前進度：第 "+abyssState.floor+" / 5 層・"+(phaseLabels[abyssState.phase]||"挑戰進行中");
     }
     function abyssBattleInfoMarkup(){
         const source=document.getElementById("battleInfo");
@@ -7945,9 +10882,7 @@ tail: error writing 'standard output': Broken pipe
     window.v141GetAbyssState=function(){ return Object.assign({mapEntered:abyssMapEntered},abyssState); };
     window.v141LeaveAbyssMap=function(){ abyssMapEntered=false; };
 
-    function moveAbyssPlayer(x,y,tail: error writing 'standard output': Broken pipe
-tail: error writing 'standard output': Broken pipe
-callback){
+    function moveAbyssPlayer(x,y,callback){
         const playerEl=document.getElementById("v141AbyssPlayer");
         if(!playerEl){ if(callback){ callback(); } return; }
         const distance=Math.hypot(x-abyssState.x,y-abyssState.y);
@@ -8155,8 +11090,7 @@ callback){
         const map=document.getElementById("v141AbyssMap");
         if(!map||map.dataset.v141AbyssDialogueOpening==="1"){ return false; }
         const bossButton=map.querySelector(".v141-abyss-boss");
-        const existingDialogue=map.querySelectotail: error writing 'standard output': Broken pipe
-r(".v143-abyss-dialogue");
+        const existingDialogue=map.querySelector(".v143-abyss-dialogue");
         if(existingDialogue){
             return positionAbyssBossDialogue(map,existingDialogue,bossButton);
         }
@@ -8198,12 +11132,518 @@ r(".v143-abyss-dialogue");
             advanceDialogue();
         };
         map.appendChild(overlay);
-        positionAbyssbwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-bwrap: Can't find source path /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-tail: error writing 'standard output': Broken pipe
-Id("battleMonster"+index);
+        positionAbyssBossDialogue(map,overlay,bossButton);
+        delete map.dataset.v141AbyssDialogueOpening;
+        return true;
+    }
+
+    window.v141ChallengeAbyssBoss=function(){
+        return openAbyssBossDialogue();
+    };
+
+    window.v141UseAbyssPortal=function(){
+        if(abyssState.floor>=5){ return; }
+        if(abyssState.phase==="chest"){
+            abyssState.message="請先點擊守關者位置的寶箱領取獎勵。";
+            persistAbyss(); refreshAbyssPage();
+            return;
+        }
+        if(abyssState.phase!=="portal"){ return; }
+        moveAbyssPlayer(50,18,()=>{
+            abyssState.floor=Math.min(5,abyssState.floor+1);
+            abyssState.phase="boss"; abyssState.x=50; abyssState.y=84; abyssState.message="";
+            persistAbyss(); refreshAbyssPage();
+        });
+    };
+
+    window.v141OpenAbyssChest=function(){
+        if(abyssState.phase!=="chest"){ return; }
+        const pos=bossPosition(abyssState.floor);
+        moveAbyssPlayer(pos[0],Math.min(84,pos[1]+27),()=>{
+            const data=definitions();
+            const floorTickets={1:"ticketSetEarth",2:"ticketSetFire",3:"ticketSetWind",4:"ticketSetWater"};
+            const ticket=abyssState.floor<5
+                ?data.tickets.find(item=>item.id===floorTickets[abyssState.floor])
+                :data.tickets[Math.floor(Math.random()*data.tickets.length)];
+            if(ticket&&window.v132CanAddItemToInventory&&!window.v132CanAddItemToInventory(ticket,1)){ alert("背包空間不足，請整理後再開啟深淵寶箱。"); return; }
+            if(abyssState.floor<5){
+                if(ticket&&!addItem(ticket,1)){ alert("背包空間不足，寶箱尚未開啟。"); return; }
+                abyssState.phase="portal";
+                abyssState.message="寶箱已開啟。請點擊上方傳送點前往下一層。";
+                persistAbyss(); rebuildInventorySlots(); saveGame(); refreshAbyssPage();
+                if(ticket&&window.v141ShowBlackGoldReward){
+                    window.v141ShowBlackGoldReward({
+                        exp:0,
+                        gold:0,
+                        items:[{
+                            id:ticket.id,
+                            name:ticket.name,
+                            count:1,
+                            icon:ticket.icon
+                        }]
+                    });
+                }
+                return;
+            }
+            const indexes=getExistingPartyIndexes();
+            const avgNeed=indexes.length?indexes.reduce((sum,index)=>sum+(Number(getPartyCharacterByIndex(index).expNext)||0),0)/indexes.length:0;
+            const exp=Math.max(300,Math.floor(avgNeed*.45));
+            const rewardGold=(2000+window.v141GetHighestCharacterLevel()*50)*5;
+            if(ticket&&!addItem(ticket,1)){ alert("背包空間不足，寶箱尚未開啟。"); return; }
+            sharedExp+=exp; gold+=rewardGold; abyssState.phase="complete"; abyssState.clears=(abyssState.clears||0)+1;
+            persistAbyss(); rebuildInventorySlots(); updateGoldDisplay(); saveGame();
+            if(window.v141RecordAbyssClear){ window.v141RecordAbyssClear(); }
+            refreshAbyssPage();
+            window.v132ShowRewardModal('<div class="v132-reward-modal-inner"><h3>深淵寶箱</h3><p>獲得 EXP '+exp.toLocaleString('zh-TW')+'<br>金幣 '+rewardGold.toLocaleString('zh-TW')+(ticket?'<br>'+escapeHtml(ticket.name)+' ×1':'')+'</p><div class="v132-reward-actions"><button onclick="v132CloseRewardModal()">收下</button></div></div>');
+        });
+    };
+})();
+
+
+/* bundled source: js/37-v142-skill-animation.js */
+/* =====================================================
+   V142 — combat action timing gate only
+   Visual rendering was retired in V174. V143 owns all battle VFX.
+===================================================== */
+(function installV142SkillAnimationSystem(){
+    "use strict";
+
+    if(typeof window==="undefined"){ return; }
+    if(window.__v142SkillAnimationInstalled && window.v142SkillAnimationDirector &&
+        typeof window.v142PlaySkillAnimationFromBadge==="function"){ return; }
+    window.__v142SkillAnimationInstalled=true;
+
+    const VERSION="142-gate-only";
+    const NORMAL_ANIMATION_MS=520;
+
+    const SPECS={
+        flameSlash:[760,"basic","slash"],fireCritical:[1050,"medium","impact"],
+        explosiveFlurry:[1450,"medium","barrage"],dragonSlash:[2800,"ultimate","dragon"],
+        fireRocket:[900,"basic","projectile"],blazeSpell:[1150,"medium","burst"],
+        flameTornado:[2100,"high","tornado"],phoenixCry:[3200,"ultimate","phoenix"],
+        rage:[1500,"medium","aura"],fireEX:[3000,"ultimate","aura"],
+
+        waterKnife:[800,"basic","slash"],frostPunch:[900,"basic","ice-impact"],
+        iceSpin:[1000,"medium","ice-barrage"],frostCrush:[1150,"high","ice-impact"],
+        waterBall:[1400,"basic","projectile"],floodBeast:[1350,"medium","wave"],
+        iceArrowRain:[1600,"high","ice-rain"],freeze:[950,"high","freeze"],
+        healSpell:[1250,"medium","heal"],revive:[1800,"high","revive"],
+        waterEX:[3000,"ultimate","aura"],
+
+        stormFist:[1200,"basic","impact"],stormFlurry:[1500,"medium","barrage"],
+        windCrossSlash:[1700,"high","cross-slash"],dizzyFist:[1800,"high","lightning"],
+        windSpell:[1400,"basic","projectile"],stormCircle:[1600,"medium","tornado"],
+        windHowlLightning:[1900,"high","lightning"],stormRain:[2600,"ultimate","tempest"],
+        dodgeSkill:[1600,"medium","aura"],stealthSkill:[1700,"medium","veil"],
+        dinghaishenzhen:[2200,"high","aura"],windEX:[3000,"ultimate","aura"],
+
+        stoneSlash:[1100,"basic","slash"],petrifyFist:[1400,"medium","stone-impact"],
+        stoneBreakSky:[1700,"high","stone-impact"],earthquakeCrush:[1800,"ultimate","earthquake"],
+        stoneThrow:[1300,"basic","projectile"],sandWind:[1500,"medium","sandstorm"],
+        flyingSandStrike:[2000,"high","petrify"],dustStorm:[2000,"ultimate","earthquake"],
+        earthShield:[1800,"medium","shield"],rockWall:[1700,"high","shield"],
+        barrier:[1900,"high","barrier"],earthEX:[3000,"ultimate","aura"],
+
+        stormSpell:[2450,"high","tempest"],
+        yuanXiangGuangMing:[2200,"high","holy-heal"],
+        yuanGuangShield:[1950,"high","holy-shield"],
+        yuanZuBlessing:[2000,"high","holy-blessing"]
+    };
+
+    function patchExtremeEmperorSkills(){
+        if(typeof skillDatabase==="undefined"){ return; }
+        const heal=skillDatabase.yuanXiangGuangMing;
+        if(heal){
+            heal.baseHeal=350;
+            heal.baseHealSP=95;
+            heal.targetType="allyAll";
+            heal.description="我方全體回復350 HP、95 SP。";
+        }
+        const shield=skillDatabase.yuanGuangShield;
+        if(shield){
+            shield.shieldAmount=200;
+            shield.shieldDuration=2;
+            shield.targetType="allyAll";
+            shield.description="我方全體獲得200護盾，持續2回合。";
+        }
+        if(!skillDatabase.yuanZuBlessing){
+            skillDatabase.yuanZuBlessing={
+                id:"yuanZuBlessing",name:"元祖賜福",element:"light",category:"buff",
+                targetType:"allyAll",maxLevel:1,spCost:45,agilityBonusPercent:75,duration:2,
+                description:"我方全體解除所有負面狀態，並增加敏捷75%，持續2回合。"
+            };
+        }
+    }
+
+    function fallbackSpec(skill){
+        if(!skill){ return [NORMAL_ANIMATION_MS,"normal","impact"]; }
+        const tier=Math.max(0,Number(skill.tier)||0);
+        const category=String(skill.category||"");
+        const target=String(skill.targetType||"");
+        if(/heal|revive|buff/.test(category)){
+            return [tier>=3?2200:1400,tier>=3?"high":"medium",category==="revive"?"revive":category==="heal"?"heal":"aura"];
+        }
+        if(target==="all"||target==="enemyAll"||target==="allyAll"){
+            return [tier>=3?2700:1900,tier>=3?"ultimate":"high","barrage"];
+        }
+        if(target==="row"||target==="tri"){
+            return [tier>=3?2100:1350,tier>=3?"high":"medium","barrage"];
+        }
+        if(tier>=4){ return [2800,"ultimate","burst"]; }
+        if(tier>=3){ return [1900,"high","burst"]; }
+        if(tier>=2){ return [1200,"medium","impact"]; }
+        return [760,"basic","impact"];
+    }
+
+    function findSkill(skillId,name,element){
+        if(typeof skillDatabase==="undefined"){ return {id:skillId,skill:null}; }
+        if(skillId&&skillDatabase[skillId]){ return {id:skillId,skill:skillDatabase[skillId]}; }
+        let foundId=null;
+        Object.getOwnPropertyNames(skillDatabase).some(id=>{
+            const candidate=skillDatabase[id];
+            if(candidate&&candidate.name===name&&(!element||!candidate.element||candidate.element===element)){
+                foundId=id;
+                return true;
+            }
+            return false;
+        });
+        return {id:foundId,skill:foundId?skillDatabase[foundId]:null};
+    }
+
+    function animationConfig(skillId,name,element){
+        if(name==="普通攻擊"||skillId==="normal"){
+            return {
+                id:"normal",name:"普通攻擊",element:element||"normal",
+                duration:NORMAL_ANIMATION_MS,resolveDuration:NORMAL_ANIMATION_MS,
+                tier:"normal",style:"impact",targetType:"single"
+            };
+        }
+        const found=findSkill(skillId,name,element);
+        const spec=SPECS[found.id]||fallbackSpec(found.skill);
+        return {
+            id:found.id||"unknown",
+            name:name||(found.skill&&found.skill.name)||"技能",
+            element:(found.skill&&found.skill.element)||element||"normal",
+            duration:Math.max(NORMAL_ANIMATION_MS,Number(found.skill&&found.skill.animationDuration)||spec[0]),
+            resolveDuration:Math.max(NORMAL_ANIMATION_MS,Number(found.skill&&found.skill.resolveDuration)||spec[0]),
+            tier:(found.skill&&found.skill.animationTier)||spec[1],
+            style:(found.skill&&found.skill.animationStyle)||spec[2],
+            category:(found.skill&&found.skill.category)||"",
+            targetType:(found.skill&&found.skill.targetType)||"single"
+        };
+    }
+
+    function applyMetadata(){
+        if(typeof skillDatabase==="undefined"){ return; }
+        Object.keys(skillDatabase).forEach(id=>{
+            const skill=skillDatabase[id];
+            if(!skill){ return; }
+            const spec=SPECS[id]||fallbackSpec(skill);
+            skill.animationDuration=Math.max(NORMAL_ANIMATION_MS,Number(skill.animationDuration)||spec[0]);
+            skill.resolveDuration=Math.max(NORMAL_ANIMATION_MS,Number(skill.resolveDuration)||spec[0]);
+            skill.animationTier=skill.animationTier||spec[1];
+            skill.animationStyle=skill.animationStyle||spec[2];
+        });
+    }
+
+    patchExtremeEmperorSkills();
+    applyMetadata();
+
+    const state={
+        sequence:0,active:null,latest:null,fallbackTimer:0,visibilityHandler:null,
+        metrics:{
+            version:VERSION,started:0,completed:0,superseded:0,
+            last:null
+        }
+    };
+
+    function removeVisibilityHandler(){
+        if(state.visibilityHandler&&typeof document!=="undefined"&&document.removeEventListener){
+            document.removeEventListener("visibilitychange",state.visibilityHandler);
+        }
+        state.visibilityHandler=null;
+    }
+
+    function cleanup(){
+        removeVisibilityHandler();
+        if(state.fallbackTimer){ clearTimeout(state.fallbackTimer); state.fallbackTimer=0; }
+    }
+
+    function armGateDeadline(gate,duration,reason){
+        if(!gate||gate.done){ return false; }
+        if(state.fallbackTimer){ clearTimeout(state.fallbackTimer); state.fallbackTimer=0; }
+        const visualDuration=Math.max(0,Number(duration)||0);
+        gate.visualStartedAt=Date.now();
+        gate.deadline=gate.visualStartedAt+visualDuration;
+        state.fallbackTimer=setTimeout(
+            ()=>gate.complete(reason||"v142-timing-only"),
+            visualDuration
+        );
+        return true;
+    }
+
+    function identity(side,name,actorIndex){
+        return [
+            typeof battleToken!=="undefined"?battleToken:"none",
+            typeof turn!=="undefined"?turn:"none",
+            typeof battlePhase!=="undefined"?battlePhase:"none",
+            typeof initiativeIndex!=="undefined"?initiativeIndex:"none",
+            typeof activeBattleCharacterIndex!=="undefined"?activeBattleCharacterIndex:"none",
+            side,actorIndex,name
+        ].join("|");
+    }
+
+    function createGate(config,key,onComplete){
+        let resolvePromise=null;
+        const gate={
+            id:++state.sequence,key:key,
+            battleToken:typeof battleToken!=="undefined"?battleToken:null,
+            config:config,startedAt:Date.now(),visualStartedAt:0,deadline:0,done:false,reason:null,
+            completionCount:0,promise:null,complete:null
+        };
+        gate.deadline=gate.startedAt+Math.max(0,Number(config.resolveDuration)||Number(config.duration)||0);
+        gate.restartVisualTimeline=function(duration){
+            return armGateDeadline(gate,duration,"v142-v143-visual-complete");
+        };
+        gate.promise=new Promise(resolve=>{ resolvePromise=resolve; });
+        gate.complete=function(reason){
+            if(gate.done){ return false; }
+            gate.done=true;
+            gate.reason=reason||"completed";
+            gate.completionCount++;
+            if(state.active===gate){ state.active=null; }
+            state.metrics.completed++;
+            cleanup();
+            resolvePromise(gate);
+            return true;
+        };
+        if(typeof onComplete==="function"){ gate.promise.then(()=>onComplete(gate)); }
+        return gate;
+    }
+
+    function play(config,meta){
+        meta=meta||{};
+        const key=meta.key||identity(meta.side||"player",config.name,meta.actorIndex);
+        if(state.active&&!state.active.done){
+            if(state.active.key===key){ return state.active; }
+            state.metrics.superseded++;
+            state.active.complete("superseded");
+        }
+        const gate=createGate(config,key,meta.onComplete);
+        state.active=gate;
+        state.latest=gate;
+        state.metrics.started++;
+        state.metrics.last={
+            id:config.id,name:config.name,duration:config.duration,
+            resolveDuration:config.resolveDuration,tier:config.tier,
+            style:config.style,element:config.element,side:meta.side||"player"
+        };
+
+        /* The gate measures visual lifetime only. Queue progression never waits
+           on this Promise; 00-main.js reads the remaining time and schedules its
+           own deterministic handoff even if the raster renderer fails. */
+        armGateDeadline(
+            gate,
+            Math.max(0,Number(config.resolveDuration)||Number(config.duration)||0),
+            meta.render===false?"v142-render-safety-deadline":"v142-timing-only"
+        );
+        if(typeof document!=="undefined"&&document.addEventListener){
+            state.visibilityHandler=function(){
+                if(!document.hidden&&Date.now()>=gate.deadline){ gate.complete("visibility-resume"); }
+            };
+            document.addEventListener("visibilitychange",state.visibilityHandler);
+        }
+        return gate;
+    }
+
+    const director={
+        play:play,
+        getActive:function(){ return state.active; },
+        getLatest:function(){ return state.latest; },
+        getMetrics:function(){ return Object.assign({},state.metrics,{active:!!state.active}); },
+        dispose:function(){
+            if(state.active&&!state.active.done){ state.active.complete("dispose"); }
+            else{ cleanup(); }
+        },
+        notifyVisibilityReturn:function(){
+            const gate=state.active;
+            if(gate&&!gate.done&&Date.now()>=gate.deadline){ gate.complete("visibility-resume"); }
+        }
+    };
+
+    window.v142SkillAnimationDirector=director;
+    window.v142GetSkillAnimationConfig=function(skillId){
+        const skill=typeof skillDatabase!=="undefined"?skillDatabase[skillId]:null;
+        return animationConfig(skillId,skill&&skill.name,skill&&skill.element);
+    };
+    window.v142GetSkillNameDisplayDuration=function(name,element){
+        const config=animationConfig(null,name,element);
+        return Math.max(1,Math.round(config.duration*2/3));
+    };
+    window.v142GetAnimationDiagnostics=function(){ return director.getMetrics(); };
+    window.v142CreateAnimationGateForTest=function(duration,onComplete){
+        return createGate({
+            id:"test",name:"test",element:"normal",duration:duration,
+            resolveDuration:duration,tier:"normal",style:"impact"
+        },"test-"+state.sequence,onComplete);
+    };
+
+    function startFromBadge(side,name,element,actorIndex,targetId,targetIds,targetContract){
+        if(typeof battleActive!=="undefined"&&!battleActive){ return null; }
+        const config=animationConfig(null,name,element);
+        if(config.category==="passive"||config.targetType==="none"){ return null; }
+        const meta={
+            side:side,actorIndex:Number.isInteger(actorIndex)?actorIndex:0,
+            key:identity(side,name,actorIndex)
+        };
+        const contract=targetContract&&targetContract.version==="battle-target-contract-v1"
+            ?targetContract
+            :Object.freeze({
+                version:"battle-target-contract-v1",
+                side:side,
+                actorIndex:meta.actorIndex,
+                targetId:targetId!==undefined?targetId:null,
+                targetIds:Object.freeze(Array.isArray(targetIds)?targetIds.slice():[])
+            });
+        meta.targetContract=contract;
+        meta.targetSide=contract.targetSide;
+        meta.targetId=contract.targetId!==undefined?contract.targetId:null;
+        meta.targetIds=Array.isArray(contract.targetIds)?contract.targetIds.slice():[];
+        return director.play(config,meta);
+    }
+    window.v142PlaySkillAnimationFromBadge=function(side,name,element,actorIndex,targetId,targetIds,targetContract){
+        return startFromBadge(side,name,element,actorIndex,targetId,targetIds,targetContract);
+    };
+
+    function currentGate(){
+        const gate=state.latest;
+        if(!gate){ return null; }
+        if(typeof battleToken!=="undefined"&&gate.battleToken!==null&&gate.battleToken!==battleToken){ return null; }
+        return gate;
+    }
+
+    /* The visual gate owns only visual lifetime. Queue progression has one
+       owner in 00-main.js and can never wait on a renderer Promise. */
+    window.v142GetActiveAnimationGate=currentGate;
+    window.v142GetRemainingAnimationMs=function(){
+        const gate=currentGate();
+        return gate&&!gate.done?Math.max(0,gate.deadline-Date.now()):0;
+    };
+
+
+    /* V142 is visual-lifecycle only. Legacy Extreme Emperor heal/shield/buff
+       gameplay dispatch and round ticking were retired; formal enemy support
+       skills are owned by V141/V155 and FourSymbolsDurationLifecycle. */
+
+    if(typeof checkBattleEnd==="function"){
+        const previous=checkBattleEnd;
+        checkBattleEnd=function(){
+            const result=previous.apply(this,arguments);
+            if(result){ setTimeout(()=>director.dispose(),0); }
+            return result;
+        };
+    }
+    if(typeof window.addEventListener==="function"){
+        window.addEventListener("pagehide",()=>director.dispose());
+    }
+})();
+
+
+/* bundled source: js/38-v143-system-fixes.js */
+/* =====================================================
+   V143 — mobile combat readability, dungeon flow and rules
+   This patch intentionally stays above the legacy engine: it fixes the
+   current public behavior without reopening js/00-main.js.
+===================================================== */
+(function installV143SystemFixes(){
+    "use strict";
+
+    if(typeof window==="undefined" || window.__v143SystemFixesInstalled){ return; }
+    window.__v143SystemFixesInstalled=true;
+
+    const VERSION="143";
+    const POTION_TARGET_ACTION="__v143PotionTarget";
+    const TIER_ALIASES={low:"white",mid:"blue",high:"purple",perfect:"orange"};
+    const TIER_META={
+        white:{label:"白階",available:true,craftGold:500,main:[1,5],color:"#D8D8D8"},
+        blue:{label:"藍階",available:true,craftGold:1500,main:[3,8],color:"#42A5FF"},
+        purple:{label:"紫階",available:true,craftGold:4000,main:[5,11],sub:[1,3],color:"#B05CFF"},
+        orange:{label:"橙階",available:true,craftGold:10000,main:[7,14],sub:[2,5],color:"#FF9F38"},
+        pink:{label:"桃紅階",available:false,planned:true,color:"#FF4FA7"},
+        "four-symbol":{label:"四象階",available:false,planned:true,color:"#E5C06B"}
+    };
+    function normalizeTierKey(value){
+        const key=String(value||"").toLowerCase();
+        return TIER_ALIASES[key]||key;
+    }
+    const SLOT_META={
+        head:{label:"頭部",type:"head",glyph:"冠"},
+        shoulder:{label:"護腕",type:"shoulder",glyph:"腕"},
+        shoes:{label:"鞋子",type:"shoes",glyph:"履"},
+        hand:{label:"武器",type:"weapon",glyph:"刃"},
+        armor:{label:"衣服",type:"armor",glyph:"甲"}
+    };
+    const STAT_KEYS=["attack","intelligence"];
+    const SUBSTAT_KEYS=["vitality","energy","agility","spirit"];
+    const NORMAL_GEAR_PREFIXES=["古銅","精鍛","雲紋","玄鐵","旅者","守備","靈巧","秘銀"];
+
+    function numeric(value){
+        const result=Number(value);
+        return Number.isFinite(result)?result:0;
+    }
+
+    function escapeHtml(value){
+        return String(value==null?"":value).replace(/&/g,"&amp;").replace(/</g,"&lt;")
+            .replace(/>/g,"&gt;").replace(/\"/g,"&quot;").replace(/'/g,"&#039;");
+    }
+
+    function svgIcon(glyph,color){
+        const safeGlyph=escapeHtml(glyph);
+        const safeColor=escapeHtml(color||"#d4aa61");
+        return '<svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="v143gear" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#332718"/><stop offset="1" stop-color="#090807"/></linearGradient></defs><rect x="3" y="3" width="58" height="58" rx="12" fill="url(#v143gear)" stroke="'+safeColor+'" stroke-width="3"/><path d="M12 46L20 18L32 11L44 18L52 46L32 55Z" fill="none" stroke="'+safeColor+'" stroke-opacity=".42" stroke-width="2"/><text x="32" y="40" text-anchor="middle" font-size="22" font-weight="900" fill="'+safeColor+'">'+safeGlyph+'</text></svg>';
+    }
+
+    /* ----- 11 / 12. Skill data and hard-control caps are one ruleset. ----- */
+    function applySkillRuleChanges(){
+        /* Retired data patch: V173.64 exclusively authors player Skill Spec. */
+        return;
+    }
+    applySkillRuleChanges();
+
+    window.v143CombatRuleSnapshot=function(){
+        return {
+            version:VERSION,
+            lockdownCaps:{regular:90,elite:80,boss:70,player:60},
+            stormRain:skillDatabase&&skillDatabase.stormRain,
+            iceArrowRain:skillDatabase&&skillDatabase.iceArrowRain,
+            freeze:skillDatabase&&skillDatabase.freeze
+        };
+    };
+
+    /* Ice Arrow Rain is finalized by the shared Frostbite owner in V149.
+       Do not install a second per-target Freeze path here. */
+
+    /* ----- 1. Enemy card text: start large, only fit when it truly overflows. ----- */
+    function fitEnemyIdentity(card,node){
+        if(!card||!node){ return; }
+        node.style.removeProperty("transform");
+        node.style.removeProperty("width");
+        node.style.setProperty("font-size","16px","important");
+        const available=Math.max(1,node.clientWidth||card.clientWidth-6||68);
+        let size=16;
+        while(size>12 && node.scrollWidth>available){
+            size--;
+            node.style.setProperty("font-size",size+"px","important");
+        }
+        if(node.scrollWidth>available){
+            const scale=Math.max(.72,available/node.scrollWidth);
+            node.style.setProperty("transform","scaleX("+scale+")");
+        }
+        node.dataset.v143FontSize=String(size);
+    }
+
+    function decorateEnemyCard(index){
+        const card=document.getElementById("battleMonster"+index);
         const monster=typeof monsters!=="undefined"?monsters[index]:null;
         if(!card||!monster){ return; }
         const name=card.querySelector(".battle-monster-name");
@@ -8334,11 +11774,463 @@ Id("battleMonster"+index);
             const outermost=directPlayerActionDepth===0;
             const previousContext=directPlayerBarrierContext;
             if(outermost){ directPlayerBarrierContext={blocked:new Map()}; }
-            directPbwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-bwrap: Can't find source path /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-bwrap: Can't find source path /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-nToSlots:true})},
+            directPlayerActionDepth++;
+            try{ return previous.apply(this,arguments); }
+            finally{
+                directPlayerActionDepth=Math.max(0,directPlayerActionDepth-1);
+                if(outermost){ directPlayerBarrierContext=previousContext; }
+            }
+        };
+    }
+    [
+        "normalAttack","secondaryCharacterNormalAttack","player2NormalAttack","windArrowAttack",
+        "castDamageSkill","castSecondaryCharacterSkill","castPlayer2Skill"
+    ].forEach(wrapDirectPlayerAction);
+
+    function currentAnimationIsPlayerAttack(){
+        const current=window.v143SkillAnimationState&&window.v143SkillAnimationState.current;
+        return !!(current&&!current.done&&current.side==="player");
+    }
+
+    if(typeof addBattleLog==="function"){
+        const previousBattleLog=addBattleLog;
+        addBattleLog=function(message){
+            let text=String(message);
+            if((directPlayerActionDepth>0||currentAnimationIsPlayerAttack())&&/造成\d+傷害/.test(text)&&typeof currentBattleMonsters!=="undefined"){
+                const blocked=currentBattleMonsters.map(index=>monsters[index]).find(monster=>
+                    isMonsterBarrier(monster)&&text.indexOf(monster.name)>=0
+                );
+                if(blocked){ text=text.replace(/造成\d+傷害/,"造成0傷害（結界格擋）"); }
+            }
+            const args=Array.prototype.slice.call(arguments);
+            args[0]=text;
+            return previousBattleLog.apply(this,args);
+        };
+    }
+
+    if(typeof showMonsterHit==="function"){
+        const previousShowMonsterHit=showMonsterHit;
+        showMonsterHit=function(index,amount,type){
+            const monster=typeof monsters!=="undefined"?monsters[index]:null;
+            const blockedShield=monster&&directPlayerBarrierContext
+                ?directPlayerBarrierContext.blocked.get(monster)
+                :null;
+            if(!monster||type!=="hp"||(!isMonsterBarrier(monster)&&!blockedShield)){
+                return previousShowMonsterHit.apply(this,arguments);
+            }
+            const shield=blockedShield||monster.v141Shield;
+            const damage=Math.max(0,numeric(amount));
+            const direct=directPlayerActionDepth>0||currentAnimationIsPlayerAttack();
+            if(direct){
+                monster.hp=Math.max(0,numeric(shield.baseHp))+
+                    (monster.v141Shield===shield?Math.max(0,numeric(shield.remaining)):0);
+                if(blockedShield){
+                    const card=document.getElementById("battleMonster"+index);
+                    if(card&&typeof showDamagePopup==="function"){
+                        showDamagePopup(card,"格擋 "+Math.max(0,numeric(shield.remainingBlocks)),"shield");
+                    }
+                    return;
+                }
+                if(directPlayerBarrierContext){
+                    directPlayerBarrierContext.blocked.set(monster,shield);
+                }
+                shield.remainingBlocks=Math.max(0,(numeric(shield.remainingBlocks)||3)-1);
+                const card=document.getElementById("battleMonster"+index);
+                if(card&&typeof showDamagePopup==="function"){ showDamagePopup(card,"格擋 "+shield.remainingBlocks,"shield"); }
+                if(typeof window.v141PlayCardEffect==="function"){ window.v141PlayCardEffect("monster",index,"barrier"); }
+                addBattleLog(monster.name+"的結界抵擋直接傷害（剩餘"+shield.remainingBlocks+"次）。");
+                if(shield.remainingBlocks<=0){ removeMonsterBarrier(monster); }
+                syncMonsterBarrierText(index);
+                return;
+            }
+            /* DOT bypasses Barrier without consuming a block. */
+            shield.baseHp=Math.max(0,numeric(shield.baseHp)-damage);
+            monster.hp=shield.baseHp+Math.max(0,numeric(shield.remaining));
+            if(shield.baseHp<=0){ removeMonsterBarrier(monster); monster.hp=0; }
+            return previousShowMonsterHit.apply(this,arguments);
+        };
+    }
+
+    function syncMonsterBarrierText(index){
+        const monster=typeof monsters!=="undefined"?monsters[index]:null;
+        if(!isMonsterBarrier(monster)){ return; }
+        const shield=monster.v141Shield;
+        if(!Number.isFinite(Number(shield.remainingBlocks))){ shield.remainingBlocks=3; }
+        const text=document.getElementById("battleMonsterHPText"+index);
+        if(text){ text.textContent=Math.floor(numeric(shield.baseHp))+"/"+Math.floor(numeric(shield.baseMaxHP))+" 結界"+shield.remainingBlocks; }
+    }
+
+    if(typeof window.v141TryMonsterSpecialAction==="function"){
+        const previousSpecial=window.v141TryMonsterSpecialAction;
+        window.v141TryMonsterSpecialAction=function(){
+            const previousLog=typeof addBattleLog==="function"?addBattleLog:null;
+            if(previousLog){
+                addBattleLog=function(message){
+                    const args=Array.prototype.slice.call(arguments);
+                    args[0]=String(message);
+                    return previousLog.apply(this,args);
+                };
+            }
+            try{ return previousSpecial.apply(this,arguments); }
+            finally{ if(previousLog){ addBattleLog=previousLog; } }
+        };
+    }
+
+    /* ----- 8 / 9. A potion may target any valid ally; cards use the same reticle. ----- */
+    function queuedPotionReservations(potionId){
+        if(typeof queuedPlayerActions==="undefined"){ return 0; }
+        return Object.keys(queuedPlayerActions||{}).reduce((sum,key)=>{
+            const action=queuedPlayerActions[key];
+            return sum+(action&&action.action==="potion"&&action.potionId===potionId?1:0);
+        },0);
+    }
+
+    function validPotionTarget(potionId,index){
+        const definition=typeof getPotionDefinition==="function"?getPotionDefinition(potionId):null;
+        const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(index):null;
+        const stats=typeof getPartyBattleStats==="function"?getPartyBattleStats(index):null;
+        if(!definition||!character||!stats||character.hp<=0){ return false; }
+        return definition.resource==="hp"?character.hp<stats.maxHP:character.sp<stats.maxSP;
+    }
+
+    if(typeof getBattleActionDisplayName==="function"){
+        const previousDisplayName=getBattleActionDisplayName;
+        getBattleActionDisplayName=function(actionType){
+            if(actionType===POTION_TARGET_ACTION){
+                const pending=window.v143PendingPotionTarget;
+                const definition=pending&&getPotionDefinition(pending.potionId);
+                return definition?definition.name:"使用物品";
+            }
+            return previousDisplayName.apply(this,arguments);
+        };
+    }
+
+    if(typeof usePotion==="function"){
+        usePotion=function(potionId){
+            const definition=getPotionDefinition(potionId);
+            const autoOn=activeBattleCharacterIndex===0?autoBattle:getPartyAutoConfig(activeBattleCharacterIndex).enabled;
+            const caster=getPartyCharacterByIndex(activeBattleCharacterIndex);
+            if(!definition||!battleActive||autoOn||actionReady||!caster||caster.hp<=0){ return; }
+            const available=getPotionCount(potionId)-queuedPotionReservations(potionId);
+            if(available<=0){ addBattleLog(definition.name+"已被其他角色預定或沒有庫存。"); return; }
+            const valid=(typeof getExistingPartyIndexes==="function"?getExistingPartyIndexes():[0,1,2])
+                .filter(index=>validPotionTarget(potionId,index));
+            if(!valid.length){ addBattleLog((definition.resource==="hp"?"所有存活角色HP":"所有存活角色SP")+"都已經是滿的。"); return; }
+            actionReady=true;
+            pendingAction=POTION_TARGET_ACTION;
+            window.v143PendingPotionTarget={potionId:potionId,casterIndex:activeBattleCharacterIndex};
+            closeMenus();
+            const region=document.getElementById("battleActionRegion");
+            if(region){ region.classList.add("target-selecting"); }
+            const prompt=document.getElementById("battleTargetPromptAction");
+            if(prompt){ prompt.textContent="選擇要使用［"+definition.name+"］的角色"; }
+            currentBattleMonsters.forEach(index=>{
+                const card=document.getElementById("battleMonster"+index);
+                if(card){ card.classList.remove("targetable","target"); }
+            });
+            [0,1,2].forEach(index=>{
+                const card=document.getElementById("battlePlayerCard"+index);
+                if(card){ card.classList.toggle("ally-targetable",valid.indexOf(index)>=0); }
+            });
+            const targetText=document.getElementById("battleTarget");
+            if(targetText){ targetText.textContent="目標：請選擇我方角色"; }
+        };
+    }
+
+    if(typeof selectBattleAllyTarget==="function"){
+        const previousSelectAlly=selectBattleAllyTarget;
+        selectBattleAllyTarget=function(index){
+            const pending=window.v143PendingPotionTarget;
+            if(pendingAction!==POTION_TARGET_ACTION||!pending){ return previousSelectAlly.apply(this,arguments); }
+            if(!battleActive||battlePhase!=="declare"||!actionReady||!validPotionTarget(pending.potionId,index)){ return; }
+            actionReady=false;
+            pendingAction=null;
+            clearBattleTargetSelectionMode();
+            queuedPlayerActions[pending.casterIndex]={
+                action:"potion",potionId:pending.potionId,target:null,targetAlly:index
+            };
+            window.v143PendingPotionTarget=null;
+            finishPlayerAction();
+        };
+    }
+
+    if(typeof returnFromBattleTargetSelection==="function"){
+        const previousReturnFromTarget=returnFromBattleTargetSelection;
+        returnFromBattleTargetSelection=function(){
+            const wasPotion=pendingAction===POTION_TARGET_ACTION;
+            const result=previousReturnFromTarget.apply(this,arguments);
+            if(wasPotion){ window.v143PendingPotionTarget=null; }
+            return result;
+        };
+    }
+
+    if(typeof applyPotionEffect==="function"){
+        const previousApplyPotion=applyPotionEffect;
+        applyPotionEffect=function(potionId,characterIndex){
+            const queued=typeof queuedPlayerActions!=="undefined"&&queuedPlayerActions[characterIndex];
+            const target=queued&&Number.isInteger(queued.targetAlly)?queued.targetAlly:characterIndex;
+            window.v143LastPotionEffectTarget={index:target,at:Date.now()};
+            const caster=getPartyCharacterByIndex(characterIndex);
+            const receiver=getPartyCharacterByIndex(target);
+            const definition=getPotionDefinition(potionId);
+            const previousLog=typeof addBattleLog==="function"?addBattleLog:null;
+            if(previousLog&&caster&&receiver&&characterIndex!==target){
+                addBattleLog=function(message){
+                    const args=Array.prototype.slice.call(arguments);
+                    const expected=(receiver.id||"你")+"使用"+(definition&&definition.name||"");
+                    if(String(args[0]).indexOf(expected)>=0){
+                        args[0]=String(args[0]).replace(expected,(caster.id||"角色")+"對"+(receiver.id||"隊友")+"使用"+(definition&&definition.name||"物品"));
+                    }
+                    return previousLog.apply(this,args);
+                };
+            }
+            try{ return previousApplyPotion.call(this,potionId,target); }
+            finally{ if(previousLog&&caster&&receiver&&characterIndex!==target){ addBattleLog=previousLog; } }
+        };
+    }
+
+    /* Escape routing/presentation is owned by core resolveEscapeAttempt() plus
+       v132AbortDungeonBattle() and FourSymbolsBattlePresentation. The former
+       Dungeon-only resolveEscapeAttempt wrapper is retired. */
+
+    /* ----- 4 / 5. Larger Abyss, tap-to-advance dialogue and correct nav shell. ----- */
+    function fixDungeonNavigation(){
+    const nav=document.getElementById("v141DungeonNav");
+    const content=document.getElementById("game-content");
+    if(!nav||!content){ return; }
+    if(nav.parentElement!==content){ content.appendChild(nav); }
+    nav.dataset.v143Fixed="1";
+    const oldReturn=document.getElementById("v141DungeonReturn");
+    if(oldReturn){ oldReturn.remove(); }
+    if(typeof window.v148SyncDungeonShell==="function"){ window.v148SyncDungeonShell(); }
+}
+
+
+/* ----- 6. Synthesis uses icon pickers and creates ordinary random gear. ----- */
+    function definitions(){
+        return window.v132GetContentDefinitions?window.v132GetContentDefinitions():{ores:[],talismans:[]};
+    }
+    function countItem(itemId){
+        return (typeof inventoryItems!=="undefined"?inventoryItems:[]).reduce((sum,item)=>
+            sum+(item&&item.id===itemId?Math.max(0,numeric(item.count)):0),0
+        );
+    }
+    function rollUniform(min,max){ return min+Math.floor(Math.random()*(max-min+1)); }
+    function rollNormalAffixes(tier){
+        if(typeof window.v141RollCraftAffixes==="function"){ return window.v141RollCraftAffixes(tier,false); }
+        const meta=TIER_META[normalizeTierKey(tier)];
+        const stats={};
+        stats[STAT_KEYS[Math.floor(Math.random()*STAT_KEYS.length)]]=rollUniform(meta.main[0],meta.main[1]);
+        if(meta.sub){ stats[SUBSTAT_KEYS[Math.floor(Math.random()*SUBSTAT_KEYS.length)]]=rollUniform(meta.sub[0],meta.sub[1]); }
+        return stats;
+    }
+    function synthesisResult(item){
+        if(!window.v132ShowRewardModal){ return; }
+        const labels={attack:"攻擊",intelligence:"智力",vitality:"體質",energy:"能量",agility:"敏捷",spirit:"精神"};
+        const stats=Object.keys(item.stats||{}).map(key=>'<span>'+labels[key]+' <b>+'+item.stats[key]+'</b></span>').join("");
+        window.v132ShowRewardModal('<div class="v132-reward-modal-inner"><h3>合成成功</h3><div class="v141-result-item">'+item.icon+'<b>'+escapeHtml(item.name)+'</b>'+stats+'</div><p>此為系統隨機生成的普通裝備，不屬於四大套裝。</p><div class="v132-reward-actions"><button type="button" onclick="v132CloseRewardModal()">確定</button></div></div>');
+    }
+
+    window.v141CraftEquipment=function(){
+        const select=document.querySelector(".v141-synthesis-body select");
+        const blueprint=select&&(inventoryItems||[]).find(item=>item&&item.id===select.value&&item.blueprintSlot);
+        if(!blueprint){ return; }
+        const tier=normalizeTierKey(blueprint.tierKey);
+        const meta=TIER_META[normalizeTierKey(tier)];
+        const slot=SLOT_META[blueprint.blueprintSlot]||SLOT_META.hand;
+        const ore=definitions().ores.find(item=>item.tierKey===tier);
+        if(!meta||meta.available===false||!ore||countItem(blueprint.id)<50||countItem(ore.id)<50||numeric(gold)<meta.craftGold){ alert("素材或金幣不足。"); return; }
+        const item={
+            id:"normal_crafted_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,8),
+            v141Uid:"gear_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,8),
+            name:NORMAL_GEAR_PREFIXES[Math.floor(Math.random()*NORMAL_GEAR_PREFIXES.length)]+meta.label+slot.label,
+            icon:svgIcon(slot.glyph,meta.color),type:slot.type,tierKey:tier,levelRequirement:1,
+            price:0,count:1,stats:rollNormalAffixes(tier),reforgeStats:null,
+            v141Crafted:true,v143NormalCraft:true
+        };
+        delete item.setId;
+        if(window.v132CanAddItemToInventory&&!window.v132CanAddItemToInventory(item,1)){ alert("背包空間不足。"); return; }
+        const transaction=window.v132RunInventoryTransaction||function(operation){ return !!operation(); };
+        const success=transaction(()=>
+            window.v132ConsumeStackItem(blueprint.id,50)&&
+            window.v132ConsumeStackItem(ore.id,50)&&
+            window.v132AddItemToInventory(item,1)
+        );
+        if(!success){ alert("合成失敗，素材已自動還原。"); return; }
+        gold-=meta.craftGold;
+        rebuildInventorySlots(); updateGoldDisplay(); saveGame();
+        window.v141RenderSynthesis();
+        synthesisResult(item);
+    };
+
+    function allEquipment(){
+        const result=[];
+        (inventoryItems||[]).forEach(item=>{ if(item&&item.v141Uid){ result.push(item); } });
+        Object.values(typeof characterEquipment!=="undefined"&&characterEquipment||{}).forEach(slots=>
+            Object.values(slots||{}).forEach(item=>{ if(item&&item.v141Uid){ result.push(item); } })
+        );
+        return result;
+    }
+    function iconForPickerValue(value){
+        const content=definitions();
+        const item=(inventoryItems||[]).find(candidate=>candidate&&(candidate.id===value||candidate.v141Uid===value))||
+            allEquipment().find(candidate=>candidate.v141Uid===value)||
+            (content.talismans||[]).find(candidate=>candidate.id===value);
+        if(item&&item.assetPath){
+            const rarity=escapeHtml(normalizeTierKey(item.rarityKey||item.quality||item.tierKey||"white"));
+            return '<span class="v169-item-art v169-equipment-art v17346-rarity-'+rarity+'"><img src="'+escapeHtml(item.assetPath)+'" alt="" draggable="false" decoding="async"></span>';
+        }
+        return item&&item.icon?item.icon:svgIcon("物","#caa461");
+    }
+
+    function decorateSynthesis(){
+        const root=document.querySelector(".v141-synthesis");
+        if(!root){ return; }
+        root.classList.add("v143-synthesis");
+        root.querySelectorAll("label").forEach(label=>{
+            const select=label.querySelector("select");
+            if(!select||label.querySelector(".v143-item-picker")){ return; }
+            if(/系列/.test(label.textContent)&&!/選擇裝備/.test(label.textContent)){ label.hidden=true; return; }
+            const picker=document.createElement("div");
+            picker.className="v143-item-picker";
+            Array.from(select.options).forEach(option=>{
+                const button=document.createElement("button");
+                button.type="button";
+                button.className=option.value===select.value?"selected":"";
+                button.setAttribute("aria-label",option.textContent);
+                button.innerHTML='<i>'+iconForPickerValue(option.value)+'</i><span>'+escapeHtml(option.textContent)+'</span>';
+                button.onclick=()=>{
+                    select.value=option.value;
+                    select.dispatchEvent(new Event("change",{bubbles:true}));
+                };
+                picker.appendChild(button);
+            });
+            select.hidden=true;
+            select.insertAdjacentElement("afterend",picker);
+        });
+        const series=root.querySelector(".v141-blueprint-series");
+        if(series){ series.innerHTML="<span>2　合成結果</span><b>系統隨機普通裝備</b>"; }
+        const preview=root.querySelector(".v141-craft-preview");
+        if(preview){
+            const icon=preview.querySelector(".v141-craft-icon");
+            const text=preview.querySelector("div:last-child");
+            if(icon){ icon.innerHTML=svgIcon("鍛","#d1ad69"); }
+            if(text){ text.innerHTML="<b>隨機普通裝備</b><span>依圖紙部位與階級生成；不會產出赤炎、寒泉、岩岳、青嵐套裝。</span>"; }
+        }
+    }
+
+    if(typeof window.v141RenderSynthesis==="function"){
+        const previousRenderSynthesis=window.v141RenderSynthesis;
+        window.v141RenderSynthesis=function(){
+            const result=previousRenderSynthesis.apply(this,arguments);
+            decorateSynthesis();
+            return result;
+        };
+    }
+
+    /* Shared lifecycle keeps the patched DOM healthy after page switches. */
+    if(typeof showPage==="function"){
+        const previousShowPage=showPage;
+        showPage=function(page){
+            const result=previousShowPage.apply(this,arguments);
+            if(page==="dungeon"){ setTimeout(fixDungeonNavigation,0); }
+            if(page==="battle"){ setTimeout(()=>{ decorateEnemyCards(); syncEarthShieldEffects(); },0); }
+            return result;
+        };
+    }
+    function boot(){
+        fixDungeonNavigation();
+        decorateEnemyCards();
+        syncEarthShieldEffects();
+        decorateSynthesis();
+    }
+    if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",boot,{once:true}); }
+    else{ setTimeout(boot,0); }
+
+    window.v143SystemDiagnostics=function(){
+        return {
+            version:VERSION,
+            enemyCards:document.querySelectorAll(".v143-monster-identity").length,
+            dungeonNavFixed:document.getElementById("v141DungeonNav")?.dataset.v143Fixed==="1",
+            pendingPotion:!!window.v143PendingPotionTarget
+        };
+    };
+})();
+
+
+/* bundled source: js/39-v143-skill-animation.js */
+/* =====================================================
+   V143 — single-owner raster battle VFX runtime
+   V174 cleanup: official PNG Sprite Sheets/status loops only.
+   Fixed Slot geometry is the only battle position/coverage source.
+   No Canvas, SVG, WebGL, shader, particle, glyph or procedural fallback.
+===================================================== */
+(function installV143SkillAnimationRuntime(){
+    "use strict";
+
+    if(typeof window==="undefined"||window.__v143SkillAnimationInstalled){ return; }
+    if(!window.v142SkillAnimationDirector){ return; }
+    window.__v143SkillAnimationInstalled=true;
+
+    const VERSION="174-slot-geometry-owner";
+    const DEFAULT_HIT=.5833333333;
+    let blockedManifestWrites=0;
+    let blockedDirectorOverrides=0;
+    let blockedCardEffectOverrides=0;
+    const failedAssets=new Set();
+    const SPRITE_SCALE_MULTIPLIER=1;
+    /* Size the raster box before centering/travel. CSS independent scale also
+       scales translate(-50%) and the travel vector, moving the visible hit. */
+    const PLACEMENT_SIZE_SCALE=Object.freeze({single:.88,targetTrajectory:.80,trajectory:1,group:1,battlefield:1});
+    const spriteFrameAspectCache=new Map();
+    const spriteFrameAspectLoading=new Set();
+
+    function castSheet(src,placement,options){
+        return Object.assign({
+            src:src,columns:4,rows:3,frames:12,hitFrame:7,
+            placement:placement||"single",renderer:"dom-sprite"
+        },options||{});
+    }
+
+    const STATUS_VISUAL_LAYERS=Object.freeze({
+        HARD_CONTROL_BASE:"hard-control-base",
+        ROTATING:"rotating",
+        HUD:"hud"
+    });
+
+    function statusVisual(src,mode,collection,options){
+        const resolvedMode=mode||"static";
+        return Object.assign({
+            src:src||"",
+            mode:resolvedMode,
+            collection:collection||"statusEffects",
+            visualLayer:resolvedMode==="icon"?STATUS_VISUAL_LAYERS.HUD:STATUS_VISUAL_LAYERS.ROTATING,
+            cropColumns:1,
+            cropRows:1,
+            renderer:"dom-status-visual"
+        },options||{});
+    }
+
+    function relicSheet(src,hitFrame,options){
+        const frame=Math.max(1,Math.min(12,Math.floor(Number(hitFrame)||7)));
+        const frameIndex=frame-1;
+        return {
+            hit:frameIndex/12,
+            authoredHitFrame:frame,
+            lazyAsset:true,
+            sprite:castSheet(src,"single",Object.assign({
+                hitFrame:frameIndex,scale:2.05,maxSize:280
+            },options||{}))
+        };
+    }
+
+    const RAW_MANIFEST={
+        normal:{hit:.57,noVisual:true},
+
+        flameSlash:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/flame-slash-cast.png","single",{scale:1.85,maxSize:220})},
+        fireCritical:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/fire-critical-cast.png?v=165","single",{scale:2.15,maxSize:260})},
+        fireBurstStrike:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/fire-critical-cast.png?v=165","single",{scale:2.15,maxSize:260,reusedFrom:"fireCritical"})},
+        explosiveFlurry:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/explosive-flurry-cast.png?v=165","group",{scale:1.08,minSize:190,alignToSlots:true})},
         dragonSlash:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/dragon-slash-cast.png?v=165","single",{scale:2.35,maxSize:300})},
         fireRocket:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/fire-rocket-cast.png?v=165","trajectory",{travelToTargets:true,scale:.72,minSize:180,maxSize:280})},
         blazeSpell:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/blaze-spell-cast.png?v=165","single",{scale:2.15,maxSize:260})},
@@ -8381,8 +12273,7 @@ nToSlots:true})},
 
         stoneSlash:{hit:.5,deferredStatusTypes:["defenseDown"],sprite:castSheet("assets/vfx/earth/stone-slash-cast.png?v=173.39","single",{scale:2.2,maxSize:270})},
         petrifyFist:{hit:.5,deferredActorStatusTypes:["shield"],sprite:castSheet("assets/vfx/earth/petrify-fist-cast.png?v=173.39","group",{scale:1.08,minSize:190,alignToSlots:true})},
-        stoneBreakSky:{hit:.5,deferredActorStatusTypes:["shield"],spritail: error writing 'standard output': Broken pipe
-te:castSheet("assets/vfx/earth/stone-break-sky-cast.png?v=173.39","single",{scale:2.35,maxSize:290})},
+        stoneBreakSky:{hit:.5,deferredActorStatusTypes:["shield"],sprite:castSheet("assets/vfx/earth/stone-break-sky-cast.png?v=173.39","single",{scale:2.35,maxSize:290})},
         earthquakeCrush:{hit:.5,deferredStatusTypes:["petrify"],sprite:castSheet("assets/vfx/earth/earthquake-crush-cast.png?v=173.39","group",{scale:1.08,minSize:190,alignToSlots:true})},
         stoneThrow:{hit:.5,deferredStatusTypes:["defenseDown"],sprite:castSheet("assets/vfx/earth/stone-throw-cast.png?v=173.39","group",{scale:1.08,minSize:190,alignToSlots:true})},
         sandWind:{hit:.5,deferredStatusTypes:["defenseDown"],sprite:castSheet("assets/vfx/earth/sand-wind-cast.png?v=173.39","group",{scale:1.08,minSize:190,alignToSlots:true,preserveSourceAspect:true})},
@@ -8436,9 +12327,117 @@ te:castSheet("assets/vfx/earth/stone-break-sky-cast.png?v=173.39","single",{scal
         stealthSkill:statusVisual("assets/vfx/status/stealth.webp","static","activeBuffs",{label:"隱身",statusName:"隱身",iconSrc:"assets/vfx/status/stealth.webp"}),
         dinghaishenzhen:statusVisual("assets/vfx/status/calm-mind.webp","pulse","activeBuffs",{label:"氣定神閒",statusName:"氣定神閒",iconSrc:"assets/vfx/status/calm-mind.webp"}),
         defenseDown:statusVisual("","icon","statusEffects",{label:"破防",statusName:"破防",iconSrc:"assets/vfx/status/defense-down-icon.webp"}),
-        shieltail: write error: Broken pipe
-bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-  }
+        shield:statusVisual("assets/vfx/status/shield.webp","static","activeBuffs",{label:"護盾",statusName:"岩盾",iconSrc:"assets/vfx/status/shield.webp"}),
+        petrify:statusVisual("assets/vfx/status/petrify.webp","static","statusEffects",{label:"石化",statusName:"石化",iconSrc:"assets/vfx/status/petrify.webp",visualLayer:STATUS_VISUAL_LAYERS.HARD_CONTROL_BASE}),
+        earthShield:statusVisual("assets/vfx/status/earth-shield.webp","static","activeBuffs",{label:"萬象土盾",statusName:"萬象土盾",iconSrc:"assets/vfx/status/earth-shield.webp"}),
+        rockWall:statusVisual("assets/vfx/status/rock-wall.webp","static","activeBuffs",{label:"岩石壁壘",statusName:"岩石壁壘",iconSrc:"assets/vfx/status/rock-wall.webp"}),
+        barrier:statusVisual("assets/vfx/status/barrier.webp","static","activeBuffs",{label:"結界",statusName:"結界",iconSrc:"assets/vfx/status/barrier.webp"}),
+        yuanZuBlessing:statusVisual("assets/vfx/status/yuan-zu-blessing.webp","pulse","activeBuffs",{label:"元祖賜福",statusName:"元祖賜福",iconSrc:"assets/vfx/status/yuan-zu-blessing.webp"}),
+        fireMomentum:statusVisual("","icon","activeBuffs",{label:"炎勢",statusName:"炎勢",iconSrc:"assets/vfx/status/fire-momentum-icon.webp"}),
+        phoenixMight:statusVisual("","icon","activeBuffs",{label:"鳳威",statusName:"鳳威",iconSrc:"assets/vfx/status/phoenix-might-icon.webp"}),
+        fireSoulResonance:statusVisual("assets/vfx/status/fire-soul-resonance.webp","pulse","activeBuffs",{label:"炎魂共鳴",statusName:"炎魂共鳴",iconSrc:"assets/vfx/status/fire-soul-resonance.webp"}),
+        bloodBurn:statusVisual("assets/vfx/status/blood-burn.webp","pulse","activeBuffs",{label:"焚血",statusName:"焚血",iconSrc:"assets/vfx/status/blood-burn.webp"})
+    };
+
+    function protectObject(value,label){
+        if(!value||typeof value!=="object"||typeof Proxy!=="function"){ return value; }
+        return new Proxy(value,{
+            set:function(){ blockedManifestWrites++; return true; },
+            deleteProperty:function(){ blockedManifestWrites++; return true; },
+            defineProperty:function(){ blockedManifestWrites++; return true; }
+        });
+    }
+
+    Object.keys(RAW_MANIFEST).forEach(id=>{
+        const model=RAW_MANIFEST[id];
+        if(model.sprite){ model.sprite=protectObject(model.sprite,"sprite:"+id); }
+        RAW_MANIFEST[id]=protectObject(model,"model:"+id);
+    });
+    Object.keys(RAW_STATUS_VISUALS).forEach(type=>{
+        RAW_STATUS_VISUALS[type]=protectObject(RAW_STATUS_VISUALS[type],"status:"+type);
+    });
+
+    const MANIFEST=typeof Proxy==="function"
+        ?new Proxy(RAW_MANIFEST,{
+            set:function(){ blockedManifestWrites++; return true; },
+            deleteProperty:function(){ blockedManifestWrites++; return true; },
+            defineProperty:function(){ blockedManifestWrites++; return true; }
+        })
+        :RAW_MANIFEST;
+    const STATUS_VISUALS=typeof Proxy==="function"
+        ?new Proxy(RAW_STATUS_VISUALS,{
+            set:function(){ blockedManifestWrites++; return true; },
+            deleteProperty:function(){ blockedManifestWrites++; return true; },
+            defineProperty:function(){ blockedManifestWrites++; return true; }
+        })
+        :RAW_STATUS_VISUALS;
+
+    window.v143SkillAnimationManifest=MANIFEST;
+    window.v143StatusVisualManifest=STATUS_VISUALS;
+    window.v143GetSkillAnimationModel=function(skillId){
+        return MANIFEST[skillId]||{hit:DEFAULT_HIT,noVisual:true,missingAsset:true,signature:"missing-"+String(skillId||"unknown")};
+    };
+
+    function preflightAsset(source){
+        if(!source||typeof Image!=="function"){ return; }
+        const image=new Image();
+        image.decoding="async";
+        image.onerror=function(){ failedAssets.add(String(source)); };
+        image.src=source;
+    }
+    Object.keys(RAW_MANIFEST).forEach(id=>{
+        const model=RAW_MANIFEST[id];
+        const sprite=model&&model.sprite;
+        if(sprite&&sprite.src&&!model.lazyAsset){ preflightAsset(sprite.src); }
+    });
+    Object.keys(RAW_STATUS_VISUALS).forEach(type=>{
+        const source=RAW_STATUS_VISUALS[type]&&RAW_STATUS_VISUALS[type].src;
+        if(source){ preflightAsset(source); }
+    });
+    window.v143PreloadBattleVfxAsset=function(effectId){
+        const model=MANIFEST[effectId];
+        const sprite=model&&model.sprite;
+        if(!sprite||!sprite.src){ return false; }
+        preflightAsset(sprite.src);
+        return true;
+    };
+
+    const director=window.v142SkillAnimationDirector;
+    const originalPlay=director.play.bind(director);
+    const originalDispose=director.dispose.bind(director);
+    const state={
+        version:VERSION,current:null,stage:null,timers:new Set(),pendingUpdates:new Map(),
+        metrics:{started:0,completed:0,missingVisuals:0,legacyNodesPurged:0,delayedNumbers:0,delayedDeaths:0}
+    };
+    window.v143SkillAnimationState=state;
+
+    function setTimer(callback,delay){
+        const id=setTimeout(()=>{ state.timers.delete(id); callback(); },Math.max(0,Number(delay)||0));
+        state.timers.add(id);
+        return id;
+    }
+
+    function clearTimers(){
+        state.timers.forEach(id=>clearTimeout(id));
+        state.timers.clear();
+        state.pendingUpdates.clear();
+    }
+
+    function purgeLegacyCardVfx(){
+        if(typeof document==="undefined"||typeof document.querySelectorAll!=="function"){ return; }
+        let removed=0;
+        document.querySelectorAll(".v141-card-effects,#v142-skill-stage").forEach(node=>{
+            if(node&&typeof node.remove==="function"){ node.remove(); removed++; }
+        });
+        state.metrics.legacyNodesPurged+=removed;
+    }
+
+    function purgeStaleRasterStages(){
+        if(typeof document==="undefined"||typeof document.querySelectorAll!=="function"){ return; }
+        document.querySelectorAll("#v143-skill-stage").forEach(node=>{
+            if(node!==state.stage&&node&&typeof node.remove==="function"){ node.remove(); }
+        });
+    }
 
     function cardFor(side,index){
         if(typeof document==="undefined"){ return null; }
@@ -8957,7 +12956,129 @@ bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such fi
         if(type==="stealthSkill"){ return "無法被單體技能選中，仍會受到範圍技能"; }
         if(type==="dinghaishenzhen"){
             const resist=statusPercent(entry,"resistBonus","amount");
-            bwrap: Can't find source path /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
+            const accuracy=Number(entry&&entry.accuracyBonusPercent)||0;
+            const parts=[];
+            if(resist){ parts.push("最終異常狀態抗性 +"+resist+"%"); }
+            if(accuracy){ parts.push("最終命中率 +"+accuracy+"%"); }
+            return parts.join("、")||"異常狀態抗性提升";
+        }
+        if(type==="defenseDown"){ return "防禦降低 "+value+"%"; }
+        if(type==="shield"){
+            const remaining=Math.max(0,Number(entry&&entry.remaining)||0);
+            return remaining?"吸收傷害，剩餘護盾 "+Math.round(remaining):"吸收傷害";
+        }
+        if(type==="petrify"){ return "無法行動"; }
+        if(type==="earthShield"){
+            const percent=statusPercent(entry,"percent","reflectPercent");
+            return "反彈受到傷害的 "+percent+"%";
+        }
+        if(type==="rockWall"){
+            const percent=statusPercent(entry,"percent","defenseBonusPercent");
+            return "防禦提升 "+percent+"%";
+        }
+        if(type==="barrier"){
+            const blocks=Math.max(0,Number(entry&&entry.remainingBlocks)||0);
+            return blocks?"完全抵擋傷害，剩餘 "+blocks+" 次":"完全抵擋傷害";
+        }
+        if(type==="yuanZuBlessing"){
+            const percent=statusPercent(entry,"bonusPercent","evasionBonusPercent");
+            return "最終閃躲提升 "+percent+"%";
+        }
+        if(type==="fireMomentum"){
+            const percent=Number(entry&&entry.bonusPercent)||0;
+            return "火系直接攻擊傷害提升 "+percent+"%";
+        }
+        if(type==="phoenixMight"){
+            const percent=Number(entry&&entry.bonusPercent)||0;
+            return "下一回合造成的所有傷害提升 "+percent+"%";
+        }
+        if(type==="fireSoulResonance"){
+            const level=Math.max(1,Math.min(5,Number(entry&&entry.skillLevel)||1));
+            const values=typeof skillDatabase!=="undefined"&&skillDatabase.fireSoulResonance&&skillDatabase.fireSoulResonance.momentumBonusByLevel;
+            const percent=Array.isArray(values)?Number(values[level-1])||0:0;
+            return "炎勢使火系直接攻擊傷害提升"+(percent?" "+percent+"%":"")+
+                "；Lv5爆擊或成功新增燃燒可延長持續回合";
+        }
+        if(type==="bloodBurn"){
+            const level=Math.max(1,Math.min(5,Number(entry&&entry.skillLevel)||1));
+            const values=typeof skillDatabase!=="undefined"&&skillDatabase.bloodBurnArt&&skillDatabase.bloodBurnArt.directDamageBonusByLevel;
+            const percent=Array.isArray(values)?Number(values[level-1])||0:0;
+            return "火系攻擊傷害提升 "+percent+"%";
+        }
+        return "效果生效中";
+    }
+
+    function normalizedStatusEntry(entry,kind){
+        const type=statusVisualTypeForEntry(entry);
+        if(!type){ return null; }
+        const spec=RAW_STATUS_VISUALS[type];
+        const turns=Math.max(0,Number(entry&&entry.turnsLeft)||0);
+        const oneShot=!!(entry&&entry.oneShot)||turns>9999;
+        return Object.freeze({
+            type:type,
+            name:spec.label||spec.statusName||type,
+            iconSrc:spec.iconSrc||spec.src||"",
+            effect:statusEffectText(type,entry),
+            turnsLeft:oneShot?null:Math.ceil(turns),
+            remainingText:oneShot?"觸發後消失":Math.ceil(turns)+" 回合",
+            kind:kind
+        });
+    }
+
+    function authoritativeStatusBuffs(entity){
+        if(!entity){ return []; }
+        const entries=[];
+        if(Array.isArray(entity.v141TeamBuffs)){ entries.push(...entity.v141TeamBuffs); }
+        ["v155WindDodge","v155EvasionBlessing"].forEach(key=>{
+            const state=entity[key];
+            if(state&&Number(state.turnsLeft)>0){ entries.push(state); }
+        });
+        return entries;
+    }
+
+    window.v143GetBattleStatusSummary=function(entity){
+        const buffs=[],debuffs=[],seen=new Set();
+        function collect(list,kind){
+            if(!Array.isArray(list)){ return; }
+            list.forEach(entry=>{
+                if(!entry||Number(entry.turnsLeft)<=0){ return; }
+                const item=normalizedStatusEntry(entry,kind);
+                if(!item){ return; }
+                const key=kind+":"+item.type+":"+item.name;
+                if(seen.has(key)){ return; }
+                seen.add(key);
+                (kind==="buff"?buffs:debuffs).push(item);
+            });
+        }
+        /* Gameplay state is authoritative. Display-only activeBuffs are collected
+           only after real sidecars/team buffs and are de-duplicated by status ID. */
+        collect(authoritativeStatusBuffs(entity),"buff");
+        collect(entity&&entity.activeBuffs,"buff");
+        collect(entity&&entity.statusEffects,"debuff");
+        if(entity&&entity.v141Shield&&Number(entity.v141Shield.turnsLeft)>0){
+            const type=entity.v141Shield.isBarrier?"barrier":"shield";
+            const item=normalizedStatusEntry(Object.assign({type:type},entity.v141Shield),"buff");
+            if(item&&!seen.has("buff:"+item.type+":"+item.name)){ buffs.push(item); }
+        }
+        return Object.freeze({buffs:Object.freeze(buffs),debuffs:Object.freeze(debuffs)});
+    };
+
+    function syncAppliedStatusVisual(entity,type){
+        if(!entity){ return; }
+        let side=null,index=-1;
+        if(typeof monsters!=="undefined"&&Array.isArray(monsters)){
+            index=monsters.indexOf(entity);
+            if(index>=0){ side="monster"; }
+        }
+        if(!side&&typeof getPartyCharacterByIndex==="function"){
+            for(let partyIndex=0;partyIndex<6;partyIndex++){
+                if(getPartyCharacterByIndex(partyIndex)===entity){ side="player"; index=partyIndex; break; }
+            }
+        }
+        if(!side||index<0){ return; }
+        const current=state.current;
+        if(current&&!current.done&&current.targetSide===side){
+            const types=Array.isArray(current.model.deferredStatusTypes)?current.model.deferredStatusTypes:[];
             if(types.indexOf(type)>=0){
                 registerTarget(side,index,false);
                 confirmTargetVisual(current,index);
