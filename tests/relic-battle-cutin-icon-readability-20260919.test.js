@@ -40,16 +40,13 @@ assert.match(cinematicPrelude,/waitMs\(RELIC_IDENTITY_HOLD_MS\)[\s\S]*classList\
   "identity hold must end in target reveal before VFX");
 assert.match(relic,/function relicTargetGeometry\(side,index\)[\s\S]*getUnitGeometry/,
   "target lookup must resolve canonical battlefield geometry");
-assert.match(relic,/function revealRelicTargets\(target\)[\s\S]*team-relic-mask-holes[\s\S]*team-relic-battle-target-outline/,
-  "target reveal must cut apertures and outlines from canonical Unit geometry");
-assert.match(relic,/function queueRelicPresentation\(def,onStart,visualContext\)[\s\S]*beginRelicCinematic\(def,resolvedTarget\)[\s\S]*enterRelicVfxPhase\(node\)[\s\S]*playRelicVfx\([\s\S]*resolvedTarget[\s\S]*relicGate&&relicGate\.promise[\s\S]*endRelicCinematic\(node\)/,
-  "formal relic VFX must start only after target reveal, and battlefield restore must wait for the V143 gate to finish");
-assert.match(relic,/function endRelicCinematic\(node\)[\s\S]*classList\.add\("releasing"\)[\s\S]*waitMs\(RELIC_DIM_OUT_MS\)/,
-  "battlefield must fade back in after the relic VFX lifecycle ends");
-const liveQueueSource=relic.slice(
-  relic.indexOf("const generation=relicPresentationGeneration",relic.indexOf("function queueRelicPresentation")),
-  relic.indexOf("function normalizeOwned")
+assert.match(relic,/function revealRelicTargets\\(target\\)[\\s\\S]*team-relic-mask-holes[\\s\\S]*createElementNS\\(namespace,"rect"\\)/,
+  "target reveal must cut portrait/HP apertures from canonical highlight geometry"
 );
+assert.match(relic,/highlightRect|highlightRects/,
+  "target reveal must consume canonical portrait/HP highlight geometry");
+assert.doesNotMatch(relic,/team-relic-battle-target-outline|team-relic-battle-target-focus-layer/,
+  "target reveal must not create a second full-Unit outline owner");
 assert.doesNotMatch(
   liveQueueSource,
   /showBanner\(def\)/,
