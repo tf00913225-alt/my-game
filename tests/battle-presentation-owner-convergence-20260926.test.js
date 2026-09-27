@@ -137,7 +137,10 @@ assert.match(relic,/function relicOverlayGeometry\(\)[\s\S]*?getBattlefieldOverl
 assert.match(relic,/function revealRelicTargets\(target\)[\s\S]*?getUnitGeometry[\s\S]*?artworkProjection[\s\S]*?hpProjection/);
 assert.doesNotMatch(relic,/team-relic-mask-holes|createElementNS\(namespace,"rect"\)/,"Relic target focus must not restore rectangle apertures");
 assert.match(relic,/team-relic-target-projection-art/);
-assert.match(relic,/team-relic-target-projection-hp/);
+assert.match(relic,/team-relic-target-projection-resource/);
+assert.match(relic,/spProjection/);
+const projection=relic.slice(relic.indexOf("function appendRelicProjection"),relic.indexOf("function revealRelicTargets"));
+assert.doesNotMatch(projection,/outerHTML|innerHTML/);
 const begin=relic.slice(relic.indexOf("function beginRelicCinematic"),relic.indexOf("function enterRelicVfxPhase"));
 assert.ok(begin.indexOf('classList.add("identity-visible")')<begin.indexOf('classList.add("dim-visible")'),"Relic identity must appear before battlefield dimming");
 assert.ok(begin.indexOf('classList.add("dim-visible")')<begin.indexOf("revealRelicTargets(target)"),"Relic dimming must precede target reveal");
