@@ -8,6 +8,7 @@ const ROOT=path.resolve(__dirname,"..");
 const read=file=>fs.readFileSync(path.join(ROOT,file),"utf8");
 
 const ownerSource=read("js/battlefield-slot-owner.js");
+const v131Source=read("js/25-v131-fix-batch.js");
 const adapterSource=read("js/battlefield-render-geometry-adapter.js");
 const vfxSource=read("js/39-v143-skill-animation.js");
 const qaSource=read("js/54-v173.51-battle-qa.js");
@@ -17,6 +18,8 @@ const css=read("css/fixed-slot-battlefield-rendering-v2.css");
 const build=read("scripts/build-production.mjs");
 
 assert.match(ownerSource,/window\.FourSymbolsBattlefieldSlots/);
+assert.match(v131Source,/const activeMatches=existing&&requested\.every\(index=>!!owner\.getEnemySlotForMonster\(existing,index\)\);/);
+assert.match(v131Source,/if\(activeMatches\)\{ return existing; \}/);
 assert.match(ownerSource,/getGeometryRectFromShape/);
 assert.match(ownerSource,/getSideRect/);
 assert.match(adapterSource,/const slots=window\.FourSymbolsBattlefieldSlots/);

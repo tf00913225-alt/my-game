@@ -136,10 +136,12 @@
     function ensureEnemyFormationSnapshot(indexes){
         const owner=fixedBattlefieldSlots();
         if(!owner){ return null; }
-        const existing=owner.getActiveEnemySnapshot();
-        if(existing){ return existing; }
         const requested=(Array.isArray(indexes)?indexes:currentBattleMonsters||[])
             .filter(index=>Number.isInteger(index)).slice(0,10);
+        if(!requested.length){ return null; }
+        const existing=owner.getActiveEnemySnapshot();
+        const activeMatches=existing&&requested.every(index=>!!owner.getEnemySlotForMonster(existing,index));
+        if(activeMatches){ return existing; }
         if(!requested.length){ return null; }
         const snapshot=owner.createEnemyFormationSnapshot(requested,{
             originalFormationType:requested.length,
