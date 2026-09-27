@@ -276,25 +276,20 @@ test("Water three-target casts use one fixed three-slot sheet even when one targ
     assert.deepEqual(placements[1],placements[0],"survivor count must not collapse a three-slot footprint");
 });
 
-test("all damage numbers share frame eight while remaining target-specific",()=>{
+test("all damage feedback resolves frame eight timing while remaining target-specific",()=>{
     const runtime=loadRuntime([0,2]);
     runtime.context.v142SkillAnimationDirector.play({
         id:"iceArrowRain",name:"冰霜箭雨",element:"water",category:"magic",
         targetType:"all",duration:1600,resolveDuration:1600
     },{side:"player",actorIndex:0});
-    const before=runtime.scheduled.length;
-    runtime.context.showMonsterHit(0,10,"hp");
-    runtime.context.showMonsterHit(2,10,"hp");
-    const candidates=runtime.scheduled.slice(before).filter(timer=>timer.delay>=920&&timer.delay<=950);
-    const timers=[];
-    candidates.forEach(timer=>{
-        const hitsBefore=runtime.hitCalls();
-        timer.callback();
-        if(runtime.hitCalls()>hitsBefore){ timers.push(timer); }
-    });
-    assert.equal(timers.length,2);
-    assert.ok(Math.abs(timers[0].delay-timers[1].delay)<=3,"all living enemies hit together");
-    assert.equal(runtime.hitCalls(),2,"each real card owns its own damage number");
+    assert.equal(typeof runtime.context.v143ResolveBattleFeedbackTiming,"function");
+    const first=runtime.context.v143ResolveBattleFeedbackTiming("monster",0,"damage");
+    const second=runtime.context.v143ResolveBattleFeedbackTiming("monster",2,"damage");
+    assert.ok(first.delayMs>=920&&first.delayMs<=950,"first target must resolve at authored frame eight");
+    assert.ok(second.delayMs>=920&&second.delayMs<=950,"second target must resolve at authored frame eight");
+    assert.ok(Math.abs(first.delayMs-second.delayMs)<=3,"all living enemies share the same authored impact time");
+    assert.equal(first.critical,false);
+    assert.equal(second.critical,false);
 });
 
 test("the current cache version publishes the 1.6 second battlefield choreography",()=>{

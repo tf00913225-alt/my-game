@@ -90,6 +90,7 @@ const gameplayScripts=[
     "js/57-v173.51-quest-qa.js",
     "js/58-v173.63-functional-fixes.js",
     "js/battlefield-render-geometry-adapter.js",
+    "js/battle-floating-feedback-owner.js",
     "js/60-v173.64-skill-progression-rebalance.js",
     "js/60-team-relic-system.js"
 ];
@@ -160,7 +161,8 @@ const gameplayStyles=[
     "css/52-v173.50-inventory-qol.css",
     "css/53-v173.51-qa.css",
     "css/fixed-slot-battlefield-rendering-v2.css",
-    "css/55-team-relic-system.css"
+    "css/55-team-relic-system.css",
+    "css/battle-floating-feedback-owner.css"
 ];
 const patrolStyles=["css/32-v131-patrol-appearance.css"];
 const abyssStyles=["css/50-v169-abyss-flow.css","css/54-v174-abyss-two-tier.css"];

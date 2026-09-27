@@ -5,6 +5,8 @@ const fs=require("node:fs");
 
 const relic=fs.readFileSync("js/60-team-relic-system.js","utf8");
 const relicCss=fs.readFileSync("css/55-team-relic-system.css","utf8");
+const feedback=fs.readFileSync("js/battle-floating-feedback-owner.js","utf8");
+const feedbackCss=fs.readFileSync("css/battle-floating-feedback-owner.css","utf8");
 const v142=fs.readFileSync("js/37-v142-skill-animation.js","utf8");
 
 assert.match(relic,/RELIC_VFX_FLOOR_MS=2000/,
@@ -27,12 +29,16 @@ assert.match(relic,/function showRelicSpFloat\(index,amount\)\{[\s\S]*?emitRelic
 assert.doesNotMatch(relic,/function showRelicSpFloat[\s\S]{0,450}createElement\(/,
     "relic SP recovery must not create its own overlapping popup node");
 
-assert.match(relicCss,/#game-stage #battlePage \.damage-popup\{animation-duration:\.65s!important;\}/,
-    "damage/recovery popup animation must finish inside the existing V142 action boundary");
-assert.match(relicCss,/\.damage-popup\.heal-popup\{[\s\S]*?top:20%!important;[\s\S]*?color:#19d85c!important/,
-    "HP recovery remains green in the upper recovery lane");
-assert.match(relicCss,/\.damage-popup\.sp-popup\{[\s\S]*?top:48%!important;[\s\S]*?color:#FF9F38!important/,
-    "SP recovery must render below HP in orange");
+assert.doesNotMatch(relicCss,/\.damage-popup|\.team-relic-sp-float/,
+    "Relic CSS must not own damage/recovery popup positioning or typography");
+assert.match(feedback,/const MAX_LANES=4/);
+assert.match(feedback,/context\.queue\.push\(request\)/);
+assert.match(feedback,/geometry\.feedbackSafeRect/);
+assert.match(feedbackCss,/color:#e32626/);
+assert.match(feedbackCss,/-webkit-text-stroke:\.85px #fff/);
+assert.match(feedbackCss,/text-shadow:1px 1px 0 #000/);
+assert.doesNotMatch(feedbackCss,/0 0 (?:7|8|10|14|16)px/,
+    "shared battle feedback must not restore colored glow");
 
 assert.match(v142,/window\.v142GetRemainingAnimationMs=function/,
     "V142 exposes remaining visual time to the core queue owner");

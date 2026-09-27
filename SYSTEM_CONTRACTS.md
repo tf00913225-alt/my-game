@@ -59,16 +59,16 @@
 - Status / Hard Control（異常／硬控）的唯一公式 owner 是 `js/00-main.js::calculateStatusEffectChance()`／`rollStatusEffectHit()`。正式公式在上限前為：`skillBaseChance + offensiveAttribute×0.05 + finalStatusBonus - targetSpirit×0.05 - finalStatusResistance`。不得再加入 level factor（等級差倍率）、`sqrt(attribute)`、硬控專屬 Spirit coefficient（精神係數）或第二套 Boss 乘算抗性。
 - 物理技能的異常主屬性使用有效 Attack Points（攻擊六圍點數）；法術技能使用有效 Intelligence（智力）。符咒、怪物技能、Boss／深淵技能與玩家技能必須走同一公式 owner，不得各自重算。
 - Hard Control 最終上限固定為：Regular 90%、Elite 75%、Boss 60%、Enemy-to-player 60%；上限只在同一套最終成功率公式最後套用一次。Freeze／Petrify 的互斥 Gate 仍先於正式寫入，禁止 Boss 額外再乘第二套隱藏抗性。
-- Frostbite（凍傷）是 Soft Debuff：造成傷害 -25%，最終閃躲 -25 個百分點、最終異常狀態抗性 -25 個百分點；不禁止使用技能。任何戰鬥狀態文字若再顯示「凍傷＝無法使用技能」都屬 Contract violation。
+- Frostbite（凍傷）是 Soft Debuff：造成傷害 -30%，最終閃躲 -25%、最終異常狀態抗性 -25%；不禁止使用技能。任何戰鬥狀態文字若再顯示「凍傷＝無法使用技能」都屬 Contract violation。
 - V140／V158／V169 等歷史模組不得再 override（覆寫）上述核心公式。Guaranteed Burn（必定燃燒）必須透過正式 `guaranteedHit` 參數，不得暫時替換全域 `rollStatusEffectHit()`。
-- 玩家可見的機率 Buff／Debuff 文字必須明確表示「最終…±N 個百分點」；禁止同一個「+10%」在不同系統被解讀為乘算、屬性換算或百分點。
+- 內部公式仍以 percentage point（百分點）做最終命中／閃躲／抗性加減；玩家可見 Buff／Debuff 一律顯示「最終…±N%」，禁止顯示「個百分點」。UI 的 `%` 是顯示語法，不改變內部百分點數學語意。
 
 ## 技能成長與說明契約
 
 - Character Element = Element DNA：`character.element` 唯一負責元素克制、EX 身份與本命元素身份；普通攻擊與所有玩家技能（包括跨修）均以施放角色 DNA 對目標元素結算克制。
 - Skill Element = Skill Identity：`skill.element` 只負責 VFX、Icon、技能／狀態類型與視覺身份，不得改寫角色 DNA 或元素克制。Skill Category 唯一負責 Physical／Magic 與 Attack／Intelligence 公式。
 - Cross Element：需已學至少一招本命技能；跨修免 `requires`、初學成本 ×2、後續升級仍 1 點；每名角色最多裝備 1 招跨元素技能，存檔／自動配裝／戰鬥 Ready Gate 都必須保留欄位順序中的第一招並自動卸下其餘跨修技能。EX 永遠本命限定。
-- Wind EX：Final Evasion +15 個百分點、Final Accuracy +15 個百分點；自身 HP <25% 時，正式一般命中公式完成後，對該角色套用 `finalHitChance = min(finalHitChance, 50)`。這是 Special Final Cap，不受一般 70% 最低命中重新拉高；HP >=25% 立即失效，且不適用 DoT、Reflect、純 Status Formula、Skill HP Cost 或明確不可閃避機制。
+- Wind EX：Final Evasion +15%、Final Accuracy +15%；自身 HP <25% 時，正式一般命中公式完成後，對該角色套用 `finalHitChance = min(finalHitChance, 50)`。這是 Special Final Cap，不受一般 70% 最低命中重新拉高；HP >=25% 立即失效，且不適用 DoT、Reflect、純 Status Formula、Skill HP Cost 或明確不可閃避機制。
 
 - 玩家四元素「主要效果包含直接傷害」技能的正式傷害曲線唯一 owner 為 `js/00-main.js::getSkillDamageAtLevel()`。Lv1 使用 `baseDamage`；Lv2～4 依 `damagePerLevel` 線性增加；Lv5 = Lv4 × 1.5；Lv6～9 再依固定成長增加；Lv10 = Lv9 × 1.5。突破與最終傷害取整統一使用正式戰鬥 `Math.round` 語意。
 - 玩家直接傷害技能正式上限為 Lv10；純 Buff／Heal／Revive／Control／Support／EX 不得因本規則被誤升 Lv10。既有玩家已學等級必須原值保留，Max Lv 提升不得重置、退點、自動補滿或重複扣點。

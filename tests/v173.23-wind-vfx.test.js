@@ -443,17 +443,16 @@ test("enemy casts use the explicit player target instead of a fixed faction posi
     assert.equal(sprites[0].style.top,"418px");
 });
 
-test("frame seven releases resolved attack results once, while buffs never shake or show damage",()=>{
+test("frame seven exposes formal attack feedback timing while buffs never create damage",()=>{
     const attack=loadRuntime();
     attack.context.v142SkillAnimationDirector.play(
         config("stormFist","single","physical"),
         {side:"player",actorIndex:0,targetId:2}
     );
-    attack.context.showMonsterHit(2,33,"hp");
-    assert.equal(attack.monsterHits.length,0);
-    attack.setClock(600);
-    runTimers(attack,600);
-    assert.equal(attack.monsterHits.length,1,"damage result appears once at frame seven");
+    assert.equal(typeof attack.context.v143ResolveBattleFeedbackTiming,"function");
+    const impact=attack.context.v143ResolveBattleFeedbackTiming("monster",2,"damage");
+    assert.ok(impact.delayMs>0&&impact.delayMs<=700,"damage feedback must resolve at the authored hit frame");
+    assert.equal(impact.critical,false);
     assert.equal(attack.cards.battleMonster2.classList.contains("v143-impact-target"),false,"raster owner must not recreate the retired procedural impact class");
 
     const buff=loadRuntime();

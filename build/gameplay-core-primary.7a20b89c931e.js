@@ -4201,6 +4201,30 @@
         currentZone=run.previousZone;
     }
 
+    function abortDungeonBattle(reason){
+        const run=window.v132ActiveDungeonRun;
+        if(!run){ return false; }
+        battleActive=false;
+        clearBattleRoundPrompt();
+        finishBattleStatisticsSession(String(reason||"escape"));
+        autoBattle=false;
+        actionReady=false;
+        pendingAction=null;
+        clearInterval(timerId);
+        timerId=null;
+        if(battleAdvanceTimeoutId){ clearTimeout(battleAdvanceTimeoutId); battleAdvanceTimeoutId=null; }
+        battleAdvanceScheduled=false;
+        battleToken++;
+        closeMenus();
+        restoreDungeonMonsters();
+        window.v132ActiveDungeonRun=null;
+        updateUI();
+        saveGame();
+        if(run.onComplete){ run.onComplete({result:String(reason||"escape"),turnsUsed:turn}); }
+        return true;
+    }
+    window.v132AbortDungeonBattle=abortDungeonBattle;
+
     if(typeof winBattle==="function"){
         const originalWinBattle=winBattle;
         winBattle=function(){
@@ -4326,7 +4350,7 @@
             }
 
             showExpDungeonRewardModal(rewardExp);
-        });
+        },{mode:"daily",dailyDungeonType:"exp"});
     }
 
     /*
@@ -4466,7 +4490,7 @@
             }
             const chestCount=outcome.turnsUsed<5 ? 3 : (outcome.turnsUsed<10 ? 2 : 1);
             showMaterialDungeonRewardModal(chestCount);
-        });
+        },{mode:"daily",dailyDungeonType:"material"});
     }
     window.v132BeginMaterialDungeon=beginMaterialDungeon;
 
@@ -4674,7 +4698,7 @@
                 return;
             }
             showEquipmentDungeonRewardModal();
-        });
+        },{mode:"daily",dailyDungeonType:"equipment"});
     }
     window.v132BeginEquipmentDungeon=beginEquipmentDungeon;
 
@@ -9211,6 +9235,36 @@
         },2700);
     }
 
+    window.v141PlayEscapeBattleExit=function(onCovered){
+        if(transitionRunning){ return Promise.resolve(false); }
+        transitionRunning=true;
+        const overlay=ensureBattleTransitionOverlay();
+        const label=overlay&&overlay.querySelector("b");
+        if(label){ label.textContent="撤離"; }
+        if(overlay){
+            overlay.dataset.v144Kind="escape";
+            overlay.classList.add("show");
+        }
+        return new Promise(resolve=>{
+            setTimeout(()=>{
+                let result;
+                try{
+                    result=typeof onCovered==="function"?onCovered():true;
+                }finally{
+                    setTimeout(()=>{
+                        if(overlay){
+                            overlay.classList.remove("show");
+                            delete overlay.dataset.v144Kind;
+                        }
+                        if(label){ label.textContent="戰"; }
+                        transitionRunning=false;
+                        resolve(result);
+                    },120);
+                }
+            },460);
+        });
+    };
+
     if(typeof winBattle==="function"){
         const originalWinBattle=winBattle;
         let exitingWin=false;
@@ -10716,7 +10770,7 @@
             const evasion=levelValue(skill.evasionBonusPercentByLevel,skill.evasionBonusPercent||0);
             const dodgeTargets=(supportTargeting.entries||[]).map(entry=>entry.monster);
             applyTimedMonsterBuff(dodgeTargets,"dodge",3,evasion);
-            addBattleLog(monster.name+"施放閃躲術，同排最多"+dodgeTargets.length+"名友方最終閃躲提升"+evasion+"個百分點，持續3回合。");
+            addBattleLog(monster.name+"施放閃躲術，同排最多"+dodgeTargets.length+"名友方最終閃躲提升"+evasion+"%，持續3回合。");
         }
         updateUI(); finishPlayerAction();
         return true;
@@ -11933,49 +11987,9 @@
         };
     }
 
-    /* ----- 3. Escaping a dungeon restores the dungeon owner before routing. ----- */
-    if(typeof resolveEscapeAttempt==="function"){
-        const previousEscape=resolveEscapeAttempt;
-        resolveEscapeAttempt=function(characterIndex){
-            const run=window.v132ActiveDungeonRun;
-            if(!run){ return previousEscape.apply(this,arguments); }
-            clearInterval(timerId);
-            timerId=null;
-            const alive=currentBattleMonsters.map(index=>monsters[index]).filter(monster=>monster&&monster.alive);
-            if(!alive.length){ checkBattleEnd(); return; }
-            const highest=Math.max.apply(null,alive.map(monster=>monster.level));
-            const character=getPartyCharacterByIndex(characterIndex)||player;
-            const chance=Math.max(10,Math.min(95,50+(numeric(character.level)-highest)*5));
-            if(Math.random()*100>=chance){ addBattleLog("逃脫失敗！"); finishPlayerAction(); return; }
-
-            battleActive=false;
-            autoBattle=false;
-            actionReady=false;
-            pendingAction=null;
-            battleToken++;
-            if(typeof battleAdvanceTimeoutId!=="undefined"&&battleAdvanceTimeoutId){
-                clearTimeout(battleAdvanceTimeoutId); battleAdvanceTimeoutId=null;
-            }
-            if(typeof battleAdvanceScheduled!=="undefined"){ battleAdvanceScheduled=false; }
-            closeMenus();
-            if(window.v142SkillAnimationDirector){ window.v142SkillAnimationDirector.dispose(); }
-            document.querySelectorAll("#v141BattleTransition,.v141-battle-transition").forEach(node=>node.classList.remove("show"));
-            const battlePage=document.getElementById("battlePage");
-            if(battlePage){ battlePage.classList.remove("preparing","v141-exiting"); }
-            monsters=run.previousMonsters;
-            currentZone=run.previousZone;
-            window.v132ActiveDungeonRun=null;
-            addBattleLog("成功從副本脫逃！");
-            if(typeof saveGame==="function"){ saveGame(); }
-            setTimeout(()=>{
-                if(typeof run.onComplete==="function"){ run.onComplete({result:"escape"}); }
-                else{
-                    showPage("dungeon");
-                    if(typeof switchDungeonTab==="function"){ switchDungeonTab("daily"); }
-                }
-            },260);
-        };
-    }
+    /* Escape routing/presentation is owned by core resolveEscapeAttempt() plus
+       v132AbortDungeonBattle() and FourSymbolsBattlePresentation. The former
+       Dungeon-only resolveEscapeAttempt wrapper is retired. */
 
     /* ----- 4 / 5. Larger Abyss, tap-to-advance dialogue and correct nav shell. ----- */
     function fixDungeonNavigation(){
@@ -12928,25 +12942,22 @@
             const damage=statusPercent(entry,"critDamageBonusPercent","bonusPercent");
             return "爆擊率 +"+chance+"%，爆擊傷害 +"+damage+"%";
         }
-        if(type==="frostbite"){ return "傷害 -30%、最終閃躲 -25個百分點、最終異常狀態抗性 -25個百分點"; }
+        if(type==="frostbite"){ return "傷害 -30%、最終閃躲 -25%、最終異常狀態抗性 -25%"; }
         if(type==="freeze"){ return "無法行動"; }
-        if(type==="agilityDown"){ return "敏捷降低 "+value+"%、最終閃躲降低 "+value+"個百分點"; }
+        if(type==="agilityDown"){ return "敏捷降低 "+value+"%、最終閃躲降低 "+value+"%"; }
         if(type==="damageDown"){ return "造成傷害降低 "+value+"%"; }
-        if(type==="stun"){ return "最終命中率降低 "+value+"個百分點"; }
+        if(type==="stun"){ return "最終命中率降低 "+value+"%"; }
         if(type==="dodgeSkill"){
-            const percent=statusPercent(entry,"percent","bonusPercent")||
-                Number(typeof skillDatabase!=="undefined"&&skillDatabase.dodgeSkill&&skillDatabase.dodgeSkill.evasionBonusPercent)||0;
-            return "最終閃躲提升 "+percent+"個百分點";
+            const percent=statusPercent(entry,"bonusPercent","percent");
+            return "最終閃躲提升 "+percent+"%";
         }
         if(type==="stealthSkill"){ return "無法被單體技能選中，仍會受到範圍技能"; }
         if(type==="dinghaishenzhen"){
-            const resist=statusPercent(entry,"resistBonus","amount")||
-                Number(typeof skillDatabase!=="undefined"&&skillDatabase.dinghaishenzhen&&skillDatabase.dinghaishenzhen.statusResistBonus)||0;
-            const accuracy=Number(entry&&entry.accuracyBonusPercent)||
-                Number(typeof skillDatabase!=="undefined"&&skillDatabase.dinghaishenzhen&&skillDatabase.dinghaishenzhen.accuracyBonusPercent)||0;
+            const resist=statusPercent(entry,"resistBonus","amount");
+            const accuracy=Number(entry&&entry.accuracyBonusPercent)||0;
             const parts=[];
-            if(resist){ parts.push("最終異常狀態抗性 +"+resist+"個百分點"); }
-            if(accuracy){ parts.push("最終命中率 +"+accuracy+"個百分點"); }
+            if(resist){ parts.push("最終異常狀態抗性 +"+resist+"%"); }
+            if(accuracy){ parts.push("最終命中率 +"+accuracy+"%"); }
             return parts.join("、")||"異常狀態抗性提升";
         }
         if(type==="defenseDown"){ return "防禦降低 "+value+"%"; }
@@ -12956,13 +12967,11 @@
         }
         if(type==="petrify"){ return "無法行動"; }
         if(type==="earthShield"){
-            const percent=statusPercent(entry,"percent","reflectPercent")||
-                Number(typeof skillDatabase!=="undefined"&&skillDatabase.earthShield&&skillDatabase.earthShield.reflectPercent)||0;
+            const percent=statusPercent(entry,"percent","reflectPercent");
             return "反彈受到傷害的 "+percent+"%";
         }
         if(type==="rockWall"){
-            const percent=statusPercent(entry,"percent","defenseBonusPercent")||
-                Number(typeof skillDatabase!=="undefined"&&skillDatabase.rockWall&&skillDatabase.rockWall.defenseBonusPercent)||0;
+            const percent=statusPercent(entry,"percent","defenseBonusPercent");
             return "防禦提升 "+percent+"%";
         }
         if(type==="barrier"){
@@ -12970,9 +12979,8 @@
             return blocks?"完全抵擋傷害，剩餘 "+blocks+" 次":"完全抵擋傷害";
         }
         if(type==="yuanZuBlessing"){
-            const percent=statusPercent(entry,"bonusPercent","evasionBonusPercent")||
-                Number(typeof skillDatabase!=="undefined"&&skillDatabase.yuanZuBlessing&&skillDatabase.yuanZuBlessing.evasionBonusPercent)||0;
-            return "最終閃躲提升 "+percent+"個百分點";
+            const percent=statusPercent(entry,"bonusPercent","evasionBonusPercent");
+            return "最終閃躲提升 "+percent+"%";
         }
         if(type==="fireMomentum"){
             const percent=Number(entry&&entry.bonusPercent)||0;
@@ -13015,6 +13023,17 @@
         });
     }
 
+    function authoritativeStatusBuffs(entity){
+        if(!entity){ return []; }
+        const entries=[];
+        if(Array.isArray(entity.v141TeamBuffs)){ entries.push(...entity.v141TeamBuffs); }
+        ["v155WindDodge","v155EvasionBlessing"].forEach(key=>{
+            const state=entity[key];
+            if(state&&Number(state.turnsLeft)>0){ entries.push(state); }
+        });
+        return entries;
+    }
+
     window.v143GetBattleStatusSummary=function(entity){
         const buffs=[],debuffs=[],seen=new Set();
         function collect(list,kind){
@@ -13029,6 +13048,9 @@
                 (kind==="buff"?buffs:debuffs).push(item);
             });
         }
+        /* Gameplay state is authoritative. Display-only activeBuffs are collected
+           only after real sidecars/team buffs and are de-duplicated by status ID. */
+        collect(authoritativeStatusBuffs(entity),"buff");
         collect(entity&&entity.activeBuffs,"buff");
         collect(entity&&entity.statusEffects,"debuff");
         if(entity&&entity.v141Shield&&Number(entity.v141Shield.turnsLeft)>0){
@@ -13526,73 +13548,26 @@
         return wait;
     };
 
-    if(typeof showMonsterHit==="function"){
-        const previous=showMonsterHit;
-        showMonsterHit=function(index){
-            const args=Array.prototype.slice.call(arguments);
-            const wait=delayFor("monster",index,true);
-            const current=state.current;
-            if(current&&!current.done&&current.config.id==="fireCritical"&&current.targetSide==="monster"){ args[3]=true; }
-            if(wait>8){
-                state.metrics.delayedNumbers++;
-                setTimer(()=>previous.apply(this,args),wait);
-                return;
-            }
-            return previous.apply(this,args);
-        };
-    }
-
-    if(typeof showPlayerHit==="function"){
-        const previous=showPlayerHit;
-        showPlayerHit=function(amount,type,index){
-            const args=Array.prototype.slice.call(arguments);
-            const wait=delayFor("player",Number(index)||0,true);
-            const current=state.current;
-            if(current&&!current.done&&current.config.id==="fireCritical"&&current.targetSide==="player"&&!args[3]){ args[4]=true; }
-            if(wait>8){
-                state.metrics.delayedNumbers++;
-                setTimer(()=>previous.apply(this,args),wait);
-                return;
-            }
-            return previous.apply(this,args);
-        };
-    }
+    /* V143 owns hit timing only. Battle Floating Feedback owns popup DOM,
+       geometry, collision lanes, typography and cleanup. */
+    window.v143ResolveBattleFeedbackTiming=function(targetSide,index,kind){
+        const side=targetSide==="monster"?"monster":"player";
+        const unitIndex=Number(index)||0;
+        const wait=delayFor(side,unitIndex,true);
+        const current=state.current;
+        const critical=String(kind||"")==="damage"&&!!(
+            current&&!current.done&&current.config&&current.config.id==="fireCritical"&&
+            current.targetSide===side
+        );
+        if(wait>8){ state.metrics.delayedNumbers++; }
+        return Object.freeze({delayMs:wait,critical:critical});
+    };
 
     if(typeof applySkillDebuffEffectsToPlayer==="function"){
         const previous=applySkillDebuffEffectsToPlayer;
         applySkillDebuffEffectsToPlayer=function(skill,level,target,index){
             registerTarget("player",Number(index)||0,true);
             return previous.apply(this,arguments);
-        };
-    }
-
-    if(typeof showMissEffect==="function"){
-        const previous=showMissEffect;
-        showMissEffect=function(isPlayerTarget,index,label){
-            const args=Array.prototype.slice.call(arguments);
-            const targetSide=isPlayerTarget?"player":"monster";
-            /* MISS is still an attempted cast. Register the resolved target through
-               the same formal V143 path so late-known monster/Boss targets get
-               their real Sprite Sheet while the MISS popup keeps hit timing. */
-            const wait=delayFor(targetSide,index,true);
-            const invoke=()=>{
-                const result=previous.apply(this,args);
-                const card=cardFor(targetSide,index);
-                if(card&&typeof card.querySelectorAll==="function"&&typeof document!=="undefined"&&document.body){
-                    const popups=card.querySelectorAll(":scope > .damage-popup.miss-popup");
-                    const popup=popups.length?popups[popups.length-1]:null;
-                    const rect=popup&&card.getBoundingClientRect?card.getBoundingClientRect():null;
-                    if(popup&&rect){
-                        popup.classList.add("v152-top-damage");
-                        popup.style.setProperty("left",(rect.left+rect.width/2)+"px","important");
-                        popup.style.setProperty("top",(rect.top+rect.height*.26)+"px","important");
-                        document.body.appendChild(popup);
-                    }
-                }
-                return result;
-            };
-            if(wait>8){ setTimer(invoke,wait); return; }
-            return invoke();
         };
     }
 

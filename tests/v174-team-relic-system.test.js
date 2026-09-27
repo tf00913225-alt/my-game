@@ -8,12 +8,16 @@ const source=fs.readFileSync("js/60-team-relic-system.js","utf8");
 const repositorySource=fs.readFileSync("js/startup/account-save-repository.js","utf8");
 const loader=fs.readFileSync("js/19-stage-v78-character-inventory-runtime.js","utf8");
 const css=fs.readFileSync("css/55-team-relic-system.css","utf8");
+const feedbackSource=fs.readFileSync("js/battle-floating-feedback-owner.js","utf8");
+const feedbackCss=fs.readFileSync("css/battle-floating-feedback-owner.css","utf8");
 const build=fs.readFileSync("scripts/build-production.mjs","utf8");
 const manifest=JSON.parse(fs.readFileSync("asset-manifest.json","utf8"));
 
 assert.match(build,/gameplayScripts=\[[\s\S]*?"js\/60-team-relic-system\.js"/);
 assert.match(build,/const bossRelicScripts=\["js\/gameplay-boss-tower-system\.js"\]/);
 assert.match(build,/gameplayStyles=\[[\s\S]*?"css\/55-team-relic-system\.css"/);
+assert.match(build,/gameplayScripts=\[[\s\S]*?"js\/battle-floating-feedback-owner\.js"/);
+assert.match(build,/gameplayStyles=\[[\s\S]*?"css\/battle-floating-feedback-owner\.css"/);
 assert.match(build,/const abyssScripts=\["js\/59-abyss-two-tier-runtime\.js"\]/);
 assert.equal(manifest.featureManifest.features.relic,"feature-boss-relic");
 assert.equal(manifest.featureManifest.features["boss-tower"],"feature-boss-relic");
@@ -65,8 +69,14 @@ assert.match(css,/#game-stage \.team-relic-home-tools \.home-card-utility\{[\s\S
     "relic and element-box buttons must retain their own hitboxes");
 assert.match(css,/\.team-relic-battle-banner\{[^}]*top:48%/,
     "relic name banner must be centered in the battlefield");
-assert.match(css,/\.team-relic-sp-float\{[^}]*top:72%/,
-    "relic SP recovery text must be vertically separated below the normal HP recovery text");
+assert.doesNotMatch(css,/\.team-relic-sp-float\{|\.damage-popup\.sp-popup\{[^}]*top:/,
+    "Relic CSS must not own a fixed SP popup top offset");
+assert.match(source,/function emitRelicPlayerHit\([\s\S]*?showPlayerHit\(/,
+    "Relic HP/SP recovery must enter the shared player-hit feedback path");
+assert.match(feedbackSource,/const MAX_LANES=4/);
+assert.match(feedbackSource,/context\.queue\.push\(request\)/);
+assert.match(feedbackCss,/body > \.battle-floating-feedback\{/,
+    "Relic recovery text must use the shared floating feedback owner");
 assert.match(source,/document\.getElementById\("battlePage"\)\|\|document\.getElementById\("game-content"\)/,
     "battle relic banner must prefer the battlefield as its positioning host");
 assert.match(source,/battleLog\(def\.name\+"｜"\+currentEffectText/,

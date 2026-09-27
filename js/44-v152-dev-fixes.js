@@ -122,24 +122,8 @@
        js/59-abyss-two-tier-runtime.js + js/46-v155-dev-fixes.js.
        V152 no longer mutates monster skill loadouts or dispatches by name. */
 
-    if(typeof showDamagePopup==="function"){
-        const previousShowDamagePopup=showDamagePopup;
-        showDamagePopup=function(element){
-            const result=previousShowDamagePopup.apply(this,arguments);
-            if(!element||typeof document==="undefined"||!document.body||!element.querySelectorAll){ return result; }
-            const popups=element.querySelectorAll(":scope > .damage-popup.hp-popup");
-            const popup=popups.length?popups[popups.length-1]:null;
-            if(!popup||typeof element.getBoundingClientRect!=="function"){ return result; }
-            const rect=element.getBoundingClientRect();
-            const visualScale=Math.max(.8,Math.min(3,rect.width/Math.max(1,numeric(element.offsetWidth)||rect.width)));
-            popup.classList.add("v152-top-damage");
-            popup.style.setProperty("left",(rect.left+rect.width/2)+"px","important");
-            popup.style.setProperty("top",(rect.top+rect.height*.26)+"px","important");
-            popup.style.setProperty("font-size",Math.round(18*visualScale)+"px","important");
-            document.body.appendChild(popup);
-            return result;
-        };
-    }
+    /* Battle Floating Feedback Owner now owns popup DOM, viewport anchoring and font sizing.
+       V152's HP-only relocation wrapper was retired to avoid a second geometry owner. */
 
     function dismissRewardToast(toast){
         if(!toast){ return; }
