@@ -1,6 +1,6 @@
 "use strict";
 
-const {assembleCanonicalSnapshot}=require("./canonical-snapshot");
+const {assembleCanonicalSnapshot,inspectCanonicalSnapshot}=require("./canonical-snapshot");
 const {makeInitialCharacterSources}=require("./initial-character-sources");
 const {createHash}=require("node:crypto");
 
@@ -44,11 +44,36 @@ function createCanonicalSourceWriter({db,FieldValue,HttpsError,runProtected,
                 if(!accountSnap.exists||receipt.ownerUid!==uid||
                    receipt.operationId!==operationId||receipt.kind!=="initial-character-sources"||
                    receipt.selectionSha256!==selectionSha256||
-                   receipt.sourceRevision!==accountSnap.get("serverRevision")||
-                   receipt.snapshotSha256!==accountSnap.get("snapshotSha256")||
                    !Number.isSafeInteger(receipt.sourceRevision)||
-                   receipt.sourceRevision>envelope.serverRevision){
+                   receipt.sourceRevision<1||receipt.sourceRevision>envelope.serverRevision||
+                   accountSnap.get("ownerUid")!==uid||
+                   accountSnap.get("provenance")!=="server-created"||
+                   accountSnap.get("slots")?.[0]!==`character-${operationId}`||
+                   !Number.isSafeInteger(accountSnap.get("serverRevision"))||
+                   accountSnap.get("serverRevision")<receipt.sourceRevision||
+                   !/^[a-f0-9]{64}$/.test(receipt.snapshotSha256||"")){
                     fail("data-loss","Initial character receipt is inconsistent.");
+                }
+                // Later protected mutations advance the account digest. A lost
+                // creation response resolves against its original version.
+                const original=await transaction.get(root.collection("playableSnapshots")
+                    .doc(String(receipt.sourceRevision)));
+                let snapshot;
+                try{
+                    if(!original.exists||original.get("sha256")!==receipt.snapshotSha256){
+                        throw new Error("Original source snapshot missing.");
+                    }
+                    snapshot=inspectCanonicalSnapshot(original.data(),uid,receipt.sourceRevision);
+                }catch(_){ fail("data-loss","Initial character snapshot is inconsistent."); }
+                if(snapshot.provenance!=="server-created"||
+                   snapshot.slots?.[0]!==`character-${operationId}`||
+                   snapshot.characters?.length!==1||
+                   Object.keys(snapshot.characters[0].state||{}).sort().join("|")!==
+                       Object.keys(choices.characters[0].state).sort().join("|")||
+                   Object.keys(choices.characters[0].state).some(key=>
+                       JSON.stringify(snapshot.characters[0].state[key])!==
+                       JSON.stringify(choices.characters[0].state[key]))){
+                    fail("data-loss","Initial character choices differ from the receipt.");
                 }
                 return {sourceRevision:receipt.sourceRevision,
                     snapshotSha256:receipt.snapshotSha256,unchanged:true,
