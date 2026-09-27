@@ -21,7 +21,7 @@ assert.match(
 );
 assert.match(
   relic,
-  /function relicTargetGeometry\(side,index\)[\s\S]*getUnitGeometry/,
+  /function relicTargetGeometries\(side,index\)[\s\S]*getUnitGeometry[\s\S]*highlightRects/,
   "all target modes must resolve through canonical battlefield Unit geometry"
 );
 assert.match(
