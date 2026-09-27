@@ -1,6 +1,6 @@
 "use strict";
 
-const {assembleCanonicalSnapshot,verifyCanonicalSnapshotAgainstSources}=
+const {assembleCanonicalSnapshot,verifyCanonicalSnapshotAgainstSources,claimRecordsDigest}=
     require("./canonical-snapshot");
 const {source,readOwnedSources,advanceOwnedRecords,advanceOwnedSources}=
     require("./canonical-owned-sources");
@@ -28,12 +28,14 @@ function createCanonicalResourceCredit({db,FieldValue,HttpsError,runProtected,
             const grantRef=root.collection("pendingGrants").doc(grantId);
             const receiptRef=root.collection("grantOperations").doc(operationId);
             const claimRef=root.collection("uniqueClaims").doc(grantId);
+            const claimRecordRef=root.collection("claimRecords").doc(grantId);
             const ledgerRef=root.collection("ledgerEntries").doc(operationId);
             const otherOperationRef=root.collection("operations").doc(operationId);
             const refs=[envelopeRef,accountRef,economyRef,loadoutRef,progressRef,
-                checkpointRef,grantRef,receiptRef,claimRef,ledgerRef,otherOperationRef];
+                checkpointRef,grantRef,receiptRef,claimRef,claimRecordRef,ledgerRef,otherOperationRef];
             const [envelopeSnap,accountSnap,economySnap,loadoutSnap,progressSnap,
-                checkpointSnap,grantSnap,receiptSnap,claimSnap,ledgerSnap,otherOperationSnap]=
+                checkpointSnap,grantSnap,receiptSnap,claimSnap,claimRecordSnap,ledgerSnap,
+                otherOperationSnap]=
                 await Promise.all(refs.map(ref=>tx.get(ref)));
             if(!envelopeSnap.exists||!accountSnap.exists||!economySnap.exists||
                !loadoutSnap.exists||!progressSnap.exists||!checkpointSnap.exists||
@@ -59,7 +61,8 @@ function createCanonicalResourceCredit({db,FieldValue,HttpsError,runProtected,
             if(receipt.creditedToCharacter===true){
                 const ledger=ledgerSnap.exists?ledgerSnap.data():null;
                 const claim=claimSnap.exists?claimSnap.data():null;
-                if(grant.status!=="credited"||!ledger||!claim||
+                const claimRecord=claimRecordSnap.exists?claimRecordSnap.data():null;
+                if(grant.status!=="credited"||!ledger||!claim||!claimRecord||
                    ledger.ownerUid!==uid||ledger.grantId!==grantId||
                    ledger.operationId!==operationId||ledger.amount!==grant.amount||
                    ledger.kind!==grant.kind||
@@ -67,6 +70,14 @@ function createCanonicalResourceCredit({db,FieldValue,HttpsError,runProtected,
                    ledger.snapshotSha256!==receipt.snapshotSha256||
                    claim.ownerUid!==uid||claim.operationId!==operationId||
                    claim.grantId!==grantId||claim.creditRevision!==receipt.creditRevision||
+                   claimRecord.ownerUid!==uid||claimRecord.claimKey!==grantId||
+                   claimRecord.status!=="claimed"||
+                   claimRecord.operationId!==operationId||
+                   claimRecord.grantId!==grantId||
+                   claimRecord.provenance!=="server-created"||
+                   !Number.isSafeInteger(claimRecord.serverRevision)||
+                   claimRecord.serverRevision<receipt.creditRevision||
+                   claimRecord.serverRevision>envelope.serverRevision||
                    !Number.isSafeInteger(receipt.creditRevision)||
                    receipt.creditRevision>envelope.serverRevision){
                     fail("data-loss","Credited grant receipt is inconsistent.");
@@ -75,7 +86,8 @@ function createCanonicalResourceCredit({db,FieldValue,HttpsError,runProtected,
                     authoritativeStateReady:false};
             }
             if(grant.status!=="reserved"||receipt.creditedToCharacter!==false||
-               claimSnap.exists||ledgerSnap.exists||otherOperationSnap.exists){
+               claimSnap.exists||claimRecordSnap.exists||ledgerSnap.exists||
+               otherOperationSnap.exists){
                 fail("failed-precondition","Grant is not available for first credit.");
             }
             if(envelope.serverRevision!==expectedRevision){
@@ -86,7 +98,6 @@ function createCanonicalResourceCredit({db,FieldValue,HttpsError,runProtected,
                !Array.isArray(account.slots)||account.slots.length!==3||
                typeof account.slots[0]!=="string"||
                account.slots[1]!==null||account.slots[2]!==null||
-               checkpointSnap.get("claimCount")!==0||
                !/^[a-f0-9]{64}$/.test(account.snapshotSha256||"")){
                 fail("failed-precondition","First-character source is not eligible.");
             }
@@ -112,6 +123,12 @@ function createCanonicalResourceCredit({db,FieldValue,HttpsError,runProtected,
                 fail("failed-precondition","Resource balance exceeds safe range.");
             }
             const revision=nextRevision(envelope);
+            const nextClaim={schemaVersion:1,ownerUid:uid,serverRevision:revision,
+                provenance:"server-created",claimKey:grantId,status:"claimed",
+                operationId,grantId};
+            const nextClaims=[...records.claimRecords.map(record=>
+                ({...record,serverRevision:revision})),nextClaim]
+                .sort((a,b)=>a.claimKey.localeCompare(b.claimKey,"en"));
             const nextRecords={...records,...advanceOwnedRecords(records,revision),
                 account:{...records.account,serverRevision:revision},
                 characters:records.characters.map(c=>({...c,serverRevision:revision})),
@@ -119,19 +136,26 @@ function createCanonicalResourceCredit({db,FieldValue,HttpsError,runProtected,
                     [balanceKey]:economy[balanceKey]+grant.amount},
                 relicLoadout:{...records.relicLoadout,serverRevision:revision},
                 progress:{...records.progress,serverRevision:revision},
-                claimCheckpoint:{...records.claimCheckpoint,serverRevision:revision}};
+                claimRecords:nextClaims,
+                claimCheckpoint:{...records.claimCheckpoint,serverRevision:revision,
+                    claimCount:nextClaims.length,
+                    claimDigest:claimRecordsDigest(nextClaims)}};
             const bundle=assembleCanonicalSnapshot(uid,revision,nextRecords);
             const stamp=FieldValue.serverTimestamp();
             tx.update(accountRef,{serverRevision:revision,snapshotSha256:bundle.sha256,updatedAt:stamp});
             tx.update(characterRef,{serverRevision:revision,updatedAt:stamp});
             tx.update(economyRef,{serverRevision:revision,
                 [balanceKey]:nextRecords.economy[balanceKey],updatedAt:stamp});
-            for(const ref of [loadoutRef,progressRef,checkpointRef]){
+            for(const ref of [loadoutRef,progressRef]){
                 tx.update(ref,{serverRevision:revision,updatedAt:stamp});
             }
+            tx.update(checkpointRef,{serverRevision:revision,
+                claimCount:nextClaims.length,
+                claimDigest:nextRecords.claimCheckpoint.claimDigest,updatedAt:stamp});
             advanceOwnedSources(tx,owned.refs,revision,stamp);
             tx.create(root.collection("playableSnapshots").doc(String(revision)),
                 {...bundle,createdAt:stamp});
+            tx.create(claimRecordRef,{...nextClaim,createdAt:stamp,updatedAt:stamp});
             tx.create(claimRef,{schemaVersion:1,ownerUid:uid,grantId,operationId,
                 creditRevision:revision,createdAt:stamp});
             tx.create(ledgerRef,{schemaVersion:1,ownerUid:uid,grantId,operationId,

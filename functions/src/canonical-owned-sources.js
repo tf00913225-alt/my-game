@@ -1,7 +1,7 @@
 "use strict";
 
 // Read the complete owned sets in the same transaction as the snapshot check.
-// Claim records require a separate claim writer that advances their digest.
+// Claims and owned items are advanced with every canonical revision.
 const SOURCE_COLLECTIONS=[
     ["inventory","ownedItemId",record=>record.ownedItemId],
     ["equipment","equipmentKey",record=>`${record.characterId}_${record.slot}`],
@@ -17,9 +17,6 @@ async function readOwnedSources(tx,root,fail){
         ...SOURCE_COLLECTIONS.map(([name])=>tx.get(root.collection(name))),
         tx.get(root.collection("claimRecords"))
     ]);
-    if(!snapshots[3].empty){
-        fail("failed-precondition","Claim records need a complete claim mutation owner.");
-    }
     const records={claimRecords:[]},refs=[];
     for(let i=0;i<SOURCE_COLLECTIONS.length;i++){
         const [name,,key]=SOURCE_COLLECTIONS[i];
@@ -32,6 +29,14 @@ async function readOwnedSources(tx,root,fail){
             return source(data);
         });
     }
+    records.claimRecords=snapshots[3].docs.map(doc=>{
+        const data=doc.data();
+        if(doc.id!==data.claimKey){
+            fail("data-loss","Claim document ID differs from its key.");
+        }
+        refs.push(doc.ref);
+        return source(data);
+    }).sort((a,b)=>a.claimKey.localeCompare(b.claimKey,"en"));
     if(refs.length>400){
         fail("failed-precondition","Owned source set exceeds the transaction budget.");
     }
@@ -39,7 +44,7 @@ async function readOwnedSources(tx,root,fail){
 }
 
 function advanceOwnedRecords(records,revision){
-    return Object.fromEntries(["inventory","equipment","relics"].map(name=>
+    return Object.fromEntries(["inventory","equipment","relics","claimRecords"].map(name=>
         [name,records[name].map(record=>({...record,serverRevision:revision}))]));
 }
 

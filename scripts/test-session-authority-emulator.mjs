@@ -294,9 +294,13 @@ abortGoldCommit=false;
 assert.equal((await db.doc(`serverUsers/${y}/economy/current`).get()).get("gold"),0);
 assert.equal((await db.doc(`serverUsers/${y}/ledgerEntries/${goldOperation}`).get()).exists,false);
 assert.equal((await db.doc(`serverUsers/${y}/uniqueClaims/${grantIdForCharacter}`).get()).exists,false);
+assert.equal((await db.doc(`serverUsers/${y}/claimRecords/${grantIdForCharacter}`).get()).exists,false);
 const credited=await goldWriter.creditReservedGrant(yRequest,creditArgs);
 assert.equal(credited.creditRevision,4);
 assert.equal((await db.doc(`serverUsers/${y}/economy/current`).get()).get("gold"),25);
+assert.equal((await db.doc(`serverUsers/${y}/claimCheckpoints/current`).get()).get("claimCount"),1);
+assert.equal((await db.doc(`serverUsers/${y}/claimRecords/${grantIdForCharacter}`).get())
+    .get("status"),"claimed");
 assert.equal((await db.doc(`serverUsers/${y}/playableSnapshots/4`).get())
     .get("readyForPublication"),false);
 assert.equal((await db.doc(`serverUsers/${y}/ledgerEntries/${goldOperation}`).get())
@@ -349,6 +353,7 @@ assert.equal((await db.doc(`serverUsers/${y}/ledgerEntries/${expOperation}`).get
     .get("kind"),"exp");
 assert.equal((await db.doc(`serverUsers/${y}/playableSnapshots/6`).get())
     .get("readyForPublication"),false);
+assert.equal((await db.doc(`serverUsers/${y}/claimCheckpoints/current`).get()).get("claimCount"),2);
 assert.equal((await goldWriter.creditReservedGrant(yRequest,expArgs)).unchanged,true);
 assert.equal((await invoke("reserveTrustedGrant",yUser.idToken,{
     uid:y,session:sessionY,grantId:expGrantId,operationId:expOperation,
@@ -372,8 +377,15 @@ await db.doc(`serverUsers/${y}/pendingGrants/${moreExpGrant}`).set({
 });
 await invoke("reserveTrustedGrant",yUser.idToken,{uid:y,session:sessionY,
     grantId:moreExpGrant,operationId:moreExpOperation,expectedRevision:6});
+const firstClaimRef=db.doc(`serverUsers/${y}/claimRecords/${grantIdForCharacter}`);
+await firstClaimRef.update({status:"blocked"});
+await assert.rejects(goldWriter.creditReservedGrant(yRequest,{grantId:moreExpGrant,
+    operationId:moreExpOperation,expectedRevision:7}),error=>error.code==="data-loss");
+assert.equal((await db.doc(`serverUsers/${y}/economy/current`).get()).get("sharedExp"),40);
+await firstClaimRef.update({status:"claimed"});
 await goldWriter.creditReservedGrant(yRequest,{grantId:moreExpGrant,
     operationId:moreExpOperation,expectedRevision:7});
+assert.equal((await db.doc(`serverUsers/${y}/claimCheckpoints/current`).get()).get("claimCount"),3);
 await assert.rejects(expAllocator.allocateSharedExp(yRequest,allocationArgs),
     error=>error.code==="aborted");
 let abortAllocation=false;
@@ -407,6 +419,8 @@ assert.equal((await db.doc(`serverUsers/${y}/ledgerEntries/${allocationOperation
     .get("amount"),-300);
 assert.equal((await db.doc(`serverUsers/${y}/playableSnapshots/9`).get())
     .get("readyForPublication"),false);
+assert.equal((await db.doc(`serverUsers/${y}/claimCheckpoints/current`).get()).get("claimCount"),3);
+assert.equal((await firstClaimRef.get()).get("serverRevision"),9);
 assert.equal((await expAllocator.allocateSharedExp(yRequest,allocArgs)).unchanged,true);
 
 await assert.rejects(expAllocator.allocateSharedExp(yRequest,{
@@ -530,6 +544,8 @@ await goldWriter.creditReservedGrant(ownedRequest,{
 assert.equal((await ownedItemRef.get()).get("serverRevision"),4);
 assert.equal((await ownedEquipRef.get()).get("serverRevision"),4);
 assert.equal((await ownedRelicRef.get()).get("serverRevision"),4);
+assert.equal((await ownedRoot.collection("claimCheckpoints").doc("current").get())
+    .get("claimCount"),1);
 const ownedAllocation="allocate-owned-source-exp-0001";
 await ownedEquipRef.update({ownedItemId:"missing-owned-item"});
 await assert.rejects(expAllocator.allocateSharedExp(ownedRequest,{
@@ -584,6 +600,10 @@ assert.equal(assignedState.attributePoints,4);
 assert.equal((await ownedItemRef.get()).get("serverRevision"),6);
 assert.equal((await ownedEquipRef.get()).get("ownedItemId"),ownedItemId);
 assert.equal((await ownedRelicRef.get()).get("serverRevision"),6);
+assert.equal((await ownedRoot.collection("claimRecords").doc(ownedGrant).get())
+    .get("serverRevision"),6);
+assert.equal((await ownedRoot.collection("claimCheckpoints").doc("current").get())
+    .get("claimCount"),1);
 assert.equal((await ownedRoot.collection("ledgerEntries")
     .doc(attributeOperation).get()).get("amount"),-1);
 assert.equal((await ownedRoot.collection("playableSnapshots").doc("6").get())

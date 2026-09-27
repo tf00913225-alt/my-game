@@ -229,4 +229,4 @@ function verifyCanonicalSnapshotAgainstSources(bundle,uid,revision,records){
 }
 
 module.exports={assembleCanonicalSnapshot,inspectCanonicalSnapshot,
-    verifyCanonicalSnapshotAgainstSources,MAX_SNAPSHOT_BYTES};
+    verifyCanonicalSnapshotAgainstSources,claimRecordsDigest:digest,MAX_SNAPSHOT_BYTES};
