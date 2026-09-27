@@ -356,10 +356,6 @@
             feedbackAnchor:{
                 x:unitRect.left+unitRect.width/2,
                 y:Math.max(feedbackSafeRect.top+11,feedbackSafeRect.bottom-12)
-            },
-            highlightRect:{
-                left:Math.max(0,unitRect.left-3),top:Math.max(0,unitRect.top-3),
-                width:unitRect.width+6,height:unitRect.height+6
             }
         };
     }
