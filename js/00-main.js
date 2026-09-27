@@ -23444,6 +23444,22 @@ function updateSingleCharacterBars(
 }
 
 
+function triggerCriticalImpact(element){
+
+    if(!element){
+        return;
+    }
+
+    element.classList.remove("critical-impact");
+    void element.offsetWidth;
+    element.classList.add("critical-impact");
+
+    setTimeout(()=>{
+        element.classList.remove("critical-impact");
+    },520);
+}
+
+
 function showDamagePopup(element,text,type,isCrit){
 
     const feedback=typeof window!=="undefined"
@@ -23462,6 +23478,9 @@ function showDamagePopup(element,text,type,isCrit){
         return null;
     }
 
+    if(isCrit&&typeof triggerCriticalImpact==="function"){
+        triggerCriticalImpact(element);
+    }
 
     return feedback.emit({
         side:unit.side,

@@ -294,7 +294,9 @@
         const location=locateEntity(entity);
         const feedback=window.FourSymbolsBattleFloatingFeedback;
         if(!label||!location||!feedback||typeof feedback.emitAtImpact!=="function"){ return; }
-        const emit=()=>feedback.emitAtImpact({side:location.side,index:location.index,kind:"status",statusType:type,text:label,phase:"status",source:"status"});
+        const emit=()=>feedback.emitAtImpact({
+            side:location.side,index:location.index,kind:"status",text:label,source:"status"
+        });
         if(
             window.__fourSymbolsBattleEffectSource==="relic"&&
             typeof window.v174QueueRelicVisual==="function"
@@ -302,7 +304,7 @@
             window.v174QueueRelicVisual(emit);
             return;
         }
-        if(typeof queueMicrotask==="function"){ queueMicrotask(emit); }else{ emit(); }
+        emit();
     }
 
     function wrapSimpleStatus(functionName,type){

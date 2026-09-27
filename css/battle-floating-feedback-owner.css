@@ -25,11 +25,6 @@ body > .battle-floating-feedback{
     transform:translate(-50%,-100%);
     animation:battleFloatingFeedback var(--battle-feedback-duration,1100ms) ease-out both;
 }
-body > .battle-floating-feedback[data-feedback-kind="heal"]{color:#20b857;}
-body > .battle-floating-feedback[data-feedback-kind="sp"]{color:#2c8de8;}
-body > .battle-floating-feedback[data-feedback-kind="shield"]{color:#f4f4f4;}
-body > .battle-floating-feedback[data-feedback-kind="miss"],body > .battle-floating-feedback[data-feedback-kind="resist"]{color:#ff5a5a;}
-body > .battle-floating-feedback[data-feedback-kind="status"]{min-height:19px;padding:2px 9px;border:1px solid rgba(255,255,255,.22);border-radius:999px;background:#0b0b0d;color:var(--battle-feedback-status-color,#f4f4f4);font-size:15px;line-height:19px;letter-spacing:.1px;-webkit-text-stroke:.35px #000;text-shadow:1px 1px 0 #000;box-shadow:0 1px 3px rgba(0,0,0,.45);}
 body > .battle-floating-feedback.is-critical{
     font-size:18px;
     letter-spacing:.45px;
