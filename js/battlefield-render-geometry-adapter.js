@@ -291,6 +291,32 @@
         return {owner:"fixed-slot",rect:rect,center:{x:rect.left+rect.width/2,y:rect.top+rect.height/2}};
     }
 
+    function runtimeEntity(side,index){
+        try{
+            if(side==="monster"){ return typeof monsters!=="undefined"&&monsters?monsters[index]:null; }
+            return typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(index):null;
+        }catch(_){ return null; }
+    }
+    function runtimeStats(side,index,entity){
+        try{ if(side==="player"&&typeof getPartyBattleStats==="function"){ return getPartyBattleStats(index)||entity; } }catch(_){ }
+        return entity;
+    }
+    function ratioFromRuntime(side,index,kind,fill){
+        const entity=runtimeEntity(side,index),stats=runtimeStats(side,index,entity);
+        const current=entity&&Number(entity[kind]), maxKey=kind==="hp"?"maxHP":"maxSP";
+        const max=stats&&Number(stats[maxKey]||entity&&entity[maxKey]);
+        if(Number.isFinite(current)&&Number.isFinite(max)&&max>0){ return Math.max(0,Math.min(1,current/max)); }
+        if(fill&&fill.style){ const match=/^([0-9.]+)%$/.exec(String(fill.style.width||"")); if(match){ return Math.max(0,Math.min(1,Number(match[1])/100)); } }
+        return null;
+    }
+    function shieldRatioFromRuntime(side,index,shieldNode){
+        const entity=runtimeEntity(side,index),stats=runtimeStats(side,index,entity);
+        const max=Number(stats&&stats.maxHP||entity&&entity.maxHP), remaining=Number(entity&&entity.v141Shield&&entity.v141Shield.remaining);
+        if(Number.isFinite(remaining)&&Number.isFinite(max)&&max>0){ return Math.max(0,Math.min(1,remaining/max)); }
+        if(shieldNode&&shieldNode.style){ const match=/^([0-9.]+)%$/.exec(String(shieldNode.style.width||"")); if(match){ return Math.max(0,Math.min(1,Number(match[1])/100)); } }
+        return 0;
+    }
+
     function unitGeometry(side,index){
         const targetSide=side==="monster"?"monster":"player";
         const unitIndex=Number(index);
@@ -318,10 +344,17 @@
             ".monster-hp,.monster-sp,.hp-bar,.sp-bar,.battle-monster-name,.battle-player-id,.monster-status-badges"
         ));
         const hpNodes=Array.from(card.querySelectorAll(".monster-hp,.hp-bar,.battle-hp-bar,.player-hp-bar,[data-hud=\"hp\"],[data-stat=\"hp\"]"));
+        const spNodes=Array.from(card.querySelectorAll(".monster-sp,.sp-bar,.battle-sp-bar,.player-sp-bar,[data-hud=\"sp\"],[data-stat=\"sp\"]"));
         const hpRects=hpNodes.map(node=>typeof node.getBoundingClientRect==="function"?plainRect(node.getBoundingClientRect()):null).filter(rect=>rect&&rect.width>0&&rect.height>0);
-        const hpRect=hpRects.length?hpRects.reduce((acc,rect)=>({left:Math.min(acc.left,rect.left),top:Math.min(acc.top,rect.top),right:Math.max(acc.right,rect.right),bottom:Math.max(acc.bottom,rect.bottom),width:Math.max(acc.right,rect.right)-Math.min(acc.left,rect.left),height:Math.max(acc.bottom,rect.bottom)-Math.min(acc.top,rect.top)})):null;
+        const spRects=spNodes.map(node=>typeof node.getBoundingClientRect==="function"?plainRect(node.getBoundingClientRect()):null).filter(rect=>rect&&rect.width>0&&rect.height>0);
+        const mergeRects=rects=>rects.length?rects.reduce((acc,rect)=>({left:Math.min(acc.left,rect.left),top:Math.min(acc.top,rect.top),right:Math.max(acc.right,rect.right),bottom:Math.max(acc.bottom,rect.bottom),width:Math.max(acc.right,rect.right)-Math.min(acc.left,rect.left),height:Math.max(acc.bottom,rect.bottom)-Math.min(acc.top,rect.top)})):null;
+        const hpRect=mergeRects(hpRects),spRect=mergeRects(spRects);
         const artworkProjection=art&&portraitRect?{rect:portraitRect,backgroundImage:String(art.style&&art.style.backgroundImage||window.getComputedStyle(art).backgroundImage||""),backgroundSize:String(art.style&&art.style.backgroundSize||window.getComputedStyle(art).backgroundSize||"contain"),backgroundPosition:String(art.style&&art.style.backgroundPosition||window.getComputedStyle(art).backgroundPosition||"center"),backgroundRepeat:String(art.style&&art.style.backgroundRepeat||window.getComputedStyle(art).backgroundRepeat||"no-repeat")} : null;
-        const hpProjection=hpNodes[0]&&hpRect?{rect:hpRect,html:String(hpNodes[0].outerHTML||"")} : null;
+        const hpFill=card.querySelector(".hp-bar-inner,.monster-hp-inner,.battle-hp-inner,[data-fill=\"hp\"]");
+        const spFill=card.querySelector(".sp-bar-inner,.monster-sp-inner,.battle-sp-inner,[data-fill=\"sp\"]");
+        const shieldNode=card.querySelector(".hp-bar-shield-overlay,.monster-shield-overlay,[data-fill=\"shield\"]");
+        const hpProjection=hpRect?{rect:hpRect,ratio:ratioFromRuntime(targetSide,unitIndex,"hp",hpFill),shieldRatio:shieldRatioFromRuntime(targetSide,unitIndex,shieldNode)}:null;
+        const spProjection=spRect?{rect:spRect,ratio:ratioFromRuntime(targetSide,unitIndex,"sp",spFill)}:null;
         const hudRects=hudNodes
             .map(node=>typeof node.getBoundingClientRect==="function"?plainRect(node.getBoundingClientRect()):null)
             .filter(rect=>rect&&rect.width>0&&rect.height>0);
@@ -350,7 +383,7 @@
 
         return {
             owner:"fixed-slot",side:targetSide,index:unitIndex,slot:slot,
-            unitRect:unitRect,portraitRect:portraitRect,hpRect:hpRect,artworkProjection:artworkProjection,hpProjection:hpProjection,hudSafeRect:hudSafeRect,
+            unitRect:unitRect,portraitRect:portraitRect,hpRect:hpRect,spRect:spRect,artworkProjection:artworkProjection,hpProjection:hpProjection,spProjection:spProjection,hudSafeRect:hudSafeRect,
             feedbackSafeRect:feedbackSafeRect,
             center:{x:unitRect.left+unitRect.width/2,y:unitRect.top+unitRect.height/2},
             feedbackAnchor:{
