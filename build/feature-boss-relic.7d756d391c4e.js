@@ -1160,16 +1160,31 @@
             onClose:onClose
         });
     }
+    function isSettledBossOutcome(outcome){
+        const result=String(outcome&&outcome.result||"");
+        return result==="win"||result==="lose";
+    }
+    function releaseBossBattleContext(detail){
+        /* Battle authority ends when the battle ends, not when the result modal
+           is eventually closed. Holding activeBattleContext here allowed the next
+           Dungeon/Tower battle to inherit the previous Boss snapshot. */
+        cleanupBossBattlePresentation();
+        activeBattleContext=null;
+        bossDetail=detail||null;
+    }
     function completePersonalBoss(definition,outcome){
         const progress=state.personal[definition.id];
         if(outcome&&outcome.result==="win"){
             const first=!progress.firstClear;grantConfiguredReward(definition,first);progress.firstClear=true;progress.clears++;persist();
         }
+        const detail={type:"personal",id:definition.id};
+        releaseBossBattleContext(detail);
         const finish=()=>{
-            cleanupBossBattlePresentation();activeBattleContext=null;bossDetail={type:"personal",id:definition.id};
+            bossDetail=detail;
             if(typeof showPage==="function"){ showPage("boss"); }
             renderBossPage();
         };
+        if(!isSettledBossOutcome(outcome)){ finish();return; }
         if(!showBossBattleResult(definition.name+"・戰鬥詳細結算",outcome,finish)){ finish(); }
     }
     function completeWorldStage(definition,stage,outcome){
@@ -1180,11 +1195,14 @@
                 const first=!progress.firstClear;grantConfiguredReward(definition,first);progress.firstClear=true;progress.completedStages=4;progress.clears++;persist();
             }
         }
+        const detail={type:"world",id:definition.id};
+        releaseBossBattleContext(detail);
         const finish=()=>{
-            cleanupBossBattlePresentation();activeBattleContext=null;bossDetail={type:"world",id:definition.id};
+            bossDetail=detail;
             if(typeof showPage==="function"){ showPage("boss"); }
             renderBossPage();
         };
+        if(!isSettledBossOutcome(outcome)){ finish();return; }
         if(!showBossBattleResult(definition.name+"・"+WORLD_STAGE_PROFILES[stage-1].label+"詳細結算",outcome,finish)){ finish(); }
     }
     function startBoss(type,id){
