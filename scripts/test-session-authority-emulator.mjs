@@ -10,6 +10,7 @@ const {HttpsError}=require("firebase-functions/v2/https");
 const {createSessionAuthority}=require("../functions/src/session-authority.js");
 const {createCanonicalSourceWriter}=require("../functions/src/canonical-source-writer.js");
 const {createCanonicalResourceCredit}=require("../functions/src/canonical-resource-credit.js");
+const {createCanonicalExpAllocation}=require("../functions/src/canonical-exp-allocation.js");
 const {inspectExistingEnvelope,nextRevision}=require("../functions/src/cloud-save-envelope.js");
 const project="demo-four-symbols-session";
 if(process.env.GCLOUD_PROJECT!==project||process.env.FIRESTORE_EMULATOR_HOST!=="127.0.0.1:18080"||
@@ -348,6 +349,62 @@ assert.equal((await goldWriter.creditReservedGrant(yRequest,expArgs)).unchanged,
 assert.equal((await invoke("reserveTrustedGrant",yUser.idToken,{
     uid:y,session:sessionY,grantId:expGrantId,operationId:expOperation,
     expectedRevision:4})).creditRevision,6);
+// Allocate exactly one level from the server-owned pool in a real transaction.
+const expAllocator=createCanonicalExpAllocation({db,FieldValue,HttpsError,
+    inspectExistingEnvelope,nextRevision,runProtected:writerSessions.runProtected});
+const allocationOperation="allocate-exp-initial-character-0001";
+const allocationArgs={operationId:allocationOperation,expectedRevision:6};
+await assert.rejects(expAllocator.allocateSharedExp(yRequest,allocationArgs),
+    error=>error.code==="failed-precondition");
+assert.equal((await db.doc(`serverUsers/${y}/operations/${allocationOperation}`).get())
+    .exists,false);
+const moreExpGrant="grant-more-initial-exp-0001";
+const moreExpOperation="credit-more-initial-exp-0001";
+await db.doc(`serverUsers/${y}/pendingGrants/${moreExpGrant}`).set({
+    schemaVersion:1,ownerUid:y,kind:"exp",source:"server-event",amount:80,
+    status:"pending",claimedByOperationId:null,createdAt:Timestamp.now()
+});
+await invoke("reserveTrustedGrant",yUser.idToken,{uid:y,session:sessionY,
+    grantId:moreExpGrant,operationId:moreExpOperation,expectedRevision:6});
+await goldWriter.creditReservedGrant(yRequest,{grantId:moreExpGrant,
+    operationId:moreExpOperation,expectedRevision:7});
+await assert.rejects(expAllocator.allocateSharedExp(yRequest,allocationArgs),
+    error=>error.code==="aborted");
+let abortAllocation=false;
+const rollbackAllocator=createCanonicalExpAllocation({db,FieldValue,HttpsError,
+    inspectExistingEnvelope,nextRevision,
+    runProtected:(request,operation)=>writerSessions.runProtected(request,async(tx,session)=>{
+        const result=await operation(tx,session);
+        if(abortAllocation){throw new Error("simulated allocation rollback");}
+        return result;
+    })});
+const allocArgs={operationId:allocationOperation,expectedRevision:8};
+abortAllocation=true;
+await assert.rejects(rollbackAllocator.allocateSharedExp(yRequest,allocArgs),
+    /simulated allocation rollback/);
+abortAllocation=false;
+assert.equal((await db.doc(`serverUsers/${y}/economy/current`).get()).get("sharedExp"),120);
+assert.equal((await db.doc(`serverUsers/${y}/operations/${allocationOperation}`).get())
+    .exists,false);
+const allocated=await expAllocator.allocateSharedExp(yRequest,allocArgs);
+assert.equal(allocated.allocatedRevision,9);
+assert.equal(allocated.cost,100);
+assert.equal(allocated.levelAfter,2);
+const leveled=(await db.doc(`serverUsers/${y}/characters/character-${initialOperation}`)
+    .get()).get("state");
+assert.equal(leveled.exp,0);assert.equal(leveled.expNext,120);
+assert.equal(leveled.attributePoints,5);assert.equal(leveled.skillPoints,4);
+assert.equal(leveled.bonusHP,30);assert.equal(leveled.bonusSP,10);
+assert.equal(leveled.hp,200);assert.equal(leveled.sp,80);
+assert.equal((await db.doc(`serverUsers/${y}/economy/current`).get()).get("sharedExp"),20);
+assert.equal((await db.doc(`serverUsers/${y}/ledgerEntries/${allocationOperation}`).get())
+    .get("amount"),-100);
+assert.equal((await db.doc(`serverUsers/${y}/playableSnapshots/9`).get())
+    .get("readyForPublication"),false);
+assert.equal((await expAllocator.allocateSharedExp(yRequest,allocArgs)).unchanged,true);
+await assert.rejects(expAllocator.allocateSharedExp(yRequest,{
+    operationId:goldOperation,expectedRevision:9}),
+    error=>error.code==="failed-precondition");
 assert.equal((await db.doc(`users/${y}/saves/current`).get()).get("authoritativeStateReady"),false);
 await rejected("protectedTest",yUser.idToken,{uid:x,session:sessionB},"SESSION_INVALID");
 await rejected("protectedTest",yUser.idToken,{uid:y,session:{...sessionB,uid:y}},"SESSION_INVALID");
