@@ -255,36 +255,6 @@
 
 
 /* bundled source: css/10-stage-v40-root-battle-background-and-cast-size.css */
-/* ============================================================
-   V40 — SOURCE-LEVEL FIX
-   Baseline: V39.
-
-   ROOT CAUSES FOUND:
-   A) Battle background:
-      V39 read #mapPage / #trainingPage background-image.
-      Those containers have NO background-image. The real patrol
-      image is #mapPageBgLayer, a child layer.
-      Therefore V39 received "none" and battle remained black.
-      We now copy the actual #mapPageBgLayer background.
-
-   B) Cast skill badge:
-      .skill-name-badge lives in the native 1080×1920 overlay,
-      while the character cards live in the legacy 420×746.666
-      surface that is enlarged 1080/420 = 2.571428...
-      Therefore 124px native was NOT equivalent to a 124px
-      legacy card. A character card is ~319 native px wide.
-============================================================ */
-
-/* --- A. Actual battle background layer --- */
-#game-stage > #app > #game-content #battlePage{
-    position:relative !important;
-    background:transparent !important;
-    isolation:isolate !important;
-    /* The outer game viewport owns page clipping. Battle artwork/VFX may paint
-       outside their unit boxes without turning battlePage into a scroll owner. */
-    overflow:visible !important;
-}
-
 #game-stage > #app > #game-content #battlePage > .battle-bg-shared{
     position:absolute !important;
     left:0 !important;
@@ -309,49 +279,8 @@
     z-index:2 !important;
 }
 
-/* --- B. Native overlay badge must match the legacy card's
-       actual 1080-space width (124 × 1080/420 ≈ 318.86). --- */
-#game-stage > #game-overlay-layer .skill-name-badge{
-    font-size:56px !important;
-    font-weight:900 !important;
-    line-height:1.05 !important;
-    width:319px !important;
-    min-width:319px !important;
-    max-width:319px !important;
-    box-sizing:border-box !important;
-    text-align:center !important;
-    padding:2px 8px !important;
-    white-space:nowrap !important;
-    overflow:visible !important;
-    -webkit-text-stroke:0 !important;
-    text-shadow:
-        0 2px 2px rgba(0,0,0,.8),
-        0 0 3px rgba(0,0,0,.8) !important;
-}
-
 
 /* bundled source: css/11-stage-v41-cast-text-and-player-alpha.css */
-/* V41:
-   - Cast skill name is intentionally oversized per user request.
-   - Player card has no black baked background; the source image is now
-     a transparent PNG.
-*/
-#game-stage > #game-overlay-layer .skill-name-badge{
-    font-size:72px !important;
-    width:420px !important;
-    min-width:420px !important;
-    max-width:none !important;
-    overflow:visible !important;
-    white-space:nowrap !important;
-    text-align:center !important;
-    font-weight:900 !important;
-    line-height:1 !important;
-    -webkit-text-stroke:0 !important;
-    text-shadow:
-        0 3px 3px rgba(0,0,0,.9),
-        0 0 5px rgba(0,0,0,.9) !important;
-}
-
 /* The image itself is now transparent. Also remove the card's own
    black fallback background so no rectangle is painted behind it.
 
@@ -410,23 +339,6 @@
     opacity:1 !important;
 }
 
-/* Bigger, more dramatic cast skill name. */
-#game-stage > #game-overlay-layer .skill-name-badge{
-    font-size:106px !important;
-    width:620px !important;
-    min-width:620px !important;
-    max-width:none !important;
-    overflow:visible !important;
-    white-space:nowrap !important;
-    text-align:center !important;
-    font-weight:900 !important;
-    line-height:1 !important;
-    -webkit-text-stroke:0 !important;
-    text-shadow:
-        0 4px 5px rgba(0,0,0,.98),
-        0 0 9px rgba(0,0,0,.95) !important;
-}
-
 
 /* bundled source: css/13-stage-v46-battle-frame-and-giant-skill-text.css */
 /* V46 — darker battle background, restore character-card frame,
@@ -447,79 +359,17 @@
     background-color:transparent !important;
 }
 
-/* GIANT skill cast name. Deliberately allowed to exceed the card. */
-#game-stage #game-overlay-layer .skill-name-badge{
-    font-size:132px !important;
-    width:760px !important;
-    min-width:760px !important;
-    max-width:none !important;
-    overflow:visible !important;
-    white-space:nowrap !important;
-    text-align:center !important;
-    font-weight:900 !important;
-    line-height:.95 !important;
-    -webkit-text-stroke:0 !important;
-    text-shadow:
-        0 5px 6px rgba(0,0,0,1),
-        0 0 12px rgba(0,0,0,1) !important;
-}
-
 
 /* bundled source: css/14-stage-v47-root-cause-skill-size.css */
-/* V47 ROOT-CAUSE FIX
-   The skill badge is dynamically created with inline !important.
-   CSS-only overrides were therefore losing to the creation/enforcement
-   code. The source code is now 150px, and this CSS is a final guard. */
 
-#game-stage #game-overlay-layer .skill-name-badge{
-    font-size:150px !important;
-    width:900px !important;
-    min-width:900px !important;
-    max-width:none !important;
-    overflow:visible !important;
-    white-space:nowrap !important;
-    text-align:center !important;
-    font-weight:900 !important;
-    line-height:.9 !important;
-    -webkit-text-stroke:0 !important;
-    text-shadow:
-        0 6px 7px rgba(0,0,0,1),
-        0 0 14px rgba(0,0,0,1) !important;
-}
 
 
 /* bundled source: css/15-stage-v48-skill-text-final.css */
-/* V48
-   - Skill cast name: card-like size.
-   - Remove ALL white outline/stroke from skill cast names.
-*/
-#game-stage #game-overlay-layer .skill-name-badge{
-    font-size:72px !important;
-    width:420px !important;
-    min-width:420px !important;
-    max-width:none !important;
-    overflow:visible !important;
-    white-space:nowrap !important;
-    text-align:center !important;
-    font-weight:900 !important;
-    line-height:1 !important;
-    -webkit-text-stroke:0 !important;
-    text-shadow:
-        0 4px 5px rgba(0,0,0,1),
-        0 0 10px rgba(0,0,0,.95) !important;
-}
+
 
 
 /* bundled source: css/16-stage-v49-remove-all-skill-white-strokes.css */
-/* V49: skill cast names have NO white outline/stroke. */
-#game-stage .skill-name-badge,
-#game-stage #game-overlay-layer .skill-name-badge,
-.skill-name-badge{
-    -webkit-text-stroke:0 !important;
-    text-stroke:0 !important;
-    border:none !important;
-    outline:none !important;
-}
+
 
 
 /* bundled source: css/17-stage-v50-remove-battle-right-edge.css */
@@ -585,12 +435,6 @@
 #game-stage .hp-change-number{
     -webkit-text-stroke:3px #ffffff !important;
     text-stroke:3px #ffffff !important;
-}
-
-/* Explicitly keep skill names without white stroke. */
-#game-stage .skill-name-badge{
-    -webkit-text-stroke:0 !important;
-    text-stroke:0 !important;
 }
 
 
@@ -4993,23 +4837,7 @@ body.quest-scroll-active,
     cursor:crosshair;
     outline:none !important;
     box-shadow:none !important;
-}
-
-/* Caster label stays text-only. It does not render or substitute skill art. */
-.skill-name-badge.v143-caster-skill-label{
-    z-index:16020 !important;
-    overflow:hidden !important;
-    border:1px solid color-mix(in srgb,currentColor 58%,#fff) !important;
-    border-radius:6px !important;
-    opacity:1;
-    background:rgba(12,10,8,.88) !important;
-    box-shadow:0 3px 10px rgba(0,0,0,.55) !important;
-    text-align:center !important;
-    text-overflow:ellipsis !important;
-    transform:translate(-50%,-118%) !important;
-}
-
-/* Formal cast Sprite Sheet stage. The viewport edge is the only VFX clip owner.
+}/* Formal cast Sprite Sheet stage. The viewport edge is the only VFX clip owner.
    Do not use strict/paint containment here: it creates an additional paint clip. */
 .v143-skill-stage{
     position:fixed;
@@ -5442,22 +5270,7 @@ body.quest-scroll-active,
     padding:6px 8px;
     color:#a99d87;
     font-size:13px;
-}
-
-
-/* Reading surfaces are non-blocking observers, but transient battle paint must
-   not cover them. Animations/timing continue underneath; only the paint is
-   hidden for the short time a status/info/stats drawer is being read. */
-body.v174-battle-reading-open > .v143-skill-stage,
-body.v174-battle-reading-open > .v-fixed-slot-popup,
-body.v174-battle-reading-open > .damage-popup,
-body.v174-battle-reading-open > .skill-name-badge.v143-caster-skill-label{
-    visibility:hidden !important;
-    opacity:0 !important;
-}
-
-
-/* Stealth changes only the combatant artwork. HUD, bars, names and status
+}/* Stealth changes only the combatant artwork. HUD, bars, names and status
    indicators remain fully readable and range skills may still hit the slot. */
 #game-stage #battlePage .battle-player.v143-unit-stealthed > .v174-battle-art,
 #game-stage #battlePage .battle-monster.v143-unit-stealthed > .v174-battle-art{
@@ -5512,26 +5325,7 @@ body.v174-battle-reading-open > .skill-name-badge.v143-caster-skill-label{
     position:relative;
     z-index:4;
     transform:translateY(16px);
-}
-
-.skill-name-badge.v143-caster-skill-label{
-    overflow:visible !important;
-    border:0 !important;
-    border-radius:0 !important;
-    color:#fff4d7 !important;
-    background:transparent !important;
-    box-shadow:none !important;
-    -webkit-text-stroke:1.15px #050403 !important;
-    paint-order:stroke fill !important;
-    text-shadow:0 1px 2px #000,0 0 5px #000 !important;
-}
-.skill-name-badge.v143-caster-skill-label.badge-normal,
-.skill-name-badge.v143-caster-skill-label[data-skill="normal"]{
-    color:#fff !important;
-    -webkit-text-fill-color:#fff !important;
-}
-
-.v146-area-impact{animation:v146AreaImpact .66s cubic-bezier(.2,.72,.25,1) both !important;}
+}.v146-area-impact{animation:v146AreaImpact .66s cubic-bezier(.2,.72,.25,1) both !important;}
 @keyframes v146AreaImpact{
     0%,100%{transform:translate(0,0) rotate(0)}
     16%{transform:translate(-7px,-5px) rotate(-1.4deg)}
@@ -9627,6 +9421,15 @@ body > .team-relic-battle-presentation .team-relic-battle-cutin-copy strong{
 
 @media(max-width:390px){#game-stage .team-relic-current-card{grid-template-columns:68px minmax(0,1fr);padding:8px;}#game-stage .team-relic-current-art{width:68px;}#game-stage .team-relic-card{grid-template-columns:62px minmax(0,1fr);min-height:178px;padding:7px;gap:3px 7px;}#game-stage .team-relic-card-art{width:62px;}#game-stage .team-relic-detail-hero{grid-template-columns:minmax(92px,34%) minmax(0,1fr);gap:2px 9px;padding:12px 10px;}}
 
+/* Foreground Projection: projected transparent artwork and cloned HP only. */
+.team-relic-battle-dim{position:absolute;inset:0;background:#000;opacity:0;transition:opacity var(--team-relic-dim-in,180ms) ease;pointer-events:none;}
+.team-relic-battle-presentation.dim-visible .team-relic-battle-dim{opacity:.78;}
+.team-relic-target-projection-layer{position:absolute;inset:0;z-index:2;opacity:0;pointer-events:none;transition:opacity 120ms ease;}
+.team-relic-battle-presentation.targets-visible .team-relic-target-projection-layer{opacity:1;}
+.team-relic-target-projection-art,.team-relic-target-projection-hp{position:absolute;box-sizing:border-box;pointer-events:none;}
+.team-relic-target-projection-art{background-color:transparent;}
+.team-relic-target-projection-hp>*{width:100%;height:100%;margin:0;}
+
 
 /* bundled source: css/battle-floating-feedback-owner.css */
 /* Battle Floating Feedback Owner — canonical popup typography and lanes. */
@@ -9660,20 +9463,10 @@ body > .battle-floating-feedback[data-feedback-kind="heal"]{color:#20b857;}
 body > .battle-floating-feedback[data-feedback-kind="sp"]{color:#2c8de8;}
 body > .battle-floating-feedback[data-feedback-kind="shield"]{color:#f4f4f4;}
 body > .battle-floating-feedback[data-feedback-kind="miss"],body > .battle-floating-feedback[data-feedback-kind="resist"]{color:#ff5a5a;}
-body > .battle-floating-feedback[data-feedback-kind="status"]{min-height:19px;padding:2px 9px;border:1px solid rgba(255,255,255,.22);border-radius:999px;background:#0b0b0d;color:var(--battle-feedback-status-color,#f4f4f4);font-size:15px;line-height:19px;letter-spacing:.1px;-webkit-text-stroke:.35px #000;text-shadow:1px 1px 0 #000;box-shadow:0 1px 3px rgba(0,0,0,.45);}
-body > .battle-floating-feedback.is-critical{
-    font-size:18px;
-    letter-spacing:.45px;
-    animation-name:battleFloatingFeedbackCritical;
-}
-@keyframes battleFloatingFeedback{
-    0%{opacity:0;transform:translate(-50%,calc(-100% + 4px)) scale(.88)}
-    12%{opacity:1;transform:translate(-50%,calc(-100% - 3px)) scale(1.08)}
-    72%{opacity:1;transform:translate(-50%,calc(-100% - 10px)) scale(1)}
-    100%{opacity:0;transform:translate(-50%,calc(-100% - 22px)) scale(1)}
-}
-@keyframes battleFloatingFeedbackCritical{
-    0%{opacity:0;transform:translate(-50%,calc(-100% + 5px)) scale(.68) rotate(-4deg)}
+body > .battle-floating-feedback[data-feedback-kind="status"]{min-height:19px;padding:2px 9px;border:1px solid rgba(255,255,255,.22);border-radius:999px;background:#0b0b0d;color:#fff;font-size:15px;line-height:19px;letter-spacing:.1px;-webkit-text-stroke:.35px #000;text-shadow:1px 1px 0 #000;box-shadow:0 1px 3px rgba(0,0,0,.45);}
+body > .battle-floating-feedback.is-critical{font-size:19px;font-weight:950;letter-spacing:.5px;-webkit-text-stroke:1.25px #fff;paint-order:stroke fill;animation-name:battleFloatingFeedbackCritical;}
+@keyframes battleFloatingFeedback{0%{opacity:0;transform:translate(-50%,calc(-100% + 4px)) scale(.88)}12%{opacity:1;transform:translate(-50%,calc(-100% - 3px)) scale(1.08)}72%{opacity:1;transform:translate(-50%,calc(-100% - 10px)) scale(1)}100%{opacity:0;transform:translate(-50%,calc(-100% - 22px)) scale(1)}}
+@keyframes battleFloatingFeedbackCritical{0%{opacity:0;transform:translate(-50%,calc(-100% + 7px)) scale(.62) rotate(-6deg)}16%{opacity:1;transform:translate(-50%,calc(-100% - 6px)) scale(1.24) rotate(5deg)}30%{transform:translate(calc(-50% - 4px),calc(-100% - 11px)) scale(1.06) rotate(-4deg)}42%{transform:translate(calc(-50% + 4px),calc(-100% - 15px)) scale(1.14) rotate(3deg)}56%{transform:translate(-50%,calc(-100% - 18px)) scale(1.04) rotate(0)}78%{opacity:1;transform:translate(-50%,calc(-100% - 25px)) scale(1)}100%{opacity:0;transform:translate(-50%,calc(-100% - 36px)) scale(1) rotate(0)}}
     14%{opacity:1;transform:translate(-50%,calc(-100% - 7px)) scale(1.18) rotate(3deg)}
     34%{transform:translate(-50%,calc(-100% - 6px)) scale(1.04) rotate(-1deg)}
     72%{opacity:1;transform:translate(-50%,calc(-100% - 12px)) scale(1)}
@@ -9686,3 +9479,13 @@ body > .battle-floating-feedback.is-critical{
 @media (prefers-reduced-motion:reduce){
     body > .battle-floating-feedback{animation-duration:.01ms!important;}
 }
+
+
+/* bundled source: css/battle-skill-name-presentation-owner.css */
+/* Canonical skill-name presentation owner. Element identity comes only from Skill Data. */
+.skill-name-badge{position:absolute;z-index:16020;display:block;box-sizing:border-box;width:max-content;min-width:0;margin:0;padding:0;border:0;border-radius:0;background:transparent;color:#fff;font-size:19px;font-weight:900;line-height:1.05;letter-spacing:.1px;text-align:center;white-space:nowrap;overflow:visible;pointer-events:none;-webkit-text-stroke:1.15px #fff;paint-order:stroke fill;text-shadow:0 1px 2px #000,0 0 4px rgba(0,0,0,.72);transform:translate(-50%,-100%);animation:skillBadgePop var(--skill-name-display-duration,347ms) ease-out forwards;}
+.skill-name-badge[data-skill-element="fire"]{color:#e32626;}
+.skill-name-badge[data-skill-element="water"]{color:#3aaeff;}
+.skill-name-badge[data-skill-element="wind"]{color:#39c96b;}
+.skill-name-badge[data-skill-element="earth"]{color:#e0b833;}
+.skill-name-badge[data-skill-element="normal"]{color:#fff;}

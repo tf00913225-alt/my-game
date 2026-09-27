@@ -14636,10 +14636,12 @@ function getPersistentStateConflict(entity,stateOrType){
         conflictNames.includes(getPersistentStateName(candidate))
     );
     if(!entry){ return null; }
+    const existingName=getPersistentStateName(entry);
     return {
         requestedName:requestedName,
-        existingName:getPersistentStateName(entry),
+        existingName:existingName,
         entry:entry,
+        reason:existingName===requestedName?"sameNameDuplicate":"exclusiveConflict",
         exclusiveHardControl:EXCLUSIVE_HARD_CONTROL_STATE_NAMES.includes(requestedName)
     };
 }
@@ -14669,9 +14671,10 @@ function reportPersistentStateMiss(entity,stateOrType,targetSide,targetIndex,sou
 
 function canApplyNamedPersistentState(entity,stateOrType,targetSide,targetIndex,sourceName){
     const conflict=getPersistentStateConflict(entity,stateOrType);
-    return conflict
-        ?reportPersistentStateMiss(entity,stateOrType,targetSide,targetIndex,sourceName,conflict)
-        :true;
+    if(!conflict){ return true; }
+    return conflict.reason==="sameNameDuplicate"
+        ?false
+        :reportPersistentStateMiss(entity,stateOrType,targetSide,targetIndex,sourceName,conflict);
 }
 
 function getPersistentStateTargetContext(entity){
@@ -14713,8 +14716,12 @@ function rollNamedPersistentStatusEffect(
     sourceName,
     guaranteedHit
 ){
-    if(!canApplyNamedPersistentState(entity,stateOrType,targetSide,targetIndex,sourceName)){
-        return {duplicate:true,hit:false};
+    const conflict=getPersistentStateConflict(entity,stateOrType);
+    if(conflict){
+        if(conflict.reason==="exclusiveConflict"){
+            reportPersistentStateMiss(entity,stateOrType,targetSide,targetIndex,sourceName,conflict);
+        }
+        return {duplicate:conflict.reason==="sameNameDuplicate",reason:conflict.reason,hit:false};
     }
     const finalRollArguments=(rollArguments||[]).slice();
     if(targetSide==="monster"){
@@ -24113,9 +24120,8 @@ function showSkillNameBadge(skillName,elementType,characterIndex,targetId,target
         );
 
 
-    badge.className =
-        "skill-name-badge badge-"+
-        elementType;
+    badge.className="skill-name-badge";
+    badge.dataset.skillElement=String(elementType||"normal");
 
 
     badge.textContent =
@@ -24131,20 +24137,7 @@ function showSkillNameBadge(skillName,elementType,characterIndex,targetId,target
         "--skill-name-display-duration",
         badgeDuration+"ms"
     );
-
-
-
-    /* V38 SOURCE-LEVEL UI SIZE FIX:
-       The badge gets its final visual size at creation time.
-       This is deliberately inline + !important so later CSS cannot
-       silently override it. */
-    badge.style.setProperty("font-size","72px","important");
-    badge.style.setProperty("line-height","1.05","important");
-    badge.style.setProperty("font-weight","900","important");
-    badge.style.setProperty("white-space","nowrap","important");
-    badge.style.setProperty("width","max-content","important");
-    badge.style.setProperty("min-width","max-content","important");
-    badge.style.setProperty("-webkit-text-stroke","1.8px #f2ead9","important");
+    badge.dataset.skillElement=String(elementType||"normal");
 const badgePoint =
         gamePointFromClient(
             rect.left+rect.width/2,
@@ -24244,9 +24237,8 @@ function showMonsterSkillNameBadge(
         );
 
 
-    badge.className=
-        "skill-name-badge badge-"+
-        elementType;
+    badge.className="skill-name-badge";
+    badge.dataset.skillElement=String(elementType||"normal");
 
 
     badge.textContent=
@@ -24262,20 +24254,7 @@ function showMonsterSkillNameBadge(
         "--skill-name-display-duration",
         badgeDuration+"ms"
     );
-
-
-
-    /* V38 SOURCE-LEVEL UI SIZE FIX:
-       The badge gets its final visual size at creation time.
-       This is deliberately inline + !important so later CSS cannot
-       silently override it. */
-    badge.style.setProperty("font-size","72px","important");
-    badge.style.setProperty("line-height","1.05","important");
-    badge.style.setProperty("font-weight","900","important");
-    badge.style.setProperty("white-space","nowrap","important");
-    badge.style.setProperty("width","max-content","important");
-    badge.style.setProperty("min-width","max-content","important");
-    badge.style.setProperty("-webkit-text-stroke","1.8px #f2ead9","important");
+    badge.dataset.skillElement=String(elementType||"normal");
 const badgePoint =
         gamePointFromClient(
             rect.left+rect.width/2,
@@ -34512,10 +34491,6 @@ try{
 
     const LEGACY_WIDTH = 420;
     const NATIVE_WIDTH = 1080;
-    const CHARACTER_CARD_LEGACY_WIDTH = 124;
-    const CAST_BADGE_NATIVE_WIDTH =
-        CHARACTER_CARD_LEGACY_WIDTH * (NATIVE_WIDTH / LEGACY_WIDTH);
-
     function ensureBattleBackgroundLayer(){
         const battle = document.getElementById("battlePage");
         if(!battle) return null;
@@ -34582,67 +34557,9 @@ try{
         return true;
     }
 
-    function ensureCastBadgeSourceSize(badge){
-        if(!badge || !badge.classList.contains("skill-name-badge")) return;
-        /*
-         * This is native-overlay space, so match the legacy card:
-         * 124 legacy px × 2.571428... = 318.857 native px.
-         */
-        badge.style.setProperty(
-            "width",
-            CAST_BADGE_NATIVE_WIDTH + "px",
-            "important"
-        );
-        badge.style.setProperty(
-            "min-width",
-            CAST_BADGE_NATIVE_WIDTH + "px",
-            "important"
-        );
-        badge.style.setProperty(
-            "max-width",
-            CAST_BADGE_NATIVE_WIDTH + "px",
-            "important"
-        );
-        badge.style.setProperty("font-size","72px","important");
-        badge.style.setProperty("font-weight","900","important");
-        badge.style.setProperty("text-align","center","important");
-        badge.style.setProperty("white-space","nowrap","important");
-    }
-
-    /*
-     * The skill badge is dynamically created by
-     * showSkillNameBadge()/showMonsterSkillNameBadge().
-     * Catch the real node at creation time.
-     */
-    function watchOverlay(){
-        const overlay = document.getElementById("game-overlay-layer");
-        if(!overlay) return;
-
-        overlay.querySelectorAll(".skill-name-badge")
-            .forEach(ensureCastBadgeSourceSize);
-
-        const observer = new MutationObserver(function(mutations){
-            mutations.forEach(function(mutation){
-                mutation.addedNodes.forEach(function(node){
-                    if(node.nodeType !== 1) return;
-                    if(node.classList &&
-                       node.classList.contains("skill-name-badge")){
-                        ensureCastBadgeSourceSize(node);
-                    }
-                    if(node.querySelectorAll){
-                        node.querySelectorAll(".skill-name-badge")
-                            .forEach(ensureCastBadgeSourceSize);
-                    }
-                });
-            });
-        });
-        observer.observe(overlay,{childList:true,subtree:true});
-    }
-
     function init(){
         ensureBattleBackgroundLayer();
         syncBattleBackgroundToCurrentMap();
-        watchOverlay();
 
         /*
          * When currentZone/map background changes, #mapPageBgLayer is
@@ -34678,20 +34595,11 @@ try{
         const layer = document.querySelector(
             "#game-stage > #app > #game-content #battlePage > .battle-bg-shared"
         );
-        const badge = document.querySelector(
-            "#game-stage > #game-overlay-layer .skill-name-badge"
-        );
         return {
             currentZone:
                 (typeof currentZone !== "undefined" ? currentZone : null),
             battleBackground:
-                layer ? getComputedStyle(layer).backgroundImage : null,
-            badgeFont:
-                badge ? getComputedStyle(badge).fontSize : null,
-            badgeWidth:
-                badge ? badge.getBoundingClientRect().width : null,
-            badgeText:
-                badge ? badge.textContent : null
+                layer ? getComputedStyle(layer).backgroundImage : null
         };
     };
 
@@ -34756,22 +34664,6 @@ try{
     "use strict";
     window.GAME_NATIVE_CONFIRMED_BASELINE = "V48";
     window.GAME_NATIVE_CURRENT_VERSION = "V49";
-    window.GAME_CAST_SKILL_BADGE_STROKE = "none";
-
-    function removeSkillWhiteStroke(){
-        document.querySelectorAll(".skill-name-badge").forEach(function(el){
-            el.style.setProperty("-webkit-text-stroke","0","important");
-            el.style.setProperty("text-stroke","0","important");
-            el.style.setProperty("border","0","important");
-            el.style.setProperty("outline","0","important");
-        });
-    }
-
-    if(document.readyState === "loading"){
-        document.addEventListener("DOMContentLoaded", removeSkillWhiteStroke, {once:true});
-    }else{
-        removeSkillWhiteStroke();
-    }
 })();
 
 
