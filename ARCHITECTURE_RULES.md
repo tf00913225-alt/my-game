@@ -1,5 +1,16 @@
 # 永久架構規則
 
+## 0. 變更安全與取代遷移（永久強制）
+
+所有新增、修改、替換、重構與修復，必須先遵守 `docs/CHANGE_SAFETY_REPLACEMENT_CONTRACT.md`。
+
+- 先分類 Additive（新增）／Replacement（取代）／Convergence（收斂）／Removal（移除）。
+- Replacement 不等於在舊版本後面再疊一層；必須掃描舊實作仍承擔的責任。
+- Owner、Contract、Lifecycle、Semantic State、Regression Test 必須一起收斂。
+- 若新版只能靠 `display:none`、`animation:none`、`!important`、更高 selector specificity、Wrapper 或 late patch 壓住舊版才正常，預設視為遷移未完成。
+- 使用者只負責產品／玩法決策；舊程式是否刪除、遷移或相容保留由代理依專案證據主動判斷並說明。
+
+
 1. 先找出此功能目前真正的來源檔、主要函式與既有後續覆蓋點。
 
 2. 一般修改優先直接修正該功能的主要來源，不新增新的 vXXX runtime patch。

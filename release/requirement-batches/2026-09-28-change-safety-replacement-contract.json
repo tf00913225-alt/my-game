@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-28-change-safety-replacement-contract",
+  "baseBranch": "dev",
+  "baseSha": "57d704e25e5c6004be421ba291fd327b0c8d9291",
+  "workBranch": "docs/change-safety-replacement-contract-20260928",
+  "title": "Change Safety & Replacement Migration Contract 永久工程把關規範",
+  "status": "VERIFIED",
+  "requirements": [
+    {
+      "id": "CSR-01",
+      "status": "VERIFIED",
+      "requirement": "建立所有變更共用的 Change Safety & Replacement Migration Contract，明確定義 Additive／Replacement／Convergence／Removal 與五層收斂 Gate。",
+      "evidence": [
+        "docs/CHANGE_SAFETY_REPLACEMENT_CONTRACT.md"
+      ]
+    },
+    {
+      "id": "CSR-02",
+      "status": "VERIFIED",
+      "requirement": "AGENTS 與 CLAUDE 必須在任何修改前讀取新契約，且不得把舊實作退場判斷責任丟回給不懂程式的專案負責人。",
+      "evidence": [
+        "AGENTS.md",
+        "CLAUDE.md"
+      ]
+    },
+    {
+      "id": "CSR-03",
+      "status": "VERIFIED",
+      "requirement": "ARCHITECTURE_RULES 明確禁止把 display:none、animation:none、!important、Wrapper 或 late patch 當成 Replacement 完成證據。",
+      "evidence": [
+        "ARCHITECTURE_RULES.md"
+      ]
+    },
+    {
+      "id": "CSR-04",
+      "status": "VERIFIED",
+      "requirement": "自主修復契約同步套用 Owner／Contract／Lifecycle／Semantic State／Regression Test 收斂與舊版本退場 Gate。",
+      "evidence": [
+        "AUTONOMOUS_REPAIR_CONTRACT.md"
+      ]
+    },
+    {
+      "id": "CSR-05",
+      "status": "VERIFIED",
+      "requirement": "HANDOFF 永久記錄專案負責人只決定產品結果、代理主動負責工程把關與技術退場。",
+      "evidence": [
+        "HANDOFF.md"
+      ]
+    }
+  ],
+  "verification": {
+    "focusedTests": "PASS — existing targeted regressions and repository checks succeeded",
+    "build": "PASS — production build synchronization check succeeded",
+    "repositoryChecks": "SUCCESS — GitHub Actions run 36335167066",
+    "browserQA": "PASS — applicable browser QA succeeded",
+    "diffCheck": "PASS — Git whitespace and conflict-marker gate succeeded",
+    "verifiedRunId": 36335167066,
+    "verifiedSourceHeadSha": "96aca8ea9d7eb08a1059c7791eccbeedb6237a46",
+    "notes": [
+      "Documentation/contract-only change; no production runtime, gameplay, save, version or main changes.",
+      "Repository checks, release gate and browser regressions passed on the first verified source candidate.",
+      "Final batch metadata update is subject to the normal PR CI on the resulting head."
+    ]
+  }
+}
