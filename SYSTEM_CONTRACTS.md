@@ -151,7 +151,8 @@
 
 
 ## Battle Presentation Final Contract (2026-09-27)
-- Relic Target Focus uses Foreground Projection: only Geometry Owner-provided transparent artwork projection plus HP projection are rendered above the document-level dim layer. No SVG rectangle aperture, live-unit z-index mutation, SP/name/status projection, or consumer-owned geometry is allowed.
-- Floating feedback remains the sole transient-text owner. Critical format is `〔💥〕 N`; status capsules are black with white text and retain `statusType` only as semantic metadata.
+- Relic Target Focus uses Foreground Projection: only Geometry Owner-provided transparent artwork plus data-driven HP and SP resource projections are rendered above the document-level dim layer. Resource projections contain rect and runtime ratio data only; they must not clone HUD HTML, show numbers/name/status, mutate live-unit z-index, use a rectangle aperture, or own geometry.
+- Floating feedback remains the sole transient-text owner. Critical format is `💥 N`; status capsules are black with white text and retain `statusType` only as semantic metadata.
+- A live V143 impact is scheduled as one target-plus-`impactId` batch. Its requests register before the batch flushes and sort Shield → Damage/Critical/MISS/Resist → Status. Synthetic feedback without an `impactId` stays on the normal queue; clear cancels every pending batch.
 - Persistent state Gate returns a reason. `sameNameDuplicate` is a silent reject before hit rolling or mutation; `exclusiveConflict` (Freeze/Petrify) emits formal status MISS; resistance remains distinct.
-- Skill-name presentation derives color from `skill.element` through `data-skill-element`; character element must not participate.
+- Skill-name presentation derives color from `skill.element` through `data-skill-element`; character element must not participate. It is a document-level fixed viewport surface and shares the ordinary floating-feedback visual font size.
