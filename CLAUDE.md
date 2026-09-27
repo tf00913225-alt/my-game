@@ -9,7 +9,15 @@
 7. **不得自行把 `low / mid / high / perfect` 或「低階／中階／高階／完美」當成新的正式物品階級；正式六階與固定色號一律以 `docs/ITEM_RARITY_UI_SPEC.md` 為準。**
 8. **凡涉及新增、替換、轉檔或正式導入任何點陣圖片資產，必須先完整閱讀 `docs/IMAGE_ASSET_SPEC.md`。該文件是圖片格式、WebP 轉換、無損驗證、透明度、尺寸、Sprite Sheet／VFX 幀資料與正式引用流程的最高權威來源。**
 9. **凡屬修復、fix、failure、test failure、CI failure、fixture、test harness、stale contract 或既有修復分支續修任務，若使用者未在當次任務另行指定不同模式，必須先完整閱讀根目錄 `AUTONOMOUS_REPAIR_CONTRACT.md`，並以該文件作為受控自主修復的唯一正式契約來源；不得依舊對話摘要自行擴張授權。**
-10. **凡涉及怪物／精英／BOSS／日常副本／天兵立繪導入，必須先讀 `MONSTER_PORTRAIT_SPEC.md` 與 `docs/MONSTER_PORTRAIT_SPEC_V1.md`。若素材已經生成並完成正式 WebP 落位，預設使用 `npm run portrait:import -- --keys=<portraitKey,...>` 快速導入；不得為已完成素材重新建立生成 batch、重跑生成或重做母圖搜尋。尚未生成的素材才使用既有 batch 流程。**
+10. **凡涉及怪物／精英／BOSS／日常副本／天兵立繪導入，必須先讀 `MONSTER_PORTRAIT_SPEC.md` 與 `docs/MONSTER_PORTRAIT_SPEC_V1.md`。若素材已經生成並完成正式 WebP 落位，預設使用 `npm run portrait:import -- --keys=<portraitKey,...>` 快速導入；不得為已完成素材重新建立生成 batch、重跑生成或重做母圖搜尋。尚未生成的素材才使用既有 batch 流程。**\n11. **所有新增、修改、替換、重構、UI／CSS、Gameplay、資料、狀態、Lifecycle 與 Bug 修復，施工前都必須完整閱讀 `docs/CHANGE_SAFETY_REPLACEMENT_CONTRACT.md`。使用者說「改成／換成／不要原本的」時預設為 Replacement（取代），代理必須自行完成舊 Owner／Contract／Lifecycle／Semantic State／Regression Test 的遷移與退場判定，不得只疊加新版，也不得把「舊的要不要刪」這類工程責任丟回給不懂程式的專案負責人。**
+
+## 最高優先：Change Safety & Replacement Migration Gate（變更安全與取代遷移閘門）
+
+- `docs/CHANGE_SAFETY_REPLACEMENT_CONTRACT.md` 是所有變更的永久必讀契約，與 `ARCHITECTURE_RULES.md` 共同適用。
+- 每次先分類 Additive（新增）／Replacement（取代）／Convergence（收斂）／Removal（移除）；「改成／換成／不要原本的」預設不是疊加。
+- Replacement 完成條件包含舊 Owner、舊 DOM/CSS/函式/Wrapper、舊 State 語意、舊 Lifecycle 與舊 Test 的遷移／刪除判定。
+- `display:none`、`animation:none`、更後面的 CSS、`!important`、Wrapper 或 late patch 不得作為「已完成取代」的預設證據。
+- 代理必須主動提醒雙 Owner、多份真相、狀態語意混用、Lifecycle 缺口與維護成本；使用者只需決定產品／遊戲結果，不需替代理判斷技術退場細節。
 
 ## 《四象江湖傳》專案開發、QA 與外部研究固定規則
 
