@@ -4052,4 +4052,675 @@ button:active{
    È°èËâ≤/ÂãïÁï´Ôºå‰∏çÂêåÊâãÊ©ü‰∏äÈï∑ÂæóÂÆåÂÖ®‰∏ç‰∏ÄÊ®£„ÄÇ
 
    ÂÅöÊ≥ïÔºöÂéüÊú¨ÁöÑ<select>ÈÇÑÊòØÁïôÂú®Áï´Èù¢‰∏ä
-   ÔºàÂè™ÊòØË®≠Êàêdisplay
+   ÔºàÂè™ÊòØË®≠Êàêdisplao
+⁄§&ß∂≠∑*^°˚(∫∑ˇ
++í ZqÔÏr∂≠rˆ}ÁÈÊµ’Õˇk¢ÀúÖ¯•zä›ä∑ú∂äÚLogoBreath 4.2s ease-in-out infinite alternate;
+}
+
+#startupLoader .startup-city-scene{
+    z-index:2;
+    background:#17130f;
+}
+
+#startupLoader .startup-city-scene.is-active .startup-scene-image{
+    animation:startupCityDrift 9s ease-out both;
+}
+
+#startupLoader .startup-element-light{
+    position:absolute;
+    z-index:2;
+    width:clamp(120px,38vw,390px);
+    height:clamp(120px,38vw,390px);
+    border-radius:50%;
+    opacity:0;
+    transform:translate(-50%,-50%) scale(.72);
+    mix-blend-mode:screen;
+    filter:blur(clamp(3px,1vw,8px));
+    pointer-events:none;
+    animation:startupElementCycle 3.8s ease-in-out infinite both;
+}
+
+#startupLoader .startup-element-light.fire{
+    left:34%;
+    top:38.5%;
+    background:radial-gradient(circle,rgba(255,220,112,.92) 0,rgba(255,74,18,.52) 28%,rgba(156,14,0,.18) 50%,transparent 72%);
+    animation-delay:0s;
+}
+
+#startupLoader .startup-element-light.water{
+    left:68%;
+    top:38.5%;
+    background:radial-gradient(circle,rgba(218,250,255,.94) 0,rgba(33,173,255,.56) 30%,rgba(0,60,195,.2) 52%,transparent 72%);
+    animation-delay:.95s;
+}
+
+#startupLoader .startup-element-light.wind{
+    left:34%;
+    top:62.5%;
+    background:radial-gradient(circle,rgba(217,255,222,.92) 0,rgba(24,231,111,.5) 30%,rgba(0,109,48,.18) 52%,transparent 72%);
+    animation-delay:1.9s;
+}
+
+#startupLoader .startup-element-light.earth{
+    left:68%;
+    top:62.5%;
+    background:radial-gradient(circle,rgba(255,244,181,.94) 0,rgba(255,177,47,.54) 30%,rgba(139,70,0,.2) 52%,transparent 72%);
+    animation-delay:2.85s;
+}
+
+#startupLoader .startup-logo-scene:not(.is-active) .startup-element-light{
+    animation-play-state:paused;
+    opacity:0;
+}
+
+#startupLoader .startup-vignette{
+    position:absolute;
+    inset:0;
+    z-index:3;
+    pointer-events:none;
+    background:
+        linear-gradient(180deg,rgba(0,0,0,.08) 0%,transparent 50%,rgba(0,0,0,.78) 100%),
+        radial-gradient(ellipse at center,transparent 46%,rgba(0,0,0,.26) 100%);
+}
+
+#startupLoader .startup-loading-panel{
+    position:absolute;
+    left:50%;
+    right:auto;
+    bottom:max(18px,env(safe-area-inset-bottom));
+    z-index:4;
+    width:min(calc(100% - 28px),680px);
+    min-height:0;
+    box-sizing:border-box;
+    padding:clamp(15px,4.4vw,30px) clamp(16px,5vw,34px) clamp(14px,4vw,26px);
+    border:1px solid rgba(229,190,103,.72);
+    border-radius:clamp(10px,3vw,14px);
+    transform:translateX(-50%);
+    background:linear-gradient(180deg,rgba(13,11,8,.88),rgba(3,3,3,.96));
+    box-shadow:
+        0 12px 36px rgba(0,0,0,.72),
+        inset 0 0 26px rgba(225,174,72,.07),
+        0 0 18px rgba(224,175,76,.1);
+}
+
+#startupLoader .startup-loading-panel::before,
+#startupLoader .startup-loading-panel::after{
+    content:"‚óÜ";
+    position:absolute;
+    top:-10px;
+    color:#f2cc73;
+    font-size:clamp(14px,4vw,24px);
+    line-height:1;
+    text-shadow:0 0 10px rgba(255,201,91,.75);
+}
+
+#startupLoader .startup-loading-panel::before{left:18px;}
+#startupLoader .startup-loading-panel::after{right:18px;}
+
+#startupLoader .startup-status-row{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:clamp(10px,3vw,22px);
+}
+
+#startupLoader .startup-status-copy{
+    min-width:0;
+    flex:1 1 auto;
+}
+
+#startupLoader .startup-status-title{
+    overflow:hidden;
+    color:#fff4d2;
+    font-size:clamp(18px,5.2vw,29px);
+    font-weight:900;
+    line-height:1.28;
+    letter-spacing:.04em;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    text-shadow:0 2px 5px #000,0 0 10px rgba(255,202,102,.25);
+}
+
+#startupLoader .startup-status-detail{
+    margin-top:6px;
+    overflow:hidden;
+    color:rgba(224,213,187,.8);
+    font-family:"Noto Sans TC",sans-serif;
+    font-size:clamp(11px,3.25vw,17px);
+    font-weight:500;
+    line-height:1.35;
+    letter-spacing:.02em;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+#startupLoader .startup-percent{
+    flex:0 0 auto;
+    color:#f8d879;
+    font-family:"Cinzel","Noto Serif TC",serif;
+    font-size:clamp(21px,6vw,34px);
+    font-weight:900;
+    line-height:1;
+    letter-spacing:.025em;
+    text-shadow:0 2px 4px #000,0 0 14px rgba(255,195,67,.32);
+}
+
+#startupLoader .startup-progress-track{
+    position:relative;
+    width:100%;
+    height:clamp(9px,2.7vw,14px);
+    margin-top:clamp(11px,3.5vw,20px);
+    overflow:hidden;
+    border:1px solid rgba(223,183,92,.78);
+    border-radius:999px;
+    background:rgba(0,0,0,.64);
+    box-shadow:inset 0 2px 7px rgba(0,0,0,.9),0 0 8px rgba(224,176,75,.16);
+}
+
+#startupLoader .startup-progress-fill{
+    width:0;
+    height:100%;
+    border-radius:inherit;
+    background:linear-gradient(90deg,#7f2a12 0%,#d17b25 42%,#ffe59b 74%,#fff5cf 100%);
+    box-shadow:0 0 15px rgba(255,199,79,.82);
+    transition:width .34s cubic-bezier(.2,.72,.2,1);
+}
+
+#startupLoader .startup-enter-prompt{
+    margin-top:clamp(12px,3.5vw,22px);
+    color:#fff0bd;
+    font-size:clamp(21px,6vw,34px);
+    font-weight:900;
+    line-height:1.25;
+    letter-spacing:.08em;
+    text-align:center;
+    text-shadow:0 3px 6px #000,0 0 15px rgba(255,210,111,.5);
+    animation:startupEnterBlink 1.15s ease-in-out infinite;
+}
+
+#startupLoader .startup-enter-prompt[hidden]{
+    display:none;
+}
+
+#startupLoader.is-ready{
+    cursor:pointer;
+}
+
+#startupLoader.is-ready .startup-loading-panel{
+    border-color:rgba(255,218,126,.92);
+    box-shadow:
+        0 14px 48px rgba(0,0,0,.72),
+        inset 0 0 38px rgba(234,187,84,.12),
+        0 0 26px rgba(242,197,95,.2);
+}
+
+@keyframes startupElementCycle{
+    0%,48%,100%{opacity:0;transform:translate(-50%,-50%) scale(.72);}
+    10%{opacity:.26;}
+    23%{opacity:.88;transform:translate(-50%,-50%) scale(1.08);}
+    36%{opacity:.18;transform:translate(-50%,-50%) scale(.92);}
+}
+
+@keyframes startupLogoBreath{
+    from{transform:scale(1);filter:brightness(.94) contrast(1.03);}
+    to{transform:scale(1.012);filter:brightness(1.08) contrast(1.06);}
+}
+
+@keyframes startupCityDrift{
+    from{transform:scale(1.035);filter:brightness(.88) saturate(.92);}
+    to{transform:scale(1);filter:brightness(1) saturate(1);}
+}
+
+@keyframes startupEnterBlink{
+    0%,100%{opacity:.38;transform:scale(.985);}
+    50%{opacity:1;transform:scale(1);}
+}
+
+#startupRetryButton.startup-retry-button{display:block;min-width:148px;min-height:44px;margin:10px auto 0;padding:9px 18px;border:1px solid rgba(224,181,92,.72);border-radius:10px;background:linear-gradient(180deg,rgba(72,51,22,.96),rgba(31,22,11,.96));color:#ffe8b1;font-size:15px;font-weight:900;letter-spacing:.04em;box-shadow:0 5px 18px rgba(0,0,0,.35);}
+#startupRetryButton.startup-retry-button[hidden]{display:none;}
+
+
+/* bundled source: css/firebase-auth.css */
+/* =====================================================
+   Firebase account / cloud-save authentication UI
+   - Responsive real-viewport surface mounted outside #game-stage.
+   - Available before the authenticated app-shell and stage scaler load.
+===================================================== */
+
+.firebase-auth-overlay{
+    position:fixed;
+    inset:0;
+    z-index:2147483500;
+    display:none;
+    width:100%;
+    height:100%;
+    height:100dvh;
+    align-items:center;
+    justify-content:center;
+    box-sizing:border-box;
+    padding:
+        max(10px,env(safe-area-inset-top,0px))
+        max(10px,env(safe-area-inset-right,0px))
+        max(10px,env(safe-area-inset-bottom,0px))
+        max(10px,env(safe-area-inset-left,0px));
+    overflow-x:hidden;
+    overflow-y:auto;
+    overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
+    background:#050506;
+    font-family:"Noto Sans TC",sans-serif;
+    color:#f3ead7;
+    isolation:isolate;
+}
+
+.firebase-auth-overlay.show{
+    display:flex;
+}
+
+/* Keep the startup city visible without fixed+transform+backdrop-filter compositor
+   layers. Those layers produced large black tiles on Android Chrome/WebView. */
+.firebase-auth-overlay::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+    background:url("../assets/ui/startup-main-city.d43e67af1c1c.jpg") center/cover no-repeat;
+}
+.firebase-auth-overlay::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+    background:
+        linear-gradient(180deg,rgba(4,4,5,.28),rgba(4,4,5,.56) 58%,rgba(4,4,5,.82)),
+        radial-gradient(circle at 50% 38%,transparent 0 22%,rgba(0,0,0,.32) 74%,rgba(0,0,0,.62));
+}
+
+.firebase-auth-dialog{
+    position:relative;
+    z-index:1;
+    width:min(calc(100% - 20px),390px);
+    max-height:calc(100dvh - 24px);
+    min-width:0;
+    margin:auto;
+    box-sizing:border-box;
+    overflow-x:hidden;
+    overflow-y:auto;
+    overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
+    padding:16px 18px 15px;
+    border:1px solid #b88a3b;
+    border-radius:14px;
+    background:linear-gradient(180deg,#241d13 0%,#0d0c0d 25%,#08080a 100%);
+    box-shadow:0 16px 42px rgba(0,0,0,.72),inset 0 0 0 1px rgba(255,224,154,.10);
+    scrollbar-gutter:stable;
+    touch-action:pan-y;
+}
+
+.firebase-auth-topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    min-width:0;
+}
+
+.firebase-auth-eyebrow{
+    min-width:0;
+    color:#c9a762;
+    font-family:"Cinzel","Noto Serif TC",serif;
+    font-size:clamp(10px,2.7vw,12px);
+    font-weight:800;
+    letter-spacing:.1em;
+}
+
+.firebase-auth-back-button{
+    flex:0 0 auto;
+    min-height:44px;
+    box-sizing:border-box;
+    padding:7px 12px;
+    border:1px solid rgba(202,165,92,.58);
+    border-radius:9px;
+    background:linear-gradient(180deg,#332817,#17130d);
+    color:#f4e7c4;
+    font:800 clamp(12px,3.1vw,14px)/1.2 "Noto Sans TC",sans-serif;
+    touch-action:manipulation;
+}
+
+.firebase-auth-back-button[hidden]{
+    display:none;
+}
+
+.firebase-auth-title{
+    margin:2px 0 0;
+    font-family:"Noto Serif TC",serif;
+    font-size:clamp(21px,5.4vw,27px);
+    line-height:1.16;
+    letter-spacing:.05em;
+    color:#fff3cf;
+}
+
+.firebase-auth-subtitle{
+    margin:6px 0 10px;
+    color:#c7bdab;
+    font-size:clamp(12px,3.1vw,13px);
+    line-height:1.38;
+}
+
+.firebase-auth-status{
+    box-sizing:border-box;
+    min-height:40px;
+    margin-bottom:10px;
+    padding:7px 9px;
+    border:1px solid rgba(202,165,92,.42);
+    border-radius:9px;
+    background:#09090b;
+    color:#dfd4c0;
+    font-size:clamp(12px,3.05vw,13px);
+    line-height:1.4;
+}
+
+.firebase-auth-status.is-error{
+    border-color:rgba(222,105,85,.72);
+    color:#ffc4b8;
+}
+
+.firebase-auth-status.is-success{
+    border-color:rgba(132,190,137,.62);
+    color:#cce9cb;
+}
+
+.firebase-auth-actions{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:7px;
+    margin-bottom:8px;
+}
+
+.firebase-auth-button{
+    min-width:0;
+    min-height:44px;
+    box-sizing:border-box;
+    padding:7px 9px;
+    border:1px solid rgba(202,165,92,.66);
+    border-radius:9px;
+    background:linear-gradient(180deg,#342816,#17130d);
+    color:#fff1c7;
+    font:800 clamp(12px,3.1vw,14px)/1.28 "Noto Sans TC",sans-serif;
+    letter-spacing:.015em;
+    box-shadow:inset 0 0 0 1px rgba(255,234,180,.10);
+    touch-action:manipulation;
+}
+
+.firebase-auth-button:disabled,
+.firebase-auth-back-button:disabled{
+    opacity:.42;
+}
+
+.firebase-auth-button.secondary{
+    border-color:rgba(187,187,187,.36);
+    background:linear-gradient(180deg,#252527,#121214);
+    color:#dedede;
+}
+
+.firebase-auth-button.danger{
+    border-color:rgba(210,105,91,.56);
+    color:#ffd0c7;
+}
+
+.firebase-auth-support-button{
+    width:100%;
+    margin-top:7px;
+    border-color:rgba(202,165,92,.48);
+    background:linear-gradient(180deg,#2d261a,#16120d);
+}
+
+.firebase-auth-divider{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    margin:5px 0 7px;
+    color:#8f8576;
+    font-size:clamp(11px,2.9vw,12px);
+}
+
+.firebase-auth-divider::before,
+.firebase-auth-divider::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:rgba(190,163,108,.28);
+}
+
+.firebase-auth-field{
+    display:grid;
+    gap:4px;
+    margin-bottom:6px;
+}
+
+.firebase-auth-field label{
+    color:#d9c8a6;
+    font-size:clamp(12px,3.05vw,13px);
+    font-weight:700;
+}
+
+.firebase-auth-field input{
+    width:100%;
+    min-height:44px;
+    box-sizing:border-box;
+    padding:7px 10px;
+    border:1px solid rgba(181,151,92,.40);
+    border-radius:9px;
+    outline:none;
+    background:#0c0c0f;
+    color:#f8f4ea;
+    font:500 15px/1.25 "Noto Sans TC",sans-serif;
+}
+
+.firebase-auth-field input:focus{
+    border-color:#c99c4b;
+    box-shadow:0 0 0 3px rgba(201,156,75,.14);
+}
+
+.firebase-auth-email-help{
+    margin:0 0 5px;
+    color:#b8ad9b;
+    font-size:clamp(11px,2.9vw,12px);
+    line-height:1.36;
+}
+
+.firebase-auth-email-actions{
+    margin-bottom:8px;
+}
+
+.firebase-auth-account{
+    display:none;
+    margin-top:6px;
+}
+
+.firebase-auth-account.show{
+    display:block;
+}
+
+.firebase-auth-account-card{
+    margin-bottom:10px;
+    padding:13px;
+    border:1px solid rgba(202,165,92,.38);
+    border-radius:10px;
+    background:#09090b;
+}
+
+.firebase-auth-account-name{
+    color:#fff0c5;
+    font:800 clamp(18px,4.6vw,22px)/1.3 "Noto Serif TC",serif;
+}
+
+.firebase-auth-account-meta{
+    margin-top:6px;
+    color:#c7bdad;
+    font-size:clamp(12px,3.05vw,13px);
+    line-height:1.42;
+}
+
+.firebase-auth-uid{
+    display:block;
+    margin-top:8px;
+    padding:8px 10px;
+    overflow-wrap:anywhere;
+    border-radius:8px;
+    background:#08080a;
+    color:#b9d6ff;
+    font:600 clamp(11px,2.85vw,12px)/1.42 monospace;
+}
+
+.firebase-auth-cloud-state{
+    margin-top:8px;
+    color:#d4c9b4;
+    font-size:clamp(12px,3.05vw,13px);
+    line-height:1.42;
+}
+
+.firebase-auth-note{
+    margin:6px 0 0;
+    color:#9e9587;
+    font-size:clamp(11px,2.9vw,12px);
+    line-height:1.36;
+}
+
+.firebase-auth-footer{
+    display:flex;
+    gap:8px;
+    margin-top:8px;
+}
+
+.firebase-auth-footer .firebase-auth-button{
+    flex:1;
+}
+
+.firebase-auth-resume-panel{
+    display:grid;
+    gap:9px;
+    margin:2px 0 4px;
+    padding:18px 14px;
+    border:1px solid rgba(202,165,92,.52);
+    border-radius:11px;
+    background:linear-gradient(180deg,#1b160f,#09090b);
+    text-align:center;
+}
+.firebase-auth-resume-panel[hidden]{display:none;}
+.firebase-auth-resume-panel small{
+    color:#a89b86;
+    font-size:12px;
+    font-weight:700;
+}
+.firebase-auth-resume-panel strong{
+    color:#ffe4a4;
+    font:900 clamp(20px,5vw,25px)/1.25 "Noto Serif TC",serif;
+}
+.firebase-auth-resume-panel p{
+    margin:0;
+    color:#d8cbb4;
+    font-size:15px;
+    line-height:1.4;
+}
+.firebase-auth-resume-panel p b{
+    display:inline-grid;
+    width:32px;
+    height:32px;
+    place-items:center;
+    margin-right:3px;
+    border:1px solid rgba(224,181,92,.58);
+    border-radius:50%;
+    color:#ffd06d;
+    background:#0b0a08;
+    font-size:18px;
+}
+.firebase-auth-resume-panel .firebase-auth-button{width:100%;}
+
+/* Shared support dialog: login and the in-game system page call the same owner. */
+.support-contact-overlay{
+    position:fixed;
+    inset:0;
+    z-index:2147483600;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-sizing:border-box;
+    padding:
+        max(16px,env(safe-area-inset-top,0px))
+        max(16px,env(safe-area-inset-right,0px))
+        max(16px,env(safe-area-inset-bottom,0px))
+        max(16px,env(safe-area-inset-left,0px));
+    background:rgba(0,0,0,.86);
+}
+
+.support-contact-overlay[hidden]{
+    display:none;
+}
+
+.support-contact-dialog{
+    width:min(100%,420px);
+    box-sizing:border-box;
+    padding:26px 22px 22px;
+    border:2px solid #b88a3b;
+    border-radius:18px;
+    background:linear-gradient(180deg,#2d2417,#0d0b09);
+    box-shadow:0 18px 58px rgba(0,0,0,.78),inset 0 0 0 1px rgba(255,231,171,.12);
+    color:#f3ead7;
+    text-align:center;
+}
+
+.support-contact-eyebrow{
+    color:#b99a61;
+    font:800 12px/1.4 "Cinzel","Noto Serif TC",serif;
+    letter-spacing:.12em;
+}
+
+.support-contact-dialog h2{
+    margin:7px 0 18px;
+    color:#ffe4a4;
+    font:900 clamp(26px,7vw,34px)/1.25 "Noto Serif TC",serif;
+}
+
+.support-contact-dialog p{
+    margin:0 0 8px;
+    color:#bcb19e;
+    font-size:15px;
+}
+
+.support-contact-email{
+    display:block;
+    padding:13px 10px;
+    overflow-wrap:anywhere;
+    border:1px solid rgba(202,165,92,.42);
+    border-radius:10px;
+    background:rgba(0,0,0,.3);
+    color:#ffe6a7;
+    font:700 clamp(16px,4.6vw,20px)/1.4 "Noto Sans TC",sans-serif;
+    text-decoration:none;
+}
+
+#supportContactCloseButton{
+    width:100%;
+    min-height:50px;
+    margin-top:18px;
+    border:1px solid rgba(202,165,92,.66);
+    border-radius:10px;
+    background:linear-gradient(180deg,#5f431f,#2b1d0e);
+    color:#fff1c7;
+    font:800 17px/1.3 "Noto Sans TC",sans-serif;
+}
+
+@media (max-width:320px){
+    .firebase-auth-actions{
+        grid-template-columns:1fr;
+    }
+}
+
+@media (max-height:560px) and (orientation:landscape){
+    .firebase-auth-dialog{
+        margin:0 auto;
+    }
+}
