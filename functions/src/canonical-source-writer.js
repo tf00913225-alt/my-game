@@ -29,10 +29,14 @@ function createCanonicalSourceWriter({db,FieldValue,HttpsError,runProtected,
             const envelopeRef=db.collection("users").doc(uid).collection("saves").doc("current");
             const accountRef=root.collection("account").doc("current");
             const operationRef=root.collection("operations").doc(operationId);
+            const grantOperationRef=root.collection("grantOperations").doc(operationId);
+            const ledgerRef=root.collection("ledgerEntries").doc(operationId);
             const candidateRef=root.collection("migrationCandidates").doc("latest");
-            const [envelopeSnap,accountSnap,operationSnap,candidateSnap]=await Promise.all([
+            const [envelopeSnap,accountSnap,operationSnap,grantOperationSnap,
+                ledgerSnap,candidateSnap]=await Promise.all([
                 transaction.get(envelopeRef),transaction.get(accountRef),
-                transaction.get(operationRef),transaction.get(candidateRef)
+                transaction.get(operationRef),transaction.get(grantOperationRef),
+                transaction.get(ledgerRef),transaction.get(candidateRef)
             ]);
             if(!envelopeSnap.exists){ fail("failed-precondition","Bootstrap the cloud account first."); }
             const envelope=inspectExistingEnvelope(envelopeSnap.data(),uid);
@@ -40,6 +44,9 @@ function createCanonicalSourceWriter({db,FieldValue,HttpsError,runProtected,
                 fail("failed-precondition","A canonical account cannot be initialized here.");
             }
             if(operationSnap.exists){
+                if(grantOperationSnap.exists||ledgerSnap.exists){
+                    fail("data-loss","Initial character operation ID overlaps another operation.");
+                }
                 const receipt=operationSnap.data();
                 if(!accountSnap.exists||receipt.ownerUid!==uid||
                    receipt.operationId!==operationId||receipt.kind!=="initial-character-sources"||
@@ -78,6 +85,9 @@ function createCanonicalSourceWriter({db,FieldValue,HttpsError,runProtected,
                 return {sourceRevision:receipt.sourceRevision,
                     snapshotSha256:receipt.snapshotSha256,unchanged:true,
                     authoritativeStateReady:false};
+            }
+            if(grantOperationSnap.exists||ledgerSnap.exists){
+                fail("failed-precondition","Operation ID is already used.");
             }
             if(accountSnap.exists||candidateSnap.exists||
                envelope.data.migrationCandidateStatus!=="none"){

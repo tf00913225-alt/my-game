@@ -405,6 +405,44 @@ assert.equal((await expAllocator.allocateSharedExp(yRequest,allocArgs)).unchange
 await assert.rejects(expAllocator.allocateSharedExp(yRequest,{
     operationId:goldOperation,expectedRevision:9}),
     error=>error.code==="failed-precondition");
+// A reservation cannot strand a server-issued grant by reusing an EXP
+// allocation operation ID; the grant remains pending and the version unchanged.
+const collisionGrant="grant-collision-after-allocation-0001";
+const collisionRef=db.doc(`serverUsers/${y}/pendingGrants/${collisionGrant}`);
+await collisionRef.set({schemaVersion:1,ownerUid:y,kind:"gold",
+    source:"server-event",amount:10,status:"pending",claimedByOperationId:null,
+    createdAt:Timestamp.now()});
+await rejected("reserveTrustedGrant",yUser.idToken,{uid:y,session:sessionY,
+    grantId:collisionGrant,operationId:allocationOperation,expectedRevision:9},
+    "FAILED_PRECONDITION");
+assert.equal((await collisionRef.get()).get("status"),"pending");
+assert.equal((await db.doc(`users/${y}/saves/current`).get()).get("serverRevision"),9);
+// The opposite order is fenced too: a reserved grant cannot become a new
+// character's operation receipt under the same UID.
+const collisionUser=await login("accounts:signUp",{
+    email:"session-operation-collision@example.test",password});
+const collisionUid=collisionUser.localId;
+const collisionSession=await invoke("createGameSession",collisionUser.idToken,
+    {uid:collisionUid});
+await invoke("bootstrapCloudSave",collisionUser.idToken,
+    {uid:collisionUid,session:collisionSession});
+const collisionOperation="initial-collision-emulator-0001";
+await db.doc(`serverUsers/${collisionUid}/pendingGrants/collision-seed-0001`).set({
+    schemaVersion:1,ownerUid:collisionUid,kind:"exp",source:"server-event",
+    amount:10,status:"pending",claimedByOperationId:null,createdAt:Timestamp.now()
+});
+await invoke("reserveTrustedGrant",collisionUser.idToken,{
+    uid:collisionUid,session:collisionSession,grantId:"collision-seed-0001",
+    operationId:collisionOperation,expectedRevision:1});
+await assert.rejects(initialWriter.commitInitialSources({
+    auth:{uid:collisionUid,token:claims(collisionUser.idToken)},
+    data:{uid:collisionUid,session:collisionSession}},
+    {operationId:collisionOperation,expectedRevision:2,selection:choices}),
+    error=>error.code==="failed-precondition");
+assert.equal((await db.doc(`serverUsers/${collisionUid}/account/current`).get())
+    .exists,false);
+assert.equal((await db.doc(`serverUsers/${collisionUid}/operations/${collisionOperation}`).get())
+    .exists,false);
 assert.equal((await db.doc(`users/${y}/saves/current`).get()).get("authoritativeStateReady"),false);
 await rejected("protectedTest",yUser.idToken,{uid:x,session:sessionB},"SESSION_INVALID");
 await rejected("protectedTest",yUser.idToken,{uid:y,session:{...sessionB,uid:y}},"SESSION_INVALID");
