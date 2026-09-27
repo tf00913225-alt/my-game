@@ -24,9 +24,13 @@ function createTrustedGrantLedger({db,FieldValue,HttpsError,runProtected,inspect
             const privateRef=db.collection("serverUsers").doc(uid);
             const grantRef=privateRef.collection("pendingGrants").doc(grantId);
             const receiptRef=privateRef.collection("grantOperations").doc(operationId);
+            const operationRef=privateRef.collection("operations").doc(operationId);
+            const ledgerRef=privateRef.collection("ledgerEntries").doc(operationId);
             const saveRef=db.collection("users").doc(uid).collection("saves").doc("current");
-            const [grantSnapshot,receiptSnapshot,saveSnapshot]=await Promise.all([
-                transaction.get(grantRef),transaction.get(receiptRef),transaction.get(saveRef)
+            const [grantSnapshot,receiptSnapshot,operationSnapshot,ledgerSnapshot,
+                saveSnapshot]=await Promise.all([
+                transaction.get(grantRef),transaction.get(receiptRef),
+                transaction.get(operationRef),transaction.get(ledgerRef),transaction.get(saveRef)
             ]);
             if(!saveSnapshot.exists){ fail("failed-precondition","Bootstrap the cloud account first."); }
             const envelope=inspectExistingEnvelope(saveSnapshot.data(),uid);
@@ -34,6 +38,9 @@ function createTrustedGrantLedger({db,FieldValue,HttpsError,runProtected,inspect
                 fail("failed-precondition","Grant ledger only supports pre-migration envelopes.");
             }
             if(receiptSnapshot.exists){
+                if(operationSnapshot.exists){
+                    fail("data-loss","Grant operation ID overlaps another operation.");
+                }
                 const receipt=receiptSnapshot.data();
                 const grant=grantSnapshot.exists?grantSnapshot.data():null;
                 if(receipt.schemaVersion!==GRANT_SCHEMA_VERSION||receipt.ownerUid!==uid||
@@ -49,10 +56,8 @@ function createTrustedGrantLedger({db,FieldValue,HttpsError,runProtected,inspect
                     fail("data-loss","Grant receipt is inconsistent.");
                 }
                 if(receipt.creditedToCharacter===true){
-                    const [claim,ledger]=await Promise.all([
-                        transaction.get(privateRef.collection("uniqueClaims").doc(grantId)),
-                        transaction.get(privateRef.collection("ledgerEntries").doc(operationId))
-                    ]);
+                    const claim=await transaction.get(privateRef.collection("uniqueClaims").doc(grantId));
+                    const ledger=ledgerSnapshot;
                     if(grant.status!=="credited"||!claim.exists||!ledger.exists||
                        claim.get("ownerUid")!==uid||claim.get("operationId")!==operationId||
                        claim.get("creditRevision")!==receipt.creditRevision||
@@ -70,11 +75,15 @@ function createTrustedGrantLedger({db,FieldValue,HttpsError,runProtected,inspect
                         currentServerRevision:envelope.serverRevision,unchanged:true,
                         creditedToCharacter:true,creditRevision:receipt.creditRevision};
                 }
-                if(receipt.creditedToCharacter!==false||grant.status!=="reserved"){
+                if(receipt.creditedToCharacter!==false||grant.status!=="reserved"||
+                   ledgerSnapshot.exists){
                     fail("data-loss","Grant reservation receipt is inconsistent.");
                 }
                 return {grantId,operationId,serverRevision:receipt.serverRevision,
                     currentServerRevision:envelope.serverRevision,unchanged:true,creditedToCharacter:false};
+            }
+            if(operationSnapshot.exists||ledgerSnapshot.exists){
+                fail("failed-precondition","Operation ID is already used.");
             }
             if(envelope.serverRevision!==expectedRevision){
                 throw new HttpsError("aborted","CLOUD_REVISION_CONFLICT",{code:"CLOUD_REVISION_CONFLICT"});
