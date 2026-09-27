@@ -282,7 +282,7 @@ assert.equal((await db.collection(`serverUsers/${atomicUid}/pendingGrants`).get(
 assert.equal((await db.collection(`serverUsers/${atomicUid}/ledgerEntries`).get()).empty,true);
 assert.equal((await db.doc(`serverUsers/${atomicUid}/economy/current`).get()).get("gold"),0);
 await rejected("claimDailyCheckin",atomicUser.idToken,
-    {...atomicRequest.data,expectedRevision:1},"CLOUD_REVISION_CONFLICT");
+    {...atomicRequest.data,expectedRevision:1},"ABORTED");
 await rejected("claimDailyCheckin",atomicUser.idToken,
     {...atomicRequest.data,amount:5000},"INVALID_ARGUMENT");
 const atomicClaim=await invoke("claimDailyCheckin",atomicUser.idToken,atomicRequest.data);
