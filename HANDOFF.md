@@ -1,3 +1,12 @@
+## 2026-09-28 — Change Safety / Replacement Migration 永久工程把關規則
+
+- 專案負責人明確要求：本人不需懂程式或自行判斷舊 CSS／DOM／函式／Wrapper／Test 是否該刪；其責任是決定遊戲、UI、系統與玩法要變成什麼樣。所有開發代理必須主動承擔工程風險把關與舊版本退場判斷。
+- 新永久契約：`docs/CHANGE_SAFETY_REPLACEMENT_CONTRACT.md`。任何新增／修改／替換／重構／修 Bug 前都必須先分類 Additive／Replacement／Convergence／Removal。
+- 「改成／換成／不要原本的」預設視為 Replacement，不得把 C 疊在 A/B 上後用 `display:none`、`animation:none`、`!important`、Wrapper 或 late patch 壓住舊實作就宣稱完成。
+- 每次變更必須一起檢查 Owner、Contract、Lifecycle、Semantic State、Regression Test；若舊實作仍承擔其他責任，先遷移責任再退場。
+- 代理發現雙 Owner、多份真相、狀態語意混用、Lifecycle 缺口、舊 Test 保護取消行為或一人團隊維護成本風險時，必須在施工前主動提醒並給出正常工程順序，不得等 Bug 發生後才解釋。
+- 完成定義包含舊版本退場：新版能運作本身不等於完成。此規則已掛入 AGENTS、CLAUDE、ARCHITECTURE_RULES 與 AUTONOMOUS_REPAIR_CONTRACT，後續新對話不需使用者重貼全文。
+
 ## 2026-09-27 — Same-head canonical recovery transaction (candidate; Phase 4 0/6 VERIFIED)
 
 - Internal `functions/src/canonical-current-recovery.js::restoreCurrent()` repairs only the current first-character server-created revision from its complete sealed archive. It requires an active UID session, exact envelope revision and a matching, unexpired, server-only operator approval. In one Firestore transaction it refuses unexpected source documents, recreates missing sources, advances the complete claim set and account to a new revision, creates an unpublished snapshot and archive, consumes approval and writes operation/audit receipts. Original claim and operation history is retained; replay resolves its receipt.
