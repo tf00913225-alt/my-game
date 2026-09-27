@@ -106,13 +106,13 @@ window.showMissEffect=function(isPlayerTarget,index,label){var el=document.getEl
  var feedback=window.FourSymbolsBattleFloatingFeedback;
  /* A/C: Relic damage + Burn status share the same target context without collision. */
  feedback.emit({side:'monster',index:0,kind:'damage',text:'-188HP',source:'relic',duration:1500,skipImpactTiming:true});
- feedback.emit({side:'monster',index:0,kind:'status',text:'燃燒',source:'relic-status',duration:1500,skipImpactTiming:true});
+	feedback.emit({side:'monster',index:0,kind:'status',statusType:'burn',text:'燃燒',source:'relic-status',duration:1500,skipImpactTiming:true});
  /* D: Shield + HP damage share another target context. */
  feedback.emit({side:'monster',index:1,kind:'shield',text:'-88',source:'shield',duration:1500,skipImpactTiming:true});
  feedback.emit({side:'monster',index:1,kind:'damage',text:'-100HP',source:'damage',duration:1500,skipImpactTiming:true});
  /* E: MISS + Status share another target context. */
  feedback.emit({side:'monster',index:2,kind:'miss',text:'MISS',source:'miss',duration:1500,skipImpactTiming:true});
- feedback.emit({side:'monster',index:2,kind:'status',text:'破防',source:'status',duration:1500,skipImpactTiming:true});
+	feedback.emit({side:'monster',index:2,kind:'status',statusType:'defenseDown',text:'破防',source:'status',duration:1500,skipImpactTiming:true});
  /* B: HP + SP recovery share one player context. */
  feedback.emit({side:'player',index:0,kind:'heal',text:'+250HP',source:'heal',duration:1500,skipImpactTiming:true});
  feedback.emit({side:'player',index:0,kind:'sp',text:'+40SP',source:'sp',duration:1500,skipImpactTiming:true});
@@ -165,10 +165,10 @@ window.showMissEffect=function(isPlayerTarget,index,label){var el=document.getEl
  var bossHp=bossCard.querySelector('.monster-hp'),bossSp=bossCard.querySelector('.monster-sp'),bossName=bossCard.querySelector('.battle-monster-name');
  var bossEvidence={footprint:rect('.v-fixed-boss-footprint'),card:rect('#battleMonster0'),art:rect('#battleMonster0 > .v174-battle-art'),hud:{hp:rect('#battleMonster0 > .monster-hp'),sp:rect('#battleMonster0 > .monster-sp'),name:rect('#battleMonster0 > .battle-monster-name'),hpPosition:getComputedStyle(bossHp).position,spPosition:getComputedStyle(bossSp).position,hpDisplay:getComputedStyle(bossHp).display,spDisplay:getComputedStyle(bossSp).display},bossCount:document.querySelectorAll('.v-fixed-boss-footprint > #battleMonster0').length,slots:bossFootprint&&bossFootprint.dataset.slots,reinforcements:['#battleMonster1','#battleMonster2'].map(function(selector){return {card:rect(selector),art:rect(selector+' > .v174-battle-art')};}),objects:['#battleMonster3','#battleMonster4'].map(function(selector){return {card:rect(selector),art:rect(selector+' > .v174-battle-art')};}),cardless:Array.from(document.querySelectorAll('.battle-monster')).every(function(card){return card.classList.contains('v174-cardless-unit');}),pointerEvents:getComputedStyle(bossCard).pointerEvents,background:getComputedStyle(bossCard).backgroundImage,reticles:{boss:{content:bossReticle.content,border:bossReticle.borderTopWidth,animation:bossReticle.animationName},object:{content:objectReticle.content,border:objectReticle.borderTopWidth,animation:objectReticle.animationName}}};
  setTimeout(function(){var legacyStyle=document.getElementById('v174-cardless-battle-style');var result={viewport:{width:${width},height:${height}},scenarios:scenarios,allyScenarios:allyScenarios,splitAlly:splitAlly,collapsedDrawer:collapsedDrawer,expandedDrawer:expandedDrawer,turnUi:turnUi,artwork:artwork,beforeDeath:beforeDeath,afterDeath:afterDeath,targetSlot:targetSlot,targetRect:targetRect,boss:bossEvidence,legacyStyle:{owner:legacyStyle&&legacyStyle.dataset.geometryOwner,textLength:legacyStyle?legacyStyle.textContent.length:-1},feedback:{
-   monster0:monster0Feedback.map(function(node){var r=node.getBoundingClientRect(),s=getComputedStyle(node);return {kind:node.dataset.feedbackKind,source:node.dataset.feedbackSource,lane:Number(node.dataset.feedbackLane),rect:{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height},color:s.color,stroke:s.webkitTextStroke,textShadow:s.textShadow,background:s.backgroundColor};}),
-   monster1:monster1Feedback.map(function(node){var r=node.getBoundingClientRect(),s=getComputedStyle(node);return {kind:node.dataset.feedbackKind,source:node.dataset.feedbackSource,lane:Number(node.dataset.feedbackLane),rect:{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height},color:s.color,stroke:s.webkitTextStroke,textShadow:s.textShadow,background:s.backgroundColor};}),
-   monster2:monster2Feedback.map(function(node){var r=node.getBoundingClientRect(),s=getComputedStyle(node);return {kind:node.dataset.feedbackKind,source:node.dataset.feedbackSource,lane:Number(node.dataset.feedbackLane),rect:{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height},color:s.color,stroke:s.webkitTextStroke,textShadow:s.textShadow,background:s.backgroundColor};}),
-   player0:player0Feedback.map(function(node){var r=node.getBoundingClientRect();return {kind:node.dataset.feedbackKind,source:node.dataset.feedbackSource,lane:Number(node.dataset.feedbackLane),rect:{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height}};}),
+	   monster0:monster0Feedback.map(function(node){var r=node.getBoundingClientRect(),s=getComputedStyle(node);return {kind:node.dataset.feedbackKind,statusType:node.dataset.feedbackStatusType||null,source:node.dataset.feedbackSource,lane:Number(node.dataset.feedbackLane),rect:{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height},color:s.color,stroke:s.webkitTextStroke,textShadow:s.textShadow,background:s.backgroundColor};}),
+	   monster1:monster1Feedback.map(function(node){var r=node.getBoundingClientRect(),s=getComputedStyle(node);return {kind:node.dataset.feedbackKind,statusType:node.dataset.feedbackStatusType||null,source:node.dataset.feedbackSource,lane:Number(node.dataset.feedbackLane),rect:{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height},color:s.color,stroke:s.webkitTextStroke,textShadow:s.textShadow,background:s.backgroundColor};}),
+	   monster2:monster2Feedback.map(function(node){var r=node.getBoundingClientRect(),s=getComputedStyle(node);return {kind:node.dataset.feedbackKind,statusType:node.dataset.feedbackStatusType||null,source:node.dataset.feedbackSource,lane:Number(node.dataset.feedbackLane),rect:{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height},color:s.color,stroke:s.webkitTextStroke,textShadow:s.textShadow,background:s.backgroundColor};}),
+	   player0:player0Feedback.map(function(node){var r=node.getBoundingClientRect(),s=getComputedStyle(node);return {kind:node.dataset.feedbackKind,source:node.dataset.feedbackSource,lane:Number(node.dataset.feedbackLane),rect:{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height},color:s.color,stroke:s.webkitTextStroke,textShadow:s.textShadow,background:s.backgroundColor};}),
    player1:player1Feedback.map(function(node){var r=node.getBoundingClientRect();return {kind:node.dataset.feedbackKind,source:node.dataset.feedbackSource,lane:Number(node.dataset.feedbackLane),rect:{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height}};}),
    player2:player2Feedback.map(function(node){var r=node.getBoundingClientRect();return {kind:node.dataset.feedbackKind,source:node.dataset.feedbackSource,lane:Number(node.dataset.feedbackLane),rect:{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height}};}),
    queueSnapshot:feedbackQueueSnapshot,
@@ -262,12 +262,20 @@ function runViewport(chrome,width,height){
             );
         });
     });
-    data.feedback.monster0.concat(data.feedback.monster1,data.feedback.monster2).forEach(function(item){
-        assert.equal(item.color,"rgb(227, 38, 38)");
-        assert.match(item.stroke,/0\.85px rgb\(255, 255, 255\)/);
-        assert.equal(item.background,"rgba(0, 0, 0, 0)");
-        assert.doesNotMatch(item.textShadow,/8px|10px|14px|16px/);
-    });
+	const damage=data.feedback.monster0.concat(data.feedback.monster1).filter(item=>item.kind==="damage");
+	damage.forEach(function(item){
+		assert.equal(item.color,"rgb(227, 38, 38)");
+		assert.match(item.stroke,/0\.85px rgb\(255, 255, 255\)/);
+		assert.equal(item.background,"rgba(0, 0, 0, 0)");
+		assert.doesNotMatch(item.textShadow,/8px|10px|14px|16px/);
+	});
+	const burn=data.feedback.monster0.find(item=>item.kind==="status");
+	assert.deepEqual({statusType:burn.statusType,color:burn.color,background:burn.background},{statusType:"burn",color:"rgb(227, 38, 38)",background:"rgb(11, 11, 13)"});
+	const defenseDown=data.feedback.monster2.find(item=>item.kind==="status");
+	assert.deepEqual({statusType:defenseDown.statusType,color:defenseDown.color,background:defenseDown.background},{statusType:"defenseDown",color:"rgb(210, 168, 92)",background:"rgb(11, 11, 13)"});
+	const recoveries=Object.fromEntries(data.feedback.player0.map(item=>[item.kind,item]));
+	assert.equal(recoveries.heal.color,"rgb(32, 184, 87)");
+	assert.equal(recoveries.sp.color,"rgb(44, 141, 232)");
     assert.equal(data.stageOverflow,"visible");
     close(data.boss.footprint.left,data.boss.card.left,"Boss card left fills six-Slot footprint");close(data.boss.footprint.right,data.boss.card.right,"Boss card right fills six-Slot footprint");close(data.boss.footprint.top,data.boss.card.top,"Boss card top fills six-Slot footprint");close(data.boss.footprint.bottom,data.boss.card.bottom,"Boss card bottom fills six-Slot footprint");
     assert.equal(data.boss.bossCount,1,"Boss must remain one DOM target");assert.equal(data.boss.slots,"ENEMY_B2 ENEMY_B3 ENEMY_B4 ENEMY_F2 ENEMY_F3 ENEMY_F4");assert.equal(data.boss.cardless,true,"Boss-side dynamic Units must be cardless immediately");assert.equal(data.boss.pointerEvents,"auto");assert.equal(data.boss.background,"none");
