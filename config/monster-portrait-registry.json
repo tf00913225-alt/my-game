@@ -1391,6 +1391,116 @@
         "status": "cataloged",
         "usedIn": "未定",
         "notes": "焦木妖魈造型獨特，先保留作精英候選，避免與 Boss 視覺過早重疊。"
+      },
+      {
+        "assetId": "MON_FIRE_MINIBOSS_002",
+        "displayName": "熔獄牛魔",
+        "element": "fire",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/小Boss/file_0000000009cc820692478957755501ce.png",
+        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-miniboss-002.png",
+        "status": "adopted",
+        "usedIn": "火元素塔 Mini Boss 候選",
+        "notes": "熔岩牛魔與巨型月刃，正面壓迫感強，適合塔中高段。"
+      },
+      {
+        "assetId": "MON_FIRE_MINIBOSS_003",
+        "displayName": "炎翼蝶后",
+        "element": "fire",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/小Boss/file_000000002de482118662fdb238646a0e.png",
+        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-miniboss-003.png",
+        "status": "adopted",
+        "usedIn": "火元素塔 Mini Boss 候選",
+        "notes": "火蝶翼、法器與女性人形主體，適合魔法型小 Boss。"
+      },
+      {
+        "assetId": "MON_FIRE_MINIBOSS_004",
+        "displayName": "炎輪獅王",
+        "element": "fire",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/小Boss/file_000000005cdc8206a91a8091c1abb3cc.png",
+        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-miniboss-004.png",
+        "status": "adopted",
+        "usedIn": "火元素塔 Mini Boss 候選",
+        "notes": "獅首、金輪與火焰武裝，具明確首領辨識度。"
+      },
+      {
+        "assetId": "MON_FIRE_MINIBOSS_005",
+        "displayName": "焚城魔將",
+        "element": "fire",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/小Boss/file_0000000065d882119879748d42e5e53b.png",
+        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-miniboss-005.png",
+        "status": "adopted",
+        "usedIn": "火元素塔 Mini Boss 候選",
+        "notes": "重甲魔將與巨型火刃，適合塔高層小 Boss。"
+      },
+      {
+        "assetId": "MON_FIRE_MINIBOSS_006",
+        "displayName": "赤焰狐后",
+        "element": "fire",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/小Boss/file_0000000068ec81f686d389e4d8079033.png",
+        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-miniboss-006.png",
+        "status": "adopted",
+        "usedIn": "火元素塔 Mini Boss 候選",
+        "notes": "九尾狐形與火焰扇尾，具高辨識度首領氣質。"
+      },
+      {
+        "assetId": "MON_FIRE_MINIBOSS_007",
+        "displayName": "熔甲鱷王",
+        "element": "fire",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/小Boss/file_0000000082f882468cc2488d6cfd7838.png",
+        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-miniboss-007.png",
+        "status": "adopted",
+        "usedIn": "火元素塔 Mini Boss 候選",
+        "notes": "厚重鱷甲與巨刃，近戰壓迫感明顯。"
+      },
+      {
+        "assetId": "MON_FIRE_MINIBOSS_008",
+        "displayName": "裂地炎蠍",
+        "element": "fire",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/小Boss/file_000000008898820cb6501721612812c9.png",
+        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-miniboss-008.png",
+        "status": "adopted",
+        "usedIn": "火元素塔 Mini Boss 候選",
+        "notes": "蠍尾、重甲與火焰鉗肢，適合高層守關小 Boss。"
+      },
+      {
+        "assetId": "MON_FIRE_MINIBOSS_009",
+        "displayName": "逐日炎侯",
+        "element": "fire",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/小Boss/file_00000000b8f081f7bff2a146a5cb832d.png",
+        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-miniboss-009.png",
+        "status": "adopted",
+        "usedIn": "火元素塔 Mini Boss 候選",
+        "notes": "火焰長弓與侯爵式重裝，適合遠程首領。"
+      },
+      {
+        "assetId": "MON_FIRE_MINIBOSS_010",
+        "displayName": "赤潮鯊將",
+        "element": "fire",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/小Boss/file_00000000bb088243a2bed54c0e5147a6.png",
+        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-miniboss-010.png",
+        "status": "adopted",
+        "usedIn": "火元素塔 Mini Boss 候選",
+        "notes": "鯊首戰將與火焰弓刃，視覺反差與輪廓辨識度高。"
+      },
+      {
+        "assetId": "MON_FIRE_MINIBOSS_011",
+        "displayName": "焰冠獅魁",
+        "element": "fire",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/小Boss/file_00000000ec88822f8cb282e18c3425b2.png",
+        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-miniboss-011.png",
+        "status": "reserved",
+        "usedIn": "火元素塔 100F Boss 候選",
+        "notes": "火焰鬃冠、長柄法器與王者構圖，先保留作 100F 高壓候選；仍屬標準尺寸小 Boss，不是大型 Boss。"
       }
     ]
   }
