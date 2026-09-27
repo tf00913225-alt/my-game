@@ -779,8 +779,8 @@
       },
       {
         "path": "build/gameplay-core-primary.7621d72c297e.js",
-        "sha256": "7a20b89c931e",
-        "bytes": 646889,
+        "sha256": "7621d72c297e",
+        "bytes": 647050,
         "priority": "P2",
         "type": "script",
         "decode": false
@@ -802,8 +802,8 @@
         "decode": false
       }
     ],
-    "manifestHash": "ffa29040ac8e",
-    "totalBytes": 21593888,
+    "manifestHash": "d31fb782d583",
+    "totalBytes": 21594049,
     "totalResources": 78
   },
   "assets": {
@@ -814,6 +814,10 @@
     "build/app-shell.d85c4c7f4db5.js": {
       "sha256": "d85c4c7f4db5",
       "bytes": 1015132
+    },
+    "build/gameplay-core-primary.7621d72c297e.js": {
+      "sha256": "7621d72c297e",
+      "bytes": 647050
     },
     "build/gameplay-core-secondary.25c03b722ed8.js": {
       "sha256": "25c03b722ed8",
@@ -926,10 +930,6 @@
     "assets/ui/startup-main-city.d43e67af1c1c.jpg": {
       "sha256": "d43e67af1c1c",
       "bytes": 363193
-    },
-    "build/gameplay-core-primary.7621d72c297e.js": {
-      "sha256": "7621d72c297e268bb5bbbd3b0fdaaf8d74a5671916d6837e1fa078c0abc0b14e",
-      "bytes": 615410
     }
   }
 }
