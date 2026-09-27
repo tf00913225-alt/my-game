@@ -40,7 +40,10 @@ assert.match(cinematicPrelude,/waitMs\(RELIC_IDENTITY_HOLD_MS\)[\s\S]*classList\
   "identity hold must end in target reveal before VFX");
 assert.match(relic,/function relicTargetGeometry\(side,index\)[\s\S]*getUnitGeometry/,
   "target lookup must resolve canonical battlefield geometry");
-assert.match(relic,/function revealRelicTargets\\(target\\)[\\s\\S]*team-relic-mask-holes[\\s\\S]*createElementNS\\(namespace,"rect"\\)/,
+assert.ok(
+  relic.includes("function revealRelicTargets(target)") &&
+  relic.includes("team-relic-mask-holes") &&
+  relic.includes('createElementNS(namespace,"rect")'),
   "target reveal must cut portrait/HP apertures from canonical highlight geometry"
 );
 assert.match(relic,/highlightRect|highlightRects/,
