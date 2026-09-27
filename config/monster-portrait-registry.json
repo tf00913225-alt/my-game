@@ -1171,6 +1171,116 @@
         "status": "cataloged",
         "usedIn": "未定",
         "notes": "熔爐頭盔與厚重護甲具精英感，但可讀性與塔內重裝類型需後續比較。"
+      },
+      {
+        "assetId": "MON_FIRE_ELITE_005",
+        "displayName": "熔角戰獠",
+        "element": "fire",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_000000007eb482109ced9a151a1fca39.png",
+        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-elite-005.png",
+        "status": "adopted",
+        "usedIn": "野怪高階／火元素塔 Elite 候選",
+        "notes": "厚甲羊角戰士，盾斧與體型使其明顯高於普通怪。"
+      },
+      {
+        "assetId": "MON_FIRE_ELITE_006",
+        "displayName": "炎棘巨鬣",
+        "element": "fire",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_0000000087fc81fa881ce1f0b63b94c7.png",
+        "runtimePath": "assets/monsters/wild/fire-pool/mon-fire-elite-006.png",
+        "status": "adopted",
+        "usedIn": "野怪高階候選",
+        "notes": "大型多刺鬃毛獸，火焰背棘與獠牙具有精英辨識度。"
+      },
+      {
+        "assetId": "MON_FIRE_NORMAL_007",
+        "displayName": "火炬邪鬼",
+        "element": "fire",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_00000000ab9c81faa34a6a9869419b1d.png",
+        "runtimePath": "assets/monsters/wild/fire-pool/mon-fire-normal-007.png",
+        "status": "adopted",
+        "usedIn": "野怪候選",
+        "notes": "小型持火炬邪鬼，裝備簡單，適合普通野怪。"
+      },
+      {
+        "assetId": "MON_FIRE_NORMAL_008",
+        "displayName": "灰燼鬼爪",
+        "element": "fire",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_00000000b93c81f483253b355508e0c9.png",
+        "runtimePath": null,
+        "status": "cataloged",
+        "usedIn": "未定",
+        "notes": "瘦長火焰鬼物，造型偏侵略但仍可作普通怪；保留待整體池比較。"
+      },
+      {
+        "assetId": "MON_FIRE_ELITE_007",
+        "displayName": "炎紋術士",
+        "element": "fire",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_00000000bd3c8211809f904e2f5b732d.png",
+        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-elite-007.png",
+        "status": "adopted",
+        "usedIn": "火元素塔 Elite 候選",
+        "notes": "人形火術士，法杖與長袍細節適合作為精英施術者。"
+      },
+      {
+        "assetId": "MON_FIRE_ELITE_008",
+        "displayName": "炎殼長戟蟲",
+        "element": "fire",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_00000000cf44824387dd10e3ea6a3289.png",
+        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-elite-008.png",
+        "status": "adopted",
+        "usedIn": "火元素塔 Elite 候選",
+        "notes": "昆蟲甲殼、長戟與多足結構，戰鬥辨識度高。"
+      },
+      {
+        "assetId": "MON_FIRE_NORMAL_009",
+        "displayName": "灰翎焰鴉",
+        "element": "fire",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_00000000e2c08211ab8c3238854b4d82.png",
+        "runtimePath": "assets/monsters/wild/fire-pool/mon-fire-normal-009.png",
+        "status": "adopted",
+        "usedIn": "野怪候選",
+        "notes": "焰羽鳥妖，體型與裝備較輕，適合普通野怪。"
+      },
+      {
+        "assetId": "MON_FIRE_ELITE_009",
+        "displayName": "熔痕巨蛙",
+        "element": "fire",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_00000000e3988211852dedfc423adcf8.png",
+        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-elite-009.png",
+        "status": "adopted",
+        "usedIn": "野怪高階／火元素塔 Elite 候選",
+        "notes": "熔岩裂紋巨蛙，體型厚重且視覺輪廓強。"
+      },
+      {
+        "assetId": "MON_FIRE_MINIBOSS_001",
+        "displayName": "炎脊裂龍",
+        "element": "fire",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_00000000e69c821183ed8ef001fc3711.png",
+        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-miniboss-001.png",
+        "status": "adopted",
+        "usedIn": "火元素塔 Mini Boss 候選",
+        "notes": "長身火龍型怪物，翼、角與熔岩脊柱具小 Boss 壓迫感。"
+      },
+      {
+        "assetId": "MON_FIRE_NORMAL_010",
+        "displayName": "燼羽獵魔",
+        "element": "fire",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_00000000f4c0820aaae74c3f4ac0a728.png",
+        "runtimePath": null,
+        "status": "cataloged",
+        "usedIn": "未定",
+        "notes": "持弓人形獵手，外觀可作普通怪，但與其他人形候選需後續取捨。"
       }
     ]
   }
