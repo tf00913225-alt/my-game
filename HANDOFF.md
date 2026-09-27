@@ -1,3 +1,8 @@
+## 2026-09-27 — Trusted EXP pool settlement (candidate; Phase 4 0/6 VERIFIED)
+
+- Internal resource settlement owner is `functions/src/canonical-resource-credit.js::creditReservedGrant()`, evolved from the prior gold-only owner. It credits only a backend-issued gold or EXP grant already reserved under the active UID session and expected revision; EXP enters `economy.sharedExp` and does not level a character. `functions/src/trusted-grant-ledger.js::reserve()` remains the single public entitlement reservation owner. The browser cannot submit kind or amount.
+- The operation commits a new unpublished source snapshot, unique claim, ledger, receipt and envelope revision together. No callable settlement endpoint, battle-reward authority, local `saveGame()` change, playable pointer or legacy admission is added. `authoritativeStateReady:false`, `readyForPublication:false`; Phase 4 remains **0/6 VERIFIED**. Verification and deployment evidence belong only after completed checks.
+
 ## 2026-09-26 — First trusted gold credit transaction (merged / deployed; Phase 4 0/6 VERIFIED)
 
 - PR #605 started from `dev@ec0de75b76e1b6f18ded1a776961cb5408c4380b`, final head `db296cff327ee92445b0ae04bd9d6a5a1242d904`, merged to `dev@1ee74aac6db0dd722201ab815dd2c479cfefc83a`; `main` unchanged. PR Repository checks `36251428353` and Session Authority `36251428154` succeeded. Merged Repository checks/DEV exact-SHA preview `36251732321` and Session Authority emulator/Firebase deployment `36251732172` succeeded.

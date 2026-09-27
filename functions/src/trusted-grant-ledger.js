@@ -1,8 +1,7 @@
 "use strict";
 
-// Only a trusted backend can create a grant record. This owner records an
-// entitlement once; it does not credit the browser's local gold or create a
-// playable cloud character before full-character migration is available.
+// Only a trusted backend can create a grant record. This owner reserves an
+// entitlement once; it never trusts a browser-supplied kind or amount.
 const ID_PATTERN=/^[A-Za-z0-9_-]{16,64}$/;
 const GRANT_SCHEMA_VERSION=1;
 
@@ -41,10 +40,9 @@ function createTrustedGrantLedger({db,FieldValue,HttpsError,runProtected,inspect
                    receipt.grantId!==grantId||receipt.operationId!==operationId||
                    !Number.isSafeInteger(receipt.serverRevision)||receipt.serverRevision<1||
                    receipt.serverRevision>envelope.serverRevision||
-                   receipt.kind!=="gold"||
                    !receipt.createdAt||typeof receipt.createdAt.toMillis!=="function"||
-                   !grant||grant.schemaVersion!==GRANT_SCHEMA_VERSION||grant.ownerUid!==uid||
-                   grant.kind!=="gold"||grant.source!=="server-event"||
+                   !grant||receipt.kind!==grant.kind||grant.schemaVersion!==GRANT_SCHEMA_VERSION||grant.ownerUid!==uid||
+                   !["gold","exp"].includes(grant.kind)||grant.source!=="server-event"||
                    !Number.isSafeInteger(grant.amount)||grant.amount<1||grant.amount>100000||
                    grant.amount!==receipt.amount||
                    grant.claimedByOperationId!==operationId){
@@ -61,6 +59,7 @@ function createTrustedGrantLedger({db,FieldValue,HttpsError,runProtected,inspect
                        ledger.get("ownerUid")!==uid||ledger.get("grantId")!==grantId||
                        ledger.get("operationId")!==operationId||
                        ledger.get("amount")!==receipt.amount||
+                       ledger.get("kind")!==grant.kind||
                        ledger.get("creditRevision")!==receipt.creditRevision||
                        ledger.get("snapshotSha256")!==receipt.snapshotSha256||
                        !Number.isSafeInteger(receipt.creditRevision)||
@@ -83,7 +82,7 @@ function createTrustedGrantLedger({db,FieldValue,HttpsError,runProtected,inspect
             if(!grantSnapshot.exists){ fail("failed-precondition","No server-issued grant exists."); }
             const grant=grantSnapshot.data();
             if(grant.schemaVersion!==GRANT_SCHEMA_VERSION||grant.ownerUid!==uid||
-               grant.kind!=="gold"||grant.source!=="server-event"||
+               !["gold","exp"].includes(grant.kind)||grant.source!=="server-event"||
                !Number.isSafeInteger(grant.amount)||grant.amount<1||grant.amount>100000||
                !grant.createdAt||typeof grant.createdAt.toMillis!=="function"){
                 fail("data-loss","Server-issued grant is invalid.");
@@ -96,7 +95,7 @@ function createTrustedGrantLedger({db,FieldValue,HttpsError,runProtected,inspect
             transaction.update(grantRef,{status:"reserved",claimedByOperationId:operationId,reservedAt:timestamp});
             transaction.create(receiptRef,{
                 schemaVersion:GRANT_SCHEMA_VERSION,ownerUid:uid,grantId,operationId,
-                kind:"gold",amount:grant.amount,serverRevision:revision,
+                kind:grant.kind,amount:grant.amount,serverRevision:revision,
                 creditedToCharacter:false,createdAt:timestamp
             });
             transaction.update(saveRef,{serverRevision:revision,updatedAt:timestamp});

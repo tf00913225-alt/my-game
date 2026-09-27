@@ -9,7 +9,7 @@ const {getAuth}=require("firebase-admin/auth");
 const {HttpsError}=require("firebase-functions/v2/https");
 const {createSessionAuthority}=require("../functions/src/session-authority.js");
 const {createCanonicalSourceWriter}=require("../functions/src/canonical-source-writer.js");
-const {createCanonicalGoldCredit}=require("../functions/src/canonical-gold-credit.js");
+const {createCanonicalResourceCredit}=require("../functions/src/canonical-resource-credit.js");
 const {inspectExistingEnvelope,nextRevision}=require("../functions/src/cloud-save-envelope.js");
 const project="demo-four-symbols-session";
 if(process.env.GCLOUD_PROJECT!==project||process.env.FIRESTORE_EMULATOR_HOST!=="127.0.0.1:18080"||
@@ -271,7 +271,7 @@ const reservedForCharacter=await invoke("reserveTrustedGrant",yUser.idToken,{
     operationId:goldOperation,expectedRevision:2});
 assert.equal(reservedForCharacter.serverRevision,3);
 let abortGoldCommit=false;
-const goldWriter=createCanonicalGoldCredit({db,FieldValue,HttpsError,
+const goldWriter=createCanonicalResourceCredit({db,FieldValue,HttpsError,
     inspectExistingEnvelope,nextRevision,
     runProtected:(request,operation)=>writerSessions.runProtected(request,async(tx,session)=>{
         const result=await operation(tx,session);
@@ -315,6 +315,39 @@ const reserveReplay=await invoke("reserveTrustedGrant",yUser.idToken,{
 assert.equal(reserveReplay.unchanged,true);
 assert.equal(reserveReplay.creditedToCharacter,true);
 assert.equal(reserveReplay.creditRevision,4);
+// A separately server-issued EXP grant credits the shared pool, not levels.
+const expGrantId="grant-initial-exp-pool-0001";
+const expOperation="credit-initial-exp-pool-0001";
+await db.doc(`serverUsers/${y}/pendingGrants/${expGrantId}`).set({
+    schemaVersion:1,ownerUid:y,kind:"exp",source:"server-event",amount:40,
+    status:"pending",claimedByOperationId:null,createdAt:Timestamp.now()
+});
+await assert.rejects(invoke("reserveTrustedGrant",yUser.idToken,{
+    uid:y,session:sessionY,grantId:expGrantId,operationId:expOperation,
+    expectedRevision:4,amount:400000}),error=>["INVALID_ARGUMENT","invalid-argument"].includes(error.code));
+const expReserved=await invoke("reserveTrustedGrant",yUser.idToken,{
+    uid:y,session:sessionY,grantId:expGrantId,operationId:expOperation,
+    expectedRevision:4});
+assert.equal(expReserved.serverRevision,5);
+assert.equal((await db.doc(`serverUsers/${y}/grantOperations/${expOperation}`).get())
+    .get("kind"),"exp");
+const expArgs={grantId:expGrantId,operationId:expOperation,expectedRevision:5};
+await assert.rejects(goldWriter.creditReservedGrant(yRequest,
+    {...expArgs,expectedRevision:4}),error=>error.code==="aborted");
+const expCredit=await goldWriter.creditReservedGrant(yRequest,expArgs);
+assert.equal(expCredit.creditRevision,6);
+assert.equal((await db.doc(`serverUsers/${y}/economy/current`).get()).get("sharedExp"),40);
+assert.equal((await db.doc(`serverUsers/${y}/economy/current`).get()).get("gold"),25);
+assert.equal((await db.doc(`serverUsers/${y}/characters/character-${initialOperation}`).get())
+    .get("state.level"),1);
+assert.equal((await db.doc(`serverUsers/${y}/ledgerEntries/${expOperation}`).get())
+    .get("kind"),"exp");
+assert.equal((await db.doc(`serverUsers/${y}/playableSnapshots/6`).get())
+    .get("readyForPublication"),false);
+assert.equal((await goldWriter.creditReservedGrant(yRequest,expArgs)).unchanged,true);
+assert.equal((await invoke("reserveTrustedGrant",yUser.idToken,{
+    uid:y,session:sessionY,grantId:expGrantId,operationId:expOperation,
+    expectedRevision:4})).creditRevision,6);
 assert.equal((await db.doc(`users/${y}/saves/current`).get()).get("authoritativeStateReady"),false);
 await rejected("protectedTest",yUser.idToken,{uid:x,session:sessionB},"SESSION_INVALID");
 await rejected("protectedTest",yUser.idToken,{uid:y,session:{...sessionB,uid:y}},"SESSION_INVALID");

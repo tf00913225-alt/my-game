@@ -8,10 +8,10 @@ const source=data=>{
     return record;
 };
 
-// Internal settlement for the first server-created character only. There is
-// no callable or browser amount input. Later character/mutation owners need
-// their own complete source-set transaction before publication is possible.
-function createCanonicalGoldCredit({db,FieldValue,HttpsError,runProtected,
+// Internal gold/EXP pool settlement for the first server-created character.
+// There is no callable or browser amount input. Later source-set mutations
+// need their own complete transaction before publication is possible.
+function createCanonicalResourceCredit({db,FieldValue,HttpsError,runProtected,
     inspectExistingEnvelope,nextRevision}){
     const fail=(code,message)=>{throw new HttpsError(code,message);};
     async function creditReservedGrant(request,{grantId,operationId,expectedRevision}){
@@ -49,12 +49,13 @@ function createCanonicalGoldCredit({db,FieldValue,HttpsError,runProtected,
                account.ownerUid!==uid||account.provenance!=="server-created"||
                economy.ownerUid!==uid||grant.ownerUid!==uid||receipt.ownerUid!==uid||
                grant.schemaVersion!==1||receipt.schemaVersion!==1||
-               grant.kind!=="gold"||grant.source!=="server-event"||
+               !["gold","exp"].includes(grant.kind)||grant.source!=="server-event"||
                grant.claimedByOperationId!==operationId||receipt.operationId!==operationId||
-               receipt.grantId!==grantId||receipt.kind!=="gold"||
+               receipt.grantId!==grantId||receipt.kind!==grant.kind||
                !Number.isSafeInteger(grant.amount)||grant.amount<1||grant.amount>100000||
                receipt.amount!==grant.amount||
-               !Number.isSafeInteger(economy.gold)||economy.gold<0){
+               !Number.isSafeInteger(economy.gold)||economy.gold<0||
+               !Number.isSafeInteger(economy.sharedExp)||economy.sharedExp<0){
                 fail("data-loss","Grant or canonical source identity is inconsistent.");
             }
             if(receipt.creditedToCharacter===true){
@@ -63,6 +64,7 @@ function createCanonicalGoldCredit({db,FieldValue,HttpsError,runProtected,
                 if(grant.status!=="credited"||!ledger||!claim||
                    ledger.ownerUid!==uid||ledger.grantId!==grantId||
                    ledger.operationId!==operationId||ledger.amount!==grant.amount||
+                   ledger.kind!==grant.kind||
                    ledger.creditRevision!==receipt.creditRevision||
                    ledger.snapshotSha256!==receipt.snapshotSha256||
                    claim.ownerUid!==uid||claim.operationId!==operationId||
@@ -108,15 +110,16 @@ function createCanonicalGoldCredit({db,FieldValue,HttpsError,runProtected,
                 uid,previous,records);}catch(_){
                 fail("data-loss","Previous canonical sources differ from snapshot.");
             }
-            if(economy.gold>Number.MAX_SAFE_INTEGER-grant.amount){
-                fail("failed-precondition","Gold balance exceeds safe range.");
+            const balanceKey=grant.kind==="gold"?"gold":"sharedExp";
+            if(economy[balanceKey]>Number.MAX_SAFE_INTEGER-grant.amount){
+                fail("failed-precondition","Resource balance exceeds safe range.");
             }
             const revision=nextRevision(envelope);
             const nextRecords={...records,
                 account:{...records.account,serverRevision:revision},
                 characters:records.characters.map(c=>({...c,serverRevision:revision})),
                 economy:{...records.economy,serverRevision:revision,
-                    gold:economy.gold+grant.amount},
+                    [balanceKey]:economy[balanceKey]+grant.amount},
                 relicLoadout:{...records.relicLoadout,serverRevision:revision},
                 progress:{...records.progress,serverRevision:revision},
                 claimCheckpoint:{...records.claimCheckpoint,serverRevision:revision}};
@@ -124,8 +127,8 @@ function createCanonicalGoldCredit({db,FieldValue,HttpsError,runProtected,
             const stamp=FieldValue.serverTimestamp();
             tx.update(accountRef,{serverRevision:revision,snapshotSha256:bundle.sha256,updatedAt:stamp});
             tx.update(characterRef,{serverRevision:revision,updatedAt:stamp});
-            tx.update(economyRef,{serverRevision:revision,gold:nextRecords.economy.gold,
-                updatedAt:stamp});
+            tx.update(economyRef,{serverRevision:revision,
+                [balanceKey]:nextRecords.economy[balanceKey],updatedAt:stamp});
             for(const ref of [loadoutRef,progressRef,checkpointRef]){
                 tx.update(ref,{serverRevision:revision,updatedAt:stamp});
             }
@@ -134,7 +137,8 @@ function createCanonicalGoldCredit({db,FieldValue,HttpsError,runProtected,
             tx.create(claimRef,{schemaVersion:1,ownerUid:uid,grantId,operationId,
                 creditRevision:revision,createdAt:stamp});
             tx.create(ledgerRef,{schemaVersion:1,ownerUid:uid,grantId,operationId,
-                kind:"gold",amount:grant.amount,balanceAfter:nextRecords.economy.gold,
+                kind:grant.kind,amount:grant.amount,
+                balanceAfter:nextRecords.economy[balanceKey],
                 creditRevision:revision,snapshotSha256:bundle.sha256,createdAt:stamp});
             tx.update(receiptRef,{creditedToCharacter:true,creditRevision:revision,
                 snapshotSha256:bundle.sha256,creditedAt:stamp});
@@ -147,4 +151,4 @@ function createCanonicalGoldCredit({db,FieldValue,HttpsError,runProtected,
     return Object.freeze({creditReservedGrant});
 }
 
-module.exports={createCanonicalGoldCredit};
+module.exports={createCanonicalResourceCredit};
