@@ -80,6 +80,12 @@ assert.match(feedback,/node\.dataset\.feedbackSource=request\.source/);
 assert.match(feedbackCss,/color:#e32626/);
 assert.match(feedbackCss,/-webkit-text-stroke:\.85px #fff/);
 assert.match(feedbackCss,/text-shadow:1px 1px 0 #000/);
+assert.match(feedbackCss,/transform:translate\(-50%,-100%\)/,
+  "feedback base box must grow upward from the canonical lane baseline");
+assert.match(feedbackCss,/@keyframes battleFloatingFeedback\{[\s\S]*calc\(-100% \+ 4px\)[\s\S]*calc\(-100% - 22px\)/,
+  "normal feedback animation must preserve the -100% baseline coordinate system");
+assert.match(feedbackCss,/@keyframes battleFloatingFeedbackCritical\{[\s\S]*calc\(-100% \+ 5px\)[\s\S]*calc\(-100% - 25px\)/,
+  "critical feedback animation must preserve the same baseline coordinate system");
 assert.doesNotMatch(feedbackCss,/0 0 (?:7|8|10|14|16)px/,"canonical feedback typography must not use neon glow");
 
 assert.doesNotMatch(v143System,/resolveEscapeAttempt=function\(/,"Dungeon-specific escape wrapper must stay retired");
