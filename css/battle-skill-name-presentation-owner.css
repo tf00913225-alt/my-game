@@ -1,7 +1,8 @@
 /* Canonical skill-name presentation owner. Element identity comes only from Skill Data. */
-.skill-name-badge{position:absolute;z-index:16020;display:block;box-sizing:border-box;width:max-content;min-width:0;margin:0;padding:0;border:0;border-radius:0;background:transparent;color:#fff;font-size:19px;font-weight:900;line-height:1.05;letter-spacing:.1px;text-align:center;white-space:nowrap;overflow:visible;pointer-events:none;-webkit-text-stroke:1.15px #fff;paint-order:stroke fill;text-shadow:0 1px 2px #000,0 0 4px rgba(0,0,0,.72);transform:translate(-50%,-100%);animation:skillBadgePop var(--skill-name-display-duration,347ms) ease-out forwards;}
-.skill-name-badge[data-skill-element="fire"]{color:#e32626;}
-.skill-name-badge[data-skill-element="water"]{color:#3aaeff;}
-.skill-name-badge[data-skill-element="wind"]{color:#39c96b;}
-.skill-name-badge[data-skill-element="earth"]{color:#e0b833;}
-.skill-name-badge[data-skill-element="normal"]{color:#fff;}
+body > .skill-name-badge{position:fixed;z-index:2147482990;display:block;box-sizing:border-box;width:max-content;min-width:0;margin:0;padding:0;border:0;border-radius:0;background:transparent;color:#fff;font-size:var(--battle-feedback-font-size);font-weight:900;line-height:1.05;letter-spacing:.1px;text-align:center;white-space:nowrap;overflow:visible;pointer-events:none;-webkit-text-stroke:.85px #fff;paint-order:stroke fill;text-shadow:1px 1px 0 #000;transform:translate(-50%,-100%);animation:skillBadgePop var(--skill-name-display-duration,347ms) ease-out forwards;}
+body > .skill-name-badge[data-skill-element="fire"]{color:#e32626;}
+body > .skill-name-badge[data-skill-element="water"]{color:#3aaeff;}
+body > .skill-name-badge[data-skill-element="wind"]{color:#39c96b;}
+body > .skill-name-badge[data-skill-element="earth"]{color:#e0b833;}
+body > .skill-name-badge[data-skill-element="normal"]{color:#fff;}
+@keyframes skillBadgePop{0%{opacity:0;transform:translate(-50%,4px) scale(.88)}12%{opacity:1;transform:translate(-50%,-3px) scale(1.08)}72%{opacity:1;transform:translate(-50%,-10px) scale(1)}100%{opacity:0;transform:translate(-50%,-22px) scale(1)}}
