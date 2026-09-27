@@ -2931,7 +2931,7 @@
         if(contextActive&&!nav&&typeof document.createElement==="function"){
   nav=document.createElement("div");
   nav.id="v141DungeonNav";
-  nav.className="bottom-nav map-page-nav v141-dungeon-nav v148-context-nav";
+  nav.className="map-page-nav v141-dungeon-nav v148-context-nav";
   const owner=document.getElementById("game-content")||app;
   if(owner&&typeof owner.appendChild==="function"){ owner.appendChild(nav); }
         }
