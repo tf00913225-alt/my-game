@@ -66,6 +66,7 @@ document.getElementById('result').textContent=JSON.stringify(rows);
     }
 }
 
-runViewport(390,844);
+runViewport(360,800);
+runViewport(393,873);
 runViewport(412,915);
-console.log("Headless Chrome: gameplay activity covers render 16:9 at 390x844 and 412x915 without internal overflow");
+console.log("Headless Chrome: gameplay activity covers render 16:9 at 360x800, 393x873 and 412x915 without internal overflow");
