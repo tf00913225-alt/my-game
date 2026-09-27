@@ -177,6 +177,23 @@
         "verification": "PR checks、Firebase emulator、Boot browser QA、dev merge/deploy SHA 尚待完成",
         "result": "Phase 4 仍為 0/6 VERIFIED；不可進行第二手機完整角色恢復"
       }
+    },
+    {
+      "id": "REQ-VISUAL-READY-20260927",
+      "title": "每日副本立繪與玩法首屏美術 Visual Ready 契約收斂",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "js/45-v154-dev-fixes.js",
+          "js/42-v148-combat-dungeon-fixes.js",
+          "js/startup/feature-loader.js",
+          "config/feature-manifest.json",
+          "css/gameplay-boss-tower.css",
+          "tests/visual-ready-contract-20260927.test.js"
+        ],
+        "verification": "Local targeted regression test, production build/build:check、Repository checks、CI、Cloudflare DEV deployment 與手機 Browser QA 待完成",
+        "result": "已完成 source owner 收斂與自動化測試，尚未宣告 VERIFIED"
+      }
     }
   ]
 }

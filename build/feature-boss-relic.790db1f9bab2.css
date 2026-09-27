@@ -147,6 +147,7 @@
     border-radius:11px;
     color:#eadfc9;
     --gameplay-cover-image:none;
+    background-color:#0d0906;
     background-image:var(--gameplay-cover-image),radial-gradient(circle at 90% 10%,rgba(209,150,54,.2),transparent 46%);
     background-position:center,center;
     background-size:cover,cover;

@@ -1122,6 +1122,9 @@
             type:type,meta:meta,level:built.level,partySize:built.partySize,highestPartyLevel:built.highestLevel,soloProtected:built.soloProtected,waves:built.waves,waveIndex:0,totalTurns:0,baseExp:baseExp
         };
         dailyDungeonSequence=sequence;
+        if(typeof window.v154PrepareDailyDungeonPortraits==="function"){
+            await window.v154PrepareDailyDungeonPortraits(type);
+        }
         const started=window.v132LaunchDungeonBattle(sequence.waves[0],function(outcome){
             const active=dailyDungeonSequence||sequence;
             if(outcome.result!=="win"){
