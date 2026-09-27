@@ -136,16 +136,11 @@ assert.match(relicCss,/body > \.team-relic-battle-presentation\{[\s\S]*position:
     "relic cinematic must own one fixed viewport presentation surface");
 assert.match(relicRuntime,/function relicGeometryOwner\(\)[\s\S]*FourSymbolsBattlefieldRenderGeometry/,
     "relic cinematic must resolve the canonical battlefield geometry owner");
-assert.match(relicRuntime,/function relicTargetGeometries\(side,index\)[\s\S]*relicGeometryOwner\(\)[\s\S]*getUnitGeometry[\s\S]*highlightRects/,
-    "relic focus must consume canonical Unit highlight geometry");
-assert.doesNotMatch(
-    relicRuntime.slice(relicRuntime.indexOf("function relicTargetGeometries"),relicRuntime.indexOf("function relativeRelicRect")),
-    /getBoundingClientRect/,
-    "relic target focus must not fall back to local DOM bounds"
-);
-const relicTargetResolver=relicRuntime.slice(relicRuntime.indexOf("function relicTargetGeometries"),relicRuntime.indexOf("function relativeRelicRect"));
+assert.match(relicRuntime,/function revealRelicTargets\(target\)[\s\S]*getUnitGeometry[\s\S]*artworkProjection[\s\S]*hpProjection/,
+    "relic focus must consume canonical projection geometry");
+assert.doesNotMatch(relicRuntime,/team-relic-mask-holes|createElementNS\(namespace,"rect"\)/,
+    "relic focus must not restore rectangle apertures");
 const relicTargetReveal=relicRuntime.slice(relicRuntime.indexOf("function revealRelicTargets"),relicRuntime.indexOf("function beginRelicCinematic"));
-assert.match(relicTargetResolver,/getUnitGeometry[\s\S]*highlightRects/,"target resolver must return canonical portrait/HP highlight geometry");
 assert.match(relicTargetReveal,/team-relic-mask-holes/,"target reveal must own the cinematic mask aperture container");
 assert.match(relicTargetReveal,/relicTargetGeometries\(target\.targetSide,index\)/,"target reveal must resolve each target through canonical geometry");
 assert.match(relicTargetReveal,/createElementNS\(namespace,"rect"\)/,"target reveal must cut a rectangle aperture for each resolved target");
