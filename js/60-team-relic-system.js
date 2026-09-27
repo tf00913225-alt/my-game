@@ -360,7 +360,7 @@
         const rect=projection&&relativeRelicRect(projection.rect,overlayRect);
         if(!rect||rect.width<=0||rect.height<=0){ return null; }
         const node=document.createElement("div"),fill=document.createElement("div");
-        node.className="team-relic-target-projection-resource team-relic-target-projection-"+kind;
+        node.className="team-relic-target-projection-resource "+(kind==="hp"?"team-relic-target-projection-hp":"team-relic-target-projection-sp");
         node.style.left=rect.left+"px";node.style.top=rect.top+"px";node.style.width=rect.width+"px";node.style.height=rect.height+"px";
         fill.className="team-relic-target-projection-resource-fill";
         fill.style.width=Math.max(0,Math.min(1,Number(projection.ratio)||0))*100+"%";
