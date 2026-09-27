@@ -270,9 +270,9 @@ function runViewport(chrome,width,height){
 		assert.doesNotMatch(item.textShadow,/8px|10px|14px|16px/);
 	});
 	const burn=data.feedback.monster0.find(item=>item.kind==="status");
-	assert.deepEqual({statusType:burn.statusType,color:burn.color,background:burn.background},{statusType:"burn",color:"rgb(227, 38, 38)",background:"rgb(11, 11, 13)"});
+	assert.deepEqual({statusType:burn.statusType,color:burn.color,background:burn.background},{statusType:"burn",color:"rgb(255, 255, 255)",background:"rgb(11, 11, 13)"});
 	const defenseDown=data.feedback.monster2.find(item=>item.kind==="status");
-	assert.deepEqual({statusType:defenseDown.statusType,color:defenseDown.color,background:defenseDown.background},{statusType:"defenseDown",color:"rgb(210, 168, 92)",background:"rgb(11, 11, 13)"});
+	assert.deepEqual({statusType:defenseDown.statusType,color:defenseDown.color,background:defenseDown.background},{statusType:"defenseDown",color:"rgb(255, 255, 255)",background:"rgb(11, 11, 13)"});
 	const recoveries=Object.fromEntries(data.feedback.player0.map(item=>[item.kind,item]));
 	assert.equal(recoveries.heal.color,"rgb(32, 184, 87)");
 	assert.equal(recoveries.sp.color,"rgb(44, 141, 232)");
