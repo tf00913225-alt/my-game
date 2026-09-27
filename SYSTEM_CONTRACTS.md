@@ -148,3 +148,10 @@
 - 每次 dev → main，除非專案負責人明確說「本次不公告」，發布 owner 必須自行從實際 `main...dev` 全量 diff 整理所有玩家可感知變更，再更新同一份正式 manifest；純文件、CI、開發工具或完全玩家不可見的內部修改才可以不公告。
 - DEV／本機驗收可在精確允許 host 加上 `?releaseUpdatePreview=marquee`（點擊跑馬燈再看視窗）或 `?releaseUpdatePreview=modal`（直接看視窗）。預覽仍只讀正式 manifest，不能寫 localStorage 已讀紀錄、不能 reload，且正式 `main` host 必須完全忽略該 query。Preview Modal 不得顯示「立即更新」造成可更新假象，主要動作固定使用「關閉預覽」或等價明確語意。
 - 禁止 rebase（變基）、force push（強制推送）或直接修改 dev／main。
+
+
+## Battle Presentation Final Contract (2026-09-27)
+- Relic Target Focus uses Foreground Projection: only Geometry Owner-provided transparent artwork projection plus HP projection are rendered above the document-level dim layer. No SVG rectangle aperture, live-unit z-index mutation, SP/name/status projection, or consumer-owned geometry is allowed.
+- Floating feedback remains the sole transient-text owner. Critical format is `〔💥〕 N`; status capsules are black with white text and retain `statusType` only as semantic metadata.
+- Persistent state Gate returns a reason. `sameNameDuplicate` is a silent reject before hit rolling or mutation; `exclusiveConflict` (Freeze/Petrify) emits formal status MISS; resistance remains distinct.
+- Skill-name presentation derives color from `skill.element` through `data-skill-element`; character element must not participate.

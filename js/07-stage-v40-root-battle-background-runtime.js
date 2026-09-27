@@ -7,10 +7,6 @@
 
     const LEGACY_WIDTH = 420;
     const NATIVE_WIDTH = 1080;
-    const CHARACTER_CARD_LEGACY_WIDTH = 124;
-    const CAST_BADGE_NATIVE_WIDTH =
-        CHARACTER_CARD_LEGACY_WIDTH * (NATIVE_WIDTH / LEGACY_WIDTH);
-
     function ensureBattleBackgroundLayer(){
         const battle = document.getElementById("battlePage");
         if(!battle) return null;
@@ -77,67 +73,9 @@
         return true;
     }
 
-    function ensureCastBadgeSourceSize(badge){
-        if(!badge || !badge.classList.contains("skill-name-badge")) return;
-        /*
-         * This is native-overlay space, so match the legacy card:
-         * 124 legacy px × 2.571428... = 318.857 native px.
-         */
-        badge.style.setProperty(
-            "width",
-            CAST_BADGE_NATIVE_WIDTH + "px",
-            "important"
-        );
-        badge.style.setProperty(
-            "min-width",
-            CAST_BADGE_NATIVE_WIDTH + "px",
-            "important"
-        );
-        badge.style.setProperty(
-            "max-width",
-            CAST_BADGE_NATIVE_WIDTH + "px",
-            "important"
-        );
-        badge.style.setProperty("font-size","72px","important");
-        badge.style.setProperty("font-weight","900","important");
-        badge.style.setProperty("text-align","center","important");
-        badge.style.setProperty("white-space","nowrap","important");
-    }
-
-    /*
-     * The skill badge is dynamically created by
-     * showSkillNameBadge()/showMonsterSkillNameBadge().
-     * Catch the real node at creation time.
-     */
-    function watchOverlay(){
-        const overlay = document.getElementById("game-overlay-layer");
-        if(!overlay) return;
-
-        overlay.querySelectorAll(".skill-name-badge")
-            .forEach(ensureCastBadgeSourceSize);
-
-        const observer = new MutationObserver(function(mutations){
-            mutations.forEach(function(mutation){
-                mutation.addedNodes.forEach(function(node){
-                    if(node.nodeType !== 1) return;
-                    if(node.classList &&
-                       node.classList.contains("skill-name-badge")){
-                        ensureCastBadgeSourceSize(node);
-                    }
-                    if(node.querySelectorAll){
-                        node.querySelectorAll(".skill-name-badge")
-                            .forEach(ensureCastBadgeSourceSize);
-                    }
-                });
-            });
-        });
-        observer.observe(overlay,{childList:true,subtree:true});
-    }
-
     function init(){
         ensureBattleBackgroundLayer();
         syncBattleBackgroundToCurrentMap();
-        watchOverlay();
 
         /*
          * When currentZone/map background changes, #mapPageBgLayer is
@@ -173,20 +111,11 @@
         const layer = document.querySelector(
             "#game-stage > #app > #game-content #battlePage > .battle-bg-shared"
         );
-        const badge = document.querySelector(
-            "#game-stage > #game-overlay-layer .skill-name-badge"
-        );
         return {
             currentZone:
                 (typeof currentZone !== "undefined" ? currentZone : null),
             battleBackground:
-                layer ? getComputedStyle(layer).backgroundImage : null,
-            badgeFont:
-                badge ? getComputedStyle(badge).fontSize : null,
-            badgeWidth:
-                badge ? badge.getBoundingClientRect().width : null,
-            badgeText:
-                badge ? badge.textContent : null
+                layer ? getComputedStyle(layer).backgroundImage : null
         };
     };
 

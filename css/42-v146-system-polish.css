@@ -12,26 +12,7 @@
     position:relative;
     z-index:4;
     transform:translateY(16px);
-}
-
-.skill-name-badge.v143-caster-skill-label{
-    overflow:visible !important;
-    border:0 !important;
-    border-radius:0 !important;
-    color:#fff4d7 !important;
-    background:transparent !important;
-    box-shadow:none !important;
-    -webkit-text-stroke:1.15px #050403 !important;
-    paint-order:stroke fill !important;
-    text-shadow:0 1px 2px #000,0 0 5px #000 !important;
-}
-.skill-name-badge.v143-caster-skill-label.badge-normal,
-.skill-name-badge.v143-caster-skill-label[data-skill="normal"]{
-    color:#fff !important;
-    -webkit-text-fill-color:#fff !important;
-}
-
-.v146-area-impact{animation:v146AreaImpact .66s cubic-bezier(.2,.72,.25,1) both !important;}
+}.v146-area-impact{animation:v146AreaImpact .66s cubic-bezier(.2,.72,.25,1) both !important;}
 @keyframes v146AreaImpact{
     0%,100%{transform:translate(0,0) rotate(0)}
     16%{transform:translate(-7px,-5px) rotate(-1.4deg)}

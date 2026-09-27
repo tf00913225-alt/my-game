@@ -3808,7 +3808,7 @@ button:active{
 
 .damage-popup.miss-popup{
     color:#ff2020;
-    -webkit-text-stroke:0 !important;
+    -webkit-text-stroke:0;
     font-size:19px;
     text-shadow:
         0 0 1px #ff2020,
@@ -3916,7 +3916,7 @@ button:active{
     font-size:22px;
     font-weight:900;
 
-    -webkit-text-stroke:0 !important;
+    -webkit-text-stroke:0;
 
     white-space:nowrap;
 

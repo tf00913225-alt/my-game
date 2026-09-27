@@ -14636,10 +14636,12 @@ function getPersistentStateConflict(entity,stateOrType){
         conflictNames.includes(getPersistentStateName(candidate))
     );
     if(!entry){ return null; }
+    const existingName=getPersistentStateName(entry);
     return {
         requestedName:requestedName,
-        existingName:getPersistentStateName(entry),
+        existingName:existingName,
         entry:entry,
+        reason:existingName===requestedName?"sameNameDuplicate":"exclusiveConflict",
         exclusiveHardControl:EXCLUSIVE_HARD_CONTROL_STATE_NAMES.includes(requestedName)
     };
 }
@@ -14669,9 +14671,10 @@ function reportPersistentStateMiss(entity,stateOrType,targetSide,targetIndex,sou
 
 function canApplyNamedPersistentState(entity,stateOrType,targetSide,targetIndex,sourceName){
     const conflict=getPersistentStateConflict(entity,stateOrType);
-    return conflict
-        ?reportPersistentStateMiss(entity,stateOrType,targetSide,targetIndex,sourceName,conflict)
-        :true;
+    if(!conflict){ return true; }
+    return conflict.reason==="sameNameDuplicate"
+        ?false
+        :reportPersistentStateMiss(entity,stateOrType,targetSide,targetIndex,sourceName,conflict);
 }
 
 function getPersistentStateTargetContext(entity){
@@ -14713,8 +14716,12 @@ function rollNamedPersistentStatusEffect(
     sourceName,
     guaranteedHit
 ){
-    if(!canApplyNamedPersistentState(entity,stateOrType,targetSide,targetIndex,sourceName)){
-        return {duplicate:true,hit:false};
+    const conflict=getPersistentStateConflict(entity,stateOrType);
+    if(conflict){
+        if(conflict.reason==="exclusiveConflict"){
+            reportPersistentStateMiss(entity,stateOrType,targetSide,targetIndex,sourceName,conflict);
+        }
+        return {duplicate:conflict.reason==="sameNameDuplicate",reason:conflict.reason,hit:false};
     }
     const finalRollArguments=(rollArguments||[]).slice();
     if(targetSide==="monster"){
@@ -24113,9 +24120,8 @@ function showSkillNameBadge(skillName,elementType,characterIndex,targetId,target
         );
 
 
-    badge.className =
-        "skill-name-badge badge-"+
-        elementType;
+    badge.className="skill-name-badge";
+    badge.dataset.skillElement=String(elementType||"normal");
 
 
     badge.textContent =
@@ -24131,20 +24137,7 @@ function showSkillNameBadge(skillName,elementType,characterIndex,targetId,target
         "--skill-name-display-duration",
         badgeDuration+"ms"
     );
-
-
-
-    /* V38 SOURCE-LEVEL UI SIZE FIX:
-       The badge gets its final visual size at creation time.
-       This is deliberately inline + !important so later CSS cannot
-       silently override it. */
-    badge.style.setProperty("font-size","72px","important");
-    badge.style.setProperty("line-height","1.05","important");
-    badge.style.setProperty("font-weight","900","important");
-    badge.style.setProperty("white-space","nowrap","important");
-    badge.style.setProperty("width","max-content","important");
-    badge.style.setProperty("min-width","max-content","important");
-    badge.style.setProperty("-webkit-text-stroke","1.8px #f2ead9","important");
+    badge.dataset.skillElement=String(elementType||"normal");
 const badgePoint =
         gamePointFromClient(
             rect.left+rect.width/2,
@@ -24244,9 +24237,8 @@ function showMonsterSkillNameBadge(
         );
 
 
-    badge.className=
-        "skill-name-badge badge-"+
-        elementType;
+    badge.className="skill-name-badge";
+    badge.dataset.skillElement=String(elementType||"normal");
 
 
     badge.textContent=
@@ -24262,20 +24254,7 @@ function showMonsterSkillNameBadge(
         "--skill-name-display-duration",
         badgeDuration+"ms"
     );
-
-
-
-    /* V38 SOURCE-LEVEL UI SIZE FIX:
-       The badge gets its final visual size at creation time.
-       This is deliberately inline + !important so later CSS cannot
-       silently override it. */
-    badge.style.setProperty("font-size","72px","important");
-    badge.style.setProperty("line-height","1.05","important");
-    badge.style.setProperty("font-weight","900","important");
-    badge.style.setProperty("white-space","nowrap","important");
-    badge.style.setProperty("width","max-content","important");
-    badge.style.setProperty("min-width","max-content","important");
-    badge.style.setProperty("-webkit-text-stroke","1.8px #f2ead9","important");
+    badge.dataset.skillElement=String(elementType||"normal");
 const badgePoint =
         gamePointFromClient(
             rect.left+rect.width/2,
