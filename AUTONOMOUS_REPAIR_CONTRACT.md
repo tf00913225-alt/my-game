@@ -14,7 +14,7 @@
 
 本契約的目的，是讓後續任何新對話、Codex（程式代理）、GPT（生成式預訓練模型）或其他開發代理，在收到《四象江湖傳》的修復型任務時，不需要使用者重貼整段規則，也能依固定邊界自主完成低風險修復。
 
-本契約只授權「受控自主修復」，不是一般性的自由修改授權。
+本契約只授權「受控自主修復」，不是一般性的自由修改授權。\n\n所有實際修復施工同時受 `docs/CHANGE_SAFETY_REPLACEMENT_CONTRACT.md` 約束；自主修復權限不代表可以用 Wrapper（包裝器）、late patch、`!important`、`display:none` 或過時測試去掩蓋未完成的 Owner／Contract／Lifecycle／Semantic State 遷移。
 
 ---
 
@@ -45,7 +45,7 @@
 3. `HANDOFF.md`
 4. `ARCHITECTURE_RULES.md`
 5. `UI_GUIDELINES.md`（若任務涉及 UI／版面／視覺）
-6. `AUTONOMOUS_REPAIR_CONTRACT.md`（本文件）
+6. `docs/CHANGE_SAFETY_REPLACEMENT_CONTRACT.md`\n7. `AUTONOMOUS_REPAIR_CONTRACT.md`（本文件）
 
 不得只依賴舊對話摘要、記憶中的 SHA（提交雜湊）或過去的工作分支狀態。
 
@@ -261,6 +261,20 @@ B2／E／E+B2 只是既有分類標籤，**分類名稱本身不得被當成擴�
 3. 涉及自主修復邊界時，以本契約較嚴格的停止條件為準。
 4. 涉及正式遊戲規格／架構時，以對應正式規範文件為準。
 5. 無法確定時，停止，不猜。
+
+---
+
+## 15A. 修復完成的變更安全 Gate（強制）
+
+即使 failure（失敗）已修好並取得可執行驗證，也必須再確認：
+
+- 修正是回到正式 Owner，而不是新增第二 Owner。
+- 若屬 Replacement／Convergence，舊 Wrapper／Patch／CSS／State／Test 已完成退場或有明確相容性理由。
+- 沒有用 stale test（過時測試）保護舊行為。
+- 沒有用 `display:none`、`animation:none`、`!important` 等遮蔽方式把舊問題藏起來並宣稱完成。
+- Semantic State 與 Lifecycle 已符合新規格。
+
+上述任一未完成，修復不得描述為「已完全收斂」。
 
 ---
 
