@@ -132,12 +132,10 @@ for(const [name,block] of [["personal",personalCompletion],["world",worldComplet
 }
 
 assert.match(relic,/function relicOverlayGeometry\(\)[\s\S]*?getBattlefieldOverlayGeometry/);
-assert.match(relic,/function relicTargetGeometries\(side,index\)[\s\S]*?getUnitGeometry[\s\S]*?highlightRects/);
-assert.doesNotMatch(
-  relic.slice(relic.indexOf("function relicTargetGeometries"),relic.indexOf("function relativeRelicRect")),
-  /getBoundingClientRect/,
-  "Relic target geometry must not guess from local DOM"
-);
+assert.match(relic,/function revealRelicTargets\(target\)[\s\S]*?getUnitGeometry[\s\S]*?artworkProjection[\s\S]*?hpProjection/);
+assert.doesNotMatch(relic,/team-relic-mask-holes|createElementNS\(namespace,"rect"\)/,"Relic target focus must not restore rectangle apertures");
+assert.match(relic,/team-relic-target-projection-art/);
+assert.match(relic,/team-relic-target-projection-hp/);
 const begin=relic.slice(relic.indexOf("function beginRelicCinematic"),relic.indexOf("function enterRelicVfxPhase"));
 assert.ok(begin.indexOf('classList.add("identity-visible")')<begin.indexOf('classList.add("dim-visible")'),"Relic identity must appear before battlefield dimming");
 assert.ok(begin.indexOf('classList.add("dim-visible")')<begin.indexOf("revealRelicTargets(target)"),"Relic dimming must precede target reveal");
