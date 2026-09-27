@@ -352,14 +352,15 @@
         const geometry=owner.getBattlefieldOverlayGeometry();
         return geometry&&geometry.rect&&geometry.rect.width>0&&geometry.rect.height>0?geometry:null;
     }
-    function relicTargetGeometry(side,index){
+    function relicTargetGeometries(side,index){
         const geometry=relicGeometryOwner();
         if(geometry&&typeof geometry.getUnitGeometry==="function"){
             const resolved=geometry.getUnitGeometry(side,index);
-            if(resolved&&resolved.highlightRect){ return resolved.highlightRect; }
-            if(resolved&&resolved.unitRect){ return resolved.unitRect; }
+            if(resolved&&Array.isArray(resolved.highlightRects)&&resolved.highlightRects.length){ return resolved.highlightRects; }
+            if(resolved&&resolved.highlightRect){ return [resolved.highlightRect]; }
+            if(resolved&&resolved.unitRect){ return [resolved.unitRect]; }
         }
-        return null;
+        return [];
     }
     function relativeRelicRect(rect,overlayRect){
         if(!rect||!overlayRect){ return null; }
@@ -391,19 +392,20 @@
         const holes=relicCutinNode.querySelector(".team-relic-mask-holes");
         const namespace="http://www.w3.org/2000/svg";
         target.targetIds.forEach(index=>{
-            const absolute=relicTargetGeometry(target.targetSide,index);
-            const rect=relativeRelicRect(absolute,overlayRect);
-            if(!rect||rect.width<=0||rect.height<=0){ return; }
-            if(holes){
-                const hole=document.createElementNS(namespace,"rect");
-                hole.setAttribute("x",String(rect.left));
-                hole.setAttribute("y",String(rect.top));
-                hole.setAttribute("width",String(Math.max(1,rect.width)));
-                hole.setAttribute("height",String(Math.max(1,rect.height)));
-                hole.setAttribute("rx","8");
-                hole.setAttribute("fill","black");
-                holes.appendChild(hole);
-            }
+            relicTargetGeometries(target.targetSide,index).forEach(absolute=>{
+                const rect=relativeRelicRect(absolute,overlayRect);
+                if(!rect||rect.width<=0||rect.height<=0){ return; }
+                if(holes){
+                    const hole=document.createElementNS(namespace,"rect");
+                    hole.setAttribute("x",String(rect.left));
+                    hole.setAttribute("y",String(rect.top));
+                    hole.setAttribute("width",String(Math.max(1,rect.width)));
+                    hole.setAttribute("height",String(Math.max(1,rect.height)));
+                    hole.setAttribute("rx","8");
+                    hole.setAttribute("fill","black");
+                    holes.appendChild(hole);
+                }
+            });
         });
         const show=()=>{ if(relicCutinNode){ relicCutinNode.classList.add("targets-visible"); } };
         if(typeof requestAnimationFrame==="function"){ requestAnimationFrame(show); }else{ show(); }
