@@ -3873,132 +3873,7 @@ button:active{
 
 }
 
-/* =====================================================
-   技能名稱標籤（施放技能時顯示在自己格子裡）
-===================================================== */
-
-/*
-   ★ 修正（依照使用者要求，整個重新設計）：
-   技能名稱原本是一個小小的實心背景徽章
-   （黑字、彩色底、黑框），
-   使用者希望改成跟爆擊數字一樣的呈現方式：
-   大字、白邊描邊、飄浮動畫，
-   只是不用爆擊那個💥圖案，
-   而且把「數字」換成「技能中文名稱」，
-   顏色依元素區分：
-   火=紅、水=水藍、土=金黃、風=淡綠。
-   文字範圍可以稍微超出卡片邊界沒關係，
-   停留時間也拉長一點，
-   讓玩家看得更清楚是誰放了什麼技能。
-*/
-
-.skill-name-badge{
-    /*
-       ★ 修正（真正解決根本原因，改用position:fixed）：
-       JS那邊已經改成用getBoundingClientRect()
-       量出卡片在畫面上的實際像素座標，
-       直接設定left/top為那個座標——
-       這裡改成position:fixed搭配
-       transform:translate(-50%,-100%)，
-       -50%把文字水平置中在那個座標上，
-       -100%把文字整個往上移到座標「上方」
-       （而不是座標本身的位置往下長），
-       效果等同之前的「貼著卡片正上方」，
-       但現在完全不是卡片的子元素了，
-       不會再被卡片自己的動畫（transform）
-       困住疊放順序。
-    */
-
-    position:fixed;
-
-    transform:translate(-50%,-100%);
-
-    font-size:22px;
-    font-weight:900;
-
-    -webkit-text-stroke:0;
-
-    white-space:nowrap;
-
-    pointer-events:none;
-
-    z-index:9999;
-
-    animation:skillBadgePop var(--skill-name-display-duration,347ms) ease-out forwards;
-}
-
-/*
-   ★ 修正（依照使用者要求，技能/普攻/HP/SP
-   顯示文字本身的顏色再粗一點，白邊
-   （-webkit-text-stroke）維持不動）：
-   font-weight已經是900（CSS的最大值），
-   沒辦法再加粗；改用疊加同色系、極小模糊
-   半徑的text-shadow，把文字顏色本身的視覺
-   厚度加強，白邊完全沒有動到。
-*/
-
-.skill-name-badge.badge-normal{
-    color:#000;
-    text-shadow:
-        0 0 1px #000,
-        0 0 1px #000;
-}
-
-.skill-name-badge.badge-fire{
-    color:#ff3b30;
-    text-shadow:
-        0 0 1px #ff3b30,
-        0 0 1px #ff3b30;
-}
-
-.skill-name-badge.badge-water{
-    color:#38bdf8;
-    text-shadow:
-        0 0 1px #38bdf8,
-        0 0 1px #38bdf8;
-}
-
-.skill-name-badge.badge-wind{
-    color:#4ade80;
-    text-shadow:
-        0 0 1px #4ade80,
-        0 0 1px #4ade80;
-}
-
-.skill-name-badge.badge-earth{
-    color:#f0b429;
-    text-shadow:
-        0 0 1px #f0b429,
-        0 0 1px #f0b429;
-}
-
-@keyframes skillBadgePop{
-
-    0%{
-        opacity:0;
-        transform:translate(-50%,4px) scale(.7);
-    }
-
-    15%{
-        opacity:1;
-        transform:translate(-50%,-6px) scale(1.15);
-    }
-
-    30%{
-        transform:translate(-50%,-4px) scale(1);
-    }
-
-    70%{
-        opacity:1;
-        transform:translate(-50%,-12px) scale(1);
-    }
-
-    100%{
-        opacity:0;
-        transform:translate(-50%,-22px) scale(1);
-    }
-
-}
+/* Skill-name presentation is owned by css/battle-skill-name-presentation-owner.css. */
 
 /* =====================================================
    狀態
@@ -6660,9 +6535,7 @@ html, body{
 }
 
 #game-stage > #app > #game-content .ice-spin-projectile,
-#game-stage > #app > #game-content .fire-rocket-projectile,
-#game-stage > #app > #game-content .skill-name-badge{
-    /* These are migrated to #game-overlay-layer by JS below. */
+#game-stage > #app > #game-content .fire-rocket-projectile{
     position:absolute !important;
 }
 

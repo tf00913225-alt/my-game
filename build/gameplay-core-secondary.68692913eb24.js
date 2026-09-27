@@ -8884,6 +8884,32 @@ ensureFunctionalStyles();runRepairs();
         return {owner:"fixed-slot",rect:rect,center:{x:rect.left+rect.width/2,y:rect.top+rect.height/2}};
     }
 
+    function runtimeEntity(side,index){
+        try{
+            if(side==="monster"){ return typeof monsters!=="undefined"&&monsters?monsters[index]:null; }
+            return typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(index):null;
+        }catch(_){ return null; }
+    }
+    function runtimeStats(side,index,entity){
+        try{ if(side==="player"&&typeof getPartyBattleStats==="function"){ return getPartyBattleStats(index)||entity; } }catch(_){ }
+        return entity;
+    }
+    function ratioFromRuntime(side,index,kind,fill){
+        const entity=runtimeEntity(side,index),stats=runtimeStats(side,index,entity);
+        const current=entity&&Number(entity[kind]), maxKey=kind==="hp"?"maxHP":"maxSP";
+        const max=stats&&Number(stats[maxKey]||entity&&entity[maxKey]);
+        if(Number.isFinite(current)&&Number.isFinite(max)&&max>0){ return Math.max(0,Math.min(1,current/max)); }
+        if(fill&&fill.style){ const match=/^([0-9.]+)%$/.exec(String(fill.style.width||"")); if(match){ return Math.max(0,Math.min(1,Number(match[1])/100)); } }
+        return null;
+    }
+    function shieldRatioFromRuntime(side,index,shieldNode){
+        const entity=runtimeEntity(side,index),stats=runtimeStats(side,index,entity);
+        const max=Number(stats&&stats.maxHP||entity&&entity.maxHP), remaining=Number(entity&&entity.v141Shield&&entity.v141Shield.remaining);
+        if(Number.isFinite(remaining)&&Number.isFinite(max)&&max>0){ return Math.max(0,Math.min(1,remaining/max)); }
+        if(shieldNode&&shieldNode.style){ const match=/^([0-9.]+)%$/.exec(String(shieldNode.style.width||"")); if(match){ return Math.max(0,Math.min(1,Number(match[1])/100)); } }
+        return 0;
+    }
+
     function unitGeometry(side,index){
         const targetSide=side==="monster"?"monster":"player";
         const unitIndex=Number(index);
@@ -8911,10 +8937,17 @@ ensureFunctionalStyles();runRepairs();
             ".monster-hp,.monster-sp,.hp-bar,.sp-bar,.battle-monster-name,.battle-player-id,.monster-status-badges"
         ));
         const hpNodes=Array.from(card.querySelectorAll(".monster-hp,.hp-bar,.battle-hp-bar,.player-hp-bar,[data-hud=\"hp\"],[data-stat=\"hp\"]"));
+        const spNodes=Array.from(card.querySelectorAll(".monster-sp,.sp-bar,.battle-sp-bar,.player-sp-bar,[data-hud=\"sp\"],[data-stat=\"sp\"]"));
         const hpRects=hpNodes.map(node=>typeof node.getBoundingClientRect==="function"?plainRect(node.getBoundingClientRect()):null).filter(rect=>rect&&rect.width>0&&rect.height>0);
-        const hpRect=hpRects.length?hpRects.reduce((acc,rect)=>({left:Math.min(acc.left,rect.left),top:Math.min(acc.top,rect.top),right:Math.max(acc.right,rect.right),bottom:Math.max(acc.bottom,rect.bottom),width:Math.max(acc.right,rect.right)-Math.min(acc.left,rect.left),height:Math.max(acc.bottom,rect.bottom)-Math.min(acc.top,rect.top)})):null;
+        const spRects=spNodes.map(node=>typeof node.getBoundingClientRect==="function"?plainRect(node.getBoundingClientRect()):null).filter(rect=>rect&&rect.width>0&&rect.height>0);
+        const mergeRects=rects=>rects.length?rects.reduce((acc,rect)=>({left:Math.min(acc.left,rect.left),top:Math.min(acc.top,rect.top),right:Math.max(acc.right,rect.right),bottom:Math.max(acc.bottom,rect.bottom),width:Math.max(acc.right,rect.right)-Math.min(acc.left,rect.left),height:Math.max(acc.bottom,rect.bottom)-Math.min(acc.top,rect.top)})):null;
+        const hpRect=mergeRects(hpRects),spRect=mergeRects(spRects);
         const artworkProjection=art&&portraitRect?{rect:portraitRect,backgroundImage:String(art.style&&art.style.backgroundImage||window.getComputedStyle(art).backgroundImage||""),backgroundSize:String(art.style&&art.style.backgroundSize||window.getComputedStyle(art).backgroundSize||"contain"),backgroundPosition:String(art.style&&art.style.backgroundPosition||window.getComputedStyle(art).backgroundPosition||"center"),backgroundRepeat:String(art.style&&art.style.backgroundRepeat||window.getComputedStyle(art).backgroundRepeat||"no-repeat")} : null;
-        const hpProjection=hpNodes[0]&&hpRect?{rect:hpRect,html:String(hpNodes[0].outerHTML||"")} : null;
+        const hpFill=card.querySelector(".hp-bar-inner,.monster-hp-inner,.battle-hp-inner,[data-fill=\"hp\"]");
+        const spFill=card.querySelector(".sp-bar-inner,.monster-sp-inner,.battle-sp-inner,[data-fill=\"sp\"]");
+        const shieldNode=card.querySelector(".hp-bar-shield-overlay,.monster-shield-overlay,[data-fill=\"shield\"]");
+        const hpProjection=hpRect?{rect:hpRect,ratio:ratioFromRuntime(targetSide,unitIndex,"hp",hpFill),shieldRatio:shieldRatioFromRuntime(targetSide,unitIndex,shieldNode)}:null;
+        const spProjection=spRect?{rect:spRect,ratio:ratioFromRuntime(targetSide,unitIndex,"sp",spFill)}:null;
         const hudRects=hudNodes
             .map(node=>typeof node.getBoundingClientRect==="function"?plainRect(node.getBoundingClientRect()):null)
             .filter(rect=>rect&&rect.width>0&&rect.height>0);
@@ -8943,7 +8976,7 @@ ensureFunctionalStyles();runRepairs();
 
         return {
             owner:"fixed-slot",side:targetSide,index:unitIndex,slot:slot,
-            unitRect:unitRect,portraitRect:portraitRect,hpRect:hpRect,artworkProjection:artworkProjection,hpProjection:hpProjection,hudSafeRect:hudSafeRect,
+            unitRect:unitRect,portraitRect:portraitRect,hpRect:hpRect,spRect:spRect,artworkProjection:artworkProjection,hpProjection:hpProjection,spProjection:spProjection,hudSafeRect:hudSafeRect,
             feedbackSafeRect:feedbackSafeRect,
             center:{x:unitRect.left+unitRect.width/2,y:unitRect.top+unitRect.height/2},
             feedbackAnchor:{
@@ -9018,6 +9051,8 @@ ensureFunctionalStyles();runRepairs();
     const LANE_BOTTOM_INSET_PX=6;
     const DEFAULT_DURATION=980;
     const contexts=new Map();
+    const pendingImpacts=new Map();
+    const impactTimers=new Set();
     let sequence=0;
 
     function numeric(value,fallback){
@@ -9089,7 +9124,6 @@ ensureFunctionalStyles();runRepairs();
     function finishRequest(request,reason){
         if(!request||request.finished){ return; }
         request.finished=true;
-        if(request.delayTimer){ clearTimeout(request.delayTimer); request.delayTimer=null; }
         if(request.removeTimer){ clearTimeout(request.removeTimer); request.removeTimer=null; }
         if(request.node&&request.node.parentNode){ request.node.remove(); }
         if(typeof request.resolve==="function"){ request.resolve(reason||"done"); }
@@ -9134,7 +9168,7 @@ ensureFunctionalStyles();runRepairs();
     function formatCritical(text){
         const value=String(text==null?"":text);
         const match=value.match(/\d+(?:\.\d+)?/);
-        return "〔💥〕 "+(match?match[0]:value);
+        return "💥 "+(match?match[0]:value);
     }
     function spawn(context,request,lane){
         if(request.cancelled||request.finished){ return false; }
@@ -9191,16 +9225,38 @@ ensureFunctionalStyles();runRepairs();
         request.context=context;
         context.queue.push(request);
         context.queue.sort(compareRequests);
-        /* Synthetic/settled callers have explicitly opted out of V143 impact
-           timing. Flush through this same queue owner now so the request is
-           immediately observable, while live impacts retain one microtask in
-           which matching damage/status phases can be ordered together. */
-        if(request.skipImpactTiming){
-            pump(context);
-            return;
-        }
         queueMicrotask(()=>pump(context));
     }
+    function impactKey(request){
+        return unitKey(request.side,request.index)+"|"+String(request.impactId);
+    }
+    function flushImpact(batch){
+        if(!batch||batch.flushed){ return; }
+        batch.flushed=true;
+        pendingImpacts.delete(batch.key);
+        if(batch.timer){ impactTimers.delete(batch.timer); batch.timer=null; }
+        const context=contextFor(batch.side,batch.index);
+        batch.requests.filter(request=>!request.cancelled&&!request.finished).forEach(request=>{
+            request.context=context;
+            context.queue.push(request);
+        });
+        context.queue.sort(compareRequests);
+        pump(context);
+    }
+    function registerImpact(request){
+        const key=impactKey(request);
+        let batch=pendingImpacts.get(key);
+        if(!batch){
+            batch={key:key,side:request.side,index:request.index,impactId:request.impactId,requests:[],timer:null,flushed:false};
+            pendingImpacts.set(key,batch);
+            const wait=Math.max(0,numeric(request.impactAt,Date.now())-Date.now());
+            batch.timer=setTimeout(()=>{ batch.timer=null; flushImpact(batch); },wait);
+            impactTimers.add(batch.timer);
+        }
+        batch.requests.push(request);
+        request.impactBatch=batch;
+    }
+
     function emit(options){
         if(typeof document==="undefined"||!document.body){ return null; }
         const input=Object.assign({},options||{});
@@ -9221,10 +9277,10 @@ ensureFunctionalStyles();runRepairs();
         };
         request.critical=request.critical||timing.critical;
         const handle=makeHandle(request);
-        if(timing.delayMs>8){
-            request.delayTimer=setTimeout(()=>{ request.delayTimer=null;enqueue(request); },timing.delayMs);
-        }else{
+        if(request.skipImpactTiming||!request.impactId){
             enqueue(request);
+        }else{
+            registerImpact(request);
         }
         return handle;
     }
@@ -9241,6 +9297,13 @@ ensureFunctionalStyles();runRepairs();
         });
     }
     function clear(){
+        Array.from(impactTimers).forEach(timer=>clearTimeout(timer));
+        impactTimers.clear();
+        Array.from(pendingImpacts.values()).forEach(batch=>{
+            batch.requests.forEach(request=>finishRequest(request,"teardown"));
+            batch.requests.length=0;
+        });
+        pendingImpacts.clear();
         Array.from(contexts.values()).forEach(context=>{
             context.queue.slice().forEach(request=>finishRequest(request,"teardown"));
             Array.from(context.active.values()).forEach(request=>finishRequest(request,"teardown"));
@@ -9263,7 +9326,7 @@ ensureFunctionalStyles();runRepairs();
     }
 
     const api=Object.freeze({
-        version:"battle-floating-feedback-v2",
+        version:"battle-floating-feedback-v3-impact-batch",
         emit:emit,
         emitAtImpact:emitAtImpact,
         emitStatus:emitStatus,
@@ -10801,19 +10864,35 @@ ensureFunctionalStyles();runRepairs();
         return node.__relicOverlayRect={left:numeric(rect.left),top:numeric(rect.top),width:Math.max(1,numeric(rect.width)),height:Math.max(1,numeric(rect.height))};
     }
     function appendRelicProjection(layer,geometry,overlayRect){
-        const artwork=geometry.artworkProjection,hp=geometry.hpProjection,artRect=relativeRelicRect(artwork.rect,overlayRect),hpRect=relativeRelicRect(hp.rect,overlayRect);
-        if(!artRect||!hpRect||artRect.width<=0||artRect.height<=0||hpRect.width<=0||hpRect.height<=0){ return; }
-        const art=document.createElement("div"), hpNode=document.createElement("div");
+        const artwork=geometry&&geometry.artworkProjection, hp=geometry&&geometry.hpProjection, sp=geometry&&geometry.spProjection;
+        const artRect=artwork&&relativeRelicRect(artwork.rect,overlayRect), hpRect=hp&&relativeRelicRect(hp.rect,overlayRect), spRect=sp&&relativeRelicRect(sp.rect,overlayRect);
+        if(!artRect||!hpRect||!spRect||artRect.width<=0||artRect.height<=0||hpRect.width<=0||hpRect.height<=0||spRect.width<=0||spRect.height<=0){ return; }
+        const art=document.createElement("div");
         art.className="team-relic-target-projection-art";
-        art.style.left=artRect.left+"px";art.style.top=artRect.top+"px";art.style.width=artRect.width+"px";art.style.height=artRect.height+"px";art.style.backgroundImage=artwork.backgroundImage;art.style.backgroundSize=artwork.backgroundSize;art.style.backgroundPosition=artwork.backgroundPosition;art.style.backgroundRepeat=artwork.backgroundRepeat;
-        hpNode.className="team-relic-target-projection-hp";hpNode.style.left=hpRect.left+"px";hpNode.style.top=hpRect.top+"px";hpNode.style.width=hpRect.width+"px";hpNode.style.height=hpRect.height+"px";hpNode.innerHTML=hp.html;
-        layer.append(art,hpNode);
+        art.style.left=artRect.left+"px";art.style.top=artRect.top+"px";art.style.width=artRect.width+"px";art.style.height=artRect.height+"px";
+        art.style.backgroundImage=artwork.backgroundImage;art.style.backgroundSize=artwork.backgroundSize;art.style.backgroundPosition=artwork.backgroundPosition;art.style.backgroundRepeat=artwork.backgroundRepeat;
+        const makeResource=(kind,projection,rect)=>{
+            const resource=document.createElement("div"),fill=document.createElement("i");
+            resource.className="team-relic-target-projection-resource team-relic-target-projection-"+kind;
+            resource.style.left=rect.left+"px";resource.style.top=rect.top+"px";resource.style.width=rect.width+"px";resource.style.height=rect.height+"px";
+            fill.className="team-relic-target-projection-resource-fill";
+            fill.style.width=(Math.max(0,Math.min(1,Number(projection.ratio)||0))*100)+"%";
+            resource.appendChild(fill);
+            if(kind==="hp"&&Number(projection.shieldRatio)>0){
+                const shield=document.createElement("i");
+                shield.className="team-relic-target-projection-shield";
+                shield.style.width=(Math.max(0,Math.min(1,Number(projection.shieldRatio)||0))*100)+"%";
+                resource.appendChild(shield);
+            }
+            return resource;
+        };
+        layer.append(art,makeResource("hp",hp,hpRect),makeResource("sp",sp,spRect));
     }
     function revealRelicTargets(target){
         clearRelicTargetFocus();
         if(!relicCutinNode||!target||!Array.isArray(target.targetIds)){ return waitMs(RELIC_TARGET_REVEAL_MS); }
         const overlayRect=syncRelicPresentationGeometry(relicCutinNode)||relicCutinNode.__relicOverlayRect, layer=relicCutinNode.querySelector(".team-relic-target-projection-layer"), owner=relicGeometryOwner();
-        if(layer&&overlayRect&&owner&&typeof owner.getUnitGeometry==="function"){target.targetIds.forEach(index=>{const geometry=owner.getUnitGeometry(target.targetSide,index);if(geometry&&geometry.artworkProjection&&geometry.hpProjection){appendRelicProjection(layer,geometry,overlayRect);}});}
+        if(layer&&overlayRect&&owner&&typeof owner.getUnitGeometry==="function"){target.targetIds.forEach(index=>{const geometry=owner.getUnitGeometry(target.targetSide,index);if(geometry&&geometry.artworkProjection&&geometry.hpProjection&&geometry.spProjection){appendRelicProjection(layer,geometry,overlayRect);}});}
         const show=()=>{if(relicCutinNode){relicCutinNode.classList.add("targets-visible");}};
         if(typeof requestAnimationFrame==="function"){requestAnimationFrame(show);}else{show();}
         return waitMs(RELIC_TARGET_REVEAL_MS);
