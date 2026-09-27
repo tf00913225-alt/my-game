@@ -274,7 +274,7 @@ async function launchPresentationQaMode(client,mode){
     return context;
 }
 
-async function captureRelicPresentationQa(client,relicId,targetKind){
+async function captureRelicPresentationQa(client,relicId,targetKind,mode){
     const id=JSON.stringify(relicId);
     const started=await client.eval("Boolean(window.v174RelicDevPreviewPresentation&&window.v174RelicDevPreviewPresentation("+id+"))");
     assert.equal(started,true,"Relic DEV presentation did not start: "+relicId);
@@ -297,12 +297,12 @@ async function captureRelicPresentationQa(client,relicId,targetKind){
         relicId+" target focus and VFX",
         9000
     );
-    const focus=await client.eval("(()=>{const n=document.getElementById('teamRelicBattlePresentation');const owner=window.FourSymbolsBattlefieldRenderGeometry;const state=window.v143SkillAnimationState?.current;const overlay=owner?.getBattlefieldOverlayGeometry?.()?.rect;const side=state?.targetSide||null;const indexes=Array.isArray(state?.targetIndexes)?state.targetIndexes.slice():[];const holes=[...n.querySelectorAll('.team-relic-mask-holes rect')].map(h=>({left:Number(h.getAttribute('x')),top:Number(h.getAttribute('y')),width:Number(h.getAttribute('width')),height:Number(h.getAttribute('height'))}));const expected=indexes.map(index=>{const g=owner?.getUnitGeometry?.(side,index);const r=g?.highlightRect||g?.unitRect;if(!r||!overlay)return null;return {left:r.left-overlay.left,top:r.top-overlay.top,width:r.width,height:r.height};}).filter(Boolean);const approx=(a,b)=>Math.abs(a-b)<=1.5;const matches=expected.length===holes.length&&expected.every((e,i)=>holes[i]&&approx(e.left,holes[i].left)&&approx(e.top,holes[i].top)&&approx(e.width,holes[i].width)&&approx(e.height,holes[i].height));const stage=document.getElementById('v143-skill-stage');const sprite=stage?.querySelector('.v143-vfx-sprite[data-skill="+id+"]');return {side,indexes,holes,outlineCount:n.querySelectorAll('.team-relic-battle-target-outline').length,geometryMatches:matches,stageOwner:stage?.dataset.geometryOwner||null,spriteOwner:sprite?.dataset.geometryOwner||null,spriteTargetSide:sprite?.dataset.targetSide||null,spriteTargetIndexes:sprite?.dataset.targetIndexes||'',presentationLock:window.FourSymbolsBattleFlow?.isPresentationActive?.()||false};})()");
+    const focus=await client.eval("(()=>{const n=document.getElementById('teamRelicBattlePresentation');const owner=window.FourSymbolsBattlefieldRenderGeometry;const state=window.v143SkillAnimationState?.current;const overlay=owner?.getBattlefieldOverlayGeometry?.()?.rect;const side=state?.targetSide||null;const indexes=Array.isArray(state?.targetIndexes)?state.targetIndexes.slice():[];const holes=[...n.querySelectorAll('.team-relic-mask-holes rect')].map(h=>({left:Number(h.getAttribute('x')),top:Number(h.getAttribute('y')),width:Number(h.getAttribute('width')),height:Number(h.getAttribute('height'))}));const diagnostics=indexes.map(index=>{const card=document.getElementById((side==='monster'?'battleMonster':'battlePlayerCard')+index);const raw=card?.getBoundingClientRect?.();const g=owner?.getUnitGeometry?.(side,index);const r=g?.highlightRect||g?.unitRect;return {index,dom:!!card,cardRect:raw?{left:raw.left,top:raw.top,width:raw.width,height:raw.height}:null,slot:g?.slot||card?.dataset?.slot||null,unitRect:g?.unitRect||null,highlightRect:g?.highlightRect||null,relative:r&&overlay?{left:r.left-overlay.left,top:r.top-overlay.top,width:r.width,height:r.height}:null};});const expected=diagnostics.map(item=>item.relative).filter(Boolean);const approx=(a,b)=>Math.abs(a-b)<=1.5;const matches=expected.length===holes.length&&expected.every((e,i)=>holes[i]&&approx(e.left,holes[i].left)&&approx(e.top,holes[i].top)&&approx(e.width,holes[i].width)&&approx(e.height,holes[i].height));const stage=document.getElementById('v143-skill-stage');const sprite=stage?.querySelector('.v143-vfx-sprite[data-skill="+id+"]');return {side,indexes,holes,targetDiagnostics:diagnostics,outlineCount:n.querySelectorAll('.team-relic-battle-target-outline').length,geometryMatches:matches,stageOwner:stage?.dataset.geometryOwner||null,spriteOwner:sprite?.dataset.geometryOwner||null,spriteTargetSide:sprite?.dataset.targetSide||null,spriteTargetIndexes:sprite?.dataset.targetIndexes||'',presentationLock:window.FourSymbolsBattleFlow?.isPresentationActive?.()||false};})()");
     assert.ok(focus.indexes.length>=1,relicId+" resolved no battle targets");
     if(targetKind==="singleAlly"){ assert.equal(focus.side,"player");assert.equal(focus.indexes.length,1); }
     if(targetKind==="allyAll"){ assert.equal(focus.side,"player"); }
     if(targetKind==="enemyAll"||targetKind==="damageStatus"){ assert.equal(focus.side,"monster"); }
-    assert.equal(focus.holes.length,focus.indexes.length,relicId+" mask holes must equal resolved targets");
+    assert.equal(focus.holes.length,focus.indexes.length,relicId+" mask holes must equal resolved targets: "+JSON.stringify({mode,side:focus.side,indexes:focus.indexes,holes:focus.holes,targetDiagnostics:focus.targetDiagnostics}));
     assert.equal(focus.outlineCount,focus.indexes.length,relicId+" focus outlines must equal resolved targets");
     assert.equal(focus.geometryMatches,true,relicId+" target apertures must match canonical Unit geometry");
     assert.equal(focus.stageOwner,"fixed-slot",relicId+" VFX stage must use Fixed Slot geometry");
@@ -335,7 +335,7 @@ async function runRelicPresentationModeMatrix(client){
         const context=await launchPresentationQaMode(client,mode);
         const presentations=[];
         for(const [relicId,targetKind] of relics){
-            const snapshot=await captureRelicPresentationQa(client,relicId,targetKind);
+            const snapshot=await captureRelicPresentationQa(client,relicId,targetKind,mode);
             presentations.push(snapshot);
             const baseline=identityBaseline.get(relicId);
             if(!baseline){ identityBaseline.set(relicId,{name:snapshot.identity.name,icon:snapshot.identity.icon}); }
