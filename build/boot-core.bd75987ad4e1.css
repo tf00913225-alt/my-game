@@ -210,8 +210,7 @@ button:disabled{
    ★ 修正（改用「固定畫布＋整體縮放」的正確做法）：
    之前是讓畫面裡每一塊區域各自「有彈性地」
    試著縮小去塞進螢幕，這種做法很難完全預測，
-   不同�tail: error writing 'standard output': Broken pipe
-��機、不同內容狀態，結果都可能不一樣，
+   不同手機、不同內容狀態，結果都可能不一樣，
    才會一直卡在「這裡調好、那裡又跑版」的循環。
 
    正確做法：把整個遊戲畫面當成一張「固定尺寸
@@ -479,9 +478,7 @@ button:disabled{
    釋放62px的空間給該頁面用
    （這兩個頁面本身都已經有顯示
    角色名/等級/HP/SP的地方，
-   頂部tail: error writing 'standard output': Broken pipe
-tail: error writing 'standard output': Broken pipe
-那條資訊列是重複的）。
+   頂部那條資訊列是重複的）。
 
    ★ 修正：
    除了個別頁面（例如#battlePage）自己的高度
@@ -691,7 +688,7 @@ tail: error writing 'standard output': Broken pipe
    所以這裡直接把使用者提供的森林小徑圖片
    當成這個頁面最底層的背景。
 
-   min-height:100vh確保就算內��很少（現在
+   min-height:100vh確保就算內容很少（現在
    幾乎沒有內容），背景圖還是能鋪滿整個
    畫面高度，不會只蓋到內容那一小塊就結束、
    下面露出一截黑底。
@@ -859,8 +856,7 @@ tail: error writing 'standard output': Broken pipe
 /*
    ★ 修正（依照使用者要求，主城改成純文字
    選單、去掉毛玻璃特效）：
-   使tail: error writing 'standard output': Broken pipe
-用者準備自己重新佈置主城版面，
+   使用者準備自己重新佈置主城版面，
    不需要卡片毛玻璃這層特效了，改用底下
    這套「純文字選單」的樣式——標楷體、
    白字黑框、沒有任何背景/邊框方塊，
@@ -937,8 +933,7 @@ tail: error writing 'standard output': Broken pipe
 
 .home-hud-resources{
     display:grid;
-    gtail: error writing 'standard output': Broken pipe
-rid-template-columns:repeat(2,minmax(0,1fr));
+    grid-template-columns:repeat(2,minmax(0,1fr));
     gap:5px;
 }
 
@@ -1463,8 +1458,7 @@ rid-template-columns:repeat(2,minmax(0,1fr));
     font-size:9px;
     font-weight:bold;
     color:#f2ead9;
-    white-stail: error writing 'standard output': Broken pipe
-pace:nowrap;
+    white-space:nowrap;
     max-width:60px;
     overflow:hidden;
     text-overflow:ellipsis;
@@ -1694,9 +1688,7 @@ pace:nowrap;
        爆擊效果做了半天卻被卡片邊界吃掉一半。
        拿掉之後數字可以真的「衝出」卡片，
        蓋到旁邊的卡片也沒關係，
-       這樣才有爆擊該有的震撼感�tail: error writing 'standard output': Broken pipe
-tail: error writing 'standard output': Broken pipe
-�
+       這樣才有爆擊該有的震撼感。
     */
 
     font-size:7px;
@@ -2134,8 +2126,7 @@ tail: error writing 'standard output': Broken pipe
 
    為了不用一個個去改95個按鈕各自的
    HTML/CSS，這裡用兩個技巧：
-   1. button:active這個偽類別�tail: error writing 'standard output': Broken pipe
-�身是
+   1. button:active這個偽類別本身是
       瀏覽器原生就會在「手指按著還沒放開」
       的當下觸發，純CSS就能做「按下瞬間
       閃一下光暈」，不用JS。
@@ -2216,7 +2207,7 @@ button:active{
 }
 
 /*
-   ★ 修正（依照���用者要求，統一色系）：
+   ★ 修正（依照使用者要求，統一色系）：
    這三個原本是「重新指定」跟.menu-button
    基礎樣式一樣的舊深棕色，現在.menu-button
    本身已經改成統一色系的深紅漸層，這三行
@@ -2483,8 +2474,7 @@ button:active{
     height:auto;
     max-height:none;
 
-    z-itail: error writing 'standard output': Broken pipe
-ndex:500;
+    z-index:500;
 
     background:#0c0b0a;
     border:2px solid #8a6a3a;
@@ -2769,8 +2759,7 @@ ndex:500;
 
 .auto-setting-panel{
     flex:0 0 62px;
-    height:62ptail: error writing 'standard output': Broken pipe
-x;
+    height:62px;
 
     width:fit-content;
 
@@ -2971,8 +2960,7 @@ x;
     overflow-y:auto;
 }
 
-.auto-settintail: error writing 'standard output': Broken pipe
-gs-expanded select{
+.auto-settings-expanded select{
     background:#17130f;
     color:#f2ead9;
     border:1px solid var(--theme-border);
@@ -3174,8 +3162,7 @@ gs-expanded select{
 }
 
 /* V109：真正可重複拖曳的懸浮元素匣。
-   直接�tail: error writing 'standard output': Broken pipe
-�在 #battlePage 底下，完全脫離 battle-info-header-row 的文件流。
+   直接掛在 #battlePage 底下，完全脫離 battle-info-header-row 的文件流。
    Pointer 拖曳只綁定這顆按鈕；單擊才開設定，拖曳不觸發設定。 */
 #battlePage > .battle-element-box-button{
     position:absolute !important;
@@ -3387,8 +3374,7 @@ gs-expanded select{
    圖片上方、底部對齊、漸層黑底確保可讀性）。
    使用者明確要求「以後角色都比照這個做法」，
    所以這裡完全複製battlePlayerCard0的規則，
-   只換圖片跟目�tail: error writing 'standard output': Broken pipe
-�ID，日後若有更多角色，
+   只換圖片跟目標ID，日後若有更多角色，
    同樣複製這個模式即可。
 */
 
@@ -3649,10 +3635,258 @@ gs-expanded select{
    （被打的用hitAnimation震動，
    攻擊的這邊用lunge往對手方向頓一下，
    這樣才看得出「這一下是誰打的」）
-===============================tail: error writing 'standard output': Broken pipe
-bwrap: Can't find source path /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-tail: error writing 'standard output': Broken pipe
-�、土=金黃、風=淡綠。
+===================================================== */
+
+.attacker-lunge-up{
+    animation:lungeUp .45s ease;
+}
+
+.attacker-lunge-down{
+    animation:lungeDown .45s ease;
+}
+
+@keyframes lungeUp{
+    /*
+       ★ 修正（依照使用者要求，幅度加大）：
+       原本-12px加大到-22px，前傾感更明顯。
+    */
+    0%{transform:translateY(0);}
+    30%{transform:translateY(-22px);}
+    60%{transform:translateY(4px);}
+    100%{transform:translateY(0);}
+}
+
+@keyframes lungeDown{
+    0%{transform:translateY(0);}
+    30%{transform:translateY(22px);}
+    60%{transform:translateY(-4px);}
+    100%{transform:translateY(0);}
+}
+
+/* =====================================================
+   冰旋一閃：技能專屬飛行動畫
+===================================================== */
+
+/*
+   ★ 新增（依照使用者要求）：
+   釋放冰旋一閃時，讓使用者上傳的冰旋圖示
+   從施法者卡片飛向被打中的怪物卡片，
+   當成這個技能專屬的攻擊動畫。
+
+   做法跟showSkillNameBadge()一樣，
+   直接掛在document.body底下、用position:fixed
+   +getBoundingClientRect()量出實際座標，
+   不當任何卡片的子元素——這樣才不會被
+   卡片自己的前傾/受擊動畫（會建立新的
+   transform疊放層）卡住，參考同一份檔案
+   裡「文字會先被蓋住」那次修正的教訓。
+
+   飛行本身用left/top的CSS transition做，
+   不是寫死的@keyframes，因為起點（施法者
+   卡片）跟終點（被打中的怪物卡片）每次
+   位置都不一樣，沒辦法用固定的關鍵影格
+   描述，要用JS量出實際座標再指定transition
+   目標值。
+*/
+
+.ice-spin-projectile{
+    position:fixed;
+
+    width:76px;
+    height:76px;
+
+    pointer-events:none;
+
+    z-index:260;
+
+    filter:
+        drop-shadow(
+            0 0 10px
+            rgba(120,200,255,.85)
+        );
+
+    transform:
+        translate(-50%,-50%)
+        rotate(0deg)
+        scale(.55);
+
+    opacity:1;
+
+    transition:
+        left .42s ease-in,
+        top .42s ease-in,
+        transform .42s ease-in,
+        opacity .16s ease .34s;
+}
+
+.ice-spin-projectile.arrived{
+    transform:
+        translate(-50%,-50%)
+        rotate(540deg)
+        scale(1.15);
+
+    opacity:0;
+}
+
+/* =====================================================
+   傷害／SP消耗浮動數字
+===================================================== */
+
+.damage-popup{
+    position:absolute;
+    left:50%;
+    top:26%;
+
+    transform:translate(-50%,0);
+
+    font-size:18px;
+    font-weight:900;
+
+    /* V99：通用 popup 不強制描邊；HP 傷害與爆擊在各自類別
+       明確套白色描邊，SP／治療／MISS 保留原本視覺。 */
+    -webkit-text-stroke:0;
+
+    pointer-events:none;
+
+    z-index:60;
+
+    animation:damageFloat 1.8s ease-out forwards;
+
+    white-space:nowrap;
+}
+
+/* V99 — HP 損傷數字取消螢光，改成紅字＋清楚白色描邊。 */
+.damage-popup.hp-popup{
+    color:#e32626;
+    -webkit-text-stroke:1.15px #fff;
+    paint-order:stroke fill;
+    text-shadow:1px 1px 0 #000;
+}
+
+.damage-popup.sp-popup{
+    color:#0090ff;
+    text-shadow:
+        0 0 1px #0090ff,
+        0 0 1px #0090ff,
+        0 0 8px rgba(0,144,255,1),
+        0 0 14px rgba(0,144,255,.8);
+}
+
+.damage-popup.heal-popup{
+    color:#00cc55;
+    text-shadow:
+        0 0 1px #00cc55,
+        0 0 1px #00cc55,
+        0 0 2px #000,
+        0 0 4px #000,
+        0 0 10px rgba(0,255,102,1);
+}
+
+/*
+   ★ 新增（依照使用者要求，「護盾傷害機制...顯示白色
+   數字扣除動畫」）：
+   護盾吸收的傷害用白色文字表示，跟HP掉血的紅字、
+   SP的藍字、回復的綠字都不一樣，一眼就能看出「這筆
+   傷害被護盾扛下來了，沒有真的扣到血」。
+*/
+.damage-popup.shield-popup{
+    color:#fff;
+    -webkit-text-stroke:1px #444;
+    paint-order:stroke fill;
+    text-shadow:
+        0 0 4px rgba(255,255,255,.85),
+        1px 1px 0 #000;
+}
+
+/*
+   ★ MISS／抵抗 文字：
+   之前用灰白色，玩家反應太不明顯，
+   直接改成跟HP傷害同一種鮮紅、白邊風格，
+   字級再拉大一點，確保打空這件事
+   在畫面上一樣搶眼。
+*/
+
+.damage-popup.miss-popup{
+    color:#ff2020;
+    -webkit-text-stroke:0 !important;
+    font-size:19px;
+    text-shadow:
+        0 0 1px #ff2020,
+        0 0 1px #ff2020,
+        0 0 8px rgba(255,32,32,1),
+        0 0 14px rgba(255,32,32,.8);
+}
+
+@keyframes damageFloat{
+
+    0%{
+        opacity:0;
+        transform:translate(-50%,4px) scale(.75);
+    }
+
+    12%{
+        opacity:1;
+        transform:translate(-50%,-4px) scale(1.2);
+    }
+
+    65%{
+        opacity:1;
+        transform:translate(-50%,-14px) scale(1);
+    }
+
+    100%{
+        opacity:0;
+        transform:translate(-50%,-26px) scale(1);
+    }
+
+}
+
+@keyframes damageFloatCrit{
+
+    0%{
+        opacity:0;
+        transform:translate(-50%,8px) scale(.45) rotate(-10deg);
+    }
+
+    10%{
+        opacity:1;
+        transform:translate(-50%,-12px) scale(1.25) rotate(7deg);
+    }
+
+    22%{
+        transform:translate(-50%,-7px) scale(1.08) rotate(-4deg);
+    }
+
+    36%{
+        transform:translate(-50%,-12px) scale(1.14) rotate(2deg);
+    }
+
+    68%{
+        opacity:1;
+        transform:translate(-50%,-22px) scale(1.05) rotate(0deg);
+    }
+
+    100%{
+        opacity:0;
+        transform:translate(-50%,-38px) scale(1) rotate(0deg);
+    }
+
+}
+
+/* =====================================================
+   技能名稱標籤（施放技能時顯示在自己格子裡）
+===================================================== */
+
+/*
+   ★ 修正（依照使用者要求，整個重新設計）：
+   技能名稱原本是一個小小的實心背景徽章
+   （黑字、彩色底、黑框），
+   使用者希望改成跟爆擊數字一樣的呈現方式：
+   大字、白邊描邊、飄浮動畫，
+   只是不用爆擊那個💥圖案，
+   而且把「數字」換成「技能中文名稱」，
+   顏色依元素區分：
+   火=紅、水=水藍、土=金黃、風=淡綠。
    文字範圍可以稍微超出卡片邊界沒關係，
    停留時間也拉長一點，
    讓玩家看得更清楚是誰放了什麼技能。
@@ -3909,9 +4143,270 @@ tail: error writing 'standard output': Broken pipe
 
 .custom-dropdown.open .custom-dropdown-label{
     border-color:#f0b429;
-    bbwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-tail: error writing 'standard output': Broken pipe
-�圖示的大小。
+    box-shadow:0 0 8px rgba(240,180,41,.4);
+}
+
+.custom-dropdown-arrow{
+    margin-left:8px;
+    font-size:11px;
+    color:#c9a35f;
+
+    transition:transform .2s ease;
+}
+
+.custom-dropdown.open .custom-dropdown-arrow{
+    transform:rotate(180deg);
+}
+
+.custom-dropdown-list{
+    position:absolute;
+    top:calc(100% + 4px);
+    left:0;
+    right:0;
+    z-index:400;
+
+    background:#1a140d;
+    border:1px solid #8a6a3a;
+    border-radius:8px;
+
+    max-height:0;
+    overflow:hidden;
+    opacity:0;
+
+    box-shadow:0 6px 16px rgba(0,0,0,.5);
+
+    transition:
+        max-height .22s ease,
+        opacity .18s ease;
+}
+
+.custom-dropdown.open .custom-dropdown-list{
+    max-height:220px;
+    opacity:1;
+    overflow-y:auto;
+}
+
+/*
+   ★ 修正（依照使用者回報，「按下去還是
+   沒反應」——這次真的挖到底了）：
+   上面那條規則是「.custom-dropdown.open
+   底下的.custom-dropdown-list」，一定要
+   清單還「留在」.custom-dropdown這個
+   外層容器裡面，這條CSS才會生效。
+
+   但moveDropdownListToBody()會把清單
+   整個搬到document.body底下（這是為了
+   逃出面板本身overflow:auto的裁切，
+   前幾輪修的那個問題），一旦搬走，清單
+   就不再是.custom-dropdown.open的子
+   元素，上面那條規則直接失效，清單
+   打回預設的max-height:0/opacity:0，
+   等於整個收合、看不到——這才是「箭頭
+   有反應（因為外層wrapper的open class
+   沒受影響），但清單完全展不開」的
+   真正原因。前一輪只修到z-index（清單
+   被彈窗背景蓋住），但清單其實從頭到尾
+   高度都收合成0，就算z-index對了也還是
+   看不到，兩個問題疊在一起，只修一個
+   當然還是沒用。
+
+   這裡直接讓清單自己身上也帶一個"open"
+   class（在moveDropdownListToBody()裡
+   加、closeCustomDropdown()裡拿掉），
+   不管清單現在人在哪裡（還在原本的
+   wrapper裡，或已經被搬到body），
+   只要它自己有open這個class就展開，
+   不用依賴「爸爸是誰」。
+*/
+
+.custom-dropdown-list.open{
+    max-height:220px;
+    opacity:1;
+    overflow-y:auto;
+}
+
+.custom-dropdown-item{
+    padding:9px 10px;
+
+    font-size:14px;
+    color:#e8ddc7;
+
+    cursor:pointer;
+
+    border-bottom:1px solid rgba(138,106,58,.25);
+
+    transition:background .12s ease;
+}
+
+.custom-dropdown-item:last-child{
+    border-bottom:0;
+}
+
+.custom-dropdown-item:active{
+    background:rgba(240,180,41,.15);
+}
+
+.custom-dropdown-item.selected{
+    color:#f0b429;
+    font-weight:bold;
+    background:rgba(240,180,41,.08);
+}
+
+.status-number{
+    flex:1;
+    text-align:center;
+    font-size:13px;
+    white-space:nowrap;
+}
+
+.status-btn{
+    width:44px;
+    height:44px;
+    flex:0 0 44px;
+    border:1px solid rgba(200,154,72,.38);
+    border-radius:9px;
+    background:linear-gradient(180deg,#2b2419,#14110d);
+    color:#ead9b4;
+    box-shadow:inset 0 1px 0 rgba(255,238,196,.04);
+    font-size:20px;
+    font-weight:900;
+    -webkit-tap-highlight-color:transparent;
+    -webkit-touch-callout:none;
+    user-select:none;
+}
+
+.status-points-line{
+    margin:10px 0 6px;
+    padding:8px 10px;
+    border-left:2px solid #c89a48;
+    background:rgba(18,13,8,.58);
+    color:#d8c7a6;
+    font-size:12px;
+    line-height:1.45;
+}
+
+/*
+   ★ 新增（依照使用者要求，「多一行註解
+   基本能力+裝備=總和」）：
+   純文字說明，放在六項屬性列表正上方，
+   解釋「9+0=9」這種格式的意思。
+*/
+
+.status-formula-hint{
+    font-size:11px;
+    color:#b3a58c;
+    text-align:center;
+    margin-bottom:6px;
+}
+
+/*
+   ★ 新增（依照使用者要求，「點數分配
+   顯示當前角色的HP、SP條，加點體質/
+   能量時可以預覽增加的動畫，血條會
+   合理縮短」）：
+   HP/SP各一條，上面是文字（目前值／
+   預覽後的上限），下面是實際的長條，
+   長條寬度＝目前HP÷預覽後上限的比例——
+   血量本身沒變、但上限變大了，比例
+   自然就會縮短，不用另外寫「縮短」的
+   特殊邏輯，純粹是比例計算的自然結果。
+*/
+
+.status-preview-bars{
+    margin-bottom:10px;
+}
+
+.status-preview-bar-row{
+    margin-bottom:6px;
+}
+
+.status-preview-bar-label{
+    display:flex;
+    justify-content:space-between;
+    font-size:11px;
+    margin-bottom:2px;
+}
+
+.status-preview-bar-track{
+    height:10px;
+
+    background:#1a140c;
+
+    border:1px solid var(--theme-border);
+    border-radius:5px;
+
+    overflow:hidden;
+}
+
+.status-preview-bar-fill{
+    height:100%;
+
+    border-radius:5px;
+
+    transition:width .25s ease;
+}
+
+.status-preview-bar-fill.hp{
+    background:linear-gradient(90deg,#7f1d1d,#dc2626);
+}
+
+.status-preview-bar-fill.sp{
+    background:linear-gradient(90deg,#1d3a7f,#2563eb);
+}
+
+.status-confirm{
+    width:100%;
+    min-height:44px;
+    margin-top:8px;
+    padding:8px 12px;
+    border:1px solid #c89a48;
+    border-radius:9px;
+    background:linear-gradient(180deg,#5a401f,#28180c);
+    color:#fff0c2;
+    box-shadow:inset 0 1px 0 rgba(255,238,196,.06);
+    font-weight:900;
+    font-size:14px;
+}
+
+.status-confirm:disabled{
+    opacity:.4;
+}
+
+/* =====================================================
+   技能
+===================================================== */
+
+.skill-select{
+    width:100%;
+
+    margin-top:8px;
+    padding:10px;
+
+    background:#17130f;
+    color:#f2ead9;
+
+    border:1px solid var(--theme-border);
+    border-radius:7px;
+
+    font-size:14px;
+}
+
+.skill-loadout-list{
+    display:grid;
+    gap:6px;
+    margin-top:10px;
+}
+
+/*
+   ★ 修正（依照使用者要求，「技能配裝只
+   顯示icon跟名稱，一排四個排一起比較省
+   空間」）：
+   原本4個裝備格是2x2排列、內容包含
+   分類標籤/描述/SP/移除按鈕一大串。
+   改成一排四個橫向排列（grid-template-
+   columns:repeat(4,1fr)），每格只留
+   圖示+名稱，其餘全部省略，格子本身
+   也縮小到接近圖示的大小。
 */
 
 .skill-loadout-row{
@@ -4456,8 +4951,7 @@ tail: error writing 'standard output': Broken pipe
        （尤其Samsung Browser）網址列/
        下方工具列會動態顯示/隱藏，vh在
        很多手機瀏覽器上是抓「工具列全部
-       收�tail: error writing 'standard output': Broken pipe
-�」時的最大可視高度去算，不是
+       收起」時的最大可視高度去算，不是
        抓「當下實際看得到」的高度，所以
        80vh在網址列還顯示著的時候，實際
        上會比畫面真正可視範圍還要高，
@@ -4695,8 +5189,7 @@ tail: error writing 'standard output': Broken pipe
        class本身的z-index提高到6050，
        確保所有從.home-feature-modal
        彈窗「裡面」再跳出來的第二層視窗
-       （物品詳細/技能詳細/屬性說明�tail: error writing 'standard output': Broken pipe
-�
+       （物品詳細/技能詳細/屬性說明）
        永遠疊在最外層那個彈窗之上。
     */
 
@@ -4867,8 +5360,7 @@ body.skill-detail-scroll-active,
     -webkit-user-drag:none;
     transform:translateZ(0) scale(.96);
     transform-origin:center;
-    filter:tail: error writing 'standard output': Broken pipe
-brightness(.88) saturate(.92);
+    filter:brightness(.88) saturate(.92);
     transition:filter .14s ease, transform .14s ease;
 }
 .nav-button.nav-art-button-wrap.active .nav-art-button{
@@ -4925,8 +5417,7 @@ brightness(.88) saturate(.92);
 }
 
 /*
-   ★ 修正（依照使用者回報，「背包�tail: error writing 'standard output': Broken pipe
-�面的角色切換按鈕與
+   ★ 修正（依照使用者回報，「背包介面的角色切換按鈕與
    返回按鈕重疊了」，這是同一個問題的第二部分）：
    所有背包情境共用同一個返回鍵幾何；context 只決定
    關閉後的返回目的地。
@@ -5210,9 +5701,625 @@ brightness(.88) saturate(.92);
     opacity:.92;
 }
 
-.bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-bwrap: Can't find source path /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-ba(0,0,0,.5);
+.nav-icon-backpack::before{
+    content:"";
+    position:absolute;
+    top:-6px;
+    left:50%;
+    transform:translateX(-50%);
+    width:10px;
+    height:7px;
+    border:2px solid currentColor;
+    border-bottom:0;
+    border-radius:5px 5px 0 0;
+    box-sizing:border-box;
+}
+
+.nav-icon-backpack::after{
+    content:"";
+    position:absolute;
+    top:3px;
+    left:50%;
+    transform:translateX(-50%);
+    width:8px;
+    height:6px;
+    background:#1a140d;
+    border-radius:2px;
+    opacity:.5;
+}
+
+/*
+   ★ 新增（依照使用者要求）：
+   四個屬性（火/水/風/土）的圖示，改用純
+   CSS畫，取代原本的🔥💧🌪️🪨這四個emoji。
+   跟導覽列圖示同一套邏輯，不同手機顯示
+   emoji長相不一樣的問題，用CSS畫的圖形
+   完全不受影響。
+
+   刻意用width/height:1em、相對定位，
+   讓這個圖示可以直接嵌在文字行內使用
+   （跟原本"🔥 火法師"這種emoji+文字
+   混在一起的用法相容），字級多大、
+   圖示就跟著多大，不用每個使用場合
+   各自訂一次尺寸。
+
+   額外加了呼吸發光動畫（animation:
+   elementIconGlow），四種屬性用不同的
+   發光顏色，讓這幾個圖示本身有生命感，
+   不是靜態圖案。
+*/
+
+@keyframes elementIconGlow{
+
+    0%,100%{
+        filter:brightness(1)
+            drop-shadow(0 0 1px currentColor);
+    }
+
+    50%{
+        filter:brightness(1.35)
+            drop-shadow(0 0 4px currentColor);
+    }
+
+}
+
+.elem-icon{
+    display:inline-block;
+    position:relative;
+    width:1em;
+    height:1em;
+    vertical-align:-0.15em;
+
+    animation:elementIconGlow 2.2s ease-in-out infinite;
+}
+
+/* ===== 火：火焰 ===== */
+
+.elem-icon-fire{
+    color:#ff6a2e;
+}
+
+.elem-icon-fire::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:currentColor;
+    border-radius:50% 50% 50% 0;
+    transform:rotate(-45deg);
+}
+
+.elem-icon-fire::after{
+    content:"";
+    position:absolute;
+    top:22%;
+    left:22%;
+    width:56%;
+    height:56%;
+    background:#fff3c4;
+    border-radius:50% 50% 50% 0;
+    transform:rotate(-45deg);
+    opacity:.85;
+}
+
+/* ===== 水：水滴 ===== */
+
+.elem-icon-water{
+    color:#38bdf8;
+}
+
+.elem-icon-water::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:currentColor;
+    border-radius:50% 50% 50% 50%/60% 60% 40% 40%;
+    clip-path:polygon(
+        50% 0%, 85% 55%, 85% 70%,
+        70% 90%, 30% 90%, 15% 70%, 15% 55%
+    );
+}
+
+.elem-icon-water::after{
+    content:"";
+    position:absolute;
+    top:48%;
+    left:32%;
+    width:22%;
+    height:22%;
+    background:#e0f7ff;
+    border-radius:50%;
+    opacity:.75;
+}
+
+/* ===== 風：風漩 ===== */
+
+.elem-icon-wind{
+    color:#4ade80;
+}
+
+.elem-icon-wind::before,
+.elem-icon-wind::after{
+    content:"";
+    position:absolute;
+    border:2px solid currentColor;
+    border-radius:50%;
+    border-right-color:transparent;
+    border-bottom-color:transparent;
+    box-sizing:border-box;
+}
+
+.elem-icon-wind::before{
+    inset:0;
+}
+
+.elem-icon-wind::after{
+    inset:26%;
+    border-width:1.6px;
+}
+
+/* ===== 土：岩石 ===== */
+
+.elem-icon-earth{
+    color:#a8845a;
+}
+
+.elem-icon-earth::before{
+    content:"";
+    position:absolute;
+    inset:8% 0 0 0;
+    background:currentColor;
+    clip-path:polygon(
+        50% 0%, 90% 30%, 100% 75%,
+        75% 100%, 25% 100%, 0% 75%, 10% 30%
+    );
+}
+
+.elem-icon-earth::after{
+    content:"";
+    position:absolute;
+    top:28%;
+    left:28%;
+    width:26%;
+    height:20%;
+    background:#e8ddc7;
+    opacity:.5;
+    clip-path:polygon(0% 0%, 100% 30%, 60% 100%, 0% 60%);
+}
+
+/* =====================================================
+   升級
+===================================================== */
+
+.modal{
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,.75);
+
+    display:none;
+
+    align-items:center;
+    justify-content:center;
+
+    z-index:1000;
+}
+
+.modal.show{
+    display:flex;
+}
+
+.modal-box{
+    width:82%;
+    max-width:350px;
+
+    background:#1a1613;
+
+    border:1px solid var(--theme-border);
+    border-radius:14px;
+
+    padding:20px;
+
+    text-align:center;
+}
+
+/* =====================================================
+   V129 — SECOND CHARACTER CREATION READABILITY
+===================================================== */
+#secondCharacterModal .modal-box{
+    width:86%;
+    max-width:370px;
+    max-height:90% !important;
+    box-sizing:border-box;
+    padding:24px;
+}
+
+#secondCharacterModal h2{
+    margin:0 0 12px;
+    font-size:25px;
+    line-height:1.3;
+}
+
+#secondCharacterModal .second-character-subtitle{
+    margin-bottom:16px !important;
+    font-size:15px !important;
+    line-height:1.6;
+}
+
+#secondCharacterModal .creation-card{
+    padding:17px;
+    margin-bottom:13px;
+}
+
+#secondCharacterModal .creation-label{
+    margin-bottom:10px;
+    font-size:16px;
+    line-height:1.4;
+}
+
+#secondCharacterModal .creation-input{
+    height:48px;
+    padding:0 14px;
+    font-size:18px;
+}
+
+#secondCharacterModal .element-grid{
+    gap:8px;
+}
+
+#secondCharacterModal .element-option{
+    min-height:64px;
+    padding:12px 4px;
+}
+
+#secondCharacterModal .element-name{
+    margin-top:0;
+    font-size:16px;
+    line-height:1.25;
+}
+
+#secondCharacterModal .creation-stat{
+    padding:10px 0;
+    font-size:16px;
+    line-height:1.4;
+}
+
+#secondCharacterModal .creation-stat-right{
+    gap:8px;
+}
+
+#secondCharacterModal .creation-stat-right > b{
+    min-width:22px;
+    text-align:center;
+    font-size:17px;
+}
+
+#secondCharacterModal .creation-stat-button{
+    width:34px;
+    height:34px;
+    font-size:21px;
+    line-height:1;
+}
+
+#secondCharacterModal .creation-points{
+    margin-top:13px;
+    font-size:16px;
+    line-height:1.4;
+}
+
+#secondCharacterModal .creation-start{
+    height:52px;
+    font-size:18px;
+}
+
+/* =====================================================
+   經驗池
+===================================================== */
+
+.exp-pool-panel{
+    width:100%;
+    padding:0;
+    background:transparent;
+    border:0;
+    box-sizing:border-box;
+}
+
+.exp-pool-hero{
+    position:relative;
+    overflow:hidden;
+    padding:18px 16px 16px;
+    border:1px solid #9a7438;
+    border-radius:14px;
+    background:
+        radial-gradient(circle at 50% -15%,rgba(240,180,41,.24),transparent 52%),
+        linear-gradient(160deg,#2a2115 0%,#171109 52%,#0e0b07 100%);
+    box-shadow:
+        inset 0 0 0 1px rgba(255,226,122,.06),
+        0 10px 24px rgba(0,0,0,.35);
+    text-align:center;
+}
+
+.exp-pool-hero::before,
+.exp-pool-hero::after{
+    content:"";
+    position:absolute;
+    top:14px;
+    width:52px;
+    height:1px;
+    background:linear-gradient(90deg,transparent,#b9914e);
+    opacity:.75;
+}
+.exp-pool-hero::before{left:12px;}
+.exp-pool-hero::after{right:12px;transform:scaleX(-1);}
+
+.exp-pool-kicker{
+    color:#a99572;
+    font-family:"Cinzel","Noto Serif TC",serif;
+    font-size:8px;
+    letter-spacing:2px;
+}
+
+.exp-pool-title{
+    margin-top:4px;
+    color:#f4dfaa;
+    font-family:"Noto Serif TC",serif;
+    font-size:17px;
+    font-weight:900;
+    letter-spacing:1px;
+}
+
+.exp-pool-total{
+    display:flex;
+    align-items:baseline;
+    justify-content:center;
+    gap:6px;
+    margin-top:9px;
+}
+
+.exp-pool-value{
+    color:#ffe27a;
+    font-family:"Cinzel","Noto Serif TC",serif;
+    font-weight:900;
+    font-size:27px;
+    line-height:1;
+    letter-spacing:.4px;
+    text-shadow:0 0 14px rgba(240,180,41,.26);
+}
+
+.exp-pool-unit{
+    color:#b99c61;
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:1px;
+}
+
+.exp-pool-caption{
+    max-width:310px;
+    margin:10px auto 0;
+    color:#a99b84;
+    font-size:10px;
+    line-height:1.55;
+}
+
+.exp-pool-section-head{
+    display:flex;
+    align-items:end;
+    justify-content:space-between;
+    margin:14px 3px 7px;
+    padding-bottom:6px;
+    border-bottom:1px solid rgba(154,116,56,.55);
+}
+.exp-pool-section-head span{
+    color:#ead5a5;
+    font-size:12px;
+    font-weight:900;
+}
+.exp-pool-section-head small{
+    color:#7f735f;
+    font-size:8px;
+}
+
+.exp-pool-character-list{
+    display:flex;
+    flex-direction:column;
+    gap:7px;
+}
+
+.exp-distribute-button{
+    width:100%;
+    min-height:58px;
+    margin:0;
+    padding:8px 10px;
+    display:grid;
+    grid-template-columns:34px minmax(0,1fr) auto;
+    align-items:center;
+    gap:9px;
+    border:1px solid #755a32;
+    border-radius:11px;
+    background:linear-gradient(160deg,#251c12,#120e09);
+    color:#ead9b5;
+    box-shadow:inset 0 0 0 1px rgba(255,226,122,.04);
+    text-align:left;
+}
+
+.exp-distribute-button:not(:disabled):active{
+    transform:translateY(1px);
+}
+
+.exp-character-icon{
+    width:34px;
+    height:34px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border:1px solid #8a6a3a;
+    border-radius:50%;
+    background:#0e0b07;
+    font-size:18px;
+}
+
+.exp-character-copy{
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+}
+.exp-character-copy strong{
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    color:#f0ddae;
+    font-size:12px;
+}
+.exp-character-copy small{
+    color:#8f826d;
+    font-size:9px;
+}
+
+.exp-character-cost{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    line-height:1;
+}
+.exp-character-cost b{
+    color:#ffe27a;
+    font-family:"Cinzel",sans-serif;
+    font-size:12px;
+}
+.exp-character-cost small{
+    margin-top:3px;
+    color:#947b4e;
+    font-size:7px;
+    letter-spacing:.8px;
+}
+
+.exp-distribute-button:disabled{
+    opacity:.38;
+    cursor:not-allowed;
+    filter:saturate(.55);
+}
+
+.exp-distribute-button.locked{
+    background:#2e2822;
+}
+
+.system-panel{
+    display:flex;
+    flex-direction:column;
+    gap:9px;
+}
+.system-panel-row{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:10px;
+    align-items:center;
+    padding:11px;
+    border:1px solid #6f542f;
+    border-radius:10px;
+    background:linear-gradient(160deg,#211910,#110d08);
+}
+.system-panel-row strong{
+    display:block;
+    color:#f0d9a4;
+    font-size:13px;
+}
+.system-panel-row small{
+    display:block;
+    margin-top:3px;
+    color:#948873;
+    font-size:9px;
+    line-height:1.45;
+}
+.system-panel-row.danger{
+    border-color:#6f3c31;
+}
+
+/* =====================================================
+   EXP 獲得提示（Toast）
+===================================================== */
+
+.exp-toast{
+    position:fixed;
+
+    left:50%;
+    top:14px;
+
+    transform:
+        translateX(-50%)
+        translateY(-30px);
+
+    background:#d4941f;
+    color:#0c0b0a;
+
+    font-weight:bold;
+    font-size:13px;
+
+    padding:9px 18px;
+    border-radius:20px;
+
+    box-shadow:0 4px 14px rgba(0,0,0,.4);
+
+    z-index:4000;
+
+    opacity:0;
+
+    transition:
+        opacity .25s ease,
+        transform .25s ease;
+
+    pointer-events:none;
+    white-space:nowrap;
+}
+
+.exp-toast.show{
+    opacity:1;
+
+    transform:
+        translateX(-50%)
+        translateY(0);
+}
+
+/*
+   ★ 新增（依照使用者要求，「升級的時候
+   可以跳出一個訊息框，顯示XXX升到XX級」）：
+   跟exp-toast同一種「輕量、不擋操作、
+   自動消失」的通知風格，不是要玩家按
+   確定才能關掉的那種彈窗（那種已經
+   照使用者要求拿掉了）。
+
+   z-index特別注意寫成6200，比目前彈窗
+   系統整套（.home-feature-modal是6000、
+   .item-modal是6050、skillDetailModal/
+   statusHelpModal是6060、下拉選單清單
+   是6100）都還高——因為升級這個動作
+   場景就是「在經驗池分配彈窗裡面按
+   分配」，觸發當下彈窗還開著，通知
+   一定要蓋得過彈窗背景才看得到，不然
+   又會重演「清單被彈窗蓋住看不到」
+   同一種bug。
+*/
+
+.level-up-toast{
+    position:fixed;
+
+    left:50%;
+    top:14px;
+
+    transform:
+        translateX(-50%)
+        translateY(-30px);
+
+    background:#f0b429;
+    color:#0c0b0a;
+
+    font-weight:900;
+    font-size:15px;
+
+    padding:11px 22px;
+    border-radius:20px;
+
+    box-shadow:0 4px 16px rgba(0,0,0,.5);
 
     z-index:6200;
 
@@ -5432,8 +6539,205 @@ html, body{
     width:1080px !important;
     height:1920px !important;
     overflow:visible !important;
-    pointer-events:none !ibwrap: Can't find source path /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-ortant;
+    pointer-events:none !important;
+    z-index:2147483000 !important;
+}
+
+#game-stage > #app > #game-content{
+    position:absolute !important;
+    left:0 !important;
+    top:0 !important;
+    width:420px !important;
+    height:746.6666667px !important;
+    max-width:none !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    transform:scale(2.571428571428571) !important;
+    transform-origin:top left !important;
+    overflow:hidden !important;
+}
+
+/* Any direct fixed/viewport sizing on the legacy app itself
+   must not escape the fixed game-stage. */
+#game-stage > #app{
+    position:absolute !important;
+}
+
+/* Full-screen modal layers remain constrained to the stage. */
+#game-stage .home-feature-modal,
+#game-stage .map-feature-modal,
+#game-stage .modal-overlay,
+#game-stage .popup-overlay{
+    max-width:none;
+}
+
+/* Prevent legacy viewport-sized blocks from creating a page scroll. */
+#game-stage, #game-stage > #app, #game-stage > #app > #game-content{
+    box-sizing:border-box;
+}
+
+/*
+   COMPLETE SCALE FIX:
+   All legacy full-screen/fixed UI is now contained by the
+   transformed 420×746.6667 design surface. 100vw/100vh
+   would otherwise escape to the real browser viewport.
+*/
+#game-stage > #app > #game-content .home-bg-fixed-layer,
+#game-stage > #app > #game-content .map-bg-fixed-layer,
+#game-stage > #app > #game-content .training-bg-fixed-layer{
+    position:absolute !important;
+    inset:0 !important;
+    width:420px !important;
+    height:746.6666667px !important;
+}
+
+#game-stage > #app > #game-content .map-quick-toggle-row{
+    position:absolute !important;
+    top:10px !important;
+    left:10px !important;
+}
+
+#game-stage > #app > #game-content .auto-settings-expanded.floating-modal{
+    position:absolute !important;
+    left:6px !important;
+    right:6px !important;
+    bottom:80px !important;
+    max-height:70% !important;
+}
+
+#game-stage > #app > #game-content .home-feature-modal,
+#game-stage > #app > #game-content .item-modal,
+#game-stage > #app > #game-content .modal,
+#game-stage > #app > #game-content .popup-overlay{
+    position:absolute !important;
+    inset:0 !important;
+    width:420px !important;
+    height:746.6666667px !important;
+}
+
+#game-stage > #app > #game-content .home-feature-modal-box.wide{
+    width:1080px !important;
+    max-width:1080px !important;
+    max-height:96% !important;
+}
+
+#game-stage > #app > #game-content .bottom-nav{
+    position:absolute !important;
+    left:0 !important;
+    bottom:0 !important;
+    width:420px !important;
+    max-width:none !important;
+}
+
+#game-stage > #app > #game-content .exp-toast,
+#game-stage > #app > #game-content .level-up-toast{
+    position:absolute !important;
+    top:14px !important;
+}
+
+#game-stage > #app > #game-content .autosave-indicator{
+    position:absolute !important;
+    right:10px !important;
+    bottom:78px !important;
+}
+
+#game-stage > #app > #game-content #mapBattleOverlay{
+    position:absolute !important;
+    left:0 !important;
+    right:0 !important;
+    bottom:70px !important;
+    width:420px !important;
+}
+
+#game-stage > #app > #game-content > div[style*="position:fixed"][style*="bottom:0"]{
+    position:absolute !important;
+    left:0 !important;
+    right:0 !important;
+    bottom:0 !important;
+    width:420px !important;
+}
+
+#game-stage > #app > #game-content .ice-spin-projectile,
+#game-stage > #app > #game-content .fire-rocket-projectile,
+#game-stage > #app > #game-content .skill-name-badge{
+    /* These are migrated to #game-overlay-layer by JS below. */
+    position:absolute !important;
+}
+
+
+
+/* ============================================================
+   V9 — NATIVE 1080×1920 COORDINATE STANDARD
+
+   IMPORTANT:
+   - Existing #game-content remains the LEGACY 420×746.6667 layer.
+   - Do NOT migrate existing gameplay UI in bulk in this version.
+   - All NEW UI / VFX / Hotspot / Canvas overlays should use the
+     native 1080×1920 coordinate space.
+   - #game-overlay-layer is the native coordinate layer.
+
+   This is an incremental migration:
+   old content stays stable, new content uses the final standard.
+============================================================ */
+
+:root{
+    --game-native-width: 1080px;
+    --game-native-height: 1920px;
+    --game-legacy-width: 420px;
+    --game-legacy-height: 746.6666667px;
+}
+
+#game-stage > #game-overlay-layer{
+    width:1080px !important;
+    height:1920px !important;
+    left:0 !important;
+    top:0 !important;
+    transform:none !important;
+    transform-origin:top left !important;
+    box-sizing:border-box !important;
+}
+
+/* Explicit class for future native 1080×1920 UI.
+   Do not use vw/vh for game-internal positioning. */
+.game-native-ui{
+    position:absolute;
+    left:0;
+    top:0;
+    width:1080px;
+    height:1920px;
+    box-sizing:border-box;
+    transform:none;
+    transform-origin:top left;
+}
+
+/* Native elements must not accidentally inherit legacy 420px sizing. */
+#game-stage > #game-overlay-layer .game-native-element{
+    box-sizing:border-box;
+}
+
+/* =====================================================
+   V105 — 戰鬥五大指令改用使用者提供的整組圖像面板
+   - 使用原圖，不重新生成、不重畫。
+   - mainBattleMenu 保留原本 66px 文件流高度，避免角色列、元素匣、
+     戰鬥資訊框因 UI 改圖而位移。
+   - 圖像本身向上延伸，五個透明點擊區分別覆蓋：
+     技能／普通攻擊／背包(既有物品功能)／防禦／逃脫。
+   - 技能快捷列仍以較高 z-index 覆蓋此面板，原戰鬥函式不變。
+===================================================== */
+#battlePage{
+    --battle-command-row-height:66px;
+    --battle-command-art-overhang:34px;
+    --battle-command-visual-height:calc(var(--battle-command-row-height) + var(--battle-command-art-overhang));
+    --battle-turn-row-height:36px;
+}
+
+#mainBattleMenu{
+    position:relative !important;
+    display:block !important;
+    overflow:visible !important;
+    height:66px !important;
     min-height:66px !important;
     background:none !important;
     border:0 !important;
@@ -6411,8 +7715,234 @@ body.creation-fixed-active{
 }
 
 #creationPage .creation-stat{
-    /* The 1080px native stagebwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
+    /* The 1080px native stage is rendered at one third size on a 360px
+       phone. Keep the real button box at 136px so its physical hit area is
+       at least 45px, without relying on transform scaling. */
+    min-height:184px;
+    padding:20px 18px 20px 20px;
+}
 
+#creationPage .creation-stat-copy{
+    flex:1 1 auto;
+    padding-right:12px;
+}
+
+#creationPage .creation-stat-copy b{
+    font-size:32px;
+    line-height:1.25;
+}
+
+#creationPage .creation-stat-copy small{
+    margin-top:7px;
+    overflow:visible;
+    font-size:22px;
+    line-height:1.3;
+    white-space:normal;
+    text-overflow:clip;
+}
+
+#creationPage .creation-stat-right{
+    gap:8px;
+}
+
+#creationPage .creation-stat-right > b{
+    min-width:36px;
+    font-size:35px;
+}
+
+#creationPage .creation-stat-button{
+    display:grid;
+    place-items:center;
+    width:136px;
+    min-width:136px;
+    height:136px;
+    min-height:136px;
+    padding:0;
+    border-radius:24px;
+    font-size:54px;
+    line-height:1;
+}
+
+#creationPage .creation-stat-details summary{
+    padding:27px 29px;
+    font-size:30px;
+    line-height:1.4;
+}
+
+#creationPage .creation-stat-details[open] .creation-stat-details-body{
+    padding:16px 29px 28px;
+    font-size:32px;
+    line-height:1.65;
+}
+
+#creationPage .creation-stat-details-body > div + div{
+    margin-top:16px;
+}
+
+#creationPage .creation-start{
+    position:relative;
+    z-index:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    width:100%;
+    height:132px;
+    border:2.571px solid #e1a541;
+    border-radius:30.857px;
+    background:
+        linear-gradient(180deg,#4c3518,#2b1c0d 55%,#1a1109);
+    color:#fff0ce;
+    box-shadow:
+        inset 0 2.571px 0 rgba(255,236,184,.18),
+        inset 0 -25.714px 46.286px rgba(0,0,0,.18),
+        0 18px 46.286px rgba(0,0,0,.28),
+        0 0 41.143px rgba(218,157,55,.12);
+}
+
+#creationPage .creation-action-row{
+    display:grid;
+    grid-template-columns:330px minmax(0,1fr);
+    gap:22px;
+    margin-top:auto;
+    flex:0 0 132px;
+    min-height:132px;
+}
+
+/* Step two is a fixed, non-scrollable 1080x1920 canvas. Keep its final
+   actions anchored inside the safe area instead of letting flex-shrink
+   collapse the row when typography or browser metrics consume more room. */
+#creationPage .creation-step-two{
+    padding-bottom:154px;
+}
+
+#creationPage .creation-step-two > .creation-action-row{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:0;
+    z-index:40;
+    margin-top:0;
+}
+
+#creationPage .creation-start span{
+    font-family:"Noto Serif TC",serif;
+    font-size:38.571px;
+    font-weight:900;
+    letter-spacing:7.714px;
+}
+
+#creationPage .creation-start small{
+    margin-top:5.143px;
+    color:#b99c6a;
+    font-family:"Cinzel",serif;
+    font-size:15.429px;
+    letter-spacing:5.143px;
+}
+
+#creationPage .creation-start:active{
+    filter:brightness(.92);
+}
+
+#creationPage .creation-bottom-space{
+    display:none;
+}
+
+/* Element themes */
+#creationPage[data-element="fire"]{
+    --creation-accent:#d95a38;
+    --creation-accent-light:#ff9a79;
+    --creation-accent-soft:rgba(217,90,56,.15);
+    --creation-accent-border:rgba(224,96,61,.34);
+    --creation-glow:rgba(229,76,39,.24);
+}
+#creationPage[data-element="water"]{
+    --creation-accent:#4d8fd7;
+    --creation-accent-light:#91c6ff;
+    --creation-accent-soft:rgba(77,143,215,.15);
+    --creation-accent-border:rgba(95,157,224,.34);
+    --creation-glow:rgba(66,139,225,.24);
+}
+#creationPage[data-element="wind"]{
+    --creation-accent:#53a978;
+    --creation-accent-light:#8ee6ae;
+    --creation-accent-soft:rgba(83,169,120,.15);
+    --creation-accent-border:rgba(92,184,130,.34);
+    --creation-glow:rgba(70,183,115,.22);
+}
+#creationPage[data-element="earth"]{
+    --creation-accent:#bd8a3d;
+    --creation-accent-light:#efc46f;
+    --creation-accent-soft:rgba(189,138,61,.15);
+    --creation-accent-border:rgba(205,154,71,.34);
+    --creation-glow:rgba(197,145,55,.22);
+}
+
+#creationPage[data-element="fire"] .creation-portrait-aura{
+    background:radial-gradient(circle,rgba(255,83,35,.44),rgba(255,83,35,0) 68%);
+    box-shadow:0 0 108px rgba(255,75,32,.18);
+}
+#creationPage[data-element="water"] .creation-portrait-aura{
+    background:radial-gradient(circle,rgba(57,140,255,.42),rgba(57,140,255,0) 68%);
+    box-shadow:0 0 108px rgba(57,140,255,.18);
+}
+#creationPage[data-element="wind"] .creation-portrait-aura{
+    background:radial-gradient(circle,rgba(65,205,113,.38),rgba(65,205,113,0) 68%);
+    box-shadow:0 0 108px rgba(65,205,113,.16);
+}
+#creationPage[data-element="earth"] .creation-portrait-aura{
+    background:radial-gradient(circle,rgba(222,167,66,.40),rgba(222,167,66,0) 68%);
+    box-shadow:0 0 108px rgba(222,167,66,.16);
+}
+
+/* Samsung Browser paint stability:
+   avoid nested paint containment/compositor islands inside the scaled,
+   scrollable stage. The legacy app is removed from paint separately. */
+#creationPage .creation-showcase,
+#creationPage .creation-portrait-panel{
+    contain:none;
+}
+
+#creationPage .creation-portrait-aura{
+    filter:none;
+}
+
+#creationPage .creation-portrait-image{
+    display:block;
+    image-rendering:auto;
+    -webkit-backface-visibility:visible;
+    backface-visibility:visible;
+}
+
+
+
+/* =====================================================
+   V125 — TAPPABLE CREATION SKILL PREVIEW
+   Native dimensions only. No transform-based migration.
+===================================================== */
+
+#creationPage .creation-skill-chip{
+    appearance:none;
+    -webkit-appearance:none;
+    margin:0;
+    font-family:inherit;
+    text-align:center;
+    cursor:pointer;
+    touch-action:manipulation;
+    -webkit-tap-highlight-color:transparent;
+    transition:
+        filter .1s ease,
+        border-color .1s ease,
+        background .1s ease;
+}
+
+#creationPage .creation-skill-chip:active{
+    filter:brightness(.78);
+    border-color:var(--creation-accent,#d89d39);
+}
+
+#creationPage .creation-skill-chip:focus-visible{
+    outline:5.143px solid var(--creation-accent-light,#f4c775);
     outline-offset:5.143px;
 }
 
@@ -6649,8 +8179,231 @@ body.creation-fixed-active{
     --creation-skill-glow:rgba(66,139,225,.18);
 }
 
-#creationSkillDetbwrap: Can't find source path /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-mp(21px,6vw,34px);
+#creationSkillDetailModal[data-element="wind"]{
+    --creation-skill-accent:#53a978;
+    --creation-skill-light:#8ee6ae;
+    --creation-skill-soft:rgba(83,169,120,.15);
+    --creation-skill-glow:rgba(70,183,115,.17);
+}
+
+#creationSkillDetailModal[data-element="earth"]{
+    --creation-skill-accent:#bd8a3d;
+    --creation-skill-light:#efc46f;
+    --creation-skill-soft:rgba(189,138,61,.15);
+    --creation-skill-glow:rgba(197,145,55,.17);
+}
+
+
+/* bundled source: css/51-v173.20-startup-loader.css */
+/* =====================================================
+   V173.20 — 開場載入動畫
+   唯一 owner：#startupLoader
+   Critical Boot 尚未載入 1080×1920 stage scaler，因此此層必須直接使用
+   browser viewport；不能再以 #game-stage 的 50%/50% 原點顯示原生尺寸。
+===================================================== */
+
+#game-stage > #startupLoader{
+    position:fixed;
+    inset:0;
+    z-index:2147483646;
+    width:100vw;
+    height:100dvh;
+    max-width:none;
+    max-height:none;
+    overflow:hidden;
+    background:#000;
+    color:#f7e7bd;
+    font-family:"Noto Serif TC","Noto Sans TC",serif;
+    opacity:1;
+    visibility:visible;
+    touch-action:manipulation;
+    user-select:none;
+    -webkit-user-select:none;
+    transition:opacity .72s ease,visibility 0s linear .72s;
+}
+
+#game-stage > #startupLoader[hidden]{
+    display:none !important;
+}
+
+#game-stage > #startupLoader.is-leaving{
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+}
+
+#startupLoader .startup-scene{
+    position:absolute;
+    inset:0;
+    overflow:hidden;
+    opacity:0;
+    transition:opacity 1.05s ease;
+}
+
+#startupLoader .startup-scene.is-active{
+    opacity:1;
+}
+
+#startupLoader .startup-scene-image{
+    display:block;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    object-position:center;
+    pointer-events:none;
+}
+
+#startupLoader .startup-logo-scene{
+    z-index:1;
+    background:#000;
+}
+
+#startupLoader .startup-logo-scene .startup-scene-image{
+    animation:startupLogoBreath 4.2s ease-in-out infinite alternate;
+}
+
+#startupLoader .startup-city-scene{
+    z-index:2;
+    background:#17130f;
+}
+
+#startupLoader .startup-city-scene.is-active .startup-scene-image{
+    animation:startupCityDrift 9s ease-out both;
+}
+
+#startupLoader .startup-element-light{
+    position:absolute;
+    z-index:2;
+    width:clamp(120px,38vw,390px);
+    height:clamp(120px,38vw,390px);
+    border-radius:50%;
+    opacity:0;
+    transform:translate(-50%,-50%) scale(.72);
+    mix-blend-mode:screen;
+    filter:blur(clamp(3px,1vw,8px));
+    pointer-events:none;
+    animation:startupElementCycle 3.8s ease-in-out infinite both;
+}
+
+#startupLoader .startup-element-light.fire{
+    left:34%;
+    top:38.5%;
+    background:radial-gradient(circle,rgba(255,220,112,.92) 0,rgba(255,74,18,.52) 28%,rgba(156,14,0,.18) 50%,transparent 72%);
+    animation-delay:0s;
+}
+
+#startupLoader .startup-element-light.water{
+    left:68%;
+    top:38.5%;
+    background:radial-gradient(circle,rgba(218,250,255,.94) 0,rgba(33,173,255,.56) 30%,rgba(0,60,195,.2) 52%,transparent 72%);
+    animation-delay:.95s;
+}
+
+#startupLoader .startup-element-light.wind{
+    left:34%;
+    top:62.5%;
+    background:radial-gradient(circle,rgba(217,255,222,.92) 0,rgba(24,231,111,.5) 30%,rgba(0,109,48,.18) 52%,transparent 72%);
+    animation-delay:1.9s;
+}
+
+#startupLoader .startup-element-light.earth{
+    left:68%;
+    top:62.5%;
+    background:radial-gradient(circle,rgba(255,244,181,.94) 0,rgba(255,177,47,.54) 30%,rgba(139,70,0,.2) 52%,transparent 72%);
+    animation-delay:2.85s;
+}
+
+#startupLoader .startup-logo-scene:not(.is-active) .startup-element-light{
+    animation-play-state:paused;
+    opacity:0;
+}
+
+#startupLoader .startup-vignette{
+    position:absolute;
+    inset:0;
+    z-index:3;
+    pointer-events:none;
+    background:
+        linear-gradient(180deg,rgba(0,0,0,.08) 0%,transparent 50%,rgba(0,0,0,.78) 100%),
+        radial-gradient(ellipse at center,transparent 46%,rgba(0,0,0,.26) 100%);
+}
+
+#startupLoader .startup-loading-panel{
+    position:absolute;
+    left:50%;
+    right:auto;
+    bottom:max(18px,env(safe-area-inset-bottom));
+    z-index:4;
+    width:min(calc(100% - 28px),680px);
+    min-height:0;
+    box-sizing:border-box;
+    padding:clamp(15px,4.4vw,30px) clamp(16px,5vw,34px) clamp(14px,4vw,26px);
+    border:1px solid rgba(229,190,103,.72);
+    border-radius:clamp(10px,3vw,14px);
+    transform:translateX(-50%);
+    background:linear-gradient(180deg,rgba(13,11,8,.88),rgba(3,3,3,.96));
+    box-shadow:
+        0 12px 36px rgba(0,0,0,.72),
+        inset 0 0 26px rgba(225,174,72,.07),
+        0 0 18px rgba(224,175,76,.1);
+}
+
+#startupLoader .startup-loading-panel::before,
+#startupLoader .startup-loading-panel::after{
+    content:"◆";
+    position:absolute;
+    top:-10px;
+    color:#f2cc73;
+    font-size:clamp(14px,4vw,24px);
+    line-height:1;
+    text-shadow:0 0 10px rgba(255,201,91,.75);
+}
+
+#startupLoader .startup-loading-panel::before{left:18px;}
+#startupLoader .startup-loading-panel::after{right:18px;}
+
+#startupLoader .startup-status-row{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:clamp(10px,3vw,22px);
+}
+
+#startupLoader .startup-status-copy{
+    min-width:0;
+    flex:1 1 auto;
+}
+
+#startupLoader .startup-status-title{
+    overflow:hidden;
+    color:#fff4d2;
+    font-size:clamp(18px,5.2vw,29px);
+    font-weight:900;
+    line-height:1.28;
+    letter-spacing:.04em;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    text-shadow:0 2px 5px #000,0 0 10px rgba(255,202,102,.25);
+}
+
+#startupLoader .startup-status-detail{
+    margin-top:6px;
+    overflow:hidden;
+    color:rgba(224,213,187,.8);
+    font-family:"Noto Sans TC",sans-serif;
+    font-size:clamp(11px,3.25vw,17px);
+    font-weight:500;
+    line-height:1.35;
+    letter-spacing:.02em;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+#startupLoader .startup-percent{
+    flex:0 0 auto;
+    color:#f8d879;
+    font-family:"Cinzel","Noto Serif TC",serif;
+    font-size:clamp(21px,6vw,34px);
     font-weight:900;
     line-height:1;
     letter-spacing:.025em;
