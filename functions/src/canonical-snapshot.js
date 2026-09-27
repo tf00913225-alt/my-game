@@ -33,6 +33,7 @@ function stable(value){
 }
 function digest(value){ return createHash("sha256").update(JSON.stringify(value),"utf8").digest("hex"); }
 function snapshotDigest(value){ return digest(stable(value)); }
+function claimRecordsDigest(records){ return digest(stable(records)); }
 
 // The future protected writer supplies server-owned records at one revision.
 // This pure reader never reads a client candidate, changes Firestore, or
@@ -174,7 +175,7 @@ function assembleCanonicalSnapshot(uid,revision,records){
     check(records.claimCheckpoint,"claim checkpoint");
     if(!Array.isArray(records.claimRecords)||
        records.claimCheckpoint.claimCount!==records.claimRecords.length||
-       records.claimCheckpoint.claimDigest!==digest(records.claimRecords)||
+       records.claimCheckpoint.claimDigest!==claimRecordsDigest(records.claimRecords)||
        records.claimCheckpoint.historicalClaimsBlocked!==
            (provenance==="grandfathered-unverified-history")){
         fail("claim checkpoint");
@@ -229,4 +230,4 @@ function verifyCanonicalSnapshotAgainstSources(bundle,uid,revision,records){
 }
 
 module.exports={assembleCanonicalSnapshot,inspectCanonicalSnapshot,
-    verifyCanonicalSnapshotAgainstSources,MAX_SNAPSHOT_BYTES};
+    verifyCanonicalSnapshotAgainstSources,claimRecordsDigest,MAX_SNAPSHOT_BYTES};

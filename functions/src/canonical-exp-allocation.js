@@ -1,6 +1,6 @@
 "use strict";
 
-const {assembleCanonicalSnapshot,verifyCanonicalSnapshotAgainstSources}=
+const {assembleCanonicalSnapshot,verifyCanonicalSnapshotAgainstSources,claimRecordsDigest}=
     require("./canonical-snapshot");
 const {newcomerExpNext}=require("./canonical-newcomer-exp");
 const {source,readOwnedSources,advanceOwnedRecords,advanceOwnedSources}=
@@ -82,7 +82,7 @@ function createCanonicalExpAllocation({db,FieldValue,HttpsError,runProtected,
             }
             const previous=account.serverRevision;
             if(!Number.isSafeInteger(previous)||previous<1||
-               previous>expectedRevision||checkpointSnap.get("claimCount")!==0||
+               previous>expectedRevision||
                !/^[a-f0-9]{64}$/.test(account.snapshotSha256||"")){
                 fail("failed-precondition","Source revision or claim state is invalid.");
             }
@@ -141,6 +141,8 @@ function createCanonicalExpAllocation({db,FieldValue,HttpsError,runProtected,
                 expNext:nextExpNext,attributePoints:state.attributePoints+5,
                 skillPoints:state.skillPoints+2,bonusHP:state.bonusHP+30,
                 bonusSP:state.bonusSP+10};
+            const nextClaimRecords=records.claimRecords.map(record=>
+                ({...record,serverRevision:revision}));
             const nextRecords={...records,...advanceOwnedRecords(records,revision),
                 account:{...records.account,serverRevision:revision},
                 characters:[{...character,serverRevision:revision,state:nextState}],
@@ -148,7 +150,8 @@ function createCanonicalExpAllocation({db,FieldValue,HttpsError,runProtected,
                     sharedExp:economy.sharedExp-cost},
                 relicLoadout:{...records.relicLoadout,serverRevision:revision},
                 progress:{...records.progress,serverRevision:revision},
-                claimCheckpoint:{...records.claimCheckpoint,serverRevision:revision}};
+                claimCheckpoint:{...records.claimCheckpoint,serverRevision:revision,
+                    claimDigest:claimRecordsDigest(nextClaimRecords)}};
             let bundle;
             try{bundle=assembleCanonicalSnapshot(uid,revision,nextRecords);}
             catch(_){fail("data-loss","Next character projection is invalid.");}
@@ -157,9 +160,11 @@ function createCanonicalExpAllocation({db,FieldValue,HttpsError,runProtected,
             tx.update(characterRef,{serverRevision:revision,state:nextState,updatedAt:stamp});
             tx.update(economyRef,{serverRevision:revision,
                 sharedExp:nextRecords.economy.sharedExp,updatedAt:stamp});
-            for(const ref of [loadoutRef,progressRef,checkpointRef]){
+            for(const ref of [loadoutRef,progressRef]){
                 tx.update(ref,{serverRevision:revision,updatedAt:stamp});
             }
+            tx.update(checkpointRef,{serverRevision:revision,
+                claimDigest:nextRecords.claimCheckpoint.claimDigest,updatedAt:stamp});
             advanceOwnedSources(tx,owned.refs,revision,stamp);
             tx.create(root.collection("playableSnapshots").doc(String(revision)),
                 {...bundle,createdAt:stamp});

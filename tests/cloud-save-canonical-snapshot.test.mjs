@@ -1,14 +1,12 @@
 import assert from "node:assert/strict";
-import {createHash} from "node:crypto";
 import {createRequire} from "node:module";
 import test from "node:test";
 
 const require=createRequire(import.meta.url);
 const {assembleCanonicalSnapshot,inspectCanonicalSnapshot,
-    verifyCanonicalSnapshotAgainstSources}=require(
+    verifyCanonicalSnapshotAgainstSources,claimRecordsDigest}=require(
     "../functions/src/canonical-snapshot.js");
 const {LEGACY_BACKUP_SIDECARS}=require("../functions/src/cloud-save-policy.js");
-const digest=value=>createHash("sha256").update(JSON.stringify(value)).digest("hex");
 
 function sources(count=1){
     const base={schemaVersion:1,ownerUid:"uid-a",serverRevision:7,
@@ -40,7 +38,7 @@ function sources(count=1){
         progress:{...base,dailyQuestState:{},commissionQuestState:{},
             achievementState:{},gameplayProgress:{},abyssProgress:{},sidecars},
         claimRecords,
-        claimCheckpoint:{...base,claimCount:1,claimDigest:digest(claimRecords),
+        claimCheckpoint:{...base,claimCount:1,claimDigest:claimRecordsDigest(claimRecords),
             historicalClaimsBlocked:true}
     };
 }
@@ -69,6 +67,8 @@ test("snapshot digest survives Firestore map key reordering",()=>{
     second.account=Object.fromEntries(Object.entries(second.account).reverse());
     second.characters[0].state=Object.fromEntries(
         Object.entries(second.characters[0].state).reverse());
+    second.claimRecords[0]=Object.fromEntries(
+        Object.entries(second.claimRecords[0]).reverse());
     const original=assembleCanonicalSnapshot("uid-a",7,first);
     const reordered=assembleCanonicalSnapshot("uid-a",7,second);
     assert.equal(reordered.sha256,original.sha256);
@@ -105,7 +105,7 @@ test("missing claim source, claim conflict, oversized or tampered snapshot canno
     const corrupt=sources();corrupt.progress.sidecars["abyss-state"].raw="{oops";
     assert.throws(()=>assembleCanonicalSnapshot("uid-a",7,corrupt),/sidecar JSON/);
     const unblocked=sources();unblocked.claimRecords[0].status="claimed";
-    unblocked.claimCheckpoint.claimDigest=digest(unblocked.claimRecords);
+    unblocked.claimCheckpoint.claimDigest=claimRecordsDigest(unblocked.claimRecords);
     assert.throws(()=>assembleCanonicalSnapshot("uid-a",7,unblocked),/blocking record/);
     const tooLarge=sources();tooLarge.progress.dailyQuestState={raw:"x".repeat(800*1024)};
     assert.throws(()=>assembleCanonicalSnapshot("uid-a",7,tooLarge),/size budget/);
