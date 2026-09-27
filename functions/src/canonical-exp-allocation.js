@@ -3,13 +3,11 @@
 const {assembleCanonicalSnapshot,verifyCanonicalSnapshotAgainstSources}=
     require("./canonical-snapshot");
 const {newcomerExpNext}=require("./canonical-newcomer-exp");
+const {source,readOwnedSources,advanceOwnedRecords,advanceOwnedSources}=
+    require("./canonical-owned-sources");
 const ID=/^[A-Za-z0-9_-]{16,64}$/;
 // js/28-v133-economy-rebalance.js owns the current game level ceiling.
 const MAX_CHARACTER_LEVEL=100;
-const source=data=>{
-    const {createdAt,updatedAt,snapshotSha256,...record}=data;
-    return record;
-};
 
 // One server-created character, one level per protected operation. The client
 // supplies an operation ID and expected revision, never a cost or new stats.
@@ -96,10 +94,11 @@ function createCanonicalExpAllocation({db,FieldValue,HttpsError,runProtected,
                priorSnap.get("sha256")!==account.snapshotSha256){
                 fail("data-loss","Previous canonical snapshot is missing.");
             }
+            const owned=await readOwnedSources(tx,root,fail);
             const records={account:source(account),characters:[source(characterSnap.data())],
-                economy:source(economy),inventory:[],equipment:[],relics:[],
+                economy:source(economy),...owned.records,
                 relicLoadout:source(loadoutSnap.data()),progress:source(progressSnap.data()),
-                claimCheckpoint:source(checkpointSnap.data()),claimRecords:[]};
+                claimCheckpoint:source(checkpointSnap.data())};
             try{verifyCanonicalSnapshotAgainstSources(priorSnap.data(),uid,previous,records);}
             catch(_){fail("data-loss","Previous sources differ from snapshot.");}
             const character=records.characters[0],state=character.state;
@@ -142,7 +141,7 @@ function createCanonicalExpAllocation({db,FieldValue,HttpsError,runProtected,
                 expNext:nextExpNext,attributePoints:state.attributePoints+5,
                 skillPoints:state.skillPoints+2,bonusHP:state.bonusHP+30,
                 bonusSP:state.bonusSP+10};
-            const nextRecords={...records,
+            const nextRecords={...records,...advanceOwnedRecords(records,revision),
                 account:{...records.account,serverRevision:revision},
                 characters:[{...character,serverRevision:revision,state:nextState}],
                 economy:{...records.economy,serverRevision:revision,
@@ -161,6 +160,7 @@ function createCanonicalExpAllocation({db,FieldValue,HttpsError,runProtected,
             for(const ref of [loadoutRef,progressRef,checkpointRef]){
                 tx.update(ref,{serverRevision:revision,updatedAt:stamp});
             }
+            advanceOwnedSources(tx,owned.refs,revision,stamp);
             tx.create(root.collection("playableSnapshots").doc(String(revision)),
                 {...bundle,createdAt:stamp});
             tx.create(operationRef,{schemaVersion:1,ownerUid:uid,operationId,

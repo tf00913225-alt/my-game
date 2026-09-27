@@ -2,11 +2,9 @@
 
 const {assembleCanonicalSnapshot,verifyCanonicalSnapshotAgainstSources}=
     require("./canonical-snapshot");
+const {source,readOwnedSources,advanceOwnedRecords,advanceOwnedSources}=
+    require("./canonical-owned-sources");
 const ID=/^[A-Za-z0-9_-]{16,64}$/;
-const source=data=>{
-    const {createdAt,updatedAt,snapshotSha256,...record}=data;
-    return record;
-};
 
 // Internal gold/EXP pool settlement for the first server-created character.
 // There is no callable or browser amount input. Later source-set mutations
@@ -100,12 +98,11 @@ function createCanonicalResourceCredit({db,FieldValue,HttpsError,runProtected,
                previousSnapshotSnap.get("sha256")!==account.snapshotSha256){
                 fail("data-loss","Previous canonical source snapshot is missing.");
             }
-            // The initial source has empty inventory/equipment/relic/claim sets.
-            // Any later state needs a different complete mutation owner.
+            const owned=await readOwnedSources(tx,root,fail);
             const records={account:source(account),characters:[source(characterSnap.data())],
-                economy:source(economy),inventory:[],equipment:[],relics:[],
+                economy:source(economy),...owned.records,
                 relicLoadout:source(loadoutSnap.data()),progress:source(progressSnap.data()),
-                claimCheckpoint:source(checkpointSnap.data()),claimRecords:[]};
+                claimCheckpoint:source(checkpointSnap.data())};
             try{verifyCanonicalSnapshotAgainstSources(previousSnapshotSnap.data(),
                 uid,previous,records);}catch(_){
                 fail("data-loss","Previous canonical sources differ from snapshot.");
@@ -115,7 +112,7 @@ function createCanonicalResourceCredit({db,FieldValue,HttpsError,runProtected,
                 fail("failed-precondition","Resource balance exceeds safe range.");
             }
             const revision=nextRevision(envelope);
-            const nextRecords={...records,
+            const nextRecords={...records,...advanceOwnedRecords(records,revision),
                 account:{...records.account,serverRevision:revision},
                 characters:records.characters.map(c=>({...c,serverRevision:revision})),
                 economy:{...records.economy,serverRevision:revision,
@@ -132,6 +129,7 @@ function createCanonicalResourceCredit({db,FieldValue,HttpsError,runProtected,
             for(const ref of [loadoutRef,progressRef,checkpointRef]){
                 tx.update(ref,{serverRevision:revision,updatedAt:stamp});
             }
+            advanceOwnedSources(tx,owned.refs,revision,stamp);
             tx.create(root.collection("playableSnapshots").doc(String(revision)),
                 {...bundle,createdAt:stamp});
             tx.create(claimRef,{schemaVersion:1,ownerUid:uid,grantId,operationId,
