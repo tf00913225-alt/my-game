@@ -1,3 +1,9 @@
+## PERMANENT DEV MERGE LOCK（永久 dev 合併鎖）
+
+- 所有平行施工可以完成分支、Commit、PR、Build、QA 與 CI，但 **沒有專案負責人的精確口令 `MERGE-DEV PR #<PR_NUMBER>` 時，禁止自行 Merge 到 `dev`**。
+- `繼續`、`接下來`、`可以`、`做完`、`不要停`、`依你建議` 等自然語句都不構成 Merge 授權。
+- CI 全綠後若未收到精確口令，必須停在 `READY_FOR_DEV_MERGE`。若另一條工作先進 `dev`，本 PR 在真正合併前必須重新同步最新 `dev`、重跑必要 Test／Build／CI。
+- 完整永久規則以 `AGENTS.md` 的「十三之二、DEV MERGE LOCK」為最高權威。
 ## 2026-09-27 — Canonical one-level EXP allocation (candidate; Phase 4 0/6 VERIFIED)
 
 - New internal owner `functions/src/canonical-exp-allocation.js::allocateSharedExp()` spends only the server-owned shared EXP pool for the first server-created character. One protected operation buys exactly one next level using the current game's cost and growth rules. It commits character/economy/source revisions, an unpublished snapshot, a UID-scoped operation receipt and a ledger entry atomically; retries return that receipt.
