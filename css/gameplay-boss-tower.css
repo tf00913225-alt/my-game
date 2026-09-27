@@ -147,9 +147,14 @@
     border:1px solid #7f6034;
     border-radius:11px;
     color:#eadfc9;
-    background:
-        linear-gradient(90deg,rgba(33,22,12,.96),rgba(13,9,6,.88)),
+    --gameplay-cover-image:none;
+    background-image:
+        linear-gradient(90deg,rgba(24,15,9,.92) 0%,rgba(13,9,6,.78) 48%,rgba(13,9,6,.36) 72%,rgba(13,9,6,.16) 100%),
+        var(--gameplay-cover-image),
         radial-gradient(circle at 90% 10%,rgba(209,150,54,.2),transparent 46%);
+    background-position:center,center,center;
+    background-size:cover,cover,cover;
+    background-repeat:no-repeat;
     box-shadow:inset 0 0 0 1px rgba(255,229,169,.045),0 6px 14px rgba(0,0,0,.36);
     text-align:left;
 }
@@ -218,6 +223,11 @@
     font-weight:900;
     text-shadow:0 2px 2px #000;
 }
+
+#game-stage .gameplay-mode-card.boss{ --gameplay-cover-image:url("../assets/gameplay/covers/boss.webp"); }
+#game-stage .gameplay-mode-card.tower{ --gameplay-cover-image:url("../assets/gameplay/covers/tower.webp"); }
+#game-stage .gameplay-mode-card.abyss{ --gameplay-cover-image:url("../assets/gameplay/covers/abyss.webp"); }
+#game-stage .gameplay-mode-card.coming-soon{ --gameplay-cover-image:url("../assets/gameplay/covers/coming-soon.webp"); }
 
 #game-stage .gameplay-mode-card.abyss .gameplay-mode-seal{ color:#b7c9ea; border-color:#5d7197; }
 #game-stage .gameplay-mode-card.tower .gameplay-mode-seal{ color:#e8875d; border-color:#9e5434; }
@@ -494,11 +504,21 @@
     padding:17px;
     border:2px solid var(--tower-color,#c15b39);
     border-radius:12px;
-    background:
+    --tower-hero-image:none;
+    background-image:
+        linear-gradient(180deg,rgba(9,6,4,.20),rgba(9,6,4,.72)),
         radial-gradient(circle at 50% 28%,var(--tower-glow,rgba(193,91,57,.28)),transparent 48%),
-        linear-gradient(180deg,#21150d,#090604);
+        var(--tower-hero-image);
+    background-position:center,center,center;
+    background-size:cover,cover,cover;
+    background-repeat:no-repeat;
     text-align:center;
 }
+
+#game-stage .tower-element-hero[data-tower-element="fire"]{ --tower-hero-image:url("../assets/gameplay/tower/tower-fire-hero.webp"); }
+#game-stage .tower-element-hero[data-tower-element="earth"]{ --tower-hero-image:url("../assets/gameplay/tower/tower-earth-hero.webp"); }
+#game-stage .tower-element-hero[data-tower-element="water"]{ --tower-hero-image:url("../assets/gameplay/tower/tower-water-hero.webp"); }
+#game-stage .tower-element-hero[data-tower-element="wind"]{ --tower-hero-image:url("../assets/gameplay/tower/tower-wind-hero.webp"); }
 
 #game-stage .tower-element-hero::before{
     content:"塔";

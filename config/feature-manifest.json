@@ -79,6 +79,16 @@
       ],
       "dependencies": [
         "gameplay-core"
+      ],
+      "assets": [
+        "assets/gameplay/covers/boss.webp",
+        "assets/gameplay/covers/tower.webp",
+        "assets/gameplay/covers/abyss.webp",
+        "assets/gameplay/covers/coming-soon.webp",
+        "assets/gameplay/tower/tower-fire-hero.webp",
+        "assets/gameplay/tower/tower-earth-hero.webp",
+        "assets/gameplay/tower/tower-water-hero.webp",
+        "assets/gameplay/tower/tower-wind-hero.webp"
       ]
     },
     "feature-adventure": {

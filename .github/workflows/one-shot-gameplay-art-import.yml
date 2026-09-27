@@ -1,0 +1,86 @@
+name: One-shot gameplay artwork import
+
+on:
+  push:
+    branches:
+      - feature/gameplay-activity-art-20260927
+
+permissions:
+  contents: write
+
+jobs:
+  import-artwork:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out candidate branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install image verification tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends imagemagick
+
+      - name: Convert inbox masters to verified lossless WebP
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p assets/gameplay/covers assets/gameplay/tower
+
+          convert_one() {
+            src="$1"
+            dst="$2"
+            before="$(identify -format '%wx%h' "$src")"
+            convert "$src" -define webp:lossless=true "$dst"
+            after="$(identify -format '%wx%h' "$dst")"
+            test "$before" = "$after"
+            identify "$dst" >/dev/null
+            ae="$(compare -metric AE "$src" "$dst" null: 2>&1 || true)"
+            test "$ae" = "0"
+            printf '%s -> %s (%s, lossless pixel match)\n' "$src" "$dst" "$before"
+          }
+
+          convert_one assets/inbox/runtime-import/gameplay-art/cover-boss.png assets/gameplay/covers/boss.webp
+          convert_one assets/inbox/runtime-import/gameplay-art/cover-tower.png assets/gameplay/covers/tower.webp
+          convert_one assets/inbox/runtime-import/gameplay-art/cover-abyss.png assets/gameplay/covers/abyss.webp
+          convert_one assets/inbox/runtime-import/gameplay-art/cover-more.png assets/gameplay/covers/coming-soon.webp
+          convert_one assets/inbox/runtime-import/gameplay-art/tower-fire.png assets/gameplay/tower/tower-fire-hero.webp
+          convert_one assets/inbox/runtime-import/gameplay-art/tower-earth.png assets/gameplay/tower/tower-earth-hero.webp
+          convert_one assets/inbox/runtime-import/gameplay-art/tower-water.png assets/gameplay/tower/tower-water-hero.webp
+          convert_one assets/inbox/runtime-import/gameplay-art/tower-wind.png assets/gameplay/tower/tower-wind-hero.webp
+
+          for src in assets/inbox/runtime-import/gameplay-art/cover-*.png; do
+            dims="$(identify -format '%w %h' "$src")"
+            read -r w h <<< "$dims"
+            test $((w*9)) -eq $((h*16))
+          done
+
+          rm -rf assets/inbox/runtime-import/gameplay-art
+
+      - name: Rebuild formal production bundles
+        run: npm run build
+
+      - name: Verify integrated artwork and build
+        run: |
+          node tests/gameplay-activity-art-integration-20260927.test.js
+          node tests/v174-gameplay-cover-16x9-browser.test.js
+          npm run build:check
+          node .github/scripts/ci.mjs resources
+
+      - name: Commit generated WebP assets and synchronized build
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A assets/inbox/runtime-import assets/gameplay
+          git add build asset-manifest.json feature-manifest.json index.html
+          if git diff --cached --quiet; then
+            echo "No generated changes to commit."
+            exit 0
+          fi
+          git commit -m "feat: import gameplay activity artwork"
+          git push origin "HEAD:feature/gameplay-activity-art-20260927"
