@@ -1,4 +1,3 @@
-tail: error writing 'standard output': Broken pipe
 
 /* bundled source: js/40-v144-rules-and-abyss.js */
 /* =====================================================
@@ -190,8 +189,7 @@ tail: error writing 'standard output': Broken pipe
         const presentation=SHOP_POTION_PRESENTATION[id];
         let potion=potionDefinitions.find(item=>item&&item.id===id);
         if(!potion){
-            potion={id:id,name:"",shortName:"",icon:"",type:"ptail: error writing 'standard output': Broken pipe
-otion",resource:resource,recoveryPercent:percent,price:price,stats:{}};
+            potion={id:id,name:"",shortName:"",icon:"",type:"potion",resource:resource,recoveryPercent:percent,price:price,stats:{}};
             potionDefinitions.push(potion);
         }
         Object.assign(potion,{
@@ -229,8 +227,7 @@ otion",resource:resource,recoveryPercent:percent,price:price,stats:{}};
     }
 
     function shopUnitPrice(item){
-        if(typeof window.v133GetShopItemPrice==="function"){ return window.v13tail: error writing 'standard output': Broken pipe
-3GetShopItemPrice(item); }
+        if(typeof window.v133GetShopItemPrice==="function"){ return window.v133GetShopItemPrice(item); }
         return Math.round(numeric(item&&item.price)*shopTier().multiplier);
     }
 
@@ -336,8 +333,7 @@ otion",resource:resource,recoveryPercent:percent,price:price,stats:{}};
             monster.v144LegalSkillPool=Array.from(new Set(monster.v144LegalSkillPool))
                 .filter(id=>isMonsterSkillElementLegal(monster,id));
         }
-        if(monster.v17tail: error writing 'standard output': Broken pipe
-5ForcedAttackSkillId&&!monster.skillIds.includes(monster.v175ForcedAttackSkillId)){
+        if(monster.v175ForcedAttackSkillId&&!monster.skillIds.includes(monster.v175ForcedAttackSkillId)){
             delete monster.v175ForcedAttackSkillId;
         }
         if(monster.v175ForcedSupportSkillId&&!monster.v141SupportSkillIds.includes(monster.v175ForcedSupportSkillId)){
@@ -582,9 +578,7 @@ otion",resource:resource,recoveryPercent:percent,price:price,stats:{}};
 
     function hasV144Buff(monster,key){ return !!(monster&&monster[key]&&numeric(monster[key].turnsLeft)>0); }
 
-    /* V1tail: error writing 'standard output': Broken pipe
-tail: error writing 'standard output': Broken pipe
-44 no longer owns an enemy support dispatcher. The shared Skill-ID
+    /* V144 no longer owns an enemy support dispatcher. The shared Skill-ID
        dispatcher in V141/V155 is the sole runtime owner. */
 
     /* Legacy V144 timed-buff round ticking is retired. Persistent durations
@@ -845,8 +839,7 @@ tail: error writing 'standard output': Broken pipe
     if(typeof openEquippedItem==="function"){
         const previousOpenEquippedItem=openEquippedItem;
         openEquippedItem=function(item){
-            const result=previousOpenEquippedtail: error writing 'standard output': Broken pipe
-Item.apply(this,arguments);
+            const result=previousOpenEquippedItem.apply(this,arguments);
             syncSetModal(item);
             return result;
         };
@@ -981,9 +974,7 @@ Item.apply(this,arguments);
                     pointX>=bossRect.left&&pointX<=bossRect.right&&
                     pointY>=bossRect.top&&pointY<=bossRect.bottom)
             ));
-            if(bossHit){ return previousAbyssMove.apply(this,argumentstail: error writing 'standard output': Broken pipe
-tail: error writing 'standard output': Broken pipe
-); }
+            if(bossHit){ return previousAbyssMove.apply(this,arguments); }
             if(map.dataset.v146Moving==="1"){ return; }
             if(event&&event.target&&event.target.closest&&event.target.closest("button")){ return; }
             const rect=map.getBoundingClientRect();
@@ -1116,8 +1107,7 @@ tail: error writing 'standard output': Broken pipe
         }
         if(show){
             target.classList.add("v146-growth-attention-target");
-            if(typeof getComputedStyle==="functtail: error writing 'standard output': Broken pipe
-ion"){
+            if(typeof getComputedStyle==="function"){
                 try{
                     if(getComputedStyle(target).position==="static"){ target.style.position="relative"; }
                 }catch(_){ }
@@ -1249,8 +1239,7 @@ ion"){
                 :type==="skill"
                 ?item.skill&&item.skill.show
                 :false;
-            const label=type==="expPotail: error writing 'standard output': Broken pipe
-ol"?"這名角色可以升級":type==="status"?"這名角色有能力點未分配":"這名角色有技能可處理";
+            const label=type==="expPool"?"這名角色可以升級":type==="status"?"這名角色有能力點未分配":"這名角色有技能可處理";
             setGrowthGuidanceDot(target,!!show,label);
         });
     }
@@ -1486,9 +1475,7 @@ ol"?"這名角色可以升級":type==="status"?"這名角色有能力點未分�
             setTimeout(syncDefeatedCards,0);
             setTimeout(syncCharacterAttentionDots,0);
             return result;
-        tail: error writing 'standard output': Broken pipe
-tail: error writing 'standard output': Broken pipe
-};
+        };
     }
 
     if(typeof updateGoldDisplay==="function"){
@@ -1775,9 +1762,7 @@ tail: error writing 'standard output': Broken pipe
     /* ----- One support resolver for every party slot. ----- */
     function finishSupport(message){
         if(message&&typeof addBattleLog==="function"){ addBattleLog(message); }
-        if(typeof updateUI==="function"){ updateUI(tail: error writing 'standard output': Broken pipe
-tail: error writing 'standard output': Broken pipe
-); }
+        if(typeof updateUI==="function"){ updateUI(); }
         if(typeof finishPlayerAction==="function"){ finishPlayerAction(); }
         return true;
     }
@@ -2010,8 +1995,7 @@ tail: error writing 'standard output': Broken pipe
         const target=Number.isInteger(targetIndex)?getPartyCharacterByIndex(targetIndex):null;
         if(!target||numeric(target.hp)>0){ return finishSupport("目前選擇的目標不需要復活。"); }
         const targetStats=getPartyBattleStats(targetIndex);
-        if(!targetStats){ return finishSupport("復活目標資料無法讀取。")tail: error writing 'standard output': Broken pipe
-; }
+        if(!targetStats){ return finishSupport("復活目標資料無法讀取。"); }
 
         animateSupportCast(state,characterIndex,skill,targetIndex,[targetIndex],"player",skill.targetType);
         const exSkill=typeof skillDatabase!=="undefined"?skillDatabase[skill.element+"EX"]:null;
@@ -2139,8 +2123,7 @@ tail: error writing 'standard output': Broken pipe
             const entity=targetSide==="monster"
                 ?(typeof monsters!=="undefined"?monsters[index]:null)
                 :getPartyCharacterByIndex(index);
-            if(!entail: error writing 'standard output': Broken pipe
-tity){ return; }
+            if(!entity){ return; }
             removed+=clearRemovableEntityStates(entity,targetSide);
             if(typeof window.v141PlayCardEffect==="function"){
                 window.v141PlayCardEffect(targetSide,index,"buff");
@@ -2259,8 +2242,7 @@ tity){ return; }
                 numeric(skill.maxLevel)||5,
                 Math.floor(numeric(caster.v141ForceSkillLevel)||1)
             ));
-            tail: error writing 'standard output': Broken pipe
-const critChance=levelValue(
+            const critChance=levelValue(
                 skill.critChanceBonusByLevel||skill.critBonusByLevel,level,0
             );
             const critDamage=levelValue(
@@ -2375,8 +2357,7 @@ const critChance=levelValue(
         if(typeof battleActive!=="undefined"&&!battleActive){ return true; }
         if(!enemiesHaveNoHp()){ return false; }
         if(typeof currentBattleMonsters!=="undefined"&&typeof killMonster==="function"){
-            currentBattleMonsters.ftail: error writing 'standard output': Broken pipe
-orEach(index=>{
+            currentBattleMonsters.forEach(index=>{
                 const monster=monsters[index];
                 if(monster&&monster.alive!==false&&numeric(monster.hp)<=0){ killMonster(index); }
             });
@@ -2504,8 +2485,7 @@ orEach(index=>{
         const protectedSolo=dailyPartyContext().soloProtected;
         const layout=protectedSolo
             ?"第1輪：6普通；第2輪：5普通＋1精英；第3輪：4普通＋1精英＋1BOSS。"
-            :"第1輪：6普通�tail: error writing 'standard output': Broken pipe
-�第2輪：4普通＋2精英；第3輪：3普通＋2精英＋1BOSS。";
+            :"第1輪：6普通；第2輪：4普通＋2精英；第3輪：3普通＋2精英＋1BOSS。";
         return window.rpgConfirm(
             "確定要進入「"+meta.title+"」嗎？\n\n共3輪，每輪固定前排3隻＋後排3隻，共18隻敵人。\n"+layout,
             {title:"副本確認",confirmText:"進入副本",cancelText:"返回"}
@@ -2630,8 +2610,7 @@ orEach(index=>{
 
     function showDailyGoldReward(amount){
         pendingDailyGoldReward=Math.max(0,Math.floor(numeric(amount)));
-        constail: error writing 'standard output': Broken pipe
-t html='<div class="v132-reward-modal-inner"><h3>金幣副本挑戰成功！</h3>'+
+        const html='<div class="v132-reward-modal-inner"><h3>金幣副本挑戰成功！</h3>'+
             '<p>可獲得金幣：<b>'+pendingDailyGoldReward.toLocaleString("zh-TW")+'</b></p>'+
             '<div class="v132-reward-actions">'+
             '<button type="button" onclick="v148ClaimDailyGoldReward(false)">直接領取</button>'+
@@ -2735,8 +2714,7 @@ t html='<div class="v132-reward-modal-inner"><h3>金幣副本挑戰成功！</h3
             return '<article class="v141-dungeon-cover-card" data-dungeon-cover="'+type+'">'+
                 '<div class="v141-dungeon-cover-art"><span>'+meta.title+'</span><small>3輪 × 每輪6隻</small></div>'+
                 '<div class="v141-dungeon-cover-info"><b>'+meta.title+'</b><span>開放：'+meta.requirement+'</span></div>'+
-     tail: error writing 'standard output': Broken pipe
-           '<div class="v141-dungeon-cover-actions"><button type="button" onclick="v148ShowDailyDungeonPreview(\''+type+'\')">獎勵預覽</button>'+
+                '<div class="v141-dungeon-cover-actions"><button type="button" onclick="v148ShowDailyDungeonPreview(\''+type+'\')">獎勵預覽</button>'+
                 '<button type="button" '+(available?'onclick="'+action+'()"':'disabled')+'>挑戰</button></div>'+
                 '<div class="v141-dungeon-remaining">'+(available?'可挑戰':'今日已完成')+'</div></article>';
         }).join("")+'</div>';
@@ -2843,8 +2821,7 @@ t html='<div class="v132-reward-modal-inner"><h3>金幣副本挑戰成功！</h3
         Object.freeze(["角色","assets/ui/nav-character.png","openHomeFeature('character')"]),
         Object.freeze(["背包","assets/ui/nav-backpack.png","v148OpenContextInventory()"]),
         Object.freeze(["秘寶","assets/ui/nav-relic-v175.webp","v148OpenContextRelic()"]),
-        Object.freeze(["元素匣","assets/ui/nav-element-box.png","openHomeFeatutail: error writing 'standard output': Broken pipe
-re('autoBattleSettings')"])
+        Object.freeze(["元素匣","assets/ui/nav-element-box.png","openHomeFeature('autoBattleSettings')"])
     ]);
 
     function contextNavMarkup(returnAction){
@@ -2966,9 +2943,143 @@ re('autoBattleSettings')"])
   :(gameplayActive&&!dungeonActive
   ?"v148ReturnFromGameplay()"
   :dungeonReturnAction(abyssMapActive,abyssSelectionActive));
-        const mode=trainingActivtail: error writing 'standard output': Broken pipe
-bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-stener("DOMContentLoaded",observe,{once:true}); }
+        const mode=trainingActive
+  ?"training"
+  :(gameplayActive&&!dungeonActive
+  ?"gameplay:"+gameplayPageId
+  :(abyssMapActive?"abyss-map":(abyssSelectionActive?"abyss-selection":"daily")));
+        renderContextNav(nav,returnAction,mode);
+    }
+
+    function scheduleDungeonSync(){ setTimeout(syncContextNavigation,0); }
+    if(typeof switchDungeonTab==="function"){
+        const previousSwitchDungeonTab=switchDungeonTab;
+        switchDungeonTab=function(){
+            const result=previousSwitchDungeonTab.apply(this,arguments);
+            scheduleDungeonSync();
+            syncQuestNoticeDots();
+            return result;
+        };
+    }
+    if(typeof showPage==="function"){
+        const previousShowPage=showPage;
+        showPage=function(page){
+            const result=previousShowPage.apply(this,arguments);
+            scheduleDungeonSync();
+            syncQuestNoticeDots();
+            return result;
+        };
+    }
+    ["v141StartAbyss","v141ResetAbyss"].forEach(functionName=>{
+        const previous=window[functionName];
+        if(typeof previous!=="function"){ return; }
+        window[functionName]=function(){
+            const result=previous.apply(this,arguments);
+            scheduleDungeonSync();
+            return result;
+        };
+    });
+
+    if(typeof window.v141AbyssMoveByEvent==="function"){
+        const previousAbyssMove=window.v141AbyssMoveByEvent;
+        window.v141AbyssMoveByEvent=function(event){
+            const map=document.getElementById("v141AbyssMap");
+            const playerElement=document.getElementById("v141AbyssPlayer");
+            if(map&&playerElement&&map.dataset.v146Moving==="1"){
+                const mapRect=map.getBoundingClientRect();
+                const playerRect=playerElement.getBoundingClientRect();
+                if(mapRect.width&&mapRect.height&&playerRect.width&&playerRect.height){
+                    const x=Math.max(4,Math.min(96,(playerRect.left+playerRect.width/2-mapRect.left)/mapRect.width*100));
+                    const y=Math.max(8,Math.min(94,(playerRect.top+playerRect.height/2-mapRect.top)/mapRect.height*100));
+                    playerElement.style.transition="none";
+                    playerElement.style.left=x+"%";
+                    playerElement.style.top=y+"%";
+                    void playerElement.offsetWidth;
+                }
+                map.dataset.v146Moving="0";
+                map.classList.remove("v146-moving");
+            }
+            return previousAbyssMove.apply(this,arguments);
+        };
+    }
+
+    /* Manual patrol click movement is retired; automatic roaming keeps the
+       original 1.8-second natural route and cannot inherit a manual duration. */
+    function installPatrolClickBlocker(){
+        if(typeof document==="undefined"){ return; }
+        const page=document.getElementById("mapPage");
+        if(!page||page.dataset.v148ManualMoveBlocked==="1"){ return; }
+        page.dataset.v148ManualMoveBlocked="1";
+        page.addEventListener("click",event=>{
+            if(event.target&&event.target.closest&&event.target.closest(
+                "button,#v141TaskTracker,[id^='mapMonster'],#v131PatrolAppearanceSwitchWrap,#mapBattleOverlay"
+            )){ return; }
+            event.stopImmediatePropagation();
+        },true);
+    }
+
+    function decoratePatrolRanks(){
+        if(typeof document==="undefined"||typeof monsters==="undefined"){ return; }
+        monsters.forEach((monster,index)=>{
+            const card=document.getElementById("mapMonster"+index);
+            if(!card||!monster){ return; }
+            const rank=typeof getMonsterRank==="function"?getMonsterRank(monster):monster.v141BattleRank;
+            card.dataset.rank=rank==="boss"?"boss":rank==="elite"?"elite":"regular";
+        });
+    }
+
+    if(typeof updateMapMonsterIcons==="function"){
+        const previousUpdateMapMonsterIcons=updateMapMonsterIcons;
+        updateMapMonsterIcons=function(){
+            const result=previousUpdateMapMonsterIcons.apply(this,arguments);
+            decoratePatrolRanks();
+            return result;
+        };
+    }
+
+    if(typeof startPatrolCharacterWalking==="function"){
+        const previousStartPatrol=startPatrolCharacterWalking;
+        startPatrolCharacterWalking=function(){
+            const wrap=document.getElementById("patrolCharacterWrap");
+            const image=document.getElementById("patrolCharacterImg");
+            if(wrap){
+                wrap.classList.add("v148-auto-route");
+                wrap.style.transition="left 1.8s ease-in-out, top 1.8s ease-in-out";
+            }
+            if(image){ image.classList.remove("v141-manual-walking"); }
+            return previousStartPatrol.apply(this,arguments);
+        };
+    }
+    if(typeof stopPatrolCharacterWalking==="function"){
+        const previousStopPatrol=stopPatrolCharacterWalking;
+        stopPatrolCharacterWalking=function(){
+            const wrap=document.getElementById("patrolCharacterWrap");
+            if(wrap){ wrap.classList.remove("v148-auto-route"); }
+            return previousStopPatrol.apply(this,arguments);
+        };
+    }
+
+    function boot(){
+        installPatrolClickBlocker();
+        decoratePatrolRanks();
+        syncContextNavigation();
+        syncQuestNoticeDots();
+        normalizeAllHardControls();
+    }
+
+    if(typeof MutationObserver!=="undefined"&&typeof document!=="undefined"){
+        let queued=false;
+        const observer=new MutationObserver(()=>{
+            if(queued){ return; }
+            queued=true;
+            requestAnimationFrame(()=>{ queued=false; syncContextNavigation(); syncQuestNoticeDots(); });
+        });
+        const observe=()=>[
+            document.getElementById("mapPage"),
+            document.getElementById("dungeonPage"),
+            document.getElementById("homeFeatureModal")
+        ].filter(Boolean).forEach(root=>observer.observe(root,{childList:true,subtree:true,attributes:true,attributeFilter:["class"]}));
+        if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",observe,{once:true}); }
         else{ observe(); }
     }
 
@@ -3102,10 +3213,122 @@ stener("DOMContentLoaded",observe,{once:true}); }
                 :{duplicate:false,hit:typeof rollStatusEffectHit==="function"&&rollStatusEffectHit.apply(null,args)};
             if(roll.hit){
                 const duration=skill.frostbiteDuration||2;
-tail: error writing 'standard output': Broken pipe
-bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-tail: error writing 'standard output': Broken pipe
-onFinish){
+                applyFrostbite(monster,duration);
+                playFrostbiteEffect("monster",index);
+                if(typeof addBattleLog==="function"){ addBattleLog(monster.name+"陷入凍傷，"+duration+"回合內傷害降低30%、閃躲與異常狀態抗性降低25%。"); }
+            }else if(!roll.duplicate&&typeof addBattleLog==="function"){
+                addBattleLog("（凍傷效果被"+monster.name+"抵抗了）");
+            }
+            return result;
+        };
+    }
+
+    if(typeof applySkillDebuffEffectsToPlayer==="function"){
+        const previousApplySkillDebuffsToPlayer=applySkillDebuffEffectsToPlayer;
+        applySkillDebuffEffectsToPlayer=function(skill,level,target,index,casterLevel,casterOffensiveAttribute){
+            const result=previousApplySkillDebuffsToPlayer.apply(this,arguments);
+            if(!skill||!numeric(skill.frostbiteChance)||!target||numeric(target.hp)<=0){ return result; }
+            const spirit=typeof getFinalBattleSpiritForPlayerTarget==="function"
+                ?getFinalBattleSpiritForPlayerTarget(target,index):numeric(target.spirit);
+            const resist=typeof getPlayerStatusResistBonus==="function"?getPlayerStatusResistBonus(target):0;
+            const args=[skill.frostbiteChance,casterLevel,target.level,casterOffensiveAttribute,spirit,false,"regular",resist];
+            const roll=typeof window.v173RollNamedPersistentStatusEffect==="function"
+                ?window.v173RollNamedPersistentStatusEffect(target,"frostbite",args,"player",index,skill.name)
+                :{duplicate:false,hit:typeof rollStatusEffectHit==="function"&&rollStatusEffectHit.apply(null,args)};
+            if(roll.hit){
+                const duration=skill.frostbiteDuration||2;
+                applyFrostbite(target,duration);
+                playFrostbiteEffect("player",index);
+                if(typeof addBattleLog==="function"){ addBattleLog((target.id||"角色")+"陷入凍傷，"+duration+"回合內傷害降低30%、閃躲與異常狀態抗性降低25%。"); }
+            }else if(!roll.duplicate&&typeof addBattleLog==="function"){
+                addBattleLog("（凍傷效果被"+(target.id||"角色")+"抵抗了）");
+            }
+            return result;
+        };
+    }
+
+    function tickFrostbite(entity,label){
+        if(!entity||!Array.isArray(entity.statusEffects)){ return; }
+        entity.statusEffects=entity.statusEffects.filter(effect=>{
+            if(!effect||effect.type!=="frostbite"){ return true; }
+            if(effect.deferFirstTick){
+                effect.deferFirstTick=false;
+                return true;
+            }
+            effect.turnsLeft=numeric(effect.turnsLeft)-1;
+            if(effect.turnsLeft<=0&&typeof addBattleLog==="function"){
+                addBattleLog(label+"的凍傷效果已解除。");
+            }
+            return effect.turnsLeft>0;
+        });
+    }
+
+    if(typeof tickStatusEffects==="function"){
+        const previousTickStatusEffects=tickStatusEffects;
+        tickStatusEffects=function(){
+            const waterEX=typeof skillDatabase!=="undefined"?skillDatabase.waterEX:null;
+            const cleanseChance=Math.max(0,numeric(waterEX&&waterEX.turnStartCleanseChance));
+            if(cleanseChance>0){
+                partyIndexes().forEach(index=>{
+                    const character=getPartyCharacterByIndex(index);
+                    if(
+                        !character||numeric(character.hp)<=0||character.element!=="water"||
+                        !Array.isArray(character.statusEffects)||!character.statusEffects.length||
+                        !learnedPartySkill(index,"waterEX")||Math.random()*100>=cleanseChance
+                    ){ return; }
+                    const removed=character.statusEffects.length;
+                    character.statusEffects=[];
+                    if(typeof addBattleLog==="function"){
+                        addBattleLog((character.id||"角色")+"的水元素EX在回合開始前解除"+removed+"個負面狀態。");
+                    }
+                });
+            }
+            const result=previousTickStatusEffects.apply(this,arguments);
+            if(!(typeof window!=="undefined"&&window.v175DurationLifecycleActive)){
+                livingMonsterIndexes().forEach(index=>tickFrostbite(monsters[index],monsters[index].name));
+                partyIndexes().forEach(index=>{
+                    const character=getPartyCharacterByIndex(index);
+                    if(character&&numeric(character.hp)>0){ tickFrostbite(character,character.id||"角色"); }
+                });
+            }
+            return result;
+        };
+    }
+
+    /* ----- Player Fire EX, guaranteed Burn and conditional follow-ups. ----- */
+    let playerSkillContext=null;
+
+    function withPlayerSkillContext(context,callback){
+        const previousContext=playerSkillContext;
+        const previousDamageActor=window.v149CurrentDamageActor;
+        playerSkillContext=context;
+        window.v149CurrentDamageActor=context&&context.character||null;
+        try{ return callback(); }
+        finally{
+            playerSkillContext=previousContext;
+            window.v149CurrentDamageActor=previousDamageActor;
+        }
+    }
+
+    /* Every qualifying Fire physical skill reuses this one owner. */
+    function firstLivingMonsterIndex(){
+        const indexes=livingMonsterIndexes();
+        return indexes.length?indexes[0]:null;
+    }
+
+    function preferredLivingMonsterIndex(preferred){
+        return Number.isInteger(preferred)&&livingMonsterIndexes().includes(preferred)
+            ?preferred:firstLivingMonsterIndex();
+    }
+
+    function scheduleAfterAnimation(callback){
+        const gate=window.v142SkillAnimationDirector&&window.v142SkillAnimationDirector.getActive
+            ?window.v142SkillAnimationDirector.getActive():null;
+        if(gate&&gate.promise&&!gate.done){ gate.promise.then(callback); }
+        else{ setTimeout(callback,0); }
+    }
+
+    function captureBattleFinish(onFinish){
         const flow=window.FourSymbolsBattleFlow;
         if(!flow||typeof flow.interceptActionFinish!=="function"){ return function(){}; }
         return flow.interceptActionFinish(()=>{
@@ -3375,13 +3598,547 @@ onFinish){
             const originalChance=monster.skillChance;
             const originalHit=typeof showPlayerHit==="function"?showPlayerHit:null;
             const originalLog=typeof addBattleLog==="function"?addBattleLog:null;
-            consttail: error writing 'standard output': Broken pipe
-bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-bwrap: Can't find source path /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-tail: error writing 'standard output': Broken pipe
-nsterPortraitRegistry=installMonsterPortraitRegistry;
+            const previousRepeatAttacker=currentReflectAttacker;
+            const livingBefore=livingPartyIndexes().map(index=>({
+                character:getPartyCharacterByIndex(index),
+                alive:numeric(getPartyCharacterByIndex(index)&&getPartyCharacterByIndex(index).hp)>0
+            }));
+            let finishRequested=false;
+            let repeatedCritical=false;
+            let failed=false;
+
+            options.skill.spCost=0;
+            monster.skillIds=[options.skill.id];
+            monster.v141SupportSkillIds=[];
+            monster.skillChance=1;
+            currentReflectAttacker=options.monsterIndex;
+            const releaseFinishCapture=options.realFinish
+                ?captureBattleFinish(()=>{ finishRequested=true; }):function(){};
+            if(originalHit){
+                showPlayerHit=function(){
+                    if(arguments[4]===true){ repeatedCritical=true; }
+                    return originalHit.apply(this,arguments);
+                };
+            }
+            if(originalLog){
+                addBattleLog=function(message){
+                    if(String(message||"").includes(options.skill.name)&&String(message||"").includes("（爆擊！）")){
+                        repeatedCritical=true;
+                    }
+                    return originalLog.apply(this,arguments);
+                };
+            }
+            const previousDamageActor=window.v149CurrentDamageActor;
+            window.v149CurrentDamageActor=monster;
+            try{
+                if(typeof window.v155WithForcedFinalAbyssSkillLevel==="function"){
+                    window.v155WithForcedFinalAbyssSkillLevel(monster,()=>
+                        options.previous.apply(options.that,options.attackArgs)
+                    );
+                }else{
+                    options.previous.apply(options.that,options.attackArgs);
+                }
+            }
+            catch(error){
+                failed=true;
+                console.error("敵方"+options.skill.name+"追擊施放失敗：",error);
+            }
+            finally{
+                releaseFinishCapture();
+                if(originalHit){ showPlayerHit=originalHit; }
+                if(originalLog){ addBattleLog=originalLog; }
+                currentReflectAttacker=previousRepeatAttacker;
+                window.v149CurrentDamageActor=previousDamageActor;
+                options.skill.spCost=originalCost;
+                monster.skillIds=originalIds;
+                monster.v141SupportSkillIds=originalSupports;
+                monster.skillChance=originalChance;
+            }
+
+            if(failed){
+                if(options.realFinish){ options.realFinish(); }
+                return;
+            }
+            const defeatedTarget=livingBefore.some(entry=>
+                entry.alive&&(!entry.character||numeric(entry.character.hp)<=0)
+            );
+            if(
+                finishRequested&&castNumber<numeric(options.skill.followUpMaxCasts)&&
+                (repeatedCritical||defeatedTarget)&&
+                monster.alive!==false&&numeric(monster.hp)>0&&livingPartyIndexes().length
+            ){
+                if(typeof addBattleLog==="function"){
+                    addBattleLog(monster.name+"的"+options.skill.name+"追擊出現爆擊或擊敗目標，再追擊一次！");
+                }
+                runMonsterFollowUp(options,castNumber+1);
+                return;
+            }
+            if(finishRequested&&options.realFinish){ options.realFinish(); }
+        });
+    }
+
+    if(typeof processSingleMonsterAttack==="function"){
+        const previousMonsterAttack=processSingleMonsterAttack;
+        processSingleMonsterAttack=function(monsterIndex){
+            const attackArgs=Array.prototype.slice.call(arguments);
+            const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
+            const realFinish=typeof finishPlayerAction==="function"?finishPlayerAction:null;
+            const previousBadge=typeof showMonsterSkillNameBadge==="function"?showMonsterSkillNameBadge:null;
+            const previousHit=typeof showPlayerHit==="function"?showPlayerHit:null;
+            const previousLog=typeof addBattleLog==="function"?addBattleLog:null;
+            const livingBefore=livingPartyIndexes().map(index=>({
+                character:getPartyCharacterByIndex(index),alive:true
+            }));
+            let finishRequested=false;
+            let castSkillId=null;
+            let critical=false;
+            const releaseFinishCapture=realFinish
+                ?captureBattleFinish(()=>{ finishRequested=true; }):function(){};
+            if(previousBadge){
+                showMonsterSkillNameBadge=function(name){
+                    if(typeof skillDatabase!=="undefined"){
+                        castSkillId=Object.keys(skillDatabase).find(id=>skillDatabase[id]&&skillDatabase[id].name===name)||null;
+                    }
+                    return previousBadge.apply(this,arguments);
+                };
+            }
+            if(previousHit){
+                showPlayerHit=function(){
+                    if(arguments[4]===true){ critical=true; }
+                    return previousHit.apply(this,arguments);
+                };
+            }
+            if(previousLog){
+                addBattleLog=function(message){
+                    const text=String(message||"");
+                    const skill=castSkillId&&typeof skillDatabase!=="undefined"?skillDatabase[castSkillId]:null;
+                    if(skill&&text.includes(skill.name)&&text.includes("（爆擊！）")){ critical=true; }
+                    return previousLog.apply(this,arguments);
+                };
+            }
+            const previousAttacker=currentReflectAttacker;
+            const previousDamageActor=window.v149CurrentDamageActor;
+            currentReflectAttacker=monsterIndex;
+            window.v149CurrentDamageActor=monster;
+            let result;
+            try{ result=previousMonsterAttack.apply(this,arguments); }
+            finally{
+                currentReflectAttacker=previousAttacker;
+                window.v149CurrentDamageActor=previousDamageActor;
+                releaseFinishCapture();
+                if(previousBadge){ showMonsterSkillNameBadge=previousBadge; }
+                if(previousHit){ showPlayerHit=previousHit; }
+                if(previousLog){ addBattleLog=previousLog; }
+            }
+            const repeatSkill=castSkillId&&skillDatabase[castSkillId];
+            const livingTargets=livingPartyIndexes();
+            const defeatedTarget=livingBefore.some(entry=>
+                entry.alive&&(!entry.character||numeric(entry.character.hp)<=0)
+            );
+            const repeat=finishRequested&&repeatSkill&&repeatSkill.followUpOnCriticalOrDefeat&&monster&&
+                monster.alive!==false&&numeric(monster.hp)>0&&livingTargets.length&&
+                (critical||defeatedTarget);
+            if(!repeat){
+                if(finishRequested&&realFinish){ realFinish(); }
+                return result;
+            }
+            if(typeof addBattleLog==="function"){ addBattleLog(monster.name+"的"+repeatSkill.name+"觸發追擊！"); }
+            runMonsterFollowUp({
+                previous:previousMonsterAttack,that:this,attackArgs:attackArgs,
+                monster:monster,monsterIndex:monsterIndex,skill:repeatSkill,realFinish:realFinish
+            },1);
+            return result;
+        };
+    }
+
+    /* ----- Procedural word-circle fallback retired; V143 raster owner is authoritative. ----- */
+
+    function refreshSkillText(){
+        try{
+            if(typeof renderSkillLoadout==="function"){ renderSkillLoadout(); }
+            if(typeof document!=="undefined"){
+                document.querySelectorAll(".creation-skill-chip[data-skill-id]").forEach(chip=>{
+                    const skill=skillDatabase[chip.dataset.skillId];
+                    if(skill){ chip.title=skill.description||skill.name; }
+                });
+            }
+        }catch(error){ console.error("V149 更新技能顯示失敗：",error); }
+    }
+
+    function boot(){
+        syncAllCombatCards();
+        refreshSkillText();
+        if(typeof document!=="undefined"){
+            const homeShop=document.getElementById("homeIconShop");
+            if(homeShop){ homeShop.style.backgroundImage="url(assets/ui/home-shop.png)"; }
+        }
+    }
+
+    if(typeof document!=="undefined"&&document.readyState==="loading"){
+        document.addEventListener("DOMContentLoaded",boot,{once:true});
+    }else{ boot(); }
+
+    window.v149SyncCombatCards=syncAllCombatCards;
+    window.v149Diagnostics=function(){
+        return {
+            version:VERSION,skillCount:Object.keys(SKILLS).length,frostbiteBlocksSkillsOnly:false,
+            sameNameStateMiss:true,barrierCornerCount:false,proceduralSkillFallback:false,
+            mainShopIcon:"assets/ui/home-shop.png",navShopIcon:"assets/ui/home-shop-v147.png"
+        };
+    };
+})();
+
+
+/* bundled source: js/44-v152-dev-fixes.js */
+/* =====================================================
+   V152 — current dev fixes and final requested values
+===================================================== */
+(function installV152DevFixes(){
+    "use strict";
+
+    if(typeof window==="undefined"||window.__v152DevFixesInstalled){ return; }
+    window.__v152DevFixesInstalled=true;
+
+    const VERSION="152";
+    const ABYSS_PORTRAITS={
+        東帝:"assets/dungeons/abyss/east-emperor.webp",
+        天帝:"assets/dungeons/abyss/heaven-emperor.webp",
+        北帝:"assets/dungeons/abyss/north-emperor.webp",
+        南帝:"assets/dungeons/abyss/south-emperor.webp",
+        天兵天將:"assets/dungeons/abyss/soldier.webp"
+    };
+
+    function numeric(value){
+        const result=Number(value);
+        return Number.isFinite(result)?result:0;
+    }
+
+    function levelValue(values,level,fallback){
+        if(!Array.isArray(values)||!values.length){ return numeric(fallback); }
+        const index=Math.max(0,Math.min(values.length-1,Math.floor(numeric(level)||1)-1));
+        return numeric(values[index]);
+    }
+
+    function patchSkill(id,fields){
+        if(typeof skillDatabase==="undefined"||!skillDatabase[id]){ return; }
+        Object.keys(fields).forEach(key=>{
+            skillDatabase[id][key]=Array.isArray(fields[key])?fields[key].slice():fields[key];
+        });
+    }
+
+    patchSkill("yuanXiangGuangMing",{
+        targetType:"allyAll",baseHeal:150,baseHealSP:55,
+        description:"我方全體回復150 HP、55 SP。"
+    });
+    patchSkill("yuanGuangShield",{
+        targetType:"allyAll",shieldAmount:100,shieldDuration:2,
+        description:"我方全體獲得100護盾，持續2回合。"
+    });
+    patchSkill("yuanZuBlessing",{
+        targetType:"allyAll",cleanseChance:20,agilityBonusPercent:50,duration:2,
+        description:"對我方全體施放祝福，有20%機率解除所有負面狀態，並增加敏捷50%，持續2回合。"
+    });
+
+    function cleanAccidentalFireSkill(){
+        if(typeof skillDatabase!=="undefined"){ delete skillDatabase.fireBurstStrike; }
+        if(typeof characterSkillLoadouts!=="undefined"&&characterSkillLoadouts){
+            Object.keys(characterSkillLoadouts).forEach(key=>{
+                const loadout=characterSkillLoadouts[key];
+                if(!loadout){ return; }
+                if(loadout.skillLevels){ delete loadout.skillLevels.fireBurstStrike; }
+                if(Array.isArray(loadout.equippedSkills)){
+                    loadout.equippedSkills=loadout.equippedSkills.filter(id=>id!=="fireBurstStrike");
+                }
+            });
+        }
+        if(typeof getExistingPartyIndexes==="function"&&typeof getPartyAutoConfig==="function"){
+            getExistingPartyIndexes().forEach(index=>{
+                const config=getPartyAutoConfig(index);
+                if(config&&config.skill==="fireBurstStrike"){ config.skill="normal"; }
+            });
+        }
+    }
+    cleanAccidentalFireSkill();
+
+    function syncSkillPointDisplay(){
+        if(typeof document==="undefined"){ return; }
+        const node=document.getElementById("skillPoints");
+        if(!node){ return; }
+        const owner=typeof getSkillCharacterObject==="function"&&typeof currentSkillCharacter!=="undefined"
+            ?getSkillCharacterObject(currentSkillCharacter):null;
+        node.textContent=String(Math.max(0,Math.floor(numeric(owner&&owner.skillPoints))));
+    }
+
+    window.v152SyncSkillPointDisplay=syncSkillPointDisplay;
+
+    function partySkillLevel(characterIndex,skillId){
+        if(typeof getSkillLevel!=="function"){ return 1; }
+        const key=typeof getPartyCharacterKey==="function"
+            ?getPartyCharacterKey(characterIndex):(characterIndex===0?"fire":"player"+(characterIndex+1));
+        return Math.max(1,Math.min(5,Math.floor(numeric(getSkillLevel(key,skillId))||1)));
+    }
+
+    function rageLevelFor(character,buff){
+        if(buff&&numeric(buff.skillLevel)>0){ return numeric(buff.skillLevel); }
+        if(typeof getExistingPartyIndexes==="function"&&typeof getPartyCharacterByIndex==="function"){
+            const index=getExistingPartyIndexes().find(item=>getPartyCharacterByIndex(item)===character);
+            if(Number.isInteger(index)){ return partySkillLevel(index,"rage"); }
+        }
+        return Math.max(1,numeric(character&&(character.v141ForceSkillLevel||character.v141SkillLevel))||1);
+    }
+
+    function normalizeRageBuff(character){
+        const buff=character&&Array.isArray(character.activeBuffs)
+            ?character.activeBuffs.find(item=>item&&item.type==="rage"&&numeric(item.turnsLeft)>0):null;
+        if(!buff){ return null; }
+        const level=rageLevelFor(character,buff);
+        const skill=typeof skillDatabase!=="undefined"?skillDatabase.rage:null;
+        const chance=levelValue(skill&&(skill.critChanceBonusByLevel||skill.critBonusByLevel),level,0);
+        const damage=levelValue(skill&&(skill.critDamageBonusByLevel||skill.critBonusByLevel),level,0);
+        buff.bonusPercent=chance;
+        buff.critChanceBonusPercent=chance;
+        buff.critDamageBonusPercent=damage;
+        buff.skillLevel=level;
+        return buff;
+    }
+
+    if(typeof rollCritical==="function"){
+        const previousRollCritical=rollCritical;
+        rollCritical=function(character){
+            normalizeRageBuff(character);
+            return previousRollCritical.apply(this,arguments);
+        };
+    }
+
+    /* Final Abyss Emperor loadouts and Skill-ID dispatch are owned by
+       js/59-abyss-two-tier-runtime.js + js/46-v155-dev-fixes.js.
+       V152 no longer mutates monster skill loadouts or dispatches by name. */
+
+    /* Battle Floating Feedback Owner now owns popup DOM, viewport anchoring and font sizing.
+       V152's HP-only relocation wrapper was retired to avoid a second geometry owner. */
+
+    function dismissRewardToast(toast){
+        if(!toast){ return; }
+        if(toast._hideTimer){ clearTimeout(toast._hideTimer); }
+        toast.classList.remove("show");
+    }
+
+    function removeTaskTracker(){
+        if(typeof document==="undefined"){ return; }
+        const tracker=document.getElementById("v141TaskTracker");
+        if(tracker){ tracker.remove(); }
+    }
+
+    if(typeof document!=="undefined"&&typeof document.addEventListener==="function"){
+        document.addEventListener("click",event=>{
+            const toast=event.target&&event.target.closest?event.target.closest("#v141RewardToast"):null;
+            if(toast){ dismissRewardToast(toast); }
+        },true);
+    }
+
+    function anyAutoRecoveryEnabled(){
+        if(typeof getExistingPartyIndexes!=="function"||typeof getPartyAutoConfig!=="function"){ return false; }
+        return getExistingPartyIndexes().some(index=>{
+            const config=getPartyAutoConfig(index);
+            return !!(config&&config.enabled);
+        });
+    }
+
+    let lastAutoRecoveryAt=-Infinity;
+    if(typeof applyPostBattleAutoRecovery==="function"){
+        const previousAutoRecovery=applyPostBattleAutoRecovery;
+        applyPostBattleAutoRecovery=function(){
+            const result=previousAutoRecovery.apply(this,arguments);
+            lastAutoRecoveryAt=Date.now();
+            return result;
+        };
+    }
+
+    function recoverOnMapEntry(){
+        if(
+            typeof battleActive!=="undefined"&&battleActive||
+            !anyAutoRecoveryEnabled()||
+            typeof applyPostBattleAutoRecovery!=="function"||
+            Date.now()-lastAutoRecoveryAt<5000
+        ){ return false; }
+        applyPostBattleAutoRecovery();
+        if(typeof updateUI==="function"){ updateUI(); }
+        if(typeof saveGame==="function"){ saveGame(); }
+        return true;
+    }
+
+    if(typeof showPage==="function"){
+        const previousShowPage=showPage;
+        showPage=function(page){
+            const target=typeof document!=="undefined"?document.getElementById(page+"Page"):null;
+            const wasActive=!!(target&&target.classList.contains("active"));
+            const result=previousShowPage.apply(this,arguments);
+            const entered=target&&target.classList.contains("active")&&!wasActive;
+            if(entered&&page==="map"){ recoverOnMapEntry(); }
+            return result;
+        };
+    }
+
+    if(typeof enterMap==="function"){
+        const previousEnterMap=enterMap;
+        enterMap=function(){
+            const result=previousEnterMap.apply(this,arguments);
+            recoverOnMapEntry();
+            return result;
+        };
+    }
+
+    ["v141StartAbyss","v141ResetAbyss"].forEach(functionName=>{
+        const previous=window[functionName];
+        if(typeof previous!=="function"){ return; }
+        window[functionName]=function(){
+            const result=previous.apply(this,arguments);
+            recoverOnMapEntry();
+            return result;
+        };
+    });
+
+    if(typeof switchDungeonTab==="function"){
+        const previousSwitchDungeonTab=switchDungeonTab;
+        switchDungeonTab=function(tabName){
+            const result=previousSwitchDungeonTab.apply(this,arguments);
+            if(tabName==="abyss"&&typeof document!=="undefined"&&document.getElementById("v141AbyssMap")){
+                recoverOnMapEntry();
+            }
+            return result;
+        };
+    }
+
+    function currentRoster(){
+        if(typeof currentBattleMonsters==="undefined"||typeof monsters==="undefined"){ return []; }
+        return currentBattleMonsters.map(index=>({index:index,monster:monsters[index]})).filter(entry=>entry.monster);
+    }
+
+    function syncAbyssBattleUi(){
+        if(typeof document==="undefined"){ return; }
+        const roster=currentRoster();
+        const abyss=roster.some(entry=>entry.monster.v141Abyss);
+        const battlePage=document.getElementById("battlePage");
+        if(battlePage){ battlePage.classList.toggle("v152-abyss-battle",abyss); }
+        const info=document.getElementById("battleInfo");
+        if(abyss&&info){ info.hidden=false; info.removeAttribute("hidden"); }
+
+        const earlyAbyss=abyss&&roster.length<=5&&!roster.some(entry=>entry.monster.name==="極帝天尊");
+        roster.forEach(entry=>{
+            const card=document.getElementById("battleMonster"+entry.index);
+            if(!card){ return; }
+            const portrait=earlyAbyss?ABYSS_PORTRAITS[entry.monster.name]:null;
+            card.classList.toggle("v152-abyss-portrait",!!portrait);
+            if(portrait){
+                card.style.setProperty("--v152-abyss-portrait",'url("'+portrait+'")');
+            }else{
+                card.style.removeProperty("--v152-abyss-portrait");
+            }
+        });
+    }
+
+    window.v152SyncAbyssBattleUi=syncAbyssBattleUi;
+
+    function boot(){
+        cleanAccidentalFireSkill();
+        syncSkillPointDisplay();
+        syncAbyssBattleUi();
+        removeTaskTracker();
+    }
+
+    if(typeof document!=="undefined"&&document.readyState==="loading"){
+        document.addEventListener("DOMContentLoaded",boot,{once:true});
+    }else{ boot(); }
+
+    window.v152SyncSkillPointDisplay=syncSkillPointDisplay;
+    window.v152NormalizeRageBuff=normalizeRageBuff;
+    window.v152SyncAbyssBattleUi=syncAbyssBattleUi;
+    window.v152Diagnostics=function(){
+        return {
+            version:VERSION,independentSkillPointDisplay:true,removedFireBurstStrike:!(typeof skillDatabase!=="undefined"&&skillDatabase.fireBurstStrike),
+            rageAppliedByCriticalResolver:true,damagePopupAboveVfx:true,taskTrackerRemoved:true,
+            autoRecoveryOnMapEntry:true,abyssBattleInfo:true,abyssPortraits:true
+        };
+    };
+})();
+
+
+/* bundled source: js/45-v154-dev-fixes.js */
+/* =====================================================
+   V154 — current dev battle, element box and monster portrait fixes
+===================================================== */
+(function installV154DevFixes(){
+    "use strict";
+
+    if(typeof window==="undefined"||window.__v154DevFixesInstalled){ return; }
+    window.__v154DevFixesInstalled=true;
+
+    const MONSTER_PORTRAIT_REGISTRY_URL="config/monster-portrait-registry.json";
+    const HEAVENLY_SOLDIER_ELEMENTS=new Set(["fire","water","wind","earth"]);
+    const TEMPORARY_MONSTER_PORTRAIT="assets/dungeons/abyss/soldier.webp";
+    const TEMPORARY_BOSS_PORTRAIT="assets/monsters/boss/boss-placeholder-fire-demon.webp";
+    const EARLY_ABYSS_PORTRAITS={
+        東帝:"assets/dungeons/abyss/east-emperor.webp",
+        天帝:"assets/dungeons/abyss/heaven-emperor.webp",
+        北帝:"assets/dungeons/abyss/north-emperor.webp",
+        南帝:"assets/dungeons/abyss/south-emperor.webp",
+        天兵天將:"assets/dungeons/abyss/soldier.webp"
+    };
+    const FINAL_ABYSS_PORTRAITS={
+        東帝天尊:"assets/dungeons/abyss/floor5-east-emperor.webp",
+        天帝天尊:"assets/dungeons/abyss/floor5-heaven-emperor.webp",
+        北帝天尊:"assets/dungeons/abyss/floor5-north-emperor.webp",
+        南帝天尊:"assets/dungeons/abyss/floor5-south-emperor.webp",
+        極帝天尊:"assets/dungeons/abyss/floor5-extreme-emperor.webp",
+        天兵天將:"assets/dungeons/abyss/floor5-soldier.webp"
+    };
+    let monsterPortraitRegistry=null;
+    let monsterPortraitRegistryPromise=null;
+    let monsterPortraitByKey=new Map();
+    let monsterPortraitByUniqueName=new Map();
+
+    function currentAbyssRoster(){
+        if(typeof currentBattleMonsters==="undefined"||typeof monsters==="undefined"){ return []; }
+        return currentBattleMonsters
+            .map(index=>({index:index,monster:monsters[index]}))
+            .filter(entry=>entry.monster&&entry.monster.v141Abyss);
+    }
+
+    function isFinalAbyssRoster(roster){
+        return roster.some(entry=>Object.prototype.hasOwnProperty.call(
+            FINAL_ABYSS_PORTRAITS,
+            entry.monster.name
+        )&&entry.monster.name!=="天兵天將");
+    }
+
+    function registryTargets(registry){
+        if(!registry||!registry.groups||!Array.isArray(registry.tupleSchema)){ return []; }
+        const fields=registry.tupleSchema;
+        return Object.entries(registry.groups).flatMap(([group,rows])=>(rows||[]).map(row=>{
+            const target={group:group};
+            fields.forEach((field,index)=>{ target[field]=row[index]; });
+            return target;
+        }));
+    }
+
+    function installMonsterPortraitRegistry(registry){
+        const byKey=new Map();
+        const byName=new Map();
+        const duplicateNames=new Set();
+        registryTargets(registry).forEach(target=>{
+            if(target.status!=="existing"||!target.portraitKey||!target.path){ return; }
+            byKey.set(target.portraitKey,target);
+            if(byName.has(target.name)){ duplicateNames.add(target.name); }
+            else{ byName.set(target.name,target); }
+        });
+        duplicateNames.forEach(name=>byName.delete(name));
+        monsterPortraitRegistry=registry;
+        monsterPortraitByKey=byKey;
+        monsterPortraitByUniqueName=byName;
+        syncMonsterPortraits();
+        return registry;
+    }
+    window.v154InstallMonsterPortraitRegistry=installMonsterPortraitRegistry;
 
     function requestMonsterPortraitRegistry(){
         if(monsterPortraitRegistryPromise||typeof fetch!=="function"){ return monsterPortraitRegistryPromise; }
@@ -3509,8 +4266,7 @@ nsterPortraitRegistry=installMonsterPortraitRegistry;
         if(record){
             const cssValue='url("'+record.path+'")';
             if(!previousManaged&&card.dataset.v174BattleArtwork){
-                card.dataset.v154BaseBattleArtwork=card.dataset.v174Batail: error writing 'standard output': Broken pipe
-ttleArtwork;
+                card.dataset.v154BaseBattleArtwork=card.dataset.v174BattleArtwork;
             }
             card.dataset.v174BattleArtwork=cssValue;
             const presentation=typeof window!=="undefined"?window.FourSymbolsBattlePresentation:null;
@@ -3758,9 +4514,159 @@ ttleArtwork;
             const emptyPotionMessage="元素匣偵測到補品不足，已停止巡練並返回主城。";
             logElementBoxRecovery(emptyPotionMessage);
             if(typeof window.v169StopElementBox==="function"){ window.v169StopElementBox(); }
-            else if(typeof toggleAutoBattle==="function"&&typeof autoBattle!=="undefined"&&tail: error writing 'standard output': Broken pipe
-bwrap: Can't find source path /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-00,shieldDuration:2,
+            else if(typeof toggleAutoBattle==="function"&&typeof autoBattle!=="undefined"&&autoBattle){ toggleAutoBattle(); }
+            if(typeof showPage==="function"){ showPage("home"); }
+            if(typeof window.rpgAlert==="function"){
+                void window.rpgAlert(
+                    "自動補品已用完，元素匣已停止巡練並返回主城。\n請補充補品後，再重新啟動元素匣。",
+                    {title:"補品不足",confirmText:"知道了",danger:true}
+                );
+            }else if(typeof alert==="function"){
+                alert(emptyPotionMessage);
+            }
+        }
+        return consumed;
+    }
+    window.v154FinishAutoRecovery=finishAutoRecovery;
+    window.v154IsElementBoxRecoveryActive=isElementBoxRecoveryActive;
+
+    if(typeof applyPostBattleAutoRecovery==="function"){
+        const previousAutoRecovery=applyPostBattleAutoRecovery;
+        applyPostBattleAutoRecovery=function(){
+            const result=previousAutoRecovery.apply(this,arguments);
+            finishAutoRecovery();
+            return result;
+        };
+    }
+
+    function syncElementBoxPrimaryButton(){
+        if(typeof document==="undefined"){ return; }
+        const button=document.getElementById("autoBattleButton");
+        if(!button){ return; }
+        button.setAttribute("onclick","v154UseElementBoxPrimaryAction()");
+        const active=typeof autoBattle!=="undefined"&&autoBattle;
+        button.textContent=active?"⏹ 停止":"套用並啟動";
+        button.classList.toggle("active",active);
+    }
+
+    function setElementBoxSettingsLayer(active){
+        if(typeof document==="undefined"||!document.body||!document.body.classList){ return; }
+        document.body.classList.toggle("v162-element-box-settings-open",!!active);
+    }
+
+    if(typeof openHomeFeature==="function"){
+        const previousOpenHomeFeature=openHomeFeature;
+        openHomeFeature=function(type){
+            const result=previousOpenHomeFeature.apply(this,arguments);
+            setElementBoxSettingsLayer(type==="autoBattleSettings");
+            return result;
+        };
+    }
+    if(typeof closeHomeFeature==="function"){
+        const previousCloseHomeFeature=closeHomeFeature;
+        closeHomeFeature=function(){
+            const result=previousCloseHomeFeature.apply(this,arguments);
+            setElementBoxSettingsLayer(false);
+            return result;
+        };
+    }
+    window.v154UseElementBoxPrimaryAction=function(){
+        if(typeof autoBattle!=="undefined"&&autoBattle){
+            return typeof toggleAutoBattle==="function"?toggleAutoBattle():undefined;
+        }
+        return typeof confirmAutoBattleSettings==="function"?confirmAutoBattleSettings():undefined;
+    };
+
+    if(typeof updateAutoButton==="function"){
+        const previousUpdateAutoButton=updateAutoButton;
+        updateAutoButton=function(){
+            const result=previousUpdateAutoButton.apply(this,arguments);
+            syncElementBoxPrimaryButton();
+            return result;
+        };
+    }
+    if(typeof openAutoBattleSettings==="function"){
+        const previousOpenAutoBattleSettings=openAutoBattleSettings;
+        openAutoBattleSettings=function(){
+            const result=previousOpenAutoBattleSettings.apply(this,arguments);
+            syncElementBoxPrimaryButton();
+            setElementBoxSettingsLayer(true);
+            return result;
+        };
+    }
+    if(typeof closeAutoBattleSettings==="function"){
+        const previousCloseAutoBattleSettings=closeAutoBattleSettings;
+        closeAutoBattleSettings=function(){
+            const result=previousCloseAutoBattleSettings.apply(this,arguments);
+            setElementBoxSettingsLayer(false);
+            return result;
+        };
+    }
+    if(typeof setTimeout==="function"){
+        setTimeout(()=>{
+            if(
+                isElementBoxRecoveryActive()&&
+                !(typeof battleActive!=="undefined"&&battleActive)
+            ){
+                const consumed=finishAutoRecovery();
+                if(consumed&&typeof updateUI==="function"){ updateUI(); }
+                if(consumed&&typeof saveGame==="function"){ saveGame(); }
+            }
+        },0);
+    }
+    if(typeof setInterval==="function"){
+        setInterval(()=>{
+            if(
+                isElementBoxRecoveryActive()&&
+                !(typeof battleActive!=="undefined"&&battleActive)
+            ){
+                const consumed=finishAutoRecovery();
+                if(consumed&&typeof updateUI==="function"){ updateUI(); }
+                if(consumed&&typeof saveGame==="function"){ saveGame(); }
+            }
+        },1000);
+    }
+    syncElementBoxPrimaryButton();
+    requestMonsterPortraitRegistry();
+    syncMonsterPortraits();
+})();
+
+
+/* bundled source: js/46-v155-dev-fixes.js */
+/* =====================================================
+   V155 — hard-control pacing, final Abyss skills and fire ultimates
+===================================================== */
+(function installV155DevFixes(){
+    "use strict";
+
+    if(typeof window==="undefined"||window.__v155DevFixesInstalled){ return; }
+    window.__v155DevFixesInstalled=true;
+
+    const VERSION="155";
+
+    function numeric(value){
+        const result=Number(value);
+        return Number.isFinite(result)?result:0;
+    }
+
+    function levelValue(values,level,fallback){
+        if(!Array.isArray(values)||!values.length){ return numeric(fallback); }
+        return numeric(values[Math.min(values.length-1,Math.max(0,Math.floor(numeric(level)||1)-1))]);
+    }
+
+    function copyValue(value){ return Array.isArray(value)?value.slice():value; }
+
+    function patchSkill(id,fields){
+        if(typeof skillDatabase==="undefined"||!skillDatabase[id]){ return; }
+        Object.keys(fields).forEach(key=>{ skillDatabase[id][key]=copyValue(fields[key]); });
+    }
+
+    patchSkill("yuanXiangGuangMing",{
+        targetType:"allyAll",baseHeal:150,baseHealSP:55,
+        description:"我方全體回復150 HP、55 SP。"
+    });
+    patchSkill("yuanGuangShield",{
+        targetType:"allyAll",shieldAmount:100,shieldDuration:2,
         description:"我方全體獲得100護盾，持續2回合。"
     });
     patchSkill("yuanZuBlessing",{
@@ -3893,11 +4799,240 @@ bwrap: Can't find source path /workspace/scratch/2feca6ea11c3/.aws: No such file
         if(!blessing){ return; }
         monster.agility=numeric(blessing.originalAgility);
         removeDisplayBuff(monster,blessing.displayBuff);
-        deltail: error writing 'standard output': Broken pipe
-bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-tail: error writing 'standard output': Broken pipe
-sterSp(ally,spAmount):0;
+        delete monster.v142AgilityBlessing;
+    }
+
+    function combineEvasion(sources){
+        if(typeof window.v173CombineEvasionRates==="function"){
+            return window.v173CombineEvasionRates(sources);
+        }
+        return Math.min(85,(sources||[]).reduce(
+            (sum,source)=>sum+numeric(source),
+            0
+        ));
+    }
+
+    function ensureV155EvasionBase(monster){
+        if(!Object.prototype.hasOwnProperty.call(monster,"v155EvasionBase")){
+            monster.v155EvasionBase=numeric(monster.evasion);
+        }
+        return numeric(monster.v155EvasionBase);
+    }
+
+    function recomputeV155Evasion(monster){
+        if(!monster){ return; }
+        const sources=[];
+        if(monster.v155EvasionBlessing){ sources.push(numeric(monster.v155EvasionBlessing.bonusPercent)); }
+        if(monster.v155WindDodge){ sources.push(numeric(monster.v155WindDodge.bonusPercent)); }
+        if(!sources.length){
+            if(Object.prototype.hasOwnProperty.call(monster,"v155EvasionBase")){
+                monster.evasion=numeric(monster.v155EvasionBase);
+                delete monster.v155EvasionBase;
+            }
+            return;
+        }
+        monster.evasion=combineEvasion([ensureV155EvasionBase(monster)].concat(sources));
+    }
+
+    function applyEvasionBlessing(monster,bonusPercent,duration){
+        if(!monster||monster.alive===false){ return false; }
+        const bonus=Math.max(0,numeric(bonusPercent));
+        const turns=Math.max(1,Math.floor(numeric(duration)||1));
+        const existing=monster.v155EvasionBlessing;
+        if(
+            existing&&existing.battleToken===currentBattleToken()&&
+            numeric(existing.displayBuff&&existing.displayBuff.turnsLeft)>0
+        ){
+            if(typeof window.v173CanApplyNamedPersistentState==="function"){
+                window.v173CanApplyNamedPersistentState(
+                    monster,"元祖賜福","monster",
+                    typeof monsters!=="undefined"?monsters.indexOf(monster):undefined,
+                    "元祖賜福"
+                );
+            }
+            return false;
+        }
+        clearOldAgilityBlessing(monster);
+        const display={
+            type:"v141TeamBuff",v141BuffType:"dodge",statusName:"元祖賜福",turnsLeft:turns
+        };
+        const blessing={
+            type:"v141TeamBuff",statusName:"元祖賜福",turnsLeft:turns,
+            originalEvasion:ensureV155EvasionBase(monster),bonusPercent:bonus,displayBuff:display,
+            battleToken:currentBattleToken(),expiresTurn:currentRound()+turns
+        };
+        monster.v155EvasionBlessing=blessing;
+        monster.activeBuffs=monster.activeBuffs||[];
+        monster.activeBuffs.push(display);
+        recomputeV155Evasion(monster);
+        if(typeof window.v173MarkPersistentStateName==="function"){
+            window.v173MarkPersistentStateName(blessing,"元祖賜福");
+            window.v173MarkPersistentStateName(display,"元祖賜福");
+        }
+        return true;
+    }
+
+    function resolveExtremeEmperorAction(monsterIndex,forcedSkillId,forcedCleanse){
+        const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
+        if(!monster||!(monster.v141SupportSkillIds||[]).includes("yuanZuBlessing")||monster.alive===false||numeric(monster.hp)<=0||hardControlled(monster)){
+            return false;
+        }
+        monster.v141AbyssAi="v155-support";
+        const allies=currentAbyssEntries();
+        if(!allies.length){ return false; }
+        const hasNegative=allies.some(entry=>Array.isArray(entry.monster.statusEffects)&&entry.monster.statusEffects.length>0);
+        const needsHeal=allies.some(entry=>monsterBaseHp(entry.monster)<monsterBaseMaxHp(entry.monster)||
+            numeric(entry.monster.sp)<numeric(entry.monster.maxSP));
+        const needsBlessing=allies.some(entry=>!(entry.monster.v155EvasionBlessing&&
+            entry.monster.v155EvasionBlessing.battleToken===currentBattleToken()&&
+            numeric(entry.monster.v155EvasionBlessing.displayBuff&&entry.monster.v155EvasionBlessing.displayBuff.turnsLeft)>0));
+        const skillId=forcedSkillId||((hasNegative||needsHeal||needsBlessing)?"yuanZuBlessing":null);
+        const skill=skillId&&typeof skillDatabase!=="undefined"?skillDatabase[skillId]:null;
+        if(skillId!=="yuanZuBlessing"||!skill||numeric(monster.sp)<numeric(skill.spCost)){ return false; }
+
+        monster.sp=Math.max(0,numeric(monster.sp)-numeric(skill.spCost));
+        if(typeof showMonsterSkillNameBadge==="function"){
+            showMonsterSkillNameBadge(skill.name,skill.element||"light",monsterIndex,null,allies.map(entry=>entry.index),"monster",skill.targetType);
+        }
+        if(skillId==="yuanZuBlessing"){
+            let removed=0;
+            let cleansedTargets=0;
+            let blessedTargets=0;
+            let healedTotal=0;
+            let restoredSpTotal=0;
+            allies.forEach((entry,index)=>{
+                const ally=entry.monster;
+                if(applyEvasionBlessing(ally,skill.evasionBonusPercent,skill.duration)){ blessedTargets++; }
+                const healed=restoreMonsterHp(ally,skill.baseHeal);
+                const restored=restoreMonsterSp(ally,skill.baseHealSP);
+                healedTotal+=healed;
+                restoredSpTotal+=restored;
+                const cleansed=forcedCleanse===undefined
+                    ?Math.random()*100<numeric(skill.cleanseChance)
+                    :Array.isArray(forcedCleanse)
+                    ?!!forcedCleanse[index]
+                    :!!forcedCleanse;
+                if(cleansed&&Array.isArray(ally.statusEffects)){
+                    cleansedTargets++;
+                    removed+=ally.statusEffects.length;
+                    ally.statusEffects=[];
+                }
+                if(healed>0&&typeof showMonsterHit==="function"){ showMonsterHit(entry.index,healed,"heal"); }
+                if(restored>0&&typeof showDamagePopup==="function"&&typeof document!=="undefined"){
+                    const card=document.getElementById("battleMonster"+entry.index);
+                    if(card){ showDamagePopup(card,"+"+restored+" SP","sp"); }
+                }
+                if(typeof window.v141PlayCardEffect==="function"){ window.v141PlayCardEffect("monster",entry.index,"buff"); }
+            });
+            if(typeof addBattleLog==="function"){
+                addBattleLog("極帝天尊施放元祖賜福：全體各恢復100 HP、100 SP（實際 "+healedTotal+" HP／"+
+                    restoredSpTotal+" SP）；"+blessedTargets+"名友方獲得閃避提升"+numeric(skill.evasionBonusPercent)+"%，持續"+
+                    numeric(skill.duration)+"回合；"+cleansedTargets+"名目標觸發35%獨立淨化，共解除"+removed+"個負面狀態。");
+            }
+        }else{ return false; }
+        if(typeof updateUI==="function"){ updateUI(); }
+        if(typeof finishPlayerAction==="function"){ finishPlayerAction(); }
+        return true;
+    }
+    window.v155ResolveExtremeEmperorAction=resolveExtremeEmperorAction;
+
+    function supportCastAllowed(monster,forceCast){
+        const chance=monster&&monster.skillChance!==undefined?numeric(monster.skillChance):.55;
+        return forceCast===true||Math.random()<=chance;
+    }
+
+    function currentAbyssEntriesIncludingDefeated(){
+        if(typeof currentBattleMonsters==="undefined"||typeof monsters==="undefined"){ return []; }
+        return currentBattleMonsters.map(index=>({index:index,monster:monsters[index]})).filter(entry=>!!entry.monster);
+    }
+
+    function allyTriTargeting(monsterIndex){
+        const living=currentAbyssEntries();
+        if(typeof window.v141GetMonsterAllyTriTargeting==="function"){
+            return window.v141GetMonsterAllyTriTargeting(monsterIndex,living);
+        }
+        const entries=typeof window.v141GetMonsterAllyTriTargets==="function"
+            ?window.v141GetMonsterAllyTriTargets(monsterIndex,living)
+            :living.slice(0,3);
+        return {entries:entries,primaryIndex:entries[0]?entries[0].index:null};
+    }
+    function allyTriTargets(monsterIndex){
+        return allyTriTargeting(monsterIndex).entries;
+    }
+
+    function hasNamedState(monster,stateName){
+        if(typeof window.v173HasNamedPersistentState==="function"){
+            return window.v173HasNamedPersistentState(monster,stateName);
+        }
+        return (monster&&((monster.activeBuffs||[]).concat(monster.v141TeamBuffs||[]))).some(buff=>
+            buff&&numeric(buff.turnsLeft)>0&&(
+                buff.statusName===stateName||buff.type===stateName||buff.v141BuffType===stateName
+            )
+        );
+    }
+
+    function markNamedState(entry,stateName){
+        if(typeof window.v173MarkPersistentStateName==="function"){
+            window.v173MarkPersistentStateName(entry,stateName);
+        }else if(entry){
+            entry.statusName={earthShield:"萬象土盾",rockWall:"岩石壁壘",dinghaishenzhen:"氣定神閒",stealthSkill:"隱身",dodgeSkill:"風行"}[stateName]||stateName;
+        }
+    }
+
+    function canApplyNamedState(monster,stateName,index,sourceName){
+        return typeof window.v173CanApplyNamedPersistentState==="function"
+            ?window.v173CanApplyNamedPersistentState(monster,stateName,"monster",index,sourceName)
+            :!hasNamedState(monster,stateName);
+    }
+
+    function registerMonsterTeamBuff(monster,buff,display){
+        buff.displayBuff=display;
+        ["bonusPercent","percent","evasionBonusPercent","resistBonus","accuracyBonusPercent","defenseBonusPercent","reflectPercent","amount","value","skillLevel"].forEach(key=>{
+            if(display&&display[key]===undefined&&buff&&buff[key]!==undefined){ display[key]=buff[key]; }
+        });
+        monster.v141TeamBuffs=monster.v141TeamBuffs||[];
+        monster.v141TeamBuffs.push(buff);
+        monster.activeBuffs=monster.activeBuffs||[];
+        monster.activeBuffs.push(display);
+    }
+
+    function finalSkillLevel(monster,skill){
+        const max=Math.max(1,Math.floor(numeric(skill&&skill.maxLevel)||1));
+        const requested=Math.max(1,Math.floor(
+            numeric(monster&&monster.v141ForceSkillLevel)||numeric(monster&&monster.v141SkillLevel)||max
+        ));
+        return Math.min(max,requested);
+    }
+
+    function resolveNorthHeal(monsterIndex,forceCast){
+        const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
+        const skill=typeof skillDatabase!=="undefined"?skillDatabase.healSpell:null;
+        if(!monster||(monster.v141SupportSkillIds||[]).indexOf("healSpell")<0||monster.alive===false||numeric(monster.hp)<=0||!skill||hardControlled(monster)){ return false; }
+        const targeting=allyTriTargeting(monsterIndex);
+        const allies=targeting.entries;
+        const needsHeal=currentAbyssEntries().some(entry=>
+            monsterBaseHp(entry.monster)<monsterBaseMaxHp(entry.monster)*.70
+        );
+        if(!needsHeal||!supportCastAllowed(monster,forceCast)||numeric(monster.sp)<numeric(skill.spCost)){ return false; }
+        monster.sp=Math.max(0,numeric(monster.sp)-numeric(skill.spCost));
+        if(typeof showMonsterSkillNameBadge==="function"){
+            showMonsterSkillNameBadge(skill.name,skill.element||"water",monsterIndex,targeting.primaryIndex,allies.map(entry=>entry.index),"monster",skill.targetType);
+        }
+        const level=finalSkillLevel(monster,skill);
+        const hpAmount=levelValue(
+            skill.healHpByLevel,
+            level,
+            numeric(skill.baseHeal)+numeric(skill.healPerLevel)*(level-1)
+        );
+        const spPercent=levelValue(skill.spRestorePercentByLevel,level,0);
+        let restoredSpTotal=0;
+        allies.forEach(entry=>{
+            const ally=entry.monster;
+            const healed=restoreMonsterHp(ally,hpAmount);
+            const spAmount=entry.index===monsterIndex
+                ?0
+                :Math.floor(Math.max(0,numeric(ally.maxSP))*spPercent/100);
+            const restored=spAmount>0?restoreMonsterSp(ally,spAmount):0;
             restoredSpTotal+=restored;
             if(healed>0&&typeof showMonsterHit==="function"){ showMonsterHit(entry.index,healed,"heal"); }
             if(restored>0&&typeof showDamagePopup==="function"&&typeof document!=="undefined"){
@@ -3987,8 +5122,105 @@ sterSp(ally,spAmount):0;
                 expiresTurn:currentRound()+duration
             };
             entry.monster.defense=Math.max(0,numeric(entry.monster.defense)*(1+percent/100));
-            bwrap: Can't find source path /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-   return !!(legal&&skill&&numeric(monster.sp)>=numeric(skill.spCost));
+            registerMonsterTeamBuff(entry.monster,buff,display);
+            applied++;
+            if(typeof window.v141PlayCardEffect==="function"){ window.v141PlayCardEffect("monster",entry.index,"shield"); }
+        });
+        if(typeof addBattleLog==="function"){
+            addBattleLog(monster.name+"施放"+skill.name+"，同排最多"+applied+"名友方防禦提升"+percent+"%，持續"+duration+"回合。");
+        }
+        if(typeof updateUI==="function"){ updateUI(); }
+        if(typeof finishPlayerAction==="function"){ finishPlayerAction(); }
+        return true;
+    }
+    window.v155ResolveRockWall=resolveRockWall;
+
+    function resolveStealthSkill(monsterIndex,forceCast){
+        const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
+        const skill=typeof skillDatabase!=="undefined"?skillDatabase.stealthSkill:null;
+        if(!monster||(monster.v141SupportSkillIds||[]).indexOf("stealthSkill")<0||monster.alive===false||numeric(monster.hp)<=0||!skill||hardControlled(monster)){ return false; }
+        const targets=currentAbyssEntries().filter(entry=>!hasNamedState(entry.monster,"stealthSkill")).slice(0,1);
+        if(!targets.length||!supportCastAllowed(monster,forceCast)||numeric(monster.sp)<numeric(skill.spCost)){ return false; }
+        monster.sp=Math.max(0,numeric(monster.sp)-numeric(skill.spCost));
+        if(typeof showMonsterSkillNameBadge==="function"){
+            showMonsterSkillNameBadge(skill.name,skill.element||"wind",monsterIndex,targets[0].index,[targets[0].index],"monster",skill.targetType);
+        }
+        const level=finalSkillLevel(monster,skill);
+        const duration=Math.max(1,Math.floor(levelValue(skill.durationByLevel,level,skill.duration||2)));
+        let applied=0;
+        targets.forEach(entry=>{
+            if(!canApplyNamedState(entry.monster,"stealthSkill",entry.index,skill.name)){ return; }
+            const display={type:"stealthSkill",v141BuffType:"stealthSkill",turnsLeft:duration};
+            const buff={type:"stealthSkill",turnsLeft:duration};
+            markNamedState(display,"stealthSkill");
+            markNamedState(buff,"stealthSkill");
+            registerMonsterTeamBuff(entry.monster,buff,display);
+            applied++;
+            if(typeof window.v141PlayCardEffect==="function"){ window.v141PlayCardEffect("monster",entry.index,"buff"); }
+        });
+        if(typeof addBattleLog==="function"){
+            addBattleLog(monster.name+"施放"+skill.name+"，"+applied+"名友方進入隱身，持續"+duration+"回合。");
+        }
+        if(typeof updateUI==="function"){ updateUI(); }
+        if(typeof finishPlayerAction==="function"){ finishPlayerAction(); }
+        return true;
+    }
+    window.v155ResolveStealthSkill=resolveStealthSkill;
+
+    function resolveWindEliteDodge(monsterIndex,forceCast){
+        const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
+        const skill=typeof skillDatabase!=="undefined"?skillDatabase.dodgeSkill:null;
+        if(!monster||!(monster.v141SupportSkillIds||[]).includes("dodgeSkill")||monster.element!=="wind"||monster.alive===false||numeric(monster.hp)<=0||!skill||hardControlled(monster)){
+            return false;
+        }
+        const targeting=allyTriTargeting(monsterIndex);
+        const requestedTargets=targeting.entries;
+        const targets=requestedTargets.filter(entry=>!hasNamedState(entry.monster,"風行"));
+        if(!targets.length||!supportCastAllowed(monster,forceCast)||numeric(monster.sp)<numeric(skill.spCost)){ return false; }
+        monster.sp=Math.max(0,numeric(monster.sp)-numeric(skill.spCost));
+        if(typeof showMonsterSkillNameBadge==="function"){
+            showMonsterSkillNameBadge(skill.name,skill.element||"wind",monsterIndex,targeting.primaryIndex,requestedTargets.map(entry=>entry.index),"monster",skill.targetType);
+        }
+        const level=finalSkillLevel(monster,skill);
+        const duration=Math.max(1,Math.floor(levelValue(skill.durationByLevel,level,skill.duration||3)));
+        const percent=Math.max(0,levelValue(skill.evasionBonusPercentByLevel,level,skill.evasionBonusPercent||70));
+        let applied=0;
+        targets.forEach(entry=>{
+            const ally=entry.monster;
+            if(!canApplyNamedState(ally,"dodgeSkill",entry.index,skill.name)){ return; }
+            ensureV155EvasionBase(ally);
+            const display={type:"dodgeSkill",v141BuffType:"dodge",turnsLeft:duration};
+            const state={
+                type:"dodgeSkill",turnsLeft:duration,bonusPercent:percent,displayBuff:display,
+                battleToken:currentBattleToken(),expiresTurn:currentRound()+duration
+            };
+            markNamedState(display,"dodgeSkill");
+            markNamedState(state,"dodgeSkill");
+            ally.v155WindDodge=state;
+            ally.activeBuffs=ally.activeBuffs||[];
+            ally.activeBuffs.push(display);
+            recomputeV155Evasion(ally);
+            applied++;
+            if(typeof window.v141PlayCardEffect==="function"){ window.v141PlayCardEffect("monster",entry.index,"buff"); }
+        });
+        if(typeof addBattleLog==="function"){
+            addBattleLog("風屬性天兵天將施放閃躲術，同排"+applied+"名友方獲得【風行】，閃躲率提升"+
+                percent+"%，持續"+duration+"回合。");
+        }
+        if(typeof updateUI==="function"){ updateUI(); }
+        if(typeof finishPlayerAction==="function"){ finishPlayerAction(); }
+        return true;
+    }
+    window.v155ResolveWindEliteDodge=resolveWindEliteDodge;
+
+    function chooseFinalAbyssAction(monster){
+        const living=currentAbyssEntries();
+        const attacks=(monster&&monster.skillIds||[]).filter(id=>{
+            const skill=skillDatabase[id];
+            const legal=typeof window.v144IsMonsterSkillElementLegal==="function"
+                ?window.v144IsMonsterSkillElementLegal(monster,id)
+                :!!(skill&&skill.element&&skill.element===monster.element);
+            return !!(legal&&skill&&numeric(monster.sp)>=numeric(skill.spCost));
         });
         const supports=(monster&&monster.v141SupportSkillIds||[]).filter(id=>{
             const skill=skillDatabase[id];
@@ -4066,8 +5298,7 @@ sterSp(ally,spAmount):0;
         if(monster.v155RockWall){ removeRockWall(monster); removed++; }
         return removed;
     }
-    window.v155ClearRemovableCombatStatail: error writing 'standard output': Broken pipe
-tes=clearRemovableCombatStates;
+    window.v155ClearRemovableCombatStates=clearRemovableCombatStates;
 
     if(
         window.FourSymbolsDurationLifecycle&&
@@ -4239,8 +5470,7 @@ tes=clearRemovableCombatStates;
     }
 
     function wrapPlayerPhoenixCast(name,skillArgumentIndex,casterFromArguments,indexFromArguments){
-        const previotail: error writing 'standard output': Broken pipe
-us=window[name];
+        const previous=window[name];
         if(typeof previous!=="function"){ return; }
         window[name]=function(){
             const args=Array.prototype.slice.call(arguments);
@@ -4374,10 +5604,253 @@ us=window[name];
     const V17342_HALF_MONSTER_FIELDS=[
         "maxHP","hp","maxSP","sp","attack","magicAttack","defense",
         "attackPoints","vitalityPoints","energyPoints","intelligencePoints","spiritPoints","agilityPoints",
-        "vitality","energy","intellitail: error writing 'standard output': Broken pipe
-bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-/
+        "vitality","energy","intelligence","spirit","agility","accuracy","evasion"
+    ];
+
+    function halveMonsterCoreStats(monster,marker){
+        if(!monster||monster[marker]){ return monster; }
+        V17342_HALF_MONSTER_FIELDS.forEach(key=>{
+            if(!Number.isFinite(Number(monster[key]))){ return; }
+            const minimum=["maxHP","hp","maxSP","sp"].includes(key)?1:0;
+            monster[key]=Math.max(minimum,Math.round(Number(monster[key])*0.5));
+        });
+        if(Number.isFinite(Number(monster.maxHP))){
+            monster.hp=Math.max(1,Math.min(Number(monster.maxHP),Number(monster.hp)||Number(monster.maxHP)));
+        }
+        if(Number.isFinite(Number(monster.maxSP))){
+            monster.sp=Math.max(0,Math.min(Number(monster.maxSP),Number(monster.sp)||Number(monster.maxSP)));
+        }
+        monster[marker]=true;
+        return monster;
+    }
+
+    function normalizeBeginnerForestMonster(monster){
+        if(!monster){ return monster; }
+        monster.v173BeginnerForest=true;
+        normalizeMonsterDefaultEvasion(monster);
+        halveMonsterCoreStats(monster,"v17342BeginnerStatsHalved");
+        monster.agilityPoints=0;
+        monster.agility=0;
+        return monster;
+    }
+
+    const DAILY_DUNGEON_SCALE_FIELDS=[
+        "maxHP","hp","maxSP","sp","attack","magicAttack","defense",
+        "attackPoints","vitalityPoints","energyPoints","intelligencePoints","spiritPoints","agilityPoints",
+        "vitality","energy","intelligence","spirit","agility","accuracy","evasion"
+    ];
+
+    function getDailyDungeonScaleContext(){
+        const run=window.v132ActiveDungeonRun||null;
+        let partySize=Math.floor(numeric(run&&run.partySize));
+        if(!(partySize>=1&&partySize<=3)&&typeof getExistingPartyIndexes==="function"){
+            partySize=getExistingPartyIndexes().slice(0,3).filter(index=>{
+                const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(index):null;
+                return !!character;
+            }).length;
+        }
+        partySize=Math.max(1,Math.min(3,partySize||1));
+        const partyMultiplier=partySize===1?.40:partySize===2?.72:1;
+
+        let highestLevel=Math.floor(numeric(run&&run.highestPartyLevel));
+        if(!(highestLevel>0)&&typeof getExistingPartyIndexes==="function"){
+            highestLevel=getExistingPartyIndexes().slice(0,3).reduce((highest,index)=>{
+                const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(index):null;
+                return character?Math.max(highest,Math.floor(numeric(character.level)||1)):highest;
+            },1);
+        }
+        highestLevel=Math.max(1,highestLevel||1);
+        const levelMultiplier=highestLevel<=15?.80:highestLevel<=20?.90:highestLevel<=50?1:1.05;
+        return {
+            partySize:partySize,
+            highestLevel:highestLevel,
+            partyMultiplier:partyMultiplier,
+            levelMultiplier:levelMultiplier,
+            difficultyMultiplier:DAILY_DUNGEON_DIFFICULTY_MULTIPLIER,
+            factor:partyMultiplier*levelMultiplier*DAILY_DUNGEON_DIFFICULTY_MULTIPLIER
+        };
+    }
+
+    const DAILY_DUNGEON_DIFFICULTY_MULTIPLIER=.5;
+    const FORMAL_DAILY_DUNGEON_TYPES=new Set(["exp","material","gold"]);
+
+    function isFormalDailyDungeonMonster(monster){
+        return !!(monster&&FORMAL_DAILY_DUNGEON_TYPES.has(String(monster.v173DailyDungeonType||"")));
+    }
+
+    function normalizeDailyDungeonMonster(monster){
+        if(!isFormalDailyDungeonMonster(monster)||monster.v141Abyss===true){ return monster; }
+        normalizeMonsterDefaultEvasion(monster);
+        if(!monster.v173DailyDungeonBaseStats){
+            const base={};
+            DAILY_DUNGEON_SCALE_FIELDS.forEach(key=>{
+                if(Number.isFinite(Number(monster[key]))){ base[key]=Number(monster[key]); }
+            });
+            monster.v173DailyDungeonBaseStats=base;
+        }
+        const context=getDailyDungeonScaleContext();
+        if(!Object.prototype.hasOwnProperty.call(monster,"v173DailyDungeonBaseSkillChance")){
+            monster.v173DailyDungeonBaseSkillChance=Number.isFinite(Number(monster.skillChance))?Number(monster.skillChance):0;
+        }
+        const base=monster.v173DailyDungeonBaseStats;
+        DAILY_DUNGEON_SCALE_FIELDS.forEach(key=>{
+            if(!Object.prototype.hasOwnProperty.call(base,key)){ return; }
+            const minimum=key==="maxHP"||key==="hp"?1:0;
+            monster[key]=Math.max(minimum,Math.round(base[key]*context.factor));
+        });
+        if(Number.isFinite(Number(monster.maxHP))){ monster.hp=Math.max(1,Number(monster.maxHP)); }
+        if(Number.isFinite(Number(monster.maxSP))){ monster.sp=Math.max(0,Number(monster.maxSP)); }
+        monster.v173DailyDungeonScaleFactor=context.factor;
+        monster.v173DailyDungeonPartySize=context.partySize;
+        monster.v173DailyDungeonHighestLevel=context.highestLevel;
+        monster.v173DailySoloProtected=context.partySize===1&&context.highestLevel<=20;
+        monster.v173DailyNoAccuracyCritBoost=monster.v173DailySoloProtected;
+        const baseSkillChance=Math.max(0,Math.min(1,Number(monster.v173DailyDungeonBaseSkillChance)||0));
+        if(monster.v173DailySoloProtected){
+            monster.skillChance=Number(monster.v141DungeonStage)===1?0:Math.min(.45,baseSkillChance*.60);
+        }else{
+            monster.skillChance=baseSkillChance;
+            monster.v173DailyBossUsedSkillLastAction=false;
+        }
+        return monster;
+    }
+
+    window.v158NormalizeMonsterDefaultEvasion=normalizeMonsterDefaultEvasion;
+    window.v17342NormalizeBeginnerForestMonster=normalizeBeginnerForestMonster;
+    window.v17342NormalizeDailyDungeonMonster=normalizeDailyDungeonMonster;
+    window.v173GetDailyDungeonScaleContext=getDailyDungeonScaleContext;
+    window.v17344IsFormalDailyDungeonMonster=isFormalDailyDungeonMonster;
+
+    if(typeof makeZoneMonster==="function"){
+        const previousMakeZoneMonster=makeZoneMonster;
+        makeZoneMonster=function(){
+            return normalizeMonsterDefaultEvasion(
+                previousMakeZoneMonster.apply(this,arguments)
+            );
+        };
+    }
+
+    if(typeof zoneConfig!=="undefined"){
+        Object.keys(zoneConfig).forEach(key=>{
+            const config=zoneConfig[key];
+            const entries=config&&typeof config.monsters==="function"
+                ?config.monsters()
+                :[];
+            (entries||[]).forEach(monster=>{
+                normalizeMonsterDefaultEvasion(monster);
+                if(key==="forest"){ normalizeBeginnerForestMonster(monster); }
+            });
+        });
+    }
+
+    if(typeof monsters!=="undefined"&&Array.isArray(monsters)){
+        monsters.forEach(monster=>{
+            normalizeMonsterDefaultEvasion(monster);
+            if(monster&&monster.v173BeginnerForest===true){ normalizeBeginnerForestMonster(monster); }
+        });
+    }
+
+    if(typeof rollBeginnerForestNormalAttackDamage==="function"){
+        rollBeginnerForestNormalAttackDamage=function(){
+            return 5+Math.floor(Math.random()*4);
+        };
+    }
+
+    function v158PrepareBattleRender(){
+        const isDungeonBattle=
+            typeof currentZone!=="undefined"&&currentZone==="dungeon"&&
+            !!window.v132ActiveDungeonRun&&
+            typeof currentBattleMonsters!=="undefined"&&
+            Array.isArray(currentBattleMonsters)&&
+            typeof monsters!=="undefined"&&Array.isArray(monsters);
+        if(isDungeonBattle){
+            const roster=currentBattleMonsters.map(index=>monsters[index]).filter(Boolean);
+            const isAbyss=roster.some(monster=>monster&&monster.v141Abyss===true);
+            if(!isAbyss){ roster.forEach(normalizeDailyDungeonMonster); }
+        }
+    }
+    window.v158PrepareBattleRender=v158PrepareBattleRender;
+
+    /* getMonsterEvasion() remains the single core owner; no late V158 wrapper. */
+
+
+    /* Solo Lv1-20 formal daily protection: wave 1 is normal-attack only.
+       From wave 2 onward skills are allowed at a reduced rate; a BOSS that just
+       used a skill must perform one non-skill action before another skill. */
+    if(typeof processSingleMonsterAttack==="function"){
+        const previousDailyProtectedMonsterAttack=processSingleMonsterAttack;
+        processSingleMonsterAttack=function(monsterIndex){
+            const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
+            if(!monster||monster.v173DailySoloProtected!==true||monster.v141Abyss===true){
+                return previousDailyProtectedMonsterAttack.apply(this,arguments);
+            }
+            const rank=typeof getMonsterRank==="function"?getMonsterRank(monster):(monster.rank||"regular");
+            const forceNormal=Number(monster.v141DungeonStage)===1||
+                (rank==="boss"&&monster.v173DailyBossUsedSkillLastAction===true);
+            const savedSkillIds=monster.skillIds;
+            const savedSupports=monster.v141SupportSkillIds;
+            const savedChance=monster.skillChance;
+            const previousBadge=typeof showMonsterSkillNameBadge==="function"?showMonsterSkillNameBadge:null;
+            let usedSkill=false;
+            if(forceNormal){
+                monster.skillIds=[];
+                monster.v141SupportSkillIds=[];
+                monster.skillChance=0;
+            }
+            if(previousBadge){
+                showMonsterSkillNameBadge=function(name){
+                    if(String(name||"")!=="普通攻擊"){ usedSkill=true; }
+                    return previousBadge.apply(this,arguments);
+                };
+            }
+            try{
+                return previousDailyProtectedMonsterAttack.apply(this,arguments);
+            }finally{
+                if(previousBadge){ showMonsterSkillNameBadge=previousBadge; }
+                if(forceNormal){
+                    monster.skillIds=savedSkillIds;
+                    monster.v141SupportSkillIds=savedSupports;
+                    monster.skillChance=savedChance;
+                }
+                if(rank==="boss"){ monster.v173DailyBossUsedSkillLastAction=usedSkill; }
+            }
+        };
+    }
+
+    /* Freeze/Hard Control execution is owned by js/00-main.js.
+       V158 keeps only combat tuning and must not wrap player skill casts. */
+
+    if(typeof openInventoryCharacterDetail==="function"){
+        const previousOpenInventoryCharacterDetail=openInventoryCharacterDetail;
+        openInventoryCharacterDetail=function(){
+            const result=previousOpenInventoryCharacterDetail.apply(this,arguments);
+            if(typeof document!=="undefined"){
+                const rows=Array.from(document.querySelectorAll("#inventoryCharacterDetailStats .inventory-character-detail-row"));
+                const evasionRow=rows.find(row=>{
+                    const label=row.querySelector("span");
+                    return label&&label.textContent.trim()==="閃避";
+                });
+                const evasionValue=evasionRow&&evasionRow.querySelector("b");
+                if(evasionValue){
+                    evasionValue.textContent=numeric(evasionValue.textContent).toFixed(1)+"%";
+                }
+                const note=document.querySelector("#inventoryCharacterDetailStats .inventory-character-detail-note");
+                if(note){
+                    note.innerHTML=
+                        "最終命中率＝95%＋命中×0.15%＋最終命中加成－目標最終閃躲－最終命中下降，最後限制70%～99%。<br>"+
+                        "命中／閃躲／異常抗性的玩家介面統一使用 % 顯示；內部仍以最終百分點加減，異常主屬性與目標精神每1點各換算0.05%的最終機率修正。";
+                }
+            }
+            return result;
+        };
+    }
+})();
+
+
+/* bundled source: js/48-v159-abyss-battle-portraits.js */
+/* =====================================================
+   V159 — deterministic battle portrait synchronization
+===================================================== */
 (function installV159AbyssBattlePortraits(){
     "use strict";
 
@@ -4521,8 +5994,7 @@ bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such fi
             const field=document.getElementById(id);
             if(!field||typeof field.addEventListener!=="function"||field.dataset.v169ImmediateSave==="1"){ return; }
             field.dataset.v169ImmediateSave="1";
-            field.addEventListener("change"tail: error writing 'standard output': Broken pipe
-,()=>{
+            field.addEventListener("change",()=>{
                 if(elementBoxIsActive()){ notifyLocked(); syncSharedRecoveryForm(); return; }
                 persistSelectedCharacterSettings();
             });
@@ -4646,13 +6118,552 @@ bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such fi
     window.v169SaveElementBoxSettings=function(){
         if(elementBoxIsActive()){ notifyLocked(); return false; }
         persistSelectedCharacterSettings();
-        if(typeof confirmAutoBattleSettings==="function"){ returtail: error writing 'standard output': Broken pipe
-bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-bwrap: Can't find source path /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-bwrap: Can't find source path /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-tail: error writing 'standard output': Broken pipe
-l;
+        if(typeof confirmAutoBattleSettings==="function"){ return confirmAutoBattleSettings(); }
+        return true;
+    };
+
+    window.v169StopElementBox=function(){
+        if(!elementBoxIsActive()||typeof toggleAutoBattle!=="function"){ syncElementBoxSettingControls(); return false; }
+        if(typeof autoBattle!=="undefined"&&!autoBattle){ autoBattle=true; }
+        const result=toggleAutoBattle();
+        syncElementBoxSettingControls();
+        return result;
+    };
+
+    if(typeof updateAutoButton==="function"){
+        const previous=updateAutoButton;
+        updateAutoButton=function(){ const result=previous.apply(this,arguments); syncElementBoxSettingControls(); return result; };
+    }
+
+    function afterOpen(type){
+        if(type!=="autoBattleSettings"){ return; }
+        bindImmediatePersistence();
+        bindLockedInteractionGuard();
+        syncElementBoxSettingControls();
+    }
+    if(typeof openHomeFeature==="function"){
+        const previous=openHomeFeature;
+        openHomeFeature=function(type){ const result=previous.apply(this,arguments); afterOpen(type); return result; };
+    }
+    if(typeof openAutoBattleSettings==="function"){
+        const previous=openAutoBattleSettings;
+        openAutoBattleSettings=function(){ const result=previous.apply(this,arguments); afterOpen("autoBattleSettings"); return result; };
+    }
+
+    normalizeSharedRecoveryAcrossParty();
+    bindImmediatePersistence();
+    bindLockedInteractionGuard();
+    syncElementBoxSettingControls();
+})();
+
+
+/* bundled source: js/50-v169-water-skill-rules.js */
+/* V169 — Water runtime compatibility only. V173.64 is the sole author of player skill fields. */
+(function installV169WaterSkillRules(){
+    "use strict";
+    if(typeof window==="undefined"||window.__v169WaterSkillRulesInstalled){ return; }
+    window.__v169WaterSkillRulesInstalled=true;
+
+    const VERSION="169";
+    const WATER_DAMAGE_SKILL_IDS=Object.freeze([
+        "waterKnife","frostPunch","iceSpin","frostCrush","waterBall","floodBeast","iceArrowRain"
+    ]);
+    const WATER_SKILL_IDS=Object.freeze(WATER_DAMAGE_SKILL_IDS.concat([
+        "freeze","healSpell","revive","purifyMind","waterEX"
+    ]));
+    const FROSTBITE_REMAINING_RATE=.70;
+    const numeric=value=>{
+        const result=Number(value);
+        return Number.isFinite(result)?result:0;
+    };
+    const activeFrostbite=entity=>!!(entity&&Array.isArray(entity.statusEffects)&&entity.statusEffects.some(effect=>
+        effect&&effect.type==="frostbite"&&numeric(effect.turnsLeft)>0
+    ));
+
+    /* Frostbite's outgoing-damage multiplier is a shared Runtime seam. Its
+       chance, duration and all other skill fields are authored by V173.64. */
+    if(typeof window.getOutgoingDamageDownPercent==="function"){
+        const previousOutgoingDamageDown=window.getOutgoingDamageDownPercent;
+        window.getOutgoingDamageDownPercent=function(attacker){
+            const existing=Math.max(0,Math.min(100,numeric(previousOutgoingDamageDown.apply(this,arguments))));
+            if(!activeFrostbite(attacker)){ return existing; }
+            return Math.max(0,Math.min(100,100-(100-existing)*FROSTBITE_REMAINING_RATE));
+        };
+    }
+
+    window.v169WaterSkillRules=Object.freeze({
+        version:VERSION,skillIds:WATER_SKILL_IDS.slice(),
+        isFrostbitten:activeFrostbite,frostbitePenaltyPercent:30
+    });
+})();
+
+
+/* bundled source: js/51-v169-rpg-ui.js */
+/* =====================================================
+   V169 — RPG dialogs, character layout, shop and dungeon UI
+===================================================== */
+(function installV169RpgUi(){
+    "use strict";
+
+    if(
+        typeof window==="undefined" ||
+        typeof document==="undefined" ||
+        window.__v169RpgUiInstalled
+    ){
+        return;
+    }
+    window.__v169RpgUiInstalled=true;
+
+    const dialogQueue=[];
+    let activeDialog=null;
+    let dialogElements=null;
+
+    function ensureDialogElements(){
+        if(dialogElements&&dialogElements.layer.isConnected){
+            return dialogElements;
+        }
+
+        const layer=document.createElement("div");
+        layer.id="v169RpgDialogLayer";
+        layer.className="v169-rpg-dialog-layer";
+        layer.setAttribute("aria-hidden","true");
+
+        const panel=document.createElement("section");
+        panel.className="v169-rpg-dialog";
+        panel.setAttribute("role","alertdialog");
+        panel.setAttribute("aria-modal","true");
+        panel.setAttribute("aria-labelledby","v169RpgDialogTitle");
+        panel.setAttribute("aria-describedby","v169RpgDialogMessage");
+
+        const crest=document.createElement("div");
+        crest.className="v169-rpg-dialog-crest";
+        crest.setAttribute("aria-hidden","true");
+        crest.textContent="✦";
+
+        const title=document.createElement("h2");
+        title.id="v169RpgDialogTitle";
+
+        const message=document.createElement("div");
+        message.id="v169RpgDialogMessage";
+        message.className="v169-rpg-dialog-message";
+
+        const actions=document.createElement("div");
+        actions.className="v169-rpg-dialog-actions";
+
+        const cancelButton=document.createElement("button");
+        cancelButton.type="button";
+        cancelButton.className="v169-rpg-dialog-button secondary";
+
+        const confirmButton=document.createElement("button");
+        confirmButton.type="button";
+        confirmButton.className="v169-rpg-dialog-button secondary";
+
+        actions.append(cancelButton,confirmButton);
+        panel.append(crest,title,message,actions);
+        layer.appendChild(panel);
+        document.body.appendChild(layer);
+
+        cancelButton.addEventListener("click",()=>settleDialog(false));
+        confirmButton.addEventListener("click",()=>settleDialog(true));
+        layer.addEventListener("keydown",event=>{
+            if(event.key!=="Escape"||!activeDialog){ return; }
+            event.preventDefault();
+            settleDialog(activeDialog.kind==="alert");
+        });
+
+        dialogElements={
+            layer,
+            panel,
+            crest,
+            title,
+            message,
+            cancelButton,
+            confirmButton
+        };
+        return dialogElements;
+    }
+
+    function normalizeDialogOptions(kind,options){
+        const supplied=options&&typeof options==="object"?options:{};
+        return {
+            title:String(
+                supplied.title ||
+                (kind==="confirm"?"冒險確認":"冒險提示")
+            ),
+            confirmText:String(
+                supplied.confirmText ||
+                (kind==="confirm"?"確定":"知道了")
+            ),
+            cancelText:String(supplied.cancelText||"返回"),
+            primary:supplied.primary===true,
+            tone:supplied.danger?"danger":String(supplied.tone||"normal")
+        };
+    }
+
+    function pumpDialogQueue(){
+        if(activeDialog||dialogQueue.length===0){ return; }
+
+        activeDialog=dialogQueue.shift();
+        const elements=ensureDialogElements();
+        const options=activeDialog.options;
+        activeDialog.previousFocus=document.activeElement;
+
+        elements.panel.dataset.kind=activeDialog.kind;
+        elements.panel.dataset.tone=options.tone;
+        elements.crest.textContent=options.tone==="danger"?"⚠":"✦";
+        elements.title.textContent=options.title;
+        elements.message.textContent=activeDialog.message;
+        elements.cancelButton.textContent=options.cancelText;
+        elements.confirmButton.textContent=options.confirmText;
+        elements.cancelButton.hidden=activeDialog.kind!=="confirm";
+        elements.confirmButton.classList.toggle("primary",options.primary||options.tone==="danger");
+        elements.confirmButton.classList.toggle("danger",options.tone==="danger");
+
+        elements.layer.classList.add("show");
+        elements.layer.setAttribute("aria-hidden","false");
+        elements.confirmButton.focus({preventScroll:true});
+    }
+
+    function settleDialog(accepted){
+        if(!activeDialog){ return; }
+
+        const completed=activeDialog;
+        const elements=ensureDialogElements();
+        activeDialog=null;
+        elements.layer.classList.remove("show");
+        elements.layer.setAttribute("aria-hidden","true");
+
+        if(
+            completed.previousFocus&&
+            completed.previousFocus.isConnected&&
+            typeof completed.previousFocus.focus==="function"
+        ){
+            completed.previousFocus.focus({preventScroll:true});
+        }
+
+        completed.resolve(!!accepted);
+        Promise.resolve().then(pumpDialogQueue);
+    }
+
+    function enqueueDialog(kind,message,options){
+        return new Promise(resolve=>{
+            dialogQueue.push({
+                kind,
+                message:String(message===undefined?"":message),
+                options:normalizeDialogOptions(kind,options),
+                resolve,
+                previousFocus:null
+            });
+            pumpDialogQueue();
+        });
+    }
+
+    window.rpgAlert=function(message,options){
+        return enqueueDialog("alert",message,options);
+    };
+
+    window.rpgConfirm=function(message,options){
+        return enqueueDialog("confirm",message,options);
+    };
+
+    /* Existing alert call sites are intentionally retained as the common
+       notification entry point, but they now render through the RPG queue. */
+    window.alert=function(message){
+        void window.rpgAlert(message);
+    };
+
+    /* A synchronous custom confirmation is impossible in the browser.
+       Known confirmation paths use rpgConfirm/await; this guard prevents a
+       missed legacy call from ever opening a native browser dialog. */
+    window.confirm=function(message){
+        void window.rpgConfirm(message);
+        return false;
+    };
+
+    window.v169GetRpgDialogState=function(){
+        return {
+            active:activeDialog?activeDialog.kind:null,
+            queued:dialogQueue.length
+        };
+    };
+
+    /* ----- Shop: keep the proven potion grid and add the equipment preview page. ----- */
+    function arrangeShopColumns(markup){
+        if(typeof markup!=="string"||markup.indexOf("shop-potion-list")<0){
+            return markup;
+        }
+
+        try{
+            const template=document.createElement("template");
+            template.innerHTML=markup;
+            const list=template.content.querySelector(".shop-potion-list");
+            if(!list){ return markup; }
+
+            const cards=Array.from(list.querySelectorAll(":scope > .shop-potion-card"));
+            const hpCards=cards.filter(card=>card.classList.contains("hp"));
+            const spCards=cards.filter(card=>card.classList.contains("sp"));
+            if(hpCards.length===0&&spCards.length===0){ return markup; }
+
+            const otherCards=cards.filter(card=>
+                !card.classList.contains("hp")&&
+                !card.classList.contains("sp")
+            );
+            const orderedCards=[];
+            const rowCount=Math.max(hpCards.length,spCards.length);
+            for(let index=0;index<rowCount;index++){
+                if(hpCards[index]){ orderedCards.push(hpCards[index]); }
+                if(spCards[index]){ orderedCards.push(spCards[index]); }
+            }
+            orderedCards.push(...otherCards);
+
+            list.textContent="";
+            list.classList.remove("v169-shop-columns");
+            orderedCards.forEach(card=>list.appendChild(card));
+            return template.innerHTML;
+        }catch(_){
+            return markup;
+        }
+    }
+    window.v169ArrangeShopColumns=arrangeShopColumns;
+
+    const SHOP_REFRESH_STORAGE_KEY=window.FourSymbolsAccountSave.accountKey("equipment-shop-daily");
+    const SHOP_FREE_REFRESHES=5;
+    const SHOP_MAX_REFRESHES=10;
+    let shopPage="potion";
+    const SHOP_EQUIPMENT_PREVIEW=[
+        {name:"青鋒長劍",slot:"武器",glyph:"劍"},{name:"厚背砍刀",slot:"武器",glyph:"刀"},
+        {name:"沉木法杖",slot:"武器",glyph:"杖"},{name:"竹骨法扇",slot:"武器",glyph:"扇"},
+        {name:"烏金戰甲",slot:"衣服",glyph:"甲"},{name:"素紋法袍",slot:"衣服",glyph:"袍"},
+        {name:"鐵紋護腕",slot:"護腕",glyph:"腕"},{name:"雲紗護腕",slot:"護腕",glyph:"袖"},
+        {name:"玄鐵戰靴",slot:"鞋子",glyph:"靴"},{name:"行雲法履",slot:"鞋子",glyph:"履"},
+        {name:"束髮戰冠",slot:"頭部",glyph:"冠"},{name:"青布法帽",slot:"頭部",glyph:"帽"},
+        {name:"精鐵短劍",slot:"武器",glyph:"鋒"},{name:"斬馬闊刀",slot:"武器",glyph:"斬"},
+        {name:"檀木短杖",slot:"武器",glyph:"木"},{name:"素竹羽扇",slot:"武器",glyph:"羽"},
+        {name:"護心皮甲",slot:"衣服",glyph:"護"},{name:"清風道袍",slot:"衣服",glyph:"道"}
+    ];
+
+    function shopEscape(value){
+        return String(value==null?"":value)
+            .replace(/&/g,"&amp;")
+            .replace(/</g,"&lt;")
+            .replace(/>/g,"&gt;")
+            .replace(/"/g,"&quot;")
+            .replace(/'/g,"&#039;");
+    }
+
+    function shopDateKey(){
+        const now=new Date();
+        return now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0");
+    }
+
+    function loadEquipmentShopRefreshState(){
+        const today=shopDateKey();
+        let state={date:today,refreshCount:0};
+        try{
+            const stored=JSON.parse(localStorage.getItem(SHOP_REFRESH_STORAGE_KEY)||"{}");
+            if(stored&&stored.date===today){
+                state.refreshCount=Math.max(0,Math.min(SHOP_MAX_REFRESHES,Math.floor(Number(stored.refreshCount)||0)));
+            }
+        }catch(_){ }
+        return state;
+    }
+
+    function saveEquipmentShopRefreshState(state){
+        try{ localStorage.setItem(SHOP_REFRESH_STORAGE_KEY,JSON.stringify(state)); }catch(_){ }
+    }
+
+    function equipmentShopOffers(refreshCount){
+        const count=Math.max(0,Math.floor(Number(refreshCount)||0));
+        const start=count*5%SHOP_EQUIPMENT_PREVIEW.length;
+        return Array.from({length:6},(_,offset)=>
+            SHOP_EQUIPMENT_PREVIEW[(start+offset)%SHOP_EQUIPMENT_PREVIEW.length]
+        );
+    }
+
+    function renderShopTabs(){
+        return '<div class="v17345-shop-tabs" role="tablist" aria-label="商店分類">'+
+            '<button type="button" class="'+(shopPage==="potion"?'active':'')+'" onclick="v169SwitchShopPage(\'potion\')">補品</button>'+
+            '<button type="button" class="'+(shopPage==="equipment"?'active':'')+'" onclick="v169SwitchShopPage(\'equipment\')">裝備</button></div>';
+    }
+
+    function renderEquipmentShop(){
+        const state=loadEquipmentShopRefreshState();
+        const offers=equipmentShopOffers(state.refreshCount);
+        const freeRemaining=Math.max(0,SHOP_FREE_REFRESHES-state.refreshCount);
+        const paidPending=state.refreshCount>=SHOP_FREE_REFRESHES&&state.refreshCount<SHOP_MAX_REFRESHES;
+        const goldText=typeof gold!=="undefined"?Math.max(0,Math.floor(Number(gold)||0)).toLocaleString("zh-TW"):"0";
+        const refreshLabel=freeRemaining>0
+            ?"免費刷新（剩"+freeRemaining+"次）"
+            :state.refreshCount>=SHOP_MAX_REFRESHES?"今日刷新已達上限":"金幣刷新・價格待設定";
+        return '<div class="v17345-equipment-shop">'+
+            '<div class="v17345-equipment-wallet"><span>目前金幣</span><b>'+goldText+'</b></div>'+
+            '<div class="v17345-equipment-grid">'+offers.map(item=>
+                '<article class="v17345-equipment-card"><div class="v17345-equipment-icon" aria-hidden="true">'+shopEscape(item.glyph)+'</div>'+
+                '<b>'+shopEscape(item.name)+'</b><span>'+shopEscape(item.slot)+'・普通裝備</span>'+
+                '<button type="button" disabled>售價待設定</button></article>'
+            ).join("")+'</div>'+
+            '<div class="v17345-equipment-refresh"><div><b>今日刷新 '+state.refreshCount+' / '+SHOP_MAX_REFRESHES+'</b>'+
+            '<span>前5次免費；第6～10次使用金幣，價格待下一步確認。</span></div>'+
+            '<button type="button" '+(freeRemaining>0?'onclick="v17345RefreshEquipmentShop()"':'disabled')+'>'+refreshLabel+'</button></div>'+
+            (paidPending?'<p class="v17345-equipment-pending">金幣刷新版面已保留，等確認刷新價格後再開放第6～10次。</p>':'')+
+            '</div>';
+    }
+
+    function rerenderShop(){
+        const body=document.getElementById("homeFeatureModalBody");
+        if(body&&typeof renderShopContent==="function"){ body.innerHTML=renderShopContent(); }
+    }
+
+    window.v169SwitchShopPage=function(page){
+        shopPage=page==="equipment"?"equipment":"potion";
+        rerenderShop();
+    };
+
+    window.v17345RefreshEquipmentShop=function(){
+        const state=loadEquipmentShopRefreshState();
+        if(state.refreshCount>=SHOP_FREE_REFRESHES){ return; }
+        state.refreshCount++;
+        saveEquipmentShopRefreshState(state);
+        rerenderShop();
+    };
+
+    if(typeof renderShopContent==="function"){
+        const previousRenderShopContent=renderShopContent;
+        renderShopContent=function(){
+            const content=shopPage==="equipment"
+                ?renderEquipmentShop()
+                :arrangeShopColumns(previousRenderShopContent.apply(this,arguments));
+            return '<div class="v17345-shop-shell">'+renderShopTabs()+content+'</div>';
+        };
+    }
+
+    if(typeof buyShopItem==="function"){
+        const previousBuyShopItem=buyShopItem;
+        buyShopItem=function(itemId,requestedQuantity){
+            const item=typeof getPotionDefinition==="function"
+                ?getPotionDefinition(itemId)
+                :null;
+            const beforeCount=typeof getPotionCount==="function"
+                ?Math.max(0,Number(getPotionCount(itemId))||0)
+                :0;
+            const beforeGold=typeof gold!=="undefined"
+                ?Math.max(0,Number(gold)||0)
+                :0;
+
+            const announcePurchase=()=>{
+                const afterCount=typeof getPotionCount==="function"
+                    ?Math.max(0,Number(getPotionCount(itemId))||0)
+                    :beforeCount;
+                const afterGold=typeof gold!=="undefined"
+                    ?Math.max(0,Number(gold)||0)
+                    :beforeGold;
+                const purchased=Math.max(0,afterCount-beforeCount);
+                const spent=Math.max(0,beforeGold-afterGold);
+                if(!item||purchased<=0||spent<=0){ return; }
+                void window.rpgAlert(
+                    "已購買「"+item.name+"」×"+purchased+"。\n花費 "+spent.toLocaleString("zh-TW")+" 金幣。",
+                    {
+                        title:"購買成功",
+                        tone:"success",
+                        confirmText:"收下物品"
+                    }
+                );
+            };
+
+            const result=previousBuyShopItem.apply(this,arguments);
+            if(result&&typeof result.then==="function"){
+                return result.then(value=>{
+                    announcePurchase();
+                    return value;
+                });
+            }
+            announcePurchase();
+            return result;
+        };
+    }
+
+    /* equipment-progression follows this source inside gameplay-core's fixed execution order. */
+
+})();
+
+
+/* bundled source: js/equipment-progression.js */
+/* =====================================================
+   Equipment progression authority
+   - four elemental set stats / orange quality
+   - explicit reforge-slot rule
+   - ordinary equipment generator shared by shop + equipment chests
+   - equipment dungeon chest rewards
+===================================================== */
+(function installEquipmentProgression(){
+    "use strict";
+    if(typeof window==="undefined"||window.__equipmentProgressionInstalled){ return; }
+    window.__equipmentProgressionInstalled=true;
+
+    const RARITIES=[
+        {key:"white",label:"白階",chance:40,min:1,max:3,reforgeSlots:0,shopPrice:500,color:"#D8D8D8",available:true},
+        {key:"blue",label:"藍階",chance:40,min:4,max:6,reforgeSlots:0,shopPrice:1500,color:"#42A5FF",available:true},
+        {key:"purple",label:"紫階",chance:15,min:7,max:9,reforgeSlots:1,shopPrice:4000,color:"#B05CFF",available:true},
+        {key:"orange",label:"橙階",chance:5,min:10,max:12,reforgeSlots:1,shopPrice:10000,color:"#FF9F38",available:true},
+        {key:"pink",label:"桃紅階",chance:0,available:false,planned:true,color:"#FF4FA7"},
+        {key:"four-symbol",label:"四象階",chance:0,available:false,planned:true,fourSymbol:true,color:null}
+    ];
+    const RARITY_BY_KEY=Object.fromEntries(RARITIES.map(item=>[item.key,item]));
+    const EQUIPMENT_CHEST_DROP_TABLE=[
+        {key:"white",label:"白階",chance:40},
+        {key:"blue",label:"藍階",chance:40},
+        {key:"purple",label:"紫階",chance:10},
+        {key:"orange",label:"橙階",chance:10}
+    ];
+    const STAT_LABEL={attack:"攻擊",intelligence:"智力",vitality:"體質",agility:"敏捷",spirit:"精神",energy:"能量"};
+    const SLOT_META={
+        shoulder:{label:"護腕",warrior:["vitality","attack"],mage:["vitality","intelligence"]},
+        head:{label:"頭盔",warrior:["vitality","attack","agility"],mage:["vitality","intelligence","agility"]},
+        shoes:{label:"鞋子",warrior:["vitality","agility","attack"],mage:["vitality","agility","intelligence"]},
+        armor:{label:"衣服",warrior:["vitality","agility","attack"],mage:["vitality","agility","intelligence"]},
+        weapon:{label:"武器",warrior:["attack"],mage:["intelligence"]}
+    };
+    const ASSETS={
+        warrior:{
+            shoulder:["assets/equipment/warrior/bracer-01.png","assets/equipment/warrior/bracer-02.png"],
+            head:["assets/equipment/warrior/head-01.png","assets/equipment/warrior/head-02.png"],
+            armor:["assets/equipment/warrior/armor-01.png","assets/equipment/warrior/armor-02.png"],
+            shoes:["assets/equipment/warrior/shoes-01.png","assets/equipment/warrior/shoes-02.png"],
+            weapon:["assets/equipment/warrior/weapon-01.png","assets/equipment/warrior/weapon-02.png","assets/equipment/warrior/weapon-03.png","assets/equipment/warrior/weapon-04.png"]
+        },
+        mage:{
+            shoulder:["assets/equipment/mage/bracer-01.png","assets/equipment/mage/bracer-02.png"],
+            head:["assets/equipment/mage/head-01.png","assets/equipment/mage/head-02.png"],
+            armor:["assets/equipment/mage/armor-01.png","assets/equipment/mage/armor-02.png"],
+            shoes:["assets/equipment/mage/shoes-01.png","assets/equipment/mage/shoes-02.png"],
+            weapon:["assets/equipment/mage/weapon-01.png","assets/equipment/mage/weapon-02.png","assets/equipment/mage/weapon-03.png","assets/equipment/mage/weapon-04.png"]
+        }
+    };
+    const NAME_PREFIX={
+        white:["素鐵","粗革","舊紋","樸木","灰鋼","素麻"],
+        blue:["青鋼","凝霜","玄紋","碧影","寒星","靈木"],
+        purple:["紫霞","幽月","星隕","玄冥","流光","凌霄"],
+        orange:["日曜","龍炎","天衡","帝曜","神鑄","無極"]
+    };
+    const NAME_SUFFIX={
+        warrior:{shoulder:"戰腕",head:"戰盔",armor:"戰甲",shoes:"戰靴",weapon:"戰刃"},
+        mage:{shoulder:"法環",head:"法冠",armor:"法袍",shoes:"法履",weapon:"法杖"}
+    };
+    const SET_RULES={
+        blade:{stats:{attack:15,vitality:-2}},
+        fan:{stats:{intelligence:15,vitality:-2}},
+        heavyArmor:{stats:{attack:7,spirit:5}},
+        robe:{stats:{intelligence:7,spirit:5}},
+        boots:{stats:{attack:2,agility:13}},
+        shoes:{stats:{intelligence:2,agility:13}},
+        helm:{stats:{attack:15}},
+        crown:{stats:{intelligence:15}},
+        wristguard:{stats:{attack:15}},
+        focus:{stats:{intelligence:15}}
+    };
+    const SET_IDS=new Set(["setFire","setWater","setEarth","setWind"]);
+    const SHOP_STORAGE_KEY=window.FourSymbolsAccountSave.accountKey("equipment-shop-daily");
+    let activeReforgeSnapshot=null;
     let equipmentDungeonRunning=false;
     let equipmentDungeonWaveIndex=-1;
 
@@ -4753,8 +6764,122 @@ l;
     }
     window.v17357RepairLegacyStarterEquipmentIcons=repairLegacyStarterEquipmentIcons;
     window.v17362StarterWhiteStats=Object.fromEntries(Object.entries(STARTER_WHITE_STATS).map(([id,stats])=>[id,{...stats}]));
-    function makeUid(prefix){ return prbwrap: Can't find source path /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-n(()=>
+    function makeUid(prefix){ return prefix+"_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,8); }
+    function assetVariant(classType,slot,random){
+        const list=ASSETS[classType]&&ASSETS[classType][slot]||[];
+        return list.length?list[Math.floor(random()*list.length)%list.length]:"";
+    }
+    function mageWeaponSuffix(asset){
+        const source=String(asset||"");
+        return /weapon-(?:03|04)\.png(?:\?|$)/i.test(source)?"法扇":"法杖";
+    }
+    function generatedName(rarity,classType,slot,random,asset){
+        const prefixes=NAME_PREFIX[rarity.key];
+        const prefix=prefixes[Math.floor(random()*prefixes.length)%prefixes.length];
+        const suffix=classType==="mage"&&slot==="weapon"
+            ?mageWeaponSuffix(asset)
+            :NAME_SUFFIX[classType][slot];
+        return prefix+suffix;
+    }
+    function normalizeGeneratedMageWeaponName(item){
+        if(!item||!item.v17346GeneratedEquipment||item.classType!=="mage"||item.type!=="weapon"){ return item; }
+        const source=item.assetPath||item.icon||"";
+        const suffix=mageWeaponSuffix(source);
+        if(/法器$/.test(String(item.name||""))){ item.name=String(item.name).replace(/法器$/,suffix); }
+        return item;
+    }
+    function generateEquipment(random=Math.random,forced={}){
+        const forcedRarity=forced.rarity?RARITY_BY_KEY[forced.rarity]:null;
+        const rarity=forcedRarity&&forcedRarity.available!==false?forcedRarity:rarityFromRandom(random);
+        const classType=forced.classType||(random()<.5?"warrior":"mage");
+        const slots=Object.keys(SLOT_META);
+        const slot=forced.slot||slots[Math.floor(random()*slots.length)%slots.length];
+        const statPool=SLOT_META[slot][classType];
+        const stat=forced.stat||statPool[Math.floor(random()*statPool.length)%statPool.length];
+        const value=forced.value==null?randomInt(rarity.min,rarity.max,random):Number(forced.value);
+        const asset=assetVariant(classType,slot,random);
+        const name=generatedName(rarity,classType,slot,random,asset);
+        return {
+            id:makeUid("gear"),v141Uid:makeUid("gearuid"),name,
+            icon:artMarkup(asset,rarity.key),type:slot,count:1,price:Math.floor(rarity.shopPrice*.2),
+            stats:{[stat]:value},reforgeStats:null,reforgeSlots:rarity.reforgeSlots,reforgeUsed:0,
+            rarityKey:rarity.key,quality:rarity.key,classType,assetPath:asset,
+            shopPrice:rarity.shopPrice,v17346GeneratedEquipment:true
+        };
+    }
+    window.v17346GenerateEquipment=generateEquipment;
+    window.v17346EquipmentRarityTable=RARITIES.map(item=>({...item}));
+
+    function equipmentChestIcon(){
+        if(typeof window.v17361GeneralDungeonChestIcon==="function"){
+            return window.v17361GeneralDungeonChestIcon();
+        }
+        return '<span class="v169-item-art v169-chest-art v169-rarity-blue"><img src="assets/items/chests/dungeon-chest.png" alt="" aria-hidden="true" draggable="false" onerror="this.hidden=true"></span>';
+    }
+    const EQUIPMENT_CHEST_DEFINITION={
+        id:"equipmentChest",
+        name:"裝備寶箱",
+        icon:equipmentChestIcon(),
+        type:"chest",
+        tierKey:"blue",
+        price:0,
+        stats:{}
+    };
+    function equipmentChestRarityFromRandom(random=Math.random){
+        const roll=random()*100;
+        let cursor=0;
+        for(const rarity of EQUIPMENT_CHEST_DROP_TABLE){
+            cursor+=rarity.chance;
+            if(roll<cursor){ return rarity; }
+        }
+        return EQUIPMENT_CHEST_DROP_TABLE[EQUIPMENT_CHEST_DROP_TABLE.length-1];
+    }
+    function rollEquipmentChestItems(random=Math.random){
+        return Array.from({length:3},()=>{
+            const rarity=equipmentChestRarityFromRandom(random);
+            return generateEquipment(random,{rarity:rarity.key});
+        });
+    }
+    function equipmentChestOddsText(separator="・"){
+        return EQUIPMENT_CHEST_DROP_TABLE.map(entry=>entry.label+entry.chance+"%").join(separator);
+    }
+    function syncEquipmentChestPresentation(){
+        if(typeof inventoryItems==="undefined"||!Array.isArray(inventoryItems)){ return; }
+        inventoryItems.forEach(item=>{
+            if(!item||item.id!==EQUIPMENT_CHEST_DEFINITION.id){ return; }
+            item.name=EQUIPMENT_CHEST_DEFINITION.name;
+            item.icon=EQUIPMENT_CHEST_DEFINITION.icon;
+            item.type=EQUIPMENT_CHEST_DEFINITION.type;
+            item.tierKey=EQUIPMENT_CHEST_DEFINITION.tierKey;
+            item.price=0;
+            if(!item.stats||typeof item.stats!=="object"){ item.stats={}; }
+        });
+    }
+    function showEquipmentChestPreview(){
+        if(typeof window.v132ShowRewardModal!=="function"){ return; }
+        const html='<div class="v132-reward-modal-inner v17346-preview-modal"><h3>裝備寶箱開啟預覽</h3><p>每個裝備寶箱開啟後固定隨機獲得3件裝備。</p><p>'+escapeHtml(equipmentChestOddsText("・"))+'</p><div class="v132-reward-actions"><button type="button" onclick="v132CloseRewardModal()">返回</button></div></div>';
+        window.v132ShowRewardModal(html);
+    }
+    function openEquipmentChest(){
+        if(typeof inventoryItems==="undefined"||!Array.isArray(inventoryItems)){
+            alert("背包資料尚未就緒，請稍後再試。");
+            return null;
+        }
+        const owned=inventoryItems.some(item=>item&&item.id===EQUIPMENT_CHEST_DEFINITION.id&&Math.max(0,Math.floor(Number(item.count)||0))>0);
+        if(!owned){
+            alert("目前沒有裝備寶箱。");
+            return null;
+        }
+        if(
+            typeof window.v132RunInventoryTransaction!=="function"||
+            typeof window.v132ConsumeStackItem!=="function"||
+            typeof window.v132AddItemToInventory!=="function"
+        ){
+            alert("裝備寶箱系統尚未就緒，請重新整理後再試。");
+            return null;
+        }
+        const rewards=rollEquipmentChestItems(Math.random);
+        const opened=window.v132RunInventoryTransaction(()=>
             window.v132ConsumeStackItem(EQUIPMENT_CHEST_DEFINITION.id,1)&&
             rewards.every(item=>window.v132AddItemToInventory(item,1))
         );
@@ -4870,8 +6995,7 @@ n(()=>
     window.v17346RemainingReforgeSlots=remainingReforgeSlots;
 
     function appendReforgeMarkers(item){
-        const statstail: error writing 'standard output': Broken pipe
-=document.getElementById("itemModalStats");
+        const stats=document.getElementById("itemModalStats");
         if(!stats){ return; }
         stats.querySelectorAll(".v17346-reforge-slot").forEach(node=>node.remove());
         const count=remainingReforgeSlots(item);
@@ -4984,9 +7108,21 @@ n(()=>
 .v17346-rarity-blue{border:2px solid #42A5FF!important;box-shadow:0 0 9px rgba(66,165,255,.7)!important}
 .v17346-rarity-purple{border:2px solid #B05CFF!important;box-shadow:0 0 10px rgba(176,92,255,.75)!important}
 .v17346-rarity-orange{border:3px solid #FF9F38!important;box-shadow:0 0 5px #FF9F38,0 0 14px rgba(255,159,56,.9),inset 0 0 8px rgba(255,159,56,.3)!important}
-.v17346tail: error writing 'standard output': Broken pipe
-bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-ght:1.25!important}.v17346-shop-preview-art{width:168px;height:168px;margin:0 auto 14px;display:grid;place-items:center}.v17346-shop-preview-art .v169-item-art{width:100%!important;height:100%!important}.v17346-shop-preview-info{display:grid;gap:7px;padding:11px 12px;border:1px solid rgba(197,151,72,.55);border-radius:9px;background:rgba(12,9,6,.7);font-size:16px}.v17346-shop-preview-info strong{color:#ffe09a;font-size:18px}.v17346-shop-preview-price{margin-top:11px;color:#ffd078;font-size:18px;font-weight:900}.v17346-shop-preview-reforge{margin-top:6px;color:#ffbf5b;font-weight:900}.v17346-shop-preview-modal .v132-reward-actions{margin-top:14px!important}.v17346-equipment-dungeon-card .v141-dungeon-cover-art{background-image:linear-gradient(rgba(5,4,3,.2),rgba(5,4,3,.68)),url('assets/ui/dungeon-equipment-v17346.png')!important;background-size:cover!important;background-position:center!important}
+.v17346-rarity-pink{border:3px solid #FF4FA7!important;box-shadow:0 0 6px #FF4FA7,0 0 16px rgba(255,79,167,.88),inset 0 0 9px rgba(255,79,167,.42)!important}
+.v17346-rarity-four-symbol{border:3px solid transparent!important;background:linear-gradient(#090807,#090807) padding-box,conic-gradient(from 0deg,#42A5FF 0 25%,#47D6A3 25% 50%,#C89B45 50% 75%,#FF5A36 75% 100%) border-box!important;box-shadow:0 0 8px rgba(255,90,54,.34),0 0 12px rgba(66,165,255,.32),0 0 16px rgba(71,214,163,.26)!important;animation:v17360FourSymbolRarityBreath 2.8s ease-in-out infinite!important}
+@keyframes v17360FourSymbolRarityBreath{0%,100%{filter:brightness(.96)}50%{filter:brightness(1.14)}}
+.v17346-reforge-slot{margin-top:7px;color:#ffbf5b!important;font-weight:900;letter-spacing:.06em}
+#game-stage #itemModal.v17346-potion-detail .item-modal-box{height:auto!important;min-height:0!important;max-height:calc(100% - 28px)!important;flex:0 0 auto!important;align-self:center!important;justify-content:flex-start!important}
+#game-stage #itemModal.v17346-potion-detail #itemModalStats{flex:0 0 auto!important;min-height:0!important;max-height:180px!important}
+#game-stage #itemModal.v17346-potion-detail .item-modal-buttons{margin-top:0!important}
+#game-stage #itemModal #v17342InventoryPotionUse{-webkit-appearance:none!important;appearance:none!important;background:linear-gradient(180deg,#d9ad55 0%,#9c641c 100%)!important;border:1px solid #f2cf83!important;color:#1a1007!important;opacity:1!important;font-weight:900!important;text-shadow:none!important;box-shadow:inset 0 1px 0 rgba(255,242,192,.42),0 3px 8px rgba(0,0,0,.34)!important}
+#game-stage #itemModal #v17342InventoryPotionUse:focus,#game-stage #itemModal #v17342InventoryPotionUse:focus-visible,#game-stage #itemModal #v17342InventoryPotionUse:active{background:linear-gradient(180deg,#edc66d 0%,#ad7524 100%)!important;color:#160d05!important;outline:2px solid rgba(255,220,139,.72)!important;outline-offset:1px!important}
+#game-stage #itemModal #v17342InventoryPotionUse:disabled{background:#33291f!important;border-color:#66533d!important;color:#8f806b!important;box-shadow:none!important;opacity:.68!important}
+.v132-reward-modal-inner.v17346-preview-modal{width:min(360px,calc(100% - 24px))!important;height:min(540px,calc(100dvh - 24px))!important;max-height:calc(100dvh - 24px)!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;padding:16px!important;box-sizing:border-box!important}
+.v132-reward-modal-inner.v17346-preview-modal>h3{position:static!important;flex:0 0 auto!important;margin:0 0 12px!important;padding:0!important;background:transparent!important}
+.v132-reward-modal-inner.v17346-preview-modal .v132-preview-list-scroll{flex:1 1 auto!important;min-height:0!important;max-height:none!important;overflow-y:auto!important;overscroll-behavior:contain;touch-action:pan-y;scrollbar-gutter:stable}
+.v132-reward-modal-inner.v17346-preview-modal .v132-reward-actions{position:static!important;flex:0 0 auto!important;margin-top:12px!important;padding-top:0!important;background:transparent!important}
+.v17346-shop-card{position:relative;overflow:hidden;padding:10px 9px 9px!important;cursor:pointer;transition:filter .16s ease,background .16s ease,border-color .16s ease}.v17346-shop-card .v17346-gear-art{width:74px;height:74px;margin:0 auto 7px}.v17346-gear-art .v169-item-art{width:100%!important;height:100%!important}.v17346-shop-card .v17346-shop-name{display:block;color:#f6e7c2!important;font-size:17px!important;line-height:1.22!important;font-weight:900!important;letter-spacing:.02em}.v17346-shop-card .v17346-shop-slot{display:block;margin-top:3px;color:#c9b894!important;font-size:14px!important;line-height:1.25!important}.v17346-shop-card .v17346-stat{display:block;margin-top:3px;color:#ffe0a0!important;font-size:15px!important;line-height:1.3!important;font-weight:800!important}.v17346-shop-card .v17346-reforge-mini{display:block;margin-top:2px;color:#ffbf5b;font-size:12px;font-weight:800}.v17346-shop-card .v17346-shop-buy{-webkit-appearance:none;appearance:none;width:100%;min-height:42px;margin-top:8px;border:1px solid rgba(226,181,87,.76);border-radius:7px;font-size:15px;font-weight:900;line-height:1.15}.v17346-shop-card.is-affordable{background:linear-gradient(180deg,rgba(51,36,19,.94),rgba(19,14,10,.96))!important;box-shadow:inset 0 0 0 1px rgba(225,179,83,.08),0 0 10px rgba(211,155,54,.08)}.v17346-shop-card.is-affordable .v17346-shop-buy{background:linear-gradient(180deg,#f4d477 0%,#cf942d 58%,#a76518 100%)!important;border-color:#ffe5a0!important;color:#241506!important;text-shadow:0 1px rgba(255,239,185,.35)!important;box-shadow:inset 0 1px 0 rgba(255,248,211,.62),0 0 10px rgba(236,183,71,.32)!important}.v17346-shop-card.is-affordable .v17346-shop-buy:active{background:linear-gradient(180deg,#fff0ad,#d69a32)!important;color:#160d05!important}.v17346-shop-card.is-unaffordable{background:linear-gradient(180deg,rgba(38,29,24,.94),rgba(17,14,12,.98))!important;border-color:rgba(119,83,61,.72)!important}.v17346-shop-card.is-unaffordable .v17346-gear-art img{filter:saturate(.48) brightness(.72)}.v17346-shop-card.is-unaffordable .v17346-shop-name{color:#b9aa98!important}.v17346-shop-card.is-unaffordable[data-rarity="orange"] .v17346-shop-name{color:#d7944d!important}.v17346-shop-card.is-unaffordable .v17346-shop-slot,.v17346-shop-card.is-unaffordable .v17346-stat{color:#978878!important}.v17346-shop-card .v17346-shop-buy:disabled{background:linear-gradient(180deg,rgba(91,43,31,.82),rgba(48,27,23,.92))!important;border-color:rgba(167,79,56,.7)!important;color:#d79279!important;box-shadow:none!important;opacity:.86!important;cursor:not-allowed}.v17346-shop-preview-modal{width:min(340px,calc(100% - 26px))!important;max-height:calc(100dvh - 30px)!important;padding:18px!important;box-sizing:border-box!important;text-align:center!important}.v17346-shop-preview-modal>h3{margin:0 0 12px!important;color:#f7e7be!important;font-size:22px!important;line-height:1.25!important}.v17346-shop-preview-art{width:168px;height:168px;margin:0 auto 14px;display:grid;place-items:center}.v17346-shop-preview-art .v169-item-art{width:100%!important;height:100%!important}.v17346-shop-preview-info{display:grid;gap:7px;padding:11px 12px;border:1px solid rgba(197,151,72,.55);border-radius:9px;background:rgba(12,9,6,.7);font-size:16px}.v17346-shop-preview-info strong{color:#ffe09a;font-size:18px}.v17346-shop-preview-price{margin-top:11px;color:#ffd078;font-size:18px;font-weight:900}.v17346-shop-preview-reforge{margin-top:6px;color:#ffbf5b;font-weight:900}.v17346-shop-preview-modal .v132-reward-actions{margin-top:14px!important}.v17346-equipment-dungeon-card .v141-dungeon-cover-art{background-image:linear-gradient(rgba(5,4,3,.2),rgba(5,4,3,.68)),url('assets/ui/dungeon-equipment-v17346.png')!important;background-size:cover!important;background-position:center!important}
 `;
         document.head.appendChild(style);
     }
@@ -5042,8 +7178,7 @@ ght:1.25!important}.v17346-shop-preview-art{width:168px;height:168px;margin:0 au
         if(!item){ return; }
         const cost=Math.max(0,Number(item.shopPrice)||0);
         if(typeof gold==="undefined"||Number(gold)<cost){ void (window.rpgAlert?window.rpgAlert("金幣不足。",{title:"無法購買"}):Promise.resolve()); return; }
-        if(window.v132CanAddItemToInventory&&!window.v132Catail: error writing 'standard output': Broken pipe
-nAddItemToInventory(item,1)){ alert("背包空間不足。"); return; }
+        if(window.v132CanAddItemToInventory&&!window.v132CanAddItemToInventory(item,1)){ alert("背包空間不足。"); return; }
         gold-=cost;
         if(typeof inventoryItems!=="undefined"&&Array.isArray(inventoryItems)){ inventoryItems.push({...item}); }
         if(typeof updateGoldDisplay==="function"){ updateGoldDisplay(); }
@@ -5132,10 +7267,126 @@ nAddItemToInventory(item,1)){ alert("背包空間不足。"); return; }
                 '<section class="v17363-preview-group"><b>裝備寶箱</b><em>×2</em><p>勝利後取得 2 個裝備寶箱；每個寶箱固定隨機取得 3 件裝備。</p></section>'+
                 '<section class="v17363-preview-group"><b>裝備品階機率</b><p>'+escapeHtml(odds)+'</p></section>'+
             '</div>'+
-            'tail: error writing 'standard output': Broken pipe
-bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-tail: error writing 'standard output': Broken pipe
-al material stacks forever. Other item types
+            '<div class="v17363-preview-note">機率直接取自正式裝備寶箱掉落表，不載入大型裝備預覽圖。</div>'+
+            '<div class="v132-reward-actions"><button type="button" onclick="v132CloseRewardModal()">返回</button></div></div>';
+        window.v132ShowRewardModal(html);
+    };
+
+    if(typeof renderDungeonTabContent==="function"){
+        const previousRenderDungeonTabContent=renderDungeonTabContent;
+        renderDungeonTabContent=function(tabName){
+            const html=previousRenderDungeonTabContent.apply(this,arguments);
+            if(tabName!=="daily"||typeof html!=="string"||html.includes("v17346-equipment-dungeon-card")){ return html; }
+            const card='<article class="v141-dungeon-cover-card v17346-equipment-dungeon-card" data-dungeon-cover="equipment"><div class="v141-dungeon-cover-art"><span>裝備副本</span><small>3輪 × 每輪6隻</small></div><div class="v141-dungeon-cover-info"><b>裝備副本</b><span>難度：與一般副本相同</span></div><div class="v141-dungeon-cover-actions"><button type="button" onclick="v17346ShowEquipmentDungeonPreview()">獎勵預覽</button><button type="button" onclick="v17346BeginEquipmentDungeon()">挑戰</button></div><div class="v141-dungeon-remaining">可挑戰</div></article>';
+            return html.replace(/<\/div>\s*$/,card+'</div>');
+        };
+    }
+
+    syncMainCharacterEquipmentStorage();
+    if(document.readyState==="loading"){
+        document.addEventListener("DOMContentLoaded",syncMainCharacterEquipmentStorage,{once:true});
+    }else{
+        setTimeout(syncMainCharacterEquipmentStorage,0);
+    }
+
+    if(typeof saveGame==="function"){ try{ saveGame(); }catch(_){ } }
+
+    /* Inventory QoL follows this source inside gameplay-core. */
+})();
+
+
+/* bundled source: js/53-v173.50-inventory-qol.js */
+/* =====================================================
+   V173.50 — inventory quality-of-life
+   - equipment bulk sell by rarity threshold
+   - batch use/open for stacked potions, chests and tickets
+   - no duplicate business rules: reuse existing inventory/content authorities
+===================================================== */
+(function installV17350InventoryQol(){
+    "use strict";
+
+    if(typeof window==="undefined"||typeof document==="undefined"||window.__v17350InventoryQolInstalled){ return; }
+    window.__v17350InventoryQolInstalled=true;
+
+    const BULK_SELL_KEY=window.FourSymbolsAccountSave.accountKey("bulk-sell-quality");
+    const EQUIPMENT_TYPES=new Set(["head","shoulder","shoes","weapon","hand","armor"]);
+    const QUALITY_ORDER=["white","blue","purple","orange","pink","four-symbol"];
+    const QUALITY_LABEL={white:"白階",blue:"藍階",purple:"紫階",orange:"橙階",pink:"桃紅階","four-symbol":"四象階"};
+    const TIER_TO_QUALITY={white:"white",blue:"blue",purple:"purple",orange:"orange",pink:"pink","four-symbol":"four-symbol",low:"white",mid:"blue",high:"purple",perfect:"orange"};
+    const SUPPORTED_BATCH_CHEST_IDS=new Set(["materialChest","equipmentChest"]);
+
+    function escapeHtml(value){
+        return String(value==null?"":value)
+            .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+            .replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+    }
+
+    function clampInteger(value,min,max){
+        const numeric=Math.floor(Number(value)||0);
+        return Math.max(min,Math.min(max,numeric));
+    }
+
+    function ownedCountById(itemId){
+        if(typeof inventoryItems==="undefined"||!Array.isArray(inventoryItems)){ return 0; }
+        return inventoryItems.reduce((sum,item)=>{
+            if(!item||item.id!==itemId){ return sum; }
+            return sum+Math.max(1,Math.floor(Number(item.count)||1));
+        },0);
+    }
+
+    function equipmentQuality(item){
+        if(!item){ return null; }
+        const direct=String(item.rarityKey||item.quality||"").toLowerCase();
+        if(QUALITY_ORDER.includes(direct)){ return direct; }
+        const tier=String(item.tierKey||"").toLowerCase();
+        if(TIER_TO_QUALITY[tier]){ return TIER_TO_QUALITY[tier]; }
+        if(isInventoryEquipment(item)&&item.setId){ return "orange"; }
+        const icon=String(item.icon||"");
+        for(const quality of QUALITY_ORDER){
+            if(icon.includes("rarity-"+quality)){ return quality; }
+        }
+        return null;
+    }
+
+    function isInventoryEquipment(item){
+        if(!item){ return false; }
+        if(typeof isEquipmentInventoryType==="function"){
+            try{ return !!isEquipmentInventoryType(item.type); }catch(_){ }
+        }
+        return EQUIPMENT_TYPES.has(String(item.type||""));
+    }
+
+    const V17362_STACK_LIMIT=999;
+
+    function inventoryQualityRank(item){
+        const quality=equipmentQuality(item);
+        const rank=QUALITY_ORDER.indexOf(quality);
+        return rank>=0?rank:-1;
+    }
+
+    function inventoryFamilyKey(item){
+        if(!item){ return "zz:unknown"; }
+        const id=String(item.id||"");
+        const type=String(item.type||"item");
+        if(isInventoryEquipment(item)){
+            const slot=type==="hand"?"weapon":type==="helmet"?"head":type;
+            return "equipment:"+String(item.classType||"any")+":"+slot;
+        }
+        if(item.blueprintSlot){ return "material:blueprint:"+String(item.blueprintSlot); }
+        if(/^ore/i.test(id)){ return "material:ore"; }
+        if(item.talismanEffect){ return "talisman:"+String(item.talismanEffect); }
+        if(type==="potion"){ return "potion:"+id; }
+        if(type==="chest"){ return "chest:"+id; }
+        if(type==="ticket"){ return "ticket:"+String(item.setId||id); }
+        return type+":"+(id||String(item.name||""));
+    }
+
+    /*
+       Stack identity is intentionally stricter than the visual family key.
+       Equipment is never stackable. For materials, the displayed material
+       name is the durable semantic identity: older saves can carry a legacy
+       id while the current definition uses a newer stable id, which used to
+       leave two visually identical material stacks forever. Other item types
        keep their stable id identity so tickets/chests/potions with different
        behavior are never accidentally merged merely because labels match.
     */
@@ -5275,9 +7526,130 @@ al material stacks forever. Other item types
             units+=count;
             goldValue+=Math.max(0,Math.floor(Number(item.price)||0))*count;
             const rank=QUALITY_ORDER.indexOf(equipmentQuality(item));
-            if(rank>=QUALITYbwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-tail: error writing 'standard output': Broken pipe
-",total};
+            if(rank>=QUALITY_ORDER.indexOf("orange")){ hasOrangeOrAbove=true; }
+        });
+        return {candidates,units,goldValue,hasOrangeOrAbove};
+    }
+
+    function refreshInventoryViews(){
+        if(typeof rebuildInventorySlots==="function"){ rebuildInventorySlots(); }
+        if(typeof renderInventory==="function"){ renderInventory(); }
+        else if(typeof renderInventoryItems==="function"){ renderInventoryItems(); }
+        if(typeof updateUI==="function"){ updateUI(); }
+        if(typeof saveGame==="function"){ saveGame(); }
+    }
+
+    function ensureBulkSellBar(){
+        const gridScroll=document.getElementById("inventoryGridScroll");
+        if(!gridScroll||!gridScroll.parentNode){ return; }
+        let bar=document.getElementById("v17350BulkSellBar");
+        if(!bar){
+            bar=document.createElement("section");
+            bar.id="v17350BulkSellBar";
+            bar.className="v17350-bulk-sell-bar";
+            bar.setAttribute("aria-label","裝備一鍵售出");
+            bar.innerHTML=
+                '<b>一鍵售出</b>'+
+                '<select id="v17350BulkSellQuality" aria-label="售出品質上限">'+
+                    '<option value="white">白階以下</option>'+
+                    '<option value="blue">藍階以下</option>'+
+                    '<option value="purple">紫階以下</option>'+
+                    '<option value="orange">橙階以下</option>' +
+                    '<option value="pink">桃紅階以下</option>' +
+                    '<option value="four-symbol">四象階以下</option>'+
+                '</select>'+
+                '<button id="v17350BulkSellButton" type="button" onclick="v17350BulkSellEquipment()">售出 0 件</button>'+
+                '<small id="v17350BulkSellMeta">僅售出背包內未穿戴裝備</small>';
+            gridScroll.parentNode.insertBefore(bar,gridScroll);
+            const select=bar.querySelector("#v17350BulkSellQuality");
+            if(select){
+                select.value=readBulkSellThreshold();
+                select.addEventListener("change",()=>{
+                    writeBulkSellThreshold(select.value);
+                    syncBulkSellBar();
+                });
+            }
+        }
+        syncBulkSellBar();
+    }
+
+    function syncBulkSellBar(){
+        const bar=document.getElementById("v17350BulkSellBar");
+        if(!bar){ return; }
+        const visible=typeof inventoryFilter!=="undefined"&&inventoryFilter==="equipment";
+        bar.hidden=!visible;
+        if(!visible){ return; }
+        const select=bar.querySelector("#v17350BulkSellQuality");
+        const threshold=select&&QUALITY_ORDER.includes(select.value)?select.value:readBulkSellThreshold();
+        if(select&&!select.value){ select.value=threshold; }
+        const summary=candidateSummary(threshold);
+        const button=bar.querySelector("#v17350BulkSellButton");
+        const meta=bar.querySelector("#v17350BulkSellMeta");
+        if(button){
+            button.disabled=summary.units<=0;
+            button.textContent="售出 "+summary.units+" 件";
+            button.classList.toggle("danger",summary.hasOrangeOrAbove);
+        }
+        if(meta){
+            meta.textContent=summary.units>0
+                ?"預計獲得 "+summary.goldValue.toLocaleString("zh-TW")+" 金幣"
+                :"目前沒有符合條件的裝備";
+        }
+    }
+
+    window.v17350BulkSellEquipment=async function(){
+        const select=document.getElementById("v17350BulkSellQuality");
+        const threshold=writeBulkSellThreshold(select&&select.value||readBulkSellThreshold());
+        const summary=candidateSummary(threshold);
+        if(summary.units<=0){
+            if(typeof window.rpgAlert==="function"){
+                await window.rpgAlert("目前沒有符合「"+QUALITY_LABEL[threshold]+"以下」條件的背包裝備。",{
+                    title:"一鍵售出",confirmText:"知道了"
+                });
+            }
+            return false;
+        }
+
+        if(summary.hasOrangeOrAbove){
+            const accepted=typeof window.rpgConfirm==="function"&&await window.rpgConfirm(
+                "這次一鍵售出包含橙階以上裝備。\n將售出 "+summary.units+" 件裝備，獲得 "+summary.goldValue.toLocaleString("zh-TW")+" 金幣。\n高階裝備售出後無法復原，確定繼續嗎？",
+                {title:"高品質裝備警告",confirmText:"確認售出",cancelText:"取消",danger:true}
+            );
+            if(!accepted){ return false; }
+        }
+
+        const selected=new Set(summary.candidates);
+        for(let index=inventoryItems.length-1;index>=0;index--){
+            if(selected.has(inventoryItems[index])){ inventoryItems.splice(index,1); }
+        }
+        if(typeof gold!=="undefined"){ gold+=summary.goldValue; }
+        if(typeof selectedInventorySlot!=="undefined"){ selectedInventorySlot=null; }
+        if(typeof closeItemModal==="function"){ closeItemModal(); }
+        refreshInventoryViews();
+        ensureBulkSellBar();
+
+        if(typeof window.rpgAlert==="function"){
+            await window.rpgAlert(
+                "已售出 "+summary.units+" 件裝備。\n獲得 "+summary.goldValue.toLocaleString("zh-TW")+" 金幣。",
+                {title:"一鍵售出完成",confirmText:"知道了",tone:"success"}
+            );
+        }
+        return true;
+    };
+
+    function getBatchDescriptor(item){
+        if(!item){ return null; }
+        const total=ownedCountById(item.id);
+        if(total<=1){ return null; }
+        if(typeof getPotionDefinition==="function"){
+            const definition=getPotionDefinition(item.id);
+            if(definition){ return {kind:"potion",label:"批量使用",total,definition}; }
+        }
+        if(item.type==="chest"&&SUPPORTED_BATCH_CHEST_IDS.has(String(item.id||""))){
+            return {kind:"chest",label:"批量開啟",total};
+        }
+        if(item.type==="ticket"&&typeof window.useEquipmentTicket==="function"){
+            return {kind:"ticket",label:"批量開啟",total};
         }
         return null;
     }
@@ -5553,9 +7925,117 @@ function fivePriority(indexes){
 }
 window.v17351FiveEnemyAutoTargetPriority=fivePriority;
 
-/* V174 battle ptail: error writing 'standard output': Broken pipe
-bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-transform:"translateY("+Math.round(halfDistance)+"px)",opacity:1,offset:.62},
+/* V174 battle presentation owner.
+   Slot geometry is owned exclusively by FourSymbolsBattlefieldSlots plus the
+   formal render-geometry adapter. This layer owns only artwork decoration,
+   layering and transient animation. It deliberately contains no Slot/Unit/HUD
+   top/left/right/bottom/inset/width/height positioning rules. */
+function removeRetiredPresentationStyles(){
+    const style=document.getElementById("v174-cardless-battle-style");
+    if(style){ style.remove(); }
+}
+function numericValue(value){const n=Number(value);return Number.isFinite(n)?Math.max(0,Math.floor(n)):0;}
+function setTextIfChanged(node,value){if(node&&node.textContent!==value)node.textContent=value;}
+function battleArtworkSource(card,kind){
+    if(!card)return "";
+    const computed=getComputedStyle(card);
+    let source="";
+    if(kind==="monster")source=String(computed.getPropertyValue("--v152-abyss-portrait")||"").trim();
+    if(!source||source==="none")source=String(card.style.backgroundImage||"").trim();
+    if(!source||source==="none")source=String(computed.backgroundImage||"").trim();
+    if(source&&source!=="none"&&!/^linear-gradient/i.test(source))card.dataset.v174BattleArtwork=source;
+    return card.dataset.v174BattleArtwork||"";
+}
+function syncUnitArtwork(card,kind){
+    if(!card)return;
+    card.classList.add("v174-cardless-unit");
+    let art=card.querySelector(":scope > .v174-battle-art");
+    if(!art){art=document.createElement("div");art.className="v174-battle-art";card.insertBefore(art,card.firstChild);}
+    const source=battleArtworkSource(card,kind);
+    if(source)art.style.backgroundImage=source;
+    card.style.setProperty("background-image","none","important");
+}
+function syncResourceNumbers(){
+    document.querySelectorAll("#battlePage .battle-player[id^='battlePlayerCard']").forEach(card=>{
+        const index=Number(String(card.id).replace("battlePlayerCard",""));
+        let character=null;
+        try{if(Number.isInteger(index)&&typeof getPartyCharacterByIndex==="function")character=getPartyCharacterByIndex(index);}catch(_){}
+        if(!character)return;
+        const hp=card.querySelector(".hp-bar-text"),sp=card.querySelector(".sp-bar-text");
+        setTextIfChanged(hp,String(numericValue(character.hp)));
+        setTextIfChanged(sp,String(numericValue(character.sp)));
+    });
+    document.querySelectorAll("#battlePage .battle-monster[id^='battleMonster']").forEach(card=>{
+        const index=Number(String(card.id).replace("battleMonster",""));
+        let monster=null;
+        try{if(Number.isInteger(index)&&typeof monsters!=="undefined")monster=monsters[index];}catch(_){}
+        if(!monster)return;
+        const hp=card.querySelector(".monster-hp .monster-bar-text"),sp=card.querySelector(".monster-sp .monster-bar-text");
+        setTextIfChanged(hp,String(numericValue(monster.hp)));
+        setTextIfChanged(sp,String(numericValue(monster.sp)));
+    });
+}
+function syncBattlePresentation(){
+    removeRetiredPresentationStyles();
+    document.querySelectorAll("#battlePage .battle-player").forEach(card=>syncUnitArtwork(card,"player"));
+    document.querySelectorAll("#battlePage .battle-monster").forEach(card=>syncUnitArtwork(card,"monster"));
+    syncResourceNumbers();
+}
+let activeEscapePresentation=null;
+function escapeGeometry(characterIndex){
+    const geometry=window.FourSymbolsBattlefieldRenderGeometry;
+    if(!geometry||typeof geometry.getUnitGeometry!=="function"){ return null; }
+    const unit=geometry.getUnitGeometry("player",characterIndex);
+    const overlay=typeof geometry.getBattlefieldOverlayGeometry==="function"
+        ?geometry.getBattlefieldOverlayGeometry()
+        :null;
+    return unit&&unit.unitRect?{unit:unit,overlay:overlay}:null;
+}
+function acquireBattlePresentationLock(owner){
+    const flow=window.FourSymbolsBattleFlow;
+    return flow&&typeof flow.acquirePresentationLock==="function"
+        ?flow.acquirePresentationLock(owner)
+        :function(){};
+}
+function cleanupEscapePresentation(){
+    const state=activeEscapePresentation;
+    activeEscapePresentation=null;
+    if(!state){ return; }
+    if(state.animation&&typeof state.animation.cancel==="function"){
+        try{ state.animation.cancel(); }catch(_){}
+    }
+    if(state.card){
+        state.card.classList.remove("v174-escape-presenting","v174-escape-success","v174-escape-failure");
+        state.card.style.removeProperty("transform");
+        state.card.style.removeProperty("opacity");
+        state.card.style.removeProperty("will-change");
+    }
+    if(typeof state.release==="function"){ state.release(); }
+}
+function playEscapePresentation(characterIndex,succeeded){
+    cleanupEscapePresentation();
+    const index=Number(characterIndex)||0;
+    const card=document.getElementById("battlePlayerCard"+index);
+    const geometry=escapeGeometry(index);
+    if(!card||!geometry){ return Promise.resolve(false); }
+    const unitRect=geometry.unit.unitRect;
+    const overlayRect=geometry.overlay&&geometry.overlay.rect;
+    const surfaceBottom=overlayRect?overlayRect.bottom:Math.max(unitRect.bottom,window.innerHeight||unitRect.bottom);
+    const fullDistance=Math.max(unitRect.height*2.1,surfaceBottom-unitRect.top+unitRect.height*.35);
+    const halfDistance=Math.max(unitRect.height*.8,Math.min(unitRect.height*1.55,fullDistance*.42));
+    const release=acquireBattlePresentationLock("escape-presentation");
+    card.classList.add("v174-escape-presenting",succeeded?"v174-escape-success":"v174-escape-failure");
+    card.style.setProperty("will-change","transform,opacity");
+    const frames=succeeded
+        ?[
+            {transform:"translateY(0)",opacity:1,offset:0},
+            {transform:"translateY("+Math.round(fullDistance)+"px)",opacity:.12,offset:.9},
+            {transform:"translateY("+Math.round(fullDistance)+"px)",opacity:0,offset:1}
+        ]
+        :[
+            {transform:"translateY(0)",opacity:1,offset:0},
+            {transform:"translateY("+Math.round(halfDistance)+"px)",opacity:1,offset:.42},
+            {transform:"translateY("+Math.round(halfDistance)+"px)",opacity:1,offset:.62},
             {transform:"translateY(0)",opacity:1,offset:1}
         ];
     const duration=succeeded?760:820;
@@ -5631,17 +8111,566 @@ function quality(i){if(!i)return null;if(i.setId)return"orange";const d=String(i
 function locked(i){return !!(i&&i.v17351Locked===true)}
 function statText(i){const all=Object.assign({},i?.stats||{});Object.entries(i?.reforgeStats||{}).forEach(([k,v])=>all[k]=num(all[k])+num(v));const L={attack:"攻擊",intelligence:"智力",vitality:"體質",agility:"敏捷",spirit:"精神",energy:"能量"};const a=Object.entries(all).filter(([,v])=>num(v)!==0).map(([k,v])=>(L[k]||k)+" "+(num(v)>0?"+":"")+num(v));return a.length?a.join("　"):"無額外能力";}
 const SLOT_ALIAS={weapon:"hand",hand:"hand",head:"head",helmet:"head",shoulder:"shoulder",wristguard:"shoulder",armor:"armor",robe:"armor",shoes:"shoes",boots:"shoes"};
-cotail: error writing 'standard output': Broken pipe
-bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-bwrap: Can't find source path /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-bwrap: Can't find source path /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-bwrap: Can't find source path /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-bwrap: Can't find source path /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-bwrap: Can't find source path /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
+const SLOT_STORAGE_ALIASES={hand:["hand","weapon"],head:["head","helmet"],shoulder:["shoulder","wristguard"],armor:["armor","robe"],shoes:["shoes","boots"]};
+const SLOT_LABEL={head:"頭部",hand:"武器",shoulder:"護腕",armor:"衣服",shoes:"鞋子"};
+const COMPARE_STAT_LABEL={attack:"攻擊",intelligence:"智力",vitality:"體質",agility:"敏捷",spirit:"精神",energy:"能量"};
+function esc(v){return String(v==null?"":v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;")}
+function slot(t){const key=String(t||"").toLowerCase();return SLOT_ALIAS[key]||key}
+function equippedFor(i){if(!i||typeof characterEquipment==="undefined")return null;let k=null;try{k=typeof getBackpackEquipmentKey==="function"?getBackpackEquipmentKey(typeof inventoryCharacterIndex!=="undefined"?inventoryCharacterIndex:0):null}catch(_){}if(!k)return null;const slots=characterEquipment[k]||{},target=slot(i.type),keys=SLOT_STORAGE_ALIASES[target]||[target];for(const key of keys){if(slots[key])return slots[key]}return null;}
+function itemArt(i){if(!i)return"";if(i.assetPath){const q=quality(i)||"white";return '<span class="v169-item-art v169-equipment-art v17346-rarity-'+esc(q)+'"><img src="'+esc(i.assetPath)+'" alt="" draggable="false" decoding="async"></span>'}return String(i.icon||"◆")}
+function compareStats(i){if(!i)return '<div class="v17351-compare-empty">未穿戴此部位裝備</div>';const all=Object.assign({},i.stats||{});Object.entries(i.reforgeStats||{}).forEach(([k,v])=>all[k]=num(all[k])+num(v));const rows=Object.entries(all).filter(([,v])=>num(v)!==0).map(([k,v])=>'<div class="v17351-compare-stat"><span>'+esc(COMPARE_STAT_LABEL[k]||k)+'</span><b>'+(num(v)>0?"+":"")+num(v)+'</b></div>');return rows.length?rows.join(""):'<div class="v17351-compare-empty">無額外能力</div>'}
+function saveRefresh(){if(typeof rebuildInventorySlots==="function")rebuildInventorySlots();if(typeof renderInventoryItems==="function")renderInventoryItems();if(typeof renderInventory==="function")renderInventory();if(typeof updateUI==="function")updateUI();if(typeof saveGame==="function")saveGame();}
+function clearEquipmentComparison(){const modal=document.getElementById("itemModal");if(!modal)return;modal.querySelectorAll("#v17351EquipmentCompare,#v17351EquipmentLockButton").forEach(n=>n.remove());modal.classList.remove("v17351-equipment-comparison","v17351-locked-equipment");}
+function syncDetail(item,slotIndex){
+const modal=document.getElementById("itemModal"),buttons=modal?.querySelector?.(".item-modal-buttons");if(!modal||!buttons)return;
+clearEquipmentComparison();
+if(!equipment(item))return;
+const worn=equippedFor(item),targetSlot=slot(item.type),box=document.createElement("section");
+const sourceIcon=modal.querySelector("#itemModalIcon"),sourceName=modal.querySelector("#itemModalName"),sourceStats=modal.querySelector("#itemModalStats");
+const selectedArt=itemArt(item);
+const selectedName=sourceName&&sourceName.textContent?sourceName.textContent:String(item.name||"背包装備");
+const selectedStats=sourceStats&&sourceStats.innerHTML?sourceStats.innerHTML:compareStats(item);
+box.id="v17351EquipmentCompare";box.className="v17351-equipment-compare";
+box.innerHTML='<header class="v17351-compare-header"><div><small>EQUIPMENT COMPARE</small><b>裝備比較</b><span>同部位對照・'+esc(SLOT_LABEL[targetSlot]||targetSlot)+'</span></div><button class="v17351-compare-back" type="button" onclick="closeItemModal()">返回</button></header>'+
+'<div class="v17351-compare-grid">'+
+'<article class="v17351-compare-pane selected"><em>背包装備</em><div class="v17351-compare-art">'+selectedArt+'</div><strong>'+esc(selectedName)+'</strong><div class="v17351-compare-stats selected-stats">'+selectedStats+'</div></article>'+
+'<article class="v17351-compare-pane current"><em>目前裝備</em>'+(worn?'<div class="v17351-compare-art">'+itemArt(worn)+'</div><strong>'+esc(worn.name||"目前裝備")+'</strong><div class="v17351-compare-stats">'+compareStats(worn)+'</div>':'<div class="v17351-compare-art empty">—</div><strong>此部位尚未裝備</strong><div class="v17351-compare-stats">'+compareStats(null)+'</div>')+'</article></div>';
+buttons.parentNode.insertBefore(box,buttons);modal.classList.add("v17351-equipment-comparison");
+const b=document.createElement("button");b.id="v17351EquipmentLockButton";b.type="button";b.className="item-modal-button v17351-lock-button"+(locked(item)?" locked":"");b.textContent=locked(item)?"🔒 已鎖定・點擊解除":"🔓 鎖定裝備";b.onclick=()=>{item.v17351Locked=!locked(item);if(typeof saveGame==="function")saveGame();syncDetail(item,slotIndex);syncSellUi();};buttons.appendChild(b);modal.classList.toggle("v17351-locked-equipment",locked(item));
+}
+if(typeof window.openItemModal==="function"){const old=window.openItemModal;window.openItemModal=function(idx){const r=old.apply(this,arguments);const hasSelected=typeof selectedInventorySlot!=="undefined"&&selectedInventorySlot!==null&&Number.isInteger(Number(selectedInventorySlot)),selected=hasSelected?Number(selectedInventorySlot):Number(idx),i=typeof inventorySlots!=="undefined"?inventorySlots[selected]:null;syncDetail(i,selected);return r}}
+/* Equipped slots are already the reference side; comparing them against themselves is meaningless.
+   Always strip the backpack-only comparison after the canonical equipped-item modal opens. */
+if(typeof window.openEquippedItem==="function"){const old=window.openEquippedItem;window.openEquippedItem=function(){const r=old.apply(this,arguments);clearEquipmentComparison();return r}}
+if(typeof window.sellSelectedItem==="function"){const old=window.sellSelectedItem;window.sellSelectedItem=async function(){const i=typeof selectedInventorySlot!=="undefined"&&selectedInventorySlot!==null&&typeof inventorySlots!=="undefined"?inventorySlots[selectedInventorySlot]:null;if(locked(i)){await alertRpg("這件裝備已鎖定，請先解除鎖定後才能出售。",{title:"裝備已鎖定",confirmText:"知道了",danger:true});return false}return old.apply(this,arguments)}}
+function selectedForge(){const s=["#v141ReforgeItemSelect","#reforgeItemSelect",'select[onchange*="v141SelectReforgeItem"]'].map(x=>document.querySelector(x)).find(Boolean);if(!s||typeof inventoryItems==="undefined")return null;const v=String(s.value||""),nidx=Number(v);if(Number.isInteger(nidx)&&nidx>=0&&inventoryItems[nidx])return inventoryItems[nidx];return inventoryItems.find(i=>i&&[i.v141Uid,i.uid,i.id].some(x=>x!=null&&String(x)===v))||null;}
+if(typeof window.v141StartReforge==="function"){const old=window.v141StartReforge;window.v141StartReforge=function(){const i=selectedForge();if(locked(i)){void alertRpg("這件裝備已鎖定，無法進行冶煉。\n請先在背包解除鎖定。",{title:"裝備已鎖定",confirmText:"知道了",danger:true});return false}return old.apply(this,arguments)}}
+function readQ(){let v="white";try{v=localStorage.getItem(KEY)||v}catch(_){}return Q.includes(v)?v:"white"}function writeQ(v){v=Q.includes(v)?v:"white";try{localStorage.setItem(KEY,v)}catch(_){}const s=document.getElementById("v17350BulkSellQuality");if(s)s.value=v;return v;}
+function candidates(q){if(typeof inventoryItems==="undefined")return[];const max=Q.indexOf(q);return inventoryItems.filter(i=>equipment(i)&&!locked(i)&&Q.indexOf(quality(i))>=0&&Q.indexOf(quality(i))<=max)}
+function summary(q){const c=candidates(q);let units=0,gold=0,orange=false;c.forEach(i=>{const n=Math.max(1,integer(i.count,1));units+=n;gold+=integer(i.price)*n;if(Q.indexOf(quality(i))>=3)orange=true});return{c,units,gold,orange}}
+function picker(){const bar=document.getElementById("v17350BulkSellBar");if(!bar)return;const native=bar.querySelector("#v17350BulkSellQuality");if(native){native.hidden=true;native.tabIndex=-1;native.setAttribute("aria-hidden","true")}let p=document.getElementById("v17351BulkQualityPicker");if(!p){p=document.createElement("div");p.id="v17351BulkQualityPicker";p.className="v17351-quality-picker";p.innerHTML='<button id="v17351BulkQualityButton" type="button" aria-haspopup="listbox" aria-expanded="false" onclick="v17351ToggleQualityMenu()"></button><div class="v17351-quality-menu" role="listbox">'+Q.map(k=>'<button type="button" role="option" data-q="'+k+'" onclick="v17351ChooseQuality(\''+k+'\')"><i class="'+k+'"></i>'+QL[k]+'以下</button>').join("")+'</div>';native?native.insertAdjacentElement("afterend",p):bar.prepend(p)}syncSellUi();}
+window.v17351ToggleQualityMenu=()=>{const p=document.getElementById("v17351BulkQualityPicker"),b=document.getElementById("v17351BulkQualityButton");if(!p||!b)return;const open=!p.classList.contains("open");p.classList.toggle("open",open);b.setAttribute("aria-expanded",open?"true":"false")};
+window.v17351ChooseQuality=v=>{writeQ(v);document.getElementById("v17351BulkQualityPicker")?.classList.remove("open");syncSellUi()};
+function syncSellUi(){const bar=document.getElementById("v17350BulkSellBar");if(!bar)return;const q=readQ(),s=summary(q),b=document.getElementById("v17351BulkQualityButton"),sell=bar.querySelector("#v17350BulkSellButton"),meta=bar.querySelector("#v17350BulkSellMeta");if(b){const text=QL[q]+"以下 ▾";if(b.textContent!==text)b.textContent=text;}document.querySelectorAll("#v17351BulkQualityPicker [data-q]").forEach(o=>{const yes=o.dataset.q===q;if(o.classList.contains("selected")!==yes)o.classList.toggle("selected",yes);const aria=yes?"true":"false";if(o.getAttribute("aria-selected")!==aria)o.setAttribute("aria-selected",aria)});if(sell){if(sell.disabled!==(s.units<=0))sell.disabled=s.units<=0;const text="售出 "+s.units+" 件";if(sell.textContent!==text)sell.textContent=text;if(sell.classList.contains("danger")!==s.orange)sell.classList.toggle("danger",s.orange)}if(meta){const lc=typeof inventoryItems!=="undefined"?inventoryItems.filter(i=>equipment(i)&&locked(i)).length:0;const text=s.units?"預計獲得 "+s.gold.toLocaleString("zh-TW")+" 金幣"+(lc?"・略過 "+lc+" 件鎖定":""):"目前沒有符合條件且未鎖定的裝備";if(meta.textContent!==text)meta.textContent=text}}
+window.v17350BulkSellEquipment=async function(){const q=readQ(),s=summary(q);if(!s.units){await alertRpg("目前沒有符合「"+QL[q]+"以下」且未鎖定的背包裝備。",{title:"一鍵售出",confirmText:"知道了"});return false}const ok=await confirmRpg((s.orange?"⚠ 本次包含橙裝。\n":"")+"將售出 "+s.units+" 件未鎖定裝備，獲得 "+s.gold.toLocaleString("zh-TW")+" 金幣。\n"+(s.orange?"橙裝售出後無法復原，確定繼續嗎？":"確定售出嗎？"),{title:s.orange?"高品質裝備警告":"一鍵售出確認",confirmText:"確認售出",cancelText:"取消",danger:s.orange});if(!ok)return false;const set=new Set(s.c);for(let i=inventoryItems.length-1;i>=0;i--)if(set.has(inventoryItems[i]))inventoryItems.splice(i,1);if(typeof gold!=="undefined")gold+=s.gold;if(typeof selectedInventorySlot!=="undefined")selectedInventorySlot=null;if(typeof closeItemModal==="function")closeItemModal();saveRefresh();picker();await alertRpg("已售出 "+s.units+" 件裝備。\n獲得 "+s.gold.toLocaleString("zh-TW")+" 金幣。",{title:"一鍵售出完成",confirmText:"知道了",tone:"success"});return true};
+const inventoryRoot=document.getElementById("inventoryPage");if(inventoryRoot){inventoryRoot.addEventListener("click",e=>{const p=document.getElementById("v17351BulkQualityPicker");if(p&&p.classList.contains("open")&&!p.contains(e.target))p.classList.remove("open")});}
+/* Backpack geometry is owned by the canonical inventory CSS and render lifecycle. */
+picker();
+syncSellUi();
+})();
 
+
+/* bundled source: js/57-v173.51-quest-qa.js */
+/* V173.51 — achievements / daily + commission quest QA */
+(function(){
+"use strict";
+if(typeof window==="undefined"||window.__v17351QuestQaInstalled)return;
+window.__v17351QuestQaInstalled=true;
+const PAGE=5;let page=0;
+const alertRpg=(m,o)=>typeof window.rpgAlert==="function"?window.rpgAlert(m,o||{}):Promise.resolve(),n=v=>Number.isFinite(Number(v))?Number(v):0;
+function achievements(){try{return Array.isArray(achievementDefinitions)?achievementDefinitions:[]}catch(_){return[]}}function ready(a){try{return !!(a&&typeof a.check==="function"&&a.check())}catch(_){return false}}function claimed(a){try{return !!(a&&achievementState[a.id])}catch(_){return false}}
+function rewardLabel(r){if(!r)return"無";const L={gold:"金幣",exp:"EXP",sharedExp:"EXP"};return Object.entries(r).map(([k,v])=>(L[k]||k)+" +"+Math.floor(n(v))).join("・")||"無"}
+const originalClaim=typeof window.claimAchievement==="function"?window.claimAchievement:null;
+function render(){const list=achievements(),pages=Math.max(1,Math.ceil(list.length/PAGE));page=Math.max(0,Math.min(pages-1,page));const slice=list.slice(page*PAGE,(page+1)*PAGE),can=list.filter(a=>ready(a)&&!claimed(a)).length;return'<section class="v17351-achievement-shell"><div class="v17351-achievement-toolbar"><span>共 '+list.length+' 項成就</span><button type="button" class="v17351-achievement-claim-all" '+(can?"":"disabled")+' onclick="v17351ClaimAllAchievements()">一鍵領取'+(can?"（"+can+"）":"")+'</button></div><div class="v17351-achievement-list">'+slice.map(a=>{const r=ready(a),c=claimed(a);return'<article class="v17351-achievement-card '+(c?"claimed":r?"ready":"locked")+'"><div class="v17351-achievement-copy"><b>'+String(a.name||"成就")+'</b><span>'+String(a.desc||"")+'</span><small>獎勵：'+rewardLabel(a.reward)+'</small></div><button type="button" '+(!r||c?"disabled":"")+' onclick="v17351ClaimAchievement(\''+String(a.id||"")+'\')">'+(c?"✓ 已領取":r?"領取":"未達成")+'</button></article>'}).join("")+'</div><div class="v17351-achievement-pager"><button type="button" onclick="v17351ChangeAchievementPage(-1)">←</button><b>'+(page+1)+' / '+pages+'</b><button type="button" onclick="v17351ChangeAchievementPage(1)">→</button></div></section>'}
+window.renderAchievementContent=render;
+function refreshAchievements(){const body=document.getElementById("homeFeatureModalBody"),title=String(document.getElementById("homeFeatureModalTitle")?.textContent||"");if(body&&(/成就/.test(title)||document.querySelector(".v17351-achievement-shell")))body.innerHTML=render()}
+window.v17351ChangeAchievementPage=d=>{page+=Number(d)||0;refreshAchievements()};
+window.v17351ClaimAchievement=async id=>{const a=achievements().find(x=>x?.id===id);if(!a||claimed(a)||!ready(a))return false;const before=claimed(a),g0=typeof gold!=="undefined"?n(gold):0,e0=typeof sharedExp!=="undefined"?n(sharedExp):0;if(originalClaim)originalClaim(id);else{achievementState[id]=true;if(a.reward?.gold&&typeof gold!=="undefined")gold+=n(a.reward.gold)}if(before===claimed(a))return false;refreshAchievements();const gd=Math.max(0,(typeof gold!=="undefined"?n(gold):g0)-g0),ed=Math.max(0,(typeof sharedExp!=="undefined"?n(sharedExp):e0)-e0);await alertRpg("已領取「"+(a.name||"成就")+"」獎勵。"+(gd?"\n金幣 +"+Math.floor(gd).toLocaleString("zh-TW"):"")+(ed?"\nEXP +"+Math.floor(ed).toLocaleString("zh-TW"):""),{title:"成就獎勵",confirmText:"知道了",tone:"success"});return true};
+window.v17351ClaimAllAchievements=async()=>{const list=achievements().filter(a=>ready(a)&&!claimed(a));if(!list.length)return false;const g0=typeof gold!=="undefined"?n(gold):0,e0=typeof sharedExp!=="undefined"?n(sharedExp):0;let count=0;list.forEach(a=>{if(originalClaim)originalClaim(a.id);else{achievementState[a.id]=true;if(a.reward?.gold&&typeof gold!=="undefined")gold+=n(a.reward.gold)}if(claimed(a))count++});refreshAchievements();const gd=Math.max(0,(typeof gold!=="undefined"?n(gold):g0)-g0),ed=Math.max(0,(typeof sharedExp!=="undefined"?n(sharedExp):e0)-e0);await alertRpg("已一次領取 "+count+" 項成就獎勵。"+(gd?"\n金幣 +"+Math.floor(gd).toLocaleString("zh-TW"):"")+(ed?"\nEXP +"+Math.floor(ed).toLocaleString("zh-TW"):""),{title:"一鍵領取完成",confirmText:"知道了",tone:"success"});return true};
+
+function rewardText(r){return[r?.gold?"金幣 +"+Math.floor(n(r.gold)).toLocaleString("zh-TW"):null,r?.exp?"EXP +"+Math.floor(n(r.exp)).toLocaleString("zh-TW"):null].filter(Boolean).join("\n")||"獎勵已領取"}
+if(typeof window.claimDailyQuest==="function"){const old=window.claimDailyQuest;window.claimDailyQuest=function(id){const q=typeof dailyQuestDefinitions!=="undefined"?dailyQuestDefinitions.find(x=>x.id===id):null,b=typeof dailyQuestState!=="undefined"&&!!dailyQuestState.claimed[id],r=old.apply(this,arguments),a=typeof dailyQuestState!=="undefined"&&!!dailyQuestState.claimed[id];if(!window.__v17361BulkQuestClaim&&!b&&a&&q)void alertRpg("已領取「"+(q.name||"每日任務")+"」。\n"+rewardText(q.reward),{title:"每日任務獎勵",confirmText:"知道了",tone:"success"});setTimeout(previewChests,0);return r}}
+if(typeof window.claimCommissionQuest==="function"){const old=window.claimCommissionQuest;window.claimCommissionQuest=function(id){const q=typeof commissionQuestDefinitions!=="undefined"?commissionQuestDefinitions.find(x=>x.id===id):null,b=typeof commissionQuestState!=="undefined"&&!!commissionQuestState.claimed[id],r=old.apply(this,arguments),a=typeof commissionQuestState!=="undefined"&&!!commissionQuestState.claimed[id];if(!window.__v17361BulkQuestClaim&&!b&&a&&q)void alertRpg("已領取「"+(q.name||"委託任務")+"」。\n"+rewardText(q.reward),{title:"委託任務獎勵",confirmText:"知道了",tone:"success"});setTimeout(previewChests,0);return r}}
+if(typeof window.v141ClaimQuestMilestone==="function"){const old=window.v141ClaimQuestMilestone;window.v141ClaimQuestMilestone=function(type,threshold){const g0=typeof gold!=="undefined"?n(gold):0,e0=typeof sharedExp!=="undefined"?n(sharedExp):0,r=old.apply(this,arguments),gd=Math.max(0,(typeof gold!=="undefined"?n(gold):g0)-g0),ed=Math.max(0,(typeof sharedExp!=="undefined"?n(sharedExp):e0)-e0);if(gd||ed)void alertRpg("完成度 "+threshold+"% 寶箱已領取。"+(gd?"\n金幣 +"+Math.floor(gd).toLocaleString("zh-TW"):"")+(ed?"\nEXP +"+Math.floor(ed).toLocaleString("zh-TW"):""),{title:type==="commission"?"委託完成度獎勵":"每日完成度獎勵",confirmText:"知道了",tone:"success"});setTimeout(previewChests,0);return r}}
+window.v17351PreviewQuestMilestone=(type,threshold,label)=>void alertRpg("完成度達到 "+threshold+"% 後可領取：\n"+(label||"獎勵"),{title:type==="commission"?"委託寶箱預覽":"每日寶箱預覽",confirmText:"知道了"});
+function previewChests(){const modal=document.getElementById("homeFeatureModal");if(!modal)return;const type=/委託/.test(String(document.getElementById("homeFeatureModalTitle")?.textContent||""))?"commission":"daily";modal.querySelectorAll(".quest-milestone:not(.reached) .quest-milestone-slot").forEach(b=>{const t=parseInt(b.closest(".quest-milestone")?.querySelector(".quest-milestone-percent")?.textContent||"0",10)||0,label=String(b.querySelector("small")?.textContent||b.getAttribute("aria-label")||"獎勵");b.disabled=false;b.classList.add("v17351-previewable");b.setAttribute("aria-label","預覽 "+t+"% 獎勵");b.onclick=e=>{e.preventDefault();window.v17351PreviewQuestMilestone(type,t,label)}})}
+if(typeof window.openHomeFeature==="function"){const old=window.openHomeFeature;window.openHomeFeature=function(type){const r=old.apply(this,arguments);if(type==="achievement")setTimeout(refreshAchievements,0);if(type==="daily"||type==="quest")setTimeout(previewChests,0);return r}}
+window.v17351PreviewQuestMilestones=previewChests;previewChests();window.__v17351QaReady=true;
+})();
+
+
+/* bundled source: js/58-v173.63-functional-fixes.js */
+/* =====================================================
+   V173.63 — requested functional fixes (runtime authority)
+   - maximum character, synthesis and dungeon-backpack canvases
+   - canonical item art + formal rarity frames
+   - premium text-only daily dungeon reward previews
+   - material promotion synthesis through Four-Symbol tier
+===================================================== */
+(function installV17363FunctionalFixes(){
+"use strict";
+if(typeof window==="undefined"||typeof document==="undefined"||window.__v17363FunctionalFixesInstalled){return;}
+window.__v17363FunctionalFixesInstalled=true;
+
+const TIER_ORDER=["white","blue","purple","orange","pink","four-symbol"];
+const TIER_LABEL={white:"白階",blue:"藍階",purple:"紫階",orange:"橙階",pink:"桃紅階","four-symbol":"四象階"};
+const TIER_ALIAS={low:"white",mid:"blue",high:"purple",perfect:"orange"};
+const BLUEPRINT_SLOTS=["head","shoulder","armor","shoes","hand"];
+const SLOT_LABEL={head:"頭部",shoulder:"護腕",armor:"衣服",shoes:"腳",hand:"武器"};
+const MATERIAL_STATE={oreTier:"white",blueprintTier:"white",blueprintSet:"setFire",blueprintSlot:"head"};
+let materialTabActive=false;
+let repairQueued=false;
+
+function normalizeTier(value){
+    const key=String(value||"").toLowerCase();
+    return TIER_ALIAS[key]||key;
+}
+function esc(value){
+    return String(value==null?"":value)
+        .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+}
+function defs(){
+    const content=typeof window.v132GetContentDefinitions==="function"?(window.v132GetContentDefinitions()||{}):{};
+    return {
+        ores:Array.isArray(content.ores)?content.ores:[],
+        blueprints:Array.isArray(content.blueprints)?content.blueprints:[],
+        talismans:Array.isArray(content.talismans)?content.talismans:[],
+        tickets:Array.isArray(content.tickets)?content.tickets:[],
+        equipmentSetItems:Array.isArray(content.equipmentSetItems)?content.equipmentSetItems:[]
+    };
+}
+function ownedCount(id){
+    if(typeof inventoryItems==="undefined"||!Array.isArray(inventoryItems)){return 0;}
+    return inventoryItems.reduce((sum,item)=>sum+(item&&item.id===id?Math.max(1,Math.floor(Number(item.count)||1)):0),0);
+}
+function setImp(node,key,value){if(node&&node.style){node.style.setProperty(key,value,"important");}}
+function refreshInventory(){
+    if(typeof window.v17361SyncItemArt==="function"){try{window.v17361SyncItemArt();}catch(_){}}
+    if(typeof rebuildInventorySlots==="function"){try{rebuildInventorySlots();}catch(_){}}
+    if(typeof renderInventoryItems==="function"){try{renderInventoryItems();}catch(_){}}
+    else if(typeof renderInventory==="function"){try{renderInventory();}catch(_){}}
+    if(typeof updateGoldDisplay==="function"){try{updateGoldDisplay();}catch(_){}}
+    if(typeof saveGame==="function"){try{saveGame();}catch(_){}}
+}
+
+/* ---------- 2 / 6 / 7. Use the maximum game canvas. ---------- */
+function maximizeCharacterPanel(){
+    const modal=document.getElementById("homeFeatureModal");
+    if(!modal||!modal.classList.contains("show")){return;}
+    const box=modal.querySelector(".home-feature-modal-box.wide");
+    const body=document.getElementById("homeFeatureModalBody");
+    const root=document.getElementById("characterTabContent");
+    if(!box||!root){return;}
+    setImp(modal,"padding","4px");
+    setImp(box,"width","calc(100% - 8px)");
+    setImp(box,"max-width","none");
+    setImp(box,"height","calc(100% - 8px)");
+    setImp(box,"max-height","calc(100% - 8px)");
+    setImp(box,"min-height","0");
+    setImp(box,"display","flex");
+    setImp(box,"flex-direction","column");
+    setImp(box,"overflow","hidden");
+    setImp(body,"flex","1 1 auto");
+    setImp(body,"min-height","0");
+    setImp(body,"overflow","hidden");
+    setImp(root,"flex","1 1 auto");
+    setImp(root,"min-height","0");
+    setImp(root,"max-height","none");
+    setImp(root,"overflow-x","hidden");
+    setImp(root,"overflow-y","auto");
+    setImp(root,"touch-action","pan-y");
+}
+function maximizeSynthesisPanel(){
+    const modal=document.getElementById("homeFeatureModal");
+    if(!modal||!modal.classList.contains("v141-synthesis-modal")){return;}
+    const box=modal.querySelector(".home-feature-modal-box");
+    const body=document.getElementById("homeFeatureModalBody");
+    setImp(modal,"padding","4px");
+    setImp(box,"width","calc(100% - 8px)");
+    setImp(box,"max-width","none");
+    setImp(box,"height","calc(100% - 8px)");
+    setImp(box,"max-height","calc(100% - 8px)");
+    setImp(box,"min-height","0");
+    setImp(box,"display","flex");
+    setImp(box,"flex-direction","column");
+    setImp(box,"overflow","hidden");
+    setImp(body,"flex","1 1 auto");
+    setImp(body,"min-height","0");
+    setImp(body,"overflow","hidden");
+    setImp(body,"touch-action","pan-y");
+    const synthesisBody=body&&body.querySelector(".v141-synthesis-body");
+    setImp(synthesisBody,"flex","1 1 auto");
+    setImp(synthesisBody,"min-height","0");
+    setImp(synthesisBody,"overflow-x","hidden");
+    setImp(synthesisBody,"overflow-y","auto");
+    setImp(synthesisBody,"overscroll-behavior-y","contain");
+    setImp(synthesisBody,"touch-action","pan-y");
+}
+/* ---------- 3 / 7. Canonical item icons and explicit rarity frames. ---------- */
+function canonicalDefinition(id){
+    const content=defs();
+    for(const group of [content.ores,content.blueprints,content.talismans,content.tickets,content.equipmentSetItems]){
+        const found=group.find(item=>item&&item.id===id);
+        if(found){return found;}
+    }
+    return null;
+}
+function syncCanonicalItemArt(){
+    if(typeof window.v17361SyncItemArt==="function"){try{window.v17361SyncItemArt();}catch(_){}}
+    if(typeof inventoryItems==="undefined"||!Array.isArray(inventoryItems)){return;}
+    inventoryItems.forEach(item=>{
+        if(!item||!item.id){return;}
+        const definition=canonicalDefinition(item.id);
+        if(definition&&definition.icon){
+            item.icon=definition.icon;
+            if(definition.tierKey){item.tierKey=normalizeTier(definition.tierKey);}
+        }
+    });
+}
+function equipmentArt(item){
+    if(!item){return "";}
+    if(item.assetPath){
+        const rarity=esc(normalizeTier(item.rarityKey||item.quality||item.tierKey||"white"));
+        return '<span class="v169-item-art v169-equipment-art v17346-rarity-'+rarity+'"><img src="'+esc(item.assetPath)+'" alt="" draggable="false" onerror="this.hidden=true"></span>';
+    }
+    return String(item.icon||"");
+}
+function findOwned(value){
+    const key=String(value||"");
+    const bag=typeof inventoryItems!=="undefined"&&Array.isArray(inventoryItems)?inventoryItems:[];
+    let found=bag.find(item=>item&&(String(item.id||"")===key||String(item.v141Uid||"")===key));
+    if(found){return found;}
+    if(typeof characterEquipment!=="undefined"&&characterEquipment){
+        for(const slots of Object.values(characterEquipment||{})){
+            found=Object.values(slots||{}).find(item=>item&&(String(item.id||"")===key||String(item.v141Uid||"")===key));
+            if(found){return found;}
+        }
+    }
+    return null;
+}
+function pickerArt(value){
+    const owned=findOwned(value);
+    const definition=canonicalDefinition(owned&&owned.id||value);
+    if(definition&&definition.icon){return String(definition.icon);}
+    return equipmentArt(owned);
+}
+function repairPicker(picker){
+    const label=picker&&picker.closest("label");
+    const select=label&&label.querySelector("select");
+    if(!select){return;}
+    const options=Array.from(select.options||[]);
+    Array.from(picker.querySelectorAll("button")).forEach((button,index)=>{
+        const option=options[index];if(!option){return;}
+        const host=button.querySelector("i");
+        const art=pickerArt(option.value);
+        if(host&&art&&host.innerHTML!==art){host.innerHTML=art;}
+        button.classList.toggle("selected",String(option.value)===String(select.value));
+    });
+}
+function repairSynthesisIcons(){document.querySelectorAll(".v143-item-picker").forEach(repairPicker);}
+
+/* ---------- 5. Actual text-only premium reward previews (no pseudo-image preview). ---------- */
+function previewMarkup(title,eyebrow,groups,note){
+    return '<div class="v132-reward-modal-inner v17361-reward-preview v17363-text-reward-preview">'+
+        '<div class="v17363-preview-heading"><small>'+esc(eyebrow||"REWARD PREVIEW")+'</small><h3>'+esc(title)+'</h3></div>'+
+        '<div class="v17363-preview-groups">'+groups.map(group=>
+            '<section class="v17363-preview-group"><b>'+esc(group.title)+'</b>'+
+            (group.badge?'<em>'+esc(group.badge)+'</em>':'')+
+            '<p>'+esc(group.text)+'</p></section>'
+        ).join("")+'</div>'+
+        (note?'<div class="v17363-preview-note">'+esc(note)+'</div>':'')+
+        '<div class="v132-reward-actions"><button type="button" onclick="v132CloseRewardModal()">返回</button></div></div>';
+}
+window.v148ShowDailyDungeonPreview=function(type){
+    if(typeof window.v132ShowRewardModal!=="function"){return;}
+    const table={
+        exp:{title:"經驗副本獎勵預覽",groups:[
+            {title:"共用經驗池",badge:"EXP",text:"通關所得經驗直接存入共用經驗池，不綁定單一角色，可自由分配給隊伍角色。"},
+            {title:"結算方式",text:"完成副本後直接結算；若該結算提供廣告加倍，可自行選擇是否加倍領取。"}
+        ],note:"重點養成資源一眼看懂，不再用獎勵圖片佔據版面。"},
+        material:{title:"材料副本獎勵預覽",groups:[
+            {title:"材料寶箱",badge:"×1～3",text:"通關回合越少，取得寶箱數越高；寶箱內含礦石、裝備設計圖等養成材料。"},
+            {title:"用途",text:"礦石與同部位設計圖可用於裝備製作、冶煉，以及材料升階合成。"}
+        ],note:"寶箱數量依副本結算規則決定。"},
+        gold:{title:"金幣副本獎勵預覽",groups:[
+            {title:"金幣獎勵",badge:"GOLD",text:"依目前副本難度與結算規則獲得金幣，通關後直接入帳。"},
+            {title:"加倍選項",text:"若結算提供廣告加倍，可選擇觀看廣告取得加倍金幣，不影響直接領取。"}
+        ],note:"僅顯示實際會影響玩家決策的資訊。"}
+    };
+    const meta=table[type]||table.exp;
+    window.v132ShowRewardModal(previewMarkup(meta.title,"DAILY DUNGEON",meta.groups,meta.note));
+};
+
+/* ---------- 8. Equipment dungeon art path authority. ---------- */
+function ensureFunctionalStyles(){
+    if(document.getElementById("v17363-functional-fixes-style")){return;}
+    const style=document.createElement("style");
+    style.id="v17363-functional-fixes-style";
+    style.textContent=`
+#game-stage .v169-material-art{box-sizing:border-box!important;border:2px solid currentColor!important;border-radius:8px!important;padding:2px!important;background:#090b0f!important;}
+#game-stage .v169-material-art.v169-rarity-white,#game-stage .v169-material-art.v169-rarity-low{color:#D8D8D8!important;border-color:#D8D8D8!important;box-shadow:0 0 7px rgba(216,216,216,.78),inset 0 0 7px rgba(216,216,216,.24)!important;}
+#game-stage .v169-material-art.v169-rarity-blue,#game-stage .v169-material-art.v169-rarity-mid{color:#42A5FF!important;border-color:#42A5FF!important;box-shadow:0 0 8px rgba(66,165,255,.88),inset 0 0 7px rgba(66,165,255,.32)!important;}
+#game-stage .v169-material-art.v169-rarity-purple,#game-stage .v169-material-art.v169-rarity-high{color:#B05CFF!important;border-color:#B05CFF!important;box-shadow:0 0 8px rgba(176,92,255,.88),inset 0 0 7px rgba(176,92,255,.34)!important;}
+#game-stage .v169-material-art.v169-rarity-orange,#game-stage .v169-material-art.v169-rarity-perfect{color:#FF9F38!important;border-color:#FF9F38!important;box-shadow:0 0 9px rgba(255,159,56,.9),inset 0 0 8px rgba(255,159,56,.35)!important;}
+#game-stage .v169-material-art.v169-rarity-pink{color:#FF4FA7!important;border-color:#FF4FA7!important;box-shadow:0 0 10px rgba(255,79,167,.92),inset 0 0 8px rgba(255,79,167,.36)!important;}
+#game-stage .v169-material-art.v169-rarity-four-symbol{color:#fff!important;border-color:transparent!important;background:linear-gradient(#090b0f,#090b0f) padding-box,conic-gradient(#42A5FF,#47D6A3,#C89B45,#FF5A36,#42A5FF) border-box!important;box-shadow:0 0 9px rgba(255,90,54,.32),0 0 13px rgba(66,165,255,.32)!important;}
+#game-stage #homeFeatureModal.v141-synthesis-modal{padding:4px!important;}
+#game-stage #homeFeatureModal.v141-synthesis-modal .home-feature-modal-box{width:calc(100% - 8px)!important;max-width:none!important;height:calc(100% - 8px)!important;max-height:calc(100% - 8px)!important;}
+#game-stage #dungeonPage:not(.v146-abyss-active) [data-dungeon-cover="equipment"] .v141-dungeon-cover-art{background-image:linear-gradient(180deg,transparent 58%,rgba(7,5,3,.38)),url("assets/dungeons/covers/equipment-v17363.png"),url("assets/dungeons/covers/equipment-v17343.png")!important;background-size:cover!important;background-position:center!important;}
+#game-stage .v17363-text-reward-preview{width:min(392px,calc(100% - 18px))!important;max-width:392px!important;padding:18px!important;border:1px solid rgba(213,164,82,.82)!important;border-radius:15px!important;background:radial-gradient(circle at 50% 0,rgba(232,177,77,.16),transparent 36%),linear-gradient(160deg,#22170e,#090807 76%)!important;box-shadow:0 22px 52px rgba(0,0,0,.78),inset 0 0 0 1px rgba(255,231,171,.07)!important;}
+#game-stage .v17363-preview-heading{text-align:left;padding-bottom:11px;margin-bottom:11px;border-bottom:1px solid rgba(196,149,75,.4);}
+#game-stage .v17363-preview-heading small{display:block;color:#8f7956;font:700 9px/1.2 Cinzel,serif;letter-spacing:.2em;}
+#game-stage .v17363-preview-heading h3{margin:4px 0 0;color:#f4d78f;font-family:"Noto Serif TC",serif;font-size:20px;line-height:1.35;letter-spacing:.04em;}
+#game-stage .v17363-preview-groups{display:grid;gap:8px;}
+#game-stage .v17363-preview-group{position:relative;padding:12px 13px;border:1px solid rgba(119,89,52,.7);border-radius:10px;background:linear-gradient(180deg,rgba(31,23,15,.96),rgba(13,10,8,.98));text-align:left;}
+#game-stage .v17363-preview-group b{display:block;padding-right:80px;color:#f0d39a;font-size:14px;line-height:1.4;}
+#game-stage .v17363-preview-group em{position:absolute;right:12px;top:11px;color:#e5b966;font:900 11px/1.4 Cinzel,"Noto Sans TC",sans-serif;font-style:normal;}
+#game-stage .v17363-preview-group p{margin:6px 0 0;color:#cdbfa7;font-size:12px;line-height:1.72;}
+#game-stage .v17363-preview-note{margin:10px 1px 0;padding:8px 10px;border-left:2px solid #b98b45;color:#9f927d;background:rgba(184,134,62,.06);font-size:11px;line-height:1.6;text-align:left;}
+#game-stage .v17363-material-synthesis{display:grid;gap:8px;padding-bottom:8px;}
+#game-stage .v17363-material-card{position:relative;padding:10px;border:1px solid rgba(154,112,58,.7);border-radius:11px;background:linear-gradient(180deg,#20170f,#0e0b08);overflow:visible;}
+#game-stage .v17363-material-card h4{margin:0 0 3px;color:#f0ce85;font:900 16px/1.35 "Noto Serif TC",serif;}
+#game-stage .v17363-material-card>p{margin:0 0 7px;color:#9f927f;font-size:10px;line-height:1.45;}
+#game-stage .v17363-material-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;position:relative;z-index:12;}
+#game-stage .v17363-material-controls.single{grid-template-columns:1fr;}
+#game-stage .v17363-material-controls:not(.single)>.v17363-material-field:last-child:nth-child(odd){grid-column:1/-1;}
+#game-stage .v17363-material-field{display:grid;gap:4px;min-width:0;color:#bbaa8c;font-size:10px;}
+#game-stage .v17363-material-field-label{color:#bbaa8c;font-size:10px;line-height:1.3;}
+#game-stage .v17363-game-select{position:relative;min-width:0;z-index:1;}
+#game-stage .v17363-game-select.open{z-index:80;}
+#game-stage .v17363-game-select-trigger{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:6px;width:100%;min-height:36px;padding:5px 8px;border:1px solid #805e31;border-radius:7px;color:#ead9b5;background:linear-gradient(180deg,#21170e,#0b0907);font-size:11px;font-weight:800;text-align:left;box-shadow:inset 0 0 0 1px rgba(255,222,151,.03);}
+#game-stage .v17363-game-select-trigger>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+#game-stage .v17363-game-select-trigger>b{color:#d7ab59;font-size:12px;}
+#game-stage .v17363-game-select.open .v17363-game-select-trigger{border-color:#d6a448;box-shadow:0 0 9px rgba(211,157,65,.2),inset 0 0 0 1px rgba(255,225,158,.14);}
+#game-stage .v17363-game-select-menu{position:absolute;left:0;right:0;top:calc(100% + 4px);display:none;max-height:205px;padding:5px;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;-webkit-overflow-scrolling:touch;border:1px solid #a0783a;border-radius:8px;background:linear-gradient(170deg,#281b0f,#090705);box-shadow:0 12px 30px rgba(0,0,0,.82),inset 0 0 0 1px rgba(255,222,151,.05);}
+#game-stage .v17363-game-select.open .v17363-game-select-menu{display:grid;gap:3px;}
+#game-stage .v17363-game-select-option{display:grid;grid-template-columns:auto minmax(0,1fr) 16px;align-items:center;gap:7px;width:100%;min-height:34px;padding:6px 8px;border:1px solid transparent;border-radius:6px;color:#d7c6a4;background:transparent;font-size:11px;font-weight:800;text-align:left;}
+#game-stage .v17363-game-select-option.selected{border-color:#9d7336;background:linear-gradient(90deg,rgba(180,126,39,.2),rgba(72,46,16,.15));color:#ffe09a;}
+#game-stage .v17363-game-select-option>b{color:#efbd55;text-align:center;}
+#game-stage .v17363-menu-rarity-dot{display:block;width:10px;height:10px;border:1px solid rgba(255,255,255,.35);border-radius:50%;background:#9d7136;box-shadow:0 0 5px rgba(255,255,255,.08);}
+#game-stage .v17363-menu-rarity-dot.white{background:#d8d8d8;}#game-stage .v17363-menu-rarity-dot.blue{background:#42a5ff;}#game-stage .v17363-menu-rarity-dot.purple{background:#b05cff;}#game-stage .v17363-menu-rarity-dot.orange{background:#ff9f38;}#game-stage .v17363-menu-rarity-dot.pink{background:#ff4fa7;}#game-stage .v17363-menu-rarity-dot.neutral{background:#b68a48;}
+#game-stage .v17363-material-flow{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:6px;margin:7px 0;padding:7px;border:1px solid rgba(116,87,49,.55);border-radius:9px;background:#090806;}
+#game-stage .v17363-material-flow section{display:grid;gap:2px;justify-items:center;min-width:0;text-align:center;color:#cab996;font-size:10px;}
+#game-stage .v17363-material-flow section>.v169-item-art,#game-stage .v17363-material-flow section>svg{width:70px!important;height:70px!important;max-width:70px!important;max-height:70px!important;margin:0 auto!important;}
+#game-stage .v17363-material-flow section>.v169-item-art img{width:100%!important;height:100%!important;object-fit:contain!important;}
+#game-stage .v17363-material-flow section b{max-width:100%;color:#f1d698;font-size:12px;line-height:1.25;overflow-wrap:anywhere;}
+#game-stage .v17363-material-flow section span{font-size:10px;line-height:1.25;}
+#game-stage .v17363-material-flow>i{color:#d3a34f;font-size:18px;font-style:normal;}
+#game-stage .v17363-material-card .v17363-craft-button{width:100%;min-height:39px;border:1px solid #b88740;border-radius:8px;color:#1c1207;background:linear-gradient(180deg,#efd17f,#bd7d2c);font-weight:900;}
+#game-stage .v17363-material-card .v17363-craft-button:disabled{filter:grayscale(.7);opacity:.45;}
+`;
+    document.head.appendChild(style);
+}
+
+/* ---------- 9. Material synthesis helpers. ---------- */
+function oreByTier(tier){return defs().ores.find(item=>normalizeTier(item&&item.tierKey)===tier)||null;}
+function blueprintsBy(tier,setId,slot){
+    return defs().blueprints.filter(item=>item&&normalizeTier(item.tierKey)===tier&&(!setId||item.setId===setId)&&(!slot||item.blueprintSlot===slot));
+}
+function canAdd(definition,amount){return !window.v132CanAddItemToInventory||window.v132CanAddItemToInventory(definition,amount);}
+function add(definition,amount){return !!(definition&&window.v132AddItemToInventory&&window.v132AddItemToInventory(definition,amount));}
+
+/* ---------- 10. Material promotion: 50 same-tier -> 10 next-tier. ---------- */
+function nextTier(tier){const index=TIER_ORDER.indexOf(normalizeTier(tier));return index>=0&&index<TIER_ORDER.length-1?TIER_ORDER[index+1]:null;}
+function blueprintDef(tier,setId,slot){return blueprintsBy(normalizeTier(tier),setId,slot)[0]||null;}
+function setOptions(){
+    const map=new Map();
+    defs().blueprints.forEach(item=>{if(item&&item.setId&&!map.has(item.setId)){const prefix=String(item.name||"").replace(/(白階|藍階|紫階|橙階|桃紅階|四象階).*$/,'');map.set(item.setId,prefix||item.setId);}});
+    return [...map.entries()];
+}
+function tierChoices(){
+    return TIER_ORDER.slice(0,-1).map(tier=>({value:tier,label:TIER_LABEL[tier]+" → "+TIER_LABEL[nextTier(tier)],tier}));
+}
+function materialGameSelect(key,label,choices,selected){
+    const normalized=(choices||[]).map(choice=>Array.isArray(choice)?{value:String(choice[0]),label:String(choice[1])}:{value:String(choice.value),label:String(choice.label),tier:choice.tier});
+    const current=normalized.find(choice=>choice.value===String(selected))||normalized[0]||{value:"",label:"未設定"};
+    const dot=current.tier?'<i class="v17363-menu-rarity-dot '+esc(current.tier)+'"></i>':'';
+    return '<div class="v17363-material-field"><span class="v17363-material-field-label">'+esc(label)+'</span><div class="v17363-game-select" data-material-key="'+esc(key)+'">'+
+        '<button class="v17363-game-select-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" onclick="v17363ToggleMaterialMenu(this)">'+dot+'<span>'+esc(current.label)+'</span><b aria-hidden="true">▾</b></button>'+
+        '<div class="v17363-game-select-menu" role="listbox">'+normalized.map(choice=>'<button class="v17363-game-select-option'+(choice.value===current.value?' selected':'')+'" type="button" role="option" aria-selected="'+(choice.value===current.value?'true':'false')+'" data-material-key="'+esc(key)+'" data-material-value="'+esc(choice.value)+'" onclick="v17363ChooseMaterialOption(this.dataset.materialKey,this.dataset.materialValue)">'+(choice.tier?'<i class="v17363-menu-rarity-dot '+esc(choice.tier)+'"></i>':'<i class="v17363-menu-rarity-dot neutral"></i>')+'<span>'+esc(choice.label)+'</span><b aria-hidden="true">'+(choice.value===current.value?'✓':'')+'</b></button>').join("")+'</div></div></div>';
+}
+function renderMaterialSynthesis(){
+    const body=document.querySelector("#homeFeatureModalBody .v141-synthesis-body");
+    if(!body){return;}
+    const oreSource=oreByTier(MATERIAL_STATE.oreTier),oreTarget=oreByTier(nextTier(MATERIAL_STATE.oreTier));
+    const bpSource=blueprintDef(MATERIAL_STATE.blueprintTier,MATERIAL_STATE.blueprintSet,MATERIAL_STATE.blueprintSlot);
+    const bpTarget=blueprintDef(nextTier(MATERIAL_STATE.blueprintTier),MATERIAL_STATE.blueprintSet,MATERIAL_STATE.blueprintSlot);
+    const sets=setOptions();
+    const setChoices=sets.map(([value,label])=>({value,label}));
+    const slotChoices=BLUEPRINT_SLOTS.map(slot=>({value:slot,label:SLOT_LABEL[slot]}));
+    body.innerHTML='<div class="v17363-material-synthesis">'+
+        '<section class="v17363-material-card"><h4>礦石升階</h4><p>同階礦石 50 個，可合成下一階礦石 10 個；最高可合至四象階。</p><div class="v17363-material-controls single">'+materialGameSelect("oreTier","升階路線",tierChoices(),MATERIAL_STATE.oreTier)+'</div>'+materialFlow(oreSource,oreTarget)+
+        '<button class="v17363-craft-button" type="button" '+(!oreSource||ownedCount(oreSource.id)<50?'disabled':'')+' onclick="v17363CraftMaterial(&quot;ore&quot;)">合成下一階礦石 ×10</button></section>'+
+        '<section class="v17363-material-card"><h4>設計圖升階</h4><p>同系列、同部位、同階設計圖 50 張，可合成下一階同款設計圖 10 張。</p><div class="v17363-material-controls">'+
+        materialGameSelect("blueprintSet","系列",setChoices,MATERIAL_STATE.blueprintSet)+
+        materialGameSelect("blueprintSlot","部位",slotChoices,MATERIAL_STATE.blueprintSlot)+
+        materialGameSelect("blueprintTier","升階路線",tierChoices(),MATERIAL_STATE.blueprintTier)+'</div>'+materialFlow(bpSource,bpTarget)+
+        '<button class="v17363-craft-button" type="button" '+(!bpSource||ownedCount(bpSource.id)<50?'disabled':'')+' onclick="v17363CraftMaterial(&quot;blueprint&quot;)">合成下一階設計圖 ×10</button></section></div>';
+    repairSynthesisIcons();
+}
+function materialFlow(source,target){
+    const sourceCount=source?ownedCount(source.id):0;
+    return '<div class="v17363-material-flow"><section>'+(source&&source.icon||'')+'<b>'+esc(source&&source.name||"來源未建立")+'</b><span>'+sourceCount+' / 50</span></section><i>→</i><section>'+(target&&target.icon||'')+'<b>'+esc(target&&target.name||"已達最高階")+'</b><span>×10</span></section></div>';
+}
+window.v17363ToggleMaterialMenu=function(trigger){
+    const root=trigger&&trigger.closest&&trigger.closest(".v17363-game-select");if(!root){return;}
+    const opening=!root.classList.contains("open");
+    document.querySelectorAll(".v17363-game-select.open").forEach(item=>{item.classList.remove("open");const button=item.querySelector(".v17363-game-select-trigger");if(button){button.setAttribute("aria-expanded","false");}});
+    root.classList.toggle("open",opening);trigger.setAttribute("aria-expanded",opening?"true":"false");
+};
+window.v17363ChooseMaterialOption=function(key,value){
+    if(!Object.prototype.hasOwnProperty.call(MATERIAL_STATE,key)){return;}
+    MATERIAL_STATE[key]=String(value||"");renderMaterialSynthesis();
+};
+window.v17363SetMaterialOption=window.v17363ChooseMaterialOption;
+const functionalModalRoot=document.getElementById("homeFeatureModal");
+if(functionalModalRoot){functionalModalRoot.addEventListener("click",event=>{
+    functionalModalRoot.querySelectorAll(".v17363-game-select.open").forEach(root=>{if(root.contains(event.target)){return;}root.classList.remove("open");const button=root.querySelector(".v17363-game-select-trigger");if(button){button.setAttribute("aria-expanded","false");}});
+});}
+window.v17363CraftMaterial=function(kind){
+    const isOre=kind==="ore";
+    const tier=isOre?MATERIAL_STATE.oreTier:MATERIAL_STATE.blueprintTier;
+    const targetTier=nextTier(tier);
+    const source=isOre?oreByTier(tier):blueprintDef(tier,MATERIAL_STATE.blueprintSet,MATERIAL_STATE.blueprintSlot);
+    const target=isOre?oreByTier(targetTier):blueprintDef(targetTier,MATERIAL_STATE.blueprintSet,MATERIAL_STATE.blueprintSlot);
+    if(!source||!target||!targetTier){alert("此道具已達最高可合成階級。");return false;}
+    if(ownedCount(source.id)<50){alert("素材不足，需要「"+source.name+"」×50。");return false;}
+    if(!canAdd(target,10)){alert("背包空間不足，無法放入合成結果。");return false;}
+    const transaction=window.v132RunInventoryTransaction||function(operation){return !!operation();};
+    const success=transaction(()=>window.v132ConsumeStackItem&&window.v132ConsumeStackItem(source.id,50)&&add(target,10));
+    if(!success){alert("材料合成失敗，素材已自動還原。");return false;}
+    refreshInventory();
+    renderMaterialSynthesis();
+    if(typeof window.rpgAlert==="function"){void window.rpgAlert("消耗「"+source.name+"」×50\n獲得「"+target.name+"」×10",{title:"材料合成成功",confirmText:"知道了",tone:"success"});}
+    return true;
+};
+function ensureMaterialTab(){
+    const tabs=document.querySelector("#homeFeatureModalBody .v141-synthesis-tabs");
+    if(!tabs){return;}
+    let button=tabs.querySelector('[data-v17363-material-tab="1"]');
+    if(!button){
+        button=document.createElement("button");button.type="button";button.dataset.v17363MaterialTab="1";button.textContent="材料合成";button.onclick=window.v17363OpenMaterialSynthesis;tabs.appendChild(button);
+    }
+    Array.from(tabs.querySelectorAll("button")).forEach(item=>item.classList.toggle("active",materialTabActive&&item===button||!materialTabActive&&item!==button&&item.classList.contains("active")));
+    if(materialTabActive){Array.from(tabs.querySelectorAll("button")).forEach(item=>item.classList.toggle("active",item===button));}
+}
+const originalRenderSynthesis=typeof window.v141RenderSynthesis==="function"?window.v141RenderSynthesis:null;
+const originalSwitchSynthesis=typeof window.v141SwitchSynthesisTab==="function"?window.v141SwitchSynthesisTab:null;
+window.v17363OpenMaterialSynthesis=function(){
+    materialTabActive=true;
+    if(originalRenderSynthesis){originalRenderSynthesis();}
+    ensureMaterialTab();renderMaterialSynthesis();maximizeSynthesisPanel();
+};
+if(originalRenderSynthesis){
+    window.v141RenderSynthesis=function(){
+        // Presentation data must be hydrated before V143 builds the first icon picker.
+        if(typeof window.v17346SyncFourElementSets==="function"){try{window.v17346SyncFourElementSets();}catch(_){}}
+        syncCanonicalItemArt();
+        const result=originalRenderSynthesis.apply(this,arguments);
+        ensureMaterialTab();if(materialTabActive){renderMaterialSynthesis();}
+        repairSynthesisIcons();maximizeSynthesisPanel();scheduleRepairs();return result;
+    };
+}
+if(originalSwitchSynthesis){
+    window.v141SwitchSynthesisTab=function(){
+        materialTabActive=false;const result=originalSwitchSynthesis.apply(this,arguments);ensureMaterialTab();scheduleRepairs();return result;
+    };
+}
+
+/* ---------- 4. Force current return artwork on patrol/dungeon navigation. ---------- */
+function syncReturnIcons(){
+    document.querySelectorAll('img[src*="map-return.png"]').forEach(img=>{
+        if(img.src&&!/assets\/ui\/map-return\.png(?:\?|$)/.test(img.getAttribute("src")||"")){img.setAttribute("src","assets/ui/map-return.png");}
+    });
+}
+
+function runRepairs(){
+    repairQueued=false;ensureFunctionalStyles();syncCanonicalItemArt();maximizeCharacterPanel();maximizeSynthesisPanel();repairSynthesisIcons();ensureMaterialTab();syncReturnIcons();
+}
+function scheduleRepairs(){
+    if(repairQueued){return;}repairQueued=true;
+    if(typeof requestAnimationFrame==="function"){requestAnimationFrame(runRepairs);}else{setTimeout(runRepairs,0);}
+}
+
+/* Production repairs are lifecycle-driven. Inventory/open/render owners call this
+   explicit hook; synthesis already calls scheduleRepairs from its own render lifecycle. */
+window.v17363SyncFunctionalFixes=runRepairs;
+ensureFunctionalStyles();runRepairs();
+})();
+
+
+/* bundled source: js/battlefield-render-geometry-adapter.js */
+/* Fixed Slot Battlefield Rendering V2 — render geometry adapter.
+   FourSymbolsBattlefieldSlots remains the only Slot/formation geometry owner.
+   This adapter only reconciles legacy renderers/popups back onto that owner. */
+(function installFixedSlotBattlefieldRenderGeometryV2(){
+    "use strict";
+
+    if(typeof window==="undefined"||window.__fixedSlotBattlefieldRenderGeometryV2Installed){ return; }
+    const slots=window.FourSymbolsBattlefieldSlots;
+    if(!slots){ return; }
+    window.__fixedSlotBattlefieldRenderGeometryV2Installed=true;
+
+    const VERSION="fixed-slot-render-v2";
+    const LEGACY_PRESENTATION_STYLE_ID="v174-cardless-battle-style";
+    const POPUP_ANCHORS=Object.freeze({
+        damage:Object.freeze({x:.5,y:.28}),
+        critical:Object.freeze({x:.5,y:.24}),
+        heal:Object.freeze({x:.5,y:.28}),
+        shield:Object.freeze({x:.5,y:.30}),
+        miss:Object.freeze({x:.5,y:.26}),
+        status:Object.freeze({x:.5,y:.42})
+    });
+    const VFX_SCALE_CONTRACT=Object.freeze({
+        single:Object.freeze({shape:"single",scale:1}),
+        tri:Object.freeze({shape:"tri",scale:1}),
+        row:Object.freeze({shape:"row",scale:1}),
+        column:Object.freeze({shape:"column",scale:1}),
+        all:Object.freeze({shape:"all",scale:1})
+    });
+
+    let reconciling=false;
+    let reconcileQueued=false;
+
+    /* Cardless presentation is source CSS only. Remove the retired runtime
+       stylesheet if an old session created it; never inject a replacement. */
+    function neutralizeLegacyPresentationGeometry(){
+        if(typeof document==="undefined"){ return; }
+        const style=document.getElementById(LEGACY_PRESENTATION_STYLE_ID);
+        if(style){ style.remove(); }
+    }
+
+    function integerIndexes(value){
+        return Array.isArray(value)?value.filter(Number.isInteger).slice(0,10):[];
+    }
+
+    function activeEnemyIndexes(){
+        try{
+            return integerIndexes(typeof currentBattleMonsters!=="undefined"?currentBattleMonsters:[]);
+        }catch(_){ return []; }
+    }
+
+    function enemyRankWeight(index){
+        try{
+            const monster=typeof monsters!=="undefined"?monsters[index]:null;
+            const rank=typeof getMonsterRank==="function"?getMonsterRank(monster):(monster&&monster.rank);
+            return rank==="boss"?3:(rank==="elite"?2:1);
+        }catch(_){ return 1; }
+    }
+
+    function activeEnemySnapshot(indexes){
+        let snapshot=slots.getActiveEnemySnapshot();
+        const requested=integerIndexes(indexes);
+        const boss=bossBattleOwner();
+        const bossActive=!!(boss&&typeof boss.isActive==="function"&&boss.isActive());
+        if(bossActive){
+            const unslotted=requested.filter(index=>{
+                const monster=typeof monsters!=="undefined"?monsters[index]:null;
+                return !!(monster&&monster.alive!==false&&Number(monster.hp)>0)&&
+                    !(snapshot&&slots.getEnemySlotForMonster(snapshot,index));
+            });
+            if(unslotted.length){
+                if(boss&&typeof boss.recordLifecycleViolation==="function"){
+                    boss.recordLifecycleViolation("boss-active-entity-without-slot",{
+                        indexes:unslotted,
+                        snapshotKind:snapshot&&snapshot.kind||null,
+                        snapshotBossOwned:!!(snapshot&&snapshot.bossBattleSnapshot)
+                    });
+                }
+                /* Boss geometry cannot degrade into a normal formation. The
+                   unassigned entity is refused by this render pass so the
+                   formal B1/B5/F1/F5/Boss footprint remains intact. */
                 return snapshot;
             }
             return snapshot;
@@ -5775,8 +8804,7 @@ bwrap: Can't find source path /workspace/scratch/2feca6ea11c3/.aws: No such file
 
     function markBattlefieldZones(){
         const page=document.getElementById("battlePage");
-        if(page){ page.classList.add("v-fixed-slot-render-v2"); page.dataset.geometryOwner="fixed-slot";tail: error writing 'standard output': Broken pipe
- }
+        if(page){ page.classList.add("v-fixed-slot-render-v2"); page.dataset.geometryOwner="fixed-slot"; }
         const info=document.querySelector("#battlePage .battle-info-region");
         if(info){ info.classList.add("v-fixed-battle-info-zone"); info.dataset.geometryOwner="fixed-slot"; }
         const action=document.getElementById("battleActionRegion")||document.getElementById("battleCommandRow");
@@ -5886,9 +8914,7 @@ bwrap: Can't find source path /workspace/scratch/2feca6ea11c3/.aws: No such file
         const hpRects=hpNodes.map(node=>typeof node.getBoundingClientRect==="function"?plainRect(node.getBoundingClientRect()):null).filter(rect=>rect&&rect.width>0&&rect.height>0);
         const hpRect=hpRects.length?hpRects.reduce((acc,rect)=>({left:Math.min(acc.left,rect.left),top:Math.min(acc.top,rect.top),right:Math.max(acc.right,rect.right),bottom:Math.max(acc.bottom,rect.bottom),width:Math.max(acc.right,rect.right)-Math.min(acc.left,rect.left),height:Math.max(acc.bottom,rect.bottom)-Math.min(acc.top,rect.top)})):null;
         const highlightRects=[portraitRect,hpRect].filter(rect=>rect&&rect.width>0&&rect.height>0);
-        const highlightRect=highlightRects.length?highlightRects.reduce((acc,rect)=>({left:Math.min(acc.left,rect.left),top:Math.min(acc.top,rect.top),right:Math.max(acc.right,rect.right),bottom:Math.max(acc.bottom,rect.bottom),width:Math.max(acc.right,rect.right)-Math.min(acc.left,rect.left),height:Math.max(acc.botttail: error writing 'standard output': Broken pipe
-tail: error writing 'standard output': Broken pipe
-om,rect.bottom)-Math.min(acc.top,rect.top)})):portraitRect;
+        const highlightRect=highlightRects.length?highlightRects.reduce((acc,rect)=>({left:Math.min(acc.left,rect.left),top:Math.min(acc.top,rect.top),right:Math.max(acc.right,rect.right),bottom:Math.max(acc.bottom,rect.bottom),width:Math.max(acc.right,rect.right)-Math.min(acc.left,rect.left),height:Math.max(acc.bottom,rect.bottom)-Math.min(acc.top,rect.top)})):portraitRect;
         const hudRects=hudNodes
             .map(node=>typeof node.getBoundingClientRect==="function"?plainRect(node.getBoundingClientRect()):null)
             .filter(rect=>rect&&rect.width>0&&rect.height>0);
@@ -6009,9 +9035,126 @@ om,rect.bottom)-Math.min(acc.top,rect.top)})):portraitRect;
         if(!element){ return null; }
         const id=String(element.id||"");
         let match=/^battleMonster(\d+)$/.exec(id);
-        if(match){ return {side:bwrap: Can't find source path /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-tail: error writing 'standard output': Broken pipe
- battle-floating-feedback-"+request.kind+(critical?" is-critical":"")+(request.kind==="status"?" is-status-capsule":"");
+        if(match){ return {side:"monster",index:Number(match[1])}; }
+        match=/^battlePlayerCard(\d+)$/.exec(id);
+        if(match){ return {side:"player",index:Number(match[1])}; }
+        if(typeof element.closest==="function"){
+            const unit=element.closest('[id^="battleMonster"],[id^="battlePlayerCard"]');
+            if(unit&&unit!==element){ return identifyUnit(unit); }
+        }
+        return null;
+    }
+    function currentGeometry(side,index){
+        const owner=geometryOwner();
+        if(!owner||typeof owner.getUnitGeometry!=="function"){ return null; }
+        return owner.getUnitGeometry(side,index)||null;
+    }
+    function contextFor(side,index){
+        const key=unitKey(side,index);
+        let context=contexts.get(key);
+        if(!context){
+            context={key:key,side:side,index:index,active:new Map(),queue:[]};
+            contexts.set(key,context);
+        }
+        return context;
+    }
+    function semanticKind(kind){
+        const value=String(kind||"damage").toLowerCase();
+        if(value==="heal"||value==="hp-recovery"){ return "heal"; }
+        if(value==="sp"||value==="sp-recovery"){ return "sp"; }
+        if(value==="shield"){ return "shield"; }
+        if(value==="miss"){ return "miss"; }
+        if(value==="resist"){ return "resist"; }
+        if(value==="status"||value==="buff"||value==="debuff"){ return "status"; }
+        if(value==="escape"||value==="escape-fail"){ return "escape"; }
+        return value==="criticaldamage"||value==="critical-damage"?"criticalDamage":"damage";
+    }
+    function statusPresentation(statusType){ return STATUS_PRESENTATION_SEMANTICS[String(statusType||"default")]||STATUS_PRESENTATION_SEMANTICS.default; }
+    function phaseOrder(kind){ return kind==="shield"?10:(kind==="status"?30:20); }
+    function compareRequests(left,right){ return left.impactId&&right.impactId&&left.impactId===right.impactId ? (left.phaseOrder-right.phaseOrder)||(left.id-right.id) : left.id-right.id; }
+    function timingFor(options){
+        if(options&&options.skipImpactTiming){ return {delayMs:0,critical:false,impactId:null,impactAt:0,sequence:0}; }
+        const resolver=window.v143ResolveBattleFeedbackTiming;
+        if(typeof resolver!=="function"){ return {delayMs:0,critical:false,impactId:null,impactAt:0,sequence:0}; }
+        try{
+            const timing=resolver(options.side==="monster"?"monster":"player",Number(options.index)||0,semanticKind(options.kind))||{};
+            return {delayMs:Math.max(0,numeric(timing.delayMs,0)),critical:timing.critical===true,impactId:timing.impactId||null,impactAt:Number.isFinite(Number(timing.impactAt))?Number(timing.impactAt):0,sequence:numeric(timing.sequence,0)};
+        }catch(_){ return {delayMs:0,critical:false,impactId:null,impactAt:0,sequence:0}; }
+    }
+    function makeHandle(request){
+        let resolvePromise;
+        const promise=new Promise(resolve=>{ resolvePromise=resolve; });
+        request.resolve=resolvePromise;
+        request.cancelled=false;
+        return Object.freeze({
+            id:request.id,
+            promise:promise,
+            cancel:function(){ cancelRequest(request); }
+        });
+    }
+    function finishRequest(request,reason){
+        if(!request||request.finished){ return; }
+        request.finished=true;
+        if(request.delayTimer){ clearTimeout(request.delayTimer); request.delayTimer=null; }
+        if(request.removeTimer){ clearTimeout(request.removeTimer); request.removeTimer=null; }
+        if(request.node&&request.node.parentNode){ request.node.remove(); }
+        if(typeof request.resolve==="function"){ request.resolve(reason||"done"); }
+    }
+    function cancelRequest(request){
+        if(!request||request.finished){ return; }
+        request.cancelled=true;
+        const context=request.context;
+        if(context){
+            context.queue=context.queue.filter(item=>item!==request);
+            if(context.active.has(request.id)){ context.active.delete(request.id); }
+        }
+        finishRequest(request,"cancelled");
+        if(context){ pump(context); }
+    }
+    function laneMetrics(context){
+        const geometry=currentGeometry(context.side,context.index);
+        if(!geometry||!geometry.feedbackSafeRect){ return null; }
+        const safe=geometry.feedbackSafeRect;
+        const anchor=geometry.feedbackAnchor||{
+            x:safe.left+safe.width/2,
+            y:safe.bottom-LANE_BOTTOM_INSET_PX
+        };
+        const baseline=Math.min(
+            numeric(anchor.y,safe.bottom-LANE_BOTTOM_INSET_PX),
+            safe.bottom-LANE_BOTTOM_INSET_PX
+        );
+        const upwardRoom=Math.max(0,baseline-safe.top-LANE_RENDER_HEIGHT_PX);
+        const capacity=Math.max(1,Math.min(
+            MAX_LANES,
+            Math.floor(upwardRoom/LANE_PITCH_PX)+1
+        ));
+        return {geometry:geometry,safe:safe,anchor:anchor,baseline:baseline,capacity:capacity};
+    }
+    function freeLane(context,metrics){
+        const resolved=metrics||laneMetrics(context);
+        if(!resolved){ return -1; }
+        const used=new Set(Array.from(context.active.values()).map(request=>request.lane));
+        for(let lane=0;lane<resolved.capacity;lane++){ if(!used.has(lane)){ return lane; } }
+        return -1;
+    }
+    function formatCritical(text){
+        const value=String(text==null?"":text);
+        if(/^爆擊\s/.test(value)){ return value; }
+        const match=value.match(/\d+(?:\.\d+)?/);
+        return "爆擊 "+(match?match[0]:value);
+    }
+    function spawn(context,request,lane){
+        if(request.cancelled||request.finished){ return false; }
+        const metrics=laneMetrics(context);
+        if(!metrics||!metrics.geometry.unitRect){
+            finishRequest(request,"missing-geometry");
+            return false;
+        }
+        const anchor=metrics.anchor;
+        const laneY=metrics.baseline-lane*LANE_PITCH_PX;
+        const critical=request.critical===true;
+        const node=document.createElement("div");
+        node.className="battle-floating-feedback battle-floating-feedback-"+request.kind+(critical?" is-critical":"")+(request.kind==="status"?" is-status-capsule":"");
         node.dataset.feedbackOwner="battle-floating-feedback";
         node.dataset.feedbackSide=context.side;
         node.dataset.feedbackIndex=String(context.index);
@@ -6249,8 +9392,7 @@ tail: error writing 'standard output': Broken pipe
             iconAssetPath:null,vfxAssetPath:null
         },
         bloodBurnArt:{
-            id:"bloodBurnArt",name:"焚血訣",element:"fire",category:"bufftail: error writing 'standard output': Broken pipe
-",targetType:"self",
+            id:"bloodBurnArt",name:"焚血訣",element:"fire",category:"buff",targetType:"self",
             learnLevel:35,learnCost:18,maxLevel:5,spCost:35,duration:3,requires:["fireSoulResonance"],progressionGroup:"tactical",
             hpCostPercentByLevel:BLOOD_BURN_HP_COST_BY_LEVEL.slice(),
             directDamageBonusByLevel:BLOOD_BURN_BY_LEVEL.slice(),fireActionCharges:4,icon:"血",
@@ -6351,9 +9493,7 @@ tail: error writing 'standard output': Broken pipe
        provide compatibility helpers, but must not become a second balance source. */
     const FINAL_REBALANCE_DATA=Object.freeze({
         flameSlash:{baseDamage:30,damagePerLevel:6,spCost:10,targetType:"single",requires:[],followUpOnCriticalOrDefeat:true,followUpMaxCasts:1},
-        fireCritical:{batail: error writing 'standard output': Broken pipe
-tail: error writing 'standard output': Broken pipe
-seDamage:45,damagePerLevel:9,spCost:28,targetType:"single",requires:["flameSlash"],followUpOnCriticalOrDefeat:true,followUpMaxCasts:1},
+        fireCritical:{baseDamage:45,damagePerLevel:9,spCost:28,targetType:"single",requires:["flameSlash"],followUpOnCriticalOrDefeat:true,followUpMaxCasts:1},
         explosiveFlurry:{baseDamage:50,damagePerLevel:10,spCost:47,targetType:"tri",requires:["fireCritical"],followUpOnCriticalOrDefeat:true,followUpMaxCasts:1},
         dragonSlash:{baseDamage:165,damagePerLevel:33,spCost:65,targetType:"single",requires:["explosiveFlurry"],followUpOnCriticalOrDefeat:true,followUpMaxCasts:2},
         fireRocket:{baseDamage:13,damagePerLevel:4,spCost:10,targetType:"tri",requires:[],
@@ -6390,13 +9530,551 @@ seDamage:45,damagePerLevel:9,spCost:28,targetType:"single",requires:["flameSlash
         dustStorm:{baseDamage:140,damagePerLevel:28,spCost:65,targetType:"single",requires:["flyingSandStrike"],petrifyChanceByLevel:[15,20,25,30,35,40,45,50,55,60],petrifyDuration:2},
         rage:{critChanceBonusByLevel:[10,15,20,25,30],critDamageBonusByLevel:[15,25,35,45,55],critBonusByLevel:[10,15,20,25,30]},
         fireSoulResonance:{momentumBonusByLevel:[12,15,18,21,25]},
-        fireEX:{damageBbwrap: Can't find source path /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-bwrap: Can't bind mount /oldroot/workspace/scratch/2feca6ea11c3/.aws on /newroot/workspace/scratch/2feca6ea11c3/.aws: Unable to remount destination "/newroot/workspace/scratch/2feca6ea11c3/.aws" with correct flags: No such file or directory
-bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-bwrap: Can't find source path /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-tail: error writing 'standard output': Broken pipe
-�置："+prerequisiteLabel(skill)); }
+        fireEX:{damageBonusPercent:10,critChanceBonusPercent:5,critDamageBonusPercent:25,statusTargetDamageBonusPercent:5},
+        waterEX:{lifestealMultiplier:1.2,spDrainMultiplier:1.2,healBonusPercent:15,turnStartCleanseChance:35,statusResistBonus:null},
+        windEX:{evasionBonusPercent:15,accuracyBonusPercent:15,lowHpFinalHitCapPercent:50},
+        earthEX:{defenseBonusPercent:35,maxHpMultiplier:1.2}
+    });
+
+    function extendLevelArrayToTen(values){
+        if(!Array.isArray(values)||!values.length){ return values; }
+        const result=values.slice(0,10);
+        while(result.length<10){ result.push(result[result.length-1]); }
+        return result;
+    }
+
+    function escapeText(value){
+        return String(value==null?"":value)
+            .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+            .replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+    }
+
+    function targetLabel(skill,level){
+        if(!skill){ return "—"; }
+        if(skill.id==="freeze"){
+            return level>=5?"敵方中、左、右最多3名":"同一直列前、後最多2名敵人";
+        }
+        if(skill.id==="purifyMind"){
+            return level>=3?"我方或敵方中、左、右最多3名":"我方或敵方1名";
+        }
+        const labels={
+            single:"敵方1名",tri:"同排中、左、右最多3名",row:"敵方同排",
+            column:"同一直列前、後最多2名",all:"敵方全體",
+            self:"自己",ally:"我方1名",allyTri:"我方中、左、右最多3名",
+            allyAll:"我方全體",deadAlly:"死亡友方1名",none:"被動"
+        };
+        return labels[skill.targetType]||"技能目標";
+    }
+
+    function skillDamageValue(skill,level){
+        if(!PLAYER_DAMAGE_SKILL_ID_SET.has(skill&&skill.id)){ return null; }
+        return typeof getSkillDamageAtLevel==="function"
+            ?getSkillDamageAtLevel(skill,level)
+            :null;
+    }
+
+    function damageStatusParts(skill,level){
+        const parts=[];
+        const lv=clampLevel(level,skill&&skill.maxLevel||1);
+        if(numeric(skill&&skill.burnChance)>0&&Array.isArray(skill.burnPercentByLevel)){
+            const burnLead=skill.guaranteedBurn===true
+                ?"燃燒：必定生效"
+                :"燃燒："+numeric(skill.burnChance)+"%基礎機率";
+            parts.push(burnLead+"，"+
+                levelValue(skill.burnPercentByLevel,lv,0)+"%最大HP／回合，"+
+                Math.max(1,numeric(skill.burnDuration)||1)+"回合");
+        }
+        if(numeric(skill&&skill.frostbiteChance)>0){
+            parts.push("凍傷："+numeric(skill.frostbiteChance)+"%基礎機率，"+
+                Math.max(1,numeric(skill.frostbiteDuration)||1)+
+                "回合；期間傷害-30%、最終閃躲-25%、最終異常狀態抗性-25%");
+        }
+        if(Array.isArray(skill&&skill.lifestealPercentByLevel)){
+            parts.push("吸血："+levelValue(skill.lifestealPercentByLevel,lv,0)+"%實際傷害回復自身HP");
+        }
+        if(Array.isArray(skill&&skill.defenseDownByLevel)){
+            parts.push("破防："+numeric(skill.defenseDownChance)+"%基礎機率，防禦-"+
+                levelValue(skill.defenseDownByLevel,lv,0)+"%，"+
+                Math.max(1,numeric(skill.defenseDownDuration)||1)+"回合");
+        }
+        if(Array.isArray(skill&&skill.damageDownByLevel)){
+            parts.push("殤風："+numeric(skill.damageDownChance)+"%基礎機率，傷害-"+
+                levelValue(skill.damageDownByLevel,lv,0)+"%，"+
+                Math.max(1,numeric(skill.damageDownDuration)||1)+"回合");
+        }
+        if(Array.isArray(skill&&skill.agilityDownByLevel)){
+            const value=levelValue(skill.agilityDownByLevel,lv,0);
+            parts.push("重力："+numeric(skill.agilityDownChance)+"%基礎機率，敏捷-"+
+                value+"%、最終閃躲-"+value+"%，"+
+                Math.max(1,numeric(skill.agilityDownDuration)||1)+"回合");
+        }
+        if(Array.isArray(skill&&skill.missBonusByLevel)){
+            parts.push("暈眩："+numeric(skill.stunChance)+"%基礎機率，最終命中率-"+
+                levelValue(skill.missBonusByLevel,lv,0)+"%，"+
+                Math.max(1,numeric(skill.stunDuration)||1)+"回合");
+        }
+        if(Array.isArray(skill&&skill.petrifyChanceByLevel)){
+            parts.push("石化："+levelValue(skill.petrifyChanceByLevel,lv,0)+"%基礎機率，"+
+                Math.max(1,numeric(skill.petrifyDuration)||1)+"回合");
+        }
+        if(Array.isArray(skill&&skill.selfShieldByLevel)){
+            parts.push("自身護盾："+levelValue(skill.selfShieldByLevel,lv,0)+"，"+
+                Math.max(1,numeric(skill.shieldDuration)||1)+"回合");
+        }
+        if(Array.isArray(skill&&skill.allyShieldByLevel)){
+            parts.push("我方護盾："+levelValue(skill.allyShieldByLevel,lv,0)+"，"+
+                Math.max(1,numeric(skill.shieldDuration)||1)+"回合");
+        }
+        if(skill&&skill.followUpOnCriticalOrDefeat){
+            const maxCasts=Math.max(1,Math.floor(numeric(skill.followUpMaxCasts,1)));
+            parts.push("追擊：爆擊或擊敗目標時免費再施放，最多額外"+
+                maxCasts+"次；免費追擊不消耗SP");
+        }
+        if(skill&&skill.id==="phoenixCry"){
+            parts.push("鳳威：本次實際新增燃燒少於"+
+                Math.max(1,Math.floor(numeric(skill.burnBonusThreshold,3)))+
+                "名時，施法者獲得"+
+                Math.max(1,Math.floor(numeric(skill.nextRoundDamageBonusDuration,1)))+
+                "回合鳳威，所有傷害+"+
+                Math.max(0,numeric(skill.nextRoundDamageBonusPercent,30))+"%");
+        }
+        return parts;
+    }
+
+    function supportEffectText(skill,level){
+        if(!skill){ return ""; }
+        const lv=clampLevel(level,skill.maxLevel||1);
+        if(skill.id==="fireSoulResonance"){
+            return "炎魂共鳴使直接攻擊技能傷害+"+levelValue(skill.momentumBonusByLevel,lv,0)+
+                "%，基礎3回合"+(lv>=5?"；爆擊或成功新增燃燒時每回合最多延長1回合、整次最多+3回合":"");
+        }
+        if(skill.id==="bloodBurnArt"){
+            return "消耗最大HP "+levelValue(skill.hpCostPercentByLevel,lv,0)+
+                "%；接下來4次成功施放的直接攻擊技能傷害+"+
+                levelValue(skill.directDamageBonusByLevel,lv,0)+
+                "%；不強化DoT；免費追擊沿用本次加成但不額外消耗次數";
+        }
+        if(skill.id==="healSpell"){
+            return "恢復"+levelValue(skill.healHpByLevel,lv,0)+" HP，並恢復目標最大SP的"+
+                levelValue(skill.spRestorePercentByLevel,lv,0)+
+                "%；解除所有可解除負面狀態；施放者不恢復自身SP";
+        }
+        if(skill.id==="revive"){
+            return "復活1名死亡友方並恢復最大HP的"+
+                levelValue(skill.reviveHealPercentByLevel,lv,0)+"%；不恢復SP";
+        }
+        if(skill.id==="freeze"){
+            return levelValue(skill.freezeChanceByLevel,lv,0)+"%基礎機率冰封，持續"+
+                levelValue(skill.freezeDurationByLevel,lv,0)+"回合；完全無法行動，受硬控命中上限與冰封／石化互斥限制";
+        }
+        if(skill.id==="purifyMind"){
+            return "立即清除所有可解除的臨時Buff、Debuff、Shield、Barrier與異常狀態；"+
+                "不清除永久被動、EX、裝備效果、Boss固有機制、HP／SP或死亡狀態";
+        }
+        if(skill.id==="dodgeSkill"){
+            return "最終閃躲+"+levelValue(skill.evasionBonusPercentByLevel,lv,0)+"%，持續3回合";
+        }
+        if(skill.id==="stealthSkill"){
+            return "隱身"+levelValue(skill.durationByLevel,lv,2)+"回合；無法被單體技能選中，仍受範圍技能影響";
+        }
+        if(skill.id==="dinghaishenzhen"){
+            return "最終異常狀態抗性+"+levelValue(skill.statusResistBonusByLevel,lv,0)+
+                "%、最終命中率+"+levelValue(skill.accuracyBonusPercentByLevel,lv,0)+
+                "%，持續3回合";
+        }
+        if(skill.id==="rockWall"){
+            return "防禦+"+levelValue(skill.defenseBonusPercentByLevel,lv,0)+"%，持續4回合";
+        }
+        if(skill.id==="earthShield"){
+            return "直接傷害減少並反射"+levelValue(skill.reflectPercentByLevel,lv,0)+"%，可觸發"+
+                levelValue(skill.remainingBlocksByLevel,lv,2)+"次，持續"+
+                levelValue(skill.durationByLevel,lv,3)+"回合；同名不可疊加或刷新";
+        }
+        if(skill.id==="barrier"){
+            return "持續"+levelValue(skill.durationByLevel,lv,3)+"回合；免疫一般直接傷害、DoT與反傷，"+
+                "但不免疫狀態、硬控或淨心訣";
+        }
+        if(skill.id==="fireEX"){
+            return "火元素角色傷害 +"+numeric(skill.damageBonusPercent)+
+                "%、爆擊率"+numeric(skill.critChanceBonusPercent)+
+                "%、爆擊傷害"+numeric(skill.critDamageBonusPercent)+
+                "%；對有異常狀態的目標傷害再+"+numeric(skill.statusTargetDamageBonusPercent)+"%";
+        }
+        if(skill.id==="waterEX"){
+            return "吸血效果 +20%、吸 SP 效果 +20%、回復類技能HP恢復量 +"+numeric(skill.healBonusPercent)+
+                "%；每回合開始前有"+numeric(skill.turnStartCleanseChance)+
+                "%機率解除自身所有可解除負面狀態";
+        }
+        if(skill.id==="windEX"){
+            return "最終閃躲 +"+numeric(skill.evasionBonusPercent)+"%，最終命中 +"+
+                numeric(skill.accuracyBonusPercent)+"%；自身 HP 低於 25% 時，敵方對自己的最終命中率最高為 50%。";
+        }
+        if(skill.id==="earthEX"){
+            return "永久提升防禦力"+numeric(skill.defenseBonusPercent)+"%、最大HP +"+
+                Math.round((numeric(skill.maxHpMultiplier,1)-1)*100)+"%";
+        }
+        if(skill.id==="rage"&&Array.isArray(skill.critBonusByLevel)){
+            const chance=levelValue(skill.critChanceBonusByLevel||skill.critBonusByLevel,lv,0);
+            const damage=levelValue(skill.critDamageBonusByLevel||skill.critBonusByLevel,lv,0);
+            return "爆擊率+"+chance+"%、爆擊傷害+"+damage+"%，持續"+
+                Math.max(1,numeric(skill.duration)||1)+"回合";
+        }
+        return String(skill.description||"");
+    }
+
+    function effectText(skill,level){
+        if(!skill){ return ""; }
+        const damage=skillDamageValue(skill,level);
+        const parts=[];
+        if(damage!==null){ parts.push("傷害 "+damage); }
+        if(skill.id==="freeze"||skill.category==="buff"||skill.category==="heal"||skill.category==="revive"){
+            const support=supportEffectText(skill,level);
+            if(support){ parts.push(support); }
+        }else{
+            parts.push(...damageStatusParts(skill,level));
+        }
+        if(skill.category==="passive"){
+            const passive=supportEffectText(skill,level);
+            if(passive){ parts.push(passive); }
+        }
+        return parts.filter(Boolean).join("｜");
+    }
+
+    function descriptionFor(skill){
+        if(!skill){ return ""; }
+        const max=Math.max(1,Math.floor(numeric(skill.maxLevel,1)));
+        const firstTarget=targetLabel(skill,1);
+        const finalTarget=targetLabel(skill,max);
+        const parts=["範圍："+firstTarget];
+        if(max>1&&finalTarget!==firstTarget){
+            parts.push("滿級範圍："+finalTarget);
+        }
+        if(PLAYER_DAMAGE_SKILL_ID_SET.has(skill.id)){
+            parts.push("Lv1傷害 "+skillDamageValue(skill,1));
+            parts.push("Lv5突破 "+skillDamageValue(skill,5));
+            parts.push("Lv10突破 "+skillDamageValue(skill,10));
+            const extras=damageStatusParts(skill,Math.min(max,10));
+            if(extras.length){ parts.push(extras.join("；")); }
+        }else{
+            parts.push(supportEffectText(skill,1));
+            if(max>1){ parts.push("最高 Lv"+max); }
+        }
+        if(skill.spCost!==undefined){ parts.push("SP "+numeric(skill.spCost)); }
+        return parts.filter(Boolean).join("。")+"。";
+    }
+
+    function levelBreakdownHtml(skill){
+        if(!skill){ return ""; }
+        const max=Math.max(1,Math.floor(numeric(skill.maxLevel,1)));
+        return Array.from({length:max},(_,index)=>{
+            const level=index+1;
+            const breakthrough=PLAYER_DAMAGE_SKILL_ID_SET.has(skill.id)&&(level===5||level===10)
+                ?"（突破×1.5）":"";
+            return '<div style="display:flex;gap:6px;padding:3px 0;border-bottom:1px solid rgba(240,180,41,.12);">'+
+                '<span style="flex:0 0 40px;color:#f0b429;font-weight:bold;">Lv.'+level+'</span>'+
+                '<span style="flex:1;">'+escapeText(effectText(skill,level)+breakthrough)+'</span></div>';
+        }).join("");
+    }
+
+    function applyFinalProgressionData(){
+        if(typeof skillDatabase==="undefined"||!skillDatabase){ return false; }
+        /* Some older save-era bases never declared Purify in the initial table.
+           Its canonical definition belongs here with the final progression data,
+           rather than relying on the retired V169 data patch to create it. */
+        if(!skillDatabase.purifyMind){
+            skillDatabase.purifyMind={
+                id:"purifyMind",name:"淨心訣",element:"water",category:"buff",targetType:"ally",
+                description:"解除目標所有可解除的臨時 Buff、Debuff、Shield、Barrier 與異常狀態。"
+            };
+        }
+        Object.entries(FINAL_PROGRESSION).forEach(([skillId,fields])=>{
+            if(!skillDatabase[skillId]){
+                if(skillId!=="fireSoulResonance"&&skillId!=="bloodBurnArt"){ return; }
+                skillDatabase[skillId]={id:skillId};
+            }
+            const skill=skillDatabase[skillId];
+            Object.entries(fields).forEach(([key,value])=>{ skill[key]=copyArray(value); });
+            skill.id=skill.id||skillId;
+
+            if(PLAYER_DAMAGE_SKILL_ID_SET.has(skillId)){
+                skill.maxLevel=10;
+                skill.upgradeCost=1;
+                Object.keys(skill).forEach(key=>{
+                    if(/ByLevel$/.test(key)&&Array.isArray(skill[key])){
+                        skill[key]=extendLevelArrayToTen(skill[key]);
+                    }
+                });
+            }
+
+            if(numeric(skill.maxLevel,1)>1){
+                skill.upgradeCost=1;
+                skill.upgradeCostByTargetLevel=SKILL_UPGRADE_COST_BY_TARGET_LEVEL;
+            }else{
+                delete skill.upgradeCostByTargetLevel;
+            }
+            skill.description=sanitizeDescription(skill.description);
+        });
+
+        const heal=skillDatabase.healSpell;
+        if(heal){
+            heal.baseHeal=550; heal.healPerLevel=30;
+            heal.healHpByLevel=HEAL_HP_BY_LEVEL.slice();
+            heal.spRestorePercentByLevel=HEAL_SP_PERCENT_BY_LEVEL.slice();
+            delete heal.baseHealSP; delete heal.healSPPerLevel;
+            heal.description="我方中、左、右最多3名存活角色恢復550/580/610/640/670 HP，並依等級恢復目標最大SP的0%/0%/5%/10%/15%；解除所有可解除負面狀態。施放者可恢復自身HP，但不恢復自身SP。SP 45。";
+        }
+        const freeze=skillDatabase.freeze;
+        if(freeze){
+            freeze.freezeChanceByLevel=FREEZE_CHANCE_BY_LEVEL.slice();
+            freeze.freezeDurationByLevel=FREEZE_DURATION_BY_LEVEL.slice();
+            delete freeze.freezeChance; delete freeze.freezeDuration;
+            delete freeze.baseDamage; delete freeze.damagePerLevel;
+            freeze.description="Lv1～4攻擊同一直列前、後最多2名敵人；Lv5攻擊中、左、右最多3名敵人。基礎冰封機率55%/65%/75%/85%/95%，持續3/3/3/4/5回合；仍受正式硬控命中上限與冰封／石化互斥規則限制。SP 32。";
+        }
+        const purify=skillDatabase.purifyMind;
+        if(purify){
+            purify.targetCountByLevel=PURIFY_TARGET_COUNT_BY_LEVEL.slice();
+            purify.description="Lv1～2選擇1名我方或敵方；Lv3選擇中、左、右最多3名目標。立即清除所有可解除的臨時Buff、Debuff、Shield、Barrier與異常狀態；不清除永久被動、EX、裝備、Boss固有機制、HP/SP或死亡狀態。SP 22。";
+        }
+        const dodge=skillDatabase.dodgeSkill;
+        if(dodge){
+            dodge.evasionBonusPercentByLevel=DODGE_BY_LEVEL.slice();
+            dodge.targetType="allyTri"; dodge.duration=3; dodge.spCost=20;
+            delete dodge.evasionBonusPercent;
+            dodge.description="我方中、左、右最多3名存活角色最終閃躲提升5/10/15/20/25%，持續3回合。SP 20。";
+        }
+        const stealth=skillDatabase.stealthSkill;
+        if(stealth){
+            stealth.durationByLevel=STEALTH_DURATION_BY_LEVEL.slice();
+            stealth.duration=2; stealth.targetType="ally"; stealth.spCost=45;
+            stealth.description="我方1人隱身2/3/4回合；無法被單體技能選中，仍會受到範圍技能影響。SP 45。";
+        }
+        const calm=skillDatabase.dinghaishenzhen;
+        if(calm){
+            calm.statusResistBonusByLevel=CALM_RESIST_BY_LEVEL.slice();
+            calm.accuracyBonusPercentByLevel=CALM_ACCURACY_BY_LEVEL.slice();
+            calm.targetType="allyAll"; calm.duration=3; calm.spCost=77;
+            delete calm.statusResistBonus; delete calm.accuracyBonusPercent;
+            calm.description="我方全體最終異常狀態抗性提升5/8/10/12/15%、最終命中率提升5/10/15/20/25%，持續3回合。SP 77。";
+        }
+        const wall=skillDatabase.rockWall;
+        if(wall){
+            wall.defenseBonusPercentByLevel=ROCK_WALL_BY_LEVEL.slice();
+            wall.targetType="allyTri"; wall.duration=4; wall.spCost=45; wall.requires=["petrifyFist","sandWind"];
+            delete wall.defenseBonusPercent;
+            wall.description="我方中、左、右最多3名存活角色防禦提升15%/20%/25%/30%/35%，持續4回合。SP 45。";
+        }
+        const shield=skillDatabase.earthShield;
+        if(shield){
+            shield.reflectPercentByLevel=EARTH_SHIELD_BY_LEVEL.slice();
+            shield.durationByLevel=EARTH_SHIELD_DURATION_BY_LEVEL.slice();
+            shield.remainingBlocksByLevel=EARTH_SHIELD_BLOCKS_BY_LEVEL.slice();
+            shield.targetType="self"; shield.spCost=45; shield.requires=["rockWall"];
+            delete shield.reflectPercent;
+            shield.description="我方1人獲得萬象土盾；直接傷害減少並反射20%/40%/60%/80%/100%，可觸發2/2/2/2/3次，持續3/3/3/3/4回合。SP 45。";
+        }
+        const barrier=skillDatabase.barrier;
+        if(barrier){
+            barrier.durationByLevel=BARRIER_DURATION_BY_LEVEL.slice();
+            barrier.targetType="ally"; barrier.spCost=40; barrier.requires=["earthShield"];
+            delete barrier.barrierBlockCountByLevel; delete barrier.barrierBlockCount; delete barrier.duration;
+            barrier.description="我方1人獲得結界，持續3/3/3/4/5回合；免疫一般直接傷害、DoT與反傷，但不免疫狀態、硬控或淨心訣。SP 40。";
+        }
+        Object.entries(FINAL_REBALANCE_DATA).forEach(([skillId,fields])=>{
+            const skill=skillDatabase[skillId];
+            if(!skill){ return; }
+            Object.entries(fields).forEach(([key,value])=>{
+                if(value===null){ delete skill[key]; }
+                else{ skill[key]=copyArray(value); }
+            });
+        });
+        /* The final Water Warrior data uses Frostbite, not the retired per-skill
+           Freeze payloads that older modules attached to these attacks. */
+        ["waterKnife","frostPunch","iceSpin","frostCrush","waterBall","floodBeast","iceArrowRain"].forEach(skillId=>{
+            const skill=skillDatabase[skillId];
+            if(!skill){ return; }
+            ["freezeChance","freezeDuration","freezeSingleTarget","teamFreezeChance","teamFreezeDuration"].forEach(field=>delete skill[field]);
+        });
+        if(skillDatabase.flyingSandStrike){ delete skillDatabase.flyingSandStrike.petrifyChanceByLevel; }
+        if(skillDatabase.dustStorm){ delete skillDatabase.dustStorm.defenseDownChance; delete skillDatabase.dustStorm.defenseDownByLevel; }
+        if(skillDatabase.earthShield){
+            skillDatabase.earthShield.description="我方1人獲得萬象土盾；直接傷害減少並反射20%/40%/60%/80%/100%，每次成功抵擋消耗2/2/2/2/3次中的1次，持續3/3/3/3/4回合。DoT不觸發。SP 45。";
+        }
+        if(skillDatabase.barrier){
+            skillDatabase.barrier.description="我方1人獲得結界，持續3/3/3/4/5回合；免疫一般直接傷害、DoT與反傷，但不免疫狀態、硬控或淨心訣。SP 40。";
+        }
+        Object.values(skillDatabase).forEach(skill=>{
+            if(!skill||!skill.id){ return; }
+            if(PLAYER_DAMAGE_SKILL_ID_SET.has(skill.id)||[
+                "rage","fireSoulResonance","bloodBurnArt","healSpell","revive","freeze","purifyMind",
+                "dodgeSkill","stealthSkill","dinghaishenzhen","rockWall","earthShield","barrier",
+                "fireEX","waterEX","windEX","earthEX"
+            ].includes(skill.id)){
+                skill.description=descriptionFor(skill);
+            }
+        });
+        return true;
+    }
+
+    function getRequiredCharacterLevelForSkillLevel(skill,targetSkillLevel){
+        const learnLevel=Math.max(1,Math.floor(numeric(skill&&skill.learnLevel,1)));
+        const target=Math.max(1,Math.floor(numeric(targetSkillLevel,1)));
+        if(target<=1){ return learnLevel; }
+        if(target===2){ return Math.max(learnLevel+8,15); }
+        if(target===3){ return Math.max(learnLevel+18,30); }
+        if(target===4){ return Math.max(learnLevel+30,50); }
+        return Math.max(learnLevel+45,80);
+    }
+    function getUpgradeCostForTargetLevel(skill,targetSkillLevel){
+        if(!skill||numeric(skill.maxLevel,1)<=1){ return 0; }
+        return numeric(SKILL_UPGRADE_COST_BY_TARGET_LEVEL[Math.floor(numeric(targetSkillLevel))],0);
+    }
+    function getSkillContext(characterKey){
+        const key=characterKey!==undefined&&characterKey!==null?characterKey:
+            (typeof currentSkillCharacter!=="undefined"?currentSkillCharacter:null);
+        const loadout=typeof characterSkillLoadouts!=="undefined"&&characterSkillLoadouts&&key!==null
+            ?characterSkillLoadouts[key]:null;
+        let character=null;
+        if(typeof getSkillCharacterObject==="function"&&key!==null){ character=getSkillCharacterObject(key); }
+        if(!character&&key!==null){
+            if(key==="player2"&&typeof player2!=="undefined"){ character=player2; }
+            else if(key==="player3"&&typeof player3!=="undefined"){ character=player3; }
+            else if(typeof player!=="undefined"){ character=player; }
+        }
+        return {key,character,loadout};
+    }
+    function learnedLevel(context,skillId){
+        return Math.max(0,Math.floor(numeric(context&&context.loadout&&context.loadout.skillLevels&&context.loadout.skillLevels[skillId])));
+    }
+    function isCrossElementSkill(character,skill){
+        return !!(character&&skill&&character.element&&skill.element&&character.element!==skill.element);
+    }
+    function hasLearnedNativeSkill(context){
+        const levels=context&&context.loadout&&context.loadout.skillLevels||{};
+        return Object.keys(levels).some(id=>numeric(levels[id])>0&&skillById(id)&&skillById(id).element===context.character.element);
+    }
+    function crossLearnGate(context,skill){
+        if(!isCrossElementSkill(context.character,skill)){ return {ok:true,cross:false}; }
+        if(/EX$/.test(String(skill.id||""))||skill.category==="passive"){
+            return {ok:false,cross:true,reason:"本命元素限定"};
+        }
+        if(!hasLearnedNativeSkill(context)){
+            return {ok:false,cross:true,reason:"需先學會至少 1 招本命元素技能"};
+        }
+        return {ok:true,cross:true};
+    }
+    function initialLearnCost(context,skill){
+        if(typeof window.v173GetInitialLearnCost==="function"){
+            return Math.max(0,Math.floor(numeric(window.v173GetInitialLearnCost(context&&context.character,skill))));
+        }
+        return Math.max(0,Math.floor(numeric(skill&&skill.learnCost)));
+    }
+    function normalizeCrossElementEquip(loadout,character){
+        if(!loadout||!character||!Array.isArray(loadout.equippedSkills)){ return false; }
+        let seen=false,changed=false;
+        loadout.equippedSkills=loadout.equippedSkills.filter(skillId=>{
+            const skill=skillById(skillId);
+            if(!skill||!isCrossElementSkill(character,skill)){ return true; }
+            if(!seen){ seen=true; return true; }
+            changed=true; return false;
+        }).slice(0,4);
+        return changed;
+    }
+    function normalizeAllCrossElementEquips(){
+        if(typeof characterSkillLoadouts==="undefined"||!characterSkillLoadouts){ return false; }
+        let changed=false;
+        Object.keys(characterSkillLoadouts).forEach(key=>{
+            const loadout=characterSkillLoadouts[key];
+            const character=typeof getSkillCharacterObject==="function"?getSkillCharacterObject(key):null;
+            if(normalizeCrossElementEquip(loadout,character)){ changed=true; }
+        });
+        return changed;
+    }
+    window.v173NormalizeCrossElementEquips=normalizeAllCrossElementEquips;
+    function prerequisiteMet(levels,skill){
+        const required=Array.isArray(skill&&skill.requires)?skill.requires.filter(Boolean):[];
+        if(!required.length){ return true; }
+        return required.some(skillId=>numeric(levels&&levels[skillId])>0);
+    }
+    function prerequisiteLabel(skill){
+        const required=Array.isArray(skill&&skill.requires)?skill.requires.filter(Boolean):[];
+        if(!required.length){ return "無"; }
+        return required.map(skillLabel).join(" 或 ");
+    }
+
+    /*
+       Canonical Skill Learn Eligibility（技能學習資格唯一來源）.
+       Renderer、指引紅點、詳細頁與 learnSkill() 必須讀同一份結果；
+       不再由各 UI 自己重算跨元素、前置與成本。
+    */
+    function getSkillLearnEligibility(character,skill,levels){
+        const safeCharacter=character||null;
+        const safeSkill=skill||null;
+        const safeLevels=levels||{};
+        const cross=isCrossElementSkill(safeCharacter,safeSkill);
+        const native=!cross;
+        const crossGate=crossLearnGate({character:safeCharacter,loadout:{skillLevels:safeLevels}},safeSkill);
+        const levelOk=!!(safeCharacter&&safeSkill&&
+            Math.max(1,Math.floor(numeric(safeCharacter.level,1)))>=
+            getRequiredCharacterLevelForSkillLevel(safeSkill,1));
+        const prerequisiteRequired=!cross;
+        const prerequisiteOk=!prerequisiteRequired||prerequisiteMet(safeLevels,safeSkill);
+        const learnCost=initialLearnCost({character:safeCharacter},safeSkill);
+        const points=Math.max(0,Math.floor(numeric(safeCharacter&&safeCharacter.skillPoints)));
+        const pointsOk=points>=learnCost;
+        const allowed=!!(safeSkill&&levelOk&&crossGate.ok&&prerequisiteOk&&pointsOk);
+        let reason="";
+        if(!safeSkill){ reason="技能資料不存在"; }
+        else if(!levelOk){ reason="Lv"+safeSkill.learnLevel+" 解鎖"; }
+        else if(!crossGate.ok){ reason=crossGate.reason; }
+        else if(!prerequisiteOk){ reason="需先學習："+prerequisiteLabel(safeSkill); }
+        else if(!pointsOk){ reason="需要"+learnCost+"點"; }
+        return Object.freeze({
+            isCrossElement:cross,
+            isNativeElement:native,
+            allowed,
+            levelOk,
+            prerequisiteRequired,
+            prerequisiteOk,
+            learnCost,
+            pointsOk,
+            crossGateOk:!!crossGate.ok,
+            reason
+        });
+    }
+    window.v173GetSkillLearnEligibility=getSkillLearnEligibility;
+    function finalizeSkillMutation(){
+        if(typeof saveGame==="function"){ saveGame(); }
+        if(typeof renderSkillLoadout==="function"){ renderSkillLoadout(); }
+        if(typeof updateUI==="function"){ updateUI(); }
+    }
+
+    applyFinalProgressionData();
+    if(typeof window.v173ApplyFormalDamageRoleProfiles==="function"){
+        /* Re-project after every final data field is installed.  V169 loads
+           before the role helper, so Water cannot rely on a historical call. */
+        window.v173ApplyFormalDamageRoleProfiles(PLAYER_DAMAGE_SKILL_IDS);
+    }
+
+    if(typeof learnSkill==="function"){
+        learnSkill=function(skillId){
+            const skill=skillById(skillId);
+            const context=getSkillContext();
+            if(!skill||!context.character||!context.loadout){ return notify("目前無法取得角色技能資料。"); }
+            context.loadout.skillLevels=context.loadout.skillLevels||{};
+            if(learnedLevel(context,skillId)>0){ return true; }
+            const characterLevel=Math.max(1,Math.floor(numeric(context.character.level,1)));
+            const requiredLevel=getRequiredCharacterLevelForSkillLevel(skill,1);
+            const levels=context.loadout.skillLevels;
+            const eligibility=getSkillLearnEligibility(context.character,skill,levels);
+            const prereqOk=eligibility.prerequisiteOk;
+            if(characterLevel<requiredLevel){
+                return notify(prereqOk
+                    ?("角色 Lv"+requiredLevel+" 才能學習「"+skill.name+"」。")
+                    :("需要 Lv"+requiredLevel+"・前置："+prerequisiteLabel(skill)));
+            }
+            if(!eligibility.crossGateOk){ return notify(eligibility.reason); }
+            if(!prereqOk){ return notify("需要前置："+prerequisiteLabel(skill)); }
             const learnCost=eligibility.learnCost;
             const points=Math.max(0,Math.floor(numeric(context.character.skillPoints)));
             if(points<learnCost){ return notify("技能點不足，需要"+learnCost+"點。"); }
@@ -6635,8 +10313,7 @@ tail: error writing 'standard output': Broken pipe
         return !!(skill&&(skill.category==="physical"||skill.category==="magic"));
     }
     function formalRound(){
-        return typeof turn!=="undefined"?Math.max(1,Math.flootail: error writing 'standard output': Broken pipe
-r(numeric(turn,1))):1;
+        return typeof turn!=="undefined"?Math.max(1,Math.floor(numeric(turn,1))):1;
     }
     function extendResonanceOncePerRound(actor,resonance,momentum){
         if(!resonance||clampLevel(resonance.skillLevel,5)<5){ return false; }
@@ -6759,9 +10436,119 @@ r(numeric(turn,1))):1;
     };
 
     normalizeAllCrossElementEquips();
-    iftail: error writing 'standard output': Broken pipe
-bwrap: Can't find source path /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-list.length;i++){
+    if(typeof renderSkillLoadout==="function"){ renderSkillLoadout(); }
+})();
+
+
+/* bundled source: js/60-team-relic-system.js */
+/* =====================================================
+   Team Relic System — first production runtime
+   - One relic per party loadout.
+   - Relics are independent battlefield events: no skill slot, action or SP use.
+   - Persistent ownership is embedded in the existing SAVE_KEY save document.
+   - Battle counters are transient and reset for every battle.
+===================================================== */
+(function installTeamRelicSystem(){
+    "use strict";
+
+    if(typeof window==="undefined"||window.__teamRelicSystemInstalled){ return; }
+    window.__teamRelicSystemInstalled=true;
+
+    const SOURCE_RELIC="relic";
+    const MAX_LEVEL=20;
+    const CATEGORY_LABELS={
+        all:"全部",attack:"攻擊",recovery:"回復",defense:"防禦",buff:"增益",
+        control:"控制",element:"元素聯動",special:"特殊"
+    };
+    const RARITY_ORDER={white:0,blue:1,purple:2,orange:3,pink:4,"four-symbol":5};
+    const RARITY_LABELS={white:"白階",blue:"藍階",purple:"紫階",orange:"橙階",pink:"桃紅階","four-symbol":"四象階"};
+
+    const RELIC_VFX_FLOOR_MS=2000;
+    const RELIC_DIM_IN_MS=360;
+    const RELIC_IDENTITY_REVEAL_MS=360;
+    const RELIC_IDENTITY_HOLD_MS=1150;
+    const RELIC_IDENTITY_EXIT_MS=420;
+    const RELIC_TARGET_REVEAL_MS=420;
+    const RELIC_DIM_OUT_MS=420;
+    const RELIC_CUTIN_DURATION_MS=RELIC_DIM_IN_MS+RELIC_IDENTITY_REVEAL_MS+RELIC_IDENTITY_HOLD_MS+Math.max(RELIC_IDENTITY_EXIT_MS,RELIC_TARGET_REVEAL_MS);
+    const RELIC_MIN_VISUAL_PROTECTION_MS=1200;
+    const RELIC_DEV_HOST="dev.four-symbols-dev.pages.dev";
+    const RELIC_BALANCE_CONFIG=Object.freeze({
+        basePower:40,
+        averagePartyLevelPower:5,
+        relicLevelPower:8,
+        bossDamageModifier:0.75,
+        bossDebuffEfficiency:0.65,
+        groupDamageModifier:1,
+        healModifier:1,
+        shieldModifier:1,
+        controlModifier:1,
+        burnPercent:3,
+        bannerDurationMs:1800,
+        presentationDurationMs:2400,
+        presentationLeadGapMs:120,
+        upgradeGoldBase:650,
+        upgradeGoldPerLevel:180
+    });
+
+    function relicVfx(durationMs,element,defaultTarget){
+        return Object.freeze({
+            durationMs:Math.max(RELIC_VFX_FLOOR_MS,Math.floor(Number(durationMs)||0)),
+            element:element||"normal",
+            defaultTarget:defaultTarget||"allyAll"
+        });
+    }
+    const RELIC_VFX_PRESENTATION=Object.freeze({
+        relic_qiankun_flask:relicVfx(2500,"normal","allyAll"),
+        relic_sun_orb:relicVfx(2250,"fire","enemyAll"),
+        relic_xuanwu_seal:relicVfx(2600,"normal","allyAll"),
+        relic_soul_bell:relicVfx(2500,"normal","enemyAll"),
+        relic_tiangang_banner:relicVfx(2800,"normal","enemyAll"),
+        relic_nine_dragon_fire:relicVfx(2550,"fire","enemyAll"),
+        relic_cold_spring_jade:relicVfx(2500,"water","singleAlly"),
+        relic_qinglan_feather:relicVfx(2350,"wind","allyAll"),
+        relic_rock_mountain_seal:relicVfx(2600,"earth","allyAll"),
+        relic_returning_wheel:relicVfx(2750,"normal","singleAlly"),
+        relic_origin_talisman:relicVfx(2350,"normal","allyAll"),
+        relic_broken_army_scroll:relicVfx(2250,"normal","singleEnemy"),
+        relic_red_sky_war_mark:relicVfx(2300,"normal","allyAll"),
+        relic_ice_mirror_heart:relicVfx(2400,"water","enemyAll"),
+        relic_wind_chasing_talisman:relicVfx(2200,"wind","allyAll"),
+        relic_mountain_river_cauldron:relicVfx(2650,"earth","allyAll"),
+        relic_burning_star_mark:relicVfx(2250,"fire","enemyAll"),
+        relic_spirit_spring_bottle:relicVfx(2450,"water","allyAll"),
+        relic_demon_suppressing_seal:relicVfx(2400,"normal","allyAll"),
+        relic_all_returning_array:relicVfx(2800,"normal","allyAll")
+    });
+    const RELIC_BATTLE_ICON_PATHS=Object.freeze({
+        relic_qiankun_flask:"assets/relics/battle-icons/relic_qiankun_flask.webp",
+        relic_sun_orb:"assets/relics/battle-icons/relic_sun_orb.webp",
+        relic_xuanwu_seal:"assets/relics/battle-icons/relic_xuanwu_seal.webp",
+        relic_soul_bell:"assets/relics/battle-icons/relic_soul_bell.webp",
+        relic_tiangang_banner:"assets/relics/battle-icons/relic_tiangang_banner.webp",
+        relic_nine_dragon_fire:"assets/relics/battle-icons/relic_nine_dragon_fire.webp",
+        relic_cold_spring_jade:"assets/relics/battle-icons/relic_cold_spring_jade.webp",
+        relic_qinglan_feather:"assets/relics/battle-icons/relic_qinglan_feather.webp",
+        relic_rock_mountain_seal:"assets/relics/battle-icons/relic_rock_mountain_seal.webp",
+        relic_returning_wheel:"assets/relics/battle-icons/relic_returning_wheel.webp",
+        relic_origin_talisman:"assets/relics/battle-icons/relic_origin_talisman.webp",
+        relic_broken_army_scroll:"assets/relics/battle-icons/relic_broken_army_scroll.webp",
+        relic_red_sky_war_mark:"assets/relics/battle-icons/relic_red_sky_war_mark.webp",
+        relic_ice_mirror_heart:"assets/relics/battle-icons/relic_ice_mirror_heart.webp",
+        relic_wind_chasing_talisman:"assets/relics/battle-icons/relic_wind_chasing_talisman.webp",
+        relic_mountain_river_cauldron:"assets/relics/battle-icons/relic_mountain_river_cauldron.webp",
+        relic_burning_star_mark:"assets/relics/battle-icons/relic_burning_star_mark.webp",
+        relic_spirit_spring_bottle:"assets/relics/battle-icons/relic_spirit_spring_bottle.webp",
+        relic_demon_suppressing_seal:"assets/relics/battle-icons/relic_demon_suppressing_seal.webp",
+        relic_all_returning_array:"assets/relics/battle-icons/relic_all_returning_array.webp"
+    });
+
+    function scalar(points,level){
+        const list=(points||[]).slice().sort((a,b)=>a[0]-b[0]);
+        const lv=Math.max(1,Math.min(MAX_LEVEL,Math.floor(Number(level)||1)));
+        if(!list.length){ return 0; }
+        if(lv<=list[0][0]){ return Number(list[0][1])||0; }
+        for(let i=1;i<list.length;i++){
             const left=list[i-1],right=list[i];
             if(lv<=right[0]){
                 const ratio=(lv-left[0])/Math.max(1,right[0]-left[0]);
@@ -6836,8 +10623,7 @@ list.length;i++){
             description:"敵方累積完成7次有效行動後爆發全體火屬性秘寶傷害。",
             scalars:{damageMultiplier:[[1,.8],[5,.85],[10,.9],[15,1],[20,1.1]],burnChance:[[1,0],[9,0],[10,.2],[15,.25],[20,.3]],burnBonus:[[1,0],[19,0],[20,.15]]},
             triggers:[trigger("enemy_actions_7","enemy_action_count",{threshold:7,resetOnTrigger:true,maxTriggersPerRound:1},[
-                effect("tail: error writing 'standard output': Broken pipe
-damage_all_enemies",{multiplierKey:"damageMultiplier",element:"fire",bonusAgainstStatus:"burn",bonusKey:"burnBonus"}),
+                effect("damage_all_enemies",{multiplierKey:"damageMultiplier",element:"fire",bonusAgainstStatus:"burn",bonusKey:"burnBonus"}),
                 effect("apply_status_all_enemies",{minLevel:10,statusId:"burn",chanceKey:"burnChance",durationRounds:2})
             ])],
             limitText:"觸發後敵方行動計數歸零；每回合最多一次。",
@@ -6880,8 +10666,7 @@ damage_all_enemies",{multiplierKey:"damageMultiplier",element:"fire",bonusAgains
             id:"relic_returning_wheel",category:"special",tags:["recovery","survival"],rarity:"pink",maxLevel:20,iconPath:"assets/relics/icons/relic_returning_wheel.webp",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
             description:"每場第一次致命傷害發生時阻止死亡，留下1HP後立即回復並獲得護盾。",
             scalars:{healHpPercent:[[1,15],[10,18],[20,22]],shieldPercent:[[1,8],[10,8],[20,10]]},
-            triggers:[trigger("before_lethal","before_lethal_dtail: error writing 'standard output': Broken pipe
-amage",{oncePerBattle:true,maxTriggersPerBattle:1},[
+            triggers:[trigger("before_lethal","before_lethal_damage",{oncePerBattle:true,maxTriggersPerBattle:1},[
                 effect("prevent_death",{}),effect("heal_single_ally",{percentKey:"healHpPercent",afterPreventDeath:true}),
                 effect("shield_single",{percentKey:"shieldPercent",durationRounds:1}),effect("cleanse_single",{minLevel:20,count:1})
             ])],
@@ -6891,8 +10676,70 @@ amage",{oncePerBattle:true,maxTriggersPerBattle:1},[
         {id:"relic_origin_talisman",category:"buff",tags:["recovery","cleanse","special"],rarity:"purple",maxLevel:20,iconPath:"assets/relics/icons/relic_origin_talisman.webp",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"每第4回合結束淨化負面最多的隊友，並恢復全隊HP。",limitText:"第一版資料已建立，尚未開放取得。"},
         {id:"relic_broken_army_scroll",category:"attack",tags:["execute"],rarity:"purple",maxLevel:20,iconPath:"assets/relics/icons/relic_broken_army_scroll.webp",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"角色擊敗敵人後，追擊目前HP最低的存活敵人。",limitText:"每回合最多一次；秘寶與DOT擊殺不觸發。"},
         {id:"relic_red_sky_war_mark",category:"buff",tags:["attack","burst"],rarity:"orange",maxLevel:20,iconPath:"assets/relics/icons/relic_red_sky_war_mark.webp",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"戰鬥開始時短暫提高全隊攻擊，後期追加暴擊率。",limitText:"只觸發一次，不長時間常駐。"},
-        {id:"relic_ice_mirror_heart",category:"element",tags:["water","frostbite","freeze","control"],rarity:"purple",maxLevel:20,iconPath:"assets/relics/icons/relic_ice_mirror_heart.webp",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:bwrap: Can't get type of source /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-&&def.scalars&&def.scalars[key]?scalar(def.scalars[key],level):0; }
+        {id:"relic_ice_mirror_heart",category:"element",tags:["water","frostbite","freeze","control"],rarity:"purple",maxLevel:20,iconPath:"assets/relics/icons/relic_ice_mirror_heart.webp",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"每第3回合結束，對凍傷或冰封中的敵人追加水屬性秘寶傷害。",limitText:"不附加冰封，不刷新凍傷。"},
+        {id:"relic_wind_chasing_talisman",category:"buff",tags:["wind","tempo"],rarity:"blue",maxLevel:20,iconPath:"assets/relics/icons/relic_wind_chasing_talisman.webp",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"每第3回合開始提高隊伍節奏與閃避。",limitText:"第一版資料保留；待確認正式速度 owner 後再開放。"},
+        {id:"relic_mountain_river_cauldron",category:"defense",tags:["recovery","anti_swarm"],rarity:"orange",maxLevel:20,iconPath:"assets/relics/icons/relic_mountain_river_cauldron.webp",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"我方累積受7次有效攻擊後，恢復全隊並短暫提高防禦。",limitText:"每回合最多一次。"},
+        {id:"relic_burning_star_mark",category:"element",tags:["fire","burn","attack"],rarity:"purple",maxLevel:20,iconPath:"assets/relics/icons/relic_burning_star_mark.webp",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"偶數回合結束時對燃燒中的敵人追加火屬性秘寶傷害。",limitText:"不消耗或刷新燃燒。"},
+        {id:"relic_spirit_spring_bottle",category:"recovery",tags:["sp","long-battle"],rarity:"blue",maxLevel:20,iconPath:"assets/relics/icons/relic_spirit_spring_bottle.webp",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"每第3回合結束恢復全隊SP，高等級追加少量HP。",limitText:"死亡角色不受影響。"},
+        {id:"relic_demon_suppressing_seal",category:"defense",tags:["buff","cleanse"],rarity:"orange",maxLevel:20,iconPath:"assets/relics/icons/relic_demon_suppressing_seal.webp",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"開場提高異常抗性，並在首次中負面時自動淨化。",limitText:"自動淨化每場一次。"},
+        {id:"relic_all_returning_array",category:"special",tags:["adaptive"],rarity:"four-symbol",maxLevel:20,iconPath:"assets/relics/icons/relic_all_returning_array.webp",runtimeReady:false,defaultUnlocked:false,unlockSource:null,description:"每第4回合開始依全隊平均HP決定回血或攻防增益。",limitText:"一次只發動回血或攻防其中一種。"}
+    ];
+
+    RELIC_CATALOG_LIST.forEach(def=>{
+        const summary=window.FourSymbolsRelicSummaryCatalog&&window.FourSymbolsRelicSummaryCatalog[def.id];
+        if(!summary){ throw new Error("Missing first-screen relic summary definition: "+def.id); }
+        def.name=summary.name;
+        def.triggerText=summary.triggerText;
+        def.vfx=RELIC_VFX_PRESENTATION[def.id]||null;
+        def.battleIconPath=RELIC_BATTLE_ICON_PATHS[def.id]||null;
+        def.upgradeCost={
+            items:[],
+            goldCost:{base:RELIC_BALANCE_CONFIG.upgradeGoldBase,perLevel:RELIC_BALANCE_CONFIG.upgradeGoldPerLevel},
+            formalMaterialSource:null
+        };
+    });
+    let relicVisualReadyPromise=null;
+    function nextVisualPaint(){ return new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))); }
+    function decodeRelicIcon(path){
+        return new Promise((resolve,reject)=>{const image=new Image();image.decoding="async";image.onload=()=>typeof image.decode==="function"?image.decode().then(resolve,reject):resolve();image.onerror=()=>reject(new Error("秘寶圖片無法載入："+path));image.src=path;});
+    }
+    function prepareRelicVisuals(){
+        if(relicVisualReadyPromise){return relicVisualReadyPromise;}
+        const iconPaths=[...new Set(RELIC_CATALOG_LIST.map(def=>def.iconPath).filter(Boolean))];
+        const loader=window.FourSymbolsFeatures;
+        const iconReady=loader&&typeof loader.ensureAssets==="function"?loader.ensureAssets(iconPaths):Promise.all(iconPaths.map(decodeRelicIcon));
+        relicVisualReadyPromise=Promise.all([document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve(),iconReady]).then(()=>iconPaths).catch(error=>{relicVisualReadyPromise=null;throw error;});
+        return relicVisualReadyPromise;
+    }
+    const relicCatalog=Object.freeze(Object.fromEntries(RELIC_CATALOG_LIST.map(item=>[item.id,Object.freeze(item)])));
+    let playerRelics={};
+    let teamLoadout={relicId:null,subRelicId:null};
+    let relicBattleState=null;
+    let pendingBattleInit=false;
+    let currentFilter="all";
+    let currentDetailId=null;
+    let sourceContext=null;
+    let relicVisualCollector=null;
+    let relicPresentationTail=Promise.resolve();
+    let relicPresentationPending=0;
+    let relicPresentationGeneration=0;
+    let relicVfxSequence=0;
+    let relicPresentationHandoffsPending=0;
+    let relicMinVisualProtectionUntil=0;
+    let relicFinishHeld=false;
+    let relicFinishRetryTimer=0;
+    let relicCutinNode=null;
+    const relicPresentationLockReleases=new Set();
+
+    function numeric(value){ const n=Number(value); return Number.isFinite(n)?n:0; }
+    function esc(value){ return String(value==null?"":value).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;").replace(/'/g,"&#039;"); }
+    function currentRound(){ return Math.max(1,Math.floor(typeof turn!=="undefined"?numeric(turn):1)); }
+    function currentBattleToken(){ return typeof battleToken!=="undefined"?battleToken:null; }
+    function partyIndexes(){ return typeof getExistingPartyIndexes==="function"?getExistingPartyIndexes().slice(0,3):[0,1,2].filter(i=>typeof getPartyCharacterByIndex==="function"&&getPartyCharacterByIndex(i)); }
+    function characterAt(index){ return typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(index):null; }
+    function statsAt(index){ return typeof getPartyBattleStats==="function"?getPartyBattleStats(index):null; }
+    function relicLevel(id){ return Math.max(1,Math.min(MAX_LEVEL,Math.floor(numeric(playerRelics[id]&&playerRelics[id].level)||1))); }
+    function valueFor(def,key,level){ return def&&def.scalars&&def.scalars[key]?scalar(def.scalars[key],level):0; }
     function isBoss(monster){ return typeof getMonsterRank==="function"?getMonsterRank(monster)==="boss":!!(monster&&(monster.rank==="boss"||monster.isBoss)); }
     function hasStatus(entity,type){
         if(typeof window.v173HasNamedPersistentState==="function"){ try{return !!window.v173HasNamedPersistentState(entity,type);}catch(_){ } }
@@ -6999,8 +10846,6 @@ amage",{oncePerBattle:true,maxTriggersPerBattle:1},[
                 hole.setAttribute("rx","8");
                 hole.setAttribute("fill","black");
                 holes.appendChild(hole);
-tail: error writing 'standard output': Broken pipe
-tail: error writing 'standard output': Broken pipe
             }
         });
         const show=()=>{ if(relicCutinNode){ relicCutinNode.classList.add("targets-visible"); } };
@@ -7206,8 +11051,138 @@ tail: error writing 'standard output': Broken pipe
     function waitForAnimationRelease(gate){
         if(!gate){ return Promise.resolve(); }
         const ready=gate.done?Promise.resolve():gate.promise;
-        return Promise.resolve(ready).then(()=>wbwrap: Can't find source path /workspace/scratch/2feca6ea11c3/.aws: No such file or directory
-ry.getActiveUid();
+        return Promise.resolve(ready).then(()=>waitMs(Math.max(0,numeric(gate.deadline)+RELIC_BALANCE_CONFIG.presentationLeadGapMs-Date.now())));
+    }
+    function queueRelicVisual(callback){
+        if(typeof callback!=="function"){ return; }
+        if(relicVisualCollector){ relicVisualCollector.push(callback); return; }
+        callback();
+    }
+    window.v174QueueRelicVisual=function(callback){ return queueRelicVisual(callback); };
+    function flushRelicVisuals(list){ (list||[]).forEach(callback=>{ try{callback();}catch(error){console.error("秘寶視覺效果失敗：",error);} }); }
+    function queueRelicPresentation(def,onStart,visualContext){
+        if(!hasLiveBattlePresentationHost()){
+            showBanner(def);
+            if(typeof onStart==="function"){ onStart(); }
+            return null;
+        }
+        const generation=relicPresentationGeneration;
+        const token=currentBattleToken();
+        const gate=currentAnimationGate();
+        const previousTail=relicPresentationTail;
+        const flow=window.FourSymbolsBattleFlow;
+        const releasePresentationLock=flow&&typeof flow.acquirePresentationLock==="function"
+            ?flow.acquirePresentationLock("team-relic")
+            :function(){};
+        relicPresentationLockReleases.add(releasePresentationLock);
+        let presentationLockReleased=false;
+        const unlockPresentation=()=>{
+            if(presentationLockReleased){ return; }
+            presentationLockReleased=true;
+            relicPresentationLockReleases.delete(releasePresentationLock);
+            releasePresentationLock();
+        };
+        let handoffReleased=false;
+        const releaseHandoff=withProtection=>{
+            if(handoffReleased){ return; }
+            handoffReleased=true;
+            releaseRelicPresentationHandoff(withProtection===true);
+        };
+        relicPresentationPending++;
+        relicPresentationHandoffsPending++;
+        let cinematicNode=null;
+        let resolvedTarget=null;
+        const job=Promise.resolve(previousTail).catch(()=>{}).then(()=>waitForAnimationRelease(gate)).then(()=>{
+            if(generation!==relicPresentationGeneration||typeof battleActive!=="undefined"&&!battleActive||currentBattleToken()!==token){
+                releaseHandoff(false);
+                return null;
+            }
+            resolvedTarget=relicVfxTarget(
+                def,
+                visualContext&&visualContext.triggerDef,
+                visualContext&&visualContext.payload||{},
+                visualContext&&visualContext.override
+            );
+            if(!resolvedTarget||!resolvedTarget.targetIds.length){
+                releaseHandoff(false);
+                return null;
+            }
+            return beginRelicCinematic(def,resolvedTarget);
+        }).then(node=>{
+            if(!node){ return null; }
+            cinematicNode=node;
+            if(generation!==relicPresentationGeneration||typeof battleActive!=="undefined"&&!battleActive||currentBattleToken()!==token){
+                releaseHandoff(false);
+                cleanupRelicCutin();
+                return null;
+            }
+            enterRelicVfxPhase(node);
+            const relicGate=playRelicVfx(
+                def,
+                visualContext&&visualContext.triggerDef,
+                visualContext&&visualContext.payload,
+                visualContext&&visualContext.override,
+                resolvedTarget
+            );
+            releaseHandoff(true);
+            if(typeof onStart==="function"){ onStart(); }
+            if(relicGate&&relicGate.promise){ return Promise.resolve(relicGate.promise).then(()=>node); }
+            return waitMs(relicPresentationDuration(def)).then(()=>node);
+        }).then(node=>{
+            if(!node){ return; }
+            return endRelicCinematic(node);
+        }).catch(error=>{
+            releaseHandoff(false);
+            cleanupRelicCutin();
+            console.error("秘寶演出序列失敗：",error);
+        }).then(()=>{
+            releaseHandoff(false);
+            if(cinematicNode&&cinematicNode===relicCutinNode){ cleanupRelicCutin(); }
+            if(generation===relicPresentationGeneration){ relicPresentationPending=Math.max(0,relicPresentationPending-1); }
+            unlockPresentation();
+        });
+        relicPresentationTail=job;
+        return job;
+    }
+    function normalizeOwned(raw){
+        const next={};
+        RELIC_CATALOG_LIST.forEach(def=>{
+            const saved=raw&&raw[def.id]&&typeof raw[def.id]==="object"?raw[def.id]:{};
+            next[def.id]={
+                unlocked:saved.unlocked===true||(!Object.prototype.hasOwnProperty.call(saved,"unlocked")&&def.defaultUnlocked===true),
+                level:Math.max(1,Math.min(MAX_LEVEL,Math.floor(numeric(saved.level)||1))),
+                exp:Math.max(0,Math.floor(numeric(saved.exp))),
+                seen:saved.seen===true
+            };
+        });
+        return next;
+    }
+    function normalizeLoadout(raw){
+        const id=raw&&typeof raw.relicId==="string"?raw.relicId:null;
+        const def=id&&relicCatalog[id];
+        return {relicId:def&&def.runtimeReady===true?id:null,subRelicId:null};
+    }
+    function readSaveDocument(){
+        try{
+            const repository=window.FourSymbolsAccountSave;
+            const uid=repository&&repository.getActiveUid();
+            if(!uid){ return null; }
+            const result=repository.readForUid(uid);
+            return result.status==="ready"?result.save:null;
+        }catch(_){ return null; }
+    }
+    function hydrateFromSave(){
+        const data=readSaveDocument()||{};
+        playerRelics=normalizeOwned(data.playerRelics);
+        teamLoadout=normalizeLoadout(data.teamLoadout);
+        window.playerRelics=playerRelics;
+        window.teamLoadout=teamLoadout;
+        if(teamLoadout.relicId){ preloadRelicVfx(teamLoadout.relicId); }
+    }
+    function persistIntoSaveDocument(){
+        try{
+            const repository=window.FourSymbolsAccountSave;
+            const uid=repository&&repository.getActiveUid();
             if(!uid){ return false; }
             const current=repository.readForUid(uid);
             if(current.status!=="ready"){ return false; }
@@ -7674,8 +11649,7 @@ ry.getActiveUid();
                         character.hp=Math.min(numeric(stats.maxHP),numeric(character.hp)+refund); displayAmount=Math.max(0,displayAmount-refund);
                     }
                     relicBattleState.damageEventSerial++;
-                    constail: write error: Broken pipe
-t eventId=relicBattleState.damageEventSerial;
+                    const eventId=relicBattleState.damageEventSerial;
                     const previousHp=Math.min(numeric(stats.maxHP),numeric(character.hp)+displayAmount);
                     const previousHpPercent=previousHp/Math.max(1,numeric(stats.maxHP));
                     if(numeric(character.hp)<=0){
@@ -7762,7 +11736,7 @@ t eventId=relicBattleState.damageEventSerial;
         if(def.id==="relic_xuanwu_seal"){ return "全隊獲得最大HP "+valueFor(def,"shieldPercent",level).toFixed(1).replace(/\.0$/,"")+"%護盾，持續2回合"+(level>=20?"，並獲得8%減傷1回合":"")+"。"; }
         if(def.id==="relic_soul_bell"){ return "敵方全體攻擊-"+Math.round(valueFor(def,"attackDown",level))+"%"+(level>=10?"、命中-"+Math.round(valueFor(def,"accuracyDown",level))+"%":"")+"，持續1回合。"; }
         if(def.id==="relic_tiangang_banner"){ return "對敵方全體造成 "+valueFor(def,"damageMultiplier",level).toFixed(2)+"×秘寶威力"+(level>=10?"並降攻"+Math.round(valueFor(def,"attackDown",level))+"%":"")+"。"; }
-        if(def.id==="relic_nine_dragon_fire"){ return "��敵方全體造成 "+valueFor(def,"damageMultiplier",level).toFixed(2)+"×火屬性秘寶傷害"+(level>=10?"，燃燒機率"+Math.round(valueFor(def,"burnChance",level)*100)+"%":"")+(level>=20?"，對燃燒目標額外+15%":"")+"。"; }
+        if(def.id==="relic_nine_dragon_fire"){ return "對敵方全體造成 "+valueFor(def,"damageMultiplier",level).toFixed(2)+"×火屬性秘寶傷害"+(level>=10?"，燃燒機率"+Math.round(valueFor(def,"burnChance",level)*100)+"%":"")+(level>=20?"，對燃燒目標額外+15%":"")+"。"; }
         if(def.id==="relic_cold_spring_jade"){ return "急救目標 "+valueFor(def,"healHpPercent",level).toFixed(1).replace(/\.0$/,"")+"%最大HP"+(level>=10?"並淨化1個一般負面":"")+(level>=20?"、恢復4%最大SP":"")+"；HP由35%以上降至35%以下時觸發，每場最多2次，冷卻3回合。"; }
         if(def.id==="relic_qinglan_feather"){ return "全隊最終閃躲+"+Math.round(valueFor(def,"evasionBonus",level))+"%、最終異常抗性+"+Math.round(valueFor(def,"resistanceBonus",level))+"%，持續"+Math.round(valueFor(def,"duration",level))+"回合。"; }
         if(def.id==="relic_rock_mountain_seal"){ return "開場防禦+"+Math.round(valueFor(def,"defenseBonus",level))+"%持續3回合；受擊計數觸發時獲得"+Math.round(valueFor(def,"shieldPercent",level))+"%最大HP護盾"+(level>=20?"；Lv20護盾後準備一次18%秘寶威力反震，作用於下一名實際攻擊者":"")+"。"; }
