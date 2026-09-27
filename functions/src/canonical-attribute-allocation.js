@@ -2,6 +2,7 @@
 
 const {assembleCanonicalSnapshot,verifyCanonicalSnapshotAgainstSources,claimRecordsDigest}=
     require("./canonical-snapshot");
+const {createRecoveryArchive}=require("./canonical-recovery-archive");
 const {source,readOwnedSources,advanceOwnedRecords,advanceOwnedSources}=
     require("./canonical-owned-sources");
 const ID=/^[A-Za-z0-9_-]{16,64}$/;
@@ -140,6 +141,8 @@ function createCanonicalAttributeAllocation({db,FieldValue,HttpsError,runProtect
             advanceOwnedSources(tx,owned.refs,revision,stamp);
             tx.create(root.collection("playableSnapshots").doc(String(revision)),
                 {...bundle,createdAt:stamp});
+            tx.create(root.collection("recoveryArchives").doc(String(revision)),
+                {...createRecoveryArchive(uid,revision,nextRecords,bundle),createdAt:stamp});
             const receipt={schemaVersion:1,ownerUid:uid,operationId,
                 kind:"attribute-allocation",characterId:character.characterId,
                 stat,statAfter:nextState[stat],

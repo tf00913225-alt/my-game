@@ -2,6 +2,7 @@
 
 const {assembleCanonicalSnapshot,verifyCanonicalSnapshotAgainstSources,claimRecordsDigest}=
     require("./canonical-snapshot");
+const {createRecoveryArchive}=require("./canonical-recovery-archive");
 const {source,readOwnedSources,advanceOwnedRecords,advanceOwnedSources}=
     require("./canonical-owned-sources");
 const {taipeiDay,REWARD_GOLD}=require("./daily-checkin-grant");
@@ -180,6 +181,8 @@ function createCanonicalResourceCredit({db,FieldValue,HttpsError,runProtected,
             advanceOwnedSources(tx,owned.refs,revision,stamp);
             tx.create(root.collection("playableSnapshots").doc(String(revision)),
                 {...bundle,createdAt:stamp});
+            tx.create(root.collection("recoveryArchives").doc(String(revision)),
+                {...createRecoveryArchive(uid,revision,nextRecords,bundle),createdAt:stamp});
             tx.create(claimRecordRef,{...nextClaim,createdAt:stamp,updatedAt:stamp});
             tx.create(claimRef,{schemaVersion:1,ownerUid:uid,grantId,operationId,
                 creditRevision:revision,createdAt:stamp});

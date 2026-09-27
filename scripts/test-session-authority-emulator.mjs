@@ -16,6 +16,7 @@ const {createCanonicalAttributeAllocation}=
     require("../functions/src/canonical-attribute-allocation.js");
 const {makeInitialCharacterSources}=require("../functions/src/initial-character-sources.js");
 const {assembleCanonicalSnapshot}=require("../functions/src/canonical-snapshot.js");
+const {inspectRecoveryArchive}=require("../functions/src/canonical-recovery-archive.js");
 const {inspectExistingEnvelope,nextRevision}=require("../functions/src/cloud-save-envelope.js");
 const project="demo-four-symbols-session";
 if(process.env.GCLOUD_PROJECT!==project||process.env.FIRESTORE_EMULATOR_HOST!=="127.0.0.1:18080"||
@@ -24,6 +25,17 @@ if(process.env.GCLOUD_PROJECT!==project||process.env.FIRESTORE_EMULATOR_HOST!=="
 }
 const testApp=initializeApp({projectId:project},"session-authority-test");
 const db=getFirestore(testApp);
+async function checkRecoveryArchive(uid,revision){
+    const root=db.collection("serverUsers").doc(uid);
+    const [archive,bundle]=await Promise.all([
+        root.collection("recoveryArchives").doc(String(revision)).get(),
+        root.collection("playableSnapshots").doc(String(revision)).get()
+    ]);
+    assert.equal(archive.exists,true);
+    assert.equal(archive.get("readyForRestore"),false);
+    inspectRecoveryArchive(archive.data(),uid,revision,bundle.data());
+    return archive;
+}
 const direct=process.env.SESSION_TEST_DIRECT_CALLABLE==="1"?require("../functions/index.js"):null;
 const authUrl="http://127.0.0.1:19099/identitytoolkit.googleapis.com/v1/";
 const functionUrl=`http://127.0.0.1:15001/${project}/us-central1/`;
@@ -241,9 +253,12 @@ await assert.rejects(initialWriter.commitInitialSources(yRequest,initialArgs),
 abortInitialCommit=false;
 assert.equal((await db.doc(`serverUsers/${y}/account/current`).get()).exists,false);
 assert.equal((await db.doc(`serverUsers/${y}/operations/${initialOperation}`).get()).exists,false);
+assert.equal((await db.doc(`serverUsers/${y}/recoveryArchives/2`).get()).exists,false);
 assert.equal((await db.doc(`users/${y}/saves/current`).get()).get("serverRevision"),1);
 const initialized=await initialWriter.commitInitialSources(yRequest,initialArgs);
 assert.equal(initialized.sourceRevision,2);
+const initialArchive=await checkRecoveryArchive(y,2);
+assert.deepEqual(initialArchive.get("sourceRecords.claimRecords"),[]);
 assert.equal((await db.doc(`serverUsers/${y}/playableSnapshots/2`).get())
     .get("readyForPublication"),false);
 assert.equal((await db.doc(`serverUsers/${y}/characters/character-${initialOperation}`).get())
@@ -372,8 +387,18 @@ assert.equal((await db.doc(`serverUsers/${y}/economy/current`).get()).get("gold"
 assert.equal((await db.doc(`serverUsers/${y}/ledgerEntries/${goldOperation}`).get()).exists,false);
 assert.equal((await db.doc(`serverUsers/${y}/uniqueClaims/${grantIdForCharacter}`).get()).exists,false);
 assert.equal((await db.doc(`serverUsers/${y}/claimRecords/${grantIdForCharacter}`).get()).exists,false);
+assert.equal((await db.doc(`serverUsers/${y}/recoveryArchives/4`).get()).exists,false);
 const credited=await goldWriter.creditReservedGrant(yRequest,creditArgs);
 assert.equal(credited.creditRevision,4);
+const creditedArchive=await checkRecoveryArchive(y,4);
+assert.equal(creditedArchive.get("sourceRecords.claimRecords")[0].claimKey,
+    grantIdForCharacter);
+const changedArchive=structuredClone(creditedArchive.data());
+changedArchive.sourceRecords.economy.gold=999;
+const creditedBundle=(await db.doc(`serverUsers/${y}/playableSnapshots/4`).get()).data();
+assert.throws(()=>inspectRecoveryArchive(changedArchive,y,4,creditedBundle));
+assert.throws(()=>inspectRecoveryArchive(creditedArchive.data(),y,4,
+    {...creditedBundle,sha256:"0".repeat(64)}));
 assert.equal((await db.doc(`serverUsers/${y}/economy/current`).get()).get("gold"),25);
 assert.equal((await db.doc(`serverUsers/${y}/claimCheckpoints/current`).get()).get("claimCount"),1);
 assert.equal((await db.doc(`serverUsers/${y}/claimRecords/${grantIdForCharacter}`).get())
@@ -422,6 +447,7 @@ await assert.rejects(goldWriter.creditReservedGrant(yRequest,
     {...expArgs,expectedRevision:4}),error=>error.code==="aborted");
 const expCredit=await goldWriter.creditReservedGrant(yRequest,expArgs);
 assert.equal(expCredit.creditRevision,6);
+await checkRecoveryArchive(y,6);
 assert.equal((await db.doc(`serverUsers/${y}/economy/current`).get()).get("sharedExp"),40);
 assert.equal((await db.doc(`serverUsers/${y}/economy/current`).get()).get("gold"),25);
 assert.equal((await db.doc(`serverUsers/${y}/characters/character-${initialOperation}`).get())
@@ -481,8 +507,11 @@ abortAllocation=false;
 assert.equal((await db.doc(`serverUsers/${y}/economy/current`).get()).get("sharedExp"),320);
 assert.equal((await db.doc(`serverUsers/${y}/operations/${allocationOperation}`).get())
     .exists,false);
+assert.equal((await db.doc(`serverUsers/${y}/recoveryArchives/9`).get()).exists,false);
 const allocated=await expAllocator.allocateSharedExp(yRequest,allocArgs);
 assert.equal(allocated.allocatedRevision,9);
+const leveledArchive=await checkRecoveryArchive(y,9);
+assert.equal(leveledArchive.get("sourceRecords.claimRecords").length,3);
 assert.equal(allocated.cost,300);
 assert.equal(allocated.levelAfter,2);
 const leveled=(await db.doc(`serverUsers/${y}/characters/character-${initialOperation}`)
@@ -663,9 +692,12 @@ await assert.rejects(rollbackAttribute.allocateAttributePoint(ownedRequest,attri
     /simulated attribute rollback/);
 abortAttribute=false;
 assert.equal((await ownedRoot.collection("operations").doc(attributeOperation).get()).exists,false);
+assert.equal((await ownedRoot.collection("recoveryArchives").doc("6").get()).exists,false);
 assert.equal((await db.doc(`users/${ownedUid}/saves/current`).get()).get("serverRevision"),5);
 const assigned=await attributeAllocator.allocateAttributePoint(ownedRequest,attributeArgs);
 assert.equal(assigned.allocatedRevision,6);
+const assignedArchive=await checkRecoveryArchive(ownedUid,6);
+assert.equal(assignedArchive.get("sourceRecords.inventory")[0].ownedItemId,ownedItemId);
 assert.equal(assigned.statAfter,3);
 assert.equal(assigned.pointsAfter,4);
 const assignedState=(await ownedRoot.collection("characters")

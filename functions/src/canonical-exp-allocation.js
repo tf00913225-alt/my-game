@@ -2,6 +2,7 @@
 
 const {assembleCanonicalSnapshot,verifyCanonicalSnapshotAgainstSources,claimRecordsDigest}=
     require("./canonical-snapshot");
+const {createRecoveryArchive}=require("./canonical-recovery-archive");
 const {newcomerExpNext}=require("./canonical-newcomer-exp");
 const {source,readOwnedSources,advanceOwnedRecords,advanceOwnedSources}=
     require("./canonical-owned-sources");
@@ -168,6 +169,8 @@ function createCanonicalExpAllocation({db,FieldValue,HttpsError,runProtected,
             advanceOwnedSources(tx,owned.refs,revision,stamp);
             tx.create(root.collection("playableSnapshots").doc(String(revision)),
                 {...bundle,createdAt:stamp});
+            tx.create(root.collection("recoveryArchives").doc(String(revision)),
+                {...createRecoveryArchive(uid,revision,nextRecords,bundle),createdAt:stamp});
             tx.create(operationRef,{schemaVersion:1,ownerUid:uid,operationId,
                 kind:"exp-allocation",characterId:character.characterId,cost,
                 levelAfter:nextState.level,allocatedRevision:revision,
