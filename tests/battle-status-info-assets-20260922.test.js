@@ -93,7 +93,7 @@ test("battle skill owners keep target scope, duration and presentation aligned",
 
   assert.match(relic,/document\.body\.appendChild\(node\)/);
   assert.match(relic,/function relicOverlayGeometry\(\)[\s\S]*?getBattlefieldOverlayGeometry/);
-  assert.match(relic,/function relicTargetGeometry\(side,index\)[\s\S]*?getUnitGeometry/);
+  assert.match(relic,/function relicTargetGeometries\(side,index\)[\s\S]*?getUnitGeometry[\s\S]*?highlightRects/);
   assert.match(relicCss,/body > \.team-relic-battle-presentation\{[\s\S]*?z-index:18090/);
   assert.match(relicCss,/team-relic-cinematic-active > \.v143-skill-stage\{z-index:18130/);
   assert.match(fixedCss,/turn-target-row\.skill-picker-open\{[\s\S]*?bottom:calc\(var\(--battle-command-visual-height\) \+ 44px\)/);
