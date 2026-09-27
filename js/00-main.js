@@ -24138,29 +24138,11 @@ function showSkillNameBadge(skillName,elementType,characterIndex,targetId,target
         badgeDuration+"ms"
     );
     badge.dataset.skillElement=String(elementType||"normal");
-const badgePoint =
-        gamePointFromClient(
-            rect.left+rect.width/2,
-            rect.top
-        );
-
-    badge.style.position=
-        "absolute";
-
-    badge.style.left=
-        badgePoint.x+"px";
-
-    badge.style.top=
-        badgePoint.y+"px";
-
-
-    const overlayLayer =
-        $("game-overlay-layer") ||
-        document.getElementById("game-stage");
-
-    overlayLayer.appendChild(
-        badge
-    );
+const badgePoint={x:rect.left+rect.width/2,y:rect.top};
+    badge.style.position="fixed";
+    badge.style.left=badgePoint.x+"px";
+    badge.style.top=badgePoint.y+"px";
+    document.body.appendChild(badge);
 
 
     setTimeout(()=>{
@@ -24255,29 +24237,11 @@ function showMonsterSkillNameBadge(
         badgeDuration+"ms"
     );
     badge.dataset.skillElement=String(elementType||"normal");
-const badgePoint =
-        gamePointFromClient(
-            rect.left+rect.width/2,
-            rect.top
-        );
-
-    badge.style.position=
-        "absolute";
-
-    badge.style.left=
-        badgePoint.x+"px";
-
-    badge.style.top=
-        badgePoint.y+"px";
-
-
-    const overlayLayer =
-        $("game-overlay-layer") ||
-        document.getElementById("game-stage");
-
-    overlayLayer.appendChild(
-        badge
-    );
+const badgePoint={x:rect.left+rect.width/2,y:rect.top};
+    badge.style.position="fixed";
+    badge.style.left=badgePoint.x+"px";
+    badge.style.top=badgePoint.y+"px";
+    document.body.appendChild(badge);
 
 
     setTimeout(()=>{
