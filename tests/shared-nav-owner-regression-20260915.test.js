@@ -47,3 +47,19 @@ test("gameplay presentation removes seal ownership and full-art dark overlays",(
     assert.doesNotMatch(gameplay,/gameplay-mode-card\{[\s\S]*?linear-gradient\(90deg,rgba\([^)]*\.92/);
     assert.doesNotMatch(gameplay,/tower-element-hero\{[\s\S]*?linear-gradient\(180deg,rgba\([^)]*\.20/);
 });
+
+test("coming-soon preserves disabled semantics without dimming its artwork",()=>{
+    const gameplay=fs.readFileSync("css/gameplay-boss-tower.css","utf8");
+    const source=fs.readFileSync("js/gameplay-boss-tower-system.js","utf8");
+    assert.match(gameplay,/\.gameplay-mode-card\.coming-soon\{[\s\S]*?cursor:default;/);
+    assert.doesNotMatch(gameplay,/\.gameplay-mode-card\.coming-soon\{[^}]*?(?:opacity|filter):/);
+    assert.match(source,/class="gameplay-mode-card coming-soon"[\s\S]*?aria-disabled="true"/);
+    assert.match(source,/class="gameplay-mode-card coming-soon"[\s\S]*?尚未開放/);
+});
+
+test("gameplay panel keeps only the top ornament owner",()=>{
+    const gameplay=fs.readFileSync("css/gameplay-boss-tower.css","utf8");
+    assert.match(gameplay,/#game-stage \.gameplay-large-panel::before\{/);
+    assert.doesNotMatch(gameplay,/gameplay-large-panel::after/);
+    assert.doesNotMatch(gameplay,/bottom:8px/);
+});
