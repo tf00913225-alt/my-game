@@ -3,15 +3,15 @@
   "baseSha": "a53661f8154bd115d3261292b31271f100e902ee",
   "workBranch": "fix/gameplay-comingsoon-bottom-ornament-owner-20260927",
   "targetBranch": "dev",
-  "status": "IMPLEMENTED",
+  "status": "VERIFIED",
   "requirements": {
-    "coming-soon-cover-keeps-full-artwork-opacity": "IMPLEMENTED",
-    "coming-soon-disabled-semantics-retained": "IMPLEMENTED",
-    "gameplay-panel-bottom-ornament-owner-retired": "IMPLEMENTED",
-    "gameplay-panel-geometry-unchanged": "IMPLEMENTED",
-    "related-tests-updated": "IMPLEMENTED",
-    "targeted-mobile-browser-qa-360-393-412": "TODO",
-    "build-and-ci": "TODO"
+    "coming-soon-cover-keeps-full-artwork-opacity": "VERIFIED",
+    "coming-soon-disabled-semantics-retained": "VERIFIED",
+    "gameplay-panel-bottom-ornament-owner-retired": "VERIFIED",
+    "gameplay-panel-geometry-unchanged": "VERIFIED",
+    "related-tests-updated": "VERIFIED",
+    "targeted-mobile-browser-qa-360-393-412": "VERIFIED",
+    "build-and-ci": "VERIFIED"
   },
   "scope": {
     "excluded": [
