@@ -72,13 +72,15 @@ assert.doesNotMatch(v146,/className="v146-status-popup/,"V146 must not create it
 assert.match(geometry,/getUnitGeometry:unitGeometry/);
 assert.match(geometry,/getBattlefieldOverlayGeometry:battlefieldOverlayGeometry/);
 assert.match(geometry,/hpRect:hpRect/);
-assert.match(geometry,/highlightRects:highlightRects/);
+assert.match(geometry,/artworkProjection:artworkProjection/);
+assert.match(geometry,/hpProjection:hpProjection/);
+assert.doesNotMatch(geometry,/highlightRects:/,"rectangle highlight geometry is retired");
 assert.doesNotMatch(geometry,/wrapDamagePopup/);
 assert.doesNotMatch(geometry,/wrapMissPopup/);
 
 assert.match(feedback,/const MAX_LANES=4/);
 assert.match(feedback,/context\.queue\.push\(request\)/);
-assert.match(feedback,/STATUS_PRESENTATION_SEMANTICS/);
+assert.doesNotMatch(feedback,/STATUS_PRESENTATION_SEMANTICS/,"status type no longer owns popup colour");
 assert.match(feedback,/phaseOrder/);
 assert.match(feedback,/if\(lane<0\)\{ break; \}/);
 assert.match(feedback,/geometry\.feedbackSafeRect/);
@@ -90,8 +92,8 @@ assert.match(feedbackCss,/transform:translate\(-50%,-100%\)/,
   "feedback base box must grow upward from the canonical lane baseline");
 assert.match(feedbackCss,/@keyframes battleFloatingFeedback\{[\s\S]*calc\(-100% \+ 4px\)[\s\S]*calc\(-100% - 22px\)/,
   "normal feedback animation must preserve the -100% baseline coordinate system");
-assert.match(feedbackCss,/@keyframes battleFloatingFeedbackCritical\{[\s\S]*calc\(-100% \+ 5px\)[\s\S]*calc\(-100% - 25px\)/,
-  "critical feedback animation must preserve the same baseline coordinate system");
+assert.match(feedbackCss,/@keyframes battleFloatingFeedbackCritical\{[\s\S]*scale\(1\.24\)[\s\S]*rotate\(-4deg\)[\s\S]*calc\(-100% - 36px\)/,
+  "critical feedback must use its formal scale-in, shake and upward fade animation");
 assert.doesNotMatch(feedbackCss,/0 0 (?:7|8|10|14|16)px/,"canonical feedback typography must not use neon glow");
 
 assert.doesNotMatch(v143System,/resolveEscapeAttempt=function\(/,"Dungeon-specific escape wrapper must stay retired");
@@ -132,12 +134,10 @@ for(const [name,block] of [["personal",personalCompletion],["world",worldComplet
 }
 
 assert.match(relic,/function relicOverlayGeometry\(\)[\s\S]*?getBattlefieldOverlayGeometry/);
-assert.match(relic,/function relicTargetGeometries\(side,index\)[\s\S]*?getUnitGeometry[\s\S]*?highlightRects/);
-assert.doesNotMatch(
-  relic.slice(relic.indexOf("function relicTargetGeometries"),relic.indexOf("function relativeRelicRect")),
-  /getBoundingClientRect/,
-  "Relic target geometry must not guess from local DOM"
-);
+assert.match(relic,/function revealRelicTargets\(target\)[\s\S]*?getUnitGeometry[\s\S]*?artworkProjection[\s\S]*?hpProjection/);
+assert.doesNotMatch(relic,/team-relic-mask-holes|createElementNS\(namespace,"rect"\)/,"Relic target focus must not restore rectangle apertures");
+assert.match(relic,/team-relic-target-projection-art/);
+assert.match(relic,/team-relic-target-projection-hp/);
 const begin=relic.slice(relic.indexOf("function beginRelicCinematic"),relic.indexOf("function enterRelicVfxPhase"));
 assert.ok(begin.indexOf('classList.add("identity-visible")')<begin.indexOf('classList.add("dim-visible")'),"Relic identity must appear before battlefield dimming");
 assert.ok(begin.indexOf('classList.add("dim-visible")')<begin.indexOf("revealRelicTargets(target)"),"Relic dimming must precede target reveal");
@@ -171,3 +171,5 @@ assert.match(contracts,/玩家可見 Buff／Debuff 一律顯示「最終…±N%�
 assert.match(contracts,/Frostbite（凍傷）是 Soft Debuff：造成傷害 -30%/);
 
 console.log("Battle presentation owner convergence contracts passed.");
+
+// Foreground Projection contract supersedes rectangle apertures.

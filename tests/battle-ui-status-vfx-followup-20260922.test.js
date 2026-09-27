@@ -80,7 +80,8 @@ test("interactive battlefield overlays outrank detached VFX and damage popups",(
   assert.match(fixedCss,/\.battle-info-region\{[\s\S]*?z-index:18060 !important/);
   assert.match(statsCss,/z-index:18072/);
   assert.match(vfxCss,/\.battle-status-detail-modal\{[\s\S]*?z-index:18120/);
-  assert.match(vfxCss,/body\.v174-battle-reading-open > \.v143-skill-stage,[\s\S]*?visibility:hidden !important;[\s\S]*?opacity:0 !important/);
+  assert.match(vfxCss,/\.v143-skill-stage\{[\s\S]*?z-index:16000/,
+    "detached VFX remains below the interactive status-detail layer");
   assert.match(fixedCss,/\.battle-info-region:not\(\.is-expanded\)\{[\s\S]*?background:transparent;[\s\S]*?box-shadow:none/);
   assert.match(fixedCss,/\.battle-info-region\.is-expanded\{[\s\S]*?background:transparent;[\s\S]*?box-shadow:none/);
   assert.match(fixedCss,/\.battle-info-region\.is-expanded > #battleInfo\{[\s\S]*?background:rgba\(0,0,0,\.92\) !important/);

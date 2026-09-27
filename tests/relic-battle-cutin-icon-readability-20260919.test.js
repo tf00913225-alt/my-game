@@ -38,16 +38,12 @@ assert.ok(
 );
 assert.match(cinematicPrelude,/waitMs\(RELIC_IDENTITY_HOLD_MS\)[\s\S]*classList\.add\("identity-exiting"\)[\s\S]*revealRelicTargets\(target\)/,
   "identity hold must end in target reveal before VFX");
-assert.match(relic,/function relicTargetGeometries\(side,index\)[\s\S]*getUnitGeometry[\s\S]*highlightRects/,
-  "target lookup must resolve canonical battlefield geometry");
-assert.ok(
-  relic.includes("function revealRelicTargets(target)") &&
-  relic.includes("team-relic-mask-holes") &&
-  relic.includes('createElementNS(namespace,"rect")'),
-  "target reveal must cut portrait/HP apertures from canonical highlight geometry"
-);
-assert.match(relic,/highlightRect|highlightRects/,
-  "target reveal must consume canonical portrait/HP highlight geometry");
+assert.match(relic,/function revealRelicTargets\(target\)[\s\S]*getUnitGeometry[\s\S]*artworkProjection[\s\S]*hpProjection/,
+  "target lookup must resolve canonical projection geometry");
+assert.match(relic,/team-relic-target-projection-layer[\s\S]*appendRelicProjection/,
+  "target reveal must project transparent artwork and HP instead of opening a rectangular aperture");
+assert.doesNotMatch(relic,/team-relic-mask-holes|createElementNS\(namespace,"rect"\)|highlightRect|highlightRects/,
+  "rectangle aperture geometry is retired");
 assert.doesNotMatch(relic,/team-relic-battle-target-outline|team-relic-battle-target-focus-layer/,
   "target reveal must not create a second full-Unit outline owner");
 const liveQueueSource=relic.slice(

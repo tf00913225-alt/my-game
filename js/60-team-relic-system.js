@@ -327,135 +327,64 @@
         return typeof document!=="undefined"&&typeof document.getElementById==="function"&&!!document.getElementById("battlePage");
     }
     function clearRelicTargetFocus(){
-        if(typeof document!=="undefined"&&typeof document.querySelectorAll==="function"){
-            const presentation=document.getElementById("teamRelicBattlePresentation");
-            const holes=presentation&&presentation.querySelector(".team-relic-mask-holes");
-            if(holes){ holes.replaceChildren(); }
-            if(presentation){ presentation.classList.remove("targets-visible"); }
-        }
+        const presentation=typeof document!=="undefined"?document.getElementById("teamRelicBattlePresentation"):null;
+        const layer=presentation&&presentation.querySelector(".team-relic-target-projection-layer");
+        if(layer){ layer.replaceChildren(); }
+        if(presentation){ presentation.classList.remove("targets-visible"); }
     }
     function cleanupRelicCutin(){
         clearRelicTargetFocus();
         const node=relicCutinNode||(typeof document!=="undefined"&&document.getElementById?document.getElementById("teamRelicBattlePresentation"):null);
         if(node&&typeof node.remove==="function"){ node.remove(); }
-        if(typeof document!=="undefined"&&document.body&&document.body.classList){
-            document.body.classList.remove("team-relic-cinematic-active");
-        }
+        if(typeof document!=="undefined"&&document.body&&document.body.classList){ document.body.classList.remove("team-relic-cinematic-active"); }
         relicCutinNode=null;
     }
-    function relicGeometryOwner(){
-        return typeof window!=="undefined"?window.FourSymbolsBattlefieldRenderGeometry:null;
-    }
+    function relicGeometryOwner(){ return typeof window!=="undefined"?window.FourSymbolsBattlefieldRenderGeometry:null; }
     function relicOverlayGeometry(){
-        const owner=relicGeometryOwner();
-        if(!owner||typeof owner.getBattlefieldOverlayGeometry!=="function"){ return null; }
-        const geometry=owner.getBattlefieldOverlayGeometry();
+        const owner=relicGeometryOwner(), geometry=owner&&typeof owner.getBattlefieldOverlayGeometry==="function"?owner.getBattlefieldOverlayGeometry():null;
         return geometry&&geometry.rect&&geometry.rect.width>0&&geometry.rect.height>0?geometry:null;
-    }
-    function relicTargetGeometries(side,index){
-        const geometry=relicGeometryOwner();
-        if(geometry&&typeof geometry.getUnitGeometry==="function"){
-            const resolved=geometry.getUnitGeometry(side,index);
-            if(resolved&&Array.isArray(resolved.highlightRects)&&resolved.highlightRects.length){ return resolved.highlightRects; }
-            if(resolved&&resolved.highlightRect){ return [resolved.highlightRect]; }
-            if(resolved&&resolved.unitRect){ return [resolved.unitRect]; }
-        }
-        return [];
     }
     function relativeRelicRect(rect,overlayRect){
         if(!rect||!overlayRect){ return null; }
-        const left=Math.max(0,numeric(rect.left)-numeric(overlayRect.left));
-        const top=Math.max(0,numeric(rect.top)-numeric(overlayRect.top));
-        const right=Math.min(numeric(overlayRect.width),numeric(rect.left)+numeric(rect.width)-numeric(overlayRect.left));
-        const bottom=Math.min(numeric(overlayRect.height),numeric(rect.top)+numeric(rect.height)-numeric(overlayRect.top));
+        const left=Math.max(0,numeric(rect.left)-numeric(overlayRect.left)),top=Math.max(0,numeric(rect.top)-numeric(overlayRect.top));
+        const right=Math.min(numeric(overlayRect.width),numeric(rect.left)+numeric(rect.width)-numeric(overlayRect.left)),bottom=Math.min(numeric(overlayRect.height),numeric(rect.top)+numeric(rect.height)-numeric(overlayRect.top));
         return {left:left,top:top,width:Math.max(0,right-left),height:Math.max(0,bottom-top)};
     }
     function syncRelicPresentationGeometry(node){
-        if(!node){ return null; }
-        const overlay=relicOverlayGeometry();
-        const rect=overlay&&overlay.rect;
-        if(!rect){ return null; }
-        node.style.left=numeric(rect.left)+"px";
-        node.style.top=numeric(rect.top)+"px";
-        node.style.width=Math.max(1,numeric(rect.width))+"px";
-        node.style.height=Math.max(1,numeric(rect.height))+"px";
-        node.__relicOverlayRect={
-            left:numeric(rect.left),top:numeric(rect.top),
-            width:Math.max(1,numeric(rect.width)),height:Math.max(1,numeric(rect.height))
-        };
-        return node.__relicOverlayRect;
+        const overlay=relicOverlayGeometry(),rect=overlay&&overlay.rect;
+        if(!node||!rect){ return null; }
+        node.style.left=numeric(rect.left)+"px";node.style.top=numeric(rect.top)+"px";node.style.width=Math.max(1,numeric(rect.width))+"px";node.style.height=Math.max(1,numeric(rect.height))+"px";
+        return node.__relicOverlayRect={left:numeric(rect.left),top:numeric(rect.top),width:Math.max(1,numeric(rect.width)),height:Math.max(1,numeric(rect.height))};
+    }
+    function appendRelicProjection(layer,geometry,overlayRect){
+        const artwork=geometry.artworkProjection,hp=geometry.hpProjection,artRect=relativeRelicRect(artwork.rect,overlayRect),hpRect=relativeRelicRect(hp.rect,overlayRect);
+        if(!artRect||!hpRect||artRect.width<=0||artRect.height<=0||hpRect.width<=0||hpRect.height<=0){ return; }
+        const art=document.createElement("div"), hpNode=document.createElement("div");
+        art.className="team-relic-target-projection-art";
+        art.style.left=artRect.left+"px";art.style.top=artRect.top+"px";art.style.width=artRect.width+"px";art.style.height=artRect.height+"px";art.style.backgroundImage=artwork.backgroundImage;art.style.backgroundSize=artwork.backgroundSize;art.style.backgroundPosition=artwork.backgroundPosition;art.style.backgroundRepeat=artwork.backgroundRepeat;
+        hpNode.className="team-relic-target-projection-hp";hpNode.style.left=hpRect.left+"px";hpNode.style.top=hpRect.top+"px";hpNode.style.width=hpRect.width+"px";hpNode.style.height=hpRect.height+"px";hpNode.innerHTML=hp.html;
+        layer.append(art,hpNode);
     }
     function revealRelicTargets(target){
         clearRelicTargetFocus();
         if(!relicCutinNode||!target||!Array.isArray(target.targetIds)){ return waitMs(RELIC_TARGET_REVEAL_MS); }
-        const overlayRect=syncRelicPresentationGeometry(relicCutinNode)||relicCutinNode.__relicOverlayRect;
-        const holes=relicCutinNode.querySelector(".team-relic-mask-holes");
-        const namespace="http://www.w3.org/2000/svg";
-        target.targetIds.forEach(index=>{
-            relicTargetGeometries(target.targetSide,index).forEach(absolute=>{
-                const rect=relativeRelicRect(absolute,overlayRect);
-                if(!rect||rect.width<=0||rect.height<=0){ return; }
-                if(holes){
-                    const hole=document.createElementNS(namespace,"rect");
-                    hole.setAttribute("x",String(rect.left));
-                    hole.setAttribute("y",String(rect.top));
-                    hole.setAttribute("width",String(Math.max(1,rect.width)));
-                    hole.setAttribute("height",String(Math.max(1,rect.height)));
-                    hole.setAttribute("rx","8");
-                    hole.setAttribute("fill","black");
-                    holes.appendChild(hole);
-                }
-            });
-        });
-        const show=()=>{ if(relicCutinNode){ relicCutinNode.classList.add("targets-visible"); } };
-        if(typeof requestAnimationFrame==="function"){ requestAnimationFrame(show); }else{ show(); }
+        const overlayRect=syncRelicPresentationGeometry(relicCutinNode)||relicCutinNode.__relicOverlayRect, layer=relicCutinNode.querySelector(".team-relic-target-projection-layer"), owner=relicGeometryOwner();
+        if(layer&&overlayRect&&owner&&typeof owner.getUnitGeometry==="function"){target.targetIds.forEach(index=>{const geometry=owner.getUnitGeometry(target.targetSide,index);if(geometry&&geometry.artworkProjection&&geometry.hpProjection){appendRelicProjection(layer,geometry,overlayRect);}});}
+        const show=()=>{if(relicCutinNode){relicCutinNode.classList.add("targets-visible");}};
+        if(typeof requestAnimationFrame==="function"){requestAnimationFrame(show);}else{show();}
         return waitMs(RELIC_TARGET_REVEAL_MS);
     }
     function beginRelicCinematic(def,target){
         if(!hasLiveBattlePresentationHost()||!def||!document.body){ return Promise.resolve(null); }
         cleanupRelicCutin();
-        const node=document.createElement("div");
-        const overlay=relicOverlayGeometry();
-        const overlayRect=overlay&&overlay.rect;
+        const node=document.createElement("div"),overlay=relicOverlayGeometry(),overlayRect=overlay&&overlay.rect;
         if(!overlayRect||overlayRect.width<=0||overlayRect.height<=0){ return Promise.resolve(null); }
-        const width=Math.max(1,numeric(overlayRect.width));
-        const height=Math.max(1,numeric(overlayRect.height));
-        const maskId="teamRelicViewportMask-"+String(currentBattleToken())+"-"+String(++relicVfxSequence);
-        node.id="teamRelicBattlePresentation";
-        node.className="team-relic-battle-presentation";
-        node.setAttribute("aria-label","秘寶發動："+def.name);
-        node.innerHTML='<svg class="team-relic-battle-dim" aria-hidden="true" viewBox="0 0 '+width+' '+height+'" preserveAspectRatio="none">'+
-            '<defs><mask id="'+maskId+'" maskUnits="userSpaceOnUse" x="0" y="0" width="'+width+'" height="'+height+'">'+
-            '<rect x="0" y="0" width="'+width+'" height="'+height+'" fill="white"></rect>'+
-            '<g class="team-relic-mask-holes"></g></mask></defs>'+
-            '<rect class="team-relic-battle-dim-fill" x="0" y="0" width="'+width+'" height="'+height+'" fill="#000" mask="url(#'+maskId+')"></rect></svg>'+
-            '<div class="team-relic-battle-cutin"><span class="team-relic-battle-cutin-icon">'+
-            '<img src="'+esc(def.battleIconPath||def.iconPath||"")+'" alt=""></span>'+
-            '<span class="team-relic-battle-cutin-copy"><strong>'+esc(def.name)+'</strong></span></div>';
-        document.body.appendChild(node);
-        relicCutinNode=node;
-        syncRelicPresentationGeometry(node);
-        document.body.classList.add("team-relic-cinematic-active");
-        const identity=()=>{ if(node===relicCutinNode){ node.classList.add("identity-visible"); } };
-        if(typeof requestAnimationFrame==="function"){ requestAnimationFrame(identity); }else{ identity(); }
-        return waitMs(RELIC_IDENTITY_REVEAL_MS)
-            .then(()=>{
-                if(node!==relicCutinNode){ return null; }
-                node.classList.add("dim-visible");
-                return waitMs(RELIC_DIM_IN_MS);
-            })
-            .then(()=>{
-                if(node!==relicCutinNode){ return null; }
-                return waitMs(RELIC_IDENTITY_HOLD_MS);
-            })
-            .then(()=>{
-                if(node!==relicCutinNode){ return null; }
-                node.classList.add("identity-exiting");
-                return Promise.all([
-                    waitMs(RELIC_IDENTITY_EXIT_MS),
-                    revealRelicTargets(target)
-                ]).then(()=>node);
-            });
+        node.id="teamRelicBattlePresentation";node.className="team-relic-battle-presentation";node.setAttribute("aria-label","秘寶發動："+def.name);
+        node.innerHTML='<div class="team-relic-battle-dim" aria-hidden="true"></div><div class="team-relic-target-projection-layer" aria-hidden="true"></div><div class="team-relic-battle-cutin"><span class="team-relic-battle-cutin-icon"><img src="'+esc(def.battleIconPath||def.iconPath||"")+'" alt=""></span><span class="team-relic-battle-cutin-copy"><strong>'+esc(def.name)+'</strong></span></div>';
+        document.body.appendChild(node);relicCutinNode=node;syncRelicPresentationGeometry(node);document.body.classList.add("team-relic-cinematic-active");
+        const identity=()=>{if(node===relicCutinNode){node.classList.add("identity-visible");}};
+        if(typeof requestAnimationFrame==="function"){requestAnimationFrame(identity);}else{identity();}
+        return waitMs(RELIC_IDENTITY_REVEAL_MS).then(()=>{if(node!==relicCutinNode){return null;}node.classList.add("dim-visible");return waitMs(RELIC_DIM_IN_MS);}).then(()=>{if(node!==relicCutinNode){return null;}return waitMs(RELIC_IDENTITY_HOLD_MS);}).then(()=>{if(node!==relicCutinNode){return null;}node.classList.add("identity-exiting");return Promise.all([waitMs(RELIC_IDENTITY_EXIT_MS),revealRelicTargets(target)]).then(()=>node);});
     }
     function enterRelicVfxPhase(node){
         if(node&&node===relicCutinNode){ node.classList.add("vfx-running"); }

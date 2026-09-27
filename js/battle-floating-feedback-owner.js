@@ -14,7 +14,6 @@
     const LANE_RENDER_HEIGHT_PX=23;
     const LANE_BOTTOM_INSET_PX=6;
     const DEFAULT_DURATION=980;
-    const STATUS_PRESENTATION_SEMANTICS=Object.freeze({burn:Object.freeze({color:"#e32626",label:"burn"}),damageDown:Object.freeze({color:"#39c96b",label:"damageDown"}),agilityDown:Object.freeze({color:"#39c96b",label:"agilityDown"}),freeze:Object.freeze({color:"#62d9ff",label:"freeze"}),frostbite:Object.freeze({color:"#62d9ff",label:"frostbite"}),petrify:Object.freeze({color:"#d2a85c",label:"petrify"}),defenseDown:Object.freeze({color:"#d2a85c",label:"defenseDown"}),statDown:Object.freeze({color:"#d49cff",label:"statDown"}),stun:Object.freeze({color:"#ffd35a",label:"stun"}),shield:Object.freeze({color:"#f4f4f4",label:"shield"}),barrier:Object.freeze({color:"#f4f4f4",label:"barrier"}),default:Object.freeze({color:"#f4f4f4",label:"default"})});
     const contexts=new Map();
     let sequence=0;
 
@@ -62,7 +61,6 @@
         if(value==="escape"||value==="escape-fail"){ return "escape"; }
         return value==="criticaldamage"||value==="critical-damage"?"criticalDamage":"damage";
     }
-    function statusPresentation(statusType){ return STATUS_PRESENTATION_SEMANTICS[String(statusType||"default")]||STATUS_PRESENTATION_SEMANTICS.default; }
     function phaseOrder(kind){ return kind==="shield"?10:(kind==="status"?30:20); }
     function compareRequests(left,right){ return left.impactId&&right.impactId&&left.impactId===right.impactId ? (left.phaseOrder-right.phaseOrder)||(left.id-right.id) : left.id-right.id; }
     function timingFor(options){
@@ -132,9 +130,8 @@
     }
     function formatCritical(text){
         const value=String(text==null?"":text);
-        if(/^爆擊\s/.test(value)){ return value; }
         const match=value.match(/\d+(?:\.\d+)?/);
-        return "爆擊 "+(match?match[0]:value);
+        return "〔💥〕 "+(match?match[0]:value);
     }
     function spawn(context,request,lane){
         if(request.cancelled||request.finished){ return false; }
@@ -156,7 +153,7 @@
         node.dataset.feedbackSource=request.source;
         node.dataset.feedbackSequence=String(request.id);
         node.dataset.feedbackPhase=request.phase;
-        if(request.statusType){ node.dataset.feedbackStatusType=request.statusType; node.style.setProperty("--battle-feedback-status-color",statusPresentation(request.statusType).color); }
+        if(request.statusType){ node.dataset.feedbackStatusType=request.statusType; }
         node.textContent=critical?formatCritical(request.text):String(request.text==null?"":request.text);
         node.style.setProperty("--battle-feedback-x",anchor.x+"px");
         node.style.setProperty("--battle-feedback-y",laneY+"px");

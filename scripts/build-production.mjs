@@ -162,7 +162,8 @@ const gameplayStyles=[
     "css/53-v173.51-qa.css",
     "css/fixed-slot-battlefield-rendering-v2.css",
     "css/55-team-relic-system.css",
-    "css/battle-floating-feedback-owner.css"
+    "css/battle-floating-feedback-owner.css",
+    "css/battle-skill-name-presentation-owner.css"
 ];
 const patrolStyles=["css/32-v131-patrol-appearance.css"];
 const abyssStyles=["css/50-v169-abyss-flow.css","css/54-v174-abyss-two-tier.css"];

@@ -13653,19 +13653,6 @@
         syncStatusVisualsForUnit("player",Number(index));
     };
 
-    function wrapBadge(name){
-        const previous=window[name];
-        if(typeof previous!=="function"){ return; }
-        window[name]=function(){
-            const result=previous.apply(this,arguments);
-            if(typeof document!=="undefined"&&typeof document.querySelectorAll==="function"){
-                document.querySelectorAll(".skill-name-badge").forEach(badge=>badge.classList.add("v143-caster-skill-label"));
-            }
-            return result;
-        };
-    }
-    wrapBadge("showSkillNameBadge");
-    wrapBadge("showMonsterSkillNameBadge");
 
     if(typeof document!=="undefined"){
         const boot=function(){ purgeLegacyCardVfx(); syncStatusVisualEffects(); };
