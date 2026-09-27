@@ -1,4 +1,5 @@
-
+µ¨¥zºè¯
+â¶)à²Ö§uªÝ¢ëiºÐk¢G§¦*^
 /* bundled source: css/battle-statistics-system.css */
 /* Battle Statistics / Detailed battle status UI owner. */
 #battlePage .battle-stats-edge-button,
@@ -1737,8 +1738,7 @@ body.quest-scroll-active,
 }
 
 /* ----- V90 enlarged fixed completion reward area ----- */
-#game-stage #hoµ¨¥zºè¯
-â¶)à²Ö§uªÝ¢ëiºÐk¢G§¦*^meFeatureModal.quest-mode .quest-completion-panel{
+#game-stage #homeFeatureModal.quest-mode .quest-completion-panel{
     flex:0 0 auto !important;
     margin-top:7px !important;
     padding:8px 9px 9px !important;
@@ -3033,7 +3033,8 @@ body.quest-scroll-active,
     z-index:3;
     flex:0 0 auto;
     margin:0;
-    padding:0 0 10px;
+    paddinµ¨¥zºè¯
+â¶)à²Ö§uªÝ¢ëiºÐk¢G§¦*^g:0 0 10px;
     font-size:22px;
     color:#ffe08a;
     background:linear-gradient(180deg,#20180f 78%,rgba(32,24,15,.92));
@@ -4788,8 +4789,7 @@ body.quest-scroll-active,
 #game-stage .v141-quantity strong{min-width:38px;text-align:center;}
 #game-stage .v141-fragment-list{display:grid;gap:6px;height:100%;}
 #game-stage .v141-fragment-row{display:grid;grid-template-columns:45px minmax(0,1fr) 158px;gap:7px;align-items:center;padding:7px;border:1px solid #664e2e;border-radius:8px;background:linear-gradient(155deg,#21180f,#100d09);}
-#game-stage .v141-fragment-icon,#game-stage .vµ¨¥zºè¯
-â¶)à²Ö§uªÝ¢ëiºÐk¢G§¦*^141-fragment-icon svg{width:42px;height:42px;}
+#game-stage .v141-fragment-icon,#game-stage .v141-fragment-icon svg{width:42px;height:42px;}
 #game-stage .v141-fragment-main{display:flex;min-width:0;flex-direction:column;}
 #game-stage .v141-fragment-main b{color:#ead09a;font-size:13px;}
 #game-stage .v141-fragment-main span{color:#a99b84;font-size:11px;}
@@ -5619,7 +5619,8 @@ body.v174-battle-reading-open > .skill-name-badge.v143-caster-skill-label{
     border:1px solid rgba(183,133,55,.72);
     border-radius:8px;
     background:linear-gradient(180deg,rgba(43,29,15,.88),rgba(14,10,7,.95));
-    color:#ead9b4;
+    color:#eµ¨¥zºè¯
+â¶)à²Ö§uªÝ¢ëiºÐk¢G§¦*^ad9b4;
     overflow:visible;
 }
 #game-stage #homeExpPoolCard .v173-exp-charge-status > div:first-child{display:flex;align-items:center;justify-content:space-between;gap:8px;}
@@ -5755,8 +5756,7 @@ body.v174-battle-reading-open > .skill-name-badge.v143-caster-skill-label{
 #game-stage #homeFeatureModal .character-showcase-choice{position:relative;padding:5px 3px 4px;border:2px solid transparent;border-radius:12px;transition:border-color .15s ease,box-shadow .15s ease,background .15s ease;}
 #game-stage #homeFeatureModal .character-showcase-choice.is-current-character{border-color:#ffe08a;background:linear-gradient(180deg,rgba(158,104,24,.35),rgba(18,12,7,.16));box-shadow:0 0 0 2px rgba(255,186,58,.22),0 0 15px rgba(255,166,32,.48);}
 #game-stage #homeFeatureModal .character-showcase-avatar.is-current-character{border-color:#fff0ab!important;box-shadow:0 0 0 3px rgba(255,176,42,.55),0 0 16px rgba(255,130,28,.9)!important;}
-#game-stage #homeFeatureModal:has(#homeFeatureModalBody>button[onclick^="claimOfflineExp"]) #homeFeatureModalBody>div:first-child{font-sizeµ¨¥zºè¯
-â¶)à²Ö§uªÝ¢ëiºÐk¢G§¦*^:15px!important;line-height:1.7!important;}
+#game-stage #homeFeatureModal:has(#homeFeatureModalBody>button[onclick^="claimOfflineExp"]) #homeFeatureModalBody>div:first-child{font-size:15px!important;line-height:1.7!important;}
 #game-stage #homeFeatureModal:has(#homeFeatureModalBody>button[onclick^="claimOfflineExp"]) #homeFeatureModalBody div[style*="font-size:11px"]{font-size:14px!important;line-height:1.55!important;}
 #game-stage .v132-dungeon-list>div[style*="font-size:11px"]{font-size:14px!important;line-height:1.5!important;}
 #game-stage .v17361-reward-icon>em{font-size:13px!important;line-height:17px!important;}

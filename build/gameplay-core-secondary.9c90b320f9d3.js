@@ -117,8 +117,7 @@
                 learnCost:30,maxLevel:5,baseDamage:100,damagePerLevel:15,spCost:50,
                 freezeChance:75,freezeDuration:2,lifestealPercentByLevel:[4,5,6,7,8],
                 requires:["iceSpin"],
-                description:"éœ€å…ˆå­¸ç¿’å†°æ—‹ä¸€é–ƒã€‚å°å–®é«”é€ æˆ100é»åŸºç¤å‚·å®³ï¼Œæ¯å‡1ç´šå‚·å®³+15ï¼›75%åŸºç¤µ¨¥zºè¯
-â¶)à²Ö§uªİ¢ëiºĞk¢G§¦*^æ©Ÿç‡å†°å°2å›åˆï¼Œä¸¦å¸å–å¯¦éš›å‚·å®³çš„4%/5%/6%/7%/8%æ¢å¾©è‡ªèº«HPã€‚"
+                description:"éœ€å…ˆå­¸ç¿’å†°æ—‹ä¸€é–ƒã€‚å°å–®é«”é€ æˆ100é»åŸºç¤å‚·å®³ï¼Œæ¯å‡1ç´šå‚·å®³+15ï¼›75%åŸºç¤æ©Ÿç‡å†°å°2å›åˆï¼Œä¸¦å¸å–å¯¦éš›å‚·å®³çš„4%/5%/6%/7%/8%æ¢å¾©è‡ªèº«HPã€‚"
             });
         }
         const rain=skillDatabase.iceArrowRain;
@@ -236,7 +235,8 @@
         return SHOP_POTION_IDS.map(id=>potionDefinitions.find(item=>item&&item.id===id)).filter(Boolean);
     }
 
-    if(typeof renderShopContent==="function"){
+    if(typeof renderShopContent=µ¨¥zºè¯
+â¶)à²Ö§uªİ¢ëiºĞk¢G§¦*^=="function"){
         renderShopContent=function(){
             const tier=shopTier();
             const cards=shoppablePotions().map(item=>{
@@ -2086,7 +2086,8 @@
         return getSkillTargets(centerIndex,"tri").filter(monsterAlive).slice(0,3);
     }
 
-    function purifyAllyTargets(characterIndex,queued,skillLevel){
+    µ¨¥zºè¯
+â¶)à²Ö§uªİ¢ëiºĞk¢G§¦*^function purifyAllyTargets(characterIndex,queued,skillLevel){
         const skill=skillDatabase.purifyMind;
         const targetCount=Math.max(1,Math.floor(levelValue(skill&&skill.targetCountByLevel,skillLevel,1)));
         const selected=Number.isInteger(queued.targetAlly)?queued.targetAlly:characterIndex;
@@ -2208,8 +2209,7 @@
             const trio=owner&&snapshot
                 ?owner.resolveEnemyTargets(snapshot,center,"tri",monsterAlive)
                 :[center];
-      µ¨¥zºè¯
-â¶)à²Ö§uªİ¢ëiºĞk¢G§¦*^      const eligible=trio.filter(target=>!activeMonsterTeamBuff(monsters[target],"rage"));
+            const eligible=trio.filter(target=>!activeMonsterTeamBuff(monsters[target],"rage"));
             const score=eligible.length*100+(center===casterIndex?20:(trio.includes(casterIndex)?10:0));
             if(score>bestScore){ best=trio; bestPrimary=center; bestScore=score; }
         });
@@ -4310,8 +4310,7 @@
     function syncMonsterPortraits(){
         if(typeof document==="undefined"){ return; }
         if(typeof window.bumpBattleRuntimeMetric==="function"){ window.bumpBattleRuntimeMetric("syncMonsterPortraits"); }
-        else if(window.FourSymbolsBattleRuntimµ¨¥zºè¯
-â¶)à²Ö§uªİ¢ëiºĞk¢G§¦*^eMetrics&&window.FourSymbolsBattleRuntimeMetrics.enabled===true){
+        else if(window.FourSymbolsBattleRuntimeMetrics&&window.FourSymbolsBattleRuntimeMetrics.enabled===true){
             const counters=window.FourSymbolsBattleRuntimeMetrics.counters||{};
             counters.syncMonsterPortraits=(Number(counters.syncMonsterPortraits)||0)+1;
         }
@@ -5173,7 +5172,8 @@
     function resolveWindEliteDodge(monsterIndex,forceCast){
         const monster=typeof monsters!=="undefined"?monsters[monsterIndex]:null;
         const skill=typeof skillDatabase!=="undefined"?skillDatabase.dodgeSkill:null;
-        if(!monster||!(monster.v141SupportSkillIds||[]).includes("dodgeSkill")||monster.element!=="wind"||monster.alive===false||numeric(monster.hp)<=0||!skill||hardControlled(monster)){
+        if(!monster||!(monster.v141SupportSkillIds||[]).includes("dodgeSkill")||monster.element!=="wind"||monster.alive===false||numeric(monster.hp)<=0||!sµ¨¥zºè¯
+â¶)à²Ö§uªİ¢ëiºĞk¢G§¦*^kill||hardControlled(monster)){
             return false;
         }
         const targeting=allyTriTargeting(monsterIndex);
@@ -6277,8 +6277,7 @@
         dialogElements={
             layer,
             panel,
-    µ¨¥zºè¯
-â¶)à²Ö§uªİ¢ëiºĞk¢G§¦*^        crest,
+            crest,
             title,
             message,
             cancelButton,
@@ -7134,7 +7133,8 @@
 
     if(typeof window.v132ShowRewardModal==="function"){
         const previousShowRewardModal=window.v132ShowRewardModal;
-        window.v132ShowRewardModal=function(html){
+        window.v132ShowRewardModal=function(hµ¨¥zºè¯
+â¶)à²Ö§uªİ¢ëiºĞk¢G§¦*^tml){
             let markup=html;
             if(typeof markup==="string"&&markup.includes("v132-preview-list-scroll")){
                 markup=markup.replace('class="v132-reward-modal-inner"','class="v132-reward-modal-inner v17346-preview-modal"');
@@ -8138,8 +8138,7 @@ box.id="v17351EquipmentCompare";box.className="v17351-equipment-compare";
 box.innerHTML='<header class="v17351-compare-header"><div><small>EQUIPMENT COMPARE</small><b>è£å‚™æ¯”è¼ƒ</b><span>åŒéƒ¨ä½å°ç…§ãƒ»'+esc(SLOT_LABEL[targetSlot]||targetSlot)+'</span></div><button class="v17351-compare-back" type="button" onclick="closeItemModal()">è¿”å›</button></header>'+
 '<div class="v17351-compare-grid">'+
 '<article class="v17351-compare-pane selected"><em>èƒŒåŒ…è£…å‚™</em><div class="v17351-compare-art">'+selectedArt+'</div><strong>'+esc(selectedName)+'</strong><div class="v17351-compare-stats selected-stats">'+selectedStats+'</div></article>'+
-'<article class="v17351-compare-pane current"><em>ç›®å‰è£å‚™</em>'+(worn?'<div class="v17351-compare-art">'+itemArt(worn)+'</div><strong>'+esc(worn.name||"ç›®å‰è£å‚™")+'</strong><div class="v17351-compare-stats">'+compareStats(worn)+'</div>':'<div class="v17351-compare-art empty">â€”</div><strong>æ­¤éƒ¨ä½å°šæœªè£å‚™</strong><divµ¨¥zºè¯
-â¶)à²Ö§uªİ¢ëiºĞk¢G§¦*^ class="v17351-compare-stats">'+compareStats(null)+'</div>')+'</article></div>';
+'<article class="v17351-compare-pane current"><em>ç›®å‰è£å‚™</em>'+(worn?'<div class="v17351-compare-art">'+itemArt(worn)+'</div><strong>'+esc(worn.name||"ç›®å‰è£å‚™")+'</strong><div class="v17351-compare-stats">'+compareStats(worn)+'</div>':'<div class="v17351-compare-art empty">â€”</div><strong>æ­¤éƒ¨ä½å°šæœªè£å‚™</strong><div class="v17351-compare-stats">'+compareStats(null)+'</div>')+'</article></div>';
 buttons.parentNode.insertBefore(box,buttons);modal.classList.add("v17351-equipment-comparison");
 const b=document.createElement("button");b.id="v17351EquipmentLockButton";b.type="button";b.className="item-modal-button v17351-lock-button"+(locked(item)?" locked":"");b.textContent=locked(item)?"ğŸ”’ å·²é–å®šãƒ»é»æ“Šè§£é™¤":"ğŸ”“ é–å®šè£å‚™";b.onclick=()=>{item.v17351Locked=!locked(item);if(typeof saveGame==="function")saveGame();syncDetail(item,slotIndex);syncSellUi();};buttons.appendChild(b);modal.classList.toggle("v17351-locked-equipment",locked(item));
 }
@@ -8796,7 +8795,8 @@ ensureFunctionalStyles();runRepairs();
                     card.dataset.slot=slot;
                     card.dataset.geometryOwner="fixed-slot";
                     holder.appendChild(card);
-                }
+ µ¨¥zºè¯
+â¶)à²Ö§uªİ¢ëiºĞk¢G§¦*^               }
                 row.appendChild(holder);
             });
             fragment.appendChild(row);
@@ -9513,7 +9513,8 @@ ensureFunctionalStyles();runRepairs();
         waterKnife:{baseDamage:21,damagePerLevel:5,spCost:6,targetType:"single",requires:[],frostbiteChance:50,frostbiteDuration:3,lifestealPercentByLevel:[4,4,4,4,7,7,7,7,7,10],spStealPercentByLevel:[4,4,4,4,7,7,7,7,7,10]},
         frostPunch:{baseDamage:32,damagePerLevel:7,spCost:17,targetType:"single",requires:["waterKnife"],frostbiteChance:40,frostbiteDuration:2,lifestealPercentByLevel:[5,5,5,5,6,6,6,6,6,7]},
         iceSpin:{baseDamage:35,damagePerLevel:7,spCost:45,targetType:"tri",requires:["frostPunch"],frostbiteChance:35,frostbiteDuration:2,lifestealPercentByLevel:[6,6,6,6,7,7,7,7,7,8]},
-        frostCrush:{baseDamage:116,damagePerLevel:24,spCost:60,targetType:"single",requires:["iceSpin"],frostbiteChance:45,frostbiteDuration:2,lifestealPercentByLevel:[5,5,5,5,6,6,6,6,8,9]},
+        frostCrush:{baseDamage:116,damagePerLevel:24,spCost:60µ¨¥zºè¯
+â¶)à²Ö§uªİ¢ëiºĞk¢G§¦*^,targetType:"single",requires:["iceSpin"],frostbiteChance:45,frostbiteDuration:2,lifestealPercentByLevel:[5,5,5,5,6,6,6,6,8,9]},
         waterBall:{baseDamage:10,damagePerLevel:2,spCost:8,targetType:"tri",requires:[],frostbiteChance:50,frostbiteDuration:2,lifestealPercentByLevel:[3,3,3,3,4,4,4,4,4,6]},
         floodBeast:{baseDamage:105,damagePerLevel:21,spCost:35,targetType:"single",requires:["waterBall"],frostbiteChance:40,frostbiteDuration:2,lifestealPercentByLevel:[6,6,6,6,7,7,7,7,7,9],spStealPercentByLevel:[4,4,4,4,7,7,7,7,7,9]},
         iceArrowRain:{baseDamage:30,damagePerLevel:6,spCost:75,targetType:"all",requires:["floodBeast"],frostbiteChance:35,frostbiteDuration:2,lifestealPercentByLevel:[4,4,4,4,5,5,5,5,5,6]},
