@@ -1192,10 +1192,12 @@
     function ensureEnemyFormationSnapshot(indexes){
         const owner=fixedBattlefieldSlots();
         if(!owner){ return null; }
-        const existing=owner.getActiveEnemySnapshot();
-        if(existing){ return existing; }
         const requested=(Array.isArray(indexes)?indexes:currentBattleMonsters||[])
             .filter(index=>Number.isInteger(index)).slice(0,10);
+        if(!requested.length){ return null; }
+        const existing=owner.getActiveEnemySnapshot();
+        const activeMatches=existing&&requested.every(index=>!!owner.getEnemySlotForMonster(existing,index));
+        if(activeMatches){ return existing; }
         if(!requested.length){ return null; }
         const snapshot=owner.createEnemyFormationSnapshot(requested,{
             originalFormationType:requested.length,
@@ -13560,7 +13562,7 @@
             current.targetSide===side
         );
         if(wait>8){ state.metrics.delayedNumbers++; }
-        return Object.freeze({delayMs:wait,critical:critical});
+        return Object.freeze({delayMs:wait,impactAt:Date.now()+wait,impactId:current&&!current.done?("v143:"+String(current.sequence)+":"+side+":"+String(unitIndex)):null,sequence:current&&!current.done?current.sequence:0,critical:critical});
     };
 
     if(typeof applySkillDebuffEffectsToPlayer==="function"){
