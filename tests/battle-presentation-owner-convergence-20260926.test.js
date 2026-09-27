@@ -169,3 +169,5 @@ assert.match(contracts,/玩家可見 Buff／Debuff 一律顯示「最終…±N%�
 assert.match(contracts,/Frostbite（凍傷）是 Soft Debuff：造成傷害 -30%/);
 
 console.log("Battle presentation owner convergence contracts passed.");
+
+// Foreground Projection contract supersedes rectangle apertures.
