@@ -141,9 +141,9 @@ assert.match(relicRuntime,/function revealRelicTargets\(target\)[\s\S]*getUnitGe
 assert.doesNotMatch(relicRuntime,/team-relic-mask-holes|createElementNS\(namespace,"rect"\)/,
     "relic focus must not restore rectangle apertures");
 const relicTargetReveal=relicRuntime.slice(relicRuntime.indexOf("function revealRelicTargets"),relicRuntime.indexOf("function beginRelicCinematic"));
-assert.match(relicTargetReveal,/team-relic-mask-holes/,"target reveal must own the cinematic mask aperture container");
-assert.match(relicTargetReveal,/relicTargetGeometries\(target\.targetSide,index\)/,"target reveal must resolve each target through canonical geometry");
-assert.match(relicTargetReveal,/createElementNS\(namespace,"rect"\)/,"target reveal must cut a rectangle aperture for each resolved target");
+assert.match(relicTargetReveal,/team-relic-target-projection-layer/,"target reveal must own the foreground projection layer");
+assert.match(relicTargetReveal,/owner\.getUnitGeometry\(target\.targetSide,index\)/,"target reveal must resolve each target through canonical geometry");
+assert.match(relicTargetReveal,/appendRelicProjection\(layer,geometry,overlayRect\)/,"target reveal must project transparent artwork and HP for each target");
 assert.doesNotMatch(relicRuntime,/team-relic-battle-target-layer|relicTargetLayer\(/,
     "relic focus must not raise live Unit DOM across stacking contexts");
 assert.doesNotMatch(relicCss,/team-relic-battle-target-layer|team-relic-battle-target-focus-visible/,
