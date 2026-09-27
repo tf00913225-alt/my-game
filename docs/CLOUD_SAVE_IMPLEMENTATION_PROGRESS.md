@@ -2,6 +2,11 @@
 
 本文件是長期工程進度來源。**每個 Phase 結束都必須更新本文件**；聊天、Commit、PR、CI 或部署成功不能取代驗收紀錄。
 
+## 2026-09-27 — atomic daily check-in candidate; Phase 4 0/6 VERIFIED
+
+- The new protected callable derives the existing 50-gold check-in reward, Taipei day and unique operation ID on the server. A single Firestore transaction writes the daily grant, claim receipt, ledger, claim record/checkpoint, economy, canonical revisions and an unpublished snapshot. It requires an active UID session and expected revision; replay returns the original receipt. No client amount, battle outcome or local quest flag can grant value.
+- This is an isolated server-created first-character path. No player UI is connected and no playable snapshot or cross-device restoration is enabled. Kill/win quest rewards still need a trusted run source. CI, merged SHA and deployment evidence are pending; Phase 4 remains **0/6 VERIFIED**.
+
 ## 2026-09-26 — historical claim source reconciliation (candidate)
 
 - Read-only reward audit now parses `quest-milestones` claimed thresholds with its recorded date and compares `abyss-state` claim entries against the mirrored main-save `abyssProgress`. Invalid milestone thresholds or contradictory Abyss claim mirrors block character draft preparation. Historical entries remain duplicate blocks only, never evidence of an unpaid reward. Earlier dates that the client no longer retains remain unverifiable.

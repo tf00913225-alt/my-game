@@ -255,6 +255,55 @@ await assert.rejects(initialWriter.commitInitialSources(yRequest,
     {...initialArgs,operationId:"initial-character-emulator-0002",expectedRevision:2}),
     error=>error.code==="failed-precondition");
 assert.equal((await db.doc(`users/${y}/saves/current`).get()).get("authoritativeStateReady"),false);
+// The public endpoint settles a server-clock check-in in ONE Firestore
+// transaction: no unclaimed reservation survives a failed commit.
+const atomicUser=await login("accounts:signUp",{
+    email:"session-atomic-checkin@example.test",password});
+const atomicUid=atomicUser.localId;
+const atomicSession=await invoke("createGameSession",atomicUser.idToken,{uid:atomicUid});
+await invoke("bootstrapCloudSave",atomicUser.idToken,
+    {uid:atomicUid,session:atomicSession});
+const atomicRequest={auth:{uid:atomicUid,token:claims(atomicUser.idToken)},
+    data:{uid:atomicUid,session:atomicSession,expectedRevision:2}};
+await initialWriter.commitInitialSources({auth:atomicRequest.auth,
+    data:{uid:atomicUid,session:atomicSession}},
+    {operationId:"initial-character-atomic-checkin",expectedRevision:1,selection:choices});
+let abortAtomic=true;
+const rollbackCheckin=createCanonicalResourceCredit({db,FieldValue,HttpsError,
+    inspectExistingEnvelope,nextRevision,
+    runProtected:(request,operation)=>writerSessions.runProtected(request,async(tx,session)=>{
+        const result=await operation(tx,session);
+        if(abortAtomic){throw new Error("simulated atomic check-in rollback");}
+        return result;
+    })});
+await assert.rejects(rollbackCheckin.claimDailyCheckin(atomicRequest),
+    /simulated atomic check-in rollback/);
+assert.equal((await db.doc(`serverUsers/${atomicUid}/pendingGrants`).get()).empty,true);
+assert.equal((await db.doc(`serverUsers/${atomicUid}/ledgerEntries`).get()).empty,true);
+assert.equal((await db.doc(`serverUsers/${atomicUid}/economy/current`).get()).get("gold"),0);
+await rejected("claimDailyCheckin",atomicUser.idToken,
+    {...atomicRequest.data,expectedRevision:1},"CLOUD_REVISION_CONFLICT");
+await rejected("claimDailyCheckin",atomicUser.idToken,
+    {...atomicRequest.data,amount:5000},"INVALID_ARGUMENT");
+const atomicClaim=await invoke("claimDailyCheckin",atomicUser.idToken,atomicRequest.data);
+assert.equal(atomicClaim.creditRevision,3);
+assert.equal(atomicClaim.unchanged,false);
+assert.equal((await db.doc(`serverUsers/${atomicUid}/economy/current`).get()).get("gold"),50);
+assert.equal((await db.doc(`serverUsers/${atomicUid}/claimRecords/${atomicClaim.grantId}`).get())
+    .get("status"),"claimed");
+assert.equal((await db.doc(`serverUsers/${atomicUid}/playableSnapshots/3`).get())
+    .get("readyForPublication"),false);
+assert.equal((await db.doc(`users/${atomicUid}/saves/current`).get())
+    .get("authoritativeStateReady"),false);
+assert.equal((await invoke("claimDailyCheckin",atomicUser.idToken,atomicRequest.data))
+    .unchanged,true);
+assert.equal((await db.doc(`serverUsers/${atomicUid}/economy/current`).get()).get("gold"),50);
+const atomicGrantRef=db.doc(`serverUsers/${atomicUid}/pendingGrants/${atomicClaim.grantId}`);
+await atomicGrantRef.update({amount:5000});
+await rejected("claimDailyCheckin",atomicUser.idToken,atomicRequest.data,"DATA_LOSS");
+await atomicGrantRef.update({amount:50});
+assert.equal((await invoke("claimDailyCheckin",atomicUser.idToken,atomicRequest.data))
+    .unchanged,true);
 // The server day and the 50 gold award are owned by the issuer, not the request.
 let checkinTime=Date.parse("2026-09-27T15:59:59Z");
 let abortCheckin=false;
