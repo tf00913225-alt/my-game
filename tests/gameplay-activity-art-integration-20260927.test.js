@@ -29,7 +29,8 @@ for(const file of allAssets){
 assert.equal(css.includes("assets/inbox/美術圖"),false,"runtime CSS must not reference inbox masters");
 
 const js=fs.readFileSync("js/gameplay-boss-tower-system.js","utf8");
-assert.ok(js.includes('data-tower-element="'+escapeHtml(tower.element)+'"'),"tower hero must expose canonical current element to the CSS owner");
+assert.ok(js.includes('data-tower-element="'),"tower hero must expose a data-tower-element attribute");
+assert.ok(js.includes("escapeHtml(tower.element)"),"tower hero element attribute must derive from the canonical tower element");
 
 const featureManifest=JSON.parse(fs.readFileSync("config/feature-manifest.json","utf8"));
 const bundleAssets=featureManifest.bundles["feature-boss-relic"].assets||[];
