@@ -2,6 +2,7 @@
 
 const {assembleCanonicalSnapshot,verifyCanonicalSnapshotAgainstSources}=
     require("./canonical-snapshot");
+const {newcomerExpNext}=require("./canonical-newcomer-exp");
 const ID=/^[A-Za-z0-9_-]{16,64}$/;
 // js/28-v133-economy-rebalance.js owns the current game level ceiling.
 const MAX_CHARACTER_LEVEL=100;
@@ -115,8 +116,16 @@ function createCanonicalExpAllocation({db,FieldValue,HttpsError,runProtected,
             if(state.level===MAX_CHARACTER_LEVEL){
                 fail("failed-precondition","Character has reached the level cap.");
             }
+            // Beyond the static newcomer curve the runtime uses a live zone roster.
+            // No client-computed threshold can become an authoritative debit.
+            if(state.level>=19){
+                fail("failed-precondition","Trusted EXP curve is unavailable at this level.");
+            }
+            if(state.expNext!==newcomerExpNext(state.level)){
+                fail("data-loss","Character EXP threshold differs from the trusted curve.");
+            }
             const cost=state.expNext-state.exp;
-            const nextExpNext=Math.max(state.expNext+1,Math.floor(state.expNext*1.2));
+            const nextExpNext=newcomerExpNext(state.level+1);
             if(economy.sharedExp<cost){
                 fail("failed-precondition","Shared EXP is insufficient.");
             }

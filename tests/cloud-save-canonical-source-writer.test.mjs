@@ -4,6 +4,7 @@ import test from "node:test";
 
 const require=createRequire(import.meta.url);
 const {createCanonicalSourceWriter}=require("../functions/src/canonical-source-writer.js");
+const {newcomerExpNext}=require("../functions/src/canonical-newcomer-exp.js");
 const stamp={toMillis:()=>1};
 const uid="uid-a";
 const save=`users/${uid}/saves/current`;
@@ -49,6 +50,12 @@ function harness(candidate="none"){
     return {writer,data,get committed(){return committed;}};
 }
 
+test("static newcomer EXP curve follows current game anchors",()=>{
+    assert.deepEqual([1,2,5,10,15,19].map(newcomerExpNext),
+        [300,375,600,1200,2500,6900]);
+    assert.throws(()=>newcomerExpNext(20),/unavailable/);
+});
+
 test("initial server-owned character commits complete sources and receipt at one revision",async()=>{
     const h=harness();
     const request={};
@@ -63,6 +70,7 @@ test("initial server-owned character commits complete sources and receipt at one
     const character=h.data.get(`${root}/characters/character-${operationId}`);
     assert.equal(character.ownerUid,uid);
     assert.equal(character.state.skillPoints,2);
+    assert.equal(character.state.expNext,300);
     assert.equal(character.state.hp,200);
     assert.equal(h.data.get(`${root}/economy/current`).gold,0);
     assert.equal(h.data.get(`${root}/claimCheckpoints/current`).claimCount,0);
