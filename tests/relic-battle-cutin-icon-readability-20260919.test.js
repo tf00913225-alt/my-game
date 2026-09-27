@@ -50,6 +50,10 @@ assert.match(relic,/highlightRect|highlightRects/,
   "target reveal must consume canonical portrait/HP highlight geometry");
 assert.doesNotMatch(relic,/team-relic-battle-target-outline|team-relic-battle-target-focus-layer/,
   "target reveal must not create a second full-Unit outline owner");
+const liveQueueSource=relic.slice(
+  relic.indexOf("const generation=relicPresentationGeneration",relic.indexOf("function queueRelicPresentation")),
+  relic.indexOf("function normalizeOwned")
+);
 assert.doesNotMatch(
   liveQueueSource,
   /showBanner\(def\)/,
