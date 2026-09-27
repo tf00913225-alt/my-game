@@ -41,11 +41,9 @@ assert.equal(vfxZ,16000,"formal V143 base layer changed unexpectedly");
 assert.equal(activeRelicVfxZ,18130,"formal V143 relic cast must rise above the cinematic viewport");
 assert.ok(rootZ<activeRelicVfxZ,"formal relic VFX must paint above the viewport mask/identity surface");
 
-assert.match(
-  relicCss,
-  /\.team-relic-battle-target-outline\{[\s\S]*transition:opacity \.42s ease/,
-  "target focus outlines must reveal gradually without mutating live Unit opacity"
-);
+assert.doesNotMatch(relic,/team-relic-battle-target-outline/,"Relic must not create a full Unit outline");
+assert.doesNotMatch(relicCss,/team-relic-battle-target-outline/,"Relic CSS must not retain the retired outline owner");
+assert.match(relic,/highlightRect|highlightRects/,"Relic target geometry must expose portrait/HP highlight data");
 
 const presentationStart=relic.indexOf("const RELIC_VFX_PRESENTATION=Object.freeze({");
 const presentationEnd=relic.indexOf("const RELIC_BATTLE_ICON_PATHS=Object.freeze({");

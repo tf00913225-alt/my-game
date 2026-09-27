@@ -64,17 +64,22 @@ assert.doesNotMatch(v152,/showDamagePopup=function\(/,"V152 HP relocation wrappe
 assert.doesNotMatch(v152,/v152-top-damage/,"V152 must not retain a popup relocation class owner");
 
 assert.match(v146,/FourSymbolsBattleFloatingFeedback/);
+assert.match(v146,/statusType:type/);
 assert.match(v146,/feedback\.emitAtImpact/);
 assert.doesNotMatch(v146,/rect\.top\+rect\.height\*\.86/,"V146 legacy status geometry is retired");
 assert.doesNotMatch(v146,/className="v146-status-popup/,"V146 must not create its own status popup DOM");
 
 assert.match(geometry,/getUnitGeometry:unitGeometry/);
 assert.match(geometry,/getBattlefieldOverlayGeometry:battlefieldOverlayGeometry/);
+assert.match(geometry,/hpRect:hpRect/);
+assert.match(geometry,/highlightRects:highlightRects/);
 assert.doesNotMatch(geometry,/wrapDamagePopup/);
 assert.doesNotMatch(geometry,/wrapMissPopup/);
 
 assert.match(feedback,/const MAX_LANES=4/);
 assert.match(feedback,/context\.queue\.push\(request\)/);
+assert.match(feedback,/STATUS_PRESENTATION_SEMANTICS/);
+assert.match(feedback,/phaseOrder/);
 assert.match(feedback,/if\(lane<0\)\{ break; \}/);
 assert.match(feedback,/geometry\.feedbackSafeRect/);
 assert.match(feedback,/node\.dataset\.feedbackSource=request\.source/);
