@@ -15,6 +15,7 @@
     const LANE_BOTTOM_INSET_PX=6;
     const DEFAULT_DURATION=980;
     const contexts=new Map();
+    const pendingImpactBatches=new Map();
     let sequence=0;
 
     function numeric(value,fallback){
@@ -72,6 +73,42 @@
             return {delayMs:Math.max(0,numeric(timing.delayMs,0)),critical:timing.critical===true,impactId:timing.impactId||null,impactAt:Number.isFinite(Number(timing.impactAt))?Number(timing.impactAt):0,sequence:numeric(timing.sequence,0)};
         }catch(_){ return {delayMs:0,critical:false,impactId:null,impactAt:0,sequence:0}; }
     }
+    function impactBatchKey(request){ return unitKey(request.side,request.index)+"|"+String(request.impactId); }
+    function removeFromImpactBatch(request){
+        if(!request||!request.impactBatchKey){ return; }
+        const batch=pendingImpactBatches.get(request.impactBatchKey);
+        if(!batch){ request.impactBatchKey=null; return; }
+        batch.requests=batch.requests.filter(item=>item!==request);
+        request.impactBatchKey=null;
+        if(!batch.requests.length){
+            if(batch.timer){ clearTimeout(batch.timer); }
+            pendingImpactBatches.delete(batch.key);
+        }
+    }
+    function flushImpactBatch(key){
+        const batch=pendingImpactBatches.get(key);
+        if(!batch){ return; }
+        pendingImpactBatches.delete(key);
+        batch.timer=null;
+        const requests=batch.requests.slice().sort(compareRequests);
+        requests.forEach(request=>{ request.impactBatchKey=null; enqueue(request,true); });
+        const context=contextFor(batch.side,batch.index);
+        pump(context);
+    }
+    function registerImpactRequest(request,timing){
+        const key=impactBatchKey(request);
+        let batch=pendingImpactBatches.get(key);
+        if(!batch){
+            const dueAt=Number(request.impactAt)||Date.now()+Math.max(0,numeric(timing.delayMs,0));
+            batch={key:key,side:request.side,index:request.index,impactId:request.impactId,dueAt:dueAt,requests:[],timer:null};
+            pendingImpactBatches.set(key,batch);
+            /* A batch owns exactly one timer. Even a zero-delay impact defers to a
+               task boundary so all synchronous and microtask status producers can register. */
+            batch.timer=setTimeout(()=>flushImpactBatch(key),Math.max(0,dueAt-Date.now()));
+        }
+        request.impactBatchKey=key;
+        batch.requests.push(request);
+    }
     function makeHandle(request){
         let resolvePromise;
         const promise=new Promise(resolve=>{ resolvePromise=resolve; });
@@ -86,7 +123,7 @@
     function finishRequest(request,reason){
         if(!request||request.finished){ return; }
         request.finished=true;
-        if(request.delayTimer){ clearTimeout(request.delayTimer); request.delayTimer=null; }
+        removeFromImpactBatch(request);
         if(request.removeTimer){ clearTimeout(request.removeTimer); request.removeTimer=null; }
         if(request.node&&request.node.parentNode){ request.node.remove(); }
         if(typeof request.resolve==="function"){ request.resolve(reason||"done"); }
@@ -131,7 +168,7 @@
     function formatCritical(text){
         const value=String(text==null?"":text);
         const match=value.match(/\d+(?:\.\d+)?/);
-        return "〔💥〕 "+(match?match[0]:value);
+        return "💥 "+(match?match[0]:value);
     }
     function spawn(context,request,lane){
         if(request.cancelled||request.finished){ return false; }
@@ -182,21 +219,13 @@
         }
         if(!context.active.size&&!context.queue.length){ contexts.delete(context.key); }
     }
-    function enqueue(request){
+    function enqueue(request,deferPump){
         if(request.cancelled||request.finished){ return; }
         const context=contextFor(request.side,request.index);
         request.context=context;
         context.queue.push(request);
         context.queue.sort(compareRequests);
-        /* Synthetic/settled callers have explicitly opted out of V143 impact
-           timing. Flush through this same queue owner now so the request is
-           immediately observable, while live impacts retain one microtask in
-           which matching damage/status phases can be ordered together. */
-        if(request.skipImpactTiming){
-            pump(context);
-            return;
-        }
-        queueMicrotask(()=>pump(context));
+        if(!deferPump){ pump(context); }
     }
     function emit(options){
         if(typeof document==="undefined"||!document.body){ return null; }
@@ -218,8 +247,8 @@
         };
         request.critical=request.critical||timing.critical;
         const handle=makeHandle(request);
-        if(timing.delayMs>8){
-            request.delayTimer=setTimeout(()=>{ request.delayTimer=null;enqueue(request); },timing.delayMs);
+        if(request.impactId&&!request.skipImpactTiming){
+            registerImpactRequest(request,timing);
         }else{
             enqueue(request);
         }
@@ -238,6 +267,11 @@
         });
     }
     function clear(){
+        Array.from(pendingImpactBatches.values()).forEach(batch=>{
+            if(batch.timer){ clearTimeout(batch.timer); }
+            batch.requests.slice().forEach(request=>finishRequest(request,"teardown"));
+        });
+        pendingImpactBatches.clear();
         Array.from(contexts.values()).forEach(context=>{
             context.queue.slice().forEach(request=>finishRequest(request,"teardown"));
             Array.from(context.active.values()).forEach(request=>finishRequest(request,"teardown"));
@@ -268,6 +302,7 @@
         clear:clear,
         identifyUnit:identifyUnit,
         getContextCount:()=>contexts.size,
+        getPendingImpactBatchCount:()=>pendingImpactBatches.size,
         debugSnapshot:debugSnapshot
     });
     window.FourSymbolsBattleFloatingFeedback=api;
