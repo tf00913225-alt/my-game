@@ -8,6 +8,7 @@ const {setGlobalOptions}=require("firebase-functions/v2");
 const {HttpsError,onCall}=require("firebase-functions/v2/https");
 const {createSessionAuthority}=require("./src/session-authority");
 const {createTrustedGrantLedger}=require("./src/trusted-grant-ledger");
+const {createCanonicalResourceCredit}=require("./src/canonical-resource-credit");
 const {createLegacyCandidateScreening}=require("./src/legacy-candidate-screening");
 const {CloudPreferencesError,PREFERENCES_SCHEMA_VERSION,normalizePreferences}=require("./src/cloud-preferences");
 const {
@@ -29,6 +30,10 @@ const {
 initializeApp();
 const sessions=createSessionAuthority({db:getFirestore(),FieldValue,HttpsError});
 const trustedGrantLedger=createTrustedGrantLedger({
+    db:getFirestore(),FieldValue,HttpsError,runProtected:sessions.runProtected,
+    inspectExistingEnvelope,nextRevision
+});
+const canonicalResourceCredit=createCanonicalResourceCredit({
     db:getFirestore(),FieldValue,HttpsError,runProtected:sessions.runProtected,
     inspectExistingEnvelope,nextRevision
 });
@@ -134,6 +139,12 @@ exports.protectedTest=onCall(CALLABLE_OPTIONS,async request=>{
 // for a future authoritative character transaction without changing gameplay.
 exports.reserveTrustedGrant=onCall(CALLABLE_OPTIONS,async request=>{
     try{ return await trustedGrantLedger.reserve(await verifyGameIdentity(request)); }
+    catch(error){ throw asHttpsError(error); }
+});
+// The request carries only identity, active session and expected revision.
+// This settles the server-clock check-in once, on an unpublished character.
+exports.claimDailyCheckin=onCall(CALLABLE_OPTIONS,async request=>{
+    try{ return await canonicalResourceCredit.claimDailyCheckin(await verifyGameIdentity(request)); }
     catch(error){ throw asHttpsError(error); }
 });
 // Reads a private candidate and returns blockers; never approves or copies it

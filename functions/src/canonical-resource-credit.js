@@ -4,6 +4,7 @@ const {assembleCanonicalSnapshot,verifyCanonicalSnapshotAgainstSources,claimReco
     require("./canonical-snapshot");
 const {source,readOwnedSources,advanceOwnedRecords,advanceOwnedSources}=
     require("./canonical-owned-sources");
+const {taipeiDay,REWARD_GOLD}=require("./daily-checkin-grant");
 const ID=/^[A-Za-z0-9_-]{16,64}$/;
 
 // Internal gold/EXP pool settlement for the first server-created character.
@@ -12,9 +13,9 @@ const ID=/^[A-Za-z0-9_-]{16,64}$/;
 function createCanonicalResourceCredit({db,FieldValue,HttpsError,runProtected,
     inspectExistingEnvelope,nextRevision}){
     const fail=(code,message)=>{throw new HttpsError(code,message);};
-    async function creditReservedGrant(request,{grantId,operationId,expectedRevision}){
+    async function settle(request,{grantId,operationId,expectedRevision,dailyDay=null}){
         if(!ID.test(grantId||"")||!ID.test(operationId||"")||
-           !Number.isSafeInteger(expectedRevision)||expectedRevision<1){
+           (dailyDay===null&&(!Number.isSafeInteger(expectedRevision)||expectedRevision<1))){
             fail("invalid-argument","A grant, operation and revision are required.");
         }
         return runProtected(request,async(tx,session)=>{
@@ -39,18 +40,40 @@ function createCanonicalResourceCredit({db,FieldValue,HttpsError,runProtected,
                 await Promise.all(refs.map(ref=>tx.get(ref)));
             if(!envelopeSnap.exists||!accountSnap.exists||!economySnap.exists||
                !loadoutSnap.exists||!progressSnap.exists||!checkpointSnap.exists||
-               !grantSnap.exists||!receiptSnap.exists){
+               (dailyDay===null&&(!grantSnap.exists||!receiptSnap.exists))){
                 fail("failed-precondition","Complete canonical sources and reserved grant required.");
             }
             const envelope=inspectExistingEnvelope(envelopeSnap.data(),uid);
             const account=accountSnap.data(),economy=economySnap.data();
-            const grant=grantSnap.data(),receipt=receiptSnap.data();
+            if(dailyDay!==null&&grantSnap.exists){
+                const existing=grantSnap.data();
+                if(existing.eventType!=="daily-checkin"||existing.periodDate!==dailyDay||
+                   existing.amount!==REWARD_GOLD){
+                    fail("data-loss","Daily grant provenance is inconsistent.");
+                }
+            }
+            if(dailyDay!==null&&!grantSnap.exists&&receiptSnap.exists){
+                fail("data-loss","Daily receipt has no grant source.");
+            }
+            if(dailyDay!==null&&grantSnap.exists&&
+               (grantSnap.get("status")==="pending")===receiptSnap.exists){
+                fail("data-loss","Daily reservation and receipt disagree.");
+            }
+            const grant=grantSnap.exists?grantSnap.data():{
+                schemaVersion:1,ownerUid:uid,kind:"gold",source:"server-event",
+                amount:REWARD_GOLD,status:"reserved",claimedByOperationId:operationId};
+            const receipt=receiptSnap.exists?receiptSnap.data():{
+                schemaVersion:1,ownerUid:uid,operationId,grantId,kind:"gold",
+                amount:REWARD_GOLD,creditedToCharacter:false};
             if(envelope.kind!=="current"||envelope.data.authoritativeStateReady!==false||
                account.ownerUid!==uid||account.provenance!=="server-created"||
                economy.ownerUid!==uid||grant.ownerUid!==uid||receipt.ownerUid!==uid||
                grant.schemaVersion!==1||receipt.schemaVersion!==1||
                !["gold","exp"].includes(grant.kind)||grant.source!=="server-event"||
-               grant.claimedByOperationId!==operationId||receipt.operationId!==operationId||
+               (dailyDay!==null&&grant.status==="pending"&&
+                   grant.claimedByOperationId===null?false:
+                   grant.claimedByOperationId!==operationId)||
+               receipt.operationId!==operationId||
                receipt.grantId!==grantId||receipt.kind!==grant.kind||
                !Number.isSafeInteger(grant.amount)||grant.amount<1||grant.amount>100000||
                receipt.amount!==grant.amount||
@@ -85,7 +108,9 @@ function createCanonicalResourceCredit({db,FieldValue,HttpsError,runProtected,
                 return {creditRevision:receipt.creditRevision,unchanged:true,
                     authoritativeStateReady:false};
             }
-            if(grant.status!=="reserved"||receipt.creditedToCharacter!==false||
+            if(!(grant.status==="reserved"||dailyDay!==null&&grant.status==="pending"&&
+                 grant.claimedByOperationId===null&&!receiptSnap.exists)||
+               receipt.creditedToCharacter!==false||
                claimSnap.exists||claimRecordSnap.exists||ledgerSnap.exists||
                otherOperationSnap.exists){
                 fail("failed-precondition","Grant is not available for first credit.");
@@ -162,15 +187,52 @@ function createCanonicalResourceCredit({db,FieldValue,HttpsError,runProtected,
                 kind:grant.kind,amount:grant.amount,
                 balanceAfter:nextRecords.economy[balanceKey],
                 creditRevision:revision,snapshotSha256:bundle.sha256,createdAt:stamp});
-            tx.update(receiptRef,{creditedToCharacter:true,creditRevision:revision,
-                snapshotSha256:bundle.sha256,creditedAt:stamp});
-            tx.update(grantRef,{status:"credited",creditedAt:stamp});
+            if(dailyDay!==null){
+                if(receiptSnap.exists){
+                    tx.update(receiptRef,{creditedToCharacter:true,creditRevision:revision,
+                        snapshotSha256:bundle.sha256,creditedAt:stamp});
+                }else{
+                    tx.create(receiptRef,{schemaVersion:1,ownerUid:uid,operationId,grantId,
+                        kind:"gold",amount:REWARD_GOLD,serverRevision:revision,
+                        creditedToCharacter:true,creditRevision:revision,
+                        snapshotSha256:bundle.sha256,createdAt:stamp,creditedAt:stamp});
+                }
+                if(grantSnap.exists){
+                    tx.update(grantRef,{status:"credited",claimedByOperationId:operationId,
+                        creditedAt:stamp});
+                }else{
+                    tx.create(grantRef,{schemaVersion:1,ownerUid:uid,kind:"gold",
+                        source:"server-event",eventType:"daily-checkin",periodDate:dailyDay,
+                        amount:REWARD_GOLD,status:"credited",claimedByOperationId:operationId,
+                        createdAt:stamp,creditedAt:stamp});
+                }
+            }else{
+                tx.update(receiptRef,{creditedToCharacter:true,creditRevision:revision,
+                    snapshotSha256:bundle.sha256,creditedAt:stamp});
+                tx.update(grantRef,{status:"credited",creditedAt:stamp});
+            }
             tx.update(envelopeRef,{serverRevision:revision,updatedAt:stamp});
             return {creditRevision:revision,unchanged:false,
                 authoritativeStateReady:false};
         });
     }
-    return Object.freeze({creditReservedGrant});
+    async function creditReservedGrant(request,args){
+        return settle(request,{...args,dailyDay:null});
+    }
+    async function claimDailyCheckin(request){
+        if(Object.keys(request.data||{}).sort().join(",")!=="expectedRevision,session,uid"||
+           !Number.isSafeInteger(request.data.expectedRevision)||
+           request.data.expectedRevision<1){
+            fail("invalid-argument","Account, session and expected revision are required.");
+        }
+        // One server clock reading for the entire transaction, including retries.
+        const dailyDay=taipeiDay(Date.now());
+        const grantId=`daily-checkin-${dailyDay}`;
+        const result=await settle(request,{grantId,operationId:`${grantId}-credit`,
+            expectedRevision:request.data.expectedRevision,dailyDay});
+        return {...result,grantId,periodDate:dailyDay};
+    }
+    return Object.freeze({creditReservedGrant,claimDailyCheckin});
 }
 
 module.exports={createCanonicalResourceCredit};

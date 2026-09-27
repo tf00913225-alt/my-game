@@ -71,4 +71,4 @@ function createDailyCheckinGrant({db,FieldValue,HttpsError,runProtected,
     return Object.freeze({issue});
 }
 
-module.exports={createDailyCheckinGrant,taipeiDay};
+module.exports={createDailyCheckinGrant,taipeiDay,REWARD_GOLD};

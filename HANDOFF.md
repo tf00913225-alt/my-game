@@ -1,3 +1,9 @@
+## 2026-09-27 — Atomic protected daily check-in settlement (candidate; Phase 4 0/6 VERIFIED)
+
+- `functions/index.js::claimDailyCheckin` verifies Firebase identity and the active game session. Its request accepts only UID, session and expected server revision. The backend freezes a Taipei calendar day, derives the existing 50-gold check-in grant and deterministic operation ID, then `functions/src/canonical-resource-credit.js::claimDailyCheckin()` commits the grant, receipt, unique claim, claim record/checkpoint, ledger, canonical economy/source revisions and unpublished snapshot in one Firestore transaction. A failed transaction leaves none of those writes; a lost response retries the same receipt without paying twice. The earlier internal `daily-checkin-grant.js::issue()` remains a server-only reservation helper and is not required by this atomic path.
+- `functions/src/session-authority.js::runProtected()` remains the session gate. No client amount, local check-in flag, battle result or character snapshot becomes authoritative. No browser/UI hook, gameplay save wrapper, published pointer, legacy adoption or second-device restore is added. The deployment allowlist includes this callable only after PR checks. Kill/win quests remain blocked on trustworthy battle events.
+- PR, merged HEAD, CI and Firebase deployment evidence must be checked separately. Phase 4 remains **0/6 VERIFIED**.
+
 ## 2026-09-27 — Server-owned daily check-in grant source (candidate; Phase 4 0/6 VERIFIED)
 
 - Internal owner `functions/src/daily-checkin-grant.js::issue()` derives the `checkin` quest's existing 50 gold award and Taipei calendar day from the server clock. A protected transaction creates one UID-scoped `pendingGrants/daily-checkin-YYYYMMDD` record, or validates the same record on retry. A transaction retry keeps its original day; a corrupt duplicate fails closed. No browser day, reward amount, battle result, or local quest counter is accepted.
