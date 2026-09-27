@@ -308,8 +308,8 @@ async function captureRelicPresentationQa(client,relicId,targetKind,mode){
     assert.equal(focus.artProjections.length,expectedArtCount,relicId+" artwork projections must equal canonical target artwork geometry: "+JSON.stringify({mode,side:focus.side,indexes:focus.indexes,artProjections:focus.artProjections,targetDiagnostics:focus.targetDiagnostics}));
     assert.equal(focus.hpProjections.length,expectedHpCount,relicId+" HP projections must equal canonical target HP geometry");
     assert.equal(focus.outlineCount,0,relicId+" must not restore the retired full-Unit outline owner");
-    assert.equal(focus.artGeometryMatches,true,relicId+" foreground artwork projections must match canonical artwork geometry");
-    assert.equal(focus.hpGeometryMatches,true,relicId+" foreground HP projections must match canonical HP geometry");
+    assert.equal(focus.artGeometryMatches,true,relicId+" foreground artwork projections must match canonical artwork geometry: "+JSON.stringify({artProjections:focus.artProjections,targetDiagnostics:focus.targetDiagnostics}));
+    assert.equal(focus.hpGeometryMatches,true,relicId+" foreground HP projections must match canonical HP geometry: "+JSON.stringify({hpProjections:focus.hpProjections,targetDiagnostics:focus.targetDiagnostics}));
     assert.equal(focus.stageOwner,"fixed-slot",relicId+" VFX stage must use Fixed Slot geometry");
     assert.equal(focus.spriteOwner,"fixed-slot",relicId+" VFX sprite must use Fixed Slot geometry");
     assert.equal(focus.spriteTargetSide,focus.side,relicId+" VFX target side drifted from focus side");
