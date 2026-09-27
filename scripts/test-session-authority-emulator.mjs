@@ -278,8 +278,8 @@ const rollbackCheckin=createCanonicalResourceCredit({db,FieldValue,HttpsError,
     })});
 await assert.rejects(rollbackCheckin.claimDailyCheckin(atomicRequest),
     /simulated atomic check-in rollback/);
-assert.equal((await db.doc(`serverUsers/${atomicUid}/pendingGrants`).get()).empty,true);
-assert.equal((await db.doc(`serverUsers/${atomicUid}/ledgerEntries`).get()).empty,true);
+assert.equal((await db.collection(`serverUsers/${atomicUid}/pendingGrants`).get()).empty,true);
+assert.equal((await db.collection(`serverUsers/${atomicUid}/ledgerEntries`).get()).empty,true);
 assert.equal((await db.doc(`serverUsers/${atomicUid}/economy/current`).get()).get("gold"),0);
 await rejected("claimDailyCheckin",atomicUser.idToken,
     {...atomicRequest.data,expectedRevision:1},"CLOUD_REVISION_CONFLICT");
