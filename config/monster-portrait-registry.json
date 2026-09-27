@@ -1281,6 +1281,116 @@
         "status": "cataloged",
         "usedIn": "未定",
         "notes": "持弓人形獵手，外觀可作普通怪，但與其他人形候選需後續取捨。"
+      },
+      {
+        "assetId": "MON_FIRE_ELITE_010",
+        "displayName": "焚鎖炎巫",
+        "element": "fire",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/菁英怪/file_000000000b708211a92314c503198d6f.png",
+        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-elite-010.png",
+        "status": "adopted",
+        "usedIn": "火元素塔 Elite 候選",
+        "notes": "火焰法器、鎖鏈與遠程能量構成，適合施術型精英。"
+      },
+      {
+        "assetId": "MON_FIRE_ELITE_011",
+        "displayName": "熔盾戰鬼",
+        "element": "fire",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/菁英怪/file_0000000012ac82069c6fdedaaaa64660.png",
+        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-elite-011.png",
+        "status": "adopted",
+        "usedIn": "火元素塔 Elite 候選",
+        "notes": "重盾熔岩鬼，護甲與體格具有前排精英定位。"
+      },
+      {
+        "assetId": "MON_FIRE_ELITE_012",
+        "displayName": "炎翎戰姬",
+        "element": "fire",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/菁英怪/file_00000000141081f7b30e758feb6e4de0.png",
+        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-elite-012.png",
+        "status": "adopted",
+        "usedIn": "火元素塔 Elite 候選",
+        "notes": "火羽、長槍與人形戰姬構圖完整，適合高辨識度精英。"
+      },
+      {
+        "assetId": "MON_FIRE_ELITE_013",
+        "displayName": "裂焰鐮蟲",
+        "element": "fire",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/菁英怪/file_000000002e7481f480cf437f43374b04.png",
+        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-elite-013.png",
+        "status": "adopted",
+        "usedIn": "火元素塔 Elite 候選",
+        "notes": "鐮刃肢體與昆蟲身形形成鮮明輪廓，適合作戰型精英。"
+      },
+      {
+        "assetId": "MON_FIRE_ELITE_014",
+        "displayName": "炎鱗蛇后",
+        "element": "fire",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/菁英怪/file_0000000054f4820eb78391ba2a7a7aa3.png",
+        "runtimePath": "assets/monsters/wild/fire-pool/mon-fire-elite-014.png",
+        "status": "adopted",
+        "usedIn": "野怪高階／火元素塔 Elite 候選",
+        "notes": "蛇身、鱗甲與火焰頭冠具高階野怪氣質。"
+      },
+      {
+        "assetId": "MON_FIRE_ELITE_015",
+        "displayName": "燼鐮冥使",
+        "element": "fire",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/菁英怪/file_0000000059fc81f59b5cd12ab7b489c1.png",
+        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-elite-015.png",
+        "status": "adopted",
+        "usedIn": "火元素塔 Elite 候選",
+        "notes": "長柄鐮刀與兜帽死靈構成，適合精英收割者。"
+      },
+      {
+        "assetId": "MON_FIRE_ELITE_016",
+        "displayName": "爐火爆魔",
+        "element": "fire",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/菁英怪/file_0000000063f881f7aaa1f65b8783acd8.png",
+        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-elite-016.png",
+        "status": "adopted",
+        "usedIn": "火元素塔 Elite 候選",
+        "notes": "多罐火焰裝置與爆破特徵鮮明，適合特殊機制精英。"
+      },
+      {
+        "assetId": "MON_FIRE_ELITE_017",
+        "displayName": "炎鎧魔將",
+        "element": "fire",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/菁英怪/file_000000008430820b8b8a6da7013a6477.png",
+        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-elite-017.png",
+        "status": "adopted",
+        "usedIn": "火元素塔 Elite 候選",
+        "notes": "雙翼重甲魔將，威壓足夠但仍維持標準立繪尺度。"
+      },
+      {
+        "assetId": "MON_FIRE_ELITE_018",
+        "displayName": "熔巖巨魁",
+        "element": "fire",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/菁英怪/file_00000000b9c48246b09f8447ab25c8b2.png",
+        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-elite-018.png",
+        "status": "adopted",
+        "usedIn": "火元素塔 Elite 候選",
+        "notes": "巨型熔巖生物與重錘，適合高階精英或塔中段守衛。"
+      },
+      {
+        "assetId": "MON_FIRE_ELITE_019",
+        "displayName": "焦木火魈",
+        "element": "fire",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/菁英怪/file_00000000f7208206a6e1e6b237ddeabf.png",
+        "runtimePath": null,
+        "status": "cataloged",
+        "usedIn": "未定",
+        "notes": "焦木妖魈造型獨特，先保留作精英候選，避免與 Boss 視覺過早重疊。"
       }
     ]
   }
