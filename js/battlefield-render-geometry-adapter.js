@@ -291,6 +291,29 @@
         return {owner:"fixed-slot",rect:rect,center:{x:rect.left+rect.width/2,y:rect.top+rect.height/2}};
     }
 
+    function clampedRatio(value,maximum){
+        const max=Number(maximum), current=Number(value);
+        return Number.isFinite(current)&&Number.isFinite(max)&&max>0?Math.max(0,Math.min(1,current/max)):0;
+    }
+    function resourceStateFor(side,index){
+        if(side==="monster"){
+            const entity=typeof monsters!=="undefined"&&Array.isArray(monsters)?monsters[index]:null;
+            return entity?{hpRatio:clampedRatio(entity.hp,entity.maxHP),spRatio:clampedRatio(entity.sp,entity.maxSP),shieldRatio:0}:null;
+        }
+        const entity=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(index):null;
+        const stats=typeof getPartyBattleStats==="function"?getPartyBattleStats(index):null;
+        const shield=entity&&Array.isArray(entity.activeBuffs)?entity.activeBuffs.find(effect=>effect&&effect.type==="shield"&&Number(effect.turnsLeft)>0&&Number(effect.remaining)>0):null;
+        return entity&&stats?{
+            hpRatio:clampedRatio(entity.hp,stats.maxHP),
+            spRatio:clampedRatio(entity.sp,stats.maxSP),
+            shieldRatio:shield?clampedRatio(shield.remaining,stats.maxHP):0
+        }:null;
+    }
+    function projectionFor(node,ratio,shieldRatio){
+        const rect=node&&typeof node.getBoundingClientRect==="function"?plainRect(node.getBoundingClientRect()):null;
+        return rect&&rect.width>0&&rect.height>0?{rect:rect,ratio:ratio,shieldRatio:shieldRatio||0}:null;
+    }
+
     function unitGeometry(side,index){
         const targetSide=side==="monster"?"monster":"player";
         const unitIndex=Number(index);
@@ -318,10 +341,13 @@
             ".monster-hp,.monster-sp,.hp-bar,.sp-bar,.battle-monster-name,.battle-player-id,.monster-status-badges"
         ));
         const hpNodes=Array.from(card.querySelectorAll(".monster-hp,.hp-bar,.battle-hp-bar,.player-hp-bar,[data-hud=\"hp\"],[data-stat=\"hp\"]"));
-        const hpRects=hpNodes.map(node=>typeof node.getBoundingClientRect==="function"?plainRect(node.getBoundingClientRect()):null).filter(rect=>rect&&rect.width>0&&rect.height>0);
-        const hpRect=hpRects.length?hpRects.reduce((acc,rect)=>({left:Math.min(acc.left,rect.left),top:Math.min(acc.top,rect.top),right:Math.max(acc.right,rect.right),bottom:Math.max(acc.bottom,rect.bottom),width:Math.max(acc.right,rect.right)-Math.min(acc.left,rect.left),height:Math.max(acc.bottom,rect.bottom)-Math.min(acc.top,rect.top)})):null;
+        const spNodes=Array.from(card.querySelectorAll(".monster-sp,.sp-bar,.battle-sp-bar,.player-sp-bar,[data-hud=\"sp\"],[data-stat=\"sp\"]"));
+        const resourceState=resourceStateFor(targetSide,unitIndex);
+        const hpProjection=projectionFor(hpNodes[0],resourceState&&resourceState.hpRatio,resourceState&&resourceState.shieldRatio);
+        const spProjection=projectionFor(spNodes[0],resourceState&&resourceState.spRatio,0);
+        const hpRect=hpProjection&&hpProjection.rect;
+        const spRect=spProjection&&spProjection.rect;
         const artworkProjection=art&&portraitRect?{rect:portraitRect,backgroundImage:String(art.style&&art.style.backgroundImage||window.getComputedStyle(art).backgroundImage||""),backgroundSize:String(art.style&&art.style.backgroundSize||window.getComputedStyle(art).backgroundSize||"contain"),backgroundPosition:String(art.style&&art.style.backgroundPosition||window.getComputedStyle(art).backgroundPosition||"center"),backgroundRepeat:String(art.style&&art.style.backgroundRepeat||window.getComputedStyle(art).backgroundRepeat||"no-repeat")} : null;
-        const hpProjection=hpNodes[0]&&hpRect?{rect:hpRect,html:String(hpNodes[0].outerHTML||"")} : null;
         const hudRects=hudNodes
             .map(node=>typeof node.getBoundingClientRect==="function"?plainRect(node.getBoundingClientRect()):null)
             .filter(rect=>rect&&rect.width>0&&rect.height>0);
@@ -350,7 +376,7 @@
 
         return {
             owner:"fixed-slot",side:targetSide,index:unitIndex,slot:slot,
-            unitRect:unitRect,portraitRect:portraitRect,hpRect:hpRect,artworkProjection:artworkProjection,hpProjection:hpProjection,hudSafeRect:hudSafeRect,
+            unitRect:unitRect,portraitRect:portraitRect,hpRect:hpRect,spRect:spRect,artworkProjection:artworkProjection,hpProjection:hpProjection,spProjection:spProjection,hudSafeRect:hudSafeRect,
             feedbackSafeRect:feedbackSafeRect,
             center:{x:unitRect.left+unitRect.width/2,y:unitRect.top+unitRect.height/2},
             feedbackAnchor:{
