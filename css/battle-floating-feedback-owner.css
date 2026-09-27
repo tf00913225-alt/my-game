@@ -31,17 +31,17 @@ body > .battle-floating-feedback.is-critical{
     animation-name:battleFloatingFeedbackCritical;
 }
 @keyframes battleFloatingFeedback{
-    0%{opacity:0;transform:translate(-50%,4px) scale(.88)}
-    12%{opacity:1;transform:translate(-50%,-3px) scale(1.08)}
-    72%{opacity:1;transform:translate(-50%,-10px) scale(1)}
-    100%{opacity:0;transform:translate(-50%,-22px) scale(1)}
+    0%{opacity:0;transform:translate(-50%,calc(-100% + 4px)) scale(.88)}
+    12%{opacity:1;transform:translate(-50%,calc(-100% - 3px)) scale(1.08)}
+    72%{opacity:1;transform:translate(-50%,calc(-100% - 10px)) scale(1)}
+    100%{opacity:0;transform:translate(-50%,calc(-100% - 22px)) scale(1)}
 }
 @keyframes battleFloatingFeedbackCritical{
-    0%{opacity:0;transform:translate(-50%,7px) scale(.68) rotate(-4deg)}
-    14%{opacity:1;transform:translate(-50%,-7px) scale(1.18) rotate(3deg)}
-    34%{transform:translate(-50%,-6px) scale(1.04) rotate(-1deg)}
-    72%{opacity:1;transform:translate(-50%,-12px) scale(1)}
-    100%{opacity:0;transform:translate(-50%,-25px) scale(1)}
+    0%{opacity:0;transform:translate(-50%,calc(-100% + 5px)) scale(.68) rotate(-4deg)}
+    14%{opacity:1;transform:translate(-50%,calc(-100% - 7px)) scale(1.18) rotate(3deg)}
+    34%{transform:translate(-50%,calc(-100% - 6px)) scale(1.04) rotate(-1deg)}
+    72%{opacity:1;transform:translate(-50%,calc(-100% - 12px)) scale(1)}
+    100%{opacity:0;transform:translate(-50%,calc(-100% - 25px)) scale(1)}
 }
 .battle-player.battle-escape-presenting{
     will-change:transform,opacity;
