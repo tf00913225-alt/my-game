@@ -181,7 +181,7 @@
     {
       "id": "REQ-VISUAL-READY-20260927",
       "title": "每日副本立繪與玩法首屏美術 Visual Ready 契約收斂",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
         "files": [
           "js/45-v154-dev-fixes.js",
@@ -191,8 +191,8 @@
           "css/gameplay-boss-tower.css",
           "tests/visual-ready-contract-20260927.test.js"
         ],
-        "verification": "Local targeted regression test, production build/build:check、Repository checks、CI、Cloudflare DEV deployment 與手機 Browser QA 待完成",
-        "result": "已完成 source owner 收斂與自動化測試，尚未宣告 VERIFIED"
+        "verification": "targeted regression、production build/build:check、PR #635 CI #3400、dev CI #3401、Cloudflare DEV deployment gate 與 360×800／393×873／412×915 gameplay cover browser QA",
+        "result": "Daily Registry Pending／Ready／Failed、三張副本立繪 decode gate、Gameplay Hub critical artwork gate 與 dark fallback 均已驗證；部署 SHA 與 dev HEAD 一致"
       }
     }
   ]
