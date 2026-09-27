@@ -72,13 +72,15 @@ assert.doesNotMatch(v146,/className="v146-status-popup/,"V146 must not create it
 assert.match(geometry,/getUnitGeometry:unitGeometry/);
 assert.match(geometry,/getBattlefieldOverlayGeometry:battlefieldOverlayGeometry/);
 assert.match(geometry,/hpRect:hpRect/);
-assert.match(geometry,/highlightRects:highlightRects/);
+assert.match(geometry,/artworkProjection:artworkProjection/);
+assert.match(geometry,/hpProjection:hpProjection/);
+assert.doesNotMatch(geometry,/highlightRects:/,"rectangle highlight geometry is retired");
 assert.doesNotMatch(geometry,/wrapDamagePopup/);
 assert.doesNotMatch(geometry,/wrapMissPopup/);
 
 assert.match(feedback,/const MAX_LANES=4/);
 assert.match(feedback,/context\.queue\.push\(request\)/);
-assert.match(feedback,/STATUS_PRESENTATION_SEMANTICS/);
+assert.doesNotMatch(feedback,/STATUS_PRESENTATION_SEMANTICS/,"status type no longer owns popup colour");
 assert.match(feedback,/phaseOrder/);
 assert.match(feedback,/if\(lane<0\)\{ break; \}/);
 assert.match(feedback,/geometry\.feedbackSafeRect/);
