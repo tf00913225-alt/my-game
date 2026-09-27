@@ -5671,6 +5671,13 @@ body.quest-scroll-active,
 }
 
 /* Deep Abyss uses the same five-slot bottom navigation as Daily Dungeon. */
+#game-stage #mapPageNav,
+#game-stage #v141DungeonNav{
+    background:linear-gradient(0deg,#0e0c0a,#1c1712);
+    border:0;
+    border-radius:0;
+    box-sizing:border-box;
+}
 #game-stage #v146AbyssReturn{display:none !important;}
 #game-stage #v141DungeonNav,
 #game-stage #v141DungeonNav[data-v146-columns="4"],

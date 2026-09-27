@@ -31,10 +31,10 @@ html,body{margin:0;width:${width}px;height:${height}px;overflow:hidden;backgroun
 .gameplay-large-panel{width:calc(100% - 24px);height:calc(100% - 24px);}
 </style></head><body>
 <div id="game-stage"><div class="gameplay-page active"><section class="gameplay-large-panel"><div class="gameplay-panel-scroll"><div class="gameplay-hub-grid">
-<button class="gameplay-mode-card boss"><span class="gameplay-mode-copy"><h3>BOSS</h3><p>個人 BOSS・世界 BOSS</p><span class="gameplay-mode-status">新的個人 BOSS 可攻略</span></span><span class="gameplay-mode-seal">戰</span></button>
-<button class="gameplay-mode-card tower"><span class="gameplay-mode-copy"><h3>四象塔</h3><p>本週試煉：火元素</p><span class="gameplay-mode-status">目前最高樓層：0 / 100</span></span><span class="gameplay-mode-seal">塔</span></button>
-<button class="gameplay-mode-card abyss"><span class="gameplay-mode-copy"><h3>深淵</h3><p>永久高難挑戰</p><span class="gameplay-mode-status">Lv20 未通關</span></span><span class="gameplay-mode-seal">淵</span></button>
-<div class="gameplay-mode-card coming-soon"><span class="gameplay-mode-copy"><h3>更多玩法</h3><p>新的特殊戰鬥將統一收錄於此</p></span><span class="gameplay-mode-seal">待</span></div>
+<button class="gameplay-mode-card boss"><span class="gameplay-mode-copy"><h3>BOSS</h3><p>個人 BOSS・世界 BOSS</p><span class="gameplay-mode-status">新的個人 BOSS 可攻略</span></span></button>
+<button class="gameplay-mode-card tower"><span class="gameplay-mode-copy"><h3>四象塔</h3><p>本週試煉：火元素</p><span class="gameplay-mode-status">目前最高樓層：0 / 100</span></span></button>
+<button class="gameplay-mode-card abyss"><span class="gameplay-mode-copy"><h3>深淵</h3><p>永久高難挑戰</p><span class="gameplay-mode-status">Lv20 未通關</span></span></button>
+<div class="gameplay-mode-card coming-soon"><span class="gameplay-mode-copy"><h3>更多玩法</h3><p>新的特殊戰鬥將統一收錄於此</p></span></div>
 </div></div></section></div></div>
 <pre id="result"></pre>
 <script>

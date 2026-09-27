@@ -249,10 +249,10 @@
         if(!content){ return; }
         const tower=state.tower,element=ELEMENTS[tower.element];
         content.innerHTML=
-            '<button type="button" class="gameplay-mode-card boss" onclick="vGameplayOpenBoss()"><span class="gameplay-mode-copy"><h3>BOSS</h3><p>個人 BOSS・世界 BOSS</p><span class="gameplay-mode-status">'+escapeHtml(bossHubSummary())+'</span></span><span class="gameplay-mode-seal">戰</span></button>'+
-            '<button type="button" class="gameplay-mode-card tower" onclick="vGameplayOpenTower()"><span class="gameplay-mode-copy"><h3>四象塔</h3><p>本週試煉：'+escapeHtml(element.label)+'元素</p><span class="gameplay-mode-status">目前最高樓層：'+tower.highestThisWeek+' / 100</span></span><span class="gameplay-mode-seal">塔</span></button>'+
-            '<button type="button" class="gameplay-mode-card abyss" onclick="vGameplayOpenAbyss()"><span class="gameplay-mode-copy"><h3>深淵</h3><p>永久高難挑戰</p><span class="gameplay-mode-status">'+escapeHtml(abyssSummary())+'</span></span><span class="gameplay-mode-seal">淵</span></button>'+
-            '<div class="gameplay-mode-card coming-soon" aria-disabled="true"><span class="gameplay-mode-copy"><h3>更多玩法</h3><p>新的特殊戰鬥將統一收錄於此</p><span class="gameplay-mode-status">尚未開放</span></span><span class="gameplay-mode-seal">待</span></div>';
+            '<button type="button" class="gameplay-mode-card boss" onclick="vGameplayOpenBoss()"><span class="gameplay-mode-copy"><h3>BOSS</h3><p>個人 BOSS・世界 BOSS</p><span class="gameplay-mode-status">'+escapeHtml(bossHubSummary())+'</span></span></button>'+
+            '<button type="button" class="gameplay-mode-card tower" onclick="vGameplayOpenTower()"><span class="gameplay-mode-copy"><h3>四象塔</h3><p>本週試煉：'+escapeHtml(element.label)+'元素</p><span class="gameplay-mode-status">目前最高樓層：'+tower.highestThisWeek+' / 100</span></span></button>'+
+            '<button type="button" class="gameplay-mode-card abyss" onclick="vGameplayOpenAbyss()"><span class="gameplay-mode-copy"><h3>深淵</h3><p>永久高難挑戰</p><span class="gameplay-mode-status">'+escapeHtml(abyssSummary())+'</span></button>'+
+            '<div class="gameplay-mode-card coming-soon" aria-disabled="true"><span class="gameplay-mode-copy"><h3>更多玩法</h3><p>新的特殊戰鬥將統一收錄於此</p><span class="gameplay-mode-status">尚未開放</span></span></div>';
     }
 
     function bossListMarkup(type){

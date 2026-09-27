@@ -250,6 +250,7 @@ test("compact UI and daily cover scaffolding meet the mobile layout requirements
     assert.match(uiSource,/v148SyncContextNavigation/);
     assert.match(uiSource,/v141-dungeon-return/);
     assert.match(cssSource,/\.v141-dungeon-active #bottomNav,[\s\S]*\.v148-context-nav-active #bottomNav\{display:none !important;\}/);
+    assert.doesNotMatch(finalNavSource,/bottom-nav map-page-nav v141-dungeon-nav/);
 });
 
 test("new blueprints encode part, tier and series while legacy saves remain selectable",()=>{
