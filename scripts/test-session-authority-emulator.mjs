@@ -472,6 +472,80 @@ assert.equal((await capRoot.collection("operations")
     .doc("allocate-exp-at-curve-boundary-0001").get()).exists,false);
 assert.equal((await capRoot.collection("economy").doc("current").get()).get("sharedExp"),120);
 
+// A server-owned item, equipment reference and relic survive both resource
+// credit and EXP allocation. This is an emulator-only source fixture, not a
+// browser item grant or player-facing inventory writer.
+const ownedUser=await login("accounts:signUp",{
+    email:"session-owned-sources@example.test",password});
+const ownedUid=ownedUser.localId;
+const ownedSession=await invoke("createGameSession",ownedUser.idToken,{uid:ownedUid});
+await invoke("bootstrapCloudSave",ownedUser.idToken,{
+    uid:ownedUid,session:ownedSession});
+const ownedOperation="initial-owned-sources-0001";
+const ownedRequest={auth:{uid:ownedUid,token:claims(ownedUser.idToken)},
+    data:{uid:ownedUid,session:ownedSession}};
+await initialWriter.commitInitialSources(ownedRequest,{
+    operationId:ownedOperation,expectedRevision:1,selection:choices});
+const ownedRecords=makeInitialCharacterSources(ownedUid,2,ownedOperation,choices);
+const ownedBase={schemaVersion:1,ownerUid:ownedUid,serverRevision:2,
+    provenance:"server-created"};
+const ownedItemId="server-owned-starter-blade-0001";
+const ownedCharacterId=ownedRecords.account.slots[0];
+ownedRecords.inventory=[{...ownedBase,ownedItemId,location:"equipped",
+    state:{id:"starter-blade",type:"weapon",count:1}}];
+ownedRecords.equipment=[{...ownedBase,characterId:ownedCharacterId,
+    slot:"hand",ownedItemId}];
+ownedRecords.relics=[{...ownedBase,relicId:"starter-relic-0001",
+    unlocked:true,level:1,exp:0}];
+ownedRecords.economy.sharedExp=320;
+const ownedBundle=assembleCanonicalSnapshot(ownedUid,2,ownedRecords);
+const ownedRoot=db.collection("serverUsers").doc(ownedUid);
+const ownedItemRef=ownedRoot.collection("inventory").doc(ownedItemId);
+const ownedEquipRef=ownedRoot.collection("equipment").doc(
+    `${ownedCharacterId}_hand`);
+const ownedRelicRef=ownedRoot.collection("relics").doc("starter-relic-0001");
+await Promise.all([
+    ownedItemRef.set(ownedRecords.inventory[0]),
+    ownedEquipRef.set(ownedRecords.equipment[0]),
+    ownedRelicRef.set(ownedRecords.relics[0]),
+    ownedRoot.collection("economy").doc("current").update({sharedExp:320}),
+    ownedRoot.collection("account").doc("current")
+        .update({snapshotSha256:ownedBundle.sha256}),
+    ownedRoot.collection("playableSnapshots").doc("2").set(ownedBundle)
+]);
+const ownedGrant="grant-owned-source-gold-0001";
+const ownedCreditOperation="credit-owned-source-gold-0001";
+await ownedRoot.collection("pendingGrants").doc(ownedGrant).set({
+    schemaVersion:1,ownerUid:ownedUid,kind:"gold",source:"server-event",
+    amount:10,status:"pending",claimedByOperationId:null,
+    createdAt:Timestamp.now()
+});
+await invoke("reserveTrustedGrant",ownedUser.idToken,{
+    uid:ownedUid,session:ownedSession,grantId:ownedGrant,
+    operationId:ownedCreditOperation,expectedRevision:2});
+await goldWriter.creditReservedGrant(ownedRequest,{
+    grantId:ownedGrant,operationId:ownedCreditOperation,expectedRevision:3});
+assert.equal((await ownedItemRef.get()).get("serverRevision"),4);
+assert.equal((await ownedEquipRef.get()).get("serverRevision"),4);
+assert.equal((await ownedRelicRef.get()).get("serverRevision"),4);
+const ownedAllocation="allocate-owned-source-exp-0001";
+await ownedEquipRef.update({ownedItemId:"missing-owned-item"});
+await assert.rejects(expAllocator.allocateSharedExp(ownedRequest,{
+    operationId:ownedAllocation,expectedRevision:4}),
+    error=>error.code==="data-loss");
+assert.equal((await ownedRoot.collection("operations").doc(ownedAllocation).get()).exists,false);
+assert.equal((await ownedRoot.collection("economy").doc("current").get()).get("sharedExp"),320);
+await ownedEquipRef.update({ownedItemId});
+const ownedAllocated=await expAllocator.allocateSharedExp(ownedRequest,{
+    operationId:ownedAllocation,expectedRevision:4});
+assert.equal(ownedAllocated.allocatedRevision,5);
+assert.equal((await ownedItemRef.get()).get("serverRevision"),5);
+assert.equal((await ownedEquipRef.get()).get("ownedItemId"),ownedItemId);
+assert.equal((await ownedEquipRef.get()).get("serverRevision"),5);
+assert.equal((await ownedRelicRef.get()).get("serverRevision"),5);
+assert.equal((await ownedRoot.collection("economy").doc("current").get()).get("sharedExp"),20);
+assert.equal((await ownedRoot.collection("playableSnapshots").doc("5").get())
+    .get("readyForPublication"),false);
 // The opposite order is fenced too: a reserved grant cannot become a new
 // character's operation receipt under the same UID.
 const collisionUser=await login("accounts:signUp",{
