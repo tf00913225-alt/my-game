@@ -10,6 +10,7 @@ const {HttpsError}=require("firebase-functions/v2/https");
 const {createSessionAuthority}=require("../functions/src/session-authority.js");
 const {createCanonicalSourceWriter}=require("../functions/src/canonical-source-writer.js");
 const {createCanonicalResourceCredit}=require("../functions/src/canonical-resource-credit.js");
+const {createDailyCheckinGrant}=require("../functions/src/daily-checkin-grant.js");
 const {createCanonicalExpAllocation}=require("../functions/src/canonical-exp-allocation.js");
 const {createCanonicalAttributeAllocation}=
     require("../functions/src/canonical-attribute-allocation.js");
@@ -254,6 +255,33 @@ await assert.rejects(initialWriter.commitInitialSources(yRequest,
     {...initialArgs,operationId:"initial-character-emulator-0002",expectedRevision:2}),
     error=>error.code==="failed-precondition");
 assert.equal((await db.doc(`users/${y}/saves/current`).get()).get("authoritativeStateReady"),false);
+// The server day and the 50 gold award are owned by the issuer, not the request.
+let checkinTime=Date.parse("2026-09-27T15:59:59Z");
+let abortCheckin=false;
+const checkinIssuer=createDailyCheckinGrant({db,FieldValue,HttpsError,
+    inspectExistingEnvelope,now:()=>checkinTime,
+    runProtected:(request,operation)=>writerSessions.runProtected(request,async(tx,session)=>{
+        const result=await operation(tx,session);
+        if(abortCheckin){throw new Error("simulated check-in rollback");}
+        return result;
+    })});
+const checkinRef=db.doc(`serverUsers/${y}/pendingGrants/daily-checkin-20260927`);
+await assert.rejects(checkinIssuer.issue({auth:{uid:x,token:claims(b.idToken)},
+    data:{uid:x,session:sessionB}}),error=>error.code==="failed-precondition");
+abortCheckin=true;
+await assert.rejects(checkinIssuer.issue(yRequest),/simulated check-in rollback/);
+abortCheckin=false;
+assert.equal((await checkinRef.get()).exists,false);
+assert.equal((await checkinIssuer.issue(yRequest)).grantId,"daily-checkin-20260927");
+assert.equal((await checkinIssuer.issue(yRequest)).unchanged,true);
+assert.equal((await checkinRef.get()).get("amount"),50);
+assert.equal((await db.doc(`users/${y}/saves/current`).get()).get("serverRevision"),2);
+checkinTime=Date.parse("2026-09-27T16:00:00Z");
+assert.equal((await checkinIssuer.issue(yRequest)).grantId,"daily-checkin-20260928");
+await checkinRef.update({amount:5000});
+checkinTime=Date.parse("2026-09-27T15:59:59Z");
+await assert.rejects(checkinIssuer.issue(yRequest),error=>error.code==="data-loss");
+await checkinRef.update({amount:50});
 const candidateUser=await login("accounts:signUp",{email:"session-candidate@example.test",password});
 const candidateUid=candidateUser.localId;
 const candidateSession=await invoke("createGameSession",candidateUser.idToken,{uid:candidateUid});
@@ -643,6 +671,22 @@ assert.equal((await db.doc(`users/${y}/saves/current`).get()).get("authoritative
 await rejected("protectedTest",yUser.idToken,{uid:x,session:sessionB},"SESSION_INVALID");
 await rejected("protectedTest",yUser.idToken,{uid:y,session:{...sessionB,uid:y}},"SESSION_INVALID");
 assert.equal((await invoke("protectedTest",yUser.idToken,{uid:y,session:sessionY})).uid,y);
+const beforeCheckin=(await db.doc(`users/${y}/saves/current`).get()).get("serverRevision");
+const checkinOperation="daily-checkin-credit-emulator-0001";
+const reservedCheckin=await invoke("reserveTrustedGrant",yUser.idToken,{
+    uid:y,session:sessionY,grantId:"daily-checkin-20260927",
+    operationId:checkinOperation,expectedRevision:beforeCheckin});
+assert.equal(reservedCheckin.serverRevision,beforeCheckin+1);
+assert.equal((await checkinIssuer.issue(yRequest)).status,"reserved");
+const settledCheckin=await goldWriter.creditReservedGrant(yRequest,{
+    grantId:"daily-checkin-20260927",operationId:checkinOperation,
+    expectedRevision:beforeCheckin+1});
+assert.equal(settledCheckin.creditRevision,beforeCheckin+2);
+assert.equal((await checkinIssuer.issue(yRequest)).status,"credited");
+assert.equal((await db.doc(`serverUsers/${y}/claimRecords/daily-checkin-20260927`).get())
+    .get("status"),"claimed");
+assert.equal((await db.doc(`serverUsers/${y}/playableSnapshots/${beforeCheckin+2}`).get())
+    .get("readyForPublication"),false);
 await rejected("screenLegacyMigrationCandidate",yUser.idToken,{...screenIntent,uid:y,session:sessionY},"FAILED_PRECONDITION");
 async function rulesRequest(path,token,method="GET"){
     const response=await fetch(`http://127.0.0.1:18080/v1/projects/${project}/databases/(default)/documents/${path}`,{
