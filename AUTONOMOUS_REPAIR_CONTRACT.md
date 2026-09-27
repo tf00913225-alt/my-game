@@ -14,7 +14,9 @@
 
 本契約的目的，是讓後續任何新對話、Codex（程式代理）、GPT（生成式預訓練模型）或其他開發代理，在收到《四象江湖傳》的修復型任務時，不需要使用者重貼整段規則，也能依固定邊界自主完成低風險修復。
 
-本契約只授權「受控自主修復」，不是一般性的自由修改授權。\n\n所有實際修復施工同時受 `docs/CHANGE_SAFETY_REPLACEMENT_CONTRACT.md` 約束；自主修復權限不代表可以用 Wrapper（包裝器）、late patch、`!important`、`display:none` 或過時測試去掩蓋未完成的 Owner／Contract／Lifecycle／Semantic State 遷移。
+本契約只授權「受控自主修復」，不是一般性的自由修改授權。
+
+所有實際修復施工同時受 `docs/CHANGE_SAFETY_REPLACEMENT_CONTRACT.md` 約束；自主修復權限不代表可以用 Wrapper（包裝器）、late patch、`!important`、`display:none` 或過時測試去掩蓋未完成的 Owner／Contract／Lifecycle／Semantic State 遷移。
 
 ---
 
@@ -45,7 +47,8 @@
 3. `HANDOFF.md`
 4. `ARCHITECTURE_RULES.md`
 5. `UI_GUIDELINES.md`（若任務涉及 UI／版面／視覺）
-6. `docs/CHANGE_SAFETY_REPLACEMENT_CONTRACT.md`\n7. `AUTONOMOUS_REPAIR_CONTRACT.md`（本文件）
+6. `docs/CHANGE_SAFETY_REPLACEMENT_CONTRACT.md`
+7. `AUTONOMOUS_REPAIR_CONTRACT.md`（本文件）
 
 不得只依賴舊對話摘要、記憶中的 SHA（提交雜湊）或過去的工作分支狀態。
 
