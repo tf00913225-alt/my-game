@@ -11,6 +11,8 @@ const {createSessionAuthority}=require("../functions/src/session-authority.js");
 const {createCanonicalSourceWriter}=require("../functions/src/canonical-source-writer.js");
 const {createCanonicalResourceCredit}=require("../functions/src/canonical-resource-credit.js");
 const {createCanonicalExpAllocation}=require("../functions/src/canonical-exp-allocation.js");
+const {createCanonicalAttributeAllocation}=
+    require("../functions/src/canonical-attribute-allocation.js");
 const {makeInitialCharacterSources}=require("../functions/src/initial-character-sources.js");
 const {assembleCanonicalSnapshot}=require("../functions/src/canonical-snapshot.js");
 const {inspectExistingEnvelope,nextRevision}=require("../functions/src/cloud-save-envelope.js");
@@ -546,6 +548,51 @@ assert.equal((await ownedRelicRef.get()).get("serverRevision"),5);
 assert.equal((await ownedRoot.collection("economy").doc("current").get()).get("sharedExp"),20);
 assert.equal((await ownedRoot.collection("playableSnapshots").doc("5").get())
     .get("readyForPublication"),false);
+// Spend one server-earned ability point without accepting a browser stat value
+// or refilling current HP/SP. Retain equipped ownership in the same revision.
+const attributeAllocator=createCanonicalAttributeAllocation({db,FieldValue,HttpsError,
+    inspectExistingEnvelope,nextRevision,runProtected:writerSessions.runProtected});
+const attributeOperation="allocate-attribute-vitality-0001";
+const attributeArgs={operationId:attributeOperation,expectedRevision:5,stat:"vitality"};
+await assert.rejects(attributeAllocator.allocateAttributePoint(ownedRequest,
+    {...attributeArgs,stat:"gold"}),error=>error.code==="invalid-argument");
+await assert.rejects(attributeAllocator.allocateAttributePoint(ownedRequest,
+    {...attributeArgs,expectedRevision:4}),error=>error.code==="aborted");
+let abortAttribute=true;
+const rollbackAttribute=createCanonicalAttributeAllocation({db,FieldValue,HttpsError,
+    inspectExistingEnvelope,nextRevision,
+    runProtected:(request,operation)=>writerSessions.runProtected(request,async(tx,session)=>{
+        const result=await operation(tx,session);
+        if(abortAttribute){throw new Error("simulated attribute rollback");}
+        return result;
+    })});
+await assert.rejects(rollbackAttribute.allocateAttributePoint(ownedRequest,attributeArgs),
+    /simulated attribute rollback/);
+abortAttribute=false;
+assert.equal((await ownedRoot.collection("operations").doc(attributeOperation).get()).exists,false);
+assert.equal((await db.doc(`users/${ownedUid}/saves/current`).get()).get("serverRevision"),5);
+const assigned=await attributeAllocator.allocateAttributePoint(ownedRequest,attributeArgs);
+assert.equal(assigned.allocatedRevision,6);
+assert.equal(assigned.statAfter,3);
+assert.equal(assigned.pointsAfter,4);
+const assignedState=(await ownedRoot.collection("characters")
+    .doc(ownedCharacterId).get()).get("state");
+assert.equal(assignedState.hp,200);
+assert.equal(assignedState.sp,80);
+assert.equal(assignedState.vitality,3);
+assert.equal(assignedState.attributePoints,4);
+assert.equal((await ownedItemRef.get()).get("serverRevision"),6);
+assert.equal((await ownedEquipRef.get()).get("ownedItemId"),ownedItemId);
+assert.equal((await ownedRelicRef.get()).get("serverRevision"),6);
+assert.equal((await ownedRoot.collection("ledgerEntries")
+    .doc(attributeOperation).get()).get("amount"),-1);
+assert.equal((await ownedRoot.collection("playableSnapshots").doc("6").get())
+    .get("readyForPublication"),false);
+assert.equal((await attributeAllocator.allocateAttributePoint(ownedRequest,attributeArgs))
+    .unchanged,true);
+await assert.rejects(attributeAllocator.allocateAttributePoint(ownedRequest,{
+    operationId:ownedCreditOperation,expectedRevision:6,stat:"vitality"}),
+    error=>error.code==="failed-precondition");
 // The opposite order is fenced too: a reserved grant cannot become a new
 // character's operation receipt under the same UID.
 const collisionUser=await login("accounts:signUp",{
