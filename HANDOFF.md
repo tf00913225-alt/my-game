@@ -1,3 +1,8 @@
+## 2026-09-27 — Canonical one-level EXP allocation (candidate; Phase 4 0/6 VERIFIED)
+
+- New internal owner `functions/src/canonical-exp-allocation.js::allocateSharedExp()` spends only the server-owned shared EXP pool for the first server-created character. One protected operation buys exactly one next level using the current game's cost and growth rules. It commits character/economy/source revisions, an unpublished snapshot, a UID-scoped operation receipt and a ledger entry atomically; retries return that receipt.
+- The module has no callable export, browser cost/stats input, local `saveGame()` hook, inventory handling or legacy adoption. It cannot publish a playable snapshot and does not establish a backup or restoration point. Phase 4 remains **0/6 VERIFIED**; PR/CI/deployment evidence is pending.
+
 ## 2026-09-27 — Trusted EXP pool settlement (candidate; Phase 4 0/6 VERIFIED)
 
 - Internal resource settlement owner is `functions/src/canonical-resource-credit.js::creditReservedGrant()`, evolved from the prior gold-only owner. It credits only a backend-issued gold or EXP grant already reserved under the active UID session and expected revision; EXP enters `economy.sharedExp` and does not level a character. `functions/src/trusted-grant-ledger.js::reserve()` remains the single public entitlement reservation owner. The browser cannot submit kind or amount.
