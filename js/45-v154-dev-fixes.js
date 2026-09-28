@@ -69,6 +69,15 @@
             if(byName.has(target.name)){ duplicateNames.add(target.name); }
             else{ byName.set(target.name,target); }
         });
+        const assetPoolEntries=registry.assetPool&&Array.isArray(registry.assetPool.entries)?registry.assetPool.entries:[];
+        assetPoolEntries.forEach(entry=>{
+            if(entry.status!=="adopted"||!entry.assetId||!entry.runtimePath){ return; }
+            const tier=String(entry.tier||"normal");
+            const record={group:"assetPool",portraitKey:entry.assetId,name:entry.displayName||entry.assetId,element:entry.element||"fire",rank:tier==="elite"?"elite":(tier==="miniboss"?"boss":"regular"),sizeClass:tier==="miniboss"?"boss":"standard",path:entry.runtimePath,status:"existing",assetId:entry.assetId,tier:tier};
+            byKey.set(entry.assetId,record);
+            if(byName.has(entry.displayName)){ duplicateNames.add(entry.displayName); }
+            else{ byName.set(entry.displayName,record); }
+        });
         duplicateNames.forEach(name=>byName.delete(name));
         monsterPortraitRegistry=registry;
         monsterPortraitByKey=byKey;

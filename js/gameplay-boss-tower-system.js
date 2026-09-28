@@ -483,6 +483,13 @@
             return monster;
         });
     }
+    const FIRE_TOWER_PORTRAIT_PLAN=Object.freeze({"normalByBand":[["MON_FIRE_NORMAL_001","MON_FIRE_NORMAL_003"],["MON_FIRE_NORMAL_002","MON_FIRE_NORMAL_005"],["MON_FIRE_NORMAL_006","MON_FIRE_NORMAL_007"],["MON_FIRE_NORMAL_008","MON_FIRE_NORMAL_009"],["MON_FIRE_NORMAL_010","MON_FIRE_NORMAL_001"],["MON_FIRE_NORMAL_003","MON_FIRE_NORMAL_005"],["MON_FIRE_NORMAL_002","MON_FIRE_NORMAL_006"],["MON_FIRE_NORMAL_007","MON_FIRE_NORMAL_008"],["MON_FIRE_NORMAL_009","MON_FIRE_NORMAL_010"],["MON_FIRE_NORMAL_001","MON_FIRE_NORMAL_004"]],"eliteByBand":[["MON_FIRE_ELITE_001","MON_FIRE_ELITE_002"],["MON_FIRE_ELITE_003","MON_FIRE_ELITE_004"],["MON_FIRE_ELITE_005","MON_FIRE_ELITE_006"],["MON_FIRE_ELITE_007","MON_FIRE_ELITE_008"],["MON_FIRE_ELITE_009","MON_FIRE_ELITE_010"],["MON_FIRE_ELITE_011","MON_FIRE_ELITE_012"],["MON_FIRE_ELITE_013","MON_FIRE_ELITE_014"],["MON_FIRE_ELITE_015","MON_FIRE_ELITE_016"],["MON_FIRE_ELITE_017","MON_FIRE_ELITE_018"],["MON_FIRE_ELITE_019"]],"bossByFloor":{"10":"MON_FIRE_MINIBOSS_001","20":"MON_FIRE_MINIBOSS_002","30":"MON_FIRE_MINIBOSS_003","40":"MON_FIRE_MINIBOSS_004","50":"MON_FIRE_MINIBOSS_005","60":"MON_FIRE_MINIBOSS_006","70":"MON_FIRE_MINIBOSS_007","80":"MON_FIRE_MINIBOSS_008","90":"MON_FIRE_MINIBOSS_009","100":"MON_FIRE_MINIBOSS_011"}});
+    function towerPortraitAssetId(floor,role,slot){
+        const band=Math.max(0,Math.min(9,Math.floor((Number(floor)-1)/10)));
+        if(role==="boss"){ return FIRE_TOWER_PORTRAIT_PLAN.bossByFloor[String(floor)]||null; }
+        const pool=role==="elite"?FIRE_TOWER_PORTRAIT_PLAN.eliteByBand[band]:FIRE_TOWER_PORTRAIT_PLAN.normalByBand[band];
+        return pool&&pool.length?pool[Math.max(0,Number(slot)||0)%pool.length]:null;
+    }
     function towerBossName(element,floor){
         const high=floor>=80;
         const map={
@@ -514,11 +521,12 @@
         }
         return monster;
     }
-    function buildTowerTroop(level,element,rank,floor){
+    function buildTowerTroop(level,element,rank,floor,portraitSlot){
         const monster=buildBaseMonster("天兵天將",level,element,rank||"regular");
         monster.vGameplayTower=true;
         monster.vGameplayTowerFloor=floor;
         monster.vGameplayTowerRole=rank==="elite"?"elite":"regular";
+        monster.portraitKey=towerPortraitAssetId(floor,monster.vGameplayTowerRole,portraitSlot);
         configureBossSkills(monster,element,Math.ceil(floor/30));
         applyTowerElementProfile(monster,element);
         return monster;
@@ -537,7 +545,7 @@
         monster.vGameplayTowerFloor=floor;
         monster.vGameplayTowerRole="boss";
         monster.vGameplayBossId=definition.id;
-        monster.portraitKey="tower-boss."+definition.element+"."+(floor>=80?"venerable":"envoy");
+        monster.portraitKey=towerPortraitAssetId(floor,"boss",0);
         monster.vGameplayPortraitSizeClass="standard";
         configureBossSkills(monster,definition.element,stage);
         applyTowerElementProfile(monster,definition.element);
@@ -547,7 +555,7 @@
         const element=state.tower.element,level=towerMonsterLevel(floor);
         const special=floor%5===0;
         if(!special){
-            return Array.from({length:6},()=>buildTowerTroop(level,element,"regular",floor));
+            return Array.from({length:6},(_,index)=>buildTowerTroop(level,element,"regular",floor,index));
         }
         const roster=[];
         if(floor%10===0){
@@ -556,10 +564,10 @@
         }
         const eliteCount=2;
         for(let i=0;i<eliteCount;i++){
-            roster.push(buildTowerTroop(level,element,"elite",floor));
+            roster.push(buildTowerTroop(level,element,"elite",floor,i));
         }
         while(roster.length<10){
-            roster.push(buildTowerTroop(level,element,"regular",floor));
+            roster.push(buildTowerTroop(level,element,"regular",floor,roster.length));
         }
         return roster;
     }

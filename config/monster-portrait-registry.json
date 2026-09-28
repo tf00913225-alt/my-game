@@ -73,7 +73,14 @@
     "portraitTargets": 107,
     "existingTargets": 22,
     "plannedTargets": 85,
-    "uniqueRuntimeNames": 104
+    "uniqueRuntimeNames": 104,
+    "assetPoolCounts": {
+      "normal": 10,
+      "elite": 19,
+      "miniboss": 11,
+      "boss": 0
+    },
+    "runtimeFinalized": true
   },
   "groups": {
     "wild": [
@@ -1070,7 +1077,7 @@
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_0000000000e482118b5473e014a602f3.png",
         "runtimePath": "assets/monsters/wild/fire-pool/mon-fire-normal-001.png",
         "status": "adopted",
-        "usedIn": "野怪候選",
+        "usedIn": "Fire Tower / Normal Rotation",
         "notes": "火元素游俠型人形，單刃與破布裝束，適合低至中階野怪。"
       },
       {
@@ -1081,7 +1088,7 @@
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_000000000da881fd8ae0f20379afb648.png",
         "runtimePath": "assets/monsters/wild/fire-pool/mon-fire-normal-002.png",
         "status": "adopted",
-        "usedIn": "野怪候選",
+        "usedIn": "Fire Tower / Normal Rotation",
         "notes": "小型持矛火蜥人，輪廓清楚，適合普通野怪。"
       },
       {
@@ -1092,7 +1099,7 @@
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_000000003a54821199f123895de6f5d2.png",
         "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-elite-001.png",
         "status": "adopted",
-        "usedIn": "火元素塔 Elite 候選",
+        "usedIn": "Fire Tower / Elite Encounter",
         "notes": "熔岩甲殼與多足鉗爪，體量與武裝高於普通怪。"
       },
       {
@@ -1103,7 +1110,7 @@
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_000000003d18820e8c32f6773124636f.png",
         "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-elite-002.png",
         "status": "adopted",
-        "usedIn": "火元素塔 Elite 候選",
+        "usedIn": "Fire Tower / Elite Encounter",
         "notes": "稻草人與長柄鐮刀構成，身形高瘦且具明顯壓迫感。"
       },
       {
@@ -1114,7 +1121,7 @@
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_00000000465082118dd011205c72c7e5.png",
         "runtimePath": "assets/monsters/wild/zone-03/fire-01.webp",
         "status": "adopted",
-        "usedIn": "wild.zone-03.fire-01",
+        "usedIn": "Fire Tower / Normal Rotation",
         "notes": "火焰尾猿型生物，動作感強，適合普通野怪。"
       },
       {
@@ -1123,9 +1130,9 @@
         "element": "fire",
         "tier": "normal",
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_0000000049bc81f79183cdcfd22f5036.png",
-        "runtimePath": null,
-        "status": "cataloged",
-        "usedIn": "未定",
+        "runtimePath": "assets/monsters/wild/fire-pool/mon-fire-normal-004.png",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Normal Rotation",
         "notes": "骷髏槍兵視覺清楚，但與既有人形怪的區分度待整合時再確認。"
       },
       {
@@ -1136,7 +1143,7 @@
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_000000005e0881fa826497584af5095a.png",
         "runtimePath": "assets/monsters/wild/zone-02/fire-01.webp",
         "status": "adopted",
-        "usedIn": "wild.zone-02.fire-01",
+        "usedIn": "Fire Tower / Normal Rotation",
         "notes": "厚甲獠牙獸，體格中等，適合普通野怪。"
       },
       {
@@ -1147,7 +1154,7 @@
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_000000005f388209b9596f039c965ead.png",
         "runtimePath": "assets/monsters/wild/zone-05/fire-01.webp",
         "status": "adopted",
-        "usedIn": "wild.zone-05.fire-01",
+        "usedIn": "Fire Tower / Elite Encounter",
         "notes": "熔巖石象持盾持錘，重裝與體型符合精英視覺。"
       },
       {
@@ -1158,7 +1165,7 @@
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_0000000069c48211bc6a565143ac4764.png",
         "runtimePath": "assets/monsters/wild/fire-pool/mon-fire-normal-006.png",
         "status": "adopted",
-        "usedIn": "野怪候選",
+        "usedIn": "Fire Tower / Normal Rotation",
         "notes": "雙持火刃的人形女戰士，身形敏捷，適合普通野怪。"
       },
       {
@@ -1167,9 +1174,9 @@
         "element": "fire",
         "tier": "elite",
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_000000007854820e87000107b3770159.png",
-        "runtimePath": null,
-        "status": "cataloged",
-        "usedIn": "未定",
+        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-elite-004.png",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Elite Encounter",
         "notes": "熔爐頭盔與厚重護甲具精英感，但可讀性與塔內重裝類型需後續比較。"
       },
       {
@@ -1180,7 +1187,7 @@
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_000000007eb482109ced9a151a1fca39.png",
         "runtimePath": "assets/monsters/wild/zone-10/fire-01.webp",
         "status": "adopted",
-        "usedIn": "wild.zone-10.fire-01",
+        "usedIn": "Fire Tower / Elite Encounter",
         "notes": "厚甲羊角戰士，盾斧與體型使其明顯高於普通怪。"
       },
       {
@@ -1191,7 +1198,7 @@
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_0000000087fc81fa881ce1f0b63b94c7.png",
         "runtimePath": "assets/monsters/wild/zone-08/fire-01.webp",
         "status": "adopted",
-        "usedIn": "wild.zone-08.fire-01",
+        "usedIn": "Fire Tower / Elite Encounter",
         "notes": "大型多刺鬃毛獸，火焰背棘與獠牙具有精英辨識度。"
       },
       {
@@ -1202,7 +1209,7 @@
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_00000000ab9c81faa34a6a9869419b1d.png",
         "runtimePath": "assets/monsters/wild/zone-01/fire-01.webp",
         "status": "adopted",
-        "usedIn": "wild.zone-01.fire-01",
+        "usedIn": "Fire Tower / Normal Rotation",
         "notes": "小型持火炬邪鬼，裝備簡單，適合普通野怪。"
       },
       {
@@ -1211,9 +1218,9 @@
         "element": "fire",
         "tier": "normal",
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_00000000b93c81f483253b355508e0c9.png",
-        "runtimePath": null,
-        "status": "cataloged",
-        "usedIn": "未定",
+        "runtimePath": "assets/monsters/wild/fire-pool/mon-fire-normal-008.png",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Normal Rotation",
         "notes": "瘦長火焰鬼物，造型偏侵略但仍可作普通怪；保留待整體池比較。"
       },
       {
@@ -1224,7 +1231,7 @@
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_00000000bd3c8211809f904e2f5b732d.png",
         "runtimePath": "assets/monsters/wild/zone-09/fire-01.webp",
         "status": "adopted",
-        "usedIn": "wild.zone-09.fire-01",
+        "usedIn": "Fire Tower / Elite Encounter",
         "notes": "人形火術士，法杖與長袍細節適合作為精英施術者。"
       },
       {
@@ -1235,7 +1242,7 @@
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_00000000cf44824387dd10e3ea6a3289.png",
         "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-elite-008.png",
         "status": "adopted",
-        "usedIn": "火元素塔 Elite 候選",
+        "usedIn": "Fire Tower / Elite Encounter",
         "notes": "昆蟲甲殼、長戟與多足結構，戰鬥辨識度高。"
       },
       {
@@ -1246,7 +1253,7 @@
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_00000000e2c08211ab8c3238854b4d82.png",
         "runtimePath": "assets/monsters/wild/zone-03/fire-02.webp",
         "status": "adopted",
-        "usedIn": "wild.zone-03.fire-02",
+        "usedIn": "Fire Tower / Normal Rotation",
         "notes": "焰羽鳥妖，體型與裝備較輕，適合普通野怪。"
       },
       {
@@ -1257,7 +1264,7 @@
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_00000000e3988211852dedfc423adcf8.png",
         "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-elite-009.png",
         "status": "adopted",
-        "usedIn": "野怪高階／火元素塔 Elite 候選",
+        "usedIn": "Fire Tower / Elite Encounter",
         "notes": "熔岩裂紋巨蛙，體型厚重且視覺輪廓強。"
       },
       {
@@ -1268,7 +1275,7 @@
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_00000000e69c821183ed8ef001fc3711.png",
         "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-miniboss-001.png",
         "status": "adopted",
-        "usedIn": "火元素塔 Mini Boss 候選",
+        "usedIn": "Fire Tower / Boss Encounter",
         "notes": "長身火龍型怪物，翼、角與熔岩脊柱具小 Boss 壓迫感。"
       },
       {
@@ -1277,9 +1284,9 @@
         "element": "fire",
         "tier": "normal",
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_00000000f4c0820aaae74c3f4ac0a728.png",
-        "runtimePath": null,
-        "status": "cataloged",
-        "usedIn": "未定",
+        "runtimePath": "assets/monsters/wild/fire-pool/mon-fire-normal-010.png",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Normal Rotation",
         "notes": "持弓人形獵手，外觀可作普通怪，但與其他人形候選需後續取捨。"
       },
       {
@@ -1290,7 +1297,7 @@
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/菁英怪/file_000000000b708211a92314c503198d6f.png",
         "runtimePath": "assets/monsters/wild/zone-06/fire-02.webp",
         "status": "adopted",
-        "usedIn": "wild.zone-06.fire-02",
+        "usedIn": "Fire Tower / Elite Encounter",
         "notes": "火焰法器、鎖鏈與遠程能量構成，適合施術型精英。"
       },
       {
@@ -1301,7 +1308,7 @@
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/菁英怪/file_0000000012ac82069c6fdedaaaa64660.png",
         "runtimePath": "assets/monsters/wild/zone-04/fire-01.webp",
         "status": "adopted",
-        "usedIn": "wild.zone-04.fire-01",
+        "usedIn": "Fire Tower / Elite Encounter",
         "notes": "重盾熔岩鬼，護甲與體格具有前排精英定位。"
       },
       {
@@ -1312,7 +1319,7 @@
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/菁英怪/file_00000000141081f7b30e758feb6e4de0.png",
         "runtimePath": "assets/monsters/wild/zone-07/fire-01.webp",
         "status": "adopted",
-        "usedIn": "wild.zone-07.fire-01",
+        "usedIn": "Fire Tower / Elite Encounter",
         "notes": "火羽、長槍與人形戰姬構圖完整，適合高辨識度精英。"
       },
       {
@@ -1323,7 +1330,7 @@
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/菁英怪/file_000000002e7481f480cf437f43374b04.png",
         "runtimePath": "assets/monsters/wild/zone-09/fire-02.webp",
         "status": "adopted",
-        "usedIn": "wild.zone-09.fire-02",
+        "usedIn": "Fire Tower / Elite Encounter",
         "notes": "鐮刃肢體與昆蟲身形形成鮮明輪廓，適合作戰型精英。"
       },
       {
@@ -1334,7 +1341,7 @@
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/菁英怪/file_0000000054f4820eb78391ba2a7a7aa3.png",
         "runtimePath": "assets/monsters/wild/zone-07/fire-02.webp",
         "status": "adopted",
-        "usedIn": "wild.zone-07.fire-02",
+        "usedIn": "Fire Tower / Elite Encounter",
         "notes": "蛇身、鱗甲與火焰頭冠具高階野怪氣質。"
       },
       {
@@ -1345,7 +1352,7 @@
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/菁英怪/file_0000000059fc81f59b5cd12ab7b489c1.png",
         "runtimePath": "assets/monsters/wild/zone-06/fire-01.webp",
         "status": "adopted",
-        "usedIn": "wild.zone-06.fire-01",
+        "usedIn": "Fire Tower / Elite Encounter",
         "notes": "長柄鐮刀與兜帽死靈構成，適合精英收割者。"
       },
       {
@@ -1356,7 +1363,7 @@
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/菁英怪/file_0000000063f881f7aaa1f65b8783acd8.png",
         "runtimePath": "assets/monsters/wild/zone-10/fire-02.webp",
         "status": "adopted",
-        "usedIn": "wild.zone-10.fire-02",
+        "usedIn": "Fire Tower / Elite Encounter",
         "notes": "多罐火焰裝置與爆破特徵鮮明，適合特殊機制精英。"
       },
       {
@@ -1367,7 +1374,7 @@
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/菁英怪/file_000000008430820b8b8a6da7013a6477.png",
         "runtimePath": "assets/monsters/wild/zone-05/fire-02.webp",
         "status": "adopted",
-        "usedIn": "wild.zone-05.fire-02",
+        "usedIn": "Fire Tower / Elite Encounter",
         "notes": "雙翼重甲魔將，威壓足夠但仍維持標準立繪尺度。"
       },
       {
@@ -1378,7 +1385,7 @@
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/菁英怪/file_00000000b9c48246b09f8447ab25c8b2.png",
         "runtimePath": "assets/monsters/wild/zone-04/fire-02.webp",
         "status": "adopted",
-        "usedIn": "wild.zone-04.fire-02",
+        "usedIn": "Fire Tower / Elite Encounter",
         "notes": "巨型熔巖生物與重錘，適合高階精英或塔中段守衛。"
       },
       {
@@ -1389,7 +1396,7 @@
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/菁英怪/file_00000000f7208206a6e1e6b237ddeabf.png",
         "runtimePath": "assets/monsters/wild/zone-08/fire-02.webp",
         "status": "adopted",
-        "usedIn": "wild.zone-08.fire-02",
+        "usedIn": "Fire Tower / Elite Encounter",
         "notes": "焦木妖魈造型獨特，先保留作精英候選，避免與 Boss 視覺過早重疊。"
       },
       {
@@ -1400,7 +1407,7 @@
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/小Boss/file_0000000009cc820692478957755501ce.png",
         "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-miniboss-002.png",
         "status": "adopted",
-        "usedIn": "火元素塔 Mini Boss 候選",
+        "usedIn": "Fire Tower / Boss Encounter",
         "notes": "熔岩牛魔與巨型月刃，正面壓迫感強，適合塔中高段。"
       },
       {
@@ -1411,7 +1418,7 @@
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/小Boss/file_000000002de482118662fdb238646a0e.png",
         "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-miniboss-003.png",
         "status": "adopted",
-        "usedIn": "火元素塔 Mini Boss 候選",
+        "usedIn": "Fire Tower / Boss Encounter",
         "notes": "火蝶翼、法器與女性人形主體，適合魔法型小 Boss。"
       },
       {
@@ -1422,7 +1429,7 @@
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/小Boss/file_000000005cdc8206a91a8091c1abb3cc.png",
         "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-miniboss-004.png",
         "status": "adopted",
-        "usedIn": "火元素塔 Mini Boss 候選",
+        "usedIn": "Fire Tower / Boss Encounter",
         "notes": "獅首、金輪與火焰武裝，具明確首領辨識度。"
       },
       {
@@ -1433,7 +1440,7 @@
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/小Boss/file_0000000065d882119879748d42e5e53b.png",
         "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-miniboss-005.png",
         "status": "adopted",
-        "usedIn": "火元素塔 Mini Boss 候選",
+        "usedIn": "Fire Tower / Boss Encounter",
         "notes": "重甲魔將與巨型火刃，適合塔高層小 Boss。"
       },
       {
@@ -1444,7 +1451,7 @@
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/小Boss/file_0000000068ec81f686d389e4d8079033.png",
         "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-miniboss-006.png",
         "status": "adopted",
-        "usedIn": "火元素塔 Mini Boss 候選",
+        "usedIn": "Fire Tower / Boss Encounter",
         "notes": "九尾狐形與火焰扇尾，具高辨識度首領氣質。"
       },
       {
@@ -1455,7 +1462,7 @@
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/小Boss/file_0000000082f882468cc2488d6cfd7838.png",
         "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-miniboss-007.png",
         "status": "adopted",
-        "usedIn": "火元素塔 Mini Boss 候選",
+        "usedIn": "Fire Tower / Boss Encounter",
         "notes": "厚重鱷甲與巨刃，近戰壓迫感明顯。"
       },
       {
@@ -1466,7 +1473,7 @@
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/小Boss/file_000000008898820cb6501721612812c9.png",
         "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-miniboss-008.png",
         "status": "adopted",
-        "usedIn": "火元素塔 Mini Boss 候選",
+        "usedIn": "Fire Tower / Boss Encounter",
         "notes": "蠍尾、重甲與火焰鉗肢，適合高層守關小 Boss。"
       },
       {
@@ -1477,7 +1484,7 @@
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/小Boss/file_00000000b8f081f7bff2a146a5cb832d.png",
         "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-miniboss-009.png",
         "status": "adopted",
-        "usedIn": "火元素塔 Mini Boss 候選",
+        "usedIn": "Fire Tower / Boss Encounter",
         "notes": "火焰長弓與侯爵式重裝，適合遠程首領。"
       },
       {
@@ -1487,8 +1494,8 @@
         "tier": "miniboss",
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/小Boss/file_00000000bb088243a2bed54c0e5147a6.png",
         "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-miniboss-010.png",
-        "status": "adopted",
-        "usedIn": "火元素塔 Mini Boss 候選",
+        "status": "reserved",
+        "usedIn": "Fire Tower / Reserved Replacement Boss",
         "notes": "鯊首戰將與火焰弓刃，視覺反差與輪廓辨識度高。"
       },
       {
@@ -1498,10 +1505,131 @@
         "tier": "miniboss",
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/小Boss/file_00000000ec88822f8cb282e18c3425b2.png",
         "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-miniboss-011.png",
-        "status": "reserved",
-        "usedIn": "火元素塔 100F Boss 候選",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Boss Encounter",
         "notes": "火焰鬃冠、長柄法器與王者構圖，先保留作 100F 高壓候選；仍屬標準尺寸小 Boss，不是大型 Boss。"
       }
+    ]
+  },
+  "fireTowerCoverage": {
+    "schemaVersion": 1,
+    "element": "fire",
+    "floorCount": 100,
+    "floorBands": [
+      "1-10",
+      "11-20",
+      "21-30",
+      "31-40",
+      "41-50",
+      "51-60",
+      "61-70",
+      "71-80",
+      "81-90",
+      "91-100"
+    ],
+    "formalRules": {
+      "eliteEvery": 5,
+      "bossEvery": 10,
+      "normalRotation": "2-4 visual assets per band",
+      "bossUsesMiniBossTier": true
+    },
+    "normalByBand": [
+      [
+        "MON_FIRE_NORMAL_001",
+        "MON_FIRE_NORMAL_003"
+      ],
+      [
+        "MON_FIRE_NORMAL_002",
+        "MON_FIRE_NORMAL_005"
+      ],
+      [
+        "MON_FIRE_NORMAL_006",
+        "MON_FIRE_NORMAL_007"
+      ],
+      [
+        "MON_FIRE_NORMAL_008",
+        "MON_FIRE_NORMAL_009"
+      ],
+      [
+        "MON_FIRE_NORMAL_010",
+        "MON_FIRE_NORMAL_001"
+      ],
+      [
+        "MON_FIRE_NORMAL_003",
+        "MON_FIRE_NORMAL_005"
+      ],
+      [
+        "MON_FIRE_NORMAL_002",
+        "MON_FIRE_NORMAL_006"
+      ],
+      [
+        "MON_FIRE_NORMAL_007",
+        "MON_FIRE_NORMAL_008"
+      ],
+      [
+        "MON_FIRE_NORMAL_009",
+        "MON_FIRE_NORMAL_010"
+      ],
+      [
+        "MON_FIRE_NORMAL_001",
+        "MON_FIRE_NORMAL_004"
+      ]
+    ],
+    "eliteByBand": [
+      [
+        "MON_FIRE_ELITE_001",
+        "MON_FIRE_ELITE_002"
+      ],
+      [
+        "MON_FIRE_ELITE_003",
+        "MON_FIRE_ELITE_004"
+      ],
+      [
+        "MON_FIRE_ELITE_005",
+        "MON_FIRE_ELITE_006"
+      ],
+      [
+        "MON_FIRE_ELITE_007",
+        "MON_FIRE_ELITE_008"
+      ],
+      [
+        "MON_FIRE_ELITE_009",
+        "MON_FIRE_ELITE_010"
+      ],
+      [
+        "MON_FIRE_ELITE_011",
+        "MON_FIRE_ELITE_012"
+      ],
+      [
+        "MON_FIRE_ELITE_013",
+        "MON_FIRE_ELITE_014"
+      ],
+      [
+        "MON_FIRE_ELITE_015",
+        "MON_FIRE_ELITE_016"
+      ],
+      [
+        "MON_FIRE_ELITE_017",
+        "MON_FIRE_ELITE_018"
+      ],
+      [
+        "MON_FIRE_ELITE_019"
+      ]
+    ],
+    "bossByFloor": {
+      "10": "MON_FIRE_MINIBOSS_001",
+      "20": "MON_FIRE_MINIBOSS_002",
+      "30": "MON_FIRE_MINIBOSS_003",
+      "40": "MON_FIRE_MINIBOSS_004",
+      "50": "MON_FIRE_MINIBOSS_005",
+      "60": "MON_FIRE_MINIBOSS_006",
+      "70": "MON_FIRE_MINIBOSS_007",
+      "80": "MON_FIRE_MINIBOSS_008",
+      "90": "MON_FIRE_MINIBOSS_009",
+      "100": "MON_FIRE_MINIBOSS_011"
+    },
+    "reserved": [
+      "MON_FIRE_MINIBOSS_010"
     ]
   }
 }
