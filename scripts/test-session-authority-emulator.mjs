@@ -19,6 +19,8 @@ const {assembleCanonicalSnapshot}=require("../functions/src/canonical-snapshot.j
 const {inspectRecoveryArchive}=require("../functions/src/canonical-recovery-archive.js");
 const {createCanonicalCurrentRecovery}=
     require("../functions/src/canonical-current-recovery.js");
+const {createCanonicalRecoveryApproval}=
+    require("../functions/src/canonical-recovery-approval.js");
 const {inspectExistingEnvelope,nextRevision}=require("../functions/src/cloud-save-envelope.js");
 const project="demo-four-symbols-session";
 if(process.env.GCLOUD_PROJECT!==project||process.env.FIRESTORE_EMULATOR_HOST!=="127.0.0.1:18080"||
@@ -732,12 +734,30 @@ const recovery=createCanonicalCurrentRecovery({db,FieldValue,HttpsError,
     inspectExistingEnvelope,nextRevision,runProtected:writerSessions.runProtected});
 await assert.rejects(recovery.restoreCurrent(ownedRequest,recoveryArgs),
     error=>error.code==="permission-denied");
+const approvalIssuer=createCanonicalRecoveryApproval({
+    db,Timestamp,HttpsError,inspectExistingEnvelope
+});
 const approvalRef=ownedRoot.collection("recoveryApprovals").doc(recoveryOperation);
-await approvalRef.set({schemaVersion:1,ownerUid:ownedUid,
-    operationId:recoveryOperation,status:"approved",sourceRevision:6,
-    sourceSha256:assignedArchive.get("sourceSha256"),
-    snapshotSha256:assignedArchive.get("snapshotSha256"),
-    approvedBy:"emulator-operator",expiresAt:Timestamp.fromMillis(Date.now()-1000)});
+const approvalPayload={ownerUid:ownedUid,operationId:recoveryOperation,
+    sourceRevision:6,ttlSeconds:120};
+await assert.rejects(approvalIssuer.issue({
+    auth:{uid:"emulator-non-operator",token:{cloudSaveOperator:false}},
+    data:approvalPayload
+}),error=>error.code==="permission-denied");
+const issuedApproval=await approvalIssuer.issue({
+    auth:{uid:"emulator-operator",token:{cloudSaveOperator:true}},
+    data:approvalPayload
+});
+assert.equal(issuedApproval.approved,true);
+assert.equal(issuedApproval.unchanged,false);
+assert.equal(issuedApproval.approvedBy,"emulator-operator");
+assert.equal((await approvalRef.get()).get("status"),"approved");
+const replayedApproval=await approvalIssuer.issue({
+    auth:{uid:"emulator-operator",token:{cloudSaveOperator:true}},
+    data:approvalPayload
+});
+assert.equal(replayedApproval.unchanged,true);
+await approvalRef.update({expiresAt:Timestamp.fromMillis(Date.now()-1000)});
 await assert.rejects(recovery.restoreCurrent(ownedRequest,recoveryArgs),
     error=>error.code==="permission-denied");
 await approvalRef.update({expiresAt:Timestamp.fromMillis(Date.now()+120000)});
