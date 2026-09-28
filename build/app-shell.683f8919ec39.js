@@ -3383,7 +3383,8 @@ function makeZoneMonster(
     name,
     level,
     element,
-    rank
+    rank,
+    portraitKey
 ){
 
     const points=
