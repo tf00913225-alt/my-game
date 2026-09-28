@@ -189,6 +189,11 @@
     const initialMainSave=readMainSave();
     const initialStoredState=initialMainSave&&initialMainSave.gameplayProgress;
     let state=normalizeState(initialStoredState);
+    /* The debug reload hook may provide a historical instant. Keep that
+       explicit clock for the remainder of the isolated debug lifecycle so
+       ensureCurrentTowerWeek() cannot silently compare it with wall-clock
+       Date.now() after a week boundary. Production never sets this value. */
+    let debugClock=null;
     const initialStateNeedsPersist=JSON.stringify(initialStoredState||null)!==JSON.stringify(state);
     let bossTab="personal";
     let bossDetail=null;
@@ -202,10 +207,11 @@
     let towerAutoAdvanceGeneration=0;
 
     function ensureCurrentTowerWeek(now){
-        const week=utcWeekInfo(now);
+        const effectiveNow=now===undefined&&debugClock!==null?debugClock:now;
+        const week=utcWeekInfo(effectiveNow);
         if(state.tower.weekKey===week.key&&state.tower.element===week.element){ return false; }
         const historical=state.tower.historicalHighest;
-        state.tower=defaultTower(now);
+        state.tower=defaultTower(effectiveNow);
         state.tower.historicalHighest=historical;
         return true;
     }
@@ -485,6 +491,13 @@
             return monster;
         });
     }
+    const FIRE_TOWER_PORTRAIT_PLAN=Object.freeze({"normalByBand":[["MON_FIRE_NORMAL_001","MON_FIRE_NORMAL_003"],["MON_FIRE_NORMAL_002","MON_FIRE_NORMAL_005"],["MON_FIRE_NORMAL_006","MON_FIRE_NORMAL_007"],["MON_FIRE_NORMAL_008","MON_FIRE_NORMAL_009"],["MON_FIRE_NORMAL_010","MON_FIRE_NORMAL_001"],["MON_FIRE_NORMAL_003","MON_FIRE_NORMAL_005"],["MON_FIRE_NORMAL_002","MON_FIRE_NORMAL_006"],["MON_FIRE_NORMAL_007","MON_FIRE_NORMAL_008"],["MON_FIRE_NORMAL_009","MON_FIRE_NORMAL_010"],["MON_FIRE_NORMAL_001","MON_FIRE_NORMAL_004"]],"eliteByBand":[["MON_FIRE_ELITE_001","MON_FIRE_ELITE_002"],["MON_FIRE_ELITE_003","MON_FIRE_ELITE_004"],["MON_FIRE_ELITE_005","MON_FIRE_ELITE_006"],["MON_FIRE_ELITE_007","MON_FIRE_ELITE_008"],["MON_FIRE_ELITE_009","MON_FIRE_ELITE_010"],["MON_FIRE_ELITE_011","MON_FIRE_ELITE_012"],["MON_FIRE_ELITE_013","MON_FIRE_ELITE_014"],["MON_FIRE_ELITE_015","MON_FIRE_ELITE_016"],["MON_FIRE_ELITE_017","MON_FIRE_ELITE_018"],["MON_FIRE_ELITE_019"]],"bossByFloor":{"10":"MON_FIRE_MINIBOSS_001","20":"MON_FIRE_MINIBOSS_002","30":"MON_FIRE_MINIBOSS_003","40":"MON_FIRE_MINIBOSS_004","50":"MON_FIRE_MINIBOSS_005","60":"MON_FIRE_MINIBOSS_006","70":"MON_FIRE_MINIBOSS_007","80":"MON_FIRE_MINIBOSS_008","90":"MON_FIRE_MINIBOSS_009","100":"MON_FIRE_MINIBOSS_011"}});
+    function towerPortraitAssetId(floor,role,slot){
+        const band=Math.max(0,Math.min(9,Math.floor((Number(floor)-1)/10)));
+        if(role==="boss"){ return FIRE_TOWER_PORTRAIT_PLAN.bossByFloor[String(floor)]||null; }
+        const pool=role==="elite"?FIRE_TOWER_PORTRAIT_PLAN.eliteByBand[band]:FIRE_TOWER_PORTRAIT_PLAN.normalByBand[band];
+        return pool&&pool.length?pool[Math.max(0,Number(slot)||0)%pool.length]:null;
+    }
     function towerBossName(element,floor){
         const high=floor>=80;
         const map={
@@ -516,11 +529,12 @@
         }
         return monster;
     }
-    function buildTowerTroop(level,element,rank,floor){
+    function buildTowerTroop(level,element,rank,floor,portraitSlot){
         const monster=buildBaseMonster("天兵天將",level,element,rank||"regular");
         monster.vGameplayTower=true;
         monster.vGameplayTowerFloor=floor;
         monster.vGameplayTowerRole=rank==="elite"?"elite":"regular";
+        monster.portraitKey=towerPortraitAssetId(floor,monster.vGameplayTowerRole,portraitSlot);
         configureBossSkills(monster,element,Math.ceil(floor/30));
         applyTowerElementProfile(monster,element);
         return monster;
@@ -539,7 +553,7 @@
         monster.vGameplayTowerFloor=floor;
         monster.vGameplayTowerRole="boss";
         monster.vGameplayBossId=definition.id;
-        monster.portraitKey="tower-boss."+definition.element+"."+(floor>=80?"venerable":"envoy");
+        monster.portraitKey=towerPortraitAssetId(floor,"boss",0);
         monster.vGameplayPortraitSizeClass="standard";
         configureBossSkills(monster,definition.element,stage);
         applyTowerElementProfile(monster,definition.element);
@@ -549,7 +563,7 @@
         const element=state.tower.element,level=towerMonsterLevel(floor);
         const special=floor%5===0;
         if(!special){
-            return Array.from({length:6},()=>buildTowerTroop(level,element,"regular",floor));
+            return Array.from({length:6},(_,index)=>buildTowerTroop(level,element,"regular",floor,index));
         }
         const roster=[];
         if(floor%10===0){
@@ -558,10 +572,10 @@
         }
         const eliteCount=2;
         for(let i=0;i<eliteCount;i++){
-            roster.push(buildTowerTroop(level,element,"elite",floor));
+            roster.push(buildTowerTroop(level,element,"elite",floor,i));
         }
         while(roster.length<10){
-            roster.push(buildTowerTroop(level,element,"regular",floor));
+            roster.push(buildTowerTroop(level,element,"regular",floor,roster.length));
         }
         return roster;
     }
@@ -1395,7 +1409,11 @@
         getActiveBattleState:function(){ return activeBattleContext?copy({mode:activeBattleContext.mode,definitionId:activeBattleContext.definitionId||null,stage:activeBattleContext.stage||null,floor:activeBattleContext.floor||null,combatPhase:activeBattleContext.combatPhase||1,totalPhases:activeBattleContext.totalPhases||1,bossIndex:bossIndex(),objectIndexes:(activeBattleContext.objectIndexes||[]).slice(),shield:bossShield()}):null; },
         debugSpawnBossObject:spawnBossObject,
         debugProcessBossRound:processBossRound,
-        debugReloadState:function(raw,now){ state=normalizeState(raw,now);return serializableState(); }
+        debugReloadState:function(raw,now){
+            debugClock=now===undefined?null:now;
+            state=normalizeState(raw,now);
+            return serializableState();
+        }
     });
 
     if(initialStateNeedsPersist||ensureCurrentTowerWeek()){ persist(); }
