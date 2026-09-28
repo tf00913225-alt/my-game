@@ -1123,7 +1123,12 @@
         };
         dailyDungeonSequence=sequence;
         if(typeof window.v154PrepareDailyDungeonPortraits==="function"){
-            await window.v154PrepareDailyDungeonPortraits(type);
+            const prepared=await window.v154PrepareDailyDungeonPortraits(type);
+            if(!prepared||prepared.state!=="ready"){
+                dailyDungeonSequence=null;
+                alert("每日副本立繪尚未就緒，請重新進入副本。");
+                return;
+            }
         }
         const started=window.v132LaunchDungeonBattle(sequence.waves[0],function(outcome){
             const active=dailyDungeonSequence||sequence;
