@@ -1308,7 +1308,16 @@
             console.warn("[tower-portrait] shared encounter preparation owner unavailable");
             return false;
         }
-        Promise.resolve(window.v154PreparePortraitsForEncounter(roster)).then(prepared=>{
+        const preparation=window.v154PreparePortraitsForEncounter(roster);
+        if(preparation&&typeof preparation.then!=="function"){
+            if(preparation.state!=="ready"){
+                battleStarting=false;
+                activeBattleContext=null;
+                return false;
+            }
+            return launch();
+        }
+        Promise.resolve(preparation).then(prepared=>{
             if(!prepared||prepared.state!=="ready"){
                 battleStarting=false;
                 activeBattleContext=null;
