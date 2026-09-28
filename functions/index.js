@@ -10,6 +10,7 @@ const {createSessionAuthority}=require("./src/session-authority");
 const {createTrustedGrantLedger}=require("./src/trusted-grant-ledger");
 const {createCanonicalResourceCredit}=require("./src/canonical-resource-credit");
 const {createLegacyCandidateScreening}=require("./src/legacy-candidate-screening");
+const {createCanonicalRecoveryApproval}=require("./src/canonical-recovery-approval");
 const {CloudPreferencesError,PREFERENCES_SCHEMA_VERSION,normalizePreferences}=require("./src/cloud-preferences");
 const {
     CLOUD_SAVE_ENVELOPE_SCHEMA_VERSION,
@@ -40,6 +41,9 @@ const canonicalResourceCredit=createCanonicalResourceCredit({
 const legacyCandidateScreening=createLegacyCandidateScreening({
     db:getFirestore(),HttpsError,runProtected:sessions.runProtected,
     inspectExistingEnvelope,validateLegacySaveCandidate,validateMigrationBackup
+});
+const recoveryApprovalIssuer=createCanonicalRecoveryApproval({
+    db:getFirestore(),Timestamp,HttpsError,inspectExistingEnvelope
 });
 
 const REGION="us-central1";
@@ -133,6 +137,14 @@ exports.revokeGameSession=onCall(CALLABLE_OPTIONS,async request=>{
 });
 exports.protectedTest=onCall(CALLABLE_OPTIONS,async request=>{
     try{ return await sessions.protectedTest(await verifyGameIdentity(request)); }
+    catch(error){ throw asHttpsError(error); }
+});
+
+/* Recovery approval is an operator-only administrative operation. It does not
+ * require a player session and is never exposed through the game UI. */
+exports.issueCanonicalRecoveryApproval=onCall(CALLABLE_OPTIONS,async request=>{
+    request=await verifyGameIdentity(request);
+    try{ return await recoveryApprovalIssuer.issue(request); }
     catch(error){ throw asHttpsError(error); }
 });
 // No browser grant issuer exists. This reserves a server-issued entitlement
