@@ -109,7 +109,7 @@ function formulaRuntime(){
     assert.doesNotMatch(v149,/rollStatusEffectHit\s*=\s*function/);
     assert.doesNotMatch(v169,/getMonsterEvasion\s*=\s*function|getMonsterEffectiveSpiritPoints\s*=\s*function|getPlayerStatusResistBonus\s*=\s*function/);
     assert.match(main,/evasion:\s*\n\s*getDefaultMonsterEvasion\(level\)/);
-    const firstZoneRosterCall=main.indexOf('makeZoneMonster("哥布林",3,"fire")');
+    const firstZoneRosterCall=main.indexOf('makeZoneMonster("火炬邪鬼",3,"fire",undefined,"wild.zone-01.fire-01")');
     assert.ok(firstZoneRosterCall>0,"first top-level zone roster call must exist");
     assert.ok(
         main.indexOf("const DEFAULT_MONSTER_EVASION_PER_LEVEL = 0.1;")<

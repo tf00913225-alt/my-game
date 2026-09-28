@@ -221,7 +221,7 @@ for(const element of ["fire","water","earth","wind"]){
     const boss=context.monsters[bossIndex];
     assert.equal(boss.rank,"boss");
     assert.equal(boss.unitKind,"tower-boss");
-    assert.equal(boss.portraitKey,"tower-boss.fire.envoy");
+    assert.equal(boss.portraitKey,"MON_FIRE_MINIBOSS_001");
     assert.equal(boss.vGameplayPortraitSizeClass,"standard");
     assert.notEqual(boss.vGameplayBoss,true);
     assert.equal(context.FourSymbolsBossBattle.isActive(),false);
