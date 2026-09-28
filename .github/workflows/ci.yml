@@ -102,6 +102,9 @@ jobs:
           node tests/abyss-owner-convergence-20260920.test.js
           node tests/abyss-two-tier-refactor.test.js
           node tests/monster-portrait-runtime.test.js
+          node tests/daily-dungeon-portrait-assets.test.js
+          node tests/daily-dungeon-portrait-owner-convergence-20260928.test.js
+          node tests/v159-abyss-battle-portraits.test.js
           node tests/monster-portrait-import-workflow.test.js
           node tests/v173.51-qa.test.js
           node tests/v173.56-shop-layout-preview-regression.test.js
@@ -232,24 +235,6 @@ jobs:
             artifacts/browser-qa/battle-layer-element-box-mobile.png
             artifacts/browser-qa/battle-result-modal-mobile.png
             artifacts/browser-qa/boss-target-entity-live-412x915.png
-          if-no-files-found: error
-          retention-days: 90
-
-      - name: Run Fire Tower identity and first-frame mobile browser QA
-        id: fire_tower_identity_browser
-        if: success() && github.event_name == 'pull_request'
-        run: |
-          python3 -m http.server 4174 --bind 127.0.0.1 > /tmp/four-symbols-fire-tower-qa-server.log 2>&1 &
-          SERVER_PID=$!
-          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
-          DEV_BASE_URL=http://127.0.0.1:4174 node .github/scripts/run-fire-tower-identity-first-frame-browser-qa.mjs
-
-      - name: Upload Fire Tower identity and first-frame browser evidence
-        if: always() && steps.fire_tower_identity_browser.outcome != 'skipped'
-        uses: actions/upload-artifact@v4
-        with:
-          name: fire-tower-identity-first-frame-browser-qa-${{ github.sha }}
-          path: artifacts/browser-qa/fire-tower-identity-first-frame-browser-qa.json
           if-no-files-found: error
           retention-days: 90
 

@@ -8873,7 +8873,7 @@ function updateMapMonsterIcons(){
             if(nameEl){
 
                 nameEl.textContent=
-                    monster.displayName||monster.name;
+                    monster.name;
 
             }
 
