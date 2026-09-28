@@ -361,10 +361,10 @@ test("a destroyed healing object stops its persistent effect immediately",()=>{
 
 test("Tower uses normal Fixed Slot geometry while Personal/World keep Large Boss mode",()=>{
     const {context}=load();
-    const now=new Date("2026-09-24T00:00:00Z");
+    const now=new Date();
     const week=context.GameplaySystem.getWeekInfo(now);
     context.GameplaySystem.debugReloadState({tower:{weekKey:week.key,completedFloor:9,highestThisWeek:9,historicalHighest:9,claimedFloors:{},pendingRelicChoice:false}},now);
-    console.log("DEBUG tower select",context.GameplaySystem.getSerializableState(),context.vGameplaySelectTowerBand(10),context.lastBattleOptions,context.currentBattleMonsters.length);
+    assert.equal(context.vGameplaySelectTowerBand(10),true);
     assert.equal(context.lastBattleOptions.mode,"tower");
     assert.equal(context.currentBattleMonsters.length,10);
     const towerBoss=context.monsters.find(monster=>monster&&monster.vGameplayTowerBoss===true);
