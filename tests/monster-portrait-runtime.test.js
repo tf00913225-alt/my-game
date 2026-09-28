@@ -174,8 +174,8 @@ assert.match(source,/MONSTER_PORTRAIT_REGISTRY_URL="config\/monster-portrait-reg
 assert.match(source,/TEMPORARY_MONSTER_PORTRAIT="assets\/dungeons\/abyss\/soldier\.webp"/);
 assert.match(source,/TEMPORARY_BOSS_PORTRAIT="assets\/monsters\/boss\/boss-placeholder-fire-demon\.webp"/);
 assert.match(source,/target\.status!=="existing"/);
-assert.match(source,/presentation\.applyUnit\(card,"monster"\)/,
-    "portrait sync must invoke the canonical cardless presentation owner");
+assert.match(source,/presentation\.sync\(\)/,
+    "portrait selection must hand off to the canonical presentation owner");
 assert.match(dailySource,/monster\.portraitKey=dailyMonsterPortraitKey\(type,rank\)/,
     "daily dungeon monsters must carry an explicit portrait key");
 assert.doesNotMatch(source,/background-size:contain!important/,
