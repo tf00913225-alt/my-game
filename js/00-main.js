@@ -3005,10 +3005,10 @@ window.v173GetDefaultMonsterEvasion=getDefaultMonsterEvasion;
 
 const forestMonsters = [
 
-    makeZoneMonster("哥布林",3,"fire"),
+    makeZoneMonster("火炬邪鬼",3,"fire",undefined,"wild.zone-01.fire-01"),
     makeZoneMonster("史萊姆",2,"water"),
-    makeZoneMonster("哥布林",3,"fire"),
-    makeZoneMonster("史萊姆",2,"water"),    makeZoneMonster("哥布林",3,"fire"),
+    makeZoneMonster("火炬邪鬼",3,"fire",undefined,"wild.zone-01.fire-01"),
+    makeZoneMonster("史萊姆",2,"water"),    makeZoneMonster("火炬邪鬼",3,"fire",undefined,"wild.zone-01.fire-01"),
     makeZoneMonster("史萊姆",2,"water")
 
 ];
@@ -3031,11 +3031,11 @@ forestMonsters.forEach(monster=>{
 
 const desertMonsters = [
 
-    makeZoneMonster("沙漠豺狼",16,"fire"),
+    makeZoneMonster("炙甲獠牙",16,"fire",undefined,"wild.zone-02.fire-01"),
     makeZoneMonster("沙蠍",15,"water"),
-    makeZoneMonster("沙漠豺狼",16,"fire"),
+    makeZoneMonster("炙甲獠牙",16,"fire",undefined,"wild.zone-02.fire-01"),
     makeZoneMonster("沙蠍",15,"water"),
-    makeZoneMonster("沙漠豺狼",16,"fire"),
+    makeZoneMonster("炙甲獠牙",16,"fire",undefined,"wild.zone-02.fire-01"),
     makeZoneMonster("沙蠍",15,"water")
 
 ];
@@ -3061,11 +3061,11 @@ const desertMonsters = [
 
 const iceMountainMonsters = [
 
-    makeZoneMonster("熾焰狼",22,"fire"),
+    makeZoneMonster("炎尾猿",22,"fire",undefined,"wild.zone-03.fire-01"),
     makeZoneMonster("寒冰魔",23,"water"),
-    makeZoneMonster("熾焰狼",22,"fire"),
+    makeZoneMonster("炎尾猿",22,"fire",undefined,"wild.zone-03.fire-01"),
     makeZoneMonster("寒冰魔",23,"water"),
-    makeZoneMonster("熾焰狼王",27,"fire"),
+    makeZoneMonster("灰翎焰鴉",27,"fire",undefined,"wild.zone-03.fire-02"),
     makeZoneMonster("寒冰魔王",28,"water")
 
 ];
@@ -3486,6 +3486,7 @@ function makeZoneMonster(
 
         alive:true,
         element:element,
+        portraitKey:portraitKey||undefined,
 
         /*
            ★ 新增（依照使用者要求，「以後
@@ -3529,11 +3530,11 @@ function makeZoneMonster(
 
 const zone4Monsters = [
 
-    makeZoneMonster("烈焰巨魔",32,"fire"),
+    makeZoneMonster("熔盾戰鬼",32,"fire",undefined,"wild.zone-04.fire-01"),
     makeZoneMonster("深淵水靈",33,"water"),
-    makeZoneMonster("烈焰巨魔",32,"fire"),
+    makeZoneMonster("熔盾戰鬼",32,"fire",undefined,"wild.zone-04.fire-01"),
     makeZoneMonster("深淵水靈",33,"water"),
-    makeZoneMonster("烈焰巨魔王",38,"fire"),
+    makeZoneMonster("熔巖巨魁",38,"fire",undefined,"wild.zone-04.fire-02"),
     makeZoneMonster("深淵水靈王",40,"water")
 
 ];
@@ -3541,11 +3542,11 @@ const zone4Monsters = [
 
 const zone5Monsters = [
 
-    makeZoneMonster("熔岩巨獸",42,"fire"),
+    makeZoneMonster("熔巖象衛",42,"fire",undefined,"wild.zone-05.fire-01"),
     makeZoneMonster("寒潮巨獸",43,"water"),
-    makeZoneMonster("熔岩巨獸",42,"fire"),
+    makeZoneMonster("熔巖象衛",42,"fire",undefined,"wild.zone-05.fire-01"),
     makeZoneMonster("寒潮巨獸",43,"water"),
-    makeZoneMonster("熔岩巨獸王",48,"fire"),
+    makeZoneMonster("炎鎧魔將",48,"fire",undefined,"wild.zone-05.fire-02"),
     makeZoneMonster("寒潮巨獸王",50,"water")
 
 ];
