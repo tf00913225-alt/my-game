@@ -33,4 +33,4 @@ const expectedNames={
 for(const [assetId,name] of Object.entries(expectedNames)){
   assert.equal(byId[assetId].displayName,name,assetId+" displayName mismatch");
 }
-console.log("Fire tower portrait coverage tests passed.");
+console.log("Fire tower portrait coverage tests passed.");\n// Keep Registry display-name coverage explicit for CI review.
