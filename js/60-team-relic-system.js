@@ -390,7 +390,7 @@
         clearRelicTargetFocus();
         if(!relicCutinNode||!target||!Array.isArray(target.targetIds)){ return waitMs(RELIC_TARGET_REVEAL_MS); }
         const overlayRect=syncRelicPresentationGeometry(relicCutinNode)||relicCutinNode.__relicOverlayRect, layer=relicCutinNode.querySelector(".team-relic-target-projection-layer"), owner=relicGeometryOwner();
-        if(layer&&overlayRect&&owner&&typeof owner.getUnitGeometry==="function"){target.targetIds.forEach(index=>{const geometry=owner.getUnitGeometry(target.targetSide,index);if(geometry&&geometry.artworkProjection&&geometry.hpProjection&&geometry.spProjection){appendRelicProjection(layer,geometry,overlayRect);}});}
+        if(layer&&overlayRect&&owner&&typeof owner.getUnitGeometry==="function"){target.targetIds.forEach(index=>{const geometry=owner.getUnitGeometry(target.targetSide,index);if(geometry&&geometry.artworkProjection&&geometry.hpProjection){appendRelicProjection(layer,geometry,overlayRect);}});}
         const show=()=>{if(relicCutinNode){relicCutinNode.classList.add("targets-visible");}};
         if(typeof requestAnimationFrame==="function"){requestAnimationFrame(show);}else{show();}
         return waitMs(RELIC_TARGET_REVEAL_MS);
