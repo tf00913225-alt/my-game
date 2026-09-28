@@ -76,7 +76,25 @@ function loadRuntime(monsterRows){
         currentBattleMonsters:monsterRows.map((_,index)=>index),monsters:monsterRows,autoBattle:false,
         updateAutoButton(){},openAutoBattleSettings(){},closeAutoBattleSettings(){},
         openHomeFeature(){},closeHomeFeature(){},applyPostBattleAutoRecovery(){},
-        confirmAutoBattleSettings(){},toggleAutoBattle(){}
+        confirmAutoBattleSettings(){},toggleAutoBattle(){},
+        /* The fixture supplies the canonical V174 presentation boundary.
+           V154 may publish selection metadata, but it must never create a
+           second <img> or artwork pipeline. */
+        FourSymbolsBattlePresentation:{
+            applyUnit(card){
+                card.classList.toggle("v174-cardless-unit",true);
+                let art=card.querySelector(".v174-battle-art");
+                if(!art){ art=element();art.className="v174-battle-art";card.insertBefore(art,card.firstChild); }
+                const source=card.style.getPropertyValue("--v152-abyss-portrait");
+                if(source){ art.style.setProperty("background-image",source); }
+            },
+            sync(){
+                context.currentBattleMonsters.forEach(index=>{
+                    const card=document.getElementById("battleMonster"+index);
+                    if(card){ this.applyUnit(card,"monster"); }
+                });
+            }
+        }
     };
     context.window=context;
     vm.createContext(context);
