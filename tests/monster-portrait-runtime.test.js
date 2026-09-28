@@ -178,6 +178,7 @@ assert.equal((source.match(/updateMonsterUI=function/g)||[]).length,0,
     "portrait owner must not wrap the per-monster HP/SP hot path");
 assert.doesNotMatch(timingSource,/\bupdateUI\s*=\s*function/,
     "V159 portrait bridge must not wrap global updateUI");
-assert.match(timingSource,/v154SyncMonsterPortraits/);
+assert.doesNotMatch(timingSource,/requestAnimationFrame|setTimeout|MutationObserver|v132LaunchDungeonBattle|v154SyncMonsterPortraits/,
+    "V159 must be retired and contain no delayed or launch synchronization");
 
 console.log("Monster portrait runtime tests passed.");

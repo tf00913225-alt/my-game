@@ -102,6 +102,9 @@ jobs:
           node tests/abyss-owner-convergence-20260920.test.js
           node tests/abyss-two-tier-refactor.test.js
           node tests/monster-portrait-runtime.test.js
+          node tests/daily-dungeon-portrait-assets.test.js
+          node tests/daily-dungeon-portrait-owner-convergence-20260928.test.js
+          node tests/v159-abyss-battle-portraits.test.js
           node tests/monster-portrait-import-workflow.test.js
           node tests/v173.51-qa.test.js
           node tests/v173.56-shop-layout-preview-regression.test.js
