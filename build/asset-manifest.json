@@ -102,7 +102,7 @@
       },
       "feature-boss-relic": {
         "scripts": [
-          "build/feature-boss-relic.4f4c0c7b8392.js",
+          "build/feature-boss-relic.0933a29d1db0.js",
           "build/feature-relic-progression.87f6a83606ad.js"
         ],
         "styles": [
@@ -847,9 +847,9 @@
       "sha256": "2a7c37a8ece6",
       "bytes": 50619
     },
-    "build/feature-boss-relic.4f4c0c7b8392.js": {
-      "sha256": "4f4c0c7b8392",
-      "bytes": 88319
+    "build/feature-boss-relic.0933a29d1db0.js": {
+      "sha256": "0933a29d1db0",
+      "bytes": 88340
     },
     "build/feature-relic-progression.87f6a83606ad.js": {
       "sha256": "87f6a83606ad",
