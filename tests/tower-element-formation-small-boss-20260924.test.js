@@ -107,6 +107,11 @@ function load(options={}){
         v141ShowBlackGoldReward:noop,v174RelicDevUnlock:()=>true
     };
     context.window=context;context.globalThis=context;
+    context.v154PreparePortraitsForEncounter=roster=>({
+        state:"ready",
+        records:(Array.isArray(roster)?roster:[]).map(monster=>({portraitKey:monster.portraitKey,path:"test://"+String(monster.portraitKey||"portrait")})),
+        paths:(Array.isArray(roster)?roster:[]).map(monster=>"test://"+String(monster.portraitKey||"portrait"))
+    });
     context.v132LaunchDungeonBattle=function(roster,onComplete,options){
         const opts=options&&typeof options==="object"?options:{};
         context.v132ActiveDungeonRun={identityVersion:1,mode:String(opts.mode||"legacy-dungeon"),gameplayMode:opts.gameplayMode||null};
