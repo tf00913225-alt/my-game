@@ -2656,7 +2656,12 @@
         };
         dailyDungeonSequence=sequence;
         if(typeof window.v154PrepareDailyDungeonPortraits==="function"){
-            await window.v154PrepareDailyDungeonPortraits(type);
+            const prepared=await window.v154PrepareDailyDungeonPortraits(type);
+            if(!prepared||prepared.state!=="ready"){
+                dailyDungeonSequence=null;
+                alert("每日副本立繪尚未就緒，請重新進入副本。");
+                return;
+            }
         }
         const started=window.v132LaunchDungeonBattle(sequence.waves[0],function(outcome){
             const active=dailyDungeonSequence||sequence;
@@ -4101,7 +4106,6 @@
     let monsterPortraitRegistryFailure=null;
     const monsterPortraitAssetFailures=new Set();
     const dailyPortraitPreparation=new Map();
-    const encounterPortraitPreparation=new Map();
     let monsterPortraitByKey=new Map();
     let monsterPortraitByUniqueName=new Map();
 
@@ -4164,8 +4168,8 @@
         if(typeof fetch!=="function"){
             monsterPortraitRegistryState="failed";
             monsterPortraitRegistryFailure=new Error("fetch unavailable");
-            monsterPortraitRegistryPromise=Promise.resolve(null);
-            return monsterPortraitRegistryPromise;
+            monsterPortraitRegistryPromise=null;
+            return Promise.resolve(null);
         }
         monsterPortraitRegistryState="pending";
         monsterPortraitRegistryPromise=fetch(MONSTER_PORTRAIT_REGISTRY_URL,{cache:"no-cache"})
@@ -4177,7 +4181,8 @@
             .catch(error=>{
                 monsterPortraitRegistryState="failed";
                 monsterPortraitRegistryFailure=error;
-                console.warn("[monster-portrait] registry load failed; existing battle art remains active.",error);
+                monsterPortraitRegistryPromise=null;
+                console.warn("[monster-portrait] registry load failed; retry is available on the next dungeon entry.",error);
                 return null;
             });
         return monsterPortraitRegistryPromise;
@@ -4248,65 +4253,50 @@
     }
     window.v154ResolveMonsterPortraitRecord=resolveMonsterPortraitRecord;
 
-    function bindMonsterPortraitIdentity(monster){
-        if(!monster){ return null; }
-        const record=resolveMonsterPortraitRecord(monster);
-        if(record&&record.name&&record.status==="existing"){
-            monster.displayName=record.name;
-            monster.portraitPath=record.path;
-        }
-        return record;
-    }
-    window.v154BindMonsterPortraitIdentity=bindMonsterPortraitIdentity;
-
-    function prepareMonsterPortraitsForEncounter(monsters){
-        const list=(Array.isArray(monsters)?monsters:[monsters]).filter(Boolean);
-        const keys=list.map(monster=>String(monster.portraitKey||monster.monsterPortraitKey||"").trim()).filter(Boolean);
-        const cacheKey=keys.slice().sort().join("|");
-        if(encounterPortraitPreparation.has(cacheKey)){ return encounterPortraitPreparation.get(cacheKey); }
-        const preparation=requestMonsterPortraitRegistry().then(()=>{
-            list.forEach(bindMonsterPortraitIdentity);
-            const records=list.map(resolveMonsterPortraitRecord);
-            const paths=Array.from(new Set(records.map(record=>record&&record.path).filter(Boolean)));
-            const assets=window.FourSymbolsFeatures&&typeof window.FourSymbolsFeatures.ensureAssets==="function"
-                ?window.FourSymbolsFeatures.ensureAssets(paths)
-                :Promise.resolve({state:"ready",paths});
-            return Promise.resolve(assets).then(()=>{
-                list.forEach(bindMonsterPortraitIdentity);
-                return {state:"ready",records:records,paths:paths};
-            });
-        }).catch(error=>{
-            list.forEach(bindMonsterPortraitIdentity);
-            throw error;
-        });
-        encounterPortraitPreparation.set(cacheKey,preparation);
-        return preparation;
-    }
-    window.v154PrepareMonsterPortraitsForEncounter=prepareMonsterPortraitsForEncounter;
-
     function prepareDailyDungeonPortraits(type){
         const key=String(type||"").trim();
         if(!key){ return Promise.resolve({state:monsterPortraitRegistryState}); }
         if(dailyPortraitPreparation.has(key)){ return dailyPortraitPreparation.get(key); }
         const preparation=requestMonsterPortraitRegistry().then(()=>{
             if(monsterPortraitRegistryState!=="ready"){
-                return {state:"failed",error:monsterPortraitRegistryFailure};
+                return {state:"failed",error:monsterPortraitRegistryFailure,keys:[]};
             }
             const keys=["regular","elite","boss"].map(rank=>"daily."+key+"."+rank);
-            const paths=keys.map(portraitKey=>monsterPortraitByKey.get(portraitKey)).filter(Boolean).map(record=>record.path);
-            const missing=keys.filter(portraitKey=>!monsterPortraitByKey.has(portraitKey));
-            missing.forEach(portraitKey=>monsterPortraitAssetFailures.add(portraitKey));
-            const assets=window.FourSymbolsFeatures&&typeof window.FourSymbolsFeatures.ensureAssets==="function"
-                ?window.FourSymbolsFeatures.ensureAssets(paths)
-                :Promise.reject(new Error("feature asset decoder unavailable"));
-            return assets.then(()=>({state:"ready",keys,paths})).catch(error=>{
-                keys.forEach(portraitKey=>monsterPortraitAssetFailures.add(portraitKey));
-                console.warn("[monster-portrait] daily portrait decode failed; fallback policy remains active.",error);
-                return {state:"failed",error,keys,paths};
+            const results=keys.map(portraitKey=>{
+                const record=monsterPortraitByKey.get(portraitKey);
+                if(!record||!record.path){
+                    monsterPortraitAssetFailures.add(portraitKey);
+                    return Promise.resolve({state:"failed",portraitKey:portraitKey,error:new Error("portrait record missing")});
+                }
+                const assets=window.FourSymbolsFeatures&&typeof window.FourSymbolsFeatures.ensureAssets==="function"
+                    ?window.FourSymbolsFeatures.ensureAssets([record.path])
+                    :Promise.reject(new Error("feature asset decoder unavailable"));
+                return assets.then(()=>{
+                    monsterPortraitAssetFailures.delete(portraitKey);
+                    return {state:"ready",portraitKey:portraitKey,path:record.path};
+                }).catch(error=>{
+                    monsterPortraitAssetFailures.add(portraitKey);
+                    console.warn("[monster-portrait] daily portrait decode failed for "+portraitKey+"; other ranks remain eligible.",error);
+                    return {state:"failed",portraitKey:portraitKey,path:record.path,error:error};
+                });
+            });
+            return Promise.all(results).then(entries=>{
+                const failed=entries.filter(entry=>entry.state!=="ready");
+                return {
+                    state:failed.length?"failed":"ready",
+                    keys:keys,
+                    paths:entries.filter(entry=>entry.state==="ready").map(entry=>entry.path),
+                    failures:failed.map(entry=>entry.portraitKey),
+                    entries:entries
+                };
             });
         });
-        dailyPortraitPreparation.set(key,preparation);
-        return preparation;
+        const tracked=preparation.then(result=>{
+            if(!result||result.state!=="ready"){ dailyPortraitPreparation.delete(key); }
+            return result;
+        });
+        dailyPortraitPreparation.set(key,tracked);
+        return tracked;
     }
     window.v154PrepareDailyDungeonPortraits=prepareDailyDungeonPortraits;
     window.resolveMonsterPortrait=function(monster){
@@ -4321,81 +4311,20 @@
         return;
     }
 
-    function syncMonsterPortraitArt(card,portrait){
-        if(!card){ return; }
-        const selector=".v162-abyss-battle-portrait-art";
-        const art=typeof card.querySelector==="function"?card.querySelector(selector):null;
-        if(!portrait){
-            if(art&&typeof art.remove==="function"){ art.remove(); }
-            else if(art&&art.parentNode&&typeof art.parentNode.removeChild==="function"){
-                art.parentNode.removeChild(art);
-            }
-            return;
-        }
-        let portraitArt=art;
-        if(!portraitArt&&typeof document.createElement==="function"){
-            portraitArt=document.createElement("img");
-            portraitArt.className="v162-abyss-battle-portrait-art v154-monster-portrait-art";
-            portraitArt.alt="";
-            portraitArt.draggable=false;
-            portraitArt.decoding="async";
-            portraitArt.setAttribute("aria-hidden","true");
-            if(card.firstChild&&typeof card.insertBefore==="function"){
-                card.insertBefore(portraitArt,card.firstChild);
-            }else if(typeof card.appendChild==="function"){
-                card.appendChild(portraitArt);
-            }
-        }
-        if(portraitArt&&portraitArt.dataset.monsterPortraitSrc!==portrait){
-            portraitArt.src=portrait;
-            portraitArt.dataset.monsterPortraitSrc=portrait;
-            portraitArt.dataset.abyssPortraitSrc=portrait;
-        }
-    }
-
     function syncCardlessPresentation(card,record){
         if(!card){ return; }
-        const previousManaged=!!card.dataset.monsterPortraitKey;
-        let art=typeof card.querySelector==="function"?card.querySelector(".v174-battle-art"):null;
+        const presentation=typeof window!=="undefined"?window.FourSymbolsBattlePresentation:null;
         if(record){
             const cssValue='url("'+record.path+'")';
-            if(!previousManaged&&card.dataset.v174BattleArtwork){
-                card.dataset.v154BaseBattleArtwork=card.dataset.v174BattleArtwork;
-            }
-            card.dataset.v174BattleArtwork=cssValue;
-            const presentation=typeof window!=="undefined"?window.FourSymbolsBattlePresentation:null;
-            if(presentation&&typeof presentation.applyUnit==="function"){
-                try{ presentation.applyUnit(card,"monster"); }catch(_){ }
-            }
-            art=typeof card.querySelector==="function"?card.querySelector(".v174-battle-art"):null;
-            if(!art&&typeof document!=="undefined"&&typeof document.createElement==="function"){
-                art=document.createElement("div");
-                art.className="v174-battle-art";
-                if(card.classList&&typeof card.classList.add==="function"){
-                    card.classList.add("v174-cardless-unit");
-                }
-                if(card.firstChild&&typeof card.insertBefore==="function"){
-                    card.insertBefore(art,card.firstChild);
-                }else if(typeof card.appendChild==="function"){
-                    card.appendChild(art);
-                }
-            }
-            if(art&&art.style){
-                if(typeof art.style.setProperty==="function"){
-                    art.style.setProperty("background-image",cssValue,"important");
-                }else{ art.style.backgroundImage=cssValue; }
-            }
-            return;
+            card.dataset.v154PortraitRecordPath=record.path;
+            card.style.setProperty("--v152-abyss-portrait",cssValue);
+        }else{
+            delete card.dataset.v154PortraitRecordPath;
+            card.style.removeProperty("--v152-abyss-portrait");
         }
-        if(!previousManaged){ return; }
-        const base=card.dataset.v154BaseBattleArtwork||"";
-        if(base){ card.dataset.v174BattleArtwork=base; }
-        else{ delete card.dataset.v174BattleArtwork; }
-        delete card.dataset.v154BaseBattleArtwork;
-        if(art&&art.style){
-            if(base){ art.style.backgroundImage=base; }
-            else if(typeof art.style.removeProperty==="function"){ art.style.removeProperty("background-image"); }
-            else{ art.style.backgroundImage=""; }
+        /* V154 selects the record. V174 is the only presentation owner. */
+        if(presentation&&typeof presentation.applyUnit==="function"){
+            try{ presentation.applyUnit(card,"monster"); }catch(_){ }
         }
     }
 
@@ -4442,7 +4371,6 @@
                 delete card.dataset.monsterPortraitPath;
                 delete card.dataset.abyssPortrait;
             }
-            syncMonsterPortraitArt(card,portrait);
         });
     }
     window.v154SyncMonsterPortraits=syncMonsterPortraits;
@@ -5942,50 +5870,8 @@
 
 
 /* bundled source: js/48-v159-abyss-battle-portraits.js */
-/* =====================================================
-   V159 — deterministic battle portrait synchronization
-===================================================== */
-(function installV159AbyssBattlePortraits(){
-    "use strict";
-
-    if(typeof window==="undefined"||window.__v159AbyssBattlePortraitsInstalled){ return; }
-    window.__v159AbyssBattlePortraitsInstalled=true;
-
-    function syncPortraits(){
-        if(typeof window.v154SyncMonsterPortraits==="function"){
-            window.v154SyncMonsterPortraits();
-            return;
-        }
-        if(typeof window.v154SyncAbyssPortraits==="function"){
-            window.v154SyncAbyssPortraits();
-        }
-    }
-
-    function syncAfterDomSettles(){
-        syncPortraits();
-        if(typeof requestAnimationFrame==="function"){
-            requestAnimationFrame(syncPortraits);
-        }
-        if(typeof setTimeout==="function"){
-            setTimeout(syncPortraits,120);
-        }
-    }
-
-    if(typeof window.v132LaunchDungeonBattle==="function"){
-        const previousLaunchDungeonBattle=window.v132LaunchDungeonBattle;
-        window.v132LaunchDungeonBattle=function(){
-            const result=previousLaunchDungeonBattle.apply(this,arguments);
-            if(result){ syncAfterDomSettles(); }
-            return result;
-        };
-    }
-
-    if(typeof document!=="undefined"&&document.readyState==="loading"){
-        document.addEventListener("DOMContentLoaded",syncAfterDomSettles,{once:true});
-    }else{
-        syncAfterDomSettles();
-    }
-})();
+/* V159 retired: portrait synchronization belongs to the canonical
+   Daily Dungeon launch lifecycle and V174 presentation owner. */
 
 
 /* bundled source: js/49-v169-element-box-settings.js */
@@ -7335,6 +7221,13 @@
         if(waves.length!==3){ return; }
         const accepted=window.rpgConfirm?await window.rpgConfirm("裝備副本共3輪，每輪6名敵人。\n勝利後獲得2個裝備寶箱，寶箱會放入背包；每箱開啟後隨機獲得3件裝備。\n是否開始挑戰？",{title:"裝備副本",confirmText:"開始挑戰"}):true;
         if(!accepted){ return; }
+        if(typeof window.v154PrepareDailyDungeonPortraits==="function"){
+            const prepared=await window.v154PrepareDailyDungeonPortraits("gold");
+            if(!prepared||prepared.state!=="ready"){
+                alert("每日副本立繪尚未就緒，請重新進入副本。");
+                return;
+            }
+        }
         equipmentDungeonRunning=true;
         const launch=index=>{
             equipmentDungeonWaveIndex=index;
@@ -9020,7 +8913,7 @@ ensureFunctionalStyles();runRepairs();
         const unitRect=isBossFootprint?(carrierRect||cardRect):(slotRect||carrierRect||cardRect);
         if(!unitRect){ return null; }
 
-        const art=card.querySelector(".v174-battle-art,img.v162-abyss-battle-portrait-art,.battle-monster-icon,.battle-player-icon");
+        const art=card.querySelector(".v174-battle-art,.battle-monster-icon,.battle-player-icon");
         const portraitRect=art&&typeof art.getBoundingClientRect==="function"
             ?plainRect(art.getBoundingClientRect())
             :unitRect;
