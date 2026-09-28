@@ -20,7 +20,7 @@
     "bundles": {
       "app-shell": {
         "scripts": [
-          "build/app-shell.683f8919ec39.js"
+          "build/app-shell.00bdaad00413.js"
         ],
         "styles": [
           "build/app-shell.ee313869063a.css"
@@ -50,7 +50,7 @@
       "gameplay-core": {
         "scripts": [
           "build/gameplay-core-primary.82733de23722.js",
-          "build/gameplay-core-secondary.bebf4ef475df.js"
+          "build/gameplay-core-secondary.2469ce8fdc38.js"
         ],
         "styles": [
           "build/gameplay-core.93e811d20b8b.css"
@@ -102,7 +102,7 @@
       },
       "feature-boss-relic": {
         "scripts": [
-          "build/feature-boss-relic.88dd8d22ecdd.js",
+          "build/feature-boss-relic.4c48b9434949.js",
           "build/feature-relic-progression.87f6a83606ad.js"
         ],
         "styles": [
@@ -827,17 +827,9 @@
       "sha256": "c4359d150c7f",
       "bytes": 64599
     },
-    "build/app-shell.683f8919ec39.js": {
-      "sha256": "683f8919ec39",
-      "bytes": 1011232
-    },
     "build/gameplay-core-primary.82733de23722.js": {
       "sha256": "82733de23722",
       "bytes": 646660
-    },
-    "build/gameplay-core-secondary.bebf4ef475df.js": {
-      "sha256": "bebf4ef475df",
-      "bytes": 659238
     },
     "build/feature-patrol.ab5bd3ce5582.js": {
       "sha256": "ab5bd3ce5582",
@@ -846,10 +838,6 @@
     "build/feature-abyss.2a7c37a8ece6.js": {
       "sha256": "2a7c37a8ece6",
       "bytes": 50619
-    },
-    "build/feature-boss-relic.88dd8d22ecdd.js": {
-      "sha256": "88dd8d22ecdd",
-      "bytes": 87140
     },
     "build/feature-relic-progression.87f6a83606ad.js": {
       "sha256": "87f6a83606ad",
@@ -946,6 +934,18 @@
     "assets/ui/startup-main-city.d43e67af1c1c.jpg": {
       "sha256": "d43e67af1c1c",
       "bytes": 363193
+    },
+    "build/gameplay-core-secondary.2469ce8fdc38.js": {
+      "sha256": "2469ce8fdc38",
+      "bytes": 661228
+    },
+    "build/feature-boss-relic.4c48b9434949.js": {
+      "sha256": "4c48b9434949",
+      "bytes": 88312
+    },
+    "build/app-shell.00bdaad00413.js": {
+      "sha256": "00bdaad00413",
+      "bytes": 1011253
     }
   }
 }

@@ -486,7 +486,8 @@
         });
     }
     const FIRE_TOWER_PORTRAIT_PLAN=Object.freeze({"normalByBand":[["MON_FIRE_NORMAL_001","MON_FIRE_NORMAL_003"],["MON_FIRE_NORMAL_002","MON_FIRE_NORMAL_005"],["MON_FIRE_NORMAL_006","MON_FIRE_NORMAL_007"],["MON_FIRE_NORMAL_008","MON_FIRE_NORMAL_009"],["MON_FIRE_NORMAL_010","MON_FIRE_NORMAL_001"],["MON_FIRE_NORMAL_003","MON_FIRE_NORMAL_005"],["MON_FIRE_NORMAL_002","MON_FIRE_NORMAL_006"],["MON_FIRE_NORMAL_007","MON_FIRE_NORMAL_008"],["MON_FIRE_NORMAL_009","MON_FIRE_NORMAL_010"],["MON_FIRE_NORMAL_001","MON_FIRE_NORMAL_004"]],"eliteByBand":[["MON_FIRE_ELITE_001","MON_FIRE_ELITE_002"],["MON_FIRE_ELITE_003","MON_FIRE_ELITE_004"],["MON_FIRE_ELITE_005","MON_FIRE_ELITE_006"],["MON_FIRE_ELITE_007","MON_FIRE_ELITE_008"],["MON_FIRE_ELITE_009","MON_FIRE_ELITE_010"],["MON_FIRE_ELITE_011","MON_FIRE_ELITE_012"],["MON_FIRE_ELITE_013","MON_FIRE_ELITE_014"],["MON_FIRE_ELITE_015","MON_FIRE_ELITE_016"],["MON_FIRE_ELITE_017","MON_FIRE_ELITE_018"],["MON_FIRE_ELITE_019"]],"bossByFloor":{"10":"MON_FIRE_MINIBOSS_001","20":"MON_FIRE_MINIBOSS_002","30":"MON_FIRE_MINIBOSS_003","40":"MON_FIRE_MINIBOSS_004","50":"MON_FIRE_MINIBOSS_005","60":"MON_FIRE_MINIBOSS_006","70":"MON_FIRE_MINIBOSS_007","80":"MON_FIRE_MINIBOSS_008","90":"MON_FIRE_MINIBOSS_009","100":"MON_FIRE_MINIBOSS_011"}});
-    function towerPortraitAssetId(floor,role,slot){
+    function towerPortraitAssetId(element,floor,role,slot){
+        if(String(element||"").toLowerCase()!=="fire"){ return null; }
         const band=Math.max(0,Math.min(9,Math.floor((Number(floor)-1)/10)));
         if(role==="boss"){ return FIRE_TOWER_PORTRAIT_PLAN.bossByFloor[String(floor)]||null; }
         const pool=role==="elite"?FIRE_TOWER_PORTRAIT_PLAN.eliteByBand[band]:FIRE_TOWER_PORTRAIT_PLAN.normalByBand[band];
@@ -528,7 +529,10 @@
         monster.vGameplayTower=true;
         monster.vGameplayTowerFloor=floor;
         monster.vGameplayTowerRole=rank==="elite"?"elite":"regular";
-        monster.portraitKey=towerPortraitAssetId(floor,monster.vGameplayTowerRole,portraitSlot);
+        monster.portraitKey=towerPortraitAssetId(element,floor,monster.vGameplayTowerRole,portraitSlot);
+        if(typeof window.v154BindMonsterPortraitIdentity==="function"){
+            window.v154BindMonsterPortraitIdentity(monster);
+        }
         configureBossSkills(monster,element,Math.ceil(floor/30));
         applyTowerElementProfile(monster,element);
         return monster;
@@ -547,7 +551,10 @@
         monster.vGameplayTowerFloor=floor;
         monster.vGameplayTowerRole="boss";
         monster.vGameplayBossId=definition.id;
-        monster.portraitKey=towerPortraitAssetId(floor,"boss",0);
+        monster.portraitKey=towerPortraitAssetId(definition.element,floor,"boss",0);
+        if(typeof window.v154BindMonsterPortraitIdentity==="function"){
+            window.v154BindMonsterPortraitIdentity(monster);
+        }
         monster.vGameplayPortraitSizeClass="standard";
         configureBossSkills(monster,definition.element,stage);
         applyTowerElementProfile(monster,definition.element);
@@ -1287,14 +1294,29 @@
             expectedPartySize:expectedPartySizeForLevel(towerMonsterLevel(target))
         };
         battleStarting=true;
-        const started=window.v132LaunchDungeonBattle(
-            roster,
-            outcome=>completeTowerFloor(target,outcome),
-            {mode:"tower"}
-        );
-        battleStarting=false;
-        if(!started){ activeBattleContext=null;return false; }
-        return true;
+        const prepare=typeof window.v154PrepareMonsterPortraitsForEncounter==="function"
+            ?window.v154PrepareMonsterPortraitsForEncounter(roster)
+            :Promise.resolve({state:"ready"});
+        return Promise.resolve(prepare).then(()=>{
+            roster.forEach(monster=>{
+                if(typeof window.v154BindMonsterPortraitIdentity==="function"){
+                    window.v154BindMonsterPortraitIdentity(monster);
+                }
+            });
+            const started=window.v132LaunchDungeonBattle(
+                roster,
+                outcome=>completeTowerFloor(target,outcome),
+                {mode:"tower"}
+            );
+            battleStarting=false;
+            if(!started){ activeBattleContext=null;return false; }
+            return true;
+        }).catch(error=>{
+            battleStarting=false;
+            activeBattleContext=null;
+            console.warn("[tower-portrait] encounter preparation failed",error);
+            return false;
+        });
     }
     function chooseTowerRelic(id){
         const choice=TOWER_CONFIG.relicChoices.find(item=>item.id===id);if(!choice||!state.tower.pendingRelicChoice){ return false; }
@@ -1399,6 +1421,7 @@
         normalizeState:normalizeState,
         getWeekInfo:utcWeekInfo,
         getTowerFloorKind:towerFloorKind,
+         getTowerPortraitAssetId:towerPortraitAssetId,
         buildTowerRoster:buildTowerRoster,
         getActiveBattleState:function(){ return activeBattleContext?copy({mode:activeBattleContext.mode,definitionId:activeBattleContext.definitionId||null,stage:activeBattleContext.stage||null,floor:activeBattleContext.floor||null,combatPhase:activeBattleContext.combatPhase||1,totalPhases:activeBattleContext.totalPhases||1,bossIndex:bossIndex(),objectIndexes:(activeBattleContext.objectIndexes||[]).slice(),shield:bossShield()}):null; },
         debugSpawnBossObject:spawnBossObject,
