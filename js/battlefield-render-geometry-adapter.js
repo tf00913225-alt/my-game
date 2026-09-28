@@ -333,7 +333,7 @@
         const unitRect=isBossFootprint?(carrierRect||cardRect):(slotRect||carrierRect||cardRect);
         if(!unitRect){ return null; }
 
-        const art=card.querySelector(".v174-battle-art,img.v162-abyss-battle-portrait-art,.battle-monster-icon,.battle-player-icon");
+        const art=card.querySelector(".v174-battle-art,.battle-monster-icon,.battle-player-icon");
         const portraitRect=art&&typeof art.getBoundingClientRect==="function"
             ?plainRect(art.getBoundingClientRect())
             :unitRect;

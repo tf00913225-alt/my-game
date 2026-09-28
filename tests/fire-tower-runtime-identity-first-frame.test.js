@@ -36,13 +36,13 @@ function loadTower({gate}={}){
         saveGame:()=>{},showPage:()=>{},renderBattle:()=>{},updateUI:()=>{},
         getExistingPartyIndexes:()=>[],getPartyCharacterByIndex:()=>null,
         rebuildInventorySlots:()=>{},updateGoldDisplay:()=>{},
-        v154PrepareMonsterPortraitsForEncounter:null
+        v154PreparePortraitsForEncounter:null
     };
     context.window=context;
     vm.createContext(context);
     vm.runInContext(portraitSource,context);
     context.v154InstallMonsterPortraitRegistry(registry);
-    if(gate){ context.v154PrepareMonsterPortraitsForEncounter=gate; }
+    if(gate){ context.v154PreparePortraitsForEncounter=gate; }
     vm.runInContext(towerSource,context);
     context.GameplaySystem.debugReloadState({tower:{weekKey:WEEK_KEY,element:"fire"}},Date.UTC(2026,8,28));
     return {context,calls,fireById};

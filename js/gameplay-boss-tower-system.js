@@ -1293,11 +1293,6 @@
         };
         battleStarting=true;
         const launch=()=>{
-            roster.forEach(monster=>{
-                if(typeof window.v154BindMonsterPortraitIdentity==="function"){
-                    window.v154BindMonsterPortraitIdentity(monster);
-                }
-            });
             const started=window.v132LaunchDungeonBattle(
                 roster,
                 outcome=>completeTowerFloor(target,outcome),
@@ -1307,10 +1302,30 @@
             if(!started){ activeBattleContext=null;return false; }
             return true;
         };
-        if(typeof window.v154PrepareMonsterPortraitsForEncounter!=="function"){
+        if(typeof window.v154PreparePortraitsForEncounter!=="function"){
+            battleStarting=false;
+            activeBattleContext=null;
+            console.warn("[tower-portrait] shared encounter preparation owner unavailable");
+            return false;
+        }
+        const preparation=window.v154PreparePortraitsForEncounter(roster);
+        if(preparation&&typeof preparation.then!=="function"){
+            if(preparation.state!=="ready"){
+                battleStarting=false;
+                activeBattleContext=null;
+                return false;
+            }
             return launch();
         }
-        Promise.resolve(window.v154PrepareMonsterPortraitsForEncounter(roster)).then(launch).catch(error=>{
+        Promise.resolve(preparation).then(prepared=>{
+            if(!prepared||prepared.state!=="ready"){
+                battleStarting=false;
+                activeBattleContext=null;
+                console.warn("[tower-portrait] shared encounter preparation failed");
+                return false;
+            }
+            return launch();
+        }).catch(error=>{
             battleStarting=false;
             activeBattleContext=null;
             console.warn("[tower-portrait] encounter preparation failed",error);

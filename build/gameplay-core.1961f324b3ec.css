@@ -8960,11 +8960,6 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
     pointer-events:none;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit > .v174-battle-art ~ *{z-index:6;}
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit > img.v162-abyss-battle-portrait-art{
-    opacity:0 !important;
-    pointer-events:none !important;
-}
-
 /* HUD uses formal Slot anchors and never participates in Unit layout. */
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .battle-monster-name,
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot .battle-player-id{

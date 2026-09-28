@@ -96,6 +96,11 @@ function load(options={}){
         v141ShowBlackGoldReward:noop,
         v174RelicDevUnlock:id=>{ (context.relicUnlocks||(context.relicUnlocks=[])).push(id);return true; }
     };
+    context.v154PreparePortraitsForEncounter=roster=>({
+        state:"ready",
+        records:(Array.isArray(roster)?roster:[]).map(monster=>({portraitKey:monster.portraitKey,path:"test://"+String(monster.portraitKey||"portrait")})),
+        paths:(Array.isArray(roster)?roster:[]).map(monster=>"test://"+String(monster.portraitKey||"portrait"))
+    });
     context.v132LaunchDungeonBattle=(roster,onComplete,options)=>{
         context.monsters=roster;context.currentBattleMonsters=roster.map((_,index)=>index);
         context.battleActive=true;context.lastBattleCallback=onComplete;context.lastBattleOptions=options||{};return true;
