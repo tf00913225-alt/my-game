@@ -225,6 +225,40 @@
         return tracked;
     }
     window.v154PrepareDailyDungeonPortraits=prepareDailyDungeonPortraits;
+    function preparePortraitsForEncounter(roster){
+        const list=(Array.isArray(roster)?roster:[roster]).filter(Boolean);
+        if(!list.length){ return Promise.resolve({state:"ready",records:[],paths:[]}); }
+        return requestMonsterPortraitRegistry().then(()=>{
+            if(monsterPortraitRegistryState!=="ready"){
+                return {state:"failed",error:monsterPortraitRegistryFailure,records:[],paths:[]};
+            }
+            const entries=list.map(monster=>{
+                const record=resolveMonsterPortraitRecord(monster);
+                if(!record||!record.path){
+                    return Promise.resolve({state:"failed",monster:monster,error:new Error("portrait record missing")});
+                }
+                const assets=window.FourSymbolsFeatures&&typeof window.FourSymbolsFeatures.ensureAssets==="function"
+                    ?window.FourSymbolsFeatures.ensureAssets([record.path])
+                    :Promise.reject(new Error("feature asset decoder unavailable"));
+                return assets.then(()=>{
+                    const name=record.displayName||record.name||monster.name||"";
+                    if(name){ monster.name=name;monster.displayName=name; }
+                    monster.portraitPath=record.path;
+                    return {state:"ready",monster:monster,record:record};
+                }).catch(error=>({state:"failed",monster:monster,record:record,error:error}));
+            });
+            return Promise.all(entries).then(results=>{
+                const failed=results.filter(entry=>entry.state!=="ready");
+                return {
+                    state:failed.length?"failed":"ready",
+                    records:results.filter(entry=>entry.state==="ready").map(entry=>entry.record),
+                    paths:results.filter(entry=>entry.state==="ready").map(entry=>entry.record.path),
+                    failures:failed.map(entry=>entry.monster&&entry.monster.portraitKey||"unknown")
+                };
+            });
+        });
+    }
+    window.v154PreparePortraitsForEncounter=preparePortraitsForEncounter;
     window.resolveMonsterPortrait=function(monster){
         const roster=currentAbyssRoster();
         const record=resolveMonsterPortraitRecord(monster,{finalAbyss:isFinalAbyssRoster(roster)});
