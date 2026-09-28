@@ -46,7 +46,7 @@ try{
     if(!base){ throw new Error("DEV_BASE_URL is required."); }
     const result=spawnSync(chrome,["--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--window-size=412,915","--virtual-time-budget=15000","--dump-dom",base+"/.daily-dungeon-webp-browser-qa.html"],{encoding:"utf8",timeout:40000,maxBuffer:32*1024*1024});
     if(result.status!==0){ throw new Error(result.stderr||"Chrome exited with "+result.status); }
-    const match=result.stdout.match(/<pre id="result">([\\s\\S]*?)<\\/pre>/);
+    const match=result.stdout.match(/<pre id="result">([\s\S]*?)<\/pre>/);
     assert.ok(match,"Daily Dungeon WebP browser QA did not produce a result.");
     const evidence=JSON.parse(match[1]);
     fs.writeFileSync(path.join(ARTIFACT_DIR,"daily-dungeon-webp-browser-qa.json"),JSON.stringify(evidence,null,2)+"\\n");
