@@ -467,7 +467,6 @@
     pointer-events:none;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit > .v174-battle-art ~ *{z-index:6;}
-legacy img hide rule
 /* HUD uses formal Slot anchors and never participates in Unit layout. */
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .battle-monster-name,
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot .battle-player-id{
