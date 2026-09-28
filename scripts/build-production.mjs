@@ -328,13 +328,24 @@ for(const asset of firstPlayTemplate.assets||[]){ addFirstPlay(asset.path,asset)
 const firstPlayResources=[...firstPlayByPath.values()].sort((a,b)=>(priorityRank[a.priority]??9)-(priorityRank[b.priority]??9)||a.path.localeCompare(b.path));
 const firstPlayBase={schemaVersion:firstPlayTemplate.schemaVersion||1,id:firstPlayTemplate.id,manifestVersion:firstPlayTemplate.manifestVersion,assetPackVersion:firstPlayTemplate.assetPackVersion,concurrency:firstPlayTemplate.concurrency||5,resources:firstPlayResources};
 const firstPlayPack={...firstPlayBase,manifestHash:hash(JSON.stringify(firstPlayBase)),totalBytes:firstPlayResources.reduce((sum,item)=>sum+item.bytes,0),totalResources:firstPlayResources.length};
+const portraitRegistry=JSON.parse(read("config/monster-portrait-registry.json"));
+const runtimePortraits={
+    fire:portraitRegistry.assetPool.entries
+        .filter(entry=>entry.element==="fire"&&entry.status==="adopted")
+        .map(entry=>{
+            const pathName=entry.runtimePath;
+            const content=bytes(pathName);
+            return {assetId:entry.assetId,displayName:entry.displayName,path:pathName,sha256:hash(content),bytes:content.length,decode:true};
+        })
+};
 const assetManifest={
     schemaVersion:1,release:release.version,generatedAt:"deterministic",
     critical:{scripts:[bootOutput.path],styles:[styleOutputs.critical.path],images:[...criticalImagePaths],firebaseBootstrap:firebaseMap["firebase-bootstrap.js"]},
     featureManifest,
     relicIcons:[...new Set(relicIconPaths)],
     firstPlay:firstPlayPack,
-    assets:Object.fromEntries(declared.map(item=>[item.path,{sha256:item.digest,bytes:Buffer.byteLength(item.content)}]))
+    assets:Object.fromEntries(declared.map(item=>[item.path,{sha256:item.digest,bytes:Buffer.byteLength(item.content)}])),
+    runtimePortraits
 };
 const manifestContent=JSON.stringify(assetManifest,null,2)+"\n";
 const manifestOutput=target("asset-manifest","json",manifestContent);
