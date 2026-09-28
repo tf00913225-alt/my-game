@@ -63,7 +63,7 @@ jobs:
             return {assetId:e.assetId,displayName:e.displayName,path,sha256:crypto.createHash("sha256").update(bytes).digest("hex"),bytes:bytes.length,decode:true};
           });
           for(const file of ["asset-manifest.json","build/asset-manifest.json"]){
-            const manifest=JSON.parse(fs.readFileSync(file,"utf8"));
+            const raw=fs.readFileSync(file,"utf8"); let manifest; try{ manifest=JSON.parse(raw); }catch(error){ console.error("Manifest parse failed:",file,"length",raw.length,"tail",raw.slice(-200)); throw error; }
             manifest.runtimePortraits={fire:portraitManifest};
             fs.writeFileSync(file,JSON.stringify(manifest,null,2)+"\\n");
           }
