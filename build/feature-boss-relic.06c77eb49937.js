@@ -1297,7 +1297,7 @@
         const prepare=typeof window.v154PrepareMonsterPortraitsForEncounter==="function"
             ?window.v154PrepareMonsterPortraitsForEncounter(roster)
             :Promise.resolve({state:"ready"});
-        return Promise.resolve(prepare).then(()=>{
+        Promise.resolve(prepare).then(()=>{
             roster.forEach(monster=>{
                 if(typeof window.v154BindMonsterPortraitIdentity==="function"){
                     window.v154BindMonsterPortraitIdentity(monster);
@@ -1317,6 +1317,7 @@
             console.warn("[tower-portrait] encounter preparation failed",error);
             return false;
         });
+        return true;
     }
     function chooseTowerRelic(id){
         const choice=TOWER_CONFIG.relicChoices.find(item=>item.id===id);if(!choice||!state.tower.pendingRelicChoice){ return false; }
