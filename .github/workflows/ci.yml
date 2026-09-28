@@ -102,6 +102,7 @@ jobs:
           node tests/abyss-owner-convergence-20260920.test.js
           node tests/abyss-two-tier-refactor.test.js
           node tests/monster-portrait-runtime.test.js
+          node tests/daily-dungeon-portrait-final-convergence.test.js
           node tests/monster-portrait-import-workflow.test.js
           node tests/v173.51-qa.test.js
           node tests/v173.56-shop-layout-preview-regression.test.js
@@ -209,6 +210,28 @@ jobs:
             artifacts/browser-qa/boss-battle-convergence-412x915.png
           if-no-files-found: error
           retention-days: 90
+      - name: Run Daily Dungeon Monster Portrait Browser QA
+        id: daily_portrait_browser
+        if: success() && (github.event_name == 'pull_request' || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main')
+        run: |
+          python3 -m http.server 4174 --bind 127.0.0.1 > /tmp/daily-portrait-qa-server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+          DEV_BASE_URL=http://127.0.0.1:4174 node .github/scripts/run-daily-dungeon-portrait-browser-qa.mjs
+
+      - name: Upload Daily Dungeon Monster Portrait Browser QA
+        if: always() && steps.daily_portrait_browser.outcome != 'skipped'
+        uses: actions/upload-artifact@v4
+        with:
+          name: daily-dungeon-monster-portrait-browser-qa-${{ github.sha }}
+          path: |
+            artifacts/browser-qa/daily-dungeon-monster-portrait-browser-qa.json
+            artifacts/browser-qa/daily-dungeon-portraits-360x800.png
+            artifacts/browser-qa/daily-dungeon-portraits-393x873.png
+            artifacts/browser-qa/daily-dungeon-portraits-412x915.png
+          if-no-files-found: error
+          retention-days: 90
+
 
       - name: Run exact-candidate real battle mobile browser QA
         id: battle_live_browser

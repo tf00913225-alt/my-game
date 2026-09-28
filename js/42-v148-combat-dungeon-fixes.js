@@ -1103,6 +1103,14 @@
         }else{ grant(1); }
     };
 
+    async function prepareDailyDungeonLaunch(type,waves){
+        const result=typeof window.v154PrepareDailyDungeonPortraits==="function"
+            ?await window.v154PrepareDailyDungeonPortraits(type):{state:"ready"};
+        if(!result||result.state!=="ready") return null;
+        return {type,waves,portraitPreparation:result};
+    }
+    window.v148PrepareDailyDungeonLaunch=prepareDailyDungeonLaunch;
+
     async function beginFormalDailyDungeon(type){
         const meta=DAILY_DUNGEON_META[type];
         if(!meta||dailyDungeonSequence||typeof window.v132LaunchDungeonBattle!=="function"){ return; }
@@ -1116,10 +1124,12 @@
         }
         if(!await confirmFormalDailyDungeon(meta)){ return; }
         const built=buildDailyDungeonWaves(type);
+        const prepared=await prepareDailyDungeonLaunch(type,built.waves);
+        if(!prepared){ alert("每日副本立繪尚未準備完成，請重新進入副本再試一次。"); return; }
         const baseExp=type==="exp"&&typeof window.v139GetExpDungeonRewardExp==="function"
             ?Math.max(0,Math.floor(numeric(window.v139GetExpDungeonRewardExp()))):0;
         const sequence={
-            type:type,meta:meta,level:built.level,partySize:built.partySize,highestPartyLevel:built.highestLevel,soloProtected:built.soloProtected,waves:built.waves,waveIndex:0,totalTurns:0,baseExp:baseExp
+            type:type,meta:meta,level:built.level,partySize:built.partySize,highestPartyLevel:built.highestLevel,soloProtected:built.soloProtected,waves:prepared.waves,waveIndex:0,totalTurns:0,baseExp:baseExp
         };
         dailyDungeonSequence=sequence;
         if(typeof window.v154PrepareDailyDungeonPortraits==="function"){
