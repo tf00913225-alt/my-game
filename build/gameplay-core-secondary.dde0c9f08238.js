@@ -4277,7 +4277,7 @@
             });
         }).catch(error=>{
             list.forEach(bindMonsterPortraitIdentity);
-            return {state:"failed",error:error,records:list.map(resolveMonsterPortraitRecord)};
+            throw error;
         });
         encounterPortraitPreparation.set(cacheKey,preparation);
         return preparation;
