@@ -187,6 +187,11 @@
     const initialMainSave=readMainSave();
     const initialStoredState=initialMainSave&&initialMainSave.gameplayProgress;
     let state=normalizeState(initialStoredState);
+    /* The debug reload hook may provide a historical instant. Keep that
+       explicit clock for the remainder of the isolated debug lifecycle so
+       ensureCurrentTowerWeek() cannot silently compare it with wall-clock
+       Date.now() after a week boundary. Production never sets this value. */
+    let debugClock=null;
     const initialStateNeedsPersist=JSON.stringify(initialStoredState||null)!==JSON.stringify(state);
     let bossTab="personal";
     let bossDetail=null;
@@ -200,10 +205,11 @@
     let towerAutoAdvanceGeneration=0;
 
     function ensureCurrentTowerWeek(now){
-        const week=utcWeekInfo(now);
+        const effectiveNow=now===undefined&&debugClock!==null?debugClock:now;
+        const week=utcWeekInfo(effectiveNow);
         if(state.tower.weekKey===week.key&&state.tower.element===week.element){ return false; }
         const historical=state.tower.historicalHighest;
-        state.tower=defaultTower(now);
+        state.tower=defaultTower(effectiveNow);
         state.tower.historicalHighest=historical;
         return true;
     }
@@ -1401,7 +1407,11 @@
         getActiveBattleState:function(){ return activeBattleContext?copy({mode:activeBattleContext.mode,definitionId:activeBattleContext.definitionId||null,stage:activeBattleContext.stage||null,floor:activeBattleContext.floor||null,combatPhase:activeBattleContext.combatPhase||1,totalPhases:activeBattleContext.totalPhases||1,bossIndex:bossIndex(),objectIndexes:(activeBattleContext.objectIndexes||[]).slice(),shield:bossShield()}):null; },
         debugSpawnBossObject:spawnBossObject,
         debugProcessBossRound:processBossRound,
-        debugReloadState:function(raw,now){ state=normalizeState(raw,now);return serializableState(); }
+        debugReloadState:function(raw,now){
+            debugClock=now===undefined?null:now;
+            state=normalizeState(raw,now);
+            return serializableState();
+        }
     });
 
     if(initialStateNeedsPersist||ensureCurrentTowerWeek()){ persist(); }
