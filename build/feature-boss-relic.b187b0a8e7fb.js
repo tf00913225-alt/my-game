@@ -524,15 +524,27 @@
         }
         return monster;
     }
+    function bindTowerMonsterIdentity(monster){
+        if(!monster){ return monster; }
+        if(typeof window.v154BindMonsterPortraitIdentity==="function"){
+            window.v154BindMonsterPortraitIdentity(monster);
+        }
+        // The portrait Registry is the single name owner for tower assets.
+        // Battle UI reads monster.name, so promote the resolved displayName
+        // only after the Registry has resolved the explicit portraitKey.
+        if(monster.portraitKey&&monster.displayName){
+            monster.name=monster.displayName;
+        }
+        return monster;
+    }
+
     function buildTowerTroop(level,element,rank,floor,portraitSlot){
         const monster=buildBaseMonster("天兵天將",level,element,rank||"regular");
         monster.vGameplayTower=true;
         monster.vGameplayTowerFloor=floor;
         monster.vGameplayTowerRole=rank==="elite"?"elite":"regular";
         monster.portraitKey=towerPortraitAssetId(element,floor,monster.vGameplayTowerRole,portraitSlot);
-        if(typeof window.v154BindMonsterPortraitIdentity==="function"){
-            window.v154BindMonsterPortraitIdentity(monster);
-        }
+        bindTowerMonsterIdentity(monster);
         configureBossSkills(monster,element,Math.ceil(floor/30));
         applyTowerElementProfile(monster,element);
         return monster;
@@ -552,9 +564,7 @@
         monster.vGameplayTowerRole="boss";
         monster.vGameplayBossId=definition.id;
         monster.portraitKey=towerPortraitAssetId(definition.element,floor,"boss",0);
-        if(typeof window.v154BindMonsterPortraitIdentity==="function"){
-            window.v154BindMonsterPortraitIdentity(monster);
-        }
+        bindTowerMonsterIdentity(monster);
         monster.vGameplayPortraitSizeClass="standard";
         configureBossSkills(monster,definition.element,stage);
         applyTowerElementProfile(monster,definition.element);
@@ -1295,6 +1305,7 @@
         };
         battleStarting=true;
         const launch=()=>{
+            roster.forEach(bindTowerMonsterIdentity);
             const started=window.v132LaunchDungeonBattle(
                 roster,
                 outcome=>completeTowerFloor(target,outcome),

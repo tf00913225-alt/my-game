@@ -18,4 +18,19 @@ for(const id of Object.values(registry.fireTowerCoverage.bossByFloor)) assert.eq
 assert.match(tower,/eliteEvery:5,bossEvery:10/);
 assert.match(tower,/monster\.portraitKey=towerPortraitAssetId/);
 assert.match(tower,/towerPortraitAssetId\(floor,"boss"/);
+assert.match(tower,/function bindTowerMonsterIdentity\(monster\)/);
+assert.match(tower,/monster\.name=monster\.displayName/);
+
+const byId=Object.fromEntries(pool.map(entry=>[entry.assetId,entry]));
+const expectedNames={
+  "MON_FIRE_NORMAL_001":"炎刃流寇",
+  "MON_FIRE_ELITE_001":"裂甲熔蠍",
+  "MON_FIRE_ELITE_002":"焚稻魈",
+  "MON_FIRE_MINIBOSS_001":"炎脊裂龍",
+  "MON_FIRE_MINIBOSS_005":"焚城魔將",
+  "MON_FIRE_MINIBOSS_011":"焰冠獅魁"
+};
+for(const [assetId,name] of Object.entries(expectedNames)){
+  assert.equal(byId[assetId].displayName,name,assetId+" displayName mismatch");
+}
 console.log("Fire tower portrait coverage tests passed.");
