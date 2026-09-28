@@ -44,7 +44,7 @@ jobs:
             fs.unlinkSync(src);
             entry.runtimePath=dest;
           }
-          fs.writeFileSync(registryPath,JSON.stringify(registry,null,2)+"\\n");
+          fs.writeFileSync(registryPath,JSON.stringify(registry,null,2)+"\n");
           console.log("Converted",selected.length,"fire runtime portraits.");
           NODE
 
@@ -65,7 +65,7 @@ jobs:
           for(const file of ["asset-manifest.json","build/asset-manifest.json"]){
             const raw=fs.readFileSync(file,"utf8"); let manifest; try{ manifest=JSON.parse(raw); }catch(error){ console.error("Manifest parse failed:",file,"length",raw.length,"tail",raw.slice(-200)); throw error; }
             manifest.runtimePortraits={fire:portraitManifest};
-            fs.writeFileSync(file,JSON.stringify(manifest,null,2)+"\\n");
+            fs.writeFileSync(file,JSON.stringify(manifest,null,2)+"\n");
           }
           console.log("Manifest updated with",portraitManifest.length,"fire WebP portraits.");
           NODE
