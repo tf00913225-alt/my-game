@@ -1304,9 +1304,7 @@
         battleStarting=true;
         const launch=()=>{
             roster.forEach(monster=>{
-                if(typeof window.v154BindMonsterPortraitIdentity==="function"){
-                    window.v154BindMonsterPortraitIdentity(monster);
-                }
+                bindTowerMonsterIdentity(monster);
             });
             const started=window.v132LaunchDungeonBattle(
                 roster,
