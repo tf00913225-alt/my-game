@@ -79,12 +79,12 @@
     "wild": [
       [
         "wild.zone-01.fire-01",
-        "哥布林",
+        "火炬邪鬼",
         "fire",
         "regular",
         "standard",
-        "assets/monsters/wild/zone-01/fire-01.png",
-        "planned"
+        "assets/monsters/wild/zone-01/fire-01.webp",
+        "existing"
       ],
       [
         "wild.zone-01.water-01",
@@ -115,12 +115,12 @@
       ],
       [
         "wild.zone-02.fire-01",
-        "沙漠豺狼",
+        "炙甲獠牙",
         "fire",
         "regular",
         "standard",
-        "assets/monsters/wild/zone-02/fire-01.png",
-        "planned"
+        "assets/monsters/wild/zone-02/fire-01.webp",
+        "existing"
       ],
       [
         "wild.zone-02.water-01",
@@ -151,12 +151,12 @@
       ],
       [
         "wild.zone-03.fire-01",
-        "熾焰狼",
+        "炎尾猿",
         "fire",
         "regular",
         "standard",
-        "assets/monsters/wild/zone-03/fire-01.png",
-        "planned"
+        "assets/monsters/wild/zone-03/fire-01.webp",
+        "existing"
       ],
       [
         "wild.zone-03.water-01",
@@ -169,12 +169,12 @@
       ],
       [
         "wild.zone-03.fire-02",
-        "熾焰狼王",
+        "灰翎焰鴉",
         "fire",
         "regular",
         "standard",
-        "assets/monsters/wild/zone-03/fire-02.png",
-        "planned"
+        "assets/monsters/wild/zone-03/fire-02.webp",
+        "existing"
       ],
       [
         "wild.zone-03.water-02",
@@ -205,12 +205,12 @@
       ],
       [
         "wild.zone-04.fire-01",
-        "烈焰巨魔",
+        "熔盾戰鬼",
         "fire",
         "regular",
         "standard",
-        "assets/monsters/wild/zone-04/fire-01.png",
-        "planned"
+        "assets/monsters/wild/zone-04/fire-01.webp",
+        "existing"
       ],
       [
         "wild.zone-04.water-01",
@@ -223,12 +223,12 @@
       ],
       [
         "wild.zone-04.fire-02",
-        "烈焰巨魔王",
+        "熔巖巨魁",
         "fire",
         "regular",
         "standard",
-        "assets/monsters/wild/zone-04/fire-02.png",
-        "planned"
+        "assets/monsters/wild/zone-04/fire-02.webp",
+        "existing"
       ],
       [
         "wild.zone-04.water-02",
@@ -259,12 +259,12 @@
       ],
       [
         "wild.zone-05.fire-01",
-        "熔岩巨獸",
+        "熔巖象衛",
         "fire",
         "regular",
         "standard",
-        "assets/monsters/wild/zone-05/fire-01.png",
-        "planned"
+        "assets/monsters/wild/zone-05/fire-01.webp",
+        "existing"
       ],
       [
         "wild.zone-05.water-01",
@@ -277,12 +277,12 @@
       ],
       [
         "wild.zone-05.fire-02",
-        "熔岩巨獸王",
+        "炎鎧魔將",
         "fire",
         "regular",
         "standard",
-        "assets/monsters/wild/zone-05/fire-02.png",
-        "planned"
+        "assets/monsters/wild/zone-05/fire-02.webp",
+        "existing"
       ],
       [
         "wild.zone-05.water-02",
@@ -1112,9 +1112,9 @@
         "element": "fire",
         "tier": "normal",
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_00000000465082118dd011205c72c7e5.png",
-        "runtimePath": "assets/monsters/wild/fire-pool/mon-fire-normal-003.png",
+        "runtimePath": "assets/monsters/wild/zone-03/fire-01.webp",
         "status": "adopted",
-        "usedIn": "野怪候選",
+        "usedIn": "wild.zone-03.fire-01",
         "notes": "火焰尾猿型生物，動作感強，適合普通野怪。"
       },
       {
@@ -1134,9 +1134,9 @@
         "element": "fire",
         "tier": "normal",
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_000000005e0881fa826497584af5095a.png",
-        "runtimePath": "assets/monsters/wild/fire-pool/mon-fire-normal-005.png",
+        "runtimePath": "assets/monsters/wild/zone-02/fire-01.webp",
         "status": "adopted",
-        "usedIn": "野怪候選",
+        "usedIn": "wild.zone-02.fire-01",
         "notes": "厚甲獠牙獸，體格中等，適合普通野怪。"
       },
       {
@@ -1145,9 +1145,9 @@
         "element": "fire",
         "tier": "elite",
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_000000005f388209b9596f039c965ead.png",
-        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-elite-003.png",
+        "runtimePath": "assets/monsters/wild/zone-05/fire-01.webp",
         "status": "adopted",
-        "usedIn": "火元素塔 Elite 候選",
+        "usedIn": "wild.zone-05.fire-01",
         "notes": "熔巖石象持盾持錘，重裝與體型符合精英視覺。"
       },
       {
@@ -1200,9 +1200,9 @@
         "element": "fire",
         "tier": "normal",
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_00000000ab9c81faa34a6a9869419b1d.png",
-        "runtimePath": "assets/monsters/wild/fire-pool/mon-fire-normal-007.png",
+        "runtimePath": "assets/monsters/wild/zone-01/fire-01.webp",
         "status": "adopted",
-        "usedIn": "野怪候選",
+        "usedIn": "wild.zone-01.fire-01",
         "notes": "小型持火炬邪鬼，裝備簡單，適合普通野怪。"
       },
       {
@@ -1244,9 +1244,9 @@
         "element": "fire",
         "tier": "normal",
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_00000000e2c08211ab8c3238854b4d82.png",
-        "runtimePath": "assets/monsters/wild/fire-pool/mon-fire-normal-009.png",
+        "runtimePath": "assets/monsters/wild/zone-03/fire-02.webp",
         "status": "adopted",
-        "usedIn": "野怪候選",
+        "usedIn": "wild.zone-03.fire-02",
         "notes": "焰羽鳥妖，體型與裝備較輕，適合普通野怪。"
       },
       {
@@ -1299,9 +1299,9 @@
         "element": "fire",
         "tier": "elite",
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/菁英怪/file_0000000012ac82069c6fdedaaaa64660.png",
-        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-elite-011.png",
+        "runtimePath": "assets/monsters/wild/zone-04/fire-01.webp",
         "status": "adopted",
-        "usedIn": "火元素塔 Elite 候選",
+        "usedIn": "wild.zone-04.fire-01",
         "notes": "重盾熔岩鬼，護甲與體格具有前排精英定位。"
       },
       {
@@ -1365,9 +1365,9 @@
         "element": "fire",
         "tier": "elite",
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/菁英怪/file_000000008430820b8b8a6da7013a6477.png",
-        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-elite-017.png",
+        "runtimePath": "assets/monsters/wild/zone-05/fire-02.webp",
         "status": "adopted",
-        "usedIn": "火元素塔 Elite 候選",
+        "usedIn": "wild.zone-05.fire-02",
         "notes": "雙翼重甲魔將，威壓足夠但仍維持標準立繪尺度。"
       },
       {
@@ -1376,9 +1376,9 @@
         "element": "fire",
         "tier": "elite",
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/菁英怪/file_00000000b9c48246b09f8447ab25c8b2.png",
-        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-elite-018.png",
+        "runtimePath": "assets/monsters/wild/zone-04/fire-02.webp",
         "status": "adopted",
-        "usedIn": "火元素塔 Elite 候選",
+        "usedIn": "wild.zone-04.fire-02",
         "notes": "巨型熔巖生物與重錘，適合高階精英或塔中段守衛。"
       },
       {
