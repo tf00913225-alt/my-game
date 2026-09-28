@@ -1292,10 +1292,7 @@
             expectedPartySize:expectedPartySizeForLevel(towerMonsterLevel(target))
         };
         battleStarting=true;
-        const prepare=typeof window.v154PrepareMonsterPortraitsForEncounter==="function"
-            ?window.v154PrepareMonsterPortraitsForEncounter(roster)
-            :Promise.resolve({state:"ready"});
-        Promise.resolve(prepare).then(()=>{
+        const launch=()=>{
             roster.forEach(monster=>{
                 if(typeof window.v154BindMonsterPortraitIdentity==="function"){
                     window.v154BindMonsterPortraitIdentity(monster);
@@ -1309,7 +1306,11 @@
             battleStarting=false;
             if(!started){ activeBattleContext=null;return false; }
             return true;
-        }).catch(error=>{
+        };
+        if(typeof window.v154PrepareMonsterPortraitsForEncounter!=="function"){
+            return launch();
+        }
+        Promise.resolve(window.v154PrepareMonsterPortraitsForEncounter(roster)).then(launch).catch(error=>{
             battleStarting=false;
             activeBattleContext=null;
             console.warn("[tower-portrait] encounter preparation failed",error);
