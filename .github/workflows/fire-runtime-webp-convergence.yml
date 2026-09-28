@@ -31,15 +31,15 @@ jobs:
           const selected=registry.assetPool.entries.filter(entry =>
             entry.element==="fire" &&
             entry.status==="adopted" &&
-            /\\.png$/i.test(entry.runtimePath)
+            /\.png$/i.test(entry.runtimePath)
           );
           if(selected.length!==21) throw new Error("Expected 21 PNG fire runtime portraits, got "+selected.length);
           for(const entry of selected){
             const src=entry.runtimePath;
-            const dest=src.replace(/\\.png$/i,".webp");
+            const dest=src.replace(/\.png$/i,".webp");
             execFileSync("convert",[src,"-define","webp:lossless=true","-quality","100",dest],{stdio:"inherit"});
             const identify=execFileSync("identify",["-format","%m %wx%h %[channels]",dest],{encoding:"utf8"}).trim();
-            if(!/^WEBP \\d+x\\d+/.test(identify)) throw new Error("Invalid WebP: "+dest+" "+identify);
+            if(!/^WEBP \d+x\d+/.test(identify)) throw new Error("Invalid WebP: "+dest+" "+identify);
             if(!identify.includes("a") && !identify.includes("rgba")) throw new Error("Transparency channel missing: "+dest+" "+identify);
             fs.unlinkSync(src);
             entry.runtimePath=dest;
@@ -58,7 +58,7 @@ jobs:
           if(fire.length!==39) throw new Error("Expected 39 adopted fire assets, got "+fire.length);
           const portraitManifest=fire.map(e=>{
             const path=e.runtimePath;
-            if(!/\\.webp$/i.test(path)) throw new Error("Non-WebP runtime path: "+e.assetId);
+            if(!/\.webp$/i.test(path)) throw new Error("Non-WebP runtime path: "+e.assetId);
             const bytes=fs.readFileSync(path);
             return {assetId:e.assetId,displayName:e.displayName,path,sha256:crypto.createHash("sha256").update(bytes).digest("hex"),bytes:bytes.length,decode:true};
           });
