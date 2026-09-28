@@ -73,6 +73,14 @@ function loadRuntime(monsterRows){
     };
     const context={
         window:null,document,console,Math,Number,Object,Array,Set,Map,Promise,
+        FourSymbolsBattlePresentation:{
+            applyUnit(card){
+                card.classList.toggle("v174-cardless-unit",true);
+                let art=card.querySelector(".v174-battle-art");
+                if(!art){ art=element(); art.className="v174-battle-art"; card.insertBefore(art,card.firstChild); }
+                art.style.setProperty("background-image",card.style.getPropertyValue("--v152-abyss-portrait"));
+            }
+        },
         currentBattleMonsters:monsterRows.map((_,index)=>index),monsters:monsterRows,autoBattle:false,
         updateAutoButton(){},openAutoBattleSettings(){},closeAutoBattleSettings(){},
         openHomeFeature(){},closeHomeFeature(){},applyPostBattleAutoRecovery(){},
