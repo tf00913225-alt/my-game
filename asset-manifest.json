@@ -954,7 +954,7 @@
         "assetId": "MON_FIRE_NORMAL_001",
         "displayName": "炎刃流寇",
         "path": "assets/monsters/wild/fire-pool/mon-fire-normal-001.webp",
-        "sha256": "c70df7a35e90aeb92a865b57753b0ad0c7d501ff1b7caf27b377bb0c329ce664",
+        "sha256": "c70df7a35e90",
         "bytes": 1094838,
         "decode": true
       },
@@ -962,7 +962,7 @@
         "assetId": "MON_FIRE_NORMAL_002",
         "displayName": "熔牙斥候",
         "path": "assets/monsters/wild/fire-pool/mon-fire-normal-002.webp",
-        "sha256": "4836f1fc7737c69085d626379949f5ef9998d6355e7d4adb3db78590b0fd5fd3",
+        "sha256": "4836f1fc7737",
         "bytes": 1153412,
         "decode": true
       },
@@ -970,7 +970,7 @@
         "assetId": "MON_FIRE_ELITE_001",
         "displayName": "裂甲熔蠍",
         "path": "assets/monsters/tower/fire-pool/mon-fire-elite-001.webp",
-        "sha256": "83b9f720754c5193e1c0d540105c4b782dec94c3e6808a8977285b6038bd762c",
+        "sha256": "83b9f720754c",
         "bytes": 1213798,
         "decode": true
       },
@@ -978,7 +978,7 @@
         "assetId": "MON_FIRE_ELITE_002",
         "displayName": "焚稻魈",
         "path": "assets/monsters/tower/fire-pool/mon-fire-elite-002.webp",
-        "sha256": "896cf3da2972fb057ddcaddf4ff00662aa765ee631eb22bdd880f0e0d83a0c00",
+        "sha256": "896cf3da2972",
         "bytes": 1376090,
         "decode": true
       },
@@ -986,7 +986,7 @@
         "assetId": "MON_FIRE_NORMAL_003",
         "displayName": "炎尾猿",
         "path": "assets/monsters/wild/zone-03/fire-01.webp",
-        "sha256": "bd1042370255dcc21431c3fbbe7cfbb44721f29500b703be873a85959f54ca4e",
+        "sha256": "bd1042370255",
         "bytes": 92,
         "decode": true
       },
@@ -994,7 +994,7 @@
         "assetId": "MON_FIRE_NORMAL_004",
         "displayName": "燼骨槍徒",
         "path": "assets/monsters/wild/fire-pool/mon-fire-normal-004.webp",
-        "sha256": "48dd8ba574ec53a9278a05501d0d48fb24208732bd396afa10fb400174a9f224",
+        "sha256": "48dd8ba574ec",
         "bytes": 855174,
         "decode": true
       },
@@ -1002,7 +1002,7 @@
         "assetId": "MON_FIRE_NORMAL_005",
         "displayName": "炙甲獠牙",
         "path": "assets/monsters/wild/zone-02/fire-01.webp",
-        "sha256": "66439580c9d74c0cfae4b7b1fa45e789c9d27c043a2ad124adadcf0ffe6ea694",
+        "sha256": "66439580c9d7",
         "bytes": 93,
         "decode": true
       },
@@ -1010,7 +1010,7 @@
         "assetId": "MON_FIRE_ELITE_003",
         "displayName": "熔巖象衛",
         "path": "assets/monsters/wild/zone-05/fire-01.webp",
-        "sha256": "62fee6a3c5c1991bbfd600f786acb105f23f4ae8333ce59a7f7997f1d657343e",
+        "sha256": "62fee6a3c5c1",
         "bytes": 93,
         "decode": true
       },
@@ -1018,7 +1018,7 @@
         "assetId": "MON_FIRE_NORMAL_006",
         "displayName": "赤燼雙刃",
         "path": "assets/monsters/wild/fire-pool/mon-fire-normal-006.webp",
-        "sha256": "dc80fa062924cbc08e7fccd0a89f3b1d01a1c58a4f82802c4503a9b9cc9f8af7",
+        "sha256": "dc80fa062924",
         "bytes": 1025480,
         "decode": true
       },
@@ -1026,7 +1026,7 @@
         "assetId": "MON_FIRE_ELITE_004",
         "displayName": "爐心罐衛",
         "path": "assets/monsters/tower/fire-pool/mon-fire-elite-004.webp",
-        "sha256": "08441c5d7ac2fc9c09382ff04aac87d80f81ba0e0c102218b6819bb59bdc1469",
+        "sha256": "08441c5d7ac2",
         "bytes": 1080834,
         "decode": true
       },
@@ -1034,7 +1034,7 @@
         "assetId": "MON_FIRE_ELITE_005",
         "displayName": "熔角戰獠",
         "path": "assets/monsters/wild/zone-10/fire-01.webp",
-        "sha256": "8ec6bb63228334335e4511ac0a3bfa7e101041db6d649edc8ab0cf026a3a5d1f",
+        "sha256": "8ec6bb632283",
         "bytes": 93,
         "decode": true
       },
@@ -1042,7 +1042,7 @@
         "assetId": "MON_FIRE_ELITE_006",
         "displayName": "炎棘巨鬣",
         "path": "assets/monsters/wild/zone-08/fire-01.webp",
-        "sha256": "48887749d7fd3ff23e6623697d2c4a1994a474f4ede8cf81f99ed011a5700fc7",
+        "sha256": "48887749d7fd",
         "bytes": 93,
         "decode": true
       },
@@ -1050,7 +1050,7 @@
         "assetId": "MON_FIRE_NORMAL_007",
         "displayName": "火炬邪鬼",
         "path": "assets/monsters/wild/zone-01/fire-01.webp",
-        "sha256": "ac967002f261eb6f9ff7136f31cda11b4d4dee7c39f71dc86ad179109c8f6d16",
+        "sha256": "ac967002f261",
         "bytes": 93,
         "decode": true
       },
@@ -1058,7 +1058,7 @@
         "assetId": "MON_FIRE_NORMAL_008",
         "displayName": "灰燼鬼爪",
         "path": "assets/monsters/wild/fire-pool/mon-fire-normal-008.webp",
-        "sha256": "5930f3781ead4564ce8193fbe23ff9ad2ceb542778978e6bb516e4d3d17bda43",
+        "sha256": "5930f3781ead",
         "bytes": 1165022,
         "decode": true
       },
@@ -1066,7 +1066,7 @@
         "assetId": "MON_FIRE_ELITE_007",
         "displayName": "炎紋術士",
         "path": "assets/monsters/wild/zone-09/fire-01.webp",
-        "sha256": "95c2dab9b1d158ac68dc0dbee75d5a408cb975cda7d23fdff7c1e34d05b2ed87",
+        "sha256": "95c2dab9b1d1",
         "bytes": 93,
         "decode": true
       },
@@ -1074,7 +1074,7 @@
         "assetId": "MON_FIRE_ELITE_008",
         "displayName": "炎殼長戟蟲",
         "path": "assets/monsters/tower/fire-pool/mon-fire-elite-008.webp",
-        "sha256": "6ea6a910c023b72592cef2dde3f890911cf4d33ec7f58ebd2aa669ed05655a76",
+        "sha256": "6ea6a910c023",
         "bytes": 988132,
         "decode": true
       },
@@ -1082,7 +1082,7 @@
         "assetId": "MON_FIRE_NORMAL_009",
         "displayName": "灰翎焰鴉",
         "path": "assets/monsters/wild/zone-03/fire-02.webp",
-        "sha256": "523f5761e900c56d3a185c921245a2f2f9fe0773c4ef32d97e910dc775e5adef",
+        "sha256": "523f5761e900",
         "bytes": 93,
         "decode": true
       },
@@ -1090,7 +1090,7 @@
         "assetId": "MON_FIRE_ELITE_009",
         "displayName": "熔痕巨蛙",
         "path": "assets/monsters/tower/fire-pool/mon-fire-elite-009.webp",
-        "sha256": "22ece523e821b5026127e83f2386207c7bb27ecd0061238abe3f8f3a688c38e0",
+        "sha256": "22ece523e821",
         "bytes": 1346738,
         "decode": true
       },
@@ -1098,7 +1098,7 @@
         "assetId": "MON_FIRE_MINIBOSS_001",
         "displayName": "炎脊裂龍",
         "path": "assets/monsters/tower/fire-pool/mon-fire-miniboss-001.webp",
-        "sha256": "f9cfd3530dac563e9b78e8472f10b50f9dd6cfcd1fcccf7e878d5be34d1034b2",
+        "sha256": "f9cfd3530dac",
         "bytes": 1167456,
         "decode": true
       },
@@ -1106,7 +1106,7 @@
         "assetId": "MON_FIRE_NORMAL_010",
         "displayName": "燼羽獵魔",
         "path": "assets/monsters/wild/fire-pool/mon-fire-normal-010.webp",
-        "sha256": "e1acdf74c3d4cdacaaa3d58f6bc69291c4156e50d667d3b8652743fdab18962f",
+        "sha256": "e1acdf74c3d4",
         "bytes": 878804,
         "decode": true
       },
@@ -1114,7 +1114,7 @@
         "assetId": "MON_FIRE_ELITE_010",
         "displayName": "焚鎖炎巫",
         "path": "assets/monsters/wild/zone-06/fire-02.webp",
-        "sha256": "41c4440840826c4df0a547f9685983830ed2691b09adeb57d8a44b002bc0e18e",
+        "sha256": "41c444084082",
         "bytes": 93,
         "decode": true
       },
@@ -1122,7 +1122,7 @@
         "assetId": "MON_FIRE_ELITE_011",
         "displayName": "熔盾戰鬼",
         "path": "assets/monsters/wild/zone-04/fire-01.webp",
-        "sha256": "3b6811567c0afb46df8e218ee4c691a946300b517db578bf558abd7d45dbf144",
+        "sha256": "3b6811567c0a",
         "bytes": 94,
         "decode": true
       },
@@ -1130,7 +1130,7 @@
         "assetId": "MON_FIRE_ELITE_012",
         "displayName": "炎翎戰姬",
         "path": "assets/monsters/wild/zone-07/fire-01.webp",
-        "sha256": "7769389b43b5b2e72dd38a40188107885becdab99a08e81b746406f5d5f8d406",
+        "sha256": "7769389b43b5",
         "bytes": 93,
         "decode": true
       },
@@ -1138,7 +1138,7 @@
         "assetId": "MON_FIRE_ELITE_013",
         "displayName": "裂焰鐮蟲",
         "path": "assets/monsters/wild/zone-09/fire-02.webp",
-        "sha256": "95c2dab9b1d158ac68dc0dbee75d5a408cb975cda7d23fdff7c1e34d05b2ed87",
+        "sha256": "95c2dab9b1d1",
         "bytes": 93,
         "decode": true
       },
@@ -1146,7 +1146,7 @@
         "assetId": "MON_FIRE_ELITE_014",
         "displayName": "炎鱗蛇后",
         "path": "assets/monsters/wild/zone-07/fire-02.webp",
-        "sha256": "74e1ff860d953c80c18a86ebb613fa4aa82ae2a7c68ef116dec14a1827493fc2",
+        "sha256": "74e1ff860d95",
         "bytes": 93,
         "decode": true
       },
@@ -1154,7 +1154,7 @@
         "assetId": "MON_FIRE_ELITE_015",
         "displayName": "燼鐮冥使",
         "path": "assets/monsters/wild/zone-06/fire-01.webp",
-        "sha256": "70c59a09e3fde3528e2afde8e6fec0606252d4d457fcc219475f4f78c9e15fb2",
+        "sha256": "70c59a09e3fd",
         "bytes": 93,
         "decode": true
       },
@@ -1162,7 +1162,7 @@
         "assetId": "MON_FIRE_ELITE_016",
         "displayName": "爐火爆魔",
         "path": "assets/monsters/wild/zone-10/fire-02.webp",
-        "sha256": "1fbe95186c187ded4b1fab6cbdd1e6b1d7e211825f8a677b9d8ed55ac7af7257",
+        "sha256": "1fbe95186c18",
         "bytes": 94,
         "decode": true
       },
@@ -1170,7 +1170,7 @@
         "assetId": "MON_FIRE_ELITE_017",
         "displayName": "炎鎧魔將",
         "path": "assets/monsters/wild/zone-05/fire-02.webp",
-        "sha256": "3be62c03f361d4e7fe447ca72ef1c134670402923a0616ff07d23c8f73e8bb04",
+        "sha256": "3be62c03f361",
         "bytes": 93,
         "decode": true
       },
@@ -1178,7 +1178,7 @@
         "assetId": "MON_FIRE_ELITE_018",
         "displayName": "熔巖巨魁",
         "path": "assets/monsters/wild/zone-04/fire-02.webp",
-        "sha256": "6e30fa6a3d140b1e9e31d7da66da96cc7ff88ba32d88e4910ea6f7053b3f0294",
+        "sha256": "6e30fa6a3d14",
         "bytes": 93,
         "decode": true
       },
@@ -1186,7 +1186,7 @@
         "assetId": "MON_FIRE_ELITE_019",
         "displayName": "焦木火魈",
         "path": "assets/monsters/wild/zone-08/fire-02.webp",
-        "sha256": "c759c178e89ec3d397e279ef6679aee2c00cbc6379ef488d476f55fca0043855",
+        "sha256": "c759c178e89e",
         "bytes": 93,
         "decode": true
       },
@@ -1194,7 +1194,7 @@
         "assetId": "MON_FIRE_MINIBOSS_002",
         "displayName": "熔獄牛魔",
         "path": "assets/monsters/tower/fire-pool/mon-fire-miniboss-002.webp",
-        "sha256": "6043b633b86a36469547ac882d3a9cf2060d6591666d51c3591c10ff981fb2c8",
+        "sha256": "6043b633b86a",
         "bytes": 2003038,
         "decode": true
       },
@@ -1202,7 +1202,7 @@
         "assetId": "MON_FIRE_MINIBOSS_003",
         "displayName": "炎翼蝶后",
         "path": "assets/monsters/tower/fire-pool/mon-fire-miniboss-003.webp",
-        "sha256": "15d280fa0b90822c732c95c0b9ddc807ecf64e559377f18ee7b1ee6c6ce5b6cf",
+        "sha256": "15d280fa0b90",
         "bytes": 2177000,
         "decode": true
       },
@@ -1210,7 +1210,7 @@
         "assetId": "MON_FIRE_MINIBOSS_004",
         "displayName": "炎輪獅王",
         "path": "assets/monsters/tower/fire-pool/mon-fire-miniboss-004.webp",
-        "sha256": "f8df8fe570a6b65d434a906fa7119eaa1c657b033dd28e03d06e559fcf6cf54f",
+        "sha256": "f8df8fe570a6",
         "bytes": 1942868,
         "decode": true
       },
@@ -1218,7 +1218,7 @@
         "assetId": "MON_FIRE_MINIBOSS_005",
         "displayName": "焚城魔將",
         "path": "assets/monsters/tower/fire-pool/mon-fire-miniboss-005.webp",
-        "sha256": "35fc86b6a96a3bbe3d419ea9af7623bc7306b92f7a78892b440a4d53fced7cc2",
+        "sha256": "35fc86b6a96a",
         "bytes": 1877240,
         "decode": true
       },
@@ -1226,7 +1226,7 @@
         "assetId": "MON_FIRE_MINIBOSS_006",
         "displayName": "赤焰狐后",
         "path": "assets/monsters/tower/fire-pool/mon-fire-miniboss-006.webp",
-        "sha256": "a7f328b26e51008f158bf0911015a94203c2c0c50c2eb09b4799c97129d92887",
+        "sha256": "a7f328b26e51",
         "bytes": 2054362,
         "decode": true
       },
@@ -1234,7 +1234,7 @@
         "assetId": "MON_FIRE_MINIBOSS_007",
         "displayName": "熔甲鱷王",
         "path": "assets/monsters/tower/fire-pool/mon-fire-miniboss-007.webp",
-        "sha256": "0a8f77b9e32f7c1ffa224e82796a27616ec64e459852063ee7475c71a6a71533",
+        "sha256": "0a8f77b9e32f",
         "bytes": 1852132,
         "decode": true
       },
@@ -1242,7 +1242,7 @@
         "assetId": "MON_FIRE_MINIBOSS_008",
         "displayName": "裂地炎蠍",
         "path": "assets/monsters/tower/fire-pool/mon-fire-miniboss-008.webp",
-        "sha256": "d59ec63a7546fd9781b42aaecbac0487c33c5a75252f546b246d0c0631ddc306",
+        "sha256": "d59ec63a7546",
         "bytes": 1564272,
         "decode": true
       },
@@ -1250,7 +1250,7 @@
         "assetId": "MON_FIRE_MINIBOSS_009",
         "displayName": "逐日炎侯",
         "path": "assets/monsters/tower/fire-pool/mon-fire-miniboss-009.webp",
-        "sha256": "cc7b293b0cb80fcb837d55d0267dfb118c849ef0df00bc9ba60e674bada2e25a",
+        "sha256": "cc7b293b0cb8",
         "bytes": 1781126,
         "decode": true
       },
@@ -1258,7 +1258,7 @@
         "assetId": "MON_FIRE_MINIBOSS_011",
         "displayName": "焰冠獅魁",
         "path": "assets/monsters/tower/fire-pool/mon-fire-miniboss-011.webp",
-        "sha256": "4b028b3ba7a1f8e16762577432f56fed91082952c707751f6c716836d7b869fe",
+        "sha256": "4b028b3ba7a1",
         "bytes": 1785386,
         "decode": true
       }
