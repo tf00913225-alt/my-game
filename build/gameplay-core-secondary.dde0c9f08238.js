@@ -4101,6 +4101,7 @@
     let monsterPortraitRegistryFailure=null;
     const monsterPortraitAssetFailures=new Set();
     const dailyPortraitPreparation=new Map();
+    const encounterPortraitPreparation=new Map();
     let monsterPortraitByKey=new Map();
     let monsterPortraitByUniqueName=new Map();
 
@@ -4246,6 +4247,42 @@
         })();
     }
     window.v154ResolveMonsterPortraitRecord=resolveMonsterPortraitRecord;
+
+    function bindMonsterPortraitIdentity(monster){
+        if(!monster){ return null; }
+        const record=resolveMonsterPortraitRecord(monster);
+        if(record&&record.name&&record.status==="existing"){
+            monster.displayName=record.name;
+            monster.portraitPath=record.path;
+        }
+        return record;
+    }
+    window.v154BindMonsterPortraitIdentity=bindMonsterPortraitIdentity;
+
+    function prepareMonsterPortraitsForEncounter(monsters){
+        const list=(Array.isArray(monsters)?monsters:[monsters]).filter(Boolean);
+        const keys=list.map(monster=>String(monster.portraitKey||monster.monsterPortraitKey||"").trim()).filter(Boolean);
+        const cacheKey=keys.slice().sort().join("|");
+        if(encounterPortraitPreparation.has(cacheKey)){ return encounterPortraitPreparation.get(cacheKey); }
+        const preparation=requestMonsterPortraitRegistry().then(()=>{
+            list.forEach(bindMonsterPortraitIdentity);
+            const records=list.map(resolveMonsterPortraitRecord);
+            const paths=Array.from(new Set(records.map(record=>record&&record.path).filter(Boolean)));
+            const assets=window.FourSymbolsFeatures&&typeof window.FourSymbolsFeatures.ensureAssets==="function"
+                ?window.FourSymbolsFeatures.ensureAssets(paths)
+                :Promise.resolve({state:"ready",paths});
+            return Promise.resolve(assets).then(()=>{
+                list.forEach(bindMonsterPortraitIdentity);
+                return {state:"ready",records:records,paths:paths};
+            });
+        }).catch(error=>{
+            list.forEach(bindMonsterPortraitIdentity);
+            throw error;
+        });
+        encounterPortraitPreparation.set(cacheKey,preparation);
+        return preparation;
+    }
+    window.v154PrepareMonsterPortraitsForEncounter=prepareMonsterPortraitsForEncounter;
 
     function prepareDailyDungeonPortraits(type){
         const key=String(type||"").trim();
