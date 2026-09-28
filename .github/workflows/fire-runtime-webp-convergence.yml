@@ -1,6 +1,8 @@
 name: Fire runtime WebP convergence
 
 on:
+  pull_request:
+    types: [opened, synchronize]
   push:
     branches:
       - fix/fire-monster-runtime-webp-convergence-20260928
