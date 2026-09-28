@@ -524,7 +524,9 @@
     }
     function bindTowerMonsterIdentity(monster){
         if(!monster){ return monster; }
-        bindTowerMonsterIdentity(monster);
+        if(typeof window.v154BindMonsterPortraitIdentity==="function"){
+            window.v154BindMonsterPortraitIdentity(monster);
+        }
         // The portrait Registry is the single name owner for tower assets.
         // Battle UI reads monster.name, so promote the resolved displayName
         // only after the Registry has resolved the explicit portraitKey.
