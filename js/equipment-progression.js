@@ -651,6 +651,13 @@
         if(waves.length!==3){ return; }
         const accepted=window.rpgConfirm?await window.rpgConfirm("裝備副本共3輪，每輪6名敵人。\n勝利後獲得2個裝備寶箱，寶箱會放入背包；每箱開啟後隨機獲得3件裝備。\n是否開始挑戰？",{title:"裝備副本",confirmText:"開始挑戰"}):true;
         if(!accepted){ return; }
+        if(typeof window.v154PrepareDailyDungeonPortraits==="function"){
+            const prepared=await window.v154PrepareDailyDungeonPortraits("gold");
+            if(!prepared||prepared.state!=="ready"){
+                alert("每日副本立繪尚未就緒，請重新進入副本。");
+                return;
+            }
+        }
         equipmentDungeonRunning=true;
         const launch=index=>{
             equipmentDungeonWaveIndex=index;
