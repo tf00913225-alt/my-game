@@ -467,10 +467,8 @@
     pointer-events:none;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit > .v174-battle-art ~ *{z-index:6;}
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit > img.v162-abyss-battle-portrait-art{
-    opacity:0 !important;
-    pointer-events:none !important;
-}
+/* Legacy V154 <img> portrait pipeline retired; V174 .v174-battle-art is
+   the only visible artwork surface. */
 
 /* HUD uses formal Slot anchors and never participates in Unit layout. */
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot .battle-monster-name,
