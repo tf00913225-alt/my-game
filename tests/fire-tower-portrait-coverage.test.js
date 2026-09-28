@@ -16,6 +16,6 @@ assert.equal(Object.keys(registry.fireTowerCoverage.bossByFloor).length,10);
 for(const e of pool.filter(e=>e.status==="adopted")) assert.ok(e.runtimePath && fs.existsSync(path.join(root,e.runtimePath)),e.assetId+" runtime missing");
 for(const id of Object.values(registry.fireTowerCoverage.bossByFloor)) assert.equal(pool.find(e=>e.assetId===id).tier,"miniboss");
 assert.match(tower,/eliteEvery:5,bossEvery:10/);
-assert.match(tower,/monster\\.portraitKey=towerPortraitAssetId/);
-assert.match(tower,/towerPortraitAssetId\\(floor,"boss"/);
+assert.match(tower,/monster\.portraitKey=towerPortraitAssetId/);
+assert.match(tower,/towerPortraitAssetId\(floor,"boss"/);
 console.log("Fire tower portrait coverage tests passed.");
