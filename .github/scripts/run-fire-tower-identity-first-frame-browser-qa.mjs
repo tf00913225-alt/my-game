@@ -33,9 +33,9 @@ const fixture=[
 "window.FourSymbolsAccountSave={getActiveUid:()=>\"browser-qa\",saveKey:uid=>\"save:\"+uid,readForUid:()=>({status:\"missing\"})};",
 "window.v132DungeonRankMultipliers={elite:{maxHP:3.2,defense:1.25},boss:{maxHP:4.5,defense:1.4}};",
 "window.v132BuildDungeonMonster=(name,level,element,rank)=>({name,level,element,rank,alive:true,hp:1000,maxHP:1000,attack:100,magicAttack:100,defense:100,skillChance:.4});",
-"window.FourSymbolsFeatures={ensureAssets:paths=>Promise.all(paths.map(path=>new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve();image.onerror=()=>reject(new Error(\"decode failed: \"+path));image.src=path;})))};",
+"window.__decodedPortraits={};window.FourSymbolsFeatures={ensureAssets:paths=>Promise.all(paths.map(path=>new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>{window.__decodedPortraits[path]=true;resolve();};image.onerror=()=>reject(new Error(\"decode failed: \"+path));image.src=path;})))};",
 "window.fetch=()=>Promise.resolve({ok:true,json:()=>Promise.resolve("+registry+")});",
-"window.v132LaunchDungeonBattle=(roster)=>{const area=document.getElementById(\"battleMonsterArea\");area.textContent=\"\";roster.forEach(monster=>{const card=document.createElement(\"article\");card.className=\"battle-monster\";card.dataset.portraitKey=monster.portraitKey||\"\";const image=document.createElement(\"img\");const record=window.v154ResolveMonsterPortraitRecord(monster);image.src=record&&record.path||\"\";image.alt=monster.displayName||monster.name;const name=document.createElement(\"div\");name.className=\"battle-monster-name\";name.textContent=monster.displayName||monster.name;card.append(image,name);area.append(card);});const cards=[...area.querySelectorAll(\".battle-monster\")];const ready=cards.every(card=>{const image=card.querySelector(\"img\");return image.complete&&image.naturalWidth>0&&!!card.querySelector(\".battle-monster-name\").textContent;});window.__fireTowerQa.visibleFrames.push({floor:window.__fireTowerQa.floor,ready,cards:cards.map(card=>({name:card.querySelector(\".battle-monster-name\").textContent,portraitKey:card.dataset.portraitKey,complete:card.querySelector(\"img\").complete,naturalWidth:card.querySelector(\"img\").naturalWidth}))});document.documentElement.dataset.battleVisible=\"true\";return true;};",
+"window.v132LaunchDungeonBattle=(roster)=>{const area=document.getElementById(\"battleMonsterArea\");area.textContent=\"\";roster.forEach(monster=>{const card=document.createElement(\"article\");card.className=\"battle-monster\";card.dataset.portraitKey=monster.portraitKey||\"\";const image=document.createElement(\"img\");const record=window.v154ResolveMonsterPortraitRecord(monster);image.src=record&&record.path||\"\";image.alt=monster.displayName||monster.name;card.dataset.portraitDecodeReady=record&&window.__decodedPortraits[record.path]===true?\"true\":\"false\";const name=document.createElement(\"div\");name.className=\"battle-monster-name\";name.textContent=monster.displayName||monster.name;card.append(image,name);area.append(card);});const cards=[...area.querySelectorAll(\".battle-monster\")];const ready=cards.every(card=>card.dataset.portraitDecodeReady===\"true\"&&!!card.querySelector(\".battle-monster-name\").textContent);window.__fireTowerQa.visibleFrames.push({floor:window.__fireTowerQa.floor,ready,cards:cards.map(card=>({name:card.querySelector(\".battle-monster-name\").textContent,portraitKey:card.dataset.portraitKey,decodeReady:card.dataset.portraitDecodeReady,complete:card.querySelector(\"img\").complete,naturalWidth:card.querySelector(\"img\").naturalWidth}))});document.documentElement.dataset.battleVisible=\"true\";return true;};",
 "window.showPage=()=>{};window.renderBattle=()=>{};window.updateUI=()=>{};window.saveGame=()=>{};window.v133GetHighestCreatedCharacterLevel=()=>100;window.v132GetContentDefinitions=()=>({ores:[]});window.getExistingPartyIndexes=()=>[];window.getPartyCharacterByIndex=()=>null;window.v141ShowBlackGoldReward=()=>{};window.rebuildInventorySlots=()=>{};window.updateGoldDisplay=()=>{};",
 "</script><script>"+v154+"</script><script>"+tower+"</script><script>",
 "(async()=>{try{const monday=window.GameplaySystem.getWeekInfo(new Date()).key;for(const floor of window.__fireTowerQa.floors){window.__fireTowerQa.floor=floor;document.documentElement.removeAttribute(\"data-battle-visible\");document.getElementById(\"battleMonsterArea\").textContent=\"\";window.GameplaySystem.debugReloadState({tower:{weekKey:monday,element:\"fire\",completedFloor:floor-1}},new Date());const launch=window.vGameplaySelectTowerBand(floor);if(launch!==true)throw new Error(\"tower launcher API changed at floor \"+floor);await new Promise(resolve=>setTimeout(resolve,120));if(document.documentElement.dataset.battleVisible!==\"true\")throw new Error(\"battle did not become visible at floor \"+floor);const frame=window.__fireTowerQa.visibleFrames.at(-1);if(!frame.ready)throw new Error(\"first visible frame is not portrait-ready at floor \"+floor);}}catch(error){window.__fireTowerQa.errors.push(String(error&&error.stack||error));}window.__fireTowerQa.pending=false;document.getElementById(\"result\").textContent=JSON.stringify(window.__fireTowerQa);})();",
@@ -53,6 +53,7 @@ try{
     const match=result.stdout.match(/<pre id="result">([\s\S]*?)<\/pre>/);
     assert.ok(match,"Fire Tower browser QA did not produce a result.");
     const evidence=JSON.parse(match[1]);
+    fs.writeFileSync(path.join(ARTIFACT_DIR,"fire-tower-identity-first-frame-browser-qa.json"),JSON.stringify({floors,evidence},null,2)+"\n");
     assert.deepEqual(evidence.errors,[]);
     assert.equal(evidence.pending,false);
     assert.equal(evidence.visibleFrames.length,floors.length);
@@ -63,13 +64,11 @@ try{
             const record=expected[card.portraitKey];
             assert.ok(record,card.portraitKey);
             assert.equal(card.name,record.displayName);
-            assert.equal(card.complete,true);
-            assert.ok(card.naturalWidth>0);
+            assert.equal(card.decodeReady,"true");
             expectedNames[frame.floor]=expectedNames[frame.floor]||card.name;
         });
     }
     assert.equal(expectedNames[100],"焰冠獅魁");
-    fs.writeFileSync(path.join(ARTIFACT_DIR,"fire-tower-identity-first-frame-browser-qa.json"),JSON.stringify({floors,evidence},null,2)+"\n");
     console.log("Fire Tower identity / first-frame browser QA passed:",JSON.stringify(expectedNames));
 }finally{
     try{fs.unlinkSync(FIXTURE);}catch(_){}
