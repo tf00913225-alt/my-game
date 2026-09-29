@@ -6914,6 +6914,13 @@ function saveGame(options={}){
         return false;
     }
 
+    // Feature runtimes can request a save while the new-account creation
+    // screen is open. An empty shell must not become a UID-owned character
+    // save: it would block the protected first-character transaction.
+    if(!player||!String(player.id||"").trim()){
+        return false;
+    }
+
     const repository=window.FourSymbolsAccountSave;
     const activeUid=repository&&repository.getActiveUid();
     if(!repository||!activeUid||SAVE_KEY!==repository.saveKey(activeUid)){

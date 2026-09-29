@@ -11233,7 +11233,7 @@ ensureFunctionalStyles();runRepairs();
 
     if(typeof saveGame==="function"){
         const previousSaveGame=saveGame;
-        saveGame=function(){ const result=previousSaveGame.apply(this,arguments); persistIntoSaveDocument(); return result; };
+        saveGame=function(){ const result=previousSaveGame.apply(this,arguments); if(result===true){ persistIntoSaveDocument(); } return result; };
     }
 
     function saveRelics(){

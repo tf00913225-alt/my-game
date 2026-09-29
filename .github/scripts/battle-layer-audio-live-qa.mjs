@@ -147,28 +147,41 @@ async function prepareAccountFirstRuntime(client,features){
     }
     await client.eval(`Promise.all(${JSON.stringify(features)}.map(feature=>FourSymbolsFeatures.ensure(feature,"live-browser-qa")))`);
     if(state==="NEED_CHARACTER"){
+        // Presentation QA needs a local battle fixture. It cannot create a
+        // canonical character against an independently deployed Functions
+        // revision, and must never issue a production cloud write here.
         const creationAttempt=await client.eval(`(()=>{
             const input=document.getElementById('creationId');
-            if(!input||typeof createCharacter!=='function'){return {created:false,errors:["creation input/function unavailable"]};}
+            const repo=window.FourSymbolsAccountSave;
+            const uid=repo?.getActiveUid?.();
+            if(!input||!uid||!window.FourSymbolsStartupPolicy?.canCreateCharacter?.()){
+                return {created:false,errors:["creation input/account unavailable"]};
+            }
             input.value='QA俠客';
             const errors=[];
-            const originalError=console.error;
-            console.error=function(){
-                try{
-                    errors.push(Array.from(arguments).map(value=>{
-                        if(value instanceof Error){ return value.name+":"+value.message+(value.code?(" code="+value.code):""); }
-                        if(value&&typeof value==="object"){
-                            try{return JSON.stringify(value);}catch(_){return String(value);}
-                        }
-                        return String(value);
-                    }).join(" | "));
-                }catch(_){}
-                return originalError.apply(this,arguments);
-            };
             try{
-                return {created:createCharacter()===true,errors};
-            }finally{
-                console.error=originalError;
+                const local=repo.readForUid(uid);
+                if(local.status!=="empty"){
+                    errors.push("UID already contains a local save");
+                    return {created:false,errors};
+                }
+                if(repo.inspectLegacy().status!=="none"){
+                    errors.push("legacy candidate exists");
+                    return {created:false,errors};
+                }
+                player.id=input.value;
+                player.element=selectedCreationElement;
+                player.attack=10;
+                player.attributePoints=0;
+                const saved=saveGame({source:"browser-presentation-qa-fixture"});
+                if(saved!==true){ errors.push("fixture save failed"); return {created:false,errors}; }
+                FourSymbolsStartupPolicy.notifyCharacterCreated();
+                document.getElementById('creationPage').style.display='none';
+                document.getElementById('gameInterface').style.display='block';
+                return {created:true,errors,fixture:"local-battle-only"};
+            }catch(error){
+                errors.push(String(error?.stack||error));
+                return {created:false,errors};
             }
         })()`);
         if(!creationAttempt.created){
@@ -200,12 +213,12 @@ async function prepareAccountFirstRuntime(client,features){
                 };
             })()`);
             throw new Error(
-                "Live anonymous account could not complete the formal character-creation flow: "+
+                "Live anonymous account could not install the local battle QA fixture: "+
                 JSON.stringify(diagnostics)+
                 " CDP="+JSON.stringify(client.events.slice(-20))
             );
         }
-        await waitFor(client,"FourSymbolsStartupPolicy.getState()==='READY'&&getComputedStyle(document.getElementById('gameInterface')).display!=='none'","anonymous character creation completion",30000);
+        await waitFor(client,"FourSymbolsStartupPolicy.getState()==='READY'&&getComputedStyle(document.getElementById('gameInterface')).display!=='none'","local battle QA fixture completion",30000);
         state="READY";
     }
     return state;
