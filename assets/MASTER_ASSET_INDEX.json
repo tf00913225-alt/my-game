@@ -1,8 +1,8 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "owner": "assets-library",
   "generatedAt": "2026-09-29T10:30:00Z",
-  "contract": "Master PNG is immutable original source; runtime derivatives are not stored on this branch.",
+  "contract": "Master PNG is immutable original source; Runtime WebP derivatives are generated only from the documented deterministic recipe and are never stored as Master.",
   "assets": [
     {
       "monsterId": "wild.zone-01.fire-01",
@@ -23,6 +23,28 @@
         "alignment": "center",
         "crop": "forbidden",
         "stretch": "forbidden"
+      },
+      "identityStatus": "IDENTITY_VERIFIED",
+      "source": {
+        "kind": "recovered project-supplied PNG",
+        "reference": "assets-library PR #686",
+        "capturedAt": "2026-09-29",
+        "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+      },
+      "runtimeRecipe": {
+        "tool": "ImageMagick",
+        "command": "convert <master.png> -resize 1024x1536 -gravity center -background none -extent 1024x1536 -define webp:lossless=true <runtime.webp>",
+        "canvas": {
+          "width": 1024,
+          "height": 1536
+        },
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "background": "transparent",
+        "format": "webp",
+        "lossless": true
       }
     },
     {
@@ -44,6 +66,28 @@
         "alignment": "center",
         "crop": "forbidden",
         "stretch": "forbidden"
+      },
+      "identityStatus": "IDENTITY_VERIFIED",
+      "source": {
+        "kind": "recovered project-supplied PNG",
+        "reference": "assets-library PR #686",
+        "capturedAt": "2026-09-29",
+        "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+      },
+      "runtimeRecipe": {
+        "tool": "ImageMagick",
+        "command": "convert <master.png> -resize 1024x1536 -gravity center -background none -extent 1024x1536 -define webp:lossless=true <runtime.webp>",
+        "canvas": {
+          "width": 1024,
+          "height": 1536
+        },
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "background": "transparent",
+        "format": "webp",
+        "lossless": true
       }
     },
     {
@@ -65,6 +109,28 @@
         "alignment": "center",
         "crop": "forbidden",
         "stretch": "forbidden"
+      },
+      "identityStatus": "IDENTITY_VERIFIED",
+      "source": {
+        "kind": "recovered project-supplied PNG",
+        "reference": "assets-library PR #686",
+        "capturedAt": "2026-09-29",
+        "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+      },
+      "runtimeRecipe": {
+        "tool": "ImageMagick",
+        "command": "convert <master.png> -resize 1024x1536 -gravity center -background none -extent 1024x1536 -define webp:lossless=true <runtime.webp>",
+        "canvas": {
+          "width": 1024,
+          "height": 1536
+        },
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "background": "transparent",
+        "format": "webp",
+        "lossless": true
       }
     },
     {
@@ -86,6 +152,28 @@
         "alignment": "center",
         "crop": "forbidden",
         "stretch": "forbidden"
+      },
+      "identityStatus": "IDENTITY_VERIFIED",
+      "source": {
+        "kind": "recovered project-supplied PNG",
+        "reference": "assets-library PR #686",
+        "capturedAt": "2026-09-29",
+        "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+      },
+      "runtimeRecipe": {
+        "tool": "ImageMagick",
+        "command": "convert <master.png> -resize 1024x1536 -gravity center -background none -extent 1024x1536 -define webp:lossless=true <runtime.webp>",
+        "canvas": {
+          "width": 1024,
+          "height": 1536
+        },
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "background": "transparent",
+        "format": "webp",
+        "lossless": true
       }
     },
     {
@@ -107,6 +195,28 @@
         "alignment": "center",
         "crop": "forbidden",
         "stretch": "forbidden"
+      },
+      "identityStatus": "IDENTITY_VERIFIED",
+      "source": {
+        "kind": "recovered project-supplied PNG",
+        "reference": "assets-library PR #686",
+        "capturedAt": "2026-09-29",
+        "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+      },
+      "runtimeRecipe": {
+        "tool": "ImageMagick",
+        "command": "convert <master.png> -resize 1024x1536 -gravity center -background none -extent 1024x1536 -define webp:lossless=true <runtime.webp>",
+        "canvas": {
+          "width": 1024,
+          "height": 1536
+        },
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "background": "transparent",
+        "format": "webp",
+        "lossless": true
       }
     },
     {
@@ -128,6 +238,28 @@
         "alignment": "center",
         "crop": "forbidden",
         "stretch": "forbidden"
+      },
+      "identityStatus": "IDENTITY_VERIFIED",
+      "source": {
+        "kind": "recovered project-supplied PNG",
+        "reference": "assets-library PR #686",
+        "capturedAt": "2026-09-29",
+        "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+      },
+      "runtimeRecipe": {
+        "tool": "ImageMagick",
+        "command": "convert <master.png> -resize 1024x1536 -gravity center -background none -extent 1024x1536 -define webp:lossless=true <runtime.webp>",
+        "canvas": {
+          "width": 1024,
+          "height": 1536
+        },
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "background": "transparent",
+        "format": "webp",
+        "lossless": true
       }
     },
     {
@@ -149,6 +281,28 @@
         "alignment": "center",
         "crop": "forbidden",
         "stretch": "forbidden"
+      },
+      "identityStatus": "IDENTITY_VERIFIED",
+      "source": {
+        "kind": "recovered project-supplied PNG",
+        "reference": "assets-library PR #686",
+        "capturedAt": "2026-09-29",
+        "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+      },
+      "runtimeRecipe": {
+        "tool": "ImageMagick",
+        "command": "convert <master.png> -resize 1024x1536 -gravity center -background none -extent 1024x1536 -define webp:lossless=true <runtime.webp>",
+        "canvas": {
+          "width": 1024,
+          "height": 1536
+        },
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "background": "transparent",
+        "format": "webp",
+        "lossless": true
       }
     },
     {
@@ -170,6 +324,28 @@
         "alignment": "center",
         "crop": "forbidden",
         "stretch": "forbidden"
+      },
+      "identityStatus": "IDENTITY_VERIFIED",
+      "source": {
+        "kind": "recovered project-supplied PNG",
+        "reference": "assets-library PR #686",
+        "capturedAt": "2026-09-29",
+        "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+      },
+      "runtimeRecipe": {
+        "tool": "ImageMagick",
+        "command": "convert <master.png> -resize 1024x1536 -gravity center -background none -extent 1024x1536 -define webp:lossless=true <runtime.webp>",
+        "canvas": {
+          "width": 1024,
+          "height": 1536
+        },
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "background": "transparent",
+        "format": "webp",
+        "lossless": true
       }
     },
     {
@@ -191,6 +367,28 @@
         "alignment": "center",
         "crop": "forbidden",
         "stretch": "forbidden"
+      },
+      "identityStatus": "IDENTITY_VERIFIED",
+      "source": {
+        "kind": "recovered project-supplied PNG",
+        "reference": "assets-library PR #686",
+        "capturedAt": "2026-09-29",
+        "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+      },
+      "runtimeRecipe": {
+        "tool": "ImageMagick",
+        "command": "convert <master.png> -resize 1024x1536 -gravity center -background none -extent 1024x1536 -define webp:lossless=true <runtime.webp>",
+        "canvas": {
+          "width": 1024,
+          "height": 1536
+        },
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "background": "transparent",
+        "format": "webp",
+        "lossless": true
       }
     },
     {
@@ -212,6 +410,28 @@
         "alignment": "center",
         "crop": "forbidden",
         "stretch": "forbidden"
+      },
+      "identityStatus": "IDENTITY_VERIFIED",
+      "source": {
+        "kind": "recovered project-supplied PNG",
+        "reference": "assets-library PR #686",
+        "capturedAt": "2026-09-29",
+        "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+      },
+      "runtimeRecipe": {
+        "tool": "ImageMagick",
+        "command": "convert <master.png> -resize 1024x1536 -gravity center -background none -extent 1024x1536 -define webp:lossless=true <runtime.webp>",
+        "canvas": {
+          "width": 1024,
+          "height": 1536
+        },
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "background": "transparent",
+        "format": "webp",
+        "lossless": true
       }
     },
     {
@@ -233,6 +453,28 @@
         "alignment": "center",
         "crop": "forbidden",
         "stretch": "forbidden"
+      },
+      "identityStatus": "IDENTITY_VERIFIED",
+      "source": {
+        "kind": "recovered project-supplied PNG",
+        "reference": "assets-library PR #686",
+        "capturedAt": "2026-09-29",
+        "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+      },
+      "runtimeRecipe": {
+        "tool": "ImageMagick",
+        "command": "convert <master.png> -resize 1024x1536 -gravity center -background none -extent 1024x1536 -define webp:lossless=true <runtime.webp>",
+        "canvas": {
+          "width": 1024,
+          "height": 1536
+        },
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "background": "transparent",
+        "format": "webp",
+        "lossless": true
       }
     },
     {
@@ -254,6 +496,28 @@
         "alignment": "center",
         "crop": "forbidden",
         "stretch": "forbidden"
+      },
+      "identityStatus": "IDENTITY_VERIFIED",
+      "source": {
+        "kind": "recovered project-supplied PNG",
+        "reference": "assets-library PR #686",
+        "capturedAt": "2026-09-29",
+        "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+      },
+      "runtimeRecipe": {
+        "tool": "ImageMagick",
+        "command": "convert <master.png> -resize 1024x1536 -gravity center -background none -extent 1024x1536 -define webp:lossless=true <runtime.webp>",
+        "canvas": {
+          "width": 1024,
+          "height": 1536
+        },
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "background": "transparent",
+        "format": "webp",
+        "lossless": true
       }
     },
     {
@@ -275,6 +539,28 @@
         "alignment": "center",
         "crop": "forbidden",
         "stretch": "forbidden"
+      },
+      "identityStatus": "IDENTITY_VERIFIED",
+      "source": {
+        "kind": "recovered project-supplied PNG",
+        "reference": "assets-library PR #686",
+        "capturedAt": "2026-09-29",
+        "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+      },
+      "runtimeRecipe": {
+        "tool": "ImageMagick",
+        "command": "convert <master.png> -resize 1024x1536 -gravity center -background none -extent 1024x1536 -define webp:lossless=true <runtime.webp>",
+        "canvas": {
+          "width": 1024,
+          "height": 1536
+        },
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "background": "transparent",
+        "format": "webp",
+        "lossless": true
       }
     },
     {
@@ -296,6 +582,28 @@
         "alignment": "center",
         "crop": "forbidden",
         "stretch": "forbidden"
+      },
+      "identityStatus": "IDENTITY_VERIFIED",
+      "source": {
+        "kind": "recovered project-supplied PNG",
+        "reference": "assets-library PR #686",
+        "capturedAt": "2026-09-29",
+        "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+      },
+      "runtimeRecipe": {
+        "tool": "ImageMagick",
+        "command": "convert <master.png> -resize 1024x1536 -gravity center -background none -extent 1024x1536 -define webp:lossless=true <runtime.webp>",
+        "canvas": {
+          "width": 1024,
+          "height": 1536
+        },
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "background": "transparent",
+        "format": "webp",
+        "lossless": true
       }
     },
     {
@@ -317,6 +625,28 @@
         "alignment": "center",
         "crop": "forbidden",
         "stretch": "forbidden"
+      },
+      "identityStatus": "IDENTITY_VERIFIED",
+      "source": {
+        "kind": "recovered project-supplied PNG",
+        "reference": "assets-library PR #686",
+        "capturedAt": "2026-09-29",
+        "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+      },
+      "runtimeRecipe": {
+        "tool": "ImageMagick",
+        "command": "convert <master.png> -resize 1024x1536 -gravity center -background none -extent 1024x1536 -define webp:lossless=true <runtime.webp>",
+        "canvas": {
+          "width": 1024,
+          "height": 1536
+        },
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "background": "transparent",
+        "format": "webp",
+        "lossless": true
       }
     },
     {
@@ -338,6 +668,28 @@
         "alignment": "center",
         "crop": "forbidden",
         "stretch": "forbidden"
+      },
+      "identityStatus": "IDENTITY_VERIFIED",
+      "source": {
+        "kind": "recovered project-supplied PNG",
+        "reference": "assets-library PR #686",
+        "capturedAt": "2026-09-29",
+        "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+      },
+      "runtimeRecipe": {
+        "tool": "ImageMagick",
+        "command": "convert <master.png> -resize 1024x1536 -gravity center -background none -extent 1024x1536 -define webp:lossless=true <runtime.webp>",
+        "canvas": {
+          "width": 1024,
+          "height": 1536
+        },
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "background": "transparent",
+        "format": "webp",
+        "lossless": true
       }
     },
     {
@@ -359,6 +711,28 @@
         "alignment": "center",
         "crop": "forbidden",
         "stretch": "forbidden"
+      },
+      "identityStatus": "IDENTITY_VERIFIED",
+      "source": {
+        "kind": "recovered project-supplied PNG",
+        "reference": "assets-library PR #686",
+        "capturedAt": "2026-09-29",
+        "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+      },
+      "runtimeRecipe": {
+        "tool": "ImageMagick",
+        "command": "convert <master.png> -resize 1024x1536 -gravity center -background none -extent 1024x1536 -define webp:lossless=true <runtime.webp>",
+        "canvas": {
+          "width": 1024,
+          "height": 1536
+        },
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "background": "transparent",
+        "format": "webp",
+        "lossless": true
       }
     },
     {
@@ -380,7 +754,30 @@
         "alignment": "center",
         "crop": "forbidden",
         "stretch": "forbidden"
+      },
+      "identityStatus": "IDENTITY_VERIFIED",
+      "source": {
+        "kind": "recovered project-supplied PNG",
+        "reference": "assets-library PR #686",
+        "capturedAt": "2026-09-29",
+        "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+      },
+      "runtimeRecipe": {
+        "tool": "ImageMagick",
+        "command": "convert <master.png> -resize 1024x1536 -gravity center -background none -extent 1024x1536 -define webp:lossless=true <runtime.webp>",
+        "canvas": {
+          "width": 1024,
+          "height": 1536
+        },
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "background": "transparent",
+        "format": "webp",
+        "lossless": true
       }
     }
-  ]
+  ],
+  "contractPath": "docs/MASTER_PNG_CONTRACT.md"
 }
