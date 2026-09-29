@@ -9,7 +9,10 @@ const relic=read("js/60-team-relic-system.js");
 test("Gameplay shared nav owns context-safe backpack and relic actions",()=>{
     assert.match(nav,/\["背包","assets\/ui\/nav-backpack\.png","v148OpenContextInventory\(\)"\]/);
     assert.match(nav,/\["秘寶","assets\/ui\/nav-relic-v175\.webp","v148OpenContextRelic\(\)"\]/);
-    assert.match(nav,/window\.v148OpenContextInventory=function\(\)[\s\S]*?activeGameplayPageId\(\)[\s\S]*?mapPage\.classList\.add\("active"\)[\s\S]*?openMapInventoryOverlay\(\)[\s\S]*?finally[\s\S]*?mapPage\.classList\.remove\("active"\)/);
+    const core=read("js/00-main.js");
+    assert.match(nav,/window\.v148OpenContextInventory=function\(\)[\s\S]*?openInventoryContext\(\{[\s\S]*?sourcePage,[\s\S]*?returnAction:sourcePage==="map"\?"leaveMap\(\)":"v148ReturnFromGameplay\(\)",[\s\S]*?closeBehavior:"restore-source"[\s\S]*?\}\)/);
+    assert.match(core,/function openInventoryContext\(context\)[\s\S]*?inventoryContextSnapshot\(context\)[\s\S]*?showPage\("inventory"\)[\s\S]*?inventoryOpenContext=normalized/);
+    assert.match(core,/function closeMapInventoryOverlay\(\)[\s\S]*?if\(context\.sourcePage==="map"&&typeof leaveMap==="function"\)[\s\S]*?else if\(\["dungeon","gameplay","gameplayPage","boss","bossPage","tower","towerPage","training","trainingPage"\]\.includes\(context\.sourcePage\)\)/);
     assert.match(nav,/window\.v148OpenContextRelic=function\(\)[\s\S]*?window\.v174OpenRelicPage\(\)/);
 });
 
