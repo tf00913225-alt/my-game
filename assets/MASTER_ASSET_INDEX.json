@@ -1,0 +1,386 @@
+{
+  "schemaVersion": 1,
+  "owner": "assets-library",
+  "generatedAt": "2026-09-29T10:30:00Z",
+  "contract": "Master PNG is immutable original source; runtime derivatives are not stored on this branch.",
+  "assets": [
+    {
+      "monsterId": "wild.zone-01.fire-01",
+      "portraitKey": "wild.zone-01.fire-01",
+      "displayName": "哥布林",
+      "masterPath": "assets/monsters/wild/zone-01/fire-01.png",
+      "masterSha256": "716fe43b91124ff54245a8d23bcea58691f0d706b70c3e68f8f03881a6bb5696",
+      "width": 1024,
+      "height": 1536,
+      "format": "png",
+      "alphaVerified": true,
+      "decodeVerified": true,
+      "runtimeContract": {
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden"
+      }
+    },
+    {
+      "monsterId": "wild.zone-02.fire-01",
+      "portraitKey": "wild.zone-02.fire-01",
+      "displayName": "沙漠豺狼",
+      "masterPath": "assets/monsters/wild/zone-02/fire-01.png",
+      "masterSha256": "d9605468187c020462d756b78d2e22f1535762e8e959b763a7c954b8e1fdd2d6",
+      "width": 1024,
+      "height": 1536,
+      "format": "png",
+      "alphaVerified": true,
+      "decodeVerified": true,
+      "runtimeContract": {
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden"
+      }
+    },
+    {
+      "monsterId": "wild.zone-03.fire-01",
+      "portraitKey": "wild.zone-03.fire-01",
+      "displayName": "熾焰狼",
+      "masterPath": "assets/monsters/wild/zone-03/fire-01.png",
+      "masterSha256": "a6dc023a976794e646a64ebc4accf3fd9f502458a435e467d098953377f34964",
+      "width": 1024,
+      "height": 1536,
+      "format": "png",
+      "alphaVerified": true,
+      "decodeVerified": true,
+      "runtimeContract": {
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden"
+      }
+    },
+    {
+      "monsterId": "wild.zone-03.fire-02",
+      "portraitKey": "wild.zone-03.fire-02",
+      "displayName": "熾焰狼王",
+      "masterPath": "assets/monsters/wild/zone-03/fire-02.png",
+      "masterSha256": "83181cb22894deb15388ff440c7b7485cd733a40f4777d74d37cc623c1bab772",
+      "width": 1086,
+      "height": 1448,
+      "format": "png",
+      "alphaVerified": true,
+      "decodeVerified": true,
+      "runtimeContract": {
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden"
+      }
+    },
+    {
+      "monsterId": "wild.zone-04.fire-01",
+      "portraitKey": "wild.zone-04.fire-01",
+      "displayName": "烈焰巨魔",
+      "masterPath": "assets/monsters/wild/zone-04/fire-01.png",
+      "masterSha256": "cba8bbee9a2df1bd40b557f575e5ad5aca70cb1c6ff9d714aa0a8c0a4c4e8756",
+      "width": 1024,
+      "height": 1536,
+      "format": "png",
+      "alphaVerified": true,
+      "decodeVerified": true,
+      "runtimeContract": {
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden"
+      }
+    },
+    {
+      "monsterId": "wild.zone-04.fire-02",
+      "portraitKey": "wild.zone-04.fire-02",
+      "displayName": "烈焰巨魔王",
+      "masterPath": "assets/monsters/wild/zone-04/fire-02.png",
+      "masterSha256": "647198c89820916e34284c88de7a0067e30660171a5cf892dd3b63897a26f54b",
+      "width": 1086,
+      "height": 1448,
+      "format": "png",
+      "alphaVerified": true,
+      "decodeVerified": true,
+      "runtimeContract": {
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden"
+      }
+    },
+    {
+      "monsterId": "wild.zone-05.fire-01",
+      "portraitKey": "wild.zone-05.fire-01",
+      "displayName": "熔岩巨獸",
+      "masterPath": "assets/monsters/wild/zone-05/fire-01.png",
+      "masterSha256": "364e9d282fb71487915d30e563d08e0d0dd220589f712742229440e6c276d16b",
+      "width": 1024,
+      "height": 1536,
+      "format": "png",
+      "alphaVerified": true,
+      "decodeVerified": true,
+      "runtimeContract": {
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden"
+      }
+    },
+    {
+      "monsterId": "wild.zone-05.fire-02",
+      "portraitKey": "wild.zone-05.fire-02",
+      "displayName": "熔岩巨獸王",
+      "masterPath": "assets/monsters/wild/zone-05/fire-02.png",
+      "masterSha256": "97a36ea29d37d74ae1478b4ce46027ab4d762993fa79ba4fbe91970b7a0e334f",
+      "width": 1374,
+      "height": 1145,
+      "format": "png",
+      "alphaVerified": true,
+      "decodeVerified": true,
+      "runtimeContract": {
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden"
+      }
+    },
+    {
+      "monsterId": "wild.zone-06.fire-01",
+      "portraitKey": "wild.zone-06.fire-01",
+      "displayName": "赤炎修羅",
+      "masterPath": "assets/monsters/wild/zone-06/fire-01.png",
+      "masterSha256": "f6c96b97e1da267816c058fdcedc832c1bb34e6d64acc5950e64de45ee803f34",
+      "width": 1212,
+      "height": 1297,
+      "format": "png",
+      "alphaVerified": true,
+      "decodeVerified": true,
+      "runtimeContract": {
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden"
+      }
+    },
+    {
+      "monsterId": "wild.zone-06.fire-02",
+      "portraitKey": "wild.zone-06.fire-02",
+      "displayName": "赤炎修羅王",
+      "masterPath": "assets/monsters/wild/zone-06/fire-02.png",
+      "masterSha256": "77d175d224f4218429e3b4178435c975fae209132c976b457480ac86370702ad",
+      "width": 1218,
+      "height": 1292,
+      "format": "png",
+      "alphaVerified": true,
+      "decodeVerified": true,
+      "runtimeContract": {
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden"
+      }
+    },
+    {
+      "monsterId": "wild.zone-07.fire-01",
+      "portraitKey": "wild.zone-07.fire-01",
+      "displayName": "業火魔君",
+      "masterPath": "assets/monsters/wild/zone-07/fire-01.png",
+      "masterSha256": "4f29221c2da3306edac9f1412faf41008681b70169c6d9c06be0790bfea8eb9f",
+      "width": 1024,
+      "height": 1536,
+      "format": "png",
+      "alphaVerified": true,
+      "decodeVerified": true,
+      "runtimeContract": {
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden"
+      }
+    },
+    {
+      "monsterId": "wild.zone-07.fire-02",
+      "portraitKey": "wild.zone-07.fire-02",
+      "displayName": "業火魔君王",
+      "masterPath": "assets/monsters/wild/zone-07/fire-02.png",
+      "masterSha256": "8dcf47f2f7504a7fe5eede7e5089b11cf51aabc7797e4b974e190b7799bc6c81",
+      "width": 1223,
+      "height": 1286,
+      "format": "png",
+      "alphaVerified": true,
+      "decodeVerified": true,
+      "runtimeContract": {
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden"
+      }
+    },
+    {
+      "monsterId": "wild.zone-08.fire-01",
+      "portraitKey": "wild.zone-08.fire-01",
+      "displayName": "焚天龍獄",
+      "masterPath": "assets/monsters/wild/zone-08/fire-01.png",
+      "masterSha256": "d70699c4c4240afbef7b4bef7642590d76aa3fb5c67ceef655c6110e1885054b",
+      "width": 1265,
+      "height": 1243,
+      "format": "png",
+      "alphaVerified": true,
+      "decodeVerified": true,
+      "runtimeContract": {
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden"
+      }
+    },
+    {
+      "monsterId": "wild.zone-08.fire-02",
+      "portraitKey": "wild.zone-08.fire-02",
+      "displayName": "焚天龍獄皇",
+      "masterPath": "assets/monsters/wild/zone-08/fire-02.png",
+      "masterSha256": "1d82540a18c4424f8de494eab5ea068cada94803de46235238e672f0b1f80556",
+      "width": 1230,
+      "height": 1278,
+      "format": "png",
+      "alphaVerified": true,
+      "decodeVerified": true,
+      "runtimeContract": {
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden"
+      }
+    },
+    {
+      "monsterId": "wild.zone-09.fire-01",
+      "portraitKey": "wild.zone-09.fire-01",
+      "displayName": "虛空煉獄",
+      "masterPath": "assets/monsters/wild/zone-09/fire-01.png",
+      "masterSha256": "e6b5228e1303d88014c6b9a0e94c3133a028368fa41f5dfd3040e607d85062a9",
+      "width": 1205,
+      "height": 1306,
+      "format": "png",
+      "alphaVerified": true,
+      "decodeVerified": true,
+      "runtimeContract": {
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden"
+      }
+    },
+    {
+      "monsterId": "wild.zone-09.fire-02",
+      "portraitKey": "wild.zone-09.fire-02",
+      "displayName": "虛空煉獄皇",
+      "masterPath": "assets/monsters/wild/zone-09/fire-02.png",
+      "masterSha256": "3db110aaf979209ff2a6d7eb414fc9dbd44219ecf20c7f0648b4579229e7f434",
+      "width": 1222,
+      "height": 1287,
+      "format": "png",
+      "alphaVerified": true,
+      "decodeVerified": true,
+      "runtimeContract": {
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden"
+      }
+    },
+    {
+      "monsterId": "wild.zone-10.fire-01",
+      "portraitKey": "wild.zone-10.fire-01",
+      "displayName": "終焉神魔",
+      "masterPath": "assets/monsters/wild/zone-10/fire-01.png",
+      "masterSha256": "4f3f159f5c31c30dbd69820648147f1a06684ebbd22483ffb4b692baf8cd37d9",
+      "width": 1206,
+      "height": 1304,
+      "format": "png",
+      "alphaVerified": true,
+      "decodeVerified": true,
+      "runtimeContract": {
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden"
+      }
+    },
+    {
+      "monsterId": "wild.zone-10.fire-02",
+      "portraitKey": "wild.zone-10.fire-02",
+      "displayName": "終焉神魔皇",
+      "masterPath": "assets/monsters/wild/zone-10/fire-02.png",
+      "masterSha256": "60a67b00b0802725402084a8052ea9e21f970b9bf9254d524912227eea27fe9c",
+      "width": 1214,
+      "height": 1295,
+      "format": "png",
+      "alphaVerified": true,
+      "decodeVerified": true,
+      "runtimeContract": {
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden"
+      }
+    }
+  ]
+}
