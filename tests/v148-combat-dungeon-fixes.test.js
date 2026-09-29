@@ -82,7 +82,7 @@ test("V148 remains ordered inside the deterministic gameplay bundle",()=>{
     const v146=buildSource.indexOf("js/41-v146-system-polish.js");
     const v148=buildSource.indexOf("js/42-v148-combat-dungeon-fixes.js");
     assert.ok(v146>=0&&v148>v146);
-    assert.match(touchLock,/\.skill-preview-body, \.creation-skill-detail-levels, #dungeonTabContent/);
+    assert.match(touchLock,/data-scroll-owner="x\|y\|both"/);
     assert.match(css,/touch-action:pan-y !important/);
     assert.match(css,/#dungeonPage:not\(\.v146-abyss-active\)\.active[\s\S]*display:flex !important/);
     ["assets/ui/training-background.jpg","assets/ui/home-synthesis.png","assets/battle/element-box.png"]

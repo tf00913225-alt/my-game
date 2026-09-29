@@ -151,6 +151,19 @@ h1,h2,h3,
    全遊戲圖片／視覺媒體禁止瀏覽器原生長按、拖曳與選取。
    不使用 pointer-events:none，避免破壞既有按鈕／圖片點擊行為。
 */
+#game-stage [data-scroll-owner="y"]{
+    touch-action:pan-y;
+    overscroll-behavior-y:contain;
+}
+#game-stage [data-scroll-owner="x"]{
+    touch-action:pan-x;
+    overscroll-behavior-x:contain;
+}
+#game-stage [data-scroll-owner="both"]{
+    touch-action:pan-x pan-y;
+    overscroll-behavior:contain;
+}
+
 #game-stage img,
 #game-stage picture,
 #game-stage svg,
@@ -5145,13 +5158,6 @@ button:active{
 /* V94：技能詳細視窗可能從獨立技能頁開啟，
    此時角色視窗的 character-scroll-active 不一定存在。
    只在技能詳細視窗開啟期間解除祖層 touch-action:none。 */
-html.skill-detail-scroll-active,
-body.skill-detail-scroll-active,
-#game-viewport.skill-detail-scroll-active,
-#game-stage.skill-detail-scroll-active{
-    touch-action:pan-y !important;
-}
-
 /*
    ★ 新增：屬性說明彈窗也是從角色視窗裡
    跳出來的，跟技能詳細彈窗同一個道理，

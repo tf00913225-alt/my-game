@@ -2,14 +2,7 @@
 (function(){
 "use strict";
 function setCharacterTouchMode(active){
-    const root=document.documentElement;
-    const body=document.body;
-    const viewport=document.getElementById("game-viewport");
-    const stage=document.getElementById("game-stage");
-    [root,body,viewport,stage].forEach(function(el){
-        if(!el)return;
-        el.classList.toggle("character-scroll-active",!!active);
-    });
+    /* Retired bridge: characterTabContent declares its own scroll owner. */
 }
 function syncCharacterTouchMode(){
     const modal=document.getElementById("homeFeatureModal");

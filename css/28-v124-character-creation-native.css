@@ -8,14 +8,6 @@
 /* Root-cause Android Chrome scroll bridge.
    #game-viewport intentionally uses touch-action:none globally.
    Creation page is the only scroll owner while it is visible. */
-html.creation-scroll-active,
-body.creation-scroll-active,
-#game-viewport.creation-scroll-active,
-#game-stage.creation-scroll-active,
-#game-overlay-layer.creation-scroll-active{
-    touch-action:pan-y !important;
-}
-
 #creationPage.creation-page-scroll:not(.native-creation-page){
     visibility:hidden !important;
 }

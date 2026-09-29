@@ -112,7 +112,8 @@ test("authentication UI exposes Google, email and Firebase anonymous identity wh
     assert.match(css, /\.firebase-auth-field input\{[\s\S]*min-height:44px/);
     assert.match(css, /@media \(max-width:320px\)/);
     assert.doesNotMatch(css, /@media \(max-width:360px\)[\s\S]*grid-template-columns:1fr/);
-    assert.match(touch, /\.firebase-auth-dialog/);
+    assert.match(touch, /data-scroll-owner="x\|y\|both"/);
+    assert.doesNotMatch(touch, /allowedSelector|scrollWhitelist/);
 });
 
 test("retained Facebook auth helper stays in the Firebase popup flow if re-enabled", ()=>{

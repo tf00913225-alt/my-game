@@ -35,3 +35,14 @@
     justify-content:center !important;
     align-items:flex-end !important;
 }
+
+/* The rendered element and its whole grid cell are the hitbox. Artwork and
+   screen-reader label never steal the pointer target. */
+#game-stage > #game-overlay-layer .native-bottom-nav .nav-button,
+#game-stage > #game-overlay-layer .native-map-nav .nav-button{
+    min-width:132px !important;
+    min-height:132px !important;
+    touch-action:manipulation;
+}
+#game-stage > #game-overlay-layer .native-bottom-nav .nav-button > *,
+#game-stage > #game-overlay-layer .native-map-nav .nav-button > *{ pointer-events:none; }

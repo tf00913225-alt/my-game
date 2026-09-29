@@ -33832,271 +33832,67 @@ try{
 (function(){
     "use strict";
 
-    /*
-     * V78 ROOT FIX
-     *
-     * 舊版用 target.closest(...) 只看第一個符合元素。
-     * 背包裡第一個符合的是 #inventoryPage，
-     * 但真正的 scroll owner 是它上面的 .content。
-     *
-     * 這裡改成一路往祖先走，只要其中任何一層
-     * 是真正可以垂直或水平捲動的容器，就允許手勢通過。
-     */
-    function isInsideAllowedScroller(target){
-        if(!target){
-            return false;
+    /* Mobile input contract owner. A scroll owner declares
+       data-scroll-owner="x|y|both". Legacy owners are inferred only from
+       real computed overflow, never from a selector whitelist. */
+    const TAP_SLOP_CSS_PX=10;
+    const activePointers=new Map();
+    const suppressedTargets=[];
+    function isGameSurfaceTarget(target){ return !!(target&&target.closest&&target.closest("#game-stage")); }
+    function isEditableGameControl(target){ return !!(target&&target.closest&&target.closest('input, textarea, [contenteditable="true"]')); }
+    function scrollAxes(node){
+        const style=window.getComputedStyle(node);
+        const declared=node.getAttribute&&node.getAttribute("data-scroll-owner");
+        const canY=(style.overflowY==="auto"||style.overflowY==="scroll")&&node.scrollHeight>node.clientHeight+1;
+        const canX=(style.overflowX==="auto"||style.overflowX==="scroll")&&node.scrollWidth>node.clientWidth+1;
+        if(declared==="y") return canY?"y":null;
+        if(declared==="x") return canX?"x":null;
+        if(declared==="both") return canX||canY?"both":null;
+        if(canX&&canY) return "both";
+        return canY?"y":canX?"x":null;
+    }
+    function findScrollOwner(target){
+        let node=target&&target.nodeType===1?target:target&&target.parentElement;
+        while(node&&node!==document.documentElement){ const axes=scrollAxes(node); if(axes) return {node,axes}; node=node.parentElement; }
+        return null;
+    }
+    function interactiveTarget(target){ return target&&target.closest&&target.closest("button,a,[role=button],input,select,textarea,[data-action],[onclick]"); }
+    function rememberSuppression(target){ if(target) suppressedTargets.push(target); }
+    function consumeSuppression(target){
+        for(let index=suppressedTargets.length-1;index>=0;index--){
+            const suppressed=suppressedTargets[index];
+            if(suppressed===target||(suppressed&&suppressed.contains&&suppressed.contains(target))||(target&&target.contains&&target.contains(suppressed))){ suppressedTargets.splice(index,1); return true; }
         }
-
-        /*
-           ★ 修正（依照使用者回報，「全屬性技能預覽」頁面
-           「不能捲動，下面看不到」）：
-           這裡是全域的觸控鎖，`#game-stage`裡任何觸控目標
-           只要不在這份白名單覆蓋的可捲動容器內，一律
-           `preventDefault()`擋掉原生捲動手勢。
-           `.skill-preview-body`（全屬性技能預覽彈窗真正
-           的捲動容器）從一開始就沒有被加進這份白名單，
-           程式化設定`scrollTop`看起來正常、但手指真的滑動
-           時（真正會經過touchmove事件）完全被這裡擋掉，
-           這是原本就存在的bug，只是內容字級變大、真的需要
-           捲動才會看到內容之後才會被踩到——之前字級小、
-           內容剛好塞得進viewport，從來沒真的需要捲動過。
-
-           V173.45 shop frame hotfix：商店改成固定 Large Panel 後，
-           真正的內容 scroll owner 是 #homeFeatureModalBody。
-           外框 .home-feature-modal-box 只負責固定尺寸且 overflow:hidden，
-           因此不能代替內頁通過觸控鎖；把真正 scroll owner 納入
-           同一份權威白名單，避免再次出現「看得到 scrollbar、
-           但手指滑不動」的假捲動狀態。
-
-           合成裝備選擇列是水平 scroll owner。舊判斷只接受
-           overflow-y，因此即使畫面已出現橫向 scrollbar，手指左右
-           滑仍會被全域 touch lock 阻擋。現在同一份權威判斷同時
-           接受真正可捲動的 X/Y 軸，避免再為單一頁面另做事件補丁。
-
-           角色詳細能力視窗的真正 scroll owner 是
-           .inventory-character-detail-grid；外框
-           .inventory-character-detail-box 本身是 overflow:hidden，
-           不能替內容區通過觸控鎖。把真正內容層加入同一白名單。
-
-           練功區地區資訊收斂成 Medium Modal 後，真正 scroll owner
-           改為 #trainingZoneModalBody；外框只負責固定尺寸。
-
-           狀態／能力說明收斂成 Medium Modal 後，真正 scroll owner
-           是 #statusHelpModal 內的 .item-stat-list；外框與返回鍵固定。
-
-           V174：秘寶頁的垂直 scroll owner 是
-           #homeFeatureModal.team-relic-mode #homeFeatureModalBody，分類列
-           .team-relic-tabs 則是水平 scroll owner。兩者都必須通過這個
-           全域觸控鎖；否則手勢從分類列或秘寶內容起始時會被
-           preventDefault()，造成「有時能滑、有時不能滑」的裝置差異。
-
-           Firebase 帳號視窗使用獨立於 game stage 的 responsive viewport
-           overlay，真正的垂直 scroll owner 是 .firebase-auth-dialog；
-           同樣只在這份全域白名單登記一次，不為登入頁另加 touchmove 補丁。
-        */
-        const allowedSelector =
-            ".content, .content-scrollable, .creation-page-scroll, .creation-role-card, .inventory-grid-scroll, .quest-tab-body, .battle-item-list, " +
-            ".characterTabContent, #characterTabContent, #inventoryPage, " +
-            ".adventure-view, " +
-            ".home-feature-modal-box, #homeFeatureModalBody, #homeFeatureModal.team-relic-mode #homeFeatureModalBody, .team-relic-tabs, .v141-synthesis-body, #trainingZoneModalBody, .auto-settings-expanded, " +
-            ".inventory-character-detail-box, .inventory-character-detail-grid, .item-modal-box, #itemModalStats, #skillDetailStats, " +
-            "#statusHelpModal .item-stat-list, .skill-preview-body, .creation-skill-detail-levels, #dungeonTabContent, .gameplay-panel-scroll, .v17342-abyss-battle-log, .v143-item-picker, .v17358-reforge-tiers, .v17363-game-select-menu, .v17351-compare-stats, .firebase-auth-dialog, " +
-            "textarea, select, input";
-
-        let node =
-            target.nodeType===1
-            ? target
-            : target.parentElement;
-
-        while(node && node!==document.documentElement){
-
-            if(
-                node.matches &&
-                node.matches(allowedSelector)
-            ){
-                const style =
-                    window.getComputedStyle(node);
-
-                const canScrollY =
-                    (
-                        style.overflowY==="auto" ||
-                        style.overflowY==="scroll"
-                    ) &&
-                    node.scrollHeight >
-                    node.clientHeight + 1;
-
-                const canScrollX =
-                    (
-                        style.overflowX==="auto" ||
-                        style.overflowX==="scroll"
-                    ) &&
-                    node.scrollWidth >
-                    node.clientWidth + 1;
-
-                if(canScrollY || canScrollX){
-                    return true;
-                }
-            }
-
-            node=node.parentElement;
-        }
-
         return false;
     }
-
-    document.addEventListener(
-        "touchmove",
-        function(event){
-            const gameSurface =
-                event.target &&
-                event.target.closest &&
-                event.target.closest("#game-stage");
-
-            if(
-                gameSurface &&
-                event.touches &&
-                event.touches.length>1
-            ){
-                event.preventDefault();
-                return;
-            }
-
-            if(
-                gameSurface &&
-                !isInsideAllowedScroller(
-                    event.target
-                )
-            ){
-                event.preventDefault();
-            }
-        },
-        {passive:false}
-    );
-
-    document.addEventListener(
-        "pointermove",
-        function(event){
-            if(
-                event.pointerType==="touch" &&
-                event.target &&
-                event.target.closest &&
-                event.target.closest("#game-stage") &&
-                !isInsideAllowedScroller(
-                    event.target
-                )
-            ){
-                event.preventDefault();
-            }
-        },
-        {passive:false}
-    );
-
-    /*
-       全遊戲瀏覽器原生互動鎖：
-       - 單指仍依既有 scroll whitelist 正常捲動。
-       - 兩指以上永遠不交給瀏覽器做 pinch zoom。
-       - 非文字輸入 UI 不開啟長按 context menu、不原生拖曳、不文字選取。
-       這是全域 owner，禁止各頁另疊長按／縮放補丁。
-    */
-    function isGameSurfaceTarget(target){
-        return !!(
-            target &&
-            target.closest &&
-            target.closest("#game-stage")
-        );
+    function classify(pointer,event){
+        const distance=Math.hypot(event.clientX-pointer.startX,event.clientY-pointer.startY);
+        pointer.currentX=event.clientX; pointer.currentY=event.clientY; pointer.distance=distance;
+        if(distance<TAP_SLOP_CSS_PX||pointer.state!=="TAP") return;
+        pointer.state=pointer.dragOwner?"DRAG":pointer.scrollOwner?"SCROLL":"CANCEL";
     }
+    document.addEventListener("pointerdown",function(event){
+        if(!isGameSurfaceTarget(event.target)||(event.pointerType==="mouse"&&event.button!==0)) return;
+        const initial=interactiveTarget(event.target)||event.target;
+        activePointers.set(event.pointerId,{pointerId:event.pointerId,startX:event.clientX,startY:event.clientY,currentX:event.clientX,currentY:event.clientY,distance:0,initialTarget:event.target,interactiveTarget:initial,scrollOwner:findScrollOwner(event.target),dragOwner:event.target.closest&&event.target.closest("[data-drag-owner]"),state:"TAP"});
+    },{capture:true,passive:true});
+    document.addEventListener("pointermove",function(event){ const pointer=activePointers.get(event.pointerId); if(pointer) classify(pointer,event); },{capture:true,passive:true});
+    function finishPointer(event){ const pointer=activePointers.get(event.pointerId); if(!pointer) return; classify(pointer,event); activePointers.delete(event.pointerId); if(pointer.state!=="TAP") rememberSuppression(pointer.interactiveTarget); }
+    document.addEventListener("pointerup",finishPointer,{capture:true,passive:true});
+    document.addEventListener("pointercancel",function(event){ activePointers.delete(event.pointerId); },{capture:true,passive:true});
+    function handleSuppressedGestureClick(event){ if(consumeSuppression(interactiveTarget(event.target)||event.target)){ event.preventDefault(); event.stopImmediatePropagation(); } }
+    const stage=document.getElementById("game-stage");
+    if(stage){ stage.addEventListener("click",handleSuppressedGestureClick,true); }
 
-    function isEditableGameControl(target){
-        return !!(
-            target &&
-            target.closest &&
-            target.closest('input, textarea, [contenteditable="true"]')
-        );
-    }
-
-
-    document.addEventListener(
-        "contextmenu",
-        function(event){
-            if(
-                isGameSurfaceTarget(event.target) &&
-                !isEditableGameControl(event.target)
-            ){
-                event.preventDefault();
-            }
-        },
-        {capture:true}
-    );
-
-    document.addEventListener(
-        "dragstart",
-        function(event){
-            if(
-                isGameSurfaceTarget(event.target) &&
-                !isEditableGameControl(event.target)
-            ){
-                event.preventDefault();
-            }
-        },
-        {capture:true}
-    );
-
-    document.addEventListener(
-        "selectstart",
-        function(event){
-            if(
-                isGameSurfaceTarget(event.target) &&
-                !isEditableGameControl(event.target)
-            ){
-                event.preventDefault();
-            }
-        },
-        {capture:true}
-    );
-
-    document.addEventListener(
-        "wheel",
-        function(event){
-            if(
-                event.ctrlKey &&
-                isGameSurfaceTarget(event.target)
-            ){
-                event.preventDefault();
-            }
-        },
-        {capture:true,passive:false}
-    );
-
-    window.addEventListener(
-        "gesturestart",
-        function(event){
-            if(
-                event.target &&
-                event.target.closest &&
-                event.target.closest("#game-stage")
-            ){
-                event.preventDefault();
-            }
-        },
-        {passive:false}
-    );
-
-    window.addEventListener(
-        "gesturechange",
-        function(event){
-            if(
-                event.target &&
-                event.target.closest &&
-                event.target.closest("#game-stage")
-            ){
-                event.preventDefault();
-            }
-        },
-        {passive:false}
-    );
-
-    window.isInsideAllowedScrollerV78 =
-        isInsideAllowedScroller;
+    /* Pinch is the sole touchmove cancellation. Single-finger panning is
+       deliberately left to the browser and the Scroll Owner CSS contract. */
+    document.addEventListener("touchmove",function(event){ if(isGameSurfaceTarget(event.target)&&event.touches&&event.touches.length>1) event.preventDefault(); },{passive:false});
+    document.addEventListener("contextmenu",function(event){ if(isGameSurfaceTarget(event.target)&&!isEditableGameControl(event.target)) event.preventDefault(); },{capture:true});
+    document.addEventListener("dragstart",function(event){ if(isGameSurfaceTarget(event.target)&&!isEditableGameControl(event.target)) event.preventDefault(); },{capture:true});
+    document.addEventListener("selectstart",function(event){ if(isGameSurfaceTarget(event.target)&&!isEditableGameControl(event.target)) event.preventDefault(); },{capture:true});
+    document.addEventListener("wheel",function(event){ if(event.ctrlKey&&isGameSurfaceTarget(event.target)) event.preventDefault(); },{capture:true,passive:false});
+    ["gesturestart","gesturechange"].forEach(name=>window.addEventListener(name,function(event){ if(isGameSurfaceTarget(event.target)) event.preventDefault(); },{passive:false}));
+    window.FourSymbolsGestureArbiter=Object.freeze({TAP_SLOP_CSS_PX,findScrollOwner,getState:pointerId=>activePointers.get(pointerId)||null});
 })();
 
 
@@ -34304,7 +34100,6 @@ try{
 
         const candidates = [
             document.getElementById("bottomNav"),
-            document.getElementById("mapPageNav"),
             document.querySelector("#game-content .bottom-nav")
         ].filter(Boolean);
 
@@ -34317,7 +34112,6 @@ try{
              */
             const isBottomNav =
                 nav.id === "bottomNav" ||
-                nav.id === "mapPageNav" ||
                 nav.classList.contains("bottom-nav");
 
             if(!isBottomNav) return;
@@ -35261,14 +35055,7 @@ if(document.readyState==="loading"){
 (function(){
 "use strict";
 function setCharacterTouchMode(active){
-    const root=document.documentElement;
-    const body=document.body;
-    const viewport=document.getElementById("game-viewport");
-    const stage=document.getElementById("game-stage");
-    [root,body,viewport,stage].forEach(function(el){
-        if(!el)return;
-        el.classList.toggle("character-scroll-active",!!active);
-    });
+    /* Retired bridge: characterTabContent declares its own scroll owner. */
 }
 function syncCharacterTouchMode(){
     const modal=document.getElementById("homeFeatureModal");
@@ -35973,7 +35760,6 @@ window.v78ApplyCharacterInventoryLayout=
 
         fixedNodes.forEach(function(node){
             if(node){
-                node.classList.remove("creation-scroll-active");
                 node.classList.toggle("creation-fixed-active",!!active);
             }
         });
@@ -36744,6 +36530,21 @@ const V_ASSET_VERSION="173.72";
         if(active){ element.dataset.featureLoadingLabel="正在載入"+(label||"功能")+"…"; }
         else{ delete element.dataset.featureLoadingLabel; }
     }
+    function createNavigationIntent(element,sourceEvent){
+        let executed=false;
+        return function executeNavigationIntent(){
+            if(executed){ return false; }
+            executed=true;
+            const inlineAction=element&&element.onclick;
+            if(typeof inlineAction==="function"){
+                const intentEvent=new MouseEvent("click",{bubbles:false,cancelable:true,view:window});
+                inlineAction.call(element,intentEvent);
+                return !intentEvent.defaultPrevented;
+            }
+            document.dispatchEvent(new CustomEvent("four-symbols:navigation-intent",{detail:{element,sourceEvent}}));
+            return true;
+        };
+    }
 
     let expPoolPrimePromise=null;
     let expPoolSafetyUiReady=false;
@@ -36792,6 +36593,7 @@ const V_ASSET_VERSION="173.72";
         event.preventDefault(); event.stopImmediatePropagation();
         if(element.dataset.featureLoading==="1"){ return; }
         element.dataset.featureLoading="1"; setLocalLoading(element,true,info.label);
+        const intent=createNavigationIntent(element,event);
         api.ensure(info.feature,info.expPool?"exp-pool-safety":"navigation").then(()=>{
             delete element.dataset.featureLoading; setLocalLoading(element,false);
             if(info.expPool){
@@ -36800,7 +36602,9 @@ const V_ASSET_VERSION="173.72";
                 refreshExpPoolSafetyUiOnce();
                 return;
             }
-            element.dataset.featureReplay="1"; element.click(); delete element.dataset.featureReplay;
+            /* One accepted human gesture produces one intent.  Do not replay
+               a synthetic DOM click: it can be intercepted as a second tap. */
+            intent();
         }).catch(error=>{
             delete element.dataset.featureLoading; setLocalLoading(element,false);
             console.error("Feature failed to load:",info.feature,error);
@@ -36810,6 +36614,7 @@ const V_ASSET_VERSION="173.72";
     document.addEventListener("pointerdown",prefetch,{capture:true,passive:true});
     document.addEventListener("touchstart",prefetch,{capture:true,passive:true});
     document.addEventListener("click",enter,true);
+    window.FourSymbolsNavigationIntent=Object.freeze({create:createNavigationIntent});
     document.addEventListener("four-symbols:startup-ready",()=>{
         const api=loader();
         if(api){

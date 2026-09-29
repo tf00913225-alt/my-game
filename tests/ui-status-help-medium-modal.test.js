@@ -14,7 +14,7 @@ assert.match(index,/id="statusHelpModal"[\s\S]*?class="item-modal"/);
 assert.match(css,/#statusHelpModal \.item-modal-box\{[\s\S]*?max-width:var\(--ui-medium-modal-max-width,360px\) !important;[\s\S]*?height:min\(var\(--ui-medium-modal-height,540px\),calc\(100% - var\(--ui-medium-modal-safe-space,28px\)\)\) !important;[\s\S]*?overflow:hidden !important;/);
 assert.match(css,/#statusHelpModal \.item-stat-list\{[\s\S]*?flex:1 1 auto !important;[\s\S]*?overflow-y:auto !important;[\s\S]*?touch-action:pan-y !important;[\s\S]*?scrollbar-gutter:stable !important;/);
 assert.match(css,/#statusHelpModal \.close-item-button\{[\s\S]*?min-height:44px !important;/);
-assert.match(touchLock,/#statusHelpModal \.item-stat-list/);
+assert.match(touchLock,/data-scroll-owner="x\|y\|both"/);
 
 // Verify the global stage touch lock admits the real status-help scroll owner.
 const listeners=new Map();

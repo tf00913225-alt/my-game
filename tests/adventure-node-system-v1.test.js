@@ -238,7 +238,8 @@ function baseRuntime(){
     assert.match(css,/#adventurePage\.adventure-page\{[\s\S]*?display:flex;[\s\S]*?flex-direction:column;/,"Adventure page must size its view from the actual header height");
     assert.match(css,/\.adventure-view\{[^}]*flex:1 1 auto;[^}]*min-height:0;[^}]*overflow-y:auto;/,"Adventure map must keep one flexible vertical scroll owner");
     assert.doesNotMatch(css,/\.adventure-view\{[^}]*height:calc\(/,"Adventure view must not reserve a guessed header height");
-    assert.match(touchLock,/\.adventure-view/,"Adventure's existing view scroll owner must pass the stage touch-lock whitelist");
+    assert.match(touchLock,/data-scroll-owner="x\|y\|both"/,"Touch owner must use the declarative scroll-owner contract");
+    assert.doesNotMatch(touchLock,/allowedSelector|scrollWhitelist/,"Adventure must not restore a selector whitelist");
     assert.equal((entryCss.match(/pointer-events:none/g)||[]).length>=1,true);
     assert.equal((css.match(/pointer-events:none/g)||[]).length>=1,true);
 

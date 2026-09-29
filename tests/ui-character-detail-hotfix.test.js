@@ -8,7 +8,7 @@ const touchSource=fs.readFileSync("js/01-stage-v8-touch-lock.js","utf8");
 const combatSource=fs.readFileSync("js/47-v158-combat-tuning.js","utf8");
 const detailCss=fs.readFileSync("css/23-stage-v77-inventory-detail-ui.css","utf8");
 
-assert.match(touchSource,/\.inventory-character-detail-box, \.inventory-character-detail-grid, \.item-modal-box/);
+assert.match(touchSource,/data-scroll-owner="x\|y\|both"/);
 assert.match(detailCss,/#inventoryCharacterDetailModal \.inventory-character-detail-grid\{[\s\S]*?overflow-y:auto !important;[\s\S]*?touch-action:pan-y !important;/);
 assert.match(combatSource,/label\.textContent\.trim\(\)==="閃避"/);
 assert.match(combatSource,/evasionValue\.textContent=numeric\(evasionValue\.textContent\)\.toFixed\(1\)\+"%"/);

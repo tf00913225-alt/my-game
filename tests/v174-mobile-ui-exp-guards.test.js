@@ -10,7 +10,7 @@ const exp=read("js/28-v133-economy-rebalance.js");
 const slots=read("js/25-v131-fix-batch.js");
 const slotCss=read("css/31-v131-fix-batch.css");
 assert.match(css,/#creationPage \.creation-role-card\{[\s\S]*overflow:visible !important;[\s\S]*touch-action:auto !important;/);
-assert.match(touch,/\.creation-page-scroll, \.creation-role-card, \.inventory-grid-scroll/);
+assert.match(touch,/data-scroll-owner="x\|y\|both"/);
 assert.match(css,/#v146HomeRoster \.v146-home-resource\{[\s\S]*height:14px !important;/);
 assert.match(css,/#v146HomeRoster \.v146-home-resource strong\{[\s\S]*font-size:11px !important;/);
 assert.match(boss,/\.v-fixed-boss-footprint\{[\s\S]*left:calc\(20% \+ 5px\);[\s\S]*right:calc\(20% \+ 5px\);/);

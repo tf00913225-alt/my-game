@@ -7,9 +7,4 @@
  Only while the character modal is open do we relax the ancestor gesture policy to pan-y.
  The existing V8 touch-lock still blocks page dragging everywhere that is not an allowed scroller.
 */
-html.character-scroll-active,
-body.character-scroll-active,
-#game-viewport.character-scroll-active,
-#game-stage.character-scroll-active{
-    touch-action:pan-y !important;
-}
+/* Retired: #game-viewport no longer suppresses descendant single-finger scroll. */

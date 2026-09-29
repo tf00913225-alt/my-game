@@ -108,7 +108,7 @@ test("item preview stays inside the stage with a reachable return button",()=>{
     assert.match(itemCss,/#itemModal \.item-modal-icon > \.v169-talisman-art\{[\s\S]*?width:150px;[\s\S]*?height:225px;/);
     assert.match(itemCss,/#itemModal \.item-modal-icon > \.v169-equipment-art\{[\s\S]*?max-height:190px;/);
     assert.match(itemCss,/#itemModal \.item-stat-list\{[\s\S]*?max-height:none !important;[\s\S]*?overflow:visible !important/);
-    assert.match(touchSource,/#itemModalStats/);
+assert.match(touchSource,/data-scroll-owner="x\|y\|both"/);
     const modal=html.slice(html.indexOf('id="itemModal"'),html.indexOf('id="skillDetailModal"'));
     assert.match(modal,/class="close-item-button"[\s\S]*?>\s*返回\s*<\/button>/);
 });

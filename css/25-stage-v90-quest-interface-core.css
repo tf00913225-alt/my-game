@@ -7,13 +7,6 @@
    - 任務卡片壓縮高度，保留原任務資料與領獎機制。
 ========================================================= */
 
-html.quest-scroll-active,
-body.quest-scroll-active,
-#game-viewport.quest-scroll-active,
-#game-stage.quest-scroll-active{
-    touch-action:pan-y !important;
-}
-
 #game-stage #homeFeatureModal.quest-mode{
     padding:12px !important;
 }
