@@ -142,6 +142,13 @@ jobs:
       - name: Run Gameplay UI regression
         run: node tests/gameplay-ui-regressions-20260908.test.js
 
+      - name: Ensure ImageMagick for portrait batch regression
+        run: |
+          if ! command -v identify >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends imagemagick
+          fi
+
       - name: Run Monster Portrait batch workflow regression
         run: node tests/monster-portrait-batch-workflow.test.js
 
