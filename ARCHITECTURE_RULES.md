@@ -30,6 +30,20 @@
 
 8. 不順手全面重構；只在本次修改的同一子系統內做小範圍收斂。
 
+## 0A. Bug Repair Owner Convergence Gate（永久強制）
+
+所有 Bug／failure／regression 修復另必須遵守 `docs/BUG_REPAIR_DOD_OWNER_CONVERGENCE_GATE.md`。
+
+1. 修復 production runtime 前，先完成 Responsibility Inventory（責任盤點）與 Multi-Owner Scan（多 Owner 掃描）。
+2. 同一責任只能有一個 Canonical Owner（正式 Owner）；載入順序最後執行者不得自然成為事實 Owner。
+3. Wrapper、late patch、Timer、rAF、Observer、CSS override、第二份 DOM／State／Registry 都必須視為 Patch 候選並完成退場判定。
+4. 新 Owner 接管時，舊 Owner 必須退役，或降為有明確用途、退場條件且沒有決策權的 Compatibility Layer（相容層）。
+5. 必須檢查完整 Lifecycle：建立、準備、啟用、更新、失敗、重試、離開、清理與再次進入。
+6. 修復測試以完整正式載入後的 final state（最終狀態）為準；中間 resolver／state／file existence 不得代替玩家最終結果。
+7. 同一玩家症狀一次修復後仍重現，下一次禁止再加局部 Patch；兩次仍重現，第三次施工前強制做 Subsystem Convergence Audit（子系統收斂稽核）。
+8. DIAGNOSED／IMPLEMENTED／INTEGRATED／DEPLOYED 均不得稱為「已修好」；只有符合該契約 VERIFIED 條件才能宣稱完成。
+9. 若產品結果可行但指定實作方式會違反本 Gate，代理必須阻止該實作方法，改採符合正式 Owner 架構的安全方案。
+
 ## Release Update Notification System
 
 1. 玩家正式版本公告的唯一資料 owner 是 `release/release-update.json`；Game／Cache Version 仍由 `release/release.json` 擁有。部署用 `release-manifest.json` 的 Commit SHA 不得作為玩家公告版本判斷。
