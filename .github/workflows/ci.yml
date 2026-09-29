@@ -136,6 +136,9 @@ jobs:
           node tests/skill-progression-rebalance.test.js
           node tests/skill-relic-owner-convergence-20260923.test.js
 
+      - name: Run Gameplay context navigation regression
+        run: node tests/gameplay-context-nav-actions-20260915.test.js
+
       - name: Run relic lifecycle and battle input regressions
         run: |
           node tests/relic-trigger-lifecycle-battle-input-ui-20260919.test.js
