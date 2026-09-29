@@ -18,7 +18,7 @@ assert.match(runtime,/class="creation-skill-detail-levels"/);
 assert.match(runtime,/class="creation-skill-detail-close"/);
 assert.match(runtime,/最終命中率降低/);
 assert.doesNotMatch(runtime,/MISS率提高/);
-assert.match(touchLock,/\.creation-skill-detail-levels/);
+assert.match(touchLock,/data-scroll-owner="x\|y\|both"/);
 assert.doesNotMatch(touchLock,/\.creation-skill-detail-box/);
 assert.match(nativeCss,/#creationSkillDetailModal\{[\s\S]*?width:1080px;[\s\S]*?height:1920px;/);
 

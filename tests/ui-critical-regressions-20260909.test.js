@@ -44,7 +44,7 @@ assert.match(guard,/text-shadow","none","important/);
 assert.match(guard,/max-width","104px","important/);
 
 assert.match(relicCss,/team-relic-modal \.home-feature-modal-box\.wide #homeFeatureModalBody\{[^}]*overflow-y:auto!important/);
-assert.match(touch,/#homeFeatureModal\.team-relic-mode #homeFeatureModalBody, \.team-relic-tabs/);
+assert.match(touch,/data-scroll-owner="x\|y\|both"/);
 assert.match(layout,/modal\.dataset\.v78CharacterLayoutActive="1"/);
 assert.match(layout,/const characterRootMounted=!!root/);
 assert.match(layout,/if\(!characterRootMounted\)\{[\s\S]*?releaseCharacterLayoutOwnership/);

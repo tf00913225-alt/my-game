@@ -15,7 +15,7 @@ assert.match(sharedCss,/--ui-medium-modal-safe-space:28px;/);
 assert.match(detailCss,/#inventoryCharacterDetailModal \.inventory-character-detail-box\{[\s\S]*?max-width:var\(--ui-medium-modal-max-width,360px\) !important;[\s\S]*?height:min\(var\(--ui-medium-modal-height,540px\),calc\(100% - var\(--ui-medium-modal-safe-space,28px\)\)\) !important;/);
 assert.match(detailCss,/#inventoryCharacterDetailModal \.inventory-character-detail-grid\{[\s\S]*?flex:1 1 auto !important;[\s\S]*?overflow-y:auto !important;[\s\S]*?touch-action:pan-y !important;[\s\S]*?scrollbar-gutter:stable !important;/);
 assert.match(detailCss,/#inventoryCharacterDetailModal \.close-item-button\{[\s\S]*?flex:0 0 auto !important;/);
-assert.match(touchLock,/\.inventory-character-detail-grid/);
+assert.match(touchLock,/data-scroll-owner="x\|y\|both"/);
 
 function findChrome(){
     for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){

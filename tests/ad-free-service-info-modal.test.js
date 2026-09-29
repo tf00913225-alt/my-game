@@ -82,7 +82,7 @@ test("the scoped RPG modal style supports internal mobile scrolling without new 
     assert.match(css,/#homeFeatureModalBody\{[\s\S]*overflow-y:auto;[\s\S]*overscroll-behavior-y:contain;[\s\S]*touch-action:pan-y;/);
     assert.match(css,/border:2px solid #b98a3f/);
     assert.match(css,/rgba\(2,2,2,.84\)/);
-    assert.match(touchLock,/#homeFeatureModalBody/);
+    assert.match(touchLock,/data-scroll-owner="x\|y\|both"/);
 });
 
 test("the owner runtime opens once on a ready home screen and closes through the shared modal function",()=>{

@@ -11,7 +11,7 @@ const touchSource=fs.readFileSync("js/01-stage-v8-touch-lock.js","utf8");
 assert.match(detailCss,/#game-stage #skillDetailModal \.item-modal-box\{[\s\S]*?max-width:var\(--ui-medium-modal-max-width,360px\) !important;[\s\S]*?height:min\(var\(--ui-medium-modal-height,540px\),calc\(100% - var\(--ui-medium-modal-safe-space,28px\)\)\) !important;/);
 assert.match(detailCss,/#game-stage #skillDetailModal #skillDetailStats\{[\s\S]*?flex:1 1 auto !important;[\s\S]*?overflow-y:auto !important;[\s\S]*?scrollbar-gutter:stable !important;/);
 assert.match(detailCss,/#game-stage #skillDetailModal \.close-item-button\{[\s\S]*?margin-top:0 !important;/);
-assert.match(touchSource,/#skillDetailStats/);
+assert.match(touchSource,/data-scroll-owner="x\|y\|both"/);
 
 function findChrome(){
     for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){

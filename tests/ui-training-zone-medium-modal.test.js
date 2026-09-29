@@ -11,7 +11,7 @@ const touchLock=fs.readFileSync("js/01-stage-v8-touch-lock.js","utf8");
 
 assert.match(css,/#trainingZoneModal \.home-feature-modal-box\{[\s\S]*?max-width:var\(--ui-medium-modal-max-width,360px\) !important;[\s\S]*?height:min\(var\(--ui-medium-modal-height,540px\),calc\(100% - var\(--ui-medium-modal-safe-space,28px\)\)\) !important;[\s\S]*?overflow:hidden !important;/);
 assert.match(css,/#trainingZoneModal #trainingZoneModalBody\{[\s\S]*?flex:1 1 auto !important;[\s\S]*?overflow-y:auto !important;[\s\S]*?touch-action:pan-y !important;[\s\S]*?scrollbar-gutter:stable !important;/);
-assert.match(touchLock,/#trainingZoneModalBody/);
+assert.match(touchLock,/data-scroll-owner="x\|y\|both"/);
 assert.doesNotMatch(runtime,/box\.style\.setProperty\("width"|box\.style\.setProperty\("max-height"|box\.style\.setProperty\("overflow-y"/);
 
 function findChrome(){
