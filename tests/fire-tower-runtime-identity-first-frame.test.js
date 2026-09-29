@@ -36,16 +36,19 @@ function loadTower({gate}={}){
         saveGame:()=>{},showPage:()=>{},renderBattle:()=>{},updateUI:()=>{},
         getExistingPartyIndexes:()=>[],getPartyCharacterByIndex:()=>null,
         rebuildInventorySlots:()=>{},updateGoldDisplay:()=>{},
-        v154PreparePortraitsForEncounter:null
+        v154PreparePortraitsForEncounter:null,
+        FourSymbolsFeatures:{ensureAssets:()=>Promise.resolve(true)},
+        fetch:()=>Promise.resolve({ok:true,json:()=>Promise.resolve(registry)})
     };
     context.window=context;
     vm.createContext(context);
     vm.runInContext(portraitSource,context);
     context.v154InstallMonsterPortraitRegistry(registry);
+    const preparePortraits=context.v154PreparePortraitsForEncounter;
     if(gate){ context.v154PreparePortraitsForEncounter=gate; }
     vm.runInContext(towerSource,context);
     context.GameplaySystem.debugReloadState({tower:{weekKey:WEEK_KEY,element:"fire"}},Date.UTC(2026,8,28));
-    return {context,calls,fireById};
+    return {context,calls,fireById,preparePortraits};
 }
 
 async function testDisplayIdentity(){
@@ -53,6 +56,8 @@ async function testDisplayIdentity(){
     for(const floor of [1,5,10,50,100]){
         const roster=runtime.context.GameplaySystem.buildTowerRoster(floor);
         assert.ok(roster.length>0,"floor "+floor+" must build a roster");
+        const prepared=await runtime.preparePortraits(roster);
+        assert.equal(prepared.state,"ready","floor "+floor+" portrait identity must resolve before launch");
         roster.forEach(monster=>{
             const record=runtime.fireById.get(monster.portraitKey);
             assert.ok(record,"fire tower portrait must resolve in the registry");
@@ -68,15 +73,24 @@ async function testDisplayIdentity(){
 async function testFirstFrameGate(){
     let registryPending=true;
     let prepareCalls=0;
-    const runtime=loadTower({gate:async monsters=>{
+    let resolveGate;
+    const gateCompleted=new Promise(resolve=>{ resolveGate=resolve; });
+    let runtime;
+    runtime=loadTower({gate:async monsters=>{
         prepareCalls++;
         assert.equal(registryPending,true,"the regression starts with a cold pending registry");
         assert.ok(monsters.every(monster=>monster.portraitKey),"the encounter must expose all portrait keys before launch");
+        const prepared=await runtime.preparePortraits(monsters);
+        assert.equal(prepared.state,"ready","the installed portrait owner must prepare the encounter");
+        assert.ok(monsters.every(monster=>monster.displayName),"registry identities must resolve before launch");
         registryPending=false;
-        return {state:"ready",decoded:monsters.map(monster=>monster.portraitKey)};
+        resolveGate();
+        return prepared;
     }});
     const result=await runtime.context.vGameplaySelectTowerBand(1);
-    assert.equal(result,true,"tower battle should launch after visual preparation");
+    assert.equal(result,true,"tower entry should accept the visual preparation request");
+    await gateCompleted;
+    await new Promise(resolve=>setTimeout(resolve,0));
     assert.equal(prepareCalls,1,"tower entry must use the shared encounter portrait gate");
     assert.equal(registryPending,false);
     const launch=runtime.calls.find(call=>call.type==="launch");
