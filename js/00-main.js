@@ -6811,33 +6811,37 @@ async function createCharacter(){
     }
 
     const previousPlayer=JSON.parse(JSON.stringify(player));
+    selectedCreationElement=selection.element;
+    Object.keys(creationStats).forEach(key=>{ creationStats[key]=selection.attributes[key]; });
+    creationPoints=0;
     player.id=id;
+    player.gender=selection.gender;
 
     player.element =
-        selectedCreationElement;
+        selection.element;
 
 
     player.attack =
-        creationStats.attack;
+        selection.attributes.attack;
 
     player.vitality =
-        creationStats.vitality;
+        selection.attributes.vitality;
 
     player.energy =
-        creationStats.energy;
+        selection.attributes.energy;
 
     player.intelligence =
-        creationStats.intelligence;
+        selection.attributes.intelligence;
 
     player.spirit =
-        creationStats.spirit;
+        selection.attributes.spirit;
 
     player.agility =
-        creationStats.agility;
+        selection.attributes.agility;
 
 
     player.attributePoints =
-        creationPoints;
+        0;
 
     player.skillPoints =
         INITIAL_CHARACTER_SKILL_POINTS;
