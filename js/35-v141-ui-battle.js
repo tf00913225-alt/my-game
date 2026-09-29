@@ -102,6 +102,11 @@
                 const item=pageItems[index]||null;
                 const box=document.createElement("div");
                 box.className="inventory-item inventory-item-classic "+(item?"has-item":"empty");
+                if(item){
+                    const rarity=typeof getInventoryRarityKey==="function"?getInventoryRarityKey(item):"white";
+                    box.classList.add("rarity-"+rarity);
+                    box.dataset.rarity=rarity;
+                }
                 box.draggable=false;
                 box.addEventListener("dragstart",event=>event.preventDefault());
                 if(item){
@@ -109,7 +114,11 @@
                         '<div class="inventory-icon">'+(item.icon||"◆")+'</div>'+
                         '<div class="inventory-count">'+((Number(item.count)||0)>1?"×"+item.count:"")+'</div>';
                     const realIndex=inventoryItems.indexOf(item);
-                    box.onclick=()=>openItemModal(realIndex);
+                    box.onclick=()=>{
+                        document.querySelectorAll("#inventoryGrid .inventory-item-classic.is-selected").forEach(selected=>selected.classList.remove("is-selected"));
+                        box.classList.add("is-selected");
+                        openItemModal(realIndex);
+                    };
                     box.setAttribute("aria-label",item.name||"背包物品");
                 }else{
                     box.innerHTML='<div class="inventory-empty-dot">·</div>';
