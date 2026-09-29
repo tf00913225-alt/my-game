@@ -139,6 +139,9 @@ jobs:
       - name: Run Gameplay context navigation regression
         run: node tests/gameplay-context-nav-actions-20260915.test.js
 
+      - name: Run Gameplay UI regression
+        run: node tests/gameplay-ui-regressions-20260908.test.js
+
       - name: Run relic lifecycle and battle input regressions
         run: |
           node tests/relic-trigger-lifecycle-battle-input-ui-20260919.test.js

@@ -26,7 +26,7 @@ assert.doesNotMatch(bossCss,/boss-mechanism-card|boss-mechanism-slot/);
    Keep these assertions whitespace-safe so formatting changes do not create a
    false CI failure while the actual combat behavior remains the same. */
 assert.match(bossRuntime,/const ELEMENT_ORDER=Object\.freeze\(\["fire","earth","water","wind"\]\)/);
-assert.match(bossRuntime,/if\(element==="fire"\)\{[\s\S]*?monster\.skillChance=Math\.min\(\.82,monster\.skillChance\+\.08\);[\s\S]*?monster\.critChance=[\s\S]*?\}/);
+assert.match(bossRuntime,/if\(element==="fire"\)\{[\s\S]*?monster\.skillChance=Math\.min\(\.82,numeric\(monster\.skillChance,\.48\)\+\.08\);[\s\S]*?monster\.critChance=[\s\S]*?\}/);
 assert.match(bossRuntime,/if\(element==="water"\)\{[\s\S]*?monster\.v141SupportSkillIds=compatibleSkillIds\(element,ELEMENTS\.water\.supports\);[\s\S]*?monster\.v141AbyssAi="support";[\s\S]*?\}/);
 assert.match(bossRuntime,/if\(element==="wind"\)\{[\s\S]*?monster\.evasion=[\s\S]*?monster\.agility=[\s\S]*?1\.12;[\s\S]*?\}/);
 assert.match(bossRuntime,/if\(element==="earth"\)\{[\s\S]*?monster\.defense=[\s\S]*?monster\.maxHP=[\s\S]*?1\.12\);[\s\S]*?monster\.hp=monster\.maxHP;[\s\S]*?\}/);
