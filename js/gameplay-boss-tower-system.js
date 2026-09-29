@@ -526,6 +526,12 @@
         if(!monster){ return monster; }
         if(typeof window.v154BindMonsterPortraitIdentity==="function"){
             window.v154BindMonsterPortraitIdentity(monster);
+        }else if(typeof window.v154ResolveMonsterPortraitRecord==="function"){
+            // Fire Tower rosters need registry identity before the encounter gate
+            // decodes portraits; resolve the already-installed record synchronously.
+            const record=window.v154ResolveMonsterPortraitRecord(monster);
+            const name=record&&(record.displayName||record.name);
+            if(name){ monster.name=name;monster.displayName=name; }
         }
         // The portrait Registry is the single name owner for tower assets.
         // Battle UI reads monster.name, so promote the resolved displayName
