@@ -15,7 +15,6 @@
 
         const candidates = [
             document.getElementById("bottomNav"),
-            document.getElementById("mapPageNav"),
             document.querySelector("#game-content .bottom-nav")
         ].filter(Boolean);
 
@@ -28,7 +27,6 @@
              */
             const isBottomNav =
                 nav.id === "bottomNav" ||
-                nav.id === "mapPageNav" ||
                 nav.classList.contains("bottom-nav");
 
             if(!isBottomNav) return;
