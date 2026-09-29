@@ -49,7 +49,7 @@
     function finishPointer(event){ const pointer=activePointers.get(event.pointerId); if(!pointer) return; classify(pointer,event); activePointers.delete(event.pointerId); if(pointer.state!=="TAP") rememberSuppression(pointer.interactiveTarget); }
     document.addEventListener("pointerup",finishPointer,{capture:true,passive:true});
     document.addEventListener("pointercancel",function(event){ activePointers.delete(event.pointerId); },{capture:true,passive:true});
-    document.addEventListener("click",function(event){ if(isGameSurfaceTarget(event.target)&&consumeSuppression(interactiveTarget(event.target)||event.target)){ event.preventDefault(); event.stopImmediatePropagation(); } },true);
+    function handleSuppressedGestureClick(event){ if(consumeSuppression(interactiveTarget(event.target)||event.target)){ event.preventDefault(); event.stopImmediatePropagation(); } }\n    const stage=document.getElementById("game-stage");\n    if(stage){ stage.addEventListener("click",handleSuppressedGestureClick,true); }
 
     /* Pinch is the sole touchmove cancellation. Single-finger panning is
        deliberately left to the browser and the Scroll Owner CSS contract. */
