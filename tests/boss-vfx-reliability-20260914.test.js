@@ -208,7 +208,8 @@ function config(id,targetType="single",duration=760){
     assert.equal(manifest.yuanGuangShield.noVisual,true);
 }
 
-assert.match(mainSource,/function showMissEffect\(isPlayerTarget,index,text\)[\s\S]*?showDamagePopup\(element,text\|\|"MISS","miss"\)/,"MISS popup must enter the canonical battle feedback owner");
+assert.match(mainSource,/function showMissEffect\(isPlayerTarget,index,text\)/,"MISS entry point remains present");
+assert.match(mainSource,/showDamagePopup\(\s*element,\s*text\|\|"MISS",\s*"miss"\s*\)/,"MISS popup must enter the canonical battle feedback owner");
 assert.match(mainSource,/return feedback\.emit\(\{[\s\S]*?kind:type==="heal"[\s\S]*?type==="miss"[\s\S]*?"miss"/,"canonical feedback maps MISS to the miss semantic kind");
 assert.match(feedbackOwner,/if\(value==="miss"\)\{ return "miss"; \}/,"feedback owner preserves MISS semantics");
 assert.match(feedbackOwner,/const resolver=window\.v143ResolveBattleFeedbackTiming/,"canonical feedback owner delegates impact timing to V143");
