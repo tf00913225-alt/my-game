@@ -37,7 +37,8 @@ function loadTower({gate}={}){
         getExistingPartyIndexes:()=>[],getPartyCharacterByIndex:()=>null,
         rebuildInventorySlots:()=>{},updateGoldDisplay:()=>{},
         v154PreparePortraitsForEncounter:null,
-        FourSymbolsFeatures:{ensureAssets:()=>Promise.resolve(true)}
+        FourSymbolsFeatures:{ensureAssets:()=>Promise.resolve(true)},
+        fetch:()=>Promise.resolve({ok:true,json:()=>Promise.resolve(registry)})
     };
     context.window=context;
     vm.createContext(context);
