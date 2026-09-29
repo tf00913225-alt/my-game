@@ -223,9 +223,9 @@ test("the formal owner supplies every direct skill base value without V149 data 
 test("shared level formula preserves gates while every upgrade costs one point",()=>{
     const r=makeRuntime();
     const required=r.context.v17364GetRequiredCharacterLevelForSkillLevel;
-    assert.deepEqual([1,2,3,4,5,6,7,8,9,10].map(level=>required(r.skills.flameSlash,level)),[1,15,30,50,80,80,80,80,80,80]);
-    assert.deepEqual([1,2,3,4,5,6,7,8,9,10].map(level=>required(r.skills.dragonSlash,level)),[30,38,48,60,80,80,80,80,80,80]);
-    assert.deepEqual([1,2,3,4,5].map(level=>required(r.skills.revive,level)),[20,28,38,50,80]);
+    assert.deepEqual([1,2,3,4,5,6,7,8,9,10].map(level=>required(r.skills.flameSlash,level)),[1,10,20,30,40,50,60,70,80,90]);
+    assert.deepEqual([1,2,3,4,5,6,7,8,9,10].map(level=>required(r.skills.dragonSlash,level)),[30,10,20,30,40,50,60,70,80,90]);
+    assert.deepEqual([1,2,3,4,5].map(level=>required(r.skills.revive,level)),[20,20,40,60,80]);
     assert.deepEqual(Object.assign({},r.context.v17364SkillUpgradeCostByTargetLevel),{2:1,3:1,4:1,5:1,6:1,7:1,8:1,9:1,10:1});
 });
 
@@ -253,7 +253,7 @@ test("learning milestones use the selected character own level, prerequisites an
 
 test("Lv10 upgrades keep the established character gates and charge one point every time",()=>{
     const r=makeRuntime();
-    const cases=[[14,1,false],[15,1,true],[29,2,false],[30,2,true],[49,3,false],[50,3,true],[79,4,false],[80,4,true],[80,5,true],[80,6,true],[80,7,true],[80,8,true],[80,9,true]];
+    const cases=[[9,1,false],[10,1,true],[19,2,false],[20,2,true],[39,4,false],[40,4,true],[49,5,false],[50,5,true],[79,8,false],[80,8,true],[80,9,false]];
     for(const [level,current,expected] of cases){
         resetForLearn(r,"fire",level,999);r.loadouts.fire.skillLevels.flameSlash=current;
         assert.equal(r.context.upgradeSkill("flameSlash"),expected,`flameSlash char ${level} skill ${current}`);
@@ -264,10 +264,10 @@ test("Lv10 upgrades keep the established character gates and charge one point ev
     assert.equal(r.loadouts.fire.skillLevels.flameSlash,3);
 });
 
-test("revive keeps 20/40/60/80/100 battle values and uses 20/28/38/50/80 gates",()=>{
+test("revive keeps 20/40/60/80/100 battle values and uses 20/40/60/80 gates",()=>{
     const r=makeRuntime();
     assert.deepEqual(Array.from(r.skills.revive.reviveHealPercentByLevel),[20,40,60,80,100]);
-    assert.deepEqual([1,2,3,4,5].map(level=>r.context.v17364GetRequiredCharacterLevelForSkillLevel(r.skills.revive,level)),[20,28,38,50,80]);
+    assert.deepEqual([1,2,3,4,5].map(level=>r.context.v17364GetRequiredCharacterLevelForSkillLevel(r.skills.revive,level)),[20,20,40,60,80]);
 });
 
 test("Fire Soul Resonance grants persistent momentum and Lv5 extends at most once per formal round",()=>{

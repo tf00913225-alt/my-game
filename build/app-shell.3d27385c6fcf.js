@@ -29612,6 +29612,11 @@ function renderSkillLoadout(){
         const eligibility=getSkillLearnEligibilityForUi(skillOwner,skill,skillLevels);
         const learnCost=eligibility.learnCost;
         const canAfford=eligibility.pointsOk;
+        const upgradeEligibility=isLearned &&
+            typeof window!=="undefined"&&
+            typeof window.v17364GetSkillUpgradeEligibility==="function"
+            ?window.v17364GetSkillUpgradeEligibility(skillOwner,skill,level)
+            :null;
 
 
         const box =
@@ -29672,18 +29677,18 @@ function renderSkillLoadout(){
         }
         else{
 
-            actionLabel=
-                availableSkillPoints<1
-                ?
-                "點數不足"
-                :
-                "升級";
+            actionLabel=upgradeEligibility
+                ?(upgradeEligibility.allowed
+                    ?"升級・"+upgradeEligibility.cost+"點"
+                    :upgradeEligibility.reason)
+                :(availableSkillPoints<1?"點數不足":"升級");
 
             actionOnclick=
                 "upgradeSkill('"+skillId+"')";
 
-            actionDisabled=
-                availableSkillPoints<1;
+            actionDisabled=upgradeEligibility
+                ?!upgradeEligibility.allowed
+                :availableSkillPoints<1;
 
         }
 
