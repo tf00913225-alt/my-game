@@ -48,7 +48,9 @@ test("Firebase layer does not wrap or mutate the existing local save owner", ()=
     assert.equal(combined.includes("localStorage.setItem"), false);
     assert.equal(nonMigrationModules.includes("battle_full_version_save_v5"), false);
     assert.match(cloud, /LEGACY_LOCAL_SAVE_KEY\s*=\s*"battle_full_version_save_v5"/);
-    assert.match(cloud, /localStorage\.getItem\(LEGACY_LOCAL_SAVE_KEY\)/);
+    assert.doesNotMatch(cloud, /localStorage\.(?:getItem|setItem)/);
+    assert.match(cloud, /repository\.verifyMigrationBackup\(uid,options\.backupKey\)/);
+    assert.match(cloud, /repository\.createMigrationBackup\(uid\)/);
 });
 
 test("bootstrap exposes the narrow Firebase bridge and cloud-read events", ()=>{
