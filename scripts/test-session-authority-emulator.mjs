@@ -1003,6 +1003,32 @@ await rejected("protectedTest",yUser.idToken,{uid:y,session:sessionY},"AUTH_REQU
 await rejected("createNativeAuthHandoff",yUser.idToken,{},"AUTH_REQUIRED");
 await getAuth(testApp).updateUser(x,{disabled:true});
 await rejected("protectedTest",e.idToken,{uid:x,session:sessionE},"AUTH_REQUIRED");
+// Exercise the deployed Callable boundary, not only the internal shop module.
+const callableShop={uid:atomicUid,session:atomicSession,
+    operationId:"shop-callable-checkin-0001",expectedRevision:3,
+    itemId:"hpPotion10",quantity:1};
+await rejected("purchaseCanonicalPotion",atomicUser.idToken,
+    {...callableShop,price:0},"INVALID_ARGUMENT");
+await rejected("purchaseCanonicalPotion",atomicUser.idToken,
+    {...callableShop,expectedRevision:2},"ABORTED");
+await rejected("purchaseCanonicalPotion",atomicUser.idToken,
+    {...callableShop,session:sessionY},"SESSION_INVALID");
+const callableBought=await invoke("purchaseCanonicalPotion",atomicUser.idToken,callableShop);
+assert.equal(callableBought.purchasedRevision,4);
+assert.equal(callableBought.cost,20);
+assert.equal((await db.doc(`serverUsers/${atomicUid}/economy/current`).get()).get("gold"),30);
+assert.equal((await db.doc(`serverUsers/${atomicUid}/inventory/${callableBought.ownedItemId}`).get())
+    .get("state.count"),1);
+assert.equal((await invoke("purchaseCanonicalPotion",atomicUser.idToken,callableShop))
+    .unchanged,true);
+assert.equal((await db.doc(`serverUsers/${atomicUid}/economy/current`).get()).get("gold"),30);
+await rejected("purchaseCanonicalPotion",atomicUser.idToken,
+    {...callableShop,quantity:2},"DATA_LOSS");
+assert.equal((await db.doc(`users/${atomicUid}/saves/current`).get())
+    .get("authoritativeStateReady"),false);
+assert.equal((await db.doc(`serverUsers/${atomicUid}/playableSnapshots/4`).get())
+    .get("readyForPublication"),false);
+await checkRecoveryArchive(atomicUid,4);
 console.log(`PASS (${direct?"direct exported handlers":"HTTP callable"}): A SUCCESS -> B takeover -> A SESSION_REVOKED -> B SUCCESS; logout, UID isolation, tampering, private rules, protected writers, concurrent takeover/write ordering, revoked/disabled Firebase identity.`);
 await db.terminate();
 if(direct){await getFirestore().terminate();}
