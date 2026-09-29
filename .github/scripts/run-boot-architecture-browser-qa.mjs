@@ -91,6 +91,7 @@ export async function readCurrentCloudSave(){
   return Object.freeze({exists:true,uid,path:"users/"+uid+"/saves/current",data:{ownerUid:uid,authoritativeStateReady:true,status:"ready",gameSave:gameSave(uid)}});
 }
 export async function bootstrapTrustedCloudSave(){return {status:"qa-no-write"};}
+export async function createInitialCanonicalCharacter(){throw new Error("QA never creates a cloud character");}
 export async function saveLocalAutoBattlePreferences(){throw new Error("QA never performs a cloud write");}
 export async function submitLegacyMigrationCandidate(){throw new Error("QA never performs a cloud write");}
 export function createLocalMigrationBackup(){throw new Error("QA never creates a migration backup");}

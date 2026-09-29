@@ -12,6 +12,7 @@ const {createCanonicalResourceCredit}=require("./src/canonical-resource-credit")
 const {createLegacyCandidateScreening}=require("./src/legacy-candidate-screening");
 const {createCanonicalRecoveryApproval}=require("./src/canonical-recovery-approval");
 const {createCanonicalCurrentRecovery}=require("./src/canonical-current-recovery");
+const {createCanonicalSourceWriter}=require("./src/canonical-source-writer");
 const {CloudPreferencesError,PREFERENCES_SCHEMA_VERSION,normalizePreferences}=require("./src/cloud-preferences");
 const {
     CLOUD_SAVE_ENVELOPE_SCHEMA_VERSION,
@@ -50,6 +51,13 @@ const currentRecovery=createCanonicalCurrentRecovery({
     db:getFirestore(),FieldValue,HttpsError,runProtected:sessions.runProtected,
     inspectExistingEnvelope,nextRevision
 });
+const initialCharacterWriter=createCanonicalSourceWriter({
+    db:getFirestore(),FieldValue,HttpsError,runProtected:sessions.runProtected,
+    inspectExistingEnvelope,nextRevision
+});
+// Existing UIDs may hold an original-phone save that was never submitted.
+// Only Auth accounts minted after this rollout may use the fresh-start path.
+const FRESH_CHARACTER_UID_CUTOFF_MS=Date.parse("2026-09-29T14:15:00Z");
 
 const REGION="us-central1";
 const PUBLIC_SAVE_PATH_SEGMENTS=["saves","current"];
@@ -165,6 +173,27 @@ exports.restoreCanonicalCurrent=onCall(CALLABLE_OPTIONS,async request=>{
         return await currentRecovery.restoreCurrent(request,{
             operationId:data.operationId,expectedRevision:data.expectedRevision
         });
+    }catch(error){ throw asHttpsError(error); }
+});
+exports.createInitialCanonicalCharacter=onCall(CALLABLE_OPTIONS,async request=>{
+    request=await verifyGameIdentity(request);
+    try{
+        const data=request.data;
+        if(!data||typeof data!=="object"||Array.isArray(data)||
+           Object.keys(data).some(key=>!["uid","session","selection","expectedRevision"].includes(key))){
+            throw new HttpsError("invalid-argument","Only creation choices and an expected revision are accepted.");
+        }
+        const user=await getAdminAuth().getUser(request.auth.uid);
+        const createdAt=Date.parse(user.metadata.creationTime);
+        if(!Number.isFinite(createdAt)||createdAt<FRESH_CHARACTER_UID_CUTOFF_MS){
+            throw new HttpsError("failed-precondition",
+                "Existing accounts require the original-device migration path.");
+        }
+        const operationId="initial-"+createHash("sha256")
+            .update(request.auth.uid,"utf8").digest("hex").slice(0,32);
+        return await initialCharacterWriter.commitInitialSources(request,{
+            operationId,expectedRevision:data.expectedRevision,selection:data.selection
+        },{requireCurrentReplay:true});
     }catch(error){ throw asHttpsError(error); }
 });
 // No browser grant issuer exists. This reserves a server-issued entitlement

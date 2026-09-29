@@ -10,7 +10,7 @@ const digest=value=>createHash("sha256").update(JSON.stringify(value)).digest("h
 const plain=value=>value!==null&&typeof value==="object"&&!Array.isArray(value);
 
 // Only the player's choices cross this boundary. All progression is generated
-// here by the server. There is deliberately no public callable yet.
+// here by the server. The callable accepts choices only, never progression.
 function makeInitialCharacterSources(uid,revision,operationId,selection){
     if(!plain(selection)||Object.keys(selection).sort().join("|")!==
         "attributes|displayName|element|gender"||

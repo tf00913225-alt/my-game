@@ -7,13 +7,14 @@ const {createHash}=require("node:crypto");
 
 const OPERATION_ID=/^[A-Za-z0-9_-]{16,64}$/;
 
-// This is an internal transaction owner. No callable accepts source records.
-// Only validated creation choices can enter this internal writer.
+// Internal transaction owner; its guarded callable accepts choices only.
+// Source records and progression are never accepted from the browser.
 function createCanonicalSourceWriter({db,FieldValue,HttpsError,runProtected,
     inspectExistingEnvelope,nextRevision}){
     const fail=(code,message)=>{ throw new HttpsError(code,message); };
 
-    async function commitInitialSources(request,{operationId,expectedRevision,selection}){
+    async function commitInitialSources(request,{operationId,expectedRevision,selection},
+        {requireCurrentReplay=false}={}){
         if(!OPERATION_ID.test(operationId||"")||
            !Number.isSafeInteger(expectedRevision)||expectedRevision<1){
             fail("invalid-argument","An internal source operation needs an ID and revision.");
@@ -83,6 +84,12 @@ function createCanonicalSourceWriter({db,FieldValue,HttpsError,runProtected,
                        JSON.stringify(choices.characters[0].state[key]))){
                     fail("data-loss","Initial character choices differ from the receipt.");
                 }
+                if(requireCurrentReplay&&
+                   (envelope.serverRevision!==receipt.sourceRevision||
+                    receipt.creationSessionId!==session.sessionId)){
+                    fail("failed-precondition",
+                        "An earlier session or advanced character cannot start a local save.");
+                }
                 return {sourceRevision:receipt.sourceRevision,
                     snapshotSha256:receipt.snapshotSha256,unchanged:true,
                     authoritativeStateReady:false};
@@ -149,6 +156,7 @@ function createCanonicalSourceWriter({db,FieldValue,HttpsError,runProtected,
                 schemaVersion:1,ownerUid:uid,kind:"initial-character-sources",
                 operationId,sourceRevision:revision,snapshotSha256:bundle.sha256,
                 selectionSha256,
+                ...(session.sessionId?{creationSessionId:session.sessionId}:{}),
                 authoritativeStateReady:false,createdAt:stamp
             });
             // The version-2 public envelope has no playable pointer. Keep the

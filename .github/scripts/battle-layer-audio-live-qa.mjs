@@ -147,28 +147,42 @@ async function prepareAccountFirstRuntime(client,features){
     }
     await client.eval(`Promise.all(${JSON.stringify(features)}.map(feature=>FourSymbolsFeatures.ensure(feature,"live-browser-qa")))`);
     if(state==="NEED_CHARACTER"){
+        // Presentation QA needs a local battle fixture. It cannot create a
+        // canonical character against an independently deployed Functions
+        // revision, and must never issue a production cloud write here.
         const creationAttempt=await client.eval(`(()=>{
             const input=document.getElementById('creationId');
-            if(!input||typeof createCharacter!=='function'){return {created:false,errors:["creation input/function unavailable"]};}
+            const repo=window.FourSymbolsAccountSave;
+            const uid=repo?.getActiveUid?.();
+            if(!input||!uid||!window.FourSymbolsStartupPolicy?.canCreateCharacter?.()){
+                return {created:false,errors:["creation input/account unavailable"]};
+            }
             input.value='QA俠客';
             const errors=[];
-            const originalError=console.error;
-            console.error=function(){
-                try{
-                    errors.push(Array.from(arguments).map(value=>{
-                        if(value instanceof Error){ return value.name+":"+value.message+(value.code?(" code="+value.code):""); }
-                        if(value&&typeof value==="object"){
-                            try{return JSON.stringify(value);}catch(_){return String(value);}
-                        }
-                        return String(value);
-                    }).join(" | "));
-                }catch(_){}
-                return originalError.apply(this,arguments);
-            };
             try{
-                return {created:createCharacter()===true,errors};
-            }finally{
-                console.error=originalError;
+                const local=repo.readForUid(uid);
+                if(local.status!=="empty"){
+                    errors.push("UID already contains a local save");
+                    return {created:false,errors};
+                }
+                if(repo.inspectLegacy().status!=="none"){
+                    errors.push("legacy candidate exists");
+                    return {created:false,errors};
+                }
+                player.id=input.value;
+                player.element=selectedCreationElement;
+                player.attack=10;
+                player.attributePoints=0;
+                const saved=saveGame({source:"browser-presentation-qa-fixture"});
+                if(saved!==true){ errors.push("fixture save failed"); return {created:false,errors}; }
+                FourSymbolsStartupPolicy.notifyCharacterCreated();
+                document.getElementById('creationPage').style.display='none';
+                document.getElementById('gameInterface').style.display='block';
+                window.syncCreationTouchMode?.();
+                return {created:true,errors,fixture:"local-battle-only"};
+            }catch(error){
+                errors.push(String(error?.stack||error));
+                return {created:false,errors};
             }
         })()`);
         if(!creationAttempt.created){
@@ -200,12 +214,12 @@ async function prepareAccountFirstRuntime(client,features){
                 };
             })()`);
             throw new Error(
-                "Live anonymous account could not complete the formal character-creation flow: "+
+                "Live anonymous account could not install the local battle QA fixture: "+
                 JSON.stringify(diagnostics)+
                 " CDP="+JSON.stringify(client.events.slice(-20))
             );
         }
-        await waitFor(client,"FourSymbolsStartupPolicy.getState()==='READY'&&getComputedStyle(document.getElementById('gameInterface')).display!=='none'","anonymous character creation completion",30000);
+        await waitFor(client,"FourSymbolsStartupPolicy.getState()==='READY'&&getComputedStyle(document.getElementById('gameInterface')).display!=='none'","local battle QA fixture completion",30000);
         state="READY";
     }
     return state;
@@ -473,7 +487,13 @@ try{
     assert.equal(bootstrap.skillVolumeScale,2,"Deployed skill SFX multiplier must be exactly 2.0 (+100%)");
     assert.equal(bootstrap.combatFeedbackVolumeScale,2,"Deployed general battle feedback multiplier must be exactly 2.0 (+100%)");
 
-    await waitFor(client,"(()=>{const page=document.getElementById('battlePage');const rect=page?.getBoundingClientRect();return page?.classList.contains('active')&&!page.classList.contains('v141-preparing-entry')&&!page.classList.contains('v141-entry-moving')&&rect?.width>0&&rect?.height>0&&document.getElementById('battlePlayerCard0')&&document.querySelector('#battlePlayerCard0 .hp-bar')&&document.querySelector('#battleMonster0 .monster-hp');})()","visible real battle after entry transition",15000);
+    try{
+        await waitFor(client,"(()=>{const page=document.getElementById('battlePage');const rect=page?.getBoundingClientRect();return page?.classList.contains('active')&&!page.classList.contains('v141-preparing-entry')&&!page.classList.contains('v141-entry-moving')&&rect?.width>0&&rect?.height>0&&document.getElementById('battlePlayerCard0')&&document.querySelector('#battlePlayerCard0 .hp-bar')&&document.querySelector('#battleMonster0 .monster-hp');})()","visible real battle after entry transition",15000);
+    }catch(error){
+        const diagnostic=await client.eval(`(()=>{const page=document.getElementById('battlePage');const rect=page?.getBoundingClientRect();return {startup:FourSymbolsStartupPolicy.getState(),pageClass:page?.className||null,pageRect:rect&&{width:rect.width,height:rect.height},battleActive:typeof battleActive==='undefined'?null:battleActive,battleToken:typeof battleToken==='undefined'?null:battleToken,playerCard:!!document.getElementById('battlePlayerCard0'),playerBar:!!document.querySelector('#battlePlayerCard0 .hp-bar'),monsterBar:!!document.querySelector('#battleMonster0 .monster-hp'),outcome:window.__battleLayerQaDungeonOutcome,playerHp:player.hp,playerId:player.id,events:performance.getEntriesByType('mark').slice(-12).map(item=>item.name)};})()`);
+        error.message+=" Diagnostic="+JSON.stringify(diagnostic)+" CDP="+JSON.stringify(client.events.slice(-10));
+        throw error;
+    }
 
     const layout=await client.eval(`(()=>{
         const rectFor=element=>{

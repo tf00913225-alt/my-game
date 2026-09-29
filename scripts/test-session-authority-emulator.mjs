@@ -246,6 +246,32 @@ const initialWriter=createCanonicalSourceWriter({db,FieldValue,HttpsError,
     })});
 const choices={displayName:"英雄",element:"water",gender:"male",
     attributes:{attack:2,vitality:2,energy:2,intelligence:2,spirit:1,agility:1}};
+// The real callable permits only a newly minted Auth UID and creation choices.
+// The browser cannot supply a starting balance, item or operation identity.
+const freshUser=await login("accounts:signUp",{
+    email:"session-fresh-character@example.test",password});
+const freshUid=freshUser.localId;
+const freshSession=await invoke("createGameSession",freshUser.idToken,{uid:freshUid});
+const freshEnvelope=await invoke("bootstrapCloudSave",freshUser.idToken,
+    {uid:freshUid,session:freshSession});
+const freshPayload={uid:freshUid,session:freshSession,
+    selection:choices,expectedRevision:freshEnvelope.serverRevision};
+await assert.rejects(invoke("createInitialCanonicalCharacter",freshUser.idToken,
+    {...freshPayload,gold:999}),error=>
+    ["invalid-argument","INVALID_ARGUMENT"].includes(error.code));
+const freshCreated=await invoke("createInitialCanonicalCharacter",
+    freshUser.idToken,freshPayload);
+assert.equal(freshCreated.sourceRevision,2);
+assert.equal(freshCreated.authoritativeStateReady,false);
+assert.equal((await db.doc(`serverUsers/${freshUid}/economy/current`).get())
+    .get("gold"),0);
+assert.equal((await db.doc(`serverUsers/${freshUid}/playableSnapshots/2`).get())
+    .get("readyForPublication"),false);
+assert.equal((await invoke("createInitialCanonicalCharacter",freshUser.idToken,
+    freshPayload)).unchanged,true);
+await assert.rejects(invoke("createInitialCanonicalCharacter",freshUser.idToken,
+    {...freshPayload,selection:{...choices,displayName:"另一人"}}),error=>
+    ["data-loss","DATA_LOSS"].includes(error.code));
 const initialOperation="initial-character-emulator-0001";
 const yRequest={auth:{uid:y,token:claims(yUser.idToken)},
     data:{uid:y,session:sessionY}};
