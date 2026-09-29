@@ -183,3 +183,5 @@ QA、測試與 debug 工具不得為方便而永久改變正式戰鬥數值、�
 - 只有 GitHub Connector／API 本身明確回傳 authentication／authorization／permission 錯誤、缺少必要寫入能力，或使用者明確指定必須使用 Git CLI 時，才可把憑證或授權列為阻塞事項。
 - 即使改走 Connector／API，仍必須遵守既有分支政策：禁止直接改寫 `dev`／`main`，必須由最新 `dev` 建立 `fix/`、`feature/`、`docs/` 等工作分支，經 PR、Repository checks／CI 與既有 Release Gate 後再合併。
 - 若修改內容先在本機產生，代理應透過既有 GitHub 檔案／blob／tree／commit／ref 能力發布到工作分支；不得因工作區沒有可持久化 Git 認證而把已完成的修改留在本機或重複要求授權。
+
+13. **凡涉及發布、Release Candidate、P0／P1／P2、Release Freeze、Exact-HEAD Verification 或發布整備判定，必須完整閱讀 `docs/RELEASE_VERIFICATION_RULES.md` 第 21 章「Release Readiness Priority Framework（發布整備優先級框架）」。該章是唯一正式 Owner：P0 是 Release Blocker 而非 Development Blocker；P1／P2 不得阻止正常開發；只有專案負責人明確啟動時才能進入 RELEASE FREEZE。**
