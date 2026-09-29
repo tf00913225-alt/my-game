@@ -173,6 +173,7 @@ Replacement／Convergence／Removal 只有在以下項目完成後才可宣稱�
 - `AGENTS.md`／`CLAUDE.md`：代理入口，必須要求所有修改先遵守本契約。
 - `ARCHITECTURE_RULES.md`：Owner、Patch、Wrapper 與架構細節；與本契約共同適用。
 - `AUTONOMOUS_REPAIR_CONTRACT.md`：修復任務的自主權限邊界；修復施工本身仍必須符合本契約。
+- `docs/BUG_REPAIR_DOD_OWNER_CONVERGENCE_GATE.md`：所有 Bug／failure／regression 的完成狀態與 Owner Convergence Gate 專項權威；找到根因、CI PASS 或新版可運作均不得自行等同 VERIFIED。
 - `UI_GUIDELINES.md`：UI 尺寸、呈現、互動規格；UI Replacement 同時適用本契約。
 - `docs/RELEASE_VERIFICATION_RULES.md`：Requirement／CI／Release 與 deprecated-code 驗證。
 - `HANDOFF.md`：記錄當前專案狀態與重要遷移結果，不作為本契約的替代來源。
