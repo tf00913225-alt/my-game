@@ -17,7 +17,8 @@ for(const e of pool.filter(e=>e.status==="adopted")) assert.ok(e.runtimePath && 
 for(const id of Object.values(registry.fireTowerCoverage.bossByFloor)) assert.equal(pool.find(e=>e.assetId===id).tier,"miniboss");
 assert.match(tower,/eliteEvery:5,bossEvery:10/);
 assert.match(tower,/monster\.portraitKey=towerPortraitAssetId/);
-assert.match(tower,/towerPortraitAssetId\(floor,"boss"/);
+assert.match(tower,/function towerPortraitAssetId\(element,floor,role,slot\)/);
+assert.match(tower,/towerPortraitAssetId\(definition\.element,floor,"boss",0\)/);
 assert.match(tower,/function bindTowerMonsterIdentity\(monster\)/);
 assert.match(tower,/monster\.name=monster\.displayName/);
 
