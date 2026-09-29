@@ -167,6 +167,7 @@ function createRuntime(options={}){
         const data=context.FourSymbolsAccountSave.readForUid(accountUid).save;
         data.gold=context.gold;
         context.FourSymbolsAccountSave.writeForUid(accountUid,data,{source:"test-core"});
+        return true;
     };
     vm.runInContext(source,context);
     return {
