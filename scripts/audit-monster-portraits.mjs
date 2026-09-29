@@ -194,8 +194,8 @@ if(!portraitRuntime.includes('monsterPortraitByKey.get("soldier."+element)')){
 if(!portraitRuntime.includes("window.resolveMonsterPortrait")){
     errors.push("V154 portrait owner does not expose resolveMonsterPortrait(monster)");
 }
-if(!portraitTiming.includes("v154SyncMonsterPortraits")){
-    errors.push("V159 timing bridge is not synchronized with the authoritative V154 portrait owner");
+if(/v154SyncMonsterPortraits|updateUI\s*=|requestAnimationFrame|setTimeout|MutationObserver/.test(portraitTiming)){
+    errors.push("V159 retirement audit failed: the retired module still participates in portrait lifecycle or global UI timing");
 }
 
 const soldiers=targets.filter(target=>target.group==="heavenly-soldier");

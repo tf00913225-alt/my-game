@@ -63,9 +63,18 @@ jobs:
           node --check .github/scripts/battle-layer-audio-live-qa.mjs
           node --check .github/scripts/battle-runtime-architecture-guard.mjs
           node --check .github/scripts/run-daily-dungeon-webp-browser-qa.mjs
+          node --check .github/scripts/run-fire-portrait-browser-qa.mjs
 
       - name: Check all project JavaScript syntax
         run: node .github/scripts/ci.mjs syntax
+
+      - name: Enforce permanent image asset pipeline gate
+        run: |
+          if ! command -v identify >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends imagemagick
+          fi
+          node tests/permanent-image-asset-pipeline.test.mjs
 
       - name: Reject unregistered persistent state
         run: node scripts/check-persisted-state-registry.mjs --self-test
@@ -280,6 +289,24 @@ jobs:
         with:
           name: daily-dungeon-webp-browser-qa-${{ github.sha }}
           path: artifacts/browser-qa/daily-dungeon-webp-browser-qa.json
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Run Fire portrait decode and battle runtime browser QA
+        id: fire_portrait_browser
+        if: success() && github.event_name == 'pull_request'
+        run: |
+          python3 -m http.server 4176 --bind 127.0.0.1 > /tmp/four-symbols-fire-portrait-qa-server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+          DEV_BASE_URL=http://127.0.0.1:4176 node .github/scripts/run-fire-portrait-browser-qa.mjs
+
+      - name: Upload Fire portrait browser evidence
+        if: always() && steps.fire_portrait_browser.outcome != 'skipped'
+        uses: actions/upload-artifact@v4
+        with:
+          name: fire-portrait-browser-qa-${{ github.sha }}
+          path: artifacts/browser-qa/fire-portrait-browser-qa.json
           if-no-files-found: error
           retention-days: 90
 
