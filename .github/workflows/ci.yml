@@ -142,6 +142,9 @@ jobs:
       - name: Run Gameplay UI regression
         run: node tests/gameplay-ui-regressions-20260908.test.js
 
+      - name: Run Monster Portrait batch workflow regression
+        run: node tests/monster-portrait-batch-workflow.test.js
+
       - name: Run relic lifecycle and battle input regressions
         run: |
           node tests/relic-trigger-lifecycle-battle-input-ui-20260919.test.js
