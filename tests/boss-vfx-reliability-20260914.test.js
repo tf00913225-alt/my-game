@@ -4,6 +4,8 @@ const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const vm=require("node:vm");
 const source=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
+const feedbackOwner=fs.readFileSync("js/battle-floating-feedback-owner.js","utf8");
+const mainSource=fs.readFileSync("js/00-main.js","utf8");
 
 function classList(){
     const values=new Set();
@@ -139,7 +141,8 @@ function config(id,targetType="single",duration=760){
     });
     let current=context.v143SkillAnimationState.current;
     assert.equal(spriteNodes(current).length,1,"monster single target uses the explicit combat target immediately");
-    context.showMissEffect(true,0,"MISS");
+    const timing=context.v143ResolveBattleFeedbackTiming("player",0,"miss");
+    assert.equal(timing.impactId,"v143:1:player:0","MISS feedback resolves through the official V143 timing owner");
     current=context.v143SkillAnimationState.current;
     const [sprite]=spriteNodes(current);
     assert.ok(sprite,"MISS must still register the attempted target and emit the formal Sprite");
@@ -205,6 +208,11 @@ function config(id,targetType="single",duration=760){
     assert.equal(manifest.yuanGuangShield.noVisual,true);
 }
 
+assert.match(mainSource,/function showMissEffect\(isPlayerTarget,index,text\)[\s\S]*?showDamagePopup\(element,text\|\|"MISS","miss"\)/,"MISS popup must enter the canonical battle feedback owner");
+assert.match(mainSource,/return feedback\.emit\(\{[\s\S]*?kind:type==="heal"[\s\S]*?type==="miss"[\s\S]*?"miss"/,"canonical feedback maps MISS to the miss semantic kind");
+assert.match(feedbackOwner,/if\(value==="miss"\)\{ return "miss"; \}/,"feedback owner preserves MISS semantics");
+assert.match(feedbackOwner,/const resolver=window\.v143ResolveBattleFeedbackTiming/,"canonical feedback owner delegates impact timing to V143");
+assert.match(feedbackOwner,/resolver\(options\.side==="monster"\?"monster":"player",Number\(options\.index\)\|\|0,semanticKind\(options\.kind\)\)/,"MISS target and kind reach the V143 timing API");
 assert.doesNotMatch(source,/function missDelayFor\(/,"MISS must not bypass target registration");
 assert.doesNotMatch(source,/v174FireRocketTravel/,"single-skill Fire Rocket override must stay retired");
 console.log("✓ Boss VFX reliability regression suite passed");
