@@ -1,0 +1,8 @@
+{
+  "batchId": "2026-09-29-touch-scroll-navigation-convergence",
+  "requirements": [
+    {"id":"P0","title":"Native single-finger scroll and gesture arbitration","status":"VERIFIED","evidence":"targeted touch regression + production build"},
+    {"id":"P1","title":"Single bottom/map navigation migration owner and intent loading","status":"VERIFIED","evidence":"targeted navigation regression + production build"},
+    {"id":"P2","title":"Scroll bridge and selector whitelist retirement","status":"VERIFIED","evidence":"source contract regression"}
+  ]
+}

@@ -211,7 +211,9 @@ html, body, #game-viewport{
     min-height:0;
 }
 #game-viewport{
-    touch-action:none;
+    /* Normal one-finger panning belongs to the browser. Pinch remains
+       blocked by the viewport declaration and the global gesture owner. */
+    touch-action:pan-x pan-y;
     user-select:none;
     -webkit-user-select:none;
 }
@@ -270,6 +272,17 @@ html, body, #game-viewport{
     justify-content:center !important;
     align-items:flex-end !important;
 }
+
+/* The rendered element and its whole grid cell are the hitbox. Artwork and
+   screen-reader label never steal the pointer target. */
+#game-stage > #game-overlay-layer .native-bottom-nav .nav-button,
+#game-stage > #game-overlay-layer .native-map-nav .nav-button{
+    min-width:132px !important;
+    min-height:132px !important;
+    touch-action:manipulation;
+}
+#game-stage > #game-overlay-layer .native-bottom-nav .nav-button > *,
+#game-stage > #game-overlay-layer .native-map-nav .nav-button > *{ pointer-events:none; }
 
 
 /* bundled source: css/07-stage-v13-native-map-nav.css */
@@ -1873,10 +1886,10 @@ html, body, #game-viewport{
  */
 #game-stage > #game-overlay-layer
 .native-bottom-nav-layer
-.native-bottom-nav-shell > #bottomNav,
+.native-bottom-nav > #bottomNav,
 #game-stage > #game-overlay-layer
 .native-bottom-nav-layer
-.native-bottom-nav-shell > .bottom-nav,
+.native-bottom-nav > .bottom-nav,
 #game-stage > #game-overlay-layer
 .native-map-nav-layer
 .native-map-nav > #mapPageNav{
@@ -1934,21 +1947,21 @@ html, body, #game-viewport{
    This is a visual UI adjustment only. Navigation logic remains intact.
 ============================================================ */
 
-#game-stage > #app > #game-content .bottom-nav,
-#game-stage > #app > #game-content #mapPageNav{
+#game-stage > #game-overlay-layer .native-bottom-nav > .bottom-nav,
+#game-stage > #game-overlay-layer .native-map-nav > #mapPageNav{
     height:84px !important;
     box-sizing:border-box !important;
 }
 
-#game-stage > #app > #game-content .bottom-nav .nav-button,
-#game-stage > #app > #game-content #mapPageNav .nav-button{
+#game-stage > #game-overlay-layer .native-bottom-nav > .bottom-nav .nav-button,
+#game-stage > #game-overlay-layer .native-map-nav > #mapPageNav .nav-button{
     font-size:12px !important;
     line-height:1.15 !important;
     padding:0 2px !important;
 }
 
-#game-stage > #app > #game-content .bottom-nav .nav-icon-shape,
-#game-stage > #app > #game-content #mapPageNav .nav-icon-shape{
+#game-stage > #game-overlay-layer .native-bottom-nav > .bottom-nav .nav-icon-shape,
+#game-stage > #game-overlay-layer .native-map-nav > #mapPageNav .nav-icon-shape{
     width:27px !important;
     height:27px !important;
     margin-bottom:4px !important;
@@ -2374,12 +2387,7 @@ html, body, #game-viewport{
  Only while the character modal is open do we relax the ancestor gesture policy to pan-y.
  The existing V8 touch-lock still blocks page dragging everywhere that is not an allowed scroller.
 */
-html.character-scroll-active,
-body.character-scroll-active,
-#game-viewport.character-scroll-active,
-#game-stage.character-scroll-active{
-    touch-action:pan-y !important;
-}
+/* Retired: #game-viewport no longer suppresses descendant single-finger scroll. */
 
 
 /* bundled source: css/30-v130-requested-updates.css */

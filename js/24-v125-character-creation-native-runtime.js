@@ -104,7 +104,6 @@
 
         fixedNodes.forEach(function(node){
             if(node){
-                node.classList.remove("creation-scroll-active");
                 node.classList.toggle("creation-fixed-active",!!active);
             }
         });

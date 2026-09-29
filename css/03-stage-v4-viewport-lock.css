@@ -77,7 +77,9 @@ html, body, #game-viewport{
     min-height:0;
 }
 #game-viewport{
-    touch-action:none;
+    /* Normal one-finger panning belongs to the browser. Pinch remains
+       blocked by the viewport declaration and the global gesture owner. */
+    touch-action:pan-x pan-y;
     user-select:none;
     -webkit-user-select:none;
 }

@@ -1249,13 +1249,6 @@
     display:none !important;
 }
 
-html.inventory-scroll-active,
-body.inventory-scroll-active,
-#game-viewport.inventory-scroll-active,
-#game-stage.inventory-scroll-active{
-    touch-action:pan-y !important;
-}
-
 #game-stage #app.on-inventory-page .content{
     bottom:0 !important;
     overflow:hidden !important;
@@ -1359,13 +1352,6 @@ body.inventory-scroll-active,
    - 完成度獎勵固定在視窗底部，不跟任務清單一起捲。
    - 任務卡片壓縮高度，保留原任務資料與領獎機制。
 ========================================================= */
-
-html.quest-scroll-active,
-body.quest-scroll-active,
-#game-viewport.quest-scroll-active,
-#game-stage.quest-scroll-active{
-    touch-action:pan-y !important;
-}
 
 #game-stage #homeFeatureModal.quest-mode{
     padding:12px !important;

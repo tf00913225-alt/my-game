@@ -1310,7 +1310,7 @@
         const filters=["all","attack","recovery","defense","buff","control","element","special"].map(key=>'<button class="'+(currentFilter===key?'active':'')+'" onclick="v174SetRelicFilter(\''+key+'\')">'+esc(CATEGORY_LABELS[key])+'</button>').join("");
         const cards=sortedRelics().filter(filterMatch).map(cardMarkup).join("");
         return '<div class="team-relic-page"><div class="team-relic-resource-line"><span>隊伍共用戰場神器</span><b>每支隊伍可裝備 1 件秘寶</b></div>'+current+
-            '<div class="team-relic-tabs">'+filters+'</div><div class="team-relic-grid">'+cards+'</div></div>';
+            '<div class="team-relic-tabs" data-scroll-owner="x">'+filters+'</div><div class="team-relic-grid">'+cards+'</div></div>';
     }
     function detailMarkup(def){
         const owned=statusOf(def.id),level=owned.level,next=nextMilestone(def,level),cost=RELIC_BALANCE_CONFIG.upgradeGoldBase+RELIC_BALANCE_CONFIG.upgradeGoldPerLevel*level;

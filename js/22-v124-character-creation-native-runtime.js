@@ -100,7 +100,6 @@
             byId("game-overlay-layer")
         ].forEach(function(node){
             if(node){
-                node.classList.toggle("creation-scroll-active",!!active);
             }
         });
     }

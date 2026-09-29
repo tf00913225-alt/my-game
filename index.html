@@ -38,7 +38,7 @@
 <link rel="preload" as="image" href="assets/ui/startup-logo.4631c0bc3f2b.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="assets/ui/startup-main-city.d43e67af1c1c.jpg" fetchpriority="high">
 <!-- build:critical-style -->
-<link id="boot-core-style" data-critical-style="true" rel="stylesheet" href="build/boot-core.01df782d9c6c.css">
+<link id="boot-core-style" data-critical-style="true" rel="stylesheet" href="build/boot-core.019c1f12ce57.css">
 <!-- /build:critical-style -->
 </head>
 
@@ -1662,6 +1662,7 @@
     <div
         id="battlePotionList"
         class="battle-item-list"
+        data-scroll-owner="y"
         role="tabpanel"
     ></div>
 </div>
@@ -1715,6 +1716,7 @@
 <div
     id="autoBattleSettingsPanel"
     class="auto-settings-expanded auto-premium-panel"
+    data-scroll-owner="y"
     style="display:none;"
 >
 
@@ -2205,7 +2207,7 @@
             <div class="inventory-category-tab" role="tab" tabindex="0" data-filter="function" onclick="setInventoryFilter('function')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();setInventoryFilter('function');}">功能</div>
         </div>
 
-        <div class="inventory-grid-scroll" id="inventoryGridScroll">
+        <div class="inventory-grid-scroll" id="inventoryGridScroll" data-scroll-owner="y">
             <div id="inventoryGrid" class="inventory-grid inventory-grid-classic"></div>
         </div>
 
@@ -2532,6 +2534,7 @@
 <div
     id="itemModalStats"
     class="item-stat-list"
+    data-scroll-owner="y"
 ></div>
 
 <div class="item-modal-buttons">

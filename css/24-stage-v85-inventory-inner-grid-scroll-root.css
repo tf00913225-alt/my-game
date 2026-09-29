@@ -34,13 +34,6 @@
     display:none !important;
 }
 
-html.inventory-scroll-active,
-body.inventory-scroll-active,
-#game-viewport.inventory-scroll-active,
-#game-stage.inventory-scroll-active{
-    touch-action:pan-y !important;
-}
-
 #game-stage #app.on-inventory-page .content{
     bottom:0 !important;
     overflow:hidden !important;

@@ -1495,10 +1495,10 @@
  */
 #game-stage > #game-overlay-layer
 .native-bottom-nav-layer
-.native-bottom-nav-shell > #bottomNav,
+.native-bottom-nav > #bottomNav,
 #game-stage > #game-overlay-layer
 .native-bottom-nav-layer
-.native-bottom-nav-shell > .bottom-nav,
+.native-bottom-nav > .bottom-nav,
 #game-stage > #game-overlay-layer
 .native-map-nav-layer
 .native-map-nav > #mapPageNav{
@@ -1556,21 +1556,21 @@
    This is a visual UI adjustment only. Navigation logic remains intact.
 ============================================================ */
 
-#game-stage > #app > #game-content .bottom-nav,
-#game-stage > #app > #game-content #mapPageNav{
+#game-stage > #game-overlay-layer .native-bottom-nav > .bottom-nav,
+#game-stage > #game-overlay-layer .native-map-nav > #mapPageNav{
     height:84px !important;
     box-sizing:border-box !important;
 }
 
-#game-stage > #app > #game-content .bottom-nav .nav-button,
-#game-stage > #app > #game-content #mapPageNav .nav-button{
+#game-stage > #game-overlay-layer .native-bottom-nav > .bottom-nav .nav-button,
+#game-stage > #game-overlay-layer .native-map-nav > #mapPageNav .nav-button{
     font-size:12px !important;
     line-height:1.15 !important;
     padding:0 2px !important;
 }
 
-#game-stage > #app > #game-content .bottom-nav .nav-icon-shape,
-#game-stage > #app > #game-content #mapPageNav .nav-icon-shape{
+#game-stage > #game-overlay-layer .native-bottom-nav > .bottom-nav .nav-icon-shape,
+#game-stage > #game-overlay-layer .native-map-nav > #mapPageNav .nav-icon-shape{
     width:27px !important;
     height:27px !important;
     margin-bottom:4px !important;
