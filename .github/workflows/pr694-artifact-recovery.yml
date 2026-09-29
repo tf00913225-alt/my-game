@@ -1,0 +1,71 @@
+name: PR 694 artifact recovery
+
+on:
+  push:
+    branches:
+      - fix/touch-scroll-navigation-convergence-20260929
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  recover:
+    if: contains(github.event.head_commit.message, '[artifact-recovery-trigger]')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/touch-scroll-navigation-convergence-20260929
+          fetch-depth: 1
+
+      - name: Download verified production build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: production-build-sync-9a0beee3c2b0e87aad1230fa9aae320c79ce91d6
+          run-id: 36590936787
+          github-token: ${{ github.token }}
+          repository: tf00913225-alt/my-game
+          path: .artifact-recovery
+
+      - name: Verify downloaded app shell
+        shell: bash
+        run: |
+          set -euo pipefail
+          source_file=".artifact-recovery/build/app-shell.fcff3ab7f30d.js"
+          test -f "$source_file"
+          test "$(wc -c < "$source_file" | tr -d ' ')" = "1011124"
+          printf '%s  %s\n' "fcff3ab7f30d956cee1b5b3a4de49cee3c1b2e045003ee124cb18e5f1116025e" "$source_file" | sha256sum -c -
+
+      - name: Restore and verify only app shell
+        shell: bash
+        run: |
+          set -euo pipefail
+          source_file=".artifact-recovery/build/app-shell.fcff3ab7f30d.js"
+          target_file="build/app-shell.fcff3ab7f30d.js"
+          cp "$source_file" "$target_file"
+          test "$(wc -c < "$target_file" | tr -d ' ')" = "1011124"
+          printf '%s  %s\n' "fcff3ab7f30d956cee1b5b3a4de49cee3c1b2e045003ee124cb18e5f1116025e" "$target_file" | sha256sum -c -
+          npm run build:check
+          git status --short
+          changed="$(git diff --name-only)"
+          test "$changed" = "$target_file"
+          git add -- "$target_file"
+          staged="$(git diff --cached --name-only)"
+          test "$staged" = "$target_file"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "fix: restore complete app-shell artifact"
+          git push origin "HEAD:fix/touch-scroll-navigation-convergence-20260929"
+
+      - name: Verify remote Git tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          target_file="build/app-shell.fcff3ab7f30d.js"
+          git fetch origin fix/touch-scroll-navigation-convergence-20260929
+          tree_line="$(git ls-tree -l FETCH_HEAD -- "$target_file")"
+          printf '%s\n' "$tree_line"
+          test "$(awk '{print $3}' <<< "$tree_line")" = "5323ddf444bb86b5e2eb51e3e8a97d34cb663249"
+          test "$(awk '{print $4}' <<< "$tree_line")" = "1011124"
