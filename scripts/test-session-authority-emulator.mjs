@@ -21,6 +21,8 @@ const {createCanonicalCurrentRecovery}=
     require("../functions/src/canonical-current-recovery.js");
 const {createCanonicalRecoveryApproval}=
     require("../functions/src/canonical-recovery-approval.js");
+const {createCanonicalShopPurchase}=
+    require("../functions/src/canonical-shop-purchase.js");
 const {inspectExistingEnvelope,nextRevision}=require("../functions/src/cloud-save-envelope.js");
 const project="demo-four-symbols-session";
 if(process.env.GCLOUD_PROJECT!==project||process.env.FIRESTORE_EMULATOR_HOST!=="127.0.0.1:18080"||
@@ -643,7 +645,7 @@ const ownedGrant="grant-owned-source-gold-0001";
 const ownedCreditOperation="credit-owned-source-gold-0001";
 await ownedRoot.collection("pendingGrants").doc(ownedGrant).set({
     schemaVersion:1,ownerUid:ownedUid,kind:"gold",source:"server-event",
-    amount:10,status:"pending",claimedByOperationId:null,
+    amount:30,status:"pending",claimedByOperationId:null,
     createdAt:Timestamp.now()
 });
 await invoke("reserveTrustedGrant",ownedUser.idToken,{
@@ -821,6 +823,58 @@ assert.equal((await attributeAllocator.allocateAttributePoint(ownedRequest,attri
 await assert.rejects(recovery.restoreCurrent(ownedRequest,{
     operationId:"recover-current-owned-source-0002",expectedRevision:6}),
     error=>error.code==="aborted");
+// A server-priced purchase spends credited gold and creates one owned bag
+// stack at the same canonical revision. Neither a browser price nor a balance
+// is accepted; receipt replay cannot buy the item a second time.
+const shop=createCanonicalShopPurchase({db,FieldValue,HttpsError,
+    inspectExistingEnvelope,nextRevision,runProtected:writerSessions.runProtected});
+const shopArgs={operationId:"shop-potion-owned-source-0001",expectedRevision:7,
+    itemId:"hpPotion10",quantity:1};
+await assert.rejects(shop.purchase(ownedRequest,{...shopArgs,itemId:"hpPotion50"}),
+    error=>error.code==="invalid-argument");
+await assert.rejects(shop.purchase(ownedRequest,{...shopArgs,quantity:1000}),
+    error=>error.code==="invalid-argument");
+await assert.rejects(shop.purchase(ownedRequest,{...shopArgs,quantity:2}),
+    error=>error.code==="failed-precondition");
+await assert.rejects(shop.purchase(ownedRequest,{...shopArgs,expectedRevision:6}),
+    error=>error.code==="aborted");
+const shopEconomyRef=ownedRoot.collection("economy").doc("current");
+await shopEconomyRef.update({gold:999});
+await assert.rejects(shop.purchase(ownedRequest,shopArgs),
+    error=>error.code==="data-loss");
+await shopEconomyRef.update({gold:originalGold});
+let abortShop=true;
+const rollbackShop=createCanonicalShopPurchase({db,FieldValue,HttpsError,
+    inspectExistingEnvelope,nextRevision,
+    runProtected:(request,operation)=>writerSessions.runProtected(request,async(tx,session)=>{
+        const result=await operation(tx,session);
+        if(abortShop){throw new Error("simulated shop rollback");}
+        return result;
+    })});
+await assert.rejects(rollbackShop.purchase(ownedRequest,shopArgs),
+    /simulated shop rollback/);
+abortShop=false;
+const shopItemRef=ownedRoot.collection("inventory").doc(`shop-${shopArgs.operationId}`);
+assert.equal((await shopItemRef.get()).exists,false);
+assert.equal((await ownedRoot.collection("operations").doc(shopArgs.operationId).get()).exists,false);
+assert.equal((await ownedRoot.collection("recoveryArchives").doc("8").get()).exists,false);
+const purchased=await shop.purchase(ownedRequest,shopArgs);
+assert.equal(purchased.purchasedRevision,8);
+assert.equal(purchased.cost,20);
+assert.equal((await shopEconomyRef.get()).get("gold"),originalGold-20);
+assert.equal((await shopItemRef.get()).get("state.count"),1);
+assert.equal((await ownedItemRef.get()).get("serverRevision"),8);
+assert.equal((await ownedRoot.collection("claimRecords").doc(ownedGrant).get())
+    .get("serverRevision"),8);
+assert.equal((await ownedRoot.collection("ledgerEntries").doc(shopArgs.operationId).get())
+    .get("amount"),-20);
+assert.equal((await shop.purchase(ownedRequest,shopArgs)).unchanged,true);
+assert.equal((await shopEconomyRef.get()).get("gold"),originalGold-20);
+await assert.rejects(shop.purchase(ownedRequest,{...shopArgs,quantity:2}),
+    error=>error.code==="data-loss");
+await checkRecoveryArchive(ownedUid,8);
+assert.equal((await ownedRoot.collection("playableSnapshots").doc("8").get())
+    .get("readyForPublication"),false);
 // The opposite order is fenced too: a reserved grant cannot become a new
 // character's operation receipt under the same UID.
 const collisionUser=await login("accounts:signUp",{
