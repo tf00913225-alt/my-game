@@ -627,14 +627,39 @@
         const learnLevel=Math.max(1,Math.floor(numeric(skill&&skill.learnLevel,1)));
         const target=Math.max(1,Math.floor(numeric(targetSkillLevel,1)));
         if(target<=1){ return learnLevel; }
-        if(target===2){ return Math.max(learnLevel+8,15); }
-        if(target===3){ return Math.max(learnLevel+18,30); }
-        if(target===4){ return Math.max(learnLevel+30,50); }
-        return Math.max(learnLevel+45,80);
+        /* Absolute character-level gates; never offset by learnLevel. */
+        const maxLevel=Math.max(1,Math.floor(numeric(skill&&skill.maxLevel,1)));
+        if(maxLevel<=1){ return Infinity; }
+        if(PLAYER_DAMAGE_SKILL_ID_SET.has(skill&&skill.id)){
+            return Math.min(90,Math.max(10,(target-1)*10));
+        }
+        return Math.min(80,Math.max(20,(target-1)*20));
     }
     function getUpgradeCostForTargetLevel(skill,targetSkillLevel){
         if(!skill||numeric(skill.maxLevel,1)<=1){ return 0; }
         return numeric(SKILL_UPGRADE_COST_BY_TARGET_LEVEL[Math.floor(numeric(targetSkillLevel))],0);
+    }
+    function getSkillUpgradeEligibility(character,skill,currentSkillLevel){
+        const current=Math.max(0,Math.floor(numeric(currentSkillLevel)));
+        const maxLevel=Math.max(1,Math.floor(numeric(skill&&skill.maxLevel,1)));
+        const target=current+1;
+        const requiredLevel=target<=maxLevel
+            ?getRequiredCharacterLevelForSkillLevel(skill,target):Infinity;
+        const characterLevel=Math.max(1,Math.floor(numeric(character&&character.level,1)));
+        const cost=target<=maxLevel?getUpgradeCostForTargetLevel(skill,target):0;
+        const points=Math.max(0,Math.floor(numeric(character&&character.skillPoints)));
+        const learned=current>0;
+        const atMax=learned&&current>=maxLevel;
+        const levelOk=learned&&!atMax&&characterLevel>=requiredLevel;
+        const pointsOk=learned&&!atMax&&points>=cost;
+        let reason="";
+        if(!skill){ reason="技能資料不存在"; }
+        else if(!learned){ reason="請先學會此技能"; }
+        else if(atMax){ reason="已達最高技能等級"; }
+        else if(!levelOk){ reason="需要角色 Lv"+requiredLevel; }
+        else if(!pointsOk){ reason="技能點不足，需要"+cost+"點"; }
+        return Object.freeze({allowed:!!(skill&&levelOk&&pointsOk),currentLevel:current,
+            targetLevel:target,maxLevel,requiredLevel,levelOk,pointsOk,cost,reason});
     }
     function getSkillContext(characterKey){
         const key=characterKey!==undefined&&characterKey!==null?characterKey:
@@ -803,15 +828,14 @@
             if(current<=0){ return notify("請先學會「"+skill.name+"」。"); }
             if(current>=maxLevel){ return notify("「"+skill.name+"」已達最高技能等級。"); }
             const target=current+1;
-            const requiredLevel=getRequiredCharacterLevelForSkillLevel(skill,target);
-            const characterLevel=Math.max(1,Math.floor(numeric(context.character.level,1)));
-            if(characterLevel<requiredLevel){
-                return notify("角色 Lv"+requiredLevel+" 可升至技能 Lv"+target+"。");
+            const eligibility=getSkillUpgradeEligibility(context.character,skill,current);
+            if(!eligibility.allowed){
+                if(!eligibility.levelOk&&eligibility.requiredLevel!==Infinity){
+                    return notify("角色 Lv"+eligibility.requiredLevel+" 才能升至技能 Lv"+target+"。");
+                }
+                return notify(eligibility.reason);
             }
-            const cost=getUpgradeCostForTargetLevel(skill,target);
-            const points=Math.max(0,Math.floor(numeric(context.character.skillPoints)));
-            if(points<cost){ return notify("技能點不足，升至技能 Lv"+target+"需要"+cost+"點。"); }
-            context.character.skillPoints=points-cost;
+            context.character.skillPoints-=eligibility.cost;
             context.loadout.skillLevels[skillId]=target;
             finalizeSkillMutation();
             return true;
@@ -1125,12 +1149,14 @@
         levelBreakdownHtml:levelBreakdownHtml,
         getRequiredCharacterLevelForSkillLevel:getRequiredCharacterLevelForSkillLevel,
         getUpgradeCostForTargetLevel:getUpgradeCostForTargetLevel,
+        getSkillUpgradeEligibility:getSkillUpgradeEligibility,
         applyFinalData:applyFinalProgressionData
     });
 
     window.v17364SkillUpgradeCostByTargetLevel=SKILL_UPGRADE_COST_BY_TARGET_LEVEL;
     window.v17364GetRequiredCharacterLevelForSkillLevel=getRequiredCharacterLevelForSkillLevel;
     window.v17364GetUpgradeCostForTargetLevel=getUpgradeCostForTargetLevel;
+    window.v17364GetSkillUpgradeEligibility=getSkillUpgradeEligibility;
     window.v17364ApplyFinalProgressionData=applyFinalProgressionData;
     window.v17364CastNewFireTactical=castNewFireTactical;
     window.v17364NormalizeCrossElementEquips=normalizeAllCrossElementEquips;
