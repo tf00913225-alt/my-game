@@ -11,6 +11,7 @@ const {createTrustedGrantLedger}=require("./src/trusted-grant-ledger");
 const {createCanonicalResourceCredit}=require("./src/canonical-resource-credit");
 const {createLegacyCandidateScreening}=require("./src/legacy-candidate-screening");
 const {createCanonicalRecoveryApproval}=require("./src/canonical-recovery-approval");
+const {createCanonicalCurrentRecovery}=require("./src/canonical-current-recovery");
 const {CloudPreferencesError,PREFERENCES_SCHEMA_VERSION,normalizePreferences}=require("./src/cloud-preferences");
 const {
     CLOUD_SAVE_ENVELOPE_SCHEMA_VERSION,
@@ -44,6 +45,10 @@ const legacyCandidateScreening=createLegacyCandidateScreening({
 });
 const recoveryApprovalIssuer=createCanonicalRecoveryApproval({
     db:getFirestore(),Timestamp,HttpsError,inspectExistingEnvelope
+});
+const currentRecovery=createCanonicalCurrentRecovery({
+    db:getFirestore(),FieldValue,HttpsError,runProtected:sessions.runProtected,
+    inspectExistingEnvelope,nextRevision
 });
 
 const REGION="us-central1";
@@ -146,6 +151,21 @@ exports.issueCanonicalRecoveryApproval=onCall(CALLABLE_OPTIONS,async request=>{
     request=await verifyGameIdentity(request);
     try{ return await recoveryApprovalIssuer.issue(request); }
     catch(error){ throw asHttpsError(error); }
+});
+/* An approved repair is executed only by the original UID's active session.
+ * The browser supplies no source records, revision contents or reward values. */
+exports.restoreCanonicalCurrent=onCall(CALLABLE_OPTIONS,async request=>{
+    request=await verifyGameIdentity(request);
+    try{
+        const data=request.data;
+        if(!data||typeof data!=="object"||Array.isArray(data)||
+           Object.keys(data).some(key=>!["uid","session","operationId","expectedRevision"].includes(key))){
+            throw new HttpsError("invalid-argument","Only a session and approved recovery operation are accepted.");
+        }
+        return await currentRecovery.restoreCurrent(request,{
+            operationId:data.operationId,expectedRevision:data.expectedRevision
+        });
+    }catch(error){ throw asHttpsError(error); }
 });
 // No browser grant issuer exists. This reserves a server-issued entitlement
 // for a future authoritative character transaction without changing gameplay.

@@ -734,6 +734,14 @@ const recovery=createCanonicalCurrentRecovery({db,FieldValue,HttpsError,
     inspectExistingEnvelope,nextRevision,runProtected:writerSessions.runProtected});
 await assert.rejects(recovery.restoreCurrent(ownedRequest,recoveryArgs),
     error=>error.code==="permission-denied");
+const recoveryPayload={uid:ownedUid,session:ownedSession,...recoveryArgs};
+await rejected("restoreCanonicalCurrent",null,recoveryPayload,"UNAUTHENTICATED");
+await assert.rejects(invoke("restoreCanonicalCurrent",ownedUser.idToken,
+    {...recoveryPayload,gold:999}),error=>
+    ["invalid-argument","INVALID_ARGUMENT"].includes(error.code));
+await assert.rejects(invoke("restoreCanonicalCurrent",ownedUser.idToken,
+    recoveryPayload),error=>
+    ["permission-denied","PERMISSION_DENIED"].includes(error.code));
 const approvalIssuer=createCanonicalRecoveryApproval({
     db,Timestamp,HttpsError,inspectExistingEnvelope
 });
@@ -760,6 +768,9 @@ assert.equal(replayedApproval.unchanged,true);
 await approvalRef.update({expiresAt:Timestamp.fromMillis(Date.now()-1000)});
 await assert.rejects(recovery.restoreCurrent(ownedRequest,recoveryArgs),
     error=>error.code==="permission-denied");
+await assert.rejects(invoke("restoreCanonicalCurrent",ownedUser.idToken,
+    recoveryPayload),error=>
+    ["permission-denied","PERMISSION_DENIED"].includes(error.code));
 await approvalRef.update({expiresAt:Timestamp.fromMillis(Date.now()+120000)});
 const oldArchive=assignedArchive.data();
 await assignedArchive.ref.update({"sourceRecords.economy.gold":999});
@@ -789,7 +800,7 @@ abortRecovery=false;
 assert.equal((await ownedRoot.collection("recoveryArchives").doc("7").get()).exists,false);
 assert.equal((await ownedRoot.collection("operations").doc(recoveryOperation).get()).exists,false);
 assert.equal((await approvalRef.get()).get("status"),"approved");
-const recovered=await recovery.restoreCurrent(ownedRequest,recoveryArgs);
+const recovered=await invoke("restoreCanonicalCurrent",ownedUser.idToken,recoveryPayload);
 assert.equal(recovered.restoredRevision,7);
 assert.equal((await ownedItemRef.get()).get("serverRevision"),7);
 assert.equal((await ownedRoot.collection("economy").doc("current").get()).get("gold"),originalGold);
@@ -800,6 +811,8 @@ assert.equal((await ownedRoot.collection("recoveryAudits").doc(recoveryOperation
 assert.equal((await approvalRef.get()).get("status"),"used");
 await checkRecoveryArchive(ownedUid,7);
 assert.equal((await recovery.restoreCurrent(ownedRequest,recoveryArgs)).unchanged,true);
+assert.equal((await invoke("restoreCanonicalCurrent",ownedUser.idToken,recoveryPayload))
+    .unchanged,true);
 assert.equal((await goldWriter.creditReservedGrant(ownedRequest,{
     grantId:ownedGrant,operationId:ownedCreditOperation,expectedRevision:3}))
     .unchanged,true);
