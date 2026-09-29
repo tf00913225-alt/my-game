@@ -486,7 +486,13 @@ try{
     assert.equal(bootstrap.skillVolumeScale,2,"Deployed skill SFX multiplier must be exactly 2.0 (+100%)");
     assert.equal(bootstrap.combatFeedbackVolumeScale,2,"Deployed general battle feedback multiplier must be exactly 2.0 (+100%)");
 
-    await waitFor(client,"(()=>{const page=document.getElementById('battlePage');const rect=page?.getBoundingClientRect();return page?.classList.contains('active')&&!page.classList.contains('v141-preparing-entry')&&!page.classList.contains('v141-entry-moving')&&rect?.width>0&&rect?.height>0&&document.getElementById('battlePlayerCard0')&&document.querySelector('#battlePlayerCard0 .hp-bar')&&document.querySelector('#battleMonster0 .monster-hp');})()","visible real battle after entry transition",15000);
+    try{
+        await waitFor(client,"(()=>{const page=document.getElementById('battlePage');const rect=page?.getBoundingClientRect();return page?.classList.contains('active')&&!page.classList.contains('v141-preparing-entry')&&!page.classList.contains('v141-entry-moving')&&rect?.width>0&&rect?.height>0&&document.getElementById('battlePlayerCard0')&&document.querySelector('#battlePlayerCard0 .hp-bar')&&document.querySelector('#battleMonster0 .monster-hp');})()","visible real battle after entry transition",15000);
+    }catch(error){
+        const diagnostic=await client.eval(`(()=>{const page=document.getElementById('battlePage');const rect=page?.getBoundingClientRect();return {startup:FourSymbolsStartupPolicy.getState(),pageClass:page?.className||null,pageRect:rect&&{width:rect.width,height:rect.height},battleActive:typeof battleActive==='undefined'?null:battleActive,battleToken:typeof battleToken==='undefined'?null:battleToken,playerCard:!!document.getElementById('battlePlayerCard0'),playerBar:!!document.querySelector('#battlePlayerCard0 .hp-bar'),monsterBar:!!document.querySelector('#battleMonster0 .monster-hp'),outcome:window.__battleLayerQaDungeonOutcome,playerHp:player.hp,playerId:player.id,events:performance.getEntriesByType('mark').slice(-12).map(item=>item.name)};})()`);
+        error.message+=" Diagnostic="+JSON.stringify(diagnostic)+" CDP="+JSON.stringify(client.events.slice(-10));
+        throw error;
+    }
 
     const layout=await client.eval(`(()=>{
         const rectFor=element=>{
