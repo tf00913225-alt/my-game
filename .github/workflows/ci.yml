@@ -25,18 +25,22 @@ jobs:
         with:
           fetch-depth: 2
 
-      - name: Export existing fire portrait source files for recovery
+      - name: Extract original PR 639 fire portrait sources for recovery
+        if: github.event_name == 'pull_request' && github.head_ref == 'chore/p0-retrieve-fire-pool-sources-20260929'
+        run: |
+          source_sha=5364cf84924aae7d20df46f3f2813f0cb54ad8d9
+          git fetch --no-tags --depth=1 origin "$source_sha"
+          mkdir -p "$RUNNER_TEMP/p0-fire-pool-sources"
+          for file in mon-fire-normal-001.png mon-fire-normal-002.png mon-fire-normal-004.png mon-fire-normal-006.png mon-fire-normal-008.png mon-fire-normal-010.png; do
+            git show "$source_sha:assets/monsters/wild/fire-pool/$file" > "$RUNNER_TEMP/p0-fire-pool-sources/$file"
+          done
+
+      - name: Upload recovered fire portrait source files
         if: github.event_name == 'pull_request' && github.head_ref == 'chore/p0-retrieve-fire-pool-sources-20260929'
         uses: actions/upload-artifact@v4
         with:
           name: p0-fire-pool-source-pngs
-          path: |
-            assets/monsters/wild/fire-pool/mon-fire-normal-001.png
-            assets/monsters/wild/fire-pool/mon-fire-normal-002.png
-            assets/monsters/wild/fire-pool/mon-fire-normal-004.png
-            assets/monsters/wild/fire-pool/mon-fire-normal-006.png
-            assets/monsters/wild/fire-pool/mon-fire-normal-008.png
-            assets/monsters/wild/fire-pool/mon-fire-normal-010.png
+          path: ${{ runner.temp }}/p0-fire-pool-sources/*.png
           if-no-files-found: error
           retention-days: 1
 
