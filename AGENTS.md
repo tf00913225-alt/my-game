@@ -2,14 +2,14 @@
 
 1. 開始任何工作前，先完整閱讀 `HANDOFF.md`。
 2. **任何 UI、CSS、版面、美術圖片、背包、裝備、技能、戰鬥介面等修改前，都必須先閱讀 `UI_GUIDELINES.md`。**
-3. `UI_GUIDELINES.md` 是一般 UI 規範的唯一來源；不要把完整規範複製到其他文件，避免版本分歧。**唯一的專項例外是 `docs/ITEM_RARITY_UI_SPEC.md`：凡涉及裝備、道具、材料、設計圖、符咒、寶箱、掉落、背包格、商店格、合成、冶煉或任何物品階級／稀有度顏色時，該文件為階級與色號的最高權威來源。**
-4. 若本次只要求 UI 修改，不得順手修改戰鬥、存檔、數值、掉落等無關邏輯。
-5. **任何程式、CSS、UI、戰鬥、存檔、技能、掉落、動畫或資產整合修改前，都必須完整閱讀 `HANDOFF.md`、`UI_GUIDELINES.md` 與 `ARCHITECTURE_RULES.md`；若工作涉及物品階級／稀有度，再額外完整閱讀 `docs/ITEM_RARITY_UI_SPEC.md`。**
-6. **修改前必須先在回報中列出：本次功能的 owner 檔案、主要函式、現有 wrapper／後續覆蓋點，以及是否需要暫時補丁。未完成此檢查不得修改。**
-7. **不得自行把 `low / mid / high / perfect` 或「低階／中階／高階／完美」當成新的正式物品階級；正式六階與固定色號一律以 `docs/ITEM_RARITY_UI_SPEC.md` 為準。**
-8. **凡涉及新增、替換、轉檔或正式導入任何點陣圖片資產，必須先完整閱讀 `docs/IMAGE_ASSET_SPEC.md`。該文件是圖片格式、WebP 轉換、無損驗證、透明度、尺寸、Sprite Sheet／VFX 幀資料與正式引用流程的最高權威來源。**
-9. **凡屬修復、fix、failure、test failure、CI failure、fixture、test harness、stale contract 或既有修復分支續修任務，若使用者未在當次任務另行指定不同模式，必須先完整閱讀根目錄 `AUTONOMOUS_REPAIR_CONTRACT.md`，並以該文件作為受控自主修復的唯一正式契約來源；不得依舊對話摘要自行擴張授權。**
-10. **凡涉及怪物／精英／BOSS／日常副本／天兵立繪導入，必須先讀 `MONSTER_PORTRAIT_SPEC.md` 與 `docs/MONSTER_PORTRAIT_SPEC_V1.md`。若素材已經生成並完成正式 WebP 落位，預設使用 `npm run portrait:import -- --keys=<portraitKey,...>` 快速導入；不得為已完成素材重新建立生成 batch、重跑生成或重做母圖搜尋。尚未生成的素材才使用既有 batch 流程。**
+6. `UI_GUIDELINES.md` 是一般 UI 規範的唯一來源；不要把完整規範複製到其他文件，避免版本分歧。**唯一的專項例外是 `docs/ITEM_RARITY_UI_SPEC.md`：凡涉及裝備、道具、材料、設計圖、符咒、寶箱、掉落、背包格、商店格、合成、冶煉或任何物品階級／稀有度顏色時，該文件為階級與色號的最高權威來源。**
+7. 若本次只要求 UI 修改，不得順手修改戰鬥、存檔、數值、掉落等無關邏輯。
+8. **任何程式、CSS、UI、戰鬥、存檔、技能、掉落、動畫或資產整合修改前，都必須完整閱讀 `HANDOFF.md`、`UI_GUIDELINES.md` 與 `ARCHITECTURE_RULES.md`；若工作涉及物品階級／稀有度，再額外完整閱讀 `docs/ITEM_RARITY_UI_SPEC.md`。**
+9. **修改前必須先在回報中列出：本次功能的 owner 檔案、主要函式、現有 wrapper／後續覆蓋點，以及是否需要暫時補丁。未完成此檢查不得修改。**
+10. **不得自行把 `low / mid / high / perfect` 或「低階／中階／高階／完美」當成新的正式物品階級；正式六階與固定色號一律以 `docs/ITEM_RARITY_UI_SPEC.md` 為準。**
+11. **凡涉及新增、替換、轉檔或正式導入任何點陣圖片資產，必須先完整閱讀 `docs/IMAGE_ASSET_SPEC.md`。該文件是圖片格式、WebP 轉換、無損驗證、透明度、尺寸、Sprite Sheet／VFX 幀資料與正式引用流程的最高權威來源。**
+12. **凡屬修復、fix、failure、test failure、CI failure、fixture、test harness、stale contract 或既有修復分支續修任務，若使用者未在當次任務另行指定不同模式，必須先完整閱讀根目錄 `AUTONOMOUS_REPAIR_CONTRACT.md`，並以該文件作為受控自主修復的唯一正式契約來源；不得依舊對話摘要自行擴張授權。**
+13. **凡涉及怪物／精英／BOSS／日常副本／天兵立繪導入，必須先讀 `MONSTER_PORTRAIT_SPEC.md` 與 `docs/MONSTER_PORTRAIT_SPEC_V1.md`。若素材已經生成並完成正式 WebP 落位，預設使用 `npm run portrait:import -- --keys=<portraitKey,...>` 快速導入；不得為已完成素材重新建立生成 batch、重跑生成或重做母圖搜尋。尚未生成的素材才使用既有 batch 流程。**
 11. **所有新增、修改、替換、重構、UI／CSS、Gameplay、資料、狀態、Lifecycle 與 Bug 修復，施工前都必須完整閱讀 `docs/CHANGE_SAFETY_REPLACEMENT_CONTRACT.md`。使用者說「改成／換成／不要原本的」時預設為 Replacement（取代），代理必須自行完成舊 Owner／Contract／Lifecycle／Semantic State／Regression Test 的遷移與退場判定，不得只疊加新版，也不得把「舊的要不要刪」這類工程責任丟回給不懂程式的專案負責人。**
 
 ## 最高優先：Change Safety & Replacement Migration Gate（變更安全與取代遷移閘門）
@@ -116,7 +116,12 @@ QA、測試與 debug 工具不得為方便而永久改變正式戰鬥數值、�
 
 強制規則：
 1. **禁止直接修改 `main` 或 `dev`。** 一般工作必須從當下最新 `dev` 建立 `fix/*`、`feature/*`、`docs/*` 或其他明確用途的工作分支，再以 PR 合回 `dev`。
-2. **工作分支合併後必須進入清理判定。** 若來源分支內容已完整進入目標分支、沒有任何獨立有效 commit／diff、也不是需長期保留的正式分支，應刪除該已完成工作分支；不得把已完成臨時分支長期堆積。
+
+2. **dev PR 自動整合規則（取消 MERGE-DEV 二次口頭授權）。** 當專案負責人已明確要求執行某項修復、功能、文件變更或「繼續施工」時，該次任務授權已包含「建立工作分支 → 建立 PR → 在通過既有 Gate 後合併回 `dev`」的整合流程。只要 PR 範圍仍符合該次任務、沒有未授權的額外變更、PR 可合併、必要 Repository checks／CI 與任務特定驗證均已通過，且沒有尚未解除的高風險阻塞，代理應直接合併 `dev`，**不得再要求專案負責人回覆 `MERGE-DEV PR #xxx`、再次「批准合併」或其他等價的二次口頭授權**。
+3. **自動整合不得繞過安全 Gate。** 若 CI／Repository checks 失敗、PR 有衝突、Head SHA 已變動、變更範圍超出原任務、正式規格仍有歧義、必要 executable verification（可執行驗證）缺失，或存在資料／帳號／存檔／部署等未解除的高風險阻塞，則不得硬合併；應先在原授權範圍內修復並重驗，無法安全排除時再回報阻塞。
+4. **本規則只取消重複確認，不擴張修改權限。** 它不授權直接寫入 `dev`／`main`、不授權 `force push`（強制推送）／`rebase`（重定基底）／改寫歷史、不授權略過必要 CI／驗證，也不等同於 `dev → main` 正式發布授權；正式發布仍依既有 Release Gate（發布閘門）與正式發布規則執行。
+
+5. **工作分支合併後必須進入清理判定。** 若來源分支內容已完整進入目標分支、沒有任何獨立有效 commit／diff、也不是需長期保留的正式分支，應刪除該已完成工作分支；不得把已完成臨時分支長期堆積。
 3. **關閉舊 PR 前必須先證明已被吸收或取代。** 只有在舊 PR 的有效內容已完整進入 `dev`／`main`，或已由明確的新 PR／commit 完整取代時，才可關閉；回報中應記錄 replacement PR／commit。若仍有獨立有效內容，禁止為了「乾淨」而直接關閉或刪分支。
 4. **永久分支不得自動刪除。** `main`、`dev`、`assets-library` 與專案負責人明確指定保留的 backup／長期分支不適用自動清理。
 5. **正式發布後必須做 main/dev 收斂檢查。** 判斷重點是「有效內容是否一致」，不得只以 ahead/behind commit 數、merge commit 數或 GitHub 顯示 `diverged` 就直接判定為風險。若兩邊 tree／實際有效 diff 已一致，單純歷史圖不同不得視為未收斂。
