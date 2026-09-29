@@ -43,7 +43,9 @@ assert.match(vfxCss,/@keyframes v143RasterCastFrames/);
 
 /* Relic scrolling must pass the global touch lock from both the body and the
    horizontal category strip. */
-assert.match(touchLock,/#homeFeatureModal\.team-relic-mode #homeFeatureModalBody, \.team-relic-tabs/);
+assert.match(touchLock,/data-scroll-owner="x\|y\|both"/);
+assert.doesNotMatch(touchLock,/allowedSelector|scrollWhitelist/);
+assert.match(fs.readFileSync("js/60-team-relic-system.js","utf8"),/team-relic-tabs" data-scroll-owner="x"/);
 assert.match(relicCss,/\.team-relic-tabs\{[^}]*touch-action:pan-x pan-y;/);
 assert.match(relicCss,/team-relic-modal \.home-feature-modal-box\.wide #homeFeatureModalBody\{[^}]*overflow-y:auto!important;[^}]*touch-action:pan-y!important;/);
 
