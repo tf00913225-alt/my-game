@@ -6701,7 +6701,8 @@ function createSecondCharacter(){
    ★ 創角完成
 ===================================================== */
 
-function createCharacter(){
+let initialCharacterCreationPending=false;
+async function createCharacter(){
 
     if(creationTargetSlot===2 || creationTargetSlot===3){
         createAdditionalCharacter(creationTargetSlot);
@@ -6756,6 +6757,56 @@ function createCharacter(){
 
     if(!window.FourSymbolsStartupPolicy||!window.FourSymbolsStartupPolicy.canCreateCharacter()){
         console.error("Character creation refused before account/save resolution.");
+        return false;
+    }
+
+    if(initialCharacterCreationPending){ return false; }
+    const accountSave=window.FourSymbolsAccountSave;
+    const uid=window.FourSymbolsStartupPolicy.getUid();
+    const firebase=window.FourSymbolsFirebase;
+    let local,legacy;
+    try{
+        local=accountSave.readForUid(uid);
+        legacy=accountSave.inspectLegacy();
+    }catch(error){
+        console.error("創角前無法驗證原裝置資料；未建立角色。",error);
+        return false;
+    }
+    if(accountSave.getActiveUid()!==uid||local.status!=="empty"||
+       legacy.status!=="none"||creationPoints!==0||
+       !firebase||typeof firebase.createInitialCanonicalCharacter!=="function"){
+        console.error("創角需要全新帳號、完整配點與已確認的雲端服務；未建立角色。");
+        return false;
+    }
+    const selection={displayName:id,element:selectedCreationElement,
+        gender:player.gender==="male"?"male":"female",
+        attributes:Object.fromEntries(Object.keys(creationStats).map(key=>
+            [key,creationStats[key]]))};
+    initialCharacterCreationPending=true;
+    try{
+        const bootstrap=await firebase.bootstrapCloudSave();
+        if(accountSave.getActiveUid()!==uid||
+           !window.FourSymbolsStartupPolicy.canCreateCharacter()||
+           accountSave.readForUid(uid).status!=="empty"){
+            throw new Error("Account changed during creation.");
+        }
+        const committed=await firebase.createInitialCanonicalCharacter(
+            selection,bootstrap.serverRevision);
+        if(committed.authoritativeStateReady!==false||
+           !Number.isSafeInteger(committed.sourceRevision)||
+           accountSave.getActiveUid()!==uid||
+           !window.FourSymbolsStartupPolicy.canCreateCharacter()||
+           accountSave.readForUid(uid).status!=="empty"){
+            throw new Error("Canonical creation response or account changed.");
+        }
+    }catch(error){
+        initialCharacterCreationPending=false;
+        console.error("受保護創角未完成；本機角色尚未建立。",error);
+        const oldAccount=String(error&&error.message||"")
+            .includes("Existing accounts require the original-device migration path");
+        alert(oldAccount
+            ?"此帳號需要保留原手機角色並走遷移流程，不能當作全新帳號創角。"
+            :"創角尚未完成，請保持原帳號並重試相同的角色選擇。舊手機角色請走遷移流程。");
         return false;
     }
 
@@ -6837,12 +6888,17 @@ function createCharacter(){
         Object.assign(player,previousPlayer);
         console.error("創角存檔失敗；角色未建立。",
             new Error("Account save commit failed."));
+        initialCharacterCreationPending=false;
         return false;
     }
 
+    initialCharacterCreationPending=false;
     window.FourSymbolsStartupPolicy.notifyCharacterCreated();
     $("creationPage").style.display="none";
     $("gameInterface").style.display="block";
+    if(typeof window.syncCreationTouchMode==="function"){
+        window.syncCreationTouchMode();
+    }
     return true;
 
 }

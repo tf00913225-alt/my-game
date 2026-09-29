@@ -89,6 +89,12 @@ export async function bootstrapTrustedCloudSave(){
     return callTrustedFunction("bootstrapCloudSave", {});
 }
 
+/* Only first-character choices cross this boundary. The backend checks Auth
+ * account age, active session, empty canonical sources and expected revision. */
+export async function createInitialCanonicalCharacter(selection,expectedRevision){
+    return callTrustedFunction("createInitialCanonicalCharacter",{selection,expectedRevision});
+}
+
 /* Explicit, same-UID preference upload. Never sends the character save,
  * and never runs as part of saveGame, login or offline replay. */
 export async function saveLocalAutoBattlePreferences(expectedRevision){

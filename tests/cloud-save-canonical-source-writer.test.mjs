@@ -15,6 +15,7 @@ const selection={displayName:"英雄",element:"fire",gender:"female",
     attributes:{attack:3,vitality:2,energy:1,intelligence:2,spirit:1,agility:1}};
 
 function harness(candidate="none"){
+    let sessionId="creation-session-one";
     const data=new Map([[save,{schemaVersion:2,ownerUid:uid,
         authoritativeStateReady:false,authoritativeStateVersion:0,
         migrationCandidateStatus:candidate,
@@ -44,11 +45,26 @@ function harness(candidate="none"){
     };
     class HttpsError extends Error{constructor(code,message){super(message);this.code=code;}}
     const writer=createCanonicalSourceWriter({db,FieldValue:{serverTimestamp:()=>stamp},
-        HttpsError,runProtected:(_request,operation)=>operation(transaction,{uid}),
+        HttpsError,runProtected:(_request,operation)=>operation(transaction,{uid,sessionId}),
         inspectExistingEnvelope:record=>({kind:"current",serverRevision:record.serverRevision,
             data:record}),nextRevision:envelope=>envelope.serverRevision+1});
-    return {writer,data,get committed(){return committed;}};
+    return {writer,data,setSessionId:value=>{sessionId=value;},
+        get committed(){return committed;}};
 }
+
+test("public first creation replay requires the original session and current revision",async()=>{
+    const h=harness(),args={operationId,expectedRevision:4,selection};
+    await h.writer.commitInitialSources({},args,{requireCurrentReplay:true});
+    assert.equal((await h.writer.commitInitialSources({},args,{requireCurrentReplay:true}))
+        .unchanged,true);
+    h.setSessionId("another-session");
+    await assert.rejects(h.writer.commitInitialSources({},args,{requireCurrentReplay:true}),
+        /earlier session/);
+    h.setSessionId("creation-session-one");
+    h.data.get(save).serverRevision=6;
+    await assert.rejects(h.writer.commitInitialSources({},args,{requireCurrentReplay:true}),
+        /advanced character/);
+});
 
 test("static newcomer EXP curve follows current game anchors",()=>{
     assert.deepEqual([1,2,5,10,15,19].map(newcomerExpNext),
