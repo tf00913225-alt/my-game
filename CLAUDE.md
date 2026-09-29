@@ -145,6 +145,8 @@ QA、測試與 debug 工具不得為方便而永久改變正式戰鬥數值、�
 ## GitHub 遠端寫入與憑證固定規則
 - 平台已連線的 GitHub Connector／API 授權，與工作區內 `git`／`gh`／SSH／PAT 的本機憑證是兩套獨立機制；不得把「本機 Git CLI 沒憑證」誤判成「GitHub 未授權」。
 - 當目前代理環境已提供可存取本 Repository 且具備所需寫入權限的 GitHub Connector／API 時，所有遠端寫入必須優先使用該已授權通道完成，包括建立 branch、建立／更新檔案、blob/tree/commit、更新 branch ref、建立或更新 PR、查詢 CI／Repository checks，以及在既有合併規則允許時合併 PR。
+- **dev PR 取消二次 MERGE-DEV 授權。** 當專案負責人已明確要求執行某項修復、功能、文件變更或繼續既有施工，且 PR 的實際 diff 仍在該次任務授權範圍內、PR 可合併、預期 Head SHA 未發生未審查變動、必要 Repository checks／CI 與任務特定可執行驗證均通過、沒有未解除的高風險阻塞時，代理應直接合併回 `dev`，不得再要求回覆 `MERGE-DEV PR #xxx`、再次批准合併或其他等價的二次口頭授權。
+- 若上述 Gate 未滿足，禁止硬合併；應先在原授權範圍內修復與重驗，無法安全排除時回報阻塞。本規則不授權直接寫入 `dev`／`main`、`force push`、`rebase`、改寫歷史、略過 CI／驗證，亦不授權自動執行 `dev → main` 正式發布。
 - 工作區內的 Git CLI 預設僅用於本機檢查、diff、修改、測試與必要的本機版本控制；不得把 `git push`、`gh auth login`、PAT 或 SSH 金鑰設定成主要或必要的遠端發布流程。
 - 若本機 `git push` 因缺少憑證失敗，但 GitHub Connector／API 仍可正常寫入，代理必須改走已連線的 GitHub 遠端寫入流程，不得要求使用者重新登入 GitHub，也不得回報成 GitHub 授權失效。
 - 只有 GitHub Connector／API 本身明確回傳 authentication／authorization／permission 錯誤、缺少必要寫入能力，或使用者明確指定必須使用 Git CLI 時，才可把憑證或授權列為阻塞事項。
