@@ -13,6 +13,7 @@ const {createLegacyCandidateScreening}=require("./src/legacy-candidate-screening
 const {createCanonicalRecoveryApproval}=require("./src/canonical-recovery-approval");
 const {createCanonicalCurrentRecovery}=require("./src/canonical-current-recovery");
 const {createCanonicalSourceWriter}=require("./src/canonical-source-writer");
+const {createCanonicalShopPurchase}=require("./src/canonical-shop-purchase");
 const {CloudPreferencesError,PREFERENCES_SCHEMA_VERSION,normalizePreferences}=require("./src/cloud-preferences");
 const {
     CLOUD_SAVE_ENVELOPE_SCHEMA_VERSION,
@@ -52,6 +53,10 @@ const currentRecovery=createCanonicalCurrentRecovery({
     inspectExistingEnvelope,nextRevision
 });
 const initialCharacterWriter=createCanonicalSourceWriter({
+    db:getFirestore(),FieldValue,HttpsError,runProtected:sessions.runProtected,
+    inspectExistingEnvelope,nextRevision
+});
+const canonicalShopPurchase=createCanonicalShopPurchase({
     db:getFirestore(),FieldValue,HttpsError,runProtected:sessions.runProtected,
     inspectExistingEnvelope,nextRevision
 });
@@ -207,6 +212,24 @@ exports.reserveTrustedGrant=onCall(CALLABLE_OPTIONS,async request=>{
 exports.claimDailyCheckin=onCall(CALLABLE_OPTIONS,async request=>{
     try{ return await canonicalResourceCredit.claimDailyCheckin(await verifyGameIdentity(request)); }
     catch(error){ throw asHttpsError(error); }
+});
+// A server-priced purchase changes only an unpublished canonical character.
+// The browser supplies an item ID and quantity, never price, gold or inventory.
+exports.purchaseCanonicalPotion=onCall(CALLABLE_OPTIONS,async request=>{
+    request=await verifyGameIdentity(request);
+    try{
+        const data=request.data;
+        if(!data||typeof data!=="object"||Array.isArray(data)||
+           Object.keys(data).some(key=>![
+               "uid","session","operationId","expectedRevision","itemId","quantity"
+           ].includes(key))){
+            throw new HttpsError("invalid-argument","Only a catalog purchase is accepted.");
+        }
+        return await canonicalShopPurchase.purchase(request,{
+            operationId:data.operationId,expectedRevision:data.expectedRevision,
+            itemId:data.itemId,quantity:data.quantity
+        });
+    }catch(error){ throw asHttpsError(error); }
 });
 // Reads a private candidate and returns blockers; never approves or copies it
 // into the public cloud-save envelope.
