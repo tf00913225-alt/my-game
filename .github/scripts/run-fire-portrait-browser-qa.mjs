@@ -7,7 +7,6 @@ const root=process.cwd();
 const artifactDir=path.join(root,"artifacts/browser-qa");
 const fixture=path.join(root,".fire-portrait-browser-qa.html");
 const provenance=JSON.parse(fs.readFileSync(path.join(root,"config/monster-asset-provenance.json"),"utf8"));
-const v154=fs.readFileSync(path.join(root,"js/45-v154-dev-fixes.js"),"utf8").replace(/<\/script/gi,"<\\/script");
 const records=provenance.assets.filter(asset=>asset.runtimeReady);
 
 function chrome(){
@@ -27,7 +26,7 @@ const html=[
     "window.__firePortraitRegistry="+JSON.stringify(JSON.parse(fs.readFileSync(path.join(root,"config/monster-portrait-registry.json"),"utf8")))+";",
     "window.currentBattleMonsters=[];window.monsters=[];window.autoBattle=false;window.updateAutoButton=()=>{};window.openAutoBattleSettings=()=>{};window.closeAutoBattleSettings=()=>{};window.openHomeFeature=()=>{};window.closeHomeFeature=()=>{};window.applyPostBattleAutoRecovery=()=>{};window.confirmAutoBattleSettings=()=>{};window.toggleAutoBattle=()=>{};",
     "window.FourSymbolsBattlePresentation={applyUnit(card){card.dataset.presentation='v154';window.__fireQa.battleApplied++;}};",
-    "</script><script>"+v154+"</script><script>",
+    "</script><script src=\"js/45-v154-dev-fixes.js\"></script><script>",
     "(async()=>{try{const rows="+JSON.stringify(records)+";window.v154InstallMonsterPortraitRegistry(window.__firePortraitRegistry);for(const item of rows){const monster={name:item.displayName,portraitKey:item.portraitKey,element:'fire'};window.monsters.push(monster);window.currentBattleMonsters.push(window.monsters.length-1);const card=document.createElement('div');card.id='battleMonster'+(window.monsters.length-1);document.body.appendChild(card);const record=window.v154ResolveMonsterPortraitRecord(monster);if(!record||record.path!==item.runtime.path||record.status!=='existing')throw new Error('registry resolution mismatch: '+item.monsterId);await new Promise((resolve,reject)=>{const image=new Image();image.decoding='async';image.onload=async()=>{try{if(image.decode)await image.decode();window.__fireQa.decoded.push({monsterId:item.monsterId,path:item.runtime.path,width:image.naturalWidth,height:image.naturalHeight});resolve();}catch(error){reject(error);}};image.onerror=()=>reject(new Error('browser image load failed: '+item.runtime.path));image.src=item.runtime.path;});window.__fireQa.resolved.push({monsterId:item.monsterId,path:record.path});}window.v154SyncMonsterPortraits();await new Promise(resolve=>setTimeout(resolve,250));window.__fireQa.pending=false;}catch(error){window.__fireQa.errors.push(String(error&&error.stack||error));window.__fireQa.pending=false;}window.__resultNode.textContent=JSON.stringify(window.__fireQa);})();",
     "</script>"
 ].join("\n");
