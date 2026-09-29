@@ -34,13 +34,27 @@ jobs:
           for file in mon-fire-normal-001.png mon-fire-normal-002.png mon-fire-normal-004.png mon-fire-normal-006.png mon-fire-normal-008.png mon-fire-normal-010.png; do
             git show "$source_sha:assets/monsters/wild/fire-pool/$file" > "$RUNNER_TEMP/p0-fire-pool-sources/$file"
           done
+          for item in \
+            zone-01/fire-01.webp \
+            zone-02/fire-01.webp \
+            zone-03/fire-01.webp zone-03/fire-02.webp \
+            zone-04/fire-01.webp zone-04/fire-02.webp \
+            zone-05/fire-01.webp zone-05/fire-02.webp \
+            zone-06/fire-01.webp zone-06/fire-02.webp \
+            zone-07/fire-01.webp zone-07/fire-02.webp \
+            zone-08/fire-01.webp zone-08/fire-02.webp \
+            zone-09/fire-01.webp zone-09/fire-02.webp \
+            zone-10/fire-01.webp zone-10/fire-02.webp; do
+            name=${item//\//-}
+            cp "assets/monsters/wild/$item" "$RUNNER_TEMP/p0-fire-pool-sources/wild-$name"
+          done
 
       - name: Upload recovered fire portrait source files
         if: github.event_name == 'pull_request' && github.head_ref == 'chore/p0-retrieve-fire-pool-sources-20260929'
         uses: actions/upload-artifact@v4
         with:
           name: p0-fire-pool-source-pngs
-          path: ${{ runner.temp }}/p0-fire-pool-sources/*.png
+          path: ${{ runner.temp }}/p0-fire-pool-sources/*
           if-no-files-found: error
           retention-days: 1
 
