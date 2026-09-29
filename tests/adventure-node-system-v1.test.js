@@ -97,6 +97,16 @@ function baseRuntime(){
     assert.equal(c.FourSymbolsAdventure.getNodeStatus("n04b_gate"),"available","unchosen branch becomes backtrackable after chapter clear");
 })();
 
+(function testPlannedChapterSlotsNeverBecomeASecondStateSource(){
+    const c=baseRuntime();
+    runScript(c,"js/adventure/adventure-content-v1-20260915.js");
+    runScript(c,"js/adventure/adventure-runtime-v1-20260915.js");
+    assert.equal(c.FourSymbolsAdventureContent.chapters.chapter_v1.mainProgressNodeCount,20);
+    assert.equal(c.FourSymbolsAdventure.getNodeStatus("n11_reserved"),"planned");
+    assert.equal(c.FourSymbolsAdventure.selectNode("n11_reserved"),true,"planned nodes remain selectable for their canonical detail sheet");
+    assert.equal(c.FourSymbolsAdventure.activateSelectedNode(),false,"planned nodes cannot create a parallel progression path");
+})();
+
 (function testObjectiveUsesUnlockedZonesOnly(){
     const c=baseRuntime();
     c.player.level=20;
@@ -231,6 +241,18 @@ function baseRuntime(){
     assert.match(touchLock,/\.adventure-view/,"Adventure's existing view scroll owner must pass the stage touch-lock whitelist");
     assert.equal((entryCss.match(/pointer-events:none/g)||[]).length>=1,true);
     assert.equal((css.match(/pointer-events:none/g)||[]).length>=1,true);
+
+    const content=read("js/adventure/adventure-content-v1-20260915.js");
+    assert.match(content,/nodeCapacity:20/,"Chapter data must explicitly support twenty progression nodes");
+    assert.match(content,/onboarding:/,"Onboarding belongs to Chapter Node data, not a second map runtime");
+    assert.match(content,/routes:\[/,"Route geometry must be owned by Chapter Data");
+    assert.match(content,/availability:"planned"/,"Future Chapter slots must be explicit data, never renderer hard-code");
+    assert.match(ui,/function nodeDetailSheet\(view\)/,"Map details must use one canonical Bottom Sheet renderer");
+    assert.match(ui,/function mapRoadSvg\(view\)/,"Routes must render from Chapter Data");
+    assert.doesNotMatch(ui,/const mainA=.*M194 1613/,"Legacy hard-coded map route geometry must retire");
+    assert.match(ui,/activateSelectedNode/,"Node selection and node activation must remain separate interactions");
+    assert.match(css,/\.adventure-route-completed/);
+    assert.match(css,/\.adventure-node-sheet/);
 })();
 
 console.log("✓ adventure node system V1 targeted regressions");

@@ -13,7 +13,7 @@
         return;
     }
 
-    const STATE_VERSION=1;
+    const STATE_VERSION=2;
     const DEFAULT_CHAPTER_ID="chapter_v1";
     const OBJECTIVE_POLL_MS=750;
     const BATTLE_RESOURCE_POLL_MS=80;
@@ -21,6 +21,7 @@
     const runtime={
         visible:false,
         activePanel:"map",
+        selectedNodeId:null,
         objectiveTimer:null,
         battleResourceTimer:null,
         battleResourceSnapshot:null,
@@ -212,6 +213,7 @@
         }
         const node=nodeById(chapter,nodeId);
         if(!node){ return "locked"; }
+        if(node.availability==="planned"){ return "planned"; }
         if(state.completedNodes[nodeId]){
             if(state.rewardClaims[nodeId]==="ready"){ return "reward-unclaimed"; }
             if(node.type==="boss"){ return "boss"; }
@@ -345,6 +347,7 @@
         if(state){ state.lastViewedAt=now(); }
         runtime.visible=true;
         runtime.activePanel=opts.panel||"map";
+        runtime.selectedNodeId=opts.focusNodeId||state&&state.currentNodeId||null;
         if(typeof showPage==="function"&&opts.keepUnderlyingPage!==true){ showPage("home"); }
         if(window.FourSymbolsAdventureUI&&typeof window.FourSymbolsAdventureUI.show==="function"){
             window.FourSymbolsAdventureUI.show(opts);
@@ -357,6 +360,7 @@
     function closeToCity(){
         runtime.visible=false;
         runtime.activePanel="map";
+        runtime.selectedNodeId=null;
         if(window.FourSymbolsAdventureUI&&typeof window.FourSymbolsAdventureUI.hide==="function"){ window.FourSymbolsAdventureUI.hide(); }
         if(typeof showPage==="function"){ showPage("home"); }
         return true;
@@ -833,7 +837,7 @@
         return true;
     }
 
-    function openNode(nodeId){
+    function selectNode(nodeId){
         const chapter=chapterDefinition();
         const state=chapterState();
         if(!state){ return false; }
@@ -843,6 +847,22 @@
         if(!node){ return false; }
         const status=nodeStatus(chapter,state,node.id);
         if(status==="locked"){ showMessage(branchLockReason(chapter,state,node)||"這個節點尚未解鎖。");return false; }
+        runtime.selectedNodeId=node.id;
+        runtime.activePanel="map";
+        render();
+        return true;
+    }
+
+    function activateSelectedNode(){
+        const chapter=chapterDefinition();
+        const state=chapterState();
+        const node=nodeById(chapter,runtime.selectedNodeId);
+        if(!state||!node){ return false; }
+        const status=nodeStatus(chapter,state,node.id);
+        if(status==="locked"||status==="planned"){
+            showMessage(status==="planned"?"此段江湖旅程仍在整備中。":branchLockReason(chapter,state,node)||"這個節點尚未解鎖。");
+            return false;
+        }
         runtime.activePanel=node.type;
         if(node.type==="battle"||node.type==="elite"||node.type==="boss"){
             if(state.rewardClaims[node.id]==="ready"){
@@ -873,6 +893,7 @@
         return false;
     }
 
+    function openNode(nodeId){ return selectNode(nodeId); }
     function setPanel(panel){ runtime.activePanel=String(panel||"map");render(); }
     function getRuntimeView(){
         const chapter=chapterDefinition();
@@ -880,6 +901,7 @@
         return {
             visible:runtime.visible,
             panel:runtime.activePanel,
+            selectedNodeId:runtime.selectedNodeId,
             chapter:chapter,
             state:state,
             objective:state&&state.objective||null,
@@ -914,6 +936,8 @@
         closeToCity:closeToCity,
         hide:hideOverlay,
         openNode:openNode,
+        selectNode:selectNode,
+        activateSelectedNode:activateSelectedNode,
         setPanel:setPanel,
         selectBranch:selectBranch,
         resolveEvent:resolveEvent,

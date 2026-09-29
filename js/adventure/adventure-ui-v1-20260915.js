@@ -70,20 +70,25 @@
 
     function nodeTypeClass(type){ return "type-"+String(type||"road").replace(/[^a-z-]/g,""); }
 
-    function mapRoadSvg(){
-        const mainA="M194 1613 C255 1545 305 1490 356 1440 C414 1385 475 1328 529 1267";
-        const safe="M529 1267 C470 1208 395 1134 335 1075 C385 1016 456 946 540 883";
-        const bold="M529 1267 C590 1206 659 1134 724 1075 C676 1008 612 942 540 883";
-        const mainB="M540 883 C474 818 391 749 324 691 C389 642 477 596 551 557 C625 516 696 470 756 422 C718 359 654 299 594 250 C527 205 446 165 367 134";
-        const hidden="M540 883 C648 860 754 824 853 787";
-        function pair(path,branch){
-            return '<path class="'+(branch?'adventure-road-branch-bed':'adventure-road-bed')+'" d="'+path+'"/>'+
-                '<path class="'+(branch?'adventure-road-branch':'adventure-road-main')+'" d="'+path+'"/>';
+    function routeState(view,route){
+        const from=API().getNodeStatus(route.from),to=API().getNodeStatus(route.to);
+        if(from==="completed"||from==="branch-selected"||from==="boss"){
+            if(to!=="locked"&&to!=="planned"){ return "completed"; }
+            return "next";
         }
-        return '<svg class="adventure-road-layer" viewBox="0 0 1080 1920" preserveAspectRatio="none" aria-hidden="true">'+
-            pair(mainA,false)+pair(safe,true)+pair(bold,true)+pair(mainB,false)+
-            '<path class="adventure-road-hidden" d="'+hidden+'"/>'+
-        '</svg>';
+        if(from==="current"||to==="current"){ return "current"; }
+        return to==="planned"?"planned":"locked";
+    }
+    function mapRoadSvg(view){
+        const routes=Array.isArray(view.chapter.routes)?view.chapter.routes:[];
+        const nodes=new Map(view.chapter.nodes.map(node=>[node.id,node]));
+        const paths=routes.map(route=>{
+            const from=nodes.get(route.from),to=nodes.get(route.to);
+            if(!from||!to){ return ""; }
+            const state=routeState(view,route),midX=Number(route.bendX||((Number(from.x)+Number(to.x))/2)),midY=Number(route.bendY||((Number(from.y)+Number(to.y))/2));
+            return '<path class="adventure-route adventure-route-'+state+'" d="M '+Number(from.x*10.8)+' '+Number(from.y*19.2)+' Q '+(midX*10.8)+' '+(midY*19.2)+' '+Number(to.x*10.8)+' '+Number(to.y*19.2)+'"/>';
+        }).join("");
+        return '<svg class="adventure-road-layer" viewBox="0 0 1080 1920" preserveAspectRatio="none" aria-hidden="true">'+paths+'</svg>';
     }
 
     function mapNodeButton(node,status,hidden){
@@ -93,12 +98,27 @@
         const type=hidden&&status==="hidden-available"?"hidden":node.type;
         const badge=status==="reward-unclaimed"?'<span class="adventure-node-reward-badge">獎</span>':
             status==="objective-ready"?'<span class="adventure-node-ready-badge">✓</span>':"";
+        const position=status==="current"?'<span class="adventure-current-position" aria-hidden="true">旗</span>':"";
         return '<button type="button" data-node-id="'+attr(node.id)+'" class="adventure-node '+nodeTypeClass(type)+' status-'+esc(status)+'" '+style+
             (locked?' disabled aria-disabled="true"':' onclick="FourSymbolsAdventure.openNode(\''+attr(node.id)+'\')"')+
             ' aria-label="'+attr(node.title)+'，'+attr(statusLabel(status))+'">'+
-                '<span class="adventure-node-icon">'+esc(nodeGlyph(node.type,status))+'</span>'+badge+
-                '<span class="adventure-node-copy"><strong>'+esc(status==="hidden-available"?"未知之處":node.title)+'</strong><small>'+esc(status==="hidden-available"?"靠近查看":node.subtitle||statusLabel(status))+'</small></span>'+
+                '<span class="adventure-node-icon">'+esc(nodeGlyph(node.type,status))+'</span>'+badge+position+
+                '<span class="adventure-node-copy"><strong>'+esc(status==="hidden-available"?"未知之處":node.title)+'</strong></span>'+
             '</button>';
+    }
+
+    function nodeDetailSheet(view){
+        const node=view.chapter.nodes.find(entry=>entry.id===view.selectedNodeId)||view.chapter.nodes.find(entry=>entry.id===view.state.currentNodeId);
+        if(!node){ return ""; }
+        const status=API().getNodeStatus(node.id);
+        const labels={battle:"普通戰鬥",event:"江湖事件",chest:"旅途寶箱",rest:"休息驛站",elite:"精英戰",boss:"章節頭目",branch:"路線選擇",objective:"江湖委託",finish:"章節終點"};
+        const detail=node.detail||node.subtitle||labels[node.type]||"章節節點";
+        const action=status==="planned"?"尚未開放":status==="locked"?"尚未解鎖":node.type==="finish"?"完成章節":node.type==="rest"?"前往休息":node.type==="chest"?"查看寶箱":node.type==="event"?"開始互動":node.type==="branch"?"選擇路線":node.type==="objective"?"查看委託":"進入";
+        const disabled=status==="planned"||status==="locked";
+        const onboarding=node.onboarding?'<span class="adventure-sheet-tag">新手引導 · '+esc(node.onboarding)+'</span>':"";
+        return '<aside class="adventure-node-sheet is-'+esc(status)+'" aria-live="polite">'+
+            '<div class="adventure-sheet-summary"><span class="adventure-sheet-icon type-'+esc(node.type)+'">'+esc(nodeGlyph(node.type,status))+'</span><div><small>'+esc(labels[node.type]||"章節節點")+'</small><h2>'+esc(node.title)+'</h2><p>'+esc(detail)+'</p>'+onboarding+'</div></div>'+
+            '<div class="adventure-sheet-actions"><button type="button" class="adventure-button primary" '+(disabled?'disabled':'onclick="FourSymbolsAdventure.activateSelectedNode()"')+'>'+action+'</button></div></aside>';
     }
 
     function renderMap(view){
@@ -107,24 +127,21 @@
         const hiddenNodes=(chapter.hiddenNodes||[]).map(node=>mapNodeButton(node,API().getNodeStatus(node.id),true)).join("");
         const branch=chapter.nodes.find(node=>node.type==="branch");
         const selected=branch&&state.branchSelections[branch.branchId];
-        const backtrack=state.chapterCompleted?'<div class="adventure-backtrack-ribbon"><b>回溯探索已開放</b><span>可直接補走第一次未選的岔路，不必重跑整章。</span></div>':"";
+        const backtrack=state.chapterCompleted?'<span class="adventure-backtrack-mark" aria-label="回溯探索已開放">↩ 回溯可走</span>':"";
         return '<section class="adventure-map-screen">'+
-            '<div class="adventure-map-caption"><span>第一章 · '+esc(chapter.title)+'</span><b>建議 Lv.'+esc(chapter.suggestedLevel)+'</b></div>'+backtrack+
+            '<div class="adventure-map-caption"><span>第一章 · '+esc(chapter.title)+'</span><b>'+esc(Object.keys(state.completedNodes||{}).length)+' / '+esc(chapter.mainProgressNodeCount||chapter.nodeCapacity||chapter.nodes.length)+' 關</b>'+backtrack+'</div>'+
             '<div class="adventure-map-canvas">'+
                 '<div class="adventure-map-depth adventure-map-far" aria-hidden="true"></div>'+
                 '<div class="adventure-map-depth adventure-map-mid" aria-hidden="true"></div>'+
                 '<div class="adventure-boss-landscape" aria-hidden="true"></div>'+
-                mapRoadSvg()+mainNodes+hiddenNodes+
+                mapRoadSvg(view)+mainNodes+hiddenNodes+
                 '<div class="adventure-landmark landmark-village" aria-hidden="true"><i></i><span>村落</span></div>'+
                 '<div class="adventure-landmark landmark-bridge" aria-hidden="true"><i></i><span>石橋</span></div>'+
                 '<div class="adventure-landmark landmark-fort" aria-hidden="true"><i></i><span>山寨</span></div>'+
                 '<div class="adventure-map-fog" aria-hidden="true"></div>'+
                 '<div class="adventure-map-depth adventure-map-near" aria-hidden="true"></div>'+
             '</div>'+
-            '<footer class="adventure-map-footer">'+
-                '<span>首次岔路：'+(selected?esc(selected==="safe"?"林間小徑":"山寨正門"):"尚未選擇")+'</span>'+
-                '<span>主線與野怪區分開：推進卡住時，可先回野怪區養成。</span>'+
-            '</footer>'+
+            nodeDetailSheet(view)+
         '</section>';
     }
 
