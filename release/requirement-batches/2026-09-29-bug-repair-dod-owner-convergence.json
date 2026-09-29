@@ -1,0 +1,45 @@
+{
+  "id": "2026-09-29-bug-repair-dod-owner-convergence",
+  "title": "Permanent Bug Repair Definition of Done and Owner Convergence Gate",
+  "status": "IMPLEMENTED",
+  "scope": "Documentation-only permanent engineering governance. No production runtime, gameplay, UI, assets, workflows, save, cloud data, version or main changes.",
+  "requirements": [
+    {
+      "id": "BR-01",
+      "status": "IMPLEMENTED",
+      "request": "Every bug repair must distinguish DIAGNOSED, IMPLEMENTED, INTEGRATED, DEPLOYED and VERIFIED; only VERIFIED may be reported as fixed.",
+      "owner": [
+        "docs/BUG_REPAIR_DOD_OWNER_CONVERGENCE_GATE.md"
+      ]
+    },
+    {
+      "id": "BR-02",
+      "status": "IMPLEMENTED",
+      "request": "Every production bug repair must pass an Owner Convergence Gate covering responsibility inventory, multi-owner scan, canonical owner, patch retirement, lifecycle closure and final-state verification.",
+      "owner": [
+        "docs/BUG_REPAIR_DOD_OWNER_CONVERGENCE_GATE.md",
+        "ARCHITECTURE_RULES.md"
+      ]
+    },
+    {
+      "id": "BR-03",
+      "status": "IMPLEMENTED",
+      "request": "The project owner decides product outcomes; agents must proactively reject unsafe implementation patterns and own technical migration/retirement decisions.",
+      "owner": [
+        "docs/BUG_REPAIR_DOD_OWNER_CONVERGENCE_GATE.md",
+        "docs/CHANGE_SAFETY_REPLACEMENT_CONTRACT.md"
+      ]
+    },
+    {
+      "id": "BR-04",
+      "status": "IMPLEMENTED",
+      "request": "All agent entry documents and repair contracts must require this permanent gate for bug/failure work.",
+      "owner": [
+        "AGENTS.md",
+        "CLAUDE.md",
+        "AUTONOMOUS_REPAIR_CONTRACT.md",
+        "HANDOFF.md"
+      ]
+    }
+  ]
+}

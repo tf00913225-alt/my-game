@@ -1,3 +1,11 @@
+## 2026-09-29 — Bug Repair DoD / Owner Convergence Gate 永久規範
+
+- 新增永久專項契約 `docs/BUG_REPAIR_DOD_OWNER_CONVERGENCE_GATE.md`；所有 Bug／fix／failure／regression 與「是否已修好」判定都必須遵守。
+- 專案負責人只決定產品／遊戲結果；Owner、Patch、Wrapper、Lifecycle、CSS、Test、資料來源與舊實作退場由代理依專案證據負責判斷。若實作方式會造成多 Owner、Patch 疊加、資料風險或不可維護架構，代理必須主動阻止並改採安全實作。
+- Bug 狀態固定區分 DIAGNOSED → IMPLEMENTED → INTEGRATED → DEPLOYED → VERIFIED；只有 VERIFIED 才能回報 FIXED／RESOLVED／已修好。
+- 同一玩家症狀修復後仍重現時，不得繼續疊局部 Patch；第三次施工前必須回查前兩次修法並執行 Subsystem Convergence Audit。
+- 此規則已掛入 AGENTS、CLAUDE、ARCHITECTURE_RULES、AUTONOMOUS_REPAIR_CONTRACT 與 CHANGE_SAFETY_REPLACEMENT_CONTRACT，後續新對話不得略過。
+
 ## 2026-09-28 — Change Safety / Replacement Migration 永久工程把關規則
 
 - 專案負責人明確要求：本人不需懂程式或自行判斷舊 CSS／DOM／函式／Wrapper／Test 是否該刪；其責任是決定遊戲、UI、系統與玩法要變成什麼樣。所有開發代理必須主動承擔工程風險把關與舊版本退場判斷。

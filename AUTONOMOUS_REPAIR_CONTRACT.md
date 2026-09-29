@@ -48,7 +48,8 @@
 4. `ARCHITECTURE_RULES.md`
 5. `UI_GUIDELINES.md`（若任務涉及 UI／版面／視覺）
 6. `docs/CHANGE_SAFETY_REPLACEMENT_CONTRACT.md`
-7. `AUTONOMOUS_REPAIR_CONTRACT.md`（本文件）
+7. `docs/BUG_REPAIR_DOD_OWNER_CONVERGENCE_GATE.md`
+8. `AUTONOMOUS_REPAIR_CONTRACT.md`（本文件）
 
 不得只依賴舊對話摘要、記憶中的 SHA（提交雜湊）或過去的工作分支狀態。
 
@@ -264,6 +265,19 @@ B2／E／E+B2 只是既有分類標籤，**分類名稱本身不得被當成擴�
 3. 涉及自主修復邊界時，以本契約較嚴格的停止條件為準。
 4. 涉及正式遊戲規格／架構時，以對應正式規範文件為準。
 5. 無法確定時，停止，不猜。
+
+---
+
+## 15A. Bug Repair DoD / Owner Convergence 優先 Gate（強制）
+
+任何 Bug／failure／regression 任務，不論本契約允許自主修到哪一步，都必須同時符合 `docs/BUG_REPAIR_DOD_OWNER_CONVERGENCE_GATE.md`。
+
+- 本契約只決定「可以自主做什麼」；不降低 Bug 的完成標準。
+- 找到 contributing cause、修改測試、PR CI PASS 或 branch implementation 都不得直接稱為「已修好」。
+- production runtime 修復若受本契約硬停止條件阻擋，應回報 BLOCKED／DIAGNOSED，不得用 tests-only Patch 迴避。
+- 同一責任若仍有多 Owner、Wrapper、Timer、Observer、CSS override 或其他 late patch，Owner Convergence Gate 不得 PASS。
+- 只有該 Bug 達到專項契約的 VERIFIED 條件，才可以對使用者宣稱 FIXED／RESOLVED／已修好。
+- 使用者不需要決定舊 Owner、Patch、Wrapper、CSS 或 Test 如何退場；代理必須先做工程判斷。若安全施工超出本契約授權，再清楚回報所需授權，不得把技術選擇題丟回使用者。
 
 ---
 
