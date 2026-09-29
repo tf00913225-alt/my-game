@@ -73,6 +73,8 @@ async function testDisplayIdentity(){
 async function testFirstFrameGate(){
     let registryPending=true;
     let prepareCalls=0;
+    let resolveGate;
+    const gateCompleted=new Promise(resolve=>{ resolveGate=resolve; });
     let runtime;
     runtime=loadTower({gate:async monsters=>{
         prepareCalls++;
@@ -82,10 +84,13 @@ async function testFirstFrameGate(){
         assert.equal(prepared.state,"ready","the installed portrait owner must prepare the encounter");
         assert.ok(monsters.every(monster=>monster.displayName),"registry identities must resolve before launch");
         registryPending=false;
+        resolveGate();
         return prepared;
     }});
     const result=await runtime.context.vGameplaySelectTowerBand(1);
-    assert.equal(result,true,"tower battle should launch after visual preparation");
+    assert.equal(result,true,"tower entry should accept the visual preparation request");
+    await gateCompleted;
+    await new Promise(resolve=>setTimeout(resolve,0));
     assert.equal(prepareCalls,1,"tower entry must use the shared encounter portrait gate");
     assert.equal(registryPending,false);
     const launch=runtime.calls.find(call=>call.type==="launch");
