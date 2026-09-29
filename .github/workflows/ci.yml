@@ -25,6 +25,21 @@ jobs:
         with:
           fetch-depth: 2
 
+      - name: Export existing fire portrait source files for recovery
+        if: github.event_name == 'pull_request' && github.head_ref == 'chore/p0-retrieve-fire-pool-sources-20260929'
+        uses: actions/upload-artifact@v4
+        with:
+          name: p0-fire-pool-source-pngs
+          path: |
+            assets/monsters/wild/fire-pool/mon-fire-normal-001.png
+            assets/monsters/wild/fire-pool/mon-fire-normal-002.png
+            assets/monsters/wild/fire-pool/mon-fire-normal-004.png
+            assets/monsters/wild/fire-pool/mon-fire-normal-006.png
+            assets/monsters/wild/fire-pool/mon-fire-normal-008.png
+            assets/monsters/wild/fire-pool/mon-fire-normal-010.png
+          if-no-files-found: error
+          retention-days: 1
+
       - name: Use current Node.js LTS
         uses: actions/setup-node@v4
         with:
