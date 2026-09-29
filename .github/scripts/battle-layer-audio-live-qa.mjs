@@ -178,6 +178,7 @@ async function prepareAccountFirstRuntime(client,features){
                 FourSymbolsStartupPolicy.notifyCharacterCreated();
                 document.getElementById('creationPage').style.display='none';
                 document.getElementById('gameInterface').style.display='block';
+                window.syncCreationTouchMode?.();
                 return {created:true,errors,fixture:"local-battle-only"};
             }catch(error){
                 errors.push(String(error?.stack||error));
