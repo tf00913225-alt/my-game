@@ -30808,6 +30808,22 @@ function setInventoryFilter(filter){
     if(scroller) scroller.scrollTop=0;
 }
 
+function getInventoryRarityKey(item){
+    if(!item){ return "white"; }
+    const direct=String(item.rarityKey||item.quality||"").toLowerCase();
+    const allowed=["white","blue","purple","orange","pink","four-symbol"];
+    if(allowed.includes(direct)){ return direct; }
+    const tier=String(item.tierKey||"").toLowerCase();
+    const legacy={low:"white",mid:"blue",high:"purple",perfect:"orange"};
+    if(allowed.includes(tier)){ return tier; }
+    if(legacy[tier]){ return legacy[tier]; }
+    if(item.setId && typeof isEquipmentInventoryType==="function" && isEquipmentInventoryType(item.type)){
+        return "orange";
+    }
+    const icon=String(item.icon||"");
+    return allowed.find(quality=>icon.includes("rarity-"+quality))||"white";
+}
+
 function renderInventoryItems(){
     rebuildInventorySlots();
     const grid=$("inventoryGrid");
@@ -30820,11 +30836,21 @@ function renderInventoryItems(){
         const item=items[index] || null;
         const box=document.createElement("div");
         box.className="inventory-item inventory-item-classic "+(item ? "has-item":"empty");
+        if(item){
+            const rarity=getInventoryRarityKey(item);
+            box.classList.add("rarity-"+rarity);
+            box.dataset.rarity=rarity;
+        }
         box.innerHTML=`<div class="inventory-slot-number">${index+1}</div>`;
 
         if(item){
             box.innerHTML+=`<div class="inventory-icon">${item.icon || "◆"}</div><div class="inventory-count">${item.count>1 ? "×"+item.count : ""}</div>`;
-            const realIndex=inventoryItems.indexOf(item);            box.onclick=()=>openItemModal(realIndex);
+            const realIndex=inventoryItems.indexOf(item);
+            box.onclick=()=>{
+                document.querySelectorAll("#inventoryGrid .inventory-item-classic.is-selected").forEach(selected=>selected.classList.remove("is-selected"));
+                box.classList.add("is-selected");
+                openItemModal(realIndex);
+            };
         }else{
             box.innerHTML+='<div class="inventory-empty-dot">·</div>';
         }

@@ -1,0 +1,30 @@
+"use strict";
+const assert=require("node:assert/strict");
+const fs=require("node:fs");
+const read=path=>fs.readFileSync(path,"utf8");
+
+const html=read("index.html");
+const core=read("css/22-stage-v78-character-inventory-core.css");
+const main=read("js/00-main.js");
+const renderer=read("js/35-v141-ui-battle.js");
+const manifest=JSON.parse(read("build/asset-manifest.json"));
+const gameplayBundle=read(manifest.featureManifest.bundles["gameplay-core"].styles[0]);
+
+assert.equal((html.match(/id="inventoryPage"/g)||[]).length,1,"backpack must keep one DOM owner");
+assert.match(html,/class="inventory-title-plate"[\s\S]*?<h2>行囊<\/h2>/);
+assert.match(html,/id="inventoryGridScroll" data-scroll-owner="y"/);
+assert.match(core,/inventory-classic-shell::before/);
+assert.match(core,/inventory-title-plate/);
+assert.match(core,/clip-path:polygon/);
+assert.match(core,/rarity-four-symbol/);
+assert.match(core,/inventory-item-classic\.is-selected/);
+assert.match(core,/bagSelectedShine/);
+assert.match(core,/aspect-ratio:1 \/ 1/);
+assert.match(main,/function getInventoryRarityKey\(item\)/);
+assert.match(main,/box\.dataset\.rarity=rarity/);
+assert.match(renderer,/box\.classList\.add\("rarity-"\+rarity\)/);
+assert.match(renderer,/box\.classList\.add\("is-selected"\)/);
+assert.match(renderer,/item\.icon\|\|"◆"/,"existing fallback remains available when an asset is missing");
+assert.match(gameplayBundle,/Backpack Commercial RPG visual convergence/,"commercial skin must ship in gameplay-core");
+assert.equal((html.match(/v169-dungeon-inventory-overlay/g)||[]).length,0,"retired overlay must not return");
+console.log("V176 backpack commercial RPG UI contract passed");
