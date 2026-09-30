@@ -31,8 +31,8 @@
 
     const V17342_HALF_MONSTER_FIELDS=[
         "maxHP","hp","maxSP","sp","attack","magicAttack","defense",
-        "attackPoints","vitalityPoints","energyPoints","intelligencePoints","spiritPoints","agilityPoints",
-        "vitality","energy","intelligence","spirit","agility","accuracy","evasion"
+        "attackPoints","vitalityPoints","energyPoints","intelligencePoints","defensePoints","agilityPoints",
+        "vitality","energy","intelligence","defense","agility","accuracy","evasion"
     ];
 
     function halveMonsterCoreStats(monster,marker){
@@ -64,8 +64,8 @@
 
     const DAILY_DUNGEON_SCALE_FIELDS=[
         "maxHP","hp","maxSP","sp","attack","magicAttack","defense",
-        "attackPoints","vitalityPoints","energyPoints","intelligencePoints","spiritPoints","agilityPoints",
-        "vitality","energy","intelligence","spirit","agility","accuracy","evasion"
+        "attackPoints","vitalityPoints","energyPoints","intelligencePoints","defensePoints","agilityPoints",
+        "vitality","energy","intelligence","defense","agility","accuracy","evasion"
     ];
 
     function getDailyDungeonScaleContext(){
