@@ -529,6 +529,7 @@
                 icon:equipmentSetIcon(set.id,piece.key),
                 type:piece.slot,
                 setId:set.id,
+                tierKey:"orange",
                 levelRequirement:20,
                 price:0,
                 stats:Object.assign({},piece.stats)
