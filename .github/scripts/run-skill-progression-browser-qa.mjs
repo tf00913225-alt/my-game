@@ -149,8 +149,8 @@ const PREPARE_RUNTIME=`(async()=>{
             errors:runtimeErrors.slice(-8)
         }));
     }
-    player.id=QA_LABELS.fireCharacter;player.element="fire";player.level=70;player.skillPoints=999;
-    player2={id:QA_LABELS.waterCharacter,element:"water",level:70,skillPoints:999};
+    player.id="QA 火角色";player.element="fire";player.level=70;player.skillPoints=999;
+    player2={id:"QA 水角色",element:"water",level:70,skillPoints:999};
     player3=null;
     currentSkillCharacter="fire";
     // Cross-element learning keeps its formal native-skill gate. Seed one
