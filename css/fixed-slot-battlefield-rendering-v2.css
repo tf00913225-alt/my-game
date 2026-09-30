@@ -35,6 +35,8 @@
     --battle-name-row-height:14px;
     --battle-resource-bar-height:11px;
     --battle-enemy-safe-top:12px;
+    --battle-item-menu-top-offset:116px;
+    --battle-item-menu-gap:8px;
 }
 
 /* Enemy, controls and allies are the three structural tracks. Battle info is
@@ -114,6 +116,7 @@
     opacity:1;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion > .turn-target-row.battle-item-open{
+    bottom:calc(var(--battle-command-visual-height) + var(--battle-item-menu-top-offset) + var(--battle-item-menu-gap));
     opacity:1;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar.skill-quick-bar{
@@ -691,4 +694,9 @@
     #game-stage #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit.ally-targetable::before{animation:none !important;}
     #game-stage #battlePage.v-fixed-slot-render-v2 .battle-info-region,
     #game-stage #battlePage.v-fixed-slot-render-v2 .battle-info-toggle > span{transition:none !important;}
+}
+
+
+#game-stage #battlePage.v-fixed-slot-render-v2 .v143-unit-stealthed > .v174-battle-art{
+    opacity:.35 !important;
 }
