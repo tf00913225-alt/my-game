@@ -36,10 +36,10 @@ assert.match(inventory,/目前裝備/);
 assert.match(inventory,/未穿戴此部位裝備/);
 assert.match(inventory,/v17351Locked/);
 assert.match(inventory,/無法進行冶煉/);
-assert.match(inventory,/equipment\(i\)&&!locked\(i\)/);
-assert.match(inventory,/v17351BulkQualityPicker/);
-assert.match(css,/#game-stage #inventoryPage #v17350BulkSellQuality\{display:none/);
-assert.match(css,/v17351-quality-menu/);
+assert.match(inventory,/function locked\(i\)/);
+assert.match(inventory,/v17350SyncQuickSellModal/);
+assert.doesNotMatch(inventory,/v17351BulkQualityPicker|v17350BulkSellBar/);
+assert.doesNotMatch(css,/v17351-quality-menu|v17350BulkSellQuality/);
 assert.doesNotMatch(css,/v17351-inventory-fullscreen/,
     "inventory QA must not own a second fullscreen geometry path");
 assert.doesNotMatch(inventory,/requestAnimationFrame|setTimeout\(/,

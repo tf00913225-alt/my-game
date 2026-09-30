@@ -17,7 +17,8 @@ assert.match(qol,/window\.v17350BulkSellEquipment=async function/);
 assert.match(qol,/QUALITY_ORDER=\["white","blue","purple","orange","pink","four-symbol"\]/);
 assert.match(qol,/summary\.hasOrangeOrAbove[\s\S]*?window\.rpgConfirm/);
 assert.match(qol,/高階裝備售出後無法復原/);
-assert.match(qol,/id="v17350BulkSellQuality"/);
+assert.match(qol,/v17350OpenQuickSellModal/);
+assert.match(qol,/id="v17350QuickSellQuality"/);
 assert.match(qol,/window\.v17350RunBatchAction=async function/);
 assert.match(qol,/id="v17350BatchQuantity"[\s\S]*?value="'\+descriptor\.total\+'"/);
 assert.match(qol,/descriptor\.kind==="potion"/);
@@ -32,8 +33,7 @@ assert.match(qol,/const stackKey=inventoryStackIdentity\(item\)/);
 
 /* Quick-sell and batch actions keep the same black/gold readable button
    language instead of the former yellow background + black text treatment. */
-assert.match(css,/\.v17350-bulk-sell-bar button\{[\s\S]*?color:#f4d793;[\s\S]*?background:linear-gradient\(180deg,#332414,#15100a\)/);
-assert.match(css,/\.v17350-bulk-sell-bar button\.danger\{[\s\S]*?background:linear-gradient\(180deg,#8d3928,#4d1812\)/);
+assert.doesNotMatch(qol,/v17350BulkSellBar|insertBefore\(bar,gridScroll\)/);
 assert.match(css,/\.v17350-batch-action button\{[\s\S]*?color:#f4d793;[\s\S]*?background:linear-gradient\(180deg,#332414,#15100a\)/);
 
 assert.match(recovery,/window\.rpgAlert\([\s\S]*?title:"補品不足"[\s\S]*?confirmText:"知道了"/);

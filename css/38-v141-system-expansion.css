@@ -157,40 +157,6 @@
     line-height:1;
 }
 
-#game-stage #inventoryPage .v141-inventory-pager{
-    flex:0 0 auto;
-    display:grid;
-    grid-template-columns:42px minmax(58px,auto) 42px;
-    align-items:center;
-    justify-content:center;
-    gap:11px;
-    margin:6px auto 0;
-}
-
-#game-stage #inventoryPage .v141-inventory-pager button{
-    width:42px;
-    height:38px;
-    min-height:38px;
-    padding:0;
-    border:1px solid #85632f;
-    border-radius:7px;
-    color:#ffe09a;
-    background:linear-gradient(180deg,#2c2114,#120e09);
-    font-size:17px;
-    line-height:29px;
-}
-
-#game-stage #inventoryPage .v141-inventory-pager span{
-    color:#d8c49c;
-    font-size:14px;
-    font-weight:800;
-    text-align:center;
-}
-
-#game-stage #inventoryPage .inventory-pagination{
-    display:none !important;
-}
-
 #game-stage #inventoryPage .inventory-character-arrow{
     width:42px !important;
     height:38px !important;

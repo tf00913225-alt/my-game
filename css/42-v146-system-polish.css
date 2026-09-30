@@ -52,8 +52,6 @@
 #battlePage .v146-defeated .v141-effect{display:none !important;}
 #battlePage .v146-defeated{pointer-events:none !important;}
 
-#game-stage #inventoryPage .v141-inventory-pager{grid-template-columns:44px minmax(62px,auto) 44px !important;}
-#game-stage #inventoryPage .v141-inventory-pager button{font-family:Arial,sans-serif !important;font-size:24px !important;line-height:29px !important;}
 
 #game-stage .shop-potion-purchase-row{display:grid !important;grid-template-columns:auto 52px minmax(70px,1fr) 64px !important;gap:5px !important;align-items:center !important;}
 #game-stage .v146-shop-total{min-width:0;color:#f3cf79;font-size:13px;line-height:17px;font-weight:900;text-align:right;white-space:nowrap;}

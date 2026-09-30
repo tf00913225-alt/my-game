@@ -240,66 +240,60 @@
         if(typeof saveGame==="function"){ saveGame(); }
     }
 
-    function ensureBulkSellBar(){
-        const gridScroll=document.getElementById("inventoryGridScroll");
-        if(!gridScroll||!gridScroll.parentNode){ return; }
-        let bar=document.getElementById("v17350BulkSellBar");
-        if(!bar){
-            bar=document.createElement("section");
-            bar.id="v17350BulkSellBar";
-            bar.className="v17350-bulk-sell-bar";
-            bar.setAttribute("aria-label","裝備一鍵售出");
-            bar.innerHTML=
-                '<b>一鍵售出</b>'+
-                '<select id="v17350BulkSellQuality" aria-label="售出品質上限">'+
-                    '<option value="white">白階以下</option>'+
-                    '<option value="blue">藍階以下</option>'+
-                    '<option value="purple">紫階以下</option>'+
-                    '<option value="orange">橙階以下</option>' +
-                    '<option value="pink">紅階以下</option>' +
-                    '<option value="four-symbol">萬象階以下</option>'+
-                '</select>'+
-                '<button id="v17350BulkSellButton" type="button" onclick="v17350BulkSellEquipment()">售出 0 件</button>'+
-                '<small id="v17350BulkSellMeta">僅售出背包內未穿戴裝備</small>';
-            gridScroll.parentNode.insertBefore(bar,gridScroll);
-            const select=bar.querySelector("#v17350BulkSellQuality");
-            if(select){
-                select.value=readBulkSellThreshold();
-                select.addEventListener("change",()=>{
-                    writeBulkSellThreshold(select.value);
-                    syncBulkSellBar();
-                });
-            }
-        }
-        syncBulkSellBar();
+    function syncQuickSellModal(){
+        const modal=document.getElementById("homeFeatureModal");
+        const thresholdSelect=document.getElementById("v17350QuickSellQuality");
+        if(!modal||!thresholdSelect){ return; }
+        const threshold=writeBulkSellThreshold(thresholdSelect.value||readBulkSellThreshold());
+        thresholdSelect.value=threshold;
+        const summary=candidateSummary(threshold);
+        const count=document.getElementById("v17350QuickSellCount");
+        const goldValue=document.getElementById("v17350QuickSellGold");
+        const confirm=document.getElementById("v17350QuickSellConfirm");
+        if(count){ count.textContent=summary.units+" 件"; }
+        if(goldValue){ goldValue.textContent=summary.goldValue.toLocaleString("zh-TW")+" 金幣"; }
+        if(confirm){ confirm.disabled=summary.units<=0; }
+        modal.classList.toggle("v17350-quick-sell-empty",summary.units<=0);
     }
 
-    function syncBulkSellBar(){
-        const bar=document.getElementById("v17350BulkSellBar");
-        if(!bar){ return; }
-        const visible=typeof inventoryFilter!=="undefined"&&inventoryFilter==="equipment";
-        bar.hidden=!visible;
-        if(!visible){ return; }
-        const select=bar.querySelector("#v17350BulkSellQuality");
-        const threshold=select&&QUALITY_ORDER.includes(select.value)?select.value:readBulkSellThreshold();
-        if(select&&!select.value){ select.value=threshold; }
-        const summary=candidateSummary(threshold);
-        const button=bar.querySelector("#v17350BulkSellButton");
-        const meta=bar.querySelector("#v17350BulkSellMeta");
-        if(button){
-            button.disabled=summary.units<=0;
-            button.textContent="售出 "+summary.units+" 件";
-            button.classList.toggle("danger",summary.hasOrangeOrAbove);
+    window.v17350SyncQuickSellModal=syncQuickSellModal;
+
+    window.v17350CloseQuickSellModal=function(){
+        const modal=document.getElementById("homeFeatureModal");
+        if(modal){ modal.classList.remove("v17350-quick-sell-open","v17350-quick-sell-empty"); }
+        if(typeof closeHomeFeature==="function"){ closeHomeFeature(); }
+    };
+
+    window.v17350OpenQuickSellModal=function(){
+        if(typeof inventoryFilter!=="undefined"&&inventoryFilter!=="equipment"){ return false; }
+        const modal=document.getElementById("homeFeatureModal");
+        const title=document.getElementById("homeFeatureModalTitle");
+        const body=document.getElementById("homeFeatureModalBody");
+        if(!modal||!title||!body){ return false; }
+        if(typeof window.v17350CloseQuickSellModal==="function"){ window.v17350CloseQuickSellModal(); }
+        title.textContent="一鍵售出";
+        body.innerHTML=
+            '<section class="v17350-quick-sell-modal" aria-label="一鍵售出設定">'+
+                '<p class="v17350-quick-sell-lede">只會出售背包內符合條件、未鎖定且未穿戴的裝備。</p>'+
+                '<label class="v17350-quick-sell-field" for="v17350QuickSellQuality"><span>售出條件</span><select id="v17350QuickSellQuality">'+
+                    '<option value="white">白階以下</option><option value="blue">藍階以下</option><option value="purple">紫階以下</option><option value="orange">橙階以下</option><option value="pink">紅階以下</option><option value="four-symbol">萬象階以下</option>'+
+                '</select></label>'+
+                '<div class="v17350-quick-sell-summary"><div><span>符合條件件數</span><b id="v17350QuickSellCount">0 件</b></div><div><span>預計獲得</span><b id="v17350QuickSellGold">0 金幣</b></div></div>'+
+                '<div class="v17350-quick-sell-actions"><button type="button" onclick="v17350CloseQuickSellModal()">取消</button><button id="v17350QuickSellConfirm" type="button" onclick="v17350BulkSellEquipment()">確認售出</button></div>'+
+            '</section>';
+        const select=document.getElementById("v17350QuickSellQuality");
+        if(select){
+            select.value=readBulkSellThreshold();
+            select.addEventListener("change",syncQuickSellModal);
         }
-        if(meta){
-            meta.textContent=summary.units>0
-                ?"預計獲得 "+summary.goldValue.toLocaleString("zh-TW")+" 金幣"
-                :"目前沒有符合條件的裝備";
-        }
-    }
+        modal.classList.add("show","v17350-quick-sell-open");
+        syncQuickSellModal();
+        return true;
+    };
 
     window.v17350BulkSellEquipment=async function(){
-        const select=document.getElementById("v17350BulkSellQuality");
+        const select=document.getElementById("v17350QuickSellQuality");
+        if(!select){ return window.v17350OpenQuickSellModal(); }
         const threshold=writeBulkSellThreshold(select&&select.value||readBulkSellThreshold());
         const summary=candidateSummary(threshold);
         if(summary.units<=0){
@@ -326,8 +320,8 @@
         if(typeof gold!=="undefined"){ gold+=summary.goldValue; }
         if(typeof selectedInventorySlot!=="undefined"){ selectedInventorySlot=null; }
         if(typeof closeItemModal==="function"){ closeItemModal(); }
+        if(typeof window.v17350CloseQuickSellModal==="function"){ window.v17350CloseQuickSellModal(); }
         refreshInventoryViews();
-        ensureBulkSellBar();
 
         if(typeof window.rpgAlert==="function"){
             await window.rpgAlert(
@@ -570,7 +564,7 @@
         const previousRenderInventoryItems=renderInventoryItems;
         renderInventoryItems=function(){
             const result=previousRenderInventoryItems.apply(this,arguments);
-            ensureBulkSellBar();
+            syncQuickSellModal();
             return result;
         };
     }
@@ -579,7 +573,7 @@
         const previousRenderInventory=renderInventory;
         renderInventory=function(){
             const result=previousRenderInventory.apply(this,arguments);
-            ensureBulkSellBar();
+            syncQuickSellModal();
             return result;
         };
     }
@@ -588,12 +582,12 @@
         const previousSetInventoryFilter=setInventoryFilter;
         setInventoryFilter=function(){
             const result=previousSetInventoryFilter.apply(this,arguments);
-            ensureBulkSellBar();
+            syncQuickSellModal();
             return result;
         };
     }
 
-    ensureBulkSellBar();
+    syncQuickSellModal();
 
     /* QA compatibility owners follow this source inside gameplay-core. */
 

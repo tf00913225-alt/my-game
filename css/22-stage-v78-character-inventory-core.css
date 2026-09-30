@@ -74,19 +74,34 @@
 #game-stage #inventoryPage .inventory-item-classic:active{transform:scale(.975)}
 @keyframes inventorySlotShine{0%,100%{filter:brightness(1.07)}50%{filter:brightness(1.14)}}
 
-/* Sell utility and pagination are game components, not independent form cards. */
-#game-stage #inventoryPage .v17350-bulk-sell-bar{display:grid;grid-template-columns:auto minmax(90px,1fr) minmax(100px,auto);grid-template-rows:34px auto;align-items:center;gap:4px 7px;width:100%;min-height:42px;margin:4px 0 7px;padding:4px 6px;border:1px solid #364541;background:linear-gradient(180deg,#1b2422,#101515);clip-path:polygon(0 5px,5px 0,100% 0,100% calc(100% - 5px),calc(100% - 5px) 100%,0 100%);box-sizing:border-box;color:#d6d0bf}
-#game-stage #inventoryPage .v17350-bulk-sell-bar[hidden]{display:none}
-#game-stage #inventoryPage .v17350-bulk-sell-bar>b{color:#e2c67e;font-size:14px;line-height:1;white-space:nowrap}
-#game-stage #inventoryPage .v17350-bulk-sell-bar select{width:100%;height:32px;min-height:32px;padding:3px 6px;border:1px solid #4d5a52;border-radius:0;color:#ded7c3;background:#111718;font:700 14px/1.2 "Noto Sans TC",sans-serif}
-#game-stage #inventoryPage .v17350-bulk-sell-bar button{height:32px;min-height:32px;padding:4px 8px;border:1px solid #8c7041;border-radius:0;color:#f0d99a;background:#24251e;font-size:14px;font-weight:800;white-space:nowrap}
-#game-stage #inventoryPage .v17350-bulk-sell-bar button:active{transform:scale(.97)}
-#game-stage #inventoryPage .v17350-bulk-sell-bar small{grid-column:1 / -1;min-width:0;overflow:hidden;color:#a39f91;font-size:13px;line-height:16px;text-overflow:ellipsis;white-space:nowrap}
-#game-stage #inventoryPage .v141-inventory-pager{display:flex;align-items:center;justify-content:center;gap:8px;margin:7px auto 2px;padding:0;border:0;background:transparent;box-shadow:none}
-#game-stage #inventoryPage .v141-inventory-pager button{width:32px;min-width:32px;height:30px;min-height:30px;padding:0;border:1px solid #46514e;border-radius:0;color:#cfc7b5;background:#141a1a;font-size:18px;line-height:1}
+/* Bottom Action owner: grid geometry, pagination, refresh and quick-sell share one rail. */
+#game-stage #inventoryPage .inventory-bottom-actions{display:grid;grid-template-columns:minmax(82px,auto) minmax(0,1fr) minmax(82px,auto);align-items:center;gap:8px;width:100%;min-height:44px;margin:2px 0 0;padding:4px 0 0;border-top:1px solid rgba(116,128,113,.22);box-sizing:border-box}
+#game-stage #inventoryPage .inventory-bottom-action{min-width:0;min-height:36px;padding:6px 8px;border:1px solid #46514e;border-radius:0;color:#cfc7b5;background:linear-gradient(180deg,#202927,#101515);font-size:15px;font-weight:800;line-height:1;white-space:nowrap;cursor:pointer;clip-path:polygon(0 4px,4px 0,100% 0,100% calc(100% - 4px),calc(100% - 4px) 100%,0 100%)}
+#game-stage #inventoryPage .inventory-bottom-action:active{transform:scale(.97)}
+#game-stage #inventoryPage .inventory-quick-sell-action{border-color:#806638;color:#efd18b;background:linear-gradient(180deg,#2b291f,#171914)}
+#game-stage #inventoryPage .inventory-bottom-action[hidden]{visibility:hidden}
+#game-stage #inventoryPage .inventory-pagination-slot{min-width:0;display:flex;justify-content:center;align-items:center}
+#game-stage #inventoryPage .v141-inventory-pager{display:grid;grid-template-columns:32px minmax(48px,auto) 32px;align-items:center;justify-content:center;gap:6px;margin:0;padding:0;border:0;background:transparent;box-shadow:none}
+#game-stage #inventoryPage .v141-inventory-pager button{width:32px;min-width:32px;height:32px;min-height:32px;padding:0;border:1px solid #46514e;border-radius:0;color:#cfc7b5;background:#141a1a;font-size:18px;line-height:1}
 #game-stage #inventoryPage .v141-inventory-pager button:active{transform:scale(.96)}
-#game-stage #inventoryPage .v141-inventory-pager span{min-width:52px;color:#bab5a7;font-size:14px;text-align:center}
+#game-stage #inventoryPage .v141-inventory-pager span{min-width:48px;color:#bab5a7;font-size:14px;text-align:center}
+
+/* Quick Sell uses the existing shared Home Feature modal owner. */
+#game-stage #homeFeatureModal.v17350-quick-sell-open .home-feature-modal-box{width:min(92%,390px);max-height:88%;min-height:0}
+#game-stage #homeFeatureModal.v17350-quick-sell-open #homeFeatureModalBody{overflow:auto;padding:0 2px 2px}
+#game-stage #homeFeatureModal .v17350-quick-sell-modal{display:grid;gap:14px;padding:4px 2px;color:#d8d0bd}
+#game-stage #homeFeatureModal .v17350-quick-sell-lede{margin:0;color:#aaa494;font-size:15px;line-height:1.55}
+#game-stage #homeFeatureModal .v17350-quick-sell-field{display:grid;gap:7px;color:#e6d19c;font-size:15px;font-weight:800}
+#game-stage #homeFeatureModal .v17350-quick-sell-field select{width:100%;min-height:42px;padding:7px 9px;border:1px solid #59645a;border-radius:0;color:#eee1c4;background:#111817;font-size:15px}
+#game-stage #homeFeatureModal .v17350-quick-sell-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+#game-stage #homeFeatureModal .v17350-quick-sell-summary>div{display:grid;gap:5px;padding:10px;border:1px solid #3e4a45;background:#151c1a;clip-path:polygon(0 5px,5px 0,100% 0,100% calc(100% - 5px),calc(100% - 5px) 100%,0 100%)}
+#game-stage #homeFeatureModal .v17350-quick-sell-summary span{color:#a9a292;font-size:14px}
+#game-stage #homeFeatureModal .v17350-quick-sell-summary b{color:#f0d58f;font-size:18px}
+#game-stage #homeFeatureModal .v17350-quick-sell-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+#game-stage #homeFeatureModal .v17350-quick-sell-actions button{min-height:44px;border:1px solid #58645b;border-radius:0;color:#d5cbb7;background:#161c1b;font-size:15px;font-weight:800}
+#game-stage #homeFeatureModal .v17350-quick-sell-actions button:last-child{border-color:#9a773f;color:#2b1d08;background:linear-gradient(180deg,#e2c071,#a87831)}
+#game-stage #homeFeatureModal .v17350-quick-sell-actions button:disabled{opacity:.45}
 
 @media (max-width:430px){#game-stage #inventoryPage .inventory-title-plate{min-width:154px;gap:7px;padding-inline:9px}#game-stage #inventoryPage .inventory-title-plate h2{font-size:20px}#game-stage #inventoryPage .inventory-character-stage{min-height:164px;padding-inline:7px;gap:7px}#game-stage #inventoryPage .inventory-equipment-grid{inset-inline:7px;gap:7px}}
-@media (max-width:380px){#game-stage #inventoryPage .inventory-classic-shell{width:96%}#game-stage #inventoryPage .inventory-character-stage{min-height:150px;grid-template-columns:minmax(50px,1fr) minmax(132px,2.2fr) minmax(50px,1fr)}#game-stage #inventoryPage .inventory-equipment-grid{grid-template-columns:minmax(50px,1fr) minmax(132px,2.2fr) minmax(50px,1fr)}#game-stage #inventoryPage .inventory-equipment-slot-label{font-size:11px}#game-stage #inventoryPage .inventory-grid-classic{gap:4px}#game-stage #inventoryPage .v17350-bulk-sell-bar{grid-template-columns:auto minmax(78px,1fr) minmax(91px,auto);gap:4px}}
+@media (max-width:380px){#game-stage #inventoryPage .inventory-classic-shell{width:96%}#game-stage #inventoryPage .inventory-character-stage{min-height:150px;grid-template-columns:minmax(50px,1fr) minmax(132px,2.2fr) minmax(50px,1fr)}#game-stage #inventoryPage .inventory-equipment-grid{grid-template-columns:minmax(50px,1fr) minmax(132px,2.2fr) minmax(50px,1fr)}#game-stage #inventoryPage .inventory-equipment-slot-label{font-size:11px}#game-stage #inventoryPage .inventory-grid-classic{gap:4px}#game-stage #inventoryPage .inventory-bottom-actions{gap:4px}#game-stage #inventoryPage .inventory-bottom-action{padding-inline:5px;font-size:14px}}
 @media (prefers-reduced-motion:reduce){#game-stage #inventoryPage .inventory-item-classic.is-selected{animation:none}}

@@ -8472,7 +8472,7 @@
 /* bundled source: js/35-v141-ui-battle.js */
 /*
    V141 — mobile UI and battle presentation
-   - 18-slot / 7-page backpack, compact dialogs and shop confirmation
+   - 24-slot / 5-page backpack, compact dialogs and shop confirmation
    - battle card status effects, monster shield bar, entrance/exit transitions
    - black-gold post-battle reward summary
    - click-to-move patrol character + draggable quest tracker
@@ -8487,8 +8487,8 @@
         "ticketSetEarth",
         "ticketSetWind"
     ]);
-    const INVENTORY_PAGE_SIZE=18;
-    const INVENTORY_PAGE_COUNT=7;
+    const INVENTORY_PAGE_SIZE=24;
+    const INVENTORY_PAGE_COUNT=Math.ceil(120/INVENTORY_PAGE_SIZE);
     const ANNOUNCEMENT_READ_KEY=window.FourSymbolsAccountSave.accountKey("announcement-read");
     const QUEST_MILESTONE_KEY=window.FourSymbolsAccountSave.accountKey("quest-milestones");
     const TASK_TRACKER_KEY=window.FourSymbolsAccountSave.accountKey("task-tracker");
@@ -8535,20 +8535,28 @@
     }
 
     /* =====================================================
-       Backpack: 18 slots × 7 pages (the final page keeps the 120-slot cap)
+       Backpack: one canonical 24-slot page for every category.
+       The source inventory cap remains 120; empty cells preserve geometry.
     ===================================================== */
     function ensureInventoryPager(){
-        const scroller=document.getElementById("inventoryGridScroll");
-        if(!scroller||document.getElementById("v141InventoryPager")){ return; }
+        const slot=document.getElementById("inventoryPaginationSlot");
+        if(!slot||document.getElementById("v141InventoryPager")){ return; }
         const pager=document.createElement("div");
         pager.id="v141InventoryPager";
         pager.className="v141-inventory-pager";
         pager.innerHTML=
             '<button type="button" aria-label="上一頁" onclick="v141ChangeInventoryPage(-1)">←</button>'+
-            '<span id="v141InventoryPageLabel">1 / 7</span>'+
+            '<span id="v141InventoryPageLabel">1 / '+INVENTORY_PAGE_COUNT+'</span>'+
             '<button type="button" aria-label="下一頁" onclick="v141ChangeInventoryPage(1)">→</button>';
-        scroller.insertAdjacentElement("afterend",pager);
+        slot.appendChild(pager);
     }
+
+    window.v141RefreshInventory=function(){
+        if(typeof rebuildInventorySlots==="function"){ rebuildInventorySlots(); }
+        if(typeof renderInventory==="function"){ renderInventory(); }
+        if(typeof updateGoldDisplay==="function"){ updateGoldDisplay(); }
+        return true;
+    };
 
     window.v141ChangeInventoryPage=function(direction){
         inventoryPageIndex=(inventoryPageIndex+Number(direction)+INVENTORY_PAGE_COUNT)%INVENTORY_PAGE_COUNT;
@@ -8601,6 +8609,12 @@
 
             const label=document.getElementById("v141InventoryPageLabel");
             if(label){ label.textContent=(inventoryPageIndex+1)+" / "+INVENTORY_PAGE_COUNT; }
+            const quickSell=document.getElementById("inventoryQuickSellButton");
+            if(quickSell){
+                const equipmentPage=typeof inventoryFilter!=="undefined"&&inventoryFilter==="equipment";
+                quickSell.hidden=!equipmentPage;
+                quickSell.setAttribute("aria-hidden",equipmentPage?"false":"true");
+            }
             document.querySelectorAll("#inventoryCategoryTabs [data-filter]").forEach(tab=>{
                 const active=tab.dataset.filter===inventoryFilter;
                 tab.classList.toggle("active",active);

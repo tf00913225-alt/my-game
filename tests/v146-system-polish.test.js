@@ -205,7 +205,7 @@ test("Abyss rapid taps are locked, one step is bounded and NPC portrait remains 
 });
 
 test("inventory, home, synthesis, nav and slow exit all use the latest mobile contract",()=>{
-    assert.match(ui,/const INVENTORY_PAGE_SIZE=18/);
+    assert.match(ui,/const INVENTORY_PAGE_SIZE=24/);
     assert.match(ui,/←/); assert.match(ui,/→/);
     assert.match(ui,/\},2700\)/);
     assert.match(inventoryCss,/grid-template-rows:repeat\(3,minmax\(0,1fr\)\)/);

@@ -97,7 +97,7 @@
 }
 
 #game-stage #app.on-inventory-page #inventoryPage .inventory-grid-scroll{
-    flex:1 1 auto !important;
+    flex:0 1 auto !important;
     min-height:0 !important;
     overflow-y:auto !important;
     overflow-x:hidden !important;
@@ -106,6 +106,10 @@
     touch-action:pan-y !important;
     padding:0 1px 8px !important;
     scrollbar-gutter:auto !important;
+}
+
+#game-stage #app.on-inventory-page #inventoryPage .inventory-bottom-actions{
+    flex:0 0 auto;
 }
 
 #game-stage #app.on-inventory-page #inventoryPage .inventory-grid-classic{
