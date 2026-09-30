@@ -118,6 +118,7 @@ class Cdp{
 }
 
 const PREPARE_RUNTIME=`(async()=>{
+    // Keep hydration failures observable in the browser artifact.
     const runtimeErrors=[];
     const originalConsoleError=console.error;
     console.error=(...args)=>{runtimeErrors.push(args.map(value=>String(value&&value.stack||value)).join(" "));originalConsoleError(...args);};
