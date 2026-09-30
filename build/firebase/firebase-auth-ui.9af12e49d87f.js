@@ -15,7 +15,7 @@ let resumeGraceUsed=false;
 let resumeActive=false;
 let resumeDeadline=0;
 let resumeInterval=0;
-let state={mode:"AUTH_RESOLVING",user:null,message:"正在初始化 Firebase Authentication…",error:false,migration:null,sessionTest:"",cloudEnvelopeTest:"",cloudPreferencesTest:""};
+let state={mode:"AUTH_RESOLVING",user:null,message:"正在初始化 Firebase Authentication…",error:false,migration:null,sessionTest:"",cloudEnvelopeTest:"",cloudPreferencesTest:"",migrationCandidate:""};
 
 const byId=id=>document.getElementById(id);
 function errorText(error){
@@ -103,6 +103,10 @@ function markup(){
               <button id="firebaseCloudPreferencesTestButton" class="firebase-auth-button secondary" type="button">驗證自動戰鬥設定上雲</button>
               <button id="firebaseCloudPreferencesRestoreButton" class="firebase-auth-button secondary" type="button">取回雲端自動戰鬥設定</button>
             </div>
+            <div id="firebaseMigrationCandidateResult" class="firebase-auth-cloud-state" role="status" aria-live="polite">原手機完整存檔可先封存，再經確認提交為私人候選；目前不能在另一台手機取回角色。</div>
+            <div class="firebase-auth-footer">
+              <button id="firebaseMigrationCandidateButton" class="firebase-auth-button secondary" type="button">封存並提交原手機存檔候選</button>
+            </div>
           </div>
           <div id="firebaseMigrationPanel" hidden>
             <p id="firebaseMigrationMessage" class="firebase-auth-subtitle"></p>
@@ -121,7 +125,7 @@ function markup(){
 }
 function setBusy(value){
     busy=value===true;
-    ["firebaseGoogleButton","firebaseGuestButton","firebaseEmailSignInButton","firebaseEmailCreateButton","firebaseMigrationConfirmButton","firebaseRetryButton","firebaseSignOutButton","firebaseAuthBackButton","firebaseSwitchAccountButton","firebaseSessionTestButton","firebaseCloudEnvelopeTestButton","firebaseCloudPreferencesRestoreButton"].forEach(id=>{ const button=byId(id); if(button){ button.disabled=busy; } });
+    ["firebaseGoogleButton","firebaseGuestButton","firebaseEmailSignInButton","firebaseEmailCreateButton","firebaseMigrationConfirmButton","firebaseRetryButton","firebaseSignOutButton","firebaseAuthBackButton","firebaseSwitchAccountButton","firebaseSessionTestButton","firebaseCloudEnvelopeTestButton","firebaseCloudPreferencesTestButton","firebaseCloudPreferencesRestoreButton","firebaseMigrationCandidateButton"].forEach(id=>{ const button=byId(id); if(button){ button.disabled=busy; } });
 }
 function renderResumeCountdown(){
     if(!resumeActive){ return; }
@@ -163,6 +167,12 @@ function render(){
     if(cloudPreferencesTestResult){
         cloudPreferencesTestResult.textContent=state.cloudPreferencesTest||"只上傳目前 UID 的自動戰鬥設定；不傳角色、金幣、背包或獎勵。";
     }
+    const candidateResult=byId("firebaseMigrationCandidateResult");
+    if(candidateResult){
+        candidateResult.textContent=state.migrationCandidate||"原手機完整存檔可先封存，再經確認提交為私人候選；目前不能在另一台手機取回角色。";
+    }
+    const candidateButton=byId("firebaseMigrationCandidateButton");
+    if(candidateButton){ candidateButton.disabled=busy||state.mode!=="READY"; }
     const migration=byId("firebaseMigrationPanel");
     migration.hidden=state.mode!=="MIGRATION_REQUIRED";
     if(!migration.hidden){
@@ -337,6 +347,91 @@ async function restoreCloudPreferences(){
         state={...state,cloudPreferencesTest:"⚠️ 未能取回設定；請確認原帳號與本機角色，或稍後再試。"};
     }finally{ setBusy(false); render(); }
 }
+async function submitOriginalDeviceMigrationCandidate(){
+    if(busy||!DEV_SESSION_TEST_ENABLED){ return; }
+    if(state.mode!=="READY"){
+        state={...state,migrationCandidate:"請先在原手機完成此 UID 的角色載入。"};
+        render();
+        return;
+    }
+    let stage="backup";
+    let operationUid=null;
+    setBusy(true);
+    state={...state,migrationCandidate:"正在封存原手機完整主存檔、metadata 與附屬資料…"};
+    render();
+    try{
+        const api=window.FourSymbolsFirebase;
+        const repository=window.FourSymbolsAccountSave;
+        if(!api?.getUser||!api.createLocalMigrationBackup||!api.bootstrapCloudSave||
+           !api.resolveCloudSave||!api.submitLegacyMigrationCandidate){
+            throw new Error("MIGRATION_CANDIDATE_UNAVAILABLE");
+        }
+        const user=api.getUser();
+        operationUid=user?.uid||null;
+        if(!user?.uid||repository?.getActiveUid?.()!==user.uid){ throw new Error("ACCOUNT_CHANGED"); }
+        const backup=api.createLocalMigrationBackup();
+        if(!backup?.backupKey){ throw new Error("MIGRATION_BACKUP_INVALID"); }
+        const backupKey=backup.backupKey;
+        state={...state,migrationCandidate:"✅ 原手機完整存檔已封存於本機。正在核對此 UID 的雲端版本…"};
+        render();
+        stage="cloud";
+        await api.bootstrapCloudSave();
+        const cloud=await api.resolveCloudSave(user);
+        const revision=cloud.data?.serverRevision;
+        if(!cloud.exists||cloud.data?.ownerUid!==user.uid||
+           !Number.isSafeInteger(revision)||revision<1||cloud.data.authoritativeStateReady!==false){
+            throw new Error("MIGRATION_CLOUD_ENVELOPE_INVALID");
+        }
+        stage="confirm";
+        if(typeof window.rpgConfirm!=="function"){ throw new Error("CONFIRM_UNAVAILABLE"); }
+        const confirmed=await window.rpgConfirm(
+            "原手機的完整角色主存檔、metadata 與附屬資料已在本機封存。確認後會將這份封存上傳到目前 UID 的私人雲端候選區供後續審查。這不是可玩的雲端角色，另一台手機目前不能取回；原手機存檔不會被覆蓋。要提交嗎？",
+            {title:"提交原手機存檔候選",confirmText:"確認提交候選",cancelText:"取消",primary:true}
+        );
+        if(!confirmed){
+            state={...state,migrationCandidate:"已取消提交；本機不可變備份保留，沒有送出候選。"};
+            return;
+        }
+        if(api.getUser()?.uid!==user.uid||repository.getActiveUid()!==user.uid||state.mode!=="READY"){
+            throw new Error("ACCOUNT_CHANGED");
+        }
+        const latest=await api.resolveCloudSave(user);
+        if(!latest.exists||latest.data?.ownerUid!==user.uid||
+           latest.data?.serverRevision!==revision||latest.data.authoritativeStateReady!==false){
+            throw new Error("CLOUD_REVISION_CONFLICT");
+        }
+        stage="submit";
+        state={...state,migrationCandidate:"正在提交原手機封存；請保持此頁開啟，勿切換帳號…"};
+        render();
+        const result=await api.submitLegacyMigrationCandidate({backupKey,expectedRevision:revision});
+        stage="readback";
+        const after=await api.resolveCloudSave(user);
+        if(api.getUser()?.uid!==user.uid||repository.getActiveUid()!==user.uid){
+            throw new Error("ACCOUNT_CHANGED");
+        }
+        if(!result?.ok||result.uid!==user.uid||result.acceptedAs!=="untrusted-migration-candidate"||
+           result.authoritativeStateReady!==false||!Number.isSafeInteger(result.revision)||
+           !after.exists||after.data?.ownerUid!==user.uid||after.data.authoritativeStateReady!==false||
+           after.data.migrationCandidateStatus!=="received"||
+           after.data.migrationCandidateRevision!==result.revision||
+           after.data.migrationCandidateFingerprint!==result.fingerprint||
+           after.data.serverRevision!==result.serverRevision){
+            throw new Error("MIGRATION_CANDIDATE_READBACK_INVALID");
+        }
+        state={...state,migrationCandidate:`✅ 已提交此 UID 的私人候選（候選 Revision ${result.revision}）；後端仍標記未受信任，另一台手機不能取回角色。原手機存檔與本機備份保留。`};
+    }catch(error){
+        console.error("Firebase original-device migration candidate submission failed:",error);
+        const sessionMessage=sessionTestFailureText(error);
+        if(operationUid&&window.FourSymbolsFirebase?.getUser?.()?.uid!==operationUid){ return; }
+        state={...state,migrationCandidate:!sessionMessage.startsWith("⚠️ 無法確認")
+            ?sessionMessage
+            :stage==="submit"||stage==="readback"
+                ?"⚠️ 提交結果尚未確認；原手機存檔與本機備份保留。請先核對雲端候選狀態，再決定是否重試同一份封存。"
+                :stage==="backup"
+                    ?"⚠️ 原手機完整存檔未能封存，沒有提交。請確認此 UID 角色已載入及手機儲存空間。"
+                    :"⚠️ 尚未提交候選；已建立的本機封存保留。請確認帳號與雲端版本後重試。"};
+    }finally{ setBusy(false); render(); }
+}
 function clearResumeTimer(){
     if(resumeInterval){ window.clearInterval(resumeInterval); resumeInterval=0; }
 }
@@ -388,6 +483,8 @@ function bind(){
     if(cloudPreferencesTestButton){ cloudPreferencesTestButton.addEventListener("click",()=>{ void testCloudPreferences(); }); }
     const cloudPreferencesRestoreButton=byId("firebaseCloudPreferencesRestoreButton");
     if(cloudPreferencesRestoreButton){ cloudPreferencesRestoreButton.addEventListener("click",()=>{ void restoreCloudPreferences(); }); }
+    const migrationCandidateButton=byId("firebaseMigrationCandidateButton");
+    if(migrationCandidateButton){ migrationCandidateButton.addEventListener("click",()=>{ void submitOriginalDeviceMigrationCandidate(); }); }
     byId("firebaseSupportButton").addEventListener("click",()=>window.FourSymbolsSupport.show());
     byId("firebaseAuthBackButton").addEventListener("click",()=>{
         if(!state.user||(state.mode!=="READY"&&state.mode!=="OFFLINE_READY")){ return; }
@@ -411,4 +508,9 @@ export function closeFirebaseAuthUi(){
     }
     return finishClose();
 }
-export function setFirebaseAuthUiState(next={}){ state={...state,...next}; render(); }
+export function setFirebaseAuthUiState(next={}){
+    if(Object.prototype.hasOwnProperty.call(next,"user")&&next.user?.uid!==state.user?.uid){
+        state={...state,migrationCandidate:""};
+    }
+    state={...state,...next}; render();
+}
