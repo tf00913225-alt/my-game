@@ -30808,20 +30808,26 @@ function setInventoryFilter(filter){
     if(scroller) scroller.scrollTop=0;
 }
 
-function getInventoryRarityKey(item){
+const INVENTORY_RARITY_DATA_TO_UI=Object.freeze({
+    white:"white",blue:"blue",purple:"purple",orange:"orange",
+    pink:"red","four-symbol":"myriad",low:"white",mid:"blue",
+    high:"purple",perfect:"orange"
+});
+
+function getInventoryRarityDataKey(item){
     if(!item){ return "white"; }
-    const direct=String(item.rarityKey||item.quality||"").toLowerCase();
-    const allowed=["white","blue","purple","orange","pink","four-symbol"];
-    if(allowed.includes(direct)){ return direct; }
-    const tier=String(item.tierKey||"").toLowerCase();
-    const legacy={low:"white",mid:"blue",high:"purple",perfect:"orange"};
-    if(allowed.includes(tier)){ return tier; }
-    if(legacy[tier]){ return legacy[tier]; }
-    if(item.setId && typeof isEquipmentInventoryType==="function" && isEquipmentInventoryType(item.type)){
-        return "orange";
+    const rawKeys=[item.rarityKey,item.quality,item.tierKey,item.legacyTierKey];
+    for(const raw of rawKeys){
+        const key=String(raw||"").toLowerCase();
+        if(Object.prototype.hasOwnProperty.call(INVENTORY_RARITY_DATA_TO_UI,key)){
+            return key;
+        }
     }
-    const icon=String(item.icon||"");
-    return allowed.find(quality=>icon.includes("rarity-"+quality))||"white";
+    return "white";
+}
+
+function getInventoryRarityKey(item){
+    return INVENTORY_RARITY_DATA_TO_UI[getInventoryRarityDataKey(item)]||"white";
 }
 
 function renderInventoryItems(){

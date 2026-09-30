@@ -589,77 +589,6 @@
     padding:0 4px 4px;
 }
 
-/* ----- Backpack: the standalone page is the only layout owner. ----- */
-#game-stage #app.on-inventory-page #inventoryPage.inventory-page-classic .inventory-classic-shell{
-    width:calc(100% - var(--ui-large-panel-safe-space)) !important;
-    max-width:var(--ui-large-panel-max-width) !important;
-    margin:0 auto !important;
-}
-
-/* Backpack character presentation follows the same black-gold language as the panel. */
-#game-stage #inventoryPage .inventory-character-arrow{
-    width:44px !important;
-    height:44px !important;
-    min-width:44px !important;
-    min-height:44px !important;
-    aspect-ratio:1 / 1 !important;
-    padding:0 !important;
-    border:1px solid #b88a42 !important;
-    border-radius:50% !important;
-    color:#f3cf76 !important;
-    background:
-        radial-gradient(circle at 50% 30%,rgba(246,204,112,.18),transparent 52%),
-        linear-gradient(180deg,#362719,#130e09) !important;
-    box-shadow:
-        inset 0 0 0 1px rgba(255,225,151,.08),
-        inset 0 -8px 14px rgba(0,0,0,.28),
-        0 3px 9px rgba(0,0,0,.48),
-        0 0 8px rgba(205,151,65,.12) !important;
-    font-family:"Noto Serif TC",serif !important;
-    font-size:28px !important;
-    font-weight:900 !important;
-    line-height:42px !important;
-    text-align:center !important;
-    text-shadow:0 1px 2px #000,0 0 6px rgba(240,180,41,.28) !important;
-}
-#game-stage #inventoryPage .inventory-character-arrow:active{
-    color:#fff0b8 !important;
-    background:linear-gradient(180deg,#49341e,#1b120b) !important;
-    transform:translateY(1px) !important;
-}
-#game-stage #inventoryPage #inventoryPortraitFrame{
-    background:
-        radial-gradient(circle at 50% 42%,rgba(194,132,47,.09),transparent 60%),
-        linear-gradient(180deg,#100c08,#060504) !important;
-}
-#game-stage #inventoryPage #inventoryPortraitFrame .v131-inventory-portrait{
-    inset:0 !important;
-    width:100% !important;
-    height:100% !important;
-    object-fit:contain !important;
-    object-position:center center !important;
-}
-#game-stage #inventoryPage #inventoryCharacterDetailButton{
-    overflow:hidden !important;
-    color:transparent !important;
-    font-size:0 !important;
-    line-height:0 !important;
-}
-#game-stage #inventoryPage #inventoryCharacterDetailButton::before{
-    content:"!" !important;
-    display:flex !important;
-    width:100% !important;
-    height:100% !important;
-    align-items:center !important;
-    justify-content:center !important;
-    color:#ffe27a !important;
-    font-family:"Noto Serif TC",serif !important;
-    font-size:27px !important;
-    font-weight:900 !important;
-    line-height:1 !important;
-    text-shadow:0 1px 2px #000,0 0 7px rgba(240,180,41,.34) !important;
-}
-
 @media (max-width:430px){
     #game-stage #homeFeatureModal .v17345-equipment-card{
         grid-template-columns:50px minmax(0,1fr);
@@ -1253,7 +1182,6 @@
 
 #game-stage .home-feature-modal-box button,
 #game-stage .item-modal-box button,
-#game-stage .inventory-classic-shell button,
 #game-stage .creation-skill-detail-box button,
 #game-stage .modal-box button,
 .v132-reward-modal-inner button,
@@ -1273,7 +1201,6 @@
 
 #game-stage .home-feature-modal-box button:hover,
 #game-stage .item-modal-box button:hover,
-#game-stage .inventory-classic-shell button:hover,
 #game-stage .creation-skill-detail-box button:hover,
 #game-stage .modal-box button:hover,
 .v132-reward-modal-inner button:hover,
@@ -1292,7 +1219,6 @@
 
 #game-stage .home-feature-modal-box button:active,
 #game-stage .item-modal-box button:active,
-#game-stage .inventory-classic-shell button:active,
 #game-stage .creation-skill-detail-box button:active,
 #game-stage .modal-box button:active,
 .v132-reward-modal-inner button:active,
@@ -1311,9 +1237,6 @@
 #game-stage .home-feature-modal-box button[aria-pressed="true"],
 #game-stage .item-modal-box button.active,
 #game-stage .item-modal-box button.selected,
-#game-stage .inventory-classic-shell button.active,
-#game-stage .inventory-classic-shell button.selected,
-#game-stage .inventory-classic-shell button[aria-selected="true"],
 #game-stage .creation-skill-detail-box button.active,
 #game-stage .creation-skill-detail-box button.selected{
     border-color:var(--rpg-window-gold-hi,#F0D38A);
@@ -1331,7 +1254,6 @@
 
 #game-stage .home-feature-modal-box button:disabled,
 #game-stage .item-modal-box button:disabled,
-#game-stage .inventory-classic-shell button:disabled,
 #game-stage .creation-skill-detail-box button:disabled,
 #game-stage .modal-box button:disabled,
 .v132-reward-modal-inner button:disabled,
@@ -1346,7 +1268,6 @@
 #game-stage .home-feature-modal-box .character-tab,
 #game-stage .home-feature-modal-box .v141-synthesis-tabs button,
 #game-stage .home-feature-modal-box .v17345-shop-tabs button,
-#game-stage .inventory-classic-shell .inventory-category-tab{
     border-color:var(--rpg-window-gold-dark,#73582D);
     color:var(--rpg-window-muted,#B9AD98);
     background:linear-gradient(180deg,#242019,#12110E);
@@ -1357,8 +1278,6 @@
 #game-stage .home-feature-modal-box .character-tab.active,
 #game-stage .home-feature-modal-box .v141-synthesis-tabs button.active,
 #game-stage .home-feature-modal-box .v17345-shop-tabs button.active,
-#game-stage .inventory-classic-shell .inventory-category-tab.active,
-#game-stage .inventory-classic-shell .inventory-category-tab.selected{
     border-color:var(--rpg-window-gold-hi,#F0D38A);
     color:#FFF0BE;
     background:
@@ -1374,7 +1293,6 @@
 #game-stage .item-modal-box .close-item-button,
 #game-stage .creation-skill-detail-box .creation-skill-detail-close,
 #game-stage .creation-skill-detail-box .creation-skill-detail-x,
-#game-stage .inventory-classic-shell .map-inventory-overlay-close{
     border-color:#9B773B;
     color:var(--rpg-window-text,#EEE7D8);
     background:linear-gradient(180deg,#342C20,#171510 62%,#0D0C09);

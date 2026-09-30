@@ -1442,7 +1442,7 @@
             img.draggable=false;
             frame.insertBefore(img,frame.firstChild);
         }
-        img.src=getCharacterArtworkPath(character);
+        img.src=getCharacterBattleArtworkPath(character);
         img.alt=(character.id||"角色")+"立繪";
     }
 
@@ -2633,6 +2633,7 @@
                 icon:equipmentSetIcon(set.id,piece.key),
                 type:piece.slot,
                 setId:set.id,
+                tierKey:"orange",
                 levelRequirement:20,
                 price:0,
                 stats:Object.assign({},piece.stats)

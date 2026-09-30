@@ -89,21 +89,7 @@
     display:flex !important;
     align-items:center !important;
     justify-content:space-between !important;
-    border:1px solid rgba(138,106,58,.65) !important;
-    border-radius:7px !important;
-    background:linear-gradient(180deg,rgba(36,28,18,.78),rgba(10,8,5,.88)) !important;
     box-sizing:border-box !important;
-}
-#game-stage #app.on-inventory-page #inventoryPage .inventory-wallet-label{
-    color:#b9aa91 !important;
-    font-size:12px !important;
-    font-weight:700 !important;
-}
-#game-stage #app.on-inventory-page #inventoryPage .inventory-wallet-value{
-    color:#ffe27a !important;
-    font-size:14px !important;
-    font-weight:900 !important;
-    font-variant-numeric:tabular-nums !important;
 }
 
 #game-stage #app.on-inventory-page #inventoryPage .inventory-category-tabs{

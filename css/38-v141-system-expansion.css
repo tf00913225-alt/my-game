@@ -1018,7 +1018,6 @@
 
 /* ----- Small-height phones: compress while the synthesis body remains the vertical scroll owner. ----- */
 @media (max-height:720px){
-    #game-stage #inventoryPage .inventory-character-stage{--inventory-stage-height:205px !important;}
     #game-stage #homeFeatureModal.v141-synthesis-modal .home-feature-modal-box{height:98dvh !important;max-height:98dvh !important;padding:8px !important;}
     #game-stage .v141-synthesis{gap:4px;}
     #game-stage .v141-synthesis-card{padding:7px;}

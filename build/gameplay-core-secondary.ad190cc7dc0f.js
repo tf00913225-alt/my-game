@@ -7332,7 +7332,7 @@
     const BULK_SELL_KEY=window.FourSymbolsAccountSave.accountKey("bulk-sell-quality");
     const EQUIPMENT_TYPES=new Set(["head","shoulder","shoes","weapon","hand","armor"]);
     const QUALITY_ORDER=["white","blue","purple","orange","pink","four-symbol"];
-    const QUALITY_LABEL={white:"白階",blue:"藍階",purple:"紫階",orange:"橙階",pink:"桃紅階","four-symbol":"四象階"};
+    const QUALITY_LABEL={white:"白階",blue:"藍階",purple:"紫階",orange:"橙階",pink:"紅階","four-symbol":"萬象階"};
     const TIER_TO_QUALITY={white:"white",blue:"blue",purple:"purple",orange:"orange",pink:"pink","four-symbol":"four-symbol",low:"white",mid:"blue",high:"purple",perfect:"orange"};
     const SUPPORTED_BATCH_CHEST_IDS=new Set(["materialChest","equipmentChest"]);
 
@@ -7357,15 +7357,14 @@
 
     function equipmentQuality(item){
         if(!item){ return null; }
+        if(typeof getInventoryRarityDataKey==="function"){
+            const canonical=getInventoryRarityDataKey(item);
+            return QUALITY_ORDER.includes(canonical)?canonical:null;
+        }
         const direct=String(item.rarityKey||item.quality||"").toLowerCase();
         if(QUALITY_ORDER.includes(direct)){ return direct; }
         const tier=String(item.tierKey||"").toLowerCase();
         if(TIER_TO_QUALITY[tier]){ return TIER_TO_QUALITY[tier]; }
-        if(isInventoryEquipment(item)&&item.setId){ return "orange"; }
-        const icon=String(item.icon||"");
-        for(const quality of QUALITY_ORDER){
-            if(icon.includes("rarity-"+quality)){ return quality; }
-        }
         return null;
     }
 
@@ -7576,8 +7575,8 @@
                     '<option value="blue">藍階以下</option>'+
                     '<option value="purple">紫階以下</option>'+
                     '<option value="orange">橙階以下</option>' +
-                    '<option value="pink">桃紅階以下</option>' +
-                    '<option value="four-symbol">四象階以下</option>'+
+                    '<option value="pink">紅階以下</option>' +
+                    '<option value="four-symbol">萬象階以下</option>'+
                 '</select>'+
                 '<button id="v17350BulkSellButton" type="button" onclick="v17350BulkSellEquipment()">售出 0 件</button>'+
                 '<small id="v17350BulkSellMeta">僅售出背包內未穿戴裝備</small>';
