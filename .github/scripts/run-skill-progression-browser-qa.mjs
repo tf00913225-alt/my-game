@@ -189,6 +189,7 @@ async function runViewport(chrome,url,width,height,capture){
     const port=9400+Math.floor(Math.random()*300);
     const proc=spawn(chrome,["--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--remote-debugging-address=127.0.0.1","--remote-debugging-port="+port,"--user-data-dir="+profile,"about:blank"],{stdio:"ignore"});
     let client=null;
+    let latestEvidence=null;
     try{
         const targets=await waitJson(`http://127.0.0.1:${port}/json/list`);
         const page=targets.find(item=>item.type==="page");
@@ -205,6 +206,7 @@ async function runViewport(chrome,url,width,height,capture){
         await client.send("Page.navigate",{url});
         await client.eval(PREPARE_RUNTIME);
         const evidence=await client.eval(COLLECT_EVIDENCE);
+        latestEvidence=evidence;
         assert.equal(evidence.runtime.renderer,true,"QA did not execute the formal renderSkillLoadout owner");
         for(const [name,action] of Object.entries(evidence.water)){ assertVisibleAction(name,action); }
         for(const [element,item] of Object.entries(evidence.elements)){ assertVisibleAction(element+"/"+item.skillId,item.action); }
@@ -221,6 +223,9 @@ async function runViewport(chrome,url,width,height,capture){
             fs.writeFileSync(path.join(ARTIFACT_DIR,"skill-393x873.png"),Buffer.from(screenshot.data,"base64"));
         }
         return {viewport:{width,height},evidence};
+    }catch(error){
+        error.skillRuntimeEvidence=latestEvidence;
+        throw error;
     }finally{
         client?.close();proc.kill("SIGTERM");
         try{fs.rmSync(profile,{recursive:true,force:true});}catch(_){}
@@ -238,6 +243,6 @@ try{
     fs.writeFileSync(path.join(ARTIFACT_DIR,"skill-inventory-semantic-browser-qa.json"),JSON.stringify(evidence,null,2)+"\n","utf8");
     console.log("Real Skill Runtime mobile browser QA passed:",VIEWPORTS.map(item=>item.join("x")).join(", "));
 }catch(error){
-    fs.writeFileSync(path.join(ARTIFACT_DIR,"skill-inventory-semantic-browser-qa.json"),JSON.stringify({suite:"skill-runtime-browser-qa",passed:false,error:String(error?.stack||error)},null,2)+"\n","utf8");
+    fs.writeFileSync(path.join(ARTIFACT_DIR,"skill-inventory-semantic-browser-qa.json"),JSON.stringify({suite:"skill-runtime-browser-qa",passed:false,error:String(error?.stack||error),evidence:error?.skillRuntimeEvidence||null},null,2)+"\n","utf8");
     throw error;
 }finally{ await new Promise(resolve=>server.server.close(resolve)); }
