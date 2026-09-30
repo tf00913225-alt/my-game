@@ -40,7 +40,7 @@ const equipmentProgressionSource=fs.readFileSync(path.join(root,"js/equipment-pr
 const stylePaths=[...(manifest.critical?.styles||[]),...Object.values(manifest.featureManifest?.bundles||{}).flatMap(bundle=>bundle.styles||[])].filter((v,i,a)=>v&&a.indexOf(v)===i);
 assert.ok(stylePaths.some(file=>file.includes("gameplay-core")),"fixture must load the production gameplay CSS bundle");
 const styleLinks=stylePaths.map(file=>`<link rel="stylesheet" href="${file}">`).join("");
-const injectedRarityMatch=equipmentProgressionSource.match(/\.v17346-rarity-white[\\s\\S]*?@keyframes v17360FourSymbolRarityBreath\\{[\\s\\S]*?\\}/);
+const injectedRarityMatch=equipmentProgressionSource.match(/\.v17346-rarity-white[\s\S]*?@keyframes v17360FourSymbolRarityBreath\{[\s\S]*?\}/);
 assert.ok(injectedRarityMatch,"fixture must source v17346 rarity CSS from equipment-progression.js");
 const injectedEquipmentProgressionRarityStyle=`<style id="equipment-progression-style">${injectedRarityMatch[0]}</style>`;
 const art=`<span class="v169-item-art v169-equipment-art v169-rarity-orange v17346-rarity-orange inventory-backpack-rarity-neutral"><img alt="裝備" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Crect width='64' height='64' fill='%23c88f30'/%3E%3C/svg%3E"></span>`;
