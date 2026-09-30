@@ -229,7 +229,11 @@ function screenLegacyCandidateSnapshot(save,sidecars=null){
     }
     const rewardAudit=auditLegacyRewardClaims(save,sidecars);
     rewardAudit.blockers.forEach(blocker=>blockers.add(blocker));
-    if(!sidecars||CLAIM_SIDECARS.some(key=>sidecars[key]?.status!=="present")){
+    // Report only allowlisted source names from the sealed inventory. Never
+    // return raw bytes or infer a default claim from a missing marker.
+    const missingClaimSidecars=sidecars?CLAIM_SIDECARS.filter(key=>
+        sidecars[key]?.status!=="present"):[];
+    if(!sidecars||missingClaimSidecars.length){
         blockers.add("SIDECAR_BACKUP_MISSING");
     }
     if(sidecars&&CLAIM_SIDECARS.some(key=>{
@@ -245,6 +249,7 @@ function screenLegacyCandidateSnapshot(save,sidecars=null){
         status:"blocked",readyForAcceptance:false,
         characterCount:characters.length,
         historicalRewardClaims:rewardAudit,
+        missingClaimSidecars:Object.freeze(missingClaimSidecars),
         blockers:Object.freeze([...blockers].sort())
     });
 }
