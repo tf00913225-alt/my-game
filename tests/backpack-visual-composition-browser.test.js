@@ -1,4 +1,5 @@
 "use strict";
+/* Production-stack fixture root is constrained to the emulated viewport. */
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const path=require("node:path");
