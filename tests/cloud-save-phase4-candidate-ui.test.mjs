@@ -94,3 +94,16 @@ test("ambiguous readback does not claim successful migration",async()=>{
     assert.equal(h.events.some(item=>Array.isArray(item)&&item[0]==="submit"),true);
     assert.match(h.context.state.migrationCandidate,/結果尚未確認/);
 });
+
+test("leaving READY clears a pending candidate confirmation",()=>{
+    const start=source.indexOf("export function setFirebaseAuthUiState(next={}){");
+    assert.ok(start>=0);
+    const context={
+        candidateConfirmation:{uid:"uid-a",backupKey:"sealed-a",revision:2},
+        state:{user:{uid:"uid-a"},mode:"READY",migrationCandidate:"已封存"},
+        render:()=>{}
+    };
+    vm.runInNewContext(source.slice(start).replace(/^export /,""),context);
+    context.setFirebaseAuthUiState({mode:"SAVE_LOADING"});
+    assert.equal(context.candidateConfirmation,null);
+});
