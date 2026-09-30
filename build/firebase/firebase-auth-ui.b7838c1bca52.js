@@ -454,7 +454,7 @@ async function submitOriginalDeviceMigrationCandidate(){
 }
 const CANDIDATE_BLOCKER_LABELS=Object.freeze({
     HISTORICAL_REWARDS_UNVERIFIED:"歷史獎勵來源尚未證實，不能據此發放獎勵",
-    SIDECAR_BACKUP_MISSING:"附屬資料封存不完整",
+    SIDECAR_BACKUP_MISSING:"領獎附屬來源缺少或尚無完整封存",
     SIDECAR_CLAIM_RECORD_INVALID:"附屬資料領獎紀錄格式不正確",
     CHARACTER_SLOT_MISSING:"主要角色資料缺失",CHARACTER_SLOT_GAP:"角色欄位不連續",
     CHARACTER_STRUCTURE_INVALID:"角色結構不正確",DUPLICATE_CHARACTER_ID:"角色識別重複",
@@ -469,8 +469,17 @@ const CANDIDATE_BLOCKER_LABELS=Object.freeze({
     RELIC_REFERENCE_INVALID:"裝備中的秘寶無法對應",
     CLAIM_PROGRESS_MISSING:"領獎進度資料缺失"
 });
-function candidateBlockerText(code){
+const CLAIM_SIDECAR_LABELS=Object.freeze({
+    "daily-dungeon-state":"每日副本","progress":"帳號進度",
+    "quest-milestones":"任務里程碑","task-tracker":"任務追蹤",
+    "legacy-abyss-state":"舊版深淵","equipment-shop-daily":"裝備商店每日紀錄",
+    "equipment-shop-purchases":"裝備商店購買紀錄","abyss-state":"深淵紀錄"
+});
+function candidateBlockerText(code,missingClaimSidecars=[]){
     if(typeof code!=="string"||!/^[A-Z][A-Z0-9_]{0,90}$/.test(code)){ return "未知阻擋原因（請保留原手機資料）"; }
+    if(code==="SIDECAR_BACKUP_MISSING"&&missingClaimSidecars.length){
+        return `原始封存缺少領獎附屬來源：${missingClaimSidecars.map(key=>`${CLAIM_SIDECAR_LABELS[key]}（${key}）`).join("、")}（${code}）`;
+    }
     const claim=/^([A-Z0-9_]+)_CLAIM_(RECORD_INVALID|MIRROR_CONFLICT)$/.exec(code);
     if(claim){
         const sources={DAILY_QUESTS:"每日任務",COMMISSION_QUESTS:"委託",ACHIEVEMENTS:"成就",TOWER:"四象塔",ABYSS:"深淵",QUEST_MILESTONES:"任務里程碑",ABYSS_SIDECAR:"深淵附屬資料"};
@@ -505,6 +514,15 @@ async function screenCurrentMigrationCandidate(){
            !Array.isArray(result.blockers)||result.blockers.some(code=>typeof code!=="string")){
             throw new Error("SCREEN_RESULT_INVALID");
         }
+        // Only known source names are safe to display. Older deployed backend
+        // responses may lack this diagnostic and retain the generic blocker.
+        const missing=result.missingClaimSidecars;
+        if(missing!==undefined&&(!Array.isArray(missing)||
+           missing.some(key=>!Object.prototype.hasOwnProperty.call(CLAIM_SIDECAR_LABELS,key))||
+           new Set(missing).size!==missing.length||
+           (missing.length>0&&!result.blockers.includes("SIDECAR_BACKUP_MISSING")))){
+            throw new Error("SCREEN_RESULT_INVALID");
+        }
         const after=await api.resolveCloudSave(user);
         if(api.getUser?.()?.uid!==uid||state.mode!=="READY"){ throw new Error("ACCOUNT_CHANGED"); }
         if(!after.exists||after.data?.ownerUid!==uid||after.data.serverRevision!==serverRevision||
@@ -512,7 +530,8 @@ async function screenCurrentMigrationCandidate(){
            after.data.migrationCandidateStatus!=="received"||
            after.data.migrationCandidateFingerprint!==result.fingerprint||
            after.data.authoritativeStateReady!==false){ throw new Error("CLOUD_REVISION_CONFLICT"); }
-        const reasons=result.blockers.length?result.blockers.map(candidateBlockerText).join("；"):"後端尚未允許採納";
+        const reasons=result.blockers.length?result.blockers.map(code=>
+            candidateBlockerText(code,missing||[])).join("；"):"後端尚未允許採納";
         state={...state,candidateScreening:`候選 Revision ${candidateRevision} 唯讀審查：仍受阻擋。原因：${reasons}。原手機存檔與封存保留；不能在其他手機取回角色，Phase 4 仍未驗收。`};
     }catch(error){
         console.error("Firebase candidate screening failed:",error);

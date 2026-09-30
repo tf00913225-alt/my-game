@@ -25,6 +25,7 @@ test("historical main save cannot pass screening without sidecar and reward prov
     assert.equal(review.readyForAcceptance,false);
     assert.equal(review.characterCount,1);
     assert.deepEqual(review.blockers,["HISTORICAL_REWARDS_UNVERIFIED","SIDECAR_BACKUP_MISSING"]);
+    assert.deepEqual(review.missingClaimSidecars,[]); // older unbundled candidate: no inferred source status
     assert.equal(review.blockers.includes("CHARACTER_SLOT_GAP"),false);
     const inconsistent=screenLegacyCandidateSnapshot({...save,
         player2:{...save.player,element:"other"},inventoryItems:[{id:"potion",count:0}],
@@ -154,6 +155,9 @@ test("read-only draft keeps empty slots and equipped objects separate from the b
     assert.deepEqual(prepareLegacyCharacterDraft(save,missing).retainedSidecars["equipment-shop-purchases"],
         {status:"missing",raw:null});
     assert.ok(screenLegacyCandidateSnapshot(save,missing).blockers.includes("SIDECAR_BACKUP_MISSING"));
+    assert.deepEqual(screenLegacyCandidateSnapshot(save,missing).missingClaimSidecars,
+        ["equipment-shop-purchases"]);
+    assert.deepEqual(screenLegacyCandidateSnapshot(save,sidecars).missingClaimSidecars,[]);
     const incomplete={...sidecars};delete incomplete["rested-exp-state"];
     assert.equal(prepareLegacyCharacterDraft(save,incomplete),null);
     const diverged={...sidecars,"abyss-state":{status:"present",raw:JSON.stringify({runs:{
