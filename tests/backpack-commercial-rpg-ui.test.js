@@ -11,7 +11,7 @@ const manifest=JSON.parse(read("build/asset-manifest.json"));
 const gameplayBundle=read(manifest.featureManifest.bundles["gameplay-core"].styles[0]);
 
 assert.equal((html.match(/id="inventoryPage"/g)||[]).length,1,"backpack must keep one DOM owner");
-assert.match(html,/class="inventory-title-plate"[\s\S]*?<h2>行囊<\/h2>/);
+assert.match(html,/class="inventory-title-plate"[\s\S]*?<h2>背包<\/h2>/);
 assert.match(html,/id="inventoryGridScroll" data-scroll-owner="y"/);
 assert.match(core,/inventory-classic-shell:before/);
 assert.match(core,/inventory-title-plate/);
