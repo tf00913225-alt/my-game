@@ -2240,7 +2240,7 @@ function getActiveBuffPercent(
     buffType
 ){
 
-    if(!character.activeBuffs){
+    if(!character || !character.activeBuffs){
         return 0;
     }
 
