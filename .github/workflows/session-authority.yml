@@ -139,6 +139,17 @@ jobs:
           fi
           FIRESTORE_DATABASE_JSON="${database_json:-}" FIRESTORE_BACKUPS_JSON="$backups_json" \
             node scripts/firestore-backup-readiness.mjs | tee -a "$GITHUB_STEP_SUMMARY"
+          if databases_json="$(gcloud firestore databases list --project=four-symbols-jianghu --format=json)"; then
+            DATABASES_JSON="$databases_json" node -e '
+              const databases=JSON.parse(process.env.DATABASES_JSON);
+              if(!Array.isArray(databases)) throw Error("Unexpected database list");
+              const leftovers=databases.map(d=>d.name).filter(n=>/^projects\\/four-symbols-jianghu\\/databases\\/restore-drill-[0-9]+-[0-9]+$/.test(n));
+              console.log(`Restore drill leftovers: ${leftovers.length}`);
+              for(const name of leftovers) console.log(`Leftover: ${name}`);
+            ' | tee -a "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'Restore drill leftovers: UNVERIFIED (database list unavailable)' | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -149,112 +160,3 @@ jobs:
           test "$(git ls-remote origin refs/heads/dev | cut -f1)" = "$GITHUB_SHA"
           npx --yes firebase-tools@15.30.0 deploy --project four-symbols-jianghu --non-interactive --force --only 'functions:createGameSession,functions:revokeGameSession,functions:protectedTest,functions:issueCanonicalRecoveryApproval,functions:restoreCanonicalCurrent,functions:createInitialCanonicalCharacter,functions:bootstrapCloudSave,functions:submitLegacyMigrationCandidate,functions:screenLegacyMigrationCandidate,functions:saveCloudPreferences,functions:reserveTrustedGrant,functions:claimDailyCheckin,functions:purchaseCanonicalPotion,functions:createNativeAuthHandoff,functions:redeemNativeAuthHandoff,firestore:rules'
 
-  restore_drill:
-    name: One-time isolated Firestore restore drill
-    needs: deploy
-    if: github.event_name == 'push' && github.ref == 'refs/heads/dev' && contains(github.event.head_commit.message, '[firestore-restore-drill]')
-    runs-on: ubuntu-latest
-    timeout-minutes: 90
-    concurrency:
-      group: firebase-isolated-restore-drill
-      cancel-in-progress: false
-    steps:
-      - uses: actions/checkout@v4
-      - name: Require exact current dev commit
-        shell: bash
-        run: test "$(git ls-remote origin refs/heads/dev | cut -f1)" = "$GITHUB_SHA"
-      - uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.FIREBASE_DEPLOY_SERVICE_ACCOUNT_JSON }}
-          project_id: four-symbols-jianghu
-      - uses: google-github-actions/setup-gcloud@v2
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - run: npm --prefix functions ci --no-audit --no-fund
-      - name: Restore to disposable named database, inspect, then delete it
-        shell: bash
-        env:
-          PROJECT_ID: four-symbols-jianghu
-          DRILL_ID: restore-drill-${{ github.run_id }}-${{ github.run_attempt }}
-        run: |
-          set -euo pipefail
-          test "$DRILL_ID" != '(default)'
-          [[ "$DRILL_ID" =~ ^restore-drill-[0-9]+-[0-9]+$ ]]
-          echo "### Isolated Firestore backup restore at $GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
-          echo "Destination: $DRILL_ID (disposable)" >> "$GITHUB_STEP_SUMMARY"
-          source_json="$(gcloud firestore databases describe --database='(default)' --project="$PROJECT_ID" --format=json)"
-          backups_json="$(gcloud firestore backups list --project="$PROJECT_ID" --format=json)"
-          backup_name="$(FIRESTORE_DATABASE_JSON="$source_json" FIRESTORE_BACKUPS_JSON="$backups_json" node --input-type=module -e '
-            import {inspectFirestoreBackups} from "./scripts/firestore-backup-readiness.mjs";
-            const result=inspectFirestoreBackups(JSON.parse(process.env.FIRESTORE_DATABASE_JSON),JSON.parse(process.env.FIRESTORE_BACKUPS_JSON));
-            if(result.status!=="READY") throw Error(result.reason);
-            process.stdout.write(result.name);
-          ')"
-          echo "Source backup: $backup_name" >> "$GITHUB_STEP_SUMMARY"
-          expected_region="$(SOURCE_JSON="$source_json" node -e 'process.stdout.write(JSON.parse(process.env.SOURCE_JSON).locationId)')"
-          restored_uid=''
-          cleanup() {
-            status=$?
-            trap - EXIT
-            if [[ -n "$restored_uid" ]]; then
-              current_json="$(gcloud firestore databases describe --database="$DRILL_ID" --project="$PROJECT_ID" --format=json)" || {
-                echo "::error::Cannot inspect disposable database for cleanup: $DRILL_ID"
-                exit 1
-              }
-              if ! DEST_JSON="$current_json" DEST_ID="$DRILL_ID" BACKUP_NAME="$backup_name" RESTORED_UID="$restored_uid" node -e '
-                const d=JSON.parse(process.env.DEST_JSON);
-                if(d.name!==`projects/four-symbols-jianghu/databases/${process.env.DEST_ID}` ||
-                   d.uid!==process.env.RESTORED_UID ||
-                   d.sourceInfo?.backup?.backup!==process.env.BACKUP_NAME) process.exit(1);
-              '; then
-                echo "::error::Cleanup identity guard refused deletion of $DRILL_ID"
-                exit 1
-              fi
-              if gcloud firestore databases delete --database="$DRILL_ID" --project="$PROJECT_ID" --quiet; then
-                echo "Cleanup: deleted disposable $DRILL_ID (UID $restored_uid)" >> "$GITHUB_STEP_SUMMARY"
-              else
-                echo "::error::Disposable $DRILL_ID could not be deleted; manual cleanup required."
-                exit 1
-              fi
-            elif [[ "$restore_started" == 1 ]]; then
-              echo "::error::Restore started but destination identity was not verified. Inspect $DRILL_ID before manual cleanup."
-              exit 1
-            fi
-            exit "$status"
-          }
-          restore_started=0
-          trap cleanup EXIT
-          # A new ID is mandatory; never delete or restore over the live default database.
-          if gcloud firestore databases describe --database="$DRILL_ID" --project="$PROJECT_ID" --format=json >/dev/null 2>&1; then
-            echo "::error::Disposable destination already exists."
-            exit 1
-          fi
-          test "$(git ls-remote origin refs/heads/dev | cut -f1)" = "$GITHUB_SHA"
-          restore_started=1
-          gcloud firestore databases restore --source-backup="$backup_name" --destination-database="$DRILL_ID" --project="$PROJECT_ID" --quiet
-          dest_json="$(gcloud firestore databases describe --database="$DRILL_ID" --project="$PROJECT_ID" --format=json)"
-          restored_uid="$(DEST_JSON="$dest_json" DEST_ID="$DRILL_ID" BACKUP_NAME="$backup_name" SOURCE_REGION="$expected_region" node -e '
-            const d=JSON.parse(process.env.DEST_JSON);
-            if(d.name!==`projects/four-symbols-jianghu/databases/${process.env.DEST_ID}` ||
-               !d.uid || d.locationId!==process.env.SOURCE_REGION ||
-               d.sourceInfo?.backup?.backup!==process.env.BACKUP_NAME) process.exit(1);
-            process.stdout.write(d.uid);
-          ')"
-          echo "Restore: source provenance, region and new database UID verified" >> "$GITHUB_STEP_SUMMARY"
-          DRILL_DB="$DRILL_ID" PROJECT_ID="$PROJECT_ID" node --input-type=module -e '
-            import {createRequire} from "node:module";
-            const require=createRequire(new URL("./functions/package.json",import.meta.url));
-            const {initializeApp,applicationDefault}=require("firebase-admin/app");
-            const {getFirestore}=require("firebase-admin/firestore");
-            const app=initializeApp({credential:applicationDefault(),projectId:process.env.PROJECT_ID});
-            const db=getFirestore(app,process.env.DRILL_DB);
-            const collections=await db.listCollections();
-            let readable=0;
-            for(const collection of collections){
-              await collection.limit(1).get();
-              readable++;
-            }
-            console.log(`Restored root collections readable: ${readable}`);
-          ' | tee -a "$GITHUB_STEP_SUMMARY"
-          echo "Restore rehearsal: VERIFIED (database restore and reads only; no playable character assertion)" >> "$GITHUB_STEP_SUMMARY"
