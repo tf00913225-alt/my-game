@@ -163,7 +163,7 @@
         damageDown:statusVisual("","icon","statusEffects",{label:"殤風",statusName:"殤風",iconSrc:"assets/vfx/status/damage-down-icon.webp"}),
         stun:statusVisual("assets/vfx/status/stun.webp","pulse","statusEffects",{label:"暈眩",statusName:"暈眩",iconSrc:"assets/vfx/status/stun-icon.webp"}),
         dodgeSkill:statusVisual("assets/vfx/status/windwalk.webp","pulse","activeBuffs",{label:"風行",statusName:"風行",iconSrc:"assets/vfx/status/windwalk.webp"}),
-        stealthSkill:statusVisual("assets/vfx/status/stealth.webp","static","activeBuffs",{label:"隱身",statusName:"隱身",iconSrc:"assets/vfx/status/stealth.webp"}),
+        stealthSkill:statusVisual("","none","activeBuffs",{label:"隱身",statusName:"隱身",noBodyVisual:true,noHudIcon:true}),
         dinghaishenzhen:statusVisual("assets/vfx/status/calm-mind.webp","pulse","activeBuffs",{label:"氣定神閒",statusName:"氣定神閒",iconSrc:"assets/vfx/status/calm-mind.webp"}),
         defenseDown:statusVisual("","icon","statusEffects",{label:"破防",statusName:"破防",iconSrc:"assets/vfx/status/defense-down-icon.webp"}),
         shield:statusVisual("assets/vfx/status/shield.webp","static","activeBuffs",{label:"護盾",statusName:"岩盾",iconSrc:"assets/vfx/status/shield.webp"}),
@@ -172,7 +172,7 @@
         rockWall:statusVisual("assets/vfx/status/rock-wall.webp","static","activeBuffs",{label:"岩石壁壘",statusName:"岩石壁壘",iconSrc:"assets/vfx/status/rock-wall.webp"}),
         barrier:statusVisual("assets/vfx/status/barrier.webp","static","activeBuffs",{label:"結界",statusName:"結界",iconSrc:"assets/vfx/status/barrier.webp"}),
         yuanZuBlessing:statusVisual("assets/vfx/status/yuan-zu-blessing.webp","pulse","activeBuffs",{label:"元祖賜福",statusName:"元祖賜福",iconSrc:"assets/vfx/status/yuan-zu-blessing.webp"}),
-        fireMomentum:statusVisual("","icon","activeBuffs",{label:"炎勢",statusName:"炎勢",iconSrc:"assets/vfx/status/fire-momentum-icon.webp"}),
+        fireMomentum:statusVisual("","none","activeBuffs",{label:"炎勢",statusName:"炎勢",noBodyVisual:true,noHudIcon:true}),
         phoenixMight:statusVisual("","icon","activeBuffs",{label:"鳳威",statusName:"鳳威",iconSrc:"assets/vfx/status/phoenix-might-icon.webp"}),
         fireSoulResonance:statusVisual("assets/vfx/status/fire-soul-resonance.webp","pulse","activeBuffs",{label:"炎魂共鳴",statusName:"炎魂共鳴",iconSrc:"assets/vfx/status/fire-soul-resonance.webp"}),
         bloodBurn:statusVisual("assets/vfx/status/blood-burn.webp","pulse","activeBuffs",{label:"焚血",statusName:"焚血",iconSrc:"assets/vfx/status/blood-burn.webp"})
@@ -605,6 +605,10 @@
         const alive=!!(spec&&card&&entity&&Number(entity.hp)>0&&(side!=="monster"||entity.alive!==false));
         const active=alive&&hasTimedEffect(entity,type);
         if(!active||deferredStatusDuringCast(side,index,type)){
+            removeStatusVisual(card,side,index,type);
+            return;
+        }
+        if(spec.noBodyVisual&&spec.noHudIcon){
             removeStatusVisual(card,side,index,type);
             return;
         }
