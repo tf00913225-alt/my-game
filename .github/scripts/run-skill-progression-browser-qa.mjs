@@ -195,6 +195,12 @@ async function runViewport(chrome,url,width,height,capture){
         assert.ok(page?.webSocketDebuggerUrl);
         client=new Cdp(page.webSocketDebuggerUrl);
         await client.send("Page.enable");await client.send("Runtime.enable");await client.send("Log.enable");
+        // This is the production account repository's persisted owner key, seeded before
+        // any formal bundle evaluates.  It supplies a syntactically valid, isolated QA
+        // identity without replacing Firebase, the feature loader, or any Skill Runtime
+        // owner.  Feature modules call accountKey() during installation, so setting this
+        // only after navigation is too late and produces a false bootstrap failure.
+        await client.send("Page.addScriptToEvaluateOnNewDocument",{source:'localStorage.setItem("four_symbols_active_uid","skill-runtime-browser-qa");'});
         await client.send("Emulation.setDeviceMetricsOverride",{width,height,deviceScaleFactor:1,mobile:true,screenWidth:width,screenHeight:height,screenOrientation:{type:"portraitPrimary",angle:0}});
         await client.send("Page.navigate",{url});
         await client.eval(PREPARE_RUNTIME);
