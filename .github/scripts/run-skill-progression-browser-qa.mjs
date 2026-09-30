@@ -134,7 +134,16 @@ const PREPARE_RUNTIME=`(async()=>{
         const rect=list?.getBoundingClientRect();
         return !!(modal?.classList.contains("show")&&rect&&rect.width>0&&rect.height>0);
     })){
-        throw new Error("formal Character Skill surface did not enter the player viewport");
+        const describe=id=>{
+            const node=document.getElementById(id);
+            if(!node){return {id,exists:false};}
+            const style=getComputedStyle(node),rect=node.getBoundingClientRect();
+            return {id,exists:true,className:node.className,hidden:node.hidden,inlineDisplay:node.style.display,display:style.display,visibility:style.visibility,opacity:style.opacity,rect:{width:rect.width,height:rect.height,left:rect.left,top:rect.top}};
+        };
+        throw new Error("formal Character Skill surface did not enter the player viewport: "+JSON.stringify({
+            startupState:window.FourSymbolsStartupPolicy?.getState?.(),
+            nodes:["game-viewport","game-stage","app","game-content","homePage","homeFeatureModal","homeFeatureModalBody","characterTabContent","skillPage","allSkillsList"].map(describe)
+        }));
     }
     if(typeof window.v146SyncCharacterAttentionDots==="function"){ window.v146SyncCharacterAttentionDots(); }
     return true;
