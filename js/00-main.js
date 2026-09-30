@@ -29627,6 +29627,7 @@ function renderSkillLoadout(){
 
         box.className =
             "skill-row";
+        box.dataset.skillId=skillId;
 
 
         let actionLabel;
