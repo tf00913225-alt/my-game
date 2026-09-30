@@ -6,9 +6,9 @@ import {
 } from "./firebase-auth.f756f769b4e4.js";
 import {
     bootstrapTrustedCloudSave,createInitialCanonicalCharacter,CLOUD_FUNCTIONS_REGION,CLOUD_SAVE_WRITE_POLICY,readCurrentCloudSave,saveLocalAutoBattlePreferences,createLocalMigrationBackup,
-    submitLegacyMigrationCandidate
-} from "./firebase-cloud-save.a1432ab4a351.js";
-import {closeFirebaseAuthUi,installFirebaseAuthUi,openFirebaseAuthUi,setFirebaseAuthUiState} from "./firebase-auth-ui.30fdc1eabded.js";
+    submitLegacyMigrationCandidate,screenLegacyMigrationCandidate
+} from "./firebase-cloud-save.4d272d58362b.js";
+import {closeFirebaseAuthUi,installFirebaseAuthUi,openFirebaseAuthUi,setFirebaseAuthUiState} from "./firebase-auth-ui.7d9d78d17cf0.js";
 import {synchronizeGameSession,revokeGameSession,protectedTest,getGameSessionState} from "./firebase-session.fe006c0f84a7.js";
 
 const AUTH_EVENT="four-symbols:firebase-auth-state";
@@ -83,7 +83,7 @@ async function resolveCloudSave(user){
 const api=Object.freeze({
     initialize:initializeLifecycle,resolveIdentity,resolveCloudSave,getUser:getSignedInUser,
     signInWithGoogle,signInWithFacebook,signInWithEmail,createAccountWithEmail,signInAsAnonymous,signOut:signOutFirebase,
-    bootstrapCloudSave:bootstrapTrustedCloudSave,createInitialCanonicalCharacter,submitLegacyMigrationCandidate,saveLocalAutoBattlePreferences,createLocalMigrationBackup,protectedTest,getGameSessionState,
+    bootstrapCloudSave:bootstrapTrustedCloudSave,createInitialCanonicalCharacter,submitLegacyMigrationCandidate,screenLegacyMigrationCandidate,saveLocalAutoBattlePreferences,createLocalMigrationBackup,protectedTest,getGameSessionState,
     openAuth:openFirebaseAuthUi,closeAuth:closeFirebaseAuthUi,
     setUiState:setFirebaseAuthUiState,cloudSaveWritePolicy:CLOUD_SAVE_WRITE_POLICY,
     cloudFunctionsRegion:CLOUD_FUNCTIONS_REGION,dispose:()=>{ if(unsubscribe){ unsubscribe(); unsubscribe=null; } }

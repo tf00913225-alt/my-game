@@ -16,7 +16,7 @@ let resumeGraceUsed=false;
 let resumeActive=false;
 let resumeDeadline=0;
 let resumeInterval=0;
-let state={mode:"AUTH_RESOLVING",user:null,message:"正在初始化 Firebase Authentication…",error:false,migration:null,sessionTest:"",cloudEnvelopeTest:"",cloudPreferencesTest:"",migrationCandidate:""};
+let state={mode:"AUTH_RESOLVING",user:null,message:"正在初始化 Firebase Authentication…",error:false,migration:null,sessionTest:"",cloudEnvelopeTest:"",cloudPreferencesTest:"",migrationCandidate:"",candidateScreening:""};
 
 const byId=id=>document.getElementById(id);
 function errorText(error){
@@ -109,6 +109,10 @@ function markup(){
               <button id="firebaseMigrationCandidateButton" class="firebase-auth-button secondary" type="button">封存並準備提交存檔候選</button>
               <button id="firebaseMigrationCandidateCancelButton" class="firebase-auth-button secondary" type="button" hidden>取消提交</button>
             </div>
+            <div id="firebaseCandidateScreeningResult" class="firebase-auth-cloud-state" role="status" aria-live="polite">已提交候選可在此進行唯讀審查；審查不會採納或恢復角色。</div>
+            <div class="firebase-auth-actions">
+              <button id="firebaseCandidateScreeningButton" class="firebase-auth-button secondary" type="button">審查目前私人候選</button>
+            </div>
           </div>
           <div id="firebaseMigrationPanel" hidden>
             <p id="firebaseMigrationMessage" class="firebase-auth-subtitle"></p>
@@ -127,7 +131,7 @@ function markup(){
 }
 function setBusy(value){
     busy=value===true;
-    ["firebaseGoogleButton","firebaseGuestButton","firebaseEmailSignInButton","firebaseEmailCreateButton","firebaseMigrationConfirmButton","firebaseRetryButton","firebaseSignOutButton","firebaseAuthBackButton","firebaseSwitchAccountButton","firebaseSessionTestButton","firebaseCloudEnvelopeTestButton","firebaseCloudPreferencesTestButton","firebaseCloudPreferencesRestoreButton","firebaseMigrationCandidateButton","firebaseMigrationCandidateCancelButton"].forEach(id=>{ const button=byId(id); if(button){ button.disabled=busy; } });
+    ["firebaseGoogleButton","firebaseGuestButton","firebaseEmailSignInButton","firebaseEmailCreateButton","firebaseMigrationConfirmButton","firebaseRetryButton","firebaseSignOutButton","firebaseAuthBackButton","firebaseSwitchAccountButton","firebaseSessionTestButton","firebaseCloudEnvelopeTestButton","firebaseCloudPreferencesTestButton","firebaseCloudPreferencesRestoreButton","firebaseMigrationCandidateButton","firebaseMigrationCandidateCancelButton","firebaseCandidateScreeningButton"].forEach(id=>{ const button=byId(id); if(button){ button.disabled=busy; } });
 }
 function renderResumeCountdown(){
     if(!resumeActive){ return; }
@@ -173,6 +177,10 @@ function render(){
     if(candidateResult){
         candidateResult.textContent=state.migrationCandidate||"原手機完整存檔可先封存，再經確認提交為私人候選；目前不能在另一台手機取回角色。";
     }
+    const screeningResult=byId("firebaseCandidateScreeningResult");
+    if(screeningResult){ screeningResult.textContent=state.candidateScreening||"已提交候選可在此進行唯讀審查；審查不會採納或恢復角色。"; }
+    const screeningButton=byId("firebaseCandidateScreeningButton");
+    if(screeningButton){ screeningButton.disabled=busy||state.mode!=="READY"; }
     const candidateButton=byId("firebaseMigrationCandidateButton");
     if(candidateButton){
         candidateButton.disabled=busy||state.mode!=="READY";
@@ -429,6 +437,7 @@ async function submitOriginalDeviceMigrationCandidate(){
             throw new Error("MIGRATION_CANDIDATE_READBACK_INVALID");
         }
         state={...state,migrationCandidate:`✅ 已提交此 UID 的私人候選（候選 Revision ${result.revision}）；後端仍標記未受信任，另一台手機不能取回角色。原手機存檔與本機備份保留。`};
+        state={...state,candidateScreening:"候選已提交；可按「審查目前私人候選」查看阻擋原因。"};
     }catch(error){
         candidateConfirmation=null;
         console.error("Firebase original-device migration candidate submission failed:",error);
@@ -441,6 +450,76 @@ async function submitOriginalDeviceMigrationCandidate(){
                 :stage==="backup"
                     ?"⚠️ 原手機完整存檔未能封存，沒有提交。請確認此 UID 角色已載入及手機儲存空間。"
                     :"⚠️ 尚未提交候選；已建立的本機封存保留。請確認帳號與雲端版本後重試。"};
+    }finally{ setBusy(false); render(); }
+}
+const CANDIDATE_BLOCKER_LABELS=Object.freeze({
+    HISTORICAL_REWARDS_UNVERIFIED:"歷史獎勵來源尚未證實，不能據此發放獎勵",
+    SIDECAR_BACKUP_MISSING:"附屬資料封存不完整",
+    SIDECAR_CLAIM_RECORD_INVALID:"附屬資料領獎紀錄格式不正確",
+    CHARACTER_SLOT_MISSING:"主要角色資料缺失",CHARACTER_SLOT_GAP:"角色欄位不連續",
+    CHARACTER_STRUCTURE_INVALID:"角色結構不正確",DUPLICATE_CHARACTER_ID:"角色識別重複",
+    CHARACTER_ELEMENT_INVALID:"角色元素不正確",CHARACTER_PROGRESSION_UNVERIFIED:"角色成長資料無法驗證",
+    INVENTORY_STRUCTURE_INVALID:"背包資料結構不正確",
+    EQUIPMENT_STRUCTURE_INVALID:"裝備資料結構不正確",EQUIPMENT_IDENTITY_INVALID:"裝備識別不正確",
+    EQUIPMENT_IDENTITY_DUPLICATE:"裝備識別重複",EQUIPMENT_OWNER_UNMAPPED:"裝備所屬角色無法對應",
+    FORMATION_STRUCTURE_INVALID:"隊伍編成資料不正確",ECONOMY_SOURCE_MISSING:"金幣或經驗值來源資料缺失",
+    SKILL_SOURCE_MISSING:"技能資料缺失",SKILL_SOURCE_INVALID:"技能資料不正確",
+    RELIC_SOURCE_MISSING:"秘寶資料缺失",RELIC_STATE_INVALID:"秘寶狀態不正確",
+    RELIC_LOADOUT_UNSUPPORTED:"舊版副秘寶欄位尚無安全轉換規則",
+    RELIC_REFERENCE_INVALID:"裝備中的秘寶無法對應",
+    CLAIM_PROGRESS_MISSING:"領獎進度資料缺失"
+});
+function candidateBlockerText(code){
+    if(typeof code!=="string"||!/^[A-Z][A-Z0-9_]{0,90}$/.test(code)){ return "未知阻擋原因（請保留原手機資料）"; }
+    const claim=/^([A-Z0-9_]+)_CLAIM_(RECORD_INVALID|MIRROR_CONFLICT)$/.exec(code);
+    if(claim){
+        const sources={DAILY_QUESTS:"每日任務",COMMISSION_QUESTS:"委託",ACHIEVEMENTS:"成就",TOWER:"四象塔",ABYSS:"深淵",QUEST_MILESTONES:"任務里程碑",ABYSS_SIDECAR:"深淵附屬資料"};
+        return `${sources[claim[1]]||"未知來源"}領獎紀錄${claim[2]==="MIRROR_CONFLICT"?"與主存檔不一致":"不正確"}（${code}）`;
+    }
+    return `${CANDIDATE_BLOCKER_LABELS[code]||"尚未建立安全審查說明"}（${code}）`;
+}
+async function screenCurrentMigrationCandidate(){
+    if(busy||!DEV_SESSION_TEST_ENABLED||state.mode!=="READY"){ return; }
+    setBusy(true);
+    state={...state,candidateScreening:"正在唯讀審查此 UID 的目前私人候選…"}; render();
+    let uid=null;
+    try{
+        const api=window.FourSymbolsFirebase;
+        const user=api?.getUser?.(); uid=user?.uid;
+        if(!uid||!api.resolveCloudSave||!api.screenLegacyMigrationCandidate){ throw new Error("SCREEN_UNAVAILABLE"); }
+        const before=await api.resolveCloudSave(user);
+        const envelope=before.data;
+        if(api.getUser?.()?.uid!==uid){ throw new Error("ACCOUNT_CHANGED"); }
+        if(!before.exists||envelope?.ownerUid!==uid||envelope.authoritativeStateReady!==false||
+           envelope.migrationCandidateStatus!=="received"||
+           !Number.isSafeInteger(envelope.migrationCandidateRevision)||envelope.migrationCandidateRevision<1||
+           !Number.isSafeInteger(envelope.serverRevision)||envelope.serverRevision<1){
+            throw new Error("CANDIDATE_NOT_CURRENT");
+        }
+        const candidateRevision=envelope.migrationCandidateRevision;
+        const serverRevision=envelope.serverRevision;
+        const result=await api.screenLegacyMigrationCandidate(candidateRevision,serverRevision);
+        if(api.getUser?.()?.uid!==uid||state.mode!=="READY"){ throw new Error("ACCOUNT_CHANGED"); }
+        if(result?.candidateRevision!==candidateRevision||result.serverRevision!==serverRevision||
+           result.status!=="blocked"||result.readyForAcceptance!==false||
+           !Array.isArray(result.blockers)||result.blockers.some(code=>typeof code!=="string")){
+            throw new Error("SCREEN_RESULT_INVALID");
+        }
+        const after=await api.resolveCloudSave(user);
+        if(api.getUser?.()?.uid!==uid||state.mode!=="READY"){ throw new Error("ACCOUNT_CHANGED"); }
+        if(!after.exists||after.data?.ownerUid!==uid||after.data.serverRevision!==serverRevision||
+           after.data.migrationCandidateRevision!==candidateRevision||
+           after.data.migrationCandidateStatus!=="received"||
+           after.data.migrationCandidateFingerprint!==result.fingerprint||
+           after.data.authoritativeStateReady!==false){ throw new Error("CLOUD_REVISION_CONFLICT"); }
+        const reasons=result.blockers.length?result.blockers.map(candidateBlockerText).join("；"):"後端尚未允許採納";
+        state={...state,candidateScreening:`候選 Revision ${candidateRevision} 唯讀審查：仍受阻擋。原因：${reasons}。原手機存檔與封存保留；不能在其他手機取回角色，Phase 4 仍未驗收。`};
+    }catch(error){
+        console.error("Firebase candidate screening failed:",error);
+        if(uid&&window.FourSymbolsFirebase?.getUser?.()?.uid!==uid){ return; }
+        const sessionMessage=sessionTestFailureText(error);
+        state={...state,candidateScreening:!sessionMessage.startsWith("⚠️ 無法確認")?sessionMessage:
+            "⚠️ 無法確認目前候選的審查結果；請確認仍在原帳號與目前版本後重試。資料未被採納或恢復。"};
     }finally{ setBusy(false); render(); }
 }
 function cancelOriginalDeviceMigrationCandidate(){
@@ -504,6 +583,8 @@ function bind(){
     if(migrationCandidateButton){ migrationCandidateButton.addEventListener("click",()=>{ void submitOriginalDeviceMigrationCandidate(); }); }
     const migrationCandidateCancelButton=byId("firebaseMigrationCandidateCancelButton");
     if(migrationCandidateCancelButton){ migrationCandidateCancelButton.addEventListener("click",cancelOriginalDeviceMigrationCandidate); }
+    const screeningButton=byId("firebaseCandidateScreeningButton");
+    if(screeningButton){ screeningButton.addEventListener("click",()=>{ void screenCurrentMigrationCandidate(); }); }
     byId("firebaseSupportButton").addEventListener("click",()=>window.FourSymbolsSupport.show());
     byId("firebaseAuthBackButton").addEventListener("click",()=>{
         if(!state.user||(state.mode!=="READY"&&state.mode!=="OFFLINE_READY")){ return; }
@@ -530,7 +611,7 @@ export function closeFirebaseAuthUi(){
 export function setFirebaseAuthUiState(next={}){
     if(Object.prototype.hasOwnProperty.call(next,"user")&&next.user?.uid!==state.user?.uid){
         candidateConfirmation=null;
-        state={...state,migrationCandidate:""};
+        state={...state,migrationCandidate:"",candidateScreening:""};
     }
     if(next.mode&&next.mode!=="READY"){ candidateConfirmation=null; }
     state={...state,...next}; render();

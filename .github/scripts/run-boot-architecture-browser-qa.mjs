@@ -94,6 +94,7 @@ export async function bootstrapTrustedCloudSave(){return {status:"qa-no-write"};
 export async function createInitialCanonicalCharacter(){throw new Error("QA never creates a cloud character");}
 export async function saveLocalAutoBattlePreferences(){throw new Error("QA never performs a cloud write");}
 export async function submitLegacyMigrationCandidate(){throw new Error("QA never performs a cloud write");}
+export async function screenLegacyMigrationCandidate(){throw new Error("QA never screens a private candidate");}
 export function createLocalMigrationBackup(){throw new Error("QA never creates a migration backup");}
 `;
 
