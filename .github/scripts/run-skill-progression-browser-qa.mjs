@@ -9,10 +9,10 @@ const ROOT=process.cwd();
 const ARTIFACT_DIR=path.join(ROOT,"artifacts","browser-qa");
 const VIEWPORTS=[[360,800],[393,873],[412,915]];
 const WATER_CASES=[
-    ["healSpell","æ²»çè¡"],
-    ["revive","å¾©æ´»è¡"],
-    ["freeze","å°å°"],
-    ["purifyMind","æ·¨å¿è¨£"]
+    ["healSpell","治療術"],
+    ["revive","復活術"],
+    ["freeze","冰封"],
+    ["purifyMind","淨心訣"]
 ];
 const ELEMENT_CASES=[["fire","fireRocket"],["water","healSpell"],["wind","stormFist"],["earth","stoneThrow"]];
 const ASSET_MANIFEST=JSON.parse(fs.readFileSync(path.join(ROOT,"build","asset-manifest.json"),"utf8"));
@@ -139,8 +139,8 @@ const PREPARE_RUNTIME=`(async()=>{
             errors:runtimeErrors.slice(-8)
         }));
     }
-    player.id="QA ç«è§è²";player.element="fire";player.level=70;player.skillPoints=999;
-    player2={id:"QA æ°´è§è²",element:"water",level:70,skillPoints:999};
+    player.id="QA 火角色";player.element="fire";player.level=70;player.skillPoints=999;
+    player2={id:"QA 水角色",element:"water",level:70,skillPoints:999};
     player3=null;
     currentSkillCharacter="fire";
     // Cross-element learning keeps its formal native-skill gate. Seed one
@@ -259,10 +259,10 @@ async function runViewport(chrome,url,width,height,capture){
         for(const [name,action] of Object.entries(evidence.water)){ assertVisibleAction(name,action); }
         for(const [element,item] of Object.entries(evidence.elements)){ assertVisibleAction(element+"/"+item.skillId,item.action); }
         assertVisibleAction("disabled learn",evidence.disabledLearn);assert.equal(evidence.disabledLearn.disabled,true,"locked action must use native disabled");
-        assertVisibleAction("upgrade",evidence.upgrade);assert.ok(evidence.upgrade.label.text.includes("åç´ã»"),"upgrade label is missing");
+        assertVisibleAction("upgrade",evidence.upgrade);assert.ok(evidence.upgrade.label.text.includes("升級・"),"upgrade label is missing");
         assertVisibleAction("equip",evidence.equip);assert.equal(evidence.equip.disabled,false,"equip action should be enabled");
         assertVisibleAction("max level",evidence.maxLevel);assert.equal(evidence.maxLevel.disabled,true,"max-level action must use native disabled");
-        assert.ok(evidence.water["æ²»çè¡"].label.text.includes("å­¸ç¿ã»"),"æ²»çè¡ is not a cross-element learn action");
+        assert.ok(evidence.water["治療術"].label.text.includes("學習・"),"治療術 is not a cross-element learn action");
         assert.ok(evidence.guidance.length>0,"learnable action has no Guidance Dot");
         for(const item of evidence.guidance){ assertVisibleAction("Guidance Dot parent",item.parent);assert.ok(item.dot.visibleRectWidth>0&&item.dot.visibleRectHeight>0,"Guidance Dot is not visible"); }
         for(const card of evidence.allCards){ assert.equal(card.tagName,"BUTTON","div.skill-action-card is forbidden in formal Runtime"); }
