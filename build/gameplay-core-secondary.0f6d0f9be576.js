@@ -8163,7 +8163,6 @@ function writeQuickSellQuality(value){const quality=QUICK_SELL_QUALITY_KEYS.incl
 function syncSellUi(){if(typeof window.v17350SyncQuickSellModal==="function")window.v17350SyncQuickSellModal();}
 window.v17351ToggleQualityMenu=()=>{};
 window.v17351ChooseQuality=v=>{const s=document.getElementById("v17350QuickSellQuality");if(s){s.value=writeQuickSellQuality(v);s.dispatchEvent(new Event("change"))}syncSellUi()};
-window.v17350BulkSellEquipment=async function(){return typeof window.v17350OpenQuickSellModal==="function"?window.v17350OpenQuickSellModal():false};
 /* Backpack geometry is owned by the canonical inventory CSS and render lifecycle. */
 syncSellUi();
 })();
