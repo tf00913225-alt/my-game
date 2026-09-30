@@ -91,6 +91,9 @@ class Cdp{
 }
 
 const PREPARE_RUNTIME=`(async()=>{
+    const runtimeErrors=[];
+    window.addEventListener("error",event=>runtimeErrors.push(String(event.message||event.error||"window error")));
+    window.addEventListener("unhandledrejection",event=>runtimeErrors.push(String(event.reason||"unhandled rejection")));
     const waitFor=async predicate=>{
         const until=Date.now()+30000;
         while(Date.now()<until){ if(predicate()){ return true; } await new Promise(resolve=>setTimeout(resolve,50)); }
@@ -99,9 +102,17 @@ const PREPARE_RUNTIME=`(async()=>{
     if(!await waitFor(()=>window.FourSymbolsFeatures&&typeof window.FourSymbolsFeatures.ensure==="function")){
         throw new Error("feature loader was not initialized");
     }
-    await window.FourSymbolsFeatures.ensure("gameplay-core","skill-runtime-browser-qa");
+    await window.FourSymbolsFeatures.ensure("skill","skill-runtime-browser-qa");
     if(!await waitFor(()=>typeof renderSkillLoadout==="function"&&typeof window.v173GetSkillLearnEligibility==="function"&&typeof window.v17364GetSkillUpgradeEligibility==="function")){
-        throw new Error("formal Skill Runtime owners were not initialized");
+        throw new Error("formal Skill Runtime owners were not initialized: "+JSON.stringify({
+            skillFeatureReady:window.FourSymbolsFeatures.isReady("skill"),
+            gameplayCoreReady:window.FourSymbolsFeatures.isReady("gameplay-core"),
+            progressionInstalled:!!window.__v17364SkillProgressionInstalled,
+            renderer:typeof renderSkillLoadout,
+            learnEligibility:typeof window.v173GetSkillLearnEligibility,
+            upgradeEligibility:typeof window.v17364GetSkillUpgradeEligibility,
+            errors:runtimeErrors.slice(-8)
+        }));
     }
     player.id="QA 火角色";player.element="fire";player.level=70;player.skillPoints=999;
     player2={id:"QA 水角色",element:"water",level:70,skillPoints:999};
