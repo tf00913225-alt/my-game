@@ -67,6 +67,17 @@ async function callTrustedFunction(name, payload){
     return callProtectedFunction(name,payload||{},expectedUid);
 }
 
+/* Read-only review of the current private candidate. The backend binds both
+ * revisions to the active UID/session and returns blockers, never save bytes. */
+export async function screenLegacyMigrationCandidate(candidateRevision,expectedRevision){
+    if(!Number.isSafeInteger(candidateRevision)||candidateRevision<1||
+       !Number.isSafeInteger(expectedRevision)||expectedRevision<1){
+        throw Object.assign(new Error("Current candidate and cloud revisions are required."),
+            {code:"CLOUD_REVISION_REQUIRED"});
+    }
+    return callTrustedFunction("screenLegacyMigrationCandidate",{candidateRevision,expectedRevision});
+}
+
 export async function readCurrentCloudSave(){
     const db = await ensureFirestore();
     const uid = requireSignedInUid();
