@@ -16,7 +16,7 @@ let resumeGraceUsed=false;
 let resumeActive=false;
 let resumeDeadline=0;
 let resumeInterval=0;
-let state={mode:"AUTH_RESOLVING",user:null,message:"正在初始化 Firebase Authentication…",error:false,migration:null,sessionTest:"",cloudEnvelopeTest:"",cloudPreferencesTest:"",migrationCandidate:"",candidateScreening:""};
+let state={mode:"AUTH_RESOLVING",user:null,message:"正在初始化 Firebase Authentication…",error:false,migration:null,sessionTest:"",cloudEnvelopeTest:"",cloudPreferencesTest:"",migrationCandidate:"",candidateScreening:"",backupExport:""};
 
 const byId=id=>document.getElementById(id);
 function errorText(error){
@@ -105,6 +105,10 @@ function markup(){
               <button id="firebaseCloudPreferencesRestoreButton" class="firebase-auth-button secondary" type="button">取回雲端自動戰鬥設定</button>
             </div>
             <div id="firebaseMigrationCandidateResult" class="firebase-auth-cloud-state" role="status" aria-live="polite">原手機完整存檔可先封存，再經確認提交為私人候選；目前不能在另一台手機取回角色。</div>
+            <div id="firebaseMigrationBackupExportResult" class="firebase-auth-cloud-state" role="status" aria-live="polite">可將此 UID 已封存的本機副本另存到手機。下載檔未加密，請勿分享；不能直接用於跨裝置恢復。</div>
+            <div class="firebase-auth-actions">
+              <button id="firebaseMigrationBackupExportButton" class="firebase-auth-button secondary" type="button">下載本機封存副本</button>
+            </div>
             <div class="firebase-auth-footer">
               <button id="firebaseMigrationCandidateButton" class="firebase-auth-button secondary" type="button">封存並準備提交存檔候選</button>
               <button id="firebaseMigrationCandidateCancelButton" class="firebase-auth-button secondary" type="button" hidden>取消提交</button>
@@ -131,7 +135,7 @@ function markup(){
 }
 function setBusy(value){
     busy=value===true;
-    ["firebaseGoogleButton","firebaseGuestButton","firebaseEmailSignInButton","firebaseEmailCreateButton","firebaseMigrationConfirmButton","firebaseRetryButton","firebaseSignOutButton","firebaseAuthBackButton","firebaseSwitchAccountButton","firebaseSessionTestButton","firebaseCloudEnvelopeTestButton","firebaseCloudPreferencesTestButton","firebaseCloudPreferencesRestoreButton","firebaseMigrationCandidateButton","firebaseMigrationCandidateCancelButton","firebaseCandidateScreeningButton"].forEach(id=>{ const button=byId(id); if(button){ button.disabled=busy; } });
+    ["firebaseGoogleButton","firebaseGuestButton","firebaseEmailSignInButton","firebaseEmailCreateButton","firebaseMigrationConfirmButton","firebaseRetryButton","firebaseSignOutButton","firebaseAuthBackButton","firebaseSwitchAccountButton","firebaseSessionTestButton","firebaseCloudEnvelopeTestButton","firebaseCloudPreferencesTestButton","firebaseCloudPreferencesRestoreButton","firebaseMigrationCandidateButton","firebaseMigrationCandidateCancelButton","firebaseCandidateScreeningButton","firebaseMigrationBackupExportButton"].forEach(id=>{ const button=byId(id); if(button){ button.disabled=busy; } });
 }
 function renderResumeCountdown(){
     if(!resumeActive){ return; }
@@ -177,6 +181,10 @@ function render(){
     if(candidateResult){
         candidateResult.textContent=state.migrationCandidate||"原手機完整存檔可先封存，再經確認提交為私人候選；目前不能在另一台手機取回角色。";
     }
+    const exportResult=byId("firebaseMigrationBackupExportResult");
+    if(exportResult){ exportResult.textContent=state.backupExport||"可將此 UID 已封存的本機副本另存到手機。下載檔未加密，請勿分享；不能直接用於跨裝置恢復。"; }
+    const exportButton=byId("firebaseMigrationBackupExportButton");
+    if(exportButton){ exportButton.disabled=busy||state.mode!=="READY"; }
     const screeningResult=byId("firebaseCandidateScreeningResult");
     if(screeningResult){ screeningResult.textContent=state.candidateScreening||"已提交候選可在此進行唯讀審查；審查不會採納或恢復角色。"; }
     const screeningButton=byId("firebaseCandidateScreeningButton");
@@ -547,6 +555,29 @@ function cancelOriginalDeviceMigrationCandidate(){
     state={...state,migrationCandidate:"已取消提交；本機不可變備份保留，沒有送出候選。"};
     render();
 }
+function downloadOriginalDeviceMigrationBackups(){
+    if(busy||!DEV_SESSION_TEST_ENABLED||state.mode!=="READY"){ return; }
+    const uid=window.FourSymbolsFirebase?.getUser?.()?.uid;
+    let url=null;
+    try{
+        if(!uid){ throw new Error("ACCOUNT_CHANGED"); }
+        const raw=window.FourSymbolsAccountSave.exportMigrationBackups(uid);
+        if(window.FourSymbolsFirebase?.getUser?.()?.uid!==uid){ throw new Error("ACCOUNT_CHANGED"); }
+        const blob=new Blob([raw],{type:"application/json"});
+        if(blob.size>16*1024*1024){ throw new Error("BACKUP_EXPORT_TOO_LARGE"); }
+        url=URL.createObjectURL(blob);
+        const link=document.createElement("a");
+        link.href=url;link.download="four-symbols-local-migration-backups.json";
+        document.body.appendChild(link);link.click();link.remove();
+        state={...state,backupExport:"已要求瀏覽器下載此 UID 的已驗證封存副本。請在手機下載資料夾確認檔案存在，妥善保管未加密檔案；這不是權威存檔或跨裝置恢復。"};
+    }catch(error){
+        console.error("Local migration backup export failed:",error);
+        state={...state,backupExport:"⚠️ 未能匯出已驗證封存；原手機資料沒有被修改。請保留網站資料並確認目前 UID。"};
+    }finally{
+        if(url){ setTimeout(()=>URL.revokeObjectURL(url),60000); }
+        render();
+    }
+}
 function clearResumeTimer(){
     if(resumeInterval){ window.clearInterval(resumeInterval); resumeInterval=0; }
 }
@@ -604,6 +635,8 @@ function bind(){
     if(migrationCandidateCancelButton){ migrationCandidateCancelButton.addEventListener("click",cancelOriginalDeviceMigrationCandidate); }
     const screeningButton=byId("firebaseCandidateScreeningButton");
     if(screeningButton){ screeningButton.addEventListener("click",()=>{ void screenCurrentMigrationCandidate(); }); }
+    const backupExportButton=byId("firebaseMigrationBackupExportButton");
+    if(backupExportButton){ backupExportButton.addEventListener("click",downloadOriginalDeviceMigrationBackups); }
     byId("firebaseSupportButton").addEventListener("click",()=>window.FourSymbolsSupport.show());
     byId("firebaseAuthBackButton").addEventListener("click",()=>{
         if(!state.user||(state.mode!=="READY"&&state.mode!=="OFFLINE_READY")){ return; }
@@ -630,7 +663,7 @@ export function closeFirebaseAuthUi(){
 export function setFirebaseAuthUiState(next={}){
     if(Object.prototype.hasOwnProperty.call(next,"user")&&next.user?.uid!==state.user?.uid){
         candidateConfirmation=null;
-        state={...state,migrationCandidate:"",candidateScreening:""};
+        state={...state,migrationCandidate:"",candidateScreening:"",backupExport:""};
     }
     if(next.mode&&next.mode!=="READY"){ candidateConfirmation=null; }
     state={...state,...next}; render();

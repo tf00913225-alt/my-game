@@ -1,4 +1,4 @@
-window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.72","firebaseBootstrap":"build/firebase/firebase-bootstrap.563bbc56c70f.js"});
+window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.72","firebaseBootstrap":"build/firebase/firebase-bootstrap.89a8fabc40bb.js"});
 (function installFourSymbolsSupportContact(global){
 "use strict";
 if(!global||global.FourSymbolsSupport){ return; }
@@ -471,6 +471,26 @@ try{ storage().setItem(backupKey,JSON.stringify(backup)); }
 catch(error){ throw coded("migration-backup-write-failed","The immutable migration backup could not be stored.",error); }
 return Object.freeze({...verifyMigrationBackup(uid,backupKey),unchanged:false});
 }
+// Export only sealed local records owned by the active UID. This is an
+// offline copy, never a cloud save or a source of reward entitlement.
+function exportMigrationBackups(uid){
+uid=validUid(uid);
+if(getActiveUid()!==uid){ throw coded("account-not-active","Backup owner is not active."); }
+const prefix=MIGRATION_BACKUP_PREFIX+uid+":";
+const keys=[];
+for(let index=0;index<storage().length;index++){
+const key=storage().key(index);
+if(typeof key==="string"&&key.startsWith(prefix)){ keys.push(key); }
+}
+keys.sort();
+if(!keys.length){ throw coded("migration-backup-missing","No sealed backup exists for this UID."); }
+const backups=keys.map(key=>{
+const {backupKey,unchanged,...backup}=verifyMigrationBackup(uid,key);
+return {backupKey,...backup};
+});
+return JSON.stringify({format:"four-symbols-local-migration-backups-v1",ownerUid:uid,
+authoritativeStateReady:false,backups});
+}
 function migrateLegacyToUid(uid,options={}){
 uid=validUid(uid);
 if(options.confirmed!==true){ throw coded("migration-confirmation-required","Legacy migration requires explicit confirmation."); }
@@ -521,7 +541,8 @@ global.FourSymbolsAccountSave=Object.freeze({
 SCHEMA_VERSION,LEGACY_KEY,ACTIVE_UID_KEY,activate,deactivate,getActiveUid,
 saveKey,metadataKey,readForUid,readActive,writeForUid,inspectLegacy,
 migrateLegacyToUid,removeActive,accountKey,fingerprint,LEGACY_SIDECARS,
-migrationBackupKeyFor,createMigrationBackup,verifyMigrationBackup,BACKUP_SIDECARS
+migrationBackupKeyFor,createMigrationBackup,verifyMigrationBackup,
+exportMigrationBackups,BACKUP_SIDECARS
 });
 })(typeof window!=="undefined"?window:globalThis);
 (function installFeatureLoader(global){
