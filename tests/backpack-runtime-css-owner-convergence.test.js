@@ -12,6 +12,7 @@ const css38=read("css/38-v141-system-expansion.css");
 const css50=read("css/50-v169-abyss-flow.css");
 const browser=read("tests/backpack-visual-composition-browser.test.js");
 
+// Permanent gate: source ownership checks are paired with full production-stack browser QA.
 assert.match(css22,/--inventory-equipment-slot-size/);
 assert.match(css22,/--inventory-equipment-cell-height/);
 assert.match(css22,/#game-stage #inventoryPage #inventoryCharacterDetailButton\{[^}]*width:28px[^}]*height:28px/);
