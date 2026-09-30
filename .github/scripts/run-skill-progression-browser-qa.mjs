@@ -118,12 +118,24 @@ const PREPARE_RUNTIME=`(async()=>{
     player2={id:"QA 水角色",element:"water",level:70,skillPoints:999};
     player3=null;
     currentSkillCharacter="fire";
-    characterSkillLoadouts.fire={skillLevels:{},equippedSkills:[]};
+    // Cross-element learning keeps its formal native-skill gate. Seed one
+    // legitimate native level so the water cases exercise the real cross
+    // element learn actions rather than a separate locked-state scenario.
+    characterSkillLoadouts.fire={skillLevels:{fireRocket:1},equippedSkills:[]};
     selectedSkillElementCharacterKey="fire";
+    showPage("home");
     openHomeFeature("character");
     switchCharacterTab("skill");
     selectedSkillElementTab="water";
     renderSkillLoadout();
+    if(!await waitFor(()=>{
+        const list=document.getElementById("allSkillsList");
+        const modal=document.getElementById("homeFeatureModal");
+        const rect=list?.getBoundingClientRect();
+        return !!(modal?.classList.contains("show")&&rect&&rect.width>0&&rect.height>0);
+    })){
+        throw new Error("formal Character Skill surface did not enter the player viewport");
+    }
     if(typeof window.v146SyncCharacterAttentionDots==="function"){ window.v146SyncCharacterAttentionDots(); }
     return true;
 })()`;
@@ -145,9 +157,11 @@ const COLLECT_EVIDENCE=`(()=>{
     ${JSON.stringify(WATER_CASES)}.forEach(([id,name])=>{water[name]=visible(findAction(id));});
     const elements={};
     ${JSON.stringify(ELEMENT_CASES)}.forEach(([element,id])=>{
+        if(element==="fire"){ characterSkillLoadouts.fire.skillLevels={}; }
         selectedSkillElementTab=element;renderSkillLoadout();
         const card=findAction(id);elements[element]={skillId:id,action:visible(card)};
     });
+    characterSkillLoadouts.fire.skillLevels={fireRocket:1};
     selectedSkillElementTab="water";renderSkillLoadout();
     if(typeof window.v146SyncCharacterAttentionDots==="function"){ window.v146SyncCharacterAttentionDots(); }
     player.skillPoints=0;renderSkillLoadout();
