@@ -1275,7 +1275,7 @@
                 return (
                     '<button type="button" class="battle-item-card talisman" '+
                     'onclick="useTalisman(\''+item.id+'\')" title="'+escapeHtml(item.name)+'">'+
-                    '<span class="battle-item-badge">符</span>'+
+                    '<span class="battle-item-icon">'+battleItemIconMarkup(definition||item)+'</span>'+
                     '<span class="battle-item-name">'+escapeHtml(item.name)+'</span>'+
                     '<span class="battle-item-effect">生效機率 '+chanceLabel+'</span>'+
                     '<span class="battle-item-count">×'+item.count+'</span>'+
