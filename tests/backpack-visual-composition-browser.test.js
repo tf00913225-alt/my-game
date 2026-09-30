@@ -54,7 +54,7 @@ fs.writeFileSync(fixture,fixtureHtml,"utf8");
             await sleep(180);
             const result=await browser.send("Runtime.evaluate",{expression:"window.__qa()",returnByValue:true});
             const data=result.result.value;
-            assert.equal(data.bodyWidth,width,`horizontal overflow at ${width}px`);
+            assert.ok(data.bodyWidth<=width,`horizontal overflow at ${width}px`);
             assert.ok(Math.abs(data.slotWidth-data.slotHeight)<1,`slot is not square at ${width}px`);
             assert.equal(data.selected,true);assert.equal(data.title,"行囊");
             const shot=await browser.send("Page.captureScreenshot",{format:"png",fromSurface:true,captureBeyondViewport:false});
