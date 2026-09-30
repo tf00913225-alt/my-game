@@ -15811,7 +15811,6 @@ const CRIT_CHANCE_BASE=10;
 const CRIT_CHANCE_MAX=95;
 const CRIT_MULTIPLIER_BASE=1.5;
 const CRIT_MULTIPLIER_MAX=2.25;
-const ANTI_CRIT_MAX_PERCENT=100;
 function calculateAntiCritPercent(value){ return Math.max(0,Number(value)||0); }
 function getCriticalStatPoints(character){
     const index=getPartyCharacterIndex(character);
