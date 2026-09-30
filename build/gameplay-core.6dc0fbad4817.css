@@ -8656,12 +8656,18 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 #game-stage .team-relic-placeholder.large{width:66px;height:66px;}
 #game-stage .team-relic-placeholder i{font-style:normal;font:900 24px "Noto Serif TC",serif;color:#d8bd7b;text-shadow:0 1px 1px #000;}
 #game-stage .team-relic-placeholder b{position:absolute;right:-4px;bottom:-4px;min-width:21px;height:21px;line-height:21px;text-align:center;border-radius:50%;border:1px solid #8b6a34;background:#120e09;color:#bca46d;font-size:13px;}
-#game-stage .rarity-white{border-color:#d8d8d8!important;}
-#game-stage .rarity-blue{border-color:#42a5ff!important;}
-#game-stage .rarity-purple{border-color:#B05CFF!important;}
-#game-stage .rarity-orange{border-color:#FF9F38!important;}
-#game-stage .rarity-pink{border-color:#FF4FA7!important;}
-#game-stage .rarity-four-symbol{
+#game-stage .team-relic-card.rarity-white,
+#game-stage .team-relic-detail-hero.rarity-white{border-color:#d8d8d8!important;}
+#game-stage .team-relic-card.rarity-blue,
+#game-stage .team-relic-detail-hero.rarity-blue{border-color:#42a5ff!important;}
+#game-stage .team-relic-card.rarity-purple,
+#game-stage .team-relic-detail-hero.rarity-purple{border-color:#B05CFF!important;}
+#game-stage .team-relic-card.rarity-orange,
+#game-stage .team-relic-detail-hero.rarity-orange{border-color:#FF9F38!important;}
+#game-stage .team-relic-card.rarity-pink,
+#game-stage .team-relic-detail-hero.rarity-pink{border-color:#FF4FA7!important;}
+#game-stage .team-relic-card.rarity-four-symbol,
+#game-stage .team-relic-detail-hero.rarity-four-symbol{
     border:2px solid transparent!important;
     background:linear-gradient(160deg,#1b1712,#090807) padding-box,conic-gradient(from 0deg,#FF5A36 0 25%,#42A5FF 25% 50%,#47D6A3 50% 75%,#C89B45 75% 100%) border-box!important;
     box-shadow:0 0 8px rgba(255,90,54,.28),0 0 12px rgba(66,165,255,.28),0 0 14px rgba(71,214,163,.24);
