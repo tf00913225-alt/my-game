@@ -156,3 +156,20 @@
 - A live V143 impact is scheduled as one target-plus-`impactId` batch. Its requests register before the batch flushes and sort Shield → Damage/Critical/MISS/Resist → Status. Synthetic feedback without an `impactId` stays on the normal queue; clear cancels every pending batch.
 - Persistent state Gate returns a reason. `sameNameDuplicate` is a silent reject before hit rolling or mutation; `exclusiveConflict` (Freeze/Petrify) emits formal status MISS; resistance remains distinct.
 - Skill-name presentation derives color from `skill.element` through `data-skill-element`; character element must not participate. It is a document-level fixed viewport surface and shares the ordinary floating-feedback visual font size.
+
+## Six-Stat Combat Attribute Convergence（2026-09-30）
+
+本節為正式六圍、戰鬥能力與防禦 Owner（控制來源）的最新契約；若歷史段落與本節衝突，以本節為準。
+
+- 正式六圍唯一為：Attack（攻擊）、Intelligence（智力）、Vitality（體質）、Energy（能量）、Defense（防禦能力值）、Agility（敏捷）。Spirit（精神）不再是六圍。
+- Attack：每 1 點 +4 Physical Attack（物理攻擊），只負責物理攻擊。
+- Intelligence：每 1 點 +2.75 Magic Attack（法術攻擊），並由同一 Intelligence Owner（智力控制來源）支援 Healing（治療）。
+- Vitality：每 1 點 +50 Max HP（最大生命值）；不再提供 Defense。
+- Energy：每 1 點 +15 Max SP（最大能量值）；不再提供命中、回復或速度。
+- Defense：以 defensePoints 作為唯一可分配防禦能力來源，每 1 點 +4 Final Defense（最終防禦）。最終防禦為 Base Defense + Level Defense + Defense Attribute × 4 + Equipment Defense + Buff／Passive modifiers − Debuff modifiers。
+- Defense 對 Physical Damage（物理傷害）與 Magic Damage（法術傷害）共用同一減傷 Owner；遞減因子維持 K / (K + Defense)，其中 K = 400 + Target Level × 10。
+- Agility：每 1 點 +1 Speed（出手速度）；不得派生 Evasion（閃避）。
+- Accuracy（命中）、Evasion（閃避）、Critical Chance（爆擊率）、Anti-Crit（抗暴）、Status Accuracy（異常命中）、Status Resistance（異常抗性）不得由六圍直接派生，只能由 Equipment、Gem、Skill、EX、Relic、Buff／Debuff 或 Passive 提供。
+- 舊存檔的 Spirit 投入點數必須透過正式可分配能力點池返還；不得轉成 Defense，不得遺失，不得以永久 Legacy Runtime Patch 保留舊公式。舊 Vitality 點數保留，但新版統一不再提供 Defense。
+- Physical Skill Elite/Boss Rank Bonus（物理技能精英／Boss 階級固定傷害加成）正式 RETIRED；相關常數與函式不得存在或被 Runtime、Tests、Skill Description 引用。
+- Character、Additional Character、Monster、Preview、Save／Load、Cloud Save、Equipment、Buff／Debuff 與 UI 必須使用同一套六圍語意；Monster 的命中、閃避與異常能力若存在，必須是獨立 Monster Combat Stat，不得假裝由 Spirit 或 Agility 派生。
