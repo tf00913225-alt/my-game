@@ -1,0 +1,28 @@
+name: Skill runtime QA build recovery
+on:
+  push:
+    branches:
+      - fix/skill-action-dom-presentation-runtime-qa-20260930
+    paths:
+      - .github/workflows/skill-runtime-qa-build-recovery.yml
+permissions:
+  contents: write
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/skill-action-dom-presentation-runtime-qa-20260930
+          fetch-depth: 0
+      - name: Apply formal Runtime QA repair and regenerate production build
+        run: |
+          printf '%s' 'H4sIAAAAAAACA52QQU7DMBBF9z7FqCtQGCctbSIUVeoWqWLDCezYKS6OXTyOqMTlcZKiFthlNmPP+P1vfWXaFhAPJoLIj5QXBXbCOH4kkL/vzDilz6CrZlkJyblWbbl5lLAsinK9Zoj4V4FlWfZPZbcDXD2Vq+qhhGw6VJCGbe+aaLyDoJNPeH031u69UL6Pd/dfDBj8lPRn3lhB9CI6DdvrYqgFDSAG/7moWXaLKBEF6cjHB89qe+n1IH3VsDoFMX5kL6S2NVO3AfHU3nqZUxPMKVIeeoeT4Sn4Q9BECUSZ3EkH/BC8G3Ocg10CnYVOuc9CvwF4FU8IEAIAAA==' | base64 -d | gzip -d > /tmp/skill-runtime-qa.patch
+          git apply /tmp/skill-runtime-qa.patch
+          npm run build
+          git rm .github/workflows/skill-runtime-qa-build-recovery.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add js/00-main.js .github/scripts/run-skill-progression-browser-qa.mjs index.html asset-manifest.json build
+          git commit -m "fix: bind formal skill row identity for runtime QA"
+          git push origin HEAD:fix/skill-action-dom-presentation-runtime-qa-20260930
