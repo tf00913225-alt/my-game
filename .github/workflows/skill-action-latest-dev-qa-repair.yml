@@ -17,7 +17,7 @@ jobs:
           fetch-depth: 0
       - name: Apply runtime presentation repair and synchronize production build
         run: |
-          curl -fsSL https://api.github.com/repos/tf00913225-alt/my-game/git/blobs/e8169855d0c4ed6e16b75a4f74a18c478765137d | jq -r .content | tr -d '\n' | base64 -d | gzip -d > /tmp/skill-action-qa-repair.patch
+          curl -fsSL https://api.github.com/repos/tf00913225-alt/my-game/git/blobs/e482ce8ccd632456335c748dd2321c14c6f3dcdc | jq -r .content | tr -d '\n' | base64 -d | gzip -d > /tmp/skill-action-qa-repair.patch
           git apply /tmp/skill-action-qa-repair.patch
           npm run build
           git rm .github/workflows/skill-action-latest-dev-qa-repair.yml
