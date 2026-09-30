@@ -41,6 +41,29 @@ test("current Revision 1 is screened read-only and blocker meanings are visible"
     assert.match(h.context.state.candidateScreening,/不能在其他手機取回角色/);
 });
 
+test("sealed missing sidecar names are displayed without raw bytes or authority claims",async()=>{
+    const h=harness();h.api.screenLegacyMigrationCandidate=async()=>({
+        candidateRevision:1,serverRevision:4,fingerprint:"digest",status:"blocked",
+        readyForAcceptance:false,
+        blockers:["HISTORICAL_REWARDS_UNVERIFIED","SIDECAR_BACKUP_MISSING"],
+        missingClaimSidecars:["quest-milestones","abyss-state"]
+    });
+    await h.run();
+    assert.match(h.context.state.candidateScreening,/任務里程碑（quest-milestones）/);
+    assert.match(h.context.state.candidateScreening,/深淵紀錄（abyss-state）/);
+    assert.match(h.context.state.candidateScreening,/不能在其他手機取回角色/);
+});
+
+test("unexpected sidecar identifiers fail closed instead of entering the UI",async()=>{
+    const h=harness();h.api.screenLegacyMigrationCandidate=async()=>({
+        candidateRevision:1,serverRevision:4,fingerprint:"digest",status:"blocked",
+        readyForAcceptance:false,blockers:["SIDECAR_BACKUP_MISSING"],
+        missingClaimSidecars:["private-raw-value"]
+    });
+    await h.run();assert.match(h.context.state.candidateScreening,/無法確認目前候選/);
+    assert.doesNotMatch(h.context.state.candidateScreening,/private-raw-value/);
+});
+
 test("missing current candidate never calls screening or submission",async()=>{
     const h=harness();h.api.resolveCloudSave=async()=>({exists:false,data:null});
     await h.run();assert.deepEqual(h.calls,[]);
