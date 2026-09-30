@@ -6,6 +6,7 @@ import test from "node:test";
 const ui=fs.readFileSync(new URL("../js/firebase/firebase-auth-ui.js",import.meta.url),"utf8");
 const client=fs.readFileSync(new URL("../js/firebase/firebase-cloud-save.js",import.meta.url),"utf8");
 const bootstrap=fs.readFileSync(new URL("../js/firebase/firebase-bootstrap.js",import.meta.url),"utf8");
+const bootQa=fs.readFileSync(new URL("../.github/scripts/run-boot-architecture-browser-qa.mjs",import.meta.url),"utf8");
 const action=ui.slice(ui.indexOf("const CANDIDATE_BLOCKER_LABELS="),ui.indexOf("function cancelOriginalDeviceMigrationCandidate(){"));
 assert.ok(action.includes("async function screenCurrentMigrationCandidate(){"));
 
@@ -69,4 +70,5 @@ test("client routes exact revisions through the protected session owner",()=>{
     assert.match(client,/callTrustedFunction\("screenLegacyMigrationCandidate",\{candidateRevision,expectedRevision\}\)/);
     assert.match(bootstrap,/screenLegacyMigrationCandidate,saveLocalAutoBattlePreferences/);
     assert.match(ui,/firebaseCandidateScreeningButton.*審查目前私人候選/);
+    assert.match(bootQa,/export async function screenLegacyMigrationCandidate\(\)/);
 });
