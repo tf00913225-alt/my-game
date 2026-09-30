@@ -29,14 +29,6 @@
 #game-stage #itemModal .v17351-lock-button{border-color:#9c773b!important;background:linear-gradient(180deg,#2d2114,#15100b)!important;color:#efd08a!important;font-weight:900!important}
 #game-stage #itemModal .v17351-lock-button.locked{border-color:#bc8737!important;background:linear-gradient(180deg,#5b3b12,#2a1b0a)!important;color:#ffe292!important;box-shadow:inset 0 0 10px rgba(236,180,68,.12)!important}
 
-#game-stage #inventoryPage #v17350BulkSellQuality{display:none!important}
-#game-stage #inventoryPage .v17351-quality-picker{position:relative!important;min-width:0!important;z-index:120!important}
-#game-stage #inventoryPage .v17351-quality-picker>button{width:100%!important;height:36px!important;padding:4px 28px 4px 9px!important;border:1px solid #876532!important;border-radius:7px!important;background:linear-gradient(180deg,#21180e,#0f0c08)!important;color:#ebd7aa!important;font-size:15px!important;font-weight:900!important;text-align:left!important;white-space:nowrap!important}
-#game-stage #inventoryPage .v17351-quality-menu{position:absolute!important;left:0!important;top:calc(100% + 5px)!important;width:100%!important;min-width:142px!important;display:none!important;padding:5px!important;border:1px solid #9a7338!important;border-radius:9px!important;background:linear-gradient(170deg,#25190e,#080705)!important;box-shadow:0 10px 30px rgba(0,0,0,.78),inset 0 0 0 1px rgba(255,224,157,.04)!important}
-#game-stage #inventoryPage .v17351-quality-picker.open .v17351-quality-menu{display:grid!important;gap:3px!important}
-#game-stage #inventoryPage .v17351-quality-menu button{display:grid!important;grid-template-columns:14px 1fr!important;gap:7px!important;align-items:center!important;width:100%!important;min-height:38px!important;padding:7px 8px!important;border:1px solid transparent!important;border-radius:6px!important;background:transparent!important;color:#d7c6a4!important;font-size:15px!important;font-weight:800!important;text-align:left!important}
-#game-stage #inventoryPage .v17351-quality-menu button.selected{border-color:#8d6932!important;background:rgba(167,116,37,.16)!important;color:#ffe09a!important}
-#game-stage #inventoryPage .v17351-quality-menu i{width:10px!important;height:10px!important;border-radius:50%!important;border:1px solid rgba(255,255,255,.35)!important}.v17351-quality-menu i.white{background:#d8d8d8!important}.v17351-quality-menu i.blue{background:#42a5ff!important}.v17351-quality-menu i.purple{background:#b05cff!important}.v17351-quality-menu i.orange{background:#ff9f38!important}
 
 #game-stage #homeFeatureModal .v17351-shop-image{position:relative!important;display:grid!important;place-items:center!important;width:100%!important;height:100%!important;overflow:hidden!important}
 #game-stage #homeFeatureModal .v17351-shop-image img{position:relative!important;z-index:2!important;width:100%!important;height:100%!important;object-fit:contain!important}

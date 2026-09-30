@@ -12,7 +12,7 @@ const inventory=read("js/35-v141-ui-battle.js");
 const qa=read("js/55-v173.51-inventory-qa.js");
 const main=read("js/00-main.js");
 
-assert.match(inventory,/const INVENTORY_PAGE_SIZE=18/);
+assert.match(inventory,/const INVENTORY_PAGE_SIZE=24/);
 assert.match(inventory,/for\(let index=0;index<INVENTORY_PAGE_SIZE;index\+\+\)/);
 assert.match(core,/grid-template-columns:repeat\(6,minmax\(0,1fr\)\)/);
 assert.match(core,/aspect-ratio:1/);
@@ -28,4 +28,4 @@ assert.doesNotMatch(windowSkin,/\.inventory-classic-shell,\n/,
 assert.doesNotMatch(bulk,/\.v17350-bulk-sell-bar\{/);
 assert.doesNotMatch(qa,/v17351-inventory-fullscreen|requestAnimationFrame|setTimeout\(/);
 assert.doesNotMatch(main,/v17351SyncInventoryQa/);
-console.log("✓ V173.74 backpack owner convergence: 18 slots, one layout owner, no delayed fullscreen geometry");
+console.log("✓ V173.74 backpack owner convergence: 24 slots, one layout owner, no delayed fullscreen geometry");

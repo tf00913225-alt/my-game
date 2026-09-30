@@ -88,11 +88,11 @@ test("V141 assets remain ordered before later patches with the current cache ver
     assert.match(indexSource,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
 
-test("backpack is 120 slots rendered as seven cyclic pages of 18 without drag or slot numbers",()=>{
+test("backpack is 120 slots rendered as five cyclic pages of 24 without drag or slot numbers",()=>{
     assert.match(mainSource,/new Array\(120\)\.fill\(null\)/);
     assert.match(mainSource,/const INVENTORY_CATEGORY_SLOT_COUNT = 120/);
-    assert.match(uiSource,/const INVENTORY_PAGE_SIZE=18/);
-    assert.match(uiSource,/const INVENTORY_PAGE_COUNT=7/);
+    assert.match(uiSource,/const INVENTORY_PAGE_SIZE=24/);
+    assert.match(uiSource,/const INVENTORY_PAGE_COUNT=Math\.ceil\(120\/INVENTORY_PAGE_SIZE\)/);
     assert.match(uiSource,/inventoryPageIndex=\(inventoryPageIndex\+Number\(direction\)\+INVENTORY_PAGE_COUNT\)%INVENTORY_PAGE_COUNT/);
     assert.match(uiSource,/box\.draggable=false/);
     assert.doesNotMatch(uiSource,/inventory-slot-number/);

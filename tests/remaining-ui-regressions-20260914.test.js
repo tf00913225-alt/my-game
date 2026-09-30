@@ -14,7 +14,7 @@ const bossJs=read("js/gameplay-boss-tower-system.js");
 const fireCss=read("css/56-v174-critical-ui-regressions.css");
 const legacyNav=read("js/38-v143-system-fixes.js");
 const finalNav=read("js/42-v148-combat-dungeon-fixes.js");
-assert.match(inventoryJs,/const INVENTORY_PAGE_SIZE=18;/);
+assert.match(inventoryJs,/const INVENTORY_PAGE_SIZE=24;/);
 assert.match(inventoryJs,/for\(let index=0;index<INVENTORY_PAGE_SIZE;index\+\+\)/);
 assert.match(inventoryCss,/inventory-grid-classic[\s\S]*grid-template-columns:repeat\(6,minmax\(0,1fr\)\)/);
 assert.match(inventoryCss,/inventory-grid-classic \.inventory-item-classic \.inventory-icon > \.v169-item-art[\s\S]*object-fit:contain/);
