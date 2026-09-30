@@ -30739,6 +30739,7 @@ function renderEquipment(){
         if(item){
             box.classList.add("has-item");
             box.innerHTML=`<div class="inventory-equipment-icon">${item.icon || "◆"}</div>`;
+            box.querySelectorAll(".v169-item-art").forEach(art=>art.classList.add("inventory-backpack-rarity-neutral"));
             box.title=item.name || slot.name;
             box.onclick=()=>openEquippedItem(item,slot.key);
         }else{

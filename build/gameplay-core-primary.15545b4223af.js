@@ -8593,6 +8593,7 @@
                     box.innerHTML=
                         '<div class="inventory-icon">'+(item.icon||"◆")+'</div>'+
                         '<div class="inventory-count">'+((Number(item.count)||0)>1?"×"+item.count:"")+'</div>';
+                    box.querySelectorAll(".v169-item-art").forEach(art=>art.classList.add("inventory-backpack-rarity-neutral"));
                     const realIndex=inventoryItems.indexOf(item);
                     box.onclick=()=>{
                         document.querySelectorAll("#inventoryGrid .inventory-item-classic.is-selected").forEach(selected=>selected.classList.remove("is-selected"));

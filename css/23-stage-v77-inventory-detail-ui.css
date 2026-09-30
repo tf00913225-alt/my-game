@@ -38,31 +38,6 @@
     background:transparent !important;
 }
 
-/* 立繪框右上角角色詳細按鈕 */
-#game-stage #inventoryPage .inventory-portrait-frame{
-    position:relative !important;
-}
-#game-stage #inventoryPage .inventory-character-detail-button{
-    position:absolute !important;
-    top:10px !important;
-    right:10px !important;
-    width:46px !important;
-    height:46px !important;
-    min-width:46px !important;
-    min-height:46px !important;
-    padding:0 !important;
-    display:flex !important;
-    align-items:center !important;
-    justify-content:center !important;
-    z-index:8 !important;
-    border:2px solid #8a6a3a !important;
-    border-radius:50% !important;
-    background:linear-gradient(180deg,#2b2115,#100c08) !important;
-    color:#ffe27a !important;
-    font-size:22px !important;
-    box-shadow:0 0 8px rgba(240,180,41,.22) !important;
-}
-
 /* 詳細資訊 modal 必須高於角色 modal */
 .inventory-character-detail-modal{
     z-index:9000 !important;

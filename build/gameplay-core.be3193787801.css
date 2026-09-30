@@ -473,7 +473,7 @@
 #game-stage #inventoryPage .inventory-character-arrow:active{transform:scale(.97)}
 #game-stage #inventoryPage .inventory-character-name{min-width:0;display:flex;align-items:center;justify-content:center;gap:6px;color:#e1d1a9;font-size:21px;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #game-stage #inventoryPage .inventory-character-name small{margin:0;color:var(--bag-muted);font-size:14px}
-#game-stage #inventoryPage .inventory-character-stage{position:relative;width:100%;min-height:180px;aspect-ratio:1.9 / 1;height:auto;margin:0;padding:0 10px;display:grid;grid-template-columns:minmax(58px,1fr) minmax(150px,2.2fr) minmax(58px,1fr);align-items:center;gap:clamp(8px,2vw,18px);box-sizing:border-box}
+#game-stage #inventoryPage .inventory-character-stage{--inventory-equipment-slot-size:clamp(50px,16vw,64px);--inventory-equipment-label-height:16px;--inventory-equipment-row-gap:4px;--inventory-equipment-cell-height:calc(var(--inventory-equipment-slot-size) + var(--inventory-equipment-label-height) + var(--inventory-equipment-row-gap));position:relative;width:100%;height:calc(3 * var(--inventory-equipment-cell-height) + 2 * clamp(6px,2vw,10px));min-height:0;margin:0;padding:0 10px;display:grid;grid-template-columns:minmax(58px,1fr) minmax(132px,2.2fr) minmax(58px,1fr);align-items:stretch;gap:clamp(6px,2vw,10px);box-sizing:border-box}
 #game-stage #inventoryPage .inventory-character-stage:before{content:"";position:absolute;inset:4% 17%;pointer-events:none;background:radial-gradient(ellipse at center,rgba(109,137,117,.18),transparent 58%),radial-gradient(ellipse at center,rgba(180,144,76,.1),transparent 72%);border:1px solid rgba(150,137,96,.18);border-radius:50%;opacity:.7}
 #game-stage #inventoryPage .inventory-portrait-frame{position:relative;grid-column:2;grid-row:1;align-self:stretch;width:100%;height:100%;min-height:0;margin:0;display:grid;place-items:center;overflow:hidden;border:0;background:transparent;box-shadow:none}
 #game-stage #inventoryPage .inventory-portrait-frame:before,#game-stage #inventoryPage .inventory-portrait-frame:after{content:"";position:absolute;pointer-events:none;border:1px solid rgba(166,146,93,.28);border-radius:50%}
@@ -483,11 +483,11 @@
 #game-stage #inventoryPage .inventory-portrait-placeholder{position:relative;z-index:1;color:var(--bag-muted);font-size:15px}
 #game-stage #inventoryPage #inventoryCharacterDetailButton{position:absolute;z-index:3;right:3%;top:4%;width:28px;height:28px;min-width:28px;min-height:28px;padding:0;border:1px solid #69715d;border-radius:0;color:#e0c782;background:#131a18;font-size:13px;line-height:1}
 #game-stage #inventoryPage #inventoryCharacterDetailButton:active{transform:scale(.96)}
-#game-stage #inventoryPage .inventory-equipment-grid{position:absolute;inset:0 10px;z-index:2;display:grid;grid-template-columns:minmax(58px,1fr) minmax(150px,2.2fr) minmax(58px,1fr);grid-template-rows:repeat(3,minmax(0,1fr));gap:clamp(8px,2vw,18px);pointer-events:none}
-#game-stage #inventoryPage .inventory-equipment-cell{width:100%;min-width:0;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:3px;pointer-events:auto}
+#game-stage #inventoryPage .inventory-equipment-grid{position:absolute;inset:0 10px;z-index:2;display:grid;grid-template-columns:minmax(58px,1fr) minmax(132px,2.2fr) minmax(58px,1fr);grid-template-rows:repeat(3,var(--inventory-equipment-cell-height));align-content:start;gap:clamp(6px,2vw,10px);pointer-events:none}
+#game-stage #inventoryPage .inventory-equipment-cell{width:100%;min-width:0;height:var(--inventory-equipment-cell-height);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:var(--inventory-equipment-row-gap);pointer-events:auto}
 #game-stage #inventoryPage .inventory-equipment-cell:nth-child(1){grid-column:1;grid-row:1}#game-stage #inventoryPage .inventory-equipment-cell:nth-child(2){grid-column:3;grid-row:1}#game-stage #inventoryPage .inventory-equipment-cell:nth-child(3){grid-column:1;grid-row:2}#game-stage #inventoryPage .inventory-equipment-cell:nth-child(4){grid-column:3;grid-row:2}#game-stage #inventoryPage .inventory-equipment-cell:nth-child(5){grid-column:1;grid-row:3}#game-stage #inventoryPage .inventory-equipment-cell:nth-child(6){grid-column:3;grid-row:3}
-#game-stage #inventoryPage .inventory-equipment-slot-label{order:2;width:100%;min-width:0;color:#a9a695;font-size:12px;line-height:1.1;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
-#game-stage #inventoryPage .inventory-equipment-slot{order:1;width:100%;aspect-ratio:1;min-width:0;min-height:0;padding:4px;border:1px solid #48534e;border-radius:0;background:linear-gradient(145deg,#202827,#0e1213 70%);box-shadow:inset 0 1px 0 rgba(226,218,185,.07),inset 0 -7px 12px rgba(0,0,0,.4);box-sizing:border-box}
+#game-stage #inventoryPage .inventory-equipment-slot-label{order:2;width:100%;height:var(--inventory-equipment-label-height);min-width:0;color:#a9a695;font-size:12px;line-height:var(--inventory-equipment-label-height);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
+#game-stage #inventoryPage .inventory-equipment-slot{order:1;width:var(--inventory-equipment-slot-size);height:var(--inventory-equipment-slot-size);flex:0 0 var(--inventory-equipment-slot-size);padding:4px;border:1px solid #48534e;border-radius:0;background:linear-gradient(145deg,#202827,#0e1213 70%);box-shadow:inset 0 1px 0 rgba(226,218,185,.07),inset 0 -7px 12px rgba(0,0,0,.4);box-sizing:border-box}
 #game-stage #inventoryPage .inventory-equipment-icon{font-size:clamp(18px,3.5vw,30px);line-height:1}
 
 /* Resource, category rail, item slots and the existing single grid scroller. */
@@ -543,8 +543,8 @@
 #game-stage #homeFeatureModal .v17350-quick-sell-actions button:last-child{border-color:#9a773f;color:#2b1d08;background:linear-gradient(180deg,#e2c071,#a87831)}
 #game-stage #homeFeatureModal .v17350-quick-sell-actions button:disabled{opacity:.45}
 
-@media (max-width:430px){#game-stage #inventoryPage .inventory-title-plate{min-width:154px;gap:7px;padding-inline:9px}#game-stage #inventoryPage .inventory-title-plate h2{font-size:20px}#game-stage #inventoryPage .inventory-character-stage{min-height:164px;padding-inline:7px;gap:7px}#game-stage #inventoryPage .inventory-equipment-grid{inset-inline:7px;gap:7px}}
-@media (max-width:380px){#game-stage #inventoryPage .inventory-classic-shell{width:96%}#game-stage #inventoryPage .inventory-character-stage{min-height:150px;grid-template-columns:minmax(50px,1fr) minmax(132px,2.2fr) minmax(50px,1fr)}#game-stage #inventoryPage .inventory-equipment-grid{grid-template-columns:minmax(50px,1fr) minmax(132px,2.2fr) minmax(50px,1fr)}#game-stage #inventoryPage .inventory-equipment-slot-label{font-size:11px}#game-stage #inventoryPage .inventory-grid-classic{gap:4px}#game-stage #inventoryPage .inventory-bottom-actions{gap:4px}#game-stage #inventoryPage .inventory-bottom-action{padding-inline:5px;font-size:14px}}
+@media (max-width:430px){#game-stage #inventoryPage .inventory-title-plate{min-width:154px;gap:7px;padding-inline:9px}#game-stage #inventoryPage .inventory-title-plate h2{font-size:20px}#game-stage #inventoryPage .inventory-character-stage{padding-inline:7px;gap:7px}#game-stage #inventoryPage .inventory-equipment-grid{inset-inline:7px;gap:7px}}
+@media (max-width:380px){#game-stage #inventoryPage .inventory-classic-shell{width:96%}#game-stage #inventoryPage .inventory-character-stage{grid-template-columns:minmax(50px,1fr) minmax(132px,2.2fr) minmax(50px,1fr)}#game-stage #inventoryPage .inventory-equipment-grid{grid-template-columns:minmax(50px,1fr) minmax(132px,2.2fr) minmax(50px,1fr)}#game-stage #inventoryPage .inventory-equipment-slot-label{font-size:11px}#game-stage #inventoryPage .inventory-grid-classic{gap:4px}#game-stage #inventoryPage .inventory-bottom-actions{gap:4px}#game-stage #inventoryPage .inventory-bottom-action{padding-inline:5px;font-size:14px}}
 @media (prefers-reduced-motion:reduce){#game-stage #inventoryPage .inventory-item-classic.is-selected{animation:none}}
 
 
@@ -586,31 +586,6 @@
     border-bottom:1px solid rgba(200,154,72,.12) !important;
     border-radius:0 !important;
     background:transparent !important;
-}
-
-/* 立繪框右上角角色詳細按鈕 */
-#game-stage #inventoryPage .inventory-portrait-frame{
-    position:relative !important;
-}
-#game-stage #inventoryPage .inventory-character-detail-button{
-    position:absolute !important;
-    top:10px !important;
-    right:10px !important;
-    width:46px !important;
-    height:46px !important;
-    min-width:46px !important;
-    min-height:46px !important;
-    padding:0 !important;
-    display:flex !important;
-    align-items:center !important;
-    justify-content:center !important;
-    z-index:8 !important;
-    border:2px solid #8a6a3a !important;
-    border-radius:50% !important;
-    background:linear-gradient(180deg,#2b2115,#100c08) !important;
-    color:#ffe27a !important;
-    font-size:22px !important;
-    box-shadow:0 0 8px rgba(240,180,41,.22) !important;
 }
 
 /* 詳細資訊 modal 必須高於角色 modal */
@@ -866,123 +841,48 @@
 
 
 /* bundled source: css/24-stage-v85-inventory-inner-grid-scroll-root.css */
-/* =========================================================
-   V85 — FIXED INVENTORY SHELL + INNER 102-SLOT SCROLL OWNER
-
-   Direct inventory page architecture:
-   - #bottomNav stays outside .content and fixed at the shell bottom.
-   - .content is NOT scrollable on inventory.
-   - #inventoryPage and .inventory-classic-shell fill the available area.
-   - Character switch / equipment / category tabs stay fixed.
-   - .inventory-grid-scroll is the ONLY vertical scroll owner.
-   - Each category renders exactly 102 visible slots; no pagination.
-========================================================= */
-
-#game-stage > #app > #game-content #bottomNav{
-    position:absolute !important;
-    left:0 !important;
-    right:auto !important;
-    bottom:0 !important;
-    top:auto !important;
-    width:420px !important;
-    max-width:none !important;
-    height:84px !important;
-    margin:0 !important;
-    transform:none !important;
-    z-index:200 !important;
-}
-
-#game-stage > #app.inventory-overlay-open > #game-content #bottomNav,
-#game-stage > #app.inventory-overlay-open > #game-content #mapPageNav,
-#game-stage > #app.inventory-overlay-open > #game-content #v141DungeonNav,
-#game-stage > #app.on-inventory-page > #game-content #bottomNav,
-#game-stage > #app.on-inventory-page > #game-content #mapPageNav,
-#game-stage > #app.on-inventory-page > #game-content #v141DungeonNav{
-    display:none !important;
-}
-
+/* V85 — Backpack scroll contract.
+   Presentation and geometry belong to css/22. This file owns only the
+   existing #inventoryGridScroll interaction contract; retired fixed-capacity
+   and non-paginated layout assumptions are intentionally not present. */
 #game-stage #app.on-inventory-page .content{
-    bottom:0 !important;
-    overflow:hidden !important;
-    touch-action:pan-y !important;
-    padding:0 !important;
+    overflow:visible;
+    touch-action:pan-y;
 }
 
 #game-stage #app.on-inventory-page #inventoryPage{
-    width:100% !important;
-    height:100% !important;
-    min-height:0 !important;
-    max-height:none !important;
-    overflow:hidden !important;
-    touch-action:pan-y !important;
-    transform:none !important;
-    will-change:auto !important;
-    padding:8px 0 !important;
-    box-sizing:border-box !important;
+    width:100%;
+    min-height:0;
+    overflow:visible;
+    touch-action:pan-y;
+    box-sizing:border-box;
 }
 
 #game-stage #app.on-inventory-page #inventoryPage .inventory-classic-shell{
-    height:100% !important;
-    min-height:0 !important;
-    display:flex !important;
-    flex-direction:column !important;
-    gap:8px !important;
-    overflow:hidden !important;
-}
-
-#game-stage #app.on-inventory-page #inventoryPage .inventory-character-panel{
-    flex:0 0 auto !important;
-    min-height:0 !important;
-}
-
-#game-stage #app.on-inventory-page #inventoryPage .inventory-equipment-icon{
-    font-size:clamp(15px,2.8vw,25px) !important;
+    min-height:0;
+    overflow:visible;
 }
 
 #game-stage #app.on-inventory-page #inventoryPage .inventory-right-panel{
-    flex:1 1 auto !important;
-    min-height:0 !important;
-    display:flex !important;
-    flex-direction:column !important;
-    overflow:hidden !important;
-    padding:8px 10px 10px !important;
-}
-
-#game-stage #app.on-inventory-page #inventoryPage .inventory-wallet-bar{
-    flex:0 0 auto !important;
-    min-height:28px !important;
-    margin:0 6px 5px !important;
-    padding:4px 9px !important;
-    display:flex !important;
-    align-items:center !important;
-    justify-content:space-between !important;
-    box-sizing:border-box !important;
-}
-
-#game-stage #app.on-inventory-page #inventoryPage .inventory-category-tabs{
-    flex:0 0 auto !important;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
 }
 
 #game-stage #app.on-inventory-page #inventoryPage .inventory-grid-scroll{
-    flex:0 1 auto !important;
-    min-height:0 !important;
-    overflow-y:auto !important;
-    overflow-x:hidden !important;
-    -webkit-overflow-scrolling:touch !important;
-    overscroll-behavior-y:contain !important;
-    touch-action:pan-y !important;
-    padding:0 1px 8px !important;
-    scrollbar-gutter:auto !important;
-}
-
-#game-stage #app.on-inventory-page #inventoryPage .inventory-bottom-actions{
-    flex:0 0 auto;
+    min-height:0;
+    overflow-y:auto;
+    overflow-x:hidden;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior-y:contain;
+    touch-action:pan-y;
+    scrollbar-gutter:auto;
 }
 
 #game-stage #app.on-inventory-page #inventoryPage .inventory-grid-classic{
-    width:100% !important;
-    margin:0 !important;
-    align-content:start !important;
+    width:100%;
+    margin:0;
+    align-content:start;
 }
 
 
@@ -2067,11 +1967,6 @@
     object-position:center 18%;
     display:block;
     z-index:0;
-}
-
-#game-stage #inventoryPortraitFrame #inventoryCharacterDetailButton{
-    position:relative;
-    z-index:2;
 }
 
 .v131-unlock-ready{ position:relative !important; }
@@ -3435,6 +3330,17 @@
     object-fit:contain;
     object-position:center;
     transform:none;
+}
+
+/* Context contract: Backpack Slot owns rarity presentation. The shared
+   v169 art remains an image container here, while other contexts keep their
+   own rarity treatment. */
+#game-stage #inventoryPage .inventory-backpack-rarity-neutral{
+    border:0;
+    border-radius:0;
+    box-shadow:none;
+    background:transparent;
+    animation:none;
 }
 
 #game-stage #inventoryPage .inventory-item-classic .inventory-slot-number{
