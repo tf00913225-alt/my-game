@@ -3,7 +3,7 @@
 "use strict";
 if(typeof window==="undefined"||window.__v17351InventoryQaInstalled)return;
 window.__v17351InventoryQaInstalled=true;
-const TYPES=new Set(["head","shoulder","shoes","weapon","hand","armor"]);
+const TYPES=new Set(["head","shoulder","shoes","weapon","hand","armor"]),QUICK_SELL_QUALITY_KEYS=["white","blue","purple","orange","pink","four-symbol"],QUICK_SELL_QUALITY_KEY=window.FourSymbolsAccountSave.accountKey("bulk-sell-quality");
 const num=v=>Number.isFinite(Number(v))?Number(v):0,integer=(v,f=0)=>Math.max(0,Math.floor(Number.isFinite(Number(v))?Number(v):f));
 const alertRpg=(m,o)=>typeof window.rpgAlert==="function"?window.rpgAlert(m,o||{}):Promise.resolve(),confirmRpg=(m,o)=>typeof window.rpgConfirm==="function"?window.rpgConfirm(m,o||{}):Promise.resolve(false);
 function equipment(i){if(!i)return false;try{if(typeof isEquipmentInventoryType==="function")return !!isEquipmentInventoryType(i.type)}catch(_){}return TYPES.has(String(i.type||""));}
@@ -45,9 +45,10 @@ if(typeof window.openEquippedItem==="function"){const old=window.openEquippedIte
 if(typeof window.sellSelectedItem==="function"){const old=window.sellSelectedItem;window.sellSelectedItem=async function(){const i=typeof selectedInventorySlot!=="undefined"&&selectedInventorySlot!==null&&typeof inventorySlots!=="undefined"?inventorySlots[selectedInventorySlot]:null;if(locked(i)){await alertRpg("這件裝備已鎖定，請先解除鎖定後才能出售。",{title:"裝備已鎖定",confirmText:"知道了",danger:true});return false}return old.apply(this,arguments)}}
 function selectedForge(){const s=["#v141ReforgeItemSelect","#reforgeItemSelect",'select[onchange*="v141SelectReforgeItem"]'].map(x=>document.querySelector(x)).find(Boolean);if(!s||typeof inventoryItems==="undefined")return null;const v=String(s.value||""),nidx=Number(v);if(Number.isInteger(nidx)&&nidx>=0&&inventoryItems[nidx])return inventoryItems[nidx];return inventoryItems.find(i=>i&&[i.v141Uid,i.uid,i.id].some(x=>x!=null&&String(x)===v))||null;}
 if(typeof window.v141StartReforge==="function"){const old=window.v141StartReforge;window.v141StartReforge=function(){const i=selectedForge();if(locked(i)){void alertRpg("這件裝備已鎖定，無法進行冶煉。\n請先在背包解除鎖定。",{title:"裝備已鎖定",confirmText:"知道了",danger:true});return false}return old.apply(this,arguments)}}
+function writeQuickSellQuality(value){const quality=QUICK_SELL_QUALITY_KEYS.includes(value)?value:"white";try{localStorage.setItem(QUICK_SELL_QUALITY_KEY,quality)}catch(_){}return quality;}
 function syncSellUi(){if(typeof window.v17350SyncQuickSellModal==="function")window.v17350SyncQuickSellModal();}
 window.v17351ToggleQualityMenu=()=>{};
-window.v17351ChooseQuality=v=>{const s=document.getElementById("v17350QuickSellQuality");if(s){s.value=v;s.dispatchEvent(new Event("change"))}syncSellUi()};
+window.v17351ChooseQuality=v=>{const s=document.getElementById("v17350QuickSellQuality");if(s){s.value=writeQuickSellQuality(v);s.dispatchEvent(new Event("change"))}syncSellUi()};
 window.v17350BulkSellEquipment=async function(){return typeof window.v17350OpenQuickSellModal==="function"?window.v17350OpenQuickSellModal():false};
 /* Backpack geometry is owned by the canonical inventory CSS and render lifecycle. */
 syncSellUi();
