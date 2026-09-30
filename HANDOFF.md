@@ -4404,4 +4404,9 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 
 - Original phone Revision 1 read-only screening returned `HISTORICAL_REWARDS_UNVERIFIED` and `SIDECAR_BACKUP_MISSING`. The latter is aggregate: the immutable backup inventory can be complete while one or more claim-bearing source values are explicitly marked missing. It does not prove upload failure.
 - Screening owner `functions/src/legacy-candidate-screening.js::screenLegacyCandidateSnapshot()` now returns only missing names from its existing eight-key claim-source allowlist when a sealed sidecar inventory exists. The DEV account panel `js/firebase/firebase-auth-ui.js` shows those names in the existing result; older unbundled candidates stay generic. No raw bytes, extra Firestore reads, fabricated defaults, resubmission, gameplay write or acceptance path. Historic reward claims remain unverified and Phase 4 stays 0/6 VERIFIED until separate proof and admission gates are met.
+
+## 2026-10-01 — Phase 4 original-device offline backup export (candidate)
+
+- Original-phone Revision 1 review reported absent `daily-dungeon-state`, `task-tracker` and `legacy-abyss-state` plus unverified historical rewards. These are immutable missing markers; no default record or claim eligibility is inferred.
+- `js/startup/account-save-repository.js::exportMigrationBackups()` verifies each sealed local backup for the active UID and packages its exact main, metadata and sidecar bytes for a DEV-only browser download from the existing account panel. It neither reads another UID nor alters local/cloud state. The downloaded JSON is unencrypted and must be kept private; download request is not proof of a saved file. No import, admission or cross-device restore is enabled. Phase 4 remains 0/6 VERIFIED. PR, CI, merge and deployment must be verified separately.
 - PR/CI/Firebase deploy and original-device read-only verification remain to be recorded separately.

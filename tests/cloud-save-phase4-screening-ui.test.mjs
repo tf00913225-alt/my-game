@@ -95,3 +95,25 @@ test("client routes exact revisions through the protected session owner",()=>{
     assert.match(ui,/firebaseCandidateScreeningButton.*審查目前私人候選/);
     assert.match(bootQa,/export async function screenLegacyMigrationCandidate\(\)/);
 });
+
+test("backup download stays on active UID and does not submit or screen a candidate",()=>{
+    const source=ui.slice(ui.indexOf("function downloadOriginalDeviceMigrationBackups(){"),
+        ui.indexOf("function clearResumeTimer(){"));
+    assert.ok(source.startsWith("function downloadOriginalDeviceMigrationBackups(){"));
+    let uid="uid-a",clicked=0,exported=0;
+    const context={busy:false,DEV_SESSION_TEST_ENABLED:true,state:{mode:"READY"},
+        render:()=>{},setTimeout:()=>{},console:{error:()=>{}},
+        window:{FourSymbolsFirebase:{getUser:()=>({uid})},FourSymbolsAccountSave:{
+            exportMigrationBackups:owner=>{exported++;assert.equal(owner,"uid-a");return '{"backups":[]}';}}},
+        Blob:class{constructor(){this.size=12;}},URL:{createObjectURL:()=>"blob:backup",revokeObjectURL:()=>{}},
+        document:{body:{appendChild:()=>{}},createElement:()=>({click:()=>{clicked++;},remove:()=>{}})}};
+    vm.runInNewContext(source,context);
+    context.downloadOriginalDeviceMigrationBackups();
+    assert.equal(exported,1);assert.equal(clicked,1);
+    assert.match(context.state.backupExport,/請在手機下載資料夾確認/);
+    uid="uid-b";
+    context.downloadOriginalDeviceMigrationBackups();
+    assert.equal(exported,2);assert.equal(clicked,1);
+    assert.match(context.state.backupExport,/未能匯出/);
+    assert.match(source,/document\.createElement\("a"\)/);
+});

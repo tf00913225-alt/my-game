@@ -10,7 +10,8 @@ const repoSource=fs.readFileSync(new URL('../js/startup/account-save-repository.
 const clientSource=fs.readFileSync(new URL('../js/firebase/firebase-cloud-save.js',import.meta.url),'utf8');
 const sha=s=>createHash('sha256').update(s).digest('hex');
 function fixture(){
- const values=new Map();const localStorage={getItem:k=>values.get(k)??null,setItem:(k,v)=>values.set(k,String(v)),removeItem:k=>values.delete(k)};
+ const values=new Map();const localStorage={getItem:k=>values.get(k)??null,setItem:(k,v)=>values.set(k,String(v)),removeItem:k=>values.delete(k),
+  key:index=>[...values.keys()][index]??null,get length(){return values.size;}};
  const context=vm.createContext({window:null,localStorage,Date,JSON,Error,Object,Array,String,WeakSet,Set,Map});context.window=context;
  vm.runInContext(repoSource,context);
  const repo=context.FourSymbolsAccountSave;
@@ -51,6 +52,26 @@ test('UID mismatch and changed raw bytes/digests fail closed',()=>{
  assert.throws(()=>validateMigrationBackup({...source,mainRaw:source.mainRaw.replace('200','900')},'uid-a'),/SHA-256/);
  assert.throws(()=>validateMigrationBackup({...source,sidecars:{...source.sidecars,progress:{status:'missing',raw:null}}},'uid-a'),/SHA-256/);
  repo.activate('uid-b');assert.throws(()=>repo.verifyMigrationBackup('uid-a',backup.backupKey),e=>e.code==='account-not-active');
+});
+test('offline export preserves every sealed version and missing markers without another UID or mutation',()=>{
+ const {repo,values}=fixture();const first=repo.createMigrationBackup('uid-a');
+ values.delete(repo.accountKey('daily-dungeon-state','uid-a'));
+ const second=repo.createMigrationBackup('uid-a');
+ values.set('four_symbols_migration_backup:uid-b:unrelated','private');
+ const before=new Map(values);
+ const archive=JSON.parse(repo.exportMigrationBackups('uid-a'));
+ assert.equal(archive.authoritativeStateReady,false);
+ assert.equal(archive.ownerUid,'uid-a');
+ assert.deepEqual(archive.backups.map(x=>x.backupKey).sort(),[first.backupKey,second.backupKey].sort());
+ assert.equal(archive.backups.find(x=>x.backupKey===second.backupKey).sidecars['daily-dungeon-state'].status,'missing');
+ for(const backup of archive.backups){
+  assert.equal(validateMigrationBackup(bundle(backup),'uid-a').snapshot.gold,200);
+ }
+ assert.deepEqual(values,before);
+ values.set(second.backupKey,'{corrupt');
+ assert.throws(()=>repo.exportMigrationBackups('uid-a'),e=>e.code==='migration-backup-corrupt');
+ repo.activate('uid-b');
+ assert.throws(()=>repo.exportMigrationBackups('uid-a'),e=>e.code==='account-not-active');
 });
 test('client submission requires a selected verified backup and sends only sealed raw bytes',async()=>{
  const {repo,values}=fixture();const backup=repo.createMigrationBackup('uid-a');
