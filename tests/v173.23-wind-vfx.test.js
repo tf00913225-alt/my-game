@@ -520,7 +520,9 @@ test("persistent status visuals start only on success, survive duplicate MISS, a
 
     applied.party[1].activeBuffs.push({type:"stealthSkill",turnsLeft:2});
     applied.context.v143SyncStatusVisualEffects();
-    assert.ok(applied.cards.battlePlayerCard1.querySelector(".v143-status-visual-stealthSkill"));
+    assert.equal(applied.cards.battlePlayerCard1.querySelector(".v143-status-visual-stealthSkill"),null,"stealth has no body visual");
+    assert.equal(applied.cards.battlePlayerCard1.querySelector(".v143-status-icon-stealthSkill"),null,"stealth has no HUD icon");
+    assert.ok(applied.cards.battlePlayerCard1.classList.contains("v143-unit-stealthed"),"stealth still projects gameplay artwork state");
     applied.context.v142SkillAnimationDirector.dispose();
     assert.equal(applied.body.querySelectorAll(".v143-status-visual").length,0,"battle disposal clears body visuals");
     assert.equal(applied.body.querySelectorAll(".v143-status-icon").length,0,"battle disposal clears status icons");
