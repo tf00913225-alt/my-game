@@ -14,6 +14,8 @@ on:
       - 'tests/session-*.test.mjs'
       - 'tests/cloud-save-*.test.mjs'
       - 'tests/firebase-trusted-cloud-save-backend.test.mjs'
+      - 'scripts/firestore-backup-readiness.mjs'
+      - 'tests/firestore-backup-readiness.test.mjs'
       - '.github/workflows/session-authority.yml'
   push:
     branches: [dev]
@@ -26,6 +28,8 @@ on:
       - 'tests/session-*.test.mjs'
       - 'tests/cloud-save-*.test.mjs'
       - 'tests/firebase-trusted-cloud-save-backend.test.mjs'
+      - 'scripts/firestore-backup-readiness.mjs'
+      - 'tests/firestore-backup-readiness.test.mjs'
       - '.github/workflows/session-authority.yml'
 
 permissions:
@@ -61,6 +65,7 @@ jobs:
           name: session-authority-boot-${{ github.sha }}
           path: artifacts/browser-qa/boot-architecture-browser-qa.json
           if-no-files-found: error
+      - run: node --test tests/firestore-backup-readiness.test.mjs
       - name: Verify actual callable and Firestore authorization
         run: npx --yes firebase-tools@15.30.0 emulators:exec --project demo-four-symbols-session --config firebase.session-emulators.json --only auth,firestore,functions 'node scripts/test-session-authority-emulator.mjs'
 
@@ -126,6 +131,14 @@ jobs:
           else
             echo 'Scheduled backups: UNVERIFIED (schedule query unavailable)' | tee -a "$GITHUB_STEP_SUMMARY"
           fi
+          if backups_json="$(gcloud firestore backups list --project=four-symbols-jianghu --format=json 2>/dev/null)"; then
+            echo 'Backup inventory: query succeeded' >> "$GITHUB_STEP_SUMMARY"
+          else
+            backups_json=''
+            echo 'Backup inventory: query unavailable' >> "$GITHUB_STEP_SUMMARY"
+          fi
+          FIRESTORE_DATABASE_JSON="${database_json:-}" FIRESTORE_BACKUPS_JSON="$backups_json" \
+            node scripts/firestore-backup-readiness.mjs | tee -a "$GITHUB_STEP_SUMMARY"
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
