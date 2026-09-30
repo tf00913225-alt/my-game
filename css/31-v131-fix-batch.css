@@ -306,11 +306,6 @@
     z-index:0;
 }
 
-#game-stage #inventoryPortraitFrame #inventoryCharacterDetailButton{
-    position:relative;
-    z-index:2;
-}
-
 .v131-unlock-ready{ position:relative !important; }
 
 .v131-unlock-dot{

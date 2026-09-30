@@ -147,6 +147,17 @@
     transform:none;
 }
 
+/* Context contract: Backpack Slot owns rarity presentation. The shared
+   v169 art remains an image container here, while other contexts keep their
+   own rarity treatment. */
+#game-stage #inventoryPage .inventory-backpack-rarity-neutral{
+    border:0;
+    border-radius:0;
+    box-shadow:none;
+    background:transparent;
+    animation:none;
+}
+
 #game-stage #inventoryPage .inventory-item-classic .inventory-slot-number{
     display:none !important;
 }
