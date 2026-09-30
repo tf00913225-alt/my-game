@@ -4238,6 +4238,9 @@ function beginBattleDurationAction(event){
 function finishBattleDurationAction(){
     /* Action Finish is notification only. Round-End is the sole consumer. */
     battleDurationAction=null;
+    if(typeof v143SyncStatusVisualEffects==="function"){
+        v143SyncStatusVisualEffects(false);
+    }
 }
 if(typeof window!=="undefined"){
     window.v175DurationLifecycleActive=true;
