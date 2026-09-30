@@ -219,7 +219,7 @@ const COLLECT_EVIDENCE=`(()=>{
     selectedSkillElementTab="water";renderSkillLoadout();
     if(typeof window.v146SyncCharacterAttentionDots==="function"){ window.v146SyncCharacterAttentionDots(); }
     const guidance=[];
-    document.querySelectorAll(".v146-growth-guidance-dot").forEach(dot=>{
+    document.querySelectorAll("#allSkillsList .v146-growth-guidance-dot").forEach(dot=>{
         const parent=dot.closest("button.skill-action-card");
         guidance.push({parent:visible(parent),dot:visible(dot)});
     });
