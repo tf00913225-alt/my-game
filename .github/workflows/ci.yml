@@ -370,6 +370,8 @@ jobs:
             artifacts/browser-qa/inventory-map-393x873.png
             artifacts/browser-qa/inventory-dungeon-393x873.png
             artifacts/browser-qa/battle-picker-393x873.png
+          if-no-files-found: warn
+          retention-days: 90
 
       - name: Run Backpack visual composition browser QA
         id: backpack_visual_browser
@@ -383,8 +385,6 @@ jobs:
           name: backpack-visual-composition-${{ github.sha }}
           path: artifacts/browser-qa/backpack-*.png
           if-no-files-found: error
-          retention-days: 90
-          if-no-files-found: warn
           retention-days: 90
 
       - name: Run relic progression mobile browser QA
