@@ -14,6 +14,7 @@ const {createCanonicalRecoveryApproval}=require("./src/canonical-recovery-approv
 const {createCanonicalCurrentRecovery}=require("./src/canonical-current-recovery");
 const {createCanonicalSourceWriter}=require("./src/canonical-source-writer");
 const {createCanonicalShopPurchase}=require("./src/canonical-shop-purchase");
+const {createCanonicalExpAllocation}=require("./src/canonical-exp-allocation");
 const {CloudPreferencesError,PREFERENCES_SCHEMA_VERSION,normalizePreferences}=require("./src/cloud-preferences");
 const {
     CLOUD_SAVE_ENVELOPE_SCHEMA_VERSION,
@@ -57,6 +58,10 @@ const initialCharacterWriter=createCanonicalSourceWriter({
     inspectExistingEnvelope,nextRevision
 });
 const canonicalShopPurchase=createCanonicalShopPurchase({
+    db:getFirestore(),FieldValue,HttpsError,runProtected:sessions.runProtected,
+    inspectExistingEnvelope,nextRevision
+});
+const canonicalExpAllocation=createCanonicalExpAllocation({
     db:getFirestore(),FieldValue,HttpsError,runProtected:sessions.runProtected,
     inspectExistingEnvelope,nextRevision
 });
@@ -228,6 +233,23 @@ exports.purchaseCanonicalPotion=onCall(CALLABLE_OPTIONS,async request=>{
         return await canonicalShopPurchase.purchase(request,{
             operationId:data.operationId,expectedRevision:data.expectedRevision,
             itemId:data.itemId,quantity:data.quantity
+        });
+    }catch(error){ throw asHttpsError(error); }
+});
+// Spend only the server-owned EXP pool on the unpublished first character.
+// The client supplies no EXP amount, target level or resulting attributes.
+exports.allocateCanonicalSharedExp=onCall(CALLABLE_OPTIONS,async request=>{
+    request=await verifyGameIdentity(request);
+    try{
+        const data=request.data;
+        if(!data||typeof data!=="object"||Array.isArray(data)||
+           Object.keys(data).some(key=>![
+               "uid","session","operationId","expectedRevision"
+           ].includes(key))){
+            throw new HttpsError("invalid-argument","Only an EXP allocation operation is accepted.");
+        }
+        return await canonicalExpAllocation.allocateSharedExp(request,{
+            operationId:data.operationId,expectedRevision:data.expectedRevision
         });
     }catch(error){ throw asHttpsError(error); }
 });
