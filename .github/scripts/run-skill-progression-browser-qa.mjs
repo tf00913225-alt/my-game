@@ -119,6 +119,8 @@ class Cdp{
 
 const PREPARE_RUNTIME=`(async()=>{
     const runtimeErrors=[];
+    const originalConsoleError=console.error;
+    console.error=(...args)=>{runtimeErrors.push(args.map(value=>String(value&&value.stack||value)).join(" "));originalConsoleError(...args);};
     window.addEventListener("error",event=>runtimeErrors.push(String(event.message||event.error||"window error")));
     window.addEventListener("unhandledrejection",event=>runtimeErrors.push(String(event.reason||"unhandled rejection")));
     const waitFor=async predicate=>{
@@ -134,7 +136,8 @@ const PREPARE_RUNTIME=`(async()=>{
             state:window.FourSymbolsStartupPolicy?.getState?.(),
             loaderHidden:document.getElementById("startupLoader")?.hidden,
             gameDisplay:getComputedStyle(document.getElementById("gameInterface")).display,
-            startupError:String(window.FourSymbolsStartupPolicy?.getLastError?.()?.message||"")
+            startupError:String(window.FourSymbolsStartupPolicy?.getLastError?.()?.message||""),
+            runtimeErrors:runtimeErrors.slice(-8)
         }));
     }
     await window.FourSymbolsFeatures.ensure("skill","skill-runtime-browser-qa");
