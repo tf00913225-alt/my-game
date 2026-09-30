@@ -24,6 +24,9 @@ assert.doesNotMatch(css24,/102-SLOT|102-slot|exactly 102|no pagination|height:10
 assert.match(css24,/inventoryGridScroll|inventory-grid-scroll/);
 assert.match(css38,/inventory-backpack-rarity-neutral/);
 assert.match(css50,/v169-item-art:not\(\.inventory-backpack-rarity-neutral\)/);
+assert.match(read("js/58-v173.63-functional-fixes.js"),/v169-material-art:not\(\.inventory-backpack-rarity-neutral\)/);
+assert.doesNotMatch(css22,/inventory-item-classic:before/);
+assert.match(css22,/border:1px solid var\(--slot-rarity,var\(--bag-slot-border\)\)/);
 for(const rarity of ["white","blue","purple","orange","pink","four-symbol"]){
     assert.doesNotMatch(css55,new RegExp(`#game-stage \\.rarity-${rarity}`),`Team Relic ${rarity} selector must not be global`);
     assert.match(css55,new RegExp(`team-relic-[^,{]+\\.rarity-${rarity}`),`Team Relic ${rarity} selector must carry Team Relic context`);
@@ -32,8 +35,10 @@ for(const rarity of ["white","blue","purple","orange","pink","four-symbol"]){
 assert.match(browser,/build\/asset-manifest\.json/);
 assert.match(browser,/gameplay-core/);
 assert.match(browser,/v169-item-art v169-equipment-art v169-rarity-orange v17346-rarity-orange inventory-backpack-rarity-neutral/);
+assert.match(browser,/v169-item-art v169-material-art v169-rarity-blue inventory-backpack-rarity-neutral/);
 assert.match(browser,/equipment-progression-style/);
+assert.match(browser,/functional-material-style/);
 assert.match(browser,/injectedRarityMatch/);
-assert.match(browser,/equipment label/);
-assert.match(browser,/art\.shadow/);
+assert.match(browser,/inventory-equipment-slot-label/);
+assert.match(browser,/inner artwork glow leaked/);
 console.log("✓ Backpack Runtime CSS Owner convergence regression passed");
