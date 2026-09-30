@@ -2079,7 +2079,7 @@ function getEquipmentBonus(characterId){
    - agilityDown 再額外降低有效敏捷。
    - defenseDown 在所有防禦加成算完後再降低最終防禦。
    - 暫時性的 vitality / energy 降低「不動態縮減 maxHP / maxSP」，
-     避免減益命中瞬間把現有 HP/SP 強制裁掉；體質仍會降低戰鬥防禦。
+     避免減益命中瞬間把現有 HP/SP 強制裁掉；Vitality 只提供 Max HP。
      這是沿用本專案先前已確認的戰鬥資源穩定原則，不新增隱性扣血/扣SP。
 ===================================================== */
 function getEffectivePlayerAbilityPoints(character,equipmentBonus,statName){
@@ -2922,7 +2922,7 @@ function generateMonsterAttributePoints(
     level
 ){
 
-    /* Fixed 10% Vitality allocation; remaining points split among Attack, Energy, Intelligence, and Defense. */
+    /* Monster generation assigns explicit Defense independently of Vitality. */
     const totalPoints=
         10+level*2;
 
