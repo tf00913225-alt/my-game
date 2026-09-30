@@ -370,7 +370,11 @@ test("wind and earth support values stay in formal arrays instead of transient s
     assert.equal(r.skills.earthShield.reflectPercent,undefined);
     assert.equal(r.skills.barrier.barrierBlockCountByLevel,undefined,"Barrier has no charge lifecycle");
     assert.equal(r.skills.earthEX.maxHpMultiplier,1.2,"Earth EX applies Max HP after base sources");
-    assert.match(main,/\)\*maxHpPassiveMultiplier\)/,"both player stat owners apply Earth EX after base Max HP");
+    assert.equal(
+        (main.match(/maxHP:\s*Math\.round\(base\.maxHP\*maxHpPassiveMultiplier\)/g)||[]).length,
+        2,
+        "both player stat owners apply Earth EX after base Max HP"
+    );
 });
 
 test("legacy learned skills remain intact while the next upgrade obeys the new gate",()=>{
