@@ -14534,7 +14534,7 @@ function getMonsterDebuffValue(
     type
 ){
 
-    if(!monster.statusEffects){
+    if(!monster || !monster.statusEffects){
         return 0;
     }
 
