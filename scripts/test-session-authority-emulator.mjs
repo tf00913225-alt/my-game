@@ -540,7 +540,14 @@ assert.equal((await db.doc(`serverUsers/${y}/economy/current`).get()).get("share
 assert.equal((await db.doc(`serverUsers/${y}/operations/${allocationOperation}`).get())
     .exists,false);
 assert.equal((await db.doc(`serverUsers/${y}/recoveryArchives/9`).get()).exists,false);
-const allocated=await expAllocator.allocateSharedExp(yRequest,allocArgs);
+const callableAllocation={...yRequest.data,...allocArgs};
+await rejected("allocateCanonicalSharedExp",yUser.idToken,
+    {...callableAllocation,cost:0},"INVALID_ARGUMENT");
+await rejected("allocateCanonicalSharedExp",yUser.idToken,
+    {...callableAllocation,expectedRevision:7},"ABORTED");
+await rejected("allocateCanonicalSharedExp",yUser.idToken,
+    {...callableAllocation,session:{...sessionY,credential:"z".repeat(43)}},"SESSION_INVALID");
+const allocated=await invoke("allocateCanonicalSharedExp",yUser.idToken,callableAllocation);
 assert.equal(allocated.allocatedRevision,9);
 const leveledArchive=await checkRecoveryArchive(y,9);
 assert.equal(leveledArchive.get("sourceRecords.claimRecords").length,3);
@@ -559,7 +566,8 @@ assert.equal((await db.doc(`serverUsers/${y}/playableSnapshots/9`).get())
     .get("readyForPublication"),false);
 assert.equal((await db.doc(`serverUsers/${y}/claimCheckpoints/current`).get()).get("claimCount"),3);
 assert.equal((await firstClaimRef.get()).get("serverRevision"),9);
-assert.equal((await expAllocator.allocateSharedExp(yRequest,allocArgs)).unchanged,true);
+assert.equal((await invoke("allocateCanonicalSharedExp",yUser.idToken,callableAllocation))
+    .unchanged,true);
 
 await assert.rejects(expAllocator.allocateSharedExp(yRequest,{
     operationId:goldOperation,expectedRevision:9}),
