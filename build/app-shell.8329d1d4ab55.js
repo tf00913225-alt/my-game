@@ -29756,7 +29756,8 @@ function renderSkillLoadout(){
             </span>
         </div>
 
-        <div
+        <button
+            type="button"
             class="skill-action-card${
                 actionDisabled
                 ?
@@ -29765,17 +29766,21 @@ function renderSkillLoadout(){
                 ""
             }"
             onclick="${actionOnclick}"
+            ${actionDisabled ? 'disabled aria-disabled="true"' : 'aria-disabled="false"'}
+            data-skill-action="learn-or-upgrade"
         >
-            <div class="skill-action-card-label">
+            <span class="skill-action-card-label">
                 ${actionLabel}
-            </div>
+            </span>
+        </button>
         </div>
 
         ${
             showEquipButton
             ?
             `
-            <div
+            <button
+                type="button"
                 class="skill-action-card${
                     equipped
                     ?
@@ -29784,8 +29789,10 @@ function renderSkillLoadout(){
                     ""
                 }"
                 onclick="equipSkill('${skillId}')"
+                ${equipped ? 'disabled aria-disabled="true"' : 'aria-disabled="false"'}
+                data-skill-action="equip"
             >
-                <div class="skill-action-card-label">
+                <span class="skill-action-card-label">
                     ${
                         equipped
                         ?
@@ -29793,7 +29800,8 @@ function renderSkillLoadout(){
                         :
                         "裝備"
                     }
-                </div>
+                </span>
+            </button>
             </div>
             `
             :
