@@ -478,7 +478,7 @@ test("one target owner handles both directions and Stealth only blocks hostile p
     assert.deepEqual(Array.from(owner.resolveTargets("player",null,"all",{hostilePrimary:true})),[0,1,2]);
 });
 
-test("core duration lifecycle consumes existing timed effects once per formal action",()=>{
+test("core duration lifecycle defers timed-effect consumption to round end",()=>{
     const main=fs.readFileSync("js/00-main.js","utf8");
     const slice=battleSourceBetween(
         main,
@@ -513,23 +513,20 @@ test("core duration lifecycle consumes existing timed effects once per formal ac
     lifecycle.beginAction(event);
     actor.activeBuffs.push({type:"dodgeSkill",turnsLeft:3});
     lifecycle.finishAction();
-    assert.equal(actor.activeBuffs.find(x=>x.type==="rage").turnsLeft,2);
+    assert.equal(actor.activeBuffs.find(x=>x.type==="rage").turnsLeft,3);
     assert.equal(actor.activeBuffs.find(x=>x.type==="dodgeSkill").turnsLeft,3);
     assert.equal(actor.activeBuffs.find(x=>x.type==="bloodBurn").turnsLeft,3);
-    assert.equal(actor.statusEffects.find(x=>x.type==="freeze").turnsLeft,2);
-    assert.equal(actor.statusEffects.find(x=>x.type==="frostbite").turnsLeft,1);
+    assert.equal(actor.statusEffects.find(x=>x.type==="freeze").turnsLeft,3);
+    assert.equal(actor.statusEffects.find(x=>x.type==="frostbite").turnsLeft,2);
 
     lifecycle.beginAction(event);
     lifecycle.finishAction();
-    assert.equal(actor.activeBuffs.find(x=>x.type==="rage").turnsLeft,1);
-    assert.equal(actor.activeBuffs.find(x=>x.type==="dodgeSkill").turnsLeft,2);
-    assert.equal(actor.statusEffects.some(x=>x.type==="frostbite"),false);
+    assert.equal(actor.activeBuffs.find(x=>x.type==="rage").turnsLeft,3);
+    assert.equal(actor.activeBuffs.find(x=>x.type==="dodgeSkill").turnsLeft,3);
+    assert.equal(actor.statusEffects.find(x=>x.type==="frostbite").turnsLeft,2);
 
-    lifecycle.beginAction(event);
-    lifecycle.finishAction();
-    assert.equal(actor.activeBuffs.some(x=>x.type==="rage"),false);
-    assert.equal(actor.statusEffects.some(x=>x.type==="freeze"),false);
-    assert.equal(actor.activeBuffs.find(x=>x.type==="dodgeSkill").turnsLeft,1);
+    assert.match(main,/function consumeRoundEndDurations\(\)/);
+    assert.match(main,/if\(type==="round_end"\)\{ consumeRoundEndDurations\(\); \}/);
 });
 
 test("repaired battle paths retire duplicate duration owners",()=>{
