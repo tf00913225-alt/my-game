@@ -2155,16 +2155,14 @@
     <div class="inventory-title-plate" aria-label="江湖行囊">
         <span class="inventory-title-plate-kicker">INVENTORY</span>
         <h2>行囊</h2>
-        <span class="inventory-title-plate-subtitle">江湖行囊</span>
+        <button
+            type="button"
+            id="mapInventoryOverlayClose"
+            class="map-inventory-overlay-close"
+            onclick="closeMapInventoryOverlay()"
+            aria-label="關閉背包"
+        >關閉</button>
     </div>
-
-    <button
-        type="button"
-        id="mapInventoryOverlayClose"
-        class="map-inventory-overlay-close"
-        onclick="closeMapInventoryOverlay()"
-        aria-label="關閉背包"
-    >關閉</button>
 
     <!-- 上方：角色切換 + 立繪 + 六部位裝備 -->
     <section class="inventory-character-panel">
@@ -2180,7 +2178,7 @@
                     class="inventory-character-detail-button"
                     aria-label="查看角色詳細資訊"
                     onclick="openInventoryCharacterDetail()"
-                >🔍</button>
+                >詳</button>
 
                 <div class="inventory-portrait-placeholder">
                     角色立繪
