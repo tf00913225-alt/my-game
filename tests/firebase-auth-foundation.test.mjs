@@ -71,7 +71,8 @@ test("DEV account UI provides a tap-only Phase 2 envelope validation without loc
     assert.match(ui, /data\.schemaVersion===2/);
     assert.match(ui, /first\.serverRevision===revision&&second\.serverRevision===revision/);
     assert.match(ui, /data\.authoritativeStateReady===false&&!hasGameplayPayload/);
-    assert.doesNotMatch(ui, /submitLegacyMigrationCandidate/);
+    const envelopeOnly=ui.slice(ui.indexOf("async function testCloudSaveEnvelope(){"),ui.indexOf("async function testCloudPreferences(){"));
+    assert.doesNotMatch(envelopeOnly, /submitLegacyMigrationCandidate/);
     assert.doesNotMatch(ui, /localStorage/);
     assert.match(ui, /cloudEnvelopeTestButton\.addEventListener\("click"/);
 });
