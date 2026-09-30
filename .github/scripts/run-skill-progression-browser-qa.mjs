@@ -9,12 +9,24 @@ const ROOT=process.cwd();
 const ARTIFACT_DIR=path.join(ROOT,"artifacts","browser-qa");
 const VIEWPORTS=[[360,800],[393,873],[412,915]];
 const WATER_CASES=[
-    ["healSpell","治療術"],
-    ["revive","復活術"],
-    ["freeze","冰封"],
-    ["purifyMind","淨心訣"]
+    ["healSpell","æ²»çè¡"],
+    ["revive","å¾©æ´»è¡"],
+    ["freeze","å°å°"],
+    ["purifyMind","æ·¨å¿è¨£"]
 ];
 const ELEMENT_CASES=[["fire","fireRocket"],["water","healSpell"],["wind","stormFist"],["earth","stoneThrow"]];
+const ASSET_MANIFEST=JSON.parse(fs.readFileSync(path.join(ROOT,"build","asset-manifest.json"),"utf8"));
+const QA_AUTH_PATH="/"+Object.keys(ASSET_MANIFEST.assets).find(file=>/build\/firebase\/firebase-auth\.[0-9a-f]{12}\.js$/.test(file));
+const QA_CLOUD_PATH="/"+Object.keys(ASSET_MANIFEST.assets).find(file=>/build\/firebase\/firebase-cloud-save\.[0-9a-f]{12}\.js$/.test(file));
+const QA_SESSION_PATH="/"+Object.keys(ASSET_MANIFEST.assets).find(file=>/build\/firebase\/firebase-session\.[0-9a-f]{12}\.js$/.test(file));
+const QA_FIRST_PLAY={gameVersion:String(ASSET_MANIFEST.release||""),manifestVersion:ASSET_MANIFEST.firstPlay.manifestVersion,assetPackVersion:ASSET_MANIFEST.firstPlay.assetPackVersion,manifestHash:ASSET_MANIFEST.firstPlay.manifestHash,completedAt:"2026-09-30T00:00:00.000Z",assets:Object.fromEntries(ASSET_MANIFEST.firstPlay.resources.map(item=>[item.path,item.sha256]))};
+/* Production index, feature loader and runtime remain real.  Only external
+   Firebase transport is replaced by a read-only local account so Startup can
+   formally reach READY without a player account or cloud write. */
+const QA_AUTH_MODULE=String.raw`const user=Object.freeze({uid:"skill-runtime-browser-qa",email:"skill-runtime-browser-qa@qa.invalid",displayName:"Skill Runtime QA",photoURL:null,isAnonymous:true,providerIds:Object.freeze([])});export function getFirebaseAuthConfigStatus(){return Object.freeze({ready:true,missingFields:[],projectId:"skill-runtime-qa",sdkVersion:"qa"});}export async function initializeFirebaseAuth(){return Object.freeze({app:{name:"skill-runtime-qa"},auth:{currentUser:user}});}export function getFirebaseApp(){return {name:"skill-runtime-qa"};}export function getFirebaseAuth(){return {currentUser:user};}export function getSignedInUser(){return user;}export function installFirebaseSessionHooks(){}export async function observeFirebaseAuthState(listener){queueMicrotask(()=>listener(user,null));return ()=>{};}export async function signInAsAnonymous(){return user;}export async function signInWithGoogle(){return user;}export async function signInWithFacebook(){return user;}export async function signInWithEmail(){return user;}export async function createAccountWithEmail(){return user;}export async function signOutFirebase(){}`;
+const QA_CLOUD_MODULE=String.raw`export const CLOUD_SAVE_WRITE_POLICY="trusted-backend-only";export const CLOUD_FUNCTIONS_REGION="qa-local";export const CURRENT_SAVE_SUBCOLLECTION="saves";export const CURRENT_SAVE_DOCUMENT="current";export const LEGACY_LOCAL_SAVE_KEY="battle_full_version_save_v5";const uid="skill-runtime-browser-qa";const save={player:{id:"Skill Runtime QA",element:"fire",gender:"male",level:70,exp:0,expNext:100,attack:10,vitality:10,energy:10,intelligence:10,spirit:10,agility:10,bonusHP:0,bonusSP:0,hp:300,sp:120,attributePoints:0,skillPoints:999,activeBuffs:[],statusEffects:[],isDefending:false},sharedExp:0,gold:0,inventoryItems:[],characterEquipment:{fire:{head:null,hand:null,shoulder:null,armor:null,shoes:null,ring:null}},characterSkillLoadouts:{fire:{name:"Skill Runtime QA",skillLevels:{fireRocket:1},equippedSkills:[]}}};export async function readCurrentCloudSave(){return Object.freeze({exists:true,uid,path:"users/"+uid+"/saves/current",data:{ownerUid:uid,authoritativeStateReady:true,status:"ready",gameSave:save}});}export async function bootstrapTrustedCloudSave(){throw new Error("QA cloud writes are forbidden");}export async function createInitialCanonicalCharacter(){throw new Error("QA cloud writes are forbidden");}export async function saveLocalAutoBattlePreferences(){throw new Error("QA cloud writes are forbidden");}export async function submitLegacyMigrationCandidate(){throw new Error("QA cloud writes are forbidden");}export function createLocalMigrationBackup(){throw new Error("QA cloud writes are forbidden");}`;
+const QA_SESSION_MODULE=String.raw`export const CLOUD_FUNCTIONS_REGION="qa-local";export async function synchronizeGameSession(user){window.dispatchEvent(new CustomEvent("four-symbols:game-session-state",{detail:{uid:user?.uid||null,status:user?"ready":"signed-out",code:null}}));return {status:"ready"};}export async function callProtectedFunction(){throw new Error("QA cloud writes are forbidden");}export async function revokeGameSession(){}export const protectedTest=()=>callProtectedFunction("protectedTest");export function getGameSessionState(){return {status:"ready"};}`;
+function qaPrelude(){return `<script>localStorage.setItem("four_symbols_active_uid","skill-runtime-browser-qa");localStorage.setItem("four_symbols_privacy_consent",JSON.stringify({privacyPolicyVersion:"2026-09-11-v2",acceptedAt:"2026-09-30T00:00:00.000Z"}));localStorage.setItem("four_symbols_first_play_ready",${JSON.stringify(JSON.stringify(QA_FIRST_PLAY))});</script>`;}
 
 function findChrome(){
     const configured=String(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH||"").trim();
@@ -41,12 +53,17 @@ function mime(file){
 async function startServer(){
     const server=http.createServer((req,res)=>{
         const pathname=decodeURIComponent(String(req.url||"/").split("?")[0]);
+        const fetchDestination=String(req.headers["sec-fetch-dest"]||"");
+        if(fetchDestination==="script"&&pathname===QA_AUTH_PATH){res.writeHead(200,{"content-type":"text/javascript; charset=utf-8","cache-control":"no-store"});res.end(QA_AUTH_MODULE);return;}
+        if(fetchDestination==="script"&&pathname===QA_CLOUD_PATH){res.writeHead(200,{"content-type":"text/javascript; charset=utf-8","cache-control":"no-store"});res.end(QA_CLOUD_MODULE);return;}
+        if(fetchDestination==="script"&&pathname===QA_SESSION_PATH){res.writeHead(200,{"content-type":"text/javascript; charset=utf-8","cache-control":"no-store"});res.end(QA_SESSION_MODULE);return;}
         const relative=pathname==="/"?"index.html":pathname.replace(/^\/+/,"");
         const file=path.resolve(ROOT,relative);
         if(!file.startsWith(ROOT+path.sep)||!fs.existsSync(file)||fs.statSync(file).isDirectory()){
             res.writeHead(404);res.end("not found");return;
         }
         res.writeHead(200,{"content-type":mime(file),"cache-control":"no-store"});
+        if(relative==="index.html"){res.end(fs.readFileSync(file,"utf8").replace("<!-- build:critical-script -->",qaPrelude()+"\n<!-- build:critical-script -->"));return;}
         fs.createReadStream(file).pipe(res);
     });
     await new Promise(resolve=>server.listen(0,"127.0.0.1",resolve));
@@ -102,6 +119,14 @@ const PREPARE_RUNTIME=`(async()=>{
     if(!await waitFor(()=>window.FourSymbolsFeatures&&typeof window.FourSymbolsFeatures.ensure==="function")){
         throw new Error("feature loader was not initialized");
     }
+    if(!await waitFor(()=>window.FourSymbolsStartupPolicy?.getState?.()==="READY"&&document.getElementById("startupLoader")?.hidden===true&&getComputedStyle(document.getElementById("gameInterface")).display!=="none")){
+        throw new Error("formal account-first startup did not reach READY: "+JSON.stringify({
+            state:window.FourSymbolsStartupPolicy?.getState?.(),
+            loaderHidden:document.getElementById("startupLoader")?.hidden,
+            gameDisplay:getComputedStyle(document.getElementById("gameInterface")).display,
+            startupError:String(window.FourSymbolsStartupPolicy?.getLastError?.()?.message||"")
+        }));
+    }
     await window.FourSymbolsFeatures.ensure("skill","skill-runtime-browser-qa");
     if(!await waitFor(()=>typeof renderSkillLoadout==="function"&&typeof window.v173GetSkillLearnEligibility==="function"&&typeof window.v17364GetSkillUpgradeEligibility==="function")){
         throw new Error("formal Skill Runtime owners were not initialized: "+JSON.stringify({
@@ -114,8 +139,8 @@ const PREPARE_RUNTIME=`(async()=>{
             errors:runtimeErrors.slice(-8)
         }));
     }
-    player.id="QA 火角色";player.element="fire";player.level=70;player.skillPoints=999;
-    player2={id:"QA 水角色",element:"water",level:70,skillPoints:999};
+    player.id="QA ç«è§è²";player.element="fire";player.level=70;player.skillPoints=999;
+    player2={id:"QA æ°´è§è²",element:"water",level:70,skillPoints:999};
     player3=null;
     currentSkillCharacter="fire";
     // Cross-element learning keeps its formal native-skill gate. Seed one
@@ -234,10 +259,10 @@ async function runViewport(chrome,url,width,height,capture){
         for(const [name,action] of Object.entries(evidence.water)){ assertVisibleAction(name,action); }
         for(const [element,item] of Object.entries(evidence.elements)){ assertVisibleAction(element+"/"+item.skillId,item.action); }
         assertVisibleAction("disabled learn",evidence.disabledLearn);assert.equal(evidence.disabledLearn.disabled,true,"locked action must use native disabled");
-        assertVisibleAction("upgrade",evidence.upgrade);assert.ok(evidence.upgrade.label.text.includes("升級・"),"upgrade label is missing");
+        assertVisibleAction("upgrade",evidence.upgrade);assert.ok(evidence.upgrade.label.text.includes("åç´ã»"),"upgrade label is missing");
         assertVisibleAction("equip",evidence.equip);assert.equal(evidence.equip.disabled,false,"equip action should be enabled");
         assertVisibleAction("max level",evidence.maxLevel);assert.equal(evidence.maxLevel.disabled,true,"max-level action must use native disabled");
-        assert.ok(evidence.water["治療術"].label.text.includes("學習・"),"治療術 is not a cross-element learn action");
+        assert.ok(evidence.water["æ²»çè¡"].label.text.includes("å­¸ç¿ã»"),"æ²»çè¡ is not a cross-element learn action");
         assert.ok(evidence.guidance.length>0,"learnable action has no Guidance Dot");
         for(const item of evidence.guidance){ assertVisibleAction("Guidance Dot parent",item.parent);assert.ok(item.dot.visibleRectWidth>0&&item.dot.visibleRectHeight>0,"Guidance Dot is not visible"); }
         for(const card of evidence.allCards){ assert.equal(card.tagName,"BUTTON","div.skill-action-card is forbidden in formal Runtime"); }
