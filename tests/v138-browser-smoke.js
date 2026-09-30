@@ -45,7 +45,7 @@ async function seedParty(page){
             vitality:20,
             energy:20,
             intelligence:0,
-            spirit:0,
+            defensePoints:0,
             agility:0,
             bonusHP:0,
             bonusSP:0,

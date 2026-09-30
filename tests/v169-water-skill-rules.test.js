@@ -45,8 +45,8 @@ test("Frostbite remains a soft runtime debuff with the final 30 percent damage p
         v141TryMonsterSpecialAction(){ specials++; return true; },
         prepareAction(){ return "skill-ok"; }, processSingleMonsterAttack(){ return "monster-skill-ok"; },
         getOutgoingDamageDownPercent(){ return 0; }, getMonsterEvasion(){ return 40; },
-        getMonsterEffectiveSpiritPoints(){ return 80; }, getPlayerStatusResistBonus(){ return 20; },
-        getFinalBattleSpiritForPlayerTarget(){ return 100; }
+        getMonsterEffectiveStatusResistance(){ return 80; }, getPlayerStatusResistBonus(){ return 20; },
+        getFinalBattleStatusResistanceForPlayerTarget(){ return 100; }
     });
     assert.equal(context.v141TryMonsterSpecialAction(0),true);
     assert.equal(specials,1);
@@ -54,9 +54,9 @@ test("Frostbite remains a soft runtime debuff with the final 30 percent damage p
     assert.equal(context.processSingleMonsterAttack(0),"monster-skill-ok");
     assert.equal(context.getOutgoingDamageDownPercent(frostbitten),30);
     assert.equal(context.getMonsterEvasion(frostbitten),40);
-    assert.equal(context.getMonsterEffectiveSpiritPoints(frostbitten),80);
+    assert.equal(context.getMonsterEffectiveStatusResistance(frostbitten),80);
     assert.equal(context.getPlayerStatusResistBonus(frostbitten),20);
-    assert.equal(context.getFinalBattleSpiritForPlayerTarget(frostbitten),100);
+    assert.equal(context.getFinalBattleStatusResistanceForPlayerTarget(frostbitten),100);
     assert.equal(context.v169WaterSkillRules.frostbitePenaltyPercent,30);
 });
 

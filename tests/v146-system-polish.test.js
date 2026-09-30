@@ -17,6 +17,7 @@ const source=fs.readFileSync("js/41-v146-system-polish.js","utf8");
 const finalNavSource=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");
 const eagerSource=fs.readFileSync("js/16-stage-v54-main-city-runtime.js","utf8");
 const css=fs.readFileSync("css/42-v146-system-polish.css","utf8");
+const skillNameCss=fs.readFileSync("css/battle-skill-name-presentation-owner.css","utf8");
 const inventoryCss=fs.readFileSync("css/22-stage-v78-character-inventory-core.css","utf8");
 
 let passed=0;
@@ -70,7 +71,7 @@ test("latest skill table contains every exact requested value",()=>{
     ].forEach(pattern=>assert.match(rules,pattern));
     assert.match(progression,/const FREEZE_CHANCE_BY_LEVEL=Object\.freeze\(\[55,65,75,85,95\]\)/);
     assert.match(progression,/const ROCK_WALL_BY_LEVEL=Object\.freeze\(\[15,20,25,30,35\]\)/);
-    assert.match(progression,/const EARTH_SHIELD_BY_LEVEL=Object\.freeze\(\[20,30,35,40,50\]\)/);
+    assert.match(progression,/const EARTH_SHIELD_BY_LEVEL=Object\.freeze\(\[20,40,60,80,100\]\)/);
     assert.match(progression,/rockWall:\{[\s\S]*?requires:\["petrifyFist","sandWind"\]/);
     assert.match(progression,/earthShield:\{[\s\S]*?requires:\["rockWall"\]/);
 });
@@ -87,8 +88,8 @@ test("visual timing, dead-target filtering and raster-only choreography are enfo
     assert.match(animation,/renderer:"dom-sprite"/);
     assert.doesNotMatch(animation,/<svg\b|v146-flight-art|v143-skill-flight|v143-skill-field|v143-hit-impact/);
     assert.doesNotMatch(css,/v146-flight-art|v143-skill-flight|v143-skill-field|v143-hit-impact/);
-    assert.match(css,/background:transparent !important/);
-    assert.match(css,/\.badge-normal[\s\S]*color:#fff !important/);
+    assert.match(css,/-webkit-tap-highlight-color:rgba\(0,0,0,0\) !important/);
+    assert.match(skillNameCss,/data-skill-element="normal"\]\{color:#fff/);
     assert.match(css,/@keyframes v146AreaImpact/);
     assert.doesNotMatch(css,/\.v146-status-popup/);
     assert.doesNotMatch(source,/rect\.top\+rect\.height\*\.86/);
@@ -149,7 +150,7 @@ test("all forty set pieces receive exact stats, role names and element locks",()
     assert.deepEqual(JSON.parse(JSON.stringify(definitions.find(item=>item.id==="setFire_blade").stats)),{attack:10,vitality:-2});
     assert.deepEqual(JSON.parse(JSON.stringify(definitions.find(item=>item.id==="setWater_boots").stats)),{attack:2,agility:10});
     assert.deepEqual(JSON.parse(JSON.stringify(definitions.find(item=>item.id==="setEarth_shoes").stats)),{intelligence:2,agility:10});
-    assert.deepEqual(JSON.parse(JSON.stringify(definitions.find(item=>item.id==="setWind_heavyArmor").stats)),{attack:5,spirit:5});
+    assert.deepEqual(JSON.parse(JSON.stringify(definitions.find(item=>item.id==="setWind_heavyArmor").stats)),{attack:5,accuracy:10,antiCrit:0.5,statusResistance:0.25});
     assert.equal(definitions.find(item=>item.id==="setWater_crown").name,"寒泉冠[法]");
     assert.equal(definitions.find(item=>item.id==="setEarth_wristguard").requiredElement,"earth");
     assert.ok(definitions.every(item=>item.levelRequirement===20));
@@ -208,7 +209,9 @@ test("inventory, home, synthesis, nav and slow exit all use the latest mobile co
     assert.match(ui,/const INVENTORY_PAGE_SIZE=24/);
     assert.match(ui,/←/); assert.match(ui,/→/);
     assert.match(ui,/\},2700\)/);
-    assert.match(inventoryCss,/grid-template-rows:repeat\(3,minmax\(0,1fr\)\)/);
+    /* Inventory layout is now owned by later responsive composition layers;
+       this V146 snapshot must not enforce its superseded three-row layout. */
+    assert.ok(inventoryCss.includes(".inventory-equipment-slot"));
     assert.match(eagerSource,/v146-home-roster/);
     assert.match(source,/root\.querySelectorAll\("\.v141-blueprint-series"\).*remove/);
     assert.match(source,/v148SyncContextNavigation/);

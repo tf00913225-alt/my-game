@@ -785,7 +785,7 @@
         }
         if(type==="frostbite"){ return "傷害 -30%、最終閃躲 -25%、最終異常狀態抗性 -25%"; }
         if(type==="freeze"){ return "無法行動"; }
-        if(type==="agilityDown"){ return "敏捷降低 "+value+"%、最終閃躲降低 "+value+"%"; }
+        if(type==="agilityDown"){ return "敏捷降低 "+value+"%、出手速度降低 "+value+"%"; }
         if(type==="damageDown"){ return "造成傷害降低 "+value+"%"; }
         if(type==="stun"){ return "最終命中率降低 "+value+"%"; }
         if(type==="dodgeSkill"){
