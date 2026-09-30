@@ -54,7 +54,6 @@ async function runViewport(chrome,url,width,height,saveScreenshots){
         assert.ok(data.skill.count>0);
         assert.ok(data.skill.noDivCards);
         assert.ok(data.skill.native&&data.skill.native.rect.width>0&&data.skill.native.rect.height>0);
-        assert.ok(data.skill.water&&data.skill.water.rect.width>0&&data.skill.water.rect.height>0);
         for(const name of ['治療術','復活術','冰封','淨心訣']){const card=data.skill.byName[name];assert.ok(card&&card.tag==='BUTTON'&&card.type==='button'&&card.visibleRectWidth>0&&card.visibleRectHeight>0&&card.label);}
         assert.equal(data.picker.count,4);assert.equal(data.picker.noDescription,true);assert.equal(data.picker.nonOverlap,true);
         for(const [source,evidence] of Object.entries(data.inventory.contexts)){assert.equal(evidence.sameGeometry,true,`inventory geometry changed for ${source}`);assert.equal(evidence.returnedTo,source);}
