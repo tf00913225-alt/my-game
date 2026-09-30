@@ -28,7 +28,7 @@ const context=vm.createContext({
     player:{id:"qa",level:50,attack:100,intelligence:100,vitality:100,energy:100,defensePoints:100,agility:100,bonusHP:0,bonusSP:0,element:"fire",activeBuffs:[]},
     BASE_PHYSICAL_ATTACK:30,BASE_MAGIC_ATTACK:30,BASE_DEFENSE:30,ATTACK_PER_LEVEL:4,MAGIC_ATTACK_PER_LEVEL:4,DEFENSE_PER_LEVEL:3,
     ATTACK_PER_POINT:4,MAGIC_ATTACK_PER_POINT:2.75,DEFENSE_PER_POINT:4,HP_PER_VITALITY_POINT:50,HEALING_INT_COEFFICIENT:1.25,
-    characterEquipment:{fire:{weapon:{stats:{accuracy:5,evasion:3}}}},
+    characterEquipment:{fire:{weapon:{stats:{accuracy:5,evasion:3},reforgeStats:{accuracy:7,statusResistance:2}}}},
     getCharacterSkillKey:()=>"fire",getSkillLevel:()=>0,getActiveBuffPercent:()=>0,getActiveAccuracyBonusPercent:()=>0,getPlayerDefenseDownPercent:()=>0,
     getLearnedElementEX:()=>null,skillDatabase:{windEX:{accuracyBonusPercent:0,evasionBonusPercent:0},earthEX:{maxHpMultiplier:1,defenseBonusPercent:0}},
     combineEvasionRates:values=>values.reduce((sum,value)=>sum+value,0),getFrostbiteFinalPercentPointPenalty:()=>0,
@@ -46,7 +46,8 @@ assert.equal(base.maxSP-50,1500,"100 Energy adds 1500 Max SP");
 assert.equal(base.defense-(30+50*3),400,"100 Defense Points add 400 Defense");
 assert.equal(base.speed,100,"100 Agility adds 100 Speed");
 assert.equal(base.evasion,3,"independent Equipment Evasion remains active");
-assert.equal(base.accuracy,5,"independent Equipment Accuracy remains active");
+assert.equal(base.accuracy,12,"equipment and reforge Accuracy remain active");
+assert.equal(base.statusResistance,2,"independent reforge status resistance remains active");
 const bareBase=context.calculateCharacterBaseStats(context.player,{});
 assert.equal(bareBase.evasion,0,"Agility does not derive Evasion");
 assert.equal(bareBase.accuracy,0,"six stats do not derive Accuracy");
@@ -54,7 +55,7 @@ assert.equal(bareBase.antiCrit,0,"six stats do not derive Anti-Crit");
 assert.equal(bareBase.statusResistance,0,"six stats do not derive status resistance");
 const mainStats=context.getMainCharacterStats();
 assert.equal(mainStats.defensePoints,100);
-assert.equal(mainStats.accuracy,5,"independent Equipment Accuracy reaches the final battle stat");
+assert.equal(mainStats.accuracy,12,"independent Equipment and reforge Accuracy reach the final battle stat");
 assert.equal(mainStats.evasion,3,"independent Equipment Evasion reaches the final battle stat");
 assert.equal(context.calculateHealingAmount(40,mainStats.intelligence),165);
 const legacy={spirit:17,attributePoints:3,vitality:20};
