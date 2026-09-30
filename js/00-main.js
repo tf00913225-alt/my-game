@@ -440,7 +440,7 @@ const START_ATTRIBUTE_POINTS = 10;
    vitality    = 體質
    energy      = 能量
    intelligence= 智力
-   spirit      = 精神
+   defensePoints= 防禦
    agility     = 敏捷
 
 ===================================================== */
@@ -451,7 +451,7 @@ const STAT_NAMES = {
     vitality:"體質",
     energy:"能量",
     intelligence:"智力",
-    spirit:"精神",
+    defensePoints:"防禦",
     agility:"敏捷"
 
 };
@@ -539,7 +539,7 @@ const creationStats = {
     vitality:0,
     energy:0,
     intelligence:0,
-    spirit:0,
+    defensePoints:0,
     agility:0
 
 };
@@ -643,7 +643,7 @@ const creationStats2 = {
     vitality:0,
     energy:0,
     intelligence:0,
-    spirit:0,
+    defensePoints:0,
     agility:0
 
 };
@@ -683,7 +683,7 @@ const player = {
 
     intelligence:0,
 
-    spirit:0,
+    defensePoints:0,
 
     agility:0,
 
@@ -1965,73 +1965,26 @@ const BASE_DEFENSE = 30;
 const ATTACK_PER_LEVEL = 4;
 const MAGIC_ATTACK_PER_LEVEL = 4;
 const DEFENSE_PER_LEVEL = 3;
-const ATTACK_PER_POINT = 3;
-const MAGIC_ATTACK_PER_POINT = 3;
-const DEFENSE_PER_VITALITY_POINT = 4;
+const ATTACK_PER_POINT = 4;
+const MAGIC_ATTACK_PER_POINT = 2.75;
+const DEFENSE_PER_POINT = 4;
 const HP_PER_VITALITY_POINT = 50;
 
 function getBaseStats(){
-
+    const level=Math.max(1,Number(player.level)||1);
     return {
-
-        /*
-           這裡只給角色固定基礎值。
-           六項能力仍然完全由玩家配點。
-
-           1體質 = +50HP +4防禦
-           1攻擊 = +3物攻
-           1智力 = +3魔攻
-           每級 = +4物攻／+4魔攻／+3防禦
-           1能量 = +15SP
-
-           bonusHP / bonusSP 是每次升級
-           額外固定獲得的 +30HP +10SP，
-           跟體質/能量的配點加成分開計算。
-        */
-
-        maxHP:
-            100+
-            player.vitality*HP_PER_VITALITY_POINT+
-            player.bonusHP,
-
-        maxSP:
-            50+
-            player.energy*15+
-            player.bonusSP,
-
-        attack:
-            BASE_PHYSICAL_ATTACK+            Math.max(1,Number(player.level)||1)*ATTACK_PER_LEVEL+
-            player.attack*ATTACK_PER_POINT,
-
-        defense:
-            BASE_DEFENSE+
-            Math.max(1,Number(player.level)||1)*DEFENSE_PER_LEVEL+
-            player.vitality*DEFENSE_PER_VITALITY_POINT,
-
-        magicAttack:
-            BASE_MAGIC_ATTACK+
-            Math.max(1,Number(player.level)||1)*MAGIC_ATTACK_PER_LEVEL+
-            player.intelligence*MAGIC_ATTACK_PER_POINT,
-
-        accuracy:
-            player.spirit*2,
-
-        resistance:
-            calculateStatusResistancePercent(player.spirit),
-
-        antiCrit:
-            calculateAntiCritPercent(player.spirit),
-
-        speed:
-            player.agility,
-
-        evasion:
-            player.agility*0.6
-
+        maxHP:100+(Number(player.vitality)||0)*HP_PER_VITALITY_POINT+(Number(player.bonusHP)||0),
+        maxSP:50+(Number(player.energy)||0)*15+(Number(player.bonusSP)||0),
+        attack:BASE_PHYSICAL_ATTACK+level*ATTACK_PER_LEVEL+(Number(player.attack)||0)*ATTACK_PER_POINT,
+        defense:BASE_DEFENSE+level*DEFENSE_PER_LEVEL+(Number(player.defensePoints)||0)*DEFENSE_PER_POINT,
+        magicAttack:BASE_MAGIC_ATTACK+level*MAGIC_ATTACK_PER_LEVEL+(Number(player.intelligence)||0)*MAGIC_ATTACK_PER_POINT,
+        accuracy:0,
+        resistance:0,
+        antiCrit:0,
+        speed:Number(player.agility)||0,
+        evasion:0
     };
-
 }
-
 
 /* =====================================================
    裝備
@@ -2068,6 +2021,18 @@ const characterEquipment = {
 
 };
 
+function migrateLegacyEquipmentStats(item){
+    if(!item||!item.stats||typeof item.stats!=="object"){ return item; }
+    const legacy=Number(item.stats.spirit);
+    if(Number.isFinite(legacy)&&legacy!==0){
+        item.stats.accuracy=(Number(item.stats.accuracy)||0)+legacy*2;
+        item.stats.antiCrit=(Number(item.stats.antiCrit)||0)+legacy*0.1;
+        item.stats.statusResistance=(Number(item.stats.statusResistance)||0)+legacy*0.05;
+        delete item.stats.spirit;
+    }
+    return item;
+}
+
 function normalizeEquipmentSlots(equipment){
     if(!equipment || typeof equipment!=="object") return;
     if(!Object.prototype.hasOwnProperty.call(equipment,"head")) equipment.head=equipment.helmet||null;
@@ -2079,6 +2044,7 @@ function normalizeEquipmentSlots(equipment){
     delete equipment.weapon;
     delete equipment.helmet;
     delete equipment.accessory;
+    Object.values(equipment).forEach(migrateLegacyEquipmentStats);
 }
 
 
@@ -2091,69 +2057,23 @@ normalizeEquipmentSlots(characterEquipment.water);
 normalizeEquipmentSlots(characterEquipment.wind);
 
 function getEquipmentBonus(characterId){
-
-    const equipment =
-        characterEquipment[characterId];
-
-    const bonus = {
-
-        attack:0,
-        vitality:0,
-        energy:0,
-        intelligence:0,
-        spirit:0,
-        agility:0,
-
-        maxHP:0,
-        maxSP:0,
-        defense:0
-
+    const equipment=characterEquipment[characterId];
+    const bonus={
+        attack:0,intelligence:0,vitality:0,energy:0,defensePoints:0,agility:0,
+        maxHP:0,maxSP:0,defense:0,accuracy:0,evasion:0,crit:0,criticalChance:0,
+        antiCrit:0,statusAccuracy:0,statusResistance:0,criticalDamage:0
     };
-
-
-    if(!equipment){
-        return bonus;
-    }
-
-
-    Object.values(equipment)
-    .forEach(item=>{
-
-        if(
-            !item ||
-            !item.stats
-        ){
-            return;
-        }
-
-
-        Object.keys(item.stats)
-        .forEach(stat=>{
-
-            if(
-                Object.prototype.hasOwnProperty.call(
-                    bonus,
-                    stat
-                )
-            ){
-
-                bonus[stat] +=
-                    Number(
-                        item.stats[stat] || 0
-                    );
-
+    if(!equipment){ return bonus; }
+    Object.values(equipment).forEach(item=>{
+        if(!item||!item.stats){ return; }
+        Object.entries(item.stats).forEach(([stat,value])=>{
+            if(Object.prototype.hasOwnProperty.call(bonus,stat)){
+                bonus[stat]+=Number(value)||0;
             }
-
         });
-
     });
-
-
     return bonus;
-
 }
-
-
 
 /* =====================================================
    V119 — 玩家戰鬥中六圍減益統一入口
@@ -2192,13 +2112,6 @@ function getEffectivePlayerAbilityPoints(character,equipmentBonus,statName){
 
 function getPlayerDefenseDownPercent(character){
     return Math.max(0,getMonsterDebuffValue(character,"defenseDown"));
-}
-
-function getPlayerEvasionBaseAgility(character,equipmentBonus){
-    if(!character){ return 0; }
-    const base=(Number(character.agility)||0)+(Number(equipmentBonus&&equipmentBonus.agility)||0);
-    const statDown=getStatDownPercentFor(character,"agility");
-    return Math.max(0,base*(1-statDown/100));
 }
 
 function getPlayerFinalEvasionReductionPercent(character){
@@ -2272,102 +2185,40 @@ window.v173GetActiveRageCriticalBonuses=getActiveRageCriticalBonuses;
 ===================================================== */
 
 function getMainCharacterStats(){
-
     const bonus=getEquipmentBonus(player.element);
-
-    /* 裝備六圍統一先進入有效屬性查詢；攻擊不再於最終物攻重複加一次。 */
-    const effectiveAttackPoints=getEffectivePlayerAbilityPoints(player,bonus,"attack");
+    const effectiveAttack=getEffectivePlayerAbilityPoints(player,bonus,"attack");
     const effectiveVitality=getEffectivePlayerAbilityPoints(player,bonus,"vitality");
     const effectiveEnergy=getEffectivePlayerAbilityPoints(player,bonus,"energy");
     const effectiveIntelligence=getEffectivePlayerAbilityPoints(player,bonus,"intelligence");
-    const effectiveSpirit=getEffectivePlayerAbilityPoints(player,bonus,"spirit");
+    const effectiveDefensePoints=getEffectivePlayerAbilityPoints(player,bonus,"defensePoints");
     const effectiveAgility=getEffectivePlayerAbilityPoints(player,bonus,"agility");
-
-    const evasionBuffPercent=getActiveBuffPercent(player,"dodgeSkill");
-    const defenseBuffPercent=getActiveBuffPercent(player,"rockWall");
-
     const characterKey=getCharacterSkillKey(player);
     const windEXLevel=characterKey?getSkillLevel(characterKey,"windEX"):0;
     const earthEXLevel=characterKey?getSkillLevel(characterKey,"earthEX"):0;
-
-    const evasionPassivePercent=windEXLevel>0
-        ? (skillDatabase.windEX.evasionBonusPercent||0)
-        : 0;
-    const defensePassivePercent=earthEXLevel>0
-        ? (skillDatabase.earthEX.defenseBonusPercent||0)
-        : 0;
-    const maxHpPassiveMultiplier=earthEXLevel>0
-        ? Math.max(1,Number(skillDatabase.earthEX.maxHpMultiplier)||1)
-        : 1;
-
+    const evasionBuffPercent=getActiveBuffPercent(player,"dodgeSkill");
+    const defenseBuffPercent=getActiveBuffPercent(player,"rockWall");
     const defenseDownPercent=getPlayerDefenseDownPercent(player);
-
-    const rawDefense=(
-        BASE_DEFENSE+
-        Math.max(1,Number(player.level)||1)*DEFENSE_PER_LEVEL+
-        effectiveVitality*DEFENSE_PER_VITALITY_POINT+
-        (Number(bonus.defense)||0)
-    );
-
-    const buffedDefense=rawDefense*(
-        1+(defenseBuffPercent+defensePassivePercent)/100
-    );
-
-    const rawEvasion=getPlayerEvasionBaseAgility(player,bonus)*0.6;
-
+    const maxHpPassiveMultiplier=earthEXLevel>0?Math.max(1,Number(skillDatabase.earthEX.maxHpMultiplier)||1):1;
+    const rawDefense=BASE_DEFENSE+Math.max(1,Number(player.level)||1)*DEFENSE_PER_LEVEL+effectiveDefensePoints*DEFENSE_PER_POINT+(Number(bonus.defense)||0);
+    const buffedDefense=rawDefense*(1+(defenseBuffPercent+(earthEXLevel>0?Number(skillDatabase.earthEX.defenseBonusPercent)||0:0))/100);
     return {
-        /* 暫時六圍減益不動態壓縮最大HP/SP；詳見上方統一規則。 */
-        maxHP:Math.round((
-            100+
-            (player.vitality+(Number(bonus.vitality)||0))*HP_PER_VITALITY_POINT+
-            player.bonusHP+
-            (Number(bonus.maxHP)||0)
-        )*maxHpPassiveMultiplier),
-
-        maxSP:
-            50+
-            (player.energy+(Number(bonus.energy)||0))*15+
-            player.bonusSP+
-            (Number(bonus.maxSP)||0),
-
-        attack:
-            BASE_PHYSICAL_ATTACK+
-            Math.max(1,Number(player.level)||1)*ATTACK_PER_LEVEL+
-            effectiveAttackPoints*ATTACK_PER_POINT,
-
-        attackPoints:effectiveAttackPoints,
-
-        defense:Math.max(
-            0,
-            Math.round(buffedDefense*(1-defenseDownPercent/100))
-        ),
-
-        magicAttack:
-            BASE_MAGIC_ATTACK+
-            Math.max(1,Number(player.level)||1)*MAGIC_ATTACK_PER_LEVEL+
-            effectiveIntelligence*MAGIC_ATTACK_PER_POINT,
-        accuracy:effectiveSpirit*2+(getLearnedElementEX(player,"wind")?Number(skillDatabase.windEX.accuracyBonusPercent)||0:0),
-        resistance:calculateStatusResistancePercent(effectiveSpirit),
-        antiCrit:calculateAntiCritPercent(effectiveSpirit),
+        maxHP:Math.round((100+(Number(player.vitality)+Number(bonus.vitality)||0)*HP_PER_VITALITY_POINT+(Number(player.bonusHP)||0)+(Number(bonus.maxHP)||0))*maxHpPassiveMultiplier),
+        maxSP:50+(Number(player.energy)+Number(bonus.energy)||0)*15+(Number(player.bonusSP)||0)+(Number(bonus.maxSP)||0),
+        attack:BASE_PHYSICAL_ATTACK+Math.max(1,Number(player.level)||1)*ATTACK_PER_LEVEL+effectiveAttack*ATTACK_PER_POINT,
+        attackPoints:effectiveAttack,
+        defense:Math.max(0,Math.round(buffedDefense*(1-defenseDownPercent/100))),
+        magicAttack:BASE_MAGIC_ATTACK+Math.max(1,Number(player.level)||1)*MAGIC_ATTACK_PER_LEVEL+effectiveIntelligence*MAGIC_ATTACK_PER_POINT,
+        accuracy:(Number(bonus.accuracy)||0)+(getLearnedElementEX(player,"wind")?Number(skillDatabase.windEX.accuracyBonusPercent)||0:0),
+        statusResistance:Number(bonus.statusResistance)||0,
+        antiCrit:Number(bonus.antiCrit)||0,
+        criticalChance:(Number(bonus.criticalChance)||0)+(Number(bonus.crit)||0),
+        criticalDamage:Number(bonus.criticalDamage)||0,
+        statusAccuracy:Number(bonus.statusAccuracy)||0,
         speed:effectiveAgility,
-
-        evasion:combineEvasionRates([
-            rawEvasion,
-            evasionBuffPercent,
-            evasionPassivePercent,
-            -getPlayerFinalEvasionReductionPercent(player),
-            -getFrostbiteFinalPercentPointPenalty(player)
-        ]),
-
-        vitality:effectiveVitality,
-        energy:effectiveEnergy,
-        intelligence:effectiveIntelligence,
-        spirit:effectiveSpirit,
-        agility:effectiveAgility
+        evasion:combineEvasionRates([Number(bonus.evasion)||0,evasionBuffPercent,windEXLevel>0?Number(skillDatabase.windEX.evasionBonusPercent)||0:0,-getPlayerFinalEvasionReductionPercent(player),-getFrostbiteFinalPercentPointPenalty(player)]),
+        vitality:effectiveVitality,energy:effectiveEnergy,intelligence:effectiveIntelligence,defensePoints:effectiveDefensePoints,agility:effectiveAgility
     };
-
 }
-
 
 /*
    ★ 新增（依照使用者要求）：
@@ -2440,98 +2291,39 @@ function hasActiveBuff(
 */
 
 function getAdditionalCharacterBattleStats(character,characterKey){
-
-    if(!character || !characterKey){ return null; }
-
     const bonus=getEquipmentBonus(characterKey);
-
-    const effectiveAttackPoints=getEffectivePlayerAbilityPoints(character,bonus,"attack");
+    const effectiveAttack=getEffectivePlayerAbilityPoints(character,bonus,"attack");
     const effectiveVitality=getEffectivePlayerAbilityPoints(character,bonus,"vitality");
     const effectiveEnergy=getEffectivePlayerAbilityPoints(character,bonus,"energy");
     const effectiveIntelligence=getEffectivePlayerAbilityPoints(character,bonus,"intelligence");
-    const effectiveSpirit=getEffectivePlayerAbilityPoints(character,bonus,"spirit");
+    const effectiveDefensePoints=getEffectivePlayerAbilityPoints(character,bonus,"defensePoints");
     const effectiveAgility=getEffectivePlayerAbilityPoints(character,bonus,"agility");
-
-    const windEXLevel=getSkillLevel(characterKey,"windEX");
-    const earthEXLevel=getSkillLevel(characterKey,"earthEX");
-
-    const evasionPassivePercent=windEXLevel>0
-        ? (skillDatabase.windEX.evasionBonusPercent||0)
-        : 0;
-    const defensePassivePercent=earthEXLevel>0
-        ? (skillDatabase.earthEX.defenseBonusPercent||0)
-        : 0;
-    const maxHpPassiveMultiplier=earthEXLevel>0
-        ? Math.max(1,Number(skillDatabase.earthEX.maxHpMultiplier)||1)
-        : 1;
-
+        const windEXLevel=characterKey?getSkillLevel(characterKey,"windEX"):0;
+    const earthEXLevel=characterKey?getSkillLevel(characterKey,"earthEX"):0;
     const evasionBuffPercent=getActiveBuffPercent(character,"dodgeSkill");
     const defenseBuffPercent=getActiveBuffPercent(character,"rockWall");
     const defenseDownPercent=getPlayerDefenseDownPercent(character);
-
-    const rawDefense=(
-        BASE_DEFENSE+
-        Math.max(1,Number(character.level)||1)*DEFENSE_PER_LEVEL+
-        effectiveVitality*DEFENSE_PER_VITALITY_POINT+
-        (Number(bonus.defense)||0)
-    );
-    const buffedDefense=rawDefense*(
-        1+(defenseBuffPercent+defensePassivePercent)/100
-    );
-    const rawEvasion=getPlayerEvasionBaseAgility(character,bonus)*0.6;
-
+    const maxHpPassiveMultiplier=earthEXLevel>0?Math.max(1,Number(skillDatabase.earthEX.maxHpMultiplier)||1):1;
+    const rawDefense=BASE_DEFENSE+Math.max(1,Number(character.level)||1)*DEFENSE_PER_LEVEL+effectiveDefensePoints*DEFENSE_PER_POINT+(Number(bonus.defense)||0);
+    const buffedDefense=rawDefense*(1+(defenseBuffPercent+(earthEXLevel>0?Number(skillDatabase.earthEX.defenseBonusPercent)||0:0))/100);
     return {
-        maxHP:Math.round((
-            100+
-            (character.vitality+(Number(bonus.vitality)||0))*HP_PER_VITALITY_POINT+
-            (Number(character.bonusHP)||0)+
-            (Number(bonus.maxHP)||0)
-        )*maxHpPassiveMultiplier),
-
-        maxSP:
-            50+
-            (character.energy+(Number(bonus.energy)||0))*15+
-            (Number(character.bonusSP)||0)+
-            (Number(bonus.maxSP)||0),
-
-        attack:
-            BASE_PHYSICAL_ATTACK+
-            Math.max(1,Number(character.level)||1)*ATTACK_PER_LEVEL+
-            effectiveAttackPoints*ATTACK_PER_POINT,
-
-        attackPoints:effectiveAttackPoints,
-
-        defense:Math.max(
-            0,
-            Math.round(buffedDefense*(1-defenseDownPercent/100))
-        ),
-
-        magicAttack:
-            BASE_MAGIC_ATTACK+
-            Math.max(1,Number(character.level)||1)*MAGIC_ATTACK_PER_LEVEL+
-            effectiveIntelligence*MAGIC_ATTACK_PER_POINT,
-        accuracy:effectiveSpirit*2+(getLearnedElementEX(character,"wind")?Number(skillDatabase.windEX.accuracyBonusPercent)||0:0),
-        resistance:calculateStatusResistancePercent(effectiveSpirit),
-        antiCrit:calculateAntiCritPercent(effectiveSpirit),
+        maxHP:Math.round((100+(Number(character.vitality)+Number(bonus.vitality)||0)*HP_PER_VITALITY_POINT+(Number(character.bonusHP)||0)+(Number(bonus.maxHP)||0))*maxHpPassiveMultiplier),
+        maxSP:50+(Number(character.energy)+Number(bonus.energy)||0)*15+(Number(character.bonusSP)||0)+(Number(bonus.maxSP)||0),
+        attack:BASE_PHYSICAL_ATTACK+Math.max(1,Number(character.level)||1)*ATTACK_PER_LEVEL+effectiveAttack*ATTACK_PER_POINT,
+        attackPoints:effectiveAttack,
+        defense:Math.max(0,Math.round(buffedDefense*(1-defenseDownPercent/100))),
+        magicAttack:BASE_MAGIC_ATTACK+Math.max(1,Number(character.level)||1)*MAGIC_ATTACK_PER_LEVEL+effectiveIntelligence*MAGIC_ATTACK_PER_POINT,
+        accuracy:(Number(bonus.accuracy)||0)+(getLearnedElementEX(character,"wind")?Number(skillDatabase.windEX.accuracyBonusPercent)||0:0),
+        statusResistance:Number(bonus.statusResistance)||0,
+        antiCrit:Number(bonus.antiCrit)||0,
+        criticalChance:(Number(bonus.criticalChance)||0)+(Number(bonus.crit)||0),
+        criticalDamage:Number(bonus.criticalDamage)||0,
+        statusAccuracy:Number(bonus.statusAccuracy)||0,
         speed:effectiveAgility,
-
-        evasion:combineEvasionRates([
-            rawEvasion,
-            evasionBuffPercent,
-            evasionPassivePercent,
-            -getPlayerFinalEvasionReductionPercent(character),
-            -getFrostbiteFinalPercentPointPenalty(character)
-        ]),
-
-        vitality:effectiveVitality,
-        energy:effectiveEnergy,
-        intelligence:effectiveIntelligence,
-        spirit:effectiveSpirit,
-        agility:effectiveAgility
+        evasion:combineEvasionRates([Number(bonus.evasion)||0,evasionBuffPercent,windEXLevel>0?Number(skillDatabase.windEX.evasionBonusPercent)||0:0,-getPlayerFinalEvasionReductionPercent(character),-getFrostbiteFinalPercentPointPenalty(character)]),
+        vitality:effectiveVitality,energy:effectiveEnergy,intelligence:effectiveIntelligence,defensePoints:effectiveDefensePoints,agility:effectiveAgility
     };
-
 }
-
 
 function getPlayer2BattleStats(){
     return getAdditionalCharacterBattleStats(player2,"player2");
@@ -2965,8 +2757,6 @@ const skillDatabase = {
    constants must be initialized before makeZoneMonster() calculates status
    resistance and anti-crit values.
 ===================================================== */
-const STATUS_RESIST_PER_SPIRIT_POINT = 0.05;
-const ANTI_CRIT_PER_SPIRIT_POINT = 0.1;
 const ANTI_CRIT_MAX_PERCENT = 25;
 const CRIT_CHANCE_MIN_AFTER_ANTI_CRIT = 5;
 
@@ -3265,7 +3055,7 @@ function generateMonsterAttributePoints(
         intelligence:
             randomShares[2],
 
-        spirit:
+        defense:
             randomShares[3],
 
         agility:
@@ -3447,8 +3237,8 @@ function makeZoneMonster(
         intelligencePoints:
             points.intelligence,
 
-        spiritPoints:
-            points.spirit,
+        defensePoints:
+            points.defense,
 
         agilityPoints:
             points.agility,
@@ -3462,21 +3252,18 @@ function makeZoneMonster(
         defense:
             BASE_DEFENSE+
             Math.max(1,Number(level)||1)*DEFENSE_PER_LEVEL+
-            points.vitality*DEFENSE_PER_VITALITY_POINT,
+            points.defense*DEFENSE_PER_POINT,
 
         magicAttack:
             BASE_MAGIC_ATTACK+
             Math.max(1,Number(level)||1)*MAGIC_ATTACK_PER_LEVEL+
             points.intelligence*MAGIC_ATTACK_PER_POINT,
 
-        accuracy:
-            points.spirit*2,
+        accuracy:0,
 
-        resistance:
-            calculateStatusResistancePercent(points.spirit),
+        statusResistance:0,
 
-        antiCrit:
-            calculateAntiCritPercent(points.spirit),
+        antiCrit:0,
 
         evasion:
             getDefaultMonsterEvasion(level),
@@ -4915,7 +4702,7 @@ const pendingStats = {
 
     intelligence:0,
 
-    spirit:0,
+    defensePoints:0,
 
     agility:0
 
@@ -5991,9 +5778,9 @@ function updateCreationUI(){
         creationStats.intelligence;
 
 
-    $("creationSpirit")
+    $("creationDefense")
         .textContent =
-        creationStats.spirit;
+        creationStats.defensePoints;
 
 
     $("creationAgility")
@@ -6129,9 +5916,9 @@ function updateCreationUI2(){
         creationStats2.intelligence;
 
 
-    $("creation2Spirit")
+    $("creation2Defense")
         .textContent =
-        creationStats2.spirit;
+        creationStats2.defensePoints;
 
 
     $("creation2Agility")
@@ -6282,7 +6069,7 @@ function buildAdditionalCharacter(id,element,gender){
         vitality:creationStats.vitality,
         energy:creationStats.energy,
         intelligence:creationStats.intelligence,
-        spirit:creationStats.spirit,
+        defensePoints:creationStats.defensePoints,
         agility:creationStats.agility,
         bonusHP:0,
         bonusSP:0,
@@ -6570,8 +6357,8 @@ function createSecondCharacter(){
         intelligence:
             creationStats2.intelligence,
 
-        spirit:
-            creationStats2.spirit,
+        defensePoints:
+            creationStats2.defensePoints,
 
         agility:
             creationStats2.agility,
@@ -6833,8 +6620,8 @@ async function createCharacter(){
     player.intelligence =
         selection.attributes.intelligence;
 
-    player.spirit =
-        selection.attributes.spirit;
+    player.defensePoints =
+        selection.attributes.defensePoints;
 
     player.agility =
         selection.attributes.agility;
@@ -7229,6 +7016,18 @@ function normalizeHydratedRetiredSkillReferences(){
 }
 
 
+function migrateLegacySixStats(character){
+    if(!character||typeof character!=="object"){ return character; }
+    const legacySpirit=Number(character.spirit);
+    if(Number.isFinite(legacySpirit)&&legacySpirit>0){
+        character.attributePoints=Math.max(0,Number(character.attributePoints)||0)+Math.max(0,legacySpirit);
+    }
+    delete character.spirit;
+    if(!Number.isFinite(Number(character.defensePoints))){ character.defensePoints=0; }
+    character.defensePoints=Math.max(0,Number(character.defensePoints)||0);
+    return character;
+}
+
 function loadGame(){
 
     const resolvedSave=arguments[0]||null;
@@ -7283,6 +7082,7 @@ function loadGame(){
             player,
             data.player
         );
+        migrateLegacySixStats(player);
 
 
         /*
@@ -7295,7 +7095,7 @@ function loadGame(){
             "vitality",
             "energy",
             "intelligence",
-            "spirit",
+            "defensePoints",
             "agility"
         ];
 
@@ -7661,6 +7461,7 @@ function loadGame(){
 
             player2=
                 data.player2;
+            migrateLegacySixStats(player2);
 
             if(
                 !characters.some(
@@ -7718,6 +7519,7 @@ function loadGame(){
 
         if(data.player3){
             player3=data.player3;
+            migrateLegacySixStats(player3);
             if(!characters.some(c=>c.id==="player3")){
                 characters.push({id:"player3",name:player3.id});
             }
@@ -7875,7 +7677,7 @@ function loadGame(){
                     item &&
                     item.id
                 ){
-
+                    migrateLegacyEquipmentStats(item);
                     inventoryItems.push(
                         item
                     );
@@ -12775,9 +12577,6 @@ function getOrdinaryDamageBonusPercent(options){
     if(attacker&&typeof getElementDamagePassiveMultiplier==="function"){
         total+=(Math.max(0,Number(getElementDamagePassiveMultiplier(attacker))||1)-1)*100;
     }
-    if(skill&&target&&typeof getPhysicalSkillRankBonusMultiplier==="function"){
-        total+=(Math.max(0,Number(getPhysicalSkillRankBonusMultiplier(skill,target))||1)-1)*100;
-    }
     if(
         attacker&&target&&attacker.element==="fire"&&
         typeof getLearnedElementEX==="function"&&getLearnedElementEX(attacker,"fire")&&
@@ -12984,13 +12783,13 @@ function getMonsterAccuracy(monster){
 
         monster.accuracy!==undefined
         ? monster.accuracy
-        : monster.level*2;
+        : 0;
 
 
     const statDown=
         getStatDownPercentFor(
             monster,
-            "spirit"
+            "defensePoints"
         );
 
 
@@ -14010,9 +13809,6 @@ const STATUS_OFFENSE_ATTRIBUTE_COEFFICIENT = 0.05;
    一般異常每1點精神降低0.05個百分點命中率；
    硬控仍在獨立公式使用原本的0.3係數。
 */
-function calculateStatusResistancePercent(spiritPoints){
-    return Math.max(0,Number(spiritPoints)||0)*STATUS_RESIST_PER_SPIRIT_POINT;
-}
 
 const STATUS_HIT_MIN_PERCENT = 5;
 
@@ -14097,70 +13893,7 @@ window.FourSymbolsEnemySkillAI=Object.freeze({
 });
 
 
-/*
-   ★ 新增（依照使用者要求，「物理技能，
-   對精英怪傷害加乘10%，boss15%」，
-   跟法術技能靠targetType比較寬廣（tri/
-   row/all）分工——物理技能專精單體
-   硬仗，這裡補上這塊）：
-
-   只有「技能」吃得到這個加成，普通攻擊
-   （沒有skill物件、或category不是
-   "physical"）不算，這是使用者明確要求
-   保留的區分——普通攻擊不是戰士的特色，
-   物理技能才是。
-
-   野怪（regular）沒有加成，精英怪
-   （名字帶「王」，或未來明確標記
-   monster.rank）+10%，BOSS+15%，跟
-   getMonsterRank()判斷稀有度是同一套
-   規則，不用重寫一次判斷邏輯。
-*/
-
-const PHYSICAL_SKILL_ELITE_BONUS_PERCENT = 10;
-
-const PHYSICAL_SKILL_BOSS_BONUS_PERCENT = 15;
-
-
-function getPhysicalSkillRankBonusMultiplier(
-    skill,
-    monster
-){
-
-    if(
-        !skill||
-        skill.category!==
-        "physical"
-    ){
-        return 1;
-    }
-
-
-    const rank=
-        getMonsterRank(monster);
-
-
-    if(rank==="boss"){
-
-        return 1+
-            PHYSICAL_SKILL_BOSS_BONUS_PERCENT/
-            100;
-
-    }
-
-
-    if(rank==="elite"){
-
-        return 1+
-            PHYSICAL_SKILL_ELITE_BONUS_PERCENT/
-            100;
-
-    }
-
-
-    return 1;
-
-}
+/* Physical skill Elite/Boss rank bonus retired. */
 
 /*
    ★ 新增（依照使用者要求，「智力遞減、
@@ -14251,7 +13984,7 @@ function calculateStatusEffectChance(
     casterLevel,
     targetLevel,
     offensiveAttribute,
-    targetSpirit,
+    targetStatusResistance,
     isLockdown,
     targetRank,
     targetBonusResistancePercent,
@@ -14275,14 +14008,7 @@ function calculateStatusEffectChance(
         Math.max(0,Number(offensiveAttribute)||0)*
         STATUS_OFFENSE_ATTRIBUTE_COEFFICIENT;
 
-    const spiritResistance=
-        Math.max(0,Number(targetSpirit)||0)*
-        STATUS_RESIST_PER_SPIRIT_POINT;
-
-    const targetResistancePercent=Math.max(
-        0,
-        spiritResistance+(Number(targetBonusResistancePercent)||0)
-    );
+    const targetResistancePercent=Math.max(0,Number(targetStatusResistance)||0)+(Number(targetBonusResistancePercent)||0);
 
     const rawChance=
         (Number(baseChancePercent)||0)+
@@ -14323,7 +14049,7 @@ function rollStatusEffectHit(
     casterLevel,
     targetLevel,
     offensiveAttribute,
-    targetSpirit,
+    targetStatusResistance,
     isLockdown,
     targetRank,
     targetBonusResistancePercent,
@@ -14335,7 +14061,7 @@ function rollStatusEffectHit(
         casterLevel,
         targetLevel,
         offensiveAttribute,
-        targetSpirit,
+        targetStatusResistance,
         isLockdown,
         targetRank,
         targetBonusResistancePercent,
@@ -15093,7 +14819,7 @@ function getMonsterEffectiveAbilityPoints(monster,statName){
         vitality:"vitalityPoints",
         energy:"energyPoints",
         intelligence:"intelligencePoints",
-        spirit:"spiritPoints",
+        defensePoints:"defensePoints",
         agility:"agilityPoints"
     };
 
@@ -15103,15 +14829,9 @@ function getMonsterEffectiveAbilityPoints(monster,statName){
     return Math.max(0,base*(1-down/100));
 }
 
-function getMonsterEffectiveSpiritPoints(monster){
-    return getMonsterEffectiveAbilityPoints(monster,"spirit");
-}
+function getMonsterEffectiveStatusResistance(monster){ return Math.max(0,Number(monster&&monster.statusResistance)||0); }
 
-function getMonsterEffectiveAntiCrit(monster){
-    return calculateAntiCritPercent(
-        getMonsterEffectiveSpiritPoints(monster)
-    );
-}
+function getMonsterEffectiveAntiCrit(monster){ return Math.max(0,Number(monster&&monster.antiCrit)||0); }
 
 function getMonsterEffectiveDefense(monster){
 
@@ -15124,7 +14844,7 @@ function getMonsterEffectiveDefense(monster){
     const statDownPercent=
         getStatDownPercentFor(
             monster,
-            "vitality"
+            "defensePoints"
         );
 
     return Math.max(
@@ -15184,7 +14904,7 @@ function applySkillDebuffEffects(
         const hit=rollNamedPersistentStatusEffect(
             monster,"agilityDown",[
                 skill.agilityDownChance,casterLevel,monster.level,
-                casterOffensiveAttribute,getMonsterEffectiveSpiritPoints(monster)
+                casterOffensiveAttribute,getMonsterEffectiveStatusResistance(monster)
             ],"monster",index,skill.name
         ).hit;
 
@@ -15220,7 +14940,7 @@ function applySkillDebuffEffects(
         const hit=rollNamedPersistentStatusEffect(
             monster,"statDown",[
                 skill.statDownChance,casterLevel,monster.level,
-                casterOffensiveAttribute,getMonsterEffectiveSpiritPoints(monster)
+                casterOffensiveAttribute,getMonsterEffectiveStatusResistance(monster)
             ],"monster",index,skill.name
         ).hit;
 
@@ -15257,7 +14977,7 @@ function applySkillDebuffEffects(
         const hit=rollNamedPersistentStatusEffect(
             monster,"damageDown",[
                 skill.damageDownChance,casterLevel,monster.level,
-                casterOffensiveAttribute,getMonsterEffectiveSpiritPoints(monster)
+                casterOffensiveAttribute,getMonsterEffectiveStatusResistance(monster)
             ],"monster",index,skill.name
         ).hit;
 
@@ -15293,7 +15013,7 @@ function applySkillDebuffEffects(
         const hit=rollNamedPersistentStatusEffect(
             monster,"defenseDown",[
                 skill.defenseDownChance,casterLevel,monster.level,
-                casterOffensiveAttribute,getMonsterEffectiveSpiritPoints(monster)
+                casterOffensiveAttribute,getMonsterEffectiveStatusResistance(monster)
             ],"monster",index,skill.name
         ).hit;
 
@@ -15329,7 +15049,7 @@ function applySkillDebuffEffects(
         const hit=rollNamedPersistentStatusEffect(
             monster,"stun",[
                 skill.stunChance,casterLevel,monster.level,
-                casterOffensiveAttribute,getMonsterEffectiveSpiritPoints(monster)
+                casterOffensiveAttribute,getMonsterEffectiveStatusResistance(monster)
             ],"monster",index,skill.name
         ).hit;
 
@@ -15370,7 +15090,7 @@ function applySkillDebuffEffects(
         const hit=rollNamedPersistentStatusEffect(
             monster,"petrify",[
                 chance,casterLevel,monster.level,casterOffensiveAttribute,
-                getMonsterEffectiveSpiritPoints(monster),true,getMonsterRank(monster)
+                getMonsterEffectiveStatusResistance(monster),true,getMonsterRank(monster)
             ],"monster",index,skill.name
         ).hit;
 
@@ -15432,15 +15152,15 @@ function applySkillDebuffEffects(
 
 /*
    V118：怪物對玩家施放異常狀態時，必須使用「最終精神」。
-   也就是角色原始精神 + 裝備精神，而不是只讀 character.spirit。
+   也就是角色原始精神 + 裝備精神，而不是只讀 character.defensePoints。
    這樣裝備面板顯示的精神、異常抗性，與實戰完全一致。
 */
-function getFinalBattleSpiritForPlayerTarget(targetCharacter,targetIndex){
+function getFinalBattleStatusResistanceForPlayerTarget(targetCharacter,targetIndex){
     const index=getPartyCharacterIndex(targetCharacter)>=0
         ? getPartyCharacterIndex(targetCharacter)
         : targetIndex;
     const stats=getPartyBattleStats(index);
-    return stats ? stats.spirit : (Number(targetCharacter&&targetCharacter.spirit)||0);
+    return stats ? stats.statusResistance : 0;
 }
 
 
@@ -15465,8 +15185,8 @@ function applySkillDebuffEffectsToPlayer(
         targetCharacter.id||
         "你";
 
-    const targetFinalSpirit=
-        getFinalBattleSpiritForPlayerTarget(
+    const targetFinalStatusResistance=
+        getFinalBattleStatusResistanceForPlayerTarget(
             targetCharacter,
             targetIndex
         );
@@ -15480,7 +15200,7 @@ function applySkillDebuffEffectsToPlayer(
         const hit=rollNamedPersistentStatusEffect(
             targetCharacter,"agilityDown",[
                 skill.agilityDownChance,casterLevel,targetCharacter.level,
-                casterOffensiveAttribute,targetFinalSpirit,false,"regular",
+                casterOffensiveAttribute,targetFinalStatusResistance,false,"regular",
                 getPlayerStatusResistBonus(targetCharacter)
             ],"player",targetIndex,skill.name
         ).hit;
@@ -15516,7 +15236,7 @@ function applySkillDebuffEffectsToPlayer(
         const hit=rollNamedPersistentStatusEffect(
             targetCharacter,"statDown",[
                 skill.statDownChance,casterLevel,targetCharacter.level,
-                casterOffensiveAttribute,targetFinalSpirit,false,"regular",
+                casterOffensiveAttribute,targetFinalStatusResistance,false,"regular",
                 getPlayerStatusResistBonus(targetCharacter)
             ],"player",targetIndex,skill.name
         ).hit;
@@ -15553,7 +15273,7 @@ function applySkillDebuffEffectsToPlayer(
         const hit=rollNamedPersistentStatusEffect(
             targetCharacter,"damageDown",[
                 skill.damageDownChance,casterLevel,targetCharacter.level,
-                casterOffensiveAttribute,targetFinalSpirit,false,"regular",
+                casterOffensiveAttribute,targetFinalStatusResistance,false,"regular",
                 getPlayerStatusResistBonus(targetCharacter)
             ],"player",targetIndex,skill.name
         ).hit;
@@ -15589,7 +15309,7 @@ function applySkillDebuffEffectsToPlayer(
         const hit=rollNamedPersistentStatusEffect(
             targetCharacter,"defenseDown",[
                 skill.defenseDownChance,casterLevel,targetCharacter.level,
-                casterOffensiveAttribute,targetFinalSpirit,false,"regular",
+                casterOffensiveAttribute,targetFinalStatusResistance,false,"regular",
                 getPlayerStatusResistBonus(targetCharacter)
             ],"player",targetIndex,skill.name
         ).hit;
@@ -15625,7 +15345,7 @@ function applySkillDebuffEffectsToPlayer(
         const hit=rollNamedPersistentStatusEffect(
             targetCharacter,"stun",[
                 skill.stunChance,casterLevel,targetCharacter.level,
-                casterOffensiveAttribute,targetFinalSpirit,false,"regular",
+                casterOffensiveAttribute,targetFinalStatusResistance,false,"regular",
                 getPlayerStatusResistBonus(targetCharacter)
             ],"player",targetIndex,skill.name
         ).hit;
@@ -15658,7 +15378,7 @@ function applySkillDebuffEffectsToPlayer(
         const hit=rollNamedPersistentStatusEffect(
             targetCharacter,"freeze",[
                 skill.freezeChance,casterLevel,targetCharacter.level,
-                casterOffensiveAttribute,targetFinalSpirit,true,"player",
+                casterOffensiveAttribute,targetFinalStatusResistance,true,"player",
                 getPlayerStatusResistBonus(targetCharacter)
             ],"player",targetIndex,skill.name
         ).hit;
@@ -15690,7 +15410,7 @@ function applySkillDebuffEffectsToPlayer(
         const hit=rollNamedPersistentStatusEffect(
             targetCharacter,"petrify",[
                 chance,casterLevel,targetCharacter.level,casterOffensiveAttribute,
-                targetFinalSpirit,true,"player",getPlayerStatusResistBonus(targetCharacter)
+                targetFinalStatusResistance,true,"player",getPlayerStatusResistBonus(targetCharacter)
             ],"player",targetIndex,skill.name
         ).hit;
 
@@ -15733,7 +15453,7 @@ function applySkillDebuffEffectsToPlayer(
         const burnHit=rollNamedPersistentStatusEffect(
             targetCharacter,"burn",[
                 skill.burnChance,casterLevel,targetCharacter.level,
-                casterOffensiveAttribute,targetFinalSpirit,false,"regular",
+                casterOffensiveAttribute,targetFinalStatusResistance,false,"regular",
                 getPlayerStatusResistBonus(targetCharacter)
             ],"player",targetIndex,skill.name,skill.guaranteedBurn===true
         ).hit;
@@ -16087,215 +15807,54 @@ function tickStatusEffects(){
    （提高的%數就是怒火技能等級對應的數字）。
 */
 
-/*
-   V118 — 正式能力規則：
-   物理爆擊由「攻擊」決定；法術爆擊由「智力」決定。
-   兩者使用完全相同的成長公式：
-   - 爆擊率：基礎10% + 每點對應屬性0.12%，上限35%
-   - 爆擊倍率：基礎1.5倍 + 每點對應屬性0.25%，上限2倍
-
-   對應屬性：
-   - physical / 普通攻擊 => attack
-   - magic              => intelligence
-
-   治療技能不走這個爆擊函式，因此不會因智力新增治療爆擊。
-*/
-
-const CRIT_CHANCE_BASE = 10;
-
-const CRIT_CHANCE_PER_ATTACK_POINT = 0.12;
-const CRIT_CHANCE_PER_INTELLIGENCE_POINT = 0.12;
-
-const CRIT_CHANCE_MAX = 35;
-
-const CRIT_MULTIPLIER_BASE = 1.5;
-
-const CRIT_MULTIPLIER_PER_ATTACK_POINT = 0.0025;
-const CRIT_MULTIPLIER_PER_INTELLIGENCE_POINT = 0.0025;
-
-const CRIT_MULTIPLIER_ATTRIBUTE_MAX = 2;
-const CRIT_MULTIPLIER_MAX = 2.25;
-
-/*
-   V118 — 精神正式加入抗暴：
-   每1點精神 = +0.1%抗暴，抗暴上限25%。
-   抗暴直接從攻擊方算出的爆擊率扣除，
-   但最終爆擊率最低仍保留5%。
-*/
-function calculateAntiCritPercent(spiritPoints){
-    return Math.min(
-        ANTI_CRIT_MAX_PERCENT,
-        Math.max(0,Number(spiritPoints)||0)*ANTI_CRIT_PER_SPIRIT_POINT
-    );
+const CRIT_CHANCE_BASE=10;
+const CRIT_CHANCE_MAX=95;
+const CRIT_MULTIPLIER_BASE=1.5;
+const CRIT_MULTIPLIER_MAX=2.25;
+const ANTI_CRIT_MAX_PERCENT=100;
+function calculateAntiCritPercent(value){ return Math.max(0,Number(value)||0); }
+function getCriticalStatPoints(character){
+    const index=getPartyCharacterIndex(character);
+    const stats=index>=0?getPartyBattleStats(index):null;
+    return Math.max(0,Number(stats&&stats.criticalChance!==undefined?stats.criticalChance:character&&character.criticalChance)||0);
 }
-
-function getCriticalStatPoints(character,category){
-    const partyIndex=getPartyCharacterIndex(character);
-    const partyStats=partyIndex>=0
-        ? getPartyBattleStats(partyIndex)
-        : null;
-
-    if(category==="magic"){
-        if(partyStats){ return partyStats.intelligence||0; }
-        return (character&&character.intelligence)||0;
-    }
-
-    if(partyStats){ return partyStats.attackPoints||partyStats.attack||0; }
-
-    return (character&&character.attack)||0;
-}
-
 function getCharacterSkillKey(character){
     if(character===player){ return "fire"; }
     if(character===player2){ return "player2"; }
-    if(typeof player3!=="undefined" && character===player3){ return "player3"; }
+    if(typeof player3!=="undefined"&&character===player3){ return "player3"; }
     return null;
 }
-
 function getLearnedElementEX(character,element){
     if(!character||character.element!==element){ return null; }
     const key=getCharacterSkillKey(character);
     if(!key){ return null; }
-    const exId=element+"EX";
-    const ex=skillDatabase[exId];
-    if(!ex || getSkillLevel(key,exId)<=0){ return null; }
-    return ex;
+    const ex=skillDatabase[element+"EX"];
+    return !ex||getSkillLevel(key,element+"EX")<=0?null:ex;
 }
-
 function getWaterExAbsorbPercent(character,basePercent,kind){
     const ex=getLearnedElementEX(character,"water");
     const multiplier=ex&&(kind==="sp"?ex.spDrainMultiplier:ex.lifestealMultiplier);
     return Math.max(0,Number(basePercent)||0)*(Number(multiplier)||1);
 }
-
 function getElementDamagePassiveMultiplier(character){
-    if(!character || !character.element){ return 1; }
+    if(!character||!character.element){ return 1; }
     const ex=getLearnedElementEX(character,character.element);
-    return ex && ex.damageBonusPercent
-        ? 1+ex.damageBonusPercent/100
-        : 1;
+    return ex&&ex.damageBonusPercent?1+ex.damageBonusPercent/100:1;
 }
-
 function rollCritical(character,category="physical",targetAntiCritPercent=0,target){
-    /* Boss Shield is evaluated at the beginning of every independent damage
-       packet. The packet's overflow therefore remains non-critical, while a
-       later multi-hit packet may roll normally after the Shield is gone. */
-    if(target&&target.vBossShield&&Number(target.vBossShield.current)>0){
-        return {isCrit:false,multiplier:1};
-    }
-
-    const isMagic=
-        category==="magic";
-
-    const critStatPoints=
-        getCriticalStatPoints(
-            character,
-            category
-        );
-
-    const chancePerPoint=
-        isMagic
-        ?
-        CRIT_CHANCE_PER_INTELLIGENCE_POINT
-        :
-        CRIT_CHANCE_PER_ATTACK_POINT;
-
-    const multiplierPerPoint=
-        isMagic
-        ?
-        CRIT_MULTIPLIER_PER_INTELLIGENCE_POINT
-        :
-        CRIT_MULTIPLIER_PER_ATTACK_POINT;
-
-
-    const rageBuff=
-
-        (
-            (character&&character.activeBuffs)||
-            []
-        )
-        .find(
-            b=>b.type==="rage"
-        );
-
-
-    let critChance=
-
-        Math.min(
-            CRIT_CHANCE_MAX,
-            CRIT_CHANCE_BASE+
-            critStatPoints*
-            chancePerPoint
-        );
-
-    let critMultiplier=
-
-        Math.min(
-            CRIT_MULTIPLIER_ATTRIBUTE_MAX,
-            CRIT_MULTIPLIER_BASE+
-            critStatPoints*
-            multiplierPerPoint
-        );
-
-
-    /* 火元素EX：屬性公式本身仍受35%/200%上限，
-       EX屬於被動額外加成，所以在基礎上限之後再疊加。 */
-    if(character && character.element==="fire"){
-        const fireEX=getLearnedElementEX(character,"fire");
-        if(fireEX){
-            critChance+=Number(fireEX.critChanceBonusPercent)||0;
-            critMultiplier+=(Number(fireEX.critDamageBonusPercent)||0)/100;
-        }
-    }
-
-
-    if(rageBuff){
-
-        critChance+=
-            rageBuff.bonusPercent;
-
-        critMultiplier+=
-            rageBuff.bonusPercent/
-            100;
-
-    }
-
-    const effectiveAntiCrit=
-        Math.min(
-            ANTI_CRIT_MAX_PERCENT,
-            Math.max(0,Number(targetAntiCritPercent)||0)
-        );
-
-    critChance=
-        Math.max(
-            CRIT_CHANCE_MIN_AFTER_ANTI_CRIT,
-            critChance-effectiveAntiCrit
-        );
-
-
-    const isCrit =
-        Math.random()*100<
-        critChance;
-
-    if(isCrit){
-        battleStatisticsRecordCriticalByActor(character);
-    }
-
-    critMultiplier=Math.min(CRIT_MULTIPLIER_MAX,critMultiplier);
-
-
-    return {
-        isCrit:isCrit,
-        multiplier:
-            isCrit
-            ?
-            critMultiplier
-            :
-            1
-    };
-
+    if(target&&target.vBossShield&&Number(target.vBossShield.current)>0){ return {isCrit:false,multiplier:1}; }
+    const stats=getPartyCharacterIndex(character)>=0?getPartyBattleStats(getPartyCharacterIndex(character)):null;
+    let chance=Math.min(CRIT_CHANCE_MAX,CRIT_CHANCE_BASE+getCriticalStatPoints(character)+(Number(stats&&stats.statusAccuracy)||0));
+    let multiplier=CRIT_MULTIPLIER_BASE+(Number(stats&&stats.criticalDamage)||0)/100;
+    const ex=character&&character.element==="fire"?getLearnedElementEX(character,"fire"):null;
+    if(ex){ chance+=Number(ex.critChanceBonusPercent)||0; multiplier+=(Number(ex.critDamageBonusPercent)||0)/100; }
+    const rage=(character&&character.activeBuffs||[]).find(b=>b&&b.type==="rage");
+    if(rage){ chance+=Number(rage.bonusPercent)||0; multiplier+=(Number(rage.bonusPercent)||0)/100; }
+    chance=Math.max(5,chance-Math.max(0,Number(targetAntiCritPercent)||0));
+    const isCrit=Math.random()*100<chance;
+    if(isCrit){ battleStatisticsRecordCriticalByActor(character); }
+    return {isCrit:isCrit,multiplier:isCrit?Math.min(CRIT_MULTIPLIER_MAX,multiplier):1};
 }
-
 
 /*
    通用傷害技能施放函式。
@@ -16547,7 +16106,7 @@ function castDamageSkill(skillId){
                 const freezeRoll=rollNamedPersistentStatusEffect(
                     monster,"freeze",[
                         freezeChance,player.level,monster.level,
-                        stats.intelligence,getMonsterEffectiveSpiritPoints(monster),
+                        stats.intelligence,getMonsterEffectiveStatusResistance(monster),
                         true,getMonsterRank(monster)
                     ],"monster",index,skill.name
                 );
@@ -16671,7 +16230,7 @@ function castDamageSkill(skillId){
             const burnRoll=rollNamedPersistentStatusEffect(
                 monster,"burn",[
                     skill.burnChance,player.level,monster.level,
-                    stats.intelligence,getMonsterEffectiveSpiritPoints(monster)
+                    stats.intelligence,getMonsterEffectiveStatusResistance(monster)
                 ],"monster",index,skill.name,skill.guaranteedBurn===true
             );
 
@@ -16728,7 +16287,7 @@ function castDamageSkill(skillId){
             const freezeRoll=rollNamedPersistentStatusEffect(
                 monster,"freeze",[
                     skill.freezeChance,player.level,monster.level,
-                    stats.intelligence,getMonsterEffectiveSpiritPoints(monster),
+                    stats.intelligence,getMonsterEffectiveStatusResistance(monster),
                     true,getMonsterRank(monster)
                 ],"monster",index,skill.name
             );
@@ -18453,12 +18012,12 @@ function processSingleMonsterAttack(monsterIndex,token){
             if(isPureControlSkill){
                 const freezeChance=getSkillFreezeChanceAtLevel(castSkillData,effectiveSkillLevel);
                 const freezeDuration=getSkillFreezeDurationAtLevel(castSkillData,effectiveSkillLevel);
-                const targetFinalSpirit=getFinalBattleSpiritForPlayerTarget(targetCharacter,targetIndex);
+                const targetFinalStatusResistance=getFinalBattleStatusResistanceForPlayerTarget(targetCharacter,targetIndex);
                 const freezeResult=rollNamedPersistentStatusEffect(
                     targetCharacter,"freeze",[
                         freezeChance,monster.level,targetCharacter.level,
                         getMonsterEffectiveAbilityPoints(monster,"intelligence"),
-                        targetFinalSpirit,true,"player",getPlayerStatusResistBonus(targetCharacter)
+                        targetFinalStatusResistance,true,"player",getPlayerStatusResistBonus(targetCharacter)
                     ],"player",targetIndex,castSkillName
                 );
                 if(freezeResult.hit){
@@ -21589,7 +21148,7 @@ function castSecondaryCharacterSkill(characterIndex,skillId,centerIndex){
             const freezeResult=rollNamedPersistentStatusEffect(
                 monster,"freeze",[
                     freezeChance,character.level,monster.level,
-                    stats.intelligence,getMonsterEffectiveSpiritPoints(monster),
+                    stats.intelligence,getMonsterEffectiveStatusResistance(monster),
                     true,getMonsterRank(monster)
                 ],"monster",index,skill.name
             );
@@ -21670,7 +21229,7 @@ function castSecondaryCharacterSkill(characterIndex,skillId,centerIndex){
                 "burn",
                 [
                     skill.burnChance,character.level,monster.level,
-                    stats.intelligence,getMonsterEffectiveSpiritPoints(monster)
+                    stats.intelligence,getMonsterEffectiveStatusResistance(monster)
                 ],
                 "monster",
                 index,
@@ -21689,7 +21248,7 @@ function castSecondaryCharacterSkill(characterIndex,skillId,centerIndex){
                 "freeze",
                 [
                     skill.freezeChance,character.level,monster.level,
-                    stats.intelligence,getMonsterEffectiveSpiritPoints(monster),
+                    stats.intelligence,getMonsterEffectiveStatusResistance(monster),
                     true,getMonsterRank(monster)
                 ],
                 "monster",
@@ -22120,7 +21679,7 @@ function castPlayer2Skill(skillId,centerIndex){
             const freezeResult=rollNamedPersistentStatusEffect(
                 monster,"freeze",[
                     freezeChance,player2.level,monster.level,
-                    stats2.intelligence,getMonsterEffectiveSpiritPoints(monster),
+                    stats2.intelligence,getMonsterEffectiveStatusResistance(monster),
                     true,getMonsterRank(monster)
                 ],"monster",index,skill.name
             );
@@ -22294,7 +21853,7 @@ function castPlayer2Skill(skillId,centerIndex){
                         player2.level,
                         monster.level,
                         stats2.intelligence,
-                        getMonsterEffectiveSpiritPoints(monster)
+                        getMonsterEffectiveStatusResistance(monster)
                     ],
                     "monster",
                     index,
@@ -22336,7 +21895,7 @@ function castPlayer2Skill(skillId,centerIndex){
                         player2.level,
                         monster.level,
                         stats2.intelligence,
-                        getMonsterEffectiveSpiritPoints(monster),
+                        getMonsterEffectiveStatusResistance(monster),
                         true,
                         getMonsterRank(monster)
                     ],
@@ -28746,9 +28305,9 @@ function updateStatusPreview(){
             targetCharacter.intelligence+
             pendingStats.intelligence,
 
-        spirit:
-            targetCharacter.spirit+
-            pendingStats.spirit,
+        defensePoints:
+            targetCharacter.defensePoints+
+            pendingStats.defensePoints,
 
         agility:
             targetCharacter.agility+
@@ -28931,11 +28490,11 @@ function updateStatusPreview(){
         );
 
 
-    $("statusSpirit")
+    $("statusDefense")
         .textContent =
         formatStatLine(
-            current.spirit,
-            equipmentBonus.spirit
+            current.statusResistance,
+            equipmentBonus.statusResistance
         );
 
 
@@ -30457,16 +30016,16 @@ function getBackpackCharacterStats(index){
         maxSP:50+(character.bonusSP||0)+character.energy*15+bonus.maxSP+bonus.energy*15,
         attack:BASE_PHYSICAL_ATTACK+Math.max(1,Number(character.level)||1)*ATTACK_PER_LEVEL+(character.attack+bonus.attack)*ATTACK_PER_POINT,
         magicAttack:BASE_MAGIC_ATTACK+Math.max(1,Number(character.level)||1)*MAGIC_ATTACK_PER_LEVEL+(character.intelligence+bonus.intelligence)*MAGIC_ATTACK_PER_POINT,
-        defense:BASE_DEFENSE+Math.max(1,Number(character.level)||1)*DEFENSE_PER_LEVEL+(character.vitality+bonus.vitality)*DEFENSE_PER_VITALITY_POINT+bonus.defense,
+        defense:BASE_DEFENSE+Math.max(1,Number(character.level)||1)*DEFENSE_PER_LEVEL+(character.defensePoints+bonus.defensePoints)*DEFENSE_PER_POINT+bonus.defense,
         vitality:character.vitality+bonus.vitality,
         energy:character.energy+bonus.energy,
         intelligence:character.intelligence+bonus.intelligence,
-        spirit:character.spirit+bonus.spirit,
+        defensePoints:character.defensePoints+bonus.defensePoints,
         agility:character.agility+bonus.agility,
-        accuracy:character.spirit*2+bonus.spirit*2,
-        resistance:calculateStatusResistancePercent(character.spirit+bonus.spirit),
-        antiCrit:calculateAntiCritPercent(character.spirit+bonus.spirit),
-        evasion:(character.agility+bonus.agility)*0.6
+        accuracy:bonus.accuracy,
+        statusResistance:bonus.statusResistance,
+        antiCrit:bonus.antiCrit,
+        evasion:bonus.evasion
     };
 }
 
@@ -30673,11 +30232,11 @@ function openInventoryCharacterDetail(){
         ["智力",stats.intelligence],
         ["體質",stats.vitality],
         ["能量",stats.energy],
-        ["精神",stats.spirit],
+        ["精神",stats.statusResistance],
         ["敏捷",stats.agility],
         ["命中",stats.accuracy],
         ["閃避",stats.evasion],
-        ["異常抗性",stats.resistance.toFixed(1)+"%"],
+        ["異常抗性",stats.statusResistance.toFixed(1)+"%"],
         ["抗暴",stats.antiCrit.toFixed(1)+"%"],
         ["物理爆擊率",critical.physical.chance.toFixed(1)+"%"],
         ["物理爆擊傷害",(critical.physical.multiplier*100).toFixed(1)+"%"],
@@ -30917,7 +30476,7 @@ function getStatText(stats){
 
         intelligence:"智力",
 
-        spirit:"精神",
+        defensePoints:"防禦",
 
         agility:"敏捷",
 
@@ -33815,7 +33374,7 @@ try{
         ["vitality","Vitality"],
         ["energy","Energy"],
         ["intelligence","Intelligence"],
-        ["spirit","Spirit"],
+        ["defensePoints","Defense"],
         ["agility","Agility"]
     ].forEach(([statKey,idPart])=>{
 
