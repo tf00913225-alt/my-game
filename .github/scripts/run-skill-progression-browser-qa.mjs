@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
+import http from "node:http";
 import os from "node:os";
 import path from "node:path";
 import {spawn,spawnSync} from "node:child_process";
@@ -7,8 +8,13 @@ import {spawn,spawnSync} from "node:child_process";
 const ROOT=process.cwd();
 const ARTIFACT_DIR=path.join(ROOT,"artifacts","browser-qa");
 const VIEWPORTS=[[360,800],[393,873],[412,915]];
-const read=file=>fs.readFileSync(path.join(ROOT,file),"utf8");
-const inline=value=>value.replace(/<\/style/gi,"<\\/style").replace(/<\/script/gi,"<\\/script");
+const WATER_CASES=[
+    ["healSpell","治療術"],
+    ["revive","復活術"],
+    ["freeze","冰封"],
+    ["purifyMind","淨心訣"]
+];
+const ELEMENT_CASES=[["fire","fireRocket"],["water","healSpell"],["wind","stormFist"],["earth","stoneThrow"]];
 
 function findChrome(){
     const configured=String(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH||"").trim();
@@ -17,48 +23,204 @@ function findChrome(){
         const probe=spawnSync("bash",["-lc",`command -v ${name}`],{encoding:"utf8"});
         if(probe.status===0&&probe.stdout.trim()){ return probe.stdout.trim(); }
     }
-    throw new Error("Headless Chrome/Chromium is required for Skill/Inventory semantic browser QA.");
+    throw new Error("Headless Chrome/Chromium is required for real Skill Runtime browser QA.");
 }
 
-function productionCascade(){
-    const manifest=JSON.parse(read("build/asset-manifest.json"));
-    const paths=[...manifest.critical.styles,...manifest.featureManifest.bundles["app-shell"].styles,...manifest.featureManifest.bundles["gameplay-core"].styles];
-    const unique=[...new Set(paths)];
-    return {paths:unique,css:unique.map(read).map(inline).join("\n")};
+function mime(file){
+    if(file.endsWith(".js")){ return "text/javascript"; }
+    if(file.endsWith(".css")){ return "text/css"; }
+    if(file.endsWith(".json")){ return "application/json"; }
+    if(file.endsWith(".html")){ return "text/html"; }
+    if(file.endsWith(".svg")){ return "image/svg+xml"; }
+    if(file.endsWith(".webp")){ return "image/webp"; }
+    if(file.endsWith(".png")){ return "image/png"; }
+    if(file.endsWith(".jpg")||file.endsWith(".jpeg")){ return "image/jpeg"; }
+    return "application/octet-stream";
 }
 
-function fixtureHtml(width,height,css){
-    const skills=[
-        ["fireRocket","火箭","physical",[["upgrade","升級",false]]],
-        ["waterKnife","水刀斬","physical",[["learnable","學習・2點",false]]],
-        ["frostPunch","冰霜拳","physical",[["level-locked","Lv7解鎖",true]]],
-        ["prereqSkill","玄冰掌","physical",[["prerequisite-locked","需先學習：水刀斬",true]]],
-        ["flameTornado","烈焰龍捲","magic",[["points-insufficient","點數不足",true]]],
-        ["maxSkill","滿級技能","physical",[["max-level","已滿級",true]]],
-        ["equipSkill","可裝備技能","magic",[["equipable","裝備",false]]],
-        ["equippedSkill","已裝備技能","magic",[["equipped","已裝備",true]]]
-    ];
-    const rows=skills.map(([id,name,category,cards])=>`<div class="skill-row" data-skill-id="${id}"><div class="skill-row-icon" aria-hidden="true">✦</div><div class="skill-row-text"><strong>${name}</strong><span class="skill-category-badge ${category}">${category==="physical"?"物理":"法術"}</span><div class="skill-row-prerequisite"></div></div>${cards.map(([state,label,disabled])=>`<button class="skill-action-card${disabled?" disabled":""}" data-action-state="${state}" type="button"><span class="skill-action-card-label">${label}</span>${state==="learnable"?'<span class="v141-notice-dot v146-growth-guidance-dot" aria-hidden="true"></span>':""}</button>`).join("")}</div>`).join("");
-    const inventoryItems=Array.from({length:30},(_,i)=>`<button class="inventory-item-slot" type="button">${i+1}</button>`).join("");
-    const progressionSource=inline(read("js/60-v173.64-skill-progression-rebalance.js"));
-    const picker=["火焰斬","冰霜箭雨","寒泉神掌・超長技能名稱","四象終焉"].map((name,i)=>`<button class="skill-quick-button" type="button"><span class="sq-icon-wrap">✦</span><span class="sq-name">${name} Lv.${i+1}</span><span class="sq-cost">${10+i*5} SP</span><span class="v135-sq-scope">${i===0?"敵方1名":i===1?"敵方全體":i===2?"我方3名":"自身"}</span></button>`).join("");
-    return `<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>${css}</style><style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080604;color:#fff}#game-stage{width:${width}px;height:${height}px;position:relative;overflow:hidden}#app{width:100%;height:100%}#homeFeatureModal{display:block!important;visibility:visible!important;opacity:1!important;position:relative!important;width:100%;height:100%}#homeFeatureModalBody{display:block!important;height:100%}#characterTabContent{display:block!important;height:100%;overflow:auto!important;touch-action:pan-y!important}#skillPage{display:block!important;min-height:100%}#allSkillsList{display:block!important}#skillQuickBar{display:block!important;position:absolute!important;inset:auto 4px 8px 4px!important;z-index:30!important}#inventoryPage{display:block!important}.inventory-portrait-placeholder{min-height:70px;display:flex;align-items:center;justify-content:center}</style></head><body><div id="game-stage"><div id="app" class="on-inventory-page"><div id="homeFeatureModal" class="home-feature-modal show"><div id="homeFeatureModalBody"><div id="characterTabContent"><section id="skillPage"><div id="allSkillsList">${rows}</div></section></div></div></div><div id="skillQuickBar" class="skill-quick-bar show"><div id="skillQuickBarGrid" class="skill-quick-grid">${picker}</div></div><div id="inventoryPage" class="page inventory-page-classic"><div class="inventory-classic-shell"><button id="mapInventoryOverlayClose" class="map-inventory-overlay-close" type="button">關閉</button><section class="inventory-character-panel"><div class="inventory-character-switch" id="inventoryCharacterTabs">角色</div><div class="inventory-character-stage"><div class="inventory-portrait-frame" id="inventoryPortraitFrame"><div class="inventory-portrait-placeholder">角色立繪</div></div><div id="equipmentGrid" class="inventory-equipment-grid">裝備</div></div></section><section class="inventory-right-panel"><div class="inventory-wallet-bar"><span class="inventory-wallet-label">金幣</span><b class="inventory-wallet-value">999</b></div><div class="inventory-category-tabs" id="inventoryCategoryTabs"><div class="inventory-category-tab active">裝備</div><div class="inventory-category-tab">物品</div><div class="inventory-category-tab">材料</div><div class="inventory-category-tab">功能</div></div><div class="inventory-grid-scroll" id="inventoryGridScroll"><div id="inventoryGrid" class="inventory-grid inventory-grid-classic">${inventoryItems}</div></div></section></div></div></div></div><pre id="result"></pre><script>
-var player={id:"火角色",element:"fire",level:20,skillPoints:999};var player2={id:"水角色",element:"water",level:20,skillPoints:999};var player3=null;var currentSkillCharacter="fire";var characterSkillLoadouts={fire:{skillLevels:{fireRocket:1},equippedSkills:[]},water:{skillLevels:{},equippedSkills:[]}};var skillDatabase={fireRocket:{id:"fireRocket",name:"火箭",element:"fire",category:"magic",learnLevel:1,learnCost:2,requires:[]},waterKnife:{id:"waterKnife",name:"水刀斬",element:"water",category:"physical",learnLevel:1,learnCost:2,requires:[]},frostPunch:{id:"frostPunch",name:"冰霜拳",element:"water",category:"physical",learnLevel:7,learnCost:6,requires:["waterKnife"]}};function getSkillCharacterObject(key){return key==="water"?player2:player;}function saveGame(){}function updateUI(){}function renderSkillLoadout(){}function alert(message){window.__lastAlert=message;}function learnSkill(){return false;}</script><script>${progressionSource}</script><script>window.__context=null;window.openInventoryContext=function(context){window.__context=Object.assign({},context);document.getElementById('app').className='on-inventory-page inventory-context-open';return true;};window.closeMapInventoryOverlay=function(){var source=window.__context&&window.__context.sourcePage||'inventory';window.__context=null;document.getElementById('app').className='on-inventory-page';return source;};function rect(node){var r=node.getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height};}function same(a,b){return ['left','top','width','height'].every(function(k){return Math.abs(a[k]-b[k])<1;});}function checkRows(){var row=document.querySelector('[data-skill-id="waterKnife"]'),card=row.querySelector('.skill-action-card'),rr=rect(row),cr=rect(card);return {visible:cr.width>0&&cr.height>0,display:getComputedStyle(card).display,visibility:getComputedStyle(card).visibility,opacity:getComputedStyle(card).opacity,label:card.textContent.trim(),inside:cr.left>=rr.left-1&&cr.right<=rr.right+1&&cr.top>=rr.top-1&&cr.bottom<=rr.bottom+1,physical:document.querySelector('[data-skill-id="waterKnife"] .skill-category-badge')?.textContent.trim()==='物理',magic:document.querySelector('[data-skill-id="flameTornado"] .skill-category-badge')?.textContent.trim()==='法術'};}function checkPicker(){var buttons=[...document.querySelectorAll('.skill-quick-button')].map(function(node){return {rect:rect(node),text:node.textContent.trim()};});return {count:buttons.length,noDescription:!document.querySelector('.sq-description'),nonOverlap:buttons.every(function(a,i){return buttons.slice(i+1).every(function(b){return a.rect.right<=b.rect.left+1||b.rect.right<=a.rect.left+1||a.rect.bottom<=b.rect.top+1||b.rect.bottom<=a.rect.top+1;});}),buttons};}function inventoryEvidence(){var ids=['inventoryPage','.inventory-classic-shell','.inventory-character-panel','.inventory-right-panel','.inventory-category-tabs','inventoryGridScroll'];var out={};ids.forEach(function(id){out[id]=rect(document.querySelector(id.startsWith('.')?id:'#'+id));});out.scroll={overflowY:getComputedStyle(document.querySelector('#inventoryGridScroll')).overflowY,touchAction:getComputedStyle(document.querySelector('#inventoryGridScroll')).touchAction};return out;}function run(){var skill=checkRows(),picker=checkPicker(),baseline=inventoryEvidence(),contexts={};['home','map','dungeon','gameplayPage','bossPage','towerPage','trainingPage'].forEach(function(source){openInventoryContext({sourcePage:source,returnAction:'qa',closeBehavior:'restore-source'});var current=inventoryEvidence();var sameGeometry=Object.keys(baseline).filter(function(k){return k!=='scroll';}).every(function(k){return same(baseline[k],current[k]);});var returned=closeMapInventoryOverlay();contexts[source]={sameGeometry:sameGeometry,returnedTo:returned,geometry:current};});var crossEligibility=window.v173GetSkillLearnEligibility(player,skillDatabase.waterKnife,characterSkillLoadouts.fire.skillLevels);var crossLearn=learnSkill('waterKnife');var cross=Object.assign({},crossEligibility,{cost:crossEligibility.learnCost,buttonEnabled:crossEligibility.allowed,learnSuccess:crossLearn,pointsRemaining:player.skillPoints});var nativeEligibility=window.v173GetSkillLearnEligibility(player2,skillDatabase.frostPunch,characterSkillLoadouts.water.skillLevels);currentSkillCharacter='water';var nativeLearn=learnSkill('frostPunch');var native=Object.assign({},nativeEligibility,{learnSuccess:nativeLearn,buttonEnabled:nativeEligibility.allowed});document.getElementById('result').textContent=JSON.stringify({viewport:{width:${width},height:${height}},skill,picker,cross,native,cost:{base:2,cross:4},inventory:{baseline,contexts}});}run();</script></body></html>`;
+async function startServer(){
+    const server=http.createServer((req,res)=>{
+        const pathname=decodeURIComponent(String(req.url||"/").split("?")[0]);
+        const relative=pathname==="/"?"index.html":pathname.replace(/^\/+/,"");
+        const file=path.resolve(ROOT,relative);
+        if(!file.startsWith(ROOT+path.sep)||!fs.existsSync(file)||fs.statSync(file).isDirectory()){
+            res.writeHead(404);res.end("not found");return;
+        }
+        res.writeHead(200,{"content-type":mime(file),"cache-control":"no-store"});
+        fs.createReadStream(file).pipe(res);
+    });
+    await new Promise(resolve=>server.listen(0,"127.0.0.1",resolve));
+    return {server,url:`http://127.0.0.1:${server.address().port}/index.html`};
 }
 
-function waitJson(url){return new Promise((resolve,reject)=>{const started=Date.now();const poll=()=>{fetch(url).then(r=>r.json()).then(resolve).catch(error=>{if(Date.now()-started>15000)reject(error);else setTimeout(poll,80);});};poll();});}
-class Cdp{constructor(url){this.ws=new WebSocket(url);this.id=0;this.pending=new Map();this.events=[];this.ready=new Promise((resolve,reject)=>{this.ws.onopen=resolve;this.ws.onerror=reject;});this.ws.onmessage=event=>{const m=JSON.parse(String(event.data));if(!m.id){this.events.push(m);return;}if(this.pending.has(m.id)){const p=this.pending.get(m.id);this.pending.delete(m.id);m.error?p.reject(new Error(m.error.message)):p.resolve(m.result||{});}};}async send(method,params={}){await this.ready;const id=++this.id;return new Promise((resolve,reject)=>{this.pending.set(id,{resolve,reject});this.ws.send(JSON.stringify({id,method,params}));});}async eval(expression){const r=await this.send('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true});if(r.exceptionDetails)throw new Error(r.exceptionDetails.text||'browser evaluation failed');return r.result?.value;}close(){try{this.ws.close();}catch(_) {}}}
-
-async function runViewport(chrome,url,width,height,saveScreenshots){
-    const profile=fs.mkdtempSync(path.join(os.tmpdir(),"skill-inventory-browser-qa-"));const port=9400+Math.floor(Math.random()*300);const proc=spawn(chrome,["--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--remote-debugging-address=127.0.0.1","--remote-debugging-port="+port,"--user-data-dir="+profile,"about:blank"],{stdio:"ignore"});let client=null;
-    try{const targets=await waitJson(`http://127.0.0.1:${port}/json/list`);const page=targets.find(item=>item.type==='page');assert.ok(page?.webSocketDebuggerUrl);client=new Cdp(page.webSocketDebuggerUrl);await client.send('Page.enable');await client.send('Runtime.enable');await client.send('Log.enable');await client.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true,screenWidth:width,screenHeight:height,screenOrientation:{type:'portraitPrimary',angle:0}});await client.send('Page.navigate',{url});let data=null;for(let i=0;i<150;i++){data=await client.eval("(()=>{try{return JSON.parse(document.getElementById('result')?.textContent||'null')}catch(_){return null}})()");if(data?.skill&&Object.hasOwn(data.skill,'noActionTop'))break;await new Promise(r=>setTimeout(r,80));}if(!data?.skill||!Object.hasOwn(data.skill,'noActionTop')){const diagnostic=await client.eval("({html:document.documentElement.outerHTML.slice(-3000),title:document.title})");throw new Error(`Browser evidence missing at ${width}x${height}: ${JSON.stringify({diagnostic,events:client.events.slice(-12)})}`);}
-      assert.equal(data.skill.visible,true);assert.equal(data.skill.display,'flex');assert.notEqual(data.skill.visibility,'hidden');assert.ok(Number(data.skill.opacity)>0);assert.match(data.skill.label,/學習・2點/);assert.equal(data.skill.inside,true);assert.equal(data.skill.physical,true);assert.equal(data.skill.magic,true);assert.equal(data.skill.noActionTop,true);assert.deepEqual(data.skill.actionStates.sort(),['equipable','equipped','learnable','level-locked','max-level','points-insufficient','prerequisite-locked','upgrade']);assert.equal(data.skill.actionLabelsHaveBox,true);assert.equal(data.skill.guidanceDotInside,true);assert.equal(data.skill.guidanceDotTopRight,true);assert.equal(data.skill.compactGeometry,true);for(const geometry of data.skill.actionGeometry){assert.equal(geometry.noActionTop,true,'empty action top exists: '+geometry.state);assert.equal(geometry.labelBox,true,'label has no box: '+geometry.state);assert.equal(geometry.compact,true,'action card is not compact: '+geometry.state);assert.equal(geometry.centered,true,'action card is not centered: '+geometry.state);assert.equal(geometry.notRowHeight,true,'action card follows row height: '+geometry.state);}assert.equal(data.cross.allowed,true);assert.equal(data.cross.prerequisiteRequired,false);assert.equal(data.cross.cost,4);assert.equal(data.cross.buttonEnabled,true);assert.equal(data.native.allowed,false);assert.equal(data.native.prerequisiteRequired,true);assert.equal(data.native.buttonEnabled,false);assert.equal(data.cost.base,2);assert.equal(data.cost.cross,4);assert.equal(data.picker.count,4);assert.equal(data.picker.noDescription,true);assert.equal(data.picker.nonOverlap,true);for(const [source,evidence] of Object.entries(data.inventory.contexts)){assert.equal(evidence.sameGeometry,true,`inventory geometry changed for ${source}`);assert.equal(evidence.returnedTo,source);assert.equal(evidence.geometry['inventoryGridScroll'].width,data.inventory.baseline['inventoryGridScroll'].width);}
-      if(saveScreenshots){for(const name of [`skill-${width}x${height}.png`]){const shot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(ARTIFACT_DIR,name),Buffer.from(shot.data,'base64'));}if(width===393){for(const name of ['inventory-home-393x873.png','inventory-map-393x873.png','inventory-dungeon-393x873.png','battle-picker-393x873.png']){const shot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(ARTIFACT_DIR,name),Buffer.from(shot.data,'base64'));}}}return data;
-    }finally{client?.close();proc.kill('SIGTERM');try{fs.rmSync(profile,{recursive:true,force:true});}catch(_) {}}
+function waitJson(url){
+    return new Promise((resolve,reject)=>{
+        const started=Date.now();
+        const poll=()=>fetch(url).then(r=>r.json()).then(resolve).catch(error=>{
+            if(Date.now()-started>15000){ reject(error); }
+            else{ setTimeout(poll,80); }
+        });
+        poll();
+    });
 }
 
-const canonicalFixtureHtml=fixtureHtml;
-const regressionProbe='<script>(()=>{const result=document.getElementById("result");const evidence=JSON.parse(result.textContent);const cards=[...document.querySelectorAll(".skill-action-card")];const states=cards.map(card=>card.dataset.actionState).filter(Boolean);const actionGeometry=cards.map(card=>{const label=card.querySelector(".skill-action-card-label");const row=card.closest(".skill-row");const c=card.getBoundingClientRect();const l=label.getBoundingClientRect();const r=row.getBoundingClientRect();const topGap=c.top-r.top;const bottomGap=r.bottom-c.bottom;return {state:card.dataset.actionState,cardRect:{top:c.top,bottom:c.bottom,width:c.width,height:c.height},labelRect:{width:l.width,height:l.height},rowRect:{height:r.height},noActionTop:!card.querySelector(".skill-action-card-top"),labelBox:l.width>0&&l.height>0,compact:c.height<=Math.max(44,l.height+4),centered:Math.abs(topGap-bottomGap)<=3,notRowHeight:c.height<r.height-2};});const learnCard=document.querySelector("[data-action-state=learnable]");const dot=learnCard?.querySelector(".v146-growth-guidance-dot");const dr=dot?.getBoundingClientRect();const cr=learnCard?.getBoundingClientRect();evidence.skill.noActionTop=document.querySelectorAll(".skill-action-card-top").length===0;evidence.skill.actionStates=states;evidence.skill.actionGeometry=actionGeometry;evidence.skill.actionLabelsHaveBox=actionGeometry.every(item=>item.labelBox);evidence.skill.compactGeometry=actionGeometry.every(item=>item.compact&&item.centered&&item.notRowHeight);evidence.skill.guidanceDotInside=!!(dot&&learnCard&&learnCard.contains(dot)&&dr.width>0&&dr.height>0);evidence.skill.guidanceDotTopRight=!!(dot&&cr&&dr.right<=cr.right+1&&dr.left>=cr.right-dr.width-12&&dr.top>=cr.top-1&&dr.bottom<=cr.top+12);result.textContent=JSON.stringify(evidence);})()</script>';
-fixtureHtml=(width,height,css)=>canonicalFixtureHtml(width,height,css).replace("</body></html>",regressionProbe+"</body></html>");
-fs.mkdirSync(ARTIFACT_DIR,{recursive:true});const chrome=findChrome();const cascade=productionCascade();const fixture=path.join(ROOT,'.skill-inventory-semantic-browser-qa.html');
-try{const results=[];for(const [width,height] of VIEWPORTS){fs.writeFileSync(fixture,fixtureHtml(width,height,cascade.css),'utf8');const url='file://'+fixture.replace(/\\/g,'/');results.push(await runViewport(chrome,url,width,height,width===393));}const evidence={suite:'skill-inventory-semantic-browser-qa',passed:true,commitSha:process.env.GITHUB_SHA||'unknown',productionCascade:cascade.paths,viewports:results.map(item=>item.viewport),results,checks:{learnActionCard:true,categoryBadge:true,crossElementEligibility:true,nativePrerequisite:true,canonicalLearnCost:true,battlePickerWithoutSqDescription:true,inventoryCanonicalGeometry:true,inventoryReturnLifecycle:true}};fs.writeFileSync(path.join(ARTIFACT_DIR,'skill-inventory-semantic-browser-qa.json'),JSON.stringify(evidence,null,2)+'\n','utf8');console.log('Skill/Inventory semantic mobile browser QA passed:',VIEWPORTS.map(v=>v.join('x')).join(', '));}catch(error){fs.writeFileSync(path.join(ARTIFACT_DIR,'skill-inventory-semantic-browser-qa.json'),JSON.stringify({suite:'skill-inventory-semantic-browser-qa',passed:false,commitSha:process.env.GITHUB_SHA||'unknown',error:String(error&&error.stack||error),productionCascade:cascade.paths},null,2)+'\n','utf8');throw error;}finally{try{fs.unlinkSync(fixture);}catch(_) {}}
+class Cdp{
+    constructor(url){
+        this.ws=new WebSocket(url);this.id=0;this.pending=new Map();this.events=[];
+        this.ready=new Promise((resolve,reject)=>{this.ws.onopen=resolve;this.ws.onerror=reject;});
+        this.ws.onmessage=event=>{
+            const message=JSON.parse(String(event.data));
+            if(!message.id){ this.events.push(message);return; }
+            const pending=this.pending.get(message.id);
+            if(!pending){ return; }
+            this.pending.delete(message.id);
+            message.error?pending.reject(new Error(message.error.message)):pending.resolve(message.result||{});
+        };
+    }
+    async send(method,params={}){
+        await this.ready;
+        const id=++this.id;
+        return new Promise((resolve,reject)=>{this.pending.set(id,{resolve,reject});this.ws.send(JSON.stringify({id,method,params}));});
+    }
+    async eval(expression){
+        const result=await this.send("Runtime.evaluate",{expression,returnByValue:true,awaitPromise:true});
+        if(result.exceptionDetails){ throw new Error(result.exceptionDetails.text||"browser evaluation failed"); }
+        return result.result?.value;
+    }
+    close(){ try{this.ws.close();}catch(_){} }
+}
+
+const PREPARE_RUNTIME=`(async()=>{
+    const waitFor=async predicate=>{
+        const until=Date.now()+30000;
+        while(Date.now()<until){ if(predicate()){ return true; } await new Promise(resolve=>setTimeout(resolve,50)); }
+        return false;
+    };
+    if(!await waitFor(()=>window.FourSymbolsFeatures&&typeof window.FourSymbolsFeatures.ensure==="function")){
+        throw new Error("feature loader was not initialized");
+    }
+    await window.FourSymbolsFeatures.ensure("gameplay-core","skill-runtime-browser-qa");
+    if(!await waitFor(()=>typeof renderSkillLoadout==="function"&&typeof window.v173GetSkillLearnEligibility==="function"&&typeof window.v17364GetSkillUpgradeEligibility==="function")){
+        throw new Error("formal Skill Runtime owners were not initialized");
+    }
+    player.id="QA 火角色";player.element="fire";player.level=70;player.skillPoints=999;
+    player2={id:"QA 水角色",element:"water",level:70,skillPoints:999};
+    player3=null;
+    currentSkillCharacter="fire";
+    characterSkillLoadouts.fire={skillLevels:{},equippedSkills:[]};
+    selectedSkillElementCharacterKey="fire";
+    openHomeFeature("character");
+    switchCharacterTab("skill");
+    selectedSkillElementTab="water";
+    renderSkillLoadout();
+    if(typeof window.v146SyncCharacterAttentionDots==="function"){ window.v146SyncCharacterAttentionDots(); }
+    return true;
+})()`;
+
+const COLLECT_EVIDENCE=`(()=>{
+    const rect=node=>{const r=node.getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height};};
+    const visible=node=>{
+        if(!node){ return {exists:false}; }
+        node.scrollIntoView({block:"center",inline:"nearest"});
+        const style=getComputedStyle(node),r=rect(node);
+        const width=Math.max(0,Math.min(r.right,innerWidth)-Math.max(r.left,0));
+        const height=Math.max(0,Math.min(r.bottom,innerHeight)-Math.max(r.top,0));
+        const label=node.querySelector(".skill-action-card-label"),lr=label?rect(label):null;
+        const hasVisualSurface=style.backgroundImage!=="none"||style.backgroundColor!=="rgba(0, 0, 0, 0)"||parseFloat(style.borderTopWidth)>0;
+        return {exists:true,tagName:node.tagName,type:node.getAttribute("type"),disabled:node.disabled,ariaDisabled:node.getAttribute("aria-disabled"),display:style.display,visibility:style.visibility,opacity:Number(style.opacity),rect:r,visibleRectWidth:width,visibleRectHeight:height,label:{exists:!!label,text:String(label?.textContent||"").trim(),rect:lr},hasVisualSurface};
+    };
+    const findAction=skillId=>document.querySelector('[data-skill-id="'+skillId+'"] button.skill-action-card[data-skill-action="growth"]');
+    const water={};
+    ${JSON.stringify(WATER_CASES)}.forEach(([id,name])=>{water[name]=visible(findAction(id));});
+    const elements={};
+    ${JSON.stringify(ELEMENT_CASES)}.forEach(([element,id])=>{
+        selectedSkillElementTab=element;renderSkillLoadout();
+        const card=findAction(id);elements[element]={skillId:id,action:visible(card)};
+    });
+    selectedSkillElementTab="water";renderSkillLoadout();
+    if(typeof window.v146SyncCharacterAttentionDots==="function"){ window.v146SyncCharacterAttentionDots(); }
+    player.skillPoints=0;renderSkillLoadout();
+    const disabledLearn=visible(findAction("healSpell"));
+    player.skillPoints=999;selectedSkillElementTab="fire";
+    characterSkillLoadouts.fire.skillLevels={fireRocket:1};renderSkillLoadout();
+    const upgrade=visible(findAction("fireRocket"));
+    const equip=visible(document.querySelector('[data-skill-id="fireRocket"] button.skill-action-card[data-skill-action="equip"]'));
+    characterSkillLoadouts.fire.skillLevels={fireRocket:(skillDatabase.fireRocket.maxLevel||1)};renderSkillLoadout();
+    const maxLevel=visible(findAction("fireRocket"));
+    selectedSkillElementTab="water";renderSkillLoadout();
+    if(typeof window.v146SyncCharacterAttentionDots==="function"){ window.v146SyncCharacterAttentionDots(); }
+    const guidance=[];
+    document.querySelectorAll(".v146-growth-guidance-dot").forEach(dot=>{
+        const parent=dot.closest("button.skill-action-card");
+        guidance.push({parent:visible(parent),dot:visible(dot)});
+    });
+    const cards=[...document.querySelectorAll("#allSkillsList .skill-action-card")];
+    return {runtime:{renderer:String(renderSkillLoadout).includes("data-skill-action=\\\"growth\\\"")},water,elements,disabledLearn,upgrade,equip,maxLevel,guidance,allCards:cards.map(visible)};
+})()`;
+
+function assertVisibleAction(name,evidence){
+    assert.equal(evidence.exists,true,`${name}: action card is missing`);
+    assert.equal(evidence.tagName,"BUTTON",`${name}: action card must be BUTTON`);
+    assert.equal(evidence.type,"button",`${name}: action button type is wrong`);
+    assert.notEqual(evidence.display,"none",`${name}: display:none`);
+    assert.notEqual(evidence.visibility,"hidden",`${name}: visibility:hidden`);
+    assert.ok(evidence.opacity>0,`${name}: transparent`);
+    assert.ok(evidence.rect.width>0&&evidence.rect.height>0,`${name}: zero geometry`);
+    assert.ok(evidence.visibleRectWidth>0&&evidence.visibleRectHeight>0,`${name}: outside player viewport`);
+    assert.equal(evidence.label.exists,true,`${name}: label is missing`);
+    assert.ok(evidence.label.rect.width>0&&evidence.label.rect.height>0,`${name}: label has zero geometry`);
+    assert.ok(evidence.label.text.length>0,`${name}: label is blank`);
+    assert.equal(evidence.hasVisualSurface,true,`${name}: button has no background or border`);
+}
+
+async function runViewport(chrome,url,width,height,capture){
+    const profile=fs.mkdtempSync(path.join(os.tmpdir(),"skill-runtime-browser-qa-"));
+    const port=9400+Math.floor(Math.random()*300);
+    const proc=spawn(chrome,["--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--remote-debugging-address=127.0.0.1","--remote-debugging-port="+port,"--user-data-dir="+profile,"about:blank"],{stdio:"ignore"});
+    let client=null;
+    try{
+        const targets=await waitJson(`http://127.0.0.1:${port}/json/list`);
+        const page=targets.find(item=>item.type==="page");
+        assert.ok(page?.webSocketDebuggerUrl);
+        client=new Cdp(page.webSocketDebuggerUrl);
+        await client.send("Page.enable");await client.send("Runtime.enable");await client.send("Log.enable");
+        await client.send("Emulation.setDeviceMetricsOverride",{width,height,deviceScaleFactor:1,mobile:true,screenWidth:width,screenHeight:height,screenOrientation:{type:"portraitPrimary",angle:0}});
+        await client.send("Page.navigate",{url});
+        await client.eval(PREPARE_RUNTIME);
+        const evidence=await client.eval(COLLECT_EVIDENCE);
+        assert.equal(evidence.runtime.renderer,true,"QA did not execute the formal renderSkillLoadout owner");
+        for(const [name,action] of Object.entries(evidence.water)){ assertVisibleAction(name,action); }
+        for(const [element,item] of Object.entries(evidence.elements)){ assertVisibleAction(element+"/"+item.skillId,item.action); }
+        assertVisibleAction("disabled learn",evidence.disabledLearn);assert.equal(evidence.disabledLearn.disabled,true,"locked action must use native disabled");
+        assertVisibleAction("upgrade",evidence.upgrade);assert.ok(evidence.upgrade.label.text.includes("升級・"),"upgrade label is missing");
+        assertVisibleAction("equip",evidence.equip);assert.equal(evidence.equip.disabled,false,"equip action should be enabled");
+        assertVisibleAction("max level",evidence.maxLevel);assert.equal(evidence.maxLevel.disabled,true,"max-level action must use native disabled");
+        assert.ok(evidence.water["治療術"].label.text.includes("學習・"),"治療術 is not a cross-element learn action");
+        assert.ok(evidence.guidance.length>0,"learnable action has no Guidance Dot");
+        for(const item of evidence.guidance){ assertVisibleAction("Guidance Dot parent",item.parent);assert.ok(item.dot.visibleRectWidth>0&&item.dot.visibleRectHeight>0,"Guidance Dot is not visible"); }
+        for(const card of evidence.allCards){ assert.equal(card.tagName,"BUTTON","div.skill-action-card is forbidden in formal Runtime"); }
+        if(capture){
+            const screenshot=await client.send("Page.captureScreenshot",{format:"png"});
+            fs.writeFileSync(path.join(ARTIFACT_DIR,"skill-393x873.png"),Buffer.from(screenshot.data,"base64"));
+        }
+        return {viewport:{width,height},evidence};
+    }finally{
+        client?.close();proc.kill("SIGTERM");
+        try{fs.rmSync(profile,{recursive:true,force:true});}catch(_){}
+    }
+}
+
+fs.mkdirSync(ARTIFACT_DIR,{recursive:true});
+const chrome=findChrome();
+const server=await startServer();
+try{
+    const results=[];
+    for(const [width,height] of VIEWPORTS){ results.push(await runViewport(chrome,server.url,width,height,width===393)); }
+    const manifest=JSON.parse(fs.readFileSync(path.join(ROOT,"build","asset-manifest.json"),"utf8"));
+    const evidence={suite:"skill-runtime-browser-qa",passed:true,commitSha:process.env.GITHUB_SHA||"unknown",runtimeUrl:server.url,productionCascade:[...manifest.critical.styles,...manifest.featureManifest.bundles["app-shell"].styles,...manifest.featureManifest.bundles["gameplay-core"].styles],results};
+    fs.writeFileSync(path.join(ARTIFACT_DIR,"skill-inventory-semantic-browser-qa.json"),JSON.stringify(evidence,null,2)+"\n","utf8");
+    console.log("Real Skill Runtime mobile browser QA passed:",VIEWPORTS.map(item=>item.join("x")).join(", "));
+}catch(error){
+    fs.writeFileSync(path.join(ARTIFACT_DIR,"skill-inventory-semantic-browser-qa.json"),JSON.stringify({suite:"skill-runtime-browser-qa",passed:false,error:String(error?.stack||error)},null,2)+"\n","utf8");
+    throw error;
+}finally{ await new Promise(resolve=>server.server.close(resolve)); }

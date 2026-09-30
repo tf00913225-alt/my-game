@@ -703,11 +703,8 @@
             const skill=skillId&&skillDatabase[skillId];
             if(!skill){ return; }
             const level=Math.max(0,numeric(levels[skillId]));
-            const actionCards=Array.from(row.querySelectorAll(".skill-action-card"));
-            const growthCard=actionCards.find(card=>{
-                const onclick=card.getAttribute("onclick")||"";
-                return onclick.includes("learnSkill(")||onclick.includes("upgradeSkill(");
-            });
+            const actionCards=Array.from(row.querySelectorAll("button.skill-action-card"));
+            const growthCard=actionCards.find(card=>card.dataset.skillAction==="growth");
             let canSpend=false;
             if(level<=0){
                 const eligibility=typeof getSkillLearnEligibilityForUi==="function"
@@ -719,11 +716,11 @@
             }
             setGrowthGuidanceDot(
                 growthCard,
-                !!(canSpend&&growthCard&&!growthCard.classList.contains("disabled")),
+                !!(canSpend&&growthCard&&!growthCard.disabled),
                 level>0?"技能點足夠，可升級":"技能點足夠，可學習"
             );
 
-            const equipCard=actionCards.find(card=>(card.getAttribute("onclick")||"").includes("equipSkill("));
+            const equipCard=actionCards.find(card=>card.dataset.skillAction==="equip");
             const canEquip=
                 level>0&&
                 EQUIPPABLE_SKILL_CATEGORIES.has(skill.category)&&
@@ -731,10 +728,10 @@
                 equipped.length<4;
             setGrowthGuidanceDot(
                 equipCard,
-                !!(canEquip&&equipCard&&!equipCard.classList.contains("disabled")),
+                !!(canEquip&&equipCard&&!equipCard.disabled),
                 "已學習但尚未裝備"
             );
-            if(canEquip&&equipCard&&!equipCard.classList.contains("disabled")){ hasEquipReminder=true; }
+            if(canEquip&&equipCard&&!equipCard.disabled){ hasEquipReminder=true; }
         });
 
         const slots=Array.from(page.querySelectorAll("#skillLoadout .skill-loadout-slot"));

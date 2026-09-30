@@ -9,9 +9,12 @@ const start = main.indexOf("function buildSkillRowElement");
 assert.notEqual(start, -1, "Canonical skill row renderer is present");
 const renderer = main.slice(start);
 
-assert.equal(renderer.includes('<div class="skill-action-card-top">${actionIcon}</div>'), true);
-assert.equal(renderer.includes('<div class="skill-action-card-top"></div>'), false);
-assert.equal(renderer.includes("actionIcon\\n                ?"), true);
+assert.match(renderer,/<button[\s\S]*?type="button"[\s\S]*?class="skill-action-card/);
+assert.match(renderer,/<span class="skill-action-card-label">/);
+assert.match(renderer,/data-skill-action="growth"/);
+assert.match(renderer,/data-skill-action="equip"/);
+assert.match(renderer,/disabled aria-disabled="true"/);
+assert.doesNotMatch(renderer,/<div\s+class="skill-action-card/);
 assert.equal(renderer.includes("availableSkillPoints<1"), true, "Point-insufficient upgrade state remains covered");
 assert.equal(renderer.includes("eligibility.reason"), true, "Level/prerequisite-ineligible learn state remains covered");
 for (const label of ["學習", "升級", "裝備", "已裝備", "已滿級"]) {

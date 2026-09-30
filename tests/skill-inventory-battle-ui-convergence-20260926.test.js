@@ -26,6 +26,10 @@ assert.match(main,/getSkillLearnEligibilityForUi\(skillOwner,skill,skillLevels\)
 assert.match(main,/skill-category-badge \$\{skill\.category\}/);
 assert.doesNotMatch(main,/skill-action-card-top|actionIcon/);
 assert.doesNotMatch(mainCss,/skill-action-card-top/);
+assert.match(main,/<button[\s\S]*?type="button"[\s\S]*?class="skill-action-card/);
+assert.match(main,/data-skill-action="growth"/);
+assert.match(main,/data-skill-action="equip"/);
+assert.doesNotMatch(main,/<div\s+class="skill-action-card/);
 const actionCardBlock=mainCss.slice(mainCss.indexOf(".skill-action-card{"),mainCss.indexOf("}",mainCss.indexOf(".skill-action-card{"))+1);
 assert.match(actionCardBlock,/align-self:center/);
 assert.match(actionCardBlock,/height:auto/);
@@ -37,8 +41,8 @@ assert.doesNotMatch(context,/if\(dungeonActive\|\|!gameplayPageId\)\{ return ope
 assert.match(mainCss,/grid-template-columns:repeat\(4,minmax\(0,1fr\)/);
 assert.doesNotMatch(mainCss,/\.skill-element-tab\.learn\{/);
 assert.doesNotMatch(mainCss,/skill-section-divider|skill-section-learned|skill-section-unlearned/);
-assert.match(inventoryCss,/app\.inventory-overlay-open[\s\S]*?display:none !important/);
-assert.match(inventoryCss,/app\.on-inventory-page \.content\{[\s\S]*?bottom:0 !important/);
+assert.doesNotMatch(inventoryCss,/inventory-overlay-open/);
+assert.match(inventoryCss,/#game-stage #app\.on-inventory-page \.content\{[\s\S]*?touch-action:pan-y/);
 assert.match(battleCss,/skill-quick-button \.sq-name\{[\s\S]*?display:block !important/);
 assert.match(battleCss,/skill-quick-button \.v135-sq-scope\{[\s\S]*?display:block !important/);
 assert.doesNotMatch(main,/sq-description|descriptionNode/);

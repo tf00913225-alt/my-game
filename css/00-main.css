@@ -4464,6 +4464,12 @@ button:active{
     display:flex;
     align-items:center;
     justify-content:center;
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font:inherit;
+    appearance:none;
+    -webkit-appearance:none;
     border-radius:7px;
     overflow:hidden;
     border:1px solid rgba(200,154,72,.38);
@@ -4476,9 +4482,10 @@ button:active{
     transform:scale(.95);
 }
 
-.skill-action-card.disabled{
+.skill-action-card.disabled,
+.skill-action-card:disabled{
     opacity:.5;
-    pointer-events:none;
+    cursor:not-allowed;
 }
 
 .skill-action-card-label{
