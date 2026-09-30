@@ -546,7 +546,7 @@ await rejected("allocateCanonicalSharedExp",yUser.idToken,
 await rejected("allocateCanonicalSharedExp",yUser.idToken,
     {...callableAllocation,expectedRevision:7},"ABORTED");
 await rejected("allocateCanonicalSharedExp",yUser.idToken,
-    {...callableAllocation,session:sessionE},"SESSION_INVALID");
+    {...callableAllocation,session:{...sessionY,credential:"z".repeat(43)}},"SESSION_INVALID");
 const allocated=await invoke("allocateCanonicalSharedExp",yUser.idToken,callableAllocation);
 assert.equal(allocated.allocatedRevision,9);
 const leveledArchive=await checkRecoveryArchive(y,9);
