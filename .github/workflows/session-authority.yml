@@ -143,7 +143,7 @@ jobs:
             DATABASES_JSON="$databases_json" node -e '
               const databases=JSON.parse(process.env.DATABASES_JSON);
               if(!Array.isArray(databases)) throw Error("Unexpected database list");
-              const leftovers=databases.map(d=>d.name).filter(n=>/^projects\\/four-symbols-jianghu\\/databases\\/restore-drill-[0-9]+-[0-9]+$/.test(n));
+              const leftovers=databases.map(d=>d.name).filter(n=>typeof n==="string" && n.startsWith("projects/four-symbols-jianghu/databases/restore-drill-") && /restore-drill-[0-9]+-[0-9]+$/.test(n));
               console.log(`Restore drill leftovers: ${leftovers.length}`);
               for(const name of leftovers) console.log(`Leftover: ${name}`);
             ' | tee -a "$GITHUB_STEP_SUMMARY"
