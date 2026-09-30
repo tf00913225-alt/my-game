@@ -10,6 +10,8 @@ const css24=read("css/24-stage-v85-inventory-inner-grid-scroll-root.css");
 const css31=read("css/31-v131-fix-batch.css");
 const css38=read("css/38-v141-system-expansion.css");
 const css50=read("css/50-v169-abyss-flow.css");
+const css55=read("css/55-team-relic-system.css");
+const equipmentProgression=read("js/equipment-progression.js");
 const browser=read("tests/backpack-visual-composition-browser.test.js");
 
 // Permanent gate: source ownership checks are paired with full production-stack browser QA.
@@ -22,9 +24,16 @@ assert.doesNotMatch(css24,/102-SLOT|102-slot|exactly 102|no pagination|height:10
 assert.match(css24,/inventoryGridScroll|inventory-grid-scroll/);
 assert.match(css38,/inventory-backpack-rarity-neutral/);
 assert.match(css50,/v169-item-art:not\(\.inventory-backpack-rarity-neutral\)/);
+for(const rarity of ["white","blue","purple","orange","pink","four-symbol"]){
+    assert.doesNotMatch(css55,new RegExp(`#game-stage \\.rarity-${rarity}`),`Team Relic ${rarity} selector must not be global`);
+    assert.match(css55,new RegExp(`team-relic-[^,{]+\\.rarity-${rarity}`),`Team Relic ${rarity} selector must carry Team Relic context`);
+    assert.match(equipmentProgression,new RegExp(`\\.v17346-rarity-${rarity}\\:not\\(\\.inventory-backpack-rarity-neutral\\)`),`v17346 ${rarity} selector must exclude Backpack neutral art`);
+}
 assert.match(browser,/build\/asset-manifest\.json/);
 assert.match(browser,/gameplay-core/);
-assert.match(browser,/v169-item-art v169-equipment-art/);
+assert.match(browser,/v169-item-art v169-equipment-art v169-rarity-orange v17346-rarity-orange inventory-backpack-rarity-neutral/);
+assert.match(browser,/equipment-progression-style/);
+assert.match(browser,/injectedRarityMatch/);
 assert.match(browser,/equipment label/);
 assert.match(browser,/art\.shadow/);
 console.log("✓ Backpack Runtime CSS Owner convergence regression passed");
