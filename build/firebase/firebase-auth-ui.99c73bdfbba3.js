@@ -108,6 +108,7 @@ function markup(){
             <div id="firebaseMigrationBackupExportResult" class="firebase-auth-cloud-state" role="status" aria-live="polite">可將此 UID 已封存的本機副本另存到手機。下載檔未加密，請勿分享；不能直接用於跨裝置恢復。</div>
             <div class="firebase-auth-actions">
               <button id="firebaseMigrationBackupExportButton" class="firebase-auth-button secondary" type="button">下載本機封存副本</button>
+              <button id="firebaseMigrationArchiveRecoveryButton" class="firebase-auth-button secondary" type="button">檢查舊封存並補存真實來源</button>
             </div>
             <div class="firebase-auth-footer">
               <button id="firebaseMigrationCandidateButton" class="firebase-auth-button secondary" type="button">封存並準備提交存檔候選</button>
@@ -135,7 +136,7 @@ function markup(){
 }
 function setBusy(value){
     busy=value===true;
-    ["firebaseGoogleButton","firebaseGuestButton","firebaseEmailSignInButton","firebaseEmailCreateButton","firebaseMigrationConfirmButton","firebaseRetryButton","firebaseSignOutButton","firebaseAuthBackButton","firebaseSwitchAccountButton","firebaseSessionTestButton","firebaseCloudEnvelopeTestButton","firebaseCloudPreferencesTestButton","firebaseCloudPreferencesRestoreButton","firebaseMigrationCandidateButton","firebaseMigrationCandidateCancelButton","firebaseCandidateScreeningButton","firebaseMigrationBackupExportButton"].forEach(id=>{ const button=byId(id); if(button){ button.disabled=busy; } });
+    ["firebaseGoogleButton","firebaseGuestButton","firebaseEmailSignInButton","firebaseEmailCreateButton","firebaseMigrationConfirmButton","firebaseRetryButton","firebaseSignOutButton","firebaseAuthBackButton","firebaseSwitchAccountButton","firebaseSessionTestButton","firebaseCloudEnvelopeTestButton","firebaseCloudPreferencesTestButton","firebaseCloudPreferencesRestoreButton","firebaseMigrationCandidateButton","firebaseMigrationCandidateCancelButton","firebaseCandidateScreeningButton","firebaseMigrationBackupExportButton","firebaseMigrationArchiveRecoveryButton"].forEach(id=>{ const button=byId(id); if(button){ button.disabled=busy; } });
 }
 function renderResumeCountdown(){
     if(!resumeActive){ return; }
@@ -555,6 +556,22 @@ function cancelOriginalDeviceMigrationCandidate(){
     state={...state,migrationCandidate:"已取消提交；本機不可變備份保留，沒有送出候選。"};
     render();
 }
+function recoverOriginalDeviceArchivedSidecars(){
+    if(busy||!DEV_SESSION_TEST_ENABLED||state.mode!=="READY"){ return; }
+    const uid=window.FourSymbolsFirebase?.getUser?.()?.uid;
+    try{
+        if(!uid){ throw new Error("ACCOUNT_CHANGED"); }
+        const result=window.FourSymbolsAccountSave.recoverArchivedMigrationSidecars(uid);
+        if(window.FourSymbolsFirebase?.getUser?.()?.uid!==uid){ throw new Error("ACCOUNT_CHANGED"); }
+        state={...state,backupExport:result.unchanged
+            ?"舊來源已在另一份不可變封存中；原候選與原封存未修改。這不代表領獎已驗證或角色已採納。"
+            :"找到與封存主存檔完全一致的舊搬移備份，已將三份真實原始來源另存為新不可變封存。請另行下載新封存妥善保管；原候選仍被阻擋，未自動提交。"};
+    }catch(error){
+        console.info("Archived migration sources unavailable:",error?.code||error);
+        state={...state,backupExport:"找不到唯一且完整、主存檔完全一致的舊搬移來源；沒有補造資料，原封存與私人候選保持不變。"};
+    }
+    render();
+}
 function downloadOriginalDeviceMigrationBackups(){
     if(busy||!DEV_SESSION_TEST_ENABLED||state.mode!=="READY"){ return; }
     const uid=window.FourSymbolsFirebase?.getUser?.()?.uid;
@@ -637,6 +654,8 @@ function bind(){
     if(screeningButton){ screeningButton.addEventListener("click",()=>{ void screenCurrentMigrationCandidate(); }); }
     const backupExportButton=byId("firebaseMigrationBackupExportButton");
     if(backupExportButton){ backupExportButton.addEventListener("click",downloadOriginalDeviceMigrationBackups); }
+    const archiveRecoveryButton=byId("firebaseMigrationArchiveRecoveryButton");
+    if(archiveRecoveryButton){ archiveRecoveryButton.addEventListener("click",recoverOriginalDeviceArchivedSidecars); }
     byId("firebaseSupportButton").addEventListener("click",()=>window.FourSymbolsSupport.show());
     byId("firebaseAuthBackButton").addEventListener("click",()=>{
         if(!state.user||(state.mode!=="READY"&&state.mode!=="OFFLINE_READY")){ return; }

@@ -125,7 +125,7 @@
       "backupRequired": true,
       "migrationRequired": true,
       "authorityTier": "B",
-      "authoritativeSource": "untrusted immutable local migration copy",
+      "authoritativeSource": "untrusted immutable local migration copy; exact-match archived legacy bytes may create a separate sealed copy, never a reward entitlement",
       "schemaVersion": "2",
       "restoreOwner": "js/startup/account-save-repository.js",
       "deletionPolicy": "retain until owner-approved cleanup",

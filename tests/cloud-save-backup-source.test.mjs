@@ -89,3 +89,58 @@ test('client submission requires a selected verified backup and sends only seale
  assert.equal(validateMigrationBackup(JSON.parse(JSON.stringify(calls[0].payload.backup)),'uid-a').snapshot.gold,200);
  uid='uid-b';await assert.rejects(context.submitLegacyMigrationCandidate({backupKey:backup.backupKey}),e=>e.code==='ACCOUNT_CHANGED');
 });
+
+test('archived UID migration sidecars create a distinct sealed backup only for the exact main bytes',()=>{
+ const {repo,values}=fixture();
+ const keys=['daily-dungeon-state','task-tracker','legacy-abyss-state'];
+ for(const suffix of keys){values.delete(repo.accountKey(suffix,'uid-a'));}
+ const original=repo.createMigrationBackup('uid-a');
+ const root='four_symbols_legacy_backup:uid-a:1234567890';
+ values.set(root,original.mainRaw);
+ for(const suffix of keys){
+  const old=Object.entries(repo.LEGACY_SIDECARS).find(([,mapped])=>mapped===suffix)[0];
+  values.set(root+':'+old,JSON.stringify({source:suffix}));
+ }
+ const result=repo.recoverArchivedMigrationSidecars('uid-a');
+ assert.equal(result.unchanged,false);
+ assert.notEqual(result.backupKey,original.backupKey);
+ const recovered=repo.verifyMigrationBackup('uid-a',result.backupKey);
+ assert.deepEqual([...result.recoveredSources],keys);
+ for(const suffix of keys){
+  assert.equal(recovered.sidecars[suffix].status,'present');
+  assert.deepEqual(JSON.parse(recovered.sidecars[suffix].raw),{source:suffix});
+  assert.equal(values.get(repo.accountKey(suffix,'uid-a')),undefined);
+ }
+ assert.equal(repo.verifyMigrationBackup('uid-a',original.backupKey).sidecars[keys[0]].status,'missing');
+ assert.equal(repo.recoverArchivedMigrationSidecars('uid-a').unchanged,true);
+ assert.equal(validateMigrationBackup(bundle(recovered),'uid-a').snapshot.gold,200);
+});
+test('archive recovery fails closed on absent, stale, ambiguous or malformed historical sources',()=>{
+ const {repo,values}=fixture();
+ const keys=['daily-dungeon-state','task-tracker','legacy-abyss-state'];
+ for(const suffix of keys){values.delete(repo.accountKey(suffix,'uid-a'));}
+ const original=repo.createMigrationBackup('uid-a');
+ assert.throws(()=>repo.recoverArchivedMigrationSidecars('uid-a'),e=>e.code==='migration-recovery-source-missing');
+ const root='four_symbols_legacy_backup:uid-a:1234567890';
+ values.set(root,JSON.stringify({version:6,player:{id:'other'}}));
+ for(const suffix of keys){
+  const old=Object.entries(repo.LEGACY_SIDECARS).find(([,mapped])=>mapped===suffix)[0];
+  values.set(root+':'+old,JSON.stringify({source:suffix}));
+ }
+ assert.throws(()=>repo.recoverArchivedMigrationSidecars('uid-a'),e=>e.code==='migration-recovery-source-missing');
+ values.set(root,original.mainRaw);
+ values.delete(root+':v141_task_tracker');
+ assert.throws(()=>repo.recoverArchivedMigrationSidecars('uid-a'),e=>e.code==='migration-recovery-source-missing');
+ values.set(root+':v141_task_tracker','{broken');
+ assert.throws(()=>repo.recoverArchivedMigrationSidecars('uid-a'),e=>e.code==='migration-backup-sidecar-corrupt');
+ values.set(root+':v141_task_tracker','{}');
+ const second='four_symbols_legacy_backup:uid-a:1234567891';
+ values.set(second,original.mainRaw);
+ for(const suffix of keys){
+  const old=Object.entries(repo.LEGACY_SIDECARS).find(([,mapped])=>mapped===suffix)[0];
+  values.set(second+':'+old,'{}');
+ }
+ assert.throws(()=>repo.recoverArchivedMigrationSidecars('uid-a'),e=>e.code==='migration-recovery-ambiguous');
+ repo.activate('uid-b');
+ assert.throws(()=>repo.recoverArchivedMigrationSidecars('uid-a'),e=>e.code==='account-not-active');
+});
