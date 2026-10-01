@@ -120,17 +120,19 @@ test('archive recovery fails closed on absent, stale, ambiguous or malformed his
  const keys=['daily-dungeon-state','task-tracker','legacy-abyss-state'];
  for(const suffix of keys){values.delete(repo.accountKey(suffix,'uid-a'));}
  const original=repo.createMigrationBackup('uid-a');
- assert.throws(()=>repo.recoverArchivedMigrationSidecars('uid-a'),e=>e.code==='migration-recovery-source-missing');
+ const before=new Map(values);
+ assert.throws(()=>repo.recoverArchivedMigrationSidecars('uid-a'),e=>e.code==='migration-recovery-archive-missing');
+ assert.deepEqual(values,before);
  const root='four_symbols_legacy_backup:uid-a:1234567890';
  values.set(root,JSON.stringify({version:6,player:{id:'other'}}));
  for(const suffix of keys){
   const old=Object.entries(repo.LEGACY_SIDECARS).find(([,mapped])=>mapped===suffix)[0];
   values.set(root+':'+old,JSON.stringify({source:suffix}));
  }
- assert.throws(()=>repo.recoverArchivedMigrationSidecars('uid-a'),e=>e.code==='migration-recovery-source-missing');
+ assert.throws(()=>repo.recoverArchivedMigrationSidecars('uid-a'),e=>e.code==='migration-recovery-main-mismatch');
  values.set(root,original.mainRaw);
  values.delete(root+':v141_task_tracker');
- assert.throws(()=>repo.recoverArchivedMigrationSidecars('uid-a'),e=>e.code==='migration-recovery-source-missing');
+ assert.throws(()=>repo.recoverArchivedMigrationSidecars('uid-a'),e=>e.code==='migration-recovery-sidecars-missing');
  values.set(root+':v141_task_tracker','{broken');
  assert.throws(()=>repo.recoverArchivedMigrationSidecars('uid-a'),e=>e.code==='migration-backup-sidecar-corrupt');
  values.set(root+':v141_task_tracker','{}');
@@ -143,4 +145,19 @@ test('archive recovery fails closed on absent, stale, ambiguous or malformed his
  assert.throws(()=>repo.recoverArchivedMigrationSidecars('uid-a'),e=>e.code==='migration-recovery-ambiguous');
  repo.activate('uid-b');
  assert.throws(()=>repo.recoverArchivedMigrationSidecars('uid-a'),e=>e.code==='account-not-active');
+});
+test('archive recovery distinguishes no eligible sealed source without changing storage',()=>{
+ const {repo,values}=fixture();
+ repo.createMigrationBackup('uid-a');
+ const before=new Map(values);
+ assert.throws(()=>repo.recoverArchivedMigrationSidecars('uid-a'),e=>e.code==='migration-recovery-sealed-missing');
+ assert.deepEqual(values,before);
+});
+test('archive check result has a dedicated status immediately after its action buttons',()=>{
+ const source=fs.readFileSync(new URL('../js/firebase/firebase-auth-ui.js',import.meta.url),'utf8');
+ const buttons=source.indexOf('id="firebaseMigrationArchiveRecoveryButton"');
+ const status=source.indexOf('id="firebaseMigrationArchiveRecoveryResult"');
+ const next=source.indexOf('class="firebase-auth-footer"',buttons);
+ assert.ok(buttons>=0&&status>buttons&&status<next);
+ assert.match(source,/recoveryResult\.textContent=state\.archiveRecovery/);
 });
