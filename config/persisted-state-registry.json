@@ -576,7 +576,7 @@
     {
       "key": "four_symbols_game_session_v1:<UID>",
       "ownerModule": "js/firebase/session-client.js",
-      "storageType": "sessionStorage",
+      "storageType": "localStorage (sessionStorage upgrade/fallback)",
       "scope": "uid+device",
       "deviceOnly": true,
       "gameplayCritical": false,
@@ -590,7 +590,7 @@
       "authoritativeSource": "server session validation",
       "schemaVersion": "legacy/unversioned",
       "restoreOwner": "js/firebase/session-client.js",
-      "deletionPolicy": "revoke/expire",
+      "deletionPolicy": "logout/revoke/UID switch; backend validates every use",
       "corruptionBehavior": "block if gameplay critical",
       "defaultBehavior": "safe default",
       "missingDataBehavior": "safe default"
