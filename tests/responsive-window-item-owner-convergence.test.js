@@ -50,7 +50,7 @@ assert.doesNotMatch(compareCss,/v17351-equipment-comparison \.item-modal-box|v17
 assert.match(frameCss,/#itemModal \.item-modal-box\{[^}]*height:auto !important;[^}]*max-height:min\(/);
 assert.match(frameCss,/#itemModal #itemModalIcon\{[^}]*aspect-ratio:1 !important/);
 assert.match(frameCss,/#itemModal #itemModalIcon img,[\s\S]*?object-fit:contain !important/);
-assert.match(compareCss,/\.v17351-compare-art\{[^}]*aspect-ratio:1!important;[^}]*flex:0 1 auto!important/);
+assert.match(compareCss,/\.v17351-compare-art\{[^}]*aspect-ratio:1!important;[^}]*flex:0 0 auto!important/);
 assert.match(compareCss,/@media \(max-width:374px\)\{[\s\S]*?grid-template-columns:minmax\(0,1fr\)!important/);
 assert.match(inventoryCss,/\.inventory-grid-scroll\{[^}]*flex:1 1 auto[^}]*overflow-y:auto/);
 assert.doesNotMatch(inventoryCss,/\.inventory-grid-scroll\{[^}]*touch-action:none/);

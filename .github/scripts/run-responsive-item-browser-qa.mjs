@@ -71,7 +71,7 @@ async function run(chrome,url,live){
    await c.send('Input.dispatchMouseEvent',{type:'mouseReleased',x,y,button:'left',clickCount:1});await settle();
   };
   const scroll=async(selector)=>{
-   const before=await measure(selector);assert.ok(before.clientHeight>24,selector+' has no usable content');
+   const before=await measure(selector);assert.ok(before.overflow<=1,selector+' content overflows horizontally');assert.ok(before.clientHeight>24,selector+' has no usable content');
    if(before.scrollHeight>before.clientHeight+1){
     const x=before.rect.left+before.rect.width/2,y=before.rect.top+before.rect.height/2;
     await c.eval(`document.querySelector(${JSON.stringify(selector)}).scrollTop=0`);
@@ -98,7 +98,7 @@ async function run(chrome,url,live){
     const back=await check(mode==='comparison'?'.v17351-compare-back':'#itemModal .close-item-button',v,true);
     const names=await check(mode==='comparison'?'.v17351-compare-pane>strong':'#itemModalName',v,true);
     const art=await check(mode==='comparison'?'.v17351-compare-art':'#itemModalIcon',v);
-    assert.ok(Math.abs(art.rect.width-art.rect.height)<1,'art is not square '+mode);
+    assert.ok(Math.abs(art.rect.width-art.rect.height)<1,'art is not square '+mode+' '+JSON.stringify(art));
     const images=await c.eval(`Array.from(document.querySelectorAll(${JSON.stringify(mode==='comparison'?'.v17351-compare-art img':'#itemModalIcon img')})).map(n=>({fit:getComputedStyle(n).objectFit,loaded:n.complete&&n.naturalWidth>0,transform:getComputedStyle(n).transform}))`);
     assert.ok(images.length>0,mode+' art missing');for(const img of images){assert.equal(img.fit,'contain');assert.ok(img.loaded,'image decode');assert.equal(img.transform,'none');}
     if(mode==='comparison'&&v[0]<=374)assert.equal((await measure(contents)).columns.split(' ').length,1,'comparison must stack');
