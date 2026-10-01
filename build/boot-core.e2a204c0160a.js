@@ -1,4 +1,4 @@
-window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.72","firebaseBootstrap":"build/firebase/firebase-bootstrap.89a8fabc40bb.js"});
+window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.72","firebaseBootstrap":"build/firebase/firebase-bootstrap.8c0ebfccd99b.js"});
 (function installFourSymbolsSupportContact(global){
 "use strict";
 if(!global||global.FourSymbolsSupport){ return; }
@@ -471,6 +471,74 @@ try{ storage().setItem(backupKey,JSON.stringify(backup)); }
 catch(error){ throw coded("migration-backup-write-failed","The immutable migration backup could not be stored.",error); }
 return Object.freeze({...verifyMigrationBackup(uid,backupKey),unchanged:false});
 }
+// Only copies historical bytes that the original UID migration sealed next to
+// the exact same main-save bytes. No live key is changed, and an absent
+// archived record remains missing. This does not establish claim entitlement.
+function recoverArchivedMigrationSidecars(uid){
+uid=validUid(uid);
+if(getActiveUid()!==uid){ throw coded("account-not-active","Recovery owner is not active."); }
+const missingKeys=["daily-dungeon-state","task-tracker","legacy-abyss-state"];
+const oldKeys=Object.fromEntries(Object.entries(LEGACY_SIDECARS)
+.map(([oldKey,suffix])=>[suffix,oldKey]));
+const sealedPrefix=MIGRATION_BACKUP_PREFIX+uid+":";
+const legacyPrefix=BACKUP_PREFIX+uid+":";
+const candidates=[];
+for(let index=0;index<storage().length;index++){
+const key=storage().key(index);
+if(typeof key!=="string"||!key.startsWith(sealedPrefix)){ continue; }
+const backup=verifyMigrationBackup(uid,key);
+if(missingKeys.some(suffix=>backup.sidecars[suffix].status!=="missing")){ continue; }
+const matches=[];
+for(let other=0;other<storage().length;other++){
+const root=storage().key(other);
+if(typeof root!=="string"||!root.startsWith(legacyPrefix)||
+!/^\d+$/.test(root.slice(legacyPrefix.length))||
+storage().getItem(root)!==backup.mainRaw){ continue; }
+const recovered={};
+for(const suffix of missingKeys){
+const raw=storage().getItem(root+":"+oldKeys[suffix]);
+if(raw===null){ break; }
+parseSave(raw,"migration-backup-sidecar-corrupt");
+recovered[suffix]={status:"present",raw};
+}
+if(Object.keys(recovered).length===missingKeys.length){
+matches.push({root,recovered});
+}
+}
+if(matches.length>1){
+throw coded("migration-recovery-ambiguous","More than one matching original migration archive exists.");
+}
+if(matches.length===1){ candidates.push({backup,match:matches[0]}); }
+}
+if(candidates.length!==1){
+throw coded(candidates.length?"migration-recovery-ambiguous":"migration-recovery-source-missing",
+"Exactly one sealed save with a complete matching original archive is required.");
+}
+const {backup,match}=candidates[0];
+const sidecars={...backup.sidecars,...match.recovered};
+const sidecarManifestFingerprint=fingerprint(sidecars);
+const backupKey=migrationBackupKeyFor(uid,backup.mainFingerprint,sidecarManifestFingerprint);
+const existing=storage().getItem(backupKey);
+if(existing){
+const checked=verifyMigrationBackup(uid,backupKey);
+if(checked.mainRaw!==backup.mainRaw||checked.metadataRaw!==backup.metadataRaw||
+JSON.stringify(checked.sidecars)!==JSON.stringify(sidecars)){
+throw coded("migration-backup-conflict","An existing recovery backup differs.");
+}
+return {backupKey,unchanged:true,recoveredSources:missingKeys};
+}
+const next={schemaVersion:2,ownerUid:uid,mainFingerprint:backup.mainFingerprint,
+sidecarManifestFingerprint,mainRaw:backup.mainRaw,metadataRaw:backup.metadataRaw,
+sidecars,createdAt:Date.now()};
+try{ storage().setItem(backupKey,JSON.stringify(next)); }
+catch(error){ throw coded("migration-backup-write-failed","Recovered backup could not be sealed.",error); }
+try{ verifyMigrationBackup(uid,backupKey); }
+catch(error){
+try{ storage().removeItem(backupKey); }catch(_){ }
+throw error;
+}
+return {backupKey,unchanged:false,recoveredSources:missingKeys};
+}
 // Export only sealed local records owned by the active UID. This is an
 // offline copy, never a cloud save or a source of reward entitlement.
 function exportMigrationBackups(uid){
@@ -542,7 +610,7 @@ SCHEMA_VERSION,LEGACY_KEY,ACTIVE_UID_KEY,activate,deactivate,getActiveUid,
 saveKey,metadataKey,readForUid,readActive,writeForUid,inspectLegacy,
 migrateLegacyToUid,removeActive,accountKey,fingerprint,LEGACY_SIDECARS,
 migrationBackupKeyFor,createMigrationBackup,verifyMigrationBackup,
-exportMigrationBackups,BACKUP_SIDECARS
+exportMigrationBackups,recoverArchivedMigrationSidecars,BACKUP_SIDECARS
 });
 })(typeof window!=="undefined"?window:globalThis);
 (function installFeatureLoader(global){
