@@ -1,4472 +1,748 @@
-## 2026-10-01 â€” Physical recording continuation: manual all-target confirmation
-
-- Fresh base: `dev@91700938c6fbd54f0bdd7d75e10c3ade10367308`; branch `fix/battle-all-target-confirmation-recovery-20261001`. #728 remains integrated, and its gesture suppression owner, shared phased flood animation, original atlas, 1350ms duration and hit fraction are retained. main is excluded.
-- New physical recording `1000072376.mp4` (42.942s, 600Ã—1280) shows repeated wind/water quickbar taps without declaration, followed later by a successful single-target water action. Full URL, device/browser details, deployed SHA and cache evidence are absent; the recording cannot prove it used the currently deployed bundle. The blue effect near the end cannot establish a Flood Beast/Boss acceptance result.
-- Direct contributing defect: #721 restored manual all-target confirmation in `prepareAction`, while `canSelectHostileBattlePrimary` still unconditionally rejected target type `all`. This prevented stormRain/iceArrowRain from entering confirmation mode at all. The original helper now accepts living all-target confirmation anchors, including stealth. Dead anchors remain invalid; hostile single/tri/row/column stealth restrictions and the separate full-group resolution remain intact. No added wrapper, touchend click, gesture owner or Boss patch.
-- `tests/battle-skill-declaration-owner.test.js` now uses the actual target helper instead of a permissive stub. New assertions first failed on stormRain against the base and then passed for three characters, stormRain/iceArrowRain, stealth/non-stealth anchors, no pre-confirmation submission, return/reselect, exactly one submission, dead-anchor rejection and retained single-target stealth rejection. Existing gesture lifecycle regression passes. The existing production-bundle native CDP suite now exercises both all-target skills, cancellation and single submission in ordinary and Boss sessions. Latest-head CI and deployed acceptance remain pending at this implementation commit.
-- Production app-shell is regenerated with the exact deterministic build concatenation; the unmodified reconstruction matches base Git blob `ad4fe1ee14df4e4fa5f37e7d504d3d4315d924bf`. New app-shell is `build/app-shell.120ef8d5549e.js`; root/build asset manifests and First Play hash/bytes are synchronized. The existing CI performs the full `npm run build:check`. Game/Cache remain 173.72.
-- TOUCH-01: DIAGNOSED/IMPLEMENTED; #728 INTEGRATED/DEPLOYED, this continuation pending integration/deployment. Other unsuccessful support/single taps in the video are not established as explained by this all-target defect. FLOOD-01: #728 DIAGNOSED/IMPLEMENTED/INTEGRATED/DEPLOYED, unchanged. Both remain physical-device NOT VERIFIED; Requirements 0/2 VERIFIED. Do not infer full symptom resolution from CI or CDP.
-- First PR CI 36842796753 passed build synchronization and native all-target declarations, then rejected a flood endpoint snapshot because the newly appended confirmation left the real next-character advance timer active. That animation evidence is discarded. The existing QA reset now clears this fixture timer before animation measurements and asserts advance=false, timer=null, phase=declare. Canonical endpoint assertions and per-snapshot animation disposal are retained; no animation Runtime change.
-
-## 2026-10-01 â€” Responsive Item runtime verification continuation (7/7 VERIFIED on deployed DEV; physical S23 Ultra pending)
-
-- Continues merged PR #726 from fresh `dev@8760a89eb505a1c9219dbd698047e1f8344be800` on `fix/responsive-window-runtime-verification-20261001`. Actual deployed desktop QA observed the INVENTORY kicker above the clipped shell and bottom equipment labels outside their shrinking panel. The deployed six-size browser acceptance now passes; physical S23 Ultra acceptance remains pending.
-- Runtime continuation absorbs `dev@67ebf68350f67f41b62cea21829d319a45f1281f` by normal merge, retaining #728 battle owners and both handoff records. Backpack, its existing entrances and item controls retire the duplicate legacy per-button ripple (`spawnButtonRipple`) whose browser-pixel geometry persisted across close/reopen inside the projected stage; shared V141 pointer feedback remains. Browser QA now records failed computed geometry and saves equipment/comparison/potion/material/chest/shop screenshots at all six sizes. Assertions remain strict. Screenshot review also found the material showing an enabled equip control: the core now uses its existing isEquipment decision for both presentation mode and control availability. Real-art screenshot review found chest-to-equipped re-entry retaining display:none on the unequip control. The original openEquippedItem owner now restores that control; browser QA asserts visible è„«ä¸‹ after the chest path. These implementation-stage pending markers are superseded by the exact-head and deployed evidence below.
-- Normal merge now absorbs `dev@6e935a59f3aa71f4de497c7ed364a386e5fdf02a`. CI `36825378222` produced Chinese-font screenshots for all item/shop modes at 360Ã—800, then failed because QA tried to remove a marker from a navigation button replaced by the canonical shell. Marker cleanup now handles retired nodes. Screenshot review additionally confirmed the native navigation paint plane covering long comparison actions: `setItemModalPresentationMode()` synchronously projects its semantic state through the existing `v148SyncContextNavigation()` owner, which hides its background shell while item mode is active and restores the source context on close. No size/coordinate owner changes. QA records hit-tests for all enabled item controls at normal and shortened heights. Final integration evidence is recorded below.
-- Existing `css/22-stage-v78-character-inventory-core.css` is the geometry owner: title stays in normal flow; character showcase does not shrink below its own three equipment rows; one inherited gap is used in both row placement and stage height; labels retain readable text. `css/24` now owns only scroll interaction, with duplicate shell/page/panel geometry removed. No new runtime wrapper, timer, observer or late size patch.
-- `tests/responsive-window-item-owner-convergence.test.js` keeps retirement contracts. Real production index/feature-loader/bundle, modes, native scroll, six mobile viewports, in-place resize, actual existing inventory entrance handlers, late feature styles and close/reopen are checked by `.github/scripts/run-responsive-item-browser-qa.mjs`. The existing skill QA external read-only transport/CDP support is shared without changing game Runtime. Missing Chrome fails the mandatory browser suite. CI and DEV deployment run this same suite; deployed checks require exact SHA and matching production manifest.
-- Legacy critical-UI assertions now forbid the retired skill-label compression guard and require the formal native label instead. This updates the test contract only; skill gameplay and UI Runtime are untouched. Game/Cache remain 173.72; main untouched. Exact-head CI, dev integration, exact-SHA deployment and deployed responsive acceptance now pass; physical Android acceptance remains separately recorded.
-- Final PR #729 Head `91ca3fb82b865f62da14a3df9c247612c545dab7`; required PR CI `36830421602` / job `110265514078` SUCCESS. PR merge snapshot `ef3e8abd023130e1f96c4e4fa02122b31a12fb59`. Item artifact `11147276827`: 6/6 viewports, 60 Chinese screenshots reviewed. Navigation artifact `11147008594`: three viewports / 48 context rows; native inventory swipe 40/28/28px and legal skill swipe 94/87/83px.
-- Normal dev merge `da95fceb5c6f08fc4ae5577760011602af513bef` has parents `6e935a59f3aa71f4de497c7ed364a386e5fdf02a` and final PR Head; tree `4092ab810115f7ea49311e32aa5b8b85e25dc862` equals the verified candidate. No main change, direct dev write, rebase, force push or git push.
-- Dev CI run `36831446075` attempt 2 / Repository checks `110269794722` PASS. Attempt 1's existing `ui-panel-browser-layout.test.js` Chrome fixture exited with no dumped DOM before geometry assertions; the unchanged failed-job retry passed. Required checks pass; the historical full Node suite is excluded by dev CI policy and `v173.25` historical assertions are not claimed as passing.
-- DEV exact deployment `da95fceb5c6f08fc4ae5577760011602af513bef` / deployment job `110271061581` SUCCESS; final release-manifest artifact `11147353517` reads `deployResult:SUCCESS`, `deploymentShaVerified:true` and this commit SHA; formal release-manifest SHA and Game/Cache `173.72` read back by the deployment gate. Deployed Responsive Item artifact `11148395785` reports `passed:true`, `environment:deployed-dev`, this exact SHA, six normal/short viewports and 60 Chinese screenshots. All ten capture families reviewed: backpack, equipment/comparison stress, real equipment/comparison, potion/material/chest and normal/short shop. Each viewport verifies four backpack footer controls and six existing entrances. Only external account transport uses the established read-only isolated QA seam; no player cloud writes.
-- Requirement batch `release/requirement-batches/2026-10-01-responsive-window-item-owner-convergence.json` is now 7/7 VERIFIED for deployed browser presentation. Bundles remain `build/gameplay-core.f80077fed10a.css`, `build/app-shell.cd59e458d64e.js`, `build/gameplay-core-secondary.0d245602adb8.js`; both asset manifests match. Original base `08d5c3cf6e327e3d9dda033dad4c42b7d66f2d64`, continuation base `8760a89eb505a1c9219dbd698047e1f8344be800` and normal absorption history are retained in the batch.
-- Navigation QA diagnosis: formal startup release notice intercepted the inventory touch. Its acknowledge control was outside 360Ã—640 and, after native scrolling, covered by the native navigation at 393Ã—873 (run `36829399402`, artifact `11146662697`, failure screenshot). This announcement geometry is outside this item task. The existing QA now selects the exact formal `closeHomeFeature()` header è¿”å›ž handler, requires native elementFromPoint hit, uses CDP mousePressed/mouseReleased and asserts modal closure. The hidden status-help button is not mistaken for è¿”å›ž. No DOM click, artificial hiding, weakened item/scroll assertions or game notice/touch CSS edits. Failure screenshots are now uploaded by the existing workflow.
-- Physical S23 Ultra remains PENDING: true mobile Chrome browser-chrome/keyboard height changes, native touch and Android long-lived GPU compositing/paint behavior. Six emulated sizes and Actions Chrome `--disable-gpu` do not establish physical-device acceptance. Bulk acceptance checks presentation/reachability/large legal counts; unchanged reward/consumption settlement is not newly claimed as live player-cloud verification.
-
-## 2026-10-01 â€” Bottom navigation / Home scroll verified on dev
-- PR #727 merged to dev `5c2330b79e807ce92f5971488b1d9f12342521e6`; main unchanged. Source/build sync and whitespace checks PASS.
-- Exact PR head `c8c215e8f8d2089322fd29dbdac2f12682396a3b`, CI run `36821241683`: all required checks PASS; mobile navigation/home artifact `11143767076` passed all three viewports and 48 context rows.
-- Dev CI/deployment run `36821889706` PASS; actual release-manifest SHA matches dev. Eight live UI contexts share `#bottomNav` / `.native-bottom-nav-layer` in `#game-overlay-layer`: 526.5Ã—105.3, bottom 936, five columns 105.3, icon frames 87.75 (screen pixels at current browser scale).
-- Home clientHeight/scrollHeight 653/653, scrollTop/document/viewport remain 0 after scrolling input; formal skill panel still scrolls (mobile native touch 94/87/83; deployed UI 936).
-- Four requirement rows VERIFIED. Full owner classification, lifecycle/fixture limitations and compatibility retirement condition: `docs/qa/2026-10-01-bottom-nav-home-scroll-convergence.md`.
-- This follow-up is documentation-only; its own latest-head CI and subsequent deployment must pass before final closeout.
-
-## 2026-10-01 â€” Navigation continuation against latest dev
-
-- PR #727 continues without rebase/force push; latest dev `67ebf68350f67f41b62cea21829d319a45f1281f` is merged into the candidate. Shared artifacts are regenerated from both source changes.
-- `showPage()` and `switchDungeonTab()` call the context projector synchronously; Abyss `refresh()` does the same. Core navMap, gameplay markGameplayNav, and V148 timer/observer navigation synchronization are retired. Existing quest-only wrappers/observer have no navigation responsibility.
-- Browser QA uses formal 24-slot paginated inventory and an actually overflowing skill panel for the single-finger scroll assertion. Final CI/deployed runtime evidence remains pending; no VERIFIED claim.
-
-## 2026-10-01 â€” Bottom Navigation / Home Scroll Owner Convergence (candidate)
-
-- Base `dev@08d5c3cf6e327e3d9dda033dad4c42b7d66f2d64`; branch `fix/bottom-nav-home-scroll-owner-convergence-20261001`. This is a Convergence/Replacement of the navigation shell and home scroll geometry; `main` remains untouched.
-- Canonical navigation DOM/lifecycle owner: `js/04-stage-v11-native-bottom-nav-runtime.js::FourSymbolsBottomNav`; sole geometry owner: `css/06-stage-v11-native-bottom-nav.css` in the 1080Ã—1920 overlay. `js/42-v148-combat-dungeon-fixes.js::syncContextNavigation()` owns only context selection and items. Legacy `#mapPageNav`, dynamic `#v141DungeonNav`, V13 migration and V143 reparenting are retired, as are their geometry styles and the V30/V31R2 CSS scaling segment. No new temporary wrapper or geometry patch is intended.
-- Home scroll owner remains `#homePage`, now fixed overflow with content geometry compacted in `css/00-main.css` and duplicate bottom-nav reserve removed from `css/19-stage-v54-main-city-moderate-native-scale.css`. Browser measurements and final CI/deployment verification remain pending; this entry is not a VERIFIED claim.
-## 2026-10-01 â€” Battle Skill Touch / Flood Beast Directionï¼ˆIMPLEMENTED candidateï¼‰
-
-- Started from live dev `08d5c3cf6e327e3d9dda033dad4c42b7d66f2d64`; incorporated responsive-window dev `8760a89eb505a1c9219dbd698047e1f8344be800` by a normal work-branch merge. No main/dev direct write, rebase or force push.
-- Touch owner remains `js/01-stage-v8-touch-lock.js`: completed gestures are keyed by pointer ID, expire after 1000ms, consume once, and retire on new pointer/lifecycle/detached target. Legacy MouseEvent ambiguity clears on next down. Cancel, leave, multi-touch and keyboard activation have explicit behavior; the 10 CSS px slop is unchanged. The node-only unbounded `suppressedTargets` list is removed.
-- Manual declaration owner is `js/00-main.js::prepareAction()` for all three roles. V141 support-skills wrapper is removed; all roles share learned/equipped/SP/auto/phase checks. V148 Purify target projection runs from the existing ally selection hook, not a prepareAction wrapper.
-- V143 remains the raster owner; V142 timing and fixed-slot geometry are unchanged. Reviewed 1536Ã—1152, 4Ã—3 sheet SHA-256 `bfb1a3520a5bb95104e98d3dc6d2b3d1d6c9b2bb686b6e64a0f4840e6fcc7327`: frames 1â€“2 cast upright at caster; 3â€“5 right-facing flight; frame 6 downward-facing flight corrected by 90 degrees; 7â€“12 upright impact/dissipation at target. Existing 1350ms and frame-eight hit are retained. `motionPhases` supplies one V143 Web Animations transform track; CSS owns only frame/opacity for that path. Other skills keep their existing travel mode. Disposal cancels the motion track. No assets were altered or derived.
-- Targeted gesture, three-role declaration and water raster regressions pass locally; two historical Water tests were aligned to the existing V173.64 data owner (no gameplay data change). Build/build:check and diff check pass.
-- Existing CI browser owners now include native CDP touch recovery and full-production battle skill/phase/target/hitbox checks plus both-side/three-column phased-motion screenshots embedded in the existing JSON artifact. PR #728 CI run 36817872202 at head 4118d8ca21968bd95e89ab6555725c3817c2b090 passed native CDP touch declaration/return/drag/cancel/exact-once target, support, hitbox and guard checks. Screenshot review then rejected the multi-target animation evidence because the fixture reused the V142 same-actor/name gate. The QA owner now disposes each isolated cast and checks its endpoint against the current canonical target; replacement head 8456de3ec786bbf0e65322249faaa7cf1a428102 is under fresh CI. Final integration/deployment evidence will be recorded on PR #728 after execution, not inferred from this earlier green run. Local browser checks remain unavailable (no Chromium). Physical S23 Ultra validation is pending; recording SHA/cache remain unknown. Do not call the contributing causes the sole complete root cause or mark VERIFIED.
-- Known unrelated baseline tests also failed locally: V141 inventory grid snapshot and V143 skill-label CSS snapshot. They were not weakened. Exact PR CI, merge and deployment evidence must be recorded only after actual execution.
-
-## 2026-09-29 â€” Bug Repair DoD / Owner Convergence Gate æ°¸ä¹…è¦ç¯„
-
-- æ–°å¢žæ°¸ä¹…å°ˆé …å¥‘ç´„ `docs/BUG_REPAIR_DOD_OWNER_CONVERGENCE_GATE.md`ï¼›æ‰€æœ‰ Bugï¼fixï¼failureï¼regression èˆ‡ã€Œæ˜¯å¦å·²ä¿®å¥½ã€åˆ¤å®šéƒ½å¿…é ˆéµå®ˆã€‚
-- å°ˆæ¡ˆè² è²¬äººåªæ±ºå®šç”¢å“ï¼éŠæˆ²çµæžœï¼›Ownerã€Patchã€Wrapperã€Lifecycleã€CSSã€Testã€è³‡æ–™ä¾†æºèˆ‡èˆŠå¯¦ä½œé€€å ´ç”±ä»£ç†ä¾å°ˆæ¡ˆè­‰æ“šè² è²¬åˆ¤æ–·ã€‚è‹¥å¯¦ä½œæ–¹å¼æœƒé€ æˆå¤š Ownerã€Patch ç–ŠåŠ ã€è³‡æ–™é¢¨éšªæˆ–ä¸å¯ç¶­è­·æž¶æ§‹ï¼Œä»£ç†å¿…é ˆä¸»å‹•é˜»æ­¢ä¸¦æ”¹æŽ¡å®‰å…¨å¯¦ä½œã€‚
-- Bug ç‹€æ…‹å›ºå®šå€åˆ† DIAGNOSED â†’ IMPLEMENTED â†’ INTEGRATED â†’ DEPLOYED â†’ VERIFIEDï¼›åªæœ‰ VERIFIED æ‰èƒ½å›žå ± FIXEDï¼RESOLVEDï¼å·²ä¿®å¥½ã€‚
-- åŒä¸€çŽ©å®¶ç—‡ç‹€ä¿®å¾©å¾Œä»é‡ç¾æ™‚ï¼Œä¸å¾—ç¹¼çºŒç–Šå±€éƒ¨ Patchï¼›ç¬¬ä¸‰æ¬¡æ–½å·¥å‰å¿…é ˆå›žæŸ¥å‰å…©æ¬¡ä¿®æ³•ä¸¦åŸ·è¡Œ Subsystem Convergence Auditã€‚
-- æ­¤è¦å‰‡å·²æŽ›å…¥ AGENTSã€CLAUDEã€ARCHITECTURE_RULESã€AUTONOMOUS_REPAIR_CONTRACT èˆ‡ CHANGE_SAFETY_REPLACEMENT_CONTRACTï¼Œå¾ŒçºŒæ–°å°è©±ä¸å¾—ç•¥éŽã€‚
-
-## 2026-09-28 â€” Change Safety / Replacement Migration æ°¸ä¹…å·¥ç¨‹æŠŠé—œè¦å‰‡
-
-- å°ˆæ¡ˆè² è²¬äººæ˜Žç¢ºè¦æ±‚ï¼šæœ¬äººä¸éœ€æ‡‚ç¨‹å¼æˆ–è‡ªè¡Œåˆ¤æ–·èˆŠ CSSï¼DOMï¼å‡½å¼ï¼Wrapperï¼Test æ˜¯å¦è©²åˆªï¼›å…¶è²¬ä»»æ˜¯æ±ºå®šéŠæˆ²ã€UIã€ç³»çµ±èˆ‡çŽ©æ³•è¦è®Šæˆä»€éº¼æ¨£ã€‚æ‰€æœ‰é–‹ç™¼ä»£ç†å¿…é ˆä¸»å‹•æ‰¿æ“”å·¥ç¨‹é¢¨éšªæŠŠé—œèˆ‡èˆŠç‰ˆæœ¬é€€å ´åˆ¤æ–·ã€‚
-- æ–°æ°¸ä¹…å¥‘ç´„ï¼š`docs/CHANGE_SAFETY_REPLACEMENT_CONTRACT.md`ã€‚ä»»ä½•æ–°å¢žï¼ä¿®æ”¹ï¼æ›¿æ›ï¼é‡æ§‹ï¼ä¿® Bug å‰éƒ½å¿…é ˆå…ˆåˆ†é¡ž Additiveï¼Replacementï¼Convergenceï¼Removalã€‚
-- ã€Œæ”¹æˆï¼æ›æˆï¼ä¸è¦åŽŸæœ¬çš„ã€é è¨­è¦–ç‚º Replacementï¼Œä¸å¾—æŠŠ C ç–Šåœ¨ A/B ä¸Šå¾Œç”¨ `display:none`ã€`animation:none`ã€`!important`ã€Wrapper æˆ– late patch å£“ä½èˆŠå¯¦ä½œå°±å®£ç¨±å®Œæˆã€‚
-- æ¯æ¬¡è®Šæ›´å¿…é ˆä¸€èµ·æª¢æŸ¥ Ownerã€Contractã€Lifecycleã€Semantic Stateã€Regression Testï¼›è‹¥èˆŠå¯¦ä½œä»æ‰¿æ“”å…¶ä»–è²¬ä»»ï¼Œå…ˆé·ç§»è²¬ä»»å†é€€å ´ã€‚
-- ä»£ç†ç™¼ç¾é›™ Ownerã€å¤šä»½çœŸç›¸ã€ç‹€æ…‹èªžæ„æ··ç”¨ã€Lifecycle ç¼ºå£ã€èˆŠ Test ä¿è­·å–æ¶ˆè¡Œç‚ºæˆ–ä¸€äººåœ˜éšŠç¶­è­·æˆæœ¬é¢¨éšªæ™‚ï¼Œå¿…é ˆåœ¨æ–½å·¥å‰ä¸»å‹•æé†’ä¸¦çµ¦å‡ºæ­£å¸¸å·¥ç¨‹é †åºï¼Œä¸å¾—ç­‰ Bug ç™¼ç”Ÿå¾Œæ‰è§£é‡‹ã€‚
-- å®Œæˆå®šç¾©åŒ…å«èˆŠç‰ˆæœ¬é€€å ´ï¼šæ–°ç‰ˆèƒ½é‹ä½œæœ¬èº«ä¸ç­‰æ–¼å®Œæˆã€‚æ­¤è¦å‰‡å·²æŽ›å…¥ AGENTSã€CLAUDEã€ARCHITECTURE_RULES èˆ‡ AUTONOMOUS_REPAIR_CONTRACTï¼Œå¾ŒçºŒæ–°å°è©±ä¸éœ€ä½¿ç”¨è€…é‡è²¼å…¨æ–‡ã€‚
-
-## 2026-09-27 â€” Same-head canonical recovery transaction (candidate; Phase 4 0/6 VERIFIED)
-
-- Internal `functions/src/canonical-current-recovery.js::restoreCurrent()` repairs only the current first-character server-created revision from its complete sealed archive. It requires an active UID session, exact envelope revision and a matching, unexpired, server-only operator approval. In one Firestore transaction it refuses unexpected source documents, recreates missing sources, advances the complete claim set and account to a new revision, creates an unpublished snapshot and archive, consumes approval and writes operation/audit receipts. Original claim and operation history is retained; replay resolves its receipt.
-- No public recovery callable, approval issuance endpoint, playable pointer or old-revision rollback is enabled. An operator approval must be created by a separately authorized server process; the module cannot restore without it. Same-database archives do not prove independent backup or disaster recovery. Phase 4 remains 0/6 VERIFIED; PR, CI and exact deployment evidence are pending.
-
-## 2026-09-27 â€” Atomic protected daily check-in settlement (candidate; Phase 4 0/6 VERIFIED)
-
-- `functions/index.js::claimDailyCheckin` verifies Firebase identity and the active game session. Its request accepts only UID, session and expected server revision. The backend freezes a Taipei calendar day, derives the existing 50-gold check-in grant and deterministic operation ID, then `functions/src/canonical-resource-credit.js::claimDailyCheckin()` commits the grant, receipt, unique claim, claim record/checkpoint, ledger, canonical economy/source revisions and unpublished snapshot in one Firestore transaction. A failed transaction leaves none of those writes; a lost response retries the same receipt without paying twice. The earlier internal `daily-checkin-grant.js::issue()` remains a server-only reservation helper and is not required by this atomic path.
-- `functions/src/session-authority.js::runProtected()` remains the session gate. No client amount, local check-in flag, battle result or character snapshot becomes authoritative. No browser/UI hook, gameplay save wrapper, published pointer, legacy adoption or second-device restore is added. The deployment allowlist includes this callable only after PR checks. Kill/win quests remain blocked on trustworthy battle events.
-- PR, merged HEAD, CI and Firebase deployment evidence must be checked separately. Phase 4 remains **0/6 VERIFIED**.
-
-## 2026-09-27 â€” Server-owned daily check-in grant source (candidate; Phase 4 0/6 VERIFIED)
-
-- Internal owner `functions/src/daily-checkin-grant.js::issue()` derives the `checkin` quest's existing 50 gold award and Taipei calendar day from the server clock. A protected transaction creates one UID-scoped `pendingGrants/daily-checkin-YYYYMMDD` record, or validates the same record on retry. A transaction retry keeps its original day; a corrupt duplicate fails closed. No browser day, reward amount, battle result, or local quest counter is accepted.
-- The existing `reserveTrustedGrant()` and `canonical-resource-credit.js::creditReservedGrant()` remain the only reservation and canonical settlement owners; the emulator exercises the new grant through both steps, claim record and unpublished snapshot. This issuer has no callable or gameplay hook, and is not a player-visible cloud reward. Kill/win quest rewards still lack a trusted battle source. No save wrapper or temporary patch is added.
-- PR, CI, merged-HEAD and deployment evidence must be recorded separately after verification. The playable pointer stays disabled; Phase 4 remains **0/6 VERIFIED**.
-
-## 2026-09-27 â€” Canonical one-level EXP allocation (candidate; Phase 4 0/6 VERIFIED)
-
-- New internal owner `functions/src/canonical-exp-allocation.js::allocateSharedExp()` spends only the server-owned shared EXP pool for the first server-created character. One protected operation buys exactly one next level using the current game's cost and growth rules. It commits character/economy/source revisions, an unpublished snapshot, a UID-scoped operation receipt and a ledger entry atomically; retries return that receipt.
-- The module has no callable export, browser cost/stats input, local `saveGame()` hook, inventory handling or legacy adoption. It cannot publish a playable snapshot and does not establish a backup or restoration point. Phase 4 remains **0/6 VERIFIED**; PR/CI/deployment evidence is pending.
-
-## 2026-09-27 â€” Trusted EXP pool settlement (candidate; Phase 4 0/6 VERIFIED)
-
-- Internal resource settlement owner is `functions/src/canonical-resource-credit.js::creditReservedGrant()`, evolved from the prior gold-only owner. It credits only a backend-issued gold or EXP grant already reserved under the active UID session and expected revision; EXP enters `economy.sharedExp` and does not level a character. `functions/src/trusted-grant-ledger.js::reserve()` remains the single public entitlement reservation owner. The browser cannot submit kind or amount.
-- The operation commits a new unpublished source snapshot, unique claim, ledger, receipt and envelope revision together. No callable settlement endpoint, battle-reward authority, local `saveGame()` change, playable pointer or legacy admission is added. `authoritativeStateReady:false`, `readyForPublication:false`; Phase 4 remains **0/6 VERIFIED**. Verification and deployment evidence belong only after completed checks.
-
-## 2026-09-26 â€” First trusted gold credit transaction (merged / deployed; Phase 4 0/6 VERIFIED)
-
-- PR #605 started from `dev@ec0de75b76e1b6f18ded1a776961cb5408c4380b`, final head `db296cff327ee92445b0ae04bd9d6a5a1242d904`, merged to `dev@1ee74aac6db0dd722201ab815dd2c479cfefc83a`; `main` unchanged. PR Repository checks `36251428353` and Session Authority `36251428154` succeeded. Merged Repository checks/DEV exact-SHA preview `36251732321` and Session Authority emulator/Firebase deployment `36251732172` succeeded.
-- Internal owner `functions/src/canonical-gold-credit.js::creditReservedGrant()` uses the existing protected session transaction to verify a server-issued reserved gold grant and prior first-character source snapshot, then atomically updates economy, all source revisions, a new unready snapshot, unique claim, ledger, receipt and envelope. It rejects stale revision, missing/corrupt sources, duplicate claims and non-initial character state. Existing `reserveTrustedGrant()` returns the credited receipt on a lost-response retry only if claim and ledger still agree. The Firestore emulator verified rollback, credit and both retries. No callable export or browser amount/balance input was added.
-- Canonical snapshot SHA-256 now orders map keys deterministically before hashing because Firestore may return map fields in another order; the stored JSON size check remains independent. `authoritativeStateReady:false` and `readyForPublication:false` remain. The only live deployed functions are the pre-existing endpoint allowlist; this internal transaction is not a player grant path.
-- Deployment read `(default)` Firestore `asia-east1` and `POINT_IN_TIME_RECOVERY_ENABLED`; scheduled backups were `UNVERIFIED` to the deploy identity. First completed backup, restore rehearsal, full mutation coverage, legacy admission and second-device playable recovery remain unverified. Phase 4 remains **0/6 VERIFIED**.
-
-## 2026-09-26 â€” Foundation B initial source and Firestore transaction (merged / deployed; Phase 4 0/6 VERIFIED)
-
-- PR #603 from `dev@c8acbf29b488fbe7d723dc5c29d9a69f813712aa`, source `ab1b2c4f11c911e562efabe7eb40f532a00f25d8`, merged to `dev@83ee38aa02439fb663d8a59c23c130c59fd21a44`; `main` unchanged. PR Repository checks `36249670805` and Session Authority `36249670668` succeeded. Merged Repository checks/DEV preview `36249942057` succeeded with deployed SHA verified; merged Session Authority emulator/Firebase deploy `36249941912` succeeded from that same SHA.
-- Internal owner `functions/src/initial-character-sources.js::makeInitialCharacterSources()` creates complete new-account sources from validated name, element, gender and exactly ten assigned attribute points. `functions/src/canonical-source-writer.js::commitInitialSources()` is still internal and runs under `session-authority.js::runProtected()`; the operation receipt binds the choices. No callable, local `createCharacter()` or `saveGame()` hook, playable pointer, legacy adoption or grant was added. `readyForPublication:false` and `authoritativeStateReady:false` remain mandatory.
-- Existing Session Authority workflow now exercises the internal writer with actual Firestore emulator transactions: stale revision, forced precommit rollback, atomic first write, identical replay, altered replay and migration-candidate conflict. This is verified server transaction behavior, not a live player character write. No wrapper or temporary runtime patch was added.
-- Deployment read `(default)` Firestore region `asia-east1` and `POINT_IN_TIME_RECOVERY_ENABLED`; scheduled backups remained `UNVERIFIED` to the deploy identity. No completed backup object, restore rehearsal or game-level recovery point was verified. Phase 4 remains **0/6 VERIFIED**. Next practical gate: backend-owned ongoing character/economy/claim mutations and recovery readiness before any publication or second-phone character restore.
-
-## 2026-09-25 â€” Cloud Phase 4 historical-reward proof gate (merged / deployed; 0/6 VERIFIED)
-
-- Latest verified integration base and current `dev`: `727279ee0653803c07179e0ff43a1a1b2cb992f8`. `main` was not modified. PR #572 (read-only candidate screening), PR #573 (original-device immutable local backup) and PR #574 (this reward-claim gate) are all merged into `dev`.
-- PR #574: `feature/cloud-phase4-reward-proof-gate-20260925` â†’ `dev`; PR head `a18ed111c4d7b9ce7de20b432e1e02ed2b62b4c9`; merge SHA `727279ee0653803c07179e0ff43a1a1b2cb992f8`. It passed PR CI `36155223164` and Session Authority `36155222413`. The merged `dev` checks also passed: CI `36155708169` (Repository checks, DEV exact-commit deployment and deployed live QA) and Session Authority `36155707692` (emulator/account-boot gates and Firebase deployment).
-- New owner `functions/src/legacy-reward-claim-audit.js` is a pure fail-closed audit over historical main-save claim records: daily quests, commissions, achievements, tower floors and Abyss chest/first-clear claims. Its only permissible interpretation is `block_historical_claims_only`: an historical client-side claim may later prevent a duplicate claim, but cannot create a grant entitlement, change gold/EXP/inventory, or establish authoritative character state.
-- `functions/src/legacy-candidate-screening.js::screenLegacyCandidateSnapshot()` includes the audit in the existing read-only protected preflight. It returns source-specific `*_CLAIM_RECORD_INVALID` blockers for missing, malformed or contradictory records; it remains `readyForAcceptance:false` and still requires `SIDECAR_BACKUP_MISSING`. The callable writes no migration marker, ledger, character, economy or restore state.
-- Tests added: `tests/cloud-save-legacy-reward-claim-audit.test.mjs` and updated `tests/cloud-save-legacy-screening.test.mjs`. Local `node --test tests/cloud-save-*.test.mjs` passed 6/6 and `git diff --check` passed before PR; the CI emulator also passed `tests/cloud-save-*.test.mjs tests/firebase-trusted-cloud-save-backend.test.mjs`.
-- Original-device preservation remains local-only through `FourSymbolsAccountSave.createMigrationBackup(uid)`: exact UID main-save bytes, metadata and registered sidecars are preserved immutably; it never uploads, rewrites or promotes gameplay data. There is no phone data submitted by this work.
-- **Do not claim cross-device character restore, authoritative cloud character, or Phase 4 completion.** Phase 4 remains **IN PROGRESS / 0/6 VERIFIED**. Browser gameplay state (gold, EXP, inventory, equipment, rewards) is still not authoritative.
-- Next engineering milestone: design and implement the complete original-device evidence upload and one-time admission transaction. It must use the immutable backup reference, complete main + sidecar evidence, active UID session, server revision and operation ID; validate schema/equipment/claim records; write a unique migration marker plus non-granting historic claim blocks and a separately marked `grandfathered-unverified-history` baseline; and stay non-playable until every future high-value reward writer has a trusted server-issued receipt/ledger path. Do not upload/proceed automatically and do not add a second-device restore before this is fully verified.
-
-## 2026-09-25 â€” Legacy baseline policy and cloud-authoritative startup guard (candidate)
-
-- Base `dev@0c9e440c303306857b86c1a52c7de3be012a507a`, branch `fix/cloud-authority-startup-conflict-20260925`. Owner `js/52-v173.20-startup-loader.js::resolveSaveFor()`; UID local cache owner `js/startup/account-save-repository.js`; `js/00-main.js::saveGame()` still has a later relic wrapper in `js/60-team-relic-system.js`. No save wrapper or temporary patch added. `DATA_SECURITY_CONTRACTS.md` does not exist at this base.
-- Owner approved one-time historically unverifiable legacy progress as an explicitly marked starting baseline, subject to backup, anomaly review, claim safeguards, and subsequent backend-controlled grants. See `docs/CLOUD_CHARACTER_AUTHORITY_MIGRATION_DESIGN.md`; chat policy consent does not upload or promote a particular phone save.
-- Fixed the forward-looking boot authority gap: a local save differing from a future cloud character blocks and preserves both copies even if its `cloudBaseFingerprint` matches. Only an identical UID cache may load the cloud snapshot. Targeted branch tests are in `tests/cloud-save-authoritative-startup-conflict.test.mjs`.
-- `js/00-main.js::persistBeforeSuspend()` now runs its existing `saveGame()` only after Startup enters READY/OFFLINE_READY. A blocked cloud conflict must not serialize unhydrated memory over the original UID local candidate on pagehide/freeze. The existing Team Relic later wrapper remains; no new wrapper or temporary patch.
-- Still no playable cloud character, trusted reward operations, full restore or second-phone acceptance. Phase 4 IN PROGRESS / 0/6 VERIFIED, Game/Cache 173.72, main unchanged. PR/CI/DEV SHA remain to be verified.
-
-## 2026-09-24 â€” Cloud Save Phase 3 UID æœ¬æ©Ÿéš”é›¢ï¼ç™»å…¥è¼‰å…¥ï¼ˆCOMPLETE / 6/6 VERIFIEDï¼‰
-
-- Baseï¼š`dev@9a7b702303d22a20f80a20ca732a6953003b38a1`ï¼›å·¥ä½œåˆ†æ”¯ï¼š`feature/cloud-save-phase3-uid-local-isolation-20260924`ï¼›`main` å…¨ç¨‹ç¦æ­¢ä¿®æ”¹ã€‚
-- çœŸæ­£æ ¹å› ä¸æ˜¯ canonical save keyï¼šä¸»å­˜æª”å·²æœ‰ UID namespace èˆ‡ active-UID write guardï¼›é¢¨éšªåœ¨åŒä¸€ document ç›´æŽ¥æ› UID æ™‚ï¼Œplayerï¼inventoryï¼equipment ç­‰ module globals èˆ‡å¤šå€‹ app-shell/gameplay sidecar key ä»ç¶å®šå‰ä¸€ UIDã€‚
-- Startup State Machine `js/52-v173.20-startup-loader.js` æ–°å¢žå”¯ä¸€ `reloadForAccountTransition()`ï¼šAuth ç™»å‡ºæˆ– UID æ”¹è®Šæ™‚ï¼Œå…ˆä½œå»¢èˆŠ async resolutionã€deactivate save ownerã€ç§»é™¤ä¸Šä¸€å¸³è™Ÿçš„ session resume markerã€éš±è—å‰µè§’ï¼gameplayï¼Œå†å®Œæ•´ reloadã€‚æ–° document æ‰è§£æžæ–° UID ä¸¦é‡æ–°å»ºç«‹æ‰€æœ‰ sidecar ownerã€‚
-- ä¸æ–°å¢ž save wrapperã€ç¬¬äºŒå¥— Startup owner æˆ– vXXX patchï¼›`account-save-repository.js`ã€`FourSymbolsGameSave`ã€Firestore readonly reader èˆ‡ Phase 2 Envelope ä¸æ”¹ã€‚è¨ªå®¢è³‡æ–™ä¸è‡ªå‹•åˆä½µè‡³ Googleï¼Emailï¼›legacy migration ä»åªå…è¨±æ˜Žç¢ºç¢ºèªã€‚
-- æ–°å¢ž `tests/cloud-save-phase3-uid-local-isolation.test.js`ï¼Œä¸¦èˆ‡ account ownershipã€auth-before-creation åŠ å…¥ PRâ†’dev å¿…è·‘ CIï¼›æ—¢æœ‰ Boot browser QA å·²å…· UID Aâ†’ç™»å‡ºâ†’UID B å®Œæ•´éš”é›¢æ¡ˆä¾‹ï¼Œå°‡ä½œ deployed candidate è‡ªå‹•è­‰æ“šã€‚
-- æœ¬æ©Ÿ Phase 3ï¼ownershipï¼auth-before-creationï¼bootï¼startupï¼V173.65 auth regressions å…¨æ•¸ PASSï¼›deterministic build èˆ‡ `build:check` PASSï¼Œ`git diff --check` PASSã€‚å®Œæ•´ `npm test` åœ¨ 12/212 æ™‚åªå›  runner ç„¡ Chrome/Chromium åœæ­¢ï¼›æœªå†’ç¨± full suite é€šéŽï¼Œbrowser QA ç•™å¾… PR CIã€‚
-- PR #557 candidate `9ad52534cf154d4f3a470afc8f71eb17a8c19371` çš„ Repository checks run `35999834624` SUCCESSï¼ŒåŒ…å« Phase 3 targeted tests èˆ‡ Boot browser UID Aâ†’ç™»å‡ºâ†’UID B éš”é›¢ï¼›åˆä½µ `dev@eed8dec359eff34727381adfbfa50b7c2ea09bd3`ã€‚
-- DEV release manifest å·²è®€å›ž exact merge SHAã€Gameï¼Cache V173.72ï¼›éƒ¨ç½²é å¼•ç”¨ `boot-core.d8fbf40b153e.js`ï¼Œbundle å…§ Phase 3 transition owner æ­£ç¢ºå­˜åœ¨ã€‚
-- ä½¿ç”¨è€…çœŸå¯¦æ‰‹æ©Ÿé©—æ”¶ PASSï¼šGoogle â†’ è¨ªå®¢æœªçœ‹è¦‹ Google è§’è‰²ï¼è³‡æ–™ï¼›è¨ªå®¢ â†’ Google å¾ŒåŽŸè§’è‰²ï¼è³‡æ–™æ­£å¸¸æ¢å¾©ã€‚Requirement Batch å·²å‡ç´š 6/6 VERIFIEDï¼ŒPhase 3 COMPLETEã€‚
-- `DATA_SECURITY_CONTRACTS.md` ä»ä¸å­˜åœ¨ï¼›æœ¬æ¬¡åªä¾æ—¢æœ‰ Bootï¼Systemï¼Cloud progress å¥‘ç´„æ–½å·¥ï¼Œæœªè‡ªè¡Œå‡é€ ç¼ºå¤±å¥‘ç´„ã€‚
-
-## 2026-09-24 â€” å››è±¡å¡” Element Ownerï¼6ãƒ»10 äººé™£å½¢ï¼Small Boss æ”¶æ–‚ï¼ˆVERIFIED candidateï¼‰
-
-- Baseï¼šæœ€æ–° `dev@ae3bfba3d75c7c40bb4eea07860f525351ffd658`ï¼›å·¥ä½œåˆ†æ”¯ï¼š`fix/tower-element-formation-small-boss-20260924`ï¼›PR #552 â†’ `dev`ï¼›`main` å…¨ç¨‹æœªä¿®æ”¹ã€‚
-- å››è±¡å¡”å…ƒç´ ï¼å›ºå®šæŠ€èƒ½å”¯ä¸€çŽ©æ³• Owner æ”¶æ–‚æ–¼ `js/gameplay-boss-tower-system.js`ï¼›V141 `rebalanceDungeonElements()` å·²é€€ä¼‘ï¼ŒDailyï¼Towerï¼Bossï¼Adventureï¼Abyss å…±ç”¨ launcher ä»¥æ­£å¼ `v132ActiveDungeonRun.mode` å€åˆ†èº«åˆ†ã€‚
-- V144 ç‚º Monster Skill Element Guard å”¯ä¸€ Ownerï¼šä¸€èˆ¬å…ƒç´ æ€ª Attackï¼Supportï¼Healï¼Buffï¼Debuffï¼Hard Control åªèƒ½å¾žæœ¬å…ƒç´ æ­£å¼æ”œå¸¶ ID é¸æ‹›ï¼›Abyss çœŸæ­£è·¨å…ƒç´ ä¾‹å¤–ä»¥ `v144CrossElementSkillIds` æ˜Žç¢º allowlistã€‚
-- Tower ä¸€èˆ¬å±¤å›ºå®š 6 åï¼ˆB2/B3/B4 + F2/F3/F4ï¼‰ï¼›5 çš„å€æ•¸ç‰¹æ®Šå±¤èˆ‡ 10 çš„å€æ•¸ Boss å±¤å›ºå®š 10 åã€‚Boss å±¤ B3 æ˜¯å”¯ä¸€ Tower Bossï¼›éž Boss ç‰¹æ®Šå±¤ B3 å„ªå…ˆ Eliteï¼›æ­»äº¡å¾Œ Slot ä¸é‡æŽ’ã€‚
-- Tower Boss gameplay rank ä¿ç•™ `boss`ï¼Œä½†ç‚º `unitKind="tower-boss"`ï¼å–®æ ¼ B3ï¼›ä¸é€² Personalï¼World çš„ Large Boss footprintã€B1/B5 æ´è»ã€F1/F5 objectã€Shieldï¼Mechanism lifecycleã€‚
-- `config/monster-portrait-registry.json` çš„ 8 å€‹ `tower-boss` target ä¿ç•™ rank=bossï¼ŒsizeClass æ”¹ standardï¼ˆ1024Ã—1536ã€2:3ï¼‰ï¼›ç´ æç›®å‰ä»æ˜¯ plannedï¼Œæœ¬æ¬¡æœªç”¢åœ–ã€æœªå»ºå‡æª”ã€‚
-- æŠ€è¡“å‚µå·²ç§»é™¤ï¼šV141 broad element rebalanceã€Tower large-boss object/summon planã€V152 æ¥µå¸åç¨±å¼æŠ€èƒ½ dispatcherã€V152 å…¨åŸŸ monster loadout mutationï¼›V149 è¿½æ“Šèˆ‡ V158 Daily solo protection åƒ…ä¿ç•™ action-scoped æš«å­˜/é‚„åŽŸç”¨é€”ï¼Œä¸æ˜¯æ°¸ä¹… Ownerã€‚
-- å°ˆé … `tests/tower-element-formation-small-boss-20260924.test.js` å·²åŠ å…¥ PRâ†’dev å¿…è·‘ CIï¼›PR CI run `35978931166` çš„ source candidate `a7ba91b90debd18ee246eca142c447363509a5ad` Repository checks SUCCESSï¼ŒåŒ…å«å°ˆé …ã€Boss/Abyss/Fixed Slot/battle/VFX targeted regressionsã€deterministic build:checkã€Fixed Slot 9:16ã€exact-candidate real battleã€Adventure mobile QAã€resourcesã€loaderã€Release Gate èˆ‡ git diffã€‚
-- Full Node Suiteï¼šPRâ†’dev workflow ä¾å¥‘ç´„è·³éŽï¼›ä¸å¾—èª¤å ±ç‚ºå·²è·‘ã€‚å¿…è·‘ targeted Nodeï¼integration suites å…¨éƒ¨ PASSã€‚
-- Requirement Batchï¼š`release/requirement-batches/2026-09-24-tower-element-formation-small-boss.json` å·² VERIFIEDã€‚
-- `DATA_SECURITY_CONTRACTS.md` åœ¨æœ¬æ¬¡ Base ä»ä¸å­˜åœ¨ï¼›æœ¬æ¬¡æœªä¿®æ”¹å¸³è™Ÿã€Cloud Save æˆ–å®‰å…¨è³‡æ–™ schemaã€‚
-
-## 2026-09-23 â€” Lv10 æŠ€èƒ½ï¼è¼”åŠ©æŠ€èƒ½ï¼ç§˜å¯¶ Runtime Owner æ”¶æ–‚ï¼ˆVERIFIED candidateï¼‰
-
-- Baseï¼š`dev@9d32e8cb022ff824e83d5dc3022f2e0a24c8d58a`ï¼›å·¥ä½œåˆ†æ”¯ï¼š`fix/skill-relic-runtime-owner-convergence-20260923`ï¼›`main` æœªä¿®æ”¹ã€‚
-- 31 å€‹çŽ©å®¶ç›´æŽ¥å‚·å®³æŠ€èƒ½æ”¹ç‚º Lv10ã€‚å”¯ä¸€ Damage Curve owner ç‚º `js/00-main.js::getSkillDamageAtLevel()`ï¼šLv2ï½ž4 ç·šæ€§ã€Lv5=Lv4Ã—1.5ã€Lv6ï½ž9 ç·šæ€§ã€Lv10=Lv9Ã—1.5ï¼Œèˆ‡æ­£å¼ `calculateDamage()` ä¸€è‡´ä½¿ç”¨ `Math.round`ã€‚
-- `js/60-v173.64-skill-progression-rebalance.js` ç¾ç‚º Final Skill Dataï¼Progressionï¼çŽ©å®¶èªªæ˜Ž projection ownerï¼Œä¸¦å›ºå®šé€² `gameplay-core`ï¼›æ‰€æœ‰å¯å‡ç´šæŠ€èƒ½æ¯ç´šå›ºå®š 1 æŠ€èƒ½é»žï¼Œæ—¢æœ‰ `skillLevels` ä¸é·ç§»ï¼ä¸é‡ç½®ã€‚
-- ç«ç³»ï¼šç‚Žé­‚å…±é³´ SP45ã€ç‚Žå‹¢ 12/15/18/21/25%ï¼ŒLv5 çˆ†æ“Šï¼æˆåŠŸæ–°å¢žç‡ƒç‡’æ¯æ­£å¼å›žåˆæœ€å¤šå»¶é•·1ã€æ•´æ¬¡æœ€å¤š+3ï¼Œå…è²»è¿½æ“Šä¸å»¶é•·ï¼›ç„šè¡€è¨£ SP35ã€HPæˆæœ¬5/10/15/20/25%ï¼ŒæŽ¥ä¸‹ä¾†3æ¬¡éžå…è²»ç«ç³»ç›´æŽ¥æ–½æ”¾ +5/10/15/20/35%ï¼ŒDoTï¼å…è²»è¿½æ“Šä¸ä½¿ç”¨ä¹Ÿä¸æ¶ˆè€—ã€‚
-- æ°´ï¼é¢¨ï¼åœŸæ”¯æ´æŠ€èƒ½å‡æ”¹è®€æ­£å¼ ByLevel æ¬„ä½ï¼›å†°å° Lv5 æ‰ç”± column å‡ç‚º triï¼›æ·¨å¿ƒè¨£ Lv3 æ‰å‡3ç›®æ¨™ä¸”é›™æ–¹éƒ½æ¸…é™¤æ‰€æœ‰å¯è§£é™¤è‡¨æ™‚æˆ°é¬¥ç‹€æ…‹ï¼›çµç•Œåªæ“‹ç›´æŽ¥å‚·å®³ä¸¦ä¾ 3/3/3/4/5 æ¬¡èˆ‡å›žåˆæ•¸ã€‚
-- æ•µæ–¹å²©çŸ³å£å£˜å·²ç”±å…¨é«” `currentAbyssEntries()` æ”¹å›žæ­£å¼ `allyTriTargets()`ï¼Œæœ€å¤š3åï¼›V144 åå‘ `requires:["barrier"]`ï¼`allyAll` èˆŠè³‡æ–™å·²é€€ä¼‘ã€‚
-- Team Relic Trigger Engine å·²å¾ž `feature-boss-relic` æ‹†å‡ºä¸¦å›ºå®šæ”¾å…¥ `gameplay-core` æœ€æœ«ç«¯ï¼›æ‰€æœ‰æ­£å¼æˆ°é¬¥å…¥å£å› æ­¤åœ¨å¯åŸ·è¡Œå‰å·²åŒæ­¥å–å¾—åŒä¸€ `js/60-team-relic-system.js`ã€‚Bossï¼Towerï¼é¤Šæˆä» lazyï¼Œæ²’æœ‰å¡žå›ž Critical Bootï¼Œä¹Ÿæ²’æœ‰æ–°å¢ž Battle Start éžåŒæ­¥è£œè¼‰ã€‚
-- 10 ä»¶ `runtimeReady:false` ç§˜å¯¶ hydrateï¼equipï¼progression å…¨éƒ¨ fail closedï¼›çŽ©å®¶åªè¦‹ã€Œæ•ˆæžœå°šæœªè¦ºé†’ï¼èƒ½åŠ›å°šæœªé–‹æ”¾ã€ã€‚å¯’æ³‰çŽ‰ç®ã€ä¹é¾ç¥žç«ç½©ã€å²©å²³éŽ®å°ã€çƒˆé™½ç¥žç èªªæ˜Žå·²åŒæ­¥å¯¦éš› Triggerï¼Scalarã€‚
-- å°ˆé …æ¸¬è©¦ï¼š`tests/skill-relic-owner-convergence-20260923.test.js`ï¼›æ—¢æœ‰ `tests/skill-progression-rebalance.test.js` åŒæ­¥æ–°è¦æ ¼ï¼Œå…©è€…å·²åŠ å…¥ dev PR å¿…è·‘ CIã€‚
-- Requirement Batchï¼š`release/requirement-batches/2026-09-23-skill-relic-runtime-owner-convergence.json` å·² VERIFIEDã€‚PR #532 æœ€çµ‚ source candidate `e52a7f78eb02978bdfe4ab4423b6cb4ddf629515`ï¼›deterministic build commit `0a3405fdb53e125fd9d0024709239e5b45f0e37c`ï¼›PR CI Run `35837276372` Repository checks SUCCESSï¼ŒåŒ…å«æŠ€èƒ½ï¼ç§˜å¯¶å°ˆé …ã€Battle/Relic regressionsã€build:checkã€exact-candidate real battle mobile QAã€resourcesã€Release Gateã€git diffã€‚
-- é¡å¤– Full Node audit æ›¾ç™¼ç¾ä¸¦ä¿®å¾©å…©å€‹æœ¬æ¬¡ç›¸é—œé»žï¼šæ·¨å¿ƒè¨£ Lv3 æ“´å±•3ç›®æ¨™æ™‚ä»ä¿ç•™çŽ©å®¶é»žé¸ç›®æ¨™ç‚º VFX primaryï¼›Heal Spell åœ¨ legacy/test data ç¼ºå°‘æ–° SP æ¬„ä½æ™‚ä¸ä¾è³´ä¸å­˜åœ¨çš„ helperã€‚Audit å¦æ­éœ²æ–½å·¥ Base å·²å­˜åœ¨çš„ `battle-status-info-assets-20260922.test.js`ï¼`ui-critical-regressions-mobile-browser.test.js` stale UI failureï¼Œä»¥åŠ V143/V144/V155/V169 æ­·å² snapshot ä»å¯«æ­»èˆŠæŠ€èƒ½æ•¸å€¼ï¼›æœ¬æ¬¡æœªç‚ºè¿½æ±‚æ­·å²ç¶ ç‡ˆè€ŒæŠŠæ­£å¼è¦æ ¼æ”¹å›žèˆŠå€¼ã€‚
-- å”¯ä¸€ä»å¾…ç”¢å“è¦æ ¼å®šæ¡ˆï¼šæ”¯æ´æŠ€èƒ½æ²’æœ‰æ˜Žç¢º Tier å°æ‡‰ï¼Œå› æ­¤åˆæ¬¡å­¸ç¿’æˆæœ¬æš«ä¿ç•™æ—¢æœ‰æ­£å¼å€¼ï¼›æœ‰æ˜Žç¢º Tier çš„å››å…ƒç´ ç›´æŽ¥å‚·å®³æŠ€èƒ½å·²ä½¿ç”¨ 2ï¼6ï¼10ï¼16ï¼Œæ‰€æœ‰æŠ€èƒ½çš„ã€Žå‡ç´šã€å‰‡å›ºå®šæ¯ç´š 1 é»žã€‚
-- `DATA_SECURITY_CONTRACTS.md` åœ¨æ–½å·¥ Base ä»ä¸å­˜åœ¨ï¼›æœ¬æ¬¡æ²’æœ‰ä¿®æ”¹ Cloud Saveï¼å¸³è™Ÿå®‰å…¨ schemaã€‚
-
-## 2026-09-23 â€” å†°å°ï¼çŸ³åŒ–äº’æ–¥ç¡¬æŽ§èˆ‡ Body Status Base Layer æ”¶æ–‚ï¼ˆVERIFIED candidateï¼‰
-
-- Baseï¼š`dev@8bab02b38197824ac47f3ba2269ba6e19cbfd52f`ï¼›å·¥ä½œåˆ†æ”¯ï¼š`fix/freeze-petrify-exclusive-status-layer-20260923`ï¼›`main`ï¼`dev` å‡æœªç›´æŽ¥ä¿®æ”¹ã€‚
-- Gameplay Hard Control Owner ç¶­æŒ `js/00-main.js` çš„ Persistent State Gateã€‚Freezeï¼Petrify ç¾ç‚ºåŒä¸€ Exclusive Hard Control Groupï¼šåŒåèˆ‡è·¨åéƒ½æœƒåœ¨æ©ŸçŽ‡éª°é»žèˆ‡æ­£å¼å¯«å…¥å‰ä»¥ã€Œç‹€æ…‹MISSã€é˜»æ­¢ï¼›æ—¢æœ‰ç‹€æ…‹ä¸è¦†è“‹ã€ä¸åˆ·æ–°ã€ä¸å»¶é•·ã€‚
-- `applyFreezeEffect()` èˆ‡ `applyMonsterDebuff()` ä¹ŸæŽ¥å›žåŒä¸€ Gateï¼Œé¿å…çŽ©å®¶æŠ€èƒ½ã€æ€ªç‰©ã€Bossï¼æ·±æ·µã€ç¬¦å’’æˆ–å…¶ä»–ç›´æŽ¥ mutation caller ç¹žéŽäº’æ–¥è¦å‰‡ã€‚è·¨å Log æœƒåŒæ™‚æŒ‡å‡ºæ—¢æœ‰ç‹€æ…‹èˆ‡æ–°çš„å¤±æ•—ç‹€æ…‹ã€‚
-- Persistent Body Status Visual Owner ä»ç‚º `js/39-v143-skill-animation.js`ã€‚æ–°å¢žèªžæ„å±¤ `hard-control-base`ï¼`rotating`ï¼`hud`ï¼›Freezeï¼Petrify å›ºå®šåœ¨ Base Coverï¼Œä¸å‘¼å¸ã€ä¸é–ƒçˆã€ä¸åŠ å…¥ 2 ç§’ Body Rotationï¼›å…¶ä»– Body Status ä¿æŒåŽŸ 2 ç§’åš´æ ¼å¾ªåºè¼ªæ’­ã€‚
-- CSS ç”± `css/40-v143-combat-dungeon-polish.css` åªå‘ˆç¾ä¸Šè¿°æ­£å¼èªžæ„å±¤ï¼›å·²ç§»é™¤ Freezeï¼Petrifyï¼Abyss çš„åŒå±¤ z-index ç‰¹ä¾‹ï¼Œä¸ä»¥ `z-index:99999 !important` é¡žè£œä¸è™•ç†ã€‚
-- Runtime è‹¥è§€å¯Ÿåˆ°åŒä¸€ entity åŒæ™‚å­˜åœ¨ Freeze + Petrifyï¼ŒV143 åªå›žå ± Hard Control Contract violationï¼Œä¸æ›¿è³‡æ–™å±¤éš±è—ï¼æ­£è¦åŒ–å…¶ä¸­ä¸€å€‹ã€‚
-- Regression å·²è¦†è“‹ï¼šåŒåï¼è·¨å MISSã€å‰©é¤˜å›žåˆä¸è®Šã€è§£é™¤å¾Œå¦ä¸€ç¡¬æŽ§å¯é‡æ–°æ–½åŠ ã€æ­£å¼ã€Œç‹€æ…‹MISSã€æ–‡æ¡ˆã€çŽ©å®¶ï¼ä¸€èˆ¬æ€ªï¼Bossï¼æ·±æ·µå…±ç”¨ Gateã€Freeze å›ºå®šåº•å±¤ï¼‹ä¸€èˆ¬ç‹€æ…‹è¼ªæ’­ã€æ­»äº¡ï¼è§£é™¤ç«‹å³æ¸…ç†ã€Cast deferred lifecycleã€‚
-- Requirement Batchï¼š`release/requirement-batches/2026-09-23-freeze-petrify-exclusive-status-layer.json` å·² VERIFIEDã€‚PR #531ï¼šå®Œæ•´ Nodeï¼æ•´åˆå›žæ­¸æ–¼ Run `35820871917` é€šéŽï¼›deterministic production build å·²åŒæ­¥ï¼›Run `35821205754` Repository checks SUCCESSã€‚
-- `DATA_SECURITY_CONTRACTS.md` åœ¨æœ¬æ¬¡æœ€æ–° dev ä»ç‚º 404ï¼›æœ¬æ¬¡æœªä¿®æ”¹å¸³è™Ÿï¼é›²ç«¯å­˜æª”ï¼å®‰å…¨è³‡æ–™æµç¨‹ï¼Œæœªè‡ªè¡Œè£œå¯«ä¸å­˜åœ¨çš„å¥‘ç´„ã€‚
-
-## 2026-09-22 â€” æˆ°é¬¥ç‹€æ…‹è¼ªæ’­ï¼æŠ½å±œåœ–å±¤ï¼å€’æ•¸æ¡†ï¼ä¸‰æŠ€èƒ½ VFX Follow-upï¼ˆcandidateï¼‰
-
-- Baseï¼š`dev@d55410bd88590b9a9052b1b4d714a27b3cc9a411`ï¼›å·¥ä½œåˆ†æ”¯ï¼š`fix/battle-status-carousel-drawers-vfx-20260922`ï¼›`main`ï¼`dev` å‡æœªç›´æŽ¥ä¿®æ”¹ã€‚
-- Persistent Status Visual Owner ç¶­æŒ `js/39-v143-skill-animation.js`ã€‚ç‹€æ…‹ Icon ç”± 14px æ”¾å¤§è‡³ 17pxï¼›Body ç‹€æ…‹åœ–ç”±ç´„ 68%Ã—72% æ”¾å¤§è‡³ç´„ 82%Ã—86%ï¼›å¤šå€‹ Body ç‹€æ…‹æ”¹ç‚ºæ¯ 1 ç§’åªé¡¯ç¤ºä¸€ç¨®ä¸¦è¼ªæ’­ï¼ŒIcon ä»å¯åŒæ™‚ä¿ç•™ä½œè³‡è¨Šåˆ—ã€‚å‘¼å¸æœ€å¤§é€æ˜Žåº¦æ”¹ç‚º 100%ã€‚
-- æšˆçœ©æ­£å¼ Body ç‹€æ…‹åœ–æŽ¥ç‚º `assets/vfx/status/stun.webp`ã€‚åŽŸå§‹ç´ æå¯¦éš›ç‚º 1774Ã—887 å–®å¼µåœ–ï¼Œä¸æ˜¯ 4Ã—3 Sprite Sheetï¼›å› æ­¤æœªåšéŒ¯èª¤è£å¹€ã€‚
-- æˆ°é¬¥è³‡è¨Šåº•éƒ¨å…¥å£æ”¹ç‚ºæ©«å‘ã€Œæˆ°é¬¥è³‡è¨Šã€ï¼›å·¦å´çµ±è¨ˆå…¥å£ï¼Drawer æ”¹åã€Œæˆ°é¬¥æ•¸æ“šã€ã€‚åº•éƒ¨æŠ½å±œæ”¶åˆæ™‚é¡¯ç¤ºç›®å‰å›žåˆï¼Œå±•é–‹æ™‚éš±è—è©²é‡è¤‡å›žåˆæ–‡å­—ã€‚
-- `syncBattleUiPriorityLayer()` ç‚ºäº’å‹•è³‡è¨Šåœ–å±¤å”èª¿å…¥å£ï¼šæˆ°é¬¥è³‡è¨Šã€æˆ°é¬¥æ•¸æ“šã€Boss åŠŸèƒ½å¡æˆ–ç‹€æ…‹è³‡è¨Šè¦–çª—æ‰“é–‹æ™‚ï¼Œ`#game-stage` æš«æ™‚æå‡åˆ°æŠ€èƒ½ VFXï¼ˆ16000ï¼‰èˆ‡ detached damage popupï¼ˆ17020ï¼‰ä¹‹ä¸Šï¼›é—œé–‰å¾Œæ¢å¾©ä¸€èˆ¬æˆ°å ´ç¹ªè£½é †åºã€‚Drawer ä»ç‚º non-blocking observerï¼Œä¸å–å¾— BattleFlow pause lockã€‚
-- æ‰‹å‹•å›žåˆå€’æ•¸æ¡†å·²ç§»å…¥ `#battleActionRegion`ï¼Œå›ºå®šæ–¼æ“ä½œé¢æ¿ä¸Šæ–¹ï¼›æŠ€èƒ½ï¼ç‰©å“é¸æ“‡åŠç›®æ¨™é¸æ“‡æ™‚é€æ˜Žåº¦é™ç‚º 25%ï¼Œä¸” `pointer-events:none`ï¼Œä¸æ””æˆªçŽ©å®¶é¸æ“‡ç›®æ¨™ã€‚
-- Lag æ ¹å› ä¹‹ä¸€ç‚ºå¯†é›†æˆ°å ´æ¯å¼µè§’è‰²ï¼æ€ªç‰©ç«‹ç¹ªæ°¸ä¹…åŸ·è¡Œ idle transform + filter compositor å·¥ä½œã€‚ç¾åœ¨å¾…æ©Ÿç«‹ç¹ªéœæ­¢ï¼›å¯¦éš›æ”»æ“Š lunge èˆ‡ target reticle ä»ä¿ç•™å‹•ç•«ï¼›æ¯å–®ä½è…³ä¸‹ blur filter å·²ç§»é™¤ã€‚
-- ä¸‰å€‹æŠ€èƒ½æ­£å¼æ–°ç´ æï¼šæ·¨å¿ƒè¨£ã€ç‚Žé­‚å…±é³´ã€ç„šè¡€è¨£å„è‡ªæ–°å¢žè£åˆ‡æ­£æ–¹å½¢ lossless WebP Iconï¼Œä»¥åŠä¿ç•™å®Œæ•´ 4Ã—3 ç•«å¸ƒçš„ lossless WebP cast VFXã€‚VFX å°ºå¯¸å‡ç‚º 1448Ã—1086ã€‚æ‰€æœ‰è½‰æª”ä½¿ç”¨ `cwebp -lossless -exact`ï¼Œåè§£ç¢¼å¾Œå°ºå¯¸ä¸€è‡´ä¸” AE=0ã€‚
-- æœ‰æ•ˆè³‡ç”¢è½‰æª” Runï¼š`35730204057` SUCCESSï¼›ç”Ÿæˆï¼Build commitï¼š`563d1608ac04ba62908ff91444d27daad800c94f`ã€‚ä¸€æ¬¡æ€§è³‡ç”¢ Workflow å·²å¾žå·¥ä½œåˆ†æ”¯ç§»é™¤ã€‚
-- Requirement Batchï¼š`release/requirement-batches/2026-09-22-battle-status-carousel-drawers-vfx-followup.json` ç›®å‰ IMPLEMENTEDï¼›å¾… PR Repository checksï¼mobile browser QAï¼DEV exact-SHA deployment å¾Œå†å‡ç´š VERIFIEDã€‚
-
-## 2026-09-22 â€” æˆ°é¬¥ç‹€æ…‹ Iconï¼å¡ç‰Œè³‡è¨Šè¦–çª—ï¼æ­£å¼ç‹€æ…‹åœ–ï¼ˆDEV candidateï¼‰
-
-- Baseï¼šæœ€æ–° `dev@c496d98d6ee373a4f0d31bc299cdd648d3be5da5`ï¼›å·¥ä½œåˆ†æ”¯ï¼š`fix/battle-status-info-assets-20260922`ï¼›`main` æœªä¿®æ”¹ã€‚
-- Render Owner ä¿æŒ `js/00-main.js::renderBattle()` å”¯ä¸€æŽ§åˆ¶ä¾†æºï¼›æœ¬æ¬¡æ²’æœ‰æ–°å¢ž renderBattle wrapperã€‚å¡ç‰Œé»žæ“Šåªæœ‰åœ¨ Idleï¼ˆæœªé¸æŠ€èƒ½ï¼ç‰©å“ï¼ç›®æ¨™ï¼‰æ™‚é–‹å•Ÿè³‡è¨Šè¦–çª—ï¼Œæ—¢æœ‰æ•µæ–¹ï¼æˆ‘æ–¹ targetable é¸å–å„ªå…ˆã€‚
-- Persistent Status Visual Owner ä»ç‚º `js/39-v143-skill-animation.js`ï¼šç‹€æ…‹ Icon å›ºå®šé¡¯ç¤ºæ–¼ HP/SP ä¸Šæ–¹ï¼Œä¸å†å‘¼å¸ï¼›å–®å¼µå‘¼å¸ï¼å›ºå®šåœ–ä»ä¿ç•™è§’è‰²æœ¬é«”è¦–è¦ºï¼Œä½†å¯¬åº¦ï¼é«˜åº¦é™åˆ¶åœ¨è‡ªèº«å¡ç‰Œç´„ 68%ï¼72% ç¯„åœä¸¦ä½¿ç”¨ containï¼Œé¿å…è“‹åˆ°å·¦å³å¡ç‰Œã€‚
-- å¡ç‰Œè³‡è¨Šè¦–çª—é¡¯ç¤ºå…ƒç´ ã€åç¨±ã€HPã€SPã€å¢žç›Šç‹€æ…‹ã€è² é¢ç‹€æ…‹ï¼›æ¯ç­†ç‹€æ…‹é¡¯ç¤ºæ­£å¼ Iconã€æ•ˆæžœæ–‡å­—èˆ‡å‰©é¤˜å›žåˆï¼è§¸ç™¼å¾Œæ¶ˆå¤±ã€‚ç„¡å°æ‡‰ç‹€æ…‹æ™‚é¡¯ç¤ºã€Œç„¡ã€ã€‚
-- æ­£å¼ç‹€æ…‹æ¸…å–®ä¾ç›®å‰ Runtime å°æ‡‰ï¼Œä¸é‡æ–°å°Žå…¥å·²é€€ä¼‘çš„ã€Œå…¨å±¬æ€§ä¸‹é™ã€ã€‚æ–°ç«ç³»æŒçºŒç‹€æ…‹ `ç‚Žé­‚å…±é³´ï¼ç„šè¡€ï¼ç‚Žå‹¢` èˆ‡ `å…ƒç¥–è³œç¦` å·²è£œå…¥æ­£å¼ Persistent State åç¨±è¡¨ï¼›æœªä¿®æ”¹æŠ€èƒ½æ•¸å€¼ã€å‘½ä¸­çŽ‡ã€æŒçºŒå›žåˆæˆ–çµç®—å…¬å¼ã€‚
-- å¾ž `assets-library/assets/inbox/æŠ€èƒ½icon/[æˆ°é¬¥ç‹€æ…‹åœ–èˆ‡icon]` å°Žå…¥ç›®å‰ Runtime å¯¦éš›ä½¿ç”¨çš„ 22 å¼µç‹€æ…‹åœ–è‡³ `assets/vfx/status/`ã€‚å…¨éƒ¨ä½¿ç”¨ lossless WebPï¼›è½‰æª”æµç¨‹é€å¼µé©—è­‰åƒç´  AE=0ã€å°ºå¯¸ä¸€è‡´èˆ‡ RIFF/WEBP signatureã€‚æœªå°‡æ²’æœ‰ç¨ç«‹ Runtime ç‹€æ…‹ Owner çš„é€šç”¨ Icon å¼·è¡ŒæŽ¥å…¥æ­£å¼éŠæˆ²ã€‚
-- ä¸€æ¬¡æ€§è³‡ç”¢è½‰æª” Workflow åªå­˜åœ¨æ–¼æ–½å·¥éŽç¨‹ï¼›å®Œæˆ asset commit å¾Œå·²è‡ªå‹•åˆªé™¤ï¼Œæœ€çµ‚åˆ†æ”¯ä¸ä¿ç•™è‡¨æ™‚ Workflowã€‚
-- å°ˆé … `tests/battle-status-info-assets-20260922.test.js` PASSï¼›`npm run build` PASSï¼›`npm run build:check` PASSã€‚è³‡ç”¢è½‰æª”æœ‰æ•ˆ Run #4ï¼š`35718725670` SUCCESSï¼›ç”Ÿæˆè³‡ç”¢ï¼åŒæ­¥ Build commitï¼š`4a32bcd7ef0d032bcd688bd57be085cbf5395a32`ã€‚
-- Requirement Batchï¼š`release/requirement-batches/2026-09-22-battle-status-info-assets.json` å·²å‡ç´šç‚º VERIFIEDã€‚PR #515 exact-candidate CI run `35719594516` SUCCESSï¼›Battle/VFX regressionsã€Fixed Slot 9:16 mobile QAã€exact-candidate real battle mobile QAã€resourcesã€loaderã€Release Gateã€git diff å…¨éƒ¨é€šéŽã€‚
-
-## 2026-09-22 â€” å…¨åŸŸæ²è»¸è¦–è¦ºéš±è—ï¼ˆDEV candidateï¼‰
-
-- Baseï¼šæœ€æ–° `dev@cfde7fda6041b0e53e34c614351e40ff3aafa0c0`ï¼›å·¥ä½œåˆ†æ”¯ï¼š`feature/hide-scrollbars-global-20260922`ï¼›`main` æœªä¿®æ”¹ã€‚
-- å…¨åŸŸ Scrollbarï¼ˆæ²è»¸ï¼‰è¦–è¦ºå”¯ä¸€ owner ç‚º `css/00-main.css`ï¼šæ‰€æœ‰ `#game-stage` å…§æ—¢æœ‰èˆ‡æœªä¾†æ²å‹•å®¹å™¨ä¿ç•™åŽŸæœ¬ `overflow`ã€`touch-action`ã€æ…£æ€§æ²å‹•èˆ‡æ‰‹å‹¢è¡Œç‚ºï¼Œåªéš±è—ç€è¦½å™¨ç¹ªè£½çš„ scrollbar track/thumbã€‚
-- Firefox ä½¿ç”¨ `scrollbar-width:none`ï¼›Blinkï¼WebKit ä½¿ç”¨ `::-webkit-scrollbar` éš±è—ã€‚æœªä¿®æ”¹ scroll whitelistã€å…§å®¹é«˜åº¦ã€æ²å‹•æ–¹å‘ã€æˆ°é¬¥ï¼å­˜æª”ï¼æ•¸å€¼ï¼çŽ©æ³•ã€‚
-- å·²ç§»é™¤ `css/46-v154-dev-fixes.css` æ·±æ·µæˆ°é¬¥ç´€éŒ„èˆ‡ `css/38-v141-system-expansion.css` é‡é‘„æ©«å‘åˆ—è¡¨çš„èˆŠ `scrollbar-width:thin` è¦†è“‹ï¼Œé¿å…å¾Œå±¤é‡æ–°é¡¯ç¤ºå¯è¦‹æ²è»¸ã€‚
-
-## 2026-09-22 â€” renderBattle Owner P1 æ”¶æ–‚å®Œæˆï¼ˆDEVï¼‰
-
-- æ­£å¼ `main` ä»ç‚º V173.70ï¼š`0b62be5944ff7a440682bfae28b3ccc43ee2fe91`ï¼›æœ¬æ¬¡ renderBattle Owner é‡æ§‹**å°šæœªç™¼å¸ƒåˆ° main**ã€‚
-- æœ€æ–° `dev`ï¼š`07ce72ac6fc602ac4a31809c26d7e4e531d4d1b1`ã€‚
-- PR #507 å·²åˆä½µ devï¼›`js/00-main.js::renderBattle()` ç¾ç‚ºå”¯ä¸€æ­£å¼ Render Ownerã€‚
-- åŽŸæ­£å¼ Runtime å…± 6 å±¤ renderBattle Wrapperï¼ˆV131ï¼V141ï¼V143ï¼V154ï¼V158ï¼Fixed Slot adapterï¼‰å·²å…¨éƒ¨ç§»é™¤ï¼Œæ”¹ç‚ºå›ºå®šé †åº named hooksï¼›Production Runtime ä¸å†å…è¨±æ–°å¢ž renderBattle wrapperã€‚
-- Before-render é †åºå›ºå®šï¼šV158 æ—¥å¸¸å‰¯æœ¬æ­£è¦åŒ– â†’ V141 é‡Žæ€ªï¼å‰¯æœ¬ lifecycleï¼›After-render é †åºå›ºå®šï¼šV131 Formation â†’ V141 Battle UIï¼entry â†’ V143 enemy decorationï¼RAFï¼V144 hook â†’ V154 Abyss UIï¼Portrait â†’ Fixed Slot reconcileã€‚
-- åŽŸæ­£å¼è¡Œç‚ºä¿æŒï¼šFormationã€Monster Portraitã€Abyss äº”å¸ã€Dungeonï¼Wildï¼Bossã€Fixed Slotã€Statusï¼Skill VFXã€Battle Statisticsã€Boss Drawerã€å›žåˆé †åºèˆ‡ Action cadence å‡æœªæ”¹è¦æ ¼ï¼›`POST_ACTION_DELAY_MS` æœªä¿®æ”¹ã€‚
-- PR #507 candidate CI run `35697256998`ï¼šSUCCESSï¼›åŒ…å« syntaxã€build:checkã€Fixed Slotã€battle layout/timing/VFXã€relic/battle-inputã€resourcesã€HTML IDsã€loaderã€Release Gateã€git diff èˆ‡ exact-candidate real battle mobile browser QAã€‚
-- Full Node Suite ä»¥ CI-only Draft PR #508 é©—è­‰ï¼šrun `35697472769`ï¼Œ**203 / 203 PASS**ï¼›PR #508 å·²é—œé–‰ä¸”æœªåˆä½µ mainã€‚
-- dev push CI run `35697890251`ï¼šSUCCESSï¼›Dev deployment gateï¼exact-SHA verificationï¼Game+Cache verificationï¼deployed battle layout & VFX Live QA å…¨éƒ¨ SUCCESSã€‚
-- æ”¶å°¾æ™‚ Open PRï¼š0ï¼›Open Issueï¼š0ã€‚
-- ç›®å‰ `dev` behind `main` = 0ï¼›dev å·²å›  V173.70 ç™¼å¸ƒå¾Œçš„æ–‡ä»¶æ”¶å°¾èˆ‡å·²é©—è­‰ dev-only renderBattle é‡æ§‹è€Œé ˜å…ˆ mainã€‚é€™ä¸ä»£è¡¨ V173.70 Release Lifecycle å¤±æ•—ï¼Œä¹Ÿä¸ä»£è¡¨éœ€è¦é‡ç™¼èˆŠç‰ˆæœ¬ã€‚
-- æœ¬æ¬¡æœªä¿®æ”¹æŠ€èƒ½æ•¸å€¼ã€å‚·å®³å…¬å¼ã€Boss AIã€æŽ‰è½ï¼ç¶“æ¿Ÿã€çŽ©å®¶å­˜æª” Schemaã€Firebase æ­£å¼è³‡æ–™è¡Œç‚ºæˆ–å…¶ä»– UIã€‚
-
-## 2026-09-22 â€” V173.70 æ­£å¼ç™¼å¸ƒå®Œæˆï¼main-dev æ”¶æ–‚å®Œæˆ
-
-- æ­£å¼ç‰ˆæœ¬ï¼šV173.70ã€‚
-- V173.70 åŠŸèƒ½ç™¼å¸ƒ SHAï¼š`25c34a2dbbfce4600691df959cc2823eff80aeab`ã€‚
-- æœ€æ–° `main`ï¼š`0b62be5944ff7a440682bfae28b3ccc43ee2fe91`ã€‚
-- V173.70 Release Lifecycle æ”¶æ–‚ç•¶æ™‚çš„ `dev`ï¼š`9a2bbc31604331fb0fe97843b25036b3cbd5a5c1`ï¼›å¾ŒçºŒ dev é€²åº¦ä»¥æœ¬æ–‡ä»¶æœ€ä¸Šæ–¹æœ€æ–°å€å¡Šç‚ºæº–ã€‚
-- PR #503ï¼šV173.70 æ­£å¼ç™¼å¸ƒæˆåŠŸã€‚
-- PR #504ï¼šCHECK_REPORT ç™¼å¸ƒå¾Œæ–‡ä»¶æ”¶å°¾æˆåŠŸã€‚
-- PR #505ï¼šmainâ†’dev æ­·å²æ”¶æ–‚æˆåŠŸã€‚
-- main CIï¼šSUCCESSï¼ˆrun 35683542056ï¼‰ã€‚
-- GitHub Pagesï¼šSUCCESSï¼ˆrun 35683540344ï¼‰ã€‚
-- dev CIï¼šSUCCESSã€‚
-- Full Node Suiteï¼š203 / 203 PASSã€‚
-- Game / Cache Versionï¼š173.70 / 173.70ã€‚
-- Open PRï¼š0ï¼›Open Issueï¼š0ã€‚
-- åœ¨ V173.70 Release Lifecycle çµæ¡ˆç•¶ä¸‹ï¼Œ`main`ï¼`dev` å¯¦éš›æª”æ¡ˆå…§å®¹ä¸€è‡´ã€`dev` behind `main` = 0ï¼Œä¸” dev åƒ…å¤š 1 å€‹ mainâ†’dev æ”¶æ–‚ Merge Commitï¼›é€™æ˜¯æ­·å²çµæ¡ˆå¿«ç…§ï¼Œä¸ä»£è¡¨å¾ŒçºŒ dev æ°¸é ä¸å¾—å‰é€²ã€‚
-- V173.70 Release Lifecycleï¼ˆç™¼å¸ƒç”Ÿå‘½é€±æœŸï¼‰å·²æ­£å¼çµæ¡ˆã€‚
-- **Historical Recordï¼ˆæ­·å²ç´€éŒ„ï¼‰è¨»è¨˜ï¼šä¸‹æ–¹ V173.69 èˆ‡èˆŠ V173.70 å€™é¸å…§å®¹åªä¿ç•™ä½œæ­·å²è„ˆçµ¡ï¼Œä¸å¾—å†è¢« AIï¼ä»£ç†ç•¶æˆç›®å‰æ­£å¼ç‹€æ…‹æˆ–ä¸‹ä¸€æ­¥ç™¼å¸ƒæŒ‡ç¤ºã€‚**
-
-## 2026-09-21 â€” ç›®å‰æ­£å¼ç‹€æ…‹ï¼V173.70 å€™é¸çµæ¡ˆ
-
-- æ­£å¼ `main`ï¼šV173.69ï¼ŒGameï¼Cache Version ç‚º `173.69`ï¼›ç›®å‰ SHAï¼š`f747717493da6e2a7f259079a9d1fc0afeb9b5c0`ã€‚æ­£å¼ CI èˆ‡ Pages deployment å‡å·²æˆåŠŸã€‚
-- æœ€æ–° `dev`ï¼š`ce40dfe0a619b86b5910060ec6e003d9d3acb475`ï¼›æœ¬è¼ªæ–‡ä»¶æ›´æ–°ä»¥æ­¤ç‚ºåŸºæº–ï¼Œæœªç›´æŽ¥ä¿®æ”¹ `dev` æˆ– `main`ã€‚
-- åŽŸ V173.70 å€™é¸ PR #423 å·²é—œé–‰ä¸”æœªåˆä½µï¼šå€™é¸ CI è¢«å››å€‹ç„¡æ•ˆæ—¥å¸¸å‰¯æœ¬ WebP é˜»å¡žï¼Œåœ–ç‰‡ä¿®å¾©å·¥ä½œå·²ç”±å°ˆæ¡ˆè² è²¬äººæ˜Žç¢ºçµæ¡ˆï¼›å¾ŒçºŒä¸å¾—æŠŠè©²å€™é¸ SHA ç•¶æˆå¯ç™¼å¸ƒç‰ˆæœ¬ã€‚
-- ä¸‹ä¸€æ¬¡ç™¼å¸ƒå¿…é ˆé‡æ–°ä»¥æœ€æ–° `main`ï¼æœ€æ–° `dev` å»ºç«‹å€™é¸ï¼Œé‡æ–°è·‘å®Œæ•´ CIã€DEV exact-SHA deployment èˆ‡ S23 Ultra å¯¦æ©Ÿé©—æ”¶ã€‚æœªå®Œæˆå‰ä¸å¾—æŽ¨é€ `main`ã€‚
-- ç›®å‰ä»ä¿ç•™çš„éžé˜»æ–·æŠ€è¡“å‚µï¼šæˆ°é¬¥æ ¸å¿ƒå¤šå±¤ `renderBattle()` wrapper å°šæœªæ”¶æ–‚ï¼›çœŸæ©Ÿé©—æ”¶ä»ä¸èƒ½ç”±æ¨¡æ“¬å°ºå¯¸ CI å–ä»£ã€‚ä»¥ä¸‹è¼ƒæ—©çš„ NOT COMPLETEï¼å¾…é©—æ”¶ç´€éŒ„å‡ç‚ºæ­·å²ç´€éŒ„ï¼Œä¸ä»£è¡¨ç›®å‰æ­£å¼ç‹€æ…‹ã€‚
-
-## 2026-09-21 â€” æŒçºŒç‹€æ…‹è¦–è¦º Owner æ”¶æ–‚ï¼ˆ4/4 VERIFIEDï¼PR #426ï¼‰
-
-- Baseï¼š`dev@2da319ad7d90cc56f56967a787d0f4ef87e2df5c`ï¼›å·¥ä½œåˆ†æ”¯ï¼š`fix/status-visual-owner-cleanup-20260921`ï¼›`main` æœªä¿®æ”¹ï¼Œæœª rebaseï¼force pushã€‚
-- æŒçºŒç‹€æ…‹è¦–è¦ºå”¯ä¸€ owner æ”¶æ–‚åˆ° `js/39-v143-skill-animation.js`ï¼šåªä¿ç•™ `pulse`ï¼ˆå–®å¼µå‘¼å¸ï¼‰ã€`static`ï¼ˆå›ºå®šå–®åœ–ï¼‰ã€`iconPulse`ï¼ˆIcon å‘¼å¸ï¼‰ä¸‰ç¨®ä½Žå‹•æ…‹æ¨¡å¼ï¼›æŒçºŒç‹€æ…‹ä¸å†ä½¿ç”¨é€å¹€ Sprite loopï¼Front-Back clockã€‚æŠ€èƒ½æ–½æ”¾çž¬é–“çš„ 12 å¹€ Cast VFX ä¿æŒä¸è®Šã€‚
-- `js/00-main.js` çš„æˆ°é¬¥ç‹€æ…‹åˆ—åªä¿ç•™ hostï¼Œä¸å†è‡ªè¡Œç•«ç‡ƒç‡’ï¼å†°å°ï¼é‡åŠ›ï¼ç ´é˜²ç­‰ç¬¬äºŒå¥— badgeï¼›èˆŠç‡ƒç‡’ï¼å†°å° card overlay å·²ç§»é™¤ã€‚`js/35-v141-ui-battle.js` çš„ retired Card Effect renderer å·²åˆªé™¤ï¼Œåªä¿ç•™ç›¸å®¹å‘¼å«é¢ã€‚
-- åˆ†é¡žï¼šç‡ƒç‡’ï¼æ€’ç«ï¼é¢¨è¡Œï¼æ°£å®šç¥žé–’ï¼å…ƒç¥–è³œç¦ç­‰ä½¿ç”¨å–®åœ–å‘¼å¸ï¼›è­·ç›¾ï¼è¬è±¡åœŸç›¾ï¼å²©çŸ³å£å£˜ï¼çµç•Œï¼å†°å°ï¼çŸ³åŒ–ï¼éš±èº«ä½¿ç”¨å›ºå®šåœ–ï¼›å‡å‚·ï¼é‡åŠ›ï¼æ®¤é¢¨ï¼æšˆçœ©ï¼ç ´é˜²ï¼å…¨å±¬æ€§é™ä½Žï¼ç‚Žå‹¢ï¼é³³å¨ä½¿ç”¨ Icon å‘¼å¸ã€‚
-- `release/deprecated-code.json` æ–°å¢ž DEP-006ï¼Œç¦æ­¢ `v143StatusRasterFrames`ã€`.v153-status-vfx`ã€èˆŠ Status Sprite API èˆ‡èˆŠ burn/freeze card overlay å›žæ­¸ã€‚Fixed Slot geometry ä»æ˜¯äººç‰©èº«ä¸Šç‹€æ…‹åœ–å”¯ä¸€å®šä½ä¾†æºã€‚
-- æœªä¿®æ”¹å‚·å®³ï¼æ²»ç™‚å…¬å¼ã€ç‹€æ…‹å‘½ä¸­ã€æŒçºŒå›žåˆã€å›žåˆæ‰£é™¤ã€Boss AIã€æŠ€èƒ½æ•¸å€¼æˆ–å­˜æª”ã€‚V142 ä»ä¿ç•™ Timing Gateï¼›å…¶æ­·å² gameplay resolver æŠ€è¡“å‚µæœ¬æ¬¡ä¸æ“´å¤§è™•ç†ã€‚
-- Requirement Batchï¼š`release/requirement-batches/2026-09-21-status-visual-owner-cleanup.json`ï¼Œ4/4 VERIFIEDã€‚å€™é¸ CI run `35593978289` çš„ Repository checks SUCCESSï¼ŒåŒ…å« battle/VFX regressionsã€deterministic buildã€Fixed Slot 9:16 mobile QAã€exact-candidate real battle mobile QAã€resourcesã€loaderã€deprecated-code Release Gate èˆ‡ git-diffã€‚
-
-## 2026-09-20 â€” Lv40 æ·±æ·µ Owner æ”¶æ–‚ï¼äº”å¸ç«‹ç¹ªï¼å•†åº—èˆ‡ä¸»åŸŽ Headerï¼ˆIMPLEMENTEDï¼PR CI èˆ‡ dev å¯¦æ©Ÿé©—æ”¶å¾…å®Œæˆï¼‰
-
-- Baseï¼šæœ€æ–° `origin/dev@bd084a1f200dc527ca101436b68b4d150a52cb3a`ï¼›å·¥ä½œåˆ†æ”¯ï¼š`fix/abyss-lv40-skill-owner-five-emperor-portrait-20260920`ï¼›`main` æœªä¿®æ”¹ï¼Œæœª rebaseï¼force pushã€‚
-- Lv40 æœ€çµ‚äº”å¸æ­£å¼æŠ€èƒ½å”¯ä¸€ owner ç‚º `js/59-abyss-two-tier-runtime.js::FINAL_TRUE_REALM_LOADOUTS`ï¼›`js/40` èˆŠ final roster patchã€`js/46` èˆŠ roster override èˆ‡ä¸‰çµ„æœªæŽ¥ç·šè§’è‰² handler å·²é€€ä¼‘ã€‚V141ï¼V155 åªå¾žå¯¦éš› `skillIds`ï¼`v141SupportSkillIds` é€²å…¥ Skill-ID dispatcherï¼›åŒ—å¸æœªæ”œå¸¶ `revive` æ™‚ä¸æœƒå¾©æ´»ã€‚
-- `js/45-v154-dev-fixes.js::resolveMonsterPortraitRecord()` å·²æ”¹ç‚ºå°ˆå±¬åœ–ï¼Registryï¼æ­£å¼ Abyss mapping å„ªå…ˆï¼ŒBoss placeholder åªä½œæœ€å¾Œ fallbackï¼›äº”å¸ Registry existing å„è‡ªè§£æž floor5 portraitã€‚V159 åªä¿ç•™ timing bridgeã€‚
-- V173.51 shop QA runtime å·²æ”¹ç‚º inertï¼Œæ­£å¼å•†åº—å›žåˆ° `js/equipment-progression.js::replaceEquipmentShop`ï¼›`css/53` èˆŠå…©åˆ—è¦†å¯«ç§»é™¤ã€‚ä¸»åŸŽéšŠä¼ Header ç”±æ­£å¼ Grid æ¬„ä½ owner åˆ†éš”éšŠä¼æ•¸ã€é‡‘å¹£èˆ‡ä½ˆé™£ã€‚
-- å·²æ–°å¢ž owner convergenceã€äº”å¸ portraitã€production bundle/cascadeã€390ï¼412 Header browser èˆ‡å•†åº— browser regression guardï¼›ç›®å‰æœ¬æ©Ÿæ²’æœ‰ Chromeï¼Œå…©å€‹ browser suite åªæœƒ skipï¼Œä¸èƒ½è¦–ç‚ºå¯¦æ©Ÿ VERIFIEDã€‚
-- æœ¬åœ° sourceï¼runtimeã€deterministic buildã€build:checkã€syntaxã€loaderã€resourcesã€HTML IDsã€Release Gate å‡é€šéŽï¼›å¾… commitï¼pushï¼PR â†’ `dev`ã€required CIã€DEV deployment èˆ‡ä½¿ç”¨è€… 390ï¼412 å¯¦æ©Ÿç¢ºèªå¾Œå†å‡ç‚º VERIFIEDã€‚Gameï¼Cache Version ç¶­æŒ V173.69ï¼Œ`main` ç¦æ­¢ä¿®æ”¹ã€‚
-
-## 2026-09-20 â€” èƒŒåŒ…ï¼å•†åº—é‡‘å¹£ï¼ä¸»åŸŽé‡‘å¹£ï¼é›¢ç·šå»£å‘Šï¼å®¢æœï¼ç™»å…¥å…­é …ä¿®å¾©ï¼ˆ6/6 VERIFIEDï¼V173.69 ç™¼å¸ƒä¸­ï¼‰
-
-- Baseï¼šæœ€æ–° dev@5b7d1052579e4bbce13291c63b9d7cc28fbb0964ï¼›å·¥ä½œåˆ†æ”¯ï¼šfix/backpack-shop-homegold-offline-auth-20260920-v2ï¼›main æœªä¿®æ”¹ã€‚èˆŠåˆ†æ”¯å› æ–½å·¥é€”ä¸­ dev å‰é€²ä¸”åŒæ™‚ä¿®æ”¹å•†åº— CSSï¼Œå·²ä¿ç•™ä½†ä¸å†ä½œæ•´åˆå€™é¸ï¼›æœ¬åˆ†æ”¯å¾žæ–° dev é‡æ–°å¥—ç”¨ï¼Œé¿å…è¦†è“‹æœ€æ–°æ•¸é‡æ¬„å­—ç´šä¿®æ­£ã€‚
-- 50% è—¥æ°´ï¼šæ­£å¼èƒŒåŒ…ç¯©é¸ owner js/00-main.js::getFilteredInventoryItems() æŽ’é™¤ hpPotion50/spPotion50ï¼›èˆŠ definition æš«ç•™åªç‚ºå®‰å…¨è§£æžæ—¢æœ‰å­˜æª”ï¼Œä¸åšç ´å£žæ€§å­˜æª”é·ç§»ã€‚Adventure V1 å¯¶ç®±ï¼å•†äººåœæ­¢å†ç”¢å‡º 50% è—¥æ°´ï¼Œæ”¹ç”¨æ­£å¼ 30% hpPotion30/spPotion30ã€‚
-- è£å‚™å•†åº—é‡‘å¹£ï¼šRuntime åŽŸæœ¬å·²æœ‰ wallet markupï¼ŒçœŸæ­£æ ¹å› æ˜¯ css/49-v169-rpg-ui.css one-screen å¹¾ä½•æŠŠ .v17345-equipment-wallet è¨­ç‚º display:noneï¼›å·²åœ¨åŒä¸€ owner æ¢å¾© 32px compact rowï¼ŒV169 èˆ‡ equipment-progression å…©å€‹æ—¢æœ‰ renderer éƒ½é¡¯ç¤ºã€Œç›®å‰é‡‘å¹£ã€ã€‚
-- ä¸»åŸŽç´…åœˆä½ç½®ï¼šjs/16-stage-v54-main-city-runtime.js::ensureHomeRosterShell() åœ¨å†’éšªéšŠä¼ header åŠ å…¥ç¸½é‡‘å¹£ï¼›js/00-main.js::updateGoldDisplay() æ–°å¢žåŒä¸€ DOM sinkï¼Œå› æ­¤ç²å¾—ï¼æ¶ˆè²»é‡‘å¹£æ²¿ç”¨æ—¢æœ‰åŒæ­¥ ownerï¼Œä¸æ–°å¢ž timerï¼observerã€‚
-- é›¢ç·šç¶“é©—ï¼šCompact UI æ›¾å‘¼å«ä¸å­˜åœ¨çš„ watchOfflineExpAd()ï¼Œæ‰€ä»¥æŒ‰éˆ•ç„¡åæ‡‰ï¼›å·²æ”¹å›žæ ¸å¿ƒæ—¢æœ‰ claimOfflineExpWithAd() â†’ showRewardedAd() â†’ claimOfflineExp(true)ï¼Œä¸å»ºç«‹ç¬¬äºŒå¥—å»£å‘Šæµç¨‹ã€‚
-- å®¢æœä¿¡ç®±ï¼šCritical Boot å”¯ä¸€ owner js/startup/support-contact.js èˆ‡ privacy.html çµ±ä¸€ç‚º foursymbols.support@gmail.comï¼›Firebase/Cloud Save ç¾è¡Œæ–‡ä»¶èˆ‡ responsive/support æ¸¬è©¦åŒæ­¥ã€‚
-- Facebookï¼šåªå¾ž js/firebase/firebase-auth-ui.js ç§»é™¤ Web ç™»å…¥æŒ‰éˆ•ã€import/bindï¼›firebase-auth.js çš„ provider/coreã€æ—¢æœ‰ Facebook èº«åˆ†ç›¸å®¹èˆ‡ Android native handoff å‡ä¿ç•™ï¼Œç¬¦åˆã€Œæš«æ™‚ä¸é–‹æ”¾ã€è€Œéžæ°¸ä¹…åˆªé™¤å¸³è™Ÿèƒ½åŠ›ã€‚
-- Requirement Batchï¼šrelease/requirement-batches/2026-09-20-backpack-shop-homegold-offline-auth.jsonï¼›6/6 VERIFIEDã€‚dev@29544c8035136462d52475be56bbe770beb8d896 çš„ CI run 35491059103 èˆ‡ DEV exact-SHA deployment å·² SUCCESSï¼ŒSession Authority run 35491058808 SUCCESSï¼›å°ˆæ¡ˆè² è²¬äººå·²æ˜Žç¢ºæŒ‡ç¤ºæŽ¨åˆ° mainã€‚æ­£å¼ç™¼å¸ƒç‰ˆæœ¬ç‚º V173.69ï¼Œéœ€å®Œæˆ release branch â†’ dev â†’ protected devâ†’main PRã€main CI èˆ‡ production SHA é©—è­‰å¾Œæ‰å¯çµæ¡ˆã€‚
-
-## 2026-09-20 â€” Battle Statisticsï¼æ­£å¼ç§˜å¯¶é…è£ï¼Boss æˆ°æ³æŠ½å±œï¼å…ƒç´ å¡”è‡ªå‹•çºŒæˆ°ï¼ˆVERIFIEDï¼main æœªä¿®æ”¹ï¼‰
-
-- å·¥ä½œåˆ†æ”¯ï¼š`feature/battle-stats-relic-ui-tower-auto-20260920`ï¼›PR #355ï¼›æœ€æ–°åŸºæº–å·²åˆä½µ `dev@48bca3e4672591b67a1fbc75d8a67c6b7a66eae9`ï¼Œæœª rebaseï¼force pushï¼Œ`main` å…¨ç¨‹æœªä¿®æ”¹ã€‚
-- ä¸»åŸŽéšŠä¼ç§˜å¯¶æ ¹å› ï¼šFirst Screenï¼ˆé¦–å±ï¼‰æ‘˜è¦èˆ‡ lazy Relicï¼ˆç§˜å¯¶ï¼‰runtime çš„åˆ·æ–°æ™‚åºä¸åŒã€‚æ­£å¼ä¿®æ³•ç¶­æŒ `teamLoadout.relicId` ç‚ºå”¯ä¸€è£å‚™çœŸç›¸ï¼Œä¸»åŸŽå¾žåŒä¸€ UID æ­£å¼å­˜æª”è®€å–æ‘˜è¦ï¼›ä¸»åŸŽæœ¬èº«æˆç‚ºå”¯ä¸€åž‚ç›´ scroll ownerï¼Œåº•éƒ¨é ç•™å›ºå®šå°Žè¦½åˆ—ï¼‹Safe Areaï¼ˆå®‰å…¨å€åŸŸï¼‰ã€‚
-- ç¬¦å’’åˆæˆå·¨å¤§åœ–æ ¹å› ï¼š92Ã—138 çš„ç¬¦å’’é è¦½è¦å‰‡åŽŸæœ¬èª¤æ”¾åœ¨ Abyssï¼ˆæ·±æ·µï¼‰lazy CSSï¼Œå–®ç¨é–‹åˆæˆé ä¸ä¸€å®šè¼‰å…¥ã€‚ææ–™èˆ‡ç›®æ¨™å…©å¼µåœ–æœ¬ä¾†å°±æ˜¯å…©å€‹æ­£å¼æ ¼ä½ï¼Œæ²’æœ‰é‡è¤‡ Renderï¼ˆæ¸²æŸ“ï¼‰ï¼›å°ºå¯¸è¦å‰‡å·²ç§»å›ž synthesis owner ä¸¦å›ºå®š `object-fit:contain`ã€‚
-- ç§˜å¯¶å¡ç‰‡ä¸å†é¡¯ç¤º DEVï¼Runtime Readyï¼Presentation Only ç­‰å·¥ç¨‹åˆ†é¡žï¼›DEV é©—æ”¶ä¹Ÿä½¿ç”¨æ­£å¼ã€Œè£å‚™ï¼å·²è£å‚™ï¼å¸ä¸‹ï¼è©³æƒ…ã€èˆ‡ `teamLoadout.relicId`ï¼Œä¸å†ä¿ç•™ `devPreviewRelicId` ç¬¬äºŒå¥—é…è£ç‹€æ…‹ã€‚å°šæœªå…·æ­£å¼ Triggerï¼Effect çš„ç§˜å¯¶ä»ä¸è™›æ§‹æŠ€èƒ½æ•ˆæžœæˆ–æ•¸å€¼ã€‚
-- æ–°å¢ž `FourSymbolsBattleStatistics`ï¼šæ¯å ´å»ºç«‹ä¸€ä»½ combatant-ID Mapï¼Œæ¬„ä½å›ºå®šç‚ºå¯¦éš›ç¸½å‚·å®³ã€æœ‰æ•ˆæ²»ç™‚ã€å¯¦éš›æ‰¿å‚·ã€çœŸæ­£æš´æ“Šæ¬¡æ•¸ï¼›æˆ°é¬¥çµæŸå‡çµåŒä¸€ä»½ snapshotï¼ŒBossï¼æ·±æ·µçµç®—ä¸é‡æ–°è¨ˆç®—ã€‚è³‡æ–™åž‹åˆ¥å·²é ç•™ `playerCharacter / heroNpc / reinforcement`ï¼Œæœªä¾† Hero NPC åªéœ€è¨»å†Šé€²åŒä¸€ ownerã€‚
-- Auto Battleï¼ˆè‡ªå‹•æˆ°é¬¥ï¼‰æ¯å€‹æ­£å¼æ–°å›žåˆåœ¨ç¬¬ä¸€å€‹å®£å‘Šï¼è¡Œå‹•å‰é¡¯ç¤º 0.5 ç§’ã€Œç¬¬ X å›žåˆã€ã€‚å·¦å´ã€Œè©³ç´°æˆ°æ³ã€èˆ‡å³å´ Boss åŠŸèƒ½ç‰©ä»¶ Drawer å…±ç”¨ `FourSymbolsBattleFlow` pause/presentation lockï¼›é–‹å•Ÿæ™‚åœæ­¢å¾ŒçºŒè‡ªå‹•è¡Œå‹•ï¼Œé—œé–‰å¾Œç”±åŒä¸€ lifecycle æ¢å¾©ã€‚
-- Boss ç´…è‰²ã€Œï¼ã€åªæŠ•å½±ç›®å‰å­˜æ´»çš„æ­£å¼ Boss object entityï¼ˆF1ï¼F5 åŠŸèƒ½ç‰©ä»¶ï¼‰ï¼Œä¸å¾©æ´»å·²é€€å½¹çš„ `MECH_*` ç³»çµ±ï¼›Drawer æœƒåˆ—å‡ºå…¨éƒ¨å­˜æ´»ç‰©ä»¶çš„åç¨±ã€æ•ˆæžœã€è§¸ç™¼ã€ç‹€æ…‹èˆ‡å‰©é¤˜å›žåˆã€‚
-- å€‹äºº Bossã€ä¸–ç•Œ Bossã€æ·±æ·µæ­£å¼æˆ°é¬¥ä½¿ç”¨åŒä¸€ Battle Statistics frozen snapshot é¡¯ç¤ºæ‰‹å‹•é—œé–‰çš„è©³ç´°çµç®—ï¼›ä¸€èˆ¬å·¡æ€ªèˆ‡æ¯æ—¥å‰¯æœ¬ä»èµ°åŽŸå¿«é€ŸçµæŸæµç¨‹ã€‚
-- å…ƒç´ å¡”æ–°å¢žã€Œè‡ªå‹•æŒ‘æˆ°ä¸‹ä¸€å±¤ã€checkboxï¼›å‹åˆ©å¾Œç”±å–®ä¸€å—ç®¡ç† timeout owner é¡¯ç¤º 3â†’2â†’1ï¼Œå†å•Ÿå‹•æ­£å¼ä¸‹ä¸€å±¤ã€‚æˆ°æ•—ã€æœ€é«˜å±¤ã€çŽå‹µ gateã€ä¸ç¬¦é€²å…¥æ¢ä»¶ã€launcher å¤±æ•—ã€çŽ©å®¶å–æ¶ˆæˆ–çœŸæ­£é›¢é–‹ Tower éƒ½æœƒå–æ¶ˆï¼Œä¸æœƒå¤±æ•—é‡è©¦æˆ–èƒŒæ™¯æ®˜ç•™ã€‚
-- æ—¢å®š `POST_ACTION_DELAY_MS=1150`ã€è§’è‰²ï¼ç§˜å¯¶æŠ€èƒ½æ•¸å€¼ã€Boss æ•¸å€¼ã€AIã€EXPã€é‡‘å¹£ã€æŽ‰è½èˆ‡çŽå‹µå‡æœªä¿®æ”¹ã€‚
-- Requirement Batchï¼š`release/requirement-batches/2026-09-20-battle-stats-relic-ui-tower-auto.json`ï¼Œ10/10 VERIFIEDã€‚PR #355 candidate CI run `35466343921` çš„ Repository checks å·² SUCCESSï¼ŒåŒ…å« focused regressionã€relic lifecycleã€deterministic build:checkã€exact-candidate real battle mobile browser QAã€Adventure mobile QAã€resourcesã€loaderï¼Release Gateï¼git-diffã€‚
-
-
-## 2026-09-19 â€” DEV æ­£å¼ç‰ˆæœ¬å…¬å‘Šè¦–è¦ºé è¦½ï¼ˆVERIFIEDï¼main æœªä¿®æ”¹ï¼‰
-
-## 2026-09-19 â€” V173.66 DEV ç™¼å¸ƒé©—è­‰ï¼ˆREL-01ï½ž04 VERIFIEDï¼main PENDINGï¼‰
-
-- V173.66 release candidate PR #349 çš„å€™é¸ CI runs `35453776605`ã€`35454779325` å·² SUCCESSã€‚
-- å€™é¸åˆä½µå¾Œ `dev@7d8a7180afc2c054b5966048e172f171a2fe5a8b`ï¼Œpush CI run `35454884505` SUCCESSï¼›Repository checks job `105928300907`ã€Dev deployment gate job `105928430038` å‡ SUCCESSã€‚
-- DEV éƒ¨ç½² job å·²é€æ­¥é€šéŽï¼šä»ç‚º dev HEADã€Release Gateã€immutable static siteã€Cloudflare deployã€éƒ¨ç½²å¾Œ Commit SHAï¼Game Versionï¼Cache Version é©—è­‰ã€deployed battle/VFX live QAã€‚
-- æ­£å¼ç‰ˆæœ¬ï¼šGame Version `V173.66`ï¼ŒCache Version `173.66`ï¼›æ­£å¼å…¬å‘Š `release-v17366` å·²ä¾å¯¦éš› main...dev çŽ©å®¶å¯æ„ŸçŸ¥å·®ç•°æ•´ç†ã€‚
-- Requirement Batchï¼š`release/requirement-batches/2026-09-19-v17366-main-release.json`ã€‚REL-01ï½ž04 VERIFIEDï¼›REL-05 ç­‰å¾… protected `dev â†’ main` PRã€main CI èˆ‡ production SHA é©—è­‰ã€‚
-- æœ¬æ–‡ä»¶æ”¶å°¾ PR åªè¨˜éŒ„ DEV ç™¼å¸ƒè­‰æ“šï¼Œä¸ä¿®æ”¹çŽ©æ³•ï¼æ•¸å€¼ï¼runtimeã€‚
-
-
-## 2026-09-19 â€” Release Update æ¯æ¬¡ç™»å…¥å…¬å‘Š + ä»Šæ—¥ä¸å†æé†’ï¼ˆ3/3 VERIFIEDï¼‰
-
-- Baseï¼š`dev@d2dfc01045ddead0e6ca71888334dc9c8eddccf7`ï¼›å·¥ä½œåˆ†æ”¯ï¼š`feature/release-update-daily-login-reminder-20260919`ï¼›`main` ä¸ä¿®æ”¹ã€‚
-- å”¯ä¸€ runtime owner ä»æ˜¯ `js/release-update-notification.js`ï¼Œé‡ç”¨æ—¢æœ‰ `#homeFeatureModal` èˆ‡è·‘é¦¬ç‡ˆï¼›æ²’æœ‰ç¬¬äºŒå¥—å…¬å‘Šç³»çµ±ã€‚
-- ç•¶å‰æ­£å¼ç‰ˆæœ¬å…¬å‘Šæ”¹ç‚ºï¼šæ¯æ¬¡æ–°çš„ç™»å…¥å·¥ä½œéšŽæ®µé€²å…¥ä¸»åŸŽå¾Œï¼Œè‡ªå‹•é¡¯ç¤ºä¸€æ¬¡ã€‚æ—¢æœ‰ `last-seen-version`ï¼`last-seen-notice` åªä¿ç•™å·²è®€ï¼é€šçŸ¥èªžæ„ï¼Œä¸å†æ°¸ä¹…é˜»æ­¢ä¸‹æ¬¡ç™»å…¥å…¬å‘Šã€‚
-- å…¬å‘Šåº•éƒ¨æ–°å¢žå°åž‹ checkboxï¼šã€Œä»Šæ—¥ä¸å†è·³å‡ºæé†’ã€ã€‚å‹¾é¸å¾Œåªåœ¨ per-UID localStorage sidecar ä¿å­˜ `noticeId + çŽ©å®¶è£ç½®ç•¶åœ°æ—¥æœŸ`ï¼›åŒæ—¥åŒå…¬å‘Šä¸å†è‡ªå‹•è·³å‡ºï¼Œéš”æ—¥é‡æ–°é¡¯ç¤ºï¼›åŒæ—¥è‹¥æ–° `noticeId` ä¸Šç·šï¼Œæ–°å…¬å‘Šä»é¡¯ç¤ºã€‚
-- ä»Šæ—¥æŠ‘åˆ¶åªå½±éŸ¿ç™»å…¥è‡ªå‹• Modalï¼Œä¸é—œé–‰è·‘é¦¬ç‡ˆã€æ–°ç‰ˆæœ¬åµæ¸¬ã€forced updateã€å®‰å…¨ reloadï¼Œä¹Ÿä¸å¯«å…¥ Cloud Saveã€‚
-- CSS owner ä»ç‚º `css/release-update-notification.css`ï¼›å‹¾é¸æ–‡å­— 13pxã€checkbox 18pxï¼Œä½æ–¼ç™¼å¸ƒæ™‚é–“èˆ‡ã€Œæˆ‘çŸ¥é“äº†ã€æŒ‰éˆ•ä¹‹é–“ã€‚
-- Targeted regression å·²æ›´æ–°ï¼šé©—è­‰å·²è®€ä»æ–°ç™»å…¥é¡¯ç¤ºã€åŒä¸€ç™»å…¥åªé¡¯ç¤ºä¸€æ¬¡ã€ä»Šæ—¥æŠ‘åˆ¶ã€éš”æ—¥æ¢å¾©ã€æ–° noticeId ç¹žéŽèˆŠæŠ‘åˆ¶ã€åŽŸæœ‰ normal/forced/update/polling è¡Œç‚ºç¶­æŒã€‚
-- Requirement Batchï¼š`release/requirement-batches/2026-09-19-release-update-daily-login-reminder.json`ã€‚ç›®å‰ 3/3 VERIFIEDã€‚PR #348 CI run `35452586346` å·²å…¨ç¶ ï¼štargeted regressionã€deterministic build:checkã€Release Update mobile browser QAã€Fixed Slot mobile QAã€exact-candidate real battle QAã€Adventure mobile QAã€resourcesã€loader integrityã€Release Gateã€git-diff å‡ SUCCESSã€‚
-- Gameï¼Cache Version ç¶­æŒ 173.65ï¼›æœ¬è¼ªä¸ä¿®æ”¹ `release/release-update.json` å…¬å‘Šå…§å®¹ï¼Œæ­£å¼ç™¼å¸ƒæ–‡æ¡ˆä»ç”±æ—¢æœ‰ dev â†’ main Diff å¥‘ç´„ç”¢ç”Ÿã€‚
-
-
-## 2026-09-19 â€” Mobile lifecycleï¼Shopï¼Element Boxï¼Adventureï¼Home First Screen ä¸ƒé …æ ¹å› ä¿®å¾©ï¼ˆ7/7 VERIFIEDï¼‰
-
-- Baseï¼š`dev@ccf587d0feec8d4790d17834a11b67a6d05bc55f`ï¼›å·¥ä½œåˆ†æ”¯ï¼š`fix/mobile-lifecycle-shop-elementbox-adventure-home-hud-20260919`ï¼›`main` å…¨ç¨‹ç¦æ­¢ä¿®æ”¹ã€‚Requirement Batchï¼š`release/requirement-batches/2026-09-19-mobile-lifecycle-shop-elementbox-adventure-home-hud.json`ã€‚
-- Screen Wake Lock å”¯ä¸€ owner ä»ç‚º `js/startup/screen-wake-lock-runtime.js`ï¼šsystem release å¯è¦‹æ™‚é‡å–ã€request å¤±æ•—åªæœ‰æœ‰é™ç¯€æµ retryã€hidden/pagehide å–æ¶ˆ retry ä¸¦ releaseï¼›`FourSymbolsScreenWakeLock.getDiagnostics()` æä¾› supportedï¼heldï¼failureï¼acquireï¼release è¨ºæ–·ï¼Œä¸é˜»å¡ž Startupã€‚
-- Mobile resume owner ä»åœ¨ `js/00-main.js`ï¼švisibility hiddenï¼pagehideï¼freeze å³æ™‚ `saveGame()`ï¼›`FourSymbolsMobileLifecycleDiagnostics` è¨˜éŒ„ `document.wasDiscarded`ã€navigation typeã€pageshow persistedã€freeze/resumeã€‚æ™®é€š pageshow/resume ä¸é‡è·‘ Startupï¼›reload/discard å¾Œä»ç”± account-first Authï¼UID save resolutionï¼hydrate æ¢å¾©ï¼Œä¸ä»¥æœ¬æ©Ÿ resume state è¦†è“‹ Cloud Saveã€‚
-- å•†åº—æ•¸é‡è¦å‰‡æ”¶æ–‚åˆ° V133 `normalizeShopPurchaseQuantity()`ï¼Œæœ€å¤§ 999ï¼›V141 å·²ç§»é™¤æœƒè¢« V144 è¦†è“‹çš„èˆŠ renderï¼buy wrapperã€‚V144 æ˜¯æœ€çµ‚è£œå“ renderï¼buy ownerï¼ŒV146 å³æ™‚è¨ˆåƒ¹æœƒç›´æŽ¥æŠŠè¼¸å…¥æ¡† >999 æ”¹å›ž 999ï¼›V169 æˆåŠŸæç¤ºä»åªä¾å¯¦éš›èƒŒåŒ…å·®é¡é¡¯ç¤ºã€‚
-- å…ƒç´ åŒ£ä»ç”± `js/45-v154-dev-fixes.js::finishAutoRecovery()`ï¼šElement Box active æ™‚ HP=0 å¯é€² HP è£œå“å€™é¸ï¼Œå¿…é ˆçœŸæ‰£è£œå“ï¼›è‹¥ HP æœªæˆåŠŸæ¢å¾©ï¼ŒSP path ä¸åŸ·è¡Œï¼›ä¸€èˆ¬ Battle heal è¦å‰‡æœªæ”¹ã€‚
-- Patrol æ­£å¼é›¢å ´ hook ç‚º `js/00-main.js::FourSymbolsPatrolLifecycle.exit()`ï¼Œé‡ç”¨æ—¢æœ‰ `stopMonsterMovement()`ï¼`stopAutoPatrol()`ã€‚Adventure `returnFromPatrol()` åªå‘¼å«æ­¤ ownerï¼Œä¸è¤‡è£½ timer/stateï¼›Fight Animation callback ä»¥ lifecycle generation + map active + autoPatrolEnabled ä¸‰é‡ç¢ºèªï¼Œé›¢å ´å¾Œå¤±æ•ˆã€‚
-- NT$99 30å¤©å…å»£å‘Šè³‡è¨Šåœ¨ `js/16-stage-v54-main-city-runtime.js` æ”¹ç‚º manual-onlyï¼›å·²ç§»é™¤ startupï¼pageshowï¼MutationObserver auto-show ç”Ÿå‘½é€±æœŸï¼Œä¿ç•™ `openAdFreeServiceInfoModal()` æ‰‹å‹•èƒ½åŠ›ï¼›ECPayï¼çŽå‹µå»£å‘Šæœªæ”¹ã€‚
-- Main City First Screenï¼š`js/16-stage-v54-main-city-runtime.js` åœ¨ app-shell å…ˆå»ºç«‹å›ºå®š `#v146HomeRoster`ã€ä¸‰æ ¼è§’è‰² placeholder èˆ‡ `.team-relic-loadout-slot`ï¼›hydrate å¾Œåªå¡«å…§å®¹ã€‚æ–°å¢žå°åž‹ `js/relic-summary-catalog.js` ä½œ `id/name/triggerText` å”¯ä¸€æ‘˜è¦è³‡æ–™æ©‹ï¼›å®Œæ•´ `feature-boss-relic` ä» lazyï¼Œ`js/60-team-relic-system.js` ä¸å†å»ºç«‹é¦–é æ‘˜è¦ DOMã€‚
-- å—å½±éŸ¿ production build å·²é‡å»ºæ–° content-hashed Boot/App/Gameplay/Relic/Adventure bundlesï¼Œ`asset-manifest.json`ï¼`build/asset-manifest.json`ï¼`index.html` å·²åŒæ­¥ï¼›Gameï¼Cache Version ç¶­æŒ 173.65ã€‚
-- Targeted tests å·²æ–°å¢žï¼æ›´æ–°ï¼š`tests/screen-wake-lock.test.js`ã€`tests/mobile-lifecycle-shop-elementbox-adventure-home-hud-20260919.test.js`ã€Adventureï¼ad-freeï¼V146 shopï¼main-cityï¼team relic save/runtime æ—¢æœ‰æ¸¬è©¦ã€‚
-- PR #347 CI run `35450909260` å·² SUCCESSï¼šsyntaxã€Release Updateã€Adventureã€Fixed Slotã€battle/VFXã€relic lifecycleã€deterministic `build:check`ã€Release Update mobile browser QAã€Fixed Slot mobile QAã€exact-candidate real battle QAã€Adventure mobile QAã€static resourcesã€HTML IDsã€loader integrityã€Release Gateã€git-diff å…¨éƒ¨é€šéŽã€‚Requirement Batch å·² 7/7 VERIFIEDã€‚
-
-
-- å·¥ä½œåˆ†æ”¯ï¼š`feature/release-update-dev-preview-20260919`ï¼ŒPR [#345](https://github.com/tf00913225-alt/my-game/pull/345) å·²åœ¨ CI run `35446496532` å…¨ç¶ å¾Œåˆä½µç‚º `dev@fff36cf702a92638f812698049015537001345b0`ï¼›DEV deployment run `35446584392` ä¹Ÿå·²å…¨ç¶ ä¸¦æ ¸å° exact SHAã€‚main ç¦æ­¢ä¿®æ”¹ã€‚`js/release-update-notification.js` æ˜¯å”¯ä¸€ ownerï¼Œæ²’æœ‰æ–°å»ºå…¬å‘Šã€è·‘é¦¬ç‡ˆæˆ– Modalã€‚
-- DEVï¼æœ¬æ©Ÿé©—æ”¶ç¶²å€ä½¿ç”¨åŒä¸€ä»½ `release/release-update.json`ï¼š`?releaseUpdatePreview=marquee` é¡¯ç¤ºæ­£å¼è·‘é¦¬ç‡ˆï¼Œé»žæ“Šå¾Œé–‹æ­£å¼æ›´æ–°è¦–çª—ï¼›`?releaseUpdatePreview=modal` ç›´æŽ¥é–‹åŒä¸€è¦–çª—ã€‚åªå…è¨± `dev.four-symbols-dev.pages.dev`ã€`localhost`ã€`127.0.0.1`ã€`::1`ï¼Œmain host å¿…é ˆå¿½ç•¥ queryã€‚
-- Preview åƒ…ä¾›ç‰ˆé¢ã€æ–‡æ¡ˆèˆ‡å…§å®¹é©—æ”¶ï¼šä¸å¾—æ”¹ loadedï¼æ­£å¼ release versionã€ä¸å¾—å¯« `last-seen` localStorageã€ä¸å¾— reloadã€‚æ›´æ–°è¦–çª—ç¶­æŒæ­£å¼ normalï¼forced æ¨£å¼ï¼›preview ä¸­çš„è¡Œå‹•æŒ‰éˆ•å®‰å…¨åœ°åªé—œé–‰è¦–çª—ã€‚
-- ç›´æŽ¥æ¸¬è©¦å¿…é ˆè¦†è“‹ï¼šDEV ç¾è¡Œç‰ˆæœ¬ä»å¯é¡¯ç¤ºè·‘é¦¬ç‡ˆèˆ‡å…§å®¹ã€æŒ‰ç«‹å³æ›´æ–°ä¸ reloadï¼ä¸å¯«å·²è®€ã€main å¸¶ç›¸åŒ query ä¸é¡¯ç¤º previewã€‚
-
-## 2026-09-19 â€” Release Update Notification Systemï¼ˆVERIFIEDï¼main æœªä¿®æ”¹ï¼‰
-
-- å·¥ä½œåˆ†æ”¯ï¼š`feature/release-update-notification-system-20260919`ï¼ŒåŸºæº–ç‚ºæœ€æ–° `origin/dev@af7d0f6b132ebbaeb5f594133db1338d2545861c`ï¼›æœ¬è¼ªåªæœƒ PR å›ž `dev`ï¼Œä¸å¾—ç›´æŽ¥ä¿®æ”¹æˆ–ç™¼å¸ƒ `main`ã€‚
-- æ­£å¼çŽ©å®¶ç‰ˆæœ¬å…¬å‘Šå”¯ä¸€è³‡æ–™ç‚º `release/release-update.json`ï¼Œèˆ‡ `release/release.json` çš„ Gameï¼Cache Version å°é½Šï¼›`release-manifest.json` ä»åªä¾›éƒ¨ç½² SHA é©—è­‰ã€‚`js/release-update-notification.js` ç‚º runtime ownerï¼Œé‡ç”¨ `#game-overlay-layer` è·‘é¦¬ç‡ˆå’Œ `#homeFeatureModal`ï¼Œä¸å¯å¦å»º Modalï¼å…¬å‘Šç³»çµ±ã€‚
-- Runtime åœ¨ startup readyã€æ¯ 4 åˆ†é˜ã€visibility å›žå‰æ™¯èˆ‡ online æ¢å¾©æ™‚ï¼Œç¯€æµè®€å– cache-busted `release/release-update.json`ï¼›æ­£å¸¸æ›´æ–°åªé€šçŸ¥ï¼Œå¼·åˆ¶æ›´æ–°å¾…å®‰å…¨ç‹€æ…‹å†éŽ–å®šã€‚å®‰å…¨ reload å”¯ä¸€å…¥å£ç‚º `canSafelyReloadForUpdate()`ï¼Œä¸”å·²æŽ¥ä¸Š battleï¼presentationï¼rewardã€èƒŒåŒ…äº¤æ˜“èˆ‡ account save write critical operationã€‚
-- æ°¸ä¹… dev â†’ main Release Contract å·²è£œå…¥ `AGENTS.md`ã€`SYSTEM_CONTRACTS.md`ã€`ARCHITECTURE_RULES.md` èˆ‡ `docs/RELEASE_VERIFICATION_RULES.md`ï¼šé™¤éžå°ˆæ¡ˆè² è²¬äººæ˜Žç¢ºèªªã€Œæœ¬æ¬¡ä¸å…¬å‘Šã€ï¼Œæ¯æ¬¡ç™¼å¸ƒ owner å¿…é ˆå¾žå®Œæ•´ main...dev å¯¦éš› diff è‡ªè¡Œæ•´ç†æ‰€æœ‰çŽ©å®¶å¯æ„ŸçŸ¥è®Šæ›´åˆ°åŒä¸€ä»½ manifestï¼›ä¸å¯è¦æ±‚å¦çµ¦å…¬å‘Šæ–‡æ¡ˆï¼Œä¹Ÿä¸å¯å°çŽ©å®¶é¡¯ç¤ºæª”åã€å‡½å¼ã€SHAã€CI æˆ– debug ç”¨èªžã€‚`npm run release:update-diff -- --base origin/main --head HEAD` æ˜¯å…§éƒ¨å·®ç•°è¦åŠƒ helperã€‚
-- å¯¦éš›é©—è­‰ï¼šPR [#344](https://github.com/tf00913225-alt/my-game/pull/344) åªç›®æ¨™ `dev`ï¼›GitHub Actions CI [run 35445108483](https://github.com/tf00913225-alt/my-game/actions/runs/35445108483) å·²å…¨ç¶ ã€‚å®ƒå®Œæˆ targeted Case Aâ€“Jã€deterministic buildï¼build checkã€Release Gateã€360Ã—800ï¼390Ã—844ï¼412Ã—915 æ›´æ–°é€šçŸ¥ browser QAã€æ—¢æœ‰æˆ°é¬¥èˆ‡è³‡æºï¼loader æª¢æŸ¥ï¼›æ›´æ–°é€šçŸ¥æˆªåœ–èˆ‡ JSON è­‰æ“šå·²ä¸Šå‚³ç‚ºè©² run artifactã€‚`main` ä»æœªä¿®æ”¹ï¼›æœ€çµ‚ `dev` SHA ä»¥ PR åˆä½µçµæžœç‚ºæº–ã€‚
-
-## 2026-09-19 â€” Phase 1 main ç™¼å¸ƒæª¢æŸ¥ï¼šFirebase æ¨¡çµ„æ•¸éŽæœŸæ¸¬è©¦ä¿®æ­£
-
-- ç™¼å¸ƒ PR #342 çš„ CI run `35441331170` å¯¦éš›ç™¼ç¾ `tests/critical-feature-budget.test.js` ä»è¦æ±‚ 5 å€‹ Firebase æ¨¡çµ„ï¼›Phase 1 æ­£å¼å»ºç½® owner å·²æ˜Žç¢ºåŒ…å« `session-client.js` èˆ‡ `firebase-session.js`ï¼Œå…± 7 å€‹ã€‚åˆ†é¡žç‚º stale test contractï¼Œéžæ­£å¼ç¨‹å¼éŒ¯èª¤ï¼›è‡ªä¸»å¤±æ•—é¡åº¦ 1/4ã€ä¿®æ­£ 1 æ¬¡ã€‚
-- å¾žæœ€æ–° `dev@10a2decd213cc061e8820fbfd5b01e4ad4d386f4` å»º `fix/cloud-session-phase1-release-gate-20260919`ï¼›åªå°‡æ—¢æœ‰æ¨¡çµ„æ•¸æ–·è¨€å°é½Š 7ï¼Œä¸æ”¾å¯¬ bytesã€hash æˆ– feature boundary æª¢æŸ¥ã€‚æœ¬æ©ŸåŒä¸€æ¸¬è©¦å…ˆé‡ç¾ 7 !== 5ï¼Œå†ä¿®æ­£ç‚º PASSã€‚
-- çµæ¡ˆæ–‡ä»¶èˆ‡æ—¢æœ‰ Session Authority workflow çš„æ–‡ä»¶é€£çµè¨»è§£åŒæ­¥ï¼›workflow æ‰€æœ‰åŸ·è¡Œå®šç¾©ã€å¾Œç«¯ï¼å®¢æˆ¶ç«¯ç¨‹å¼ã€éŠæˆ²èˆ‡ Cache Version å‡ä¸è®Šã€‚ä¿®å¾©å¿…é ˆ PR å›ž devã€CI é€šéŽå¾Œåˆä½µï¼Œå†é©—è­‰æœ€æ–° devï¼Firebaseï¼DEV èˆ‡ main PRï¼›æœ€æ–°ç™¼å¸ƒç‹€æ…‹å’Œ SHA ä»¥ [çµæ¡ˆ PR #341](https://github.com/tf00913225-alt/my-game/pull/341) æ°¸ä¹…è¨˜éŒ„ç‚ºæº–ã€‚Phase 1 ä»ç‚º 5/5 VERIFIEDï¼ŒPhase 2 æœªé–‹å§‹ã€‚
-
-## 2026-09-19 â€” Cloud Account Phase 1 æ­£å¼é©—æ”¶çµæ¡ˆï¼ˆCOMPLETE / 5/5 VERIFIEDï¼‰
-
-- æœ¬ç¯€å–ä»£ä¸‹æ–¹æ­·å²ã€ŒPhase 1 BLOCKED / Firebase 403ã€ä½œç‚ºç›®å‰ç‹€æ…‹ï¼›æ­·å²ç´€éŒ„ä¿ç•™ã€‚é•·æœŸé€²åº¦å”¯ä¸€ä¾†æºä»æ˜¯ `docs/CLOUD_SAVE_IMPLEMENTATION_PROGRESS.md`ï¼ŒPhase 2â€“10 å…¨éƒ¨å°šæœªé–‹å§‹ã€‚
-- çµæ¡ˆåŸºæº–ç‚ºé‡æ–°æ ¸å°çš„ `dev@342ef104fa2897f5ae5c3249e0c75c9efca3e762`ï¼›Firebase run `35438044543`ï¼deploy job `105884400094` æˆåŠŸï¼Œä¸ƒæ”¯ Functions å…¨éƒ¨æ›´æ–°ï¼ŒFirestore Rules ç·¨è­¯èˆ‡ç™¼å¸ƒæˆåŠŸã€‚éƒ¨ç½²æœå‹™å¸³è™Ÿï¼š`github-firebase-deployer@four-symbols-jianghu.iam.gserviceaccount.com`ã€‚Rules IAM 403 å·²è§£é™¤ï¼›Artifact Registry æ¸…ç†æ”¿ç­–è­¦å‘Šå·²ä¸é˜»æ“‹éƒ¨ç½²ï¼Œä½†æœªå†’ç¨±æ”¿ç­–æœ¬èº«å·²è¨­å®šæˆåŠŸã€‚
-- åŒ UID çœŸå¯¦é›™æ‰‹æ©Ÿï¼šèˆŠæ‰‹æ©Ÿç•«é¢é¡¯ç¤º `SESSION_REVOKED` èˆ‡ã€Œé€™å°è£ç½®å·²è¢«å¦ä¸€å°è£ç½®å–ä»£ã€ï¼›å¾Œç™»å…¥æ‰‹æ©Ÿ SUCCESS ç”±ä½¿ç”¨è€…æ–¼æœ¬æ¬¡å°è©±æ˜Žç¢ºå›žå ±ï¼ŒæˆåŠŸæˆªåœ–å·²åˆªé™¤ã€‚ä½¿ç”¨è€…å¾ŒçºŒæ¾„æ¸…å·²å®Œæˆå¯¦æ¸¬ã€æ²’æœ‰å•é¡Œï¼›ä¸æŠŠå…ˆå‰ç°¡çŸ­å›žè¦†èª¤è¨˜æˆé›™æ‰‹æ©Ÿå‡å¤±æ•ˆã€‚ä¸åŒ UID éš”é›¢ç”±åŒ SHA çš„ HTTP emulator job `105883976742` å¯¦éš›é€šéŽï¼Œæœªå†’ç¨±æœ‰ä¸åŒ UID çœŸæ©Ÿæˆªåœ–ã€‚
-- åŒä¸€åŸºæº–çš„ Repository checksã€DEV deployment èˆ‡éƒ¨ç½² SHA æ ¸å°ç”± run `35438044719` æˆåŠŸã€‚æ”¶å°¾ PR åˆä½µå¾Œå¿…é ˆå¦å¤–è¨˜éŒ„æœ€æ–° dev çš„æª¢æŸ¥ã€Firebaseï¼DEV éƒ¨ç½²åŠæ­£å¼ main ç™¼å¸ƒè­‰æ“šï¼Œä¸èƒ½ç”¨æœ¬æ®µåŸºæº–æˆåŠŸå†’å……æœ€å¾Œç™¼å¸ƒ SHAã€‚
-- DEV æ¸¬è©¦å€ä»ç”± `js/firebase/firebase-auth-ui.js` çš„ç²¾ç¢º hostname allowlist æŽ§åˆ¶ï¼Œåªå…è¨± `dev.four-symbols-dev.pages.dev`ã€`localhost`ã€`127.0.0.1`ã€‚ä¸æ”¹æ­£å¼æ¬Šé™ ownerã€UIã€çŽ©æ³•æˆ–å­˜æª”ï¼›Gameï¼Cache Version ç¶­æŒ `173.65`ã€‚`DATA_SECURITY_CONTRACTS.md` ä»ä¸å­˜åœ¨ã€‚
-- ä½¿ç”¨è€…å·²æŽˆæ¬Šæœ¬æ¬¡æ–‡ä»¶ PR â†’ dev â†’ å—ä¿è­· main PR ç™¼å¸ƒï¼›æœ€çµ‚ SHA èˆ‡ç™¼å¸ƒçµæžœè¨˜éŒ„æ–¼[çµæ¡ˆ PR #341](https://github.com/tf00913225-alt/my-game/pull/341) çš„æ°¸ä¹…ç™¼å¸ƒè­‰æ“šï¼Œä¸é å¡«æœªåŸ·è¡Œçµæžœã€‚Phase 1 åŠŸèƒ½é©—æ”¶å·²å®Œæˆï¼›æ•´æ¬¡ç™¼å¸ƒä»é ˆå®Œæˆæ—¢æœ‰ Release Gate èˆ‡æ­£å¼éƒ¨ç½²é©—è­‰æ‰å¯å›žå ±å®Œæˆã€‚
-
-## 2026-09-19 â€” Cloud Account Phase 1ï¼šSingle Active Sessionï¼ˆæ­·å² BLOCKED ç´€éŒ„ï¼‰
-
-- åŸºæº– `dev@7dd60dcddc9334902e058123a6084a93353e5943`ï¼›åˆ†æ”¯ `feature/cloud-session-authority-phase1-20260919`ï¼Œåªæ•´åˆ `dev`ï¼Œ`main` ç¦æ­¢ä¿®æ”¹ã€‚
-- é•·æœŸé€²åº¦å”¯ä¸€ä¾†æºï¼š[docs/CLOUD_SAVE_IMPLEMENTATION_PROGRESS.md](docs/CLOUD_SAVE_IMPLEMENTATION_PROGRESS.md)ã€‚å¾ŒçºŒæ¯å€‹ Cloud Save Phase å¿…é ˆæ›´æ–°ï¼›å…§å« 14 é …ç¨½æ ¸ã€åéšŽæ®µç‹€æ…‹ã€æ°¸ä¹…æ±ºç­–ã€é¢¨éšªèˆ‡ä¸‹ä¸€æ­¥ã€‚åŸºæº–ç¼ºå°‘ `DATA_SECURITY_CONTRACTS.md`ï¼Œå·²å¦‚å¯¦è¨˜éŒ„ã€‚
-- æ–° ownerï¼š`functions/src/session-authority.js`ï¼›æ–°å¢ž `createGameSession`ï¼`revokeGameSession`ï¼`protectedTest`ã€‚å…©æ”¯æ—¢æœ‰å­˜æª” callable åœ¨åŒä¸€ Firestore transaction å…§é©—è­‰ active session èˆ‡å¯«å…¥ï¼›native auth handoff åŠ  source authTime é˜²ç¹žéŽï¼Œä»åªåšèº«åˆ†äº¤æ›ã€‚
-- Client ownerï¼š`js/firebase/session-client.js`ï¼‹`firebase-session.js`ï¼›auth/bootstrapï¼readonly cloud-save æŽ¥å…¥ï¼Œä¸åŒ…è£ gameplay saveã€ä¸æ¬çŽ©å®¶è³‡æ–™ã€ä¸æ”¹ UI ç‰ˆé¢ï¼›æ‰€æœ‰ error æ˜Žç¢ºä¸”ä¸è‡ªå‹•é‡è©¦å¯«å…¥ï¼æ¶å›ž sessionã€‚
-- ç¨‹å¼ PR #335 å·²æ–¼ CI å…¨ç¶ å¾Œåˆä½µ `dev@b105f5329d95874820202b6ade78254712200d5e`ï¼›ç²¾æº–æ¸¬è©¦ã€HTTP emulator A/Bï¼UIDï¼rulesï¼ä½µç™¼é©—æ”¶ã€account boot browser QA èˆ‡ DEV å‰ç«¯éƒ¨ç½²ï¼SHA é©—è­‰å‡é€šéŽã€‚Gameï¼Cache version ç¶­æŒ `173.65`ã€‚
-- **NOT COMPLETEï¼ŒRequirements 4/5 VERIFIEDï¼š** Firebase deploy run `35430858389`ï¼job `105865475494` æ–¼ Rules API test å›žè¦† 403ï¼›Secret èˆ‡ç™»å…¥æˆåŠŸï¼Œéƒ¨ç½²æ¬Šé™ä¸è¶³ã€‚ä¸ƒæ”¯ Functionsï¼Rules å°šæœªå®Œæˆéƒ¨ç½²ï¼ŒçœŸæ­£é›²ç«¯é›™è£ç½®é©—æ”¶æœªåšï¼›ç·šä¸Šä¸èƒ½å®£ç¨±å·²å…·æœ¬æ¬¡ authorityã€‚
-- ä¸‹ä¸€æ­¥ï¼šå°ˆæ¡ˆç®¡ç†è€…è™•ç†æ—¢æœ‰éƒ¨ç½²èº«åˆ†çš„ Rules IAM æ¬Šé™ï¼Œå†å¾žæœ€æ–° dev éƒ¨ç½²ä¸ƒæ”¯ Functionsï¼‹Rulesã€å®Œæˆ Aâ†’B takeoverï¼UID éš”é›¢é©—æ”¶ä¸¦æ›´æ–°é•·æœŸé€²åº¦ã€‚ç´”æ–‡ä»¶åˆä½µä¸è§¸ç™¼ Firebase éƒ¨ç½²ï¼Œä¸èƒ½é‡è·‘èˆŠ SHA å†’å……æœ€æ–°éƒ¨ç½²ï¼›è©³ç´°å‘½ä»¤èˆ‡è­‰æ“šè¦‹é•·æœŸæ–‡ä»¶ã€‚Phase 1 é©—æ”¶å‰ä¸é–‹å§‹ Phase 2ã€‚
-
-## 2026-09-18 â€” 20 ä»¶ç§˜å¯¶ 4Ã—3 VFX WebP èˆ‡æˆ°é¬¥æ¼”å‡ºæ•´åˆ
-
-- å·¥ä½œåˆ†æ”¯ï¼š`feature/relic-vfx-animation-20260918`ï¼›åŸºæº–ç‚º `dev@d91687cb09d04519766d8303c331945508bde3a5`ï¼Œ`main` ä¸ä¿®æ”¹ã€‚
-- 20 å¼µæ¯åœ–ä¾†æºå›ºå®šç‚º `assets-library/assets/inbox/ç§˜å¯¶icon/ç§˜å¯¶æŠ€èƒ½VFX/`ï¼›æ­£å¼ runtime åªä½¿ç”¨ `assets/vfx/relic/*.webp`ã€‚ä¾ `docs/IMAGE_ASSET_SPEC.md` ä¿ç•™ 1448Ã—1086 å®Œæ•´ç•«å¸ƒã€4Ã—3ï¼12 å¹€ã€362Ã—362 å–®æ ¼èˆ‡ Alphaï¼Œä¸ trimï¼cropï¼resizeï¼›PNG åƒ…ç•™ç´ æåº«ã€‚
-- VFX å”¯ä¸€ raster owner ä»æ˜¯ `js/39-v143-skill-animation.js`ï¼š`relicSheet()` èˆ‡ `RAW_MANIFEST` ç™»éŒ„ 20 ä»¶ç§˜å¯¶ç´ æèˆ‡ reviewed hit frameï¼›ä½¿ç”¨æ—¢æœ‰ `v143RasterCastFrames`ï¼Œæœªå»ºç«‹ç¬¬äºŒ rendererã€‚ç§˜å¯¶ç´ ææŽ¡ lazy preflightï¼Œåƒ…è£å‚™ä¸­çš„ç§˜å¯¶ç”± `v143PreloadBattleVfxAsset()` é è¼‰ã€‚
-- ç§˜å¯¶è§¸ç™¼ï¼æ•ˆæžœå”¯ä¸€ owner ä»æ˜¯ `js/60-team-relic-system.js`ï¼š`relicVfxTarget()` ä¾æ—¢æœ‰ Triggerï¼Effect æ±ºå®š enemy allã€ally allã€single ally æˆ– single enemyï¼›`queueRelicPresentation()` å‘¼å«æ­£å¼ V142/V143 å‹•ç•«ç®¡ç·šã€‚å·²é–‹æ”¾ 10 ä»¶ç«‹å³ä½¿ç”¨ï¼›å…¶é¤˜ `runtimeReady:false` çš„ 10 ä»¶åªé å…ˆç™»éŒ„ VFXï¼Œä¸å› æ­¤é–‹æ”¾æŠ€èƒ½æˆ–å–å¾—ã€‚
-- æ—¢æœ‰ 1.15 ç§’å‡ºæ‰‹å¾Œç¯€å¥ owner `js/00-main.js::POST_ACTION_DELAY_MS` ä¸ä¿®æ”¹ã€‚ç§˜å¯¶ VFX æŽ¡ 0.78â€“0.98 ç§’ä¸¦ä¿ç•™ 120ms lead gapï¼Œé¿å…åœ¨ä¸‹ä¸€å€‹æ­£å¼è¡Œå‹•é–‹å§‹æ™‚è¢«æˆªæ–·ã€‚è‡´å‘½å‚·ä¿å‘½ä»å…ˆåŒæ­¥çµç®—ï¼Œå†æ’­æ”¾ `å›žå¤©å¯¶è¼ª` è¦–è¦ºï¼Œä¸èƒ½ç‚ºäº†å‹•ç•«å»¶å¾Œæ­»äº¡æ””æˆªã€‚
-- æª”åå‹˜èª¤æ˜ å°„ï¼š`çŽ„å†°æ·¨å¿ƒvfx.png` â†’ æ­£å¼ `çŽ„å†°é¡å¿ƒ`ï¼›`èµ¤å®µæˆ°ç´‹vfx.png` â†’ æ­£å¼ `èµ¤éœ„æˆ°ç´‹`ã€‚å…©è€…åªä¿®æ­£ runtime å‘½åæ˜ å°„ï¼Œä¸ä¿®æ”¹ç´ æå…§å®¹ã€‚
-
-## 2026-09-18 â€” ç§˜å¯¶ç¢Žç‰‡èƒŒåŒ…é»‘åœ–ï¼è©³æƒ…ç©¿åœ–ä¿®å¾©ï¼ˆVERIFIEDï¼‰
-
-- Base: `dev@d9c6d2d2beb78a0a944af171ca20eeb92f02abaa`; branch: `fix/relic-fragment-inventory-image-fit-20260918`; `main` ä¸ä¿®æ”¹ã€‚
-- å¯¦æ©Ÿæˆªåœ–é¡¯ç¤ºç§˜å¯¶ç¢Žç‰‡åœ¨èƒŒåŒ…æ ¼å…§åªçœ‹åˆ°é»‘è‰²ï¼å±€éƒ¨ç•«é¢ï¼Œé»žé–‹é“å…·è©³æƒ…å¾Œå‰‡ä»¥åŽŸå§‹å¤§åœ–å°ºå¯¸ç©¿å‡º modalã€‚
-- æ ¹å› åœ¨ `js/relic-progression-drop-system.js::fragmentIconMarkup()`ï¼šä¸Šä¸€è¼ª WebP å°Žå…¥ä½¿ç”¨è£¸ `<img>`ï¼Œç¹žéŽæ—¢æœ‰èƒŒåŒ…èˆ‡ itemModal çš„ `.v169-item-art > img` å¹¾ä½• ownerã€‚
-- ä¿®æ­£åªæŠŠç¢Žç‰‡ icon markup æ”¶æ–‚å›žæ—¢æœ‰ `v169-item-art` åŒ…è£ï¼›æ²¿ç”¨ `css/38-v141-system-expansion.css` å·²æœ‰çš„å°ºå¯¸èˆ‡ `object-fit:contain`ã€‚æ²’æœ‰æ–°å¢ž CSS overrideã€runtime wrapperã€ç´ æè½‰æª”æˆ–çŽ©æ³•ï¼æŽ‰è½ï¼åˆæˆè®Šæ›´ã€‚
-- Requirement batch: `release/requirement-batches/2026-09-18-relic-fragment-inventory-image-fit.json`ã€‚PR #315 Repository checks run `35364121111` å·²é€šéŽï¼ŒåŒ…å« build syncã€9:16 mobile QAã€exact-candidate real battle QAã€Adventure mobile QA èˆ‡ release gatesã€‚
-
-## 2026-09-18 â€” Battle presentation follow-up: Boss HUD, cardless enemy feedback, drawer and reinforcement spacing (IMPLEMENTED / QA PENDING)
-
-- Base: latest GitHub `dev@394d4a6baba1aa6e7061d60390201bf1925c4a1e`; branch: `fix/battle-presentation-boss-hud-slots-20260918`. `main` remains excluded.
-- User video `1000070405.mp4` and screenshots `1000070400.jpg`ï¼`1000070404.jpg` show the Boss footprint still inheriting a legacy elemental card border, enemy red HP popup feedback, a missing Boss HP bar, a stale Frostbite skill-prohibition label, a centered drawer handle, a perceived enemy/player bar-height mismatch and B1 reinforcement artwork touching the Boss portrait.
-- Existing owners only: `css/fixed-slot-battlefield-rendering-v2.css` now applies the cardless root reset to every enemy entity, suppresses enemy red HP popup paint, shares an 11px player/enemy resource-bar token and anchors the drawer handle at bottom-right with a translucent black background. No new stylesheet or late runtime patch was added.
-- `css/gameplay-boss-tower.css` now gives the Boss HUD explicit visibility/height priority over older shared battle styles, reserves 12px beyond the outer enemy columns for the Boss footprint and insets B1/B5/F1/F5 artwork so reinforcements/objects do not touch the central Boss portrait.
-- Frostbite is formally converged to its V169 soft-debuff rule: `js/43`, `js/44`, `js/50` and `css/45` no longer contain player/monster skill-lock wrappers, disabled-control classes or the obsolete prohibition text. Damage, evasion and status resistance penalties remain owned by V169. Deprecated-code gate prevents those retired tokens from returning.
-- Requirement batch: `release/requirement-batches/2026-09-18-battle-presentation-followup.json`. Status remains IMPLEMENTED / QA PENDING until focused tests, deterministic build check, mobile browser geometry and Repository checks pass.
-
-## 2026-09-18 â€” Boss target-entity convergence, cardless battlefield and queue-owner cleanup (IMPLEMENTED / QA PENDING)
-
-- Base: latest GitHub `dev@1142ba9c0cc0dac9200772326ba920d5b1a07fed`; branch: `fix/boss-battle-architecture-convergence-20260918`. `main` is excluded.
-- This entry supersedes every older function-cardï¼Mechanism design below. Boss is one target entity with one HP/SP/status identity; `B2/B3/B4/F2/F3/F4` are one visual footprint only. Reinforcements use `B1/B5`; destructible Boss objects use `F1/F5`, normal numeric enemy identities, `canAct=false` and no ordinary rewards.
-- é‡‘å‰›è­·é«” is now Boss Shield. The old `MECH_*`, `mechanism:*`, mandatory mechanism target, mechanism-specific settlement and mechanism VFX paths are removed from production owners.
-- Boss mode isolates non-all damage to the selected target; `all/enemyAll` hits every living Boss-side entity. General battles retain their existing singleï¼triï¼rowï¼columnï¼all Fixed Slot rules. Boss tri VFX keeps authored group size even though damage settles one target.
-- `00-main.js` is the sole `finishPlayerAction`ï¼`processNextCombatant` owner. V142 exposes remaining visual time only; dungeon, relic and Fire follow-up modules no longer Promise-gate or replace queue functions. Fire follow-up uses the core `FourSymbolsBattleFlow` removable interceptor.
-- Cardless presentation is source CSS plus immediate `FourSymbolsBattlePresentation.applyUnit()` at DOM creation. The 300ms presentation poll and `.red-hit` root-card feedback are retired; Heal has independent positive feedback.
-- Fixed Slot CSS owns 42ï¼14ï¼44 enemy-center-ally tracks, equal 10px player/enemy bars, bottom information drawer, 66px Element Box and the raised 64Ã—32 gold drawer handle. The center-region borders were the two residual gold lines and are now removed at their source.
-- Existing V131 Formation remains the only editor and persists through `saveGame({source:"ally-formation"})`; no fake modal was added.
-- System contract: `SYSTEM_CONTRACTS.md`. Focused regression: `tests/boss-battle-architecture-convergence-20260918.test.js`. Requirement batch: `release/requirement-batches/2026-09-18-boss-battle-architecture-convergence.json`.
-- Status remains IMPLEMENTED / QA PENDING until 412Ã—915 Browser QA, full repository checks, commit/push and PR to dev complete.
-
-## 2026-09-18 â€” Battle target contract, four-track layout, Formation entry and flow recovery (VERIFIED)
-
-- Base is the latest GitHub `dev@30c8253713fa0fee76ceea597521d7e9a314a9a0`; branch is `fix/battle-vfx-layout-formation-freeze-20260918`. `main` is excluded. The requested `SYSTEM_CONTRACTS.md` does not exist in the base or reachable history, so no substitute contract was invented.
-- User video `1000070339.mp4` ends after Water's Ice Arrow Rain with an unchanged battle frame. Source tracing found the systemic deadlock boundary: initiative ultimately relied on VFX/DOM completion, while the combat owner had no bounded final recovery.
-- Target ownership is now combat â†’ immutable `battle-target-contract-v1` â†’ V142 timing gate â†’ V143 raster renderer. V143 no longer reads `queuedPlayerActions`, `selectedMonster`, hit order or survivor bounds. Player/enemy damage actions pass explicit targets; V148 support actions pass explicit target side and ids, including enemy-target Purify Mind.
-- Fixed Slot remains the only geometry owner. Single uses card center, tri/row/column use fixed semantic shape size centered on the explicit primary card, all uses the whole side, and trajectory starts at caster Slot center and ends at primary Slot center. Stale stages are purged and render errors release the gate.
-- `index.html` and the canonical fixed-slot stylesheet now own four tracks: enemy cards, middle turn/actions, ally cards, bottom battle info. The element-box button is restored to 66Ã—66; enemy/ally HUD rows sit below art; ally rows use a real 8px gap with no negative overlap. The adapter accepts six ally Slots.
-- The existing V131 Formation editor remains the only editor. The home button now declares `data-feature="gameplay-core"`, allowing the first click to load that real owner before `openHomeFeature('formation')` renders it.
-- `processNextCombatant()` now arms a 7-second final action watchdog and catches player/enemy settlement exceptions. It completes any active V142 gate and advances exactly once; ordinary V142/V143 deadlines remain the primary cleanup path.
-- Exact-candidate PR CI Run `35259234890` (`#1832`) passed. The 412Ã—915 real browser run opened and moved/restored the Formation editor, launched eight-enemy combat, verified four structural regions and fixed VFX footprints, advanced a formally declared Fire action, completed the dungeon handoff and left zero V143 stages. The separate Fixed Slot browser suite passed 412Ã—915, 393Ã—873 and 360Ã—800 including six occupied ally Slots.
-- Requirement batch: `release/requirement-batches/2026-09-18-battle-system-integration.json` is VERIFIED / COMPLETE. Detailed analysis: `docs/qa/battle-system-integration-20260918.md`.
-
-## 2026-09-17 â€” Battle three-region layout, range VFX footprint and action-gate repair (NOT COMPLETE)
-
-- Base is `dev@b38411944c8c01b56faa6308f41d969644d82b25`; branch is `fix/battle-layout-vfx-runtime-20260917`. Severity is P1 because the reported Ice Arrow Rain path can block the core battle loop. `main` is explicitly excluded.
-- User evidence `1000070338.mp4` shows a stopped battle after Ice Arrow Rain, undersized single-card-like area VFX and crowded/tiny battle units. Screenshot `1000070335.jpg` is treated only as a three-region proportion concept.
-- Root causes: V142 omitted its safety deadline for V143's `render:false` timing call; V143 shrank complete-side/group geometry through square contain fitting and 0.72/0.62 factors; final skill target types could drift from authored manifest placement; the battle DOM lacked explicit enemy/operation/ally region ownership; and a failed raster render could leave a stale stage before the next Wind Flame cast.
-- Existing owners were repaired: `index.html` now exposes enemy / operation-status / ally regions; `css/fixed-slot-battlefield-rendering-v2.css` owns 34fr / 31fr / 35fr tracks and centralized equal slot/card/art/name/bar sizing; V142 always releases the action gate by deadline; V143 derives range placement from `config.targetType`, preserves three-target/full-side footprints, permits visual overflow and purges stale stages. Fixed Slot geometry adapters and combat/target/damage data remain unchanged.
-- Focused coverage audits all four elements' representative single/tri/all skills, Ice Arrow Rain after casualties, Ice Spin and Wind Flame survivor-independent group geometry, one Wind Flame raster node, unclipped cards/VFX and render-failure gate release. `npm run build` was used only after `build:check` identified a stale manifest; synchronized bundles retain V173.65/cache 173.65.
-- Detailed evidence: `docs/qa/battle-layout-vfx-runtime-20260917.md`. Requirement batch `2026-09-17-battle-layout-vfx-runtime` remains IMPLEMENTED / NOT COMPLETE until Repository checks pass, the candidate is merged to `dev`, the exact SHA is deployed, and fully loaded portrait-mobile combat confirms progression/layout/range VFX. No dev â†’ main promotion is authorized.
-
-## 2026-09-17 â€” Function-card spread isolation and primary-target VFX anchor (NOT COMPLETE)
-
-- Follow-up base is `dev@a21736f3ea1f92b2e7da9e48870dce705c4c5cc4`; working branch is `fix/battle-tri-mechanism-vfx-anchor-20260917`. `main` is not part of this repair.
-- Real DEV confirmation completed the prior three battle-formation requirements. The new report exposed two separate defects: a player three-target skill aimed at a BOSS function card also damaged the two rear reinforcements, and enemy single/three-target VFX stayed at the front-row center instead of the actual attacked card. Full-field VFX must remain formation-centered.
-- Root causes remain in existing owners. `resolveMechanismAction()` damaged the mechanism and then retargeted spread skills into the normal monster resolver; enemy `processSingleMonsterAttack()` started the badge before target selection; V142 carried no target metadata; V143 centered group geometry on the row.
-- Repair keeps one settlement path and one VFX owner: mechanism-targeted skills pay once, damage only the mechanism and finish; monster selection passes primary/target indexes through the badge and V142; V143 keeps fixed-shape sizing but centers non-battlefield group VFX on the explicit primary card. Battlefield/all-target VFX still use the whole-side center.
-- Focused regressions: Gameplay/BOSS/Tower runtime proves BOSS and both reinforcements retain HP, the skill cost is paid once and normal monster settlement is never entered; primary-target VFX regression proves enemy single and tri use the selected non-center ally while all-target keeps the complete formation center.
-- Requirement batch `2026-09-17-battle-formation-targeting` is **3/5 VERIFIED â€” NOT COMPLETE**. The two new items remain IMPLEMENTED until the deployed dev runtime confirms (1) a three-target mechanism hit leaves the BOSS/reinforcements untouched and (2) enemy single/tri/all VFX use the required centers. Game/Cache Version remains 173.65.
-
-## 2026-09-17 â€” Real runtime follow-up: BOSS mechanism front-lane collision (NOT COMPLETE)
-
-- User mobile DEV recording `1000070330.mp4` verifies the ally projection: the water character is behind the two front allies. Requirement batch `2026-09-17-battle-formation-targeting` is now 1/3 VERIFIED.
-- The same real recording disproves the first BOSS mechanism placement as complete: the mechanism card occupies the same visual band and covers the center BOSSï¼reinforcement unit.
-- Root cause is in the existing BOSS owner, not another CSS cascade: `seedBossBattlefieldSnapshot()` and `BOSS_REINFORCEMENT_SLOTS` still placed the BOSS trio at `ENEMY_F3/F2/F4`, while the independent `MECH_*` zone now correctly owns the enemy front plane.
-- Follow-up branch `fix/boss-mechanism-front-lane-runtime-20260917` starts from `dev@167486c627e57fde9d1f9baabf7185d455c423ed`. It reserves `ENEMY_B3/B2/B4` for every Gameplay BOSS and its two reinforcements, then asks the existing fixed-slot geometry adapter to reconcile the live DOM immediately. No new wrapper, CSS priority patch, skill-number change, VFX change or save change.
-- The recording only shows enemy single-target casts (`å†°éœœæ‹³`, `æ´ªæ°´çŒ›ç¸`). It does not validate `tri`ï¼`row`; range targeting remains IMPLEMENTED but not VERIFIED until a real enemy range cast is captured.
-
-## 2026-09-17 â€” Battle runtime P1 repair candidate (NOT COMPLETE)
-
-- Base `acc6419b72ee3a31a6314a6833ded3f81a3fd219`; branch `fix/battle-runtime-portraits-vfx-20260917`.
-- Scope only portraits and VFX geometry. Actual deployed normal battle confirmed legacy 122px/100px unit heights overriding 86px/92px slots; user video plus source trace identifies same-token BOSS reinforcement redraw reapplying entry hiding/translation.
-- Existing owners edited: V141 `renderBattle` / `startTurn` entry-token lifecycle; fixed-slot canonical CSS host namespace; V146 legacy zone translation; V143 `applySpriteBox` size factors. No added runtime wrapper or temporary patch.
-- `docs/qa/battle-runtime-p1-20260917.md` distinguishes actual observations, source diagnosis and supplementary tests. Requirement batch `2026-09-17-battle-runtime-p1` remains 0/2 VERIFIED. Version/cache remain 173.65.
-- Runtime source was connector-published as `a486e4bc6d2b1580cb50b796b112caa5b2646af8`; Draft PR #263 targets `dev`. CI Run #1799 (`35219995186`) passed, including Repository checks and the existing isolated 9:16 browser gate; the Draft PR dev deployment gate was skipped. These are supplementary only and do not change 0/2 VERIFIED.
-- Browser native DEV resource alert blocked further real-game inspection. Candidate BOSS reinforcement and VFX captures remain required. Never treat isolated QA or CI success as completion; no merge/deployment authorized by the autonomous validation contract.
-
-## 2026-09-12 Facebook Android åŽŸç”Ÿç™»å…¥ PoCï¼ˆå·¥ä½œåˆ†æ”¯ï¼Œæœªåˆä½µï¼‰
-
-- å·¥ä½œåˆ†æ”¯ `feature/android-native-facebook-login-poc-20260912`ï¼ŒåŸºæº–ç‚ºå·²é‡æ–°æ ¸å°çš„ GitHub `dev@f4fc2f78d704a6019252b52345cb6f66a74133ce`ï¼›`main` æ²’æœ‰ä¿®æ”¹ã€æ²’æœ‰å»ºç«‹ promotionã€‚
-- å¯¦éš›æŽƒæ repository å¾Œç¢ºèªï¼šç¾æœ‰éŠæˆ²æ²’æœ‰ Androidã€Capacitorã€Cordovaã€TWAã€WebView æˆ–å…¶ä»–åŽŸç”Ÿ hostã€‚æ—¢æœ‰å”¯ä¸€ Web Auth owner ä»ç‚º `js/firebase/firebase-auth.js::signInWithFacebook()`ï¼Œç¶­æŒ Firebase Web `signInWithPopup()`ï¼›æœ¬è¼ªå®Œå…¨æ²’æœ‰ä¿®æ”¹å®ƒï¼Œä¹Ÿæ²’æœ‰å†æ–°å¢ž Web OAuth workaroundã€‚
-- æ–°å¢žç¨ç«‹ owner `android/facebook-login-poc/app/src/main/java/com/foursymbols/jianghu/authpoc/MainActivity.kt`ã€‚å®ƒåªèµ° Meta Android `LoginManager`ï¼`CallbackManager` â†’ Facebook AccessToken â†’ Firebase Android `FacebookAuthProvider.getCredential()` â†’ `FirebaseAuth.signInWithCredential()`ï¼Œæœ€å¾Œåªé¡¯ç¤º Firebase UIDã€‚æ²’æœ‰ WebViewã€Firestoreã€localStorageã€éŠæˆ²å­˜æª”ã€UID ownershipã€è§’è‰²ã€migration æˆ– bridge å¯¦ä½œã€‚
-- å›ºå®š PoC package ç‚º `com.foursymbols.jianghu.authpoc`ï¼ŒDefault Activity ç‚º `com.foursymbols.jianghu.authpoc.MainActivity`ï¼ŒMeta App ID ç‚º `1712957419809925`ã€‚Manifest åŒ…å« FacebookActivityã€CustomTab callback scheme èˆ‡ Android package visibilityï¼›Meta App Secretï¼client secret æ²’æœ‰å¯«å…¥ç¨‹å¼ã€æ–‡ä»¶æˆ– Gitã€‚
-- `android/facebook-login-poc/app/google-services.json`ã€ç°½ç« æª”èˆ‡ local properties è¢« `.gitignore` æŽ’é™¤ã€‚PoC åœ¨ç¼ºå°‘ Google Services config æ™‚æœƒæ˜Žç¢ºåœç”¨ç™»å…¥ï¼›é…ç½®æª”å¿…é ˆç”± Firebase `four-symbols-jianghu` è¨»å†ŠåŒä¸€ Android package å¾Œä¸‹è¼‰ä¸¦åƒ…æ”¾åœ¨æœ¬æ©Ÿã€‚README å·²åˆ—å‡º Meta/Firebase Console ç²¾ç¢ºæ¬„ä½ã€debug/release Key Hash å‘½ä»¤ã€APK å»ºç½®èˆ‡ S23 Ultra é©—æ”¶ã€‚
-- å®‰å…¨æ©‹æŽ¥åƒ…è¨˜éŒ„è¨­è¨ˆé¸é …ï¼Œæœªå¯¦ä½œï¼šåŽŸç”Ÿ Firebase session ä¸æœƒè‡ªå‹•å…±äº«åˆ° Web SDKï¼›å»ºè­°æœªä¾†ä½¿ç”¨ trusted backend é©—è­‰ native ID tokenï¼Œå†çµ¦åŒæºç¶²é ä¸€æ¬¡æ€§ handoff/custom tokenã€‚ç¦æ­¢æŠŠ Facebook tokenã€UID query æˆ– localStorage ç•¶ bridgeã€‚
-- é©—è­‰ï¼š`node --test tests/android-facebook-native-poc.test.mjs` 6/6 PASSï¼›Gradle 8.9 `:app:tasks` PASSï¼›å«ä¸€æ¬¡æ€§ synthetic non-secret `google-services.json` çš„ `:app:processDebugGoogleServices` PASSï¼Œæ¸¬å¾Œå·²åˆªé™¤ synthetic configã€‚å˜—è©¦ `:app:assembleDebug` çš„å”¯ä¸€å¤±æ•—æ˜¯æ­¤åŸ·è¡Œç’°å¢ƒæ²’æœ‰ Android SDKï¼ˆ`SDK location not found`ï¼‰ï¼Œå› æ­¤å°šç„¡å¯è²ç¨±çš„ debug APKï¼S23 å¯¦æ¸¬ã€‚
-- Requirement batchï¼š`release/requirement-batches/2026-09-12-android-native-facebook-login-poc.json`ï¼›4/5 VERIFIEDï¼Œæœ€å¾Œä¸€é …ä¿ç•™ç‚º Meta/Firebase Console è¨­å®šã€å¯¦éš› APK èˆ‡ Samsung S23 Ultraï¼ˆFacebook App æ”¯æ´é€£çµä¿æŒé–‹å•Ÿï¼‰é©—è­‰ã€‚Game/Cache Version ç¶­æŒ V173.65ï¼173.65ã€‚
-
-## 2026-09-12 Facebook ç™»å…¥ owner æ”¶æ–‚ï¼šç§»é™¤ DEV direct OAuth
-
-- å·¥ä½œåˆ†æ”¯ `fix/facebook-login-standard-flow-20260912`ï¼ŒåŸºæº–ç‚ºç•¶æ™‚æœ€æ–° `dev@fb316e564fb72e521df3d363b8bde81445c2dc15`ï¼›`main` ä¸ä¿®æ”¹ã€‚
-- Android å¯¦æ©Ÿç¢ºèªï¼šçŽ©å®¶ä¿ç•™ Facebook App æ­£å¸¸ã€Œé–‹å•Ÿæ”¯æ´é€£çµã€æ™‚ï¼ŒDEV direct `location.assign(facebook.com)` æœƒè¢«å¤–éƒ¨ Facebook App æŽ¥ç®¡ä¸¦åœåœ¨ `Error Facebook`ï¼›åªæœ‰é—œé–‰æ”¯æ´é€£çµã€ç”± Chrome æŽ¥æ‰‹æ™‚æ‰å¯å®Œæˆ OAuthã€‚å› æ­¤å•é¡Œä¸æ˜¯çŽ©å®¶æ‰‹æ©Ÿéœ€é¡å¤–è¨­å®šï¼Œè€Œæ˜¯ DEV TEMP direct-OAuth/full-page navigation ä¸å¯ä½œç‚ºæ­£å¼çŽ©å®¶æµç¨‹ã€‚
-- å”¯ä¸€ Auth owner `js/firebase/firebase-auth.js` å·²ç§»é™¤æ•´å¥— `FACEBOOK_DIAGNOSTIC_*`ã€`location.assign()`ã€manual access-token callbackã€`signInWithCredential()` èˆ‡ mobile `signInWithRedirect()` åˆ†æ”¯ï¼›ä¸å¾—å†ç–Šç¬¬ä¸‰å±¤ workaroundã€‚
-- `signInWithFacebook()` ç¾åœ¨å–®ä¸€è·¯å¾‘ä½¿ç”¨ Firebase `FacebookAuthProvider` + `signInWithPopup()`ï¼Œä¸¦è¨­å®š `display=popup`ï¼Œè®“æ‰‹æ©Ÿèˆ‡æ¡Œæ©Ÿéƒ½ç¶­æŒç€è¦½å™¨ popup æµç¨‹ï¼›åˆå§‹åŒ–åƒ…ä¿ç•™ `getRedirectResult()` ä»¥ç›¸å®¹ä¿®æ­£å‰å·²å•Ÿå‹•ä½†å°šæœªçµæŸçš„èˆŠ redirect sessionã€‚
-- `js/firebase/firebase-auth-ui.js` ç§»é™¤å·²ä¸å­˜åœ¨çš„ DEV diagnostic éŒ¯èª¤æ–‡æ¡ˆï¼›`docs/FIREBASE_AUTH_CLOUD_SAVE.md` èˆ‡ Auth regression test åŒæ­¥æ”¹ç‚º popup contractã€‚
-- ä¸ä¿®æ”¹ UID ownershipã€å­˜æª” schemaã€Firestore Rulesã€Startup State Machineã€Game/Cache Versionã€‚å¯¦æ©Ÿé©—æ”¶æ¢ä»¶ï¼šFacebook App ä¿æŒæ­£å¸¸æ”¯æ´é€£çµè¨­å®šï¼Œä¸è¦æ±‚çŽ©å®¶é—œé–‰ App linkï¼›é»žã€ŒFacebook ç™»å…¥ã€ä¸å¾—å†å‡ºç¾èˆŠ DEV direct-OAuth `Error Facebook`ã€‚
-
-## 2026-09-11 Facebook UID å­˜æª” hydration ä¿®æ­£
-
-- ç—‡ç‹€ï¼šFacebook OAuth å·²æˆåŠŸå–å¾— Firebase UIDï¼Œä½† Account UI é¡¯ç¤º `Account save passed resolution but gameplay hydration failed.`ã€‚
-- æ ¹å› ï¼šStartup State Machine å·²åœ¨ `resolveSaveFor()` è§£æžå‡ºè©² UID çš„ç¢ºåˆ‡ save payloadï¼Œ`enterReady(save)` å»å¿½ç•¥åƒæ•¸ä¸¦å†æ¬¡å‘¼å« `FourSymbolsGameSave.load()` é‡è®€ repositoryï¼›ç¬¬äºŒæ¬¡è®€å–å¯èƒ½èˆ‡å·²è§£æžç‹€æ…‹ä¸åŒæ­¥è€Œå›žå‚³ falseã€‚
-- ä¿®æ­£ï¼š`FourSymbolsGameSave` æ–°å¢ž `hydrate(save)`ï¼Œæ²¿ç”¨æ—¢æœ‰ `loadGame()` hydration/normalization é‚è¼¯ä½†ç›´æŽ¥ä½¿ç”¨å·²è§£æž payloadï¼›ä¸€èˆ¬ `load()` è¡Œç‚ºç¶­æŒåŽŸæœ¬å¾ž active UID repository è®€å–ã€‚çœŸæ­£ verified-empty UID ä»åªèµ° `enterCreation()`ï¼Œä¸æœƒèª¤é€² READYã€‚
-- ä¸ä¿®æ”¹ save schemaã€UID ownershipã€Firestore Rulesã€Game/Cache Versionï¼›`main` ä¸ä¿®æ”¹ã€‚
-
-## 2026-09-11 ä¸‰åˆ†æ”¯æ‰‹æ©Ÿ UIï¼BOSS ç§˜å¯¶ï¼ç„¡å¡ç‰Œæˆ°é¬¥å®‰å…¨æ•´åˆï¼ˆDEV VERIFIEDï¼‰
-
-- æ•´åˆå‰ GitHub `dev@34c5603b2ac7c062813489d5ddd1fef95fb20590`ã€`main@4989000c1034a6ca05a26dbdcf1ff36ed92e7d37`ï¼›ä¸‰æ¢é ç«¯ tip éƒ½ç²¾ç¢ºç­‰æ–¼æŒ‡å®š SHAã€‚å¯¦éš›é †åºç‚ºæ—¢å­˜ mobile UIï¼EXP guards â†’ BOSSï¼å››è±¡å¡”å¹³è¡¡ã€çŽ©æ³•å°é¢ã€æŠ€èƒ½é è¦½èˆ‡ Lv20 ç§˜å¯¶ â†’ ç„¡å¡ç‰Œæˆ°é¬¥å‘ˆç¾ã€‚
-- `fix/mobile-ui-exp-guards-20260911@1dcff7dbfcad1837ce8399857861a41909eaf523` å·²æ˜¯èµ·å§‹ dev merge `34c5603b2ac7c062813489d5ddd1fef95fb20590` çš„ç¬¬äºŒ parentï¼Œå› æ­¤æ²’æœ‰é‡è¤‡åˆä½µï¼›æ—¢æœ‰ PR #165 èˆ‡ run `34575775811` å·²æˆåŠŸï¼Œå¾ŒçºŒå›žæ­¸æ¸¬è©¦ä»é€šéŽã€‚
-- `feature/boss-balance-gameplay-cover-skill-preview-relic-20260911@7751692d9df4afba08a5ce7058661ca3ede682c4` ä»¥é›™è¦ª source merge `548e3a76697810af91c27f8c748eff694f50c393` ç¶“ PR #172 åˆå…¥ `dev@6de0d00d413362fd5e860698b1fa0ec76addc55d`ã€‚è¡çªç‚ºå…©ä»½ manifestã€app-shellï¼feature-boss-relic hashed build renameã€`css/56-v174-critical-ui-regressions.css` èˆ‡ `tests/ui-typography-battle-preservation.test.js`ï¼›äººå·¥ä¿ç•™è¼ƒæ–° dev çš„ 4:3 BOSSï¼æ©Ÿé—œ ownerã€mobile guards èˆ‡ battle baselineï¼ŒåŒæ™‚åŠ å…¥çŽ©æ³• 16:9ã€å…ƒç´ å…‹åˆ¶ã€BOSSï¼æ´è»èˆ‡ç§˜å¯¶éœ€æ±‚ï¼Œå†ç”± combined source é‡å»º generated assetsã€‚
-- `fix/battle-cardless-motion-ui@d802f846d80301fe96b97dea1c6055a1e13377c4` ä»¥é›™è¦ª source merge `3e98aace46d86f1dab73f25856b4d92801fe60a7` ç¶“ PR #173 åˆå…¥ `dev@d7ce985768399eb4b3071976e86805ee3f8b8fba`ã€‚è¡çªåªåœ¨å…©ä»½ manifest èˆ‡ gameplay-core hashed build renameï¼Œå‡ä»¥ combined source deterministic rebuild è§£æ±ºï¼›`js/54-v173.51-battle-qa.js` åªæ“´å……æ—¢æœ‰å–®ä¸€ observer callbackï¼Œæ²’æœ‰ç¬¬äºŒ observerï¼listenerï¼state ownerï¼ŒV142/V143 æŠ€èƒ½ VFXã€æˆ°é¬¥å¸­ä½ã€actionï¼turn UI owner å‡æœªæ”¹ã€‚
-- äº¤å‰ç¨½æ ¸å¦ç™¼ç¾å‰ä¸€å·¥ä½œåˆ†æ”¯ç•™ä¸‹çš„ BOSSï¼æ©Ÿé—œ 9:16 èˆŠè¨»è§£èˆ‡æœƒè·¨ CSS rule èª¤åŒ¹é…çš„éŽå¯¬ regexï¼›å·²æ”¹æˆç²¾ç¢ºéŽ–å®šç›®å‰ dev æ ¸å‡†çš„ 4:3 owning ruleï¼Œé¿å…å‡é™½æ€§èˆ‡èˆŠè¦æ ¼å›žæµã€‚
-- åˆ†æ”¯ 2ï¼šPR run `34578585776`ã€dev run `34578810848` SUCCESSï¼›BOSS/Tower 13/13ã€relicã€mechanismã€typographyã€mobile guards èˆ‡ 390Ã—844ï¼412Ã—915ï¼420Ã—747 Chrome suites é€šéŽï¼ŒCloudflare exact-SHA deployment èˆ‡ live QA æˆåŠŸã€‚
-- åˆ†æ”¯ 3ï¼šPR run `34580597818`ã€dev run `34580804490` SUCCESSï¼›228/228 JS syntaxã€152/152 Node/browser suitesã€299 resourcesã€242 static IDsã€22 deterministic build assetsã€releaseï¼loaderï¼git-diff gates å…¨æ•¸é€šéŽã€‚Chrome çš„ cardless battle 360Ã—800ï¼412Ã—915ã€çŽ©æ³•å°é¢ã€mobile guardsã€bootï¼skillï¼relic QAï¼Œä»¥åŠéƒ¨ç½²å¾Œ account-firstã€Abyssã€battle-layer/audio live QA å…¨éƒ¨ PASSã€‚
-- Cloudflare `https://dev.four-symbols-dev.pages.dev` å·²é©—è­‰éƒ¨ç½² manifest exact SHA `d7ce985768399eb4b3071976e86805ee3f8b8fba`ï¼ŒGameï¼Cache Version åˆ»æ„ç¶­æŒ V173.65ï¼173.65ã€‚é¡å¤– signed-out å¯¦é æª¢æŸ¥ç„¡ broken imageã€æ°´å¹³ overflow æˆ– app-origin console warning/errorï¼›æœªå»ºç«‹åŒ¿åè¨ªå®¢å¸³è™Ÿã€‚
-- Requirement Batchï¼š`release/requirement-batches/2026-09-11-three-branch-dev-integration.json`ï¼Œ7/7 VERIFIEDã€‚å…¨ç¨‹æ²’æœ‰ä»¥ `main` ç‚º base çš„ PRã€merge æˆ– pushï¼›å®Œæˆ feature deployment å¾Œ `main` ä»ç‚º `4989000c1034a6ca05a26dbdcf1ff36ed92e7d37`ã€‚
-
-## 2026-09-11 Facebook public_profile DEV è¨ºæ–·ï¼ˆTEMPï¼‰
-
-- å·¥ä½œåˆ†æ”¯ `fix/facebook-public-profile-diagnostic`ï¼ŒåŸºæº–ç‚ºç•¶æ™‚æœ€æ–° `dev@8e1a2d9cf5f2a0f6b4551b2d42fddae419eb505f`ã€‚Android DEV å·²åè¦†é‡ç¾ Meta `Invalid Scopes: email` èˆ‡ `Error Facebook / ç„¡æ³•è¼‰å…¥`ï¼›Firebase Authorized Domainsã€Meta App Domainsã€Firebase handler redirectã€App IDã€ç®¡ç†å“¡è§’è‰²ï¼Œä»¥åŠ Firebase mobile redirect å‡å·²é€é …æŽ’é™¤ã€‚
-- å®˜æ–¹ Firebase JS SDK åŽŸå§‹ç¢¼é¡¯ç¤º `FacebookAuthProvider` æœ¬èº«ä¸é è¼‰ `email` scopeï¼Œ`BaseOAuthProvider` scopes é è¨­ç‚ºç©ºï¼›å°ˆæ¡ˆä¹Ÿæ²’æœ‰ `addScope('email')`ã€‚å› æ­¤è¨ºæ–·ç›®æ¨™æ˜¯éš”é›¢ Firebase hosted Facebook OAuth ä¸‹æ¸¸æ˜¯å¦é¡å¤–è¦æ±‚ `email`ã€‚
-- æœ€çµ‚è¨ºæ–·ä¸è¼‰å…¥ Meta JavaScript SDKã€ä¸æ–°å¢žå¤–éƒ¨ runtime scriptã€ä¸æ”¾å¯¬ production manifest/release gateã€‚åƒ… `https://dev.four-symbols-dev.pages.dev/` ç”±å”¯ä¸€ Auth owner `js/firebase/firebase-auth.js` ç›´æŽ¥å°Žå‘ Meta OAuth dialogï¼Œæ˜Žç¢ºåªè¦æ±‚ `public_profile` èˆ‡ `response_type=token`ï¼›callback ä½¿ç”¨ `sessionStorage` éš¨æ©Ÿ state é©—è­‰ã€é˜² CSRFï¼Œå–å¾— token å¾Œç«‹åˆ»æ¸…é™¤ URL fragmentï¼Œå†ä»¥ Firebase å®˜æ–¹ `FacebookAuthProvider.credential(token)` + `signInWithCredential()` å›žåˆ°æ—¢æœ‰åŒä¸€ Firebase UID ownerã€‚
-- DEV ç›´æŽ¥ OAuth callback å›ºå®šç‚º `https://dev.four-symbols-dev.pages.dev/`ï¼ŒMeta â†’ Facebook ç™»å…¥ â†’ è¨­å®š â†’ã€Œæœ‰æ•ˆçš„ OAuth é‡æ–°å°Žå‘ URIã€å¿…é ˆé¡å¤–åŠ å…¥é€™å€‹å®Œæ•´ç¶²å€ï¼›åŽŸ Firebase handler `https://four-symbols-jianghu.firebaseapp.com/__/auth/handler` ä¿ç•™ä¸åˆªã€‚
-- é€™æ˜¯æ˜Žç¢º TEMP patchï¼šè‹¥ public_profile-only å¯¦æ©ŸæˆåŠŸï¼Œæ ¹å› é›†ä¸­åˆ° Firebase hosted Facebook OAuth / email scopeï¼›ä¸‹ä¸€è¼ªå¿…é ˆé¸æ“‡æ­£å¼ä¿®æ­£ Meta/Firebase scope æˆ–å°‡å·²é©—è­‰ token exchange æ”¶æ–‚æˆæ­£å¼ ownerã€‚è‹¥ä»å¤±æ•—ï¼Œç§»é™¤æ­¤è¨ºæ–·ä¸¦æŠŠæ ¹å› é›†ä¸­åˆ° Meta App/OAuth å±¤ã€‚ç¦æ­¢å†å¾€ `signInWithFacebook()` ç–Šç¬¬ä¸‰å±¤ workaroundã€‚
-- ä¸ä¿®æ”¹ `saveGame()` / `loadGame()`ã€UID ownershipã€Firestore Rulesã€é›²ç«¯/æœ¬æ©Ÿ schemaã€Game/Cache Versionï¼›`main` ä¸ä¿®æ”¹ã€‚
-
-## 2026-09-11 å¤šå°è©± dev åˆ†æ”¯ç¨½æ ¸èˆ‡ ancestry æ”¶æ–‚
-
-- ç¨½æ ¸åŸºæº–ç‚º GitHub `dev@fa21dc23971909556d65357c4e8e012c97b413d9`ã€`main@3d3e529e8e74dcced3dfcf8f82bac772a588d4a7`ï¼›ç¨½æ ¸æ™‚é ç«¯å…±æœ‰ 100 å€‹ branch headsï¼Œå…¶ä¸­ 76 å€‹å·¥ä½œï¼æ•´åˆåˆ†æ”¯å·²æ˜¯ dev ancestorï¼Œæ²’æœ‰ä»»ä½• branch æ˜¯å»ºç«‹åœ¨æœ€æ–° dev ä¹‹ä¸Šçš„æœªåˆä½µ descendantã€‚
-- 2026-09-11 åŒæ™‚å¤šå°è©±ç”¢ç”Ÿçš„æœ‰æ•ˆå·¥ä½œå·²ä¾åºå­˜åœ¨æ–¼åŒä¸€æ¢ devï¼šå†·å•Ÿå‹•å‰µè§’ lifecycleã€å‰µè§’ç¬¬ 2 æ­¥åº•éƒ¨ actionsã€å…©å¹• boot intro èˆ‡ compact auth overlayã€privacy policyï¼Œä»¥åŠ Facebook mobile redirectï¼›æœ€æ–° dev çš„ Repository checks èˆ‡ Cloudflare exact-SHA deployment å‡ç‚º SUCCESSï¼Œä¸å­˜åœ¨ä¸‰å¥—äº’ç›¸ç«¶çˆ­çš„ç¨‹å¼ç¢¼ã€‚
-- å”¯ä¸€éœ€è¦æ”¶æ–‚çš„æ˜¯ protected main release merges çš„ ancestryã€‚`git merge-tree --write-tree dev main` ç”¢ç”Ÿ tree `8d06fde7d9442b8f0c14562822ec7fef421a055e`ï¼Œèˆ‡åˆä½µå‰ dev tree å®Œå…¨ç›¸åŒï¼›æ•´åˆ commit `6ae1b494f5c24858bed329cabe4a33eacc5983a6` å› æ­¤åªå¢žåŠ  main parentï¼Œä¸æ”¹ä»»ä½•éŠæˆ²ã€UIã€buildã€release metadataã€Firebaseã€å­˜æª”æˆ–çŽ©å®¶è³‡æ–™ã€‚
-- èˆŠè‰ç¨¿ PR #146ï¼`fix/ui-equipment-gameplay-city-polish` å·²ç”± `fix/ui-equipment-gameplay-city-polish-continued@26a67473128674c91fa363cefbd33e5f3f1c8034` çš„å®‰å…¨ owner-converged ç‰ˆæœ¬å–ä»£ï¼Œä¸¦æ—©å·²é€éŽ `2f3dc7d13df8e3c629b0544b52c494416a6f6ab1` åˆå…¥ devï¼›PR #146 å·²ç•™ä¸‹ superseded èªªæ˜Žå¾Œé—œé–‰ï¼Œç¦æ­¢å†æ¬¡åˆå…¥èˆŠ manifestï¼buildã€‚
-- `feature/facebook-login` çš„ branch aggregate patch èˆ‡ dev integration commit `2d713dd08bee8efa7abf0ad18b61c950c9af9fa8` patch-id å®Œå…¨ç›¸åŒï¼Œå¾ŒçºŒ mobile redirect äº¦å·²åœ¨ devï¼›æ­¤èˆŠåˆ†æ”¯ä¸éœ€å† mergeã€‚`noop`ï¼`noop3`ï¼`noop4` åªæ–°å¢žå ä½æª”ï¼Œ`assets-library` ä»ç‚ºç´ æå°ˆç”¨ï¼Œå…¶é¤˜ divergent branches å‡æ˜¯å·²å–ä»£çš„èˆŠåŸºåº•æˆ–æ­·å² releaseï¼verification branchï¼Œçš†ä¸å¾—ç›´æŽ¥åˆå…¥ç›®å‰ devã€‚
-- æœ¬æ¬¡åªä»¥ PR #162 æ•´ç† ancestry èˆ‡æœ¬äº¤æŽ¥ç´€éŒ„ï¼›Gameï¼Cache Version ç¶­æŒ V173.65ï¼173.65ï¼Œ`main` ä¸ä¿®æ”¹ã€‚Repository checks æˆåŠŸä¸” PR åˆå…¥å¾Œï¼Œå¿…é ˆå†æ¬¡ç¢ºèª dev HEADã€Cloudflare deployed manifest SHA èˆ‡ç‰ˆæœ¬ä¸€è‡´ï¼Œæ‰å¯å›žå ±å®Œæˆã€‚
-
-## 2026-09-10 å››åˆ†æ”¯å®‰å…¨æ•´åˆï¼šBoss 9:16 æ‰‹æ©Ÿç‰ˆé¢ï¼ˆdev integrationï¼‰
-
-- æŒ‡å®šå·¥ä½œåˆ†æ”¯ `fix/boss-ui-9x16-mobile-20260910@0865bbaef3e8c1ee5f054bf4774bc800db9f7ec2` çš„ Boss èˆ‡æ©Ÿåˆ¶å¡ 9:16 CSS å·²æ•´åˆåˆ°æ­£å¼ owner `css/gameplay-boss-tower.css`ã€‚
-- èˆ‡ç§˜å¯¶åˆ†æ”¯å…±åŒä¿®æ”¹ `asset-manifest.json`ã€`build/asset-manifest.json` èˆ‡ `feature-boss-relic` bundleï¼›äººå·¥æ•´åˆä¿ç•™ Boss CSS æ–°ç‰ˆã€ç§˜å¯¶æ¨™ç±¤ï¼é›œæ¹Šç´ æã€ä»¥åŠå…¶å¾Œè¼‰å…¥çš„ `feature-relic-progression` CSS/JSã€‚
-- Boss åˆ†æ”¯å»ºç«‹æ–¼èˆŠ devï¼›æœªå¸¶å›žèˆŠ manifestã€èˆŠè³‡æºè·¯å¾‘æˆ–å…¶ä»– runtimeã€‚æ¸¬è©¦æ¶µè“‹ 360Ã—800ã€393Ã—873ã€412Ã—915ï¼Œä¸¦ä½¿ç”¨é•· HP `5601 / 5601` é©—è­‰å¡ç‰‡ä¸æº¢ä½ã€‚
-- CSS å“è³ªæª¢æŸ¥å…ˆç§»é™¤è¨»è§£å†æŽƒæå…¨æª” `!important` å®£å‘Šï¼›è¨»è§£ä¸­çš„è©žå½™ä¸æœƒé€ æˆèª¤åˆ¤ï¼Œå¯¦éš› Boss owner ä»ç„¡å„ªå…ˆæ¬Šè£œä¸ã€‚
-
-## 2026-09-10 Facebook Firebase ç™»å…¥è£œé½Šï¼ˆPR #152ï¼‰
-
-- å·¥ä½œåˆ†æ”¯ `feature/facebook-login`ï¼›æ•´åˆåŸºæº–æ”¶æ–‚åˆ° `dev@2f3dc7d13df8e3c629b0544b52c494416a6f6ab1`ã€‚Firebase Console å·²å•Ÿç”¨ Email/Passwordã€Googleã€Facebookã€Anonymousï¼›æœ¬æ¬¡è£œé½Šæ—¢æœ‰ Authentication owner ç¼ºå°‘çš„ Facebook providerã€‚
-- `js/firebase/firebase-auth.js` æ–°å¢ž `FacebookAuthProvider` / `signInWithFacebook()`ï¼›`js/firebase/firebase-auth-ui.js` åœ¨æ—¢æœ‰ account-first responsive dialog åŠ å…¥ã€ŒFacebook ç™»å…¥ã€ã€busy/error handlingï¼›`js/firebase/firebase-bootstrap.js` é€éŽæ—¢æœ‰ `FourSymbolsFirebaseLifecycle` æš´éœ²åŒä¸€ç™»å…¥æ–¹æ³•ã€‚æ²’æœ‰æ–°å¢žç¬¬äºŒå¥— Auth ownerã€modal wrapper æˆ– runtime patchã€‚
-- deterministic build å·²é‡æ–°ç”¢ç”Ÿ content-hashed Firebase/Boot assets èˆ‡ manifestsï¼›`.github/scripts/run-boot-architecture-browser-qa.mjs` çš„ Firebase Auth test double åŒæ­¥è£œ `signInWithFacebook()`ï¼Œä¸¦æ“´å…… Auth source contract èˆ‡ 390Ã—844ã€360Ã—640ã€844Ã—390 responsive fixtureã€‚
-- ä¸ä¿®æ”¹ `saveGame()` / `loadGame()`ã€UID local ownershipã€Startup State Machineã€Firestore browser write policyã€é›²ç«¯/æœ¬æ©Ÿå­˜æª” schemaã€Game/Cache Versionï¼›`main` ä¸åœ¨æœ¬å·¥ä½œä¿®æ”¹ã€‚
-- Meta live å‰æï¼šValid OAuth Redirect URIs å¿…é ˆåŒ…å« `https://four-symbols-jianghu.firebaseapp.com/__/auth/handler`ã€‚åˆå…¥ dev å¾Œä»éœ€æ‰‹æ©Ÿå¯¦æ¸¬ Facebook popupã€Firebase UID èˆ‡åŒ UID å­˜æª”è§£æžã€‚
-
-## 2026-09-10 å››åˆ†æ”¯å®‰å…¨æ•´åˆï¼šScreen Wake Lock owner æ”¶æ–‚ï¼ˆdev integrationï¼‰
-
-- æŒ‡å®šå·¥ä½œåˆ†æ”¯ `feature/screen-wake-lock-runtime-20260910@55054cb18c93d319653922541b343079cc41eb19` çš„å¯è¦‹é é¢å¸¸äº®éœ€æ±‚ä¿ç•™ï¼›æ•´åˆæ™‚ç§»é™¤ `index.html` å…§æœªç™»è¨˜çš„ inline runtimeï¼Œæ”¹ç”± `js/startup/screen-wake-lock-runtime.js` ä½œå”¯ä¸€ ownerï¼Œä¸¦ç´å…¥æ—¢æœ‰å–®ä¸€ hashed Boot Coreã€‚å®ƒåªå®‰è£ç”Ÿå‘½é€±æœŸä¸¦ fire-and-forget å‘¼å« Wake Lock APIï¼Œä¸ç­‰å¾…ã€ä¸é˜»å¡ž Authï¼å­˜æª”ï¼é¦–å€‹å¯æ“ä½œç•«é¢ã€‚
-- `visibilitychange` hidden èˆ‡ `pagehide` æœƒä¸»å‹•é‡‹æ”¾ï¼›visibleï¼`pageshow` æœƒæ¢å¾©ã€‚`requestGeneration` ä½¿ release å¾Œæ‰å®Œæˆçš„ pending request å¤±æ•ˆä¸¦ç«‹å³é‡‹æ”¾ï¼Œé¿å…é é¢å·²é›¢é–‹ä»é‡æ–°æŒéŽ–ï¼›å…¨åŸŸ guard ä¿è­‰ä¸æœƒé‡è¤‡å®‰è£ listenerã€‚å…¬é–‹è¨ºæ–·ä»ç‚º `window.FourSymbolsScreenWakeLock`ã€‚
-- `tests/screen-wake-lock.test.js` è¦†è“‹ unsupportedï¼æ‹’çµ•ã€é‡è¤‡ acquireã€hidden releaseã€pageshow/pagehideã€pending race èˆ‡é‡è¤‡å®‰è£ï¼›`tests/boot-architecture.test.js` æ°¸ä¹…ç¦æ­¢ `index.html` å†å‡ºç¾æœªç™»è¨˜ inline executable scriptã€‚æ­£å¼è£ç½®æ˜¯å¦ç¢ºå¯¦ä¸ä¼‘çœ ä»éœ€åœ¨ HTTPS dev èˆ‡æ”¯æ´ Screen Wake Lock çš„æ‰‹æ©Ÿé©—è­‰ã€‚
-
-## 2026-09-10 V173.65 ç™»å…¥è‡ªé©æ‡‰èˆ‡å…±ç”¨å®¢æœä¿¡ç®±ï¼ˆMAIN RELEASEDï¼‰
-
-- åŸºæº–ç‚º `dev@2bd79fb3c0133101caa3ba7a0345b7e39277f94d`ï¼Œå·¥ä½œåˆ†æ”¯ `fix/v17365-auth-responsive-support`ã€‚ä½¿ç”¨è€…å›žå ± Androidï¼å…§åµŒç€è¦½å™¨çš„æœªç™»å…¥ç•«é¢åªéœ²å‡º 1080Ã—1920 stage å³ä¸‹è§’ï¼Œä¸¦è¦æ±‚ç™»å…¥é ã€ç³»çµ±é èˆ‡å…å»£å‘Šæœå‹™è³‡è¨Šçµ±ä¸€é¡¯ç¤ºå®¢æœä¿¡ç®± `tf00913225@gmail.com`ã€‚
-- æ ¹å› æ˜¯ `js/firebase/firebase-auth-ui.js` åœ¨ä½¿ç”¨è€…å°šæœªç™»å…¥ã€`app-shell`ï¼`js/00-main.js` stage scaler å°šæœªè¼‰å…¥æ™‚ï¼Œå°±æŠŠ account overlay æŽ›å…¥å›ºå®š `#game-stage`ã€‚ç™»å…¥ UI ç¾æ”¹æŽ› `document.body`ï¼›`css/firebase-auth.css` ä»¥ fixed real viewportã€`100dvh`ã€safe-areaã€clamp å­—ç´šã€å…§éƒ¨åž‚ç›´ scroll èˆ‡çª„å¹…ï¼æ©«å‘ breakpoint è² è²¬è‡ªé©æ‡‰ï¼Œä¸å†ä¾è³´ç™»å…¥å¾Œ runtime æ‰ç¸®æ”¾ã€‚
-- `js/startup/support-contact.js` æ˜¯å”¯ä¸€å®¢æœè³‡æ–™èˆ‡å…±ç”¨è¯çµ¡è¦–çª— ownerï¼Œç´å…¥ Critical Bootï¼Œå›ºå®šä¿¡ç®±ç‚º `tf00913225@gmail.com`ã€‚ç™»å…¥é çš„ã€Œè¯çµ¡å®¢æœã€èˆ‡ç³»çµ±é çš„ã€Œå®¢æœä¿¡ç®±ï¼æŸ¥çœ‹ä¿¡ç®±ã€å‘¼å«åŒä¸€ `FourSymbolsSupport.show()`ï¼›å…å»£å‘Šæœå‹™è³‡è¨Šäº¦è®€å–åŒä¸€ ownerï¼Œä¸å†å‡ºç¾ã€Œå®¢æœ Emailï¼šå°šæœªè¨­å®šã€ã€‚
-- æ–°å¢ž `tests/v174-auth-responsive-support.test.js`ï¼Œå›ºå®š 390Ã—844ã€360Ã—640ã€844Ã—390 ä¸‰ç¨® viewport çš„ auth overlayï¼dialog é‚Šç•Œã€æ°´å¹³ overflowã€å…±ç”¨å®¢æœè¦–çª—èˆ‡ emailï¼›åŒæ­¥æ“´å…… Firebaseã€ad-free regressionã€‚Requirement Batchï¼š`release/requirement-batches/2026-09-10-responsive-auth-support-contact.json`ï¼Œ3/3 å·² VERIFIEDã€‚
-- PR #136ï¼ˆhead `72cfd90b8377a51ad391e90dbf63d11fdb3c6df3`ï¼‰Repository checks run `34440677556` é‡è·‘æˆåŠŸå¾Œåˆå…¥ `dev@ed0aaab9d8f1d0f39edab5cbe6bdf02089cd6f66`ï¼›dev run `34441228608` çš„ Repository checks èˆ‡ Cloudflare deployment å‡æˆåŠŸï¼Œdeployed manifest SHA äº¦ç²¾ç¢ºå»åˆã€‚å¯¦é  `https://dev.four-symbols-dev.pages.dev/` é¡¯ç¤º V173.65ï¼Œç™»å…¥ overlay ç‚º `BODY` ä¸‹çš„ fixed viewport surfaceã€dialog å®Œæ•´ä½æ–¼ viewport å…§ï¼›é»žæ“Šã€Œè¯çµ¡å®¢æœã€é¡¯ç¤º `tf00913225@gmail.com`ã€‚æœ¬æ©Ÿå®Œæ•´é©—è­‰ï¼šNode tests 140/140ã€JavaScript syntax 214/214ã€static resources 303ã€HTML IDs 249ï¼ŒåŠ ä¸Š deterministic buildã€loaderã€releaseã€git diff gates å…¨æ•¸é€šéŽã€‚Gameï¼Cache Version ç¶­æŒ V173.65ï¼173.65ã€‚ä½¿ç”¨è€…æ–¼ 2026-09-10 æ˜Žç¢ºåŒæ„ä»¥å—ä¿è­· PR æŽ¨é€² `main`ã€‚
-- æ ¸å‡†ç´€éŒ„ PR #138 çš„ Repository checks run `34443468268` SUCCESSï¼Œåˆå…¥æœ€çµ‚ `dev@3512dc1273acbcd4b6836ffbfa32b7fb83c1a563`ï¼›dev push run `34443625297` çš„ Repository checksã€Cloudflare exact-SHA deployment èˆ‡ live QA å…¨éƒ¨ SUCCESSã€‚å—ä¿è­· promotion PR #139 çš„ Repository checks run `34444001508` SUCCESS å¾Œåˆå…¥ `main@0ab586409b9d50a8b46a6436d9a82bf59f07fb52`ï¼Œmain tree `57a588bac0af491715d2ab286e9c356ba68cc7d3` èˆ‡æ ¸å‡† dev tree å®Œå…¨ä¸€è‡´ã€‚main CI run `34444120869` SUCCESSï¼›GitHub Pages run `34444119929` çš„ buildï¼deployï¼report å…¨éƒ¨ SUCCESSï¼Œartifact `10139005197` èˆ‡ `pages_build_version` å‡ç¶å®šåŒä¸€ main SHAã€‚æ­£å¼ç¶²å€ `https://tf00913225-alt.github.io/my-game/` å·²è®€å›žæ¨™é¡Œ V173.65ã€`build/boot-core.5c427ac9f8a4.js` èˆ‡ `build/boot-core.ebcef3e27424.css`ï¼›ç™»å…¥ overlay å¯¦æ¸¬æŽ›æ–¼ `BODY`ã€position fixedã€å®Œæ•´ä½æ–¼ viewportï¼Œé»žæ“Šã€Œè¯çµ¡å®¢æœã€é¡¯ç¤º `tf00913225@gmail.com` èˆ‡ `mailto:tf00913225@gmail.com`ã€‚æ­£å¼é é¢ç„¡ app-origin console errorï¼›V173.65 æœ¬æ‰¹ç™¼å¸ƒå®Œæˆã€‚
-
-## 2026-09-10 V173.65 battle/audio live QA race follow-upï¼ˆMAIN RELEASEDï¼‰
-
-- Work branchesï¼š`fix/v17365-battle-live-qa-race` èˆ‡ `fix/v17365-battle-live-qa-cast-race`ï¼ŒåŸºæº–éˆè‡ª release merge å¾Œçš„ `dev@1783d3847ef7e2835915d763c4d517268e5a6098` é–‹å§‹ï¼›PR #129ã€#131 èˆ‡æœ€çµ‚ç´€éŒ„ PR #132 å‡åœ¨ Repository checks æˆåŠŸå¾Œåˆå…¥ï¼Œæœ€çµ‚æ ¸å‡† tip ç‚º `dev@6cb25539a87891161168970ee9b4d4dc0c278b87`ã€‚å—ä¿è­· promotion PR #133 çš„ Repository checks run `34436151522` SUCCESS å¾Œåˆå…¥ `main@389765910b32b1de498b74fd9b58dcb7dbef4234`ã€‚
-- Release merge çš„ Actions run `34430685287` å·²é€šéŽ Repository checksã€Cloudflare exact-SHAï¼V173.65 é©—è­‰ã€live account-first cold-start èˆ‡ live Abyss QAï¼›å”¯ä¸€å¤±æ•—ç‚º `.github/scripts/battle-layer-audio-live-qa.mjs` çš„ V143ï¼å…ƒç´ åŒ£ç–Šå±¤æª¢æŸ¥ã€‚åŽŸå§‹ attempt åœ¨é–‹ modal å¾Œè®€åˆ°å·²çµæŸçš„ stageï¼Œé‡è·‘ attempt 2 å‰‡åœ¨é–‹ modal å‰ç­‰å¾…æ¸¬è©¦ stage æ™‚å·²è¢«ä¸‹ä¸€å€‹çœŸå¯¦æˆ°é¬¥å‹•ä½œ supersedeï¼Œè­‰æ˜Žå¤±æ•—ä¾†è‡ªè·¨ CDP round-trip çš„ live battle æ™‚åºç«¶æ…‹ï¼Œä¸æ˜¯æ­£å¼ç–Šå±¤æˆ– VFX owner å›žæ­¸ã€‚
-- QA owner æ”¹ç‚ºå…©å€‹å„è‡ª atomic çš„ browser taskï¼šç¬¬ä¸€å€‹åœ¨æ­£å¼ `castDamageSkill('explosiveFlurry')` è¿”å›žå‰ç«‹å³æ“·å–å…¶ V143 raster stageï¼Œè­‰æ˜ŽçœŸå¯¦æˆ°é¬¥æ–½æ”¾æœƒåˆ°é” V143ï¼›ç¬¬äºŒå€‹ä¾åºå‘¼å«æ­£å¼ `v142SkillAnimationDirector.play()`ã€å–å¾— stageã€å‘¼å«æ­£å¼ `openHomeFeature('autoBattleSettings')` wrapper chainï¼Œä¸¦ç«‹å³é©—è­‰å‰å¾Œç‚ºåŒä¸€ DOM nodeã€stage ä» mountedã€presentation å·² hiddenï¼opacity 0ã€modal ownership èˆ‡ audio scale æ­£ç¢ºã€‚
-- `js/37-v142-skill-animation.js`ï¼ˆgateï¼supersedeï¼‰ã€`js/39-v143-skill-animation.js`ï¼ˆraster stage lifecycleï¼‰ã€`js/45-v154-dev-fixes.js` èˆ‡ `css/46-v154-dev-fixes.css`ï¼ˆå…ƒç´ åŒ£ focusï¼presentation suppressionï¼‰å‡æœªä¿®æ”¹ï¼›æ²’æœ‰æš«åœæˆ°é¬¥ã€å»¶é•·æ­£å¼å‹•ç•«ã€ä¿ç•™ idle stageã€å¢žåŠ  wrapper æˆ–æ–°å¢ž runtime patchã€‚
-- `tests/v174-battle-layer-audio-fixes.test.js` æ–°å¢ž regressionï¼Œå›ºå®šæ­£å¼ cast è­‰æ“šèˆ‡ modal overlap è­‰æ“šå„è‡ªåœ¨å–®ä¸€ atomic browser snapshot å…§å®Œæˆï¼Œæ¶µè“‹ production castã€directorã€æ­£å¼å…ƒç´ åŒ£ opener èˆ‡ stage identityï¼Œç¦æ­¢æ¢å¾©æœƒèˆ‡æŒçºŒæˆ°é¬¥ç«¶é€Ÿçš„ç­‰å¾…å¼æª¢æŸ¥ã€‚
-- æœ¬æ©Ÿå·²é€šéŽï¼š139/139 Node suitesã€212/212 JavaScript syntaxã€303 static resourcesã€249 unique HTML IDsã€deterministic buildã€loaderã€V173.65 release gateï¼ˆ10/10ï¼‰ã€git-diffï¼conflict-marker gatesã€‚Gameï¼Cache Version ç¶­æŒ V173.65ï¼173.65ã€‚
-- GitHub Actions push run `34434007783` çš„ Repository checks èˆ‡ Dev deployment gate å…¨éƒ¨ SUCCESSï¼šCloudflare å·²è®€å›ž exact SHA `1a3b5a35942e9821f3fad2c933afe198126597b0`ï¼Œlive account-first auth UI 1253.6 msï¼ˆ5 ç§’ç›®æ¨™é”æˆï¼‰ï¼Œlive Abyss èˆ‡ä¿®æ­£å¾Œ battle/audio mobile QA å‡ PASSã€‚
-- å¾ŒçºŒç´”æ–‡ä»¶ deploy run `34434554334` æ­éœ²æ­£å¼ Fire Flurry cast çš„è­‰æ“šä»è·¨è¶Š wait/read CDP round-tripï¼Œ1.45 ç§’ stage åœ¨è®€å€¼å‰åˆæ³•çµæŸè€Œå¾—åˆ° `skill:null`ï¼›PR #131 å°‡é€™ä¸€æ®µä¹Ÿæ”¹ç‚º atomic snapshotã€‚ä¿®æ­£å¾Œ push run `34435227337` å…¨æ•¸ SUCCESSï¼šCloudflare exact SHA `e47a0ca8d1d39363640abb4e9d4755f73c809a73`ã€live account-first auth UI 2014.9 msã€live Abyss èˆ‡ live battle/audio mobile QA å…¨æ•¸ PASSã€‚æœ€çµ‚æ–‡ä»¶ merge å¾Œçš„ dev push run `34435831671` å†æ¬¡å…¨æ•¸ SUCCESSï¼šexact SHA `6cb25539a87891161168970ee9b4d4dc0c278b87`ã€V173.65ï¼cache 173.65ã€10/10 VERIFIEDã€auth UI 897.5 msã€Abyss èˆ‡ battle/audio å‡ PASSã€‚
-- æ­£å¼ main push run `34436296299` çš„é¦–æ¬¡ Chrome fixture åœ¨ `ui-critical-regressions-mobile-browser` é‡åˆ°ä¸€æ¬¡æ€§ RAFï¼timer æŽ’ç¨‹æŠ–å‹•ï¼›åˆä½µ tree èˆ‡å·²é©—è­‰ dev tree å®Œå…¨ç›¸åŒï¼Œè©²æ¸¬è©¦åŒä»½ tree æœ¬æ©Ÿé€£è·‘ 20/20 PASSï¼Œå®˜æ–¹ failed-job rerun éš¨å¾Œ Repository checks SUCCESSã€‚GitHub Pages run `34436294497` çš„ buildï¼deploy å…¨éƒ¨ SUCCESSï¼Œartifact `10136282359` èˆ‡ deployment å‡ç¶å®š exact main SHA `389765910b32b1de498b74fd9b58dcb7dbef4234`ï¼›æ­£å¼ç¶²å€ `https://tf00913225-alt.github.io/my-game/` å·²è®€å›žé é¢æ¨™é¡Œ V173.65ã€`build/boot-core.46539aba8ff7.js`ã€`build/boot-core.83625fb1541f.css` èˆ‡å¯è¦‹ account-first ç™»å…¥å…¥å£ã€‚V173.65 æ­£å¼ç™¼å¸ƒå®Œæˆã€‚
-
-## 2026-09-10 V173.65 Account-first Boot Architectureï¼ˆDEV VERIFIEDï¼å·²æŽˆæ¬ŠæŽ¨é€² mainï¼‰
-
-- åŸºæº–ç‚º GitHub `dev@70df66e8cb371ff6193a7f70609cf9aad7bd15ac`ï¼›åŽŸå·¥ä½œåˆ†æ”¯ `perf/cold-start-auth-boot-architecture` ç¶“ PR #123 åˆå…¥ devï¼Œå¾ŒçºŒåƒ…ä»¥ PR #124ï½ž#127 ä¿®å¾©éƒ¨ç½² header èˆ‡æ—¢æœ‰ Live QA å°æ–° lazy owner çš„èˆŠå‡è¨­ã€‚ä½¿ç”¨è€…å·²æ˜Žç¢ºæŽˆæ¬Šä¾åºå®Œæˆ dev preview å¾ŒæŽ¨é€² mainã€‚
-- `js/startup/startup-contract.js` + `js/52-v173.20-startup-loader.js` æ˜¯å”¯ä¸€ StartupStateMachine ownerã€‚æ­£å¼ç‹€æ…‹ç‚º `BOOT_LOADING / AUTH_RESOLVING / AUTH_REQUIRED / SAVE_LOADING / MIGRATION_REQUIRED / NEED_CHARACTER / READY / OFFLINE_READY / ERROR`ï¼›å‰µè§’åªæœ‰ `NEED_CHARACTER` ä¸” Auth UID/resolved UID/active UID ä¸€è‡´æ™‚å¯è¦‹ã€‚
-- `js/startup/account-save-repository.js` æ˜¯ UID local ownership èˆ‡ legacy migration ownerã€‚Canonical key ç‚º `four_symbols_save:{uid}`ï¼Œmetadata èˆ‡ sidecar äº¦ä¾ UID éš”é›¢ï¼›`battle_full_version_save_v5` ä¸è‡ªå‹•ç¶å®šï¼Œmigration å¿…é ˆç¢ºèªã€å…ˆå‚™ä»½ã€è¡çª fail closedã€‚
-- `scripts/build-production.mjs` ç”¢ç”Ÿ deterministic content-hashed boot/app/gameplay/feature bundlesï¼›`asset-manifest.json` æ˜¯å¯¦éš› Critical/Feature deploy manifestã€‚Execution order å›ºå®šåœ¨ bundle source listï¼Œç¶²è·¯ preparation ä¸¦è¡Œï¼Œä¸å†ç”¨å¤§é‡ sequential HTTP request ç¶­æŒ wrapper é †åºã€‚
-- `js/startup/feature-loader.js` æ˜¯å”¯ä¸€å‹•æ…‹ script ownerï¼›`js/20-anonymous-20.js` åªè² è²¬ pointer/touch prefetchã€feature-local loading èˆ‡ idle preloadï¼Œä¸å†æœ‰ 32-runtime å…¨åŸŸ input lockã€‚å·²æœ‰å¸³è™Ÿåˆ°ä¸»åŸŽåªç­‰ app shellï¼›gameplay/patrol/abyss/skill/boss/relic ç­‰ä¸é˜»å¡ž Authï¼å‰µè§’ï¼ä¸»åŸŽã€‚
-- 61 å€‹ `v131-patrol-sprite-*.js` chunk å·²åˆªé™¤ï¼›`js/26-v131-patrol-appearance.js` æ”¹ç”¨ 16 å€‹ `assets/characters/patrol/*.webp` content-hashed æ­£å¸¸è³‡ç”¢ã€‚Critical logo äº¦æ”¹ç‚º `assets/ui/startup-logo.4631c0bc3f2b.jpg`ã€‚
-- Firebase æ­£å¼é †åºæ”¹ç‚º identity â†’ UID â†’ cloud/local read â†’ destinationï¼›è¨ªå®¢ä½¿ç”¨ Anonymous Authã€‚æ­£å¼å¸³è™Ÿ UI å·²ç§»é™¤ã€Œå…ˆä½¿ç”¨æœ¬æ©Ÿå­˜æª”ã€ã€‚Firestore browser write ä»ç¦æ­¢ï¼Œtrusted-backend-only policy æœªæ”¾å¯¬ã€‚
-- æ°¸ä¹…è¦æ ¼è¦‹ `docs/BOOT_ARCHITECTURE.md`ï¼›before static baseline èˆ‡å¯¦æ¸¬ browser evidence è¦‹ `docs/BOOT_PERFORMANCE_BASELINE.md`ã€‚æ–°å¢ž account/auth/boot/feature/budget Node gatesã€controlled mobile Chrome QA èˆ‡ deployed live cold-start QAã€‚
-- DEV verification commit `08d23ecbf38ab74a6b1ef4ced43fefcded02901a`ã€Actions run `34428020728`ï¼š139/139 Node suitesã€controlled account-first browser QAã€Cloudflare exact-SHA deployã€live auth-first cold bootã€Abyss èˆ‡ battle/audio mobile QA å…¨æ•¸ SUCCESSã€‚Live signed-out auth UI 693.3 msã€first paint 448 msã€10 requestsï¼356,374 Bï¼›controlled warm existing-user city interactive 475 msã€‚
-- Requirement Batchï¼š`release/requirement-batches/2026-09-09-cold-start-auth-boot-architecture.json`ï¼Œ12/12 VERIFIEDï¼›ç™¼å¸ƒå€™é¸ V173.65ã€‚æ­£å¼ main promotion ä»é ˆå—ä¿è­· PRã€main CIã€GitHub Pages deploy èˆ‡ production exact-SHA/version é©—è­‰å¾Œæ‰èƒ½å®£ç¨±å®Œæˆã€‚
-
-## 2026-09-08 ä¸‰åˆ†æ”¯ gameplayï¼ç§˜å¯¶æ–¹å½¢åœ–ï¼å…¨åŸŸéžæˆ°é¬¥å­—ç´šå®‰å…¨æ•´åˆï¼ˆdevï¼‰
-
-- æ•´åˆå‰ GitHub `dev` ç‚º `39767ce2b9dbfa59650b7c5fd4d52a57a2642ea5`ï¼›ä¸‰æ¢é ç«¯ branch tip å‡ç²¾ç¢ºç­‰æ–¼ä½¿ç”¨è€…æŒ‡å®š SHAï¼Œä¸” merge base éƒ½æ˜¯è©² devã€0 behindï¼Œæ²’æœ‰äº’ç›¸åŒ…å«ã€‚å¯¦éš›é †åºä¾ ownerï¼è¦–è¦ºå±¤ç´šç‚º gameplay regressions â†’ relic square art â†’ global non-battle typographyã€‚
-- `fix/gameplay-ui-battle-regressions-20260908@4a592dd4c41d7efb1a4849fbfe0cbf68598121bf` ä»¥ merge commit `035845aa703a7a72c053ae9d0945b9f1f75d4be2` åˆå…¥ï¼›`js/01-stage-v8-touch-lock.js`ã€`js/41-v146-system-polish.js`ã€`js/53-v173.50-inventory-qol.js` ä»æ˜¯è§¸æŽ§ã€åœ°ä¸‹åŸŽå°Žèˆªèˆ‡èƒŒåŒ… stack identity ownerã€‚CI run `34238583523` SUCCESSã€‚
-- `fix/ui-relic-square-art@1788efe7bd20492014b75f1311ab2badde0e7ba0` ä»¥ merge commit `9fae60e148f39782e3b09b71b4ade604243fea65` åˆå…¥ï¼›ç§˜å¯¶ current/list/detail çµ±ä¸€ 1:1 `aspect-ratio`ã€`object-fit:contain`ï¼Œä¿ç•™å–®ä¸€ `def.iconPath` runtime è³‡æ–™æµã€‚CI run `34239750357` SUCCESSã€‚
-- `fix/global-ui-font-size-standard@58dfa219269c8d8a5f31675adbeceb5c920e5bfe` ä»¥ merge commit `1ee3cc8fbfbced873080f21b0cc4c64f1f670875` åˆå…¥ã€‚åªåœ¨ `css/52-v173.50-inventory-qol.css` èˆ‡ `css/55-team-relic-system.css` ç™¼ç”Ÿ Git conflictï¼›æ²’æœ‰ JS å‡½å¼ã€listenerã€state æˆ– runtime owner è¡çªã€‚
-- `css/52` äººå·¥ä¿ç•™ gameplay åˆ†æ”¯çš„é»‘é‡‘ï¼danger æ‰¹é‡æ“ä½œå¤–è§€ï¼Œä¸¦åˆå…¥ typography åˆ†æ”¯çš„ 15px èˆ‡ 36ï½ž38px æŽ§åˆ¶å°ºå¯¸ï¼›`css/55` åŒæ™‚ä¿ç•™ gameplay åˆ†æ”¯çš„å…¥å£ WebPï¼`pan-x pan-y`ã€square-art åˆ†æ”¯çš„ 1:1 åœ–å€èˆ‡ detail gridã€typography åˆ†æ”¯çš„ 13ï½ž18px å±¤ç´šåŠ 390px responsive é«˜åº¦ã€‚æœªä½¿ç”¨æ•´æª” ours/theirsï¼Œæ²’æœ‰é‡è¤‡ selector owner æˆ–èˆŠè¦å‰‡å›žé€€ã€‚
-- typography çš„ battle-preservation æ¸¬è©¦åŽŸæœ¬æŠŠæ•´åˆå‰ dev ç•¶å”¯ä¸€ BOSS åŸºæº–ï¼Œæœƒèª¤æ“‹ç¬¬ä¸€åˆ†æ”¯æ ¸å‡†çš„ mechanism lifecycle èˆ‡ 9pxï¼charge 10px ä¿®æ­£ï¼›merge resolution æ”¹ç‚ºç²¾ç¢ºä¿è­·æŒ‡å®š gameplay commitã€‚é¦–æ¬¡ CI run `34242410904` å¦æ­éœ² `fetch-depth:2` ç¼ºå°‘å…©å€‹å›ºå®šæ­·å² treeï¼Œæ•…ç”± `.github/workflows/ci.yml` åœ¨æ—¢æœ‰ comparison-base step ç²¾æº– fetchï¼Œfollow-up `ff5db2efabfff533a39724b16850a2169031f4f7` ä¿®æ­£ï¼›æ·ºå±¤ clone é‡ç¾èˆ‡ä¿®å¾©å‡å·²é©—è­‰ã€‚
-- åŠŸèƒ½æ¨¹æœ€çµ‚ CI run `34243622829` SUCCESSï¼š250/250 JavaScript syntaxã€125/125 Node suitesã€467 static resourcesã€291 unique HTML IDsã€108 loader dependenciesï¼26 ordered runtimesã€Release Gate 10/10ã€git-diffã€skill progression mobile Chromeã€live Abyss èˆ‡ battle/audio å…¨éƒ¨é€šéŽï¼›éƒ¨ç½² SHA ç²¾ç¢ºé©—è­‰ç‚º `ff5db2efabfff533a39724b16850a2169031f4f7`ï¼ŒGameï¼Cache Version ç¶­æŒ V173.64ï¼173.64ã€‚
-- DEV Cloud Browser å¯¦æ¸¬ï¼šç§˜å¯¶ 20 å¡ã€å…©æ¬„ã€current/list/detail æ–¹å½¢åœ–å€ ratio=1ã€å¡ç‰‡ overflow=0ã€modal body 0â†’527ã€tabs 0â†’121ã€detail hero ç„¡ overflowã€è¿”å›žåˆ—è¡¨æ­£å¸¸ï¼›56 stylesheetsã€broken image 0ã€app-origin console error/warning 0ã€‚ä¸‰å¼µæ–°å¢ž UI WebP å‡ HTTP 200ï¼`image/webp`ã€‚
-- ä¸‰å€‹å·¥ä½œåˆ†æ”¯æŒ‡å®š SHA éƒ½æ˜¯æœ€çµ‚ dev çš„ ancestorï¼›æœ¬è¼ªæ²’æœ‰æ–°å¢ž listenerã€æ²’æœ‰é‡è¤‡ inventory identity å‡½å¼ã€æ²’æœ‰å¤±æ•ˆ import/pathã€‚`main` æœª mergeã€æœª pushã€æœªå»ºç«‹ä¿®æ”¹ main çš„ PRï¼›ä»é ˆæ˜Žç¢ºæŽˆæ¬Šæ‰å¯æŠŠæœ¬è¼ªæŽ¨é€² mainã€‚
-- æœ¬è¼ª Requirement Batchï¼š`release/requirement-batches/2026-09-08-three-branch-dev-integration.json`ï¼ˆ8/8 VERIFIEDï¼‰ã€‚
-
-## 2026-09-08 V173.64 çŽ©æ³•ä¸­å¿ƒï¼BOSSï¼å››è±¡å¡”ï¼æ·±æ·µæ­£å¼ç™¼å¸ƒå€™é¸
-
-- åŠŸèƒ½åŸºæº–ç‚º `dev` `75cf90774d1d8a63818f65de999d044603e21a09`ï¼Œå¯¦ä½œ tip `6d7d136608711b616a02db726085bf9817a4068a` å·²ç”±ä½¿ç”¨è€…æ˜Žç¢ºæŽˆæ¬Šå¿«è½‰è‡³ `dev`ï¼›GitHub Actions run `34205400669` çš„ Repository checks èˆ‡ Dev deployment gate å…¨æ•¸ SUCCESSï¼Œå®˜æ–¹ DEV manifest exact SHA èˆ‡ `dev` ä¸€è‡´ã€‚
-- `js/gameplay-boss-tower-system.js` æ˜¯çŽ©æ³•ä¸­å¿ƒã€å€‹äººï¼ä¸–ç•Œ BOSSã€äº”ç¨®æ©Ÿåˆ¶å¡èˆ‡å››è±¡å¡”è¨­å®šï¼é€²åº¦çš„æ­£å¼ ownerï¼›BOSS èˆ‡å¡”å…±ç”¨æ—¢æœ‰ `v132BuildDungeonMonster`ï¼`v132LaunchDungeonBattle` æˆ°é¬¥ ownerï¼Œæ©Ÿåˆ¶å¡ä½¿ç”¨ä¸é€²å…¥ä¸€èˆ¬æ€ªç‰©é™£åˆ—çš„ battle sidecar å°ˆå±¬æ§½ã€‚
-- `index.html` èˆ‡ `css/gameplay-boss-tower.css` å»ºç«‹ç¨ç«‹çŽ©æ³•ä¸­å¿ƒã€BOSS é›™æ¨™ç±¤é èˆ‡å››è±¡å¡”å›ºå®šå¤§é¢æ¿ï¼›åº•éƒ¨ä¿ç•™äº”é¡†æŒ‰éˆ•èˆ‡ `bossNav` ç›¸å®¹ idï¼Œä½†çŽ©å®¶å¯è¦‹æ–‡å­—ã€ariaã€titleã€å…¥å£èˆ‡ icon å‡æ­£å¼æ”¹ç‚ºã€ŒçŽ©æ³•ã€ã€‚
-- é™„ä»¶åŽŸåœ–ç¶“å¯¦éš›æª¢è¦–å¾Œï¼Œåªç§»é™¤èˆ‡ç•«é¢é‚Šç•Œé€£é€šçš„é»‘è‰²èƒŒæ™¯ï¼›åœ–ç¤º RGB æœ¬é«”æœªé‡ç•«ã€‚è¼¸å‡º `assets/ui/nav-gameplay.png` ç‚º 320Ã—320 RGBA çœŸé€æ˜Ž PNGï¼Œå››è§’ alpha å‡ç‚º 0ï¼ŒèˆŠ `assets/ui/nav-boss.png` ä¿ç•™ã€‚
-- å€‹äºº BOSS å›ºå®š Lv20ï½ž100ã€å¯ä¸é™æ¬¡å†æˆ°ä¸”ç‰¹æ®Šé¦–é€šçŽå‹µåªç™¼ä¸€æ¬¡ï¼›ä¸–ç•Œ BOSS ç‚ºæ°¸ä¹…å–®äººå››éšŽæ®µè¨Žä¼ï¼Œé€éšŽå‹åˆ©ç«‹å³å­˜æª”ï¼Œå¤±æ•—ä¸å›žé€€ã€‚è­·ç›¾æœƒé˜»æ“‹ BOSS é»žé¸ã€å–®é«”ï¼ä¸‰é«”ï¼å…¨é«”æ–°ç›´æŽ¥æ•ˆæžœèˆ‡æ–°ç•°å¸¸ï¼ŒåŒä¸€æŠ€èƒ½ç ´ç›¾å¾Œå‰©é¤˜æ®µæ•¸ä»ç¶­æŒè©²æ¬¡ shield snapshotï¼›auto ä¾è­·ç›¾â†’è“„åŠ›â†’å›žå¾©â†’å¢žå¹…â†’å°éŽ–è™•ç†ã€‚
-- å››è±¡å¡”å…± 100 å±¤ï¼ŒLv30 é–‹æ”¾ï¼ŒUTC é€±ä¸€æ²¿ç”¨ç¾æœ‰æ—¥æœŸåŸºæº–ï¼Œä»¥ç«â†’åœŸâ†’æ°´â†’é¢¨å¾ªç’°ï¼›é€±å…§æ¨“å±¤ï¼é¦–é€š claims ä¿å­˜ï¼Œè·¨é€±åªæ¸…é€±è³‡æ–™ï¼Œæ­·å²æœ€é«˜èˆ‡å·²å–å¾—è³‡ç”¢ä¿ç•™ã€‚ç¬¬ 50 å±¤ä½¿ç”¨ç›®å‰æ­£å¼å››ä»¶å…ƒç´ ç§˜å¯¶è‡ªé¸è³‡æ–™ã€‚
-- æ·±æ·µçŽ©å®¶å…¥å£å·²è‡ªå‰¯æœ¬é ç§»åˆ°çŽ©æ³•ä¸­å¿ƒï¼›`js/59-abyss-two-tier-runtime.js` ä»æ˜¯ Lv20ï¼Lv40ã€åœ°åœ–ã€äº”å¸ã€å¯¶ç®±ã€å‚³é€ã€æˆ°é¬¥èˆ‡é€²åº¦ ownerã€‚æ–°å¢žæ°¸ä¹… `firstClearClaims`ï¼Œå†æˆ°è·³éŽå·²é ˜é¦–é€šå¯¶ç®±ï¼æœ€çµ‚ç‰¹æ®ŠçŽå‹µï¼›æ‰€æœ‰é€€å‡ºï¼å®Œæˆè·¯å¾‘å›žçŽ©æ³•ä¸­å¿ƒã€‚
-- å·²é€šéŽï¼š244/244 JavaScript syntaxã€119/119 Node suitesã€464 resourcesã€291 unique HTML IDsã€108 loader dependenciesï¼26 ordered runtimesã€Release Gate 10/10ã€git diffï¼Œä»¥åŠ PNG RGBAï¼å››è§’ alpha è‡ªå‹•æª¢æŸ¥ã€‚Gameplayï¼BOSSï¼Tower 13/13ã€Abyss 15/15 å‡åŒ…å« reload èˆ‡é˜²é‡è¤‡çŽå‹µ regressionã€‚
-- å®˜æ–¹ DEV å¯¦éš›æ“ä½œå·²ç¢ºèªï¼šåº•éƒ¨çŽ©æ³• iconï¼å…¥å£ã€çŽ©æ³•ä¸­å¿ƒã€BOSS é›™æ¨™ç±¤ã€å€‹äºº BOSS æ­£å¼é–‹æˆ°ã€è­·ç›¾æ©Ÿåˆ¶å¡ç”Ÿæˆã€å—ä¿è­· BOSS é»žæ“Šæç¤ºã€å››è±¡å¡”é¦–é ï¼æ¨“å±¤ä¸€è¦½ï¼æˆ°é¬¥åŠå¤±æ•—è¿”å›žå‡æ­£å¸¸ï¼›å›ºå®š stage ç„¡æ©«å‘ overflowã€broken image æˆ–æ–°å¢ž app-origin console errorã€‚é ç«¯ mobile Chrome èˆ‡ live Abyssï¼battle-audio QA åŒæ­¥é€šéŽã€‚
-- æœ¬æ‰¹ `release/requirement-batches/2026-09-08-gameplay-boss-tower-hub.json` å·²é” 12/12 VERIFIEDã€‚ä½¿ç”¨è€…æ–¼ 2026-09-08 æ˜Žç¢ºè¦æ±‚æŽ¨é€² `main`ï¼ŒGameï¼Cache Version æ­£å¼æŽ¨é€² V173.64ï¼›ç™¼å¸ƒé ˆç¹¼çºŒèµ°å—ä¿è­· PRã€main Repository checksã€GitHub Pages deploy èˆ‡ production SHA é©—è­‰ã€‚
-
-## 2026-09-08 å…­åˆ†æ”¯å®‰å…¨æ•´åˆã€æœ€çµ‚ QA èˆ‡æ­£å¼ç™¼å¸ƒ
-
-- ä½¿ç”¨è€…æ–¼æ•´åˆé©—è­‰å®Œæˆå¾Œæ˜Žç¢ºæŽˆæ¬ŠæŽ¨é€²æ­£å¼ç‰ˆï¼›å—ä¿è­· PR #96ï¼ˆ`dev` â†’ `main`ï¼‰åœ¨ PR Repository checks run `34154431926` SUCCESS å¾Œï¼Œä»¥ merge commit `253962c539bdb62deaa1f80e4212bc306469ab0f` åˆä½µã€‚åˆä½µ tree `b257175b2cdaf13fc57a13f2767414d76236aa17` èˆ‡æ ¸å‡†çš„ `dev` tree å®Œå…¨ç›¸åŒï¼Œæ²’æœ‰è¡çªæˆ–é¡å¤–åŠŸèƒ½å·®ç•°ã€‚
-- æ­£å¼ `main` Repository checks run `34154526744` SUCCESSï¼›GitHub Pages run `34154525713` çš„ buildï¼deploy å…¨éƒ¨ SUCCESSï¼Œdeployment `6314784680` ç¶å®šåŒä¸€ main SHAï¼Œæ­£å¼ç¶²å€ `https://tf00913225-alt.github.io/my-game/` å·²è®€å›ž V173.63 èˆ‡æœ¬è¼ªé—œéµè³‡æºã€‚Gameï¼Cache Version ç¶­æŒ 173.63ã€‚
-- èµ·å§‹ GitHub `dev` ç‚º `cb269fef7f28e54161b9abda9cfcb66bfbfbe74f`ï¼›é€æ¢é †åºç‚º EXP æˆé•·æ›²ç·š â†’ è£å‚™å‰¯æœ¬å¯¶ç®± â†’ æ·±æ·µå‰ç½®ç·¨éšŠ â†’ æŠ€èƒ½æˆé•· â†’ éšŠä¼ç§˜å¯¶ â†’ é»‘é‡‘è¦–çª—ã€‚å…­æ¢é ç«¯åˆ†æ”¯ tip å‡èˆ‡æŒ‡å®š SHA å®Œå…¨ä¸€è‡´ã€‚
-- å”¯ä¸€ merge conflict ä½æ–¼ `js/19-stage-v78-character-inventory-runtime.js`ã€‚äººå·¥ä¿ç•™ Abyss â†’ skill progression â†’ team relic çš„å”¯ä¸€ late-runtime chainï¼›team relic æœ€å¾ŒæŽ›æŽ¥æ­£å¼ battle/save/showPage ownerï¼Œæ²’æœ‰æ•´ä»½é¸ ours/theirsï¼Œä¹Ÿæ²’æœ‰é‡è¤‡ load/error listenerã€‚
-- æ·±æ·µæ”¹ç‚ºæ­£å¼ 8 åï¼ˆ5+3ï¼‰å¾Œï¼ŒèˆŠ live battle QA ä»ç¡¬å¯« 10 åï¼›ç”± `b650978e` æ›´æ–° QA owner å¾Œé€šéŽã€‚ä¸å¾—æŠŠèˆŠ 10 å assertion æ¢å¾©ã€‚
-- DEV Cloud Browser æ‰¾å‡ºä¸¦ä¿®æ­£ä¸‰å€‹ç§˜å¯¶æ•´åˆ owner å•é¡Œï¼š`051aa7ed` æé«˜ `#homeFeatureModalBody` scroll owner specificityï¼›`ee384218` è®“æ ¸å¿ƒ `saveGame()` åœ¨ late relic runtime å°šæœªè¼‰å…¥æ™‚ä¿ç•™æ—¢æœ‰ `playerRelics/teamLoadout`ï¼›`f337d70e` è®“æ©«è·¨ä¸»åŸŽæ•´åˆ—çš„é€æ˜Ž `.team-relic-home-tools` ä¸å†æ””æˆªç³»çµ±ï¼é›¢ç·šç¶“é©—ï¼Œåªè®“å…©é¡†å¯¦éš› utility button æŽ¥æ”¶ pointerã€‚
-- æœ€çµ‚åŠŸèƒ½ç‹€æ…‹ `f337d70ee6b9dbce3750a4cc60a990ca9c2edfe7` å·²é€šéŽ CI run 34151818800ã€115/115 Node suitesã€239/239 JS syntaxã€462 resourcesã€285 IDsã€loader/release/git-diffã€390Ã—844ï¼412Ã—915 Chromeã€live Abyss èˆ‡ battle/audio QAã€‚DEV manifest exact SHAã€V173.63ï¼cache 173.63 ç›¸ç¬¦ã€‚
-- æœ€çµ‚å¯¦éš›ç€è¦½å™¨ï¼šé’åµç¾½ç¬¦è£å‚™å¾Œé€£çºŒå®Œæ•´é‡è¼‰ä»ä¿ç•™ï¼›20 å¡å…©æ¬„ï¼›modal body 0â†’520ã€tabs 0â†’50ï¼›ç³»çµ±ï¼é›¢ç·šç¶“é©—ï¼ç§˜å¯¶ï¼å…ƒç´ åŒ£ hit target èˆ‡é–‹å•Ÿå‡æ­£å¸¸ï¼›app-origin console error/warning 0ã€broken image 0ã€‚
-- æœ¬è¼ª Requirement Batchï¼š`release/requirement-batches/2026-09-08-multi-branch-dev-integration.json`ï¼ˆ9/9 VERIFIEDï¼‰ã€‚å®˜æ–¹ Game/Cache Version ç¶­æŒ V173.63ã€‚`main` å…¨ç¨‹ç¶­æŒ `d0b666e4eeae4cff8bb21dd877f4b95414b367d9`ï¼Œç¦æ­¢æŠŠæœ¬è¼ªå…§å®¹æŽ¨å…¥ mainï¼Œé™¤éžä½¿ç”¨è€…å¦è¡Œæ˜Žç¢ºè¦æ±‚ã€‚
-
-## 2026-09-07 å…¨éŠæˆ²æ‰‹å‹¢ï¼åœ–ç‰‡é•·æŒ‰ï¼æŠ€èƒ½ VFX owner æ”¶æ–‚ï¼ˆdevï¼‰
-- `js/01-stage-v8-touch-lock.js` æ˜¯å…¨éŠæˆ²ç€è¦½å™¨æ‰‹å‹¢å”¯ä¸€ ownerï¼šæ—¢æœ‰å–®æŒ‡ scroll whitelist ä¿ç•™ï¼Œä½†å…©æŒ‡ä»¥ä¸Šåœ¨ä»»ä½• `#game-stage` å…§ä½ç½®ä¸€å¾‹é˜»æ­¢ç€è¦½å™¨ pinch zoomï¼›éžæ–‡å­—è¼¸å…¥ UI çš„ contextmenuï¼dragstartï¼selectstart äº¦å…¨åŸŸé˜»æ­¢ã€‚
-- `css/00-main.css` æ˜¯åœ–ç‰‡ï¼SVGï¼Canvas åŽŸç”Ÿé•·æŒ‰èˆ‡æ‹–æ›³çš„åŸºç¤Ž CSS ownerï¼›ä¸ä½¿ç”¨ `pointer-events:none`ï¼Œé¿å…ç ´å£žæ­£å¸¸éŠæˆ²é»žæ“Šã€‚
-- `index.html` çš„ç›´æŽ¥ touch-lock è¼‰å…¥å·²è·Ÿç¾è¡Œ Cache Version 173.62 å°é½Šï¼Œ`release/release.json` å°‡è©²æª”ç´å…¥ managed cache referencesï¼Œé¿å…ä¹‹å¾Œä¿®æ”¹ touch owner å»ä»è¼‰å…¥èˆŠ queryã€‚
-- æŠ€èƒ½æ¼”å‡ºä»ç”± `js/37-v142-skill-animation.js`ï¼ˆgateï¼æ™‚åºï¼‰ï¼‹ `js/39-v143-skill-animation.js`ï¼ˆSprite/VFX rendererï¼‰å”¯ä¸€è² è²¬ã€‚`js/54-v173.51-battle-qa.js` èˆ‡ `css/53-v173.51-qa.css` ä¸å†ç¢° `#v143-skill-stage` visibilityï¼Œé¿å…çµ‚çµä¸€æ“Šæ™‚ battleActive å…ˆåˆ‡æ›è€ŒæŠŠå°šæœªçµæŸçš„ VFX è—æŽ‰ã€‚
-- Game/Cache Version ç¶­æŒ 173.62ï¼›æœ¬æ‰¹éœ€ç¶“ Repository checksã€DEV deployed SHA é©—è­‰èˆ‡æ‰‹æ©Ÿå¯¦æ©Ÿé•·æŒ‰ï¼pinchï¼VFX é©—æ”¶å¾Œæ‰å¯æ¨™ VERIFIEDã€‚
-
-## 2026-09-07 åˆæˆé¦–æ¬¡é–‹é  Icon æ™‚åºä¿®å¾©ï¼ˆdevï¼‰
-- ä½¿ç”¨è€…å¯¦æ©Ÿç¢ºèªè£å‚™ï¼ç¬¦å’’ icon åœ¨é¦–æ¬¡æ‰“é–‹åˆæˆé ä»éœ€é»žä¸€ä¸‹æ‰é¡¯ç¤ºã€‚æ ¹å› æ˜¯ `js/36-v141-content-systems.js` çš„åˆæˆå…¥å£ç›´æŽ¥å‘¼å« closure `renderSynthesis()`ï¼Œç¹žéŽ V143/V146/V173.63 çš„æœ€çµ‚ public rendererã€‚
-- åˆæˆå…¥å£æ”¹ç‚ºå„ªå…ˆå‘¼å« `window.v141RenderSynthesis()`ï¼›`js/58-v173.63-functional-fixes.js` åœ¨æ­£å¼ render å‰å…ˆåŒæ­¥ equipment/static item presentationï¼Œrender å¾Œç«‹å³ repair pickerï¼Œä¸å†æŠŠé¦–æ¬¡ icon é¡¯ç¤ºä¾è³´é»žæ“Šæˆ–ä¸‹ä¸€æ¬¡ rerenderã€‚
-- ownerï¼š`js/36-v141-content-systems.js`ï¼ˆåˆæˆå…¥å£ï¼‰ï¼‹ `js/58-v173.63-functional-fixes.js`ï¼ˆæœ€çµ‚ presentation/render wrapperï¼‰ï¼›ä¸æ–°å¢ž runtime patchã€‚
-- Game/Cache Version ç¶­æŒ V173.62ï¼Œå¾… DEV æ‰‹æ©Ÿå¯¦æ©Ÿç¢ºèªé¦–æ¬¡æ‰“é–‹è£å‚™èˆ‡ç¬¦å’’å‡ç›´æŽ¥é¡¯ç¤º icon å¾Œæ‰èƒ½æ¨™ VERIFIEDã€‚
-
-## V173.61 è¿”å›žåœ–ç¤ºï¼é“å…·åœ–ï¼å‰¯æœ¬é è¦½ï¼éŸ³æ•ˆï¼å¸¸äº®çœé›»ï¼ä»»å‹™å³æ™‚é ˜å–ï¼ˆç›®å‰ devï¼‰
-- V173.60 å·²é€šéŽå—ä¿è­· Repository checks ä¸¦ç”± PR #70 æ­£å¼åˆä½µ mainï¼›æœ¬è¼ªæ–°ä¿®æ”¹åªåœ¨ devã€‚
-- `css/00-main.css` æ˜¯å…±ç”¨è¿”å›žæŒ‰éˆ•è¦–è¦º ownerï¼šæ‰€æœ‰å¯¦éš›ä½¿ç”¨ `assets/ui/map-return.png` çš„å…¥å£çµ±ä¸€è£œ `#050505` åœ“å½¢é»‘åº•ã€‚
-- ç´ æåˆ†æ”¯çš„ã€Œç¤¦çŸ³.pngã€ã€Œå‰¯æœ¬èˆ‡èƒŒåŒ…çš„å¯¶ç®±.pngã€å·²å°Žå…¥ `assets/items/materials/ore.png`ã€`assets/items/chests/dungeon-chest.png`ï¼›æ—¢æœ‰èƒŒåŒ…ç¤¦çŸ³ï¼ææ–™å¯¶ç®±ä¹ŸæœƒåŒæ­¥æ–°åœ–ç¤ºã€‚
-- ä¸€èˆ¬å‰¯æœ¬çŽå‹µé è¦½ç”± `js/42` + `css/43` æ”¹ç‚ºåœ–ç‰‡å„ªå…ˆï¼›è£å‚™å‰¯æœ¬ç”±æ—¢æœ‰ `js/equipment-progression.js` åŒæ­¥æ”¹æˆå¯¦éš›è£å‚™åœ–ï¼‹æ­£å¼éšŽç´šæ¡†ã€‚
-- æˆ°é¬¥ç¨‹åºéŸ³æ•ˆ `js/34` master gain 0.22â†’0.30ï¼›`js/35` ç§»é™¤ `v141-once-*` CSS flashï¼Œä½†ä¿ç•™ Canvas particlesï¼›`js/39` Sprite/VFX æ™‚åºä»æ˜¯ç¾è¡ŒæŠ€èƒ½å‹•ç•« ownerã€‚
-- ä¸€èˆ¬æ¨¡å¼åœ¨é¦–æ¬¡ä½¿ç”¨è€…æ“ä½œå¾Œå˜—è©¦ Screen Wake Lockï¼›å·¡æ€ªæ–°å¢žã€Œçœé›» OFF/ONã€ï¼Œçœé›» ON é‡‹æ”¾ Wake Lockï¼Œé é¢éš±è—æ™‚ä¹Ÿæœƒé‡‹æ”¾ã€‚
-- æ¯æ—¥ï¼å§”è¨—æ­£å¼åŠ å…¥ä¸€éµé ˜å–ï¼›èƒŒæ™¯ä»»å‹™é€²åº¦è®ŠåŒ–æ™‚åªåˆ·æ–°å·²é–‹å•Ÿçš„ä»»å‹™å…§å®¹èˆ‡å®Œæˆåº¦ï¼Œä¿ç•™ç›®å‰åˆ†é ï¼æ²å‹•ä½ç½®ã€‚æˆå°±æ—¢æœ‰ä¸€éµé ˜å–ä¿ç•™ã€‚
-- ç‰ˆæœ¬èˆ‡ live cache key åŒæ­¥ V173.61ã€‚
-
-## V173.60 æ­£å¼ç‰©å“éšŽç´šï¼ç¬¦å’’åˆ¤å®šé‡æ§‹ï¼ˆç›®å‰ devï¼‰
-- æ­£å¼ä¸€èˆ¬ç‰©å“éšŽç´šçµ±ä¸€ç‚ºï¼šç™½éšŽï¼ˆwhiteï¼‰â†’è—éšŽï¼ˆblueï¼‰â†’ç´«éšŽï¼ˆpurpleï¼‰â†’æ©™éšŽï¼ˆorangeï¼‰â†’æ¡ƒç´…éšŽï¼ˆpinkï¼‰â†’å››è±¡éšŽï¼ˆfour-symbolï¼‰ï¼›å›ºå®šè‰²è™Ÿä¾ `docs/ITEM_RARITY_UI_SPEC.md`ã€‚
-- ç¬¦å’’ç‚ºæ­£å¼ä¾‹å¤–ï¼šå†°å°ç¬¦ï¼éš±èº«ç¬¦ï¼çµç•Œç¬¦åªåˆ°ç™½ã€è—ã€ç´«ã€æ©™å››éšŽï¼›ç•«ç¬¦å•Ÿå‹•çŽ‡å›ºå®š 35%ï¼55%ï¼75%ï¼100%ã€‚èˆŠ `*TalismanLow/Mid/High/Perfect` id ä¿ç•™åªç‚ºèˆŠå­˜æª”ï¼èˆŠæŽ‰è½ç›¸å®¹ï¼ŒçŽ©å®¶è³‡æ–™ `tierKey` èˆ‡åç¨±æ”¹ç‚ºæ­£å¼éšŽç´šã€‚
-- ç¬¦å’’æ”¹ç‚ºå…©æ®µåˆ¤å®šï¼šå…ˆä»¥ç¬¦å’’éšŽç´šæ“²ã€Œç•«ç¬¦ã€ï¼›å¤±æ•—å›ºå®šé¡¯ç¤ºã€Œç•«ç¬¦å¤±æ•—ã€ã€‚æˆåŠŸå¾Œå†ç”¨æ–½æ”¾è§’è‰²ç´ è³ªèµ°å°æ‡‰æ»¿ç´šæŠ€èƒ½å‘½ä¸­è¦å‰‡ï¼›æ©™éšŽ 100% ä¸ç­‰æ–¼æŽ§åˆ¶ï¼ç¬¦è¡“å¿…ä¸­ã€‚
-- `js/27-v132-content-expansion.js` æ˜¯ç¬¦å’’ï¼ç¤¦çŸ³ï¼è¨­è¨ˆåœ–èˆ‡ç¬¦å’’çµç®— ownerï¼›`js/36-v141-content-systems.js` æ˜¯åˆæˆï¼å†¶ç…‰éšŽç´šæ•¸å€¼ ownerï¼›`js/equipment-progression.js` æ˜¯æ™®é€šè£å‚™å“è³ªï¼ç”Ÿæˆ ownerã€‚`js/33` èˆ‡ `js/50` åƒ…ä¿ç•™æ—¢æœ‰æŠ€èƒ½è³‡æ–™æ™šè¦†è“‹åŒæ­¥ï¼Œä¸æ–°å¢žç¬¬ä¸‰å±¤ runtimeã€‚
-- ç¤¦çŸ³ã€è¨­è¨ˆåœ–ã€è£å‚™è³‡æ–™çµæ§‹å·²é ç•™æ¡ƒç´…èˆ‡å››è±¡ï¼›æœ¬è¼ªä¸æ“…è‡ªè¨­å®šå°šæœªæä¾›çš„é«˜éšŽæ•¸å€¼ï¼åƒ¹æ ¼ï¼æŽ‰è½ä¾†æºï¼Œå› æ­¤å…©éšŽç›®å‰ `available:false`ã€æ™®é€šè£å‚™æŽ‰è½ chance=0ï¼Œææ–™å¯¶ç®±ä»åªå‡ºç™½ï¼è—ï¼ç´«ï¼æ©™ã€‚
-- èˆŠ `low/mid/high/perfect` åƒ…ä½œè³‡æ–™å…¼å®¹æ˜ å°„ç‚º white/blue/purple/orangeï¼Œä¸å†ä½œçŽ©å®¶å¯è¦‹æ­£å¼éšŽç´šã€‚
-- ç‰ˆæœ¬èˆ‡å¿«å–åŒæ­¥ V173.60ï¼›åƒ…ä¿®æ”¹ devï¼Œmain ä¸å‹•ã€‚
-
-## V173.45 æˆ°é¬¥ï¼å‰¯æœ¬ï¼å•†åº—ï¼æ·±æ·µç¶­ä¿®ï¼ˆç›®å‰ devï¼‰
-- æ°´å…ƒç´ ã€æ·¨å¿ƒè¨£ã€‘æ‰‹å‹•æ–½æ”¾æ™‚å¯è‡ªç”±é¸æ“‡æˆ‘æ–¹æˆ–æ•µæ–¹ï¼šæˆ‘æ–¹è§£é™¤æ‰€æœ‰å¢žç›Šèˆ‡ç•°å¸¸ï¼›æ•µæ–¹è§£é™¤æ‰€æœ‰æ­£é¢å¢žç›Šï¼ˆå«çµç•Œã€è­·ç›¾ç­‰ï¼‰ä½†ä¿ç•™æ•µæ–¹æ—¢æœ‰è² é¢ç‹€æ…‹ã€‚
-- é‡‘å¹£å‰¯æœ¬å‹åˆ©çµç®—è£œå›žæ­£å¼é‡‘å¹£çŽå‹µå‡½å¼ï¼Œä¿®æ­£ undefined ä¾‹å¤–é€ æˆçš„å‹åˆ©ç•«é¢å¡æ­»ï¼›åŒæ™‚è¤‡æ ¸ç¶“é©—ï¼ææ–™å‰¯æœ¬ä»èµ°å„è‡ªæ—¢æœ‰æœ‰æ•ˆçµç®—å…¥å£ã€‚
-- ä¸‰è¼ªæ—¥å¸¸å‰¯æœ¬æ›å ´çš„ 360ms éŠœæŽ¥æœŸé–“ç¶­æŒ battleActiveï¼Œå…ƒç´ åŒ£ä¸å†æŠŠæ›å ´èª¤åˆ¤æˆæˆ°é¬¥å¤–è€Œè‡ªå‹•è£œè¡€ã€‚
-- å…ƒç´ åŒ£æˆ°é¬¥å¤–è£œå“é€šçŸ¥æ”¹ç‚ºç•«é¢ä¸Šæ–¹ç´„ 1/4 çš„ç´”æ–‡å­—å…­è¡Œä½‡åˆ—ï¼›åªé¡¯ç¤ºã€Œ[è§’è‰²ä½¿ç”¨è£œå“ æ¢å¾©xxHP/SP]ã€ï¼Œè¶…éŽå…­è¡Œç”±æœ€èˆŠè¨Šæ¯å¾€ä¸Šç§»é™¤ï¼Œä¸å†å¯«å…¥ä¸‹ä¸€å ´æˆ°é¬¥è³‡è¨Šã€‚
-- åˆæˆä»‹é¢ç§»é™¤ã€Œè£å‚™åˆæˆã€åˆ†é ï¼Œåªä¿ç•™è£å‚™å†¶ç…‰ã€ç¬¦å’’åˆæˆã€ç¢Žç‰‡åˆæˆï¼›æ—¢æœ‰èˆŠå­˜æª”ç›¸å®¹å‡½å¼ä¿ç•™ä½†ä¸å†æä¾›è£å‚™åˆæˆå…¥å£ã€‚
-- å•†åº—æ–°å¢žã€Œè£œå“ï¼è£å‚™ã€é›™é ï¼›è£å‚™é ç›®å‰å…ˆå®Œæˆå…­æ ¼ç‰ˆé¢èˆ‡æ¯æ—¥åˆ·æ–°æ¡†æž¶ï¼šå‰5æ¬¡å…è²»ã€ç¸½ä¸Šé™10æ¬¡ï¼›ç¬¬6ï½ž10æ¬¡é‡‘å¹£åˆ·æ–°åƒ¹æ ¼èˆ‡è£å‚™å”®åƒ¹å°šæœªå®šæ¡ˆï¼Œå› æ­¤æœ¬è¼ªåªé¡¯ç¤ºå¾…è¨­å®šç‹€æ…‹ã€ä¸æ“…è‡ªæ‰£æ¬¾ã€‚
-- ä»»å‹™ç´…é»žæ‹†åˆ†æ¯æ—¥ï¼å§”è¨—ä¾†æºï¼›ä¸»å…¥å£ä»é¡¯ç¤ºä»»ä¸€å¯é ˜çŽå‹µï¼Œä»»å‹™é å…§å‰‡ç”±å„è‡ªåˆ†é é¡¯ç¤ºè‡ªå·±çš„ç´…é»žã€‚
-- æ·±æ·µæˆ°é¬¥è³‡è¨ŠåŠ å…¥å…¨åŸŸ touch-lock æ²å‹•ç™½åå–®ä¸¦ä¿ç•™åŽŸç”Ÿ pan-yï¼›å®ˆé—œå¸çŽ‹ï¼å¯¶ç®±ï¼æŽ¥è¿‘é»žçµ±ä¸€ç§»åˆ°ä¸Šæ–¹å¹³å°ç´„ x61%ã€y21%ï¼Œå°é½Šæœ¬è¼ªåƒè€ƒåœ–ç´…åœˆä½ç½®ã€‚
-- åƒ…ä¿®æ”¹ devï¼Œmain ä¸å‹•ï¼›å®Œæ•´è¼‰å…¥ï¼å¿«å–ç‰ˆæœ¬åŒæ­¥ V173.45ã€‚
-
-## V173.44 ç¶­ä¿®æ”¶æ–‚ï¼ˆç›®å‰ devï¼‰
-- ä¸‰å€‹æ­£å¼æ—¥å¸¸å‰¯æœ¬çµ±ä¸€ç‚ºä»»ä¸€è§’è‰² Lv10 å¯é€²ï¼›ç¶“é©—å‰¯æœ¬çŽå‹µç›´æŽ¥é€²å…±ç”¨ç¶“é©—æ± ï¼Œä¸å†æŒ‡å®šè§’è‰²ã€‚
-- ç¬¬äºŒï¼ç¬¬ä¸‰è§’è‰²æ–°å»ºæ™‚å›ºå®šå¾ž Lv1 é–‹å§‹ï¼›Lv20 å‰åªä¿ç•™æ—¢æœ‰ EXP è¿½è¶•å€çŽ‡ï¼Œä¸å†å¼·åˆ¶è·³åˆ° Lv10ã€‚
-- æ°´å…ƒç´ ã€æ´ªæ°´çŒ›ç¸ã€‘ç¶­æŒæ­£å¼è¦æ ¼ï¼šéœ€å…ˆå­¸æ°´çƒè¡“ã€åˆå­¸ 15 æŠ€èƒ½é»žï¼›å­¸ç¿’æµç¨‹è®€å–ç›®å‰é¸ä¸­è§’è‰²çš„å¯¦éš› skillPointsï¼ŒéŽ–å®šæŒ‰éˆ•ç›´æŽ¥é¡¯ç¤ºç¼ºå°‘çš„å‰ç½®æŠ€èƒ½ã€‚
-- ä¸»åŸŽ HUDã€index è¼‰å…¥ç‰ˆæœ¬èˆ‡ V_ASSET_VERSION å·²åŒæ­¥ V173.44ï¼›ä¸»åŸŽ UHD èƒŒæ™¯ä½¿ç”¨ home-background-v17344.pngã€‚
-- dev é è¦½å›ºå®šç”± Cloudflare Pages è‡ªå‹•ç™¼å¸ƒï¼š`https://four-symbols-dev.pages.dev`ï¼›ä¸å†ä½¿ç”¨ GitHackï¼RawCDN ä½œç‚ºæ¸¬è©¦ç«™ã€‚
-- åƒ…ä¿®æ”¹ devï¼Œmain ä¸å‹•ã€‚
-
-## V173.42 çŽ©å®¶æµç¨‹ï¼å…ƒç´ åŒ£ï¼æ·±æ·µè³‡è¨Šï¼æ”¶ç›Šèª¿æ•´
-- èƒŒåŒ…è£œå“è©³æƒ…æ–°å¢žã€Œä½¿ç”¨ã€ï¼Œä½œç”¨å°è±¡å›ºå®šç‚ºèƒŒåŒ…ç•¶å‰åˆ‡æ›è§’è‰²ã€‚
-- å…ƒç´ åŒ£å•Ÿå‹•ä¸­éŽ–å®šæ‰€æœ‰è¨­å®šä¸¦æç¤ºã€Œå…ˆåœæ­¢å…ƒç´ åŒ£ï¼Œæ‰èƒ½è¨­å®šã€ï¼›HP/SPè£œå“é–€æª»èˆ‡è£œå“è€—ç›¡å›žä¸»åŸŽæ”¹ç‚ºä¸‰åè§’è‰²å…±ç”¨å€å¡Šï¼Œè‡ªå‹•è¡Œå‹•ä»å„è§’è‰²ç¨ç«‹ã€‚
-- å…ƒç´ åŒ£å•Ÿå‹•å¾Œå³ä½¿æœªé€²æˆ°é¬¥ï¼Œä¹Ÿæ¯ç§’æª¢æŸ¥ä¸€æ¬¡è£œå“é–€æª»ï¼›è£œå“ä½¿ç”¨è³‡è¨Šæœƒé€²æˆ°é¬¥è³‡è¨Šï¼Œéžæˆ°é¬¥æœŸé–“ç”¢ç”Ÿçš„è¨Šæ¯æœƒå¸¶å…¥ä¸‹ä¸€å ´æˆ°é¬¥è³‡è¨Šä¸€æ¬¡ã€‚
-- æ·±æ·µåœ°åœ–åº•éƒ¨æ–°å¢žæˆ°é¬¥è³‡è¨Šå€ï¼›å°é¢ç¶­æŒ supplied 864Ã—1536ï¼ˆ9:16ï¼‰æ¯”ä¾‹ï¼Œé€²å…¥æŒ‰éˆ•ç§»åˆ°å°é¢åœ–ä¹‹å¤–ã€‚
-- ç¶“é©—æ± è¶³ä»¥è®“ä»»ä¸€æœªæ»¿ç´šè§’è‰²å‡ç´šæ™‚ï¼Œè§’è‰²å…¥å£èˆ‡ HUD ç¶“é©—æ± äº®ç´…é»žã€‚
-- é›¢ç·šç¶“é©—ç§»è‡³æˆå°±ä¸‹æ–¹ã€ç³»çµ±ç§»è‡³å…¬å‘Šä¸‹æ–¹ï¼Œæ”¹ç”¨èˆ‡å…¶ä»–å…­å€‹å´é‚ŠåŠŸèƒ½ä¸€è‡´çš„ 80Ã—82 é»‘é‡‘å¡ã€‚
-- ä¸€èˆ¬æˆ°é¬¥ç¾æœ‰ EXP Ã—3ï¼›æ€ªç‰©é‡‘å¹£æŽ‰è½ Ã—5ï¼›ç¶“é©—å‰¯æœ¬ 11%â†’33%ï¼›é›¢ç·š EXP Ã—3ï¼›ä»»å‹™/å§”è¨—/æˆå°±/å®Œæˆåº¦çŽå‹µ EXPÃ—3ã€é‡‘å¹£Ã—5ï¼›æ·±æ·µæœ€çµ‚å¯¶ç®± EXPÃ—3ã€é‡‘å¹£Ã—5ã€‚
-- æ–°æ‰‹æ£®æž—å–æ¶ˆã€Œ1éš»/3éš»åŒä¸€ä»½å›ºå®šEXPã€ï¼Œæ”¹ä¾å¯¦éš›æ“Šæ•—æ€ªç‰©æ•¸èˆ‡rankæ¬Šé‡è¨ˆç®—ï¼Œå†å¥—æœ¬è¼ªå…¨åŸŸEXPÃ—3ã€‚
-- åƒ…ä¿®æ”¹ devï¼Œæœªä¿®æ”¹ mainã€‚
-
-## V173.41 æ‰‹æ©ŸèƒŒæ™¯æ¢å¾©ï¼å•Ÿå‹•å‹•ç•«å·¥ä½œéšŽæ®µ
-- åŒä¸€å€‹ç€è¦½å™¨åˆ†é å·¥ä½œéšŽæ®µé¦–æ¬¡å®Œæˆ12ï½ž15ç§’å•Ÿå‹•ä¸¦é»žæ“Šé€²å…¥å¾Œï¼Œä»¥ sessionStorage è¨˜éŒ„å·²é€²å…¥ï¼›åŒåˆ†é å¾ŒçºŒå›  Android/Chrome renderer å›žæ”¶è€Œé‡è¼‰æ™‚ï¼Œ`js/00-main.js` æœƒç«‹å³éš±è— startup loaderï¼Œä¸å†è¦æ±‚ç­‰å¾…å®Œæ•´å•Ÿå‹•å‹•ç•«ã€‚
-- `visibilitychange -> hidden` èˆ‡ `pagehide` æœƒç«‹å³å‘¼å«ç¾æœ‰ `saveGame()`ï¼Œé™ä½Ž Android èƒŒæ™¯å›žæ”¶é€ æˆçš„æœªå­˜é€²åº¦é¢¨éšªã€‚
-- é—œé–‰åˆ†é ï¼æ–°çš„ç€è¦½å™¨å·¥ä½œéšŽæ®µä»æœƒæ­£å¸¸æ’­æ”¾é¦–æ¬¡å•Ÿå‹•å‹•ç•«ï¼›æ²’æœ‰ä½¿ç”¨ Wake Lockã€å‡éŸ³è¨Šã€reload æ””æˆªæˆ– runtime patchã€‚
-- æœ¬è¼ªåªä¿®æ”¹ devï¼Œä¸ä¿®æ”¹ mainã€‚
-
-## V173.40 æ–°æ‰‹æ£®æž—ç”Ÿå­˜ï¼EXPèˆ‡å·¡æ€ªæ‰“æž¶åœ–æ–¹å‘
-- æ–°æ‰‹æ£®æž—å…­éš»æ€ªç‰©çš„æ•æ·èˆ‡æ•æ·é»žæ•¸å›ºå®šç‚º0ã€‚
-- æ–°æ‰‹æ£®æž—æ™®é€šæ”»æ“Šï¼ˆéžæŠ€èƒ½ï¼‰ä¸çˆ†æ“Šï¼Œæœªé˜²ç¦¦ï¼æœªè¢«ç›¾å¸æ”¶å‰å›ºå®š10ï½ž15å‚·å®³ã€‚
-- ä¸€èˆ¬æ–°æ‰‹æ£®æž—å‹åˆ©EXPä¾ç›®å‰Lv1â†’10æ­£å¼æ›²ç·šåæŽ¨ç‚ºç´„20å ´ï¼›ç›®å‰åŸºæº–690 EXP/å ´ã€‚å…ƒç´ åŒ£70%èˆ‡ä¼‘æ¯EXPÃ—2æ²¿ç”¨æ—¢æœ‰è¦å‰‡ã€‚
-- å·¡æ€ªé€²æˆ°é¬¥å‰çš„patrol-fight-1/2é¡¯ç¤ºæ™‚çµ±ä¸€é †æ™‚é‡90Â°ï¼›èµ°è·¯ï¼å¾…æ©Ÿæ¢å¾©0Â°ã€‚
-- åœŸï¼é¢¨ä¸‰äººã€å…¨é«”èˆ‡å†°éœœç®­é›¨å›ºå®šç¯„åœVFXè¦å‰‡æœªæ”¹ï¼Œæ–°å¢žå›žæ­¸ä¿è­·ã€‚
-# å°ˆæ¡ˆé€²åº¦äº¤æŽ¥è¡¨
-
-é€™ä»½æ–‡ä»¶æ˜¯é€™å€‹å°ˆæ¡ˆå”¯ä¸€çš„ã€Œç›®å‰ç‹€æ…‹ã€çœŸç›¸ä¾†æºã€‚ä½¿ç”¨è€…æœƒè¼ªæµç”¨ä¸åŒçš„ AI
-å·¥å…·ï¼ˆClaude Code / ChatGPT ç­‰ï¼‰é–‹ç™¼é€™å€‹å°ˆæ¡ˆï¼Œ**æ¯ä¸€æ¬¡é–‹å§‹å·¥ä½œå‰éƒ½å¿…é ˆå…ˆè®€å®Œé€™ä»½æ–‡ä»¶ï¼Œ
-çµæŸå·¥ä½œå‰éƒ½å¿…é ˆæ›´æ–°é€™ä»½æ–‡ä»¶**ï¼Œå¦å‰‡ä¸‹ä¸€å€‹æŽ¥æ‰‹çš„äººï¼ˆä¸ç®¡æ˜¯äººé‚„æ˜¯ AIï¼‰æœƒåœ¨ä¸çŸ¥æƒ…çš„ç‹€æ³ä¸‹
-é‡åšã€æ”¹å£žã€æˆ–èª¤åˆ¤ç›®å‰çš„ç‹€æ…‹ã€‚
-
----
-
-## V173.39 åœŸï¼é¢¨ç¯„åœæŠ€èƒ½èˆ‡å†°éœœç®­é›¨ VFX å®šä½ä¿®æ­£ï¼ˆç›®å‰ devï¼‰
-
-- `js/39-v143-skill-animation.js` ç¹¼çºŒä½œç‚º Sprite VFX å¹¾ä½• ownerï¼Œæœªæ–°å¢ž runtime patchã€‚
-- åœŸï¼é¢¨ `tri`ï¼`allyTri` å…±ç”¨å›ºå®šä¸‰ç«™ä½è¦–è¦ºæ¡†ï¼šå¯¦éš›å­˜æ´»ï¼å‘½ä¸­æ•¸åªæ±ºå®šå‚·å®³èˆ‡ç‹€æ…‹ï¼Œä¸å†åƒèˆ‡ Sprite å°ºå¯¸ï¼›çŽ©å®¶é¸å®šçš„æ–½æ”¾ç›®æ¨™æ˜¯å›ºå®šè¦–è¦ºä¸­å¿ƒã€‚
-- åœŸï¼é¢¨ `all`ï¼`allyAll` battlefield æŠ€èƒ½ç¶­æŒå®Œæ•´é™£åœ°å¹¾ä½•ï¼Œæ­»äº¡æˆ–å‰©é¤˜äººæ•¸ä¸æœƒç¸®å°æˆ–æŠŠå‹•ç•«æ‹‰å‘å€–å­˜è€…ã€‚
-- æ°´å…ƒç´  `iceArrowRain`ï¼ˆå†°éœœç®­é›¨ï¼‰æ”¹ç‚º `fixedFormation`ï¼šæ°¸é ä½¿ç”¨å®Œæ•´ `battleMonsterArea` ä½œç‚ºæ•µæ–¹ 10 äººé™£åœ°ç¯„åœèˆ‡ä¸­å¿ƒï¼Œä¸å†ä½¿ç”¨ `living-targets` é‚Šç•Œã€‚
-- å‚·å®³ã€æŠ€èƒ½ç›®æ¨™åˆ¤å®šã€ç‹€æ…‹å‘½ä¸­ã€SPã€AIã€è§’è‰²è³‡æ–™èˆ‡å­˜æª”è¦å‰‡å‡æœªä¿®æ”¹ã€‚
-- å›žæ­¸æ¸¬è©¦è¦†è“‹ï¼šé¢¨ä¸‰äººæŠ€ 3â†’1 å­˜æ´»å°ºå¯¸ï¼ä¸­å¿ƒä¸è®Šã€é¢¨å…¨é«”æŠ€å­˜æ´»æ•¸è®ŠåŒ–ä¸å½±éŸ¿ç¯„åœã€åœŸä¸‰äºº Sprite å…¨æ•¸å›ºå®šç«™ä½ã€å†°éœœç®­é›¨ 3â†’1 å­˜æ´»ä»ä¿æŒå®Œæ•´æ•µæ–¹é™£åœ°å°ºå¯¸èˆ‡ä¸­å¿ƒã€‚
-
-## V173.39 ä¸»åŸŽ UI æœ€å¾Œå¾®èª¿ï¼ˆç›®å‰ devï¼‰
-
-> æœ¬è¼ªåªèª¿æ•´ä¸»åŸŽæ—¢æœ‰ä¸‰å€‹è¦–è¦ºå€å¡Šï¼Œä¸é‡æ§‹ã€ä¸æ–°å¢ž UIã€ä¸ä¿®æ”¹åŠŸèƒ½äº‹ä»¶æˆ–éŠæˆ²é‚è¼¯ã€‚
-
-- `css/00-main.css` ä»æ˜¯ä¸»åŸŽ HUD èˆ‡å…¥å£å°ºå¯¸ ownerï¼šå››è±¡ä¸»åŸŽå­—ç´šç”± 8px èª¿ç‚º 10pxã€èº«ä»½å€ç•¥å³ç§»ä¸¦ç¶­æŒåž‚ç›´ç½®ä¸­ï¼›é‡‘å¹£ã€ç¶“é©—æ± ã€DEV çµæ§‹èˆ‡å¤§å°æœªæ”¹ã€‚
-- `index.html` æ—¢æœ‰ `home-version-badge` å…§åµŒæ¨£å¼ä»æ˜¯ç‰ˆæœ¬å¾½ç«  ownerï¼šå­—ç´šç”± 7px èª¿ç‚º 9pxï¼Œåƒ…åŒæ­¥æ”¾å¤§æ—¢æœ‰å¾½ç« ï¼Œä¸æ–°å¢žä»»ä½• HUD è³‡è¨Šã€‚
-- `css/00-main.css` çš„é›¢ç·šç¶“é©—ï¼ç³»çµ±ç¶­æŒå®Œæ•´åº•æ¿èˆ‡é‡‘æ¡†ï¼š86Ã—40 èª¿ç‚º 100Ã—47ï¼Œicon èˆ‡æ–‡å­—åŒæ¯”æ”¾å¤§ï¼Œå…©é¡†æŒ‰éˆ•å„å‘å¤–å¾®ç§»ï¼Œä¸­å¤®åŸŽé–€ä¿ç•™ç´„ 60px è¨­è¨ˆé€šé“ï¼›è§’è‰²ï¼å•†åº—èˆ‡å·¦å³å…­å€‹åŠŸèƒ½å…¥å£å°ºå¯¸å®Œå…¨ä¸å‹•ã€‚
-- `css/42-v146-system-polish.css` ä»æ˜¯å†’éšªéšŠä¼è¦–è¦º ownerï¼šå®¹å™¨ä¸‹ç§» 7pxï¼Œåž‚ç›´ padding ç”± 2px å¾®å¢žè‡³ 3pxï¼Œæ¯åˆ—ç”± 44px å¾®å¢žè‡³ 46pxï¼›è§’è‰²æŽ’åˆ—ã€45Ã—45 é ­åƒèˆ‡ HP/SP è¦å‰‡ä¸è®Šã€‚
-- `js/41-v146-system-polish.js` çš„ `renderHomeRoster()` æœªä¿®æ”¹ï¼›åº•éƒ¨å°Žèˆªã€èƒŒæ™¯ã€äº‹ä»¶ã€è§’è‰²è³‡æ–™ã€é‡‘å¹£ï¼ç¶“é©—é‚è¼¯ã€DEVã€æˆ°é¬¥ã€æŠ€èƒ½èˆ‡å­˜æª”çš†æœªä¿®æ”¹ã€‚
-- å·²ä»¥ Chromium å¯¦éš›é©—è­‰ 1080Ã—1920 æ ¸å¿ƒç›´å‘æ¯”ä¾‹èˆ‡ 390Ã—844 æ‰‹æ©Ÿç›´å‘æ¯”ä¾‹ï¼šä¸‰äººéšŠä¼ç‹€æ…‹ç„¡é‡ç–Šã€ç„¡è£åˆ‡ã€ç„¡ä½¿ç”¨è€…æ²å‹•ï¼Œå…©é¡†æ¬¡ç´šæŒ‰éˆ•ä¹‹é–“ä¿ç•™ä¸­å¤®åŸŽé–€ä¸­è»¸ã€‚
-
-## V173.39 åœŸï¼å…‰å…ƒç´  Sprite VFXï¼ˆç›®å‰ devï¼‰
-
-> **ç›®å‰ VFX æ•´åˆå…¥å£ã€‚** V173.38 çš„æ­£å¼å‚·å®³æ¨¡åž‹å®Œå…¨ä¿ç•™ï¼›æœ¬è¼ªåªæŠŠ assets-library å·²å®Œæˆçš„
-> åœŸå…ƒç´ èˆ‡æ¥µå¸å¤©å°Šã€å…ƒç¥–è³œç¦ã€‘Sprite Sheet æŽ¥å…¥æ—¢æœ‰ V142/V143 å‹•ç•« ownerã€‚
-
-- `js/37-v142-skill-animation.js` ä»æ˜¯æŠ€èƒ½æ¼”å‡ºæ™‚é–“å”¯ä¸€ ownerï¼›åœŸçŸ³æ–¬ï¼çŸ³ç›¾æ‹³ï¼çŸ³ç ´å¤©é©šï¼
-  åœ°è£‚é‡æ‹³ï¼è½çŸ³è¡“ï¼æ»¾çŸ³è¡“ï¼é£›æ²™çž¬æ“Šï¼åœ°ç‰›çŒ›è¥²ï¼è¬è±¡åœŸç›¾ï¼å²©çŸ³å£å£˜ï¼çµç•Œèˆ‡å…ƒç¥–è³œç¦
-  å·²ä¾æˆå“ Sprite Sheet çš„ 1.1ï½ž2.0 ç§’ç¯€å¥æ ¡æº–ã€‚
-- `js/39-v143-skill-animation.js` ä»æ˜¯ Sprite æ’­æ”¾èˆ‡ç‹€æ…‹å¾ªç’°å”¯ä¸€ ownerï¼›12 å¹€æŠ€èƒ½åœ–çµ±ä¸€ç”¨
-  `canvas-crop + naturalGrid` æŒ‰ 4Ã—3ã€384Ã—384 é€æ ¼è£åˆ‡ï¼Œ8 å¹€ç‹€æ…‹åœ–æŒ‰ 4Ã—2ã€256Ã—256
-  ç„¡ç¸«å¾ªç’°ï¼Œä¸å»ºç«‹æ¯å¹€ç¨ç«‹ PNGï¼Œä¹Ÿä¸æ–°å¢ž runtimeã€‚
-- æ­£å¼ production assets æ”¾åœ¨ `assets/vfx/earth/` èˆ‡ `assets/vfx/light/`ï¼›ä¾†æºä¿ç•™åœ¨
-  `assets-library/assets/inbox/`ã€‚æŠ€èƒ½å°æ‡‰åŒ…å«å–®é«”ã€åŒæŽ’ä¸‰äººã€å…¨å ´èˆ‡æˆ‘æ–¹å¢žç›Šå®šä½ï¼›å…ƒç¥–è³œç¦
-  ä¾æ¥µå¸ç¾æœ‰ `yuanZuBlessing`ï¼`statusName:"å…ƒç¥–è³œç¦"` ç‹€æ…‹ owner é¡¯ç¤ºã€‚
-- æ–°å¢žæŒçºŒç‹€æ…‹ Spriteï¼šç ´é˜²ã€å²©ç›¾ã€çŸ³åŒ–ã€è¬è±¡åœŸç›¾ã€å²©çŸ³å£å£˜ã€çµç•Œã€å…ƒç¥–è³œç¦ã€‚
-  çŸ³ç›¾æ‹³ï¼çŸ³ç ´å¤©é©šçš„å²©ç›¾å±¬æ–¼æ–½è¡“è€…è‡ªèº«ï¼ŒV143 æœƒç­‰æ–½æ”¾ Sprite çµæŸå¾Œæ‰é¡¯ç¤ºæŒçºŒå²©ç›¾ï¼›
-  å…ƒç¥–è³œç¦å‰‡ä»¥æ­£å¼ `statusName` å°æ‡‰æ¥µå¸çš„ `v141TeamBuff` é¡¯ç¤ºè³‡æ–™ã€‚
-- `js/38-v143-system-fixes.js` åªæ”¶æ–‚è¬è±¡åœŸç›¾èˆŠçš„ã€Œå››è§’ï¼‹è±¡å­—ã€ç¨‹åºç‰¹æ•ˆï¼šç•¶æ–°çš„ Sprite
-  status owner å­˜åœ¨æ™‚ä¸å†ç–ŠåŠ èˆŠæ•ˆæžœï¼›åå‚·è¦å‰‡ã€çµç•Œæ¬¡æ•¸ UIã€ç‹€æ…‹è³‡æ–™èˆ‡æˆ°é¬¥æ•¸å€¼çš†ä¸æ”¹ã€‚
-- æœ¬è¼ªåªç™¼å¸ƒ `dev`ï¼Œä¸ä¿®æ”¹ï¼åˆä½µ `main`ã€‚
-
-## V173.38 æ­£å¼å‚·å®³æ¨¡åž‹ï¼ˆç›®å‰ devï¼‰
-
-> **ç›®å‰å”¯ä¸€å‚·å®³è¦æ ¼å…¥å£ã€‚** æœ¬ç¯€èˆ‡ `tests/v170-final-spec-integration.test.js` ä»£è¡¨
-> å®Œæ•´è¼‰å…¥å¾Œçš„ V173.38 æˆ°é¬¥å‚·å®³è¦å‰‡ï¼›ä¸‹æ–¹ V173.37 èˆ‡æ›´æ—©æ®µè½åƒ…ä¿ç•™æ­·å²åŸºç·šã€‚
-
-- `js/00-main.js` æ˜¯ `calculateDamage()`ã€`calculateSkillDamage()` èˆ‡ `damageRole` çš„å–®ä¸€æ¬Šå¨ ownerï¼›
-  V149ã€V155ã€V169 çš„ä¸‹æ¸¸å‚·å®³è¦†å¯«å·²ç§»é™¤ï¼Œæ—¢æœ‰å…ƒç´ ã€ç‹€æ…‹ã€çˆ†æ“Šèˆ‡æŠ€èƒ½åˆ†é¡žä»ä¿ç•™ã€‚
-- çŽ©å®¶èˆ‡æ€ªç‰©çµ±ä¸€æŽ¡ã€Œ30ï¼‹ç­‰ç´šæˆé•·ï¼‹æœ‰æ•ˆå…­åœã€å°ºåº¦ï¼›äº”ç¨®æ­£å¼ damageRoleã€æ›²ç·šé˜²ç¦¦ã€
-  0.85ï½ž1.15 ç­‰ç´šå·®ã€1.20ï¼1.00ï¼0.85 å…ƒç´ å€çŽ‡å‡ä¾ V173.38 è¦æ ¼æ ¡æº–ã€‚
-- å…ƒç´  EXã€å¥—è£ã€ç•°å¸¸å¢žå‚·ã€ä¸€èˆ¬æŠ€èƒ½èˆ‡æœªä¾†è©žæ¢é€²å…¥åŒä¸€æ™®é€šå¢žå‚·åŠ ç®—æ¡¶ï¼Œä¸Šé™ 1.50ï¼›
-  çˆ†æ“Šæœ€çµ‚ä¸Šé™ 2.25ï¼ŒæŠ€èƒ½å¯é¸ `damageBudgetMultiplier`ï¼ŒæœªæŒ‡å®šæ™‚ç‚º 1.00ã€‚
-- æ€ªç‰©å°çŽ©å®¶æ‰å¥—æ•µæ–¹å£“åŠ›ï¼šæ™®é€šï¼ç²¾è‹±ï¼BOSS åŠ æˆ 0%ï¼10%ï¼20%ï¼Œæ—¥å¸¸å‰¯æœ¬å¦åŠ  5%ï¼Œ
-  æ·±æ·µå¦åŠ  15%ï¼›çŽ©å®¶æ”»æ“Šæ€ªç‰©å›ºå®šä¸å¥—ã€‚å‰¯æœ¬èˆ‡æ·±æ·µå»ºæ€ªä¸å†ä»¥ rank æ”¾å¤§æ”»æ“Šï¼é­”æ”»ã€‚
-- æ·±æ·µç¬¬ 1ï½ž4 å±¤æŠ€èƒ½ç­‰ç´šæ”¹ä¾æ€ªç‰©ç­‰ç´šåˆ†æ®µï¼›ç¬¬ 5 å±¤åäººé™£å®¹èˆ‡æŠ€èƒ½é…ç½®ä¸è®Šï¼Œå…¨å“¡ Lv5ã€‚
-- ç›´æŽ¥å½±éŸ¿å›žæ­¸å…± 33 é …é€šéŽï¼Œæ¶µè“‹ Lv20ï¼50ï¼80ï¼100ã€äº”ç¨®å‚·å®³è§’è‰²ã€ç­‰ç´šï¼å…ƒç´ ã€
-  ä¹ç¨®æ•µæ–¹å£“åŠ›ã€åŠ ç®—æ¡¶ã€çˆ†æ“Šä¸Šé™ã€æ•¸å€¼å®‰å…¨ã€ä»£è¡¨æƒ…å¢ƒå¿«ç…§èˆ‡ç¬¬äº”å±¤åäººé…ç½®ã€‚
-- æœ¬è¼ªåƒ…æ›´æ–° `dev`ï¼Œä¸åˆä½µ `main`ï¼Œä¸æ”¹å­˜æª”æ ¼å¼ã€UIã€æŠ€èƒ½æˆæœ¬ã€ç‹€æ…‹ã€è£å‚™æ•¸å€¼æˆ–ç¶“æ¿Ÿã€‚
-
-## V173.37 æœ€çµ‚æ­£å¼è¦æ ¼ï¼ˆæ­·å²åŸºç·šï¼‰
-
-> æœ¬ç¯€ã€`tests/v170-final-spec-integration.test.js` èˆ‡ `tests/v173.18-final-request.test.js`
-> è¨˜éŒ„ V173.37 çš„å®Œæ•´è¼‰å…¥ç‹€æ…‹ï¼›ç›®å‰å‚·å®³æ•¸å€¼è«‹ä»¥ä¸Šæ–¹ V173.38 ç‚ºæº–ã€‚
-
-### ç›®å‰æœ€çµ‚å€¼
-
-- æ­£å¼ `main` ç›®å‰ä»æ˜¯ V173.24ï¼ˆSHA `5256564115b613c0ea4bab1d97506a5734aff8ee`ï¼‰ï¼›
-  V173.25ï½žV173.37 ç›®å‰åªå­˜åœ¨ `dev`ã€‚æœ¬è¼ªä¾ä½¿ç”¨è€…æ˜Žç¢ºè¦æ±‚åªæäº¤ï¼æŽ¨é€ `dev`ï¼Œä¸åˆä½µ mainã€‚
-- çœŸå¯¦è¼‰å…¥æ˜¯ `index.html` çš„ 24 æ”¯åŒæ­¥ classic scriptï¼ˆ`js/23` â†’ `js/52` é–‹å ´ loader â†’ `js/00` â†’
-  `js/01`ï½ž`js/20` â†’ `js/24`ï¼‰ï¼Œå†ç”± `js/20-anonymous-20.js` ä¾ `load/error â†’ next`
-  åš´æ ¼ä¸²è¡Œè¼‰å…¥ 26 æ”¯æ­£å¼ runtimeï¼š`js/25` â†’ `js/27`ï½ž`js/51`ã€‚å·¡æ€ªç´ æéˆæœ€å¾Œçš„
-  `js/26` èˆ‡æ­£å¼ gameplay runtime éˆä¸¦è¡Œï¼Œåªç®¡å¤–è§€ï¼Œä¸èƒ½æ’é€²å¹³è¡¡è£œä¸é †åºã€‚
-- `tests/v170-final-spec-integration.test.js` æœƒåœ¨åŒä¸€å€‹ `vm.Context` çœŸæ­£ä¾ä¸Šè¿°é †åº
-  åŸ·è¡Œ 50 æ”¯ JavaScriptï¼Œå†æª¢æŸ¥æœ€çµ‚è³‡æ–™èˆ‡è¡Œç‚ºï¼›V173.34 å¦éŽ–å®šåŒåç‹€æ…‹å…ˆåˆ¤å®šã€æ­£å¼ç‹€æ…‹åã€
-  å¿…å®šç‡ƒç‡’ã€é³³å¨ã€è¿½æ“Šã€å¸è¡€ã€ç¡¬æŽ§ã€åå‚·ã€å²©ç›¾ã€çµç•Œã€ä¹˜ç®—é–ƒèº²ã€æ•µæˆ‘æ”¯æ´æŠ€èƒ½ï¼Œä»¥åŠ
-  32 æ‹›æ­£å¼å‚·å®³æŠ€èƒ½çš„ damageRoleã€å‹•æ…‹é˜²ç¦¦ã€å…­åœå°ºåº¦èˆ‡å„å±¤å‰¯æœ¬ä»£è¡¨å‚·å®³ï¼›V173.36 å†éŽ–å®š
-  æ·±æ·µç¬¬äº”é—œå›ºå®šåäººç«™ä½ã€äº”å¸ï¼äº”ç²¾è‹±ç²¾ç¢ºæŠ€èƒ½ã€å…¨å“¡æœ€é«˜æŠ€èƒ½ç­‰ç´šã€åŒ—å¸å¾©æ´»å„ªå…ˆç´šã€
-  æ±å¸ï¼å¤©å¸æ”¯æ´è¡Œç‚ºã€æ¥µå¸å–®ä¸€å…ƒç¥–è³œç¦ï¼Œä»¥åŠé¢¨å¤©å…µå¤©å°‡åªä½¿ç”¨é–ƒèº²è¡“è€Œéžéš±èº«ã€‚
-  `tests/v173.18-final-request.test.js` ç¹¼çºŒéŽ–å®šç¬¦å’’æ ¼ç·šã€æ·±æ·µæˆ°å¾Œå›žç¨‹èˆ‡æœ€çµ‚ ownerã€‚
-- ä¸‹è¡¨çš„ã€Œå‚·å®³ã€æ¬„æ˜¯ç‚ºç›¸å®¹èˆŠç¨‹å¼ã€é è¦½èˆ‡æ­·å²æ¸¬è©¦è€Œä¿ç•™çš„ `baseDamageï¼damagePerLevel`ï¼›
-  V173.34 å·²é·ç§»çš„æ­£å¼ç›´æŽ¥å‚·å®³ä¸å†ä»¥è©²æ¬„ç‚ºä¸»å‚·å®³ï¼Œè€Œæ˜¯ä½¿ç”¨è¡¨å¾Œçš„ damageRole å€çŽ‡ã€‚
-  å…¶é¤˜æ ¼å¼ç‚ºã€ŒSPï¼›ç›®æ¨™ï¼›åˆå­¸ï¼å‡ç´šï¼æœ€é«˜ï¼›å‰ç½®ã€ï¼Œå‰ç½®æœ‰å…©é …æ™‚ä»£è¡¨ä»»ä¸€é …å³å¯ã€‚
-
-| å…ƒç´  | æŠ€èƒ½ | å‚·å®³ | SP | ç›®æ¨™ | æŠ€èƒ½é»žï¼ˆåˆå­¸ï¼å‡ç´šï¼æœ€é«˜ï¼‰ | å‰ç½® |
-|---|---|---:|---:|---|---|---|
-| ç« | ç«ç„°æ–¬ | 30ï¼+6 | 10 | å–®é«” | 2ï¼1ï¼5 | ç„¡ |
-| ç« | æœƒå¿ƒä¸€æ“Š | 45ï¼+9 | 28 | å–®é«” | 10ï¼1ï¼5 | ç«ç„°æ–¬ |
-| ç« | ç«çˆ†äº‚æ“Š | 50ï¼+10 | 47 | åŒæŽ’æœ€å¤š3äºº | 20ï¼1ï¼5 | æœƒå¿ƒä¸€æ“Š |
-| ç« | éœ¸é¾è£‚å¤©æ–¬ | 165ï¼+33 | 65 | å–®é«” | 35ï¼1ï¼5 | ç«çˆ†äº‚æ“Š |
-| ç« | ç«ç®­ | 13ï¼+4 | 10 | åŒæŽ’æœ€å¤š3äºº | 2ï¼1ï¼5 | ç„¡ |
-| ç« | çƒˆç«è¡“ | 45ï¼+9 | 28 | å–®é«” | 10ï¼1ï¼5 | ç«ç®­ |
-| ç« | çƒˆç„°é¾æ² | 150ï¼+30 | 47 | å–®é«” | 30ï¼1ï¼5 | çƒˆç«è¡“ |
-| ç« | ç«é³³å¤©é³´ | 28ï¼+6 | 60 | æ•µæ–¹å…¨é«” | 35ï¼1ï¼5 | çƒˆç„°é¾æ² |
-| ç« | æ€’ç« | â€” | 50 | æˆ‘æ–¹åŒæŽ’æœ€å¤š3äºº | 25ï¼1ï¼5 | ç«çˆ†äº‚æ“Šæˆ–çƒˆç„°é¾æ² |
-| ç« | ç«å…ƒç´ EX | â€” | â€” | è¢«å‹• | 25ï¼â€”ï¼1 | ç„¡ |
-| æ°´ | æ°´åˆ€æ–¬ | 21ï¼+5 | 6 | å–®é«” | 2ï¼1ï¼5 | ç„¡ |
-| æ°´ | å†°éœœæ‹³ | 32ï¼+7 | 17 | å–®é«” | 10ï¼1ï¼5 | æ°´åˆ€æ–¬ |
-| æ°´ | å†°æ—‹ä¸€é–ƒ | 35ï¼+7 | 45 | åŒæŽ’æœ€å¤š3äºº | 20ï¼1ï¼5 | å†°éœœæ‹³ |
-| æ°´ | å†°å°é‡æ“Š | 116ï¼+24 | 60 | å–®é«” | 30ï¼1ï¼5 | å†°æ—‹ä¸€é–ƒ |
-| æ°´ | æ°´çƒè¡“ | 10ï¼+2 | 8 | åŒæŽ’æœ€å¤š3äºº | 2ï¼1ï¼5 | ç„¡ |
-| æ°´ | æ´ªæ°´çŒ›ç¸ | 105ï¼+21 | 35 | å–®é«” | 15ï¼1ï¼5 | æ°´çƒè¡“ |
-| æ°´ | å†°éœœç®­é›¨ | 20ï¼+4 | 75 | æ•µæ–¹å…¨é«” | 20ï¼1ï¼5 | æ´ªæ°´çŒ›ç¸ |
-| æ°´ | å†°å° | â€” | 32 | åŒåˆ—å‰å¾Œæœ€å¤š2äºº | 25ï¼â€”ï¼1 | å†°éœœç®­é›¨ |
-| æ°´ | æ²»ç™‚è¡“ | â€” | 45 | æˆ‘æ–¹åŒæŽ’æœ€å¤š3äºº | 20ï¼1ï¼5 | å†°éœœç®­é›¨æˆ–å†°æ—‹ä¸€é–ƒ |
-| æ°´ | å¾©æ´»è¡“ | â€” | 45 | æ­»äº¡å‹æ–¹å–®é«” | 20ï¼1ï¼5 | æ²»ç™‚è¡“ |
-| æ°´ | æ°´å…ƒç´ EX | â€” | â€” | è¢«å‹• | 25ï¼â€”ï¼1 | ç„¡ |
-| é¢¨ | æš´é¢¨æ‹³ | 26ï¼+6 | 7 | å–®é«” | 2ï¼1ï¼5 | ç„¡ |
-| é¢¨ | æš´é¢¨äº‚æ“Š | 13ï¼+3 | 20 | åŒæŽ’æœ€å¤š3äºº | 10ï¼1ï¼5 | æš´é¢¨æ‹³ |
-| é¢¨ | é¢¨æ—‹åå­—æ–¬ | 128ï¼+26 | 39 | å–®é«” | 15ï¼1ï¼5 | æš´é¢¨äº‚æ“Š |
-| é¢¨ | æšˆçœ©çŒ›æ“Š | 141ï¼+29 | 55 | å–®é«” | 30ï¼1ï¼5 | æš´é¢¨äº‚æ“Š |
-| é¢¨ | ç‹‚é¢¨è¡“ | 12ï¼+3 | 9 | åŒæŽ’æœ€å¤š3äºº | 2ï¼1ï¼5 | ç„¡ |
-| é¢¨ | é¢¨ç„°è¡“ | 14ï¼+4 | 18 | åŒæŽ’æœ€å¤š3äºº | 10ï¼1ï¼5 | ç‹‚é¢¨è¡“ |
-| é¢¨ | é¢¨å“®é›»æ“Š | 128ï¼+26 | 55 | å–®é«” | 15ï¼1ï¼5 | é¢¨ç„°è¡“ |
-| é¢¨ | é¢¨èµ·é›²æ¹§ | 24ï¼+5 | 75 | æ•µæ–¹å…¨é«” | 30ï¼1ï¼5 | é¢¨å“®é›»æ“Š |
-| é¢¨ | é–ƒèº²è¡“ | â€” | 20 | æˆ‘æ–¹åŒæŽ’æœ€å¤š3äºº | 10ï¼â€”ï¼1 | é¢¨æ—‹åå­—æ–¬æˆ–é¢¨å“®é›»æ“Š |
-| é¢¨ | éš±èº«è¡“ | â€” | 45 | å‹æ–¹å–®é«” | 15ï¼â€”ï¼1 | é–ƒèº²è¡“ |
-| é¢¨ | æ°£å®šç¥žé–’ | â€” | 77 | æˆ‘æ–¹å…¨é«” | 20ï¼â€”ï¼1 | éš±èº«è¡“ |
-| é¢¨ | é¢¨å…ƒç´ EX | â€” | â€” | è¢«å‹• | 25ï¼â€”ï¼1 | ç„¡ |
-| åœŸ | åœŸçŸ³æ–¬ | 26ï¼+6 | 7 | å–®é«” | 2ï¼1ï¼5 | ç„¡ |
-| åœŸ | çŸ³ç›¾æ‹³ | 13ï¼+3 | 26 | åŒæŽ’æœ€å¤š3äºº | 10ï¼1ï¼5 | åœŸçŸ³æ–¬ |
-| åœŸ | çŸ³ç ´å¤©é©š | 128ï¼+26 | 42 | å–®é«” | 15ï¼1ï¼5 | çŸ³ç›¾æ‹³ |
-| åœŸ | åœ°è£‚é‡æ‹³ | 47ï¼+9 | 55 | åŒæŽ’æœ€å¤š3äºº | 30ï¼1ï¼5 | çŸ³ç ´å¤©é©š |
-| åœŸ | è½çŸ³è¡“ | 12ï¼+3 | 7 | åŒæŽ’æœ€å¤š3äºº | 2ï¼1ï¼5 | ç„¡ |
-| åœŸ | æ»¾çŸ³è¡“ | 14ï¼+4 | 19 | åŒæŽ’æœ€å¤š3äºº | 10ï¼1ï¼5 | è½çŸ³è¡“ |
-| åœŸ | é£›æ²™çž¬æ“Š | 24ï¼+5 | 55 | æ•µæ–¹å…¨é«” | 15ï¼1ï¼5 | æ»¾çŸ³è¡“ |
-| åœŸ | åœ°ç‰›çŒ›è¥² | 140ï¼+28 | 65 | å–®é«” | 30ï¼1ï¼5 | é£›æ²™çž¬æ“Š |
-| åœŸ | è¬è±¡åœŸç›¾ | â€” | 66 | æˆ‘æ–¹åŒæŽ’æœ€å¤š3äºº | 10ï¼â€”ï¼1 | çŸ³ç ´å¤©é©šæˆ–é£›æ²™çž¬æ“Š |
-| åœŸ | å²©çŸ³å£å£˜ | â€” | 45 | æˆ‘æ–¹åŒæŽ’æœ€å¤š3äºº | 15ï¼â€”ï¼1 | çµç•Œ |
-| åœŸ | çµç•Œ | â€” | 40 | å‹æ–¹å–®é«” | 20ï¼â€”ï¼1 | è¬è±¡åœŸç›¾ |
-| åœŸ | åœŸå…ƒç´ EX | â€” | â€” | è¢«å‹• | 25ï¼â€”ï¼1 | ç„¡ |
-
-V173.34 æ­£å¼å‚·å®³æ¨¡åž‹ï¼š
-
-- ç‰©ç†æŠ€èƒ½ `rawAttack = effectiveAttack Ã— effectivePower + effectiveFlatDamage`ï¼›æ³•è¡“æŠ€èƒ½æŠŠ
-  `effectiveAttack` æ›æˆ `effectiveMagicAttack`ã€‚`effectivePower = powerMultiplier +
-  powerPerLevel Ã— (skillLevel - 1)`ï¼›å›ºå®šå‚·å®³åŒæ¨£ä¾ `flatDamage + flatDamagePerLevel Ã—
-  (skillLevel - 1)` è¨ˆç®—ã€‚å·²æœ‰æ–°ç‰ˆæ¬„ä½æ™‚å¿…èµ°å€çŽ‡åˆ¶ï¼Œå°šæœªé·ç§»è€…æ‰å›žé€€èˆŠå›ºå®šå‚·å®³ï¼›
-  `baseDamageï¼damagePerLevel` æš«ä¸åˆªé™¤ã€‚
-- å…±ç”¨æ ¸å¿ƒå†ä¾åºå¥—å…¥æ—¢æœ‰ç­‰ç´šå·®ã€å…ƒç´ ã€é˜²ç¦¦ã€çˆ†æ“Šã€Buffï¼Debuff èˆ‡ 95%ï½ž105% æµ®å‹•ã€‚
-  é˜²ç¦¦å°ºåº¦ç‚º `K = 250 + ç›®æ¨™ç­‰ç´šÃ—15`ã€`defenseFactor = K/(K+DEF)`ï¼Œæœ€ä½Žå‚·å®³1ï¼›
-  ç‰©æ”»ç‚º `10 + æ”»æ“Šé»žÃ—8`ã€é­”æ”»ç‚º `10 + æ™ºåŠ›é»žÃ—8`ã€é˜²ç¦¦ç‚º `10 + é«”è³ªé»žÃ—6`ã€
-  HP ç¶­æŒ `100 + é«”è³ªé»žÃ—50 + æ—¢æœ‰å‡ç´šï¼è£å‚™åŠ æˆ`ã€‚çŽ©å®¶èˆ‡æ€ªç‰©å…±ç”¨æ›ç®—å°ºåº¦ã€‚
-
-| damageRole | Lv1å€çŽ‡ | æ¯ç´š | å›ºå®šå‚·å®³ | æ­£å¼æŠ€èƒ½ |
-|---|---:|---:|---:|---|
-| single_low | 1.40 | +0.05 | 0 | ç«ç„°æ–¬ã€æ°´åˆ€æ–¬ã€æš´é¢¨æ‹³ã€åœŸçŸ³æ–¬ |
-| single_normal | 1.75 | +0.075 | 10 | æœƒå¿ƒä¸€æ“Šã€å†°éœœæ‹³ã€æ´ªæ°´çŒ›ç¸ã€é¢¨æ—‹åå­—æ–¬ã€æšˆçœ©çŒ›æ“Šã€é¢¨å“®é›»æ“Šã€çŸ³ç ´å¤©é©š |
-| single_burst | 2.10 | +0.10 | 20 | éœ¸é¾è£‚å¤©æ–¬ã€å†°å°é‡æ“Š |
-| tri_damage | 1.35 | +0.05 | 5 | ç«çˆ†äº‚æ“Šã€å†°æ—‹ä¸€é–ƒã€æ°´çƒè¡“ã€æš´é¢¨äº‚æ“Šã€ç‹‚é¢¨è¡“ã€é¢¨ç„°è¡“ã€çŸ³ç›¾æ‹³ã€è½çŸ³è¡“ã€æ»¾çŸ³è¡“ |
-| aoe_damage | 1.10 | +0.05 | 0 | å†°éœœç®­é›¨ã€é¢¨èµ·é›²æ¹§ã€æš´é¢¨è¡“ã€é£›æ²™çž¬æ“Š |
-| single_control | 1.35 | +0.05 | 0 | åœ°ç‰›çŒ›è¥² |
-| tri_control | 1.20 | +0.04 | 0 | åœ°è£‚é‡æ‹³ |
-| aoe_control | 0.95 | +0.04 | 0 | ç›®å‰ç„¡æ­£å¼ç›´æŽ¥å‚·å®³æŠ€èƒ½ï¼Œä¿ç•™å…±ç”¨ profile |
-| single_dot | 1.50 | +0.06 | 5 | çƒˆç«è¡“ã€çƒˆç„°é¾æ² |
-| tri_dot | 1.15 | +0.04 | 0 | ç«ç®­ |
-| aoe_dot | 0.95 | +0.04 | 0 | ç«é³³å¤©é³´ |
-
-`flatDamagePerLevel` ç›®å‰å…¨éƒ¨ç‚º0ã€‚æšˆçœ©çŒ›æ“Šï¼é¢¨èµ·é›²æ¹§çš„ç¾è¡Œã€Œæšˆçœ©ã€æ˜¯æé«˜ MISSã€ä¸æ˜¯ç¦æ­¢
-è¡Œå‹•ï¼Œå› æ­¤ä¾å¯¦éš›ç‹€æ…‹æ•ˆæžœæ­¸å…¥ damage é¡žï¼›å†°å°ç´”æŽ§ä¸é€ æˆç›´æŽ¥å‚·å®³ï¼Œæ²’æœ‰ damageRoleã€‚
-
-ç‹€æ…‹èˆ‡é«˜é¢¨éšªè¡Œç‚ºçš„ç›®å‰æœ€çµ‚å€¼ï¼š
-
-- æ‰€æœ‰æŒçºŒæ€§ Buffã€Debuffã€DOTã€æŽ§åˆ¶ã€è­·ç›¾ã€åå‚·èˆ‡çµç•Œå…ˆæŒ‰æ­£å¼ã€Œç‹€æ…‹åç¨±ã€æª¢æŸ¥ã€‚
-  ç›®æ¨™å·²æœ‰åŒåç‹€æ…‹æ™‚ï¼Œæ–°ç‹€æ…‹ç›´æŽ¥ MISSï¼Œä¸æ“²æ©ŸçŽ‡ã€ä¸ç–ŠåŠ ã€ä¸è¦†è“‹ã€ä¸åˆ·æ–°ã€ä¸è£œæ»¿æ•¸å€¼æˆ–
-  æ¬¡æ•¸ï¼›ç›´æŽ¥å‚·å®³ã€å¸è¡€ã€ç«‹å³æ²»ç™‚èˆ‡ SP å›žå¾©ä»æ­£å¸¸çµç®—ã€‚å¤šäººæŠ€èƒ½é€ç›®æ¨™ç¨ç«‹åˆ¤å®šã€‚
-  æ­£å¼åç¨±ç‚ºç‡ƒç‡’ã€æ€’ç«ã€é³³å¨ã€å‡å‚·ã€å†°å°ã€é‡åŠ›ã€æ®¤é¢¨ã€æšˆçœ©ã€é¢¨è¡Œã€éš±èº«ã€æ°£å®šç¥žé–’ã€
-  ç ´é˜²ã€å²©ç›¾ã€çŸ³åŒ–ã€è¬è±¡åœŸç›¾ã€å²©çŸ³å£å£˜ã€çµç•Œã€‚
-- å‚·å®³ã€ä¸€èˆ¬ç•°å¸¸èˆ‡ç¡¬æŽ§å…±ç”¨ç­‰ç´šå·®å€çŽ‡ `clamp(1 + ç­‰ç´šå·®Ã—0.02, 0.70, 1.30)`ï¼›ä¸€èˆ¬ç•°å¸¸ç‰©ç†å…¬å¼ç‚º
-  `åŸºç¤Žæ©ŸçŽ‡Ã—å€çŽ‡ + ç‰©æ”»Ã—0.05 - ç²¾ç¥žÃ—0.05 - é¡å¤–æŠ—æ€§`ï¼Œæ³•è¡“æŠŠç‰©æ”»é …æ”¹ç‚ºæ™ºåŠ›Ã—0.05ï¼Œ
-  æœ€çµ‚æ²¿ç”¨æ—¢æœ‰ 5%ï½ž95% ä¸Šä¸‹é™ã€‚å†°å°ï¼çŸ³åŒ–ç­‰ç¡¬æŽ§æŠŠå±¬æ€§é …æ”¹æˆ `sqrt(ç‰©æ”»æˆ–æ™ºåŠ›)Ã—0.2`ï¼Œ
-  æ™®é€šï¼ç²¾è‹±ï¼BOSS ä¸Šé™åˆ†åˆ¥ç‚º 80%ï¼60%ï¼40%ï¼Œå…¶é¤˜æ—¢æœ‰è¦å‰‡ä¸è®Šã€‚
-- çŽ©å®¶åŸºç¤Žé–ƒèº²ç‚ºæœ‰æ•ˆæ•æ·Ã—0.6%ï¼›æ™®é€šæ€ªç‰©é è¨­åŸºç¤Žé–ƒèº²ç‚º
-  `min(30%, ç­‰ç´šÃ—0.3%)`ï¼Œæ˜Žç¢ºè‡ªè¨‚ `evasion` ä¸è¦†è“‹ã€‚åŸºç¤Žå‘½ä¸­çŽ‡ç‚º
-  `clamp(95 + å‘½ä¸­Ã—0.3 - ç›´æŽ¥å‘½ä¸­çŽ‡é™ä½Ž, 50%, 99%)`ï¼Œæœ€çµ‚å†ä¹˜
-  `(1 - æœ€çµ‚é–ƒèº²çŽ‡)` ä¸¦é™åˆ¶ 1%ï½ž99%ã€‚é¢¨è¡Œ75%ã€é¢¨å…ƒç´ EX35%ã€å…ƒç¥–è³œç¦35%ç­‰é¡å¤–ä¾†æº
-  ç¶­æŒç¨ç«‹ä¹˜ç®—ï¼Œæœ€çµ‚é–ƒèº²ä¸Šé™85%ã€‚
-- ç«ï¼šç«ç„°æ–¬ã€æœƒå¿ƒä¸€æ“Šã€ç«çˆ†äº‚æ“Šåœ¨ç›®æ¨™æ­»äº¡æˆ–ä»»ä¸€çˆ†æ“Šæ™‚å…è²»è¿½æ“Šä¸€æ¬¡ï¼›éœ¸é¾è£‚å¤©æ–¬æœ€å¤š
-  è¿½æ“Šå…©æ¬¡ã€‚ç«ç®­ 25% ç‡ƒç‡’2å›žåˆã€æ¯å›žåˆæœ€å¤§ HP `[1,1,2,2,3]%`ï¼›çƒˆç«è¡“ 30%ï¼2å›žåˆï¼
-  `[1,2,3,4,5]%`ï¼›çƒˆç„°é¾æ²å¿…å®šç‡ƒç‡’1å›žåˆï¼`[3,4,5,6,7]%`ï¼›ç«é³³å¤©é³´ 40%ï¼2å›žåˆï¼
-  `[5,7,9,11,13]%`ï¼Œæœ¬æ¬¡å¯¦éš›æ–°å¢žç‡ƒç‡’å°‘æ–¼3äººæ™‚æ–½æ³•è€…å–å¾—ã€é³³å¨ã€‘ï¼Œä¸‹ä¸€å›žåˆæ‰€æœ‰ç›´æŽ¥å‚·å®³
-  èˆ‡ç”±æ–½æ³•è€…é€ æˆçš„ç‡ƒç‡’å‚·å®³ +30%ï¼Œä¸”åŒåé³³å¨ä¸åˆ·æ–°ã€‚æ€’ç«3å›žåˆçš„çˆ†æ“ŠçŽ‡ç‚º
-  `[5,10,15,20,25]%`ã€çˆ†å‚·ç‚º `[10,20,30,40,50]%`ã€‚ç«å…ƒç´ EXç‚ºç«å‚·+10%ã€çˆ†çŽ‡+5%ã€
-  çˆ†å‚·+5%ï¼Œå°ç•°å¸¸ç›®æ¨™å‚·å®³+5%ã€‚
-- æ°´ï¼šæ°´åˆ€æ–¬ï¼å†°éœœæ‹³ï¼å†°æ—‹ä¸€é–ƒï¼å†°å°é‡æ“Šï¼æ°´çƒè¡“ï¼æ´ªæ°´çŒ›ç¸ï¼å†°éœœç®­é›¨çš„å‡å‚·åŸºç¤Žæ©ŸçŽ‡
-  ä¾åºç‚º 10ï¼15ï¼20ï¼25ï¼10ï¼15ï¼20%ï¼Œå‡åªç¦æ­¢æŠ€èƒ½1å›žåˆï¼›å¸è¡€ä¾å„æŠ€èƒ½è¡¨ç‚º
-  `[4,5,6,7,8]`ã€`[4,5,6,7,8]`ã€`[3,4,5,6,7]`ã€`[4,5,6,7,8]`ã€
-  `[3,4,5,6,7]`ã€`[4,5,6,7,8]`ã€`[1,2,3,4,5]%`ã€‚å†°å°ç‚ºåŒåˆ—å‰å¾Œæœ€å¤š2äººã€90%åŸºç¤Ž
-  æ©ŸçŽ‡ã€3å›žåˆã€ç´”æŽ§åˆ¶ã€‚æ²»ç™‚è¡“ Lv1 ç‚ºæˆ‘æ–¹åŒæŽ’3äººå„ 550 HPï¼å›ºå®š35 SPï¼Œåªæœ‰ HP æ¯ç´š+30ï¼Œ
-  ä¸¦è§£é™¤å…¨éƒ¨å¯è§£é™¤è² é¢ï¼›æ–½æ³•è€…ä¸åƒè‡ªå·±çš„ SP å›žå¾©ã€‚å¾©æ´»è¡“æ¢å¾©
-  `[20,40,60,80,100]%` HPã€ä¸å›žå¾© SPã€‚æ°´å…ƒç´ EX
-  ç‚ºæ°´å‚·+5%ã€å›žå¾©+10%ï¼Œå›žåˆé–‹å§‹å‰30%è§£é™¤è‡ªèº«å…¨éƒ¨è² é¢ã€‚
-- é¢¨ï¼šæš´é¢¨æ‹³é™ä½Žæ•æ· `[30,40,50,60,70]%` 1å›žåˆï¼›æš´é¢¨äº‚æ“Šã€é¢¨æ—‹åå­—æ–¬ã€é¢¨ç„°è¡“ã€
-  é¢¨å“®é›»æ“Šä¾æŠ€èƒ½è³‡æ–™é™ä½Žå‚·å®³ï¼›æšˆçœ©çŒ›æ“Š5å›žåˆèˆ‡é¢¨èµ·é›²æ¹§1å›žåˆçš„ MISS å¢žå¹…å‡ç‚º
-  `[30,45,50,55,65]%`ã€‚é–ƒèº²è¡“çµ¦åŒæŽ’3äººã€é¢¨è¡Œã€‘75%å…±3å›žåˆï¼›éš±èº«3å›žåˆï¼›æ°£å®šç¥žé–’ç‚ºå…¨éšŠ
-  ç•°å¸¸æŠ—æ€§+65%ã€å‘½ä¸­+50%å…±3å›žåˆï¼›é¢¨å…ƒç´ EXæ°¸ä¹…é–ƒèº²35%ã€‚æ‰€æœ‰é–ƒèº²ä¾†æºæŽ¡
-  `1 - Î (1 - å„ä¾†æº)` ä¹˜ç®—ï¼Œæœ€çµ‚ä¸Šé™85%ã€‚
-- åœŸï¼šåœŸçŸ³æ–¬ï¼è½çŸ³è¡“ï¼æ»¾çŸ³è¡“ï¼é£›æ²™çž¬æ“Šä¾æŠ€èƒ½è³‡æ–™é™ä½Žé˜²ç¦¦ï¼›çŸ³ç›¾æ‹³èˆ‡çŸ³ç ´å¤©é©šçµ¦è‡ªèº«
-  `[100,125,150,175,200]` è­·ç›¾2å›žåˆï¼›åœ°è£‚é‡æ‹³çŸ³åŒ–çŽ‡ `[30,35,40,45,50]%`ã€åœ°ç‰›çŒ›è¥²
-  `[20,25,30,35,45]%`ï¼Œå‡2å›žåˆã€‚è¬è±¡åœŸç›¾ç‚ºåŒæŽ’3äººåå‚·50%å…±3å›žåˆï¼›å²©çŸ³å£å£˜ç‚ºåŒæŽ’3äºº
-  é˜²ç¦¦+35%å…±4å›žåˆï¼›å²©ç›¾åªå¸æ”¶ç›´æŽ¥å‚·å®³ï¼ŒåŒåå²©ç›¾ä¸è£œæ»¿ï¼›çµç•ŒæŒ‰ã€Œä¸€æ¬¡æŠ€èƒ½æ–½æ”¾ã€æ“‹5æ¬¡
-  ç›´æŽ¥å‚·å®³æŠ€èƒ½ã€æœ€å¤š5å›žåˆï¼Œå¤šæ®µåŒä¸€æŠ€èƒ½åªæ‰£1æ¬¡ï¼ŒDOTï¼åå‚·ç©¿é€ã€‚è¬è±¡åœŸç›¾åªæŒ‰å¯¦éš› HP
-  ç›´æŽ¥å‚·å®³åå‚·50%ï¼Œå²©ç›¾ï¼çµç•Œå¸æ”¶ã€DOTã€åå‚·æœ¬èº«å‡ä¸è§¸ç™¼ã€‚åœŸå…ƒç´ EXæ°¸ä¹…é˜²ç¦¦+35%ã€‚
-- æ·±æ·µç¬¬äº”é—œå›ºå®šå‰æŽ’ã€Œæ±å¸ï¼å¤©å¸ï¼æ¥µå¸ï¼åŒ—å¸ï¼å—å¸ã€ã€å¾ŒæŽ’ã€Œæ°´ï¼åœŸï¼ç«ï¼é¢¨ï¼æ°´ã€äº”å
-  åŒåå¤©å…µå¤©å°‡ï¼Œååæ•µäººå…¨éƒ¨ä½¿ç”¨æœ€é«˜æŠ€èƒ½ç­‰ç´šã€‚æŒ‡å®šæŠ€èƒ½ç‚ºï¼šæ±å¸ã€Œåœ°ç‰›çŒ›è¥²ï¼çŸ³ç ´å¤©é©šï¼
-  è¬è±¡åœŸç›¾ã€ã€å¤©å¸ã€Œé¢¨å“®é›»æ“Šï¼é¢¨èµ·é›²æ¹§ï¼æ°£å®šç¥žé–’ã€ã€æ¥µå¸åƒ…ã€Œå…ƒç¥–è³œç¦ã€ã€åŒ—å¸ã€Œå†°éœœç®­é›¨ï¼
-  å¾©æ´»è¡“ï¼æ²»ç™‚è¡“ã€ã€å—å¸ã€Œæ€’ç«ï¼éœ¸é¾è£‚å¤©æ–¬ï¼çƒˆç„°é¾æ²ã€ï¼›æ°´ï¼åœŸï¼ç«ï¼é¢¨ç²¾è‹±ä¾åºåªå¸¶
-  æ²»ç™‚è¡“ï¼çŸ³ç ´å¤©é©šï¼çƒˆç„°é¾æ²ï¼é–ƒèº²è¡“ï¼Œç¬¬äºŒåæ°´ç²¾è‹±åŒæ¨£åªå¸¶æ²»ç™‚è¡“ã€‚é¢¨ç²¾è‹±ä¸å¸¶éš±èº«è¡“ã€‚
-- æ¥µå¸å¤©å°Šçš„å”¯ä¸€æŠ€èƒ½ç”± V155 resolver çµç®—ï¼šå…ƒç¥–è³œç¦å°å­˜æ´»æˆ‘æ–¹å…¨é«”é€ç›®æ¨™ç¨ç«‹é€²è¡Œ35%
-  æ·¨åŒ–åˆ¤å®šï¼Œæ¯å€‹ç›®æ¨™åŒæ™‚ç«‹å³æ¢å¾©100 HPèˆ‡100 SPï¼Œä¸¦å°å°šæœªæŒæœ‰åŒåç¥ç¦è€…å¢žåŠ 35%é–ƒé¿ã€
-  æŒçºŒ2å›žåˆï¼ˆæˆæœ¬45ï¼‰ã€‚ç«‹å³å›žå¾©èˆ‡æ·¨åŒ–å³ä½¿åŒåæŒçºŒç‹€æ…‹å·²å­˜åœ¨ä»æœƒçµç®—ï¼›é–ƒé¿ç‹€æ…‹ä¸ç–ŠåŠ ã€
-  ä¸è¦†è“‹ã€ä¸åˆ·æ–°ï¼Œä¸”èˆ‡é¢¨è¡ŒæŒ‰æ­£å¼ä¹˜ç®—ã€æœ€çµ‚ä¸Šé™85%ã€‚
-
-### æ­·å²ç‰ˆæœ¬ç´€éŒ„èˆ‡ owner é‚Šç•Œ
-
-- V140ï½žV173.17 çš„èˆŠæŠ€èƒ½æ–·è¨€åªä»£è¡¨æ­·å²å¿«ç…§ï¼›ä¸å¾—å†ç‚ºäº†è®“èˆŠæ•¸å€¼æ–·è¨€é€šéŽè€Œæ”¹å›žæ­£å¼å€¼ã€‚
-  V173.18 å·²åˆªé™¤ `js/44`ã€`js/46`ã€`js/47` çš„ä¸‹æ¸¸è³‡æ–™è¦†è“‹ï¼šç«ï¼é¢¨ï¼åœŸå”¯ä¸€è³‡æ–™ owner æ˜¯
-  `js/43-v149-skill-ui-rules.js`ï¼Œæ°´æ˜¯ `js/50-v169-water-skill-rules.js`ï¼Œç•°å¸¸å…¬å¼æ˜¯ `js/33`ï¼Œ
-  æ¬Šå¨ç›®æ¨™è§£æžèˆ‡æ²»ç™‚ï¼æ”¯æ´çµç®—æ˜¯ `js/42`ï¼›V173.19 çš„å…±ç”¨åŒåç‹€æ…‹ã€ç›´æŽ¥å‚·å®³ã€åå‚·èˆ‡èƒ½åŠ›
-  æŸ¥è©¢å…¥å£åœ¨ `js/00`ï¼Œæ€ªç‰©çµç•Œï¼å²©ç›¾ç›¸å®¹å±¤åœ¨ `js/38`ï¼Œé³³å¨åœ¨ `js/46`ï¼Œæœ€çµ‚æ°´æŠ€èƒ½åœ¨ `js/50`ã€‚
-- `skillDatabase.yuanXiangGuangMing`ï¼`yuanGuangShield` çš„æ­·å²æ¬„ä½ä»ä¿ç•™ä¾›èˆŠç´€éŒ„ç›¸å®¹ï¼Œä½†
-  V173.36 çš„ç¬¬äº”é—œé…ç½®ä¸å†æŠŠå…©æ‹›äº¤çµ¦æ¥µå¸å¤©å°Šã€‚`js/46-v155-dev-fixes.js` æ˜¯ç¬¬äº”é—œæœ€çµ‚ç·¨éšŠã€
-  å¼·åˆ¶æŠ€èƒ½ç­‰ç´šåŠäº”å¸ï¼é¢¨ç²¾è‹±å°ˆå±¬æ”¯æ´è¡Œç‚ºçš„å”¯ä¸€æœ€ä¸‹æ¸¸ ownerï¼›ä¸å¾—å†ç”±èˆŠ V142ï¼V144 resolver
-  è¦†è“‹ï¼Œä¹Ÿä¸å¾—æŠŠé¢¨ç²¾è‹±æ”¹æŽ¥éš±èº«è¡“ã€‚
-- V173.34 çš„ `calculateDamage()`ã€`calculateSkillDamage()`ã€damageRole profile èˆ‡å…­åœæ›ç®—å”¯ä¸€ owner
-  æ˜¯ `js/00-main.js`ï¼›`js/47` ä¸å†é‡å¯«å‚·å®³å…¬å¼ï¼Œ`js/43`ï¼`js/50` åªåœ¨å„è‡ªæŠ€èƒ½è³‡æ–™å®Œæˆå¾Œå¥—å…¥
-  å…±ç”¨ profileã€‚æœ¬è¼ªæ²’æœ‰å¦å»ºè‡¨æ™‚ runtime æˆ–å¹³è¡Œ ownerï¼Œé¿å…ä¸‹æ¸¸å†æ¬¡è¦†è“‹ã€‚
-
----
-
-## çµ¦æŽ¥æ‰‹ AI çš„è¦å‰‡ï¼ˆå‹™å¿…å…ˆè®€ï¼‰
-
-1. **`main` åˆ†æ”¯æ°¸é æ˜¯å”¯ä¸€çš„æ­£å¼ç‹€æ…‹**ï¼Œä¹Ÿæ˜¯ GitHub Pages å¯¦éš›ä¸Šç·šçš„ä¾†æº
-   ï¼ˆ`https://tf00913225-alt.github.io/my-game/`ï¼‰ã€‚ä¸è¦å‡è¨­æœ‰å…¶ä»–ã€Œæ›´æ–°ã€çš„åˆ†æ”¯ï¼Œ
-   é–‹å·¥å‰å…ˆ `git fetch` ç¢ºèª `main` çš„æœ€æ–° commitã€‚
-2. **æ”¹å®Œã€é©—è­‰éŽä¹‹å¾Œï¼Œç›´æŽ¥æƒ³è¾¦æ³•åˆä½µå›ž `main`**ï¼Œä¸è¦ç•™è‘—é•·æœŸåˆ†æ”¯æˆ–æœªåˆä½µçš„ PRã€‚
-   å…©å€‹ AI å·¥å…·è¼ªæµæŽ¥æ‰‹æ™‚ï¼Œåªçœ‹å¾—æ‡‚ `main` ç¾åœ¨é•·æ€Žæ¨£ï¼Œçœ‹ä¸æ‡‚å°æ–¹ç•™åœ¨åˆ¥çš„åˆ†æ”¯ä¸Šçš„åŠæˆå“ã€‚
-3. **ä»»ä½•ä¸€æ¬¡å·¥ä½œçµæŸå‰ï¼Œä¸€å®šè¦æ›´æ–°æœ¬æ–‡ä»¶çš„ã€Œæœ€æ–°é€²åº¦ã€æ®µè½**ï¼š
-   - é€™æ¬¡åšäº†ä»€éº¼ï¼ˆå«æª”æ¡ˆè·¯å¾‘ï¼‰
-   - æ€Žéº¼é©—è­‰éŽçš„ï¼ˆèªžæ³•æª¢æŸ¥ï¼é‚è¼¯è¿½è¹¤ï¼å¯¦éš›è·‘éŽï¼‰
-   - æœ‰æ²’æœ‰å·²çŸ¥é™åˆ¶æˆ–é‚„æ²’åšå®Œçš„åœ°æ–¹
-   - æ²’æœ‰æ›´æ–°é€™ä»½æ–‡ä»¶å°±çµæŸå·¥ä½œ = äº¤æŽ¥å¤±æ•—ï¼Œä¸‹ä¸€å€‹äººæœƒè¿·è·¯ã€‚
-4. **æ”¹å‹•å‰ï¼Œå…ˆæžæ‡‚ä¸‹é¢ã€Œç³»çµ±æž¶æ§‹é‡é»žã€ï¼Œå°¤å…¶æ˜¯å‹•æ…‹è¼‰å…¥å™¨é‚£æ®µ**â€”â€”é€™å€‹å°ˆæ¡ˆçš„è¼‰å…¥æ©Ÿåˆ¶
-   ä¸æ˜¯å–®ç´”çœ‹ `index.html` çš„ `<script>` æ¨™ç±¤å°±èƒ½åˆ¤æ–·å®Œçš„ï¼Œä¹‹å‰æœ‰ä¸€æ¬¡é€£ Claude è‡ªå·±
-   éƒ½èª¤åˆ¤éŽï¼Œå¤šèŠ±äº†ä¸€è¼ªå·¥æ‰ç™¼ç¾æžéŒ¯ã€‚
-5. é€™å€‹å°ˆæ¡ˆå·²æœ‰ GitHub Actions CIï¼ˆ`.github/workflows/ci.yml`ï¼Œæ­£å¼ required check åç¨±ç‚º
-   `Repository checks`ï¼‰ï¼Œæœƒè‡ªå‹•åŸ·è¡Œèªžæ³•ã€Node suitesã€è³‡æºã€HTML IDã€ç‰ˆæœ¬ï¼Loader èˆ‡
-   Git å·®ç•°æ ¼å¼æª¢æŸ¥ï¼›V137 èµ·å¦æœ‰ä¸€çµ„é‡å°é«˜é¢¨éšªå›žæ­¸çš„ Node æ¸¬è©¦
-   `tests/v137-regressions.test.js`ï¼ŒV138 å¦æœ‰éœ€æ±‚é©—æ”¶
-   `tests/v138-feature-requirements.test.js`ï¼ŒV139 æ–°å¢žç¶“æ¿Ÿï¼ä¼‘æ¯ç¶“é©—é©—æ”¶
-   `tests/v139-economy-rested-exp.test.js`ï¼ŒV140 æ–°å¢žå››å…ƒç´ æŠ€èƒ½å®šæ¡ˆé©—æ”¶
-   `tests/v140-four-element-balance.test.js`ï¼ŒV141 æ–°å¢žç³»çµ±æ“´å……é©—æ”¶
-   `tests/v141-system-expansion.test.js`ï¼ŒV142 æ–°å¢žæŠ€èƒ½å‹•ç•«ï¼è¡Œå‹•é–˜é–€é©—æ”¶
-   `tests/v142-skill-animation.test.js`ï¼ŒV143 æ–°å¢žæˆ°é¬¥ï¼å‰¯æœ¬ï¼åˆæˆä¿®æ­£é©—æ”¶
-   `tests/v143-combat-dungeon-polish.test.js`ï¼ŒV144 æ–°å¢žå•†åº—ï¼æ€ªç‰©æŠ€èƒ½ï¼æ·±æ·µå®šæ¡ˆé©—æ”¶
-   `tests/v144-rules-and-abyss.test.js`ï¼ŒV146 æ–°å¢žæœ€å¾Œä¸€è¼ªæ‰‹æ©Ÿï¼æˆ°é¬¥ï¼å¥—è£é©—æ”¶
-   `tests/v146-system-polish.test.js`ï¼ŒV148 æ–°å¢žæˆ°é¬¥ç›®æ¨™ï¼å‰¯æœ¬æµç¨‹é©—æ”¶
-   `tests/v148-combat-dungeon-fixes.test.js`ï¼ŒV149 æ–°å¢žæŠ€èƒ½å®šæ¡ˆï¼ä»‹é¢è¦å‰‡é©—æ”¶
-   `tests/v149-skill-ui-rules.test.js`ï¼ŒV150 æ–°å¢žå†°éœœç®­é›¨ VFX é©—æ”¶
-   `tests/v150-ice-arrow-rain-vfx.test.js`ï¼ŒV152 æ–°å¢žæœ¬è¼ªæŠ€èƒ½ï¼å‰¯æœ¬ï¼æˆ°é¬¥ä»‹é¢é©—æ”¶
-   `tests/v152-dev-fixes.test.js`ï¼ŒV153 æ–°å¢žç«å…ƒç´ æ–½æ”¾ï¼æŒçºŒç‹€æ…‹æ­£å¼åœ–é©—æ”¶
-   `tests/v153-fire-vfx.test.js`ï¼ŒV154 æ–°å¢žæœ¬è¼ªæˆ°é¬¥ï¼å…ƒç´ åŒ£ï¼æ·±æ·µï¼ç‰ˆé¢é©—æ”¶
-   `tests/v154-current-request.test.js`ï¼ŒV155 æ–°å¢žç¡¬æŽ§ç¯€å¥ï¼æ·±æ·µç¬¬äº”é—œï¼ç«ç³»çµ‚éšŽæŠ€èƒ½é©—æ”¶
-   `tests/v155-current-request.test.js`ï¼ŒV156 æ–°å¢žæ·±æ·µåœ°åœ–ç«‹ç¹ªï¼é»žæ“Šç†±å€èˆ‡å…ƒç´ åŒ£ç‹€æ…‹ä¸åŒæ­¥é©—æ”¶
-   `tests/v156-deep-trace-fixes.test.js`ï¼ŒV157 æ–°å¢žæ·±æ·µåœ°åœ–ç«‹ç¹ªå°ºå¯¸èˆ‡ç›´æŽ¥é»žæ“Šé©—æ”¶
-   `tests/v157-abyss-map-tap-fix.test.js`ï¼ŒV158 æ–°å¢žæŠ€èƒ½ï¼å‘½ä¸­ï¼å‚·å®³èˆ‡æ·±æ·µç«‹ç¹ªé©—æ”¶
-   `tests/v158-combat-tuning.test.js`ï¼ŒV159 æ–°å¢žæ·±æ·µæˆ°é¬¥ç«‹ç¹ªè¼‰å…¥æ™‚åºé©—æ”¶
-   `tests/v159-abyss-battle-portraits.test.js`ï¼ŒV160 æ–°å¢žæŠ€èƒ½æ•¸å€¼ï¼ç›®æ¨™ã€å…ƒç´ åŒ£èˆ‡ç«ç³»å‹•ç•«é©—æ”¶
-   `tests/v160-current-request.test.js`ï¼ŒV161 æ–°å¢žç«ç„°æ–¬æ­£å¼ Sprite VFX é©—æ”¶
-   `tests/v161-flame-slash-vfx.test.js`ã€‚V162 çš„ç‡ƒç‡’åŒæ­¥ã€å…ƒç´ åŒ£å±¤ç´šèˆ‡æ·±æ·µæˆ°é¬¥ç«‹ç¹ª
-   é©—æ”¶å‰‡è£œå¼·åœ¨ `tests/v153-fire-vfx.test.js` èˆ‡ `tests/v154-current-request.test.js`ï¼›V163 æ–°å¢ž
-   inbox åŽŸå§‹ PNG æ ¡æ­£é©—æ”¶ `tests/v163-flame-slash-source.test.js`ï¼›V165 æ–°å¢žæ€’ç«ï¼éœ¸é¾è£‚å¤©æ–¬
-   åœ–ç‰‡èˆ‡ç«ç®­ç§»å‹•è½é»žé©—æ”¶ `tests/v165-fire-vfx-fixes.test.js`ï¼›V166 æ–°å¢žæ°´å…ƒç´ åæ‹›æ–½æ”¾ã€
-   å…©ç¨®ç‹€æ…‹å¾ªç’°ã€é€ç›®æ¨™æŠ•å°„èˆ‡æ•´å€ AOE é©—æ”¶ `tests/v166-water-vfx.test.js`ï¼›V169 æ–°å¢ž
-   RPG è¦–çª—ï¼è§’è‰²èˆ‡å•†åº—ä»‹é¢ã€å…ƒç´ åŒ£é€è§’è‰²è¨­å®šã€æ°´æŠ€èƒ½æœ€çµ‚è¦å‰‡åŠæ·±æ·µè³‡ç”¢ï¼æµç¨‹å››å¥—é©—æ”¶ï¼š
-   `tests/v169-rpg-ui.test.js`ã€`tests/v169-element-box-settings.test.js`ã€
-   `tests/v169-water-skill-rules.test.js`ã€`tests/v169-abyss-assets-flow.test.js`ï¼›V170 æ–°å¢žå”¯ä¸€ä»£è¡¨
-   å®Œæ•´æ­£å¼è¼‰å…¥å¾Œæœ€çµ‚å€¼çš„æ•´åˆé©—æ”¶ `tests/v170-final-spec-integration.test.js`ã€‚é©—è­‰è‡³å°‘è¦åŒ…å«ï¼š
-   V171 å¦æ–°å¢žæ€’ç«ï¼æ°´çƒè¡“ï¼æ´ªæ°´çŒ›ç¸ï¼å†°éœœç®­é›¨å®šä½èˆ‡å–®é«”å‡å‚·ç¯„åœé©—æ”¶
-   `tests/v171-combat-vfx-fixes.test.js`ï¼›V172 æ–°å¢žæ°´çƒè¡“å¤šç›®æ¨™åˆ†å±¤æ’­æ”¾èˆ‡åŽŸåœ–ä¿ç•™é©—æ”¶
-   `tests/v172-water-orb-vfx.test.js`ï¼›V173 æ–°å¢žæ°´çƒè¡“é›™å‘æ—‹è½‰é£›è¡Œã€å®Œæ•´å‘½ä¸­ç•«æ ¼èˆ‡ç‰ˆæœ¬æ¨™ç¤ºé©—æ”¶
-   `tests/v173-water-orb-direction-vfx.test.js`ï¼›V173.16 æ–°å¢žæ·±æ·µå°è©±ç¸®æ”¾å®šä½ã€å¯è¦–é‚Šç•Œèˆ‡ä¸‰æ®µå°è©±
-   é€²æˆ°é¬¥é©—æ”¶ `tests/v173.16-abyss-dialogue-visibility.test.js`ï¼›V173.17 æ–°å¢žç‰©å“è¦–çª—ã€è£å‚™å‰¯æœ¬
-   æŠ½çŽåˆ¸ç‰ˆé¢ã€èˆŠå­˜æª”å±•ç¤ºè³‡æ–™ä¿®å¾©èˆ‡æ‰‹æ©Ÿç¸®åœ–é©—æ”¶ `tests/v173.17-item-ui-assets.test.js`ï¼›V173.18
-   æ–°å¢žç¬¦å’’æ ¼ç·šã€æ·±æ·µå‹æ•—å›žåœ–èˆ‡ä¸‹æ¸¸ä¸å¾—è¦†è“‹æœ€çµ‚æŠ€èƒ½ owner é©—æ”¶
-   `tests/v173.18-final-request.test.js`ï¼›V173.23 æ–°å¢ž 11 æ‹›é¢¨ç³»æ–½æ”¾ã€6 ç¨®æŒçºŒç‹€æ…‹ã€é€æ ¼è£åˆ‡ã€
-   å¯¦éš›ç›®æ¨™å®šä½ã€å–®æ¬¡å‘½ä¸­åŒæ­¥èˆ‡ç‹€æ…‹ç”Ÿå‘½é€±æœŸé©—æ”¶ `tests/v173.23-wind-vfx.test.js`ã€‚
-   - `node --check æª”æ¡ˆ.js` ç¢ºèªèªžæ³•æ²’éŒ¯
-   - `node tests/v137-regressions.test.js` è·‘æ—¢æœ‰é«˜é¢¨éšªå›žæ­¸
-   - è¿½ç¨‹å¼é‚è¼¯ï¼ˆè®€ codeï¼Œä¸æ˜¯ç”¨çŒœçš„ï¼‰ç¢ºèªè¡Œç‚ºç¬¦åˆéœ€æ±‚
-   - å¦‚æžœæœ‰è¾¦æ³•èµ·ç€è¦½å™¨ï¼Œå¯¦éš›æ“ä½œä¸€æ¬¡æœ€æº–
-   ä¸è¦åœ¨æ²’é©—è­‰éŽçš„æƒ…æ³ä¸‹å®£ç¨±ã€Œåšå®Œäº†ã€ã€‚
-6. **ä»»ä½• UIã€CSSã€ç‰ˆé¢ã€ç¾Žè¡“åœ–ç‰‡ã€èƒŒåŒ…ã€è£å‚™ã€æŠ€èƒ½ã€æˆ°é¬¥ä»‹é¢ç­‰ä¿®æ”¹å‰ï¼Œ
-   éƒ½å¿…é ˆå…ˆå®Œæ•´é–±è®€ `UI_GUIDELINES.md`ã€‚** UI è¦ç¯„ä¸å¾—åªä¾è³´èŠå¤©è¨˜æ†¶ï¼›
-   `AGENTS.md` èˆ‡ `CLAUDE.md` åªæä¾›å…¥å£ï¼Œæœ¬é«”ä»¥ `UI_GUIDELINES.md` ç‚ºæº–ã€‚
-7. **æ¯æ¬¡å°å¤–æ›´æ–°éƒ½å¿…é ˆå‡ä¸€å€‹ç‰ˆæœ¬è™Ÿ**ï¼ŒåŒæ­¥æ›´æ–° loader cacheã€`index.html` ç›´è¼‰ query
-   èˆ‡ä¸»é å°é¢å³ä¸‹è§’çš„ç‰ˆæœ¬æ¨™ç¤ºï¼›äº¤ä»˜æ™‚ä¹Ÿå¿…é ˆæ˜Žç¢ºå‘ŠçŸ¥ä½¿ç”¨è€…æœ¬æ¬¡ç‰ˆæœ¬è™Ÿã€‚è‹¥å‰é¢çš„æ•´æ•¸
-   ä¸»ç‰ˆè™Ÿä¸è®Šï¼Œå¿…é ˆæ”¹ç”¨å°æ•¸ä¿®è¨‚è™Ÿä¾åºéžå¢žï¼Œä¾‹å¦‚ `V173 â†’ V173.1 â†’ V173.2`ï¼Œä¸å¾—é‡è¤‡
-   ä½¿ç”¨åŒä¸€å€‹é¡¯ç¤ºç‰ˆè™Ÿã€‚
-8. **ç™¼ç¾å•é¡Œæ™‚å„ªå…ˆå®šä½æ ¹å› ã€‚** èƒ½ä¿®æ­£æ—¢æœ‰åŽŸå§‹é‚è¼¯æ™‚ï¼Œä¸æ–°å¢žå¹³è¡Œé‚è¼¯ã€é‡è¤‡åˆ¤æ–·
-   æˆ–è¦†è“‹å¼è£œä¸ï¼›ç¶­æŒæœ€å°ä¿®æ”¹ï¼Œä¸é€²è¡Œç„¡é—œé‡æ§‹ã€‚
-
----
-
-## ç›®å‰ç‹€æ…‹ï¼ˆæˆªè‡³ 2026-09-02ï¼ŒV173.37 devï¼‰
-
-- å°ˆæ¡ˆæ˜¯ç´”å‰ç«¯ç¶²é  RPGï¼Œç”¨ GitHub Pages ç›´æŽ¥serve `index.html` + `css/` + `js/` +
-  `assets/`ï¼Œæ²’æœ‰ build stepã€æ²’æœ‰ bundlerã€‚
-- V173.20 æ–°å¢ž 12ï½ž15 ç§’éš¨æ©Ÿé›™åœ–é–‹å ´è¼‰å…¥å‹•ç•«ï¼šLogo å››å…ƒç´ ä¾åºç™¼å…‰å¾Œåˆ‡æ›ä¸»åŸŽç©ºæ™¯ï¼Œ
-  100% æ™‚åœç•™ä¸¦é–ƒçˆæç¤ºï¼Œå¿…é ˆç”±çŽ©å®¶é»žæ“Šæˆ–éµç›¤ç¢ºèªæ‰æœƒæ­éœ²å·²åœ¨ä¸‹å±¤åˆå§‹åŒ–çš„éŠæˆ²ã€‚
-- V173.21 è®“æ–°å‰µè§’è‰²åœ¨ Lv1 å–å¾— 2 é»žæŠ€èƒ½é»žï¼Œæ—¢æœ‰å‡ç´šæ¯ç´š +2 ä¸è®Šï¼›æ–°æ‰‹æ£®æž—æœ€çµ‚æ€ªç‰©
-  ç¶­æŒ Lv2ï½žLv3ï¼Œä¸”åªå¥—ç”¨ `makeZoneMonster()` åŸºç¤Žå€¼ Ã—0.75ï¼Œä¸å†ç–ŠåŠ ä¸€èˆ¬ç·´åŠŸå€ Ã—1.30ã€‚
-  è©²ç‰ˆç•¶æ™‚é›¢é–‹æ–°æ‰‹æ£®æž—å¾Œä»ç‚º Ã—1.30ï¼Œå·²ç”± V173.32 æ­£å¼åå€æ›²ç·šå–ä»£ï¼›Lv1ï½ž10 é‡Žæ€ªä»åª
-  ä½¿ç”¨æ™®é€šæ”»æ“Šã€‚
-- V173.21 åŒæ­¥åŠ å…¥ 11 å¼µé¢¨ç³»æŠ€èƒ½ iconã€æ—¥å¸¸å®Œæˆåº¦å¯¶ç®±å·²é ˜ï¼æœªé ˜ç‹€æ…‹ã€å››å…ƒç´ ç”·è§’å·¡æ€ª
-  æ­£èƒŒé¢æ–°ç«‹ç¹ªåŠå…©å¼µå·¡æ€ªæˆ°é¬¥åœ–ã€‚
-- V173.22 è£œä¸Šç‹‚é¢¨è¡“ iconï¼Œä¸¦ä¾ç«ï¼æ°´ï¼åœŸï¼é¢¨èˆ‡åˆ€ã€éŽ§ç”²ã€é´ã€ç›”ã€è­·è…•äº”å€‹éƒ¨ä½æŽ¥å…¥
-  20 å¼µæ”»æ“Šå¥—è£ iconï¼›è©²ç‰ˆæ³•è¡“å¥—è£ä»ä½¿ç”¨åŽŸæœ¬åœ–ç¤ºã€‚æ—¢æœ‰å­˜æª”çš„èƒŒåŒ…èˆ‡å·²ç©¿æˆ´å¥—è£æœƒä¾ç©©å®š ID
-  åŒæ­¥æ–°åœ–ï¼Œä¸æ›´å‹•å­˜æª”æ ¼å¼ã€è£å‚™æ•¸å€¼æˆ–å¥—è£è¦å‰‡ï¼›æ³•è¡“å¥—è£å·²æ–¼ V173.24 è£œé½Šæ­£å¼åœ–ã€‚
-- V173.23 å°‡ 11 æ‹›é¢¨ç³»æ–½æ”¾èˆ‡é‡åŠ›ã€æ®¤é¢¨ã€æšˆçœ©ã€é¢¨è¡Œã€éš±èº«ã€æ°£å®šç¥žé–’ 6 ç¨®æŒçºŒç‹€æ…‹æŽ¥å…¥
-  å°ˆæ¡ˆç¾æœ‰å…±ç”¨ Sprite VFX rendererã€åœ–ç‰‡å¿«å–ã€å®šä½èˆ‡æˆ°é¬¥è¡Œå‹•ä½‡åˆ—ï¼›æ–½æ”¾åœ–åªæ’­æ”¾ä¸€æ¬¡ï¼Œ
-  ç‹€æ…‹åœ–é€è§’è‰²å¾ªç’°ï¼ŒåŒåç‹€æ…‹å†æ¬¡ MISS ä¸é‡å•Ÿã€‚æŠ€èƒ½æ•¸å€¼ã€çµç®—ã€æ©ŸçŽ‡èˆ‡å›žåˆæ•¸æœªæ”¹ã€‚
-- V173.24 å°‡æœ¬è¼ª 20 å¼µæ³•å¸«è£å‚™ç´ æä¾ç«ï¼æ°´ï¼åœŸï¼é¢¨èˆ‡æ³•æ‰‡ã€æ³•è¢ã€æ³•éž‹ã€æ³•å† ã€æ³•ç’°æŽ¥å…¥
-  æ­£å¼å¥—è£ iconï¼›çŽ©å®¶åŸºç¤Žé–ƒèº²æ”¹ç‚ºæœ‰æ•ˆæ•æ·Ã—0.6%ï¼Œæ™®é€šæ€ªç‰©é è¨­é–ƒèº²æ”¹ç‚ºç­‰ç´šÃ—0.3%ä¸”æœ€é«˜
-  30%ï¼Œä¸€èˆ¬ç•°å¸¸çš„ç‰©æ”»ï¼æ™ºåŠ›ï¼ç²¾ç¥žä¿‚æ•¸çµ±ä¸€ç‚º0.05ã€‚ç¡¬æŽ§ã€æŠ€èƒ½åŸºç¤Žæ©ŸçŽ‡èˆ‡å¿…å®šæ–½åŠ è¦å‰‡ä¸è®Šã€‚
-- V173.25 ä¿®æ­£è£å‚™è©³ç´°è¦–çª—è£åˆ‡ã€èƒ½åŠ›æ˜Žç´°é—œé–‰éµã€èƒ½åŠ›é é»‘è‰²
-  ç•™ç™½ã€å…Œæ›åˆ¸å®Œæ•´é è¦½èˆ‡äºŒå±¤è£å‚™æ˜Žç´°ï¼›å‡å‚·æŠ€èƒ½å°éŽ–æ”¹ç‚ºç´”æ–‡å­—ï¼ŒæŠ€èƒ½åç¨±ä¾å„æŠ€èƒ½å‹•ç•«ç¸½é•·
-  é¡¯ç¤º 2/3ï¼Œæˆ°é¬¥ç•°å¸¸æ–‡å­—ç§»åˆ°å¡ç‰Œä¸‹æ–¹ä¸¦å®Œæ•´é¡¯ç¤º 1 ç§’ã€‚
-- V173.26 è£œæ­£ V173.25 å¯¦æ©Ÿå›žå ±ï¼šç§»é™¤å¾Œè¼‰ V131 ä»æ®˜ç•™çš„
-  110px èƒ½åŠ›é åº•éƒ¨ç©ºç™½ï¼›è‡ªè¨‚ä¸‹æ‹‰çµ±ä¸€ä»¥åŽŸç”Ÿå­—ä¸²å€¼åŒæ­¥ï¼Œåˆ‡æ›è§’è‰²ä¸å†æ®˜ç•™ä¸Šä¸€è§’è‰²çš„å‡
-  100% è£œå“é–€æª»ï¼›å‡å‚·å›žåˆçµæŸå¾Œç«‹å³åŒæ­¥ç§»é™¤ç‹€æ…‹ Spriteï¼›ç•°å¸¸æ–‡å­—å†ä¸‹ç§»è‡³å¡ç‰Œé«˜åº¦ 86%ã€‚
-- V173.27 ç¢ºèªé»‘è‰²ç©ºå€ä¸æ˜¯èƒ½åŠ›å€¼é å…§å®¹ï¼Œè€Œæ˜¯è§’è‰²é å…±ç”¨
-  å¤–æ¡†è¢« V78 runtime èˆ‡ V131 CSS å›ºå®šæ’åˆ° 94%ï½ž96% é«˜åº¦ã€‚å…±ç”¨å¤–æ¡†ç¾æ”¹ç‚ºä¾åˆ†é å…§å®¹è‡ªç„¶
-  æ”¶åˆã€æœ€é«˜ä»é™åˆ¶åœ¨ 96%ï¼›çŸ­çš„èƒ½åŠ›å€¼ï¼ç¶“é©—æ± é ä¸å†ç•™ä¸‹é»‘è‰²å°¾å€ï¼Œé•·çš„æŠ€èƒ½é ä»ç”±æ—¢æœ‰
-  `#characterTabContent` å–®ä¸€å®¹å™¨æ²å‹•ã€‚V173.25ï½žV173.27 å·²æ–¼ 2026-09-02 ä¸€ä½µç™¼å¸ƒè‡³ `main`ã€‚
-- V173.28ï¼ˆåƒ… `dev`ï¼Œå¾…ä½¿ç”¨è€…å¯¦æ©Ÿé©—æ”¶ï¼‰å°‡ä¸»åŸŽé¦–é æ”¹ç‚ºæ±æ–¹æ­¦ä¿  RPG Lobbyï¼šé ‚éƒ¨ç‚ºè§’è‰²ï¼
-  è³‡æº HUDï¼Œè§’è‰²èˆ‡å•†åº—ç‚ºå…©å€‹ä¸»è¦å…¥å£ï¼Œå…­å€‹æ¬¡è¦å…¥å£æ²¿å·¦å³å´æŽ’åˆ—ä¿ç•™ä¸­å¤®åŸŽé–€ï¼Œé›¢ç·šç¶“é©—èˆ‡
-  ç³»çµ±é™ç‚ºä½Žæ¬Šé‡æ©«å‘å…¥å£ï¼›ä¸‰äººå†’éšªéšŠä¼æ”¹ç‚ºç›´åˆ—éšŠä¼å¡ã€‚æ‰€æœ‰åŽŸ IDã€onclickã€åœ–ç‰‡èˆ‡èƒŒæ™¯å‡
-  ä¿ç•™ï¼ŒDEV é‡‘å¹£ï¼ç¶“é©—å¿«æ·éµç¸®å…¥ HUDï¼Œæœªä¿®æ”¹ä»»ä½•éŠæˆ²è³‡æ–™æˆ–æˆ°é¬¥é‚è¼¯ã€‚
-- V173.29ï¼ˆåƒ… `dev`ï¼‰ä¿®æ­£ V173.28 åœ¨ Githackï¼æ‰‹æ©Ÿå¿«å–ä¸‹å‡ºç¾ã€Œæ–° HTML æ­é…èˆŠ CSSï¼JSã€çš„
-  æ··ç‰ˆå•é¡Œï¼š`css/00-main.css`ã€V54 ä¸»åŸŽç›¸å®¹ CSS èˆ‡ runtime å‡æ”¹ç”± `index.html` ä½¿ç”¨åŒä¸€
-  ç™¼å¸ƒç‰ˆ query è¼‰å…¥ï¼ŒCI ä¹Ÿæœƒå¼·åˆ¶æª¢æŸ¥é€™ä¸‰å€‹ä¸»åŸŽ ownerã€‚ç‰ˆé¢çµæ§‹ã€äº‹ä»¶ã€ç´ æåŠéŠæˆ²é‚è¼¯æœªæ”¹ã€‚
-- V173.30ï¼ˆ`dev`ï¼Œé ç«¯ commit `707f3678f995f8d2af37017b740a6f5ba0e1ed90`ï¼‰åœ¨ V173.29
-  Lobby åŸºç¤Žä¸Šå®Œæˆç¬¬äºŒè¼ªç²¾ä¿®ï¼šè§’è‰²ï¼å•†åº—ä¸»å¡
-  é«˜åº¦ç¸®å° 12.5%ï¼Œå…­å€‹æ¬¡è¦å…¥å£æ”¹ç‚ºé€åˆ—å‘ä¸­å¤®æ”¶æŸçš„éšŽæ¢¯ä½ç½®ï¼Œé›¢ç·šç¶“é©—ï¼ç³»çµ±æ”¹ç‚ºåŒåˆ—å°åž‹
-  æ©«å‘å…¥å£ï¼ŒåŠŸèƒ½å€ç¸½é«˜æ¸›å°‘ 22 å€‹é‚è¼¯åƒç´ ï¼Œä½¿å†’éšªéšŠä¼åœ¨ç›®å‰æ‰‹æ©Ÿæ¯”ä¾‹ä¸Šè‡ªç„¶ä¸Šç§»ç´„ 27.6pxã€‚
-  é‡‘å¹£èˆ‡ç¶“é©—æ± å…±ç”¨ä¸­æ–‡ç°¡å¯« formatterï¼Œä¸»è¦æ•¸å€¼ä¸å†ä»¥çœç•¥è™Ÿæˆªæ–·ï¼›äº‹ä»¶ã€è³‡æ–™ã€åº•éƒ¨å°Žèˆªã€
-  æˆ°é¬¥ã€æŠ€èƒ½èˆ‡å­˜æª”å‡æœªä¿®æ”¹ã€‚
-- V173.31ï¼ˆ`dev`ï¼Œå…§å®¹ commit `e194b680d495601cae29103226a6e4345c16a73f`ï¼‰å®Œæˆä¸»åŸŽç¬¬ä¸‰è¼ª
-  ç²¾æº–ç‰ˆé¢é‡æ§‹ï¼šHUD ç”±æ—¢æœ‰è§’è‰²è³‡æ–™å‹•æ…‹é¡¯ç¤º 1ï½ž3 åçœŸå¯¦è§’è‰²ï¼Œåªå«å°é ­åƒã€åç¨±èˆ‡ç­‰ç´šï¼›
-  é‡‘å¹£ï¼ç¶“é©—æ± æ”¹ç”¨ `è¬`ã€`å„„` ç°¡å¯«ä¸”ä¸å†å‡ºç¾çœç•¥è™Ÿã€‚è§’è‰²ï¼å•†åº—ç‚º 46% å¯¬ã€78px é«˜çš„ç´°é‡‘æ¡†
-  åœ–åƒå…¥å£ï¼›å…­å€‹æ¬¡åŠŸèƒ½ä»¥æ¯å±¤ 34px å‘ä¸­å¤®æ”¶æŸï¼Œé›¢ç·šç¶“é©—ï¼ç³»çµ±ç‚º 108Ã—40px å°è† å›Šï¼›ä¸‰åˆ—éšŠä¼
-  å¡ç¸®ç‚º 38px é«˜ã€é ­åƒå‘å¤–çªå‡ºä¸¦é™ä½Žå®¹å™¨ä¸é€æ˜Žåº¦ã€‚æ—¢æœ‰åçµ„å…¥å£äº‹ä»¶ã€åº•éƒ¨å°Žèˆªã€èƒŒæ™¯ã€è§’è‰²
-  èˆ‡è³‡æºè³‡æ–™ã€æˆ°é¬¥ã€æŠ€èƒ½åŠå­˜æª” owner å‡æœªä¿®æ”¹ã€‚
-- V173.32ï¼ˆ`dev`ï¼‰å®ŒæˆåŒè¼ªæˆ°é¬¥å¹³è¡¡ï¼šåå€é‡Žæ€ªå€çŽ‡ä¾åºç‚º
-  `0.75ï¼0.90ï¼0.95ï¼1.00ï¼1.05ï¼1.10ï¼1.15ï¼1.20ï¼1.25ï¼1.30`ï¼Œæ¯éš»åªå¥—ä¸€æ¬¡ï¼›å‚·å®³ã€ä¸€èˆ¬
-  ç•°å¸¸èˆ‡ç¡¬æŽ§çš„æ­£å¼ç­‰ç´šå·®çµ±ä¸€ç‚º `clamp(1 + ç­‰ç´šå·®Ã—0.02, 0.70, 1.30)`ï¼Œå‘½ä¸­ï¼é–ƒèº²ï¼çˆ†æ“Šä¸å—
-  ç­‰ç´šå·®å½±éŸ¿ã€‚è£å‚™å‰¯æœ¬å›ºå®š `1 BOSS + 4 ç²¾è‹±`ï¼Œä½¿ç”¨å°ˆç”¨ rank å€çŽ‡ï¼ŒBOSS Tier4 Lv3ã€ç²¾è‹±
-  Tier3 Lv2ï¼›æ·±æ·µ 1ï½ž4 å±¤å›ºå®š Lv1ï½žLv4ï¼Œç¬¬5å±¤ BOSS Lv5ã€ç²¾è‹± Lv4ï¼Œé¡å¤– HP ä¸è®Šã€‚ç¬¬äº”å±¤
-  åäººç«™ä½èˆ‡æŒ‡å®šæŠ€èƒ½å·²æ ¡æ­£ï¼ŒåŒ—å¸èˆ‡æ°´å¤©å…µçš„æ²»ç™‚è¡“åªä½œç”¨åŒæŽ’æœ€å¤š3åï¼›å…ƒç¥–è³œç¦é€ç›®æ¨™ç¨ç«‹
-  25% æ·¨åŒ–ä¸¦å¢žåŠ 35%é–ƒé¿2å›žåˆã€‚é‡‘å¹£ã€è—¥åƒ¹ã€EXPã€çŽ©å®¶æŠ€èƒ½ã€çŽå‹µèˆ‡å­˜æª”å‡æœªä¿®æ”¹ã€‚
-- V173.33ï¼ˆ`dev`ï¼‰ä¾ä½¿ç”¨è€…æä¾›çš„åƒè€ƒåœ–åªå–ç‰ˆé¢æ¯”ä¾‹èˆ‡ä¸»æ¬¡å±¤ç´šï¼Œå®Œæˆä¸»åŸŽç¬¬å››è¼ªåŽšå¯¦åŒ–ï¼šHUD
-  è‡³å°‘70pxé«˜ä¸¦ä¿ç•™1ï½ž3åå‹•æ…‹è§’è‰²ï¼Œå…©å¼µä¸»å…¥å£ç‚ºå…§å±¤46%å¯¬ã€90pxé«˜ï¼›å·¦å³å…­å€‹å…¥å£æ”¹ç‚º
-  90Ã—95pxå®Œæ•´é‡‘æ¡†æ–¹å½¢æŒ‰éˆ•ï¼›é›¢ç·šç¶“é©—ï¼ç³»çµ±ç‚º98Ã—46pxå®Œæ•´æ©«å‘æŒ‰éˆ•ï¼›éšŠä¼åˆ—æ”¹ç‚º48pxé«˜ã€
-  é ­åƒ49pxã€HPï¼SPæ¢10pxã€‚åº•éƒ¨å°Žèˆªã€èƒŒæ™¯ã€å…¥å£äº‹ä»¶ã€è§’è‰²è³‡æ–™èˆ‡æ‰€æœ‰éŠæˆ²é‚è¼¯å‡æœªä¿®æ”¹ã€‚
-- V173.34ï¼ˆ`dev`ï¼‰é‡æ§‹åº•å±¤å‚·å®³æ¨¡åž‹ï¼š32 æ‹›å››å…ƒç´ æ­£å¼å‚·å®³æŠ€èƒ½æ”¹ç”¨å›ºå®š damageRole å€çŽ‡ï¼Œ
-  çŽ©å®¶èˆ‡æ€ªç‰©æŠ€èƒ½çµ±ä¸€èµ° `calculateSkillDamage()`ï¼Œå†å…±ç”¨ `calculateDamage()`ï¼›èˆŠå›ºå®šå‚·å®³æ¬„ä½
-  åƒ…ä¿ç•™ç›¸å®¹å›žé€€ã€‚é˜²ç¦¦æ”¹ç‚º `K=250+ç›®æ¨™ç­‰ç´šÃ—15` çš„å‹•æ…‹è»Ÿä¸Šé™ï¼ŒçŽ©å®¶èˆ‡æ€ªç‰©çš„æ”»ï¼é­”æ”»ï¼é˜²
-  å…­åœæ›ç®—çµ±ä¸€ç‚ºæ¯é»ž +8ï¼+8ï¼+6ï¼ŒHP æ¯é»žé«”è³ª +50 ä¸è®Šã€‚è£å‚™å‰¯æœ¬ã€æ·±æ·µå€çŽ‡ã€æŠ€èƒ½é…ç½®ã€
-  AIã€ç‹€æ…‹ã€SPã€UIã€å­˜æª”èˆ‡åœ°åœ–å‡æœªä¿®æ”¹ã€‚
-- V173.35ï¼ˆ`dev`ï¼‰åœ¨ V173.33 åŽšå¯¦ Lobby åŸºç¤Žä¸Šå®Œæˆç¬¬äº”è¼ªç²¾ä¿®èˆ‡è³‡è¨ŠåŽ»é‡ï¼šä¸Šæ–¹ HUD ç§»é™¤
-  ä¸‰åè§’è‰²é ­åƒï¼åç¨±ï¼ç­‰ç´šï¼Œåªä¿ç•™ä¸»åŸŽï¼ç‰ˆæœ¬ã€é‡‘å¹£ã€ç¶“é©—æ± èˆ‡å…©å€‹ DEV æ·å¾‘ï¼›ä¸‹æ–¹å†’éšªéšŠä¼
-  æˆç‚ºå”¯ä¸€å®Œæ•´è§’è‰²è³‡è¨Šå€ã€‚å…­å€‹æ¬¡åŠŸèƒ½èˆ‡å…©å€‹ä½Žé »å…¥å£å„ç¸®å°ç´„10%ï½ž15%ï¼Œä½Žé »å…¥å£ç§»åˆ°ä¸­å¤®
-  é€šé“å…©å´ï¼›è§’è‰²ï¼å•†åº—ç¶­æŒ90pxä¸»å¡ï¼ŒåªæŠŠ28pxæ–‡å­—åº•æ¿ç¸®ç‚º19pxã€‚éšŠä¼å¡åˆ—èˆ‡é ­åƒç´„ç¸®å°
-  8%ï½ž10%ï¼ŒèƒŒæ™¯ã€å…¥å£äº‹ä»¶ã€è§’è‰²ï¼è³‡æºï¼æˆ°é¬¥è³‡æ–™ã€åº•éƒ¨å°Žèˆªèˆ‡å­˜æª”å‡æœªä¿®æ”¹ã€‚
-- V173.36ï¼ˆ`dev`ï¼‰ä¾æœ€çµ‚æˆ°æ–°è¦æ ¼é‡è¨­æ·±æ·µç¬¬äº”é—œï¼šååæ•µäººç¶­æŒæ—¢æœ‰å‰äº”å¸ã€å¾Œæ°´åœŸç«é¢¨æ°´
-  å›ºå®šç«™ä½ï¼Œäº”åç²¾è‹±åç¨±çµ±ä¸€ç‚ºå¤©å…µå¤©å°‡ï¼ŒåäººæŠ€èƒ½å…¨éƒ¨éŽ–å®šæœ€é«˜ç­‰ç´šã€‚äº”å¸èˆ‡ç²¾è‹±åªæ”œå¸¶æœ¬è¼ª
-  æŒ‡å®šæŠ€èƒ½ï¼›æ¥µå¸åƒ…èƒ½æ–½æ”¾å…ƒç¥–è³œç¦ï¼Œé€ç›®æ¨™ç¨ç«‹35%æ·¨åŒ–ã€HPï¼SPå„å›ž100ä¸¦å¢žåŠ 35%é–ƒé¿2å›žåˆï¼›
-  åŒ—å¸æœƒå„ªå…ˆä»¥æœ€é«˜ç´šå¾©æ´»è¡“æ•‘æ´æ­»äº¡å‹æ–¹ï¼Œæ±å¸ï¼å¤©å¸æ”¯æ´æŠ€èƒ½ä½¿ç”¨æ­£å¼è¬è±¡åœŸç›¾ï¼æ°£å®šç¥žé–’
-  æ•¸å€¼ã€‚é¢¨å±¬å¤©å…µå¤©å°‡å›ºå®šä½¿ç”¨é–ƒèº²è¡“ï¼ˆé¢¨è¡Œ75%ã€3å›žåˆï¼‰ï¼Œå·²ç§»é™¤ç¬¬äº”é—œèˆŠæœ‰éš±èº«æ””æˆªèˆ‡å–®é«”
-  ç¦é¸é‚è¼¯ï¼›ä¸€èˆ¬çŽ©å®¶éš±èº«è¡“æœ¬èº«æœªä¿®æ”¹ã€‚
-- V173.37ï¼ˆ`dev`ï¼‰åªå¾®èª¿ V173.36 ä¸»åŸŽä¸‰è™•æ—¢æœ‰ CSS ownerï¼šä¸»åŸŽåç¨±èˆ‡ç‰ˆæœ¬åœ¨åŽŸ HUD é«˜åº¦å…§
-  æ˜Žç¢ºåž‚ç›´ç½®ä¸­ä¸¦å³ç§»4pxï¼›é›¢ç·šç¶“é©—ï¼ç³»çµ±å„å‘å¤–ç§»6pxï¼Œä¸­å¤®é€šé“ç”±48pxå¢žè‡³60pxï¼›å†’éšªéšŠä¼
-  å¤–æ¡†ã€å…§ç™¼å…‰èˆ‡è§’è‰²åˆ—æ¡†ç·šé™ä½Žäº®åº¦ã€‚è§’è‰²ï¼å•†åº—ã€å·¦å³å…­åŠŸèƒ½ã€ä½Žé »æŒ‰éˆ•å°ºå¯¸ã€éšŠä¼é«˜åº¦ã€
-  é ­åƒã€HPï¼SPã€åº•éƒ¨å°Žèˆªã€èƒŒæ™¯èˆ‡å…¨éƒ¨åŠŸèƒ½ï¼è³‡æ–™ï¼æˆ°é¬¥ owner å‡æœªä¿®æ”¹ã€‚
-- æ¯ç‰ˆæ­·å²ï¼šV120ï¼ˆå–®ä¸€å·¨å¤§ index.htmlï¼Œå…¨éƒ¨ inlineï¼‰â†’ V121_SPLITï¼ˆæ‹†æˆå¤–éƒ¨æª”æ¡ˆï¼Œ
-  è¡Œç‚ºå®Œå…¨ä¸è®Šï¼ŒéŽç¨‹è¦‹ `CHECK_REPORT.txt` / `README_*.txt`ï¼‰â†’ ä¹‹å¾Œé™¸çºŒç–ŠåŠ  V123ï½žV131
-  å„ç¨® stage patchï¼Œä¸€è·¯ç–Šåˆ°ç¾åœ¨ã€‚
-- æœ€æ–°ä¸€æ‰¹å¤§æ”¹å‹•æ˜¯ **V131**ï¼ˆ`js/25-v131-fix-batch.js` + `js/26-v131-patrol-appearance.js`
-  + `css/31`ã€`css/32` + `js/v131-patrol-sprite-*.js`ï¼‰ï¼Œå°æ‡‰ä½¿ç”¨è€…æå‡ºçš„ 17 é …éœ€æ±‚
-  ï¼ˆæˆ°é¬¥ç¯€å¥ã€æ€ªç‰©ç·¨éšŠã€æŠ€èƒ½å‘½ä¸­é‚è¼¯ã€å…ƒç´ åŒ£ã€ç¶“é©—æ± é è¦½ã€å•†åº—é»‘åº•ã€EXP Ã—3.5 ç­‰ï¼‰ã€‚
-  è©³ç´°æ¸…å–®è¦‹ä¸‹é¢ã€Œå·²å®ŒæˆåŠŸèƒ½è¨˜éŒ„ã€ã€‚
-- åœ¨ V131 ä¹‹å¾Œï¼Œåˆè£œä¸Šäº†**ç”·è§’ Q ç‰ˆå·¡æ€ªç«‹ç¹ª**ï¼ˆç«/æ°´/é¢¨/åœŸå››å…ƒç´ ï¼‰ï¼Œè·ŸåŽŸæœ¬åªæœ‰å¥³è§’çš„
-  å·¡æ€ªç³»çµ±æ•´åˆåœ¨ä¸€èµ·ï¼Œä¾è§’è‰²çš„ `gender` æ¬„ä½è‡ªå‹•åˆ‡æ›ã€‚
-- V138 å®Œæˆæˆ°é¬¥ 1.6 ç§’å‡ºæ‰‹ï¼2 ç§’æ›å›žåˆã€BOSSï¼ç²¾è‹±ç½®ä¸­å„ªå…ˆã€å…ƒç´ å¤–æ¡†èˆ‡
-  æ€ªç‰©å¼·åº¦åç¨±è‰²ã€ä¸‰å‰¯æœ¬é€²å ´ç¢ºèªã€è£å‚™å‰¯æœ¬ä¾çŽ©å®¶æ•¸é…ç½® BOSSã€ç¶“é©—å‰¯æœ¬
-  å…¨éšŠ `expNext` å¹³å‡ã€å¯¶ç®±ï¼æŠ½çŽåˆ¸è‡ªä¸»é–‹å•Ÿèˆ‡æ©ŸçŽ‡é è¦½ã€æŠ€èƒ½é»žèˆ‡å­¸ç¿’æˆæœ¬
-  å¼·åŒ–ï¼Œä»¥åŠå‰¯æœ¬ç²¾è‹±ï¼BOSS æœ€æ–° HPã€SP å€çŽ‡ã€‚
-- V139 æŠŠå‡ç´šæ›²ç·šæ”¹ç‚ºä¾å„ç·´åŠŸå€å¯¦éš›å¹³å‡ EXP åæŽ¨ï¼ŒLv.1â†’100 ç´„
-  69,760 å ´æœ‰æ•ˆæˆ°é¬¥ã€Lv.99â†’100 ç´„ 4,000 å ´ï¼›ç¶“é©—å‰¯æœ¬æ”¹ç‚ºå…¨éšŠç•¶ç´š
-  å‡ç´šéœ€æ±‚å¹³å‡å€¼çš„ 11%ï¼Œæ–°å¢žæœ€å¤š 300 å ´çš„ä¼‘æ¯ç¶“é©—ï¼Œä¸¦æ ¡æ­£å•†åº—è—¥æ°´
-  åƒ¹æ ¼èˆ‡æ°¸ä¹…æ¨¡çµ„åŒ–é“å…·ç¾Žè¡“è¦ç¯„ã€‚
-- V140 å°‡ç‰©ç†æŠ€èƒ½é™„å¸¶ç•°å¸¸æ”¹è®€æœ€çµ‚ç‰©ç†æ”»æ“ŠåŠ›ï¼ˆä¸€èˆ¬Ã—0.2ã€ç¡¬æŽ§
-  `sqrt(ç‰©æ”»)Ã—0.2`ï¼‰ï¼Œæ³•è¡“ç¶­æŒæ™ºåŠ›ä¸€èˆ¬Ã—0.3ã€ç¡¬æŽ§`sqrt(æ™ºåŠ›)Ã—0.2`ï¼›
-  æ°´ç³»ä¸ƒæ‹›å¸è¡€æ”¹ç‚ºåªæ¢å¾© HPï¼Œä¸¦ä¾å®Œæ•´å®šæ¡ˆæ ¡æ­£ä¸‰æ‹›ç›´æŽ¥
-  å‚·å®³ã€å…©æ‹›ç‡ƒç‡’ç™¾åˆ†æ¯”ã€æ€’ç«ã€æš´é¢¨æ‹³ã€æ²»ç™‚è¡“èˆ‡çµç•Œï¼›æœ€çµ‚å‘½ä¸­çŽ‡ä¸‹é™
-  ç‚º 50%ã€‚å…¶é¤˜æŠ€èƒ½é»žã€SPã€å‚·å®³ã€å‰ç½®èˆ‡æ•ˆæžœå‡å·²é€é …æ ¸å°æœªèª¤æ”¹ã€‚
-- V141 å®ŒæˆèƒŒåŒ…äº”é ã€æˆ°é¬¥å¡ç‰Œï¼ç‹€æ…‹ç‰¹æ•ˆã€å·¡æ€ªç§»å‹•èˆ‡ä»»å‹™è¿½è¹¤ã€æ—¥å¸¸å‰¯æœ¬å°é¢æž¶æ§‹ã€
-  æ·±æ·µäº”å±¤ã€åˆæˆï¼å†¶ç…‰ï¼ç¬¦å’’ï¼ç¢Žç‰‡ç³»çµ±ã€æ€ªç‰© rankï¼æŠ€èƒ½ï¼æŽ‰è½ã€ç¨‹åºåŒ–æˆ°é¬¥éŸ³æ•ˆã€
-  é›¢ç·š EXP ç­‰ç´šå€çŽ‡èˆ‡å¤§é‡ä¸æ²å‹•ä»‹é¢èª¿æ•´ã€‚æ ¸å¿ƒæª”æ¡ˆç‚º `js/34-v141-core-systems.js`ã€
-  `js/35-v141-ui-battle.js`ã€`js/36-v141-content-systems.js`ã€
-  `css/38-v141-system-expansion.css`ï¼Œå¿«å–ç‰ˆæœ¬å·²å‡è‡³ 141ã€‚
-- V142 æ–°å¢žå¯é‡ç”¨æŠ€èƒ½å‹•ç•«æŽ§åˆ¶å™¨ï¼šæ™®é€šæ”»æ“Šç¶­æŒ 520ms è¡¨ç¾ï¼ŒåˆéšŽï¼ä¸­éšŽï¼é«˜éšŽï¼
-  çµ‚æ¥µæŠ€èƒ½åˆ†åˆ¥ä¾å¯¦éš› `animationDuration`ï¼`resolveDuration` å®Œæˆå¾Œæ‰å…è¨±æŽ¨é€²ï¼›
-  V138 æ—¢æœ‰ 1.6 ç§’å‡ºæ‰‹èˆ‡ 2 ç§’æ›å›žåˆç¯€å¥ä¿ç•™ï¼ŒçŸ­å‹•ç•«ä¸é¡å¤–åŠ æ™‚ï¼Œé•·å‹•ç•«åªè£œè¶³
-  å°šæœªæ’­æ”¾å®Œçš„éƒ¨åˆ†ã€‚çŽ©å®¶ã€æ€ªç‰©èˆ‡è‡ªå‹•æˆ°é¬¥å…±ç”¨åŒä¸€å€‹ä¸€æ¬¡æ€§ Promise è¡Œå‹•é–˜é–€ã€‚
-  æ¥µå¸å¤©å°ŠåŒæ­¥è£œé½Šå…ƒç›¸å…‰æ˜Žï¼ˆå…¨é«” 350 HPï¼95 SPï¼‰ã€å…ƒå…‰è­·é«”ï¼ˆå…¨é«” 200 è­·ç›¾
-  2 å›žåˆï¼‰èˆ‡å…ƒç¥–è³œç¦ï¼ˆå…¨é«”æ·¨åŒ–ï¼‹æ•æ· 75% å…©å›žåˆï¼‰ã€‚
-- V143 å°‡æŠ€èƒ½ä¸»æ•ˆæžœæ¬å›žæˆ°å ´ï¼šæ¯å€‹å·²çŸ¥æŠ€èƒ½ ID éƒ½æœ‰ç¨ç«‹çš„å…ƒç´ ã€ç§»å‹•è·¯å¾‘ã€
-  å‘½ä¸­èˆ‡è¡æ“Šçµ„åˆï¼ŒæŠ€èƒ½åç¨±åªåœ¨æ–½è¡“è€…ä¸Šæ–¹çŸ­æš«æç¤ºï¼Œå‚·å®³ï¼MISSï¼æ­»äº¡èˆ‡ç‹€æ…‹
-  çš†å»¶å¾Œè‡³å„ç›®æ¨™å¯¦éš›å‘½ä¸­å¹€ï¼›ä¸‹ä¸€ä½è§’è‰²å¿…é ˆç­‰å¾…æ•´æ®µæ¼”å‡ºå®Œæˆã€‚å¦å®Œæˆæ•µæ–¹å¡ç‰Œ
-  å­—ç´šã€è¬è±¡åœŸç›¾å››è‰²è§’å…‰ã€é›™æ–¹çµç•Œæ“‹å‚·ã€æˆ‘æ–¹ç‰©å“è·¨è§’è‰²é¸æ“‡èˆ‡æº–æ˜Ÿã€ä¸‰æ‹›æŠ€èƒ½
-  å®šæ¡ˆã€ç¡¬æŽ§ä¸Šé™ã€è„«é€ƒé»‘ç•«é¢ã€æ·±æ·µåœ°åœ–ï¼å°è©±ã€å‰¯æœ¬å°ŽèˆªåŠéš¨æ©Ÿæ™®é€šè£å‚™åˆæˆã€‚
-- V144 å°‡å•†åº—è—¥æ°´æ”¶æ–‚ç‚º HPï¼SP 10%ã€20%ã€30% å…­é …ï¼Œæ€ªç‰©ä¾é­é‡å›ºå®šæŠ½å–
-  1ï½ž3 æ‹›åˆæ³•æŠ€èƒ½ä¸¦ä¾ç­‰ç´šå¸¶ Lv1ï½ž5ï¼ˆæ·±æ·µæŽ’é™¤ï¼‰ï¼›ç¡¬æŽ§çŽ©å®¶æ–¼å®£å‘ŠéšŽæ®µç›´æŽ¥è·³éŽï¼Œ
-  è½‰å ´å­—æ¨£çµ±ä¸€ã€‚æ²»ç™‚è¡“ã€é–ƒèº²è¡“ã€éš±èº«è¡“ã€æ°£å®šç¥žé–’ã€è¬è±¡åœŸç›¾ä¾æ–°å®šæ¡ˆé‡è¨­ï¼Œ
-  æ·±æ·µç¬¬äº”é—œæœ€çµ‚åäººç«™ä½ã€ç²¾è‹±æŠ€èƒ½èˆ‡å¸å°Šå°ˆå±¬ AI ä¹Ÿå·²å®Œæ•´æ”¹ç‚ºæŒ‡å®šç‰ˆæœ¬ã€‚
-- V146 æ”¶æ–‚æœ€æ–° 18 é …ä¿®æ­£ï¼šæˆ°é¬¥å‹•ç•«ç•¥éŽæ­»äº¡å¡ç‰Œã€æŠ€èƒ½åç¨±æ”¹æé‚Šã€æ™®é€šæ”»æ“Šç™½å­—ã€
-  å…¨ç¯„åœæŠ€èƒ½æ‰“äº‚é™£å½¢å¾Œæ­¸ä½ã€æœ€å¾Œå‹•ç•«å®Œæˆå‰ä¸é–‹æ‰‹å‹•æŒ‡ä»¤ï¼›æŠ€èƒ½è³‡æ–™ä¾æœ€æ–°å®šæ¡ˆé‡è¨­ï¼Œ
-  è£œä¸Šå—æŽ§ï¼æ²»ç™‚ï¼ç•°å¸¸ç‹€æ…‹å‘½ä¸­æç¤ºèˆ‡é¾é³³å¼“ç®­å²©çŸ³ç­‰å…·è±¡æ¼”å‡ºã€‚æ·±æ·µæ”¹ç‚ºä»‹ç´¹åœ–â†’å…¨èž¢å¹•
-  å·¡æ€ªåœ°åœ–â†’é è¿‘ NPC é»žæ“Šå°è©±â†’æˆ°é¬¥ï¼Œä¸¦é™åˆ¶å–®æ¬¡ç§»å‹•åŠé€£é»žï¼›å¦å®ŒæˆèƒŒåŒ…æ¯é  18 æ ¼ã€
-  å•†åº—å³æ™‚è¨ˆåƒ¹ã€ä¸»åŸŽéšŠä¼è³‡è¨Šã€æ™®é€šè£å‚™åˆæˆã€å››å…ƒç´ å¥—è£æ•¸å€¼ï¼å…ƒç´ é™åˆ¶èˆ‡æˆ°æ•—æ…¢é€€å ´ã€‚
-- V147 å®Œæˆæ–°å•†åº—åœ–ç¤ºè³‡ç”¢æ›´æ–°ï¼šæŠŠä½¿ç”¨è€…æä¾›ä½†å¯¦éš›ç‚ºç„¡é€æ˜Žå±¤ JPEG çš„æ­£æ–¹å½¢åœ–ï¼Œ
-  åƒ…åŽ»é™¤åœ“å½¢å¾½ç« å¤–é»‘åº•ä¸¦è¼¸å‡ºé€æ˜Ž PNGï¼Œå†ç¸®æ”¾ç‚º 512Ã—512 æ‰‹æ©Ÿç‰ˆè³‡ç”¢ï¼›ä¸»åŸŽèˆ‡å‰¯æœ¬
-  å°Žè¦½çš„ä¸‰å€‹å•†åº—å…¥å£å…¨éƒ¨æ”¹ç”¨ `assets/ui/home-shop-v147.png`ï¼Œå¿«å–ç‰ˆæœ¬å‡è‡³ 147ã€‚
-- V148 ä¿®æ­£ç›¸é„°ä¸‰äººæŠ€èƒ½ç›®æ¨™ã€å–®é«”å¢žç›Šèˆ‡æ­»äº¡å¡ç‰Œç‰¹æ•ˆã€è¬è±¡åœŸç›¾åå‚·ã€å¾©æ´»é¸å–ã€
-  æ—¥å¸¸ï¼æ·±æ·µå‰¯æœ¬å°Žè¦½èˆ‡ç§»å‹•ã€æˆ°é¬¥æ­»äº¡å¾ŒçºŒå‡ºæ‰‹ã€å·¡æ€ªè·¯å¾‘èˆ‡ç²¾è‹±åç¨±è‰²ï¼Œä¸¦çµ±ä¸€é™åˆ¶
-  åŒå¢žç›ŠçºŒå›žåˆã€ç¡¬æŽ§ä¸¦å­˜åŠæ²»ç™‚è€… SP å›žå¾©ï¼›å°Žè¦½åˆ—å•†åº—ä½¿ç”¨ V147 æ–°åœ–ï¼Œä¸»åŸŽä¿ç•™èˆŠåœ–ã€‚
-- V149 ä¾æœ€æ–°è¦æ ¼é‡è¨­ç«ï¼æ°´ï¼é¢¨ï¼åœŸå…± 45 æ‹›æŠ€èƒ½ï¼Œè£œé½Šå‡å‚·ã€å¢žç›Šäº’æ–¥ã€çµç•Œå››è§’å±¤æ•¸ã€
-  æŠ€èƒ½åç¨±é€å­—åœ“åœˆã€å¾©æ´»æ€ªç‰©äº®åº¦ã€ç²¾è‹±ï¼BOSS åç¨±è‰²èˆ‡è¬è±¡åœŸç›¾åå‚·æç¤ºï¼›å•†åº—ç‰ˆé¢
-  åŒæ­¥æ ¡æ­£ã€‚ç‰ˆæœ¬ 149 åƒ…ä½œç‚º `dev` æ¸¬è©¦ç‰ˆï¼Œä¸åˆä½µè‡³ `main`ã€‚
-- V150 å°‡ã€Œå†°éœœç®­é›¨ã€4Ã—3ã€12 å¹€æ­£å¼ Sprite Sheet æŽ¥å…¥æ—¢æœ‰ V143/V142 æŠ€èƒ½å‹•ç•«å°Žæ¼”ï¼›
-  ç‰¹æ•ˆä¾å¯¦éš›å­˜æ´»ç›®æ¨™å¡ç‰Œä¸­å¿ƒæ’­æ”¾ä¸€æ¬¡ï¼Œç¬¬ 7ï½ž8 å¹€åŒæ­¥å‘½ä¸­èˆ‡å‚·å®³æ•¸å­—ï¼Œå®Œæ•´ 12 å¹€
-  æ’­å®Œæ‰è§£é™¤è¡Œå‹•é–˜é–€ã€‚ç´ æä½æ–¼ `assets/vfx/water/ice-arrow-rain.png`ï¼Œå¿«å–ç‰ˆæœ¬å‡è‡³ 150ï¼›
-  æœ¬è¼ªåªç™¼å¸ƒåˆ° `dev` ä¾›å¯¦æ©Ÿæ¸¬è©¦ï¼Œæœªåˆä½µ `main`ã€‚
-- V151 ä¿®æ­£ V149 é€å­—åœ“åœˆåŒ…è£å™¨è¦†è“‹æ­£å¼ Sprite å‹•ç•«çš„è¼‰å…¥è¡çªï¼›å·²æœ‰ Sprite metadata
-  çš„æŠ€èƒ½ä¿ç•™åŽŸå‹•ç•« ID èˆ‡æ—¢æœ‰ VFX æ’­æ”¾å™¨ï¼Œå¿«å–ç‰ˆæœ¬å‡è‡³ 151ï¼Œåªç™¼å¸ƒ `dev`ã€‚
-- V152 ä¾æœ€æ–°éœ€æ±‚æ ¡æ­£è§’è‰²ç¨ç«‹æŠ€èƒ½é»žé¡¯ç¤ºã€ç§»é™¤èª¤æ¤ç«ç³»æŠ€èƒ½ã€å››å…ƒç´ æŠ€èƒ½èˆ‡ç•°å¸¸å‘½ä¸­ã€
-  æ€’ç«ã€æ¥µå¸å¤©å°Šä¸‰æ‹›ã€å‡å‚·ç¦ç”¨æŠ€èƒ½ã€è‡ªå‹•å›žå¾©ã€æˆ°é¬¥è³‡è¨ŠåŠå‰¯æœ¬ï¼å·¡æ€ªä»‹é¢ï¼›åŠ å…¥æ—¥å¸¸
-  å‰¯æœ¬å°é¢èˆ‡æ·±æ·µä¸€è‡³å››é—œç«‹ç¹ªï¼Œä¸¦ä¿®æ­£å‚·å®³å­—å±¤ç´šã€æ€ªç‰©æ–‡å­—ã€æŒ‡ä»¤ç†±å€èˆ‡æˆ°é¬¥çŽå‹µæ¡†ã€‚
-  å¿«å–ç‰ˆæœ¬å‡è‡³ 152ï¼›ä¾ä½¿ç”¨è€…è¦æ±‚åªç™¼å¸ƒ `dev`ï¼Œä¸å¾—åˆä½µæˆ–æŽ¨é€ `main`ã€‚
-- V153 å°‡æœ¬æ¬¡æ”¶åˆ°çš„ 8 å¼µç«å…ƒç´ æ–½æ”¾å‹•ç•«èˆ‡ 2 å¼µæŒçºŒç‹€æ…‹å‹•ç•«æŽ¥å…¥ V142ï¼V143 å…±ç”¨
-  Sprite Sheet æ’­æ”¾å™¨ï¼šå–®é«”ä¾å¯¦éš›ç›®æ¨™å¡ä¸­å¤®ã€åŒæŽ’æŠ€èƒ½ä¾å¯¦éš›ç›®æ¨™åˆä½µç¯„åœä¸”ä¸»å‹•ç•«
-  åªæ’­ä¸€æ¬¡ã€ç«é³³å¤©é³´å…¨å ´åªæ’­ä¸€éš»ã€ç«ç®­æ¶µè“‹æ–½æ”¾è€…è‡³ç›®æ¨™ç¾¤çµ„ï¼›ç¬¬ 8 å¹€åŒæ­¥å‚·å®³ï¼MISSï¼
-  å‘½ä¸­ï¼æˆåŠŸç‹€æ…‹ï¼Œå®Œæ•´ 12 å¹€å¾Œæ‰è§£é™¤è¡Œå‹•é–˜é–€ã€‚ç‡ƒç‡’ 0.8 ç§’èˆ‡æ€’ç« 1 ç§’å¾ªç’°ä¸é˜»æ“‹å›žåˆï¼Œ
-  ä¸¦ä¾æ—¢æœ‰ç‹€æ…‹è³‡æ–™ç§»é™¤ã€‚å¿«å–ç‰ˆæœ¬å‡è‡³ 153ï¼Œåªç™¼å¸ƒ `dev`ï¼›æœ¬æ‰¹æ²’æœ‰æ”¶åˆ°
-  `flame-slash-cast.png`ï¼Œç«ç„°æ–¬ç•¶æ™‚ä»æ²¿ç”¨èˆŠé€šç”¨æ¼”å‡ºï¼›V161 å·²ç”¨å¾ŒçºŒè£œäº¤çš„æ­£å¼ç´ æå®ŒæˆæŽ¥å…¥ã€‚
-- V154 ä¿®æ­£æˆ°é¬¥å‹•ç•«äº¤æ£’ã€å…ƒç´ åŒ£è‡ªå‹•è£œå“èˆ‡ä¸»æŒ‰éˆ•ã€æ€’ç«é€å¡å‹•ç•«ã€èƒ½åŠ›å€¼æ²å‹•ã€è£å‚™
-  å‰¯æœ¬å°é¢ã€æ·±æ·µä¸€è‡³äº”é—œç«‹ç¹ªåŠè³‡è¨Šé®æ“‹ï¼›åªç™¼å¸ƒ `dev`ï¼Œæœªåˆä½µ `main`ã€‚
-- V155 å°‡å†°å°ï¼çŸ³åŒ–ä¸èƒ½è¡Œå‹•çš„äº¤æ£’å›ºå®šç‚º 0.3 ç§’ï¼›ç¬¬äº”é—œäº”å¸èˆ‡äº”åå¤©å…µå¤©å°‡æ”¹ç”¨æœ¬è¼ª
-  æŒ‡å®šæŠ€èƒ½ï¼Œäº”å¸å›ºå®šæœ€é«˜ç­‰ç´šã€ç²¾è‹±å›ºå®šæœ€ä½Žç­‰ç´šã€‚å…ƒç¥–è³œç¦æ”¹ç‚º 20% å…¨æ·¨åŒ–èˆ‡é–ƒé¿
-  +30% å…©å›žåˆï¼›éœ¸é¾è£‚å¤©æ–¬èˆ‡ç«é³³å¤©é³´ä¾æœ¬è¼ªæ•¸å€¼åŠè¿½åŠ ï¼æœªç‡ƒç‡’è£œå„Ÿè¦å‰‡å®šæ¡ˆã€‚
-  å¿«å–ç‰ˆæœ¬å‡è‡³ 155ï¼Œåªç™¼å¸ƒ `dev`ï¼Œä¸å¾—åˆä½µæˆ–æŽ¨é€ `main`ã€‚
-- V156 æ·±è¿½ç¢ºèªå‰ç‰ˆåªæŠŠæ·±æ·µç«‹ç¹ªæŽ¥åˆ°æˆ°é¬¥å¡ç‰Œï¼Œåœ°åœ–å®ˆé—œè€…ä»æ˜¯æ–‡å­—æŒ‰éˆ•ï¼Œä¸” V154 CSS
-  æŠŠå…¶æœ€å°å¯¬é«˜æ­¸é›¶ï¼›ç¾æ”¹ç‚º 1ï½ž5 é—œå„è‡ªçš„å¤§åž‹ 3:4 ç«‹ç¹ªæŒ‘æˆ°æŒ‰éˆ•ã€‚å…ƒç´ åŒ£è£œå“åŽŸå…ˆè¢«
-  è§’è‰²å€‹åˆ¥ `enabled` æ——æ¨™èª¤æ“‹ï¼Œç¾ä»¥å…ƒç´ åŒ£å¯¦éš›å•Ÿå‹•ç‹€æ…‹æŽˆæ¬Šå…¨éšŠè£œçµ¦ï¼Œä¿ç•™åŽŸé–€æª»ã€
-  è£œå“èˆ‡æ­»äº¡è§’è‰²è¦å‰‡ã€‚å¿«å–ç‰ˆæœ¬å‡è‡³ 156ï¼Œåªç™¼å¸ƒ `dev`ï¼Œä¸å¾—åˆä½µæˆ–æŽ¨é€ `main`ã€‚
-- V157 ä¾ä½¿ç”¨è€…æ‰‹æ©ŸéŒ„å½±ç¢ºèªæ·±æ·µå®ˆé—œç«‹ç¹ª 200Ã—280 éŽå¤§ï¼Œå·²ç¸®ç‚º 120Ã—168ï¼›éŒ„å½±ä¸­çš„
-  é»žæ“Šé«˜äº®è­‰å¯¦äº‹ä»¶æœ‰é€²å…¥ï¼Œä½† V146 çš„è·é›¢é™åˆ¶æ””ä¸‹æŒ‘æˆ°ï¼Œè€Œè­¦å‘Šæ–‡å­—åˆè¢«ç²¾ç°¡ç‰ˆé¢éš±è—ï¼Œ
-  å› æ­¤è¦–è¦ºä¸Šå®Œå…¨ç„¡åæ‡‰ã€‚ç¾ç§»é™¤å®ˆé—œç«‹ç¹ªçš„è·é›¢æ””æˆªï¼Œä¿ç•™åŽŸæŒ‰éˆ•ã€å°è©±èˆ‡æˆ°é¬¥æµç¨‹ï¼Œ
-  å¿«å–ç‰ˆæœ¬å‡è‡³ 157ï¼Œåªç™¼å¸ƒ `dev`ï¼Œä¸å¾—åˆä½µæˆ–æŽ¨é€ `main`ã€‚
-- V158 å°‡æ€’ç«æ”¹ç‚º 4 å›žåˆï¼65 SPã€å†°å°æ”¹ç‚ºåŒæŽ’ä¸­å·¦å³ä¸‰ç›®æ¨™ï¼66 SPã€æ²»ç™‚è¡“æ”¹ç‚º
-  å…¨é«” 550 HPï¼65 SPã€45 SP æ¶ˆè€—ä¸”æ–½æ”¾è€…ä»ä¸å›ž SPï¼›ä¸€èˆ¬å‘½ä¸­ä¸‹é™æé«˜ç‚º 80%ï¼Œåªæœ‰
-  é™ä½Žå‘½ä¸­ Debuff å¯é™è‡³ 60%ï¼Œæ€ªç‰©é è¨­é–ƒé¿æ”¹ç‚ºç­‰ç´šÃ—0.5ï¼Œå‚·å®³æµ®å‹•æ”¹ç‚º 95%ï½ž105%
-  ä¸¦å››æ¨äº”å…¥ã€‚æ·±æ·µåœ°åœ–ç«‹ç¹ªç§»é™¤å¤–æ¡†ã€å¡ç‰‡é»‘åº•èˆ‡é™°å½±ï¼Œä¿ç•™ V157 å°ºå¯¸åŠç›´æŽ¥é»žæ“Šã€‚
-  å¿«å–ç‰ˆæœ¬å‡è‡³ 158ï¼Œåªç™¼å¸ƒ `dev`ï¼Œä¸å¾—åˆä½µæˆ–æŽ¨é€ `main`ã€‚
-- V159 ä¿®æ­£ Githack å†·è¼‰å…¥æ™‚å¯èƒ½å…ˆå»ºç«‹æ·±æ·µæˆ°é¬¥å¡ã€å¾Œå®Œæˆ V154 runtimeï¼Œå°Žè‡´æˆ°é¬¥ç«‹ç¹ª
-  æ²’æœ‰è£œæŽ›çš„æ™‚åºå•é¡Œï¼›åŒæ™‚æŠŠæœ€çµ‚åŒæ­¥æŽ’åœ¨ V152 çš„èˆŠ UI æ›´æ–°ä¹‹å¾Œï¼Œé¿å…ç¬¬äº”é—œåœ–ç‰‡è·¯å¾‘
-  è¢«èˆŠå±¤å†æ¬¡ç§»é™¤ã€‚é€²å…¥å‰¯æœ¬æˆ°é¬¥ã€è£œä¸å»¶å¾Œè¼‰å…¥èˆ‡æ¯æ¬¡ UI æ›´æ–°éƒ½æœƒé‡æŽ›æ—¢æœ‰ç«‹ç¹ªè³‡æ–™ã€‚
-  å¿«å–ç‰ˆæœ¬å‡è‡³ 159ï¼Œåªç™¼å¸ƒ `dev`ï¼Œä¸å¾—åˆä½µæˆ–æŽ¨é€ `main`ã€‚
-- V160 å°‡å†°éœœç®­é›¨æœ€çµ‚å†°å°çŽ‡æ”¹ç‚º 20%ï¼Œç¡¬æŽ§ä¸Šé™æ”¹ç‚ºæ™®é€š 80%ï¼ç²¾è‹± 60%ï¼BOSS 40%ï¼›
-  ä¿®æ­£ `allyTri` è¢«å‹•ç•«å±¤èª¤ç•¶å…¨é«”ã€å…ƒç´ åŒ£è£œå“è¢«ç¬¬ä¸€äººå„ªå…ˆè€—ç›¡ã€ç«ç„°æ–¬ç¼ºå°‘å‘½ä¸­æ–¬æ“Šèˆ‡
-  ç«ç®­ Sprite éŽåº¦æ”¾å¤§ã€‚å¿«å–ç‰ˆæœ¬å‡è‡³ 160ï¼Œä¸æ–°å¢ž runtimeï¼Œåªç™¼å¸ƒ `dev`ï¼Œä¸å¾—åˆä½µæˆ–æŽ¨é€ `main`ã€‚
-- V161 å°‡è£œäº¤çš„ `flame-slash-cast.png` æ ¡æ­£ç‚ºçœŸæ­£é€æ˜Ž RGBA PNGï¼Œä¾ 4Ã—3ã€12 å¹€æŽ¥å…¥æ—¢æœ‰
-  V142ï¼V143 æ’­æ”¾å™¨ï¼›åªåœ¨æœ‰æ•ˆå–®é«”ç›®æ¨™ä¸­å¤®æ’­æ”¾ä¸€æ¬¡ã€ç¸½é•· 0.76 ç§’ï¼Œç¬¬ 8 å¹€åŒæ­¥å‚·å®³èˆ‡å‘½ä¸­åæ‡‰ã€‚
-  V160 çš„è‡¨æ™‚ CSS æ–¬æ“Šå·²ç§»é™¤ï¼Œå¿«å–ç‰ˆæœ¬å‡è‡³ 161ï¼Œåªç™¼å¸ƒ `dev`ï¼Œä¸å¾—åˆä½µæˆ–æŽ¨é€ `main`ã€‚
-- V162 è£œå›žç‡ƒç‡’ç‹€æ…‹ Spriteï¼šç‹€æ…‹å¯«å…¥å¾Œæœƒä¾æœ¬æ¬¡å¯¦éš›ç›®æ¨™çš„å‘½ä¸­å¹€åŒæ­¥å•Ÿå‹•ï¼Œä¸æœƒæå‰è·‘åˆ°å…¶ä»–
-  å¡ç‰Œã€‚å…ƒç´ åŒ£è¨­å®šé–‹å•ŸæœŸé–“æœƒæŠŠéŠæˆ²èˆžå°æå‡åˆ°æŠ€èƒ½èˆ‡ç‹€æ…‹ç‰¹æ•ˆä¹‹ä¸Šï¼Œé—œé–‰å¾Œç«‹å³å¾©åŽŸï¼›æ·±æ·µ
-  1ï½ž5 é—œæˆ°é¬¥å¡ç‰Œæ”¹ç‚ºæ’å…¥å¯¦éš›ç«‹ç¹ª `<img>` åœ–å±¤ï¼Œä¸å†åªä¾è³´å®¹æ˜“è¢«è¦†å¯«çš„èƒŒæ™¯æ¨£å¼ã€‚
-  å¿«å–ç‰ˆæœ¬å‡è‡³ 162ï¼Œåªç™¼å¸ƒ `dev`ï¼Œä¸å¾—åˆä½µæˆ–æŽ¨é€ `main`ã€‚
-- V163 ç¢ºèª assets-library inbox çš„ `flame-slash-cast.png` æœ¬èº«æ˜¯ 1448Ã—1086ã€8-bit RGBA
-  é€æ˜Ž PNGï¼›å°‡ 12 æ ¼ 362Ã—362 åŽŸå§‹åƒç´ é€æ ¼ç½®ä¸­è£œé€æ˜Žé‚Šç‚º 384Ã—384ï¼Œæœªç¸®æ”¾ã€æ‹‰ä¼¸æˆ–é‡ç¹ªï¼Œ
-  ä¸¦æ›¿æ› V161 ç”±èŠå¤©é™„ä»¶è½‰å‡ºçš„ç‰ˆæœ¬ã€‚æ—¢æœ‰å–®é«”å®šä½ã€0.76 ç§’èˆ‡ç¬¬ 8 å¹€å‘½ä¸­è¨­å®šå®Œå…¨ä¸è®Šï¼›
-  å¿«å–ç‰ˆæœ¬å‡è‡³ 163ï¼Œåªç™¼å¸ƒ `dev`ï¼Œä¸å¾—åˆä½µæˆ–æŽ¨é€ `main`ã€‚
-- V164 é©—è­‰ assets-library inbox æ–°å¢žçš„å…¶é¤˜ 10 å¼µç«å…ƒç´ å‹•ç•«å‡ç‚º 8-bit RGBA çœŸ PNGï¼Œ
-  ä¾åŽŸæª”åæ›´æ–°æœƒå¿ƒä¸€æ“Šã€ç«çˆ†äº‚æ“Šã€éœ¸é¾è£‚å¤©æ–¬ã€ç«ç®­ã€çƒˆç«è¡“ã€çƒˆç„°é¾æ²ã€ç«é³³å¤©é³´ã€
-  æ€’ç«ã€ç‡ƒç‡’èˆ‡æ€’ç«æŒçºŒç‹€æ…‹åœ–ã€‚ä¾†æºç‚º 3Ã—2ï¼4Ã—3ï¼4Ã—2 çš„åœ–ä¾æ—¢æœ‰ metadata æ­£è¦åŒ–æˆ
-  4Ã—3ï¼4Ã—2ï¼›æ‰€æœ‰æŠ€èƒ½ç§’æ•¸ã€ä½ç½®ã€ç›®æ¨™èˆ‡ç¬¬ 8 å¹€å‘½ä¸­è¨­å®šå‡æœªä¿®æ”¹ï¼Œç«ç„°æ–¬åœ–ç‰‡ä¹Ÿä¿æŒ
-  V163 å®Œå…¨ä¸è®Šã€‚å¿«å–ç‰ˆæœ¬å‡è‡³ 164ï¼Œåªç™¼å¸ƒ `dev`ï¼Œä¸å¾—åˆä½µæˆ–æŽ¨é€ `main`ã€‚
-- V165 ä¿®æ­£ V164 å°‡æ€’ç«èˆ‡éœ¸é¾è£‚å¤©æ–¬çš„ 1536Ã—1024 åŽŸåœ–èª¤åˆ¤ç‚º 3Ã—2ï¼šå…©å¼µåŽŸåœ–å¯¦éš›çš†ç‚º
-  4Ã—3ã€12 å€‹ç¨ç«‹ç•«æ ¼ï¼Œç¾ä»¥ 384px å››æ¬„åŠ 341ï¼342ï¼341px ä¸‰åˆ—é€æ ¼åŽŸåƒç´ è¤‡è£½ï¼Œåƒ…è£œæˆ
-  384Ã—384 é€æ˜Žæ ¼ï¼Œæ²’æœ‰ç¸®æ”¾æˆ–é‡ç¹ªã€‚ç«ç®­æ­£å¼ Sprite æ”¹ç‚ºå‰ 3 å¹€åœåœ¨æ–½æ”¾è€…ã€ä¸­é–“ 3 å¹€
-  ç§»å‘æœ¬æ¬¡å¯¦éš›ç›®æ¨™ç¾¤ä¸­å¿ƒã€ç¬¬ 7 å¹€èµ·å›ºå®šåœ¨ç›®æ¨™å¡ç‰Œå‰æ’­æ”¾çˆ†ç‚¸ï¼›æ­£åå‘æ–½æ”¾éƒ½ä¾ç•¶æ¬¡å¡ç‰Œ
-  åº§æ¨™è¨ˆç®—ï¼Œç¬¬ 8 å¹€å‘½ä¸­ã€0.9 ç§’ç¸½é•·åŠæ—¢æœ‰å‚·å®³ï¼ç›®æ¨™è¦å‰‡ä¸è®Šã€‚æ–°å¢ž V165 åœ–ç‰‡é›œæ¹Šã€
-  12 æ ¼å”¯ä¸€æ€§ã€é€æ˜Žè£œé‚Šã€Alpha çµ±è¨ˆã€CSS ç§»å‹•åŠé›™å‘å®šä½æ¸¬è©¦ï¼›å¿«å–ç‰ˆæœ¬å‡è‡³ 165ï¼Œ
-  åªç™¼å¸ƒ `dev`ï¼Œä¸å¾—åˆä½µæˆ–æŽ¨é€ `main`ã€‚æœ¬è¼ªå·²å®Œæˆå…¨éƒ¨ JSï¼æ¸¬è©¦èªžæ³•æª¢æŸ¥ã€24 å¥—å…±
-  208 é … Node é©—æ”¶åŠ `git diff --check`ï¼›æœ¬æ©Ÿæœªåšå¯¦éš›æ‰‹æ©Ÿç€è¦½å™¨æ“ä½œï¼Œä»éœ€åœ¨ `dev`
-  ä»¥çœŸæ©Ÿç¢ºèªæœ€çµ‚è¦–è¦ºæ¯”ä¾‹èˆ‡çˆ†ç‚¸å‰å¾Œæ™¯æ„Ÿã€‚
-- V166 ç¢ºèª assets-library inbox çš„ 12 å¼µæ°´ï¼å†°å‹•ç•«å…¨ç‚ºå¯å®Œæ•´è§£ç¢¼çš„ 8-bit RGBA çœŸé€æ˜Ž PNGï¼›
-  10 å¼µæ–½æ”¾åœ–æ­£è¦åŒ–ç‚º 4Ã—3ã€12 å¹€ï¼Œå‡å‚·ï¼å†°å°ç‹€æ…‹åœ–æ­£è¦åŒ–ç‚º 4Ã—2ã€8 å¹€ï¼Œåƒ…é€æ ¼ç½®ä¸­è£œé€æ˜Žé‚Šï¼Œ
-  æœªç¸®æ”¾æˆ–é‡ç¹ªã€‚æ°´åˆ€æ–¬ã€å†°éœœæ‹³ã€å†°å°é‡æ“Šã€å†°å°ã€æ²»ç™‚èˆ‡å¾©æ´»ä¾æ¯å¼µå¯¦éš›å¡ç‰Œå®šä½ï¼›å†°æ—‹ä¸€é–ƒ
-  ä¾ 1ï¼2ï¼3 å€‹å¯¦éš›ç›®æ¨™å„è‡ªå®šä½ä¸”åŒæ­¥å‘½ä¸­ï¼›æ°´çƒè¡“èˆ‡æ´ªæ°´çŒ›ç¸ç”±æ–½æ”¾å¡ç§»å‹•åˆ°å„è‡ªå¯¦éš›ç›®æ¨™ï¼›
-  å†°éœœç®­é›¨å›ºå®šè¦†è“‹å®Œæ•´æ•µæ–¹æˆ°é¬¥å€ï¼Œå³ä½¿åƒ…ä¸€åæ•µäººä¹Ÿä¸ç¸®æˆå–®é«”ã€‚åæ‹›å‡ä¾æŒ‡å®šç¸½é•·ä¸¦åœ¨ç¬¬ 8 å¹€
-  åŒæ­¥æ•¸å­—ï¼å‘½ä¸­åæ‡‰ï¼Œå¾©æ´»çš„ HP èˆ‡ç«™èµ·æ™‚é»žä¹Ÿå»¶è‡³ç¬¬ 8 å¹€ã€‚å‡å‚· 1.0 ç§’ã€å†°å° 1.1 ç§’åªè®€æ—¢æœ‰
-  `statusEffects` å¾ªç’°ï¼Œæ–½æ”¾åœ–çµæŸå¾Œæ‰æŽ¥çºŒï¼Œè§£é™¤ç«‹å³ç§»é™¤ä¸”ä¸è§¸ç™¼ DOTï¼æŽ§åˆ¶çµç®—ã€‚V158 æœ€çµ‚
-  `freeze=tri`ã€`healSpell=allyAll` èˆ‡ Frostbite éž DOT çš„æ­£å¼æˆ°é¬¥è¦å‰‡å‡ä¿ç•™ï¼›å¿«å–å‡è‡³ 166ï¼Œ
-  åªç™¼å¸ƒ `dev`ï¼Œä¸å¾—åˆä½µæˆ–æŽ¨é€ `main`ã€‚
-- V169 ä»¥é ç«¯ V166 `dev` ç‚ºå”¯ä¸€åŸºåº•ï¼Œé€ hunk ç§»æ¤æœ¬è¼ªæ–½å·¥ï¼Œä¸åˆä½µ `main`ã€‚è§’è‰²èƒ½åŠ›å€¼ï¼ç¶“é©—æ± 
-  æ”¹ç‚ºå›ºå®šä¸æ²å‹•çš„ç·Šæ¹ŠæŽ’ç‰ˆï¼ŒæŠ€èƒ½é ä¿ç•™è‡ªèº«æ²å‹•ï¼›åŽŸç”Ÿ alertï¼confirm æ”¹ç‚ºæŽ’éšŠå¼ RPG ä¸»é¡Œè¦–çª—ï¼›
-  å•†åº—å›ºå®š HP å·¦æ¬„ã€SP å³æ¬„ä¸¦åœ¨è³¼è²·æˆåŠŸå¾Œé¡¯ç¤ºæ”¶æ“šï¼›å‰¯æœ¬èƒŒåŒ…æå‡è‡³å°Žè¦½åˆ—ä¹‹ä¸Šã€‚å…ƒç´ åŒ£é€è§’è‰²å³æ™‚
-  ä¿å­˜è¨­å®šï¼Œå•Ÿå‹•ä¸­ä»å¯ç·¨è¼¯ä¸¦å¦è¨­åœæ­¢éµã€‚ä¸ƒé …æ°´æŠ€èƒ½ç”± `js/50-v169-water-skill-rules.js` å®šæ¡ˆï¼›
-  æ·±æ·µé‡æ–°é€²å…¥é¡¯ç¤ºé€²åº¦ï¼ŒçŽ©å®¶ï¼å®ˆé—œè€…å›ºå®šä½ç½®ï¼Œ1ï½ž4 å±¤æ–°å¢žå¯¶ç®±èˆ‡ä¸Šæ–¹å‚³é€é»žæµç¨‹ã€‚15 å¼µ inbox PNG
-  ç›´æŽ¥ä½¿ç”¨åŽŸæª”ï¼Œ11 å¼µæ·±æ·µäººç‰© WebP åªç§»é™¤é»‘è‰²å¤–èƒŒæ™¯ï¼›Android åˆæˆå±¤çš„æ°¸ä¹…é™°å½±ï¼æŠ€èƒ½å¡
-  `will-change` å·²éœæ…‹åŒ–ã€‚å¿«å–èˆ‡ç›´è¼‰ query å‡è‡³ 169ã€‚
-- V141 ä¿ç•™ V139 è¼ƒæ–°çš„ç¶“æ¿Ÿå®šæ¡ˆï¼šé‡Žæ€ª EXP åŽŸå€çŽ‡ Ã—3.5ã€ç²¾è‹± EXP Ã—1.5ã€
-  ç²¾è‹±é‡‘å¹£ Ã—2ã€BOSS EXP Ã—3ã€BOSS é‡‘å¹£ Ã—5ï¼›åŒæ™‚å¥—ç”¨ä¸€èˆ¬åœ°åœ–ç²¾è‹± 10% ç¨ç«‹ç”Ÿæˆèˆ‡
-  ç²¾è‹± 19% å–®ä¸€ç‰¹æ®ŠæŽ‰è½è¡¨ã€‚é€™æ˜¯éœ€æ±‚ #34 èˆ‡å¾Œåˆ— #36 ç™¼ç”Ÿå€çŽ‡è¡çªæ™‚ï¼Œä»¥å¾Œåˆ—è¦æ ¼ç‚ºæº–çš„
-  æ˜Žç¢ºæ±ºç­–ï¼Œä¸å¯å†èª¤æ”¹å›žç²¾è‹± EXP Ã—3ï¼é‡‘å¹£ Ã—3ã€‚
-- å·²å»ºç«‹ `UI_GUIDELINES.md` ä½œç‚ºæ°¸ä¹… UI è¦ç¯„ï¼›æ‰€æœ‰å¾ŒçºŒ UIï¼CSSï¼ç‰ˆé¢ï¼
-  ç¾Žè¡“ä¿®æ”¹éƒ½å¿…é ˆå…ˆé–±è®€ï¼ŒæŽ¡é€é æ•´ç†èˆ‡å…±ç”¨å…ƒä»¶åŒ–ï¼Œä¸å¾—è—‰ UI ä»»å‹™å¤¾å¸¶ä¿®æ”¹
-  æˆ°é¬¥ã€å­˜æª”ã€æ•¸å€¼æˆ–æŽ‰è½é‚è¼¯ã€‚
-
----
-
-## ç³»çµ±æž¶æ§‹é‡é»žï¼ˆè¸©éŽçš„å‘ï¼Œå‹™å¿…çœ‹å®Œï¼‰
-
-### 1. V131 ä¸æ˜¯é  `index.html` çš„ `<script>` æ¨™ç±¤è¼‰å…¥çš„
-
-`index.html` æœ¬èº«**æ²’æœ‰**ç›´æŽ¥å¼•ç”¨ `js/25-v131-fix-batch.js`ã€`js/26-v131-patrol-appearance.js`ã€
-`css/31-*.css`ã€`css/32-*.css`ã€æˆ–ä»»ä½• `js/v131-patrol-sprite-*.js`ã€‚
-
-é€™äº›æª”æ¡ˆæ˜¯ç”± **`js/20-anonymous-20.js`** åœ¨åŸ·è¡ŒæœŸå‹•æ…‹æ³¨å…¥çš„ã€‚å·¡æ€ª sprite
-èˆ‡å¤–è§€ runtime ä»ç”± `loadV131PatrolAppearanceAssets()` ä¾ä¾†æºé™£åˆ—ä¾åºè¼‰å…¥ï¼›
-V131ï½žV136 çš„é‚è¼¯ patch å‰‡åœ¨ V137 æ”¹ç”±
-`loadVersionedRuntimePatchesInOrder()` åš´æ ¼æŒ‰ç‰ˆæœ¬é€æ”¯è¼‰å…¥ï¼Œå‰ä¸€æ”¯è§¸ç™¼
-`load`ï¼`error` å¾Œæ‰æ’å…¥ä¸‹ä¸€æ”¯ã€‚æ‰€æœ‰æ³¨å…¥é»žéƒ½æœ‰
-`document.getElementById(id)` é˜²é‡è¤‡åˆ¤æ–·ã€‚
-
-**ä¸è¦æŠŠ V131ï½žV136 runtime æ”¹å›žå„è‡ªç¨ç«‹ appendã€‚** å‹•æ…‹æ’å…¥çš„ script
-åŽŸæœ¬æœƒä»¥ async è¡Œç‚ºç«¶é€Ÿï¼›é€™äº›æª”æ¡ˆåˆæœƒä¸€å±¤å±¤åŒ…è£ç›¸åŒå…¨åŸŸå‡½å¼ï¼Œè¼‰å…¥é †åº
-æ”¹è®Šå°±æœƒæ”¹è®Šå¯¦éš›è¡Œç‚ºã€‚V137 å·²æŠŠé †åºå›ºå®šï¼›V170 æ­£å¼ gameplay runtime å®Œæ•´é †åºç‚º
-`js/25` â†’ `js/27` â†’ `js/28` â†’ `js/29` â†’ `js/30` â†’ `js/31` â†’ `js/32` â†’ `js/33`
-â†’ `js/34` â†’ `js/35` â†’ `js/36` â†’ `js/37` â†’ `js/38` â†’ `js/39` â†’ `js/40` â†’ `js/41`
-â†’ `js/42` â†’ `js/43` â†’ `js/44` â†’ `js/45` â†’ `js/46` â†’ `js/47` â†’ `js/48`
-â†’ `js/49` â†’ `js/50` â†’ `js/51`ã€‚`js/26` å±¬å·¡æ€ªç´ æéˆï¼Œèˆ‡é€™æ¢ gameplay chain ä¸¦è¡Œã€‚
-
-**å¦‚æžœä½ åœ¨ `index.html` è£¡ç›´æŽ¥çœ‹åˆ°ã€Œé€™å¹¾å€‹æª”æ¡ˆå¥½åƒæ²’è¢«è¼‰å…¥ã€è€Œæƒ³æ‰‹å‹•åŠ  `<script>` æ¨™ç±¤ï¼Œ
-å…ˆä½æ‰‹ã€åŽ»è®€ `js/20-anonymous-20.js`**â€”â€”æ‰‹å‹•åŠ æ¨™ç±¤å¹¾ä¹Žä¸€å®šæœƒé€ æˆé‡è¤‡è¼‰å…¥ï¼Œ
-V131 çš„æ‰€æœ‰ overrideï¼ˆ`finishPlayerAction`ã€`getSkillTargets`ã€`learnSkill`ã€
-`renderExpDistributeList`ã€`confirmAutoBattleSettings`ã€`winBattle`ã€`showExpToast` ç­‰ï¼‰
-éƒ½æ˜¯ç”¨ã€Œè®€èˆŠå‡½å¼ã€åŒ…ä¸€å±¤æ–°é‚è¼¯ã€è“‹å›žåŒä¸€å€‹å…¨åŸŸè®Šæ•¸åã€çš„å¯«æ³•ï¼Œè¢«è¼‰å…¥å…©æ¬¡æœƒé€ æˆ
-æ•ˆæžœç–ŠåŠ å…©æ¬¡ï¼ˆä¾‹å¦‚ 1.3 ç§’å»¶é²è®Š 2.6 ç§’ï¼‰ã€`setInterval` é–‹å…©å€‹ã€äº‹ä»¶è¢«è§¸ç™¼å…©æ¬¡ç­‰ç­‰ã€‚
-
-è¦æ–°å¢žå·¡æ€ª sprite ç›¸é—œçš„è³‡æºæª”ï¼ˆä¾‹å¦‚ä»¥å¾Œè£œç”·è§’èƒŒé¢åœ–ï¼‰ï¼Œè¨˜å¾—åŒæ­¥æ›´æ–°
-`js/20-anonymous-20.js` çš„ `sources` é™£åˆ—ï¼ˆåœ¨ `loadV131PatrolAppearanceAssets` è£¡ï¼‰ï¼Œ
-æŠŠæ–°æª”æ¡ˆæŽ’åœ¨ `js/26-v131-patrol-appearance.js` **ä¹‹å‰**ï¼Œä¸ç„¶ `js/26` åŸ·è¡Œæ™‚
-é‚„è®€ä¸åˆ°æ–°çš„ chunk è³‡æ–™ã€‚
-
-### 1.2 â˜…â˜…â˜… `?v=` ç‰ˆæœ¬è™Ÿæ²’æœ‰è·Ÿè‘—æ¯æ¬¡æ”¹å‹•åŒæ­¥éžå¢žï¼Œç­‰æ–¼ç€è¦½å™¨ä¸€ç›´åœ¨ç”¨å¿«å–çš„èˆŠæª”æ¡ˆ â˜…â˜…â˜…
-
-é€™æ˜¯ 2026-08-25 ç¬¬ä¸‰è¼ªä¿®å¾©æ™‚ç™¼ç¾çš„é‡å¤§å•é¡Œï¼Œ**å¹¾ä¹Žå¯ä»¥è§£é‡‹é€™æ•´å€‹å°ˆæ¡ˆå¥½å¹¾è¼ª
-ã€Œæ˜Žæ˜Žä¿®å¥½äº†ã€ä½¿ç”¨è€…å»èªªæ²’ç”Ÿæ•ˆï¼è®Šå¾—æ›´å°ï¼åˆè·‘æŽ‰äº†ã€çš„å›žå ±**ï¼š
-
-`js/00-main.js`ï¼ˆ`index.html` è£¡çš„ `<script src="js/00-main.js?v=XXX">`ï¼‰ã€
-`js/25-v131-fix-batch.js`ã€`css/31-v131-fix-batch.css`ã€
-`js/26-v131-patrol-appearance.js`ã€`css/32-v131-patrol-appearance.css`
-ï¼ˆé€™äº”å€‹æª”æ¡ˆéƒ½æ˜¯åœ¨ `js/20-anonymous-20.js` è£¡ç”¨å¸¶ `?v=æ•¸å­—` çš„ç¶²å€å‹•æ…‹è¼‰å…¥çš„ï¼‰
-é€™ç¨®ã€Œç¶²å€å¸¶ç‰ˆæœ¬è™Ÿã€çš„å¯«æ³•ï¼Œç›®çš„æ˜¯è®“ç€è¦½å™¨æŠŠé€™å€‹ç¶²å€ç•¶æˆã€Œå…§å®¹ä¸æœƒè®Šçš„
-å›ºå®šç‰ˆæœ¬ã€æ”¾å¿ƒå¿«å–å¾ˆä¹…â€”â€”**ä½†å‰ææ˜¯æ¯æ¬¡çœŸçš„æ”¹äº†æª”æ¡ˆå…§å®¹ï¼Œå°±è¦è·Ÿè‘—æŠŠ
-`?v=` å¾Œé¢çš„æ•¸å­—æ”¹æŽ‰**ï¼Œä¸ç„¶ç€è¦½å™¨ï¼ˆå°¤å…¶æ‰‹æ©Ÿç€è¦½å™¨çš„é•·æ•ˆå¿«å–ï¼‰æœƒä¸€ç›´
-serveèˆŠå…§å®¹ï¼Œç¶²å€å®Œå…¨æ²’è®ŠéŽï¼Œç€è¦½å™¨æ ¹æœ¬ä¸çŸ¥é“è¦é‡æ–°æŠ“ã€‚
-
-å¯¦éš›ç¨½æ ¸ç™¼ç¾ï¼š`js/00-main.js?v=130` é€™å€‹ç‰ˆæœ¬è™Ÿï¼Œå¾žå¾ˆæ—©ä»¥å‰ï¼ˆ`77583cd`é‚£å€‹
-commitä¹‹å‰ï¼‰å°±æ²’å†è®ŠéŽï¼Œä½†é€™ä¹‹å¾Œå¥½å¹¾è¼ªä¿®æ”¹ï¼ˆ`elementSkillIconMap`ã€
-`switchCharacterTab`ã€è‡ªå‹•æˆ°é¬¥è¨­å®šçš„padding/max-heightâ€¦â€¦ï¼‰å…¨éƒ¨éƒ½æ˜¯æ”¹
-`js/00-main.js`æœ¬é«”ï¼Œ`?v=130`å»åŽŸå°ä¸å‹•ã€‚`css/31-v131-fix-batch.css?v=131`ã€
-`js/25-v131-fix-batch.js?v=131`ä¹Ÿæ˜¯åŒæ¨£ç‹€æ³â€”â€”å¾žV131ç¬¬ä¸€æ‰¹ä¿®æ­£åˆ°ç¾åœ¨
-å¥½å¹¾è¼ªï¼Œç‰ˆæœ¬è™Ÿéƒ½å›ºå®šå¯«æ­»`131`ï¼Œå³ä½¿å…§å®¹æ”¹äº†å¾ˆå¤šæ¬¡ã€‚
-
-**é€™ä»£è¡¨ä½¿ç”¨è€…å¯¦æ©Ÿæ¸¬è©¦æ™‚ï¼Œå¾ˆå¯èƒ½ä¸€ç›´çœ‹åˆ°çš„æ˜¯èˆŠç‰ˆï¼ˆç”šè‡³æ˜¯å¥½å¹¾è¼ªå‰ï¼‰çš„
-ç¨‹å¼ç¢¼/æ¨£å¼ï¼Œä¸æ˜¯Claude/GPTå‰›å‰›æŽ¨ä¸ŠåŽ»çš„ç‰ˆæœ¬**ï¼Œé€™å®Œå…¨å¯ä»¥è§£é‡‹ã€Œå­—ç´š
-æ˜Žæ˜Žå°±æ”¹å¤§äº†ï¼Œä½¿ç”¨è€…å»èªªè®Šæ›´å°äº†ã€é€™ç¨®çŸ›ç›¾å›žå ±â€”â€”ä½¿ç”¨è€…çœ‹åˆ°çš„æžä¸å¥½
-æ ¹æœ¬æ˜¯æ›´æ—©ä¸€è¼ªã€é‚„æ²’æ”¾å¤§éŽçš„å¿«å–ç‰ˆæœ¬ã€‚
-
-**é€™æ¬¡çš„ä¿®æ³•**ï¼šæŠŠ `index.html` è£¡çš„ `js/00-main.js?v=130` æ”¹æˆ
-`?v=132`ï¼Œ`js/20-anonymous-20.js` è£¡çš„ `css/31-v131-fix-batch.css`ã€
-`js/25-v131-fix-batch.js`ã€`css/32-v131-patrol-appearance.css`ã€
-`js/26-v131-patrol-appearance.js` å…¨éƒ¨çµ±ä¸€æ”¹æˆ `?v=132`ã€‚
-
-**â˜… ä»¥å¾Œçš„è¦å‰‡ï¼ˆå‹™å¿…éµå®ˆï¼‰**ï¼šåªè¦æ”¹äº†é€™äº”å€‹æª”æ¡ˆè£¡ä»»ä½•ä¸€å€‹çš„å…§å®¹ï¼Œ
-**ç•¶æ¬¡æ”¶å·¥å‰ä¸€å®šè¦æŠŠè©²æª”æ¡ˆçš„ `?v=` æ•¸å­—å¾€ä¸ŠåŠ **ï¼ˆæ‰¾ `index.html` çš„
-`<script src="js/00-main.js?v=...">` é‚£ä¸€è¡Œï¼Œè·Ÿ `js/20-anonymous-20.js`
-è£¡å°æ‡‰é‚£å€‹æª”æ¡ˆçš„ `?v=...`ï¼‰ï¼Œæ²’æ”¹ç‰ˆæœ¬è™Ÿ = ä½¿ç”¨è€…çš„ç€è¦½å™¨å¾ˆå¯èƒ½ç¹¼çºŒçœ‹åˆ°
-èˆŠç‰ˆï¼Œç­‰æ–¼é€™æ¬¡çš„ä¿®æ”¹åœ¨ä½¿ç”¨è€…ç«¯å½¢åŒæ²’ç™¼ç”ŸéŽã€‚
-
----
-
-#### â˜…â˜…â˜… 2026-08-26 æ›´æ–°ï¼šé€™å€‹å‘åˆè¸©äº† 4 è¼ªï¼Œå·²ç¶“æ”¹æˆã€Œå–®ä¸€å¸¸æ•¸ã€æ©Ÿåˆ¶ â˜…â˜…â˜…
-
-å³ä½¿ä¸Šé¢æ•´æ®µè­¦å‘Šå°±å¯«åœ¨é€™è£¡ï¼Œ**å¾ž PR #15 ä¹‹å¾Œé‚„æ˜¯åˆé€£çºŒ 4 å€‹ PR
-ï¼ˆ#17ï¼#18ï¼#19ï¼#20ï¼‰æ”¹äº† `js/25`ï¼`js/27`ï¼`css/33`ï¼Œç‰ˆæœ¬è™Ÿå»ä¸€æ¬¡éƒ½
-æ²’å‹•**ï¼Œå…¨éƒ¨å¡åœ¨ `?v=132`ã€‚çµæžœä½¿ç”¨è€…æ•´æ•´ 4 è¼ªéƒ½åœ¨è·‘ PR #15 æ™‚ä»£çš„èˆŠ
-ç¨‹å¼ç¢¼ï¼Œå›žå ±äº†ä¸€å †ã€Œå·²ç¶“ä¿®å¥½å»é‚„åœ¨ç™¼ç”Ÿã€çš„å•é¡Œï¼ˆå‰¯æœ¬æ¬¡æ•¸æ²’è§£é™¤ã€
-æˆ°é¬¥ç¯€å¥æ²’æ”¹å–„â€¦â€¦ï¼‰ï¼Œå¯¦éš›ä¸Šé‚£äº›ä¿®æ­£ä»–æ ¹æœ¬æ²’æ”¶åˆ°ã€‚
-
-**æ ¹æœ¬å•é¡Œæ˜¯ã€Œç‰ˆæœ¬è™Ÿæ•£åœ¨ 4 å€‹ loader è£¡å„å¯«å„çš„å­—é¢å€¼ã€**ï¼Œåªè¦æœ‰ä¸€å€‹
-å¿˜è¨˜æ”¹å°±ç ´åŠŸâ€”â€”å…‰é æ–‡ä»¶æé†’é¡¯ç„¶æ²’ç”¨ï¼ˆé€™æ®µè­¦å‘Šæœ¬ä¾†å°±åœ¨ï¼Œé‚„æ˜¯æ¼äº† 4 æ¬¡ï¼‰ã€‚
-
-**ç¾åœ¨çš„åšæ³•**ï¼š`js/20-anonymous-20.js` æª”æ¡ˆæœ€ä¸Šé¢æœ‰å”¯ä¸€çš„ä¸€è¡Œ
-
-```js
-const V_ASSET_VERSION="134";
-function vAssetUrl(path){ return path+"?v="+V_ASSET_VERSION; }
-```
-
-4 å€‹ loader å…¨éƒ¨æ”¹ç”¨ `vAssetUrl("css/31-....css")` é€™ç¨®å¯«æ³•ã€‚
-**ä»¥å¾Œæ”¹ä»»ä½•è¢«é€™äº› loader è¼‰å…¥çš„æª”æ¡ˆï¼Œåªè¦æŠŠ `V_ASSET_VERSION`
-é‚£ä¸€å€‹æ•¸å­—åŠ ä¸€å°±å¥½ã€‚**
-
-é‚„æœ‰å…©å€‹ä¾‹å¤–è¦è¨˜å¾—ï¼š
-1. `js/00-main.js` çš„ `?v=` å¯«åœ¨ `index.html`ï¼ˆä¸ç¶“éŽ loaderï¼‰ï¼Œ
-   æ”¹é‚£å€‹æª”æ¡ˆè¦å¦å¤–åŽ» `index.html` æ›´æ–°ã€‚
-2. `js/v131-patrol-sprite-*.js` é‚£ 61 å€‹ sprite chunk æ˜¯ç´” base64
-   åœ–ç‰‡ã€é«”ç©å¾ˆå¤§ã€å…§å®¹ä¹Ÿå¾ˆä¹…æ²’è®Šï¼Œ**åˆ»æ„ç¶­æŒé‡˜æ­»åœ¨èˆŠç‰ˆæœ¬è™Ÿ**
-   ï¼ˆ`?v=131f` / `?v=131c`ï¼‰ï¼Œä¸è·Ÿè‘— `V_ASSET_VERSION` èµ°ï¼Œé¿å…æ”¹
-   ä¸€è¡Œé‚è¼¯å°±å®³ä½¿ç”¨è€…é‡æ–°ä¸‹è¼‰ä¸€æ•´åŒ…åœ–ç‰‡ã€‚çœŸçš„æ›åœ–æ™‚å†æ‰‹å‹•æ”¹ã€‚
-
-å¦å¤–é€™æ¬¡ä¹Ÿé †æ‰‹æŠŠ `css/08-stage-v14-character-scroll-fix.css`
-ï¼ˆåŽŸæœ¬æ˜¯ `index.html` è£¡é€£ `?v=` éƒ½æ²’æœ‰çš„éœæ…‹ `<link>`ï¼Œä½† PR #16
-æ”¹éŽå®ƒï¼‰è£œä¸Šäº† `?v=134`ã€‚
-
-#### â˜…â˜…â˜… 2026-08-26 V136 è£œå……ï¼šloader è‡ªå·±ä¹Ÿå¿…é ˆæœ‰ç‰ˆæœ¬è™Ÿ â˜…â˜…â˜…
-
-ä¸Šé¢çš„å–®ä¸€å¸¸æ•¸åªèƒ½æ›´æ–°ã€Œç”± loader å‹•æ…‹è¼‰å…¥çš„å­è³‡æºã€ï¼Œä½†åŽŸæœ¬
-`index.html` æ˜¯ç”¨æ²’æœ‰ query string çš„ `js/20-anonymous-20.js` è¼‰å…¥ loader
-æœ¬èº«ã€‚å¦‚æžœæ‰‹æ©Ÿå¿«å–çš„æ˜¯èˆŠ loaderï¼Œå®ƒæ ¹æœ¬çœ‹ä¸åˆ°æ–°çš„ `V_ASSET_VERSION`ï¼Œ
-ä¹Ÿä¸æœƒçŸ¥é“å¾Œä¾†æ–°å¢žçš„ patch æª”å­˜åœ¨ã€‚é€™æ­£æ˜¯ç‰ˆæœ¬æ©Ÿåˆ¶æœ€å¤–å±¤ä»ç„¶ç¼ºä¸€ç’°çš„åœ°æ–¹ã€‚
-
-V136 å·²æŠŠå…¥å£æ”¹æˆï¼š
-
-```html
-<script src="js/20-anonymous-20.js?v=136"></script>
-```
-
-**ä»¥å¾Œæ¯æ¬¡èª¿é«˜ `V_ASSET_VERSION`ï¼Œ`index.html` é€™ä¸€è¡Œçš„ç‰ˆæœ¬ä¹Ÿå¿…é ˆä¸€èµ·
-èª¿é«˜ã€‚** å…©è€…å¿…é ˆç›¸åŒï¼›åªæ”¹ loader å…§çš„å¸¸æ•¸ã€æ²’æ”¹ loader è‡ªå·±çš„ URLï¼Œ
-ä»å¯èƒ½è®“æ‰‹æ©Ÿæ°¸é åœåœ¨èˆŠç‰ˆã€‚
-
-è‡³æ–¼æ²’æœ‰ç‰ˆæœ¬è™Ÿã€ç”¨ç´”éœæ…‹ `<link>`/`<script>` æ¨™ç±¤è¼‰å…¥çš„æª”æ¡ˆï¼ˆä¾‹å¦‚
-`css/00-main.css`ã€`css/22-stage-v78-character-inventory-core.css`ï¼‰â€”â€”
-é€™äº›æ²’æœ‰è¾¦æ³•ç”¨æ”¹ç‰ˆæœ¬è™Ÿçš„æ–¹å¼å¼·åˆ¶åˆ·æ–°ï¼Œåªèƒ½ä¾è³´ GitHub Pages é è¨­çš„
-å¿«å–æ™‚é–“ï¼ˆé€šå¸¸è¼ƒçŸ­ï¼Œæœƒè‡ªç„¶éŽæœŸé‡æ–°æŠ“å–ï¼‰ï¼Œé¢¨éšªæ¯”ä¸Šé¢é‚£äº”å€‹ã€Œç‰ˆæœ¬è™Ÿå¯«æ­»
-æ²’è·Ÿè‘—å‹•ã€çš„æª”æ¡ˆä½Žå¾ˆå¤šï¼Œä¸ç”¨ç‰¹åˆ¥è™•ç†ï¼Œä½†å¦‚æžœåŒä¸€æ‰¹ä¿®æ”¹å‰›å¥½ä¹Ÿå‹•åˆ°é€™é¡ž
-æª”æ¡ˆï¼Œé‚„æ˜¯å¯ä»¥åœ¨èªªæ˜Žè£¡æé†’ä¸€ä¸‹ã€Œé€™å€‹éƒ¨åˆ†å¯èƒ½è¦ç­‰å¿«å–è‡ªç„¶éŽæœŸæˆ–ä½¿ç”¨è€…
-å¼·åˆ¶é‡æ–°æ•´ç†ã€ã€‚
-
-### 1.3 â˜… æ”¹`#allElementSkillPreviewModal`ï¼ˆå…¨å±¬æ€§æŠ€èƒ½é è¦½ï¼‰çš„font-sizeï¼Œæ•¸å­—è¦ä¹˜ä¸Šç´„2.57å€æ‰æœƒæ˜¯èž¢å¹•ä¸Šå¯¦éš›çœ‹åˆ°çš„å¤§å°
-
-`#allElementSkillPreviewModal`ï¼ˆæŠ€èƒ½é é¢è£¡ã€Œå…¨å±¬æ€§æŠ€èƒ½é è¦½ã€é‚£å€‹å½ˆçª—ï¼‰
-æ´»åœ¨ `#game-stage` çš„ `transform:scale()` åº§æ¨™ç³»åº•ä¸‹â€”â€”æ•´å€‹éŠæˆ²ç•«é¢å…ˆåœ¨
-1080å¯¬çš„è¨­è¨ˆç¨¿åº§æ¨™ç•«å¥½ï¼Œå†ç”¨CSS transformæ•´é«”ç¸®å°è²¼åˆæ‰‹æ©Ÿå¯¦éš›èž¢å¹•å¯¬åº¦ã€‚
-ç”¨Playwrightåœ¨420pxå¯¬viewporté‡åˆ°çš„ç¸®æ”¾æ¯”ä¾‹æ˜¯ `0.388889`
-ï¼ˆ`getComputedStyle(document.getElementById('game-stage')).transform`
-= `matrix(0.388889,...)`ï¼‰ï¼Œé€™å€‹æ¯”ä¾‹ä¸æœƒå› ç‚ºæ‰‹æ©Ÿåž‹è™Ÿå·®å¾ˆå¤šï¼ˆå› ç‚ºè¨­è¨ˆç¨¿
-1080å¯¬ã€æ‰‹æ©Ÿå¤§æ¦‚380~430å¯¬ï¼Œæ¯”ä¾‹éƒ½åœ¨0.35~0.40å·¦å³ï¼‰ï¼Œå¯ä»¥æ”¾å¿ƒç•¶é€šç”¨å€¼ã€‚
-
-2026-08-25~26é€™å¹¾è¼ªä¸€è·¯æŠŠé€™å€‹å½ˆçª—çš„æ–‡å­—å¾ž13.5pxåŠ å¤§åˆ°22pxï¼Œä½¿ç”¨è€…å»
-ä¸€ç›´åæ˜ ã€Œé‚„æ˜¯å¾ˆå°ã€â€”â€”çœŸæ­£åŽŸå› æ˜¯**é€™è£¡å¯«çš„font-sizeæœƒå†è¢«é‚£å±¤scale
-ä¹˜ä¸Š0.389**ï¼Œ22pxå¯¦éš›é¡¯ç¤ºåœ¨èž¢å¹•ä¸Šåªå‰©ç´„8.6pxï¼Œæ¯ä¸€è¼ªçš„ã€ŒåŠ å¤§ã€åœ¨èž¢å¹•ä¸Š
-çš„å¯¦éš›æ•ˆæžœéƒ½è¢«åƒæŽ‰å…­æˆå¤šï¼Œé›£æ€ªæ„Ÿè¦ºæ²’ä»€éº¼ç”¨ã€‚2026-08-26æœ€å¾Œä¸€è¼ª
-ï¼ˆ`css/31-v131-fix-batch.css`è£¡`.skill-preview-card`é‚£å¹¾æ¢è¦å‰‡ï¼‰å·²ç¶“
-æ”¹æˆå¯«90pxï¼ˆå¸Œæœ›èž¢å¹•ä¸Šçœ‹åˆ°35pxçš„è©±ï¼Œå°±è¦å¯«35Ã·0.388889â‰ˆ90pxï¼‰ï¼Œå·²ç”¨
-`getBoundingClientRect()`å¯¦æ¸¬ç¢ºèªæ›ç®—å¾Œæ•¸å€¼æ­£ç¢ºã€‚
-
-**ä»¥å¾Œå¦‚æžœè¦å†èª¿é€™å€‹å½ˆçª—ï¼ˆæˆ–ä»»ä½•ç¢ºèªéŽæ´»åœ¨`#game-stage`ç¸®æ”¾åº§æ¨™ç³»åº•ä¸‹
-çš„å…¶ä»–å…ƒç´ ï¼‰çš„å­—ç´š/å°ºå¯¸ï¼Œè¨˜å¾—å…ˆç”¨é¡žä¼¼æ–¹æ³•é‡ä¸€æ¬¡ç›®å‰çš„ç¸®æ”¾æ¯”ä¾‹
-ï¼ˆæ¯”è¼ƒ`getBoundingClientRect().height`è·Ÿ`offsetHeight`å…©å€‹å€¼çš„æ¯”ä¾‹ï¼‰ï¼Œ
-å†å›žæŽ¨ã€Œèž¢å¹•ä¸Šæƒ³è¦çš„å¯¦éš›pxå€¼ Ã· ç¸®æ”¾æ¯”ä¾‹ã€å¯«é€²CSSï¼Œä¸è¦ç›´æŽ¥æŠŠä½¿ç”¨è€…èªªçš„
-æ•¸å­—åŽŸå°ä¸å‹•å¯«é€²åŽ»ã€‚**
-
-V173.16 åˆç¢ºèªä¸€å€‹åŒé¡žé™·é˜±ï¼šå³ä½¿ JavaScript å·²æŠŠ viewport åº§æ¨™æ­£ç¢ºæ›å›ž map-local
-é‚è¼¯åº§æ¨™ï¼Œæœ€çµ‚ CSS çš„ `inset:auto !important` ä»æœƒæŠŠ inline `left/top` ç•¶æˆç„¡æ•ˆï¼Œ
-é€ æˆå…ƒç´ çš„ `style.left/top` çœ‹ä¼¼æœ‰å€¼ã€å¯¦éš› `getBoundingClientRect()` å»ä»è½åœ¨ç•«é¢å¤–ã€‚
-æ·±æ·µå°è©±ç›®å‰ç”± `js/36-v141-content-systems.js` è¨ˆç®—åº§æ¨™ä¸¦å¯«å…¥ CSS custom propertiesï¼Œ
-å†ç”± `css/50-v169-abyss-flow.css` çš„æœ€çµ‚ `left/top:var(...) !important` æ¶ˆè²»ï¼›æª¢æŸ¥é€™é¡žå•é¡Œ
-ä¸èƒ½åªè®€ `element.style`ï¼Œå¿…é ˆåŒæ™‚é‡ computed styleã€å…ƒç´  rect èˆ‡å®¹å™¨ rectã€‚
-
-åéŽä¾†ï¼Œ`#homeFeatureModal`ï¼ˆè§’è‰²/æŠ€èƒ½åˆ—è¡¨ã€ç‹€æ…‹é é‚£å€‹å½ˆçª—ï¼‰å·²ç¶“åœ¨
-æ›´æ—©ä¸€è¼ªï¼ˆ`js/19-stage-v78-character-inventory-runtime.js`é‚£æ¬¡ä¿®æ­£ï¼‰
-è­‰å¯¦æ˜¯1:1é¡¯ç¤ºã€æ²’æœ‰è¢«é€™å±¤ç¸®æ”¾å½±éŸ¿ï¼ŒåŒä¸€å€‹æŠ€å·§ä¸é©ç”¨åœ¨é‚£å€‹å½ˆçª—ä¸Šâ€”â€”
-ä¸åŒå½ˆçª—ã€ä¸åŒå®¹å™¨ï¼Œå¥—ç”¨ç¸®æ”¾èˆ‡å¦å¯èƒ½ä¸ä¸€æ¨£ï¼Œæ”¹ä¹‹å‰å‹™å¿…å€‹åˆ¥å¯¦æ¸¬ï¼Œ
-ä¸è¦æ†‘å°è±¡å¥—ç”¨ã€‚
-
-### 1.5 æœ‰è¾¦æ³•çš„è©±ï¼Œä¸€å®šè¦å¯¦éš›è·‘èµ·ä¾†æ¸¬è©¦ï¼Œä¸è¦åªé è®€ç¨‹å¼ç¢¼åˆ¤æ–·
-
-2026-08-25 é€™ä¸€è¼ªä¿®äº† 7 å€‹å›žå ±çš„ bugï¼ˆæŠ€èƒ½æ¬„/ç¶“é©—æ± ç„¡æ³•æ²å‹•ã€å·¡æ€ªç«‹ç¹ªè®Šç™½è‰²ç©ºç™½æ–¹å¡Šã€
-æŠ€èƒ½iconé…éŒ¯ã€å­¸ç¿’å‡ç´šæ¡†å¤ªå¤§ã€æ–‡å­—å¤ªå°ã€å½¢è±¡åˆ‡æ›æŒ‰éˆ•å¤ªå°ç•«è³ªå·®ï¼‰ï¼Œå…¨éƒ¨éƒ½æ˜¯ã€Œè®€ç¨‹å¼ç¢¼
-çœ‹èµ·ä¾†æ²’å•é¡Œï¼Œä½†å¯¦éš›æ¸²æŸ“å‡ºä¾†æ˜¯éŒ¯çš„ã€â€”â€”ä¾‹å¦‚ï¼š
-
-- æ²å‹•å¤±æ•ˆçš„æ ¹æœ¬åŽŸå› æ˜¯ `js/19-stage-v78-character-inventory-runtime.js` ç”¨
-  `getBoundingClientRect()` é‡å‡ºä¾†çš„èž¢å¹•åº§æ¨™ï¼Œé™¤ä»¥ä¸€å€‹ã€Œé€™å€‹å½ˆçª—å…¶å¯¦æ ¹æœ¬æ²’æœ‰åœ¨ç”¨ã€
-  çš„ `#game-stage` ç¸®æ”¾ä¿‚æ•¸ï¼ŒæŠŠå¯ç”¨é«˜åº¦èª¤ç®—æˆå¿«3å€å¤§â€”â€”é€™ç¨®bugå…‰çœ‹ç¨‹å¼ç¢¼é‚è¼¯å®Œå…¨
-  çœ‹ä¸å‡ºå•é¡Œï¼ˆå…¬å¼æœ¬èº«æ²’æœ‰èªžæ³•éŒ¯èª¤ï¼Œæ•¸å­¸ä¸Šä¹Ÿã€Œçœ‹èµ·ä¾†åˆç†ã€ï¼‰ï¼Œåªæœ‰å¯¦éš›é‡æ¸¬
-  `clientHeight` vs `getBoundingClientRect().height` æ‰ç™¼ç¾å…©è€…å…¶å¯¦æ˜¯1:1ï¼Œ
-  ä¸éœ€è¦æ›ç®—ã€‚
-- å·¡æ€ªç©ºç™½æ–¹å¡Šæ˜¯ Chromium çš„ä¸€å€‹æ¸²æŸ“æ€ªç™–ï¼š`<img>` åªè¦ `src` æ˜¯ä¸€å¼µèƒ½æˆåŠŸè§£ç¢¼çš„åœ–ç‰‡
-  ï¼ˆå°±ç®—æ˜¯1x1é€æ˜ŽGIFï¼‰ï¼Œç–ŠåŠ çš„CSS `background-image` å¤§éƒ¨åˆ†å€åŸŸå°±æœƒè¢«ç•«æˆç™½è‰²ï¼Œ
-  é€™å®Œå…¨æ²’è¾¦æ³•å¾žç¨‹å¼ç¢¼é‚è¼¯æŽ¨è«–å‡ºä¾†ï¼Œåªèƒ½å¯¦éš›æ¸²æŸ“å‡ºä¾†çœ‹ã€ç„¶å¾Œç”¨æœ€å°é‡ç¾æ¡ˆä¾‹
-  ï¼ˆåŒæ¨£çš„CSSå¥—åœ¨`<div>`ä¸Š vs å¥—åœ¨`<img>`ä¸Šæ¯”è¼ƒï¼‰æ‰èƒ½éŽ–å®šå•é¡Œã€‚
-
-**ç’°å¢ƒè£¡å·²ç¶“æœ‰ Chromium + Playwright å¯ä»¥ç”¨**ï¼ˆ`/opt/pw-browsers/chromium-1194/`ï¼Œ
-Node.js ç‰ˆplaywrightå¥—ä»¶éœ€è¦è‡ªå·±`npm install playwright`ä¸€æ¬¡ï¼Œ
-ç”¨`PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1`é¿å…å®ƒé‡æ–°ä¸‹è¼‰ç€è¦½å™¨ï¼‰ã€‚ç”¨
-`python3 -m http.server` æŠŠæ•´å€‹å°ˆæ¡ˆè³‡æ–™å¤¾serveèµ·ä¾†ï¼Œé…åˆPlaywrightå¯«å°è…³æœ¬
-ï¼ˆé–‹é é¢â†’è·‘å®Œå‰µè§’æµç¨‹â†’æ“ä½œåˆ°å‡ºå•é¡Œçš„é é¢â†’screenshot / è®€computed style /
-è®€scrollTopç­‰ï¼‰ï¼Œæ˜¯ç›®å‰é€™å€‹å°ˆæ¡ˆå”¯ä¸€å¯é çš„é©—è­‰æ–¹å¼ã€‚**ç´”è®€ç¨‹å¼ç¢¼ã€ç´”æŽ¨ç†
-ã€Œé€™æ¨£æ‡‰è©²æœƒå‹•ã€æ˜¯ä¸å¤ çš„**ï¼Œå°¤å…¶æ˜¯é€™ç¨®ç–Šäº†30å¹¾å±¤CSS/JS overrideã€å½¼æ­¤äº’ç›¸
-ç”¨`!important`è“‹ä¾†è“‹åŽ»çš„æž¶æ§‹ï¼Œå…‰ç”¨çœ¼ç›çœ‹å¾ˆå®¹æ˜“æ¼æŽ‰çœŸæ­£ç”Ÿæ•ˆçš„æ˜¯å“ªä¸€æ¢è¦å‰‡ã€‚
-
-### 2. å¤§éƒ¨åˆ†æ ¸å¿ƒéŠæˆ²é‚è¼¯åœ¨ `js/00-main.js`ï¼ˆå¾ˆå¤§ï¼Œç´„ 750KBï¼‰
-
-è§’è‰²/æˆ°é¬¥/æŠ€èƒ½/è£å‚™/å­˜æª”ç­‰ç³»çµ±çš„æœ¬é«”éƒ½åœ¨é€™è£¡ï¼Œå‡½å¼åç¨±ç›´æŽ¥æ²¿ç”¨ï¼ˆ`getMainCharacterStats`ã€
-`castDamageSkill`ã€`checkLevelUp`ã€`saveGame`/`loadGame`â€¦â€¦ï¼‰ã€‚é€™ä¸€æ”¯ä¸è¦æ•´æ”¯æ”¹å¯«ï¼Œ
-å¾ŒçºŒä¿®æ”¹ä¸€å¾‹èµ°ã€Œç–Š patchã€çš„æ¨¡å¼ï¼ˆè®€èˆŠå‡½å¼ã€åŒ…ä¸€å±¤ã€è“‹å›žåŒåå…¨åŸŸè®Šæ•¸ï¼‰ï¼Œ
-è·Ÿ V131 é‚£æ‰¹çš„å¯«æ³•ä¸€è‡´â€”â€”é€™æ˜¯é€™å€‹å°ˆæ¡ˆå¾ž V120 å°±å®šä¸‹ä¾†çš„è¦å‰‡ï¼ˆè¦‹ `README_*.txt`ï¼‰ï¼š
-**ä¸è¦æŠŠ 21 æ”¯ script åˆä½µæˆä¸€æ”¯ game.js**ï¼Œå› ç‚ºæœƒæ”¹è®Šä¾‹å¤–é‚Šç•Œè·Ÿé ‚å±¤ `let`/`const`
-åˆå§‹åŒ–æ™‚æ©Ÿã€‚æ–°çš„ patch æª”ä¸€æ¨£ç…§é€™å€‹è¦å‰‡ä¾†ï¼Œä¸è¦åœ–æ–¹ä¾¿ç›´æŽ¥æ”¹ `00-main.js`ã€‚
-
-### 3. åœ–ç‰‡è³‡æºå‘½åæ…£ä¾‹ï¼šbase64 â†’ å¤–éƒ¨æª” â†’ chunk æ‹†æª”
-
-`assets/` åº•ä¸‹æ˜¯çœŸæ­£çš„åœ–ç‰‡æª”ï¼ˆpng/jpg/webpï¼‰ã€‚å¦‚æžœæŸå€‹è³‡æºå¿…é ˆå…§åµŒåœ¨ JS è£¡
-ï¼ˆä¾‹å¦‚å·¡æ€ªçš„é€æ˜Ž spriteï¼Œéœ€è¦åœ¨ runtime ç”¨ CSS `background-position` åšå››æ–¹å‘åˆ‡æ›ï¼‰ï¼Œ
-æ…£ä¾‹æ˜¯ï¼š
-
-1. ç”¨ PIL ä¹‹é¡žçš„å·¥å…·æŠŠåœ–ç‰‡çµ„æˆä¸€å¼µ sprite sheetï¼ˆwebpï¼Œéœ€è¦é€æ˜ŽèƒŒæ™¯å°±ç”¨ losslessï¼‰
-2. base64 ç·¨ç¢¼
-3. åˆ‡æˆå¤šå€‹ `js/v131-patrol-sprite-*.js`ï¼ˆæˆ–é¡žä¼¼å‘½åï¼‰å°æª”ï¼Œæ¯å€‹æª”æ¡ˆå…§å®¹å›ºå®šæ ¼å¼ï¼š
-   ```js
-   window.SOME_GLOBAL_CHUNKS=window.SOME_GLOBAL_CHUNKS||[];
-   window.SOME_GLOBAL_CHUNKS[i]="....(base64 ç‰‡æ®µ)....";
-   ```
-4. æ¶ˆè²»ç«¯ï¼ˆä¾‹å¦‚ `js/26-v131-patrol-appearance.js`ï¼‰æª¢æŸ¥é™£åˆ—é•·åº¦/å®Œæ•´æ€§ï¼Œ
-   ä¸å®Œæ•´å°±å®‰å…¨é™ç´šï¼ˆfallback åˆ°èˆŠè¡Œç‚ºï¼‰ï¼Œä¸è¦è®“è¼‰å…¥å¤±æ•—ç›´æŽ¥æŠŠæ•´æ”¯ script ç‚¸æŽ‰ã€‚
-5. **ä¸€å®šè¦é©—è­‰ byte-for-byte é‚„åŽŸ**ï¼ˆdecode æ‰€æœ‰ chunkã€çµ„å›žäºŒé€²ä½ã€è·ŸåŽŸå§‹æª”æ¡ˆæ¯”å°
-   hashï¼‰å†æäº¤ï¼Œé€™æ˜¯é€™å€‹å°ˆæ¡ˆå”¯ä¸€èƒ½ä¿è­‰ã€Œåˆ‡æª”æ²’åˆ‡å£žè³‡æ–™ã€çš„æ–¹æ³•ã€‚
-
-ç¾æœ‰ç¯„ä¾‹ï¼š`js/v131-patrol-sprite-0.js` ~ `9.js`ï¼ˆå¥³è§’ Q ç‰ˆï¼Œ3x3 gridï¼Œ
-æ¯æ ¼å°æ‡‰ä¸€å€‹å…ƒç´ çš„æ­£/èƒŒé¢ï¼Œ2026-08-25ç¬¬äºŒè¼ªç”¨æ›´é«˜ç•«è³ªä¾†æºé‡å»ºéŽï¼Œ
-chunkæ•¸å¾ž6å€‹å¢žåŠ åˆ°10å€‹ï¼‰ã€`js/v131-patrol-sprite-male-0.js` ~ `17.js`
-ï¼ˆç”·è§’ Q ç‰ˆï¼Œ4x2 gridï¼Œæ­£èƒŒé¢çš†æœ‰ï¼‰ã€‚
-
-**æ›æŽ‰chunkå…§å®¹ä½†æª”åï¼æ•¸é‡ä¸è®Šæ™‚ï¼Œè¨˜å¾—æŠŠ `js/20-anonymous-20.js` è£¡
-å°æ‡‰çš„ `?v=131x` query string ç‰ˆæœ¬è™Ÿå¾€å¾Œéžå¢ž**ï¼ˆä¾‹å¦‚`131a`â†’`131e`ï¼‰ï¼Œ
-ä¸ç„¶ä½¿ç”¨è€…ç€è¦½å™¨å¯èƒ½é‚„å¿«å–è‘—èˆŠç‰ˆbase64å…§å®¹ï¼Œçœ‹èµ·ä¾†åƒæ˜¯ã€Œæ›åœ–æ²’ç”Ÿæ•ˆã€ã€‚
-å¦‚æžœchunkæ•¸é‡æœ¬èº«è®Šå¤šï¼è®Šå°‘ï¼Œ`sources`é™£åˆ—ä¹Ÿè¦åŒæ­¥å¢žæ¸›å°æ‡‰çš„æª”æ¡ˆæ¸…å–®ã€‚
-
-### 4. è§’è‰²ç³»çµ±ï¼š`player`ï¼`player2`ï¼`player3`
-
-ä¸‰å€‹è§’è‰²æ˜¯å¹³è¡Œçµæ§‹ï¼ˆä¸æ˜¯é™£åˆ—ï¼‰ï¼Œè¼”åŠ©å‡½å¼ `getPartyCharacterByIndex(index)`ï¼
-`getExistingPartyIndexes()` çµ±ä¸€è™•ç†ã€Œä¸ç®¡å“ªå€‹è§’è‰²ï¼Œåªè¦å­˜åœ¨å°±è™•ç†ã€çš„é‚è¼¯ï¼Œ
-æ–°ç¨‹å¼ç¢¼ç›¡é‡å‘¼å«é€™å…©å€‹è¼”åŠ©å‡½å¼ï¼Œä¸è¦è‡ªå·±å¯« `index===0?player:index===1?player2:player3`
-é€™ç¨®ä¸‰å…ƒåˆ¤æ–·ï¼ˆé›–ç„¶èˆŠç¨‹å¼ç¢¼è£¡åˆ°è™•éƒ½æ˜¯ï¼Œä½†æ–°å¢žçš„éƒ¨åˆ†ç›¡é‡åˆ¥å†åŠ ï¼‰ã€‚
-
-`character.gender`ï¼ˆ`"male"`/`"female"`ï¼‰è·Ÿ `character.element`
-ï¼ˆ`"fire"`/`"water"`/`"wind"`/`"earth"`ï¼‰æ˜¯å…©å€‹ç¨ç«‹æ¬„ä½ï¼Œç«‹ç¹ª/Qç‰ˆç´ æè¦åŒæ™‚çœ‹é€™å…©å€‹
-æ¬„ä½æ‰èƒ½é¸åˆ°æ­£ç¢ºçš„åœ–ï¼ˆè¦‹ `getCharacterArtworkPath()` åœ¨ `js/00-main.js`ï¼‰ã€‚
-
-### 5. `#game-stage` è£¡æ–°å¢žä»»ä½•éœ€è¦æ‰‹æŒ‡æ²å‹•çš„å®¹å™¨ï¼Œè¨˜å¾—åŠ é€²è§¸æŽ§éŽ–ç™½åå–®
-
-`js/01-stage-v8-touch-lock.js` æœ‰ä¸€å€‹å…¨åŸŸçš„ `touchmove` ç›£è½ï¼Œåªè¦è§¸æŽ§ç›®æ¨™åœ¨
-`#game-stage` è£¡é¢ã€åˆä¸åœ¨å®ƒè‡ªå·±ç¶­è­·çš„ `allowedSelector` ç™½åå–®è¦†è“‹çš„å¯æ²å‹•å®¹å™¨å…§ï¼Œ
-å°±æœƒ `preventDefault()` æ•´å€‹æ“‹æŽ‰ï¼Œé˜²æ­¢æ‰‹æŒ‡èª¤æ»‘åˆ°éŠæˆ²èƒŒæ™¯é€ æˆéžé æœŸçš„é é¢æ²å‹•/ç¸®æ”¾ã€‚
-
-**é€™ä»£è¡¨ï¼šä»»ä½•æ–°å¢žçš„ã€é æœŸè¦èƒ½è®“çŽ©å®¶æ‰‹æŒ‡æ»‘å‹•æ²å‹•çš„å®¹å™¨ï¼ˆæ–°å½ˆçª—ã€æ–°åˆ—è¡¨â€¦â€¦ï¼‰ï¼Œ
-å¦‚æžœæ²’æœ‰æŠŠå®ƒè‡ªå·±çš„ class/id åŠ é€²é€™ä»½ç™½åå–®ï¼Œç¨‹å¼åŒ–è¨­å®š `scrollTop` æœƒæ­£å¸¸é‹ä½œ
-ï¼ˆå› ç‚ºé‚£ä¸ç¶“éŽtouchmoveäº‹ä»¶ï¼‰ï¼Œä½†çŽ©å®¶çœŸçš„ç”¨æ‰‹æŒ‡æ»‘çš„æ™‚å€™æœƒå®Œå…¨æ²’åæ‡‰**â€”â€”é€™æ­£æ˜¯
-2026-08-26ã€Œå…¨å±¬æ€§æŠ€èƒ½é è¦½ã€å½ˆçª—ã€Œä¸èƒ½æ²å‹•ã€å›žå ±çš„æ ¹æœ¬åŽŸå› ï¼Œ`.skill-preview-body`
-å¾žé€™å€‹åŠŸèƒ½ä¸€é–‹å§‹åšå‡ºä¾†å°±æ²’è¢«åŠ é€²ç™½åå–®ï¼Œåªæ˜¯å…§å®¹å¤ çŸ­ã€å¾žä¾†ä¸éœ€è¦çœŸçš„æ²å‹•ï¼Œæ‰ä¸€ç›´
-æ²’è¢«ç™¼ç¾ã€‚ä¹‹å‰å¥½å¹¾è¼ªå•ç´”ç”¨`scrollTop`/`getBoundingClientRect()`é©—è­‰æ²å‹•ã€Œçœ‹èµ·ä¾†æ²’å•é¡Œã€ï¼Œ
-å…¶å¯¦éƒ½æ²’æœ‰æ¸¬åˆ°çœŸæ­£çš„æ‰‹æŒ‡è§¸æŽ§è·¯å¾‘ï¼Œéƒ½æ˜¯ä¸å¤ æº–çš„é©—è­‰æ–¹å¼ã€‚
-
-**ä»¥å¾Œåªè¦æ–°å¢ž/ç™¼ç¾ä»»ä½•ã€Œé€™è£¡æ‡‰è©²è¦èƒ½æ²å‹•ã€çš„å®¹å™¨ï¼Œé©—è­‰æ–¹å¼è¦ç”¨æ¨¡æ“¬çœŸå¯¦è§¸æŽ§æ»‘å‹•
-ï¼ˆPlaywrightçš„`Input.dispatchTouchEvent`ï¼Œ`touchStart`â†’`touchMove`â†’`touchEnd`ï¼‰ï¼Œ
-ä¸èƒ½åªæ¸¬`scrollTop`è³¦å€¼æˆ–`overflow-y:auto`çš„computed styleï¼Œé€™å…©ç¨®éƒ½æ¸¬ä¸å‡º
-è§¸æŽ§éŽ–æ“‹ä½æ‰‹å‹¢é€™ç¨®å•é¡Œã€‚**
-
----
-
-## å·²å®ŒæˆåŠŸèƒ½è¨˜éŒ„ï¼ˆæ–°çš„åŠ åœ¨æœ€ä¸Šé¢ï¼‰
-
-### 2026-09-02 â€” V173.37ï¼šä¸»åŸŽ HUDã€ä¸­å¤®é€šé“èˆ‡éšŠä¼æ¡†ç·šæœ€çµ‚å¾®èª¿ï¼ˆdevï¼‰
-
-- æœ¬è¼ªæ²’æœ‰é‡æ§‹ã€æ²’æœ‰æ–°å¢ž runtimeï¼wrapperï¼æš«æ™‚è£œä¸ã€‚HUD èˆ‡ä½Žé »å…¥å£ç›´æŽ¥ä¿®æ”¹æ­£å¼ owner
-  `css/00-main.css`ï¼š`.home-hud-identity` ä¿æŒåŽŸ grid æ¬„ä½èˆ‡ HUD 48px æœ€å°é«˜åº¦ï¼Œæ”¹ç‚ºåœ¨æ•´åˆ—ä¸­
-  åž‚ç›´ç½®ä¸­ä¸¦å‘å³4pxï¼›é‡‘å¹£ï¼ç¶“é©—æ± ã€DEV å°ºå¯¸èˆ‡å…§å®¹ä¸è®Šã€‚`.home-utility-actions` åªæŠŠæ°´å¹³
-  padding ç”±88pxæ”¹ç‚º82pxï¼Œå› æ­¤é›¢ç·šç¶“é©—å‘å·¦ã€ç³»çµ±å‘å³å„6pxï¼ŒæŒ‰éˆ•ä»ç¶­æŒ86Ã—40pxå®Œæ•´æ¨£å¼ï¼Œ
-  å¯¦éš›ä¸­å¤®ç©ºéš™ç”±48pxå¢žåŠ ç‚º60pxã€‚
-- å†’éšªéšŠä¼ç›´æŽ¥ä¿®æ”¹æ—¢æœ‰ owner `css/42-v146-system-polish.css`ï¼šå¤–æ¡†é‡‘ç·š alpha ç”±.76é™è‡³.54ã€
-  å…§ç™¼å…‰ç”±.07é™è‡³.04ï¼Œè§’è‰²åˆ—æ¡†ç·šç”±.58é™è‡³.38ã€å…§ç·šç”±.035é™è‡³.02ã€‚é‚Šæ¡†ä»ç‚º1pxï¼Œå› æ­¤
-  éšŠä¼ç¸½é«˜ã€44pxè§’è‰²åˆ—ã€45pxé ­åƒã€9px HPï¼SPæ¢ã€æ–‡å­—èˆ‡æŽ’åˆ—æ–¹å¼å®Œå…¨ä¸è®Šï¼›
-  `js/41-v146-system-polish.js` çš„è§’è‰²ï¼HPï¼SPè³‡æ–™æ¸²æŸ“æœªä¿®æ”¹ã€‚
-- ä»¥é ç«¯ç²¾ç¢º UI SHA `509b5e3390f5078a9f4e470a29d5e022abb77a26` åœ¨ Chrome å¯¦éš›è¼‰å…¥ä¸‰è§’è‰²å­˜æª”ä¸¦
-  ç›®è¦– 9:16 ç›´å‘ç•«é¢ã€‚è¨­è¨ˆé¢å¯¦æ¸¬æ¯”ä¾‹0.562508ï¼ˆ9/16ç‚º0.5625ï¼‰ï¼ŒHUDé«˜60.17pxã€è³‡æºåˆ—é«˜
-  26.33pxã€ä¸»å…¥å£112.82pxã€å…­åŠŸèƒ½102.79pxã€ä½Žé »å…¥å£50.14pxã€è§’è‰²åˆ—55.16pxåŠåº•éƒ¨å°Žèˆª
-  105.30pxå‡èˆ‡ V173.36 ç­‰æ•ˆç¸®æ”¾å°ºå¯¸ä¸€è‡´ï¼›ä¸­å¤®å¯¦éš›å¯è¦–ç©ºéš™ç”±60.17pxå¢žè‡³75.21pxï¼Œæ‰€æœ‰å€å¡Š
-  å‡åœ¨è¨­è¨ˆé¢å…§ï¼Œbodyï¼html scroll å°ºå¯¸ç­‰æ–¼ viewportï¼Œç„¡é‡ç–Šã€è£åˆ‡æˆ–æ²å‹•ã€‚éŠæˆ²ä¾†æºæ²’æœ‰
-  console errorï¼›é›²ç«¯ç€è¦½å™¨æ“´å……å…ƒä»¶è‡ªèº«çš„ metadata è¨Šæ¯ä¸å±¬æ–¼éŠæˆ²é ã€‚
-- ä¹¾æ·¨ worktree å®Œæ•´ Repository checks é€šéŽï¼šJavaScriptèªžæ³•166ï¼166ã€Node suites 52ï¼52ã€
-  éœæ…‹è³‡æº383ã€HTML ID 285ã€ç‰ˆæœ¬ï¼loaderï¼ˆ24æ”¯ç›´è¼‰ã€108å€‹ç›¸ä¾è³‡æºã€26æ”¯ ordered runtimesï¼‰
-  åŠ Git ç©ºç™½ï¼è¡çªæ¨™è¨˜çš†æ­£å¸¸ã€‚å·¥ä½œå€æ—¢æœ‰æœªæäº¤çš„ `assets/inbox/æšˆçœ©-ç‹€æ…‹å¾ªç’°åœ–.png` å·²ä¿ç•™ï¼Œ
-  æœªè¦†å¯«ã€æœªæš«å­˜ã€æœªæäº¤ï¼›åªç™¼å¸ƒ `dev`ï¼Œä¸åˆä½µã€ä¸æŽ¨é€ `main`ã€‚
-
-### 2026-09-02 â€” V173.36ï¼šæ·±æ·µç¬¬äº”é—œæœ€çµ‚åäººæŠ€èƒ½èˆ‡é¢¨å¤©å…µé–ƒèº²è¡“ï¼ˆdevï¼‰
-
-- æ²¿ç”¨æ—¢æœ‰ç¬¬äº”é—œç·¨éšŠã€ç«‹ç¹ªã€æˆ°é¬¥èˆ‡è³‡æ–™ ownerï¼Œä¸æ–°å¢ž runtimeã€‚æœ€ä¸‹æ¸¸ç¬¬äº”é—œ owner
-  `js/46-v155-dev-fixes.js` å·²å›ºå®šå‰æŽ’æ±å¸ï¼å¤©å¸ï¼æ¥µå¸ï¼åŒ—å¸ï¼å—å¸ã€å¾ŒæŽ’æ°´ï¼åœŸï¼ç«ï¼é¢¨ï¼æ°´
-  äº”ååŒåã€Œå¤©å…µå¤©å°‡ã€ï¼›äº”å¸èˆ‡äº”åç²¾è‹±çš„ `v141ForceSkillLevel`ã€`v141SkillLevel`ã€
-  `v144SkillLevel` å…¨éƒ¨æ”¹ç‚º5ã€‚æŠ€èƒ½è¡¨åªä¿ç•™æœ¬è¼ªæŒ‡å®šé …ç›®ï¼šæ±å¸åœ°ç‰›çŒ›è¥²ï¼çŸ³ç ´å¤©é©šï¼è¬è±¡åœŸç›¾ï¼Œ
-  å¤©å¸é¢¨å“®é›»æ“Šï¼é¢¨èµ·é›²æ¹§ï¼æ°£å®šç¥žé–’ï¼Œæ¥µå¸å…ƒç¥–è³œç¦ï¼ŒåŒ—å¸å†°éœœç®­é›¨ï¼å¾©æ´»è¡“ï¼æ²»ç™‚è¡“ï¼Œå—å¸
-  æ€’ç«ï¼éœ¸é¾è£‚å¤©æ–¬ï¼çƒˆç„°é¾æ²ï¼›ç²¾è‹±ç‚ºæ°´æ²»ç™‚ã€åœŸçŸ³ç ´ã€ç«çƒˆç„°é¾æ²ã€é¢¨é–ƒèº²ã€æ°´æ²»ç™‚ã€‚
-- å…ƒç¥–è³œç¦æ”¹ç‚ºå­˜æ´»æ•µæ–¹å…¨é«”é€ç›®æ¨™ç¨ç«‹35%æ·¨åŒ–ã€ç«‹å³å„æ¢å¾©100 HPï¼100 SPï¼Œå†ç‚ºå°šæœªæŒæœ‰
-  åŒåç¥ç¦è€…å¢žåŠ 35%é–ƒé¿2å›žåˆã€‚é‡æ–½æ™‚ç«‹å³å›žå¾©èˆ‡å„è‡ªæ·¨åŒ–ä»çµç®—ï¼Œä½†åŒåæŒçºŒé–ƒé¿ä¸ç–ŠåŠ ã€
-  ä¸åˆ·æ–°ï¼›èˆ‡é¢¨è¡Œå…±åŒå­˜åœ¨æ™‚ä½¿ç”¨å…±ç”¨ä¹˜ç®—ä¸¦æ­£ç¢ºå„è‡ªåˆ°æœŸã€‚åŒ—å¸æ–°å¢žæœ€é«˜ç´šå¾©æ´»å„ªå…ˆæµç¨‹ï¼›æ±å¸
-  è¬è±¡åœŸç›¾èˆ‡å¤©å¸æ°£å®šç¥žé–’ä¾æ­£å¼ç›®æ¨™ï¼æ•¸å€¼çµç®—ï¼Œæ•µæ–¹è¬è±¡åœŸç›¾åªæŒ‰çŽ©å®¶å¯¦éš›é€ æˆçš„ HP æå¤±
-  åå‚·ï¼Œè­·ç›¾å¸æ”¶èˆ‡éŽé‡å‚·å®³ä¸å¤šç®—ã€‚
-- é¢¨å±¬å¤©å…µå¤©å°‡çš„ç¬¬äº”é—œå°ˆå±¬è¡Œç‚ºå·²ç”±èˆŠ `v155ResolveWindEliteStealth` å®Œæ•´æ›¿æ›ç‚º
-  `v155ResolveWindEliteDodge`ï¼šå°åŒæŽ’æœ€å¤š3åå‹æ–¹å¥—ç”¨ã€é¢¨è¡Œã€‘75%é–ƒèº²3å›žåˆï¼Œæ²’æœ‰éš±èº«ç‹€æ…‹ï¼Œ
-  ä¹Ÿä¸å†æ”¹å¯«çŽ©å®¶å–®é«”é¸å–ï¼æŽ’éšŠç›®æ¨™ã€‚çŽ©å®¶æ—¢æœ‰ã€Œéš±èº«è¡“ã€æŠ€èƒ½èˆ‡å…¶ä»–é—œå¡è³‡æ–™å®Œå…¨æœªä¿®æ”¹ã€‚
-- `tests/v155-current-request.test.js` èˆ‡ `tests/v170-final-spec-integration.test.js` å·²éŽ–å®šç²¾ç¢ºåäºº
-  æŠ€èƒ½ï¼ç­‰ç´šã€å…ƒç¥–è³œç¦å…©æ¬¡æ–½æ”¾ã€åŒ—å¸å¾©æ´»å„ªå…ˆã€æ±å¸ï¼å¤©å¸æ”¯æ´ã€é¢¨å…µåªé–ƒèº²ä¸éš±èº«åŠæ•µæ–¹
-  åå‚·å¯¦éš› HP æå¤±ã€‚`node --check js/46-v155-dev-fixes.js` é€šéŽï¼›52 æ”¯ Node suite å…¨æ•¸é€šéŽã€‚
-  å·¥ä½œå€å¦æœ‰ä½¿ç”¨è€…æœªæäº¤çš„ `assets/inbox/æšˆçœ©-ç‹€æ…‹å¾ªç’°åœ–.png`ï¼Œæœ¬è¼ªæœªè¦†å¯«ã€æœªæš«å­˜ã€æœªæäº¤ï¼›
-  å…¶ç´ æé›œæ¹Šæ¸¬è©¦ä»¥ `HEAD` åŽŸæª”éš”é›¢åŸ·è¡Œå¾Œé€šéŽã€‚
-- é¡¯ç¤ºç‰ˆæœ¬ã€é¦–é æ¨™ç¤ºã€ç›´è¼‰ query èˆ‡ loader cache å·²åŒæ­¥å‡ç‚º V173.36ï¼›åªç™¼å¸ƒ `dev`ï¼Œä¸åˆä½µã€
-  ä¸æŽ¨é€ `main`ã€‚
-
-### 2026-09-02 â€” V173.35ï¼šä¸»åŸŽç¬¬äº”è¼ªç²¾ä¿®èˆ‡è§’è‰²è³‡è¨ŠåŽ»é‡ï¼ˆdevï¼‰
-
-- å»¶çºŒ V173.33 çš„åŽšå¯¦ RPG Lobbyï¼Œä¸é‡åšç‰ˆé¢ã€ä¸æ¢å¾©ä¹å®®æ ¼ï¼Œä¹Ÿä¸æ–°å¢žå° icon æˆ–å¹³è¡Œ ownerã€‚
-  æ­£å¼ owner ä»æ˜¯ `index.html`ã€`css/00-main.css`ã€`js/41-v146-system-polish.js` èˆ‡
-  `css/42-v146-system-polish.css`ã€‚ä¸Šæ–¹ HUD å·²ç§»é™¤ä¸‰åè§’è‰²çš„é ­åƒã€åç¨±èˆ‡ Lv. DOMï¼CSSï¼æ¸²æŸ“
-  è·¯å¾‘ï¼Œåªä¿ç•™å››è±¡ä¸»åŸŽã€V173.35ã€é‡‘å¹£ã€ç¶“é©—æ± èˆ‡å…©å€‹ DEV æ·å¾‘ï¼›ä¸‹æ–¹å†’éšªéšŠä¼æ˜¯å”¯ä¸€å®Œæ•´
-  è§’è‰²è³‡è¨Šå€ã€‚é‡‘å¹£ï¼ç¶“é©—æ± æ”¹ç‚ºç­‰å¯¬é›™æ¬„ï¼ŒHUD æœ€å°é«˜åº¦ç”±70pxé™ç‚º48pxï¼Œæ²’æœ‰ç•™ä¸‹å·¦å´ç©ºæ´žã€‚
-- è§’è‰²ï¼å•†åº—ä»æ˜¯46%å¯¬ã€90pxé«˜çš„å…©å€‹æœ€å¤§å…¥å£ï¼Œåœ–ç‰‡ã€é‡‘æ¡†èˆ‡æš—ç´…æ¼¸å±¤çš†ä¿ç•™ï¼›åªæŠŠæ–‡å­—åº•æ¿
-  ç”±28pxé™ç‚º19pxï¼ˆ-32.1%ï¼‰ã€‚å·¦å³å…­å€‹å®Œæ•´åŠŸèƒ½æŒ‰éˆ•ç”±90Ã—95pxé™ç‚º80Ã—82pxï¼Œå¯¬ï¼é«˜åˆ†åˆ¥
-  ç¸®å°11.1%ï¼13.7%ï¼Œåœ–ç‰‡å€59pxã€æ–‡å­—å€21pxï¼Œä»æœ‰å®Œæ•´åº•æ¿ã€é‡‘æ¡†ã€åœ–ç‰‡èˆ‡æ–‡å­—ã€‚
-- é›¢ç·šç¶“é©—ï¼ç³»çµ±ç”±98Ã—46pxé™ç‚º86Ã—40pxï¼Œå¯¬ï¼é«˜ç¸®å°12.2%ï¼13.0%ï¼›æ”¹ç‚ºåŠŸèƒ½å€å·¦å³å°ç¨±å®šä½ï¼Œ
-  ä¸­å¤®ä¿ç•™72å€‹é‚è¼¯åƒç´ çš„ç„¡æŒ‰éˆ•é€šé“ï¼Œä¸å†æ­£å£“åŸŽé–€ï¼ä¸»è¡—é“ä¸­è»¸ã€‚å†’éšªéšŠä¼æ¯åˆ—ç”±48pxé™ç‚º
-  44pxã€é ­åƒ49pxé™ç‚º45pxã€HPï¼SPæ¢10pxé™ç‚º9pxä¸¦å‘å…§ç¸®2pxï¼›ä¸‰è§’è‰²æ»¿åˆ—é«˜åº¦é ç®—ç”±176px
-  é™ç‚º159pxï¼ˆ-9.7%ï¼‰ï¼Œåç¨±ã€Lv.èˆ‡å…©æ¢æ•¸å€¼ä»å®Œæ•´ä¿ç•™ã€‚
-- åçµ„æ—¢æœ‰ `openHomeFeature(...)` äº‹ä»¶ã€äº”é …åº•éƒ¨å°ŽèˆªåŠæ‰€æœ‰èƒŒæ™¯ã€åœ–ç‰‡ã€è§’è‰²ï¼HPï¼SPã€é‡‘å¹£ã€
-  ç¶“é©—æ± ã€DEVã€æˆ°é¬¥ã€æŠ€èƒ½èˆ‡å­˜æª” owner å‡æœªä¿®æ”¹ã€‚`tests/v173.28-main-city-lobby.test.js` å·²æ›´æ–°
-  ç‚º12é … V173.35 å°ˆé …é©—æ”¶ï¼›å®Œæ•´ Repository checks é€šéŽï¼šJavaScriptèªžæ³•166ï¼166ã€Node suites
-  52ï¼52ã€éœæ…‹è³‡æº383ã€HTML ID 285ã€ç‰ˆæœ¬ï¼Loaderï¼ˆ24æ”¯ç›´è¼‰ã€108å€‹ç›¸ä¾è³‡æºã€26æ”¯ ordered
-  runtimesï¼‰åŠ Git ç©ºç™½ï¼è¡çªæ¨™è¨˜çš†æ­£å¸¸ï¼›é ç«¯ GitHub Actions run #98 äº¦æˆåŠŸã€‚
-- å·²å˜—è©¦ä»¥ç²¾ç¢ºé ç«¯ SHA é€²è¡Œ9:16æ‰‹æ©Ÿç›´å‘æ¸²æŸ“ï¼Œä½†é›²ç«¯ç€è¦½å™¨å·¥ä½œéšŽæ®µåœ¨é€£ç·šé‡ç½®æ™‚æŒçºŒç„¡å›žæ‡‰ï¼Œ
-  æœ¬æ©Ÿä¹Ÿæ²’æœ‰ Chromiumï¼Œå®˜æ–¹ Playwright Chromium ä¸‹è¼‰ç«¯é»žå›žå‚³502ï¼é€¾æ™‚ã€‚å› æ­¤æœ¬è¼ªåªèƒ½ç¢ºèª
-  9:16é«˜åº¦é ç®—ã€ä¸­å¤®72pxé€šé“ã€ç„¡æ°´å¹³ï¼åž‚ç›´æº¢ä½å¥‘ç´„èˆ‡å®Œæ•´ä¸‰è§’è‰²éœæ…‹å¹¾ä½•æ¸¬è©¦ï¼Œå°šæœªå–å¾—
-  V173.35 æœ€çµ‚ç€è¦½å™¨æˆªåœ–ï¼›äº¤ä»˜æ™‚ä¸å¾—å®£ç¨±å·²å®Œæˆ Android å¯¦æ©Ÿç›®è¦–é©—æ”¶ã€‚
-
-### 2026-09-02 â€” V173.34ï¼šåº•å±¤å‚·å®³æ¨¡åž‹å€çŽ‡åŒ–èˆ‡å‹•æ…‹é˜²ç¦¦å°ºåº¦ï¼ˆdevï¼‰
-
-- `js/00-main.js` æˆç‚ºå”¯ä¸€æ ¸å¿ƒå‚·å®³å…¬å¼ ownerï¼šæ­£å¼æŠ€èƒ½ä»¥
-  `æœ‰æ•ˆæ”»ï¼é­”æ”»Ã—effectivePower+effectiveFlatDamage` å»ºç«‹ rawAttackï¼Œå†åªå¥—ä¸€æ¬¡ç­‰ç´šå·®ã€å…ƒç´ èˆ‡
-  `K/(K+DEF)`ï¼›`K=250+ç›®æ¨™ç­‰ç´šÃ—15`ï¼Œæœ€ä½Žå‚·å®³1ã€‚`js/47-v158-combat-tuning.js` å·²åœæ­¢è¦†å¯«
-  `calculateDamage()`ï¼Œ`js/46-v155-dev-fixes.js` çš„é³³å¨æ•ˆæžœ wrapper èˆ‡ `js/50` å†°å°å±€éƒ¨æ””æˆªä¿ç•™ã€‚
-- æ­£å¼ damageRole å°ç…§å…±32æ‹›ï¼Œå›ºå®š profile ç”± `js/00-main.js` æä¾›ï¼Œç«ï¼é¢¨ï¼åœŸæ­£å¼ owner
-  `js/43-v149-skill-ui-rules.js` èˆ‡æ°´ç³» owner `js/50-v169-water-skill-rules.js` åœ¨æœ€çµ‚è³‡æ–™è½å®šå¾Œå¥—ç”¨ã€‚
-  ç´”å†°å°ä¸é€ æˆå‚·å®³æ‰€ä»¥ä¸é·ç§»ï¼›èˆŠ `baseDamageï¼damagePerLevel` å…¨æ•¸ä¿ç•™ï¼Œåƒ…ä¾›å°šæœªé·ç§»æµç¨‹
-  å›žé€€ã€‚`js/43` çš„ç«å…ƒç´ EX wrapper å·²å…¼å®¹æ–°ç‰ˆ options å‘¼å«ï¼Œ`js/46` çš„æ·±æ·µå¼·åˆ¶æŠ€èƒ½ç­‰ç´šæœƒåŒæ­¥
-  æŠ˜ç®— `powerMultiplierï¼flatDamage`ï¼Œé¿å…ç¬¬äº”å±¤ä»èª¤ç”¨Lv1å€çŽ‡æˆ–é‡è¤‡å¥—ç”¨ã€‚
-- çŽ©å®¶èˆ‡æ€ªç‰©çš„æ•¸å€¼æ›ç®—çµ±ä¸€ï¼šç‰©æ”» `10+æ”»æ“Šé»žÃ—8`ã€é­”æ”» `10+æ™ºåŠ›é»žÃ—8`ã€é˜²ç¦¦
-  `10+é«”è³ªé»žÃ—6`ï¼›HPç¶­æŒ `100+é«”è³ªé»žÃ—50+æ—¢æœ‰åŠ æˆ`ã€‚ä¸»è§’ã€ç¬¬äºŒï¼ç¬¬ä¸‰è§’è‰²ã€èƒŒåŒ…é è¦½èˆ‡
-  `makeZoneMonster()` å·²åŒæ­¥ï¼Œè£å‚™è©žæ¢ã€Buffï¼Debuffã€rank èˆ‡æ—¢æœ‰è¢«å‹•ç¹¼çºŒåœ¨åŽŸå…¥å£ç”Ÿæ•ˆã€‚
-- åŒç´šã€ä¸­ä½æµ®å‹•ã€ç„¡çˆ†æ“Šï¼ç„¡å‰‹åˆ¶ã€åˆç†20%é«”è³ªé…ç½®çš„å¯¦éš›é©—ç®—ï¼šLv20ï¼50ï¼80ï¼100é‡Žæ€ªæ™®æ”»
-  åˆ†åˆ¥ç‚º66ï¼143ï¼246ï¼318ï¼Œä½”çŽ©å®¶æœ€å¤§HP 3.95%ï¼3.51%ï¼3.80%ï¼3.94%ã€‚å„ç´š role æ¯”ä¾‹å‡ç¬¦åˆ
-  å–®é«”ä½ŽéšŽ < ä¸€èˆ¬ < çˆ†ç™¼ï¼Œä¸‰äººï¼å…¨é«”å–®ç›®æ¨™ä½Žæ–¼ä¸€èˆ¬ï¼çˆ†ç™¼ï¼ŒæŽ§åˆ¶ä½Žæ–¼ç´”çˆ†ç™¼ã€‚
-- è£å‚™å‰¯æœ¬Lv60å¯¦éš›é©—ç®—ï¼šç²¾è‹±æ™®æ”»261ï¼ˆ5.36% HPï¼‰ã€Tier3 Lv2ä»£è¡¨æŠ€èƒ½484ï¼ˆ9.94%ï¼‰ï¼›BOSS
-  æ™®æ”»295ï¼ˆ6.06%ï¼‰ã€Tier4 Lv3ä»£è¡¨æŠ€èƒ½378ï¼ˆ7.76%ï¼‰ã€‚åŽŸå°ˆç”¨rankå€çŽ‡èˆ‡å›ºå®š1çŽ‹4ç²¾è‹±æœªæ”¹ã€‚
-  æ·±æ·µLv100ç¬¬1ï½ž5å±¤BOSSæ™®æ”»çš†ç‚º525ï¼ˆ6.51%ï¼‰ï¼›ä»£è¡¨æŠ€èƒ½ä¾Lv1ï½ž5ç‚º709ï¼ˆ8.79%ï¼‰ã€
-  1170ï¼ˆ14.50%ï¼‰ã€1005ï¼ˆ12.45%ï¼‰ã€1044ï¼ˆ12.94%ï¼‰ã€1327ï¼ˆ16.44%ï¼‰ã€‚ä¸åŒæŠ€èƒ½Roleä¸å¼·åˆ¶
-  å–®èª¿ï¼Œä½†åŒä¸€Roleæœƒéš¨æŠ€èƒ½ç­‰ç´šæå‡ï¼›ç¬¬äº”å±¤éœ¸é¾è£‚å¤©æ–¬è½åœ¨15%ï½ž25%å¼·å–®é«”ç›®æ¨™å€é–“ã€‚
-- é©—è­‰æ›´æ–°æ–¼ `tests/v170-final-spec-integration.test.js` èˆ‡æ­·å² owner æ¸¬è©¦
-  `tests/v158-combat-tuning.test.js`ï¼šéŽ–å®š32æ‹›ç„¡éºæ¼ã€Roleå›ºå®šå€¼ã€æ–°èˆŠå…¬å¼åˆ†æµã€å‹•æ…‹Kã€å…­åœã€
-  çŽ©å®¶ï¼æ€ªç‰©å…±ç”¨å…¥å£ã€è£å‚™ï¼æ·±æ·µä»£è¡¨å‚·å®³åŠç¬¬äº”å±¤å€çŽ‡åªæŠ˜ç®—ä¸€æ¬¡ã€‚ç™¼å¸ƒç‰ˆæœ¬åŒæ­¥æ›´æ–°
-  `index.html`ã€`js/20-anonymous-20.js` èˆ‡ç‰ˆæœ¬é©—æ”¶ã€‚å°šå¾…äººå·¥å¯¦çŽ©ç¢ºèªä¸åŒé…é»žã€è£å‚™ã€å…ƒç´ å‰‹åˆ¶ã€
-  çˆ†æ“Šèˆ‡Buffç–ŠåŠ ä¸‹çš„é•·æœŸé«”æ„Ÿï¼›æœ¬è¼ªæ²’æœ‰æ”¹å‰¯æœ¬å€çŽ‡ã€AIã€æŠ€èƒ½æ•¸é‡ã€ç‹€æ…‹æ©ŸçŽ‡ã€UIã€VFXæˆ–å­˜æª”ã€‚
-
-### 2026-09-02 â€” V173.33ï¼šä¸»åŸŽç¬¬å››è¼ªåŽšå¯¦ RPG ç‰ˆé¢é‡æ§‹ï¼ˆdevï¼‰
-
-- åƒè€ƒåœ–åªç”¨æ–¼æ¯”ä¾‹ã€æŒ‰éˆ•å°ºå¯¸ã€HUDåŽšåº¦ã€éšŠä¼å¡åŽšåº¦èˆ‡å±¤ç´šï¼›æ²’æœ‰è¤‡è£½æˆ–é‡æ–°ç”Ÿæˆè§’è‰²ã€ç¾Žè¡“ã€
-  é…è‰²ã€åœ–æ¡ˆæˆ–ä¸»åŸŽèƒŒæ™¯ã€‚æ­£å¼ owner ä»æ˜¯ `index.html`ã€`css/00-main.css`ã€
-  `js/41-v146-system-polish.js` èˆ‡ `css/42-v146-system-polish.css`ï¼Œæ²’æœ‰æ–°å¢ž runtimeã€CSS owner
-  æˆ–è‡¨æ™‚ wrapperï¼›åçµ„æ—¢æœ‰ `openHomeFeature(...)` äº‹ä»¶èˆ‡åº•éƒ¨äº”é …å°Žèˆªå®Œå…¨ä¿ç•™ã€‚
-- `css/00-main.css` å°‡ HUD ç”±64pxæé«˜è‡³è‡³å°‘70pxï¼Œè§’è‰²é ­åƒç”±12pxæé«˜è‡³17pxï¼Œæ¯åè§’è‰²ä¿ç•™
-  åç¨±èˆ‡ Lv.ï¼›é‡‘å¹£ï¼ç¶“é©—æ± å„è‡ªä½¿ç”¨20pxé«˜çš„å¯¦å¿ƒé‡‘æ¡†é¢æ¿ï¼Œæ²¿ç”¨æ—¢æœ‰ `è¬`ï¼`å„„` formatterï¼Œ
-  ä¸æœƒç”¢ç”Ÿ `...`ã€‚å…©å¼µè§’è‰²ï¼å•†åº—ä¸»å…¥å£ç”±78pxæé«˜è‡³90pxï¼Œå…§å±¤æ¬„å¯¬ä»ç‚º46%ï¼Œåœ–ç‰‡èˆ‡28px
-  æš—ç´…é‡‘å­—æ–‡å­—å€æ˜Žç¢ºåˆ†é–‹ã€‚
-- å…­å€‹æ¬¡åŠŸèƒ½å–æ¶ˆ34ï¼68pxéšŽæ¢¯ä½ç§»ï¼Œæ”¹ç‚ºå·¦å³å…©æ¢å›ºå®šç›´æ¬„ï¼›æ¯é¡†ç‚º90Ã—95pxå®Œæ•´æŒ‰éˆ•ï¼Œä¸Šæ–¹
-  67pxåœ–ç‰‡å€ã€ä¸‹æ–¹26pxæš—è‰²æ–‡å­—å€ï¼Œä¸¦æœ‰é‡‘æ¡†ã€åº•æ¿èˆ‡é™°å½±ã€‚ä¸­å¤®å‰å…©åˆ—ä¿æŒ202pxé‚è¼¯å¯¬åº¦çš„
-  ç„¡å¤§åž‹ UI é€šé“ï¼ŒåŸŽé–€ä¸­è»¸ä»å¯è¦‹ã€‚é›¢ç·šç¶“é©—ï¼ç³»çµ±æ”¹ç‚º98Ã—46pxå®Œæ•´æ©«å‘æŒ‰éˆ•ï¼Œç½®æ–¼ç¬¬ä¸‰åˆ—
-  ä¸­å¤®é€šé“ä¸”ä¸å¦å¤–å¢žåŠ ç‰ˆé¢é«˜åº¦ã€‚
-- `css/42-v146-system-polish.css` å°‡æ¯å¼µéšŠä¼å¡ç”±38pxæé«˜è‡³48pxï¼ˆ+26.3%ï¼‰ï¼Œé ­åƒç”±39pxæé«˜
-  è‡³49pxï¼ˆ+25.6%ï¼‰ï¼Œåç¨±ï¼Lv.å­—ç´šæé«˜10%ï½ž11%ï¼ŒHPï¼SPæ¢ç”±8pxåŠ ç²—è‡³10pxï¼›éšŠä¼å¤–æ¡†èˆ‡
-  å„åˆ—åº•è‰²æé«˜ä¸é€æ˜Žåº¦ï¼Œä¸‰åˆ—ä»¥ç¨ç«‹é‡‘æ¡†èˆ‡3pxé–“è·åˆ†éš”ã€‚ä¸‰äººæœ€æ»¿ç‰ˆé¢é«˜åº¦é ç®—ç‚º630pxï¼Œä½Žæ–¼
-  å›ºå®šä¸»åŸŽå¯ç”¨630.67pxï¼Œä¸”æœªæ”¹ç”¨ `transform:scale()` å‡ç¸®æ”¾ã€‚
-- `tests/v173.28-main-city-lobby.test.js` æ“´å……ç‚º12é … V173.33 é©—æ”¶ï¼ŒéŽ–å®šå®Œæ•´HUDã€ä¸‰è§’è‰²è³‡æ–™ã€
-  è³‡æºç„¡çœç•¥è™Ÿã€å…©å¼µæœ€å¤§ä¸»å…¥å£ã€å…­å€‹90Ã—95pxå®Œæ•´æ–¹å½¢æŒ‰éˆ•ã€å…©å€‹98Ã—46pxæ©«å‘æŒ‰éˆ•ã€éšŠä¼å¡
-  èˆ‡é ­åƒå¢žå¹…ã€630pxé«˜åº¦é ç®—ã€åçµ„äº‹ä»¶åŠåº•éƒ¨å°Žèˆª owner ä¸è®Šã€‚å®Œæ•´ Repository checks é€šéŽï¼š
-  JavaScriptèªžæ³•166ï¼166ã€Node suites 52ï¼52ã€éœæ…‹è³‡æº383ã€HTML ID 288ã€ç‰ˆæœ¬ï¼Loader
-  ï¼ˆ24æ”¯ç›´è¼‰ã€108å€‹ç›¸ä¾è³‡æºã€26æ”¯ ordered runtimesï¼‰åŠ Git ç©ºç™½ï¼è¡çªæ¨™è¨˜çš†æ­£å¸¸ã€‚
-- ç€è¦½å™¨æª¢æŸ¥ç’°å¢ƒåœ¨é€£ç·šéšŽæ®µç«‹å³å› å¿…è¦æ¨¡çµ„ç¼ºå¤±åœæ­¢ï¼Œæ²’æœ‰è¶…éŽ3åˆ†é˜ï¼Œä¹Ÿæ²’æœ‰æ”¹ç”¨å…¶ä»–æ¸²æŸ“å™¨
-  å†’å……å¯¦éš›æˆªåœ–ã€‚å› æ­¤æœ¬è¼ªå°šæœªå–å¾— V173.33 çœŸå¯¦æ‰‹æ©Ÿæˆªåœ–æˆ–ç€è¦½å™¨ Console çµæžœï¼›Android
-  å¯¦æ©Ÿä»é ˆç¢ºèªæœ€çµ‚è¦–è¦ºé‡é‡ã€ä¸­å¤®åŸŽé–€å¯è¦‹åº¦èˆ‡ä¸åŒåç¨±é•·åº¦ï¼Œäº¤ä»˜æ™‚ä¸å¾—å®£ç¨±å·²å®Œæˆç›®è¦–é©—æ”¶ã€‚
-
-### 2026-09-02 â€” V173.32ï¼šé‡Žæ€ªæ›²ç·šã€ç­‰ç´šå·®ã€è£å‚™å‰¯æœ¬èˆ‡æ·±æ·µé›£åº¦åˆ†å±¤ï¼ˆdevï¼‰
-
-- `js/25-v131-fix-batch.js` èˆ‡ `js/34-v141-core-systems.js` å°‡åå€é‡Žæ€ªå€çŽ‡æ­£å¼æ”¹ç‚º
-  `0.75ï¼0.90ï¼0.95ï¼1.00ï¼1.05ï¼1.10ï¼1.15ï¼1.20ï¼1.25ï¼1.30`ï¼›æ—¢æœ‰
-  `_v131StrengthApplied` å–®æ¬¡æ——æ¨™ä¿ç•™ï¼Œæ–°è£œå…¥çš„é¢¨ï¼åœŸæ€ªä¹Ÿç›´æŽ¥å–æ‰€å±¬å€å€çŽ‡ã€‚å€çŽ‡åªä½œç”¨æ–¼
-  maxHPã€maxSPã€attackã€magicAttackã€defenseï¼›æ–°æ‰‹æ£®æž—ä»åªæœ‰ Lv2ï½ž3 æ™®æ”»æ€ªã€‚
-- `js/00-main.js`ã€`js/33-v140-four-element-balance.js`ã€`js/47-v158-combat-tuning.js`
-  æŠŠå‚·å®³ã€ä¸€èˆ¬ç•°å¸¸èˆ‡å†°å°ï¼çŸ³åŒ–ç­‰ç¡¬æŽ§çš„ç­‰ç´šå·®çµ±ä¸€ç‚º
-  `clamp(1 + (æ–½æ³•è€…ç­‰ç´š - ç›®æ¨™ç­‰ç´š)Ã—0.02, 0.70, 1.30)`ã€‚å‘½ä¸­ã€é–ƒèº²ã€çˆ†æ“Šã€SPã€
-  é˜²ç¦¦èˆ‡è£å‚™éœ€æ±‚æ²’æœ‰åŠ å…¥ç­‰ç´šå·®ï¼›ä¸€èˆ¬ç•°å¸¸ 5%ï½ž95% èˆ‡ç¡¬æŽ§æ™®é€šï¼ç²¾è‹±ï¼BOSS
-  80%ï¼60%ï¼40% ä¸Šé™ä¸è®Šã€‚åŒåæŒçºŒç‹€æ…‹ä»åœ¨æ“²æ©ŸçŽ‡å‰ç›´æŽ¥ MISSã€‚
-- `js/27-v132-content-expansion.js` çš„è£å‚™å‰¯æœ¬å›ºå®šç‚º 1 BOSS + 4 ç²¾è‹±ï¼Œç„¡è«–çŽ©å®¶ 1ï½ž3 åçš†
-  å…±5æ€ªï¼›å…¨éƒ¨ä½¿ç”¨ `getDungeonMonsterLevel()`ï¼ŒBOSS ä¸å†é¡å¤–Ã—1.15ç­‰ç´šã€‚å¦è¨­ä¸”åªå¥—ä¸€æ¬¡çš„
-  è£å‚™å‰¯æœ¬å°ˆç”¨ rank å€çŽ‡ï¼šç²¾è‹± HPÃ—1.80ã€æ”»ï¼é­”æ”»Ã—1.15ã€é˜²Ã—1.10ï¼›BOSS HPÃ—2.80ã€
-  æ”»ï¼é­”æ”»Ã—1.30ã€é˜²Ã—1.20ï¼›SP ä¸ä½œ rank åŠ æˆã€‚å…±ç”¨æ·±æ·µ rank å€çŽ‡å®Œå…¨æœªæ”¹ã€‚BOSS å›ºå®š
-  Tier4ï¼70%ï¼Lv3ï¼Œç²¾è‹±å›ºå®š Tier3ï¼70%ï¼Lv2ï¼›`js/40-v144-rules-and-abyss.js` æœƒä¿ç•™é€™ä»½
-  éŽ–å®šé…ç½®ï¼Œä¸å†ä¾æ€ªç‰©ç­‰ç´šé‡æŠ½æˆ–å‡åˆ° Lv4ï¼Lv5ã€‚
-- `js/36-v141-content-systems.js`ã€`js/40-v144-rules-and-abyss.js`ã€
-  `js/46-v155-dev-fixes.js` å›ºå®šæ·±æ·µ1ï½ž4å±¤ç‚º 1 BOSS + 4ç²¾è‹±ï¼ŒæŠ€èƒ½ç­‰ç´šä¾åºå…¨å“¡
-  Lv1ï¼Lv2ï¼Lv3ï¼Lv4ï¼Œé¡å¤– HP ä»æ˜¯ BOSS +5000ã€ç²¾è‹± +2500ï¼›ç¬¬5å±¤å›ºå®š5 BOSS +5ç²¾è‹±ï¼Œ
-  BOSS Lv5ï¼+10000 HPã€ç²¾è‹± Lv4ï¼+3500 HPã€‚ç¬¬äº”å±¤å‰æŽ’é †åºç‚ºæ±å¸ã€å¤©å¸ã€æ¥µå¸ã€åŒ—å¸ã€
-  å—å¸ï¼Œå¾ŒæŽ’ç‚ºæ°´ï¼åœŸï¼ç«ï¼é¢¨ï¼æ°´å¤©å…µå¤©å°‡ï¼›äº”å¸èˆ‡ç²¾è‹±å‡ä½¿ç”¨æœ¬è¼ªæŒ‡å®šæŠ€èƒ½ã€‚
-- æ•µæ–¹æ²»ç™‚è¡“çš„æ ¹å› æ˜¯æ€ªç‰©æ”¯æ´ resolver ç›´æŽ¥éæ­·å…¨é«”ã€‚ç¾åœ¨åŒ—å¸èˆ‡ä¸€èˆ¬æ°´ç³»æ”¯æ´æ€ªéƒ½å…ˆå¾žå›ºå®š
-  ç«™ä½æŒ‘é¸ä¸€çµ„åŒæŽ’ã€æœ€å¤š3åçš„æ²»ç™‚ç›®æ¨™ï¼›ç¬¬äº”å±¤å…©åæ°´å¤©å…µå› æ­¤ä¸å†ç”¢ç”Ÿå…¨é«”æ²»ç™‚ã€‚æ¥µå¸çš„
-  å…ƒç›¸å…‰æ˜Žå›ºå®šå…¨é«” +150 HPï¼+55 SPï¼Œå…ƒå…‰è­·é«”å›ºå®šå…¨é«”100è­·ç›¾2å›žåˆï¼Œå…ƒç¥–è³œç¦å‰‡é€ç›®æ¨™
-  ç¨ç«‹25%æ·¨åŒ–ä¸¦å¢žåŠ 35%é–ƒé¿2å›žåˆï¼ŒåŒåç¥ç¦ä¸åˆ·æ–°ä¹Ÿä¸é‡æ–°æ“²æ·¨åŒ–ã€‚
-- ç¶“æ¿Ÿåªåšå…¬å¼é©—ç®—ï¼Œæœªä¿®æ”¹ä»»ä½•é‡‘å¹£ï¼è—¥åƒ¹ã€‚é©—ç®—æƒ…å¢ƒç‚º3ååŒç´šã€å¹³å‡é…é»žèˆ‡æ­£å¸¸è£å‚™è§’è‰²ï¼Œ
-  æ™®æ”»æ­é…ç¬¬ä¸€ï¼ç¬¬äºŒéšŽåŒæŽ’æŠ€èƒ½ï¼Œç¬¬ä¸‰éšŽåªåœ¨ç²¾è‹±æˆ–å¿«é€Ÿæ¸…å ´ä½¿ç”¨ï¼›å¹³å‡é‡‘å¹£å«10%ç²¾è‹±æœŸæœ›å€¼èˆ‡
-  æ—¢æœ‰Â±15%æŽ‰è½æµ®å‹•ï¼ŒSPç‚ºä¸‰äººåˆè¨ˆçš„ä¿å®ˆè¼ªè½‰ä¼°å€¼ã€‚è£œå“å æ¯”ä»¥è£œå›žåŒé‡SPçš„30% SPè—¥ï¼Œå¦åŠ 
-  æ¯10å ´1ç“¶30% HPè—¥è¨ˆç®—ï¼š
-
-  | çŽ©å®¶ç­‰ç´š | å¹³å‡æ€ªæ•¸ | ä¸€èˆ¬ç·´åŠŸæŠ€èƒ½éšŽ | ä¼°è¨ˆSPï¼å ´ | å¹³å‡é‡‘å¹£ï¼å ´ | ä¼°è¨ˆè£œå“å æ”¶å…¥ |
-  |---:|---:|---|---:|---:|---:|
-  | 20 | 2.0 | ä¸€éšŽ | 24 | 75.4 | 29% |
-  | 40 | 4.5 | ä¸€ï½žäºŒéšŽ | 72 | 356.6 | 13% |
-  | 60 | 4.5 | ä¸€ï½žäºŒéšŽ | 84 | 554.6 | 12% |
-  | 80 | 4.5 | äºŒéšŽï¼›ç²¾è‹±å¯é¸ä¸‰éšŽ | 96 | 752.6 | 11% |
-  | 100 | 4.5 | äºŒéšŽï¼›ç²¾è‹±å¯é¸ä¸‰éšŽ | 108 | 950.6 | 10% |
-
-  ä¾æ­¤æƒ…å¢ƒä¸éœ€é »ç¹è£œSPï¼Œé•·æœŸè£œå“æˆæœ¬æ²’æœ‰è¶…éŽæ”¶å…¥40%ï¼›Lv20å®‰å…¨ç©ºé–“æœ€å°ï¼Œè‹¥å¯¦æ©Ÿéœ€è¦30%
-  HPè—¥é »çŽ‡é«˜æ–¼ç´„æ¯5å ´1ç“¶ï¼Œæ‰å¯èƒ½æŽ¥è¿‘æˆ–è¶…éŽ40%ï¼Œç›®å‰åªåˆ—é¢¨éšªã€ä¸èª¿ç¶“æ¿Ÿã€‚
-- `tests/v170-final-spec-integration.test.js` æ“´å……è‡³24é …æ­£å¼æ•´åˆé©—æ”¶ï¼Œæ¶µè“‹åå€å–®æ¬¡å€çŽ‡ã€ç­‰ç´šå·®
-  ä¹å€‹æª¢æŸ¥é»žã€ä¸€èˆ¬ç•°å¸¸ï¼ç¡¬æŽ§ã€è£å‚™å‰¯æœ¬ä¸‰ç¨®éšŠä¼äººæ•¸ã€å°ˆç”¨å€çŽ‡èˆ‡æŠ€èƒ½éŽ–ã€æ·±æ·µäº”å±¤ã€ç¬¬äº”å±¤
-  ç«™ä½ï¼æŠ€èƒ½ï¼HPåŠæ•µæ–¹ä¸‰äººæ²»ç™‚ï¼›ç›¸ä¾æ­·å²æ¸¬è©¦åŒæ­¥æ”¹è®€æœ¬è¼ªæ­£å¼è¦æ ¼ã€‚å…¨éƒ¨50å€‹ Node æ¸¬è©¦æª”
-  å·²é€šéŽï¼Œæ­£å¼50æ”¯ runtime ä¾ production é †åºè¼‰å…¥ç„¡ä¾‹å¤–ï¼Œ`git diff --check` é€šéŽã€‚å¯é¸ç€è¦½å™¨
-  smoke åœ¨0.2ç§’å…§å› ç’°å¢ƒæ²’æœ‰ Chromium ç•¥éŽï¼›å°šéœ€ Android å¯¦æ©Ÿç¢ºèªå¯¦éš›æˆ°é¬¥æ‰‹æ„Ÿèˆ‡ç€è¦½å™¨
-  consoleã€‚ç‰ˆæœ¬ titleã€é¦–é  badgeã€ç›´è¼‰ query èˆ‡å‹•æ…‹ loader cache åŒæ­¥å‡ç‚º V173.32ã€‚
-
-### 2026-09-02 â€” V173.31ï¼šä¸»åŸŽç¬¬ä¸‰è¼ªç²¾æº–ç‰ˆé¢é‡æ§‹èˆ‡ä¸‰è§’è‰²å¯¦æ¸¬ï¼ˆdevï¼‰
-
-- `index.html` çš„ HUD ä¿ç•™åŽŸé¦–åˆ—ç›¸å®¹ IDï¼Œæ–°å¢žå”¯ä¸€ `#homeHudCharacterList`ï¼›æ—¢æœ‰
-  `js/41-v146-system-polish.js` owner ä»¥ `getExistingPartyIndexes().slice(0,3)` åŒæ­¥å¯¦éš›å·²å»ºç«‹è§’è‰²ï¼Œ
-  ä¸ç”Ÿæˆç©ºæ§½ï¼Œä¸¦è®“åŒä¸€ä»½è§’è‰²ç´¢å¼•åŒæ™‚é©…å‹• HUD èˆ‡å†’éšªéšŠä¼ã€‚ä¸‰åè§’è‰²å¯¦æ¸¬ç‚ºã€Œç‰ˆé¢æ¸¬è©¦ Lv.50ã€ã€
-  ã€Œæ¸¬è©¦äºŒ Lv.50ã€ã€ã€Œæ¸¬è©¦ä¸‰ Lv.1ã€ï¼ŒHUD èˆ‡éšŠä¼å‡é¡¯ç¤º 3ï¼3ã€‚
-- é‡‘å¹£èˆ‡ç¶“é©—æ± æ²¿ç”¨åŒä¸€ formatterï¼š12,485,243 â†’ `1248è¬`ã€104,852,430 â†’ `1.05å„„`ã€
-  1,248,524,300 â†’ `12.5å„„`ï¼›å®Œæ•´å€¼åªç•™åœ¨ `title`ï¼`aria-label`ã€‚ä¸‰è§’è‰²ç•«é¢å¯¦éš›é¡¯ç¤º
-  `9.29å„„`ï¼Œæ²’æœ‰ `...`ï¼›DEV å…©éµä»ç‚ºåŽŸäº‹ä»¶ï¼Œåƒ…ä»¥ 16px é«˜åº¦ç½®æ–¼è³‡æºä¸‹æ–¹é™ä½Žæ¬Šé‡ã€‚
-- `css/00-main.css` å°‡å…©å¼µä¸»å…¥å£å®šç‚ºæ¯æ¬„ 46%ã€78px é«˜ï¼›526.5Ã—936 çš„ 9:16 èˆžå°å¯¦æ¸¬å„ç‚º
-  201.6Ã—97.8pxï¼Œå¯¬é«˜æ¯” 2.06:1ã€‚å…­å€‹æ¬¡å…¥å£ç¶­æŒåŽŸåŠŸèƒ½é †åºä½†æŽ¡ 0ï¼34ï¼68px é‚è¼¯ä½ç§»ï¼Œå¯¦æ¸¬
-  æ¯å±¤å‘ä¸­å¤® 42.6pxï¼Œä¸­å¤®åŸŽé–€è»¸ç·šæ²’æœ‰å¤§åž‹æŒ‰éˆ•æˆ–é»‘æ¡†ï¼›å…©å€‹å·¥å…·è† å›Šç‚º 108Ã—40px é‚è¼¯å°ºå¯¸ï¼Œ
-  å¯¦æ¸¬ 135.4Ã—50.1pxã€‚
-- `css/42-v146-system-polish.css` å°‡å†’éšªéšŠä¼æ”¹ç‚ºåŠé€æ˜Žå–®ä¸€å¤–å®¹å™¨èˆ‡ä¸‰å¼µ 38px ç·Šæ¹ŠéšŠä¼åˆ—ï¼Œåˆ—é–“
-  ä¿ç•™ 5pxï¼Œ39px åœ“å½¢é ­åƒå‘å·¦çªå‡º 4pxï¼›åç¨±ï¼Lv. èˆ‡ HPï¼SP ä¿ç•™ä½†å¤–æ¡†ã€åº•è‰²åŠé™°å½±é™ä½Žã€‚
-  ä¸‰è§’è‰²å¯¦æ¸¬å®¹å™¨é«˜ 194.3pxã€æ¯åˆ— 47.6pxï¼Œå¾Œæ–¹è¡—é“ä»æ¸…æ¥šå¯è¦‹ï¼Œä¸‰åˆ—ç„¡é‡ç–Šã€‚
-- é›²ç«¯ Chrome å·²åœ¨ V173.31 immutable `dev` é è¦½ä»¥å®Œæ•´ä¸‰è§’è‰²å­˜æª”å¯¦éš›æ“ä½œï¼šèˆžå°
-  526.5Ã—936ã€HUD é«˜ 80.2pxã€é é¢èˆ‡å…§å®¹ `scrollY/scrollTop` å‡ç‚º 0ï¼Œå…§å®¹
-  `clientHeight=scrollHeight=747`ï¼›åå€‹ä¸»åŸŽå…¥å£é€ä¸€é»žé–‹çš†é¡¯ç¤ºæ­£ç¢ºåŠŸèƒ½è¦–çª—ä¸¦å¯è¿”å›žï¼Œæ‡‰ç”¨ç¨‹å¼
-  console ç„¡éŒ¯èª¤ã€‚äº”å€‹åº•éƒ¨å°ŽèˆªæŒ‰éˆ•æ“ä½œå‰å¾Œçš„ xï¼yï¼å¯¬ï¼é«˜å®Œå…¨ä¸€è‡´ï¼Œæœªç§»ä½ã€‚
-- `tests/v173.28-main-city-lobby.test.js` å…± 11 é … V173.31 ä¸»åŸŽé©—æ”¶é€šéŽï¼›å®Œæ•´ Repository checks
-  äº¦å…¨æ•¸é€šéŽï¼šJavaScript èªžæ³• `166/166`ã€Node suites `52/52`ã€éœæ…‹è³‡æº `383`ã€HTML ID
-  `288`ã€ç‰ˆæœ¬ï¼Loaderï¼ˆ24 æ”¯ç›´è¼‰ã€108 å€‹ç›¸ä¾è³‡æºã€26 æ”¯ ordered runtimesï¼‰åŠ Git
-  ç©ºç™½ï¼è¡çªæ¨™è¨˜å‡æ­£å¸¸ã€‚å…§å®¹ commit å·²æŽ¨è‡³é ç«¯ `dev`
-  `e194b680d495601cae29103226a6e4345c16a73f`ï¼›`main` æœªä¿®æ”¹ã€‚
-
-### 2026-09-02 â€” V173.30ï¼šæ–°ç‰ˆä¸»åŸŽç¬¬äºŒè¼ªè¦–è¦ºå±¤ç´šç²¾ä¿®ï¼ˆdevï¼‰
-
-- ç‰ˆé¢ owner ä»åªä¿®æ”¹æ—¢æœ‰ `css/00-main.css`ï¼šè§’è‰²ï¼å•†åº—ä¸»å¡ç”± 96px é™è‡³ 84pxï¼ˆ12.5%ï¼‰ï¼›
-  ä¼‘æ¯ï¼åˆæˆã€ä»»å‹™ï¼åœ–é‘‘ã€æˆå°±ï¼å…¬å‘Šç¶­æŒå…©æ¬„ä¸‰åˆ—ï¼Œä½†å·¦å³å…¥å£ä¾åºå‘ä¸­å¤®æ”¶æŸ 0ï¼14ï¼28pxï¼Œ
-  icon ä¿ç•™ 32px é»žæ“Šè¾¨è­˜åº¦ä¸¦ç¸®çŸ­æ–‡å­—é–“è·ï¼›æ²’æœ‰æ¢å¾©ä¹å®®æ ¼ã€æ²’æœ‰æ–°å¢žåœ–ç‰‡æˆ–å¤§é¢ç©é¢æ¿ã€‚
-- é›¢ç·šç¶“é©—èˆ‡ç³»çµ±æ”¹ç‚ºç½®ä¸­çš„ 116pxï¼88px åŒåˆ—å°å…¥å£ï¼Œé«˜åº¦ç”± 36px é™è‡³ 30pxï¼Œé™ä½Žé‚Šæ¡†ã€åº•è‰²
-  èˆ‡é™°å½±æ¬Šé‡ã€‚ä¸»åŠŸèƒ½å€åˆè¨ˆç¸®çŸ­ 22 å€‹é‚è¼¯åƒç´ ï¼›ä»¥å·²ä¸Šç·šåŒçµæ§‹ç‰ˆåœ¨ 526.5Ã—936 æ‰‹æ©Ÿç›´å‘èˆžå°
-  çš„ 1.2536 å€ç¸®æ”¾é‡æ¸¬ï¼Œå†’éšªéšŠä¼æœƒè‡ªç„¶ä¸Šç§»ç´„ 27.6pxï¼Œåº•éƒ¨å°Žèˆªå›ºå®šä½ç½®åŠä¸­å¤®åŸŽé–€ï¼å¤©ç©ºç•™ç™½
-  å‡ä¸è®Šã€‚
-- `js/41-v146-system-polish.js` çš„æ—¢æœ‰ `renderHomeRoster()` æ–°å¢žå–®ä¸€ HUD è³‡æºæ ¼å¼å…¥å£ï¼Œé‡‘å¹£èˆ‡
-  ç¶“é©—æ± å…±ç”¨è¦å‰‡ï¼š10,485,243 é¡¯ç¤º `1048è¬`ï¼Œ108,500,000 é¡¯ç¤º `1.08å„„`ï¼›å®Œæ•´æ•¸å­—ä¿ç•™åœ¨
-  `title` èˆ‡ `aria-label`ï¼Œä¸¦ç§»é™¤ HUD è³‡æºçš„ ellipsisã€‚é‡‘å¹£ï¼EXP å¯¦éš›è³‡æ–™åŠå¢žæ¸›é‚è¼¯æœªæ”¹ã€‚
-- `tests/v173.28-main-city-lobby.test.js` æ“´å……è‡³ 11 é …é©—æ”¶ï¼ŒéŽ–å®šä¸»å¡é«˜åº¦ã€ä¸‰åˆ—éšŽæ¢¯ä½ç§»ã€ä½Žæ¬Šé‡
-  å·¥å…·å…¥å£ã€10 çµ„åŽŸ `onclick` åˆç´„ã€éžä¹å®®æ ¼çµæ§‹èˆ‡å…©ç¨®è³‡æºå…±ç”¨ç°¡å¯«ã€‚ç‰ˆæœ¬ titleã€HUD badgeã€
-  loader cache èˆ‡ç›´è¼‰ query åŒæ­¥å‡è‡³ V173.30ï¼›æ²’æœ‰ä¿®æ”¹è§’è‰²ã€éšŠä¼è³‡æ–™ã€åº•éƒ¨å°Žèˆªã€æˆ°é¬¥ã€æŠ€èƒ½
-  æˆ–å­˜æª” ownerã€‚
-- å®Œæ•´æœ¬æ©Ÿ Repository checks å…¨æ•¸é€šéŽï¼šJavaScript èªžæ³• `166/166`ã€Node suites `52/52`ã€
-  éœæ…‹è³‡æº `383`ã€HTML ID `287`ã€ç‰ˆæœ¬ï¼Loaderï¼ˆ24 æ”¯ç›´è¼‰ã€108 å€‹ç›¸ä¾è³‡æºã€26 æ”¯ ordered
-  runtimesï¼‰åŠ Git ç©ºç™½ï¼è¡çªæ¨™è¨˜å‡æ­£å¸¸ã€‚é›²ç«¯ Chrome å·²å¯¦æ¸¬ V173.29 åŒçµæ§‹åŸºæº–ç‚º
-  526.5Ã—936ã€æ–‡ä»¶ç„¡æ²å‹•ã€éšŠä¼èˆ‡å›ºå®šå°Žèˆªå®Œæ•´ï¼›ç´”éœæ…‹ repo ç„¡æ³•ç”± Sites preview å•Ÿå‹•ï¼Œä¸”
-  Cloud Browser å®‰å…¨æ”¿ç­–é˜»æ“‹æœ¬æ©Ÿ data URLï¼Œå› æ­¤æŽ¨é€å‰å€™é¸åªèƒ½å®Œæˆ CSS å¹¾ä½•ï¼äº‹ä»¶åˆç´„é©—æ”¶ã€‚
-  V173.30 å·²ä»¥éžå¼·åˆ¶æ–¹å¼æŽ¨è‡³é ç«¯ `dev` commit
-  `707f3678f995f8d2af37017b740a6f5ba0e1ed90`ï¼›GitHub Actions CI
-  `33590261317` æˆåŠŸï¼Œæœ€çµ‚ Android çœŸæ©Ÿæ‰‹æ„Ÿä»ç•™å¾…ä½¿ç”¨è€…åœ¨ `dev` é©—æ”¶ã€‚
-
-### 2026-09-02 â€” V173.29ï¼šä¸»åŸŽ Githackï¼æ‰‹æ©Ÿå¿«å–æ··ç‰ˆæ ¹å› ä¿®æ­£ï¼ˆdevï¼‰
-
-- ä½¿ç”¨è€…å¯¦æ©Ÿæˆªåœ–ä¸­çš„ç›´æ¬„ç ´ç‰ˆä¸æ˜¯ V173.28 æ­£å¼ CSS çš„æŽ’ç‰ˆçµæžœï¼Œè€Œæ˜¯åˆ†æ”¯ç¶²å€è¼‰å…¥æ–°ç‰ˆ
-  `index.html` å¾Œï¼Œä»å¾žç„¡ query çš„å›ºå®šç¶²å€å–å¾—èˆŠ `css/00-main.css`ã€èˆŠ V54 CSS èˆ‡èˆŠ V54
-  runtimeã€‚èˆŠ runtime æœƒæŠŠæ‰€æœ‰å…¥å£é‡æ–°å¯«æˆåŒä¸€å­—ç´šï¼ŒèˆŠ CSS åˆåªèªèˆŠä¹å®®æ ¼çµæ§‹ï¼Œå› è€Œå½¢æˆ
-  å¤§åž‹ DEV æŒ‰éˆ•ã€åŠŸèƒ½ç›´æ¬„èˆ‡åº•éƒ¨å°Žè¦½é®æ“‹ã€‚
-- å”¯ä¸€ç‰ˆé¢ owner ä»æ˜¯ `index.html` èˆ‡ `css/00-main.css`ï¼›V54 åªä¿ç•™ç›¸å®¹æ©‹æŽ¥ï¼ŒV146
-  `renderHomeRoster()` ä»åªåŒæ­¥ HUDï¼éšŠä¼è³‡æ–™ã€‚æœ¬è¼ªæ²’æœ‰æ–°å¢žè£œä¸æª”ã€wrapper æˆ–ç¬¬äºŒå¥—ç‰ˆé¢ã€‚
-- `index.html` ç¾ä»¥ `?v=173.29` è¼‰å…¥ `css/00-main.css`ã€
-  `css/19-stage-v54-main-city-moderate-native-scale.css` èˆ‡
-  `js/16-stage-v54-main-city-runtime.js`ï¼›`.github/scripts/ci.mjs` æŠŠä¸‰è€…åŠ å…¥æ­£å¼ release entry
-  ä¸€è‡´æ€§æª¢æŸ¥ï¼Œä¹‹å¾Œä»»ä½•ä¸€é …æ¼æŽ‰æˆ–ç‰ˆæœ¬ä¸ä¸€è‡´éƒ½æœƒä»¤ Repository checks å¤±æ•—ã€‚
-- é ç«¯ V173.29 commit `3275d5a34dee375772bfd5cd5b7203ed9a21f3dc` èˆ‡å¸¶ç‰ˆæœ¬åƒæ•¸çš„
-  `dev/index.html?v=173.29` å‡å·²åœ¨é›²ç«¯ Chrome å¯¦éš›è¼‰å…¥ï¼šæ¨™é¡ŒåŠä¸‰å€‹ä¸»åŸŽ owner query éƒ½æ˜¯
-  V173.29ï¼›526.5Ã—936 éŠæˆ²ç•«é¢å…§å¯è¦‹å…©å€‹ä¸»è¦å…¥å£ã€å…­å€‹æ¬¡è¦å…¥å£ã€å…©å€‹å·¥å…·å…¥å£èˆ‡äº”å€‹å›ºå®š
-  åº•éƒ¨å°Žèˆªï¼Œæ–‡ä»¶é«˜åº¦åŒç‚º 936pxã€ç„¡é é¢æ²å‹•ã€‚æ—¢æœ‰ç€è¦½å™¨è‹¥ä»å¿«å–ç„¡ç‰ˆæœ¬åƒæ•¸çš„èˆŠ `dev` HTMLï¼Œ
-  é ˆæ”¹é–‹ä¸Šè¿°å¸¶ç‰ˆæœ¬åƒæ•¸ç¶²å€æˆ–é‡æ–°æ•´ç†ä¸€æ¬¡ï¼Œä¹‹å¾Œä¸»åŸŽ CSSï¼runtime æœƒç”±æ–° query éš”é›¢èˆŠå¿«å–ã€‚
-- æœ¬æ©Ÿ Repository checks å…¨æ•¸é€šéŽï¼šJavaScript èªžæ³• `166/166`ã€Node suites `52/52`ã€éœæ…‹
-  è³‡æº `383`ã€HTML ID `287`ã€ç‰ˆæœ¬ï¼Loaderï¼ˆ24 æ”¯ç›´è¼‰ã€108 å€‹ç›¸ä¾è³‡æºã€26 æ”¯ ordered
-  runtimesï¼‰åŠ Git ç©ºç™½ï¼è¡çªæ¨™è¨˜å‡æ­£å¸¸ã€‚æœ¬æ©ŸéŠæˆ² commit ç‚º `2c888f8`ï¼›é ç«¯ `dev` å…§å®¹
-  commit ç‚º `3275d5a34dee375772bfd5cd5b7203ed9a21f3dc`ï¼ŒGitHub Actions CI
-  `33583378303` æˆåŠŸï¼Œ`main` å®Œå…¨æœªä¿®æ”¹ã€‚
-
-### 2026-09-02 â€” V173.28ï¼šä¸»åŸŽé¦–é  RPG Lobby è¦–è¦ºå±¤ç´šé‡æ•´ï¼ˆdevï¼‰
-
-- æ–½å·¥å‰å…ˆå°‡å·²é©—æ”¶ V173.27 é€éŽ PR #35 ç™¼å¸ƒåˆ° `main`ï¼›required check `Repository checks`
-  é€šéŽï¼Œæ­£å¼ merge SHA ç‚º `024b2c7c34c14db7b4ee2ba4be3b7addcabac414`ï¼ŒGitHub Pages æ¨™é¡Œ
-  å·²ç¢ºèªç‚º `å››è±¡æ±Ÿæ¹–å‚³ V173.27`ã€‚V173.28 å…¨ç¨‹åªåœ¨åŽŸ `dev` å·¥ä½œï¼Œæœªå»ºç«‹åˆ†æ”¯ã€æœª merge
-  `main`ã€æœª resetï¼force pushï¼å‹• stashã€‚
-- ä¸»åŸŽæ—¢æœ‰ owner åŽŸåœ°èª¿æ•´ï¼š`index.html` å»ºç«‹ç²¾ç°¡ HUDã€å…©å€‹ä¸»å…¥å£ã€å·¦å³æ¬¡è¦å…¥å£åŠä½Žæ¬Šé‡
-  å·¥å…·åˆ—ï¼›`css/00-main.css` å»ºç«‹æ·±é»‘ï¼æš—ç´…ï¼å¤é‡‘ Lobby å±¤ç´šä¸¦ä¿ç•™ä¸­å¤®åŸŽé–€ç•™ç™½ï¼›
-  `js/41-v146-system-polish.js` èˆ‡ `css/42-v146-system-polish.css` åªæ“´å……æ—¢æœ‰éšŠä¼ rendererï¼Œ
-  åŒæ­¥ HUD ç¾æœ‰è§’è‰²ï¼é‡‘å¹£ï¼ç¶“é©—æ± è³‡æ–™ä¸¦å°‡ä¸‰äººè³‡è¨Šæ”¹ç‚ºç·Šæ¹Šç›´åˆ—éšŠä¼å¡ï¼›V54 æ­·å²æ©‹æŽ¥åªç§»é™¤
-  æœƒæŠŠæ‰€æœ‰å…¥å£é‡æ–°å£“æˆåŒä¸€å­—ç´šçš„èˆŠ inline-important è¡Œç‚ºã€‚æ²’æœ‰æ–°å¢žå¹³è¡Œ runtime æˆ– CSS ownerã€‚
-- è§’è‰²ã€å•†åº—ã€ä¼‘æ¯ã€åˆæˆã€ä»»å‹™ã€åœ–é‘‘ã€æˆå°±ã€å…¬å‘Šã€é›¢ç·šç¶“é©—ã€ç³»çµ±çš„ 10 çµ„æ—¢æœ‰ icon ID èˆ‡
-  `openHomeFeature(...)` åˆç´„é€ä¸€ä¿ç•™ï¼›æ¸¬è©¦é‡‘å¹£ï¼ç¶“é©—æ± æŒ‰éˆ•ä»ç›´æŽ¥å‘¼å«åŽŸå‡½å¼ã€‚åº•éƒ¨äº”é …å°Žèˆª
-  çµæ§‹èˆ‡äº‹ä»¶å®Œå…¨æœªæ”¹ï¼Œç‰ˆæœ¬æ¨™é¡Œã€é¦–é  badgeã€ç›´è¼‰ query èˆ‡ loader cache å‡è‡³ V173.28ã€‚
-- é›²ç«¯ç€è¦½å™¨ä»¥æ­£å¼ 420 é‚è¼¯å…§å®¹å€ï¼1080Ã—1920 è™›æ“¬èˆžå°åŒå€çŽ‡æŽ›è¼‰å€™é¸ HTML/CSSï¼Œåœ¨
-  526.5Ã—936 çš„å¯¦éš› 9:16 ç•«é¢å®Œæˆè¦–è¦ºèˆ‡å¹¾ä½•é©—è­‰ï¼šæ–‡ä»¶èˆ‡ä¸»åŸŽå…§å±¤ X/Y overflow å‡ç‚º 0ï¼Œ
-  ä¸‰åéšŠå“¡å®Œæ•´é¡¯ç¤ºï¼ŒéšŠä¼å€ä¸é®åº•éƒ¨å°Žèˆªä¸”ä¿ç•™ 108.6px è¡—æ™¯ï¼Œ10 å€‹æ­£å¼å…¥å£å¯¦éš›è§¸æŽ§é«˜åº¦ç‚º
-  45.1ï½ž120.3pxï¼Œæ‰€æœ‰ä¸»åŸŽï¼å°Žèˆªåœ–ç‰‡å‡è¼‰å…¥ã€‚æœªç™¼å¸ƒ raw é è¦½çš„ JavaScript æœƒè¢«æœå‹™æ²™ç›’é˜»æ“‹ï¼Œ
-  å› æ­¤å€™é¸åŠŸèƒ½åˆç´„å¦ç”± Node å›žæ­¸æ¸¬è©¦éŽ–å®šï¼›Android çœŸæ©Ÿæ‰‹æ„Ÿä»ç•™å¾…ä½¿ç”¨è€…åœ¨ `dev` é©—æ”¶ã€‚
-- æ–°å¢ž `tests/v173.28-main-city-lobby.test.js`ï¼ŒéŽ–å®š HUDã€ä¸‰å±¤å…¥å£ã€10 çµ„äº‹ä»¶ï¼IDã€DEV å·¥å…·ã€
-  V54 ownerã€ä¸‰äººéšŠä¼èˆ‡éžæ²å‹• 9:16 çµæ§‹ã€‚å®Œæ•´æœ¬åœ° Repository checks å·²é€šéŽï¼šJavaScript
-  èªžæ³• `166/166`ã€Node suites `52/52`ã€éœæ…‹è³‡æº `383`ã€HTML ID `287`ã€ç‰ˆæœ¬ï¼Loader
-  ï¼ˆ24 æ”¯ç›´è¼‰ã€108 å€‹ç›¸ä¾è³‡æºã€26 æ”¯ ordered runtimesï¼‰åŠ Git ç©ºç™½ï¼è¡çªæ¨™è¨˜å‡é€šéŽï¼›é ç«¯
-  `dev` CI çµæžœä»¥æœ¬è¼ªæœ€çµ‚ push ç´€éŒ„ç‚ºæº–ã€‚
-
-### 2026-09-01 â€” V173.27ï¼šè§’è‰²é å…±ç”¨å¤–æ¡†é»‘è‰²å°¾å€æ ¹å› ä¿®æ­£ï¼ˆdevï¼‰
-
-- æ­£å¼ç«™ç€è¦½å™¨å¯¦æ¸¬ç¢ºèªå•é¡Œæ©«è·¨æ•´å€‹è§’è‰²é ï¼šèƒ½åŠ›å€¼åˆ†é çš„å›ºå®šå…±ç”¨å…§å®¹å€æ¯”å¯¦éš›å…§å®¹å¤šå‡ºç´„
-  152pxï¼Œç¶“é©—æ± åˆ†é å¤šå‡ºè¶…éŽ 370pxï¼›å› æ­¤é»‘è‰²å€å¡Šä¸æ˜¯èƒ½åŠ›å¡æˆ–å–®ä¸€åˆ†é çš„ paddingï¼Œè€Œæ˜¯
-  `.home-feature-modal-box.wide`ã€`#homeFeatureModalBody` èˆ‡ `#characterTabContent` è¢«å…±åŒ
-  å¼·åˆ¶å¡«æ»¿æŽ¥è¿‘æ•´å€‹è¦–çª—ã€‚
-- æ ¹å›  owner æ˜¯ `js/19-stage-v78-character-inventory-runtime.js` çš„ `applyNow()`ï¼Œå…¶å°‡å¤–æ¡†
-  é«˜åº¦å›ºå®šç‚º 96%ï¼Œå†ä»¥é‡æ¸¬çµæžœå›ºå®šå…§å®¹å€é«˜åº¦ï¼›å¾Œè¼‰ `css/31-v131-fix-batch.css` åˆä»¥ 94%
-  å¤–æ¡†åŠ `height:0 + flex:1` å»¶çºŒå¡«æ»¿è¡Œç‚ºã€‚V173.27 ç›´æŽ¥ä¿®æ­£é€™äº›æ—¢æœ‰ ownerï¼Œæ”¹ç‚ºå…§å®¹è‡ªç„¶
-  é«˜åº¦èˆ‡å¯æ”¶ç¸® flexï¼Œä¿ç•™ 96% å¯è¦–ä¸Šé™ã€é•·åˆ†é å…§å±¤æ²å‹•åŠèƒŒåŒ…æ—¢æœ‰å°ˆç”¨æ²å‹•ï¼Œä¸æ–°å¢žè£œä¸æª”
-  æˆ–ç¬¬äºŒå¥— layout runtimeã€‚
-- `css/22-stage-v78-character-inventory-core.css` åŒæ­¥æ”¹ç‚ºå…±ç”¨å¤–æ¡†è‡ªç„¶æ”¶åˆï¼›V154 çš„èˆŠå›ºå®šé«˜åº¦
-  æ­·å²æœŸå¾…å·²æ›´æ–°ï¼Œæ–°å¢ž `tests/v173.27-character-shell.test.js` éŽ–å®šçŸ­åˆ†é æ”¶åˆã€å¾Œè¼‰ V131 ä¸å¾—
-  æ¢å¾©å›ºå®šé»‘å°¾ã€é•·æŠ€èƒ½é ä»ä¿ç•™å–®ä¸€æ²å‹• ownerï¼Œä»¥åŠç‰ˆæœ¬å‡è‡³ V173.27ã€‚
-- æœ¬åœ° Repository checks ç‚º JavaScript èªžæ³• `165/165`ã€Node suites `51/51`ã€éœæ…‹è³‡æº
-  `383`ã€HTML ID `283`ã€ç‰ˆæœ¬ï¼Loaderï¼ˆ24 æ”¯ç›´è¼‰ã€108 å€‹ç›¸ä¾è³‡æºã€26 æ”¯ ordered runtimesï¼‰
-  åŠ Git ç©ºç™½ï¼è¡çªæ¨™è¨˜å…¨æ•¸é€šéŽã€‚é›²ç«¯ç€è¦½å™¨å·²åœ¨æ­£å¼ V173.24 é‡ç¾ä¸¦é‡æ¸¬æ ¹å› ï¼Œä½†ç„¡æ³•è¼‰å…¥
-  æœªç™¼å¸ƒçš„ dev å€™é¸ï¼Œå› æ­¤ V173.27 æœ€çµ‚é¡¯ç¤ºä»ä¾è¦æ±‚ç•™å¾…ä½¿ç”¨è€…åœ¨ dev å¯¦æ©Ÿé©—æ”¶ã€‚
-
-### 2026-09-01 â€” V173.26ï¼šå¯¦æ©Ÿå›žå ±ä¹‹è§’è‰²é ã€å…ƒç´ åŒ£èˆ‡ç‹€æ…‹é¡¯ç¤ºè£œæ­£ï¼ˆdevï¼‰
-
-- æ·±è¿½èƒ½åŠ›å€¼é é»‘æ¡†å¾Œç¢ºèª V173.25 åªç§»é™¤äº† `css/22-stage-v78-character-inventory-core.css`
-  çš„èˆŠ 160px ç•™ç™½ï¼Œä½†å¾Œè¼‰ `css/31-v131-fix-batch.css` ä»æœ‰åŒé¸æ“‡å™¨ã€åŒç‚º `!important` çš„
-  110px ç•™ç™½ã€‚V173.26 ç›´æŽ¥å°‡é€™å€‹æœ€çµ‚ç”Ÿæ•ˆ owner æ­¸é›¶ï¼Œä¸æ–°å¢žæ›´æ™šçš„è¦†å¯«è¦å‰‡ï¼›æŠ€èƒ½é ä»ä¿ç•™
-  è‡ªå·±çš„ 240px å°ˆç”¨åº•éƒ¨ç©ºé–“ï¼ŒèƒŒåŒ…é ä¹Ÿç¶­æŒæ—¢æœ‰é å…§ paddingã€‚å¯¦æ©Ÿå¾ŒçºŒç¢ºèªå›ºå®šé«˜åº¦å…±ç”¨å¤–æ¡†
-  ä»æœƒå½¢æˆæ›´å¤§çš„é»‘è‰²å°¾å€ï¼Œè©²å±¤æ ¹å› å·²ç”± V173.27 ä¿®æ­£ã€‚
-- `js/00-main.js` çš„ `makeSelectValueReactive()` åŽŸå…ˆæŠŠç¨‹å¼å¯«å…¥çš„æ•¸å­— `50`ï¼`25` èˆ‡ option
-  çš„å­—ä¸² `"50"`ï¼`"25"` åš´æ ¼æ¯”è¼ƒï¼Œæ²’æœ‰ä»»ä½•é¸é …å‘½ä¸­æ™‚ï¼Œå‡ä¸‹æ‹‰æ¨™ç±¤å°±æ²¿ç”¨ä¸Šä¸€è§’è‰²çš„
-  `100%`ï¼Œä½†å¯¦éš› config ä»æ˜¯ 50ï¼25ï¼Œå½¢æˆã€Œçœ‹ä¼¼ 100% å»ä¸è£œã€çš„å‡ç•«é¢ã€‚ç¾åœ¨ setter
-  æ¯”ç…§åŽŸç”Ÿ select å°‡å€¼çµ±ä¸€è½‰æˆå­—ä¸²å¾Œå†é¸å–èˆ‡é‡ç•«ï¼›æ¯è§’è‰² configã€V135ï¼V136ï¼V169 å„²å­˜
-  åŒ…è£åŠ V154 æˆ°å¾Œè£œçµ¦å…¬å¼å‡æœªå¦å»ºæˆ–ä¿®æ”¹ã€‚
-- `js/43-v149-skill-ui-rules.js` çš„å‡å‚·å€’æ•¸ä½æ–¼åŸºåº• `tickStatusEffects()` å‘¼å« `updateUI()`
-  ä¹‹å¾Œï¼Œä¸” `tickPlayerBuffs()` é‚„æœƒå†ç§»é™¤é¢¨è¡Œç­‰å¢žç›Šï¼›éŽåŽ» `js/39-v143-skill-animation.js` çš„
-  Sprite åŒæ­¥æ—©æ–¼é€™å…©æ®µæœ€çµ‚æ¸…ç†ï¼Œæ®˜å½±ä¾¿è¦ç­‰ä¸‹ä¸€æ¬¡æ“ä½œæ‰æ¶ˆå¤±ã€‚ç¾æ”¹åœ¨ `js/00-main.js`
-  `startTurn()` ä¸­ï¼Œå¾… `tickStatusEffects()` èˆ‡ `tickPlayerBuffs()` éƒ½å®Œæˆå¾ŒåªåŒæ­¥ä¸€æ¬¡å…±ç”¨
-  `v143SyncStatusSpriteEffects()`ï¼ŒåŒæ™‚æ¶µè“‹ä¸€èˆ¬ç•°å¸¸ã€å‡å‚·èˆ‡å¢žç›Šï¼Œä¸å¢žåŠ ç¬¬äºŒå€‹å›žåˆè¨ˆæ™‚å™¨æˆ–
-  ç‹€æ…‹è³‡æ–™ä¾†æºã€‚
-- `js/41-v146-system-polish.js` å°‡ç•°å¸¸ç‹€æ…‹æ–‡å­—å¾žå¡ç‰Œé«˜åº¦ 68% å†ä¸‹ç§»è‡³ 86%ï¼›æ—¢æœ‰ 1.25 ç§’
-  å‹•ç•«ã€10%ï½ž90% å®Œå…¨å¯è¦‹ï¼ˆ1 ç§’ï¼‰èˆ‡ 1.3 ç§’ DOM æ¸…ç†å‡ç¶­æŒã€‚
-- æ–°å¢ž `tests/v173.26-followup-fixes.test.js`ï¼Œä¸¦è£œå¼· V146ï¼V149ï¼V173.25 æ—¢æœ‰æ¸¬è©¦ï¼ŒéŽ–å®š
-  æ•¸å­—é–€æª»åˆ‡æ›ç‚ºæ­£ç¢ºè§’è‰² 50%ï¼25%ã€å¾Œè¼‰ padding æ­¸é›¶ã€ç‹€æ…‹èˆ‡å¢žç›ŠåŒ tick æ¸…é™¤ Sprite èˆ‡
-  86% å®šä½ã€‚ç‰ˆæœ¬æ¨™é¡Œã€é¦–é  badgeã€ç›´è¼‰ query èˆ‡ runtime cache å‡è‡³ V173.26ï¼›æœ¬åœ° Repository
-  checks ç‚º JavaScript èªžæ³• `164/164`ã€Node suites `50/50`ã€éœæ…‹è³‡æº `383`ã€HTML ID `283`ã€
-  ç‰ˆæœ¬ï¼Loaderï¼ˆ24 æ”¯ç›´è¼‰ã€108 å€‹ç›¸ä¾è³‡æºã€26 æ”¯ ordered runtimesï¼‰åŠ Git ç©ºç™½ï¼è¡çªæ¨™è¨˜
-  å…¨æ•¸é€šéŽã€‚
-- æŽ§åˆ¶ç€è¦½å™¨åœ¨æ­£å¼ V173.24 é é¢å¯¦éš›é‡å¾— `#characterTabContent` çš„ 160px åˆæˆ padding èˆ‡
-  æŒ‰éˆ•ä¸‹æ–¹ç©ºç™½ï¼Œç¢ºèªé»‘æ¡†ç¢ºç”±å…±ç”¨å®¹å™¨åº•éƒ¨ç•™ç™½é€ æˆï¼›å¦åœ¨çœŸå¯¦ 9:16 æˆ°é¬¥å¡é‡å¾— 86% ç‹€æ…‹
-  æ–‡å­—ä¸­å¿ƒèˆ‡ 26% HP å‚·å®³ä¸­å¿ƒç›¸è· 78ï½ž90pxï¼Œä¸”ä»ç•™åœ¨å¡ç‰Œä¸‹ç·£å…§ã€‚é›²ç«¯ç€è¦½å™¨ç„¡æ³•å­˜å–
-  localhostï¼Œä¸”å®‰å…¨è¦å‰‡ç¦æ­¢è¼‰å…¥ raw.githack çš„æœªç™¼å¸ƒ dev å€™é¸ï¼Œå› æ­¤ V173.26 å€™é¸ä»éœ€
-  ä½¿ç”¨è€…åœ¨ dev å¯¦æ©Ÿé©—æ”¶ã€‚
-
-### 2026-09-01 â€” V173.25ï¼šæ‰‹æ©Ÿè£å‚™ï¼èƒ½åŠ›ï¼ç¥¨åˆ¸èˆ‡æˆ°é¬¥æç¤º UIï¼ˆdevï¼‰
-
-- `css/00-main.css` è®“ã€Œç©¿æˆ´ï¼è„«ä¸‹ã€èˆ‡ã€Œå”®å‡ºã€å…±ç”¨å®Œå…¨ç›¸åŒçš„å•Ÿç”¨æ¼¸å±¤ã€å­—è‰²ï¼›è£å‚™å¤§åœ–æ”¹æˆ
-  æ˜Žç¢ºçš„éŸ¿æ‡‰å¼æ­£æ–¹å½¢ï¼Œç§»é™¤ç‰©å“æ–‡å­—å€çš„äºŒé‡è£åˆ‡ï¼æ²å‹•ï¼Œåœ–ç‰‡ã€èƒ½åŠ›æ–‡å­—ã€ä¸‰é¡†å‹•ä½œéµèˆ‡è¿”å›žéµ
-  éƒ½ç”±åŒä¸€å€‹å½ˆçª—é«˜åº¦ç®¡ç†ã€‚
-- èƒŒåŒ…æ”¾å¤§é¡èƒ½åŠ›æ˜Žç´°æ”¹æˆã€Œå¤–æ¡† flexã€èƒ½åŠ›æ ¼ç·šå–®ä¸€æ²å‹•ã€é—œé–‰éµå›ºå®šã€ï¼›èƒ½åŠ›å€¼é å…ˆç§»é™¤
-  `css/22-stage-v78-character-inventory-core.css` çš„ 160px åº•éƒ¨ç•™ç™½ï¼Œä½†å¯¦æ©Ÿå¾ŒçºŒç¢ºèªå¾Œè¼‰
-  `css/31-v131-fix-batch.css` ä»æ®˜ç•™ 110pxï¼Œå®Œæ•´æ ¹å› èˆ‡æœ€çµ‚ä¿®æ­£å·²æ–¼ V173.26 è£œé½Šã€‚
-- å‡å‚·ç¦æ­¢æŠ€èƒ½ä¸å†å»ºç«‹æˆ–é¡¯ç¤ºç¦æ­¢ç¬¦è™Ÿï¼Œä¸»æŠ€èƒ½éµç›´æŽ¥é¡¯ç¤ºã€Œå‡å‚·ç¦æ­¢ä½¿ç”¨æŠ€èƒ½ã€ï¼Œä¸¦æŠŠé®ç½©å…§å®¹
-  å¾€å³æ ¡æ­£ã€‚èˆŠç¬¦è™Ÿç¯€é»žè‹¥ä»æ®˜ç•™ä¹Ÿæœƒåœ¨åŒæ­¥ç‹€æ…‹æ™‚æ¸…æŽ‰ã€‚
-- è£å‚™å…Œæ›åˆ¸å›ºå®šç‚º 2 æ¬„Ã—5 åˆ—ã€æ•´é ä¸æ²å‹•ï¼›åä»¶è£å‚™å‡æ”¹ç‚ºå¯æ“ä½œæŒ‰éˆ•ï¼Œé»žæ“Šå¾Œé‡ç”¨æ­£å¼
-  `openEquippedItem()` è©³ç´°è³‡æ–™ä»‹é¢ï¼Œåªéš±è—åœ¨é è¦½æƒ…å¢ƒä¸æˆç«‹çš„ç©¿æˆ´ã€å”®å‡ºã€ä½¿ç”¨ã€åˆ†è§£å‹•ä½œï¼Œ
-  é—œé–‰äºŒå±¤æ˜Žç´°æœƒæº–ç¢ºå›žåˆ°åŽŸå…Œæ›åˆ¸é è¦½ã€‚
-- ç§»é™¤ V134ï¼V143 çš„å›ºå®š 1000msï¼650ms æŠ€èƒ½åç¨±ç§»é™¤è¨ˆæ™‚ï¼›çŽ©å®¶èˆ‡æ•µäººç¾åœ¨éƒ½ç”± V142 å”¯ä¸€
-  å‹•ç•«è¨­å®šæŸ¥å‡ºè©²æŠ€èƒ½ç¸½ç§’æ•¸ï¼Œåç¨±é¡¯ç¤ºæ™‚é–“ç‚º `round(animationDuration Ã— 2/3)`ï¼ŒCSS å‹•ç•«èˆ‡
-  DOM ç§»é™¤ä½¿ç”¨åŒä¸€å€‹å€¼ã€‚
-- ç•°å¸¸ç‹€æ…‹æ–‡å­—å¾žè§’è‰²å¡é«˜åº¦ 32% ä¸‹ç§»åˆ° 68%ï¼Œé¿é–‹ä¸Šæ–¹ HP å‚·å®³æ•¸å­—ï¼›å‹•ç•«æ”¹ç‚º 1.25 ç§’ï¼Œ
-  10%ï½ž90% ä¿æŒå®Œå…¨å¯è¦‹ï¼Œæ°ç‚º 1 ç§’ï¼Œ1.3 ç§’å¾Œæ¸…ç†ç¯€é»žã€‚
-- ç‰ˆæœ¬æ¨™é¡Œã€é¦–é  badgeã€ç›´è¼‰ query èˆ‡ runtime cache å·²å‡è‡³ V173.25ã€‚JavaScript èªžæ³•
-  `163/163`ã€Node suites `49/49`ã€`git diff --check` å…¨æ•¸é€šéŽã€‚æŽ§åˆ¶ç€è¦½å™¨å·²åœ¨æ­£å¼ç«™é‡ç¾ä¸¦
-  é‡æ¸¬èƒ½åŠ›é  160px é»‘è‰²ç•™ç™½çš„çœŸæ­£ç”Ÿæ•ˆä¾†æºï¼›é ç«¯å€™é¸æäº¤çš„ 63 å€‹æª”æ¡ˆèˆ‡æœ¬æ©Ÿ blob/tree
-  é›œæ¹Šé€ä¸€ç›¸ç¬¦ã€‚é›²ç«¯ç€è¦½å™¨å®‰å…¨è¦å‰‡ç¦æ­¢è¼‰å…¥ `raw.githack.com` çš„æœªç™¼å¸ƒå€™é¸ç¶²å€ï¼Œå› æ­¤
-  V173.25 å€™é¸ç•«é¢ç„¡æ³•åœ¨è©²ç€è¦½å™¨ç›´æŽ¥é–‹å•Ÿï¼Œæ‰‹æ©Ÿå¯¦éš›é¡¯ç¤ºä»ä¾æœ¬è¼ªè¦æ±‚ç•™å¾…ä½¿ç”¨è€…é©—æ”¶ã€‚
-
-### 2026-09-01 â€” V173.24ï¼šæ³•å¸«å¥—è£ iconã€é–ƒèº²èˆ‡ä¸€èˆ¬ç•°å¸¸å…¬å¼ï¼ˆmainï¼‰
-
-- å°‡æœ¬è¼ª 20 å¼µé€æ˜Ž PNG ä¾ç«ï¼æ°´ï¼åœŸï¼é¢¨èˆ‡æ³•æ‰‡ã€æ³•è¢ã€æ³•éž‹ã€æ³•å† ã€æ³•ç’°é€å¼µè¾¨è­˜ï¼Œçµ±ä¸€
-  è½‰ç‚º 512Ã—512 é€æ˜Ž lossless WebPï¼Œæ”¾å…¥ `assets/equipment/sets/`ã€‚æ˜ å°„è½åœ¨æ—¢æœ‰
-  `js/27-v132-content-expansion.js` `equipmentSetIcon()`ï¼›`js/41-v146-system-polish.js`
-  ç¹¼çºŒä¾ç©©å®šç‰©å“ ID åŒæ­¥æ—¢æœ‰èƒŒåŒ…èˆ‡å·²ç©¿æˆ´è£å‚™ï¼Œæœªä¿®æ”¹è£å‚™æ•¸å€¼ã€å¥—è£è¦å‰‡æˆ–å­˜æª”æ ¼å¼ã€‚
-- `js/00-main.js` å°‡çŽ©å®¶åŸºç¤Žé–ƒèº²çµ±ä¸€ç‚ºæœ‰æ•ˆæ•æ·Ã—0.6%ï¼Œæ€ªç‰©å»ºç«‹èˆ‡ç¼ºçœå›žé€€çµ±ä¸€ç‚º
-  `min(30%, ç­‰ç´šÃ—0.3%)`ï¼›`js/47-v158-combat-tuning.js` åªè£œç¼ºå°‘ `evasion` çš„æ€ªç‰©ï¼Œä»»ä½•
-  æ˜Žç¢ºè‡ªè¨‚å€¼å‡ä¿ç•™ã€‚é¢¨è¡Œ75%ã€é¢¨å…ƒç´ EX35%ã€å…ƒç¥–è³œç¦30%ç­‰é¡å¤–ä¾†æºä»ç¶“æ—¢æœ‰
-  `combineEvasionRates()` ç¨ç«‹ä¹˜ç®—ä¸¦é™åˆ¶85%ã€‚å‘½ä¸­ç¶­æŒ95ï¼‹å‘½ä¸­Ã—0.3ã€åŸºç¤Ž50%ï½ž99%ï¼Œå†ä¹˜
-  æœ€çµ‚é–ƒèº²ä¸”é™åˆ¶1%ï½ž99%çš„å”¯ä¸€æ­£å¼æž¶æ§‹ã€‚
-- `js/33-v140-four-element-balance.js` å°‡æ‰€æœ‰éžç¡¬æŽ§ç•°å¸¸çš„ç‰©æ”»ï¼æ™ºåŠ›ï¼ç²¾ç¥žä¿‚æ•¸çµ±ä¸€ç‚º0.05ï¼›
-  `js/00-main.js` çš„åŸºåº•å¸¸æ•¸èˆ‡èªªæ˜ŽåŒæ­¥ï¼Œä¸ä¿ç•™èˆŠ0.2ï¼0.3ä¸€èˆ¬ç•°å¸¸å…¬å¼ã€‚å†°å°ã€çŸ³åŒ–ä»ä½¿ç”¨
-  `sqrt(ç‰©æ”»æˆ–æ™ºåŠ›)Ã—0.2` èˆ‡æ™®é€šï¼ç²¾è‹±ï¼BOSS 80%ï¼60%ï¼40%ä¸Šé™ã€‚æŠ€èƒ½åŸºç¤Žæ©ŸçŽ‡ã€å‚·å®³ã€
-  SPã€æŒçºŒå›žåˆã€æ•ˆæžœå‡æœªä¿®æ”¹ï¼›å†°éœœç®­é›¨ä»é€ç›®æ¨™ç¨ç«‹20%å‡å‚·1å›žåˆï¼Œçƒˆç„°é¾æ²ä»å¿…å®šç‡ƒç‡’ã€‚
-- åŒåç‹€æ…‹å‰ç½®åˆ¤å®šä»ä¸æ“²æ©ŸçŽ‡ã€ä¸è¦†è“‹ã€ä¸ç–ŠåŠ ã€ä¸åˆ·æ–°ï¼›ç•«é¢æç¤ºæ”¹ç‚ºã€Œç‹€æ…‹MISSã€ï¼Œæˆ°é¬¥
-  ç´€éŒ„ç¶­æŒã€Œå·²æœ‰ã€ç‹€æ…‹ã€‘ï¼Œæ–°çš„ã€ç‹€æ…‹ã€‘MISSã€‚ã€ï¼Œä¸¦ä»¥å®Œæ•´æ–½æ”¾æ¸¬è©¦ç¢ºèªå·²å‘½ä¸­çš„ç›´æŽ¥å‚·å®³
-  ä¸æœƒè¢«å–æ¶ˆã€‚æ”»æ“Šæœªå‘½ä¸­ä»é¡¯ç¤ºã€ŒMISSã€ï¼Œç•°å¸¸åˆ¤å®šå¤±æ•—ç¶­æŒæ—¢æœ‰ã€ŒæŠµæŠ—ã€æç¤ºã€‚
-- ç‰ˆæœ¬æ¨™é¡Œã€é¦–é  badgeã€ç›´è¼‰ queryã€runtime cache èˆ‡ V173.23 é¢¨ç³»åœ–è³‡ query åŒæ­¥å‡è‡³
-  V173.24ã€‚Repository checks æœ¬åœ°å…¨æ•¸é€šéŽï¼šJavaScript èªžæ³• `162/162`ã€Node suites
-  `48/48`ã€éœæ…‹è³‡æº `383`ã€HTML ID `283`ã€ç‰ˆæœ¬ï¼Loaderï¼ˆ24 æ”¯ç›´è¼‰ã€108 å€‹ç›¸ä¾è³‡æºã€
-  26 æ”¯ ordered runtimesï¼‰ã€ç©ºç™½èˆ‡è¡çªæ¨™è¨˜çš†æ­£å¸¸ã€‚æŽ§åˆ¶ç€è¦½å™¨ç„¡æ³•å­˜å–æœ¬æ©Ÿ localhostï¼Œ
-  å› æ­¤æœªåŸ·è¡Œ Playwright browser smokeï¼›20 å¼µæœ€çµ‚ WebP å·²ä»¥åˆæˆé è¦½é€å¼µæª¢æŸ¥å…ƒç´ èˆ‡éƒ¨ä½ã€‚
-
-### 2026-09-01 â€” V173.23ï¼šé¢¨ç³»æ–½æ”¾èˆ‡æŒçºŒç‹€æ…‹ Sprite VFXï¼ˆmainï¼‰
-
-- æ²¿ç”¨ `js/39-v143-skill-animation.js` ç¾æœ‰ VFX rendererã€é è¼‰åœ–ç‰‡å¿«å–ã€ç›®æ¨™è¨»å†Šã€å‘½ä¸­å»¶é²
-  èˆ‡ action gateï¼ŒæŽ¥å…¥ 11 å¼µé¢¨ç³»æ–½æ”¾ PNGã€‚å–®é«”ä¾å¯¦éš›å¡ç‰Œä¸­å¤®å®šä½ï¼Œä¸‰äººæŠ€èƒ½åªåœ¨ç›®æ¨™åˆ—
-  æ’­æ”¾ä¸€ä»½å…§å«ä¸‰è·¯çš„åœ–ï¼Œå…¨é«”æŠ€èƒ½åªè¦†è“‹å¯¦éš›ç›®æ¨™éšŠä¼å€åŸŸä¸€ä»½ï¼›çŽ©å®¶èˆ‡æ•µæ–¹æ–½æ”¾å…±ç”¨åŒä¸€å¥—
-  å‹•æ…‹å®šä½ã€‚ç¬¬ 7 å¹€åªé‡‹æ”¾æ—¢æœ‰çµç®—çµæžœä¸€æ¬¡ï¼Œç¬¬ 8 å¹€ä¸å†æ¬¡çµç®—ã€‚
-- æŽ¥å…¥é‡åŠ›ã€æ®¤é¢¨ã€æšˆçœ©ã€é¢¨è¡Œã€éš±èº«ã€æ°£å®šç¥žé–’ 6 å¼µå¾ªç’° PNGã€‚åªæœ‰ç‹€æ…‹å¯¦éš›æˆåŠŸå¥—ç”¨å¾Œæ‰
-  é¡¯ç¤ºï¼›åŒåç‹€æ…‹å†æ¬¡æ–½åŠ  MISS æ™‚ä¿ç•™åŽŸç¯€é»žã€ä¸é‡å•Ÿæˆ–åˆ·æ–°ï¼›åˆ°æœŸã€è§£é™¤ã€æ­»äº¡ã€å¡ç‰Œç§»é™¤
-  æˆ–æˆ°é¬¥çµæŸæœƒæ¸…é™¤ã€‚å¢žç›Šæ–½æ”¾ä¸åŠ å‚·å®³ã€å—æ“Šéœ‡å‹•æˆ–ç¯„åœéœ‡å‹•ã€‚
-- é¢¨ç³»æ­£å¼ Sprite è·¯å¾‘æœƒç•¥éŽåŽŸç¨‹åºåŒ– chargeï¼flightï¼fieldï¼impact ç¯€é»žï¼Œä¸¦åˆªé™¤å…©æ¢èˆŠçš„
-  é¢¨ç³»æŠ€èƒ½å°ˆå±¬ CSS åœ–å½¢è¦å‰‡ã€‚`js/37-v142-skill-animation.js` åªä¾æŒ‡å®šå€¼èª¿æ•´å‹•ç•«æ™‚é•·ï¼›
-  `js/41-v146-system-polish.js` åªåŒæ­¥æ­£å¼ç‹€æ…‹åèˆ‡å¤šç›®æ¨™åŒå¹€æç¤ºã€‚æŠ€èƒ½æ•¸å€¼ã€å‚·å®³ã€ç›®æ¨™ã€
-  ç‹€æ…‹æ©ŸçŽ‡èˆ‡å›žåˆæ•¸å‡æœªä¿®æ”¹ã€‚
-- 17 å¼µ `assets/inbox/` åŽŸæª”æœªé‡æ–°ç”Ÿæˆã€ä¿®æ”¹ã€è£åˆ‡ã€é‡æ–°å‘½åæˆ–è½‰ç¢¼ï¼ŒSHA-256 å·²ç”±æ–°æ¸¬è©¦
-  éŽ–å®šã€‚å¯¦éš›æ–½æ”¾åœ–å°ºå¯¸ç‚º 1448Ã—1086ï¼Œå¦æœ‰æš´é¢¨æ‹³ï¼é¢¨ç„°è¡“ç‚º 1536Ã—1024ï¼›ç‹€æ…‹åœ–çš†ç‚º
-  1774Ã—887ï¼Œèˆ‡éœ€æ±‚æ–‡å­—ä¸­çš„ 1536Ã—1152ï¼1024Ã—512 ä¸åŒã€‚renderer å› æ­¤æŒ‰åœ–ç‰‡å¯¦éš›å°ºå¯¸é™¤ä»¥
-  4Ã—3ï¼4Ã—2 å‹•æ…‹å–ä¾†æºæ ¼ï¼Œå†ç¹ªå…¥ 384Ã—384ï¼256Ã—256 ç›®çš„æ ¼ï¼Œæ²’æœ‰æ”¹å‹•ä¾†æºç´ æã€‚
-- ç‰ˆæœ¬æ¨™é¡Œã€é¦–é  badgeã€ç›´è¼‰ query èˆ‡ runtime cache åŒæ­¥å‡è‡³ V173.23ã€‚Repository checks
-  å…¨æ•¸é€šéŽï¼šJavaScript èªžæ³• `162/162`ã€Node suites `48/48`ã€éœæ…‹è³‡æº `363`ã€HTML ID `283`ã€
-  ç‰ˆæœ¬ï¼Loaderï¼ˆ24 æ”¯ç›´è¼‰ã€108 å€‹ç›¸ä¾è³‡æºã€26 æ”¯ ordered runtimesï¼‰ã€ç©ºç™½èˆ‡è¡çªæ¨™è¨˜æª¢æŸ¥
-  çš†æ­£å¸¸ã€‚ç’°å¢ƒæ²’æœ‰ Chromiumï¼Œå› æ­¤ Playwright browser smoke èˆ‡çœŸæ©Ÿè¦–è¦ºå°ä½ï¼æµæš¢åº¦ä»éœ€
-  äººå·¥ç¢ºèªã€‚é ç«¯ `dev` éŠæˆ² commit `432c801baef7267f0932029eb84f4cd71c813c2f` çš„ push CI #75
-  èˆ‡ PR #33 CI #76 å‡æˆåŠŸï¼›ç›¸åŒéŠæˆ²æª”æ¡ˆæ¨¹å·²é€²å…¥ `main` commit
-  `e0c0c780d6f72dcb2af5581c2cb501c3a141b260`ï¼ŒPR #33 å¦è£œé½Šæœ¬ç­†æ­£å¼ç™¼å¸ƒç´€éŒ„ä¸¦è§¸ç™¼
-  `main` CIï¼Pagesã€‚
-
-### 2026-09-01 â€” V173.22ï¼šç‹‚é¢¨è¡“èˆ‡å››å…ƒç´ æ”»æ“Šå¥—è£ iconï¼ˆmainï¼‰
-
-- `js/00-main.js` çš„æ—¢æœ‰ `elementSkillIconMap` è£œä¸Š `windSpell`ï¼ŒæŠ€èƒ½åˆ—è¡¨èˆ‡è©³æƒ…å…±ç”¨
-  `assets/skills/wind-gale-spell.jpg`ï¼Œæ²’æœ‰æ–°å¢žç¬¬äºŒä»½æŠ€èƒ½ icon ownerã€‚
-- å°‡æœ¬è¼ª 20 å¼µè£å‚™ç´ æä¾å…ƒç´ è‰²èˆ‡éƒ¨ä½æ•´ç†ç‚º 512Ã—512 é€æ˜Ž lossless WebPï¼Œæ”¾åœ¨
-  `assets/equipment/sets/`ï¼›ç«ï¼æ°´ï¼åœŸï¼é¢¨å„è‡ªå°æ‡‰åˆ€ã€éŽ§ç”²ã€é´ã€ç›”ã€è­·è…•ã€‚åªæœ‰äº”å€‹æ”»æ“Š
-  variant ä½¿ç”¨æ–°åœ–ï¼Œæ‰‡ã€è¢ã€å±¥ã€å† ã€æ³•ç’°äº”å€‹æ³•è¡“ variant ä¿æŒæ—¢æœ‰ SVGã€‚
-- `js/27-v132-content-expansion.js` åœ¨åŽŸæœ¬ `equipmentSetIcon()` owner å…§åŠ å…¥æ”»æ“Šè£è·¯å¾‘è¡¨ï¼Œ
-  æ²¿ç”¨æ—¢æœ‰ `rasterItemIcon()` èˆ‡ `.v169-item-art` é¡¯ç¤ºï¼Œä¸æ–°å¢ž CSSã€‚`js/41-v146-system-polish.js`
-  çš„æ—¢æœ‰ `syncSetDefinitions()` æœƒæŠŠ canonical icon å›žå¡«åˆ°èˆŠèƒŒåŒ…èˆ‡å·²ç©¿æˆ´ç‰©å“ï¼ŒIDã€æ•¸å€¼ã€
-  å…ƒç´ é™åˆ¶ã€å¥—è£æ•ˆæžœèˆ‡å­˜æª” schema å‡æœªæ”¹ã€‚
-- ç‰ˆæœ¬æ¨™é¡Œã€é¦–é  badgeã€ç›´è¼‰ query èˆ‡ runtime cache åŒæ­¥å‡è‡³ V173.22ã€‚æ–°å¢ž
-  `tests/v173.22-skill-equipment-icons.test.js`ï¼ŒéŽ–å®šç‹‚é¢¨è¡“æ˜ å°„ã€20 å¼µ 512Ã—512 WebPã€æ”»æ“Šï¼
-  æ³•è¡“ variant é‚Šç•Œï¼Œä»¥åŠèˆŠå­˜æª”èˆ‡å·²ç©¿æˆ´è£å‚™åœ–ç¤ºåŒæ­¥ã€‚
-- æœ¬æ©Ÿ Repository checks å…¨æ•¸é€šéŽï¼šJavaScript èªžæ³• `161/161`ã€Node suites `47/47`ã€
-  éœæ…‹è³‡æº `346`ã€HTML ID `283`ã€ç‰ˆæœ¬ï¼Loaderï¼ˆ24 æ”¯ç›´è¼‰ã€108 å€‹ç›¸ä¾è³‡æºã€26 æ”¯ ordered
-  runtimesï¼‰ã€ç©ºç™½èˆ‡è¡çªæ¨™è¨˜æª¢æŸ¥çš†æ­£å¸¸ã€‚ç’°å¢ƒæ²’æœ‰ Chromiumï¼Œå› æ­¤ Playwright browser smoke
-  æœªåŸ·è¡Œï¼›20 å¼µæˆå“å·²ç”¨è¯çµ¡è¡¨é€å¼µäººå·¥æª¢è¦–ã€‚é ç«¯ `dev` ç¨‹å¼ commit
-  `175bfd33394b69e227480edc3eb68f343f3a35f9` å·²é€éŽ PR #32 ç™¼å¸ƒï¼›æ­£å¼ `main` merge commit
-  ç‚º `2a2cbe86d1719c722007d2f28fe65b0f05bade3a`ï¼ŒRepository checks èˆ‡ Pages å‡æˆåŠŸã€‚
-
-### 2026-09-01 â€” V173.21ï¼šæ–°æ‰‹æœŸå¹³è¡¡èˆ‡ç´ ææ›´æ–°ï¼ˆmainï¼‰
-
-- æ–°è§’è‰²æŠ€èƒ½é»žçš„å”¯ä¸€å»ºç«‹æµç¨‹å·²æ”¹ç‚º Lv1 åˆå§‹ 2 é»žï¼Œæ¶µè“‹ä¸»è§’è‰²ã€ç¬¬äºŒï¼ç¬¬ä¸‰è§’è‰²èˆ‡èˆŠç‰ˆç¬¬äºŒ
-  è§’è‰²å…¥å£ï¼›`player` é è¨­æ¨¡æ¿ä»ä¿ç•™ 0ï¼Œé¿å…è®€å–ç¼ºæ¬„ä½èˆŠå­˜æª”æ™‚ç„¡æ¢ä»¶è£œç™¼ã€‚æ—¢æœ‰å‡ç´šæµç¨‹
-  `checkLevelUp()` çš„æ¯ç´š +2 å®Œå…¨æœªæ”¹ã€‚
-- ä¸€èˆ¬é‡Žæ€ªå¼·åŒ–ä»ç”±æ—¢æœ‰ `strengthenMonster()`ï¼`strengthenNewWildMonster()` è² è²¬ï¼›åªç‚º
-  æ–°æ‰‹æ£®æž—å‚³å…¥ Ã—0.75ï¼Œå…¶ä»–ä¸€èˆ¬ç·´åŠŸå€ä»ä½¿ç”¨ V131 Ã—1.30ï¼Œä¸¦æ²¿ç”¨æ—¢æœ‰å·²å¥—ç”¨æ——æ¨™é¿å…é‡è¤‡
-  å¼·åŒ–ã€‚æ–°æ‰‹æ£®æž—å¾ŒåŠ çš„é¢¨ï¼åœŸæ€ªç‰©ç”± Lv4 æ ¡æ­£ç‚º Lv3ï¼Œä½¿å®Œæ•´è¼‰å…¥å¾Œå…¨å€éƒ½ç¶­æŒ Lv2ï½žLv3ã€‚
-  ç²¾è‹±ã€BOSSã€å‰¯æœ¬èˆ‡ Lv1ï½ž10 é‡Žæ€ªæ™®é€šæ”»æ“Šè¦å‰‡å‡æœªæ”¹å‹•ã€‚
-- é¢¨ç³»æŠ€èƒ½è¡¨åŠ å…¥ 11 å¼µå°æ‡‰ iconï¼›ä¸Šå‚³æª”æ²’æœ‰ã€Œç‹‚é¢¨è¡“ã€åŒååœ–ï¼Œå› æ­¤ä¿ç•™ç©ºç™½ï¼Œæœªèª¤é…ç´ æã€‚
-  ä¸Šå‚³çš„ã€Œåˆ†èº«è¡“ã€ä¾ç•«é¢å…§å®¹æŽ¥åˆ°æ—¢æœ‰ã€Œé–ƒèº²è¡“ã€ã€‚æŠ€èƒ½åˆ—è¡¨èˆ‡æŠ€èƒ½è©³æƒ…å…±ç”¨åŒä¸€ä»½æ—¢æœ‰
-  `elementSkillIconMap` ownerã€‚
-- æ—¥å¸¸å‰¯æœ¬å®Œæˆåº¦çŽå‹µæ”¹ç”¨å¯¶ç®± iconï¼šæœªé ˜å–é¡¯ç¤ºæ˜Žäº®çš„é—œé–‰å¯¶ç®±ï¼Œé ˜å–å¾Œæ”¹ç‚ºé–‹å•Ÿå¯¶ç®±ä¸¦
-  é™ä½Žé£½å’Œåº¦èˆ‡äº®åº¦ã€‚ç”·æ€§å·¡æ€ªä¾çŽ©å®¶å…ƒç´ åˆ‡æ›ç«ï¼æ°´ï¼é¢¨ï¼åœŸå››å¥—æ–°æ­£èƒŒé¢ç«‹ç¹ªï¼›å¥³æ€§æµç¨‹
-  ä¿æŒåŽŸç‹€ã€‚å…©å¼µå·¡æ€ªæˆ°é¬¥åœ–äº¦æ›æˆæœ€æ–°ç´ æã€‚æ–°åœ–åƒ…å¦å­˜ç‚ºæœ€ä½³åŒ– WebPï¼JPEGï¼Œæ²’æœ‰è¦†è“‹
-  ä¸Šå‚³åŽŸæª”ã€‚
-- ç‰ˆæœ¬æ¨™é¡Œã€é¦–é  badgeã€ç›´è¼‰ query èˆ‡ runtime cache åŒæ­¥å‡è‡³ V173.21ã€‚æ–°å¢žï¼æ“´å……æ¸¬è©¦
-  éŽ–å®š Lv1 åˆå§‹é»žæ•¸ã€å‡ç´š +2ã€èˆŠå­˜æª”é è¨­ã€æ–°æ‰‹æ£®æž—å®Œæ•´æœ€çµ‚æ•¸å€¼ã€å…¶ä»–ç·´åŠŸå€ Ã—1.30ã€
-  ç„¡æŠ€èƒ½é‡Žæ€ªï¼Œä»¥åŠå„ç´ æ owner èˆ‡ UI ç‹€æ…‹ã€‚
-- æœ¬æ©Ÿ Repository checks å…¨æ•¸é€šéŽï¼šJavaScript èªžæ³• `160/160`ã€Node suites `46/46`ã€
-  éœæ…‹è³‡æº `325`ã€HTML ID `283`ã€ç‰ˆæœ¬ï¼Loaderï¼ˆ24 æ”¯ç›´è¼‰ã€108 å€‹ç›¸ä¾è³‡æºã€26 æ”¯ ordered
-  runtimesï¼‰ã€ç©ºç™½èˆ‡è¡çªæ¨™è¨˜æª¢æŸ¥çš†æ­£å¸¸ã€‚æ­¤ç’°å¢ƒæ²’æœ‰ Chromiumï¼Œå› æ­¤ Playwright browser
-  smoke æœªåŸ·è¡Œï¼›ç´ ææœ¬èº«èˆ‡æ•´åˆå¾Œè¯çµ¡è¡¨å·²äººå·¥æª¢è¦–ï¼Œä»å»ºè­°åœ¨çœŸå¯¦ Android ç›´å¼ç•«é¢è¤‡é©—ã€‚
-  åŽŸé ç«¯ `dev` ç¨‹å¼ commit ç‚º `011dd6a89005afc54d78eb954ac3df97bfcd11ae`ã€‚å¾ŒçºŒé€£åŒ V173.20
-  é€éŽ PR #31 åˆä½µç‚º `main` commit `2f8dbc2a389464aecc3b9375f422fc9cc3fbc93a`ï¼›main CI #68 èˆ‡
-  Pages build/deploy #63 å‡æˆåŠŸã€‚
-
-### 2026-09-01 â€” V173.20ï¼šé›™åœ–é–‹å ´è¼‰å…¥å‹•ç•«ï¼ˆdevï¼‰
-
-- ä½¿ç”¨è€…æä¾›çš„ Logo èˆ‡ä¸»åŸŽç©ºæ™¯åŽŸæª”å¯¦éš›çš†ç‚º JPEG 864Ã—1536ï¼›æœªè¦†è“‹é™„ä»¶ï¼Œæ”¹ä»¥æ­£ç¢ºå‰¯æª”å
-  ä¿å­˜ç‚º `assets/ui/startup-logo-v173.20.jpg` èˆ‡
-  `assets/ui/startup-main-city-v173.20.jpg`ã€‚å…©å¼µåœ–å‡ä»¥ 9:16 åŽŸæ¯”ä¾‹é‹ªæ»¿ 1080Ã—1920 native
-  stageï¼ŒLogo ç‚ºç¬¬ä¸€å¹•ã€ä¸»åŸŽç©ºæ™¯ç‚ºç¬¬äºŒå¹•ã€‚
-- æ–°å¢žå”¯ä¸€é–‹å ´ owner `js/52-v173.20-startup-loader.js` èˆ‡
-  `css/51-v173.20-startup-loader.css`ï¼›`index.html` åªè² è²¬è³‡æº preloadã€DOMã€æ¨£å¼èˆ‡ runtime
-  å…¥å£ã€‚é–‹å ´å±¤ç½®æ–¼ `#game-stage` æœ€ä¸Šå±¤ï¼Œæ—¢æœ‰ `loadGame()` èˆ‡ 26 æ”¯æ­£å¼ gameplay runtime
-  ä»åœ¨ä¸‹å±¤ç…§åŽŸé †åºåˆå§‹åŒ–ï¼›æ²’æœ‰åŒ…è£æ—¢æœ‰å‡½å¼ã€æ²’æœ‰æ–°å¢ž gameplay override æˆ–è‡¨æ™‚è£œä¸ã€‚
-- æ¯æ¬¡é–‹å•ŸæœƒæŠ½å‡ºåˆè¨ˆ 12ï½ž15 ç§’ç¸½æ™‚é•·ï¼ŒLogo ç´„ä½” 36%ï½ž43% å¾Œæ·¡å…¥ä¸»åŸŽï¼›è¼‰å…¥æ–‡å­—æœƒåœ¨å¿…è¦
-  æ–‡ä»¶ã€è³‡æºé©—è­‰ã€è§’è‰²è³‡æ–™ã€å››å…ƒç´ æ ¸å¿ƒã€å­˜æª”ã€æˆ°é¬¥æ¨¡çµ„ã€å ´æ™¯æ¸²æŸ“ã€è¡Œå‹•è£ç½®æ ¡æº–ç­‰éšŽæ®µ
-  åˆ‡æ›ï¼Œç™¾åˆ†æ¯”ä»¥ä¸ç­‰è·å°å¹…è·³å‹•ä¸”åœ¨ç¸½æ™‚é•·å‰æœ€é«˜åªåˆ°99%ã€‚åˆ°æ™‚å¼·åˆ¶ç¬¬äºŒå¹•èˆ‡100%ï¼Œä¸æœƒ
-  è‡ªå‹•é€²éŠæˆ²ï¼›æŒçºŒé–ƒçˆ `ã€”é»žæ“Šç©ºç™½è™• é€²å…¥éŠæˆ²ã€•`ï¼Œå®Œæˆå¾Œé»žæ“Šï¼è§¸æŽ§æˆ– Enterï¼Space æ‰æ·¡å‡ºã€‚
-- Logo å››è±¡ä½ç½®å„æœ‰ç¨ç«‹ screen blend å…‰æšˆï¼Œä¾ç«ç´…ã€æ°´è—ã€é¢¨ç¶ ã€åœŸé‡‘çš„å»¶é²é †åºå¾ªç’°äº®èµ·ï¼›
-  åŒæ™‚ä¿ç•™è¼•å¾®å‘¼å¸èˆ‡ä¸»åŸŽæ™¯æ·±æŽ¨è¿‘ï¼Œæœªæ”¹å‹•åŽŸå§‹åœ–åƒåƒç´ ã€‚
-- ç‰ˆæœ¬æ¨™é¡Œã€é¦–é  badgeã€ç›´è¼‰ query èˆ‡ runtime cache åŒæ­¥å‡è‡³ V173.20ã€‚æ–°å¢ž
-  `tests/v173.20-startup-loader.test.js`ï¼Œä»¥å‡æ™‚é˜è¦†è“‹ 12 ç§’èˆ‡15ç§’é‚Šç•Œã€æå‰é»žæ“Šç„¡æ•ˆã€
-  100% ä¸è‡ªå‹•é€²å…¥ã€é»žæ“Šå¾Œæ·¡å‡ºèˆ‡äº‹ä»¶é€å‡ºï¼›ä¸¦æŠŠæ•´åˆè¼‰å…¥é †åºç´å…¥æ­£å¼æ¸¬è©¦ã€‚
-- æœ¬æ©Ÿ Repository checks å…¨æ•¸é€šéŽï¼šJavaScript èªžæ³• `159/159`ã€Node suites `45/45`ã€
-  éœæ…‹è³‡æº `304`ã€HTML ID `283`ã€ç‰ˆæœ¬ï¼Loaderï¼ˆ24 æ”¯ç›´è¼‰ã€26 æ”¯ ordered runtimesï¼‰ã€ç©ºç™½èˆ‡
-  è¡çªæ¨™è¨˜æª¢æŸ¥çš†æ­£å¸¸ã€‚æ­¤ç’°å¢ƒæ²’æœ‰ Chromiumï¼Œå› æ­¤ Playwright browser smoke æœªåŸ·è¡Œï¼›ä»éœ€åœ¨
-  çœŸå¯¦ Android ç›´å¼ç•«é¢ç¢ºèªæœ€çµ‚å…‰æšˆä½ç½®èˆ‡é–±è®€æ‰‹æ„Ÿã€‚é ç«¯ `dev` commit ç‚º
-  `38c955cd55139c42799c95212b4dd49b740e93f8`ï¼›æœªåˆä½µ `main`ã€‚
-
-### 2026-09-01 â€” V173.19ï¼šå››å…ƒç´ æŠ€èƒ½å®Œæ•´æ­£å¼è¦æ ¼ï¼ˆdevï¼‰
-
-- ä¾ä½¿ç”¨è€…æŒ‡å®šé †åºï¼Œå…ˆå°‡å·²é©—è­‰çš„ V173.18 é€éŽ PR #29 éžå¼·åˆ¶åˆä½µåˆ° `main`ï¼›æ­£å¼
-  merge commit ç‚º `cef7b2766786ce5db03ce35b7d6415d76bdd3705`ã€‚ä¹‹å¾Œæ‰é–‹å§‹ V173.19ï¼Œ
-  æ²’æœ‰ force pushã€æ²’æœ‰æ”¹å¯«æ­·å²ï¼Œä¹Ÿæ²’æœ‰æŠŠå°šæœªé©—è­‰çš„æ–°è¦æ ¼æ··é€²è©²æ¬¡æ­£å¼ç™¼å¸ƒã€‚
-- `js/00-main.js` æ–°å¢žå”¯ä¸€çš„æ­£å¼åŒåç‹€æ…‹æ ¸å¿ƒï¼šæ‰€æœ‰æŒçºŒ Buffï¼Debuffï¼DOTï¼æŽ§åˆ¶ï¼è­·ç›¾ï¼
-  åå‚·ï¼çµç•Œå…ˆä»¥ç‹€æ…‹åç¨±æª¢æŸ¥ï¼›å·²æœ‰åŒåç‹€æ…‹å³ç›´æŽ¥ MISSï¼Œä¸æ“²æ©ŸçŽ‡ã€ä¸ç–ŠåŠ ã€ä¸è¦†è“‹ã€
-  ä¸åˆ·æ–°ï¼Œä¹Ÿä¸è£œæ»¿è­·ç›¾å€¼æˆ–æ¬¡æ•¸ã€‚ç›´æŽ¥å‚·å®³ã€å¸è¡€ã€æ²»ç™‚ã€SP æ¢å¾©ç­‰å³æ™‚æ•ˆæžœç…§å¸¸çµç®—ï¼›
-  å¤šäººæŠ€èƒ½é€ç›®æ¨™ç¨ç«‹è™•ç†ã€‚æ€ªç‰©ã€çŽ©å®¶ã€ç¬¦å’’èˆ‡æ”¯æ´æŠ€èƒ½å‡æŽ¥å…¥åŒä¸€è¦å‰‡ã€‚
-- ç«ï¼é¢¨ï¼åœŸè³‡æ–™å”¯ä¸€ owner `js/43-v149-skill-ui-rules.js` èˆ‡æ°´è³‡æ–™ owner
-  `js/50-v169-water-skill-rules.js` å·²ä¾æœ¬æ–‡ä»¶é ‚ç«¯ V173.19 è¡¨æ ¼æ›´æ–°ã€‚æ­£å¼çµç®—åˆ†å·¥ç¶­æŒæ—¢æœ‰
-  ownerï¼šä¸€èˆ¬ï¼ç¡¬æŽ§å…¬å¼èˆ‡çµç•Œåœ¨ `js/33`ï¼Œç›®æ¨™ã€éšŠä¼å¢žç›Šã€æ²»ç™‚ï¼å¾©æ´»åœ¨ `js/42`ï¼Œæ€ªç‰©
-  è­·ç›¾ç›¸å®¹å±¤åœ¨ `js/38`ï¼Œé³³å¨åœ¨ `js/46`ï¼›æ²’æœ‰æ–°å¢žè‡¨æ™‚ runtime æˆ–ç¬¬äºŒå¥—è¦†è“‹è³‡æ–™ã€‚
-- å®Œæˆç«ç³»å…è²»è¿½æ“Šèˆ‡æ­»äº¡æ›ç›®æ¨™ã€ç«é³³å¤©é³´å¯¦éš›æ–°å¢žç‡ƒç‡’å°‘æ–¼3äººå–å¾—ä¸‹ä¸€å›žåˆã€é³³å¨ã€‘ã€
-  æ°´ç³»ä¾å¯¦éš› HP å‚·å®³å¸è¡€ã€å†°å°3å›žåˆã€æ²»ç™‚å›ºå®š35 SPã€é¢¨ç³»ä¹˜ç®—é–ƒèº²ä¸”ä¸Šé™85%ã€éš±èº«
-  å–®é«”ç›®æ¨™æŽ’é™¤ã€åœŸç³»å²©ç›¾ä¸å¾—è£œæ»¿ã€çµç•ŒåŒä¸€å¤šæ®µæŠ€èƒ½åªæ‰£1æ¬¡ï¼Œä»¥åŠåªæŒ‰å¯¦éš› HP ç›´æŽ¥å‚·å®³
-  è§¸ç™¼åå‚·ã€‚DOT èˆ‡åå‚·æœƒç©¿é€çµç•Œä¸”ä¸è§¸ç™¼åå‚·é€£éŽ–ã€‚
-- ä¸€èˆ¬ç•°å¸¸èˆ‡ç¡¬æŽ§å…¬å¼å‡ä¾æ­£å¼è¦æ ¼è½å¯¦ï¼›æ™®é€šï¼ç²¾è‹±ï¼BOSS çš„ç¡¬æŽ§å‘½ä¸­ä¸Šé™ç‚º
-  80%ï¼60%ï¼40%ã€‚æ°£å®šç¥žé–’çš„æŠ—æ€§65%ã€å‘½ä¸­50%ï¼Œæ€’ç«çš„çˆ†çŽ‡ï¼çˆ†å‚·èˆ‡æ•µæˆ‘çµç®—äº¦ä½¿ç”¨
-  æ­£å¼æ¬„ä½ã€‚
-- `tests/v170-final-spec-integration.test.js` æ“´ç‚º17é …å®Œæ•´è¼‰å…¥æ•´åˆé©—æ”¶ï¼Œå¦æ›´æ–°å„æ­·å² suite
-  çš„ç›®å‰ç‰ˆæœ¬èˆ‡å·²è¢«æ­£å¼è¦æ ¼å–ä»£çš„æœŸæœ›å€¼ã€‚ç‰ˆæœ¬ã€é¦–é æ¨™ç¤ºã€ç›´è¼‰ query èˆ‡ loader cache
-  åŒæ­¥å‡è‡³ V173.19ã€‚æœ¬æ©Ÿ Repository checks å…¨æ•¸é€šéŽï¼šJavaScript èªžæ³• `157/157`ã€Node
-  suites `44/44`ã€éœæ…‹è³‡æº `300`ã€HTML ID `272`ã€ç‰ˆæœ¬ï¼Loaderã€ç©ºç™½èˆ‡è¡çªæ¨™è¨˜æª¢æŸ¥çš†æ­£å¸¸ã€‚
-  é ç«¯ `dev` ç¨‹å¼ commit `d31f4cd63c460db9e7c05da1d7e0ff5359fa098a` çš„ GitHub Actions
-  run #56ï¼ˆ`33493617136`ï¼‰æˆåŠŸï¼›æœªç¶“ä½¿ç”¨è€…å¦è¡ŒæŒ‡ç¤ºï¼Œä¸åˆä½µ `main`ã€‚
-
-### 2026-09-01 â€” V173.18ï¼šç¬¦å’’æ ¼ç·šã€æ·±æ·µæˆ°å¾Œå›žåœ–èˆ‡å››å…ƒç´ æŠ€èƒ½æœ€çµ‚å®šæ¡ˆï¼ˆmainï¼‰
-
-- æœ¬è¼ªå…ˆä¾ä½¿ç”¨è€…è¦æ±‚æŠŠå·²é©—è­‰çš„ V173.17 é€éŽ PR #28 æ­£å¼åˆä½µåˆ° `main`ï¼Œä¹‹å¾Œæ‰é–‹å§‹
-  V173.18ï¼›æ²’æœ‰ force pushã€æ²’æœ‰æ”¹å¯«æ­·å²ã€æ²’æœ‰è¦†è“‹åŽŸåœ–ï¼Œä¹Ÿæ²’æœ‰å¦é–‹å¹³è¡Œåˆ†æ”¯ã€‚
-- åè¦†å¤±æ•ˆçš„æ ¹å› æ˜¯ loader é †åºï¼šå…ˆå‰ä¿®æ­£æŠ€èƒ½è³‡æ–™å¾Œï¼Œè¼ƒæ™šè¼‰å…¥çš„ `js/44`ã€`js/46`ã€
-  `js/47` åˆæŠŠéƒ¨åˆ†ç«ï¼æ°´ï¼é¢¨ï¼åœŸæ•¸å€¼æ”¹å›žæ­·å²å€¼ã€‚V173.18 åˆªé™¤é€™äº›ä¸‹æ¸¸è¦†è“‹ï¼Œç«ï¼é¢¨ï¼åœŸ
-  è³‡æ–™é›†ä¸­æ–¼ `js/43-v149-skill-ui-rules.js`ï¼Œæ°´é›†ä¸­æ–¼ `js/50-v169-water-skill-rules.js`ï¼›
-  `js/33-v140-four-element-balance.js` ä¿ç•™å”¯ä¸€ç•°å¸¸å‘½ä¸­å…¬å¼ï¼Œ`js/42-v148-combat-dungeon-fixes.js`
-  ä¿ç•™åŒæŽ’ï¼åŒåˆ—ç›®æ¨™èˆ‡æ²»ç™‚çµç®—ã€‚ç«ç³»æ­»äº¡ï¼çˆ†æ“Šè¿½æ“Šä¹Ÿæ”¶æ–‚ç‚ºçŽ©å®¶ä¸€å€‹ wrapperã€æ€ªç‰©ä¸€å€‹
-  wrapperï¼Œä¸å†é€æ‹›é‡ç–ŠåŒ…è£ã€‚å››å…ƒç´ å…¨éƒ¨å‚·å®³ã€æˆé•·ã€SPã€æŠ€èƒ½é»žã€å‰ç½®ã€ç›®æ¨™ã€ç‹€æ…‹ã€å¢žç›Šèˆ‡
-  EX è¢«å‹•å‡ä¾æœ¬æ–‡ä»¶é ‚ç«¯ V173.18 è¡¨æ ¼å®šæ¡ˆã€‚
-- æ·±æ·µæˆ°å¾Œèª¤å›žå°é¢çš„æ ¹å› æ˜¯ `showPage("dungeon")` å…ˆè§¸ç™¼é é¢åˆ‡æ›ä¸¦æ¸…æŽ‰
-  `abyssMapEntered`ï¼›`js/36-v141-content-systems.js` ç¾åœ¨æ–¼å‹åˆ©èˆ‡å¤±æ•—å›žå‘¼åˆ‡å›žæ·±æ·µåˆ†é å‰ï¼Œ
-  æ˜Žç¢ºæ¢å¾©å·²é€²åœ°åœ–ç‹€æ…‹ï¼Œå› æ­¤å…©æ¢è·¯å¾‘éƒ½ç›´æŽ¥å›žç›®å‰æ·±æ·µåœ°åœ–ã€‚æ²’æœ‰æ–°å¢žç¬¬äºŒå¥— Boss å…ƒç´ æˆ–
-  è§¸ç™¼å™¨ã€‚
-- ç¬¦å’’è¶…æ ¼çš„æ ¹å› æ˜¯ `.v169-item-art` åœ¨èƒŒåŒ…æ ¼å…§ä»å¯æ²¿ç”¨å±•ç¤ºå¤§åœ–å°ºå¯¸ï¼›`css/38` è®“å”¯ä¸€
-  `.inventory-icon` owner æˆç‚º `100%Ã—100%`ã€`min-width/min-height:0`ã€`overflow:hidden` çš„
-  gridï¼Œ`css/50` æŠŠå…¶ç›´æŽ¥å­ `.v169-item-art` é™åˆ¶ç‚ºå¯¬é«˜èˆ‡æœ€å¤§å¯¬é«˜çš†100%ã€‚åŽŸå§‹ç´ æèˆ‡
-  V173.17 æ‰‹æ©Ÿç¸®åœ–å‡æœªè¦†è“‹ã€‚
-- ç‰ˆæœ¬èˆ‡å¿«å–åŒæ­¥å‡è‡³ V173.18ã€‚æœ¬æ©Ÿé©—è­‰ï¼šJavaScript èªžæ³• `157/157`ã€Node suites
-  `44/44`ã€`git diff --check` å…¨æ•¸é€šéŽï¼›é ç«¯ `dev` code commit `8572adb` çš„ GitHub Actions
-  CI run #51 æˆåŠŸã€‚ä¸å¯è®Šé é¢ä»¥é›²ç«¯ Chrome å¯¦æ¸¬æ¨™é¡Œç‚º V173.18ï¼Œå®Œæ•´èµ°éŽæ·±æ·µå°é¢â†’åœ°åœ–â†’
-  æ±å¸ä¸‰æ®µå°è©±â†’æˆ°é¬¥â†’æ•—åŒ—ï¼Œç¢ºèªç›´æŽ¥å›žåˆ°å«æ±å¸æŒ‰éˆ•çš„æ·±æ·µåœ°åœ–ï¼ŒéŠæˆ²ä¾†æº console error ç‚º0ã€‚
-  å‹åˆ©å›žåœ–ç”±å‹•æ…‹å›žå‘¼æ¸¬è©¦å¦è¡Œè¦†è“‹ã€‚
-- é›²ç«¯æ‰‹æ©Ÿèˆžå°å¯¦æ¸¬ç‚º `526.5Ã—936`ï¼›èƒŒåŒ…æ ¼èˆ‡ icon owner åˆ†åˆ¥ç´„ `62.84Ã—62.84`ã€
-  `52.81Ã—52.81`ï¼Œæ­£å¼é é¢è¼‰å…¥çš„ç¬¦å’’ç›´æŽ¥å­è¦å‰‡ç‚ºå¯¬ï¼é«˜ï¼æœ€å¤§å¯¬ï¼æœ€å¤§é«˜çš†100%ã€‚æ¸¬è©¦å­˜æª”
-  ç•¶ä¸‹æ²’æœ‰ç¬¦å’’ï¼Œæ•…ç„¡æ³•åœ¨è©²æ¬¡é›²ç«¯ session é‡åˆ°çœŸå¯¦ç¬¦å’’ç¯€é»ž rectï¼›å·²ç”± CSS owner èˆ‡
-  `tests/v173.18-final-request.test.js` éŽ–å®šï¼Œä»å»ºè­°ä½¿ç”¨è€…åœ¨åŽŸ Android å­˜æª”åšæœ€å¾Œè¦–è¦ºè¤‡é©—ã€‚
-  å¾ŒçºŒç¶“ PR #29 æ­£å¼åˆä½µåˆ° `main`ï¼Œmerge commit ç‚º
-  `cef7b2766786ce5db03ce35b7d6415d76bdd3705`ï¼›åˆä½µå‰ PR CI run #53 æˆåŠŸã€‚
-
-### 2026-09-01 â€” V173.17ï¼šæ­£å¼ç™¼å¸ƒï¼ˆmainï¼‰
-
-- ä½¿ç”¨è€…æ˜Žç¢ºè¦æ±‚ã€Œæ­¤ç‰ˆæœ¬å…ˆæŽ¨åˆ° mainã€ï¼›PR #28 ä»¥éžå¼·åˆ¶åˆä½µæŠŠ V173.17 ç™¼å¸ƒåˆ° `main`ï¼Œ
-  merge commit ç‚º `7b2239be41ebedd0fbf07a85ac4d0a577455465c`ã€‚PR CI run `33479755762`
-  èˆ‡åˆä½µå¾Œ `main` CI run `33480061202` å‡æˆåŠŸã€‚
-- æœ¬æ¬¡ç™¼å¸ƒåªå°‡å…ˆå‰å·²é©—è­‰çš„ V173.17 UIï¼ç ´åœ–ï¼ç©¿åœ–ï¼è¿”å›žéµä¿®æ­£å‡ç‚ºæ­£å¼ç‰ˆï¼›å¾ŒçºŒç¬¦å’’ã€
-  æ·±æ·µå›žç¨‹èˆ‡æŠ€èƒ½è¦æ ¼å…¨éƒ¨å¦åˆ— V173.18ï¼Œæ²’æœ‰æ··é€² V173.17 çš„ main ç™¼å¸ƒã€‚
-
-### 2026-09-01 â€” V173.17ï¼šç‰©å“ï¼è£å‚™å‰¯æœ¬å½ˆçª—ã€ç ´åœ–èˆ‡è¿”å›žéµä¿®æ­£ï¼ˆdevï¼‰
-
-- æ ¹å› ä¸æ˜¯å–®ä¸€åœ–ç‰‡å£žæŽ‰ï¼š`js/27-v132-content-expansion.js` ä»æŠŠ 2.3ï½ž2.9 MB çš„åŽŸå§‹æŠ½çŽåˆ¸ï¼ç¬¦å’’ PNG ç›´æŽ¥æ”¾é€²èƒŒåŒ…èˆ‡å½ˆçª—ï¼›`css/50-v169-abyss-flow.css` åˆæŠŠæŠ½çŽåˆ¸å…§åœ–å›ºå®šæˆ `58Ã—58`ï¼Œè¶…å‡º `css/33-v132-content-expansion.css` ç•¶æ™‚çš„ `40Ã—40` çˆ¶æ¡†ï¼Œå› è€Œå’Œåç¨±ç©¿ç–Šï¼›èˆŠå­˜æª”å‰‡ä¿ç•™å»ºç«‹ç•¶ä¸‹çš„ç©ºç™½ï¼èˆŠ `icon`ï¼ŒV170 åªè£œéŽå››å¼µåˆ¸ï¼Œå…¶ä»–ç¬¦å’’ã€ç¤¦çŸ³ã€è¨­è¨ˆåœ–ä»æœƒé¡¯ç¤ºè±å½¢æˆ–èˆŠåœ–ã€‚è£å‚™å‰¯æœ¬æˆåŠŸå½ˆçª—æœ¬èº«ä¹Ÿæ²’æœ‰é›¢é–‹æŒ‰éˆ•ï¼Œç‰©å“è©³æƒ…å‰‡å…è¨±å¤§åœ–èˆ‡å…§å®¹æŠŠæœ€ä¸‹æ–¹æŒ‰éˆ•æŽ¨é›¢å¯è¦–ç¯„åœã€‚
-- åŽŸå§‹åœ–å…¨éƒ¨ä¿ç•™ã€æ²’æœ‰è¦†è“‹ï¼›å¦å»ºå››å¼µ `assets/items/tickets/*-icon.png`ï¼ˆ384Ã—256ï¼‰èˆ‡ä¸‰å¼µ `assets/items/talismans/*-icon.png`ï¼ˆ384Ã—576ï¼‰ä¾›æ‰‹æ©Ÿ UI ä½¿ç”¨ã€‚åœ–ç‰‡è§£ç¢¼å¤±æ•—æœƒéš±è—å£žæŽ‰çš„ `<img>` ä¸¦é¡¯ç¤ºã€Œåˆ¸ï¼ç¬¦ï¼åœ–ã€æ–‡å­—å¾Œå‚™ï¼Œä¸å†éœ²å‡ºç€è¦½å™¨ç ´åœ–ç¬¦è™Ÿã€‚
-- å”¯ä¸€å…§å®¹ owner ç¶­æŒ `js/27-v132-content-expansion.js`ï¼Œæ²’æœ‰æ–°å¢ž wrapperï¼šèˆŠå­˜æª”åªä¾ç©©å®š id åŒæ­¥ç™½åå–®å…§çš„åç¨±ã€åœ–ç¤ºã€é¡žåž‹èˆ‡å±•ç¤ºæ¬„ä½ï¼Œä¸ç¢°æ•¸é‡ï¼›è£å‚™å‰¯æœ¬çŽåˆ¸æ”¹ç‚ºå›ºå®šåœ–ç‰‡åˆ—ï¼åç¨±åˆ—ä¸¦æ–°å¢žã€Œè¿”å›žã€ã€‚`css/33`ï¼`css/38`ï¼`css/50` æ”¶æ–‚å½ˆçª—é«˜åº¦ã€åœ–ç‰‡æ¡†èˆ‡æ²å‹•ï¼Œ`js/01-stage-v8-touch-lock.js` å°‡ `#itemModalStats` ç´å…¥çœŸå¯¦è§¸æŽ§æ²å‹•ç™½åå–®ï¼›ç‰©å“è©³æƒ…åº•éƒ¨æ–‡å­—çµ±ä¸€ç‚ºã€Œè¿”å›žã€ã€‚
-- ç‰ˆæœ¬èˆ‡å¿«å–å‡è‡³ `V173.17`ã€‚æœ¬æ©Ÿ Repository checks å…¨æ•¸é€šéŽï¼šJavaScript `156/156`ã€Node suites `43/43`ã€éœæ…‹è³‡æº `300`ã€HTML ID `272`ã€ç‰ˆæœ¬ï¼Loaderï¼Git å·®ç•°çš†æ­£å¸¸ï¼›é ç«¯ `dev` code commit `77ea395` çš„ GitHub Actions run #46 äº¦æˆåŠŸã€‚
-- ä¸å¯è®Š `dev` é é¢ä»¥é›²ç«¯ Chrome å¯¦æ¸¬ï¼šä¸ƒå¼µæ‰‹æ©Ÿåœ–å‡ `complete=true` ä¸”è‡ªç„¶å°ºå¯¸æ­£ç¢ºï¼Œç‰©å“è©³æƒ…çš„æ¡†é«”å®Œæ•´ç•™åœ¨ overlay å…§ã€åº•éƒ¨ã€Œè¿”å›žã€å¯è¦‹ä¸”é»žæ“Šå¾Œç¢ºå¯¦é—œé–‰ï¼›è£å‚™å‰¯æœ¬çŽå‹µé è¦½çš„ã€Œè¿”å›žã€äº¦å¯é»žæ“Šé—œé–‰ï¼ŒéŠæˆ²ä¾†æº console error ç‚º 0ã€‚é›²ç«¯ç€è¦½å™¨å›ºå®šèˆžå°ç‚ºç´„ 526Ã—936ï¼Œç„¡æ³•åˆ‡æˆå›žå ±æˆªåœ–çš„ç²¾ç¢º Android viewportï¼›å› æ­¤æœ€çµ‚ Android çœŸæ©Ÿçš„å­—ç´šï¼æ‰‹æ„Ÿä»æ‡‰ç”±ä½¿ç”¨è€…è¤‡é©—ã€‚æœªä¿®æ”¹æˆ–åˆä½µ `main`ã€‚
-
-### 2026-09-01 â€” V173.16ï¼šæ­£å¼ç™¼å¸ƒï¼ˆmainï¼‰
-
-- ä½¿ç”¨è€…åœ¨ V173.16 çš„ `dev` CI æˆåŠŸå¾Œæ˜Žç¢ºæŒ‡ç¤ºå‡æ­£å¼ç‰ˆï¼›ä»¥å·²é©—è­‰çš„ `dev` commit `31927bc` ç‚ºéŠæˆ²å…§å®¹åŸºæº–ï¼ŒæŽ¡éžå¼·åˆ¶ fast-forward æŽ¨é€² `main`ï¼Œä¸æ”¹å¯«æ­·å²ã€ä¸è¦†è“‹æ—¢æœ‰æª”æ¡ˆã€‚
-- æœ¬æ¬¡ç™¼å¸ƒé™¤æœ¬äº¤æŽ¥ç´€éŒ„å¤–ï¼Œä¸å†ä¿®æ”¹éŠæˆ²ç¨‹å¼ã€ç´ æã€æ¸¬è©¦æˆ–ç‰ˆæœ¬å­—æ¨£ï¼›ç™¼å¸ƒå‰ `main` commit `7646154` æ˜¯ `dev` çš„ç›´æŽ¥ç¥–å…ˆï¼Œå…©åˆ†æ”¯æ²’æœ‰åˆ†å²”ã€‚
-
-### 2026-09-01 â€” V173.16ï¼šæ·±æ·µå®ˆé—œè€…å°è©±å¯è¦–å®šä½èˆ‡å®Œæ•´é»žæ“Šæµç¨‹ï¼ˆdevï¼‰
-
-- æ ¹å› éˆï¼šV173.13 æŠŠæ·±æ·µ Boss å°è©± owner å¾ž `js/38-v143-system-fixes.js` æ”¶æ–‚å›ž `js/36-v141-content-systems.js` æ™‚ï¼Œæ¼å¸¶ V173.6 å·²é©—è­‰çš„ç¸®æ”¾åº§æ¨™æ›ç®—ï¼›è£œå›žæ›ç®—å¾Œï¼ŒçœŸå¯¦ç€è¦½å™¨åˆç¢ºèª `css/50-v169-abyss-flow.css` çš„ `inset:auto !important` ä»æœƒè¦†è“‹ä¸€èˆ¬ inline `left/top`ï¼Œå› æ­¤ç¨‹å¼ç¢¼çœ‹ä¼¼å·²æœ‰åº§æ¨™ï¼Œä½†å°è©± rect ä»å®Œæ•´ä½æ–¼åœ°åœ–ä¸Šç·£å¤–ã€‚
-- å”¯ä¸€ owner ç¶­æŒ `js/36-v141-content-systems.js`ï¼šBoss æŒ‰éˆ•ã€capture `pointerup/click` èˆ‡åœ°åœ– bounds fallback éƒ½é€²åŒä¸€å€‹ `v141HandleAbyssBossInteraction()`ï¼`openAbyssBossDialogue()`ï¼`launchAbyssBossBattle()` æµç¨‹ï¼›`js/38` ä¸å†è¦†å¯«æŒ‘æˆ°å‡½å¼ï¼Œ`js/41`ï¼`js/42` åªä¿ç•™æ—¢æœ‰åœ°åœ–ç§»å‹• wrapperï¼Œæ²’æœ‰æ–°å¢ž runtime patch æˆ–ç¬¬äºŒå¥— Boss å…ƒç´ ã€‚
-- `positionAbyssBossDialogue()` ä»¥åœ°åœ– `offsetWidth/Height` å°ç…§å¯¦éš› rectï¼Œå°‡å®ˆé—œè€… viewport åº§æ¨™æ›å›ž map-local é‚è¼¯åº§æ¨™ï¼Œä¸¦ä¾å°è©±å¯¦éš›å¯¬é«˜é™åˆ¶åœ¨åœ°åœ–å››é‚Šå…§ï¼›æ—¢æœ‰å°è©±å†æ¬¡è§¸ç™¼æ™‚ä¹Ÿæœƒé‡æ–°å®šä½ã€‚æœ€çµ‚åº§æ¨™ä»¥ CSS custom properties äº¤çµ¦ `css/50-v169-abyss-flow.css` çš„æ¬Šå¨ `left/top !important` ä½¿ç”¨ï¼Œä¿ç•™ legacy `inset:0 !important` çš„å³ï¼ä¸‹æ¸…é™¤ä½†ä¸å†è“‹æŽ‰å®šä½ã€‚
-- æ–°å¢ž `tests/v173.16-abyss-dialogue-visibility.test.js`ï¼Œå‹•æ…‹é©—è­‰ç¸®æ”¾åº§æ¨™ã€å®Œæ•´å¯è¦–é‚Šç•Œã€å”¯ä¸€ ownerï¼Œä»¥åŠé»žå®ˆé—œè€…å¾Œä¸‰æ®µå°è©±å¯é€£çºŒé»žæ“Šä¸¦æ­£å¼é€²æˆ°é¬¥ï¼›ç™¼å¸ƒèˆ‡æ‰€æœ‰ç¾è¡Œå¿«å–æ–·è¨€åŒæ­¥å‡è‡³ `V173.16`ã€‚
-- å®Œæ•´ Repository checks é€šéŽï¼šJavaScript èªžæ³• `155/155`ã€Node suites `42/42`ã€æœ¬åœ°è³‡æº `300`ã€HTML ID `272`ã€ç‰ˆæœ¬ï¼Loader èˆ‡ Git å·®ç•°æª¢æŸ¥å…¨æ•¸æ­£å¸¸ã€‚ä¸å¯è®Š `dev` commit `6542718` çš„é›²ç«¯ Chrome å¯¦æ¸¬ï¼šé»žæ±å¸å¾Œå°è©± rect å®Œæ•´ä½æ–¼åœ°åœ– rect å…§ï¼ˆ`fullyVisible=true`ï¼‰ï¼Œä¸‰æ¬¡é»žæ“Šä¾åºé¡¯ç¤ºä¸‰å¥ä¸¦é€²å…¥æ±å¸ï¼‹å››åå¤©å…µæˆ°é¬¥ï¼›ç„¡éŠæˆ²ä¾†æº console errorã€‚æœªä¿®æ”¹æˆ–åˆä½µ `main`ï¼Œä»å¾…ä½¿ç”¨è€…åœ¨åŽŸ Android è£ç½®åšæœ€å¾Œæ‰‹æ„Ÿç¢ºèªã€‚
-
-### 2026-09-01 â€” V173.14ï¼šæ°´çƒè¡“å›ºå®š 4Ã—3 Sprite Sheet æ ¡æ­£ï¼ˆdevï¼‰
-
-- æ°´çƒè¡“çš„å”¯ä¸€ owner ä»æ˜¯ `js/39-v143-skill-animation.js`ï¼šæ—¢æœ‰ `drawCanvasCropSprite()` èˆ‡ `placeSprite()` å·²ä½¿ç”¨å–®ä¸€ `group` Canvas nodeã€å›ºå®š `384Ã—384` source cropã€å­˜æ´»ç›®æ¨™ç¾¤çµ„ä¸­å¿ƒèˆ‡ç¬¬ 7ï½ž8 å¹€å‘½ä¸­ï¼›æœ¬è¼ªæ²’æœ‰æ–°å¢ž wrapper æˆ–å¹³è¡Œæ’­æ”¾è·¯å¾‘ã€‚
-- æ ¹å› ï¼š`assets-library/assets/inbox/water-orb.png` èˆ‡ `frost-arrow-rain.png` åŽŸå§‹æª”å‡ç‚º `1448Ã—1086`ï¼ˆå›ºå®š 4Ã—3ã€æ¯æ ¼ `362Ã—362`ï¼‰ï¼Œå»è¢«ç›´æŽ¥è¦†è“‹åˆ°æ­£å¼ `assets/vfx/water/`ï¼›Canvas renderer å·²ä¾ 384px æ ¼è®€å–ï¼Œé€ æˆä¾†æºèˆ‡è£åˆ‡åº§æ¨™ä¸ä¸€è‡´ã€‚
-- å…©å¼µæ­£å¼ VFX å‡ä¾å›ºå®šæ ¼åº§æ¨™è™•ç†ï¼šæ¯æ ¼ä¾†æº `x=(frameIndex % 4)Ã—362`ã€`y=floor(frameIndex / 4)Ã—362`ï¼Œä¸åšé€æ˜Žé‚Šç•Œåµæ¸¬ã€ä¸ç¸®æ”¾ã€ä¸é‡ç¹ªï¼›æ¯å€‹ 362px æ ¼åƒ…ç½®ä¸­è£œ 11px é€æ˜Žé‚Šï¼Œè¼¸å‡ºç‚º `1536Ã—1152`ã€4Ã—3ã€æ¯æ ¼ `384Ã—384` çš„ RGBA PNGã€‚12 æ ¼é€ä¸€åƒç´ æ¯”å°åŽŸå…§å®¹å‡ç‚ºå·®ç•° 0ã€‚
-- ç™¼å¸ƒï¼è³‡ç”¢å¿«å–åŒæ­¥å‡è‡³ `V173.14`ï¼ŒåŒ…æ‹¬é¦–é ã€ç›´è¼‰å…¥å£ã€Loaderã€å…©å¼µæ°´ç³» Canvas ç´ æ URL èˆ‡ç¾è¡Œç‰ˆæœ¬å›žæ­¸ï¼›ä¸‰å€‹æ­·å²éœæ…‹æ¸¬è©¦ï¼ˆV157ã€V169ã€V173.11ï¼‰åƒ…æ”¾å¯¬ç‚ºé©—è­‰ç›®å‰ç›´æŽ¥ ownerï¼å…è¨±æ ¼å¼æ›è¡Œï¼Œæœªå›žå¡«å·²ç§»é™¤çš„ legacy runtime patchã€‚
-- ç›´æŽ¥é©—è­‰é€šéŽï¼šæ°´çƒè¡“ã€å†°éœœç®­é›¨ã€V166 æ°´ç³»ã€V171ã€V172ã€V173 èˆ‡ Canvasï¼æ·±æ·µè¼¸å…¥å…± 44 é …ç›´æŽ¥æ–·è¨€ã€‚å®Œæ•´ CI å·²é€šéŽï¼šJavaScript èªžæ³• `154/154`ã€Node æ¸¬è©¦ `41/41`ã€æœ¬åœ°è³‡æº `300`ã€HTML IDï¼ç‰ˆæœ¬ï¼Loaderï¼`git diff --check`ï¼›Browser smoke å› æœ¬æ©Ÿæœªå®‰è£ Playwright/Chromium æœªåŸ·è¡Œã€‚æœªä¿®æ”¹ `main`ã€æŠ€èƒ½æ•¸å€¼ã€å‚·å®³ã€å­˜æª”æˆ–ç›®æ¨™è¦å‰‡ï¼Œä»å¾… Android å¯¦æ©Ÿè¦–è¦ºé©—æ”¶ã€‚
-
-### 2026-09-01 â€” V173.13ï¼šæ·±æ·µå®ˆé—œè€…é»žæ“Šèˆ‡æ°´ç³» Canvas Sprite Sheet æ”¶æ–‚ï¼ˆdevï¼‰
-
-- æ·±æ·µå®ˆé—œè€…çš„å”¯ä¸€ owner æ”¶æ–‚å›ž `js/36-v141-content-systems.js`ï¼šå°è©±èˆ‡é€²æˆ°é¬¥æµç¨‹ä¸å†ç”± `js/38-v143-system-fixes.js` wrapper è¦†è“‹ï¼›å®ˆé—œç«‹ç¹ªã€åœ°åœ– click èˆ‡ capture-phase `pointerup/click` éƒ½é€²å…¥åŒä¸€å€‹ç›´æŽ¥å°è©±å…¥å£ã€‚æ—¢æœ‰ `js/41-v146-system-polish.js`ï¼`js/42-v148-combat-dungeon-fixes.js` åªä¿ç•™åœ°åœ–ç§»å‹•äº‹ä»¶çš„åŽŸå§‹åº§æ¨™å‚³éžã€‚
-- å¾ž `assets-library/assets/inbox/` é¸æ“‡æ€§è¤‡è£½ `water-orb.png` èˆ‡ `frost-arrow-rain.png` åˆ°æ—¢æœ‰ `assets/vfx/water/` å°æ‡‰è·¯å¾‘ï¼›æœªåˆä½µæˆ–ä¿®æ”¹ `assets-library`ã€‚
-- æ°´çƒè¡“èˆ‡å†°éœœç®­é›¨çš„å”¯ä¸€ VFX owner ä»æ˜¯ `js/39-v143-skill-animation.js`ã€‚å…©æ‹›æ”¹ç”¨æ—¢æœ‰ VFX nodeï¼ç”Ÿå‘½é€±æœŸä¸­çš„ Canvas crop rendererï¼šæ¯æ¬¡åƒ…ä»¥å›ºå®š 384Ã—384 source cell ç¹ªè£½ç¬¬ 0ï½ž11 å¹€ï¼Œå†ä»¥æ—¢æœ‰ç›®æ¨™ç¾¤çµ„æˆ–å­˜æ´»æ•µæ–¹ bounding box æ±ºå®šé¡¯ç¤ºç¯„åœï¼›èˆŠ CSS background-sheet æ’­æ”¾è·¯å¾‘å·²åªå°é€™å…©æ‹›ç§»é™¤ã€‚
-- æ°´çƒè¡“ç¶­æŒ 1.4 ç§’ã€å–®ä¸€ live-target-group instanceï¼›å†°éœœç®­é›¨ç¶­æŒå–®ä¸€ all-living-targets AOE instanceã€‚å…©è€…å‡ä¿ç•™ç¬¬ 7ï½ž8 å¹€å‘½ä¸­æ™‚æ©Ÿã€æ­»äº¡ç›®æ¨™æŽ’é™¤èˆ‡æ—¢æœ‰å‹•ç•«çµæŸæ¸…ç†ï¼Œä¸ä¿®æ”¹æŠ€èƒ½æ•¸å€¼ã€å‚·å®³ã€å­˜æª”æˆ–å…¶ä»–æ°´ç³»æŠ€èƒ½ã€‚
-- æ–°å¢žï¼æ›´æ–°ç›´æŽ¥å›žæ­¸ï¼šCanvas å›ºå®šè£åˆ‡ã€å…©é …æ–°ç´ æå°ºå¯¸ã€ç¾¤çµ„ï¼AOE å®šä½ã€æ·±æ·µç›´æŽ¥å°è©±å…¥å£ã€ç‰ˆæœ¬ï¼Loader ä¸€è‡´æ€§ã€‚Repository checks èˆ‡çœŸæ©Ÿé»žæ“Šã€å‹•ç•«é©—è­‰å¾…æ­¤ dev commit å®Œæˆå¾ŒåŸ·è¡Œã€‚
-
-### 2026-08-31 â€” V173.9ï¼šP0 æ¢å¾©å·²é©—è­‰æŠ€èƒ½å‹•ç•«è§¸ç™¼éˆï¼ˆdevï¼‰
-
-- ä»¥ V173.4 main ç‚ºæ­£ç¢ºåŸºæº–ï¼Œæ¢å¾© `js/37-v142-skill-animation.js` çš„åŽŸå§‹ `showSkillNameBadge()`ï¼`showMonsterSkillNameBadge()` wrapper èˆ‡ä¸€æ¬¡æ€§åˆå§‹åŒ–å®ˆè¡›ã€‚
-- ç§»é™¤ V173.6ï½žV173.8 æ–°å¢žä½†æœªèƒ½å¯¦éš›è§¸ç™¼çš„ç›´æŽ¥ badge hookï¼›ä¿ç•™ V173.5 çš„æ°´çƒç´ æèˆ‡æ¼”å‡ºã€å‡å‚·è™•ç†ï¼Œä»¥åŠ `js/38-v143-system-fixes.js` çš„æ·±æ·µå°è©±ç¸®æ”¾ä¿®æ­£ã€‚
-- ownerï¼š`js/37-v142-skill-animation.js`ï¼›æœ¬æ¬¡æ²’æœ‰æš«æ™‚è£œä¸ã€‚
-- é é¢ã€Loader èˆ‡å‹•ç•«ç´ æå¿«å–ç‰ˆæœ¬å‡ç‚º V173.9ï¼›CI èˆ‡ dev æ‰‹å‹•æ¸¬è©¦å¾…æœ¬æ¬¡æäº¤å¾Œç¢ºèªã€‚
-
-### 2026-08-31 â€” V173.8ï¼šP0 æŠ€èƒ½å‹•ç•«åˆå§‹åŒ–å®Œæ•´æ€§ï¼ˆdevï¼‰
-
-- V142 åƒ…åœ¨æ—¢æœ‰ director èˆ‡æ–°ç‰ˆç›´æŽ¥è§¸ç™¼å™¨éƒ½å­˜åœ¨æ™‚æ‰ç•¥éŽåˆå§‹åŒ–ï¼›èˆŠå¿«å–åªç•™ä¸‹éƒ¨åˆ† runtime ç‹€æ…‹æ™‚ï¼Œæœƒé‡æ–°å»ºç«‹åŒä¸€å€‹å‹•ç•« ownerã€‚
-- ä¸æ–°å¢ž runtime patchï¼Œä¸æ”¹æˆ°é¬¥ã€æŠ€èƒ½æ•¸å€¼ã€ç´ ææˆ–å­˜æª”ï¼›æ·±æ·µç«‹ç¹ªå°è©±ç¸®æ”¾ä¿®æ­£ç¶­æŒä¸è®Šã€‚
-- é é¢ã€Loader èˆ‡å‹•ç•«ç´ æå¿«å–ç‰ˆæœ¬å‡ç‚º V173.8ï¼›Repository checks å·²æˆåŠŸï¼Œdev æ‰‹å‹•æ¸¬è©¦è«‹ä½¿ç”¨ä¸å¯è®Š commit URLï¼Œé¿å… raw.githack çš„ dev å¿«å–ã€‚
-
-### 2026-08-31 â€” V173.8ï¼šP0 æŠ€èƒ½å‹•ç•«ç›´æŽ¥è§¸ç™¼æ”¶æ–‚ï¼ˆdevï¼‰
-
-- æŠ€èƒ½å‹•ç•«çš„å”¯ä¸€è§¸ç™¼é»žæ”¶æ–‚ç‚º `js/00-main.js` æ—¢æœ‰çš„ `showSkillNameBadge()` èˆ‡ `showMonsterSkillNameBadge()`ï¼›å…©è€…åœ¨æ—¢æœ‰ badge å»ºç«‹å¾Œç›´æŽ¥å‘¼å« `js/37-v142-skill-animation.js` åŒ¯å‡ºçš„ `v142PlaySkillAnimationFromBadge()`ã€‚
-- ç§»é™¤ V142 ä»¥ wrapper æ””æˆª badge çš„ä¾è³´ï¼Œé¿å…å¾ŒçºŒ runtime wrapper é †åºé€ æˆæ‰€æœ‰æŠ€èƒ½æ¼”å‡ºå¤±æ•ˆï¼›ä¸æ”¹æŠ€èƒ½æ•¸å€¼ã€å‚·å®³ã€å›žåˆã€ç´ ææˆ–å­˜æª”ã€‚
-- æ·±æ·µç«‹ç¹ªå°è©±çš„ç¸®æ”¾åº§æ¨™ä¿®æ­£ç¶­æŒæ–¼ `js/38-v143-system-fixes.js`ï¼Œæœ¬æ¬¡æœªæ”¹å‹•å…¶ä»–æ·±æ·µè¦å‰‡ã€‚
-- é é¢ã€Loader èˆ‡å‹•ç•«ç´ æå¿«å–ç‰ˆæœ¬å‡ç‚º V173.8ï¼›CI èˆ‡ dev å¯¦æ¸¬å¾…æœ¬æ¬¡æäº¤å¾Œç¢ºèªã€‚
-
-### 2026-08-31 â€” V173.6ï¼šP0 å‹•ç•« runtime èˆ‡æ·±æ·µå°è©±å®šä½ä¿®å¾©ï¼ˆdevï¼‰
-
-- æŠ€èƒ½å‹•ç•« owner ç‚º `js/37-v142-skill-animation.js`ï¼šè‹¥å‰ä¸€è¼ªè¼‰å…¥åªç•™ä¸‹ `__v142SkillAnimationInstalled` æ——æ¨™å»æ²’æœ‰å»ºç«‹æŽ§åˆ¶å™¨ï¼Œç¾åœ¨æœƒå®‰å…¨é‡å»ºæŽ§åˆ¶å™¨ï¼›`js/39-v143-skill-animation.js` çš„æ‰€æœ‰ Sprite å‹•ç•«å¯å†æ¬¡æŽ›å…¥æ—¢æœ‰ directorã€‚
-- æ·±æ·µå°è©±ç›®å‰ç”± `js/38-v143-system-fixes.js` ç”¢ç”Ÿï¼›å°è©±å®šä½æ”¹ä»¥åœ°åœ–çš„å¯¦éš›ç¸®æ”¾æ¯”ä¾‹è½‰å›žé‚è¼¯åº§æ¨™ï¼Œé¿å…æ³¡æ³¡è¢«æ¸²æŸ“åˆ°ç•«é¢ä¸Šæ–¹è€Œä¸å¯è¦‹ã€‚
-- å¯¦éš› dev éš”é›¢ç€è¦½å™¨å·²é‡ç¾ï¼šä¿®æ­£å‰æ·±æ·µå°è©±æŒ‰éˆ•çš„ computed top ç‚ºè² å€¼ï¼Œä¸”æ°´çƒè¡“æ–½æ”¾å¾Œæ²’æœ‰ä»»ä½• `#v143-skill-stage`ã€‚
-- æœ¬æ¬¡åƒ…è™•ç† P0 å‹•ç•« runtime èˆ‡æ·±æ·µå°è©±ï¼›ä¸ä¿®æ”¹æŠ€èƒ½æ•¸å€¼ã€å­˜æª”ã€æŽ‰è½ã€ç´ æå…§å®¹æˆ– UI ç‰ˆé¢ã€‚å®Œæ•´ CI èˆ‡ dev å¯¦æ¸¬å¾…æœ¬è¼ªæäº¤å¾ŒåŸ·è¡Œã€‚
-- é é¢èˆ‡ Loader å¿«å–ç‰ˆæœ¬å‡ç‚º V173.6ã€‚
-
-### 2026-08-31 â€” V173.5ï¼šæ·±æ·µã€æŽ‰è½äº’å‹•èˆ‡æ°´ï¼ç« VFX ä¿®æ­£ï¼ˆdevï¼‰
-
-- æ·±æ·µåœ°åœ–å®ˆé—œç«‹ç¹ªæ”¹ç‚ºç›´æŽ¥é–‹å•Ÿå°è©±ï¼šæ¬Šå¨ä½ç½®ç‚º `js/38-v143-system-fixes.js` çš„ `v141ChallengeAbyssBoss`ï¼›ä¸å†ç¶“éŽæœƒè®“æ‰‹æ©Ÿé»žæ“Šçœ‹ä¼¼ç„¡åæ‡‰çš„æŽ¥è¿‘ç§»å‹•é–˜é–€ã€‚
-- é‡Žæ€ªæˆ°é¬¥çŽå‹µ toast çš„éš±è—ç‹€æ…‹æ¢å¾© `pointer-events:none`ï¼Œåªåœ¨ `.show` æ™‚æŽ¥æ”¶é»žæ“Šï¼›æ¬Šå¨æ¨£å¼ç‚º `css/45-v152-dev-fixes.css`ï¼Œä¸æœƒå†ç•™ä¸‹é€æ˜Žæ””æˆªå€å¡Šã€‚
-- `assets-review/assets/inbox/water-orb.png` å·²è¦†è“‹ç‚º `assets/vfx/water/water-orb-vfx.png`ï¼›`js/39-v143-skill-animation.js` çš„æ°´çƒè¡“ä¿ç•™æ—¢æœ‰ 4Ã—3ï¼12 å¹€ã€ä¸‰ç›®æ¨™è»Œè·¡èˆ‡å‘½ä¸­æ™‚æ©Ÿï¼Œåƒ…æ›´æ–°ç´ æå¿«å–ç‚º `v=173.5`ã€‚
-- ç«é³³å¤©é³´èˆ‡å†°éœœç®­é›¨åœ¨ `js/39-v143-skill-animation.js` çµ±ä¸€æ”¹ç‚ºå–®å¼µã€å›ºå®šæ•µï¼æˆ‘æ–¹æˆ°å€ä¸­å¤®çš„å…¨å ´ Spriteï¼Œä¸éš¨å‰©é¤˜ç›®æ¨™æ•¸ç¸®å°ï¼Œä¹Ÿä¸å†æ‹†æˆå¤šå¼µ tileã€‚
-- å‡å‚·åŠ å…¥ `js/00-main.js` çš„ `tickStatusEffects()` æ­£å¼å›žåˆå€’æ•¸ï¼Œæ™‚é–“çµæŸå¾Œè³‡æ–™èˆ‡ç‹€æ…‹å‹•ç•«æœƒéš¨æ—¢æœ‰ UI åŒæ­¥ç§»é™¤ï¼›ä¸è®Šæ›´å‡å‚·æ©ŸçŽ‡ã€å›žåˆæ•¸æˆ–å…¶ä»–æŠ€èƒ½æ•¸å€¼ã€‚
-- æ–°å¢ž `tests/v173.5-bugfixes.test.js`ï¼Œä¸¦æ›´æ–°ç›¸é—œæ°´ç³»ï¼å…¨å ´ VFX å›žæ­¸ã€‚å®Œæ•´ CI åŒç­‰æª¢æŸ¥å·²é€šéŽï¼š151/151 JavaScript èªžæ³•ã€38/38 Node suitesã€300 å€‹éœæ…‹è³‡æºã€272 å€‹ HTML IDã€Loaderï¼ç‰ˆæœ¬ä¸€è‡´æ€§èˆ‡ Git æ ¼å¼çš†æ­£å¸¸ã€‚
-- ç™¼å¸ƒã€Loaderã€é é¢èˆ‡å¿«å–ç‰ˆæœ¬å‡ç‚º V173.5ã€‚
-
-### 2026-08-31 â€” æ°¸ä¹…æž¶æ§‹è¦å‰‡å·²å•Ÿç”¨ï¼ˆdevï¼‰
-
-- æ–°å¢ž `ARCHITECTURE_RULES.md` ä½œç‚ºæ°¸ä¹…æž¶æ§‹è¦å‰‡å”¯ä¸€ä¾†æºï¼›å®Œæ•´è¦å‰‡åªä¿ç•™æ–¼è©²æ–‡ä»¶ï¼Œé¿å…åœ¨äº¤æŽ¥æ—¥èªŒé‡è¤‡è€Œç”¢ç”Ÿç‰ˆæœ¬åˆ†æ­§ã€‚
-- `AGENTS.md` èˆ‡ `CLAUDE.md` å·²è¦æ±‚ä»»ä½•ç¨‹å¼ã€CSSã€UIã€æˆ°é¬¥ã€å­˜æª”ã€æŠ€èƒ½ã€æŽ‰è½ã€å‹•ç•«æˆ–è³‡ç”¢æ•´åˆä¿®æ”¹å‰ï¼Œå®Œæ•´é–±è®€ `HANDOFF.md`ã€`UI_GUIDELINES.md` èˆ‡ `ARCHITECTURE_RULES.md`ï¼›ä¸¦é ˆå…ˆå›žå ± owner æª”æ¡ˆã€ä¸»è¦å‡½å¼ã€æ—¢æœ‰ wrapperï¼å¾ŒçºŒè¦†è“‹é»žèˆ‡æš«æ™‚è£œä¸éœ€æ±‚ã€‚
-- æœ¬æ¬¡åƒ…è®Šæ›´è¦ç¯„æ–‡ä»¶ï¼›æœªä¿®æ”¹éŠæˆ²ç¨‹å¼ã€CSSã€è³‡ç”¢ã€æ¸¬è©¦ã€ç‰ˆæœ¬è™Ÿã€å¿«å–æˆ– Pages è¨­å®šã€‚
-
-### 2026-08-31 â€” V173.4ï¼šP2 ç¬¬ä¸‰éšŽæ®µå…ƒç´ åŒ£æœ¬æ¬¡ä¸Šç·šé‡‘å¹£çµ±è¨ˆï¼ˆdevï¼‰
-
-- ä»¥ `origin/dev=a2d99b4b05d4c5f5c3f421bf7dc1d1c1c017404d` ç‚ºå”¯ä¸€æ–½å·¥åŸºç¤Žï¼›æœ¬æ©Ÿ
-  `dev` å·²ä¾ä½¿ç”¨è€…æ˜Žç¢ºæŽˆæ¬Šé‡è¨­è‡³è©² SHAã€‚æœªå»ºç«‹åˆ†æ”¯ã€æœªä¿®æ”¹æˆ–åˆä½µ `main`ã€‚
-- `js/25-v131-fix-batch.js` ç§»é™¤å…ƒç´ åŒ£ä»¥æˆ°é¬¥å‰å¾Œå…¨åŸŸ `gold` å·®é¡ç´¯è¨ˆçš„è·¯å¾‘ï¼›æ”¹ç‚ºåŒ…è£
-  `awardMonsterGoldDrop()`ï¼Œåœ¨æ—¢æœ‰åŽŸå‡½å¼å·²æˆåŠŸå°‡æ€ªç‰©æŽ‰è½å…¥å¸³ä¸¦å›žå‚³å¯¦éš› `amount` å¾Œï¼Œ
-  åƒ…æ–¼å…ƒç´ åŒ£æœ‰æ•ˆçš„ä¸€èˆ¬å·¡æ€ªç´¯åŠ è©²ç­† amountã€‚çœŸæ­£å‰¯æœ¬ï¼ˆ`v132ActiveDungeonRun`ï¼‰æŽ’é™¤ï¼›
-  V141 é‡Žå¤–ç²¾è‹±çš„çŸ­æš«æŽ‰è½éš”é›¢æ——æ¨™ä»è¦–ç‚ºæ—¢æœ‰ä¸€èˆ¬å·¡æ€ªï¼Œé¿å…å°‘ç®—ç²¾è‹±æŽ‰è½ã€‚
-- `elementBoxSession.gold` ä¿æŒã€Œæœ¬æ¬¡ä¸Šç·šã€æš«å­˜ï¼Œé‡æ–°è¼‰å…¥ä»æ­¸é›¶ï¼›å¸³è™Ÿå…±ç”¨ `gold`ã€æ€ªç‰©
-  æŽ‰è½å…¬å¼ã€å‰¯æœ¬çŽå‹µèˆ‡å­˜æª”çµæ§‹å‡æœªæ”¹å‹•ã€‚èˆŠå­˜æª” `autoConfig.skill="normal"` ä¸è®€ã€ä¸å¯«ã€
-  ä¸æç¤ºä¹Ÿä¸é‚„åŽŸã€‚
-- æ–°å¢ž `tests/v173.4-element-box-gold.test.js`ï¼Œæ¶µè“‹é€ç­†å…¥å¸³ã€æœªå•Ÿç”¨ã€æ—¢æœ‰ï¼éžæ€ªç‰©é‡‘å¹£ã€
-  ä¸­é€”åœæ­¢ã€æ™‚æ•¸è€—ç›¡ã€åˆ‡æ›è§’è‰²ã€é‡æ–°è¼‰å…¥ã€å‰¯æœ¬æŽ’é™¤ã€é‡Žå¤–ç²¾è‹±èˆ‡ legacy normal ä¸è®Šã€‚
-- ç™¼å¸ƒï¼å¿«å–åŒæ­¥å‡ç‚º V173.4ï¼š`index.html` é¦–é æ¨™ç¤ºèˆ‡ release entry queryã€
-  `js/20-anonymous-20.js` çš„ `V_ASSET_VERSION`ã€ç¾è¡Œç™¼å¸ƒç‰ˆæ¸¬è©¦æ–·è¨€ã€‚
-- æœ¬æ©Ÿå®Œæ•´ CI åŒç­‰æª¢æŸ¥é€šéŽï¼š`node --check .github/scripts/ci.mjs`ã€JavaScript 150ï¼150ã€
-  Node suites 37ï¼37ã€300 å€‹éœæ…‹è³‡æºã€272 å€‹ HTML IDã€V173.4 Loaderï¼entry åŠ Git
-  whitespaceï¼conflict marker å…¨æ•¸é€šéŽã€‚`tests/v138-browser-smoke.js` æœªåŸ·è¡Œï¼æœªè¨ˆå…¥ï¼›
-  æœ¬è¼ªæœªåšæ‰‹æ©ŸçœŸæ©Ÿæˆ– Playwrightï¼Chromium è¦–è¦ºé©—è­‰ã€‚
-
-**æœ¬è¼ªåˆ»æ„æœªè™•ç†**ï¼šèˆŠå­˜æª” `autoConfig.skill="normal"` ç„¡æ³•å¯é åˆ¤åˆ¥ï¼Œç¶­æŒä¸å‹•ï¼›æ€’ç«ã€
-æ°´çƒè¡“ã€æ´ªæ°´çŒ›ç¸ã€å†°éœœç®­é›¨ä¿ç•™å¾…ç¨ç«‹ä¿®æ­£ã€‚ç‡ƒç‡’ç´ æ `burn-loop.png` ä»åªåœ¨å…·å stash
-`pre-v173.4-burn-loop-local-20260831`ï¼Œä¸å¾—ç´å…¥æœ¬ç‰ˆã€‚
-
-### 2026-08-31 â€” V173.3ï¼šP2 ç¬¬ä¸€éšŽæ®µå°ˆæ¡ˆåŸºç·šæ•´ç†ï¼ˆdevï¼‰
-
-- é–‹å·¥å‰ç¢ºèªé ç«¯ `main=8c7ceea1643a519b110ffab95a50d2de3cb69adf`ï¼ŒåŽŸ `dev`
-  `1d695f2868e77e7ce62bb0ccf59b0610661b0880` æ˜¯å…¶ç›´æŽ¥ç¥–å…ˆä¸”æ²’æœ‰åˆ†æ­§ï¼›å·²ç”¨éžå¼·åˆ¶
-  fast-forward å°‡ `dev` å®‰å…¨åŒæ­¥åˆ°ç›¸åŒåŸºç·šï¼Œæœªå»ºç«‹æ–°åˆ†æ”¯ã€æœªä¿®æ”¹ `main`ã€‚
-- `CHECK_REPORT.txt` å·²ç”± V121 æ‹†æª”å¿«ç…§æ”¹ç‚º V173.3 ç¾è¡ŒåŸºç·šï¼šè¨˜éŒ„ 1 HTMLã€50 CSSã€
-  112 æ”¯æ­£å¼ JavaScriptã€37 æ”¯ tests JavaScriptã€142 å€‹è³‡ç”¢ã€272 å€‹éœæ…‹ HTML IDã€
-  23 æ”¯ index ç›´è¼‰è…³æœ¬ã€108 å€‹ Loader ç›¸ä¾æª”èˆ‡ 26 æ”¯ ordered runtimeï¼›V121 åŽŸå ±å‘Šä»ä¿ç•™ç‚º
-  æ­·å²é™„éŒ„ï¼Œæ˜Žç¢ºä¸ä»£è¡¨ç›®å‰å°ˆæ¡ˆã€‚
-- `index.html` éŽæœŸ title ç”±ã€Œæˆ°é¬¥å®Œæ•´ç‰ˆ V129 SPLITã€æ”¹ç‚ºã€Œå››è±¡æ±Ÿæ¹–å‚³ V173.3ã€ï¼›é¦–é 
-  ç‰ˆæœ¬æ¨™ç¤ºã€ç›¸é—œ CSSï¼JavaScript queryã€`js/20-anonymous-20.js` çš„ `V_ASSET_VERSION` åŠ
-  ç¾è¡Œç™¼å¸ƒç‰ˆæ¸¬è©¦æ–·è¨€åŒæ­¥ç‚º V173.3ã€‚æ­·å²é‡˜æ­»å¿«å–éµèˆ‡èˆŠç‰ˆæ¸¬è©¦æª”åå‡ä¿ç•™ã€‚
-- æœ¬è¼ªåªæ›´æ–°åŸºç·šæ–‡ä»¶ã€title èˆ‡ç™¼å¸ƒï¼å¿«å–ç‰ˆæœ¬ï¼›æœªä¿®æ”¹æˆ°é¬¥ã€æŠ€èƒ½ã€æ•¸å€¼ã€å­˜æª”ã€æŽ‰è½ã€
-  å‹•ç•«ã€è§’è‰²èƒ½åŠ›ã€ç¾Žè¡“è³‡ç”¢æˆ– JavaScript è£œä¸æž¶æ§‹ï¼Œä¹Ÿæœªä¿®æ”¹ V170 æœ€çµ‚æŠ€èƒ½è¦æ ¼ã€‚
-- æœ¬æ©Ÿå®Œæ•´ CI åŒç­‰æª¢æŸ¥ï¼š`.github/scripts/ci.mjs` èªžæ³•ã€JavaScript 149ï¼149ã€Node suites
-  36ï¼36ã€300 å€‹éœæ…‹è³‡æºç›®æ¨™ã€272 å€‹ HTML IDã€V173.3 releaseï¼Loader å®Œæ•´æ€§åŠ Git
-  whitespaceï¼conflict marker å…¨æ•¸é€šéŽã€‚
-
-**æœ¬è¼ªåˆ»æ„æœªè™•ç†ã€ç•™å¾…ç¨ç«‹ä¿®æ­£çš„æ—¢æœ‰æˆ°é¬¥æ¼”å‡ºå•é¡Œ**ï¼šæ€’ç« Buff é¡¯ç¤ºã€æ°´çƒè¡“å®šä½ã€
-æ´ªæ°´çŒ›ç¸å®šä½èˆ‡å°ºå¯¸ã€å†°éœœç®­é›¨æ¼”å‡ºã€‚
-
-**é©—è­‰é™åˆ¶**ï¼šV173.3 æœªåŸ·è¡Œæ‰‹æ©ŸçœŸæ©Ÿæˆ–å®Œæ•´ Playwrightï¼Chromium è¦–è¦ºèˆ‡æ“ä½œé©—è­‰ï¼›
-`tests/v138-browser-smoke.js` æœªç´å…¥ 36 å¥— Node suiteï¼Œä¸å¾—æŠŠæœªåŸ·è¡Œï¼skip ç•¶æˆç€è¦½å™¨é€šéŽã€‚
-
-### 2026-08-31 â€” V173.2ï¼šå‰µè§’æ‰‹æ©Ÿè§¸æŽ§å°ºå¯¸èˆ‡æŠ€èƒ½è©³ç´°æ²å‹•ï¼ˆdevï¼‰
-
-- åªä¿®æ­£å·²ç¢ºèªçš„ UI æ ¹å› ï¼šnative å‰µè§’èƒ½åŠ›å€¼åŠ æ¸›æŒ‰éˆ•ç”± `72px` æ”¹ç‚ºçœŸå¯¦
-  `136Ã—136px`ï¼ˆå« `min-width`ï¼`min-height`ï¼‰ï¼Œä¸¦èª¿æ•´åŒåˆ—é–“è·èˆ‡å¡ç‰‡æœ€å°é«˜åº¦ï¼›
-  1080px èˆžå°ç¸®æ”¾è‡³ 360px æ‰‹æ©Ÿæ™‚ï¼ŒæŒ‰éˆ•å¯¦éš›ç‚ºç´„ `45.3Ã—45.3px`ï¼Œ390pxï¼412px
-  å¯¬åº¦å‰‡ç´„ç‚º `49.1px`ï¼`51.9px`ã€‚ç¬¬ä¸€ã€ç¬¬äºŒã€ç¬¬ä¸‰è§’è‰²å‡å…±ç”¨é€™å¥— native å‰µè§’é ã€‚
-- `js/01-stage-v8-touch-lock.js` åªæ–°å¢žçœŸæ­£æ²å‹• owner
-  `.creation-skill-detail-levels` è‡³æ—¢æœ‰ç™½åå–®ï¼›ä¿ç•™ `scrollHeight > clientHeight`
-  åˆ¤å®šèˆ‡å…¶é¤˜ `#game-stage` è§¸æŽ§éŽ–ï¼Œä¸æ”¾å¯¬èƒŒæ™¯ã€å½ˆçª—å¤–å€åŸŸæˆ–å…¶ä»–ä»‹é¢ã€‚
-- æ–°å¢ž `tests/v173.2-mobile-touch-scroll.test.js`ï¼šé©—è­‰å„ç›®æ¨™æ‰‹æ©Ÿå°ºå¯¸çš„å¯¦éš›ç¸®æ”¾ä¸‹é™ã€
-  æ¯é¡†èƒ½åŠ›å€¼æŒ‰éˆ•åƒ…ä¸€å€‹ action pathã€æŠ€èƒ½è©³ç´°æ¸…å–®èƒ½é€šéŽ touchmoveï¼pointermoveï¼Œ
-  ä¸” modal èƒŒæ™¯ä»æœƒè¢«éŽ–ä½ã€‚
-- å¿«å–åŒæ­¥ï¼šé¦–é ç‰ˆæœ¬æ¨™ç¤ºã€ä¸‰å€‹ release entryã€ç›´æŽ¥è¼‰å…¥çš„å‰µè§’ CSS èˆ‡è§¸æŽ§éŽ–è…³æœ¬ã€
-  `V_ASSET_VERSION` å…¨éƒ¨å‡ç‚º `V173.2`ã€‚æœ¬è¼ªä¸ä¿®æ”¹æˆ°é¬¥ã€æŠ€èƒ½ã€å­˜æª”ã€æŽ‰è½æˆ–å‹•ç•«ã€‚
-- ç€è¦½å™¨é™åˆ¶ï¼šé›²ç«¯ç€è¦½å™¨å°æœ¬æ©Ÿèˆ‡ CDN URL å›žå ± `ERR_BLOCKED_BY_CLIENT`ï¼Œè€Œæœ¬æ©Ÿé›–æœ‰
-  Playwright å¥—ä»¶ä½†æ²’æœ‰ Chromium åŸ·è¡Œæª”ï¼›æœªä¸‹è¼‰ç€è¦½å™¨æˆ–ç­‰å¾…é‡è©¦ã€‚å› æ­¤å¯¦æ©Ÿï¼Chromium
-  è¦–è¦ºé©—è­‰ä»é ˆåœ¨å¯ç”¨ç€è¦½å™¨ç’°å¢ƒè£œåšï¼Œä¸èƒ½ä»¥ Node å›žæ­¸æ¸¬è©¦å†’å……å®Œæˆã€‚
-
-### 2026-08-31 â€” V173.1ï¼šç‰ˆæœ¬è¾¨è­˜èˆ‡å°æ•¸ä¿®è¨‚è™Ÿè¦å‰‡ï¼ˆdevï¼‰
-
-- ä¾ä½¿ç”¨è€…æŒ‡å®šï¼Œä¸»ç‰ˆè™Ÿ 173 ä¸è®Šæ™‚æ”¹ç”¨å°æ•¸ä¿®è¨‚è™Ÿï¼›æœ¬æ¬¡ç”± `V173` å‡ç‚º `V173.1`ï¼Œ
-  å¾ŒçºŒè‹¥ä»ç¶­æŒ 173 ä¸»ç‰ˆè™Ÿï¼Œä¾åºä½¿ç”¨ `V173.2`ã€`V173.3`ï¼Œæ–¹ä¾¿è¾¨è­˜æ˜¯å¦å·²æ›´æ–°ã€‚
-- `index.html` åŒæ­¥æ›´æ–°é¦–é å³ä¸‹ç‰ˆæœ¬æ¨™ç¤ºã€ç„¡éšœç¤™æ¨™ç±¤ã€æ¨£å¼ IDï¼Œä»¥åŠ `js/00-main.js`ã€
-  `js/19-stage-v78-character-inventory-runtime.js`ã€`js/20-anonymous-20.js` ä¸‰å€‹ç›´è¼‰ queryï¼›
-  `js/20-anonymous-20.js` çš„ `V_ASSET_VERSION` åŒæ­¥å‡ç‚º `173.1`ã€‚
-- åªåŒæ­¥ 30 ä»½æ—¢æœ‰æ¸¬è©¦å…§çš„ã€Œç›®å‰ç™¼å¸ƒç‰ˆè™Ÿã€æ–·è¨€ï¼›V173 æ°´çƒè¡“çš„æ­·å²æª”åã€CSSï¼keyframe
-  è­˜åˆ¥èˆ‡åŠŸèƒ½è¦æ ¼å‡ä¿ç•™ã€‚æœªä¿®æ”¹ä»»ä½•éŠæˆ²æ•¸å€¼ã€æŠ€èƒ½ã€æˆ°é¬¥å…¬å¼ã€UI ç‰ˆé¢æˆ–å‹•ç•«é‚è¼¯ã€‚
-- é©—è­‰ï¼šJavaScript èªžæ³• `148/148`ã€Node suite `35/35`ã€éœæ…‹è³‡æº 300 é …ã€HTML ID 272 é …ã€
-  23 æ”¯ç›´è¼‰è…³æœ¬ï¼108 å€‹ loader ä¾è³´ï¼26 æ”¯æ­£å¼ runtimeã€Git ç©ºç™½èˆ‡è¡çªæ¨™è¨˜æª¢æŸ¥å…¨æ•¸é€šéŽï¼›
-  loader ä¸€è‡´æ€§ç¢ºèªç›®å‰æ­£å¼é¡¯ç¤ºç‚º `V173.1`ã€‚ç€è¦½å™¨ smoke ä»å› æœªå®‰è£ Chromium æœªåŸ·è¡Œï¼Œ
-  ä¹Ÿæœªåˆ—å…¥ 35 å¥— Node æ¸¬è©¦æ•¸é‡ã€‚
-
-### 2026-08-31 â€” V170 æœ€çµ‚è¦æ ¼æ”¶æ–‚èˆ‡å®Œæ•´è¼‰å…¥æ•´åˆæ¸¬è©¦ï¼ˆdevï¼›éŠæˆ²ç‰ˆæœ¬ä» V173ï¼‰
-
-- ä»¥é ç«¯ `main=9115b66988feb992822826eb5397e9515b4d795e` çš„ V170 ç‚ºè¦æ ¼åŸºæº–ï¼Œæœªä¿®æ”¹
-  gameplay runtimeã€CSSã€HTMLã€æ•¸å€¼ã€å…¬å¼ã€å­˜æª”ã€UI æˆ–å‹•ç•«ï¼›æœ¬è¼ªåªæ›´æ–°æ¸¬è©¦èˆ‡æœ¬æ–‡ä»¶ï¼Œ
-  å› æ­¤ä¸å‡ loader cache æˆ–ä¸»é  V173 ç‰ˆæœ¬æ¨™ç¤ºï¼Œä¹Ÿä¸åˆä½µï¼ä¿®æ”¹ `main`ã€‚
-- æ–°å¢ž `tests/v170-final-spec-integration.test.js`ï¼šå¾ž `index.html` éŽ–å®š 23 æ”¯ç›´è¼‰è…³æœ¬ï¼Œå¾ž
-  `js/20-anonymous-20.js` è§£æžä¸¦éŽ–å®š 26 æ”¯æ­£å¼ runtimeï¼Œåœ¨åŒä¸€å€‹ `vm.Context` ä¾çœŸå¯¦é †åº
-  åŸ·è¡Œå…¨éƒ¨ 49 æ”¯ JavaScriptï¼Œå†æª¢æŸ¥å››å…ƒç´  45 æ‹›çš„å‚·å®³ã€SPã€ç›®æ¨™ã€æŠ€èƒ½é»žèˆ‡å‰ç½®ã€‚
-- æ•´åˆæ¸¬è©¦å¦å¯¦éš›èµ°å®Œæ•´ wrapper stackï¼š10 åæ•µäººçš„æ´ªæ°´çŒ›ç¸åªèƒ½å‚·å®³ï¼å‡å‚·é¸å®šå–®é«”ï¼Œ
-  å†°éœœç®­é›¨å‚·å®³å…¨é«”ä¸”åªå¥—å‡å‚·ï¼›ä¸¦é©—è­‰ç‡ƒç‡’ã€å†°å°ã€çŸ³åŒ–ã€å…¶ä»–é™ç›Šã€å‘½ä¸­ä¸Šä¸‹é™ã€æ²»ç™‚è¡“
-  æ–½æ³•è€…ä¸å›žè‡ªèº« SPï¼Œä»¥åŠæ¥µå¸å¤©å°Šä¸‰æ‹›çš„ V155 æœ€çµ‚çµç®—ã€‚
-- V140ã€V142ã€V143ã€V144ã€V146ã€V148ã€V149ã€V152ã€V155ã€V158ã€V160ã€V166 èˆ‡
-  V169 æ°´ç³» suite ä¿ç•™åŽŸæ–·è¨€ä½œç‰ˆæœ¬ç´€éŒ„ï¼Œä½†æª”é ­å·²æ¨™ç¤ºç‚º `HISTORICAL SPEC SNAPSHOT`ï¼›
-  ä¸å†æŠŠå„è‡ªå–®å±¤ fixture èª¤ç¨±ç‚º V170 æœ€çµ‚ç‹€æ…‹ã€‚
-- é©—è­‰çµæžœï¼š`tests/*.test.js` å…± 35 ä»½ suite å…¨æ•¸é€šéŽï¼Œå…¶ä¸­æ–° V170 suite 9 é …å…¨æ•¸é€šéŽï¼›
-  `js/`ï¼`tests/` å…± 148 æ”¯ JavaScript å…¨æ•¸é€šéŽ `node --check`ã€‚
-
-**ä»å­˜åœ¨ä½†æœ¬è¼ªä¾è¦æ±‚æœªä¿®æ”¹çš„è¦æ ¼å‚µ**ï¼šå…ƒç›¸å…‰æ˜Žè³‡æ–™ç‰©ä»¶ä»æœ‰ V144 æ­·å²æ¬„ä½ï¼Œä½†æ­£å¼ V155
-resolver ä¸è®€ï¼›V170 main çš„æ´ªæ°´çŒ›ç¸å…¨éšŠå†°å° wrapper ç‚ºå¤±æ•ˆæ­»ç¢¼ï¼ŒV169 æœ€çµ‚æ¬„ä½æœƒä»¤æ¢ä»¶ç‚º
-falseï¼Œä¸” dev V171 å·²ç‰©ç†ç§»é™¤ï¼›1 å›žåˆå‡å‚·åœ¨å›žåˆé–‹é ­å€’æ•¸çš„æ—¢å­˜æ™‚åºä»æœ‰èªžç¾©æ­§ç¾©ã€‚è©³ç´°å…§å®¹
-è¦‹æ–‡ä»¶é ‚éƒ¨ã€ŒV170 æœ€çµ‚æ­£å¼è¦æ ¼ã€ã€‚
-
-### 2026-08-31 â€” V173ï¼šæ°´çƒè¡“æ—‹è½‰é£›è¡Œèˆ‡å®Œæ•´å‘½ä¸­ä¿®æ­£ï¼ˆdevï¼‰
-
-- ä¾ä½¿ç”¨è€…å½±ç‰‡é€æ®µæª¢æŸ¥æ°´çƒè¡“ï¼šV172 ç¬¬ 5ï½ž7 å¹€é›–å·²è¤‡è£½è‡³å¯¦éš›ç›®æ¨™ï¼Œå»ä»ä¿æŒåŽŸå§‹æ©«å‘ï¼›
-  ç¬¬ 9ï½ž12 å¹€ä¹Ÿæ²¿ç”¨åªé¡¯ç¤ºä¸‹åŠå¼µçš„è£åˆ‡ï¼Œé€ æˆä¸‰å€‹å‘½ä¸­ç‰¹æ•ˆäº’ç›¸é€£æˆè—è‰²é•·æ¢ã€‚
-- ä¸ä¿®æ”¹ã€ä¸é‡è£½ä¹Ÿä¸é‡æ–°ç·¨ç¢¼ `assets/vfx/water/water-orb-vfx.png`ï¼›åŽŸåœ–å¯¦éš›åªæœ‰ 4Ã—3ã€
-  å…± 12 å¹€ï¼Œå› æ­¤éœ€æ±‚ä¸­çš„ç¬¬ 13 å¹€ä»¥æ—¢æœ‰ç¬¬ 12 å¹€ä½œç‚ºå‹•ç•«æ”¶å°¾ï¼Œä¸è®€å–ä¸å­˜åœ¨çš„ç•«æ ¼ã€‚
-- æ°´çƒè¡“æ”¹ç”¨ç¨ç«‹ `v173WaterOrbTargetTravel`ï¼šç¬¬ 1ï½ž4 å¹€ä»åªé¡¯ç¤ºä¸€é¡†å…±åŒèšé›†ï¼›ç¬¬ 5ï½ž7 å¹€
-  ä¾æœ¬æ¬¡ 1ï¼2ï¼3 å€‹å¯¦éš›æœ‰æ•ˆç›®æ¨™å»ºç«‹å°æ‡‰å‰¯æœ¬ï¼ŒçŽ©å®¶å¾€æ•µæ–¹é£›è¡Œæ™‚æ—‹è½‰ `+90deg`ï¼Œæ•µæ–¹å¾€çŽ©å®¶
-  é£›è¡Œæ™‚æ—‹è½‰ `-90deg`ï¼Œä¸¦å¾žæ–½è¡“å¡ç§»å‹•è‡³å„è‡ªç›®æ¨™å¡ä¸­å¿ƒã€‚
-- ç¬¬ 8 å¹€å…ˆåœ¨å„ç›®æ¨™ä½ç½®æ’­æ”¾åŽŸåœ–ä¸‹åŠéƒ¨ä¸»è¦æ°´çˆ†ï¼Œç¬¬ 9ï½ž12 å¹€æ”¹ç”¨å®Œæ•´ç•«æ ¼æ–¼å„è‡ªç›®æ¨™é™„è¿‘
-  çˆ†ç‚¸ã€æ¶ˆæ•£ï¼›ä¸‰åæœ‰æ•ˆç›®æ¨™ç¶­æŒåŒæ­¥å‘½ä¸­ã€‚æ´ªæ°´çŒ›ç¸ä»ä½¿ç”¨åŽŸæœ‰æ™‚é–“è»¸ï¼Œæ²’æœ‰è¢«æ­¤ä¿®æ­£å½±éŸ¿ã€‚
-- å¿«å–ã€ç›´è¼‰ query èˆ‡ä¸»é å³ä¸‹ç‰ˆæœ¬æ¨™ç¤ºåŒæ­¥å‡ç‚º `V173`ï¼›æ–°å¢ž
-  `tests/v173-water-orb-direction-vfx.test.js`ï¼Œä¸¦æ›´æ–° V172 èˆ‡æ—¢æœ‰ cache-bust é©—æ”¶ã€‚
-- é©—è­‰çµæžœï¼š`node --test tests/*.test.js` å…± 34 ä»½ suite å…¨æ•¸é€šéŽï¼›ç•°å‹• loader èˆ‡å…¨éƒ¨æ¸¬è©¦æª”
-  å‡é€šéŽ `node --check`ï¼Œ`git diff --check` é€šéŽï¼ŒåŽŸå§‹æ°´çƒ PNG SHA-256 ä¿æŒä¸è®Šã€‚å¦ä»¥æœªç§»å‹•
-  åˆ†æ”¯çš„å€™é¸ commit åœ¨é›²ç«¯ Chrome è¼‰å…¥å¯¦éš› CSS èˆ‡ PNG æ…¢é€Ÿé è¦½ï¼Œç¢ºèªèšé›†æœŸåªæœ‰ä¸€é¡†ã€
-  é£›è¡ŒæœŸä¸‰é¡†ä¾ä¸åŒç›®æ¨™åº§æ¨™æ—‹è½‰ç§»å‹•ï¼Œå‘½ä¸­æœŸä¸‰å€‹å®Œæ•´æ°´çˆ†åˆ†åˆ¥éŽ–å®šä¸‰å¼µç›®æ¨™å¡ç‰Œã€‚
-
-### 2026-08-31 â€” V172ï¼šæ°´çƒè¡“å¤šç›®æ¨™å‹•ç•«åˆ†å±¤ä¿®æ­£ï¼ˆdevï¼‰
-
-- ä¿ç•™ `assets/vfx/water/water-orb-vfx.png` åŽŸå§‹é€æ˜Ž PNGï¼Œä¸ä¿®æ”¹ã€ä¸é‡è£½ä¹Ÿä¸é‡æ–°ç·¨ç¢¼ï¼›
-  ä¿®æ­£å…ˆå‰æ¯å€‹ç›®æ¨™éƒ½å„è‡ªæ’­æ”¾å®Œæ•´ 12 å¹€ Spriteï¼Œå°Žè‡´å…±åŒèšé›†ç–Šæˆå¤§åž‹å…‰åœ˜ã€é£›è¡Œé€”ä¸­åˆå¤¾å¸¶
-  æå‰çˆ†è£‚åœ–å¡Šçš„å•é¡Œã€‚
-- ç¬¬ 1ï½ž4 å¹€åªé¡¯ç¤ºä¸€å€‹å…±åŒæ°´çƒèšé›†ï¼›ç¬¬ 5ï½ž7 å¹€ä¾æ¯å€‹å¯¦éš›æœ‰æ•ˆç›®æ¨™åˆ†åˆ¥ç§»å‹•ç•«æ ¼ä¸ŠåŠéƒ¨çš„
-  æ°´çƒï¼ŒæŠµé”å°æ‡‰å¡ç‰Œå¾Œæ‰æ–¼ç¬¬ 7ï½ž8 å¹€åˆ‡æ›ç‚ºç•«æ ¼ä¸‹åŠéƒ¨å‘½ä¸­ç‰¹æ•ˆï¼Œç¬¬ 8ï½ž12 å¹€ç•™åœ¨ç›®æ¨™é™„è¿‘
-  å®Œæˆæ°´çˆ†æ¶ˆæ•£ã€‚æ°´çƒè¡“å°ºå¯¸åŒæ­¥ç¸®ç‚º 1.25 å€ã€110ï½ž165pxã€‚
-- ä¸Šè¿°åˆ†å±¤ã€è£åˆ‡åŠå°ºå¯¸åªå¥—ç”¨æ–¼ `waterBall`ï¼›æ´ªæ°´çŒ›ç¸æ²¿ç”¨å®Œæ•´ç•«æ ¼èˆ‡åŽŸå®šä½ã€å°ºå¯¸ï¼Œä¸å—å½±éŸ¿ã€‚
-  å¿«å–èˆ‡ç›´è¼‰ query å‡è‡³ 172ï¼Œæ–°å¢ž `tests/v172-water-orb-vfx.test.js`ã€‚
-- é©—è­‰çµæžœï¼š`node --test tests/*.test.js` å…± 33 ä»½ suite å…¨æ•¸é€šéŽï¼›ç€è¦½å™¨å¯¦æˆ°å·²å»ºç«‹ä¸¦è£å‚™
-  æ°´çƒè¡“è§’è‰²ï¼Œç¢ºèªä¸‰åå¯¦éš›ç›®æ¨™åœ¨åŒä¸€å‘½ä¸­æ™‚é»žå„è‡ªå—åˆ°å‚·å®³ã€‚
-- ä¸»é å°é¢å³ä¸‹å®‰å…¨å€æ–°å¢žå°åž‹é‡‘æ¡† `V172` ç‰ˆæœ¬æ¨™ç¤ºï¼Œæ–¹ä¾¿æ‰‹æ©Ÿæ¸¬è©¦æ™‚ç›´æŽ¥è¾¨èªæ˜¯å¦è¼‰å…¥æœ¬ç‰ˆï¼›
-  æ¨™ç¤ºä¸æ””æˆªè§¸æŽ§ï¼Œä¹Ÿä¸å£“ä½è§’è‰²éšŠä¼è³‡è¨Šæˆ–åº•éƒ¨å°Žè¦½ã€‚
-
-### 2026-08-31 â€” V171ï¼šæ€’ç«ã€æ°´çƒï¼æ´ªæ°´èˆ‡å†°éœœç®­é›¨å®šä½ä¿®æ­£ï¼ˆdevï¼‰
-
-- æ€’ç«çš„æ–½æ”¾ Sprite ç”±éŽå°çš„ 0.82 å€ã€64ï½ž108px èª¿æ•´ç‚º 1.08 å€ã€96ï½ž148pxï¼Œè²¼è¿‘å¯¦éš›
-  å—ç›Šå¡ç‰Œé‚Šç·£ï¼›çŽ©å®¶ `activeBuffs` èˆ‡æ•µæ–¹ `v141TeamBuffs` å‡å»ºç«‹æŒçºŒ loopã€‚å¦è¦†å¯«æ·±æ·µ
-  ç«‹ç¹ªå¡çš„é«˜æ¬Šé‡ `position:relative`ï¼Œé¿å…æ•µæ–¹æ€’ç«ï¼å…¶ä»–ç‹€æ…‹åœ–è¢«æŽ¨é›¢å¡ç‰Œã€‚
-- æ°´çƒè¡“èˆ‡æ´ªæ°´çŒ›ç¸æ”¹ç‚ºå…ˆå¯«å…¥æ–½è¡“è€…åŠå„å¯¦éš›ç›®æ¨™çš„ `left/top`ï¼Œå†æŽ›ä¸Š Sprite å‹•ç•« classï¼›
-  33.333%ï½ž58.332% ç”±æ–½è¡“å¡ç§»å‹•åˆ°ç›®æ¨™å¡ä¸­å¿ƒï¼Œä¿®æ­£éƒ¨åˆ† Androidï¼WebView æŠŠ fallback
-  åº§æ¨™å¿«ç…§æˆ 0ã€å‹•ç•«åœåœ¨è‡ªå·±ä½ç½®çš„å•é¡Œã€‚æ´ªæ°´çŒ›ç¸åŒæ­¥ç¸®ç‚º 1.85 å€ã€175ï½ž250pxã€‚
-- å†°éœœç®­é›¨ä¸å†ä»¥æ•µæˆ‘å€åŸŸè¼ƒé•·é‚Šå»ºç«‹æ­£æ–¹å½¢å¾Œç½®ä¸­è£åˆ‡ï¼›ç¾åœ¨ä»¥å®Œæ•´ç›®æ¨™æ–¹æˆ°é¬¥å€ç‚º clipping
-  rectangleï¼Œä¾çŸ­é‚Šå»ºç«‹åŒæ­¥ Sprite tilesã€‚çŽ©å®¶æ–½æ”¾åªè¦†è“‹æ•µæ–¹å€ï¼Œæ•µæ–¹æ–½æ”¾åªè¦†è“‹æˆ‘æ–¹å€ï¼›
-  å‚·å®³æ•¸å­—ä»é€å¼µå¡ç‰Œé¡¯ç¤ºã€‚
-- ç§»é™¤ V149 éºç•™çš„ `teamFreezeChance` èˆ‡é›™æ–¹å…¨éšŠå†°å°è¿´åœˆã€‚å½±ç‰‡ä¸­æ´ªæ°´çŒ›ç¸å‘½ä¸­ä¸€äººå»è®“
-  10 åæ•µäººå„è‡ªå‡ºç¾å†°å°ï¼æŠµæŠ—ï¼Œæ ¹å› å³ç‚ºé€™æ®µèˆŠé‚è¼¯ï¼›V169 æœ€çµ‚è¦å‰‡ç¶­æŒåªå°å¯¦éš›å‘½ä¸­å–®é«”
-  é€²è¡Œ 40% å‡å‚·åˆ¤å®šã€æŒçºŒ 1 å›žåˆã€‚å¦åŠ å–®é«”æŠ€èƒ½æ™šåˆ° callback é˜²è­·ï¼Œä¸èƒ½æ“´å¼µåˆ°å…¶ä»–å¡ç‰Œã€‚
-- å¿«å–ç‰ˆæœ¬å‡è‡³ 171ï¼›ä¿®æ”¹ `js/39-v143-skill-animation.js`ã€
-  `css/40-v143-combat-dungeon-polish.css`ã€`js/43-v149-skill-ui-rules.js`ã€loader èˆ‡ç›¸é—œå›žæ­¸ã€‚
-  æ²’æœ‰ä¿®æ”¹ã€é‡è£½æˆ–é‡æ–°ç·¨ç¢¼ä»»ä½• PNGã€‚
-- é©—è­‰çµæžœï¼š`node --test tests/*.test.js` å…± 32 ä»½ suite å…¨æ•¸é€šéŽï¼›ä¸‰æ”¯ç•°å‹• JavaScript
-  é€šéŽ `node --check`ï¼Œ`git diff --check` é€šéŽã€‚å¦ä»¥é›²ç«¯ Chrome è¼‰å…¥æœªç§»å‹•åˆ†æ”¯çš„å€™é¸ commitï¼Œ
-  å¯¦éš›å¾žä¸»åŸŽå»ºç«‹ï¼å‡ç´šè§’è‰²ã€å­¸ç¿’ä¸¦è£å‚™æ€’ç«ï¼Œå†é€²å…¥ 5ï½ž6 æ•µäººæˆ°é¬¥ï¼›æ•µæ–¹æ°´çƒè¡“ç”±æ•µæ–¹å‘½ä¸­
-  å¯¦éš›æˆ‘æ–¹å¡ç‰Œï¼Œæ€’ç«æˆåŠŸå¥—ç”¨ä¸”æˆ°é¬¥ DOM é¡¯ç¤ºã€Œæ€’ç«ç”Ÿæ•ˆä¸­ã€ã€‚
-
-**å·²çŸ¥é™åˆ¶**ï¼šè‡ªå‹•æ¸¬è©¦èˆ‡ç€è¦½å™¨æ¡Œé¢æˆ°é¬¥ smoke å‡é€šéŽï¼›å‹•ç•«æœ€çµ‚å¤§å°èˆ‡æ‰‹æ©Ÿ GPU åˆæˆæ•ˆæžœä»æ‡‰
-ç”±ä½¿ç”¨è€…åœ¨ `dev` çš„ç›®æ¨™ Android è£ç½®å¯¦æ¸¬æ‰‹æ„Ÿï¼Œç¢ºèªå¾Œå†æ±ºå®šæ˜¯å¦å‡ç‰ˆè‡³ `main`ã€‚
-
-### 2026-08-30 â€” V170ï¼šå‰µè§’è¿”å›žã€æŠ½çŽåˆ¸åœ–ç¤ºèˆ‡ä¸Šä¸€ç‰ˆç‰ˆé¢å›žå¾©ï¼ˆdevï¼‰
-
-- ç¬¬äºŒã€ç¬¬ä¸‰è§’è‰²å…±ç”¨å‰µè§’æµç¨‹çš„ç¬¬ä¸€é æ–°å¢žã€Œè¿”å›žè§’è‰²é ã€ï¼›è¿”å›žå¾Œæœƒå›žåˆ°ä¸»åŸŽè§’è‰²è¦–çª—ã€‚
-  è§’è‰² ID ä»¥åŽ»é™¤é¦–å°¾ç©ºç™½ã€NFKC æ­£è¦åŒ–åŠä¸åˆ†å¤§å°å¯«æ¯”è¼ƒï¼Œä¸‰åè§’è‰²å‡ä¸å¯é‡è¤‡ã€‚
-- ä¸»åŸŽæ¸¬è©¦å·¥å…·çš„å…±ç”¨ç¶“é©—æ± æŒ‰éˆ•ç”±æ¯æ¬¡ 1,000 è¬æ”¹ç‚ºæ¯æ¬¡ 10 å„„ï¼Œé¡¯ç¤ºã€å¯¦éš›åŠ å€¼ã€å­˜æª”
-  èˆ‡æç¤ºæ•¸å­—ä¸€è‡´ã€‚
-- èˆŠå­˜æª”ä¸­çš„èµ¤ç‚Žï¼å¯’æ³‰ï¼å²©å²³ï¼é’åµè£å‚™æŠ½çŽåˆ¸æœƒä¾ç©©å®š ID è£œå›žæœ¬è¼ªå·²ä¸Šå‚³çš„ PNGï¼›æ–°å¢žåˆ¸
-  ç–Šå…¥æ—¢æœ‰å †ç–Šæ™‚ä¹ŸæœƒåŒæ­¥åœ–ç¤ºï¼Œæ·±æ·µå¯¶ç®±çŽå‹µæç¤ºæœƒé¡¯ç¤ºå°æ‡‰åˆ¸åœ–ã€‚åä»¶å¥—è£æœ¬é«”ä»ä½¿ç”¨å„éƒ¨ä½
-  è‡ªå·±çš„è£å‚™åœ–ç¤ºï¼Œä¸æœƒèª¤å¥—æŠ½çŽåˆ¸åœ–ã€‚
-- è§’è‰²é å›žå¾© V169 å‰çš„è‡ªç„¶æ²å‹•èˆ‡åŽŸæœ‰æ¯”ä¾‹ï¼Œåªç§»é™¤é»‘è‰²å°¾ç«¯ç©ºå¡Šï¼›å•†åº—å›žå¾©åŽŸæœ¬ flat å…©æ¬„å¡ç‰‡ï¼Œ
-  æ¯åˆ—ç¶­æŒ HP åœ¨å·¦ã€SP åœ¨å³ï¼›å‰¯æœ¬èƒŒåŒ…ä¿ç•™é«˜å±¤ç´šä½†é¿é–‹åº•éƒ¨å°Žè¦½ã€‚æ·±æ·µçºŒé—œé å›žå¾©ä¸Šä¸€ç‰ˆå¯†åº¦ï¼Œ
-  å¯¶ç®±ï¼å‚³é€é»žç¸®å›žè¼ƒå°è¶³è·¡ï¼›RPG è¦–çª—ã€è³¼è²·æç¤ºã€å…ƒç´ åŒ£ã€æ·±æ·µæµç¨‹èˆ‡é–ƒçˆä¿®æ­£å‡ä¿ç•™ã€‚
-- å¿«å–ç‰ˆæœ¬å‡è‡³ 170ï¼›æ–°å¢ž `tests/v167-character-creation-exp.test.js` èˆ‡
-  `tests/v169-ticket-icon-paths.test.js`ï¼Œä¸¦æ›´æ–°è§’è‰²ï¼å•†åº—ï¼æ·±æ·µç‰ˆé¢å›žæ­¸é©—æ”¶ã€‚
-- é©—è­‰çµæžœï¼š31 ä»½ Node test suite å…± 264 é …å…¨æ•¸é€šéŽï¼›`js/`ï¼`tests/` å…± 144 æ”¯
-  JavaScript é€šéŽ `node --check`ï¼Œ`git diff --check` é€šéŽã€‚
-
-**ç•¶æ™‚é™åˆ¶ï¼ˆå·²æ–¼ V173.24 å®Œå…¨è§£é™¤ï¼‰**ï¼šV169 æ”¶åˆ°çš„å››å¼µ inbox PNG æ˜¯å››å…ƒç´ ã€Œè£å‚™æŠ½çŽåˆ¸ã€
-åœ–ï¼Œä¸æ˜¯å¥—è£æœ¬é«”ã€‚V173.22 å·²è£œé½Šå››å¥—å„äº”å€‹æ”»æ“Šéƒ¨ä½çš„æ–°åœ–ï¼ŒV173.24 å†è£œé½Šäº”å€‹æ³•è¡“éƒ¨ä½ã€‚
-
-### 2026-08-30 â€” V169ï¼šRPG è¦–çª—ã€è§’è‰²ï¼å•†åº—ã€å…ƒç´ åŒ£ã€æ°´æŠ€èƒ½èˆ‡æ·±æ·µæµç¨‹ï¼ˆdevï¼‰
-
-- ä»¥é ç«¯ `dev=a325b1c` ç‚ºå”¯ä¸€åŸºåº•ï¼Œé€ hunk ç§»æ¤ `9014748` æœ¬è¼ªå¯¦éš›ä¿®æ”¹ï¼›æœª merge `main`ï¼Œ
-  æœªæ•´æª”è¦†è“‹è¡çªæª”æ¡ˆã€‚V167ï¼V168 æ¸¬è©¦åŠå…¶å‰ç½®æ–½å·¥ä¸å±¬æ–¼æœ¬æ¬¡ commitï¼Œæ²’æœ‰å¤¾å¸¶ã€‚
-- `js/51-v169-rpg-ui.js`ï¼`css/49-v169-rpg-ui.css` æ–°å¢žæŽ’éšŠå¼ RPG alertï¼confirmï¼›è§’è‰²èƒ½åŠ›å€¼
-  èˆ‡ç¶“é©—æ± å›ºå®šæ–¼å¯è¦–é«˜åº¦ï¼ŒæŠ€èƒ½é ä¿ç•™è‡ªèº«æ²å‹•ã€‚å•†åº—é‡æŽ’ç‚º HP å·¦ã€SP å³ä¸”æˆåŠŸè³¼è²·æ‰é¡¯ç¤ºæ”¶æ“šï¼›
-  å‰¯æœ¬é èƒŒåŒ…æ²¿ç”¨çœŸå¯¦èƒŒåŒ… DOMï¼Œä¸¦æå‡è‡³å‰¯æœ¬å°Žè¦½ä¹‹ä¸Šã€‚
-- `js/49-v169-element-box-settings.js`ï¼`css/48-v169-element-box-settings.css` è®“è¡Œå‹•ã€HPã€SPã€
-  å›žåŸŽé–€æª»ã€åˆ‡æ›è§’è‰²èˆ‡é—œé–‰éƒ½ä¿å­˜ç›®å‰è§’è‰²ï¼›å…ƒç´ åŒ£å•Ÿå‹•ä¸­å¯ç¹¼çºŒç·¨è¼¯ï¼Œå¦æœ‰ç¨ç«‹åœæ­¢éµã€‚
-- `js/50-v169-water-skill-rules.js` å®šæ¡ˆå†°éœœæ‹³ã€å†°æ—‹ä¸€é–ƒã€å†°å°é‡æ“Šã€æ°´çƒè¡“ã€æ´ªæ°´çŒ›ç¸ã€
-  å†°éœœç®­é›¨èˆ‡å†°å°çš„å­¸ç¿’ï¼å‡ç´šæˆæœ¬ã€SPã€å‚·å®³ã€å¸è¡€ã€ç›®æ¨™èˆ‡å‰ç½®ï¼›å‡å‚·åªç¦æ­¢æŠ€èƒ½ï¼Œ
-  å†°å°ç‚ºå–®é«” 90%ï¼5 å›žåˆç´”æŽ§åˆ¶ã€‚
-- `js/27-v132-content-expansion.js`ã€`js/36-v141-content-systems.js`ã€
-  `js/38-v143-system-fixes.js` èˆ‡ `css/50-v169-abyss-flow.css` æŽ¥å…¥ç¬¦å’’ã€æŠ½çŽåˆ¸ã€è¨­è¨ˆåœ–ã€
-  é–‹ï¼é—œå¯¶ç®±èˆ‡å‚³é€é»žå…± 15 å¼µåŽŸå§‹ PNGï¼›æ·±æ·µåŠ å…¥é€²åº¦å…¥å£ã€å›ºå®šåœ°åœ–ä½ç½®ã€å±€éƒ¨ Boss å°è©±ã€
-  1ï½ž4 å±¤å¯¶ç®±ï¼å°æ‡‰å…ƒç´ åˆ¸ï¼å‚³é€é»žæµç¨‹ã€‚11 å¼µäººç‰©ç«‹ç¹ªåªå°‡é»‘è‰²å¤–èƒŒæ™¯è½‰é€æ˜Žã€‚
-- å½ˆçª—æ°¸ä¹…å‘¼å¸é™°å½±èˆ‡æŠ€èƒ½å¡ `will-change` å·²éœæ…‹åŒ–ï¼Œé™ä½Ž Android åˆæˆå±¤çŸ©å½¢ç©¿é€ã€‚
-  `V_ASSET_VERSION`ã€`js/00-main.js`ã€`js/19...` èˆ‡å¤–å±¤ loader query å‡è‡³ 169ã€‚
-- é©—è­‰çµæžœï¼š29 ä»½ Node test suite å…± 254 é …å…¨æ•¸é€šéŽï¼›å¦æœ‰ç€è¦½å™¨ smoke å› ç¼ºå°‘ Chromium
-  è‡ªå‹•ç•¥éŽã€‚å…±æœ‰ 142 æ”¯ `js/`ï¼`tests/` JavaScript é€šéŽ `node --check`ï¼Œ
-  `git diff --check` é€šéŽã€‚
-
-**å·²çŸ¥é™åˆ¶**ï¼šAndroidï¼Samsung åˆæˆå±¤å•é¡Œç„¡æ³•åœ¨ç›®å‰ç„¡ Chromium çš„ç’°å¢ƒé‡ç¾ï¼›ä»éœ€åŒä¸€å°æ‰‹æ©Ÿ
-å°‡è§’è‰²ï¼å…ƒç´ åŒ£ï¼æŠ€èƒ½è©³ç´°è¦–çª—å„ä¿æŒé–‹å•Ÿç´„ 10 ç§’ç¢ºèªã€‚
-
-### 2026-08-30 â€” V166ï¼šæ°´å…ƒç´ æ­£å¼ Sprite Sheet VFXï¼ˆdevï¼‰
-
-- ä¾ä½¿ç”¨è€…è¦æ±‚æŽ¥çºŒæ—¢æœ‰ `dev`ï¼Œæœªå»ºç«‹æ–°åˆ†æ”¯ï¼Œæœªä¿®æ”¹ã€åˆä½µæˆ–æŽ¨é€ `main`ã€‚
-- å¾ž `origin/assets-library` çš„ `assets/inbox/` å–ç”¨ 12 å¼µæœ¬æ¬¡ç´ æï¼›å…¨éƒ¨é€šéŽ PNG chunkã€zlibã€
-  8-bit RGBAã€é€æ˜Žèˆ‡åŠé€æ˜Ž Alpha æª¢æŸ¥ã€‚ä¹å¼µ 1448Ã—1086 ä¾†æºä»¥ 362Ã—362 æ ¼ç½®ä¸­è£œè‡³ 384Ã—384ï¼›
-  `tidal-beast.png` ä¾ 384px å››æ¬„åŠ 341ï¼342ï¼341px ä¸‰åˆ—è£œæˆæ­£æ–¹æ ¼ï¼›å…©å¼µ 1774Ã—887 ç‹€æ…‹åœ–
-  ä¾ 444ï¼443px é‚Šç•Œåˆ‡ç‚ºå…«æ ¼å†è£œè‡³ 444Ã—444ã€‚æ­£å¼è¼¸å‡ºçš„ 136 å€‹å½±æ ¼èˆ‡å„è‡ªä¾†æºå…§å®¹å€é€åƒç´ 
-  æ¯”å°å·®ç•°çš†ç‚º 0ï¼Œæ²’æœ‰ç¸®æ”¾ã€æ‹‰ä¼¸æˆ–é‡ç¹ªã€‚
-- `js/37-v142-skill-animation.js`ã€`js/39-v143-skill-animation.js` èˆ‡
-  `css/40-v143-combat-dungeon-polish.css` æŽ¥å…¥åæ‹›æŒ‡å®šæª”åèˆ‡ 0.80ï¼0.90ï¼1.00ï¼1.15ï¼1.10ï¼
-  1.35ï¼0.95ï¼1.25ï¼1.80ï¼1.60 ç§’æ™‚åºï¼Œçµ±ä¸€ç¬¬ 8 å¹€å‘½ä¸­ã€‚å–®å¡ã€å¯¦éš› 1ï½ž3 å¡ã€æ¯ç›®æ¨™ç¨ç«‹
-  æŠ•å°„ã€å®Œæ•´æ•µæ–¹å€ AOE å‡ç”±ç•¶æ¬¡ DOM åº§æ¨™è¨ˆç®—ï¼›åœç”¨èˆŠå†°æ—‹æŠ•å°„ï¼Œé¿å…é‡ç–Šæ’­æ”¾ã€‚
-- å‡å‚·èˆ‡å†°å°ç‹€æ…‹åœ–åªé¡å°„ canonical `statusEffects`ï¼Œå¾ªç’°é »çŽ‡ä¸æœƒè§¸ç™¼ HPï¼DOTï¼æŽ§åˆ¶é‚è¼¯ï¼›
-  ä¸€æ¬¡æ€§æ–½æ”¾åœ–å®Œæˆå¾Œæ‰å»ºç«‹ loopï¼Œç‹€æ…‹è§£é™¤æˆ–è§’è‰²å€’ä¸‹ç«‹å³ç§»é™¤ã€‚èˆŠç”Ÿæˆå¼å†°å°è¦†è“‹å±¤å·²ç”±æ­£å¼
-  Frozen loop å–ä»£ã€‚
-- `js/42-v148-combat-dungeon-fixes.js` å°‡å¾©æ´» HPã€å¡ç‰Œç«™èµ·ã€æ•¸å­—èˆ‡å¾©æ´»åæ‡‰çµ±ä¸€æŽ’åˆ°ç¬¬ 8 å¹€ï¼›
-  æ²»ç™‚ä»ä¿ç•™ V158 çš„å…¨é«”è¦å‰‡ï¼Œå†°å°ä»ä¿ç•™ V158 çš„åŒæŽ’æœ€å¤šä¸‰äººè¦å‰‡ï¼Œå†°å°é‡æ“Šï¼å†°æ—‹ä¸€é–ƒæ²¿ç”¨
-  æ­£å¼ Frostbite è¦å‰‡ï¼Œæ²’æœ‰è—‰å‹•ç•«å·¥ä½œæ”¹å‹•å¹³è¡¡æ•¸å€¼æˆ–æ–°å¢ž DOTã€‚
-- `V_ASSET_VERSION` èˆ‡å¤–å±¤ loader å‡è‡³ 166ï¼›é‡å¯« V150 å…¨å€å†°éœœç®­é›¨é©—æ”¶ã€æ–°å¢ž V166 ç«¯åˆ°ç«¯
-  å‹•ç•«é©—æ”¶ä¸¦è£œå¼· V148 ç¬¬ 8 å¹€å¾©æ´»æ¸¬è©¦ã€‚æœ€çµ‚ 25 ä»½ Node suiteã€224 é …å…¨æ•¸é€šéŽï¼›`js/`ï¼
-  `tests/` å…± 135 æ”¯ JavaScript é€šéŽ `node --check`ï¼Œ`git diff --check` é€šéŽã€‚
-
-**å·²çŸ¥é™åˆ¶**ï¼šç’°å¢ƒæ²’æœ‰ Chromiumï¼Œæœªåšæœ¬æ©Ÿç€è¦½å™¨ï¼æ‰‹æ©Ÿè¦–è¦ºæ¸¬è©¦ï¼›éœ€åœ¨ `dev` çœŸæ©Ÿç¢ºèªå„å¼µ
-æ­£å¼åœ–çš„æœ€çµ‚é¡¯ç¤ºæ¯”ä¾‹ã€æ··è‰²èˆ‡é®æ“‹æ„Ÿã€‚
-
-### 2026-08-30 â€” V163ï¼šç«ç„°æ–¬åŽŸå§‹é€æ˜Ž PNG æ ¡æ­£ï¼ˆdevï¼‰
-
-- ä¾ä½¿ç”¨è€…è¦æ±‚æŽ¥çºŒæ—¢æœ‰ `dev`ï¼Œæœªå»ºç«‹æ–°åˆ†æ”¯ï¼Œæœªä¿®æ”¹ã€åˆä½µæˆ–æŽ¨é€ `main`ã€‚
-- å¾ž `origin/assets-library` çš„ `assets/inbox/flame-slash-cast.png` å–ç”¨æœ¬æ¬¡ç´ æï¼›å·²ç¢ºèªåŽŸæª”ç‚º
-  1448Ã—1086ã€8-bit RGBA é€æ˜Ž PNGï¼Œ4Ã—3 å…± 12 å¹€ï¼Œæ¯æ ¼å¯¦éš› 362Ã—362ã€‚
-- å°‡æ¯æ ¼åŽŸå§‹åƒç´ ç½®ä¸­è£œ 11px é€æ˜Žé‚Šç‚º 384Ã—384ï¼Œå†çµ„æˆ 1536Ã—1152 Sprite Sheetï¼›12 æ ¼é€åƒç´ 
-  æ¯”å°å·®ç•°çš†ç‚º 0ï¼Œæœªç¸®æ”¾ã€æ‹‰ä¼¸ã€é‡ç¹ªæˆ–åŠ å…¥åº•è‰²ã€‚æ­£å¼æª”æ¡ˆè¦†è“‹
-  `assets/vfx/fire/flame-slash-cast.png`ã€‚
-- V161 æ—¢æœ‰ `flameSlash` ç¶å®šç¶­æŒä¸è®Šï¼šåªåœ¨æœ¬æ¬¡æœ‰æ•ˆå–®é«”ç›®æ¨™ä¸­å¤®æ’­æ”¾ä¸€æ¬¡ã€ç¸½é•· 760msã€
-  ç¬¬ 8 å¹€é–‹å§‹é¡¯ç¤ºå‚·å®³èˆ‡å‘½ä¸­åæ‡‰ï¼Œå®Œæ•´ 12 å¹€å¾Œæ‰è§£é™¤è¡Œå‹•é–˜é–€ã€‚
-- `V_ASSET_VERSION` èˆ‡å¤–å±¤ loader å‡è‡³ 163ï¼›æ–°å¢ž `tests/v163-flame-slash-source.test.js`
-  é©—è­‰æ­£å¼ç´ æé›œæ¹Šã€RGBAï¼å°ºå¯¸ã€æŠ€èƒ½è¨­å®šèˆ‡å¿«å–ç™¼å¸ƒã€‚
-- é©—è­‰çµæžœç‚º 23 ä»½ Node suiteã€204 é …å…¨æ•¸é€šéŽï¼›`js/`ï¼`tests/` å…± 133 æ”¯ JavaScript
-  å…¨éƒ¨é€šéŽ `node --check`ï¼Œ`git diff --check` é€šéŽï¼Œæ­£å¼è¼¸å‡ºèˆ‡ inbox åŽŸåœ–çš„ 12 æ ¼é€åƒç´ 
-  æ¯”å°å·®ç•°çš†ç‚º 0ã€‚
-
-**å·²çŸ¥é™åˆ¶**ï¼šç’°å¢ƒæ²’æœ‰ Chromiumï¼Œæœªåšæœ¬æ©Ÿç€è¦½å™¨è¦–è¦ºæ¸¬è©¦ï¼›éœ€ç”±ä½¿ç”¨è€…åœ¨ `dev` æ‰‹æ©Ÿç¢ºèªå¯¦éš›å‹•ç•«å°ºå¯¸ã€‚
-
-### 2026-08-30 â€” V162ï¼šç‡ƒç‡’ç‰¹æ•ˆã€å…ƒç´ åŒ£å±¤ç´šèˆ‡æ·±æ·µæˆ°é¬¥ç«‹ç¹ªï¼ˆdevï¼‰
-
-- ä¾ä½¿ç”¨è€…è¦æ±‚æŽ¥çºŒæ—¢æœ‰ `dev`ï¼Œæœªå»ºç«‹æ–°åˆ†æ”¯ï¼Œæœªä¿®æ”¹ã€åˆä½µæˆ–æŽ¨é€ `main`ã€‚
-- `js/39-v143-skill-animation.js` åœ¨ç‡ƒç‡’ç‹€æ…‹æˆåŠŸå¯«å…¥å¾Œï¼Œä¾å¯¦éš›å—å½±éŸ¿å¡ç‰ŒåŠæœ¬æ¬¡å‘½ä¸­å¹€åŒæ­¥
-  `burn-loop.png`ï¼Œä¸¦ä¿ç•™æ­»äº¡ç›®æ¨™ä¸é¡¯ç¤ºèˆ‡ç‹€æ…‹çµæŸè‡ªå‹•ç§»é™¤çš„æ—¢æœ‰è¦å‰‡ã€‚
-- `js/45-v154-dev-fixes.js`ã€`css/46-v154-dev-fixes.css` åªåœ¨å…ƒç´ åŒ£è¨­å®šé–‹å•ŸæœŸé–“æå‡å…¶å±¤ç´šï¼Œ
-  é—œé–‰ä»»ä¸€è·¯å¾‘éƒ½æœƒå¾©åŽŸï¼›æ·±æ·µç¬¬ 1ï½ž5 é—œæ¯å¼µæ•µæ–¹å¡ç‰Œéƒ½æœƒæ’å…¥å°æ‡‰çš„å¯¦éš›ç«‹ç¹ªåœ–ç‰‡åœ–å±¤ï¼Œ
-  ä¿ç•™åç¨±ã€HPï¼SPã€ç‹€æ…‹èˆ‡å‚·å®³ç‰¹æ•ˆåœ¨åœ–ç‰‡ä¸Šæ–¹ã€‚
-- `V_ASSET_VERSION` èˆ‡å¤–å±¤ loader å‡è‡³ 162ï¼›è£œå¼· V153ï¼V154 å‹•æ…‹é©—æ”¶ä¸¦åŒæ­¥æ‰€æœ‰å¿«å–å›žæ­¸ã€‚
-  é©—è­‰çµæžœç‚º 22 ä»½ Node suiteã€201 é …å…¨æ•¸é€šéŽï¼›`js/`ï¼`tests/` å…± 132 æ”¯ JavaScript å…¨éƒ¨
-  é€šéŽ `node --check`ï¼Œ`git diff --check` é€šéŽã€‚
-
-**å·²çŸ¥é™åˆ¶**ï¼šç’°å¢ƒæ²’æœ‰ Chromiumï¼Œæœªåšæœ¬æ©Ÿç€è¦½å™¨è¦–è¦ºæ¸¬è©¦ï¼›éœ€ç”±ä½¿ç”¨è€…åœ¨ `dev` æ‰‹æ©Ÿç¢ºèªå¯¦éš›å‘ˆç¾ã€‚
-
-### 2026-08-30 â€” V161ï¼šç«ç„°æ–¬æ­£å¼ Sprite Sheet VFXï¼ˆdevï¼‰
-
-- ä¾ä½¿ç”¨è€…è¦æ±‚æŽ¥çºŒæ—¢æœ‰ `dev`ï¼Œæœªå»ºç«‹æ–°åˆ†æ”¯ï¼Œæœªä¿®æ”¹ã€åˆä½µæˆ–æŽ¨é€ `main`ã€‚
-- ä¸Šå‚³çš„ 1536Ã—1152 ç´ æå¯¦éš›ç‚ºç„¡ Alpha çš„ JPEGï¼›åªå°‡é»‘è‰²åˆæˆåº•é‚„åŽŸç‚ºé€æ˜Žï¼åŠé€æ˜Ž Alphaï¼Œ
-  æœªé‡ç¹ªæˆ–æ”¹å‹• 4Ã—3ã€12 å¹€å…§å®¹ï¼Œè¼¸å‡ºç‚º `assets/vfx/fire/flame-slash-cast.png` çš„ 8-bit RGBA PNGã€‚
-- `js/39-v143-skill-animation.js` å°‡ `flameSlash` æŽ¥åˆ°æ—¢æœ‰ V143 Sprite rendererï¼šå–®é«”å®šä½ã€
-  4Ã—3ã€12 å¹€ã€`hitFrame:7`ï¼Œå‹•ç•«åªåœ¨æœ¬æ¬¡æœ‰æ•ˆç›®æ¨™å¡ç‰Œä¸­å¤®ç”¢ç”Ÿä¸€æ¬¡ï¼›æ—¢æœ‰ V142 æ™‚é•· 760ms
-  ä¿æŒä¸è®Šï¼Œç¬¬ 8 å¹€é–‹å§‹åŒæ­¥å‚·å®³ã€MISS èˆ‡å¡ç‰Œå‘½ä¸­åæ‡‰ã€‚
-- `js/43-v149-skill-ui-rules.js` æœƒä¾æ—¢æœ‰ Sprite metadata ä¿ç•™æ­£å¼å‹•ç•« IDï¼›ç§»é™¤ V160 åœ¨
-  `css/44-v149-skill-ui-rules.css` çš„è‡¨æ™‚æœˆç‰™æ–¬ï¼Œé¿å…æ­£å¼ç´ æèˆ‡æ›¿ä»£ç‰¹æ•ˆé‡ç–Šã€‚
-- `V_ASSET_VERSION` èˆ‡å¤–å±¤ loader å‡è‡³ 161ï¼›æ–°å¢ž `tests/v161-flame-slash-vfx.test.js` 5 é …é©—æ”¶ï¼Œ
-  ä¸¦åŠ å¼· V149ï¼V153ï¼V160 å›žæ­¸ã€‚é©—è­‰çµæžœç‚º 22 ä»½ Node suiteã€199 é …å…¨æ•¸é€šéŽï¼›`js/`ï¼`tests/`
-  å…± 132 æ”¯ JavaScript å…¨éƒ¨é€šéŽ `node --check`ï¼Œ`git diff --check` é€šéŽã€‚
-
-**å·²çŸ¥é™åˆ¶**ï¼šç’°å¢ƒæ²’æœ‰ Chromiumï¼Œæœªåšæœ¬æ©Ÿç€è¦½å™¨è¦–è¦ºæ¸¬è©¦ï¼›éœ€ç”±ä½¿ç”¨è€…åœ¨ `dev` æ‰‹æ©Ÿç¢ºèªå¯¦éš›å‹•ç•«å°ºå¯¸ã€‚
-
-### 2026-08-30 â€” V160ï¼šæŠ€èƒ½æ•¸å€¼ï¼ç›®æ¨™ã€å…ƒç´ åŒ£èˆ‡ç«ç³»å‹•ç•«ä¿®æ­£ï¼ˆdevï¼‰
-
-- ä¾ä½¿ç”¨è€…è¦æ±‚æŽ¥çºŒæ—¢æœ‰ `dev`ï¼Œæœªå»ºç«‹æ–°åˆ†æ”¯ï¼Œæœªä¿®æ”¹ã€åˆä½µæˆ–æŽ¨é€ `main`ã€‚
-- `js/44-v152-dev-fixes.js` å°‡å†°éœœç®­é›¨æœ€çµ‚å†°å°çŽ‡æ”¹ç‚º 20% ä¸¦åŒæ­¥èªªæ˜Žï¼›
-  `js/33-v140-four-element-balance.js` èˆ‡ `js/38-v143-system-fixes.js` å°‡ç¡¬æŽ§ä¸Šé™çµ±ä¸€ç‚º
-  æ™®é€š 80%ï¼ç²¾è‹± 60%ï¼BOSS 40%ã€‚
-- `js/39-v143-skill-animation.js` æ”¹ç‚ºåªæŠŠç²¾ç¢º `all`ï¼`allyAll` ç•¶å…¨é«”ï¼Œæ•µæ–¹æ€’ç«ç­‰å¾…å¯¦éš›
-  ä¸‰å€‹è§£æžç›®æ¨™æ‰é€å¡æ’­æ”¾ï¼›ç«ç®­ä¿ç•™åŽŸè»Œè·¡ä¸¦å°‡ Sprite é™åˆ¶åœ¨ 180ï½ž280pxã€‚
-- `js/43-v149-skill-ui-rules.js` èˆ‡ `css/44-v149-skill-ui-rules.css` ä¿ç•™ç«ç„°æ–¬ä¸‰å€‹å­—åœˆï¼Œå‘½ä¸­æ™‚è¿½åŠ 
-  ç·Šæ¹Šç«ç„°æœˆç‰™æ–¬æ“Šï¼›`js/45-v154-dev-fixes.js` å°‡å…ƒç´ åŒ£ HPï¼SP è£œå“æ”¹ç‚ºå¯ç”¨è§’è‰²è¼ªæµä½¿ç”¨ï¼Œ
-  é¿å…æœ‰é™è£œå“å…¨è¢«çŽ©å®¶ 1 è€—å®Œã€‚
-- `V_ASSET_VERSION` èˆ‡å¤–å±¤ loader å‡è‡³ 160ï¼›æ–°å¢ž `tests/v160-current-request.test.js` 5 é …é©—æ”¶ï¼Œ
-  ä¸¦åŠ å¼· V140ï¼V143ï¼V149ï¼V152ï¼V153ï¼V156 ç›¸é—œå›žæ­¸ã€‚é©—è­‰çµæžœç‚º 21 ä»½ Node suiteã€193 é …å…¨æ•¸é€šéŽï¼›
-  `js/`ï¼`tests/` å…± 131 æ”¯ JavaScript å…¨éƒ¨é€šéŽ `node --check`ï¼Œ`git diff --check` é€šéŽã€‚
-
-**å·²çŸ¥é™åˆ¶**ï¼šç’°å¢ƒæ²’æœ‰ Chromiumï¼Œæœªåšæœ¬æ©Ÿç€è¦½å™¨è¦–è¦ºæ¸¬è©¦ï¼›éœ€ç”±ä½¿ç”¨è€…åœ¨ `dev` å¯¦æ©Ÿç¢ºèªå‹•ç•«å°ºå¯¸èˆ‡æ‰‹æ„Ÿã€‚
-
-### 2026-08-30 â€” V159ï¼šæ·±æ·µæˆ°é¬¥ç«‹ç¹ªè¼‰å…¥æ™‚åºä¿®æ­£ï¼ˆdevï¼‰
-
-- ä¾ä½¿ç”¨è€…å¯¦æ©Ÿæˆªåœ–æ·±è¿½ï¼šç´ æèˆ‡ V154 ç«‹ç¹ªæ˜ å°„éƒ½å­˜åœ¨ï¼Œä½†å‹•æ…‹ runtime è‹¥åœ¨æˆ°é¬¥å¡å»ºç«‹å¾Œ
-  æ‰è¼‰å…¥ï¼ŒV154 å®‰è£æ™‚æ²’æœ‰ä¸»å‹•åŒæ­¥å·²å­˜åœ¨å¡ç‰Œï¼›ç¬¬äº”é—œæ¯æ¬¡ `updateUI()` çµæŸæ™‚ï¼ŒV152 èˆŠå±¤
-  é‚„æœƒåœ¨ V154 ä¹‹å¾Œç§»é™¤åœ–ç‰‡è®Šæ•¸ï¼Œå› æ­¤æœƒåªå‰©é»‘è‰²å¡åº•ã€‚
-- æ–°å¢ž `js/48-v159-abyss-battle-portraits.js`ï¼Œä¸é‡åšç´ ææ˜ å°„ï¼Œåªåœ¨ runtime å®‰è£å®Œæˆã€
-  `v132LaunchDungeonBattle()` å»ºç«‹å¡ç‰Œå¾Œèˆ‡æœ€çµ‚ `updateUI()` å¾Œé‡æ–°å‘¼å«æ—¢æœ‰ V154 åŒæ­¥å…¥å£ï¼›
-  åŒæ­¥è£œä¸€å€‹ animation frame èˆ‡ 120ms DOM ç©©å®šé»žï¼Œæ¶µè“‹ Githack å†·è¼‰å…¥åŠå·²é–‹æˆ°ç•«é¢ã€‚
-- `V_ASSET_VERSION` èˆ‡å¤–å±¤ loader å‡è‡³ 159ï¼ŒV159 runtime æŽ’åœ¨ V158 å¾Œï¼›æ–°å¢ž
-  `tests/v159-abyss-battle-portraits.test.js` 4 é …è¼‰å…¥æ™‚åºï¼é–‹æˆ°ï¼èˆŠå±¤è¦†è“‹é©—æ”¶ï¼ŒèˆŠæ¸¬è©¦å¿«å–
-  èˆ‡ runtime æ•¸é‡æ–·è¨€åŒæ­¥æ›´æ–°ã€‚
-- é©—è­‰ï¼š20 ä»½ Node suite å…± 187 é …å…¨æ•¸é€šéŽï¼›`js/`ï¼`tests/` å…± 130 æ”¯ JavaScript
-  å…¨éƒ¨é€šéŽ `node --check`ï¼Œ`git diff --check` é€šéŽã€‚ç’°å¢ƒæ²’æœ‰ Chromiumï¼Œä¿®æ­£å¾Œä»éœ€ä½¿ç”¨è€…
-  ç”± Githack `dev` å¯¦æ©Ÿç¢ºèªç«‹ç¹ªå‘ˆç¾ã€‚
-
-**å·²çŸ¥é™åˆ¶**ï¼šæœ¬è¼ªæ²’æœ‰å·²çŸ¥æœªå®ŒæˆåŠŸèƒ½ï¼›ç„¡æœ¬æ©Ÿç€è¦½å™¨å¯åšæœ€å¾Œè¦–è¦ºæˆªåœ–ã€‚
-
-### 2026-08-30 â€” V158ï¼šæŠ€èƒ½ã€å‘½ä¸­ï¼å‚·å®³èˆ‡æ·±æ·µåœ°åœ–ç«‹ç¹ªå®šæ¡ˆï¼ˆdevï¼‰
-
-- ä¾ä½¿ç”¨è€…è¦æ±‚æŽ¥çºŒæ—¢æœ‰ `dev`ï¼Œæœªå»ºç«‹æ–°åˆ†æ”¯ï¼Œæœªä¿®æ”¹ã€åˆä½µæˆ–æŽ¨é€ `main`ã€‚
-- æ–°å¢ž `js/47-v158-combat-tuning.js` ä½œç‚ºæœ€çµ‚è³‡æ–™èˆ‡æˆ°é¬¥è¦å‰‡å±¤ï¼šæ€’ç«ç‚º 4 å›žåˆï¼65 SPï¼›
-  å†°å°ç‚ºåŒæŽ’ä¸­ã€å·¦ã€å³æœ€å¤šä¸‰åç›®æ¨™ã€80% åŸºç¤Žæ©ŸçŽ‡ã€4 å›žåˆï¼66 SPï¼Œä¸¦è£œé½Šæ‰€æœ‰è§’è‰²çš„
-  ä¸‰ç›®æ¨™å¯¦éš›çµç®—ï¼›æ²»ç™‚è¡“ç‚ºå…¨é«” 550 HPï¼65 SPã€æ¯ç´šå„ +30ã€æ¶ˆè€— 45 SPï¼Œæ–½æ”¾è€…ä¸å›ž SPã€‚
-- å‘½ä¸­ç¶­æŒ 95% åŸºç¤Žèˆ‡å‘½ä¸­ï¼é–ƒé¿å„ 0.3 ä¿‚æ•¸ï¼Œä¸€èˆ¬ä¸Šä¸‹é™æ”¹ç‚º 80%ï½ž99%ï¼Œåªæœ‰å‚³å…¥é™ä½Ž
-  å‘½ä¸­çš„ Debuff æ‰ä½¿ç”¨ 60% ä¸‹é™ï¼›æ€ªç‰©æ—¢æœ‰é è¨­é–ƒé¿è³‡æ–™èˆ‡å‚™æ´å€¼çµ±ä¸€ç‚ºç­‰ç´šÃ—0.5ï¼Œä¿ç•™
-  è‡ªè¨‚é–ƒé¿åŠæ•æ·é™ä½Žæ•ˆæžœã€‚å…±ç”¨å‚·å®³æµ®å‹•æ”¹ç‚º 95%ï½ž105%ï¼Œæœ€çµ‚å€¼ä½¿ç”¨å››æ¨äº”å…¥ã€‚
-- æ–°å¢ž `css/47-v158-combat-tuning.css`ï¼Œæ·±æ·µåœ°åœ–å®ˆé—œç«‹ç¹ªä¿ç•™ 120Ã—168 èˆ‡æ•´å¼µæŒ‰éˆ•é»žæ“Šå€ï¼Œ
-  ç§»é™¤å¡æ¡†ã€é»‘åº•ã€åœ“è§’åŠé™°å½±ï¼›åŽŸåœ–å…§é»‘è‰²åˆæˆåº•ä»¥ç•«é¢æ··åˆå‘ˆç¾ç‚ºåœ°åœ–èƒŒæ™¯ï¼Œä¸æ”¹ç«‹ç¹ªè³‡ç”¢ã€‚
-- `V_ASSET_VERSION` èˆ‡å¤–å±¤ loader å‡è‡³ 158ï¼Œæ–°å¢ž V158 CSSï¼runtime ä¸¦æŽ’åœ¨ V155 å¾Œï¼›
-  `tests/v158-combat-tuning.test.js` æ–°å¢ž 7 é …é©—æ”¶ï¼ŒèˆŠæ¸¬è©¦å¿«å–æ–·è¨€èˆ‡ runtime æ•¸é‡åŒæ­¥æ›´æ–°ã€‚
-- é©—è­‰ï¼š19 ä»½ Node suite å…± 183 é …å…¨æ•¸é€šéŽï¼›`js/`ï¼`tests/` å…± 128 æ”¯ JavaScript
-  å…¨éƒ¨é€šéŽ `node --check`ï¼Œ`git diff --check` é€šéŽã€‚ç’°å¢ƒæ²’æœ‰ Chromiumï¼Œæœªåšæœ¬æ©Ÿå¯¦éš›ç•«é¢é»žæ“Šï¼Œéœ€ç”±ä½¿ç”¨è€…åœ¨ `dev`
-  å¯¦æ©Ÿç¢ºèªæ··è‰²å¾Œçš„ç«‹ç¹ªè§€æ„Ÿã€‚
-
-**å·²çŸ¥é™åˆ¶**ï¼šæœ¬è¼ªä¸‰é …éœ€æ±‚æ²’æœ‰å·²çŸ¥æœªå®ŒæˆåŠŸèƒ½ï¼›æ·±æ·µç«‹ç¹ªå¤–è§€ä»éœ€ä½¿ç”¨è€…å¯¦æ©Ÿç¢ºèªã€‚
-
-### 2026-08-29 â€” V156ï¼šæ·±æ·µåœ°åœ–ç«‹ç¹ªï¼é»žæ“Šç†±å€èˆ‡å…ƒç´ åŒ£è£œå“æ·±è¿½ä¿®æ­£ï¼ˆdevï¼‰
-
-- ä¾ä½¿ç”¨è€…è¦æ±‚åªæ²¿ç”¨æ—¢æœ‰ `dev`ï¼Œæœªå»ºç«‹æ–°åˆ†æ”¯ï¼Œæœªä¿®æ”¹ã€åˆä½µæˆ–æŽ¨é€ `main`ã€‚
-- æ·±è¿½ç¢ºèª V152ï¼V154 åªåœ¨æˆ°é¬¥å¡ç‰‡å¥—ç”¨æ·±æ·µç«‹ç¹ªï¼›åœ°åœ–ä»ç”± `js/36-v141-content-systems.js`
-  ç”¢ç”Ÿç´”æ–‡å­— `.v141-abyss-boss`ï¼Œè€Œ V154 CSS åˆæŠŠå…¶ `min-width`ï¼`min-height` è¨­æˆ 0ï¼Œ
-  å› æ­¤åœ°åœ–æ²’æœ‰ç«‹ç¹ªä¸”å¯¦æ©Ÿé»žæ“Šå€æ¥µå°ã€‚`css/46-v154-dev-fixes.css` ç¾åœ¨ä¾æ¨“å±¤æŽ¥å…¥æ±ï¼å—ï¼
-  å¤©ï¼åŒ—å¸èˆ‡ç¬¬äº”é—œæ¥µå¸ç«‹ç¹ªï¼Œä¿æŒ `contain` æ¯”ä¾‹ï¼Œä¸¦å°‡æ•´å€‹æ—¢æœ‰èªžæ„æŒ‰éˆ•æ“´ç‚º 200Ã—280ã€‚
-- æ·±è¿½ç¢ºèª V154 è‡ªå‹•è£œå“åªæŽ¥å—è§’è‰²å€‹åˆ¥ `config.enabled=true`ï¼›å…ƒç´ åŒ£å¯¦éš›å·²å•Ÿå‹•ä½†èˆŠå­˜æª”
-  è§’è‰²æ——æ¨™ä¸åŒæ­¥æ™‚æœƒç›´æŽ¥ç•¥éŽã€‚`js/45-v154-dev-fixes.js` ç¾ä»¥
-  `v131GetElementBoxState().active` ä½œç‚ºå…¨éšŠå…±ç”¨æŽˆæ¬Šï¼Œä»ä¾æ¯åè§’è‰²åŽŸ HPï¼SP é–€æª»æŒçºŒåƒè—¥ï¼Œ
-  å…ƒç´ åŒ£æœªå•Ÿå‹•æ™‚ä¸æœƒç¹žéŽè§’è‰²è¨­å®šï¼›é é¢è¼‰å…¥æ™‚è‹¥å…ƒç´ åŒ£å·²å•Ÿå‹•ä¹Ÿæœƒç«‹å³å®Œæˆä¸€æ¬¡è£œçµ¦ã€‚
-- `V_ASSET_VERSION` èˆ‡å¤–å±¤ loader æå‡è‡³ 156ï¼›æ–°å¢ž
-  `tests/v156-deep-trace-fixes.test.js`ï¼Œè¦†è“‹å…ˆå‰æ¼æ¸¬çš„ã€Œå…ƒç´ åŒ£å•Ÿå‹•ã€è§’è‰²æ——æ¨™ç‚º falseã€ã€
-  æœªå•Ÿå‹•ä¸å¾—è¶Šæ¬Šã€äº”å±¤åœ°åœ–ç«‹ç¹ªèˆ‡å¤§åž‹é»žæ“Šå€ã€‚
-- é©—è­‰ï¼š17 ä»½ Node suite å…± 173 é …å…¨æ•¸é€šéŽï¼›`js/`ï¼`tests/` å…± 125 æ”¯ JavaScript
-  å…¨éƒ¨é€šéŽ `node --check`ï¼Œ`git diff --check`ã€äº”å¼µåœ°åœ–ç«‹ç¹ª 1152Ã—1536 WebP èˆ‡ loader
-  ç‰ˆæœ¬æª¢æŸ¥é€šéŽã€‚é›²ç«¯ç€è¦½å™¨è¢«é è¦½ç«™å®‰å…¨ä¸­ç¹¼é æ””æˆªï¼Œæœ¬æ©Ÿäº¦ç„¡ Chromiumï¼Œbrowser smoke
-  ä¾æ—¢æœ‰è¦å‰‡ç•¥éŽã€‚
-
-**å·²çŸ¥é™åˆ¶**ï¼šæœ¬è¼ªç„¡å¯ç”¨ç€è¦½å™¨åšçœŸå¯¦è§¸æŽ§æˆªåœ–é©—æ”¶ï¼›æ–°å¢žçš„ VM å›žæ­¸å·²ç›´æŽ¥é‡ç¾ä¸¦è¦†è“‹
-å…ƒç´ åŒ£ç‹€æ…‹ä¸åŒæ­¥è·¯å¾‘ï¼Œå¯¦æ©Ÿè¦–è¦ºèˆ‡é»žæ“Šæ‰‹æ„Ÿä»éœ€ä½¿ç”¨è€…åœ¨ `dev` ç¢ºèªã€‚
-
-### 2026-08-29 â€” V155ï¼šç¡¬æŽ§å¿«è·³ã€æ·±æ·µç¬¬äº”é—œæŠ€èƒ½èˆ‡ç«ç³»çµ‚éšŽæŠ€èƒ½å®šæ¡ˆï¼ˆdevï¼‰
-
-- ä¾ä½¿ç”¨è€…è¦æ±‚æ²¿ç”¨æ—¢æœ‰ `dev` åˆ†æ”¯ï¼Œæœªå»ºç«‹æ–°åˆ†æ”¯ï¼Œæœªä¿®æ”¹ã€åˆä½µæˆ–æŽ¨é€ `main`ã€‚
-- `js/25-v131-fix-batch.js` èˆ‡ `js/37-v142-skill-animation.js` æ–°å¢žä¸€æ¬¡æ€§çš„è¡Œå‹•äº¤æ£’å»¶é²
-  overrideï¼›`js/46-v155-dev-fixes.js` åªåœ¨è§’è‰²ï¼æ€ªç‰©å› å†°å°æˆ–çŸ³åŒ–ä¸èƒ½è¡Œå‹•æ™‚æŒ‡å®š 300msï¼Œ
-  ä¸€èˆ¬å‡ºæ‰‹ 1.6 ç§’èˆ‡å›žåˆäº¤æŽ¥è¦å‰‡ç¶­æŒä¸è®Šã€‚
-- æ·±æ·µç¬¬äº”é—œç¶­æŒæ—¢æœ‰åäººç«™ä½èˆ‡ç«‹ç¹ªï¼Œåªæ›¿æ›æŒ‡å®šæŠ€èƒ½ï¼šæ±ï¼å¤©ï¼æ¥µï¼åŒ—ï¼å—å¸ä½¿ç”¨å„è‡ª
-  ä¸‰æ‹›ä¸¦å›ºå®šæœ€é«˜æŠ€èƒ½ç­‰ç´šï¼›äº”åç²¾è‹±çµ±ä¸€åç‚ºå¤©å…µå¤©å°‡ï¼Œä¾åºä½¿ç”¨æ°´å†°å°é‡æ“Šã€åœŸè½çŸ³è¡“ã€
-  ç«ç«çˆ†ä¸€æ“Šã€é¢¨éš±èº«è¡“ã€æ°´å†°å°é‡æ“Šä¸¦å›ºå®šæœ€ä½ŽæŠ€èƒ½ç­‰ç´šã€‚ç«çˆ†ä¸€æ“Šåƒ…ä¾›æ€ªç‰©ç›´æŽ¥æŸ¥æ‰¾ï¼Œ
-  ä¸æœƒå‡ºç¾åœ¨çŽ©å®¶æŠ€èƒ½æ¸…å–®ï¼›å¤©å¸ä¸å†æ–½æ”¾æ°£å®šç¥žé–’ï¼ŒåŒ—å¸ä¸å†æ”œå¸¶å¾©æ´»è¡“ã€‚
-- æ¥µå¸ä¸‰æ‹›å®šæ¡ˆç‚ºå…¨é«” 150 HPï¼55 SPã€100 è­·ç›¾å…©å›žåˆã€20% å…¨æ·¨åŒ–ï¼‹é–ƒé¿ 30% å…©å›žåˆï¼›
-  é¢¨ç²¾è‹±éš±èº«æœŸé–“ä¸èƒ½è¢«å–®é«”æŠ€èƒ½é¸ä¸­ï¼Œä½†ä»æœƒå—åˆ°ç¯„åœæŠ€èƒ½æ³¢åŠã€‚
-- `js/43-v149-skill-ui-rules.js` å°‡éœ¸é¾è£‚å¤©æ–¬æ”¹ç‚ºé¦–æ¬¡è¿½åŠ è‹¥çˆ†æ“Šæˆ–æ“Šæ•—ç›®æ¨™å¯å†è¿½åŠ ä¸€æ¬¡ï¼Œ
-  çŽ©å®¶èˆ‡æ€ªç‰©éƒ½åªæ‰£ä¸€æ¬¡ SP ä¸”æœ€å¤šè¿½åŠ å…©æ¬¡ï¼›V155 æœ€çµ‚è³‡æ–™ç‚º Lv1 165 å‚·ã€æ¯ç´š +25ã€
-  SP65ã€è¿½åŠ çŽ‡ 5%ï¼10%ï¼20%ï¼30%ï¼40%ã€‚ç«é³³å¤©é³´å®šæ¡ˆç‚ºå…¨é«” Lv1 60 å‚·ã€æ¯ç´š +18ã€
-  SP68ã€70% ç‡ƒç‡’å…©å›žåˆèˆ‡æœ€å¤§ HP 5%ï¼7%ï¼9%ï¼11%ï¼13%ï¼›æœ¬æ¬¡é›¶ç‡ƒç‡’ç›®æ¨™æ™‚ï¼Œä¸‹ä¸€å›žåˆ
-  çš„ç«é³³å¤©é³´å‚·å®³æå‡ 50%ï¼Œåªä¿ç•™ä¸€å›žåˆã€‚
-- è¼‰å…¥å™¨æ–°å¢ž `js/46-v155-dev-fixes.js` ä¸¦å‡ç´š `V_ASSET_VERSION`ï¼`index.html` loader è‡³ 155ï¼›
-  æ–°å¢ž `tests/v155-current-request.test.js`ï¼Œä¸¦æŠŠéœ¸é¾æ¢ä»¶å¼ç¬¬äºŒæ¬¡è¿½åŠ åŠ å…¥ V149 å›žæ­¸æ¸¬è©¦ã€‚
-- é©—è­‰ï¼šå…¨éƒ¨ 16 ä»½ Node suite å…± 168 é …å…¨æ•¸é€šéŽï¼›æ‰€æœ‰ JS `node --check` èˆ‡
-  `git diff --check` é€šéŽã€‚`tests/v138-browser-smoke.js` å› æœ¬ç’°å¢ƒæ²’æœ‰ Chromiumï¼Œä¾æ—¢æœ‰è¦å‰‡ç•¥éŽã€‚
-
-**å·²çŸ¥é™åˆ¶**ï¼šæœ¬è¼ªæ²’æœ‰å¯ç”¨ Chromiumï¼Œå› æ­¤æœªåŸ·è¡Œæœ¬æ©Ÿç€è¦½å™¨å¯¦éš›é»žæ“Šï¼›ç„¡å·²çŸ¥æœªå®Œæˆçš„åŠŸèƒ½é …ç›®ã€‚
-
-### 2026-08-29 â€” V154ï¼šæˆ°é¬¥äº¤æ£’ã€å…ƒç´ åŒ£ã€æ€’ç«å‹•ç•«èˆ‡æ·±æ·µç«‹ç¹ªï¼ä»‹é¢ä¿®æ­£ï¼ˆdevï¼‰
-
-- ä¾ä½¿ç”¨è€…è¦æ±‚åªåœ¨æ—¢æœ‰ `dev` åˆ†æ”¯æ–½å·¥ï¼Œæœªå»ºç«‹æ–°åˆ†æ”¯ã€æœªåˆä½µæˆ–ä¿®æ”¹ `main`ã€‚
-- æˆ°é¬¥ä¸­é€”åœä½ï¼š`js/37-v142-skill-animation.js` çš„å‹•ç•«äº¤æ£’å®Œæˆè­˜åˆ¥åŠ å…¥å›žåˆåºè™Ÿï¼Œé¿å…
-  ç„¡å‹•ç•«ï¼æ²¿ç”¨ä¸Šä¸€å€‹ gate çš„å¾ŒçºŒå›žåˆè¢«èª¤åˆ¤æˆå·²è™•ç†ï¼Œä¸¦åœ¨ V142 æ¸¬è©¦åŠ å…¥è·¨å›žåˆé‡ç”¨
-  gate çš„å›žæ­¸æƒ…å¢ƒã€‚
-- å…ƒç´ åŒ£ï¼šæ–°å¢ž `js/45-v154-dev-fixes.js`ï¼Œä¸Šæ–¹ä¸»æŒ‰éˆ•åœ¨æœªå•Ÿå‹•æ™‚ç›´æŽ¥ã€Œå¥—ç”¨ä¸¦å•Ÿå‹•ã€ï¼Œ
-  ä¸‹æ–¹é‡è¤‡æ“ä½œåˆ—ç”± `css/46-v154-dev-fixes.css` æ”¶èµ·ï¼›è‡ªå‹•æ¢å¾©æœƒæŒçºŒä½¿ç”¨å¯ç”¨è£œå“ï¼Œç›´åˆ°
-  HPï¼SP é«˜æ–¼å„è§’è‰²è¨­å®šé–€æª»æˆ–åº«å­˜è€—ç›¡ã€‚
-- æ€’ç«ï¼š`js/39-v143-skill-animation.js` æ”¹æˆæ¯å€‹å¯¦éš›å—å½±éŸ¿å¡ç‰Œå„è‡ªä¸€å¼µå°åž‹ Sprite Sheet
-  å‹•ç•«ï¼Œä¸å†ç”¨æˆ°å ´ä¸­å¤®çš„ç¾¤çµ„å¤§å‹•ç•«ï¼›æŒçºŒç‹€æ…‹å¾ªç’°ç¶­æŒåŽŸæœ¬é€å¡è¡Œç‚ºã€‚
-- èƒ½åŠ›å€¼é ï¼š`js/19-stage-v78-character-inventory-runtime.js` æ”¹ç”¨ `characterTabContent` èµ·é»ž
-  åˆ° modal body åº•éƒ¨çš„çœŸæ­£å‰©é¤˜é«˜åº¦ï¼Œä¿ç•™å®ƒä½œç‚ºå–®ä¸€ç¸±å‘æ²å‹•å®¹å™¨ï¼Œä¿®æ­£ä¸‹æ–¹è¢«è£åˆ‡ã€‚
-- æ—¥å¸¸è£å‚™å‰¯æœ¬ï¼šV154 CSS ä»¥åŒç­‰ specificity è¦†å¯« V148 éºç•™çš„ `background-size:auto 84%`ï¼Œ
-  è®“ V152 è£å‚™å°é¢çœŸæ­£å¡«æ»¿å¡ç‰‡ã€‚
-- æ·±æ·µï¼š1ï½ž4 é—œå–æ¶ˆè„†å¼±çš„ roster æ•¸é‡é™åˆ¶ä¸¦ä¿ç•™æ—¢æœ‰æ±ï¼å—ï¼å¤©ï¼åŒ—å¸èˆ‡å¤©å…µåœ–ï¼›ç¬¬ 5 é—œ
-  æŽ¥å…¥ä½¿ç”¨è€…æä¾›çš„ç¶ ã€ç™½ã€é»‘ã€ç´…ã€é‡‘åŠç”·å¤©å…µå…­å¼µç«‹ç¹ªï¼Œè½‰æˆ
-  `assets/dungeons/abyss/floor5-*.webp`ï¼ˆçš† 1152Ã—1536ï¼‰ï¼ŒæŒ‰å®Œæ•´æ€ªç‰©åç¨±å›ºå®šå°æ‡‰ã€‚
-  æˆ°é¬¥å¡ç‰‡ç¶­æŒåŽŸå°ºå¯¸èˆ‡ HPï¼SP è³‡è¨Šï¼Œç«‹ç¹ªé‹ªæ»¿ 3:4 æ¡†ä¸”æŠ€èƒ½ VFX ä»ä»¥å¡ç‰‡å³æ™‚çŸ©å½¢å®šä½ã€‚
-- æ·±æ·µå…¥å£åªä¿ç•™åº•éƒ¨è¡Œå‹•æŒ‰éˆ•ï¼Œåœ°åœ–æ¨“å±¤è³‡è¨Šæ”¹æˆå°åž‹æµ®å±¤ã€æ”¶èµ·é‡è¤‡æç¤ºï¼çŽ©å®¶æ¨™ç±¤ä¸¦ç¸®å°
-  å®ˆé—œè€…æŒ‰éˆ•ï¼Œé™ä½Žé®æ“‹ç¾Žè¡“åœ–çš„é¢ç©ã€‚
-- è¼‰å…¥ï¼š`V_ASSET_VERSION` èˆ‡ `index.html` loader æå‡åˆ° 154ï¼Œæ–°å¢ž V154 CSSï¼runtime ä¸¦
-  ä¿æŒæ—¢æœ‰é †åºè¼‰å…¥ï¼›V78 ç›´è¼‰è…³æœ¬å¦åŠ  `?v=154`ã€‚
-- é©—è­‰ï¼šæ‰€æœ‰ JS `node --check`ã€`git diff --check`ã€å…­å¼µæ–°åœ–æ ¼å¼ï¼å°ºå¯¸æª¢æŸ¥é€šéŽï¼›åŸ·è¡Œ
-  `tests/*.js` å…± 158 é …å…¨æ•¸é€šéŽã€‚`tests/v138-browser-smoke.js` å› åŸ·è¡Œç’°å¢ƒæ²’æœ‰æœ¬æ©Ÿ
-  Chromium ä¾æ—¢æœ‰è¦å‰‡ç•¥éŽï¼›é ç«¯ dev é è¦½å¦è¢« raw.githack å®‰å…¨ä¸­ç¹¼é æ””æˆªï¼Œå› æ­¤æœ¬è¼ª
-  è¦–è¦ºæ ¡æº–ä»¥ä½¿ç”¨è€…å…©å¼µå¯¦æ©Ÿæˆªåœ–ã€åŽŸå§‹ç¾Žè¡“èˆ‡ DOM/CSS å°ºå¯¸æª¢æŸ¥å®Œæˆã€‚
-
-### 2026-08-29 â€” V153ï¼šç«å…ƒç´ æ­£å¼ Sprite Sheet VFXï¼ˆdevï¼‰
-
-1. æŠŠæœ¬æ¬¡æ”¶åˆ°çš„ 10 å¼µæµæ°´è™Ÿç´ ææ ¸å°ä¸¦è¼¸å‡ºç‚º `assets/vfx/fire/` ä¸‹çš„æ­£å¼ RGBA PNGï¼š
-   `fire-critical-cast.png`ã€`explosive-flurry-cast.png`ã€`dragon-slash-cast.png`ã€
-   `fire-rocket-cast.png`ã€`blaze-spell-cast.png`ã€`flame-tornado-cast.png`ã€
-   `phoenix-cry-cast.png`ã€`rage-cast.png`ã€`rage-buff-loop.png`ã€`burn-loop.png`ã€‚
-   ä¸Šå‚³æª”å¯¦éš›æ˜¯ç„¡ Alpha çš„ JPEGï¼›åªå°‡é»‘è‰²åˆæˆåº•é‚„åŽŸæˆé€æ˜Žï¼åŠé€æ˜Ž Alphaï¼Œæœªé‡ç¹ªã€‚
-   å…©å¼µ 1536Ã—1024 çš„ 12 å¹€ç´ æé€æ ¼ç½®ä¸­è£œæˆ 384Ã—384 é€æ˜Žç•«å¸ƒï¼Œæœªæ‹‰ä¼¸å…§å®¹ã€‚
-2. `js/39-v143-skill-animation.js` æ²¿ç”¨æ—¢æœ‰ V143 å°Žæ¼”èˆ‡ Sprite Sheet rendererï¼Œæ–°å¢žå–®é«”ã€
-   ç›®æ¨™ç¾¤çµ„ã€æ–½æ”¾è€…åˆ°ç›®æ¨™ç¾¤çµ„ä¸‰ç¨®å®šä½ï¼›æ‰€æœ‰åº§æ¨™å‡å–å¯¦éš›å¡ç‰ŒçŸ©å½¢èˆ‡æ—¢æœ‰ target çµæžœã€‚
-   ç«çˆ†äº‚æ“Šï¼ç«ç®­ï¼æ€’ç«æ¯æ¬¡åªç”¢ç”Ÿä¸€å€‹ä¸»å‹•ç•«ï¼Œç«é³³å¤©é³´ç„¡è«–å¹¾å€‹æœ‰æ•ˆç›®æ¨™éƒ½åªæœ‰ä¸€éš»é³³å‡°ï¼›
-   æ­»äº¡ï¼ç„¡æ•ˆç›®æ¨™æŽ’é™¤ï¼Œå‚·å®³ã€MISSã€çˆ†æ“Šè¦–è¦ºèˆ‡å¢žç›Šï¼ç‡ƒç‡’æˆåŠŸåæ‡‰çµ±ä¸€åœ¨ç¬¬ 8 å¹€é–‹å§‹é»žã€‚
-3. `rage-buff-loop.png` èˆ‡ `burn-loop.png` ç”±åŒä¸€ä»½ç‹€æ…‹ Sprite metadata é©…å‹•ï¼Œåˆ†åˆ¥ä»¥ 1 ç§’ï¼
-   0.8 ç§’åœ¨æ¯å¼µå¯¦éš›æœ‰æ•ˆå¡ç‰Œå¾ªç’°ï¼›åªè®€æ—¢æœ‰ `activeBuffs`ï¼`statusEffects`ï¼Œä¸é‡åˆ¤æ©ŸçŽ‡ã€
-   ä¸å»ºç«‹ action gateï¼Œç‹€æ…‹çµæŸã€æ¸…é™¤ã€æ­»äº¡æˆ–æˆ°é¬¥çµæŸå³ç§»é™¤ã€‚
-4. `css/40-v143-combat-dungeon-polish.css` æ–°å¢žå…±ç”¨ 4Ã—3 ä¸€æ¬¡æ€§å¹€åºèˆ‡ 4Ã—2 æŒçºŒå¹€åºï¼›
-   `js/37-v142-skill-animation.js` æ˜Žç¢ºç•¥éŽè¢«å‹•ï¼`targetType:none` çš„æŠ€èƒ½åç¨±å‹•ç•«ï¼Œç¢ºä¿
-   `fireEX` ä¸æ–½æ”¾ã€ä¸å å›žåˆã€‚ç«ç®­èˆŠå¤§åž‹é£›è¡Œä¸»ç‰¹æ•ˆåœ¨æ­£å¼ Sprite æ’­æ”¾æ™‚åœç”¨ï¼Œå°åž‹å¡ç‰Œ
-   å‘½ä¸­ã€å‚·å®³æ•¸å­—èˆ‡ç‹€æ…‹æç¤ºä¿ç•™ã€‚éœ¸é¾è£‚å¤©æ–¬çš„æ—¢æœ‰é€ç´šè¿½æ“Šæ©ŸçŽ‡èˆ‡ç›®æ¨™ä»å®Œå…¨ç”±ç¾è¡Œ
-   æˆ°é¬¥é‚è¼¯æ±ºå®šï¼Œç¬¬ä¸€æ®µ 2.8 ç§’ gate çµæŸå¾Œæ‰é–‹å§‹ç¬¬äºŒæ®µï¼ŒVFX æœªæŠ½å–æ©ŸçŽ‡æˆ–æ”¹é¸ç›®æ¨™ã€‚
-5. å¿«å–éµåŒæ­¥å‡è‡³ 153ï¼›æ–°å¢ž `tests/v153-fire-vfx.test.js` é©—æ”¶ RGBAï¼å°ºå¯¸ï¼å¹€åºã€ç²¾æº–
-   ç›®æ¨™ã€å–®ä¸»å‹•ç•«ã€ç¬¬ 8 å¹€ã€å®Œæ•´ gateã€ç«ç®­åŽ»é‡ã€ç‹€æ…‹å¾ªç’°åŠ Fire EX è¢«å‹•è¦å‰‡ã€‚
-
-**å·²çŸ¥é™åˆ¶ï¼ˆV161 å·²è§£æ±ºï¼‰**ï¼šæœ¬æ‰¹ç•¶æ™‚æ²’æœ‰ `flame-slash-cast.png`ï¼›å¾ŒçºŒè£œäº¤ç´ æå·²æ–¼ V161
-æŽ¥å…¥ `flameSlash`ï¼Œå…¶é¤˜æ”¶åˆ°çš„ 10 å¼µç´ æç¶­æŒåŽŸè¨­å®šã€‚
-
-**é©—è­‰**ï¼šå…¨éƒ¨ V137ï½žV153 å…± 14 ä»½ã€150 é … Node æ¸¬è©¦é€šéŽï¼›`node --check`ã€
-`git diff --check` èˆ‡ 10 å¼µç´ æçš„ PNG 8-bit sRGBAï¼é€æ˜ŽåŠåŠé€æ˜Ž Alpha é©—æ”¶é€šéŽã€‚
-æœ¬è¼ªåªæäº¤ä¸¦ç™¼å¸ƒ `dev`ï¼Œä¸åˆä½µ `main`ã€‚
-
-### 2026-08-29 â€” V152ï¼šæŠ€èƒ½ã€æˆ°é¬¥èˆ‡å‰¯æœ¬æœ€æ–°å®šæ¡ˆï¼ˆdevï¼‰
-
-1. è§’è‰²æŠ€èƒ½é»žç¶­æŒé€è§’è‰²ç¨ç«‹å„²å­˜èˆ‡æ‰£é™¤ï¼Œè£œæ­£æŠ€èƒ½é åˆ‡æ›è§’è‰²å¾Œçš„é»žæ•¸é¡¯ç¤ºï¼›ç§»é™¤èª¤æ¤çš„
-   `fireBurstStrike`ï¼Œä¸¦ä¾æœ¬è¼ªå®šæ¡ˆèª¿æ•´ç«ï¼æ°´ï¼é¢¨ï¼åœŸæŠ€èƒ½ã€ç•°å¸¸ç‹€æ…‹å…¬å¼èˆ‡ç¡¬æŽ§ä¸Šé™ã€‚
-2. è£œæ­£æ€’ç«å¯¦éš›çˆ†æ“ŠçŽ‡ï¼çˆ†æ“Šå‚·å®³ã€å‡å‚·æ‰‹å‹•ç¦ç”¨æŠ€èƒ½ã€éœ¸é¾è£‚å¤©æ–¬é€ç´šè¿½æ“ŠçŽ‡ã€å‚·å®³æ–‡å­—
-   æœ€ä¸Šå±¤ã€æ€ªç‰©æ–‡å­—ç½®ä¸­ã€æŠ€èƒ½æŒ‡ä»¤é‚Šç•Œã€å·¡æ€ªçŽå‹µé»žæ“Šé—œé–‰ã€ä»»å‹™è¿½è¹¤ç§»é™¤èˆ‡é€²åœ–è‡ªå‹•å›žå¾©ã€‚
-3. æ¥µå¸å¤©å°Šçš„å…ƒç›¸å…‰æ˜Žã€å…ƒå…‰è­·é«”ã€å…ƒç¥–è³œç¦æ”¹ç‚ºæœ¬è¼ªæŒ‡å®šæ•¸å€¼èˆ‡æ©ŸçŽ‡ï¼›æ·±æ·µæˆ°é¬¥è£œä¸Šæˆ°é¬¥
-   è³‡è¨Šæ¡†ï¼Œæ—¥å¸¸ï¼æ·±æ·µå‰¯æœ¬å°Žè¦½ç‰ˆé¢ä¿®æ­£ä¸¦æŽ¥å…¥æ—¥å¸¸ä¸‰å¼µå°é¢ã€æ·±æ·µå°é¢èˆ‡ä¸€è‡³å››é—œå¸å›ï¼
-   å¤©å…µå¤©å°‡ç«‹ç¹ªã€‚ä¸»è¦æ–°å¢ž `js/44-v152-dev-fixes.js`ã€`css/45-v152-dev-fixes.css`ã€
-   `tests/v152-dev-fixes.test.js` èˆ‡ `assets/dungeons/`ã€‚
-4. loader èˆ‡è³‡ç”¢å¿«å–ç‰ˆæœ¬å‡è‡³ 152ï¼›æœ¬è¼ªä¾ä½¿ç”¨è€…æ˜Žç¢ºè¦æ±‚åªç™¼å¸ƒ `dev`ï¼Œä¸åˆä½µ `main`ã€‚
-
-**é©—è­‰**ï¼šå…¨éƒ¨ JavaScript èªžæ³•æª¢æŸ¥é€šéŽï¼ŒV137ï½žV152 å…± 13 ä»½ã€143 é … Node å›žæ­¸æ¸¬è©¦
-èˆ‡ `git diff --check` å…¨éƒ¨é€šéŽï¼›é›²ç«¯ç€è¦½å™¨æ””æˆªæœ¬æ©Ÿ localhostï¼Œç„¡æ³•åŸ·è¡Œé›²ç«¯æ‰‹æ©Ÿäº’å‹•èµ°æŸ¥ã€‚
-
-### 2026-08-29 â€” V151ï¼šå†°éœœç®­é›¨æ­£å¼ VFX è¼‰å…¥ä¿®æ­£ï¼ˆdevï¼‰
-
-1. å¯¦æ©Ÿå›žå ±ã€Œå†°éœœç®­é›¨ã€ç„¡ç‰¹æ•ˆå¾Œï¼Œç¢ºèªå¾Œè¼‰å…¥çš„ V149 é€å­—åœ“åœˆå°Žæ¼”æœƒæŠŠæ‰€æœ‰éžæ™®é€šæŠ€èƒ½
-   æ”¹æˆè‡¨æ™‚å‹•ç•« IDï¼Œå› æ­¤ V150 çš„ `iceArrowRain` Sprite metadata æ²’æœ‰è¢«ä½¿ç”¨ã€‚
-2. `js/43-v149-skill-ui-rules.js` åªå°å·²æœ‰ Sprite metadata çš„æ­£å¼å‹•ç•«ä¿ç•™åŽŸ IDï¼›å…¶ä»–æŠ€èƒ½
-   çš„é€å­—åœ“åœˆæ¼”å‡ºä¸è®Šï¼Œå†°éœœç®­é›¨å‚·å®³ã€SPã€ç¯„åœã€ç›®æ¨™åˆ¤å®šèˆ‡æˆ°é¬¥æ•¸å€¼å‡æœªä¿®æ”¹ã€‚
-3. loader å¿«å–ç‰ˆæœ¬å‡è‡³ 151ï¼Œä¸¦åœ¨ V149 é©—æ”¶åŠ å…¥æ­£å¼ Sprite ä¸å¾—è¢«è‡¨æ™‚å‹•ç•«å–ä»£çš„å›žæ­¸ã€‚
-
-**é©—è­‰**ï¼šå…¨éƒ¨ JavaScript é€šéŽ `node --check`ï¼ŒV137ï½žV150 å…± 12 ä»½ã€132 é … Node
-æ¸¬è©¦å…¨éƒ¨é€šéŽï¼›`git diff --check` é€šéŽã€‚æœ¬è¼ªåªç™¼å¸ƒ `dev`ï¼Œä¸åˆä½µ `main`ã€‚
-
-### 2026-08-29 â€” V150ï¼šå†°éœœç®­é›¨æ­£å¼ 12 å¹€ Sprite Sheet VFXï¼ˆdevï¼‰
-
-1. ä½¿ç”¨è€…æä¾›çš„ `1000065660.png` å¯¦éš›æª”æ¡ˆç‚º 1536Ã—1152ã€4Ã—3 æŽ’åˆ—çš„ JPEGï¼Œæ²’æœ‰
-   Alphaï¼›ä¾ V147 åŒé¡žç´ æè™•ç†æ–¹å¼ï¼ŒåªæŠŠé»‘è‰²åˆæˆåº•æ¢å¾©ç‚ºé€æ˜Žï¼åŠé€æ˜Ž Alphaï¼Œæ²’æœ‰
-   é‡ç¹ªæˆ–é‡æŽ’ä»»ä½•ä¸€å¹€ï¼Œè¼¸å‡ºç‚ºçœŸæ­£ RGBA PNGï¼š
-   `assets/vfx/water/ice-arrow-rain.png`ã€‚æ¯æ ¼ç²¾ç¢º 384Ã—384ï¼ŒæŽ’åˆ—èˆ‡æ’­æ”¾é †åºç¶­æŒ
-   å·¦â†’å³ã€ä¸Šâ†’ä¸‹ã€‚
-2. `js/39-v143-skill-animation.js` åœ¨æ—¢æœ‰å…±ç”¨å‹•ç•«å°Žæ¼”å…§æ–°å¢ž Sprite Sheet metadata
-   èˆ‡å…±ç”¨æ¸²æŸ“è·¯å¾‘ï¼Œæ²’æœ‰å»ºç«‹ç¬¬äºŒå¥—æˆ°é¬¥æˆ– VFX ç³»çµ±ã€‚ã€Œå†°éœœç®­é›¨ã€ä¾æ–½æ”¾ç•¶ä¸‹å­˜æ´»çš„
-   å¯¦éš›ç›®æ¨™å¿«ç…§èˆ‡å¡ç‰Œ `getBoundingClientRect()` ä¸­å¿ƒå®šä½ï¼›å·²æ­»äº¡ï¼ç„¡æ•ˆå¡ç‰Œä¸å»ºç«‹
-   VFXï¼Œè¢«æœ¬æ¬¡æ”»æ“Šæ“Šå€’çš„åŽŸæœ‰æ•ˆç›®æ¨™ä»æ­£å¸¸å®Œæˆå‘½ä¸­æ¼”å‡ºã€‚
-3. `css/40-v143-combat-dungeon-polish.css` ä¾ 4 æ¬„Ã—3 åˆ—ç²¾ç¢ºåˆ‡æ› 12 å¹€ï¼Œåªæ’­æ”¾ä¸€æ¬¡ï¼›
-   ç¬¬ 8 å¹€é–‹å§‹é»žï¼ˆæ•´æ®µ 58.333%ï¼‰ä½œç‚ºä¸»è¦å‘½ä¸­é»žï¼Œæ‰€æœ‰ç¯„åœç›®æ¨™åŒæ­¥é¡¯ç¤ºå¡ç‰Œå‘½ä¸­ã€
-   å‚·å®³æ•¸å­—èˆ‡æ—¢æœ‰ç‹€æ…‹æ•ˆæžœã€‚ç¸½é•·æ²¿ç”¨å†°éœœç®­é›¨æ—¢æœ‰ 2500msï¼Œé«˜éšŽæŠ€èƒ½ Promise è¡Œå‹•
-   é–˜é–€åœ¨ç¬¬ 12 å¹€å®Œæˆå‰ä¸æœƒäº¤çµ¦ä¸‹ä¸€ä½è§’è‰²ã€‚
-4. æ²’æœ‰ä¿®æ”¹å†°éœœç®­é›¨æˆ–å…¶ä»–æŠ€èƒ½çš„å‚·å®³ã€SPã€ç¯„åœã€å†°å°æ©ŸçŽ‡ã€ç›®æ¨™åˆ¤å®šèˆ‡æˆ°é¬¥æ•¸å€¼ã€‚
-   `V_ASSET_VERSION` èˆ‡å¤–å±¤ loader å¿«å–éµå‡è‡³ 150ï¼›æ–°å¢ž
-   `tests/v150-ice-arrow-rain-vfx.test.js`ï¼Œä¸¦åŒæ­¥èˆŠé©—æ”¶çš„å¿«å–ç‰ˆæœ¬é æœŸã€‚
-
-**é©—è­‰**ï¼šImageMagick ç¢ºèªç´ æç‚º 1536Ã—1152ã€8-bit sRGBA PNGï¼ŒAlpha ç¯„åœ 0ï½ž1ï¼›
-å…¨éƒ¨ `js/`ï¼`tests/` é€šéŽ `node --check`ï¼Œ`git diff --check` é€šéŽã€‚V137ï½žV150
-å…± 12 ä»½ Node æ¸¬è©¦ã€132 é …æ–·è¨€å…¨éƒ¨é€šéŽï¼›V150 å¦ä»¥ VM æ¨¡æ“¬ä¸‰å¼µç›®æ¨™å¡ï¼Œç¢ºèªå…©å¼µ
-å­˜æ´»å¡å„è‡ªåªç”Ÿæˆä¸€å€‹ Spriteã€æ­»äº¡å¡ä¸ç”Ÿæˆã€ä½ç½®ç²¾ç¢ºè½åœ¨å¡ç‰Œä¸­å¿ƒã€å‚·å®³æ•¸å­—å»¶è‡³ç´„
-1458msã€å®Œæ•´ 2500ms æ‰å®Œæˆã€‚`tests/v138-browser-smoke.js` å› ç’°å¢ƒæ²’æœ‰ Chromium
-ä¾è¨­è¨ˆç•¥éŽï¼›æœ¬è¼ªä¾ä½¿ç”¨è€…è¦æ±‚åªç™¼å¸ƒè‡³ `dev`ï¼Œä¸åˆä½µ `main`ã€‚
-
-### 2026-08-29 â€” V148ï¼V149ï¼šæˆ°é¬¥ç›®æ¨™ã€å‰¯æœ¬æµç¨‹ã€å››å…ƒç´ æŠ€èƒ½èˆ‡ä»‹é¢è¦å‰‡å®šæ¡ˆ
-
-1. V148 å®Œæˆç›¸é„°ä¸‰äººç›®æ¨™ã€å–®é«”å¢žç›Šç‰¹æ•ˆã€æ­»äº¡ç›®æ¨™ç‰¹æ•ˆæŽ’é™¤ã€è¬è±¡åœŸç›¾ 50% åå‚·ã€
-   æ­»äº¡å‹æ–¹å¾©æ´»é¸å–ã€æ—¥å¸¸å‰¯æœ¬æ²å‹•ã€æ·±æ·µä¸‹æ–¹è¿”å›žèˆ‡é€”ä¸­æ”¹å‘ã€æ€ªç‰©å…¨æ»…å³åœæ‰‹ã€
-   è‡ªå‹•å·¡æ€ªè·¯å¾‘ã€ç²¾è‹±åç¨±è‰²ã€åŒå¢žç›Šä¸çºŒæœŸã€ç¡¬æŽ§äº’æ–¥ã€æ²»ç™‚è€…ä¸å›ž SP èˆ‡å•†åº—åœ–ç¤ºæ›´æ–°ã€‚
-2. V149 ä¾ä½¿ç”¨è€…æœ€æ–°å®Œæ•´è¡¨é€é …é‡è¨­ç«ï¼æ°´ï¼é¢¨ï¼åœŸ 45 æ‹›æŠ€èƒ½çš„å­¸ç¿’é»žã€å‰ç½®ã€SPã€
-   ç›®æ¨™ã€å‚·å®³ã€æˆé•·ã€æ©ŸçŽ‡ã€å›žåˆèˆ‡æ•ˆæžœï¼Œä¸¦è£œé½Šå‡å‚·é™åˆ¶ã€ç«å…ƒç´  EX ç•°å¸¸å¢žå‚·ã€
-   æ´ªæ°´çŒ›ç¸ç¾¤é«”å†°å°åŠéœ¸é¾è£‚å¤©æ–¬åŽŸç›®æ¨™è¿½æ“Šã€‚
-3. ä¿®æ­£å•†åº—æ‰‹æ©Ÿç‰ˆé¢èˆ‡ä¸»åŸŽï¼å°Žè¦½åˆ—å•†åº—åœ–ç¤ºæ··ç”¨ï¼›æ€ªç‰©å¾©æ´»å¾Œç«‹å³æ¢å¾©å¡ç‰Œäº®åº¦ï¼Œ
-   ç²¾è‹±ï¼BOSS åç¨±åˆ†åˆ¥æ¢å¾©æ©˜è‰²ï¼æ¡ƒç´…è‰²ã€‚
-4. çµç•Œèˆ‡è¬è±¡åœŸç›¾ã€éš±èº«ã€é–ƒèº²äº’æ–¥ï¼Œè¡çªæ–½æ”¾é¡¯ç¤º MISS ä¸”ä¸æ‰£ SPï¼›çµç•Œä¸å†é¡¯ç¤º
-   ç™½è‰²è­·ç›¾æ¢èˆ‡ä¸­å¤®ã€Œç•Œã€ï¼Œæ”¹ç‚ºæ·±é»ƒè‰²å››è§’æ¡†åŠå››è§’å‰©é¤˜å±¤æ•¸ã€‚è¬è±¡åœŸç›¾åå‚·é¡¯ç¤º
-   `åå‚·HP-XXX`ã€‚
-5. å…¨æŠ€èƒ½æ”¹ç‚ºä¾æŠ€èƒ½é¡¯ç¤ºåç¨±é€å­—ç”¢ç”Ÿå…ƒç´ è‰²åœ“åœˆï¼Œæ¯ä¸€å­—ä¸€åœˆï¼Œç¶­æŒé£›è¡Œé€Ÿåº¦ä¸¦æ‹‰é–‹é–“è·ï¼›
-   å¯¦éš›ç›®æ¨™èˆ‡æ­»äº¡å¡ç‰Œè¦å‰‡æ²¿ç”¨ V148 æ ¡æ­£çµæžœã€‚ä¸»è¦æ–°å¢žæª”æ¡ˆç‚º
-   `js/42-v148-combat-dungeon-fixes.js`ã€`css/43-v148-combat-dungeon-fixes.css`ã€
-   `js/43-v149-skill-ui-rules.js`ã€`css/44-v149-skill-ui-rules.css`ï¼Œloader å¿«å–å‡è‡³ 149ã€‚
-
-**é©—è­‰**ï¼šæ‰€æœ‰ç›¸é—œ JavaScript é€šéŽ `node --check`ï¼Œ`git diff --check` é€šéŽï¼›V137ï½žV149
-å…± 11 ä»½ Node æ¸¬è©¦ã€126 é …æ–·è¨€å…¨éƒ¨é€šéŽã€‚é›²ç«¯ç€è¦½å™¨æœƒæ””æˆªæœ¬æ©Ÿ localhostï¼Œç„¡æ³•å®Œæˆ
-æœ¬è¼ªæ‰‹æ©Ÿå¯¦æ©Ÿè¦–è¦ºèµ°æŸ¥ï¼›æŽ¨é€å¾Œä»éœ€åœ¨ `dev` ç¢ºèªå•†åº—ç‰ˆé¢ã€çµç•Œå››è§’èˆ‡é€å­—æŠ€èƒ½å‹•ç•«ã€‚
-æœ¬è¼ªåªç™¼å¸ƒ `dev` æ¸¬è©¦ç‰ˆï¼Œä¸åˆä½µæˆ–æŽ¨é€ `main`ã€‚
-
-### 2026-08-28 â€” V147ï¼šæ–°å•†åº—åœ–ç¤ºé€æ˜ŽåŒ–èˆ‡å¿«å–æ›´æ–°
-
-1. ä½¿ç”¨è€…è£œäº¤çš„ `1000065524.png` ç¶“å¯¦éš›æª”æ¡ˆæª¢æŸ¥ï¼Œå…§å®¹é›–ä»¥ `.png` å‘½åï¼Œå¯¦éš›æ˜¯
-   1536Ã—1536ã€ä¸‰é€šé“ã€ç„¡ alpha çš„ JPEGï¼›å¤–åœé»‘è‰²ä¸æ˜¯é€æ˜Žé¡¯ç¤ºã€‚ä½¿ç”¨å…§å»ºå½±åƒç·¨ä¿®
-   åšèƒŒæ™¯æ“·å–ï¼Œåªç§»é™¤åœ“å½¢å•†åº—å¾½ç« å¤–å´é»‘åº•ï¼Œä¿ç•™å•†åº—å ´æ™¯ã€å¯¶ç®±ã€é‡‘å¹£ã€æ­¦å™¨ã€è—¥æ°´ã€
-   ä¸­æ–‡æ–‡å­—èˆ‡åœ“å½¢é‡‘ç´…å¤–æ¡†ï¼Œå†ä»¥ç„¡æ alpha è¼¸å‡ºä¸¦ç¸®æ”¾ç‚º 512Ã—512 RGBA PNGã€‚
-2. æ–°å¢ž `assets/ui/home-shop-v147.png`ï¼Œä¸è¦†å¯«èˆŠ `home-shop.png`ï¼›`index.html`ã€
-   `js/38-v143-system-fixes.js`ã€`js/41-v146-system-polish.js` ä¸‰å€‹å¯¦éš›å…¥å£å…¨éƒ¨æ”¹ç”¨æ–°æª”åã€‚
-3. `V_ASSET_VERSION` èˆ‡ `index.html` loader å¿«å–éµå‡è‡³ 147ï¼ŒV137ï½žV146 é©—æ”¶åŒæ­¥æ›´æ–°ï¼›
-   V146 æ¸¬è©¦å¦ç›´æŽ¥æª¢æŸ¥ä¸‰å€‹å…¥å£ã€æ–°è³‡ç”¢å­˜åœ¨åŠ PNG IHDR color type 6ï¼ˆRGBAï¼‰ã€‚
-
-**é©—è­‰**ï¼š`identify` ç¢ºèªæ–°åœ–ç‚º 512Ã—512ã€RGBAã€å«é€æ˜Žé€šé“ã€465,735 bytesï¼›
-`node --check`ã€`git diff --check` åŠ V137ï½žV146 å…¨å¥— 103 é …æ¸¬è©¦å…¨éƒ¨é€šéŽã€‚
-`assets-library/assets/inbox/` å››å¼µæ¸¬è©¦åœ–åƒ…ä»¥å”¯è®€æ–¹å¼ä¸‹è¼‰æš«å­˜å‰¯æœ¬é€å¼µè§€çœ‹ï¼Œæœ¬æ¬¡æœªä¿®æ”¹ã€
-ç§»å‹•ã€é‡æ–°å‘½åæˆ–æäº¤è©²åˆ†æ”¯ä»»ä½•æª”æ¡ˆã€‚
-å·²ç™¼å¸ƒè‡³ `dev`ï¼ˆ`367e633`ï¼‰èˆ‡ `main`ï¼ˆ`77effbd`ï¼‰ï¼Œå…©åˆ†æ”¯æª”æ¡ˆæ¨¹ä¸€è‡´ï¼›GitHub Pages
-æ­£å¼ç¶²å€ã€`home-shop-v147.png`ã€V147 loader èˆ‡ V146 polish script å‡å›žå‚³ HTTP 200ï¼Œ
-ç·šä¸Šå…§å®¹å·²ç¢ºèªè¼‰å…¥é€æ˜Žå•†åº—åœ–èˆ‡å¿«å–ç‰ˆæœ¬ 147ã€‚
-
-### 2026-08-28 â€” V146ï¼šæˆ°é¬¥æ¼”å‡ºã€æ·±æ·µæµç¨‹èˆ‡æ‰‹æ©Ÿä»‹é¢æœ€çµ‚ä¿®æ­£
-
-1. `js/39-v143-skill-animation.js` èˆ‡ `js/37-v142-skill-animation.js` å®Œæˆæœ€å¾Œä¸€ä½
-   è¡Œå‹•å‹•ç•«é–˜é–€ï¼Œæ‰‹å‹•æŒ‡ä»¤å¿…é ˆç­‰ç›®å‰æ•´æ‹›æ¼”å®Œï¼›é£›è¡Œã€å‘½ä¸­åŠç¯„åœç›®æ¨™åªæŽ¥å—å­˜æ´»å¡ç‰Œï¼Œ
-   æŠ€èƒ½ä¾ ID ä½¿ç”¨é¢¨èµ·é›²æ¹§å››å­—ã€å†°ç®­ç¾¤ã€ç«é¾ã€ç«é³³ã€é£›æ²™ã€å²©çŸ³ç­‰å…·è±¡ SVGï¼ç²’å­ï¼Œ
-   å‘½ä¸­å®šä½æ”¹åˆ°å¡ç‰Œæ­£ä¸­å¤®ï¼Œå…¨é«”æŠ€èƒ½ä»¤ç›®æ¨™å…«æ–¹å‘éœ‡å‹•å¾Œå›žåˆ°åŽŸä½ã€‚æŠ€èƒ½æç¤ºåªä¿ç•™
-   é€æ˜Žåº•æé‚Šæ–‡å­—ï¼Œæ™®é€šæ”»æ“Šå¼·åˆ¶ç™½å­—ï¼›æ•µæ–¹å¡ç‰Œä¸‹ç§»ä½†ä¸å¢žåŠ å…©æŽ’é–“è·ã€‚
-2. `js/40-v144-rules-and-abyss.js` åŒæ­¥æœ€æ–°æŠ€èƒ½è¡¨ï¼šå²©çŸ³å£å£˜ã€è¬è±¡åœŸç›¾ã€æ°´å…ƒç´  EXã€
-   æ²»ç™‚è¡“ã€å†°å°é‡æ“Šã€å†°éœœç®­é›¨ã€æ€’ç«ã€ç«é³³å¤©é³´çš„å‰ç½®ã€æŠ€èƒ½é»žã€SPã€ç›®æ¨™æ•¸ã€å‚·å®³ã€
-   å›žå¾©ã€å¸è¡€ã€æŽ§åˆ¶ã€ç‡ƒç‡’èˆ‡ç­‰ç´šæˆé•·å‡å·²é‡è¨­ã€‚å†°éœœç®­é›¨æ”¹æˆæ¯ä¸€å€‹å­˜æ´»ç›®æ¨™å„è‡ªåˆ¤å®š
-   å†°å°ï¼›æ•µæ–¹æ²»ç™‚æœƒåœ¨æ¯åå—çœ¾å¡ç‰Œé¡¯ç¤ºå¯¦éš› HPï¼SP å›žå¾©é‡ã€‚
-3. æ–°å¢ž `js/41-v146-system-polish.js`ï¼šè—¥æ°´è¼¸å…¥æ•¸é‡å³æ™‚è¨ˆç®—ç¸½åƒ¹ï¼›é–‹å•Ÿè‡ªå‹•æˆ°é¬¥æ™‚ç«‹å³
-   åŸ·è¡Œæˆ°å¾Œè‡ªå‹•è£œçµ¦ï¼›ç¬¬ä¸€æ¬¡æˆåŠŸé™„åŠ ç‡ƒç‡’ï¼å†°å°ï¼çŸ³åŒ–ï¼é™æ•ï¼é™é˜²ï¼æšˆçœ©ç­‰æœƒè·³å‡ºåç¨±ï¼›
-   æ·±æ·µ NPC éœ€èµ°è¿‘æ‰å¯å°è©±ï¼Œå–®æ¬¡ç§»å‹•æœ€å¤š 24% ä¸”èµ°è·¯ä¸­å¿½ç•¥å¿«é€Ÿé€£é»žã€‚æ·±æ·µä½¿ç”¨å››éµ
-   å°Žè¦½èˆ‡å³ä¸Šè¿”å›žï¼Œæ™®é€šå‰¯æœ¬ç‚ºäº”éµï¼›ä¸»åŸŽæ–°å¢žæœ€å¤šä¸‰åçŽ©å®¶çš„é ­åƒã€IDã€ç­‰ç´šã€HPã€SP
-   èˆ‡é‡‘å¹£è³‡è¨Šï¼›åˆæˆåªä¿ç•™ icon é¸æ“‡ä¸”æ°¸é ç”¢å‡ºæ™®é€šè£å‚™ã€‚
-4. å››å…ƒç´ æ”»ï¼æ³•å¥—è£å…± 40 ä»¶ä¾æœ€æ–°è¡¨é‡è¨­æ•¸å€¼ã€åç¨±èˆ‡ç­‰ç´š 20 é™åˆ¶ï¼ŒéžåŒå…ƒç´ è§’è‰²ä¸å¯
-   ç©¿æˆ´ï¼›ä¸‰ä»¶å…¨èƒ½åŠ› +1ã€äº”ä»¶å°æ‡‰å…ƒç´ æŠ€èƒ½å‚·å®³ +2%ï¼Œä¸”æ”»ï¼æ³•ä»¶æ•¸åˆ†é–‹è¨ˆç®—ï¼Œä¸å…è¨±æ··ç©¿
-   èª¤è§¸å¥—è£æ•ˆæžœã€‚èƒŒåŒ…æ”¹ç‚ºæ¯é  18 æ ¼ã€å…­æ¬„ä¸‰åˆ—åŠå·¦å³ç®­é ­ã€‚
-5. `css/42-v146-system-polish.css` è£œé½Šä¸Šè¿°æ‰‹æ©Ÿç‰ˆé¢ã€å…¨èž¢å¹•æ·±æ·µã€ä¸­å¤®å¤§å­—å°è©±ã€ç©©å®š
-   å‰¯æœ¬å°Žè¦½ã€ä¸»åŸŽè³‡è¨Šå¡ã€å•†åº—ç¸½åƒ¹èˆ‡æ…¢é€Ÿæˆ°é¬¥é›¢å ´ï¼›`js/35-v141-ui-battle.js` å°‡å¤±æ•—
-   æ–‡å­—å›ºå®šç‚ºã€Œæˆ°é¬¥å¤±æ•—ã€ï¼Œå…ˆä¿ç•™æ­»äº¡æ¼”å‡ºå†é€æ­¥æš—å ´ï¼Œé¿å…ä»æœ‰è¡€æ™‚ç•«é¢å…ˆæ¶ˆå¤±ã€‚
-6. loader ä»¥å›ºå®šé †åºåœ¨ V144 å¾Œè¼‰å…¥ `js/41` èˆ‡ `css/42`ï¼›`V_ASSET_VERSION` åŠ
-   `index.html` å¤–å±¤å¿«å–éµå‡ç‚º 146ã€‚æ–°å¢ž `tests/v146-system-polish.test.js` 8 é …ä¸¦åŒæ­¥
-   æ›´æ–° V137ï½žV144 çš„ç‰ˆæœ¬ï¼æœ€æ–°è¦å‰‡é æœŸã€‚
-
-**é©—è­‰**ï¼š`node --check`ã€`git diff --check` åŠ V137ï½žV146 å…¨å¥—æ¸¬è©¦é€šéŽï¼šV137 9/9ã€
-V138 10/10ã€V139 7/7ã€V140 14/14ã€V141 18/18ã€V142 14/14ã€V143 12/12ã€
-V144 11/11ã€V146 8/8ï¼Œå…± 103 é …ã€‚`tests/v138-browser-smoke.js` å·²åŸ·è¡Œï¼Œä½†æœ¬ç’°å¢ƒ
-æ²’æœ‰ Chromiumï¼Œè…³æœ¬ä¾è¨­è¨ˆç•¥éŽï¼›ä»éœ€æ­£å¼æ‰‹æ©Ÿå¯¦æ©Ÿèµ°ä¸€æ¬¡æ·±æ·µèˆ‡åæ€ªå¤§åž‹æŠ€èƒ½ã€‚
-2026-08-28 ç¶“ä½¿ç”¨è€…å†æ¬¡æ˜Žç¢ºç¢ºèªç›®çš„åœ°å¾Œï¼Œå·²å°‡ V146 ç™¼å¸ƒè‡³ `dev`
-ï¼ˆ`3659625`ï¼‰èˆ‡ `main`ï¼ˆ`bcc2304`ï¼‰ã€‚`main` ä½¿ç”¨é›™è¦ªåˆä½µæäº¤ä¿ç•™å¤–éƒ¨ V145
-ï¼ˆ`845c955`ï¼‰æ­·å²ï¼Œä½†æ•´ä»½æª”æ¡ˆæ¨¹ç²¾ç¢ºæŽ¡ç”¨ V146ï¼Œä¸åŒ…å« V145 çš„ wrapper loaderã€
-`js/20-anonymous-20-v144-original.js` æˆ– `js/41-v145-wind-skill-icons.js`ã€‚GitHub Pages
-æ­£å¼ç¶²å€å›žå‚³ HTTP 200ï¼Œç·šä¸Š `index.html` å·²ç¢ºèªè¼‰å…¥ `?v=146`ï¼Œ`js/20`ã€`js/41`
-èˆ‡ `css/42` å‡å›žå‚³ HTTP 200 ä¸”å…§å®¹ï¼SHA èˆ‡æœ¬æ©Ÿ V146 ä¸€è‡´ã€‚
-
-### 2026-08-28 â€” V144ï¼šå•†åº—è—¥æ°´ã€æ€ªç‰©æ”œå¸¶æŠ€èƒ½ã€ç¡¬æŽ§æµç¨‹èˆ‡æ·±æ·µç¬¬äº”é—œå®šæ¡ˆ
-
-1. æ–°å¢ž `js/40-v144-rules-and-abyss.js`ï¼Œå•†åº—åªä¸Šæž¶ HPï¼SP å„ 10%ã€20%ã€30%
-   å…­ç¨®è—¥æ°´ï¼›HP åŸºç¤Žå”®åƒ¹ç‚º 20ï¼45ï¼75ï¼ŒSP ç‚º 25ï¼55ï¼90ï¼Œå†æ²¿ç”¨æ—¢æœ‰ã€Œæœ€é«˜å·²å»º
-   è§’è‰²ç­‰ç´šã€å€çŽ‡å…¬å¼ï¼ˆÃ—1ï½žÃ—4.5ï¼‰ã€‚èˆŠ 50%ï¼100% è—¥æ°´ä¸å†è²©å”®ï¼Œä½†å·²æŒæœ‰å“é …
-   ä»ä¿ç•™å®šç¾©åŠä½¿ç”¨èƒ½åŠ›ï¼Œé¿å…ç ´å£žèˆŠå­˜æª”ã€‚
-2. ä¸€èˆ¬æ€ªç‰©ç”Ÿæˆæ™‚å…ˆä¾å…ƒç´ ã€ç­‰ç´šèˆ‡æ—¢æœ‰ Tier é™åˆ¶å»ºç«‹åˆæ³•æŠ€èƒ½æ± ï¼Œå†æŒ‰ Lv1ï½ž20ï¼
-   21ï½ž40ï¼41+ éš¨æ©ŸæŠ½å–æœ€å¤š 1ï¼2ï¼3 æ‹›ï¼›æœ¬å ´æŠ€èƒ½çµ„åˆå›ºå®šï¼Œä¸‹æ¬¡é­é‡æ‰é‡æŠ½ã€‚
-   æŠ€èƒ½ç­‰ç´šä¾ Lv1ï½ž20ï¼21ï½ž40ï¼41ï½ž60ï¼61ï½ž80ï¼81+ å›ºå®šç‚º 1ï¼2ï¼3ï¼4ï¼5ï¼Œ
-   ä¸”ä¸è¶…éŽæŠ€èƒ½ `maxLevel`ã€‚é‡Žæ€ªã€ç²¾è‹±ã€ä¸€èˆ¬ï¼æ—¥å¸¸å‰¯æœ¬åŠä¸€èˆ¬ BOSS å…±ç”¨ï¼›æ·±æ·µ
-   ä»¥ `v141Abyss` æ˜Žç¢ºæŽ’é™¤ä¸¦ç¶­æŒç¨ç«‹è¦å‰‡ã€‚æ—¥å¸¸å‰¯æœ¬åœ¨æ—¢æœ‰å…ƒç´ é‡é…å®Œæˆå¾Œæ‰æŠ½æŠ€èƒ½ã€‚
-3. çŽ©å®¶è¢«å†°å°æˆ–çŸ³åŒ–æ™‚ï¼Œ`beginCharacterTurn` åœ¨å‹•ä½œé¸å–®å‡ºç¾å‰å°±æ¨™è¨˜ä¸¦ç›´æŽ¥å®Œæˆè©²
-   è¡Œå‹•ï¼Œä¸å†å®¹è¨±æ‰‹å‹•é¸æ“‡ã€‚é€²å ´ã€å‹åˆ©ã€å¤±æ•—è½‰å ´æ–‡å­—å›ºå®šç‚ºã€Œé€²å…¥æˆ°å ´ã€ã€Œå‹åˆ©ã€
-   ã€Œå¤±æ•—ã€ï¼Œä¸¦ç”± `css/41-v144-rules-and-abyss.css` èª¿æ•´æç¤ºæ¡†å¯¬åº¦ä»¥å®¹ç´å®Œæ•´æ–‡å­—ã€‚
-4. æ²»ç™‚è¡“é‡è¨­ç‚ºå…¨é«”å›ºå®šå›žå¾© HP 95ï¼‹æ¯ç´š 15ã€SP 15ï¼‹æ¯ç´š 15ï¼Œå«æ–½è¡“è€…è‡ªèº«ï¼›
-   é–ƒèº²è¡“ç‚ºå…¨é«”é–ƒèº² +60% å…©å›žåˆï¼›éš±èº«è¡“ç‚ºå–®é«”å…©å›žåˆï¼Œåªé¿é–‹å–®é«”é¸å–è€Œä»æ‰¿å—
-   ç¯„åœæŠ€èƒ½ï¼›æ°£å®šç¥žé–’ç‚ºå…¨é«”ç•°å¸¸æŠ—æ€§ +45%ã€å‘½ä¸­ +50% ä¸‰å›žåˆï¼›è¬è±¡åœŸç›¾ç‚ºå…¨é«”
-   50% åå‚·ä¸‰å›žåˆã€‚äº”æ‹›çš„å‰ç½®ã€åˆå­¸é»žæ•¸ã€SP èˆ‡æœ€é«˜ç­‰ç´šå‡ä¾å®šæ¡ˆåŒæ­¥åˆ°è³‡æ–™ã€
-   é è¦½èˆ‡å¯¦éš›çµç®—ï¼›æ°£å®šç¥žé–’çš„å‘½ä¸­å¢žç›Šä¹ŸçœŸæ­£é€²å…¥çŽ©å®¶å‘½ä¸­å±¬æ€§è¨ˆç®—ã€‚
-5. æ·±æ·µç¬¬äº”é—œæœ€çµ‚æˆ°å›ºå®šç‚ºå‰æŽ’æ±å¸ï¼å¤©å¸ï¼æ¥µå¸ï¼åŒ—å¸ï¼å—å¸ï¼Œå¾ŒæŽ’æ°´ï¼åœŸï¼ç«ï¼
-   é¢¨ï¼æ°´å¤©å…µå¤©å°‡ã€‚äº”å¸èˆ‡äº”åç²¾è‹±å‡åªæ”œå¸¶æŒ‡å®šæŠ€èƒ½ä¸”å¼·åˆ¶æœ€é«˜ç´šã€‚æ¥µå¸ã€Œå…ƒç›¸å…‰æ˜Žã€
-   å…¨é«”å›žå¾© 450 HPï¼95 SPã€æ¸…é™¤è² é¢ä¸¦åŠ æ•æ· 75% å…©å›žåˆï¼Œã€Œå…ƒå…‰è­·é«”ã€å…¨é«”è­·ç›¾
-   200 å…©å›žåˆï¼›åŒ—å¸å¾©æ´»ï¼æ²»ç™‚ã€å¤©å¸æ°£å®šç¥žé–’åŠé¢¨ç³»ç²¾è‹±é–ƒèº²çš†æœ‰å°æ‡‰æ€ªç‰©ç«¯å¯¦éš› AIï¼Œ
-   åŽŸæœ¬é¡å¤–çš„å…ƒç¥–è³œç¦ä¸å†æ–¼æœ€çµ‚æˆ°æ–½æ”¾ã€‚
-6. loader åœ¨ V143 å¾Œè¼‰å…¥ `js/40` èˆ‡ `css/41`ï¼›`V_ASSET_VERSION`ã€`index.html`
-   loader èˆ‡ V137ï½žV143 é©—æ”¶å¿«å–éµå…¨éƒ¨å‡ç‚º 144ã€‚æ–°å¢ž
-   `tests/v144-rules-and-abyss.test.js` å…± 11 é …ï¼Œå‹•æ…‹é©—è­‰å•†åº—ã€æŠ€èƒ½æŠ½å–ç©©å®šï¼é‡æŠ½ã€
-   æ·±æ·µæŽ’é™¤ã€æŠ€èƒ½ç­‰ç´šã€ç¡¬æŽ§è·³éŽã€è½‰å ´ã€äº”æ‹›è³‡æ–™èˆ‡çµç®—ã€æœ€çµ‚ç«™ä½åŠå¸å°Š AIã€‚
-
-**é©—è­‰**ï¼š`node --check`ã€`git diff --check` èˆ‡ V137ï½žV144 å…¨å¥—æ¸¬è©¦é€šéŽï¼šV137 9/9ã€
-V138 10/10ã€V139 7/7ã€V140 14/14ã€V141 18/18ã€V142 14/14ã€V143 12/12ã€
-V144 11/11ï¼Œå…± 95 é …ã€‚åŸ·è¡Œç’°å¢ƒæ²’æœ‰ Chromiumï¼Œé›²ç«¯ç€è¦½å™¨ä¹Ÿç¦æ­¢é€£å…¥æœ¬æ©Ÿé è¦½ï¼Œ
-æ‰€ä»¥å°šæœªå®ŒæˆçœŸå¯¦æ‰‹æ©Ÿè¦–è¦ºï¼é»žæ“Šé©—æ”¶ã€‚2026-08-28 ç¶“ä½¿ç”¨è€…æ˜Žç¢ºåŒæ„ç™¼å¸ƒå¾Œï¼Œå·²å°‡
-`dev` å¿«é€²åˆä½µè‡³ `main`ï¼›GitHub Pages çš„ buildï¼deployï¼report ä¸‰å€‹å·¥ä½œå…¨éƒ¨æˆåŠŸï¼Œ
-æ­£å¼ç¶²å€å›žå‚³ HTTP 200ï¼Œä¸”ç·šä¸Š `index.html` èˆ‡ loader å‡ç¢ºèªè¼‰å…¥å¿«å–ç‰ˆæœ¬ 144ã€
-`js/40-v144-rules-and-abyss.js` åŠ `css/41-v144-rules-and-abyss.css`ã€‚å¾ŒçºŒä»æ‡‰ä»¥æ‰‹æ©Ÿ
-å¯¦æ©Ÿæª¢æŸ¥åæ•µå¡ç‰Œã€å•†åº—ã€ç¡¬æŽ§è·³éŽèˆ‡æ·±æ·µç¬¬äº”é—œå®Œæ•´æµç¨‹ã€‚
-
-### 2026-08-28 â€” V143ï¼šå¡ç‰Œå¯è®€æ€§ã€é€æ‹›æˆ°å ´å‹•ç•«ã€å‰¯æœ¬ï¼åˆæˆèˆ‡æˆ°é¬¥è¦å‰‡ä¿®æ­£
-
-1. æ–°å¢ž `js/38-v143-system-fixes.js`ï¼Œä¸€æ¬¡æ”¶æ–‚æœ¬è¼ªè¦å‰‡èˆ‡æµç¨‹ä¿®æ­£ï¼š
-   - é¢¨èµ·é›²æ¹§ã€å†°éœœç®­é›¨ã€å†°å°çš„æŠ€èƒ½é»žã€å‰ç½®ã€SPã€å‚·å®³ã€ç­‰ç´šæˆé•·ã€æšˆçœ©ï¼
-     å†°å°èˆ‡å¸è¡€è³‡æ–™å·²ä¾å®šæ¡ˆé‡è¨­ï¼›å†°éœœç®­é›¨åªå°å…¨é«”å‚·å®³å¾ŒæŠ½ä¸€å€‹ç›®æ¨™åˆ¤å®šå†°å°ã€‚
-   - ç¡¬æŽ§æœ€çµ‚å‘½ä¸­ä¸Šé™æ”¹ç‚ºæ™®é€š 80%ã€ç²¾è‹± 45%ã€BOSS 30%ã€‚
-   - é›™æ–¹çµç•Œçµ±ä¸€ç‚ºäº”æ¬¡ç›´æŽ¥å‚·å®³å®Œå…¨é˜»æ“‹ï¼ŒDOT ç©¿é€ä¸”ä¸æ¶ˆè€—æ¬¡æ•¸ï¼›æ€ªç‰©ç«¯ä¸å†
-     ä»¥å‡æ€§ 999999 è­·ç›¾å€¼å‘ˆç¾ã€‚è¬è±¡åœŸç›¾å¦æœ‰å°ˆå±¬ã€Œè±¡ã€å­—èˆ‡ç´…é»ƒç¶ è—å››è§’å‘¼å¸å…‰ã€‚
-   - ç‰©å“å¯ç”±ä»»ä¸€å‡ºæ‰‹è§’è‰²æŒ‡å®šä»»ä¸€æœ‰æ•ˆæˆ‘æ–¹è§’è‰²ï¼›é¸æ“‡ä¸­çš„æˆ‘æ–¹å¡ç‰Œä½¿ç”¨èˆ‡æ€ªç‰©
-     ç›®æ¨™ç›¸åŒçš„é–ƒçˆæº–æ˜Ÿï¼Œåº«å­˜é ç•™ï¼å–æ¶ˆï¼å¥—ç”¨åŠè—¥æ°´ç‰¹æ•ˆéƒ½è·Ÿè‘—å¯¦éš›æŽ¥å—è€…ã€‚
-   - å‰¯æœ¬è„«é€ƒç›´æŽ¥æ¸…ç†è¨ˆæ™‚å™¨ã€å‹•ç•«èˆ‡ run ç‹€æ…‹ä¸¦é‚„åŽŸåŽŸåœ°åœ–ï¼Œé¿å…é é¢åˆ‡æ›å¾Œé»‘å±ï¼›
-     æ·±æ·µæ”¹ç”¨å®Œæ•´ç•«é¢ç§»å‹•ç¯„åœï¼ŒBOSS å°è©±ç½®ä¸­æ”¾å¤§ä¸”æ¯æ¬¡é»žæ“Šæ‰é€²ä¸‹ä¸€å¥ã€‚
-   - å‰¯æœ¬é ‚éƒ¨è¿”å›žéµç§»é™¤ï¼Œåº•éƒ¨å›ºå®šç‚ºè§’è‰²ï¼èƒŒåŒ…ï¼å•†åº—ï¼å…ƒç´ åŒ£ï¼è¿”å›žäº”é …ï¼›å°Žèˆª
-     æ¬å›žç¸®æ”¾å®¹å™¨å…§ï¼Œé¿å…å‰¯æœ¬é è®Šå½¢ã€‚
-   - åˆæˆæ”¹æˆ icon å„ªå…ˆçš„é¸æ“‡èˆ‡é è¦½ï¼›è£å‚™åˆæˆéš¨æ©Ÿç”¢ç”Ÿæ™®é€šéƒ¨ä½ï¼éšŽç´šè£å‚™ï¼Œ
-     ä¸å†ç”Ÿæˆæˆ–é¸æ“‡å››å¤§å¥—è£ï¼Œåˆæˆçµæžœä¸å¸¶ `setId`ã€‚
-2. æ–°å¢ž `js/39-v143-skill-animation.js`ï¼Œè¦†å¯« V142 çš„ä¸­å¤®å¤§åž‹é€šç”¨æ¼”å‡ºã€‚æ‰€æœ‰ç¾æœ‰
-   æˆ°é¬¥æŠ€èƒ½ä¾æŠ€èƒ½ ID å»ºç«‹å„è‡ªçš„ choreographyï¼ˆå…ƒç´ ã€æ”»æ“Šæ–¹å¼ã€glyphã€è»Œè·¡ã€
-   å‘½ä¸­ç‰¹æ•ˆã€è„ˆè¡èˆ‡å±•é–‹æ–¹å¼ï¼‰ï¼›æœªçŸ¥å¾ŒçºŒæŠ€èƒ½ä¹Ÿä»¥ IDï¼åç¨±ç©©å®šç”Ÿæˆä¸å…±ç”¨çš„çµ„åˆã€‚
-   æ¼”å‡ºä¾æ–½è¡“è€…å¡ç‰Œåº§æ¨™é£›å‘å„ç›®æ¨™ï¼ŒæŠ€èƒ½ååªåœ¨æ–½è¡“è€…ä¸Šæ–¹ä»¥å°å­—é¡¯ç¤º 0.4ï½ž0.7 ç§’ï¼Œ
-   å‚·å®³ã€MISSã€æ­»äº¡èˆ‡ç‹€æ…‹ç‰¹æ•ˆåœ¨å„è‡ª hit frame æ‰é¡¯ç¤ºã€‚æ™®é€šæ”»æ“Šä»ç‚ºç´„ 520msï¼Œ
-   å¤§åž‹æŠ€èƒ½å‰‡ç”± Promise action gate ç­‰å®Œæ•´å‹•ç•«çµæŸå¾Œæ‰äº¤æ£’ï¼›æ¯æ¬¡çµæŸç«‹å³ç§»é™¤
-   DOMã€timerã€class èˆ‡ Canvas ç²’å­ï¼Œä¸¦ä¾è£ç½®èƒ½åŠ›é™åˆ¶ç¸½ç²’å­é‡ã€‚
-3. æ–°å¢ž `css/40-v143-combat-dungeon-polish.css`ï¼šæ•µæ–¹åç¨±ï¼‹ç­‰ç´šåˆä½µæˆåŒåˆ— 16px
-   ç²—é«”ç½®ä¸­ï¼ŒJS åƒ…åœ¨å¯¦éš›è¶…å¯¬æ™‚é€æ­¥ç¸®åˆ°æœ€å° 12pxï¼›HPï¼SP ç‚º 12px ç²—é«”ä¸”ç½®ä¸­æ–¼
-   æ—¢æœ‰è¡€æ¢ï¼Œå¡ç‰Œå¯¬é«˜èˆ‡å…©æŽ’é–“è·ä¸å¢žåŠ ã€‚CSS åŒæ™‚åŒ…å«æˆ°å ´è»Œè·¡ï¼è¡æ“Šã€æˆ‘æ–¹æº–æ˜Ÿã€
-   åœŸç›¾å››è‰²è§’å…‰ã€æ·±æ·µå°è©±ã€å‰¯æœ¬äº”éµå°Žèˆªèˆ‡åˆæˆ icon ç‰ˆé¢ã€‚
-4. loader åš´æ ¼åœ¨ V142 å¾Œä¾åºè¼‰å…¥ `js/38`ã€`js/39`ï¼Œä¸¦åŠ å…¥ `css/40`ï¼›
-   `V_ASSET_VERSION`ã€`index.html` æœ€å¤–å±¤ loader åŠæ‰€æœ‰é©—æ”¶ä¸­çš„å¿«å–éµå‡å‡ç‚º 143ã€‚
-5. æ–°å¢ž `tests/v143-combat-dungeon-polish.test.js`ï¼Œä¸¦æ›´æ–° V137ï½žV142 å° loaderã€
-   ç‰ˆæœ¬èˆ‡æ–°å®šæ¡ˆçš„é æœŸã€‚æ­¤æ¬¡ä¾ä½¿ç”¨è€…æ—¢å®šå·¥ä½œæµç¨‹åªæäº¤è‡³ `dev`ï¼Œä¸åˆä½µ `main`ã€‚
-
-**é©—è­‰**ï¼š`node --check js/38-v143-system-fixes.js js/39-v143-skill-animation.js`
-èˆ‡ `git diff --check` é€šéŽï¼›V137 9/9ã€V138 10/10ã€V139 7/7ã€V140 14/14ã€
-V141 18/18ã€V142 14/14ã€V143 12/12ï¼Œå…± 84 é …è‡ªå‹•å›žæ­¸å…¨éƒ¨é€šéŽã€‚å°ˆå±¬æ¸¬è©¦å¦ä»¥
-å‹•æ…‹ VM é©—è­‰æŠ€èƒ½è³‡æ–™ã€å†°éœœç®­é›¨å–®ä¸€å†°å°æŠ½é¸èˆ‡æ€ªç‰©çµç•Œé€æ“Šæ¶ˆè€—ã€‚å¯é¸çš„æœ¬æ©Ÿ
-Playwright smoke å› ç¼ºå°‘ Chromium ç•¥éŽï¼›é›²ç«¯ç€è¦½å™¨åˆç¦æ­¢é€£å…¥ `127.0.0.1`ï¼Œå› æ­¤
-é€™ä¸€ç‰ˆå°šæœªåšçœŸå¯¦æ‰‹æ©Ÿï¼ç€è¦½å™¨é»žæ“Šèˆ‡è¦–è¦ºé©—æ”¶ï¼Œåˆä½µ `main` å‰æ‡‰åœ¨ `dev` å¯¦æ©Ÿç¢ºèªã€‚
-
-### 2026-08-27 â€” V142ï¼šå…±ç”¨æŠ€èƒ½å‹•ç•«æŽ§åˆ¶å™¨ã€è¡Œå‹•å®Œæˆé–˜é–€èˆ‡æ¥µå¸å¤©å°Šä¸‰æŠ€èƒ½
-
-1. æ–°å¢ž `js/37-v142-skill-animation.js`ï¼Œç‚ºæ¯å€‹æŠ€èƒ½é›†ä¸­æä¾›
-   `animationDuration`ã€`resolveDuration`ã€æ¼”å‡ºåˆ†ç´šèˆ‡æ•ˆæžœé¢¨æ ¼ã€‚æ™®é€šæ”»æ“Šç‚º
-   520msï¼›åˆéšŽç´„ 720ï½ž980msã€ä¸­åž‹ç´„ 1.05ï½ž1.7 ç§’ã€é«˜éšŽç´„ 1.85ï½ž2.5 ç§’ï¼Œ
-   éœ¸é¾è£‚å¤©æ–¬ï¼ç«é³³å¤©é³´ç­‰çµ‚æ¥µæŠ€èƒ½ç‚º 2.65ï½ž3.2 ç§’ã€‚æ²’æœ‰ä¿®æ”¹ä»»ä½•æŠ€èƒ½å‚·å®³ã€
-   SPã€å‘½ä¸­ã€Buffï¼Debuff æˆ–è‡ªå‹•æˆ°é¬¥é¸æ‹›ã€‚
-2. çŽ©å®¶èˆ‡æ€ªç‰©çš„æŠ€èƒ½åç¨±å…¥å£å…±ç”¨åŒä¸€å€‹å‹•ç•« directorï¼›è¦–è¦ºç”± CSS å‹•ç•«ã€
-   SVG åŠæ°£ï¼èƒ½é‡ç’°èˆ‡ä¸€å¼µé‡ç”¨ Canvas çš„è‡ªé©æ‡‰ç²’å­çµ„æˆã€‚ç«é¾ã€ç«é³³ã€
-   å†°æ™¶ã€æ°´æµªã€æš´é¢¨ã€é›·å…‰ã€å·¨çŸ³ã€åœ°è£‚ã€è­·ç›¾ã€æ²»ç™‚ï¼å¾©æ´»åŠå…‰ç³»æ”¯æ´å‡
-   ä»¥åŒä¸€å¥— renderer ç‹€æ…‹çµ„åˆï¼Œä¸å†æ¯æ‹›å„å¯«ä¸€å¥—æŽ¨é€²è¨ˆæ™‚å™¨ã€‚
-3. V138 æ—¢æœ‰æˆ°é¬¥ç¯€å¥å®Œæ•´ä¿ç•™ï¼šä¸€èˆ¬çµç®—ä»ä»¥ 1.6 ç§’ç‚ºåŸºæº–ã€æ›å›žåˆä»ç‚º
-   0.4ï¼‹1.6 ç§’ã€‚V142 åªåœ¨å‹•ç•«æ¯”æ—¢æœ‰æŽ’ç¨‹æ›´é•·æ™‚ç­‰å¾… animation Promiseï¼›
-   çŸ­å‹•ç•«ä¸é¡å¤–åŠ æ™‚ï¼Œå¤§æ‹›å‰‡åœ¨å¯¦éš› `animationend`ï¼Promise resolve å¾Œæ‰
-   é€²å…¥ä¸‹ä¸€å€‹ initiativeã€‚
-4. æ¯æ¬¡ `finishPlayerAction` åªç°½ç™¼ä¸€å¼µå« battle tokenã€phase èˆ‡ index çš„
-   è¡Œå‹•ç¥¨ï¼›`beginCharacterTurn`ï¼`processNextCombatant` åªèƒ½æ¶ˆè€—ä¸€æ¬¡ã€‚
-   animationendã€fallback timerã€èƒŒæ™¯æ¢å¾©é‡è¤‡è§¸ç™¼æ™‚ï¼Œgate çš„ once guard
-   èˆ‡æ—¢æœ‰ processed-index é˜²è­·å…±åŒé˜»æ­¢é‡è¤‡æ”»æ“Šã€è·³äººæˆ–é€£è·³å…©å›žåˆã€‚
-5. æ•ˆèƒ½æŽ¡ä¸€å€‹æŒä¹…èˆžå°ï¼‹ä¸€å¼µæŒä¹… Canvasï¼šæ¯æ‹›çµæŸæœƒå–æ¶ˆ RAFã€æ¸… timerã€
-   æ¸…ç²’å­ã€ç§»é™¤å¡ç‰Œ class èˆ‡ visibility listenerã€‚ä¾ `deviceMemory`ã€
-   `hardwareConcurrency` åŠ reduced-motion é™ä½Žç²’å­ã€é™°å½±å“è³ªï¼Œä½†ä¸å–æ¶ˆ
-   æŠ€èƒ½ä¸»å‹•ç•«ï¼›å¦ä¿ç•™ renderer è¨»å†Šä»‹é¢ä¾›æœªä¾†å°‘æ•¸å¤§æ‹›æŽ¥ WebGLï¼Shaderã€‚
-6. æ¥µå¸å¤©å°ŠæŠ€èƒ½æ›´æ–°ï¼šå…ƒç›¸å…‰æ˜Žç‚ºå­˜æ´»æˆ‘æ–¹å…¨é«”å›žå¾© 350 HPï¼95 SPï¼›
-   å…ƒå…‰è­·é«”ç‚ºå…¨é«” 200 è­·ç›¾ã€2 å›žåˆï¼›æ–°å¢žå…ƒç¥–è³œç¦ï¼Œæ¸…é™¤å…¨é«”
-   `statusEffects` ä¸¦ä½¿æ•æ·æé«˜ 75%ã€æŒçºŒ 2 å›žåˆï¼ŒçµæŸå¾Œæ¢å¾©åŽŸæ•æ·ã€‚
-   æ”¯æ´ AI æœƒä¾è² é¢ç‹€æ…‹ã€HPï¼SP ç¼ºå£ã€è­·ç›¾åŠè³œç¦ç‹€æ…‹é¸æ‹›ï¼›è¢«å†°å°ï¼çŸ³åŒ–
-   æ™‚ä»æ²¿ç”¨æ—¢æœ‰ä¸èƒ½è¡Œå‹•è¦å‰‡ã€‚
-7. æ–°å¢ž `css/39-v142-skill-animation.css` èˆ‡
-   `tests/v142-skill-animation.test.js`ï¼›loader åš´æ ¼æŽ¥åœ¨ `js/36` å¾Œï¼Œ
-   `V_ASSET_VERSION` èˆ‡æœ€å¤–å±¤ loader URL åŒæ­¥å‡ç‚º 142ã€‚
-
-**é©—è­‰**ï¼šå…¨éƒ¨ JavaScript é€šéŽ `node --check`ï¼Œ`git diff --check` é€šéŽã€‚
-V137 9/9ã€V138 10/10ã€V139 7/7ã€V140 14/14ã€V141 18/18ã€V142 14/14ï¼Œ
-å…± 72 é …è‡ªå‹•å›žæ­¸å…¨éƒ¨é€šéŽã€‚V142 å°ˆå±¬æ¸¬è©¦æ¶µè“‹æ™®é€šï¼å°ï¼å¤§æŠ€èƒ½æ™‚é–“ã€
-æ—¢æœ‰ 1.6 ç§’ç¯€å¥ã€è‡ªå‹•æˆ°é¬¥å®£å‘ŠéšŽæ®µã€é•·å‹•ç•«é˜»æ“‹ initiativeã€é‡è¤‡å®Œæˆã€
-åˆ‡èƒŒæ™¯æ¢å¾©ã€200 æ¬¡é•·æˆ°é¬¥æ¸…ç†ï¼Œä»¥åŠæ¥µå¸å¤©å°Šä¸‰æ‹›ã€‚ç’°å¢ƒæ²’æœ‰ Chromiumï¼Œ
-æ‰€ä»¥ `tests/v138-browser-smoke.js` æ˜Žç¢ºç•¥éŽã€‚GitHub Pages ç¬¬ 46 æ¬¡éƒ¨ç½²å·²æ–¼
-2026-08-27 æˆåŠŸï¼Œæ­£å¼ `main` æäº¤ç‚º `de2e5f2a5096848f376f5be84818c0002ddf76a5`ï¼›
-ç·šä¸Š `?audit=142` å·²ç¢ºèªå¤–å±¤ loaderã€V131ï½žV142 å…± 12 å€‹ä¾åºè¼‰å…¥çš„ç‰ˆæœ¬è£œä¸ã€
-`js/37-v142-skill-animation.js?v=142` èˆ‡
-`css/39-v142-skill-animation.css?v=142` å…¨éƒ¨è¼‰å…¥ï¼Œæ²’æœ‰ä»»ä½• runtime æ¨™è¨˜å¤±æ•—ã€‚
-ç·šä¸Šé é¢æ²’æœ‰æ–°å¢žéŠæˆ²ä¾†æºçš„ console errorï¼warningï¼›æª¢æŸ¥ç’°å¢ƒé¡¯ç¤ºçš„å…©ç­† error
-ä¾†è‡ª Chrome æ“´å……å¥—ä»¶ï¼Œä¸å±¬æ–¼éŠæˆ²ç¨‹å¼ã€‚
-
-### 2026-08-27 â€” V141ï¼š36 é …éŠæˆ²ç³»çµ±ã€æˆ°é¬¥è¡¨ç¾ã€æ·±æ·µèˆ‡åˆæˆæ•´åˆ
-
-**è¼‰å…¥èˆ‡æª”æ¡ˆï¼š**
-
-- æ–°å¢ž `js/34-v141-core-systems.js`ï¼šrankã€é‡Žæ€ªã€æŠ€èƒ½ã€æŽ‰è½ã€è­·ç›¾ã€éŸ³æ•ˆã€é›¢ç·š EXPã€
-  æˆå°±ï¼ä»»å‹™è³‡æ–™èˆ‡è£å‚™å†¶ç…‰èƒ½åŠ›æ©‹æŽ¥ã€‚
-- æ–°å¢ž `js/35-v141-ui-battle.js`ï¼šèƒŒåŒ…ã€æˆ°é¬¥å¡ç‰Œèˆ‡ç‰¹æ•ˆã€é€²é€€å ´ã€çŽå‹µæç¤ºã€å·¡æ€ªç§»å‹•ã€
-  ä»»å‹™è¿½è¹¤ã€ç´…é»žã€æ—¥å¸¸å‰¯æœ¬å°é¢ï¼å°Žèˆªèˆ‡å„é¡žç·Šæ¹Šä»‹é¢ã€‚
-- æ–°å¢ž `js/36-v141-content-systems.js`ï¼šå®Œæ•´åˆæˆå››åˆ†é èˆ‡æ·±æ·µäº”å±¤åœ°åœ–æµç¨‹ã€‚
-- æ–°å¢ž `css/38-v141-system-expansion.css`ï¼›ç”± `js/20-anonymous-20.js` ä¾åºè¼‰å…¥ï¼Œ
-  `index.html`ã€loader èˆ‡å…¨éƒ¨å‹•æ…‹è³‡æºå¿«å–éµå·²å‡è‡³ `?v=141`ã€‚
-
-**èƒŒåŒ…ã€UI èˆ‡å·¡æ€ªï¼š**
-
-- èƒŒåŒ…å®¹é‡æ”¹ 120 æ ¼ï¼Œæ¯é å›ºå®š 24 æ ¼ã€å…± 5 é ï¼›éš±è—æ ¼æ•¸å­—ã€ç¦ç”¨æ‹–æ›³ï¼Œè§’è‰²ç®­é ­å¾ªç’°ï¼Œ
-  ç‰©å“é è¦½åœ–ç¤ºç¸®å°ã€æ–‡å­—è‡³å°‘ 15pxï¼Œæ”¾å¤§é¡å…§å®¹æ”¹ç‚ºä¸éœ€å…§æ²å‹•çš„ä¹¾æ·¨æŽ’ç‰ˆã€‚
-- ç¶“é©—æ± ã€å…ƒç´ åŒ£ã€å•†åº—ã€é›¢ç·šç¶“é©—ã€æˆå°±ã€ä»»å‹™ã€åœ–é‘‘ã€ç³»çµ±ã€å…¬å‘Šç­‰ä»‹é¢èª¿æ•´å­—ç´šèˆ‡ç‰ˆé¢ï¼›
-  å…ƒç´ åŒ£åªä¿ç•™å‰©é¤˜æ™‚é–“èˆ‡ã€Œè§€çœ‹å»£å‘Š +8 å°æ™‚ã€ï¼Œæœ€å¤šç´¯ç© 32 å°æ™‚ã€‚
-- å·¡æ€ªè§’è‰²æ”¯æ´é»žåœ°å¹³æ»‘ç§»å‹•ï¼›å·¦å´æ–°å¢žå¯æ”¶åˆã€å¯æ²¿å·¦é‚Šä¸Šä¸‹æ‹–æ›³ä¸”ä¸è¦†è“‹æˆ°é¬¥è³‡è¨Šçš„ä»»å‹™æ¡†ï¼›
-  å…¨é é»žæ“Šå›žé¥‹ã€æœªé ˜ï¼æœªå®Œæˆï¼æœªè®€ç´…é»žå·²åŠ å…¥ã€‚
-- ç”·è§’èˆŠ 56Ã—84 å·¡æ€ªåœ–ä»¥é«˜å“è³ª Canvas æ”¾å¤§åˆ° 140Ã—210ï¼Œæ¸›å°‘åŽŸæœ¬æœ€è¿‘é„°é€ æˆçš„é‹¸é½’ï¼›
-  ä½†åŽŸåœ–ç´°ç¯€ç„¡æ³•æ†‘æ’å€¼çœŸæ­£å¢žåŠ ï¼Œè‹¥è¦åŽŸç”Ÿé«˜ç•«è³ªä»éœ€è£œæ–°ç¾Žè¡“ï¼ˆè¦æ ¼è¦‹ UI æŒ‡å—ï¼‰ã€‚
-
-**æˆ°é¬¥èˆ‡æŠ€èƒ½ï¼š**
-
-- æ€ªç‰©é•·åç¨±ï¼è¡€æ¢ä¸å†è£åˆ‡ï¼›çŽ©å®¶åç¨±ç§»åˆ°å¡ç‰Œå¤–ç·Šè²¼ä¸‹æ–¹ï¼›åœŸå…ƒç´ è¡Œå‹•æ¡†æé«˜äº®åº¦èˆ‡é–ƒçˆã€‚
-- æ€ªç‰©è­·ç›¾æŠ€èƒ½ç¾åœ¨å…·å‚™å¯å¸æ”¶å‚·å®³çš„ç™½è‰²è­·ç›¾é‡æ¢ï¼Œä¸å†åªæ˜¯æ–‡å­—ï¼buffï¼›è­·ç›¾åˆ°æœŸæœƒæ­£ç¢ºç§»é™¤ã€‚
-- å¡ç‰Œå…§æ–°å¢žç‡ƒç‡’ã€æšˆçœ©ã€å†°å°ã€çŸ³åŒ–ã€è­·ç›¾ã€çµç•Œã€é™é˜²ã€é™æ•ã€è£œè¡€ã€å¾©æ´»ã€è£œå“ã€ç¬¦å’’ç­‰
-  CSSï¼‹Canvas ç‰¹æ•ˆï¼›ç¨‹å¼åŒ– Web Audio ä¾æŠ€èƒ½æ•ˆæžœçµ„åˆæ®ç ã€å‘½ä¸­ã€æš´æ“Šã€å…ƒç´ èˆ‡å¢žæ¸›ç›ŠéŸ³è‰²ã€‚
-- æ‰€æœ‰æˆ‘æ–¹è§’è‰²éƒ½èƒ½æ‰‹å‹•æ–½æ”¾æ²»ç™‚ã€å¾©æ´»èˆ‡ buffï¼Œä¸å†è¢«ã€Œåƒ…æ”¯æ´æ”»æ“ŠæŠ€èƒ½ã€æ“‹ä½ã€‚
-- æˆ°é¬¥é–‹å§‹å…ˆ 1 ç§’é®ç½©è½‰å ´ï¼Œå†ç”±çŽ©å®¶ä¸‹æ–¹ï¼æ€ªç‰©ä¸Šæ–¹é€²å ´ï¼›çµæŸæ™‚å‹æ–¹é€£åŒå·²æ­»äº¡å¡ç‰Œé€€å ´ï¼Œ
-  æˆ°æ•—æ–¹ç•™å ´ï¼Œé€€å ´å¾Œæ‰å›žåœ°åœ–ä¸¦ä»¥é»‘é‡‘æç¤ºé¡¯ç¤º EXPã€é‡‘å¹£ã€ç‰©å“ã€‚é»ƒè‰² EXP å€çŽ‡æç¤ºå·²ç§»é™¤ã€‚
-
-**æ€ªç‰©ã€å‰¯æœ¬ã€æ•¸å€¼èˆ‡çŽå‹µï¼š**
-
-- ä¸€èˆ¬åœ°åœ–æ€ªç‰©æ”¹æ˜Žç¢º `rank`ï¼›æ¯æ¬¡ç”Ÿæˆç¨ç«‹ 10% ç²¾è‹±ã€90% ä¸€èˆ¬ï¼Œçµ•ä¸éš¨æ©Ÿ BOSSï¼›
-  æ—¥å¸¸å‰¯æœ¬èˆ‡æ·±æ·µé…ç½®éš”é›¢ã€‚ç²¾è‹±ä½¿ç”¨å–®æ¬¡éª°çš„ 19% ç‰¹æ®Šæ± ï¼Œä¸€æ¬¡æœ€å¤šä¸€é …ä¸”ä¸å†æŽ‰ä¸€èˆ¬ä½ŽéšŽæ± ã€‚
-- æ€ªç‰©æŠ€èƒ½æ•¸é‡ä¸Šé™ä¾ç­‰ç´šç‚º 1ï¼2ï¼3ï¼ŒæŠ€èƒ½ç­‰ç´šä¾ Lv.1ï½ž20 è‡³ Lv.81+ å›ºå®šç‚º Lv.1ï½ž5ï¼›
-  æ·±æ·µå®Œå…¨æŽ’é™¤ã€‚æ—¢æœ‰æ–½æ”¾çŽ‡ã€SP èˆ‡ä¸è¶³æ™‚æ™®æ”»æµç¨‹ä¿ç•™ã€‚
-- ä¸€èˆ¬å€æ¯å€è£œé¢¨ï¼åœŸæ€ªï¼›æ—¥å¸¸å‰¯æœ¬å…ƒç´ å¹³å‡éŒ¯é–‹ï¼ŒBOSS å„ªå…ˆä¸åŒï¼›è£å‚™å‰¯æœ¬å¤š 5 ç²¾è‹±ã€
-  ç¶“é©—å‰¯æœ¬ç¬¬ä¸‰å ´ç‚º 10 ç²¾è‹±ã€‚æ—¥å¸¸æ¬¡æ•¸é™åˆ¶é‡æ–°å•Ÿç”¨ã€‚
-- é›¢ç·š EXP ä»¥å¸³è™Ÿæœ€é«˜è§’è‰²å¥—ç”¨ Lv.1ï½ž10 Ã—1.0 è‡³ Lv.51+ Ã—2.0ï¼Œæ™‚é–“ä¸Šé™èˆ‡å…±ç”¨ç¶“é©—æ± ä¸è®Šã€‚
-- EXP æ›²ç·šä»ç‚º V139 åæŽ¨æ›²ç·šï¼šç¸½è¨ˆç´„ 69,760 å ´ï¼›å…ƒç´ åŒ£ 70%ã€æ¯åˆ†é˜ 5 å ´ã€æ¯æ—¥ 8 å°æ™‚ï¼Œ
-  Lv.1â†’100 ç´„ 41.52 å¤©ã€‚ä¼‘æ¯ç¶“é©—ç¶­æŒæœ€å¤š 300 å ´ï¼Œä¸”å…ƒç´ åŒ£ä¸æ¶ˆè€—ã€‚
-
-**æ—¥å¸¸å‰¯æœ¬ã€æ·±æ·µèˆ‡åˆæˆï¼š**
-
-- ä¸‰å€‹æ—¥å¸¸å‰¯æœ¬åŠ å…¥ 16:9 å°é¢æž¶æ§‹ã€çŽå‹µé è¦½ï¼æŒ‘æˆ°ï¼å‰©é¤˜æ¬¡æ•¸èˆ‡å·¡æ€ªåŒæ¬¾åº•éƒ¨å°Žèˆªï¼›
-  ç¾Žè¡“è«‹ä¸Šå‚³ 1280Ã—720 WebP è‡³ `assets/dungeons/covers/exp.webp`ã€`material.webp`ã€
-  `equipment.webp`ï¼Œæœªè£œåœ–å‰ä»¥é»‘é‡‘æ¼¸å±¤æ­£å¸¸é¡¯ç¤ºã€‚
-- æ·±æ·µå…±äº”å±¤ï¼šé»žåœ°ç§»å‹•ã€BOSS é»žæ“Šå¾Œéš¨æ©Ÿ 1ï½ž3 å¥å°è©žã€å®Œæ•´æŒ‡å®šæŠ€èƒ½ï¼å…ƒç´ ï¼é¡å¤– HPï¼Œ
-  å‰å››å±¤å‹åˆ©å¾Œå‡ºç¾å‚³é€é»žï¼Œç¬¬äº”å±¤æ¥µå¸å¤©å°Šå›ºå®šå‰æŽ’ä¸­å¤®ä¸¦å„ªå…ˆæ²»ç™‚ï¼è­·ç›¾ï¼›å‹åˆ©å¾Œå¿…é ˆèµ°åˆ°
-  æ·±æ·µå¯¶ç®±ä¸¦é»žæ“Šï¼Œæ‰æ­£å¼é ˜å–çŽå‹µã€‚
-- åˆæˆé å«è£å‚™åˆæˆã€è£å‚™å†¶ç…‰ã€ç¬¦å’’åˆæˆã€ç¢Žç‰‡åˆæˆå››é ï¼›ææ–™ï¼é‡‘å¹£ã€éšŽç´šé™åˆ¶ã€è©žæ¢ç¯„åœã€
-  å–®å³° 10%ã€é›™å³° 5%ã€å†¶ç…‰æ–°èˆŠçµæžœé¸æ“‡èˆ‡ä¸å¯ç´¯ç©ã€æ‰¹é‡åˆæˆåŠç³»åˆ—åˆ†è§£å‡å·²è½å¯¦ã€‚
-  åœ–ç´™è³‡æ–™è£œé½Š 5 éƒ¨ä½Ã—4 éšŽÃ—4 ç³»åˆ—å…± 80 ç¨®ï¼›èˆŠå­˜æª”ç„¡ç³»åˆ—åœ–ç´™ä»å¯é¸æ“‡ç³»åˆ—å¾Œä½¿ç”¨ã€‚
-
-**é©—è­‰ï¼š**
-
-- `node --check` å·²é€šéŽæ‰€æœ‰ V141 æ–°å¢žï¼ä¿®æ”¹ JSã€‚
-- `tests/v137-regressions.test.js` 9 é …ã€`v138` 10 é …ã€`v139` 7 é …ã€`v140` 14 é …ã€
-  æ–°å¢ž `tests/v141-system-expansion.test.js` 18 é …ï¼Œå…± 58 é …å…¨éƒ¨é€šéŽã€‚
-- `git diff --check` é€šéŽã€‚æ­£å¼ GitHub Pages å·²å®Œæˆéƒ¨ç½²é©—è­‰ï¼š`index.html` æ­£ç¢ºè¼‰å…¥
-  `js/00-main.js?v=141`ã€V141 ä¸‰å€‹ runtime èˆ‡ `css/38-v141-system-expansion.css`ï¼›
-  Console æ²’æœ‰éŠæˆ²ä¾†æºçš„ errorï¼warningï¼ˆåƒ…é›²ç«¯ç€è¦½å™¨æ“´å……å¥—ä»¶è‡ªèº«è¨Šæ¯ï¼‰ã€‚
-
-**å·²çŸ¥é™åˆ¶ï¼š**
-
-- åŽŸç”Ÿ Canvas 2Dï¼CSSï¼Web Audio èƒ½åšå¯è¾¨è­˜ä¸”è¼•é‡çš„ç‰¹æ•ˆèˆ‡éŸ³æ•ˆï¼Œä½†ä¸æ˜¯æ‰‹å·¥ Shaderï¼éŸ³æª”çš„
-  æœ€çµ‚ç¾Žè¡“å“è³ªï¼›æž¶æ§‹å·²é›†ä¸­ï¼Œå¯åœ¨ä¸æ”¹æˆ°é¬¥é‚è¼¯ä¸‹é€æ­¥æ›¿æ›ç´ æã€‚
-- ç”·è§’ Q ç‰ˆåŽŸå§‹åœ–åªæœ‰ 56Ã—84ï¼Œç¾åœ¨åªèƒ½é«˜å“è³ªæ’å€¼ï¼›çœŸæ­£æ”¹å–„ç´°ç¯€å¿…é ˆæ›åŽŸç”Ÿ 140Ã—210 ä»¥ä¸Šç´ æã€‚
-
-### 2026-08-27 â€” V140ï¼šå››å…ƒç´ æŠ€èƒ½å¹³è¡¡å®šæ¡ˆ
-
-1. æ–°å¢ž `js/33-v140-four-element-balance.js`ï¼Œä¾ patch æž¶æ§‹æœ€å¾Œè¼‰å…¥ï¼Œæ²’æœ‰
-   ç›´æŽ¥ä¿®æ”¹ `js/00-main.js`ã€‚ç‰©ç†æŠ€èƒ½é™„å¸¶çš„ä¸€èˆ¬ç•°å¸¸ä½¿ç”¨
-   `åŸºç¤Žæ©ŸçŽ‡Ã—ç­‰ç´šå·®å€çŽ‡ï¼‹æœ€çµ‚ç‰©ç†æ”»æ“ŠåŠ›Ã—0.2ï¼ç›®æ¨™ç²¾ç¥žÃ—0.3`ï¼›æ³•è¡“ä»ç‚º
-   `åŸºç¤Žæ©ŸçŽ‡Ã—ç­‰ç´šå·®å€çŽ‡ï¼‹æ™ºåŠ›Ã—0.3ï¼ç›®æ¨™ç²¾ç¥žÃ—0.3`ã€‚ä¸»è§’ã€ç¬¬äºŒï¼ç¬¬ä¸‰
-   è§’è‰²èˆ‡æ€ªç‰©æ–½æ”¾å››å…ƒç´ æŠ€èƒ½æ™‚éƒ½æœƒå»ºç«‹æ­£ç¢ºçš„æ–½æ³•å±¬æ€§ä¸Šä¸‹æ–‡ã€‚
-2. å†°å°ï¼çŸ³åŒ–ç¡¬æŽ§çš„å±¬æ€§åŠ æˆåˆ†åˆ¥ç‚ºç‰©ç† `sqrt(æœ€çµ‚ç‰©æ”»)Ã—0.2`ã€æ³•è¡“
-   `sqrt(æ™ºåŠ›)Ã—0.2`ã€‚æ—¢æœ‰ç­‰ç´šå·®0.5ï½ž1.5ã€ç²¾ç¥žèˆ‡é¡å¤–ç•°å¸¸æŠ—æ€§ã€ä¸€èˆ¬ç•°å¸¸
-   5%ï½ž95%ï¼Œä»¥åŠæ™®é€šï¼ç²¾è‹±ï¼BOSSç¡¬æŽ§5%ï½ž75%ï¼45%ï¼15%å…¨éƒ¨ä¿ç•™ï¼›
-   æ²’æœ‰ä¿®æ”¹å†°å°ã€çŸ³åŒ–æœ¬èº«çš„åŸºç¤Žæ©ŸçŽ‡ã€‚
-3. æ°´åˆ€æ–¬ã€å†°éœœæ‹³ã€å†°æ—‹ä¸€é–ƒã€å†°å°é‡æ“Šã€æ°´çƒè¡“ã€æ´ªæ°´çŒ›ç¸ã€å†°éœœç®­é›¨çš„
-   å¸è¡€æ¯”ä¾‹ä¾å®šæ¡ˆæ›´æ–°ç‚º4ï½ž8%ã€4ï½ž8%ã€3ï½ž7%ã€4ï½ž8%ã€3ï½ž7%ã€4ï½ž8%ã€
-   1ï½ž5%ï¼Œåªæ¢å¾© HPã€‚ä¸»è§’ã€ç¬¬äºŒï¼ç¬¬ä¸‰è§’è‰²èˆ‡æ€ªç‰©åŽŸæœ‰çš„ SP å¸å–çµæžœå‡
-   è¢«é˜»æ­¢ï¼Œæˆ°é¬¥ç´€éŒ„ã€æŠ€èƒ½åˆ—è¡¨ã€æŠ€èƒ½è©³ç´°èˆ‡å‰µè§’æŠ€èƒ½èªªæ˜Žä¹Ÿæ”¹ç‚ºåªå¯« HPã€‚
-   å¸è¡€ä»ç›´æŽ¥ç´¯åŠ æš´æ“Šèˆ‡æ¸›å‚·çµç®—å¾Œçš„å¯¦éš›æœ€çµ‚å‚·å®³ï¼Œæ²’æœ‰å¦å»ºå‚·å®³å…¬å¼ã€‚
-4. åªæœ‰ä¸‰æ‹›ç›´æŽ¥å‚·å®³æ”¹å‹•ï¼šç«ç®­17ï¼‹æ¯ç´š8ï¼ˆ17/25/33/41/49ï¼‰ã€å†°éœœæ‹³
-   30ï¼‹æ¯ç´š8ï¼ˆ30/38/46/54/62ï¼‰ã€çŸ³ç ´å¤©é©š65ï¼‹æ¯ç´š9
-   ï¼ˆ65/74/83/92/101ï¼‰ã€‚ä¸‰æ‹› SP ä»ç‚º8ï¼17ï¼42ï¼Œæ‰€æœ‰æŠ€èƒ½å­¸ç¿’é»žæ•¸ä¸è®Šã€‚
-5. çƒˆç„°é¾æ²æ¯å›žåˆç‡ƒç‡’æ”¹ç‚ºæœ€å¤§HPçš„3/4/5/6/8%ï¼Œç«é³³å¤©é³´æ”¹ç‚º
-   5/7/9/11/13%ï¼›æ©ŸçŽ‡ä»ç‚º30%/50%ã€æŒçºŒ2å›žåˆã€‚æš´é¢¨æ‹³é™æ•æ”¹ç‚º
-   30/40/50/60/70%ï¼Œå…¶é¤˜é¢¨ç³»æ•¸å€¼ä¸è®Šã€‚
-6. æ€’ç«ä¸å†ç”¨åŒä¸€çµ„æ•¸å€¼åŒæ™‚åŠ å…©é …ï¼šçˆ†æ“ŠçŽ‡ç‚º5/10/15/20/25%ï¼Œ
-   çˆ†æ“Šå‚·å®³ç‚º10/20/30/40/50%ã€‚æˆ°é¬¥æ“²éª°ã€èƒŒåŒ…è©³æƒ…ã€æŠ€èƒ½é è¦½èˆ‡
-   å‰µè§’èªªæ˜Žå‡åŒæ­¥ã€‚
-7. æ²»ç™‚è¡“ä¿ç•™HP40/SP15ã€æ¯ç´š+5ã€æ—¢æœ‰æ™ºåŠ›èˆ‡æ°´EXåŠ æˆï¼›çŽ©å®¶
-   æœ€çµ‚æ›´æ­£è¦æ ¼ç‚ºã€Œæ–½æ”¾è€…æœ¬äººä¸å›žSPã€ï¼Œå°è‡ªå·±æ–½æ”¾åªå›žHPä¸”
-   ä»æ­£å¸¸æ”¯ä»˜SP30ã€‚æŠ€èƒ½èªªæ˜Žã€é è¦½èˆ‡ç­‰ç´šæ˜Žç´°å‡ä¿ç•™æ­¤é™åˆ¶æ–‡å­—ã€‚
-8. æŠ€èƒ½çµç•Œçš„SPç”±28æ”¹ç‚º40ï¼Œæœ€å¤š5å›žåˆã€åªæ ¼æ“‹æŽ¥ä¸‹ä¾†5æ¬¡ç›´æŽ¥
-   å‚·å®³ï¼›ç¬¬6æ¬¡æœƒæ­£å¸¸å‘½ä¸­ã€‚ç‡ƒç‡’ç­‰DOTæœƒç©¿é€ä¸”ä¸æ¶ˆè€—æ¬¡æ•¸ã€‚çµç•Œç¬¦
-   ä¹Ÿå…±ç”¨åŒä¸€å¥—æ•ˆæžœï¼›å†°å°ç¬¦ï¼éš±èº«ç¬¦çš„æŒçºŒå›žåˆåŒæ¨£æ”¹ç‚ºç›´æŽ¥è®€å–
-   å°æ‡‰æŠ€èƒ½ï¼Œç¬¦å’’éšŽç´šæœ¬èº«çš„ç”Ÿæ•ˆæ©ŸçŽ‡å‰‡ä¿ç•™ã€‚
-9. `rollHitChance()` ä¿ç•™ `95ï¼‹å‘½ä¸­Ã—0.3ï¼é–ƒé¿Ã—0.3ï¼æ—¢æœ‰æŠ€èƒ½æ‰£å€¼`ï¼ŒåªæŠŠ
-   æœ€çµ‚ä¸‹é™60%æ”¹æˆ50%ï¼Œä¸Šé™ä»99%ã€‚æ²’æœ‰ä¿®æ”¹æ•æ·ã€ç²¾ç¥žã€å…¶ä»–BUFFã€
-   æ€ªç‰©å±¬æ€§æˆ–æˆ°é¬¥å›žåˆã€‚
-10. `js/20-anonymous-20.js` å°‡ `js/33` æŽ¥åœ¨ `js/32` å¾Œï¼Œ
-   `V_ASSET_VERSION` èˆ‡ `index.html` çš„å¤–å±¤ loader URL åŒæ­¥å‡ç‚º140ã€‚
-   èˆŠç‰ˆ V137ï½žV139 æ¸¬è©¦ä¸­çš„å¿«å–ç‰ˆæœ¬èˆ‡ runtime æ•¸é‡æ–·è¨€ä¹ŸåŒæ­¥æ›´æ–°ã€‚
-
-**é©—è­‰**ï¼š`tests/v140-four-element-balance.test.js` 14/14ã€V137 9/9ã€
-V138 10/10ã€V139 7/7 é€šéŽï¼›æ‰€æœ‰ç•°å‹• JavaScript é€šéŽ `node --check`ï¼Œ
-`git diff --check` é€šéŽã€‚å°ˆå±¬æ¸¬è©¦é€é …å°ç…§å®Œæ•´45æ‹›æŠ€èƒ½çš„å­¸ç¿’é»žã€SPã€
-ç¯„åœã€å‰ç½®èˆ‡æ•ˆæžœï¼Œä¸¦æ¶µè“‹ç²¾ç¢ºå‚·å®³ï¼ç‡ƒç‡’åºåˆ—ã€ä¸ƒçµ„å¸è¡€æ¯”ä¾‹ã€ä¸‰ç¨®
-ç¡¬æŽ§ä¸Šé™ã€ä¸»è§’ï¼ç¬¬äºŒï¼ç¬¬ä¸‰è§’è‰²ï¼æ€ªç‰©å¸è¡€åªå›žHPã€æ€’ç«ã€æ²»ç™‚è¡“ä¸å›žè‡ªå·±SPã€
-çµç•Œ5æ¬¡ç›´å‚·ï¼DOTï¼ç¬¦å’’å…±ç”¨ã€ç‰©ç†ï¼æ³•è¡“å±¬æ€§ä¾†æºã€50%ï½ž99%å‘½ä¸­ç¯„åœåŠ
-æœ€çµ‚å‚·å®³å¸è¡€é †åºã€‚æœ¬æ©Ÿ Playwright å†’ç…™è…³æœ¬å› æ²’æœ‰ Chromium è‡ªå‹•ç•¥éŽï¼›
-æ­£å¼ GitHub Pages å·²æ–¼ 2026-08-27 å®Œæˆéƒ¨ç½²é©—è­‰ï¼š`index.html` æ­£ç¢ºè¼‰å…¥
-`js/20-anonymous-20.js?v=140`ï¼ŒV131â†’V140 runtime ä¾åºè¼‰å…¥ä¸” `js/33` æ¨™è¨˜ç‚º
-å®Œæˆï¼Œå‰µè§’é¦–é å¯æ­£å¸¸æ¸²æŸ“ï¼Œconsole æ²’æœ‰æ–°å¢žéŠæˆ²ç¨‹å¼éŒ¯èª¤ã€‚æ²»ç™‚è¡“è‡ªèº«ä¸å›žSPèˆ‡
-ç¬¦å’’å…±ç”¨æŠ€èƒ½æ•ˆæžœå‰‡ç”±ä¸Šè¿° V140 å°ˆå±¬å›žæ­¸æ¸¬è©¦è¦†è“‹ã€‚
-
-### 2026-08-27 â€” V139ï¼šå€åŸŸç”¢å‡ºåæŽ¨ EXP æ›²ç·šã€ä¼‘æ¯ç¶“é©—èˆ‡ç¶“æ¿Ÿè¦æ ¼å®šæ¡ˆ
-
-1. `js/28-v133-economy-rebalance.js` ä¸å†ä½¿ç”¨ `400Ã—Lv^2.5`ï¼Œæ”¹ä»¥
-   ã€Œè©²ç´šç·´åŠŸå€å¯¦éš›å¹³å‡æ¯å ´ EXP Ã— è©²ç´šç›®æ¨™å ´æ•¸ã€è¨ˆç®— `expNext`ã€‚
-   å¹³å‡å€¼ç›´æŽ¥è®€ `zoneConfig` çš„ç›®å‰æ€ªç‰©ç·¨æˆï¼Œå¥—ç”¨æ¯éš»æ€ªç‰©ç­‰ç´šÃ—10ã€
-   æ™®é€šÃ—1ï¼ç²¾è‹±Ã—1.5ï¼BOSSÃ—3ã€ç¾æœ‰ç¸½ EXPÃ—3.5ï¼Œä»¥åŠå‰å…©å€å¹³å‡2éš»ã€
-   å…¶é¤˜å€å¹³å‡4.5éš»çš„çœŸå¯¦é­é‡æ•¸ã€‚åªæœ‰åœ¨è³‡æ–™å°šæœªåˆå§‹åŒ–çš„æ¸¬è©¦ç’°å¢ƒæ‰
-   ä½¿ç”¨åŒä¸€ä»½ main è³‡æ–™é ç®—å‡ºçš„ fallbackã€‚
-2. æ¯ç´šç›®æ¨™å ´æ•¸ä»¥å°‘é‡éŒ¨é»žç·šæ€§æ’å€¼ï¼Œå‰æœŸå¿«ã€ä¸­æœŸæ¼¸æ…¢ã€å¾ŒæœŸæ˜Žé¡¯è®Šæ…¢ï¼›
-   Lv.1â†’100 åˆè¨ˆ **69,760 å ´æœ‰æ•ˆæˆ°é¬¥**ã€‚ä¸»è¦æª¢æŸ¥é»žï¼š
-   - Lv.10ï¼š2,625 EXPï¼Œç´„15å ´ï¼ˆå€åŸŸå¹³å‡175 EXPï¼å ´ï¼‰
-   - Lv.30ï¼š452,800 EXPï¼Œç´„100å ´ï¼ˆå€åŸŸå¹³å‡4,528 EXPï¼å ´ï¼‰
-   - Lv.50ï¼š3,328,400 EXPï¼Œç´„400å ´ï¼ˆå€åŸŸå¹³å‡8,321 EXPï¼å ´ï¼‰
-   - Lv.70ï¼š10,796,400 EXPï¼Œç´„900å ´ï¼ˆå€åŸŸå¹³å‡11,996 EXPï¼å ´ï¼‰
-   - Lv.80ï¼š14,112,000 EXPï¼Œç´„1,200å ´ï¼ˆå€åŸŸå¹³å‡11,760 EXPï¼å ´ï¼‰
-   - Lv.90ï¼š22,669,500 EXPï¼Œç´„1,700å ´ï¼ˆå€åŸŸå¹³å‡13,335 EXPï¼å ´ï¼‰
-   - Lv.99ï¼š59,640,000 EXPï¼Œç´„4,000å ´ï¼ˆå€åŸŸå¹³å‡14,910 EXPï¼å ´ï¼‰
-3. å…ƒç´ åŒ£ç¶­æŒ 70% EXPã€æ¯åˆ†é˜5å ´ã€æ¯å¤©8å°æ™‚ä¸”ä¸è¨ˆå‰¯æœ¬ï¼ä¼‘æ¯åŠ æˆæ™‚ï¼Œ
-   ç´„éœ€99,657å ´å¯¦éš›æŽ›æ©Ÿæˆ°é¬¥ã€**41.52å¤©**å‡åˆ° Lv.100ã€‚
-4. `js/32-v139-rested-experience.js` æ–°å¢žä¼‘æ¯ç¶“é©—ï¼šé›¢ç·šï¼èƒŒæ™¯æ¯2åˆ†é˜
-   ç´¯ç©1å ´ï¼Œæœ€å¤š300å ´ï¼›ä¸€èˆ¬ç·´åŠŸå‹åˆ©æ¶ˆè€—1å ´ä¸¦æŠŠè©²å ´ EXP è®Šæˆ2å€ã€‚
-   å…ƒç´ åŒ£å•Ÿç”¨æœŸé–“ä¸ç´¯ç©ï¼Œå…ƒç´ åŒ£èˆ‡å‰¯æœ¬ä¹Ÿä¸ä½¿ç”¨ã€ä¸æ¶ˆè€—ã€‚ç‹€æ…‹æ”¾åœ¨ç¨ç«‹
-   `v139_rested_exp_state`ï¼Œæ²’æœ‰æ”¹æ—¢æœ‰ä¸»å­˜æª” schemaï¼›åˆªé™¤æ‰€æœ‰è§’è‰²å¾Œ
-   é‡æ–°è¼‰å…¥æœƒè‡ªå‹•æ¸…é™¤é€™å€‹å´é‚Šç‹€æ…‹ã€‚
-5. `js/27-v132-content-expansion.js` æŠŠç¶“é©—å‰¯æœ¬åŸºç¤ŽçŽå‹µæ”¹ç‚ºå…¨éšŠç›®å‰
-   `expNext` å¹³å‡å€¼çš„11%ï¼Œä½æ–¼æŒ‡å®š10ï½ž12%å€é–“ï¼›æ—¢æœ‰å»£å‘Šé›™å€ä»ç‚º22%ã€‚
-6. æ—¢æœ‰é‡Žæ€ª EXPÃ—3.5ã€æ™®é€šï¼ç²¾è‹±ï¼BOSS EXPÃ—1ï¼1.5ï¼3ã€å…ƒç´ åŒ£é‡‘å¹£ï¼
-   ææ–™ï¼æŽ‰è½100%ã€é‡‘å¹£ `ç­‰ç´šÃ—2+3` åŠ Â±15%èˆ‡æ™®é€šï¼ç²¾è‹±ï¼BOSSÃ—1ï¼2ï¼5
-   å…¨æ•¸ä¿ç•™ã€‚å•†åº—ä»åªçœ‹å¸³è™Ÿå…§æœ€é«˜è§’è‰²çš„8éšŽåƒ¹æ ¼å€çŽ‡ã€‚
-7. ä¸€èˆ¬å•†åº—åªå…è¨±æŒ‡å®šçš„å…­å€‹è—¥æ°´ IDï¼ŒåŸºç¤Žåƒ¹å®šæ¡ˆç‚º HP
-   10/30/50%=20/50/80ã€SP 10/30/50%=25/65/100ï¼›ä¸æ˜¯ç”¨ã€Œä½Žæ–¼100%ã€
-   çš„å¯¬é¬†æ¢ä»¶ï¼Œæœªä¾†æ–°å¢žå…¶ä»–æ¢å¾©æ¯”ä¾‹ä¹Ÿä¸æœƒæ„å¤–ä¸Šæž¶ã€‚100% HP/SP è—¥æ°´ä»
-   ä¿ç•™å®Œæ•´é“å…·è³‡æ–™ä½†ä¸åœ¨ä¸€èˆ¬å•†åº—é¡¯ç¤ºï¼Œå¯ä¾› BOSSï¼å‰¯æœ¬ï¼ä»»å‹™ï¼æˆå°±ç­‰
-   ç¨€æœ‰ä¾†æºä½¿ç”¨ã€‚
-8. `UI_GUIDELINES.md` å¢žåŠ æ°¸ä¹…çš„æ¨¡çµ„åŒ–é“å…· Icon è¦å‰‡ï¼šä¸€èˆ¬ææ–™ã€è—¥æ°´ã€
-   åœ–ç´™ã€ç¥¨åˆ¸ã€å¯¶ç®±ä½¿ç”¨ã€Œåˆ†é¡žåŸºåº•ï¼‹å…ƒç´ æ¨™èªŒï¼‹ç¨€æœ‰åº¦æ¡†ï¼‹ç‰¹æ•ˆå±¤ã€ï¼Œ
-   é‡è¦è£å‚™ã€BOSSã€æŠ€èƒ½ã€åŠ‡æƒ…ç‰©å“æ‰å„ªå…ˆä½¿ç”¨ç¨ç«‹ PNGï¼›100å€‹ä¸€èˆ¬é“å…·çš„
-   æ–°å¢žç´ æç›®æ¨™æŽ§åˆ¶åœ¨10ï½ž20å€‹åŸºç¤Žç´ æã€‚
-9. æ–°å¢ž `css/37-v139-rested-experience.css`ï¼Œåªåœ¨æ—¢æœ‰é›¢ç·šç¶“é©—å½ˆçª—é™„åŠ 
-   ä¼‘æ¯ç‹€æ…‹ï¼Œæ²’æœ‰æ–°å¢žå·¢ç‹€æ²å‹•æˆ–é‡åšèˆŠ UIã€‚`V_ASSET_VERSION` èˆ‡æœ€å¤–å±¤
-   loader URL åŒæ­¥å‡ç‚º139ï¼Œ`js/32` ä¾åºæŽ¥åœ¨ `js/31` å¾Œã€‚
-10. æ˜Žç¢ºæ²’æœ‰ä¿®æ”¹ `js/00-main.js` çš„çŽ©å®¶èƒ½åŠ›ã€æŠ€èƒ½å‚·å®³ã€é‡Žæ€ªï¼å‰¯æœ¬æ€ªç‰©
-    å¼·åº¦ã€è£å‚™å±¬æ€§ã€æˆ°é¬¥å›žåˆèˆ‡æ—¢æœ‰å­˜æª”è³‡æ–™çµæ§‹ã€‚
-
-**é©—è­‰**ï¼šæ‰€æœ‰ç•°å‹• JS èˆ‡æ–°æ¸¬è©¦é€šéŽ `node --check`ï¼›
-`tests/v139-economy-rested-exp.test.js` 7/7ã€V137 9/9ã€V138 10/10 é€šéŽï¼Œ
-`git diff --check` é€šéŽã€‚V139 æ¸¬è©¦æœƒç›´æŽ¥è§£æžç›®å‰ `js/00-main.js` çš„åå€
-æ€ªç‰©é™£åˆ—å¾Œå†åæŽ¨ï¼Œä¸æ˜¯è¤‡è£½ä¸€ä»½å‡è¨­è³‡æ–™ã€‚ç•¶å‰å·¥ä½œç’°å¢ƒæ²’æœ‰æä¾›ç€è¦½å™¨æŽ§åˆ¶
-ä»‹é¢ï¼Œå› æ­¤æœ¬è¼ªä¸èƒ½å®£ç¨±å®ŒæˆçœŸå¯¦æ‰‹æ©Ÿé»žæ“Šå›žæ­¸ï¼›ä¼‘æ¯é¢æ¿çš„ DOM å…§å®¹ã€è¼‰å…¥
-é †åºã€ç‹€æ…‹æŒä¹…åŒ–èˆ‡å…ƒç´ åŒ£æŽ’é™¤å·²ç”± Node æ¨¡æ“¬ç’°å¢ƒé©—è­‰ã€‚
-
-### 2026-08-27 â€” å»ºç«‹æ°¸ä¹… UI é–‹ç™¼è¦ç¯„èˆ‡é›™ AI å¿…è®€å…¥å£ï¼ˆæ–‡ä»¶é™å®šï¼‰
-
-1. æ–°å¢ž `UI_GUIDELINES.md`ï¼Œå®Œæ•´è¨˜éŒ„æ‰‹æ©Ÿ 9:16 æ ¸å¿ƒå®‰å…¨å€ã€åœ–ç‰‡æ¯”ä¾‹ã€
-   UI å…ƒä»¶åŒ–ï¼ç‹€æ…‹ï¼tokensã€é™ä½Žç¶²é æ–¹å¡Šæ„Ÿã€nine-sliceã€æŠ€è¡“åˆ†å·¥ã€å‹•ç•«ã€
-   æ•ˆèƒ½ã€éŸ¿æ‡‰å¼ã€å®‰å…¨å€ã€åº•éƒ¨å°Žèˆªã€ç¾Žè¡“ç³»åˆ—ä¸€è‡´æ€§ã€UIï¼éŠæˆ²é‚è¼¯åˆ†é›¢ã€
-   æ¼¸é€²æ•´ç†é †åºåŠæ¯æ¬¡ UI ä¿®æ”¹å¾Œçš„ 12 é …é©—æ”¶æ¸…å–®ã€‚
-2. å°ˆæ¡ˆåŽŸæœ¬æ²’æœ‰ `AGENTS.md` æˆ– `CLAUDE.md`ï¼›æœ¬è¼ªå„æ–°å¢žä¸€ä»½æœ€å°å…¥å£ï¼Œ
-   è®“ GPTï¼Codex èˆ‡ Claude åœ¨ä»»ä½• UIã€CSSã€ç‰ˆé¢ã€ç¾Žè¡“ã€èƒŒåŒ…ã€è£å‚™ã€æŠ€èƒ½ã€
-   æˆ°é¬¥ä»‹é¢ä¿®æ”¹å‰éƒ½å…ˆé–±è®€ `UI_GUIDELINES.md`ã€‚è¦ç¯„æ­£æ–‡ä¸é‡è¤‡è¤‡è£½ï¼Œé¿å…
-   ä¸‰ä»½æ–‡ä»¶æ—¥å¾Œåˆ†æ­§ã€‚
-3. `HANDOFF.md` çš„æŽ¥æ‰‹è¦å‰‡èˆ‡ç›®å‰ç‹€æ…‹åŒæ­¥åŠ å…¥ç›¸åŒå¼·åˆ¶è¦å‰‡ï¼Œç¢ºä¿å³ä½¿å·¥å…·
-   æ²’æœ‰è‡ªå‹•è¼‰å…¥å°ˆå±¬å…¥å£ï¼Œä¹Ÿèƒ½å¾žå°ˆæ¡ˆå”¯ä¸€äº¤æŽ¥ä¾†æºçœ‹åˆ°è¦æ±‚ã€‚
-4. æœ¬è¼ªåªæ–°å¢žï¼ä¿®æ”¹ Markdown è¦ç¯„æ–‡ä»¶ï¼›æ²’æœ‰ä¿®æ”¹ HTMLã€CSSã€JavaScriptã€
-   åœ–ç‰‡ã€éŠæˆ²é‚è¼¯æˆ–è³‡æºç‰ˆæœ¬è™Ÿï¼Œä¹Ÿæ²’æœ‰é–‹å§‹ä»»ä½• UI é‡æ§‹ã€‚
-5. åˆæ­¥ç›¤é»žå¾Œï¼Œç¬¬ä¸€æ‰¹æœ€é©åˆæŠ½æˆå…±ç”¨å…ƒä»¶çš„æ˜¯ï¼šä»¥åŒä¸€å€‹ `SlotBase` è¡ç”Ÿ
-   `EquipmentSlot`ï¼`ItemSlot`ï¼`SkillSlot`ï¼Œå…ˆåœ¨è§’è‰²ï¼è£å‚™é å°ç¯„åœé©—è­‰ï¼›
-   æŽ¥è‘—æ•´ç† `Button` ç‹€æ…‹ã€`Panel`ï¼‹`TitleBar`ï¼‹`Dialog`ã€`Tab`ã€
-   `ProgressBar`ã€‚`BottomNav` é›–ç„¶ä¹Ÿæ‡‰å…±ç”¨ï¼Œä½†ç‰½æ¶‰å…©å¥—å°Žè¦½èˆ‡å¤šå±¤å®šä½ï¼Œ
-   ä¸é©åˆç•¶ç¬¬ä¸€å€‹é‡æ§‹è©¦é»žã€‚
-6. ç›®å‰æœ€é«˜ç¶­è­·é¢¨éšªæ˜¯ï¼š36 ä»½ CSS ä¸­ç´„ 1,630 å€‹ `!important` å½¢æˆåš´é‡
-   specificityï¼è¼‰å…¥é †åºç«¶çˆ­ï¼›1080Ã—1920 å›ºå®šèˆžå°å¤–åŠ å¤šå±¤ scale åº§æ¨™ç³»ï¼›
-   modalï¼overlay è¢«æ‹†æˆå¤šå¥—å®¹å™¨èˆ‡ runtime æ¬ç§»ï¼›è§’è‰²ï¼æŠ€èƒ½ï¼èƒŒåŒ…æ¨£å¼æ•£åœ¨
-   `css/00`ã€`08`ã€`09`ã€`21`ï½ž`24`ã€`30`ã€`31`ã€`35`ï¼›å…©å¥—åº•éƒ¨å°Žèˆªåˆè¢«
-   äº”ä»½ CSS è¦†å¯«ï¼›ä»¥åŠ `#game-stage` æ²å‹•å€å¿…é ˆåŒæ­¥ç¶­è­·å…¨åŸŸè§¸æŽ§ç™½åå–®ã€‚
-   é€™äº›éƒ½åªèƒ½é€å…ƒä»¶æ”¶æ–‚ï¼Œä¸èƒ½ä¸€æ¬¡å…¨åŸŸå–ä»£ã€‚
-
-**é©—è­‰**ï¼šç¢ºèªä¸‰å€‹å…¥å£éƒ½ç²¾ç¢ºå¼•ç”¨ `UI_GUIDELINES.md`ï¼ŒMarkdown çµæ§‹å®Œæ•´ï¼Œ
-`git diff --check` é€šéŽï¼›å› æ²’æœ‰ runtime ç•°å‹•ï¼Œä¸éœ€è¦æé«˜ V138 å¿«å–ç‰ˆæœ¬ã€‚
-
-### 2026-08-27 â€” V138ï¼šæˆ°é¬¥ç¯€å¥ã€æ€ªç‰©ç·¨éšŠã€å‰¯æœ¬çŽå‹µèˆ‡æŠ€èƒ½ï¼å¥—è£è³‡è¨Š
-
-æœ¬è¼ªæŠŠä½¿ç”¨è€…å…©æ‰¹é‡ç–Šéœ€æ±‚ä¾å¾Œå‡ºè¦æ ¼æ•´åˆï¼Œå¯¶ç®±ï¼æŠ½çŽåˆ¸åªä¿ç•™ã€Œé–‹å•Ÿï¼é è¦½ã€ï¼›
-å‰¯æœ¬ç²¾è‹±æœ€çµ‚åœ¨æ—¢æœ‰å€çŽ‡ä¸Šå†åŠ  HP 100%ã€SP 100%ï¼ŒBOSS å†åŠ  HP 50%ã€SP 100%ã€‚
-
-1. `js/25-v131-fix-batch.js` æŠŠæœ‰æ•ˆè§’è‰²ï¼æ€ªç‰©çš„å‡ºæ‰‹é–“éš”æ”¹æˆ 1.6 ç§’ï¼›ä¸€è¼ª
-   æœ€å¾Œä¸€ä½å‡ºæ‰‹è‡³ä¸‹ä¸€è¼ªç¬¬ä¸€ä½å‡ºæ‰‹å›ºå®šç¸½è¨ˆ 2 ç§’ï¼ˆ0.4 ç§’äº¤æŽ¥ï¼‹1.6 ç§’é¦–ä½
-   å‡ºæ‰‹ï¼‰ã€‚æ­»äº¡è§’è‰²ï¼æ€ªç‰©æœƒåœ¨æŽ’ç¨‹å‰ä¸€æ¬¡ç•¥éŽï¼Œä¸å†æ¯å€‹ç©ºä½å¤šç­‰ 1.6 ç§’ã€‚
-2. æ€ªç‰©ç·¨éšŠå…ˆä¾ BOSSï¼žç²¾è‹±ï¼žæ™®é€šæŽ’åºï¼Œå†ç”±æ¯æŽ’ä¸­å¿ƒå‘å…©å´é…ç½®ï¼›äº”æ€ªæ™‚
-   å¤šå BOSS æœƒå…ˆå ä¸­å¤®ä½ç½®ã€‚triï¼row æŠ€èƒ½ä»ä»¥åŒä¸€ä»½å¯¦éš›ç·¨éšŠè¨ˆç®—ç›®æ¨™ã€‚
-3. æˆ°é¬¥è§’è‰²èˆ‡æ€ªç‰©å¡å¤–æ¡†æ”¹ä¾ç«ï¼æ°´ï¼é¢¨ï¼åœŸå…ƒç´ è‘—è‰²ï¼Œç•¶å‰è§’è‰²é–ƒæ¡†ä¹Ÿæ²¿ç”¨
-   å…ƒç´ è‰²ï¼›æ€ªç‰©åç¨±å‰‡å›ºå®šä»¥æ™®é€šç™½ã€ç²¾è‹±æ©˜ã€BOSS æ¡ƒç²‰è­˜åˆ¥å¼·åº¦ã€‚
-4. `js/27-v132-content-expansion.js` çš„è£å‚™å‰¯æœ¬å›ºå®šäº”éš»æ€ªï¼ŒBOSS æ•¸é‡ç­‰æ–¼
-   ç•¶å‰å¯¦éš›çŽ©å®¶æ•¸ï¼Œå…¶é¤˜å…¨ç‚ºç²¾è‹±ï¼›åŽŸæœ‰è‡³å°‘å…©å Lv.20 çš„é–‹æ”¾æ¢ä»¶ä¸è®Šã€‚
-5. ç¶“é©—ï¼ææ–™ï¼è£å‚™ä¸‰å€‹å·²å¯¦ä½œå‰¯æœ¬éƒ½åœ¨é€šéŽç­‰ç´šèˆ‡èƒŒåŒ…æª¢æŸ¥å¾Œå†é¡¯ç¤ºé€²å ´
-   ç¢ºèªï¼Œå–æ¶ˆä¸æœƒé–‹å§‹æˆ°é¬¥æˆ–æ”¹å‹•å‰¯æœ¬ç‹€æ…‹ã€‚
-6. ç¶“é©—å‰¯æœ¬åŸºç¤ŽçŽå‹µæ”¹ç‚ºå…¨éšŠæ¯åè§’è‰²ç›®å‰ `expNext` åŠ ç¸½é™¤ä»¥çŽ©å®¶æ•¸ï¼›ä¾‹å¦‚
-   50,000ï¼‹60,000 çš„å…©äººéšŠä¼æœƒå¾—åˆ° 55,000 EXPï¼Œä¸å†ä¹˜èˆŠç‰ˆ 10% æ¯”ä¾‹ã€‚
-7. ææ–™å‰¯æœ¬é ˜çŽåªæŠŠææ–™å¯¶ç®±æ”¾å…¥èƒŒåŒ…ï¼Œè£å‚™å‰¯æœ¬åªæŠŠæ‰€é¸æŠ½çŽåˆ¸æ”¾å…¥èƒŒåŒ…ï¼›
-   å…©è€…å‡ç”±çŽ©å®¶ä¹‹å¾Œè‡ªè¡Œé–‹å•Ÿã€‚æ—¢æœ‰ all-or-nothing å®¹é‡é æª¢èˆ‡ transaction
-   rollback ä¿ç•™ï¼ŒèƒŒåŒ…æ»¿æ™‚ä¸æ‰£ç®±ï¼åˆ¸ã€ä¸éƒ¨åˆ†å¡žå…¥çŽå‹µã€‚
-8. å¯¶ç®±èˆ‡æŠ½çŽåˆ¸ç‰©å“è©³ç´°åªé¡¯ç¤ºã€Œé–‹å•Ÿï¼é è¦½ã€ï¼Œéš±è—ç©¿æˆ´ã€å”®å‡ºèˆ‡å”®åƒ¹ã€‚
-   å¯¶ç®±é è¦½é€é …åˆ—å‡º 4 ç¨®ç¤¦çŸ³èˆ‡ 20 ç¨®è¨­è¨ˆåœ–çš„å¯¦éš›æ•¸é‡ï¼æ©ŸçŽ‡ï¼›å¥—è£åˆ¸åˆ—å‡º
-   10 ä»¶å¯èƒ½è£å‚™åŠå„ 10% æ©ŸçŽ‡ã€‚
-9. å‰¯æœ¬ç²¾è‹±ç›¸å°å‰¯æœ¬æ™®é€šæ€ªçš„æœ€çµ‚å€çŽ‡ç‚º HPÃ—3.20ã€SPÃ—2.00ï¼›BOSS ç‚º
-   HPÃ—4.50ã€SPÃ—2.00ã€‚æ”»æ“Šã€é­”æ”»ã€é˜²ç¦¦æ²¿ç”¨æ—¢æœ‰ç²¾è‹±ï¼BOSS å€çŽ‡ã€‚
-10. æŠ€èƒ½é çš„å‰©é¤˜æŠ€èƒ½é»žæ”¹ç‚ºé«˜å°æ¯”è³‡è¨Šæ¢èˆ‡ 22px æ•¸å­—ï¼›æœªå­¸ç¿’æŠ€èƒ½ä¸ç”¨å…ˆ
-    é–‹è©³ç´°è¦–çª—ï¼Œå³å¯åœ¨åˆ—è¡¨ç›´æŽ¥çœ‹åˆ°ã€Œå­¸ç¿’éœ€è¦ N æŠ€èƒ½é»žã€ã€‚
-11. é»žæ“ŠèƒŒåŒ…æˆ–å·²ç©¿æˆ´çš„å¥—è£è£å‚™æœƒç›´æŽ¥é¡¯ç¤º `[å¥—è£]ä»¶æ•¸/5`ã€ä¸‰ä»¶ï¼äº”ä»¶
-    æ•ˆæžœåŠ `[å·²å•Ÿå‹•]`ï¼`[æœªå•Ÿå‹•]`ï¼Œå·²å•Ÿå‹•æ˜Žäº®ã€æœªå•Ÿå‹•é»¯æ·¡ã€‚
-12. `V_ASSET_VERSION` èˆ‡æœ€å¤–å±¤ loader URL åŒæ­¥å‡ç‚º 138ï¼Œç¢ºä¿æ‰‹æ©Ÿå–å¾—
-    `js/25`ã€`js/27`ã€`css/31`ã€`css/33` çš„æ–°å…§å®¹ã€‚
-
-**é©—è­‰**ï¼šæ‰€æœ‰ `js/` èˆ‡ `tests/` JavaScript å‡é€šéŽ `node --check`ï¼›
-`tests/v137-regressions.test.js` 9/9ã€`tests/v138-feature-requirements.test.js`
-10/10 é€šéŽï¼Œ`git diff --check` é€šéŽã€‚å¦æ–°å¢ž `tests/v138-browser-smoke.js`ï¼Œ
-æ¶µè“‹å¯¦éš› DOM æ¨£å¼ã€ç‰©å“æŒ‰éˆ•ï¼é è¦½ã€å¥—è£è³‡è¨Šã€å‰¯æœ¬ç¢ºèªèˆ‡äº”æ€ªç·¨éšŠï¼›ç›®å‰
-åŸ·è¡Œç’°å¢ƒæ²’æœ‰ Chromiumï¼Œå› æ­¤è©²æ¸¬è©¦æ˜Žç¢ºæ¨™è¨˜ skippedï¼Œä¸èƒ½å®£ç¨±å®Œæˆæœ¬æ©Ÿ
-ç•«é¢é»žæ“Šå›žæ­¸ã€‚ç™¼å¸ƒå¾Œå·²å¾žæ­£å¼ç«™ç›´æŽ¥ç¢ºèª `index.html`ã€`js/20`ã€`js/25`ã€
-`js/27` å‡ç‚º V138ï¼›é›²ç«¯ç€è¦½å™¨å¯¦éš›å®Œæˆå‰µè§’ã€é€²ä¸»åŸŽã€é–‹è§’è‰²ï¼æŠ€èƒ½é ï¼Œ
-å‰©é¤˜æŠ€èƒ½é»ž computed style ç‚º 22px é‡‘è‰²é«˜å°æ¯”è† å›Šï¼Œ10 ç­†æœªå­¸æŠ€èƒ½éƒ½ç›´æŽ¥
-é¡¯ç¤ºå­¸ç¿’æˆæœ¬ï¼Œä¸”æœªå‡ºç¾éŠæˆ²æœ¬èº«çš„ console errorã€‚å¾ŒçºŒè¦ç”¨å…§å»ºåŠ é€ŸåŠŸèƒ½
-å‡åˆ°å‰¯æœ¬é–€æª»æ™‚ï¼Œé›²ç«¯ç€è¦½å™¨æŽ§åˆ¶é€šé“æŒçºŒé€¾æ™‚ï¼Œå› æ­¤å¯¶ç®±ï¼å‰¯æœ¬å®Œæ•´é»žæ“Šæµç¨‹
-ä»åªç”±é‚è¼¯æ¸¬è©¦è¦†è“‹ï¼Œä¸èƒ½å®£ç¨±å·²å®Œæˆæ•´å¥—ç·šä¸Š UI å›žæ­¸ã€‚
-
-### 2026-08-27 â€” V137ï¼šClaude æŽ¥æ‰‹ç¯„åœå®Œæ•´ç¨½æ ¸èˆ‡é«˜é¢¨éšªå›žæ­¸ä¿®å¾©
-
-ç¨½æ ¸ç¯„åœç‚º V130 åŸºæº– `77583cd` åˆ° Claude æœ€å¾Œä¸€ç‰ˆ V135 `6ad4af4`ï¼Œä¸¦æŠŠ
-GPT å¾ŒçºŒ V136 è‡ªå‹•æŠ€èƒ½ä¿®å¾©ä¸€èµ·ç´å…¥ç›¸å®¹æ€§é©—è­‰ã€‚V131ï½žV135 å¤§éƒ¨åˆ†éœ€æ±‚ç¢ºå¯¦
-æœ‰è½åœ°ï¼Œè¦–è¦ºè³‡æºå¼•ç”¨ä¹Ÿå®Œæ•´ï¼Œä½†è·¨ patch çš„è¼‰å…¥é †åºã€å…ƒç´ åŒ£æŽˆæ¬Šã€å‰¯æœ¬çµç®—ã€
-èƒŒåŒ…æ»¿æ ¼äº¤æ˜“èˆ‡ç­‰ç´šæ›²ç·šæœ‰å¤šå€‹åªæœ‰åœ¨é‚Šç•Œç‹€æ…‹æ‰æœƒå‡ºç¾çš„å¯¦è³ª bugã€‚æœ¬è¼ªä¿®æ­£ï¼š
-
-1. `js/20-anonymous-20.js` æŠŠ V131ï½žV136 runtime æ”¹æˆåš´æ ¼å¾ªåºè¼‰å…¥ï¼Œæ¶ˆé™¤
-   async ç«¶é€Ÿé€ æˆ wrapper é †åºä¸å›ºå®šã€ä¸€èˆ¬æˆ°é¬¥ EXP èª¤å¥—é€²å‰¯æœ¬ç­‰é¢¨éšªã€‚
-2. `js/25-v131-fix-batch.js` çš„ç¶“é©—é è¦½æ”¹ç”¨ V133 çš„ `400Ã—Lv^2.5` æ›²ç·šï¼›
-   ä¸å†ç”¨èˆŠçš„æ¯ç´š Ã—1.2 ä¼°ç®—ï¼Œä¹Ÿä¸èƒ½é è¦½è¶…éŽ Lv.100ã€‚
-3. `js/28-v133-economy-rebalance.js` çœŸæ­£å¯¦ä½œ Lv.100 ä¸Šé™ï¼Œè®€æª”ã€å‡ç´šèˆ‡
-   åˆ†é…å…¥å£éƒ½æœƒå°é ‚ï¼›èˆŠç‰ˆåªæœ‰ Lv.1ï½ž100 æ›²ç·šï¼Œå¯¦éš›ä»èƒ½å‡åˆ° 101 ä»¥ä¸Šã€‚
-4. å…ƒç´ åŒ£æœƒå¾žå­˜æª”æ¢å¾©ã€Œæœ‰å‰©é¤˜æ™‚æ•¸ï¼‹è‡ªå‹•è¨­å®šå·²é–‹ã€çš„ active ç‹€æ…‹ï¼›æ²’æœ‰
-   æ™‚æ•¸æ™‚ï¼Œæˆ°é¬¥ HUD ç›´æŽ¥åˆ‡æ›ã€é‡æ–°æ•´ç†å¾Œè‡ªå‹•é–‹æˆ°ã€å‰¯æœ¬é–‹æˆ°ä¸‰æ¢æ—è·¯éƒ½æœƒ
-   åœæ­¢è‡ªå‹•æˆ°é¬¥ï¼Œä¸å†å‡ºç¾ä¸æ‰£æ™‚æ•¸å»æ‹¿ 100% EXP çš„æƒ…æ³ã€‚
-5. `js/00-main.js` ä¿®æ­£ç¬¬ä¸‰è§’è‰²å‡ç´šæ™‚èª¤è®€ `player2` è£å‚™ï¼Œä¸¦åœ¨è®€æª”æ™‚ä¸€ä½µ
-   æ­£è¦åŒ–ç¬¬äºŒï¼ç¬¬ä¸‰è§’è‰² HPã€SPï¼Œé¿å…èˆŠå­˜æª”å…ˆé¡¯ç¤º NaN æˆ–è¶…éŽæ–°ä¸Šé™ã€‚
-6. è‡ªå‹• triï¼rowï¼columnï¼all æŠ€èƒ½ä¸å†ç”¨æ•´ä»½æ€ªç‰©é™£åˆ—çš„ä¸­é»žç•¶ç›®æ¨™ï¼Œè€Œæ˜¯
-   é€ä¸€æ¯”è¼ƒå¯¦éš›å‘½ä¸­æ•¸ï¼Œé¸èƒ½å‘½ä¸­æœ€å¤šå­˜æ´»æ€ªç‰©çš„ä½ç½®ã€‚
-7. ææ–™ï¼è£å‚™å‰¯æœ¬çš„é–‹æ”¾æ¢ä»¶æ”¹æˆã€Œä»»å…©åå¯¦éš›è§’è‰²éƒ½é” Lv.20ã€ï¼Œä¸å†åªçœ‹
-   éšŠä¼äººæ•¸åŠ ä¸»è§’ç­‰ç´šï¼›ä»‹é¢æ–‡æ¡ˆåŒæ­¥ä¿®æ­£ã€‚
-8. å‰¯æœ¬æ—¥æœŸæ”¹ç”¨çŽ©å®¶æœ¬åœ°æ—¥æœŸï¼Œä¸å†ä»¥ UTC æ—¥æœŸææ—©ï¼å»¶å¾Œè·¨æ—¥ã€‚
-9. å‰¯æœ¬å‹åˆ©ä¸å†æ–¼é ˜çŽå‰æ¨™è¨˜å·²å®Œæˆï¼›åªæœ‰çŽå‹µæˆåŠŸæ”¾å…¥èƒŒåŒ…å¾Œæ‰å®Œæˆçµç®—ï¼Œ
-   èƒŒåŒ…ä¸è¶³æ™‚ä¿ç•™é ˜çŽè¦–çª—ï¼Œä¸æœƒåŒæ™‚åžæŽ‰æ¬¡æ•¸èˆ‡çŽå‹µã€‚
-10. é€šç”¨èƒŒåŒ…åŠ å…¥æ”¹æˆ all-or-nothing å®¹é‡é æª¢ï¼›æŠ½çŽåˆ¸ã€ææ–™å¯¶ç®±é–‹å•Ÿä½¿ç”¨
-    transaction rollbackï¼Œæ»¿ 102 æ ¼æ™‚ä¸æœƒå…ˆæ‰£åˆ¸ï¼å¯¶ç®±ã€åªå¡žä¸€åŠçŽå‹µã€‚
-11. é€²ææ–™ï¼è£å‚™å‰¯æœ¬å‰å…ˆæª¢æŸ¥æœ€ä½ŽçŽå‹µç©ºé–“ï¼›å»£å‘Šé›™å€è‹¥ç©ºé–“ä¸è¶³ä»å¯é€€å›ž
-    ç›´æŽ¥é ˜å–ï¼Œä¸æœƒå½¢æˆç„¡æ³•é—œé–‰ä¹Ÿç„¡æ³•é ˜å–çš„æ­»å±€ã€‚
-12. å‰¯æœ¬æˆ°æ•—ä¸å†å‘¼å«ä¸€èˆ¬ `loseBattle()` çš„å»¶é²å›žåœ°åœ–æµç¨‹ï¼Œä¿®æŽ‰ 2.2 ç§’å¾Œ
-    è¢«èˆŠ timeout å¾žå‰¯æœ¬é è¸¢å›žå·¡æ€ªåœ°åœ–çš„å•é¡Œã€‚
-13. ç¶“é©—å‰¯æœ¬å¤šéšŽæ®µï¼å…¶ä»–å‰¯æœ¬é–‹æˆ°ä¸å†æ¯å ´å…è²»è£œæ»¿ç¬¬äºŒã€ç¬¬ä¸‰è§’è‰²ï¼›ä¸‰å
-    è§’è‰²éƒ½ä¿ç•™ç•¶å‰ HP/SPï¼Œåªä¾æœ€æ–°ä¸Šé™å¤¾å€¼ã€‚
-14. ç§»é™¤å››å€‹æ—©å·²ä¸å­˜åœ¨çš„èˆŠè‡ªå‹•è¨­å®š DOM ç¶å®šï¼Œç€è¦½å™¨ console ä¸å†æ¯æ¬¡
-    é–‹å•ŸéŠæˆ²éƒ½å°å‡ºå‡éŒ¯èª¤ï¼Œé¿å…æŽ©è“‹çœŸæ­£çš„ runtime å•é¡Œã€‚
-
-æ–°å¢ž `tests/v137-regressions.test.js`ï¼Œç›®å‰ 9 é …æ¸¬è©¦æ¶µè“‹å¾ªåº loaderã€V133
-EXP é è¦½èˆ‡ Lv.100ã€é˜²èƒŒåŒ…éƒ¨åˆ†å¯«å…¥ã€æœ¬åœ°æ—¥æœŸã€é›™ Lv.20ã€å‰¯æœ¬èˆ‡è§’è‰²é—œéµ
-è·¯å¾‘ã€å…­æ€ª tri é¸ä½ã€ç¬¬ä¸‰è§’è‰²è£å‚™ï¼Œä»¥åŠ V136ã€ŒSP è¶³å¤ å»éŒ¯æŽ’æ™®é€šæ”»æ“Šæ™‚
-æ ¡æ­£å›žå·²é¸æŠ€èƒ½ã€ã€‚æ‰€æœ‰ JS èˆ‡æ¸¬è©¦é€šéŽ `node --check`ï¼Œæ¸¬è©¦ 9/9 é€šéŽï¼Œ
-`git diff --check` é€šéŽï¼›å¦ä»¥å¯¦éš›ç€è¦½å™¨æª¢æŸ¥è§’è‰²ï¼æŠ€èƒ½é èˆ‡å…¨å±¬æ€§æŠ€èƒ½é è¦½ï¼Œ
-æœªé‡ç¾æŒçºŒæ€§çš„ç–Šå­—ã€ç ´åœ–æˆ–è¿”å›žéµæ¶ˆå¤±ã€‚
-
-**ä»éœ€ç•™æ„**ï¼šæ›´æ–°å‰å·²ç¶“åªå‰© `autoConfig.skill="normal"`ã€ä¸”æ²’æœ‰ä¿å­˜éŽ
-`v136LastSkill` çš„èˆŠå­˜æª”ï¼Œç„¡æ³•å®‰å…¨çŒœå›žçŽ©å®¶ä»¥å‰é¸å“ªå€‹æŠ€èƒ½ï¼Œä»éœ€çŽ©å®¶é‡æ–°
-é¸ä¸€æ¬¡ã€‚å…¨å±¬æ€§æŠ€èƒ½é è¦½çš„ç‰¹å®šæ‰‹æ©Ÿæ…£æ€§æ²å‹•ç ´åœ–ä»æœªèƒ½é‡ç¾ï¼Œè‹¥å†å‡ºç¾éœ€è¦
-èž¢å¹•éŒ„å½±èˆ‡æ©Ÿåž‹ï¼ç€è¦½å™¨ç‰ˆæœ¬ã€‚
-
-### 2026-08-26 â€” V136ï¼šè‡ªå‹•æŠ€èƒ½ç«‹å³å­˜æª”ã€é˜»æ­¢è¨­å®šè¢«æ´—å›žæ™®æ”»ã€è£œé½Šæœ€å¤–å±¤å¿«å–å¤±æ•ˆ
-
-æ–°å¢ž `js/31-v136-auto-battle-fix.js`ï¼Œä¸¦æŽ¥é€² `js/20-anonymous-20.js`ï¼›
-`V_ASSET_VERSION` å‡åˆ° `136`ï¼ŒåŒæ™‚æŠŠ `index.html` è¼‰å…¥ loader çš„ç¶²å€æ”¹æˆ
-`js/20-anonymous-20.js?v=136`ã€‚é€™ä¸€è¼ªæ²’æœ‰ä¿®æ”¹ `js/00-main.js`ã€‚
-
-1. **ä¿®æŽ‰ loader è‡ªå·±æ²’æœ‰ç‰ˆæœ¬è™Ÿçš„æ ¹æœ¬å¿«å–æ¼æ´ž**ï¼šV134/V135 é›–ç„¶å·²ç¶“è®“
-   loader å…§éƒ¨çš„å­è³‡æºçµ±ä¸€è·Ÿè‘— `V_ASSET_VERSION`ï¼Œä½† loader æœ¬èº«ä»æ˜¯
-   ç„¡ç‰ˆæœ¬ç¶²å€ã€‚æ‰‹æ©Ÿåªè¦å¿«å–èˆŠ loaderï¼Œå°±æ°¸é çœ‹ä¸åˆ°æ–°å¸¸æ•¸èˆ‡æ–° patchã€‚
-   V136 å¾ž `index.html` æœ€å¤–å±¤å¼·åˆ¶åˆ·æ–° loaderï¼Œç¢ºä¿å¯¦æ©Ÿèƒ½çœŸæ­£æ‹¿åˆ°ä¿®æ­£ã€‚
-2. **è‡ªå‹•è¡Œå‹•é¸æ“‡æ”¹ç‚ºç•¶ä¸‹ç«‹å³å­˜æª”**ï¼šçŽ©å®¶åœ¨è‡ªè¨‚ä¸‹æ‹‰é¸å–®é»žåˆ°æŠ€èƒ½æ™‚ï¼Œ
-   ç«‹åˆ»åŒæ­¥ `autoConfig` ä¸¦å‘¼å« `saveGame()`ï¼Œä¸å†åªç­‰æœ€å¾Œçš„ã€Œå¥—ç”¨ä¸¦å•Ÿå‹•ã€ã€‚
-   å¥—ç”¨æŒ‰éˆ•å¦åŠ  capture éšŽæ®µä¿éšªï¼Œå› æ­¤å…ƒç´ åŒ£æ™‚æ•¸ï¼å»£å‘Š wrapper æå‰ return
-   æ™‚ï¼Œå·²é¸çš„æŠ€èƒ½ä¹Ÿä¸æœƒæ•´ç­†æ¶ˆå¤±ã€‚
-3. **è¨˜éŒ„çŽ©å®¶æ˜Žç¢ºæ„åœ–**ï¼šæ¯å€‹è§’è‰²æœƒä¿å­˜ `v136ActionIntent`ï¼ˆæ™®é€šæ”»æ“Šï¼
-   é˜²ç¦¦ï¼æŠ€èƒ½ï¼‰èˆ‡ `v136LastSkill`ã€‚èˆŠç‰ˆ `populateAutoSkillOptions()` åŒæ­¥è‹¥æŠŠ
-   ä¸€å€‹ä»ç„¶å·²è£å‚™ã€å·²å­¸æœƒä¸”å¯è‡ªå‹•æ–½æ”¾çš„æŠ€èƒ½èª¤æ´—æˆ `normal`ï¼ŒV136 æœƒæ¢å¾©
-   çŽ©å®¶æœ€å¾Œæ˜Žç¢ºé¸éŽçš„æŠ€èƒ½ï¼›çŽ©å®¶è‹¥æ˜Žç¢ºé¸æ™®é€šæ”»æ“Šï¼Œçµ•ä¸æœƒè¢«è‡ªå‹•æ”¹æˆæŠ€èƒ½ã€‚
-4. **ä»¥å¯¦éš›æŽ’å…¥è¡Œå‹•ä½‡åˆ—çš„çµæžœåšæœ€å¾Œæ ¡æ­£**ï¼šåªæœ‰åœ¨æŠ€èƒ½å­˜åœ¨ã€å·²è£å‚™ã€
-   å·²å­¸æœƒã€é¡žåž‹å…è¨±ä¸”ç›®å‰ SP è¶³å¤ æ™‚ï¼Œè‹¥èˆŠå¼•æ“Žä»æŽ’å…¥ `normal`ï¼Œæ‰æŠŠ
-   `queuedPlayerActions` æ ¡æ­£å›žçŽ©å®¶é¸çš„æŠ€èƒ½ã€‚ä»»ä½•åˆæ³•é™åˆ¶éƒ½ä¸æœƒè¢«ç¹žéŽã€‚
-   åŒæ™‚è£œä¸ŠèˆŠå¼•æ“Žç¼ºå°‘çš„ã€Œä»åœ¨è£å‚™æ¬„ã€æª¢æŸ¥ï¼Œé¿å…æ®˜ç•™è¨­å®šåéŽä¾†æ–½æ”¾æœªè£å‚™
-   çš„æŠ€èƒ½ã€‚
-5. **æ‰€æœ‰æ™®é€šæ”»æ“Šéƒ½æœ‰å¯è¾¨è­˜åŽŸå› **ï¼šè¨­å®šæœ¬èº«æ˜¯æ™®é€šæ”»æ“Šæ™‚æœƒæ˜Žç¢ºæç¤º
-   ã€ŒSPå……è¶³ä¸æœƒè‡ªå‹•æ”¹æ”¾æŠ€èƒ½ã€ï¼›SPä¸è¶³æœƒé¡¯ç¤ºç›®å‰å€¼ï¼æŠ€èƒ½æ¶ˆè€—ï¼›æœªè£å‚™ã€
-   æœªå­¸æœƒã€è³‡æ–™éºå¤±ã€é¡žåž‹ä¸æ”¯æ´ä¹Ÿå„æœ‰ç¨ç«‹è¨Šæ¯ã€‚`js/30-v135-fixes.js`
-   åœ¨ V136 å­˜åœ¨æ™‚æœƒåœæ­¢èˆŠå›žé¥‹å±¤ï¼Œé¿å…ç›¸åŒè¨Šæ¯é‡è¤‡å…©æ¬¡ã€‚
-
-**é©—è­‰**ï¼šç•°å‹•çš„ä¸‰æ”¯ JS å…¨éƒ¨é€šéŽ `node --check`ï¼Œ`git diff --check`é€šéŽï¼›
-å¦ç”¨ Node æœ€å°æˆ°é¬¥ç’°å¢ƒé€é …åŸ·è¡ŒçœŸæ­£çš„ V136 wrapperï¼Œç¢ºèªï¼š(a) SP è¶³å¤ ä½†
-èˆŠå¼•æ“ŽéŒ¯æŽ’æ™®æ”»æ™‚æœƒæ ¡æ­£æˆæŠ€èƒ½ã€(b) SP 5ï¼æ¶ˆè€—15æ™‚ç¶­æŒæ™®æ”»ä¸¦å°å‡º5/15ã€
-(c) çŽ©å®¶æ˜Žç¢ºé¸æ™®é€šæ”»æ“Šæ™‚ä¸æ“…è‡ªæ›æ‹›ã€(d) èˆŠåŒæ­¥æŠŠæœ‰æ•ˆæŠ€èƒ½æ´—æˆ normal
-æ™‚æœƒæ¢å¾©ã€(e) ä¸‹æ‹‰é¸æŠ€èƒ½ç•¶ä¸‹ç«‹å³è½ç›¤ã€(f) æœªè£å‚™æŠ€èƒ½è¢«é˜»æ“‹ã€‚é€™å€‹åŸ·è¡Œ
-ç’°å¢ƒæ²’æœ‰å¯ç”¨ Chromiumï¼Œå› æ­¤æœ¬è¼ªæ²’æœ‰å®£ç¨±åšéŽå®Œæ•´ç•«é¢é»žæ“Šå›žæ­¸ã€‚
-
-**æ—¢æœ‰å­˜æª”é™åˆ¶**ï¼šå¦‚æžœèˆŠç‰ˆå·²ç¶“æŠŠè¨­å®šæ°¸ä¹…å­˜æˆ `normal`ï¼Œè€Œå­˜æª”è£¡å®Œå…¨æ²’æœ‰
-ç•™ä¸‹å…ˆå‰é¸éŽå“ªå€‹æŠ€èƒ½ï¼Œç¨‹å¼ç„¡æ³•å®‰å…¨çŒœæ¸¬çŽ©å®¶åŽŸæœ¬æƒ³é¸å“ªæ‹›ï¼ˆå› ç‚ºä¹Ÿæœ‰äººæœƒ
-åˆ»æ„é¸æ™®é€šæ”»æ“Šï¼‰ã€‚æ›´æ–°åˆ° V136 å¾Œéœ€åœ¨å…ƒç´ åŒ£é‡æ–°é¸ä¸€æ¬¡æŠ€èƒ½ï¼›å¾žé€™æ¬¡é–‹å§‹
-æœƒè¨˜ä½æ˜Žç¢ºæ„åœ–ï¼Œä¸æœƒå†ç™¼ç”ŸåŒä¸€ç¨®è³‡æ–™éºå¤±ã€‚
-
-### 2026-08-26 â€” V135ï¼šè‡ªå‹•æˆ°é¬¥å›žé¥‹æ”¹ã€Œçœ‹çµæžœã€ã€æŠ€èƒ½ä½œç”¨å°è±¡æ¨™ç¤ºã€è­·ç›¾æ»¿è¡€é¡¯ç¤ºã€ç¯€å¥çµ±ä¸€1.25ç§’
-
-æ–°å¢ž `js/30-v135-fixes.js` ï¼‹ `css/36-v135-fixes.css`ï¼ˆå·²æŽ¥é€² loaderï¼Œ
-`V_ASSET_VERSION` ä¸€ä½µå‡åˆ° `135`ï¼‰ã€‚
-
-1. **ã€Œæˆ‘å¾ˆç¢ºå®šæœ‰SPï¼Œè‡ªå‹•æˆ°é¬¥é‚„æ˜¯ä½¿ç”¨æ™®é€šæ”»æ“Šã€**ï¼šâš ï¸ **åœ¨ä¹¾æ·¨ç’°å¢ƒä¸‹
-   é‡ç¾ä¸å‡ºä¾†**ã€‚è©¦éŽå››ç¨®æƒ…å¢ƒï¼ˆå–®è§’è‰²ã€ç¬¬äºŒè§’è‰²ã€èµ°çœŸæ­£çš„å…ƒç´ åŒ£é¢æ¿
-   è¨­å®šã€å­˜æª”â†’é‡æ–°è¼‰å…¥çš„å¾€è¿”ï¼‰å…¨éƒ¨éƒ½æ­£å¸¸æ”¾æŠ€èƒ½ï¼Œ`syncBattleAutoSettings()`
-   ä¹Ÿæ²’æœ‰æŠŠè¨­å®šæ´—æŽ‰ã€‚
-
-   **ä½†é€™ä¸€è¼ªæ‰¾åˆ°äº† V134 åšæ³•æœ¬èº«çš„ç¼ºé™·ä¸¦ä¿®å¥½**ï¼šV134 æ˜¯åœ¨åŽŸå‡½å¼è·‘
-   ã€Œä¹‹å‰ã€è‡ªå·±è¤‡è£½ä¸€ä»½å¼•æ“Žçš„å››å€‹åˆ¤æ–·æ¢ä»¶åŽ»**é æ¸¬**æœƒä¸æœƒé€€å›žæ™®æ”»ã€‚
-   åªè¦å¼•æ“Žå› ç‚ºæŸå€‹æ²’è¢«è¤‡è£½åˆ°çš„ç†ç”±é€€å›žï¼Œé åˆ¤å°±æœƒå…¨éƒ¨é€šéŽã€ä»€éº¼éƒ½
-   ä¸å°â€”â€”çŽ©å®¶çœ‹åˆ°çš„é‚„æ˜¯èŽ«åå…¶å¦™çš„æ™®æ”»ã€‚ä½¿ç”¨è€…é€™æ¬¡çš„å›žå ±æ­£æ˜¯é€™ç¨®
-   å°ä¸ä¸Šçš„æƒ…æ³ï¼ˆSP æ˜Žæ˜Žå¤ ï¼Œæ‰€ä»¥ SP åˆ¤æ–·ä¸æœƒè§¸ç™¼ï¼‰ã€‚
-   V135 æ”¹æˆ**å®Œå…¨ä»¥å¯¦éš›çµæžœç‚ºæº–**ï¼šå…ˆè¨˜ä¸‹çŽ©å®¶è¨­å®šçš„æŠ€èƒ½ï¼Œè®“åŽŸå‡½å¼
-   ç…§å¸¸è·‘ï¼Œè·‘å®Œç›´æŽ¥çœ‹ `queuedPlayerActions` è£¡å¯¦éš›æŽ’é€²åŽ»çš„è¡Œå‹•æ˜¯ä»€éº¼ã€‚
-   åªè¦ã€Œè¨­å®šçš„æ˜¯æŠ€èƒ½ã€å¯¦éš›æŽ’é€²åŽ»çš„å»æ˜¯æ™®é€šæ”»æ“Šã€å°±ä¸€å®šæœƒå°èªªæ˜Žâ€”â€”
-   èƒ½å°ä¸Šå·²çŸ¥åŽŸå› å°±å°å…·é«”åŽŸå› ï¼Œå››å€‹éƒ½å°ä¸ä¸Šå°±æ˜Žè¬›**ã€ŒåŽŸå› ä¸æ˜Žã€ä¸¦
-   é™„ä¸Šç­‰ç´šï¼SPï¼é¡žåž‹ç­‰åˆ¤æ–·æ•¸å€¼**ï¼Œè«‹ä½¿ç”¨è€…æŠŠé‚£ä¸€è¡Œå›žå ±å›žä¾†ã€‚
-   é€™æ¨£ä¸ç®¡å¼•æ“Žç‚ºä»€éº¼é€€å›žï¼Œéƒ½ä¸æœƒå†æœ‰éœé»˜å¤±æ•—ã€‚
-   ï¼ˆV134 é‚£æ®µé æ¸¬å¼çš„é‚è¼¯å·²å¾ž `js/29` æ•´æ®µç§»é™¤ï¼Œé¿å…å…©ä»½åŒæ™‚å°é‡è¤‡è¨Šæ¯ã€‚ï¼‰
-
-2. **æŠ€èƒ½è¦é¡¯ç¤ºä½œç”¨å°è±¡èˆ‡æ•¸é‡**ï¼šæ–°å¢ž `getSkillTargetScopeLabel()`ï¼Œ
-   å°ç…§ `js/25` çš„ `getSkillTargets()` å¯¦éš›è¡Œç‚ºï¼ˆé‚£æ‰æ˜¯çœŸæ­£æ±ºå®šæ‰“åˆ°èª°
-   çš„åœ°æ–¹ï¼‰ç”¢ç”Ÿæ¨™ç±¤ï¼š`single`â†’æ•µæ–¹ä¸€äººã€`tri`â†’æ•µæ–¹ä¸‰äººãƒ»åŒæŽ’å·¦ä¸­å³ã€
-   `row`â†’æ•µæ–¹æ•´æŽ’ã€`all`â†’æ•µæ–¹å…¨é«”ã€`ally`â†’æˆ‘æ–¹ä¸€äººã€`allyAll`â†’æˆ‘æ–¹å…¨é«”ã€
-   `deadAlly`â†’æˆ‘æ–¹é™£äº¡ä¸€äººã€`none`â†’è‡ªèº«ã€‚ä¸‰å€‹åœ°æ–¹éƒ½è£œä¸Šï¼š
-   - æ‰‹å‹•æˆ°é¬¥çš„æŠ€èƒ½æ ¼ï¼ˆ`populateSkillQuickBar` åŒ…ä¸€å±¤ï¼Œåœ¨æ¶ˆè€—SPä¸Šé¢åŠ ä¸€è¡Œï¼‰
-   - è‡ªå‹•æˆ°é¬¥è¨­å®šçš„æŠ€èƒ½ä¸‹æ‹‰ï¼ˆé¸é …æ–‡å­—å¾Œé¢åŠ è¨»è¨˜ï¼‰
-   - é¸å¥½æŠ€èƒ½è·³åˆ°é¸ç›®æ¨™æ™‚çš„æç¤ºåˆ—ï¼ˆ`setBattleTargetSelectionMode` /
-     `setBattleAllyTargetSelectionMode` åŒ…ä¸€å±¤ï¼‰
-   ç¬¦å’’ä¹Ÿä¸€ä½µæ”¯æ´ï¼ˆå®ƒå€‘ä¸åœ¨ `skillDatabase` è£¡ï¼Œæ‰€ä»¥ `js/27` å¤šæš´éœ²äº†
-   ä¸€å€‹ `window.v132GetTalismanDefinition` çµ¦é€™é‚ŠæŸ¥ï¼‰ã€‚
-   **è¸©åˆ°çš„å‘**ï¼š`#autoSettingsActionSelect` é€™å¹¾å€‹ `<select>` é–‹å ´å°±è¢«
-   `initCustomDropdown()`/`makeSelectValueReactive()`ï¼ˆ`js/00-main.js:4326`ï¼‰
-   æ›æˆäº†è‡ªè¨‚çš„å‡ä¸‹æ‹‰ï¼Œç•«é¢ä¸Šçœ‹å¾—åˆ°çš„æ˜¯å¦å¤–æ¸²æŸ“çš„é‚£ä»½æ¸…å–®ï¼Œè€Œå®ƒ**åªæœ‰
-   åœ¨ `.value` è¢«è¨­å®šæ™‚æ‰æœƒé‡æ–°æ¸²æŸ“**â€”â€”åªæ”¹ `<option>` çš„æ–‡å­—å®Œå…¨ä¸æœƒ
-   åæ˜ åˆ°ç•«é¢ä¸Šï¼Œå¿…é ˆåœ¨æ”¹å®Œæ–‡å­—å¾Œé‡æ–°æŒ‡æ´¾ä¸€æ¬¡ `.value` è§¸ç™¼é‡ç¹ªã€‚
-   å¦å¤–æ¨™ç±¤åˆ»æ„ä¸ç”¨æ‹¬è™Ÿå¯«ã€Œï¼ˆåŒæŽ’å·¦ä¸­å³ï¼‰ã€è€Œæ˜¯ç”¨ä¸­é»žï¼Œå¦å‰‡åœ¨ä¸‹æ‹‰è£¡æœƒ
-   è®Šæˆã€Œå†°æ—‹ä¸€é–ƒï¼ˆæ•µæ–¹ä¸‰äººï¼ˆåŒæŽ’å·¦ä¸­å³ï¼‰ï¼‰ã€é€™ç¨®å·¢ç‹€æ‹¬è™Ÿå¾ˆé›£è®€ã€‚
-   è¨»ï¼šå­˜æª”å­˜çš„æ˜¯ `<option>` çš„ valueï¼ˆæŠ€èƒ½idï¼‰ä¸æ˜¯é¡¯ç¤ºæ–‡å­—ï¼Œæ‰€ä»¥åŠ è¨»è¨˜
-   ä¸æœƒå½±éŸ¿å­˜æª”æˆ– `stillValid` åˆ¤æ–·ã€‚
-
-3. **è­·ç›¾åœ¨æ»¿è¡€æ™‚çœ‹ä¸åˆ°**ï¼šæ ¹å› æ˜¯ `updateSingleCharacterBars()`
-   ï¼ˆ`js/00-main.js:22793`ï¼‰æŠŠè¡€æ¢å¯¬åº¦ç®—æˆ `hp/maxHP`ï¼Œè­·ç›¾å‰‡æ˜¯
-   `left=hpPercent`ã€`width=shield/maxHP`ï¼Œå…©è€…å…±ç”¨åŒä¸€å€‹ maxHP åŸºæº–
-   è€Œä¸”è­·ç›¾æ˜¯ã€ŒæŽ¥åœ¨è¡€æ¢å³é‚Šã€ç•«çš„â€”â€”æ»¿è¡€æ™‚ `hpPercent` æ­£å¥½ 100ï¼Œ
-   è­·ç›¾èµ·é»žè¢«æŽ¨åˆ°è¡€æ¢æœ€å³ç·£ä¹‹å¤–ï¼Œåˆå› ç‚º `.hp-bar` æ˜¯ `overflow:hidden`ï¼Œ
-   æ•´æ®µç™½è‰²è­·ç›¾ç›´æŽ¥è¢«è£æŽ‰ã€‚ä¾ä½¿ç”¨è€…æŒ‡å®šçš„åšæ³•ä¿®ï¼šè¡€æ¢å’Œè­·ç›¾æ”¹æˆæ”¾é€²
-   åŒä¸€å€‹ã€Œç¸½é•·åº¦ã€æŒ‰æ¯”ä¾‹åˆ†é…ï¼ˆç¸½é•· = maxHP + è­·ç›¾é‡ï¼‰ï¼Œæ»¿è¡€æ™‚è¡€æ¢æœƒ
-   å¾€å·¦ç¸®ã€ç©ºå‡ºçš„ä½ç½®æ­£å¥½å¡žä¸‹ç­‰å€¼è­·ç›¾ï¼Œå…©æ®µåŠ èµ·ä¾†å‰›å¥½å¡«æ»¿æ•´æ¢ã€‚
-   æ²’æœ‰è­·ç›¾æ™‚åˆ†æ¯å°±æ˜¯ maxHPï¼Œè¡Œç‚ºè·ŸåŽŸæœ¬å®Œå…¨ä¸€æ¨£ã€‚
-   å¯¦æ¸¬ï¼šmaxHP 1100ã€æ»¿è¡€ã€è­·ç›¾ 550 â†’ è¡€æ¢ 66.67%ã€è­·ç›¾ left 66.67%
-   å¯¬ 33.33%ï¼›æ²’è­·ç›¾ä¸”å‰© 40% è¡€ â†’ è¡€æ¢ 40%ã€è­·ç›¾ 0%ï¼ˆç¶­æŒåŽŸæ¨£ï¼‰ã€‚
-
-4. **æ‰€æœ‰å‡ºæ‰‹ï¼å›žåˆé–“éš”çµ±ä¸€ 1.25 ç§’**ï¼š`V131_RESOLVE_DELAY_MS`
-   1500â†’1250ï¼ŒæŠ€èƒ½åç¨±å¾½ç« å£½å‘½è·Ÿè‘— 1200â†’1000ï¼ˆå¿…é ˆå°æ–¼é–“éš”ï¼Œå¦å‰‡ä¸Šä¸€ä½
-   çš„ç‰¹æ•ˆæœƒè·¨åˆ°ä¸‹ä¸€ä½å‡ºæ‰‹ï¼‰ã€‚
-   **å¦å¤–ä¿®å¥½ä¸€å€‹åŽŸæœ¬å°±å­˜åœ¨ã€é€™æ¬¡é‡æ¸¬æ‰ç™¼ç¾çš„ä¸ä¸€è‡´**ï¼šåªæŠŠé‚£å€‹å¸¸æ•¸
-   æ”¹æŽ‰é‚„ä¸å¤ æº–â€”â€”å®£å‘ŠéšŽæ®µæœ¬èº«ä¹ŸæœƒèŠ±æ™‚é–“ï¼ˆæ¯å€‹è‡ªå‹•è§’è‰²æœƒç¶“éŽ
-   `beginCharacterTurn` çš„ 150ms è‡ªå‹•å‡ºæ‰‹å»¶é²ï¼ŒåŠ ä¸Š `finishPlayerAction`
-   å®£å‘Šåˆ†æ”¯çš„ `BATTLE_DECLARE_ADVANCE_MS` 90msï¼‰ï¼Œæ‰€ä»¥ã€Œå›žåˆé–‹å§‹â†’ç¬¬ä¸€ä½
-   å‡ºæ‰‹ã€å¯¦éš›ä¸Šæœƒè®Šæˆ 1250+240â‰ˆ1500msï¼Œè·Ÿå…¶ä»–æ¯æ­¥å°ä¸é½Šï¼ˆå¯¦æ¸¬ç¬¬ä¸€æ­¥
-   1507msã€å¾Œé¢æ¯æ­¥ 1255msï¼‰ã€‚æ”¹æˆä»¥ã€Œé€™ä¸€å›žåˆé–‹å§‹çš„æ™‚é–“é»žã€ç‚ºéŒ¨ï¼š
-   ç­‰å¾…æ™‚é–“ = 1250 âˆ’ï¼ˆå®£å‘ŠéšŽæ®µå·²èŠ±æŽ‰çš„æ™‚é–“ï¼‰ï¼Œä¸è¶³å°±ä¸å†ç­‰ã€‚
-   å¯¦æ¸¬ä¿®å¥½å¾Œæ•´å ´æ¯ä¸€æ­¥éƒ½æ˜¯ 1252~1257msï¼Œå®Œå…¨ä¸€è‡´ï¼›å®£å‘ŠéšŽæ®µè‹¥æœ¬èº«å°±
-   è¶…éŽ 1.25 ç§’ï¼ˆæ‰‹å‹•è§’è‰²æ€è€ƒå¾ˆä¹…ï¼‰ï¼Œç­‰å¾…æœƒè®Šæˆ 0ï¼ŒçŽ©å®¶ä¸€æŒ‰å®Œå°±ç«‹åˆ»
-   çµç®—ï¼Œä¸æœƒå†ç„¡è¬‚å¤šç­‰ã€‚
-
-**é©—è­‰**ï¼š`node --check` å…¨éƒ¨é€šéŽã€Playwright å…¨ç¨‹é›¶ `pageerror`ï¼›
-ä¸Šè¿°æ¯ä¸€é …éƒ½æœ‰å¯¦æ¸¬æ•¸å­—ï¼ˆè¦‹å„é …èªªæ˜Žï¼‰ï¼›ä¸¦ä¸”å›žæ­¸é©—è­‰äº† V134 çš„å››é …è¡Œç‚º
-ï¼ˆæ‰‹å‹•è§’è‰²æŒ‡ä»¤åˆ—æœƒé¡¯ç¤ºã€ç¬¦å’’å‹•ç•«è½åœ¨å„è‡ªå¡ç‰‡ `[0,1]`ã€åº«å­˜é ç•™ã€
-èƒŒåŒ…è¿”å›žéµä¸‰æ¢è·¯å¾‘ï¼‰éƒ½æ²’æœ‰è¢«é€™æ¬¡æ”¹å‹•ç ´å£žã€‚
-
-**å·²çŸ¥é™åˆ¶**ï¼šç¬¬ 1 é»žæ²’æœ‰çœŸæ­£é‡ç¾ï¼Œåªæ˜¯æŠŠã€Œéœé»˜å¤±æ•—ã€è®Šæˆã€Œä¸€å®šæœƒèªªæ˜Ž
-åŽŸå› ã€ã€‚éœ€è¦ä½¿ç”¨è€…æ¸…å¿«å–å¾Œå†è·‘ä¸€æ¬¡ï¼ŒæŠŠæˆ°é¬¥ç´€éŒ„è£¡é‚£è¡Œ âš ï¸ å›žå ±å›žä¾†æ‰èƒ½
-å®šä½ã€‚ï¼ˆä¹Ÿæœ‰å¯èƒ½ä¸Šæ¬¡å›žå ±æ™‚ä½¿ç”¨è€…ä»åœ¨è·‘ V133 çš„èˆŠå¿«å–ï¼Œå› ç‚º V134 çš„
-ç‰ˆæœ¬è™Ÿä¿®æ­£æ­£æ˜¯é‚£ä¸€è¼ªæ‰åˆä½µçš„ã€‚ï¼‰
-
-### 2026-08-26 â€” V134ï¼šä¿®å¾© 6 é …å›žå ±å•é¡Œï¼ˆå…¶ä¸­ 2 é …çš„çœŸæ­£åŽŸå› æ˜¯å¿«å–ç‰ˆæœ¬è™Ÿå¿˜äº†åŠ ï¼‰
-
-ä½¿ç”¨è€…å›žå ± 6 å€‹å•é¡Œã€‚**èª¿æŸ¥å¾Œç™¼ç¾å…¶ä¸­è‡³å°‘ 2 é …æ ¹æœ¬ä¸æ˜¯æ–° bugï¼Œè€Œæ˜¯ä½¿ç”¨è€…
-çš„ç€è¦½å™¨å¾žä¾†æ²’æ‹¿åˆ°å…ˆå‰å·²ç¶“åˆä½µçš„ä¿®æ­£**â€”â€”è©³è¦‹ä¸Šæ–¹ã€Œç³»çµ±æž¶æ§‹é‡é»žã€1.2 ç¯€
-æ–°å¢žçš„é‚£æ®µã€‚é€™æ¬¡é™¤äº†ä¿® bugï¼Œä¹ŸæŠŠç‰ˆæœ¬è™Ÿæ©Ÿåˆ¶åŒ–ï¼ˆå–®ä¸€å¸¸æ•¸ï¼‰é¿å…å†çŠ¯ã€‚
-
-1. **åˆªé™¤è§’è‰²å¾Œå‰¯æœ¬æ¬¡æ•¸æ²’æœ‰é‡ç½®**ï¼šå‰¯æœ¬æ¯æ—¥æ¬¡æ•¸å­˜åœ¨**ç¨ç«‹çš„ localStorage
-   key**ï¼ˆ`v132_daily_dungeon_state`ï¼‰ï¼Œè€Œåˆªè§’è‰²ç”¨çš„ `resetGame()`
-   ï¼ˆ`js/00-main.js:6907`ï¼‰åªæ¸… `SAVE_KEY` è·Ÿå…©å€‹èˆŠç‰ˆå­˜æª” keyï¼Œå¾žä¾†æ²’ç¢°éŽ
-   é€™å€‹ keyã€‚ä¿®æ³•åˆ»æ„**ä¸åŽ»åŒ… `resetGame()`**ï¼ˆå®ƒæ˜¯å…ˆ `confirm()` å†
-   `location.reload()`ï¼ŒåŒ…åœ¨å¤–é¢æœƒè®Šæˆã€Œä½¿ç”¨è€…æŒ‰å–æ¶ˆã€è³‡æ–™å»å·²è¢«æ¸…æŽ‰ã€ï¼‰ï¼Œ
-   æ”¹æˆåœ¨ `js/27` è¼‰å…¥æ™‚åˆ¤æ–·ã€Œç›®å‰å®Œå…¨æ²’æœ‰ä»»ä½•è§’è‰²ã€ï¼ˆreload å¾Œ `loadGame()`
-   æ‰¾ä¸åˆ°å­˜æª”ï¼Œ`player.id` æ˜¯ç©ºå­—ä¸²ï¼‰å°±é †æ‰‹æ¸…æŽ‰é€™å€‹ key è·Ÿ
-   `v131_element_box_state`ã€‚
-2. **å‰¯æœ¬æ¬¡æ•¸é™åˆ¶è¦ç¶­æŒé—œé–‰**ï¼šä¸Šä¸€ç‰ˆåªåœ¨ã€Œå¯«å…¥ã€ç«¯ï¼ˆ`markDungeonUsed`ï¼‰
-   æ“‹äº† `DUNGEON_DAILY_LIMIT_ENABLED` æ——æ¨™ï¼Œ**ã€Œè®€å–ã€ç«¯ï¼ˆ`isDungeonAvailable`
-   è·Ÿ `dungeonEntryCard`ï¼‰æ²’æ“‹**â€”â€”æ‰€ä»¥æ——æ¨™é—œæŽ‰ä¹‹å‰å°±å·²ç¶“å­˜é€²åŽ»çš„
-   `used:true` æœƒç¹¼çºŒè®“æŒ‰éˆ•æ°¸ä¹… disabled åˆ°éš”å¤©ã€‚æ–°å¢ž `isDungeonUsedToday()`
-   è®“è®€å¯«å…©ç«¯éƒ½çœ‹æ——æ¨™ï¼Œä¸¦æŠŠç•«é¢åº•éƒ¨é‚£è¡Œå¯«æ­»çš„ã€Œæ¯æ—¥åªèƒ½æŒ‘æˆ°1æ¬¡ã€ä¹Ÿæ”¹æˆ
-   è·Ÿè‘—æ——æ¨™åˆ‡æ›æ–‡æ¡ˆï¼ˆé—œé–‰æ™‚é¡¯ç¤ºã€Œâš™ï¸ æ¸¬è©¦æ¨¡å¼ã€ï¼‰ï¼Œä¸å†è‡ªç›¸çŸ›ç›¾ã€‚é †æ‰‹æŠŠ
-   ç¶“é©—å‰¯æœ¬å¡ç‰‡ä¸Šé‚„å¯«è‘—èˆŠå…¬å¼ã€Œ50%ã€çš„èªªæ˜Žæ›´æ–°æˆ V133 çš„å¯¦éš›å€¼ï¼ˆ10%ï¼‰ã€‚
-3. **æˆ°é¬¥ã€Œç©ºæ‹å¾ˆä¹…ã€**ï¼šçœŸæ­£åŽŸå› æ˜¯ `updateActionHudVisibility()`
-   ï¼ˆ`00-main.js:31898`ï¼‰**å¾žä¾†æ²’æœ‰è¢« `beginCharacterTurn()` å‘¼å«éŽ**â€”â€”
-   å…¨å°ˆæ¡ˆåªæœ‰ `startTurn`ï¼ˆæ­¤æ™‚ index æ†ç‚º 0ï¼‰ã€`startResolutionPhase`ã€
-   `toggleAutoBattle` ä¸‰è™•æœƒå‘¼å«ã€‚æ‰€ä»¥åªè¦ 0 è™Ÿè‡ªå‹•ã€1ï¼2 è™Ÿæ‰‹å‹•ï¼ŒæŒ‡ä»¤åˆ—
-   åœ¨å›žåˆä¸€é–‹å§‹å°±è¢«åˆ¤å®šéš±è—ï¼Œä¹‹å¾Œæ•´å€‹å®£å‘ŠéšŽæ®µéƒ½ä¸å†æ›´æ–°ï¼šè¼ªåˆ°æ‰‹å‹•è§’è‰²æ™‚
-   çŽ©å®¶**çœ‹ä¸åˆ°ä»»ä½•æŒ‰éˆ•**ã€ä»€éº¼éƒ½ä¸èƒ½åšï¼Œåªèƒ½ä¹¾ç­‰ `beginCharacterTurn`
-   è£¡é‚£å€‹ 20 ç§’å€’æ•¸è·‘å®Œæ‰è·³ã€Œâ° æ™‚é–“åˆ°ã€ã€‚ä¸€å€‹æ‰‹å‹•è§’è‰² 20 ç§’ã€å…©å€‹å°± 40 ç§’ã€‚
-   ä¿®æ³•æ˜¯åŒ…ä¸€å±¤ `beginCharacterTurn()`ï¼Œåœ¨åŽŸå‡½å¼è·‘å®Œå¾Œè£œå‘¼å«ä¸€æ¬¡
-   `updateActionHudVisibility()`ã€‚ä¾ä½¿ç”¨è€…æ±ºå®š **20 ç§’å€’æ•¸æœ¬èº«ä¿ç•™ä¸å‹•**ã€‚
-   å¦å¤–æŠŠæŠ€èƒ½åç¨±å¾½ç« å£½å‘½å¾ž 2200ms æ”¶åˆ° 1200msâ€”â€”åŽŸæœ¬æ¯”æ¯æ­¥ 1500ms é‚„é•·ï¼Œ
-   ä¸Šä¸€ä½çš„ç‰¹æ•ˆæœƒè·¨åˆ°ä¸‹ä¸€ä½å‡ºæ‰‹ï¼Œçœ‹èµ·ä¾†æœƒã€Œç–Šåœ¨ä¸€èµ·ã€æ€ªæ€ªçš„ã€ã€‚
-4. **ç¬¦å’’æ²’å•ç›®æ¨™ã€ä¸‰å€‹äººç”¨å»åªæœ‰ä¸€å€‹äººåœ¨ç”¨**ï¼šä¸‰å€‹ç¨ç«‹çš„ bugã€‚
-   (a) `useTalisman()` è·³éŽäº†éŠæˆ²æ—¢æœ‰çš„é¸ç›®æ¨™æµç¨‹ï¼Œç›´æŽ¥å¯«æ­»
-   `{target:null}`ï¼Œ`applyTalismanEffect()` å‰‡æ˜¯å†°å°ç¬¦**éš¨æ©Ÿ**æŒ‘ä¸€éš»æ€ªã€
-   éš±èº«/çµç•Œç¬¦å¯«æ­»åªçµ¦æ–½æ³•è€…è‡ªå·±ã€‚ä¾ä½¿ç”¨è€…æ±ºå®šã€Œå®Œå…¨æ¯”ç…§æŠ€èƒ½ã€ï¼Œæ”¹æˆæŽ¥ä¸Š
-   æ—¢æœ‰çš„ `setBattleTargetSelectionMode`ï¼`selectBattleTarget`ï¼ˆé¸æ€ªï¼‰èˆ‡
-   `setBattleAllyTargetSelectionMode`ï¼`selectBattleAllyTarget`ï¼ˆé¸æˆ‘æ–¹ï¼‰ï¼Œ
-   ä¸è‡ªå·±é€ ä¸€å¥— UIã€‚**è¸©åˆ°çš„ç›¸å®¹æ€§å‘**ï¼š`selectBattleTarget()` å®Œå…¨ä¸æŸ¥
-   `skillDatabase`ï¼Œæ‰€ä»¥é¸æ€ªé‚£æ¢è·¯ç›´æŽ¥å°±èƒ½ç”¨ç¬¦å’’ idï¼›ä½†é¸æˆ‘æ–¹é‚£æ¢è·¯
-   ï¼ˆ`setBattleAllyTargetSelectionMode`ï¼`selectBattleAllyTarget`ï¼‰è·Ÿ
-   `getBattleActionDisplayName()` éƒ½æœƒæŸ¥ `skillDatabase[actionType]` ä¸¦
-   è¦æ±‚ `targetType` æ˜¯ allyï¼Œç¬¦å’’ id æŸ¥ä¸åˆ°å°±æ•´å€‹å¤±æ•ˆâ€”â€”æ‰€ä»¥é¡å¤–è¦†å¯«äº†
-   é€™ä¸‰å€‹å‡½å¼ï¼Œé‡åˆ°ç¬¦å’’ id æ™‚æ”¹ç”¨ä¸€å€‹ã€Œé•·å¾—åƒæŠ€èƒ½ã€çš„åˆæˆç‰©ä»¶èµ°åŒä¸€å¥—åˆ¤æ–·ã€‚
-   (b) **ã€Œåªæœ‰ä¸€å€‹äººåœ¨ç”¨ã€çš„çœŸæ­£åŽŸå› æ˜¯å‹•ç•«æ‰“éŒ¯å¡ç‰‡**ï¼š
-   `lungePlayerCard()` è·Ÿ `showSkillNameBadge()` çš„æœ€å¾Œä¸€å€‹åƒæ•¸éƒ½æ˜¯
-   `characterIndex`ï¼ˆå…§éƒ¨ `$("battlePlayerCard"+(characterIndex||0))`ï¼‰ï¼Œ
-   åŽŸæœ¬å…©å€‹å‘¼å«éƒ½**æ²’æœ‰å‚³**ï¼Œæ‰€ä»¥ä¸ç®¡èª°æ–½æ”¾ï¼Œç‰¹æ•ˆæ°¸é æ¼”åœ¨ 0 è™Ÿå¡ç‰‡ä¸Šã€‚
-   äºŒä¸‰è™Ÿè§’è‰²å…¶å¯¦æœ‰æ­£å¸¸çµç®—ï¼ˆlog æœ‰å°ã€buff æœ‰ä¸Šï¼‰ï¼Œåªæ˜¯ç•«é¢çœ‹èµ·ä¾†åƒæ²’ç”¨ã€‚
-   ï¼ˆåŒä¸€å€‹å‡½å¼è£¡çš„ `showMissEffect()` æœ¬ä¾†å°±æœ‰æ­£ç¢ºå‚³ï¼Œæ‰€ä»¥ã€Œç•«ç¬¦å¤±æ•—ã€
-   åè€Œä¸€ç›´æ¼”åœ¨å°çš„å¡ç‰‡ä¸Šï¼Œå‰›å¥½æ˜¯å°ç…§çµ„ã€‚ï¼‰
-   (c) åº«å­˜æ²’æœ‰é ç•™ï¼šå®£å‘Šæ™‚åªæª¢æŸ¥ä¸æ‰£ã€çµç®—æ‰æ‰£ï¼Œåªæœ‰ 1 å¼µç¬¦å’’æ™‚ä¸‰å€‹äºº
-   éƒ½èƒ½å®£å‘Šï¼Œçµæžœå…ˆæ‰‹ç”¨æŽ‰ã€å¾Œé¢å…©ä½ç™½ç™½æµªè²»å›žåˆã€‚æ”¹æˆå®£å‘Šæ™‚æŠŠã€Œé€™å›žåˆ
-   å…¶ä»–è§’è‰²å·²ç¶“é å®šçš„æ•¸é‡ã€ä¹Ÿç®—é€²åŽ»ã€‚
-   (d) èƒŒåŒ…è£¡é»žç¬¦å’’æœƒè·³å‡ºä¸€é¡†**é¨™äººçš„ã€Œç©¿æˆ´ã€æŒ‰éˆ•**ï¼ˆæŒ‰äº†å› ç‚º
-   `getInventoryEquipmentSlot("talisman")` æŸ¥ä¸åˆ°æ¬„ä½è€Œéœé»˜å¤±æ•—ï¼‰â€”â€”
-   ä¾ä½¿ç”¨è€…æ±ºå®šã€Œç¬¦å’’ä¸èƒ½åœ¨æˆ°é¬¥å¤–ä½¿ç”¨ã€ï¼ŒåªæŠŠé€™é¡†æŒ‰éˆ•è—æŽ‰ã€‚
-5. **å…ƒç´ åŒ£è¨­å®šå‡ºæ‹›å»ä¸€ç›´æ™®é€šæ”»æ“Š**ï¼š`autoActionForCharacter()`
-   ï¼ˆ`00-main.js:20239-20249`ï¼‰æœ‰ 4 å€‹æ¢ä»¶æœƒæŠŠè¨­å®šå¥½çš„æŠ€èƒ½é»˜é»˜ä¸ŸæŽ‰é€€å›ž
-   æ™®æ”»ï¼Œè€Œä¸”**ä¸€è¡Œæˆ°é¬¥ç´€éŒ„éƒ½ä¸å¯«**ã€‚å…¶ä¸­æœ€å¸¸è¦‹çš„æ˜¯ **SP ä¸è¶³**â€”â€”è‡ªå‹•
-   æˆ°é¬¥è·¯å¾‘å·²ç¶“æŠŠå–è—¥é‚è¼¯æ•´å€‹ç§»é™¤ï¼Œæˆ°é¬¥ä¸­å®Œå…¨æ²’æœ‰ä»»ä½• SP å›žå¾©ï¼Œ
-   `applyPostBattleAutoRecovery()` åˆåªåœ¨æˆ°é¬¥çµæŸå¾Œä¸”èº«ä¸Šæœ‰è—¥æ°´æ‰è£œï¼Œ
-   æ‰€ä»¥ SP ä¸€è¦‹åº•å°±æ°¸é é€€å›žæ™®æ”»ã€‚å°ç…§çµ„ï¼šæ‰‹å‹•è·¯å¾‘çš„ `castDamageSkill()`
-   **æœƒ**å°ã€ŒSPä¸è¶³ï¼Œæ”¹ç”¨æ™®é€šæ”»æ“Šã€‚ã€ï¼Œåªæœ‰è‡ªå‹•è·¯å¾‘æ˜¯éœé»˜çš„ã€‚
-   ä¾ä½¿ç”¨è€…æ±ºå®š **ä¸è‡ªå‹•å–è—¥ã€åªæŠŠåŽŸå› å¯«å‡ºä¾†**ï¼Œç¾åœ¨æœƒå°å‡ºä¾‹å¦‚
-   ã€Œâš ï¸ ä¸»è§’ASPä¸è¶³ï¼ˆ5/15ï¼‰ï¼Œç„¡æ³•ä½¿ç”¨ã€Œæœƒå¿ƒä¸€æ“Šã€ï¼Œæ”¹ç”¨æ™®é€šæ”»æ“Šã€‚ã€
-   ï¼ˆä¸¦ä¸”ç”¨ lastReason åŽ»é‡ï¼Œé•·æ™‚é–“æŽ›æ©Ÿä¸æœƒæ´—ç‰ˆï¼‰ã€‚
-   **å¦å¤–æŸ¥è­‰æŽ¨ç¿»äº†ä¸€å€‹åŽŸæœ¬ä»¥ç‚ºè¦ä¿®çš„æ±è¥¿**ï¼šæœ¬ä¾†ä»¥ç‚º
-   `populateAutoSkillOptions()` å°‘æ¿¾ heal/revive æ˜¯å€‹ bugï¼Œå¯¦éš› grep ç™¼ç¾
-   å®ƒæ“ä½œçš„ `#autoSkillHome`ï¼`#autoSkillBattle`ï¼`#autoEnabled` åœ¨ç¾åœ¨çš„
-   `index.html` è£¡**æ ¹æœ¬ä¸å­˜åœ¨**ï¼ˆé€™ä¹Ÿæ­£æ˜¯ console ä¸€ç›´åœ¨å°ã€Œæ‰¾ä¸åˆ°å…ƒç´ ï¼š
-   autoSkillHomeã€çš„åŽŸå› ï¼‰ï¼Œæ˜¯èˆŠç‰ˆä¸»åŸŽé¢æ¿çš„æ®˜ç•™æ­»ç¨‹å¼ç¢¼ï¼›çŽ©å®¶çœŸæ­£åœ¨ç”¨çš„
-   `#autoSettingsActionSelect` ç”± `switchCharacterTab`/`switchAutoSettingsCharacter`
-   å¡«å……ï¼Œ**æœ¬ä¾†å°±æœ‰**æ­£ç¢ºæ¿¾æŽ‰ heal/reviveã€‚æ‰€ä»¥æ²’æœ‰åŠ å¤šé¤˜çš„ä¿®æ­£ï¼Œåªåœ¨
-   `js/29` ç•™ä¸‹è¨»è§£èªªæ˜ŽæŸ¥è­‰çµæžœã€‚
-6. **èƒŒåŒ…æ²’æœ‰è¿”å›žéµ**ï¼š`#inventoryPage` å”¯ä¸€çš„é—œé–‰éµ
-   `#mapInventoryOverlayClose` è¢« CSSï¼ˆ`css/00-main.css:5604`ï¼‰ç¶æ­»åªåœ¨
-   `.map-inventory-overlay-open` é€™å€‹ class å­˜åœ¨æ™‚é¡¯ç¤ºï¼Œè€Œé‚£å€‹ class
-   **åªæœ‰ `openMapInventoryOverlay()` æœƒåŠ **ã€‚èƒŒåŒ…æœ‰ä¸‰ç¨®é€²å…¥æ–¹å¼ï¼Œåªæœ‰
-   ã€Œå¾žåœ°åœ–é ã€é‚£ç¨®æœƒåŠ â€”â€”ä½¿ç”¨è€…æˆªåœ–æ˜¯å¾ž**ä¸‹æ–¹å°Žè¦½åˆ—**é€²åŽ»çš„ï¼Œé‚£æ¢è·¯å¾‘
-   å®Œå…¨æ²’æœ‰ä»»ä½•è¿”å›žæŽ§åˆ¶é …ã€‚ï¼ˆé€™ä¹Ÿè§£é‡‹äº†ä¸Šä¸€è¼ªæˆ‘ã€Œæ‰¾ä¸åˆ°ã€ç„¡æ³•é‡ç¾ã€â€”â€”
-   ç•¶æ™‚åªæ¸¬äº†åœ°åœ–è¦†è“‹å±¤é‚£æ¢è·¯å¾‘ã€‚ï¼‰ä¿®æ³•ï¼šCSS æ”¹æˆåœ¨ `#inventoryPage` ä¸€å¾‹
-   é¡¯ç¤ºï¼ˆè¦–è¦ºå®Œå…¨æ²¿ç”¨åŽŸæœ¬é‚£çµ„ï¼‰ï¼ŒJS ä¾ä½¿ç”¨è€…æ±ºå®šã€Œè¿”å›žä¸Šä¸€å€‹é é¢ã€ï¼ŒåŒ…ä¸€å±¤
-   `showPage()` è¨˜éŒ„å‰ä¸€é ï¼ŒæŒ‰éˆ•è¡Œç‚ºæ”¹æˆä¸‰é¸ä¸€ï¼šè¦†è“‹å±¤é–‹è‘—â†’é—œè¦†è“‹å±¤ï¼
-   èƒŒåŒ…è¢«å€Ÿé€²è§’è‰²å½ˆçª—â†’é—œå½ˆçª—ï¼å¦å‰‡â†’å›žä¸Šä¸€é ã€‚**é€™è£¡è¸©åˆ°ä¸€å€‹å‘**ï¼š
-   ä¸€é–‹å§‹ã€Œæœ‰æ²’æœ‰è¢«å€Ÿé€²å½ˆçª—ã€æ˜¯ç”¨ã€Œå½ˆçª—æ˜¯ä¸æ˜¯å¯è¦‹ã€åˆ¤æ–·ï¼Œå¤ªå¯¬é¬†â€”â€”åªè¦
-   ç•«é¢ä¸Šå‰›å¥½æœ‰ä»»ä½• home-feature å½ˆçª—é–‹è‘—ï¼ˆå³ä½¿è·ŸèƒŒåŒ…ç„¡é—œï¼‰ï¼ŒæŒ‰è¿”å›žå°±åªæœƒ
-   é—œæŽ‰é‚£å€‹ä¸ç›¸å¹²çš„å½ˆçª—ã€èƒŒåŒ…é ç•™åœ¨åŽŸåœ°ï¼ˆå¯¦æ¸¬é‡ç¾ï¼‰ã€‚æ”¹æˆç”¨
-   `homeFeatureModalBody.contains(inventoryPage)` æª¢æŸ¥çœŸæ­£çš„çˆ¶å­é—œä¿‚æ‰ç²¾æº–ã€‚
-
-**æ–°å¢žæª”æ¡ˆ**ï¼š`js/29-v134-fixes.js`ã€`css/35-v134-fixes.css`
-ï¼ˆå·²æŽ¥é€² `js/20-anonymous-20.js` çš„ loaderï¼‰ã€‚
-
-**é©—è­‰æ–¹å¼**ï¼ˆå…¨éƒ¨ Playwright å¯¦æ¸¬ï¼Œé›¶ `pageerror`ï¼‰ï¼š
-- ç‰ˆæœ¬è™Ÿï¼šç¢ºèª 4 å€‹ loader æ³¨å…¥çš„ script/link å…¨éƒ¨å¸¶ `?v=134`ï¼Œ
-  sprite chunk æ­£ç¢ºç¶­æŒé‡˜æ­»èˆŠç‰ˆæœ¬ï¼Œ`js/00-main.js?v=132` ç¢ºèªå…§å®¹çœŸçš„
-  æ²’è®ŠéŽæ‰€ä»¥ä¸ç”¨å‹•
-- å‰¯æœ¬æ¬¡æ•¸ï¼šå…ˆæŠŠ `v132_daily_dungeon_state` å¯«æˆä¸‰å€‹éƒ½ `used:true` å†
-  reloadï¼Œç¢ºèªä¸‰å¼µå¡ç‰‡éƒ½æ²’æœ‰ã€Œä»Šæ—¥å·²å®Œæˆï¼ä»Šæ—¥å·²æŒ‘æˆ°ã€ã€`disabled` æ•¸ç‚º 0ã€
-  æœ‰ã€Œæ¸¬è©¦æ¨¡å¼ã€å­—æ¨£ï¼›å†ç”¨**çœŸæ­£çš„ `resetGame()`**ï¼ˆä¸æ˜¯æ‰‹å‹•åˆª keyâ€”â€”
-  æ‰‹å‹•åˆªæœƒè¢« unload æ™‚çš„è‡ªå‹•å­˜æª”é‡æ–°å¯«å›žåŽ»ï¼Œé€™é»žä¹Ÿè¸©éŽï¼‰ç¢ºèªåˆªè§’è‰²å¾Œ
-  å…©å€‹å´é‚Š key éƒ½è¢«æ¸…ä¹¾æ·¨
-- æˆ°é¬¥ç©ºæ‹ï¼š0 è™Ÿè‡ªå‹•ã€1 è™Ÿæ‰‹å‹•ï¼Œå¯¦æ¸¬è¼ªåˆ° 1 è™Ÿæ™‚
-  `battleCommandRow.classList.contains("battle-hud-hidden")` ç‚º **false**
-  ï¼ˆä¿®å¥½å‰æœƒæ˜¯ true â†’ ä¹¾ç­‰ 20 ç§’ï¼‰
-- ç¬¦å’’ï¼šå†°å°ç¬¦é€²å…¥é¸æ€ªæ¨¡å¼ï¼ˆæç¤ºæ­£ç¢ºé¡¯ç¤ºã€Œé¸æ“‡ [æ¥µå“å†°å°ç¬¦]ã€è€Œä¸æ˜¯
-  åŽŸå§‹ idã€3 éš»æ€ªéƒ½å¯é¸ï¼‰â†’ æŒ‡å®šç¬¬ 3 éš» â†’ çµç®—å¾Œ**åªæœ‰é‚£éš»**è¢«å†°å°ã€
-  å¦å¤–å…©éš»æ²’æœ‰ï¼›çµç•Œç¬¦é€²å…¥é¸æˆ‘æ–¹æ¨¡å¼ â†’ å‰¯æ‰‹B æŒ‡å®šçµ¦ ä¸»è§’A â†’ çµç®—å¾Œ
-  buff æ­£ç¢ºè½åœ¨ ä¸»è§’A èº«ä¸Šè€Œä¸æ˜¯æ–½æ³•è€…ï¼›å‹•ç•«åƒæ•¸å¯¦æ¸¬ç‚º `[0,1]`
-  ï¼ˆä¿®å¥½å‰æ˜¯ `[undefined,undefined]` å…¨éƒ¨è½åœ¨ 0 è™Ÿå¡ï¼‰ï¼›åªå‰© 1 å¼µç¬¦å’’æ™‚
-  ç¬¬äºŒå€‹äººè¢«æ­£ç¢ºæ“‹ä¸‹ä¸¦æç¤ºã€Œå‰©ä¸‹çš„æ•¸é‡å·²ç¶“è¢«é€™å›žåˆå…¶ä»–è§’è‰²é å®šäº†ã€
-- è‡ªå‹•å‡ºæ‹›ï¼šSP ä¸è¶³ï¼æœªå­¸æœƒï¼æ²»ç™‚é¡žä¸‰ç¨®æƒ…å¢ƒéƒ½æœƒå°å‡ºå°æ‡‰çš„ âš ï¸ èªªæ˜Žï¼Œ
-  SP è¶³å¤ ä¸”å·²å­¸æœƒæ™‚ä¸æœƒå°ã€ä¸”æŠ€èƒ½æ­£ç¢ºé€²å…¥ `queuedPlayerActions`
-- èƒŒåŒ…è¿”å›žéµï¼šä¸‹æ–¹å°Žè¦½åˆ—è·¯å¾‘æœ‰è¿”å›žéµä¸”å›žåˆ°ä¸Šä¸€é ï¼ˆtrainingï¼‰ï¼›åœ°åœ–è¦†è“‹å±¤
-  è·¯å¾‘ä»æ­£å¸¸é—œé–‰è¦†è“‹å±¤ä¸¦ç•™åœ¨ mapPageï¼›å€Ÿé€²è§’è‰²å½ˆçª—æ™‚æ­£ç¢ºé—œé–‰å½ˆçª—
-- å›žåˆç¯€å¥å›žæ­¸ï¼šé‡æ–°é‡ `addBattleLog()` æ™‚é–“æˆ³ï¼Œé€£çºŒ 3 å›žåˆæ¯ä¸€æ­¥éƒ½ç©©å®š
-  è½åœ¨ ~1.5 ç§’ï¼Œç¢ºèªé€™æ¬¡çš„ `beginCharacterTurn` åŒ…è£æ²’æœ‰ç ´å£žæ—¢æœ‰ç¯€å¥
-
-**å·²çŸ¥é™åˆ¶**ï¼š`console` ä»æœƒå°ã€Œæ‰¾ä¸åˆ°å…ƒç´ ï¼š autoSkillHome / autoEnabled /
-hpUsePctHome / spUsePctHomeã€é€™å¹¾è¡Œâ€”â€”é‚£æ˜¯ä¸Šé¢ç¬¬ 5 é»žæŸ¥åˆ°çš„èˆŠç‰ˆä¸»åŸŽè‡ªå‹•
-é¢æ¿æ®˜ç•™æ­»ç¨‹å¼ç¢¼åœ¨æ‰¾å·²ç¶“ä¸å­˜åœ¨çš„å…ƒç´ ï¼Œç„¡å®³ï¼Œé€™æ¬¡æ²’æœ‰å‹•å®ƒï¼ˆæ¸…ç†å®ƒå±¬æ–¼
-ç¨ç«‹çš„æŠ€è¡“å‚µæ•´ç†ï¼Œä¸åœ¨é€™è¼ªç¯„åœï¼‰ã€‚
-
-### 2026-08-26 â€” V133ï¼šç¶“æ¿Ÿï¼é¤Šæˆå…¨é¢é‡æ–°è¨­è¨ˆï¼ˆå‡ç´šæ›²ç·šã€æŽ›æ©ŸEXPæ•ˆçŽ‡ã€ç¶“é©—å‰¯æœ¬ã€ç²¾è‹±/BOSSå€çŽ‡ã€å•†åº—åƒ¹æ ¼éšŽç´šã€è—¥æ°´é…ç½®ï¼‰
-
-ä½¿ç”¨è€…é€™è¼ªçµ¦äº†éžå¸¸preciseçš„12é»žè¦æ ¼ï¼Œæ ¸å¿ƒç›®æ¨™æ˜¯ã€Œæ»¿ç­‰ç´„3å€‹æœˆæŽ›æ©Ÿé‡ï¼‹
-è‡ªå‹•æŽ›æ©ŸEXP 70%ï¼‹ç¶“é©—å‰¯æœ¬ä¸€å¤©ç´„10%ä¸€ç´šï¼‹å•†åº—çœ‹æœ€é«˜è§’è‰²ç­‰ç´šï¼‹ç§»é™¤
-å¸¸æ…‹100%è£œå“ã€ã€‚æ–°å¢ž`js/28-v133-economy-rebalance.js`ï¼ˆ+
-`css/34-v133-economy-rebalance.css`ï¼‰æ‰¿è¼‰å¤§éƒ¨åˆ†æ”¹å‹•ï¼Œ`js/25`/`js/27`
-å„è‡ªå°å¹…æ“´å……æ—¢æœ‰ç›¸é—œå‡½å¼ï¼Œ**å®Œå…¨æ²’æœ‰å‹•åˆ°**çŽ©å®¶æˆ°é¬¥èƒ½åŠ›å…¬å¼ã€æŠ€èƒ½
-å‚·å®³ã€é‡Žæ€ªå¼·åº¦å…¬å¼ã€å‰¯æœ¬æ€ªç‰©å¼·åº¦ã€è£å‚™å±¬æ€§ã€ææ–™/è£å‚™æŽ‰çŽ‡ã€æˆ°é¬¥
-å›žåˆé‚è¼¯é€™äº›æ˜Žç¢ºç¦æ­¢çš„ç¯„åœã€‚
-
-1. **Lv.1~100å‡ç´šæ›²ç·šé‡åš**ï¼šåŽŸæœ¬`checkLevelUp()`è£¡`expNext`æ˜¯
-   ã€Œè¤‡åˆ©Ã—1.20ã€ï¼Œæ›æŽ‰ä¸ç”¨ï¼Œæ”¹æˆç´”æ¬¡æ–¹æ›²ç·š`expNext(Lv)=
-   round(400Ã—Lv^2.5)`ï¼ˆ`js/28`çš„`getExpNextForLevel()`ï¼‰ã€‚ç”¨ã€Œæ­£å¸¸
-   ç·´åŠŸä¸€å ´æˆ°é¬¥å¹³å‡EXPâ‰ˆ105Ã—æ€ªç‰©ç­‰ç´šã€ï¼ˆ3éš»æ€ªÃ—ç­‰ç´šÃ—10Ã—æ—¢æœ‰3.5å€
-   åŠ æˆï¼‰åæŽ¨ï¼Œå…¨ç¨‹Lv.1â†’100ç¸½å ´æ•¸â‰ˆ150,481å ´ï¼Œè·Ÿä½¿ç”¨è€…è¦æ±‚çš„
-   150,000å ´å¹¾ä¹Žç²¾ç¢ºå»åˆï¼Œå„å€é–“å ´æ•¸åˆ†å¸ƒï¼ˆ1~20ç´„2,898ã€21~40ç´„
-   13,006ã€41~60ç´„27,476ã€61~80ç´„45,214ã€81~100ç´„61,886ï¼‰æœ¬èº«å°±
-   è‡ªç„¶å‘ˆç¾ã€Œå‰æœŸå¿«ã€å¾ŒæœŸéžå¸¸æ…¢ã€ï¼Œ81~100å–®ä¸€å€é–“å°±ä½”äº†è¶…éŽ4æˆçš„
-   ç¸½å ´æ•¸ã€‚è…³æœ¬è¼‰å…¥ç•¶ä¸‹æœƒç«‹åˆ»ä¾ç…§è§’è‰²ã€Œç›®å‰ç­‰ç´šã€é‡ç®—ä¸€æ¬¡
-   `expNext`ï¼ˆä¸ç®¡æ˜¯èˆŠå­˜æª”é‚„æ˜¯æ–°è§’è‰²éƒ½æœƒæ ¡æ­£ï¼Œä¸æœƒå‹•åˆ°exp/é‡‘å¹£/
-   è£å‚™ç­‰å…¶ä»–ä»»ä½•æ¬„ä½ï¼‰ï¼Œä¹‹å¾Œæ¯æ¬¡çœŸçš„å‡ç´šï¼Œè¦†å¯«`checkLevelUp()`
-   è®“å®ƒç…§èˆŠè·‘å®Œå…¨éƒ¨åŽŸæœ¬çš„é‚è¼¯ï¼ˆattributePoints/skillPoints/
-   bonusHP/bonusSP/å‡ç´šæç¤ºå®Œå…¨ä¸è®Šï¼‰ä¹‹å¾Œï¼ŒåªæŠŠ`expNext`è“‹æˆç”¨
-   æ–°å…¬å¼é‡ç®—çš„å€¼ã€‚
-2. **å…ƒç´ åŒ£ï¼ˆè‡ªå‹•æŽ›æ©Ÿï¼‰EXPé™ç‚º70%**ï¼š`js/25`çš„`winBattle()` override
-   æ–°å¢ž`ELEMENT_BOX_EXP_RATIO=0.70`ï¼Œåªå½±éŸ¿æœ€çµ‚çŒé€²`sharedExp`çš„
-   EXPï¼Œé‡‘å¹£/æŽ‰è½/ææ–™æ˜¯å®Œå…¨ç¨ç«‹çš„å‡½å¼ï¼Œé€™è£¡æ²’æœ‰å‹•åˆ°ï¼Œç¶­æŒ100%ã€‚
-3. **ç²¾è‹±/BOSSæˆ°é¬¥EXPå€çŽ‡**ï¼š`js/25`æ–°å¢ž
-   `getMonsterExpRankMultiplier()`ï¼ˆæ™®é€šÃ—1ï¼ç²¾è‹±Ã—1.5ï¼BOSSÃ—3ï¼‰ï¼Œ
-   è·Ÿæ—¢æœ‰3.5å€åŠ æˆç–Šä¹˜ï¼ˆä¸æ˜¯é¡å¤–å¤šåŠ ä¸€æ¬¡3.5ï¼Œä½¿ç”¨è€…æ˜Žç¢ºè¦æ±‚3.5
-   ä¿ç•™ä¸èƒ½å†ç–ŠåŠ ï¼‰ã€‚
-4. **ç¶“é©—å‰¯æœ¬EXPé™ç‚ºç´„10%**ï¼š`js/27`çš„`getExpDungeonRewardExp()`
-   æ–°å¢ž`EXP_DUNGEON_REWARD_RATIO=0.10`ï¼ŒåŽŸæœ¬ã€ŒéšŠä¼å¹³å‡expNextã€
-   ï¼ˆå–®äººéšŠä¼ç­‰æ–¼100%ï¼‰ä¹˜ä¸Šé€™å€‹æ¯”ä¾‹ï¼Œå»£å‘Šé›™å€æ²¿ç”¨æ—¢æœ‰Ã—2é‚è¼¯ï¼Œ
-   å…©å€‹ç›¸ä¹˜æ­£å¥½æ˜¯ã€Œæ­£å¸¸â‰ˆ10%ã€é›™å€â‰ˆ20%ã€ã€‚
-5. **é‡‘å¹£æŽ‰è½rankå€çŽ‡èª¿æ•´**ï¼š`js/28`è¦†å¯«`getMonsterGoldDrop()`ï¼Œ
-   ç²¾è‹±å€çŽ‡3â†’2ã€BOSSå€çŽ‡8â†’5ï¼ŒåŸºç¤Žå…¬å¼ï¼ˆç­‰ç´šÃ—2+3ï¼ŒÂ±15%æµ®å‹•ï¼‰
-   å®Œå…¨æ²’æ”¹ã€‚
-6. **å•†åº—åƒ¹æ ¼æ”¹ç”¨ã€Œå¸³è™Ÿå…§å·²å»ºç«‹è§’è‰²çš„æœ€é«˜ç­‰ç´šã€**ï¼šæ–°å¢ž
-   `getHighestCreatedCharacterLevel()`ï¼ˆæŽƒéŽ`player`/`player2`/
-   `player3`å–æœ€é«˜`.level`ï¼‰ï¼Œ`getShopPriceTier()`ä¾é€™å€‹ç­‰ç´šå°æ‡‰
-   8å€‹ç´šè·ï¼ˆLv.1~30Ã—1ã€31~40Ã—1.5ã€41~50Ã—2ã€51~60Ã—2.5ã€61~70Ã—3ã€
-   71~80Ã—3.5ã€81~90Ã—4ã€91~100Ã—4.5ï¼‰ï¼Œå…¨éƒ¨ä¹˜å®Œå››æ¨äº”å…¥æˆæ•´æ•¸ã€‚
-   å®Œå…¨è¦†å¯«`renderShopContent()`ï¼`buyShopItem()`ï¼ˆå› ç‚ºåŽŸæœ¬
-   `const shopItems=potionDefinitions`æ˜¯åŒä¸€å€‹é™£åˆ—åƒç…§ï¼Œæ²’è¾¦æ³•å¾ž
-   å¤–é¢é‡æ–°è³¦å€¼æˆéŽæ¿¾å¾Œçš„æ–°é™£åˆ—ï¼Œåªèƒ½æ•´å€‹è“‹æŽ‰é€™å…©å€‹å‡½å¼ï¼‰ï¼Œç•«é¢ä¸Š
-   è£œä¸€è¡Œã€Œç›®å‰å•†åº—éšŽç´šï¼šLvXï½žYï¼ˆåƒ¹æ ¼Ã—Nï¼‰ã€ã€‚
-7. **è—¥æ°´é‡æ–°æ•´ç†**ï¼š`potionDefinitions`é™£åˆ—ï¼ˆ`const`ä½†å¯è®Šï¼‰
-   pushé€²å…©å€‹æ–°çš„30%éšŽï¼ˆ`hpPotion30`/`spPotion30`ï¼‰ï¼Œåƒ¹æ ¼ç”¨10%è·Ÿ
-   50%åŸºç¤Žåƒ¹æ ¼çš„ã€Œæ¯%å–®åƒ¹ã€ç·šæ€§å…§æ’ç®—å‡ºä¸­é–“å€¼å†æ¹Šæ•´åˆ°5çš„å€æ•¸
-   ï¼ˆHPï¼š20/10=2.0èˆ‡80/50=1.6å…§æ’å‡º30%â‰ˆ1.8â†’55ï¼›SPï¼š25/10=2.5èˆ‡
-   100/50=2.0å…§æ’å‡º30%â‰ˆ2.25â†’70ï¼‰ï¼Œå–®ä½åƒ¹æ ¼10%>30%>50%ã€å–®ç“¶åƒ¹æ ¼
-   10%<30%<50%ï¼Œç¬¦åˆã€Œå¤§å®¹é‡è—¥æ°´å–®ä½æœ‰å„ªæƒ ã€ä½†å–®ç“¶æœ€è²´ã€çš„è¦æ±‚ã€‚
-   `renderShopContent()`/`buyShopItem()`æ”¹æˆåªåˆ—å‡º
-   `recoveryPercent<100`çš„é …ç›®ï¼Œ`hpPotion100`/`spPotion100`é€™å…©å€‹
-   é“å…·å®šç¾©å®Œå…¨æ²’æœ‰å¾ž`potionDefinitions`åˆªé™¤ï¼ˆä¹‹å¾ŒBOSSæŽ‰è½ï¼å‰¯æœ¬
-   çŽå‹µï¼ä»»å‹™çŽå‹µï¼æˆå°±çŽå‹µç­‰ç³»çµ±è¦ç™¼æ”¾é€™å…©å€‹idä¸€æ¨£èƒ½æ­£å¸¸é‹ä½œï¼‰ï¼Œ
-   åªæ˜¯çŽ©å®¶æ²’è¾¦æ³•åœ¨å•†åº—ç›´æŽ¥èŠ±éŒ¢è²·åˆ°ï¼›åŸŽéŽ®ï¼ä¼‘æ¯åŠŸèƒ½æ˜¯å¦ä¸€å¥—ç¨ç«‹
-   é‚è¼¯ï¼ˆç›´æŽ¥çŒæ»¿HP/SPï¼Œä¸ç¶“éŽpotionDefinitionsï¼‰ï¼Œå®Œå…¨æ²’æœ‰è¢«å‹•åˆ°ã€‚
-8. **é ç•™æœªä¾†é‡‘å¹£æ¶ˆè€—ç³»çµ±**ï¼šæ–°å¢ž`v133SpendGoldForFutureSystem(amount)`
-   ï¼ˆæ‰£éŒ¢ï¼‹é˜²å‘†ï¼‹å­˜æª”çš„å…±ç”¨å·¥å…·å‡½å¼ï¼‰ï¼Œä¹‹å¾Œè¦åŠ è£å‚™å¼·åŒ–/è£½ä½œ/æ´—éŠ/
-   åˆæˆ/ææ–™å‡éšŽé€™äº›çŽ©æ³•ï¼Œç›´æŽ¥å‘¼å«é€™å€‹å°±å¥½ï¼Œé€™æ¬¡ä¸å¯¦ä½œå¯¦éš›çŽ©æ³•
-   æœ¬èº«ã€‚
-
-**é©—è­‰æ–¹å¼**ï¼ˆå…¨éƒ¨ç”¨Playwrightå¯¦éš›å‘¼å«çœŸæ­£çš„éŠæˆ²å‡½å¼é‡å‡ºä¾†ï¼Œä¸æ˜¯
-ç´”ç†è«–ç®—å¼ï¼‰ï¼š
-- `node --check`å…¨éƒ¨æ”¹å‹•æª”æ¡ˆèªžæ³•é€šéŽ
-- å‡ç´šæ›²ç·šcheckpointï¼ˆçœŸçš„å¾žéŠæˆ²è£¡çš„`v133GetExpNextForLevel()`
-  è®€å‡ºä¾†ï¼‰ï¼š
-
-  | ç­‰ç´š | å‡ç´šæ‰€éœ€EXP | ç´„éœ€å ´æ•¸ï¼ˆè©²ç­‰ç´šï¼‰ |
-  |---|---|---|
-  | Lv.1 | 400 | 4 |
-  | Lv.10 | 126,491 | 120 |
-  | Lv.30 | 1,971,801 | 626 |
-  | Lv.50 | 7,071,068 | 1,347 |
-  | Lv.70 | 16,398,537 | 2,231 |
-  | Lv.80 | 22,897,336 | 2,726 |
-  | Lv.90 | 30,737,339 | 3,253 |
-  | Lv.99 | 39,007,487 | 3,753 |
-
-  å…¨ç¨‹ç¸½å ´æ•¸â‰ˆ150,481å ´ï¼›æ›ç®—å¤©æ•¸ï¼ˆ1åˆ†é˜5å ´ï¼‹å…ƒç´ åŒ£70%æ•ˆçŽ‡ï¼‹
-  æ¯å¤©æŽ›8å°æ™‚ï¼‰â‰ˆ**89.6å¤©**ï¼Œå¹¾ä¹Žç²¾ç¢ºå‘½ä¸­ä½¿ç”¨è€…è¦æ±‚çš„ã€Œç´„90å¤©ã€ï¼›
-  24å°æ™‚æ¥µç«¯æŽ›æ©Ÿâ‰ˆ29.9å¤©ï¼ˆç´„1å€‹æœˆï¼Œæ˜Žç¢ºè¶…éŽã€Œä¸€å…©é€±ã€ä¸‹é™ï¼‰ï¼›
-  ç´”æ‰‹å‹•100%æ•ˆçŽ‡ã€æ¯å¤©8å°æ™‚â‰ˆ62.7å¤©ï¼ˆæ¯”æŽ›æ©Ÿå¿«ï¼Œç¬¦åˆã€Œæ‰‹å‹•æ¯”æŽ›æ©Ÿ
-  æœ‰æ•ˆçŽ‡ã€çš„åˆç†è¨­è¨ˆï¼‰ã€‚
-- `checkLevelUp()`å¯¦æ¸¬ï¼šLv.1è§’è‰²çŒå¥½å‰›å¥½å‡1ç´šçš„EXPï¼Œå‡ç´šå¾Œ
-  `expNext`æ­£ç¢ºè®Šæˆ`getExpNextForLevel(2)=2263`ï¼Œè·Ÿæ–°å…¬å¼å®Œå…¨ä¸€è‡´ã€‚
-- ç²¾è‹±/BOSSæˆ°é¬¥EXPå¯¦æ¸¬ï¼šLv.20æ€ªç‰©ï¼Œæ™®é€šæ‹¿700ã€ç²¾è‹±æ‹¿1050
-  ï¼ˆç²¾ç¢º1.5å€ï¼‰ã€BOSSæ‹¿2100ï¼ˆç²¾ç¢º3å€ï¼‰ã€‚
-- å…ƒç´ åŒ£70%EXPå¯¦æ¸¬ï¼šé€éŽçœŸå¯¦UIæµç¨‹ï¼ˆé»žæµ®å‹•å…ƒç´ åŒ£æŒ‰éˆ•â†’å¥—ç”¨ä¸¦
-  å•Ÿå‹•ï¼‰å•Ÿå‹•å…ƒç´ åŒ£å¾Œæ‰“è´ä¸€å ´æˆ°é¬¥ï¼Œæ­£å¸¸æ€ªæ‹¿åˆ°490ï¼ˆ700Ã—0.7ç²¾ç¢º
-  ç­‰æ–¼490ï¼ŒéŽç¨‹ä¸­æŠ“åˆ°ä¸¦ä¿®æ­£ä¸€å€‹çœŸçš„å­˜åœ¨çš„æµ®é»žæ•¸èª¤å·®â€”â€”
-  `700*0.7`åœ¨JavaScriptè£¡é‹ç®—çµæžœæ˜¯`489.999999...`ï¼ŒåŽŸæœ¬ç”¨
-  `Math.floor`æœƒèª¤æ‰£1é»žè®Šæˆ489ï¼Œæ”¹ç”¨`Math.round`å¾Œç²¾ç¢ºæ‹¿åˆ°490ï¼‰ã€‚
-- é‡‘å¹£æŽ‰è½rankå€çŽ‡å¯¦æ¸¬ï¼šLv.20æ€ªç‰©ï¼ˆå›ºå®švariance=1.0æŽ’é™¤éš¨æ©Ÿæµ®å‹•ï¼‰
-  æ™®é€š43ã€ç²¾è‹±86ï¼ˆç²¾ç¢º2å€ï¼‰ã€BOSS215ï¼ˆç²¾ç¢º5å€ï¼‰ã€‚
-- å•†åº—éšŽç´šå¯¦æ¸¬ï¼šLv.30è§’è‰²é¡¯ç¤ºã€ŒLv.1ï½ž30ï¼ˆåƒ¹æ ¼Ã—1ï¼‰ã€ã€Lv.71è§’è‰²
-  é¡¯ç¤ºã€ŒLv.71ï½ž80ï¼ˆåƒ¹æ ¼Ã—3.5ï¼‰ã€ï¼›é›™è§’è‰²Lv.80+Lv.10æ··åˆéšŠä¼ï¼Œå•†åº—
-  æ­£ç¢ºé¡¯ç¤ºã€ŒLv.71ï½ž80ï¼ˆåƒ¹æ ¼Ã—3.5ï¼‰ã€ï¼ˆ`v133GetHighestCreatedCharacterLevel()`
-  å›žå‚³80ï¼Œä¸æ˜¯å¹³å‡æˆ–ç›®å‰é¸ä¸­è§’è‰²ï¼‰ï¼Œç¢ºèªä¸æœƒè¢«ä½Žç­‰è§’è‰²æ‹–ç´¯åƒ¹æ ¼ã€‚
-- è³¼è²·å¯¦æ¸¬ï¼šLv.71è§’è‰²ï¼ˆÃ—3.5éšŽç´šï¼‰è²·2ç“¶HP10%è—¥æ°´ï¼Œå¯¦éš›æ‰£æ¬¾140
-  é‡‘å¹£ï¼Œç²¾ç¢ºç­‰æ–¼`20Ã—3.5Ã—2`ã€‚
-- è—¥æ°´é…ç½®å¯¦æ¸¬ï¼šå•†åº—åŒæ™‚åˆ—å‡ºHP/SPçš„30%éšŽï¼ˆ`å›žå¾©30%HPè—¥æ°´`/
-  `å›žå¾©30%SPè—¥æ°´`éƒ½åœ¨ï¼‰ï¼Œå®Œå…¨æ²’æœ‰åˆ—å‡º100%éšŽï¼ˆ`å›žå¾©æ‰€æœ‰HP`/
-  `å›žå¾©æ‰€æœ‰SP`éƒ½ä¸åœ¨ç•«é¢è£¡ï¼‰ï¼›`potionDefinitions`é™£åˆ—æœ¬èº«
-  `hpPotion100`/`spPotion100`å…©å€‹é“å…·å®šç¾©éƒ½é‚„åœ¨ï¼ˆ`.some()`ç¢ºèª
-  å­˜åœ¨ï¼‰ï¼Œåªæ˜¯å•†åº—æ¸²æŸ“æ™‚è¢«éŽæ¿¾æŽ‰ï¼Œé™£åˆ—é•·åº¦æ­£ç¢ºæ˜¯8ï¼ˆåŽŸæœ¬6å€‹+
-  æ–°å¢ž2å€‹30%éšŽï¼‰ã€‚
-
-**å·²çŸ¥é™åˆ¶**ï¼šé€™æ¬¡åªé©—è­‰äº†å„é …æ”¹å‹•é»žæœ¬èº«çš„æ•¸å€¼æ­£ç¢ºæ€§ï¼Œæ²’æœ‰é‡æ–°
-è·‘ä¸€æ¬¡å®Œæ•´çš„é•·æ™‚é–“æŽ›æ©Ÿæ¨¡æ“¬ï¼ˆä¸å¯èƒ½çœŸçš„æ¨¡æ“¬89å¤©éŠæˆ²æ™‚é–“ï¼‰ï¼Œ89.6å¤©
-é€™å€‹æ•¸å­—æ˜¯ç”¨å¯¦éš›éŠæˆ²å…¬å¼ç®—å‡ºä¾†çš„æŽ¨ç®—å€¼ï¼Œä¸æ˜¯å¯¦æ¸¬å€¼ï¼›ä¹Ÿæ²’æœ‰æ¸¬è©¦
-ã€ŒBOSSæŽ‰è½/å‰¯æœ¬çŽå‹µ/ä»»å‹™çŽå‹µ/æˆå°±çŽå‹µã€å¯¦éš›ç™¼æ”¾100%è—¥æ°´çš„æµç¨‹
-ï¼ˆé€™æ¬¡è¦æ ¼åªè¦æ±‚é“å…·è³‡æ–™ä¿ç•™ï¼Œæ²’æœ‰è¦æ±‚æ–°å¢žé€™äº›ç™¼æ”¾ä¾†æºæœ¬èº«ï¼‰ã€‚
-
-### 2026-08-26 â€” å¯¶ç®±æ”¹è‡ªä¸»é–‹å•Ÿã€ç¶“é©—å‰¯æœ¬å…¬å¼ä¿®æ­£ã€å¥—è£é¡¯ç¤ºã€å›žåˆç¯€å¥è£œå®Œæ•´ã€å‰¯æœ¬æ¬¡æ•¸æš«é—œ
-
-ä½¿ç”¨è€…é€™è¼ªä¸€æ¬¡æå‡º6é»žï¼ˆç¬¬4é»žæ²’æœ‰å¯¦éš›å…§å®¹ï¼‰ï¼š
-
-1. **å‰¯æœ¬å¯¶ç®±é ˜å–æ™‚ä¸æ‡‰è©²ç›´æŽ¥é–‹å•Ÿï¼Œè¦æ”¾é€²èƒŒåŒ…çµ¦çŽ©å®¶è‡ªå·±é–‹**ï¼šææ–™å‰¯æœ¬
-   åŽŸæœ¬ã€Œç›´æŽ¥é ˜å–ã€æŒ‰ä¸‹åŽ»å°±æœƒé¦¬ä¸Šéª°å®Œææ–™å¡žé€²èƒŒåŒ…ã€‚æ”¹æˆ`v132ClaimMaterialDungeonReward()`
-   åªæŠŠã€Œææ–™å¯¶ç®±ã€é€™å€‹æ–°ç‰©å“ï¼ˆ`type:"chest"`ï¼Œå¯å †ç–Šï¼‰æ”¾é€²èƒŒåŒ…ï¼ŒçœŸæ­£
-   éª°ç¤¦çŸ³/è¨­è¨ˆåœ–ç´™éšŽç´šå»¶å¾Œåˆ°çŽ©å®¶è‡ªå·±åœ¨èƒŒåŒ…é»žé–‹ã€æŒ‰ã€Œé–‹å•Ÿã€æ‰é€²è¡Œ
-   ï¼ˆ`openSingleMaterialChestFromInventory()`ï¼Œå…§éƒ¨é‡ç”¨`rollMaterialChestRewards()`
-   è·ŸåŽŸæœ¬`openMaterialChests()`åŒä¸€å¥—æ©ŸçŽ‡é‚è¼¯ï¼Œåªæ˜¯æ”¹æˆä¸€æ¬¡é–‹ä¸€å€‹ï¼‰ã€‚
-   è£å‚™å‰¯æœ¬åŽŸæœ¬å°±å·²ç¶“æ˜¯é€™å€‹è¡Œç‚ºï¼ˆ`v132ClaimEquipmentDungeonReward()`æœ¬ä¾†
-   å°±åªæ˜¯æŠŠæŠ½çŽåˆ¸æ”¾é€²èƒŒåŒ…ï¼Œ`useEquipmentTicket()`æ‰æ˜¯çœŸæ­£é–‹ï¼‰ï¼Œé€™æ¬¡æ²’å‹•ã€‚
-2. **å¯¶ç®±/æŠ½çŽåˆ¸é»žé–‹è¦æœ‰ã€Œé–‹å•Ÿï¼é è¦½ï¼å‡ºå”®ã€ä¸‰é¡†æŒ‰éˆ•**ï¼šæ“´å……`openItemModal()`
-   çš„è¦†å¯«ï¼Œ`item.type`æ˜¯`chest`æˆ–`ticket`æ™‚æŠŠã€Œç©¿æˆ´ã€æŒ‰éˆ•æ•´å€‹è—èµ·ä¾†
-   ï¼ˆ`style.display="none"`ï¼‰ï¼Œé¡å¤–æ’å…¥ã€Œé–‹å•Ÿã€ï¼ˆå‘¼å«æ—¢æœ‰çš„
-   `useEquipmentTicket()`/æ–°çš„`openSingleMaterialChestFromInventory()`ï¼‰
-   è·Ÿæ–°çš„ã€Œé è¦½ã€æŒ‰éˆ•ï¼ˆ`showItemPreview()`ï¼Œé‡ç”¨`v132ShowRewardModal()`
-   å½ˆçª—é¡¯ç¤ºå¯èƒ½é–‹å‡ºçš„å…§å®¹è·Ÿæ©ŸçŽ‡ï¼Œä¸ç”¨å¦å¤–åšä¸€æ•´å¥—æ–°UIï¼‰ï¼›ã€Œå”®å‡ºã€æ˜¯
-   ç‰©å“å½ˆçª—æœ¬ä¾†å°±æœ‰çš„é€šç”¨æŒ‰éˆ•ï¼Œä¸ç”¨é¡å¤–è™•ç†ã€‚
-3. **ç¶“é©—å‰¯æœ¬çµç®—å…¬å¼é‡å¯«**ï¼šåŽŸæœ¬ç”¨ä¸€å€‹é€™å€‹å°ˆæ¡ˆè£¡æ ¹æœ¬ä¸å­˜åœ¨çš„
-   `getExpToNextLevel()`ï¼ˆæ°¸é è½åˆ°å‚™æ´å€¼ã€Œç­‰ç´šÃ—100ã€ï¼‰ï¼Œä¹˜0.5ç•¶çŽå‹µã€‚
-   ä½¿ç”¨è€…æŒ‡å‡ºé€™å€‹æ•¸å­—å…¶å¯¦å·²ç¶“å­˜åœ¨è§’è‰²ç‰©ä»¶çš„`character.expNext`æ¬„ä½è£¡
-   ï¼ˆ`js/00-main.js`çš„`checkLevelUp()`æ¯æ¬¡å‡ç´šéƒ½æœƒæ›´æ–°é€™å€‹å€¼ï¼Œä»£è¡¨
-   ã€Œå‡ä¸‹ä¸€ç´šé‚„éœ€è¦å¤šå°‘ç¶“é©—ã€ï¼‰ã€‚æ–°å…¬å¼ï¼š`getExpDungeonRewardExp()`ï¼
-   éšŠä¼æ¯å€‹è§’è‰²çš„`expNext`åŠ ç¸½ã€é™¤ä»¥è§’è‰²äººæ•¸ï¼Œä¸å†ä¹˜0.5ã€‚
-4. **å¥—è£æ•ˆæžœè¦åœ¨é»žæ“Šè£å‚™æ™‚é¡¯ç¤º**ï¼š`openItemModal()`/`openEquippedItem()`
-   éƒ½è£œä¸Š`appendEquipmentSetInfo()`ï¼Œåªè¦é»žåˆ°çš„ç‰©å“æœ‰`setId`ï¼ˆä¸ç®¡ç©¿åœ¨
-   èº«ä¸Šé‚„æ˜¯é‚„åœ¨èƒŒåŒ…è£¡ï¼‰ï¼Œå°±åœ¨ç‰©å“è©³ç´°å½ˆçª—statså€å¡Šå¾Œé¢é™„åŠ ã€Œ[å¥—è£å]
-   ç›®å‰ä»¶æ•¸/5ã€è·Ÿå…©è¡Œå¥—è£åŠ æˆèªªæ˜Žï¼Œé”æˆé–€æª»çš„é‚£è¡Œç”¨`.v132-set-bonus.active`
-   ï¼ˆäº®è‰²+ç²—é«”+ã€Œ[å·²å•Ÿå‹•]ã€ï¼‰ï¼Œæ²’é”æˆç”¨`.v132-set-bonus.inactive`
-   ï¼ˆæš—è‰²+ã€Œ[æœªå•Ÿå‹•]ã€ï¼‰ï¼Œè·Ÿä½¿ç”¨è€…çµ¦çš„ç¯„ä¾‹æ ¼å¼å®Œå…¨å°é½Šã€‚
-5. **å‰¯æœ¬æ¯æ—¥æ¬¡æ•¸é™åˆ¶æš«æ™‚é—œé–‰**ï¼ˆæ–¹ä¾¿ä½¿ç”¨è€…é »ç¹æ¸¬è©¦ï¼‰ï¼šæ–°å¢ž
-   `DUNGEON_DAILY_LIMIT_ENABLED=false`å¸¸æ•¸ï¼Œ`markDungeonUsed()`åœ¨é—œé–‰æ™‚
-   ç›´æŽ¥è·³éŽï¼ˆä¸å¯«å…¥`dungeonState.used`ï¼‰ï¼Œé€£éŽ–è®“UIçš„ã€Œä»Šæ—¥å·²æŒ‘æˆ°ã€
-   åœç”¨æ¨£å¼ä¹Ÿä¸æœƒå‡ºç¾ï¼Œä¹‹å¾Œè¦æ¢å¾©æ¯æ—¥é™åˆ¶åªè¦æŠŠé€™å€‹å¸¸æ•¸æ”¹å›ž`true`ï¼Œ
-   ä¸ç”¨å‹•å…¶ä»–åœ°æ–¹ã€‚
-6. **æ€ªç‰©ä¹‹é–“çš„å‡ºæ‰‹é–“éš”ä¹Ÿè¦å›ºå®š1.5ç§’ï¼ŒåŒ…å«ã€Œé€²å…¥æˆ°é¬¥â†’ç¬¬ä¸€ä¸‹å‡ºæ‰‹ã€è·Ÿ
-   ã€Œä¸‹ä¸€å›žåˆé–‹å§‹â†’ç¬¬ä¸€ä¸‹å‡ºæ‰‹ã€é€™å…©å€‹åŽŸæœ¬è¢«æ¼æŽ‰çš„ç¯€é»ž**ï¼šæ ¹å› æ˜¯
-   `startResolutionPhase()`å®£å‘ŠéšŽæ®µä¸€çµæŸï¼Œæœƒé¦¬ä¸ŠåŒæ­¥å‘¼å«
-   `processNextCombatant()`é–‹å§‹çµç®—ç¬¬ä¸€ä½è§’è‰²ï¼Œä¸­é–“å®Œå…¨æ²’æœ‰åœé “
-   ï¼ˆè·Ÿå…¶ä»–æ¯ä¸€ä½è§’è‰²å‡ºæ‰‹ä¹‹é–“ã€ç”±`finishPlayerAction()`è² è²¬çš„1.5ç§’
-   å®Œå…¨ä¸ä¸€æ¨£ï¼‰ã€‚ä¿®æ³•ï¼šåœ¨`js/25-v131-fix-batch.js`æ–°å¢žä¸€çµ„æ¨™è¨˜å¼è¦†å¯«
-   â€”â€”`startResolutionPhase()`è¢«å‘¼å«ã€è€Œä¸”é€™æ¬¡çœŸçš„æœƒåŸ·è¡Œï¼ˆæ¯”ç…§åŽŸæœ¬
-   å‡½å¼è‡ªå·±çš„`resolutionPhaseStarted`é˜²é‡è¤‡åˆ¤æ–·ï¼‰æ™‚ï¼Œæž¶ä¸€å€‹æ——æ¨™ï¼›
-   `processNextCombatant()`åªåœ¨åµæ¸¬åˆ°é€™å€‹æ——æ¨™æ™‚ï¼Œæ‰æŠŠã€ŒçœŸæ­£åŸ·è¡Œã€åŒ…é€²
-   `setTimeout(...,1500ms)`å»¶å¾Œï¼Œæ¶ˆè²»æŽ‰æ——æ¨™å¾Œä¸å½±éŸ¿åŒä¸€å›žåˆè£¡å¾Œé¢
-   æ­£å¸¸çš„å‘¼å«ã€‚**é€™è£¡è¸©äº†ä¸€å€‹é‡æ¸¬æ–¹æ³•çš„å‘ï¼Œè¨˜éŒ„ä¸‹ä¾†çµ¦ä¸‹ä¸€å€‹äººåƒè€ƒ**ï¼š
-   ä¸€é–‹å§‹ç›´æŽ¥é‡æ¸¬ã€Œé€£çºŒå…©æ¬¡`processNextCombatant`å‘¼å«ä¹‹é–“çš„æ™‚é–“å·®ã€ï¼Œ
-   çµæžœçœ‹èµ·ä¾†åƒæ˜¯ã€ŒæŸäº›åœ°æ–¹è®Šæˆé›™å€å»¶é²ï¼ˆ~3ç§’ï¼‰ã€æŸäº›åœ°æ–¹å®Œå…¨æ²’å»¶é²
-   ï¼ˆ~250msï¼‰ã€ï¼Œä¸€åº¦ä»¥ç‚ºä¿®æ³•æœ¬èº«æœ‰bugâ€”â€”å¾Œä¾†æ”¹æˆé‡æ¸¬`addBattleLog()`
-   å¯¦éš›å¯«å…¥æˆ°é¬¥ç´€éŒ„çš„æ™‚é–“é»žï¼ˆä¹Ÿå°±æ˜¯çŽ©å®¶ã€ŒçœŸæ­£çœ‹åˆ°ã€å‹•ä½œç™¼ç”Ÿçš„æ™‚åˆ»ï¼‰
-   æ‰ç™¼ç¾ï¼šå› ç‚ºæ–°çš„å»¶é²æ˜¯ã€Œå‘¼å«ç•¶ä¸‹å°±returnã€setTimeoutåˆ°æ™‚é–“æ‰çœŸæ­£
-   åŸ·è¡Œã€ï¼Œå‘¼å«æ™‚é–“é»žæœ¬èº«æ²’æœ‰æ„ç¾©ï¼Œé‡å‘¼å«é–“éš”æœƒè¢«å»¶é²çš„å…ˆå¾Œé †åºæžäº‚ï¼›
-   é‡çœŸæ­£å¯è¦‹çš„å‹•ä½œæ™‚é–“é»žï¼Œç¯€å¥å®Œå…¨æ­£ç¢ºï¼ˆè¦‹ä¸‹æ–¹é©—è­‰ï¼‰ã€‚
-
-**é©—è­‰æ–¹å¼**ï¼š
-- `node --check`å…¨éƒ¨æ”¹å‹•æª”æ¡ˆèªžæ³•é€šéŽ
-- ææ–™å‰¯æœ¬ï¼šé ˜å–å¾ŒèƒŒåŒ…å¤š3å€‹ã€Œææ–™å¯¶ç®±ã€ï¼Œç¤¦çŸ³/è¨­è¨ˆåœ–ç´™ç¸½é‡ä¸è®Š
-  ï¼ˆæ²’æœ‰è¢«è‡ªå‹•é–‹å•Ÿï¼‰ï¼›é–‹å•Ÿ1å€‹å¯¶ç®±å¾Œï¼Œå¯¶ç®±åº«å­˜-1ã€ç¤¦çŸ³/è¨­è¨ˆåœ–ç´™+2ç¨®
-  ï¼ˆå„è‡ªå°æ‡‰éšŽç´šçš„æ•¸é‡ï¼‰
-- å¯¶ç®±ç‰©å“å½ˆçª—ï¼šç©¿æˆ´éµéš±è—ã€é–‹å•Ÿ/é è¦½/å‡ºå”®ä¸‰é¡†éƒ½åœ¨ï¼Œé è¦½å½ˆçª—æ­£ç¢º
-  é¡¯ç¤ºä½Ž/ä¸­/é«˜/æ¥µå“ç¤¦çŸ³èˆ‡è¨­è¨ˆåœ–ç´™çš„40%/30%/20%/10%æ©ŸçŽ‡ï¼›æŠ½çŽåˆ¸ç‰©å“
-  å½ˆçª—é è¦½æ­£ç¢ºåˆ—å‡ºå°æ‡‰å¥—è£å…¨éƒ¨10å€‹éƒ¨ä½è·Ÿåœ–ç¤ºï¼›é»žå®Œå¯¶ç®±/æŠ½çŽåˆ¸ä¹‹å¾Œ
-  å†é»žä¸€èˆ¬è£å‚™/è—¥æ°´ï¼Œç©¿æˆ´éµæ­£ç¢ºæ¢å¾©é¡¯ç¤ºã€é–‹å•Ÿ/é è¦½éµæ­£ç¢ºæ¢å¾©éš±è—ï¼Œ
-  æ²’æœ‰æ®˜ç•™ç‹€æ…‹
-- ç¶“é©—å‰¯æœ¬ï¼š`player.expNext=50000`ã€`player2.expNext=60000`ï¼Œå‰¯æœ¬å½ˆçª—
-  æ­£ç¢ºé¡¯ç¤ºã€Œ55,000ã€ï¼Œå¯¦éš›å…¥å¸³`sharedExp`å¢žåŠ é‡ä¹Ÿæ˜¯55000
-- æ¯æ—¥æ¬¡æ•¸ï¼šclaimå®Œç¶“é©—å‰¯æœ¬å¾Œç«‹åˆ»å†å‘¼å«`v132BeginExpDungeon()`ï¼Œæ²’æœ‰
-  è·³å‡ºã€Œä»Šå¤©å·²ç¶“æŒ‘æˆ°éŽäº†ã€ã€æ­£å¸¸é–‹æ–°ä¸€å ´
-- å¥—è£é¡¯ç¤ºï¼šè£å‚™3ä»¶[å²©å²³]å¥—è£å¾Œé»žå…¶ä¸­ä¸€ä»¶ï¼Œå½ˆçª—æ­£ç¢ºé¡¯ç¤º
-  ã€Œ[å²©å²³]3/5ã€ã€ã€Œè£å‚™ä¸‰ä»¶ å…¨èƒ½åŠ›+1 [å·²å•Ÿå‹•]ã€ï¼ˆactiveæ¨£å¼ï¼‰ã€
-  ã€Œè£å‚™äº”ä»¶ åœŸå…ƒç´ æŠ€èƒ½å‚·å®³+2% [æœªå•Ÿå‹•]ã€ï¼ˆinactiveæ¨£å¼ï¼‰
-- å›žåˆç¯€å¥ï¼šå¯¦éš›æ””æˆª`addBattleLog()`å°å‡ºæ™‚é–“æˆ³ï¼Œé€£çºŒ3å€‹å›žåˆçš„å®Œæ•´
-  æ™‚é–“è»¸â€”â€”æ¯ä¸€è¡Œé–“éš”éƒ½ç²¾ç¢ºè½åœ¨1.5ç§’ä¸Šä¸‹ï¼ˆ1502~1756msï¼ŒdeclareéšŽæ®µ
-  æœ¬èº«çš„æ¥µçŸ­è™•ç†æ™‚é–“ä¹Ÿç®—åœ¨å…§ï¼‰ï¼ŒåŒ…å«ã€Œå›žåˆé–‹å§‹logã€åˆ°ã€ŒçŽ©å®¶1å‡ºæ‰‹logã€
-  è·Ÿã€Œæœ€å¾Œä¸€éš»æ€ªå‡ºæ‰‹ã€åˆ°ã€Œä¸‹ä¸€å›žåˆé–‹å§‹logã€é€™å…©å€‹åŽŸæœ¬è¢«æ¼æŽ‰çš„ç¯€é»žï¼Œ
-  å®Œå…¨ç¬¦åˆä½¿ç”¨è€…çµ¦çš„ç¯€å¥è¦æ ¼
-
-**å·²çŸ¥é™åˆ¶**ï¼šé€™æ¬¡æ²’æœ‰é‡æ–°æ¸¬è©¦æ¯å€‹å‰¯æœ¬å®Œæ•´èµ°ä¸€æ¬¡ï¼ˆwin/loseé›™è·¯å¾‘ï¼‰
-çš„å›žæ­¸ï¼Œåªé‡å°é€™6é»žå„è‡ªçš„æ”¹å‹•é»žåšé‡å°æ€§é©—è­‰ï¼Œæ¯”ç…§ä½¿ç”¨è€…æœ¬äººã€Œä¸éœ€è¦
-è·‘æ•´å€‹ç¶²ç«™å®Œæ•´å›žæ­¸ã€çš„æŒ‡ç¤ºã€‚
-
-### 2026-08-26 â€” å‰¯æœ¬æ€ªç‰©å¼·åº¦ç¬¬äºŒè¼ªé‡èª¿ï¼ˆç­‰ç´šå…¬å¼æ”¹æˆã€Œæœ€é«˜70%ï¼‹å¹³å‡30%ã€ï¼‹æ™®é€š/ç²¾è‹±/BOSSåˆ†ç´šå€çŽ‡ï¼‰
-
-ä½¿ç”¨è€…ä¸Šä¸€è¼ªåæ‡‰ã€Œå‰¯æœ¬çš„æ€ªç‰©æ„Ÿè¦ºå¤ªå¼±äº†ã€ï¼Œæˆ‘è£œä¸Šäº†è®“å‰¯æœ¬æ€ªæ‰“å¹³ä¸€èˆ¬é‡Žæ€ªçš„
-+30%ï¼ˆ`DUNGEON_MONSTER_STRENGTH`ï¼‰ï¼Œä½†ä½¿ç”¨è€…é€™è¼ªæ˜Žç¢ºæŒ‡å‡ºé‚„æ˜¯åå¼±ï¼Œä¸¦çµ¦äº†
-éžå¸¸preciseçš„è¦æ ¼ï¼Œè¦æ±‚é‡æ–°è¨­è¨ˆå‰¯æœ¬ç­‰ç´šå…¬å¼è·Ÿåˆ†ç´šå¼·åº¦ï¼ŒåŒæ™‚**æ˜Žç¢ºç¦æ­¢**ï¼š
-ä¸èƒ½é‡åšæˆ°é¬¥ç³»çµ±ã€ä¸èƒ½å‹•ä¸€èˆ¬é‡Žæ€ªæ•¸å€¼/`getMonsterRank()`ã€æ—¢æœ‰çš„+30%ä¸èƒ½
-è¢«é‡è¤‡å¥—ç”¨ç¬¬äºŒæ¬¡ã€‚å…¨éƒ¨æ”¹å‹•éƒ½åœ¨`js/27-v132-content-expansion.js`è£¡å®Œæˆï¼Œ
-`js/00-main.js`è·Ÿ`js/25-v131-fix-batch.js`å®Œå…¨æ²’æœ‰å‹•ã€‚
-
-1. **å‰¯æœ¬åŸºæº–ç­‰ç´šå…¬å¼é‡åš**ï¼šåŽŸæœ¬ã€Œæ‰€æœ‰å·²å»ºç«‹è§’è‰²ç­‰ç´šç¸½å’ŒÃ·è§’è‰²æ•¸é‡ã€
-   åœ¨é«˜ç­‰ä¸»åŠ›å¸¶ä½Žç­‰è§’è‰²æ™‚æœƒè¢«å¹³å‡å¾—å¾ˆä½Žï¼ˆLv.50+Lv.20+Lv.10åªç®—å‡ºç´„
-   Lv.27ï¼‰ã€‚æ”¹æˆ`round(éšŠä¼æœ€é«˜ç­‰ç´šÃ—0.70 + éšŠä¼å¹³å‡ç­‰ç´šÃ—0.30)`
-   ï¼ˆ`getDungeonMonsterLevel()`ï¼‰ï¼Œå–®ä¸€è§’è‰²æ™‚æœ€é«˜=å¹³å‡=è§’è‰²ç­‰ç´šï¼Œ
-   çµæžœä¸è®Šã€‚
-
-2. **å‰¯æœ¬æ€ªç‰©ä¸‰å±¤å¼·åº¦ç–ŠåŠ **ï¼Œæ–°çš„å”¯ä¸€å»ºæ§‹å…¥å£
-   `buildDungeonMonster(name,level,element,rank)`å›ºå®šè·‘ä¸‰æ­¥ï¼ˆä¸€èˆ¬æ€ª
-   åªæœƒç¶“éŽå‰å…©æ­¥ï¼‰ï¼š
-   - `applyDungeonMonsterStrength()`â€”â€”æ²¿ç”¨æ—¢æœ‰`DUNGEON_MONSTER_STRENGTH
-     =1.30`ï¼Œå®Œå…¨æ²’æ”¹ï¼Œåªå¥—ç”¨ä¸€æ¬¡
-   - `applyDungeonNormalBonus()`ï¼ˆæ–°å¢žï¼ŒÃ—1.10ï¼Œå«SPï¼‰â€”â€”è®“ã€Œå‰¯æœ¬æ™®é€šæ€ªã€
-     åŸºæº–æœ¬èº«å°±æ¯”é‡Žå¤–æ™®é€šæ€ªå†å¼·ä¸€æˆªï¼ˆ1.30Ã—1.10â‰ˆ1.43å€ï¼‰
-   - `applyDungeonRankStrength()`ï¼ˆæ–°å¢žï¼Œè®€`monster.rank`ï¼‰â€”â€”ç²¾è‹±
-     ï¼ˆ`maxHPÃ—1.60/attackÃ—1.30/magicAttackÃ—1.30/defenseÃ—1.25`ï¼‰ã€
-     BOSSï¼ˆ`maxHPÃ—3.00/attackÃ—1.50/magicAttackÃ—1.50/defenseÃ—1.40`ï¼‰
-     éƒ½æ˜¯åœ¨ã€Œå‰¯æœ¬æ™®é€šæ€ªã€çš„å®Œæ•´æ•¸å€¼ä¸Šå†ç–ŠåŠ ï¼Œä¸æ˜¯å¾žè£¸æ•¸å€¼é‡ç®—ï¼›å…©è€…
-     éƒ½åˆ»æ„ä¸å‹•SPï¼Œç¶­æŒåœ¨è·Ÿå‰¯æœ¬æ™®é€šæ€ªåŒä¸€æ°´æº–ï¼Œé¿å…ç²¾è‹±/BOSSæŠ€èƒ½
-     é »çŽ‡æš´å¢žã€‚è£å‚™å‰¯æœ¬BOSSåŽŸæœ¬çš„ã€ŒåŸºæº–ç­‰ç´šÃ—1.15ã€ä¿ç•™ä¸å‹•ã€‚
-
-3. **5å€‹å‰¯æœ¬æ€ªç‰©å»ºæ§‹å‘¼å«é»žå…¨éƒ¨æ”¹ç”¨`buildDungeonMonster()`**ï¼ˆç¶“é©—å‰¯æœ¬
-   10éš»å°å…µã€ææ–™å‰¯æœ¬5ç²¾è‹±+5æ™®é€šã€è£å‚™å‰¯æœ¬1BOSS+4ç²¾è‹±ï¼‰ï¼Œå–ä»£åŽŸæœ¬
-   å„è‡ªå¯«`applyDungeonMonsterStrength(makeZoneMonster(...))`çš„å¯«æ³•ï¼Œ
-   é™ä½Žä¹‹å¾Œæ¼åŠ æŸä¸€æ­¥é©Ÿçš„é¢¨éšªã€‚æŠ€èƒ½éšŽç´š/æ©ŸçŽ‡è¨­å®šï¼ˆ`setMonsterSkillTier`/
-   `setMonsterMaxTierSkills`ï¼‰å®Œå…¨æ²’å‹•ã€‚
-
-**é©—è­‰æ•¸å­—**ï¼ˆç”¨Playwrightå¯¦éš›å‘¼å«`v132BeginExpDungeon()`/
-`v132BeginMaterialDungeon()`/`v132BeginEquipmentDungeon()`ç”¢ç”Ÿçš„çœŸå¯¦
-æ€ªç‰©ç‰©ä»¶è®€å‡ºä¾†çš„ï¼Œä¸æ˜¯æ‰‹ç®—ï¼‰ï¼š
-
-ç­‰ç´šå…¬å¼ï¼ˆ4çµ„éšŠä¼å…¨éƒ¨ç²¾ç¢ºç¬¦åˆä½¿ç”¨è€…çµ¦çš„æœŸæœ›å€¼ï¼‰ï¼š
-| éšŠä¼ | ç­‰ç´šçµ„æˆ | æœŸæœ› | å¯¦éš› |
-|---|---|---|---|
-| A | 20 | 20 | 20 |
-| B | 50+50 | 50 | 50 |
-| C | 50+20 | â‰ˆ46 | 46 |
-| D | 50+20+10 | â‰ˆ43 | 43 |
-
-Lv.20ï¼ˆé›™è§’è‰²éƒ½Lv.20ï¼Œå‰¯æœ¬åŸºæº–ç­‰ç´š=20ï¼‰ï¼š
-| é¡žåž‹ | HP | SP | æ”»æ“Š | é˜²ç¦¦ | é­”æ”» |
-|---|---|---|---|---|---|
-| é‡Žå¤–æ™®é€šæ€ª | 300 | 200 | 60 | 70 | 50 |
-| å‰¯æœ¬æ™®é€šæ€ª | 429 | 286 | 86 | 100 | 72 |
-| å‰¯æœ¬ç²¾è‹±æ€ª | 686 | 286 | 112 | 125 | 94 |
-| å‰¯æœ¬BOSSï¼ˆç­‰ç´š23ï¼20Ã—1.15ï¼‰ | 1503 | 308 | 141 | 171 | 119 |
-
-Lv.50ï¼ˆé›™è§’è‰²éƒ½Lv.50ï¼Œå‰¯æœ¬åŸºæº–ç­‰ç´š=50ï¼‰ï¼š
-| é¡žåž‹ | HP | SP | æ”»æ“Š | é˜²ç¦¦ | é­”æ”» |
-|---|---|---|---|---|---|
-| é‡Žå¤–æ™®é€šæ€ª | 550 | 365 | 115 | 145 | 105 |
-| å‰¯æœ¬æ™®é€šæ€ª | 787 | 523 | 165 | 208 | 151 |
-| å‰¯æœ¬ç²¾è‹±æ€ª | 1259 | 523 | 215 | 260 | 196 |
-| å‰¯æœ¬BOSSï¼ˆç­‰ç´š57â‰ˆ50Ã—1.15ï¼‰ | 2790 | 586 | 279 | 351 | 248 |
-
-å…©å€‹ç­‰ç´šéƒ½æ˜Žç¢ºæˆç«‹ã€Œé‡Žå¤–æ™®é€š < å‰¯æœ¬æ™®é€š < å‰¯æœ¬ç²¾è‹± < å‰¯æœ¬BOSSã€ï¼Œä¸”æ‰‹ç®—
-é©—è­‰éŽå‰¯æœ¬æ™®é€šæ€ªæ•¸å€¼ï¼é‡Žå¤–åŽŸå§‹å€¼Ã—1.30Ã—1.10ï¼ˆä¾‹å¦‚Lv.20çš„429ï¼
-300Ã—1.30Ã—1.10å››æ¨äº”å…¥ï¼Œä¸æ˜¯è¢«å¥—äº†å…©æ¬¡1.30çš„300Ã—1.30Ã—1.30ï¼507ï¼‰ï¼Œç²¾è‹±/
-BOSSçš„SPéƒ½è·Ÿå‰¯æœ¬æ™®é€šæ€ªä¸€è‡´ï¼ˆä¾‹å¦‚Lv.20ç²¾è‹±/æ™®é€šSPéƒ½æ˜¯286ï¼‰ï¼Œç¢ºèªæ²’æœ‰
-èª¤è§¸ç²¾è‹±/BOSSçš„SPé¡å¤–å€çŽ‡ã€‚å¦å¤–ç¢ºèªï¼š`node --check`èªžæ³•é€šéŽã€ä¸‰å€‹å‰¯æœ¬
-éƒ½èƒ½æ­£å¸¸å‘¼å«ä¸¦ç”¢ç”Ÿæ­£ç¢ºæ•¸é‡çš„æ€ªç‰©ï¼ˆç¶“é©—10éš»ã€ææ–™5+5ã€è£å‚™1+4ï¼‰ã€
-rankæ¬„ä½æ­£ç¢ºã€`js/00-main.js`/`js/25-v131-fix-batch.js`å®Œå…¨æ²’æœ‰æ”¹å‹•
-ï¼ˆä¸€èˆ¬é‡Žæ€ªæ•¸å€¼/`getMonsterRank()`ä¸å—å½±éŸ¿ï¼‰ã€‚å‹è² çµç®—æµç¨‹ï¼ˆ`winBattle`/
-`loseBattle`/`launchDungeonBattle`ï¼‰é€™è¼ªå®Œå…¨æ²’æœ‰æ”¹å‹•ï¼Œæ²¿ç”¨ä¸Šä¸€è¼ªå·²ç¶“
-é©—è­‰éŽçš„é‚è¼¯ï¼Œé€™æ¬¡æ²’æœ‰é‡æ–°è·‘ä¸€æ¬¡å®Œæ•´å‹è² æµç¨‹å›žæ­¸ï¼ˆä½¿ç”¨è€…æœ¬äººä¹Ÿæ˜Žç¢º
-è¡¨ç¤ºä¸éœ€è¦è·‘æ•´å€‹ç¶²ç«™å®Œæ•´å›žæ­¸ï¼‰ã€‚
-
-### 2026-08-26 â€” ã€Œå¥—ç”¨ä¸¦å•Ÿå‹•ã€çœŸçš„æœƒå•Ÿå‹•è‡ªå‹•æˆ°é¬¥ã€å‰¯æœ¬æ€ªç‰©è£œå›ž30%å¼·åŒ–ã€å›žåˆé–“éš”å•é¡ŒæŽ’æŸ¥
-
-ä½¿ç”¨è€…é€™è¼ªæå‡º4é»žï¼ˆç¬¬4é»žè¨Šæ¯è¢«æˆªæ–·ï¼Œæ²’æœ‰å…§å®¹ï¼‰ï¼š
-
-1. **ã€Œæˆ°é¬¥ä¸­é–‹å•Ÿå…ƒç´ åŒ£ï¼Œå¥—ç”¨å•Ÿå‹•æ‰æ˜¯æ²’åæ‡‰ã€**â€”â€”æ ¹å› æ‰¾åˆ°äº†ï¼š
-   `confirmAutoBattleSettings()`ï¼ˆæŒ‰éˆ•æ–‡å­—è¢«`ensureElementBoxStatsUI()`æ”¹æˆ
-   ã€Œå¥—ç”¨ä¸¦å•Ÿå‹•ã€ï¼‰åŽŸæœ¬åªæœƒå‘¼å«æ—¢æœ‰çš„å­˜æª”é‚è¼¯ï¼ˆå­˜è§’è‰²/æŠ€èƒ½/HP-SPé–€æª»è¨­å®šï¼‰ï¼Œ
-   å¾žé ­åˆ°å°¾æ²’æœ‰çœŸçš„æŠŠ`autoBattle`æ‰“é–‹ï¼Œè·ŸæŒ‰éˆ•æ–‡å­—æ‰¿è«¾çš„è¡Œç‚ºå°ä¸èµ·ä¾†â€”â€”
-   çŽ©å®¶è¨­å®šå­˜å¥½äº†ã€è¦–çª—ä¹Ÿé—œäº†ï¼Œä½†ç•«é¢ä¸Šä»€éº¼éƒ½æ²’è®Šï¼ˆå› ç‚ºæ ¹æœ¬æ²’é€²å…¥è‡ªå‹•
-   æ¨¡å¼ï¼‰ï¼Œæ„Ÿè¦ºå°±åƒã€Œæ²’åæ‡‰ã€ã€‚ä¿®æ³•ï¼š`js/25-v131-fix-batch.js`çš„
-   `confirmAutoBattleSettings`è¦†å¯«è£¡ï¼Œå­˜å®Œè¨­å®šä¹‹å¾Œï¼Œå¦‚æžœ`autoBattle`é‚„æ²’
-   æ‰“é–‹ï¼Œå‘¼å«æ—¢æœ‰çš„`toggleAutoBattle()`ï¼ˆè·Ÿé¢æ¿æœ€ä¸Šé¢ã€Œå•Ÿå‹•ã€æŒ‰éˆ•åŒä¸€å¥—
-   é‚è¼¯ï¼Œ`autoConfig`/`autoConfig2`/`autoConfig3`ã€UIã€æˆ°é¬¥ç´€éŒ„éƒ½æœƒä¸€èµ·
-   æ­£ç¢ºåŒæ­¥ï¼‰ï¼Œå¦‚æžœå·²ç¶“é–‹è‘—å‰‡ä¸æœƒèª¤è§¸ç™¼é—œé–‰ã€‚ç”¨Playwrightåœ¨çœŸå¯¦æˆ°é¬¥
-   ç‹€æ…‹ä¸‹å¯¦æ¸¬ï¼šé»žæµ®å‹•å…ƒç´ åŒ£æŒ‰éˆ•â†’é»žå¥—ç”¨ï¼ˆå«å…ƒç´ åŒ£æ™‚æ•¸ç‚º0æ™‚è¦å…ˆéŽå»£å‘Š
-   ç¢ºèªå½ˆçª—é‚£æ¢è·¯å¾‘ï¼‰â†’ç¢ºèª`autoBattle`è®Šæˆtrueï¼›å¦å¤–æ¸¬éŽã€Œå·²ç¶“æ˜¯é–‹è‘—çš„
-   ç‹€æ…‹ä¸‹å†é»žä¸€æ¬¡å¥—ç”¨ã€ç¢ºèªä¸æœƒè¢«èª¤é—œæŽ‰ã€‚
-
-2. **ã€Œå›žåˆä¹‹é–“éŠœæŽ¥é–“éš”è¶Šä¾†è¶Šé•·ã€**â€”â€”âš ï¸ èŠ±äº†å¤§é‡æ™‚é–“æŽ’æŸ¥ï¼Œ**æ²’æœ‰åœ¨å—æŽ§
-   æ¸¬è©¦ä¸­é‡ç¾**ã€‚åˆ†å…©éšŽæ®µæŸ¥ï¼š(a) ç›´æŽ¥é‡æ¸¬é€£çºŒå¤šå›žåˆ`processNextCombatant`
-   çš„å¯¦éš›é–“éš”ï¼ˆ25ç§’è‡ªå‹•æˆ°é¬¥ï¼‰ï¼Œå…¨ç¨‹ç©©å®šè½åœ¨~1.5ç§’ï¼Œæ²’æœ‰ä»»ä½•æˆé•·è¶¨å‹¢ï¼›
-   åŒæ™‚ç›£æŽ§æ¯ä¸€æ¬¡`setTimeout`/`setInterval`å‘¼å«ï¼Œ`pendingCount`å…¨ç¨‹ç¶­æŒ
-   å€‹ä½æ•¸ï¼Œæ²’æœ‰è¨ˆæ™‚å™¨å †ç©ã€‚(b) ä¸€åº¦ä»¥ç‚ºæ‰¾åˆ°DOMç¯€é»žæŒçºŒå¢žåŠ çš„è­‰æ“š
-   ï¼ˆ80ç§’æ¸¬è©¦`domNodeCount`å¾ž1490é•·åˆ°1607ï¼‰ï¼Œä½†ç”¨`MutationObserver`
-   è¿½è¹¤ã€Œæ·¨å¢žåŠ çš„ç¯€é»žã€ç´°åˆ†ä¹‹å¾Œç™¼ç¾ï¼šå¢žåŠ çš„ç¯€é»žå¹¾ä¹Žå…¨éƒ¨æ˜¯`battle-line`
-   ï¼ˆæˆ°é¬¥ç´€éŒ„çš„æ¯ä¸€è¡Œï¼Œæœ¬ä¾†å°±æœ‰80è¡Œä¸Šé™ï¼Œåªæ˜¯80ç§’æ¸¬è©¦è¦–çª—é‚„æ²’è§¸é ‚ï¼Œ
-   çœ‹èµ·ä¾†åƒæŒçºŒå¢žåŠ ï¼Œå…¶å¯¦æœƒåœåœ¨ä¸Šé™ï¼‰ã€æŠ€èƒ½åç¨±å¾½ç« /å‚·å®³å½ˆå­—ï¼ˆæœ¬ä¾†å°±æœ‰
-   1.8~2.2ç§’å¾Œè‡ªå‹•ç§»é™¤çš„è¨ˆæ™‚å™¨ï¼Œåªæ˜¯é‡æ¸¬ç•¶ä¸‹å‰›å¥½æœ‰å¹¾å€‹é‚„åœ¨é£›è¡Œä¸­ï¼‰â€”â€”
-   é€™äº›å…¨éƒ¨éƒ½æ˜¯é æœŸå…§ã€æœ‰ä¸Šé™çš„è¡Œç‚ºï¼Œä¸æ˜¯æ´©æ¼ã€‚ç›®å‰æŽ’é™¤äº†ã€Œè¨ˆæ™‚å™¨
-   ç´¯ç©ã€è·Ÿã€ŒDOMæ´©æ¼ã€é€™å…©å€‹æœ€å¯èƒ½çš„é‚è¼¯æ ¹å› ï¼Œå·²ç¶“è·Ÿä½¿ç”¨è€…è¦æ›´å…·é«”çš„
-   é‡ç¾æ–¹å¼ï¼ˆå–®å ´æˆ°é¬¥å…§å›žåˆæ•¸å¢žåŠ æ™‚æ‰è®Šæ…¢ï¼Ÿé‚„æ˜¯é•·æ™‚é–“é–‹è‘—éŠæˆ²ã€è·¨å¤šå ´
-   æˆ°é¬¥æ‰è®Šæ…¢ï¼Ÿå¤§æ¦‚å¹¾å›žåˆ/å¹¾åˆ†é˜æœƒç™¼ç¾ï¼Ÿå“ªå€‹è£ç½®ï¼‰ï¼Œç›®å‰é‚„åœ¨ç­‰å›žè¦†ï¼Œ
-   æ²’æœ‰åšä»»ä½•æ”¹å‹•ã€‚
-
-3. **å‰¯æœ¬æ€ªç‰©å¼·åº¦è³‡æ–™**â€”â€”ä½¿ç”¨è€…è¦åƒè€ƒè³‡æ–™ï¼ŒåŒæ™‚åæ‡‰ã€Œå‰¯æœ¬çš„æ€ªç‰©æ„Ÿè¦º
-   å¤ªå¼±äº†ã€ã€‚æä¾›äº†`makeZoneMonster()`çš„å®Œæ•´æ›ç®—å…¬å¼ï¼ˆç¸½é»žæ•¸/æ•æ·/é«”è³ª/
-   éš¨æ©Ÿæ± åˆ†é…/æŠ€èƒ½åˆ†ç´šé–€æª»ï¼Œå…¨éƒ¨åœ¨`js/00-main.js`çš„
-   `generateMonsterAttributePoints()`/`getMonsterSkillTierAndChance()`ï¼‰
-   çµ¦ä½¿ç”¨è€…åƒè€ƒï¼ŒåŒæ™‚ç™¼ç¾ä¸€å€‹å¯¦éš›è½å·®ï¼šä¸€èˆ¬ç·´åŠŸå€åŸŸçš„æ€ªç‰©åœ¨
-   `js/25-v131-fix-batch.js`è£¡æœƒå†å¥—ç”¨`V131_MONSTER_STRENGTH=1.30`
-   ï¼ˆHP/SP/æ”»æ“Š/é˜²ç¦¦/é­”æ”»å„Ã—1.3ï¼‰ï¼Œä½†é€™æ¬¡æ–°å¢žçš„å‰¯æœ¬æ€ªç‰©æ˜¯ç›´æŽ¥ç”¨
-   `makeZoneMonster()`çš„è£¸æ•¸å€¼ã€æ²’æœ‰å¥—ç”¨é€™æ¢å¼·åŒ–â€”â€”æ›ç®—ä¸‹ä¾†åŒç­‰ç´šçš„
-   å‰¯æœ¬æ€ªç‰©æ¯”ä¸€èˆ¬ç·´åŠŸæ€ªç‰©å¼±äº†æ•´æ•´30%ï¼Œé€™æ¥µå¯èƒ½å°±æ˜¯ä½¿ç”¨è€…æ„Ÿè¦ºåˆ°çš„è½å·®
-   ä¾†æºã€‚å·²åœ¨`js/27-v132-content-expansion.js`æ–°å¢ž
-   `applyDungeonMonsterStrength()`ï¼ˆè·Ÿ`strengthenMonster()`å®Œå…¨åŒä¸€å¥—
-   Ã—1.30å€çŽ‡ï¼‰ï¼ŒæŽ¥åˆ°å…¨éƒ¨5å€‹å‰¯æœ¬æ€ªç‰©å»ºæ§‹é»žï¼ˆç¶“é©—å‰¯æœ¬10éš»å°å…µã€ææ–™å‰¯æœ¬
-   5ç²¾è‹±+5æ™®é€šã€è£å‚™å‰¯æœ¬1BOSS+4ç²¾è‹±ï¼‰ï¼Œè®“å‰¯æœ¬æ€ªç‰©è‡³å°‘æ‰“å¹³ä¸€èˆ¬ç·´åŠŸå€åŸŸ
-   åŒç­‰ç´šçš„æ€ªç‰©ï¼ˆå‰¯æœ¬æœ¬èº«å·²ç¶“ç”¨æ›´é«˜ç­‰ç´šå…¬å¼/æ›´å¤šç²¾è‹±-BOSSå †ç–Šé›£åº¦ï¼Œ
-   ä¸éœ€è¦åŒç­‰ç´šæ•¸å€¼æœ¬èº«é‚„æ‰“æŠ˜ï¼‰ã€‚ç”¨Playwrighté©—è­‰ï¼š25ç´šæ€ªç‰©åŽŸå§‹
-   `maxHP=350/attack=70`ï¼Œå¥—ç”¨å¾Œè®Šæˆ`maxHP=455/attack=91`ï¼Œè·Ÿæ‰‹å‹•ç®—çš„
-   Ã—1.30çµæžœå®Œå…¨ä¸€è‡´ï¼Œä¸”é€éŽçœŸæ­£å‘¼å«`v132BeginExpDungeon()`ç”¢ç”Ÿçš„
-   å¯¦éš›å‰¯æœ¬æ€ªç‰©é™£åˆ—é€ä¸€æ ¸å°æ•¸å€¼æ­£ç¢ºã€‚
-
-**å·²çŸ¥é™åˆ¶**ï¼šç¬¬2é»žï¼ˆå›žåˆé–“éš”å•é¡Œï¼‰å°šæœªè§£æ±ºï¼Œéœ€è¦ä½¿ç”¨è€…æä¾›æ›´å…·é«”çš„
-é‡ç¾æ¢ä»¶æ‰èƒ½ç¹¼çºŒæŸ¥ï¼›ä½¿ç”¨è€…è¨Šæ¯è£¡çš„ç¬¬4é»žå…§å®¹æ˜¯ç©ºçš„ï¼Œé‚„æ²’æœ‰å¾—åˆ°å¾ŒçºŒå›žè¦†ã€‚
-
-### 2026-08-26 â€” è‡ªå‹•æˆ°é¬¥è¨­å®šï¼šæ‹†æŽ‰é›™å±¤æ¡†ã€æ‹¿æŽ‰å¤šé¤˜çš„å…§éƒ¨æ²å‹•
-
-ä½¿ç”¨è€…å›žå ±è‡ªå‹•æˆ°é¬¥è¨­å®šè¦–çª—ã€Œä¸ç”¨åˆæœ‰ä¸€å€‹å…§æ¡†ï¼Œç›´æŽ¥ä¸€å€‹æ¡†å°±å¥½ï¼Œç„¶å¾ŒæŠŠæ¡†æ”¾å¤§ï¼Œ
-è®“æ‰€æœ‰æŒ‰éˆ•æ–‡å­—ä¸€æ¬¡å°±å‘ˆç¾ï¼Œç„¡éœ€æ²å‹•ã€ï¼ˆé™„æˆªåœ–ï¼šå¤–å±¤`.home-feature-modal-box`
-è£¡é¢é‚„å¥—äº†ä¸€å±¤æœ‰è‡ªå·±é‡‘è‰²é‚Šæ¡†/åº•è‰²çš„`#autoBattleSettingsPanel`ï¼Œå…§å±¤æ¡†è‡ªå·±
-è¢«æˆªæ–·ã€ä¸‹é¢é‚„æœ‰ä¸€æ®µæ²è»¸ï¼Œå…§å®¹è¢«è£æŽ‰ä¸€éƒ¨åˆ†ï¼‰ã€‚
-
-**æ ¹å› **ï¼š`css/08-stage-v14-character-scroll-fix.css`è£¡æœ‰ä¸€æ¢èˆŠè¦å‰‡
-`#homeFeatureModal .auto-settings-expanded{ max-height:70dvh; overflow-y:auto !important; }`ï¼Œ
-æŠŠé€™å€‹é¢æ¿å–®ç¨éŽ–åœ¨æ¯”å¤–å±¤`.home-feature-modal-box`ï¼ˆ`max-height:96dvh`ï¼‰çŸ®å¾ˆå¤š
-çš„é«˜åº¦ä¸Šï¼Œé€ æˆã€Œå¤–å±¤æ¡†å…¶å¯¦é‚„æœ‰ç©ºé–“ã€å…§å±¤æ¡†å»å…ˆè¢«æˆªæ–·ã€é‚„è¦è‡ªå·±æ²å‹•ã€çš„é›™æ¡†
-ï¼‹å…§éƒ¨æ²å‹•æ€ªè±¡ã€‚é€™æ¢è¦å‰‡æ˜¯V14é‚£ä¸€è¼ªç‚ºäº†ä¿®æ²å‹•å•é¡ŒåŠ çš„ï¼Œå¾Œä¾†`.dock-bottom`
-è¢«æ‹¿æŽ‰ã€å¤–å±¤æ¡†çš„max-heightä¹Ÿå·²ç¶“æ”¾å¯¬åˆ°96dvhï¼Œé€™æ¢70dvhçš„èˆŠè¦å‰‡å»æ²’æœ‰è·Ÿè‘—
-æ‹¿æŽ‰ï¼Œè®ŠæˆæŠ€è¡“å‚µã€‚
-
-**ä¿®æ³•**ï¼š
-1. æ‹¿æŽ‰é€™å€‹é¢æ¿è‡ªå·±çš„`max-height:70dvh`è·Ÿ`overflow-y:auto !important`ï¼Œ
-   æ”¹æˆ`overflow:visible !important; max-height:none !important;`ï¼Œè®“å®ƒ
-   å–®ç´”éš¨å…§å®¹é•·é«˜ï¼Œæ²å‹•å®Œå…¨äº¤çµ¦å¤–å±¤`.home-feature-modal-box`ä¸€å€‹äººè² è²¬
-   ï¼ˆæœ¬ä¾†å°±æœ‰`overflow-y:auto`ï¼‹`96dvh`ï¼‰ã€‚
-2. æ–°å¢ž`#homeFeatureModal #autoBattleSettingsPanel.auto-settings-expanded{border:0;background:transparent;border-radius:0;box-shadow:none;padding:0;}`ï¼Œ
-   æ‹¿æŽ‰é¢æ¿è‡ªå·±çš„è¦–è¦ºæ¡†ï¼ˆåŽŸæœ¬`.auto-settings-expanded`åŸºç¤Žæ¨£å¼åœ¨
-   `00-main.css`è£¡æœ‰è‡ªå·±çš„é‡‘æ¡†/æ·±åº•/åœ“è§’/10px paddingï¼‰ï¼Œåªç•™å¤–å±¤é‚£ä¸€å€‹
-   æ¡†ï¼Œå¤–å±¤æœ¬ä¾†å°±æœ‰16px paddingï¼Œå…§å®¹ä¸æœƒè²¼é‚Šã€‚
-
-**é©—è­‰æ–¹å¼**ï¼šPlaywrighté‡æ¸¬`getBoundingClientRect`/`getComputedStyle`ï¼Œ
-ç¢ºèªï¼šå…§å±¤é¢æ¿`border`/`background`/`padding`éƒ½æ­¸é›¶ã€`max-height:none`ã€
-`overflow-y:visible`ï¼›åœ¨900pxé«˜çš„è¦–çª—ä¸‹å¤–å±¤æ¡†ï¼ˆ663pxï¼‰å®Œå…¨ä¸éœ€è¦æ²å‹•å°±èƒ½
-è£ä¸‹å…¨éƒ¨å…§å®¹ï¼ˆå«æœ€ä¸‹é¢ã€Œå¥—ç”¨ä¸¦å•Ÿå‹•ã€æŒ‰éˆ•ï¼‰ï¼›æŠŠè¦–çª—é«˜åº¦æ¨¡æ“¬é™åˆ°700pxç”šè‡³
-600pxæ™‚ï¼Œä¹Ÿåªæœ‰å¤–å±¤æ¡†ä¸€å€‹æ²è»¸ï¼ˆä¸å†æ˜¯é›™å±¤æ¡†å„è‡ªæˆªæ–·ï¼‰ï¼Œç¬¦åˆé æœŸçš„å„ªé›…
-é™ç´šè¡Œç‚ºã€‚æˆªåœ–æ¯”å°ç¢ºèªè¦–è¦ºä¸ŠçœŸçš„è®Šæˆå–®ä¸€å€‹æ¡†ã€æ‰€æœ‰å¡ç‰‡èˆ‡æŒ‰éˆ•ä¸€æ¬¡é¡¯ç¤ºã€‚
-å¦å¤–ç”¨Playwrightå¯¦éš›é»žæ“Šã€Œå•Ÿå‹•ã€æŒ‰éˆ•ç¢ºèª`autoBattle`ç‹€æ…‹æ­£å¸¸åˆ‡æ›ï¼Œ
-ç¢ºèªé€™æ¬¡æ”¹å‹•æ²’æœ‰å‹•åˆ°ä»»ä½•é»žæ“Šäº‹ä»¶é‚è¼¯ã€‚
-
-**å·²çŸ¥é™åˆ¶**ï¼š`css/08-stage-v14-character-scroll-fix.css`ç›®å‰æ²’æœ‰è¢«ç´å…¥
-`?v=`å¿«å–ç‰ˆæœ¬è™Ÿæ©Ÿåˆ¶ï¼ˆåŽŸæœ¬å°±æ˜¯ç”¨ç´”`<link>`æ¨™ç±¤éœæ…‹è¼‰å…¥ï¼Œä¸åƒV131/V132é‚£å¹¾å€‹
-æª”æ¡ˆæœ‰å‹•æ…‹è¼‰å…¥å™¨ï¼‹ç‰ˆæœ¬è™Ÿï¼‰ï¼Œé€™æ¬¡ä¿®æ”¹å¦‚æžœä½¿ç”¨è€…ç€è¦½å™¨å¿«å–äº†èˆŠç‰ˆCSSï¼Œå¯èƒ½
-éœ€è¦æ‰‹å‹•æ¸…ä¸€æ¬¡å¿«å–æˆ–å¼·åˆ¶é‡æ–°æ•´ç†æ‰æœƒçœ‹åˆ°æ•ˆæžœã€‚
-
-### 2026-08-26 â€” V132ï¼šæ–°å¢žç¬¦å’’ï¼ææ–™ï¼è£å‚™å¥—è£ï¼æŠ½çŽåˆ¸ï¼ä¸‰å€‹æ—¥å¸¸å‰¯æœ¬ï¼ˆç¬¬å››è¼ªå¤§æ”¹å‹•ï¼‰
-
-ä½¿ç”¨è€…é€™è¼ªæå‡ºä¸€æ¬¡å¤§åž‹å…§å®¹æ“´å……éœ€æ±‚ï¼ˆä¸æ˜¯å›žå ±bugï¼‰ï¼šæ–°å¢ž3ç¨®ç¬¦å’’ï¼ˆå†°å°/éš±èº«/çµç•Œï¼Œå„4éšŽï¼Œ
-å‘½ä¸­æ©ŸçŽ‡ï¼éšŽç´šå›ºå®šæ©ŸçŽ‡ï¼‹è§’è‰²æ™ºåŠ›åŠ æˆï¼‰ã€ç¤¦çŸ³èˆ‡è£å‚™è¨­è¨ˆåœ–ç´™ææ–™ã€ä¸€èˆ¬ç·´åŠŸ4ç¨®ä½ŽéšŽé“å…·å„5%
-ç¨ç«‹æŽ‰è½ã€3å€‹æ—¥å¸¸å‰¯æœ¬ï¼ˆç¶“é©—/ææ–™/è£å‚™ï¼Œå„æ¯æ—¥1æ¬¡ã€å¤±æ•—ä¸æ‰£æ¬¡æ•¸ï¼‰ã€4å…ƒç´ è£å‚™å¥—è£ï¼ˆèµ¤ç‚Ž/
-å¯’æ³‰/å²©å²³/é’åµï¼Œå„10ä»¶ã€3ä»¶6åœå…¨+1ï¼5ä»¶å°æ‡‰å…ƒç´ æŠ€èƒ½å‚·å®³+2%ï¼‰ã€æŠ½çŽåˆ¸é–‹å¥—è£æ©Ÿåˆ¶ï¼Œå¤–åŠ 
-æŠŠå›žåˆé–“ç©ºæ‹å¾ž1.3ç§’èª¿åˆ°1.5ç§’ã€‚å…¨éƒ¨æ–°å¢žé‚è¼¯æ”¾åœ¨æ–°æª”æ¡ˆï¼š
-
-- **`js/27-v132-content-expansion.js`**ï¼ˆæ–°æª”ï¼‰ï¼šæ•´åŒ…å…§å®¹é‚è¼¯ï¼Œç”¨åŒä¸€å€‹IIFEã€ã€Œè®€èˆŠå‡½å¼â†’
-  åŒ…ä¸€å±¤â†’å‘¼å«åŽŸå‡½å¼â†’åŠ æ–°é‚è¼¯â†’å¡žå›žåŒåå…¨åŸŸè®Šæ•¸ã€çš„æ—¢æœ‰overrideæ‰‹æ³•æŽ¥é€²
-  `killMonster`/`winBattle`/`loseBattle`/`resolveQueuedPlayerAction`/`getEquipmentBonus`/
-  `getElementDamagePassiveMultiplier`/`equipSelectedItem`/`renderBattleItemMenu`/
-  `renderDungeonTabContent`/`openItemModal`/`openEquippedItem` é€™äº›æ—¢æœ‰å‡½å¼ï¼Œæ²’æœ‰æ”¹å‹•ä»»ä½•
-  ä¸€è¡Œ`js/00-main.js`æœ¬é«”ã€‚å‰¯æœ¬æ€ªç‰©å€Ÿç”¨`monsters`å…¨åŸŸé™£åˆ—æœ¬ä¾†å°±å¯ä»¥æ•´åŒ…æ›¿æ›çš„æ—¢æœ‰æ…£ä¾‹
-  ï¼ˆ`launchDungeonBattle()`å€Ÿå®Œæ•´ä»½`monsters`/`currentZone`ï¼ŒçµæŸå¾Œå®Œæ•´é‚„åŽŸï¼‰ã€‚
-- **`css/33-v132-content-expansion.css`**ï¼ˆæ–°æª”ï¼‰ï¼šçŽå‹µå½ˆçª—ã€å‰¯æœ¬æ¸…å–®å¡ç‰‡ã€æŠ½çŽåˆ¸é¸æ“‡æŒ‰éˆ•
-  çš„æœ€å°å¯ç”¨æ¨£å¼ï¼Œè·ŸéŠæˆ²æ—¢æœ‰æ·±è‰²ç³»é…è‰²ä¸€è‡´ã€‚
-- **`js/20-anonymous-20.js`**ï¼šæ¯”ç…§V131çš„å‹•æ…‹è¼‰å…¥å™¨æ¨¡å¼ï¼Œæ–°å¢ž`loadV132ContentExpansion()`ï¼Œ
-  åœ¨`DOMContentLoaded`å¾Œå‹•æ…‹æ’å…¥ä¸Šé¢å…©å€‹æ–°æª”æ¡ˆï¼ˆ`?v=132`ï¼‰ã€‚
-- **`js/25-v131-fix-batch.js`**ï¼š`V131_RESOLVE_DELAY_MS` å¾ž1300æ”¹æˆ1500ï¼ˆå›žåˆé–“ç©ºæ‹1.5ç§’ï¼‰ã€‚
-
-**éŽç¨‹ä¸­ç™¼ç¾ä¸¦ä¿®æ­£çš„2å€‹çœŸbug**ï¼ˆéƒ½æ˜¯å…ˆå¯«ç¨‹å¼ç¢¼å†ç”¨Playwrightå¯¦éš›è·‘éŽæ‰æŠ“åˆ°çš„ï¼‰ï¼š
-
-1. ä¸€é–‹å§‹å¯«talismançµç®—çš„dispatch overrideæ™‚çŒœéŒ¯äº†`js/00-main.js`è£¡ã€Œå®£å‘Šå¾Œçµç®—ã€é‚£å€‹
-   å‡½å¼çš„åå­—ï¼ˆçŒœæˆ`resolveQueuedActionForCharacter`ï¼‰ï¼Œå¯¦éš›ä¸Šæ˜¯`resolveQueuedPlayerAction`
-   ï¼ˆ`characterIndex,token`å…©å€‹åƒæ•¸ï¼‰ã€‚å·²ç”¨`grep`å¯¦éš›ç¢ºèªå‡½å¼åç¨±ä¸¦ä¿®æ­£ï¼Œä¸ç„¶ç¬¦å’’åœ¨æˆ°é¬¥ä¸­
-   æœƒå®Œå…¨æ²’æœ‰çµç®—æ•ˆæžœï¼ˆåŽŸæœ¬çš„ç¨‹å¼ç¢¼æœ‰`console.warn`é˜²å‘†ï¼Œä½†å¦‚æžœæ²’ç‰¹åˆ¥åŽ»çœ‹console log
-   å¾ˆå®¹æ˜“æ¼æŽ‰é€™å€‹å•é¡Œï¼Œä¹‹å¾ŒæŽ¥æ‰‹çš„äººå¯«overrideå‰å‹™å¿…å…ˆgrepç¢ºèªå‡½å¼åç¨±å­˜åœ¨ï¼‰ã€‚
-2. 4å…ƒç´ è£å‚™å¥—è£è£¡æ­¦å™¨éƒ¨ä½ï¼ˆåˆ€/æ‰‡ï¼‰çš„ç‰©å“`type`åŽŸæœ¬å¯«æˆ`"hand"`ï¼Œä½†`js/00-main.js`è£¡
-   å¯¦éš›æ±ºå®šã€Œé€™å€‹typeèƒ½ä¸èƒ½è¢«ç©¿åˆ°å“ªå€‹è£å‚™æ¬„ã€çš„`getInventoryEquipmentSlot()`åªèª
-   `"weapon"`é€™å€‹typeå­—ä¸²ï¼ˆ`"hand"`ä¸åœ¨å°ç…§è¡¨è£¡ï¼Œæœƒå°Žè‡´ç©¿è£å¤±æ•—ä½†ä¸æœƒå ±éŒ¯ï¼Œ
-   `equipSelectedItem()`åªæ˜¯éœé»˜returnï¼‰ã€‚é€™å€‹bugåœ¨headlessç€è¦½å™¨è£¡å¯¦éš›æ¸¬è©¦ã€Œè£å‚™å¥—è£
-   3ä»¶åŠ æˆã€æ™‚æ‰ç™¼ç¾ï¼ˆç©¿è£ä¹‹å¾Œå¥—è£è¨ˆæ•¸ä¸€ç›´å¡åœ¨2ï¼Œæ¹Šä¸æ»¿3ä»¶ï¼‰ã€‚å·²ä¿®æ­£æˆ`type:"weapon"`ã€‚
-   `js/00-main.js`æœ¬èº«é€™è£¡æœ‰å€‹æ—¢æœ‰çš„ä¸ä¸€è‡´ï¼ˆ`isEquipmentInventoryType()`æŠŠ`"hand"`ä¹Ÿç®—
-   é€²åŽ»ã€ä½†`getInventoryEquipmentSlot()`ä¸èªï¼‰ï¼Œé€™æ¬¡æ²’æœ‰å‹•`00-main.js`åŽ»ä¿®é€™å€‹ä¸ä¸€è‡´ï¼Œ
-   åªæ˜¯ç¢ºä¿æ–°å¢žçš„ç‰©å“å®šç¾©ç”¨å°çš„typeå€¼ã€‚
-
-**é©—è­‰æ–¹å¼**ï¼šç”¨æœ¬æ©Ÿ `python3 -m http.server 8899` + Playwright headless Chromiumï¼Œå…¨ç¨‹ç¹žéŽ
-UIè¡¨å–®ç›´æŽ¥å‘¼å«`createCharacter()`/`createAdditionalCharacter()`å»ºç«‹æ¸¬è©¦è§’è‰²ï¼ˆç­‰ç´šç›´æŽ¥æ”¹
-`player.level`ï¼‰ï¼Œé€ä¸€å¯¦éš›è·‘éŽä»¥ä¸‹æµç¨‹ä¸¦ç¢ºèªè³‡æ–™/DOMç‹€æ…‹æ­£ç¢ºã€å…¨ç¨‹é›¶`pageerror`ï¼š
-- ä¸€èˆ¬ç·´åŠŸæŽ‰è½ï¼šå¼·åˆ¶RNGå¿…ä¸­ï¼Œç¢ºèª4ç¨®ä½ŽéšŽé“å…·ï¼ˆ3ç¬¦å’’+1ç¤¦çŸ³ï¼‰å„è‡ªç¨ç«‹åˆ¤å®šã€èƒ½æ­£ç¢ºåŠ å…¥èƒŒåŒ…
-- ç¬¦å’’æˆ°é¬¥ä½¿ç”¨ï¼šå†°å°ç¬¦å‘½ä¸­ï¼ˆæ€ªç‰©æ­£ç¢ºæ‹¿åˆ°`{type:"freeze",turnsLeft:4}`ç‹€æ…‹ã€åº«å­˜æ­£ç¢ºæ‰£1ï¼‰ã€
-  æœªå‘½ä¸­ï¼ˆç•«ç‰ˆå¤±æ•—logã€ä¸æ¶ˆè€—é¡å¤–åº«å­˜ï¼‰ã€`renderBattleItemMenu()`åœ¨ç¬¦å’’åˆ†é æ­£ç¢ºæ¸²æŸ“å‡º
-  å¯é»žæ“ŠæŒ‰éˆ•ï¼ˆå«ã€Œç”Ÿæ•ˆæ©ŸçŽ‡35%ã€æ–‡å­—ã€`onclick="useTalisman(...)"`ï¼‰
-- è£å‚™å¥—è£ï¼šç­‰ç´šé–€æª»ï¼ˆ<20é˜»æ“‹ä¸¦è·³alertã€â‰¥20æ”¾è¡Œï¼‰ã€3ä»¶6åœ+1åŠ æˆï¼ˆæ•¸å€¼é€é …æ ¸å°æ­£ç¢ºï¼‰ã€
-  5ä»¶å°æ‡‰å…ƒç´ å‚·å®³+2%ï¼ˆç”¨`player`æœ¬äººè·Ÿ`player2`åˆ†åˆ¥é©—è­‰åªæœ‰å…ƒç´ /å¥—è£éƒ½ç¬¦åˆçš„è§’è‰²æ‰åƒåˆ°ï¼‰
-- æŠ½çŽåˆ¸é–‹å¥—è£ï¼šæ¶ˆè€—1å¼µåˆ¸ã€æ­£ç¢ºæ‹¿åˆ°1ä»¶å°æ‡‰å¥—è£çš„éš¨æ©Ÿéƒ¨ä½
-- ä¸‰å€‹æ—¥å¸¸å‰¯æœ¬å®Œæ•´è·‘éŽï¼ˆç”¨çœŸå¯¦çš„`winBattle()`/`loseBattle()`/`checkBattleEnd()`çµç®—ï¼Œä¸æ˜¯
-  å¦å¤–æ¨¡æ“¬ï¼‰ï¼šç¶“é©—å‰¯æœ¬3å ´è»Šè¼ªæˆ°å®Œæ•´è·‘å®Œã€çŽå‹µå½ˆçª—ã€ç›´æŽ¥é ˜å–å¾Œ`sharedExp`æ­£ç¢ºå¢žåŠ ã€
-  ä»Šæ—¥å·²å®Œæˆå¾ŒäºŒæ¬¡æŒ‘æˆ°è¢«æ­£ç¢ºæ“‹ä¸‹ï¼›ææ–™å‰¯æœ¬ä¾å›žåˆæ•¸åˆ¤æ–·å¯¶ç®±æ•¸é‡ã€é–‹ç®±æ­£ç¢ºæ‹¿åˆ°ææ–™ï¼›
-  è£å‚™å‰¯æœ¬boss+4ç²¾è‹±ã€æŠ½çŽåˆ¸é¸æ“‡å½ˆçª—ã€ç›´æŽ¥é ˜å–è·Ÿçœ‹å»£å‘Šé›™å€é ˜å–ï¼ˆ`showRewardedAd`ï¼‰å…©æ¢
-  è·¯å¾‘éƒ½æ¸¬éŽï¼›æˆ°æ•—è·¯å¾‘ç¢ºèª`monsters`/`currentZone`æœƒæ­£ç¢ºé‚„åŽŸã€ç•¶æ—¥æŒ‘æˆ°æ¬¡æ•¸ä¸æœƒè¢«æ‰£æŽ‰ã€
-  å¯ä»¥ç«‹åˆ»é‡æ–°æŒ‘æˆ°
-- æ¯æ—¥é‡ç½®ï¼šæŠŠ`localStorage`è£¡`v132_daily_dungeon_state`çš„æ—¥æœŸæ”¹æˆå¾ˆä¹…ä»¥å‰ï¼Œé‡æ–°æ•´ç†é é¢
-  ï¼ˆæ¨¡æ“¬è·¨æ—¥ï¼‰å¾Œç¢ºèª`used`ç‹€æ…‹æ­£ç¢ºé‡ç½®ã€å‰¯æœ¬é‡æ–°å¯æŒ‘æˆ°
-- ç‰©å“è©³ç´°å½ˆçª—SVGåœ–ç¤ºæ¸²æŸ“ä¿®æ­£ï¼šç¢ºèª`openItemModal()`è£¡çš„åœ–ç¤ºå…ƒç´ `innerHTML`çœŸçš„é•·å‡º
-  `<svg>` DOMç¯€é»žï¼Œä¸æ˜¯è¢«ç•¶æˆä¸€æ•´ä¸²æ–‡å­—å°å‡ºä¾†
-
-**å·²çŸ¥é™åˆ¶**ï¼š
-- åªåšäº†è³‡æ–™/é‚è¼¯å±¤è·Ÿæœ€å°å¯ç”¨çš„CSS/inline SVGè¦–è¦ºï¼ˆä¾ä½¿ç”¨è€…æ˜Žç¢ºæŒ‡ç¤ºã€Œå…ˆæš«æ™‚ç”¨
-  CSS/JavaScriptå‹•ç•«+Canvas/SVGåšå‡ºä¾†ï¼Œå¾ŒæœŸå†ç”¨ç¾Žè¡“æ›´æ”¹ã€ï¼‰ï¼Œæ²’æœ‰åšé€ç•«é¢UIèµ°æŸ¥
-  ï¼ˆä¾‹å¦‚çœŸçš„ç”¨æ»‘é¼ é»žéŽå‰¯æœ¬æ¸…å–®é çš„æŽ’ç‰ˆã€æŠ½çŽåˆ¸é¸æ“‡æŒ‰éˆ•åœ¨å°èž¢å¹•çš„å¯¦éš›è§¸æ„Ÿï¼‰ï¼Œé€™æ¬¡å…¨éƒ¨
-  é©—è­‰éƒ½æ˜¯ç›´æŽ¥å‘¼å«åº•å±¤å‡½å¼/æ“ä½œDOMç‹€æ…‹ï¼Œä¸æ˜¯æ¨¡æ“¬çœŸå¯¦æ‰‹æŒ‡é»žæ“Šæ•´å€‹æµç¨‹ã€‚
-- æ²’æœ‰æ¸¬è©¦ä¸‰å€‹è§’è‰²ï¼ˆ`player3`ï¼‰æƒ…å¢ƒä¸‹çš„å¥—è£åŠ æˆ/å‰¯æœ¬é–‹æ”¾æ¢ä»¶ï¼Œç›®å‰é›™è§’è‰²é–€æª»åªç”¨
-  `player`+`player2`é©—è­‰éŽã€‚
-- `js/27-v132-content-expansion.js`è£¡è£å‚™å‰¯æœ¬çš„é›™å€é ˜å–æµç¨‹ï¼ˆ`v132ClaimEquipmentDungeonReward`
-  è£¡çš„`grant2`å·¢ç‹€å‡½å¼ï¼‰å¯«æ³•ç¨å¾®ç¹žï¼Œé‚è¼¯æ­£ç¢ºä½†ä¹‹å¾Œå¦‚æžœè¦å†æ“´å……å»ºè­°é †æ‰‹æ•´ç†æˆè·Ÿ
-  `v132ClaimMaterialDungeonReward`/`v132ClaimExpDungeonReward`ä¸€è‡´çš„å¯«æ³•ã€‚
-
-### 2026-08-26 â€” æŒ‰éˆ•æ´©æ¼åˆ°å…¶ä»–è¦–çª—ã€è­·ç›¾æ‰£è¡€æç¤ºé‡è¤‡ã€æŠ€èƒ½é è¦½æ²å‹•ç ´åœ–èª¿æŸ¥
-
-ä½¿ç”¨è€…é€™è¼ªå›žå ±4å€‹å•é¡Œï¼Œé™„äº†5å¼µæˆªåœ–ï¼š
-
-1. **ã€Œå…¨å±¬æ€§æŠ€èƒ½é è¦½ã€æŒ‰éˆ•æ´©æ¼åˆ°è‡ªå‹•æˆ°é¬¥è¨­å®šè¦–çª—ä¸Š**ï¼ˆä½¿ç”¨è€…æˆªåœ–è£¡è‡ªå‹•æˆ°é¬¥
-   è¨­å®šè¦–çª—å³ä¸Šè§’å¤šäº†ä¸€é¡†ä¸è©²å‡ºç¾çš„ã€Œå…¨å±¬æ€§æŠ€èƒ½é è¦½ã€æŒ‰éˆ•ï¼ŒUIå› æ­¤è®Šå¾—
-   é›œäº‚ï¼‰â€” æ ¹å› è·Ÿ`statusHelpButton`æ˜¯åŒä¸€ç¨®bugï¼š`skillPreviewHeaderButton`
-   åªæœ‰åœ¨`switchCharacterTab()`åˆ‡åˆ†é æ™‚è¢«è¨­å®šé¡¯ç¤º/éš±è—ï¼Œä½†`closeHomeFeature()`
-   é—œé–‰è¦–çª—æ™‚æ²’æœ‰æŠŠå®ƒé‡ç½®å›žéš±è—ï¼ˆ`statusHelpButton`ç•¶æ™‚æœ‰é‡ç½®ã€é€™é¡†æ¼æŽ‰äº†ï¼‰ï¼Œ
-   åªè¦çŽ©å®¶é€²éŽä¸€æ¬¡æŠ€èƒ½åˆ†é ï¼Œé€™é¡†æŒ‰éˆ•çš„`display:inline-block`å°±æœƒä¸€ç›´æ®˜ç•™ï¼Œ
-   ä¹‹å¾Œé–‹ä»»ä½•å…¶ä»–è¦–çª—ï¼ˆè‡ªå‹•æˆ°é¬¥è¨­å®šã€å•†åº—â€¦â€¦ï¼‰éƒ½æœƒçœ‹åˆ°å®ƒã€‚å·²è£œä¸Šè·Ÿ
-   `statusHelpButton`ä¸€æ¨£çš„é‡ç½®ã€‚ã€Œå¥—ç”¨ä¸¦å•Ÿå‹•æŒ‰éˆ•åœ¨æˆ°é¬¥ä¸­æ²’åæ‡‰ã€ç”¨
-   Playwrightå¯¦æ¸¬ï¼ˆå«çœŸçš„åœ¨æˆ°é¬¤ä¸­ã€å…ƒç´ åŒ£æœ‰å‰©é¤˜æ™‚æ•¸çš„æƒ…å¢ƒï¼‰æ²’æœ‰é‡ç¾ï¼Œ
-   æ‡·ç–‘æ˜¯åŒä¸€å€‹æŒ‰éˆ•æ´©æ¼é€ æˆçš„ç‰ˆé¢éŒ¯ä½é–“æŽ¥å½±éŸ¿åˆ°é»žæ“Šï¼Œé€™æ¬¡ä¸€èµ·ä¿®æŽ‰äº†ï¼Œ
-   å¦‚æžœé‚„æœ‰å•é¡Œéœ€è¦ä½¿ç”¨è€…å†å›žå ±ã€‚
-2. **è­·ç›¾æ‰£è¡€æç¤ºé‚è¼¯**ï¼šè­·ç›¾å®Œå…¨æ“‹ä¸‹é€™æ¬¡æ”»æ“Šï¼ˆ`damage`è¢«æ‰£åˆ°0ï¼‰æ™‚ï¼ŒåŽŸæœ¬
-   é‚„æ˜¯æœƒå‘¼å«`showPlayerHit(0,"hp",...)`ï¼Œè·³å‡ºæ²’æœ‰æ„ç¾©çš„ã€Œ-0HPã€ç´…å­—è·Ÿ
-   å¡ç‰‡éœ‡å‹•ã€‚æ”¹æˆåªæœ‰`damage>0`ï¼ˆè­·ç›¾æ²’å®Œå…¨æ“‹ä½ã€çœŸçš„æœ‰æ‰£è¡€ï¼‰æ‰å‘¼å«ï¼Œ
-   å·²ç”¨Playwrightå¯¦æ¸¬é©—è­‰ï¼šå·¨å¤§è­·ç›¾æƒ…å¢ƒä¸‹å…¨ç¨‹0æ¬¡ç´…å­—HPå½ˆå‡ºã€åªæœ‰ç™½è‰²
-   è­·ç›¾æ‰£é™¤æ•¸å­—ï¼›å°è­·ç›¾ï¼ˆæœƒè¢«æ‰“ç©¿ï¼‰æƒ…å¢ƒä¸‹ç¬¬ä¸€æ“Šè­·ç›¾+HPå…©å€‹å½ˆå‡ºéƒ½å‡ºç¾ã€
-   ä¹‹å¾Œè­·ç›¾è€—ç›¡åªå‰©ç´…å­—HPå½ˆå‡ºï¼Œç¬¦åˆã€Œé™¤éžè­·ç›¾å‰©é¤˜æ‰¿å—é‡å°æ–¼å‚·å®³æ‰ä¸€èµ·
-   é¡¯ç¤ºã€çš„éœ€æ±‚ã€‚
-3. **æŠ€èƒ½é è¦½é ã€Œç ´åœ–ã€ï¼ˆæˆªåœ–é¡¯ç¤ºæ²å‹•æ™‚æ–‡å­—ç–Šå­—/äº‚ç¢¼ï¼‰**ï¼šâš ï¸ æ²’æœ‰ä¿®å¥½ï¼Œ
-   ç”¨çœŸå¯¦è§¸æŽ§æ»‘å‹•æ¨¡æ“¬ï¼ˆå«å¿«é€Ÿé€£çºŒæ»‘å‹•ã€æ»‘å‹•ä¸­é–“æˆªåœ–ã€åˆ‡åˆ†é å¾Œæ»‘å‹•ï¼‰
-   åè¦†å˜—è©¦éƒ½ç„¡æ³•é‡ç¾æˆªåœ–è£¡é‚£ç¨®ç–Šå­—ç•«é¢ã€‚æˆªåœ–è£¡å‡ºç¾ä¸å±¬æ–¼ä»»ä½•çœŸå¯¦æŠ€èƒ½
-   åç¨±çš„äº‚ç¢¼æ–‡å­—ï¼ˆä¾‹å¦‚ã€Œæ°´å°è±¡æ‰‹ã€ï¼‰ï¼Œæ¯”è¼ƒåƒæ˜¯æ‰‹æ©Ÿåœ¨æ²å‹•æ…£æ€§é‚„æ²’å®Œå…¨
-   åˆæˆå¥½æ–°ç•«é¢çš„é‚£ä¸€çž¬é–“è¢«æˆªåœ–æˆªåˆ°ï¼Œä¸æ˜¯æŒçºŒæ€§çš„é é¢ç‹€æ…‹éŒ¯èª¤â€”â€”é€™ç¨®
-   æ™‚åºå•é¡Œæ²’è¾¦æ³•å¾žç¨‹å¼é‚è¼¯ä¸Šç›´æŽ¥ã€Œä¿®å¥½ã€ï¼Œåªèƒ½åšå¸¸è¦‹çš„æ‰‹æ©Ÿæ²å‹•æ•ˆèƒ½
-   å„ªåŒ–ï¼ˆ`.skill-preview-card`åŠ ä¸Š`contain:content`è·Ÿ`will-change:
-   transform`ï¼Œè®“æ¯å¼µå¡ç‰‡å„è‡ªç¨ç«‹åˆæˆï¼Œé™ä½Žæ²å‹•æ™‚æ•´é«”é‡ç¹ªé‡ï¼‰ï¼Œé™ä½Ž
-   ç™¼ç”Ÿæ©ŸçŽ‡ã€‚å¦‚æžœä¹‹å¾Œé‚„æ˜¯å¸¸å¸¸ç™¼ç”Ÿï¼Œéœ€è¦ä½¿ç”¨è€…æä¾›**èž¢å¹•éŒ„å½±**ï¼ˆä¸æ˜¯
-   æˆªåœ–ï¼‰æ‰æœ‰æ©ŸæœƒæŠ“åˆ°çœŸæ­£çš„ç•«é¢æ™‚åºã€ç¢ºèªæ˜¯ä¸æ˜¯åŒä¸€ç¨®æƒ…æ³ã€‚
-4. **èƒŒåŒ…ä»‹é¢è¿”å›žéµä¸è¦‹äº†**ï¼šâš ï¸ æ²’æœ‰æ‰¾åˆ°ã€ä¹Ÿæ²’æœ‰é‡ç¾ã€‚ç”¨Playwrightæª¢æŸ¥äº†
-   èƒŒåŒ…çš„å…©å€‹é€²å…¥è·¯å¾‘ï¼ˆä¸‹æ–¹å°Žè¦½åˆ—çš„`#inventoryPage`ã€åœ°åœ–é è£¡
-   `openMapInventoryOverlay()`é–‹çš„è¦†è“‹å±¤ç‰ˆæœ¬ï¼‰ï¼Œé—œé–‰/è¿”å›žæŒ‰éˆ•åœ¨å…©é‚Šéƒ½
-   æ­£å¸¸é¡¯ç¤ºã€æ­£å¸¸é‹ä½œã€‚é€™æ¬¡ä½¿ç”¨è€…é™„çš„5å¼µæˆªåœ–è£¡æ²’æœ‰ä¸€å¼µæ˜¯èƒŒåŒ…ç•«é¢ï¼Œ
-   ç¼ºä¹è¦–è¦ºç·šç´¢æ¯”å°ï¼Œä¸‹ä¸€å€‹æŽ¥æ‰‹çš„äººå¦‚æžœè¦ç¹¼çºŒæŸ¥ï¼Œéœ€è¦å…ˆè·Ÿä½¿ç”¨è€…è¦
-   ä¸€å¼µå¯¦éš›çœ‹åˆ°ã€Œè¿”å›žéµä¸è¦‹äº†ã€é‚£å€‹ç•«é¢çš„æˆªåœ–ï¼Œæ‰å¥½åˆ¤æ–·åˆ°åº•æ˜¯å“ªå€‹
-   èƒŒåŒ…ç›¸é—œç•«é¢ã€å“ªå€‹æŒ‰éˆ•ã€‚
-
-### 2026-08-26 â€” å…¨å±¬æ€§æŠ€èƒ½é è¦½ï¼šçœŸæ­£ä¿®å¥½æ²å‹• + å­—ç´šèª¿åˆ°èˆ’æœå¤§å°
-
-ä¸Šä¸€è¼ªæŠŠæ–‡å­—åŠ å¤§åˆ°90pxï¼ˆèž¢å¹•ä¸Šç´„35pxï¼‰ä¹‹å¾Œï¼Œä½¿ç”¨è€…å›žå ±ã€Œä¸èƒ½æ²å‹•ï¼Œä¸‹é¢çœ‹ä¸åˆ°ã€ï¼Œ
-è€Œä¸”35pxç¢ºå¯¦å¤ªå¤§ã€‚é€™æ¬¡å…©å€‹å•é¡Œä¸€èµ·ä¿®ï¼š
-
-1. **æ²å‹•bugçš„çœŸæ­£æ ¹å› **ï¼š`js/01-stage-v8-touch-lock.js`çš„å…¨åŸŸè§¸æŽ§éŽ–ç™½åå–®
-   ä¸€ç›´æ²’æœ‰æŠŠ`.skill-preview-body`åŠ é€²åŽ»ï¼Œæ‰‹æŒ‡çœŸçš„æ»‘å‹•æ™‚è¢«å®Œå…¨æ“‹æŽ‰ï¼ˆç¨‹å¼åŒ–
-   `scrollTop`è³¦å€¼ä¸å—å½±éŸ¿ï¼Œæ‰€ä»¥ä¹‹å‰ç”¨é€™å€‹æ–¹æ³•é©—è­‰ã€Œçœ‹èµ·ä¾†æ²’å•é¡Œã€å…¶å¯¦æ²’æ¸¬åˆ°
-   çœŸæ­£çš„å•é¡Œï¼‰ã€‚åŠ é€²ç™½åå–®å¾Œï¼Œç”¨Playwrightæ¨¡æ“¬çœŸå¯¦è§¸æŽ§æ»‘å‹•
-   ï¼ˆ`Input.dispatchTouchEvent`ï¼‰é©—è­‰éŽ`scrollTop`çœŸçš„æœƒè·Ÿè‘—æ”¹è®Šã€‚è©³ç´°åŽŸç†è¦‹
-   ä¸Šæ–¹ã€Œç³»çµ±æž¶æ§‹é‡é»žã€ç¬¬5ç¯€ï¼Œä»¥å¾Œä»»ä½•æ–°å¢žçš„å¯æ²å‹•å®¹å™¨éƒ½è¦è¨˜å¾—æª¢æŸ¥é€™ä»½ç™½åå–®ã€‚
-2. **å­—ç´šèª¿åˆ°èˆ’æœå¤§å°**ï¼š90pxé™åˆ°æ¨™é¡Œ49pxï¼ˆèž¢å¹•ç´„19pxï¼‰ã€å±¬æ€§åˆ†é æŒ‰éˆ•39px
-   ï¼ˆèž¢å¹•ç´„15pxï¼‰ã€æŠ€èƒ½åç¨±44pxï¼ˆèž¢å¹•ç´„17pxï¼‰ã€åˆ†é¡žæ¨™ç±¤33pxï¼ˆèž¢å¹•ç´„13pxï¼‰ã€
-   èªªæ˜Žæ–‡å­—39pxï¼ˆèž¢å¹•ç´„15pxï¼‰ï¼Œéƒ½æ˜¯ç”¨0.388889ç¸®æ”¾æ¯”ä¾‹æ›ç®—ï¼Œæ•¸å€¼åœ¨
-   `css/31-v131-fix-batch.css`è£¡`#allElementSkillPreviewModal`é‚£å¹¾æ¢è¦å‰‡ã€‚
-
-### 2026-08-26 â€” å…¨å±¬æ€§æŠ€èƒ½é è¦½æ–‡å­—çœŸæ­£çš„æ ¹å› ä¿®æ­£ï¼ˆPR #9ï¼‰
-
-ç¬¬ä¸‰è¼ªä¿®å®Œå¾Œï¼Œä½¿ç”¨è€…åˆåæ˜ ã€Œå…¨å±¬æ€§æŠ€èƒ½é è¦½ã€æ–‡å­—é‚„æ˜¯å¾ˆå°ã€ç›´æŽ¥è¦æ±‚
-åŠ åˆ°35pxã€‚é€™æ¬¡æ²’æœ‰å†å–®ç´”æŠŠæ•¸å­—å¾€ä¸Šèª¿ï¼Œè€Œæ˜¯å¯¦æ¸¬ç™¼ç¾é€™å€‹å½ˆçª—æ´»åœ¨
-`#game-stage`çš„scaleåº§æ¨™ç³»åº•ä¸‹ï¼ˆç¸®æ”¾æ¯”ä¾‹0.388889ï¼‰ï¼Œå‰å¹¾è¼ªä¸€è·¯åŠ å¤§çš„
-13.5â†’22pxå…¨éƒ¨è¢«é€™å±¤ç¸®æ”¾åƒæŽ‰å…­æˆå¤šï¼Œé›£æ€ªä½¿ç”¨è€…ä¸€ç›´è¦ºå¾—æ²’è®Šã€‚æ”¹æˆå¯«
-90pxï¼ˆ35Ã·0.388889æ›ç®—å›žä¾†çš„è£œå„Ÿå€¼ï¼‰ï¼Œè®“èž¢å¹•ä¸Šå¯¦éš›é¡¯ç¤ºå‡ºä¾†æ‰æ˜¯ä½¿ç”¨è€…
-è¦çš„35pxã€‚è©³ç´°åŽŸç†è·Ÿæ›ç®—æ–¹æ³•å¯«é€²äº†ä¸Šæ–¹ã€Œç³»çµ±æž¶æ§‹é‡é»žã€1.3ç¯€ï¼Œä»¥å¾Œ
-å†èª¿é€™å€‹å½ˆçª—æˆ–ä»»ä½•confirmedæ´»åœ¨game-stageç¸®æ”¾åº§æ¨™ç³»åº•ä¸‹çš„å…ƒç´ ï¼Œéƒ½è¦
-å…ˆå¯¦æ¸¬ç¸®æ”¾æ¯”ä¾‹å†å›žæŽ¨æ•¸å€¼ï¼Œä¸èƒ½ç›´æŽ¥æŠŠä½¿ç”¨è€…èªªçš„pxæ•¸å­—åŽŸå°ä¸å‹•å¯«é€²åŽ»ã€‚
-
-### 2026-08-26 â€” ç¬¬ä¸‰è¼ªä¿®å¾© 11 é …å›žå ±å•é¡Œ
-
-ä½¿ç”¨è€…é€™æ¬¡å›žå ±11å€‹å•é¡Œï¼ŒåŒæ¨£å…¨éƒ¨ç”¨Playwright + headless Chromiumé€ä¸€é©—è­‰ï¼š
-
-1. **æˆ°é¬¥è³‡è¨Šæ¡†/äººç‰©å¡ç‰Œé«˜åº¦æ‡‰å›ºå®šï¼ˆä¸ç®¡1æŽ’æˆ–2æŽ’æ€ªç‰©ï¼‰** â€”
-   `#battleMonsterArea.v131-formation`åŽŸæœ¬`min-height`åªå¤ 1æŽ’ï¼ˆ90pxï¼‰ï¼Œ
-   1æŽ’æ€ªç‰©æ™‚å®¹å™¨è®ŠçŸ®ï¼Œé å‰©é¤˜ç©ºé–“ä¼¸ç¸®çš„å›žåˆè³‡è¨Šæ¡†è·Ÿè‘—è®Šé«˜ã€äººç‰©å¡ç‰Œ
-   ä½ç½®è·Ÿè‘—è·‘å‹•ã€‚æ”¹æˆå›ºå®š`min-height:189px`ï¼ˆ2æŽ’æ€ªç‰©+æŽ’é–“è·+å®¹å™¨
-   paddingï¼‰ï¼Œä¸ç®¡å¯¦éš›å¹¾æŽ’æ€ªç‰©éƒ½ä¿ç•™é€™å€‹é«˜åº¦ã€‚
-2. **çˆ†æ“Šæ–‡å­—å¤ªå¤§** â€” `.damage-popup.critical-popup`åŽŸæœ¬27pxã€å‹•ç•«
-   å³°å€¼å†ä¹˜1.62å€ï¼ˆå¯¦éš›å³°å€¼43.7pxï¼‰ï¼Œç¸®å°æˆ17px+å‹•ç•«å³°å€¼1.25å€
-   ï¼ˆå³°å€¼ç´„21pxï¼‰ã€‚
-3. **åœŸçš‡æˆ°é¬¥æ²’æœ‰é‡‘è‰²å¤–æ¡† + çŽ©å®¶ç«‹ç¹ªåŽ»èƒŒ** â€” æ ¹å› æ‰¾åˆ°ï¼š
-   `css/11-stage-v41-cast-text-and-player-alpha.css`è£¡ä¸€å€‹V41å¹´ä»£
-   çš„`#battlePlayerCard0{border:0 !important;...}`è¦å‰‡ï¼Œå› ç‚ºæ˜¯ID
-   é¸æ“‡å™¨ï¼Œspecificityæ¯”V131å¾Œä¾†åŠ çš„`.battle-player`é‡‘è‰²å¤–æ¡†è¦å‰‡é«˜ï¼Œ
-   ä¸ç®¡loadé †åºã€å…©é‚Šéƒ½æ˜¯`!important`ï¼ŒIDé¸æ“‡å™¨é‚„æ˜¯è´ï¼Œå°Žè‡´ã€ŒéšŠä¼
-   ç¬¬ä¸€ä½ã€è§’è‰²ï¼ˆä¸åˆ†å“ªå€‹å…ƒç´ ï¼‰æ°¸é æ²’æœ‰å¤–æ¡†ã€‚æ‹¿æŽ‰é€™æ¢è¦å‰‡è£¡çš„
-   border/outline/box-shadowä¸‰è¡Œå³å¯ã€‚åŽ»èƒŒéƒ¨åˆ†ï¼šç”¨rembgæŠŠ8å¼µ
-   `assets/characters/æ€§åˆ¥_å…ƒç´ .jpg`åŽ»èƒŒå­˜æˆå°ˆå±¬çš„
-   `assets/characters/battle_æ€§åˆ¥_å…ƒç´ .png`ï¼Œæ–°å¢ž
-   `getCharacterBattleArtworkPath()`åªçµ¦æˆ°é¬¥å¡ç‰‡ç”¨ï¼Œè·Ÿè§’è‰²å‰µå»ºé è¦½/
-   èƒŒåŒ…ç«‹ç¹ªé é¢å…±ç”¨çš„`getCharacterArtworkPath()`åˆ†é–‹ï¼Œä¸å½±éŸ¿é‚£å…©å€‹
-   åœ°æ–¹ä»é¡¯ç¤ºåŽŸæœ¬å¸¶å ´æ™¯èƒŒæ™¯çš„ç‰ˆæœ¬ã€‚
-4. **å·¡æ€ªç«‹ç¹ªæ­£èƒŒé¢é¡è‰²ä¸ä¸€è‡´ + è§£æžåº¦å¤ªä½Ž** â€” ç”¨åƒç´ æ¯”å°æŠ“å‡ºæ ¹å› ï¼š
-   ä¸Šä¸€è¼ªé‡å»ºå¥³è§’spriteæ™‚ï¼Œæ°´/é¢¨/åœŸä¸‰å€‹ã€ŒèƒŒé¢ã€ä¾†æºåœ–è¢«å¾ªç’°éŒ¯ä½
-   ï¼ˆé¢¨èƒŒé¢èª¤ç”¨äº†åœŸçš„åœ–ã€åœŸèƒŒé¢èª¤ç”¨äº†æ°´çš„åœ–ã€æ°´èƒŒé¢èª¤ç”¨äº†é¢¨çš„åœ–ï¼‰ï¼Œ
-   å·²é‡æ–°ç”¨æ­£ç¢ºå°æ‡‰é—œä¿‚å»ºç½®ã€‚è§£æžåº¦éƒ¨åˆ†ï¼šsprite cellå¾ž56x84æ”¾å¤§åˆ°
-   140x210ï¼ˆè·Ÿé¡¯ç¤ºå°ºå¯¸70x105ç­‰æ¯”ä¾‹æ”¾å¤§2å€ï¼Œæ‰‹æ©Ÿretinaèž¢å¹•æ›´æ¸…æ™°ï¼‰ï¼Œ
-   ç”·è§’spriteç¶­æŒåŽŸæœ¬56x84ä¸è®Šï¼ˆæ²’æœ‰æ–°ç´ æå¯æ›ï¼‰ï¼Œ`js/26-v131-patrol-
-   appearance.js`çš„è£åˆ‡å‡½å¼æ”¹æˆä¾sheetåˆ†åˆ¥å»ºç«‹å„è‡ªå°ºå¯¸çš„canvasã€‚
-   å½¢è±¡åˆ‡æ›æŒ‰éˆ•å¾ž76pxç¸®å°æˆ68pxï¼Œè·Ÿæ­£ä¸Šæ–¹è¿”å›žéµï¼ˆ68pxï¼‰çµ±ä¸€ã€‚
-5. **èƒŒåŒ…è§’è‰²åˆ‡æ›ç®­é ­èˆ‡é—œé–‰æŒ‰éˆ•é‡ç–Š** â€” æ ¹å› æ˜¯`.inventory-character-
-   switch`åŽŸæœ¬ç”¨gridæ’æ»¿æ•´åˆ—å¯¬åº¦ï¼Œå³ç®­é ­è¢«æŽ¨åˆ°æœ€å³ç·£ã€å¡é€²çµ•å°å®šä½
-   è²¼å³ä¸Šè§’çš„é—œé–‰æŒ‰éˆ•ä¸‹é¢ã€‚æ”¹æˆflexç½®ä¸­ã€ç®­é ­è²¼é½Šè§’è‰²åç¨±å…©å´ï¼›
-   è§’è‰²åç¨±è¼ƒé•·æ™‚ï¼Œå¦å¤–é‡å°ã€Œå¾žåœ°åœ–é é–‹å•Ÿçš„è¦†è“‹å±¤ç‰ˆæœ¬ã€ï¼ˆå”¯ä¸€æœƒå‡ºç¾
-   é—œé–‰æŒ‰éˆ•çš„æƒ…å¢ƒï¼‰åŠ äº†`padding-right:64px`ï¼Œç¢ºä¿ç½®ä¸­ç¯„åœä¸»å‹•é¿é–‹
-   é—œé–‰æŒ‰éˆ•ï¼Œä¸ç®¡åå­—å¤šé•·éƒ½ä¸æœƒå†æ’žåœ¨ä¸€èµ·ã€‚
-6. **å…¨å±¬æ€§æŠ€èƒ½é è¦½æ–‡å­—ä»ç„¶å¤ªå°** â€” é€™æ˜¯ç¬¬ä¸‰æ¬¡åŠ å¤§è«‹æ±‚ï¼Œæ•¸å€¼å¾ž
-   17/19/20pxåŠ å¤§åˆ°19/21/22pxï¼›åŒæ™‚ç™¼ç¾ä¸¦ä¿®æ­£äº†1.2ç¯€é‚£å€‹ç‰ˆæœ¬è™Ÿæ²’æœ‰
-   éžå¢žçš„æ ¹æœ¬å•é¡Œï¼ˆ`css/31-v131-fix-batch.css?v=131`å¾žç¬¬ä¸€è¼ªåˆ°ç¾åœ¨
-   æ²’è®ŠéŽï¼‰ï¼Œä½¿ç”¨è€…å…ˆå‰çœ‹åˆ°çš„å­—ç´šå¾ˆå¯èƒ½æ ¹æœ¬æ˜¯ç€è¦½å™¨å¿«å–çš„èˆŠç‰ˆæœ¬ï¼Œ
-   ä¸æ˜¯é€™å¹¾è¼ªçš„ä¿®æ”¹çœŸçš„æ²’ç”Ÿæ•ˆã€‚
-7. **èƒ½åŠ›å€¼/æŠ€èƒ½è©³ç´°/å…¨å±¬æ€§æŠ€èƒ½é è¦½é é¢ã€Œç ´åœ–é »ç¹é–ƒçˆã€** â€”
-   âš ï¸ **é€™é …æ²’æœ‰ä¿®**ï¼šç”¨MutationObserverç›£æ¸¬5ç§’æ²’æœ‰ç™¼ç¾ä»»ä½•`<img>`
-   çš„srcè¢«åè¦†æ”¹å‹•ã€ç”¨ç¶²è·¯ç›£è½æ²’æœ‰ç™¼ç¾ä»»ä½•åœ–ç‰‡è³‡æº404ã€ç”¨é€£çºŒæˆªåœ–
-   åƒç´ æ¯”å°ä¹Ÿæ²’æœ‰åµæ¸¬åˆ°æ˜Žé¡¯çš„è¦–è¦ºè·³å‹•ï¼ˆè·Ÿé€™ä¸‰å€‹é é¢å…±ç”¨çš„
-   `.home-feature-modal-box`é‚Šæ¡†å‘¼å¸å‹•ç•«`borderGlowBreathe`å»åˆçš„
-   3.6ç§’é€±æœŸæ€§æ•ˆæžœåªæœ‰æ¥µè¼•å¾®çš„glowè®ŠåŒ–ï¼Œä¸æ˜¯ã€Œç ´åœ–ã€ï¼‰ã€‚åœ¨ç›®å‰é€™å€‹
-   headless Chromiumæ¸¬è©¦ç’°å¢ƒå®Œå…¨ç„¡æ³•é‡ç¾ä½¿ç”¨è€…æè¿°çš„ç—‡ç‹€ï¼Œæ¯”è¼ƒåˆç†
-   çš„æ‡·ç–‘æ–¹å‘æ˜¯ä½¿ç”¨è€…å¯¦éš›è£ç½®çš„GPU/ç€è¦½å™¨ç‰ˆæœ¬ç‰¹æœ‰çš„æ¸²æŸ“å•é¡Œï¼ˆé¡žä¼¼
-   ä¹‹å‰æŠ“åˆ°çš„ã€Œimg+background-imageã€Chromiumæ¸²æŸ“bugï¼Œé‚£æ¬¡ä¹Ÿæ˜¯
-   åœ¨åˆ¥çš„ç’°å¢ƒå®Œå…¨æ­£å¸¸ã€åªæœ‰ç‰¹å®šç‰ˆæœ¬æ‰æœƒå‡ºç¾ï¼‰ã€‚å·²ç¶“åœ¨å›žè¦†è£¡æ˜Žç¢ºå‘ŠçŸ¥
-   ä½¿ç”¨è€…é€™é …æ²’æœ‰ä¿®å¥½ã€éœ€è¦æ›´å¤šç·šç´¢ï¼ˆä¾‹å¦‚èž¢å¹•éŒ„å½±ã€æ˜¯ä¸æ˜¯ç‰¹å®šæ©Ÿåž‹ï¼‰
-   æ‰èƒ½ç¹¼çºŒå¾€ä¸‹æŸ¥ï¼Œé¿å…ä¸ç¢ºå®šçš„æƒ…æ³ä¸‹äº‚çŒœäº‚æ”¹ã€‚
-8. **å°Žè¦½åˆ—é‡Žæ€ªå€iconæ²’åŽ»èƒŒ** â€” å”¯ä¸€ä¸€å€‹é‚„æ˜¯RGBï¼ˆä¸é€æ˜Žï¼‰ã€è€Œä¸”è§£æžåº¦
-   ç•°å¸¸å¤§ï¼ˆ1536x1404ï¼Œå…¶ä»–éƒ½æ˜¯~320pxçš„RGBAé€æ˜ŽPNGï¼‰çš„nav iconï¼Œ
-   ç¢ºèªæ˜¯é€™æ ¼ç´ ææ²’æœ‰è·Ÿå…¶ä»–iconä¸€æ¨£èµ°éŽåŽ»èƒŒæµç¨‹ã€‚ç”¨rembgåŽ»èƒŒ+
-   ç¸®å°åˆ°è·Ÿå…¶ä»–iconä¸€è‡´çš„~320pxï¼Œç›´æŽ¥è¦†è“‹`assets/ui/nav-training.png`ã€‚
-9. **èƒŒåŒ…è£å‚™éƒ¨ä½ã€Œè‚©ç”²ã€æ”¹ã€Œè­·è…•ã€** â€” `js/00-main.js`çš„
-   `renderEquipment()`è£¡`slots`é™£åˆ—ï¼Œç´”æ–‡å­—ä¿®æ”¹ã€‚
-10. **è‡ªå‹•æˆ°é¬¥è¨­å®šé é¢æ‡‰å›ºå®šç½®ä¸­ã€æ”¾å¤§é¿å…æ²å‹•** â€” é€™æ˜¯å°æ›´æ—©ä¸€è¼ª
-    ä½¿ç”¨è€…è‡ªå·±è¦æ±‚çš„ã€Œdock-bottomè²¼åº•é¡¯ç¤ºã€çš„æ˜Žç¢ºåæ‚”ï¼ˆã€Œæœ‰æ™‚å€™ç½®ä¸­
-    æœ‰æ™‚å€™é ä¸‹é¢ã€æ­£æ˜¯å› ç‚ºæˆ°é¬¥ä¸­/éžæˆ°é¬¥ä¸­åˆ‡æ›dock-bottomé€ æˆçš„ï¼‰ï¼Œ
-    é€™æ¬¡æ”¹æˆå®Œå…¨ä¸å†åŠ `dock-bottom`é€™å€‹classï¼Œå…©ç¨®æƒ…å¢ƒéƒ½ç¶­æŒ
-    `.home-feature-modal`é è¨­çš„ç½®ä¸­é¡¯ç¤ºï¼›è¦–çª—`max-height`ä¸åˆ†æƒ…å¢ƒ
-    çµ±ä¸€ç”¨96dvhï¼ˆåŽŸæœ¬æˆ°é¬¥ä¸­é‚„æ˜¯å¡åœ¨80dvhï¼‰ã€‚
-11. **è­·ç›¾è¦–è¦ºæ•ˆæžœ**ï¼ˆHPæ¢å¢žåŠ ç­‰å€¼ç™½è‰²è‰²å¡Šã€å¸æ”¶å‚·å®³é¡¯ç¤ºç™½è‰²æ‰£é™¤
-    å‹•ç•«ï¼‰â€” åº•å±¤çš„è­·ç›¾å‚·å®³å¸æ”¶é‚è¼¯ï¼ˆ`min(å‚·å®³,è­·ç›¾å‰©é¤˜)`å¸æ”¶ã€
-    è¶…éŽçš„éƒ¨åˆ†æ‰çœŸçš„æ‰£è¡€ï¼‰å…¶å¯¦æ—©å°±æ˜¯å°çš„ï¼Œé€™æ¬¡ç´”ç²¹æ˜¯è£œè¦–è¦ºå‘ˆç¾ï¼š
-    HP baræ–°å¢ž`.hp-bar-shield-overlay`ç™½è‰²è‰²å¡Šï¼ˆ`left`=ç›®å‰HP%ï¼Œ
-    `width`=è­·ç›¾å‰©é¤˜/maxHP%ï¼Œç·ŠæŽ¥åœ¨ç´…è‰²è¡€é‡å¾Œé¢ï¼‰ï¼Œ`updateSingle
-    CharacterBars()`è£¡åŒæ­¥è¨ˆç®—æ›´æ–°ï¼›æ–°å¢ž`showShieldAbsorb()`è·³å‡º
-    ç™½è‰²ï¼ˆéžç´…è‰²ï¼‰çš„å‚·å®³æ•¸å­—ï¼ˆ`.damage-popup.shield-popup`ï¼‰ï¼Œ
-    åœ¨ç‡ƒç‡’å‚·å®³å¸æ”¶è·Ÿä¸€èˆ¬æ”»æ“Šå‚·å®³å¸æ”¶å…©è™•å„å‘¼å«ä¸€æ¬¡ã€‚
-
-**å·²çŸ¥é™åˆ¶ï¼æœªå®Œæˆ**ï¼šç¬¬7é …ï¼ˆç ´åœ–é–ƒçˆï¼‰æ²’æœ‰ä¿®ï¼Œéœ€è¦ä½¿ç”¨è€…æä¾›æ›´å¤š
-ç·šç´¢æ‰èƒ½ç¹¼çºŒæŽ’æŸ¥ï¼Œè©³è¦‹ä¸Šæ–¹ç¬¬7é»žèªªæ˜Žã€‚
-
-### 2026-08-25 â€” ç¬¬äºŒè¼ªä¿®å¾© 7 é …å›žå ±å•é¡Œï¼ˆPR #6ï¼Œå·²åˆä½µï¼‰
-
-å»¶çºŒä¸Šä¸€è¼ªçš„7é …ä¿®å¾©ï¼Œä½¿ç”¨è€…å†æ¬¡å¯¦éš›æ“ä½œå¾Œå›žå ±7å€‹æ–°å•é¡Œï¼Œå…¨éƒ¨ç”¨ Playwright +
-headless Chromium é€ä¸€é©—è­‰å¾Œä¿®å¾©ï¼š
-
-1. **å½¢è±¡åˆ‡æ›æŒ‰éˆ•åœ–ç‰‡ç•«è³ªå¤ªå·®** â€” ä½¿ç”¨è€…é€™æ¬¡æä¾›çš„ä¸æ˜¯è§’è‰²ç´ æï¼Œè€Œæ˜¯ä¸€å¼µå°ˆå±¬çš„
-   ã€Œå½¢è±¡åˆ‡æ›ã€åŠŸèƒ½å¾½ç« åœ–ï¼ˆå›ºå®šåœ–æ¡ˆï¼Œè·Ÿè§’è‰²/å…ƒç´ ç„¡é—œï¼‰ã€‚`js/26-v131-patrol-appearance.js`
-   çš„ `updateSwitchIcon()` æ”¹æˆå¥—ç”¨é€™å¼µéœæ…‹é«˜ç•«è³ªåœ–ï¼ˆå­˜æˆ
-   `assets/ui/patrol-appearance-switch-icon.png`ï¼‰ï¼Œä¸å†å‹•æ…‹å¥—ç”¨ã€Œç›®å‰é¸ä¸­è§’è‰²ã€
-   è£åˆ‡å‡ºä¾†çš„ä½Žè§£æžåº¦spriteå°åœ–ã€‚ä¸Šä¸€è¼ªã€Œå·²çŸ¥é™åˆ¶ã€è£¡æåˆ°çš„ç•«è³ªå•é¡Œå·²è§£æ±ºã€‚
-2. **æŠ€èƒ½æ­£ç¢ºåç¨±** â€” ç”¨åƒç´ æ¯”å°æ‰¾å‡ºçœŸæ­£çš„æ ¹å› ï¼š`js/00-main.js` çš„
-   `elementSkillIconMap` è£¡ `dustStorm`ï¼ˆçœŸå¯¦åç¨±ã€Œåœ°ç‰›çŒ›è¥²ã€ï¼‰è·Ÿ `rockWall`
-   ï¼ˆçœŸå¯¦åç¨±ã€Œå²©çŸ³å£å£˜ã€ï¼‰å…©å€‹æŠ€èƒ½çš„iconæª”æ¡ˆå…§å®¹è¢«å°èª¿äº†ï¼ˆé€™å€‹bugåœ¨æ›´æ—©ä¸€è¼ªå°±å­˜åœ¨ï¼Œ
-   ä¸æ˜¯é€™æ¬¡æ‰introduceçš„ï¼Œåªæ˜¯é€™æ¬¡ä½¿ç”¨è€…æä¾›çš„å…©å¼µæ¨™ç±¤åƒè€ƒåœ–æ‰è®“å®ƒè¢«æŠ“å‡ºä¾†ï¼‰ã€‚
-   ç›´æŽ¥å°èª¿ `assets/skills/earth-dust-storm.jpg` è·Ÿ `earth-rock-wall.jpg`
-   å…©å€‹æª”æ¡ˆçš„å…§å®¹ï¼ˆä¸ç”¨æ”¹ `elementSkillIconMap`ï¼Œkeyè·Ÿæª”åæœ¬ä¾†å°±æ˜¯å°çš„ï¼Œ
-   éŒ¯çš„æ˜¯æª”æ¡ˆå…§å®¹æœ¬èº«ï¼‰ã€‚åŒæ™‚ä½¿ç”¨è€…é‡æ–°æä¾›ã€Œè¬è±¡åœŸç›¾ã€çš„å°ˆç”¨åœ–ï¼Œè£œå›ž
-   `earth-shield.jpg`ï¼ˆä¸Šä¸€è¼ªæ‹¿æŽ‰å¾Œçš„å·²çŸ¥é™åˆ¶ï¼Œé€™æ¬¡è§£æ±ºï¼‰ã€‚
-3. **é‡æ–°ä¸Šå‚³é«˜ç•«è³ªQç‰ˆå¥³ç”Ÿç«‹ç¹ª** â€” ä½¿ç”¨è€…æä¾›8å¼µæ–°çš„ç«/æ°´/é¢¨/åœŸï¼ˆå„æ­£/èƒŒé¢ï¼‰
-   é«˜è§£æžåº¦ç«‹ç¹ªï¼ˆ1024x1536ï¼Œæ¯”ä¾‹å‰›å¥½ç­‰æ–¼sprite cellçš„56:84ï¼‰ï¼Œæ•´çµ„é‡æ–°çµ„æˆ
-   3x3 sprite sheetï¼ˆ`/tmp/new_female_sheet.png`â†’webpï¼‰ï¼Œæ”¹ç”¨10å€‹base64 chunk
-   ï¼ˆåŽŸæœ¬6å€‹chunkæ”¾ä¸ä¸‹ï¼Œ`js/v131-patrol-sprite-0.js`~`9.js`ï¼‰ï¼Œä¸¦åœ¨
-   `js/20-anonymous-20.js` çš„ `sources` é™£åˆ—è£œä¸Šæ–°çš„4å€‹chunkæª”æ¡ˆã€
-   æŠŠç‰ˆæœ¬query stringå¾ž`?v=131a`æ”¹æˆ`?v=131e`é¿å…ç€è¦½å™¨å¿«å–èˆŠspriteã€‚
-   å·²é©—è­‰æ–°spriteè¦–è¦ºå“è³ªæ˜Žé¡¯æå‡ã€‚
-4. **å…¨æŠ€èƒ½é è¦½æ–‡å­—å¤ªå°** â€” ä¸Šä¸€è¼ªå·²ç¶“åŠ å¤§éŽä¸€æ¬¡ï¼ˆ13.5/14.5/15pxï¼‰ï¼Œä½¿ç”¨è€…åæ˜ 
-   é‚„æ˜¯å¤ªå°ï¼Œé€™æ¬¡å¤§å¹…åŠ å¤§åˆ°17/19/20pxï¼ˆ`css/31-v131-fix-batch.css`ï¼‰ã€‚
-5. **å…¨æŠ€èƒ½é è¦½æŒ‰éˆ•ä½ç½®** â€” åŽŸæœ¬è·Ÿã€ŒæŠ€èƒ½é…è£ã€æ¨™é¡Œä¸¦æŽ’åœ¨æŠ€èƒ½é é¢å…§éƒ¨ï¼Œä½¿ç”¨è€…
-   è¦æ±‚ç§»åˆ°ã€Œè¿”å›žã€æŒ‰éˆ•æ­£ä¸‹æ–¹ã€‚æ”¹æ³•ï¼šæŠŠå…±ç”¨å½ˆçª—headerï¼ˆ`.home-feature-modal-title`
-   å³å´åŽŸæœ¬åªæœ‰ï¼Ÿ/è¿”å›žå…©é¡†æŒ‰éˆ•çš„å€å¡Šï¼‰å¾žå–®æŽ’æ”¹æˆå…©æŽ’çš„flex columnï¼Œæ–°å¢ž
-   `id="skillPreviewHeaderButton"`æ”¾åœ¨ç¬¬äºŒæŽ’ï¼Œé è¨­éš±è—ï¼Œ`switchCharacterTab()`
-   åˆ‡åˆ°`"skill"`åˆ†é æ™‚æ‰é¡¯ç¤ºï¼ˆè·Ÿ`statusHelpButton`åŒä¸€å¥—é‚è¼¯ï¼‰ï¼ŒæŠ€èƒ½é é¢å…§éƒ¨
-   åŽŸæœ¬é‚£é¡†æŒ‰éˆ•ç›´æŽ¥ç§»é™¤ï¼Œä¸ç•™é‡è¤‡æŒ‰éˆ•ã€‚
-6. **è‡ªå‹•æˆ°é¬¥è¨­å®šé é¢ç„¡æ³•æ²å‹•** â€” é€™æ¬¡çš„æ ¹å› è·Ÿä¸Šä¸€è¼ª`characterTabContent`é‚£å€‹
-   bugä¸ä¸€æ¨£ï¼šæ²å‹•æ©Ÿåˆ¶æœ¬èº«å…¶å¯¦æ²’å£žï¼ˆç¨‹å¼åŒ–`scrollTop`è³¦å€¼ã€æ¨¡æ“¬è§¸æŽ§æ»‘å‹•éƒ½èƒ½
-   æ²åˆ°åº•ï¼‰ï¼ŒçœŸæ­£åŽŸå› æ˜¯`.home-feature-modal.dock-bottom{padding-bottom:172px}`
-   ï¼ˆåŽŸæœ¬æ˜¯ç‚ºäº†è²¼é½Šæˆ°é¬¥ä¸­çš„æˆ°é¬¥è³‡è¨Šæ¡†è¨­è¨ˆçš„ï¼‰ä¸ç®¡æ˜¯ä¸æ˜¯çœŸçš„åœ¨æˆ°é¬¥ä¸­éƒ½å¥—ç”¨ï¼Œ
-   åŠ ä¸Š`.home-feature-modal-box`è‡ªå·±`max-height:80dvh`çš„ç¡¬ä¸Šé™ï¼Œå…©è€…ç–ŠåŠ å°Žè‡´
-   éžæˆ°é¬¥ä¸­é–‹å•Ÿé€™å€‹è¨­å®šé æ™‚å¯ç”¨é«˜åº¦è¢«éŽåº¦å£“ç¸®ã€‚`js/00-main.js`è£¡é–‹å•Ÿé€™å€‹å½ˆçª—
-   çš„åœ°æ–¹æ”¹æˆï¼š`padding-bottom`è·Ÿ`max-height`éƒ½ä¾`battleActive`å‹•æ…‹è¨­å®š
-   ï¼ˆæˆ°é¬¥ä¸­ç¶­æŒ172px/80dvhï¼Œéžæˆ°é¬¥ä¸­é™åˆ°24px/96dvhï¼‰ã€‚å·²é©—è­‰ï¼šä¸€èˆ¬420x900
-   viewportä¸‹å¯ç”¨é«˜åº¦å‰›å¥½ç­‰æ–¼å…§å®¹é«˜åº¦ï¼ˆå®Œå…¨ä¸ç”¨æ²ï¼‰ï¼›å°±ç®—æ•…æ„ç¸®åˆ°390x660
-   é€™ç¨®æ¯”ä»»ä½•çœŸå¯¦æ‰‹æ©Ÿéƒ½çŸ­çš„æ¥µç«¯viewportï¼Œå‰©é¤˜çš„ä¸€é»žé»žå…§å®¹ä¹Ÿèƒ½é€éŽæ²å‹•
-   ï¼ˆç¨‹å¼åŒ–èˆ‡çœŸå¯¦è§¸æŽ§æ»‘å‹•çš†æ¸¬è©¦éŽï¼‰å®Œæ•´çœ‹åˆ°ã€‚
-7. **æŠ€èƒ½å‡ç´šæ²’æœ‰é˜²å‘†/æˆåŠŸæç¤º** â€” ä¸Šä¸€è¼ªåªå¹«`learnSkill`åŠ äº†`confirm()`/
-   `alert()`åŒ…è£ï¼Œ`upgradeSkill`ç•¶æ™‚æ²’æœ‰åŒæ­¥è™•ç†ã€‚`js/25-v131-fix-batch.js`
-   è£œä¸Šçµæ§‹ç›¸åŒçš„`upgradeSkill`åŒ…è£ï¼Œå·²é©—è­‰ç¢ºèªå°è©±æ¡†è·ŸæˆåŠŸæç¤ºéƒ½æ­£å¸¸
-   è·³å‡ºï¼ŒæŠ€èƒ½ç­‰ç´šä¹Ÿç¢ºå¯¦å¾ž1å‡åˆ°2ã€‚
-
-### 2026-08-25 â€” ä¿®å¾© 7 é …å›žå ±å•é¡Œï¼ˆç”¨å¯¦æ©Ÿç€è¦½å™¨æ¸¬è©¦é€ä¸€é©—è­‰ï¼‰
-
-ä½¿ç”¨è€…å¯¦éš›åœ¨æ‰‹æ©Ÿ/æˆªåœ–ä¸Šå›žå ±çš„ 7 å€‹å•é¡Œï¼Œé€™æ¬¡å…¨éƒ¨ç”¨æœ¬æ©Ÿ Playwright + headless
-Chromium æž¶è¨­æ¸¬è©¦ç’°å¢ƒï¼Œå¯¦éš›æ“ä½œåˆ°å‡ºå•é¡Œçš„ç•«é¢ã€é‡æ¸¬ computed style / DOM
-çµæ§‹ï¼Œè€Œä¸æ˜¯åªæ†‘è®€ç¨‹å¼ç¢¼åˆ¤æ–·ï¼Œé€ä¸€æ ¹å› æŽ’æŸ¥å¾Œä¿®å¾©ï¼š
-
-1. **æŠ€èƒ½æ¬„ï¼ç¶“é©—æ± é é¢ç„¡æ³•æ²å‹•** â€” æ ¹å› è¦‹ä¸Šæ–¹ã€Œç³»çµ±æž¶æ§‹é‡é»žã€ç¬¬1.5ç¯€ï¼Œ
-   `js/19-stage-v78-character-inventory-runtime.js` çš„ `applyNow()` æ”¹æˆç›´æŽ¥ç”¨
-   `body.clientHeight` è¨­å®š `#characterTabContent` é«˜åº¦ï¼Œä¸å†ç”¨
-   `getBoundingClientRect()` é™¤ä»¥ä¸€å€‹ä¸é©ç”¨çš„ç¸®æ”¾ä¿‚æ•¸ã€‚å·²é©—è­‰æ²å‹•å¯ä»¥
-   åˆ°åº•ï¼ˆ`scrollTop+clientHeight>=scrollHeight`ï¼‰ã€‚
-2. **å·¡æ€ª Q ç‰ˆç«‹ç¹ªè®Šç™½è‰²ç©ºç™½æ–¹å¡Š** â€” æ ¹å› æ˜¯ Chromium çš„ `<img src=éžç©º>` +
-   CSS `background-image` ç–Šåœ–æ¸²æŸ“ bugï¼ˆè·Ÿ object-fitã€ç´ æéƒ½ç„¡é—œï¼Œå·²ç”¨
-   æœ€å°é‡ç¾æ¡ˆä¾‹ç¢ºèªï¼‰ã€‚`js/26-v131-patrol-appearance.js` æ”¹ç”¨ canvas
-   ï¼ˆ`drawImage`+`toDataURL`ï¼‰æŠŠsprite sheetè£¡éœ€è¦çš„é‚£ä¸€æ ¼å¯¦éš›ã€Œè£ã€æˆ
-   ç¨ç«‹åœ–ç‰‡å†è¨­å®š `img.src`ï¼Œä¸å†ç–ŠCSSèƒŒæ™¯ã€‚é€™å€‹bugå…¶å¯¦å¾žæœ€æ—©çš„å¥³è§’ç‰ˆæœ¬
-   å°±å­˜åœ¨ï¼Œé€™æ¬¡é †ä¾¿ä¸€èµ·ä¿®æŽ‰ï¼Œä¸æ˜¯åªä¿®ç”·è§’ã€‚
-3. **æŠ€èƒ½åœ–ç¤ºé…éŒ¯** â€” ä½¿ç”¨è€…æä¾›å¸¶åç¨±æ¨™ç±¤çš„åƒè€ƒåœ–ï¼Œç”¨åƒç´ æ¯”å°ï¼ˆä¸æ˜¯è‚‰çœ¼ï¼‰
-   æŠ“å‡º5å€‹å¯¦éš›é…éŒ¯/éºæ¼çš„æŠ€èƒ½åœ–ç¤ºä¸¦ä¿®æ­£ï¼Œç´°ç¯€è¦‹ `js/00-main.js` è£¡
-   `elementSkillIconMap` ä¸Šæ–¹çš„è¨»è§£ã€‚`earthShield` å› ç‚ºå®ƒåŽŸæœ¬ç”¨çš„åœ–è¢«è­‰å¯¦
-   å…¶å¯¦æ˜¯ `sandWind` çš„ï¼Œé€™æ¬¡æ‹¿æŽ‰äº†ã€æš«æ™‚æ²’æœ‰åœ–ã€‚
-4. **æŠ€èƒ½ç‰©ç†/æ³•è¡“æ¨™ç±¤æ²’é¡¯ç¤ºã€å­¸ç¿’å‡ç´šæ¡†å¤ªå¤§** â€” æ ¹å› æ˜¯
-   `js/25-v131-fix-batch.js` çš„ `decorateSkillRows()` è·Ÿ `css/31` çš„æŒ‰éˆ•
-   ç¸®å°è¦å‰‡ï¼ŒåŽŸæœ¬éŽ–å®šçš„æ˜¯ `.learned-skill`/`.learnable-skill` é€™å…©å€‹
-   **ç›®å‰ç‰ˆæœ¬æŠ€èƒ½é æ ¹æœ¬ä¸å­˜åœ¨çš„ class**ï¼ˆçœŸæ­£çš„æ˜¯ `.skill-row` /
-   `.skill-action-card`ï¼‰ï¼Œå¾žPR#1é‚£æ¬¡é–‹å§‹å°±æ²’çœŸçš„ç”Ÿæ•ˆéŽã€‚å·²æ”¹æˆæ­£ç¢ºçš„
-   selectorï¼ŒæŠ€èƒ½iconçš„idï¼ˆ`skillIcon_xxx`ï¼‰ç¾åœ¨ä¹Ÿæ‹¿ä¾†ç•¶ä½œæŠ“skillIdçš„
-   ä¸»è¦ä¾æ“šï¼Œæ¯”åŽŸæœ¬çŒœonclickå­—ä¸²å¯é ã€‚
-5. **æŠ€èƒ½é è¦½/èƒ½åŠ›å€¼/æŠ€èƒ½åˆ—è¡¨æ–‡å­—å¤ªå°** â€” åŽŸæœ¬åªåœ¨ `#characterTabContent`
-   é€™å€‹ç¥–å±¤è¨­font-sizeï¼Œä½†åº•ä¸‹ `.status-row`ã€`.skill-row-desc`ã€
-   `.skill-preview-card` é€™äº›å…ƒç´ å„è‡ªéƒ½æœ‰è‡ªå·±çš„font-sizeï¼Œç¹¼æ‰¿éˆåœ¨é‚£è£¡
-   å°±æ–·äº†ã€‚æ”¹æˆç›´æŽ¥å°é€™äº›çœŸæ­£æ±ºå®šç•«é¢æ–‡å­—å¤§å°çš„classåŠ å¤§ï¼Œæ²’æœ‰å‹•ä»»ä½•
-   å¯¬é«˜ã€‚
-6. **å½¢è±¡åˆ‡æ›æŒ‰éˆ•å¤ªå°ã€ç•«è³ªå·®** â€” æŒ‰éˆ•å¾ž58pxæ”¾å¤§åˆ°76pxï¼›iconæ”¹æˆå³æ™‚é¡¯ç¤º
-   ã€Œç›®å‰çœŸæ­£é¸ä¸­çš„è§’è‰²ã€è£åˆ‡å‡ºä¾†çš„åœ–ï¼ˆåŽŸæœ¬æ˜¯å¯«æ­»å¥—ç”¨å¥³è§’ï¼‰ï¼Œç•«è³ªå—é™æ–¼
-   sprite sheetæœ¬èº«56x84çš„è§£æžåº¦ï¼Œé€™éƒ¨åˆ†æ²’æœ‰å¾žæ ¹æœ¬è§£æ±ºï¼Œè¦‹ä¸‹æ–¹å·²çŸ¥é™åˆ¶ã€‚
-
-### 2026-08-25 â€” ç”·è§’ Q ç‰ˆå·¡æ€ªèƒŒé¢ + åœŸç³»æŠ€èƒ½ icon
-
-- **ç”·è§’ Q ç‰ˆå·¡æ€ªèƒŒé¢**ï¼šä½¿ç”¨è€…è£œä¸Šäº†ç«/æ°´/é¢¨/åœŸå››å…ƒç´ çš„ç”·è§’èƒŒé¢ç«‹ç¹ªã€‚
-  æŠŠåŽŸæœ¬åªæœ‰æ­£é¢çš„ 2x2 spriteï¼ˆ`js/v131-patrol-sprite-male-0.js`~`8.js`ï¼Œå…±9å€‹chunkï¼‰
-  æ›æˆ 4 æ¬„ï¼ˆå…ƒç´ ï¼‰Ã— 2 åˆ—ï¼ˆæ­£/èƒŒé¢ï¼‰çš„ 4x2 spriteï¼ˆæ”¹åæ²¿ç”¨åŒæ¨£çš„æª”åï¼Œ
-  ç¾åœ¨æ˜¯ `js/v131-patrol-sprite-male-0.js`~`17.js`ï¼Œå…±18å€‹chunkï¼‰ï¼Œ
-  å·²é©—è­‰ byte-for-byte é‚„åŽŸæ­£ç¢ºã€‚`js/26-v131-patrol-appearance.js` çš„
-  `maleSpriteCells` æ”¹æˆè·Ÿå¥³è§’ä¸€æ¨£çš„ `{element:{front:[...],back:[...]}}`
-  çµæ§‹ï¼Œ`applyPatrolArt()` å°ç”·è§’ä¹Ÿæœƒä¾ `facingBack` åˆ‡æ›æ­£èƒŒé¢äº†
-  ï¼ˆä¸å†å›ºå®šé¡¯ç¤ºæ­£é¢ï¼Œé€™å€‹é™åˆ¶å·²ç¶“è§£é™¤ï¼‰ã€‚
-- **åœŸç³»æŠ€èƒ½ icon**ï¼šä½¿ç”¨è€…ä¸Šå‚³äº†11å¼µå€™é¸åœ–ï¼Œæ¯”å° `js/00-main.js` è£¡
-  æŠ€èƒ½è³‡æ–™åº«ä¸­ï¼ˆæœå°‹ `element:"earth"` å¯ä»¥æ‰¾åˆ°å…¨éƒ¨12å€‹ï¼‰åœŸç³»æŠ€èƒ½çš„
-  åç¨±/æè¿°å¾Œï¼Œé…å°äº†å…¶ä¸­10å€‹ï¼ˆ`petrifyFist`ã€`stoneBreakSky`ã€
-  `earthquakeCrush`ã€`stoneThrow`ã€`sandWind`ã€`flyingSandStrike`ã€`dustStorm`ã€
-  `earthShield`ã€`rockWall`ã€`barrier`ï¼‰ï¼Œå­˜é€² `assets/skills/earth-*.jpg`
-  ï¼ˆ120x120ï¼Œè·Ÿç«/æ°´ç³»iconåŒè¦æ ¼ï¼‰ï¼Œä¸¦åœ¨ `js/00-main.js` çš„
-  `elementSkillIconMap` è£œä¸Šå°æ‡‰é …ç›®ï¼ˆå«é…å°ç†ç”±è¨»è§£ï¼‰ã€‚
-  **`stoneSlash`ï¼ˆå…¥é–€å–®é«”æŠ€èƒ½ï¼‰è·Ÿ `earthEX`ï¼ˆè¢«å‹•ï¼‰é€™å…©å€‹æ²’æœ‰é…å°**ï¼Œ
-  å› ç‚ºä¸Šå‚³çš„åœ–è£¡æ²’æœ‰æ˜Žé¡¯å°æ‡‰çš„ç•«é¢ï¼ˆ`earthEX` éœ€è¦çš„æ˜¯é¡žä¼¼
-  `fire-ex.jpg`/`water-ex.jpg` é‚£ç¨®åœ–ä¸Šç›´æŽ¥å¯«ã€ŒEXã€å­—æ¨£çš„å°ˆç”¨iconï¼Œ
-  é€™æ¬¡æ²’æœ‰æä¾›é€™æ¬¾ï¼‰ã€‚å¦å¤–æœ‰1å¼µå€™é¸åœ–ï¼ˆå²©çŸ³å°–å¡”+å…‰ç’°ï¼Œè·Ÿå…¶ä»–å€™é¸åœ–
-  å€åˆ†åº¦å¤ªä½Žï¼‰é€™æ¬¡ä¹Ÿæ²’ç”¨ä¸Šã€‚é€™äº›éƒ½æ˜¯åˆ»æ„ç•™ç™½ï¼Œä¸æ˜¯éºæ¼â€”â€”å¦‚æžœä¹‹å¾Œ
-  è¦è£œé€™å…©å€‹æŠ€èƒ½çš„iconæˆ–æƒ³èª¿æ•´æŸå€‹é…å°ï¼Œç›´æŽ¥æ”¹
-  `js/00-main.js` è£¡ `elementSkillIconMap` é‚£å€‹ç‰©ä»¶å°±å¥½ã€‚
-
-### 2026-08-25 â€” ç”·è§’ Q ç‰ˆå·¡æ€ªç«‹ç¹ªï¼ˆPR #2ï¼Œå·²åˆä½µï¼‰
-
-- ä¾†æºï¼šä½¿ç”¨è€…ä¸Šå‚³ 4 å¼µç”·è§’ Q ç‰ˆç«‹ç¹ªï¼ˆç«/æ°´/é¢¨/åœŸï¼Œåªæœ‰æ­£é¢ï¼‰
-- ç”¨ `rembg`ï¼ˆPythonï¼ŒU2Net æ¨¡åž‹ï¼‰åšçœŸæ­£çš„é€æ˜ŽèƒŒæ™¯åŽ»èƒŒï¼Œä¸æ˜¯ CSS é®è‰²ç‰‡
-- çµ„æˆ 2x2 é€æ˜Ž WebP sprite sheetï¼Œåˆ‡æˆ 9 å€‹ base64 chunk
-  ï¼ˆ`js/v131-patrol-sprite-male-0.js` ~ `8.js`ï¼‰ï¼Œå·²é©—è­‰ byte-for-byte é‚„åŽŸæ­£ç¢º
-- `js/26-v131-patrol-appearance.js`ï¼šæ–°å¢ž `isMaleCharacter()` / `maleSpriteCells` /
-  `maleBackgroundPosition()`ï¼Œ`applyPatrolArt()` ä¾ `character.gender` åˆ†æµï¼›
-  ç”·è§’ sprite è³‡æ–™ä¸å®Œæ•´æ™‚è‡ªå‹•é€€å›žå¥³è§’é‚£çµ„ï¼Œä¸å½±éŸ¿æ—¢æœ‰è¡Œç‚º
-- `js/20-anonymous-20.js`ï¼š`loadV131PatrolAppearanceAssets()` çš„ `sources` é™£åˆ—
-  è£œä¸Š 9 å€‹æ–° chunkï¼Œé †åºæŽ’åœ¨ `js/26-v131-patrol-appearance.js` ä¹‹å‰
-- **å·²çŸ¥é™åˆ¶**ï¼šåªæœ‰æ­£é¢åœ–ï¼Œæ²’æœ‰èƒŒé¢ã€‚ç”·è§’å·¡æ€ªæ™‚ä¸æœƒå› ç‚ºå¾€ä¸Šèµ°åˆ‡æ›èƒŒé¢é¡¯ç¤º
-  ï¼ˆå›ºå®šé¡¯ç¤ºæ­£é¢ï¼‰ã€‚ä¹‹å¾Œè‹¥æ‹¿åˆ°ç”·è§’èƒŒé¢åœ–ï¼Œå¯ä»¥ç›´æŽ¥æ¯”ç…§å¥³è§’é‚£çµ„
-  `spriteCells={element:{front:[...],back:[...]}}` çš„çµæ§‹æ“´å……ã€‚
-- é©—è­‰æ–¹å¼ï¼š`node --check` å…¨éƒ¨ç•°å‹•æª”æ¡ˆèªžæ³•é€šéŽï¼›base64 é‚„åŽŸ hash æ¯”å°é€šéŽï¼›
-  æ²’æœ‰å¯¦æ©Ÿç€è¦½å™¨æ¸¬è©¦ï¼ˆç’°å¢ƒé™åˆ¶ï¼Œè¦‹ä¸‹æ–¹ã€Œå°šæœªé©—è­‰ã€ï¼‰ã€‚
-
-### 2026-08-25 â€” V131ï¼š17 é …éœ€æ±‚ä¿®æ­£æ‰¹æ¬¡ï¼ˆPR #1ï¼Œå·²åˆä½µï¼‰
-
-å°æ‡‰ä½¿ç”¨è€…ä¸€æ¬¡æå‡ºçš„ 17 é …éœ€æ±‚ï¼Œå…¨éƒ¨å·²åœ¨ç¨‹å¼ç¢¼å±¤ç´šé€é …è¿½è¹¤é©—è­‰ï¼ˆä¸æ˜¯åªçœ‹ PR èªªæ˜Žæ–‡å­—ï¼‰ï¼Œ
-ç´°ç¯€èˆ‡å°æ‡‰ç¨‹å¼ç¢¼ä½ç½®ï¼š
-
-1. æ¯ä½è§’è‰²/æ€ªç‰©å‡ºæ‰‹å¾Œç­‰ 1.3 ç§’æ‰è¼ªä¸‹ä¸€ä½ â€”
-   `js/25-v131-fix-batch.js` çš„ `V131_RESOLVE_DELAY_MS=1300`ï¼Œ
-   åŒ…åœ¨å…±ç”¨çš„ `finishPlayerAction`ï¼ˆçŽ©å®¶èˆ‡æ€ªç‰©å›žåˆéƒ½å…±ç”¨åŒä¸€å€‹çµæŸå‡½å¼ï¼‰
-2. æˆ°é¬¥/é‡Žæ€ª icon åŽ»èƒŒã€çŽ©å®¶å¡çµ±ä¸€è£œé‡‘è‰²å¤–æ¡† â€” åœ–ç‰‡æœ¬èº«å·²ç”¨çœŸé€æ˜ŽèƒŒæ™¯è™•ç†
-   ï¼ˆä¸æ˜¯ CSS é®è‰²ç‰‡ï¼‰ï¼ŒCSS çµ±ä¸€è£œ `.battle-player` é‚Šæ¡†
-3. æ€ªç‰©å…©æŽ’ç·¨éšŠï¼ˆ1â€“5 åŒæŽ’ï¼6=3+3ï¼7â€“10=5+ç½®ä¸­è£œæ»¿ï¼‰â€”
-   `getFormationRows()`ï¼ŒCSS `.v131-monster-row{justify-content:center}` åšç½®ä¸­
-4. triï¼row æŠ€èƒ½ä¾å›ºå®šç«™ä½åˆ¤å®šï¼Œæ­»äº¡ä¸è£œä½ â€” æ–°ç‰ˆ `getSkillTargets()` ç”¨é™£åˆ—å›ºå®š
-   index å–ç›¸é„°ç«™ä½ã€äº‹å¾Œæ‰éŽæ¿¾å­˜æ´»
-5. æŠ€èƒ½é¸å–®æ²å‹•ç¯„åœä¿®æ­£ â€” CSS `overflow-y:auto` + padding
-6. å…ƒç´ åŒ£ï¼šå–®ä¸€è¿”å›žéµã€æŒ‰éˆ•æ”¹ã€Œå¥—ç”¨ä¸¦å•Ÿå‹•ã€ã€å»£å‘Š 8 å°æ™‚æ™‚æ•¸é–€æª»ã€çµ±è¨ˆé¢æ¿
-   ï¼ˆå•Ÿå‹•ç¸½æ™‚æ•¸ï¼æˆ°é¬¥æ¬¡æ•¸ï¼EXPï¼é‡‘å¹£ï¼å‰©é¤˜æ™‚æ•¸ï¼‰â€” `confirmAutoBattleSettings` æ””æˆªï¼Œ
-   æŽ¥æ—¢æœ‰çš„ `showRewardedAd()`
-7. é‡Žæ€ªå¼·åº¦ +30%ï¼ˆHP/SP/æ”»/é˜²/é­”æ”»ï¼‰â€” `V131_MONSTER_STRENGTH=1.30`ï¼Œ
-   æ¶µè“‹æ‰€æœ‰å·²å®šç¾©å€åŸŸæ€ªç‰©é™£åˆ—
-8. èƒŒåŒ…ç«‹ç¹ªä¾è§’è‰²å½¢è±¡ï¼ˆæ€§åˆ¥ï¼‹å…ƒç´ ï¼‰å¥—ç”¨ â€” `getCharacterArtworkPath()`
-   ï¼ˆ`js/00-main.js`ï¼‰+ `syncInventoryPortrait()`
-9. äºŒä¸‰è§’è‰²å‰µå»ºå…é—œé å³æ™‚åˆ·æ–° + ç´…é»žæç¤º â€” `syncCharacterCreationAvailability()`
-10. æŠ€èƒ½é è¦½ç§»åˆ°æœ€ä¸Šå±¤ + å¯æ²å‹• â€” DOM æ¬é€² overlay å®¹å™¨ï¼Œz-index 9800
-11. æŠ€èƒ½å­¸ç¿’/å‡ç´šæŒ‰éˆ•ç¸®å° + é˜²å‘†ç¢ºèª + æˆåŠŸæç¤º â€” `learnSkill` åŒ…ä¸€å±¤
-    `confirm()`/`alert()`
-12. æŠ€èƒ½åˆ—è¡¨å…ˆé¡¯ç¤ºç‰©ç†/æ³•è¡“æ¨™ç±¤ï¼ˆä¸ç”¨é»žé–‹è©³ç´°è³‡æ–™ï¼‰â€” `decorateSkillRows()`
-13. ç¶“é©—æ± ï¼šç´”åå­—é¡¯ç¤ºã€é è¦½å‡ç´šã€ç¢ºå®š/è¿”å›žæµç¨‹ â€” `renderExpDistributeList` æ•´å€‹æ”¹å¯«
-14. æŠ€èƒ½/èƒ½åŠ›å€¼/ç¶“é©—é æ–‡å­—æ”¾å¤§ï¼ˆæ¡†é«”å°ºå¯¸ä¸è®Šï¼‰â€” CSS font-size èª¿æ•´
-15. å·¡æ€ª Q ç‰ˆç«‹ç¹ªä¾è§’è‰²å…ƒç´ åˆ‡æ›ï¼ˆæ­£åé¢éš¨ç§»å‹•æ–¹å‘ï¼‰ï¼Œæ–°å¢žã€Œå½¢è±¡åˆ‡æ›ã€æŒ‰éˆ•
-    â€” `js/26-v131-patrol-appearance.js`ï¼ˆç•¶æ™‚åªæœ‰å¥³è§’ç´ æï¼Œç”·è§’éƒ¨åˆ†è¦‹ä¸Šé¢
-    2026-08-25 çš„å¦ä¸€ç­†è¨˜éŒ„ï¼‰
-16. å•†åº—æ”¹é»‘åº• â€” `.v131-shop-open` class åˆ‡æ›ç´”é»‘èƒŒæ™¯
-17. æˆ°é¬¥ EXP Ã—3.5 â€” `winBattle` é¡å¤–åŠ ç®— `finalExp - baseExp`
-
-**éŽç¨‹æ›´æ­£ç´€éŒ„**ï¼šè™•ç†é€™æ‰¹éœ€æ±‚æ™‚ï¼ŒClaude ä¸€åº¦èª¤åˆ¤ã€Œ`index.html` æ²’æœ‰å¯¦éš›è¼‰å…¥é€™äº›æª”æ¡ˆã€
-è€Œå¤šåŠ äº†é‡è¤‡çš„ `<script>` æ¨™ç±¤ï¼Œå¾Œä¾†ç™¼ç¾ `js/20-anonymous-20.js` æœ¬èº«å·²ç¶“æœ‰å‹•æ…‹è¼‰å…¥å™¨ï¼Œ
-å·²æ’¤éŠ·é‚£æ¬¡èª¤æ”¹ã€‚è©³è¦‹ä¸Šæ–¹ã€Œç³»çµ±æž¶æ§‹é‡é»žã€ç¬¬ 1 é»žï¼Œé¿å…ä¸‹ä¸€å€‹äººé‡è¹ˆè¦†è½ã€‚
-
----
-
-## å·²çŸ¥é™åˆ¶ / å¾…è¾¦äº‹é …
-
-- [x] ~~ç”·è§’ Q ç‰ˆå·¡æ€ªç«‹ç¹ªç¼ºèƒŒé¢åœ–~~ 2026-08-25 å·²è£œä¸Šï¼Œè¦‹ä¸Šæ–¹è¨˜éŒ„
-- [x] ~~åœŸç³»æŠ€èƒ½ `stoneSlash`ã€`earthEX` æ²’æœ‰icon~~ 2026-08-25 å·²è£œä¸Š
-      ï¼ˆåˆ†åˆ¥ç”¨ä½¿ç”¨è€…æ¨™ç±¤ç¢ºèªçš„åœ– + æ–°æä¾›çš„EXå°ˆç”¨åœ–ï¼‰
-- [x] ~~åœŸç³»æŠ€èƒ½ `earthShield`ï¼ˆè¬è±¡åœŸç›¾ï¼‰æ²’æœ‰icon~~ 2026-08-25ç¬¬äºŒè¼ªå·²è£œä¸Š
-      ï¼ˆä½¿ç”¨è€…é‡æ–°æä¾›å°ˆç”¨åœ–ï¼Œè¦‹ä¸Šæ–¹è¨˜éŒ„ï¼‰
-- [x] ~~å½¢è±¡åˆ‡æ›æŒ‰éˆ•ç•«è³ªå·®~~ 2026-08-25ç¬¬äºŒè¼ªå·²è§£æ±ºï¼šæ”¹ç”¨ä½¿ç”¨è€…æä¾›çš„å°ˆç”¨
-      éœæ…‹å¾½ç« åœ–ï¼Œä¸å†ä¾è³´56x84çš„ä½Žè§£æžåº¦è§’è‰²spriteè£åˆ‡
-- [x] ~~V131é€™å¹¾æ‰¹ä¿®æ­£çš„ç€è¦½å™¨å¿«å–é¢¨éšª~~ 2026-08-26ç¬¬ä¸‰è¼ªæ‰¾åˆ°å…·é«”æ ¹å› ä¸¦ä¿®æ­£ï¼š
-      `js/00-main.js`/`js/25-v131-fix-batch.js`/`css/31-v131-fix-batch.css`/
-      `js/26-v131-patrol-appearance.js`/`css/32-v131-patrol-appearance.css`
-      é€™äº”å€‹æª”æ¡ˆçš„`?v=`ç‰ˆæœ¬è™Ÿå¥½å¹¾è¼ªéƒ½æ²’æœ‰è·Ÿè‘—å…§å®¹è®Šå‹•éžå¢žï¼Œé€™æ¬¡å·²ç¶“çµ±ä¸€
-      bumpåˆ°`?v=132`ã€‚**é€™ä¸æ˜¯ä¸€æ¬¡æ€§ä¿®å¥½å°±æ²’äº‹äº†â€”â€”ä¹‹å¾Œæ¯æ¬¡æ”¹é€™äº”å€‹æª”æ¡ˆ
-      è£¡ä»»ä½•ä¸€å€‹ï¼Œéƒ½è¦è¨˜å¾—æ‰‹å‹•æŠŠå°æ‡‰çš„`?v=`æ•¸å­—å¾€ä¸ŠåŠ ä¸€**ï¼Œè©³è¦‹ä¸Šæ–¹
-      ã€Œç³»çµ±æž¶æ§‹é‡é»žã€1.2ç¯€ï¼Œé€™æ˜¯ç›®å‰æœ€å®¹æ˜“è¢«å¿½ç•¥ã€å¾Œæžœå»æœ€åš´é‡çš„å‘ã€‚
-- [x] ~~ç›®å‰ä»æ²’æœ‰ CI~~ V173.1 å·²å»ºç«‹ GitHub Actions `Repository checks`ï¼›V137 çš„
-      `tests/v137-regressions.test.js` æœ‰ 9 é …é«˜é¢¨éšª
-      å›žæ­¸ï¼ŒV138 çš„ `tests/v138-feature-requirements.test.js` å¦æœ‰ 10 é …éœ€æ±‚é©—æ”¶ï¼Œ
-      V139 çš„ `tests/v139-economy-rested-exp.test.js` æœ‰ 7 é …ç¶“æ¿Ÿï¼ä¼‘æ¯ç¶“é©—é©—æ”¶ï¼Œ
-      V140 çš„ `tests/v140-four-element-balance.test.js` æœ‰ 14 é …æŠ€èƒ½å®šæ¡ˆé©—æ”¶ï¼Œ
-      V141 çš„ `tests/v141-system-expansion.test.js` æœ‰ 18 é …ç³»çµ±æ“´å……é©—æ”¶ï¼Œ
-      V142 çš„ `tests/v142-skill-animation.test.js` æœ‰ 15 é …å‹•ç•«ï¼è¡Œå‹•é–˜é–€é©—æ”¶ï¼Œ
-      V143 çš„ `tests/v143-combat-dungeon-polish.test.js` æœ‰ 12 é …æœ¬è¼ªéœ€æ±‚é©—æ”¶ï¼Œ
-      V144 çš„ `tests/v144-rules-and-abyss.test.js` æœ‰ 11 é …å•†åº—ï¼æ€ªç‰©æŠ€èƒ½ï¼æ·±æ·µé©—æ”¶ï¼Œ
-      V146 çš„ `tests/v146-system-polish.test.js` æœ‰ 8 é …æˆ°é¬¥ï¼æ·±æ·µï¼æ‰‹æ©Ÿä»‹é¢é©—æ”¶ï¼Œ
-      V148 çš„ `tests/v148-combat-dungeon-fixes.test.js` æœ‰ 13 é …æˆ°é¬¥ç›®æ¨™ï¼å‰¯æœ¬é©—æ”¶ï¼Œ
-      V149 çš„ `tests/v149-skill-ui-rules.test.js` æœ‰ 13 é …æŠ€èƒ½ï¼ä»‹é¢è¦å‰‡é©—æ”¶ï¼Œ
-      V150 çš„ `tests/v150-ice-arrow-rain-vfx.test.js` æœ‰ 6 é …æ­£å¼ Sprite VFX é©—æ”¶ï¼Œ
-      V152 çš„ `tests/v152-dev-fixes.test.js` æœ‰ 11 é …æŠ€èƒ½ï¼å‰¯æœ¬ï¼æˆ°é¬¥ä»‹é¢é©—æ”¶ï¼Œ
-      V153 çš„ `tests/v153-fire-vfx.test.js` æœ‰ 12 é …ç«å…ƒç´ æ­£å¼ Sprite VFX é©—æ”¶ï¼Œ
-      V154 çš„ `tests/v154-current-request.test.js` æœ‰ 7 é …æœ¬è¼ªéœ€æ±‚é©—æ”¶ï¼Œ
-      V155 çš„ `tests/v155-current-request.test.js` æœ‰ 8 é …æœ¬è¼ªéœ€æ±‚é©—æ”¶ï¼Œ
-      V156 çš„ `tests/v156-deep-trace-fixes.test.js` æœ‰ 5 é …æ·±æ·µåœ°åœ–ï¼å…ƒç´ åŒ£é©—æ”¶ï¼ŒV157 çš„
-      `tests/v157-abyss-map-tap-fix.test.js` æœ‰ 3 é …ç«‹ç¹ªå°ºå¯¸ï¼ç›´æŽ¥é»žæ“Šé©—æ”¶ï¼ŒV158 çš„
-      `tests/v158-combat-tuning.test.js` æœ‰ 7 é …æŠ€èƒ½ï¼å‘½ä¸­ï¼å‚·å®³ï¼ç«‹ç¹ªé©—æ”¶ï¼ŒV159 çš„
-      `tests/v159-abyss-battle-portraits.test.js` æœ‰ 4 é …ç«‹ç¹ªè¼‰å…¥æ™‚åºé©—æ”¶ï¼ŒV160 çš„
-      `tests/v160-current-request.test.js` æœ‰ 5 é …æœ¬è¼ªæ•¸å€¼ï¼ç›®æ¨™ï¼è£œçµ¦ï¼å‹•ç•«é©—æ”¶ï¼ŒV161 çš„
-      `tests/v161-flame-slash-vfx.test.js` æœ‰ 5 é …ç«ç„°æ–¬æ­£å¼ Sprite VFX é©—æ”¶ï¼ŒV163 çš„
-      `tests/v163-flame-slash-source.test.js` æœ‰ 3 é …ä¾†æºæ ¡æ­£é©—æ”¶ï¼ŒV165 çš„
-      `tests/v165-fire-vfx-fixes.test.js` æœ‰ 3 é …ç«ç³»åœ–èˆ‡ç«ç®­è½é»žé©—æ”¶ï¼ŒV166 çš„
-      `tests/v166-water-vfx.test.js` æœ‰ 15 é …æ°´ï¼å†°æ­£å¼ Sprite VFX é©—æ”¶ï¼ŒV169 å››å¥—æ¸¬è©¦
-      åˆè¨ˆ 30 é … RPG UIï¼å…ƒç´ åŒ£ï¼æ°´æŠ€èƒ½ï¼æ·±æ·µè³‡ç”¢æµç¨‹é©—æ”¶ï¼Œä¸¦ä¿ç•™å¯é¸çš„
-      `tests/v138-browser-smoke.js`ã€‚æœ¬è¼ªç’°å¢ƒæ²’æœ‰ Chromium executableï¼Œæ‰€ä»¥å®Œæ•´æˆ°é¬¥ï¼
-      å‰¯æœ¬ UI é»žæ“Šæµç¨‹ä»æœªç´å…¥è‡ªå‹•æ¸¬è©¦ï¼›ä¹‹å¾Œä¿®æ”¹ loaderã€ç¶“é©—
-      æ›²ç·šã€èƒŒåŒ…äº¤æ˜“ã€è‡ªå‹•æˆ°é¬¥æˆ–å¤šäººè§’è‰²é‚è¼¯æ™‚ï¼Œå¿…é ˆåŒæ­¥æ“´å……ä¸¦åŸ·è¡Œæ¸¬è©¦ã€‚
-- [x] ~~V146 æš«æ™‚æ²¿ç”¨èˆŠå•†åº— icon~~ 2026-08-28 å·²ç”± V147 ä½¿ç”¨ä½¿ç”¨è€…è£œäº¤åœ–å®Œæˆé€æ˜ŽåŒ–ã€
-      æ‰‹æ©Ÿå°ºå¯¸å„ªåŒ–èˆ‡ä¸‰å…¥å£æ›¿æ›ï¼ŒæŽ¡æ–°æª” `assets/ui/home-shop-v147.png` é¿å…è¦†å¯«èˆŠè³‡ç”¢ã€‚
-- [ ] å…ƒç´ åŒ£çš„ã€Œé‡‘å¹£ã€çµ±è¨ˆç›®å‰è·Ÿè‘—æ—¢æœ‰çš„ `gold` å…¨åŸŸè®Šæ•¸èµ°ï¼Œæ²’æœ‰å¦å¤–æª¢æŸ¥é€™å€‹è®Šæ•¸
-      æœ¬èº«çš„ä¾†æº/æ­£ç¢ºæ€§æ˜¯å¦ç¬¦åˆé æœŸï¼ˆè¶…å‡ºé€™æ¬¡éœ€æ±‚ç¯„åœï¼Œæ²’æœ‰æ·±å…¥æŸ¥è­‰ï¼‰ã€‚
-- [ ] **è§’è‰²ï¼å…ƒç´ åŒ£ï¼æŠ€èƒ½è¦–çª—çš„ Android åˆæˆå±¤ç ´åœ–éœ€çœŸæ©Ÿè¤‡é©—**ï¼šV169 å·²ç¢ºèªåº•å±¤é é¢
-      æœƒä»¥çŸ©å½¢ tile ç©¿é€ä»é–‹å•Ÿçš„è¦–çª—ï¼›æœ€å¯èƒ½åŽŸå› æ˜¯ transformï¼paint containment å…§çš„å½ˆçª—
-      æ°¸ä¹… `box-shadow` å‹•ç•«èˆ‡æ¯å¼µæŠ€èƒ½å¡ `will-change:transform` åŒæ™‚å»ºç«‹å¤§é‡åˆæˆå±¤ã€‚
-      V169 å·²å°‡å‰è€… `animation:none`ã€å¾Œè€…æ”¹ç‚º `will-change:auto`ã€‚ç›®å‰ç¼ºå°‘ Chromiumï¼Œ
-      éœ€åœ¨åŒæ¬¾ Android è£ç½®æŠŠè§’è‰²ã€å…ƒç´ åŒ£èˆ‡æŠ€èƒ½è©³ç´°è¦–çª—å„ä¿æŒé–‹å•Ÿç´„ 10 ç§’è¤‡é©—ã€‚
-- [x] ~~**èƒŒåŒ…ä»‹é¢ã€Œè¿”å›žéµã€ä¸è¦‹äº†**~~ V173.17 ç”±ä½¿ç”¨è€…æˆªåœ–ç¢ºèªå•é¡Œç•«é¢å…¶å¯¦æ˜¯
-      `#itemModal` ç‰©å“è©³æƒ…ï¼Œè€Œä¸æ˜¯èƒŒåŒ…ä¸»é æˆ–åœ°åœ–èƒŒåŒ…è¦†è“‹å±¤ï¼›ç‰©å“åœ–èˆ‡å…§å®¹æœƒæŠŠåŽŸæœ¬æœ€ä¸‹æ–¹
-      çš„é—œé–‰éµæŽ¨å‡ºå¯è¦–ç¯„åœã€‚ç¾å·²é™åˆ¶åœ–ç‰‡ï¼å…§å®¹é«˜åº¦ã€å…è¨±å…§å®¹å€æ²å‹•ï¼ŒæŒ‰éˆ•æ–‡å­—æ”¹ç‚ºã€Œè¿”å›žã€ï¼Œ
-      ä¸¦ä»¥ç·šä¸Šç€è¦½å™¨å¯¦éš›é»žæ“Šç¢ºèªå¯è¦‹ã€å¯é—œé–‰ã€‚
-- [ ] **V136 èˆŠå­˜æª”è‹¥æ—©å·²åªå‰© `autoConfig.skill="normal"`ï¼Œç„¡æ³•åæŽ¨å‡ºåŽŸæœ¬
-      é¸éŽçš„æŠ€èƒ½**ï¼šæ›´æ–°å¾Œéœ€è¦çŽ©å®¶åœ¨å…ƒç´ åŒ£é‡æ–°é¸ä¸€æ¬¡ï¼›ä¹‹å¾Œæœƒç”±
-      `v136ActionIntent`ï¼`v136LastSkill`ä¿è­·ï¼Œä¸å†è¢«èˆŠåŒæ­¥éœé»˜æ´—æŽ‰ã€‚
-
----
-
-## æ›´æ–°å®ˆå‰‡ï¼ˆä¸‹ä¸€å€‹æŽ¥æ‰‹çš„äººï¼Œä¸ç®¡æ˜¯èª°ï¼Œè«‹ç…§åšï¼‰
-
-æ¯æ¬¡å·¥ä½œçµæŸå‰ï¼š
-
-1. åœ¨ä¸Šé¢ã€Œå·²å®ŒæˆåŠŸèƒ½è¨˜éŒ„ã€æ–°å¢žä¸€ç­†ï¼Œæ—¥æœŸ + æ¨™é¡Œ + åšäº†ä»€éº¼ + æ€Žéº¼é©—è­‰çš„ + å·²çŸ¥é™åˆ¶
-2. å¦‚æžœè§£æ±ºäº†ã€Œå·²çŸ¥é™åˆ¶ / å¾…è¾¦äº‹é …ã€è£¡çš„é …ç›®ï¼Œæ‰“å‹¾æˆ–åˆªæŽ‰é‚£ä¸€è¡Œ
-3. å¦‚æžœç™¼ç¾æ–°çš„æž¶æ§‹é™·é˜±ï¼ˆåƒã€ŒV131 ä¸æ˜¯ç”¨ script æ¨™ç±¤è¼‰å…¥ã€é‚£ç¨®ï¼‰ï¼Œ
-   è£œé€²ã€Œç³»çµ±æž¶æ§‹é‡é»žã€ï¼Œä¸è¦åªç•™åœ¨å°è©±ç´€éŒ„è£¡ï¼Œä¹‹å¾Œä¸åŒå·¥å…·ã€ä¸åŒè¦–çª—çœ‹ä¸åˆ°é‚£æ®µå°è©±
-4. ç¢ºèª `main` åˆ†æ”¯å·²ç¶“æ˜¯æœ€æ–°ã€å¯é‹ä½œçš„ç‹€æ…‹æ‰ç®—å·¥ä½œçµæŸ
-
-
-## 2026-09-07 â€” Synthesis / Dungeon / Equipment UI bugfix batch
-
-- Work branch: `bugfix/synthesis-dungeon-equipment-ui`, based on dev `ed1cd126d60f01fb7554b71e6fe54968adddd83b`. `main` untouched.
-- Official version/cache remain `173.62`; this batch is intentionally unversioned until every requirement is VERIFIED.
-- Reforge material tier layout owner remains `css/38-v141-system-expansion.css`; its tier picker is now a touch-whitelisted horizontal rail.
-- Dungeon text reward preview frame is body-mounted; the matching CSS owner is `css/33-v132-content-expansion.css`, not a `#game-stage`-prefixed selector.
-- Backpack equipment comparison owner remains `js/55-v173.51-inventory-qa.js` + `css/53-v173.51-qa.css`. Canonical equipment slots are `head / hand / shoulder / armor / shoes`; item type `weapon` maps to equipment slot `hand`.
-- Material synthesis remains owned by `js/58-v173.63-functional-fixes.js`; player-visible native browser selects are replaced with in-game listbox controls and the material artwork is compacted.
-- Initial synthesis equipment art is resolved by `js/38-v143-system-fixes.js` directly from `assetPath` on first picker render, rather than waiting for a later repair pass.
-- Permanent UI rule: player-visible native `<select>/<option>` menus are forbidden; see `UI_GUIDELINES.md`.
-- Batch checklist: `release/requirement-batches/2026-09-07-synthesis-dungeon-equipment-ui.json`. Status remains IMPLEMENTED pending CI + dev visual verification; do not claim COMPLETE or bump version yet.
-
-
-## 2026-09-07 â€” Cloudflare DEV branch alias
-
-- Cloudflare å·²ç”±å¯¦éš› deployment è­‰å¯¦ï¼š`dev` åˆ†æ”¯å›ºå®š alias ç‚º `https://dev.four-symbols-dev.pages.dev`ã€‚
-- ç¾è¡Œ DEV å¯¦æ©Ÿæ¸¬è©¦ã€release manifest èˆ‡ commit SHA read-back ä¸€å¾‹ä½¿ç”¨æ­¤ branch aliasï¼›è¼ƒæ—©æ–‡ä»¶ä¸­å‡ºç¾çš„ `https://four-symbols-dev.pages.dev` åƒ…ç‚ºæ­·å² root URLï¼Œä¸å¾—å†ä½œç‚ºç›®å‰ `dev` SHA é©—è­‰ä¾†æºã€‚
-- `.github/workflows/deploy-dev-cloudflare.yml` å·²æ˜Žç¢ºä½¿ç”¨ `--branch=dev`ï¼Œä¸”éƒ¨ç½²å¾Œæœƒå¾žä¸Šè¿° branch alias é©—è­‰ commit SHAã€Game Version èˆ‡ Cache Versionã€‚
-
-
-## 2026-09-07 åˆæˆå…§é åž‚ç›´æ²å‹• follow-upï¼ˆdevï¼‰
-- ä½¿ç”¨è€…æ‰‹æ©Ÿé©—æ”¶ç¢ºèªè£å‚™å†¶ç…‰èˆ‡ææ–™åˆæˆå…§å®¹ä»æœƒåœ¨åº•éƒ¨è£åˆ‡ï¼›çœŸæ­£åž‚ç›´ scroll owner ç‚º `.v141-synthesis-body`ï¼Œä¸æ˜¯å¤–å±¤ `#homeFeatureModalBody`ã€‚
-- `css/38-v141-system-expansion.css` æ”¹ç‚º `.v141-synthesis-body` åŽŸç”Ÿ `overflow-y:auto` + `touch-action:pan-y`ï¼Œé•·å…§å®¹å¡ç‰‡æ”¹ `height:auto; min-height:100%`ï¼›å†¶ç…‰éšŽç´šæ©«å‘ rail å…è¨± pan-x/pan-yã€‚
-- `js/58-v173.63-functional-fixes.js` çš„ `maximizeSynthesisPanel()` åŒæ­¥æŠŠçœŸæ­£å…§å®¹ body è¨­ç‚ºåž‚ç›´ scroll ownerï¼›`js/01-stage-v8-touch-lock.js` ç™½åå–®åŠ å…¥ `.v141-synthesis-body`ã€‚
-- ç‰ˆæœ¬ä»ç¶­æŒ V173.62ï¼›éœ€ç­‰ DEV å¯¦æ©Ÿç¢ºèªå…©é éƒ½èƒ½æ»‘åˆ°åº•å¾Œæ‰å¯æŠŠæœ¬ follow-up æ¨™æˆ VERIFIEDã€‚
-
-
-## 2026-09-07 â€” EXP æˆé•·æ›²ç·šæ­£å¼æ”¶æ–‚
-
-æœ¬æ®µç‚ºç›®å‰ EXPï¼æˆé•·è¦å‰‡çš„æœ€æ–°æ­£å¼ owner è¦æ ¼ï¼›è‹¥å‰æ–‡æ­·å²ç‰ˆæœ¬æ•˜è¿°èˆ‡æœ¬æ®µè¡çªï¼Œä»¥æœ¬æ®µèˆ‡å¯¦éš› runtime owner ç‚ºæº–ã€‚
-
-- å‡ç´šéœ€æ±‚å”¯ä¸€é•·æœŸ ownerï¼š`js/28-v133-economy-rebalance.js` çš„ `v133GetExpNextForLevel()`ã€‚
-- Lv1â†’20ï¼šæ–°æ‰‹å¿«é€ŸæœŸï¼Œä¿ç•™æ—¢æœ‰ newcomer bonusï¼æ–°æ‰‹æ£®æž—ï¼æ–°æ‰‹ä»»å‹™ç¯€å¥ï¼Œæ­£å¸¸æµç¨‹ç›®æ¨™ç´„ 20ï½ž30 åˆ†é˜åˆ° Lv20ã€‚`v133GetExpNextForLevel(1..19)` ç¶­æŒæ—¢æœ‰æ–°æ‰‹éœæ…‹éœ€æ±‚ã€‚
-- å¾ž Lv20â†’21 é–‹å§‹ï¼š`expNext = è©²ç­‰ç´šç·´åŠŸå€æ­£å¼å¹³å‡æ¨™æº–å·¡æ€ª EXP Ã— TARGET_BATTLE_ANCHORS`ï¼Œä¸å¾—å†ç”¨å¦ä¸€å¥—é«˜ç­‰ç´šéœæ…‹ EXP anchors è¦†è“‹ã€‚
-- `TARGET_BATTLE_ANCHORS` æ­£å¼æŽ§åˆ¶ expNextï¼šLv20=45ã€Lv30=100ã€Lv40=250ã€Lv50=400ã€Lv60=650ã€Lv70=900ã€Lv80=1200ã€Lv90=1700ã€Lv95=2600ã€Lv98=3500ã€Lv99=4000ï¼›ä¸­é–“ç­‰ç´šå¹³æ»‘æ’å€¼ã€‚
-- ä¸€èˆ¬å·¡æ€ªæ­£å¼ EXP ownerï¼š`js/25-v131-fix-batch.js`ã€‚Lv20+ æ¨™æº–å·¡æ€ª = æ€ªç‰©åŸºç¤Ž EXPï¼ˆç­‰ç´šÃ—10ï¼‰Ã— rankï¼ˆæ™®é€š1ï¼ç²¾è‹±1.5ï¼BOSS3ï¼‰Ã— ç·´åŠŸå€çŽ‡3.5ï¼›V173.42 å…¨åŸŸ EXP Ã—3 åƒ…ä¿ç•™ Lv1ï½ž19 å¿«é€ŸæœŸï¼Œä¸å¾—åœ¨ Lv20+ å†ç–ŠåŠ ã€‚
-- å…ƒç´ åŒ£ï¼šåŒæ¢ä»¶æ­£å¼å·¡æ€ª EXP çš„ 70%ï¼›ä¸åƒä¼‘æ¯ç¶“é©—ã€‚
-- ä¼‘æ¯ç¶“é©—ï¼šä¸€èˆ¬å·¡æ€ªåŒæ¢ä»¶ 200%ï¼›æ¯ç´„é›¢ç·š2åˆ†é˜ç´¯ç©1å ´ã€æœ€å¤š300å ´ï¼›å…ƒç´ åŒ£èˆ‡ä¼‘æ¯ç¶“é©—ç¦æ­¢ç–ŠåŠ ã€‚
-- è‡ªç„¶å……èƒ½ï¼šLv20+ ä»ä¾ `expNext Ã— levelsPerDay`ï¼Œæ—¢æœ‰ levels/day æ„åœ–ä¸é‡åšï¼ˆLv20ç´„1.30ã€Lv50ç´„1.00ã€Lv99ç´„0.32ï¼‰ã€‚
-- æ¯æ—¥ Growth EXPï¼šä»ä¾æ–° `expNext Ã— levelsPerDay` å‹•æ…‹è¨ˆç®—ï¼Œä¸å¾—ç¡¬å¯«èˆŠ EXPï¼Œä¹Ÿä¸å¾—å†é¡å¤–ä¹˜å…¨åŸŸ Ã—3ã€‚
-- ç¶“é©—å‰¯æœ¬ï¼šç¶­æŒå…¨éšŠç•¶ç´š `expNext` å¹³å‡ Ã—33%ï¼Œå»£å‘Šé›™å€ç´„66%ï¼›`DUNGEON_DAILY_LIMIT_ENABLED=false` æ˜¯ç›®å‰ DEV QA åˆ»æ„è¨­å®šï¼Œç¦æ­¢ç•¶æˆ Bug æ¢å¾©æ¬¡æ•¸é™åˆ¶ã€‚
-- å‚³çµ±é›¢ç·š EXPï¼šä»ç”± `js/00-main.js` åŸºç¤Ž 10 EXP/åˆ†é˜ï¼ˆæœ€å¤š480åˆ†é˜ï¼‰ï¼‹`js/34-v141-core-systems.js` æœ€é«˜è§’è‰²ç­‰ç´šå€çŽ‡èˆ‡ V173.42 Ã—3 è¨ˆç®—ï¼›æœ¬æ¬¡è©•ä¼°ç›¸å°æ–°é•·æœŸ expNext ä¸¦æœªç ´å£žå®šä½ï¼Œå› æ­¤ä¸ä¿®æ”¹ã€‚å»£å‘Šé ˜å–ä»ç‚ºé›™å€ã€‚
-- EXP å ´æ•¸å¥æª¢å¿…é ˆèµ°çœŸæ­£ runtimeï¼šå¯¦éš›æ€ªç‰©ï¼rank â†’ æˆ°é¬¥ EXP â†’ modeï¼ˆæ‰‹å‹•ï¼å…ƒç´ åŒ£ï¼ä¼‘æ¯ï¼‰â†’ `expNext`ï¼Œä¸å¾—åªæ¯”è¼ƒ UIã€è¨»è§£ã€anchor arrayã€‚
-- å›žæ­¸ ownerï¼š`tests/v170-final-spec-integration.test.js` é©—è­‰å®Œæ•´æœ€çµ‚ runtimeï¼›`tests/v139-economy-rested-exp.test.js` é©—è­‰æ›²ç·šèˆ‡ä¼‘æ¯ç¶“é©—ï¼›`tests/v173.43-growth-charge.test.js` é©—è­‰è‡ªç„¶å……èƒ½ï¼æ¯æ—¥ Growthï¼æ–°æ‰‹æœŸã€‚
-
-
-## 2026-09-09 â€” æˆ°é¬¥ VFX å–®ä¸€ owner æ”¶æ–‚
-- `js/39-v143-skill-animation.js` æ˜¯å·¡æ€ªã€æ—¥å¸¸ï¼æ·±æ·µå‰¯æœ¬ã€çŽ©æ³•ï¼æ´»å‹•èˆ‡ BOSS æˆ°é¬¥çš„å”¯ä¸€æŠ€èƒ½ VFX èˆ‡æŒçºŒç‹€æ…‹ Sprite Sheet ownerã€‚
-- æ­£å¼æˆ°é¬¥è¦–è¦ºåªå…è¨± PNGï¼WebP Sprite Sheet èˆ‡ç‹€æ…‹å¾ªç’°åœ–ï¼›V142 åƒ…ä¿ç•™ action gateï¼æ™‚åºç›¸å®¹ï¼Œä¸å†ç¹ªè£½è¦–è¦ºã€‚
-- ç¦æ­¢ CSSï¼JavaScript ç¨‹åºå¼æŠ€èƒ½æ›¿ä»£å‹•ç•«ã€Canvasã€SVGã€WebGLï¼Shader fallbackï¼›æ­£å¼ç´ æç¼ºå¤±æ™‚åªè¨˜éŒ„ missing visualï¼Œä¸å¾—é€€å›žèˆŠ rendererã€‚
-- `js/43-v149-skill-ui-rules.js`ã€`js/46-v155-dev-fixes.js`ã€`js/59-abyss-two-tier-runtime.js` ç­‰å¾Œè¼‰å…¥è¦å‰‡ï¼å‰¯æœ¬æ¨¡çµ„ä¸å¾—æ”¹å¯« `v143SkillAnimationManifest` æˆ– `v142SkillAnimationDirector.play`ã€‚
-- è¬è±¡åœŸç›¾ã€çµç•Œèˆ‡å…¶ä»– Buffï¼Debuff è¦–è¦ºç”± V143 `RAW_STATUS_SPRITES` æ­£å¼å¾ªç’°åœ–å‘ˆç¾ï¼Œä¸å†å»ºç«‹èˆŠå››è§’ï¼ç²’å­ CSS è¦–è¦ºã€‚
-
-
-## 2026-09-09 â€” å…©æ¢ UI ç¶­ä¿®åˆ†æ”¯å®‰å…¨æ•´åˆï¼ˆdev onlyï¼‰
-
-- æ•´åˆå‰é ç«¯ `dev`ï¼š`29b9668057846164a941fbf6617d2458d9af5476`ï¼›æ•´åˆå‰åŠæ”¶å°¾å‰é ç«¯ `main` å‡ç‚º `bcaaf0dfff1bbfbcddeb08bd1e4a712738bb4bfe`ã€‚æœ¬æ‰¹æœªå° `main` å»ºç«‹ mergeã€push æˆ–æ›´æ–° refã€‚
-- å¯¦éš›é †åºä¾ runtime owner åˆ¤å®šï¼šå…ˆåˆå…¥ `fix/character-inventory-skill-relic-ui-20260909@27e905ee9a9280a3dc520a3487bc2aa4f464d2af`ï¼ˆmerge `5479368c19c044ceb985772d305237866f4a314c`ï¼‰ï¼Œå®Œæˆç¨ç«‹ CIï¼éƒ¨ç½²é©—è­‰å¾Œï¼Œå†ä»¥å·²å«ç¬¬ä¸€æ¢çš„æœ€æ–° `dev` åˆå…¥ `fix/boss-mechanism-card-detail-ui@ac6c89bde325e37b49d0518fa132657886ac9387`ï¼ˆmerge `6f387ea1fc9183b4e476db281558923627fe3d32`ï¼‰ã€‚
-- å…©æ¢åˆ†æ”¯éƒ½å­˜åœ¨ä¸”æŒ‡å®š SHA å°±æ˜¯é ç«¯åˆ†æ”¯ tipï¼›å…©è€…ç›¸å°åˆå§‹ `dev` éƒ½ä¸è½å¾Œã€‚å”¯ä¸€å…±åŒæª”æ¡ˆæ˜¯ `js/19-stage-v78-character-inventory-runtime.js`ï¼Œä½†ç¬¬ä¸€æ¢åªæ”¹ `releaseCharacterLayoutOwnership()`ï¼`applyNow`ï¼Œç¬¬äºŒæ¢åªæ”¹ Gameplay BOSS CSSï¼JS å‹•æ…‹è¼‰å…¥ URLï¼Œæ²’æœ‰åŒå‡½å¼ã€selectorã€listenerã€stateã€è³‡æ–™çµæ§‹æˆ– runtime owner é‡ç–Šï¼›å…©æ¬¡å¯¦éš› merge éƒ½æ²’æœ‰ conflictã€‚
-- ç¬¬ä¸€æ¢åˆå…¥å¾Œï¼Œlive Abyss QA æš´éœ²åˆå§‹ `dev` å·²å­˜åœ¨çš„éŽæ™‚ Canvas assertionï¼›æ­£å¼ runtime å·²ç”± `js/39-v143-skill-animation.js` æ“æœ‰ DOM raster Spriteã€‚ä¿®å¾© `.github/scripts/run-abyss-live-browser-qa.mjs` èˆ‡ `tests/v174-raster-only-combat-vfx-owner.test.js` çš„çœŸæ­£ QA ownerï¼Œcommit `c5885c2486f29738947dc642d60162be0bdd24d7`ï¼›GitHub Actions run `34344546671` çš„ Repository checksã€ç²¾ç¢º SHA éƒ¨ç½²èˆ‡ live mobile QA å…¨éƒ¨ SUCCESSã€‚
-- ç¬¬äºŒæ¢åˆå…¥å¾Œï¼Œpush checkout depth 2 æœªåŒ…å«å…¶ typography regression å¯«æ­»çš„åˆå§‹åŸºæº– SHAï¼›`.github/workflows/ci.yml` å·²æ˜Žç¢ºæŠ“å– `29b9668057846164a941fbf6617d2458d9af5476`ï¼Œcommit `aae6b2d9a095ecb00329a24e7f068f3f37f945dd`ã€‚GitHub Actions run `34345787199` çš„ Repository checksã€ç²¾ç¢º SHA éƒ¨ç½²ã€live Abyss èˆ‡ battle/audio QA å…¨éƒ¨ SUCCESSã€‚
-- æœ€çµ‚æœ¬æ©Ÿ `node .github/scripts/ci.mjs tests`ï¼š131/131 suites é€šéŽï¼›èªžæ³•ã€éœæ…‹è³‡æºã€é‡è¤‡ HTML IDã€loaderã€V173.64 release gateã€whitespaceï¼conflict markerï¼Œä»¥åŠé‡è¤‡å‡½å¼ï¼listenerï¼CSS owner ç¨½æ ¸å‡é€šéŽã€‚
-- `https://dev.four-symbols-dev.pages.dev` å¯¦éš›ç€è¦½å™¨ QAï¼šå®Œæˆç”·æ€§æ°´ç³»å‰µè§’èˆ‡é…é»žï¼Œé–‹å•Ÿè§’è‰²æŠ€èƒ½ã€èƒŒåŒ…ã€ç§˜å¯¶ï¼›ç¢ºèªèƒŒåŒ… `pan-y`ã€ç§˜å¯¶å…§å®¹åž‚ç›´æ²å‹•èˆ‡åˆ†é¡žæ©«å‘æ²å‹•ã€‚å¦ä»¥ DEV å·¥å…·å‡è‡³ Lv20ï¼Œå¯¦éš›é€²å…¥ç†¾ç„°ç‹¼çŽ‹æˆ°é¬¥ï¼›ç¬¬äºŒå›žåˆç”Ÿæˆã€Œé‡‘å‰›è­·é«”ã€9:16 å¡ï¼ŒBOSS battle title åªåœ¨è©² runtime éš±è—ï¼Œç´…è‰² `!` å¯é–‹å•Ÿ 9:16 è©³æƒ…ã€é¡¯ç¤ºå®Œæ•´æ•ˆæžœä¸¦ç”±ã€Œè¿”å›žã€æ”¶åˆã€‚é é¢ä¾†æºæ²’æœ‰ console errorï¼›è§€å¯Ÿåˆ°çš„ error åªä¾†è‡ªæ¸¬è©¦ç€è¦½å™¨çš„ `chrome-extension://` metadata extensionã€‚
-- Requirement batchï¼š`release/requirement-batches/2026-09-09-two-branch-dev-integration.json`ï¼Œå…¨éƒ¨æ¨™è¨˜ VERIFIEDã€‚Gameï¼Cache Version åˆ»æ„ç¶­æŒ V173.64ï¼›æ²’æœ‰ main promotion approvalã€‚
-- å°šæœªåšå¯¦é«” Android è£ç½® QAï¼›æ—¢æœ‰ Android åˆæˆå±¤çœŸæ©Ÿå¾…é©—é …ç›®ä»ä¿ç•™ã€‚æœ¬æ‰¹å·²ç”¨ 390Ã—844ï¼412Ã—915 CI Chromeã€live mobile QA èˆ‡å¯¦éš›é›²ç«¯ç€è¦½å™¨äº¤å‰é©—è­‰ï¼Œæœªç™¼ç¾å…©åˆ†æ”¯äº’ç›¸è¦†è“‹ã€‚
-
-
-## 2026-09-09 â€” å…©æ¢ UI ç¶­ä¿®åˆ†æ”¯ main promotion æŽˆæ¬Š
-
-- ä½¿ç”¨è€…æ–¼ 2026-09-09 æ˜Žç¢ºè¦æ±‚ã€ŒæŽ¨åˆ° dev å†æŽ¨åˆ° mainã€ï¼Œå–ä»£ä¸Šä¸€æ®µç•¶æ™‚å°šæœªå–å¾— main promotion approval çš„ç‹€æ…‹ï¼›æœ¬æ‰¹ promotion approval å·²è¨˜éŒ„æ–¼ `release/requirement-batches/2026-09-09-two-branch-dev-integration.json`ã€‚
-- Promotion å‰é‡æ–°è®€å–é ç«¯ï¼š`dev=ade22629ddaa7f8451dc3aaa8b4696f8d67cc92b`ã€`main=bcaaf0dfff1bbfbcddeb08bd1e4a712738bb4bfe`ã€‚å…©è€… history å› æ­·æ¬¡ main promotion commit åˆ†å²”ï¼Œä½† main tree `80baa9b133252950283ff37ea95b32e0911de63d` èˆ‡æœ¬è¼ªæ•´åˆå‰ `dev@29b9668057846164a941fbf6617d2458d9af5476` tree å®Œå…¨ç›¸åŒã€‚
-- å·²å»ºç«‹ ancestry reconciliation commit `6d9273d014ca7c2c746bccbc453eeb1b00a86780`ï¼Œé›™è¦ªç‚ºå·²é©—è­‰ dev èˆ‡ç¾è¡Œ mainï¼Œtree ä¿æŒ dev `686eec88a0d9ac2a08f0631876e68f1d1e47baa5` ä¸è®Šï¼›é€™åªæ”¶æ–‚æ­·å²ï¼Œä¸å›žé€€æˆ–è¦†è“‹ä»»ä½• runtimeï¼CSSï¼æ¸¬è©¦å…§å®¹ã€‚
-- å¾ŒçºŒå›ºå®šèµ° `dev CIï¼ç²¾ç¢º SHA éƒ¨ç½² â†’ dev-to-main PR â†’ main Repository checks â†’ merge â†’ production Pages SHA æ ¸å°`ï¼Œç¦æ­¢ force-push mainã€‚
-
-## 2026-09-10 â€” ç§˜å¯¶é¤Šæˆï¼æŽ‰è½ç³»çµ±å®‰å…¨æ•´åˆï¼ˆdev onlyï¼‰
-
-- æŒ‡å®šä¾†æºç‚º `feature/relic-progression-drop-system@7125580afa5d1c89d6cae0a2d986c71a6f22d916`ï¼›æœ¬æ¬¡åƒ…æ•´åˆè‡³ `dev`ï¼Œ`main` å—ä¿è­·ä¸”ä¸å¾—ä¿®æ”¹ã€‚
-- `js/relic-progression-drop-system.js` æ˜¯ç¢Žç‰‡åˆæˆã€é€šç”¨ç¢Žç‰‡æ›¿ä»£ã€ç§˜å¯¶ç²¾è¯ï¼çªç ´çŸ³ã€Boss å®šå‘æŽ‰è½ã€å¡”é‡Œç¨‹ç¢‘è‡ªé¸ç®±èˆ‡ pending receipt çš„å”¯ä¸€ ownerï¼›ç‹€æ…‹æ²¿ç”¨ UID ä¸»å­˜æª”å…§çš„ `player.relicProgression` èˆ‡æ—¢æœ‰ inventory transactionï¼Œä¸å»ºç«‹ sidecar storageã€‚
-- Loader é †åºå¿…é ˆç¶­æŒ `feature-boss-relic` åŸºç¤Ž runtime åœ¨å‰ã€`feature-relic-progression` åœ¨å¾Œã€‚singleton installed flag åªå¯åœ¨ `v174RelicSystem`ã€`GameplaySystem`ã€`FourSymbolsAccountSave` ä¸‰å€‹ owner éƒ½å­˜åœ¨å¾Œè¨­å®šï¼Œé¿å…ä¾è³´é †åºç•°å¸¸æ™‚æ°¸ä¹…åœç”¨ä¸”ç„¡æ³•é‡è©¦ã€‚
-- æœ¬ owner ä¸å¾—æŽ¥ç®¡ `winBattle`ã€`loseBattle`ã€`v132LaunchDungeonBattle` æˆ– `saveGame`ï¼›å®ƒåªåŒ…è£å…¬é–‹ Bossï¼å¡”å…¥å£ä¸¦ä¾æ—¢æœ‰é€²åº¦ state å°å¸³ exact-once receiptã€‚ç†è«–ä¸Šçš„åŒ ID ä¸¦è¡Œç‰©å“ç•°å‹•ã€UTC è·¨é€±é‚Šç•Œèˆ‡æ»¿ 120 æ ¼é¸æ“‡ç®±ä»éœ€åˆ—ç‚ºå·²çŸ¥é‚Šç•Œï¼Œä¸å¾—ä»¥ CI ç¶ ç‡ˆå®£ç¨±å·²æ¶ˆé™¤ã€‚
-- Gameï¼Cache Version ç¶­æŒ V173.65ï¼›æœ¬æ‰¹æœ€çµ‚é©—è­‰èˆ‡æœªé©—è­‰é …ç›®çµ±ä¸€è¨˜éŒ„æ–¼ `release/requirement-batches/2026-09-10-four-branch-dev-integration.json`ã€‚
-
-## 2026-09-10 â€” è£å‚™ï¼çŽ©æ³•ï¼ä¸»åŸŽ UI owner æ”¶æ–‚ï¼ˆdev onlyï¼‰
-
-- æŒ‡å®šä¾†æºç‚º `fix/ui-equipment-gameplay-city-polish-continued@26a67473128674c91fa363cefbd33e5f3f1c8034`ï¼›æœ¬æ¬¡åªå…è¨±é€²å…¥ `dev`ï¼Œä¸å¾—ä¿®æ”¹ `main`ã€‚
-- åŽŸåˆ†æ”¯çš„ `body #game-stage .v17361-reward-preview` èˆ‡ `body #game-stage #allElementSkillPreviewModal` éƒ½ä¸ç¬¦åˆæ­£å¼ DOMï¼šreward modal èˆ‡å…¨å…ƒç´ æŠ€èƒ½ modal æœƒç›´æŽ¥æŽ›åœ¨ `document.body`ã€‚æ•´åˆæ™‚æ”¹ç”± `js/equipment-progression.js` ç”¢ç”Ÿæ­£å¼æ–‡å­—é è¦½ã€`css/33-v132-content-expansion.css` æŒæœ‰ body modal ç‰ˆé¢ï¼Œä¸¦ç›´æŽ¥èª¿æ•´ `css/56-v174-critical-ui-regressions.css` çš„ body selectorã€‚
-- å›ºå®šã€Œè¿”å›žä¸»åŸŽã€æŽ§åˆ¶ç›´æŽ¥ç”± `index.html#gameplayPage` æŒæœ‰ï¼›ä¸ä¿ç•™ `js/62-v174-current-ui-fixes.js`ã€æ°¸ä¹… `four-symbols:feature-ready` listener æˆ– app-ui-fixes bundleã€‚
-- è£å‚™æ ¼ã€çŸ­èž¢å¹•éšŠä¼ HUDã€ç§˜å¯¶ï¼å…ƒç´ åŒ£æ¨™ç±¤åˆ†åˆ¥æ”¶æ–‚è‡³ `css/38-v141-system-expansion.css`ã€`css/42-v146-system-polish.css`ã€`css/55-team-relic-system.css`ã€‚æœªä¿ç•™å«å¤§é‡ `!important` çš„ `css/57-v174-current-ui-fixes.css`ã€‚
-- æ–°ç§˜å¯¶ä¸»åŸŽåœ–ä½¿ç”¨ content-hashed è·¯å¾‘ `assets/ui/home-relic-v174.eed14e806044.webp`ï¼›èˆŠç„¡ hash URL ä¸è¦†å¯«ï¼Œé¿å…æ—¢æœ‰å®¢æˆ¶ç«¯å¿«å–æ²¿ç”¨éŒ¯èª¤å…§å®¹ã€‚
-- è£å‚™å‰¯æœ¬å“éšŽæ©ŸçŽ‡ç”± `EQUIPMENT_CHEST_DROP_TABLE` ç¶“ `equipmentChestOddsText()` ç”¢ç”Ÿï¼Œä¸å†æŠŠ 40/40/10/10 è¤‡è£½åˆ° CSS å½å…ƒç´ ã€‚
-- CI çš„çª„èž¢å¹• fixture è­‰å¯¦æ–‡å­—çŽå‹µæ¡†åŽŸæœ¬ä»å¯å›  392px ä¸Šé™æº¢å‡ºï¼›æ­£å¼ owner å·²æ”¹ç”¨ `calc(100vw - 32px)`ï¼`calc(100dvh - 32px)`ã€‚QA ä»¥æ˜Žç¢º 390Ã—844ï¼412Ã—915 overlay surface é©—è­‰å››é‚Š containmentï¼Œä¸æŠŠ CI Chrome çš„ 500px æœ€å° `innerWidth` èª¤ç¨±ç‚ºæ‰‹æ©Ÿ viewportã€‚
-
-
-## 2026-09-11 â€” Cold-start å‰µè§’ Native lifecycle ä¿®å¾©ï¼ˆPR #157ï¼‰
-
-- åŸºæº–ï¼š`dev@29f83030d6427f2641952745243291b35731659a`ï¼›å·¥ä½œåˆ†æ”¯ `fix/cold-start-character-creation-lifecycle-20260911`ã€‚`main` æœªä¿®æ”¹ã€‚
-- æ ¹å› ï¼šaccount-first Startup State Machine åœ¨ `NEED_CHARACTER` ç›´æŽ¥æŠŠ `#creationPage` è¨­æˆ `display:block`ï¼Œç¹žéŽ `FourSymbolsGameSave.showCreation()` èˆ‡ `js/24-v125-character-creation-native-runtime.js` çš„ Native å•Ÿç”¨æµç¨‹ï¼›Android Chrome å› è€Œå¯èƒ½åœ¨ç¬¬ä¸€å€‹å¯è¦‹ frame ç¼ºå°‘ `creation-fixed-active` / `creation-native-active`ï¼Œè®“ legacy `#app` / overlay ä»åƒèˆ‡ paint/compositingã€‚
-- ä¿®æ­£ï¼š`js/52-v173.20-startup-loader.js` æ–°å¢ž fail-closed çš„ `showCharacterCreationSurface()`ï¼Œåªé€éŽ canonical `FourSymbolsGameSave.showCreation()` é€²å…¥å‰µè§’ï¼Œä¸¦åœ¨ startup loader å°šè¦†è“‹èˆžå°æ™‚å…ˆå®Œæˆ Native layer migration / isolationï¼Œå†æ·¡å‡º loaderã€‚ç¦æ­¢å†ç”± startup owner ç›´æŽ¥ `display:block`ã€‚
-- æ¸…ç†ï¼šproduction `app-shell` ä¸å†æ‰“åŒ…é€€å½¹çš„ `js/22-v124-character-creation-native-runtime.js` èˆ‡ `css/28-v124-character-creation-native.css`ï¼›ä¿ç•™ `js/23` bootstrap + `js/24` runtime + critical `css/29` ç‚ºç›®å‰å‰µè§’ ownerï¼Œé¿å…èˆŠç‰ˆ `overflow-y:auto` / `touch-action:pan-y` / isolation è¦å‰‡åœ¨æ–°ç‰ˆå›ºå®š canvas å¾Œæ–¹é‡æ–°è¦†å¯«ã€‚
-- Browser QAï¼š390Ã—844ã€DPR 3ã€touch emulation çš„ account-first æ–° UID å†·å•Ÿå‹•ç¾åœ¨å¿…é ˆé©—è­‰ `#creationPage` ä½æ–¼ `#game-overlay-layer`ã€`native-creation-page`ã€`creation-fixed-active`ã€`creation-native-active`ã€legacy `#app` inert ä¸”ä¸ paintã€å‰µè§’ canvas `overflow-y:clip` / `touch-action:none`ï¼Œä¸¦ä»¥ `elementFromPoint()` é©—è­‰ã€Œä¸‹ä¸€æ­¥ã€æŒ‰éˆ•å³å´æ²’æœ‰è¢«å…¶ä»– layer è“‹ä½ï¼›Boot QA ä¸å†å¼·åˆ¶ `--disable-gpu`ã€‚
-- Production build ä»ç”± `scripts/build-production.mjs` ç”¢ç”Ÿ content-hash bundle / manifestï¼›æœ¬è¼ªä¸å¾—ç”¨ query version æˆ–è‡¨æ™‚ CSS/JS patch è¦é¿ ownerã€‚
-
-
-## 2026-09-11 â€” å‰µè§’ç¬¬äºŒé åº•éƒ¨æ“ä½œåˆ—è£åˆ‡ä¿®å¾©
-
-- åŸºæº–ï¼š`dev@daf724a10802b6074fdcce3f0f9bee2e7f404ac4`ï¼›å·¥ä½œåˆ†æ”¯ `fix/creation-step2-bottom-actions-20260911`ï¼Œ`main` ä¸ä¿®æ”¹ã€‚
-- `css/29-v125-character-creation-native.css` ä»æ˜¯å›ºå®š 1080Ã—1920 å‰µè§’ç‰ˆé¢ ownerï¼›`js/24-v125-character-creation-native-runtime.js::applyCreationStep()` åªè² è²¬æ­¥é©Ÿåˆ‡æ›ï¼Œä¸æ–°å¢ž wrapperã€‚
-- æ ¹å› ï¼šç¬¬äºŒé  `.creation-action-row` æ˜¯ fixed canvas å…§çš„ flex childï¼Œä½†æœªéŽ–å®š shrinkï¼›åœ¨çœŸæ©Ÿå­—é«”ï¼å¯ç”¨é«˜åº¦åƒæ»¿æ™‚ï¼Œaction row å¯è¢«å£“ç¸®åˆ°æŽ¥è¿‘ 0ï¼Œè€Œå…¶ 124ï½ž132px å­æŒ‰éˆ•åˆè¢« `.creation-step{overflow:clip}` è£æŽ‰ï¼Œç•«é¢åªå‰©æŒ‰éˆ•ä¸Šç·£ã€‚
-- ä¿®æ­£ï¼šstep two é ç•™ 154px åº•éƒ¨å®‰å…¨å€ï¼Œæ“ä½œåˆ—æ”¹ç‚ºåœ¨ step å…§ `position:absolute; bottom:0`ï¼Œä¸¦ä¿ç•™è‡³å°‘ 132px row é«˜åº¦ï¼›ä¸é–‹æ”¾æ•´é æ²å‹•ã€ä¸æ”¹é…é»žï¼å»ºè§’é‚è¼¯ã€‚
-- 390Ã—844ã€DPR 3ã€touch QA æœƒå¯¦éš›åˆ‡åˆ°ç¬¬äºŒé ï¼Œé©—è­‰ã€Œä¸Šä¸€æ­¥ï¼é–‹å§‹å†’éšªã€é«˜åº¦è‡³å°‘ 44pxã€å®Œæ•´è½åœ¨ step/stage å…§ï¼Œä¸”å·¦å³ hit-test éƒ½ç”±æŒ‰éˆ•æœ¬èº«å–å¾—ã€‚
-
-
-## 2026-09-11 â€” é›™æ®µå•Ÿå‹•ç•«é¢ï¼‹ç¬¬äºŒå¹•ç™»å…¥è¦†è“‹
-
-- åŸºæº– `dev@f859f747301941f346f4d2b9590d3f3d87a06cd8`ï¼Œåˆ†æ”¯ `feature/boot-intro-auth-overlay-20260911`ï¼›`main` ä¸ä¿®æ”¹ã€‚
-- æœ¬è¼ªå…©å¼µé™„ä»¶èˆ‡æ—¢æœ‰ V173.20 ä½¿ç”¨è€…å•Ÿå‹•ç´ æä½å…ƒçµ„ä¸€è‡´ï¼›Logo=`assets/ui/startup-logo.4631c0bc3f2b.jpg`ï¼Œç¬¬äºŒå¹•æ–°å¢ž content-addressed alias `assets/ui/startup-main-city.d43e67af1c1c.jpg`ï¼Œæ²’æœ‰é‡æ–°ç”Ÿæˆåœ–ç‰‡ã€‚
-- `js/52-v173.20-startup-loader.js` ä»æ˜¯å”¯ä¸€ StartupStateMachine ownerï¼›900ms åƒ…æŽ§åˆ¶ Logoâ†’ç¬¬äºŒå¹•ï¼ŒçœŸå¯¦ Firebase/Auth/save å…¨ç¨‹ä¸¦è¡Œä¸” readiness ä¸ç­‰å¾…å‹•ç•«ã€‚
-- `css/firebase-auth.css` å°‡ç™»å…¥æ¡†ç¸®è‡³æœ€å¤š 390pxã€ç¸®å°æ–‡å­—ä½†ä¿ç•™ 44px è§¸æŽ§é«˜åº¦ï¼Œç™»å…¥èƒŒæ™¯æŒçºŒä½¿ç”¨ç¬¬äºŒå¹•æ…¢æŽ¨ã€‚å…©å¼µåœ–å‡é€² Critical preload/immutable cacheï¼›éžå¿…è¦ gameplay è³‡ç”¢ä»ç¶­æŒ lazyã€‚
-
-
-## 2026-09-11 éš±ç§æ¬Šæ”¿ç­–åŒæ„ gate
-
-- `privacy-consent.html` æ˜¯éš±ç§æ¬Šæ”¿ç­–é¦–æ¬¡åŒæ„èˆ‡å¾ŒçºŒæŸ¥çœ‹çš„å”¯ä¸€ ownerï¼›æ­£å¼æ”¿ç­–æœ¬æ–‡ä»ç”± `privacy.html` å–®ä¸€ç¶­è­·ã€‚
-- `index.html` åªæŽ›ä¸€å€‹æœ€é«˜å±¤ç´šåŒæº iframe gateï¼Œä¸æ–°å¢žç¬¬äºŒå¥— Authï¼Startup State Machineã€‚é¦–æ¬¡æœªåŒæ„æ™‚å¿…é ˆæŠŠæ”¿ç­–æ»‘åˆ°åº•æ‰é–‹å§‹ 5 ç§’å€’æ•¸ï¼Œå€’æ•¸å®Œç•¢æ‰å¯æŒ‰ã€Œæˆ‘åŒæ„ã€ï¼›åŒæ„ç‰ˆæœ¬ä»¥ `four_symbols_privacy_consent_version` å„²å­˜åœ¨åŒæº localStorageã€‚
-- ã€Œä¸åŒæ„ã€å…ˆå˜—è©¦é—œé–‰è¦–çª—ï¼›å› ä¸€èˆ¬ç€è¦½å™¨é€šå¸¸ç¦æ­¢ç¶²é è‡ªè¡Œé—œé–‰ä½¿ç”¨è€…é–‹å•Ÿçš„åˆ†é ï¼Œå¤±æ•—æ™‚æ”¹å°Žå‘ `privacy-declined.html` ä¸¦çµ‚æ­¢éŠæˆ²ä»‹é¢ã€‚
-- åŒæ„ gate æŒçºŒä»¥éš±è— iframe ä½œ ownerï¼Œå‹•æ…‹ç‚ºç™»å…¥é æ’å…¥ã€Œéš±ç§æ¬Šæ”¿ç­–ã€å…¥å£ï¼Œä¸¦åœ¨ä¸»åŸŽã€Œç³»çµ±ã€çš„å®¢æœåˆ—å¾Œæ’å…¥åŒä¸€å…¥å£ï¼›å…©è€…çš†é‡æ–°é–‹å•Ÿç›¸åŒæ”¿ç­– viewerï¼Œä¸è¤‡è£½æ”¿ç­–æœ¬æ–‡ã€‚
-- æœ¬åŠŸèƒ½ä¸ä¿®æ”¹ Firebase UIDã€ç™»å…¥ providerã€å­˜æª”ã€è§’è‰²è³‡æ–™ã€æˆ°é¬¥ã€æŽ‰è½æˆ–éŠæˆ²æ•¸å€¼ã€‚
-## 2026-09-12 æ€ªç‰©ç«‹ç¹ªåŸºç¤Žèˆ‡é¦–æ¬¡éŠçŽ©æ‰‹æ©Ÿä¿®å¾©æ•´åˆï¼ˆå¾… DEV CIï¼‰
-
-- ä½¿ç”¨è€…æŽˆæ¬Šæ•´åˆ `feature/monster-portrait-pipeline-v1-20260911@bfab950abc32726d72c65eb75006475e499c4148` èˆ‡ `fix/mobile-first-play-ui-vfx-20260911@b22065175f514ea1f93ecb020cbb0c3ae2d38b25` åˆ°æœ€æ–° `dev@7d5f841f237c5dc02e79767972f95516df575e3f`ï¼›æ•´åˆåˆ†æ”¯ç‚º `integrate/monster-portrait-mobile-first-play-20260912`ï¼Œ`main` æœªä¿®æ”¹ã€‚
-- å·¡æ€ªå½¢è±¡åˆ‡æ›ï¼è§’è‰²åœ– owner ç¶­æŒ `js/26-v131-patrol-appearance.js` + `css/32-v131-patrol-appearance.css`ï¼›é¦–æ¬¡éŠçŽ©å…©å¹•èˆ‡å‰µè§’é å‚™ owner ç¶­æŒ `js/52-v173.20-startup-loader.js`ï¼›å¡ç‰Œç«‹ç¹ªï¼ç«ç®­æ–¹å‘çš„æ—¢æœ‰æœ€çµ‚ CSS owner ç‚º `css/56-v174-critical-ui-regressions.css`ã€‚æœ¬è¼ªæœªæ–°å¢ž runtime wrapperã€‚
-- æ€ªç‰©ç«‹ç¹ªåŸºç¤Ž owner ç‚º `config/monster-portrait-registry.json`ã€`js/45-v154-dev-fixes.js` resolver èˆ‡ `js/48-v159-abyss-battle-portraits.js` åŒæ­¥æ©‹æŽ¥ã€‚å››å¼µå·²åˆå…¥ä½†ææ¯€çš„å¤©å…µ PNG å·²ä»¥æ—¢æœ‰é€æ˜Žæ¯åœ–é‡æ–°ç½®å…¥ 1024Ã—1536 RGBA æª”ï¼Œéžé‡æ–°ç”Ÿæˆã€‚
-- å·²é€šéŽ monster auditï¼ˆ13 existingï¼94 plannedï¼Œ4 å¼µ generated assets å‡å¯è§£ç¢¼ï¼‰ã€å°ˆé …æ¸¬è©¦ã€124/124 éžç€è¦½å™¨ Node suitesã€233/233 JS syntaxã€build deterministicã€resourcesï¼IDsï¼loaderï¼release gateï¼git diffã€‚æ­¤ç’°å¢ƒæ²’æœ‰ Chromiumï¼›29 å€‹æ—¢æœ‰ç€è¦½å™¨æ¸¬è©¦ç•™å¾… GitHub Actions é©—è­‰å¾Œæ‰å¯æ¨™ç¤ºå®Œæ•´å®Œæˆã€‚
-## 2026-09-15 å‡ºåŸŽå†’éšªåœ°åœ– footer å¯è¦‹æ€§ä¿®å¾©ï¼ˆDEV PR å¾… CIï¼‰
-
-- å·¥ä½œåˆ†æ”¯ `fix/adventure-map-footer-visibility-20260915` å¾žç•¶æ™‚æœ€æ–° `dev@cca990ec6cf34cffc82501d888d909ae2af69181` å»ºç«‹ï¼›æœ¬è¼ªç¦æ­¢ä¿®æ”¹æˆ–æŽ¨é€ `main`ã€‚
-- Adventure å”¯ä¸€åœ°åœ–ç‰ˆé¢ owner ä»ç‚º `css/adventure-v1-20260915.css`ã€‚åŽŸ `.adventure-view` ä»¥é ä¼°çš„ `clamp(66px,9vh,92px)` æ‰£é™¤é«˜åº¦ï¼›å¯¦éš› header å«ç€æµ·å®‰å…¨å€æ™‚å¯æ¯”é ä¼°å€¼é«˜ï¼Œé€ æˆè¦–çª—æœ«ç«¯èˆ‡ footer çš„å¯è¦‹å€ä¸å¯é ã€‚ç¾æŠŠæ—¢æœ‰ `#adventurePage` æ”¶æ–‚ç‚º flex columnï¼Œç”±å¯¦éš› header ä½”ä½ï¼Œ`.adventure-view` ç¶­æŒå”¯ä¸€ `overflow-y:auto` scroll ownerï¼Œä¸¦ä¿ç•™ footer æ‰€éœ€çš„ bottom safe-area paddingï¼›æ²’æœ‰æ–°å¢žç¬¬äºŒå€‹ scroll container æˆ–ç¸®å°æ–‡å­—ã€‚
-- `js/01-stage-v8-touch-lock.js` çš„æ—¢æœ‰å…¨åŸŸ scroll whitelist å·²åŠ å…¥ `.adventure-view`ï¼Œä½¿åŒä¸€å€‹æ—¢æœ‰ scroll owner åœ¨æ‰‹æ©Ÿæ‰‹å‹¢ä¸‹ä¸æœƒè¢« touch lock æ“‹ä½ã€‚æœªæ”¹ Adventure çŽ©æ³•ã€ç« ç¯€è³‡æ–™ã€äº‹ä»¶ã€æˆ°é¬¥ã€èƒŒåŒ…ã€ä¸»åŸŽæˆ–å…¶ä»– UIã€‚
-- æ–°å¢žæœ€å°å›žæ­¸ï¼š`tests/adventure-node-system-v1.test.js` éŽ–å®š flex ownerã€ç¦æ­¢çŒœæ¸¬ header é«˜åº¦èˆ‡ touch whitelistï¼›`.github/scripts/run-adventure-browser-qa.mjs` æœƒåœ¨ 360Ã—800ã€390Ã—844ã€412Ã—915 é€ä¸€æ²åˆ°æœ€åº•ï¼Œé©—è­‰ footer å®Œæ•´å¯è¦‹ä¸”åœ°åœ–åªæœ‰ä¸€å€‹åž‚ç›´ scroll ownerã€‚
-- æœ¬æ©Ÿå·²é€šéŽ targeted Adventure regressionã€buildã€build checkã€release gateã€syntax èˆ‡ `git diff --check`ï¼›PR #241 çš„ Repository checks run `34958900612` å·²é€šéŽï¼Œä¸¦å¯¦éš›å®Œæˆä¸‰å°ºå¯¸ Adventure Chrome QAï¼evidence uploadã€‚Requirement Batch `release/requirement-batches/2026-09-15-adventure-map-footer-visibility.json` å·²æ›´æ–°ç‚º 2/2 VERIFIEDï¼›åƒ…å¾…æœ€å¾Œçš„é©—è­‰ç´€éŒ„ CI èˆ‡ dev éƒ¨ç½² SHA æ ¸å°ã€‚
-## 2026-09-17 â€” Battle formation / BOSS mechanism / monster range repair candidate (NOT COMPLETE)
-
-- Base `dev@f4cd11ff8e9a4ba51edf64ec37c0db711140616a`; branch `fix/battle-formation-targeting-20260917`. Scope is limited to front/back visual projection, BOSS mechanism-card visual plane, and monster range target resolution. Do not change VFX, skill numbers, normal target rules, save data, or unrelated gameplay.
-- Root cause 1: `js/battlefield-slot-owner.js` correctly kept `ALLY_F*` semantic front slots and `ALLY_B*` back slots, but `css/fixed-slot-battlefield-rendering-v2.css` displayed them opposite the enemy-relative definition. The canonical CSS now projects ally front at the top (nearest enemies) and ally back at the bottom.
-- Root cause 2: `js/gameplay-boss-tower-system.js::renderMechanisms()` created separate mechanism targets after the absolute enemy rows, and `css/gameplay-boss-tower.css` left their container in normal flow at the enemy-zone top. The renderer now marks the independent mechanism zone synchronously; the canonical fixed-slot stylesheet places it in the enemy front plane. Mechanisms remain outside enemy unit geometry and target resolution.
-- Root cause 3: `js/00-main.js::processSingleMonsterAttack()` converted `tri` / `row` directly to all living party members. It now reuses `FourSymbolsBattlefieldSlots.resolveAllyTargets()` for `tri` / `row` / `column`, retaining explicit `all` and existing single-target stealth behavior.
-- Regression coverage is supplementary only: `tests/fixed-battlefield-ally-formation.test.js` locks a split two-front/one-back party; `tests/fixed-slot-battlefield-rendering-v2.test.js` locks ally projection and mechanism front plane. Requirement batch `release/requirement-batches/2026-09-17-battle-formation-targeting.json` remains 0/3 VERIFIED pending fully loaded dev gameplay evidence.
-## 2026-09-18 â€” Boss HUD width / World reinforcement live snapshot / enemy hit feedback / integrated Shield (IMPLEMENTED / QA PENDING)
-
-- Base: latest GitHub `dev@9e0ba369925e3c857bc6a8c619fcd071c87d94bc`; branch: `fix/boss-hud-world-reinforcement-hit-shield-20260918`. `main` remains excluded.
-- The prior two repairs (#297/#298) fixed Boss HUD visibility, height and vertical order, but neither removed the shared V143 `width: var(--v143-monster-bar-width,68px) !important` owner. The Boss appeared visible while still measuring as a normal 68px monster bar.
-- `css/40-v143-combat-dungeon-polish.css` now scopes that width owner to non-Boss enemies. `css/gameplay-boss-tower.css` remains the only Boss HUD geometry owner, so its left/right insets determine both HP and SP width.
-- World-only reinforcement overlap was a snapshot identity split: the Boss context preferred its startup snapshot even if runtime rendering had already replaced the active Fixed Slot snapshot. Summons could be assigned to stale data while the adapter painted a live natural formation. `bossBattlefieldSnapshot()` now adopts the active snapshot containing the Boss before any dynamic assignment; Personal Boss behavior is covered separately.
-- `showMonsterHit()` is now the enemy HP feedback owner: HP damage creates no red popup for any enemy entity. `shakeArtForPopup()` also refuses enemy cards so a legacy/reparented popup cannot reintroduce `v174-hit-shake`. Player-side hit feedback is untouched.
-- The old extra Boss shield HUD is retired. `syncBossShieldHud()` now maintains one white `.boss-hp-shield-overlay` inside `.monster-hp`, using the formal player owner proportion `maxHP + currentShield`; HP text remains `currentHP / maxHP`. Damage settlement remains Shield â†’ HP overflow and heal resyncs the same owner.
-- Focused Boss runtime tests and `build:check` pass locally. The local full Node suite is blocked only because this workspace lacks Chrome required by the existing browser test. Requirement batch: `release/requirement-batches/2026-09-18-boss-hud-world-reinforcement-hit-shield.json` remains IMPLEMENTED until CI, deployed SHA and 412Ã—915 real Runtime QA pass.
-## 2026-09-19 â€” ç§˜å¯¶ Trigger Lifecycleã€æ­£å¼å›žåˆé‚Šç•Œã€HUD Lockã€æ“ä½œ Hitbox èˆ‡å¿«é€Ÿé»žæ“Šæ•ˆèƒ½ï¼ˆVERIFIEDï¼‰
-
-- Base: latest GitHub `dev@7c1a074c45a2426b78901cad1ec1cbfbe7623649`; branch: `fix/relic-trigger-lifecycle-battle-input-ui-20260919`; `main` ä¸ä¿®æ”¹ã€‚
-- `js/00-main.js` çš„ `FourSymbolsBattleFlow` æ–°å¢žå”¯ä¸€ `round_start`ï¼`round_end` subscriber èˆ‡ core-owned presentation lockã€‚`processNextCombatant()` åœ¨ `turn++` å‰åŒæ­¥æ´¾é€ round endï¼›`startTurn()` æ´¾é€ round startï¼›boundary key ç”± battle tokenï¼‹round åŽ»é‡ã€‚Feature module ä¸å†ç”± before-combatant æŽ¨æ¸¬ä¸Šä¸€å›žåˆï¼Œä¹Ÿä¸æŽ¥ç®¡ `turn++`ã€`finishPlayerAction()` æˆ– `processNextCombatant()`ã€‚
-- `js/60-team-relic-system.js` å°‡ 10 ä»¶ `runtimeReady:true` ç§˜å¯¶çµ±ä¸€æ”¹æˆ `canTrigger â†’ triggerMatches â†’ markTriggered â†’ resolveEffects` åŒæ­¥ Gameplay çµç®—ï¼Œå†æŽ’ cinematic presentationã€‚å›žå¤©å¯¶è¼ªä¸å†æ˜¯å”¯ä¸€ç‰¹ä¾‹ï¼›æ¼”å‡ºå–æ¶ˆã€generation resetã€battle end æˆ– VFX failure éƒ½ä¸æœƒå›žæ»¾å·²æˆç«‹æ•ˆæžœã€‚åéœ‡ä¹Ÿæ”¹ç‚ºå…ˆå‚·å®³çµç®—ã€å¾Œè¦–è¦ºã€‚
-- å¾Œ 10 ä»¶ä»ç¶­æŒ `runtimeReady:false`ã€‚DEV å¯æš«æ™‚é…è£ï¼Œä½†é€²æˆ°é¬¥ä¸å†è‡ªå‹•æ’­æ”¾ï¼›å¡ç‰‡èˆ‡è©³æƒ…æ¸…æ¥šæ¨™ç¤º `Runtime Readyï¼ˆæ­£å¼åŠŸèƒ½å·²å®Œæˆï¼‰`ï¼`Presentation Onlyï¼ˆåƒ…æ¼”å‡ºé è¦½ï¼‰`ï¼Œåªæœ‰ `v174RelicDevPreviewPresentation()`ï¼æˆ°é¬¥ä¸­çš„ã€ŒDEV æ¼”å‡ºé è¦½ã€å¯æ‰‹å‹•æŽ’å…¥è¦–è¦ºä½‡åˆ—ã€‚
-- `updateActionHudVisibility()` ç´å…¥ core presentation lockï¼›æ¼”å‡ºæœŸé–“ battle commandã€skill quick barã€item menu èˆ‡ target-selecting UI å…¨éƒ¨ä¸å¯æ“ä½œï¼Œæœ€å¾Œä¸€å€‹ presentation lock é‡‹æ”¾å¾Œæ‰ç”± Core æ¢å¾©åŽŸå®£å‘Šæµç¨‹ã€‚
-- æˆ°é¬¥æŒ‡ä»¤ Hitbox å¹¾ä½•æ”¶æ–‚å›ž `css/00-main.css`ï¼Œä¾ 1536Ã—559 `battle-command-panel.jpg` äº”é¡†è¦–è¦ºä¸­å¿ƒè¨­å®šç™¾åˆ†æ¯”é‚Šç•Œï¼›äº”å€äº’ä¸é‡ç–Šã€‚`css/45-v152-dev-fixes.css` çš„ Skill 21.5% priority overlap å·²ç§»é™¤ã€‚
-- å…¨åŸŸ tap ripple åœ¨ `#battlePage` åœç”¨ï¼›å…¶ä»–é é¢å…±ç”¨å–®ä¸€ DOM nodeï¼Œå‹•ç•«ç”± widthï¼heightï¼margin æ”¹ç‚º transformï¼‹opacityï¼Œå¿«é€Ÿé»žæ“Šä¸å†ç´¯ç© 20 å€‹é«˜ z-index animated nodesã€‚
-- Focused Node testsã€10 ä»¶ç§˜å¯¶ runtimeã€æ­£å¼å›žåˆè·¯å¾‘ã€HUD Lockã€VFX/cinematic regressionsã€V141/V142/V152 èˆ‡ deterministic build å‡ PASSã€‚PR #332 Repository checks run 35424956704 SUCCESSï¼›390Ã—844ï¼412Ã—915 hitbox èˆ‡ 20 æ¬¡ pointerdown browser QA å‡é€šéŽã€‚
-- Requirement batch: `release/requirement-batches/2026-09-19-relic-trigger-lifecycle-battle-input-ui.json`ã€‚
-
-## 2026-09-20 â€” å•†åº—è£œå“é‡æŽ’èˆ‡ä¸»åŸŽç§˜å¯¶ HUD å£“ç¸®ï¼ˆIMPLEMENTED / å¯¦æ©Ÿ QA å¾…ç¢ºèªï¼‰
-
-- Baseï¼šæœ€æ–° GitHub `dev`ï¼›å·¥ä½œåˆ†æ”¯ `fix/shop-potion-home-relic-layout-20260920`ï¼›`main` ä¸ä¿®æ”¹ã€‚
-- å•†åº—è£œå“ç‰ˆé¢å”¯ä¸€å¾Œå±¤ owner ç¶­æŒ `css/49-v169-rpg-ui.css`ï¼›æ­£å¼è³‡æ–™ï¼è³¼è²· owner ä»ç‚º `js/40-v144-rules-and-abyss.js`ï¼ŒHP/SP äº¤éŒ¯æŽ’åº owner ä»ç‚º `js/51-v169-rpg-ui.js::arrangeShopColumns()`ã€‚æœ¬æ¬¡ä¸æ–°å¢ž late CSS æª”æˆ– runtime wrapperï¼›å…­å¼µè£œå“å¡ç¶­æŒ 2Ã—3ï¼Œä½†æ”¹æˆæ˜Žç¢º Headerï¼Icon+æ–‡å­—ï¼æ•¸é‡+åƒ¹æ ¼ï¼è³¼è²·æŒ‰éˆ•åˆ†å€ï¼Œé¿å…å…§å®¹äº’ç›¸é‡ç–Šã€‚
-- ä¸»åŸŽéšŠä¼ç§˜å¯¶æ‘˜è¦ First Screen owner ç¶­æŒ `js/16-stage-v54-main-city-runtime.js` + `css/19-stage-v54-main-city-moderate-native-scale.css`ã€‚ä¸è¼‰å…¥å®Œæ•´ç§˜å¯¶ featureï¼›åªåœ¨æ—¢æœ‰ slot éš±è—æ¬¡è¦ trigger èªªæ˜Žï¼Œå°‡åˆ—é«˜ 58pxâ†’44pxã€æŒ‰éˆ•è¦–è¦ºé«˜ 34pxâ†’30pxï¼Œä¿ç•™åç¨±ã€Lv èˆ‡æ›´æ›æ“ä½œã€‚
-- Requirement batchï¼š`release/requirement-batches/2026-09-20-shop-potion-home-relic-layout.json`ã€‚ç›®å‰å…©é …å‡ç‚º IMPLEMENTEDï¼Œå¾… dev å¯¦éš›éƒ¨ç½²èˆ‡æ‰‹æ©Ÿè¦–è¦ºç¢ºèªå¾Œæ‰å¯å‡ç‚º VERIFIEDã€‚
-## 2026-09-20 â€” Persistent Effect Duration Lifecycle èˆ‡ç„šè¡€è¨£ï¼ˆdev æ•´åˆå‰ï¼‰
-
-- æ­£å¼ duration owner ç‚º `js/00-main.js` çš„ round/status sweep åŠ ä¸Š `js/60-v173.64-skill-progression-rebalance.js::FourSymbolsDurationLifecycle` çš„ initiative action snapshotã€‚èˆŠå…¨åŸŸ round-start sweep ä¸å†æ‰£é™¤ Freezeï¼Petrifyï¼å‡å‚·èˆ‡ä¸€èˆ¬ soft Debuffï¼›å¢žç›Šä¹Ÿä¸å†å› æ–½æ”¾æˆ–ç„¡é—œå¤§å›žåˆå°‘ç®—æœ‰æ•ˆè¡Œå‹•ã€‚
-- `deferFirstTick` ä¸å†å¯«å…¥å‡å‚·ã€‚Freezeï¼Petrify ä»åœ¨æœ¬æ¬¡å—æŽ§å–®ä½çš„è¡Œå‹•æ™‚é˜»æ“‹è¡Œå‹•ï¼Œç„¶å¾Œç”± action-finished boundary æ‰£é™¤ä¸€æ¬¡ï¼Œå› æ­¤ N å›žåˆå¿…å®šé˜»æ“‹ N æ¬¡ï¼›Burn ä¿ç•™ç¨ç«‹ round-start Status Tickï¼Œå¥—ç”¨æ™‚ä¸ç«‹å³è·³å‚·å®³ï¼ŒN å›žåˆç”¢ç”Ÿ N æ¬¡ DoTã€‚
-- ç„šè¡€è¨£ owner ä»æ˜¯ `js/60-v173.64-skill-progression-rebalance.js`ï¼šLv1â€“5 æ”¹ç‚ºæ¶ˆè€—æœ€å¤§ HP 5/10/15/20/25%ï¼ŒæŽ¥ä¸‹ä¾†ä¸‰æ¬¡çŽ©å®¶ä¸»å‹•ç«ç³»ç›´æŽ¥å‚·å®³å„æå‡åŒæ¨£ç™¾åˆ†æ¯”ï¼›ç‡ƒç‡’ DoTã€å…è²»è¿½æ“Šä¸ä½¿ç”¨ã€‚æ–½æ”¾æœ¬èº«ä¸æ¶ˆè€—é€™ä¸‰æ¬¡ï¼Œç¬¬å››æ¬¡ç«ç³»ç›´æŽ¥å‚·å®³ä¸å†åŠ æˆã€‚
-- å›žæ­¸ ownerï¼š`tests/skill-progression-rebalance.test.js`ã€‚å·²è¦†è“‹ç„šè¡€ Lv1â€“5 çš„ç²¾ç¢º HP æˆæœ¬ã€ä¸‰æ¬¡åŠ æˆèˆ‡ç¬¬å››æ¬¡å¤±æ•ˆï¼Œä»¥åŠ Buffï¼Freezeï¼Frostbite çš„æœ‰æ•ˆï¼é˜»æ“‹è¡Œå‹•æ‰£é™¤èˆ‡ç•¶å›žåˆæ–° Buff ä¸é æ‰£ã€‚
-
-## 2026-09-20 â€” Cold Start Visual Readyï¼ä¸»åŸŽé¦–å± Gateï¼èƒŒæ™¯ UI é æŠ“
-
-- æ ¹å› ï¼šè³‡æ–™ hydrateã€detached Blob decode èˆ‡å…©æ¬¡ paint ä¸ç­‰æ–¼ live ä¸»åŸŽ DOM å·²å¯ç¹ªè£½ï¼›startup-ready listener å¦æœ‰ä¸€æ¬¡ roster é‡å»ºç«¶æ…‹ã€‚
-- ä¿®å¾©ï¼š`prepareFirstScreenVisuals()` gate å¯¦éš› `<img>`ã€CSS backgroundã€å¿…è¦å­—åž‹èˆ‡ paintï¼›`hideLoader()` åªèƒ½åœ¨ visual-ready å¾ŒåŸ·è¡Œã€‚é¦–å±å¤±æ•—æ²¿ç”¨æ­£å¼ Startup Retryã€‚
-- ä¸‰å±¤æ¨¡åž‹ï¼šLevel 1 é¦–å±å®Œæ•´å¾Œæ›å…‰ï¼›Level 2 ä¸»åŸŽå¯æ“ä½œå¾Œç”±å”¯ä¸€ Feature Loaderã€idleã€concurrency 1 èƒŒæ™¯é æŠ“ï¼›Level 3 å¤§åž‹çŽ©æ³•ç¶­æŒæŒ‰éœ€ Lazy Loadã€‚
-- Relic é¦–æ¬¡é–‹å•Ÿå…ˆé¡¯ç¤ºæ­£å¼å±€éƒ¨ loadingï¼Œ20 icon åªç”± `RELIC_CATALOG_LIST[].iconPath` è¡ç”Ÿä¸¦åœ¨ visual-ready å¾Œä¸€æ¬¡å‘ˆç¾ï¼›èƒŒæ™¯ä¸ execute Bossï¼Towerï¼Relic runtimeã€‚
-- å·¥ä½œåˆ†æ”¯ï¼š`fix/cold-start-visual-ready-background-prefetch-20260920`ï¼›ä»¥æœ€æ–° `dev` ç‚ºåŸºæº–ï¼Œmain ä¸ä¿®æ”¹ã€‚å¾… GitHub èªè­‰å¾Œä¾ä¿è­·æµç¨‹æŽ¨é€ã€CIã€PR åˆä½µã€‚
-
-
-## 2026-09-22 â€” Monster Portrait Fast Importï¼ˆå·²ç”Ÿæˆæ€ªç‰©ç«‹ç¹ªå¿«é€Ÿå°Žå…¥ï¼‰
-
-### æ°¸ä¹… Owner
-- å·²ç”Ÿæˆä¸”å·²è½æ­£å¼è·¯å¾‘çš„æ€ªç‰©ç«‹ç¹ªï¼Œæ­£å¼å¿«é€Ÿå°Žå…¥ ownerï¼š`scripts/import-monster-portraits.mjs`ã€‚
-- CLI aliasï¼š`npm run portrait:import -- ...`ã€‚
-- Registry owner ä»ç‚º `config/monster-portrait-registry.json`ã€‚
-- Runtime resolver owner ä»ç‚º `js/45-v154-dev-fixes.js` çš„ `resolveMonsterPortraitRecord()`ï¼›V159 åƒ…åŒæ­¥æ™‚åºï¼Œä¸æ–°å¢ž wrapperã€‚
-
-### å›ºå®šæµç¨‹
-1. æ¯åœ–ï¼å¾…è™•ç†ç´ æä»ä¾ `docs/IMAGE_ASSET_SPEC.md` å®Œæˆç„¡æ WebP èˆ‡é€æ˜Žï¼å°ºå¯¸é©—è­‰ã€‚
-2. æ ¸å‡† WebP æ”¾åˆ° registry æŒ‡å®šçš„ `assets/monsters/` æ­£å¼è·¯å¾‘ã€‚
-3. å·²ç”Ÿæˆç´ æä¸å†è¦æ±‚å»ºç«‹ monster portrait batch manifestï¼›ç›´æŽ¥ä½¿ç”¨ï¼š
-   `npm run portrait:import -- --keys=<portraitKey,...>`
-4. `planned` é€šéŽæª¢æŸ¥å¾Œå‡ç‚º `existing`ã€‚
-5. `retired` é è¨­ç¦æ­¢é‡æ–°å•Ÿç”¨ï¼›åªæœ‰å°ˆæ¡ˆè² è²¬äººæ˜Žç¢ºæŽˆæ¬Šæ™‚ä½¿ç”¨ `--reactivate-retired`ã€‚
-6. å·¥å…·å¿…é ˆé©—è­‰ WebP è§£ç¢¼ã€sizeClass å°ºå¯¸ã€Alphaï¼é€æ˜Žåƒç´ ã€V154 resolver å¥‘ç´„èˆ‡æ—¢æœ‰ monster portrait runtime testï¼›è‹¥ registry é‚„æ˜¯èˆŠ `.png/.jpg/.jpeg` pathï¼Œä½†åŒ stem æ­£å¼ WebP å·²å­˜åœ¨ï¼Œå·¥å…·æœƒè‡ªå‹•æ”¶æ–‚æˆ `.webp`ã€‚
-7. æœªç”Ÿæˆç´ æä»ç¶­æŒæ—¢æœ‰ batch generate/finalize/strict audit æµç¨‹ã€‚
-
-### æ”¶æ–‚ç›®çš„
-- è§£æ±ºã€Œåœ–ç‰‡å·²å­˜åœ¨ï¼Œä½†ä»å›  plannedï¼retiredï¼batch manifest æµç¨‹è€Œé•·æ™‚é–“å¡åœ¨æ­£å¼æŽ¥ç·šã€ã€‚
-- é¿å…åªçœ‹æª”æ¡ˆå­˜åœ¨å°±èª¤åˆ¤å®Œæˆï¼›æ­£å¼å°Žå…¥ä»ä»¥ `status=existing` ä¸” Runtime owner å¯è§£æžç‚ºæº–ã€‚
-- å¿«é€Ÿå°Žå…¥å·¥å…·åªè™•ç†æœ¬å­ç³»çµ±ï¼Œä¸ä¿®æ”¹æˆ°é¬¥çŽ©æ³•ã€UIã€æ€ªç‰©æ•¸å€¼æˆ– mainã€‚
-
-
-## 2026-09-23 â€” Battle UI / Hit / Status Owner Convergenceï¼ˆVERIFIED candidateï¼‰
-
-- Baseï¼š`dev@ae535061883029d12e9ca951e2c23b5f791fbf86`ï¼›å·¥ä½œåˆ†æ”¯ `fix/battle-ui-hit-status-owner-convergence-20260923`ï¼›PR #533ï¼›`main` å…¨ç¨‹æœªä¿®æ”¹ã€‚
-- ä¸€èˆ¬å‘½ä¸­å”¯ä¸€ Owner æ”¶æ–‚è‡³ `js/00-main.js::calculateHitChancePercent()/rollHitChance()`ï¼š`clamp(95 + accuracyÃ—0.15 + finalAccuracyBonus - targetFinalEvasion - finalHitReduction, 70, 99)`ã€‚æ™®é€šæ€ªç‰©æœªæ˜Žç¢ºæŒ‡å®š evasion æ™‚ä½¿ç”¨ `min(10, levelÃ—0.1)`ï¼›å¤šå€‹é–ƒèº²ä¾†æºæ”¹ä»¥æœ€çµ‚ç™¾åˆ†é»žç›´æŽ¥åŠ æ¸›ã€‚
-- ç•°å¸¸ï¼Hard Control å”¯ä¸€ Owner æ”¶æ–‚è‡³ `calculateStatusEffectChance()/rollStatusEffectHit()`ï¼šæŠ€èƒ½åŸºç¤ŽæˆåŠŸçŽ‡ï¼‹ä¸»å±¬æ€§Ã—0.05%ï¼‹æœ€çµ‚ç•°å¸¸å‘½ä¸­åŠ æˆï¼ç›®æ¨™ SpiritÃ—0.05%ï¼æœ€çµ‚æŠ—æ€§ã€‚ç‰©ç†ç•°å¸¸è®€æœ‰æ•ˆ Attack Pointsã€æ³•è¡“ç•°å¸¸è®€ Intelligenceï¼›ç§»é™¤ level factorã€sqrt(attribute)ã€ç¡¬æŽ§å°ˆå±¬ Spirit coefficient èˆ‡ V140/V158/V149/V169 èˆŠå…¬å¼ Wrapperã€‚Hard Control ä¸Šé™ï¼šRegular 90%ã€Elite 75%ã€Boss 60%ã€enemy-to-player 60%ã€‚
-- å‡å‚·æ­£å¼ç‚º Soft Debuffï¼šå‚·å®³ -25%ã€æœ€çµ‚é–ƒèº² -25 å€‹ç™¾åˆ†é»žã€æœ€çµ‚ç•°å¸¸æŠ—æ€§ -25 å€‹ç™¾åˆ†é»žï¼Œä¸ç¦æ­¢æŠ€èƒ½ï¼›èˆŠã€Œç„¡æ³•ä½¿ç”¨æŠ€èƒ½ã€æˆ°é¬¥ç‹€æ…‹æ–‡å­—å·²æ¸…é™¤ã€‚
-- æŠ€èƒ½èªªæ˜Ž Owner è£œé½Šç«ç³»ç‰©ç†è¿½æ“Šã€çƒˆç„°é¾æ²å¿…å®šç‡ƒç‡’ã€ç«é³³å¤©é³´é³³å¨ã€å‡å‚·å®Œæ•´æ•ˆæžœã€ç„šè¡€å…è²»è¿½æ“Šä¸è€— Chargeã€æ·¨å¿ƒè¨£ä¸å¯æ¸…é™¤é …ç›®èˆ‡å››å…ƒç´  EXï¼›æœªå¾©æ´» V149/V169 èˆŠæ–‡å­— Ownerã€‚
-- æ€’ç«ç­‰ Buff ä»ç”± `FourSymbolsDurationLifecycle` ä¾ action-finished æ‰£é™¤ï¼Œ0 å›žåˆç§»é™¤å¾Œç«‹å³åŒæ­¥ V143 Status Visualï¼›ä¸æ–°å¢ž timerï¼pollingã€‚
-- å·¡æ€ªäººç‰©ä¸å†å…ˆé¡¯ç¤º legacy `patrol-character.png`ï¼›æ­£å¼ WebP decode/load å®Œæˆå¾Œæ‰é¡¯ç¤ºã€‚å·¡æ€ª `#mapBattleInfo` èˆ‡æ­£å¼ Battle Info Drawer æ¨£å¼ Owner åˆ†é›¢ã€‚
-- Battle UIï¼šå”¯ä¸€é‡‘è‰² Target Reticleï¼›æ€ªç‰©åç¨±é€æ˜Žï¼›24px ç‹€æ…‹ Icon HUD é«˜æ–¼ HP/SPï¼›é¸ç›®æ¨™æ™‚å€’æ•¸æ¡†èˆ‡ Target Prompt ä½¿ç”¨æ­£å¼ä¸é‡ç–Šå¹¾ä½•ï¼›Battle Info å¤–æ®¼é€æ˜Žã€åªä¿ç•™å° Tabï¼å±•é–‹æ­£æ–‡é»‘åº•ï¼›Tab æ‹–æ›³æ”¹ç‚º pointerdown ä¸€æ¬¡é‡æ¸¬ï¼‹rAF/translate3dï¼›æ“ä½œé¢æ¿æ”¹ç”¨é€æ˜Žç´ ææŠ•å½±ã€‚
-- æ–½å·¥æœŸé–“ Browser QA æŠ“åˆ°ä¸€å€‹çœŸå•Ÿå‹•é †åºå•é¡Œï¼š`makeZoneMonster()` åœ¨ App Shell é ‚å±¤å»ºæ€ªæ™‚æ—©æ–¼å¾Œç½®çš„ default evasion const åˆå§‹åŒ–ï¼Œæœƒé€ æˆ TDZ ä¸¦ä¸­æ­¢ App Shellã€‚æ­£å¼ Default Monster Evasion Owner å·²ç§»åˆ° zone roster å»ºç«‹ä¹‹å‰ï¼Œä¸¦æ–°å¢ž boot-order regressionã€‚
-- Production build commitï¼š`7567aa216fba3f32e92792ea9dac317ff9f8d942`ã€‚Verified source candidateï¼š`1596ea0a36e564facca92432376775d9728bc0fe`ã€‚
-- GitHub Actions Repository checks run `35866039901`ï¼šSUCCESSã€‚åŒ…å« Syntaxã€Battle Runtime Architecture Guardã€å°ˆé …ï¼æ—¢æœ‰ battle regressionsã€production build synchronizationã€Fixed Slot 9:16 mobile browser QAã€exact-candidate real battle mobile browser QAã€Adventure mobile QAã€static resourcesã€release gate èˆ‡ `git diff --check` å…¨éƒ¨é€šéŽã€‚
-- Requirement Batchï¼š`release/requirement-batches/2026-09-23-battle-ui-hit-status-owner-convergence.json` å·²å‡ç´šç‚º VERIFIEDã€‚
-## 2026-09-24 â€” Cloud Save Phase 2 Server-owned Envelopeï¼ˆCOMPLETE / 6/6 VERIFIEDï¼‰
-
-- Baseï¼šæœ€æ–° `dev@e9a2f481d5a318050991d475201f359d694871cc`ï¼›å·¥ä½œåˆ†æ”¯ï¼š`feature/cloud-save-phase2-envelope-20260924`ï¼›`main`ï¼`dev` å‡æœªç›´æŽ¥ä¿®æ”¹ã€‚
-- Phase 1 Single Active Session ç¶­æŒ 5/5 VERIFIEDã€‚Phase 2 å”¯ä¸€ Envelope owner æ–°å¢žæ–¼ `functions/src/cloud-save-envelope.js`ï¼›public `users/{uid}/saves/current` ä½¿ç”¨ schema Version 2ã€server-owned Revisionã€server timestamps èˆ‡åš´æ ¼ç‹€æ…‹é©—è­‰ã€‚
-- `bootstrapCloudSave`ï¼šæ–° envelope å¾ž Revision 1 å»ºç«‹ï¼›é‡è¤‡å‘¼å«ä¸äº‚å¢ž Revisionï¼updatedAtï¼›æ—¢æœ‰ Phase 1 Version 1ï¼Revision 0 ç²¾ç¢ºéª¨æž¶å—æŽ§å‡ç´šã€‚ä»»æ„ owner/schema/revision/timestamp/status æå£žä¸€å¾‹ fail closedã€‚
-- `submitLegacyMigrationCandidate`ï¼šä»åªä¿å­˜ `trusted:false` candidateï¼›metadata æ”¹è®Šèˆ‡ active Session é©—è­‰åŒä¸€ transactionï¼Œ`serverRevision` åŽŸå­éžå¢žã€‚Phase 2 ä¸ç”¢ç”Ÿæ­£å¼ gameplay payloadã€ä¸å‡æ ¼æœ¬æ©Ÿè³‡æ–™ã€‚
-- PR #553 å·²åˆä½µ `dev@195acb63d4acd36ceada31ed95b5f50e448d297f`ã€‚PR CI `35987380366`ï¼Session `35987380024`ã€merged dev CIï¼‹DEV deploy `35987880895`ã€Session emulatorï¼‹Firebase deploy `35987880460` å‡ SUCCESSï¼›æ­£å¼ deploy job `107595824436` SUCCESSã€‚
-- æœ€å° live é©—æ”¶ bridge ç‚º `FourSymbolsFirebase.bootstrapCloudSave()`ï¼›ä¸è‡ªå‹•å‘¼å«ã€ä¸æ”¹ first-use read ownerã€ä¸å‚³ local gameplay saveã€‚çœŸå¯¦ Google å¸³è™Ÿå·²åœ¨æ‰‹æ©Ÿ Chrome é©—è­‰ Version 2ã€Revision 1 èˆ‡é‡è¤‡ bootstrap idempotencyï¼›Requirement Batch ç¾ç‚º COMPLETE / 6/6 VERIFIEDã€‚Phase 3â€“10 æœªé–‹å§‹ã€‚
-- ç‚ºç„¡é›»è…¦çš„çœŸå¯¦è£ç½®é©—æ”¶ï¼ŒDEV å¸³è™Ÿé¢æ¿æ–°å¢žæ‰‹å‹•ã€Œé©—è­‰é›²ç«¯å­˜æª”éª¨æž¶ã€æŒ‰éˆ•ï¼›å®ƒé€£çºŒ bootstrap å…©æ¬¡ä¸¦è®€å›ž envelopeï¼Œåªé¡¯ç¤º Schemaï¼Revision çµæžœï¼Œä¸é¡¯ç¤º credentialã€ä¸é€ local saveã€‚ä½¿ç”¨è€…å·²ä»¥åŽŸ Google å¸³è™Ÿåœ¨å®Œæ•´æ‰‹æ©Ÿ Chrome å–å¾— `Schema V2ã€Revision 1` æˆåŠŸçµæžœï¼›ChatGPT å…§å»ºç€è¦½å™¨çš„ Google OAuth æœªå®Œæˆä¸è¦–ç‚ºå¾Œç«¯å¤±æ•—ã€‚PR #555 åˆä½µ `dev@b037ced9dad9d1cf67d9aacccb4e064c74a135e1`ï¼›merged dev CI `35992274605`ã€Session Authorityï¼Firebase deploy `35992274447` attempt 2 å‡ SUCCESSã€‚
-## 2026-09-24 â€” Cloud Save Phase 4 ä¸€èˆ¬é€²åº¦é·ç§»å•Ÿå‹•ï¼ˆIN PROGRESS / 0/6 VERIFIEDï¼‰
-
-- æœ€æ–°åŸºæº– `dev@d8986afa62f0c1f2646fad1f4d1ca73b2be389f6`ï¼Œå·¥ä½œåˆ†æ”¯ `feature/cloud-save-phase4-general-progress-20260924`ï¼›`main` ç¦æ­¢ä¿®æ”¹ã€‚
-- `docs/CLOUD_SAVE_PHASE4_CONTRACT.md` å…ˆè¨˜éŒ„ç¾æœ‰ ownerã€å­˜æª”æ¬„ä½çŽå‹µè€¦åˆã€revisionï¼sessionï¼UID ä¿è­·ã€è¡çªèˆ‡é©—æ”¶æ¢ä»¶ï¼›Requirement Batch `release/requirement-batches/2026-09-24-cloud-save-phase4-general-progress.json` ç‚º TODO / 0/6 VERIFIEDã€‚
-- åˆå§‹è¨­è¨ˆç›¤é»žæ™‚æ²’æœ‰ä¿®æ”¹ Firebase callableã€Firestore rulesã€Gameplay saveï¼Boot ownerï¼Œä¹Ÿæ²’æœ‰ä¸Šå‚³ã€åˆªé™¤æˆ–é‡å¯«ä»»ä½•çŽ©å®¶å­˜æª”ï¼›ç•¶æ™‚æœªå»ºç«‹ PRã€æœªéƒ¨ç½²ã€æœªä½œçœŸæ‰‹æ©Ÿé©—æ”¶ã€‚**Phase 4 NOT COMPLETE**ã€‚
-- æœ¬è¼ªå¾ŒçºŒä½¿ç”¨è€…åŒæ„ä¿å®ˆæ–¹å‘ï¼Œå·¥ä½œåˆ†æ”¯è‰ç¨¿ PR #559 å·²å»ºç«‹ï¼›å€™é¸å¯¦ä½œæ–°å¢ž `functions/src/cloud-preferences.js` ç™½åå–®ã€`functions/index.js::saveCloudPreferences` Sessionï¼‹revision äº¤æ˜“ã€`js/firebase/firebase-cloud-save.js` çš„ UID æœ¬æ©Ÿè¨­å®šæå–ã€å¸³è™Ÿé¢æ¿ DEV æ‰‹å‹•é©—è­‰ï¼å–å›žã€`js/00-main.js::restoreAutoBattlePreferences` åŒ UIDï¼åŒè§’è‰² ID æ¢å¾©ã€‚åƒ…è¨­å®šï¼Œä¸å«é‡‘å¹£ï¼è§’è‰²ï¼çŽå‹µï¼›æ­¤ç‚ºæ–°å¢žå€™é¸ç‹€æ…‹ï¼Œå‰ä¸€è¡Œè¨˜éŒ„çš„æ˜¯ PR å»ºç«‹å‰çš„èµ·é»žã€‚æœªéƒ¨ç½²ã€æœªå¯¦æ©Ÿé©—æ”¶ï¼Œä» **NOT COMPLETE**ã€‚
-- ä¸‹ä¸€æ­¥å…ˆå®Œæˆé€æ¬„çŽå‹µå¯©æ ¸ï¼›å¯ä¿¡çš„å±€éƒ¨ä¸€èˆ¬é€²åº¦æ‰å¯åœ¨å—ä¿è­·å¾Œç«¯äº¤æ˜“æäº¤ï¼æ¢å¾©ã€‚`gameplayProgress` çš„ Boss é¦–é€šèˆ‡å››è±¡å¡”å·²é ˜çŽç´€éŒ„ä¸å¯ç•¶ä¸€èˆ¬ç„¡å®³è³‡æ–™ç›´æŽ¥ä¸Šå‚³ï¼›ç„¡æ³•åœ¨ Phase 4 ç¨ç«‹åˆ¤å®šçš„æ¬„ä½ä¿ç•™è‡³ Phase 5ï¼Œä¸å¾—ä»¥å®¢æˆ¶ç«¯æ•´åŒ…å­˜æª”å¡«å…¥æ¬Šå¨ envelopeã€‚
-## 2026-09-25 â€” Cloud Save legacy candidate history (candidate)
-
-- Base: `dev@5c4ae26b0ec2f4d9ecec47c1289d5d6ad1002185`; owner: `functions/index.js::submitLegacyMigrationCandidate()`; existing `functions/src/session-authority.js::runProtected()` and `functions/src/cloud-save-envelope.js` remain the authority gates. No `saveGame()` wrapper or client restore owner changed. `DATA_SECURITY_CONTRACTS.md` remains absent at this baseline.
-- Each new untrusted migration candidate is created under private `serverUsers/{uid}/migrationCandidates/{revision}` in the same transaction as `latest` and the envelope. Same fingerprint retries are idempotent; distinct submissions retain the rate limit and create a new revision. Metadata inconsistencies fail closed. Existing previously overwritten candidates cannot be recovered from this change.
-- This is a candidate retention step only. No client auto-upload, no character authority promotion, no gameplay rewards or restore. Phase 4 remains 0/6 VERIFIED; Game/Cache remain 173.72; `main` untouched. PR/CI/merge/deploy results must be recorded separately when available.
-
-## 2026-09-25 â€” Server-issued grant reservation candidate
-
-- Base `dev@2f88b6e67135f5d0cabbf0c9a048fb5d437a5f11`. Owner `functions/src/trusted-grant-ledger.js::reserve()` behind `functions/index.js::reserveTrustedGrant`; existing Session owner `functions/src/session-authority.js::runProtected()` and Envelope owner `functions/src/cloud-save-envelope.js` are reused. No `saveGame()` wrapper or temporary patch. `DATA_SECURITY_CONTRACTS.md` is absent at this base.
-- Accept only a private server-issued grant ID, operation ID and expected revision. Protected transaction reserves a unique grant and creates a private receipt; retries return the same result. No client-supplied amount, balance mutation or authoritative playable character. Explicitly `creditedToCharacter:false` until a later complete economy/character operation consumes the reserved receipt.
-- Phase 4 remains 0/6 VERIFIED, Game/Cache 173.72, `main` untouched. This is a prerequisite with no player-facing restore or phone acceptance; CI/emulator/DEV/Firebase deployment evidence must be checked after PR.
-## 2026-09-25 â€” Private legacy candidate screening (candidate)
-
-- Base `dev@45bd836380d4e5f416b9377fdefed8be0d9bfde3`, branch `feature/cloud-legacy-baseline-admission-20260925`. Backend screening owner `functions/src/legacy-candidate-screening.js::screen()`; callable entry `functions/index.js::screenLegacyMigrationCandidate`. It reads the existing private candidate written by `submitLegacyMigrationCandidate` in `sessions.runProtected()`, checks envelope/candidate revision and UID, then returns blocker codes. No gameplay save wrapper, temporary patch, public payload, client button or authoritative character writer is added. Existing `js/60-team-relic-system.js` save wrapper remains out of scope.
-- Screening is read only and always `readyForAcceptance:false` while historical reward provenance and backed-up claim-bearing sidecars are absent. It neither changes revision nor approves migration. Pure tests pass; emulator CI, PR, merge and DEV verification remain pending. Phase 4 stays IN PROGRESS / 0/6 VERIFIED. `DATA_SECURITY_CONTRACTS.md` is absent; no fabricated contract was used.
-
-## 2026-09-26 â€” Read-only legacy character conversion draft (candidate)
-
-- Owner remains `functions/src/legacy-candidate-screening.js`: `screenLegacyCandidateSnapshot()` validates sources and `prepareLegacyCharacterDraft()` derives an internal review draft from a complete candidate. The existing `functions/index.js::screenLegacyMigrationCandidate` entry and `runProtected()` session/revision gate remain in place. The late `js/60-team-relic-system.js` save wrapper is an input source only; no new gameplay wrapper or temporary patch was added.
-- The draft preserves three character slots, economy, bag objects and separately equipped objects with source paths, skills, relics, progress and claim-bearing sidecars. The callable exposes only status and counts. It never provides canonical IDs, a trusted baseline, award or playable snapshot; `authoritativeStateReady:false` and Phase 4 0/6 remain. PR/merge/deploy status must be verified separately.
-- Next source-completeness slice: `functions/src/cloud-save-policy.js::LEGACY_BACKUP_SIDECARS` owns the 14-key server backup inventory; `functions/src/legacy-candidate-screening.js::prepareLegacyCharacterDraft()` retains each exact raw sidecar or explicit missing marker and retains every allowlisted main-save field, including fields not yet mapped to canonical records. Claim blockers remain in force even when a review draft can be constructed. No new wrapper, authoritative writer, reward mutation or temporary patch is introduced. PR/CI/merge/deploy evidence remains pending until verified.
-- Historical claim reconciliation candidate: `functions/src/legacy-reward-claim-audit.js::auditLegacyRewardClaims()` additionally parses the quest milestone sidecar and compares the Abyss sidecar's reward/first-clear claim entries against the main-save mirror. `functions/src/legacy-candidate-screening.js::screenLegacyCandidateSnapshot()` passes the sealed sidecar inventory to that owner. Contradictory claims block draft preparation; no gameplay writer or wrapper changes. The audit does not prove historical reward entitlement or replace server claim receipts.
-
-## 2026-09-26 â€” Foundation B verified boundary and relic projection
-
-- PR #594 merged at `c5995ac04ca8a80704c5dfb1fce4eec2a4028d41`; #595 at `a58ec250e5af6616a898f7e9b26b652c945d51f0`; #596 at `74af409090402bb68ec74db7d3be094af922f0f8`; #597 at `74815ccdd15c57062b6b1184bb4e2a62a7a8c38d`; #598 at `0deda585dda43bd08f531fe957237920fd301735`. For #598, merged SHA CI `36243201543` (Repository checks and DEV preview) and Session Authority `36243201415` (emulator and Firebase deploy) completed successfully. These are read-only prerequisite slices; Phase 4 remains 0/6 VERIFIED.
-- The next candidate keeps `functions/src/legacy-candidate-screening.js::screenLegacyCandidateSnapshot()` as the structural gate and `functions/src/canonical-character-review-plan.js::buildCanonicalCharacterReviewPlan()` as the private conversion owner. The late `js/60-team-relic-system.js::persistIntoSaveDocument()` is the input writer, not a new backend wrapper. Relic source records and a selected relic reference are projected only for review; invalid state or a nonempty legacy secondary slot blocks rather than silently dropping it. No canonical writer, acceptance, reward credit or playable restoration is enabled. PR/CI/merge/deploy status for this candidate is pending verification.
-
-## 2026-09-27 â€” Canonical claim record continuity candidate
-
-- Base `dev@5948445fa8c6f8fa60daa7c5d42605812b8cc274`. The claim mutation owner is `functions/src/canonical-resource-credit.js::creditReservedGrant()`; `functions/src/canonical-owned-sources.js::readOwnedSources()/advanceOwnedRecords()` reads and advances the complete claim set; `functions/src/canonical-snapshot.js::claimRecordsDigest()` owns the checkpoint digest. Protected Session remains `functions/src/session-authority.js::runProtected()`. No gameplay save wrapper or temporary patch.
-- The internal credit transaction adds a UID-owned claim record and checkpoint digest with its unique grant claim, ledger, receipt, source revision and unpublished snapshot. EXP and attribute allocations preserve the claim records at their next revisions. Browser-submitted amounts, historical migration admission and playable publication remain disabled. This is a candidate pending PR CI and Firestore emulator verification; Phase 4 remains 0/6 VERIFIED.
-
-## 2026-09-30 â€” Phase 4 private candidate read-only screening UI (candidate)
-
-- Base `dev@c9e8c3608855bde7a6a65226993a1140c9c80d3f`. The backend screening owner remains `functions/src/legacy-candidate-screening.js::screen()` through `functions/index.js::screenLegacyMigrationCandidate`. The browser callable owner is `js/firebase/firebase-cloud-save.js`, exposed by `js/firebase/firebase-bootstrap.js`; DEV account panel presentation and click lifecycle remain in `js/firebase/firebase-auth-ui.js`. No save wrapper, temporary patch, Firestore write or additional authority owner was added.
-- The explicit DEV button reads the current same-UID unadmitted envelope, sends its exact candidate and server revisions through the existing protected session, then reads back the envelope to reject changed revisions/fingerprint. It shows backend blocker codes with Chinese explanations and consistently says the result is blocked, untrusted and unavailable for second-device character restore. It does not create a candidate or replay a failed submission.
-- Targeted tests cover Revision 1 screening, missing candidate, changed revision and UID. PR checks, merge SHA, deployed DEV SHA and original-device read-only result must be verified separately. Phase 4 remains **IN PROGRESS / 0/6 VERIFIED**; original phone save and immutable backup stay in place.
-
-## 2026-09-30 â€” Phase 4 missing claim-sidecar source diagnosis (candidate)
-
-- Original phone Revision 1 read-only screening returned `HISTORICAL_REWARDS_UNVERIFIED` and `SIDECAR_BACKUP_MISSING`. The latter is aggregate: the immutable backup inventory can be complete while one or more claim-bearing source values are explicitly marked missing. It does not prove upload failure.
-- Screening owner `functions/src/legacy-candidate-screening.js::screenLegacyCandidateSnapshot()` now returns only missing names from its existing eight-key claim-source allowlist when a sealed sidecar inventory exists. The DEV account panel `js/firebase/firebase-auth-ui.js` shows those names in the existing result; older unbundled candidates stay generic. No raw bytes, extra Firestore reads, fabricated defaults, resubmission, gameplay write or acceptance path. Historic reward claims remain unverified and Phase 4 stays 0/6 VERIFIED until separate proof and admission gates are met.
-
-## 2026-10-01 â€” Phase 4 original-device offline backup export (candidate)
-
-- Original-phone Revision 1 review reported absent `daily-dungeon-state`, `task-tracker` and `legacy-abyss-state` plus unverified historical rewards. These are immutable missing markers; no default record or claim eligibility is inferred.
-- `js/startup/account-save-repository.js::exportMigrationBackups()` verifies each sealed local backup for the active UID and packages its exact main, metadata and sidecar bytes for a DEV-only browser download from the existing account panel. It neither reads another UID nor alters local/cloud state. The downloaded JSON is unencrypted and must be kept private; download request is not proof of a saved file. No import, admission or cross-device restore is enabled. Phase 4 remains 0/6 VERIFIED. PR, CI, merge and deployment must be verified separately.
-- PR/CI/Firebase deploy and original-device read-only verification remain to be recorded separately.
-## 2026-10-01 â€” Physical follow-up: revive rejection feedback and upright Flood Beast
-
-- New physical recording `1000072388.mp4` (34.647s, 1080Ã—2316) shows a DEV Boss battle with all three allies alive. Repeated `å¾©æ´»è¡“` taps do not enter ally selection because its formal `deadAlly` target contract has no legal target. This is not evidence of another touch failure. `prepareAction` already wrote a hidden battle log; it now also projects the same legal rejection through a visible, non-interactive `aria-live` battle notice: `æˆ‘æ–¹ç›®å‰æ²’æœ‰äººæ­»äº¡ï¼Œç„¡æ³•ä½¿ç”¨å¾©æ´»è¡“ã€‚` A fallen ally still enters the existing ally-selection owner.
-- The same recording shows `æ´ªæ°´çŒ›ç¸` externally rotated along its trajectory. The updated decision is to keep the original sheet orientation for both sides. V143 now uses `preserveSourceOrientation` metadata: actor/target travel and phased timing remain, but cast, flight, impact and dissipate all use zero external rotation. No side/Boss special case, replacement asset, damage, Frostbite, hit fraction, duration or endpoint change.
-- Fresh base `dev@c474d10349472210bfc0c45569aa3741c06221af`; local branch `fix/battle-revive-feedback-flood-upright-20261001`. Formal declaration regression covers revive rejection notice and fallen-ally selection. Existing browser QA now asserts the visible no-target notice and upright Flood Beast for player, regular monster and actual Boss across three targets. Production build/check pass locally. Exact-head CI, integration, deployment and physical follow-up remain pending; both requirements stay IMPLEMENTED / NOT VERIFIED.
+YªçŠx-®éÜj×¢ëiºÚ+Š§j[h‘éÜ¢éí×­ûë´èµ©hºÚn¶X§zÍHÈÈŒ‹LLLH8 %\ÚXØ[™XÛÜ™[™ÈÛÛ[X][ÛŽˆX[X[[]\™Ù]ÛÛ™š\›X][Û‚‚‹Hœ™\Ú˜\ÙNˆ]LMÌLÎÍ™˜™MŒ™ÙÍYLLÌØYLLÍÌÌÈœ˜[˜Úš^Ø˜]KX[]\™Ù]XÛÛ™š\›X][Û‹\™XÛÝ™\žKLŒŒLXˆÍÌŽ™[XZ[œÈ[YÜ˜]Y[™]ÈÙ\Ý\™HÝ\™\ÜÚ[ÛˆÝÛ™\‹Ú\™Y\ÙY›ÛÙ[š[X][Û‹ÜšYÚ[˜[]\ËLÍL\È\˜][Ûˆ[™]œ˜XÝ[Ûˆ\™H™]Z[™YˆXZ[ˆ\È^ÛYY‚‹H™]È\ÚXØ[™XÛÜ™[™ÈLÌŒÍÍ‹›\
+‹ŽMœËŒ0åÌLŽ
+HÚÝÜÈ™\X]YÚ[™ÝØ]\ˆ]ZXÚØ˜\ˆ\ÈÚ]Ý]XÛ\˜][Û‹›ÛÝÙY]\ˆžHHÝXØÙ\ÜÙ[Ú[™ÛK]\™Ù]Ø]\ˆXÝ[Û‹ˆ[T“]šXÙKØœ›ÝÜÙ\ˆ]Z[Ë\ÞYYÒH[™ØXÚH]šY[˜ÙH\™HXœÙ[ÈH™XÛÜ™[™ÈØ[››Ý›Ý™H]\ÙYHÝ\œ™[H\ÞYY[™KˆH›YHY™™XÝ™X\ˆH[™Ø[››Ý\ÝX›\ÚH›ÛÙ™X\ÝÐ›ÜÜÈXØÙ\[˜ÙH™\Ý[‚‹H\™XÝÛÛšX][™ÈY™XÝˆÍÌŒH™\ÝÜ™YX[X[[]\™Ù]ÛÛ™š\›X][Ûˆ[ˆ™\\™PXÝ[Û˜Ú[HØ[”Ù[XÝÜÝ[P˜]Tš[X\žXÝ[[˜ÛÛ™][Û˜[H™Z™XÝY\™Ù]\H[ˆ\È™]™[YÝÜ›T˜Z[‹ÚXÙP\œ›ÝÔ˜Z[ˆœ›ÛH[\š[™ÈÛÛ™š\›X][Ûˆ[ÙH][ˆHÜšYÚ[˜[[\ˆ›ÝÈXØÙ\È]š[™È[]\™Ù]ÛÛ™š\›X][Ûˆ[˜ÚÜœË[˜ÛY[™ÈÝX[ˆXY[˜ÚÜœÈ™[XZ[ˆ[˜[YÈÜÝ[HÚ[™ÛKÝšKÜ›ÝËØÛÛ[[ˆÝX[™\ÝšXÝ[ÛœÈ[™HÙ\\˜]H[YÜ›Ý\™\ÛÛ][Ûˆ™[XZ[ˆ[XÝˆ›ÈYYÜ˜\\‹ÝXÚ[™ÛXÚËÙ\Ý\™HÝÛ™\ˆÜˆ›ÜÜÈ]Ú‚‹H\ÝËØ˜]K\ÚÚ[YXÛ\˜][Û‹[ÝÛ™\‹\ÝšœØ›ÝÈ\Ù\ÈHXÝX[\™Ù][\ˆ[œÝXYÙˆH\›Z\ÜÚ]™HÝX‹ˆ™]È\ÜÙ\[ÛœÈš\œÝ˜Z[YÛˆÝÜ›T˜Z[ˆYØZ[œÝH˜\ÙH[™[ˆ\ÜÙY›Üˆ™YHÚ\˜XÝ\œËÝÜ›T˜Z[‹ÚXÙP\œ›ÝÔ˜Z[‹ÝX[Û›Û‹\ÝX[[˜ÚÜœË›È™KXÛÛ™š\›X][ÛˆÝX›Z\ÜÚ[Û‹™]\›‹Ü™\Ù[XÝ^XÝHÛ™HÝX›Z\ÜÚ[Û‹XYX[˜ÚÜˆ™Z™XÝ[Ûˆ[™™]Z[™YÚ[™ÛK]\™Ù]ÝX[™Z™XÝ[Û‹ˆ^\Ý[™ÈÙ\Ý\™HY™XÞXÛH™YÜ™\ÜÚ[Ûˆ\ÜÙ\ËˆH^\Ý[™È›ÙXÝ[Û‹X[™H˜]]™HÑÝZ]H›ÝÈ^\˜Ú\Ù\È›Ý[]\™Ù]ÚÚ[ËØ[˜Ù[][Ûˆ[™Ú[™ÛHÝX›Z\ÜÚ[Ûˆ[ˆÜ™[˜\žH[™›ÜÜÈÙ\ÜÚ[ÛœËˆ]\ÝZXYÒH[™\ÞYYXØÙ\[˜ÙH™[XZ[ˆ[™[™È]\È[\[Y[][ÛˆÛÛ[Z]‚‹H›ÙXÝ[Ûˆ\\Ú[\È™YÙ[™\˜]YÚ]H^XÝ]\›Z[š\ÝXÈZ[ÛÛ˜Ø][˜][ÛŽÈH[›[ÙYšYY™XÛÛœÝXÝ[ÛˆX]Ú\È˜\ÙHÚ]›ØˆY™LYYLMM˜MYŒÍÙMÙLÙÌMYL™˜ˆ™]È\\Ú[\ÈZ[Ø\\Ú[ŒLŒYŽMMYKšœØÈ›ÛÝØZ[\ÜÙ]X[šY™\ÝÈ[™š\œÝ^H\ÚØž]\È\™HÞ[˜Ú›Ûš^™YˆH^\Ý[™ÈÒH\™›Ü›\ÈH[œH[ˆZ[˜ÚXÚØˆØ[YKÐØXÚH™[XZ[ˆMÌËÌ‹‚‹HÕPÒLNˆPQÓ“ÔÑQÒSTSQS•QÈÍÌŽS•QÔUQÑTÖQQ\ÈÛÛ[X][Ûˆ[™[™È[YÜ˜][Û‹Ù\Þ[Y[ˆÝ\ˆ[œÝXØÙ\ÜÙ[Ý\ÜÜÚ[™ÛH\È[ˆHšY[È\™H›Ý\ÝX›\ÚY\È^Z[™YžH\È[]\™Ù]Y™XÝˆ“ÓÑLNˆÍÌŽPQÓ“ÔÑQÒSTSQS•QÒS•QÔUQÑTÖQQ[˜Ú[™ÙYˆ›Ý™[XZ[ˆ\ÚXØ[Y]šXÙH“Õ‘T’Q’QQÈ™\]Z\™[Y[ÈÌˆ‘T’Q’QQˆÈ›Ý[™™\ˆ[Þ[\ÛH™\ÛÛ][Ûˆœ›ÛHÒHÜˆÑ‚‹Hš\œÝˆÒHÍŽÎMÍLÈ\ÜÙYZ[Þ[˜Ú›Ûš^˜][Ûˆ[™˜]]™H[]\™Ù]XÛ\˜][ÛœË[ˆ™Z™XÝYH›ÛÙ[™Ú[Û˜\ÚÝ™XØ]\ÙHH™]ÛH\[™YÛÛ™š\›X][ÛˆYH™X[™^XÚ\˜XÝ\ˆY˜[˜ÙH[Y\ˆXÝ]™Kˆ][š[X][Ûˆ]šY[˜ÙH\È\ØØ\™YˆH^\Ý[™ÈPH™\Ù]›ÝÈÛX\œÈ\Èš^\™H[Y\ˆ™Y›Ü™H[š[X][ÛˆYX\Ý\™[Y[È[™\ÜÙ\ÈY˜[˜ÙOY˜[ÙK[Y\[[\ÙOYXÛ\™KˆØ[›ÛšXØ[[™Ú[\ÜÙ\[ÛœÈ[™\‹\Û˜\ÚÝ[š[X][Ûˆ\ÜÜØ[\™H™]Z[™YÈ›È[š[X][Ûˆ[[YHÚ[™ÙK‚‚ˆÈÈŒ‹LLLH8 %™\ÜÛœÚ]™H][H[[YH™\šYšXØ][ÛˆÛÛ[X][Ûˆ
+ËÍÈ‘T’Q’QQÛˆ\ÞYYUŽÈ\ÚXØ[ÌŒÈ[˜H[™[™ÊB‚‹HÛÛ[Y\ÈY\™ÙYˆÍÌˆœ›ÛHœ™\Ú]ÍŒNYXLXLXÎLŒNY™ŽNÙLYŽÍ™NÛˆš^Ü™\ÜÛœÚ]™K]Ú[™ÝË\[[YK]™\šYšXØ][Û‹LŒŒLXˆXÝX[\ÞYY\ÚÝÜPHØœÙ\™YHS•‘S•Ô–HÚXÚÙ\ˆX›Ý™HHÛ\YÚ[[™›ÝÛH\]Z\Y[X™[ÈÝ]ÚYHZ\ˆÚš[šÚ[™È[™[ˆH\ÞYYÚ^\Ú^™Hœ›ÝÜÙ\ˆXØÙ\[˜ÙH›ÝÈ\ÜÙ\ÎÈ\ÚXØ[ÌŒÈ[˜HXØÙ\[˜ÙH™[XZ[œÈ[™[™Ë‚‹H[[YHÛÛ[X][ÛˆXœÛÜ˜œÈ]ÙX™ŽÍLÙXŒ˜ÙXLŒNŽYÌNXMYŒLŽY˜žH›Ü›X[Y\™ÙK™]Z[š[™ÈÍÌŽ˜]HÝÛ™\œÈ[™›Ý[™Ù™ˆ™XÛÜ™Ëˆ˜XÚÜXÚË]È^\Ý[™È[˜[˜Ù\È[™][HÛÛ›ÛÈ™]\™HH\XØ]HYØXÞH\‹X]Ûˆš\H
+Ü]Û]Û”š\X
+HÚÜÙHœ›ÝÜÙ\‹\^[Ù[ÛY]žH\œÚ\ÝYXÜ›ÜÜÈÛÜÙKÜ™[Ü[ˆ[œÚYHH›Ú™XÝYÝYÙNÈÚ\™YŒMHÚ[\ˆ™YY˜XÚÈ™[XZ[œËˆœ›ÝÜÙ\ˆPH›ÝÈ™XÛÜ™È˜Z[YÛÛ\]YÙ[ÛY]žH[™Ø]™\È\]Z\Y[ØÛÛ\\š\ÛÛ‹ÜÝ[Û‹ÛX]\šX[ØÚ\ÝÜÚÜØÜ™Y[œÚÝÈ][Ú^Ú^™\Ëˆ\ÜÙ\[ÛœÈ™[XZ[ˆÝšXÝˆØÜ™Y[œÚÝ™]šY]È[ÛÈ›Ý[™HX]\šX[ÚÝÚ[™È[ˆ[˜X›Y\]Z\ÛÛ›ÛˆHÛÜ™H›ÝÈ\Ù\È]È^\Ý[™È\Ñ\]Z\Y[XÚ\Ú[Ûˆ›Üˆ›Ý™\Ù[][Ûˆ[ÙH[™ÛÛ›Û]˜Z[Xš[]Kˆ™X[X\ØÜ™Y[œÚÝ™]šY]È›Ý[™Ú\Ý]ËY\]Z\Y™KY[žH™]Z[š[™È\Ü^N››Û™HÛˆH[™\]Z\ÛÛ›ÛˆHÜšYÚ[˜[Ü[‘\]Z\Y][HÝÛ™\ˆ›ÝÈ™\ÝÜ™\È]ÛÛ›ÛÈœ›ÝÜÙ\ˆPH\ÜÙ\Èš\ÚX›H:!*ù."ÈY\ˆHÚ\Ý]ˆ\ÙH[\[Y[][Û‹\ÝYÙH[™[™ÈX\šÙ\œÈ\™HÝ\\œÙYYžHH^XÝZXY[™\ÞYY]šY[˜ÙH™[ÝË‚‹H›Ü›X[Y\™ÙH›ÝÈXœÛÜ˜œÈ]™NLÍXMNYŒØXMÌYMMØÍÙYÍLÎ™MY™Œ˜XˆÒHÍŽLÍÎŒŒ˜›ÙXÙYÚ[™\ÙKY›ÛØÜ™Y[œÚÝÈ›Üˆ[][KÜÚÜ[Ù\È]ÍŒ0åÎ[ˆ˜Z[Y™XØ]\ÙHPHšYYÈ™[[Ý™HHX\šÙ\ˆœ›ÛHH˜]šYØ][Ûˆ]Ûˆ™\XÙYžHHØ[›ÛšXØ[Ú[ˆX\šÙ\ˆÛX[\›ÝÈ[™\È™]\™Y›Ù\ËˆØÜ™Y[œÚÝ™]šY]ÈY][Û˜[HÛÛ™š\›YYH˜]]™H˜]šYØ][ÛˆZ[[™HÛÝ™\š[™ÈÛ™ÈÛÛ\\š\ÛÛˆXÝ[ÛœÎˆÙ]][S[Ù[™\Ù[][Û“[ÙJ
+XÞ[˜Ú›Û›Ý\ÛH›Ú™XÝÈ]ÈÙ[X[XÈÝ]H›ÝYÚH^\Ý[™ÈŒMÞ[˜ÐÛÛ^˜]šYØ][ÛŠ
+XÝÛ™\‹ÚXÚY\È]È˜XÚÙÜ›Ý[™Ú[Ú[H][H[ÙH\ÈXÝ]™H[™™\ÝÜ™\ÈHÛÝ\˜ÙHÛÛ^ÛˆÛÜÙKˆ›ÈÚ^™KØÛÛÜ™[˜]HÝÛ™\ˆÚ[™Ù\ËˆPH™XÛÜ™È]]\ÝÈ›Üˆ[[˜X›Y][HÛÛ›ÛÈ]›Ü›X[[™ÚÜ[™YZYÚËˆš[˜[[YÜ˜][Ûˆ]šY[˜ÙH\È™XÛÜ™Y™[ÝË‚‹H^\Ý[™ÈÜÜËÌŒ‹\ÝYÙK]ÎXÚ\˜XÝ\‹Z[™[ÜžKXÛÜ™K˜ÜÜØ\ÈHÙ[ÛY]žHÝÛ™\Žˆ]HÝ^\È[ˆ›Ü›X[›ÝÎÈÚ\˜XÝ\ˆÚÝØØ\ÙHÙ\È›ÝÚš[šÈ™[ÝÈ]ÈÝÛˆ™YH\]Z\Y[›ÝÜÎÈÛ™H[š\š]YØ\\È\ÙY[ˆ›Ý›ÝÈXÙ[Y[[™ÝYÙHZYÚÈX™[È™]Z[ˆ™XYX›H^ˆÜÜËÌ›ÝÈÝÛœÈÛ›HØÜ›Û[\˜XÝ[Û‹Ú]\XØ]HÚ[ÜYÙKÜ[™[Ù[ÛY]žH™[[Ý™Yˆ›È™]È[[YHÜ˜\\‹[Y\‹ØœÙ\™\ˆÜˆ]HÚ^™H]Ú‚‹H\ÝËÜ™\ÜÛœÚ]™K]Ú[™ÝËZ][K[ÝÛ™\‹XÛÛ™\™Ù[˜ÙK\ÝšœØÙY\È™]\™[Y[ÛÛ˜XÝËˆ™X[›ÙXÝ[Ûˆ[™^Ù™X]\™K[ØY\‹Ø[™K[Ù\Ë˜]]™HØÜ›ÛÚ^[Øš[HšY]ÜÜË[‹\XÙH™\Ú^™KXÝX[^\Ý[™È[™[ÜžH[˜[˜ÙH[™\œË]H™X]\™HÝ[\È[™ÛÜÙKÜ™[Ü[ˆ\™HÚXÚÙYžH™Ú]X‹ÜØÜš\ËÜ[‹\™\ÜÛœÚ]™KZ][KXœ›ÝÜÙ\‹\XK›ZœØˆH^\Ý[™ÈÚÚ[PH^\›˜[™XY[Û›H˜[œÜÜÐÑÝ\Ü\ÈÚ\™YÚ]Ý]Ú[™Ú[™ÈØ[YH[[YKˆZ\ÜÚ[™ÈÚ›ÛYH˜Z[ÈHX[™]ÜžHœ›ÝÜÙ\ˆÝZ]KˆÒH[™Uˆ\Þ[Y[[ˆ\ÈØ[YHÝZ]NÈ\ÞYYÚXÚÜÈ™\]Z\™H^XÝÒH[™X]Ú[™È›ÙXÝ[ÛˆX[šY™\Ý‚‹HYØXÞHÜš]XØ[URH\ÜÙ\[ÛœÈ›ÝÈ›Ü˜šYH™]\™YÚÚ[[X™[ÛÛ\™\ÜÚ[ÛˆÝX\™[™™\]Z\™HH›Ü›X[˜]]™HX™[[œÝXYˆ\È\]\ÈH\ÝÛÛ˜XÝÛ›NÈÚÚ[Ø[Y\^H[™RH[[YH\™H[ÝXÚYˆØ[YKÐØXÚH™[XZ[ˆMÌËÌŽÈXZ[ˆ[ÝXÚYˆ^XÝZXYÒK]ˆ[YÜ˜][Û‹^XÝTÒH\Þ[Y[[™\ÞYY™\ÜÛœÚ]™HXØÙ\[˜ÙH›ÝÈ\ÜÎÈ\ÚXØ[[™›ÚYXØÙ\[˜ÙH™[XZ[œÈÙ\\˜][H™XÛÜ™Y‚‹Hš[˜[ˆÍÌŽHXYLXØLÙ˜Ž˜ŽYŒ™LMLÙŽXÌÍŒL˜ÍMYXØÈ™\]Z\™YˆÒHÍŽÌŒMŒ˜È›ØˆLLMLMÎÕPÐÑTÔËˆˆY\™ÙHÛ˜\ÚÝYŒÙNX™ŒÌLÌLYŽM˜ÍM˜LŒLŒ˜ŒÌXLL™˜NXˆ][H\Y˜XÝLLMÌÍŽØˆ‹ÍˆšY]ÜÜËŒÚ[™\ÙHØÜ™Y[œÚÝÈ™]šY]ÙYˆ˜]šYØ][Ûˆ\Y˜XÝLLMÌNMˆ™YHšY]ÜÜÈÈÛÛ^›ÝÜÎÈ˜]]™H[™[ÜžHÝÚ\HÌŽÌŽ[™YØ[ÚÚ[ÝÚ\HMÎËÎÜ‚‹H›Ü›X[]ˆY\™ÙHNMY˜ÙXXÍ™Œ˜ÍYMMMÍÍÍŒLMŒ˜YLLØ™Y˜\È\™[È™NLÍXMNYŒØXMÌYMMØÍÙYÍLÎ™MY™Œ˜X[™š[˜[ˆXYÈ™YHL˜XŽLLMYÙXMLÌLYLÌ˜XMXŽŽYLYÎŒ˜\]X[ÈH™\šYšYYØ[™Y]Kˆ›ÈXZ[ˆÚ[™ÙK\™XÝ]ˆÜš]K™X˜\ÙK›Ü˜ÙH\ÚÜˆÚ]\Ú‚‹H]ˆÒH[ˆÍŽÌMŒÍX][\ˆÈ™\ÜÚ]ÜžHÚXÚÜÈLLŽMÎMÌŒ˜TÔËˆ][\IÜÈ^\Ý[™ÈZK\[™[Xœ›ÝÜÙ\‹[^[Ý]\ÝšœØÚ›ÛYHš^\™H^]YÚ]›È[\YÓH™Y›Ü™HÙ[ÛY]žH\ÜÙ\[ÛœÎÈH[˜Ú[™ÙY˜Z[YZ›Øˆ™]žH\ÜÙYˆ™\]Z\™YÚXÚÜÈ\ÜÎÈH\ÝÜšXØ[[›ÙHÝZ]H\È^ÛYYžH]ˆÒHÛXÞH[™ŒMÌËŒX\ÝÜšXØ[\ÜÙ\[ÛœÈ\™H›ÝÛZ[YY\È\ÜÚ[™Ë‚‹HUˆ^XÝ\Þ[Y[NMY˜ÙXXÍ™Œ˜ÍYMMMÍÍÍŒLMŒ˜YLLØ™Y˜È\Þ[Y[›ØˆLLÌLŒMNXÕPÐÑTÔÎÈš[˜[™[X\ÙK[X[šY™\Ý\Y˜XÝLLMÌÍLÍLMØ™XYÈ\ÞT™\Ý[”ÕPÐÑTÔØ\Þ[Y[ÚU™\šYšYYYX[™\ÈÛÛ[Z]ÒNÈ›Ü›X[™[X\ÙK[X[šY™\ÝÒH[™Ø[YKÐØXÚHMÌËÌ˜™XY˜XÚÈžHH\Þ[Y[Ø]Kˆ\ÞYY™\ÜÛœÚ]™H][H\Y˜XÝLLMÎMMÎX™\ÜÈ\ÜÙYYX[š\›Û›Y[™\ÞYYY]˜\È^XÝÒKÚ^›Ü›X[ÜÚÜšY]ÜÜÈ[™ŒÚ[™\ÙHØÜ™Y[œÚÝËˆ[[ˆØ\\™H˜[Z[Y\È™]šY]ÙYˆ˜XÚÜXÚË\]Z\Y[ØÛÛ\\š\ÛÛˆÝ™\ÜË™X[\]Z\Y[ØÛÛ\\š\ÛÛ‹Ý[Û‹ÛX]\šX[ØÚ\Ý[™›Ü›X[ÜÚÜÚÜˆXXÚšY]ÜÜ™\šYšY\È›Ý\ˆ˜XÚÜXÚÈ›ÛÝ\ˆÛÛ›ÛÈ[™Ú^^\Ý[™È[˜[˜Ù\ËˆÛ›H^\›˜[XØÛÝ[˜[œÜÜ\Ù\ÈH\ÝX›\ÚY™XY[Û›H\ÛÛ]YPHÙX[NÈ›È^Y\ˆÛÝYÜš]\Ë‚‹H™\]Z\™[Y[˜]Ú™[X\ÙKÜ™\]Z\™[Y[X˜]Ú\ËÌŒ‹LLLK\™\ÜÛœÚ]™K]Ú[™ÝËZ][K[ÝÛ™\‹XÛÛ™\™Ù[˜ÙKšœÛÛ˜\È›ÝÈËÍÈ‘T’Q’QQ›Üˆ\ÞYYœ›ÝÜÙ\ˆ™\Ù[][Û‹ˆ[™\È™[XZ[ˆZ[ÙØ[Y\^KXÛÜ™K™ŽÍÙ™YLK˜ÜÜØZ[Ø\\Ú[˜ÙNYMNKšœØZ[ÙØ[Y\^KXÛÜ™K\ÙXÛÛ™\žKŒMŒ˜YŽšœØÈ›Ý\ÜÙ]X[šY™\ÝÈX]ÚˆÜšYÚ[˜[˜\ÙHXÌØÙ™LÌÙLÙYLÌÙYÍ˜Ù™Œ™ÛÛ[X][Ûˆ˜\ÙHÍŒNYXLXLXÎLŒNY™ŽNÙLYŽÍ™N[™›Ü›X[XœÛÜœ[Ûˆ\ÝÜžH\™H™]Z[™Y[ˆH˜]Ú‚‹H˜]šYØ][ÛˆPHXYÛ›ÜÚ\Îˆ›Ü›X[Ý\\™[X\ÙH›ÝXÙH[\˜Ù\YH[™[ÜžHÝXÚˆ]ÈXÚÛ›ÝÛYÙHÛÛ›ÛØ\ÈÝ]ÚYHÍŒ0åÍ[™Y\ˆ˜]]™HØÜ›Û[™ËÛÝ™\™YžHH˜]]™H˜]šYØ][Ûˆ]ÎLðåÎÌÈ
+[ˆÍŽŽLÎNM˜\Y˜XÝLLMŒŽMØ˜Z[\™HØÜ™Y[œÚÝ
+Kˆ\È[››Ý[˜Ù[Y[Ù[ÛY]žH\ÈÝ]ÚYH\È][H\ÚËˆH^\Ý[™ÈPH›ÝÈÙ[XÝÈH^XÝ›Ü›X[ÛÜÙRÛYQ™X]\™J
+XXY\ˆ:/å9fçˆ[™\‹™\]Z\™\È˜]]™H[[Y[œ›ÛTÚ[]\Ù\ÈÑ[Ý\ÙT™\ÜÙYÛ[Ý\ÙT™[X\ÙY[™\ÜÙ\È[Ù[ÛÜÝ\™KˆHY[ˆÝ]\ËZ[]Ûˆ\È›ÝZ\ÝZÙ[ˆ›Üˆ:/å9fç‹ˆ›ÈÓHÛXÚË\YšXÚX[Y[™ËÙXZÙ[™Y][KÜØÜ›Û\ÜÙ\[ÛœÈÜˆØ[YH›ÝXÙKÝÝXÚÔÔÈY]Ëˆ˜Z[\™HØÜ™Y[œÚÝÈ\™H›ÝÈ\ØYYžHH^\Ý[™ÈÛÜšÙ›ÝË‚‹H\ÚXØ[ÌŒÈ[˜H™[XZ[œÈS‘S‘ÎˆYH[Øš[HÚ›ÛYHœ›ÝÜÙ\‹XÚ›ÛYKÚÙ^X›Ø\™ZYÚÚ[™Ù\Ë˜]]™HÝXÚ[™[™›ÚYÛ™Ë[]™YÔHÛÛ\ÜÚ][™ËÜZ[™Z]š[Ü‹ˆÚ^[][]YÚ^™\È[™XÝ[ÛœÈÚ›ÛYHKY\ØX›KYÜXÈ›Ý\ÝX›\Ú\ÚXØ[Y]šXÙHXØÙ\[˜ÙKˆ[ÈXØÙ\[˜ÙHÚXÚÜÈ™\Ù[][Û‹Ü™XXÚXš[]KÛ\™ÙHYØ[ÛÝ[ÎÈ[˜Ú[™ÙY™]Ø\™ØÛÛœÝ[\[ÛˆÙ][Y[\È›Ý™]ÛHÛZ[YY\È]™H^Y\‹XÛÝY™\šYšXØ][Û‹‚‚ˆÈÈŒ‹LLLH8 %›ÝÛH˜]šYØ][ÛˆÈÛYHØÜ›Û™\šYšYYÛˆ]‚‹HˆÍÌÈY\™ÙYÈ]ˆXÌŒÌÌÎYNØÙNL™NMÌMŒYYŒLŒÍLŒYM˜ÈXZ[ˆ[˜Ú[™ÙYˆÛÝ\˜ÙKØZ[Þ[˜È[™Ú]\ÜXÙHÚXÚÜÈTÔË‚‹H^XÝˆXYÎÌŒMYNŽŒLÌŒ™™ŽY™XÌ™ŒLŽŒÎM˜LØ˜ÒH[ˆÍŽŒLMŽØˆ[™\]Z\™YÚXÚÜÈTÔÎÈ[Øš[H˜]šYØ][Û‹ÚÛYH\Y˜XÝLLMÍÍÌÍ˜\ÜÙY[™YHšY]ÜÜÈ[™ÛÛ^›ÝÜË‚‹H]ˆÒKÙ\Þ[Y[[ˆÍŽŒNMÌ˜TÔÎÈXÝX[™[X\ÙK[X[šY™\ÝÒHX]Ú\È]‹ˆZYÚ]™HRHÛÛ^ÈÚ\™HØ›ÝÛS˜]˜È›˜]]™KX›ÝÛK[˜]‹[^Y\˜[ˆÙØ[YK[Ý™\›^K[^Y\˜ˆL‹påÌLKŒË›ÝÛHLÍ‹š]™HÛÛ[[œÈLKŒËXÛÛˆœ˜[Y\ÈËÍH
+ØÜ™Y[ˆ^[È]Ý\œ™[œ›ÝÜÙ\ˆØØ[JK‚‹HÛYHÛY[ZYÚÜØÜ›ÛZYÚLËÍLËØÜ›ÛÜÙØÝ[Y[ÝšY]ÜÜ™[XZ[ˆY\ˆØÜ›Û[™È[œ]È›Ü›X[ÚÚ[[™[Ý[ØÜ›ÛÈ
+[Øš[H˜]]™HÝXÚMÎËÎÎÈ\ÞYYRHLÍŠK‚‹H›Ý\ˆ™\]Z\™[Y[›ÝÜÈ‘T’Q’QQˆ[ÝÛ™\ˆÛ\ÜÚYšXØ][Û‹Y™XÞXÛKÙš^\™H[Z]][ÛœÈ[™ÛÛ\]Xš[]H™]\™[Y[ÛÛ™][ÛŽˆØÜËÜXKÌŒ‹LLLKX›ÝÛK[˜]‹ZÛYK\ØÜ›ÛXÛÛ™\™Ù[˜ÙK›Y‚‹H\È›ÛÝË]\\ÈØÝ[Y[][Û‹[Û›NÈ]ÈÝÛˆ]\ÝZXYÒH[™ÝXœÙ\]Y[\Þ[Y[]\Ý\ÜÈ™Y›Ü™Hš[˜[ÛÜÙ[Ý]‚‚ˆÈÈŒ‹LLLH8 %˜]šYØ][ÛˆÛÛ[X][ÛˆYØZ[œÝ]\Ý]‚‚‹HˆÍÌÈÛÛ[Y\ÈÚ]Ý]™X˜\ÙKÙ›Ü˜ÙH\ÚÈ]\Ý]ˆÙX™ŽÍLÙXŒ˜ÙXLŒNŽYÌNXMYŒLŽY˜\ÈY\™ÙY[ÈHØ[™Y]KˆÚ\™Y\Y˜XÝÈ\™H™YÙ[™\˜]Yœ›ÛH›ÝÛÝ\˜ÙHÚ[™Ù\Ë‚‹HÚÝÔYÙJ
+X[™ÝÚ]Ú[™Ù[Û•XŠ
+XØ[HÛÛ^›Ú™XÝÜˆÞ[˜Ú›Û›Ý\ÛNÈXž\ÜÈ™Yœ™\Ú
+
+XÙ\ÈHØ[YKˆÛÜ™H˜]“X\Ø[Y\^HX\šÑØ[Y\^S˜]‹[™ŒM[Y\‹ÛØœÙ\™\ˆ˜]šYØ][ÛˆÞ[˜Ú›Ûš^˜][Ûˆ\™H™]\™Yˆ^\Ý[™È]Y\Ý[Û›HÜ˜\\œËÛØœÙ\™\ˆ]™H›È˜]šYØ][Ûˆ™\ÜÛœÚXš[]K‚‹Hœ›ÝÜÙ\ˆPH\Ù\È›Ü›X[\ÛÝYÚ[˜]Y[™[ÜžH[™[ˆXÝX[HÝ™\™›ÝÚ[™ÈÚÚ[[™[›ÜˆHÚ[™ÛKYš[™Ù\ˆØÜ›Û\ÜÙ\[Û‹ˆš[˜[ÒKÙ\ÞYY[[YH]šY[˜ÙH™[XZ[œÈ[™[™ÎÈ›È‘T’Q’QQÛZ[K‚‚ˆÈÈŒ‹LLLH8 %›ÝÛH˜]šYØ][ÛˆÈÛYHØÜ›ÛÝÛ™\ˆÛÛ™\™Ù[˜ÙH
+Ø[™Y]JB‚‹H˜\ÙH]XÌØÙ™LÌÙLÙYLÌÙYÍ˜Ù™Œ™Èœ˜[˜Úš^Ø›ÝÛK[˜]‹ZÛYK\ØÜ›Û[ÝÛ™\‹XÛÛ™\™Ù[˜ÙKLŒŒLXˆ\È\ÈHÛÛ™\™Ù[˜ÙKÔ™\XÙ[Y[ÙˆH˜]šYØ][ÛˆÚ[[™ÛYHØÜ›ÛÙ[ÛY]žNÈXZ[˜™[XZ[œÈ[ÝXÚY‚‹HØ[›ÛšXØ[˜]šYØ][ÛˆÓKÛY™XÞXÛHÝÛ™\ŽˆœËÌ\ÝYÙK]ŒLK[˜]]™KX›ÝÛK[˜]‹\[[YKšœÎŽ‘›Ý\”Þ[X›ÛÐ›ÝÛS˜]˜ÈÛÛHÙ[ÛY]žHÝÛ™\ŽˆÜÜËÌ‹\ÝYÙK]ŒLK[˜]]™KX›ÝÛK[˜]‹˜ÜÜØ[ˆHL0åÌNLŒÝ™\›^KˆœËÍ‹]ŒMXÛÛX˜]Y[™Ù[Û‹Yš^\ËšœÎŽœÞ[˜ÐÛÛ^˜]šYØ][ÛŠ
+XÝÛœÈÛ›HÛÛ^Ù[XÝ[Ûˆ[™][\ËˆYØXÞHÛX\YÙS˜]˜[˜[ZXÈÝŒMQ[™Ù[Û“˜]˜ŒLÈZYÜ˜][Ûˆ[™ŒMÈ™\\™[[™È\™H™]\™Y\È\™HZ\ˆÙ[ÛY]žHÝ[\È[™HŒÌÕŒÌTŒˆÔÔÈØØ[[™ÈÙYÛY[ˆ›È™]È[\Ü˜\žHÜ˜\\ˆÜˆÙ[ÛY]žH]Ú\È[[™Y‚‹HÛYHØÜ›ÛÝÛ™\ˆ™[XZ[œÈÚÛYTYÙX›ÝÈš^YÝ™\™›ÝÈÚ]ÛÛ[Ù[ÛY]žHÛÛ\XÝY[ˆÜÜËÌ[XZ[‹˜ÜÜØ[™\XØ]H›ÝÛK[˜]ˆ™\Ù\™H™[[Ý™Yœ›ÛHÜÜËÌNK\ÝYÙK]M[XZ[‹XÚ]K[[Ù\˜]K[˜]]™K\ØØ[K˜ÜÜØˆœ›ÝÜÙ\ˆYX\Ý\™[Y[È[™š[˜[ÒKÙ\Þ[Y[™\šYšXØ][Ûˆ™[XZ[ˆ[™[™ÎÈ\È[žH\È›ÝH‘T’Q’QQÛZ[K‚ˆÈÈŒ‹LLLH8 %˜]HÚÚ[ÝXÚÈ›ÛÙ™X\Ý\™XÝ[Û»ï"STSQS•QØ[™Y]{ï"B‚‹HÝ\Yœ›ÛH]™H]ˆXÌØÙ™LÌÙLÙYLÌÙYÍ˜Ù™Œ™È[˜ÛÜœÜ˜]Y™\ÜÛœÚ]™K]Ú[™ÝÈ]ˆÍŒNYXLXLXÎLŒNY™ŽNÙLYŽÍ™NžHH›Ü›X[ÛÜšËXœ˜[˜ÚY\™ÙKˆ›ÈXZ[‹Ù]ˆ\™XÝÜš]K™X˜\ÙHÜˆ›Ü˜ÙH\Ú‚‹HÝXÚÝÛ™\ˆ™[XZ[œÈœËÌK\ÝYÙK]Ž]ÝXÚ[ØÚËšœØˆÛÛ\]YÙ\Ý\™\È\™HÙ^YYžHÚ[\ˆQ^\™HY\ˆL\ËÛÛœÝ[YHÛ˜ÙK[™™]\™HÛˆ™]ÈÚ[\‹ÛY™XÞXÛKÙ]XÚY\™Ù]ˆYØXÞH[Ý\ÙQ]™[[XšYÝZ]HÛX\œÈÛˆ™^ÝÛ‹ˆØ[˜Ù[X]™K][K]ÝXÚ[™Ù^X›Ø\™XÝ]˜][Ûˆ]™H^XÚ]™Z]š[ÜŽÈHLÔÔÈÛÜ\È[˜Ú[™ÙYˆH›ÙK[Û›H[˜›Ý[™YÝ\™\ÜÙY\™Ù]Ø\Ý\È™[[Ý™Y‚‹HX[X[XÛ\˜][ÛˆÝÛ™\ˆ\ÈœËÌ[XZ[‹šœÎŽœ™\\™PXÝ[ÛŠ
+X›Üˆ[™YH›Û\ËˆŒMHÝ\Ü\ÚÚ[ÈÜ˜\\ˆ\È™[[Ý™YÈ[›Û\ÈÚ\™HX\›™YÙ\]Z\YÔÔØ]]ËÜ\ÙHÚXÚÜËˆŒM\šYžH\™Ù]›Ú™XÝ[Ûˆ[œÈœ›ÛHH^\Ý[™È[HÙ[XÝ[ÛˆÛÚË›ÝH™\\™PXÝ[ÛˆÜ˜\\‹‚‹HŒMÈ™[XZ[œÈH˜\Ý\ˆÝÛ™\ŽÈŒMˆ[Z[™È[™š^Y\ÛÝÙ[ÛY]žH\™H[˜Ú[™ÙYˆ™]šY]ÙYMLÍ°åÌLML‹0åÌÈÚY]ÒKLMˆ™˜ŒXLÍLŒMX˜ŽMLLNNÙÍ™˜ŒÙY˜ÎXŒ˜˜Ž˜™MLM™˜ØÍÌÌØˆœ˜[Y\Èx $ÌˆØ\Ý\šYÚ]Ø\Ý\ŽÈø $ÍHšYÚY˜XÚ[™È›YÚÈœ˜[YHˆÝÛØ\™Y˜XÚ[™È›YÚÛÜœ™XÝYžHLYÜ™Y\ÎÈø $ÌLˆ\šYÚ[\XÝÙ\ÜÚ\][Ûˆ]\™Ù]ˆ^\Ý[™ÈLÍL\È[™œ˜[YKYZYÚ]\™H™]Z[™Yˆ[Ý[Û”\Ù\ØÝ\Y\ÈÛ™HŒMÈÙXˆ[š[X][ÛœÈ˜[œÙ›Ü›H˜XÚÎÈÔÔÈÝÛœÈÛ›Hœ˜[YKÛÜXÚ]H›Üˆ]]ˆÝ\ˆÚÚ[ÈÙY\Z\ˆ^\Ý[™È˜]™[[ÙKˆ\ÜÜØ[Ø[˜Ù[ÈH[Ý[Ûˆ˜XÚËˆ›È\ÜÙ]ÈÙ\™H[\™YÜˆ\š]™Y‚‹H\™Ù]YÙ\Ý\™K™YK\›ÛHXÛ\˜][Ûˆ[™Ø]\ˆ˜\Ý\ˆ™YÜ™\ÜÚ[ÛœÈ\ÜÈØØ[NÈÛÈ\ÝÜšXØ[Ø]\ˆ\ÝÈÙ\™H[YÛ™YÈH^\Ý[™ÈŒMÌË]HÝÛ™\ˆ
+›ÈØ[Y\^H]HÚ[™ÙJKˆZ[ØZ[˜ÚXÚÈ[™Y™ˆÚXÚÈ\ÜË‚‹H^\Ý[™ÈÒHœ›ÝÜÙ\ˆÝÛ™\œÈ›ÝÈ[˜ÛYH˜]]™HÑÝXÚ™XÛÝ™\žH[™[\›ÙXÝ[Ûˆ˜]HÚÚ[Ü\ÙKÝ\™Ù]Ú]›ÞÚXÚÜÈ\È›Ý\ÚYKÝ™YKXÛÛ[[ˆ\ÙY[[Ý[ÛˆØÜ™Y[œÚÝÈ[X™YY[ˆH^\Ý[™È”ÓÓˆ\Y˜XÝˆˆÍÌŽÒH[ˆÍŽMÎÌŒŒˆ]XYLNØLŒNMŽ™MYNXXMMMÌXÌÎMØÌ˜ŒL\ÜÙY˜]]™HÑÝXÚXÛ\˜][Û‹Ü™]\›‹Ù˜YËØØ[˜Ù[Ù^XÝ[Û˜ÙH\™Ù]Ý\Ü]›Þ[™ÝX\™ÚXÚÜËˆØÜ™Y[œÚÝ™]šY]È[ˆ™Z™XÝYH][K]\™Ù][š[X][Ûˆ]šY[˜ÙH™XØ]\ÙHHš^\™H™]\ÙYHŒMˆØ[YKXXÝÜ‹Û˜[YHØ]KˆHPHÝÛ™\ˆ›ÝÈ\ÜÜÙ\ÈXXÚ\ÛÛ]YØ\Ý[™ÚXÚÜÈ]È[™Ú[YØZ[œÝHÝ\œ™[Ø[›ÛšXØ[\™Ù]È™\XÙ[Y[XYM™LÙXÍÎ˜˜™ŒMLÌŒŒY˜XXMØÙŒXMŽLˆ\È[™\ˆœ™\ÚÒKˆš[˜[[YÜ˜][Û‹Ù\Þ[Y[]šY[˜ÙHÚ[™H™XÛÜ™YÛˆˆÍÌŽY\ˆ^XÝ][Û‹›Ý[™™\œ™Yœ›ÛH\ÈX\›Y\ˆÜ™Y[ˆ[‹ˆØØ[œ›ÝÜÙ\ˆÚXÚÜÈ™[XZ[ˆ[˜]˜Z[X›H
+›ÈÚ›ÛZ][JKˆ\ÚXØ[ÌŒÈ[˜H˜[Y][Ûˆ\È[™[™ÎÈ™XÛÜ™[™ÈÒKØØXÚH™[XZ[ˆ[šÛ›ÝÛ‹ˆÈ›ÝØ[HÛÛšX][™ÈØ]\Ù\ÈHÛÛHÛÛ\]H›ÛÝØ]\ÙHÜˆX\šÈ‘T’Q’QQ‚‹HÛ›ÝÛˆ[œ™[]Y˜\Ù[[™H\ÝÈ[ÛÈ˜Z[YØØ[NˆŒMH[™[ÜžHÜšYÛ˜\ÚÝ[™ŒMÈÚÚ[[X™[ÔÔÈÛ˜\ÚÝˆ^HÙ\™H›ÝÙXZÙ[™Yˆ^XÝˆÒKY\™ÙH[™\Þ[Y[]šY[˜ÙH]\Ý™H™XÛÜ™YÛ›HY\ˆXÝX[^XÝ][Û‹‚‚ˆÈÈŒ‹LKLŽH8 %YÈ™\Z\ˆÑÈÝÛ™\ˆÛÛ™\™Ù[˜ÙHØ]H9¬.9.az)£ùëá‚‹H9¥¬9h§¹¬.9.ayl":h!yidyí!ØÜËÐ•Q×Ô‘TRT—ÑÑÓÕÓ‘T—ÐÓÓ•‘T‘ÑSÑWÑÐUK›Y;ï&ù¢`9§"HYûï#Ùš^;ï#Ù˜Z[\™{ï#Ü™YÜ™\ÜÚ[Ûˆ:"!øà#9¦+ùd)¹mì¹/ë¹ioxà#yb)9k¦º`ïyoázh":`myk¢8à ‚‹H9l"9¨b:,¨:,«9.®¹cê¹¬n¹k¦¹å(¹dà{ï#ú`b¹¢,¹íd9§§;ï&ÓÝÛ™\¸à T]Ú8à UÜ˜\\¸à SY™XÞXÛxà PÔÔøà U\Ý8à z,áù¥¦y/¡¹®¤:"!ú""¹ké¹/g:` 9h-9å,y.èùä!¹/§yl"9¨b:+by¤æº,¨:,«9b)9¥­øà º"éyké¹/g9¥®yo#ù§ ú`(9¢$9i&ˆÝÛ™\¸à T]Ú9å¢¹b¨8à z,áù¥¦zhª:fª¹¢%¹.#ycëùí«z+mù§­¹©âûï#9.èùä!¹oázh"9..ùbåzf.ù«h¹.)¹¥.y£¨yk¢yaj9ké¹/g8à ‚‹HYÈ9âà9¡bùfî¹k¦¹c`9b!ˆPQÓ“ÔÑQ8¡¤ˆSTSQS•Q8¡¤ˆS•QÔUQ8¡¤ˆTÖQQ8¡¤ˆ‘T’Q’QQ;ï&ùcê¹§"H‘T’Q’QQ9¢cz ïyfç¹h,H’VQ;ï#Ô‘TÓÓ‘Q;ï#ùmì¹/ë¹ioxà ‚‹H9d#9. 9ãªyk­¹åáùâà9/ë¹oªyo£9.ãzaãyãï¹¦`»ï#9.#yo¥ùîo9î£9å¢¹l`:`ê]Ú;ï&ùë+9."y«(y¥¯yméybcyoázh"9fç¹§éybcyajy«(y/ë¹¬åy.)¹gíú(cÝXœÞ\Ý[HÛÛ™\™Ù[˜ÙH]Y]8à ‚‹H9«i:)£ùbaùmì¹£¦ùaiHQÑS•øà PÓUQxà PTÒUPÕT‘WÔ•STøà PUUÓ“ÓSÕT×Ô‘TRT—ÐÓÓ•PÕ:"!ÈÒS‘ÑWÔÐQ‘UWÔ‘TPÑSQS•ÐÓÓ•PÕ;ï#9o£9î£9¥¬9l#z*ly.#yo¥ùåiz`c¸à ‚‚ˆÈÈŒ‹LKLŽ8 %Ú[™ÙHØY™]HÈ™\XÙ[Y[ZYÜ˜][Ûˆ9¬.9.ayméyê"ù¢¢ºeç:)£ùbaÂ‚‹H9l"9¨b:,¨:,«9.®¹¦#¹è®º) y¬`»ï&¹§+9.®¹.#zg 9¡à¹ê"ùo#ù¢%º!êº(c9b)9¥­ú""ˆÔÔûï#ÑÓ{ï#ùaïyo#ûï#ÕÜ˜\\»ï#Õ\Ý9¦+ùd)º*l¹b*»ï&ùamº,«9.îù¦+ù¬n¹k¦º`b¹¢,¸à URxà yìîùílz"!ùãªy¬åz) z+¢¹¢$9.à:n¯9ª(øà ¹¢`9§"ze¢ùæo9.èùä!¹oázh"9..ùbåy¢où¤å9méyê"úhª:fª¹¢¢ºeç:"!ú""¹âb9§+:` 9h-9b)9¥­øà ‚‹H9¥¬9¬.9.ayidyí!;ï&˜ØÜËÐÒS‘ÑWÔÐQ‘UWÔ‘TPÑSQS•ÐÓÓ•PÕ›Y8à ¹.îù/ey¥¬9h§»ï#ù/ë¹¥.{ï#ù¦ïù£æûï#úaãy©âûï#ù/ëˆYÈ9bcz`ïyoázh"9ab9b!ºhgˆY]]™{ï#Ô™\XÙ[Y[;ï#ÐÛÛ™\™Ù[˜Ù{ï#Ô™[[Ý˜[8à ‚‹H8à#9¥.y¢$;ï#ù£æù¢$;ï#ù.#z) yc§ù§+9æ¡8à#zh$:*+z)¥¹à®ˆ™\XÙ[Y[;ï#9.#yo¥ù¢¢ˆÈ9å¢¹g*KÐˆ9."¹o£9å*\Ü^N››Û™X8à X[š[X][ÛŽ››Û™X8à XZ[\Ü[8à UÜ˜\\ˆ9¢%ˆ]H]Ú9häù/cú""¹ké¹/g9l,yk¨ùê,yk£9¢$8à ‚‹H9«ãù«(z+¢¹¦í9oázh"9. :-mùª¨¹§éHÝÛ™\¸à PÛÛ˜XÝ8à SY™XÞXÛxà TÙ[X[XÈÝ]xà T™YÜ™\ÜÚ[Ûˆ\Ý;ï&ú"éz""¹ké¹/g9.ãy¢où¤å9am¹.åº,«9.îûï#9ab:`mùéîú,«9.îùa£z` 9h-8à ‚‹H9.èùä!¹æo9ãïºfæHÝÛ™\¸à yi&¹.ïyç'ùæî8à yâà9¡bú*§¹¡#ù­íùå*8à SY™XÞXÛH9ï.¹cèøà z""ˆ\Ý9/çz+mùcå¹­¢:(c9à®¹¢%¹. 9.®¹g&:f¢¹í«z+mù¢$9§+:hª:fª¹¦`»ï#9oázh"9g*9¥¯yméybcy..ùbåy£ä:a¤¹.)¹íi¹aî¹«hùn.9méyê"úh!¹n£ûï#9.#yo¥ùëbHYÈ9æo9å'ùo£9¢cz)èúaâøà ‚‹H9k£9¢$9k¦¹ïªyc!yd*ú""¹âb9§+:` 9h-;ï&¹¥¬9âb: ïz`bù/g9§+:.ªù.#yëby¥¯9k£9¢$8à ¹«i:)£ùbaùmì¹£¦ùaiHQÑS•øà PÓUQxà PTÒUPÕT‘WÔ•STÈ:"!ÈUUÓ“ÓSÕT×Ô‘TRT—ÐÓÓ•PÕ;ï#9o£9î£9¥¬9l#z*ly.#zg 9/oùå*: !zaãz,¯9aj9¥¡øà ‚‚ˆÈÈŒ‹LKLÈ8 %Ø[YKZXYØ[›ÛšXØ[™XÛÝ™\žH˜[œØXÝ[Ûˆ
+Ø[™Y]NÈ\ÙHÍˆ‘T’Q’QQ
+B‚‹H[\›˜[[˜Ý[ÛœËÜÜ˜ËØØ[›ÛšXØ[XÝ\œ™[\™XÛÝ™\žKšœÎŽœ™\ÝÜ™PÝ\œ™[
+
+X™\Z\œÈÛ›HHÝ\œ™[š\œÝXÚ\˜XÝ\ˆÙ\™\‹XÜ™X]Y™]š\Ú[Ûˆœ›ÛH]ÈÛÛ\]HÙX[Y\˜Ú]™Kˆ]™\]Z\™\È[ˆXÝ]™HRQÙ\ÜÚ[Û‹^XÝ[™[ÜH™]š\Ú[Ûˆ[™HX]Ú[™Ë[™^\™YÙ\™\‹[Û›HÜ\˜]Üˆ\›Ý˜[ˆ[ˆÛ™Hš\™\ÝÜ™H˜[œØXÝ[Ûˆ]™Y\Ù\È[™^XÝYÛÝ\˜ÙHØÝ[Y[Ë™XÜ™X]\ÈZ\ÜÚ[™ÈÛÝ\˜Ù\ËY˜[˜Ù\ÈHÛÛ\]HÛZ[HÙ][™XØÛÝ[ÈH™]È™]š\Ú[Û‹Ü™X]\È[ˆ[œX›\ÚYÛ˜\ÚÝ[™\˜Ú]™KÛÛœÝ[Y\È\›Ý˜[[™Üš]\ÈÜ\˜][Û‹Ø]Y]™XÙZ\ËˆÜšYÚ[˜[ÛZ[H[™Ü\˜][Ûˆ\ÝÜžH\È™]Z[™YÈ™\^H™\ÛÛ™\È]È™XÙZ\‚‹H›ÈX›XÈ™XÛÝ™\žHØ[X›K\›Ý˜[\ÜÝX[˜ÙH[™Ú[^XX›HÚ[\ˆÜˆÛ\™]š\Ú[Ûˆ›Û˜XÚÈ\È[˜X›Yˆ[ˆÜ\˜]Üˆ\›Ý˜[]\Ý™HÜ™X]YžHHÙ\\˜][H]]Üš^™YÙ\™\ˆ›ØÙ\ÜÎÈH[Ù[HØ[››Ý™\ÝÜ™HÚ]Ý]]ˆØ[YKY]X˜\ÙH\˜Ú]™\ÈÈ›Ý›Ý™H[™\[™[˜XÚÝ\Üˆ\Ø\Ý\ˆ™XÛÝ™\žKˆ\ÙH™[XZ[œÈÍˆ‘T’Q’QQÈ‹ÒH[™^XÝ\Þ[Y[]šY[˜ÙH\™H[™[™Ë‚‚ˆÈÈŒ‹LKLÈ8 %]ÛZXÈ›ÝXÝYZ[HÚXÚËZ[ˆÙ][Y[
+Ø[™Y]NÈ\ÙHÍˆ‘T’Q’QQ
+B‚‹H[˜Ý[ÛœËÚ[™^šœÎŽ˜ÛZ[QZ[PÚXÚÚ[˜™\šYšY\Èš\™X˜\ÙHY[]H[™HXÝ]™HØ[YHÙ\ÜÚ[Û‹ˆ]È™\]Y\ÝXØÙ\ÈÛ›HRQÙ\ÜÚ[Ûˆ[™^XÝYÙ\™\ˆ™]š\Ú[Û‹ˆH˜XÚÙ[™œ™Y^™\ÈHZ\ZHØ[[™\ˆ^K\š]™\ÈH^\Ý[™ÈLYÛÛÚXÚËZ[ˆÜ˜[[™]\›Z[š\ÝXÈÜ\˜][ÛˆQ[ˆ[˜Ý[ÛœËÜÜ˜ËØØ[›ÛšXØ[\™\ÛÝ\˜ÙKXÜ™Y]šœÎŽ˜ÛZ[QZ[PÚXÚÚ[Š
+XÛÛ[Z]ÈHÜ˜[™XÙZ\[š\]YHÛZ[KÛZ[H™XÛÜ™ØÚXÚÜÚ[YÙ\‹Ø[›ÛšXØ[XÛÛ›Û^KÜÛÝ\˜ÙH™]š\Ú[ÛœÈ[™[œX›\ÚYÛ˜\ÚÝ[ˆÛ™Hš\™\ÝÜ™H˜[œØXÝ[Û‹ˆH˜Z[Y˜[œØXÝ[ÛˆX]™\È›Û™HÙˆÜÙHÜš]\ÎÈHÜÝ™\ÜÛœÙH™]šY\ÈHØ[YH™XÙZ\Ú]Ý]^Z[™ÈÚXÙKˆHX\›Y\ˆ[\›˜[Z[KXÚXÚÚ[‹YÜ˜[šœÎŽš\ÜÝYJ
+X™[XZ[œÈHÙ\™\‹[Û›H™\Ù\˜][Ûˆ[\ˆ[™\È›Ý™\]Z\™YžH\È]ÛZXÈ]‚‹H[˜Ý[ÛœËÜÜ˜ËÜÙ\ÜÚ[Û‹X]]Üš]KšœÎŽœ[”›ÝXÝY
+
+X™[XZ[œÈHÙ\ÜÚ[ÛˆØ]Kˆ›ÈÛY[[[Ý[ØØ[ÚXÚËZ[ˆ›YË˜]H™\Ý[ÜˆÚ\˜XÝ\ˆÛ˜\ÚÝ™XÛÛY\È]]Üš]]]™Kˆ›Èœ›ÝÜÙ\‹ÕRHÛÚËØ[Y\^HØ]™HÜ˜\\‹X›\ÚYÚ[\‹YØXÞHYÜ[ÛˆÜˆÙXÛÛ™Y]šXÙH™\ÝÜ™H\ÈYYˆH\Þ[Y[[ÝÛ\Ý[˜ÛY\È\ÈØ[X›HÛ›HY\ˆˆÚXÚÜËˆÚ[ÝÚ[ˆ]Y\ÝÈ™[XZ[ˆ›ØÚÙYÛˆ\ÝÛÜH˜]H]™[Ë‚‹H‹Y\™ÙYPQÒH[™š\™X˜\ÙH\Þ[Y[]šY[˜ÙH]\Ý™HÚXÚÙYÙ\\˜][Kˆ\ÙH™[XZ[œÈ
+ŠŒÍˆ‘T’Q’QQ
+Š‹‚‚ˆÈÈŒ‹LKLÈ8 %Ù\™\‹[ÝÛ™YZ[HÚXÚËZ[ˆÜ˜[ÛÝ\˜ÙH
+Ø[™Y]NÈ\ÙHÍˆ‘T’Q’QQ
+B‚‹H[\›˜[ÝÛ™\ˆ[˜Ý[ÛœËÜÜ˜ËÙZ[KXÚXÚÚ[‹YÜ˜[šœÎŽš\ÜÝYJ
+X\š]™\ÈHÚXÚÚ[˜]Y\Ý	ÜÈ^\Ý[™ÈLÛÛ]Ø\™[™Z\ZHØ[[™\ˆ^Hœ›ÛHHÙ\™\ˆÛØÚËˆH›ÝXÝY˜[œØXÝ[ÛˆÜ™X]\ÈÛ™HRQ\ØÛÜY[™[™ÑÜ˜[ËÙZ[KXÚXÚÚ[‹VVVVSSQ™XÛÜ™Üˆ˜[Y]\ÈHØ[YH™XÛÜ™Ûˆ™]žKˆH˜[œØXÝ[Ûˆ™]žHÙY\È]ÈÜšYÚ[˜[^NÈHÛÜœ\\XØ]H˜Z[ÈÛÜÙYˆ›Èœ›ÝÜÙ\ˆ^K™]Ø\™[[Ý[˜]H™\Ý[ÜˆØØ[]Y\ÝÛÝ[\ˆ\ÈXØÙ\Y‚‹HH^\Ý[™È™\Ù\™U\ÝYÜ˜[
+
+X[™Ø[›ÛšXØ[\™\ÛÝ\˜ÙKXÜ™Y]šœÎŽ˜Ü™Y]™\Ù\™YÜ˜[
+
+X™[XZ[ˆHÛ›H™\Ù\˜][Ûˆ[™Ø[›ÛšXØ[Ù][Y[ÝÛ™\œÎÈH[][]Üˆ^\˜Ú\Ù\ÈH™]ÈÜ˜[›ÝYÚ›ÝÝ\ËÛZ[H™XÛÜ™[™[œX›\ÚYÛ˜\ÚÝˆ\È\ÜÝY\ˆ\È›ÈØ[X›HÜˆØ[Y\^HÛÚË[™\È›ÝH^Y\‹]š\ÚX›HÛÝY™]Ø\™ˆÚ[ÝÚ[ˆ]Y\Ý™]Ø\™ÈÝ[XÚÈH\ÝY˜]HÛÝ\˜ÙKˆ›ÈØ]™HÜ˜\\ˆÜˆ[\Ü˜\žH]Ú\ÈYY‚‹H‹ÒKY\™ÙYRPQ[™\Þ[Y[]šY[˜ÙH]\Ý™H™XÛÜ™YÙ\\˜][HY\ˆ™\šYšXØ][Û‹ˆH^XX›HÚ[\ˆÝ^\È\ØX›YÈ\ÙH™[XZ[œÈ
+ŠŒÍˆ‘T’Q’QQ
+Š‹‚‚ˆÈÈŒ‹LKLÈ8 %Ø[›ÛšXØ[Û™K[]™[V[ØØ][Ûˆ
+Ø[™Y]NÈ\ÙHÍˆ‘T’Q’QQ
+B‚‹H™]È[\›˜[ÝÛ™\ˆ[˜Ý[ÛœËÜÜ˜ËØØ[›ÛšXØ[Y^X[ØØ][Û‹šœÎŽ˜[ØØ]TÚ\™Y^
+
+XÜ[™ÈÛ›HHÙ\™\‹[ÝÛ™YÚ\™YVÛÛ›ÜˆHš\œÝÙ\™\‹XÜ™X]YÚ\˜XÝ\‹ˆÛ™H›ÝXÝYÜ\˜][Ûˆ^\È^XÝHÛ™H™^]™[\Ú[™ÈHÝ\œ™[Ø[YIÜÈÛÜÝ[™Ü›ÝÝ[\Ëˆ]ÛÛ[Z]ÈÚ\˜XÝ\‹ÙXÛÛ›Û^KÜÛÝ\˜ÙH™]š\Ú[ÛœË[ˆ[œX›\ÚYÛ˜\ÚÝHRQ\ØÛÜYÜ\˜][Ûˆ™XÙZ\[™HYÙ\ˆ[žH]ÛZXØ[NÈ™]šY\È™]\›ˆ]™XÙZ\‚‹HH[Ù[H\È›ÈØ[X›H^Üœ›ÝÜÙ\ˆÛÜÝÜÝ]È[œ]ØØ[Ø]™QØ[YJ
+XÛÚË[™[ÜžH[™[™ÈÜˆYØXÞHYÜ[Û‹ˆ]Ø[››ÝX›\ÚH^XX›HÛ˜\ÚÝ[™Ù\È›Ý\ÝX›\ÚH˜XÚÝ\Üˆ™\ÝÜ˜][ÛˆÚ[ˆ\ÙH™[XZ[œÈ
+ŠŒÍˆ‘T’Q’QQ
+ŠŽÈ‹ÐÒKÙ\Þ[Y[]šY[˜ÙH\È[™[™Ë‚‚ˆÈÈŒ‹LKLÈ8 %\ÝYVÛÛÙ][Y[
+Ø[™Y]NÈ\ÙHÍˆ‘T’Q’QQ
+B‚‹H[\›˜[™\ÛÝ\˜ÙHÙ][Y[ÝÛ™\ˆ\È[˜Ý[ÛœËÜÜ˜ËØØ[›ÛšXØ[\™\ÛÝ\˜ÙKXÜ™Y]šœÎŽ˜Ü™Y]™\Ù\™YÜ˜[
+
+X]›Û™Yœ›ÛHHš[ÜˆÛÛ[Û›HÝÛ™\‹ˆ]Ü™Y]ÈÛ›HH˜XÚÙ[™Z\ÜÝYYÛÛÜˆVÜ˜[[™XYH™\Ù\™Y[™\ˆHXÝ]™HRQÙ\ÜÚ[Ûˆ[™^XÝY™]š\Ú[ÛŽÈV[\œÈXÛÛ›Û^KœÚ\™Y^[™Ù\È›Ý]™[HÚ\˜XÝ\‹ˆ[˜Ý[ÛœËÜÜ˜ËÝ\ÝYYÜ˜[[YÙ\‹šœÎŽœ™\Ù\™J
+X™[XZ[œÈHÚ[™ÛHX›XÈ[][Y[™\Ù\˜][ÛˆÝÛ™\‹ˆHœ›ÝÜÙ\ˆØ[››ÝÝX›Z]Ú[™Üˆ[[Ý[‚‹HHÜ\˜][ÛˆÛÛ[Z]ÈH™]È[œX›\ÚYÛÝ\˜ÙHÛ˜\ÚÝ[š\]YHÛZ[KYÙ\‹™XÙZ\[™[™[ÜH™]š\Ú[ÛˆÙÙ]\‹ˆ›ÈØ[X›HÙ][Y[[™Ú[˜]K\™]Ø\™]]Üš]KØØ[Ø]™QØ[YJ
+XÚ[™ÙK^XX›HÚ[\ˆÜˆYØXÞHYZ\ÜÚ[Ûˆ\ÈYYˆ]]Üš]]]™TÝ]T™XYN™˜[ÙX™XYQ›Ü”X›XØ][ÛŽ™˜[ÙXÈ\ÙH™[XZ[œÈ
+ŠŒÍˆ‘T’Q’QQ
+Š‹ˆ™\šYšXØ][Ûˆ[™\Þ[Y[]šY[˜ÙH™[Û™ÈÛ›HY\ˆÛÛ\]YÚXÚÜË‚‚ˆÈÈŒ‹LKLˆ8 %š\œÝ\ÝYÛÛÜ™Y]˜[œØXÝ[Ûˆ
+Y\™ÙYÈ\ÞYYÈ\ÙHÍˆ‘T’Q’QQ
+B‚‹HˆÍŒHÝ\Yœ›ÛH]XÌMÍXÍ™LX™ŒNYXMÍÍŽMŒXØMÍÎ˜š[˜[XYŒŽM˜Ù™ŒÌÙYNLXŒYL™Y˜MXLL™LY\™ÙYÈ]YYMÍXXÍ™ŒÌŒŒŒXXŽMY˜ÍÎXÙ™Y˜ÎØXÈXZ[˜[˜Ú[™ÙYˆˆ™\ÜÚ]ÜžHÚXÚÜÈÍŒLMŽÍLØ[™Ù\ÜÚ[Ûˆ]]Üš]HÍŒLMŽMMÝXØÙYYYˆY\™ÙY™\ÜÚ]ÜžHÚXÚÜËÑUˆ^XÝTÒH™]šY]ÈÍŒLMÌÌŒÌŒX[™Ù\ÜÚ[Ûˆ]]Üš]H[][]Ü‹Ñš\™X˜\ÙH\Þ[Y[ÍŒLMÌÌŒMÌ˜ÝXØÙYYY‚‹H[\›˜[ÝÛ™\ˆ[˜Ý[ÛœËÜÜ˜ËØØ[›ÛšXØ[YÛÛXÜ™Y]šœÎŽ˜Ü™Y]™\Ù\™YÜ˜[
+
+X\Ù\ÈH^\Ý[™È›ÝXÝYÙ\ÜÚ[Ûˆ˜[œØXÝ[ÛˆÈ™\šYžHHÙ\™\‹Z\ÜÝYY™\Ù\™YÛÛÜ˜[[™š[Üˆš\œÝXÚ\˜XÝ\ˆÛÝ\˜ÙHÛ˜\ÚÝ[ˆ]ÛZXØ[H\]\ÈXÛÛ›Û^K[ÛÝ\˜ÙH™]š\Ú[ÛœËH™]È[œ™XYHÛ˜\ÚÝ[š\]YHÛZ[KYÙ\‹™XÙZ\[™[™[ÜKˆ]™Z™XÝÈÝ[H™]š\Ú[Û‹Z\ÜÚ[™ËØÛÜœ\ÛÝ\˜Ù\Ë\XØ]HÛZ[\È[™›Û‹Z[š]X[Ú\˜XÝ\ˆÝ]Kˆ^\Ý[™È™\Ù\™U\ÝYÜ˜[
+
+X™]\›œÈHÜ™Y]Y™XÙZ\ÛˆHÜÝ\™\ÜÛœÙH™]žHÛ›HYˆÛZ[H[™YÙ\ˆÝ[YÜ™YKˆHš\™\ÝÜ™H[][]Üˆ™\šYšYY›Û˜XÚËÜ™Y][™›Ý™]šY\Ëˆ›ÈØ[X›H^ÜÜˆœ›ÝÜÙ\ˆ[[Ý[Ø˜[[˜ÙH[œ]Ø\ÈYY‚‹HØ[›ÛšXØ[Û˜\ÚÝÒKLMˆ›ÝÈÜ™\œÈX\Ù^\È]\›Z[š\ÝXØ[H™Y›Ü™H\Ú[™È™XØ]\ÙHš\™\ÝÜ™HX^H™]\›ˆX\šY[È[ˆ[›Ý\ˆÜ™\ŽÈHÝÜ™Y”ÓÓˆÚ^™HÚXÚÈ™[XZ[œÈ[™\[™[ˆ]]Üš]]]™TÝ]T™XYN™˜[ÙX[™™XYQ›Ü”X›XØ][ÛŽ™˜[ÙX™[XZ[‹ˆHÛ›H]™H\ÞYY[˜Ý[ÛœÈ\™HH™KY^\Ý[™È[™Ú[[ÝÛ\ÝÈ\È[\›˜[˜[œØXÝ[Ûˆ\È›ÝH^Y\ˆÜ˜[]‚‹H\Þ[Y[™XY
+Y˜][
+Xš\™\ÝÜ™H\ÚXKYX\ÝX[™ÒS•ÒS—ÕSQWÔ‘PÓÕ‘T–WÑSP“QÈØÚY[Y˜XÚÝ\ÈÙ\™HS•‘T’Q’QQÈH\ÞHY[]Kˆš\œÝÛÛ\]Y˜XÚÝ\™\ÝÜ™H™ZX\œØ[[]]][ÛˆÛÝ™\˜YÙKYØXÞHYZ\ÜÚ[Ûˆ[™ÙXÛÛ™Y]šXÙH^XX›H™XÛÝ™\žH™[XZ[ˆ[™\šYšYYˆ\ÙH™[XZ[œÈ
+ŠŒÍˆ‘T’Q’QQ
+Š‹‚‚ˆÈÈŒ‹LKLˆ8 %›Ý[™][Ûˆˆ[š]X[ÛÝ\˜ÙH[™š\™\ÝÜ™H˜[œØXÝ[Ûˆ
+Y\™ÙYÈ\ÞYYÈ\ÙHÍˆ‘T’Q’QQ
+B‚‹HˆÍŒÈœ›ÛH]ÎXØ™ŒŽX˜™MÙÌŒÙÍXÌŽYXMŽYŽLÍÌL˜XXÛÝ\˜ÙHXŒXŒ˜ÍŒLXÎLLYMMŒ™Y˜X™MÙXLÌ˜LŒYY\™ÙYÈ]ÙYLÎXLÎY˜ŒÙMNXÌŒØÌLÌÍNY™ŒXMÈXZ[˜[˜Ú[™ÙYˆˆ™\ÜÚ]ÜžHÚXÚÜÈÍŒMÌX[™Ù\ÜÚ[Ûˆ]]Üš]HÍŒMÌŽÝXØÙYYYˆY\™ÙY™\ÜÚ]ÜžHÚXÚÜËÑUˆ™]šY]ÈÍŒNMŒMØÝXØÙYYYÚ]\ÞYYÒH™\šYšYYÈY\™ÙYÙ\ÜÚ[Ûˆ]]Üš]H[][]Ü‹Ñš\™X˜\ÙH\ÞHÍŒNMNLL˜ÝXØÙYYYœ›ÛH]Ø[YHÒK‚‹H[\›˜[ÝÛ™\ˆ[˜Ý[ÛœËÜÜ˜ËÚ[š]X[XÚ\˜XÝ\‹\ÛÝ\˜Ù\ËšœÎŽ›XZÙR[š]X[Ú\˜XÝ\”ÛÝ\˜Ù\Ê
+XÜ™X]\ÈÛÛ\]H™]ËXXØÛÝ[ÛÝ\˜Ù\Èœ›ÛH˜[Y]Y˜[YK[[Y[Ù[™\ˆ[™^XÝH[ˆ\ÜÚYÛ™Y]šX]HÚ[Ëˆ[˜Ý[ÛœËÜÜ˜ËØØ[›ÛšXØ[\ÛÝ\˜ÙK]Üš]\‹šœÎŽ˜ÛÛ[Z][š]X[ÛÝ\˜Ù\Ê
+X\ÈÝ[[\›˜[[™[œÈ[™\ˆÙ\ÜÚ[Û‹X]]Üš]KšœÎŽœ[”›ÝXÝY
+
+XÈHÜ\˜][Ûˆ™XÙZ\š[™ÈHÚÚXÙ\Ëˆ›ÈØ[X›KØØ[Ü™X]PÚ\˜XÝ\Š
+XÜˆØ]™QØ[YJ
+XÛÚË^XX›HÚ[\‹YØXÞHYÜ[ÛˆÜˆÜ˜[Ø\ÈYYˆ™XYQ›Ü”X›XØ][ÛŽ™˜[ÙX[™]]Üš]]]™TÝ]T™XYN™˜[ÙX™[XZ[ˆX[™]ÜžK‚‹H^\Ý[™ÈÙ\ÜÚ[Ûˆ]]Üš]HÛÜšÙ›ÝÈ›ÝÈ^\˜Ú\Ù\ÈH[\›˜[Üš]\ˆÚ]XÝX[š\™\ÝÜ™H[][]Üˆ˜[œØXÝ[ÛœÎˆÝ[H™]š\Ú[Û‹›Ü˜ÙY™XÛÛ[Z]›Û˜XÚË]ÛZXÈš\œÝÜš]KY[XØ[™\^K[\™Y™\^H[™ZYÜ˜][Û‹XØ[™Y]HÛÛ™›XÝˆ\È\È™\šYšYYÙ\™\ˆ˜[œØXÝ[Ûˆ™Z]š[Ü‹›ÝH]™H^Y\ˆÚ\˜XÝ\ˆÜš]Kˆ›ÈÜ˜\\ˆÜˆ[\Ü˜\žH[[YH]ÚØ\ÈYY‚‹H\Þ[Y[™XY
+Y˜][
+Xš\™\ÝÜ™H™YÚ[Ûˆ\ÚXKYX\ÝX[™ÒS•ÒS—ÕSQWÔ‘PÓÕ‘T–WÑSP“QÈØÚY[Y˜XÚÝ\È™[XZ[™YS•‘T’Q’QQÈH\ÞHY[]Kˆ›ÈÛÛ\]Y˜XÚÝ\Øš™XÝ™\ÝÜ™H™ZX\œØ[ÜˆØ[YK[]™[™XÛÝ™\žHÚ[Ø\È™\šYšYYˆ\ÙH™[XZ[œÈ
+ŠŒÍˆ‘T’Q’QQ
+Š‹ˆ™^˜XÝXØ[Ø]Nˆ˜XÚÙ[™[ÝÛ™YÛ™ÛÚ[™ÈÚ\˜XÝ\‹ÙXÛÛ›Û^KØÛZ[H]]][ÛœÈ[™™XÛÝ™\žH™XY[™\ÜÈ™Y›Ü™H[žHX›XØ][ÛˆÜˆÙXÛÛ™\Û™HÚ\˜XÝ\ˆ™\ÝÜ™K‚‚ˆÈÈŒ‹LKLH8 %ÛÝY\ÙH\ÝÜšXØ[\™]Ø\™›ÛÙˆØ]H
+Y\™ÙYÈ\ÞYYÈÍˆ‘T’Q’QQ
+B‚‹H]\Ý™\šYšYY[YÜ˜][Ûˆ˜\ÙH[™Ý\œ™[]˜ˆÌÌÎYYLLÎØÌÌMÎYL™ØLXLXŒ˜ØŽNL™ŽˆXZ[˜Ø\È›Ý[ÙYšYYˆˆÍMÌˆ
+™XY[Û›HØ[™Y]HØÜ™Y[š[™ÊKˆÍMÌÈ
+ÜšYÚ[˜[Y]šXÙH[[]]X›HØØ[˜XÚÝ\
+H[™ˆÍMÍ
+\È™]Ø\™XÛZ[HØ]JH\™H[Y\™ÙY[È]˜‚‹HˆÍMÍˆ™X]\™KØÛÝY\\ÙM\™]Ø\™\›ÛÙ‹YØ]KLŒŒLX8¡¤ˆ]˜ÈˆXYLNYLLXÍØŽXÙMÙLŒÌ™LYL™Y˜Œ˜ÎXÈY\™ÙHÒHÌÌÎYYLLÎØÌÌMÎYL™ØLXLXŒ˜ØŽNL™Žˆ]\ÜÙYˆÒHÍŒMMLŒŒÌM[™Ù\ÜÚ[Ûˆ]]Üš]HÍŒMMLŒŒLØˆHY\™ÙY]˜ÚXÚÜÈ[ÛÈ\ÜÙYˆÒHÍŒMMMÌMŽX
+™\ÜÚ]ÜžHÚXÚÜËUˆ^XÝXÛÛ[Z]\Þ[Y[[™\ÞYY]™HPJH[™Ù\ÜÚ[Ûˆ]]Üš]HÍŒMMMÌÍŽL˜
+[][]Ü‹ØXØÛÝ[X›ÛÝØ]\È[™š\™X˜\ÙH\Þ[Y[
+K‚‹H™]ÈÝÛ™\ˆ[˜Ý[ÛœËÜÜ˜ËÛYØXÞK\™]Ø\™XÛZ[KX]Y]šœØ\ÈH\™H˜Z[XÛÜÙY]Y]Ý™\ˆ\ÝÜšXØ[XZ[‹\Ø]™HÛZ[H™XÛÜ™ÎˆZ[H]Y\ÝËÛÛ[Z\ÜÚ[ÛœËXÚY]™[Y[ËÝÙ\ˆ›ÛÜœÈ[™Xž\ÜÈÚ\ÝÙš\œÝXÛX\ˆÛZ[\Ëˆ]ÈÛ›H\›Z\ÜÚX›H[\œ™]][Ûˆ\È›ØÚ×Ú\ÝÜšXØ[ØÛZ[\×ÛÛ›Xˆ[ˆ\ÝÜšXØ[ÛY[\ÚYHÛZ[HX^H]\ˆ™]™[H\XØ]HÛZ[K]Ø[››ÝÜ™X]HHÜ˜[[][Y[Ú[™ÙHÛÛÑVÚ[™[ÜžKÜˆ\ÝX›\Ú]]Üš]]]™HÚ\˜XÝ\ˆÝ]K‚‹H[˜Ý[ÛœËÜÜ˜ËÛYØXÞKXØ[™Y]K\ØÜ™Y[š[™ËšœÎŽœØÜ™Y[“YØXÞPØ[™Y]TÛ˜\ÚÝ
+
+X[˜ÛY\ÈH]Y][ˆH^\Ý[™È™XY[Û›H›ÝXÝY™Y›YÚˆ]™]\›œÈÛÝ\˜ÙK\ÜXÚYšXÈ
+—ÐÓRSWÔ‘PÓÔ‘ÒS•SQ›ØÚÙ\œÈ›ÜˆZ\ÜÚ[™ËX[›Ü›YYÜˆÛÛ˜YXÝÜžH™XÛÜ™ÎÈ]™[XZ[œÈ™XYQ›ÜXØÙ\[˜ÙN™˜[ÙX[™Ý[™\]Z\™\ÈÒQPÐT—ÐPÒÕTÓRTÔÒS‘ØˆHØ[X›HÜš]\È›ÈZYÜ˜][ÛˆX\šÙ\‹YÙ\‹Ú\˜XÝ\‹XÛÛ›Û^HÜˆ™\ÝÜ™HÝ]K‚‹H\ÝÈYYˆ\ÝËØÛÝY\Ø]™K[YØXÞK\™]Ø\™XÛZ[KX]Y]\Ý›ZœØ[™\]Y\ÝËØÛÝY\Ø]™K[YØXÞK\ØÜ™Y[š[™Ë\Ý›ZœØˆØØ[›ÙHK]\Ý\ÝËØÛÝY\Ø]™KJ‹\Ý›ZœØ\ÜÙY‹Íˆ[™Ú]Y™ˆKXÚXÚØ\ÜÙY™Y›Ü™HŽÈHÒH[][]Üˆ[ÛÈ\ÜÙY\ÝËØÛÝY\Ø]™KJ‹\Ý›ZœÈ\ÝËÙš\™X˜\ÙK]\ÝYXÛÝY\Ø]™KX˜XÚÙ[™\Ý›ZœØ‚‹HÜšYÚ[˜[Y]šXÙH™\Ù\˜][Ûˆ™[XZ[œÈØØ[[Û›H›ÝYÚ›Ý\”Þ[X›ÛÐXØÛÝ[Ø]™K˜Ü™X]SZYÜ˜][Û˜XÚÝ\
+ZY
+Xˆ^XÝRQXZ[‹\Ø]™Hž]\ËY]Y]H[™™YÚ\Ý\™YÚYXØ\œÈ\™H™\Ù\™Y[[]]X›NÈ]™]™\ˆ\ØYË™]Üš]\ÈÜˆ›Û[Ý\ÈØ[Y\^H]Kˆ\™H\È›ÈÛ™H]HÝX›Z]YžH\ÈÛÜšË‚‹H
+Š‘È›ÝÛZ[HÜ›ÜÜËY]šXÙHÚ\˜XÝ\ˆ™\ÝÜ™K]]Üš]]]™HÛÝYÚ\˜XÝ\‹Üˆ\ÙHÛÛ\][Û‹ŠŠˆ\ÙH™[XZ[œÈ
+Š’Sˆ“ÑÔ‘TÔÈÈÍˆ‘T’Q’QQ
+Š‹ˆœ›ÝÜÙ\ˆØ[Y\^HÝ]H
+ÛÛV[™[ÜžK\]Z\Y[™]Ø\™ÊH\ÈÝ[›Ý]]Üš]]]™K‚‹H™^[™Ú[™Y\š[™ÈZ[\ÝÛ™Nˆ\ÚYÛˆ[™[\[Y[HÛÛ\]HÜšYÚ[˜[Y]šXÙH]šY[˜ÙH\ØY[™Û™K][YHYZ\ÜÚ[Ûˆ˜[œØXÝ[Û‹ˆ]]\Ý\ÙHH[[]]X›H˜XÚÝ\™Y™\™[˜ÙKÛÛ\]HXZ[ˆ
+ÈÚYXØ\ˆ]šY[˜ÙKXÝ]™HRQÙ\ÜÚ[Û‹Ù\™\ˆ™]š\Ú[Ûˆ[™Ü\˜][ÛˆQÈ˜[Y]HØÚ[XKÙ\]Z\Y[ØÛZ[H™XÛÜ™ÎÈÜš]HH[š\]YHZYÜ˜][ÛˆX\šÙ\ˆ\È›Û‹YÜ˜[[™È\ÝÜšXÈÛZ[H›ØÚÜÈ[™HÙ\\˜][HX\šÙYÜ˜[™˜]\™Y][™\šYšYYZ\ÝÜžX˜\Ù[[™NÈ[™Ý^H›Û‹\^XX›H[[]™\žH]\™HYÚ]˜[YH™]Ø\™Üš]\ˆ\ÈH\ÝYÙ\™\‹Z\ÜÝYY™XÙZ\ÛYÙ\ˆ]ˆÈ›Ý\ØYÜ›ØÙYY]]ÛX]XØ[H[™È›ÝYHÙXÛÛ™Y]šXÙH™\ÝÜ™H™Y›Ü™H\È\È[H™\šYšYY‚‚ˆÈÈŒ‹LKLH8 %YØXÞH˜\Ù[[™HÛXÞH[™ÛÝYX]]Üš]]]™HÝ\\ÝX\™
+Ø[™Y]JB‚‹H˜\ÙH]ÎYMÌÌÌÌŽMØŽ˜ÌXML˜ÍÙLØ™LL˜MLØXœ˜[˜Úš^ØÛÝYX]]Üš]K\Ý\\XÛÛ™›XÝLŒŒLXˆÝÛ™\ˆœËÍL‹]ŒMÌËŒŒ\Ý\\[ØY\‹šœÎŽœ™\ÛÛ™TØ]™Q›ÜŠ
+XÈRQØØ[ØXÚHÝÛ™\ˆœËÜÝ\\ØXØÛÝ[\Ø]™K\™\ÜÚ]ÜžKšœØÈœËÌ[XZ[‹šœÎŽœØ]™QØ[YJ
+XÝ[\ÈH]\ˆ™[XÈÜ˜\\ˆ[ˆœËÍŒ]X[K\™[XË\Þ\Ý[KšœØˆ›ÈØ]™HÜ˜\\ˆÜˆ[\Ü˜\žH]ÚYYˆUWÔÑPÕT’UWÐÓÓ•PÕË›YÙ\È›Ý^\Ý]\È˜\ÙK‚‹HÝÛ™\ˆ\›Ý™YÛ™K][YH\ÝÜšXØ[H[™\šYšXX›HYØXÞH›ÙÜ™\ÜÈ\È[ˆ^XÚ]HX\šÙYÝ\[™È˜\Ù[[™KÝXš™XÝÈ˜XÚÝ\[›ÛX[H™]šY]ËÛZ[HØY™YÝX\™Ë[™ÝXœÙ\]Y[˜XÚÙ[™XÛÛ›ÛYÜ˜[ËˆÙYHØÜËÐÓÕQÐÒTPÕT—ÐUUÔ’UWÓRQÔUSÓ—ÑTÒQÓ‹›YÈÚ]ÛXÞHÛÛœÙ[Ù\È›Ý\ØYÜˆ›Û[ÝHH\XÝ[\ˆÛ™HØ]™K‚‹Hš^YH›ÜØ\™[ÛÚÚ[™È›ÛÝ]]Üš]HØ\ˆHØØ[Ø]™HY™™\š[™Èœ›ÛHH]\™HÛÝYÚ\˜XÝ\ˆ›ØÚÜÈ[™™\Ù\™\È›ÝÛÜY\È]™[ˆYˆ]ÈÛÝY˜\ÙQš[™Ù\œš[X]Ú\ËˆÛ›H[ˆY[XØ[RQØXÚHX^HØYHÛÝYÛ˜\ÚÝˆ\™Ù]Yœ˜[˜Ú\ÝÈ\™H[ˆ\ÝËØÛÝY\Ø]™KX]]Üš]]]™K\Ý\\XÛÛ™›XÝ\Ý›ZœØ‚‹HœËÌ[XZ[‹šœÎŽœ\œÚ\Ý™Y›Ü™TÝ\Ü[™
+
+X›ÝÈ[œÈ]È^\Ý[™ÈØ]™QØ[YJ
+XÛ›HY\ˆÝ\\[\œÈ‘PQKÓÑ‘“S‘WÔ‘PQKˆH›ØÚÙYÛÝYÛÛ™›XÝ]\Ý›ÝÙ\šX[^™H[šY˜]YY[[ÜžHÝ™\ˆHÜšYÚ[˜[RQØØ[Ø[™Y]HÛˆYÙZYKÙœ™Y^™KˆH^\Ý[™ÈX[H™[XÈ]\ˆÜ˜\\ˆ™[XZ[œÎÈ›È™]ÈÜ˜\\ˆÜˆ[\Ü˜\žH]Ú‚‹HÝ[›È^XX›HÛÝYÚ\˜XÝ\‹\ÝY™]Ø\™Ü\˜][ÛœË[™\ÝÜ™HÜˆÙXÛÛ™\Û™HXØÙ\[˜ÙKˆ\ÙHSˆ“ÑÔ‘TÔÈÈÍˆ‘T’Q’QQØ[YKÐØXÚHMÌËÌ‹XZ[ˆ[˜Ú[™ÙYˆ‹ÐÒKÑUˆÒH™[XZ[ˆÈ™H™\šYšYY‚‚ˆÈÈŒ‹LKL8 %ÛÝYØ]™H\ÙHÈRQ9§+9ªgúf¥:fè»ï#ùænùaiz/"yai{ï"ÓÓTUHÈ‹Íˆ‘T’Q’QQ;ï"B‚‹H˜\Ù{ï&˜]XMØÌŒÌÙŒ˜LŒŽLŒØMÌÌ˜MŽMLÌØŒÎLX;ï&ùméy/g9b!¹¥+ûï&˜™X]\™KØÛÝY\Ø]™K\\ÙLË]ZY[ØØ[Z\ÛÛ][Û‹LŒŒL;ï&ØXZ[˜9aj9ê"ùé y«h¹/ë¹¥.xà ‚‹H9ç'ù«hù¨.yfè9.#y¦+ÈØ[›ÛšXØ[Ø]™HÙ^{ï&¹..ùkf9ª¥9mì¹§"HRQ˜[Y\ÜXÙH:"!ÈXÝ]™KURQÜš]HÝX\™;ï&úhª:fª¹g*9d#9. ØÝ[Y[9æí9£©y£æÈRQ9¦`»ï#^Y\»ï#Ú[™[Üž{ï#Ù\]Z\Y[9ëbH[Ù[HÛØ˜[È:"!ùi&¹`"È\\Ú[ÙØ[Y\^HÚYXØ\ˆÙ^H9.ãyí yk¦¹bcy. RQ8à ‚‹HÝ\\Ý]HXXÚ[™HœËÍL‹]ŒMÌËŒŒ\Ý\\[ØY\‹šœØ9¥¬9h§¹e+ù. ™[ØY›ÜXØÛÝ[˜[œÚ][ÛŠ
+X;ï&]]9ænùaî¹¢%ˆRQ9¥.z+¢¹¦`»ï#9ab9/g9nèº""ˆ\Þ[˜È™\ÛÛ][Û¸à YXXÝ]˜]HØ]™HÝÛ™\¸à yéîúfi9."¹. 9n,ú&gùæ¡Ù\ÜÚ[Ûˆ™\Ý[YHX\šÙ\¸à zf¬z%ãùbmz)ä»ï#ÙØ[Y\^{ï#9a£yk£9¥m™[ØY8à ¹¥¬ØÝ[Y[9¢cz)èù§¤9¥¬RQ9.)ºaãy¥¬9nî¹êâù¢`9§"HÚYXØ\ˆÝÛ™\¸à ‚‹H9.#y¥¬9h§ˆØ]™HÜ˜\\¸à yë+9.£9ieÈÝ\\ÝÛ™\ˆ9¢%ˆ–]Ú;ï&ØXØÛÝ[\Ø]™K\™\ÜÚ]ÜžKšœØ8à X›Ý\”Þ[X›ÛÑØ[YTØ]™X8à Qš\™\ÝÜ™H™XYÛ›H™XY\ˆ:"!È\ÙHˆ[™[ÜH9.#y¥.xà º**¹k¨º,áù¥¦y.#z!ê¹båyd"9/mz!ìÈÛÛÙÛ{ï#Ñ[XZ[;ï&ÛYØXÞHZYÜ˜][Ûˆ9.ãycê¹a`z*,y¦#¹è®¹è®º*£xà ‚‹H9¥¬9h§ˆ\ÝËØÛÝY\Ø]™K\\ÙLË]ZY[ØØ[Z\ÛÛ][Û‹\ÝšœØ;ï#9.)º"!ÈXØÛÝ[ÝÛ™\œÚ\8à X]]X™Y›Ü™KXÜ™X][Ûˆ9b¨9aiH¸¡¤™]ˆ9oáz-äHÒ{ï&ù¥è¹§"H›ÛÝœ›ÝÜÙ\ˆPH9mì¹amÈRQx¡¤¹ænùaî¸¡¤•RQˆ9k£9¥m:f¥:fè¹¨b9/¢ûï#9l!ù/g\ÞYYØ[™Y]H:!ê¹båz+by¤æ¸à ‚‹H9§+9ªgÈ\ÙHûï#ÛÝÛ™\œÚ\;ï#Ø]]X™Y›Ü™KXÜ™X][Û»ï#Ø›ÛÝ;ï#ÜÝ\\;ï#ÕŒMÌËH]]™YÜ™\ÜÚ[ÛœÈ9aj9¥nTÔûï&Ù]\›Z[š\ÝXÈZ[:"!ÈZ[˜ÚXÚØTÔûï#Ú]Y™ˆKXÚXÚØTÔøà ¹k£9¥mœH\Ý9g*L‹ÌŒLˆ9¦`¹cê¹fè[›™\ˆ9á(HÚ›ÛYKÐÚ›ÛZ][H9`g9«h»ï&ù§*¹a¤¹ê,H[ÝZ]H:`&º`c»ï#œ›ÝÜÙ\ˆPH9åfyo¡HˆÒxà ‚‹HˆÍMMÈØ[™Y]HXYLLÍÙŒMMŒØMÌY˜ÎÌYXŒMØNÌNLÍÌX9æ¡™\ÜÚ]ÜžHÚXÚÜÈ[ˆÍNNNNÍŒÕPÐÑTÔûï#9c!yd*È\ÙHÈ\™Ù]Y\ÝÈ:"!È›ÛÝœ›ÝÜÙ\ˆRQx¡¤¹ænùaî¸¡¤•RQˆ:f¥:fè»ï&ùd"9/mH]YYXÌÍNYY™ŒÍÌÌÎXY˜™˜MLØÌ™XLX™Ø8à ‚‹HUˆ™[X\ÙHX[šY™\Ý9mìº+ 9fçˆ^XÝY\™ÙHÒxà QØ[Y{ï#ÐØXÚHŒMÌËÌ»ï&ú`ê9ïlºh yo%yå*›ÛÝXÛÜ™K™˜™ŒMLÙKšœØ;ï#[™H9aiÈ\ÙHÈ˜[œÚ][ÛˆÝÛ™\ˆ9«hùè®¹kf9g*8à ‚‹H9/oùå*: !yç'ùké¹¢bùªgújeù¥-ˆTÔûï&‘ÛÛÙÛH8¡¤ˆ:**¹k¨¹§*¹ç"ú)¢ÈÛÛÙÛH:)äº"l»ï#ú,áù¥¦{ï&ú**¹k¨ˆ8¡¤ˆÛÛÙÛH9o£9c§ú)äº"l»ï#ú,áù¥¦y«hùn.9 h¹oªxà ”™\]Z\™[Y[˜]Ú9mì¹caùí&ˆ‹Íˆ‘T’Q’QQ;ï#\ÙHÈÓÓTUxà ‚‹HUWÔÑPÕT’UWÐÓÓ•PÕË›Y9.ãy.#ykf9g*;ï&ù§+9«(ycê¹/§y¥è¹§"H›ÛÝ;ï#ÔÞ\Ý[{ï#ÐÛÝY›ÙÜ™\ÜÈ9idyí!9¥¯ymé{ï#9§*º!êº(c9`aú`(9ï.¹i,yidyí!8à ‚‚ˆÈÈŒ‹LKL8 %9fæú,hyhe[[Y[ÝÛ™\»ï#Í¸àîÌL9.®ºfhùoh»ï#ÔÛX[›ÜÜÈ9¥-¹¥ »ï"‘T’Q’QQØ[™Y]{ï"B‚‹H˜\Ù{ï&¹§ 9¥¬]YLØ™˜˜LÙÍXÍØÍ˜YXLÎŒLLÍLY™™N;ï&ùméy/g9b!¹¥+ûï&˜š^ÝÝÙ\‹Y[[Y[Y›Ü›X][Û‹\ÛX[X›ÜÜËLŒŒL;ï&ÔˆÍMLˆ8¡¤ˆ]˜;ï&ØXZ[˜9aj9ê"ù§*¹/ë¹¥.xà ‚‹H9fæú,hyhe9a`ùí(;ï#ùfî¹k¦¹¢ : ïye+ù. 9ãªy¬åHÝÛ™\ˆ9¥-¹¥ ¹¥¯œËÙØ[Y\^KX›ÜÜË]ÝÙ\‹\Þ\Ý[KšœØ;ï&ÕŒMH™X˜[[˜ÙQ[™Ù[Û‘[[Y[Ê
+X9mìº` 9/${ï#Z[{ï#ÕÝÙ\»ï#Ð›ÜÜûï#ÐY™[\™{ï#ÐXž\ÜÈ9alyå*][˜Ú\ˆ9.éy«hùo#ÈŒLÌXÝ]™Q[™Ù[Û”[‹›[ÙX9c`9b!º.ªùb!¸à ‚‹HŒM9à®ˆ[ÛœÝ\ˆÚÚ[[[Y[ÝX\™9e+ù. ÝÛ™\»ï&¹. :"+9a`ùí(9 *ˆ]XÚûï#ÔÝ\Ü;ï#ÒX[;ï#ÐY™»ï#ÑXY™»ï#Ò\™ÛÛ›Û9cêº ïyo§¹§+9a`ùí(9«hùo#ù¥'9n-ˆQ:`n9¢æûï&ÐXž\ÜÈ9ç'ù«hú-ê9a`ùí(9/¢ùi%¹.éHŒMÜ›ÜÜÑ[[Y[ÚÚ[YØ9¦#¹è®ˆ[ÝÛ\Ý8à ‚‹HÝÙ\ˆ9. :"+9li9fî¹k¦ˆˆ9d#{ï"Œ‹ÐŒËÐ
+ÈŒ‹ÑŒËÑ;ï"{ï&ÍH9æ¡9`#y¥n9âny«¢¹li:"!ÈL9æ¡9`#y¥n›ÜÜÈ9li9fî¹k¦ˆL9d#xà ›ÜÜÈ9liŒÈ9¦+ùe+ù. ÝÙ\ˆ›ÜÜûï&úggˆ›ÜÜÈ9âny«¢¹liŒÈ9a*¹ab[]{ï&ù«nù.¨yo£ÛÝ9.#zaãy£¤¸à ‚‹HÝÙ\ˆ›ÜÜÈØ[Y\^H˜[šÈ9/çyåfH›ÜÜØ;ï#9/a¹à®ˆ[š]Ú[™HÝÙ\‹X›ÜÜÈ˜;ï#ùe«¹¨/Œûï&ù.#z`,ˆ\œÛÛ˜[;ï#ÕÛÜ›9æ¡\™ÙH›ÜÜÈ›ÛÝš[8à PŒKÐH9£í:.ãxà QŒKÑHØš™XÝ8à TÚY[;ï#ÓYXÚ[š\ÛHY™XÞXÛxà ‚‹HÛÛ™šYËÛ[ÛœÝ\‹\Ü˜Z]\™YÚ\ÝžKšœÛÛ˜9æ¡9`"ÈÝÙ\‹X›ÜÜØ\™Ù]9/çyåfH˜[šÏX›ÜÜûï#Ú^™PÛ\ÜÈ9¥.HÝ[™\™;ï"L0åÌMLÍ¸à LŽŒûï"{ï&ùí(9§d9æë¹bcy.ãy¦+È[›™Y;ï#9§+9«(y§*¹å(¹g%¸à y§*¹nî¹`aùª¥8à ‚‹H9¢ :(dù`­ymì¹éîúfi;ï&•ŒMHœ›ØY[[Y[™X˜[[˜Ùxà UÝÙ\ˆ\™ÙKX›ÜÜÈØš™XÝÜÝ[[[Ûˆ[¸à UŒMLˆ9©myn'yd#yê,yo#ù¢ : ïH\Ü]Ú\¸à UŒMLˆ9aj9gçÈ[ÛœÝ\ˆØYÝ]]]][Û»ï&ÕŒMH:/ïy¤âº"!ÈŒMNZ[HÛÛÈ›ÝXÝ[Ûˆ9`áy/çyåfHXÝ[Û‹\ØÛÜY9¦ªùkfú`¡9c§ùå*:`%;ï#9.#y¦+ù¬.9.aHÝÛ™\¸à ‚‹H9l":h!H\ÝËÝÝÙ\‹Y[[Y[Y›Ü›X][Û‹\ÛX[X›ÜÜËLŒŒL\ÝšœØ9mì¹b¨9aiH¸¡¤™]ˆ9oáz-äHÒ{ï&ÔˆÒH[ˆÍNMÎLÌLM˜9æ¡ÛÝ\˜ÙHØ[™Y]HMØ˜NLXŽLX™NYL™XØLM˜ÍÌÍŒÍLXMXY™\ÜÚ]ÜžHÚXÚÜÈÕPÐÑTÔûï#9c!yd*ùl":h!xà P›ÜÜËÐXž\ÜËÑš^YÛÝØ˜]KÕ‘–\™Ù]Y™YÜ™\ÜÚ[Ûœøà Y]\›Z[š\ÝXÈZ[˜ÚXÚøà Qš^YÛÝNŒM¸à Y^XÝXØ[™Y]H™X[˜]xà PY™[\™H[Øš[HPxà \™\ÛÝ\˜Ù\øà [ØY\¸à T™[X\ÙHØ]H:"!ÈÚ]Y™¸à ‚‹H[›ÙHÝZ]{ï&”¸¡¤™]ˆÛÜšÙ›ÝÈ9/§yidyí!:-ìú`c»ï&ù.#yo¥ú*©9h,yà®¹mìº-äxà ¹oáz-äH\™Ù]Y›Ù{ï#Ú[YÜ˜][ÛˆÝZ]\È9aj:`êTÔøà ‚‹H™\]Z\™[Y[˜]Ú;ï&˜™[X\ÙKÜ™\]Z\™[Y[X˜]Ú\ËÌŒ‹LKL]ÝÙ\‹Y[[Y[Y›Ü›X][Û‹\ÛX[X›ÜÜËšœÛÛ˜9mìˆ‘T’Q’QQ8à ‚‹HUWÔÑPÕT’UWÐÓÓ•PÕË›Y9g*9§+9«(H˜\ÙH9.ãy.#ykf9g*;ï&ù§+9«(y§*¹/ë¹¥.yn,ú&gøà PÛÝYØ]™H9¢%¹k¢yaj:,áù¥¦HØÚ[Xxà ‚‚ˆÈÈŒ‹LKLŒÈ8 %ŒL9¢ : ï{ï#ú/%9bªy¢ : ï{ï#ùéæ9kíˆ[[YHÝÛ™\ˆ9¥-¹¥ »ï"‘T’Q’QQØ[™Y]{ï"B‚‹H˜\Ù{ï&˜]YÌ™NØŒŒ™™ŽNÙYÌÌŒ™Œ™LLÎNX;ï&ùméy/g9b!¹¥+ûï&˜š^ÜÚÚ[\™[XË\[[YK[ÝÛ™\‹XÛÛ™\™Ù[˜ÙKLŒŒLŒØ;ï&ØXZ[˜9§*¹/ë¹¥.xà ‚‹HÌH9`"ùãªyk­¹æí9£©y`­ùk¬ù¢ : ïy¥.yà®ˆŒL8à ¹e+ù. [XYÙHÝ\™HÝÛ™\ˆ9à®ˆœËÌ[XZ[‹šœÎŽ™Ù]ÚÚ[[XYÙP]]™[
+
+X;ï&“Œ»ïg9íæ¹ )øà SOS0åÌKxà S»ïgŽH9íæ¹ )øà SŒLSŽpåÌK{ï#:"!ù«hùo#ÈØ[Ý[]Q[XYÙJ
+X9. :!í9/oùå*X]œ›Ý[™8à ‚‹HœËÍŒ]ŒMÌË\ÚÚ[\›ÙÜ™\ÜÚ[Û‹\™X˜[[˜ÙKšœØ9ãï¹à®ˆš[˜[ÚÚ[]{ï#Ô›ÙÜ™\ÜÚ[Û»ï#ùãªyk­º*ª¹¦#ˆ›Ú™XÝ[ÛˆÝÛ™\»ï#9.)¹fî¹k¦º`,ˆØ[Y\^KXÛÜ™X;ï&ù¢`9§"ycëùcaùí&¹¢ : ïy«ãùí&¹fî¹k¦ˆH9¢ : ïznç»ï#9¥è¹§"HÚÚ[]™[Ø9.#z`mùéîûï#ù.#zaãyïk¸à ‚‹H9àjùìîûï&¹à£ºk`¹alzlíÔxà yà£¹bèˆL‹ÌMKÌNÌŒKÌI{ï#H9â!¹¤â»ï#ù¢$9b§ù¥¬9h§¹áàùáä¹«ãù«hùo#ùfç¹d"9§ 9i&¹níºemÌxà y¥m9«(y§ 9i&ŠÌûï#9acz,®ú/ïy¤â¹.#yníºemûï&ùá&º(`:*(ÈÔÍxà R9¢$9§+KÌLÌMKÌŒÌI{ï#9£©y."ù/¡Œù«(zgg¹acz,®ùàjùìîùæí9£©y¥¯y¥/ˆ
+ÍKÌLÌMKÌŒÌÍI{ï#Õ;ï#ùacz,®ú/ïy¤â¹.#y/oùå*9.gù.#y­¢: %øà ‚‹H9¬-;ï#úhª;ï#ùg'ù¥+ù£í9¢ : ïygaù¥.z+ 9«hùo#ÈžS]™[9«!9/c{ï&ùa¬9l HH9¢cyå,HÛÛ[[ˆ9caùà®ˆš{ï&ù­ê9oàú*(ÈŒÈ9¢cycaÌùæë¹ª&y.%:fæy¥®z`ïy®!zfi9¢`9§"ycëú)èúfi:!ê9¦`¹¢,:k)yâà9¡bûï&ùíd9åc9cê¹¤âùæí9£©y`­ùk¬ù.)¹/§HËÌËÌËÍÍH9«(z"!ùfç¹d"9¥n8à ‚‹H9¥my¥®ylªyçìùhàyhæ9mì¹å,yaj:jåÝ\œ™[Xž\ÜÑ[šY\Ê
+X9¥.yfç¹«hùo#È[UšU\™Ù]Ê
+X;ï#9§ 9i&Œùd#{ï&ÕŒM9cãyd$H™\]Z\™\Î–È˜˜\œšY\ˆ—X;ï#Ø[P[:""º,áù¥¦ymìº` 9/$xà ‚‹HX[H™[XÈšYÙÙ\ˆ[™Ú[™H9mì¹o§ˆ™X]\™KX›ÜÜË\™[XØ9¢á¹aî¹.)¹fî¹k¦¹¥/¹aiHØ[Y\^KXÛÜ™X9§ 9§*ùêëûï&ù¢`9§"y«hùo#ù¢,:k)yaiycèùfè9«i9g*9cëùgíú(c9bcymì¹d#9«iycå¹o¥ùd#9. œËÍŒ]X[K\™[XË\Þ\Ý[KšœØ8à ›ÜÜûï#ÕÝÙ\»ï#úi"¹¢$9.ãH^ž{ï#9¬¤¹§"yhg¹fçˆÜš]XØ[›ÛÝ;ï#9.gù¬¤¹§"y¥¬9h§ˆ˜]HÝ\:gg¹d#9«iz(ç:/"xà ‚‹HL9.íˆ[[YT™XYN™˜[ÙX9éæ9kíˆY˜]{ï#Ù\]Z\;ï#Ü›ÙÜ™\ÜÚ[Ûˆ9aj:`ê˜Z[ÛÜÙY;ï&ùãªyk­¹cêº)¢øà#9¥b9§§9l&¹§*º)®ºa¤»ï#ú ïyb¦ùl&¹§*ºe¢ù¥/¸à#xà ¹kä¹¬âyã¢yãë¸à y.gzo£yég¹àjùïjxà ylªyl¬úc«¹cl8à yàâ:foyég¹ãè:*ª¹¦#¹mì¹d#9«iykéºf¦ÈšYÙÙ\»ï#ÔØØ[\¸à ‚‹H9l":h!y®+:*i»ï&˜\ÝËÜÚÚ[\™[XË[ÝÛ™\‹XÛÛ™\™Ù[˜ÙKLŒŒLŒË\ÝšœØ;ï&ù¥è¹§"H\ÝËÜÚÚ[\›ÙÜ™\ÜÚ[Û‹\™X˜[[˜ÙK\ÝšœØ9d#9«iy¥¬:)£ù¨/;ï#9ajz !ymì¹b¨9aiH]ˆˆ9oáz-äHÒxà ‚‹H™\]Z\™[Y[˜]Ú;ï&˜™[X\ÙKÜ™\]Z\™[Y[X˜]Ú\ËÌŒ‹LKLŒË\ÚÚ[\™[XË\[[YK[ÝÛ™\‹XÛÛ™\™Ù[˜ÙKšœÛÛ˜9mìˆ‘T’Q’QQ8à ”ˆÍLÌˆ9§ 9í`ˆÛÝ\˜ÙHØ[™Y]HML˜MÙÎXŒŽMÎ™™MXŒØ˜ØŒŽMLMX;ï&Ù]\›Z[š\ÝXÈZ[ÛÛ[Z]LÍY™LÙLLY™YÌLŒÎYMXYŒLÍØØ;ï&ÔˆÒH[ˆÍNÍÌÍŒÍÌ˜™\ÜÚ]ÜžHÚXÚÜÈÕPÐÑTÔûï#9c!yd*ù¢ : ï{ï#ùéæ9kí¹l":h!xà P˜]KÔ™[XÈ™YÜ™\ÜÚ[Ûœøà XZ[˜ÚXÚøà Y^XÝXØ[™Y]H™X[˜]H[Øš[HPxà \™\ÛÝ\˜Ù\øà T™[X\ÙHØ]xà YÚ]Y™¸à ‚‹H:hcyi%ˆ[›ÙH]Y]9¦ï¹æo9ãï¹.)¹/ë¹oªyajy`"ù§+9«(yæî:eç:nç»ï&¹­ê9oàú*(ÈŒÈ9¤í9leLùæë¹ª&y¦`¹.ãy/çyåfyãªyk­ºnçº`n9æë¹ª&yà®ˆ‘–š[X\ž{ï&ÒX[Ü[9g*YØXÞKÝ\Ý]H9ï.¹l$y¥¬Ô9«!9/cy¦`¹.#y/§z,í9.#ykf9g*9æ¡[\¸à ]Y]9cé¹£ëzg,¹¥¯yméH˜\ÙH9mì¹kf9g*9æ¡˜]K\Ý]\ËZ[™›ËX\ÜÙ]ËLŒŒLŒ‹\ÝšœØ;ï#ØZKXÜš]XØ[\™YÜ™\ÜÚ[ÛœË[[Øš[KXœ›ÝÜÙ\‹\ÝšœØÝ[HRH˜Z[\™{ï#9.éycâˆŒMËÕŒMÕŒMMKÕŒMŽH9«mùcìˆÛ˜\ÚÝ9.ãykêù«nú""¹¢ : ïy¥n9`/;ï&ù§+9«(y§*¹à®º/ïy¬`¹«mùcì¹í¨9áâ: #9¢¢¹«hùo#ú)£ù¨/9¥.yfçº""¹`/8à ‚‹H9e+ù. 9.ãyo¡yå(¹dàz)£ù¨/9k¦¹¨b;ï&¹¥+ù£í9¢ : ïy¬¤¹§"y¦#¹è®ˆY\ˆ9l#y¡â{ï#9fè9«i9b'y«(ykn9ïä¹¢$9§+9¦ªù/çyåfy¥è¹§"y«hùo#ù`/;ï&ù§"y¦#¹è®ˆY\ˆ9æ¡9fæùa`ùí(9æí9£©y`­ùk¬ù¢ : ïymì¹/oùå*»ï#Í»ï#ÌL;ï#ÌM»ï#9¢`9§"y¢ : ïyæ¡8à#¹caùí&¸à#ùbaùfî¹k¦¹«ãùí&ˆH:nç¸à ‚‹HUWÔÑPÕT’UWÐÓÓ•PÕË›Y9g*9¥¯yméH˜\ÙH9.ãy.#ykf9g*;ï&ù§+9«(y¬¤¹§"y/ë¹¥.HÛÝYØ]™{ï#ùn,ú&gùk¢yajØÚ[Xxà ‚‚ˆÈÈŒ‹LKLŒÈ8 %9a¬9l {ï#ùçìùc%¹.¤¹¥©yèk9£©ú"!È›ÙHÝ]\È˜\ÙH^Y\ˆ9¥-¹¥ »ï"‘T’Q’QQØ[™Y]{ï"B‚‹H˜\Ù{ï&˜]˜XŒ˜ŒÎNMÎXÍÙŒØ˜LŒŽX˜M™LNXØ™™L™˜;ï&ùméy/g9b!¹¥+ûï&˜š^Ùœ™Y^™K\]šYžKY^Û\Ú]™K\Ý]\Ë[^Y\‹LŒŒLŒØ;ï&ØXZ[˜;ï#Ø]˜9gaù§*¹æí9£©y/ë¹¥.xà ‚‹HØ[Y\^H\™ÛÛ›ÛÝÛ™\ˆ9í«y£ HœËÌ[XZ[‹šœØ9æ¡\œÚ\Ý[Ý]HØ]xà ‘œ™Y^™{ï#Ô]šYžH9ãï¹à®¹d#9. ^Û\Ú]™H\™ÛÛ›ÛÜ›Ý\;ï&¹d#9d#z"!ú-ê9d#z`ïy§ ùg*9ªgùã¡új¬:nçº"!ù«hùo#ùkêùaiybcy.éxà#9âà9¡bÓRTÔøà#zf.ù«h»ï&ù¥è¹§"yâà9¡bù.#z)¡º$âøà y.#yb-ù¥¬8à y.#yníºemøà ‚‹H\Qœ™Y^™QY™™XÝ
+
+X:"!È\S[ÛœÝ\‘XY™Š
+X9.gù£©yfç¹d#9. Ø]{ï#:`oùacyãªyk­¹¢ : ïxà y *¹âjxà P›ÜÜûï#ù­ìy­íxà yë)¹d¤¹¢%¹am¹.å¹æí9£©H]]][ÛˆØ[\ˆ9îgº`c¹.¤¹¥©z)£ùbaøà º-ê9d#HÙÈ9§ ùd#9¦`¹£!ùaî¹¥è¹§"yâà9¡bú"!ù¥¬9æ¡9i,y¥eùâà9¡bøà ‚‹H\œÚ\Ý[›ÙHÝ]\Èš\ÝX[ÝÛ™\ˆ9.ãyà®ˆœËÌÎK]ŒMË\ÚÚ[X[š[X][Û‹šœØ8à ¹¥¬9h§º*§¹¡#ùli\™XÛÛ›ÛX˜\ÙX;ï#Ø›Ý][™Ø;ï#ØY;ï&Ñœ™Y^™{ï#Ô]šYžH9fî¹k¦¹g*˜\ÙHÛÝ™\»ï#9.#ydo9d.8à y.#ze ùâ#xà y.#yb¨9aiHˆ9éäˆ›ÙH›Ý][Û»ï&ùam¹.åˆ›ÙHÝ]\È9/çy£ yc§Èˆ9éä¹f­9¨/9oª¹n£ú/*¹¤«xà ‚‹HÔÔÈ9å,HÜÜËÍ]ŒMËXÛÛX˜]Y[™Ù[Û‹\Û\Ú˜ÜÜØ9cê¹db9ãï¹."º/ì9«hùo#ú*§¹¡#ùli;ï&ùmì¹éîúfiœ™Y^™{ï#Ô]šYž{ï#ÐXž\ÜÈ9æ¡9d#9li‹Z[™^9âny/¢ûï#9.#y.éH‹Z[™^ŽNNNNHZ[\Ü[:hgº(ç9. z&eyä!¸à ‚‹H[[YH:"éz)à9kçùb,9d#9. []H9d#9¦`¹kf9g*œ™Y^™H
+È]šYž{ï#ŒMÈ9cê¹fç¹h,H\™ÛÛ›ÛÛÛ˜XÝš[Û][Û»ï#9.#y¦ïú,áù¥¦yli:f¬z%ãûï#ù«hú)£ùc%¹am¹.+y. 9`"øà ‚‹H™YÜ™\ÜÚ[Ûˆ9mìº)¡º$âûï&¹d#9d#{ï#ú-ê9d#HRTÔøà ybjzi&9fç¹d"9.#z+¢¸à z)èúfi9o£9cé¹. 9èk9£©ùcëúaãy¥¬9¥¯yb¨8à y«hùo#øà#9âà9¡bÓRTÔøà#y¥¡ù¨b8à yãªyk­»ï#ù. :"+9 *»ï#Ð›ÜÜûï#ù­ìy­íyalyå*Ø]xà Qœ™Y^™H9fî¹k¦¹n¥yli;ï"ù. :"+9âà9¡bú/*¹¤«xà y«nù.¨{ï#ú)èúfi9êâùclù®!yä!¸à PØ\ÝY™\œ™YY™XÞXÛxà ‚‹H™\]Z\™[Y[˜]Ú;ï&˜™[X\ÙKÜ™\]Z\™[Y[X˜]Ú\ËÌŒ‹LKLŒËYœ™Y^™K\]šYžKY^Û\Ú]™K\Ý]\Ë[^Y\‹šœÛÛ˜9mìˆ‘T’Q’QQ8à ”ˆÍLÌ{ï&¹k£9¥m›Ù{ï#ù¥m9d"9fç¹«n9¥¯[ˆÍNŒÌNLMØ:`&º`c»ï&Ù]\›Z[š\ÝXÈ›ÙXÝ[ÛˆZ[9mì¹d#9«i{ï&Ô[ˆÍNŒLŒMÍM™\ÜÚ]ÜžHÚXÚÜÈÕPÐÑTÔøà ‚‹HUWÔÑPÕT’UWÐÓÓ•PÕË›Y9g*9§+9«(y§ 9¥¬]ˆ9.ãyà®ˆ;ï&ù§+9«(y§*¹/ë¹¥.yn,ú&gûï#úfì¹êëùkf9ª¥;ï#ùk¢yaj:,áù¥¦y­`yê"ûï#9§*º!êº(c:(ç9kêù.#ykf9g*9æ¡9idyí!8à ‚‚ˆÈÈŒ‹LKLŒˆ8 %9¢,:k)yâà9¡bú/*¹¤«{ï#ù¢¯ylg9g%¹li;ï#ù`$¹¥n9¨a»ï#ù."y¢ : ïH‘–›ÛÝË]\;ï"Ø[™Y]{ï"B‚‹H˜\Ù{ï&˜]MML™NLŽXNLL˜ŒXÌMLØŒØØÎXMLX;ï&ùméy/g9b!¹¥+ûï&˜š^Ø˜]K\Ý]\ËXØ\›Ý\Ù[Y˜]Ù\œË]™žLŒŒLŒ˜;ï&ØXZ[˜;ï#Ø]˜9gaù§*¹æí9£©y/ë¹¥.xà ‚‹H\œÚ\Ý[Ý]\Èš\ÝX[ÝÛ™\ˆ9í«y£ HœËÌÎK]ŒMË\ÚÚ[X[š[X][Û‹šœØ8à ¹âà9¡bÈXÛÛˆ9å,HM9¥/¹i)ú!ìÈMÜ;ï&Ð›ÙH9âà9¡bùg%¹å,yí!Ž	påÍÌ‰H9¥/¹i)ú!ìùí!‰påÎ‰{ï&ùi&¹`"È›ÙH9âà9¡bù¥.yà®¹«ãÈH9éä¹cêºhkùé.¹. 9ê+¹.)º/*¹¤«{ï#XÛÛˆ9.ãycëùd#9¦`¹/çyåfy/g:,áú*"¹b%øà ¹do9d.9§ 9i)ú`#ù¦#¹n©¹¥.yà®ˆL	xà ‚‹H9¦¢9ç*y«hùo#È›ÙH9âà9¡bùg%¹£©yà®ˆ\ÜÙ]ËÝ™žÜÝ]\ËÜÝ[‹ÙXœ8à ¹c§ùiâùí(9§d9kéºf¦ùà®ˆMÍÍ0åÎÈ9e«¹o-yg%»ï#9.#y¦+È0åÌÈÜš]HÚY];ï&ùfè9«i9§*¹`fºc+ú*©:(àyn`8à ‚‹H9¢,:k)z,áú*"¹n¥z`ê9aiycèù¥.yà®¹ªjùd$xà#9¢,:k)z,áú*"¸à#{ï&ùmé¹`m9ílz*"9aiycèûï#Ñ˜]Ù\ˆ9¥.yd#xà#9¢,:k)y¥n9¤æ¸à#xà ¹n¥z`ê9¢¯ylg9¥-¹d"9¦`ºhkùé.¹æë¹bcyfç¹d";ï#9leze¢ù¦`ºf¬z%ãú*lºaãz)!ùfç¹d"9¥¡ùkeøà ‚‹HÞ[˜Ð˜]UZTš[Üš]S^Y\Š
+X9à®¹.¤¹båz,áú*"¹g%¹li9ce:*¯ùaiycèûï&¹¢,:k)z,áú*"¸à y¢,:k)y¥n9¤æ¸à P›ÜÜÈ9b§ú ïychy¢%¹âà9¡bú,áú*"º)¥¹ê¥ù¢dúe¢ù¦`»ï#ÙØ[YK\ÝYÙX9¦ªù¦`¹£ä9caùb,9¢ : ïH‘–;ï"MŒ;ï"z"!È]XÚY[XYÙHÜ\;ï"MÌŒ;ï"y.bù."»ï&úeç:e¢yo£9 h¹oªy. :"+9¢,9h-9îjº(ïzh!¹n£øà ‘˜]Ù\ˆ9.ãyà®ˆ›Û‹X›ØÚÚ[™ÈØœÙ\™\»ï#9.#ycå¹o¥È˜]Q›ÝÈ]\ÙHØÚøà ‚‹H9¢bùbåyfç¹d"9`$¹¥n9¨a¹mì¹éîùaiHØ˜]PXÝ[Û”™YÚ[Û˜;ï#9fî¹k¦¹¥¯9¤ãy/g:gh¹§où."¹¥®{ï&ù¢ : ï{ï#ùâjydàz`n9¤áùcâ¹æë¹ª&z`n9¤áù¦`º`#ù¦#¹n©ºfcyà®ˆI{ï#9.%Ú[\‹Y]™[Î››Û™X;ï#9.#y¥%9¢*¹ãªyk­º`n9¤áùæë¹ª&xà ‚‹HYÈ9¨.yfè9.bù. 9à®¹káºfá¹¢,9h-9«ãùo-z)äº"l»ï#ù *¹âjyêâùîj¹¬.9.aygíú(cYH˜[œÙ›Ü›H
+Èš[\ˆÛÛ\ÜÚ]Üˆ9méy/g8à ¹ãï¹g*9o¡yªgùêâùîjºgg9«h»ï&ùkéºf¦ù¥.ù¤âˆ[™ÙH:"!È\™Ù]™]XÛH9.ãy/çyåfybåyåjûï&ù«ãùe«¹/cz!lù."È›\ˆš[\ˆ9mì¹éîúfi8à ‚‹H9."y`"ù¢ : ïy«hùo#ù¥¬9í(9§d;ï&¹­ê9oàú*(øà yà£ºk`¹alzlí8à yá&º(`:*(ùd!:!ê¹¥¬9h§º(àyb!ù«hù¥®yohˆÜÜÛ\ÜÈÙX”XÛÛ»ï#9.éycâ¹/çyåfyk£9¥m0åÌÈ9åjùn ùæ¡ÜÜÛ\ÜÈÙX”Ø\Ý‘–8à •‘–9l.¹kî9gaùà®ˆM0åÌL¸à ¹¢`9§"z/byª¥9/oùå*ÝÙXœ[ÜÜÛ\ÜÈY^XÝ;ï#9cãz)èùè¯9o£9l.¹kî9. :!í9.%QOL8à ‚‹H9§"y¥b:,áùå(º/byª¥[»ï&˜ÍMÌÌŒMØÕPÐÑTÔûï&ùå'ù¢$;ï#ÐZ[ÛÛ[Z];ï&˜MŒÙMŒXÌ˜MŒŽL™ŽLMÙXYÎM˜8à ¹. 9«(y )ú,áùå(ˆÛÜšÙ›ÝÈ9mì¹o§¹méy/g9b!¹¥+ùéîúfi8à ‚‹H™\]Z\™[Y[˜]Ú;ï&˜™[X\ÙKÜ™\]Z\™[Y[X˜]Ú\ËÌŒ‹LKLŒ‹X˜]K\Ý]\ËXØ\›Ý\Ù[Y˜]Ù\œË]™žY›ÛÝÝ\šœÛÛ˜9æë¹bcHSTSQS•Q;ï&ùo¡Hˆ™\ÜÚ]ÜžHÚXÚÜûï#Û[Øš[Hœ›ÝÜÙ\ˆP{ï#ÑUˆ^XÝTÒH\Þ[Y[9o£9a£ycaùí&ˆ‘T’Q’QQ8à ‚‚ˆÈÈŒ‹LKLŒˆ8 %9¢,:k)yâà9¡bÈXÛÛ»ï#ùchyâc:,áú*"º)¥¹ê¥ûï#ù«hùo#ùâà9¡bùg%»ï"UˆØ[™Y]{ï"B‚‹H˜\Ù{ï&¹§ 9¥¬]ÍM™N™YLÍÌØMŒÌX˜ÌŽNXÙØ™MYMX;ï&ùméy/g9b!¹¥+ûï&˜š^Ø˜]K\Ý]\ËZ[™›ËX\ÜÙ]ËLŒŒLŒ˜;ï&ØXZ[˜9§*¹/ë¹¥.xà ‚‹H™[™\ˆÝÛ™\ˆ9/çy£ HœËÌ[XZ[‹šœÎŽœ™[™\˜]J
+X9e+ù. 9£©ùb-¹/¡¹®¤;ï&ù§+9«(y¬¤¹§"y¥¬9h§ˆ™[™\˜]HÜ˜\\¸à ¹chyâc:nç¹¤â¹cê¹§"yg*Y{ï"9§*º`n9¢ : ï{ï#ùâjydà{ï#ùæë¹ª&{ï"y¦`ºe¢ùegú,áú*"º)¥¹ê¥ûï#9¥è¹§"y¥my¥®{ï#ù¢$y¥®H\™Ù]X›H:`n9cå¹a*¹ab8à ‚‹H\œÚ\Ý[Ý]\Èš\ÝX[ÝÛ™\ˆ9.ãyà®ˆœËÌÎK]ŒMË\ÚÚ[X[š[X][Û‹šœØ;ï&¹âà9¡bÈXÛÛˆ9fî¹k¦ºhkùé.¹¥¯ÔÔ9."¹¥®{ï#9.#ya£ydo9d.;ï&ùe«¹o-ydo9d.;ï#ùfî¹k¦¹g%¹.ãy/çyåfz)äº"l¹§+:jå:)¥º)®»ï#9/a¹kë9n©»ï#újæ9n©ºfd9b-¹g*:!êº.ªùchyâc9í!Ž	{ï#ÍÌ‰H9ëá9g#y.)¹/oùå*ÛÛZ[»ï#:`oùacz$âùb,9mé¹cìùchyâc8à ‚‹H9chyâc:,áú*"º)¥¹ê¥úhkùé.¹a`ùí(8à yd#yê,xà R8à TÔ8à yh§¹æâ¹âà9¡bøà z,¨:gh¹âà9¡bûï&ù«ãùëa¹âà9¡búhkùé.¹«hùo#ÈXÛÛ¸à y¥b9§§9¥¡ùkeú"!ùbjzi&9fç¹d";ï#ú)î9æo9o£9­¢9i,xà ¹á(yl#y¡âyâà9¡bù¦`ºhkùé.¸à#9á(xà#xà ‚‹H9«hùo#ùâà9¡bù®!ye«¹/§yæë¹bcH[[YH9l#y¡â{ï#9.#zaãy¥¬9l#¹aiymìº` 9/$yæ¡8à#9aj9lk9 )ù."úfcxà#xà ¹¥¬9àjùìîù£ yî£9âà9¡bÈ9à£ºk`¹alzlí;ï#ùá&º(`;ï#ùà£¹bè˜:"!È9a`ùéeº,ç9é£Ø9mìº(ç9aiy«hùo#È\œÚ\Ý[Ý]H9d#yê,z(j;ï&ù§*¹/ë¹¥.y¢ : ïy¥n9`/8à ydoy.+yã¡øà y£ yî£9fç¹d"9¢%¹íd9ë¥ùak9o#øà ‚‹H9o§ˆ\ÜÙ]Ë[Xœ˜\žKØ\ÜÙ]ËÚ[˜›Þù¢ : ïZXÛÛ‹Öù¢,:k)yâà9¡bùg%º"!ÚXÛÛ—X9l#¹aiyæë¹bcH[[YH9kéºf¦ù/oùå*9æ¡Œˆ9o-yâà9¡bùg%º!ìÈ\ÜÙ]ËÝ™žÜÝ]\ËØ8à ¹aj:`ê9/oùå*ÜÜÛ\ÜÈÙX”;ï&ú/byª¥9­`yê"ú`$9o-zjeú+by`ãùí(QOL8à yl.¹kî9. :!í:"!È’Q‘‹ÕÑP”ÚYÛ˜]\™xà ¹§*¹l!ù¬¤¹§"yãj9êâÈ[[YH9âà9¡bÈÝÛ™\ˆ9æ¡:`&¹å*XÛÛˆ9o-ú(c9£©yaiy«hùo#ú`b¹¢,¸à ‚‹H9. 9«(y )ú,áùå(º/byª¥ÛÜšÙ›ÝÈ9cê¹kf9g*9¥¯9¥¯yméz`c¹ê"ûï&ùk£9¢$\ÜÙ]ÛÛ[Z]9o£9mìº!ê¹båyb*ºfi;ï#9§ 9í`¹b!¹¥+ù.#y/çyåfz!ê9¦`ˆÛÜšÙ›Ýøà ‚‹H9l":h!H\ÝËØ˜]K\Ý]\ËZ[™›ËX\ÜÙ]ËLŒŒLŒ‹\ÝšœØTÔûï&ØœH[ˆZ[TÔûï&ØœH[ˆZ[˜ÚXÚØTÔøà º,áùå(º/byª¥9§"y¥b[ˆÍ;ï&˜ÍMÌNÌMÌÕPÐÑTÔûï&ùå'ù¢$:,áùå(»ï#ùd#9«iHZ[ÛÛ[Z];ï&˜LÌ˜˜ÙÙYŒÌ˜˜ÙŽ™MØ™LXØ™LÎMXLÌ˜8à ‚‹H™\]Z\™[Y[˜]Ú;ï&˜™[X\ÙKÜ™\]Z\™[Y[X˜]Ú\ËÌŒ‹LKLŒ‹X˜]K\Ý]\ËZ[™›ËX\ÜÙ]ËšœÛÛ˜9mì¹caùí&¹à®ˆ‘T’Q’QQ8à ”ˆÍLMH^XÝXØ[™Y]HÒH[ˆÍMÌNMNMLM˜ÕPÐÑTÔûï&Ð˜]KÕ‘–™YÜ™\ÜÚ[Ûœøà Qš^YÛÝNŒMˆ[Øš[HPxà Y^XÝXØ[™Y]H™X[˜]H[Øš[HPxà \™\ÛÝ\˜Ù\øà [ØY\¸à T™[X\ÙHØ]xà YÚ]Y™ˆ9aj:`ê:`&º`c¸à ‚‚ˆÈÈŒ‹LKLŒˆ8 %9aj9gçù£lº.î:)¥º)®ºf¬z%ãûï"UˆØ[™Y]{ï"B‚‹H˜\Ù{ï&¹§ 9¥¬]Ù™MÙ™MŒXŒMLÙLÍÍŒMÍLYM™ŒØXY˜LÌ;ï&ùméy/g9b!¹¥+ûï&˜™X]\™KÚYK\ØÜ›Û˜\œËYÛØ˜[LŒŒLŒ˜;ï&ØXZ[˜9§*¹/ë¹¥.xà ‚‹H9aj9gçÈØÜ›Û˜\»ï"9£lº.î;ï"z)¥º)®¹e+ù. ÝÛ™\ˆ9à®ˆÜÜËÌ[XZ[‹˜ÜÜØ;ï&¹¢`9§"HÙØ[YK\ÝYÙX9aiù¥è¹§"z"!ù§*¹/¡¹£l¹båyk®yfj9/çyåfyc§ù§+Ý™\™›ÝØ8à XÝXÚXXÝ[Û˜8à y¡hù )ù£l¹båz"!ù¢bùbèº(c9à®»ï#9cêºf¬z%ãùà#ú)¯yfj9îjº(ïyæ¡ØÜ›Û˜\ˆ˜XÚËÝ[X¸à ‚‹Hš\™Y›Þ9/oùå*ØÜ›Û˜\‹]ÚY››Û™X;ï&Ð›[šûï#ÕÙX’Ú]9/oùå*Ž‹]ÙXšÚ]\ØÜ›Û˜\˜:f¬z%ãøà ¹§*¹/ë¹¥.HØÜ›ÛÚ][\Ý8à yaiùk®zjæ9n©¸à y£l¹båy¥®yd$xà y¢,:k){ï#ùkf9ª¥;ï#ù¥n9`/;ï#ùãªy¬åxà ‚‹H9mì¹éîúfiÜÜËÍ‹]ŒMMY]‹Yš^\Ë˜ÜÜØ9­ìy­íy¢,:k)yí :c!:"!ÈÜÜËÌÎ]ŒMK\Þ\Ý[KY^[œÚ[Û‹˜ÜÜØ:aãzda9ªjùd$yb%ú(j9æ¡:""ˆØÜ›Û˜\‹]ÚY[˜:)¡º$âûï#:`oùacyo£9li:aãy¥¬:hkùé.¹cëú)¢ù£lº.î8à ‚‚ˆÈÈŒ‹LKLŒˆ8 %™[™\˜]HÝÛ™\ˆH9¥-¹¥ ¹k£9¢$;ï"U»ï"B‚‹H9«hùo#ÈXZ[˜9.ãyà®ˆŒMÌËÌ;ï&˜Œ˜™MNM™ØMŽ˜™˜YLŽŒØØØÍÙYL™™NLX;ï&ù§+9«(H™[™\˜]HÝÛ™\ˆ:aãy©âÊŠ¹l&¹§*¹æo9n ùb,XZ[ŠŠ¸à ‚‹H9§ 9¥¬]˜;ï&˜ØÙMÌ˜XÍ™˜ÍŒ˜XÍLÌNXÌ™ÙMMLÌYXŒX8à ‚‹HˆÍLÈ9mì¹d"9/mH]»ï&ØœËÌ[XZ[‹šœÎŽœ™[™\˜]J
+X9ãï¹à®¹e+ù. 9«hùo#È™[™\ˆÝÛ™\¸à ‚‹H9c§ù«hùo#È[[YH9alHˆ9li™[™\˜]HÜ˜\\»ï"ŒLÌ{ï#ÕŒM{ï#ÕŒMûï#ÕŒMM;ï#ÕŒMN;ï#Ñš^YÛÝY\\»ï"ymì¹aj:`ê9éîúfi;ï#9¥.yà®¹fî¹k¦ºh!¹n£È˜[YYÛÚÜûï&Ô›ÙXÝ[Ûˆ[[YH9.#ya£ya`z*,y¥¬9h§ˆ™[™\˜]HÜ˜\\¸à ‚‹H™Y›Ü™K\™[™\ˆ:h!¹n£ùfî¹k¦»ï&•ŒMN9¥éyn.9bkù§+9«hú)£ùc%ˆ8¡¤ˆŒMH:aã¹ *»ï#ùbkù§+Y™XÞXÛ{ï&ÐY\‹\™[™\ˆ:h!¹n£ùfî¹k¦»ï&•ŒLÌH›Ü›X][Ûˆ8¡¤ˆŒMH˜]HR{ï#Ù[žH8¡¤ˆŒMÈ[™[^HXÛÜ˜][Û»ï#ÔQ»ï#ÕŒMÛÚÈ8¡¤ˆŒMMXž\ÜÈR{ï#ÔÜ˜Z]8¡¤ˆš^YÛÝ™XÛÛ˜Ú[xà ‚‹H9c§ù«hùo#ú(c9à®¹/çy£ {ï&‘›Ü›X][Û¸à S[ÛœÝ\ˆÜ˜Z]8à PXž\ÜÈ9.¥9n'xà Q[™Ù[Û»ï#ÕÚ[;ï#Ð›ÜÜøà Qš^YÛÝ8à TÝ]\ûï#ÔÚÚ[‘–8à P˜]HÝ]\ÝXÜøà P›ÜÜÈ˜]Ù\¸à yfç¹d":h!¹n£ú"!ÈXÝ[ÛˆØY[˜ÙH9gaù§*¹¥.z)£ù¨/;ï&ØÔÕÐPÕSÓ—ÑSVWÓTØ9§*¹/ë¹¥.xà ‚‹HˆÍLÈØ[™Y]HÒH[ˆÍMŽMÌMŽNN;ï&”ÕPÐÑTÔûï&ùc!yd*ÈÞ[^8à XZ[˜ÚXÚøà Qš^YÛÝ8à X˜]H^[Ý]Ý[Z[™ËÕ‘–8à \™[XËØ˜]KZ[œ]8à \™\ÛÝ\˜Ù\øà RSQøà [ØY\¸à T™[X\ÙHØ]xà YÚ]Y™ˆ:"!È^XÝXØ[™Y]H™X[˜]H[Øš[Hœ›ÝÜÙ\ˆPxà ‚‹H[›ÙHÝZ]H9.éHÒK[Û›H˜YˆÍL:jeú+b{ï&œ[ˆÍMŽMÍÌÍŽX;ï#
+ŠŒŒÈÈŒÈTÔÊŠ»ï&ÔˆÍL9mìºeç:e¢y.%9§*¹d"9/mHXZ[¸à ‚‹H]ˆ\ÚÒH[ˆÍMŽMÎLLX;ï&”ÕPÐÑTÔûï&Ñ]ˆ\Þ[Y[Ø]{ï#Ù^XÝTÒH™\šYšXØ][Û»ï#ÑØ[YJÐØXÚH™\šYšXØ][Û»ï#Ù\ÞYY˜]H^[Ý]	ˆ‘–]™HPH9aj:`êÕPÐÑTÔøà ‚‹H9¥-¹l/¹¦`ˆÜ[ˆ»ï&Œ;ï&ÓÜ[ˆ\ÜÝY{ï&Œ8à ‚‹H9æë¹bcH]˜™Z[™XZ[˜H;ï&Ù]ˆ9mì¹fèŒMÌËÌ9æo9n ùo£9æ¡9¥¡ù.í¹¥-¹l/º"!ùmìºjeú+bH]‹[Û›H™[™\˜]H:aãy©âú #:h&9abXZ[¸à º`&y.#y.èú(jŒMÌËÌ™[X\ÙHY™XÞXÛH9i,y¥eûï#9.gù.#y.èú(j:g :) zaãyæo:""¹âb9§+8à ‚‹H9§+9«(y§*¹/ë¹¥.y¢ : ïy¥n9`/8à y`­ùk¬ùak9o#øà P›ÜÜÈRxà y£¢z$/{ï#ùí¤ù¯çøà yãªyk­¹kf9ª¥ØÚ[Xxà Qš\™X˜\ÙH9«hùo#ú,áù¥¦z(c9à®¹¢%¹am¹.åˆRxà ‚‚ˆÈÈŒ‹LKLŒˆ8 %ŒMÌËÌ9«hùo#ùæo9n ùk£9¢$;ï#ÛXZ[‹Y]ˆ9¥-¹¥ ¹k£9¢$‚‹H9«hùo#ùâb9§+;ï&•ŒMÌËÌ8à ‚‹HŒMÌËÌ9b§ú ïyæo9n ÈÒ{ï&˜XÌÍL™˜™˜ÙMŒŽLYŽMNXØÌŽŒÙY™ŽYXX˜8à ‚‹H9§ 9¥¬XZ[˜;ï&˜Œ˜™MNM™ØMŽ˜™˜YLŽŒØØØÍÙYL™™NLX8à ‚‹HŒMÌËÌ™[X\ÙHY™XÞXÛH9¥-¹¥ ¹åm¹¦`¹æ¡]˜;ï&˜XL˜˜˜ÌÌMŒÌÌY˜Œ™NMÎØŒLÍ˜ŒØØ™XMXÌX;ï&ùo£9î£]ˆ:`,¹n©¹.éy§+9¥¡ù.í¹§ 9."¹¥®y§ 9¥¬9c`9hb¹à®¹®¥¸à ‚‹HˆÍLûï&•ŒMÌËÌ9«hùo#ùæo9n ù¢$9b§øà ‚‹HˆÍL;ï&ÒPÒ×Ô‘TÔ•9æo9n ùo£9¥¡ù.í¹¥-¹l/¹¢$9b§øà ‚‹HˆÍL{ï&›XZ[¸¡¤™]ˆ9«mùcì¹¥-¹¥ ¹¢$9b§øà ‚‹HXZ[ˆÒ{ï&”ÕPÐÑTÔûï"[ˆÍMŽÍMŒM»ï"xà ‚‹HÚ]XˆYÙ\ûï&”ÕPÐÑTÔûï"[ˆÍMŽÍMÍ;ï"xà ‚‹H]ˆÒ{ï&”ÕPÐÑTÔøà ‚‹H[›ÙHÝZ]{ï&ŒŒÈÈŒÈTÔøà ‚‹HØ[YHÈØXÚH™\œÚ[Û»ï&ŒMÌËÌÈMÌËÌ8à ‚‹HÜ[ˆ»ï&Œ;ï&ÓÜ[ˆ\ÜÝY{ï&Œ8à ‚‹H9g*ŒMÌËÌ™[X\ÙHY™XÞXÛH9íd9¨b9åm¹."ûï#XZ[˜;ï#Ø]˜9kéºf¦ùª¥9¨b9aiùk®y. :!í8à X]˜™Z[™XZ[˜H;ï#9.%]ˆ9`áyi&ˆH9`"ÈXZ[¸¡¤™]ˆ9¥-¹¥ ˆY\™ÙHÛÛ[Z];ï&ú`&y¦+ù«mùcì¹íd9¨b9oêùáiûï#9.#y.èú(j9o£9î£]ˆ9¬.:`h9.#yo¥ùbcz`,¸à ‚‹HŒMÌËÌ™[X\ÙHY™XÞXÛ{ï"9æo9n ùå'ùdoz`,y§'ûï"ymì¹«hùo#ùíd9¨b8à ‚‹H
+Š’\ÝÜšXØ[™XÛÜ™;ï"9«mùcì¹í :c!;ï"z*.ú*&;ï&¹."ù¥®HŒMÌËŽH:"!ú""ˆŒMÌËÌ9`&z`n9aiùk®ycê¹/çyåfy/g9«mùcìº!"9íh{ï#9.#yo¥ùa£z(ªÈR{ï#ù.èùä!¹åm¹¢$9æë¹bcy«hùo#ùâà9¡bù¢%¹."ù. 9«iyæo9n ù£!ùé.¸à ŠŠ‚‚ˆÈÈŒ‹LKLŒH8 %9æë¹bcy«hùo#ùâà9¡bûï#ÕŒMÌËÌ9`&z`n9íd9¨b‚‹H9«hùo#ÈXZ[˜;ï&•ŒMÌËŽ{ï#Ø[Y{ï#ÐØXÚH™\œÚ[Ûˆ9à®ˆMÌËŽX;ï&ùæë¹bcHÒ{ï&˜ÍÍÌMÍLÙM™L˜MÙŒNLÎXNYY˜ÌY™XŽXXÌ8à ¹«hùo#ÈÒH:"!ÈYÙ\È\Þ[Y[9gaùmì¹¢$9b§øà ‚‹H9§ 9¥¬]˜;ï&˜ÙM™LMŒNXŽ˜NLLŒXÍ™LÙYØXØÍX;ï&ù§+:/*¹¥¡ù.í¹¦í9¥¬9.éy«i9à®¹gî¹®¥»ï#9§*¹æí9£©y/ë¹¥.H]˜9¢%ˆXZ[˜8à ‚‹H9c§ÈŒMÌËÌ9`&z`nˆÍŒÈ9mìºeç:e¢y.%9§*¹d"9/m{ï&¹`&z`nÒH:(ªùfæù`"ùá(y¥b9¥éyn.9bkù§+ÙX”:f.ùhg»ï#9g%¹âaù/ë¹oªyméy/g9mì¹å,yl"9¨b:,¨:,«9.®¹¦#¹è®¹íd9¨b;ï&ùo£9î£9.#yo¥ù¢¢º*l¹`&z`nÒH9åm¹¢$9cëùæo9n ùâb9§+8à ‚‹H9."ù. 9«(yæo9n ùoázh":aãy¥¬9.éy§ 9¥¬XZ[˜;ï#ù§ 9¥¬]˜9nî¹êâù`&z`n;ï#:aãy¥¬:-äyk£9¥mÒxà QUˆ^XÝTÒH\Þ[Y[:"!ÈÌŒÈ[˜H9ké¹ªgújeù¥-¸à ¹§*¹k£9¢$9bcy.#yo¥ù£ª:` HXZ[˜8à ‚‹H9æë¹bcy.ãy/çyåfyæ¡:ggºf.ù¥­ù¢ :(dù`­{ï&¹¢,:k)y¨.9oàùi&¹li™[™\˜]J
+XÜ˜\\ˆ9l&¹§*¹¥-¹¥ »ï&ùç'ùªgújeù¥-¹.ãy.#z ïyå,yª(y¤ë9l.¹kîÒH9cå¹.èøà ¹.éy."ú/ ù¥êyæ¡“ÕÓÓTU{ï#ùo¡zjeù¥-¹í :c!9gaùà®¹«mùcì¹í :c!;ï#9.#y.èú(j9æë¹bcy«hùo#ùâà9¡bøà ‚‚ˆÈÈŒ‹LKLŒH8 %9£ yî£9âà9¡bú)¥º)®ˆÝÛ™\ˆ9¥-¹¥ »ï"Í‘T’Q’QQ;ï#ÔˆÍ»ï"B‚‹H˜\Ù{ï&˜]™LÌNXYÙLØÍM™MŽMØMÎÙYŽÙL™XØ;ï&ùméy/g9b!¹¥+ûï&˜š^ÜÝ]\Ë]š\ÝX[[ÝÛ™\‹XÛX[\LŒŒLŒX;ï&ØXZ[˜9§*¹/ë¹¥.{ï#9§*ˆ™X˜\Ù{ï#Ù›Ü˜ÙH\Ú8à ‚‹H9£ yî£9âà9¡bú)¥º)®¹e+ù. ÝÛ™\ˆ9¥-¹¥ ¹b,œËÌÎK]ŒMË\ÚÚ[X[š[X][Û‹šœØ;ï&¹cê¹/çyåfH[ÙX;ï"9e«¹o-ydo9d.;ï"xà XÝ]XØ;ï"9fî¹k¦¹e«¹g%»ï"xà XXÛÛ”[ÙX;ï"XÛÛˆ9do9d.;ï"y."yê+¹/c¹båy¡bùª(yo#ûï&ù£ yî£9âà9¡bù.#ya£y/oùå*:`$9n`Üš]HÛÜ;ï#Ñœ›ÛP˜XÚÈÛØÚøà ¹¢ : ïy¥¯y¥/¹ç«:e¤ùæ¡Lˆ9n`Ø\Ý‘–9/çy£ y.#z+¢¸à ‚‹HœËÌ[XZ[‹šœØ9æ¡9¢,:k)yâà9¡bùb%ùcê¹/çyåfHÜÝ;ï#9.#ya£z!êº(c9åjùáàùáä»ï#ùa¬9l {ï#úaãyb¦ûï#ùè-:f,¹ëbyë+9.£9ieÈ˜YÙ{ï&ú""¹áàùáä»ï#ùa¬9l HØ\™Ý™\›^H9mì¹éîúfi8à ˜œËÌÍK]ŒMK]ZKX˜]KšœØ9æ¡™]\™YØ\™Y™™XÝ™[™\™\ˆ9mì¹b*ºfi;ï#9cê¹/çyåfyæî9k®ydo9cêúgh¸à ‚‹H9b!ºhg»ï&¹áàùáä»ï#ù $¹àjûï#úhª:(c;ï#ù¬(ùk¦¹égºe¤»ï#ùa`ùéeº,ç9é£ùëby/oùå*9e«¹g%¹do9d.;ï&ú+mùæï»ï#ú$+:,hyg'ùæï»ï#ùlªyçìùhàyhæ;ï#ùíd9åc;ï#ùa¬9l {ï#ùçìùc%»ï#úf¬z.ªù/oùå*9fî¹k¦¹g%»ï&ùaãy`­ûï#úaãyb¦ûï#ù«©:hª;ï#ù¦¢9ç*{ï#ùè-:f,»ï#ùaj9lk9 )úfcy/c»ï#ùà£¹bè»ï#úlìùj y/oùå*XÛÛˆ9do9d.8à ‚‹H™[X\ÙKÙ\™XØ]YXÛÙKšœÛÛ˜9¥¬9h§ˆTL»ï#9é y«hˆŒMÔÝ]\Ô˜\Ý\‘œ˜[Y\Ø8à XŒMLË\Ý]\Ë]™ž8à z""ˆÝ]\ÈÜš]HTH:"!ú""ˆ\›‹Ùœ™Y^™HØ\™Ý™\›^H9fç¹«n8à ‘š^YÛÝÙ[ÛY]žH9.ãy¦+ù.®¹âjz.ªù."¹âà9¡bùg%¹e+ù. 9k¦¹/cy/¡¹®¤8à ‚‹H9§*¹/ë¹¥.y`­ùk¬ûï#ù¬®ùæ`¹ak9o#øà yâà9¡bùdoy.+xà y£ yî£9fç¹d"8à yfç¹d"9¢húfi8à P›ÜÜÈRxà y¢ : ïy¥n9`/9¢%¹kf9ª¥8à •ŒMˆ9.ãy/çyåfH[Z[™ÈØ]{ï&ùam¹«mùcìˆØ[Y\^H™\ÛÛ™\ˆ9¢ :(dù`­y§+9«(y.#y¤í9i)ú&eyä!¸à ‚‹H™\]Z\™[Y[˜]Ú;ï&˜™[X\ÙKÜ™\]Z\™[Y[X˜]Ú\ËÌŒ‹LKLŒK\Ý]\Ë]š\ÝX[[ÝÛ™\‹XÛX[\šœÛÛ˜;ï#Í‘T’Q’QQ8à ¹`&z`nÒH[ˆÍMNLÎMÎŽX9æ¡™\ÜÚ]ÜžHÚXÚÜÈÕPÐÑTÔûï#9c!yd*È˜]KÕ‘–™YÜ™\ÜÚ[Ûœøà Y]\›Z[š\ÝXÈZ[8à Qš^YÛÝNŒMˆ[Øš[HPxà Y^XÝXØ[™Y]H™X[˜]H[Øš[HPxà \™\ÛÝ\˜Ù\øà [ØY\¸à Y\™XØ]YXÛÙH™[X\ÙHØ]H:"!ÈÚ]YY™¸à ‚‚ˆÈÈŒ‹LKLŒ8 %9­ìy­íHÝÛ™\ˆ9¥-¹¥ »ï#ù.¥9n'yêâùîj»ï#ùea¹n¥ú"!ù..ùgãˆXY\»ï"STSQS•Q;ï#ÔˆÒH:"!È]ˆ9ké¹ªgújeù¥-¹o¡yk£9¢$;ï"B‚‹H˜\Ù{ï&¹§ 9¥¬ÜšYÚ[‹Ù]™LYŒŒÍLØØLLMÍ˜ŽMLML˜ØŒØX;ï&ùméy/g9b!¹¥+ûï&˜š^ØXž\ÜË[\ÚÚ[[ÝÛ™\‹Yš]™KY[\\›Ü‹\Ü˜Z]LŒŒLŒ;ï&ØXZ[˜9§*¹/ë¹¥.{ï#9§*ˆ™X˜\Ù{ï#Ù›Ü˜ÙH\Ú8à ‚‹H9§ 9í`¹.¥9n'y«hùo#ù¢ : ïye+ù. ÝÛ™\ˆ9à®ˆœËÍNKXXž\ÜË]ÛË]Y\‹\[[YKšœÎŽ‘’SSÕ•QWÔ‘PSWÓÐQÕUØ;ï&ØœËÍ:""ˆš[˜[›ÜÝ\ˆ]Ú8à XœËÍ˜:""ˆ›ÜÝ\ˆÝ™\œšYH:"!ù."yía9§*¹£©yíæº)äº"lˆ[™\ˆ9mìº` 9/$xà •ŒM{ï#ÕŒMMH9cê¹o§¹kéºf¦ÈÚÚ[YØ;ï#ØŒMTÝ\ÜÚÚ[YØ:`,¹aiHÚÚ[RQ\Ü]Ú\»ï&ùc%ùn'y§*¹¥'9n-ˆ™]š]™X9¦`¹.#y§ ùoªy­.øà ‚‹HœËÍK]ŒMMY]‹Yš^\ËšœÎŽœ™\ÛÛ™S[ÛœÝ\”Ü˜Z]™XÛÜ™
+
+X9mì¹¥.yà®¹l"9lk9g%»ï#Ô™YÚ\Ýž{ï#ù«hùo#ÈXž\ÜÈX\[™È9a*¹ab;ï#›ÜÜÈXÙZÛ\ˆ9cê¹/g9§ 9o£˜[˜XÚûï&ù.¥9n'H™YÚ\ÝžH^\Ý[™È9d!:!êº)èù§¤›ÛÜHÜ˜Z]8à •ŒMNH9cê¹/çyåfH[Z[™ÈœšYÙxà ‚‹HŒMÌËLHÚÜPH[[YH9mì¹¥.yà®ˆ[™\;ï#9«hùo#ùea¹n¥ùfç¹b,œËÙ\]Z\Y[\›ÙÜ™\ÜÚ[Û‹šœÎŽœ™\XÙQ\]Z\Y[ÚÜ;ï&ØÜÜËÍLØ:""¹ajyb%ú)¡¹kêùéîúfi8à ¹..ùgãºf¢¹/#HXY\ˆ9å,y«hùo#ÈÜšY9«!9/cHÝÛ™\ˆ9b!ºf¥:f¢¹/#y¥n8à zaäynhú"!ù/b:fhøà ‚‹H9mì¹¥¬9h§ˆÝÛ™\ˆÛÛ™\™Ù[˜Ùxà y.¥9n'HÜ˜Z]8à \›ÙXÝ[Ûˆ[™KØØ\ØØYxà LÎL;ï#ÍLˆXY\ˆœ›ÝÜÙ\ˆ:"!ùea¹n¥Èœ›ÝÜÙ\ˆ™YÜ™\ÜÚ[ÛˆÝX\™;ï&ùæë¹bcy§+9ªgù¬¤¹§"HÚ›ÛY{ï#9ajy`"Èœ›ÝÜÙ\ˆÝZ]H9cê¹§ ÈÚÚ\;ï#9.#z ïz)¥¹à®¹ké¹ªgÈ‘T’Q’QQ8à ‚‹H9§+9g,ÛÝ\˜Ù{ï#Ü[[Yxà Y]\›Z[š\ÝXÈZ[8à XZ[˜ÚXÚøà \Þ[^8à [ØY\¸à \™\ÛÝ\˜Ù\øà RSQøà T™[X\ÙHØ]H9gaú`&º`c»ï&ùo¡HÛÛ[Z];ï#Ü\Ú;ï#Ôˆ8¡¤ˆ]˜8à \™\]Z\™YÒxà QUˆ\Þ[Y[:"!ù/oùå*: !HÎL;ï#ÍLˆ9ké¹ªgùè®º*£yo£9a£ycaùà®ˆ‘T’Q’QQ8à ‘Ø[Y{ï#ÐØXÚH™\œÚ[Ûˆ9í«y£ HŒMÌËŽ{ï#XZ[˜9é y«h¹/ë¹¥.xà ‚‚ˆÈÈŒ‹LKLŒ8 %: ã9c!{ï#ùea¹n¥úaäynhûï#ù..ùgãºaäynhûï#úfè¹íæ¹nèùdb»ï#ùk¨¹§#{ï#ùænùaiyakzh!y/ë¹oª{ï"‹Íˆ‘T’Q’QQ;ï#ÕŒMÌËŽH9æo9n ù.+{ï"B‚‹H˜\Ù{ï&¹§ 9¥¬]XÙLLMÎYM˜˜ÙLLÌŽLXÍŒØŽYØØÌŽ˜˜ŒM;ï&ùméy/g9b!¹¥+ûï&™š^Ø˜XÚÜXÚË\ÚÜZÛYYÛÛ[Ù™›[™KX]]LŒŒLŒ]Œ»ï&ÛXZ[ˆ9§*¹/ë¹¥.xà º""¹b!¹¥+ùfè9¥¯yméz`%9.+H]ˆ9bcz`,¹.%9d#9¦`¹/ë¹¥.yea¹n¥ÈÔÔûï#9mì¹/çyåfy/a¹.#ya£y/g9¥m9d"9`&z`n;ï&ù§+9b!¹¥+ùo§¹¥¬]ˆ:aãy¥¬9ieùå*;ï#:`oùacz)¡º$âù§ 9¥¬9¥n:aãù«!9keùí&¹/ë¹«høà ‚‹HL	H:%éy¬-;ï&¹«hùo#ú ã9c!yëêz`nÝÛ™\ˆœËÌ[XZ[‹šœÎŽ™Ù]š[\™Y[™[ÜžR][\Ê
+H9£¤ºfiÝ[ÛLÜÜÝ[ÛL;ï&ú""ˆYš[š][Ûˆ9¦ªùåfycê¹à®¹k¢yaj:)èù§¤9¥è¹§"ykf9ª¥;ï#9.#y`f¹è-9hç¹ )ùkf9ª¥:`mùéîøà Y™[\™HŒH9kí¹ë¬{ï#ùea¹.®¹`g9«h¹a£yå(¹aîˆL	H:%éy¬-;ï#9¥.yå*9«hùo#ÈÌ	HÝ[ÛŒÌÜÜÝ[ÛŒÌ8à ‚‹H:(çy`¦yea¹n¥úaäynhûï&”[[YH9c§ù§+9mì¹§"HØ[]X\šÝ\;ï#9ç'ù«hù¨.yfè9¦+ÈÜÜËÍK]ŒMŽK\œË]ZK˜ÜÜÈÛ™K\ØÜ™Y[ˆ9no¹/ey¢¢ˆŒMÌÍKY\]Z\Y[]Ø[]:*+yà®ˆ\Ü^N››Û™{ï&ùmì¹g*9d#9. ÝÛ™\ˆ9 h¹oªHÌœÛÛ\XÝ›Ýûï#ŒMŽH:"!È\]Z\Y[\›ÙÜ™\ÜÚ[Ûˆ9ajy`"ù¥è¹§"H™[™\™\ˆ:`ïzhkùé.¸à#9æë¹bczaäynhøà#xà ‚‹H9..ùgã¹í!yg"9/cyïk»ï&šœËÌM‹\ÝYÙK]M[XZ[‹XÚ]K\[[YKšœÎŽ™[œÝ\™RÛYT›ÜÝ\”Ú[
+
+H9g*9a¤ºfªºf¢¹/#HXY\ˆ9b¨9aiyî/zaäynhûï&ÚœËÌ[XZ[‹šœÎŽ\]QÛÛ\Ü^J
+H9¥¬9h§¹d#9. ÓHÚ[šûï#9fè9«i9ãl¹o¥ûï#ù­¢:,®úaäynhù¬¯ùå*9¥è¹§"yd#9«iHÝÛ™\»ï#9.#y¥¬9h§ˆ[Y\»ï#ÛØœÙ\™\¸à ‚‹H:fè¹íæ¹í¤újeûï&ÛÛ\XÝRH9¦ï¹do9cêù.#ykf9g*9æ¡Ø]ÚÙ™›[™Q^Y
+
+{ï#9¢`9.éy£"zb%yá(ycãy¡â{ï&ùmì¹¥.yfç¹¨.9oàù¥è¹§"HÛZ[SÙ™›[™Q^Ú]Y
+
+H8¡¤ˆÚÝÔ™]Ø\™YY
+
+H8¡¤ˆÛZ[SÙ™›[™Q^
+YJ{ï#9.#ynî¹êâùë+9.£9ieùnèùdb¹­`yê"øà ‚‹H9k¨¹§#y/èyë¬{ï&Üš]XØ[›ÛÝ9e+ù. ÝÛ™\ˆœËÜÝ\\ÜÝ\ÜXÛÛXÝšœÈ:"!Èš]˜XÞKš[9íly. 9à®ˆ›Ý\œÞ[X›ÛËœÝ\ÜÛXZ[˜ÛÛ{ï&Ñš\™X˜\ÙKÐÛÝYØ]™H9ãïº(c9¥¡ù.íº"!È™\ÜÛœÚ]™KÜÝ\Ü9®+:*i¹d#9«ixà ‚‹H˜XÙX›ÛÚûï&¹cê¹o§ˆœËÙš\™X˜\ÙKÙš\™X˜\ÙKX]]]ZKšœÈ9éîúfiÙXˆ9ænùaiy£"zb%xà Z[\ÜØš[™;ï&Ùš\™X˜\ÙKX]]šœÈ9æ¡›ÝšY\‹ØÛÜ™xà y¥è¹§"H˜XÙX›ÛÚÈ:.ªùb!¹æî9k®z"!È[™›ÚY˜]]™H[™Ù™ˆ9gaù/çyåf{ï#9ë)¹d"8à#9¦ªù¦`¹.#ze¢ù¥/¸à#z #:gg¹¬.9.ayb*ºfi9n,ú&gú ïyb¦øà ‚‹H™\]Z\™[Y[˜]Ú;ï&œ™[X\ÙKÜ™\]Z\™[Y[X˜]Ú\ËÌŒ‹LKLŒX˜XÚÜXÚË\ÚÜZÛYYÛÛ[Ù™›[™KX]]šœÛÛ»ï&Í‹Íˆ‘T’Q’QQ8à ™]ŽMMÎÍLLÍŒ™LÍX™MM˜˜™MÍÌ™XŽMˆ9æ¡ÒH[ˆÍMLLNLLÈ:"!ÈUˆ^XÝTÒH\Þ[Y[9mìˆÕPÐÑTÔûï#Ù\ÜÚ[Ûˆ]]Üš]H[ˆÍMLLNÕPÐÑTÔûï&ùl"9¨b:,¨:,«9.®¹mì¹¦#¹è®¹£!ùé.¹£ª9b,XZ[¸à ¹«hùo#ùæo9n ùâb9§+9à®ˆŒMÌËŽ{ï#:g 9k£9¢$™[X\ÙHœ˜[˜Ú8¡¤ˆ]ˆ8¡¤ˆ›ÝXÝY]¸¡¤›XZ[ˆ¸à [XZ[ˆÒH:"!È›ÙXÝ[ÛˆÒH:jeú+byo£9¢cycëùíd9¨b8à ‚‚ˆÈÈŒ‹LKLŒ8 %˜]HÝ]\ÝXÜûï#ù«hùo#ùéæ9kíºacz(ç{ï#Ð›ÜÜÈ9¢,9¬ày¢¯ylg;ï#ùa`ùí(9he:!ê¹båyî£9¢,;ï"‘T’Q’QQ;ï#ÛXZ[ˆ9§*¹/ë¹¥.{ï"B‚‹H9méy/g9b!¹¥+ûï&˜™X]\™KØ˜]K\Ý]Ë\™[XË]ZK]ÝÙ\‹X]]ËLŒŒLŒ;ï&ÔˆÌÍM{ï&ù§ 9¥¬9gî¹®¥¹mì¹d"9/mH]˜ØLÙMÌNLXØLY˜˜ÍÍYMØÍ˜ØM™XYNX;ï#9§*ˆ™X˜\Ù{ï#Ù›Ü˜ÙH\Ú;ï#XZ[˜9aj9ê"ù§*¹/ë¹¥.xà ‚‹H9..ùgãºf¢¹/#yéæ9kí¹¨.yfè;ï&‘š\œÝØÜ™Y[»ï":i¥¹lcûï"y¤f:) z"!È^žH™[Xûï"9éæ9kí»ï"\[[YH9æ¡9b-ù¥¬9¦`¹n£ù.#yd#8à ¹«hùo#ù/ë¹¬åyí«y£ HX[SØYÝ]œ™[XÒY9à®¹e+ù. :(çy`¦yç'ùæî;ï#9..ùgã¹o§¹d#9. RQ9«hùo#ùkf9ª¥:+ 9cå¹¤f:) {ï&ù..ùgã¹§+:.ªù¢$9à®¹e+ù. 9g ¹æíØÜ›ÛÝÛ™\»ï#9n¥z`ê:h$9åfyfî¹k¦¹l#º)¯yb%ûï"ÔØY™H\™X{ï"9k¢yaj9c`9gçûï"xà ‚‹H9ë)¹d¤¹d"9¢$9mê9i)ùg%¹¨.yfè;ï&ŽL°åÌLÎ9æ¡9ë)¹d¤ºh$:)¯z)£ùbaùc§ù§+:*©9¥/¹g*Xž\Üûï"9­ìy­í{ï"[^žHÔÔûï#9e«¹ãj:e¢ùd"9¢$:h y.#y. 9k¦º/"yaixà ¹§d9¥¦z"!ùæë¹ª&yajyo-yg%¹§+9/¡¹l,y¦+ùajy`"ù«hùo#ù¨/9/c{ï#9¬¤¹§"zaãz)!È™[™\»ï"9®,¹§äûï"{ï&ùl.¹kî:)£ùbaùmì¹éîùfçˆÞ[\Ú\ÈÝÛ™\ˆ9.)¹fî¹k¦ˆØš™XÝYš]˜ÛÛZ[˜8à ‚‹H9éæ9kí¹chyâaù.#ya£zhkùé.ˆU»ï#Ô[[YH™XY{ï#Ô™\Ù[][ÛˆÛ›H9ëbyméyê"ùb!ºhg»ï&ÑUˆ:jeù¥-¹.gù/oùå*9«hùo#øà#:(çy`¦{ï#ùmìº(çy`¦{ï#ùcn9."ûï#ú*lù áxà#z"!ÈX[SØYÝ]œ™[XÒY;ï#9.#ya£y/çyåfH]”™]šY]Ô™[XÒY9ë+9.£9ieúacz(çyâà9¡bøà ¹l&¹§*¹amù«hùo#ÈšYÙÙ\»ï#ÑY™™XÝ9æ¡9éæ9kí¹.ãy.#z&fù©âù¢ : ïy¥b9§§9¢%¹¥n9`/8à ‚‹H9¥¬9h§ˆ›Ý\”Þ[X›ÛÐ˜]TÝ]\ÝXÜØ;ï&¹«ãùh-9nî¹êâù. 9.ïHÛÛX˜][RQX\;ï#9«!9/cyfî¹k¦¹à®¹kéºf¦ùî/y`­ùk¬øà y§"y¥b9¬®ùæ`¸à ykéºf¦ù¢où`­øà yç'ù«hù¦­9¤â¹«(y¥n;ï&ù¢,:k)yíd9§gùaãyíd9d#9. 9.ïHÛ˜\ÚÝ;ï#›ÜÜûï#ù­ìy­íyíd9ë¥ù.#zaãy¥¬:*"9ë¥øà º,áù¥¦yg¢ùb)ymìºh$9åfH^Y\Ú\˜XÝ\ˆÈ\›ÓœÈÈ™Z[™›Ü˜Ù[Y[;ï#9§*¹/¡ˆ\›È”È9cêºg :*.ùa¢º`,¹d#9. ÝÛ™\¸à ‚‹H]]È˜]{ï":!ê¹båy¢,:k){ï"y«ãù`"ù«hùo#ù¥¬9fç¹d"9g*9ë+9. 9`"ùk¨ùdb»ï#ú(c9båybczhkùé.ˆH9éä¸à#9ë+9fç¹d"8à#xà ¹mé¹`m8à#:*lùí,9¢,9¬àxà#z"!ùcìù`m›ÜÜÈ9b§ú ïyâjy.íˆ˜]Ù\ˆ9alyå*›Ý\”Þ[X›ÛÐ˜]Q›ÝØ]\ÙKÜ™\Ù[][ÛˆØÚûï&úe¢ùegù¦`¹`g9«h¹o£9î£:!ê¹båz(c9bå{ï#:eç:e¢yo£9å,yd#9. Y™XÞXÛH9 h¹oªxà ‚‹H›ÜÜÈ9í!z"l¸à#;ï xà#ycê¹¢¥yolyæë¹bcykf9­.ùæ¡9«hùo#È›ÜÜÈØš™XÝ[]{ï"Œ{ï#ÑH9b§ú ïyâjy.í»ï"{ï#9.#yoªy­.ùmìº` 9onyæ¡QPÒÊ˜9ìîùíl{ï&Ñ˜]Ù\ˆ9§ ùb%ùaî¹aj:`ê9kf9­.ùâjy.í¹æ¡9d#yê,xà y¥b9§§8à z)î9æo8à yâà9¡bú"!ùbjzi&9fç¹d"8à ‚‹H9`"ù.®ˆ›ÜÜøà y.%¹åc›ÜÜøà y­ìy­íy«hùo#ù¢,:k)y/oùå*9d#9. ˜]HÝ]\ÝXÜÈœ›Þ™[ˆÛ˜\ÚÝ:hkùé.¹¢bùbåzeç:e¢yæ¡:*lùí,9íd9ë¥ûï&ù. :"+9mèy *º"!ù«ãù¥éybkù§+9.ãz-l9c§ùoêú`'ùíd9§gù­`yê"øà ‚‹H9a`ùí(9he9¥¬9h§¸à#:!ê¹båy£$y¢,9."ù. 9li8à#XÚXÚØ›Þ;ï&ùbçyb*yo£9å,ye«¹. 9cåùë¨yä!ˆ[Y[Ý]ÝÛ™\ˆ:hkùé.ˆø¡¤Œ¸¡¤Œ{ï#9a£yegùbåy«hùo#ù."ù. 9li8à ¹¢,9¥eøà y§ :jæ9li8à yãc¹bíHØ]xà y.#yë)º`,¹aiy¨§y.í¸à [][˜Ú\ˆ9i,y¥eøà yãªyk­¹cå¹­¢9¢%¹ç'ù«húfèºe¢ÈÝÙ\ˆ:`ïy§ ùcå¹­¢;ï#9.#y§ ùi,y¥eúaãz*i¹¢%º ã9¦kù«¦9åfxà ‚‹H9¥è¹k¦ˆÔÕÐPÕSÓ—ÑSVWÓTÏLLML8à z)äº"l»ï#ùéæ9kí¹¢ : ïy¥n9`/8à P›ÜÜÈ9¥n9`/8à PRxà QV8à zaäynhøà y£¢z$/z"!ùãc¹bíygaù§*¹/ë¹¥.xà ‚‹H™\]Z\™[Y[˜]Ú;ï&˜™[X\ÙKÜ™\]Z\™[Y[X˜]Ú\ËÌŒ‹LKLŒX˜]K\Ý]Ë\™[XË]ZK]ÝÙ\‹X]]ËšœÛÛ˜;ï#LÌL‘T’Q’QQ8à ”ˆÌÍMHØ[™Y]HÒH[ˆÍMŒÍÎLŒX9æ¡™\ÜÚ]ÜžHÚXÚÜÈ9mìˆÕPÐÑTÔûï#9c!yd*È›ØÝ\ÙY™YÜ™\ÜÚ[Û¸à \™[XÈY™XÞXÛxà Y]\›Z[š\ÝXÈZ[˜ÚXÚøà Y^XÝXØ[™Y]H™X[˜]H[Øš[Hœ›ÝÜÙ\ˆPxà PY™[\™H[Øš[HPxà \™\ÛÝ\˜Ù\øà [ØY\»ï#Ô™[X\ÙHØ]{ï#ÙÚ]YY™¸à ‚‚‚ˆÈÈŒ‹LKLNH8 %Uˆ9«hùo#ùâb9§+9ak9dbº)¥º)®ºh$:)¯{ï"‘T’Q’QQ;ï#ÛXZ[ˆ9§*¹/ë¹¥.{ï"B‚ˆÈÈŒ‹LKLNH8 %ŒMÌËˆUˆ9æo9n újeú+b{ï"‘SL{ïgŒ‘T’Q’QQ;ï#ÛXZ[ˆS‘S‘ûï"B‚‹HŒMÌËˆ™[X\ÙHØ[™Y]HˆÌÍH9æ¡9`&z`nÒH[œÈÍMLÍÍÍŒX8à XÍMMÍÎLÌX9mìˆÕPÐÑTÔøà ‚‹H9`&z`n9d"9/myo£]ÙMÌNY˜Ì˜ÌMNMŒLMÌ™ŒMÌXL™™MXN˜;ï#\ÚÒH[ˆÍMMLXÕPÐÑTÔûï&Ô™\ÜÚ]ÜžHÚXÚÜÈ›ØˆLNLŽÌLØ8à Q]ˆ\Þ[Y[Ø]H›ØˆLNLŽÌÎ9gaÈÕPÐÑTÔøà ‚‹HUˆ:`ê9ïlˆ›Øˆ9mìº`$9«iz`&º`c»ï&¹.ãyà®ˆ]ˆPQ8à T™[X\ÙHØ]xà Z[[]]X›HÝ]XÈÚ]xà PÛÝY›\™H\Þxà z`ê9ïl¹o£ÛÛ[Z]Ò{ï#ÑØ[YH™\œÚ[Û»ï#ÐØXÚH™\œÚ[Ûˆ:jeú+bxà Y\ÞYY˜]KÕ‘–]™HPxà ‚‹H9«hùo#ùâb9§+;ï&‘Ø[YH™\œÚ[ÛˆŒMÌË˜;ï#ØXÚH™\œÚ[ÛˆMÌË˜;ï&ù«hùo#ùak9dbˆ™[X\ÙK]ŒMÌÍ˜9mì¹/§ykéºf¦ÈXZ[‹‹‹™]ˆ9ãªyk­¹cëù¡'ùçéymë¹ål9¥m9ä!¸à ‚‹H™\]Z\™[Y[˜]Ú;ï&˜™[X\ÙKÜ™\]Z\™[Y[X˜]Ú\ËÌŒ‹LKLNK]ŒMÌÍ‹[XZ[‹\™[X\ÙKšœÛÛ˜8à ”‘SL{ïgŒ‘T’Q’QQ;ï&Ô‘SLH9ëbyo¡H›ÝXÝY]ˆ8¡¤ˆXZ[˜¸à [XZ[ˆÒH:"!È›ÙXÝ[ÛˆÒH:jeú+bxà ‚‹H9§+9¥¡ù.í¹¥-¹l/ˆˆ9cêº*&:c!Uˆ9æo9n ú+by¤æ»ï#9.#y/ë¹¥.yãªy¬å{ï#ù¥n9`/;ï#Ü[[Yxà ‚‚‚ˆÈÈŒ‹LKLNH8 %™[X\ÙH\]H9«ãù«(yænùaiyak9dbˆ
+È9.â¹¥éy.#ya£y£ä:a¤»ï"ËÌÈ‘T’Q’QQ;ï"B‚‹H˜\Ù{ï&˜]™˜ÌLYXYM˜ØMÌNÌÍÎXÎYØÙØ;ï&ùméy/g9b!¹¥+ûï&˜™X]\™KÜ™[X\ÙK]\]KYZ[K[ÙÚ[‹\™[Z[™\‹LŒŒLNX;ï&ØXZ[˜9.#y/ë¹¥.xà ‚‹H9e+ù. [[YHÝÛ™\ˆ9.ãy¦+ÈœËÜ™[X\ÙK]\]K[›ÝYšXØ][Û‹šœØ;ï#:aãyå*9¥è¹§"HÚÛYQ™X]\™S[Ù[:"!ú-äzi«9áâ;ï&ù¬¤¹§"yë+9.£9ieùak9db¹ìîùílxà ‚‹H9åm¹bcy«hùo#ùâb9§+9ak9db¹¥.yà®»ï&¹«ãù«(y¥¬9æ¡9ænùaiyméy/g:f£¹«­z`,¹aiy..ùgã¹o£;ï#:!ê¹båzhkùé.¹. 9«(xà ¹¥è¹§"H\Ý\ÙY[‹]™\œÚ[Û˜;ï#Ø\Ý\ÙY[‹[›ÝXÙX9cê¹/çyåfymìº+ ;ï#ú`&¹çéz*§¹¡#ûï#9.#ya£y¬.9.azf.ù«h¹."ù«(yænùaiyak9db¸à ‚‹H9ak9db¹n¥z`ê9¥¬9h§¹l#ùg¢ÈÚXÚØ›Þ;ï&¸à#9.â¹¥éy.#ya£z-ìùaî¹£ä:a¤¸à#xà ¹bïº`n9o£9cê¹g*\‹URQØØ[ÝÜ˜YÙHÚYXØ\ˆ9/çykf›ÝXÙRY
+È9ãªyk­º(çyïk¹åm¹g,9¥éy§'Ø;ï&ùd#9¥éyd#9ak9db¹.#ya£z!ê¹båz-ìùaî»ï#:f¥9¥ézaãy¥¬:hkùé.»ï&ùd#9¥éz"éy¥¬›ÝXÙRY9."¹íæ»ï#9¥¬9ak9db¹.ãzhkùé.¸à ‚‹H9.â¹¥éy¢¤yb-¹cê¹olzgïùænùaiz!ê¹båH[Ù[;ï#9.#zeç:e¢z-äzi«9áâ8à y¥¬9âb9§+9`my®+8à Y›Ü˜ÙY\]xà yk¢yaj™[ØY;ï#9.gù.#ykêùaiHÛÝYØ]™xà ‚‹HÔÔÈÝÛ™\ˆ9.ãyà®ˆÜÜËÜ™[X\ÙK]\]K[›ÝYšXØ][Û‹˜ÜÜØ;ï&ùbïº`n9¥¡ùkeÈLÜ8à XÚXÚØ›ÞN;ï#9/cy¥¯9æo9n ù¦`ºe¤ú"!øà#9¢$yçéz`dù.¡¸à#y£"zb%y.búe¤øà ‚‹H\™Ù]Y™YÜ™\ÜÚ[Ûˆ9mì¹¦í9¥¬;ï&ºjeú+bymìº+ 9.ãy¥¬9ænùaizhkùé.¸à yd#9. 9ænùaiycêºhkùé.¹. 9«(xà y.â¹¥éy¢¤yb-¸à zf¥9¥éy h¹oªxà y¥¬›ÝXÙRY9îgº`cº""¹¢¤yb-¸à yc§ù§"H›Ü›X[Ù›Ü˜ÙYÝ\]KÜÛ[™È:(c9à®¹í«y£ xà ‚‹H™\]Z\™[Y[˜]Ú;ï&˜™[X\ÙKÜ™\]Z\™[Y[X˜]Ú\ËÌŒ‹LKLNK\™[X\ÙK]\]KYZ[K[ÙÚ[‹\™[Z[™\‹šœÛÛ˜8à ¹æë¹bcHËÌÈ‘T’Q’QQ8à ”ˆÌÍÒH[ˆÍMLNŒÍ˜9mì¹aj9í¨;ï&\™Ù]Y™YÜ™\ÜÚ[Û¸à Y]\›Z[š\ÝXÈZ[˜ÚXÚøà T™[X\ÙH\]H[Øš[Hœ›ÝÜÙ\ˆPxà Qš^YÛÝ[Øš[HPxà Y^XÝXØ[™Y]H™X[˜]HPxà PY™[\™H[Øš[HPxà \™\ÛÝ\˜Ù\øà [ØY\ˆ[YÜš]xà T™[X\ÙHØ]xà YÚ]YY™ˆ9gaÈÕPÐÑTÔøà ‚‹HØ[Y{ï#ÐØXÚH™\œÚ[Ûˆ9í«y£ HMÌË{ï&ù§+:/*¹.#y/ë¹¥.H™[X\ÙKÜ™[X\ÙK]\]KšœÛÛ˜9ak9db¹aiùk®{ï#9«hùo#ùæo9n ù¥¡ù¨b9.ãyå,y¥è¹§"H]ˆ8¡¤ˆXZ[ˆY™ˆ9idyí!9å(¹å'øà ‚‚‚ˆÈÈŒ‹LKLNH8 %[Øš[HY™XÞXÛ{ï#ÔÚÜ;ï#Ñ[[Y[›Þ;ï#ÐY™[\™{ï#ÒÛYHš\œÝØÜ™Y[ˆ9. úh!y¨.yfè9/ë¹oª{ï"ËÍÈ‘T’Q’QQ;ï"B‚‹H˜\Ù{ï&˜]ØÙNÙ™YXÎÎLMÎÍLLXØM™X˜ÍMY˜;ï&ùméy/g9b!¹¥+ûï&˜š^Û[Øš[K[Y™XÞXÛK\ÚÜY[[Y[›ÞXY™[\™KZÛYKZYLŒŒLNX;ï&ØXZ[˜9aj9ê"ùé y«h¹/ë¹¥.xà ”™\]Z\™[Y[˜]Ú;ï&˜™[X\ÙKÜ™\]Z\™[Y[X˜]Ú\ËÌŒ‹LKLNK[[Øš[K[Y™XÞXÛK\ÚÜY[[Y[›ÞXY™[\™KZÛYKZYšœÛÛ˜8à ‚‹HØÜ™Y[ˆØZÙHØÚÈ9e+ù. ÝÛ™\ˆ9.ãyà®ˆœËÜÝ\\ÜØÜ™Y[‹]ØZÙK[ØÚË\[[YKšœØ;ï&œÞ\Ý[H™[X\ÙH9cëú)¢ù¦`ºaãycå¸à \™\]Y\Ý9i,y¥eùcê¹§"y§"zfd9ëà9­`H™]žxà ZY[‹ÜYÙZYH9cå¹­¢™]žH9.)ˆ™[X\Ù{ï&Ø›Ý\”Þ[X›ÛÔØÜ™Y[•ØZÙSØÚË™Ù]XYÛ›ÜÝXÜÊ
+X9£ä9/¦ÈÝ\ÜY;ï#Ú[;ï#Ù˜Z[\™{ï#ØXÜ]Z\™{ï#Ü™[X\ÙH:*.¹¥­ûï#9.#zf.ùhgˆÝ\\8à ‚‹H[Øš[H™\Ý[YHÝÛ™\ˆ9.ãyg*œËÌ[XZ[‹šœØ;ï&š\ÚXš[]HY[»ï#ÜYÙZY{ï#Ùœ™Y^™H9clù¦`ˆØ]™QØ[YJ
+X;ï&Ø›Ý\”Þ[X›ÛÓ[Øš[SY™XÞXÛQXYÛ›ÜÝXÜØ:*&:c!ØÝ[Y[Ø\Ñ\ØØ\™Y8à [˜]šYØ][Ûˆ\xà \YÙ\ÚÝÈ\œÚ\ÝY8à Yœ™Y^™KÜ™\Ý[Yxà ¹¦kº`&ˆYÙ\ÚÝËÜ™\Ý[YH9.#zaãz-äHÝ\\;ï&Ü™[ØYÙ\ØØ\™9o£9.ãyå,HXØÛÝ[Yš\œÝ]];ï#ÕRQØ]™H™\ÛÛ][Û»ï#ÚY˜]H9 h¹oª{ï#9.#y.éy§+9ªgÈ™\Ý[YHÝ]H:)¡º$âÈÛÝYØ]™xà ‚‹H9ea¹n¥ù¥n:aãú)£ùbaù¥-¹¥ ¹b,ŒLÌÈ›Ü›X[^™TÚÜ\˜Ú\ÙT]X[]J
+X;ï#9§ 9i)ÈNN{ï&ÕŒMH9mì¹éîúfi9§ ú(ªÈŒM:)¡º$âùæ¡:""ˆ™[™\»ï#Ø^HÜ˜\\¸à •ŒM9¦+ù§ 9í`º(ç9dàH™[™\»ï#Ø^HÝÛ™\»ï#ŒMˆ9clù¦`º*"9`îy§ ùæí9£©y¢¢º/.9aiy¨aˆŽNNH9¥.yfçˆNN{ï&ÕŒMŽH9¢$9b§ù£ä9é.¹.ãycê¹/§ykéºf¦ú ã9c!ymëºhczhkùé.¸à ‚‹H9a`ùí(9c(ù.ãyå,HœËÍK]ŒMMY]‹Yš^\ËšœÎŽ™š[š\Ú]]Ô™XÛÝ™\žJ
+X;ï&‘[[Y[›ÞXÝ]™H9¦`ˆL9cëú`,ˆ:(ç9dày`&z`n;ï#9oázh"9ç'ù¢hú(ç9dà{ï&ú"éH9§*¹¢$9b§ù h¹oª{ï#Ô]9.#ygíú(c;ï&ù. :"+˜]HX[:)£ùbaù§*¹¥.xà ‚‹H]›Û9«hùo#úfè¹h-ÛÚÈ9à®ˆœËÌ[XZ[‹šœÎŽ‘›Ý\”Þ[X›ÛÔ]›ÛY™XÞXÛK™^]
+
+X;ï#:aãyå*9¥è¹§"HÝÜ[ÛœÝ\“[Ý™[Y[
+
+X;ï#ØÝÜ]]Ô]›Û
+
+X8à Y™[\™H™]\›‘œ›ÛT]›Û
+
+X9cê¹do9cêù«iÝÛ™\»ï#9.#z)!ú(ïH[Y\‹ÜÝ]{ï&ÑšYÚ[š[X][ÛˆØ[˜XÚÈ9.éHY™XÞXÛHÙ[™\˜][Ûˆ
+ÈX\XÝ]™H
+È]]Ô]›Û[˜X›Y9."zaãyè®º*£{ï#:fè¹h-9o£9i,y¥b8à ‚‹H•	NHÌ9i*yacynèùdbº,áú*"¹g*œËÌM‹\ÝYÙK]M[XZ[‹XÚ]K\[[YKšœØ9¥.yà®ˆX[X[[Û›{ï&ùmì¹éîúfiÝ\\;ï#ÜYÙ\ÚÝûï#Ó]]][Û“ØœÙ\™\ˆ]]Ë\ÚÝÈ9å'ùdoz`,y§'ûï#9/çyåfHÜ[Yœ™YTÙ\šXÙR[™›Ó[Ù[
+
+X9¢bùbåz ïyb¦ûï&ÑPÔ^{ï#ùãc¹bíynèùdb¹§*¹¥.xà ‚‹HXZ[ˆÚ]Hš\œÝØÜ™Y[»ï&˜œËÌM‹\ÝYÙK]M[XZ[‹XÚ]K\[[YKšœØ9g*\\Ú[9ab9nî¹êâùfî¹k¦ˆÝŒM’ÛYT›ÜÝ\˜8à y."y¨/:)äº"lˆXÙZÛ\ˆ:"!ÈX[K\™[XË[ØYÝ]\ÛÝ;ï&ÚY˜]H9o£9cê¹hjùaiùk®xà ¹¥¬9h§¹l#ùg¢ÈœËÜ™[XË\Ý[[X\žKXØ][ÙËšœØ9/gYÛ˜[YKÝšYÙÙ\•^9e+ù. 9¤f:) z,áù¥¦yªbûï&ùk£9¥m™X]\™KX›ÜÜË\™[XØ9.ãH^ž{ï#œËÍŒ]X[K\™[XË\Þ\Ý[KšœØ9.#ya£ynî¹êâúi¥ºh y¤f:) HÓxà ‚‹H9cåùolzgïÈ›ÙXÝ[ÛˆZ[9mìºaãynî¹¥¬ÛÛ[Z\ÚY›ÛÝÐ\ÑØ[Y\^KÔ™[XËÐY™[\™H[™\ûï#\ÜÙ][X[šY™\ÝšœÛÛ˜;ï#ØZ[Ø\ÜÙ][X[šY™\ÝšœÛÛ˜;ï#Ø[™^š[9mì¹d#9«i{ï&ÑØ[Y{ï#ÐØXÚH™\œÚ[Ûˆ9í«y£ HMÌËxà ‚‹H\™Ù]Y\ÝÈ9mì¹¥¬9h§»ï#ù¦í9¥¬;ï&˜\ÝËÜØÜ™Y[‹]ØZÙK[ØÚË\ÝšœØ8à X\ÝËÛ[Øš[K[Y™XÞXÛK\ÚÜY[[Y[›ÞXY™[\™KZÛYKZYLŒŒLNK\ÝšœØ8à PY™[\™{ï#ØYYœ™Y{ï#ÕŒMˆÚÜ;ï#ÛXZ[‹XÚ]{ï#ÝX[H™[XÈØ]™KÜ[[YH9¥è¹§"y®+:*i¸à ‚‹HˆÌÍÈÒH[ˆÍMLLLŒ9mìˆÕPÐÑTÔûï&œÞ[^8à T™[X\ÙH\]xà PY™[\™xà Qš^YÛÝ8à X˜]KÕ‘–8à \™[XÈY™XÞXÛxà Y]\›Z[š\ÝXÈZ[˜ÚXÚØ8à T™[X\ÙH\]H[Øš[Hœ›ÝÜÙ\ˆPxà Qš^YÛÝ[Øš[HPxà Y^XÝXØ[™Y]H™X[˜]HPxà PY™[\™H[Øš[HPxà \Ý]XÈ™\ÛÝ\˜Ù\øà RSQøà [ØY\ˆ[YÜš]xà T™[X\ÙHØ]xà YÚ]YY™ˆ9aj:`ê:`&º`c¸à ”™\]Z\™[Y[˜]Ú9mìˆËÍÈ‘T’Q’QQ8à ‚‚‚‹H9méy/g9b!¹¥+ûï&˜™X]\™KÜ™[X\ÙK]\]KY]‹\™]šY]ËLŒŒLNX;ï#ˆÈÌÍWJÎ‹ËÙÚ]X‹˜ÛÛKÝŒLLÌŒKX[Û^KYØ[YKÜ[ÌÍJH9mì¹g*ÒH[ˆÍMMLÌ˜9aj9í¨9o£9d"9/myà®ˆ]™™ŒÍ˜ÙÌ˜NLŒÎŽLŽNLMMLÍÌLÍXŒ;ï&ÑUˆ\Þ[Y[[ˆÍMNÎL˜9.gùmì¹aj9í¨9.)¹¨.9l#H^XÝÒxà ›XZ[ˆ9é y«h¹/ë¹¥.xà ˜œËÜ™[X\ÙK]\]K[›ÝYšXØ][Û‹šœØ9¦+ùe+ù. ÝÛ™\»ï#9¬¤¹§"y¥¬9nî¹ak9db¸à z-äzi«9áâ9¢%ˆ[Ù[8à ‚‹HU»ï#ù§+9ªgújeù¥-¹í¬¹g`9/oùå*9d#9. 9.ïH™[X\ÙKÜ™[X\ÙK]\]KšœÛÛ˜;ï&˜Ü™[X\ÙU\]T™]šY]Ï[X\œ]YYX:hkùé.¹«hùo#ú-äzi«9áâ;ï#:nç¹¤â¹o£:e¢ù«hùo#ù¦í9¥¬:)¥¹ê¥ûï&ØÜ™[X\ÙU\]T™]šY]Ï[[Ù[9æí9£©ze¢ùd#9. :)¥¹ê¥øà ¹cê¹a`z*,H]‹™›Ý\‹\Þ[X›ÛËY]‹œYÙ\Ë™]˜8à XØØ[ÜÝ8à XLËŒŒŒX8à XŽŒX;ï#XZ[ˆÜÝ9oázh"9oïyåiH]Y\žxà ‚‹H™]šY]È9`áy/¦ùâb:gh¸à y¥¡ù¨b:"!ùaiùk®zjeù¥-»ï&¹.#yo¥ù¥.HØYY;ï#ù«hùo#È™[X\ÙH™\œÚ[Û¸à y.#yo¥ùkêÈ\Ý\ÙY[˜ØØ[ÝÜ˜YÙxà y.#yo¥È™[ØY8à ¹¦í9¥¬:)¥¹ê¥ùí«y£ y«hùo#È›Ü›X[;ï#Ù›Ü˜ÙY9ª(ùo#ûï&Ü™]šY]È9.+yæ¡:(c9båy£"zb%yk¢yaj9g,9cêºeç:e¢z)¥¹ê¥øà ‚‹H9æí9£©y®+:*i¹oázh":)¡º$âûï&‘Uˆ9ãïº(c9âb9§+9.ãycëúhkùé.º-äzi«9áâ:"!ùaiùk®xà y£"yêâùclù¦í9¥¬9.#H™[ØY;ï#ù.#ykêùmìº+ 8à [XZ[ˆ9n-¹æî9d#]Y\žH9.#zhkùé.ˆ™]šY]øà ‚‚ˆÈÈŒ‹LKLNH8 %™[X\ÙH\]H›ÝYšXØ][ÛˆÞ\Ý[{ï"‘T’Q’QQ;ï#ÛXZ[ˆ9§*¹/ë¹¥.{ï"B‚‹H9méy/g9b!¹¥+ûï&˜™X]\™KÜ™[X\ÙK]\]K[›ÝYšXØ][Û‹\Þ\Ý[KLŒŒLNX;ï#9gî¹®¥¹à®¹§ 9¥¬ÜšYÚ[‹Ù]YÙ˜ŒLÌ™X˜˜YXYNMLÌÙŒLÌÎMNŒXØ;ï&ù§+:/*¹cê¹§ Èˆ9fçˆ]˜;ï#9.#yo¥ùæí9£©y/ë¹¥.y¢%¹æo9n ÈXZ[˜8à ‚‹H9«hùo#ùãªyk­¹âb9§+9ak9db¹e+ù. :,áù¥¦yà®ˆ™[X\ÙKÜ™[X\ÙK]\]KšœÛÛ˜;ï#:"!È™[X\ÙKÜ™[X\ÙKšœÛÛ˜9æ¡Ø[Y{ï#ÐØXÚH™\œÚ[Ûˆ9l#zob»ï&Ø™[X\ÙK[X[šY™\ÝšœÛÛ˜9.ãycê¹/¦ú`ê9ïlˆÒH:jeú+bxà ˜œËÜ™[X\ÙK]\]K[›ÝYšXØ][Û‹šœØ9à®ˆ[[YHÝÛ™\»ï#:aãyå*ÙØ[YK[Ý™\›^K[^Y\˜:-äzi«9áâ9d£ÚÛYQ™X]\™S[Ù[;ï#9.#ycëùcé¹nîˆ[Ù[;ï#ùak9db¹ìîùílxà ‚‹H[[YH9g*Ý\\™XYxà y«ãÈ9b!ºd&8à ]š\ÚXš[]H9fç¹bcy¦kú"!ÈÛ›[™H9 h¹oªy¦`»ï#9ëà9­`z+ 9cåˆØXÚKX\ÝY™[X\ÙKÜ™[X\ÙK]\]KšœÛÛ˜;ï&ù«hùn.9¦í9¥¬9cêº`&¹çé{ï#9o-ùb-¹¦í9¥¬9o¡yk¢yaj9âà9¡bùa£zc¥¹k¦¸à ¹k¢yaj™[ØY9e+ù. 9aiycèùà®ˆØ[”ØY™[T™[ØY›Ü•\]J
+X;ï#9.%9mì¹£©y."ˆ˜]{ï#Ü™\Ù[][Û»ï#Ü™]Ø\™8à z ã9c!y.©9¦$ú"!ÈXØÛÝ[Ø]™HÜš]HÜš]XØ[Ü\˜][Û¸à ‚‹H9¬.9.aH]ˆ8¡¤ˆXZ[ˆ™[X\ÙHÛÛ˜XÝ9mìº(ç9aiHQÑS•Ë›Y8à XÖTÕSWÐÓÓ•PÕË›Y8à XTÒUPÕT‘WÔ•STË›Y:"!ÈØÜËÔ‘SPTÑWÕ‘T’Q’PÐUSÓ—Ô•STË›Y;ï&ºfi:gg¹l"9¨b:,¨:,«9.®¹¦#¹è®º*ª¸à#9§+9«(y.#yak9db¸à#{ï#9«ãù«(yæo9n ÈÝÛ™\ˆ9oázh"9o§¹k£9¥mXZ[‹‹‹™]ˆ9kéºf¦ÈY™ˆ:!êº(c9¥m9ä!¹¢`9§"yãªyk­¹cëù¡'ùçéz+¢¹¦í9b,9d#9. 9.ïHX[šY™\Ý;ï&ù.#ycëú) y¬`¹cé¹íi¹ak9db¹¥¡ù¨b;ï#9.gù.#ycëùl#yãªyk­ºhkùé.¹ª¥9d#xà yaïyo#øà TÒxà PÒH9¢%ˆXYÈ9å*:*§¸à ˜œH[ˆ™[X\ÙN\]KYY™ˆKHKX˜\ÙHÜšYÚ[‹ÛXZ[ˆKZXYPQ9¦+ùaiú`ê9më¹ål:)£ùb È[\¸à ‚‹H9kéºf¦újeú+b{ï&”ˆÈÌÍJÎ‹ËÙÚ]X‹˜ÛÛKÝŒLLÌŒKX[Û^KYØ[YKÜ[ÌÍ
+H9cê¹æë¹ª&H]˜;ï&ÑÚ]XˆXÝ[ÛœÈÒHÜ[ˆÍMLL×JÎ‹ËÙÚ]X‹˜ÛÛKÝŒLLÌŒKX[Û^KYØ[YKØXÝ[ÛœËÜ[œËÌÍMLLÊH9mì¹aj9í¨8à ¹k ùk£9¢$\™Ù]YØ\ÙHx $Ò¸à Y]\›Z[š\ÝXÈZ[;ï#ØZ[ÚXÚøà T™[X\ÙHØ]xà LÍŒ0åÎ;ï#ÌÎL0åÎ;ï#ÍL°åÎLMH9¦í9¥¬:`&¹çéHœ›ÝÜÙ\ˆPxà y¥è¹§"y¢,:k)z"!ú,áù®¤;ï#ÛØY\ˆ9ª¨¹§é{ï&ù¦í9¥¬:`&¹çéy¢*¹g%º"!È”ÓÓˆ:+by¤æ¹mì¹."¹`¬ùà®º*lˆ[ˆ\Y˜XÝ8à ˜XZ[˜9.ãy§*¹/ë¹¥.{ï&ù§ 9í`ˆ]˜ÒH9.éHˆ9d"9/myíd9§§9à®¹®¥¸à ‚‚ˆÈÈŒ‹LKLNH8 %\ÙHHXZ[ˆ9æo9n ùª¨¹§é{ï&‘š\™X˜\ÙH9ª(yía9¥n:`c¹§'ù®+:*i¹/ë¹«hÂ‚‹H9æo9n ÈˆÌÍˆ9æ¡ÒH[ˆÍMLÌÌLMÌ9kéºf¦ùæo9ãïˆ\ÝËØÜš]XØ[Y™X]\™KXYÙ]\ÝšœØ9.ãz) y¬`ˆH9`"Èš\™X˜\ÙH9ª(yía;ï&Ô\ÙHH9«hùo#ùnî¹ïkˆÝÛ™\ˆ9mì¹¦#¹è®¹c!yd*ÈÙ\ÜÚ[Û‹XÛY[šœØ:"!Èš\™X˜\ÙK\Ù\ÜÚ[Û‹šœØ;ï#9alHÈ9`"øà ¹b!ºhg¹à®ˆÝ[H\ÝÛÛ˜XÝ;ï#:gg¹«hùo#ùê"ùo#úc+ú*©;ï&ú!ê¹..ùi,y¥eúhcyn©ˆKÍ8à y/ë¹«hÈH9«(xà ‚‹H9o§¹§ 9¥¬]LL™XÙŒLØØÌŒYNŒ˜™™XŒYMYÎ™9nîˆš^ØÛÝY\Ù\ÜÚ[Û‹\\ÙLK\™[X\ÙKYØ]KLŒŒLNX;ï&ùcê¹l!ù¥è¹§"yª(yía9¥n9¥­ú* 9l#zobˆûï#9.#y¥/¹këž]\øà Z\Ú9¢%ˆ™X]\™H›Ý[™\žH9ª¨¹§éxà ¹§+9ªgùd#9. 9®+:*i¹ab:aãyãïˆÈOOH{ï#9a£y/ë¹«hùà®ˆTÔøà ‚‹H9íd9¨b9¥¡ù.íº"!ù¥è¹§"HÙ\ÜÚ[Ûˆ]]Üš]HÛÜšÙ›ÝÈ9æ¡9¥¡ù.íº`(ùíd:*.ú)èùd#9«i{ï&ÝÛÜšÙ›ÝÈ9¢`9§"ygíú(c9k¦¹ïªxà yo£9êëûï#ùk¨¹¢-¹êëùê"ùo#øà z`b¹¢,º"!ÈØXÚH™\œÚ[Ûˆ9gaù.#z+¢¸à ¹/ë¹oªyoázh"ˆ9fçˆ]¸à PÒH:`&º`c¹o£9d"9/m{ï#9a£zjeú+by§ 9¥¬]»ï#Ñš\™X˜\Ù{ï#ÑUˆ:"!ÈXZ[ˆ»ï&ù§ 9¥¬9æo9n ùâà9¡bùd£ÒH9.éHùíd9¨bˆÌÍWJÎ‹ËÙÚ]X‹˜ÛÛKÝŒLLÌŒKX[Û^KYØ[YKÜ[ÌÍJH9¬.9.az*&:c!9à®¹®¥¸à ”\ÙHH9.ãyà®ˆKÍH‘T’Q’QQ;ï#\ÙHˆ9§*ºe¢ùiâøà ‚‚ˆÈÈŒ‹LKLNH8 %ÛÝYXØÛÝ[\ÙHH9«hùo#újeù¥-¹íd9¨b;ï"ÓÓTUHÈKÍH‘T’Q’QQ;ï"B‚‹H9§+9ëà9cå¹.èù."ù¥®y«mùcì¸à#\ÙHH“ÐÒÑQÈš\™X˜\ÙHøà#y/g9à®¹æë¹bcyâà9¡bûï&ù«mùcì¹í :c!9/çyåfxà ºemù§'ú`,¹n©¹e+ù. 9/¡¹®¤9.ãy¦+ÈØÜËÐÓÕQÔÐU‘WÒSTSQS•USÓ—Ô“ÑÔ‘TÔË›Y;ï#\ÙH¸ $ÌL9aj:`ê9l&¹§*ºe¢ùiâøà ‚‹H9íd9¨b9gî¹®¥¹à®ºaãy¥¬9¨.9l#yæ¡]Í™YŒL˜LŽMÙXYMXÌÌYLÍÍXÎYY˜ØLÙMÍŒ˜;ï&Ñš\™X˜\ÙH[ˆÍMÎMØ;ï#Ù\ÞH›ØˆLNM9¢$9b§ûï#9. ù¥+È[˜Ý[ÛœÈ9aj:`ê9¦í9¥¬;ï#š\™\ÝÜ™H[\È9íê:+kú"!ùæo9n ù¢$9b§øà º`ê9ïl¹§#ybæyn,ú&gûï&˜Ú]X‹Yš\™X˜\ÙKY\ÞY\›Ý\‹\Þ[X›ÛËZšX[™ÚKšX[K™ÜÙ\šXÙXXØÛÝ[˜ÛÛX8à ”[\ÈPSHÈ9mìº)èúfi;ï&Ð\Y˜XÝ™YÚ\ÝžH9®!yä!¹¥/ùëeº+i¹db¹mì¹.#zf.ù¤âú`ê9ïl»ï#9/a¹§*¹a¤¹ê,y¥/ùëe¹§+:.ªùmìº*+yk¦¹¢$9b§øà ‚‹H9d#RQ9ç'ùkéºfæy¢bùªgûï&º""¹¢bùªgùåjúghºhkùé.ˆÑTÔÒSÓ—Ô‘U“ÒÑQ:"!øà#:`&ycì:(çyïk¹mìº(ªùcé¹. 9cì:(çyïk¹cå¹.èøà#{ï&ùo£9ænùaiy¢bùªgÈÕPÐÑTÔÈ9å,y/oùå*: !y¥¯9§+9«(yl#z*ly¦#¹è®¹fç¹h,{ï#9¢$9b§ù¢*¹g%¹mì¹b*ºfi8à ¹/oùå*: !yo£9î£9¯¡9®!ymì¹k£9¢$9ké¹®+8à y¬¤¹§"yecúhc;ï&ù.#y¢¢¹ab9bcyì(yçëyfçº)¡º*©:*&9¢$:fæy¢bùªgùgaùi,y¥b8à ¹.#yd#RQ:f¥:fè¹å,yd#ÒH9æ¡[][]Üˆ›ØˆLNÎMÍÍ˜9kéºf¦ú`&º`c»ï#9§*¹a¤¹ê,y§"y.#yd#RQ9ç'ùªgù¢*¹g%¸à ‚‹H9d#9. 9gî¹®¥¹æ¡™\ÜÚ]ÜžHÚXÚÜøà QUˆ\Þ[Y[:"!ú`ê9ïlˆÒH9¨.9l#yå,H[ˆÍMÎÌNX9¢$9b§øà ¹¥-¹l/ˆˆ9d"9/myo£9oázh"9cé¹i%º*&:c!9§ 9¥¬]ˆ9æ¡9ª¨¹§éxà Qš\™X˜\Ù{ï#ÑUˆ:`ê9ïl¹câ¹«hùo#ÈXZ[ˆ9æo9n ú+by¤æ»ï#9.#z ïyå*9§+9«­ygî¹®¥¹¢$9b§ùa¤¹aay§ 9o£9æo9n ÈÒxà ‚‹HUˆ9®+:*i¹c`9.ãyå,HœËÙš\™X˜\ÙKÙš\™X˜\ÙKX]]]ZKšœØ9æ¡9ì¯¹è®ˆÜÝ˜[YH[ÝÛ\Ý9£©ùb-»ï#9cê¹a`z*,H]‹™›Ý\‹\Þ[X›ÛËY]‹œYÙ\Ë™]˜8à XØØ[ÜÝ8à XLËŒŒŒX8à ¹.#y¥.y«hùo#ù«"ºfdÝÛ™\¸à URxà yãªy¬åy¢%¹kf9ª¥;ï&ÑØ[Y{ï#ÐØXÚH™\œÚ[Ûˆ9í«y£ HMÌËX8à ˜UWÔÑPÕT’UWÐÓÓ•PÕË›Y9.ãy.#ykf9g*8à ‚‹H9/oùå*: !ymì¹£¢9«"¹§+9«(y¥¡ù.íˆˆ8¡¤ˆ]ˆ8¡¤ˆ9cåù/çz+mÈXZ[ˆˆ9æo9n ûï&ù§ 9í`ˆÒH:"!ùæo9n ùíd9§§:*&:c!9¥¯ùíd9¨bˆÌÍWJÎ‹ËÙÚ]X‹˜ÛÛKÝŒLLÌŒKX[Û^KYØ[YKÜ[ÌÍJH9æ¡9¬.9.ayæo9n ú+by¤æ»ï#9.#zh$9hjù§*¹gíú(c9íd9§§8à ”\ÙHH9b§ú ïzjeù¥-¹mì¹k£9¢$;ï&ù¥m9«(yæo9n ù.ãzh"9k£9¢$9¥è¹§"H™[X\ÙHØ]H:"!ù«hùo#ú`ê9ïlºjeú+by¢cycëùfç¹h,yk£9¢$8à ‚‚ˆÈÈŒ‹LKLNH8 %ÛÝYXØÛÝ[\ÙH{ï&”Ú[™ÛHXÝ]™HÙ\ÜÚ[Û»ï"9«mùcìˆ“ÐÒÑQ9í :c!;ï"B‚‹H9gî¹®¥ˆ]ÙŒÙÎLÌÍL™LNLŒØMŒNLÌÍLÙMNMØ;ï&ùb!¹¥+È™X]\™KØÛÝY\Ù\ÜÚ[Û‹X]]Üš]K\\ÙLKLŒŒLNX;ï#9cê¹¥m9d"]˜;ï#XZ[˜9é y«h¹/ë¹¥.xà ‚‹H:emù§'ú`,¹n©¹e+ù. 9/¡¹®¤;ï&–ÙØÜËÐÓÕQÔÐU‘WÒSTSQS•USÓ—Ô“ÑÔ‘TÔË›YJØÜËÐÓÕQÔÐU‘WÒSTSQS•USÓ—Ô“ÑÔ‘TÔË›Y
+xà ¹o£9î£9«ãù`"ÈÛÝYØ]™H\ÙH9oázh"9¦í9¥¬;ï&ùaiùd*ÈM:h!yê/y¨.8à yc`zf£¹«­yâà9¡bøà y¬.9.ay¬n¹ëe¸à zhª:fªº"!ù."ù. 9«ixà ¹gî¹®¥¹ï.¹l$HUWÔÑPÕT’UWÐÓÓ•PÕË›Y;ï#9mì¹i ¹kéº*&:c!8à ‚‹H9¥¬ÝÛ™\»ï&˜[˜Ý[ÛœËÜÜ˜ËÜÙ\ÜÚ[Û‹X]]Üš]KšœØ;ï&ù¥¬9h§ˆÜ™X]QØ[YTÙ\ÜÚ[Û˜;ï#Ø™]›ÚÙQØ[YTÙ\ÜÚ[Û˜;ï#Ø›ÝXÝY\Ý8à ¹ajy¥+ù¥è¹§"ykf9ª¥Ø[X›H9g*9d#9. š\™\ÝÜ™H˜[œØXÝ[Ûˆ9aiújeú+bHXÝ]™HÙ\ÜÚ[Ûˆ:"!ùkêùai{ï&Û˜]]™H]][™Ù™ˆ9b¨ÛÝ\˜ÙH]][YH:f,¹îgº`c»ï#9.ãycê¹`fº.ªùb!¹.©9£æøà ‚‹HÛY[ÝÛ™\»ï&˜œËÙš\™X˜\ÙKÜÙ\ÜÚ[Û‹XÛY[šœØ;ï"Øš\™X˜\ÙK\Ù\ÜÚ[Û‹šœØ;ï&Ø]]Ø›ÛÝÝ˜\;ï#Ü™XYÛ›HÛÝY\Ø]™H9£©yai{ï#9.#yc!z(çHØ[Y\^HØ]™xà y.#y¤+9ãªyk­º,áù¥¦xà y.#y¥.HRH9âb:gh»ï&ù¢`9§"H\œ›Üˆ9¦#¹è®¹.%9.#z!ê¹båzaãz*i¹kêùai{ï#ù¤-¹fçˆÙ\ÜÚ[Û¸à ‚‹H9ê"ùo#ÈˆÌÌÍH9mì¹¥¯ÒH9aj9í¨9o£9d"9/mH]ŒLYLÌŽYMNÍŒŒ˜˜YMÎMÌLŒŒYX;ï&ùì¯¹®¥¹®+:*i¸à R[][]ÜˆKÐ»ï#ÕRQ;ï#Ü[\ûï#ù/myæo:jeù¥-¸à XXØÛÝ[›ÛÝœ›ÝÜÙ\ˆPH:"!ÈUˆ9bcyêëú`ê9ïl»ï#ÔÒH:jeú+bygaú`&º`c¸à ‘Ø[Y{ï#ÐØXÚH™\œÚ[Ûˆ9í«y£ HMÌËX8à ‚‹H
+Š““ÕÓÓTU{ï#™\]Z\™[Y[ÈÍH‘T’Q’QQ;ï&ŠŠˆš\™X˜\ÙH\ÞH[ˆÍMÌNÎX;ï#Ú›ØˆLNMÍMM9¥¯[\ÈTH\Ý9fçº)¡ˆûï&ÔÙXÜ™]:"!ùænùaiy¢$9b§ûï#:`ê9ïl¹«"ºfd9.#z-¬øà ¹. ù¥+È[˜Ý[Ûœûï#Ô[\È9l&¹§*¹k£9¢$:`ê9ïl»ï#9ç'ù«húfì¹êëúfæz(çyïkºjeù¥-¹§*¹`f»ï&ùíæ¹."¹.#z ïyk¨ùê,ymì¹amù§+9«(H]]Üš]xà ‚‹H9."ù. 9«i{ï&¹l"9¨b9ë¨yä!º !z&eyä!¹¥è¹§"z`ê9ïlº.ªùb!¹æ¡[\ÈPSH9«"ºfd;ï#9a£yo§¹§ 9¥¬]ˆ:`ê9ïl¹. ù¥+È[˜Ý[Ûœûï"Ô[\øà yk£9¢$x¡¤ˆZÙ[Ý™\»ï#ÕRQ:f¥:fèºjeù¥-¹.)¹¦í9¥¬:emù§'ú`,¹n©¸à ¹í%9¥¡ù.í¹d"9/my.#z)î9æoš\™X˜\ÙH:`ê9ïl»ï#9.#z ïzaãz-äz""ˆÒH9a¤¹aay§ 9¥¬:`ê9ïl»ï&ú*lùí,9doy.é:"!ú+by¤æº)¢úemù§'ù¥¡ù.í¸à ”\ÙHH:jeù¥-¹bcy.#ze¢ùiâÈ\ÙH¸à ‚‚ˆÈÈŒ‹LKLN8 %Œ9.í¹éæ9kíˆ0åÌÈ‘–ÙX”:"!ù¢,:k)y¯%9aî¹¥m9d"‚‹H9méy/g9b!¹¥+ûï&˜™X]\™KÜ™[XË]™žX[š[X][Û‹LŒŒLN;ï&ùgî¹®¥¹à®ˆ]LMŽØØŒYLNMÍ™ÌØÌÌÌNMML™LØMX;ï#XZ[˜9.#y/ë¹¥.xà ‚‹HŒ9o-y«ãyg%¹/¡¹®¤9fî¹k¦¹à®ˆ\ÜÙ]Ë[Xœ˜\žKØ\ÜÙ]ËÚ[˜›Þùéæ9kíšXÛÛ‹ùéæ9kí¹¢ : ïU‘–Ø;ï&ù«hùo#È[[YH9cê¹/oùå*\ÜÙ]ËÝ™žÜ™[XËÊ‹ÙXœ8à ¹/§HØÜËÒSPQÑWÐTÔÑUÔÔPË›Y9/çyåfHM0åÌLˆ9k£9¥m9åjùn øà M0åÌûï#ÌLˆ9n`8à LÍŒ°åÌÍŒˆ9e«¹¨/:"!È[{ï#9.#Hš[{ï#ØÜ›Ü;ï#Ü™\Ú^™{ï&Ô‘È9`áyåfyí(9§d9nªøà ‚‹H‘–9e+ù. ˜\Ý\ˆÝÛ™\ˆ9.ãy¦+ÈœËÌÎK]ŒMË\ÚÚ[X[š[X][Û‹šœØ;ï&˜™[XÔÚY]
+
+X:"!ÈU×ÓPS’Q‘TÕ9ænúc!Œ9.í¹éæ9kí¹í(9§d:"!È™]šY]ÙY]œ˜[Y{ï&ù/oùå*9¥è¹§"HŒMÔ˜\Ý\Ø\Ýœ˜[Y\Ø;ï#9§*¹nî¹êâùë+9.£™[™\™\¸à ¹éæ9kí¹í(9§d9£¨H^žH™Y›YÚ;ï#9`áz(çy`¦y.+yæ¡9éæ9kí¹å,HŒMÔ™[ØY˜]U™ž\ÜÙ]
+
+X:h$:/"xà ‚‹H9éæ9kíº)î9æo;ï#ù¥b9§§9e+ù. ÝÛ™\ˆ9.ãy¦+ÈœËÍŒ]X[K\™[XË\Þ\Ý[KšœØ;ï&˜™[XÕ™ž\™Ù]
+
+X9/§y¥è¹§"HšYÙÙ\»ï#ÑY™™XÝ9¬n¹k¦ˆ[™[^H[8à X[H[8à \Ú[™ÛH[H9¢%ˆÚ[™ÛH[™[^{ï&Ø]Y]YT™[XÔ™\Ù[][ÛŠ
+X9do9cêù«hùo#ÈŒM‹ÕŒMÈ9båyåjùë¨yíæ¸à ¹mìºe¢ù¥/ˆL9.í¹êâùclù/oùå*;ï&ùamºi&[[YT™XYN™˜[ÙX9æ¡L9.í¹cêºh$9ab9ænúc!‘–;ï#9.#yfè9«i:e¢ù¥/¹¢ : ïy¢%¹cå¹o¥øà ‚‹H9¥è¹§"HKŒMH9éä¹aî¹¢bùo£9ëà9icÈÝÛ™\ˆœËÌ[XZ[‹šœÎŽ”ÔÕÐPÕSÓ—ÑSVWÓTØ9.#y/ë¹¥.xà ¹éæ9kíˆ‘–9£¨HÎ8 $ÌŽN9éä¹.)¹/çyåfHLŒ\ÈXYØ\;ï#:`oùacyg*9."ù. 9`"ù«hùo#ú(c9båze¢ùiâù¦`º(ªù¢*¹¥­øà º!í9doy`­ù/çydoy.ãyab9d#9«iyíd9ë¥ûï#9a£y¤«y¥/ˆ9fç¹i*ykíº/*˜:)¥º)®»ï#9.#z ïyà®¹.¡¹båyåjùní¹o£9«nù.¨y¥%9¢*¸à ‚‹H9ª¥9d#ybæ:*©9¦(9l!;ï&˜9ã¡9a¬9­ê9oàÝ™žœ™Ø8¡¤ˆ9«hùo#È9ã¡9a¬:cèyoàØ;ï&Ø:-i9k­y¢,9í"Ý™žœ™Ø8¡¤ˆ9«hùo#È:-i:g!9¢,9í"Ø8à ¹ajz !ycê¹/ë¹«hÈ[[YH9doyd#y¦(9l!;ï#9.#y/ë¹¥.yí(9§d9aiùk®xà ‚‚ˆÈÈŒ‹LKLN8 %9éæ9kí¹è£¹âaú ã9c!znäyg%»ï#ú*lù áyêoùg%¹/ë¹oª{ï"‘T’Q’QQ;ï"B‚‹H˜\ÙNˆ]XÍ™™˜™XÎLNMYŒMÌXØLŒYXŽL™Œ˜X˜XXÈœ˜[˜Úˆš^Ü™[XËYœ˜YÛY[Z[™[ÜžKZ[XYÙKYš]LŒŒLNÈXZ[˜9.#y/ë¹¥.xà ‚‹H9ké¹ªgù¢*¹g%ºhkùé.¹éæ9kí¹è£¹âaùg*: ã9c!y¨/9aiùcê¹ç"ùb,:näz"l»ï#ùl`:`ê9åjúgh»ï#:nçºe¢ú`dùamú*lù áyo£9baù.éyc§ùiâùi)ùg%¹l.¹kî9êoùaîˆ[Ù[8à ‚‹H9¨.yfè9g*œËÜ™[XË\›ÙÜ™\ÜÚ[Û‹Y›Ü\Þ\Ý[KšœÎŽ™œ˜YÛY[XÛÛ“X\šÝ\
+
+X;ï&¹."¹. :/*ˆÙX”9l#¹aiy/oùå*:(î[YÏ˜;ï#9îgº`c¹¥è¹§"z ã9c!z"!È][S[Ù[9æ¡ŒMŽKZ][KX\ˆ[YØ9no¹/eHÝÛ™\¸à ‚‹H9/ë¹«hùcê¹¢¢¹è£¹âaÈXÛÛˆX\šÝ\9¥-¹¥ ¹fç¹¥è¹§"HŒMŽKZ][KX\9c!z(ç{ï&ù¬¯ùå*ÜÜËÌÎ]ŒMK\Þ\Ý[KY^[œÚ[Û‹˜ÜÜØ9mì¹§"yæ¡9l.¹kî:"!ÈØš™XÝYš]˜ÛÛZ[˜8à ¹¬¤¹§"y¥¬9h§ˆÔÔÈÝ™\œšYxà \[[YHÜ˜\\¸à yí(9§d:/byª¥9¢%¹ãªy¬å{ï#ù£¢z$/{ï#ùd"9¢$:+¢¹¦í8à ‚‹H™\]Z\™[Y[˜]Úˆ™[X\ÙKÜ™\]Z\™[Y[X˜]Ú\ËÌŒ‹LKLN\™[XËYœ˜YÛY[Z[™[ÜžKZ[XYÙKYš]šœÛÛ˜8à ”ˆÌÌMH™\ÜÚ]ÜžHÚXÚÜÈ[ˆÍLÍLŒLLLX9mìº`&º`c»ï#9c!yd*ÈZ[Þ[˜øà NNŒMˆ[Øš[HPxà Y^XÝXØ[™Y]H™X[˜]HPxà PY™[\™H[Øš[HPH:"!È™[X\ÙHØ]\øà ‚‚ˆÈÈŒ‹LKLN8 %˜]H™\Ù[][Ûˆ›ÛÝË]\ˆ›ÜÜÈQØ\™\ÜÈ[™[^H™YY˜XÚË˜]Ù\ˆ[™™Z[™›Ü˜Ù[Y[ÜXÚ[™È
+STSQS•QÈPHS‘S‘ÊB‚‹H˜\ÙNˆ]\ÝÚ]Xˆ]ÎMM˜˜X˜LXXM™MÌŒYŒÎLŒX™ŒNLXÍLYXÈœ˜[˜Úˆš^Ø˜]K\™\Ù[][Û‹X›ÜÜËZY\ÛÝËLŒŒLNˆXZ[˜™[XZ[œÈ^ÛYY‚‹H\Ù\ˆšY[ÈLÌK›\[™ØÜ™Y[œÚÝÈLÌšœØ;ï#ØLÌšœØÚÝÈH›ÜÜÈ›ÛÝš[Ý[[š\š][™ÈHYØXÞH[[Y[[Ø\™›Ü™\‹[™[^H™YÜ\™YY˜XÚËHZ\ÜÚ[™È›ÜÜÈ˜\‹HÝ[Hœ›ÜÝš]HÚÚ[\›ÚXš][ÛˆX™[HÙ[\™Y˜]Ù\ˆ[™KH\˜ÙZ]™Y[™[^KÜ^Y\ˆ˜\‹ZZYÚZ\ÛX]Ú[™ŒH™Z[™›Ü˜Ù[Y[\ÛÜšÈÝXÚ[™ÈH›ÜÜÈÜ˜Z]‚‹H^\Ý[™ÈÝÛ™\œÈÛ›NˆÜÜËÙš^Y\ÛÝX˜]YšY[\™[™\š[™Ë]Œ‹˜ÜÜØ›ÝÈ\Y\ÈHØ\™\ÜÈ›ÛÝ™\Ù]È]™\žH[™[^H[]KÝ\™\ÜÙ\È[™[^H™YÜ\Z[Ú\™\È[ˆL\^Y\‹Ù[™[^H™\ÛÝ\˜ÙKX˜\ˆÚÙ[ˆ[™[˜ÚÜœÈH˜]Ù\ˆ[™H]›ÝÛK\šYÚÚ]H˜[œÛXÙ[›XÚÈ˜XÚÙÜ›Ý[™ˆ›È™]ÈÝ[\ÚY]Üˆ]H[[YH]ÚØ\ÈYY‚‹HÜÜËÙØ[Y\^KX›ÜÜË]ÝÙ\‹˜ÜÜØ›ÝÈÚ]™\ÈH›ÜÜÈQ^XÚ]š\ÚXš[]KÚZYÚš[Üš]HÝ™\ˆÛ\ˆÚ\™Y˜]HÝ[\Ë™\Ù\™\ÈLœ™^[Û™HÝ]\ˆ[™[^HÛÛ[[œÈ›ÜˆH›ÜÜÈ›ÛÝš[[™[œÙ]ÈŒKÐKÑŒKÑH\ÛÜšÈÛÈ™Z[™›Ü˜Ù[Y[ËÛØš™XÝÈÈ›ÝÝXÚHÙ[˜[›ÜÜÈÜ˜Z]‚‹Hœ›ÜÝš]H\È›Ü›X[HÛÛ™\™ÙYÈ]ÈŒMŽHÛÙYXY™ˆ[NˆœËÍØœËÍœËÍL[™ÜÜËÍX›ÈÛ™Ù\ˆÛÛZ[ˆ^Y\‹Û[ÛœÝ\ˆÚÚ[[ØÚÈÜ˜\\œË\ØX›YXÛÛ›ÛÛ\ÜÙ\ÈÜˆHØœÛÛ]H›ÚXš][Ûˆ^ˆ[XYÙK]˜\Ú[Ûˆ[™Ý]\È™\Ú\Ý[˜ÙH[˜[Y\È™[XZ[ˆÝÛ™YžHŒMŽKˆ\™XØ]YXÛÙHØ]H™]™[ÈÜÙH™]\™YÚÙ[œÈœ›ÛH™]\›š[™Ë‚‹H™\]Z\™[Y[˜]Úˆ™[X\ÙKÜ™\]Z\™[Y[X˜]Ú\ËÌŒ‹LKLNX˜]K\™\Ù[][Û‹Y›ÛÝÝ\šœÛÛ˜ˆÝ]\È™[XZ[œÈSTSQS•QÈPHS‘S‘È[[›ØÝ\ÙY\ÝË]\›Z[š\ÝXÈZ[ÚXÚË[Øš[Hœ›ÝÜÙ\ˆÙ[ÛY]žH[™™\ÜÚ]ÜžHÚXÚÜÈ\ÜË‚‚ˆÈÈŒ‹LKLN8 %›ÜÜÈ\™Ù]Y[]HÛÛ™\™Ù[˜ÙKØ\™\ÜÈ˜]YšY[[™]Y]YK[ÝÛ™\ˆÛX[\
+STSQS•QÈPHS‘S‘ÊB‚‹H˜\ÙNˆ]\ÝÚ]Xˆ]LM˜˜NXÌØÌXÎLŒÍÌŒÌ˜˜NLŒXŒXLÙ™YÈœ˜[˜Úˆš^Ø›ÜÜËX˜]KX\˜Ú]XÝ\™KXÛÛ™\™Ù[˜ÙKLŒŒLNˆXZ[˜\È^ÛYY‚‹H\È[žHÝ\\œÙY\È]™\žHÛ\ˆ[˜Ý[Û‹XØ\™;ï#ÓYXÚ[š\ÛH\ÚYÛˆ™[ÝËˆ›ÜÜÈ\ÈÛ™H\™Ù][]HÚ]Û™HÔÔÜÝ]\ÈY[]NÈŒ‹ÐŒËÐÑŒ‹ÑŒËÑ\™HÛ™Hš\ÝX[›ÛÝš[Û›Kˆ™Z[™›Ü˜Ù[Y[È\ÙHŒKÐXÈ\ÝXÝX›H›ÜÜÈØš™XÝÈ\ÙHŒKÑX›Ü›X[[Y\šXÈ[™[^HY[]Y\ËØ[XÝY˜[ÙX[™›ÈÜ™[˜\žH™]Ø\™Ë‚‹H:aäybfú+mújå\È›ÝÈ›ÜÜÈÚY[ˆHÛQPÒÊ˜YXÚ[š\ÛNŠ˜X[™]ÜžHYXÚ[š\ÛH\™Ù]YXÚ[š\ÛK\ÜXÚYšXÈÙ][Y[[™YXÚ[š\ÛH‘–]È\™H™[[Ý™Yœ›ÛH›ÙXÝ[ÛˆÝÛ™\œË‚‹H›ÜÜÈ[ÙH\ÛÛ]\È›Û‹X[[XYÙHÈHÙ[XÝY\™Ù]È[Ù[™[^P[]È]™\žH]š[™È›ÜÜË\ÚYH[]KˆÙ[™\˜[˜]\È™]Z[ˆZ\ˆ^\Ý[™ÈÚ[™Û{ï#Ýš{ï#Ü›Ýûï#ØÛÛ[[»ï#Ø[š^YÛÝ[\Ëˆ›ÜÜÈšH‘–ÙY\È]]Ü™YÜ›Ý\Ú^™H]™[ˆÝYÚ[XYÙHÙ]\ÈÛ™H\™Ù]‚‹H[XZ[‹šœØ\ÈHÛÛHš[š\Ú^Y\XÝ[Û˜;ï#Ø›ØÙ\ÜÓ™^ÛÛX˜][ÝÛ™\‹ˆŒMˆ^ÜÙ\È™[XZ[š[™Èš\ÝX[[YHÛ›NÈ[™Ù[Û‹™[XÈ[™š\™H›ÛÝË]\[Ù[\È›ÈÛ™Ù\ˆ›ÛZ\ÙKYØ]HÜˆ™\XÙH]Y]YH[˜Ý[ÛœËˆš\™H›ÛÝË]\\Ù\ÈHÛÜ™H›Ý\”Þ[X›ÛÐ˜]Q›ÝØ™[[Ý˜X›H[\˜Ù\Ü‹‚‹HØ\™\ÜÈ™\Ù[][Ûˆ\ÈÛÝ\˜ÙHÔÔÈ\È[[YYX]H›Ý\”Þ[X›ÛÐ˜]T™\Ù[][Û‹˜\U[š]
+
+X]ÓHÜ™X][Û‹ˆHÌ\È™\Ù[][ÛˆÛ[™œ™YZ]›ÛÝXØ\™™YY˜XÚÈ\™H™]\™YÈX[\È[™\[™[ÜÚ]]™H™YY˜XÚË‚‹Hš^YÛÝÔÔÈÝÛœÈ»ï#ÌM;ï#Í[™[^KXÙ[\‹X[H˜XÚÜË\]X[L^Y\‹Ù[™[^H˜\œË›ÝÛH[™›Ü›X][Ûˆ˜]Ù\‹œ[[Y[›Þ[™H˜Z\ÙY0åÌÌˆÛÛ˜]Ù\ˆ[™KˆHÙ[\‹\™YÚ[Ûˆ›Ü™\œÈÙ\™HHÛÈ™\ÚYX[ÛÛ[™\È[™\™H›ÝÈ™[[Ý™Y]Z\ˆÛÝ\˜ÙK‚‹H^\Ý[™ÈŒLÌH›Ü›X][Ûˆ™[XZ[œÈHÛ›HY]Üˆ[™\œÚ\ÝÈ›ÝYÚØ]™QØ[YJÜÛÝ\˜ÙNˆ˜[KY›Ü›X][ÛˆŸJXÈ›È˜ZÙH[Ù[Ø\ÈYY‚‹HÞ\Ý[HÛÛ˜XÝˆÖTÕSWÐÓÓ•PÕË›Yˆ›ØÝ\ÙY™YÜ™\ÜÚ[ÛŽˆ\ÝËØ›ÜÜËX˜]KX\˜Ú]XÝ\™KXÛÛ™\™Ù[˜ÙKLŒŒLN\ÝšœØˆ™\]Z\™[Y[˜]Úˆ™[X\ÙKÜ™\]Z\™[Y[X˜]Ú\ËÌŒ‹LKLNX›ÜÜËX˜]KX\˜Ú]XÝ\™KXÛÛ™\™Ù[˜ÙKšœÛÛ˜‚‹HÝ]\È™[XZ[œÈSTSQS•QÈPHS‘S‘È[[L°åÎLMHœ›ÝÜÙ\ˆPK[™\ÜÚ]ÜžHÚXÚÜËÛÛ[Z]Ü\Ú[™ˆÈ]ˆÛÛ\]K‚‚ˆÈÈŒ‹LKLN8 %˜]H\™Ù]ÛÛ˜XÝ›Ý\‹]˜XÚÈ^[Ý]›Ü›X][Ûˆ[žH[™›ÝÈ™XÛÝ™\žH
+‘T’Q’QQ
+B‚‹H˜\ÙH\ÈH]\ÝÚ]Xˆ]ÌÎLÍÌLÙ˜L™YMÍ˜ÙYXMNMÍLŒYÙNXLÌMNXLÈœ˜[˜Ú\Èš^Ø˜]K]™ž[^[Ý]Y›Ü›X][Û‹Yœ™Y^™KLŒŒLNˆXZ[˜\È^ÛYYˆH™\]Y\ÝYÖTÕSWÐÓÓ•PÕË›YÙ\È›Ý^\Ý[ˆH˜\ÙHÜˆ™XXÚX›H\ÝÜžKÛÈ›ÈÝXœÝ]]HÛÛ˜XÝØ\È[™[Y‚‹H\Ù\ˆšY[ÈLÌÌÎK›\[™ÈY\ˆØ]\‰ÜÈXÙH\œ›ÝÈ˜Z[ˆÚ][ˆ[˜Ú[™ÙY˜]Hœ˜[YKˆÛÝ\˜ÙH˜XÚ[™È›Ý[™HÞ\Ý[ZXÈXYØÚÈ›Ý[™\žNˆ[š]X]]™H[[X][H™[YYÛˆ‘–ÑÓHÛÛ\][Û‹Ú[HHÛÛX˜]ÝÛ™\ˆY›È›Ý[™Yš[˜[™XÛÝ™\žK‚‹H\™Ù]ÝÛ™\œÚ\\È›ÝÈÛÛX˜]8¡¤ˆ[[]]X›H˜]K]\™Ù]XÛÛ˜XÝ]ŒX8¡¤ˆŒMˆ[Z[™ÈØ]H8¡¤ˆŒMÈ˜\Ý\ˆ™[™\™\‹ˆŒMÈ›ÈÛ™Ù\ˆ™XYÈ]Y]YY^Y\XÝ[ÛœØÙ[XÝY[ÛœÝ\˜]Ü™\ˆÜˆÝ\š]›Üˆ›Ý[™Ëˆ^Y\‹Ù[™[^H[XYÙHXÝ[ÛœÈ\ÜÈ^XÚ]\™Ù]ÎÈŒMÝ\ÜXÝ[ÛœÈ\ÜÈ^XÚ]\™Ù]ÚYH[™YË[˜ÛY[™È[™[^K]\™Ù]\šYžHZ[™‚‹Hš^YÛÝ™[XZ[œÈHÛ›HÙ[ÛY]žHÝÛ™\‹ˆÚ[™ÛH\Ù\ÈØ\™Ù[\‹šKÜ›ÝËØÛÛ[[ˆ\ÙHš^YÙ[X[XÈÚ\HÚ^™HÙ[\™YÛˆH^XÚ]š[X\žHØ\™[\Ù\ÈHÚÛHÚYK[™˜Z™XÝÜžHÝ\È]Ø\Ý\ˆÛÝÙ[\ˆ[™[™È]š[X\žHÛÝÙ[\‹ˆÝ[HÝYÙ\È\™H\™ÙY[™™[™\ˆ\œ›ÜœÈ™[X\ÙHHØ]K‚‹H[™^š[[™HØ[›ÛšXØ[š^Y\ÛÝÝ[\ÚY]›ÝÈÝÛˆ›Ý\ˆ˜XÚÜÎˆ[™[^HØ\™ËZYH\›‹ØXÝ[ÛœË[HØ\™Ë›ÝÛH˜]H[™›ËˆH[[Y[X›Þ]Ûˆ\È™\ÝÜ™YÈ°åÍŽÈ[™[^KØ[HQ›ÝÜÈÚ]™[ÝÈ\È[H›ÝÜÈ\ÙHH™X[Ø\Ú]›È™YØ]]™HÝ™\›\ˆHY\\ˆXØÙ\ÈÚ^[HÛÝË‚‹HH^\Ý[™ÈŒLÌH›Ü›X][ÛˆY]Üˆ™[XZ[œÈHÛ›HY]Ü‹ˆHÛYH]Ûˆ›ÝÈXÛ\™\È]KY™X]\™OH™Ø[Y\^KXÛÜ™H˜[ÝÚ[™ÈHš\œÝÛXÚÈÈØY]™X[ÝÛ™\ˆ™Y›Ü™HÜ[’ÛYQ™X]\™J	Ù›Ü›X][Û‰ÊX™[™\œÈ]‚‹H›ØÙ\ÜÓ™^ÛÛX˜][
+
+X›ÝÈ\›\ÈHË\ÙXÛÛ™š[˜[XÝ[ÛˆØ]ÚÙÈ[™Ø]Ú\È^Y\‹Ù[™[^HÙ][Y[^Ù\[ÛœËˆ]ÛÛ\]\È[žHXÝ]™HŒMˆØ]H[™Y˜[˜Ù\È^XÝHÛ˜ÙNÈÜ™[˜\žHŒM‹ÕŒMÈXY[™\È™[XZ[ˆHš[X\žHÛX[\]‚‹H^XÝXØ[™Y]HˆÒH[ˆÍLNLŒÍL
+ÌNÌ˜
+H\ÜÙYˆHL°åÎLMH™X[œ›ÝÜÙ\ˆ[ˆÜ[™Y[™[Ý™YÜ™\ÝÜ™YH›Ü›X][ÛˆY]Ü‹][˜ÚYZYÚY[™[^HÛÛX˜]™\šYšYY›Ý\ˆÝXÝ\˜[™YÚ[ÛœÈ[™š^Y‘–›ÛÝš[ËY˜[˜ÙYH›Ü›X[HXÛ\™Yš\™HXÝ[Û‹ÛÛ\]YH[™Ù[Ûˆ[™Ù™ˆ[™Y™\›ÈŒMÈÝYÙ\ËˆHÙ\\˜]Hš^YÛÝœ›ÝÜÙ\ˆÝZ]H\ÜÙYL°åÎLMKÎLðåÎÌÈ[™ÍŒ0åÎ[˜ÛY[™ÈÚ^ØØÝ\YY[HÛÝË‚‹H™\]Z\™[Y[˜]Úˆ™[X\ÙKÜ™\]Z\™[Y[X˜]Ú\ËÌŒ‹LKLNX˜]K\Þ\Ý[KZ[YÜ˜][Û‹šœÛÛ˜\È‘T’Q’QQÈÓÓTUKˆ]Z[Y[˜[\Ú\ÎˆØÜËÜXKØ˜]K\Þ\Ý[KZ[YÜ˜][Û‹LŒŒLN›Y‚‚ˆÈÈŒ‹LKLMÈ8 %˜]H™YK\™YÚ[Ûˆ^[Ý]˜[™ÙH‘–›ÛÝš[[™XÝ[Û‹YØ]H™\Z\ˆ
+“ÕÓÓTUJB‚‹H˜\ÙH\È]ŒÎLNMÎÌXM™˜XMŒÌYMŽM˜ŒXÈœ˜[˜Ú\Èš^Ø˜]K[^[Ý]]™ž\[[YKLŒŒLMØˆÙ]™\š]H\ÈH™XØ]\ÙHH™\ÜYXÙH\œ›ÝÈ˜Z[ˆ]Ø[ˆ›ØÚÈHÛÜ™H˜]HÛÜˆXZ[˜\È^XÚ]H^ÛYY‚‹H\Ù\ˆ]šY[˜ÙHLÌÌÎ›\ÚÝÜÈHÝÜY˜]HY\ˆXÙH\œ›ÝÈ˜Z[‹[™\œÚ^™YÚ[™ÛKXØ\™[ZÙH\™XH‘–[™Ü›ÝÙYÝ[žH˜]H[š]ËˆØÜ™Y[œÚÝLÌÌÍKšœØ\È™X]YÛ›H\ÈH™YK\™YÚ[Ûˆ›ÜÜ[ÛˆÛÛ˜Ù\‚‹H›ÛÝØ]\Ù\ÎˆŒMˆÛZ]Y]ÈØY™]HXY[™H›ÜˆŒMÉÜÈ™[™\Ž™˜[ÙX[Z[™ÈØ[ÈŒMÈÚ˜[šÈÛÛ\]K\ÚYKÙÜ›Ý\Ù[ÛY]žH›ÝYÚÜ]X\™HÛÛZ[ˆš][™È[™Ì‹ÌŒˆ˜XÝÜœÎÈš[˜[ÚÚ[\™Ù]\\ÈÛÝ[šYœ›ÛH]]Ü™YX[šY™\ÝXÙ[Y[ÈH˜]HÓHXÚÙY^XÚ][™[^KÛÜ\˜][Û‹Ø[H™YÚ[ÛˆÝÛ™\œÚ\È[™H˜Z[Y˜\Ý\ˆ™[™\ˆÛÝ[X]™HHÝ[HÝYÙH™Y›Ü™HH™^Ú[™›[YHØ\Ý‚‹H^\Ý[™ÈÝÛ™\œÈÙ\™H™\Z\™Yˆ[™^š[›ÝÈ^ÜÙ\È[™[^HÈÜ\˜][Û‹\Ý]\ÈÈ[H™YÚ[ÛœÎÈÜÜËÙš^Y\ÛÝX˜]YšY[\™[™\š[™Ë]Œ‹˜ÜÜØÝÛœÈÍœˆÈÌYœˆÈÍYœˆ˜XÚÜÈ[™Ù[˜[^™Y\]X[ÛÝØØ\™Ø\Û˜[YKØ˜\ˆÚ^š[™ÎÈŒMˆ[Ø^\È™[X\Ù\ÈHXÝ[ÛˆØ]HžHXY[™NÈŒMÈ\š]™\È˜[™ÙHXÙ[Y[œ›ÛHÛÛ™šYË\™Ù]\X™\Ù\™\È™YK]\™Ù]Ù[\ÚYH›ÛÝš[Ë\›Z]Èš\ÝX[Ý™\™›ÝÈ[™\™Ù\ÈÝ[HÝYÙ\Ëˆš^YÛÝÙ[ÛY]žHY\\œÈ[™ÛÛX˜]Ý\™Ù]Ù[XYÙH]H™[XZ[ˆ[˜Ú[™ÙY‚‹H›ØÝ\ÙYÛÝ™\˜YÙH]Y]È[›Ý\ˆ[[Y[ÉÈ™\™\Ù[]]™HÚ[™ÛKÝšKØ[ÚÚ[ËXÙH\œ›ÝÈ˜Z[ˆY\ˆØ\ÝX[Y\ËXÙHÜ[ˆ[™Ú[™›[YHÝ\š]›Ü‹Z[™\[™[Ü›Ý\Ù[ÛY]žKÛ™HÚ[™›[YH˜\Ý\ˆ›ÙK[˜Û\YØ\™ËÕ‘–[™™[™\‹Y˜Z[\™HØ]H™[X\ÙKˆœH[ˆZ[Ø\È\ÙYÛ›HY\ˆZ[˜ÚXÚØY[YšYYHÝ[HX[šY™\ÝÈÞ[˜Ú›Ûš^™Y[™\È™]Z[ˆŒMÌËKØØXÚHMÌËK‚‹H]Z[Y]šY[˜ÙNˆØÜËÜXKØ˜]K[^[Ý]]™ž\[[YKLŒŒLMË›Yˆ™\]Z\™[Y[˜]ÚŒ‹LKLMËX˜]K[^[Ý]]™ž\[[YX™[XZ[œÈSTSQS•QÈ“ÕÓÓTUH[[™\ÜÚ]ÜžHÚXÚÜÈ\ÜËHØ[™Y]H\ÈY\™ÙYÈ]˜H^XÝÒH\È\ÞYY[™[HØYYÜ˜Z][[Øš[HÛÛX˜]ÛÛ™š\›\È›ÙÜ™\ÜÚ[Û‹Û^[Ý]Ü˜[™ÙH‘–ˆ›È]ˆ8¡¤ˆXZ[ˆ›Û[Ý[Ûˆ\È]]Üš^™Y‚‚ˆÈÈŒ‹LKLMÈ8 %[˜Ý[Û‹XØ\™Ü™XY\ÛÛ][Ûˆ[™š[X\žK]\™Ù]‘–[˜ÚÜˆ
+“ÕÓÓTUJB‚‹H›ÛÝË]\˜\ÙH\È]LŒMÌÍ™ŒÙXLYŽL˜Œ™MÙNYMÌÙMÌXÍÍXØÍÈÛÜšÚ[™Èœ˜[˜Ú\Èš^Ø˜]K]šK[YXÚ[š\ÛK]™žX[˜ÚÜ‹LŒŒLMØˆXZ[˜\È›Ý\Ùˆ\È™\Z\‹‚‹H™X[UˆÛÛ™š\›X][ÛˆÛÛ\]YHš[Üˆ™YH˜]KY›Ü›X][Ûˆ™\]Z\™[Y[ËˆH™]È™\Ü^ÜÙYÛÈÙ\\˜]HY™XÝÎˆH^Y\ˆ™YK]\™Ù]ÚÚ[Z[YY]H“ÔÔÈ[˜Ý[ÛˆØ\™[ÛÈ[XYÙYHÛÈ™X\ˆ™Z[™›Ü˜Ù[Y[Ë[™[™[^HÚ[™ÛKÝ™YK]\™Ù]‘–Ý^YY]Hœ›Û\›ÝÈÙ[\ˆ[œÝXYÙˆHXÝX[]XÚÙYØ\™ˆ[YšY[‘–]\Ý™[XZ[ˆ›Ü›X][Û‹XÙ[\™Y‚‹H›ÛÝØ]\Ù\È™[XZ[ˆ[ˆ^\Ý[™ÈÝÛ™\œËˆ™\ÛÛ™SYXÚ[š\ÛPXÝ[ÛŠ
+X[XYÙYHYXÚ[š\ÛH[™[ˆ™]\™Ù]YÜ™XYÚÚ[È[ÈH›Ü›X[[ÛœÝ\ˆ™\ÛÛ™\ŽÈ[™[^H›ØÙ\ÜÔÚ[™ÛS[ÛœÝ\]XÚÊ
+XÝ\YH˜YÙH™Y›Ü™H\™Ù]Ù[XÝ[ÛŽÈŒMˆØ\œšYY›È\™Ù]Y]Y]NÈŒMÈÙ[\™YÜ›Ý\Ù[ÛY]žHÛˆH›ÝË‚‹H™\Z\ˆÙY\ÈÛ™HÙ][Y[][™Û™H‘–ÝÛ™\ŽˆYXÚ[š\ÛK]\™Ù]YÚÚ[È^HÛ˜ÙK[XYÙHÛ›HHYXÚ[š\ÛH[™š[š\ÚÈ[ÛœÝ\ˆÙ[XÝ[Ûˆ\ÜÙ\Èš[X\žKÝ\™Ù][™^\È›ÝYÚH˜YÙH[™ŒMŽÈŒMÈÙY\Èš^Y\Ú\HÚ^š[™È]Ù[\œÈ›Û‹X˜]YšY[Ü›Ý\‘–ÛˆH^XÚ]š[X\žHØ\™ˆ˜]YšY[Ø[]\™Ù]‘–Ý[\ÙHHÚÛK\ÚYHÙ[\‹‚‹H›ØÝ\ÙY™YÜ™\ÜÚ[ÛœÎˆØ[Y\^KÐ“ÔÔËÕÝÙ\ˆ[[YH›Ý™\È“ÔÔÈ[™›Ý™Z[™›Ü˜Ù[Y[È™]Z[ˆHÚÚ[ÛÜÝ\ÈZYÛ˜ÙH[™›Ü›X[[ÛœÝ\ˆÙ][Y[\È™]™\ˆ[\™YÈš[X\žK]\™Ù]‘–™YÜ™\ÜÚ[Ûˆ›Ý™\È[™[^HÚ[™ÛH[™šH\ÙHHÙ[XÝY›Û‹XÙ[\ˆ[HÚ[H[]\™Ù]ÙY\ÈHÛÛ\]H›Ü›X][ÛˆÙ[\‹‚‹H™\]Z\™[Y[˜]ÚŒ‹LKLMËX˜]KY›Ü›X][Û‹]\™Ù][™Ø\È
+ŠŒËÍH‘T’Q’QQ8 %“ÕÓÓTUJŠ‹ˆHÛÈ™]È][\È™[XZ[ˆSTSQS•Q[[H\ÞYY]ˆ[[YHÛÛ™š\›\È
+JHH™YK]\™Ù]YXÚ[š\ÛH]X]™\ÈH“ÔÔËÜ™Z[™›Ü˜Ù[Y[È[ÝXÚY[™
+ŠH[™[^HÚ[™ÛKÝšKØ[‘–\ÙHH™\]Z\™YÙ[\œËˆØ[YKÐØXÚH™\œÚ[Ûˆ™[XZ[œÈMÌËK‚‚ˆÈÈŒ‹LKLMÈ8 %™X[[[YH›ÛÝË]\ˆ“ÔÔÈYXÚ[š\ÛHœ›Û[[™HÛÛ\Ú[Ûˆ
+“ÕÓÓTUJB‚‹H\Ù\ˆ[Øš[HUˆ™XÛÜ™[™ÈLÌÌÌ›\™\šYšY\ÈH[H›Ú™XÝ[ÛŽˆHØ]\ˆÚ\˜XÝ\ˆ\È™Z[™HÛÈœ›Û[Y\Ëˆ™\]Z\™[Y[˜]ÚŒ‹LKLMËX˜]KY›Ü›X][Û‹]\™Ù][™Ø\È›ÝÈKÌÈ‘T’Q’QQ‚‹HHØ[YH™X[™XÛÜ™[™È\Ü›Ý™\ÈHš\œÝ“ÔÔÈYXÚ[š\ÛHXÙ[Y[\ÈÛÛ\]NˆHYXÚ[š\ÛHØ\™ØØÝ\Y\ÈHØ[YHš\ÝX[˜[™[™ÛÝ™\œÈHÙ[\ˆ“ÔÔûï#Ü™Z[™›Ü˜Ù[Y[[š]‚‹H›ÛÝØ]\ÙH\È[ˆH^\Ý[™È“ÔÔÈÝÛ™\‹›Ý[›Ý\ˆÔÔÈØ\ØØYNˆÙYY›ÜÜÐ˜]YšY[Û˜\ÚÝ
+
+X[™“ÔÔ×Ô‘RS‘“ÔÑSQS•ÔÓÕØÝ[XÙYH“ÔÔÈš[È]S‘SVWÑŒËÑŒ‹ÑÚ[HH[™\[™[QPÒÊ˜›Û™H›ÝÈÛÜœ™XÝHÝÛœÈH[™[^Hœ›Û[™K‚‹H›ÛÝË]\œ˜[˜Úš^Ø›ÜÜË[YXÚ[š\ÛKYœ›Û[[™K\[[YKLŒŒLMØÝ\Èœ›ÛH]MÍ˜ÍŒÙMMÙ™NYYŽX˜XX™ÌNYMXÍŒÙYˆ]™\Ù\™\ÈS‘SVWÐŒËÐŒ‹Ð›Üˆ]™\žHØ[Y\^H“ÔÔÈ[™]ÈÛÈ™Z[™›Ü˜Ù[Y[Ë[ˆ\ÚÜÈH^\Ý[™Èš^Y\ÛÝÙ[ÛY]žHY\\ˆÈ™XÛÛ˜Ú[HH]™HÓH[[YYX][Kˆ›È™]ÈÜ˜\\‹ÔÔÈš[Üš]H]ÚÚÚ[[[X™\ˆÚ[™ÙK‘–Ú[™ÙHÜˆØ]™HÚ[™ÙK‚‹HH™XÛÜ™[™ÈÛ›HÚÝÜÈ[™[^HÚ[™ÛK]\™Ù]Ø\ÝÈ
+9a¬:g'9¢ìØ9­*¹¬-9ã&ùãn
+Kˆ]Ù\È›Ý˜[Y]HšX;ï#Ø›ÝØÈ˜[™ÙH\™Ù][™È™[XZ[œÈSTSQS•Q]›Ý‘T’Q’QQ[[H™X[[™[^H˜[™ÙHØ\Ý\ÈØ\\™Y‚‚ˆÈÈŒ‹LKLMÈ8 %˜]H[[YHH™\Z\ˆØ[™Y]H
+“ÕÓÓTUJB‚‹H˜\ÙHXØÍNXÌ™YLØLÌXMŒÌMMŽÌÙYÙŽXLÙ™ŒNXÈœ˜[˜Úš^Ø˜]K\[[YK\Ü˜Z]Ë]™žLŒŒLMØ‚‹HØÛÜHÛ›HÜ˜Z]È[™‘–Ù[ÛY]žKˆXÝX[\ÞYY›Ü›X[˜]HÛÛ™š\›YYYØXÞHLŒœÌL[š]ZYÚÈÝ™\œšY[™ÈœÎLœÛÝÎÈ\Ù\ˆšY[È\ÈÛÝ\˜ÙH˜XÙHY[YšY\ÈØ[YK]ÚÙ[ˆ“ÔÔÈ™Z[™›Ü˜Ù[Y[™Y˜]È™X\Z[™È[žHY[™ËÝ˜[œÛ][Û‹‚‹H^\Ý[™ÈÝÛ™\œÈY]YˆŒMH™[™\˜]XÈÝ\\›˜[žK]ÚÙ[ˆY™XÞXÛNÈš^Y\ÛÝØ[›ÛšXØ[ÔÔÈÜÝ˜[Y\ÜXÙNÈŒMˆYØXÞH›Û™H˜[œÛ][ÛŽÈŒMÈ\TÜš]P›ÞÚ^™H˜XÝÜœËˆ›ÈYY[[YHÜ˜\\ˆÜˆ[\Ü˜\žH]Ú‚‹HØÜËÜXKØ˜]K\[[YK\KLŒŒLMË›Y\Ý[™ÝZ\Ú\ÈXÝX[ØœÙ\˜][ÛœËÛÝ\˜ÙHXYÛ›ÜÚ\È[™Ý\[Y[\žH\ÝËˆ™\]Z\™[Y[˜]ÚŒ‹LKLMËX˜]K\[[YK\X™[XZ[œÈÌˆ‘T’Q’QQˆ™\œÚ[Û‹ØØXÚH™[XZ[ˆMÌËK‚‹H[[YHÛÝ\˜ÙHØ\ÈÛÛ›™XÝÜ‹\X›\ÚY\ÈM™M˜Í™˜ŒMNØLÎM˜ŒLL˜ØXMXŒ˜YŽÈ˜YˆÌŒÈ\™Ù]È]˜ˆÒH[ˆÌMÎNH
+ÍLŒNNNMLN˜
+H\ÜÙY[˜ÛY[™È™\ÜÚ]ÜžHÚXÚÜÈ[™H^\Ý[™È\ÛÛ]YNŒMˆœ›ÝÜÙ\ˆØ]NÈH˜Yˆ]ˆ\Þ[Y[Ø]HØ\ÈÚÚ\Yˆ\ÙH\™HÝ\[Y[\žHÛ›H[™È›ÝÚ[™ÙHÌˆ‘T’Q’QQ‚‹Hœ›ÝÜÙ\ˆ˜]]™HUˆ™\ÛÝ\˜ÙH[\›ØÚÙY\\ˆ™X[YØ[YH[œÜXÝ[Û‹ˆØ[™Y]H“ÔÔÈ™Z[™›Ü˜Ù[Y[[™‘–Ø\\™\È™[XZ[ˆ™\]Z\™Yˆ™]™\ˆ™X]\ÛÛ]YPHÜˆÒHÝXØÙ\ÜÈ\ÈÛÛ\][ÛŽÈ›ÈY\™ÙKÙ\Þ[Y[]]Üš^™YžHH]]Û›Û[Ý\È˜[Y][ÛˆÛÛ˜XÝ‚‚ˆÈÈŒ‹LKLLˆ˜XÙX›ÛÚÈ[™›ÚY9c§ùå'ùænùaiHÐûï"9méy/g9b!¹¥+ûï#9§*¹d"9/m{ï"B‚‹H9méy/g9b!¹¥+È™X]\™KØ[™›ÚY[˜]]™KY˜XÙX›ÛÚË[ÙÚ[‹\ØËLŒŒLL˜;ï#9gî¹®¥¹à®¹mìºaãy¥¬9¨.9l#yæ¡Ú]Xˆ]˜Ì™ÎÌMŒNLL˜LŒÍXØ™˜MÍLÌØÙX;ï&ØXZ[˜9¬¤¹§"y/ë¹¥.xà y¬¤¹§"ynî¹êâÈ›Û[Ý[Û¸à ‚‹H9kéºf¦ù£ ù£ãÈ™\ÜÚ]ÜžH9o£9è®º*£{ï&¹ãï¹§"z`b¹¢,¹¬¤¹§"H[™›ÚY8à PØ\XÚ]Ü¸à PÛÜ™Ý˜xà UÐxà UÙX•šY]È9¢%¹am¹.å¹c§ùå'ÈÜÝ8à ¹¥è¹§"ye+ù. ÙXˆ]]ÝÛ™\ˆ9.ãyà®ˆœËÙš\™X˜\ÙKÙš\™X˜\ÙKX]]šœÎŽœÚYÛ’[•Ú]˜XÙX›ÛÚÊ
+X;ï#9í«y£ Hš\™X˜\ÙHÙXˆÚYÛ’[•Ú]Ü\
+
+X;ï&ù§+:/*¹k£9aj9¬¤¹§"y/ë¹¥.yk ûï#9.gù¬¤¹§"ya£y¥¬9h§ˆÙXˆÐ]]ÛÜšØ\›Ý[™8à ‚‹H9¥¬9h§¹ãj9êâÈÝÛ™\ˆ[™›ÚYÙ˜XÙX›ÛÚË[ÙÚ[‹\ØËØ\ÜÜ˜ËÛXZ[‹Ú˜]˜KØÛÛKÙ›Ý\œÞ[X›ÛËÚšX[™ÚKØ]]ØËÓXZ[XÝ]š]KšÝ8à ¹k ùcêº-lY]H[™›ÚYÙÚ[“X[˜YÙ\˜;ï#ØØ[˜XÚÓX[˜YÙ\˜8¡¤ˆ˜XÙX›ÛÚÈXØÙ\ÜÕÚÙ[ˆ8¡¤ˆš\™X˜\ÙH[™›ÚY˜XÙX›ÛÚÐ]]›ÝšY\‹™Ù]Ü™Y[X[
+
+X8¡¤ˆš\™X˜\ÙP]]œÚYÛ’[•Ú]Ü™Y[X[
+
+X;ï#9§ 9o£9cêºhkùé.ˆš\™X˜\ÙHRQ8à ¹¬¤¹§"HÙX•šY]øà Qš\™\ÝÜ™xà [ØØ[ÝÜ˜YÙxà z`b¹¢,¹kf9ª¥8à URQÝÛ™\œÚ\8à z)äº"l¸à [ZYÜ˜][Ûˆ9¢%ˆœšYÙH9ké¹/g8à ‚‹H9fî¹k¦ˆÐÈXÚØYÙH9à®ˆÛÛK™›Ý\œÞ[X›ÛËššX[™ÚK˜]]ØØ;ï#Y˜][XÝ]š]H9à®ˆÛÛK™›Ý\œÞ[X›ÛËššX[™ÚK˜]]ØË“XZ[XÝ]š]X;ï#Y]H\Q9à®ˆMÌLŽMMÍNNNLX8à “X[šY™\Ý9c!yd*È˜XÙX›ÛÚÐXÝ]š]xà PÝ\ÝÛUXˆØ[˜XÚÈØÚ[YH:"!È[™›ÚYXÚØYÙHš\ÚXš[]{ï&ÓY]H\ÙXÜ™];ï#ØÛY[ÙXÜ™]9¬¤¹§"ykêùaiyê"ùo#øà y¥¡ù.í¹¢%ˆÚ]8à ‚‹H[™›ÚYÙ˜XÙX›ÛÚË[ÙÚ[‹\ØËØ\ÙÛÛÙÛK\Ù\šXÙ\ËšœÛÛ˜8à yì/yêè9ª¥:"!ÈØØ[›Ü\Y\È:(ªÈ™Ú]YÛ›Ü™X9£¤ºfi8à ”ÐÈ9g*9ï.¹l$HÛÛÙÛHÙ\šXÙ\ÈÛÛ™šYÈ9¦`¹§ ù¦#¹è®¹`g9å*9ænùai{ï&úacyïk¹ª¥9oázh"9å,Hš\™X˜\ÙH›Ý\‹\Þ[X›ÛËZšX[™ÚX:*.ùa¢¹d#9. [™›ÚYXÚØYÙH9o£9."ú/"y.)¹`áy¥/¹g*9§+9ªgøà ”‘PQQH9mì¹b%ùaîˆY]KÑš\™X˜\ÙHÛÛœÛÛH9ì¯¹è®¹«!9/cxà YXYËÜ™[X\ÙHÙ^H\Ú9doy.é8à PTÈ9nî¹ïkº"!ÈÌŒÈ[˜H:jeù¥-¸à ‚‹H9k¢yaj9ªbù£©y`áz*&:c!:*+z*":`n:h!{ï#9§*¹ké¹/g;ï&¹c§ùå'Èš\™X˜\ÙHÙ\ÜÚ[Ûˆ9.#y§ ú!ê¹båyaly.ªùb,ÙXˆÑûï&ùnîº+l9§*¹/¡¹/oùå*\ÝY˜XÚÙ[™:jeú+bH˜]]™HQÚÙ[»ï#9a£yíi¹d#9®¤9í¬ºh y. 9«(y )È[™Ù™‹ØÝ\ÝÛHÚÙ[¸à ¹é y«h¹¢¢ˆ˜XÙX›ÛÚÈÚÙ[¸à URQ]Y\žH9¢%ˆØØ[ÝÜ˜YÙH9åmˆœšYÙxà ‚‹H:jeú+b{ï&˜›ÙHK]\Ý\ÝËØ[™›ÚYY˜XÙX›ÛÚË[˜]]™K\ØË\Ý›ZœØ‹ÍˆTÔûï&ÑÜ˜YHŽH˜\\ÚÜØTÔûï&ùd*ù. 9«(y )ÈÞ[]XÈ›Û‹\ÙXÜ™]ÛÛÙÛK\Ù\šXÙ\ËšœÛÛ˜9æ¡˜\œ›ØÙ\ÜÑXYÑÛÛÙÛTÙ\šXÙ\ØTÔûï#9®+9o£9mì¹b*ºfiÞ[]XÈÛÛ™šYøà ¹f%ú*iˆ˜\˜\ÜÙ[X›QXYØ9æ¡9e+ù. 9i,y¥eù¦+ù«i9gíú(c9ä¬9h ù¬¤¹§"H[™›ÚYÑûï"ÑÈØØ][Ûˆ›Ý›Ý[™;ï"{ï#9fè9«i9l&¹á(ycëú l¹ê,yæ¡XYÈTûï#ÔÌŒÈ9ké¹®+8à ‚‹H™\]Z\™[Y[˜]Ú;ï&˜™[X\ÙKÜ™\]Z\™[Y[X˜]Ú\ËÌŒ‹LKLL‹X[™›ÚY[˜]]™KY˜XÙX›ÛÚË[ÙÚ[‹\ØËšœÛÛ˜;ï&ÍÍH‘T’Q’QQ;ï#9§ 9o£9. :h!y/çyåfyà®ˆY]KÑš\™X˜\ÙHÛÛœÛÛH:*+yk¦¸à ykéºf¦ÈTÈ:"!ÈØ[\Ý[™ÈÌŒÈ[˜{ï"˜XÙX›ÛÚÈ\9¥+ù£í:`(ùíd9/çy£ ze¢ùegûï"zjeú+bxà ‘Ø[YKÐØXÚH™\œÚ[Ûˆ9í«y£ HŒMÌË{ï#ÌMÌËxà ‚‚ˆÈÈŒ‹LKLLˆ˜XÙX›ÛÚÈ9ænùaiHÝÛ™\ˆ9¥-¹¥ »ï&¹éîúfiUˆ\™XÝÐ]]‚‹H9méy/g9b!¹¥+Èš^Ù˜XÙX›ÛÚË[ÙÚ[‹\Ý[™\™Y›ÝËLŒŒLL˜;ï#9gî¹®¥¹à®¹åm¹¦`¹§ 9¥¬]˜ŒÌM™MM˜Ì™MLŒYŒÙÍŒØŽ™NMXÌ™ÌMX;ï&ØXZ[˜9.#y/ë¹¥.xà ‚‹H[™›ÚY9ké¹ªgùè®º*£{ï&¹ãªyk­¹/çyåfH˜XÙX›ÛÚÈ\9«hùn.8à#:e¢ùegù¥+ù£í:`(ùíd8à#y¦`»ï#Uˆ\™XÝØØ][Û‹˜\ÜÚYÛŠ˜XÙX›ÛÚË˜ÛÛJX9§ ú(ªùi%º`ê˜XÙX›ÛÚÈ\9£©yë¨y.)¹`g9g*\œ›Üˆ˜XÙX›ÛÚØ;ï&ùcê¹§"zeç:e¢y¥+ù£í:`(ùíd8à yå,HÚ›ÛYH9£©y¢bù¦`¹¢cycëùk£9¢$Ð]]8à ¹fè9«i9ecúhc9.#y¦+ùãªyk­¹¢bùªgúg :hcyi%º*+yk¦»ï#: #9¦+ÈUˆST\™XÝSÐ]]Ù[\YÙH˜]šYØ][Ûˆ9.#ycëù/g9à®¹«hùo#ùãªyk­¹­`yê"øà ‚‹H9e+ù. ]]ÝÛ™\ˆœËÙš\™X˜\ÙKÙš\™X˜\ÙKX]]šœØ9mì¹éîúfi9¥m9ieÈPÑP“ÓÒ×ÑPQÓ“ÔÕP×Ê˜8à XØØ][Û‹˜\ÜÚYÛŠ
+X8à [X[X[XØÙ\ÜË]ÚÙ[ˆØ[˜XÚøà XÚYÛ’[•Ú]Ü™Y[X[
+
+X:"!È[Øš[HÚYÛ’[•Ú]™Y\™XÝ
+
+X9b!¹¥+ûï&ù.#yo¥ùa£yå¢¹ë+9."yliÛÜšØ\›Ý[™8à ‚‹HÚYÛ’[•Ú]˜XÙX›ÛÚÊ
+X9ãï¹g*9e«¹. :-ëùo¤y/oùå*š\™X˜\ÙH˜XÙX›ÛÚÐ]]›ÝšY\˜
+ÈÚYÛ’[•Ú]Ü\
+
+X;ï#9.)º*+yk¦ˆ\Ü^O\Ü\;ï#:+¤ù¢bùªgú"!ù¨c9ªgú`ïyí«y£ yà#ú)¯yfjÜ\9­`yê"ûï&ùb'yiâùc%¹`áy/çyåfHÙ]™Y\™XÝ™\Ý[
+
+X9.éyæî9k®y/ë¹«hùbcymì¹egùbåy/a¹l&¹§*¹íd9§gùæ¡:""ˆ™Y\™XÝÙ\ÜÚ[Û¸à ‚‹HœËÙš\™X˜\ÙKÙš\™X˜\ÙKX]]]ZKšœØ9éîúfi9mì¹.#ykf9g*9æ¡UˆXYÛ›ÜÝXÈ:c+ú*©9¥¡ù¨b;ï&ØØÜËÑ’T‘PTÑWÐUUÐÓÕQÔÐU‘K›Y:"!È]]™YÜ™\ÜÚ[Ûˆ\Ý9d#9«iy¥.yà®ˆÜ\ÛÛ˜XÝ8à ‚‹H9.#y/ë¹¥.HRQÝÛ™\œÚ\8à ykf9ª¥ØÚ[Xxà Qš\™\ÝÜ™H[\øà TÝ\\Ý]HXXÚ[™xà QØ[YKÐØXÚH™\œÚ[Û¸à ¹ké¹ªgújeù¥-¹¨§y.í»ï&‘˜XÙX›ÛÚÈ\9/çy£ y«hùn.9¥+ù£í:`(ùíd:*+yk¦»ï#9.#z) y¬`¹ãªyk­ºeç:e¢H\[šûï&únç¸à#˜XÙX›ÛÚÈ9ænùaixà#y.#yo¥ùa£yaî¹ãïº""ˆUˆ\™XÝSÐ]]\œ›Üˆ˜XÙX›ÛÚØ8à ‚‚ˆÈÈŒ‹LKLLH˜XÙX›ÛÚÈRQ9kf9ª¥Y˜][Ûˆ9/ë¹«hÂ‚‹H9åáùâà;ï&‘˜XÙX›ÛÚÈÐ]]9mì¹¢$9b§ùcå¹o¥Èš\™X˜\ÙHRQ;ï#9/aˆXØÛÝ[RH:hkùé.ˆXØÛÝ[Ø]™H\ÜÙY™\ÛÛ][Ûˆ]Ø[Y\^HY˜][Ûˆ˜Z[Y˜8à ‚‹H9¨.yfè;ï&”Ý\\Ý]HXXÚ[™H9mì¹g*™\ÛÛ™TØ]™Q›ÜŠ
+X:)èù§¤9aîº*lˆRQ9æ¡9è®¹b!ÈØ]™H^[ØY;ï#[\”™XYJØ]™JX9cnùoïyåiycàù¥n9.)¹a£y«(ydo9cêÈ›Ý\”Þ[X›ÛÑØ[YTØ]™K›ØY
+
+X:aãz+ ™\ÜÚ]Üž{ï&ùë+9.£9«(z+ 9cå¹cëú ïz"!ùmìº)èù§¤9âà9¡bù.#yd#9«iz #9fç¹`¬È˜[Ùxà ‚‹H9/ë¹«hûï&˜›Ý\”Þ[X›ÛÑØ[YTØ]™X9¥¬9h§ˆY˜]JØ]™JX;ï#9¬¯ùå*9¥è¹§"HØYØ[YJ
+XY˜][Û‹Û›Ü›X[^˜][Ûˆ:`£ú/+ù/a¹æí9£©y/oùå*9mìº)èù§¤^[ØY;ï&ù. :"+ØY
+
+X:(c9à®¹í«y£ yc§ù§+9o§ˆXÝ]™HRQ™\ÜÚ]ÜžH:+ 9cå¸à ¹ç'ù«hÈ™\šYšYYY[\HRQ9.ãycêº-l[\Ü™X][ÛŠ
+X;ï#9.#y§ ú*©:`,ˆ‘PQxà ‚‹H9.#y/ë¹¥.HØ]™HØÚ[Xxà URQÝÛ™\œÚ\8à Qš\™\ÝÜ™H[\øà QØ[YKÐØXÚH™\œÚ[Û»ï&ØXZ[˜9.#y/ë¹¥.xà ‚‚ˆÈÈŒ‹LKLLH9."yb!¹¥+ù¢bùªgÈR{ï#Ð“ÔÔÈ9éæ9kí»ï#ùá(ychyâc9¢,:k)yk¢yaj9¥m9d";ï"Uˆ‘T’Q’QQ;ï"B‚‹H9¥m9d"9bcHÚ]Xˆ]ÍÍMŒØŒ˜XÍØÌŒŽLÍYYY™YŽMY˜ŒŒNL8à XXZ[NLÌLÍM˜ØLXL™™ÙŒY™ŒÍ™YL™MÙÍØ;ï&ù."y¨§z`h9êëÈ\:`ïyì¯¹è®¹ëby¥¯9£!ùk¦ˆÒxà ¹kéºf¦úh!¹n£ùà®¹¥è¹kf[Øš[HR{ï#ÑVÝX\™È8¡¤ˆ“ÔÔûï#ùfæú,hyhe9nlú(hxà yãªy¬åyl zgh¸à y¢ : ïzh$:)¯z"!ÈŒŒ9éæ9kíˆ8¡¤ˆ9á(ychyâc9¢,:k)ydb9ãï¸à ‚‹Hš^Û[Øš[K]ZKY^YÝX\™ËLŒŒLLPYÙ™Ù™˜ØYNÍØÙNÎNNMÎŒXMNLYXYLŒØ9mì¹¦+ú-mùiâÈ]ˆY\™ÙHÍÍMŒØŒ˜XÍØÌŒŽLÍYYY™YŽMY˜ŒŒNL9æ¡9ë+9.£\™[;ï#9fè9«i9¬¤¹§"zaãz)!ùd"9/m{ï&ù¥è¹§"HˆÌMH:"!È[ˆÍMÍMÍÍNLX9mì¹¢$9b§ûï#9o£9î£9fç¹«n9®+:*i¹.ãz`&º`c¸à ‚‹H™X]\™KØ›ÜÜËX˜[[˜ÙKYØ[Y\^KXÛÝ™\‹\ÚÚ[\™]šY]Ë\™[XËLŒŒLLPÍÍLMŽL™YY˜˜LMXÙMÌNŒXØLÙYMŽ˜Í9.ézfæz)ªˆÛÝ\˜ÙHY\™ÙHMLØMÍŽMÎLYŽLXÌÙŽÍÍY™ŽMLÌÎLØ9í¤ÈˆÌMÌˆ9d"9aiH]™LLÌÍŒ™™YNŒŽNŒY˜LXÍÍ˜YÍMY8à º(gyê yà®¹ajy.ïHX[šY™\Ý8à X\\Ú[;ï#Ù™X]\™KX›ÜÜË\™[XÈ\ÚYZ[™[˜[Yxà XÜÜËÍM‹]ŒMÍXÜš]XØ[]ZK\™YÜ™\ÜÚ[ÛœË˜ÜÜØ:"!È\ÝËÝZK]\ÙÜ˜\KX˜]K\™\Ù\˜][Û‹\ÝšœØ;ï&ù.®¹méy/çyåfz/ ù¥¬]ˆ9æ¡ŒÈ“ÔÔûï#ùªgúeçÝÛ™\¸à [[Øš[HÝX\™È:"!È˜]H˜\Ù[[™{ï#9d#9¦`¹b¨9aiyãªy¬åHMŽŽxà ya`ùí(9abùb-¸à P“ÔÔûï#ù£í:.ãz"!ùéæ9kíºg 9¬`»ï#9a£yå,HÛÛXš[™YÛÝ\˜ÙH:aãynîˆÙ[™\˜]Y\ÜÙ]øà ‚‹Hš^Ø˜]KXØ\™\ÜË[[Ý[Û‹]ZP™Ž™ÌY™NM˜ŽMÙXLXÍŒMXLYLLÌÍÍØÍ9.ézfæz)ªˆÛÝ\˜ÙHY\™ÙHÙNNXXÙM™™ŒYXÌÙŒNM˜LŽY™MŒMØ9í¤ÈˆÌMÌÈ9d"9aiH]ØÙNNMÍŽÎNYXŒÌÌNMÍ™NŽYYLÙŽŽ˜˜X8à º(gyê ycê¹g*9ajy.ïHX[šY™\Ý:"!ÈØ[Y\^KXÛÜ™H\ÚYZ[™[˜[Y{ï#9gaù.éHÛÛXš[™YÛÝ\˜ÙH]\›Z[š\ÝXÈ™XZ[:)èù¬n»ï&ØœËÍM]ŒMÌËLKX˜]K\XKšœØ9cê¹¤í9aay¥è¹§"ye«¹. ØœÙ\™\ˆØ[˜XÚûï#9¬¤¹§"yë+9.£ØœÙ\™\»ï#Û\Ý[™\»ï#ÜÝ]HÝÛ™\»ï#ŒM‹ÕŒMÈ9¢ : ïH‘–8à y¢,:k)yn+y/cxà XXÝ[Û»ï#Ý\›ˆRHÝÛ™\ˆ9gaù§*¹¥.xà ‚‹H9.©9câyê/y¨.9cé¹æo9ãï¹bcy. 9méy/g9b!¹¥+ùåfy."ùæ¡“ÔÔûï#ùªgúeçNŒMˆ:""º*.ú)èú"!ù§ ú-êÔÔÈ[H:*©9c.zacyæ¡:`c¹kë™YÙ^;ï&ùmì¹¥.y¢$9ì¯¹è®ºc¥¹k¦¹æë¹bcH]ˆ9¨.9aá¹æ¡ŒÈÝÛš[™È[{ï#:`oùacy`aúfoy )ú"!ú""º)£ù¨/9fç¹­`xà ‚‹H9b!¹¥+È»ï&”ˆ[ˆÍMÎNMÍÍ˜8à Y]ˆ[ˆÍMÎLÕPÐÑTÔûï&Ð“ÔÔËÕÝÙ\ˆLËÌLøà \™[Xøà [YXÚ[š\Ûxà ]\ÙÜ˜\xà [[Øš[HÝX\™È:"!ÈÎL0åÎ;ï#ÍL°åÎLM{ï#ÍŒ0åÍÍÈÚ›ÛYHÝZ]\È:`&º`c»ï#ÛÝY›\™H^XÝTÒH\Þ[Y[:"!È]™HPH9¢$9b§øà ‚‹H9b!¹¥+Èûï&”ˆ[ˆÍNNMÎN8à Y]ˆ[ˆÍNLÕPÐÑTÔûï&ÌŒŽÌŒŽ”ÈÞ[^8à LML‹ÌMLˆ›ÙKØœ›ÝÜÙ\ˆÝZ]\øà LŽNH™\ÛÝ\˜Ù\øà LˆÝ]XÈQøà LŒˆ]\›Z[š\ÝXÈZ[\ÜÙ]øà \™[X\Ù{ï#ÛØY\»ï#ÙÚ]YY™ˆØ]\È9aj9¥n:`&º`c¸à Ú›ÛYH9æ¡Ø\™\ÜÈ˜]HÍŒ0åÎ;ï#ÍL°åÎLMxà yãªy¬åyl zgh¸à [[Øš[HÝX\™øà X›ÛÝ;ï#ÜÚÚ[;ï#Ü™[XÈP{ï#9.éycâº`ê9ïl¹o£XØÛÝ[Yš\œÝ8à PXž\Üøà X˜]K[^Y\‹Ø]Y[È]™HPH9aj:`êTÔøà ‚‹HÛÝY›\™HÎ‹ËÙ]‹™›Ý\‹\Þ[X›ÛËY]‹œYÙ\Ë™]˜9mìºjeú+bz`ê9ïlˆX[šY™\Ý^XÝÒHØÙNNMÍŽÎNYXŒÌÌNMÍ™NŽYYLÙŽŽ˜˜X;ï#Ø[Y{ï#ÐØXÚH™\œÚ[Ûˆ9b.ù¡#ùí«y£ HŒMÌË{ï#ÌMÌËxà ºhcyi%ˆÚYÛ™Y[Ý]9kéºh yª¨¹§éyá(Hœ›ÚÙ[ˆ[XYÙxà y¬-9nlÈÝ™\™›ÝÈ9¢%ˆ\[ÜšYÚ[ˆÛÛœÛÛHØ\›š[™ËÙ\œ›Ü»ï&ù§*¹nî¹êâùc/ùd#z**¹k¨¹n,ú&gøà ‚‹H™\]Z\™[Y[˜]Ú;ï&˜™[X\ÙKÜ™\]Z\™[Y[X˜]Ú\ËÌŒ‹LKLLK]™YKXœ˜[˜ÚY]‹Z[YÜ˜][Û‹šœÛÛ˜;ï#ËÍÈ‘T’Q’QQ8à ¹aj9ê"ù¬¤¹§"y.éHXZ[˜9à®ˆ˜\ÙH9æ¡¸à [Y\™ÙH9¢%ˆ\Ú;ï&ùk£9¢$™X]\™H\Þ[Y[9o£XZ[˜9.ãyà®ˆNLÌLÍM˜ØLXL™™ÙŒY™ŒÍ™YL™MÙÍØ8à ‚‚ˆÈÈŒ‹LKLLH˜XÙX›ÛÚÈX›X×Ü›Ùš[HUˆ:*.¹¥­ûï"ST;ï"B‚‹H9méy/g9b!¹¥+Èš^Ù˜XÙX›ÛÚË\X›XË\›Ùš[KYXYÛ›ÜÝXØ;ï#9gî¹®¥¹à®¹åm¹¦`¹§ 9¥¬]LXL™XÙYŒ˜L˜MLXŒ™™™YMNYXLY˜8à [™›ÚYUˆ9mì¹cãz)¡ºaãyãïˆY]H[˜[YØÛÜ\Îˆ[XZ[:"!È\œ›Üˆ˜XÙX›ÛÚÈÈ9á(y¬åz/"yaiX;ï&Ñš\™X˜\ÙH]]Üš^™YÛXZ[œøà SY]H\ÛXZ[œøà Qš\™X˜\ÙH[™\ˆ™Y\™XÝ8à P\Q8à yë¨yä!¹dèz)äº"l»ï#9.éycâˆš\™X˜\ÙH[Øš[H™Y\™XÝ9gaùmìº`$:h!y£¤ºfi8à ‚‹H9k¦9¥®Hš\™X˜\ÙH”ÈÑÈ9c§ùiâùè¯:hkùé.ˆ˜XÙX›ÛÚÐ]]›ÝšY\˜9§+:.ªù.#zh$:/"H[XZ[ØÛÜ{ï#˜\ÙSÐ]]›ÝšY\˜ØÛÜ\È:h$:*+yà®¹ên»ï&ùl"9¨b9.gù¬¤¹§"HYØÛÜJ	Ù[XZ[	ÊX8à ¹fè9«i:*.¹¥­ùæë¹ª&y¦+úf¥:fèˆš\™X˜\ÙHÜÝY˜XÙX›ÛÚÈÐ]]9."ù®.9¦+ùd)ºhcyi%º) y¬`ˆ[XZ[8à ‚‹H9§ 9í`º*.¹¥­ù.#z/"yaiHY]H˜]˜TØÜš\Ñøà y.#y¥¬9h§¹i%º`ê[[YHØÜš\8à y.#y¥/¹kë›ÙXÝ[ÛˆX[šY™\ÝÜ™[X\ÙHØ]xà ¹`áHÎ‹ËÙ]‹™›Ý\‹\Þ[X›ÛËY]‹œYÙ\Ë™]‹Ø9å,ye+ù. ]]ÝÛ™\ˆœËÙš\™X˜\ÙKÙš\™X˜\ÙKX]]šœØ9æí9£©yl#¹d$HY]HÐ]]X[Ùûï#9¦#¹è®¹cêº) y¬`ˆX›X×Ü›Ùš[X:"!È™\ÜÛœÙWÝ\O]ÚÙ[˜;ï&ØØ[˜XÚÈ9/oùå*Ù\ÜÚ[Û”ÝÜ˜YÙX:fª9ªgÈÝ]H:jeú+bxà zf,ˆÔÔ‘»ï#9cå¹o¥ÈÚÙ[ˆ9o£9êâùb.ù®!zfiT“œ˜YÛY[;ï#9a£y.éHš\™X˜\ÙH9k¦9¥®H˜XÙX›ÛÚÐ]]›ÝšY\‹˜Ü™Y[X[
+ÚÙ[ŠX
+ÈÚYÛ’[•Ú]Ü™Y[X[
+
+X9fç¹b,9¥è¹§"yd#9. š\™X˜\ÙHRQÝÛ™\¸à ‚‹HUˆ9æí9£©HÐ]]Ø[˜XÚÈ9fî¹k¦¹à®ˆÎ‹ËÙ]‹™›Ý\‹\Þ[X›ÛËY]‹œYÙ\Ë™]‹Ø;ï#Y]H8¡¤ˆ˜XÙX›ÛÚÈ9ænùaiH8¡¤ˆ:*+yk¦ˆ8¡¤¸à#9§"y¥b9æ¡Ð]]:aãy¥¬9l#¹d$HT’xà#yoázh":hcyi%¹b¨9aiz`&y`"ùk£9¥m9í¬¹g`;ï&ùc§Èš\™X˜\ÙH[™\ˆÎ‹ËÙ›Ý\‹\Þ[X›ÛËZšX[™ÚK™š\™X˜\ÙX\˜ÛÛK××ËØ]]Ú[™\˜9/çyåfy.#yb*¸à ‚‹H:`&y¦+ù¦#¹è®ˆST]Ú;ï&º"éHX›X×Ü›Ùš[K[Û›H9ké¹ªgù¢$9b§ûï#9¨.yfè:fá¹.+yb,š\™X˜\ÙHÜÝY˜XÙX›ÛÚÈÐ]]È[XZ[ØÛÜ{ï&ù."ù. :/*¹oázh":`n9¤áù«hùo#ù/ë¹«hÈY]KÑš\™X˜\ÙHØÛÜH9¢%¹l!ùmìºjeú+bHÚÙ[ˆ^Ú[™ÙH9¥-¹¥ ¹¢$9«hùo#ÈÝÛ™\¸à º"éy.ãyi,y¥eûï#9éîúfi9«i:*.¹¥­ù.)¹¢¢¹¨.yfè:fá¹.+yb,Y]H\ÓÐ]]9li8à ¹é y«h¹a£yo ÚYÛ’[•Ú]˜XÙX›ÛÚÊ
+X9å¢¹ë+9."yliÛÜšØ\›Ý[™8à ‚‹H9.#y/ë¹¥.HØ]™QØ[YJ
+XÈØYØ[YJ
+X8à URQÝÛ™\œÚ\8à Qš\™\ÝÜ™H[\øà zfì¹êëËù§+9ªgÈØÚ[Xxà QØ[YKÐØXÚH™\œÚ[Û»ï&ØXZ[˜9.#y/ë¹¥.xà ‚‚ˆÈÈŒ‹LKLLH9i&¹l#z*lH]ˆ9b!¹¥+ùê/y¨.:"!È[˜Ù\ÝžH9¥-¹¥ ‚‚‹H9ê/y¨.9gî¹®¥¹à®ˆÚ]Xˆ]˜LŒYÌŒÎMÌNLMMM™LÍMØÍNLL˜ÎMØLÙX8à XXZ[ÙÙMLŽYNMÍØÙYÙ˜ÙŽŽ˜˜XÍÍÌ˜MNMØ;ï&ùê/y¨.9¦`º`h9êëùaly§"HL9`"Èœ˜[˜ÚXYûï#9am¹.+HÍˆ9`"ùméy/g;ï#ù¥m9d"9b!¹¥+ùmì¹¦+È]ˆ[˜Ù\ÝÜ»ï#9¬¤¹§"y.îù/eHœ˜[˜Ú9¦+ùnî¹êâùg*9§ 9¥¬]ˆ9.bù."¹æ¡9§*¹d"9/mH\ØÙ[™[8à ‚‹HŒ‹LKLLH9d#9¦`¹i&¹l#z*lyå(¹å'ùæ¡9§"y¥b9méy/g9mì¹/§yn£ùkf9g*9¥¯9d#9. 9¨§H]»ï&¹a­ùegùbåybmz)äˆY™XÞXÛxà ybmz)ä¹ë+ˆ9«iyn¥z`êXÝ[Ûœøà yajyneH›ÛÝ[›È:"!ÈÛÛ\XÝ]]Ý™\›^xà \š]˜XÞHÛXÞ{ï#9.éycâˆ˜XÙX›ÛÚÈ[Øš[H™Y\™XÝ;ï&ù§ 9¥¬]ˆ9æ¡™\ÜÚ]ÜžHÚXÚÜÈ:"!ÈÛÝY›\™H^XÝTÒH\Þ[Y[9gaùà®ˆÕPÐÑTÔûï#9.#ykf9g*9."yieù.¤¹æî9êí¹â+yæ¡9ê"ùo#ùè¯8à ‚‹H9e+ù. :g :) y¥-¹¥ ¹æ¡9¦+È›ÝXÝYXZ[ˆ™[X\ÙHY\™Ù\È9æ¡[˜Ù\Ýžxà ˜Ú]Y\™ÙK]™YHK]Üš]K]™YH]ˆXZ[˜9å(¹å'È™YH™™MÙM˜ŽŒÌMMŒŽŒ™XÍÙ™YŒXLMYX;ï#:"!ùd"9/mybcH]ˆ™YH9k£9aj9æî9d#;ï&ù¥m9d"ÛÛ[Z]˜YLXMXÌN™YÌŽXØX™MLÌÙXXØÍNNØM˜9fè9«i9cê¹h§¹b¨XZ[ˆ\™[;ï#9.#y¥.y.îù/ez`b¹¢,¸à URxà XZ[8à \™[X\ÙHY]Y]xà Qš\™X˜\Ùxà ykf9ª¥9¢%¹ãªyk­º,áù¥¦xà ‚‹H:""º#byê/ÈˆÌM»ï#Øš^ÝZKY\]Z\Y[YØ[Y\^KXÚ]K\Û\Ú9mì¹å,Hš^ÝZKY\]Z\Y[YØ[Y\^KXÚ]K\Û\ÚXÛÛ[YY˜MÍÌÌLŽÍÎLY˜LÍŒØÙY˜™ÌÙMYŒÙŒXÎÍ9æ¡9k¢yajÝÛ™\‹XÛÛ™\™ÙY9âb9§+9cå¹.èûï#9.)¹¥êymìº`#ú`cˆ™ŒÙÍÙLÙŽLØÍŒŽXŒML˜ÍMM˜M™˜XŒX9d"9aiH]»ï&ÔˆÌMˆ9mì¹åfy."ÈÝ\\œÙYY:*ª¹¦#¹o£:eç:e¢{ï#9é y«h¹a£y«(yd"9aiz""ˆX[šY™\Ý;ï#ØZ[8à ‚‹H™X]\™KÙ˜XÙX›ÛÚË[ÙÚ[˜9æ¡œ˜[˜ÚYÙÜ™YØ]H]Ú:"!È]ˆ[YÜ˜][ÛˆÛÛ[Z]™ÌLÙ™YNY˜MØX™ŒYNŒXÎMLÎXYŽY˜N]ÚZY9k£9aj9æî9d#;ï#9o£9î£[Øš[H™Y\™XÝ9.©¹mì¹g*]»ï&ù«i:""¹b!¹¥+ù.#zg 9a£HY\™Ùxà ˜›ÛÜ;ï#Ø›ÛÜØ;ï#Ø›ÛÜ9cê¹¥¬9h§¹ch9/cyª¥;ï#\ÜÙ]Ë[Xœ˜\žX9.ãyà®¹í(9§d9l"9å*;ï#9amºi&]™\™Ù[œ˜[˜Ú\È9gaù¦+ùmì¹cå¹.èùæ¡:""¹gî¹n¥y¢%¹«mùcìˆ™[X\Ù{ï#Ý™\šYšXØ][Ûˆœ˜[˜Ú;ï#9æ¡¹.#yo¥ùæí9£©yd"9aiyæë¹bcH]¸à ‚‹H9§+9«(ycê¹.éHˆÌMŒˆ9¥m9ä!ˆ[˜Ù\ÝžH:"!ù§+9.©9£©yí :c!;ï&ÑØ[Y{ï#ÐØXÚH™\œÚ[Ûˆ9í«y£ HŒMÌË{ï#ÌMÌË{ï#XZ[˜9.#y/ë¹¥.xà ”™\ÜÚ]ÜžHÚXÚÜÈ9¢$9b§ù.%ˆ9d"9aiyo£;ï#9oázh"9a£y«(yè®º*£H]ˆPQ8à PÛÝY›\™H\ÞYYX[šY™\ÝÒH:"!ùâb9§+9. :!í;ï#9¢cycëùfç¹h,yk£9¢$8à ‚‚ˆÈÈŒ‹LKLL9fæùb!¹¥+ùk¢yaj9¥m9d";ï&›ÜÜÈNŒMˆ9¢bùªgùâb:gh»ï"]ˆ[YÜ˜][Û»ï"B‚‹H9£!ùk¦¹méy/g9b!¹¥+Èš^Ø›ÜÜË]ZKN^M‹[[Øš[KLŒŒLLX˜˜YYŒÙNÌYYMYŒM™ÍÍ˜ÎŽYÙXÌ˜9æ¡›ÜÜÈ:"!ùªgùb-¹chHNŒMˆÔÔÈ9mì¹¥m9d"9b,9«hùo#ÈÝÛ™\ˆÜÜËÙØ[Y\^KX›ÜÜË]ÝÙ\‹˜ÜÜØ8à ‚‹H:"!ùéæ9kí¹b!¹¥+ùalyd#9/ë¹¥.H\ÜÙ][X[šY™\ÝšœÛÛ˜8à XZ[Ø\ÜÙ][X[šY™\ÝšœÛÛ˜:"!È™X]\™KX›ÜÜË\™[XØ[™{ï&ù.®¹méy¥m9d"9/çyåfH›ÜÜÈÔÔÈ9¥¬9âb8à yéæ9kí¹ª&yìi;ï#úfç9®b¹í(9§d8à y.éycâ¹am¹o£:/"yaiyæ¡™X]\™K\™[XË\›ÙÜ™\ÜÚ[Û˜ÔÔËÒ”øà ‚‹H›ÜÜÈ9b!¹¥+ùnî¹êâù¥¯:""ˆ]»ï&ù§*¹n-¹fçº""ˆX[šY™\Ý8à z""º,áù®¤:-ëùo¤y¢%¹am¹.åˆ[[Yxà ¹®+:*i¹­­z$âÈÍŒ0åÎ8à LÎLðåÎÌøà ML°åÎLM{ï#9.)¹/oùå*:emÈMŒHÈMŒX:jeú+bychyâaù.#y®¨¹/cxà ‚‹HÔÔÈ9dàz,ê¹ª¨¹§éyab9éîúfi:*.ú)èùa£y£ ù£ãùaj9ª¥Z[\Ü[9k¨ùdb»ï&ú*.ú)èù.+yæ¡:*g¹ofy.#y§ ú`(9¢$:*©9b);ï#9kéºf¦È›ÜÜÈÝÛ™\ˆ9.ãyá(ya*¹ab9«"º(ç9. xà ‚‚ˆÈÈŒ‹LKLL˜XÙX›ÛÚÈš\™X˜\ÙH9ænùaiz(ç:ob»ï"ˆÌML»ï"B‚‹H9méy/g9b!¹¥+È™X]\™KÙ˜XÙX›ÛÚË[ÙÚ[˜;ï&ù¥m9d"9gî¹®¥¹¥-¹¥ ¹b,]™ŒÙÍÙLÙŽLØÍŒŽXŒML˜ÍMM˜M™˜XŒX8à ‘š\™X˜\ÙHÛÛœÛÛH9mì¹egùå*[XZ[Ô\ÜÝÛÜ™8à QÛÛÙÛxà Q˜XÙX›ÛÚøà P[›Ûž[[Ý\ûï&ù§+9«(z(ç:ob¹¥è¹§"H]][XØ][ÛˆÝÛ™\ˆ9ï.¹l$yæ¡˜XÙX›ÛÚÈ›ÝšY\¸à ‚‹HœËÙš\™X˜\ÙKÙš\™X˜\ÙKX]]šœØ9¥¬9h§ˆ˜XÙX›ÛÚÐ]]›ÝšY\˜ÈÚYÛ’[•Ú]˜XÙX›ÛÚÊ
+X;ï&ØœËÙš\™X˜\ÙKÙš\™X˜\ÙKX]]]ZKšœØ9g*9¥è¹§"HXØÛÝ[Yš\œÝ™\ÜÛœÚ]™HX[ÙÈ9b¨9aixà#˜XÙX›ÛÚÈ9ænùaixà#xà X\ÞKÙ\œ›Üˆ[™[™ûï&ØœËÙš\™X˜\ÙKÙš\™X˜\ÙKX›ÛÝÝ˜\šœØ:`#ú`c¹¥è¹§"H›Ý\”Þ[X›ÛÑš\™X˜\ÙSY™XÞXÛX9¦­:g,¹d#9. 9ænùaiy¥®y¬åxà ¹¬¤¹§"y¥¬9h§¹ë+9.£9ieÈ]]ÝÛ™\¸à [[Ù[Ü˜\\ˆ9¢%ˆ[[YH]Ú8à ‚‹H]\›Z[š\ÝXÈZ[9mìºaãy¥¬9å(¹å'ÈÛÛ[Z\ÚYš\™X˜\ÙKÐ›ÛÝ\ÜÙ]È:"!ÈX[šY™\Ýûï&Ø™Ú]X‹ÜØÜš\ËÜ[‹X›ÛÝX\˜Ú]XÝ\™KXœ›ÝÜÙ\‹\XK›ZœØ9æ¡š\™X˜\ÙH]]\ÝÝX›H9d#9«iz(çÚYÛ’[•Ú]˜XÙX›ÛÚÊ
+X;ï#9.)¹¤í9aaH]]ÛÝ\˜ÙHÛÛ˜XÝ:"!ÈÎL0åÎ8à LÍŒ0åÍ8à N0åÌÎL™\ÜÛœÚ]™Hš^\™xà ‚‹H9.#y/ë¹¥.HØ]™QØ[YJ
+XÈØYØ[YJ
+X8à URQØØ[ÝÛ™\œÚ\8à TÝ\\Ý]HXXÚ[™xà Qš\™\ÝÜ™Hœ›ÝÜÙ\ˆÜš]HÛXÞxà zfì¹êëËù§+9ªgùkf9ª¥ØÚ[Xxà QØ[YKÐØXÚH™\œÚ[Û»ï&ØXZ[˜9.#yg*9§+9méy/g9/ë¹¥.xà ‚‹HY]H]™H9bcy£ä;ï&•˜[YÐ]]™Y\™XÝT’\È9oázh"9c!yd*ÈÎ‹ËÙ›Ý\‹\Þ[X›ÛËZšX[™ÚK™š\™X˜\ÙX\˜ÛÛK××ËØ]]Ú[™\˜8à ¹d"9aiH]ˆ9o£9.ãzg 9¢bùªgùké¹®+˜XÙX›ÛÚÈÜ\8à Qš\™X˜\ÙHRQ:"!ùd#RQ9kf9ª¥:)èù§¤8à ‚‚ˆÈÈŒ‹LKLL9fæùb!¹¥+ùk¢yaj9¥m9d";ï&”ØÜ™Y[ˆØZÙHØÚÈÝÛ™\ˆ9¥-¹¥ »ï"]ˆ[YÜ˜][Û»ï"B‚‹H9£!ùk¦¹méy/g9b!¹¥+È™X]\™KÜØÜ™Y[‹]ØZÙK[ØÚË\[[YKLŒŒLLMLMØŒNÎLÙÌNMLÎLŒMXŒÍÌÎXØÍYXŒNX9æ¡9cëú)¢úh zgh¹n.9.«ºg 9¬`¹/çyåf{ï&ù¥m9d"9¦`¹éîúfi[™^š[9aiù§*¹ænú*&9æ¡[›[™H[[Y{ï#9¥.yå,HœËÜÝ\\ÜØÜ™Y[‹]ØZÙK[ØÚË\[[YKšœØ9/g9e+ù. ÝÛ™\»ï#9.)¹í#yaiy¥è¹§"ye«¹. \ÚY›ÛÝÛÜ™xà ¹k ùcê¹k¢z(çyå'ùdoz`,y§'ù.)ˆš\™KX[™Y›Ü™Ù]9do9cêÈØZÙHØÚÈT{ï#9.#yëbyo¡xà y.#zf.ùhgˆ]];ï#ùkf9ª¥;ï#úi¥¹`"ùcëù¤ãy/g9åjúgh¸à ‚‹Hš\ÚXš[]XÚ[™ÙXY[ˆ:"!ÈYÙZYX9§ ù..ùbåzaâù¥/»ï&Ýš\ÚX›{ï#ØYÙ\ÚÝØ9§ ù h¹oªxà ˜™\]Y\ÝÙ[™\˜][Û˜9/oÈ™[X\ÙH9o£9¢cyk£9¢$9æ¡[™[™È™\]Y\Ý9i,y¥b9.)¹êâùclúaâù¥/»ï#:`oùaczh zgh¹mìºfèºe¢ù.ãzaãy¥¬9£ zc¥»ï&ùaj9gçÈÝX\™9/çz+by.#y§ úaãz)!ùk¢z(çH\Ý[™\¸à ¹ak:e¢ú*.¹¥­ù.ãyà®ˆÚ[™ÝË‘›Ý\”Þ[X›ÛÔØÜ™Y[•ØZÙSØÚØ8à ‚‹H\ÝËÜØÜ™Y[‹]ØZÙK[ØÚË\ÝšœØ:)¡º$âÈ[œÝ\ÜY;ï#ù¢ä¹íexà zaãz)!ÈXÜ]Z\™xà ZY[ˆ™[X\Ùxà \YÙ\ÚÝËÜYÙZYxà \[™[™È˜XÙH:"!úaãz)!ùk¢z(ç{ï&Ø\ÝËØ›ÛÝX\˜Ú]XÝ\™K\ÝšœØ9¬.9.ayé y«hˆ[™^š[9a£yaî¹ãï¹§*¹ænú*&[›[™H^XÝ]X›HØÜš\8à ¹«hùo#ú(çyïk¹¦+ùd)¹è®¹ké¹.#y/$yç(9.ãzg 9g*È]ˆ:"!ù¥+ù£íØÜ™Y[ˆØZÙHØÚÈ9æ¡9¢bùªgújeú+bxà ‚‚ˆÈÈŒ‹LKLLŒMÌËH9ænùaiz!êº`jy¡âz"!ùalyå*9k¨¹§#y/èyë¬{ï"PRSˆ‘SPTÑQ;ï"B‚‹H9gî¹®¥¹à®ˆ]˜™ÎY˜ŒØÌLÌÌLXØXLØ˜MØLÍXÙLÎLÍÙŽM;ï#9méy/g9b!¹¥+Èš^ÝŒMÌÍKX]]\™\ÜÛœÚ]™K\Ý\Ü8à ¹/oùå*: !yfç¹h,H[™›ÚY;ï#ùaiùmc9à#ú)¯yfj9æ¡9§*¹ænùaiyåjúgh¹cêºg,¹aîˆL0åÌNLŒÝYÙH9cìù."ú)ä»ï#9.)º) y¬`¹ænùaizh xà yìîùílzh z"!ùacynèùdb¹§#ybæz,áú*"¹íly. :hkùé.¹k¨¹§#y/èyë¬HŒLLÌŒPÛXZ[˜ÛÛX8à ‚‹H9¨.yfè9¦+ÈœËÙš\™X˜\ÙKÙš\™X˜\ÙKX]]]ZKšœØ9g*9/oùå*: !yl&¹§*¹ænùaixà X\\Ú[;ï#ØœËÌ[XZ[‹šœØÝYÙHØØ[\ˆ9l&¹§*º/"yaiy¦`»ï#9l,y¢¢ˆXØÛÝ[Ý™\›^H9£¦ùaiyfî¹k¦ˆÙØ[YK\ÝYÙX8à ¹ænùaiHRH9ãï¹¥.y£¦ÈØÝ[Y[˜›ÙX;ï&ØÜÜËÙš\™X˜\ÙKX]]˜ÜÜØ9.éHš^Y™X[šY]ÜÜ8à XLš8à \ØY™KX\™Xxà XÛ[\9keùí&¸à yaiú`ê9g ¹æíØÜ›Û:"!ùê¡9na{ï#ùªjùd$Hœ™XZÜÚ[:,¨:,«:!êº`jy¡â{ï#9.#ya£y/§z,í9ænùaiyo£[[YH9¢cyî+¹¥/¸à ‚‹HœËÜÝ\\ÜÝ\ÜXÛÛXÝšœØ9¦+ùe+ù. 9k¨¹§#z,áù¥¦z"!ùalyå*: kùíhz)¥¹ê¥ÈÝÛ™\»ï#9í#yaiHÜš]XØ[›ÛÝ;ï#9fî¹k¦¹/èyë¬yà®ˆŒLLÌŒPÛXZ[˜ÛÛX8à ¹ænùaizh yæ¡8à#: kùíhyk¨¹§#xà#z"!ùìîùílzh yæ¡8à#9k¨¹§#y/èyë¬{ï#ù§éyç"ù/èyë¬xà#ydo9cêùd#9. ›Ý\”Þ[X›ÛÔÝ\ÜœÚÝÊ
+X;ï&ùacynèùdb¹§#ybæz,áú*"¹.©º+ 9cå¹d#9. ÝÛ™\»ï#9.#ya£yaî¹ãï¸à#9k¨¹§#H[XZ[;ï&¹l&¹§*º*+yk¦¸à#xà ‚‹H9¥¬9h§ˆ\ÝËÝŒMÍX]]\™\ÜÛœÚ]™K\Ý\Ü\ÝšœØ;ï#9fî¹k¦ˆÎL0åÎ8à LÍŒ0åÍ8à N0åÌÎL9."yê+ˆšY]ÜÜ9æ¡]]Ý™\›^{ï#ÙX[ÙÈ:`¢¹åc8à y¬-9nlÈÝ™\™›Ýøà yalyå*9k¨¹§#z)¥¹ê¥ú"!È[XZ[;ï&ùd#9«iy¤í9aaHš\™X˜\Ùxà XYYœ™YH™YÜ™\ÜÚ[Û¸à ”™\]Z\™[Y[˜]Ú;ï&˜™[X\ÙKÜ™\]Z\™[Y[X˜]Ú\ËÌŒ‹LKLL\™\ÜÛœÚ]™KX]]\Ý\ÜXÛÛXÝšœÛÛ˜;ï#ËÌÈ9mìˆ‘T’Q’QQ8à ‚‹HˆÌLÍ»ï"XYÌ˜Ù™LŽÍÍØMLXYÎLYNL™ŒÙLY™ŒØÍ™ŒØ;ï"T™\ÜÚ]ÜžHÚXÚÜÈ[ˆÍÍÍMM˜:aãz-äy¢$9b§ùo£9d"9aiH]YXXXŽYŒYŒÎYYXXØ™M˜™ŒŒXÙ™˜;ï&Ù]ˆ[ˆÍLŒŽŒ9æ¡™\ÜÚ]ÜžHÚXÚÜÈ:"!ÈÛÝY›\™H\Þ[Y[9gaù¢$9b§ûï#\ÞYYX[šY™\ÝÒH9.©¹ì¯¹è®¹d.ùd"8à ¹kéºh HÎ‹ËÙ]‹™›Ý\‹\Þ[X›ÛËY]‹œYÙ\Ë™]‹Ø:hkùé.ˆŒMÌË{ï#9ænùaiHÝ™\›^H9à®ˆ“ÑX9."ùæ¡š^YšY]ÜÜÝ\™˜XÙxà YX[ÙÈ9k£9¥m9/cy¥¯šY]ÜÜ9aiûï&únç¹¤â¸à#: kùíhyk¨¹§#xà#zhkùé.ˆŒLLÌŒPÛXZ[˜ÛÛX8à ¹§+9ªgùk£9¥m:jeú+b{ï&“›ÙH\ÝÈMÌM8à R˜]˜TØÜš\Þ[^ŒMÌŒM8à \Ý]XÈ™\ÛÝ\˜Ù\ÈÌøà RSQÈ{ï#9b¨9."ˆ]\›Z[š\ÝXÈZ[8à [ØY\¸à \™[X\Ùxà YÚ]Y™ˆØ]\È9aj9¥n:`&º`c¸à ‘Ø[Y{ï#ÐØXÚH™\œÚ[Ûˆ9í«y£ HŒMÌË{ï#ÌMÌËxà ¹/oùå*: !y¥¯Œ‹LKLL9¦#¹è®¹d#9¡#ù.éycåù/çz+mÈˆ9£ª:`,ˆXZ[˜8à ‚‹H9¨.9aá¹í :c!ˆÌLÎ9æ¡™\ÜÚ]ÜžHÚXÚÜÈ[ˆÍÍŽŽÕPÐÑTÔûï#9d"9aiy§ 9í`ˆ]ÍLL™ÌLÌØXØ˜ÙŽÍ™™˜™˜LÌ˜Ù˜ŽØÌXMMŒØ;ï&Ù]ˆ\Ú[ˆÍÍŒLŽMØ9æ¡™\ÜÚ]ÜžHÚXÚÜøà PÛÝY›\™H^XÝTÒH\Þ[Y[:"!È]™HPH9aj:`êÕPÐÑTÔøà ¹cåù/çz+mÈ›Û[Ý[ÛˆˆÌLÎH9æ¡™\ÜÚ]ÜžHÚXÚÜÈ[ˆÍMLÕPÐÑTÔÈ9o£9d"9aiHXZ[XNXŽYLN˜MÍ™XN˜™NYŒÙ˜L˜;ï#XZ[ˆ™YHMØMN˜XÌYLMÌMY˜XŒŽ™NXÌÍM˜˜MŽØÍÙØ:"!ù¨.9aáˆ]ˆ™YH9k£9aj9. :!í8à ›XZ[ˆÒH[ˆÍLŒŽXÕPÐÑTÔûï&ÑÚ]XˆYÙ\È[ˆÍLNNLŽX9æ¡Z[;ï#Ù\Þ{ï#Ü™\Ü9aj:`êÕPÐÑTÔûï#\Y˜XÝLLÎLLNMØ:"!ÈYÙ\×ØZ[Ý™\œÚ[Û˜9gaùí yk¦¹d#9. XZ[ˆÒxà ¹«hùo#ùí¬¹g`Î‹ËÝŒLLÌŒKX[™Ú]X‹š[ËÛ^KYØ[YKØ9mìº+ 9fç¹ª&zhcŒMÌËxà XZ[Ø›ÛÝXÛÜ™KXÍØXÎYŽMšœØ:"!ÈZ[Ø›ÛÝXÛÜ™K™X˜ÙYŒÙLÍ˜ÜÜØ;ï&ùænùaiHÝ™\›^H9ké¹®+9£¦ù¥¯“ÑX8à \ÜÚ][Ûˆš^Y8à yk£9¥m9/cy¥¯šY]ÜÜ;ï#:nç¹¤â¸à#: kùíhyk¨¹§#xà#zhkùé.ˆŒLLÌŒPÛXZ[˜ÛÛX:"!ÈXZ[ÎŒLLÌŒPÛXZ[˜ÛÛX8à ¹«hùo#úh zgh¹á(H\[ÜšYÚ[ˆÛÛœÛÛH\œ›Ü»ï&ÕŒMÌËH9§+9¢nyæo9n ùk£9¢$8à ‚‚ˆÈÈŒ‹LKLLŒMÌËH˜]KØ]Y[È]™HPH˜XÙH›ÛÝË]\;ï"PRSˆ‘SPTÑQ;ï"B‚‹HÛÜšÈœ˜[˜Ú\ûï&˜š^ÝŒMÌÍKX˜]K[]™K\XK\˜XÙX:"!Èš^ÝŒMÌÍKX˜]K[]™K\XKXØ\Ý\˜XÙX;ï#9gî¹®¥ºcâ:!êˆ™[X\ÙHY\™ÙH9o£9æ¡]MÎÙÎÙYÙLŽÍNLMYÍŒØÍLMÌŽMXMŒN:e¢ùiâûï&ÔˆÌLŽxà HÌLÌH:"!ù§ 9í`¹í :c!ˆÌLÌˆ9gaùg*™\ÜÚ]ÜžHÚXÚÜÈ9¢$9b§ùo£9d"9ai{ï#9§ 9í`¹¨.9aáˆ\9à®ˆ]˜ØŒMLÎXNÎLLMŒLMŽMÌYNXÌÌÎŽØ8à ¹cåù/çz+mÈ›Û[Ý[ÛˆˆÌLÌÈ9æ¡™\ÜÚ]ÜžHÚXÚÜÈ[ˆÍÍŒMLMLŒ˜ÕPÐÑTÔÈ9o£9d"9aiHXZ[ÎMÍNLLŒÌ˜ŒYMNÍ™XNØÙ™YŒÍ8à ‚‹H™[X\ÙHY\™ÙH9æ¡XÝ[ÛœÈ[ˆÍÌŽLŽØ9mìº`&º`cˆ™\ÜÚ]ÜžHÚXÚÜøà PÛÝY›\™H^XÝTÒ{ï#ÕŒMÌËH:jeú+bxà []™HXØÛÝ[Yš\œÝÛÛ\Ý\:"!È]™HXž\ÜÈP{ï&ùe+ù. 9i,y¥eùà®ˆ™Ú]X‹ÜØÜš\ËØ˜]K[^Y\‹X]Y[Ë[]™K\XK›ZœØ9æ¡ŒMûï#ùa`ùí(9c(ùå¢¹li9ª¨¹§éxà ¹c§ùiâÈ][\9g*:e¢È[Ù[9o£:+ 9b,9mì¹íd9§gùæ¡ÝYÙ{ï#:aãz-äH][\ˆ9baùg*:e¢È[Ù[9bcyëbyo¡y®+:*iˆÝYÙH9¦`¹mìº(ªù."ù. 9`"ùç'ùké¹¢,:k)ybåy/gÝ\\œÙY{ï#:+by¦#¹i,y¥eù/¡º!êº-êÑ›Ý[™]š\9æ¡]™H˜]H9¦`¹n£ùêí¹¡bûï#9.#y¦+ù«hùo#ùå¢¹li9¢%ˆ‘–ÝÛ™\ˆ9fç¹«n8à ‚‹HPHÝÛ™\ˆ9¥.yà®¹ajy`"ùd!:!êˆ]ÛZXÈ9æ¡œ›ÝÜÙ\ˆ\Úûï&¹ë+9. 9`"ùg*9«hùo#ÈØ\Ý[XYÙTÚÚ[
+	Ù^ÜÚ]™Q›\œžIÊX:/å9fç¹bcyêâùclù¤íùcå¹amˆŒMÈ˜\Ý\ˆÝYÙ{ï#:+by¦#¹ç'ùké¹¢,:k)y¥¯y¥/¹§ ùb,:`eŒMûï&ùë+9.£9`"ù/§yn£ùdo9cêù«hùo#ÈŒM”ÚÚ[[š[X][Û‘\™XÝÜ‹œ^J
+X8à ycå¹o¥ÈÝYÙxà ydo9cêù«hùo#ÈÜ[’ÛYQ™X]\™J	Ø]]Ð˜]TÙ][™ÜÉÊXÜ˜\\ˆÚZ[»ï#9.)¹êâùclújeú+bybcyo£9à®¹d#9. ÓH›Ùxà \ÝYÙH9.ãH[Ý[Y8à \™\Ù[][Ûˆ9mìˆY[»ï#ÛÜXÚ]H8à [[Ù[ÝÛ™\œÚ\:"!È]Y[ÈØØ[H9«hùè®¸à ‚‹HœËÌÍË]ŒM‹\ÚÚ[X[š[X][Û‹šœØ;ï"Ø]{ï#ÜÝ\\œÙY{ï"xà XœËÌÎK]ŒMË\ÚÚ[X[š[X][Û‹šœØ;ï"˜\Ý\ˆÝYÙHY™XÞXÛ{ï"xà XœËÍK]ŒMMY]‹Yš^\ËšœØ:"!ÈÜÜËÍ‹]ŒMMY]‹Yš^\Ë˜ÜÜØ;ï"9a`ùí(9c(È›ØÝ\ûï#Ü™\Ù[][ÛˆÝ\™\ÜÚ[Û»ï"ygaù§*¹/ë¹¥.{ï&ù¬¤¹§"y¦ªù`g9¢,:k)xà yníºemù«hùo#ùbåyåjøà y/çyåfHYHÝYÙxà yh§¹b¨Ü˜\\ˆ9¢%¹¥¬9h§ˆ[[YH]Ú8à ‚‹H\ÝËÝŒMÍX˜]K[^Y\‹X]Y[ËYš^\Ë\ÝšœØ9¥¬9h§ˆ™YÜ™\ÜÚ[Û»ï#9fî¹k¦¹«hùo#ÈØ\Ý:+by¤æº"!È[Ù[Ý™\›\:+by¤æ¹d!:!ê¹g*9e«¹. ]ÛZXÈœ›ÝÜÙ\ˆÛ˜\ÚÝ9aiùk£9¢$;ï#9­­z$âÈ›ÙXÝ[ÛˆØ\Ý8à Y\™XÝÜ¸à y«hùo#ùa`ùí(9c(ÈÜ[™\ˆ:"!ÈÝYÙHY[]{ï#9é y«h¹ h¹oªy§ ú"!ù£ yî£9¢,:k)yêíº`'ùæ¡9ëbyo¡yo#ùª¨¹§éxà ‚‹H9§+9ªgùmìº`&º`c»ï&ŒLÎKÌLÎH›ÙHÝZ]\øà LŒL‹ÌŒLˆ˜]˜TØÜš\Þ[^8à LÌÈÝ]XÈ™\ÛÝ\˜Ù\øà LH[š\]YHSQøà Y]\›Z[š\ÝXÈZ[8à [ØY\¸à UŒMÌËH™[X\ÙHØ]{ï"LÌL;ï"xà YÚ]YY™»ï#ØÛÛ™›XÝ[X\šÙ\ˆØ]\øà ‘Ø[Y{ï#ÐØXÚH™\œÚ[Ûˆ9í«y£ HŒMÌË{ï#ÌMÌËxà ‚‹HÚ]XˆXÝ[ÛœÈ\Ú[ˆÍÍÍÎØ9æ¡™\ÜÚ]ÜžHÚXÚÜÈ:"!È]ˆ\Þ[Y[Ø]H9aj:`êÕPÐÑTÔûï&ÛÝY›\™H9mìº+ 9fçˆ^XÝÒHXLØXLÍNM™NNŒYŒÙ˜Y˜ÎLÌØY™LNNLNMØŒ;ï#]™HXØÛÝ[Yš\œÝ]]RHLLËˆ\ûï"H9éä¹æë¹ª&z`e9¢$;ï"{ï#]™HXž\ÜÈ:"!ù/ë¹«hùo£˜]KØ]Y[È[Øš[HPH9gaÈTÔøà ‚‹H9o£9î£9í%9¥¡ù.íˆ\ÞH[ˆÍÍMMÌÍ9£ëzg,¹«hùo#Èš\™H›\œžHØ\Ý9æ¡:+by¤æ¹.ãz-ê:-¢ˆØZ]Ü™XYÑ›Ý[™]š\;ï#KH9éäˆÝYÙH9g*:+ 9`/9bcyd"9¬åyíd9§gú #9o¥ùb,ÚÚ[›[;ï&ÔˆÌLÌH9l!ú`&y. 9«­y.gù¥.yà®ˆ]ÛZXÈÛ˜\ÚÝ8à ¹/ë¹«hùo£\Ú[ˆÍÍLŒÌÌÍØ9aj9¥nÕPÐÑTÔûï&ÛÝY›\™H^XÝÒHMØLØNYÎLÍŒÍX˜NYÍMYÌØÎXMÌØ8à []™HXØÛÝ[Yš\œÝ]]RHŒMŽH\øà []™HXž\ÜÈ:"!È]™H˜]KØ]Y[È[Øš[HPH9aj9¥nTÔøà ¹§ 9í`¹¥¡ù.íˆY\™ÙH9o£9æ¡]ˆ\Ú[ˆÍÍNÌMÌX9a£y«(yaj9¥nÕPÐÑTÔûï&™^XÝÒH˜ØŒMLÎXNÎLLMŒLMŽMÌYNXÌÌÎŽØ8à UŒMÌË{ï#ØØXÚHMÌËxà LLÌL‘T’Q’QQ8à X]]RHMËH\øà PXž\ÜÈ:"!È˜]KØ]Y[È9gaÈTÔøà ‚‹H9«hùo#ÈXZ[ˆ\Ú[ˆÍÍŒŽMŒŽNX9æ¡:i¥¹«(HÚ›ÛYHš^\™H9g*ZKXÜš]XØ[\™YÜ™\ÜÚ[ÛœË[[Øš[KXœ›ÝÜÙ\˜:`aùb,9. 9«(y )ÈQ»ï#Ý[Y\ˆ9£¤¹ê"ù¢¥¹bå{ï&ùd"9/mH™YH:"!ùmìºjeú+bH]ˆ™YH9k£9aj9æî9d#;ï#:*l¹®+:*i¹d#9.ïH™YH9§+9ªgú`(ú-äHŒÌŒTÔûï#9k¦9¥®H˜Z[YZ›Øˆ™\[ˆ:fª9o£™\ÜÚ]ÜžHÚXÚÜÈÕPÐÑTÔøà ‘Ú]XˆYÙ\È[ˆÍÍŒŽMMØ9æ¡Z[;ï#Ù\ÞH9aj:`êÕPÐÑTÔûï#\Y˜XÝLLÍŒŽŒÍNX:"!È\Þ[Y[9gaùí yk¦ˆ^XÝXZ[ˆÒHÎMÍNLLŒÌ˜ŒYMNÍ™XNØÙ™YŒÍ;ï&ù«hùo#ùí¬¹g`Î‹ËÝŒLLÌŒKX[™Ú]X‹š[ËÛ^KYØ[YKØ9mìº+ 9fçºh zgh¹ª&zhcŒMÌËxà XZ[Ø›ÛÝXÛÜ™KLÎXX˜N™ËšœØ8à XZ[Ø›ÛÝXÛÜ™KŽÍŒY˜ŒMMY‹˜ÜÜØ:"!ùcëú)¢ÈXØÛÝ[Yš\œÝ9ænùaiyaiycèøà •ŒMÌËH9«hùo#ùæo9n ùk£9¢$8à ‚‚ˆÈÈŒ‹LKLLŒMÌËHXØÛÝ[Yš\œÝ›ÛÝ\˜Ú]XÝ\™{ï"Uˆ‘T’Q’QQ;ï#ùmì¹£¢9«"¹£ª:`,ˆXZ[»ï"B‚‹H9gî¹®¥¹à®ˆÚ]Xˆ]Ì™NØŒÍÌY™ŒNLØMÙÌŒXÙŽXXYØ™MXXØ;ï&ùc§ùméy/g9b!¹¥+È\™‹ØÛÛ\Ý\X]]X›ÛÝX\˜Ú]XÝ\™X9í¤ÈˆÌLŒÈ9d"9aiH]»ï#9o£9î£9`áy.éHˆÌL;ïgˆÌLÈ9/ë¹oªz`ê9ïlˆXY\ˆ:"!ù¥è¹§"H]™HPH9l#y¥¬^žHÝÛ™\ˆ9æ¡:""¹`aú*+xà ¹/oùå*: !ymì¹¦#¹è®¹£¢9«"¹/§yn£ùk£9¢$]ˆ™]šY]È9o£9£ª:`,ˆXZ[¸à ‚‹HœËÜÝ\\ÜÝ\\XÛÛ˜XÝšœØ
+ÈœËÍL‹]ŒMÌËŒŒ\Ý\\[ØY\‹šœØ9¦+ùe+ù. Ý\\Ý]SXXÚ[™HÝÛ™\¸à ¹«hùo#ùâà9¡bùà®ˆ“ÓÕÓÐQS‘ÈÈUUÔ‘TÓÓ’S‘ÈÈUUÔ‘TURT‘QÈÐU‘WÓÐQS‘ÈÈRQÔUSÓ—Ô‘TURT‘QÈ‘QQÐÒTPÕTˆÈ‘PQHÈÑ‘“S‘WÔ‘PQHÈT”“Ô˜;ï&ùbmz)ä¹cê¹§"H‘QQÐÒTPÕT˜9.%]]RQÜ™\ÛÛ™YRQØXÝ]™HRQ9. :!í9¦`¹cëú)¢øà ‚‹HœËÜÝ\\ØXØÛÝ[\Ø]™K\™\ÜÚ]ÜžKšœØ9¦+ÈRQØØ[ÝÛ™\œÚ\:"!ÈYØXÞHZYÜ˜][ÛˆÝÛ™\¸à Ø[›ÛšXØ[Ù^H9à®ˆ›Ý\—ÜÞ[X›Û×ÜØ]™NžÝZYX;ï#Y]Y]H:"!ÈÚYXØ\ˆ9.©¹/§HRQ:f¥:fè»ï&Ø˜]WÙ[Ý™\œÚ[Û—ÜØ]™WÝX9.#z!ê¹båyí yk¦»ï#ZYÜ˜][Ûˆ9oázh"9è®º*£xà yab9`¦y.ïxà z(gyê H˜Z[ÛÜÙY8à ‚‹HØÜš\ËØZ[\›ÙXÝ[Û‹›ZœØ9å(¹å'È]\›Z[š\ÝXÈÛÛ[Z\ÚY›ÛÝØ\ÙØ[Y\^KÙ™X]\™H[™\ûï&Ø\ÜÙ][X[šY™\ÝšœÛÛ˜9¦+ùkéºf¦ÈÜš]XØ[Ñ™X]\™H\ÞHX[šY™\Ý8à ‘^XÝ][ÛˆÜ™\ˆ9fî¹k¦¹g*[™HÛÝ\˜ÙH\Ý;ï#9í¬º-ëÈ™\\˜][Ûˆ9.)º(c;ï#9.#ya£yå*9i)úaãÈÙ\]Y[X[™\]Y\Ý9í«y£ HÜ˜\\ˆ:h!¹n£øà ‚‹HœËÜÝ\\Ù™X]\™K[ØY\‹šœØ9¦+ùe+ù. 9båy¡bÈØÜš\ÝÛ™\»ï&ØœËÌŒX[›Ûž[[Ý\ËLŒšœØ9cêº,¨:,«Ú[\‹ÝÝXÚ™Y™]Ú8à Y™X]\™K[ØØ[ØY[™È:"!ÈYH™[ØY;ï#9.#ya£y§"HÌ‹\[[YH9aj9gçÈ[œ]ØÚøà ¹mì¹§"yn,ú&gùb,9..ùgã¹cê¹ëbH\Ú[;ï&ÙØ[Y\^KÜ]›ÛØXž\ÜËÜÚÚ[Ø›ÜÜËÜ™[XÈ9ëby.#zf.ùhgˆ]];ï#ùbmz)ä»ï#ù..ùgã¸à ‚‹HŒH9`"ÈŒLÌK\]›Û\Üš]KJ‹šœØÚ[šÈ9mì¹b*ºfi;ï&ØœËÌ‹]ŒLÌK\]›ÛX\X\˜[˜ÙKšœØ9¥.yå*Mˆ9`"È\ÜÙ]ËØÚ\˜XÝ\œËÜ]›ÛÊ‹ÙXœÛÛ[Z\ÚY9«hùn.:,áùå(¸à Üš]XØ[ÙÛÈ9.©¹¥.yà®ˆ\ÜÙ]ËÝZKÜÝ\\[ÙÛËŒÌXÌ˜ÌÙŒ˜‹šœØ8à ‚‹Hš\™X˜\ÙH9«hùo#úh!¹n£ù¥.yà®ˆY[]H8¡¤ˆRQ8¡¤ˆÛÝYÛØØ[™XY8¡¤ˆ\Ý[˜][Û»ï&ú**¹k¨¹/oùå*[›Ûž[[Ý\È]]8à ¹«hùo#ùn,ú&gÈRH9mì¹éîúfi8à#9ab9/oùå*9§+9ªgùkf9ª¥8à#xà ‘š\™\ÝÜ™Hœ›ÝÜÙ\ˆÜš]H9.ãyé y«h»ï#\ÝYX˜XÚÙ[™[Û›HÛXÞH9§*¹¥/¹kë8à ‚‹H9¬.9.az)£ù¨/:)¢ÈØÜËÐ“ÓÕÐTÒUPÕT‘K›Y;ï&Ø™Y›Ü™HÝ]XÈ˜\Ù[[™H:"!ùké¹®+œ›ÝÜÙ\ˆ]šY[˜ÙH:)¢ÈØÜËÐ“ÓÕÔT‘“Ô“PSÑWÐTÑSS‘K›Y8à ¹¥¬9h§ˆXØÛÝ[Ø]]Ø›ÛÝÙ™X]\™KØYÙ]›ÙHØ]\øà XÛÛ›ÛY[Øš[HÚ›ÛYHPH:"!È\ÞYY]™HÛÛ\Ý\Pxà ‚‹HUˆ™\šYšXØ][ÛˆÛÛ[Z]ŒÙXØ™ŒÎXÍM˜ŒYYÙYÙ™Y˜ÙYŽLXX8à PXÝ[ÛœÈ[ˆÍŽŒÌŽ;ï&ŒLÎKÌLÎH›ÙHÝZ]\øà XÛÛ›ÛYXØÛÝ[Yš\œÝœ›ÝÜÙ\ˆPxà PÛÝY›\™H^XÝTÒH\Þxà []™H]]Yš\œÝÛÛ›ÛÝ8à PXž\ÜÈ:"!È˜]KØ]Y[È[Øš[HPH9aj9¥nÕPÐÑTÔøà “]™HÚYÛ™Y[Ý]]]RHŽLËŒÈ\øà Yš\œÝZ[\øà LL™\]Y\Ýûï#ÌÍM‹ÍÍ»ï&ØÛÛ›ÛYØ\›H^\Ý[™Ë]\Ù\ˆÚ]H[\˜XÝ]™HÍH\øà ‚‹H™\]Z\™[Y[˜]Ú;ï&˜™[X\ÙKÜ™\]Z\™[Y[X˜]Ú\ËÌŒ‹LKLKXÛÛ\Ý\X]]X›ÛÝX\˜Ú]XÝ\™KšœÛÛ˜;ï#L‹ÌLˆ‘T’Q’QQ;ï&ùæo9n ù`&z`nŒMÌËxà ¹«hùo#ÈXZ[ˆ›Û[Ý[Ûˆ9.ãzh"9cåù/çz+mÈ¸à [XZ[ˆÒxà QÚ]XˆYÙ\È\ÞH:"!È›ÙXÝ[Ûˆ^XÝTÒKÝ™\œÚ[Ûˆ:jeú+byo£9¢cz ïyk¨ùê,yk£9¢$8à ‚‚ˆÈÈŒ‹LKL9."yb!¹¥+ÈØ[Y\^{ï#ùéæ9kí¹¥®yoh¹g%»ï#ùaj9gçúgg¹¢,:k)ykeùí&¹k¢yaj9¥m9d";ï"]»ï"B‚‹H9¥m9d"9bcHÚ]Xˆ]˜9à®ˆÎMÍØÙL˜ŽY™˜MNMLØÍY™L˜MMØL™XMX;ï&ù."y¨§z`h9êëÈœ˜[˜Ú\9gaùì¯¹è®¹ëby¥¯9/oùå*: !y£!ùk¦ˆÒ{ï#9.%Y\™ÙH˜\ÙH:`ïy¦+ú*lˆ]¸à L™Z[™;ï#9¬¤¹§"y.¤¹æî9c!yd*øà ¹kéºf¦úh!¹n£ù/§HÝÛ™\»ï#ú)¥º)®¹li9í&¹à®ˆØ[Y\^H™YÜ™\ÜÚ[ÛœÈ8¡¤ˆ™[XÈÜ]X\™H\8¡¤ˆÛØ˜[›Û‹X˜]H\ÙÜ˜\xà ‚‹Hš^ÙØ[Y\^K]ZKX˜]K\™YÜ™\ÜÚ[ÛœËLŒŒLMNL™ÍYÙY˜ŒXMY˜™™LØ™ŽNNLŒX™˜9.éHY\™ÙHÛÛ[Z]ÍNXXMÌØMØMÌ˜ÌLØYNYMXŽYŒYÍY™L˜9d"9ai{ï&ØœËÌK\ÝYÙK]Ž]ÝXÚ[ØÚËšœØ8à XœËÍK]ŒM‹\Þ\Ý[K\Û\ÚšœØ8à XœËÍLË]ŒMÌËLZ[™[ÜžK\[ÛšœØ9.ãy¦+ú)î9£©øà yg,9."ùgã¹l#º"*º"!ú ã9c!HÝXÚÈY[]HÝÛ™\¸à ÒH[ˆÍŒÎNÍLŒØÕPÐÑTÔøà ‚‹Hš^ÝZK\™[XË\Ü]X\™KX\MÎY™MØ™ŒLŒMÍYŒLÌLXXŒ˜˜YLMØ˜L9.éHY\™ÙHÛÛ[Z]Y˜YMŒLMŒÎMÎ™LØŒXÌXYMŒÙ™XMX9d"9ai{ï&ùéæ9kíˆÝ\œ™[Û\ÝÙ]Z[9íly. NŒH\ÜXÝ\˜][Ø8à XØš™XÝYš]˜ÛÛZ[˜;ï#9/çyåfye«¹. Y‹šXÛÛ”][[YH:,áù¥¦y­`xà ÒH[ˆÍŒÎMÍLÍMØÕPÐÑTÔøà ‚‹Hš^ÙÛØ˜[]ZKY›Û\Ú^™K\Ý[™\™N˜LŒNLŽXÎMYŒÌMÍXY™XÙXXÎLŒMX™™X9.éHY\™ÙHÛÛ[Z]YYLØØÎ˜™˜˜ÙYÌÌŒŒXŒØÍÍŒYÌÍX9d"9aixà ¹cê¹g*ÜÜËÍL‹]ŒMÌËLZ[™[ÜžK\[Û˜ÜÜØ:"!ÈÜÜËÍMK]X[K\™[XË\Þ\Ý[K˜ÜÜØ9æo9å'ÈÚ]ÛÛ™›XÝ;ï&ù¬¤¹§"H”È9aïyo#øà [\Ý[™\¸à \Ý]H9¢%ˆ[[YHÝÛ™\ˆ:(gyê xà ‚‹HÜÜËÍL˜9.®¹méy/çyåfHØ[Y\^H9b!¹¥+ùæ¡:näzaä{ï#Ù[™Ù\ˆ9¢nzaãù¤ãy/g9i%º)à;ï#9.)¹d"9aiH\ÙÜ˜\H9b!¹¥+ùæ¡M\:"!ÈÍ»ïgŒÎ9£©ùb-¹l.¹kî;ï&ØÜÜËÍMX9d#9¦`¹/çyåfHØ[Y\^H9b!¹¥+ùæ¡9aiycèÈÙX”;ï#Ø[‹^[‹^X8à \Ü]X\™KX\9b!¹¥+ùæ¡NŒH9g%¹c`:"!È]Z[ÜšY8à ]\ÙÜ˜\H9b!¹¥+ùæ¡LûïgŒN9li9í&¹câˆÎL™\ÜÛœÚ]™H:jæ9n©¸à ¹§*¹/oùå*9¥m9ª¥Ý\œËÝZ\œûï#9¬¤¹§"zaãz)!ÈÙ[XÝÜˆÝÛ™\ˆ9¢%º""º)£ùbaùfçº` 8à ‚‹H\ÙÜ˜\H9æ¡˜]K\™\Ù\˜][Ûˆ9®+:*i¹c§ù§+9¢¢¹¥m9d"9bcH]ˆ9åm¹e+ù. “ÔÔÈ9gî¹®¥»ï#9§ ú*©9¤âùë+9. 9b!¹¥+ù¨.9aá¹æ¡YXÚ[š\ÛHY™XÞXÛH:"!È\;ï#ØÚ\™ÙHL9/ë¹«hûï&ÛY\™ÙH™\ÛÛ][Ûˆ9¥.yà®¹ì¯¹è®¹/çz+mù£!ùk¦ˆØ[Y\^HÛÛ[Z]8à ºi¥¹«(HÒH[ˆÍLL9cé¹£ëzg,ˆ™]ÚY\Œ˜9ï.¹l$yajy`"ùfî¹k¦¹«mùcìˆ™Y{ï#9¥ayå,H™Ú]X‹ÝÛÜšÙ›ÝÜËØÚKž[[9g*9¥è¹§"HÛÛ\\š\ÛÛ‹X˜\ÙHÝ\9ì¯¹®¥ˆ™]Ú;ï#›ÛÝË]\™YŒ™Y˜X™™™LÌØLÎMÌŒMŽLLŒMŽLÌYØ9/ë¹«hûï&ù­î¹liÛÛ™H:aãyãïº"!ù/ë¹oªygaùmìºjeú+bxà ‚‹H9b§ú ïyª.y§ 9í`ˆÒH[ˆÍÍŒŒŽŽXÕPÐÑTÔûï&ŒLÌL˜]˜TØÜš\Þ[^8à LLKÌLH›ÙHÝZ]\øà MÈÝ]XÈ™\ÛÝ\˜Ù\øà LŽLH[š\]YHSQøà LLØY\ˆ\[™[˜ÚY\ûï#ÌˆÜ™\™Y[[Y\øà T™[X\ÙHØ]HLÌL8à YÚ]YY™¸à \ÚÚ[›ÙÜ™\ÜÚ[Ûˆ[Øš[HÚ›ÛYxà []™HXž\ÜÈ:"!È˜]KØ]Y[È9aj:`ê:`&º`c»ï&ú`ê9ïlˆÒH9ì¯¹è®ºjeú+byà®ˆ™YŒ™Y˜X™™™LÌØLÎMÌŒMŽLLŒMŽLÌYØ;ï#Ø[Y{ï#ÐØXÚH™\œÚ[Ûˆ9í«y£ HŒMÌË;ï#ÌMÌË8à ‚‹HUˆÛÝYœ›ÝÜÙ\ˆ9ké¹®+;ï&¹éæ9kíˆŒ9chxà yajy«!8à XÝ\œ™[Û\ÝÙ]Z[9¥®yoh¹g%¹c`˜][ÏLxà ychyâaÈÝ™\™›ÝÏL8à [[Ù[›ÙH8¡¤Løà ]XœÈ8¡¤ŒLŒxà Y]Z[\›È9á(HÝ™\™›Ýøà z/å9fç¹b%ú(j9«hùn.;ï&ÍMˆÝ[\ÚY]øà Xœ›ÚÙ[ˆ[XYÙH8à X\[ÜšYÚ[ˆÛÛœÛÛH\œ›Ü‹ÝØ\›š[™È8à ¹."yo-y¥¬9h§ˆRHÙX”9gaÈŒ;ï#Ø[XYÙKÝÙXœ8à ‚‹H9."y`"ùméy/g9b!¹¥+ù£!ùk¦ˆÒH:`ïy¦+ù§ 9í`ˆ]ˆ9æ¡[˜Ù\ÝÜ»ï&ù§+:/*¹¬¤¹§"y¥¬9h§ˆ\Ý[™\¸à y¬¤¹§"zaãz)!È[™[ÜžHY[]H9aïyo#øà y¬¤¹§"yi,y¥b[\ÜÜ]8à ˜XZ[˜9§*ˆY\™Ùxà y§*ˆ\Ú8à y§*¹nî¹êâù/ë¹¥.HXZ[ˆ9æ¡»ï&ù.ãzh"9¦#¹è®¹£¢9«"¹¢cycëù¢¢¹§+:/*¹£ª:`,ˆXZ[¸à ‚‹H9§+:/*ˆ™\]Z\™[Y[˜]Ú;ï&˜™[X\ÙKÜ™\]Z\™[Y[X˜]Ú\ËÌŒ‹LKL]™YKXœ˜[˜ÚY]‹Z[YÜ˜][Û‹šœÛÛ˜;ï"Î‘T’Q’QQ;ï"xà ‚‚ˆÈÈŒ‹LKLŒMÌË9ãªy¬åy.+yoàûï#Ð“ÔÔûï#ùfæú,hyhe;ï#ù­ìy­íy«hùo#ùæo9n ù`&z`n‚‹H9b§ú ïygî¹®¥¹à®ˆ]˜ÍXÙŽLÍÍYMŒÎNYNNNYŒÙLŒXLX;ï#9ké¹/g\™ÙLÍŒÌLXŒM˜L™ÌŒX™ŽNMØMŽX9mì¹å,y/oùå*: !y¦#¹è®¹£¢9«"¹oêú/bz!ìÈ]˜;ï&ÑÚ]XˆXÝ[ÛœÈ[ˆÍŒMŽX9æ¡™\ÜÚ]ÜžHÚXÚÜÈ:"!È]ˆ\Þ[Y[Ø]H9aj9¥nÕPÐÑTÔûï#9k¦9¥®HUˆX[šY™\Ý^XÝÒH:"!È]˜9. :!í8à ‚‹HœËÙØ[Y\^KX›ÜÜË]ÝÙ\‹\Þ\Ý[KšœØ9¦+ùãªy¬åy.+yoàøà y`"ù.®»ï#ù.%¹åc“ÔÔøà y.¥9ê+¹ªgùb-¹chz"!ùfæú,hyhe:*+yk¦»ï#ú`,¹n©¹æ¡9«hùo#ÈÝÛ™\»ï&Ð“ÔÔÈ:"!ùhe9alyå*9¥è¹§"HŒLÌZ[[™Ù[Û“[ÛœÝ\˜;ï#ØŒLÌ“][˜Ú[™Ù[Û˜]X9¢,:k)HÝÛ™\»ï#9ªgùb-¹chy/oùå*9.#z`,¹aiy. :"+9 *¹âjzfhùb%ùæ¡˜]HÚYXØ\ˆ9l"9lk9©ïxà ‚‹H[™^š[:"!ÈÜÜËÙØ[Y\^KX›ÜÜË]ÝÙ\‹˜ÜÜØ9nî¹êâùãj9êâùãªy¬åy.+yoàøà P“ÔÔÈ:fæyª&yìi:h z"!ùfæú,hyhe9fî¹k¦¹i)úgh¹§oûï&ùn¥z`ê9/çyåfy.¥:ha¹£"zb%z"!È›ÜÜÓ˜]˜9æî9k®HY;ï#9/a¹ãªyk­¹cëú)¢ù¥¡ùkeøà X\šXxà ]]xà yaiycèú"!ÈXÛÛˆ9gaù«hùo#ù¥.yà®¸à#9ãªy¬åxà#xà ‚‹H:fa9.í¹c§ùg%¹í¤ùkéºf¦ùª¨º)¥¹o£;ï#9cê¹éîúfi:"!ùåjúghº`¢¹åc:`(ú`&¹æ¡:näz"lº ã9¦kûï&ùg%¹é.ˆ‘Ðˆ9§+:jå9§*ºaãyåjøà º/.9aîˆ\ÜÙ]ËÝZKÛ˜]‹YØ[Y\^Kœ™Ø9à®ˆÌŒ0åÌÌŒ‘ÐH9ç'ú`#ù¦#ˆ‘ûï#9fæú)äˆ[H9gaùà®ˆ;ï#:""ˆ\ÜÙ]ËÝZKÛ˜]‹X›ÜÜËœ™Ø9/çyåfxà ‚‹H9`"ù.®ˆ“ÔÔÈ9fî¹k¦ˆŒŒ;ïgŒL8à ycëù.#zfd9«(ya£y¢,9.%9âny«¢ºi¥º`&¹ãc¹bíycê¹æo9. 9«({ï&ù.%¹åc“ÔÔÈ9à®¹¬.9.aye«¹.®¹fæúf£¹«­z*#¹/$;ï#:`$:f£¹bçyb*yêâùclùkf9ª¥;ï#9i,y¥eù.#yfçº` 8à º+mùæï¹§ úf.ù¤âÈ“ÔÔÈ:nçº`n8à ye«ºjå;ï#ù."zjå;ï#ùaj:jå9¥¬9æí9£©y¥b9§§:"!ù¥¬9ål9n.;ï#9d#9. 9¢ : ïyè-9æï¹o£9bjzi&9«­y¥n9.ãyí«y£ z*l¹«(HÚY[Û˜\ÚÝ;ï&Ø]]È9/§z+mùæï¸¡¤º$á9b¦ø¡¤¹fç¹oªx¡¤¹h§¹nax¡¤¹l zc¥º&eyä!¸à ‚‹H9fæú,hyhe9alHL9li;ï#ŒÌ:e¢ù¥/»ï#UÈ:`,y. 9¬¯ùå*9ãï¹§"y¥éy§'ùgî¹®¥»ï#9.éyàjø¡¤¹g'ø¡¤¹¬-8¡¤ºhª9oª¹ä¬;ï&ú`,yaiùª$ùli;ï#úi¥º`&ˆÛZ[\È9/çykf;ï#:-ê:`,ycê¹®!z`,z,áù¥¦{ï#9«mùcì¹§ :jæ:"!ùmì¹cå¹o¥ú,áùå(¹/çyåfxà ¹ë+L9li9/oùå*9æë¹bcy«hùo#ùfæù.í¹a`ùí(9éæ9kíº!êº`n:,áù¥¦xà ‚‹H9­ìy­íyãªyk­¹aiycèùmìº!ê¹bkù§+:h yéîùb,9ãªy¬åy.+yoàûï&ØœËÍNKXXž\ÜË]ÛË]Y\‹\[[YKšœØ9.ãy¦+ÈŒŒ;ï#Ó8à yg,9g%¸à y.¥9n'xà ykí¹ë¬xà y`¬ú` xà y¢,:k)z"!ú`,¹n©ˆÝÛ™\¸à ¹¥¬9h§¹¬.9.aHš\œÝÛX\ÛZ[\Ø;ï#9a£y¢,:-ìú`c¹mìºh&:i¥º`&¹kí¹ë¬{ï#ù§ 9í`¹âny«¢¹ãc¹bí{ï&ù¢`9§"z` 9aî»ï#ùk£9¢$:-ëùo¤yfç¹ãªy¬åy.+yoàøà ‚‹H9mìº`&º`c»ï&ŒÌ˜]˜TØÜš\Þ[^8à LLNKÌLNH›ÙHÝZ]\øà M™\ÛÝ\˜Ù\øà LŽLH[š\]YHSQøà LLØY\ˆ\[™[˜ÚY\ûï#ÌˆÜ™\™Y[[Y\øà T™[X\ÙHØ]HLÌL8à YÚ]Y™»ï#9.éycâˆ‘È‘Ð{ï#ùfæú)äˆ[H:!ê¹båyª¨¹§éxà ‘Ø[Y\^{ï#Ð“ÔÔûï#ÕÝÙ\ˆLËÌLøà PXž\ÜÈMKÌMH9gaùc!yd*È™[ØY:"!úf,ºaãz)!ùãc¹bíH™YÜ™\ÜÚ[Û¸à ‚‹H9k¦9¥®HUˆ9kéºf¦ù¤ãy/g9mì¹è®º*£{ï&¹n¥z`ê9ãªy¬åHXÛÛ»ï#ùaiycèøà yãªy¬åy.+yoàøà P“ÔÔÈ:fæyª&yìi8à y`"ù.®ˆ“ÔÔÈ9«hùo#úe¢ù¢,8à z+mùæï¹ªgùb-¹chyå'ù¢$8à ycåù/çz+mÈ“ÔÔÈ:nç¹¤â¹£ä9é.¸à yfæú,hyhe:i¥ºh {ï#ùª$ùli9. :)¯{ï#ù¢,:k)ycâ¹i,y¥eú/å9fç¹gaù«hùn.;ï&ùfî¹k¦ˆÝYÙH9á(yªjùd$HÝ™\™›Ýøà Xœ›ÚÙ[ˆ[XYÙH9¢%¹¥¬9h§ˆ\[ÜšYÚ[ˆÛÛœÛÛH\œ›Ü¸à º`h9êëÈ[Øš[HÚ›ÛYH:"!È]™HXž\Üûï#Ø˜]KX]Y[ÈPH9d#9«iz`&º`c¸à ‚‹H9§+9¢nH™[X\ÙKÜ™\]Z\™[Y[X˜]Ú\ËÌŒ‹LKLYØ[Y\^KX›ÜÜË]ÝÙ\‹ZX‹šœÛÛ˜9mìº`eL‹ÌLˆ‘T’Q’QQ8à ¹/oùå*: !y¥¯Œ‹LKL9¦#¹è®º) y¬`¹£ª:`,ˆXZ[˜;ï#Ø[Y{ï#ÐØXÚH™\œÚ[Ûˆ9«hùo#ù£ª:`,ˆŒMÌË;ï&ùæo9n úh"9îo9î£:-l9cåù/çz+mÈ¸à [XZ[ˆ™\ÜÚ]ÜžHÚXÚÜøà QÚ]XˆYÙ\È\ÞH:"!È›ÙXÝ[ÛˆÒH:jeú+bxà ‚‚ˆÈÈŒ‹LKL9akyb!¹¥+ùk¢yaj9¥m9d"8à y§ 9í`ˆPH:"!ù«hùo#ùæo9n Â‚‹H9/oùå*: !y¥¯9¥m9d":jeú+byk£9¢$9o£9¦#¹è®¹£¢9«"¹£ª:`,¹«hùo#ùâb;ï&ùcåù/çz+mÈˆÎM»ï"]˜8¡¤ˆXZ[˜;ï"yg*ˆ™\ÜÚ]ÜžHÚXÚÜÈ[ˆÍMMÌNL˜ÕPÐÑTÔÈ9o£;ï#9.éHY\™ÙHÛÛ[Z]LÎMŒ˜ÍLÎX™Œ™XXLYŽMŒL˜˜ÌÌŽXXŒ˜9d"9/mxà ¹d"9/mH™YHŒMÌMÍXŒ˜ÙYŒLÙ˜ÍMØLLÙŒÍÍMÍŒŒÍ˜XLMØ:"!ù¨.9aá¹æ¡]˜™YH9k£9aj9æî9d#;ï#9¬¤¹§"z(gyê y¢%ºhcyi%¹b§ú ïymë¹ål8à ‚‹H9«hùo#ÈXZ[˜™\ÜÚ]ÜžHÚXÚÜÈ[ˆÍMMLÍÕPÐÑTÔûï&ÑÚ]XˆYÙ\È[ˆÍMMLMÌLØ9æ¡Z[;ï#Ù\ÞH9aj:`êÕPÐÑTÔûï#\Þ[Y[ŒÌMÎŽ9í yk¦¹d#9. XZ[ˆÒ{ï#9«hùo#ùí¬¹g`Î‹ËÝŒLLÌŒKX[™Ú]X‹š[ËÛ^KYØ[YKØ9mìº+ 9fçˆŒMÌËŒÈ:"!ù§+:/*ºeç:cmz,áù®¤8à ‘Ø[Y{ï#ÐØXÚH™\œÚ[Ûˆ9í«y£ HMÌËŒøà ‚‹H:-mùiâÈÚ]Xˆ]˜9à®ˆØŒŽY™YÙŒŽMMMŒXŽXX™NXÙ˜Ø˜™˜™˜™MÍ˜;ï&ú`$9¨§zh!¹n£ùà®ˆV9¢$:emù¦ì¹íæˆ8¡¤ˆ:(çy`¦ybkù§+9kí¹ë¬H8¡¤ˆ9­ìy­íybcyïk¹íê:f¢ˆ8¡¤ˆ9¢ : ïy¢$:emÈ8¡¤ˆ:f¢¹/#yéæ9kíˆ8¡¤ˆ:näzaäz)¥¹ê¥øà ¹aky¨§z`h9êëùb!¹¥+È\9gaú"!ù£!ùk¦ˆÒH9k£9aj9. :!í8à ‚‹H9e+ù. Y\™ÙHÛÛ™›XÝ9/cy¥¯œËÌNK\ÝYÙK]ÎXÚ\˜XÝ\‹Z[™[ÜžK\[[YKšœØ8à ¹.®¹méy/çyåfHXž\ÜÈ8¡¤ˆÚÚ[›ÙÜ™\ÜÚ[Ûˆ8¡¤ˆX[H™[XÈ9æ¡9e+ù. ]K\[[YHÚZ[»ï&ÝX[H™[XÈ9§ 9o£9£¦ù£©y«hùo#È˜]KÜØ]™KÜÚÝÔYÙHÝÛ™\»ï#9¬¤¹§"y¥m9.ïz`nÝ\œËÝZ\œûï#9.gù¬¤¹§"zaãz)!ÈØYÙ\œ›Üˆ\Ý[™\¸à ‚‹H9­ìy­íy¥.yà®¹«hùo#È9d#{ï"JÌûï"yo£;ï#:""ˆ]™H˜]HPH9.ãyèk9kêÈL9d#{ï&ùå,HLMÎX9¦í9¥¬PHÝÛ™\ˆ9o£:`&º`c¸à ¹.#yo¥ù¢¢º""ˆL9d#H\ÜÙ\[Ûˆ9 h¹oªxà ‚‹HUˆÛÝYœ›ÝÜÙ\ˆ9¢o¹aî¹.)¹/ë¹«hù."y`"ùéæ9kí¹¥m9d"ÝÛ™\ˆ9ecúhc;ï&˜LXXMÙY9£ä:jæÚÛYQ™X]\™S[Ù[›ÙXØÜ›ÛÝÛ™\ˆÜXÚYšXÚ]{ï&ØYLÎŒN:+¤ù¨.9oàÈØ]™QØ[YJ
+X9g*]H™[XÈ[[YH9l&¹§*º/"yaiy¦`¹/çyåfy¥è¹§"H^Y\”™[XÜËÝX[SØYÝ];ï&ØŒÌÍÙÌX:+¤ùªjú-ê9..ùgã¹¥m9b%ùæ¡:`#ù¦#ˆX[K\™[XËZÛYK]ÛÛØ9.#ya£y¥%9¢*¹ìîùíl{ï#úfè¹íæ¹í¤újeûï#9cêº+¤ùajzha¹kéºf¦È][]H]Ûˆ9£©y¥-ˆÚ[\¸à ‚‹H9§ 9í`¹b§ú ïyâà9¡bÈŒÌÍÙÌYM˜ŽY˜ÙLÍÍLMØÍŒNNLØNXÌ™Y™MØ9mìº`&º`cˆÒH[ˆÍMLNN8à LLMKÌLMH›ÙHÝZ]\øà LŒÎKÌŒÎH”ÈÞ[^8à MŒˆ™\ÛÝ\˜Ù\øà LŽHQøà [ØY\‹Ü™[X\ÙKÙÚ]YY™¸à LÎL0åÎ;ï#ÍL°åÎLMHÚ›ÛYxà []™HXž\ÜÈ:"!È˜]KØ]Y[ÈPxà ‘UˆX[šY™\Ý^XÝÒxà UŒMÌËŒûï#ØØXÚHMÌËŒÈ9æî9ë)¸à ‚‹H9§ 9í`¹kéºf¦ùà#ú)¯yfj;ï&ºgd¹md9ï¯yë)º(çy`¦yo£:`(ùî£9k£9¥m:aãz/"y.ãy/çyåf{ï&ÌŒ9chyajy«!;ï&Û[Ù[›ÙH8¡¤LŒ8à ]XœÈ8¡¤L;ï&ùìîùíl{ï#úfè¹íæ¹í¤újeûï#ùéæ9kí»ï#ùa`ùí(9c(È]\™Ù]:"!úe¢ùegùgaù«hùn.;ï&Ø\[ÜšYÚ[ˆÛÛœÛÛH\œ›Ü‹ÝØ\›š[™È8à Xœ›ÚÙ[ˆ[XYÙH8à ‚‹H9§+:/*ˆ™\]Z\™[Y[˜]Ú;ï&˜™[X\ÙKÜ™\]Z\™[Y[X˜]Ú\ËÌŒ‹LKL[][KXœ˜[˜ÚY]‹Z[YÜ˜][Û‹šœÛÛ˜;ï"KÎH‘T’Q’QQ;ï"xà ¹k¦9¥®HØ[YKÐØXÚH™\œÚ[Ûˆ9í«y£ HŒMÌËŒøà ˜XZ[˜9aj9ê"ùí«y£ H™MYXYMÙ™Ž˜ŒŒYÍÙŽMMMŒÍÙX;ï#9é y«h¹¢¢¹§+:/*¹aiùk®y£ª9aiHXZ[»ï#:fi:gg¹/oùå*: !ycéº(c9¦#¹è®º) y¬`¸à ‚‚ˆÈÈŒ‹LKLÈ9aj:`b¹¢,¹¢bùbè»ï#ùg%¹âaúemù£"{ï#ù¢ : ïH‘–ÝÛ™\ˆ9¥-¹¥ »ï"]»ï"B‹HœËÌK\ÝYÙK]Ž]ÝXÚ[ØÚËšœØ9¦+ùaj:`b¹¢,¹à#ú)¯yfj9¢bùbè¹e+ù. ÝÛ™\»ï&¹¥è¹§"ye«¹£!ÈØÜ›ÛÚ][\Ý9/çyåf{ï#9/a¹ajy£!ù.éy."¹g*9.îù/eHÙØ[YK\ÝYÙX9aiù/cyïk¹. 9o¢úf.ù«h¹à#ú)¯yfj[˜Ú›ÛÛ{ï&úgg¹¥¡ùkeú/.9aiHRH9æ¡ÛÛ^Y[{ï#Ù˜YÜÝ\;ï#ÜÙ[XÝÝ\9.©¹aj9gçúf.ù«h¸à ‚‹HÜÜËÌ[XZ[‹˜ÜÜØ9¦+ùg%¹âaûï#ÔÕ‘ûï#ÐØ[˜\È9c§ùå'úemù£"z"!ù¢å¹¦ìùæ¡9gî¹é#ˆÔÔÈÝÛ™\»ï&ù.#y/oùå*Ú[\‹Y]™[Î››Û™X;ï#:`oùacyè-9hç¹«hùn.:`b¹¢,ºnç¹¤â¸à ‚‹H[™^š[9æ¡9æí9£©HÝXÚ[ØÚÈ:/"yaiymìº-çùãïº(cØXÚH™\œÚ[ÛˆMÌËŒˆ9l#zob»ï#™[X\ÙKÜ™[X\ÙKšœÛÛ˜9l!ú*l¹ª¥9í#yaiHX[˜YÙYØXÚH™Y™\™[˜Ù\ûï#:`oùacy.bùo£9/ë¹¥.HÝXÚÝÛ™\ˆ9cnù.ãz/"yaiz""ˆ]Y\žxà ‚‹H9¢ : ïy¯%9aî¹.ãyå,HœËÌÍË]ŒM‹\ÚÚ[X[š[X][Û‹šœØ;ï"Ø]{ï#ù¦`¹n£ûï"{ï"ÈœËÌÎK]ŒMË\ÚÚ[X[š[X][Û‹šœØ;ï"Üš]KÕ‘–™[™\™\»ï"ye+ù. :,¨:,«8à ˜œËÍM]ŒMÌËLKX˜]K\XKšœØ:"!ÈÜÜËÍLË]ŒMÌËLK\XK˜ÜÜØ9.#ya£yè¬ÝŒMË\ÚÚ[\ÝYÙXš\ÚXš[]{ï#:`oùacyí`¹íd9. 9¤â¹¦`ˆ˜]PXÝ]™H9ab9b!ù£æú #9¢¢¹l&¹§*¹íd9§gùæ¡‘–:%ãù£¢xà ‚‹HØ[YKÐØXÚH™\œÚ[Ûˆ9í«y£ HMÌËŒ»ï&ù§+9¢nzg 9í¤È™\ÜÚ]ÜžHÚXÚÜøà QUˆ\ÞYYÒH:jeú+bz"!ù¢bùªgùké¹ªgúemù£"{ï#Ü[˜Ú;ï#Õ‘–:jeù¥-¹o£9¢cycëùª&H‘T’Q’QQ8à ‚‚ˆÈÈŒ‹LKLÈ9d"9¢$:i¥¹«(ze¢úh HXÛÛˆ9¦`¹n£ù/ë¹oª{ï"]»ï"B‹H9/oùå*: !yké¹ªgùè®º*£z(çy`¦{ï#ùë)¹d¤ˆXÛÛˆ9g*:i¥¹«(y¢dúe¢ùd"9¢$:h y.ãzg :nç¹. 9."ù¢czhkùé.¸à ¹¨.yfè9¦+ÈœËÌÍ‹]ŒMKXÛÛ[\Þ\Ý[\ËšœØ9æ¡9d"9¢$9aiycèùæí9£©ydo9cêÈÛÜÝ\™H™[™\”Þ[\Ú\Ê
+X;ï#9îgº`cˆŒMËÕŒM‹ÕŒMÌËŒÈ9æ¡9§ 9í`ˆX›XÈ™[™\™\¸à ‚‹H9d"9¢$9aiycèù¥.yà®¹a*¹ab9do9cêÈÚ[™ÝËŒMT™[™\”Þ[\Ú\Ê
+X;ï&ØœËÍN]ŒMÌËŒËY[˜Ý[Û˜[Yš^\ËšœØ9g*9«hùo#È™[™\ˆ9bcyab9d#9«iH\]Z\Y[ÜÝ]XÈ][H™\Ù[][Û»ï#™[™\ˆ9o£9êâùclÈ™\Z\ˆXÚÙ\»ï#9.#ya£y¢¢ºi¥¹«(HXÛÛˆ:hkùé.¹/§z,í:nç¹¤â¹¢%¹."ù. 9«(H™\™[™\¸à ‚‹HÝÛ™\»ï&˜œËÌÍ‹]ŒMKXÛÛ[\Þ\Ý[\ËšœØ;ï"9d"9¢$9aiycèûï"{ï"ÈœËÍN]ŒMÌËŒËY[˜Ý[Û˜[Yš^\ËšœØ;ï"9§ 9í`ˆ™\Ù[][Û‹Ü™[™\ˆÜ˜\\»ï"{ï&ù.#y¥¬9h§ˆ[[YH]Ú8à ‚‹HØ[YKÐØXÚH™\œÚ[Ûˆ9í«y£ HŒMÌËŒ»ï#9o¡HUˆ9¢bùªgùké¹ªgùè®º*£zi¥¹«(y¢dúe¢ú(çy`¦z"!ùë)¹d¤¹gaùæí9£©zhkùé.ˆXÛÛˆ9o£9¢cz ïyª&H‘T’Q’QQ8à ‚‚ˆÈÈŒMÌËŒH:/å9fç¹g%¹é.»ï#ú`dùamùg%»ï#ùbkù§+:h$:)¯{ï#úgìù¥b;ï#ùn.9.«¹ç zfîûï#ù.îùbæyclù¦`ºh&9cå»ï"9æë¹bcH]»ï"B‹HŒMÌËŒ9mìº`&º`c¹cåù/çz+mÈ™\ÜÚ]ÜžHÚXÚÜÈ9.)¹å,HˆÍÌ9«hùo#ùd"9/mHXZ[»ï&ù§+:/*¹¥¬9/ë¹¥.ycê¹g*]¸à ‚‹HÜÜËÌ[XZ[‹˜ÜÜØ9¦+ùalyå*:/å9fç¹£"zb%z)¥º)®ˆÝÛ™\»ï&¹¢`9§"ykéºf¦ù/oùå*\ÜÙ]ËÝZKÛX\\™]\›‹œ™Ø9æ¡9aiycèùíly. :(çÌLLX9g$ùohºnäyn¥xà ‚‹H9í(9§d9b!¹¥+ùæ¡8à#9é)¹çìËœ™øà#xà#9bkù§+:"!ú ã9c!yæ¡9kí¹ë¬Kœ™øà#ymì¹l#¹aiH\ÜÙ]ËÚ][\ËÛX]\šX[ËÛÜ™Kœ™Ø8à X\ÜÙ]ËÚ][\ËØÚ\ÝËÙ[™Ù[Û‹XÚ\Ýœ™Ø;ï&ù¥è¹§"z ã9c!yé)¹çìûï#ù§d9¥¦ykí¹ë¬y.gù§ ùd#9«iy¥¬9g%¹é.¸à ‚‹H9. :"+9bkù§+9ãc¹bízh$:)¯yå,HœËÍ˜
+ÈÜÜËÍØ9¥.yà®¹g%¹âaùa*¹ab;ï&ú(çy`¦ybkù§+9å,y¥è¹§"HœËÙ\]Z\Y[\›ÙÜ™\ÜÚ[Û‹šœØ9d#9«iy¥.y¢$9kéºf¦ú(çy`¦yg%»ï"ù«hùo#úf£¹í&¹¨a¸à ‚‹H9¢,:k)yê"ùn£úgìù¥bœËÌÍX\Ý\ˆØZ[ˆŒŒ¸¡¤ŒŒÌ;ï&ØœËÌÍX9éîúfiŒMK[Û˜ÙKJ˜ÔÔÈ›\Ú;ï#9/a¹/çyåfHØ[˜\È\XÛ\ûï&ØœËÌÎXÜš]KÕ‘–9¦`¹n£ù.ãy¦+ùãïº(c9¢ : ïybåyåjÈÝÛ™\¸à ‚‹H9. :"+9ª(yo#ùg*:i¥¹«(y/oùå*: !y¤ãy/g9o£9f%ú*iˆØÜ™Y[ˆØZÙHØÚûï&ùmèy *¹¥¬9h§¸à#9ç zfîÈÑ‘‹ÓÓ¸à#{ï#9ç zfîÈÓˆ:aâù¥/ˆØZÙHØÚûï#:h zghºf¬z%ãù¦`¹.gù§ úaâù¥/¸à ‚‹H9«ãù¥é{ï#ùiå:*%ù«hùo#ùb¨9aiy. :cmzh&9cå»ï&ú ã9¦kù.îùbæz`,¹n©º+¢¹c%¹¦`¹cê¹b-ù¥¬9mìºe¢ùegùæ¡9.îùbæyaiùk®z"!ùk£9¢$9n©»ï#9/çyåfyæë¹bcyb!ºh {ï#ù£l¹båy/cyïk¸à ¹¢$9l,y¥è¹§"y. :cmzh&9cå¹/çyåfxà ‚‹H9âb9§+:"!È]™HØXÚHÙ^H9d#9«iHŒMÌËŒxà ‚‚ˆÈÈŒMÌËŒ9«hùo#ùâjydàzf£¹í&»ï#ùë)¹d¤¹b)9k¦ºaãy©âûï"9æë¹bcH]»ï"B‹H9«hùo#ù. :"+9âjydàzf£¹í&¹íly. 9à®»ï&¹æozf£»ï"Ú]{ï"x¡¤º%ãzf£»ï"›Y{ï"x¡¤¹í*úf£»ï"\œ{ï"x¡¤¹ªfzf£»ï"Ü˜[™Ù{ï"x¡¤¹¨`ùí!zf£»ï"[šûï"x¡¤¹fæú,hzf£»ï"›Ý\‹\Þ[X›Û;ï"{ï&ùfî¹k¦º"lº&gù/§HØÜËÒUSWÔT’UWÕRWÔÔPË›Y8à ‚‹H9ë)¹d¤¹à®¹«hùo#ù/¢ùi%»ï&¹a¬9l yë)»ï#úf¬z.ªùë)»ï#ùíd9åc9ë)¹cê¹b,9æoxà z%ãxà yí*øà yªfyfæúf£»ï&ùåjùë)¹egùbåyã¡ùfî¹k¦ˆÍI{ï#ÍMI{ï#ÍÍI{ï#ÌL	xà º""ˆ
+•[\ÛX[“ÝËÓZYÒYÚÔ\™™XÝY9/çyåfycê¹à®º""¹kf9ª¥;ï#ú""¹£¢z$/yæî9k®{ï#9ãªyk­º,áù¥¦HY\’Ù^X:"!ùd#yê,y¥.yà®¹«hùo#úf£¹í&¸à ‚‹H9ë)¹d¤¹¥.yà®¹ajy«­yb)9k¦»ï&¹ab9.éyë)¹d¤ºf£¹í&¹¤ì¸à#9åjùë)¸à#{ï&ùi,y¥eùfî¹k¦ºhkùé.¸à#9åjùë)¹i,y¥eøà#xà ¹¢$9b§ùo£9a£yå*9¥¯y¥/º)äº"l¹í(:,êº-l9l#y¡ây®ïùí&¹¢ : ïydoy.+z)£ùbaûï&ùªfzf£ˆL	H9.#yëby¥¯9£©ùb-»ï#ùë)º(dùoáy.+xà ‚‹HœËÌË]ŒLÌ‹XÛÛ[Y^[œÚ[Û‹šœØ9¦+ùë)¹d¤»ï#ùé)¹çìûï#ú*+z*"9g%º"!ùë)¹d¤¹íd9ë¥ÈÝÛ™\»ï&ØœËÌÍ‹]ŒMKXÛÛ[\Þ\Ý[\ËšœØ9¦+ùd"9¢$;ï#ùa­¹ábzf£¹í&¹¥n9`/ÝÛ™\»ï&ØœËÙ\]Z\Y[\›ÙÜ™\ÜÚ[Û‹šœØ9¦+ù¦kº`&º(çy`¦ydàz,ê»ï#ùå'ù¢$ÝÛ™\¸à ˜œËÌÌØ:"!ÈœËÍL9`áy/çyåfy¥è¹§"y¢ : ïz,áù¥¦y¦fº)¡º$âùd#9«i{ï#9.#y¥¬9h§¹ë+9."yli[[Yxà ‚‹H9é)¹çìøà z*+z*"9g%¸à z(çy`¦z,áù¥¦yíd9©âùmìºh$9åfy¨`ùí!z"!ùfæú,h{ï&ù§+:/*¹.#y¤áz!êº*+yk¦¹l&¹§*¹£ä9/¦ùæ¡:jæ:f£¹¥n9`/;ï#ù`îy¨/;ï#ù£¢z$/y/¡¹®¤;ï#9fè9«i9ajzf£¹æë¹bcH]˜Z[X›N™˜[ÙX8à y¦kº`&º(çy`¦y£¢z$/HÚ[˜ÙOL;ï#9§d9¥¦ykí¹ë¬y.ãycê¹aî¹æo{ï#ú%ã{ï#ùí*ûï#ùªfxà ‚‹H:""ˆÝËÛZYÚYÚÜ\™™XÝ9`áy/g:,áù¥¦yao9k®y¦(9l!9à®ˆÚ]KØ›YKÜ\œKÛÜ˜[™Ù{ï#9.#ya£y/g9ãªyk­¹cëú)¢ù«hùo#úf£¹í&¸à ‚‹H9âb9§+:"!ùoêùcå¹d#9«iHŒMÌËŒ;ï&ù`áy/ë¹¥.H]»ï#XZ[ˆ9.#ybåxà ‚‚ˆÈÈŒMÌËH9¢,:k){ï#ùbkù§+;ï#ùea¹n¥ûï#ù­ìy­íyí«y/ë»ï"9æë¹bcH]»ï"B‹H9¬-9a`ùí(8à$9­ê9oàú*(øà$y¢bùbåy¥¯y¥/¹¦`¹cëú!ê¹å,z`n9¤áù¢$y¥®y¢%¹¥my¥®{ï&¹¢$y¥®z)èúfi9¢`9§"yh§¹æâº"!ùål9n.;ï&ù¥my¥®z)èúfi9¢`9§"y«húgh¹h§¹æâ»ï"9d*ùíd9åc8à z+mùæï¹ëb{ï"y/a¹/çyåfy¥my¥®y¥è¹§"z,¨:gh¹âà9¡bøà ‚‹H:aäynhùbkù§+9bçyb*yíd9ë¥ú(ç9fç¹«hùo#úaäynhùãc¹bíyaïyo#ûï#9/ë¹«hÈ[™Yš[™Y9/¢ùi%º`(9¢$9æ¡9bçyb*yåjúgh¹chy«nûï&ùd#9¦`º)!ù¨.9í¤újeûï#ù§d9¥¦ybkù§+9.ãz-l9d!:!ê¹¥è¹§"y§"y¥b9íd9ë¥ùaiycèøà ‚‹H9."z/*¹¥éyn.9bkù§+9£æùh-9æ¡ÍŒ\È:b§9£©y§'úe¤ùí«y£ H˜]PXÝ]™{ï#9a`ùí(9c(ù.#ya£y¢¢¹£æùh-:*©9b)9¢$9¢,:k)yi%º #:!ê¹båz(ç:(`8à ‚‹H9a`ùí(9c(ù¢,:k)yi%º(ç9dàz`&¹çéy¥.yà®¹åjúgh¹."¹¥®yí!KÍ9æ¡9í%9¥¡ùkeùakz(c9/aùb%ûï&ùcêºhkùé.¸à#ú)äº"l¹/oùå*:(ç9dàH9 h¹oª^ÔÔxà#{ï#:-¡z`c¹akz(c9å,y§ :""º*"¹ kùo 9."¹éîúfi;ï#9.#ya£ykêùaiy."ù. 9h-9¢,:k)z,áú*"¸à ‚‹H9d"9¢$9.âúgh¹éîúfi8à#:(çy`¦yd"9¢$8à#yb!ºh {ï#9cê¹/çyåfz(çy`¦ya­¹ábxà yë)¹d¤¹d"9¢$8à yè£¹âaùd"9¢$;ï&ù¥è¹§"z""¹kf9ª¥9æî9k®yaïyo#ù/çyåfy/a¹.#ya£y£ä9/¦ú(çy`¦yd"9¢$9aiycèøà ‚‹H9ea¹n¥ù¥¬9h§¸à#:(ç9dà{ï#ú(çy`¦xà#zfæzh {ï&ú(çy`¦zh yæë¹bcyab9k£9¢$9aky¨/9âb:ghº"!ù«ãù¥éyb-ù¥¬9¨a¹§­»ï&¹bcMy«(yacz,®øà yî/y."ºfdL9«({ï&ùë+»ïgŒL9«(zaäynhùb-ù¥¬9`îy¨/:"!ú(çy`¦ye+¹`îyl&¹§*¹k¦¹¨b;ï#9fè9«i9§+:/*¹cêºhkùé.¹o¡z*+yk¦¹âà9¡bøà y.#y¤áz!ê¹¢hù«/¸à ‚‹H9.îùbæyí!znç¹¢á¹b!¹«ãù¥é{ï#ùiå:*%ù/¡¹®¤;ï&ù..ùaiycèù.ãzhkùé.¹.îù. 9cëúh&9ãc¹bí{ï#9.îùbæzh yaiùbaùå,yd!:!ê¹b!ºh zhkùé.º!ê¹mìyæ¡9í!znç¸à ‚‹H9­ìy­íy¢,:k)z,áú*"¹b¨9aiyaj9gçÈÝXÚ[ØÚÈ9£l¹båyæoyd#ye«¹.)¹/çyåfyc§ùå'È[‹^{ï&ùk¢:eç9n'yã¢ûï#ùkí¹ë¬{ï#ù£©z/äznç¹íly. 9éîùb,9."¹¥®ynlùcì9í!ŒIxà ^LŒI{ï#9l#zob¹§+:/*¹càú  ùg%¹í!yg"9/cyïk¸à ‚‹H9`áy/ë¹¥.H]»ï#XZ[ˆ9.#ybå{ï&ùk£9¥m:/"yai{ï#ùoêùcå¹âb9§+9d#9«iHŒMÌËxà ‚‚ˆÈÈŒMÌË9í«y/ë¹¥-¹¥ »ï"9æë¹bcH]»ï"B‹H9."y`"ù«hùo#ù¥éyn.9bkù§+9íly. 9à®¹.îù. :)äº"lˆŒL9cëú`,»ï&ùí¤újeùbkù§+9ãc¹bíyæí9£©z`,¹alyå*9í¤újeù¬h;ï#9.#ya£y£!ùk¦º)äº"l¸à ‚‹H9ë+9.£;ï#ùë+9."z)äº"l¹¥¬9nî¹¦`¹fî¹k¦¹o§ˆŒH:e¢ùiâûï&ÓŒŒ9bcycê¹/çyåfy¥è¹§"HV:/ïz-¥y`#yã¡ûï#9.#ya£yo-ùb-º-ìùb,ŒL8à ‚‹H9¬-9a`ùí(8à$9­*¹¬-9ã&ùãn8à$yí«y£ y«hùo#ú)£ù¨/;ï&ºg 9ab9kn9¬-9ä ú(døà yb'yknMH9¢ : ïznç»ï&ùkn9ïä¹­`yê"ú+ 9cå¹æë¹bcz`n9.+z)äº"l¹æ¡9kéºf¦ÈÚÚ[Ú[ûï#:c¥¹k¦¹£"zb%yæí9£©zhkùé.¹ï.¹l$yæ¡9bcyïk¹¢ : ïxà ‚‹H9..ùgãˆQ8à Z[™^:/"yaiyâb9§+:"!È—ÐTÔÑUÕ‘T”ÒSÓˆ9mì¹d#9«iHŒMÌË;ï&ù..ùgãˆR: ã9¦kù/oùå*ÛYKX˜XÚÙÜ›Ý[™]ŒMÌÍœ™øà ‚‹H]ˆ:h$:)¯yfî¹k¦¹å,HÛÝY›\™HYÙ\È:!ê¹båyæo9n ûï&˜Î‹ËÙ›Ý\‹\Þ[X›ÛËY]‹œYÙ\Ë™]˜;ï&ù.#ya£y/oùå*Ú]XÚûï#Ô˜]ÐÑˆ9/g9à®¹®+:*i¹êæxà ‚‹H9`áy/ë¹¥.H]»ï#XZ[ˆ9.#ybåxà ‚‚ˆÈÈŒMÌËˆ9ãªyk­¹­`yê"ûï#ùa`ùí(9c(ûï#ù­ìy­íz,áú*"»ï#ù¥-¹æâº*¯ù¥m‹H: ã9c!z(ç9dàz*lù áy¥¬9h§¸à#9/oùå*8à#{ï#9/g9å*9l#z,hyfî¹k¦¹à®º ã9c!yåm¹bcyb!ù£æú)äº"l¸à ‚‹H9a`ùí(9c(ùegùbåy.+zc¥¹k¦¹¢`9§"z*+yk¦¹.)¹£ä9é.¸à#9ab9`g9«h¹a`ùí(9c(ûï#9¢cz ïz*+yk¦¸à#{ï&ÒÔÔ:(ç9dàze 9ª®ú"!ú(ç9dàz %ùæèyfç¹..ùgã¹¥.yà®¹."yd#z)äº"l¹alyå*9c`9hb»ï#:!ê¹båz(c9båy.ãyd!:)äº"l¹ãj9êâøà ‚‹H9a`ùí(9c(ùegùbåyo£9clù/où§*º`,¹¢,:k){ï#9.gù«ãùéä¹ª¨¹§éy. 9«(z(ç9dàze 9ª®ûï&ú(ç9dày/oùå*:,áú*"¹§ ú`,¹¢,:k)z,áú*"»ï#:gg¹¢,:k)y§'úe¤ùå(¹å'ùæ¡:*"¹ kù§ ùn-¹aiy."ù. 9h-9¢,:k)z,áú*"¹. 9«(xà ‚‹H9­ìy­íyg,9g%¹n¥z`ê9¥¬9h§¹¢,:k)z,áú*"¹c`;ï&ùl zgh¹í«y£ HÝ\YY0åÌMLÍ»ï"NŒM»ï"y«å9/¢ûï#:`,¹aiy£"zb%yéîùb,9l zgh¹g%¹.bùi%¸à ‚‹H9í¤újeù¬h:-¬ù.éz+¤ù.îù. 9§*¹®ïùí&º)äº"l¹caùí&¹¦`»ï#:)äº"l¹aiycèú"!ÈQ9í¤újeù¬h9.«¹í!znç¸à ‚‹H:fè¹íæ¹í¤újeùéîú!ìù¢$9l,y."ù¥®xà yìîùílyéîú!ìùak9db¹."ù¥®{ï#9¥.yå*:"!ùam¹.å¹aky`"ù`m:`¢¹b§ú ïy. :!í9æ¡0åÎˆ:näzaäychxà ‚‹H9. :"+9¢,:k)yãï¹§"HV0åÌûï&ù *¹âjzaäynhù£¢z$/H0åÍ{ï&ùí¤újeùbkù§+LIx¡¤ŒÌÉ{ï&úfè¹íæˆV0åÌûï&ù.îùbæKùiå:*%Ëù¢$9l,Kùk£9¢$9n©¹ãc¹bíHV0åÌøà zaäynhðåÍ{ï&ù­ìy­íy§ 9í`¹kí¹ë¬HV0åÌøà zaäynhðåÍxà ‚‹H9¥¬9¢bù¨ë¹§¥ùcå¹­¢8à#zf®ËÌúf®ùd#9. 9.ïyfî¹k¦‘V8à#{ï#9¥.y/§ykéºf¦ù¤â¹¥eù *¹âjy¥n:"!Ü˜[šù«"ºaãz*"9ë¥ûï#9a£yieù§+:/*¹aj9gçÑV0åÌøà ‚‹H9`áy/ë¹¥.H]»ï#9§*¹/ë¹¥.HXZ[¸à ‚‚ˆÈÈŒMÌËH9¢bùªgú ã9¦kù h¹oª{ï#ùegùbåybåyåjùméy/g:f£¹«­B‹H9d#9. 9`"ùà#ú)¯yfj9b!ºh yméy/g:f£¹«­zi¥¹«(yk£9¢$L»ïgŒMyéä¹egùbåy.)ºnç¹¤âº`,¹aiyo£;ï#9.éHÙ\ÜÚ[Û”ÝÜ˜YÙH:*&:c!9mìº`,¹ai{ï&ùd#9b!ºh yo£9î£9fè[™›ÚYÐÚ›ÛYH™[™\™\ˆ9fç¹¥-º #:aãz/"y¦`»ï#œËÌ[XZ[‹šœØ9§ ùêâùclúf¬z%ãÈÝ\\ØY\»ï#9.#ya£z) y¬`¹ëbyo¡yk£9¥m9egùbåybåyåjøà ‚‹Hš\ÚXš[]XÚ[™ÙHOˆY[˜:"!ÈYÙZYX9§ ùêâùclùdo9cêùãï¹§"HØ]™QØ[YJ
+X;ï#:fcy/cˆ[™›ÚY: ã9¦kùfç¹¥-º`(9¢$9æ¡9§*¹kf:`,¹n©ºhª:fª¸à ‚‹H:eç:e¢yb!ºh {ï#ù¥¬9æ¡9à#ú)¯yfj9méy/g:f£¹«­y.ãy§ ù«hùn.9¤«y¥/ºi¥¹«(yegùbåybåyåjûï&ù¬¤¹§"y/oùå*ØZÙHØÚøà y`aúgìú*"¸à \™[ØY9¥%9¢*¹¢%ˆ[[YH]Ú8à ‚‹H9§+:/*¹cê¹/ë¹¥.H]»ï#9.#y/ë¹¥.HXZ[¸à ‚‚ˆÈÈŒMÌË9¥¬9¢bù¨ë¹§¥ùå'ùkf;ï#ÑV:"!ùmèy *¹¢dù§­¹g%¹¥®yd$B‹H9¥¬9¢bù¨ë¹§¥ùakzf®ù *¹âjyæ¡9¥cù£mú"!ù¥cù£múnç¹¥n9fî¹k¦¹à®Œ8à ‚‹H9¥¬9¢bù¨ë¹§¥ù¦kº`&¹¥.ù¤â»ï":gg¹¢ : ï{ï"y.#yâ!¹¤â»ï#9§*ºf,¹é©»ï#ù§*º(ªùæï¹d.9¥-¹bcyfî¹k¦ŒL;ïgŒMy`­ùk¬øà ‚‹H9. :"+9¥¬9¢bù¨ë¹§¥ùbçyb*QV9/§yæë¹bcSŒx¡¤ŒL9«hùo#ù¦ì¹íæ¹cãy£ª9à®¹í!Œ9h-;ï&ùæë¹bcygî¹®¥ŽLVùh-8à ¹a`ùí(9c(ÍÌ	z"!ù/$y kÑV0åÌ¹¬¯ùå*9¥è¹§"z)£ùbaøà ‚‹H9mèy *º`,¹¢,:k)ybcyæ¡]›ÛYšYÚLKÌºhkùé.¹¦`¹íly. :h!¹¦`ºaçNL0¬;ï&ú-l:-ëûï#ùo¡yªgù h¹oªL0¬8à ‚‹H9g'ûï#úhª9."y.®¸à yaj:jå:"!ùa¬:g'9ë«zfê9fî¹k¦¹ëá9g#U‘–:)£ùbaù§*¹¥.{ï#9¥¬9h§¹fç¹«n9/çz+møà ‚ˆÈ9l"9¨b:`,¹n©¹.©9£©z(j‚º`&y.ïy¥¡ù.í¹¦+ú`&y`"ùl"9¨b9e+ù. 9æ¡8à#9æë¹bcyâà9¡bøà#yç'ùæî9/¡¹®¤8à ¹/oùå*: !y§ ú/*¹­`yå*9.#yd#9æ¡RB¹méyamûï"Û]YHÛÙHÈÚ]Ô9ëb{ï"ze¢ùæo:`&y`"ùl"9¨b;ï#
+Š¹«ãù. 9«(ze¢ùiâùméy/g9bcz`ïyoázh"9ab:+ 9k£:`&y.ïy¥¡ù.í»ï#¹íd9§gùméy/g9bcz`ïyoázh"9¦í9¥¬:`&y.ïy¥¡ù.íŠŠ»ï#9d)¹baù."ù. 9`"ù£©y¢bùæ¡9.®»ï"9.#yë¨y¦+ù.®º`¡9¦+ÈR{ï"y§ ùg*9.#yçéy áyæ¡9âà9¬ày."Âºaãy`f¸à y¥.yhç¸à y¢%º*©9b)9æë¹bcyæ¡9âà9¡bøà ‚‚‹KKB‚ˆÈÈŒMÌËŒÎH9g'ûï#úhª9ëá9g#y¢ : ïz"!ùa¬:g'9ë«zfê‘–9k¦¹/cy/ë¹«hûï"9æë¹bcH]»ï"B‚‹HœËÌÎK]ŒMË\ÚÚ[X[š[X][Û‹šœØ9îo9î£9/g9à®ˆÜš]H‘–9no¹/eHÝÛ™\»ï#9§*¹¥¬9h§ˆ[[YH]Ú8à ‚‹H9g'ûï#úhªšX;ï#Ø[UšX9alyå*9fî¹k¦¹."yêæy/cz)¥º)®¹¨a»ï&¹kéºf¦ùkf9­.ûï#ùdoy.+y¥n9cê¹¬n¹k¦¹`­ùk¬ú"!ùâà9¡bûï#9.#ya£ycàú"!ÈÜš]H9l.¹kî;ï&ùãªyk­º`n9k¦¹æ¡9¥¯y¥/¹æë¹ª&y¦+ùfî¹k¦º)¥º)®¹.+yoàøà ‚‹H9g'ûï#úhª[;ï#Ø[P[˜]YšY[9¢ : ïyí«y£ yk£9¥m:fhùg,9no¹/e{ï#9«nù.¨y¢%¹bjzi&9.®¹¥n9.#y§ ùî+¹l#ù¢%¹¢¢¹båyåjù¢âyd$y`%¹kf: !xà ‚‹H9¬-9a`ùí(XÙP\œ›ÝÔ˜Z[˜;ï"9a¬:g'9ë«zfê;ï"y¥.yà®ˆš^Y›Ü›X][Û˜;ï&¹¬.:`h9/oùå*9k£9¥m˜]S[ÛœÝ\\™XX9/g9à®¹¥my¥®HL9.®ºfhùg,9ëá9g#z"!ù.+yoàûï#9.#ya£y/oùå*]š[™Ë]\™Ù]Ø:`¢¹åc8à ‚‹H9`­ùk¬øà y¢ : ïyæë¹ª&yb)9k¦¸à yâà9¡bùdoy.+xà TÔ8à PRxà z)äº"lº,áù¥¦z"!ùkf9ª¥:)£ùbaùgaù§*¹/ë¹¥.xà ‚‹H9fç¹«n9®+:*iº)¡º$âûï&ºhª9."y.®¹¢ ø¡¤ŒH9kf9­.ùl.¹kî;ï#ù.+yoàù.#z+¢¸à zhª9aj:jå9¢ 9kf9­.ù¥n:+¢¹c%¹.#yolzgïùëá9g#xà yg'ù."y.®ˆÜš]H9aj9¥n9fî¹k¦¹êæy/cxà ya¬:g'9ë«zfêø¡¤ŒH9kf9­.ù.ãy/çy£ yk£9¥m9¥my¥®zfhùg,9l.¹kî:"!ù.+yoàøà ‚‚ˆÈÈŒMÌËŒÎH9..ùgãˆRH9§ 9o£9o«º*¯ûï"9æë¹bcH]»ï"B‚ˆ9§+:/*¹cêº*¯ù¥m9..ùgã¹¥è¹§"y."y`"ú)¥º)®¹c`9hb»ï#9.#zaãy©âøà y.#y¥¬9h§ˆRxà y.#y/ë¹¥.yb§ú ïy.¢ù.í¹¢%º`b¹¢,º`£ú/+øà ‚‚‹HÜÜËÌ[XZ[‹˜ÜÜØ9.ãy¦+ù..ùgãˆQ:"!ùaiycèùl.¹kîÝÛ™\»ï&¹fæú,hy..ùgã¹keùí&¹å,H:*¯ùà®ˆL8à z.ªù.ïyc`9åiycìùéîù.)¹í«y£ yg ¹æí9ïk¹.+{ï&úaäynhøà yí¤újeù¬h8à QUˆ9íd9©âú"!ùi)ùl#ù§*¹¥.xà ‚‹H[™^š[9¥è¹§"HÛYK]™\œÚ[Û‹X˜YÙX9aiùmc9ª(ùo#ù.ãy¦+ùâb9§+9o¯yêèÝÛ™\»ï&¹keùí&¹å,HÜ:*¯ùà®ˆ\;ï#9`áyd#9«iy¥/¹i)ù¥è¹§"yo¯yêè;ï#9.#y¥¬9h§¹.îù/eHQ:,áú*"¸à ‚‹HÜÜËÌ[XZ[‹˜ÜÜØ9æ¡:fè¹íæ¹í¤újeûï#ùìîùílyí«y£ yk£9¥m9n¥y§oú"!úaäy¨a»ï&Ž°åÍ:*¯ùà®ˆL0åÍûï#XÛÛˆ:"!ù¥¡ùkeùd#9«å9¥/¹i)ûï#9ajzha¹£"zb%yd!9d$yi%¹o«¹éîûï#9.+yi+¹gãºe 9/çyåfyí!Œ:*+z*":`&º`dûï&ú)äº"l»ï#ùea¹n¥ú"!ùmé¹cìùaky`"ùb§ú ïyaiycèùl.¹kî9k£9aj9.#ybåxà ‚‹HÜÜËÍ‹]ŒM‹\Þ\Ý[K\Û\Ú˜ÜÜØ9.ãy¦+ùa¤ºfªºf¢¹/#z)¥º)®ˆÝÛ™\»ï&¹k®yfj9."ùéîÈÜ;ï#9g ¹æíY[™È9å,Hœ9o«¹h§º!ìÈÜ;ï#9«ãùb%ùå,H9o«¹h§º!ìÈœ;ï&ú)äº"l¹£¤¹b%øà MpåÍH:h+y`ãú"!ÈÔÔ:)£ùbaù.#z+¢¸à ‚‹HœËÍK]ŒM‹\Þ\Ý[K\Û\ÚšœØ9æ¡™[™\’ÛYT›ÜÝ\Š
+X9§*¹/ë¹¥.{ï&ùn¥z`ê9l#º"*¸à z ã9¦køà y.¢ù.í¸à z)äº"lº,áù¥¦xà zaäynhûï#ùí¤újeú`£ú/+øà QU¸à y¢,:k)xà y¢ : ïz"!ùkf9ª¥9æ¡¹§*¹/ë¹¥.xà ‚‹H9mì¹.éHÚ›ÛZ][H9kéºf¦újeú+bHL0åÌNLŒ9¨.9oàùæí9d$y«å9/¢ú"!ÈÎL0åÎ9¢bùªgùæí9d$y«å9/¢ûï&¹."y.®ºf¢¹/#yâà9¡bùá(zaãyå¢¸à yá(z(àyb!øà yá(y/oùå*: !y£l¹bå{ï#9ajzha¹«(yí&¹£"zb%y.búe¤ù/çyåfy.+yi+¹gãºe 9.+z.î8à ‚‚ˆÈÈŒMÌËŒÎH9g'ûï#ùabya`ùí(Üš]H‘–;ï"9æë¹bcH]»ï"B‚ˆ
+Š¹æë¹bcH‘–9¥m9d"9aiycèøà ŠŠˆŒMÌËŒÎ9æ¡9«hùo#ù`­ùk¬ùª(yg¢ùk£9aj9/çyåf{ï&ù§+:/*¹cê¹¢¢ˆ\ÜÙ]Ë[Xœ˜\žH9mì¹k£9¢$9æ¡ˆ9g'ùa`ùí(:"!ù©myn'yi*yl"¸à$9a`ùéeº,ç9é£øà$TÜš]HÚY]9£©yaiy¥è¹§"HŒM‹ÕŒMÈ9båyåjÈÝÛ™\¸à ‚‚‹HœËÌÍË]ŒM‹\ÚÚ[X[š[X][Û‹šœØ9.ãy¦+ù¢ : ïy¯%9aî¹¦`ºe¤ùe+ù. ÝÛ™\»ï&ùg'ùçìù¥«;ï#ùçìùæï¹¢ìûï#ùçìùè-9i*zjf»ï#Âˆ9g,:(àºaãy¢ìûï#ú$/yçìú(dûï#ù®ï¹çìú(dûï#úhæù¬¦yç«9¤â»ï#ùg,9âfùã&ú)l»ï#ú$+:,hyg'ùæï»ï#ùlªyçìùhàyhæ;ï#ùíd9åc:"!ùa`ùéeº,ç9é£Âˆ9mì¹/§y¢$9dàHÜš]HÚY]9æ¡KŒ{ïgŒ‹Œ9éä¹ëà9icù¨(y®¥¸à ‚‹HœËÌÎK]ŒMË\ÚÚ[X[š[X][Û‹šœØ9.ãy¦+ÈÜš]H9¤«y¥/º"!ùâà9¡bùoª¹ä¬9e+ù. ÝÛ™\»ï&ÌLˆ9n`9¢ : ïyg%¹íly. 9å*ˆØ[˜\ËXÜ›Ü
+È˜]\˜[ÜšY9£"H0åÌøà LÎ0åÌÎ:`$9¨/:(àyb!ûï#9n`9âà9¡bùg%¹£"H0åÌ¸à LM°åÌM‚ˆ9á(yî*ùoª¹ä¬;ï#9.#ynî¹êâù«ãùn`9ãj9êâÈ‘ûï#9.gù.#y¥¬9h§ˆ[[Yxà ‚‹H9«hùo#È›ÙXÝ[Ûˆ\ÜÙ]È9¥/¹g*\ÜÙ]ËÝ™žÙX\Ø:"!È\ÜÙ]ËÝ™žÛYÚØ;ï&ù/¡¹®¤9/çyåfyg*ˆ\ÜÙ]Ë[Xœ˜\žKØ\ÜÙ]ËÚ[˜›ÞØ8à ¹¢ : ïyl#y¡âyc!yd*ùe«ºjå8à yd#9£¤¹."y.®¸à yaj9h-:"!ù¢$y¥®yh§¹æâ¹k¦¹/c{ï&ùa`ùéeº,ç9é£Âˆ9/§y©myn'yãï¹§"H]X[–P›\ÜÚ[™Ø;ï#ØÝ]\Ó˜[YNˆ¹a`ùéeº,ç9é£È˜9âà9¡bÈÝÛ™\ˆ:hkùé.¸à ‚‹H9¥¬9h§¹£ yî£9âà9¡bÈÜš]{ï&¹è-:f,¸à ylªyæï¸à yçìùc%¸à z$+:,hyg'ùæï¸à ylªyçìùhàyhæ8à yíd9åc8à ya`ùéeº,ç9é£øà ‚ˆ9çìùæï¹¢ìûï#ùçìùè-9i*zjf¹æ¡9lªyæï¹lk9¥¯9¥¯z(dú !z!êº.ªûï#ŒMÈ9§ ùëby¥¯y¥/ˆÜš]H9íd9§gùo£9¢czhkùé.¹£ yî£9lªyæï»ï&Âˆ9a`ùéeº,ç9é£ùbaù.éy«hùo#ÈÝ]\Ó˜[YX9l#y¡ây©myn'yæ¡ŒMUX[PY™˜:hkùé.º,áù¥¦xà ‚‹HœËÌÎ]ŒMË\Þ\Ý[KYš^\ËšœØ9cê¹¥-¹¥ º$+:,hyg'ùæïº""¹æ¡8à#9fæú)ä»ï"ú,hykeøà#yê"ùn£ùâny¥b;ï&¹åm¹¥¬9æ¡Üš]BˆÝ]\ÈÝÛ™\ˆ9kf9g*9¦`¹.#ya£yå¢¹b¨:""¹¥b9§§;ï&ùcãy`­ú)£ùbaøà yíd9åc9«(y¥nRxà yâà9¡bú,áù¥¦z"!ù¢,:k)y¥n9`/9æ¡¹.#y¥.xà ‚‹H9§+:/*¹cê¹æo9n È]˜;ï#9.#y/ë¹¥.{ï#ùd"9/mHXZ[˜8à ‚‚ˆÈÈŒMÌËŒÎ9«hùo#ù`­ùk¬ùª(yg¢ûï"9æë¹bcH]»ï"B‚ˆ
+Š¹æë¹bcye+ù. 9`­ùk¬ú)£ù¨/9aiycèøà ŠŠˆ9§+9ëà:"!È\ÝËÝŒMÌYš[˜[\ÜXËZ[YÜ˜][Û‹\ÝšœØ9.èú(jˆ9k£9¥m:/"yaiyo£9æ¡ŒMÌËŒÎ9¢,:k)y`­ùk¬ú)£ùbaûï&ù."ù¥®HŒMÌËŒÍÈ:"!ù¦í9¥êy«­z$/y`áy/çyåfy«mùcì¹gî¹íæ¸à ‚‚‹HœËÌ[XZ[‹šœØ9¦+ÈØ[Ý[]Q[XYÙJ
+X8à XØ[Ý[]TÚÚ[[XYÙJ
+X:"!È[XYÙT›ÛX9æ¡9e«¹. 9«"¹j HÝÛ™\»ï&ÂˆŒMxà UŒMMxà UŒMŽH9æ¡9."ù®.9`­ùk¬ú)¡¹kêùmì¹éîúfi;ï#9¥è¹§"ya`ùí(8à yâà9¡bøà yâ!¹¤âº"!ù¢ : ïyb!ºhg¹.ãy/çyåfxà ‚‹H9ãªyk­º"!ù *¹âjyíly. 9£¨xà#Ì;ï"ùëbyí&¹¢$:emûï"ù§"y¥b9akyg#xà#yl.¹n©»ï&ù.¥9ê+¹«hùo#È[XYÙT›Ûxà y¦ì¹íæºf,¹é©¸à BˆŽ{ïgŒKŒMH9ëbyí&¹më¸à LKŒŒ;ï#ÌKŒ;ï#ÌŽH9a`ùí(9`#yã¡ùgaù/§HŒMÌËŒÎ:)£ù¨/9¨(y®¥¸à ‚‹H9a`ùí(V8à yieú(çxà yål9n.9h§¹`­øà y. :"+9¢ : ïz"!ù§*¹/¡º*g¹¨§z`,¹aiyd#9. 9¦kº`&¹h§¹`­ùb¨9ë¥ù¨m»ï#9."ºfdKL;ï&Âˆ9â!¹¤â¹§ 9í`¹."ºfd‹Œ{ï#9¢ : ïycëú`n[XYÙPYÙ]][\Y\˜;ï#9§*¹£!ùk¦¹¦`¹à®ˆKŒ8à ‚‹H9 *¹âjyl#yãªyk­¹¢cyieù¥my¥®yhäùb¦ûï&¹¦kº`&»ï#ùì¯º"ì{ï#Ð“ÔÔÈ9b¨9¢$	{ï#ÌL	{ï#ÌŒ	{ï#9¥éyn.9bkù§+9cé¹b¨I{ï#ˆ9­ìy­íycé¹b¨MI{ï&ùãªyk­¹¥.ù¤â¹ *¹âjyfî¹k¦¹.#yieøà ¹bkù§+:"!ù­ìy­íynî¹ *¹.#ya£y.éH˜[šÈ9¥/¹i)ù¥.ù¤â»ï#úke9¥.øà ‚‹H9­ìy­íyë+{ïg9li9¢ : ïyëbyí&¹¥.y/§y *¹âjyëbyí&¹b!¹«­{ï&ùë+H9li9c`y.®ºfhùk®z"!ù¢ : ïzacyïk¹.#z+¢»ï#9aj9dèHxà ‚‹H9æí9£©yolzgïùfç¹«n9alHÌÈ:h!z`&º`c»ï#9­­z$âÈŒŒ;ï#ÍL;ï#Î;ï#ÌL8à y.¥9ê+¹`­ùk¬ú)äº"l¸à yëbyí&»ï#ùa`ùí(8à Bˆ9.gyê+¹¥my¥®yhäùb¦øà yb¨9ë¥ù¨m¸à yâ!¹¤â¹."ºfd8à y¥n9`/9k¢yaj8à y.èú(j9 áyh ùoêùáiú"!ùë+9.¥9li9c`y.®ºacyïk¸à ‚‹H9§+:/*¹`áy¦í9¥¬]˜;ï#9.#yd"9/mHXZ[˜;ï#9.#y¥.ykf9ª¥9¨/9o#øà URxà y¢ : ïy¢$9§+8à yâà9¡bøà z(çy`¦y¥n9`/9¢%¹í¤ù¯çøà ‚‚ˆÈÈŒMÌËŒÍÈ9§ 9í`¹«hùo#ú)£ù¨/;ï"9«mùcì¹gî¹íæ»ï"B‚ˆ9§+9ëà8à X\ÝËÝŒMÌYš[˜[\ÜXËZ[YÜ˜][Û‹\ÝšœØ:"!È\ÝËÝŒMÌËŒNYš[˜[\™\]Y\Ý\ÝšœØˆ:*&:c!ŒMÌËŒÍÈ9æ¡9k£9¥m:/"yaiyâà9¡bûï&ùæë¹bcy`­ùk¬ù¥n9`/:*âù.éy."¹¥®HŒMÌËŒÎ9à®¹®¥¸à ‚‚ˆÈÈÈ9æë¹bcy§ 9í`¹`/‚‹H9«hùo#ÈXZ[˜9æë¹bcy.ãy¦+ÈŒMÌËŒ;ï"ÒHLMMLMXŒLØÌXM˜XŒYMÍL˜MMÌÍY™ŽYX;ï"{ï&ÂˆŒMÌËŒ{ïg•ŒMÌËŒÍÈ9æë¹bcycê¹kf9g*]˜8à ¹§+:/*¹/§y/oùå*: !y¦#¹è®º) y¬`¹cê¹£ä9.©;ï#ù£ª:` H]˜;ï#9.#yd"9/mHXZ[¸à ‚‹H9ç'ùkéº/"yaiy¦+È[™^š[9æ¡9¥+ùd#9«iHÛ\ÜÚXÈØÜš\;ï"œËÌŒØ8¡¤ˆœËÍL˜:e¢ùh-ØY\ˆ8¡¤ˆœËÌ8¡¤‚ˆœËÌX;ïg˜œËÌŒ8¡¤ˆœËÌ;ï"{ï#9a£yå,HœËÌŒX[›Ûž[[Ý\ËLŒšœØ9/§HØYÙ\œ›Üˆ8¡¤ˆ™^ˆ9f­9¨/9.,º(c:/"yaiHˆ9¥+ù«hùo#È[[Y{ï&˜œËÌX8¡¤ˆœËÌØ;ïg˜œËÍLX8à ¹mèy *¹í(9§d:câ9§ 9o£9æ¡ˆœËÌ˜:"!ù«hùo#ÈØ[Y\^H[[YH:câ9.)º(c;ï#9cê¹ë¨yi%º)à;ï#9.#z ïy£äº`,¹nlú(hz(ç9. zh!¹n£øà ‚‹H\ÝËÝŒMÌYš[˜[\ÜXËZ[YÜ˜][Û‹\ÝšœØ9§ ùg*9d#9. 9`"È›KÛÛ^9ç'ù«hù/§y."º/ì:h!¹n£Âˆ9gíú(cL9¥+È˜]˜TØÜš\;ï#9a£yª¨¹§éy§ 9í`º,áù¥¦z"!ú(c9à®»ï&ÕŒMÌËŒÍ9céºc¥¹k¦¹d#9d#yâà9¡bùab9b)9k¦¸à y«hùo#ùâà9¡bùd#xà Bˆ9oáyk¦¹áàùáä¸à zlìùj xà z/ïy¤â¸à yd.:(`8à yèk9£©øà ycãy`­øà ylªyæï¸à yíd9åc8à y.f9ë¥úe ú.¬¸à y¥my¢$y¥+ù£í9¢ : ï{ï#9.éycâ‚ˆÌˆ9¢æù«hùo#ù`­ùk¬ù¢ : ïyæ¡[XYÙT›Ûxà ybåy¡búf,¹é©¸à yakyg#yl.¹n©º"!ùd!9li9bkù§+9.èú(j9`­ùk¬ûï&ÕŒMÌËŒÍˆ9a£zc¥¹k¦‚ˆ9­ìy­íyë+9.¥:eç9fî¹k¦¹c`y.®¹êæy/cxà y.¥9n'{ï#ù.¥9ì¯º"ìyì¯¹è®¹¢ : ïxà yaj9dèy§ :jæ9¢ : ïyëbyí&¸à yc%ùn'yoªy­.ùa*¹ab9í&¸à Bˆ9§lyn'{ï#ùi*yn'y¥+ù£í:(c9à®¸à y©myn'ye«¹. 9a`ùéeº,ç9é£ûï#9.éycâºhª9i*yamyi*yl!ùcê¹/oùå*:e ú.¬º(dú #:ggºf¬z.ªøà ‚ˆ\ÝËÝŒMÌËŒNYš[˜[\™\]Y\Ý\ÝšœØ9îo9î£:c¥¹k¦¹ë)¹d¤¹¨/9íæ¸à y­ìy­íy¢,9o£9fç¹ê"ú"!ù§ 9í`ˆÝÛ™\¸à ‚‹H9."ú(j9æ¡8à#9`­ùk¬øà#y«!9¦+ùà®¹æî9k®z""¹ê"ùo#øà zh$:)¯z"!ù«mùcì¹®+:*iº #9/çyåfyæ¡˜\ÙQ[XYÙ{ï#Ù[XYÙT\“]™[;ï&ÂˆŒMÌËŒÍ9mìº`mùéîùæ¡9«hùo#ùæí9£©y`­ùk¬ù.#ya£y.éz*l¹«!9à®¹..ù`­ùk¬ûï#: #9¦+ù/oùå*:(j9o£9æ¡[XYÙT›ÛH9`#yã¡øà ‚ˆ9amºi&9¨/9o#ùà®¸à#Ô;ï&ùæë¹ª&{ï&ùb'ykn;ï#ùcaùí&»ï#ù§ :jæ;ï&ùbcyïk¸à#{ï#9bcyïk¹§"yajzh!y¦zß¾»¶‰žËkºwµçk:*i¹ä¬9h ù¢cBˆ9/oùå*9d#9. 9.ïHXZ[ˆ:,áù¥¦zh$9ë¥ùaî¹æ¡˜[˜XÚøà ‚Œ‹ˆ9«ãùí&¹æë¹ª&yh-9¥n9.éyl$zaãúc*:nç¹íæ¹ )ù£ä¹`/;ï#9bcy§'ùoêøà y.+y§'ù¯.9¡h¸à yo£9§'ù¦#ºhkú+¢¹¡h»ï&Âˆ‹Œx¡¤ŒL9d":*"
+ŠŽKÍŒ9h-9§"y¥b9¢,:k)JŠ¸à ¹..ú) yª¨¹§éznç»ï&‚ˆH‹ŒL;ï&Œ‹ŒHV;ï#9í!Myh-;ï"9c`9gçùnlùgaÌMÍHV;ï#ùh-;ï"BˆH‹ŒÌ;ï&L‹V;ï#9í!L9h-;ï"9c`9gçùnlùgaÍLŽV;ï#ùh-;ï"BˆH‹L;ï&ŒËÌŽV;ï#9í!9h-;ï"9c`9gçùnlùgaÎÌŒHV;ï#ùh-;ï"BˆH‹Ì;ï&ŒLÎM‹V;ï#9í!L9h-;ï"9c`9gçùnlùgaÌLKNMˆV;ï#ùh-;ï"BˆH‹Ž;ï&ŒMLL‹V;ï#9í!KŒ9h-;ï"9c`9gçùnlùgaÌLKÍŒV;ï#ùh-;ï"BˆH‹ŽL;ï&ŒŒ‹ŽKLV;ï#9í!KÌ9h-;ï"9c`9gçùnlùgaÌLËÌÍHV;ï#ùh-;ï"BˆH‹ŽN{ï&NKV;ï#9í!9h-;ï"9c`9gçùnlùgaÌMLLV;ï#ùh-;ï"BŒËˆ9a`ùí(9c(ùí«y£ HÌ	HV8à y«ãùb!ºd&yh-8à y«ãùi*N9l#ù¦`¹.%9.#z*"9bkù§+;ï#ù/$y kùb¨9¢$9¦`»ï#ˆ9í!:g NKMùh-9kéºf¦ù£¦ùªgù¢,:k)xà JŠKL¹i*JŠ¹caùb,‹ŒL8à ‚ˆœËÌÌ‹]ŒLÎK\™\ÝYY^\šY[˜ÙKšœØ9¥¬9h§¹/$y kùí¤újeûï&ºfè¹íæ»ï#ú ã9¦kù«ãÌ¹b!ºd&ˆ9í+ùêcLyh-;ï#9§ 9i&ŒÌ9h-;ï&ù. :"+9íí9b§ùbçyb*y­¢: %Ìyh-9.)¹¢¢º*l¹h-V:+¢¹¢$¹`#xà ‚ˆ9a`ùí(9c(ùegùå*9§'úe¤ù.#yí+ùêc{ï#9a`ùí(9c(ú"!ùbkù§+9.gù.#y/oùå*8à y.#y­¢: %øà ¹âà9¡bù¥/¹g*9ãj9êâÂˆŒLÎWÜ™\ÝYÙ^ÜÝ]X;ï#9¬¤¹§"y¥.y¥è¹§"y..ùkf9ª¥ØÚ[X{ï&ùb*ºfi9¢`9§"z)äº"l¹o£ˆ:aãy¥¬:/"yaiy§ ú!ê¹båy®!zfi:`&y`"ù`m:`¢¹âà9¡bøà ‚KˆœËÌË]ŒLÌ‹XÛÛ[Y^[œÚ[Û‹šœØ9¢¢¹í¤újeùbkù§+9gî¹é#¹ãc¹bíy¥.yà®¹aj:f¢¹æë¹bcBˆ^™^9nlùgaù`/9æ¡LI{ï#9/cy¥¯9£!ùk¦ŒL;ïgŒL‰yc`:e¤ûï&ù¥è¹§"ynèùdbºfæy`#y.ãyà®ŒŒ‰xà ‚‹ˆ9¥è¹§"zaã¹ *ˆV0åÌËxà y¦kº`&»ï#ùì¯º"ì{ï#Ð“ÔÔÈV0åÌ{ï#ÌK{ï#Ìøà ya`ùí(9c(úaäynhûï#Âˆ9§d9¥¦{ï#ù£¢z$/LL	xà zaäynhÈ9ëbyí&°åÌŠÌØ9b¨0¬LMIz"!ù¦kº`&»ï#ùì¯º"ì{ï#Ð“ÔÔðåÌ{ï#Ì»ï#ÍBˆ9aj9¥n9/çyåfxà ¹ea¹n¥ù.ãycê¹ç"ùn,ú&gùaiù§ :jæ:)äº"l¹æ¡:f£¹`îy¨/9`#yã¡øà ‚Ëˆ9. :"+9ea¹n¥ùcê¹a`z*,y£!ùk¦¹æ¡9aky`"ú%éy¬-Q;ï#9gî¹é#¹`îyk¦¹¨b9à®ˆˆLÌÌÍL	OLŒÍLÎ8à TÔLÌÌÍL	OLKÍKÌL;ï&ù.#y¦+ùå*8à#9/c¹¥¯L	xà#Bˆ9æ¡9kë:k!¹¨§y.í»ï#9§*¹/¡¹¥¬9h§¹am¹.å¹ h¹oªy«å9/¢ù.gù.#y§ ù¡#ùi%¹."¹§­¸à ŒL	HÔÔ:%éy¬-9.ãBˆ9/çyåfyk£9¥m:`dùamú,áù¥¦y/a¹.#yg*9. :"+9ea¹n¥úhkùé.»ï#9cëù/¦È“ÔÔûï#ùbkù§+;ï#ù.îùbæ{ï#ù¢$9l,yëbBˆ9ê 9§"y/¡¹®¤9/oùå*8à ‚ŽˆRWÑÕRQSS‘TË›Y9h§¹b¨9¬.9.ayæ¡9ª(yía9c%º`dùamÈXÛÛˆ:)£ùbaûï&¹. :"+9§d9¥¦xà z%éy¬-8à Bˆ9g%¹í&xà yéj9b.8à ykí¹ë¬y/oùå*8à#9b!ºhg¹gî¹n¥{ï"ùa`ùí(9ª&z*£;ï"ùê 9§"yn©¹¨a»ï"ùâny¥b9li8à#{ï#ˆ:aãz) z(çy`¦xà P“ÔÔøà y¢ : ïxà yb¡ù áyâjydày¢cya*¹ab9/oùå*9ãj9êâÈ‘ûï&ÌL9`"ù. :"+:`dùamùæ¡ˆ9¥¬9h§¹í(9§d9æë¹ª&y£©ùb-¹g*L;ïgŒŒ9`"ùgî¹é#¹í(9§d8à ‚ŽKˆ9¥¬9h§ˆÜÜËÌÍË]ŒLÎK\™\ÝYY^\šY[˜ÙK˜ÜÜØ;ï#9cê¹g*9¥è¹§"zfè¹íæ¹í¤újeùob9ê¥úfa9b¨ˆ9/$y kùâà9¡bûï#9¬¤¹§"y¥¬9h§¹mè¹âà9£l¹båy¢%ºaãy`fº""ˆRxà ˜—ÐTÔÑUÕ‘T”ÒSÓ˜:"!ù§ 9i%¹liˆØY\ˆT“9d#9«iycaùà®ŒLÎ{ï#œËÌÌ˜9/§yn£ù£©yg*œËÌÌX9o£8à ‚ŒLˆ9¦#¹è®¹¬¤¹§"y/ë¹¥.HœËÌ[XZ[‹šœØ9æ¡9ãªyk­º ïyb¦øà y¢ : ïy`­ùk¬øà zaã¹ *»ï#ùbkù§+9 *¹âjBˆ9o-ùn©¸à z(çy`¦ylk9 )øà y¢,:k)yfç¹d":"!ù¥è¹§"ykf9ª¥:,áù¥¦yíd9©âøà ‚‚ŠŠºjeú+bJŠ»ï&¹¢`9§"yål9båH”È:"!ù¥¬9®+:*iº`&º`cˆ›ÙHKXÚXÚØ;ï&Â˜\ÝËÝŒLÎKYXÛÛ›Û^K\™\ÝYY^\ÝšœØËÍøà UŒLÍÈKÎxà UŒLÎLÌL:`&º`c»ï#˜Ú]Y™ˆKXÚXÚØ:`&º`c¸à •ŒLÎH9®+:*i¹§ ùæí9£©z)èù§¤9æë¹bcHœËÌ[XZ[‹šœØ9æ¡9c`yc`¹ *¹âjzfhùb%ùo£9a£ycãy£ª;ï#9.#y¦+ú)!ú(ïy. 9.ïy`aú*+z,áù¥¦xà ¹åm¹bcyméy/g9ä¬9h ù¬¤¹§"y£ä9/¦ùà#ú)¯yfj9£©ùb-‚¹.âúgh»ï#9fè9«i9§+:/*¹.#z ïyk¨ùê,yk£9¢$9ç'ùké¹¢bùªgúnç¹¤â¹fç¹«n;ï&ù/$y kúgh¹§oùæ¡ÓH9aiùk®xà z/"yaiBºh!¹n£øà yâà9¡bù£ y.ayc%º"!ùa`ùí(9c(ù£¤ºfi9mì¹å,H›ÙH9ª(y¤ë9ä¬9h újeú+bxà ‚‚ˆÈÈÈŒ‹LLÈ8 %9nî¹êâù¬.9.aHRH:e¢ùæo:)£ùëá:"!úfæHRH9oáz+ 9aiycèûï"9¥¡ù.íºfd9k¦»ï"B‚ŒKˆ9¥¬9h§ˆRWÑÕRQSS‘TË›Y;ï#9k£9¥m:*&:c!9¢bùªgÈNŒMˆ9¨.9oàùk¢yaj9c`8à yg%¹âaù«å9/¢øà BˆRH9a`ù.í¹c%»ï#ùâà9¡bûï#ÝÚÙ[œøà zfcy/c¹í¬ºh y¥®yhb¹¡'øà [š[™K\ÛXÙxà y¢ :(dùb!¹méxà ybåyåjøà Bˆ9¥b: ïxà zgïù¡âyo#øà yk¢yaj9c`8à yn¥z`ê9l#º"*¸à yï£º(dùìîùb%ù. :!í9 )øà UR{ï#ú`b¹¢,º`£ú/+ùb!ºfè¸à Bˆ9¯.:`,¹¥m9ä!ºh!¹n£ùcâ¹«ãù«(HRH9/ë¹¥.yo£9æ¡Lˆ:h!zjeù¥-¹®!ye«¸à ‚Œ‹ˆ9l"9¨b9c§ù§+9¬¤¹§"HQÑS•Ë›Y9¢%ˆÓUQK›Y;ï&ù§+:/*¹d!9¥¬9h§¹. 9.ïy§ 9l#ùaiycèûï#ˆ:+¤ÈÔ;ï#ÐÛÙ^:"!ÈÛ]YH9g*9.îù/eHRxà PÔÔøà yâb:gh¸à yï£º(døà z ã9c!xà z(çy`¦xà y¢ : ïxà Bˆ9¢,:k)y.âúgh¹/ë¹¥.ybcz`ïyab:e¬z+ RWÑÕRQSS‘TË›Y8à º)£ùëá9«hù¥¡ù.#zaãz)!ú)!ú(ï{ï#:`oùacBˆ9."y.ïy¥¡ù.í¹¥éyo£9b!¹«iøà ‚ŒËˆS‘Ñ‘‹›Y9æ¡9£©y¢bú)£ùbaú"!ùæë¹bcyâà9¡bùd#9«iyb¨9aiyæî9d#9o-ùb-º)£ùbaûï#9è®¹/çyclù/oùméyamÂˆ9¬¤¹§"z!ê¹båz/"yaiyl"9lk9aiycèûï#9.gú ïyo§¹l"9¨b9e+ù. 9.©9£©y/¡¹®¤9ç"ùb,:) y¬`¸à ‚ˆ9§+:/*¹cê¹¥¬9h§»ï#ù/ë¹¥.HX\šÙÝÛˆ:)£ùëá9¥¡ù.í»ï&ù¬¤¹§"y/ë¹¥.HS8à PÔÔøà R˜]˜TØÜš\8à Bˆ9g%¹âaøà z`b¹¢,º`£ú/+ù¢%º,áù®¤9âb9§+:&gûï#9.gù¬¤¹§"ze¢ùiâù.îù/eHRH:aãy©âøà ‚Kˆ9b'y«iyæé:nç¹o£;ï#9ë+9. 9¢ny§ :`jyd"9¢¯y¢$9alyå*9a`ù.í¹æ¡9¦+ûï&¹.éyd#9. 9`"ÈÛÝ˜\ÙX:(cyå'Âˆ\]Z\Y[ÛÝ;ï#Ø][TÛÝ;ï#ØÚÚ[ÛÝ;ï#9ab9g*:)äº"l»ï#ú(çy`¦zh yl#ùëá9g#zjeú+b{ï&Âˆ9£©z$eù¥m9ä!ˆ]Û˜9âà9¡bøà X[™[;ï"Ø]P˜\˜;ï"ØX[ÙØ8à XX˜8à Bˆ›ÙÜ™\ÜÐ˜\˜8à ˜›ÝÛS˜]˜:få¹á-¹.gù¡âyalyå*;ï#9/a¹âoy­¢yajyieùl#º)¯z"!ùi&¹li9k¦¹/c{ï#ˆ9.#z`jyd"9åm¹ë+9. 9`"úaãy©âú*iºnç¸à ‚‹ˆ9æë¹bcy§ :jæ9í«z+múhª:fª¹¦+ûï&ŒÍˆ9.ïHÔÔÈ9.+yí!KŒÌ9`"ÈZ[\Ü[9oh¹¢$9f­:aãBˆÜXÚYšXÚ]{ï#ú/"yaizh!¹n£ùêí¹â+{ï&ÌL0åÌNLŒ9fî¹k¦º"'¹cì9i%¹b¨9i&¹liØØ[H9n©ùª&yìîûï&Âˆ[Ù[;ï#ÛÝ™\›^H:(ªù¢á¹¢$9i&¹ieùk®yfj:"!È[[YH9¤+9éîûï&ú)äº"l»ï#ù¢ : ï{ï#ú ã9c!yª(ùo#ù¥hùg*ˆÜÜËÌ8à X8à XX8à XŒX;ïg˜8à XÌ8à XÌX8à XÍX;ï&ùajyieùn¥z`ê9l#º"*¹câ:(ªÂˆ9.¥9.ïHÔÔÈ:)¡¹kêûï&ù.éycâˆÙØ[YK\ÝYÙX9£l¹båyc`9oázh"9d#9«iyí«z+mùaj9gçú)î9£©ùæoyd#ye«¸à ‚ˆ:`&y.¦ú`ïycêº ïz`$9a`ù.í¹¥-¹¥ »ï#9.#z ïy. 9«(yaj9gçùcå¹.èøà ‚‚ŠŠºjeú+bJŠ»ï&¹è®º*£y."y`"ùaiycèú`ïyì¯¹è®¹o%yå*RWÑÕRQSS‘TË›Y;ï#X\šÙÝÛˆ9íd9©âùk£9¥m;ï#˜Ú]Y™ˆKXÚXÚØ:`&º`c»ï&ùfè9¬¤¹§"H[[YH9ål9bå{ï#9.#zg :) y£ä:jæŒLÎ9oêùcå¹âb9§+8à ‚‚ˆÈÈÈŒ‹LLÈ8 %ŒLÎ;ï&¹¢,:k)yëà9icøà y *¹âjyíê:f¢¸à ybkù§+9ãc¹bíz"!ù¢ : ï{ï#ùieú(çz,áú*"‚‚¹§+:/*¹¢¢¹/oùå*: !yajy¢nzaãyå¢ºg 9¬`¹/§yo£9aîº)£ù¨/9¥m9d";ï#9kí¹ë¬{ï#ù¢¯yãc¹b.9cê¹/çyåfxà#:e¢ùegûï#úh$:)¯xà#{ï&Â¹bkù§+9ì¯º"ìy§ 9í`¹g*9¥è¹§"y`#yã¡ù."¹a£yb¨L	xà TÔL	{ï#“ÔÔÈ9a£yb¨L	xà TÔL	xà ‚‚ŒKˆœËÌK]ŒLÌKYš^X˜]ÚšœØ9¢¢¹§"y¥b:)äº"l»ï#ù *¹âjyæ¡9aî¹¢búe¤úf¥9¥.y¢$Kˆ9éä»ï&ù. :/*‚ˆ9§ 9o£9. 9/cyaî¹¢bú!ìù."ù. :/*¹ë+9. 9/cyaî¹¢bùfî¹k¦¹î/z*"ˆ9éä»ï"9éä¹.©9£©{ï"ÌKˆ9éäºi¥¹/cBˆ9aî¹¢bûï"xà ¹«nù.¨z)äº"l»ï#ù *¹âjy§ ùg*9£¤¹ê"ùbcy. 9«(yåiz`c»ï#9.#ya£y«ãù`"ùên¹/cyi&¹ëbHKˆ9éä¸à ‚Œ‹ˆ9 *¹âjyíê:f¢¹ab9/§H“ÔÔûï'¹ì¯º"ì{ï'¹¦kº`&¹£¤¹n£ûï#9a£yå,y«ãù£¤¹.+yoàùd$yajy`m:acyïk»ï&ù.¥9 *¹¦`‚ˆ9i&¹d#H“ÔÔÈ9§ ùab9ch9.+yi+¹/cyïk¸à š{ï#Ü›ÝÈ9¢ : ïy.ãy.éyd#9. 9.ïykéºf¦ùíê:f¢º*"9ë¥ùæë¹ª&xà ‚ŒËˆ9¢,:k)z)äº"lº"!ù *¹âjychyi%¹¨a¹¥.y/§yàjûï#ù¬-;ï#úhª;ï#ùg'ùa`ùí(:$eú"l»ï#9åm¹bcz)äº"lºe ù¨a¹.gù¬¯ùå*ˆ9a`ùí(:"l»ï&ù *¹âjyd#yê,ybaùfî¹k¦¹.éy¦kº`&¹æoxà yì¯º"ìyªf8à P“ÔÔÈ9¨`ùì¢z+f9b)yo-ùn©¸à ‚ˆœËÌË]ŒLÌ‹XÛÛ[Y^[œÚ[Û‹šœØ9æ¡:(çy`¦ybkù§+9fî¹k¦¹.¥:f®ù *»ï#“ÔÔÈ9¥n:aãùëby¥¯ˆ9åm¹bcykéºf¦ùãªyk­¹¥n;ï#9amºi&9aj9à®¹ì¯º"ì{ï&ùc§ù§"z!ìùl$yajyd#H‹ŒŒ9æ¡:e¢ù¥/¹¨§y.í¹.#z+¢¸à ‚Kˆ9í¤újeûï#ù§d9¥¦{ï#ú(çy`¦y."y`"ùmì¹ké¹/g9bkù§+:`ïyg*:`&º`c¹ëbyí&º"!ú ã9c!yª¨¹§éyo£9a£zhkùé.º`,¹h-ˆ9è®º*£{ï#9cå¹­¢9.#y§ úe¢ùiâù¢,:k)y¢%¹¥.ybåybkù§+9âà9¡bøà ‚‹ˆ9í¤újeùbkù§+9gî¹é#¹ãc¹bíy¥.yà®¹aj:f¢¹«ãùd#z)äº"l¹æë¹bcH^™^9b¨9î/zfi9.éyãªyk­¹¥n;ï&ù/¢ùi ‚ˆL;ï"ÍŒ9æ¡9ajy.®ºf¢¹/#y§ ùo¥ùb,MKV;ï#9.#ya£y.f:""¹âbL	H9«å9/¢øà ‚Ëˆ9§d9¥¦ybkù§+:h&9ãc¹cê¹¢¢¹§d9¥¦ykí¹ë¬y¥/¹aiz ã9c!{ï#:(çy`¦ybkù§+9cê¹¢¢¹¢`:`n9¢¯yãc¹b.9¥/¹aiz ã9c!{ï&Âˆ9ajz !ygaùå,yãªyk­¹.bùo£:!êº(c:e¢ùegøà ¹¥è¹§"H[[Ü‹[›Ý[™È9k®zaãúh$9ª¨º"!È˜[œØXÝ[Û‚ˆ›Û˜XÚÈ9/çyåf{ï#: ã9c!y®ïù¦`¹.#y¢hùë¬{ï#ùb.8à y.#z`ê9b!¹hg¹aiyãc¹bíxà ‚Žˆ9kí¹ë¬z"!ù¢¯yãc¹b.9âjydàz*lùí,9cêºhkùé.¸à#:e¢ùegûï#úh$:)¯xà#{ï#:f¬z%ãùêoù¢-8à ye+¹aîº"!ùe+¹`îxà ‚ˆ9kí¹ë¬zh$:)¯z`$:h!yb%ùaîˆ9ê+¹é)¹çìú"!ÈŒ9ê+º*+z*"9g%¹æ¡9kéºf¦ù¥n:aãûï#ùªgùã¡ûï&ùieú(çyb.9b%ùaî‚ˆL9.í¹cëú ïz(çy`¦ycâ¹d!L	H9ªgùã¡øà ‚ŽKˆ9bkù§+9ì¯º"ìyæî9l#ybkù§+9¦kº`&¹ *¹æ¡9§ 9í`¹`#yã¡ùà®ˆ0åÌËŒŒ8à TÔ0åÌ‹Œ;ï&Ð“ÔÔÈ9à®‚ˆ0åÍL8à TÔ0åÌ‹Œ8à ¹¥.ù¤â¸à zke9¥.øà zf,¹é©¹¬¯ùå*9¥è¹§"yì¯º"ì{ï#Ð“ÔÔÈ9`#yã¡øà ‚ŒLˆ9¢ : ïzh yæ¡9bjzi&9¢ : ïznç¹¥.yà®ºjæ9l#y«å:,áú*"¹¨§z"!ÈŒœ9¥n9keûï&ù§*¹kn9ïä¹¢ : ïy.#yå*9abˆ:e¢ú*lùí,:)¥¹ê¥ûï#9clùcëùg*9b%ú(j9æí9£©yç"ùb,8à#9kn9ïäºg :) Hˆ9¢ : ïznç¸à#xà ‚ŒLKˆ:nç¹¤âº ã9c!y¢%¹mì¹êoù¢-9æ¡9ieú(çz(çy`¦y§ ùæí9£©zhkùé.ˆùieú(çWy.í¹¥nÍX8à y."y.í»ï#ù.¥9.í‚ˆ9¥b9§§9câˆùmì¹egùbåWX;ï#Øù§*¹egùbåWX;ï#9mì¹egùbåy¦#¹.«¸à y§*¹egùbåznëù­èxà ‚ŒL‹ˆ—ÐTÔÑUÕ‘T”ÒSÓ˜:"!ù§ 9i%¹liØY\ˆT“9d#9«iycaùà®ˆLÎ;ï#9è®¹/çy¢bùªgùcå¹o¥ÂˆœËÌX8à XœËÌØ8à XÜÜËÌÌX8à XÜÜËÌÌØ9æ¡9¥¬9aiùk®xà ‚‚ŠŠºjeú+bJŠ»ï&¹¢`9§"HœËØ:"!È\ÝËØ˜]˜TØÜš\9gaú`&º`cˆ›ÙHKXÚXÚØ;ï&Â˜\ÝËÝŒLÍË\™YÜ™\ÜÚ[ÛœË\ÝšœØKÎxà X\ÝËÝŒLÎY™X]\™K\™\]Z\™[Y[Ë\ÝšœØŒLÌL:`&º`c»ï#Ú]Y™ˆKXÚXÚØ:`&º`c¸à ¹cé¹¥¬9h§ˆ\ÝËÝŒLÎXœ›ÝÜÙ\‹\Û[ÚÙKšœØ;ï#¹­­z$âùkéºf¦ÈÓH9ª(ùo#øà yâjydày£"zb%{ï#úh$:)¯xà yieú(çz,áú*"¸à ybkù§+9è®º*£z"!ù.¥9 *¹íê:f¢»ï&ùæë¹bcB¹gíú(c9ä¬9h ù¬¤¹§"HÚ›ÛZ][{ï#9fè9«i:*l¹®+:*i¹¦#¹è®¹ª&z*&ÚÚ\Y;ï#9.#z ïyk¨ùê,yk£9¢$9§+9ªgÂ¹åjúghºnç¹¤â¹fç¹«n8à ¹æo9n ùo£9mì¹o§¹«hùo#ùêæyæí9£©yè®º*£H[™^š[8à XœËÌŒ8à XœËÌX8à B˜œËÌØ9gaùà®ˆŒLÎ;ï&úfì¹êëùà#ú)¯yfj9kéºf¦ùk£9¢$9bmz)ä¸à z`,¹..ùgã¸à ze¢ú)äº"l»ï#ù¢ : ïzh {ï#¹bjzi&9¢ : ïznçˆÛÛ\]YÝ[H9à®ˆŒœ:aäz"lºjæ9l#y«å:!¨9fâ»ï#L9ëa¹§*¹kn9¢ : ïz`ïyæí9£©Bºhkùé.¹kn9ïä¹¢$9§+;ï#9.%9§*¹aî¹ãïº`b¹¢,¹§+:.ªùæ¡ÛÛœÛÛH\œ›Ü¸à ¹o£9î£:) yå*9aiùnî¹b¨:`'ùb§ú ïB¹caùb,9bkù§+:e 9ª®ù¦`»ï#:fì¹êëùà#ú)¯yfj9£©ùb-º`&º`dù£ yî£:`/¹¦`»ï#9fè9«i9kí¹ë¬{ï#ùbkù§+9k£9¥m:nç¹¤â¹­`yê"Â¹.ãycê¹å,z`£ú/+ù®+:*iº)¡º$âûï#9.#z ïyk¨ùê,ymì¹k£9¢$9¥m9ieùíæ¹."ˆRH9fç¹«n8à ‚‚ˆÈÈÈŒ‹LLÈ8 %ŒLÍûï&Û]YH9£©y¢bùëá9g#yk£9¥m9ê/y¨.:"!újæ:hª:fª¹fç¹«n9/ë¹oªB‚¹ê/y¨.9ëá9g#yà®ˆŒLÌ9gî¹®¥ˆÍÍNØÙ9b,Û]YH9§ 9o£9. 9âbŒLÍH˜YY;ï#9.)¹¢¢‚‘Ô9o£9î£ŒLÍˆ:!ê¹båy¢ : ïy/ë¹oªy. :-mùí#yaiyæî9k®y )újeú+bxà •ŒLÌ{ïg•ŒLÍH9i)ú`ê9b!ºg 9¬`¹è®¹ké‚¹§"z$/yg,;ï#:)¥º)®º,áù®¤9o%yå*9.gùk£9¥m;ï#9/aº-ê]Ú9æ¡:/"yaizh!¹n£øà ya`ùí(9c(ù£¢9«"¸à ybkù§+9íd9ë¥øà Bº ã9c!y®ïù¨/9.©9¦$ú"!ùëbyí&¹¦ì¹íæ¹§"yi&¹`"ùcê¹§"yg*:`¢¹åc9âà9¡bù¢cy§ ùaî¹ãï¹æ¡9kéº,êˆYøà ¹§+:/*¹/ë¹«hûï&‚‚ŒKˆœËÌŒX[›Ûž[[Ý\ËLŒšœØ9¢¢ˆŒLÌ{ïg•ŒLÍˆ[[YH9¥.y¢$9f­9¨/9oª¹n£ú/"yai{ï#9­¢:fiˆ\Þ[˜È9êíº`'ú`(9¢$Ü˜\\ˆ:h!¹n£ù.#yfî¹k¦¸à y. :"+9¢,:k)HV:*©9ieú`,¹bkù§+9ëbzhª:fª¸à ‚Œ‹ˆœËÌK]ŒLÌKYš^X˜]ÚšœØ9æ¡9í¤újeúh$:)¯y¥.yå*ŒLÌÈ9æ¡0åÓ—Œ‹X9¦ì¹íæ»ï&Âˆ9.#ya£yå*:""¹æ¡9«ãùí&ˆ0åÌKŒˆ9/,9ë¥ûï#9.gù.#z ïzh$:)¯z-¡z`cˆ‹ŒL8à ‚ŒËˆœËÌŽ]ŒLÌËYXÛÛ›Û^K\™X˜[[˜ÙKšœØ9ç'ù«hùké¹/g‹ŒL9."ºfd;ï#:+ 9ª¥8à ycaùí&º"!Âˆ9b!ºacyaiycèú`ïy§ ùl zh »ï&ú""¹âb9cê¹§"H‹Œ{ïgŒL9¦ì¹íæ»ï#9kéºf¦ù.ãz ïycaùb,LH9.éy."¸à ‚ˆ9a`ùí(9c(ù§ ùo§¹kf9ª¥9 h¹oªxà#9§"ybjzi&9¦`¹¥n;ï"ú!ê¹båz*+yk¦¹mìºe¢øà#yæ¡XÝ]™H9âà9¡bûï&ù¬¤¹§"Bˆ9¦`¹¥n9¦`»ï#9¢,:k)HQ9æí9£©yb!ù£æøà zaãy¥¬9¥m9ä!¹o£:!ê¹båze¢ù¢,8à ybkù§+:e¢ù¢,9."y¨§y¥àz-ëú`ïy§ Âˆ9`g9«hº!ê¹båy¢,:k){ï#9.#ya£yaî¹ãï¹.#y¢hù¦`¹¥n9cnù¢ïÈL	HV9æ¡9 áy¬àxà ‚KˆœËÌ[XZ[‹šœØ9/ë¹«hùë+9."z)äº"l¹caùí&¹¦`º*©:+ ^Y\Œ˜:(çy`¦{ï#9.)¹g*:+ 9ª¥9¦`¹. 9/mBˆ9«hú)£ùc%¹ë+9.£;ï#ùë+9."z)äº"lˆ8à TÔ;ï#:`oùacz""¹kf9ª¥9ab:hkùé.ˆ˜Sˆ9¢%º-¡z`c¹¥¬9."ºfd8à ‚‹ˆ:!ê¹båHš{ï#Ü›Ýûï#ØÛÛ[[»ï#Ø[9¢ : ïy.#ya£yå*9¥m9.ïy *¹âjzfhùb%ùæ¡9.+znç¹åm¹æë¹ª&{ï#: #9¦+Âˆ:`$9. 9«å:/ ùkéºf¦ùdoy.+y¥n;ï#:`n: ïydoy.+y§ 9i&¹kf9­.ù *¹âjyæ¡9/cyïk¸à ‚Ëˆ9§d9¥¦{ï#ú(çy`¦ybkù§+9æ¡:e¢ù¥/¹¨§y.í¹¥.y¢$8à#9.îùajyd#ykéºf¦ú)äº"lº`ïz`e‹ŒŒ8à#{ï#9.#ya£ycê¹ç"Âˆ:f¢¹/#y.®¹¥n9b¨9..ú)ä¹ëbyí&»ï&ù.âúgh¹¥¡ù¨b9d#9«iy/ë¹«høà ‚Žˆ9bkù§+9¥éy§'ù¥.yå*9ãªyk­¹§+9g,9¥éy§'ûï#9.#ya£y.éHUÈ9¥éy§'ù£ä9¥ê{ï#ùní¹o£:-ê9¥éxà ‚ŽKˆ9bkù§+9bçyb*y.#ya£y¥¯:h&9ãc¹bcyª&z*&9mì¹k£9¢$;ï&ùcê¹§"yãc¹bíy¢$9b§ù¥/¹aiz ã9c!yo£9¢cyk£9¢$9íd9ë¥ûï#ˆ: ã9c!y.#z-¬ù¦`¹/çyåfzh&9ãcº)¥¹ê¥ûï#9.#y§ ùd#9¦`¹d'¹£¢y«(y¥n:"!ùãc¹bíxà ‚ŒLˆ:`&¹å*: ã9c!yb¨9aiy¥.y¢$[[Ü‹[›Ý[™È9k®zaãúh$9ª¨»ï&ù¢¯yãc¹b.8à y§d9¥¦ykí¹ë¬ze¢ùegù/oùå*ˆ˜[œØXÝ[Ûˆ›Û˜XÚûï#9®ïÈLˆ9¨/9¦`¹.#y§ ùab9¢hùb.;ï#ùkí¹ë¬xà ycê¹hg¹. 9cb¹ãc¹bíxà ‚ŒLKˆ:`,¹§d9¥¦{ï#ú(çy`¦ybkù§+9bcyab9ª¨¹§éy§ 9/c¹ãc¹bíyênºe¤ûï&ùnèùdbºfæy`#z"éyênºe¤ù.#z-¬ù.ãycëú` 9fç‚ˆ9æí9£©zh&9cå»ï#9.#y§ ùoh¹¢$9á(y¬åzeç:e¢y.gùá(y¬åzh&9cå¹æ¡9«nùl`8à ‚ŒL‹ˆ9bkù§+9¢,9¥eù.#ya£ydo9cêù. :"+ÜÙP˜]J
+X9æ¡9níº`l¹fç¹g,9g%¹­`yê"ûï#9/ë¹£¢H‹Œˆ9éä¹o£ˆ:(ªú""ˆ[Y[Ý]9o§¹bkù§+:h z.(¹fç¹mèy *¹g,9g%¹æ¡9ecúhc8à ‚ŒLËˆ9í¤újeùbkù§+9i&ºf£¹«­{ï#ùam¹.å¹bkù§+:e¢ù¢,9.#ya£y«ãùh-9acz,®ú(ç9®ïùë+9.£8à yë+9."z)äº"l»ï&ù."yd#Bˆ:)äº"lº`ïy/çyåfyåm¹bcHÔÔ;ï#9cê¹/§y§ 9¥¬9."ºfd9i/¹`/8à ‚ŒMˆ9éîúfi9fæù`"ù¥êymì¹.#ykf9g*9æ¡:""º!ê¹båz*+yk¦ˆÓH9í yk¦»ï#9à#ú)¯yfjÛÛœÛÛH9.#ya£y«ãù«(Bˆ:e¢ùegú`b¹¢,º`ïycl9aî¹`aúc+ú*©;ï#:`oùacy£ªz$âùç'ù«hùæ¡[[YH9ecúhc8à ‚‚¹¥¬9h§ˆ\ÝËÝŒLÍË\™YÜ™\ÜÚ[ÛœË\ÝšœØ;ï#9æë¹bcHH:h!y®+:*i¹­­z$âùoª¹n£ÈØY\¸à UŒLÌÂ‘V:h$:)¯z"!È‹ŒL8à zf,º ã9c!z`ê9b!¹kêùaixà y§+9g,9¥éy§'øà zfæH‹ŒŒ8à ybkù§+:"!ú)äº"lºeç:cmBº-ëùo¤xà yaky *ˆšH:`n9/cxà yë+9."z)äº"lº(çy`¦{ï#9.éycâˆŒLÍ¸à#Ô:-¬ùi(9cnúc+ù£¤¹¦kº`&¹¥.ù¤â¹¦`‚¹¨(y«hùfç¹mìº`n9¢ : ïxà#xà ¹¢`9§"H”È:"!ù®+:*iº`&º`cˆ›ÙHKXÚXÚØ;ï#9®+:*iˆKÎH:`&º`c»ï#˜Ú]Y™ˆKXÚXÚØ:`&º`c»ï&ùcé¹.éykéºf¦ùà#ú)¯yfj9ª¨¹§éz)äº"l»ï#ù¢ : ïzh z"!ùaj9lk9 )ù¢ : ïzh$:)¯{ï#¹§*ºaãyãï¹£ yî£9 )ùæ¡9å¢¹keøà yè-9g%¹¢%º/å9fçºcmy­¢9i,xà ‚‚ŠŠ¹.ãzg 9åfy¡#ÊŠ»ï&¹¦í9¥¬9bcymì¹í¤ùcê¹bjH]]ÐÛÛ™šYËœÚÚ[H››Ü›X[˜8à y.%9¬¤¹§"y/çykf:`c‚˜ŒLÍ“\ÝÚÚ[9æ¡:""¹kf9ª¥;ï#9á(y¬åyk¢yaj9ã'9fç¹ãªyk­¹.éybcz`n9dê¹`"ù¢ : ï{ï#9.ãzg 9ãªyk­ºaãy¥¬º`n9. 9«(xà ¹aj9lk9 )ù¢ : ïzh$:)¯yæ¡9ânyk¦¹¢bùªgù¡hù )ù£l¹båyè-9g%¹.ãy§*º ïzaãyãï»ï#:"éya£yaî¹ãïºg :) Bº'¨¹nezc!9olz"!ùªgùg¢ûï#ùà#ú)¯yfj9âb9§+8à ‚‚ˆÈÈÈŒ‹LLˆ8 %ŒLÍ»ï&º!ê¹båy¢ : ïyêâùclùkf9ª¥8à zf.ù«hº*+yk¦º(ªù­%ùfç¹¦k¹¥.øà z(ç:ob¹§ 9i%¹li9oêùcå¹i,y¥b‚¹¥¬9h§ˆœËÌÌK]ŒLÍ‹X]]ËX˜]KYš^šœØ;ï#9.)¹£©z`,ˆœËÌŒX[›Ûž[[Ý\ËLŒšœØ;ï&Â˜—ÐTÔÑUÕ‘T”ÒSÓ˜9caùb,LÍ˜;ï#9d#9¦`¹¢¢ˆ[™^š[:/"yaiHØY\ˆ9æ¡9í¬¹g`9¥.y¢$˜œËÌŒX[›Ûž[[Ý\ËLŒšœÏÝLLÍ˜8à º`&y. :/*¹¬¤¹§"y/ë¹¥.HœËÌ[XZ[‹šœØ8à ‚‚ŒKˆ
+Š¹/ë¹£¢HØY\ˆ:!ê¹mìy¬¤¹§"yâb9§+:&gùæ¡9¨.y§+9oêùcå¹¯#ù­'ŠŠ»ï&•ŒLÍÕŒLÍH:få¹á-¹mì¹í¤ú+¤ÂˆØY\ˆ9aiú`ê9æ¡9kd:,áù®¤9íly. :-çú$eÈ—ÐTÔÑUÕ‘T”ÒSÓ˜;ï#9/aˆØY\ˆ9§+:.ªù.ãy¦+Âˆ9á(yâb9§+9í¬¹g`8à ¹¢bùªgùcêº) yoêùcåº""ˆØY\»ï#9l,y¬.:`h9ç"ù.#yb,9¥¬9n.9¥n:"!ù¥¬]Ú8à ‚ˆŒLÍˆ9o§ˆ[™^š[9§ 9i%¹li9o-ùb-¹b-ù¥¬ØY\»ï#9è®¹/çyké¹ªgú ïyç'ù«hù¢ïùb,9/ë¹«høà ‚Œ‹ˆ
+Šº!ê¹båz(c9båz`n9¤áù¥.yà®¹åm¹."ùêâùclùkf9ª¥
+Š»ï&¹ãªyk­¹g*:!êº* ¹."ù¢âz`n9e«ºnç¹b,9¢ : ïy¦`»ï#ˆ9êâùb.ùd#9«iH]]ÐÛÛ™šYØ9.)¹do9cêÈØ]™QØ[YJ
+X;ï#9.#ya£ycê¹ëby§ 9o£9æ¡8à#9ieùå*9.)¹egùbåxà#xà ‚ˆ9ieùå*9£"zb%ycé¹b¨Ø\\™H:f£¹«­y/çzfª»ï#9fè9«i9a`ùí(9c(ù¦`¹¥n;ï#ùnèùdbˆÜ˜\\ˆ9£ä9bcH™]\›‚ˆ9¦`»ï#9mìº`n9æ¡9¢ : ïy.gù.#y§ ù¥m9ëa¹­¢9i,xà ‚ŒËˆ
+Šº*&:c!9ãªyk­¹¦#¹è®¹¡#ùg%ŠŠ»ï&¹«ãù`"ú)äº"l¹§ ù/çykfŒLÍXÝ[Û’[[;ï"9¦kº`&¹¥.ù¤â»ï#Âˆ:f,¹é©»ï#ù¢ : ï{ï"z"!ÈŒLÍ“\ÝÚÚ[8à º""¹âbÜ[]P]]ÔÚÚ[Ü[ÛœÊ
+X9d#9«iz"éy¢¢‚ˆ9. 9`"ù.ãyá-¹mìº(çy`¦xà ymì¹kn9§ ù.%9cëú!ê¹båy¥¯y¥/¹æ¡9¢ : ïz*©9­%ù¢$›Ü›X[;ï#ŒLÍˆ9§ ù h¹oªBˆ9ãªyk­¹§ 9o£9¦#¹è®º`n:`c¹æ¡9¢ : ï{ï&ùãªyk­º"éy¦#¹è®º`n9¦kº`&¹¥.ù¤â»ï#9íey.#y§ ú(ªú!ê¹båy¥.y¢$9¢ : ïxà ‚ˆ
+Š¹.éykéºf¦ù£¤¹aiz(c9båy/aùb%ùæ¡9íd9§§9`f¹§ 9o£9¨(y«hÊŠ»ï&¹cê¹§"yg*9¢ : ïykf9g*8à ymìº(çy`¦xà Bˆ9mì¹kn9§ øà zhg¹g¢ùa`z*,y.%9æë¹bcHÔ:-¬ùi(9¦`»ï#:"éz""¹o%y¤ã¹.ãy£¤¹aiH›Ü›X[;ï#9¢cy¢¢‚ˆ]Y]YY^Y\XÝ[ÛœØ9¨(y«hùfç¹ãªyk­º`n9æ¡9¢ : ïxà ¹.îù/eyd"9¬åzfd9b-º`ïy.#y§ ú(ªùîgº`c¸à ‚ˆ9d#9¦`º(ç9."º""¹o%y¤ã¹ï.¹l$yæ¡8à#9.ãyg*:(çy`¦y«!8à#yª¨¹§é{ï#:`oùacy«¦9åfz*+yk¦¹cãz`c¹/¡¹¥¯y¥/¹§*º(çy`¦Bˆ9æ¡9¢ : ïxà ‚Kˆ
+Š¹¢`9§"y¦kº`&¹¥.ù¤âº`ïy§"ycëú/ª:+f9c§ùfè
+Š»ï&º*+yk¦¹§+:.ªù¦+ù¦kº`&¹¥.ù¤â¹¦`¹§ ù¦#¹è®¹£ä9é.‚ˆ8à#Ô9aaz-¬ù.#y§ ú!ê¹båy¥.y¥/¹¢ : ïxà#{ï&ÔÔ9.#z-¬ù§ úhkùé.¹æë¹bcy`/;ï#ù¢ : ïy­¢: %ûï&ù§*º(çy`¦xà Bˆ9§*¹kn9§ øà z,áù¥¦z`n¹i,xà zhg¹g¢ù.#y¥+ù£í9.gùd!9§"yãj9êâú*"¹ køà ˜œËÌÌ]ŒLÍKYš^\ËšœØˆ9g*ŒLÍˆ9kf9g*9¦`¹§ ù`g9«hº""¹fçºibùli;ï#:`oùacyæî9d#:*"¹ kúaãz)!ùajy«(xà ‚‚ŠŠºjeú+bJŠ»ï&¹ål9båyæ¡9."y¥+È”È9aj:`ê:`&º`cˆ›ÙHKXÚXÚØ;ï#Ú]Y™ˆKXÚXÚØ:`&º`c»ï&Â¹cé¹å*›ÙH9§ 9l#ù¢,:k)yä¬9h ú`$:h!ygíú(c9ç'ù«hùæ¡ŒLÍˆÜ˜\\»ï#9è®º*£{ï&ŠJHÔ:-¬ùi(9/a‚º""¹o%y¤ãºc+ù£¤¹¦k¹¥.ù¦`¹§ ù¨(y«hù¢$9¢ : ïxà JŠHÔ{ï#ù­¢: %ÌMy¦`¹í«y£ y¦k¹¥.ù.)¹cl9aîKÌMxà BŠÊH9ãªyk­¹¦#¹è®º`n9¦kº`&¹¥.ù¤â¹¦`¹.#y¤áz!ê¹£æù¢æøà J
+H:""¹d#9«iy¢¢¹§"y¥b9¢ : ïy­%ù¢$›Ü›X[¹¦`¹§ ù h¹oªxà JJH9."ù¢âz`n9¢ : ïyåm¹."ùêâùclú$/yæé8à JŠH9§*º(çy`¦y¢ : ïz(ªúf.ù¤âøà º`&y`"ùgíú(c¹ä¬9h ù¬¤¹§"ycëùå*Ú›ÛZ][{ï#9fè9«i9§+:/*¹¬¤¹§"yk¨ùê,y`fº`c¹k£9¥m9åjúghºnç¹¤â¹fç¹«n8à ‚‚ŠŠ¹¥è¹§"ykf9ª¥:fd9b-ŠŠ»ï&¹i ¹§§:""¹âb9mì¹í¤ù¢¢º*+yk¦¹¬.9.aykf9¢$›Ü›X[;ï#: #9kf9ª¥:(èyk£9aj9¬¤¹§"B¹åfy."ùab9bcz`n:`c¹dê¹`"ù¢ : ï{ï#9ê"ùo#ùá(y¬åyk¢yaj9ã'9®+9ãªyk­¹c§ù§+9 ìú`n9dê¹¢æûï"9fè9à®¹.gù§"y.®¹§ Â¹b.ù¡#ú`n9¦kº`&¹¥.ù¤â»ï"xà ¹¦í9¥¬9b,ŒLÍˆ9o£:g 9g*9a`ùí(9c(úaãy¥¬:`n9. 9«(y¢ : ï{ï&ùo§º`&y«(ze¢ùiâÂ¹§ ú*&9/cù¦#¹è®¹¡#ùg%»ï#9.#y§ ùa£yæo9å'ùd#9. 9ê+º,áù¥¦z`n¹i,xà ‚‚ˆÈÈÈŒ‹LLˆ8 %ŒLÍ{ï&º!ê¹båy¢,:k)yfçºibù¥.xà#9ç"ùíd9§§8à#xà y¢ : ïy/g9å*9l#z,hyª&yé.¸à z+mùæï¹®ïú(`:hkùé.¸à yëà9icùíly. KŒyéä‚‚¹¥¬9h§ˆœËÌÌ]ŒLÍKYš^\ËšœØ;ï"ÈÜÜËÌÍ‹]ŒLÍKYš^\Ë˜ÜÜØ;ï"9mì¹£©z`,ˆØY\»ï#˜—ÐTÔÑUÕ‘T”ÒSÓ˜9. 9/mycaùb,LÍX;ï"xà ‚‚ŒKˆ
+Š¸à#9¢$yo¢9è®¹k¦¹§"TÔ;ï#:!ê¹båy¢,:k)z`¡9¦+ù/oùå*9¦kº`&¹¥.ù¤â¸à#JŠ»ï&¸¦¨;î#È
+Š¹g*9.o¹­ê9ä¬9h ù."Âˆ:aãyãï¹.#yaî¹/¡ŠŠ¸à º*iº`c¹fæùê+¹ áyh ûï"9e«º)äº"l¸à yë+9.£:)äº"l¸à z-l9ç'ù«hùæ¡9a`ùí(9c(úgh¹§oÂˆ:*+yk¦¸à ykf9ª¥8¡¤ºaãy¥¬:/"yaiyæ¡9o :/å;ï"yaj:`ê:`ïy«hùn.9¥/¹¢ : ï{ï#Þ[˜Ð˜]P]]ÔÙ][™ÜÊ
+Xˆ9.gù¬¤¹§"y¢¢º*+yk¦¹­%ù£¢xà ‚‚ˆ
+Š¹/aº`&y. :/*¹¢o¹b,9.¡ˆŒLÍ9`f¹¬åy§+:.ªùæ¡9ï.ºfmù.)¹/ë¹ioJŠ»ï&•ŒLÍ9¦+ùg*9c§ùaïyo#ú-äBˆ8à#9.bùbcxà#z!ê¹mìz)!ú(ïy. 9.ïyo%y¤ã¹æ¡9fæù`"ùb)9¥­ù¨§y.í¹c®ÊŠºh$9®+
+Š¹§ ù.#y§ ú` 9fç¹¦k¹¥.øà ‚ˆ9cêº) yo%y¤ã¹fè9à®¹§ä9`"ù¬¤º(ªú)!ú(ïyb,9æ¡9ä!¹å,z` 9fç»ï#:h$9b)9l,y§ ùaj:`ê:`&º`c¸à y.à:n¯:`ïBˆ9.#ycl8 %8 %9ãªyk­¹ç"ùb,9æ¡:`¡9¦+ú#ªùd#yam¹i¦yæ¡9¦k¹¥.øà ¹/oùå*: !z`&y«(yæ¡9fç¹h,y«hù¦+ú`&yê+‚ˆ9l#y.#y."¹æ¡9 áy¬à{ï"Ô9¦#¹¦#¹i(;ï#9¢`9.éHÔ9b)9¥­ù.#y§ ú)î9æo;ï"xà ‚ˆŒLÍH9¥.y¢$
+Š¹k£9aj9.éykéºf¦ùíd9§§9à®¹®¥ŠŠ»ï&¹ab:*&9."ùãªyk­º*+yk¦¹æ¡9¢ : ï{ï#:+¤ùc§ùaïyo#Âˆ9áiùn.:-ä{ï#:-äyk£9æí9£©yç"È]Y]YY^Y\XÝ[ÛœØ:(èykéºf¦ù£¤º`,¹c®ùæ¡:(c9båy¦+ù.à:n¯8à ‚ˆ9cêº) xà#:*+yk¦¹æ¡9¦+ù¢ : ïxà ykéºf¦ù£¤º`,¹c®ùæ¡9cnù¦+ù¦kº`&¹¥.ù¤â¸à#yl,y. 9k¦¹§ ùcl:*ª¹¦#¸ %8 %ˆ: ïyl#y."¹mì¹çéyc§ùfè9l,ycl9amújå9c§ùfè;ï#9fæù`"ú`ïyl#y.#y."¹l,y¦#º+&ÊŠ¸à#9c§ùfè9.#y¦#¸à#y.)‚ˆ:fa9."¹ëbyí&»ï#ÔÔ;ï#úhg¹g¢ùëbyb)9¥­ù¥n9`/
+Š»ï#:*âù/oùå*: !y¢¢º`¨ù. :(c9fç¹h,yfç¹/¡¸à ‚ˆ:`&yª(ù.#yë¨yo%y¤ã¹à®¹.à:n¯:` 9fç»ï#:`ïy.#y§ ùa£y§"zgg:næ9i,y¥eøà ‚ˆ;ï"ŒLÍ:`¨ù«­zh$9®+9o#ùæ¡:`£ú/+ùmì¹o§ˆœËÌŽX9¥m9«­yéîúfi;ï#:`oùacyajy.ïyd#9¦`¹cl:aãz)!ú*"¹ køà »ï"B‚Œ‹ˆ
+Š¹¢ : ïz) zhkùé.¹/g9å*9l#z,hz"!ù¥n:aãÊŠ»ï&¹¥¬9h§ˆÙ]ÚÚ[\™Ù]ØÛÜSX™[
+
+X;ï#ˆ9l#yáiÈœËÌX9æ¡Ù]ÚÚ[\™Ù]Ê
+X9kéºf¦ú(c9à®»ï":`¨ù¢cy¦+ùç'ù«hù¬n¹k¦¹¢dùb,:*¬ˆ9æ¡9g,9¥®{ï"yå(¹å'ùª&yìi;ï&˜Ú[™ÛX8¡¤¹¥my¥®y. 9.®¸à XšX8¡¤¹¥my¥®y."y.®¸àîùd#9£¤¹mé¹.+ycìøà Bˆ›ÝØ8¡¤¹¥my¥®y¥m9£¤¸à X[8¡¤¹¥my¥®yaj:jå8à X[X8¡¤¹¢$y¥®y. 9.®¸à X[P[8¡¤¹¢$y¥®yaj:jå8à BˆXY[X8¡¤¹¢$y¥®zfhù.¨y. 9.®¸à X›Û™X8¡¤º!êº.ªøà ¹."y`"ùg,9¥®z`ïz(ç9."»ï&‚ˆH9¢bùbåy¢,:k)yæ¡9¢ : ïy¨/;ï"Ü[]TÚÚ[]ZXÚÐ˜\˜9c!y. 9li;ï#9g*9­¢: %ÔÔ9."ºgh¹b¨9. :(c;ï"BˆH:!ê¹båy¢,:k)z*+yk¦¹æ¡9¢ : ïy."ù¢â{ï":`n:h!y¥¡ùkeùo£:gh¹b¨:*.ú*&;ï"BˆH:`n9ioy¢ : ïz-ìùb,:`n9æë¹ª&y¦`¹æ¡9£ä9é.¹b%ûï"Ù]˜]U\™Ù]Ù[XÝ[Û“[ÙXÂˆÙ]˜]P[U\™Ù]Ù[XÝ[Û“[ÙX9c!y. 9li;ï"Bˆ9ë)¹d¤¹.gù. 9/my¥+ù£í;ï"9k ù`$y.#yg*ÚÚ[]X˜\ÙX:(è{ï#9¢`9.éHœËÌØ9i&¹¦­:g,¹.¡‚ˆ9. 9`"ÈÚ[™ÝËŒLÌ‘Ù][\ÛX[‘Yš[š][Û˜9íiº`&z`¢¹§é{ï"xà ‚ˆ
+Šº.*yb,9æ¡9gdJŠ»ï&˜Ø]]ÔÙ][™ÜÐXÝ[Û”Ù[XÝ:`&yno¹`"ÈÙ[XÝ˜:e¢ùh-9l,z(ªÂˆ[š]Ý\ÝÛQ›ÜÝÛŠ
+XØXZÙTÙ[XÝ˜[YT™XXÝ]™J
+X;ï"œËÌ[XZ[‹šœÎÌ˜;ï"Bˆ9£æù¢$9.¡º!êº* ¹æ¡9`aù."ù¢â{ï#9åjúgh¹."¹ç"ùo¥ùb,9æ¡9¦+ùcé¹i%¹®,¹§äùæ¡:`¨ù.ïy®!ye«»ï#: #9k ÊŠ¹cê¹§"Bˆ9g*˜[YX:(ªú*+yk¦¹¦`¹¢cy§ úaãy¥¬9®,¹§äÊŠ¸ %8 %9cê¹¥.HÜ[Û˜9æ¡9¥¡ùkeùk£9aj9.#y§ Âˆ9cãy¦(9b,9åjúgh¹."»ï#9oázh"9g*9¥.yk£9¥¡ùkeùo£:aãy¥¬9£!ù­/¹. 9«(H˜[YX:)î9æo:aãyîj¸à ‚ˆ9cé¹i%¹ª&yìi9b.ù¡#ù.#yå*9¢ë:&gùkêøà#;ï"9d#9£¤¹mé¹.+ycìûï"xà#z #9¦+ùå*9.+znç»ï#9d)¹baùg*9."ù¢âz(èy§ Âˆ:+¢¹¢$8à#9a¬9¥âù. :e ûï"9¥my¥®y."y.®»ï"9d#9£¤¹mé¹.+ycìûï"{ï"xà#z`&yê+¹mè¹âà9¢ë:&gùo¢:fèú+ 8à ‚ˆ:*.ûï&¹kf9ª¥9kf9æ¡9¦+ÈÜ[Û˜9æ¡˜[Y{ï"9¢ : ïZY;ï"y.#y¦+úhkùé.¹¥¡ùkeûï#9¢`9.éyb¨:*.ú*&ˆ9.#y§ ùolzgïùkf9ª¥9¢%ˆÝ[˜[Y9b)9¥­øà ‚‚ŒËˆ
+Šº+mùæï¹g*9®ïú(`9¦`¹ç"ù.#yb,
+Š»ï&¹¨.yfè9¦+È\]TÚ[™ÛPÚ\˜XÝ\˜\œÊ
+Xˆ;ï"œËÌ[XZ[‹šœÎŒŒÎLØ;ï"y¢¢º(`9¨§ykë9n©¹ë¥ù¢$ÛX^;ï#:+mùæï¹baù¦+ÂˆYZ\˜Ù[8à XÚY\ÚY[ÛX^;ï#9ajz !yalyå*9d#9. 9`"ÈX^9gî¹®¥‚ˆ: #9.%:+mùæï¹¦+øà#9£©yg*:(`9¨§ycìú`¢¸à#yåjùæ¡8 %8 %9®ïú(`9¦`ˆ\˜Ù[9«hùioHL;ï#ˆ:+mùæïº-múnçº(ªù£ª9b,:(`9¨§y§ 9cìùíèù.bùi%»ï#9câ9fè9à®ˆšX˜\˜9¦+ÈÝ™\™›ÝÎšY[˜;ï#ˆ9¥m9«­yæoz"lº+mùæï¹æí9£©z(ªú(ày£¢xà ¹/§y/oùå*: !y£!ùk¦¹æ¡9`f¹¬åy/ë»ï&º(`9¨§yd£:+mùæï¹¥.y¢$9¥/º`,‚ˆ9d#9. 9`"øà#9î/zemùn©¸à#y£"y«å9/¢ùb!ºac{ï"9î/zemÈHX^
+È:+mùæïºaãûï"{ï#9®ïú(`9¦`º(`9¨§y§ Âˆ9o 9mé¹î+¸à yên¹aî¹æ¡9/cyïk¹«hùioyhg¹."ùëby`/:+mùæï»ï#9ajy«­yb¨:-mù/¡¹bfùioyhjù®ïù¥m9¨§xà ‚ˆ9¬¤¹§"z+mùæï¹¦`¹b!¹«ãyl,y¦+ÈX^;ï#:(c9à®º-çùc§ù§+9k£9aj9. 9ª(øà ‚ˆ9ké¹®+;ï&›X^LL8à y®ïú(`8à z+mùæïˆML8¡¤ˆ:(`9¨§H‹Éxà z+mùæïˆY‹ÉBˆ9këÌËŒÌÉ{ï&ù¬¤º+mùæï¹.%9bjH	H:(`8¡¤ˆ:(`9¨§H	xà z+mùæïˆ	{ï"9í«y£ yc§ùª(ûï"xà ‚‚ˆ
+Š¹¢`9§"yaî¹¢bûï#ùfç¹d":e¤úf¥9íly. KŒH9éäŠŠ»ï&˜ŒLÌWÔ‘TÓÓ‘WÑSVWÓTØˆML8¡¤ŒLL;ï#9¢ : ïyd#yê,yo¯yêè9hïydoz-çú$eÈLŒ8¡¤ŒL;ï"9oázh"9l#ù¥¯:e¤úf¥;ï#9d)¹baù."¹. 9/cBˆ9æ¡9âny¥b9§ ú-ê9b,9."ù. 9/cyaî¹¢bûï"xà ‚ˆ
+Š¹cé¹i%¹/ë¹ioy. 9`"ùc§ù§+9l,ykf9g*8à z`&y«(zaãù®+9¢cyæo9ãï¹æ¡9.#y. :!í
+Š»ï&¹cê¹¢¢º`¨ù`"ùn.9¥nˆ9¥.y£¢z`¡9.#yi(9®¥¸ %8 %9k¨ùdbºf£¹«­y§+:.ªù.gù§ ú"¬y¦`ºe¤ûï"9«ãù`"ú!ê¹båz)äº"l¹§ ùí¤ú`c‚ˆ™YÚ[Ú\˜XÝ\•\›˜9æ¡ML\È:!ê¹båyaî¹¢bùníº`l»ï#9b¨9."ˆš[š\Ú^Y\XÝ[Û˜ˆ9k¨ùdb¹b!¹¥+ùæ¡UWÑPÓT‘WÐQSÑWÓTØL\ûï"{ï#9¢`9.éxà#9fç¹d":e¢ùiâø¡¤¹ë+9. 9/cBˆ9aî¹¢bøà#ykéºf¦ù."¹§ ú+¢¹¢$LL
+Ì8¢bML\ûï#:-çùam¹.å¹«ãù«iyl#y.#zob»ï"9ké¹®+9ë+9. 9«iBˆMLÛ\øà yo£:gh¹«ãù«iHLM[\ûï"xà ¹¥.y¢$9.éxà#:`&y. 9fç¹d":e¢ùiâùæ¡9¦`ºe¤únç¸à#yà®ºc*;ï&‚ˆ9ëbyo¡y¦`ºe¤ÈHLL8¢$»ï"9k¨ùdbºf£¹«­ymìº"¬y£¢yæ¡9¦`ºe¤ûï"{ï#9.#z-¬ùl,y.#ya£yëbxà ‚ˆ9ké¹®+9/ë¹ioyo£9¥m9h-9«ãù. 9«iz`ïy¦+ÈLLŸŒLMÛ\ûï#9k£9aj9. :!í;ï&ùk¨ùdbºf£¹«­z"éy§+:.ªùl,Bˆ:-¡z`cˆKŒH9éä»ï"9¢bùbåz)äº"l¹ 'z  ùo¢9.a{ï"{ï#9ëbyo¡y§ ú+¢¹¢$;ï#9ãªyk­¹. 9£"yk£9l,yêâùb.Âˆ9íd9ë¥ûï#9.#y§ ùa£yá(z+ ¹i&¹ëbxà ‚‚ŠŠºjeú+bJŠ»ï&˜›ÙHKXÚXÚØ9aj:`ê:`&º`c¸à T^]ÜšYÚ9aj9ê"úfíˆYÙY\œ›Ü˜;ï&Â¹."º/ì9«ãù. :h!z`ïy§"yké¹®+9¥n9keûï":)¢ùd!:h!z*ª¹¦#»ï"{ï&ù.)¹.%9fç¹«n:jeú+by.¡ˆŒLÍ9æ¡9fæúh!z(c9à®‚»ï"9¢bùbåz)äº"l¹£!ù.é9b%ù§ úhkùé.¸à yë)¹d¤¹båyåjú$/yg*9d!:!ê¹chyâaÈÌWX8à ynªùkf:h$9åfxà Bº ã9c!z/å9fçºcmy."y¨§z-ëùo¤{ï"z`ïy¬¤¹§"z(ªú`&y«(y¥.ybåyè-9hç¸à ‚‚ŠŠ¹mì¹çézfd9b-ŠŠ»ï&¹ë+H:nç¹¬¤¹§"yç'ù«húaãyãï»ï#9cê¹¦+ù¢¢¸à#:gg:næ9i,y¥eøà#z+¢¹¢$8à#9. 9k¦¹§ ú*ª¹¦#‚¹c§ùfè8à#xà ºg :) y/oùå*: !y®!yoêùcå¹o£9a£z-äy. 9«({ï#9¢¢¹¢,:k)yí :c!:(èz`¨ú(c8¦¨;î#È9fç¹h,yfç¹/¡¹¢cz ïB¹k¦¹/cxà »ï"9.gù§"ycëú ïy."¹«(yfç¹h,y¦`¹/oùå*: !y.ãyg*:-äHŒLÌÈ9æ¡:""¹oêùcå»ï#9fè9à®ˆŒLÍ9æ¡¹âb9§+:&gù/ë¹«hù«hù¦+ú`¨ù. :/*¹¢cyd"9/myæ¡8à »ï"B‚ˆÈÈÈŒ‹LLˆ8 %ŒLÍ;ï&¹/ë¹oªHˆ:h!yfç¹h,yecúhc;ï"9am¹.+Hˆ:h!yæ¡9ç'ù«hùc§ùfè9¦+ùoêùcå¹âb9§+:&gùoæ9.¡¹b¨;ï"B‚¹/oùå*: !yfç¹h,Hˆ9`"ùecúhc8à ŠŠº*¯ù§éyo£9æo9ãï¹am¹.+z!ìùl$Hˆ:h!y¨.y§+9.#y¦+ù¥¬Yûï#: #9¦+ù/oùå*: !B¹æ¡9à#ú)¯yfj9o§¹/¡¹¬¤¹¢ïùb,9ab9bcymì¹í¤ùd"9/myæ¡9/ë¹«hÊŠ¸ %8 %:*lú)¢ù."¹¥®xà#9ìîùíly§­¹©âúaãznç¸à#LKŒˆ9ëà¹¥¬9h§¹æ¡:`¨ù«­xà º`&y«(zfi9.¡¹/ëˆYûï#9.gù¢¢¹âb9§+:&gùªgùb-¹c%»ï"9e«¹. 9n.9¥n;ï"z`oùacya£yâ«øà ‚‚ŒKˆ
+Š¹b*ºfi:)äº"l¹o£9bkù§+9«(y¥n9¬¤¹§"zaãyïkŠŠ»ï&¹bkù§+9«ãù¥éy«(y¥n9kf9g*
+Š¹ãj9êâùæ¡ØØ[ÝÜ˜YÙBˆÙ^JŠ»ï"ŒLÌ—ÙZ[WÙ[™Ù[Û—ÜÝ]X;ï"{ï#: #9b*º)äº"l¹å*9æ¡™\Ù]Ø[YJ
+Xˆ;ï"œËÌ[XZ[‹šœÎŽLØ;ï"ycê¹®!HÐU‘WÒÑVX:-çùajy`"ú""¹âb9kf9ª¥Ù^{ï#9o§¹/¡¹¬¤¹è¬:`c‚ˆ:`&y`"ÈÙ^xà ¹/ë¹¬åyb.ù¡#ÊŠ¹.#yc®ùc!H™\Ù]Ø[YJ
+X
+Š»ï"9k ù¦+ùabÛÛ™š\›J
+X9a£BˆØØ][Û‹œ™[ØY
+
+X;ï#9c!yg*9i%ºgh¹§ ú+¢¹¢$8à#9/oùå*: !y£"ycå¹­¢8à z,áù¥¦ycnùmìº(ªù®!y£¢xà#{ï"{ï#ˆ9¥.y¢$9g*œËÌØ:/"yaiy¦`¹b)9¥­øà#9æë¹bcyk£9aj9¬¤¹§"y.îù/ez)äº"l¸à#{ï"™[ØY9o£ØYØ[YJ
+Xˆ9¢o¹.#yb,9kf9ª¥;ï#^Y\‹šY9¦+ùên¹keù.,»ï"yl,zh!¹¢bù®!y£¢z`&y`"ÈÙ^H:-çÂˆŒLÌWÙ[[Y[Ø›ÞÜÝ]X8à ‚Œ‹ˆ
+Š¹bkù§+9«(y¥n:fd9b-º) yí«y£ zeç:e¢JŠ»ï&¹."¹. 9âb9cê¹g*8à#9kêùaixà#yêëûï"X\šÑ[™Ù[Û•\ÙY;ï"Bˆ9¤âù.¡ˆS‘ÑSÓ—ÑRSWÓSRUÑSP“Q9¥åùª&{ï#
+Š¸à#:+ 9cå¸à#yêëûï"\Ñ[™Ù[Û]˜Z[X›Xˆ:-çÈ[™Ù[Û‘[žPØ\™;ï"y¬¤¹¤âÊŠ¸ %8 %9¢`9.éy¥åùª&zeç9£¢y.bùbcyl,ymì¹í¤ùkf:`,¹c®ùæ¡ˆ\ÙYYX9§ ùîo9î£:+¤ù£"zb%y¬.9.aH\ØX›Y9b,:f¥9i*xà ¹¥¬9h§ˆ\Ñ[™Ù[Û•\ÙYÙ^J
+Xˆ:+¤ú+ 9kêùajyêëú`ïyç"ù¥åùª&{ï#9.)¹¢¢¹åjúgh¹n¥z`ê:`¨ú(c9kêù«nùæ¡8à#9«ãù¥éycêº ïy£$y¢,y«(xà#y.gù¥.y¢$ˆ:-çú$eù¥åùª&yb!ù£æù¥¡ù¨b;ï":eç:e¢y¦`ºhkùé.¸à#8¦¦{î#È9®+:*i¹ª(yo#øà#{ï"{ï#9.#ya£z!ê¹æî9çæùæï¸à ºh!¹¢bù¢¢‚ˆ9í¤újeùbkù§+9chyâaù."º`¡9kêú$eú""¹ak9o#øà#L	xà#yæ¡:*ª¹¦#¹¦í9¥¬9¢$ŒLÌÈ9æ¡9kéºf¦ù`/;ï"L	{ï"xà ‚ŒËˆ
+Š¹¢,:k)xà#9ên¹¢ãyo¢9.axà#JŠ»ï&¹ç'ù«hùc§ùfè9¦+È\]PXÝ[Û’Yš\ÚXš[]J
+Xˆ;ï"[XZ[‹šœÎŒÌNN;ï"JŠ¹o§¹/¡¹¬¤¹§"z(ªÈ™YÚ[Ú\˜XÝ\•\›Š
+X9do9cêú`cŠŠ¸ %8 %ˆ9aj9l"9¨b9cê¹§"HÝ\\›˜;ï"9«i9¦`ˆ[™^9 a¹à®ˆ;ï"xà XÝ\™\ÛÛ][Û”\ÙX8à BˆÙÙÛP]]Ð˜]X9."z&ey§ ùdo9cêøà ¹¢`9.éycêº) H:&gú!ê¹båxà L{ï#Ìˆ:&gù¢bùbå{ï#9£!ù.é9b%Âˆ9g*9fç¹d"9. :e¢ùiâùl,z(ªùb)9k¦ºf¬z%ãûï#9.bùo£9¥m9`"ùk¨ùdbºf£¹«­z`ïy.#ya£y¦í9¥¬;ï&º/*¹b,9¢bùbåz)äº"l¹¦`‚ˆ9ãªyk­ŠŠ¹ç"ù.#yb,9.îù/ey£"zb%JŠ¸à y.à:n¯:`ïy.#z ïy`f»ï#9cêº ïy.o¹ëbH™YÚ[Ú\˜XÝ\•\›˜ˆ:(èz`¨ù`"ÈŒ9éä¹`$¹¥n:-äyk£9¢cz-ìøà#8£ì9¦`ºe¤ùb,8à#xà ¹. 9`"ù¢bùbåz)äº"lˆŒ9éä¸à yajy`"ùl,H9éä¸à ‚ˆ9/ë¹¬åy¦+ùc!y. 9li™YÚ[Ú\˜XÝ\•\›Š
+X;ï#9g*9c§ùaïyo#ú-äyk£9o£:(ç9do9cêù. 9«(Bˆ\]PXÝ[Û’Yš\ÚXš[]J
+X8à ¹/§y/oùå*: !y¬n¹k¦ˆ
+ŠŒŒ9éä¹`$¹¥n9§+:.ªù/çyåfy.#ybåJŠ¸à ‚ˆ9cé¹i%¹¢¢¹¢ : ïyd#yê,yo¯yêè9hïydoyo§ˆŒŒ\È9¥-¹b,LŒ\ø %8 %9c§ù§+9«å9«ãù«iHML\È:`¡:emûï#ˆ9."¹. 9/cyæ¡9âny¥b9§ ú-ê9b,9."ù. 9/cyaî¹¢bûï#9ç"ú-mù/¡¹§ øà#9å¢¹g*9. :-møà y *¹ *¹æ¡8à#xà ‚ˆ
+Š¹ë)¹d¤¹¬¤¹ecùæë¹ª&xà y."y`"ù.®¹å*9cnùcê¹§"y. 9`"ù.®¹g*9å*
+Š»ï&¹."y`"ùãj9êâùæ¡Yøà ‚ˆ
+JH\ÙU[\ÛX[Š
+X:-ìú`c¹.¡º`b¹¢,¹¥è¹§"yæ¡:`n9æë¹ª&y­`yê"ûï#9æí9£©ykêù«nÂˆÝ\™Ù]›[X;ï#\U[\ÛX[‘Y™™XÝ
+
+X9baù¦+ùa¬9l yë)ŠŠºfª9ªgÊŠ¹£$y. :f®ù *¸à Bˆ:f¬z.ªËùíd9åc9ë)¹kêù«nùcê¹íi¹¥¯y¬åz !z!ê¹mìxà ¹/§y/oùå*: !y¬n¹k¦¸à#9k£9aj9«å9áiù¢ : ïxà#{ï#9¥.y¢$9£©y."‚ˆ9¥è¹§"yæ¡Ù]˜]U\™Ù]Ù[XÝ[Û“[ÙX;ï#ØÙ[XÝ˜]U\™Ù];ï":`n9 *»ï"z"!ÂˆÙ]˜]P[U\™Ù]Ù[XÝ[Û“[ÙX;ï#ØÙ[XÝ˜]P[U\™Ù];ï":`n9¢$y¥®{ï"{ï#ˆ9.#z!ê¹mìz`(9. 9ieÈRxà ŠŠº.*yb,9æ¡9æî9k®y )ùgdJŠ»ï&˜Ù[XÝ˜]U\™Ù]
+
+X9k£9aj9.#y§éBˆÚÚ[]X˜\ÙX;ï#9¢`9.éz`n9 *º`¨ù¨§z-ëùæí9£©yl,z ïyå*9ë)¹d¤ˆY;ï&ù/aº`n9¢$y¥®z`¨ù¨§z-ëÂˆ;ï"Ù]˜]P[U\™Ù]Ù[XÝ[Û“[ÙX;ï#ØÙ[XÝ˜]P[U\™Ù];ï"z-çÂˆÙ]˜]PXÝ[Û‘\Ü^S˜[YJ
+X:`ïy§ ù§éHÚÚ[]X˜\ÙVØXÝ[Û•\WX9.)‚ˆ:) y¬`ˆ\™Ù]\X9¦+È[{ï#9ë)¹d¤ˆY9§éy.#yb,9l,y¥m9`"ùi,y¥b8 %8 %9¢`9.ézhcyi%º)¡¹kêù.¡‚ˆ:`&y."y`"ùaïyo#ûï#:`aùb,9ë)¹d¤ˆY9¦`¹¥.yå*9. 9`"øà#:emùo¥ù`ãù¢ : ïxà#yæ¡9d"9¢$9âjy.íº-l9d#9. 9ieùb)9¥­øà ‚ˆ
+ŠH
+Š¸à#9cê¹§"y. 9`"ù.®¹g*9å*8à#yæ¡9ç'ù«hùc§ùfè9¦+ùbåyåjù¢dúc+ùchyâaÊŠ»ï&‚ˆ[™ÙT^Y\Ø\™
+
+X:-çÈÚÝÔÚÚ[˜[YP˜YÙJ
+X9æ¡9§ 9o£9. 9`"ùcàù¥n:`ïy¦+ÂˆÚ\˜XÝ\’[™^;ï"9aiú`ê	
+˜˜]T^Y\Ø\™ŠÊÚ\˜XÝ\’[™^
+JX;ï"{ï#ˆ9c§ù§+9ajy`"ùdo9cêú`ïJŠ¹¬¤¹§"y`¬ÊŠ»ï#9¢`9.éy.#yë¨z*¬9¥¯y¥/»ï#9âny¥b9¬.:`h9¯%9g*:&gùchyâaù."¸à ‚ˆ9.£9."z&gú)äº"l¹am¹ké¹§"y«hùn.9íd9ë¥ûï"ÙÈ9§"ycl8à XY™ˆ9§"y."»ï"{ï#9cê¹¦+ùåjúgh¹ç"ú-mù/¡¹`ãù¬¤¹å*8à ‚ˆ;ï"9d#9. 9`"ùaïyo#ú(èyæ¡ÚÝÓZ\ÜÑY™™XÝ
+
+X9§+9/¡¹l,y§"y«hùè®¹`¬ûï#9¢`9.éxà#9åjùë)¹i,y¥eøà#Bˆ9cãz #9. 9æí9¯%9g*9l#yæ¡9chyâaù."»ï#9bfùioy¦+ùl#yáiùía8à »ï"Bˆ
+ÊH9nªùkf9¬¤¹§"zh$9åf{ï&¹k¨ùdb¹¦`¹cê¹ª¨¹§éy.#y¢høà yíd9ë¥ù¢cy¢hûï#9cê¹§"HH9o-yë)¹d¤¹¦`¹."y`"ù.®‚ˆ:`ïz ïyk¨ùdb»ï#9íd9§§9ab9¢bùå*9£¢xà yo£:gh¹ajy/cyæoyæoy­jº,®ùfç¹d"8à ¹¥.y¢$9k¨ùdb¹¦`¹¢¢¸à#:`&yfç¹d"ˆ9am¹.åº)äº"l¹mì¹í¤úh$9k¦¹æ¡9¥n:aãøà#y.gùë¥ú`,¹c®øà ‚ˆ
+
+H: ã9c!z(èznç¹ë)¹d¤¹§ ú-ìùaî¹. :haŠŠºj&y.®¹æ¡8à#9êoù¢-8à#y£"zb%JŠ»ï"9£"y.¡¹fè9à®‚ˆÙ][™[ÜžQ\]Z\Y[ÛÝ
+[\ÛX[ˆŠX9§éy.#yb,9«!9/cz #:gg:næ9i,y¥eûï"x %8 %ˆ9/§y/oùå*: !y¬n¹k¦¸à#9ë)¹d¤¹.#z ïyg*9¢,:k)yi%¹/oùå*8à#{ï#9cê¹¢¢º`&zha¹£"zb%z%ãù£¢xà ‚Kˆ
+Š¹a`ùí(9c(ú*+yk¦¹aî¹¢æùcnù. 9æí9¦kº`&¹¥.ù¤âŠŠ»ï&˜]]ÐXÝ[Û‘›ÜÚ\˜XÝ\Š
+Xˆ;ï"[XZ[‹šœÎŒŒŒÎKLŒX;ï"y§"H9`"ù¨§y.í¹§ ù¢¢º*+yk¦¹ioyæ¡9¢ : ïznæ:næ9.'ù£¢z` 9fç‚ˆ9¦k¹¥.ûï#: #9.%
+Š¹. :(c9¢,:k)yí :c!:`ïy.#ykêÊŠ¸à ¹am¹.+y§ 9n.:)¢ùæ¡9¦+È
+Š”Ô9.#z-¬ÊŠ¸ %8 %:!ê¹båBˆ9¢,:k)z-ëùo¤ymì¹í¤ù¢¢¹e§z%éz`£ú/+ù¥m9`"ùéîúfi;ï#9¢,:k)y.+yk£9aj9¬¤¹§"y.îù/eHÔ9fç¹oª{ï#ˆ\TÜÝ˜]P]]Ô™XÛÝ™\žJ
+X9câ9cê¹g*9¢,:k)yíd9§gùo£9.%:.ªù."¹§"z%éy¬-9¢cz(ç;ï#ˆ9¢`9.éHÔ9. :)¢ùn¥yl,y¬.:`h:` 9fç¹¦k¹¥.øà ¹l#yáiùía;ï&¹¢bùbåz-ëùo¤yæ¡Ø\Ý[XYÙTÚÚ[
+
+Xˆ
+Š¹§ ÊŠ¹cl8à#Ô9.#z-¬ûï#9¥.yå*9¦kº`&¹¥.ù¤â¸à ¸à#{ï#9cê¹§"z!ê¹båz-ëùo¤y¦+úgg:næ9æ¡8à ‚ˆ9/§y/oùå*: !y¬n¹k¦ˆ
+Š¹.#z!ê¹båye§z%éxà ycê¹¢¢¹c§ùfè9kêùaî¹/¡ŠŠ»ï#9ãï¹g*9§ ùcl9aî¹/¢ùi ‚ˆ8à#8¦¨;î#È9..ú)äTÔ9.#z-¬ûï"KÌM{ï"{ï#9á(y¬åy/oùå*8à#9§ ùoàù. 9¤â¸à#{ï#9¥.yå*9¦kº`&¹¥.ù¤â¸à ¸à#Bˆ;ï"9.)¹.%9å*\Ý™X\ÛÛˆ9c®úaã{ï#:emù¦`ºe¤ù£¦ùªgù.#y§ ù­%ùâb;ï"xà ‚ˆ
+Š¹cé¹i%¹§éz+by£ª9ïîù.¡¹. 9`"ùc§ù§+9.éyà®º) y/ë¹æ¡9§lz)oÊŠ»ï&¹§+9/¡¹.éyà®‚ˆÜ[]P]]ÔÚÚ[Ü[ÛœÊ
+X9l$y¯ïˆX[Ü™]š]™H9¦+ù`"ÈYûï#9kéºf¦ÈÜ™\9æo9ãï‚ˆ9k ù¤ãy/g9æ¡Ø]]ÔÚÚ[ÛYX;ï#ØØ]]ÔÚÚ[˜]X;ï#ØØ]]Ñ[˜X›Y9g*9ãï¹g*9æ¡ˆ[™^š[:(èJŠ¹¨.y§+9.#ykf9g*
+Š»ï":`&y.gù«hù¦+ÈÛÛœÛÛH9. 9æí9g*9cl8à#9¢o¹.#yb,9a`ùí(;ï&‚ˆ]]ÔÚÚ[ÛYxà#yæ¡9c§ùfè;ï"{ï#9¦+ú""¹âb9..ùgãºgh¹§oùæ¡9«¦9åfy«nùê"ùo#ùè¯;ï&ùãªyk­¹ç'ù«hùg*9å*9æ¡ˆØ]]ÔÙ][™ÜÐXÝ[Û”Ù[XÝ9å,HÝÚ]ÚÚ\˜XÝ\•X˜ØÝÚ]Ú]]ÔÙ][™ÜÐÚ\˜XÝ\˜ˆ9hjùaa{ï#
+Š¹§+9/¡¹l,y§"JŠ¹«hùè®¹¯ï¹£¢HX[Ü™]š]™xà ¹¢`9.éy¬¤¹§"yb¨9i&ºi&9æ¡9/ë¹«hûï#9cê¹g*ˆœËÌŽX9åfy."ú*.ú)èú*ª¹¦#¹§éz+byíd9§§8à ‚‹ˆ
+Šº ã9c!y¬¤¹§"z/å9fçºcmJŠ»ï&˜Ú[™[ÜžTYÙX9e+ù. 9æ¡:eç:e¢zcmBˆÛX\[™[ÜžSÝ™\›^PÛÜÙX:(ªÈÔÔûï"ÜÜËÌ[XZ[‹˜ÜÜÎMŒ;ï"yí y«nùcê¹g*ˆ›X\Z[™[ÜžK[Ý™\›^K[Ü[˜:`&y`"ÈÛ\ÜÈ9kf9g*9¦`ºhkùé.»ï#: #:`¨ù`"ÈÛ\ÜÂˆ
+Š¹cê¹§"HÜ[“X\[™[ÜžSÝ™\›^J
+X9§ ùb¨
+Š¸à º ã9c!y§"y."yê+º`,¹aiy¥®yo#ûï#9cê¹§"Bˆ8à#9o§¹g,9g%ºh xà#z`¨ùê+¹§ ùb¨8 %8 %9/oùå*: !y¢*¹g%¹¦+ùo§ŠŠ¹."ù¥®yl#º)¯yb%ÊŠº`,¹c®ùæ¡;ï#:`¨ù¨§z-ëùo¤Bˆ9k£9aj9¬¤¹§"y.îù/ez/å9fç¹£©ùb-ºh!xà »ï":`&y.gú)èúaâù.¡¹."¹. :/*¹¢$xà#9¢o¹.#yb,8à yá(y¬åzaãyãï¸à#x %8 %ˆ9åm¹¦`¹cê¹®+9.¡¹g,9g%º)¡º$âùli:`¨ù¨§z-ëùo¤xà »ï"y/ë¹¬å{ï&ÔÔÈ9¥.y¢$9g*Ú[™[ÜžTYÙX9. 9o¢Âˆ:hkùé.»ï":)¥º)®¹k£9aj9¬¯ùå*9c§ù§+:`¨ùía;ï"{ï#”È9/§y/oùå*: !y¬n¹k¦¸à#:/å9fç¹."¹. 9`"úh zgh¸à#{ï#9c!y. 9liˆÚÝÔYÙJ
+X:*&:c!9bcy. :h {ï#9£"zb%z(c9à®¹¥.y¢$9."z`n9. ;ï&º)¡º$âùli:e¢ú$eø¡¤ºeç:)¡º$âùli;ï#Âˆ: ã9c!z(ªù`'ú`,º)äº"l¹ob9ê¥ø¡¤ºeç9ob9ê¥ûï#ùd)¹baø¡¤¹fç¹."¹. :h xà ŠŠº`&z(èz.*yb,9. 9`"ùgdJŠ»ï&‚ˆ9. :e¢ùiâøà#9§"y¬¤¹§"z(ªù`'ú`,¹ob9ê¥øà#y¦+ùå*8à#9ob9ê¥ù¦+ù.#y¦+ùcëú)¢øà#yb)9¥­ûï#9i*¹kë:k!¸ %8 %9cêº) Bˆ9åjúgh¹."¹bfùioy§"y.îù/eHÛYKY™X]\™H9ob9ê¥úe¢ú$eûï"9clù/oú-çú ã9c!yá(zeç;ï"{ï#9£"z/å9fç¹l,ycê¹§ Âˆ:eç9£¢z`¨ù`"ù.#yæî9nl¹æ¡9ob9ê¥øà z ã9c!zh yåfyg*9c§ùg,;ï"9ké¹®+:aãyãï»ï"xà ¹¥.y¢$9å*ˆÛYQ™X]\™S[Ù[›ÙK˜ÛÛZ[œÊ[™[ÜžTYÙJX9ª¨¹§éyç'ù«hùæ¡9â-¹kd:eç9/à¹¢cyì¯¹®¥¸à ‚‚ŠŠ¹¥¬9h§¹ª¥9¨b
+Š»ï&˜œËÌŽK]ŒLÍYš^\ËšœØ8à XÜÜËÌÍK]ŒLÍYš^\Ë˜ÜÜØ»ï"9mì¹£©z`,ˆœËÌŒX[›Ûž[[Ý\ËLŒšœØ9æ¡ØY\»ï"xà ‚‚ŠŠºjeú+by¥®yo#ÊŠ»ï"9aj:`ê^]ÜšYÚ9ké¹®+;ï#:fíˆYÙY\œ›Ü˜;ï"{ï&‚‹H9âb9§+:&gûï&¹è®º*£H9`"ÈØY\ˆ9¬ê9aiyæ¡ØÜš\Û[šÈ9aj:`ê9n-ˆÝLLÍ;ï#ˆÜš]HÚ[šÈ9«hùè®¹í«y£ zaæ9«nú""¹âb9§+;ï#œËÌ[XZ[‹šœÏÝLLÌ˜9è®º*£yaiùk®yç'ùæ¡ˆ9¬¤º+¢º`c¹¢`9.éy.#yå*9båB‹H9bkù§+9«(y¥n;ï&¹ab9¢¢ˆŒLÌ—ÙZ[WÙ[™Ù[Û—ÜÝ]X9kêù¢$9."y`"ú`ïH\ÙYYX9a£Bˆ™[ØY;ï#9è®º*£y."yo-ychyâaú`ïy¬¤¹§"xà#9.â¹¥éymì¹k£9¢$;ï#ù.â¹¥éymì¹£$y¢,8à#xà X\ØX›Y9¥n9à®ˆ8à Bˆ9§"xà#9®+:*i¹ª(yo#øà#ykeùª(ûï&ùa£yå*
+Š¹ç'ù«hùæ¡™\Ù]Ø[YJ
+X
+Š»ï"9.#y¦+ù¢bùbåyb*ˆÙ^x %8 %ˆ9¢bùbåyb*¹§ ú(ªÈ[›ØY9¦`¹æ¡:!ê¹båykf9ª¥:aãy¥¬9kêùfç¹c®ûï#:`&znç¹.gú.*z`c»ï"yè®º*£yb*º)äº"l¹o£ˆ9ajy`"ù`m:`¢ˆÙ^H:`ïz(ªù®!y.o¹­ê‹H9¢,:k)yên¹¢ã{ï&Œ:&gú!ê¹båxà LH:&gù¢bùbå{ï#9ké¹®+:/*¹b,H:&gù¦`‚ˆ˜]PÛÛ[X[™›ÝË˜Û\ÜÓ\Ý˜ÛÛZ[œÊ˜˜]KZYZY[ˆŠX9à®ˆ
+Š™˜[ÙJŠ‚ˆ;ï"9/ë¹ioybcy§ ù¦+ÈYH8¡¤ˆ9.o¹ëbHŒ9éä»ï"B‹H9ë)¹d¤»ï&¹a¬9l yë)º`,¹aiz`n9 *¹ª(yo#ûï"9£ä9é.¹«hùè®ºhkùé.¸à#:`n9¤áÈù©mydàya¬9l yë)—xà#z #9.#y¦+Âˆ9c§ùiâÈY8à LÈ:f®ù *º`ïycëú`n;ï"x¡¤ˆ9£!ùk¦¹ë+È:f®È8¡¤ˆ9íd9ë¥ùo£
+Š¹cê¹§"z`¨úf®ÊŠº(ªùa¬9l xà Bˆ9cé¹i%¹ajzf®ù¬¤¹§"{ï&ùíd9åc9ë)º`,¹aiz`n9¢$y¥®yª(yo#È8¡¤ˆ9bkù¢bÐˆ9£!ùk¦¹íiˆ9..ú)äH8¡¤ˆ9íd9ë¥ùo£ˆY™ˆ9«hùè®º$/yg*9..ú)äH:.ªù."º #9.#y¦+ù¥¯y¬åz !{ï&ùbåyåjùcàù¥n9ké¹®+9à®ˆÌWXˆ;ï"9/ë¹ioybcy¦+ÈÝ[™Yš[™Y[™Yš[™YX9aj:`ê:$/yg*:&gùch{ï"{ï&ùcê¹bjHH9o-yë)¹d¤¹¦`‚ˆ9ë+9.£9`"ù.®º(ªù«hùè®¹¤âù."ù.)¹£ä9é.¸à#9bjy."ùæ¡9¥n:aãùmì¹í¤ú(ªú`&yfç¹d"9am¹.åº)äº"lºh$9k¦¹.¡¸à#B‹H:!ê¹båyaî¹¢æûï&”Ô9.#z-¬ûï#ù§*¹kn9§ ûï#ù¬®ùæ`ºhg¹."yê+¹ áyh ú`ïy§ ùcl9aî¹l#y¡âyæ¡8¦¨;î#È:*ª¹¦#»ï#ˆÔ:-¬ùi(9.%9mì¹kn9§ ù¦`¹.#y§ ùcl8à y.%9¢ : ïy«hùè®º`,¹aiH]Y]YY^Y\XÝ[ÛœØ‹H: ã9c!z/å9fçºcm{ï&¹."ù¥®yl#º)¯yb%ú-ëùo¤y§"z/å9fçºcmy.%9fç¹b,9."¹. :h {ï"˜Z[š[™ûï"{ï&ùg,9g%º)¡º$âùliˆ:-ëùo¤y.ãy«hùn.:eç:e¢z)¡º$âùli9.)¹åfyg*X\YÙ{ï&ù`'ú`,º)äº"l¹ob9ê¥ù¦`¹«hùè®ºeç:e¢yob9ê¥Â‹H9fç¹d"9ëà9icùfç¹«n;ï&ºaãy¥¬:aãÈY˜]SÙÊ
+X9¦`ºe¤ù¢,ûï#:`(ùî£È9fç¹d"9«ãù. 9«iz`ïyêjyk¦‚ˆ:$/yg*ŒKH9éä»ï#9è®º*£z`&y«(yæ¡™YÚ[Ú\˜XÝ\•\›˜9c!z(çy¬¤¹§"yè-9hç¹¥è¹§"yëà9icÂ‚ŠŠ¹mì¹çézfd9b-ŠŠ»ï&˜ÛÛœÛÛX9.ãy§ ùcl8à#9¢o¹.#yb,9a`ùí(;ï&ˆ]]ÔÚÚ[ÛYHÈ]]Ñ[˜X›YÂš\ÙTÝÛYHÈÜ\ÙTÝÛYxà#z`&ynoº(c8 %8 %:`¨ù¦+ù."ºgh¹ë+H:nç¹§éyb,9æ¡:""¹âb9..ùgãº!ê¹båBºgh¹§où«¦9åfy«nùê"ùo#ùè¯9g*9¢o¹mì¹í¤ù.#ykf9g*9æ¡9a`ùí(;ï#9á(yk¬ûï#:`&y«(y¬¤¹§"ybåyk ûï"9®!yä!¹k ùlk9¥¯¹ãj9êâùæ¡9¢ :(dù`­y¥m9ä!»ï#9.#yg*:`&z/*¹ëá9g#{ï"xà ‚‚ˆÈÈÈŒ‹LLˆ8 %ŒLÌûï&¹í¤ù¯çûï#úi"¹¢$9aj:ghºaãy¥¬:*+z*";ï"9caùí&¹¦ì¹íæ¸à y£¦ùªgÑV9¥b9ã¡øà yí¤újeùbkù§+8à yì¯º"ìKÐ“ÔÔù`#yã¡øà yea¹n¥ù`îy¨/:f£¹í&¸à z%éy¬-:acyïk»ï"B‚¹/oùå*: !z`&z/*¹íi¹.¡ºgg¹n.™XÚ\Ùyæ¡Lºnçº)£ù¨/;ï#9¨.9oàùæë¹ª&y¦+øà#9®ïùëbyí!ù`"ù§"9£¦ùªgúaãûï"Âº!ê¹båy£¦ùªgÑVÌ	{ï"ùí¤újeùbkù§+9. 9i*yí!L	y. 9í&»ï"ùea¹n¥ùç"ù§ :jæ:)äº"l¹ëbyí&»ï"ùéîúfi¹n.9¡bÌL	z(ç9dàxà#xà ¹¥¬9h§˜œËÌŽ]ŒLÌËYXÛÛ›Û^K\™X˜[[˜ÙKšœØ;ï"
+Â˜ÜÜËÌÍ]ŒLÌËYXÛÛ›Û^K\™X˜[[˜ÙK˜ÜÜØ;ï"y¢oú/"yi)ú`ê9b!¹¥.ybå{ï#œËÌXØœËÌØ¹d!:!ê¹l#ùnay¤í9aay¥è¹§"yæî:eç9aïyo#ûï#
+Š¹k£9aj9¬¤¹§"ybåyb,
+Š¹ãªyk­¹¢,:k)z ïyb¦ùak9o#øà y¢ : ïB¹`­ùk¬øà zaã¹ *¹o-ùn©¹ak9o#øà ybkù§+9 *¹âjyo-ùn©¸à z(çy`¦ylk9 )øà y§d9¥¦Kú(çy`¦y£¢yã¡øà y¢,:k)B¹fç¹d":`£ú/+ú`&y.¦ù¦#¹è®¹é y«h¹æ¡9ëá9g#xà ‚‚ŒKˆ
+Š“‹Œ_ŒL9caùí&¹¦ì¹íæºaãy`fŠŠ»ï&¹c§ù§+ÚXÚÓ]™[\
+
+X:(èX^™^9¦+Âˆ8à#:)!ùb*påÌKŒŒ8à#{ï#9£æù£¢y.#yå*;ï#9¥.y¢$9í%9«(y¥®y¦ì¹íæ˜^™^
+ŠOBˆ›Ý[™
+0åÓ—Œ‹JX;ï"œËÌŽ9æ¡Ù]^™^›Ü“]™[
+
+X;ï"xà ¹å*8à#9«hùn.ˆ9íí9b§ù. 9h-9¢,:k)ynlùgaÑV8¢bLpåù *¹âjyëbyí&¸à#{ï"úf®ù *°åùëbyí&°åÌL0åù¥è¹§"LËy`#Bˆ9b¨9¢$;ï"ycãy£ª;ï#9aj9ê"Ó‹Œx¡¤ŒL9î/yh-9¥n8¢bMLyh-;ï#:-çù/oùå*: !z) y¬`¹æ¡ˆML9h-9no¹.c¹ì¯¹è®¹d.ùd";ï#9d!9c`:e¤ùh-9¥n9b!¹n ûï"_ŒŒ9í!‹N8à LŒ_9í!ˆLË¸à M_Œ9í!ËÍ¸à MŒ_Ž9í!KŒM8à N_ŒL9í!ŒK»ï"y§+:.ªùl,Bˆ:!ê¹á-¹db9ãï¸à#9bcy§'ùoêøà yo£9§'úgg¹n.9¡h¸à#{ï#_ŒL9e«¹. 9c`:e¤ùl,y/e9.¡º-¡z`c9¢$9æ¡ˆ9î/yh-9¥n8à º!lù§+:/"yaiyåm¹."ù§ ùêâùb.ù/§yáiú)äº"l¸à#9æë¹bcyëbyí&¸à#zaãyë¥ù. 9«(Bˆ^™^;ï"9.#yë¨y¦+ú""¹kf9ª¥:`¡9¦+ù¥¬:)äº"lº`ïy§ ù¨(y«hûï#9.#y§ ùbåyb,^úaäynhËÂˆ:(çy`¦yëbyam¹.å¹.îù/ey«!9/c{ï"{ï#9.bùo£9«ãù«(yç'ùæ¡9caùí&»ï#:)¡¹kêØÚXÚÓ]™[\
+
+Xˆ:+¤ùk ùáiú""º-äyk£9aj:`ê9c§ù§+9æ¡:`£ú/+ûï"]šX]TÚ[ËÜÚÚ[Ú[ËÂˆ›Û\ÒØ›Û\ÔÔùcaùí&¹£ä9é.¹k£9aj9.#z+¢»ï"y.bùo£;ï#9cê¹¢¢˜^™^:$âù¢$9å*ˆ9¥¬9ak9o#úaãyë¥ùæ¡9`/8à ‚Œ‹ˆ
+Š¹a`ùí(9c(ûï":!ê¹båy£¦ùªgûï"QV:fcyà®Ì	JŠ»ï&˜œËÌX9æ¡Ú[˜]J
+XÝ™\œšYBˆ9¥¬9h§˜SSQS•Ð“ÖÑVÔUSÏLÌ;ï#9cê¹olzgïù§ 9í`¹àc:`,˜Ú\™Y^9æ¡ˆV;ï#:aäynhËù£¢z$/Kù§d9¥¦y¦+ùk£9aj9ãj9êâùæ¡9aïyo#ûï#:`&z(èy¬¤¹§"ybåyb,;ï#9í«y£ LL	xà ‚ŒËˆ
+Š¹ì¯º"ìKÐ“ÔÔù¢,:k)QV9`#yã¡ÊŠ»ï&˜œËÌX9¥¬9h§‚ˆÙ][ÛœÝ\‘^˜[šÓ][\Y\Š
+X;ï"9¦kº`&°åÌ{ï#ùì¯º"ìpåÌK{ï#Ð“ÔÔðåÌûï"{ï#ˆ:-çù¥è¹§"LËy`#yb¨9¢$9å¢¹.f;ï"9.#y¦+úhcyi%¹i&¹b¨9. 9«(LË{ï#9/oùå*: !y¦#¹è®º) y¬`ŒËBˆ9/çyåfy.#z ïya£yå¢¹b¨;ï"xà ‚ˆ
+Š¹í¤újeùbkù§+V:fcyà®¹í!L	JŠ»ï&˜œËÌØ9æ¡Ù]^[™Ù[Û”™]Ø\™^
+
+Xˆ9¥¬9h§˜VÑS‘ÑSÓ—Ô‘UÐT‘ÔUSÏLŒL;ï#9c§ù§+8à#:f¢¹/#ynlùgaÙ^™^8à#Bˆ;ï"9e«¹.®ºf¢¹/#yëby¥¯L	{ï"y.f9."º`&y`"ù«å9/¢ûï#9nèùdbºfæy`#y¬¯ùå*9¥è¹§"påÌº`£ú/+ûï#ˆ9ajy`"ùæî9.f9«hùioy¦+øà#9«hùn.8¢bL	xà zfæy`#x¢bŒ	xà#xà ‚Kˆ
+Šºaäynhù£¢z$/\˜[šù`#yã¡ú*¯ù¥m
+Š»ï&˜œËÌŽ:)¡¹kêØÙ][ÛœÝ\‘ÛÛ›Ü
+
+X;ï#ˆ9ì¯º"ìy`#yã¡Ìø¡¤Œ¸à P“ÔÔù`#yã¡Î8¡¤{ï#9gî¹é#¹ak9o#ûï"9ëbyí&°åÌŠÌûï#0¬LMIy­k¹bå{ï"Bˆ9k£9aj9¬¤¹¥.xà ‚‹ˆ
+Š¹ea¹n¥ù`îy¨/9¥.yå*8à#9n,ú&gùaiùmì¹nî¹êâú)äº"l¹æ¡9§ :jæ9ëbyí&¸à#JŠ»ï&¹¥¬9h§‚ˆÙ]YÚ\ÝÜ™X]YÚ\˜XÝ\“]™[
+
+X;ï"9£ ú`c˜^Y\˜Ø^Y\Œ˜Âˆ^Y\ŒØ9cå¹§ :jæ›]™[;ï"{ï#Ù]ÚÜšXÙUY\Š
+X9/§z`&y`"ùëbyí&¹l#y¡âBˆ9`"ùí&º-ç{ï"‹Œ_ŒÌ0åÌxà LÌ_0åÌKxà M_L0åÌ¸à ML_Œ0åÌ‹xà MŒ_Ì0åÌøà BˆÌ_Ž0åÌËxà N_ŽL0åÍ8à NL_ŒL0åÍ{ï"{ï#9aj:`ê9.f9k£9fæù£j9.¥9aiy¢$9¥m9¥n8à ‚ˆ9k£9aj:)¡¹kêØ™[™\”ÚÜÛÛ[
+
+X;ï#Ø^TÚÜ][J
+X;ï"9fè9à®¹c§ù§+ˆÛÛœÝÚÜ][\Ï\Ý[Û‘Yš[š][ÛœØ9¦+ùd#9. 9`"úfhùb%ùcàùáiûï#9¬¤º/©¹¬åyo§‚ˆ9i%ºghºaãy¥¬:,é¹`/9¢$:`c¹¯ï¹o£9æ¡9¥¬:fhùb%ûï#9cêº ïy¥m9`"ú$âù£¢z`&yajy`"ùaïyo#ûï"{ï#9åjúgh¹."‚ˆ:(ç9. :(c8à#9æë¹bcyea¹n¥úf£¹í&»ï&“–;ïg–{ï"9`îy¨/0åÓ»ï"xà#xà ‚Ëˆ
+Šº%éy¬-:aãy¥¬9¥m9ä!ŠŠ»ï&˜Ý[Û‘Yš[š][ÛœØ:fhùb%ûï"ÛÛœÝ9/a¹cëú+¢»ï"Bˆ\Ú:`,¹ajy`"ù¥¬9æ¡Ì	zf£»ï"Ý[ÛŒÌØÜÝ[ÛŒÌ;ï"{ï#9`îy¨/9å*L	z-çÂˆL	ygî¹é#¹`îy¨/9æ¡8à#9«ãÉye«¹`îxà#yíæ¹ )ùaiù£ä¹ë¥ùaî¹.+ze¤ù`/9a£y®b¹¥m9b,yæ¡9`#y¥nˆ;ï";ï&ŒŒÌLL‹Œ:"!ÎÍLLK¹aiù£ä¹aîŒÌ	x¢bKŽ8¡¤M{ï&ÔÔ;ï&ŒKÌLL‹z"!ÂˆLÍLL‹Œ9aiù£ä¹aîŒÌ	x¢b‹Œx¡¤Ì;ï"{ï#9e«¹/cy`îy¨/L	OŒÌ	OL	xà ye«¹äí¹`îy¨/ˆL	OÌ	OL	{ï#9ë)¹d"8à#9i)ùk®zaãú%éy¬-9e«¹/cy§"ya*¹ è8à y/a¹e«¹äí¹§ :,­8à#yæ¡:) y¬`¸à ‚ˆ™[™\”ÚÜÛÛ[
+
+XØ^TÚÜ][J
+X9¥.y¢$9cê¹b%ùaî‚ˆ™XÛÝ™\žT\˜Ù[L9æ¡:h!yæë»ï#Ý[ÛŒLØÜÝ[ÛŒL:`&yajy`"Âˆ:`dùamùk¦¹ïªyk£9aj9¬¤¹§"yo§˜Ý[Û‘Yš[š][ÛœØ9b*ºfi;ï"9.bùo£“ÔÔù£¢z$/{ï#ùbkù§+ˆ9ãc¹bí{ï#ù.îùbæyãc¹bí{ï#ù¢$9l,yãc¹bíyëbyìîùílz) yæo9¥/º`&yajy`"ÚY9. 9ª(ú ïy«hùn.:`bù/g;ï"{ï#ˆ9cê¹¦+ùãªyk­¹¬¤º/©¹¬åyg*9ea¹n¥ùæí9£©z"¬zc(º,­ùb,;ï&ùgãºc«»ï#ù/$y kùb§ú ïy¦+ùcé¹. 9ieùãj9êâÂˆ:`£ú/+ûï"9æí9£©yàc9®ïÒÔÔ;ï#9.#yí¤ú`cœÝ[Û‘Yš[š][Ûœûï"{ï#9k£9aj9¬¤¹§"z(ªùbåyb,8à ‚Žˆ
+Šºh$9åfy§*¹/¡ºaäynhù­¢: %ùìîùílJŠ»ï&¹¥¬9h§˜ŒLÌÔÜ[™ÛÛ›Ü‘]\™TÞ\Ý[J[[Ý[
+Xˆ;ï"9¢húc(»ï"úf,¹da»ï"ùkf9ª¥9æ¡9alyå*9méyamùaïyo#ûï"{ï#9.bùo£:) yb¨:(çy`¦yo-ùc%‹ú(ïy/gù­%úcb‹Âˆ9d"9¢$ù§d9¥¦ycaúf£º`&y.¦ùãªy¬å{ï#9æí9£©ydo9cêú`&y`"ùl,yio{ï#:`&y«(y.#yké¹/g9kéºf¦ùãªy¬åBˆ9§+:.ªøà ‚‚ŠŠºjeú+by¥®yo#ÊŠ»ï"9aj:`ê9å*^]ÜšYÚ9kéºf¦ùdo9cêùç'ù«hùæ¡:`b¹¢,¹aïyo#úaãùaî¹/¡»ï#9.#y¦+Â¹í%9ä!º*å¹ë¥ùo#ûï"{ï&‚‹H›ÙHKXÚXÚØ9aj:`ê9¥.ybåyª¥9¨b:*§¹¬åz`&º`c‚‹H9caùí&¹¦ì¹íæ˜ÚXÚÜÚ[;ï"9ç'ùæ¡9o§º`b¹¢,º(èyæ¡ŒLÌÑÙ]^™^›Ü“]™[
+
+Xˆ:+ 9aî¹/¡»ï"{ï&‚‚ˆ9ëbyí&ˆ9caùí&¹¢`:g V9í!:g 9h-9¥n;ï":*l¹ëbyí&»ï"HˆKK_KK_KK_ˆ‹ŒHˆ‹ŒLL‹LHLŒˆ‹ŒÌKMÌKHŒˆˆ‹LËÌKŽKÍÈˆ‹ÌM‹ÎNLÍÈ‹ŒÌHˆ‹ŽŒ‹MËÌÍˆ‹Ìˆˆ‹ŽLÌÌÍËÌÎHËLÈˆ‹ŽNHÎKËÈËÍLÈ‚ˆ9aj9ê"ùî/yh-9¥n8¢bMLyh-;ï&ù£æùë¥ùi*y¥n;ï"yb!ºd&yh-;ï"ùa`ùí(9c(ÍÌ	y¥b9ã¡ûï"Âˆ9«ãùi*y£¦Î9l#ù¦`»ï"x¢b
+ŠŽK¹i*JŠ»ï#9no¹.c¹ì¯¹è®¹doy.+y/oùå*: !z) y¬`¹æ¡8à#9í!L9i*xà#{ï&Âˆ9l#ù¦`¹©myêëù£¦ùªgø¢bŽKŽyi*{ï"9í!y`"ù§";ï#9¦#¹è®º-¡z`c¸à#9. 9ajz`,xà#y."úfd;ï"{ï&Âˆ9í%9¢bùbåLL	y¥b9ã¡øà y«ãùi*N9l#ù¦`¸¢bŒ‹ùi*{ï"9«å9£¦ùªgùoêûï#9ë)¹d"8à#9¢bùbåy«å9£¦ùªgÂˆ9§"y¥b9ã¡øà#yæ¡9d"9ä!º*+z*";ï"xà ‚‹HÚXÚÓ]™[\
+
+X9ké¹®+;ï&“‹Œz)äº"l¹àc9ioybfùioycaÌyí&¹æ¡V;ï#9caùí&¹o£ˆ^™^9«hùè®º+¢¹¢$Ù]^™^›Ü“]™[
+ŠOLŒŒØ;ï#:-çù¥¬9ak9o#ùk£9aj9. :!í8à ‚‹H9ì¯º"ìKÐ“ÔÔù¢,:k)QV9ké¹®+;ï&“‹ŒŒ9 *¹âj{ï#9¦kº`&¹¢ïÍÌ8à yì¯º"ìy¢ïÌLLˆ;ï"9ì¯¹è®ŒKy`#{ï"xà P“ÔÔù¢ïÌŒL;ï"9ì¯¹è®Œù`#{ï"xà ‚‹H9a`ùí(9c(ÍÌ	QV9ké¹®+;ï&º`#ú`c¹ç'ùké•Ry­`yê"ûï":nç¹­k¹båya`ùí(9c(ù£"zb%x¡¤¹ieùå*9.)‚ˆ9egùbå{ï"yegùbåya`ùí(9c(ùo£9¢dú-#ù. 9h-9¢,:k){ï#9«hùn.9 *¹¢ïùb,L;ï"Ì0åÌùì¯¹è®‚ˆ9ëby¥¯L;ï#:`c¹ê"ù.+y¢¤ùb,9.)¹/ë¹«hù. 9`"ùç'ùæ¡9kf9g*9æ¡9­kºnç¹¥n:*©9më¸ %8 %ˆÌ
+ŒØ9g*˜]˜TØÜš\:(èz`bùë¥ùíd9§§9¦+ØKŽNNNNNK‹‹˜;ï#9c§ù§+9å*ˆX]™›ÛÜ˜9§ ú*©9¢hÌznçº+¢¹¢${ï#9¥.yå*X]œ›Ý[™9o£9ì¯¹è®¹¢ïùb,L;ï"xà ‚‹H:aäynhù£¢z$/\˜[šù`#yã¡ùké¹®+;ï&“‹ŒŒ9 *¹âj{ï"9fî¹k¦˜\šX[˜ÙOLKŒ9£¤ºfi:fª9ªgù­k¹bå{ï"Bˆ9¦kº`&øà yì¯º"ìN»ï"9ì¯¹è®Œ¹`#{ï"xà P“ÔÔÌŒM{ï"9ì¯¹è®y`#{ï"xà ‚‹H9ea¹n¥úf£¹í&¹ké¹®+;ï&“‹ŒÌ:)äº"lºhkùé.¸à#‹Œ{ïgŒÌ;ï"9`îy¨/0åÌ{ï"xà#xà S‹Ìz)äº"l‚ˆ:hkùé.¸à#‹Ì{ïgŽ;ï"9`îy¨/0åÌË{ï"xà#{ï&úfæz)äº"l“‹Ž
+Ó‹ŒL9­íùd":f¢¹/#{ï#9ea¹n¥Âˆ9«hùè®ºhkùé.¸à#‹Ì{ïgŽ;ï"9`îy¨/0åÌË{ï"xà#{ï"ŒLÌÑÙ]YÚ\ÝÜ™X]YÚ\˜XÝ\“]™[
+
+Xˆ9fç¹`¬Î;ï#9.#y¦+ùnlùgaù¢%¹æë¹bcz`n9.+z)äº"l»ï"{ï#9è®º*£y.#y§ ú(ªù/c¹ëbz)äº"l¹¢å¹í+ù`îy¨/8à ‚‹H:,ï:,­ùké¹®+;ï&“‹Ìz)äº"l»ï"0åÌËzf£¹í&»ï"z,­Ì¹äí’L	z%éy¬-;ï#9kéºf¦ù¢hù«/ŒMˆ:aäynhûï#9ì¯¹è®¹ëby¥¯Œ0åÌËpåÌ˜8à ‚‹H:%éy¬-:acyïk¹ké¹®+;ï&¹ea¹n¥ùd#9¦`¹b%ùaî’ÔÔ9æ¡Ì	zf£»ï"9fç¹oªLÌ	R:%éy¬-Âˆ9fç¹oªLÌ	TÔ:%éy¬-:`ïyg*;ï"{ï#9k£9aj9¬¤¹§"yb%ùaîŒL	zf£»ï"9fç¹oªy¢`9§"RÂˆ9fç¹oªy¢`9§"TÔ:`ïy.#yg*9åjúghº(è{ï"{ï&ØÝ[Û‘Yš[š][ÛœØ:fhùb%ù§+:.ªÂˆÝ[ÛŒLØÜÝ[ÛŒL9ajy`"ú`dùamùk¦¹ïªz`ïz`¡9g*;ï"œÛÛYJ
+X9è®º*£Bˆ9kf9g*;ï"{ï#9cê¹¦+ùea¹n¥ù®,¹§äù¦`º(ªú`c¹¯ï¹£¢{ï#:fhùb%úemùn©¹«hùè®¹¦+Î;ï"9c§ù§+¹`"ÊÂˆ9¥¬9h§Œ¹`"ÌÌ	zf£»ï"xà ‚‚ŠŠ¹mì¹çézfd9b-ŠŠ»ï&º`&y«(ycêºjeú+by.¡¹d!:h!y¥.ybåznç¹§+:.ªùæ¡9¥n9`/9«hùè®¹ )ûï#9¬¤¹§"zaãy¥¬º-äy. 9«(yk£9¥m9æ¡:emù¦`ºe¤ù£¦ùªgùª(y¤ë;ï"9.#ycëú ïyç'ùæ¡9ª(y¤ëyi*z`b¹¢,¹¦`ºe¤ûï"{ï#K¹i*Bº`&y`"ù¥n9keù¦+ùå*9kéºf¦ú`b¹¢,¹ak9o#ùë¥ùaî¹/¡¹æ¡9£ª9ë¥ù`/;ï#9.#y¦+ùké¹®+9`/;ï&ù.gù¬¤¹§"y®+:*i‚¸à#“ÔÔù£¢z$/Kùbkù§+9ãc¹bíKù.îùbæyãc¹bíKù¢$9l,yãc¹bíxà#ykéºf¦ùæo9¥/ŒL	z%éy¬-9æ¡9­`yê"Â»ï":`&y«(z)£ù¨/9cêº) y¬`º`dùamú,áù¥¦y/çyåf{ï#9¬¤¹§"z) y¬`¹¥¬9h§º`&y.¦ùæo9¥/¹/¡¹®¤9§+:.ªûï"xà ‚‚ˆÈÈÈŒ‹LLˆ8 %9kí¹ë¬y¥.z!ê¹..úe¢ùegøà yí¤újeùbkù§+9ak9o#ù/ë¹«høà yieú(çzhkùé.¸à yfç¹d"9ëà9icú(ç9k£9¥m8à ybkù§+9«(y¥n9¦ªúeç‚¹/oùå*: !z`&z/*¹. 9«(y£ä9aîºnç»ï"9ë+:nç¹¬¤¹§"ykéºf¦ùaiùk®{ï"{ï&‚‚ŒKˆ
+Š¹bkù§+9kí¹ë¬zh&9cå¹¦`¹.#y¡âz*l¹æí9£©ze¢ùegûï#:) y¥/º`,º ã9c!yíi¹ãªyk­º!ê¹mìze¢ÊŠ»ï&¹§d9¥¦ybkù§+ˆ9c§ù§+8à#9æí9£©zh&9cå¸à#y£"y."ùc®ùl,y§ úi«9."ºj¬9k£9§d9¥¦yhgº`,º ã9c!xà ¹¥.y¢$ŒLÌÛZ[SX]\šX[[™Ù[Û”™]Ø\™
+
+Xˆ9cê¹¢¢¸à#9§d9¥¦ykí¹ë¬xà#z`&y`"ù¥¬9âjydà{ï"\Nˆ˜Ú\Ý˜;ï#9cëùh!¹å¢»ï"y¥/º`,º ã9c!{ï#9ç'ù«hÂˆ:j¬9é)¹çìËú*+z*"9g%¹í&zf£¹í&¹ní¹o£9b,9ãªyk­º!ê¹mìyg*: ã9c!znçºe¢øà y£"xà#:e¢ùegøà#y¢cz`,º(cˆ;ï"Ü[”Ú[™ÛSX]\šX[Ú\Ýœ›ÛR[™[ÜžJ
+X;ï#9aiú`ê:aãyå*›ÛX]\šX[Ú\Ý™]Ø\™Ê
+Xˆ:-çùc§ù§+Ü[“X]\šX[Ú\ÝÊ
+X9d#9. 9ieùªgùã¡ú`£ú/+ûï#9cê¹¦+ù¥.y¢$9. 9«(ze¢ù. 9`"ûï"xà ‚ˆ:(çy`¦ybkù§+9c§ù§+9l,ymì¹í¤ù¦+ú`&y`"ú(c9à®»ï"ŒLÌÛZ[Q\]Z\Y[[™Ù[Û”™]Ø\™
+
+X9§+9/¡‚ˆ9l,ycê¹¦+ù¢¢¹¢¯yãc¹b.9¥/º`,º ã9c!{ï#\ÙQ\]Z\Y[XÚÙ]
+
+X9¢cy¦+ùç'ù«húe¢ûï"{ï#:`&y«(y¬¤¹båxà ‚Œ‹ˆ
+Š¹kí¹ë¬Kù¢¯yãc¹b.:nçºe¢ú) y§"xà#:e¢ùegûï#úh$:)¯{ï#ùaî¹e+¸à#y."zha¹£"zb%JŠ»ï&¹¤í9aaXÜ[’][S[Ù[
+
+Xˆ9æ¡:)¡¹kêûï#][K\X9¦+ØÚ\Ý9¢%˜XÚÙ]9¦`¹¢¢¸à#9êoù¢-8à#y£"zb%y¥m9`"ú%ãú-mù/¡‚ˆ;ï"Ý[K™\Ü^OH››Û™H˜;ï"{ï#:hcyi%¹£ä¹aixà#:e¢ùegøà#{ï"9do9cêù¥è¹§"yæ¡ˆ\ÙQ\]Z\Y[XÚÙ]
+
+Xù¥¬9æ¡Ü[”Ú[™ÛSX]\šX[Ú\Ýœ›ÛR[™[ÜžJ
+X;ï"Bˆ:-çù¥¬9æ¡8à#:h$:)¯xà#y£"zb%{ï"ÚÝÒ][T™]šY]Ê
+X;ï#:aãyå*ŒLÌ”ÚÝÔ™]Ø\™[Ù[
+
+Xˆ9ob9ê¥úhkùé.¹cëú ïze¢ùaî¹æ¡9aiùk®z-çùªgùã¡ûï#9.#yå*9cé¹i%¹`f¹. 9¥m9ieù¥¬R{ï"{ï&øà#9e+¹aî¸à#y¦+Âˆ9âjydàyob9ê¥ù§+9/¡¹l,y§"yæ¡:`&¹å*9£"zb%{ï#9.#yå*:hcyi%º&eyä!¸à ‚ŒËˆ
+Š¹í¤újeùbkù§+9íd9ë¥ùak9o#úaãykêÊŠ»ï&¹c§ù§+9å*9. 9`"ú`&y`"ùl"9¨b:(èy¨.y§+9.#ykf9g*9æ¡ˆÙ]^Ó™^]™[
+
+X;ï"9¬.:`h:$/yb,9`¦y£í9`/8à#9ëbyí&°åÌL8à#{ï"{ï#9.fyåm¹ãc¹bíxà ‚ˆ9/oùå*: !y£!ùaîº`&y`"ù¥n9keùam¹ké¹mì¹í¤ùkf9g*:)äº"l¹âjy.í¹æ¡Ú\˜XÝ\‹™^™^9«!9/cz(èBˆ;ï"œËÌ[XZ[‹šœØ9æ¡ÚXÚÓ]™[\
+
+X9«ãù«(ycaùí&º`ïy§ ù¦í9¥¬:`&y`"ù`/;ï#9.èú(jˆ8à#9caù."ù. 9í&º`¡:g :) yi&¹l$yí¤újeøà#{ï"xà ¹¥¬9ak9o#ûï&˜Ù]^[™Ù[Û”™]Ø\™^
+
+X;ï'Bˆ:f¢¹/#y«ãù`"ú)äº"l¹æ¡^™^9b¨9î/xà zfi9.éz)äº"l¹.®¹¥n;ï#9.#ya£y.fxà ‚ˆ
+Š¹ieú(çy¥b9§§:) yg*:nç¹¤âº(çy`¦y¦`ºhkùé.ŠŠ»ï&˜Ü[’][S[Ù[
+
+XØÜ[‘\]Z\Y][J
+Xˆ:`ïz(ç9."˜\[™\]Z\Y[Ù][™›Ê
+X;ï#9cêº) znç¹b,9æ¡9âjydày§"XÙ]Y;ï"9.#yë¨yêoùg*ˆ:.ªù."º`¡9¦+ú`¡9g*: ã9c!z(è{ï"{ï#9l,yg*9âjydàz*lùí,9ob9ê¥ÜÝ]ùc`9hb¹o£:ghºfa9b¨8à#ùieú(çyd#WBˆ9æë¹bcy.í¹¥nÍxà#z-çùajz(c9ieú(çyb¨9¢$:*ª¹¦#»ï#:`e9¢$:e 9ª®ùæ¡:`¨ú(c9å*ŒLÌ‹\Ù]X›Û\Ë˜XÝ]™Xˆ;ï"9.«º"lŠùì¥újå
+øà#ùmì¹egùbåWxà#{ï"{ï#9¬¤º`e9¢$9å*ŒLÌ‹\Ù]X›Û\Ëš[˜XÝ]™Xˆ;ï"9¦¥ú"lŠøà#ù§*¹egùbåWxà#{ï"{ï#:-çù/oùå*: !yíi¹æ¡9ëá9/¢ù¨/9o#ùk£9aj9l#zob¸à ‚Kˆ
+Š¹bkù§+9«ãù¥éy«(y¥n:fd9b-¹¦ªù¦`ºeç:e¢JŠ»ï"9¥®y/¯ù/oùå*: !zh.ùî`y®+:*i»ï"{ï&¹¥¬9h§‚ˆS‘ÑSÓ—ÑRSWÓSRUÑSP“QY˜[ÙX9n.9¥n;ï#X\šÑ[™Ù[Û•\ÙY
+
+X9g*:eç:e¢y¦`‚ˆ9æí9£©z-ìú`c»ï"9.#ykêùaiX[™Ù[Û”Ý]K\ÙY;ï"{ï#:`(úc¥º+¤ÕRyæ¡8à#9.â¹¥éymì¹£$y¢,8à#Bˆ9`g9å*9ª(ùo#ù.gù.#y§ ùaî¹ãï»ï#9.bùo£:) y h¹oªy«ãù¥ézfd9b-¹cêº) y¢¢º`&y`"ùn.9¥n9¥.yfç˜YX;ï#ˆ9.#yå*9båyam¹.å¹g,9¥®xà ‚‹ˆ
+Š¹ *¹âjy.búe¤ùæ¡9aî¹¢búe¤úf¥9.gú) yfî¹k¦ŒKyéä»ï#9c!yd*øà#:`,¹aiy¢,:k)x¡¤¹ë+9. 9."ùaî¹¢bøà#z-çÂˆ8à#9."ù. 9fç¹d":e¢ùiâø¡¤¹ë+9. 9."ùaî¹¢bøà#z`&yajy`"ùc§ù§+:(ªù¯#ù£¢yæ¡9ëà:nçŠŠ»ï&¹¨.yfè9¦+ÂˆÝ\™\ÛÛ][Û”\ÙJ
+X9k¨ùdbºf£¹«­y. 9íd9§gûï#9§ úi«9."¹d#9«iydo9cêÂˆ›ØÙ\ÜÓ™^ÛÛX˜][
+
+X:e¢ùiâùíd9ë¥ùë+9. 9/cz)äº"l»ï#9.+ze¤ùk£9aj9¬¤¹§"y`g:h$Âˆ;ï":-çùam¹.å¹«ãù. 9/cz)äº"l¹aî¹¢bù.búe¤øà yå,Xš[š\Ú^Y\XÝ[ÛŠ
+X:,¨:,«9æ¡Kyéä‚ˆ9k£9aj9.#y. 9ª(ûï"xà ¹/ë¹¬å{ï&¹g*œËÌK]ŒLÌKYš^X˜]ÚšœØ9¥¬9h§¹. 9ía9ª&z*&9o#ú)¡¹kêÂˆ8 %8 %Ý\™\ÛÛ][Û”\ÙJ
+X:(ªùdo9cêøà z #9.%:`&y«(yç'ùæ¡9§ ùgíú(c;ï"9«å9áiùc§ù§+ˆ9aïyo#ú!ê¹mìyæ¡™\ÛÛ][Û”\ÙTÝ\Y:f,ºaãz)!ùb)9¥­ûï"y¦`»ï#9§­¹. 9`"ù¥åùª&{ï&Âˆ›ØÙ\ÜÓ™^ÛÛX˜][
+
+X9cê¹g*9`my®+9b,:`&y`"ù¥åùª&y¦`»ï#9¢cy¢¢¸à#9ç'ù«hùgíú(c8à#yc!z`,‚ˆÙ][Y[Ý]
+‹‹‹ML\ÊX9ní¹o£;ï#9­¢:,®ù£¢y¥åùª&yo£9.#yolzgïùd#9. 9fç¹d":(èyo£:gh‚ˆ9«hùn.9æ¡9do9cêøà ŠŠº`&z(èz.*y.¡¹. 9`"úaãù®+9¥®y¬åyæ¡9gd{ï#:*&:c!9."ù/¡¹íi¹."ù. 9`"ù.®¹càú  ÊŠ»ï&‚ˆ9. :e¢ùiâùæí9£©zaãù®+8à#:`(ùî£9ajy«(X›ØÙ\ÜÓ™^ÛÛX˜][9do9cêù.búe¤ùæ¡9¦`ºe¤ùmë¸à#{ï#ˆ9íd9§§9ç"ú-mù/¡¹`ãù¦+øà#9§ä9.¦ùg,9¥®z+¢¹¢$:fæy`#yníº`l»ï"Œùéä»ï"xà y§ä9.¦ùg,9¥®yk£9aj9¬¤¹níº`l‚ˆ;ï"ŒL\ûï"xà#{ï#9. 9n©¹.éyà®¹/ë¹¬åy§+:.ªù§"XYø %8 %9o£9/¡¹¥.y¢$:aãù®+Y˜]SÙÊ
+Xˆ9kéºf¦ùkêùaiy¢,:k)yí :c!9æ¡9¦`ºe¤únç»ï"9.gùl,y¦+ùãªyk­¸à#9ç'ù«hùç"ùb,8à#ybåy/g9æo9å'ùæ¡9¦`¹b.ûï"Bˆ9¢cyæo9ãï»ï&¹fè9à®¹¥¬9æ¡9níº`l¹¦+øà#9do9cêùåm¹."ùl,\™]\›¸à \Ù][Y[Ý]9b,9¦`ºe¤ù¢cyç'ù«hÂˆ9gíú(c8à#{ï#9do9cêù¦`ºe¤únç¹§+:.ªù¬¤¹§"y¡#ùïª{ï#:aãùdo9cêúe¤úf¥9§ ú(ªùníº`l¹æ¡9ab9o£:h!¹n£ù¤'¹. »ï&Âˆ:aãùç'ù«hùcëú)¢ùæ¡9båy/g9¦`ºe¤únç»ï#9ëà9icùk£9aj9«hùè®»ï":)¢ù."ù¥®zjeú+b{ï"xà ‚‚ŠŠºjeú+by¥®yo#ÊŠ»ï&‚‹H›ÙHKXÚXÚØ9aj:`ê9¥.ybåyª¥9¨b:*§¹¬åz`&º`c‚‹H9§d9¥¦ybkù§+;ï&ºh&9cå¹o£: ã9c!yi&Œù`"øà#9§d9¥¦ykí¹ë¬xà#{ï#9é)¹çìËú*+z*"9g%¹í&yî/zaãù.#z+¢‚ˆ;ï"9¬¤¹§"z(ªú!ê¹båze¢ùegûï"{ï&úe¢ùegÌy`"ùkí¹ë¬yo£;ï#9kí¹ë¬ynªùkfLxà yé)¹çìËú*+z*"9g%¹í&JÌ¹ê+‚ˆ;ï"9d!:!ê¹l#y¡âzf£¹í&¹æ¡9¥n:aãûï"B‹H9kí¹ë¬yâjydàyob9ê¥ûï&¹êoù¢-:cmzf¬z%ãøà ze¢ùegËúh$:)¯Kùaî¹e+¹."zhaº`ïyg*;ï#:h$:)¯yob9ê¥ù«hùè®‚ˆ:hkùé.¹/c‹ù.+Kújæù©mydàyé)¹çìú"!ú*+z*"9g%¹í&yæ¡	KÌÌ	KÌŒ	KÌL	yªgùã¡ûï&ù¢¯yãc¹b.9âjydàBˆ9ob9ê¥úh$:)¯y«hùè®¹b%ùaî¹l#y¡âyieú(çyaj:`êL9`"ú`ê9/cz-çùg%¹é.»ï&únç¹k£9kí¹ë¬Kù¢¯yãc¹b.9.bùo£ˆ9a£znç¹. :"+:(çy`¦Kú%éy¬-;ï#9êoù¢-:cmy«hùè®¹ h¹oªzhkùé.¸à ze¢ùegËúh$:)¯zcmy«hùè®¹ h¹oªzf¬z%ãûï#ˆ9¬¤¹§"y«¦9åfyâà9¡bÂ‹H9í¤újeùbkù§+;ï&˜^Y\‹™^™^ML8à X^Y\Œ‹™^™^MŒ;ï#9bkù§+9ob9ê¥Âˆ9«hùè®ºhkùé.¸à#MK8à#{ï#9kéºf¦ùaiyn,ØÚ\™Y^9h§¹b¨:aãù.gù¦+ÍML‹H9«ãù¥éy«(y¥n;ï&˜ÛZ[yk£9í¤újeùbkù§+9o£9êâùb.ùa£ydo9cêØŒLÌ™YÚ[‘^[™Ù[ÛŠ
+X;ï#9¬¤¹§"Bˆ:-ìùaî¸à#9.â¹i*ymì¹í¤ù£$y¢,:`c¹.¡¸à#xà y«hùn.:e¢ù¥¬9. 9h-‹H9ieú(çzhkùé.»ï&º(çy`¦Lù.í–ùlªyl¬×yieú(çyo£:nç¹am¹.+y. 9.í»ï#9ob9ê¥ù«hùè®ºhkùé.‚ˆ8à#ùlªyl¬×LËÍxà#xà xà#:(çy`¦y."y.íˆ9aj: ïyb¦ÊÌHùmì¹egùbåWxà#{ï"XÝ]™yª(ùo#ûï"xà Bˆ8à#:(çy`¦y.¥9.íˆ9g'ùa`ùí(9¢ : ïy`­ùk¬ÊÌ‰Hù§*¹egùbåWxà#{ï"[˜XÝ]™yª(ùo#ûï"B‹H9fç¹d"9ëà9icûï&¹kéºf¦ù¥%9¢*˜Y˜]SÙÊ
+X9cl9aî¹¦`ºe¤ù¢,ûï#:`(ùî£ù`"ùfç¹d"9æ¡9k£9¥mˆ9¦`ºe¤ú.î8 %8 %9«ãù. :(c:e¤úf¥:`ïyì¯¹è®º$/yg*Kyéä¹."¹."ûï"MLŸŒMÍM›\ûï#XÛ\™zf£¹«­Bˆ9§+:.ªùæ¡9©myçëz&eyä!¹¦`ºe¤ù.gùë¥ùg*9aiûï"{ï#9c!yd*øà#9fç¹d":e¢ùiâÛÙøà#yb,8à#9ãªyk­Œyaî¹¢bÛÙøà#Bˆ:-çøà#9§ 9o£9. :f®ù *¹aî¹¢bøà#yb,8à#9."ù. 9fç¹d":e¢ùiâÛÙøà#z`&yajy`"ùc§ù§+:(ªù¯#ù£¢yæ¡9ëà:nç»ï#ˆ9k£9aj9ë)¹d"9/oùå*: !yíi¹æ¡9ëà9icú)£ù¨/‚ŠŠ¹mì¹çézfd9b-ŠŠ»ï&º`&y«(y¬¤¹§"zaãy¥¬9®+:*i¹«ãù`"ùbkù§+9k£9¥m:-l9. 9«({ï"Ú[‹ÛÜÙzfæz-ëùo¤{ï"B¹æ¡9fç¹«n;ï#9cêºaçyl#z`&Mºnç¹d!:!ê¹æ¡9¥.ybåznç¹`fºaçyl#y )újeú+b{ï#9«å9áiù/oùå*: !y§+9.®¸à#9.#zg :) Bº-äy¥m9`"ùí¬¹êæyk£9¥m9fç¹«n8à#yæ¡9£!ùé.¸à ‚‚ˆÈÈÈŒ‹LLˆ8 %9bkù§+9 *¹âjyo-ùn©¹ë+9.£:/*ºaãz*¯ûï"9ëbyí&¹ak9o#ù¥.y¢$8à#9§ :jæÌ	{ï"ùnlùgaÌÌ	xà#{ï"ù¦kº`&‹ùì¯º"ìKÐ“ÔÔùb!¹í&¹`#yã¡ûï"B‚¹/oùå*: !y."¹. :/*¹cãy¡âxà#9bkù§+9æ¡9 *¹âjy¡'ú)®¹i*¹o,y.¡¸à#{ï#9¢$z(ç9."¹.¡º+¤ùbkù§+9 *¹¢dùnlù. :"+:aã¹ *¹æ¡ŠÌÌ	{ï"S‘ÑSÓ—ÓSÓ”ÕT—ÔÕ‘S‘Õ;ï"{ï#9/a¹/oùå*: !z`&z/*¹¦#¹è®¹£!ùaîº`¡9¦+ù`cùo,{ï#9.)¹íi¹.¡‚ºgg¹n.™XÚ\Ùyæ¡:)£ù¨/;ï#:) y¬`ºaãy¥¬:*+z*"9bkù§+9ëbyí&¹ak9o#ú-çùb!¹í&¹o-ùn©»ï#9d#9¦`ŠŠ¹¦#¹è®¹é y«hŠŠ»ï&‚¹.#z ïzaãy`f¹¢,:k)yìîùílxà y.#z ïybåy. :"+:aã¹ *¹¥n9`/ØÙ][ÛœÝ\”˜[šÊ
+X8à y¥è¹§"yæ¡
+ÌÌ	y.#z ïBº(ªúaãz)!ùieùå*9ë+9.£9«(xà ¹aj:`ê9¥.ybåz`ïyg*œËÌË]ŒLÌ‹XÛÛ[Y^[œÚ[Û‹šœØ:(èyk£9¢$;ï#˜œËÌ[XZ[‹šœØ:-çØœËÌK]ŒLÌKYš^X˜]ÚšœØ9k£9aj9¬¤¹§"ybåxà ‚‚ŒKˆ
+Š¹bkù§+9gî¹®¥¹ëbyí&¹ak9o#úaãy`fŠŠ»ï&¹c§ù§+8à#9¢`9§"ymì¹nî¹êâú)äº"l¹ëbyí&¹î/yd£0íú)äº"l¹¥n:aãøà#Bˆ9g*:jæ9ëby..ùb¦ùn-¹/c¹ëbz)äº"l¹¦`¹§ ú(ªùnlùgaùo¥ùo¢9/c»ï"‹L
+Ó‹ŒŒ
+Ó‹ŒL9cê¹ë¥ùaî¹í!ˆ‹Œûï"xà ¹¥.y¢$›Ý[™
+:f¢¹/#y§ :jæ9ëbyí&°åÌÌ
+È:f¢¹/#ynlùgaùëbyí&°åÌŒÌ
+Xˆ;ï"Ù][™Ù[Û“[ÛœÝ\“]™[
+
+X;ï"{ï#9e«¹. :)äº"l¹¦`¹§ :jæynlùgaÏz)äº"l¹ëbyí&»ï#ˆ9íd9§§9.#z+¢¸à ‚‚Œ‹ˆ
+Š¹bkù§+9 *¹âjy."yli9o-ùn©¹å¢¹b¨
+Š»ï#9¥¬9æ¡9e+ù. 9nî¹©âùaiycèÂˆZ[[™Ù[Û“[ÛœÝ\Š˜[YK]™[[[Y[˜[šÊX9fî¹k¦º-äy."y«i{ï"9. :"+9 *‚ˆ9cê¹§ ùí¤ú`c¹bcyajy«i{ï"{ï&‚ˆH\Q[™Ù[Û“[ÛœÝ\”Ý™[™Ý
+
+X8 %8 %9¬¯ùå*9¥è¹§"XS‘ÑSÓ—ÓSÓ”ÕT—ÔÕ‘S‘ÕˆLKŒÌ;ï#9k£9aj9¬¤¹¥.{ï#9cê¹ieùå*9. 9«(BˆH\Q[™Ù[Û“›Ü›X[›Û\Ê
+X;ï"9¥¬9h§»ï#0åÌKŒL;ï#9d*ÔÔ;ï"x %8 %:+¤øà#9bkù§+9¦kº`&¹ *¸à#Bˆ9gî¹®¥¹§+:.ªùl,y«å:aã¹i%¹¦kº`&¹ *¹a£yo-ù. 9¢*»ï"KŒÌ0åÌKŒL8¢bKù`#{ï"BˆH\Q[™Ù[Û”˜[šÔÝ™[™Ý
+
+X;ï"9¥¬9h§»ï#:+ [ÛœÝ\‹œ˜[šØ;ï"x %8 %9ì¯º"ìBˆ;ï"X^0åÌKŒØ]XÚðåÌKŒÌÛXYÚXÐ]XÚðåÌKŒÌÙY™[œÙpåÌKŒX;ï"xà Bˆ“ÔÔûï"X^0åÌËŒØ]XÚðåÌKLÛXYÚXÐ]XÚðåÌKLÙY™[œÙpåÌK;ï"Bˆ:`ïy¦+ùg*8à#9bkù§+9¦kº`&¹ *¸à#yæ¡9k£9¥m9¥n9`/9."¹a£yå¢¹b¨;ï#9.#y¦+ùo§º(î9¥n9`/:aãyë¥ûï&ùajz !Bˆ:`ïyb.ù¡#ù.#ybåTÔ;ï#9í«y£ yg*:-çùbkù§+9¦kº`&¹ *¹d#9. 9¬-9®¥»ï#:`oùacyì¯º"ìKÐ“ÔÔù¢ : ïBˆ:h.ùã¡ù¦­9h§¸à º(çy`¦ybkù§+“ÔÔùc§ù§+9æ¡8à#9gî¹®¥¹ëbyí&°åÌKŒMxà#y/çyåfy.#ybåxà ‚‚ŒËˆ
+Šy`"ùbkù§+9 *¹âjynî¹©âùdo9cêúnç¹aj:`ê9¥.yå*Z[[™Ù[Û“[ÛœÝ\Š
+X
+Š»ï"9í¤újeùbkù§+ˆL:f®ùl#ùamxà y§d9¥¦ybkù§+yì¯º"ìJÍy¦kº`&¸à z(çy`¦ybkù§+P“ÔÔÊÍ9ì¯º"ì{ï"{ï#9cå¹.èùc§ù§+ˆ9d!:!ê¹kêØ\Q[™Ù[Û“[ÛœÝ\”Ý™[™Ý
+XZÙV›Û™S[ÛœÝ\Š‹‹ŠJX9æ¡9kêù¬å{ï#ˆ:fcy/c¹.bùo£9¯#ùb¨9§ä9. 9«izjgùæ¡:hª:fª¸à ¹¢ : ïzf£¹í&‹ùªgùã¡ú*+yk¦»ï"Ù][ÛœÝ\”ÚÚ[Y\˜ÂˆÙ][ÛœÝ\“X^Y\”ÚÚ[Ø;ï"yk£9aj9¬¤¹båxà ‚‚ŠŠºjeú+by¥n9keÊŠ»ï"9å*^]ÜšYÚ9kéºf¦ùdo9cêØŒLÌ™YÚ[‘^[™Ù[ÛŠ
+XÂ˜ŒLÌ™YÚ[“X]\šX[[™Ù[ÛŠ
+XØŒLÌ™YÚ[‘\]Z\Y[[™Ù[ÛŠ
+X9å(¹å'ùæ¡9ç'ùké‚¹ *¹âjyâjy.íº+ 9aî¹/¡¹æ¡;ï#9.#y¦+ù¢bùë¥ûï"{ï&‚‚¹ëbyí&¹ak9o#ûï"9ía:f¢¹/#yaj:`ê9ì¯¹è®¹ë)¹d"9/oùå*: !yíi¹æ¡9§'ù§&ù`/;ï"{ï&‚Ÿ:f¢¹/#H9ëbyí&¹ía9¢$9§'ù§&È9kéºf¦ÈŸKK_KK_KK_KK_ŸHŒŒŒŸˆL
+ÍLLLŸÈL
+ÌŒ8¢bˆˆŸL
+ÌŒ
+ÌL8¢bÈÈ‚“‹ŒŒ;ï":fæz)äº"lº`ïS‹ŒŒ;ï#9bkù§+9gî¹®¥¹ëbyí&LŒ;ï"{ï&‚Ÿ:hg¹g¢ÈÔ9¥.ù¤âˆ:f,¹é©ˆ:ke9¥.ÈŸKK_KK_KK_KK_KK_KK_Ÿ:aã¹i%¹¦kº`&¹ *ˆÌŒŒÌLŸ9bkù§+9¦kº`&¹ *ˆŽHŽˆˆLÌˆŸ9bkù§+9ì¯º"ìy *ˆŽˆŽˆLLˆLHMŸ9bkù§+“ÔÔûï"9ëbyí&ŒŒûï'LŒ0åÌKŒM{ï"HMLÈÌMHMÌHLNH‚“‹L;ï":fæz)äº"lº`ïS‹L;ï#9bkù§+9gî¹®¥¹ëbyí&ML;ï"{ï&‚Ÿ:hg¹g¢ÈÔ9¥.ù¤âˆ:f,¹é©ˆ:ke9¥.ÈŸKK_KK_KK_KK_KK_KK_Ÿ:aã¹i%¹¦kº`&¹ *ˆMLÍHLMHMHLHŸ9bkù§+9¦kº`&¹ *ˆÎÈLŒÈMHŒMLHŸ9bkù§+9ì¯º"ìy *ˆLNHLŒÈŒMHŒNMˆŸ9bkù§+“ÔÔûï"9ëbyí&Mø¢bL0åÌKŒM{ï"HÎLNˆÎHÍLH‚¹ajy`"ùëbyí&º`ïy¦#¹è®¹¢$9êâøà#:aã¹i%¹¦kº`&ˆ9bkù§+9¦kº`&ˆ9bkù§+9ì¯º"ìH9bkù§+“ÔÔøà#{ï#9.%9¢bùë¥Âºjeú+bz`c¹bkù§+9¦kº`&¹ *¹¥n9`/;ï'zaã¹i%¹c§ùiâù`/0åÌKŒÌ0åÌKŒL;ï"9/¢ùi “‹ŒŒ9æ¡Ž{ï'BŒÌ0åÌKŒÌ0åÌKŒL9fæù£j9.¥9ai{ï#9.#y¦+ú(ªùieù.¡¹ajy«(LKŒÌ9æ¡Ì0åÌKŒÌ0åÌKŒÌ;ï'MLûï"{ï#9ì¯º"ìKÂ“ÔÔùæ¡Ô:`ïz-çùbkù§+9¦kº`&¹ *¹. :!í;ï"9/¢ùi “‹ŒŒ9ì¯º"ìKù¦kº`&”Ô:`ïy¦+ÌŽ»ï"{ï#9è®º*£y¬¤¹§"Bº*©:)î9ì¯º"ìKÐ“ÔÔùæ¡Ô:hcyi%¹`#yã¡øà ¹cé¹i%¹è®º*£{ï&˜›ÙHKXÚXÚØ:*§¹¬åz`&º`c¸à y."y`"ùbkù§+º`ïz ïy«hùn.9do9cêù.)¹å(¹å'ù«hùè®¹¥n:aãùæ¡9 *¹âj{ï"9í¤újeÌL:f®øà y§d9¥¦MJÍxà z(çy`¦LJÍ;ï"xà Bœ˜[šù«!9/cy«hùè®¸à XœËÌ[XZ[‹šœØØœËÌK]ŒLÌKYš^X˜]ÚšœØ9k£9aj9¬¤¹§"y¥.ybåB»ï"9. :"+:aã¹ *¹¥n9`/ØÙ][ÛœÝ\”˜[šÊ
+X9.#ycåùolzgïûï"xà ¹bçz,¨9íd9ë¥ù­`yê"ûï"Ú[˜]XÂ˜ÜÙP˜]XØ][˜Ú[™Ù[Û˜]X;ï"z`&z/*¹k£9aj9¬¤¹§"y¥.ybå{ï#9¬¯ùå*9."¹. :/*¹mì¹í¤Âºjeú+bz`c¹æ¡:`£ú/+ûï#:`&y«(y¬¤¹§"zaãy¥¬:-äy. 9«(yk£9¥m9bçz,¨9­`yê"ùfç¹«n;ï"9/oùå*: !y§+9.®¹.gù¦#¹è®‚º(j9é.¹.#zg :) z-äy¥m9`"ùí¬¹êæyk£9¥m9fç¹«n;ï"xà ‚‚ˆÈÈÈŒ‹LLˆ8 %8à#9ieùå*9.)¹egùbåxà#yç'ùæ¡9§ ùegùbåz!ê¹båy¢,:k)xà ybkù§+9 *¹âjz(ç9fçŒÌ	yo-ùc%¸à yfç¹d":e¤úf¥9ecúhc9£¤¹§éB‚¹/oùå*: !z`&z/*¹£ä9aî:nç»ï"9ë+:nçº*"¹ kú(ªù¢*¹¥­ûï#9¬¤¹§"yaiùk®{ï"{ï&‚‚ŒKˆ
+Š¸à#9¢,:k)y.+ze¢ùegùa`ùí(9c(ûï#9ieùå*9egùbåy¢cy¦+ù¬¤¹cãy¡âxà#JŠ¸ %8 %9¨.yfè9¢o¹b,9.¡»ï&‚ˆÛÛ™š\›P]]Ð˜]TÙ][™ÜÊ
+X;ï"9£"zb%y¥¡ùkeú(ªØ[œÝ\™Q[[Y[›ÞÝ]ÕRJ
+X9¥.y¢$ˆ8à#9ieùå*9.)¹egùbåxà#{ï"yc§ù§+9cê¹§ ùdo9cêù¥è¹§"yæ¡9kf9ª¥:`£ú/+ûï"9kf:)äº"l‹ù¢ : ïKÒTÔ:e 9ª®ú*+yk¦»ï"{ï#ˆ9o§ºh+yb,9l/¹¬¤¹§"yç'ùæ¡9¢¢˜]]Ð˜]X9¢dúe¢ûï#:-çù£"zb%y¥¡ùkeù¢oú*ï¹æ¡:(c9à®¹l#y.#z-mù/¡¸ %8 %ˆ9ãªyk­º*+yk¦¹kf9ioy.¡¸à z)¥¹ê¥ù.gúeç9.¡»ï#9/a¹åjúgh¹."¹.à:n¯:`ïy¬¤º+¢»ï"9fè9à®¹¨.y§+9¬¤º`,¹aiz!ê¹båBˆ9ª(yo#ûï"{ï#9¡'ú)®¹l,y`ãøà#9¬¤¹cãy¡âxà#xà ¹/ë¹¬å{ï&˜œËÌK]ŒLÌKYš^X˜]ÚšœØ9æ¡ˆÛÛ™š\›P]]Ð˜]TÙ][™ÜØ:)¡¹kêú(è{ï#9kf9k£:*+yk¦¹.bùo£;ï#9i ¹§§]]Ð˜]X:`¡9¬¤‚ˆ9¢dúe¢ûï#9do9cêù¥è¹§"yæ¡ÙÙÛP]]Ð˜]J
+X;ï":-çúgh¹§où§ 9."ºgh¸à#9egùbåxà#y£"zb%yd#9. 9ieÂˆ:`£ú/+ûï#]]ÐÛÛ™šYØØ]]ÐÛÛ™šYÌ˜Ø]]ÐÛÛ™šYÌØ8à URxà y¢,:k)yí :c!:`ïy§ ù. :-mÂˆ9«hùè®¹d#9«i{ï"{ï#9i ¹§§9mì¹í¤úe¢ú$eùbaù.#y§ ú*©:)î9æo:eç:e¢xà ¹å*^]ÜšYÚ9g*9ç'ùké¹¢,:k)Bˆ9âà9¡bù."ùké¹®+;ï&ºnç¹­k¹båya`ùí(9c(ù£"zb%x¡¤ºnç¹ieùå*;ï"9d*ùa`ùí(9c(ù¦`¹¥n9à®Œ9¦`º) yab:`c¹nèùdb‚ˆ9è®º*£yob9ê¥ú`¨ù¨§z-ëùo¤{ï"x¡¤¹è®º*£X]]Ð˜]X:+¢¹¢$Y{ï&ùcé¹i%¹®+:`c¸à#9mì¹í¤ù¦+úe¢ú$eùæ¡ˆ9âà9¡bù."ùa£znç¹. 9«(yieùå*8à#yè®º*£y.#y§ ú(ªú*©:eç9£¢xà ‚‚Œ‹ˆ
+Š¸à#9fç¹d"9.búe¤úb§9£©ze¤úf¥:-¢¹/¡º-¢ºemøà#JŠ¸ %8 %8¦¨;î#È:"¬y.¡¹i)úaãù¦`ºe¤ù£¤¹§é{ï#
+Š¹¬¤¹§"yg*9cåù£©Âˆ9®+:*i¹.+zaãyãïŠŠ¸à ¹b!¹ajzf£¹«­y§é{ï&ŠJH9æí9£©zaãù®+:`(ùî£9i&¹fç¹d"›ØÙ\ÜÓ™^ÛÛX˜][ˆ9æ¡9kéºf¦úe¤úf¥;ï"yéäº!ê¹båy¢,:k){ï"{ï#9aj9ê"ùêjyk¦º$/yg*ŒKyéä»ï#9¬¤¹§"y.îù/ey¢$:emú-ª9bè»ï&Âˆ9d#9¦`¹æèù£©ù«ãù. 9«(XÙ][Y[Ý]ØÙ][\˜[9do9cêûï#[™[™ÐÛÝ[9aj9ê"ùí«y£ Bˆ9`"ù/cy¥n;ï#9¬¤¹§"z*"9¦`¹fj9h!¹êcxà ŠŠH9. 9n©¹.éyà®¹¢o¹b,Óyëà:nç¹£ yî£9h§¹b¨9æ¡:+by¤æ‚ˆ;ï"9éä¹®+:*i˜ÛS›ÙPÛÝ[9o§ŒML:emùb,MŒûï"{ï#9/a¹å*]]][Û“ØœÙ\™\˜ˆ:/ïz.i8à#9­ê9h§¹b¨9æ¡9ëà:nç¸à#yí,9b!¹.bùo£9æo9ãï»ï&¹h§¹b¨9æ¡9ëà:nç¹no¹.c¹aj:`ê9¦+Ø˜]K[[™Xˆ;ï"9¢,:k)yí :c!9æ¡9«ãù. :(c;ï#9§+9/¡¹l,y§"N:(c9."ºfd;ï#9cê¹¦+Î9éä¹®+:*iº)¥¹ê¥ú`¡9¬¤º)î:h »ï#ˆ9ç"ú-mù/¡¹`ãù£ yî£9h§¹b¨;ï#9am¹ké¹§ ù`g9g*9."ºfd;ï"xà y¢ : ïyd#yê,yo¯yêèù`­ùk¬ùob9keûï"9§+9/¡¹l,y§"BˆKŽŒ‹Œ¹éä¹o£:!ê¹båyéîúfi9æ¡:*"9¦`¹fj;ï#9cê¹¦+úaãù®+9åm¹."ùbfùioy§"yno¹`"ú`¡9g*:hæú(c9.+{ï"x %8 %ˆ:`&y.¦ùaj:`ê:`ïy¦+úh$9§'ùaiøà y§"y."ºfd9æ¡:(c9à®»ï#9.#y¦+ù­*y¯#øà ¹æë¹bcy£¤ºfi9.¡¸à#:*"9¦`¹fjˆ9í+ùêcxà#z-çøà#Óy­*y¯#øà#z`&yajy`"ù§ 9cëú ïyæ¡:`£ú/+ù¨.yfè;ï#9mì¹í¤ú-çù/oùå*: !z) y¦í9amújå9æ¡ˆ:aãyãï¹¥®yo#ûï"9e«¹h-9¢,:k)yaiùfç¹d"9¥n9h§¹b¨9¦`¹¢cz+¢¹¡h»ï'ú`¡9¦+úemù¦`ºe¤úe¢ú$eú`b¹¢,¸à z-ê9i&¹h-ˆ9¢,:k)y¢cz+¢¹¡h»ï'ùi)ù© ¹no¹fç¹d"ùno¹b!ºd&9§ ùæo9ãï»ï'ùdê¹`"ú(çyïk»ï"{ï#9æë¹bcz`¡9g*9ëbyfçº)¡»ï#ˆ9¬¤¹§"y`f¹.îù/ey¥.ybåxà ‚‚ŒËˆ
+Š¹bkù§+9 *¹âjyo-ùn©º,áù¥¦JŠ¸ %8 %9/oùå*: !z) ycàú  ú,áù¥¦{ï#9d#9¦`¹cãy¡âxà#9bkù§+9æ¡9 *¹âjy¡'ú)®‚ˆ9i*¹o,y.¡¸à#xà ¹£ä9/¦ù.¡˜XZÙV›Û™S[ÛœÝ\Š
+X9æ¡9k£9¥m9£æùë¥ùak9o#ûï"9î/znç¹¥nù¥cù£mËújå:,ê‹Âˆ:fª9ªgù¬h9b!ºacKù¢ : ïyb!¹í&ºe 9ª®ûï#9aj:`ê9g*œËÌ[XZ[‹šœØ9æ¡ˆÙ[™\˜]S[ÛœÝ\]šX]TÚ[Ê
+XØÙ][ÛœÝ\”ÚÚ[Y\[™Ú[˜ÙJ
+X;ï"Bˆ9íi¹/oùå*: !ycàú  ûï#9d#9¦`¹æo9ãï¹. 9`"ùkéºf¦ú$/ymë»ï&¹. :"+9íí9b§ùc`9gçùæ¡9 *¹âjyg*ˆœËÌK]ŒLÌKYš^X˜]ÚšœØ:(èy§ ùa£yieùå*ŒLÌWÓSÓ”ÕT—ÔÕ‘S‘ÕLKŒÌˆ;ï"ÔÔù¥.ù¤â‹úf,¹é©‹úke9¥.ùd!0åÌKŒûï"{ï#9/aº`&y«(y¥¬9h§¹æ¡9bkù§+9 *¹âjy¦+ùæí9£©yå*ˆXZÙV›Û™S[ÛœÝ\Š
+X9æ¡:(î9¥n9`/8à y¬¤¹§"yieùå*:`&y¨§yo-ùc%¸ %8 %9£æùë¥ù."ù/¡¹d#9ëbyí&¹æ¡ˆ9bkù§+9 *¹âjy«å9. :"+9íí9b§ù *¹âjyo,y.¡¹¥m9¥mÌ	{ï#:`&y©mycëú ïyl,y¦+ù/oùå*: !y¡'ú)®¹b,9æ¡:$/ymë‚ˆ9/¡¹®¤8à ¹mì¹g*œËÌË]ŒLÌ‹XÛÛ[Y^[œÚ[Û‹šœØ9¥¬9h§‚ˆ\Q[™Ù[Û“[ÛœÝ\”Ý™[™Ý
+
+X;ï":-çØÝ™[™Ý[“[ÛœÝ\Š
+X9k£9aj9d#9. 9ieÂˆ0åÌKŒÌ9`#yã¡ûï"{ï#9£©yb,9aj:`êy`"ùbkù§+9 *¹âjynî¹©âúnç»ï"9í¤újeùbkù§+L:f®ùl#ùamxà y§d9¥¦ybkù§+ˆyì¯º"ìJÍy¦kº`&¸à z(çy`¦ybkù§+P“ÔÔÊÍ9ì¯º"ì{ï"{ï#:+¤ùbkù§+9 *¹âjz!ìùl$y¢dùnlù. :"+9íí9b§ùc`9gçÂˆ9d#9ëbyí&¹æ¡9 *¹âj{ï"9bkù§+9§+:.ªùmì¹í¤ùå*9¦í:jæ9ëbyí&¹ak9o#Ëù¦í9i&¹ì¯º"ìKP“ÔÔùh!¹å¢ºfèùn©»ï#ˆ9.#zg :) yd#9ëbyí&¹¥n9`/9§+:.ªú`¡9¢dù¢¦;ï"xà ¹å*^]ÜšYÚ:jeú+b{ï&Œyí&¹ *¹âjyc§ùiâÂˆX^LÍLØ]XÚÏMÌ;ï#9ieùå*9o£:+¢¹¢$X^MMKØ]XÚÏNLX;ï#:-çù¢bùbåyë¥ùæ¡ˆ0åÌKŒÌ9íd9§§9k£9aj9. :!í;ï#9.%:`#ú`c¹ç'ù«hùdo9cêØŒLÌ™YÚ[‘^[™Ù[ÛŠ
+X9å(¹å'ùæ¡ˆ9kéºf¦ùbkù§+9 *¹âjzfhùb%ú`$9. 9¨.9l#y¥n9`/9«hùè®¸à ‚‚ŠŠ¹mì¹çézfd9b-ŠŠ»ï&¹ë+ºnç»ï"9fç¹d":e¤úf¥9ecúhc;ï"yl&¹§*º)èù¬n»ï#:g :) y/oùå*: !y£ä9/¦ù¦í9amújå9æ¡ºaãyãï¹¨§y.í¹¢cz ïyîo9î£9§é{ï&ù/oùå*: !z*"¹ kú(èyæ¡9ë+:nç¹aiùk®y¦+ùên¹æ¡;ï#:`¡9¬¤¹§"yo¥ùb,9o£9î£9fçº)¡¸à ‚‚ˆÈÈÈŒ‹LLˆ8 %:!ê¹båy¢,:k)z*+yk¦»ï&¹¢á¹£¢zfæyli9¨a¸à y¢ïù£¢yi&ºi&9æ¡9aiú`ê9£l¹båB‚¹/oùå*: !yfç¹h,z!ê¹båy¢,:k)z*+yk¦º)¥¹ê¥øà#9.#yå*9câ9§"y. 9`"ùaiù¨a»ï#9æí9£©y. 9`"ù¨a¹l,yio{ï#9á-¹o£9¢¢¹¨a¹¥/¹i)ûï#º+¤ù¢`9§"y£"zb%y¥¡ùkeù. 9«(yl,ydb9ãï»ï#9á(zg 9£l¹båxà#{ï":fa9¢*¹g%»ï&¹i%¹lišÛYKY™X]\™K[[Ù[X›Þº(èzghº`¡9ieù.¡¹. 9li9§"z!ê¹mìzaäz"lº`¢¹¨a‹ùn¥z"l¹æ¡Ø]]Ð˜]TÙ][™ÜÔ[™[;ï#9aiùli9¨aº!ê¹mìBº(ªù¢*¹¥­øà y."úghº`¡9§"y. 9«­y£lº.î;ï#9aiùk®z(ªú(ày£¢y. :`ê9b!»ï"xà ‚‚ŠŠ¹¨.yfè
+Š»ï&˜ÜÜËÌ\ÝYÙK]ŒMXÚ\˜XÝ\‹\ØÜ›ÛYš^˜ÜÜØ:(èy§"y. 9¨§z""º)£ùbaÂ˜ÚÛYQ™X]\™S[Ù[˜]]Ë\Ù][™ÜËY^[™YÈX^ZZYÚÌšÈÝ™\™›ÝË^N˜]]ÈZ[\Ü[ÈX;ï#¹¢¢º`&y`"úgh¹§oùe«¹ãj:c¥¹g*9«å9i%¹lišÛYKY™X]\™K[[Ù[X›Þ;ï"X^ZZYÚŽM™š;ï"yçë¹o¢9i&‚¹æ¡:jæ9n©¹."»ï#:`(9¢$8à#9i%¹li9¨a¹am¹kéº`¡9§"yênºe¤øà yaiùli9¨a¹cnùab:(ªù¢*¹¥­øà z`¡:) z!ê¹mìy£l¹båxà#yæ¡:fæy¨a‚»ï"ùaiú`ê9£l¹båy *º,hxà º`&y¨§z)£ùbaù¦+ÕŒM:`¨ù. :/*¹à®¹.¡¹/ë¹£l¹båyecúhc9b¨9æ¡;ï#9o£9/¡˜™ØÚËX›ÝÛXº(ªù¢ïù£¢xà yi%¹li9¨a¹æ¡X^ZZYÚ9.gùmì¹í¤ù¥/¹kë9b,M™š;ï#:`&y¨§MÌš9æ¡:""º)£ùbaùcnù¬¤¹§"z-çú$eÂ¹¢ïù£¢{ï#:+¢¹¢$9¢ :(dù`­xà ‚‚ŠŠ¹/ë¹¬åJŠ»ï&‚ŒKˆ9¢ïù£¢z`&y`"úgh¹§oú!ê¹mìyæ¡X^ZZYÚÌš:-çØÝ™\™›ÝË^N˜]]ÈZ[\Ü[;ï#ˆ9¥.y¢$Ý™\™›ÝÎš\ÚX›HZ[\Ü[ÈX^ZZYÚ››Û™HZ[\Ü[Ø;ï#:+¤ùk Âˆ9e«¹í%:fª9aiùk®zemújæ;ï#9£l¹båyk£9aj9.©9íi¹i%¹lišÛYKY™X]\™K[[Ù[X›Þ9. 9`"ù.®º,¨:,«ˆ;ï"9§+9/¡¹l,y§"XÝ™\™›ÝË^N˜]]Ø;ï"ØM™š;ï"xà ‚Œ‹ˆ9¥¬9h§˜ÚÛYQ™X]\™S[Ù[Ø]]Ð˜]TÙ][™ÜÔ[™[˜]]Ë\Ù][™ÜËY^[™YØ›Ü™\ŽŒØ˜XÚÙÜ›Ý[™˜[œÜ\™[Ø›Ü™\‹\˜Y]\ÎŒØ›Þ\ÚYÝÎ››Û™NÜY[™ÎŒßX;ï#ˆ9¢ïù£¢zgh¹§oú!ê¹mìyæ¡:)¥º)®¹¨a»ï"9c§ù§+˜]]Ë\Ù][™ÜËY^[™Y9gî¹é#¹ª(ùo#ùg*ˆ[XZ[‹˜ÜÜØ:(èy§"z!ê¹mìyæ¡:aäy¨a‹ù­ìyn¥Kùg$ú)ä‹ÌLY[™ûï"{ï#9cê¹åfyi%¹li:`¨ù. 9`"Âˆ9¨a»ï#9i%¹li9§+9/¡¹l,y§"LMœY[™ûï#9aiùk®y.#y§ ú,¯:`¢¸à ‚‚ŠŠºjeú+by¥®yo#ÊŠ»ï&”^]ÜšYÚ:aãù®+Ù]›Ý[™[™ÐÛY[™XÝØÙ]ÛÛ\]YÝ[X;ï#¹è®º*£{ï&¹aiùli:gh¹§oØ›Ü™\˜Ø˜XÚÙÜ›Ý[™ØY[™Ø:`ïy«n:fí¸à XX^ZZYÚ››Û™X8à B˜Ý™\™›ÝË^Nš\ÚX›X;ï&ùg*L:jæ9æ¡:)¥¹ê¥ù."ùi%¹li9¨a»ï"ŒÜ;ï"yk£9aj9.#zg :) y£l¹båyl,z ïBº(çy."ùaj:`ê9aiùk®{ï"9d*ù§ 9."úgh¸à#9ieùå*9.)¹egùbåxà#y£"zb%{ï"{ï&ù¢¢º)¥¹ê¥újæ9n©¹ª(y¤ë:fcyb,Ì9å&º!ìÂŒ9¦`»ï#9.gùcê¹§"yi%¹li9¨a¹. 9`"ù£lº.î;ï"9.#ya£y¦+úfæyli9¨a¹d!:!ê¹¢*¹¥­ûï"{ï#9ë)¹d":h$9§'ùæ¡9a*ºfáBºfcyí&º(c9à®¸à ¹¢*¹g%¹«å9l#yè®º*£z)¥º)®¹."¹ç'ùæ¡:+¢¹¢$9e«¹. 9`"ù¨a¸à y¢`9§"ychyâaú"!ù£"zb%y. 9«(zhkùé.¸à ‚¹cé¹i%¹å*^]ÜšYÚ9kéºf¦únç¹¤â¸à#9egùbåxà#y£"zb%yè®º*£X]]Ð˜]X9âà9¡bù«hùn.9b!ù£æûï#¹è®º*£z`&y«(y¥.ybåy¬¤¹§"ybåyb,9.îù/eznç¹¤â¹.¢ù.íº`£ú/+øà ‚‚ŠŠ¹mì¹çézfd9b-ŠŠ»ï&˜ÜÜËÌ\ÝYÙK]ŒMXÚ\˜XÝ\‹\ØÜ›ÛYš^˜ÜÜØ9æë¹bcy¬¤¹§"z(ªùí#yaiB˜ÝX9oêùcå¹âb9§+:&gùªgùb-»ï"9c§ù§+9l,y¦+ùå*9í%[šÏ˜9ª&yìi:gg9¡bú/"yai{ï#9.#y`ãÕŒLÌKÕŒLÌº`¨ùno¹`"Â¹ª¥9¨b9§"ybåy¡bú/"yaiyfj;ï"ùâb9§+:&gûï"{ï#:`&y«(y/ë¹¥.yi ¹§§9/oùå*: !yà#ú)¯yfj9oêùcå¹.¡º""¹âbÔÔûï#9cëú ïBºg :) y¢bùbåy®!y. 9«(yoêùcå¹¢%¹o-ùb-ºaãy¥¬9¥m9ä!¹¢cy§ ùç"ùb,9¥b9§§8à ‚‚ˆÈÈÈŒ‹LLˆ8 %ŒLÌ»ï&¹¥¬9h§¹ë)¹d¤»ï#ù§d9¥¦{ï#ú(çy`¦yieú(ç{ï#ù¢¯yãc¹b.;ï#ù."y`"ù¥éyn.9bkù§+;ï"9ë+9fæú/*¹i)ù¥.ybå{ï"B‚¹/oùå*: !z`&z/*¹£ä9aî¹. 9«(yi)ùg¢ùaiùk®y¤í9aazg 9¬`»ï"9.#y¦+ùfç¹h,XYûï"{ï&¹¥¬9h§Œùê+¹ë)¹d¤»ï"9a¬9l Kúf¬z.ªËùíd9åc;ï#9d!:f£»ï#¹doy.+yªgùã¡ûï'zf£¹í&¹fî¹k¦¹ªgùã¡ûï"ú)äº"l¹¦n¹b¦ùb¨9¢$;ï"xà yé)¹çìú"!ú(çy`¦z*+z*"9g%¹í&y§d9¥¦xà y. :"+9íí9b§Í9ê+¹/cºf£º`dùamùd!IB¹ãj9êâù£¢z$/xà Lù`"ù¥éyn.9bkù§+;ï"9í¤újeËù§d9¥¦Kú(çy`¦{ï#9d!9«ãù¥éLy«(xà yi,y¥eù.#y¢hù«(y¥n;ï"xà M9a`ùí(:(çy`¦yieú(ç{ï":-i9à£‹Â¹kä¹¬âKùlªyl¬Ëúgd¹md;ï#9d!L9.í¸à Lù.í¹g#yaj
+Ì{ï#Íy.í¹l#y¡âya`ùí(9¢ : ïy`­ùk¬ÊÌ‰{ï"xà y¢¯yãc¹b.:e¢ùieú(çyªgùb-»ï#9i%¹b¨¹¢¢¹fç¹d":e¤ùên¹¢ãyo§ŒKŒùéäº*¯ùb,Kyéä¸à ¹aj:`ê9¥¬9h§º`£ú/+ù¥/¹g*9¥¬9ª¥9¨b;ï&‚‚‹H
+Š˜œËÌË]ŒLÌ‹XÛÛ[Y^[œÚ[Û‹šœØ
+Š»ï"9¥¬9ª¥;ï"{ï&¹¥m9c!yaiùk®z`£ú/+ûï#9å*9d#9. 9`"ÒRQ‘xà xà#:+ :""¹aïyo#ø¡¤‚ˆ9c!y. 9li8¡¤¹do9cêùc§ùaïyo#ø¡¤¹b¨9¥¬:`£ú/+ø¡¤¹hg¹fç¹d#9d#yaj9gçú+¢¹¥n8à#yæ¡9¥è¹§"[Ý™\œšYy¢bù¬åy£©z`,‚ˆÚ[[ÛœÝ\˜ØÚ[˜]XØÜÙP˜]XØ™\ÛÛ™T]Y]YY^Y\XÝ[Û˜ØÙ]\]Z\Y[›Û\ØÂˆÙ][[Y[[XYÙT\ÜÚ]™S][\Y\˜Ø\]Z\Ù[XÝY][XØ™[™\˜]R][SY[XÂˆ™[™\‘[™Ù[Û•XÛÛ[ØÜ[’][S[Ù[ØÜ[‘\]Z\Y][X:`&y.¦ù¥è¹§"yaïyo#ûï#9¬¤¹§"y¥.ybåy.îù/eBˆ9. :(cœËÌ[XZ[‹šœØ9§+:jå8à ¹bkù§+9 *¹âjy`'ùå*[ÛœÝ\œØ9aj9gçúfhùb%ù§+9/¡¹l,ycëù.éy¥m9c!y¦ïù£æùæ¡9¥è¹§"y¡hù/¢Âˆ;ï"][˜Ú[™Ù[Û˜]J
+X9`'ùk£9¥m9.ïX[ÛœÝ\œØØÝ\œ™[›Û™X;ï#9íd9§gùo£9k£9¥m:`¡9c§ûï"xà ‚‹H
+Š˜ÜÜËÌÌË]ŒLÌ‹XÛÛ[Y^[œÚ[Û‹˜ÜÜØ
+Š»ï"9¥¬9ª¥;ï"{ï&¹ãc¹bíyob9ê¥øà ybkù§+9®!ye«¹chyâaøà y¢¯yãc¹b.:`n9¤áù£"zb%Bˆ9æ¡9§ 9l#ùcëùå*9ª(ùo#ûï#:-çú`b¹¢,¹¥è¹§"y­ìz"l¹ìîúacz"l¹. :!í8à ‚‹H
+Š˜œËÌŒX[›Ûž[[Ý\ËLŒšœØ
+Š»ï&¹«å9áiÕŒLÌyæ¡9båy¡bú/"yaiyfj9ª(yo#ûï#9¥¬9h§˜ØYŒLÌÛÛ[^[œÚ[ÛŠ
+X;ï#ˆ9g*ÓPÛÛ[ØYY9o£9båy¡bù£ä¹aiy."ºgh¹ajy`"ù¥¬9ª¥9¨b;ï"ÝLLÌ˜;ï"xà ‚‹H
+Š˜œËÌK]ŒLÌKYš^X˜]ÚšœØ
+Š»ï&˜ŒLÌWÔ‘TÓÓ‘WÑSVWÓTØ9o§ŒLÌ9¥.y¢$ML;ï"9fç¹d":e¤ùên¹¢ãLKyéä»ï"xà ‚‚ŠŠº`c¹ê"ù.+yæo9ãï¹.)¹/ë¹«hùæ¡¹`"ùç'ØYÊŠ»ï":`ïy¦+ùab9kêùê"ùo#ùè¯9a£yå*^]ÜšYÚ9kéºf¦ú-äz`c¹¢cy¢¤ùb,9æ¡;ï"{ï&‚‚ŒKˆ9. :e¢ùiâùkêÝ[\ÛX[¹íd9ë¥ùæ¡\Ü]ÚÝ™\œšYy¦`¹ã':c+ù.¡˜œËÌ[XZ[‹šœØ:(èxà#9k¨ùdb¹o£9íd9ë¥øà#z`¨ù`"Âˆ9aïyo#ùæ¡9d#ykeûï"9ã'9¢$™\ÛÛ™T]Y]YYXÝ[Û‘›ÜÚ\˜XÝ\˜;ï"{ï#9kéºf¦ù."¹¦+Ø™\ÛÛ™T]Y]YY^Y\XÝ[Û˜ˆ;ï"Ú\˜XÝ\’[™^ÚÙ[˜9ajy`"ùcàù¥n;ï"xà ¹mì¹å*Ü™\9kéºf¦ùè®º*£yaïyo#ùd#yê,y.)¹/ë¹«hûï#9.#yá-¹ë)¹d¤¹g*9¢,:k)y.+Bˆ9§ ùk£9aj9¬¤¹§"yíd9ë¥ù¥b9§§;ï"9c§ù§+9æ¡9ê"ùo#ùè¯9§"XÛÛœÛÛKØ\›˜:f,¹da»ï#9/a¹i ¹§§9¬¤¹ânyb)yc®ùç"ØÛÛœÛÛHÙÂˆ9o¢9k®y¦$ù¯#ù£¢z`&y`"ùecúhc;ï#9.bùo£9£©y¢bùæ¡9.®¹kêÛÝ™\œšYybcybæyoáyabÜ™\9è®º*£yaïyo#ùd#yê,ykf9g*;ï"xà ‚Œ‹ˆ9a`ùí(:(çy`¦yieú(çz(èy«i¹fj:`ê9/c{ï"9b ù¢aûï"yæ¡9âjydàX\X9c§ù§+9kêù¢$š[™˜;ï#9/a˜œËÌ[XZ[‹šœØ:(èBˆ9kéºf¦ù¬n¹k¦¸à#:`&y`"Ý\z ïy.#z ïz(ªùêoùb,9dê¹`"ú(çy`¦y«!8à#yæ¡Ù][™[ÜžQ\]Z\Y[ÛÝ
+
+X9cêº*£BˆÙX\Ûˆ˜:`&y`"Ý\ykeù.,»ï"š[™˜9.#yg*9l#yáiú(j:(è{ï#9§ ùl#º!í9êoú(çyi,y¥eù/a¹.#y§ ùh,zc+ûï#ˆ\]Z\Ù[XÝY][J
+X9cê¹¦+úgg:næ™]\›»ï"xà º`&y`"ØYùg*XY\Üùà#ú)¯yfj:(èykéºf¦ù®+:*i¸à#:(çy`¦yieú(çBˆù.í¹b¨9¢$8à#y¦`¹¢cyæo9ãï»ï"9êoú(çy.bùo£9ieú(çz*"9¥n9. 9æí9chyg*»ï#9®b¹.#y®ïÌù.í»ï"xà ¹mì¹/ë¹«hù¢$\NˆÙX\Ûˆ˜8à ‚ˆœËÌ[XZ[‹šœØ9§+:.ªú`&z(èy§"y`"ù¥è¹§"yæ¡9.#y. :!í;ï"\Ñ\]Z\Y[[™[ÜžU\J
+X9¢¢˜š[™˜9.gùë¥Âˆ:`,¹c®øà y/a˜Ù][™[ÜžQ\]Z\Y[ÛÝ
+
+X9.#z*£{ï"{ï#:`&y«(y¬¤¹§"ybåX[XZ[‹šœØ9c®ù/ëº`&y`"ù.#y. :!í;ï#ˆ9cê¹¦+ùè®¹/çy¥¬9h§¹æ¡9âjydàyk¦¹ïªyå*9l#yæ¡\y`/8à ‚‚ŠŠºjeú+by¥®yo#ÊŠ»ï&¹å*9§+9ªgÈ]ÛŒÈ[HœÙ\™\ˆNX
+È^]ÜšYÚXY\ÜÈÚ›ÛZ][{ï#9aj9ê"ùîgº`c‚•Rz(j9e«¹æí9£©ydo9cêØÜ™X]PÚ\˜XÝ\Š
+XØÜ™X]PY][Û˜[Ú\˜XÝ\Š
+X9nî¹êâù®+:*iº)äº"l»ï"9ëbyí&¹æí9£©y¥.B˜^Y\‹›]™[;ï"{ï#:`$9. 9kéºf¦ú-äz`c¹.éy."ù­`yê"ù.)¹è®º*£z,áù¥¦KÑÓyâà9¡bù«hùè®¸à yaj9ê"úfí˜YÙY\œ›Ü˜;ï&‚‹H9. :"+9íí9b§ù£¢z$/{ï&¹o-ùb-”“‘ùoáy.+{ï#9è®º*£M9ê+¹/cºf£º`dùamûï"ùë)¹d¤ŠÌyé)¹çìûï"yd!:!ê¹ãj9êâùb)9k¦¸à z ïy«hùè®¹b¨9aiz ã9c!B‹H9ë)¹d¤¹¢,:k)y/oùå*;ï&¹a¬9l yë)¹doy.+{ï"9 *¹âjy«hùè®¹¢ïùb,Ý\Nˆ™œ™Y^™H‹\›œÓYX9âà9¡bøà ynªùkf9«hùè®¹¢hÌ{ï"xà Bˆ9§*¹doy.+{ï"9åjùâb9i,y¥eÛÙøà y.#y­¢: %úhcyi%¹nªùkf;ï"xà X™[™\˜]R][SY[J
+X9g*9ë)¹d¤¹b!ºh y«hùè®¹®,¹§äùaî‚ˆ9cëúnç¹¤â¹£"zb%{ï"9d*øà#9å'ù¥b9ªgùã¡ÌÍIxà#y¥¡ùkeøà XÛ˜ÛXÚÏH\ÙU[\ÛX[Š‹‹ŠH˜;ï"B‹H:(çy`¦yieú(ç{ï&¹ëbyí&ºe 9ª®ûï"Œ:f.ù¤âù.)º-ìØ[\8à x¢iLŒ9¥/º(c;ï"xà Lù.í¹g#JÌyb¨9¢$;ï"9¥n9`/:`$:h!y¨.9l#y«hùè®»ï"xà Bˆy.í¹l#y¡âya`ùí(9`­ùk¬ÊÌ‰{ï"9å*^Y\˜9§+9.®º-çØ^Y\Œ˜9b!¹b)zjeú+bycê¹§"ya`ùí(ùieú(çz`ïyë)¹d"9æ¡:)äº"l¹¢cyd ùb,;ï"B‹H9¢¯yãc¹b.:e¢ùieú(ç{ï&¹­¢: %Ìyo-yb.8à y«hùè®¹¢ïùb,y.í¹l#y¡âyieú(çyæ¡:fª9ªgú`ê9/cB‹H9."y`"ù¥éyn.9bkù§+9k£9¥m:-äz`c»ï"9å*9ç'ùké¹æ¡Ú[˜]J
+XØÜÙP˜]J
+XØÚXÚÐ˜]Q[™
+
+X9íd9ë¥ûï#9.#y¦+Âˆ9cé¹i%¹ª(y¤ë;ï"{ï&¹í¤újeùbkù§+ùh-:.âº/*¹¢,9k£9¥m:-äyk£8à yãc¹bíyob9ê¥øà yæí9£©zh&9cå¹o£Ú\™Y^9«hùè®¹h§¹b¨8à Bˆ9.â¹¥éymì¹k£9¢$9o£9.£9«(y£$y¢,:(ªù«hùè®¹¤âù."ûï&ù§d9¥¦ybkù§+9/§yfç¹d"9¥n9b)9¥­ùkí¹ë¬y¥n:aãøà ze¢ùë¬y«hùè®¹¢ïùb,9§d9¥¦{ï&Âˆ:(çy`¦ybkù§+›ÜÜÊÍ9ì¯º"ìxà y¢¯yãc¹b.:`n9¤áùob9ê¥øà yæí9£©zh&9cåº-çùç"ùnèùdbºfæy`#zh&9cå»ï"ÚÝÔ™]Ø\™YY;ï"yajy¨§Bˆ:-ëùo¤z`ïy®+:`c»ï&ù¢,9¥eú-ëùo¤yè®º*£X[ÛœÝ\œØØÝ\œ™[›Û™X9§ ù«hùè®º`¡9c§øà yåm¹¥éy£$y¢,9«(y¥n9.#y§ ú(ªù¢hù£¢xà Bˆ9cëù.éyêâùb.úaãy¥¬9£$y¢,‹H9«ãù¥ézaãyïk»ï&¹¢¢˜ØØ[ÝÜ˜YÙX:(èXŒLÌ—ÙZ[WÙ[™Ù[Û—ÜÝ]X9æ¡9¥éy§'ù¥.y¢$9o¢9.ay.éybc{ï#:aãy¥¬9¥m9ä!ºh zgh‚ˆ;ï"9ª(y¤ë:-ê9¥é{ï"yo£9è®º*£X\ÙY9âà9¡bù«hùè®ºaãyïk¸à ybkù§+:aãy¥¬9cëù£$y¢,‹H9âjydàz*lùí,9ob9ê¥ÔÕ‘ùg%¹é.¹®,¹§äù/ë¹«hûï&¹è®º*£XÜ[’][S[Ù[
+
+X:(èyæ¡9g%¹é.¹a`ùí([›™\’S9ç'ùæ¡:emùaî‚ˆÝ™Ï˜Óyëà:nç»ï#9.#y¦+ú(ªùåm¹¢$9. 9¥m9.,¹¥¡ùkeùcl9aî¹/¡‚‚ŠŠ¹mì¹çézfd9b-ŠŠ»ï&‚‹H9cê¹`f¹.¡º,áù¥¦Kú`£ú/+ùli:-çù§ 9l#ùcëùå*9æ¡ÔÔËÚ[›[™HÕ‘ú)¥º)®»ï"9/§y/oùå*: !y¦#¹è®¹£!ùé.¸à#9ab9¦ªù¦`¹å*ˆÔÔËÒ˜]˜TØÜš\9båyåjÊÐØ[˜\ËÔÕ‘ù`f¹aî¹/¡»ï#9o£9§'ùa£yå*9ï£º(dù¦í9¥.xà#{ï"{ï#9¬¤¹§"y`fº`$9åjúgh•Rz-l9§éBˆ;ï"9/¢ùi ¹ç'ùæ¡9å*9®äzo(:nçº`c¹bkù§+9®!ye«ºh yæ¡9£¤¹âb8à y¢¯yãc¹b.:`n9¤áù£"zb%yg*9l#ú'¨¹neyæ¡9kéºf¦ú)î9¡'ûï"{ï#:`&y«(yaj:`êˆ:jeú+bz`ïy¦+ùæí9£©ydo9cêùn¥yli9aïyo#Ëù¤ãy/gÓyâà9¡bûï#9.#y¦+ùª(y¤ë9ç'ùké¹¢bù£!únç¹¤â¹¥m9`"ù­`yê"øà ‚‹H9¬¤¹§"y®+:*i¹."y`"ú)äº"l»ï"^Y\ŒØ;ï"y áyh ù."ùæ¡9ieú(çyb¨9¢$ùbkù§+:e¢ù¥/¹¨§y.í»ï#9æë¹bczfæz)äº"lºe 9ª®ùcê¹å*ˆ^Y\˜
+Ø^Y\Œ˜:jeú+bz`c¸à ‚‹HœËÌË]ŒLÌ‹XÛÛ[Y^[œÚ[Û‹šœØ:(èz(çy`¦ybkù§+9æ¡:fæy`#zh&9cå¹­`yê"ûï"ŒLÌÛZ[Q\]Z\Y[[™Ù[Û”™]Ø\™ˆ:(èyæ¡Ü˜[˜9mè¹âà9aïyo#ûï"ykêù¬åyê#yo«¹îg»ï#:`£ú/+ù«hùè®¹/a¹.bùo£9i ¹§§:) ya£y¤í9aaynîº+l:h!¹¢bù¥m9ä!¹¢$:-çÂˆŒLÌÛZ[SX]\šX[[™Ù[Û”™]Ø\™ØŒLÌÛZ[Q^[™Ù[Û”™]Ø\™9. :!í9æ¡9kêù¬åxà ‚‚ˆÈÈÈŒ‹LLˆ8 %9£"zb%y­*y¯#ùb,9am¹.åº)¥¹ê¥øà z+mùæï¹¢hú(`9£ä9é.ºaãz)!øà y¢ : ïzh$:)¯y£l¹båyè-9g%º*¯ù§éB‚¹/oùå*: !z`&z/*¹fç¹h,M9`"ùecúhc;ï#:fa9.¡yo-y¢*¹g%»ï&‚‚ŒKˆ
+Š¸à#9aj9lk9 )ù¢ : ïzh$:)¯xà#y£"zb%y­*y¯#ùb,:!ê¹båy¢,:k)z*+yk¦º)¥¹ê¥ù."ŠŠ»ï"9/oùå*: !y¢*¹g%º(èz!ê¹båy¢,:k)Bˆ:*+yk¦º)¥¹ê¥ùcìù."º)ä¹i&¹.¡¹. :ha¹.#z*l¹aî¹ãï¹æ¡8à#9aj9lk9 )ù¢ : ïzh$:)¯xà#y£"zb%{ï#Ryfè9«i:+¢¹o¥Âˆ:fç9. »ï"x %9¨.yfè:-çØÝ]\Ò[]Û˜9¦+ùd#9. 9ê+˜Yûï&˜ÚÚ[™]šY]ÒXY\]Û˜ˆ9cê¹§"yg*ÝÚ]ÚÚ\˜XÝ\•XŠ
+X9b!ùb!ºh y¦`º(ªú*+yk¦ºhkùé.‹úf¬z%ãûï#9/a˜ÛÜÙRÛYQ™X]\™J
+Xˆ:eç:e¢z)¥¹ê¥ù¦`¹¬¤¹§"y¢¢¹k úaãyïk¹fçºf¬z%ãûï"Ý]\Ò[]Û˜9åm¹¦`¹§"zaãyïk¸à z`&zha¹¯#ù£¢y.¡»ï"{ï#ˆ9cêº) yãªyk­º`,º`c¹. 9«(y¢ : ïyb!ºh {ï#:`&zha¹£"zb%yæ¡\Ü^Nš[›[™KX›ØÚØ9l,y§ ù. 9æí9«¦9åf{ï#ˆ9.bùo£:e¢ù.îù/eyam¹.åº)¥¹ê¥ûï":!ê¹båy¢,:k)z*+yk¦¸à yea¹n¥ø )¸ )»ï"z`ïy§ ùç"ùb,9k øà ¹mìº(ç9."º-çÂˆÝ]\Ò[]Û˜9. 9ª(ùæ¡:aãyïk¸à ¸à#9ieùå*9.)¹egùbåy£"zb%yg*9¢,:k)y.+y¬¤¹cãy¡âxà#yå*ˆ^]ÜšYÚ9ké¹®+;ï"9d*ùç'ùæ¡9g*9¢,:k)9.+xà ya`ùí(9c(ù§"ybjzi&9¦`¹¥n9æ¡9 áyh ûï"y¬¤¹§"zaãyãï»ï#ˆ9¡íùå¤y¦+ùd#9. 9`"ù£"zb%y­*y¯#ú`(9¢$9æ¡9âb:ghºc+ù/cze¤ù£©yolzgïùb,:nç¹¤â»ï#:`&y«(y. :-mù/ë¹£¢y.¡»ï#ˆ9i ¹§§:`¡9§"yecúhc:g :) y/oùå*: !ya£yfç¹h,xà ‚Œ‹ˆ
+Šº+mùæï¹¢hú(`9£ä9é.º`£ú/+ÊŠ»ï&º+mùæï¹k£9aj9¤âù."ú`&y«(y¥.ù¤â»ï"[XYÙX:(ªù¢hùb,;ï"y¦`»ï#9c§ù§+ˆ:`¡9¦+ù§ ùdo9cêØÚÝÔ^Y\’]
+š‹‹‹ŠX;ï#:-ìùaî¹¬¤¹§"y¡#ùïªyæ¡8à#L8à#yí!ykeú-çÂˆ9chyâaúg!ùbåxà ¹¥.y¢$9cê¹§"X[XYÙOŒ;ï":+mùæï¹¬¤¹k£9aj9¤âù/cøà yç'ùæ¡9§"y¢hú(`;ï"y¢cydo9cêûï#ˆ9mì¹å*^]ÜšYÚ9ké¹®+:jeú+b{ï&¹mê9i)ú+mùæï¹ áyh ù."ùaj9ê"Ì9«(yí!ykeÒ9ob9aî¸à ycê¹§"yæoz"l‚ˆ:+mùæï¹¢húfi9¥n9keûï&ùl#ú+mùæï»ï"9§ ú(ªù¢dùêoûï"y áyh ù."ùë+9. 9¤âº+mùæïŠÒ9ajy`"ùob9aîº`ïyaî¹ãï¸à Bˆ9.bùo£:+mùæïº %ùæèycê¹bjyí!ykeÒ9ob9aî»ï#9ë)¹d"8à#:fi:ggº+mùæï¹bjzi&9¢oùcåúaãùl#ù¥¯9`­ùk¬ù¢cy. :-mÂˆ:hkùé.¸à#yæ¡:g 9¬`¸à ‚ŒËˆ
+Š¹¢ : ïzh$:)¯zh xà#9è-9g%¸à#{ï"9¢*¹g%ºhkùé.¹£l¹båy¦`¹¥¡ùkeùå¢¹keËù. ¹è¯;ï"JŠ»ï&¸¦¨;î#È9¬¤¹§"y/ë¹io{ï#ˆ9å*9ç'ùkéº)î9£©ù®äybåyª(y¤ë;ï"9d*ùoêú`'ú`(ùî£9®äybåxà y®äybåy.+ze¤ù¢*¹g%¸à yb!ùb!ºh yo£9®äybå{ï"Bˆ9cãz)¡¹f%ú*iº`ïyá(y¬åzaãyãï¹¢*¹g%º(èz`¨ùê+¹å¢¹keùåjúgh¸à ¹¢*¹g%º(èyaî¹ãï¹.#ylk9¥¯9.îù/eyç'ùké¹¢ : ïBˆ9d#yê,yæ¡9. ¹è¯9¥¡ùkeûï"9/¢ùi ¸à#9¬-9l#z,hy¢bøà#{ï"{ï#9«å:/ ù`ãù¦+ù¢bùªgùg*9£l¹båy¡hù )ú`¡9¬¤¹k£9ajˆ9d"9¢$9ioy¥¬9åjúgh¹æ¡:`¨ù. 9ç«:e¤ú(ªù¢*¹g%¹¢*¹b,;ï#9.#y¦+ù£ yî£9 )ùæ¡:h zgh¹âà9¡búc+ú*©8 %8 %:`&yê+‚ˆ9¦`¹n£ùecúhc9¬¤º/©¹¬åyo§¹ê"ùo#ú`£ú/+ù."¹æí9£©xà#9/ë¹ioxà#{ï#9cêº ïy`f¹n.:)¢ùæ¡9¢bùªgù£l¹båy¥b: ïBˆ9a*¹c%»ï"œÚÚ[\™]šY]ËXØ\™9b¨9."˜ÛÛZ[Ž˜ÛÛ[:-çØÚ[XÚ[™ÙN‚ˆ˜[œÙ›Ü›X;ï#:+¤ù«ãùo-ychyâaùd!:!ê¹ãj9êâùd"9¢$;ï#:fcy/c¹£l¹båy¦`¹¥m:jå:aãyîjºaãûï"{ï#:fcy/c‚ˆ9æo9å'ùªgùã¡øà ¹i ¹§§9.bùo£:`¡9¦+ùn.9n.9æo9å'ûï#:g :) y/oùå*: !y£ä9/¦ÊŠº'¨¹nezc!9olJŠ»ï"9.#y¦+Âˆ9¢*¹g%»ï"y¢cy§"yªgù§ ù¢¤ùb,9ç'ù«hùæ¡9åjúgh¹¦`¹n£øà yè®º*£y¦+ù.#y¦+ùd#9. 9ê+¹ áy¬àxà ‚ˆ
+Šº ã9c!y.âúghº/å9fçºcmy.#z)¢ù.¡ŠŠ»ï&¸¦¨;î#È9¬¤¹§"y¢o¹b,8à y.gù¬¤¹§"zaãyãï¸à ¹å*^]ÜšYÚ9ª¨¹§éy.¡‚ˆ: ã9c!yæ¡9ajy`"ú`,¹aiz-ëùo¤{ï"9."ù¥®yl#º)¯yb%ùæ¡Ú[™[ÜžTYÙX8à yg,9g%ºh z(èBˆÜ[“X\[™[ÜžSÝ™\›^J
+X:e¢ùæ¡:)¡º$âùli9âb9§+;ï"{ï#:eç:e¢Kú/å9fç¹£"zb%yg*9ajz`¢º`ïBˆ9«hùn.:hkùé.¸à y«hùn.:`bù/g8à º`&y«(y/oùå*: !zfa9æ¡yo-y¢*¹g%º(èy¬¤¹§"y. 9o-y¦+ú ã9c!yåjúgh»ï#ˆ9ï.¹.cú)¥º)®¹íæ¹í(¹«å9l#{ï#9."ù. 9`"ù£©y¢bùæ¡9.®¹i ¹§§:) yîo9î£9§é{ï#:g :) yab:-çù/oùå*: !z) Bˆ9. 9o-ykéºf¦ùç"ùb,8à#:/å9fçºcmy.#z)¢ù.¡¸à#z`¨ù`"ùåjúgh¹æ¡9¢*¹g%»ï#9¢cyioyb)9¥­ùb,9n¥y¦+ùdê¹`"Âˆ: ã9c!yæî:eç9åjúgh¸à ydê¹`"ù£"zb%xà ‚‚ˆÈÈÈŒ‹LLˆ8 %9aj9lk9 )ù¢ : ïzh$:)¯{ï&¹ç'ù«hù/ë¹ioy£l¹båH
+È9keùí&º*¯ùb,:"$¹§#yi)ùl#Â‚¹."¹. :/*¹¢¢¹¥¡ùkeùb¨9i)ùb,L;ï":'¨¹ney."¹í!Í\;ï"y.bùo£;ï#9/oùå*: !yfç¹h,xà#9.#z ïy£l¹bå{ï#9."úgh¹ç"ù.#yb,8à#{ï#º #9.%Í\9è®¹ké¹i*¹i)øà º`&y«(yajy`"ùecúhc9. :-mù/ë»ï&‚‚ŒKˆ
+Š¹£l¹båXYùæ¡9ç'ù«hù¨.yfè
+Š»ï&˜œËÌK\ÝYÙK]Ž]ÝXÚ[ØÚËšœØ9æ¡9aj9gçú)î9£©úc¥¹æoyd#ye«‚ˆ9. 9æí9¬¤¹§"y¢¢˜œÚÚ[\™]šY]ËX›ÙX9b¨:`,¹c®ûï#9¢bù£!ùç'ùæ¡9®äybåy¦`º(ªùk£9aj9¤âù£¢{ï"9ê"ùo#ùc%‚ˆØÜ›ÛÜ:,é¹`/9.#ycåùolzgïûï#9¢`9.éy.bùbcyå*:`&y`"ù¥®y¬åzjeú+bxà#9ç"ú-mù/¡¹¬¤¹ecúhc8à#yam¹ké¹¬¤¹®+9b,ˆ9ç'ù«hùæ¡9ecúhc;ï"xà ¹b¨:`,¹æoyd#ye«¹o£;ï#9å*^]ÜšYÚ9ª(y¤ë9ç'ùkéº)î9£©ù®äybåBˆ;ï"[œ]™\Ü]ÚÝXÚ]™[;ï"zjeú+bz`c˜ØÜ›ÛÜ9ç'ùæ¡9§ ú-çú$eù¥.z+¢¸à º*lùí,9c§ùä!º)¢Âˆ9."¹¥®xà#9ìîùíly§­¹©âúaãznç¸à#yë+yëà;ï#9.éyo£9.îù/ey¥¬9h§¹æ¡9cëù£l¹båyk®yfj:`ïz) z*&9o¥ùª¨¹§éz`&y.ïyæoyd#ye«¸à ‚Œ‹ˆ
+Š¹keùí&º*¯ùb,:"$¹§#yi)ùl#ÊŠ»ï&ŽL:fcyb,9ª&zhc\;ï":'¨¹neyí!N\;ï"xà ylk9 )ùb!ºh y£"zb%LÎ\ˆ;ï":'¨¹neyí!M\;ï"xà y¢ : ïyd#yê,M;ï":'¨¹neyí!MÜ;ï"xà yb!ºhg¹ª&yìiÌÜ;ï":'¨¹neyí!LÜ;ï"xà Bˆ:*ª¹¦#¹¥¡ùkeÌÎ\;ï":'¨¹neyí!M\;ï"{ï#:`ïy¦+ùå*ŒÎyî+¹¥/¹«å9/¢ù£æùë¥ûï#9¥n9`/9g*ˆÜÜËÌÌK]ŒLÌKYš^X˜]Ú˜ÜÜØ:(èXØ[[[Y[ÚÚ[™]šY]Ó[Ù[:`¨ùno¹¨§z)£ùbaøà ‚‚ˆÈÈÈŒ‹LLˆ8 %9aj9lk9 )ù¢ : ïzh$:)¯y¥¡ùkeùç'ù«hùæ¡9¨.yfè9/ë¹«hûï"ˆÎ{ï"B‚¹ë+9."z/*¹/ë¹k£9o£;ï#9/oùå*: !ycâ9cãy¦(8à#9aj9lk9 )ù¢ : ïzh$:)¯xà#y¥¡ùkeú`¡9¦+ùo¢9l#øà yæí9£©z) y¬`‚¹b¨9b,Í\8à º`&y«(y¬¤¹§"ya£ye«¹í%9¢¢¹¥n9keùo 9."º*¯ûï#: #9¦+ùké¹®+9æo9ãïº`&y`"ùob9ê¥ù­.ùg*˜ÙØ[YK\ÝYÙX9æ¡ØØ[yn©ùª&yìîùn¥y."ûï"9î+¹¥/¹«å9/¢ÌŒÎ{ï"{ï#9bcynoº/*¹. :-ëùb¨9i)ùæ¡ŒLËx¡¤ŒŒœ9aj:`ê:(ªú`&yli9î+¹¥/¹d ù£¢yaky¢$9i&»ï#:fèù *¹/oùå*: !y. 9æí:)®¹o¥ù¬¤º+¢¸à ¹¥.y¢$9kêÂŽL;ï"ÍpíÌŒÎy£æùë¥ùfç¹/¡¹æ¡:(ç9a'ù`/;ï"{ï#:+¤ú'¨¹ney."¹kéºf¦úhkùé.¹aî¹/¡¹¢cy¦+ù/oùå*: !Bº) yæ¡Í\8à º*lùí,9c§ùä!º-çù£æùë¥ù¥®y¬åykêú`,¹.¡¹."¹¥®xà#9ìîùíly§­¹©âúaãznç¸à#LKŒùëà;ï#9.éyo£¹a£z*¯ú`&y`"ùob9ê¥ù¢%¹.îù/eXÛÛ™š\›YY9­.ùg*Ø[YK\ÝYÙyî+¹¥/¹n©ùª&yìîùn¥y."ùæ¡9a`ùí(;ï#:`ïz) B¹ab9ké¹®+9î+¹¥/¹«å9/¢ùa£yfç¹£ª9¥n9`/;ï#9.#z ïyæí9£©y¢¢¹/oùå*: !z*ª¹æ¡9¥n9keùc§ùl y.#ybåykêú`,¹c®øà ‚‚ˆÈÈÈŒ‹LLˆ8 %9ë+9."z/*¹/ë¹oªHLH:h!yfç¹h,yecúhc‚¹/oùå*: !z`&y«(yfç¹h,LLy`"ùecúhc;ï#9d#9ª(ùaj:`ê9å*^]ÜšYÚ
+ÈXY\ÜÈÚ›ÛZ][z`$9. :jeú+b{ï&‚‚ŒKˆ
+Š¹¢,:k)z,áú*"¹¨a‹ù.®¹âjychyâc:jæ9n©¹¡âyfî¹k¦»ï"9.#yë¨Ly£¤¹¢%Œ¹£¤¹ *¹âj{ï"JŠˆ8 %ˆØ˜]S[ÛœÝ\\™XKŒLÌKY›Ü›X][Û˜9c§ù§+Z[‹ZZYÚ9cê¹i(y£¤»ï"L;ï"{ï#ˆy£¤¹ *¹âjy¦`¹k®yfj:+¢¹çë»ï#:gh9bjzi&9ênºe¤ù/.9î+¹æ¡9fç¹d":,áú*"¹¨aº-çú$eú+¢ºjæ8à y.®¹âjychyâcˆ9/cyïkº-çú$eú-äybåxà ¹¥.y¢$9fî¹k¦˜Z[‹ZZYÚŒN\;ï"¹£¤¹ *¹âjJù£¤ºe¤ú-çJùk®yfjˆY[™ûï"{ï#9.#yë¨ykéºf¦ùno¹£¤¹ *¹âjz`ïy/çyåfz`&y`"újæ9n©¸à ‚Œ‹ˆ
+Š¹â!¹¤â¹¥¡ùkeùi*¹i)ÊŠˆ8 %™[XYÙK\Ü\˜Üš]XØ[\Ü\9c§ù§+Ü8à ybåyåjÂˆ9lì9`/9a£y.fKŒ¹`#{ï"9kéºf¦ùlì9`/ËÜ;ï"{ï#9î+¹l#ù¢$MÜ
+ùbåyåjùlì9`/KŒy`#Bˆ;ï"9lì9`/9í!Œ\;ï"xà ‚ŒËˆ
+Š¹g'ùæ¡ù¢,:k)y¬¤¹§"zaäz"l¹i%¹¨aˆ
+È9ãªyk­¹êâùîj¹c®ú ã
+Šˆ8 %9¨.yfè9¢o¹b,;ï&‚ˆÜÜËÌLK\ÝYÙK]KXØ\Ý]^X[™\^Y\‹X[K˜ÜÜØ:(èy. 9`"Õynm9.èÂˆ9æ¡Ø˜]T^Y\Ø\™Ø›Ü™\ŽŒZ[\Ü[Ë‹‹ŸX:)£ùbaûï#9fè9à®¹¦+ÒQˆ:`n9¤áùfj;ï#ÜXÚYšXÚ]y«åŒLÌyo£9/¡¹b¨9æ¡˜˜]K\^Y\˜:aäz"l¹i%¹¨aº)£ùbaújæ;ï#ˆ9.#yë¨[ØY:h!¹n£øà yajz`¢º`ïy¦+ØZ[\Ü[;ï#Q:`n9¤áùfj:`¡9¦+ú-#ûï#9l#º!í8à#:f¢¹/#Bˆ9ë+9. 9/cxà#z)äº"l»ï"9.#yb!¹dê¹`"ùa`ùí(;ï"y¬.:`h9¬¤¹§"yi%¹¨a¸à ¹¢ïù£¢z`&y¨§z)£ùbaú(èyæ¡ˆ›Ü™\‹ÛÝ][™KØ›Þ\ÚYÝù."z(c9clùcëøà ¹c®ú ã:`ê9b!»ï&¹å*™[X™ù¢¢Ž9o-Bˆ\ÜÙ]ËØÚ\˜XÝ\œËù )ùb)Wùa`ùí(šœØ9c®ú ã9kf9¢$9l"9lk9æ¡ˆ\ÜÙ]ËØÚ\˜XÝ\œËØ˜]Wù )ùb)Wùa`ùí(œ™Ø;ï#9¥¬9h§‚ˆÙ]Ú\˜XÝ\˜]P\ÛÜšÔ]
+
+X9cê¹íi¹¢,:k)ychyâaùå*;ï#:-çú)äº"l¹bmynîºh$:)¯KÂˆ: ã9c!yêâùîjºh zgh¹alyå*9æ¡Ù]Ú\˜XÝ\\ÛÜšÔ]
+
+X9b!ºe¢ûï#9.#yolzgïú`¨ùajy`"Âˆ9g,9¥®y.ãzhkùé.¹c§ù§+9n-¹h-9¦kú ã9¦kùæ¡9âb9§+8à ‚ˆ
+Š¹mèy *¹êâùîj¹«hú ã:ghºhcú"l¹.#y. :!í
+È:)èù§¤9n©¹i*¹/cŠŠˆ8 %9å*9`ãùí(9«å9l#y¢¤ùaî¹¨.yfè;ï&‚ˆ9."¹. :/*ºaãynî¹ilú)äœÜš]y¦`»ï#9¬-úhªùg'ù."y`"øà#: ã:gh¸à#y/¡¹®¤9g%º(ªùoª¹ä¬:c+ù/cBˆ;ï":hª: ã:ghº*©9å*9.¡¹g'ùæ¡9g%¸à yg'ú ã:ghº*©9å*9.¡¹¬-9æ¡9g%¸à y¬-: ã:ghº*©9å*9.¡ºhª9æ¡9g%»ï"{ï#ˆ9mìºaãy¥¬9å*9«hùè®¹l#y¡âzeç9/à¹nî¹ïk¸à º)èù§¤9n©º`ê9b!»ï&œÜš]HÙ[9o§Mž9¥/¹i)ùb,ˆMŒL;ï":-çúhkùé.¹l.¹kîÌLyëby«å9/¢ù¥/¹i)Ì¹`#{ï#9¢bùªgÜ™][˜z'¨¹ney¦í9®!y¦l;ï"{ï#ˆ9å-ú)äœÜš]yí«y£ yc§ù§+Mž9.#z+¢»ï"9¬¤¹§"y¥¬9í(9§d9cëù£æûï"{ï#œËÌ‹]ŒLÌK\]›ÛBˆ\X\˜[˜ÙKšœØ9æ¡:(àyb!ùaïyo#ù¥.y¢$9/§\ÚY]9b!¹b)ynî¹êâùd!:!ê¹l.¹kî9æ¡Ø[˜\øà ‚ˆ9ohº,hyb!ù£æù£"zb%yo§Íœ9î+¹l#ù¢$Ž;ï#:-çù«hù."¹¥®z/å9fçºcm{ï"Ž;ï"yíly. 8à ‚Kˆ
+Šº ã9c!z)äº"l¹b!ù£æùë«zh+z"!úeç:e¢y£"zb%zaãyå¢ŠŠˆ8 %9¨.yfè9¦+Øš[™[ÜžKXÚ\˜XÝ\‹BˆÝÚ]Ú9c§ù§+9å*ÜšY9¤¤9®ïù¥m9b%ùkë9n©»ï#9cìùë«zh+z(ªù£ª9b,9§ 9cìùíèøà ychz`,¹íeyl#yk¦¹/cBˆ:,¯9cìù."º)ä¹æ¡:eç:e¢y£"zb%y."úgh¸à ¹¥.y¢$›^9ïk¹.+xà yë«zh+z,¯:obº)äº"l¹d#yê,yajy`m;ï&Âˆ:)äº"l¹d#yê,z/ úemù¦`»ï#9cé¹i%ºaçyl#xà#9o§¹g,9g%ºh ze¢ùegùæ¡:)¡º$âùli9âb9§+8à#{ï"9e+ù. 9§ ùaî¹ãï‚ˆ:eç:e¢y£"zb%yæ¡9 áyh ûï"yb¨9.¡˜Y[™Ë\šYÚ;ï#9è®¹/çyïk¹.+yëá9g#y..ùbåz`oúe¢Âˆ:eç:e¢y£"zb%{ï#9.#yë¨yd#ykeùi&ºemú`ïy.#y§ ùa£y¤§¹g*9. :-møà ‚‹ˆ
+Š¹aj9lk9 )ù¢ : ïzh$:)¯y¥¡ùkeù.ãyá-¹i*¹l#ÊŠˆ8 %:`&y¦+ùë+9."y«(yb¨9i)ú*âù¬`»ï#9¥n9`/9o§‚ˆMËÌNKÌŒ9b¨9i)ùb,NKÌŒKÌŒœ;ï&ùd#9¦`¹æo9ãï¹.)¹/ë¹«hù.¡ŒKŒ¹ëà:`¨ù`"ùâb9§+:&gù¬¤¹§"Bˆ:`g¹h§¹æ¡9¨.y§+9ecúhc;ï"ÜÜËÌÌK]ŒLÌKYš^X˜]Ú˜ÜÜÏÝLLÌX9o§¹ë+9. :/*¹b,9ãï¹g*ˆ9¬¤º+¢º`c»ï"{ï#9/oùå*: !yab9bcyç"ùb,9æ¡9keùí&¹o¢9cëú ïy¨.y§+9¦+ùà#ú)¯yfj9oêùcå¹æ¡:""¹âb9§+;ï#ˆ9.#y¦+ú`&ynoº/*¹æ¡9/ë¹¥.yç'ùæ¡9¬¤¹å'ù¥b8à ‚Ëˆ
+Šº ïyb¦ù`/ù¢ : ïz*lùí,ùaj9lk9 )ù¢ : ïzh$:)¯zh zgh¸à#9è-9g%ºh.ùî`ze ùâ#xà#JŠˆ8 %ˆ8¦¨;î#È
+Šº`&zh!y¬¤¹§"y/ëŠŠ»ï&¹å*]]][Û“ØœÙ\™\¹æèù®+yéä¹¬¤¹§"yæo9ãï¹.îù/eX[YÏ˜ˆ9æ¡Ü˜ú(ªùcãz)¡¹¥.ybåxà yå*9í¬º-ëùæèú oy¬¤¹§"yæo9ãï¹.îù/eyg%¹âaú,áù®¤8à yå*:`(ùî£9¢*¹g%‚ˆ9`ãùí(9«å9l#y.gù¬¤¹§"y`my®+9b,9¦#ºhkùæ¡:)¥º)®º-ìùbå{ï":-çú`&y."y`"úh zgh¹alyå*9æ¡ˆšÛYKY™X]\™K[[Ù[X›Þ:`¢¹¨a¹do9d.9båyåjØ›Ü™\‘ÛÝÐœ™X]X9d.ùd"9æ¡ˆË¹éäº`,y§'ù )ù¥b9§§9cê¹§"y©mz/%yo«¹æ¡ÛÝú+¢¹c%»ï#9.#y¦+øà#9è-9g%¸à#{ï"xà ¹g*9æë¹bcz`&y`"ÂˆXY\ÜÈÚ›ÛZ][y®+:*i¹ä¬9h ùk£9aj9á(y¬åzaãyãï¹/oùå*: !y£ãú/ì9æ¡9åáùâà;ï#9«å:/ ùd"9ä!‚ˆ9æ¡9¡íùå¤y¥®yd$y¦+ù/oùå*: !ykéºf¦ú(çyïk¹æ¡ÔKùà#ú)¯yfj9âb9§+9âny§"yæ¡9®,¹§äùecúhc;ï":hg¹//ˆ9.bùbcy¢¤ùb,9æ¡8à#[YÊØ˜XÚÙÜ›Ý[™Z[XYÙxà#PÚ›ÛZ][y®,¹§äØYûï#:`¨ù«(y.gù¦+Âˆ9g*9b)yæ¡9ä¬9h ùk£9aj9«hùn.8à ycê¹§"yânyk¦¹âb9§+9¢cy§ ùaî¹ãï»ï"xà ¹mì¹í¤ùg*9fçº)¡º(èy¦#¹è®¹db¹çéBˆ9/oùå*: !z`&zh!y¬¤¹§"y/ë¹ioxà zg :) y¦í9i&¹íæ¹í(»ï"9/¢ùi º'¨¹nezc!9olxà y¦+ù.#y¦+ùânyk¦¹ªgùg¢ûï"Bˆ9¢cz ïyîo9î£9o 9."ù§é{ï#:`oùacy.#yè®¹k¦¹æ¡9 áy¬ày."ù. ¹ã'9. ¹¥.xà ‚Žˆ
+Š¹l#º)¯yb%úaã¹ *¹c`XÛÛ¹¬¤¹c®ú ã
+Šˆ8 %9e+ù. 9. 9`"ú`¡9¦+Ô‘Ð»ï"9.#z`#ù¦#»ï"xà z #9.%:)èù§¤9n©‚ˆ9ål9n.9i)ûï"MLÍžM;ï#9am¹.åº`ïy¦+ßŒÌŒ9æ¡‘Ðz`#ù¦#”‘ûï"yæ¡˜]ˆXÛÛ»ï#ˆ9è®º*£y¦+ú`&y¨/9í(9§d9¬¤¹§"z-çùam¹.åšXÛÛ¹. 9ª(ú-l:`c¹c®ú ã9­`yê"øà ¹å*™[X™ùc®ú ã
+Âˆ9î+¹l#ùb,:-çùam¹.åšXÛÛ¹. :!í9æ¡ŒÌŒ;ï#9æí9£©z)¡º$âØ\ÜÙ]ËÝZKÛ˜]‹]˜Z[š[™Ëœ™Ø8à ‚ŽKˆ
+Šº ã9c!z(çy`¦z`ê9/cxà#: ªyå,¸à#y¥.xà#:+mú!exà#JŠˆ8 %œËÌ[XZ[‹šœØ9æ¡ˆ™[™\‘\]Z\Y[
+
+X:(èXÛÝØ:fhùb%ûï#9í%9¥¡ùkeù/ë¹¥.xà ‚ŒLˆ
+Šº!ê¹båy¢,:k)z*+yk¦ºh zgh¹¡âyfî¹k¦¹ïk¹.+xà y¥/¹i)ú`oùacy£l¹båJŠˆ8 %:`&y¦+ùl#y¦í9¥êy. :/*‚ˆ9/oùå*: !z!ê¹mìz) y¬`¹æ¡8à#ØÚËX›ÝÛz,¯9n¥zhkùé.¸à#yæ¡9¦#¹è®¹cãy ¥;ï"8à#9§"y¦`¹`&yïk¹.+Bˆ9§"y¦`¹`&zgh9."úgh¸à#y«hù¦+ùfè9à®¹¢,:k)y.+Kúgg¹¢,:k)y.+yb!ù£æÙØÚËX›ÝÛz`(9¢$9æ¡;ï"{ï#ˆ:`&y«(y¥.y¢$9k£9aj9.#ya£yb¨ØÚËX›ÝÛX:`&y`"ØÛ\Üûï#9ajyê+¹ áyh ú`ïyí«y£ BˆšÛYKY™X]\™K[[Ù[:h$:*+yæ¡9ïk¹.+zhkùé.»ï&ú)¥¹ê¥ØX^ZZYÚ9.#yb!¹ áyh Âˆ9íly. 9å*M™š;ï"9c§ù§+9¢,:k)y.+z`¡9¦+ùchyg*š;ï"xà ‚ŒLKˆ
+Šº+mùæïº)¥º)®¹¥b9§§
+Š»ï"9¨§yh§¹b¨9ëby`/9æoz"lº"l¹hb¸à yd.9¥-¹`­ùk¬úhkùé.¹æoz"l¹¢húfiˆ9båyåjûï"x %9n¥yli9æ¡:+mùæï¹`­ùk¬ùd.9¥-º`£ú/+ûï"Z[Š9`­ùk¬Ë:+mùæï¹bjzi&
+X9d.9¥-¸à Bˆ:-¡z`c¹æ¡:`ê9b!¹¢cyç'ùæ¡9¢hú(`;ï"yam¹ké¹¥êyl,y¦+ùl#yæ¡;ï#:`&y«(yí%9ì®y¦+ú(ç:)¥º)®¹db9ãï»ï&‚ˆ˜\¹¥¬9h§˜šX˜\‹\ÚY[[Ý™\›^X9æoz"lº"l¹hb»ï"Yyæë¹bcR	{ï#ˆÚYz+mùæï¹bjzi&ÛX^	{ï#9íâ¹£©yg*9í!z"lº(`:aãùo£:gh»ï"{ï#\]TÚ[™ÛBˆÚ\˜XÝ\˜\œÊ
+X:(èyd#9«iz*"9ë¥ù¦í9¥¬;ï&ù¥¬9h§˜ÚÝÔÚY[XœÛÜ˜Š
+X:-ìùaî‚ˆ9æoz"l»ï":gg¹í!z"l»ï"yæ¡9`­ùk¬ù¥n9keûï"™[XYÙK\Ü\œÚY[\Ü\;ï"{ï#ˆ9g*9áàùáä¹`­ùk¬ùd.9¥-º-çù. :"+9¥.ù¤â¹`­ùk¬ùd.9¥-¹ajz&eyd!9do9cêù. 9«(xà ‚‚ŠŠ¹mì¹çézfd9b-»ï#ù§*¹k£9¢$
+Š»ï&¹ë+úh!{ï"9è-9g%ºe ùâ#{ï"y¬¤¹§"y/ë»ï#:g :) y/oùå*: !y£ä9/¦ù¦í9i&‚¹íæ¹í(¹¢cz ïyîo9î£9£¤¹§é{ï#:*lú)¢ù."¹¥®yë+únçº*ª¹¦#¸à ‚‚ˆÈÈÈŒ‹LLH8 %9ë+9.£:/*¹/ë¹oªHÈ:h!yfç¹h,yecúhc;ï"ˆÍ»ï#9mì¹d"9/m{ï"B‚¹ní¹î£9."¹. :/*¹æ¡úh!y/ë¹oª{ï#9/oùå*: !ya£y«(ykéºf¦ù¤ãy/g9o£9fç¹h,Mù`"ù¥¬9ecúhc;ï#9aj:`ê9å*^]ÜšYÚ
+ÂšXY\ÜÈÚ›ÛZ][H:`$9. :jeú+byo£9/ë¹oª{ï&‚‚ŒKˆ
+Š¹ohº,hyb!ù£æù£"zb%yg%¹âaùåjú,ê¹i*¹mëŠŠˆ8 %9/oùå*: !z`&y«(y£ä9/¦ùæ¡9.#y¦+ú)äº"l¹í(9§d;ï#: #9¦+ù. 9o-yl"9lk9æ¡ˆ8à#9ohº,hyb!ù£æøà#yb§ú ïyo¯yêè9g%»ï"9fî¹k¦¹g%¹¨b;ï#:-çú)äº"l‹ùa`ùí(9á(zeç;ï"xà ˜œËÌ‹]ŒLÌK\]›ÛX\X\˜[˜ÙKšœØˆ9æ¡\]TÝÚ]ÚXÛÛŠ
+X9¥.y¢$9ieùå*:`&yo-zgg9¡bújæ9åjú,ê¹g%»ï"9kf9¢$ˆ\ÜÙ]ËÝZKÜ]›ÛX\X\˜[˜ÙK\ÝÚ]ÚZXÛÛ‹œ™Ø;ï"{ï#9.#ya£ybåy¡bùieùå*8à#9æë¹bcz`n9.+z)äº"l¸à#Bˆ:(àyb!ùaî¹/¡¹æ¡9/cº)èù§¤9n©œÜš]yl#ùg%¸à ¹."¹. :/*¸à#9mì¹çézfd9b-¸à#z(èy£ä9b,9æ¡9åjú,ê¹ecúhc9mìº)èù¬n¸à ‚Œ‹ˆ
+Š¹¢ : ïy«hùè®¹d#yê,JŠˆ8 %9å*9`ãùí(9«å9l#y¢o¹aî¹ç'ù«hùæ¡9¨.yfè;ï&˜œËÌ[XZ[‹šœØ9æ¡ˆ[[Y[ÚÚ[XÛÛ“X\:(èH\ÝÝÜ›X;ï"9ç'ùké¹d#yê,xà#9g,9âfùã&ú)l¸à#{ï"z-çÈ›ØÚÕØ[ˆ;ï"9ç'ùké¹d#yê,xà#9lªyçìùhàyhæ8à#{ï"yajy`"ù¢ : ïyæ¡XÛÛ¹ª¥9¨b9aiùk®z(ªùl#z*¯ù.¡»ï":`&y`"ØYùg*9¦í9¥êy. :/*¹l,ykf9g*;ï#ˆ9.#y¦+ú`&y«(y¢cZ[›ÙXÙyæ¡;ï#9cê¹¦+ú`&y«(y/oùå*: !y£ä9/¦ùæ¡9ajyo-yª&yìi9càú  ùg%¹¢cz+¤ùk ú(ªù¢¤ùaî¹/¡»ï"xà ‚ˆ9æí9£©yl#z*¯È\ÜÙ]ËÜÚÚ[ËÙX\Y\Ý\ÝÜ›KšœØ:-çÈX\\›ØÚË]Ø[šœØˆ9ajy`"ùª¥9¨b9æ¡9aiùk®{ï"9.#yå*9¥.H[[Y[ÚÚ[XÛÛ“X\;ï#Ù^z-çùª¥9d#y§+9/¡¹l,y¦+ùl#yæ¡;ï#ˆ:c+ùæ¡9¦+ùª¥9¨b9aiùk®y§+:.ªûï"xà ¹d#9¦`¹/oùå*: !zaãy¥¬9£ä9/¦øà#:$+:,hyg'ùæï¸à#yæ¡9l"9å*9g%»ï#:(ç9fç‚ˆX\\ÚY[šœØ;ï"9."¹. :/*¹¢ïù£¢yo£9æ¡9mì¹çézfd9b-»ï#:`&y«(z)èù¬n»ï"xà ‚ŒËˆ
+Šºaãy¥¬9."¹`¬újæ9åjú,ê”yâb9ilùå'ùêâùîjŠŠˆ8 %9/oùå*: !y£ä9/¦Î9o-y¥¬9æ¡9àjËù¬-úhªùg'ûï"9d!9«hËú ã:gh»ï"Bˆ:jæ:)èù§¤9n©¹êâùîj»ï"LMLÍ»ï#9«å9/¢ùbfùioyëby¥¯Üš]HÙ[9æ¡MŽŽ;ï"{ï#9¥m9ía:aãy¥¬9ía9¢$ˆÞÈÜš]HÚY];ï"Ý\Û™]×Ù™[X[WÜÚY]œ™Ø8¡¤ÙXœ;ï"{ï#9¥.yå*L9`"Ø˜\ÙMÚ[šÂˆ;ï"9c§ù§+¹`"ØÚ[šù¥/¹.#y."ûï#œËÝŒLÌK\]›Û\Üš]KLšœØ˜KšœØ;ï"{ï#9.)¹g*ˆœËÌŒX[›Ûž[[Ý\ËLŒšœØ9æ¡ÛÝ\˜Ù\Ø:fhùb%ú(ç9."¹¥¬9æ¡9`"ØÚ[šùª¥9¨b8à Bˆ9¢¢¹âb9§+]Y\žHÝš[™ùo§˜ÝLLÌXX9¥.y¢$ÝLLÌYX:`oùacyà#ú)¯yfj9oêùcåº""œÜš]xà ‚ˆ9mìºjeú+by¥¬Üš]z)¥º)®¹dàz,ê¹¦#ºhkù£ä9caøà ‚ˆ
+Š¹aj9¢ : ïzh$:)¯y¥¡ùkeùi*¹l#ÊŠˆ8 %9."¹. :/*¹mì¹í¤ùb¨9i)ú`c¹. 9«({ï"LËKÌMKÌM\;ï"{ï#9/oùå*: !ycãy¦(ˆ:`¡9¦+ùi*¹l#ûï#:`&y«(yi)ùnayb¨9i)ùb,MËÌNKÌŒ;ï"ÜÜËÌÌK]ŒLÌKYš^X˜]Ú˜ÜÜØ;ï"xà ‚Kˆ
+Š¹aj9¢ : ïzh$:)¯y£"zb%y/cyïkŠŠˆ8 %9c§ù§+:-çøà#9¢ : ïzacz(çxà#yª&zhc9.)¹£¤¹g*9¢ : ïzh zgh¹aiú`ê;ï#9/oùå*: !Bˆ:) y¬`¹éîùb,8à#:/å9fç¸à#y£"zb%y«hù."ù¥®xà ¹¥.y¬å{ï&¹¢¢¹alyå*9ob9ê¥ÚXY\»ï"šÛYKY™X]\™K[[Ù[]]Xˆ9cìù`m9c§ù§+9cê¹§"{ï'Ëú/å9fç¹ajzha¹£"zb%yæ¡9c`9hb»ï"yo§¹e«¹£¤¹¥.y¢$9ajy£¤¹æ¡›^ÛÛ[[»ï#9¥¬9h§‚ˆYHœÚÚ[™]šY]ÒXY\]Ûˆ˜9¥/¹g*9ë+9.£9£¤»ï#:h$:*+zf¬z%ãûï#ÝÚ]ÚÚ\˜XÝ\•XŠ
+Xˆ9b!ùb,œÚÚ[˜9b!ºh y¦`¹¢czhkùé.»ï":-çØÝ]\Ò[]Û˜9d#9. 9ieú`£ú/+ûï"{ï#9¢ : ïzh zgh¹aiú`êˆ9c§ù§+:`¨úha¹£"zb%yæí9£©yéîúfi;ï#9.#yåfzaãz)!ù£"zb%xà ‚‹ˆ
+Šº!ê¹båy¢,:k)z*+yk¦ºh zgh¹á(y¬åy£l¹båJŠˆ8 %:`&y«(yæ¡9¨.yfè:-çù."¹. :/*˜Ú\˜XÝ\•XÛÛ[:`¨ù`"ÂˆYù.#y. 9ª(ûï&¹£l¹båyªgùb-¹§+:.ªùam¹ké¹¬¤¹hç»ï"9ê"ùo#ùc%˜ØÜ›ÛÜ:,é¹`/8à yª(y¤ë:)î9£©ù®äybåz`ïz ïBˆ9£l¹b,9n¥{ï"{ï#9ç'ù«hùc§ùfè9¦+ØšÛYKY™X]\™K[[Ù[™ØÚËX›ÝÛ^ÜY[™ËX›ÝÛNŒMÌœXˆ;ï"9c§ù§+9¦+ùà®¹.¡º,¯:ob¹¢,:k)y.+yæ¡9¢,:k)z,áú*"¹¨aº*+z*"9æ¡;ï"y.#yë¨y¦+ù.#y¦+ùç'ùæ¡9g*9¢,:k)y.+z`ïyieùå*;ï#ˆ9b¨9."˜šÛYKY™X]\™K[[Ù[X›Þ:!ê¹mìXX^ZZYÚŽš9æ¡9èk9."ºfd;ï#9ajz !yå¢¹b¨9l#º!íˆ:gg¹¢,:k)y.+ze¢ùegú`&y`"ú*+yk¦ºh y¦`¹cëùå*:jæ9n©º(ªú`c¹n©¹häùî+¸à ˜œËÌ[XZ[‹šœØ:(èze¢ùegú`&y`"ùob9ê¥Âˆ9æ¡9g,9¥®y¥.y¢$;ï&˜Y[™ËX›ÝÛX:-çØX^ZZYÚ:`ïy/§X˜]PXÝ]™X9båy¡bú*+yk¦‚ˆ;ï"9¢,:k)y.+yí«y£ LMÌœÎš;ï#:gg¹¢,:k)y.+zfcyb,ÎM™š;ï"xà ¹mìºjeú+b{ï&¹. :"+ŒLˆšY]ÜÜ9."ùcëùå*:jæ9n©¹bfùioyëby¥¯9aiùk®zjæ9n©»ï"9k£9aj9.#yå*9£l»ï"{ï&ùl,yë¥ù¥ay¡#ùî+¹b,ÎLŒˆ:`&yê+¹«å9.îù/eyç'ùké¹¢bùªgú`ïyçëyæ¡9©myêëÝšY]ÜÜ;ï#9bjzi&9æ¡9. :nçºnç¹aiùk®y.gú ïz`#ú`c¹£l¹båBˆ;ï"9ê"ùo#ùc%º"!ùç'ùkéº)î9£©ù®äybåyæ¡¹®+:*iº`c»ï"yk£9¥m9ç"ùb,8à ‚Ëˆ
+Š¹¢ : ïycaùí&¹¬¤¹§"zf,¹da‹ù¢$9b§ù£ä9é.ŠŠˆ8 %9."¹. :/*¹cê¹njØX\›”ÚÚ[9b¨9.¡˜ÛÛ™š\›J
+XÂˆ[\
+
+X9c!z(ç{ï#\Ü˜YTÚÚ[9åm¹¦`¹¬¤¹§"yd#9«iz&eyä!¸à ˜œËÌK]ŒLÌKYš^X˜]ÚšœØˆ:(ç9."¹íd9©âùæî9d#9æ¡\Ü˜YTÚÚ[9c!z(ç{ï#9mìºjeú+byè®º*£yl#z*ly¨aº-çù¢$9b§ù£ä9é.º`ïy«hùn.ˆ:-ìùaî»ï#9¢ : ïyëbyí&¹.gùè®¹ké¹o§Œycaùb,¸à ‚‚ˆÈÈÈŒ‹LLH8 %9/ë¹oªHÈ:h!yfç¹h,yecúhc;ï"9å*9ké¹ªgùà#ú)¯yfj9®+:*iº`$9. :jeú+b{ï"B‚¹/oùå*: !ykéºf¦ùg*9¢bùªgËù¢*¹g%¹."¹fç¹h,yæ¡È9`"ùecúhc;ï#:`&y«(yaj:`ê9å*9§+9ªgÈ^]ÜšYÚ
+ÈXY\ÜÂÚ›ÛZ][H9§­º*+y®+:*i¹ä¬9h ûï#9kéºf¦ù¤ãy/g9b,9aî¹ecúhc9æ¡9åjúgh¸à zaãù®+ÛÛ\]YÝ[HÈÓB¹íd9©âûï#: #9.#y¦+ùcê¹¡¤z+ 9ê"ùo#ùè¯9b)9¥­ûï#:`$9. 9¨.yfè9£¤¹§éyo£9/ë¹oª{ï&‚‚ŒKˆ
+Š¹¢ : ïy«!;ï#ùí¤újeù¬h:h zgh¹á(y¬åy£l¹båJŠˆ8 %9¨.yfè:)¢ù."¹¥®xà#9ìîùíly§­¹©âúaãznç¸à#yë+Kyëà;ï#ˆœËÌNK\ÝYÙK]ÎXÚ\˜XÝ\‹Z[™[ÜžK\[[YKšœØ9æ¡\S›ÝÊ
+X9¥.y¢$9æí9£©yå*ˆ›ÙK˜ÛY[ZYÚ:*+yk¦ˆØÚ\˜XÝ\•XÛÛ[:jæ9n©»ï#9.#ya£yå*ˆÙ]›Ý[™[™ÐÛY[™XÝ
+
+X:fi9.éy. 9`"ù.#z`jyå*9æ¡9î+¹¥/¹/à¹¥n8à ¹mìºjeú+by£l¹båycëù.éBˆ9b,9n¥{ï"ØÜ›ÛÜ
+ØÛY[ZYÚ\ØÜ›ÛZYÚ;ï"xà ‚Œ‹ˆ
+Š¹mèy *ˆH9âb9êâùîjº+¢¹æoz"l¹ên¹æoy¥®yhbŠŠˆ8 %9¨.yfè9¦+ÈÚ›ÛZ][H9æ¡[YÈÜ˜Ïzgg¹ên˜
+ÂˆÔÔÈ˜XÚÙÜ›Ý[™Z[XYÙX9å¢¹g%¹®,¹§äÈYûï":-çÈØš™XÝYš]8à yí(9§d:`ïyá(zeç;ï#9mì¹å*ˆ9§ 9l#úaãyãï¹¨b9/¢ùè®º*£{ï"xà ˜œËÌ‹]ŒLÌK\]›ÛX\X\˜[˜ÙKšœØ9¥.yå*Ø[˜\Âˆ;ï"˜]Ò[XYÙX
+ØÑ]UT“;ï"y¢¢œÜš]HÚY]:(èzg :) yæ¡:`¨ù. 9¨/9kéºf¦øà#:(àxà#y¢$ˆ9ãj9êâùg%¹âaùa£z*+yk¦ˆ[YËœÜ˜Ø;ï#9.#ya£yå¢ÔÔú ã9¦køà º`&y`"ØYùam¹ké¹o§¹§ 9¥êyæ¡9ilú)ä¹âb9§+ˆ9l,ykf9g*;ï#:`&y«(zh!¹/¯ù. :-mù/ë¹£¢{ï#9.#y¦+ùcê¹/ë¹å-ú)ä¸à ‚ŒËˆ
+Š¹¢ : ïyg%¹é.ºaczc+ÊŠˆ8 %9/oùå*: !y£ä9/¦ùn-¹d#yê,yª&yìi9æ¡9càú  ùg%»ï#9å*9`ãùí(9«å9l#{ï"9.#y¦+ú ¢yç/;ï"Bˆ9¢¤ùaîy`"ùkéºf¦úaczc+Ëú`n¹¯#ùæ¡9¢ : ïyg%¹é.¹.)¹/ë¹«hûï#9í,9ëà:)¢ÈœËÌ[XZ[‹šœØ:(èBˆ[[Y[ÚÚ[XÛÛ“X\9."¹¥®yæ¡:*.ú)èøà ˜X\ÚY[9fè9à®¹k ùc§ù§+9å*9æ¡9g%º(ªú+byké‚ˆ9am¹ké¹¦+ÈØ[™Ú[™9æ¡;ï#:`&y«(y¢ïù£¢y.¡¸à y¦ªù¦`¹¬¤¹§"yg%¸à ‚ˆ
+Š¹¢ : ïyâjyä!‹ù¬åz(dùª&yìi9¬¤ºhkùé.¸à ykn9ïä¹caùí&¹¨a¹i*¹i)ÊŠˆ8 %9¨.yfè9¦+ÂˆœËÌK]ŒLÌKYš^X˜]ÚšœØ9æ¡XÛÜ˜]TÚÚ[›ÝÜÊ
+X:-çÈÜÜËÌÌX9æ¡9£"zb%Bˆ9î+¹l#ú)£ùbaûï#9c§ù§+:c¥¹k¦¹æ¡9¦+È›X\›™Y\ÚÚ[Ø›X\›˜X›K\ÚÚ[:`&yajy`"Âˆ
+Š¹æë¹bcyâb9§+9¢ : ïzh y¨.y§+9.#ykf9g*9æ¡Û\ÜÊŠ»ï"9ç'ù«hùæ¡9¦+ÈœÚÚ[\›ÝØÂˆœÚÚ[XXÝ[Û‹XØ\™;ï"{ï#9o§”ˆÌz`¨ù«(ze¢ùiâùl,y¬¤¹ç'ùæ¡9å'ù¥b:`c¸à ¹mì¹¥.y¢$9«hùè®¹æ¡ˆÙ[XÝÜ»ï#9¢ : ïZXÛÛ¹æ¡Y;ï"ÚÚ[XÛÛ—Þ;ï"yãï¹g*9.gù¢ïù/¡¹åm¹/g9¢¤ÜÚÚ[Y9æ¡ˆ9..ú) y/§y¤æ»ï#9«å9c§ù§+9ã'Û˜ÛXÚùkeù.,¹cëúgh8à ‚Kˆ
+Š¹¢ : ïzh$:)¯Kú ïyb¦ù`/ù¢ : ïyb%ú(j9¥¡ùkeùi*¹l#ÊŠˆ8 %9c§ù§+9cê¹g*ØÚ\˜XÝ\•XÛÛ[ˆ:`&y`"ùée¹li:*+Y›Û\Ú^™{ï#9/a¹n¥y."ÈœÝ]\Ë\›ÝØ8à XœÚÚ[\›ÝËY\ØØ8à BˆœÚÚ[\™]šY]ËXØ\™:`&y.¦ùa`ùí(9d!:!êº`ïy§"z!ê¹mìyæ¡›Û\Ú^™{ï#9îo9¢oúcâ9g*:`¨ú(èBˆ9l,y¥­ù.¡¸à ¹¥.y¢$9æí9£©yl#z`&y.¦ùç'ù«hù¬n¹k¦¹åjúgh¹¥¡ùkeùi)ùl#ùæ¡Û\Üùb¨9i)ûï#9¬¤¹§"ybåy.îù/eBˆ9kë:jæ8à ‚‹ˆ
+Š¹ohº,hyb!ù£æù£"zb%yi*¹l#øà yåjú,ê¹mëŠŠˆ8 %9£"zb%yo§N9¥/¹i)ùb,Íœ;ï&ÚXÛÛ¹¥.y¢$9clù¦`ºhkùé.‚ˆ8à#9æë¹bcyç'ù«hú`n9.+yæ¡:)äº"l¸à#z(àyb!ùaî¹/¡¹æ¡9g%»ï"9c§ù§+9¦+ùkêù«nùieùå*9ilú)ä»ï"{ï#9åjú,ê¹cåúfd9¥¯ˆÜš]HÚY]9§+:.ªÍMž9æ¡:)èù§¤9n©»ï#:`&z`ê9b!¹¬¤¹§"yo§¹¨.y§+:)èù¬n»ï#:)¢ù."ù¥®ymì¹çézfd9b-¸à ‚‚ˆÈÈÈŒ‹LLH8 %9å-ú)äˆH9âb9mèy *º ã:ghˆ
+È9g'ùìîù¢ : ïHXÛÛ‚‚‹H
+Š¹å-ú)äˆH9âb9mèy *º ã:ghŠŠ»ï&¹/oùå*: !z(ç9."¹.¡¹àjËù¬-úhªùg'ùfæùa`ùí(9æ¡9å-ú)äº ã:gh¹êâùîj¸à ‚ˆ9¢¢¹c§ù§+9cê¹§"y«húgh¹æ¡žˆÜš]{ï"œËÝŒLÌK\]›Û\Üš]K[X[KLšœØ˜šœØ;ï#9alNy`"ØÚ[šûï"Bˆ9£æù¢$9«!;ï"9a`ùí(;ï"påÈˆ9b%ûï"9«hËú ã:gh»ï"yæ¡ˆÜš]{ï"9¥.yd#y¬¯ùå*9d#9ª(ùæ¡9ª¥9d#{ï#ˆ9ãï¹g*9¦+ÈœËÝŒLÌK\]›Û\Üš]K[X[KLšœØ˜MËšœØ;ï#9alLN9`"ØÚ[šûï"{ï#ˆ9mìºjeú+bHž]KY›Ü‹Xž]H:`¡9c§ù«hùè®¸à ˜œËÌ‹]ŒLÌK\]›ÛX\X\˜[˜ÙKšœØ9æ¡ˆX[TÜš]PÙ[Ø9¥.y¢$:-çùilú)ä¹. 9ª(ùæ¡Ù[[Y[žÙœ›Û–Ë‹‹—K˜XÚÎ–Ë‹‹—__Xˆ9íd9©âûï#\T]›Û\
+
+X9l#yå-ú)ä¹.gù§ ù/§H˜XÚ[™Ð˜XÚØ9b!ù£æù«hú ã:gh¹.¡‚ˆ;ï"9.#ya£yfî¹k¦ºhkùé.¹«húgh»ï#:`&y`"úfd9b-¹mì¹í¤ú)èúfi;ï"xà ‚‹H
+Š¹g'ùìîù¢ : ïHXÛÛŠŠ»ï&¹/oùå*: !y."¹`¬ù.¡ŒLyo-y`&z`n9g%»ï#9«å9l#HœËÌ[XZ[‹šœØ:(èBˆ9¢ : ïz,áù¥¦ynªù.+{ï"9¤'9l"È[[Y[ˆ™X\˜9cëù.éy¢o¹b,9aj:`êL¹`"ûï"yg'ùìîù¢ : ïyæ¡ˆ9d#yê,Kù£ãú/ì9o£;ï#:acyl#y.¡¹am¹.+LL9`"ûï"]šYžQš\Ý8à XÝÛ™Pœ™XZÔÚÞX8à BˆX\]XZÙPÜ\Ú8à XÝÛ™U›ÝØ8à XØ[™Ú[™8à X›Z[™ÔØ[™ÝšZÙX8à X\ÝÝÜ›X8à BˆX\ÚY[8à X›ØÚÕØ[8à X˜\œšY\˜;ï"{ï#9kf:`,ˆ\ÜÙ]ËÜÚÚ[ËÙX\J‹šœØˆ;ï"LŒLŒ;ï#:-çùàjËù¬-9ìîÚXÛÛ¹d#:)£ù¨/;ï"{ï#9.)¹g*œËÌ[XZ[‹šœØ9æ¡ˆ[[Y[ÚÚ[XÛÛ“X\:(ç9."¹l#y¡âzh!yæë»ï"9d*úacyl#yä!¹å,z*.ú)èûï"xà ‚ˆ
+Š˜ÝÛ™TÛ\Ú;ï"9aize 9e«ºjå9¢ : ï{ï"z-çÈX\V;ï":(ªùbå{ï"z`&yajy`"ù¬¤¹§"zacyl#JŠ»ï#ˆ9fè9à®¹."¹`¬ùæ¡9g%º(èy¬¤¹§"y¦#ºhkùl#y¡âyæ¡9åjúgh»ï"X\V:g :) yæ¡9¦+úhg¹//ˆš\™KY^šœØØØ]\‹Y^šœØ:`¨ùê+¹g%¹."¹æí9£©ykêøà#V8à#ykeùª(ùæ¡9l"9å*XÛÛ»ï#ˆ:`&y«(y¬¤¹§"y£ä9/¦ú`&y«/»ï"xà ¹cé¹i%¹§"Lyo-y`&z`n9g%»ï"9lªyçìùl%¹he
+ùabyä¬;ï#:-çùam¹.å¹`&z`n9g%‚ˆ9c`9b!¹n©¹i*¹/c»ï"z`&y«(y.gù¬¤¹å*9."¸à º`&y.¦ú`ïy¦+ùb.ù¡#ùåfyæo{ï#9.#y¦+ú`n¹¯#ø %8 %9i ¹§§9.bùo£ˆ:) z(ç:`&yajy`"ù¢ : ïyæ¡XÛÛ¹¢%¹ ìú*¯ù¥m9§ä9`"úacyl#{ï#9æí9£©y¥.BˆœËÌ[XZ[‹šœØ:(èH[[Y[ÚÚ[XÛÛ“X\:`¨ù`"ùâjy.í¹l,yioxà ‚‚ˆÈÈÈŒ‹LLH8 %9å-ú)äˆH9âb9mèy *¹êâùîj»ï"ˆÌ»ï#9mì¹d"9/m{ï"B‚‹H9/¡¹®¤;ï&¹/oùå*: !y."¹`¬È9o-yå-ú)äˆH9âb9êâùîj»ï"9àjËù¬-úhªùg'ûï#9cê¹§"y«húgh»ï"B‹H9å*™[X™Ø;ï"]Û»ï#L“™]9ª(yg¢ûï"y`f¹ç'ù«hùæ¡:`#ù¦#º ã9¦kùc®ú ã;ï#9.#y¦+ÈÔÔÈ:`kº"l¹âaÂ‹H9ía9¢$žˆ:`#ù¦#ˆÙX”Üš]HÚY];ï#9b!ù¢$H9`"È˜\ÙMÚ[šÂˆ;ï"œËÝŒLÌK\]›Û\Üš]K[X[KLšœØˆšœØ;ï"{ï#9mìºjeú+bHž]KY›Ü‹Xž]H:`¡9c§ù«hùè®‚‹HœËÌ‹]ŒLÌK\]›ÛX\X\˜[˜ÙKšœØ;ï&¹¥¬9h§ˆ\ÓX[PÚ\˜XÝ\Š
+XÈX[TÜš]PÙ[ØÂˆX[P˜XÚÙÜ›Ý[™ÜÚ][ÛŠ
+X;ï#\T]›Û\
+
+X9/§HÚ\˜XÝ\‹™Ù[™\˜9b!¹­`{ï&Âˆ9å-ú)äˆÜš]H:,áù¥¦y.#yk£9¥m9¦`º!ê¹båz` 9fç¹ilú)äº`¨ùía;ï#9.#yolzgïù¥è¹§"z(c9à®‚‹HœËÌŒX[›Ûž[[Ý\ËLŒšœØ;ï&˜ØYŒLÌT]›Û\X\˜[˜ÙP\ÜÙ]Ê
+X9æ¡ÛÝ\˜Ù\Ø:fhùb%Âˆ:(ç9."ˆH9`"ù¥¬Ú[šûï#:h!¹n£ù£¤¹g*œËÌ‹]ŒLÌK\]›ÛX\X\˜[˜ÙKšœØ9.bùbcB‹H
+Š¹mì¹çézfd9b-ŠŠ»ï&¹cê¹§"y«húgh¹g%»ï#9¬¤¹§"z ã:gh¸à ¹å-ú)ä¹mèy *¹¦`¹.#y§ ùfè9à®¹o 9."º-l9b!ù£æú ã:ghºhkùé.‚ˆ;ï"9fî¹k¦ºhkùé.¹«húgh»ï"xà ¹.bùo£:"éy¢ïùb,9å-ú)äº ã:gh¹g%»ï#9cëù.éyæí9£©y«å9áiùilú)äº`¨ùíaˆÜš]PÙ[Ï^Ù[[Y[žÙœ›Û–Ë‹‹—K˜XÚÎ–Ë‹‹—__X9æ¡9íd9©âù¤í9aaxà ‚‹H:jeú+by¥®yo#ûï&˜›ÙHKXÚXÚØ9aj:`ê9ål9båyª¥9¨b:*§¹¬åz`&º`c»ï&Ø˜\ÙM:`¡9c§È\Ú9«å9l#z`&º`c»ï&Âˆ9¬¤¹§"yké¹ªgùà#ú)¯yfj9®+:*i»ï"9ä¬9h úfd9b-»ï#:)¢ù."ù¥®xà#9l&¹§*ºjeú+bxà#{ï"xà ‚‚ˆÈÈÈŒ‹LLH8 %ŒLÌ{ï&ŒMÈ:h!zg 9¬`¹/ë¹«hù¢ny«({ï"ˆÌ{ï#9mì¹d"9/m{ï"B‚¹l#y¡ây/oùå*: !y. 9«(y£ä9aî¹æ¡MÈ:h!zg 9¬`»ï#9aj:`ê9mì¹g*9ê"ùo#ùè¯9li9í&º`$:h!z/ïz.i:jeú+b{ï"9.#y¦+ùcê¹ç"Èˆ:*ª¹¦#¹¥¡ùkeûï"{ï#¹í,9ëà:"!ùl#y¡âyê"ùo#ùè¯9/cyïk»ï&‚‚ŒKˆ9«ãù/cz)äº"l‹ù *¹âjyaî¹¢bùo£9ëbHKŒÈ9éä¹¢cz/*¹."ù. 9/cH8 %ˆœËÌK]ŒLÌKYš^X˜]ÚšœØ9æ¡ŒLÌWÔ‘TÓÓ‘WÑSVWÓTÏLLÌ;ï#ˆ9c!yg*9alyå*9æ¡š[š\Ú^Y\XÝ[Û˜;ï"9ãªyk­º"!ù *¹âjyfç¹d":`ïyalyå*9d#9. 9`"ùíd9§gùaïyo#ûï"BŒ‹ˆ9¢,:k)Kúaã¹ *ˆXÛÛˆ9c®ú ã8à yãªyk­¹chyíly. :(ç:aäz"l¹i%¹¨aˆ8 %9g%¹âaù§+:.ªùmì¹å*9ç'ú`#ù¦#º ã9¦kú&eyä!‚ˆ;ï"9.#y¦+ÈÔÔÈ:`kº"l¹âaûï"{ï#ÔÔÈ9íly. :(ç˜˜]K\^Y\˜:`¢¹¨a‚ŒËˆ9 *¹âjyajy£¤¹íê:f¢»ï"x $ÍH9d#9£¤»ï#ÍLÊÌûï#Íø $ÌLMJùïk¹.+z(ç9®ïûï"x %ˆÙ]›Ü›X][Û”›ÝÜÊ
+X;ï#ÔÔÈŒLÌK[[ÛœÝ\‹\›ÝÞÚ\ÝYžKXÛÛ[˜Ù[\ŸX9`f¹ïk¹.+Bˆš{ï#Ü›ÝÈ9¢ : ïy/§yfî¹k¦¹êæy/cyb)9k¦»ï#9«nù.¨y.#z(ç9/cH8 %9¥¬9âbÙ]ÚÚ[\™Ù]Ê
+X9å*:fhùb%ùfî¹k¦‚ˆ[™^9cå¹æî:a,9êæy/cxà y.¢ùo£9¢cz`c¹¯ï¹kf9­.ÂKˆ9¢ : ïz`n9e«¹£l¹båyëá9g#y/ë¹«hÈ8 %ÔÔÈÝ™\™›ÝË^N˜]]Ø
+ÈY[™Â‹ˆ9a`ùí(9c(ûï&¹e«¹. :/å9fçºcmxà y£"zb%y¥.xà#9ieùå*9.)¹egùbåxà#xà ynèùdbˆ9l#ù¦`¹¦`¹¥n:e 9ª®øà yílz*":gh¹§oÂˆ;ï"9egùbåyî/y¦`¹¥n;ï#ù¢,:k)y«(y¥n;ï#ÑV;ï#úaäynhûï#ùbjzi&9¦`¹¥n;ï"x %ÛÛ™š\›P]]Ð˜]TÙ][™ÜØ9¥%9¢*»ï#ˆ9£©y¥è¹§"yæ¡ÚÝÔ™]Ø\™YY
+
+XËˆ:aã¹ *¹o-ùn©ˆ
+ÌÌ	{ï"ÔÔù¥.Ëúf,‹úke9¥.ûï"x %ŒLÌWÓSÓ”ÕT—ÔÕ‘S‘ÕLKŒÌ;ï#ˆ9­­z$âù¢`9§"ymì¹k¦¹ïªyc`9gçù *¹âjzfhùb%ÂŽˆ: ã9c!yêâùîj¹/§z)äº"l¹ohº,h{ï"9 )ùb){ï"ùa`ùí(;ï"yieùå*8 %Ù]Ú\˜XÝ\\ÛÜšÔ]
+
+Xˆ;ï"œËÌ[XZ[‹šœØ;ï"JÈÞ[˜Ò[™[ÜžTÜ˜Z]
+
+XŽKˆ9.£9."z)äº"l¹bmynî¹aczeç:h yclù¦`¹b-ù¥¬
+È9í!znç¹£ä9é.ˆ8 %Þ[˜ÐÚ\˜XÝ\Ü™X][Û]˜Z[Xš[]J
+XŒLˆ9¢ : ïzh$:)¯yéîùb,9§ 9."¹li
+È9cëù£l¹båH8 %ÓH9¤+:`,ˆÝ™\›^H9k®yfj;ï#‹Z[™^NŒLKˆ9¢ : ïykn9ïä‹ùcaùí&¹£"zb%yî+¹l#È
+È:f,¹da¹è®º*£H
+È9¢$9b§ù£ä9é.ˆ8 %X\›”ÚÚ[9c!y. 9liˆÛÛ™š\›J
+XØ[\
+
+XŒL‹ˆ9¢ : ïyb%ú(j9ab:hkùé.¹âjyä!‹ù¬åz(dùª&yìi;ï"9.#yå*:nçºe¢ú*lùí,:,áù¥¦{ï"x %XÛÜ˜]TÚÚ[›ÝÜÊ
+XŒLËˆ9í¤újeù¬h;ï&¹í%9d#ykeúhkùé.¸à zh$:)¯ycaùí&¸à yè®¹k¦‹ú/å9fç¹­`yê"È8 %™[™\‘^\ÝšX]S\Ý9¥m9`"ù¥.ykêÂŒMˆ9¢ : ïKú ïyb¦ù`/ùí¤újeúh y¥¡ùkeù¥/¹i)ûï"9¨aºjå9l.¹kî9.#z+¢»ï"x %ÔÔÈ›Û\Ú^™H:*¯ù¥mŒMKˆ9mèy *ˆH9âb9êâùîj¹/§z)äº"l¹a`ùí(9b!ù£æûï"9«hùcãzghºfª9éîùbåy¥®yd${ï"{ï#9¥¬9h§¸à#9ohº,hyb!ù£æøà#y£"zb%Bˆ8 %œËÌ‹]ŒLÌK\]›ÛX\X\˜[˜ÙKšœØ;ï"9åm¹¦`¹cê¹§"yilú)ä¹í(9§d;ï#9å-ú)äº`ê9b!º)¢ù."ºgh‚ˆŒ‹LLH9æ¡9cé¹. 9ëaº*&:c!;ï"BŒM‹ˆ9ea¹n¥ù¥.znäyn¥H8 %ŒLÌK\ÚÜ[Ü[˜Û\ÜÈ9b!ù£æùí%:näz ã9¦kÂŒMËˆ9¢,:k)HV0åÌËH8 %Ú[˜]X:hcyi%¹b¨9ë¥Èš[˜[^H˜\ÙQ^‚ŠŠº`c¹ê"ù¦í9«hùí :c!
+Š»ï&º&eyä!º`&y¢nzg 9¬`¹¦`»ï#Û]YH9. 9n©º*©9b)8à#[™^š[9¬¤¹§"ykéºf¦ú/"yaiz`&y.¦ùª¥9¨b8à#Bº #9i&¹b¨9.¡ºaãz)!ùæ¡ØÜš\˜9ª&yìi;ï#9o£9/¡¹æo9ãïˆœËÌŒX[›Ûž[[Ý\ËLŒšœØ9§+:.ªùmì¹í¤ù§"ybåy¡bú/"yaiyfj;ï#¹mì¹¤©:b­ú`¨ù«(z*©9¥.xà º*lú)¢ù."¹¥®xà#9ìîùíly§­¹©âúaãznç¸à#yë+H:nç»ï#:`oùacy."ù. 9`"ù.®ºaãz.b:)¡º/cxà ‚‚‹KKB‚ˆÈÈ9mì¹çézfd9b-ˆÈ9o¡z/©¹.¢úh!B‚‹HÞHŸ¹å-ú)äˆH9âb9mèy *¹êâùîj¹ï.º ã:gh¹g%ŸŸˆŒ‹LLH9mìº(ç9."»ï#:)¢ù."¹¥®z*&:c!‹HÞHŸ¹g'ùìîù¢ : ïHÝÛ™TÛ\Ú8à XX\V9¬¤¹§"ZXÛÛŸŸˆŒ‹LLH9mìº(ç9."‚ˆ;ï"9b!¹b)yå*9/oùå*: !yª&yìi9è®º*£yæ¡9g%ˆ
+È9¥¬9£ä9/¦ùæ¡V9l"9å*9g%»ï"B‹HÞHŸ¹g'ùìîù¢ : ïHX\ÚY[;ï":$+:,hyg'ùæï»ï"y¬¤¹§"ZXÛÛŸŸˆŒ‹LLyë+9.£:/*¹mìº(ç9."‚ˆ;ï"9/oùå*: !zaãy¥¬9£ä9/¦ùl"9å*9g%»ï#:)¢ù."¹¥®z*&:c!;ï"B‹HÞHŸ¹ohº,hyb!ù£æù£"zb%yåjú,ê¹mëŸŸˆŒ‹LLyë+9.£:/*¹mìº)èù¬n»ï&¹¥.yå*9/oùå*: !y£ä9/¦ùæ¡9l"9å*ˆ:gg9¡bùo¯yêè9g%»ï#9.#ya£y/§z,íMž9æ¡9/cº)èù§¤9n©º)äº"lœÜš]z(àyb!Â‹HÞHŸ•ŒLÌz`&yno¹¢ny/ë¹«hùæ¡9à#ú)¯yfj9oêùcåºhª:fªŸŸˆŒ‹LL¹ë+9."z/*¹¢o¹b,9amújå9¨.yfè9.)¹/ë¹«hûï&‚ˆœËÌ[XZ[‹šœØØœËÌK]ŒLÌKYš^X˜]ÚšœØØÜÜËÌÌK]ŒLÌKYš^X˜]Ú˜ÜÜØÂˆœËÌ‹]ŒLÌK\]›ÛX\X\˜[˜ÙKšœØØÜÜËÌÌ‹]ŒLÌK\]›ÛX\X\˜[˜ÙK˜ÜÜØˆ:`&y.¥9`"ùª¥9¨b9æ¡ÝX9âb9§+:&gùioynoº/*º`ïy¬¤¹§"z-çú$eùaiùk®z+¢¹båz`g¹h§»ï#:`&y«(ymì¹í¤ùíly. ˆ[\9b,ÝLLÌ˜8à ŠŠº`&y.#y¦+ù. 9«(y )ù/ë¹ioyl,y¬¤¹.¢ù.¡¸ %8 %9.bùo£9«ãù«(y¥.z`&y.¥9`"ùª¥9¨bˆ:(èy.îù/ey. 9`"ûï#:`ïz) z*&9o¥ù¢bùbåy¢¢¹l#y¡âyæ¡ÝX9¥n9keùo 9."¹b¨9. 
+Š»ï#:*lú)¢ù."¹¥®Bˆ8à#9ìîùíly§­¹©âúaãznç¸à#LKŒ¹ëà;ï#:`&y¦+ùæë¹bcy§ 9k®y¦$ú(ªùoïyåixà yo£9§§9cnù§ 9f­:aãyæ¡9gdxà ‚‹HÞHŸ¹æë¹bcy.ãy¬¤¹§"HÒ_ŸˆŒMÌËŒH9mì¹nî¹êâÈÚ]XˆXÝ[ÛœÈ™\ÜÚ]ÜžHÚXÚÜØ;ï&ÕŒLÍÈ9æ¡ˆ\ÝËÝŒLÍË\™YÜ™\ÜÚ[ÛœË\ÝšœØ9§"HH:h!zjæ:hª:fª‚ˆ9fç¹«n;ï#ŒLÎ9æ¡\ÝËÝŒLÎY™X]\™K\™\]Z\™[Y[Ë\ÝšœØ9cé¹§"HL:h!zg 9¬`ºjeù¥-»ï#ˆŒLÎH9æ¡\ÝËÝŒLÎKYXÛÛ›Û^K\™\ÝYY^\ÝšœØ9§"HÈ:h!yí¤ù¯çûï#ù/$y kùí¤újeújeù¥-»ï#ˆŒM9æ¡\ÝËÝŒMY›Ý\‹Y[[Y[X˜[[˜ÙK\ÝšœØ9§"HM:h!y¢ : ïyk¦¹¨b:jeù¥-»ï#ˆŒMH9æ¡\ÝËÝŒMK\Þ\Ý[KY^[œÚ[Û‹\ÝšœØ9§"HN:h!yìîùíly¤í9aazjeù¥-»ï#ˆŒMˆ9æ¡\ÝËÝŒM‹\ÚÚ[X[š[X][Û‹\ÝšœØ9§"HMH:h!ybåyåjûï#ú(c9båze¦:e :jeù¥-»ï#ˆŒMÈ9æ¡\ÝËÝŒMËXÛÛX˜]Y[™Ù[Û‹\Û\Ú\ÝšœØ9§"HLˆ:h!y§+:/*ºg 9¬`ºjeù¥-»ï#ˆŒM9æ¡\ÝËÝŒM\[\ËX[™XXž\ÜË\ÝšœØ9§"HLH:h!yea¹n¥ûï#ù *¹âjy¢ : ï{ï#ù­ìy­ízjeù¥-»ï#ˆŒMˆ9æ¡\ÝËÝŒM‹\Þ\Ý[K\Û\Ú\ÝšœØ9§"H:h!y¢,:k){ï#ù­ìy­í{ï#ù¢bùªgù.âúghºjeù¥-»ï#ˆŒM9æ¡\ÝËÝŒMXÛÛX˜]Y[™Ù[Û‹Yš^\Ë\ÝšœØ9§"HLÈ:h!y¢,:k)yæë¹ª&{ï#ùbkù§+:jeù¥-»ï#ˆŒMH9æ¡\ÝËÝŒMK\ÚÚ[]ZK\[\Ë\ÝšœØ9§"HLÈ:h!y¢ : ï{ï#ù.âúghº)£ùbaújeù¥-»ï#ˆŒML9æ¡\ÝËÝŒMLZXÙKX\œ›ÝË\˜Z[‹]™ž\ÝšœØ9§"Hˆ:h!y«hùo#ÈÜš]H‘–:jeù¥-»ï#ˆŒMLˆ9æ¡\ÝËÝŒML‹Y]‹Yš^\Ë\ÝšœØ9§"HLH:h!y¢ : ï{ï#ùbkù§+;ï#ù¢,:k)y.âúghºjeù¥-»ï#ˆŒMLÈ9æ¡\ÝËÝŒMLËYš\™K]™ž\ÝšœØ9§"HLˆ:h!yàjùa`ùí(9«hùo#ÈÜš]H‘–:jeù¥-»ï#ˆŒMM9æ¡\ÝËÝŒMMXÝ\œ™[\™\]Y\Ý\ÝšœØ9§"HÈ:h!y§+:/*ºg 9¬`ºjeù¥-»ï#ˆŒMMH9æ¡\ÝËÝŒMMKXÝ\œ™[\™\]Y\Ý\ÝšœØ9§"H:h!y§+:/*ºg 9¬`ºjeù¥-»ï#ˆŒMMˆ9æ¡\ÝËÝŒMM‹YY\]˜XÙKYš^\Ë\ÝšœØ9§"HH:h!y­ìy­íyg,9g%»ï#ùa`ùí(9c(újeù¥-»ï#ŒMMÈ9æ¡ˆ\ÝËÝŒMMËXXž\ÜË[X\]\Yš^\ÝšœØ9§"HÈ:h!yêâùîj¹l.¹kî;ï#ùæí9£©znç¹¤âºjeù¥-»ï#ŒMN9æ¡ˆ\ÝËÝŒMNXÛÛX˜]][š[™Ë\ÝšœØ9§"HÈ:h!y¢ : ï{ï#ùdoy.+{ï#ù`­ùk¬ûï#ùêâùîjºjeù¥-»ï#ŒMNH9æ¡ˆ\ÝËÝŒMNKXXž\ÜËX˜]K\Ü˜Z]Ë\ÝšœØ9§"H:h!yêâùîjº/"yaiy¦`¹n£újeù¥-»ï#ŒMŒ9æ¡ˆ\ÝËÝŒMŒXÝ\œ™[\™\]Y\Ý\ÝšœØ9§"HH:h!y§+:/*¹¥n9`/;ï#ùæë¹ª&{ï#ú(ç9íi»ï#ùbåyåjújeù¥-»ï#ŒMŒH9æ¡ˆ\ÝËÝŒMŒKY›[YK\Û\Ú]™ž\ÝšœØ9§"HH:h!yàjùá,9¥«9«hùo#ÈÜš]H‘–:jeù¥-»ï#ŒMŒÈ9æ¡ˆ\ÝËÝŒMŒËY›[YK\Û\Ú\ÛÝ\˜ÙK\ÝšœØ9§"HÈ:h!y/¡¹®¤9¨(y«hújeù¥-»ï#ŒMH9æ¡ˆ\ÝËÝŒMKYš\™K]™žYš^\Ë\ÝšœØ9§"HÈ:h!yàjùìîùg%º"!ùàjùë«z$/znçºjeù¥-»ï#ŒMˆ9æ¡ˆ\ÝËÝŒM‹]Ø]\‹]™ž\ÝšœØ9§"HMH:h!y¬-;ï#ùa¬9«hùo#ÈÜš]H‘–:jeù¥-»ï#ŒMŽH9fæùieù®+:*i‚ˆ9d":*"Ì:h!H”ÈR{ï#ùa`ùí(9c(ûï#ù¬-9¢ : ï{ï#ù­ìy­íz,áùå(¹­`yê"újeù¥-»ï#9.)¹/çyåfycëú`n9æ¡ˆ\ÝËÝŒLÎXœ›ÝÜÙ\‹\Û[ÚÙKšœØ8à ¹§+:/*¹ä¬9h ù¬¤¹§"HÚ›ÛZ][H^XÝ]X›{ï#9¢`9.éyk£9¥m9¢,:k){ï#Âˆ9bkù§+RH:nç¹¤â¹­`yê"ù.ãy§*¹í#yaiz!ê¹båy®+:*i»ï&ù.bùo£9/ë¹¥.HØY\¸à yí¤újeÂˆ9¦ì¹íæ¸à z ã9c!y.©9¦$øà z!ê¹båy¢,:k)y¢%¹i&¹.®º)äº"lº`£ú/+ù¦`»ï#9oázh"9d#9«iy¤í9aay.)¹gíú(c9®+:*i¸à ‚‹HÞHŸ•ŒMˆ9¦ªù¦`¹¬¯ùå*:""¹ea¹n¥ÈXÛÛŸŸˆŒ‹LLŽ9mì¹å,HŒMÈ9/oùå*9/oùå*: !z(ç9.©9g%¹k£9¢$:`#ù¦#¹c%¸à Bˆ9¢bùªgùl.¹kî9a*¹c%º"!ù."yaiycèù¦ïù£æûï#9£¨y¥¬9ª¥\ÜÙ]ËÝZKÚÛYK\ÚÜ]ŒMËœ™Ø:`oùacz)¡¹kêú""º,áùå(¸à ‚‹HÈH9a`ùí(9c(ùæ¡8à#:aäynhøà#yílz*"9æë¹bcz-çú$eù¥è¹§"yæ¡ÛÛ9aj9gçú+¢¹¥n:-l;ï#9¬¤¹§"ycé¹i%¹ª¨¹§éz`&y`"ú+¢¹¥nˆ9§+:.ªùæ¡9/¡¹®¤ù«hùè®¹ )ù¦+ùd)¹ë)¹d":h$9§'ûï":-¡yaîº`&y«(zg 9¬`¹ëá9g#{ï#9¬¤¹§"y­ìyaiy§éz+b{ï"xà ‚‹HÈH
+Šº)äº"l»ï#ùa`ùí(9c(ûï#ù¢ : ïz)¥¹ê¥ùæ¡[™›ÚY9d"9¢$9li9è-9g%ºg 9ç'ùªgú)!újeÊŠ»ï&•ŒMŽH9mì¹è®º*£yn¥yli:h zgh‚ˆ9§ ù.éyçêyohˆ[H9êoú`#ù.ãze¢ùegùæ¡:)¥¹ê¥ûï&ù§ 9cëú ïyc§ùfè9¦+È˜[œÙ›Ü›{ï#ÜZ[ÛÛZ[›Y[9aiùæ¡9ob9ê¥Âˆ9¬.9.aH›Þ\ÚYÝØ9båyåjú"!ù«ãùo-y¢ : ïychHÚ[XÚ[™ÙN˜[œÙ›Ü›X9d#9¦`¹nî¹êâùi)úaãùd"9¢$9li8à ‚ˆŒMŽH9mì¹l!ùbcz !H[š[X][ÛŽ››Û™X8à yo£: !y¥.yà®ˆÚ[XÚ[™ÙN˜]]Ø8à ¹æë¹bcyï.¹l$HÚ›ÛZ][{ï#ˆ:g 9g*9d#9«/ˆ[™›ÚY:(çyïk¹¢¢º)äº"l¸à ya`ùí(9c(ú"!ù¢ : ïz*lùí,:)¥¹ê¥ùd!9/çy£ ze¢ùegùí!L9éäº)!újeøà ‚‹HÞHŸŠŠº ã9c!y.âúgh¸à#:/å9fçºcmxà#y.#z)¢ù.¡ŠŠŸŸˆŒMÌËŒMÈ9å,y/oùå*: !y¢*¹g%¹è®º*£yecúhc9åjúgh¹am¹ké¹¦+ÂˆÚ][S[Ù[9âjydàz*lù á{ï#: #9.#y¦+ú ã9c!y..úh y¢%¹g,9g%º ã9c!z)¡º$âùli;ï&ùâjydàyg%º"!ùaiùk®y§ ù¢¢¹c§ù§+9§ 9."ù¥®Bˆ9æ¡:eç:e¢zcmy£ª9aî¹cëú)¥¹ëá9g#xà ¹ãï¹mìºfd9b-¹g%¹âaûï#ùaiùk®zjæ9n©¸à ya`z*,yaiùk®yc`9£l¹bå{ï#9£"zb%y¥¡ùkeù¥.yà®¸à#:/å9fç¸à#{ï#ˆ9.)¹.éyíæ¹."¹à#ú)¯yfj9kéºf¦únç¹¤â¹è®º*£ycëú)¢øà ycëúeç:e¢xà ‚‹HÈH
+Š•ŒLÍˆ:""¹kf9ª¥:"éy¥êymì¹cê¹bjH]]ÐÛÛ™šYËœÚÚ[H››Ü›X[˜;ï#9á(y¬åycãy£ª9aî¹c§ù§+ˆ:`n:`c¹æ¡9¢ : ïJŠ»ï&¹¦í9¥¬9o£:g :) yãªyk­¹g*9a`ùí(9c(úaãy¥¬:`n9. 9«({ï&ù.bùo£9§ ùå,BˆŒLÍXÝ[Û’[[;ï#ØŒLÍ“\ÝÚÚ[9/çz+mûï#9.#ya£z(ªú""¹d#9«izgg:næ9­%ù£¢xà ‚‚‹KKB‚ˆÈÈ9¦í9¥¬9k¢9baûï"9."ù. 9`"ù£©y¢bùæ¡9.®»ï#9.#yë¨y¦+ú*¬;ï#:*âùáiù`f»ï"B‚¹«ãù«(yméy/g9íd9§gùbc{ï&‚‚ŒKˆ9g*9."ºgh¸à#9mì¹k£9¢$9b§ú ïz*&:c!8à#y¥¬9h§¹. 9ëa»ï#9¥éy§'È
+È9ª&zhc
+È9`f¹.¡¹.à:n¯
+È9 #ºn¯:jeú+byæ¡
+È9mì¹çézfd9b-‚Œ‹ˆ9i ¹§§:)èù¬n¹.¡¸à#9mì¹çézfd9b-ˆÈ9o¡z/©¹.¢úh!xà#z(èyæ¡:h!yæë»ï#9¢dùbï¹¢%¹b*¹£¢z`¨ù. :(cŒËˆ9i ¹§§9æo9ãï¹¥¬9æ¡9§­¹©âúfmúf,{ï"9`ãøà#ŒLÌH9.#y¦+ùå*ØÜš\9ª&yìi:/"yaixà#z`¨ùê+»ï"{ï#ˆ:(ç:`,¸à#9ìîùíly§­¹©âúaãznç¸à#{ï#9.#z) ycê¹åfyg*9l#z*lyí :c!:(è{ï#9.bùo£9.#yd#9méyamøà y.#yd#:)¥¹ê¥ùç"ù.#yb,:`¨ù«­yl#z*lBˆ9è®º*£HXZ[˜9b!¹¥+ùmì¹í¤ù¦+ù§ 9¥¬8à ycëú`bù/g9æ¡9âà9¡bù¢cyë¥ùméy/g9íd9§gÂ‚‚ˆÈÈŒ‹LKLÈ8 %Þ[\Ú\ÈÈ[™Ù[ÛˆÈ\]Z\Y[RHYÙš^˜]Ú‚‹HÛÜšÈœ˜[˜ÚˆYÙš^ÜÞ[\Ú\ËY[™Ù[Û‹Y\]Z\Y[]ZX˜\ÙYÛˆ]ˆYXÙL™ŒŒY˜ÍMMÌYM™™MMMŽYØ˜ˆXZ[˜[ÝXÚY‚‹HÙ™šXÚX[™\œÚ[Û‹ØØXÚH™[XZ[ˆMÌËŒ˜È\È˜]Ú\È[[[Û˜[H[™\œÚ[Û™Y[[]™\žH™\]Z\™[Y[\È‘T’Q’QQ‚‹H™Y›Ü™ÙHX]\šX[Y\ˆ^[Ý]ÝÛ™\ˆ™[XZ[œÈÜÜËÌÎ]ŒMK\Þ\Ý[KY^[œÚ[Û‹˜ÜÜØÈ]ÈY\ˆXÚÙ\ˆ\È›ÝÈHÝXÚ]Ú][\ÝYÜš^›Û[˜Z[‚‹H[™Ù[Ûˆ^™]Ø\™™]šY]Èœ˜[YH\È›ÙK[[Ý[YÈHX]Ú[™ÈÔÔÈÝÛ™\ˆ\ÈÜÜËÌÌË]ŒLÌ‹XÛÛ[Y^[œÚ[Û‹˜ÜÜØ›ÝHÙØ[YK\ÝYÙX\™Yš^YÙ[XÝÜ‹‚‹H˜XÚÜXÚÈ\]Z\Y[ÛÛ\\š\ÛÛˆÝÛ™\ˆ™[XZ[œÈœËÍMK]ŒMÌËLKZ[™[ÜžK\XKšœØ
+ÈÜÜËÍLË]ŒMÌËLK\XK˜ÜÜØˆØ[›ÛšXØ[\]Z\Y[ÛÝÈ\™HXYÈ[™ÈÚÝ[\ˆÈ\›[ÜˆÈÚÙ\ØÈ][H\HÙX\Û˜X\ÈÈ\]Z\Y[ÛÝ[™‚‹HX]\šX[Þ[\Ú\È™[XZ[œÈÝÛ™YžHœËÍN]ŒMÌËŒËY[˜Ý[Û˜[Yš^\ËšœØÈ^Y\‹]š\ÚX›H˜]]™Hœ›ÝÜÙ\ˆÙ[XÝÈ\™H™\XÙYÚ][‹YØ[YH\Ý›ÞÛÛ›ÛÈ[™HX]\šX[\ÛÜšÈ\ÈÛÛ\XÝY‚‹H[š]X[Þ[\Ú\È\]Z\Y[\\È™\ÛÛ™YžHœËÌÎ]ŒMË\Þ\Ý[KYš^\ËšœØ\™XÝHœ›ÛH\ÜÙ]]Ûˆš\œÝXÚÙ\ˆ™[™\‹˜]\ˆ[ˆØZ][™È›ÜˆH]\ˆ™\Z\ˆ\ÜË‚‹H\›X[™[RH[Nˆ^Y\‹]š\ÚX›H˜]]™HÙ[XÝ‹ÏÜ[Û˜Y[\È\™H›Ü˜šY[ŽÈÙYHRWÑÕRQSS‘TË›Y‚‹H˜]ÚÚXÚÛ\Ýˆ™[X\ÙKÜ™\]Z\™[Y[X˜]Ú\ËÌŒ‹LKLË\Þ[\Ú\ËY[™Ù[Û‹Y\]Z\Y[]ZKšœÛÛ˜ˆÝ]\È™[XZ[œÈSTSQS•Q[™[™ÈÒH
+È]ˆš\ÝX[™\šYšXØ][ÛŽÈÈ›ÝÛZ[HÓÓTUHÜˆ[\™\œÚ[ÛˆY]‚‚‚ˆÈÈŒ‹LKLÈ8 %ÛÝY›\™HUˆœ˜[˜Ú[X\Â‚‹HÛÝY›\™H9mì¹å,ykéºf¦È\Þ[Y[:+byké»ï&˜]˜9b!¹¥+ùfî¹k¦ˆ[X\È9à®ˆÎ‹ËÙ]‹™›Ý\‹\Þ[X›ÛËY]‹œYÙ\Ë™]˜8à ‚‹H9ãïº(cUˆ9ké¹ªgù®+:*i¸à \™[X\ÙHX[šY™\Ý:"!ÈÛÛ[Z]ÒH™XYX˜XÚÈ9. 9o¢ù/oùå*9«iœ˜[˜Ú[X\ûï&ú/ ù¥êy¥¡ù.í¹.+yaî¹ãï¹æ¡Î‹ËÙ›Ý\‹\Þ[X›ÛËY]‹œYÙ\Ë™]˜9`áyà®¹«mùcìˆ›ÛÝT“;ï#9.#yo¥ùa£y/g9à®¹æë¹bcH]˜ÒH:jeú+by/¡¹®¤8à ‚‹H™Ú]X‹ÝÛÜšÙ›ÝÜËÙ\ÞKY]‹XÛÝY›\™Kž[[9mì¹¦#¹è®¹/oùå*KXœ˜[˜ÚY]˜;ï#9.%:`ê9ïl¹o£9§ ùo§¹."º/ìœ˜[˜Ú[X\È:jeú+bHÛÛ[Z]Òxà QØ[YH™\œÚ[Ûˆ:"!ÈØXÚH™\œÚ[Û¸à ‚‚‚ˆÈÈŒ‹LKLÈ9d"9¢$9aiúh yg ¹æí9£l¹båH›ÛÝË]\;ï"]»ï"B‹H9/oùå*: !y¢bùªgújeù¥-¹è®º*£z(çy`¦ya­¹ábz"!ù§d9¥¦yd"9¢$9aiùk®y.ãy§ ùg*9n¥z`ê:(àyb!ûï&ùç'ù«hùg ¹æíØÜ›ÛÝÛ™\ˆ9à®ˆŒMK\Þ[\Ú\ËX›ÙX;ï#9.#y¦+ùi%¹liÚÛYQ™X]\™S[Ù[›ÙX8à ‚‹HÜÜËÌÎ]ŒMK\Þ\Ý[KY^[œÚ[Û‹˜ÜÜØ9¥.yà®ˆŒMK\Þ[\Ú\ËX›ÙX9c§ùå'ÈÝ™\™›ÝË^N˜]]Ø
+ÈÝXÚXXÝ[ÛŽœ[‹^X;ï#:emùaiùk®ychyâaù¥.HZYÚ˜]]ÎÈZ[‹ZZYÚŒL	X;ï&ùa­¹ábzf£¹í&¹ªjùd$H˜Z[9a`z*,H[‹^Ü[‹^xà ‚‹HœËÍN]ŒMÌËŒËY[˜Ý[Û˜[Yš^\ËšœØ9æ¡X^[Z^™TÞ[\Ú\Ô[™[
+
+X9d#9«iy¢¢¹ç'ù«hùaiùk®H›ÙH:*+yà®¹g ¹æíØÜ›ÛÝÛ™\»ï&ØœËÌK\ÝYÙK]Ž]ÝXÚ[ØÚËšœØ9æoyd#ye«¹b¨9aiHŒMK\Þ[\Ú\ËX›ÙX8à ‚‹H9âb9§+9.ãyí«y£ HŒMÌËŒ»ï&úg 9ëbHUˆ9ké¹ªgùè®º*£yajzh z`ïz ïy®äyb,9n¥yo£9¢cycëù¢¢¹§+›ÛÝË]\9ª&y¢$‘T’Q’QQ8à ‚‚‚ˆÈÈŒ‹LKLÈ8 %V9¢$:emù¦ì¹íæ¹«hùo#ù¥-¹¥ ‚‚¹§+9«­yà®¹æë¹bcHV;ï#ù¢$:emú)£ùbaùæ¡9§ 9¥¬9«hùo#ÈÝÛ™\ˆ:)£ù¨/;ï&ú"éybcy¥¡ù«mùcì¹âb9§+9¥f:/ì:"!ù§+9«­z(gyê {ï#9.éy§+9«­z"!ùkéºf¦È[[YHÝÛ™\ˆ9à®¹®¥¸à ‚‚‹H9caùí&ºg 9¬`¹e+ù. :emù§'ÈÝÛ™\»ï&˜œËÌŽ]ŒLÌËYXÛÛ›Û^K\™X˜[[˜ÙKšœØ9æ¡ŒLÌÑÙ]^™^›Ü“]™[
+
+X8à ‚‹HŒx¡¤ŒŒ;ï&¹¥¬9¢bùoêú`'ù§'ûï#9/çyåfy¥è¹§"H™]ØÛÛY\ˆ›Û\ûï#ù¥¬9¢bù¨ë¹§¥ûï#ù¥¬9¢bù.îùbæyëà9icûï#9«hùn.9­`yê"ùæë¹ª&yí!Œ;ïgŒÌ9b!ºd&9b,ŒŒ8à ˜ŒLÌÑÙ]^™^›Ü“]™[
+K‹ŒNJX9í«y£ y¥è¹§"y¥¬9¢búgg9¡búg 9¬`¸à ‚‹H9o§ˆŒŒ8¡¤ŒŒH:e¢ùiâûï&˜^™^H:*l¹ëbyí&¹íí9b§ùc`9«hùo#ùnlùgaùª&y®¥¹mèy *ˆV0åÈT‘ÑUÐUWÐSÒÔ”Ø;ï#9.#yo¥ùa£yå*9cé¹. 9ieújæ9ëbyí&ºgg9¡bÈV[˜ÚÜœÈ:)¡º$âøà ‚‹HT‘ÑUÐUWÐSÒÔ”Ø9«hùo#ù£©ùb-ˆ^™^;ï&“ŒŒMxà SŒÌLL8à SLL8à SLM8à SŒML8à SÌNL8à SŽLLŒ8à SŽLLMÌ8à SŽMOLŒ8à SŽNLÍL8à SŽNOM;ï&ù.+ze¤ùëbyí&¹nlù®äy£ä¹`/8à ‚‹H9. :"+9mèy *¹«hùo#ÈVÝÛ™\»ï&˜œËÌK]ŒLÌKYš^X˜]ÚšœØ8à “ŒŒ
+È9ª&y®¥¹mèy *ˆH9 *¹âjygî¹é#ˆV;ï"9ëbyí&°åÌL;ï"påÈ˜[šûï"9¦kº`&Œ{ï#ùì¯º"ìLK{ï#Ð“ÔÔÌûï"påÈ9íí9b§ù`#yã¡ÌË{ï&ÕŒMÌËˆ9aj9gçÈV0åÌÈ9`áy/çyåfHŒ{ïgŒNH9oêú`'ù§'ûï#9.#yo¥ùg*ŒŒ
+È9a£yå¢¹b¨8à ‚‹H9a`ùí(9c(ûï&¹d#9¨§y.í¹«hùo#ùmèy *ˆV9æ¡Ì	{ï&ù.#yd ù/$y kùí¤újeøà ‚‹H9/$y kùí¤újeûï&¹. :"+9mèy *¹d#9¨§y.íˆŒ	{ï&ù«ãùí!:fè¹íæŒ¹b!ºd&9í+ùêcLyh-8à y§ 9i&ŒÌ9h-;ï&ùa`ùí(9c(ú"!ù/$y kùí¤újeùé y«h¹å¢¹b¨8à ‚‹H:!ê¹á-¹aaz ï{ï&“ŒŒ
+È9.ãy/§H^™^0åÈ]™[Ô\‘^X;ï#9¥è¹§"H]™[ËÙ^H9¡#ùg%¹.#zaãy`f»ï"ŒŒ9í!KŒÌ8à SL9í!KŒ8à SŽNyí!ŒÌ»ï"xà ‚‹H9«ãù¥éHÜ›ÝÝV;ï&¹.ãy/§y¥¬^™^0åÈ]™[Ô\‘^X9båy¡bú*"9ë¥ûï#9.#yo¥ùèk9kêú""ˆV;ï#9.gù.#yo¥ùa£zhcyi%¹.f9aj9gçÈ0åÌøà ‚‹H9í¤újeùbkù§+;ï&¹í«y£ yaj:f¢¹åm¹í&ˆ^™^9nlùgaÈ0åÌÌÉ{ï#9nèùdbºfæy`#yí!‰{ï&ØS‘ÑSÓ—ÑRSWÓSRUÑSP“QY˜[ÙX9¦+ùæë¹bcHUˆPH9b.ù¡#ú*+yk¦»ï#9é y«h¹åm¹¢$YÈ9 h¹oªy«(y¥n:fd9b-¸à ‚‹H9`¬ùílzfè¹íæˆV;ï&¹.ãyå,HœËÌ[XZ[‹šœØ9gî¹é#ˆLVùb!ºd&;ï"9§ 9i&9b!ºd&;ï"{ï"ØœËÌÍ]ŒMKXÛÜ™K\Þ\Ý[\ËšœØ9§ :jæ:)äº"l¹ëbyí&¹`#yã¡ú"!ÈŒMÌËˆ0åÌÈ:*"9ë¥ûï&ù§+9«(z*ey/,9æî9l#y¥¬:emù§'È^™^9.)¹§*¹è-9hç¹k¦¹/c{ï#9fè9«i9.#y/ë¹¥.xà ¹nèùdbºh&9cå¹.ãyà®ºfæy`#xà ‚‹HV9h-9¥n9`iyª¨¹oázh":-l9ç'ù«hÈ[[Y{ï&¹kéºf¦ù *¹âj{ï#Ü˜[šÈ8¡¤ˆ9¢,:k)HV8¡¤ˆ[Ù{ï"9¢bùbå{ï#ùa`ùí(9c(ûï#ù/$y kûï"x¡¤ˆ^™^;ï#9.#yo¥ùcê¹«å:/ ÈRxà z*.ú)èøà X[˜ÚÜˆ\œ˜^xà ‚‹H9fç¹«nÝÛ™\»ï&˜\ÝËÝŒMÌYš[˜[\ÜXËZ[YÜ˜][Û‹\ÝšœØ:jeú+byk£9¥m9§ 9í`ˆ[[Y{ï&Ø\ÝËÝŒLÎKYXÛÛ›Û^K\™\ÝYY^\ÝšœØ:jeú+by¦ì¹íæº"!ù/$y kùí¤újeûï&Ø\ÝËÝŒMÌËËYÜ›ÝÝXÚ\™ÙK\ÝšœØ:jeú+bz!ê¹á-¹aaz ï{ï#ù«ãù¥éHÜ›ÝÝ;ï#ù¥¬9¢bù§'øà ‚‚‚ˆÈÈŒ‹LKLH8 %9¢,:k)H‘–9e«¹. ÝÛ™\ˆ9¥-¹¥ ‚‹HœËÌÎK]ŒMË\ÚÚ[X[š[X][Û‹šœØ9¦+ùmèy *¸à y¥éyn.;ï#ù­ìy­íybkù§+8à yãªy¬å{ï#ù­.ùbåz"!È“ÔÔÈ9¢,:k)yæ¡9e+ù. 9¢ : ïH‘–:"!ù£ yî£9âà9¡bÈÜš]HÚY]ÝÛ™\¸à ‚‹H9«hùo#ù¢,:k)z)¥º)®¹cê¹a`z*,H‘ûï#ÕÙX”Üš]HÚY]:"!ùâà9¡bùoª¹ä¬9g%»ï&ÕŒMˆ9`áy/çyåfHXÝ[ÛˆØ]{ï#ù¦`¹n£ùæî9k®{ï#9.#ya£yîjº(ïz)¥º)®¸à ‚‹H9é y«hˆÔÔûï#Ò˜]˜TØÜš\9ê"ùn£ùo#ù¢ : ïy¦ïù.èùbåyåjøà PØ[˜\øà TÕ‘øà UÙX‘Ó;ï#ÔÚY\ˆ˜[˜XÚûï&ù«hùo#ùí(9§d9ï.¹i,y¦`¹cêº*&:c!Z\ÜÚ[™Èš\ÝX[;ï#9.#yo¥ú` 9fçº""ˆ™[™\™\¸à ‚‹HœËÍË]ŒMK\ÚÚ[]ZK\[\ËšœØ8à XœËÍ‹]ŒMMKY]‹Yš^\ËšœØ8à XœËÍNKXXž\ÜË]ÛË]Y\‹\[[YKšœØ9ëbyo£:/"yaiz)£ùbaûï#ùbkù§+9ª(yía9.#yo¥ù¥.ykêÈŒMÔÚÚ[[š[X][Û“X[šY™\Ý9¢%ˆŒM”ÚÚ[[š[X][Û‘\™XÝÜ‹œ^X8à ‚‹H:$+:,hyg'ùæï¸à yíd9åc:"!ùam¹.åˆY™»ï#ÑXY™ˆ:)¥º)®¹å,HŒMÈU×ÔÕUT×ÔÔ’UTØ9«hùo#ùoª¹ä¬9g%¹db9ãï»ï#9.#ya£ynî¹êâú""¹fæú)ä»ï#ùì¤¹kdÔÔÈ:)¥º)®¸à ‚‚‚ˆÈÈŒ‹LKLH8 %9ajy¨§HRH9í«y/ë¹b!¹¥+ùk¢yaj9¥m9d";ï"]ˆÛ›{ï"B‚‹H9¥m9d"9bcz`h9êëÈ]˜;ï&˜ŽXŽMŽMÎŒMNMY˜™ŒMÙNXYMÍ˜;ï&ù¥m9d"9bcycâ¹¥-¹l/¹bcz`h9êëÈXZ[˜9gaùà®ˆ˜ØXYŒ™™ŒX˜™˜˜ÙXŒ™YMMÌLÌÎ˜™™X8à ¹§+9¢ny§*¹l#HXZ[˜9nî¹êâÈY\™Ùxà \\Ú9¢%¹¦í9¥¬™Y¸à ‚‹H9kéºf¦úh!¹n£ù/§H[[YHÝÛ™\ˆ9b)9k¦»ï&¹ab9d"9aiHš^ØÚ\˜XÝ\‹Z[™[ÜžK\ÚÚ[\™[XË]ZKLŒŒLPÙNLYYNXNLŽLÙÍLŒLÍØ˜Ì˜XM˜Y˜;ï"Y\™ÙHMÎLÍŽÌNXÌÙXŽNMÍÌ™ÌLŒÍÎ™LÌMØ;ï"{ï#9k£9¢$9ãj9êâÈÒ{ï#ú`ê9ïlºjeú+byo£;ï#9a£y.éymì¹d*ùë+9. 9¨§yæ¡9§ 9¥¬]˜9d"9aiHš^Ø›ÜÜË[YXÚ[š\ÛKXØ\™Y]Z[]ZPXÍ˜ÎX™LÌYLÍØYLN˜LLÌMÎ˜XÎLÎØ;ï"Y\™ÙH™ŒÎÙXLY˜ÎLNØMÍ™ŒŽMMNLŒÍŒÙ™LÙÌ˜;ï"xà ‚‹H9ajy¨§yb!¹¥+ú`ïykf9g*9.%9£!ùk¦ˆÒH9l,y¦+ú`h9êëùb!¹¥+È\;ï&ùajz !yæî9l#yb'yiâÈ]˜:`ïy.#z$/yo£8à ¹e+ù. 9alyd#9ª¥9¨b9¦+ÈœËÌNK\ÝYÙK]ÎXÚ\˜XÝ\‹Z[™[ÜžK\[[YKšœØ;ï#9/a¹ë+9. 9¨§ycê¹¥.H™[X\ÙPÚ\˜XÝ\“^[Ý]ÝÛ™\œÚ\
+
+X;ï#Ø\S›ÝØ;ï#9ë+9.£9¨§ycê¹¥.HØ[Y\^H“ÔÔÈÔÔûï#Ò”È9båy¡bú/"yaiHT“;ï#9¬¤¹§"yd#9aïyo#øà \Ù[XÝÜ¸à [\Ý[™\¸à \Ý]xà z,áù¥¦yíd9©âù¢%ˆ[[YHÝÛ™\ˆ:aãyå¢»ï&ùajy«(ykéºf¦ÈY\™ÙH:`ïy¬¤¹§"HÛÛ™›XÝ8à ‚‹H9ë+9. 9¨§yd"9aiyo£;ï#]™HXž\ÜÈPH9¦­:g,¹b'yiâÈ]˜9mì¹kf9g*9æ¡:`c¹¦`ˆØ[˜\È\ÜÙ\[Û»ï&ù«hùo#È[[YH9mì¹å,HœËÌÎK]ŒMË\ÚÚ[X[š[X][Û‹šœØ9¤ày§"HÓH˜\Ý\ˆÜš]xà ¹/ë¹oªH™Ú]X‹ÜØÜš\ËÜ[‹XXž\ÜË[]™KXœ›ÝÜÙ\‹\XK›ZœØ:"!È\ÝËÝŒMÍ\˜\Ý\‹[Û›KXÛÛX˜]]™ž[ÝÛ™\‹\ÝšœØ9æ¡9ç'ù«hÈPHÝÛ™\»ï#ÛÛ[Z]ÍNXÌ™ŒŽMÌÎMÙÍ™ŒMŒ˜™L™Ø;ï&ÑÚ]XˆXÝ[ÛœÈ[ˆÍÍMÌX9æ¡™\ÜÚ]ÜžHÚXÚÜøà yì¯¹è®ˆÒH:`ê9ïlº"!È]™H[Øš[HPH9aj:`êÕPÐÑTÔøà ‚‹H9ë+9.£9¨§yd"9aiyo£;ï#\ÚÚXÚÛÝ]\ˆ9§*¹c!yd*ùamˆ\ÙÜ˜\H™YÜ™\ÜÚ[Ûˆ9kêù«nùæ¡9b'yiâùgî¹®¥ˆÒ{ï&Ø™Ú]X‹ÝÛÜšÙ›ÝÜËØÚKž[[9mì¹¦#¹è®¹¢¤ùcåˆŽXŽMŽMÎŒMNMY˜™ŒMÙNXYMÍ˜;ï#ÛÛ[Z]XYM˜Œ™XLMYXØŒÌŽXLMÙŒŽŒÙŒÍÙŽMY8à ‘Ú]XˆXÝ[ÛœÈ[ˆÍÍMÎÌNNX9æ¡™\ÜÚ]ÜžHÚXÚÜøà yì¯¹è®ˆÒH:`ê9ïl¸à []™HXž\ÜÈ:"!È˜]KØ]Y[ÈPH9aj:`êÕPÐÑTÔøà ‚‹H9§ 9í`¹§+9ªgÈ›ÙH™Ú]X‹ÜØÜš\ËØÚK›ZœÈ\ÝØ;ï&ŒLÌKÌLÌHÝZ]\È:`&º`c»ï&ú*§¹¬åxà zgg9¡bú,áù®¤8à zaãz)!ÈSQ8à [ØY\¸à UŒMÌË™[X\ÙHØ]xà ]Ú]\ÜXÙ{ï#ØÛÛ™›XÝX\šÙ\»ï#9.éycâºaãz)!ùaïyo#ûï#Û\Ý[™\»ï#ÐÔÔÈÝÛ™\ˆ9ê/y¨.9gaú`&º`c¸à ‚‹HÎ‹ËÙ]‹™›Ý\‹\Þ[X›ÛËY]‹œYÙ\Ë™]˜9kéºf¦ùà#ú)¯yfjP{ï&¹k£9¢$9å-ù )ù¬-9ìîùbmz)äº"!úacznç»ï#:e¢ùegú)äº"l¹¢ : ïxà z ã9c!xà yéæ9kí»ï&ùè®º*£z ã9c!H[‹^X8à yéæ9kí¹aiùk®yg ¹æí9£l¹båz"!ùb!ºhg¹ªjùd$y£l¹båxà ¹cé¹.éHUˆ9méyamùcaú!ìÈŒŒ;ï#9kéºf¦ú`,¹aiyá¯¹á,9âï9ã¢ù¢,:k){ï&ùë+9.£9fç¹d"9å'ù¢$8à#:aäybfú+mújå8à#NNŒMˆ9ch{ï#“ÔÔÈ˜]H]H9cê¹g*:*lˆ[[YH:f¬z%ãûï#9í!z"lˆX9cëúe¢ùegÈNŒMˆ:*lù áxà zhkùé.¹k£9¥m9¥b9§§9.)¹å,xà#:/å9fç¸à#y¥-¹d"8à ºh zgh¹/¡¹®¤9¬¤¹§"HÛÛœÛÛH\œ›Ü»ï&ú)à9kçùb,9æ¡\œ›Üˆ9cê¹/¡º!ê¹®+:*i¹à#ú)¯yfj9æ¡Ú›ÛYKY^[œÚ[ÛŽ‹ËØY]Y]H^[œÚ[Û¸à ‚‹H™\]Z\™[Y[˜]Ú;ï&˜™[X\ÙKÜ™\]Z\™[Y[X˜]Ú\ËÌŒ‹LKLK]ÛËXœ˜[˜ÚY]‹Z[YÜ˜][Û‹šœÛÛ˜;ï#9aj:`ê9ª&z*&‘T’Q’QQ8à ‘Ø[Y{ï#ÐØXÚH™\œÚ[Ûˆ9b.ù¡#ùí«y£ HŒMÌË;ï&ù¬¤¹§"HXZ[ˆ›Û[Ý[Ûˆ\›Ý˜[8à ‚‹H9l&¹§*¹`f¹kéºjå[™›ÚY:(çyïkˆP{ï&ù¥è¹§"H[™›ÚY9d"9¢$9li9ç'ùªgùo¡zjeúh!yæë¹.ãy/çyåfxà ¹§+9¢nymì¹å*ÎL0åÎ;ï#ÍL°åÎLMHÒHÚ›ÛYxà []™H[Øš[HPH:"!ùkéºf¦úfì¹êëùà#ú)¯yfj9.©9câzjeú+b{ï#9§*¹æo9ãï¹ajyb!¹¥+ù.¤¹æî:)¡º$âøà ‚‚‚ˆÈÈŒ‹LKLH8 %9ajy¨§HRH9í«y/ë¹b!¹¥+ÈXZ[ˆ›Û[Ý[Ûˆ9£¢9«"‚‚‹H9/oùå*: !y¥¯Œ‹LKLH9¦#¹è®º) y¬`¸à#9£ª9b,]ˆ9a£y£ª9b,XZ[¸à#{ï#9cå¹.èù."¹. 9«­yåm¹¦`¹l&¹§*¹cå¹o¥ÈXZ[ˆ›Û[Ý[Ûˆ\›Ý˜[9æ¡9âà9¡bûï&ù§+9¢nH›Û[Ý[Ûˆ\›Ý˜[9mìº*&:c!9¥¯™[X\ÙKÜ™\]Z\™[Y[X˜]Ú\ËÌŒ‹LKLK]ÛËXœ˜[˜ÚY]‹Z[YÜ˜][Û‹šœÛÛ˜8à ‚‹H›Û[Ý[Ûˆ9bczaãy¥¬:+ 9cåº`h9êëûï&˜]XYLŒŒŽYXMÙŽLYÌØXXNŽM™ŽØØÎL˜˜8à XXZ[X˜ØXYŒ™™ŒX˜™˜˜ÙXŒ™YMMÌLÌÎ˜™™X8à ¹ajz !H\ÝÜžH9fè9«mù«(HXZ[ˆ›Û[Ý[ÛˆÛÛ[Z]9b!¹l¥;ï#9/aˆXZ[ˆ™YH˜XNXŒLÌÌLŽMLŽÙ™ŒÍÙXNMXŒÌ™LLLYMŒÙ:"!ù§+:/*¹¥m9d"9bcH]ŽXŽMŽMÎŒMNMY˜™ŒMÙNXYMÍ˜™YH9k£9aj9æî9d#8à ‚‹H9mì¹nî¹êâÈ[˜Ù\ÝžH™XÛÛ˜Ú[X][ÛˆÛÛ[Z]™LÌÙMØMØÌ˜ÍÍ˜˜ØØ˜ÍLÙYXŒXŒNÎ;ï#:fæz)ª¹à®¹mìºjeú+bH]ˆ:"!ùãïº(cXZ[»ï#™YH9/çy£ H]ˆŽ™YXÎLXXÌ˜LŒŒÌNÍ™MŽŒYYMØ˜XMX9.#z+¢»ï&ú`&ycê¹¥-¹¥ ¹«mùcì»ï#9.#yfçº` 9¢%º)¡º$âù.îù/eH[[Y{ï#ÐÔÔûï#ù®+:*i¹aiùk®xà ‚‹H9o£9î£9fî¹k¦º-l]ˆÒ{ï#ùì¯¹è®ˆÒH:`ê9ïlˆ8¡¤ˆ]‹]Ë[XZ[ˆˆ8¡¤ˆXZ[ˆ™\ÜÚ]ÜžHÚXÚÜÈ8¡¤ˆY\™ÙH8¡¤ˆ›ÙXÝ[ÛˆYÙ\ÈÒH9¨.9l#X;ï#9é y«hˆ›Ü˜ÙK\\ÚXZ[¸à ‚‚ˆÈÈŒ‹LKLL8 %9éæ9kíºi"¹¢$;ï#ù£¢z$/yìîùílyk¢yaj9¥m9d";ï"]ˆÛ›{ï"B‚‹H9£!ùk¦¹/¡¹®¤9à®ˆ™X]\™KÜ™[XË\›ÙÜ™\ÜÚ[Û‹Y›Ü\Þ\Ý[PÌLMNY˜MYXÎY˜ØYLL™N˜ÍÌXM™ŒŒ™LM˜;ï&ù§+9«(y`áy¥m9d":!ìÈ]˜;ï#XZ[˜9cåù/çz+mù.%9.#yo¥ù/ë¹¥.xà ‚‹HœËÜ™[XË\›ÙÜ™\ÜÚ[Û‹Y›Ü\Þ\Ý[KšœØ9¦+ùè£¹âaùd"9¢$8à z`&¹å*9è£¹âaù¦ïù.èøà yéæ9kí¹ì¯º#ëûï#ùê yè-9çìøà P›ÜÜÈ9k¦¹d$y£¢z$/xà yhe:aã9ê"ùè¤z!êº`n9ë¬z"!È[™[™È™XÙZ\9æ¡9e+ù. ÝÛ™\»ï&ùâà9¡bù¬¯ùå*RQ9..ùkf9ª¥9aiùæ¡^Y\‹œ™[XÔ›ÙÜ™\ÜÚ[Û˜:"!ù¥è¹§"H[™[ÜžH˜[œØXÝ[Û»ï#9.#ynî¹êâÈÚYXØ\ˆÝÜ˜YÙxà ‚‹HØY\ˆ:h!¹n£ùoázh"9í«y£ H™X]\™KX›ÜÜË\™[XØ9gî¹é#ˆ[[YH9g*9bcxà X™X]\™K\™[XË\›ÙÜ™\ÜÚ[Û˜9g*9o£8à œÚ[™Û]Ûˆ[œÝ[Y›YÈ9cê¹cëùg*ŒMÍ™[XÔÞ\Ý[X8à XØ[Y\^TÞ\Ý[X8à X›Ý\”Þ[X›ÛÐXØÛÝ[Ø]™X9."y`"ÈÝÛ™\ˆ:`ïykf9g*9o£:*+yk¦»ï#:`oùacy/§z,í:h!¹n£ùål9n.9¦`¹¬.9.ay`g9å*9.%9á(y¬åzaãz*i¸à ‚‹H9§+ÝÛ™\ˆ9.#yo¥ù£©yë¨HÚ[˜]X8à XÜÙP˜]X8à XŒLÌ“][˜Ú[™Ù[Û˜]X9¢%ˆØ]™QØ[YX;ï&ùk ùcê¹c!z(çyak:e¢È›ÜÜûï#ùhe9aiycèù.)¹/§y¥è¹§"z`,¹n©ˆÝ]H9l#yn,È^XÝ[Û˜ÙH™XÙZ\8à ¹ä!º*å¹."¹æ¡9d#Q9.)º(c9âjydàyål9båxà UUÈ:-ê:`,z`¢¹åc:"!ù®ïÈLŒ9¨/:`n9¤áùë¬y.ãzg 9b%ùà®¹mì¹çéz`¢¹åc;ï#9.#yo¥ù.éHÒH9í¨9áâ9k¨ùê,ymì¹­¢:fi8à ‚‹HØ[Y{ï#ÐØXÚH™\œÚ[Ûˆ9í«y£ HŒMÌË{ï&ù§+9¢ny§ 9í`ºjeú+bz"!ù§*ºjeú+bzh!yæë¹íly. :*&:c!9¥¯™[X\ÙKÜ™\]Z\™[Y[X˜]Ú\ËÌŒ‹LKLLY›Ý\‹Xœ˜[˜ÚY]‹Z[YÜ˜][Û‹šœÛÛ˜8à ‚‚ˆÈÈŒ‹LKLL8 %:(çy`¦{ï#ùãªy¬å{ï#ù..ùgãˆRHÝÛ™\ˆ9¥-¹¥ »ï"]ˆÛ›{ï"B‚‹H9£!ùk¦¹/¡¹®¤9à®ˆš^ÝZKY\]Z\Y[YØ[Y\^KXÚ]K\Û\ÚXÛÛ[YY˜MÍÌÌLŽÍÎLY˜LÍŒØÙY˜™ÌÙMYŒÙŒXÎÍ;ï&ù§+9«(ycê¹a`z*,z`,¹aiH]˜;ï#9.#yo¥ù/ë¹¥.HXZ[˜8à ‚‹H9c§ùb!¹¥+ùæ¡›ÙHÙØ[YK\ÝYÙHŒMÌÍŒK\™]Ø\™\™]šY]Ø:"!È›ÙHÙØ[YK\ÝYÙHØ[[[Y[ÚÚ[™]šY]Ó[Ù[:`ïy.#yë)¹d"9«hùo#ÈÓ{ï&œ™]Ø\™[Ù[:"!ùaj9a`ùí(9¢ : ïH[Ù[9§ ùæí9£©y£¦ùg*ØÝ[Y[˜›ÙX8à ¹¥m9d"9¦`¹¥.yå,HœËÙ\]Z\Y[\›ÙÜ™\ÜÚ[Û‹šœØ9å(¹å'ù«hùo#ù¥¡ùkeúh$:)¯xà XÜÜËÌÌË]ŒLÌ‹XÛÛ[Y^[œÚ[Û‹˜ÜÜØ9£ y§"H›ÙH[Ù[9âb:gh»ï#9.)¹æí9£©z*¯ù¥mÜÜËÍM‹]ŒMÍXÜš]XØ[]ZK\™YÜ™\ÜÚ[ÛœË˜ÜÜØ9æ¡›ÙHÙ[XÝÜ¸à ‚‹H9fî¹k¦¸à#:/å9fç¹..ùgã¸à#y£©ùb-¹æí9£©yå,H[™^š[ÙØ[Y\^TYÙX9£ y§"{ï&ù.#y/çyåfHœËÍŒ‹]ŒMÍXÝ\œ™[]ZKYš^\ËšœØ8à y¬.9.aH›Ý\‹\Þ[X›ÛÎ™™X]\™K\™XYX\Ý[™\ˆ9¢%ˆ\]ZKYš^\È[™xà ‚‹H:(çy`¦y¨/8à yçëz'¨¹nezf¢¹/#HQ8à yéæ9kí»ï#ùa`ùí(9c(ùª&yìi9b!¹b)y¥-¹¥ º!ìÈÜÜËÌÎ]ŒMK\Þ\Ý[KY^[œÚ[Û‹˜ÜÜØ8à XÜÜËÍ‹]ŒM‹\Þ\Ý[K\Û\Ú˜ÜÜØ8à XÜÜËÍMK]X[K\™[XË\Þ\Ý[K˜ÜÜØ8à ¹§*¹/çyåfyd*ùi)úaãÈZ[\Ü[9æ¡ÜÜËÍMË]ŒMÍXÝ\œ™[]ZKYš^\Ë˜ÜÜØ8à ‚‹H9¥¬9éæ9kí¹..ùgã¹g%¹/oùå*ÛÛ[Z\ÚY:-ëùo¤H\ÜÙ]ËÝZKÚÛYK\™[XË]ŒMÍ™YYMNŒÙXœ;ï&ú""¹á(H\ÚT“9.#z)¡¹kêûï#:`oùacy¥è¹§"yk¨¹¢-¹êëùoêùcå¹¬¯ùå*:c+ú*©9aiùk®xà ‚‹H:(çy`¦ybkù§+9dàzf£¹ªgùã¡ùå,HTURTQS•ÐÒTÕÑ“ÔÕP“X9í¤È\]Z\Y[Ú\ÝÙÕ^
+
+X9å(¹å'ûï#9.#ya£y¢¢ˆÍÌLÌL:)!ú(ïyb,ÔÔÈ9`oya`ùí(8à ‚‹HÒH9æ¡9ê¡:'¨¹neHš^\™H:+byké¹¥¡ùkeùãc¹bíy¨a¹c§ù§+9.ãycëùfèÎLœ9."ºfd9®¨¹aî»ï&ù«hùo#ÈÝÛ™\ˆ9mì¹¥.yå*Ø[ÊLÈHÌœ
+X;ï#ØØ[ÊLšHÌœ
+X8à ”PH9.éy¦#¹è®ˆÎL0åÎ;ï#ÍL°åÎLMHÝ™\›^HÝ\™˜XÙH:jeú+byfæú`¢ˆÛÛZ[›Y[;ï#9.#y¢¢ˆÒHÚ›ÛYH9æ¡L9§ 9l#È[›™\•ÚY:*©9ê,yà®¹¢bùªgÈšY]ÜÜ8à ‚‚‚ˆÈÈŒ‹LKLLH8 %ÛÛ\Ý\9bmz)äˆ˜]]™HY™XÞXÛH9/ë¹oª{ï"ˆÌMMûï"B‚‹H9gî¹®¥»ï&˜]ŽYŽÌÌÙŒNMLÍLÌŽLXŒÍMÌÌMNXX;ï&ùméy/g9b!¹¥+Èš^ØÛÛ\Ý\XÚ\˜XÝ\‹XÜ™X][Û‹[Y™XÞXÛKLŒŒLLX8à ˜XZ[˜9§*¹/ë¹¥.xà ‚‹H9¨.yfè;ï&˜XØÛÝ[Yš\œÝÝ\\Ý]HXXÚ[™H9g*‘QQÐÒTPÕT˜9æí9£©y¢¢ˆØÜ™X][Û”YÙX:*+y¢$\Ü^N˜›ØÚØ;ï#9îgº`cˆ›Ý\”Þ[X›ÛÑØ[YTØ]™KœÚÝÐÜ™X][ÛŠ
+X:"!ÈœËÌ]ŒLKXÚ\˜XÝ\‹XÜ™X][Û‹[˜]]™K\[[YKšœØ9æ¡˜]]™H9egùå*9­`yê"ûï&Ð[™›ÚYÚ›ÛYH9fè: #9cëú ïyg*9ë+9. 9`"ùcëú)¢Èœ˜[YH9ï.¹l$HÜ™X][Û‹Yš^YXXÝ]™XÈÜ™X][Û‹[˜]]™KXXÝ]™X;ï#:+¤ÈYØXÞHØ\ÈÝ™\›^H9.ãycàú"!ÈZ[ØÛÛ\ÜÚ][™øà ‚‹H9/ë¹«hûï&˜œËÍL‹]ŒMÌËŒŒ\Ý\\[ØY\‹šœØ9¥¬9h§ˆ˜Z[XÛÜÙY9æ¡ÚÝÐÚ\˜XÝ\Ü™X][Û”Ý\™˜XÙJ
+X;ï#9cêº`#ú`cˆØ[›ÛšXØ[›Ý\”Þ[X›ÛÑØ[YTØ]™KœÚÝÐÜ™X][ÛŠ
+X:`,¹aiybmz)ä»ï#9.)¹g*Ý\\ØY\ˆ9l&º)¡º$âú"'¹cì9¦`¹ab9k£9¢$˜]]™H^Y\ˆZYÜ˜][ÛˆÈ\ÛÛ][Û»ï#9a£y­èyaîˆØY\¸à ¹é y«h¹a£yå,HÝ\\ÝÛ™\ˆ9æí9£©H\Ü^N˜›ØÚØ8à ‚‹H9®!yä!»ï&œ›ÙXÝ[Ûˆ\\Ú[9.#ya£y¢dùc!z` 9onyæ¡œËÌŒ‹]ŒLXÚ\˜XÝ\‹XÜ™X][Û‹[˜]]™K\[[YKšœØ:"!ÈÜÜËÌŽ]ŒLXÚ\˜XÝ\‹XÜ™X][Û‹[˜]]™K˜ÜÜØ;ï&ù/çyåfHœËÌŒØ›ÛÝÝ˜\
+ÈœËÌ[[YH
+ÈÜš]XØ[ÜÜËÌŽX9à®¹æë¹bcybmz)äˆÝÛ™\»ï#:`oùacz""¹âbÝ™\™›ÝË^N˜]]ØÈÝXÚXXÝ[ÛŽœ[‹^XÈ\ÛÛ][Ûˆ:)£ùbaùg*9¥¬9âb9fî¹k¦ˆØ[˜\È9o£9¥®zaãy¥¬:)¡¹kêøà ‚‹Hœ›ÝÜÙ\ˆP{ï&ŒÎL0åÎ8à Qˆøà ]ÝXÚ[][][Ûˆ9æ¡XØÛÝ[Yš\œÝ9¥¬RQ9a­ùegùbåyãï¹g*9oázh":jeú+bHØÜ™X][Û”YÙX9/cy¥¯ÙØ[YK[Ý™\›^K[^Y\˜8à X˜]]™KXÜ™X][Û‹\YÙX8à XÜ™X][Û‹Yš^YXXÝ]™X8à XÜ™X][Û‹[˜]]™KXXÝ]™X8à [YØXÞHØ\[™\9.%9.#HZ[8à ybmz)äˆØ[˜\ÈÝ™\™›ÝË^N˜Û\ÈÝXÚXXÝ[ÛŽ››Û™X;ï#9.)¹.éH[[Y[œ›ÛTÚ[
+
+X:jeú+bxà#9."ù. 9«ixà#y£"zb%ycìù`m9¬¤¹§"z(ªùam¹.åˆ^Y\ˆ:$âù/cûï&Ð›ÛÝPH9.#ya£yo-ùb-ˆKY\ØX›KYÜX8à ‚‹H›ÙXÝ[ÛˆZ[9.ãyå,HØÜš\ËØZ[\›ÙXÝ[Û‹›ZœØ9å(¹å'ÈÛÛ[Z\Ú[™HÈX[šY™\Ý;ï&ù§+:/*¹.#yo¥ùå*]Y\žH™\œÚ[Ûˆ9¢%º!ê9¦`ˆÔÔËÒ”È]Ú:)£ú`oÈÝÛ™\¸à ‚‚‚ˆÈÈŒ‹LKLLH8 %9bmz)ä¹ë+9.£:h yn¥z`ê9¤ãy/g9b%ú(àyb!ù/ë¹oªB‚‹H9gî¹®¥»ï&˜]YÌLL˜ŒÍ™ØÙLÙŒŽX™YL™MÙXÍ;ï&ùméy/g9b!¹¥+Èš^ØÜ™X][Û‹\Ý\‹X›ÝÛKXXÝ[ÛœËLŒŒLLX;ï#XZ[˜9.#y/ë¹¥.xà ‚‹HÜÜËÌŽK]ŒLKXÚ\˜XÝ\‹XÜ™X][Û‹[˜]]™K˜ÜÜØ9.ãy¦+ùfî¹k¦ˆL0åÌNLŒ9bmz)ä¹âb:ghˆÝÛ™\»ï&ØœËÌ]ŒLKXÚ\˜XÝ\‹XÜ™X][Û‹[˜]]™K\[[YKšœÎŽ˜\PÜ™X][Û”Ý\
+
+X9cêº,¨:,«9«izjgùb!ù£æûï#9.#y¥¬9h§ˆÜ˜\\¸à ‚‹H9¨.yfè;ï&¹ë+9.£:h H˜Ü™X][Û‹XXÝ[Û‹\›ÝØ9¦+Èš^YØ[˜\È9aiùæ¡›^Ú[;ï#9/a¹§*ºc¥¹k¦ˆÚš[šûï&ùg*9ç'ùªgùkeújå;ï#ùcëùå*:jæ9n©¹d ù®ïù¦`»ï#XÝ[Ûˆ›ÝÈ9cëú(ªùhäùî+¹b,9£©z/äH;ï#: #9amˆL;ïgŒLÌœ9kd9£"zb%ycâ:(ªÈ˜Ü™X][Û‹\Ý\ÛÝ™\™›ÝÎ˜Û\X:(ày£¢{ï#9åjúgh¹cê¹bjy£"zb%y."¹íèøà ‚‹H9/ë¹«hûï&œÝ\ÛÈ:h$9åfHMM9n¥z`ê9k¢yaj9c`;ï#9¤ãy/g9b%ù¥.yà®¹g*Ý\9aiÈÜÚ][ÛŽ˜XœÛÛ]NÈ›ÝÛNŒ;ï#9.)¹/çyåfz!ìùl$HLÌœ›ÝÈ:jæ9n©»ï&ù.#ze¢ù¥/¹¥m:h y£l¹båxà y.#y¥.zacznç»ï#ùnîº)äº`£ú/+øà ‚‹HÎL0åÎ8à Qˆøà ]ÝXÚPH9§ ùkéºf¦ùb!ùb,9ë+9.£:h {ï#:jeú+bxà#9."¹. 9«i{ï#úe¢ùiâùa¤ºfª¸à#zjæ9n©º!ìùl$H8à yk£9¥m:$/yg*Ý\ÜÝYÙH9aiûï#9.%9mé¹cìÈ]]\Ý:`ïyå,y£"zb%y§+:.ªùcå¹o¥øà ‚‚‚ˆÈÈŒ‹LKLLH8 %:fæy«­yegùbåyåjúgh»ï"ùë+9.£9neyænùaiz)¡º$âÂ‚‹H9gî¹®¥ˆ]ŽNYÍÌÌNMYŒÍ™˜ŽMNLÙŒÙØL˜Ù;ï#9b!¹¥+È™X]\™KØ›ÛÝZ[›ËX]][Ý™\›^KLŒŒLLX;ï&ØXZ[˜9.#y/ë¹¥.xà ‚‹H9§+:/*¹ajyo-zfa9.íº"!ù¥è¹§"HŒMÌËŒŒ9/oùå*: !yegùbåyí(9§d9/cya`ùía9. :!í;ï&ÓÙÛÏX\ÜÙ]ËÝZKÜÝ\\[ÙÛËŒÌXÌ˜ÌÙŒ˜‹šœØ;ï#9ë+9.£9ney¥¬9h§ˆÛÛ[XY™\ÜÙY[X\È\ÜÙ]ËÝZKÜÝ\\[XZ[‹XÚ]K™ÙMØYŒXÌXËšœØ;ï#9¬¤¹§"zaãy¥¬9å'ù¢$9g%¹âaøà ‚‹HœËÍL‹]ŒMÌËŒŒ\Ý\\[ØY\‹šœØ9.ãy¦+ùe+ù. Ý\\Ý]SXXÚ[™HÝÛ™\»ï&ÎL\È9`áy£©ùb-ˆÙÛø¡¤¹ë+9.£9ne{ï#9ç'ùkéˆš\™X˜\ÙKÐ]]ÜØ]™H9aj9ê"ù.)º(c9.%™XY[™\ÜÈ9.#yëbyo¡ybåyåjøà ‚‹HÜÜËÙš\™X˜\ÙKX]]˜ÜÜØ9l!ùænùaiy¨a¹î+º!ìù§ 9i&ˆÎL8à yî+¹l#ù¥¡ùkeù/a¹/çyåfH:)î9£©újæ9n©»ï#9ænùaiz ã9¦kù£ yî£9/oùå*9ë+9.£9ney¡h¹£ª8à ¹ajyo-yg%¹gaú`,ˆÜš]XØ[™[ØYÚ[[]]X›HØXÚ{ï&úgg¹oáz) HØ[Y\^H:,áùå(¹.ãyí«y£ H^žxà ‚‚‚ˆÈÈŒ‹LKLLH:f¬yéày«"¹¥/ùëe¹d#9¡#ÈØ]B‚‹Hš]˜XÞKXÛÛœÙ[š[9¦+úf¬yéày«"¹¥/ùëeºi¥¹«(yd#9¡#ú"!ùo£9î£9§éyç"ùæ¡9e+ù. ÝÛ™\»ï&ù«hùo#ù¥/ùëe¹§+9¥¡ù.ãyå,Hš]˜XÞKš[9e«¹. 9í«z+møà ‚‹H[™^š[9cê¹£¦ù. 9`"ù§ :jæ9li9í&¹d#9®¤Yœ˜[YHØ]{ï#9.#y¥¬9h§¹ë+9.£9ieÈ]];ï#ÔÝ\\Ý]HXXÚ[™xà ºi¥¹«(y§*¹d#9¡#ù¦`¹oázh"9¢¢¹¥/ùëe¹®äyb,9n¥y¢cze¢ùiâÈH9éä¹`$¹¥n;ï#9`$¹¥n9k£9åh¹¢cycëù£"xà#9¢$yd#9¡#øà#{ï&ùd#9¡#ùâb9§+9.éH›Ý\—ÜÞ[X›Û×Üš]˜XÞWØÛÛœÙ[Ý™\œÚ[Û˜9a,¹kf9g*9d#9®¤ØØ[ÝÜ˜YÙxà ‚‹H8à#9.#yd#9¡#øà#yab9f%ú*iºeç:e¢z)¥¹ê¥ûï&ùfè9. :"+9à#ú)¯yfj:`&¹n.9é y«h¹í¬ºh z!êº(c:eç:e¢y/oùå*: !ze¢ùegùæ¡9b!ºh {ï#9i,y¥eù¦`¹¥.yl#¹d$Hš]˜XÞKYXÛ[™Yš[9.)¹í`¹«hº`b¹¢,¹.âúgh¸à ‚‹H9d#9¡#ÈØ]H9£ yî£9.ézf¬z%ãÈYœ˜[YH9/gÝÛ™\»ï#9båy¡bùà®¹ænùaizh y£ä¹aixà#:f¬yéày«"¹¥/ùëe¸à#yaiycèûï#9.)¹g*9..ùgã¸à#9ìîùílxà#yæ¡9k¨¹§#yb%ùo£9£ä¹aiyd#9. 9aiycèûï&ùajz !yæ¡ºaãy¥¬:e¢ùegùæî9d#9¥/ùëeˆšY]Ù\»ï#9.#z)!ú(ïy¥/ùëe¹§+9¥¡øà ‚‹H9§+9b§ú ïy.#y/ë¹¥.Hš\™X˜\ÙHRQ8à yænùaiH›ÝšY\¸à ykf9ª¥8à z)äº"lº,áù¥¦xà y¢,:k)xà y£¢z$/y¢%º`b¹¢,¹¥n9`/8à ‚ˆÈÈŒ‹LKLLˆ9 *¹âjyêâùîj¹gî¹é#º"!úi¥¹«(z`b¹ãªy¢bùªgù/ë¹oªy¥m9d";ï"9o¡HUˆÒ{ï"B‚‹H9/oùå*: !y£¢9«"¹¥m9d"™X]\™KÛ[ÛœÝ\‹\Ü˜Z]\\[[™K]ŒKLŒŒLLP™˜XŽMLX˜ÌÌÌ™Ì˜ÍYXÍLÍYMNXÍM:"!Èš^Û[Øš[KYš\œÝ\^K]ZK]™žLŒŒLLPŒŒŒLMÍYLMXLYŽLÙXØŒŒØ˜ŒÌØYL™ÎŒX9b,9§ 9¥¬]ÙYŽYŒŒÍØÍYÌ™MÎMÍÎMÌ™ŽMMLM™MÍYLÙ˜;ï&ù¥m9d"9b!¹¥+ùà®ˆ[YÜ˜]KÛ[ÛœÝ\‹\Ü˜Z][[Øš[KYš\œÝ\^KLŒŒLL˜;ï#XZ[˜9§*¹/ë¹¥.xà ‚‹H9mèy *¹ohº,hyb!ù£æûï#ú)äº"l¹g%ˆÝÛ™\ˆ9í«y£ HœËÌ‹]ŒLÌK\]›ÛX\X\˜[˜ÙKšœØ
+ÈÜÜËÌÌ‹]ŒLÌK\]›ÛX\X\˜[˜ÙK˜ÜÜØ;ï&úi¥¹«(z`b¹ãªyajynez"!ùbmz)äºh$9`¦HÝÛ™\ˆ9í«y£ HœËÍL‹]ŒMÌËŒŒ\Ý\\[ØY\‹šœØ;ï&ùchyâc9êâùîj»ï#ùàjùë«y¥®yd$yæ¡9¥è¹§"y§ 9í`ˆÔÔÈÝÛ™\ˆ9à®ˆÜÜËÍM‹]ŒMÍXÜš]XØ[]ZK\™YÜ™\ÜÚ[ÛœË˜ÜÜØ8à ¹§+:/*¹§*¹¥¬9h§ˆ[[YHÜ˜\\¸à ‚‹H9 *¹âjyêâùîj¹gî¹é#ˆÝÛ™\ˆ9à®ˆÛÛ™šYËÛ[ÛœÝ\‹\Ü˜Z]\™YÚ\ÝžKšœÛÛ˜8à XœËÍK]ŒMMY]‹Yš^\ËšœØ™\ÛÛ™\ˆ:"!ÈœËÍ]ŒMNKXXž\ÜËX˜]K\Ü˜Z]ËšœØ9d#9«iyªbù£©xà ¹fæùo-ymì¹d"9aiy/a¹¤#y«à9æ¡9i*yamH‘È9mì¹.éy¥è¹§"z`#ù¦#¹«ãyg%ºaãy¥¬9ïk¹aiHL0åÌMLÍˆ‘ÐH9ª¥;ï#:ggºaãy¥¬9å'ù¢$8à ‚‹H9mìº`&º`cˆ[ÛœÝ\ˆ]Y];ï"LÈ^\Ý[™ûï#ÎM[›™Y;ï#9o-HÙ[™\˜]Y\ÜÙ]È9gaùcëú)èùè¯;ï"xà yl":h!y®+:*i¸à LLÌL:gg¹à#ú)¯yfj›ÙHÝZ]\øà LŒÌËÌŒÌÈ”ÈÞ[^8à XZ[]\›Z[š\ÝXøà \™\ÛÝ\˜Ù\ûï#ÒQûï#ÛØY\»ï#Ü™[X\ÙHØ]{ï#ÙÚ]Y™¸à ¹«i9ä¬9h ù¬¤¹§"HÚ›ÛZ][{ï&ÌŽH9`"ù¥è¹§"yà#ú)¯yfj9®+:*i¹åfyo¡HÚ]XˆXÝ[ÛœÈ:jeú+byo£9¢cycëùª&yé.¹k£9¥m9k£9¢$8à ‚ˆÈÈŒ‹LKLMH9aî¹gã¹a¤ºfª¹g,9g%ˆ›ÛÝ\ˆ9cëú)¢ù )ù/ë¹oª{ï"Uˆˆ9o¡HÒ{ï"B‚‹H9méy/g9b!¹¥+Èš^ØY™[\™K[X\Y›ÛÝ\‹]š\ÚXš[]KLŒŒLMX9o§¹åm¹¦`¹§ 9¥¬]ØØNNLXÍ˜ÙŒÍÙ™˜ÎLYLXYL˜YŽLNX9nî¹êâûï&ù§+:/*¹é y«h¹/ë¹¥.y¢%¹£ª:` HXZ[˜8à ‚‹HY™[\™H9e+ù. 9g,9g%¹âb:ghˆÝÛ™\ˆ9.ãyà®ˆÜÜËØY™[\™K]ŒKLŒŒLMK˜ÜÜØ8à ¹c§È˜Y™[\™K]šY]Ø9.ézh$9/,9æ¡Û[\
+œ]šLœ
+X9¢húfi:jæ9n©»ï&ùkéºf¦ÈXY\ˆ9d*ùà#ù­mùk¢yaj9c`9¦`¹cëù«å:h$9/,9`/:jæ;ï#:`(9¢$:)¥¹ê¥ù§*ùêëú"!È›ÛÝ\ˆ9æ¡9cëú)¢ùc`9.#ycëúgh8à ¹ãï¹¢¢¹¥è¹§"HØY™[\™TYÙX9¥-¹¥ ¹à®ˆ›^ÛÛ[[»ï#9å,ykéºf¦ÈXY\ˆ9/e9/c{ï#˜Y™[\™K]šY]Ø9í«y£ ye+ù. Ý™\™›ÝË^N˜]]ØØÜ›ÛÝÛ™\»ï#9.)¹/çyåfH›ÛÝ\ˆ9¢`:g 9æ¡›ÝÛHØY™KX\™XHY[™ûï&ù¬¤¹§"y¥¬9h§¹ë+9.£9`"ÈØÜ›ÛÛÛZ[™\ˆ9¢%¹î+¹l#ù¥¡ùkeøà ‚‹HœËÌK\ÝYÙK]Ž]ÝXÚ[ØÚËšœØ9æ¡9¥è¹§"yaj9gçÈØÜ›ÛÚ][\Ý9mì¹b¨9aiH˜Y™[\™K]šY]Ø;ï#9/oùd#9. 9`"ù¥è¹§"HØÜ›ÛÝÛ™\ˆ9g*9¢bùªgù¢bùbè¹."ù.#y§ ú(ªÈÝXÚØÚÈ9¤âù/cøà ¹§*¹¥.HY™[\™H9ãªy¬åxà yêè9ëà:,áù¥¦xà y.¢ù.í¸à y¢,:k)xà z ã9c!xà y..ùgã¹¢%¹am¹.åˆRxà ‚‹H9¥¬9h§¹§ 9l#ùfç¹«n;ï&˜\ÝËØY™[\™K[›ÙK\Þ\Ý[K]ŒK\ÝšœØ:c¥¹k¦ˆ›^ÝÛ™\¸à yé y«h¹ã'9®+XY\ˆ:jæ9n©º"!ÈÝXÚÚ][\Ý;ï&Ø™Ú]X‹ÜØÜš\ËÜ[‹XY™[\™KXœ›ÝÜÙ\‹\XK›ZœØ9§ ùg*ÍŒ0åÎ8à LÎL0åÎ8à ML°åÎLMH:`$9. 9£l¹b,9§ 9n¥{ï#:jeú+bH›ÛÝ\ˆ9k£9¥m9cëú)¢ù.%9g,9g%¹cê¹§"y. 9`"ùg ¹æíØÜ›ÛÝÛ™\¸à ‚‹H9§+9ªgùmìº`&º`cˆ\™Ù]YY™[\™H™YÜ™\ÜÚ[Û¸à XZ[8à XZ[ÚXÚøà \™[X\ÙHØ]xà \Þ[^:"!ÈÚ]Y™ˆKXÚXÚØ;ï&ÔˆÌH9æ¡™\ÜÚ]ÜžHÚXÚÜÈ[ˆÍMNLŒL˜9mìº`&º`c»ï#9.)¹kéºf¦ùk£9¢$9."yl.¹kîY™[\™HÚ›ÛYHP{ï#Ù]šY[˜ÙH\ØY8à ”™\]Z\™[Y[˜]Ú™[X\ÙKÜ™\]Z\™[Y[X˜]Ú\ËÌŒ‹LKLMKXY™[\™K[X\Y›ÛÝ\‹]š\ÚXš[]KšœÛÛ˜9mì¹¦í9¥¬9à®ˆ‹Ìˆ‘T’Q’QQ;ï&ù`áyo¡y§ 9o£9æ¡:jeú+byí :c!ÒH:"!È]ˆ:`ê9ïlˆÒH9¨.9l#xà ‚ˆÈÈŒ‹LKLMÈ8 %˜]H›Ü›X][ÛˆÈ“ÔÔÈYXÚ[š\ÛHÈ[ÛœÝ\ˆ˜[™ÙH™\Z\ˆØ[™Y]H
+“ÕÓÓTUJB‚‹H˜\ÙH]ÙLY™ŽNXM˜MLYYXÌÍØÌÌLLMŒM˜XÈœ˜[˜Úš^Ø˜]KY›Ü›X][Û‹]\™Ù][™ËLŒŒLMØˆØÛÜH\È[Z]YÈœ›ÛØ˜XÚÈš\ÝX[›Ú™XÝ[Û‹“ÔÔÈYXÚ[š\ÛKXØ\™š\ÝX[[™K[™[ÛœÝ\ˆ˜[™ÙH\™Ù]™\ÛÛ][Û‹ˆÈ›ÝÚ[™ÙH‘–ÚÚ[[X™\œË›Ü›X[\™Ù][\ËØ]™H]KÜˆ[œ™[]YØ[Y\^K‚‹H›ÛÝØ]\ÙHNˆœËØ˜]YšY[\ÛÝ[ÝÛ™\‹šœØÛÜœ™XÝHÙ\SWÑŠ˜Ù[X[XÈœ›ÛÛÝÈ[™SWÐŠ˜˜XÚÈÛÝË]ÜÜËÙš^Y\ÛÝX˜]YšY[\™[™\š[™Ë]Œ‹˜ÜÜØ\Ü^YY[HÜÜÚ]HH[™[^K\™[]]™HYš[š][Û‹ˆHØ[›ÛšXØ[ÔÔÈ›ÝÈ›Ú™XÝÈ[Hœ›Û]HÜ
+™X\™\Ý[™[ZY\ÊH[™[H˜XÚÈ]H›ÝÛK‚‹H›ÛÝØ]\ÙHŽˆœËÙØ[Y\^KX›ÜÜË]ÝÙ\‹\Þ\Ý[KšœÎŽœ™[™\“YXÚ[š\Û\Ê
+XÜ™X]YÙ\\˜]HYXÚ[š\ÛH\™Ù]ÈY\ˆHXœÛÛ]H[™[^H›ÝÜË[™ÜÜËÙØ[Y\^KX›ÜÜË]ÝÙ\‹˜ÜÜØYZ\ˆÛÛZ[™\ˆ[ˆ›Ü›X[›ÝÈ]H[™[^K^›Û™HÜˆH™[™\™\ˆ›ÝÈX\šÜÈH[™\[™[YXÚ[š\ÛH›Û™HÞ[˜Ú›Û›Ý\ÛNÈHØ[›ÛšXØ[š^Y\ÛÝÝ[\ÚY]XÙ\È][ˆH[™[^Hœ›Û[™KˆYXÚ[š\Û\È™[XZ[ˆÝ]ÚYH[™[^H[š]Ù[ÛY]žH[™\™Ù]™\ÛÛ][Û‹‚‹H›ÛÝØ]\ÙHÎˆœËÌ[XZ[‹šœÎŽœ›ØÙ\ÜÔÚ[™ÛS[ÛœÝ\]XÚÊ
+XÛÛ™\YšXÈ›ÝØ\™XÝHÈ[]š[™È\HY[X™\œËˆ]›ÝÈ™]\Ù\È›Ý\”Þ[X›ÛÐ˜]YšY[ÛÝËœ™\ÛÛ™P[U\™Ù]Ê
+X›ÜˆšXÈ›ÝØÈÛÛ[[˜™]Z[š[™È^XÚ][[™^\Ý[™ÈÚ[™ÛK]\™Ù]ÝX[™Z]š[Ü‹‚‹H™YÜ™\ÜÚ[ÛˆÛÝ™\˜YÙH\ÈÝ\[Y[\žHÛ›Nˆ\ÝËÙš^YX˜]YšY[X[KY›Ü›X][Û‹\ÝšœØØÚÜÈHÜ]ÛËYœ›ÛÛÛ™KX˜XÚÈ\NÈ\ÝËÙš^Y\ÛÝX˜]YšY[\™[™\š[™Ë]Œ‹\ÝšœØØÚÜÈ[H›Ú™XÝ[Ûˆ[™YXÚ[š\ÛHœ›Û[™Kˆ™\]Z\™[Y[˜]Ú™[X\ÙKÜ™\]Z\™[Y[X˜]Ú\ËÌŒ‹LKLMËX˜]KY›Ü›X][Û‹]\™Ù][™ËšœÛÛ˜™[XZ[œÈÌÈ‘T’Q’QQ[™[™È[HØYY]ˆØ[Y\^H]šY[˜ÙK‚ˆÈÈŒ‹LKLN8 %›ÜÜÈQÚYÈÛÜ›™Z[™›Ü˜Ù[Y[]™HÛ˜\ÚÝÈ[™[^H]™YY˜XÚÈÈ[YÜ˜]YÚY[
+STSQS•QÈPHS‘S‘ÊB‚‹H˜\ÙNˆ]\ÝÚ]Xˆ]YL˜LÍŽNLYLØÎMØ˜Í˜NÍŒNY˜ÙÌXÎÙM˜ØÈœ˜[˜Úˆš^Ø›ÜÜËZY]ÛÜ›\™Z[™›Ü˜Ù[Y[Z]\ÚY[LŒŒLNˆXZ[˜™[XZ[œÈ^ÛYY‚‹HHš[ÜˆÛÈ™\Z\œÈ
+ÌŽMËÈÌŽN
+Hš^Y›ÜÜÈQš\ÚXš[]KZYÚ[™™\XØ[Ü™\‹]™Z]\ˆ™[[Ý™YHÚ\™YŒMÈÚYˆ˜\ŠK]ŒMË[[ÛœÝ\‹X˜\‹]ÚYŽ
+HZ[\Ü[ÝÛ™\‹ˆH›ÜÜÈ\X\™Yš\ÚX›HÚ[HÝ[YX\Ý\š[™È\ÈH›Ü›X[Ž[ÛœÝ\ˆ˜\‹‚‹HÜÜËÍ]ŒMËXÛÛX˜]Y[™Ù[Û‹\Û\Ú˜ÜÜØ›ÝÈØÛÜ\È]ÚYÝÛ™\ˆÈ›Û‹P›ÜÜÈ[™[ZY\ËˆÜÜËÙØ[Y\^KX›ÜÜË]ÝÙ\‹˜ÜÜØ™[XZ[œÈHÛ›H›ÜÜÈQÙ[ÛY]žHÝÛ™\‹ÛÈ]ÈYÜšYÚ[œÙ]È]\›Z[™H›Ý[™ÔÚY‚‹HÛÜ›[Û›H™Z[™›Ü˜Ù[Y[Ý™\›\Ø\ÈHÛ˜\ÚÝY[]HÜ]ˆH›ÜÜÈÛÛ^™Y™\œ™Y]ÈÝ\\Û˜\ÚÝ]™[ˆYˆ[[YH™[™\š[™ÈY[™XYH™\XÙYHXÝ]™Hš^YÛÝÛ˜\ÚÝˆÝ[[[ÛœÈÛÝ[™H\ÜÚYÛ™YÈÝ[H]HÚ[HHY\\ˆZ[YH]™H˜]\˜[›Ü›X][Û‹ˆ›ÜÜÐ˜]YšY[Û˜\ÚÝ
+
+X›ÝÈYÜÈHXÝ]™HÛ˜\ÚÝÛÛZ[š[™ÈH›ÜÜÈ™Y›Ü™H[žH[˜[ZXÈ\ÜÚYÛ›Y[È\œÛÛ˜[›ÜÜÈ™Z]š[Üˆ\ÈÛÝ™\™YÙ\\˜][K‚‹HÚÝÓ[ÛœÝ\’]
+
+X\È›ÝÈH[™[^H™YY˜XÚÈÝÛ™\Žˆ[XYÙHÜ™X]\È›È™YÜ\›Üˆ[žH[™[^H[]KˆÚZÙP\›Ü”Ü\
+
+X[ÛÈ™Y\Ù\È[™[^HØ\™ÈÛÈHYØXÞKÜ™\\™[YÜ\Ø[››Ý™Z[›ÙXÙHŒMÍZ]\ÚZÙXˆ^Y\‹\ÚYH]™YY˜XÚÈ\È[ÝXÚY‚‹HHÛ^˜H›ÜÜÈÚY[Q\È™]\™YˆÞ[˜Ð›ÜÜÔÚY[Y
+
+X›ÝÈXZ[Z[œÈÛ™HÚ]H˜›ÜÜËZ\ÚY[[Ý™\›^X[œÚYH›[ÛœÝ\‹Z\Ú[™ÈH›Ü›X[^Y\ˆÝÛ™\ˆ›ÜÜ[ÛˆX^
+ÈÝ\œ™[ÚY[È^™[XZ[œÈÝ\œ™[ÈX^ˆ[XYÙHÙ][Y[™[XZ[œÈÚY[8¡¤ˆÝ™\™›ÝÈ[™X[™\Þ[˜ÜÈHØ[YHÝÛ™\‹‚‹H›ØÝ\ÙY›ÜÜÈ[[YH\ÝÈ[™Z[˜ÚXÚØ\ÜÈØØ[KˆHØØ[[›ÙHÝZ]H\È›ØÚÙYÛ›H™XØ]\ÙH\ÈÛÜšÜÜXÙHXÚÜÈÚ›ÛYH™\]Z\™YžHH^\Ý[™Èœ›ÝÜÙ\ˆ\Ýˆ™\]Z\™[Y[˜]Úˆ™[X\ÙKÜ™\]Z\™[Y[X˜]Ú\ËÌŒ‹LKLNX›ÜÜËZY]ÛÜ›\™Z[™›Ü˜Ù[Y[Z]\ÚY[šœÛÛ˜™[XZ[œÈSTSQS•Q[[ÒK\ÞYYÒH[™L°åÎLMH™X[[[YHPH\ÜË‚ˆÈÈŒ‹LKLNH8 %9éæ9kíˆšYÙÙ\ˆY™XÞXÛxà y«hùo#ùfç¹d":`¢¹åc8à RQØÚøà y¤ãy/g]›Þ:"!ùoêú`'únç¹¤â¹¥b: ï{ï"‘T’Q’QQ;ï"B‚‹H˜\ÙNˆ]\ÝÚ]Xˆ]ØÌXLÍÍXL˜ÎLXØYYXÌXØ™˜™MÍŒŒÍXÈœ˜[˜Úˆš^Ü™[XË]šYÙÙ\‹[Y™XÞXÛKX˜]KZ[œ]]ZKLŒŒLNXÈXZ[˜9.#y/ë¹¥.xà ‚‹HœËÌ[XZ[‹šœØ9æ¡›Ý\”Þ[X›ÛÐ˜]Q›ÝØ9¥¬9h§¹e+ù. ›Ý[™ÜÝ\;ï#Ø›Ý[™Ù[™ÝXœØÜšX™\ˆ:"!ÈÛÜ™K[ÝÛ™Y™\Ù[][ÛˆØÚøà ˜›ØÙ\ÜÓ™^ÛÛX˜][
+
+X9g*\›ŠÊØ9bcyd#9«iy­/º` H›Ý[™[™;ï&ØÝ\\›Š
+X9­/º` H›Ý[™Ý\;ï&Ø›Ý[™\žHÙ^H9å,H˜]HÚÙ[»ï"Ü›Ý[™9c®úaãxà ‘™X]\™H[Ù[H9.#ya£yå,H™Y›Ü™KXÛÛX˜][9£ª9®+9."¹. 9fç¹d";ï#9.gù.#y£©yë¨H\›ŠÊØ8à Xš[š\Ú^Y\XÝ[ÛŠ
+X9¢%ˆ›ØÙ\ÜÓ™^ÛÛX˜][
+
+X8à ‚‹HœËÍŒ]X[K\™[XË\Þ\Ý[KšœØ9l!ÈL9.íˆ[[YT™XYNYX9éæ9kí¹íly. 9¥.y¢$Ø[•šYÙÙ\ˆ8¡¤ˆšYÙÙ\“X]Ú\È8¡¤ˆX\šÕšYÙÙ\™Y8¡¤ˆ™\ÛÛ™QY™™XÝØ9d#9«iHØ[Y\^H9íd9ë¥ûï#9a£y£¤ˆÚ[™[X]XÈ™\Ù[][Û¸à ¹fç¹i*ykíº/*¹.#ya£y¦+ùe+ù. 9âny/¢ûï&ù¯%9aî¹cå¹­¢8à YÙ[™\˜][Ûˆ™\Ù]8à X˜]H[™9¢%ˆ‘–˜Z[\™H:`ïy.#y§ ùfç¹®ï¹mì¹¢$9êâù¥b9§§8à ¹cãzg!ù.gù¥.yà®¹ab9`­ùk¬ùíd9ë¥øà yo£:)¥º)®¸à ‚‹H9o£L9.í¹.ãyí«y£ H[[YT™XYN™˜[ÙX8à ‘Uˆ9cëù¦ªù¦`ºacz(ç{ï#9/aº`,¹¢,:k)y.#ya£z!ê¹båy¤«y¥/»ï&ùchyâaú"!ú*lù áy®!y©f¹ª&yé.ˆ[[YH™XY{ï"9«hùo#ùb§ú ïymì¹k£9¢$;ï"X;ï#Ø™\Ù[][ÛˆÛ›{ï"9`áy¯%9aîºh$:)¯{ï"X;ï#9cê¹§"HŒMÍ™[XÑ]”™]šY]Ô™\Ù[][ÛŠ
+X;ï#ù¢,:k)y.+yæ¡8à#Uˆ9¯%9aîºh$:)¯xà#ycëù¢bùbåy£¤¹aiz)¥º)®¹/aùb%øà ‚‹H\]PXÝ[Û’Yš\ÚXš[]J
+X9í#yaiHÛÜ™H™\Ù[][ÛˆØÚûï&ù¯%9aî¹§'úe¤È˜]HÛÛ[X[™8à \ÚÚ[]ZXÚÈ˜\¸à Z][HY[H:"!È\™Ù]\Ù[XÝ[™ÈRH9aj:`ê9.#ycëù¤ãy/g;ï#9§ 9o£9. 9`"È™\Ù[][ÛˆØÚÈ:aâù¥/¹o£9¢cyå,HÛÜ™H9 h¹oªyc§ùk¨ùdb¹­`yê"øà ‚‹H9¢,:k)y£!ù.é]›Þ9no¹/ey¥-¹¥ ¹fçˆÜÜËÌ[XZ[‹˜ÜÜØ;ï#9/§HMLÍ°åÍMNH˜]KXÛÛ[X[™\[™[šœØ9.¥:haº)¥º)®¹.+yoàú*+yk¦¹æo¹b!¹«å:`¢¹åc;ï&ù.¥9c`9.¤¹.#zaãyå¢¸à ˜ÜÜËÍK]ŒML‹Y]‹Yš^\Ë˜ÜÜØ9æ¡ÚÚ[ŒKIHš[Üš]HÝ™\›\9mì¹éîúfi8à ‚‹H9aj9gçÈ\š\H9g*Ø˜]TYÙX9`g9å*;ï&ùam¹.åºh zgh¹alyå*9e«¹. ÓH›Ù{ï#9båyåjùå,HÚY;ï#ÚZYÚ;ï#ÛX\™Ú[ˆ9¥.yà®ˆ˜[œÙ›Ü›{ï"ÛÜXÚ]{ï#9oêú`'únç¹¤â¹.#ya£yí+ùêcHŒ9`"újæ‹Z[™^[š[X]Y›Ù\øà ‚‹H›ØÝ\ÙY›ÙH\Ýøà LL9.í¹éæ9kíˆ[[Yxà y«hùo#ùfç¹d":-ëùo¤xà RQØÚøà U‘–ØÚ[™[X]XÈ™YÜ™\ÜÚ[Ûœøà UŒMKÕŒM‹ÕŒMLˆ:"!È]\›Z[š\ÝXÈZ[9gaÈTÔøà ”ˆÌÌÌˆ™\ÜÚ]ÜžHÚXÚÜÈ[ˆÍMMMÌÕPÐÑTÔûï&ÌÎL0åÎ;ï#ÍL°åÎLMH]›Þ:"!ÈŒ9«(HÚ[\™ÝÛˆœ›ÝÜÙ\ˆPH9gaú`&º`c¸à ‚‹H™\]Z\™[Y[˜]Úˆ™[X\ÙKÜ™\]Z\™[Y[X˜]Ú\ËÌŒ‹LKLNK\™[XË]šYÙÙ\‹[Y™XÞXÛKX˜]KZ[œ]]ZKšœÛÛ˜8à ‚‚ˆÈÈŒ‹LKLŒ8 %9ea¹n¥ú(ç9dàzaãy£¤º"!ù..ùgã¹éæ9kíˆQ9häùî+»ï"STSQS•QÈ9ké¹ªgÈPH9o¡yè®º*£{ï"B‚‹H˜\Ù{ï&¹§ 9¥¬Ú]Xˆ]˜;ï&ùméy/g9b!¹¥+Èš^ÜÚÜ\Ý[Û‹ZÛYK\™[XË[^[Ý]LŒŒLŒ;ï&ØXZ[˜9.#y/ë¹¥.xà ‚‹H9ea¹n¥ú(ç9dàyâb:gh¹e+ù. 9o£9liÝÛ™\ˆ9í«y£ HÜÜËÍK]ŒMŽK\œË]ZK˜ÜÜØ;ï&ù«hùo#ú,áù¥¦{ï#ú,ï:,­ÈÝÛ™\ˆ9.ãyà®ˆœËÍ]ŒM\[\ËX[™XXž\ÜËšœØ;ï#ÔÔ9.©:c+ù£¤¹n£ÈÝÛ™\ˆ9.ãyà®ˆœËÍLK]ŒMŽK\œË]ZKšœÎŽ˜\œ˜[™ÙTÚÜÛÛ[[œÊ
+X8à ¹§+9«(y.#y¥¬9h§ˆ]HÔÔÈ9ª¥9¢%ˆ[[YHÜ˜\\»ï&ùakyo-z(ç9dàychyí«y£ H°åÌûï#9/a¹¥.y¢$9¦#¹è®ˆXY\»ï#ÒXÛÛŠù¥¡ùkeûï#ù¥n:aãÊù`îy¨/;ï#ú,ï:,­ù£"zb%yb!¹c`;ï#:`oùacyaiùk®y.¤¹æî:aãyå¢¸à ‚‹H9..ùgãºf¢¹/#yéæ9kí¹¤f:) Hš\œÝØÜ™Y[ˆÝÛ™\ˆ9í«y£ HœËÌM‹\ÝYÙK]M[XZ[‹XÚ]K\[[YKšœØ
+ÈÜÜËÌNK\ÝYÙK]M[XZ[‹XÚ]K[[Ù\˜]K[˜]]™K\ØØ[K˜ÜÜØ8à ¹.#z/"yaiyk£9¥m9éæ9kíˆ™X]\™{ï&ùcê¹g*9¥è¹§"HÛÝ:f¬z%ãù«(z) HšYÙÙ\ˆ:*ª¹¦#»ï#9l!ùb%újæN8¡¤8à y£"zb%z)¥º)®ºjæÍ8¡¤ŒÌ;ï#9/çyåfyd#yê,xà Sˆ:"!ù¦í9£æù¤ãy/g8à ‚‹H™\]Z\™[Y[˜]Ú;ï&˜™[X\ÙKÜ™\]Z\™[Y[X˜]Ú\ËÌŒ‹LKLŒ\ÚÜ\Ý[Û‹ZÛYK\™[XË[^[Ý]šœÛÛ˜8à ¹æë¹bcyajzh!ygaùà®ˆSTSQS•Q;ï#9o¡H]ˆ9kéºf¦ú`ê9ïlº"!ù¢bùªgú)¥º)®¹è®º*£yo£9¢cycëùcaùà®ˆ‘T’Q’QQ8à ‚ˆÈÈŒ‹LKLŒ8 %\œÚ\Ý[Y™™XÝ\˜][ÛˆY™XÞXÛH:"!ùá&º(`:*(ûï"]ˆ9¥m9d"9bc{ï"B‚‹H9«hùo#È\˜][ÛˆÝÛ™\ˆ9à®ˆœËÌ[XZ[‹šœØ9æ¡›Ý[™ÜÝ]\ÈÝÙY\9b¨9."ˆœËÍŒ]ŒMÌË\ÚÚ[\›ÙÜ™\ÜÚ[Û‹\™X˜[[˜ÙKšœÎŽ‘›Ý\”Þ[X›ÛÑ\˜][Û“Y™XÞXÛX9æ¡[š]X]]™HXÝ[ÛˆÛ˜\ÚÝ8à º""¹aj9gçÈ›Ý[™\Ý\ÝÙY\9.#ya£y¢húfiœ™Y^™{ï#Ô]šYž{ï#ùaãy`­ú"!ù. :"+ÛÙXY™»ï&ùh§¹æâ¹.gù.#ya£yfè9¥¯y¥/¹¢%¹á(zeç9i)ùfç¹d"9l$yë¥ù§"y¥b:(c9båxà ‚‹HY™\‘š\œÝXÚØ9.#ya£ykêùaiyaãy`­øà ‘œ™Y^™{ï#Ô]šYžH9.ãyg*9§+9«(ycåù£©ùe«¹/cyæ¡:(c9båy¦`ºf.ù¤âú(c9bå{ï#9á-¹o£9å,HXÝ[Û‹Yš[š\ÚY›Ý[™\žH9¢húfi9. 9«({ï#9fè9«iˆ9fç¹d"9oáyk¦ºf.ù¤âÈˆ9«({ï&Ð\›ˆ9/çyåfyãj9êâÈ›Ý[™\Ý\Ý]\ÈXÚûï#9ieùå*9¦`¹.#yêâùclú-ìù`­ùk¬ûï#ˆ9fç¹d"9å(¹å'Èˆ9«(HÕ8à ‚‹H9á&º(`:*(ÈÝÛ™\ˆ9.ãy¦+ÈœËÍŒ]ŒMÌË\ÚÚ[\›ÙÜ™\ÜÚ[Û‹\™X˜[[˜ÙKšœØ;ï&“Œx $ÍH9¥.yà®¹­¢: %ù§ 9i)ÈKÌLÌMKÌŒÌI{ï#9£©y."ù/¡¹."y«(yãªyk­¹..ùbåyàjùìîùæí9£©y`­ùk¬ùd!9£ä9caùd#9ª(ùæo¹b!¹«å;ï&ùáàùáäˆÕ8à yacz,®ú/ïy¤â¹.#y/oùå*8à ¹¥¯y¥/¹§+:.ªù.#y­¢: %ú`&y."y«({ï#9ë+9fæù«(yàjùìîùæí9£©y`­ùk¬ù.#ya£yb¨9¢$8à ‚‹H9fç¹«nÝÛ™\»ï&˜\ÝËÜÚÚ[\›ÙÜ™\ÜÚ[Û‹\™X˜[[˜ÙK\ÝšœØ8à ¹mìº)¡º$âùá&º(`Œx $ÍH9æ¡9ì¯¹è®ˆ9¢$9§+8à y."y«(yb¨9¢$:"!ùë+9fæù«(yi,y¥b;ï#9.éycâˆY™»ï#Ñœ™Y^™{ï#Ñœ›ÜÝš]H9æ¡9§"y¥b;ï#úf.ù¤âú(c9båy¢húfi:"!ùåm¹fç¹d"9¥¬Y™ˆ9.#zh$9¢høà ‚‚ˆÈÈŒ‹LKLŒ8 %ÛÛÝ\š\ÝX[™XY{ï#ù..ùgãºi¥¹lcÈØ]{ï#ú ã9¦kÈRH:h$9¢¤Â‚‹H9¨.yfè;ï&º,áù¥¦HY˜]xà Y]XÚY›ØˆXÛÙH:"!ùajy«(HZ[9.#yëby¥¯]™H9..ùgãˆÓH9mì¹cëùîjº(ï{ï&ÜÝ\\\™XYH\Ý[™\ˆ9cé¹§"y. 9«(H›ÜÝ\ˆ:aãynî¹êí¹¡bøà ‚‹H9/ë¹oª{ï&˜™\\™Qš\œÝØÜ™Y[•š\ÝX[Ê
+XØ]H9kéºf¦È[YÏ˜8à PÔÔÈ˜XÚÙÜ›Ý[™8à yoáz) ykeùg¢ú"!ÈZ[;ï&ØYSØY\Š
+X9cêº ïyg*š\ÝX[\™XYH9o£9gíú(c8à ºi¥¹lcùi,y¥eù¬¯ùå*9«hùo#ÈÝ\\™]žxà ‚‹H9."yli9ª(yg¢ûï&“]™[H:i¥¹lcùk£9¥m9o£9¦çyab{ï&Ó]™[ˆ9..ùgã¹cëù¤ãy/g9o£9å,ye+ù. ™X]\™HØY\¸à ZYxà XÛÛ˜Ý\œ™[˜ÞHH: ã9¦kúh$9¢¤ûï&Ó]™[È9i)ùg¢ùãªy¬åyí«y£ y£"zg ^žHØY8à ‚‹H™[XÈ:i¥¹«(ze¢ùegùab:hkùé.¹«hùo#ùl`:`êØY[™ûï#ŒXÛÛˆ9cê¹å,H‘SP×ÐÐUSÑ×ÓTÕ×KšXÛÛ”]:(cyå'ù.)¹g*š\ÝX[\™XYH9o£9. 9«(ydb9ãï»ï&ú ã9¦kù.#H^XÝ]H›ÜÜûï#ÕÝÙ\»ï#Ô™[XÈ[[Yxà ‚‹H9méy/g9b!¹¥+ûï&˜š^ØÛÛ\Ý\]š\ÝX[\™XYKX˜XÚÙÜ›Ý[™\™Y™]ÚLŒŒLŒ;ï&ù.éy§ 9¥¬]˜9à®¹gî¹®¥»ï#XZ[ˆ9.#y/ë¹¥.xà ¹o¡HÚ]Xˆ:*£z+byo£9/§y/çz+mù­`yê"ù£ª:` xà PÒxà Tˆ9d"9/mxà ‚‚‚ˆÈÈŒ‹LKLŒˆ8 %[ÛœÝ\ˆÜ˜Z]˜\Ý[\Ü;ï"9mì¹å'ù¢$9 *¹âjyêâùîj¹oêú`'ùl#¹ai{ï"B‚ˆÈÈÈ9¬.9.aHÝÛ™\‚‹H9mì¹å'ù¢$9.%9mìº$/y«hùo#ú-ëùo¤yæ¡9 *¹âjyêâùîj»ï#9«hùo#ùoêú`'ùl#¹aiHÝÛ™\»ï&˜ØÜš\ËÚ[\Ü[[ÛœÝ\‹\Ü˜Z]Ë›ZœØ8à ‚‹HÓH[X\ûï&˜œH[ˆÜ˜Z]š[\ÜKH‹‹˜8à ‚‹H™YÚ\ÝžHÝÛ™\ˆ9.ãyà®ˆÛÛ™šYËÛ[ÛœÝ\‹\Ü˜Z]\™YÚ\ÝžKšœÛÛ˜8à ‚‹H[[YH™\ÛÛ™\ˆÝÛ™\ˆ9.ãyà®ˆœËÍK]ŒMMY]‹Yš^\ËšœØ9æ¡™\ÛÛ™S[ÛœÝ\”Ü˜Z]™XÛÜ™
+
+X;ï&ÕŒMNH9`áyd#9«iy¦`¹n£ûï#9.#y¥¬9h§ˆÜ˜\\¸à ‚‚ˆÈÈÈ9fî¹k¦¹­`yê"ÂŒKˆ9«ãyg%»ï#ùo¡z&eyä!¹í(9§d9.ãy/§HØÜËÒSPQÑWÐTÔÑUÔÔPË›Y9k£9¢$9á(y¤#HÙX”:"!ú`#ù¦#»ï#ùl.¹kî:jeú+bxà ‚Œ‹ˆ9¨.9aáˆÙX”9¥/¹b,™YÚ\ÝžH9£!ùk¦¹æ¡\ÜÙ]ËÛ[ÛœÝ\œËØ9«hùo#ú-ëùo¤xà ‚ŒËˆ9mì¹å'ù¢$9í(9§d9.#ya£z) y¬`¹nî¹êâÈ[ÛœÝ\ˆÜ˜Z]˜]ÚX[šY™\Ý;ï&ùæí9£©y/oùå*;ï&‚ˆœH[ˆÜ˜Z]š[\ÜKHKZÙ^\ÏOÜ˜Z]Ù^K‹‹˜ˆ[›™Y:`&º`c¹ª¨¹§éyo£9caùà®ˆ^\Ý[™Ø8à ‚Kˆ™]\™Y:h$:*+yé y«hºaãy¥¬9egùå*;ï&ùcê¹§"yl"9¨b:,¨:,«9.®¹¦#¹è®¹£¢9«"¹¦`¹/oùå*K\™XXÝ]˜]K\™]\™Y8à ‚‹ˆ9méyamùoázh":jeú+bHÙX”:)èùè¯8à \Ú^™PÛ\ÜÈ9l.¹kî8à P[{ï#ú`#ù¦#¹`ãùí(8à UŒMM™\ÛÛ™\ˆ9idyí!:"!ù¥è¹§"H[ÛœÝ\ˆÜ˜Z][[YH\Ý;ï&ú"éH™YÚ\ÝžH:`¡9¦+ú""ˆœ™ËËšœËËšœYØ];ï#9/a¹d#Ý[H9«hùo#ÈÙX”9mì¹kf9g*;ï#9méyamù§ ú!ê¹båy¥-¹¥ ¹¢$ÙXœ8à ‚Ëˆ9§*¹å'ù¢$9í(9§d9.ãyí«y£ y¥è¹§"H˜]ÚÙ[™\˜]KÙš[˜[^™KÜÝšXÝ]Y]9­`yê"øà ‚‚ˆÈÈÈ9¥-¹¥ ¹æë¹æ¡‹H:)èù¬n¸à#9g%¹âaùmì¹kf9g*;ï#9/a¹.ãyfè[›™Y;ï#Ü™]\™Y;ï#Ø˜]ÚX[šY™\Ý9­`yê"ú #:emù¦`ºe¤ùchyg*9«hùo#ù£©yíæ¸à#xà ‚‹H:`oùacycê¹ç"ùª¥9¨b9kf9g*9l,z*©9b)9k£9¢$;ï&ù«hùo#ùl#¹aiy.ãy.éHÝ]\ÏY^\Ý[™Ø9.%[[YHÝÛ™\ˆ9cëú)èù§¤9à®¹®¥¸à ‚‹H9oêú`'ùl#¹aiyméyamùcêº&eyä!¹§+9kd9ìîùíl{ï#9.#y/ë¹¥.y¢,:k)yãªy¬åxà URxà y *¹âjy¥n9`/9¢%ˆXZ[¸à ‚‚‚ˆÈÈŒ‹LKLŒÈ8 %˜]HRHÈ]ÈÝ]\ÈÝÛ™\ˆÛÛ™\™Ù[˜Ù{ï"‘T’Q’QQØ[™Y]{ï"B‚‹H˜\Ù{ï&˜]YMLÍLŒNÌŽYL™NXØNMLYL˜ÌŒØYÎLY˜™Ž˜;ï&ùméy/g9b!¹¥+Èš^Ø˜]K]ZKZ]\Ý]\Ë[ÝÛ™\‹XÛÛ™\™Ù[˜ÙKLŒŒLŒØ;ï&ÔˆÍLÌûï&ØXZ[˜9aj9ê"ù§*¹/ë¹¥.xà ‚‹H9. :"+9doy.+ye+ù. ÝÛ™\ˆ9¥-¹¥ º!ìÈœËÌ[XZ[‹šœÎŽ˜Ø[Ý[]R]Ú[˜ÙT\˜Ù[
+
+KÜ›Û]Ú[˜ÙJ
+X;ï&˜Û[\
+MH
+ÈXØÝ\˜XÞpåÌŒMH
+Èš[˜[XØÝ\˜XÞP›Û\ÈH\™Ù]š[˜[]˜\Ú[ÛˆHš[˜[]™YXÝ[Û‹ÌNJX8à ¹¦kº`&¹ *¹âjy§*¹¦#¹è®¹£!ùk¦ˆ]˜\Ú[Ûˆ9¦`¹/oùå*Z[ŠL]™[0åÌŒJX;ï&ùi&¹`"úe ú.¬¹/¡¹®¤9¥.y.éy§ 9í`¹æo¹b!ºnç¹æí9£©yb¨9®&øà ‚‹H9ål9n.;ï#Ò\™ÛÛ›Û9e+ù. ÝÛ™\ˆ9¥-¹¥ º!ìÈØ[Ý[]TÝ]\ÑY™™XÝÚ[˜ÙJ
+KÜ›ÛÝ]\ÑY™™XÝ]
+
+X;ï&¹¢ : ïygî¹é#¹¢$9b§ùã¡ûï"ù..ùlk9 )ðåÌŒI{ï"ù§ 9í`¹ål9n.9doy.+yb¨9¢$;ï#yæë¹ª&HÜ\š]0åÌŒI{ï#y§ 9í`¹¢¥ù )øà ¹âjyä!¹ål9n.:+ 9§"y¥b]XÚÈÚ[øà y¬åz(dùål9n.:+ [[YÙ[˜Ù{ï&ùéîúfi]™[˜XÝÜ¸à \Ü\
+]šX]Jxà yèk9£©ùl"9lkÜ\š]ÛÙY™šXÚY[:"!ÈŒMÕŒMNÕŒMKÕŒMŽH:""¹ak9o#ÈÜ˜\\¸à ’\™ÛÛ›Û9."ºfd;ï&”™YÝ[\ˆL	xà Q[]HÍIxà P›ÜÜÈŒ	xà Y[™[^K]Ë\^Y\ˆŒ	xà ‚‹H9aãy`­ù«hùo#ùà®ˆÛÙXY™»ï&¹`­ùk¬ÈLIxà y§ 9í`ºe ú.¬ˆLH9`"ùæo¹b!ºnç¸à y§ 9í`¹ål9n.9¢¥ù )ÈLH9`"ùæo¹b!ºnç»ï#9.#yé y«h¹¢ : ï{ï&ú""¸à#9á(y¬åy/oùå*9¢ : ïxà#y¢,:k)yâà9¡bù¥¡ùkeùmì¹®!zfi8à ‚‹H9¢ : ïz*ª¹¦#ˆÝÛ™\ˆ:(ç:ob¹àjùìîùâjyä!º/ïy¤â¸à yàâ9á,:o£y£l¹oáyk¦¹áàùáä¸à yàjúlìùi*zlí:lìùj xà yaãy`­ùk£9¥m9¥b9§§8à yá&º(`9acz,®ú/ïy¤â¹.#z %ÈÚ\™Ùxà y­ê9oàú*(ù.#ycëù®!zfi:h!yæëº"!ùfæùa`ùí(V;ï&ù§*¹oªy­.ÈŒMKÕŒMŽH:""¹¥¡ùkeÈÝÛ™\¸à ‚‹H9 $¹àjùëbHY™ˆ9.ãyå,H›Ý\”Þ[X›ÛÑ\˜][Û“Y™XÞXÛX9/§HXÝ[Û‹Yš[š\ÚY9¢húfi;ï#9fç¹d"9éîúfi9o£9êâùclùd#9«iHŒMÈÝ]\Èš\ÝX[;ï&ù.#y¥¬9h§ˆ[Y\»ï#ÜÛ[™øà ‚‹H9mèy *¹.®¹âjy.#ya£yab:hkùé.ˆYØXÞH]›ÛXÚ\˜XÝ\‹œ™Ø;ï&ù«hùo#ÈÙX”XÛÙKÛØY9k£9¢$9o£9¢czhkùé.¸à ¹mèy *ˆÛX\˜]R[™›Ø:"!ù«hùo#È˜]H[™›È˜]Ù\ˆ9ª(ùo#ÈÝÛ™\ˆ9b!ºfè¸à ‚‹H˜]HR{ï&¹e+ù. :aäz"lˆ\™Ù]™]XÛ{ï&ù *¹âjyd#yê,z`#ù¦#»ï&Ì9âà9¡bÈXÛÛˆQ:jæ9¥¯ÔÔ;ï&ú`n9æë¹ª&y¦`¹`$¹¥n9¨aº"!È\™Ù]›Û\9/oùå*9«hùo#ù.#zaãyå¢¹no¹/e{ï&Ð˜]H[™›È9i%¹«¯:`#ù¦#¸à ycê¹/çyåfyl#ÈX»ï#ùleze¢ù«hù¥¡únäyn¥{ï&ÕXˆ9¢å¹¦ìù¥.yà®ˆÚ[\™ÝÛˆ9. 9«(zaãù®+;ï"ÜQ‹Ý˜[œÛ]LÙ;ï&ù¤ãy/g:gh¹§où¥.yå*:`#ù¦#¹í(9§d9¢¥yolxà ‚‹H9¥¯yméy§'úe¤Èœ›ÝÜÙ\ˆPH9¢¤ùb,9. 9`"ùç'ùegùbåzh!¹n£ùecúhc;ï&˜XZÙV›Û™S[ÛœÝ\Š
+X9g*\Ú[:h ¹li9nî¹ *¹¦`¹¥êy¥¯9o£9ïk¹æ¡Y˜][]˜\Ú[ÛˆÛÛœÝ9b'yiâùc%»ï#9§ ú`(9¢$ˆ9.)¹.+y«hˆ\Ú[8à ¹«hùo#ÈY˜][[ÛœÝ\ˆ]˜\Ú[ÛˆÝÛ™\ˆ9mì¹éîùb,›Û™H›ÜÝ\ˆ9nî¹êâù.bùbc{ï#9.)¹¥¬9h§ˆ›ÛÝ[Ü™\ˆ™YÜ™\ÜÚ[Û¸à ‚‹H›ÙXÝ[ÛˆZ[ÛÛ[Z];ï&˜ÍMØXLŒM™˜˜LÙŒÌ™NLÎL™XNYXÌÌMÙ™ŽYŽM˜8à •™\šYšYYÛÝ\˜ÙHØ[™Y]{ï&˜MNM™XLLÍ™MM˜XØØNLÌŒÍÍÍÍYMÌŽ˜Ì™X8à ‚‹HÚ]XˆXÝ[ÛœÈ™\ÜÚ]ÜžHÚXÚÜÈ[ˆÍNŒÎNLX;ï&”ÕPÐÑTÔøà ¹c!yd*ÈÞ[^8à P˜]H[[YH\˜Ú]XÝ\™HÝX\™8à yl":h!{ï#ù¥è¹§"H˜]H™YÜ™\ÜÚ[Ûœøà \›ÙXÝ[ÛˆZ[Þ[˜Ú›Ûš^˜][Û¸à Qš^YÛÝNŒMˆ[Øš[Hœ›ÝÜÙ\ˆPxà Y^XÝXØ[™Y]H™X[˜]H[Øš[Hœ›ÝÜÙ\ˆPxà PY™[\™H[Øš[HPxà \Ý]XÈ™\ÛÝ\˜Ù\øà \™[X\ÙHØ]H:"!ÈÚ]Y™ˆKXÚXÚØ9aj:`ê:`&º`c¸à ‚‹H™\]Z\™[Y[˜]Ú;ï&˜™[X\ÙKÜ™\]Z\™[Y[X˜]Ú\ËÌŒ‹LKLŒËX˜]K]ZKZ]\Ý]\Ë[ÝÛ™\‹XÛÛ™\™Ù[˜ÙKšœÛÛ˜9mì¹caùí&¹à®ˆ‘T’Q’QQ8à ‚ˆÈÈŒ‹LKL8 %ÛÝYØ]™H\ÙHˆÙ\™\‹[ÝÛ™Y[™[Ü{ï"ÓÓTUHÈ‹Íˆ‘T’Q’QQ;ï"B‚‹H˜\Ù{ï&¹§ 9¥¬]NXL™YXLÌNLNLYÍLŒYŒÍNYŽMÌXØØ;ï&ùméy/g9b!¹¥+ûï&˜™X]\™KØÛÝY\Ø]™K\\ÙL‹Y[™[ÜKLŒŒL;ï&ØXZ[˜;ï#Ø]˜9gaù§*¹æí9£©y/ë¹¥.xà ‚‹H\ÙHHÚ[™ÛHXÝ]™HÙ\ÜÚ[Ûˆ9í«y£ HKÍH‘T’Q’QQ8à ”\ÙHˆ9e+ù. [™[ÜHÝÛ™\ˆ9¥¬9h§¹¥¯[˜Ý[ÛœËÜÜ˜ËØÛÝY\Ø]™KY[™[ÜKšœØ;ï&ÜX›XÈ\Ù\œËÞÝZYKÜØ]™\ËØÝ\œ™[9/oùå*ØÚ[XH™\œÚ[Ûˆ¸à \Ù\™\‹[ÝÛ™Y™]š\Ú[Û¸à \Ù\™\ˆ[Y\Ý[\È:"!ùf­9¨/9âà9¡bújeú+bxà ‚‹H›ÛÝÝ˜\ÛÝYØ]™X;ï&¹¥¬[™[ÜH9o§ˆ™]š\Ú[ÛˆH9nî¹êâûï&úaãz)!ùdo9cêù.#y. ¹h§ˆ™]š\Ú[Û»ï#Ý\]Y];ï&ù¥è¹§"H\ÙHH™\œÚ[Ûˆ{ï#Ô™]š\Ú[Ûˆ9ì¯¹è®ºjª9§­¹cåù£©ùcaùí&¸à ¹.îù¡#ÈÝÛ™\‹ÜØÚ[XKÜ™]š\Ú[Û‹Ý[Y\Ý[\ÜÝ]\È9¤#yhç¹. 9o¢È˜Z[ÛÜÙY8à ‚‹HÝX›Z]YØXÞSZYÜ˜][ÛØ[™Y]X;ï&¹.ãycê¹/çykf\ÝY™˜[ÙXØ[™Y]{ï&ÛY]Y]H9¥.z+¢º"!ÈXÝ]™HÙ\ÜÚ[Ûˆ:jeú+byd#9. ˜[œØXÝ[Û»ï#Ù\™\”™]š\Ú[Û˜9c§ùkd:`g¹h§¸à ”\ÙHˆ9.#yå(¹å'ù«hùo#ÈØ[Y\^H^[ØY8à y.#ycaù¨/9§+9ªgú,áù¥¦xà ‚‹HˆÍMLÈ9mì¹d"9/mH]NMXXØŒÙXÙÍ˜ÙXYLÌYYMXYLMŽMÙ˜8à ”ˆÒHÍNNÌÎÍ˜;ï#ÔÙ\ÜÚ[ÛˆÍNNÌÎ8à [Y\™ÙY]ˆÒ{ï"ÑUˆ\ÞHÍNNÎMX8à TÙ\ÜÚ[Ûˆ[][]Ü»ï"Ñš\™X˜\ÙH\ÞHÍNNÎŒ9gaÈÕPÐÑTÔûï&ù«hùo#È\ÞH›ØˆLÍNMNÍ˜ÕPÐÑTÔøà ‚‹H9§ 9l#È]™H:jeù¥-ˆœšYÙH9à®ˆ›Ý\”Þ[X›ÛÑš\™X˜\ÙK˜›ÛÝÝ˜\ÛÝYØ]™J
+X;ï&ù.#z!ê¹båydo9cêøà y.#y¥.Hš\œÝ]\ÙH™XYÝÛ™\¸à y.#y`¬ÈØØ[Ø[Y\^HØ]™xà ¹ç'ùkéˆÛÛÙÛH9n,ú&gùmì¹g*9¢bùªgÈÚ›ÛYH:jeú+bH™\œÚ[Ûˆ¸à T™]š\Ú[ÛˆH:"!úaãz)!È›ÛÝÝ˜\Y[\Ý[˜Þ{ï&Ô™\]Z\™[Y[˜]Ú9ãï¹à®ˆÓÓTUHÈ‹Íˆ‘T’Q’QQ8à ”\ÙHø $ÌL9§*ºe¢ùiâøà ‚‹H9à®¹á(zfîú!i¹æ¡9ç'ùkéº(çyïkºjeù¥-»ï#Uˆ9n,ú&gúgh¹§où¥¬9h§¹¢bùbåxà#:jeú+bzfì¹êëùkf9ª¥:jª9§­¸à#y£"zb%{ï&ùk ú`(ùî£›ÛÝÝ˜\9ajy«(y.)º+ 9fçˆ[™[Ü{ï#9cêºhkùé.ˆØÚ[X{ï#Ô™]š\Ú[Ûˆ9íd9§§;ï#9.#zhkùé.ˆÜ™Y[X[8à y.#z` HØØ[Ø]™xà ¹/oùå*: !ymì¹.éyc§ÈÛÛÙÛH9n,ú&gùg*9k£9¥m9¢bùªgÈÚ›ÛYH9cå¹o¥ÈØÚ[XHŒ¸à T™]š\Ú[ÛˆX9¢$9b§ùíd9§§;ï&ÐÚ]Ô9aiùnî¹à#ú)¯yfj9æ¡ÛÛÙÛHÐ]]9§*¹k£9¢$9.#z)¥¹à®¹o£9êëùi,y¥eøà ”ˆÍMMH9d"9/mH]ŒÍØÙYYYYXÙÙXXXØØØLÍÍLLÍYLX;ï&ÛY\™ÙY]ˆÒHÍNNLŒÍŒX8à TÙ\ÜÚ[Ûˆ]]Üš]{ï#Ñš\™X˜\ÙH\ÞHÍNNLŒÍØ][\ˆ9gaÈÕPÐÑTÔøà ‚ˆÈÈŒ‹LKL8 %ÛÝYØ]™H\ÙH9. :"+:`,¹n©º`mùéîùegùbå{ï"Sˆ“ÑÔ‘TÔÈÈÍˆ‘T’Q’QQ;ï"B‚‹H9§ 9¥¬9gî¹®¥ˆ]N˜Y˜MŒ™ŒÌYŒ™˜YYXØMÌØŒ˜™LÎY˜;ï#9méy/g9b!¹¥+È™X]\™KØÛÝY\Ø]™K\\ÙMYÙ[™\˜[\›ÙÜ™\ÜËLŒŒL;ï&ØXZ[˜9é y«h¹/ë¹¥.xà ‚‹HØÜËÐÓÕQÔÐU‘WÔTÑMÐÓÓ•PÕ›Y9ab:*&:c!9ãï¹§"HÝÛ™\¸à ykf9ª¥9«!9/cyãc¹bíz )¹d"8à \™]š\Ú[Û»ï#ÜÙ\ÜÚ[Û»ï#ÕRQ9/çz+møà z(gyê z"!újeù¥-¹¨§y.í»ï&Ô™\]Z\™[Y[˜]Ú™[X\ÙKÜ™\]Z\™[Y[X˜]Ú\ËÌŒ‹LKLXÛÝY\Ø]™K\\ÙMYÙ[™\˜[\›ÙÜ™\ÜËšœÛÛ˜9à®ˆÑÈÈÍˆ‘T’Q’QQ8à ‚‹H9b'yiâú*+z*"9æé:nç¹¦`¹¬¤¹§"y/ë¹¥.Hš\™X˜\ÙHØ[X›xà Qš\™\ÝÜ™H[\øà QØ[Y\^HØ]™{ï#Ð›ÛÝÝÛ™\»ï#9.gù¬¤¹§"y."¹`¬øà yb*ºfi9¢%ºaãykêù.îù/eyãªyk­¹kf9ª¥;ï&ùåm¹¦`¹§*¹nî¹êâÈ¸à y§*º`ê9ïl¸à y§*¹/g9ç'ù¢bùªgújeù¥-¸à ŠŠ”\ÙH“ÕÓÓTUJŠ¸à ‚‹H9§+:/*¹o£9î£9/oùå*: !yd#9¡#ù/çyk¢9¥®yd${ï#9méy/g9b!¹¥+ú#byê/ÈˆÍMNH9mì¹nî¹êâûï&ù`&z`n9ké¹/g9¥¬9h§ˆ[˜Ý[ÛœËÜÜ˜ËØÛÝY\™Y™\™[˜Ù\ËšœØ9æoyd#ye«¸à X[˜Ý[ÛœËÚ[™^šœÎŽœØ]™PÛÝY™Y™\™[˜Ù\ØÙ\ÜÚ[Û»ï"Ü™]š\Ú[Ûˆ9.©9¦$øà XœËÙš\™X˜\ÙKÙš\™X˜\ÙKXÛÝY\Ø]™KšœØ9æ¡RQ9§+9ªgú*+yk¦¹£ä9cå¸à yn,ú&gúgh¹§oÈUˆ9¢bùbåzjeú+b{ï#ùcå¹fç¸à XœËÌ[XZ[‹šœÎŽœ™\ÝÜ™P]]Ð˜]T™Y™\™[˜Ù\Ø9d#RQ;ï#ùd#:)äº"lˆQ9 h¹oªxà ¹`áz*+yk¦»ï#9.#yd*úaäynhûï#ú)äº"l»ï#ùãc¹bí{ï&ù«i9à®¹¥¬9h§¹`&z`n9âà9¡bûï#9bcy. :(c:*&:c!9æ¡9¦+Èˆ9nî¹êâùbcyæ¡:-múnç¸à ¹§*º`ê9ïl¸à y§*¹ké¹ªgújeù¥-»ï#9.ãH
+Š““ÕÓÓTUJŠ¸à ‚‹H9."ù. 9«iyab9k£9¢$:`$9«!9ãc¹bíykêy¨.;ï&ùcëù/èyæ¡9l`:`ê9. :"+:`,¹n©¹¢cycëùg*9cåù/çz+mùo£9êëù.©9¦$ù£ä9.©;ï#ù h¹oªxà ˜Ø[Y\^T›ÙÜ™\ÜØ9æ¡›ÜÜÈ:i¥º`&º"!ùfæú,hyhe9mìºh&9ãc¹í :c!9.#ycëùåm¹. :"+9á(yk¬ú,áù¥¦yæí9£©y."¹`¬ûï&ùá(y¬åyg*\ÙH9ãj9êâùb)9k¦¹æ¡9«!9/cy/çyåfz!ìÈ\ÙH{ï#9.#yo¥ù.éyk¨¹¢-¹êëù¥m9c!ykf9ª¥9hjùaiy«"¹j H[™[Üxà ‚ˆÈÈŒ‹LKLH8 %ÛÝYØ]™HYØXÞHØ[™Y]H\ÝÜžH
+Ø[™Y]JB‚‹H˜\ÙNˆ]XÍYL˜ŒXÌ™YXÙXÍØÌLŽYY˜YLŒNXÈÝÛ™\Žˆ[˜Ý[ÛœËÚ[™^šœÎŽœÝX›Z]YØXÞSZYÜ˜][ÛØ[™Y]J
+XÈ^\Ý[™È[˜Ý[ÛœËÜÜ˜ËÜÙ\ÜÚ[Û‹X]]Üš]KšœÎŽœ[”›ÝXÝY
+
+X[™[˜Ý[ÛœËÜÜ˜ËØÛÝY\Ø]™KY[™[ÜKšœØ™[XZ[ˆH]]Üš]HØ]\Ëˆ›ÈØ]™QØ[YJ
+XÜ˜\\ˆÜˆÛY[™\ÝÜ™HÝÛ™\ˆÚ[™ÙYˆUWÔÑPÕT’UWÐÓÓ•PÕË›Y™[XZ[œÈXœÙ[]\È˜\Ù[[™K‚‹HXXÚ™]È[\ÝYZYÜ˜][ÛˆØ[™Y]H\ÈÜ™X]Y[™\ˆš]˜]HÙ\™\•\Ù\œËÞÝZYKÛZYÜ˜][ÛØ[™Y]\ËÞÜ™]š\Ú[ÛŸX[ˆHØ[YH˜[œØXÝ[Ûˆ\È]\Ý[™H[™[ÜKˆØ[YHš[™Ù\œš[™]šY\È\™HY[\Ý[È\Ý[˜ÝÝX›Z\ÜÚ[ÛœÈ™]Z[ˆH˜]H[Z][™Ü™X]HH™]È™]š\Ú[Û‹ˆY]Y]H[˜ÛÛœÚ\Ý[˜ÚY\È˜Z[ÛÜÙYˆ^\Ý[™È™]š[Ý\ÛHÝ™\Üš][ˆØ[™Y]\ÈØ[››Ý™H™XÛÝ™\™Yœ›ÛH\ÈÚ[™ÙK‚‹H\È\ÈHØ[™Y]H™][[ÛˆÝ\Û›Kˆ›ÈÛY[]]Ë]\ØY›ÈÚ\˜XÝ\ˆ]]Üš]H›Û[Ý[Û‹›ÈØ[Y\^H™]Ø\™ÈÜˆ™\ÝÜ™Kˆ\ÙH™[XZ[œÈÍˆ‘T’Q’QQÈØ[YKÐØXÚH™[XZ[ˆMÌËÌŽÈXZ[˜[ÝXÚYˆ‹ÐÒKÛY\™ÙKÙ\ÞH™\Ý[È]\Ý™H™XÛÜ™YÙ\\˜][HÚ[ˆ]˜Z[X›K‚‚ˆÈÈŒ‹LKLH8 %Ù\™\‹Z\ÜÝYYÜ˜[™\Ù\˜][ÛˆØ[™Y]B‚‹H˜\ÙH]™Ž™MÌLÍYYØX˜™ŒÎXL˜YÍØMYŒLXˆÝÛ™\ˆ[˜Ý[ÛœËÜÜ˜ËÝ\ÝYYÜ˜[[YÙ\‹šœÎŽœ™\Ù\™J
+X™Z[™[˜Ý[ÛœËÚ[™^šœÎŽœ™\Ù\™U\ÝYÜ˜[È^\Ý[™ÈÙ\ÜÚ[ÛˆÝÛ™\ˆ[˜Ý[ÛœËÜÜ˜ËÜÙ\ÜÚ[Û‹X]]Üš]KšœÎŽœ[”›ÝXÝY
+
+X[™[™[ÜHÝÛ™\ˆ[˜Ý[ÛœËÜÜ˜ËØÛÝY\Ø]™KY[™[ÜKšœØ\™H™]\ÙYˆ›ÈØ]™QØ[YJ
+XÜ˜\\ˆÜˆ[\Ü˜\žH]ÚˆUWÔÑPÕT’UWÐÓÓ•PÕË›Y\ÈXœÙ[]\È˜\ÙK‚‹HXØÙ\Û›HHš]˜]HÙ\™\‹Z\ÜÝYYÜ˜[QÜ\˜][ÛˆQ[™^XÝY™]š\Ú[Û‹ˆ›ÝXÝY˜[œØXÝ[Ûˆ™\Ù\™\ÈH[š\]YHÜ˜[[™Ü™X]\ÈHš]˜]H™XÙZ\È™]šY\È™]\›ˆHØ[YH™\Ý[ˆ›ÈÛY[\Ý\YY[[Ý[˜[[˜ÙH]]][ÛˆÜˆ]]Üš]]]™H^XX›HÚ\˜XÝ\‹ˆ^XÚ]HÜ™Y]YÐÚ\˜XÝ\Ž™˜[ÙX[[H]\ˆÛÛ\]HXÛÛ›Û^KØÚ\˜XÝ\ˆÜ\˜][ÛˆÛÛœÝ[Y\ÈH™\Ù\™Y™XÙZ\‚‹H\ÙH™[XZ[œÈÍˆ‘T’Q’QQØ[YKÐØXÚHMÌËÌ‹XZ[˜[ÝXÚYˆ\È\ÈH™\™\]Z\Ú]HÚ]›È^Y\‹Y˜XÚ[™È™\ÝÜ™HÜˆÛ™HXØÙ\[˜ÙNÈÒKÙ[][]Ü‹ÑU‹Ñš\™X˜\ÙH\Þ[Y[]šY[˜ÙH]\Ý™HÚXÚÙYY\ˆ‹‚ˆÈÈŒ‹LKLH8 %š]˜]HYØXÞHØ[™Y]HØÜ™Y[š[™È
+Ø[™Y]JB‚‹H˜\ÙH]X™ÍŒÎMYM˜ŽLÍÍÙ™Y™Y™LX™™LØœ˜[˜Ú™X]\™KØÛÝY[YØXÞKX˜\Ù[[™KXYZ\ÜÚ[Û‹LŒŒLXˆ˜XÚÙ[™ØÜ™Y[š[™ÈÝÛ™\ˆ[˜Ý[ÛœËÜÜ˜ËÛYØXÞKXØ[™Y]K\ØÜ™Y[š[™ËšœÎŽœØÜ™Y[Š
+XÈØ[X›H[žH[˜Ý[ÛœËÚ[™^šœÎŽœØÜ™Y[“YØXÞSZYÜ˜][ÛØ[™Y]Xˆ]™XYÈH^\Ý[™Èš]˜]HØ[™Y]HÜš][ˆžHÝX›Z]YØXÞSZYÜ˜][ÛØ[™Y]X[ˆÙ\ÜÚ[ÛœËœ[”›ÝXÝY
+
+XÚXÚÜÈ[™[ÜKØØ[™Y]H™]š\Ú[Ûˆ[™RQ[ˆ™]\›œÈ›ØÚÙ\ˆÛÙ\Ëˆ›ÈØ[Y\^HØ]™HÜ˜\\‹[\Ü˜\žH]ÚX›XÈ^[ØYÛY[]ÛˆÜˆ]]Üš]]]™HÚ\˜XÝ\ˆÜš]\ˆ\ÈYYˆ^\Ý[™ÈœËÍŒ]X[K\™[XË\Þ\Ý[KšœØØ]™HÜ˜\\ˆ™[XZ[œÈÝ]ÙˆØÛÜK‚‹HØÜ™Y[š[™È\È™XYÛ›H[™[Ø^\È™XYQ›ÜXØÙ\[˜ÙN™˜[ÙXÚ[H\ÝÜšXØ[™]Ø\™›Ý™[˜[˜ÙH[™˜XÚÙY]\ÛZ[KX™X\š[™ÈÚYXØ\œÈ\™HXœÙ[ˆ]™Z]\ˆÚ[™Ù\È™]š\Ú[Ûˆ›Üˆ\›Ý™\ÈZYÜ˜][Û‹ˆ\™H\ÝÈ\ÜÎÈ[][]ÜˆÒK‹Y\™ÙH[™Uˆ™\šYšXØ][Ûˆ™[XZ[ˆ[™[™Ëˆ\ÙHÝ^\ÈSˆ“ÑÔ‘TÔÈÈÍˆ‘T’Q’QQˆUWÔÑPÕT’UWÐÓÓ•PÕË›Y\ÈXœÙ[È›È˜XœšXØ]YÛÛ˜XÝØ\È\ÙY‚‚ˆÈÈŒ‹LKLˆ8 %™XY[Û›HYØXÞHÚ\˜XÝ\ˆÛÛ™\œÚ[Ûˆ˜Y
+Ø[™Y]JB‚‹HÝÛ™\ˆ™[XZ[œÈ[˜Ý[ÛœËÜÜ˜ËÛYØXÞKXØ[™Y]K\ØÜ™Y[š[™ËšœØˆØÜ™Y[“YØXÞPØ[™Y]TÛ˜\ÚÝ
+
+X˜[Y]\ÈÛÝ\˜Ù\È[™™\\™SYØXÞPÚ\˜XÝ\‘˜Y
+
+X\š]™\È[ˆ[\›˜[™]šY]È˜Yœ›ÛHHÛÛ\]HØ[™Y]KˆH^\Ý[™È[˜Ý[ÛœËÚ[™^šœÎŽœØÜ™Y[“YØXÞSZYÜ˜][ÛØ[™Y]X[žH[™[”›ÝXÝY
+
+XÙ\ÜÚ[Û‹Ü™]š\Ú[ÛˆØ]H™[XZ[ˆ[ˆXÙKˆH]HœËÍŒ]X[K\™[XË\Þ\Ý[KšœØØ]™HÜ˜\\ˆ\È[ˆ[œ]ÛÝ\˜ÙHÛ›NÈ›È™]ÈØ[Y\^HÜ˜\\ˆÜˆ[\Ü˜\žH]ÚØ\ÈYY‚‹HH˜Y™\Ù\™\È™YHÚ\˜XÝ\ˆÛÝËXÛÛ›Û^K˜YÈØš™XÝÈ[™Ù\\˜][H\]Z\YØš™XÝÈÚ]ÛÝ\˜ÙH]ËÚÚ[Ë™[XÜË›ÙÜ™\ÜÈ[™ÛZ[KX™X\š[™ÈÚYXØ\œËˆHØ[X›H^ÜÙ\ÈÛ›HÝ]\È[™ÛÝ[Ëˆ]™]™\ˆ›ÝšY\ÈØ[›ÛšXØ[QËH\ÝY˜\Ù[[™K]Ø\™Üˆ^XX›HÛ˜\ÚÝÈ]]Üš]]]™TÝ]T™XYN™˜[ÙX[™\ÙHÍˆ™[XZ[‹ˆ‹ÛY\™ÙKÙ\ÞHÝ]\È]\Ý™H™\šYšYYÙ\\˜][K‚‹H™^ÛÝ\˜ÙKXÛÛ\][™\ÜÈÛXÙNˆ[˜Ý[ÛœËÜÜ˜ËØÛÝY\Ø]™K\ÛXÞKšœÎŽ“QÐPÖWÐPÒÕTÔÒQPÐT”ØÝÛœÈHMZÙ^HÙ\™\ˆ˜XÚÝ\[™[ÜžNÈ[˜Ý[ÛœËÜÜ˜ËÛYØXÞKXØ[™Y]K\ØÜ™Y[š[™ËšœÎŽœ™\\™SYØXÞPÚ\˜XÝ\‘˜Y
+
+X™]Z[œÈXXÚ^XÝ˜]ÈÚYXØ\ˆÜˆ^XÚ]Z\ÜÚ[™ÈX\šÙ\ˆ[™™]Z[œÈ]™\žH[ÝÛ\ÝYXZ[‹\Ø]™HšY[[˜ÛY[™ÈšY[È›ÝY]X\YÈØ[›ÛšXØ[™XÛÜ™ËˆÛZ[H›ØÚÙ\œÈ™[XZ[ˆ[ˆ›Ü˜ÙH]™[ˆÚ[ˆH™]šY]È˜YØ[ˆ™HÛÛœÝXÝYˆ›È™]ÈÜ˜\\‹]]Üš]]]™HÜš]\‹™]Ø\™]]][ÛˆÜˆ[\Ü˜\žH]Ú\È[›ÙXÙYˆ‹ÐÒKÛY\™ÙKÙ\ÞH]šY[˜ÙH™[XZ[œÈ[™[™È[[™\šYšYY‚‹H\ÝÜšXØ[ÛZ[H™XÛÛ˜Ú[X][ÛˆØ[™Y]Nˆ[˜Ý[ÛœËÜÜ˜ËÛYØXÞK\™]Ø\™XÛZ[KX]Y]šœÎŽ˜]Y]YØXÞT™]Ø\™ÛZ[\Ê
+XY][Û˜[H\œÙ\ÈH]Y\ÝZ[\ÝÛ™HÚYXØ\ˆ[™ÛÛ\\™\ÈHXž\ÜÈÚYXØ\‰ÜÈ™]Ø\™Ùš\œÝXÛX\ˆÛZ[H[šY\ÈYØZ[œÝHXZ[‹\Ø]™HZ\œ›Ü‹ˆ[˜Ý[ÛœËÜÜ˜ËÛYØXÞKXØ[™Y]K\ØÜ™Y[š[™ËšœÎŽœØÜ™Y[“YØXÞPØ[™Y]TÛ˜\ÚÝ
+
+X\ÜÙ\ÈHÙX[YÚYXØ\ˆ[™[ÜžHÈ]ÝÛ™\‹ˆÛÛ˜YXÝÜžHÛZ[\È›ØÚÈ˜Y™\\˜][ÛŽÈ›ÈØ[Y\^HÜš]\ˆÜˆÜ˜\\ˆÚ[™Ù\ËˆH]Y]Ù\È›Ý›Ý™H\ÝÜšXØ[™]Ø\™[][Y[Üˆ™\XÙHÙ\™\ˆÛZ[H™XÙZ\Ë‚‚ˆÈÈŒ‹LKLˆ8 %›Ý[™][Ûˆˆ™\šYšYY›Ý[™\žH[™™[XÈ›Ú™XÝ[Û‚‚‹HˆÍNMY\™ÙY]ÍNNMXXÌØNNÌÍY˜ŒY˜ÙMYXÌ˜MŽXÈÍNMH]MNXÌLMXYŒM˜NNÙNXŒ˜L˜ÎMYLYŒÈÍNMˆ]ÍYLL˜˜ŽXÍÍÙØ™LMYŽLŒ™ŒŽÈÍNMÈ]ÍMXØÙMXÍMÌŒ˜˜ŒLN˜L˜MŒ˜MØNÌÎÈÍNN]YMNYMØ™LÌY™NMMÌŒÍÎLŒ™ÌMÌÍXˆ›ÜˆÍNNY\™ÙYÒHÒHÍŒÌŒMMØ
+™\ÜÚ]ÜžHÚXÚÜÈ[™Uˆ™]šY]ÊH[™Ù\ÜÚ[Ûˆ]]Üš]HÍŒÌŒMMX
+[][]Üˆ[™š\™X˜\ÙH\ÞJHÛÛ\]YÝXØÙ\ÜÙ[Kˆ\ÙH\™H™XY[Û›H™\™\]Z\Ú]HÛXÙ\ÎÈ\ÙH™[XZ[œÈÍˆ‘T’Q’QQ‚‹HH™^Ø[™Y]HÙY\È[˜Ý[ÛœËÜÜ˜ËÛYØXÞKXØ[™Y]K\ØÜ™Y[š[™ËšœÎŽœØÜ™Y[“YØXÞPØ[™Y]TÛ˜\ÚÝ
+
+X\ÈHÝXÝ\˜[Ø]H[™[˜Ý[ÛœËÜÜ˜ËØØ[›ÛšXØ[XÚ\˜XÝ\‹\™]šY]Ë\[‹šœÎŽ˜Z[Ø[›ÛšXØ[Ú\˜XÝ\”™]šY]Ô[Š
+X\ÈHš]˜]HÛÛ™\œÚ[ÛˆÝÛ™\‹ˆH]HœËÍŒ]X[K\™[XË\Þ\Ý[KšœÎŽœ\œÚ\Ý[ÔØ]™QØÝ[Y[
+
+X\ÈH[œ]Üš]\‹›ÝH™]È˜XÚÙ[™Ü˜\\‹ˆ™[XÈÛÝ\˜ÙH™XÛÜ™È[™HÙ[XÝY™[XÈ™Y™\™[˜ÙH\™H›Ú™XÝYÛ›H›Üˆ™]šY]ÎÈ[˜[YÝ]HÜˆH›Û™[\HYØXÞHÙXÛÛ™\žHÛÝ›ØÚÜÈ˜]\ˆ[ˆÚ[[H›Ü[™È]ˆ›ÈØ[›ÛšXØ[Üš]\‹XØÙ\[˜ÙK™]Ø\™Ü™Y]Üˆ^XX›H™\ÝÜ˜][Ûˆ\È[˜X›Yˆ‹ÐÒKÛY\™ÙKÙ\ÞHÝ]\È›Üˆ\ÈØ[™Y]H\È[™[™È™\šYšXØ][Û‹‚‚ˆÈÈŒ‹LKLÈ8 %Ø[›ÛšXØ[ÛZ[H™XÛÜ™ÛÛ[Z]HØ[™Y]B‚‹H˜\ÙH]NMY˜NÍ™Ž˜MŒXMØÍYŒNL˜ŽØÌÍˆHÛZ[H]]][ÛˆÝÛ™\ˆ\È[˜Ý[ÛœËÜÜ˜ËØØ[›ÛšXØ[\™\ÛÝ\˜ÙKXÜ™Y]šœÎŽ˜Ü™Y]™\Ù\™YÜ˜[
+
+XÈ[˜Ý[ÛœËÜÜ˜ËØØ[›ÛšXØ[[ÝÛ™Y\ÛÝ\˜Ù\ËšœÎŽœ™XYÝÛ™YÛÝ\˜Ù\Ê
+KØY˜[˜ÙSÝÛ™Y™XÛÜ™Ê
+X™XYÈ[™Y˜[˜Ù\ÈHÛÛ\]HÛZ[HÙ]È[˜Ý[ÛœËÜÜ˜ËØØ[›ÛšXØ[\Û˜\ÚÝšœÎŽ˜ÛZ[T™XÛÜ™ÑYÙ\Ý
+
+XÝÛœÈHÚXÚÜÚ[YÙ\Ýˆ›ÝXÝYÙ\ÜÚ[Ûˆ™[XZ[œÈ[˜Ý[ÛœËÜÜ˜ËÜÙ\ÜÚ[Û‹X]]Üš]KšœÎŽœ[”›ÝXÝY
+
+Xˆ›ÈØ[Y\^HØ]™HÜ˜\\ˆÜˆ[\Ü˜\žH]Ú‚‹HH[\›˜[Ü™Y]˜[œØXÝ[ÛˆYÈHRQ[ÝÛ™YÛZ[H™XÛÜ™[™ÚXÚÜÚ[YÙ\ÝÚ]]È[š\]YHÜ˜[ÛZ[KYÙ\‹™XÙZ\ÛÝ\˜ÙH™]š\Ú[Ûˆ[™[œX›\ÚYÛ˜\ÚÝˆV[™]šX]H[ØØ][ÛœÈ™\Ù\™HHÛZ[H™XÛÜ™È]Z\ˆ™^™]š\Ú[ÛœËˆœ›ÝÜÙ\‹\ÝX›Z]Y[[Ý[Ë\ÝÜšXØ[ZYÜ˜][ÛˆYZ\ÜÚ[Ûˆ[™^XX›HX›XØ][Ûˆ™[XZ[ˆ\ØX›Yˆ\È\ÈHØ[™Y]H[™[™ÈˆÒH[™š\™\ÝÜ™H[][]Üˆ™\šYšXØ][ÛŽÈ\ÙH™[XZ[œÈÍˆ‘T’Q’QQ‚‚ˆÈÈŒ‹LKLÌ8 %\ÙHš]˜]HØ[™Y]H™XY[Û›HØÜ™Y[š[™ÈRH
+Ø[™Y]JB‚‹H˜\ÙH]ÎYNÌÍŒMX™MØM˜MLŒŽNLØLLMÎXÎÙ˜ˆH˜XÚÙ[™ØÜ™Y[š[™ÈÝÛ™\ˆ™[XZ[œÈ[˜Ý[ÛœËÜÜ˜ËÛYØXÞKXØ[™Y]K\ØÜ™Y[š[™ËšœÎŽœØÜ™Y[Š
+X›ÝYÚ[˜Ý[ÛœËÚ[™^šœÎŽœØÜ™Y[“YØXÞSZYÜ˜][ÛØ[™Y]XˆHœ›ÝÜÙ\ˆØ[X›HÝÛ™\ˆ\ÈœËÙš\™X˜\ÙKÙš\™X˜\ÙKXÛÝY\Ø]™KšœØ^ÜÙYžHœËÙš\™X˜\ÙKÙš\™X˜\ÙKX›ÛÝÝ˜\šœØÈUˆXØÛÝ[[™[™\Ù[][Ûˆ[™ÛXÚÈY™XÞXÛH™[XZ[ˆ[ˆœËÙš\™X˜\ÙKÙš\™X˜\ÙKX]]]ZKšœØˆ›ÈØ]™HÜ˜\\‹[\Ü˜\žH]Úš\™\ÝÜ™HÜš]HÜˆY][Û˜[]]Üš]HÝÛ™\ˆØ\ÈYY‚‹HH^XÚ]Uˆ]Ûˆ™XYÈHÝ\œ™[Ø[YKURQ[˜YZ]Y[™[ÜKÙ[™È]È^XÝØ[™Y]H[™Ù\™\ˆ™]š\Ú[ÛœÈ›ÝYÚH^\Ý[™È›ÝXÝYÙ\ÜÚ[Û‹[ˆ™XYÈ˜XÚÈH[™[ÜHÈ™Z™XÝÚ[™ÙY™]š\Ú[ÛœËÙš[™Ù\œš[ˆ]ÚÝÜÈ˜XÚÙ[™›ØÚÙ\ˆÛÙ\ÈÚ]Ú[™\ÙH^[˜][ÛœÈ[™ÛÛœÚ\Ý[HØ^\ÈH™\Ý[\È›ØÚÙY[\ÝY[™[˜]˜Z[X›H›ÜˆÙXÛÛ™Y]šXÙHÚ\˜XÝ\ˆ™\ÝÜ™Kˆ]Ù\È›ÝÜ™X]HHØ[™Y]HÜˆ™\^HH˜Z[YÝX›Z\ÜÚ[Û‹‚‹H\™Ù]Y\ÝÈÛÝ™\ˆ™]š\Ú[ÛˆHØÜ™Y[š[™ËZ\ÜÚ[™ÈØ[™Y]KÚ[™ÙY™]š\Ú[Ûˆ[™RQˆˆÚXÚÜËY\™ÙHÒK\ÞYYUˆÒH[™ÜšYÚ[˜[Y]šXÙH™XY[Û›H™\Ý[]\Ý™H™\šYšYYÙ\\˜][Kˆ\ÙH™[XZ[œÈ
+Š’Sˆ“ÑÔ‘TÔÈÈÍˆ‘T’Q’QQ
+ŠŽÈÜšYÚ[˜[Û™HØ]™H[™[[]]X›H˜XÚÝ\Ý^H[ˆXÙK‚‚ˆÈÈŒ‹LKLÌ8 %\ÙHZ\ÜÚ[™ÈÛZ[K\ÚYXØ\ˆÛÝ\˜ÙHXYÛ›ÜÚ\È
+Ø[™Y]JB‚‹HÜšYÚ[˜[Û™H™]š\Ú[ÛˆH™XY[Û›HØÜ™Y[š[™È™]\›™YTÕÔ’PÐSÔ‘UÐT‘×ÕS•‘T’Q’QQ[™ÒQPÐT—ÐPÒÕTÓRTÔÒS‘ØˆH]\ˆ\ÈYÙÜ™YØ]NˆH[[]]X›H˜XÚÝ\[™[ÜžHØ[ˆ™HÛÛ\]HÚ[HÛ™HÜˆ[Ü™HÛZ[KX™X\š[™ÈÛÝ\˜ÙH˜[Y\È\™H^XÚ]HX\šÙYZ\ÜÚ[™Ëˆ]Ù\È›Ý›Ý™H\ØY˜Z[\™K‚‹HØÜ™Y[š[™ÈÝÛ™\ˆ[˜Ý[ÛœËÜÜ˜ËÛYØXÞKXØ[™Y]K\ØÜ™Y[š[™ËšœÎŽœØÜ™Y[“YØXÞPØ[™Y]TÛ˜\ÚÝ
+
+X›ÝÈ™]\›œÈÛ›HZ\ÜÚ[™È˜[Y\Èœ›ÛH]È^\Ý[™ÈZYÚZÙ^HÛZ[K\ÛÝ\˜ÙH[ÝÛ\ÝÚ[ˆHÙX[YÚYXØ\ˆ[™[ÜžH^\ÝËˆHUˆXØÛÝ[[™[œËÙš\™X˜\ÙKÙš\™X˜\ÙKX]]]ZKšœØÚÝÜÈÜÙH˜[Y\È[ˆH^\Ý[™È™\Ý[ÈÛ\ˆ[˜[™YØ[™Y]\ÈÝ^HÙ[™\šXËˆ›È˜]Èž]\Ë^˜Hš\™\ÝÜ™H™XYË˜XœšXØ]YY˜][Ë™\ÝX›Z\ÜÚ[Û‹Ø[Y\^HÜš]HÜˆXØÙ\[˜ÙH]ˆ\ÝÜšXÈ™]Ø\™ÛZ[\È™[XZ[ˆ[™\šYšYY[™\ÙHÝ^\ÈÍˆ‘T’Q’QQ[[Ù\\˜]H›ÛÙˆ[™YZ\ÜÚ[ÛˆØ]\È\™HY]‚‚ˆÈÈŒ‹LLLH8 %\ÙHÜšYÚ[˜[Y]šXÙHÙ™›[™H˜XÚÝ\^Ü
+Ø[™Y]JB‚‹HÜšYÚ[˜[\Û™H™]š\Ú[ÛˆH™]šY]È™\ÜYXœÙ[Z[KY[™Ù[Û‹\Ý]X\ÚË]˜XÚÙ\˜[™YØXÞKXXž\ÜË\Ý]X\È[™\šYšYY\ÝÜšXØ[™]Ø\™Ëˆ\ÙH\™H[[]]X›HZ\ÜÚ[™ÈX\šÙ\œÎÈ›ÈY˜][™XÛÜ™ÜˆÛZ[H[YÚXš[]H\È[™™\œ™Y‚‹HœËÜÝ\\ØXØÛÝ[\Ø]™K\™\ÜÚ]ÜžKšœÎŽ™^ÜZYÜ˜][Û˜XÚÝ\Ê
+X™\šYšY\ÈXXÚÙX[YØØ[˜XÚÝ\›ÜˆHXÝ]™HRQ[™XÚØYÙ\È]È^XÝXZ[‹Y]Y]H[™ÚYXØ\ˆž]\È›ÜˆHU‹[Û›Hœ›ÝÜÙ\ˆÝÛ›ØYœ›ÛHH^\Ý[™ÈXØÛÝ[[™[ˆ]™Z]\ˆ™XYÈ[›Ý\ˆRQ›Üˆ[\œÈØØ[ØÛÝYÝ]KˆHÝÛ›ØYY”ÓÓˆ\È[™[˜Üž\Y[™]\Ý™HÙ\š]˜]NÈÝÛ›ØY™\]Y\Ý\È›Ý›ÛÙˆÙˆHØ]™Yš[Kˆ›È[\ÜYZ\ÜÚ[ÛˆÜˆÜ›ÜÜËY]šXÙH™\ÝÜ™H\È[˜X›Yˆ\ÙH™[XZ[œÈÍˆ‘T’Q’QQˆ‹ÒKY\™ÙH[™\Þ[Y[]\Ý™H™\šYšYYÙ\\˜][K‚‹H‹ÐÒKÑš\™X˜\ÙH\ÞH[™ÜšYÚ[˜[Y]šXÙH™XY[Û›H™\šYšXØ][Ûˆ™[XZ[ˆÈ™H™XÛÜ™YÙ\\˜][K‚ˆÈÈŒ‹LLLH8 %\ÚXØ[›ÛÝË]\ˆ™]š]™H™Z™XÝ[Ûˆ™YY˜XÚÈ[™\šYÚ›ÛÙ™X\Ý‚‹H™]È\ÚXØ[™XÛÜ™[™ÈLÌŒÎ›\
+ÍÜËL0åÌŒÌMŠHÚÝÜÈHUˆ›ÜÜÈ˜]HÚ][™YH[Y\È[]™Kˆ™\X]Y9oªy­.ú(dØ\ÈÈ›Ý[\ˆ[HÙ[XÝ[Ûˆ™XØ]\ÙH]È›Ü›X[XY[X\™Ù]ÛÛ˜XÝ\È›ÈYØ[\™Ù]ˆ\È\È›Ý]šY[˜ÙHÙˆ[›Ý\ˆÝXÚ˜Z[\™Kˆ™\\™PXÝ[Û˜[™XYHÜ›ÝHHY[ˆ˜]HÙÎÈ]›ÝÈ[ÛÈ›Ú™XÝÈHØ[YHYØ[™Z™XÝ[Ûˆ›ÝYÚHš\ÚX›K›Û‹Z[\˜XÝ]™H\šXK[]™X˜]H›ÝXÙNˆ9¢$y¥®yæë¹bcy¬¤¹§"y.®¹«nù.¨{ï#9á(y¬åy/oùå*9oªy­.ú(døà ˜H˜[[ˆ[HÝ[[\œÈH^\Ý[™È[K\Ù[XÝ[ÛˆÝÛ™\‹‚‹HHØ[YH™XÛÜ™[™ÈÚÝÜÈ9­*¹¬-9ã&ùãn^\›˜[H›Ý]Y[Û™È]È˜Z™XÝÜžKˆH\]YXÚ\Ú[Ûˆ\ÈÈÙY\HÜšYÚ[˜[ÚY]ÜšY[][Ûˆ›Üˆ›ÝÚY\ËˆŒMÈ›ÝÈ\Ù\È™\Ù\™TÛÝ\˜ÙSÜšY[][Û˜Y]Y]NˆXÝÜ‹Ý\™Ù]˜]™[[™\ÙY[Z[™È™[XZ[‹]Ø\Ý›YÚ[\XÝ[™\ÜÚ\]H[\ÙH™\›È^\›˜[›Ý][Û‹ˆ›ÈÚYKÐ›ÜÜÈÜXÚX[Ø\ÙK™\XÙ[Y[\ÜÙ][XYÙKœ›ÜÝš]K]œ˜XÝ[Û‹\˜][ÛˆÜˆ[™Ú[Ú[™ÙK‚‹Hœ™\Ú˜\ÙH]ÍÍLÍMÌŒŒL™˜ÌÍMMŽXXLÍÍXÌŒŒŒXY˜ÈØØ[œ˜[˜Úš^Ø˜]K\™]š]™KY™YY˜XÚËY›ÛÙ]\šYÚLŒŒLXˆ›Ü›X[XÛ\˜][Ûˆ™YÜ™\ÜÚ[ÛˆÛÝ™\œÈ™]š]™H™Z™XÝ[Ûˆ›ÝXÙH[™˜[[‹X[HÙ[XÝ[Û‹ˆ^\Ý[™Èœ›ÝÜÙ\ˆPH›ÝÈ\ÜÙ\ÈHš\ÚX›H›Ë]\™Ù]›ÝXÙH[™\šYÚ›ÛÙ™X\Ý›Üˆ^Y\‹™YÝ[\ˆ[ÛœÝ\ˆ[™XÝX[›ÜÜÈXÜ›ÜÜÈ™YH\™Ù]Ëˆ›ÙXÝ[ÛˆZ[ØÚXÚÈ\ÜÈØØ[Kˆ^XÝZXYÒK[YÜ˜][Û‹\Þ[Y[[™\ÚXØ[›ÛÝË]\™[XZ[ˆ[™[™ÎÈ›Ý™\]Z\™[Y[ÈÝ^HSTSQS•QÈ“Õ‘T’Q’QQ‚‹Hš\œÝ^XÝXØ[™Y]HÒH[ˆÍŽLÎÍM˜^ÜÙYHš^\™IÜÈ[˜ÛÜœ™XÝ\ÜÝ[\[Ûˆ][™YH\H[™^\ÈÙ\™HÜ[]YÈH\ÜÜØX›HPHXØÛÝ[\È[\HÛÝÈ]H\ÜÙ\[ÛˆYX\YÈˆHš^\™H›ÝÈÛ˜\ÚÝÈXZÙ\È]™\žH™\Ù[[H[]™H›Üˆ\È›Ë]\™Ù]Ø\ÙK™\šYšY\ÈH™X[ÝXÚ]š\ÚX›H™Z™XÝ[Û‹[™™\ÝÜ™\Èˆ[\H\HÛÝÈ\™H^ÛYY™XØ]\ÙH›Ü›X[™\\™PXÝ[Û˜Ù\È›Ý™X][ˆXœÙ[Ú\˜XÝ\ˆ\ÈHXY[KˆH\ÜÙ\[ÛœÈÙ\™H›ÝÙXZÙ[™Y[™[[YHØ\È›ÝÚ[™ÙY›Üˆ\ÈÛÜœ™XÝ[Û‹‚
