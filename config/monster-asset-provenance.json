@@ -937,6 +937,2606 @@
         }
       },
       "runtimeReady": true
+    },
+    {
+      "monsterId": "wild.zone-01.wind-01",
+      "displayName": "風芽魈",
+      "portraitKey": "wild.zone-01.wind-01",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/wild/zone-01/wind-01.png",
+        "sha256": "9acc197139e3fb4a04d297744b096403841810ed6c1bab109b5815b89bb7c4a4",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/wild/zone-01/wind-01.webp",
+        "sha256": "31e16f3dc1dae46cefc665d8f1f2ad99b0dcf209ae522594dc095828190c1cdc",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "wild.zone-02.wind-01",
+      "displayName": "疾角妖",
+      "portraitKey": "wild.zone-02.wind-01",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/wild/zone-02/wind-01.png",
+        "sha256": "a2b2dd0547cb9070c829b54254a410b7fc2be47e0db0ecc76df34f3de6dd04e7",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/wild/zone-02/wind-01.webp",
+        "sha256": "cfaaa4a24fd818a950d820165542dfd47e5e8f64ca2de02a106d070025fc466a",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "wild.zone-03.wind-01",
+      "displayName": "霧鬃狼",
+      "portraitKey": "wild.zone-03.wind-01",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/wild/zone-03/wind-01.png",
+        "sha256": "9782b8eb35ea6a6a23aca862eed03a2f10556688273e6eda73945cf7ec5ccae4",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/wild/zone-03/wind-01.webp",
+        "sha256": "a732e43075c90e3a2c62cb81f430009045ff72e3d737852eb57b1df2a3bca6b3",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "wild.zone-04.wind-01",
+      "displayName": "旋風鬼",
+      "portraitKey": "wild.zone-04.wind-01",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/wild/zone-04/wind-01.png",
+        "sha256": "23062750ef81aca2aef7eb744bbfe0596db6eb1c217f8ef5fc89b5cbbea9000e",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/wild/zone-04/wind-01.webp",
+        "sha256": "bf2852329e8011c486645c4f73226c29b943ed4fb2f8e1ef172297b36fb26155",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "wild.zone-05.wind-01",
+      "displayName": "青嵐虎",
+      "portraitKey": "wild.zone-05.wind-01",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/wild/zone-05/wind-01.png",
+        "sha256": "0cc6909364c47223ac5b78dc1d3107846828d6727ff908fe07281e90e7bab17a",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/wild/zone-05/wind-01.webp",
+        "sha256": "238c9220c16235c3f468283d4313855234ac69c25aa8d840fc6782024a1be8cf",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "wild.zone-06.wind-01",
+      "displayName": "逐風客",
+      "portraitKey": "wild.zone-06.wind-01",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/wild/zone-06/wind-01.png",
+        "sha256": "049a4c34ad09e12ab8f4a452befbcbb1d84a6b296abbb39b6ba434f106c416f4",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/wild/zone-06/wind-01.webp",
+        "sha256": "26b51a11793130a7e96b97c152422b40dfa441d2b92c2cb16c0a46fc2dd87913",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "wild.zone-07.wind-01",
+      "displayName": "嵐鎧衛",
+      "portraitKey": "wild.zone-07.wind-01",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/wild/zone-07/wind-01.png",
+        "sha256": "164621d95610e9dbc4255a75cc3b82e76c9c6beaefb97d8108fe6947ea6a4fd3",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/wild/zone-07/wind-01.webp",
+        "sha256": "5107b49c03f2ff28b135eb7d6ce67a5538aad2a25c00cd667a4ec1dc3f58ee3a",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "wild.zone-08.wind-01",
+      "displayName": "翼影魔",
+      "portraitKey": "wild.zone-08.wind-01",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/wild/zone-08/wind-01.png",
+        "sha256": "e39847fadf37ea48eabd09e9d85b8705baa01735096b4423391473afc28e4a80",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/wild/zone-08/wind-01.webp",
+        "sha256": "fa39c346cb99f7a8e62e583f0800939246d6e958001707eab1370171dd9f412f",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "wild.zone-09.wind-01",
+      "displayName": "風魘使",
+      "portraitKey": "wild.zone-09.wind-01",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/wild/zone-09/wind-01.png",
+        "sha256": "48a04f341a40571ef0dc0d27128e64f2617c43f6b40aac72709669f9e0a2dd71",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/wild/zone-09/wind-01.webp",
+        "sha256": "8f1392eff6ad37e81d32b3ea91cad374c7108b80977e65d0b92c32f96888709c",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "wild.zone-10.wind-01",
+      "displayName": "蒼羽尊",
+      "portraitKey": "wild.zone-10.wind-01",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/wild/zone-10/wind-01.png",
+        "sha256": "13734eab58648bc842cfd78347a7940f2cf126f241c5340003f2b92ffb16935d",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/wild/zone-10/wind-01.webp",
+        "sha256": "bf1d1cb8c7a937fbd5ae53639349920a2dc1ca06a4e74243ea053c295da097de",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_WIND_NORMAL_001",
+      "displayName": "翎爪衛",
+      "portraitKey": "MON_WIND_NORMAL_001",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-001.png",
+        "sha256": "df0903f797f4f683b4cc9b6044ff066a8c13ff6af9e966a88a350b184f49035d",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725 / assets/inbox/英雄or怪物立繪/風元素/普通怪/file_00000000110c8211ac3519c8427f5495.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-001.webp",
+        "sha256": "72fa74879f8020e0aeac19625937f2800edbe74a284e0008f7e257bd6d2b6172",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_WIND_NORMAL_002",
+      "displayName": "旋刃卒",
+      "portraitKey": "MON_WIND_NORMAL_002",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-002.png",
+        "sha256": "7007c8ca1565e5ceb20b8b03d86e567491cd7def50fd97467579bea098edf0c5",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725 / assets/inbox/英雄or怪物立繪/風元素/普通怪/file_0000000018808211ad89369fdbe5206b.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-002.webp",
+        "sha256": "56a810fb66ebeb54ca14908e201357b26ff464e856d5d39057f1482f5fe06544",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_WIND_NORMAL_003",
+      "displayName": "踏雲客",
+      "portraitKey": "MON_WIND_NORMAL_003",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-003.png",
+        "sha256": "c31359cc23ffe45ecf022e9d4740e71c83bd2244df6301d6f0e8b08f6730fac7",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725 / assets/inbox/英雄or怪物立繪/風元素/普通怪/file_0000000029ec8211954f031267398b64.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-003.webp",
+        "sha256": "3efbce2ba65e3dfd739661dbfd1aff9ad3f7d0dc89a93918a2368381ddc6dd4a",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_WIND_NORMAL_004",
+      "displayName": "嵐鹿靈",
+      "portraitKey": "MON_WIND_NORMAL_004",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-004.png",
+        "sha256": "206785e33b5193e1014a53f4792264444252b66267f6bf1b124d80c18e07cbe0",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725 / assets/inbox/英雄or怪物立繪/風元素/普通怪/file_00000000310c82119a363c77382b3515.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-004.webp",
+        "sha256": "e9df8692521468424a96d2a6c9169fbecbfb4e02aafe9d4662998ccd12d93e83",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_WIND_NORMAL_005",
+      "displayName": "飛絮姬",
+      "portraitKey": "MON_WIND_NORMAL_005",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-005.png",
+        "sha256": "7a3ebc0925f371f6641a089e17487a70e4d4008562cc7f355905925f47d49043",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725 / assets/inbox/英雄or怪物立繪/風元素/普通怪/file_00000000333c8211b66e6e70090be2be.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-005.webp",
+        "sha256": "8a609e945b11453a2448ff0a4d982dd6146a89733c341a4839a4893616bdfbc7",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_WIND_NORMAL_006",
+      "displayName": "巨牙象",
+      "portraitKey": "MON_WIND_NORMAL_006",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-006.png",
+        "sha256": "d636bbf80f68ec6f499538a45b217c9f4795865ec74845c5e46badec5867b99e",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725 / assets/inbox/英雄or怪物立繪/風元素/普通怪/file_0000000033c082119aea0a5fc2495543.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-006.webp",
+        "sha256": "7d3ab8264a01994902ab1c417d103bf140200e8aff14da1b953bceb1623e5bd5",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_WIND_NORMAL_007",
+      "displayName": "雲翎使",
+      "portraitKey": "MON_WIND_NORMAL_007",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-007.png",
+        "sha256": "bc1a1dcc7a33dc151459cacb7b26213e7c2b99f708cd56793bf8ae4f7d6a5624",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725 / assets/inbox/英雄or怪物立繪/風元素/普通怪/file_000000004b5c82118d738dff7a5b221c.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-007.webp",
+        "sha256": "fe53c99d31a9880bed013a5e2e7521233f5fc9c4174d92e0352f1504be2a6450",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_WIND_NORMAL_008",
+      "displayName": "風枝妖",
+      "portraitKey": "MON_WIND_NORMAL_008",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-008.png",
+        "sha256": "b1b0defb3bc58e4392f7503a52075372c1a12c270e86ce56db58ec8fa4e582bb",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725 / assets/inbox/英雄or怪物立繪/風元素/普通怪/file_00000000557482119a78311672e3be09.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-008.webp",
+        "sha256": "77e4ca31b113adf105f765a0f50e5efb8ee7223d817a9d1f60a6e9db1e8abbff",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_WIND_NORMAL_009",
+      "displayName": "逐嵐俠",
+      "portraitKey": "MON_WIND_NORMAL_009",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-009.png",
+        "sha256": "668dbfa7a45054f5bf58a17286187c1a01d7fbcaec99a384f0d66e1f7835bae9",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725 / assets/inbox/英雄or怪物立繪/風元素/普通怪/file_0000000069048210beef99e484d5e855.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-009.webp",
+        "sha256": "8e17b40d92b368ec875ce1bfd1e19adf6f451a52d4161f13a0a4e5f239c6a30b",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_WIND_NORMAL_010",
+      "displayName": "青羽劍",
+      "portraitKey": "MON_WIND_NORMAL_010",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-010.png",
+        "sha256": "79ef0fb4141d8b82a2eff10a27def08badd65975ccf7529d780d85213ea940f1",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725 / assets/inbox/英雄or怪物立繪/風元素/普通怪/file_000000008988821187b754f995c3536e.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-010.webp",
+        "sha256": "ad5a40fa37543640e62c2b436f9cdf4057db3b6adf89417c543a7ebd242723ac",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_WIND_NORMAL_011",
+      "displayName": "風紋祭",
+      "portraitKey": "MON_WIND_NORMAL_011",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-011.png",
+        "sha256": "60b6afd5c8b51b88cc777ce481512bd894ed6051792d9ff2487ef6aae9a03498",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725 / assets/inbox/英雄or怪物立繪/風元素/普通怪/file_00000000ab248211958883a19cbd50d9.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-011.webp",
+        "sha256": "14df282a4ab650cc36c40c66aa261c36945f9a250ea9a4ff854f11d1ec842cb6",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_WIND_NORMAL_012",
+      "displayName": "翔雲女",
+      "portraitKey": "MON_WIND_NORMAL_012",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-012.png",
+        "sha256": "166f351f15f9b4ab03a859ba6cd19e2945700bead74a27f325927edc741ea4fe",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725 / assets/inbox/英雄or怪物立繪/風元素/普通怪/file_00000000adac821182e906c6d94ce02f.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-012.webp",
+        "sha256": "a3fbb34c05745c230266f909db7caca4f52ecd25826bbb0a6adde44b510176ee",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_WIND_NORMAL_013",
+      "displayName": "浮空傘",
+      "portraitKey": "MON_WIND_NORMAL_013",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-013.png",
+        "sha256": "a70b2cf8c830431bec264db255cb26f8f026f8d1faeea27e75092491e3ff5dfc",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725 / assets/inbox/英雄or怪物立繪/風元素/普通怪/file_00000000af588210b29e0d1214e182c4.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-013.webp",
+        "sha256": "08de508517c51df44606978baec8e3e88bf65cf4e63edc005b00aa06e7e2a542",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_WIND_NORMAL_014",
+      "displayName": "疾羽槍",
+      "portraitKey": "MON_WIND_NORMAL_014",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-014.png",
+        "sha256": "f38966049e36336476e9d0868a7d78eb0ef7deabdd587814d74faebfac76a00f",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725 / assets/inbox/英雄or怪物立繪/風元素/普通怪/file_00000000b9888211a7c2373ca1164047.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-014.webp",
+        "sha256": "cb57718c4f339da479f40828d3139805aa83bded91ba3b5843e8e1c5b5ff5c86",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_WIND_NORMAL_015",
+      "displayName": "嵐狼騎",
+      "portraitKey": "MON_WIND_NORMAL_015",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-015.png",
+        "sha256": "fb3ffbc867c6ddead98f688b2834138f27ab32239811bc90fc7b5295a86b8122",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725 / assets/inbox/英雄or怪物立繪/風元素/普通怪/file_00000000c2648211ac8c3e8b66777439.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-015.webp",
+        "sha256": "383438363a79970226649722324086c826685496adac5e0749850eaa339be999",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_WIND_NORMAL_016",
+      "displayName": "流風俠",
+      "portraitKey": "MON_WIND_NORMAL_016",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-016.png",
+        "sha256": "325763175786eaef5dd3a41e4e2c79b6099a4809ba41ba9fd0da7e137a66caac",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725 / assets/inbox/英雄or怪物立繪/風元素/普通怪/file_00000000c87c8211b1d6fa7a4f7ea526.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-016.webp",
+        "sha256": "5a05c657f404125ba2635c606adbf5cf83c6fda80591cb1630e8f16d270c0c5f",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_WIND_NORMAL_017",
+      "displayName": "雲蛇姬",
+      "portraitKey": "MON_WIND_NORMAL_017",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-017.png",
+        "sha256": "090dcc1065fb1a242d42e749e9663681ab38b9aba2ce60d661cb152414f05a37",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725 / assets/inbox/英雄or怪物立繪/風元素/普通怪/file_00000000ce188211a28bea9d6e268273.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-017.webp",
+        "sha256": "204f421581708ff6597200ed4f732dabdbc4a40626b31953a09c1f089a2220b3",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_WIND_NORMAL_018",
+      "displayName": "古木巫",
+      "portraitKey": "MON_WIND_NORMAL_018",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-018.png",
+        "sha256": "594ff3e6a2dca801e23d6e69373dab7555020a68029ebd436d086c397816ea6a",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725 / assets/inbox/英雄or怪物立繪/風元素/普通怪/file_00000000d1e08211936924ae3e81cde1.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-018.webp",
+        "sha256": "33c37c4351ba50fc2209c33aaf29889fd691a8473469ed11bcd963dc4cbf22a7",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_WIND_NORMAL_019",
+      "displayName": "風蹄魔",
+      "portraitKey": "MON_WIND_NORMAL_019",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-019.png",
+        "sha256": "cda2f36ce33c9f96742187b2cb0982e89b54d92dade575dccf0523ce09858c2e",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725 / assets/inbox/英雄or怪物立繪/風元素/普通怪/file_00000000dfe0821180a2176f3da0cb8f.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-019.webp",
+        "sha256": "c1293895c12539cec0749472c9f7382ee155ac7c8c90b9336fb9aa37c5c3ea9b",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_WIND_NORMAL_020",
+      "displayName": "霧羽仙",
+      "portraitKey": "MON_WIND_NORMAL_020",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-020.png",
+        "sha256": "bf87981a0b7a894ea227fc00705d87bae3c87d53bb438ed05cb52bcea237848f",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725 / assets/inbox/英雄or怪物立繪/風元素/普通怪/file_00000000e164820794f4d6ec26866b49.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-020.webp",
+        "sha256": "07be0e673832d8133aa9330972fcc0a6fae03256dcf6ceea7b2ec07503baaa65",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_WIND_ELITE_001",
+      "displayName": "嵐羽鸞",
+      "portraitKey": "MON_WIND_ELITE_001",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-elite-001.png",
+        "sha256": "6d61dca586cd5490411dad436d917d1a4026a7e9b1f25f2770cca2be3816b2d7",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725 / assets/inbox/英雄or怪物立繪/風元素/菁英怪/file_000000001d908211b1b8e3c1b063f7ef.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/wind-pool/mon-wind-elite-001.webp",
+        "sha256": "1f4c9459c5f99081c6bb20b03971aaa091a745fefa8989ccb1e01ec8f106d851",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_WIND_ELITE_002",
+      "displayName": "青風蛟",
+      "portraitKey": "MON_WIND_ELITE_002",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-elite-002.png",
+        "sha256": "b0c4546666ec240136a600ad8f5b12f1a05b29f21997bdfabaac546555f4fc12",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725 / assets/inbox/英雄or怪物立繪/風元素/菁英怪/file_000000003b8c8206b6b1a8e56f2b0507.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/wind-pool/mon-wind-elite-002.webp",
+        "sha256": "a18e7da24f86a5282a54c071b97006c466db66f1cc904b56fbd6f8c96ff6c8e6",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_WIND_ELITE_003",
+      "displayName": "裂雲狼",
+      "portraitKey": "MON_WIND_ELITE_003",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-elite-003.png",
+        "sha256": "4a6f72631693ace13c276b3ce73a4b1fce632b0510b0a7770aa8ca897646f112",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725 / assets/inbox/英雄or怪物立繪/風元素/菁英怪/file_000000004de882438708f3c4296ed161.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/wind-pool/mon-wind-elite-003.webp",
+        "sha256": "054e64ef4d15161656fdd6422631c8e8daa5612ca4cc7813bc8ce082ee37a3aa",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_WIND_ELITE_004",
+      "displayName": "黑翼祭",
+      "portraitKey": "MON_WIND_ELITE_004",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-elite-004.png",
+        "sha256": "d8ec3917fd06e656c4dfff70ca4973315dd5a167f85437b9884af266ab7f87ad",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725 / assets/inbox/英雄or怪物立繪/風元素/菁英怪/file_000000006bd4820682322ec0b93a2f63.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/wind-pool/mon-wind-elite-004.webp",
+        "sha256": "19ec3b2aafef4bca3001c23a679e82129e8c4ce88658b27851cdc478d727a3c6",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_WIND_ELITE_005",
+      "displayName": "蒼嵐龍",
+      "portraitKey": "MON_WIND_ELITE_005",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-elite-005.png",
+        "sha256": "32aae5946a69096be5c73a2a874201c43f6043b8cb3d7deb212e4ab47f789cc4",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725 / assets/inbox/英雄or怪物立繪/風元素/菁英怪/file_0000000081dc82119419ccb04677fd02.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/wind-pool/mon-wind-elite-005.webp",
+        "sha256": "60f701947d7abf7d067604c82c3156479559b2a1f9f957a17e5a7f7306396ec4",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_WIND_ELITE_006",
+      "displayName": "巨象王",
+      "portraitKey": "MON_WIND_ELITE_006",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-elite-006.png",
+        "sha256": "22434a76fd3249c36f8da9bb9b8ef1fd494e1502611146fb39b90345a80976d3",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725 / assets/inbox/英雄or怪物立繪/風元素/菁英怪/file_0000000093a081f88936974e17db0258.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/wind-pool/mon-wind-elite-006.webp",
+        "sha256": "258f8fb52c34300b9633424f46f428602c4d93da7ad8947d4fb19abe7f8255ee",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_WIND_ELITE_007",
+      "displayName": "靈木神",
+      "portraitKey": "MON_WIND_ELITE_007",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-elite-007.png",
+        "sha256": "1a9c683345bdd54d1b4ca8ddfb262b9b82b099ea07baca1ffb944509ac5081a5",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725 / assets/inbox/英雄or怪物立繪/風元素/菁英怪/file_00000000a9548211bd28a38a1ccbba95.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/wind-pool/mon-wind-elite-007.webp",
+        "sha256": "63851b8ff0f3c5fa0402fbb452ef08104cc956f1b8a71ee224b748332c632acb",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_WIND_ELITE_008",
+      "displayName": "風角鹿",
+      "portraitKey": "MON_WIND_ELITE_008",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-elite-008.png",
+        "sha256": "e94c6ecd022e77e5f8b938d6aa86db9d2275c440e0ad70c6a93d5b254c73d815",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725 / assets/inbox/英雄or怪物立繪/風元素/菁英怪/file_00000000b048821192b638d45b2301a7.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/wind-pool/mon-wind-elite-008.webp",
+        "sha256": "11cec0a8356b0f29aadc609184def0f1b64aca6cee5e28d6a1ab496967a66346",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_WIND_ELITE_009",
+      "displayName": "破空將",
+      "portraitKey": "MON_WIND_ELITE_009",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-elite-009.png",
+        "sha256": "f0259492dfb44440147b8c488d1c459fa729b02a9e2e9a29040a639ebabc95c2",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725 / assets/inbox/英雄or怪物立繪/風元素/菁英怪/file_00000000ba5082089f8f7f862de6521d.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/wind-pool/mon-wind-elite-009.webp",
+        "sha256": "040fce4e93c5b2ea89409054b1654549e41cb58603768568eb133f21820e5fe3",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_WIND_ELITE_010",
+      "displayName": "霜刃使",
+      "portraitKey": "MON_WIND_ELITE_010",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-elite-010.png",
+        "sha256": "4ccc047f13edc8390c38d178c391c63fba1f53645652964ced9a41905a5fdb3f",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725 / assets/inbox/英雄or怪物立繪/風元素/菁英怪/file_00000000bdb48209926106010b80de97.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/wind-pool/mon-wind-elite-010.webp",
+        "sha256": "8834875d85ca337add963c7a6ece2a3370af7859814b16c9dccae9130bf5eab1",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_WIND_MINIBOSS_001",
+      "displayName": "天風武尊",
+      "portraitKey": "MON_WIND_MINIBOSS_001",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-miniboss-001.png",
+        "sha256": "d8332bda574248b30362b2fa3703527a8977734009d125c51ac99a912a8c114f",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725 / assets/inbox/英雄or怪物立繪/風元素/小Boss/file_0000000017088208be472aaefb2bc243.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/wind-pool/mon-wind-miniboss-001.webp",
+        "sha256": "49ef8605c0c5396ce7cbe059855326b66d4c39a5c53c19402262c7282bf22cd3",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_WIND_MINIBOSS_002",
+      "displayName": "蒼龍仙",
+      "portraitKey": "MON_WIND_MINIBOSS_002",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-miniboss-002.png",
+        "sha256": "dc1be065805d593f0578277268f11c16d42a623c630017ad73dea4786d3d209f",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725 / assets/inbox/英雄or怪物立繪/風元素/小Boss/file_0000000025208211a7bf6854a1830df0.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/wind-pool/mon-wind-miniboss-002.webp",
+        "sha256": "25a611642830f2c2bdc58bbf8a78935798664dd1f34a9e725f9e74a9d9e6fce1",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_WIND_MINIBOSS_003",
+      "displayName": "嵐海龍君",
+      "portraitKey": "MON_WIND_MINIBOSS_003",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-miniboss-003.png",
+        "sha256": "578bde71b893bcee6db903566759cf53a0c83546aae29ceb738669d2b69313d4",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725 / assets/inbox/英雄or怪物立繪/風元素/小Boss/file_0000000026cc8243a22862667dc15e05.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/wind-pool/mon-wind-miniboss-003.webp",
+        "sha256": "cc3d5a7a88836353eea52f35fb0fb5494c98ceb915f8934e6b4e48b151d32cd6",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_WIND_MINIBOSS_004",
+      "displayName": "青翼神",
+      "portraitKey": "MON_WIND_MINIBOSS_004",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-miniboss-004.png",
+        "sha256": "c601008e5d640bda6ba181c4b5d6be9d07b258a461b41c6e3dd650775f6e79be",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725 / assets/inbox/英雄or怪物立繪/風元素/小Boss/file_000000006be88211acc8fa8169a731d0.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/wind-pool/mon-wind-miniboss-004.webp",
+        "sha256": "4d7670ef3db2d6275409ced2014d74b15c582645975639bd559c679aa88401f0",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_WIND_MINIBOSS_005",
+      "displayName": "雲蝶尊",
+      "portraitKey": "MON_WIND_MINIBOSS_005",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-miniboss-005.png",
+        "sha256": "c5aae1c79806f8196a299f1b4fde80c8624ad7de4cdebba4c4ba4623cc960d25",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725 / assets/inbox/英雄or怪物立繪/風元素/小Boss/file_00000000989c821192a06ed6b9878166.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/wind-pool/mon-wind-miniboss-005.webp",
+        "sha256": "7928e8be2e95d1fcc350fad0678c39a1a3851f09346cfdc802d7f6526a0cb858",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_WIND_MINIBOSS_006",
+      "displayName": "風鹿天尊",
+      "portraitKey": "MON_WIND_MINIBOSS_006",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-miniboss-006.png",
+        "sha256": "fb7991b82a3f08970e9be83f24b6ab22c691208a3b0c054dbd3a576eb1d1bd7e",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725 / assets/inbox/英雄or怪物立繪/風元素/小Boss/file_00000000a2c48211881b6d402543d6c1.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/wind-pool/mon-wind-miniboss-006.webp",
+        "sha256": "8a266aacc87211b2f5e77c54b3f4efa5a512fe7d5345124e450fa6accdc14bf1",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_WIND_MINIBOSS_007",
+      "displayName": "逐風劍聖",
+      "portraitKey": "MON_WIND_MINIBOSS_007",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-miniboss-007.png",
+        "sha256": "edae23ade8c221fc23db646528daff218da96896866d18f9302727707e769f96",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725 / assets/inbox/英雄or怪物立繪/風元素/小Boss/file_00000000a7388211a34780e9d89131ce.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/wind-pool/mon-wind-miniboss-007.webp",
+        "sha256": "f1c0c9c80ff4aaf96c6948a3513c81770afd3313d6fc67910a7b9652859cddb1",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_WIND_MINIBOSS_008",
+      "displayName": "鎮嵐巨象",
+      "portraitKey": "MON_WIND_MINIBOSS_008",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-miniboss-008.png",
+        "sha256": "b6a0f826834c5ee8ce52b05e5efae920aec6c222ab864e387e7095b3c6535b1e",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725 / assets/inbox/英雄or怪物立繪/風元素/小Boss/file_00000000ae208211ba58fc8dc23097cb.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/wind-pool/mon-wind-miniboss-008.webp",
+        "sha256": "bb43908266c8833ebcac88882ed9427ab9c730683d0802b5687d5819d088ac15",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_WIND_MINIBOSS_009",
+      "displayName": "雲角聖獸",
+      "portraitKey": "MON_WIND_MINIBOSS_009",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-miniboss-009.png",
+        "sha256": "ff9a0ea0fc521cea266f5b55342105a941b24ec8565ed8a3cc5c8496b27b2b91",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725 / assets/inbox/英雄or怪物立繪/風元素/小Boss/file_00000000b71c82439792ba4bb9130497.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/wind-pool/mon-wind-miniboss-009.webp",
+        "sha256": "c7e4a4142d1da89c7bbcbe1e6a5793bdc7b56177f226deb0d604d6cc275b65c7",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_WIND_MINIBOSS_010",
+      "displayName": "風極真君",
+      "portraitKey": "MON_WIND_MINIBOSS_010",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-miniboss-010.png",
+        "sha256": "f7d876f35a9b47b6f8910269ab8ec6efb4bd27ab5a29681d243e481fb2b70fd1",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library PR #725 / assets/inbox/英雄or怪物立繪/風元素/小Boss/file_00000000c52882468a012d52987a23a0.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/wind-pool/mon-wind-miniboss-010.webp",
+        "sha256": "0e6efbbda8b7207f8a0dc82794b73cfce28f3bf30a509de36509859f6f05ed75",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "Pillow",
+          "command": "RGBA contain centered canvas; save WEBP lossless exact",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
     }
   ]
 }

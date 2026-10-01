@@ -49,8 +49,8 @@
       },
       "gameplay-core": {
         "scripts": [
-          "build/gameplay-core-primary.2afe4c119f7f.js",
-          "build/gameplay-core-secondary.0d245602adb8.js"
+          "build/gameplay-core-primary.5708d42b5683.js",
+          "build/gameplay-core-secondary.2216f40bf3ae.js"
         ],
         "styles": [
           "build/gameplay-core.f80077fed10a.css"
@@ -102,7 +102,7 @@
       },
       "feature-boss-relic": {
         "scripts": [
-          "build/feature-boss-relic.347349efb934.js",
+          "build/feature-boss-relic.92a368250dad.js",
           "build/feature-relic-progression.87f6a83606ad.js"
         ],
         "styles": [
@@ -794,17 +794,17 @@
         "decode": false
       },
       {
-        "path": "build/gameplay-core-primary.2afe4c119f7f.js",
-        "sha256": "2afe4c119f7f",
-        "bytes": 648661,
+        "path": "build/gameplay-core-primary.5708d42b5683.js",
+        "sha256": "5708d42b5683",
+        "bytes": 648640,
         "priority": "P2",
         "type": "script",
         "decode": false
       },
       {
-        "path": "build/gameplay-core-secondary.0d245602adb8.js",
-        "sha256": "0d245602adb8",
-        "bytes": 654859,
+        "path": "build/gameplay-core-secondary.2216f40bf3ae.js",
+        "sha256": "2216f40bf3ae",
+        "bytes": 654834,
         "priority": "P2",
         "type": "script",
         "decode": false
@@ -818,8 +818,8 @@
         "decode": false
       }
     ],
-    "manifestHash": "ef7a735a4caa",
-    "totalBytes": 21572400,
+    "manifestHash": "f57861f61ba8",
+    "totalBytes": 21572354,
     "totalResources": 78
   },
   "assets": {
@@ -831,13 +831,13 @@
       "sha256": "120ef8d5549e",
       "bytes": 992639
     },
-    "build/gameplay-core-primary.2afe4c119f7f.js": {
-      "sha256": "2afe4c119f7f",
-      "bytes": 648661
+    "build/gameplay-core-primary.5708d42b5683.js": {
+      "sha256": "5708d42b5683",
+      "bytes": 648640
     },
-    "build/gameplay-core-secondary.0d245602adb8.js": {
-      "sha256": "0d245602adb8",
-      "bytes": 654859
+    "build/gameplay-core-secondary.2216f40bf3ae.js": {
+      "sha256": "2216f40bf3ae",
+      "bytes": 654834
     },
     "build/feature-patrol.ab5bd3ce5582.js": {
       "sha256": "ab5bd3ce5582",
@@ -847,9 +847,9 @@
       "sha256": "3d158554cc2a",
       "bytes": 50656
     },
-    "build/feature-boss-relic.347349efb934.js": {
-      "sha256": "347349efb934",
-      "bytes": 89004
+    "build/feature-boss-relic.92a368250dad.js": {
+      "sha256": "92a368250dad",
+      "bytes": 90109
     },
     "build/feature-relic-progression.87f6a83606ad.js": {
       "sha256": "87f6a83606ad",
@@ -1260,6 +1260,328 @@
         "path": "assets/monsters/tower/fire-pool/mon-fire-miniboss-011.webp",
         "sha256": "4b028b3ba7a1",
         "bytes": 1785386,
+        "decode": true
+      }
+    ],
+    "wind": [
+      {
+        "assetId": "MON_WIND_NORMAL_001",
+        "displayName": "翎爪衛",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-001.webp",
+        "sha256": "72fa74879f80",
+        "bytes": 1753388,
+        "decode": true
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_002",
+        "displayName": "旋刃卒",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-002.webp",
+        "sha256": "56a810fb66eb",
+        "bytes": 2021498,
+        "decode": true
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_003",
+        "displayName": "踏雲客",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-003.webp",
+        "sha256": "3efbce2ba65e",
+        "bytes": 1818932,
+        "decode": true
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_004",
+        "displayName": "嵐鹿靈",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-004.webp",
+        "sha256": "e9df86925214",
+        "bytes": 1361122,
+        "decode": true
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_005",
+        "displayName": "飛絮姬",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-005.webp",
+        "sha256": "8a609e945b11",
+        "bytes": 1466056,
+        "decode": true
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_006",
+        "displayName": "巨牙象",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-006.webp",
+        "sha256": "7d3ab8264a01",
+        "bytes": 1955274,
+        "decode": true
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_007",
+        "displayName": "雲翎使",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-007.webp",
+        "sha256": "fe53c99d31a9",
+        "bytes": 1314356,
+        "decode": true
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_008",
+        "displayName": "風枝妖",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-008.webp",
+        "sha256": "77e4ca31b113",
+        "bytes": 1745928,
+        "decode": true
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_009",
+        "displayName": "逐嵐俠",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-009.webp",
+        "sha256": "8e17b40d92b3",
+        "bytes": 1508608,
+        "decode": true
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_010",
+        "displayName": "青羽劍",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-010.webp",
+        "sha256": "ad5a40fa3754",
+        "bytes": 1445122,
+        "decode": true
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_011",
+        "displayName": "風紋祭",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-011.webp",
+        "sha256": "14df282a4ab6",
+        "bytes": 1415322,
+        "decode": true
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_012",
+        "displayName": "翔雲女",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-012.webp",
+        "sha256": "a3fbb34c0574",
+        "bytes": 1385276,
+        "decode": true
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_013",
+        "displayName": "浮空傘",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-013.webp",
+        "sha256": "08de508517c5",
+        "bytes": 1252082,
+        "decode": true
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_014",
+        "displayName": "疾羽槍",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-014.webp",
+        "sha256": "cb57718c4f33",
+        "bytes": 1762944,
+        "decode": true
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_015",
+        "displayName": "嵐狼騎",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-015.webp",
+        "sha256": "383438363a79",
+        "bytes": 1727424,
+        "decode": true
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_016",
+        "displayName": "流風俠",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-016.webp",
+        "sha256": "5a05c657f404",
+        "bytes": 1650966,
+        "decode": true
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_017",
+        "displayName": "雲蛇姬",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-017.webp",
+        "sha256": "204f42158170",
+        "bytes": 1669570,
+        "decode": true
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_018",
+        "displayName": "古木巫",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-018.webp",
+        "sha256": "33c37c4351ba",
+        "bytes": 1769350,
+        "decode": true
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_019",
+        "displayName": "風蹄魔",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-019.webp",
+        "sha256": "c1293895c125",
+        "bytes": 1360152,
+        "decode": true
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_020",
+        "displayName": "霧羽仙",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-normal-020.webp",
+        "sha256": "07be0e673832",
+        "bytes": 1823160,
+        "decode": true
+      },
+      {
+        "assetId": "MON_WIND_ELITE_001",
+        "displayName": "嵐羽鸞",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-elite-001.webp",
+        "sha256": "1f4c9459c5f9",
+        "bytes": 1905968,
+        "decode": true
+      },
+      {
+        "assetId": "MON_WIND_ELITE_002",
+        "displayName": "青風蛟",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-elite-002.webp",
+        "sha256": "a18e7da24f86",
+        "bytes": 2007346,
+        "decode": true
+      },
+      {
+        "assetId": "MON_WIND_ELITE_003",
+        "displayName": "裂雲狼",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-elite-003.webp",
+        "sha256": "054e64ef4d15",
+        "bytes": 1872474,
+        "decode": true
+      },
+      {
+        "assetId": "MON_WIND_ELITE_004",
+        "displayName": "黑翼祭",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-elite-004.webp",
+        "sha256": "19ec3b2aafef",
+        "bytes": 1801784,
+        "decode": true
+      },
+      {
+        "assetId": "MON_WIND_ELITE_005",
+        "displayName": "蒼嵐龍",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-elite-005.webp",
+        "sha256": "60f701947d7a",
+        "bytes": 2044006,
+        "decode": true
+      },
+      {
+        "assetId": "MON_WIND_ELITE_006",
+        "displayName": "巨象王",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-elite-006.webp",
+        "sha256": "258f8fb52c34",
+        "bytes": 1990748,
+        "decode": true
+      },
+      {
+        "assetId": "MON_WIND_ELITE_007",
+        "displayName": "靈木神",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-elite-007.webp",
+        "sha256": "63851b8ff0f3",
+        "bytes": 1669724,
+        "decode": true
+      },
+      {
+        "assetId": "MON_WIND_ELITE_008",
+        "displayName": "風角鹿",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-elite-008.webp",
+        "sha256": "11cec0a8356b",
+        "bytes": 1800584,
+        "decode": true
+      },
+      {
+        "assetId": "MON_WIND_ELITE_009",
+        "displayName": "破空將",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-elite-009.webp",
+        "sha256": "040fce4e93c5",
+        "bytes": 1808100,
+        "decode": true
+      },
+      {
+        "assetId": "MON_WIND_ELITE_010",
+        "displayName": "霜刃使",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-elite-010.webp",
+        "sha256": "8834875d85ca",
+        "bytes": 1510560,
+        "decode": true
+      },
+      {
+        "assetId": "MON_WIND_MINIBOSS_001",
+        "displayName": "天風武尊",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-miniboss-001.webp",
+        "sha256": "49ef8605c0c5",
+        "bytes": 2257204,
+        "decode": true
+      },
+      {
+        "assetId": "MON_WIND_MINIBOSS_002",
+        "displayName": "蒼龍仙",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-miniboss-002.webp",
+        "sha256": "25a611642830",
+        "bytes": 2082298,
+        "decode": true
+      },
+      {
+        "assetId": "MON_WIND_MINIBOSS_003",
+        "displayName": "嵐海龍君",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-miniboss-003.webp",
+        "sha256": "cc3d5a7a8883",
+        "bytes": 1963136,
+        "decode": true
+      },
+      {
+        "assetId": "MON_WIND_MINIBOSS_004",
+        "displayName": "青翼神",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-miniboss-004.webp",
+        "sha256": "4d7670ef3db2",
+        "bytes": 2066378,
+        "decode": true
+      },
+      {
+        "assetId": "MON_WIND_MINIBOSS_005",
+        "displayName": "雲蝶尊",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-miniboss-005.webp",
+        "sha256": "7928e8be2e95",
+        "bytes": 2001316,
+        "decode": true
+      },
+      {
+        "assetId": "MON_WIND_MINIBOSS_006",
+        "displayName": "風鹿天尊",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-miniboss-006.webp",
+        "sha256": "8a266aacc872",
+        "bytes": 2068724,
+        "decode": true
+      },
+      {
+        "assetId": "MON_WIND_MINIBOSS_007",
+        "displayName": "逐風劍聖",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-miniboss-007.webp",
+        "sha256": "f1c0c9c80ff4",
+        "bytes": 1804836,
+        "decode": true
+      },
+      {
+        "assetId": "MON_WIND_MINIBOSS_008",
+        "displayName": "鎮嵐巨象",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-miniboss-008.webp",
+        "sha256": "bb43908266c8",
+        "bytes": 2055790,
+        "decode": true
+      },
+      {
+        "assetId": "MON_WIND_MINIBOSS_009",
+        "displayName": "雲角聖獸",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-miniboss-009.webp",
+        "sha256": "c7e4a4142d1d",
+        "bytes": 1981938,
+        "decode": true
+      },
+      {
+        "assetId": "MON_WIND_MINIBOSS_010",
+        "displayName": "風極真君",
+        "path": "assets/monsters/tower/wind-pool/mon-wind-miniboss-010.webp",
+        "sha256": "0e6efbbda8b7",
+        "bytes": 2035248,
         "decode": true
       }
     ]

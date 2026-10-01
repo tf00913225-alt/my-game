@@ -104,7 +104,8 @@ function testCrossElementIsolation(){
         const runtime=loadTower();
         const id=runtime.context.GameplaySystem.getTowerPortraitAssetId(element,10,"boss",0);
         if(element==="fire") assert.match(id,/^MON_FIRE_/,"fire tower must use the fire portrait plan");
-        else assert.equal(id,null,element+" tower must not inherit the fire tower plan");
+        else if(element==="wind") assert.match(id,/^MON_WIND_/,"wind tower must use the wind portrait plan");
+        else assert.equal(id,null,element+" tower must not inherit fire or wind portrait plans");
     }
 }
 
