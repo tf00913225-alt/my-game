@@ -27,11 +27,25 @@ const expectedNames={
   "MON_FIRE_NORMAL_001":"炎刃流寇",
   "MON_FIRE_ELITE_001":"裂甲熔蠍",
   "MON_FIRE_ELITE_002":"焚稻魈",
+  "MON_FIRE_ELITE_008":"赤甲槍蟲",
+  "MON_FIRE_ELITE_010":"六臂修羅",
+  "MON_FIRE_ELITE_013":"獄輪魔尊",
+  "MON_FIRE_ELITE_014":"業炎法王",
+  "MON_FIRE_ELITE_016":"末炎祭司",
+  "MON_FIRE_ELITE_017":"熔翼獸王",
+  "MON_FIRE_ELITE_018":"炎錘巨魔",
+  "MON_FIRE_ELITE_019":"焚天炎龍",
   "MON_FIRE_MINIBOSS_001":"炎脊裂龍",
   "MON_FIRE_MINIBOSS_005":"焚城魔將",
   "MON_FIRE_MINIBOSS_011":"焰冠獅魁"
 };
 for(const [assetId,name] of Object.entries(expectedNames)){
   assert.equal(byId[assetId].displayName,name,assetId+" displayName mismatch");
+}
+const fireNames=pool.map(entry=>entry.displayName);
+assert.equal(new Set(fireNames).size,fireNames.length,"fire portrait names must remain unique");
+for(const name of fireNames){
+  const length=Array.from(name).length;
+  assert.ok(length>=2&&length<=4,`${name} must contain 2-4 characters`);
 }
 console.log("Fire tower portrait coverage tests passed.");

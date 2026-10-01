@@ -264,7 +264,7 @@
     },
     {
       "monsterId": "wild.zone-04.fire-02",
-      "displayName": "烈焰巨魔王",
+      "displayName": "炎錘巨魔",
       "portraitKey": "wild.zone-04.fire-02",
       "identityStatus": "IDENTITY_VERIFIED",
       "master": {
@@ -368,7 +368,7 @@
     },
     {
       "monsterId": "wild.zone-05.fire-02",
-      "displayName": "熔岩巨獸王",
+      "displayName": "熔翼獸王",
       "portraitKey": "wild.zone-05.fire-02",
       "identityStatus": "IDENTITY_VERIFIED",
       "master": {
@@ -472,7 +472,7 @@
     },
     {
       "monsterId": "wild.zone-06.fire-02",
-      "displayName": "赤炎修羅王",
+      "displayName": "六臂修羅",
       "portraitKey": "wild.zone-06.fire-02",
       "identityStatus": "IDENTITY_VERIFIED",
       "master": {
@@ -576,7 +576,7 @@
     },
     {
       "monsterId": "wild.zone-07.fire-02",
-      "displayName": "業火魔君王",
+      "displayName": "業炎法王",
       "portraitKey": "wild.zone-07.fire-02",
       "identityStatus": "IDENTITY_VERIFIED",
       "master": {
@@ -680,7 +680,7 @@
     },
     {
       "monsterId": "wild.zone-08.fire-02",
-      "displayName": "焚天龍獄皇",
+      "displayName": "焚天炎龍",
       "portraitKey": "wild.zone-08.fire-02",
       "identityStatus": "IDENTITY_VERIFIED",
       "master": {
@@ -784,7 +784,7 @@
     },
     {
       "monsterId": "wild.zone-09.fire-02",
-      "displayName": "虛空煉獄皇",
+      "displayName": "獄輪魔尊",
       "portraitKey": "wild.zone-09.fire-02",
       "identityStatus": "IDENTITY_VERIFIED",
       "master": {
@@ -888,7 +888,7 @@
     },
     {
       "monsterId": "wild.zone-10.fire-02",
-      "displayName": "終焉神魔皇",
+      "displayName": "末炎祭司",
       "portraitKey": "wild.zone-10.fire-02",
       "identityStatus": "IDENTITY_VERIFIED",
       "master": {

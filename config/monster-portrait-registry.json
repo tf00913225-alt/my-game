@@ -230,7 +230,7 @@
       ],
       [
         "wild.zone-04.fire-02",
-        "烈焰巨魔王",
+        "炎錘巨魔",
         "fire",
         "regular",
         "standard",
@@ -284,7 +284,7 @@
       ],
       [
         "wild.zone-05.fire-02",
-        "熔岩巨獸王",
+        "熔翼獸王",
         "fire",
         "regular",
         "standard",
@@ -338,7 +338,7 @@
       ],
       [
         "wild.zone-06.fire-02",
-        "赤炎修羅王",
+        "六臂修羅",
         "fire",
         "regular",
         "standard",
@@ -392,7 +392,7 @@
       ],
       [
         "wild.zone-07.fire-02",
-        "業火魔君王",
+        "業炎法王",
         "fire",
         "regular",
         "standard",
@@ -446,7 +446,7 @@
       ],
       [
         "wild.zone-08.fire-02",
-        "焚天龍獄皇",
+        "焚天炎龍",
         "fire",
         "regular",
         "standard",
@@ -500,7 +500,7 @@
       ],
       [
         "wild.zone-09.fire-02",
-        "虛空煉獄皇",
+        "獄輪魔尊",
         "fire",
         "regular",
         "standard",
@@ -554,7 +554,7 @@
       ],
       [
         "wild.zone-10.fire-02",
-        "終焉神魔皇",
+        "末炎祭司",
         "fire",
         "regular",
         "standard",
@@ -1861,7 +1861,7 @@
       },
       {
         "assetId": "MON_FIRE_ELITE_008",
-        "displayName": "炎殼長戟蟲",
+        "displayName": "赤甲槍蟲",
         "element": "fire",
         "tier": "elite",
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_00000000cf44824387dd10e3ea6a3289.png",
@@ -1916,7 +1916,7 @@
       },
       {
         "assetId": "MON_FIRE_ELITE_010",
-        "displayName": "赤炎修羅王",
+        "displayName": "六臂修羅",
         "element": "fire",
         "tier": "elite",
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/菁英怪/file_000000000b708211a92314c503198d6f.png",
@@ -1949,7 +1949,7 @@
       },
       {
         "assetId": "MON_FIRE_ELITE_013",
-        "displayName": "虛空煉獄皇",
+        "displayName": "獄輪魔尊",
         "element": "fire",
         "tier": "elite",
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/菁英怪/file_000000002e7481f480cf437f43374b04.png",
@@ -1960,7 +1960,7 @@
       },
       {
         "assetId": "MON_FIRE_ELITE_014",
-        "displayName": "業火魔君王",
+        "displayName": "業炎法王",
         "element": "fire",
         "tier": "elite",
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/菁英怪/file_0000000054f4820eb78391ba2a7a7aa3.png",
@@ -1982,7 +1982,7 @@
       },
       {
         "assetId": "MON_FIRE_ELITE_016",
-        "displayName": "終焉神魔皇",
+        "displayName": "末炎祭司",
         "element": "fire",
         "tier": "elite",
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/菁英怪/file_0000000063f881f7aaa1f65b8783acd8.png",
@@ -1993,7 +1993,7 @@
       },
       {
         "assetId": "MON_FIRE_ELITE_017",
-        "displayName": "熔岩巨獸王",
+        "displayName": "熔翼獸王",
         "element": "fire",
         "tier": "elite",
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/菁英怪/file_000000008430820b8b8a6da7013a6477.png",
@@ -2004,7 +2004,7 @@
       },
       {
         "assetId": "MON_FIRE_ELITE_018",
-        "displayName": "烈焰巨魔王",
+        "displayName": "炎錘巨魔",
         "element": "fire",
         "tier": "elite",
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/菁英怪/file_00000000b9c48246b09f8447ab25c8b2.png",
@@ -2015,7 +2015,7 @@
       },
       {
         "assetId": "MON_FIRE_ELITE_019",
-        "displayName": "焚天龍獄皇",
+        "displayName": "焚天炎龍",
         "element": "fire",
         "tier": "elite",
         "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/菁英怪/file_00000000f7208206a6e1e6b237ddeabf.png",
