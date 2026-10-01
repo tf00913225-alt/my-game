@@ -26,6 +26,7 @@ assert.match(battlefieldCss,/\.v-fixed-enemy-slot \.battle-monster-name\{[\s\S]*
 assert.match(battlefieldCss,/\.v-fixed-battle-slot > \.battle-monster > \.v174-battle-art,[\s\S]*bottom:var\(--battle-art-hud-reserve\) !important/,
     "the Fixed Slot layout owner must reserve card-bottom HUD space");
 assert.match(battlefieldCss,/battle-player\.v174-cardless-unit\.active-turn\{[\s\S]*outline:0 !important;[\s\S]*box-shadow:none !important/);
+assert.match(battlefieldCss,/battle-player\.v174-cardless-unit\.active-turn::after\{[\s\S]*border:3px solid #ffd21f !important;[\s\S]*animation:v174ManualActiveTurnFrameFlash \.3s linear infinite !important/);
 assert.match(vfx,/const SPRITE_SCALE_MULTIPLIER=1;/);
 assert.doesNotMatch(vfx,/function visualRectForCard\(/,"VFX geometry must not regress to character/art DOM bounds");
 assert.match(vfx,/function geometryOwner\(\)\{[\s\S]*window\.FourSymbolsBattlefieldSlots/);

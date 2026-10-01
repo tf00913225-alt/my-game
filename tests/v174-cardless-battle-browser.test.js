@@ -94,7 +94,18 @@ window.__qaBefore=qaRects();
 <script>
 (function(){
   var player=document.getElementById('battlePlayerCard0');
+  var activePlayer=document.getElementById('battlePlayerCard1');
+  var activeFrame=getComputedStyle(activePlayer,'::after');
   var art=player.querySelector(':scope > .v174-battle-art');
+  var activeArt=activePlayer.querySelector(':scope > .v174-battle-art');
+  activePlayer.classList.add('attacker-lunge-up');
+  var activeLungeAnimation=getComputedStyle(activeArt).animationName;
+  var activeFrameDuringLunge=getComputedStyle(activePlayer,'::after').animationName;
+  activePlayer.classList.remove('attacker-lunge-up');
+  activePlayer.classList.add('dodge-back');
+  var activeDodgeAnimation=getComputedStyle(activePlayer).animationName;
+  var activeFrameDuringDodge=getComputedStyle(activePlayer,'::after').animationName;
+  activePlayer.classList.remove('dodge-back');
   player.classList.add('attacker-lunge-up');
   var lungeAnimation=getComputedStyle(art).animationName;
   player.classList.remove('attacker-lunge-up');
@@ -125,6 +136,14 @@ window.__qaBefore=qaRects();
       activeOutlineWidth:getComputedStyle(document.getElementById('battlePlayerCard1')).outlineWidth,
       activeShadow:getComputedStyle(document.getElementById('battlePlayerCard1')).boxShadow,
       activeArtFilter:getComputedStyle(document.getElementById('battlePlayerCard1').querySelector(':scope > .v174-battle-art')).filter,
+      activeFrameContent:activeFrame.content,
+      activeFrameBorder:activeFrame.borderTopWidth,
+      activeFrameShadow:activeFrame.boxShadow,
+      activeFrameAnimation:activeFrame.animationName,
+      activeLungeAnimation:activeLungeAnimation,
+      activeFrameDuringLunge:activeFrameDuringLunge,
+      activeDodgeAnimation:activeDodgeAnimation,
+      activeFrameDuringDodge:activeFrameDuringDodge,
       playerIdle:getComputedStyle(document.getElementById('battlePlayerCard1').querySelector(':scope > .v174-battle-art')).animationName,
       lungeAnimation:lungeAnimation,
       hitAnimation:getComputedStyle(art).animationName,
@@ -179,6 +198,14 @@ function runViewport(chrome,width,height){
     assert.equal(data.activeOutlineWidth,"0px");
     assert.equal(data.activeShadow,"none");
     assert.notEqual(data.activeArtFilter,"none","active cardless feedback must remain on artwork instead of a card frame");
+    assert.equal(data.activeFrameContent,'""');
+    assert.equal(data.activeFrameBorder,"3px");
+    assert.notEqual(data.activeFrameShadow,"none");
+    assert.equal(data.activeFrameAnimation,"v174ManualActiveTurnFrameFlash");
+    assert.equal(data.activeLungeAnimation,"v174BattleLungeUp");
+    assert.equal(data.activeFrameDuringLunge,"v174ManualActiveTurnFrameFlash","manual frame must survive attacker lunge");
+    assert.equal(data.activeDodgeAnimation,"dodgeBack");
+    assert.equal(data.activeFrameDuringDodge,"v174ManualActiveTurnFrameFlash","manual frame must survive dodge/MISS");
     assert.equal(data.playerIdle,"none","cardless portraits stay static between actions to avoid permanent compositor work");
     assert.equal(data.lungeAnimation,"v174BattleLungeUp");
     assert.equal(data.hitAnimation,"none","damage popups must not start a persistent portrait animation");

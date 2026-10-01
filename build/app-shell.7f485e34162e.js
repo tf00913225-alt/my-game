@@ -11257,6 +11257,11 @@ function beginCharacterTurn(token){
        直接跳過閃爍。
     */
 
+    /* active-turn is a manual-control presentation projection, not a second
+       turn-state owner. Always retire the preceding character's projection
+       before deciding whether the current character needs manual input. */
+    clearActiveCharacterHighlight();
+
     if(!autoOn){
 
         updateActiveCharacterHighlight();
