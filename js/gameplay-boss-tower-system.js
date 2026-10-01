@@ -1407,6 +1407,11 @@
     window.FourSymbolsBossBattle=Object.freeze({
         version:"boss-target-entity-v1",
         isActive:function(){ return !!activeBoss(); },
+        getEnemyFormationSnapshot:bossBattlefieldSnapshot,
+        ownsEnemyFormationSnapshot:function(snapshot){
+            return !!(activeBattleContext&&snapshot&&snapshot.bossBattleSnapshot===true&&
+                activeBattleContext.enemySnapshot===snapshot);
+        },
         getBossIndex:bossIndex,
         isBossIndex:isBossIndex,
         isBossObjectIndex:isBossObjectIndex,

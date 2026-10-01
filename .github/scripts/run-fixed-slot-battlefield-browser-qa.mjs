@@ -21,6 +21,24 @@ function findChrome(){
 function decode(value){return value.replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"').replace(/&#39;/g,"'");}
 
 const ownerSource=read("js/battlefield-slot-owner.js").replace(/<\/script/gi,"<\\/script");
+const fullV131Source=read("js/25-v131-fix-batch.js");
+const v131FormationSource=fullV131Source.slice(
+    fullV131Source.indexOf("    function getFormationRankWeight("),
+    fullV131Source.indexOf("    function formatDuration(")
+).replace(/<\/script/gi,"<\\/script");
+const v131EnemyApplySource=(fullV131Source.slice(
+    fullV131Source.indexOf("    function applyBattleFormation("),
+    fullV131Source.indexOf("    function ensureAllyFormationState(")
+)+"\nwindow.v131AfterBattleRender=function(){ applyBattleFormation(); };\n").replace(/<\/script/gi,"<\\/script");
+const mainSource=read("js/00-main.js");
+const mainRenderHookSource=mainSource.slice(
+    mainSource.indexOf("const BATTLE_RENDER_HOOK_ORDER="),
+    mainSource.indexOf("function isBattleStatusInspectionBlocked(")
+).replace(/<\/script/gi,"<\\/script");
+const mainRenderSource=mainSource.slice(
+    mainSource.indexOf("function renderBattle(){"),
+    mainSource.indexOf("function fillBattleInfoGap(")
+).replace(/<\/script/gi,"<\\/script");
 const adapterSource=read("js/battlefield-render-geometry-adapter.js").replace(/<\/script/gi,"<\\/script");
 const feedbackSource=read("js/battle-floating-feedback-owner.js").replace(/<\/script/gi,"<\\/script");
 const feedbackCss=read("css/battle-floating-feedback-owner.css").replace(/<\/style/gi,"<\\/style");
@@ -64,7 +82,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#120e09;col
 window.__allyIndexes=[0,1,2];
 window.getExistingPartyIndexes=function(){return window.__allyIndexes.slice();};
 window.monsters=Array.from({length:10},function(_,i){return {hp:1000,alive:true,rank:i===2?'boss':(i===1?'elite':'regular')};});
-window.currentBattleMonsters=[];window.getMonsterRank=function(m){return m&&m.rank||'regular';};window.renderBattle=function(){};
+window.currentBattleMonsters=[];window.getMonsterRank=function(m){return m&&m.rank||'regular';};window.$=function(id){return document.getElementById(id);};window.updateMonsterUI=function(){};window.renderPlayers=function(){};window.selectBattleTarget=function(){};window.openBattleStatusDetailModal=function(){};
 window.addEventListener('error',function(event){var result=document.getElementById('result');if(result&&!result.textContent){result.textContent=JSON.stringify({fixtureError:String(event.error&&event.error.stack||event.message||'unknown fixture error')});}});
 /* The focused geometry fixture supplies the public presentation boundary only;
    the exact production implementation is covered by static/runtime suites and
@@ -73,7 +91,7 @@ window.addEventListener('error',function(event){var result=document.getElementBy
 window.FourSymbolsBattlePresentation={applyUnit:function(card){if(!card)return;card.classList.add('v174-cardless-unit');var art=card.querySelector(':scope > .v174-battle-art');if(!art){art=document.createElement('div');art.className='v174-battle-art';card.insertBefore(art,card.firstChild);}card.style.setProperty('background-image','none','important');}};
 window.showDamagePopup=function(element,text,type,isCrit){var p=document.createElement('div');p.className='damage-popup hp-popup'+(isCrit?' crit':'');p.textContent=text||'-100';element.appendChild(p);return p;};
 window.showMissEffect=function(isPlayerTarget,index,label){var el=document.getElementById((isPlayerTarget?'battlePlayerCard':'battleMonster')+index);if(!el)return;var p=document.createElement('div');p.className='damage-popup miss-popup';p.textContent=label||'MISS';el.appendChild(p);};
-</script><script>${ownerSource}</script><script>${adapterSource}</script><script>${feedbackSource}</script>
+</script><script>${ownerSource}</script><script>${v131FormationSource}</script><script>${v131EnemyApplySource}</script><script>${adapterSource}</script><script>${feedbackSource}</script><script>${mainRenderHookSource}</script><script>${mainRenderSource}</script>
 <script>
 (function(){
  const owner=window.FourSymbolsBattlefieldSlots,adapter=window.FourSymbolsBattlefieldRenderGeometry;
@@ -158,19 +176,24 @@ window.showMissEffect=function(isPlayerTarget,index,label){var el=document.getEl
  drawer.classList.remove('is-expanded');
  addCards(5,6,false);
  var bossSnapshot=owner.createEnemyFormationSnapshot([0],{originalFormationType:6});
+ bossSnapshot.bossBattleSnapshot=true;
  owner.setActiveEnemySnapshot(bossSnapshot);
  owner.assignMonsterToEnemySlot(bossSnapshot,1,'ENEMY_B1');owner.assignMonsterToEnemySlot(bossSnapshot,2,'ENEMY_B5');
  owner.assignMonsterToEnemySlot(bossSnapshot,3,'ENEMY_F1');owner.assignMonsterToEnemySlot(bossSnapshot,4,'ENEMY_F5');
  window.monsters[0].rank='boss';window.monsters[1].rank='elite';window.monsters[2].rank='elite';
  window.monsters[3].unitKind='boss-object';window.monsters[3].canAct=false;window.monsters[4].unitKind='boss-object';window.monsters[4].canAct=false;
- window.FourSymbolsBossBattle={getBossIndex:function(){return 0;},isBossIndex:function(index){return index===0;}};
+ window.FourSymbolsBossBattle={getBossIndex:function(){return 0;},isBossIndex:function(index){return index===0;},isActive:function(){return true;},getEnemyFormationSnapshot:function(){if(owner.getActiveEnemySnapshot()!==bossSnapshot)owner.setActiveEnemySnapshot(bossSnapshot);return bossSnapshot;},ownsEnemyFormationSnapshot:function(snapshot){return snapshot===bossSnapshot;}};
  adapter.reconcile();
  var bossCard=document.getElementById('battleMonster0'),leftObject=document.getElementById('battleMonster3');
  bossCard.classList.add('targetable');leftObject.classList.add('targetable');
  var bossFootprint=document.querySelector('.v-fixed-boss-footprint'),bossReticle=getComputedStyle(bossCard,'::before'),objectReticle=getComputedStyle(leftObject,'::before');
  var bossHp=bossCard.querySelector('.monster-hp'),bossSp=bossCard.querySelector('.monster-sp'),bossName=bossCard.querySelector('.battle-monster-name');
  var bossEvidence={footprint:rect('.v-fixed-boss-footprint'),card:rect('#battleMonster0'),art:rect('#battleMonster0 > .v174-battle-art'),hud:{hp:rect('#battleMonster0 > .monster-hp'),sp:rect('#battleMonster0 > .monster-sp'),name:rect('#battleMonster0 > .battle-monster-name'),hpPosition:getComputedStyle(bossHp).position,spPosition:getComputedStyle(bossSp).position,hpDisplay:getComputedStyle(bossHp).display,spDisplay:getComputedStyle(bossSp).display},bossCount:document.querySelectorAll('.v-fixed-boss-footprint > #battleMonster0').length,slots:bossFootprint&&bossFootprint.dataset.slots,reinforcements:['#battleMonster1','#battleMonster2'].map(function(selector){return {card:rect(selector),art:rect(selector+' > .v174-battle-art')};}),objects:['#battleMonster3','#battleMonster4'].map(function(selector){return {card:rect(selector),art:rect(selector+' > .v174-battle-art')};}),cardless:Array.from(document.querySelectorAll('.battle-monster')).every(function(card){return card.classList.contains('v174-cardless-unit');}),pointerEvents:getComputedStyle(bossCard).pointerEvents,background:getComputedStyle(bossCard).backgroundImage,reticles:{boss:{content:bossReticle.content,border:bossReticle.borderTopWidth,animation:bossReticle.animationName},object:{content:objectReticle.content,border:objectReticle.borderTopWidth,animation:objectReticle.animationName}}};
- setTimeout(function(){var legacyStyle=document.getElementById('v174-cardless-battle-style');var result={viewport:{width:${width},height:${height}},scenarios:scenarios,allyScenarios:allyScenarios,splitAlly:splitAlly,manualControl:manualControl,collapsedDrawer:collapsedDrawer,expandedDrawer:expandedDrawer,turnUi:turnUi,artwork:artwork,beforeDeath:beforeDeath,afterDeath:afterDeath,targetSlot:targetSlot,targetRect:targetRect,boss:bossEvidence,legacyStyle:{owner:legacyStyle&&legacyStyle.dataset.geometryOwner,textLength:legacyStyle?legacyStyle.textContent.length:-1},feedback:{
+ function bossLifecycleEvidence(){var active=owner.getActiveEnemySnapshot(),bossArt=document.querySelector('#battleMonster0 > .v174-battle-art'),bossRect=bossArt&&bossArt.getBoundingClientRect();return {sameSnapshot:active===bossSnapshot,bossSlot:owner.getEnemySlotForMonster(active,0),reinforcementSlots:[owner.getEnemySlotForMonster(active,1),owner.getEnemySlotForMonster(active,2)],objectSlots:[owner.getEnemySlotForMonster(active,3),owner.getEnemySlotForMonster(active,4)],roster:window.currentBattleMonsters.slice(),reinforcements:[1,2].map(function(index){var card=document.getElementById('battleMonster'+index),holder=card&&card.parentElement,art=card&&card.querySelector(':scope > .v174-battle-art'),r=art&&art.getBoundingClientRect();return {holderSlot:holder&&holder.dataset.slot||null,artworkClear:!!(r&&bossRect&&(r.right<=bossRect.left+.5||r.left>=bossRect.right-.5))};})};}
+ var bossLifecycle={initial:bossLifecycleEvidence()};
+ window.monsters[3].alive=false;window.monsters[3].hp=0;owner.removeMonsterFromEnemySlot(bossSnapshot,3);window.renderBattle();bossLifecycle.afterF1=bossLifecycleEvidence();
+ window.monsters[4].alive=false;window.monsters[4].hp=0;owner.removeMonsterFromEnemySlot(bossSnapshot,4);window.renderBattle();window.renderBattle();bossLifecycle.afterF5=bossLifecycleEvidence();
+ setTimeout(function(){var legacyStyle=document.getElementById('v174-cardless-battle-style');var result={viewport:{width:${width},height:${height}},scenarios:scenarios,allyScenarios:allyScenarios,splitAlly:splitAlly,manualControl:manualControl,collapsedDrawer:collapsedDrawer,expandedDrawer:expandedDrawer,turnUi:turnUi,artwork:artwork,beforeDeath:beforeDeath,afterDeath:afterDeath,targetSlot:targetSlot,targetRect:targetRect,boss:bossEvidence,bossLifecycle:bossLifecycle,legacyStyle:{owner:legacyStyle&&legacyStyle.dataset.geometryOwner,textLength:legacyStyle?legacyStyle.textContent.length:-1},feedback:{
 	   monster0:monster0Feedback.map(function(node){var r=node.getBoundingClientRect(),s=getComputedStyle(node);return {kind:node.dataset.feedbackKind,statusType:node.dataset.feedbackStatusType||null,source:node.dataset.feedbackSource,lane:Number(node.dataset.feedbackLane),rect:{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height},color:s.color,stroke:s.webkitTextStroke,textShadow:s.textShadow,background:s.backgroundColor};}),
 	   monster1:monster1Feedback.map(function(node){var r=node.getBoundingClientRect(),s=getComputedStyle(node);return {kind:node.dataset.feedbackKind,statusType:node.dataset.feedbackStatusType||null,source:node.dataset.feedbackSource,lane:Number(node.dataset.feedbackLane),rect:{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height},color:s.color,stroke:s.webkitTextStroke,textShadow:s.textShadow,background:s.backgroundColor};}),
 	   monster2:monster2Feedback.map(function(node){var r=node.getBoundingClientRect(),s=getComputedStyle(node);return {kind:node.dataset.feedbackKind,statusType:node.dataset.feedbackStatusType||null,source:node.dataset.feedbackSource,lane:Number(node.dataset.feedbackLane),rect:{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height},color:s.color,stroke:s.webkitTextStroke,textShadow:s.textShadow,background:s.backgroundColor};}),
@@ -305,12 +328,14 @@ function runViewport(chrome,width,height){
     [data.boss.reinforcements[0],data.boss.objects[0]].forEach(function(side){assert.ok(side.art.centerX<=side.card.centerX-6,"left Boss-side artwork must visibly shift outward");});
     [data.boss.reinforcements[1],data.boss.objects[1]].forEach(function(side){assert.ok(side.art.centerX>=side.card.centerX+6,"right Boss-side artwork must visibly shift outward");});
     assert.equal(data.boss.reticles.boss.content,'""');assert.equal(data.boss.reticles.object.content,'""');assert.equal(data.boss.reticles.boss.border,"3px");assert.equal(data.boss.reticles.object.border,"3px");assert.equal(data.boss.reticles.boss.animation,"none");assert.equal(data.boss.reticles.object.animation,"none");
+    for(const phase of [data.bossLifecycle.initial,data.bossLifecycle.afterF1,data.bossLifecycle.afterF5]){assert.equal(phase.sameSnapshot,true,"Boss lifecycle must preserve snapshot identity");assert.equal(phase.bossSlot,"ENEMY_B3");assert.deepEqual(phase.reinforcementSlots,["ENEMY_B1","ENEMY_B5"]);assert.ok(phase.reinforcements.every(function(item,index){return item.holderSlot===["ENEMY_B1","ENEMY_B5"][index]&&item.artworkClear;}),"Boss reinforcements must remain outside the central artwork footprint");}
+    assert.deepEqual(data.bossLifecycle.initial.objectSlots,["ENEMY_F1","ENEMY_F5"]);assert.deepEqual(data.bossLifecycle.afterF1.objectSlots,[null,"ENEMY_F5"]);assert.deepEqual(data.bossLifecycle.afterF5.objectSlots,[null,null]);assert.ok(data.bossLifecycle.afterF5.roster.includes(3)&&data.bossLifecycle.afterF5.roster.includes(4),"dead Boss objects remain in the lifecycle roster without forcing compaction");
     assert.ok(data.pageScroll.width<=data.pageScroll.clientWidth+1,`horizontal page scroll ${width}x${height}`);assert.ok(data.pageScroll.height<=data.pageScroll.clientHeight+1,`vertical page scroll ${width}x${height}`);return data;
 }
 
 fs.mkdirSync(ARTIFACT_DIR,{recursive:true});
 try{
     const chrome=findChrome();const results=VIEWPORTS.map(([width,height])=>runViewport(chrome,width,height));
-    const evidence={suite:"fixed-slot-battlefield-rendering-v2",passed:true,viewports:results.map(item=>item.viewport),checks:{threeStructuralRegions:true,centerControlsIsolated:true,centerBackgroundRemoved:true,bottomBattleInfoDrawer:true,drawerCollapsedAndExpanded:true,largeElementBox:true,enemyCounts:[1,3,5,6,8,10],allyCounts:[1,2,3,4,5,6],manualActiveCharacterFlash:true,manualActiveCharacterUnique:true,autoHasNoManualFlash:true,equalEnemyCardGeometry:true,equalAllyCardGeometry:true,sixAllyNoOverlap:true,enlargedUnitCards:true,splitAllyFormation:true,deathDoesNotCompress:true,bossSingleEntity:true,bossSixSlotFootprint:true,bossHudAnchored:true,bossSideUnits:["ENEMY_B1","ENEMY_B5","ENEMY_F1","ENEMY_F5"],bossSideUnitsDoNotOverlap:true,bossSideArtworkSeparated:true,bossSideArtworkShiftedOutward:true,bossAndObjectReticles:true,dynamicCardlessImmediate:true,vfxShapes:["single","tri","row","column","all"],vfxCenterUsesGeometry:true,vfxScaleStable:true,artworkKinds:["player","regular","elite","boss","abyss"],artworkNoBattlefieldClip:true,popupKinds:["damage","critical","status","shield","miss","heal","sp"],popupUsesCanonicalUnitGeometry:true,popupCollisionFree:true,popupHudSafe:true,unifiedTypography:true,legacyRuntimeGeometryNeutralized:true,noPageScroll:true},results};
+    const evidence={suite:"fixed-slot-battlefield-rendering-v2",passed:true,viewports:results.map(item=>item.viewport),checks:{threeStructuralRegions:true,centerControlsIsolated:true,centerBackgroundRemoved:true,bottomBattleInfoDrawer:true,drawerCollapsedAndExpanded:true,largeElementBox:true,enemyCounts:[1,3,5,6,8,10],allyCounts:[1,2,3,4,5,6],manualActiveCharacterFlash:true,manualActiveCharacterUnique:true,autoHasNoManualFlash:true,equalEnemyCardGeometry:true,equalAllyCardGeometry:true,sixAllyNoOverlap:true,enlargedUnitCards:true,splitAllyFormation:true,deathDoesNotCompress:true,bossSingleEntity:true,bossSixSlotFootprint:true,bossHudAnchored:true,bossSnapshotIdentityStableAfterObjectDeath:true,bossObjectDeathDoesNotCompact:true,bossSideUnits:["ENEMY_B1","ENEMY_B5","ENEMY_F1","ENEMY_F5"],bossSideUnitsDoNotOverlap:true,bossSideArtworkSeparated:true,bossSideArtworkShiftedOutward:true,bossAndObjectReticles:true,dynamicCardlessImmediate:true,vfxShapes:["single","tri","row","column","all"],vfxCenterUsesGeometry:true,vfxScaleStable:true,artworkKinds:["player","regular","elite","boss","abyss"],artworkNoBattlefieldClip:true,popupKinds:["damage","critical","status","shield","miss","heal","sp"],popupUsesCanonicalUnitGeometry:true,popupCollisionFree:true,popupHudSafe:true,unifiedTypography:true,legacyRuntimeGeometryNeutralized:true,noPageScroll:true},results};
     fs.writeFileSync(path.join(ARTIFACT_DIR,"fixed-slot-battlefield-rendering-v2.json"),JSON.stringify(evidence,null,2)+"\n","utf8");console.log("Fixed Slot Battlefield Rendering V2 mobile browser QA passed:",VIEWPORTS.map(v=>v.join("x")).join(", "));
 }finally{try{fs.unlinkSync(FIXTURE);}catch(_){}}

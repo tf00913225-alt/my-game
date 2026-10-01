@@ -18,6 +18,11 @@ const css=read("css/fixed-slot-battlefield-rendering-v2.css");
 const build=read("scripts/build-production.mjs");
 
 assert.match(ownerSource,/window\.FourSymbolsBattlefieldSlots/);
+assert.match(v131Source,/function bossEnemyFormationAuthority\(owner\)/);
+assert.match(v131Source,/if\(bossAuthority\.owns\)\{ return bossAuthority\.snapshot; \}/,
+    "V131 must return the Boss-owned snapshot before normal formation matching");
+assert.match(v131Source,/if\(bossEnemyFormationAuthority\(owner\)\.owns\)\{ return; \}/,
+    "V131 enemy DOM projection must retire while the Large Boss owner is active");
 assert.match(v131Source,/const activeMatches=existing&&requested\.every\(index=>!!owner\.getEnemySlotForMonster\(existing,index\)\);/);
 assert.match(v131Source,/if\(activeMatches\)\{ return existing; \}/);
 assert.match(ownerSource,/getGeometryRectFromShape/);
