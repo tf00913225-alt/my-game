@@ -40,16 +40,15 @@ assert.match(frameCss,/item-modal-mode-comparison \.item-modal-box\{[^}]*max-wid
 assert.match(compareCss,/\.v17351-compare-grid\{[^}]*overflow-y:auto!important/);
 assert.match(compareCss,/\.v17351-compare-stats\{[^}]*max-height:none!important[^}]*overflow:visible!important/);
 
-assert.match(guard,/compactSkillActionLabel/);
-assert.match(guard,/Lv"\+match\[1\]\+" 解鎖/);
+assert.doesNotMatch(guard,/compactSkillActionLabel/);
+assert.doesNotMatch(guard,/Lv"\+match\[1\]\+" 解鎖/);
 assert.match(guard,/text-shadow","none","important/);
-assert.match(guard,/max-width","104px","important/);
+assert.doesNotMatch(guard,/max-width","104px","important/);
+assert.match(read("js/00-main.js"),/skill-action-card-label/);
 
 assert.match(relicCss,/team-relic-modal \.home-feature-modal-box\.wide #homeFeatureModalBody\{[^}]*overflow-y:auto!important/);
 assert.match(touch,/data-scroll-owner="x\|y\|both"/);
-assert.match(layout,/modal\.dataset\.v78CharacterLayoutActive="1"/);
-assert.match(layout,/const characterRootMounted=!!root/);
-assert.match(layout,/if\(!characterRootMounted\)\{[\s\S]*?releaseCharacterLayoutOwnership/);
-assert.match(layout,/body\.style\.removeProperty\(property\)/);
+assert.match(layout,/function applyCharacterInventoryLayout\(\)\{ return false; \}/);
+assert.doesNotMatch(layout,/v78CharacterLayoutActive|releaseCharacterLayoutOwnership|setProperty/);
 
-console.log("✓ 2026-09-09 critical UI regression guards");
+console.log("✓ 2026-09-09 critical UI retirement regression contracts");

@@ -1,3 +1,10 @@
+## 2026-10-01 — Responsive Item runtime verification continuation (candidate)
+
+- Continues merged PR #726 from fresh `dev@8760a89eb505a1c9219dbd698047e1f8344be800` on `fix/responsive-window-runtime-verification-20261001`. Actual deployed desktop QA observed the INVENTORY kicker above the clipped shell and bottom equipment labels outside their shrinking panel. Mobile acceptance remains pending.
+- Existing `css/22-stage-v78-character-inventory-core.css` is the geometry owner: title stays in normal flow; character showcase does not shrink below its own three equipment rows; one inherited gap is used in both row placement and stage height; labels retain readable text. `css/24` now owns only scroll interaction, with duplicate shell/page/panel geometry removed. No new runtime wrapper, timer, observer or late size patch.
+- `tests/responsive-window-item-owner-convergence.test.js` keeps retirement contracts. Real production index/feature-loader/bundle, modes, native scroll, six mobile viewports, in-place resize, actual existing inventory entrance handlers, late feature styles and close/reopen are checked by `.github/scripts/run-responsive-item-browser-qa.mjs`. The existing skill QA external read-only transport/CDP support is shared without changing game Runtime. Missing Chrome fails the mandatory browser suite. CI and DEV deployment run this same suite; deployed checks require exact SHA and matching production manifest.
+- Legacy critical-UI assertions now forbid the retired skill-label compression guard and require the formal native label instead. This updates the test contract only; skill gameplay and UI Runtime are untouched. Game/Cache remain 173.72; main untouched. Candidate NOT COMPLETE until exact-head CI, deployment and responsive evidence pass; physical Android acceptance remains separately recorded.
+
 ## 2026-09-29 — Bug Repair DoD / Owner Convergence Gate 永久規範
 
 - 新增永久專項契約 `docs/BUG_REPAIR_DOD_OWNER_CONVERGENCE_GATE.md`；所有 Bug／fix／failure／regression 與「是否已修好」判定都必須遵守。

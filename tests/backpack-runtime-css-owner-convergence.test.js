@@ -21,7 +21,8 @@ assert.match(css22,/#game-stage #inventoryPage #inventoryCharacterDetailButton\{
 assert.doesNotMatch(css23,/inventory-character-detail-button/);
 assert.doesNotMatch(css31,/inventoryCharacterDetailButton/);
 assert.doesNotMatch(css24,/102-SLOT|102-slot|exactly 102|no pagination|flex:1 1 auto !important/);
-assert.match(css24,/#inventoryPage\{[\s\S]*?height:100%;[\s\S]*?overflow:hidden;/);
+assert.match(css22,/#inventoryPage\{[^}]*height:100%;[^}]*overflow:hidden;/);
+assert.doesNotMatch(css24,/inventory-classic-shell|inventory-right-panel/);
 assert.match(css24,/inventoryGridScroll|inventory-grid-scroll/);
 assert.match(css38,/inventory-backpack-rarity-neutral/);
 assert.match(css50,/v169-item-art:not\(\.inventory-backpack-rarity-neutral\)/);

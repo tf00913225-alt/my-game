@@ -57,6 +57,8 @@ jobs:
           node --check .github/scripts/release-gate.mjs
           node --check .github/scripts/run-boot-architecture-browser-qa.mjs
           node --check .github/scripts/run-skill-progression-browser-qa.mjs
+          node --check .github/scripts/runtime-browser-qa-support.mjs
+          node --check .github/scripts/run-responsive-item-browser-qa.mjs
           node --check .github/scripts/run-relic-progression-browser-qa.mjs
           node --check .github/scripts/run-adventure-browser-qa.mjs
           node --check .github/scripts/run-fixed-slot-battlefield-browser-qa.mjs
@@ -176,6 +178,23 @@ jobs:
       - name: Verify production build is synchronized
         id: build_sync
         run: npm run build:check
+
+      - name: Run Responsive Item owner and production runtime regression
+        id: responsive_item_browser
+        run: |
+          node tests/responsive-window-item-owner-convergence.test.js
+          node tests/ui-critical-regressions-20260909.test.js
+          node tests/backpack-grid-bottom-action.test.js
+          node .github/scripts/run-responsive-item-browser-qa.mjs
+
+      - name: Upload Responsive Item browser evidence
+        if: always() && steps.responsive_item_browser.outcome != 'skipped'
+        uses: actions/upload-artifact@v4
+        with:
+          name: responsive-item-browser-qa-${{ github.sha }}
+          path: artifacts/browser-qa/responsive-item/
+          if-no-files-found: error
+          retention-days: 90
 
       - name: Run Touch / Scroll / Navigation mobile browser QA
         id: touch_scroll_navigation_browser

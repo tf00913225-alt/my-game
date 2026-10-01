@@ -123,6 +123,19 @@ jobs:
           done
           test "$success" = "1" || { echo "Deployed release manifest did not converge to expected SHA/version"; exit 1; }
 
+      - name: Verify deployed Responsive Item production runtime
+        id: responsive_item_live
+        run: node .github/scripts/run-responsive-item-browser-qa.mjs
+
+      - name: Upload deployed Responsive Item evidence
+        if: always() && steps.responsive_item_live.outcome != 'skipped'
+        uses: actions/upload-artifact@v4
+        with:
+          name: responsive-item-live-qa-${{ github.sha }}
+          path: artifacts/browser-qa/responsive-item/
+          if-no-files-found: error
+          retention-days: 90
+
       - name: Run deployed battle layout and VFX live QA
         run: node .github/scripts/battle-layer-audio-live-qa.mjs
 
