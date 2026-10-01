@@ -89,6 +89,9 @@ export async function battleSkillTouchFloodQa(rawClient,artifactDir){
         const enemyIds=await client.eval(`currentBattleMonsters.filter(i=>monsters[i]?.alive&&document.getElementById('battleMonster'+i)).slice(0,3)`);
         const slots=await client.eval(`FourSymbolsBattlefieldSlots.allySlots.slice(0,3)`);
         const originalSlot=await client.eval(`FourSymbolsBattlefieldSlots.getAllySlotForCharacter(0)`);
+        // Lossless screenshots at CSS-pixel resolution keep this permanent QA
+        // evidence small without changing the viewport or formal artwork.
+        const screenshotClip=await client.eval(`({x:0,y:0,width:innerWidth,height:innerHeight,scale:1/devicePixelRatio})`);
         for(const side of ['player','monster']){
             for(let column=0;column<3;column++){
                 const targetId=side==='player'?enemyIds[column]:0;
@@ -118,7 +121,7 @@ export async function battleSkillTouchFloodQa(rawClient,artifactDir){
                         const expected=Math.atan2(snapshot.dy,snapshot.dx)*180/Math.PI;
                         assert.ok(Math.abs(snapshot.angle-expected)<.1,'beast must point at target');
                     }
-                    const shot=await client.send('Page.captureScreenshot',{format:'png'});
+                    const shot=await client.send('Page.captureScreenshot',{format:'png',clip:screenshotClip});
                     fs.writeFileSync(path.join(artifactDir,'flood-'+side+'-'+column+'-'+phase+'.png'),Buffer.from(shot.data,'base64'));
                     checks.animation.push({side,column,phase,...snapshot,imagePngBase64:shot.data});
                 }
