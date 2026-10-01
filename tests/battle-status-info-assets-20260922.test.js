@@ -64,6 +64,7 @@ test("idle card inspection yields to existing target-selection interaction",()=>
 
 test("battle skill owners keep target scope, duration and presentation aligned",()=>{
   const main=read("js/00-main.js");
+  const bottomNav=read("js/04-stage-v11-native-bottom-nav-runtime.js");
   const v141=read("js/36-v141-content-systems.js");
   const v148=read("js/42-v148-combat-dungeon-fixes.js");
   const v155=read("js/46-v155-dev-fixes.js");
@@ -100,7 +101,9 @@ test("battle skill owners keep target scope, duration and presentation aligned",
   assert.match(fixedCss,/turn-target-row\.skill-picker-open\{[\s\S]*?bottom:calc\(var\(--battle-command-visual-height\) \+ 44px\)/);
   assert.match(fixedCss,/#skillQuickBar\.skill-quick-bar\{[\s\S]*?top:-82px[\s\S]*?bottom:0/);
   assert.doesNotMatch(featureBoundary,/MutationObserver/);
-  assert.match(v148,/trainingActive[\s\S]*?\?"training"/);
+  assert.match(bottomNav,/trainingActive[\s\S]*?\?"training"/);
+  assert.match(v148,/FourSymbolsBottomNav\?\.syncContext\(\)/);
+  assert.doesNotMatch(v148,/trainingActive[\s\S]*?\?"training"/);
 });
 
 test("all formal battle status assets are WebP files",()=>{
