@@ -129,7 +129,41 @@ test("battle target selection avoids the dense compositor and unrelated global U
   const selectBlock=main.slice(start,end);
   assert.ok(start>=0&&end>start);
   assert.doesNotMatch(selectBlock,/updateUI\(\)/);
-  assert.match(fixed,/\.battle-monster\.v174-cardless-unit\.targetable::after,[\s\S]*?content:none !important;[\s\S]*?display:none !important/);
+  assert.match(fixed,/\.battle-monster\.v174-cardless-unit\.targetable::after,[\s\S]*?\.battle-player\.v174-cardless-unit\.ally-targetable:not\(\.active-turn\)::after\{[\s\S]*?content:none !important;[\s\S]*?display:none !important/);
   assert.match(fixed,/\.battle-player\.v174-cardless-unit\.ally-targetable::before,[\s\S]*?\.battle-monster\.v174-cardless-unit\.targetable::before,[\s\S]*?\.battle-monster\.v174-cardless-unit\.target::before\{/);
-  assert.match(fixed,/\.battle-player\.v174-cardless-unit\.active-turn::after\{[\s\S]*?animation:none !important/);
+  const activeFrameRule=fixed.match(/#game-stage #battlePage\.v-fixed-slot-render-v2 \.battle-player\.v174-cardless-unit\.active-turn::after\{([^}]*)\}/);
+  assert.ok(activeFrameRule,"Fixed Slot must own the manual active-character frame");
+  assert.match(activeFrameRule[1],/border:3px solid #ffd21f !important/);
+  assert.match(activeFrameRule[1],/box-shadow:[^;]+!important/);
+  assert.match(activeFrameRule[1],/animation:v174ManualActiveTurnFrameFlash \.3s linear infinite !important/);
+  assert.match(fixed,/@keyframes v174ManualActiveTurnFrameFlash\{[\s\S]*?50%\{[\s\S]*?opacity:\.24/);
+  assert.doesNotMatch(activeFrameRule[1],/animation:none/);
+});
+
+test("manual active character highlight is unique and cleared for per-character auto control",()=>{
+  const main=read("js/00-main.js");
+  const beginStart=main.indexOf("function beginCharacterTurn(token)");
+  const beginEnd=main.indexOf("function clearActiveCharacterHighlight()",beginStart);
+  const beginBlock=main.slice(beginStart,beginEnd);
+  assert.ok(beginStart>=0&&beginEnd>beginStart);
+  assert.match(beginBlock,/const autoOn=[\s\S]*?getPartyAutoConfig\(activeBattleCharacterIndex\)\.enabled/);
+  assert.match(beginBlock,/clearActiveCharacterHighlight\(\);[\s\S]*?if\(!autoOn\)\{[\s\S]*?updateActiveCharacterHighlight\(\)/);
+
+  const cards=Array.from({length:3},()=>{
+    const classes=new Set();
+    return {classList:{remove:name=>classes.delete(name),toggle:(name,on)=>on?classes.add(name):classes.delete(name),contains:name=>classes.has(name)}};
+  });
+  let activeBattleCharacterIndex=0;
+  const $=id=>cards[Number(id.slice(-1))]||null;
+  const clearBody=main.match(/function clearActiveCharacterHighlight\(\)\{[\s\S]*?\n\}/)?.[0];
+  const updateBody=main.match(/function updateActiveCharacterHighlight\(\)\{[\s\S]*?\n\}/)?.[0];
+  assert.ok(clearBody&&updateBody,"canonical highlight functions must remain extractable");
+  const clear=new Function("$",`${clearBody};return clearActiveCharacterHighlight;`)($);
+  const update=new Function("$","getIndex",`${updateBody.replaceAll("activeBattleCharacterIndex","getIndex()")};return updateActiveCharacterHighlight;`)($,()=>activeBattleCharacterIndex);
+  const active=()=>cards.map((card,index)=>card.classList.contains("active-turn")?index:null).filter(index=>index!==null);
+
+  clear();update();assert.deepEqual(active(),[0]);
+  activeBattleCharacterIndex=1;clear();update();assert.deepEqual(active(),[1]);
+  activeBattleCharacterIndex=2;clear();update();assert.deepEqual(active(),[2]);
+  clear();assert.deepEqual(active(),[],"auto-controlled character must not retain a manual-control flash");
 });

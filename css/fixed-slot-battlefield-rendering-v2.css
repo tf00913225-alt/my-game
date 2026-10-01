@@ -552,16 +552,36 @@
     z-index:32 !important;
 }
 
-/* Presentation-only state effects formerly co-located with V173.51 geometry. */
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn::after{
-    border:0 !important;
-    background:none !important;
-    box-shadow:none !important;
-    animation:none !important;
+/* Fixed Slot is the production owner of the manual-control indicator. The
+   frame lives on its own pseudo-element so continuous feedback never claims
+   the Unit root or portrait animation property used by lunge/hit/dodge. */
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn::after{
+    content:"" !important;
+    position:absolute !important;
+    inset:-4px !important;
+    box-sizing:border-box !important;
+    border:3px solid #ffd21f !important;
+    border-radius:10px !important;
+    background:transparent !important;
+    box-shadow:0 0 7px 2px rgba(255,210,31,1),0 0 18px 5px rgba(255,196,0,.72) !important;
+    opacity:1;
+    pointer-events:none !important;
+    z-index:36 !important;
+    animation:v174ManualActiveTurnFrameFlash .3s linear infinite !important;
 }
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn{
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn{
     outline:0 !important;
     box-shadow:none !important;
+}
+@keyframes v174ManualActiveTurnFrameFlash{
+    0%,100%{
+        opacity:1;
+        box-shadow:0 0 7px 2px rgba(255,210,31,1),0 0 18px 5px rgba(255,196,0,.72);
+    }
+    50%{
+        opacity:.24;
+        box-shadow:0 0 14px 4px rgba(255,240,130,1),0 0 28px 8px rgba(255,210,31,.95);
+    }
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.ally-targetable,
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.target{
@@ -583,7 +603,7 @@
    ::after reticles so allies, enemies, Bosses and reinforcements can never
    display two crosshairs at once. */
 #game-stage #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.targetable::after,
-#game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.ally-targetable::after{
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.ally-targetable:not(.active-turn)::after{
     content:none !important;
     display:none !important;
     animation:none !important;

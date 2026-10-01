@@ -161,7 +161,7 @@ assert.doesNotMatch(statusText,/個百分點/,"player-visible status text must u
     assert.match(fixedCss,/\.v-fixed-enemy-slot \.battle-monster-name\{[\s\S]*?background:none !important;[\s\S]*?border:0 !important/);
     assert.match(fixedCss,/\.monster-status-badges\{[\s\S]*?bottom:40px !important;[\s\S]*?min-height:24px !important;[\s\S]*?z-index:32 !important/);
     assert.match(statusCss,/--v143-status-layer-hud:34/);
-    assert.match(fixedCss,/\.targetable::after,[\s\S]*?\.ally-targetable::after\{[\s\S]*?content:none !important;[\s\S]*?display:none !important/);
+    assert.match(fixedCss,/\.targetable::after,[\s\S]*?\.ally-targetable:not\(\.active-turn\)::after\{[\s\S]*?content:none !important;[\s\S]*?display:none !important/);
     assert.match(fixedCss,/\.ally-targetable::before,[\s\S]*?\.targetable::before,[\s\S]*?\.target::before\{/);
     assert.match(fixedCss,/\.battle-info-region:not\(\.is-expanded\)\{[\s\S]*?background:transparent/);
     assert.match(fixedCss,/\.battle-info-region\.is-expanded > #battleInfo\{[\s\S]*?background:rgba\(0,0,0,\.92\) !important/);
