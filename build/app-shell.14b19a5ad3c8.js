@@ -8283,41 +8283,6 @@ function showPage(page){
     }
 
 
-    document
-    .querySelectorAll(".nav-button")
-    .forEach(b=>{
-        b.classList.remove(
-            "active"
-        );
-    });
-
-
-    const navMap = {
-
-        home:"homeNav",
-
-        training:"trainingNav",
-
-        dungeon:"dungeonNav",
-
-        gameplay:"bossNav",
-
-        boss:"bossNav",
-
-        tower:"bossNav",
-
-        inventory:"inventoryNav"
-
-    };
-
-
-    if(navMap[page] && $(navMap[page])){
-
-        $(navMap[page]).classList.add("active");
-
-    }
-
-
     if(page==="skill"){
         renderSkillLoadout();
     }
@@ -8353,6 +8318,9 @@ function showPage(page){
 
 
     updateUI();
+    if(typeof window.v148SyncContextNavigation==="function"){
+        window.v148SyncContextNavigation();
+    }else{ window.FourSymbolsBottomNav?.renderMain(page); }
 
 }
 
@@ -26765,6 +26733,8 @@ function switchDungeonTab(tabName){
 
         }
     );
+
+    window.v148SyncContextNavigation?.();
 
 }
 

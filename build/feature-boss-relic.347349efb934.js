@@ -1357,10 +1357,6 @@
         state.tower.pendingRelicChoice=false;persist();renderTowerPage();return true;
     }
 
-    function markGameplayNav(){
-        document.querySelectorAll(".nav-button").forEach(button=>button.classList.remove("active"));
-        const button=document.getElementById("bossNav");if(button){ button.classList.add("active"); }
-    }
     function openGameplay(){ cancelTowerAutoAdvance(true);abyssSession=false;if(typeof showPage==="function"){ showPage("gameplay"); }renderGameplayHub(); }
     function openBoss(){ cancelTowerAutoAdvance(true);abyssSession=false;bossDetail=null;if(typeof showPage==="function"){ showPage("boss"); }renderBossPage(); }
     function openTower(){ abyssSession=false;towerOverviewOpen=false;if(typeof showPage==="function"){ showPage("tower"); }renderTowerPage(); }
@@ -1369,7 +1365,7 @@
         abyssSession=true;if(typeof showPage==="function"){ showPage("dungeon"); }
         if(typeof window.v174AbyssBackToSelection==="function"){ window.v174AbyssBackToSelection(); }
         else if(typeof switchDungeonTab==="function"){ switchDungeonTab("abyss"); }
-        markGameplayNav();return true;
+        return true;
     }
     function openDailyDungeons(){ cancelTowerAutoAdvance(true);abyssSession=false;if(typeof showPage==="function"){ showPage("dungeon"); }if(typeof switchDungeonTab==="function"){ switchDungeonTab("daily"); } }
 
@@ -1385,7 +1381,6 @@
             if(page==="gameplay"){ renderGameplayHub(); }
             else if(page==="boss"){ renderBossPage(); }
             else if(page==="tower"){ renderTowerPage(); }
-            else if(page==="dungeon"&&abyssSession){ markGameplayNav(); }
             return result;
         };
     }

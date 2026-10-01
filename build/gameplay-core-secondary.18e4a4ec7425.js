@@ -2936,12 +2936,10 @@
         renderContextNav(returnAction,mode);
     }
 
-    function scheduleDungeonSync(){ setTimeout(syncContextNavigation,0); }
     if(typeof switchDungeonTab==="function"){
         const previousSwitchDungeonTab=switchDungeonTab;
         switchDungeonTab=function(){
             const result=previousSwitchDungeonTab.apply(this,arguments);
-            scheduleDungeonSync();
             syncQuestNoticeDots();
             return result;
         };
@@ -2950,21 +2948,10 @@
         const previousShowPage=showPage;
         showPage=function(page){
             const result=previousShowPage.apply(this,arguments);
-            scheduleDungeonSync();
             syncQuestNoticeDots();
             return result;
         };
     }
-    ["v141StartAbyss","v141ResetAbyss"].forEach(functionName=>{
-        const previous=window[functionName];
-        if(typeof previous!=="function"){ return; }
-        window[functionName]=function(){
-            const result=previous.apply(this,arguments);
-            scheduleDungeonSync();
-            return result;
-        };
-    });
-
     if(typeof window.v141AbyssMoveByEvent==="function"){
         const previousAbyssMove=window.v141AbyssMoveByEvent;
         window.v141AbyssMoveByEvent=function(event){
@@ -3057,7 +3044,7 @@
         const observer=new MutationObserver(()=>{
             if(queued){ return; }
             queued=true;
-            requestAnimationFrame(()=>{ queued=false; syncContextNavigation(); syncQuestNoticeDots(); });
+            requestAnimationFrame(()=>{ queued=false; syncQuestNoticeDots(); });
         });
         const observe=()=>[
             document.getElementById("mapPage"),
