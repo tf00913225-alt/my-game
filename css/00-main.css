@@ -3265,14 +3265,16 @@ button:active{
    避免混淆「誰在攻擊」跟「攻擊誰」。
 */
 
-.battle-player.active-turn{
+.battle-player.active-turn:not(.v174-cardless-unit){
     position:relative;
 }
 
-/* V95 — 當前手動操作角色使用獨立外框層快速閃爍。
+/* V95 legacy battlefield compatibility only. Fixed Slot V2 owns the current
+   production manual-control frame in fixed-slot-battlefield-rendering-v2.css.
+   當前手動操作角色使用獨立外框層快速閃爍。
    閃爍不再佔用卡片本身的 animation，因此不會蓋掉
    攻擊前傾、受擊、MISS 後退等既有動畫。 */
-.battle-player.active-turn::after{
+.battle-player.active-turn:not(.v174-cardless-unit)::after{
     content:"";
     position:absolute;
     inset:-4px;
@@ -3283,11 +3285,11 @@ button:active{
     animation:activeTurnFrameFlash .28s linear infinite;
 }
 
-.battle-player.active-turn.attacker-lunge-up{
+.battle-player.active-turn:not(.v174-cardless-unit).attacker-lunge-up{
     animation:lungeUp .45s ease;
 }
 
-.battle-player.active-turn.dodge-back{
+.battle-player.active-turn:not(.v174-cardless-unit).dodge-back{
     animation:dodgeBack .45s ease;
 }
 
