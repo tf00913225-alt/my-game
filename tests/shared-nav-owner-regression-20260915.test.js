@@ -60,3 +60,10 @@ test("gameplay panel keeps only the top ornament owner",()=>{
     assert.doesNotMatch(read("js/00-main.js"),/enforceVirtualStageLayout|nav\.style\.width/);
     assert.match(read("js/04-stage-v11-native-bottom-nav-runtime.js"),/frame\.className="nav-icon-frame"/);
  });
+
+ test("home backdrop cannot force the full legacy surface into the home scroll area",()=>{
+    const css=read("css/00-main.css");
+    assert.match(css,/\.home-bg-fixed-layer\{\s*position:absolute;\s*inset:0;/);
+    assert.doesNotMatch(css,/#game-stage > #app > #game-content \.home-bg-fixed-layer/);
+    assert.doesNotMatch(read("css/02-stage-v3-layout-fix.css"),/#game-stage > #app > #game-content \.home-bg-fixed-layer/);
+ });

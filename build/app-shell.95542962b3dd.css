@@ -66,7 +66,6 @@
 
 /* Full-screen overlays must use the virtual design surface,
    not the real browser viewport. */
-#game-stage > #app > #game-content .home-bg-fixed-layer,
 #game-stage > #app > #game-content .map-bg-fixed-layer,
 #game-stage > #app > #game-content .training-bg-fixed-layer{
     position:absolute !important;

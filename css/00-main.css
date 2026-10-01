@@ -697,7 +697,7 @@ button:disabled{
 }
 
 .home-bg-fixed-layer{
-    position:fixed;
+    position:absolute;
     inset:0;
     z-index:0;
 
@@ -6354,7 +6354,6 @@ html, body{
    transformed 420×746.6667 design surface. 100vw/100vh
    would otherwise escape to the real browser viewport.
 */
-#game-stage > #app > #game-content .home-bg-fixed-layer,
 #game-stage > #app > #game-content .map-bg-fixed-layer,
 #game-stage > #app > #game-content .training-bg-fixed-layer{
     position:absolute !important;
