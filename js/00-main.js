@@ -3833,6 +3833,7 @@ let battleInputResumeToken=null;
 let battleResolutionResumeToken=null;
 let battleAutoActionResume=null;
 let battleRoundPromptTimeoutId=null;
+let battleActionNoticeTimeoutId=null;
 let battleRoundPromptRelease=null;
 let activeBattleStatisticsAction=null;
 /*
@@ -4053,6 +4054,43 @@ function clearBattleRoundPrompt(){
         battleRoundPromptRelease=null;
         release();
     }
+}
+
+function clearBattleActionNotice(){
+    if(battleActionNoticeTimeoutId){
+        clearTimeout(battleActionNoticeTimeoutId);
+        battleActionNoticeTimeoutId=null;
+    }
+    const notice=typeof document!=="undefined"
+        ?document.getElementById("battleActionNotice")
+        :null;
+    if(notice){
+        notice.hidden=true;
+        notice.classList.remove("show");
+    }
+}
+
+function showBattleActionNotice(message){
+    const page=typeof document!=="undefined"
+        ?document.getElementById("battlePage")
+        :null;
+    if(!page){ return false; }
+
+    clearBattleActionNotice();
+    let notice=document.getElementById("battleActionNotice");
+    if(!notice){
+        notice=document.createElement("div");
+        notice.id="battleActionNotice";
+        notice.className="battle-round-prompt battle-action-notice";
+        notice.setAttribute("role","status");
+        notice.setAttribute("aria-live","polite");
+        page.appendChild(notice);
+    }
+    notice.textContent=String(message||"");
+    notice.hidden=false;
+    notice.classList.add("show");
+    battleActionNoticeTimeoutId=setTimeout(clearBattleActionNotice,1800);
+    return true;
 }
 
 function showAutoBattleRoundPrompt(token){
@@ -12072,11 +12110,11 @@ function prepareAction(type){
                 );
 
                 if(!hasValidTarget){
-                    addBattleLog(
-                        skill.targetType==="deadAlly"
-                        ? "目前沒有陣亡的隊友可供復活。"
-                        : "目前沒有可選擇的友方目標。"
-                    );
+                    const rejectionMessage=skill.targetType==="deadAlly"
+                        ? "我方目前沒有人死亡，無法使用復活術。"
+                        : "目前沒有可選擇的友方目標。";
+                    addBattleLog(rejectionMessage);
+                    showBattleActionNotice(rejectionMessage);
                     return;
                 }
 
