@@ -32,3 +32,9 @@ The former lazy V148 context selector and CSS42 global 7px dot override are reti
 - home remains non-scrolling while formal backpack/skill scroll owners remain usable.
 
 Local source tests and deterministic build checks pass. Local browser execution is unavailable when Chrome/Chromium is absent; CI and deployed DEV evidence must be recorded separately before VERIFIED.
+
+## PR verification log
+
+- PR #747 run 3832 exposed and corrected one stale owner assertion before browser QA.
+- PR #747 run 3834 passed source, owner and build-sync checks, then stalled in the pre-existing CJK font installation step; it is not accepted as browser evidence.
+- A fresh run on the final PR head must complete the browser matrix before merge.
