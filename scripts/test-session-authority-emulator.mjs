@@ -353,7 +353,8 @@ assert.equal((await invoke("claimDailyCheckin",atomicUser.idToken,atomicRequest.
     .unchanged,true);
 // Both public retry paths must inspect immutable credit proof in the real
 // transaction. Admin mutations below exist only in this disposable emulator.
-const atomicRoot=db.collection(`serverUsers/${atomicUid}`);
+const atomicRoot=db.doc(`serverUsers/${atomicUid}`);
+const atomicRef=path=>db.doc(`${atomicRoot.path}/${path}`);
 const atomicOperation=`${atomicClaim.grantId}-credit`;
 const atomicLedger=atomicRoot.collection("ledgerEntries").doc(atomicOperation);
 assert.equal((await atomicLedger.get()).get("balanceBefore"),0);
@@ -373,14 +374,14 @@ for(const [path,patch] of [
     [`claimRecords/${atomicClaim.grantId}`,{operationId:"corrupt-operation-0001"}],
     [`operations/${atomicOperation}`,{schemaVersion:1,kind:"collision"}]
 ]){
-    const ref=atomicRoot.doc(path),saved=await ref.get();
+    const ref=atomicRef(path),saved=await ref.get();
     if(patch===null)await ref.delete();
     else if(saved.exists)await ref.update(patch);else await ref.set(patch);
     // Compare all authoritative writes relevant to this operation, including
     // the tampered proof; a rejection must not try to repair/reissue it.
     const refs=[db.doc(`users/${atomicUid}/saves/current`),
-        atomicRoot.doc("economy/current"),atomicLedger,
-        atomicRoot.doc(`grantOperations/${atomicOperation}`),ref];
+        atomicRef("economy/current"),atomicLedger,
+        atomicRef(`grantOperations/${atomicOperation}`),ref];
     const before=await Promise.all(refs.map(async item=>(await item.get()).data()));
     for(const retry of [replayAtomic,reserveAtomic]){
         await assert.rejects(retry(),error=>error.code==="DATA_LOSS");
