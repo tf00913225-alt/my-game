@@ -328,15 +328,15 @@ const firstPlayResources=[...firstPlayByPath.values()].sort((a,b)=>(priorityRank
 const firstPlayBase={schemaVersion:firstPlayTemplate.schemaVersion||1,id:firstPlayTemplate.id,manifestVersion:firstPlayTemplate.manifestVersion,assetPackVersion:firstPlayTemplate.assetPackVersion,concurrency:firstPlayTemplate.concurrency||5,resources:firstPlayResources};
 const firstPlayPack={...firstPlayBase,manifestHash:hash(JSON.stringify(firstPlayBase)),totalBytes:firstPlayResources.reduce((sum,item)=>sum+item.bytes,0),totalResources:firstPlayResources.length};
 const portraitRegistry=JSON.parse(read("config/monster-portrait-registry.json"));
-const runtimePortraits={
-    fire:portraitRegistry.assetPool.entries
-        .filter(entry=>entry.element==="fire"&&entry.status==="adopted")
+const runtimePortraits=Object.fromEntries(["fire","wind"].map(element=>[element,
+    portraitRegistry.assetPool.entries
+        .filter(entry=>entry.element===element&&entry.status==="adopted")
         .map(entry=>{
             const pathName=entry.runtimePath;
             const content=bytes(pathName);
             return {assetId:entry.assetId,displayName:entry.displayName,path:pathName,sha256:hash(content),bytes:content.length,decode:true};
         })
-};
+]));
 const assetManifest={
     schemaVersion:1,release:release.version,generatedAt:"deterministic",
     critical:{scripts:[bootOutput.path],styles:[styleOutputs.critical.path],images:[...criticalImagePaths],firebaseBootstrap:firebaseMap["firebase-bootstrap.js"]},

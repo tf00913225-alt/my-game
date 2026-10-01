@@ -194,6 +194,20 @@
         "verification": "targeted regression、production build/build:check、PR #635 CI #3400、dev CI #3401、Cloudflare DEV deployment gate 與 360×800／393×873／412×915 gameplay cover browser QA",
         "result": "Daily Registry Pending／Ready／Failed、三張副本立繪 decode gate、Gameplay Hub critical artwork gate 與 dark fallback 均已驗證；部署 SHA 與 dev HEAD 一致"
       }
+    },
+    {
+      "id": "REQ-WIND-PORTRAITS-20261001",
+      "title": "風元素野怪與四象塔怪物立繪接入及逐項驗收",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "release/requirement-batches/2026-10-01-wind-monster-portraits.json",
+          "config/monster-portrait-registry.json",
+          "config/monster-asset-provenance.json"
+        ],
+        "verification": "本機 50 張來源與成品 SHA-256、像素、解碼、透明度通過；最新 PR CI 瀏覽器驗收、DEV 部署及實機顯示尚待核對",
+        "result": "風元素素材與引用已在候選 PR；未完成 DEV 與實機驗收前保持 IMPLEMENTED"
+      }
     }
   ]
 }

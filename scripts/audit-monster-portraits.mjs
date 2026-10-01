@@ -115,6 +115,12 @@ if(finalStart<0||finalEnd<0){
 
 discovered.push("天兵天將");
 
+// Tower rotations resolve explicit asset IDs through the Registry at encounter
+// construction time, so their display names are data rather than JS literals.
+const towerIds=new Set(collectMatches(bossTower,/"(MON_(?:FIRE|WIND)_(?:NORMAL|ELITE|MINIBOSS)_\d{3})"/g));
+(registry.assetPool?.entries||[]).filter(entry=>entry.element==="wind"&&entry.status==="adopted"&&towerIds.has(entry.assetId))
+    .forEach(entry=>discovered.push(entry.displayName));
+
 const runtimeNames=uniq(discovered);
 const registryNames=uniq(targets.map(target=>target.name));
 const unregistered=runtimeNames.filter(name=>!registryNames.includes(name)).sort();
