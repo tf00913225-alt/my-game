@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import {spawn,spawnSync} from "node:child_process";
+import {battleSkillTouchFloodQa} from './battle-skill-touch-flood-qa.mjs';
 
 const baseUrl=String(process.env.DEV_BASE_URL||"https://dev.four-symbols-dev.pages.dev").replace(/\/$/,"");
 const expectedSha=String(process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||"");
@@ -700,6 +701,8 @@ try{
     assert.equal(spQuickBar.insufficient,false,`${spQuickBar.skillId} must not keep the insufficient-SP class when enoughSP is true`);
     assert.equal(spQuickBar.blockHidden,true,`${spQuickBar.skillId} insufficient-SP overlay should be semantically hidden`);
     assert.equal(spQuickBar.blockDisplay,"none",`${spQuickBar.skillId} insufficient-SP overlay must be visually hidden`);
+
+    evidence.checks.skillTouchFlood=await battleSkillTouchFloodQa(client,artifactDir);
 
     const infoDrawer=await client.eval(`(()=>{
         const region=document.querySelector('#battlePage .battle-info-region');

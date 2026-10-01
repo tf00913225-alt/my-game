@@ -1,3 +1,13 @@
+## 2026-10-01 — Battle Skill Touch / Flood Beast Direction（IMPLEMENTED candidate）
+
+- Started from live dev `08d5c3cf6e327e3d9dda033dad4c42b7d66f2d64`; incorporated responsive-window dev `8760a89eb505a1c9219dbd698047e1f8344be800` by a normal work-branch merge. No main/dev direct write, rebase or force push.
+- Touch owner remains `js/01-stage-v8-touch-lock.js`: completed gestures are keyed by pointer ID, expire after 1000ms, consume once, and retire on new pointer/lifecycle/detached target. Legacy MouseEvent ambiguity clears on next down. Cancel, leave, multi-touch and keyboard activation have explicit behavior; the 10 CSS px slop is unchanged. The node-only unbounded `suppressedTargets` list is removed.
+- Manual declaration owner is `js/00-main.js::prepareAction()` for all three roles. V141 support-skills wrapper is removed; all roles share learned/equipped/SP/auto/phase checks. V148 Purify target projection runs from the existing ally selection hook, not a prepareAction wrapper.
+- V143 remains the raster owner; V142 timing and fixed-slot geometry are unchanged. Reviewed 1536×1152, 4×3 sheet SHA-256 `bfb1a3520a5bb95104e98d3dc6d2b3d1d6c9b2bb686b6e64a0f4840e6fcc7327`: frames 1–2 cast upright at caster; 3–5 right-facing flight; frame 6 downward-facing flight corrected by 90 degrees; 7–12 upright impact/dissipation at target. Existing 1350ms and frame-eight hit are retained. `motionPhases` supplies one V143 Web Animations transform track; CSS owns only frame/opacity for that path. Other skills keep their existing travel mode. Disposal cancels the motion track. No assets were altered or derived.
+- Targeted gesture, three-role declaration and water raster regressions pass locally; two historical Water tests were aligned to the existing V173.64 data owner (no gameplay data change). Build/build:check and diff check pass.
+- Existing CI browser owners now include native CDP touch recovery and full-production battle skill/phase/target/hitbox checks plus both-side/three-column phased-motion screenshots embedded in the existing JSON artifact. Browser checks have NOT yet run in this local environment (no Chromium). Physical S23 Ultra validation is pending; recording SHA/cache remain unknown. Do not call the contributing causes the sole complete root cause or mark VERIFIED.
+- Known unrelated baseline tests also failed locally: V141 inventory grid snapshot and V143 skill-label CSS snapshot. They were not weakened. Exact PR CI, merge and deployment evidence must be recorded only after actual execution.
+
 ## 2026-09-29 — Bug Repair DoD / Owner Convergence Gate 永久規範
 
 - 新增永久專項契約 `docs/BUG_REPAIR_DOD_OWNER_CONVERGENCE_GATE.md`；所有 Bug／fix／failure／regression 與「是否已修好」判定都必須遵守。
