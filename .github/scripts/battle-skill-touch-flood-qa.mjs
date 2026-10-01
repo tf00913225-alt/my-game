@@ -93,7 +93,10 @@ export async function battleSkillTouchFloodQa(rawClient,artifactDir){
             for(let column=0;column<3;column++){
                 const targetId=side==='player'?enemyIds[column]:0;
                 assert.ok(Number.isInteger(targetId));
-                if(side==='monster'){await client.eval(`FourSymbolsBattlefieldSlots.moveAllyCharacter(0,${JSON.stringify(slots[column])});updateUI();true`);}
+                if(side==='monster'){
+                    const projected=await client.eval(`(()=>{FourSymbolsBattlefieldSlots.moveAllyCharacter(0,${JSON.stringify(slots[column])});FourSymbolsBattlefieldRenderGeometry.reconcile();updateUI();return document.getElementById('battlePlayerCard0').dataset.slot;})()`);
+                    assert.equal(projected,slots[column],'moved target must be rendered in its canonical slot');
+                }
                 for(const [phase,time] of [['cast',.08],['flight',.3],['impact',.65],['dissipate',.92]]){
                     console.log('Battle touch/flood QA: '+side+' target '+column+' '+phase);
                     const snapshot=await client.eval(`(()=>{
@@ -121,7 +124,7 @@ export async function battleSkillTouchFloodQa(rawClient,artifactDir){
                 }
             }
         }
-        await client.eval(`FourSymbolsBattlefieldSlots.moveAllyCharacter(0,${JSON.stringify(originalSlot)});v142SkillAnimationDirector.dispose();true`);
+        await client.eval(`FourSymbolsBattlefieldSlots.moveAllyCharacter(0,${JSON.stringify(originalSlot)});FourSymbolsBattlefieldRenderGeometry.reconcile();v142SkillAnimationDirector.dispose();true`);
         return checks;
     }finally{
         await client.eval(`(()=>{if(!window.__touchQa)return;clearTimeout(battleAdvanceTimeoutId);battleAdvanceTimeoutId=null;battleAdvanceScheduled=false;finishPlayerAction=__touchQa.finish;for(const key of Object.keys(characterSkillLoadouts)){delete characterSkillLoadouts[key];}Object.assign(characterSkillLoadouts,__touchQa.loadouts);player.sp=__touchQa.sp;activeBattleCharacterIndex=__touchQa.index;battlePhase=__touchQa.phase;autoBattle=__touchQa.auto;actionReady=__touchQa.ready;pendingAction=__touchQa.pending;queuedPlayerActions=__touchQa.queued;clearBattleTargetSelectionMode();closeMenus();delete window.__touchQa;delete window.__touchQaReset;updateUI();return true;})()`);
