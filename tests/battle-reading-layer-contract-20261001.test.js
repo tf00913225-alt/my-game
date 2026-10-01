@@ -67,6 +67,6 @@ test("reading state is paint-only and is synchronized at rebuild, teardown and n
     assert.match(syncBody,/v174-battle-reading-open/);
     assert.doesNotMatch(syncBody,/FourSymbolsBattleFlow|acquirePresentationLock|acquirePauseLock|battleActive\s*=|clearTimeout|clearInterval/);
     assert.match(finishBody,/closeBattleStatusDetailModal\(\);[\s\S]*setBattleInfoExpanded\(false\);[\s\S]*syncBattleUiPriorityLayer\(\);/);
-    assert.match(source,/runBattleRenderHooks\("after",this,arguments\);\s*syncBattleUiPriorityLayer\(\);/);
+    assert.match(source,/runBattleRenderHooks\("after",this,arguments\);\s*if\(typeof syncBattleUiPriorityLayer==="function"\)\{\s*syncBattleUiPriorityLayer\(\);\s*\}/);
     assert.match(source,/target\.classList\.add\([\s\S]*?"active"[\s\S]*?\);[\s\S]*?syncBattleUiPriorityLayer\(\);/);
 });

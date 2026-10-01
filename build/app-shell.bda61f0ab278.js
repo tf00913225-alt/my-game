@@ -22409,7 +22409,9 @@ function renderBattle(){
     }
 
     runBattleRenderHooks("after",this,arguments);
-    syncBattleUiPriorityLayer();
+    if(typeof syncBattleUiPriorityLayer==="function"){
+        syncBattleUiPriorityLayer();
+    }
 
 
     /*
