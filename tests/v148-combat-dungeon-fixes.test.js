@@ -336,24 +336,25 @@ test("Abyss movement freezes the current frame and accepts a new direction",()=>
     assert.equal(player.style.top,"40%");
 });
 
-test("Abyss final nav heals stale five-button markup even when mode and count match",()=>{
-    let html="";
-    const labels=["角色","背包","商店","元素匣","返回"];
-    const stale=labels.map((label,index)=>element({getAttribute:name=>name==="aria-label"?label:(name==="onclick"?(index===4?"showPage('home')":"legacy()") : ""),querySelector:()=>index===2?{getAttribute:()=>"assets/ui/home-shop-v147.png"}:null}));
-    const nav=element({dataset:{v148Mode:"abyss-map"},children:stale});
-    Object.defineProperty(nav,"innerHTML",{get:()=>html,set:value=>{ html=value; nav.children=[1,2,3,4,5]; }});
+test("Abyss projects five context buttons into the canonical native shell",()=>{
+    const calls=[];
     const page=element({classList:classList(["active"]),querySelector:selector=>selector===".v141-abyss-shell"?{}:null});
     const topReturn=element();
-    const context=baseContext({document:{readyState:"complete",body:element(),addEventListener(){},querySelector:()=>null,querySelectorAll:()=>[],getElementById:id=>id==="dungeonPage"?page:id==="v141DungeonNav"?nav:id==="v146AbyssReturn"?topReturn:null}});
+    const context=baseContext({
+        FourSymbolsBottomNav:{renderContext:(buttons,mode)=>calls.push({buttons,mode}),renderMain(){},hide(){}},
+        document:{readyState:"complete",body:element(),addEventListener(){},querySelector:()=>null,querySelectorAll:()=>[],
+            getElementById:id=>id==="dungeonPage"?page:id==="v146AbyssReturn"?topReturn:null}
+    });
     context.v148SyncDungeonShell();
-    assert.equal((html.match(/<button/g)||[]).length,5);
-    assert.match(html,/aria-label="秘寶"/);
-    assert.match(html,/src="assets\/ui\/nav-relic-v175\.webp"/);
-    assert.match(html,/aria-label="返回"/);
-    assert.doesNotMatch(html,/aria-label="商店"|aria-label="主城"/);
-    assert.equal(nav.dataset.v146Columns,"5");
+    assert.ok(calls.length>=1);
+    const projected=calls.at(-1);
+    assert.equal(projected.buttons.length,5);
+    assert.equal(projected.buttons[2][0],"秘寶");
+    assert.equal(projected.buttons[2][1],"assets/ui/nav-relic-v175.webp");
+    assert.equal(projected.buttons[4][0],"返回");
+    assert.equal(projected.mode,"abyss-map");
     assert.notEqual(topReturn.removed,true);
-    assert.match(source,/function contextNavMatches\(nav,returnAction\)/);
+    assert.doesNotMatch(source,/createElement\("div"\)[\s\S]*?v141DungeonNav/);
 });
 
 console.log("\nV148 combat/dungeon fixes suite: "+passed+" tests passed.");

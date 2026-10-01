@@ -8335,11 +8335,9 @@ function showPage(page){
     };
 
 
-    if(navMap[page]){
+    if(navMap[page] && $(navMap[page])){
 
-        $(navMap[page])
-            .classList
-            .add("active");
+        $(navMap[page]).classList.add("active");
 
     }
 

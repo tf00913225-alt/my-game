@@ -1,48 +1,49 @@
-
-/* ============================================================
-   V11 — FIRST REAL NATIVE UI MIGRATION: BOTTOM NAVIGATION
-
-   The existing bottom navigation is visually preserved.
-   Its final placement is now expressed in the native 1080×1920
-   coordinate system, rather than being tied to browser viewport
-   positioning.
-
-   Legacy gameplay remains untouched.
-============================================================ */
-
+/* Canonical navigation geometry: one shell in the 1080 x 1920 overlay.
+   Context changes only the five button contents. */
 #game-stage > #game-overlay-layer .native-bottom-nav-layer{
-    position:absolute !important;
-    left:0 !important;
-    top:0 !important;
-    width:1080px !important;
-    height:1920px !important;
-    pointer-events:none !important;
+    position:absolute;
+    inset:auto 0 0;
+    width:1080px;
+    height:216px;
+    pointer-events:auto;
+    z-index:200;
 }
-
-#game-stage > #game-overlay-layer .native-bottom-nav-layer .native-bottom-nav{
-    position:absolute !important;
-
-    /* Legacy 420px design translated to native 1080px space */
-    left:0 !important;
-    bottom:0 !important;
-
-    width:1080px !important;
-
-    box-sizing:border-box !important;
-    pointer-events:auto !important;
-
-    display:flex !important;
-    justify-content:center !important;
-    align-items:flex-end !important;
+#game-stage > #game-overlay-layer .native-bottom-nav-layer[hidden]{display:none;}
+#game-stage > #game-overlay-layer .native-bottom-nav-layer > #bottomNav{
+    position:relative;
+    inset:auto;
+    display:grid;
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    width:1080px;
+    max-width:none;
+    height:216px;
+    margin:0;
+    transform:none;
+    box-sizing:border-box;
+    border:0;
+    border-top:5px solid #8a6a3a;
+    border-radius:0;
+    background:linear-gradient(0deg,#0e0c0a,#1c1712);
 }
-
-/* The rendered element and its whole grid cell are the hitbox. Artwork and
-   screen-reader label never steal the pointer target. */
-#game-stage > #game-overlay-layer .native-bottom-nav .nav-button,
-#game-stage > #game-overlay-layer .native-map-nav .nav-button{
-    min-width:132px !important;
-    min-height:132px !important;
+#game-stage > #game-overlay-layer #bottomNav > .nav-button{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-width:0;
+    width:100%;
+    height:100%;
+    padding:0;
+    box-sizing:border-box;
     touch-action:manipulation;
 }
-#game-stage > #game-overlay-layer .native-bottom-nav .nav-button > *,
-#game-stage > #game-overlay-layer .native-map-nav .nav-button > *{ pointer-events:none; }
+/* The image itself is the fixed icon frame for every context. */
+#game-stage > #game-overlay-layer #bottomNav .nav-art-button{
+    display:block;
+    width:180px;
+    height:180px;
+    max-width:100%;
+    max-height:100%;
+    object-fit:contain;
+    object-position:center;
+}
+#game-stage > #game-overlay-layer #bottomNav > .nav-button > *{pointer-events:none;}

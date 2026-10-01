@@ -425,8 +425,6 @@
         const abyssActive=abyssMapActive||abyssSelectionActive;
         page.classList.toggle("v146-abyss-active",abyssActive);
         page.classList.toggle("v146-abyss-intro-mode",active&&!!page.querySelector(".v141-abyss-intro"));
-        const nav=document.getElementById("v141DungeonNav");
-        if(nav){ nav.dataset.v146Columns="5"; }
         if(typeof window.v148SyncContextNavigation==="function"){
   window.v148SyncContextNavigation();
         }else if(typeof window.v148SyncDungeonShell==="function"){
@@ -745,7 +743,7 @@
         const attention=getCharacterGrowthAttention();
         const homeButton=document.getElementById("homeIconCharacter")?.parentElement||null;
         setCharacterAttentionDot(homeButton,attention.show,attention.label);
-        document.querySelectorAll("#mapPageNav button[aria-label='角色']").forEach(button=>{
+        document.querySelectorAll("#bottomNav button[aria-label='角色']").forEach(button=>{
             setCharacterAttentionDot(button,attention.show,attention.label);
         });
         clearLegacyHudExpAttention();

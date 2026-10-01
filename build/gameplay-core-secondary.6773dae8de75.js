@@ -1024,8 +1024,6 @@
         const abyssActive=abyssMapActive||abyssSelectionActive;
         page.classList.toggle("v146-abyss-active",abyssActive);
         page.classList.toggle("v146-abyss-intro-mode",active&&!!page.querySelector(".v141-abyss-intro"));
-        const nav=document.getElementById("v141DungeonNav");
-        if(nav){ nav.dataset.v146Columns="5"; }
         if(typeof window.v148SyncContextNavigation==="function"){
   window.v148SyncContextNavigation();
         }else if(typeof window.v148SyncDungeonShell==="function"){
@@ -1344,7 +1342,7 @@
         const attention=getCharacterGrowthAttention();
         const homeButton=document.getElementById("homeIconCharacter")?.parentElement||null;
         setCharacterAttentionDot(homeButton,attention.show,attention.label);
-        document.querySelectorAll("#mapPageNav button[aria-label='角色']").forEach(button=>{
+        document.querySelectorAll("#bottomNav button[aria-label='角色']").forEach(button=>{
             setCharacterAttentionDot(button,attention.show,attention.label);
         });
         clearLegacyHudExpAttention();
@@ -2790,7 +2788,7 @@
         const notices=questRewardNoticeState();
         const home=document.getElementById("homeIconQuest");
         setQuestNoticeDot(home&&home.parentElement?home.parentElement:home,notices.any,"任務獎勵可領取");
-        document.querySelectorAll("#mapPageNav button[aria-label='任務'],#v141DungeonNav button[aria-label='任務']")
+        document.querySelectorAll("#bottomNav button[aria-label='任務']")
             .forEach(button=>setQuestNoticeDot(button,notices.any,"任務獎勵可領取"));
         document.querySelectorAll("#homeFeatureModal.quest-mode .quest-tab").forEach(tab=>{
             const marker=((tab.getAttribute("onclick")||"")+" "+(tab.textContent||"")).toLowerCase();
@@ -2829,30 +2827,10 @@
         Object.freeze(["元素匣","assets/ui/nav-element-box.png","openHomeFeature('autoBattleSettings')"])
     ]);
 
-    function contextNavMarkup(returnAction){
+    function renderContextNav(returnAction,mode){
         const buttons=CONTEXT_NAV_ITEMS.map(item=>item.slice());
         buttons.push(["返回","assets/ui/map-return.png",returnAction]);
-        return buttons.map(button=>'<button class="nav-button nav-art-button-wrap" onclick="'+button[2]+'" aria-label="'+button[0]+'"><img class="nav-art-button" src="'+button[1]+'" alt=""><span class="nav-sr-only">'+button[0]+'</span></button>').join("");
-    }
-
-    function contextNavMatches(nav,returnAction){
-        const buttons=Array.from(nav&&nav.children||[]);
-        if(buttons.length!==5){ return false; }
-        const labels=buttons.map(button=>button&&typeof button.getAttribute==="function"?button.getAttribute("aria-label"):"").join("|");
-        if(labels!=="角色|背包|秘寶|元素匣|返回"){ return false; }
-        const relicImage=buttons[2]&&typeof buttons[2].querySelector==="function"?buttons[2].querySelector("img"):null;
-        if(!relicImage||relicImage.getAttribute("src")!=="assets/ui/nav-relic-v175.webp"){ return false; }
-        const action=buttons[4]&&typeof buttons[4].getAttribute==="function"?buttons[4].getAttribute("onclick"):"";
-        return action===returnAction;
-    }
-
-    function renderContextNav(nav,returnAction,mode){
-        if(!nav){ return; }
-        if(nav.dataset.v148Mode!==mode||!contextNavMatches(nav,returnAction)){
-  nav.innerHTML=contextNavMarkup(returnAction);
-  nav.dataset.v148Mode=mode;
-        }
-        nav.dataset.v146Columns="5";
+        window.FourSymbolsBottomNav?.renderContext(buttons,mode);
     }
 
     function dungeonReturnAction(abyssMapActive,abyssSelectionActive){
@@ -2903,15 +2881,12 @@
         const page=document.getElementById("dungeonPage");
         const trainingPage=document.getElementById("trainingPage");
         const app=document.getElementById("app");
-        const patrolNav=document.getElementById("mapPageNav");
-        if(patrolNav){
-            renderContextNav(patrolNav,"leaveMap()","patrol");
-        }
         const gameplayPageId=activeGameplayPageId();
         const dungeonActive=!!(page&&page.classList&&page.classList.contains("active"));
         const trainingActive=!!(trainingPage&&trainingPage.classList&&trainingPage.classList.contains("active"));
         const gameplayActive=!!gameplayPageId;
-        const contextActive=dungeonActive||gameplayActive||trainingActive;
+        const mapActive=!!document.getElementById("mapPage")?.classList.contains("active");
+        const contextActive=mapActive||dungeonActive||gameplayActive||trainingActive;
         if(app&&app.classList&&typeof app.classList.toggle==="function"){
   app.classList.toggle("v148-context-nav-active",contextActive);
         }
@@ -2932,28 +2907,33 @@
   topReturn.remove();
         }
 
-        let nav=document.getElementById("v141DungeonNav");
-        if(contextActive&&!nav&&typeof document.createElement==="function"){
-  nav=document.createElement("div");
-  nav.id="v141DungeonNav";
-  nav.className="map-page-nav v141-dungeon-nav v148-context-nav";
-  const owner=document.getElementById("game-content")||app;
-  if(owner&&typeof owner.appendChild==="function"){ owner.appendChild(nav); }
+        if(app?.classList?.contains("inventory-overlay-open")){
+            window.FourSymbolsBottomNav?.hide();
+            return;
         }
-        if(!nav||!contextActive){ return; }
-        if(nav.classList&&typeof nav.classList.add==="function"){ nav.classList.add("v148-context-nav"); }
+        if(!contextActive){
+            if(app?.classList?.contains("in-battle")){
+                window.FourSymbolsBottomNav?.hide();
+            }else{
+                const mainPage=document.querySelector("#game-content .page.active");
+                window.FourSymbolsBottomNav?.renderMain(mainPage?.id.replace(/Page$/, "")||"home");
+            }
+            return;
+        }
 
-        const returnAction=trainingActive
+        const returnAction=mapActive
+  ?"leaveMap()"
+  :trainingActive
   ?"showPage('home')"
   :(gameplayActive&&!dungeonActive
   ?"v148ReturnFromGameplay()"
   :dungeonReturnAction(abyssMapActive,abyssSelectionActive));
         const mode=trainingActive
   ?"training"
-  :(gameplayActive&&!dungeonActive
+  :(mapActive?"patrol":(gameplayActive&&!dungeonActive
   ?"gameplay:"+gameplayPageId
-  :(abyssMapActive?"abyss-map":(abyssSelectionActive?"abyss-selection":"daily")));
-        renderContextNav(nav,returnAction,mode);
+  :(abyssMapActive?"abyss-map":(abyssSelectionActive?"abyss-selection":"daily"))));
+        renderContextNav(returnAction,mode);
     }
 
     function scheduleDungeonSync(){ setTimeout(syncContextNavigation,0); }

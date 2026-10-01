@@ -1,3 +1,9 @@
+## 2026-10-01 — Bottom Navigation / Home Scroll Owner Convergence (candidate)
+
+- Base `dev@08d5c3cf6e327e3d9dda033dad4c42b7d66f2d64`; branch `fix/bottom-nav-home-scroll-owner-convergence-20261001`. This is a Convergence/Replacement of the navigation shell and home scroll geometry; `main` remains untouched.
+- Canonical navigation DOM/lifecycle owner: `js/04-stage-v11-native-bottom-nav-runtime.js::FourSymbolsBottomNav`; sole geometry owner: `css/06-stage-v11-native-bottom-nav.css` in the 1080×1920 overlay. `js/42-v148-combat-dungeon-fixes.js::syncContextNavigation()` owns only context selection and items. Legacy `#mapPageNav`, dynamic `#v141DungeonNav`, V13 migration and V143 reparenting are retired, as are their geometry styles and the V30/V31R2 CSS scaling segment. No new temporary wrapper or geometry patch is intended.
+- Home scroll owner remains `#homePage`, now fixed overflow with content geometry compacted in `css/00-main.css` and duplicate bottom-nav reserve removed from `css/19-stage-v54-main-city-moderate-native-scale.css`. Browser measurements and final CI/deployment verification remain pending; this entry is not a VERIFIED claim.
+
 ## 2026-09-29 — Bug Repair DoD / Owner Convergence Gate 永久規範
 
 - 新增永久專項契約 `docs/BUG_REPAIR_DOD_OWNER_CONVERGENCE_GATE.md`；所有 Bug／fix／failure／regression 與「是否已修好」判定都必須遵守。

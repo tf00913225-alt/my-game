@@ -443,16 +443,11 @@
 
     /* ----- 4 / 5. Larger Abyss, tap-to-advance dialogue and correct nav shell. ----- */
     function fixDungeonNavigation(){
-    const nav=document.getElementById("v141DungeonNav");
-    const content=document.getElementById("game-content");
-    if(!nav||!content){ return; }
-    if(nav.parentElement!==content){ content.appendChild(nav); }
-    nav.dataset.v143Fixed="1";
-    const oldReturn=document.getElementById("v141DungeonReturn");
-    if(oldReturn){ oldReturn.remove(); }
-    if(typeof window.v148SyncDungeonShell==="function"){ window.v148SyncDungeonShell(); }
-}
-
+        // Context items are projected by V148 into the shared native shell.
+        if(typeof window.v148SyncContextNavigation==="function"){
+            window.v148SyncContextNavigation();
+        }
+    }
 
 /* ----- 6. Synthesis uses icon pickers and creates ordinary random gear. ----- */
     function definitions(){
@@ -599,7 +594,7 @@
         return {
             version:VERSION,
             enemyCards:document.querySelectorAll(".v143-monster-identity").length,
-            dungeonNavFixed:document.getElementById("v141DungeonNav")?.dataset.v143Fixed==="1",
+            dungeonNavFixed:!!window.FourSymbolsBottomNav?.ensureShell(),
             pendingPotion:!!window.v143PendingPotionTarget
         };
     };

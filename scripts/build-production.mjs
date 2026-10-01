@@ -32,7 +32,6 @@ const appScripts=[
     "js/02-stage-v9-native-coordinate-api.js",
     "js/03-stage-v10-battle-log-scroll-runtime.js",
     "js/04-stage-v11-native-bottom-nav-runtime.js",
-    "js/05-stage-v13-native-map-nav-runtime.js",
     "js/06-stage-v39-battle-map-background-runtime.js",
     "js/07-stage-v40-root-battle-background-runtime.js",
     "js/08-stage-v41-runtime.js",
@@ -117,7 +116,7 @@ const gameplayScriptParts=[
 const criticalStyles=["css/00-main.css","css/29-v125-character-creation-native.css","css/51-v173.20-startup-loader.css","css/firebase-auth.css"];
 const appStyles=[
     "css/01-stage-v8-map-page-fix.css","css/02-stage-v3-layout-fix.css","css/03-stage-v4-viewport-lock.css",
-    "css/04-v119-ally-target-style.css","css/06-stage-v11-native-bottom-nav.css","css/07-stage-v13-native-map-nav.css",
+    "css/04-v119-ally-target-style.css","css/06-stage-v11-native-bottom-nav.css",
     "css/08-stage-v14-character-scroll-fix.css","css/09-stage-v15-native-character-shell.css",
     "css/19-stage-v54-main-city-moderate-native-scale.css","css/20-stage-v60-training-only-safety.css",
     "css/21-stage-v64-character-touch-action-bridge.css",
