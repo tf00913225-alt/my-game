@@ -7,7 +7,7 @@ const root=process.cwd();
 const artifactDir=path.join(root,"artifacts/browser-qa");
 const fixture=path.join(root,".fire-portrait-browser-qa.html");
 const provenance=JSON.parse(fs.readFileSync(path.join(root,"config/monster-asset-provenance.json"),"utf8"));
-const records=provenance.assets.filter(asset=>asset.runtimeReady);
+const records=provenance.assets.filter(asset=>asset.runtimeReady&&/^wild\.zone-\d+\.fire-\d+$/.test(asset.portraitKey));
 
 function chrome(){
     for(const candidate of [process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH,"google-chrome","google-chrome-stable","chromium","chromium-browser"]){
