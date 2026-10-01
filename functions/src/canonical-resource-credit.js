@@ -2,7 +2,8 @@
 
 const {assembleCanonicalSnapshot,verifyCanonicalSnapshotAgainstSources,claimRecordsDigest}=
     require("./canonical-snapshot");
-const {createRecoveryArchive}=require("./canonical-recovery-archive");
+const {createRecoveryArchive,inspectRecoveryArchive}=require("./canonical-recovery-archive");
+const {verifyCreditedGrant}=require("./credited-grant-evidence");
 const {source,readOwnedSources,advanceOwnedRecords,advanceOwnedSources}=
     require("./canonical-owned-sources");
 const {taipeiDay,REWARD_GOLD}=require("./daily-checkin-grant");
@@ -83,29 +84,12 @@ function createCanonicalResourceCredit({db,FieldValue,HttpsError,runProtected,
                 fail("data-loss","Grant or canonical source identity is inconsistent.");
             }
             if(receipt.creditedToCharacter===true){
-                const ledger=ledgerSnap.exists?ledgerSnap.data():null;
-                const claim=claimSnap.exists?claimSnap.data():null;
-                const claimRecord=claimRecordSnap.exists?claimRecordSnap.data():null;
-                if(grant.status!=="credited"||!ledger||!claim||!claimRecord||
-                   ledger.ownerUid!==uid||ledger.grantId!==grantId||
-                   ledger.operationId!==operationId||ledger.amount!==grant.amount||
-                   ledger.kind!==grant.kind||
-                   ledger.creditRevision!==receipt.creditRevision||
-                   ledger.snapshotSha256!==receipt.snapshotSha256||
-                   claim.ownerUid!==uid||claim.operationId!==operationId||
-                   claim.grantId!==grantId||claim.creditRevision!==receipt.creditRevision||
-                   claimRecord.ownerUid!==uid||claimRecord.claimKey!==grantId||
-                   claimRecord.status!=="claimed"||
-                   claimRecord.operationId!==operationId||
-                   claimRecord.grantId!==grantId||
-                   claimRecord.provenance!=="server-created"||
-                   !Number.isSafeInteger(claimRecord.serverRevision)||
-                   claimRecord.serverRevision<receipt.creditRevision||
-                   claimRecord.serverRevision>envelope.serverRevision||
-                   !Number.isSafeInteger(receipt.creditRevision)||
-                   receipt.creditRevision>envelope.serverRevision){
-                    fail("data-loss","Credited grant receipt is inconsistent.");
-                }
+                await verifyCreditedGrant({tx,root,uid,grantId,operationId,
+                    currentRevision:envelope.serverRevision,grant,receipt,
+                    ledger:ledgerSnap.exists?ledgerSnap.data():null,
+                    claim:claimSnap.exists?claimSnap.data():null,
+                    claimRecord:claimRecordSnap.exists?claimRecordSnap.data():null,
+                    otherOperationExists:otherOperationSnap.exists,fail});
                 return {creditRevision:receipt.creditRevision,unchanged:true,
                     authoritativeStateReady:false};
             }
@@ -129,8 +113,9 @@ function createCanonicalResourceCredit({db,FieldValue,HttpsError,runProtected,
             }
             const characterRef=root.collection("characters").doc(account.slots[0]);
             const previousSnapshotRef=root.collection("playableSnapshots").doc(String(previous));
-            const [characterSnap,previousSnapshotSnap]=await Promise.all([
-                tx.get(characterRef),tx.get(previousSnapshotRef)]);
+            const [characterSnap,previousSnapshotSnap,previousArchiveSnap]=await Promise.all([
+                tx.get(characterRef),tx.get(previousSnapshotRef),
+                tx.get(root.collection("recoveryArchives").doc(String(previous)))]);
             if(!characterSnap.exists||!previousSnapshotSnap.exists||
                previousSnapshotSnap.get("sha256")!==account.snapshotSha256){
                 fail("data-loss","Previous canonical source snapshot is missing.");
@@ -141,7 +126,10 @@ function createCanonicalResourceCredit({db,FieldValue,HttpsError,runProtected,
                 relicLoadout:source(loadoutSnap.data()),progress:source(progressSnap.data()),
                 claimCheckpoint:source(checkpointSnap.data())};
             try{verifyCanonicalSnapshotAgainstSources(previousSnapshotSnap.data(),
-                uid,previous,records);}catch(_){
+                uid,previous,records);
+                inspectRecoveryArchive(previousArchiveSnap.data(),uid,previous,
+                    previousSnapshotSnap.data());
+            }catch(_){
                 fail("data-loss","Previous canonical sources differ from snapshot.");
             }
             const balanceKey=grant.kind==="gold"?"gold":"sharedExp";
@@ -188,6 +176,9 @@ function createCanonicalResourceCredit({db,FieldValue,HttpsError,runProtected,
                 creditRevision:revision,createdAt:stamp});
             tx.create(ledgerRef,{schemaVersion:1,ownerUid:uid,grantId,operationId,
                 kind:grant.kind,amount:grant.amount,
+                creditEvidenceVersion:1,sourceRevision:previous,
+                sourceSnapshotSha256:previousSnapshotSnap.get("sha256"),
+                balanceBefore:economy[balanceKey],
                 balanceAfter:nextRecords.economy[balanceKey],
                 creditRevision:revision,snapshotSha256:bundle.sha256,createdAt:stamp});
             if(dailyDay!==null){

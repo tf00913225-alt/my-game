@@ -222,6 +222,18 @@
         "verification": "本機 10 張來源與成品 SHA-256、解碼、透明度及 RGBA 像素相等；最新 PR CI、DEV 部署與手機實機顯示尚待核對",
         "result": "只有 10 個水系野怪 target 為 runtimeReady；其餘普通怪與水塔普通／精英／小 Boss 未提前接入"
       }
+    },
+    {
+      "id": "REQ-CLOUD-REWARD-EVIDENCE-20261001",
+      "title": "可信獎勵入帳與重試證據完整性",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "release/requirement-batches/2026-10-01-cloud-reward-evidence.json"
+        ],
+        "verification": "目標測試通過；真實交易 CI 與部署待核對。",
+        "result": "缺證據即阻擋，不補造歷史、不採納 Revision 1；Phase 4 維持 0/6。"
+      }
     }
   ]
 }
