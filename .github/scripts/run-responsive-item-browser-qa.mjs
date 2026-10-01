@@ -12,8 +12,8 @@ const VIEWPORTS=[[360,800],[360,640],[393,873],[393,660],[412,915],[412,680]];
 const settle=()=>new Promise(resolve=>setTimeout(resolve,150));
 const PREPARE=String.raw`(async()=>{
  const until=Date.now()+45000;
- while(Date.now()<until&&!(window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden)) await new Promise(r=>setTimeout(r,50));
- if(window.FourSymbolsStartupPolicy?.getState?.()!=='READY') throw Error('formal startup did not reach READY');
+ while(Date.now()<until&&!(window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show'))) await new Promise(r=>setTimeout(r,50));
+ if(window.FourSymbolsStartupPolicy?.getState?.()!=='READY'||document.getElementById('firebaseAuthOverlay')?.classList.contains('show')) throw Error('formal startup did not reach interactive READY');
  await FourSymbolsFeatures.ensure('gameplay-core','responsive-item-qa');
  if(typeof openItemModal!=='function'||typeof v17346PreviewEquipmentShopOffer!=='function') throw Error('formal item runtime missing');
  const art='<span class="v169-item-art v169-equipment-art"><img src="data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'900\' height=\'500\'%3E%3Crect width=\'900\' height=\'500\' fill=\'gold\'/%3E%3C/svg%3E" alt="QA"></span>';
