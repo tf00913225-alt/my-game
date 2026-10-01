@@ -4,6 +4,7 @@ const fs=require("node:fs");
 const path=require("node:path");
 const cp=require("node:child_process");
 const root=path.resolve(__dirname,"..");
+const artifact=path.join(root,"artifacts/browser-qa/bottom-nav-home-scroll-qa.json");
 const chrome=["google-chrome","google-chrome-stable","chromium","chromium-browser"]
     .map(name=>cp.spawnSync("bash",["-lc",`command -v ${name}`],{encoding:"utf8"}))
     .find(result=>result.status===0&&result.stdout.trim())?.stdout.trim();
@@ -49,6 +50,8 @@ try{
     const match=result.stdout.match(/<pre id="result">([^<]+)<\/pre>/);
     assert.ok(match,"browser geometry evidence missing");
     const data=JSON.parse(match[1].replace(/&quot;/g,'"').replace(/&amp;/g,"&"));
+    fs.mkdirSync(path.dirname(artifact),{recursive:true});
+    fs.writeFileSync(artifact,JSON.stringify({passed:false,...data},null,2)+"\n");
     const baseline=data.results[0];
     for(const row of data.results){
         assert.equal(row.owners,1,row.mode+" shell owners");
@@ -64,5 +67,6 @@ try{
     assert.equal(data.home.scrollTop,0);
     assert.equal(data.documentScroll,0);
     assert.equal(data.legalScrollTop,50);
+    fs.writeFileSync(artifact,JSON.stringify({passed:true,...data},null,2)+"\n");
     console.log("Navigation and home geometry browser QA passed",JSON.stringify(data));
 }finally{try{fs.unlinkSync(file);}catch(_){}}
