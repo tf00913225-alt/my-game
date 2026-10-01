@@ -104,10 +104,10 @@ test("enemy AI keeps 70/30 category selection and hard-control caps directional"
     assert.match(coreSource,/elite:\{\s*min:5,\s*max:75/);
     assert.match(coreSource,/boss:\{\s*min:5,\s*max:60/);
     assert.match(coreSource,/player:\{\s*min:5,\s*max:60/);
-    assert.match(coreSource,/targetFinalSpirit,true,"player"/);
-    const v143=fs.readFileSync("js/38-v143-system-fixes.js","utf8");
-    assert.match(v143,/rain\.frostbiteChance=50/);
-    assert.doesNotMatch(v143,/rain\.freezeChance=50/);
+    assert.match(coreSource,/targetFinalStatusResistance,true,"player"/);
+    const progression=fs.readFileSync("js/60-v173.64-skill-progression-rebalance.js","utf8");
+    assert.match(progression,/waterKnife:\{[^\n]*frostbiteChance:50/);
+    assert.doesNotMatch(progression,/waterKnife:\{[^\n]*freezeChance:50/);
 });
 
 test("Extreme Emperor uses only Yuan Zu Blessing with independent cleanse and instant recovery",()=>{

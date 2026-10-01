@@ -9,11 +9,11 @@ const alertRpg=(m,o)=>typeof window.rpgAlert==="function"?window.rpgAlert(m,o||{
 function equipment(i){if(!i)return false;try{if(typeof isEquipmentInventoryType==="function")return !!isEquipmentInventoryType(i.type)}catch(_){}return TYPES.has(String(i.type||""));}
 function quality(i){if(!i)return null;return typeof getInventoryRarityDataKey==="function"?getInventoryRarityDataKey(i):String(i.rarityKey||i.quality||"").toLowerCase()||null;}
 function locked(i){return !!(i&&i.v17351Locked===true)}
-function statText(i){const all=Object.assign({},i?.stats||{});Object.entries(i?.reforgeStats||{}).forEach(([k,v])=>all[k]=num(all[k])+num(v));const L={attack:"攻擊",intelligence:"智力",vitality:"體質",agility:"敏捷",spirit:"精神",energy:"能量"};const a=Object.entries(all).filter(([,v])=>num(v)!==0).map(([k,v])=>(L[k]||k)+" "+(num(v)>0?"+":"")+num(v));return a.length?a.join("　"):"無額外能力";}
+function statText(i){const all=Object.assign({},i?.stats||{});Object.entries(i?.reforgeStats||{}).forEach(([k,v])=>all[k]=num(all[k])+num(v));const L={attack:"攻擊",intelligence:"智力",vitality:"體質",agility:"敏捷",energy:"能量",defensePoints:"防禦",accuracy:"命中",evasion:"閃避",antiCrit:"抗暴",statusAccuracy:"異常命中",statusResistance:"異常抗性"};const a=Object.entries(all).filter(([,v])=>num(v)!==0).map(([k,v])=>(L[k]||k)+" "+(num(v)>0?"+":"")+num(v));return a.length?a.join("　"):"無額外能力";}
 const SLOT_ALIAS={weapon:"hand",hand:"hand",head:"head",helmet:"head",shoulder:"shoulder",wristguard:"shoulder",armor:"armor",robe:"armor",shoes:"shoes",boots:"shoes"};
 const SLOT_STORAGE_ALIASES={hand:["hand","weapon"],head:["head","helmet"],shoulder:["shoulder","wristguard"],armor:["armor","robe"],shoes:["shoes","boots"]};
 const SLOT_LABEL={head:"頭部",hand:"武器",shoulder:"護腕",armor:"衣服",shoes:"鞋子"};
-const COMPARE_STAT_LABEL={attack:"攻擊",intelligence:"智力",vitality:"體質",agility:"敏捷",spirit:"精神",energy:"能量"};
+const COMPARE_STAT_LABEL={attack:"攻擊",intelligence:"智力",vitality:"體質",agility:"敏捷",energy:"能量",defensePoints:"防禦",accuracy:"命中",evasion:"閃避",antiCrit:"抗暴",statusAccuracy:"異常命中",statusResistance:"異常抗性"};
 function esc(v){return String(v==null?"":v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;")}
 function slot(t){const key=String(t||"").toLowerCase();return SLOT_ALIAS[key]||key}
 function equippedFor(i){if(!i||typeof characterEquipment==="undefined")return null;let k=null;try{k=typeof getBackpackEquipmentKey==="function"?getBackpackEquipmentKey(typeof inventoryCharacterIndex!=="undefined"?inventoryCharacterIndex:0):null}catch(_){}if(!k)return null;const slots=characterEquipment[k]||{},target=slot(i.type),keys=SLOT_STORAGE_ALIASES[target]||[target];for(const key of keys){if(slots[key])return slots[key]}return null;}

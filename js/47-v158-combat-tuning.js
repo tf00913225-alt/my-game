@@ -31,8 +31,8 @@
 
     const V17342_HALF_MONSTER_FIELDS=[
         "maxHP","hp","maxSP","sp","attack","magicAttack","defense",
-        "attackPoints","vitalityPoints","energyPoints","intelligencePoints","spiritPoints","agilityPoints",
-        "vitality","energy","intelligence","spirit","agility","accuracy","evasion"
+        "attackPoints","vitalityPoints","energyPoints","intelligencePoints","defensePoints","agilityPoints",
+        "vitality","energy","intelligence","defense","agility","accuracy","evasion"
     ];
 
     function halveMonsterCoreStats(monster,marker){
@@ -64,8 +64,8 @@
 
     const DAILY_DUNGEON_SCALE_FIELDS=[
         "maxHP","hp","maxSP","sp","attack","magicAttack","defense",
-        "attackPoints","vitalityPoints","energyPoints","intelligencePoints","spiritPoints","agilityPoints",
-        "vitality","energy","intelligence","spirit","agility","accuracy","evasion"
+        "attackPoints","vitalityPoints","energyPoints","intelligencePoints","defensePoints","agilityPoints",
+        "vitality","energy","intelligence","defense","agility","accuracy","evasion"
     ];
 
     function getDailyDungeonScaleContext(){
@@ -266,7 +266,7 @@
                 if(note){
                     note.innerHTML=
                         "最終命中率＝95%＋命中×0.15%＋最終命中加成－目標最終閃躲－最終命中下降，最後限制70%～99%。<br>"+
-                        "命中／閃躲／異常抗性的玩家介面統一使用 % 顯示；內部仍以最終百分點加減，異常主屬性與目標精神每1點各換算0.05%的最終機率修正。";
+                        "命中／閃避／異常抗性的玩家介面統一使用 % 顯示；這些戰鬥詞條不由六圍直接派生。敏捷只影響出手速度。";
                 }
             }
             return result;

@@ -6,7 +6,29 @@ const {createRecoveryArchive}=require("./canonical-recovery-archive");
 const {source,readOwnedSources,advanceOwnedRecords,advanceOwnedSources}=
     require("./canonical-owned-sources");
 const ID=/^[A-Za-z0-9_-]{16,64}$/;
-const STATS=new Set(["attack","vitality","energy","intelligence","spirit","agility"]);
+const STATS=new Set(["attack","intelligence","vitality","energy","defensePoints","agility"]);
+
+function migrateLegacyCanonicalCharacterState(state){
+    if(!state||typeof state!=="object"||Array.isArray(state)){ throw new Error("Invalid canonical character state."); }
+    const next={...state};
+    const legacySpirit=state.spirit;
+    if(legacySpirit!==undefined&&(!Number.isSafeInteger(legacySpirit)||legacySpirit<0)){
+        throw new Error("Invalid legacy Spirit allocation.");
+    }
+    if(!Number.isSafeInteger(state.attributePoints)||state.attributePoints<0){
+        throw new Error("Invalid unspent attribute points.");
+    }
+    if(legacySpirit){
+        if(!Number.isSafeInteger(state.attributePoints+legacySpirit)){ throw new Error("Legacy point refund exceeds safe range."); }
+        next.attributePoints=state.attributePoints+legacySpirit;
+    }
+    if(state.defensePoints===undefined){ next.defensePoints=0; }
+    else if(!Number.isSafeInteger(state.defensePoints)||state.defensePoints<0){
+        throw new Error("Invalid Defense allocation.");
+    }
+    delete next.spirit;
+    return next;
+}
 
 // Internal first-character ability allocation. Only a stat choice crosses the
 // boundary; points, new values, HP/SP and revision are computed from sources.
@@ -99,7 +121,11 @@ function createCanonicalAttributeAllocation({db,FieldValue,HttpsError,runProtect
                 claimCheckpoint:source(checkpointSnap.data())};
             try{verifyCanonicalSnapshotAgainstSources(priorSnap.data(),uid,previous,records);}
             catch(_){fail("data-loss","Previous sources differ from snapshot.");}
-            const character=records.characters[0],state=character.state;
+            const sourceCharacter=records.characters[0];
+            let migratedState;
+            try{ migratedState=migrateLegacyCanonicalCharacterState(sourceCharacter.state); }
+            catch(_){ fail("data-loss","Character ability migration is invalid."); }
+            const character={...sourceCharacter,state:migratedState},state=character.state;
             const keys=[...STATS,"attributePoints","bonusHP","bonusSP","hp","sp"];
             if(character.characterId!==account.slots[0]||
                keys.some(key=>!Number.isSafeInteger(state[key])||state[key]<0)||
@@ -158,4 +184,4 @@ function createCanonicalAttributeAllocation({db,FieldValue,HttpsError,runProtect
     }
     return Object.freeze({allocateAttributePoint});
 }
-module.exports={createCanonicalAttributeAllocation};
+module.exports={createCanonicalAttributeAllocation,migrateLegacyCanonicalCharacterState};

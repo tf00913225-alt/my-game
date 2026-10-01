@@ -118,7 +118,10 @@ class Cdp{
 }
 
 const PREPARE_RUNTIME=`(async()=>{
+    // Keep hydration failures observable in the browser artifact.
     const runtimeErrors=[];
+    const originalConsoleError=console.error;
+    console.error=(...args)=>{runtimeErrors.push(args.map(value=>String(value&&value.stack||value)).join(" "));originalConsoleError(...args);};
     window.addEventListener("error",event=>runtimeErrors.push(String(event.message||event.error||"window error")));
     window.addEventListener("unhandledrejection",event=>runtimeErrors.push(String(event.reason||"unhandled rejection")));
     const waitFor=async predicate=>{
@@ -134,7 +137,8 @@ const PREPARE_RUNTIME=`(async()=>{
             state:window.FourSymbolsStartupPolicy?.getState?.(),
             loaderHidden:document.getElementById("startupLoader")?.hidden,
             gameDisplay:getComputedStyle(document.getElementById("gameInterface")).display,
-            startupError:String(window.FourSymbolsStartupPolicy?.getLastError?.()?.message||"")
+            startupError:String(window.FourSymbolsStartupPolicy?.getLastError?.()?.message||""),
+            runtimeErrors:runtimeErrors.slice(-8)
         }));
     }
     await window.FourSymbolsFeatures.ensure("skill","skill-runtime-browser-qa");
@@ -195,6 +199,8 @@ const COLLECT_EVIDENCE=`(()=>{
         const label=node.querySelector(".skill-action-card-label"),lr=label?rect(label):null;
         const hasVisualSurface=style.backgroundImage!=="none"||style.backgroundColor!=="rgba(0, 0, 0, 0)"||parseFloat(style.borderTopWidth)>0;
         return {exists:true,tagName:node.tagName,type:node.getAttribute("type"),disabled:node.disabled,ariaDisabled:node.getAttribute("aria-disabled"),display:style.display,visibility:style.visibility,opacity:Number(style.opacity),rect:r,visibleRectWidth:width,visibleRectHeight:height,label:{exists:!!label,text:String(label?.textContent||"").trim(),rect:lr},hasVisualSurface};
+
+// GitHub UI synchronization marker; no Runtime behavior change.
     };
     const findAction=skillId=>document.querySelector('[data-skill-id="'+skillId+'"] button.skill-action-card[data-skill-action="growth"]');
     const water={};
@@ -304,3 +310,4 @@ try{
     fs.writeFileSync(path.join(ARTIFACT_DIR,"skill-inventory-semantic-browser-qa.json"),JSON.stringify({suite:"skill-runtime-browser-qa",passed:false,error:String(error?.stack||error),evidence:error?.skillRuntimeEvidence||null},null,2)+"\n","utf8");
     throw error;
 }finally{ await new Promise(resolve=>server.server.close(resolve)); }
+// CI synchronization marker for the current six-stat convergence validation head.

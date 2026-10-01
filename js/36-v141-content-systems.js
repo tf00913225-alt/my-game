@@ -35,9 +35,9 @@
         {setId:"setEarth",label:"岩岳",element:"earth",color:"#c59a54"},
         {setId:"setWind",label:"青嵐",element:"wind",color:"#55cda3"}
     ];
-    const STAT_LABEL={attack:"攻擊",intelligence:"智力",vitality:"體質",energy:"能量",agility:"敏捷",spirit:"精神"};
+    const STAT_LABEL={attack:"攻擊",intelligence:"智力",vitality:"體質",energy:"能量",defensePoints:"防禦",agility:"敏捷",accuracy:"命中",evasion:"閃避",antiCrit:"抗暴",statusAccuracy:"異常命中",statusResistance:"異常抗性"};
     const MAIN_STATS=["attack","intelligence"];
-    const SUB_STATS=["vitality","energy","agility","spirit"];
+    const SUB_STATS=["vitality","energy","defensePoints","agility","statusResistance"];
     const TALISMAN_GOLD={white:300,blue:1000,purple:3000};
     const synthesisState={
         tab:"reforge",blueprintId:null,seriesId:"setFire",reforgeUid:null,

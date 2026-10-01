@@ -99,7 +99,7 @@
             if(!skill||!numeric(skill.frostbiteChance)||!monster||!monster.alive){ return result; }
             const args=[
                 skill.frostbiteChance,casterLevel,monster.level,casterOffensiveAttribute,
-                typeof getMonsterEffectiveSpiritPoints==="function"?getMonsterEffectiveSpiritPoints(monster):numeric(monster.spiritPoints),
+                typeof getMonsterEffectiveStatusResistance==="function"?getMonsterEffectiveStatusResistance(monster):numeric(monster.statusResistance),
                 false,typeof getMonsterRank==="function"?getMonsterRank(monster):"regular"
             ];
             const roll=typeof window.v173RollNamedPersistentStatusEffect==="function"
@@ -122,10 +122,10 @@
         applySkillDebuffEffectsToPlayer=function(skill,level,target,index,casterLevel,casterOffensiveAttribute){
             const result=previousApplySkillDebuffsToPlayer.apply(this,arguments);
             if(!skill||!numeric(skill.frostbiteChance)||!target||numeric(target.hp)<=0){ return result; }
-            const spirit=typeof getFinalBattleSpiritForPlayerTarget==="function"
-                ?getFinalBattleSpiritForPlayerTarget(target,index):numeric(target.spirit);
+            const statusResistance=typeof getFinalBattleStatusResistanceForPlayerTarget==="function"
+                ?getFinalBattleStatusResistanceForPlayerTarget(target,index):numeric(target.statusResistance);
             const resist=typeof getPlayerStatusResistBonus==="function"?getPlayerStatusResistBonus(target):0;
-            const args=[skill.frostbiteChance,casterLevel,target.level,casterOffensiveAttribute,spirit,false,"regular",resist];
+            const args=[skill.frostbiteChance,casterLevel,target.level,casterOffensiveAttribute,statusResistance,false,"regular",resist];
             const roll=typeof window.v173RollNamedPersistentStatusEffect==="function"
                 ?window.v173RollNamedPersistentStatusEffect(target,"frostbite",args,"player",index,skill.name)
                 :{duplicate:false,hit:typeof rollStatusEffectHit==="function"&&rollStatusEffectHit.apply(null,args)};

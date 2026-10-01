@@ -69,7 +69,6 @@ function formulaRuntime(){
         constLine("HIT_CHANCE_MAX_PERCENT"),
         constLine("DEFAULT_MONSTER_EVASION_PER_LEVEL"),
         constLine("DEFAULT_MONSTER_EVASION_CAP"),
-        constLine("STATUS_RESIST_PER_SPIRIT_POINT"),
         constLine("STATUS_OFFENSE_ATTRIBUTE_COEFFICIENT"),
         constLine("STATUS_HIT_MIN_PERCENT"),
         constLine("STATUS_HIT_MAX_PERCENT"),
@@ -107,7 +106,7 @@ function formulaRuntime(){
     assert.doesNotMatch(v140,/previousCalculateStatusEffectChance|v140PreviousCalculateStatusEffectChance/);
     assert.doesNotMatch(v158,/v158GetHitChancePercent|rollHitChance\s*=\s*function/);
     assert.doesNotMatch(v149,/rollStatusEffectHit\s*=\s*function/);
-    assert.doesNotMatch(v169,/getMonsterEvasion\s*=\s*function|getMonsterEffectiveSpiritPoints\s*=\s*function|getPlayerStatusResistBonus\s*=\s*function/);
+    assert.doesNotMatch(v169,/getMonsterEvasion\s*=\s*function|getMonsterEffectivetargetStatusResistancePoints\s*=\s*function|getPlayerStatusResistBonus\s*=\s*function/);
     assert.match(main,/evasion:\s*\n\s*getDefaultMonsterEvasion\(level\)/);
     const firstZoneRosterCall=main.indexOf('makeZoneMonster("哥布林",3,"fire",undefined,"wild.zone-01.fire-01")');
     assert.ok(firstZoneRosterCall>0,"first top-level zone roster call must exist");
