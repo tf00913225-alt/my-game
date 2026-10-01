@@ -57,7 +57,7 @@ export async function battleSkillTouchFloodQa(client,artifactDir){
         assert.equal(submitted.queue.action,'waterBall');assert.equal(submitted.queue.target,target);assert.equal(submitted.count,1);assert.equal(submitted.advance,true);
         await client.eval(`selectBattleTarget(${target});true`);assert.equal((await state()).submissions,1,'duplicate target cannot submit twice');
         checks.skillDeclaration={normalTap:true,returnAndReselect:true,dragRecovery:true,cancelRecovery:true,targetSubmittedOnce:true,hitbox:true};
-        for(const skill of ['healSpell','rage']){
+        for(const skill of ['healSpell','earthShield']){
             await client.eval(`__touchQaReset(${JSON.stringify(skill)});true`);
             await tap('.skill-quick-button[data-skill-id="'+skill+'"]');
             const declared=await state();
