@@ -137,9 +137,6 @@ async function runViewport(chrome,url,width,height){
   await client.send('Emulation.setFocusEmulationEnabled',{enabled:true});
   await client.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true});
   await client.send('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:1});
-  // Hold lazy gameplay bundle responses so the first training tap proves that
-  // app-shell context projection works before gameplay-core can execute.
-  await client.send('Fetch.enable',{patterns:COLD_ENTRY_BLOCK_PATTERNS});
   await client.send('Page.navigate',{url});await new Promise(r=>setTimeout(r,300));evidence.startup=await client.eval(PREPARE);
   assert.equal(evidence.startup.state,'READY');assert.equal(evidence.startup.ready,true);
   // Dismiss the real, non-forced startup notice through its formal header
@@ -154,6 +151,10 @@ async function runViewport(chrome,url,width,height){
    await client.send('Input.dispatchMouseEvent',{type:'mouseReleased',x,y,button:'left',clickCount:1});await settle(client);
    assert.equal(await client.eval("document.getElementById('homeFeatureModal').classList.contains('show')"),false,'formal release return must close the notice');
   }
+  // Formal Startup may download first-play resources, but it does not execute
+  // the lazy gameplay owner.  Begin delaying matching module requests only
+  // after READY, immediately before the first real training tap.
+  await client.send('Fetch.enable',{patterns:COLD_ENTRY_BLOCK_PATTERNS});
   evidence.phase='cold-training';
   evidence.coldTrainingBefore=await client.eval(`(()=>{const button=document.getElementById('trainingNav'),r=button.getBoundingClientRect();window.__navQaTrainingClicks=0;document.addEventListener('click',event=>{if(event.target.closest?.('#trainingNav'))window.__navQaTrainingClicks+=1;},{capture:true,once:true});return {x:r.left+r.width/2,y:r.top+r.height/2,gameplayReady:FourSymbolsFeatures.isReady('gameplay-core'),labels:[...bottomNav.children].map(n=>n.getAttribute('aria-label')),context:bottomNav.dataset.navContext};})()`);
   assert.equal(evidence.coldTrainingBefore.gameplayReady,false,'cold-entry test must not preload gameplay-core');
