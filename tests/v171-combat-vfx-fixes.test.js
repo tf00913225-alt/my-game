@@ -33,6 +33,11 @@ test("Tidal Beast is single-target Frostbite and has no legacy team Freeze path"
         animation,
         /floodBeast:\{[\s\S]*?deferredStatusTypes:\["frostbite"\][\s\S]*?scale:1\.85,minSize:175,maxSize:250/
     );
+    assert.match(
+        animation,
+        /floodBeast:\{[^\n]*preserveSourceOrientation:true/,
+        "Flood Beast keeps the supplied artwork upright for both player and enemy travel"
+    );
 });
 
 test("Water trajectories use resolved actor-target geometry before raster activation",()=>{

@@ -95,6 +95,13 @@ export async function battleSkillTouchFloodQa(rawClient,artifactDir,{animationOn
             }
             checks.supportDeclarations.push({skill,targetType:formal.targetType,passed:true});
         }
+        await client.eval(`__touchQaReset('revive');true`);
+        const reviveFixture=await client.eval(`[0,1,2].map(index=>({index,hp:getBattleCharacterByIndex(index)?.hp||0}))`);
+        assert.ok(reviveFixture.every(item=>item.hp>0),'revive no-target acceptance requires all three allies alive');
+        await tap('.skill-quick-button[data-skill-id="revive"]');
+        const reviveRejected=await client.eval(`(()=>{const n=document.getElementById('battleActionNotice');return {ready:actionReady,pending:pendingAction,text:n?.textContent||'',visible:!!n&&!n.hidden&&n.classList.contains('show')};})()`);
+        assert.deepEqual(reviveRejected,{ready:false,pending:null,text:'我方目前沒有人死亡，無法使用復活術。',visible:true});
+        checks.reviveNoTargetNotice=reviveRejected;
         await client.eval(`__touchQaReset('waterBall');player.sp=0;populateSkillQuickBar();document.getElementById('skillQuickBar').classList.add('show');true`);
         assert.equal((await point(button)).disabled,true);await tap(button);assert.equal((await state()).ready,false);
         const rejection=await client.eval(`(()=>{__touchQaReset('waterBall');autoBattle=true;prepareAction('waterBall');const auto=!actionReady;autoBattle=false;battlePhase='resolve';prepareAction('waterBall');const phase=!actionReady;battlePhase='declare';characterSkillLoadouts[getPartyCharacterKey(0)].equippedSkills=[];prepareAction('waterBall');return {auto,phase,equipment:!actionReady};})()`);
@@ -164,14 +171,11 @@ export async function battleSkillTouchFloodQa(rawClient,artifactDir,{animationOn
                     })()`);
                     assert.ok(snapshot);assert.equal(snapshot.motion,'phased');assert.equal(snapshot.travel,null);
                     assert.equal(snapshot.hit,.5833333333);
+                    assert.ok(Math.abs(snapshot.angle)<.01,phase+' must preserve the original upright artwork');
                     if(phase==='cast'||phase==='impact'||phase==='dissipate'){
-                        assert.ok(Math.abs(snapshot.angle)<.01,phase+' must stay upright');
                         const atTarget=phase!=='cast';
                         assert.ok(Math.abs(snapshot.center.x-snapshot.actor.x-(atTarget?snapshot.dx:0))<1);
                         assert.ok(Math.abs(snapshot.center.y-snapshot.actor.y-(atTarget?snapshot.dy:0))<1);
-                    }else{
-                        const expected=Math.atan2(snapshot.dy,snapshot.dx)*180/Math.PI;
-                        assert.ok(Math.abs(snapshot.angle-expected)<.1,'beast must point at target');
                     }
                     const shot=await client.send('Page.captureScreenshot',{format:'png',clip:screenshotClip});
                     fs.writeFileSync(path.join(artifactDir,'flood-'+side+'-'+column+'-'+phase+'.png'),Buffer.from(shot.data,'base64'));

@@ -12225,9 +12225,9 @@
         iceSpin:{hit:DEFAULT_HIT,deferredStatusTypes:["frostbite"],sprite:castSheet("assets/vfx/water/frost-spinning-slash-vfx.png?v=166","single",{scale:1.95,maxSize:235})},
         frostCrush:{hit:DEFAULT_HIT,deferredStatusTypes:["frostbite"],sprite:castSheet("assets/vfx/water/freeze-heavy-strike-vfx.png?v=166","single",{scale:2.35,maxSize:290})},
         waterBall:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/water-orb-vfx.png?v=173.19","group",{scale:1.22,minSize:150,maxSize:500,alignToSlots:true})},
-        // Reviewed full sheet: 1-2 cast; 3-5 face right; 6 faces down;
-        // 7-12 impact/dissipation stay upright. Hit frame/timing is unchanged.
-        floodBeast:{hit:DEFAULT_HIT,deferredStatusTypes:["frostbite"],sprite:castSheet("assets/vfx/water/tidal-beast-vfx.png?v=166","targetTrajectory",{travelToTargets:true,scale:1.85,minSize:175,maxSize:250,motionPhases:{flightStart:2,turnFrame:5,impactStart:6,flightSourceAngle:0,turnSourceAngle:90}})},
+        // Keep every authored frame at its original source angle while the
+        // complete sheet moves between actor and target. Hit timing is unchanged.
+        floodBeast:{hit:DEFAULT_HIT,deferredStatusTypes:["frostbite"],sprite:castSheet("assets/vfx/water/tidal-beast-vfx.png?v=166","targetTrajectory",{travelToTargets:true,preserveSourceOrientation:true,scale:1.85,minSize:175,maxSize:250,motionPhases:{flightStart:2,turnFrame:5,impactStart:6,flightSourceAngle:0,turnSourceAngle:90}})},
         iceArrowRain:{hit:DEFAULT_HIT,deferredStatusTypes:["frostbite"],sprite:castSheet("assets/vfx/water/frost-arrow-rain-vfx.png?v=173.19","battlefield",{fixedFormation:true,coverageScale:1.22,minWidth:140,minHeight:140})},
         freeze:{hit:DEFAULT_HIT,deferredStatusTypes:["freeze"],sprite:castSheet("assets/vfx/water/freeze-cast-vfx.png?v=166","single",{scale:2.2,maxSize:270})},
         healSpell:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/water-heal-vfx.png?v=166","single",{scale:2.05,maxSize:250})},
@@ -13181,6 +13181,7 @@
 
     function placePhasedMotion(current,node,sprite,dx,dy,angle){
         const phases=sprite.motionPhases;
+        const preserveSourceOrientation=!!sprite.preserveSourceOrientation;
         const start=phases.flightStart/sprite.frames;
         const turn=phases.turnFrame/sprite.frames;
         const impact=phases.impactStart/sprite.frames;
@@ -13189,10 +13190,10 @@
         const frames=[
             {offset:0,transform:transform(0,0)},
             {offset:start,transform:transform(0,0)},
-            {offset:start,transform:transform(0,angle-phases.flightSourceAngle)},
-            {offset:turn,transform:transform(turnProgress,angle-phases.flightSourceAngle)},
-            {offset:turn,transform:transform(turnProgress,angle-phases.turnSourceAngle)},
-            {offset:impact,transform:transform(1,angle-phases.turnSourceAngle)},
+            {offset:start,transform:transform(0,preserveSourceOrientation?0:angle-phases.flightSourceAngle)},
+            {offset:turn,transform:transform(turnProgress,preserveSourceOrientation?0:angle-phases.flightSourceAngle)},
+            {offset:turn,transform:transform(turnProgress,preserveSourceOrientation?0:angle-phases.turnSourceAngle)},
+            {offset:impact,transform:transform(1,preserveSourceOrientation?0:angle-phases.turnSourceAngle)},
             {offset:impact,transform:transform(1,0)},
             {offset:1,transform:transform(1,0)}
         ];
@@ -13234,8 +13235,9 @@
             applySpriteBox(node,size,size,sprite);
             node.style.setProperty("--v143-sprite-dx",target.x-actor.x+"px");
             node.style.setProperty("--v143-sprite-dy",target.y-actor.y+"px");
-            node.style.setProperty("--v143-sprite-angle",Math.atan2(target.y-actor.y,target.x-actor.x)*180/Math.PI+"deg");
-            if(sprite.motionPhases){ placePhasedMotion(current,node,sprite,target.x-actor.x,target.y-actor.y,Math.atan2(target.y-actor.y,target.x-actor.x)*180/Math.PI); }
+            const trajectoryAngle=Math.atan2(target.y-actor.y,target.x-actor.x)*180/Math.PI;
+            node.style.setProperty("--v143-sprite-angle",(sprite.preserveSourceOrientation?0:trajectoryAngle)+"deg");
+            if(sprite.motionPhases){ placePhasedMotion(current,node,sprite,target.x-actor.x,target.y-actor.y,trajectoryAngle); }
             return;
         }
 
