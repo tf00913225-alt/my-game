@@ -61,6 +61,12 @@ async function run(chrome,url,live){
   const runtime=await c.eval(PREPARE);await c.eval(INSTALL_MEASURE);
   assert.ok(runtime.productionStyles.some(p=>/build\/gameplay-core\.[a-f0-9]+\.css/.test(p)),'production CSS not loaded');
   const measure=selector=>c.eval(`__responsiveMeasure(${JSON.stringify(selector)})`);
+  const actionable=async()=>{
+   const controls=await c.eval(`Array.from(document.querySelectorAll('#itemModal button,#v17350BatchQuantity')).filter(n=>{const r=n.getBoundingClientRect();return r.width>0&&r.height>0&&!n.disabled}).map(n=>{const r=n.getBoundingClientRect(),h=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return {text:n.textContent||n.value,hit:!!(h&&(h===n||n.contains(h)))}})`);
+   assert.ok(controls.length,'item controls missing');
+   for(const control of controls)assert.ok(control.hit,'item control covered '+control.text);
+   return controls;
+  };
   const check=async(selector,v,text=false)=>{const row=await measure(selector);try{visible(row,v);}catch(error){console.error('FAILED geometry '+JSON.stringify(row));throw error;}if(text)assert.ok(row.projectedFont>=13-0.1,selector+' rendered font '+row.projectedFont);return row;};
   const click=async(selector,v)=>{
    const row=await check(selector,v),x=row.rect.left+row.rect.width/2,y=row.rect.top+row.rect.height/2;
@@ -116,10 +122,10 @@ async function run(chrome,url,live){
     if(mode==='potion'||mode==='material')assert.ok(await c.eval(`document.getElementById('itemEquipButton').disabled`),'non-equipment must not offer equip');
     if(mode==='potion')assert.ok(await c.eval(`Number(document.getElementById('v17350BatchQuantity').max)>=100000`),'large owned count not exercised');
     const textSizes=await c.eval(`Array.from(document.querySelectorAll('#itemModalName,#itemModalStats div,#itemModalStats b,.v17351-compare-stat span,.v17351-compare-stat b,.v17351-compare-pane>strong,#v17350BatchAction label,#v17350BatchAction input,#v17350BatchAction span,#v17350BatchAction button,#itemModal .item-modal-buttons button')).filter(n=>n.getBoundingClientRect().width>0).map(n=>({text:(n.textContent||n.value||'').slice(0,40),size:parseFloat(getComputedStyle(n).fontSize)*n.getBoundingClientRect().width/n.offsetWidth}))`);for(const t of textSizes)assert.ok(t.size>=12.9,'unreadable text '+JSON.stringify(t));
-    await screenshot(mode+'-'+v.join('x'));
-    const contentScroll=await scroll(contents);modes.push({mode,frame,actions,back,names,art,batch,contentScroll,textSizes});
+    const controlHits=await actionable();await screenshot(mode+'-'+v.join('x'));
+    const contentScroll=await scroll(contents);modes.push({mode,frame,actions,back,names,art,batch,contentScroll,textSizes,controlHits});
     // Resize while open; the state and fixed controls must survive.
-    await resize([v[0],v[1]-80]);await check('#itemModal .item-modal-buttons',[v[0],v[1]-80]);assert.equal((await measure('#itemModal')).mode,expected);await resize(v);
+    await resize([v[0],v[1]-80]);await check('#itemModal .item-modal-buttons',[v[0],v[1]-80]);await actionable();assert.equal((await measure('#itemModal')).mode,expected);await resize(v);
     await click(mode==='comparison'?'.v17351-compare-back':'#itemModal .close-item-button',v);
     const clean=await c.eval(`({show:document.getElementById('itemModal').classList.contains('show'),mode:document.getElementById('itemModal').dataset.presentationMode,compare:!!document.getElementById('v17351EquipmentCompare'),batch:!!document.getElementById('v17350BatchAction')})`);
     assert.equal(clean.show,false);assert.equal(clean.mode,undefined);assert.equal(clean.compare,false);assert.equal(clean.batch,false);
@@ -146,12 +152,12 @@ async function run(chrome,url,live){
     await check('.inventory-title-plate',v);await check('.inventory-bottom-actions',v);
     await click('.map-inventory-overlay-close',v);
     const closed=await c.eval(`!document.getElementById('app').classList.contains('on-inventory-page')`);assert.ok(closed,'inventory did not restore '+source);
-    await c.eval(`document.querySelector('[data-responsive-qa-entrance="active"]').removeAttribute('data-responsive-qa-entrance')`);
+    await c.eval(`document.querySelectorAll('[data-responsive-qa-entrance="active"]').forEach(n=>n.removeAttribute('data-responsive-qa-entrance'))`);
     // Re-enter from the same existing entrance after its formal source restore.
     await c.eval(`showPage(${JSON.stringify(source)})`);await settle();
     const again=await c.eval(`(()=>{const nodes=[...document.querySelectorAll(${JSON.stringify(source==='home'?'#bottomNav [onclick*="inventory"]':'[onclick*="v148OpenContextInventory"],[onclick*="openMapInventoryOverlay"]')})];const n=nodes.find(n=>{const r=n.getBoundingClientRect();return r.width>0&&r.height>0});if(!n)throw Error('missing re-entry');n.dataset.responsiveQaEntrance='active';return true})()`);
     assert.ok(again);await click(selected.selector,v);await check('.inventory-bottom-actions',v);await click('.map-inventory-overlay-close',v);
-    await c.eval(`document.querySelector('[data-responsive-qa-entrance="active"]').removeAttribute('data-responsive-qa-entrance')`);
+    await c.eval(`document.querySelectorAll('[data-responsive-qa-entrance="active"]').forEach(n=>n.removeAttribute('data-responsive-qa-entrance'))`);
     entrances.push({source,handler:selected.handler,closed,reentered:true});
    }
    evidence.push({viewport:v,backpack,grid,gridScroll,modes,realImage,shop,shopArt,shopBack,entrances});

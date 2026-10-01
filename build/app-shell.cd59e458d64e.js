@@ -30306,6 +30306,9 @@ function setItemModalPresentationMode(mode){
         modal.classList.add("item-modal-mode-"+normalized);
     }
 
+    // The native navigation is a separate paint plane. Project modal state
+    // through its existing context owner before exposing item controls.
+    window.v148SyncContextNavigation?.();
     return normalized;
 }
 window.setItemModalPresentationMode=setItemModalPresentationMode;

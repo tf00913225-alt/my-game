@@ -2893,7 +2893,8 @@
   topReturn.remove();
         }
 
-        if(app?.classList?.contains("inventory-overlay-open")){
+        if(app?.classList?.contains("inventory-overlay-open")||
+           document.getElementById("itemModal")?.dataset.presentationMode){
             window.FourSymbolsBottomNav?.hide();
             return;
         }
