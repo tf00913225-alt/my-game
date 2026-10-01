@@ -1685,6 +1685,14 @@ function setBattleItemCategory(category){
     renderBattleItemMenu();
 }
 
+function battleItemIconMarkup(item){
+    const raw=String(item&&item.icon||"").trim();
+    if(!raw){ return ""; }
+    if(raw.indexOf("<img")>=0||raw.indexOf("<svg")>=0||raw.indexOf("<span")>=0){ return raw; }
+    const escaped=raw.replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    return '<img src="'+escaped+'" alt="" aria-hidden="true" draggable="false" decoding="async">';
+}
+
 function renderBattleItemMenu(){
     const list=$("battlePotionList");
     const potionTab=$("battleItemPotionTab");
@@ -1727,6 +1735,7 @@ function renderBattleItemMenu(){
             const effectLabel=definition.recoveryPercent>=100
                 ? `${resourceLabel} 全回復`
                 : `${resourceLabel} +${definition.recoveryPercent}%`;
+            const iconMarkup=battleItemIconMarkup(definition);
 
             return `
                 <button
@@ -1735,7 +1744,7 @@ function renderBattleItemMenu(){
                     onclick="usePotion('${definition.id}')"
                     title="${definition.name}"
                 >
-                    <span class="battle-item-badge">${resourceLabel}</span>
+                    <span class="battle-item-icon">${iconMarkup}</span>
                     <span class="battle-item-name">${definition.shortName}</span>
                     <span class="battle-item-effect">${effectLabel}</span>
                     <span class="battle-item-count">×${count}</span>
@@ -1780,7 +1789,7 @@ function renderBattleItemMenu(){
                 disabled
                 title="${item.name||item.id}"
             >
-                <span class="battle-item-badge">符</span>
+                <span class="battle-item-icon">${battleItemIconMarkup(item)}</span>
                 <span class="battle-item-name">${item.name||item.id}</span>
                 <span class="battle-item-effect">${skillLabel}</span>
                 <span class="battle-item-count">×${item.count}</span>
@@ -4227,21 +4236,10 @@ function beginBattleDurationAction(event){
     };
 }
 function finishBattleDurationAction(){
-    const action=battleDurationAction;
+    /* Action Finish is notification only. Round-End is the sole consumer. */
     battleDurationAction=null;
-    if(!action){ return; }
-    action.buffs.forEach(buff=>{
-        if(Array.isArray(action.entity.activeBuffs)&&action.entity.activeBuffs.includes(buff)){
-            expireBattleActionBuff(action.entity,buff);
-        }
-    });
-    action.statuses.forEach(effect=>{
-        if(Array.isArray(action.entity.statusEffects)&&action.entity.statusEffects.includes(effect)){
-            expireBattleActionStatus(action.entity,effect);
-        }
-    });
-    if(typeof window!=="undefined"&&typeof window.v143SyncStatusVisualEffects==="function"){
-        window.v143SyncStatusVisualEffects(false);
+    if(typeof v143SyncStatusVisualEffects==="function"){
+        v143SyncStatusVisualEffects(false);
     }
 }
 if(typeof window!=="undefined"){
@@ -4571,6 +4569,7 @@ function notifyBattleRoundBoundary(type,token){
         try{ observer({token:token,turn:roundNumber,type:type}); }
         catch(error){ console.error("戰鬥回合邊界觀察器失敗：",error); }
     });
+    if(type==="round_end"){ consumeRoundEndDurations(); }
     return true;
 }
 function getBattleAdvanceDelay(phase){
@@ -11302,14 +11301,8 @@ function startTurn(token){
        結束的話就不要再往下開新回合。
     */
 
-    tickStatusEffects();
-
-    tickPlayerBuffs();
-
-    if(
-        typeof window!=="undefined" &&
-        typeof window.v143SyncStatusVisualEffects==="function"
-    ){
+    /* Round Start only projects already-settled state. */
+    if(typeof window!=="undefined"&&typeof window.v143SyncStatusVisualEffects==="function"){
         window.v143SyncStatusVisualEffects();
     }
 
@@ -12439,14 +12432,6 @@ function prepareAction(type){
 
 
     const hostileTargetType=getBattleActionTargetType(type,activeBattleCharacterIndex);
-
-    if(hostileTargetType==="all"){
-        queuedPlayerActions[activeBattleCharacterIndex]={action:type,target:null};
-        closeMenus();
-        updateUI();
-        finishPlayerAction();
-        return;
-    }
 
     const hasSelectablePrimary=currentBattleMonsters.some(index=>
         canSelectHostileBattlePrimary("monster",index,hostileTargetType)
@@ -17481,6 +17466,25 @@ function tickBuffsForCharacter(character){
 
 }
 
+
+function shouldConsumeRoundEndState(entry){
+    if(!entry||Number(entry.turnsLeft)<=0||entry.oneShot){ return false; }
+    return !(Number.isFinite(Number(entry.remainingBlocks))||Number.isFinite(Number(entry.chargeCount))||Number.isFinite(Number(entry.charges))||Number.isFinite(Number(entry.triggerCount))||entry.type==="bloodBurn"||entry.type==="phoenixMight");
+}
+function consumeRoundEndDurations(){
+    if(!battleActive){ return; }
+    tickStatusEffects();
+    const entities=[];
+    getExistingPartyIndexes().forEach(index=>{const entity=getPartyCharacterByIndex(index);if(entity){entities.push(entity);}});
+    currentBattleMonsters.forEach(index=>{const entity=monsters[index];if(entity){entities.push(entity);}});
+    entities.forEach(entity=>{
+        if(Array.isArray(entity.activeBuffs)){entity.activeBuffs.slice().forEach(buff=>{if(shouldConsumeRoundEndState(buff)&&entity.activeBuffs.includes(buff)){expireBattleActionBuff(entity,buff);}});}
+        if(Array.isArray(entity.statusEffects)){entity.statusEffects.slice().forEach(effect=>{if(effect&&effect.type!=="burn"&&shouldConsumeRoundEndState(effect)&&entity.statusEffects.includes(effect)){expireBattleActionStatus(entity,effect);}});}
+    });
+    tickPlayerBuffs();
+    if(typeof window!=="undefined"&&typeof window.v143SyncStatusVisualEffects==="function"){window.v143SyncStatusVisualEffects(false);}
+    updateUI();
+}
 
 function tickPlayerBuffs(){
 

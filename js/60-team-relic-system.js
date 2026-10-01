@@ -396,16 +396,36 @@
         if(typeof requestAnimationFrame==="function"){requestAnimationFrame(show);}else{show();}
         return waitMs(RELIC_TARGET_REVEAL_MS);
     }
-    function beginRelicCinematic(def,target){
-        if(!hasLiveBattlePresentationHost()||!def||!document.body){ return Promise.resolve(null); }
+    function loadBattleIdentityImage(path){
+        return new Promise((resolve,reject)=>{
+            if(!path){reject(new Error("秘寶身份圖示路徑為空"));return;}
+            const image=new Image();image.decoding="async";
+            const ready=()=>Promise.resolve(typeof image.decode==="function"?image.decode():undefined).then(()=>{
+                if(image.complete&&image.naturalWidth>0){resolve(path);}else{reject(new Error("秘寶身份圖示 decode 後無有效尺寸："+path));}
+            },reject);
+            image.onload=ready;image.onerror=()=>reject(new Error("秘寶身份圖示無法載入："+path));image.src=path;
+            if(image.complete&&image.naturalWidth>0){ready();}
+        });
+    }
+    function resolveBattleIdentityIcon(def){
+        const candidates=[def&&def.battleIconPath,def&&def.iconPath].filter(Boolean);
+        let chain=Promise.reject(new Error("沒有可用秘寶身份圖示"));
+        candidates.forEach(path=>{chain=chain.catch(()=>loadBattleIdentityImage(path));});
+        return chain;
+    }
+    async function beginRelicCinematic(def,target){
+        if(!hasLiveBattlePresentationHost()||!def||!document.body){return null;}
+        const iconPath=await resolveBattleIdentityIcon(def);
         cleanupRelicCutin();
         const node=document.createElement("div"),overlay=relicOverlayGeometry(),overlayRect=overlay&&overlay.rect;
-        if(!overlayRect||overlayRect.width<=0||overlayRect.height<=0){ return Promise.resolve(null); }
+        if(!overlayRect||overlayRect.width<=0||overlayRect.height<=0){return null;}
         node.id="teamRelicBattlePresentation";node.className="team-relic-battle-presentation";node.setAttribute("aria-label","秘寶發動："+def.name);
-        node.innerHTML='<div class="team-relic-battle-dim" aria-hidden="true"></div><div class="team-relic-target-projection-layer" aria-hidden="true"></div><div class="team-relic-battle-cutin"><span class="team-relic-battle-cutin-icon"><img src="'+esc(def.battleIconPath||def.iconPath||"")+'" alt=""></span><span class="team-relic-battle-cutin-copy"><strong>'+esc(def.name)+'</strong></span></div>';
+        node.innerHTML='<div class="team-relic-battle-dim" aria-hidden="true"></div><div class="team-relic-target-projection-layer" aria-hidden="true"></div><div class="team-relic-battle-cutin"><span class="team-relic-battle-cutin-icon"><img src="'+esc(iconPath)+'" alt="" decoding="async"></span><span class="team-relic-battle-cutin-copy"><strong>'+esc(def.name)+'</strong></span></div>';
         document.body.appendChild(node);relicCutinNode=node;syncRelicPresentationGeometry(node);document.body.classList.add("team-relic-cinematic-active");
-        const identity=()=>{if(node===relicCutinNode){node.classList.add("identity-visible");}};
-        if(typeof requestAnimationFrame==="function"){requestAnimationFrame(identity);}else{identity();}
+        if(typeof requestAnimationFrame==="function"){
+            await new Promise(resolve=>requestAnimationFrame(()=>{if(node===relicCutinNode){node.classList.add("identity-visible");}resolve();}));
+            await nextVisualPaint();
+        }else{node.classList.add("identity-visible");}
         return waitMs(RELIC_IDENTITY_REVEAL_MS).then(()=>{if(node!==relicCutinNode){return null;}node.classList.add("dim-visible");return waitMs(RELIC_DIM_IN_MS);}).then(()=>{if(node!==relicCutinNode){return null;}return waitMs(RELIC_IDENTITY_HOLD_MS);}).then(()=>{if(node!==relicCutinNode){return null;}node.classList.add("identity-exiting");return Promise.all([waitMs(RELIC_IDENTITY_EXIT_MS),revealRelicTargets(target)]).then(()=>node);});
     }
     function enterRelicVfxPhase(node){

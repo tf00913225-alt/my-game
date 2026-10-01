@@ -19,7 +19,7 @@ test("persistent status icons are static while body states stay pulse/static",()
   const js=read("js/39-v143-skill-animation.js");
   const css=read("css/40-v143-combat-dungeon-polish.css");
   assert.match(js,/frostbite:statusVisual\("","icon","statusEffects"/);
-  assert.match(js,/fireMomentum:statusVisual\("","icon","activeBuffs"/);
+  assert.match(js,/fireMomentum:statusVisual\("","none","activeBuffs"/);
   assert.match(js,/burn:statusVisual\("assets\/vfx\/status\/burn\.webp","pulse"/);
   assert.match(js,/freeze:statusVisual\("assets\/vfx\/status\/freeze\.webp","static"/);
   assert.doesNotMatch(js,/statDown:statusVisual/);
