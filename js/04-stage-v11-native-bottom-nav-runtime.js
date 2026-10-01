@@ -8,7 +8,18 @@
         const nav=document.getElementById("bottomNav");
         const overlay=document.getElementById("game-overlay-layer");
         if(!nav||!overlay){ return null; }
-        if(!mainButtons){ mainButtons=Array.from(nav.children); }
+        if(!mainButtons){
+            mainButtons=Array.from(nav.children);
+            mainButtons.forEach(button=>{
+                const image=button.querySelector(".nav-art-button");
+                if(image&&!image.parentElement.classList.contains("nav-icon-frame")){
+                    const frame=document.createElement("span");
+                    frame.className="nav-icon-frame";
+                    image.replaceWith(frame);
+                    frame.appendChild(image);
+                }
+            });
+        }
         if(!shell){
             shell=document.createElement("div");
             shell.className="native-bottom-nav-layer";
@@ -47,7 +58,10 @@
                 const assistive=document.createElement("span");
                 assistive.className="nav-sr-only";
                 assistive.textContent=label;
-                button.append(img,assistive);
+                const frame=document.createElement("span");
+                frame.className="nav-icon-frame";
+                frame.appendChild(img);
+                button.append(frame,assistive);
                 return button;
             }));
             nav.dataset.navContext=key;

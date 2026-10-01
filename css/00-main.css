@@ -5216,38 +5216,6 @@ button:active{
    只替換對應導覽視覺；原 onclick / active / page 切換機制不變。
    主導覽改為「背包／野怪區／主城／副本／BOSS」；地圖導覽的自動戰鬥改用透明元素匣圖示。
 ===================================================== */
-.nav-button.nav-art-button-wrap{
-    position:relative;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:0;
-    overflow:visible;
-    color:inherit;
-}
-.nav-art-button{
-    display:block;
-    width:auto;
-    height:66px;
-    max-width:96%;
-    object-fit:contain;
-    object-position:center;
-    pointer-events:none;
-    user-select:none;
-    -webkit-user-drag:none;
-    transform:translateZ(0) scale(.96);
-    transform-origin:center;
-    filter:brightness(.88) saturate(.92);
-    transition:filter .14s ease, transform .14s ease;
-}
-.nav-button.nav-art-button-wrap.active .nav-art-button{
-    filter:brightness(1.12) saturate(1.08) drop-shadow(0 0 5px rgba(240,180,41,.58));
-    transform:translateZ(0) scale(1.02);
-}
-.nav-button.nav-art-button-wrap:active .nav-art-button{
-    filter:brightness(1.2) saturate(1.08);
-    transform:translateZ(0) scale(.92);
-}
 .nav-sr-only{
     position:absolute!important;
     width:1px!important;

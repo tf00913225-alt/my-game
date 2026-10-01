@@ -36,14 +36,33 @@
     box-sizing:border-box;
     touch-action:manipulation;
 }
-/* The image itself is the fixed icon frame for every context. */
-#game-stage > #game-overlay-layer #bottomNav .nav-art-button{
+/* Fixed frame geometry does not change when the contained art is animated. */
+#game-stage > #game-overlay-layer #bottomNav .nav-icon-frame{
     display:block;
+    flex:0 0 180px;
     width:180px;
     height:180px;
-    max-width:100%;
-    max-height:100%;
+    pointer-events:none;
+}
+#game-stage > #game-overlay-layer #bottomNav .nav-art-button{
+    display:block;
+    width:100%;
+    height:100%;
     object-fit:contain;
     object-position:center;
+    pointer-events:none;
+    user-select:none;
+    -webkit-user-drag:none;
+    transform:translateZ(0) scale(.96);
+    filter:brightness(.88) saturate(.92);
+    transition:filter .14s ease, transform .14s ease;
+}
+#game-stage > #game-overlay-layer #bottomNav > .nav-button.active .nav-art-button{
+    filter:brightness(1.12) saturate(1.08) drop-shadow(0 0 5px rgba(240,180,41,.58));
+    transform:translateZ(0) scale(1.02);
+}
+#game-stage > #game-overlay-layer #bottomNav > .nav-button:active .nav-art-button{
+    filter:brightness(1.2) saturate(1.08);
+    transform:translateZ(0) scale(.92);
 }
 #game-stage > #game-overlay-layer #bottomNav > .nav-button > *{pointer-events:none;}
