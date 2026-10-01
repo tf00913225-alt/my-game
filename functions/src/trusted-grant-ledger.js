@@ -2,6 +2,7 @@
 
 // Only a trusted backend can create a grant record. This owner reserves an
 // entitlement once; it never trusts a browser-supplied kind or amount.
+const {verifyCreditedGrant}=require("./credited-grant-evidence");
 const ID_PATTERN=/^[A-Za-z0-9_-]{16,64}$/;
 const GRANT_SCHEMA_VERSION=1;
 
@@ -56,21 +57,16 @@ function createTrustedGrantLedger({db,FieldValue,HttpsError,runProtected,inspect
                     fail("data-loss","Grant receipt is inconsistent.");
                 }
                 if(receipt.creditedToCharacter===true){
-                    const claim=await transaction.get(privateRef.collection("uniqueClaims").doc(grantId));
-                    const ledger=ledgerSnapshot;
-                    if(grant.status!=="credited"||!claim.exists||!ledger.exists||
-                       claim.get("ownerUid")!==uid||claim.get("operationId")!==operationId||
-                       claim.get("creditRevision")!==receipt.creditRevision||
-                       ledger.get("ownerUid")!==uid||ledger.get("grantId")!==grantId||
-                       ledger.get("operationId")!==operationId||
-                       ledger.get("amount")!==receipt.amount||
-                       ledger.get("kind")!==grant.kind||
-                       ledger.get("creditRevision")!==receipt.creditRevision||
-                       ledger.get("snapshotSha256")!==receipt.snapshotSha256||
-                       !Number.isSafeInteger(receipt.creditRevision)||
-                       receipt.creditRevision>envelope.serverRevision){
-                        fail("data-loss","Credited grant receipt is inconsistent.");
-                    }
+                    const [claim,claimRecord]=await Promise.all([
+                        transaction.get(privateRef.collection("uniqueClaims").doc(grantId)),
+                        transaction.get(privateRef.collection("claimRecords").doc(grantId))
+                    ]);
+                    await verifyCreditedGrant({tx:transaction,root:privateRef,uid,
+                        grantId,operationId,currentRevision:envelope.serverRevision,
+                        grant,receipt,ledger:ledgerSnapshot.exists?ledgerSnapshot.data():null,
+                        claim:claim.exists?claim.data():null,
+                        claimRecord:claimRecord.exists?claimRecord.data():null,
+                        otherOperationExists:operationSnapshot.exists,fail});
                     return {grantId,operationId,serverRevision:receipt.serverRevision,
                         currentServerRevision:envelope.serverRevision,unchanged:true,
                         creditedToCharacter:true,creditRevision:receipt.creditRevision};

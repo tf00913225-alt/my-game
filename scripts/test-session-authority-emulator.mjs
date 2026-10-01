@@ -351,6 +351,47 @@ await rejected("claimDailyCheckin",atomicUser.idToken,atomicRequest.data,"DATA_L
 await atomicGrantRef.update({amount:50});
 assert.equal((await invoke("claimDailyCheckin",atomicUser.idToken,atomicRequest.data))
     .unchanged,true);
+// Both public retry paths must inspect immutable credit proof in the real
+// transaction. Admin mutations below exist only in this disposable emulator.
+const atomicRoot=db.collection(`serverUsers/${atomicUid}`);
+const atomicOperation=`${atomicClaim.grantId}-credit`;
+const atomicLedger=atomicRoot.collection("ledgerEntries").doc(atomicOperation);
+assert.equal((await atomicLedger.get()).get("balanceBefore"),0);
+assert.equal((await atomicLedger.get()).get("balanceAfter"),50);
+assert.equal((await atomicLedger.get()).get("sourceRevision"),2);
+const replayAtomic=()=>invoke("claimDailyCheckin",atomicUser.idToken,atomicRequest.data);
+const reserveAtomic=()=>invoke("reserveTrustedGrant",atomicUser.idToken,{
+    uid:atomicUid,session:atomicSession,grantId:atomicClaim.grantId,
+    operationId:atomicOperation,expectedRevision:2});
+for(const [path,patch] of [
+    ["playableSnapshots/3",null],["recoveryArchives/3",null],
+    ["recoveryArchives/2",null],
+    ["playableSnapshots/3",{sha256:"0".repeat(64)}],
+    ["recoveryArchives/3",{"sourceRecords.economy.gold":999}],
+    [`ledgerEntries/${atomicOperation}`,{balanceAfter:51}],
+    [`ledgerEntries/${atomicOperation}`,{balanceBefore:1}],
+    [`claimRecords/${atomicClaim.grantId}`,{operationId:"corrupt-operation-0001"}],
+    [`operations/${atomicOperation}`,{schemaVersion:1,kind:"collision"}]
+]){
+    const ref=atomicRoot.doc(path),saved=await ref.get();
+    if(patch===null)await ref.delete();else await ref.set(patch,{merge:true});
+    // Compare all authoritative writes relevant to this operation, including
+    // the tampered proof; a rejection must not try to repair/reissue it.
+    const refs=[db.doc(`users/${atomicUid}/saves/current`),
+        atomicRoot.doc("economy/current"),atomicLedger,
+        atomicRoot.doc(`grantOperations/${atomicOperation}`),ref];
+    const before=await Promise.all(refs.map(async item=>(await item.get()).data()));
+    for(const retry of [replayAtomic,reserveAtomic]){
+        await assert.rejects(retry(),error=>error.code==="DATA_LOSS");
+    }
+    assert.deepEqual(await Promise.all(refs.map(async item=>(await item.get()).data())),before);
+    if(saved.exists)await ref.set(saved.data());else await ref.delete();
+}
+assert.equal((await replayAtomic()).unchanged,true);
+assert.equal((await reserveAtomic()).creditedToCharacter,true);
+assert.equal((await atomicRoot.collection("ledgerEntries").get()).size,1);
+assert.equal((await atomicRoot.collection("uniqueClaims").get()).size,1);
+console.log("Credited grant evidence: callable corruption/missing-proof/collision retries rejected without writes.");
 // The server day and the 50 gold award are owned by the issuer, not the request.
 let checkinTime=Date.parse("2026-09-27T15:59:59Z");
 let abortCheckin=false;
@@ -420,6 +461,15 @@ assert.equal((await db.doc(`serverUsers/${y}/ledgerEntries/${goldOperation}`).ge
 assert.equal((await db.doc(`serverUsers/${y}/uniqueClaims/${grantIdForCharacter}`).get()).exists,false);
 assert.equal((await db.doc(`serverUsers/${y}/claimRecords/${grantIdForCharacter}`).get()).exists,false);
 assert.equal((await db.doc(`serverUsers/${y}/recoveryArchives/4`).get()).exists,false);
+// Missing source recovery proof blocks the first credit atomically.
+const creditSourceArchiveRef=db.doc(`serverUsers/${y}/recoveryArchives/2`);
+const creditSourceArchive=(await creditSourceArchiveRef.get()).data();
+await creditSourceArchiveRef.delete();
+await assert.rejects(goldWriter.creditReservedGrant(yRequest,creditArgs),error=>error.code==="data-loss");
+assert.equal((await db.doc(`serverUsers/${y}/economy/current`).get()).get("gold"),0);
+assert.equal((await db.doc(`serverUsers/${y}/ledgerEntries/${goldOperation}`).get()).exists,false);
+assert.equal((await db.doc(`users/${y}/saves/current`).get()).get("serverRevision"),3);
+await creditSourceArchiveRef.set(creditSourceArchive);
 const credited=await goldWriter.creditReservedGrant(yRequest,creditArgs);
 assert.equal(credited.creditRevision,4);
 const creditedArchive=await checkRecoveryArchive(y,4);
