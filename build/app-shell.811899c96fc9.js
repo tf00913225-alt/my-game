@@ -4795,7 +4795,7 @@ function spawnButtonRipple(
     // Item controls already receive the shared V141 pointer feedback.
     // The legacy per-button ripple uses browser pixels inside the projected
     // legacy stage and survives close/reopen, creating scrollable overflow.
-    if(button.closest("#itemModal")){
+    if(button.closest("#itemModal,#inventoryPage")||button.matches("#bottomNav [onclick*='inventory'],[onclick*='v148OpenContextInventory'],[onclick*='openMapInventoryOverlay']")){
         return;
     }
 
@@ -30435,7 +30435,7 @@ function openItemModal(
     );
 
 
-    if(item.type==="potion"){
+    if(!isEquipment){
 
         equipButton.disabled=true;
 

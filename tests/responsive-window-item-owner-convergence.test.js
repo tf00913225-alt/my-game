@@ -47,7 +47,8 @@ const rippleSource=main.slice(main.indexOf("function spawnButtonRipple("),main.i
 const vm=require("node:vm");
 const rippleContext={lastRippleTime:0,document:{createElement(){throw Error("retired item ripple created");}},setTimeout(){throw Error("retired item ripple timer");}};
 vm.runInNewContext(rippleSource,rippleContext);
-rippleContext.spawnButtonRipple({closest:s=>s==="#itemModal"},180,500);
+rippleContext.spawnButtonRipple({closest:()=>true},180,500);
+rippleContext.spawnButtonRipple({closest:()=>false,matches:()=>true},180,500);
 
 // Replaced geometry is deleted rather than hidden behind another late override.
 assert.doesNotMatch(legacySystemCss,/#itemModal \./);

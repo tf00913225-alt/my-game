@@ -113,6 +113,7 @@ async function run(chrome,url,live){
     assert.ok(images.length>0,mode+' art missing');for(const img of images){assert.equal(img.fit,'contain');assert.ok(img.loaded,'image decode');assert.equal(img.transform,'none');}
     if(mode==='comparison'&&v[0]<=374)assert.equal((await measure(contents)).columns.split(' ').length,1,'comparison must stack');
     const batch=(mode==='potion'||mode==='chest')?await check('#v17350BatchAction',v):null;
+    if(mode==='potion'||mode==='material')assert.ok(await c.eval(`document.getElementById('itemEquipButton').disabled`),'non-equipment must not offer equip');
     if(mode==='potion')assert.ok(await c.eval(`Number(document.getElementById('v17350BatchQuantity').max)>=100000`),'large owned count not exercised');
     const textSizes=await c.eval(`Array.from(document.querySelectorAll('#itemModalName,#itemModalStats div,#itemModalStats b,.v17351-compare-stat span,.v17351-compare-stat b,.v17351-compare-pane>strong,#v17350BatchAction label,#v17350BatchAction input,#v17350BatchAction span,#v17350BatchAction button,#itemModal .item-modal-buttons button')).filter(n=>n.getBoundingClientRect().width>0).map(n=>({text:(n.textContent||n.value||'').slice(0,40),size:parseFloat(getComputedStyle(n).fontSize)*n.getBoundingClientRect().width/n.offsetWidth}))`);for(const t of textSizes)assert.ok(t.size>=12.9,'unreadable text '+JSON.stringify(t));
     await screenshot(mode+'-'+v.join('x'));
