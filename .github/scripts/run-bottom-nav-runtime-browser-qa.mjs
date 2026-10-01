@@ -90,7 +90,11 @@ class Cdp{
     async send(method,params={}){
         await this.ready;
         const id=++this.id;
-        return new Promise((resolve,reject)=>{this.pending.set(id,{resolve,reject});this.ws.send(JSON.stringify({id,method,params}));});
+        return new Promise((resolve,reject)=>{
+            const timer=setTimeout(()=>{this.pending.delete(id);reject(new Error("CDP timed out: "+method));},20000);
+            this.pending.set(id,{resolve:value=>{clearTimeout(timer);resolve(value);},reject:error=>{clearTimeout(timer);reject(error);}});
+            this.ws.send(JSON.stringify({id,method,params}));
+        });
     }
     async eval(expression){
         const result=await this.send("Runtime.evaluate",{expression,returnByValue:true,awaitPromise:true});
@@ -134,6 +138,7 @@ async function runViewport(chrome,url,width,height){
   assert.equal(evidence.startup.state,'READY');assert.equal(evidence.startup.ready,true);
   for(let pass=0;pass<2;pass++){
    for(const [mode,action] of SCENARIOS){
+    console.log("Navigation QA",width,height,pass,mode);
     await client.eval(action);await settle(client);
     const row={mode,pass,...await client.eval(MEASURE)};evidence.rows.push(row);
     assert.equal(row.sameShell,true,mode+' shell identity');assert.equal(row.shellCount,1);assert.equal(row.legacyCount,0);assert.equal(row.visible,true,mode+' visible');
@@ -146,18 +151,18 @@ async function runViewport(chrome,url,width,height){
   }
   evidence.lifecycle=[];
   for(const [name,action] of [['patrol-backpack',"showPage('training');enterMap();v148OpenContextInventory()"],['patrol-backpack-close',"closeMapInventoryOverlay()"],['dungeon-tab',"vGameplayOpenDailyDungeons();switchDungeonTab('daily')"],['battle-exit',"showPage('battle');showPage('dungeon')"],['return-home',"showPage('home')"]]){
-    await client.eval(action);await settle(client);const row={name,...await client.eval(MEASURE)};evidence.lifecycle.push(row);assert.equal(row.sameShell,true);assert.equal(row.shellCount,1);assert.equal(row.legacyCount,0);
+    console.log("Lifecycle QA",name);evidence.phase=name;await client.eval(action);await settle(client);const row={name,...await client.eval(MEASURE)};evidence.lifecycle.push(row);assert.equal(row.sameShell,true);assert.equal(row.shellCount,1);assert.equal(row.legacyCount,0);
   }
-  await client.send('Page.setWebLifecycleState',{state:'frozen'});await client.send('Page.setWebLifecycleState',{state:'active'});await settle(client);
+  evidence.phase='foreground';console.log('Lifecycle QA background/foreground');await client.send('Page.setWebLifecycleState',{state:'frozen'});await client.send('Page.setWebLifecycleState',{state:'active'});await client.send('Page.bringToFront');await settle(client);
   evidence.foreground=await client.eval(MEASURE);assert.equal(evidence.foreground.sameShell,true);assert.equal(evidence.foreground.visible,true);
   await client.eval("showPage('home')");await settle(client);
-  evidence.home=await client.eval(`(()=>{const n=document.getElementById('homePage'),r=n.getBoundingClientRect();return {clientHeight:n.clientHeight,scrollHeight:n.scrollHeight,scrollTop:n.scrollTop,overflow:getComputedStyle(n).overflowY,rect:{left:r.left,top:r.top,width:r.width,height:r.height},documentScroll:document.scrollingElement.scrollTop};})()`);
+  evidence.phase='home';console.log('Home scroll QA');evidence.home=await client.eval(`(()=>{const n=document.getElementById('homePage'),r=n.getBoundingClientRect();return {clientHeight:n.clientHeight,scrollHeight:n.scrollHeight,scrollTop:n.scrollTop,overflow:getComputedStyle(n).overflowY,rect:{left:r.left,top:r.top,width:r.width,height:r.height},documentScroll:document.scrollingElement.scrollTop};})()`);
   assert.ok(evidence.home.scrollHeight<=evidence.home.clientHeight+1,JSON.stringify(evidence.home));assert.notEqual(evidence.home.overflow,'auto');
   const hr=evidence.home.rect;await swipe(client,hr.left+hr.width/2,Math.min(height-100,hr.top+hr.height*.7));
   evidence.homeAfterSwipe=await client.eval("({scrollTop:homePage.scrollTop,documentScroll:document.scrollingElement.scrollTop})");assert.equal(evidence.homeAfterSwipe.scrollTop,0);assert.equal(evidence.homeAfterSwipe.documentScroll,0);
   // Use the real inventory grid and its real scroll owner. QA-only inventory
   // data supplies enough rows; no production state or CSS is replaced.
-  await client.eval(`inventoryItems.splice(0,inventoryItems.length,...Array.from({length:80},(_,i)=>({id:'qa-scroll-'+i,name:'測試材料',type:'material',rarityKey:'white',count:1})));showPage('inventory');setInventoryFilter('material');renderInventory();`);await settle(client);
+  evidence.phase='inventory';console.log('Inventory scroll QA');await client.eval(`inventoryItems.splice(0,inventoryItems.length,...Array.from({length:80},(_,i)=>({id:'qa-scroll-'+i,name:'測試材料',type:'material',rarityKey:'white',count:1})));showPage('inventory');setInventoryFilter('material');renderInventory();`);await settle(client);
   evidence.inventory=await client.eval(`(()=>{const n=document.getElementById('inventoryGridScroll'),r=n.getBoundingClientRect();n.scrollTop=0;return {clientHeight:n.clientHeight,scrollHeight:n.scrollHeight,overflow:getComputedStyle(n).overflowY,rect:{left:r.left,top:r.top,width:r.width,height:r.height}}})()`);
   const ir=evidence.inventory.rect;assert.ok(evidence.inventory.scrollHeight>evidence.inventory.clientHeight,'real inventory has no scrollable rows');
   await swipe(client,ir.left+ir.width/2,ir.top+Math.min(ir.height-20,ir.height*.8));
