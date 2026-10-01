@@ -33,31 +33,7 @@
     }
 })();
 
-/* V3 runtime guard: the wrapper is created before this runs, but keep this
-   idempotent in case another script re-renders/reparents the navigation. */
-(function enforceVirtualStageLayout(){
-    function apply(){
-        const app=document.getElementById('app');
-        const content=document.getElementById('game-content');
-        if(!app || !content) return;
-        const navs=content.querySelectorAll('.bottom-nav');
-        navs.forEach(function(nav){
-            nav.style.position='absolute';
-            nav.style.left='0';
-            nav.style.right='auto';
-            nav.style.bottom='0';
-            nav.style.width='420px';
-            nav.style.maxWidth='none';
-            nav.style.transform='none';
-            nav.style.margin='0';
-        });
-    }
-    if(document.readyState==='loading'){
-        document.addEventListener('DOMContentLoaded',apply,{once:true});
-    }else{
-        apply();
-    }
-})();
+/* Legacy V3 navigation positioning retired; FourSymbolsBottomNav owns the shell. */
 
 const GAME_WIDTH = 1080;
 const GAME_HEIGHT = 1920;

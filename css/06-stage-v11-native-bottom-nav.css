@@ -26,6 +26,10 @@
     background:linear-gradient(0deg,#0e0c0a,#1c1712);
 }
 #game-stage > #game-overlay-layer #bottomNav > .nav-button{
+    position:relative;
+    border:0;
+    background:transparent;
+    color:#b3a58c;
     display:flex;
     align-items:center;
     justify-content:center;

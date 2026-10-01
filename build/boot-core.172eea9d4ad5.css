@@ -5286,35 +5286,6 @@ button:active{
    NAV
 ===================================================== */
 
-.nav-button{
-    border:0;
-
-    background:transparent;
-    color:#b3a58c;
-
-    font-size:10px;
-
-    transition:color .15s;
-
-    /*
-       ★ 新增（依照使用者要求，「自動戰鬥」
-       放進地圖頁面導覽列）：
-       4個字比原本「角色」「任務」「返回」
-       這種2字標籤長，4欄變窄之後容易溢出
-       格子，加white-space:nowrap讓文字
-       保持一行，配合scale稍微縮小整個
-       按鈕的內距，確保4個字塞得下。
-    */
-
-    white-space:nowrap;
-    padding:0 2px;
-}
-
-.nav-button.active{
-    color:#f0b429;
-    text-shadow:0 0 8px rgba(240,180,41,.6);
-}
-
 .nav-icon{
     display:block;
     font-size:20px;

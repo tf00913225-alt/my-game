@@ -56,6 +56,7 @@ test("gameplay panel keeps only the top ornament owner",()=>{
  test("navigation frames and state styling have only the canonical CSS owner",()=>{
     const css=read("css/06-stage-v11-native-bottom-nav.css");
     assert.match(css,/\.nav-icon-frame\{[\s\S]*?width:180px;[\s\S]*?height:180px;/);
-    assert.doesNotMatch(read("css/00-main.css"),/\.nav-art-button\{/);
+    assert.doesNotMatch(read("css/00-main.css"),/\.nav-art-button\{|\.nav-button\{/);
+    assert.doesNotMatch(read("js/00-main.js"),/enforceVirtualStageLayout|nav\.style\.width/);
     assert.match(read("js/04-stage-v11-native-bottom-nav-runtime.js"),/frame\.className="nav-icon-frame"/);
  });

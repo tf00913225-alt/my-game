@@ -111,7 +111,7 @@ class Cdp{
     }
     async eval(expression){
         const result=await this.send("Runtime.evaluate",{expression,returnByValue:true,awaitPromise:true});
-        if(result.exceptionDetails){ throw new Error(result.exceptionDetails.text||"browser evaluation failed"); }
+        if(result.exceptionDetails){ throw new Error(JSON.stringify(result.exceptionDetails)); }
         return result.result?.value;
     }
     close(){ try{this.ws.close();}catch(_){} }
@@ -147,13 +147,14 @@ async function runViewport(chrome,url,width,height){
   await client.send('Page.enable');await client.send('Runtime.enable');
   await client.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true});
   await client.send('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:1});
-  await client.send('Page.navigate',{url});evidence.startup=await client.eval(PREPARE);
+  await client.send('Page.navigate',{url});await new Promise(r=>setTimeout(r,300));evidence.startup=await client.eval(PREPARE);
   assert.equal(evidence.startup.state,'READY');assert.equal(evidence.startup.ready,true);
   for(let pass=0;pass<2;pass++){
    for(const [mode,action] of SCENARIOS){
     await client.eval(action);await settle(client);
     const row={mode,pass,...await client.eval(MEASURE)};evidence.rows.push(row);
     assert.equal(row.sameShell,true,mode+' shell identity');assert.equal(row.shellCount,1);assert.equal(row.legacyCount,0);assert.equal(row.visible,true,mode+' visible');
+    assert.ok(Math.abs(row.nav.width-row.shell.width)<=1,mode+' native width');
     const base=evidence.rows[0];for(const key of ['width','height','left','bottom'])assert.ok(Math.abs(row.nav[key]-base.nav[key])<=1,mode+' '+key);
     assert.equal(row.columns.length,5);assert.equal(row.frames.length,5);
     for(const col of row.columns)assert.ok(Math.abs(col.width-row.columns[0].width)<=1,mode+' equal columns');
@@ -177,7 +178,7 @@ async function runViewport(chrome,url,width,height){
   await client.send('Page.reload',{ignoreCache:true});await client.eval(PREPARE);evidence.reload=await client.eval(MEASURE);assert.equal(evidence.reload.shellCount,1);assert.equal(evidence.reload.legacyCount,0);
   const shot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(ARTIFACT_DIR,`navigation-home-${width}x${height}.png`),Buffer.from(shot.data,'base64'));
   return evidence;
- }catch(error){error.navEvidence=evidence;throw error;}finally{client?.close();proc.kill('SIGTERM');fs.rmSync(profile,{recursive:true,force:true});}
+ }catch(error){error.navEvidence=evidence;throw error;}finally{client?.close();proc.kill('SIGTERM');try{fs.rmSync(profile,{recursive:true,force:true,maxRetries:3,retryDelay:100});}catch(_){}}
 }
 fs.mkdirSync(ARTIFACT_DIR,{recursive:true});
 const server=await startServer();const results=[];
