@@ -2771,10 +2771,10 @@ window.v173GetDefaultMonsterEvasion=getDefaultMonsterEvasion;
 const forestMonsters = [
 
     makeZoneMonster("哥布林",3,"fire",undefined,"wild.zone-01.fire-01"),
-    makeZoneMonster("史萊姆",2,"water"),
+    makeZoneMonster("水靈狐",2,"water",undefined,"wild.zone-01.water-01"),
     makeZoneMonster("哥布林",3,"fire",undefined,"wild.zone-01.fire-01"),
-    makeZoneMonster("史萊姆",2,"water"),    makeZoneMonster("哥布林",3,"fire",undefined,"wild.zone-01.fire-01"),
-    makeZoneMonster("史萊姆",2,"water")
+    makeZoneMonster("水靈狐",2,"water",undefined,"wild.zone-01.water-01"),    makeZoneMonster("哥布林",3,"fire",undefined,"wild.zone-01.fire-01"),
+    makeZoneMonster("水靈狐",2,"water",undefined,"wild.zone-01.water-01")
 
 ];
 
@@ -2797,11 +2797,11 @@ forestMonsters.forEach(monster=>{
 const desertMonsters = [
 
     makeZoneMonster("沙漠豺狼",16,"fire",undefined,"wild.zone-02.fire-01"),
-    makeZoneMonster("沙蠍",15,"water"),
+    makeZoneMonster("浪尾獺",15,"water",undefined,"wild.zone-02.water-01"),
     makeZoneMonster("沙漠豺狼",16,"fire",undefined,"wild.zone-02.fire-01"),
-    makeZoneMonster("沙蠍",15,"water"),
+    makeZoneMonster("浪尾獺",15,"water",undefined,"wild.zone-02.water-01"),
     makeZoneMonster("沙漠豺狼",16,"fire",undefined,"wild.zone-02.fire-01"),
-    makeZoneMonster("沙蠍",15,"water")
+    makeZoneMonster("浪尾獺",15,"water",undefined,"wild.zone-02.water-01")
 
 ];
 
@@ -2827,9 +2827,9 @@ const desertMonsters = [
 const iceMountainMonsters = [
 
     makeZoneMonster("熾焰狼",22,"fire",undefined,"wild.zone-03.fire-01"),
-    makeZoneMonster("寒冰魔",23,"water"),
+    makeZoneMonster("澤木妖",23,"water",undefined,"wild.zone-03.water-01"),
     makeZoneMonster("熾焰狼",22,"fire",undefined,"wild.zone-03.fire-01"),
-    makeZoneMonster("寒冰魔",23,"water"),
+    makeZoneMonster("澤木妖",23,"water",undefined,"wild.zone-03.water-01"),
     makeZoneMonster("熾焰狼王",27,"fire",undefined,"wild.zone-03.fire-02"),
     makeZoneMonster("寒冰魔王",28,"water")
 
@@ -3230,9 +3230,9 @@ function makeZoneMonster(
 const zone4Monsters = [
 
     makeZoneMonster("烈焰巨魔",32,"fire",undefined,"wild.zone-04.fire-01"),
-    makeZoneMonster("深淵水靈",33,"water"),
+    makeZoneMonster("沼鉤怪",33,"water",undefined,"wild.zone-04.water-01"),
     makeZoneMonster("烈焰巨魔",32,"fire",undefined,"wild.zone-04.fire-01"),
-    makeZoneMonster("深淵水靈",33,"water"),
+    makeZoneMonster("沼鉤怪",33,"water",undefined,"wild.zone-04.water-01"),
     makeZoneMonster("烈焰巨魔王",38,"fire",undefined,"wild.zone-04.fire-02"),
     makeZoneMonster("深淵水靈王",40,"water")
 
@@ -3242,9 +3242,9 @@ const zone4Monsters = [
 const zone5Monsters = [
 
     makeZoneMonster("熔岩巨獸",42,"fire",undefined,"wild.zone-05.fire-01"),
-    makeZoneMonster("寒潮巨獸",43,"water"),
+    makeZoneMonster("潮蛙卒",43,"water",undefined,"wild.zone-05.water-01"),
     makeZoneMonster("熔岩巨獸",42,"fire",undefined,"wild.zone-05.fire-01"),
-    makeZoneMonster("寒潮巨獸",43,"water"),
+    makeZoneMonster("潮蛙卒",43,"water",undefined,"wild.zone-05.water-01"),
     makeZoneMonster("熔岩巨獸王",48,"fire",undefined,"wild.zone-05.fire-02"),
     makeZoneMonster("寒潮巨獸王",50,"water")
 
@@ -3254,9 +3254,9 @@ const zone5Monsters = [
 const zone6Monsters = [
 
     makeZoneMonster("赤炎修羅",52,"fire",undefined,"wild.zone-06.fire-01"),
-    makeZoneMonster("玄冰修羅",53,"water"),
+    makeZoneMonster("鱗潭獸",53,"water",undefined,"wild.zone-06.water-01"),
     makeZoneMonster("赤炎修羅",52,"fire",undefined,"wild.zone-06.fire-01"),
-    makeZoneMonster("玄冰修羅",53,"water"),
+    makeZoneMonster("鱗潭獸",53,"water",undefined,"wild.zone-06.water-01"),
     makeZoneMonster("赤炎修羅王",58,"fire",undefined,"wild.zone-06.fire-02"),
     makeZoneMonster("玄冰修羅王",60,"water")
 
@@ -3266,9 +3266,9 @@ const zone6Monsters = [
 const zone7Monsters = [
 
     makeZoneMonster("業火魔君",62,"fire",undefined,"wild.zone-07.fire-01"),
-    makeZoneMonster("絕冰魔君",63,"water"),
+    makeZoneMonster("瀾花姬",63,"water",undefined,"wild.zone-07.water-01"),
     makeZoneMonster("業火魔君",62,"fire",undefined,"wild.zone-07.fire-01"),
-    makeZoneMonster("絕冰魔君",63,"water"),
+    makeZoneMonster("瀾花姬",63,"water",undefined,"wild.zone-07.water-01"),
     makeZoneMonster("業火魔君王",68,"fire",undefined,"wild.zone-07.fire-02"),
     makeZoneMonster("絕冰魔君王",70,"water")
 
@@ -3278,9 +3278,9 @@ const zone7Monsters = [
 const zone8Monsters = [
 
     makeZoneMonster("焚天龍獄",72,"fire",undefined,"wild.zone-08.fire-01"),
-    makeZoneMonster("極寒龍獄",73,"water"),
+    makeZoneMonster("海蜇巫",73,"water",undefined,"wild.zone-08.water-01"),
     makeZoneMonster("焚天龍獄",72,"fire",undefined,"wild.zone-08.fire-01"),
-    makeZoneMonster("極寒龍獄",73,"water"),
+    makeZoneMonster("海蜇巫",73,"water",undefined,"wild.zone-08.water-01"),
     makeZoneMonster("焚天龍獄皇",78,"fire",undefined,"wild.zone-08.fire-02"),
     makeZoneMonster("極寒龍獄皇",80,"water")
 
@@ -3302,9 +3302,9 @@ const zone8Monsters = [
 const zone9Monsters = [
 
     makeZoneMonster("虛空煉獄",82,"fire",undefined,"wild.zone-09.fire-01"),
-    makeZoneMonster("永凍深淵",83,"water"),
+    makeZoneMonster("霜鬃狼",83,"water",undefined,"wild.zone-09.water-01"),
     makeZoneMonster("虛空煉獄",82,"fire",undefined,"wild.zone-09.fire-01"),
-    makeZoneMonster("永凍深淵",83,"water"),
+    makeZoneMonster("霜鬃狼",83,"water",undefined,"wild.zone-09.water-01"),
     makeZoneMonster("虛空煉獄皇",88,"fire",undefined,"wild.zone-09.fire-02"),
     makeZoneMonster("永凍深淵皇",90,"water")
 
@@ -3314,9 +3314,9 @@ const zone9Monsters = [
 const zone10Monsters = [
 
     makeZoneMonster("終焉神魔",92,"fire",undefined,"wild.zone-10.fire-01"),
-    makeZoneMonster("末世寒神",93,"water"),
+    makeZoneMonster("玄潮俠",93,"water",undefined,"wild.zone-10.water-01"),
     makeZoneMonster("終焉神魔",92,"fire",undefined,"wild.zone-10.fire-01"),
-    makeZoneMonster("末世寒神",93,"water"),
+    makeZoneMonster("玄潮俠",93,"water",undefined,"wild.zone-10.water-01"),
     makeZoneMonster("終焉神魔皇",98,"fire",undefined,"wild.zone-10.fire-02"),
     makeZoneMonster("末世寒神皇",100,"water")
 

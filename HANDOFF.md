@@ -1,3 +1,10 @@
+## 2026-10-01 — Water wild monster portraits batch 1 (candidate)
+
+- Remote work branch `feature/water-wild-monsters-batch1-20261001` was created from live `dev@bf07c2cdf63f4b358b3e3cbdbb8e012a95ed347e`; `main` and `assets-library` remain unchanged. This batch covers exactly ten water wild portraits and does not adopt water tower assets or the other ten normal sources.
+- Selected identities are `wild.zone-01..10.water-01`: 水靈狐、浪尾獺、澤木妖、沼鉤怪、潮蛙卒、鱗潭獸、瀾花姬、海蜇巫、霜鬃狼、玄潮俠. Each gameplay roster entry carries the explicit portrait key; the eight `water-02` registry targets remain planned.
+- Source authority is `assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce` under `assets/inbox/英雄or怪物立繪/水元素/普通怪/`. Ten 1024×1536 transparent PNG Masters were converted to lossless WebP with no crop, resize or canvas change. Per-file SHA-256 and source mapping are recorded in `docs/qa/2026-10-01-water-wild-monsters-batch1.md`; PNG/WebP RGBA pixel difference is zero for all ten.
+- V154 remains the sole portrait resolver. Production manifest now exposes a `water` section for the ten existing water wild targets without mixing fire/wind pools. New exact-candidate browser QA decodes all ten and checks first frame, redraw and fire/wind isolation. Local static/image/build gates pass; PR CI, merge, exact DEV deployment and Android physical-device display remain pending. Requirement status is IMPLEMENTED / NOT COMPLETE, never VERIFIED from local or CI evidence alone.
+
 ## 2026-10-01 — Physical recording continuation: manual all-target confirmation
 
 - Fresh base: `dev@91700938c6fbd54f0bdd7d75e10c3ade10367308`; branch `fix/battle-all-target-confirmation-recovery-20261001`. #728 remains integrated, and its gesture suppression owner, shared phased flood animation, original atlas, 1350ms duration and hit fraction are retained. main is excluded.
