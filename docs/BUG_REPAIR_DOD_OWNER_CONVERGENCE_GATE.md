@@ -1,4 +1,9 @@
 # 《四象江湖傳》Bug Repair Definition of Done & Owner Convergence Gate
+
+## 一般 Bug 預設路徑（2026-10-01 生效）
+
+一般 Bug 必須先讀 `docs/BUG_FIX_FAST_PATH.md`，以該文件為調查範圍、證據升級、自主整合與結案的權威來源。預設最小必要調查＋最小安全修正；只查直接相關責任與呼叫鏈。完整 Owner Convergence／Lifecycle 稽核僅在該文件第四節證據成立或使用者明確要求架構工程時適用。下文不得以「較嚴格優先」恢復一般 Bug 全面稽核、tests-only 限制、固定失敗額度、僅草稿 PR 或正式 Runtime 即硬停止。最新 Head 必要 CI、原症狀驗證與資料安全仍必須遵守；一般 Bug 結案不要求發布 main。
+
 # Bug 修復完成定義與控制來源收斂閘門
 
 > 文件定位：本文件是《四象江湖傳》所有 Bug／failure／regression（回歸）修復任務的永久完成標準，以及 Owner（控制來源）收斂的唯一專項契約。
@@ -91,6 +96,8 @@ Confirmed Contributing Cause（已確認的促成原因）
 
 ### 3.2 重複修復升級規則
 
+以下升級規則僅在直接診斷確認相同根因復發或其他 Fast Path 證據升級條件成立時適用，不得只憑相同症狀自動全面稽核。
+
 同一個「玩家可觀察症狀」若在一次 IMPLEMENTED 修復後仍重現：
 
 - 下一次禁止再做局部 Patch。
@@ -106,7 +113,7 @@ Confirmed Contributing Cause（已確認的促成原因）
 
 ## 4. Owner Convergence Gate（控制來源收斂閘門）
 
-任何 Bug 修復在修改 production runtime（正式執行程式）前，必須先完成以下 Gate。
+一般 Bug 依 `docs/BUG_FIX_FAST_PATH.md` 做直接責任檢查；只有已達證據升級條件或明確架構工程，才在修改 production runtime（正式執行程式）前完成以下完整 Gate。
 
 ### Gate A — Responsibility Inventory（責任盤點）
 

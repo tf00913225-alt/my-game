@@ -1,4 +1,9 @@
 # 《四象江湖傳》Change Safety & Replacement Migration Contract
+
+## 一般 Bug 預設路徑（2026-10-01 生效）
+
+一般 Bug 必須先讀 `docs/BUG_FIX_FAST_PATH.md`，以該文件為調查範圍、證據升級、自主整合與結案的權威來源。預設最小必要調查＋最小安全修正；只查直接相關責任與呼叫鏈。完整 Owner Convergence／Lifecycle 稽核僅在該文件第四節證據成立或使用者明確要求架構工程時適用。下文不得以「較嚴格優先」恢復一般 Bug 全面稽核、tests-only 限制、固定失敗額度、僅草稿 PR 或正式 Runtime 即硬停止。最新 Head 必要 CI、原症狀驗證與資料安全仍必須遵守；一般 Bug 結案不要求發布 main。
+
 # 變更安全與取代遷移契約
 
 > 文件定位：本文件是《四象江湖傳》所有新增、修改、替換、重構、UI／CSS、Gameplay（玩法）、資料、狀態、Lifecycle（生命週期）與 Bug 修復的永久變更安全契約。
