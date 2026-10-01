@@ -79,3 +79,10 @@ test("Google reauthentication verifies the same UID before reacquiring a game se
     await assert.rejects(context.reauthenticateWithGoogle(),error=>error.code==="ACCOUNT_CHANGED");
     assert.equal(hookCalls,1);
 });
+
+test("browser QA account stubs export the runtime reauthentication entry",()=>{
+    for(const path of ["run-boot-architecture-browser-qa.mjs","runtime-browser-qa-support.mjs","run-bottom-nav-runtime-browser-qa.mjs"]){
+        const source=fs.readFileSync(new URL("../.github/scripts/"+path,import.meta.url),"utf8");
+        assert.match(source,/export async function reauthenticateWithGoogle\(\)/,path);
+    }
+});
