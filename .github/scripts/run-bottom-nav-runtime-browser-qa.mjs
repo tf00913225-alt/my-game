@@ -138,6 +138,15 @@ async function runViewport(chrome,url,width,height){
   await client.send('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:1});
   await client.send('Page.navigate',{url});await new Promise(r=>setTimeout(r,300));evidence.startup=await client.eval(PREPARE);
   assert.equal(evidence.startup.state,'READY');assert.equal(evidence.startup.ready,true);
+  // Acknowledge the real startup release notice through its native control;
+  // an open announcement intercepts the later scroll gestures.
+  evidence.releaseNotice=await client.eval(`(()=>{const modal=document.getElementById('homeFeatureModal');if(!modal?.classList.contains('show')||!modal.classList.contains('release-update-modal'))return null;const button=modal.querySelector('[data-release-update-action="acknowledge"]');if(!button)throw Error('Startup release notice has no acknowledge control');const r=button.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2;if(!button.contains(document.elementFromPoint(x,y)))throw Error('Release acknowledge control is obstructed');return {x,y,action:button.dataset.releaseUpdateAction};})()`);
+  if(evidence.releaseNotice){
+   const {x,y}=evidence.releaseNotice;
+   await client.send('Input.dispatchMouseEvent',{type:'mousePressed',x,y,button:'left',clickCount:1});
+   await client.send('Input.dispatchMouseEvent',{type:'mouseReleased',x,y,button:'left',clickCount:1});await settle(client);
+   assert.equal(await client.eval("document.getElementById('homeFeatureModal').classList.contains('show')"),false,'release acknowledgement must close the formal modal');
+  }
   for(let pass=0;pass<2;pass++){
    for(const [mode,action] of SCENARIOS){
     console.log("Navigation QA",width,height,pass,mode);
