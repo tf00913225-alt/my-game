@@ -16,7 +16,7 @@ const {createCanonicalAttributeAllocation}=
     require("../functions/src/canonical-attribute-allocation.js");
 const {makeInitialCharacterSources}=require("../functions/src/initial-character-sources.js");
 const {assembleCanonicalSnapshot}=require("../functions/src/canonical-snapshot.js");
-const {inspectRecoveryArchive}=require("../functions/src/canonical-recovery-archive.js");
+const {inspectRecoveryArchive,createRecoveryArchive}=require("../functions/src/canonical-recovery-archive.js");
 const {createCanonicalCurrentRecovery}=
     require("../functions/src/canonical-current-recovery.js");
 const {createCanonicalRecoveryApproval}=
@@ -374,7 +374,8 @@ for(const [path,patch] of [
     [`operations/${atomicOperation}`,{schemaVersion:1,kind:"collision"}]
 ]){
     const ref=atomicRoot.doc(path),saved=await ref.get();
-    if(patch===null)await ref.delete();else await ref.set(patch,{merge:true});
+    if(patch===null)await ref.delete();
+    else if(saved.exists)await ref.update(patch);else await ref.set(patch);
     // Compare all authoritative writes relevant to this operation, including
     // the tampered proof; a rejection must not try to repair/reissue it.
     const refs=[db.doc(`users/${atomicUid}/saves/current`),
@@ -723,7 +724,9 @@ await Promise.all([
     ownedRoot.collection("economy").doc("current").update({sharedExp:320}),
     ownedRoot.collection("account").doc("current")
         .update({snapshotSha256:ownedBundle.sha256}),
-    ownedRoot.collection("playableSnapshots").doc("2").set(ownedBundle)
+    ownedRoot.collection("playableSnapshots").doc("2").set(ownedBundle),
+    ownedRoot.collection("recoveryArchives").doc("2")
+        .set(createRecoveryArchive(ownedUid,2,ownedRecords,ownedBundle))
 ]);
 const ownedGrant="grant-owned-source-gold-0001";
 const ownedCreditOperation="credit-owned-source-gold-0001";
