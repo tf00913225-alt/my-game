@@ -14027,7 +14027,9 @@ function isBattleTargetStealthed(entity){
 }
 function canSelectHostileBattlePrimary(targetSide,index,targetType){
     const normalized=normalizeBattleTargetType(targetType);
-    if(normalized==="all"||!isBattleTargetAlive(targetSide,index)){ return false; }
+    if(!isBattleTargetAlive(targetSide,index)){ return false; }
+    // All-target declarations use a living confirmation anchor; stealth does not exclude the group.
+    if(normalized==="all"){ return true; }
     return !isBattleTargetStealthed(getBattleTargetEntity(targetSide,index));
 }
 function resolveBattlefieldTargets(targetSide,primaryIndex,targetType,options){

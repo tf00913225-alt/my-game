@@ -101,7 +101,34 @@ export async function battleSkillTouchFloodQa(rawClient,artifactDir,{animationOn
         assert.deepEqual(rejection,{auto:true,phase:true,equipment:true});checks.rejections=rejection;
         }
 
-        console.log('Battle touch/flood QA: native input and formal support declarations passed; warming flood atlas');
+        checks.allTargetDeclarations=[];
+        for(const skill of ['stormRain','iceArrowRain']){
+            await client.eval(`__touchQaReset(${JSON.stringify(skill)});true`);
+            const before=(await state()).submissions;
+            const button='.skill-quick-button[data-skill-id="'+skill+'"]';
+            await tap(button);
+            assert.equal((await state()).pending,skill,'all-target must enter confirmation selection');
+            assert.equal((await state()).submissions,before,'all-target must wait for confirmation');
+            await client.eval(`returnFromBattleTargetSelection();true`);
+            assert.equal((await state()).ready,false);
+            await tap(button);
+            const target=await client.eval(`currentBattleMonsters.find(i=>canSelectHostileBattlePrimary('monster',i,'all'))`);
+            assert.ok(Number.isInteger(target),'all-target must have a living confirmation anchor');
+            await tap('#battleMonster'+target);
+            const submitted=await client.eval(`({queue:queuedPlayerActions[0],count:__touchQa.submissions})`);
+            assert.equal(submitted.queue.action,skill);assert.equal(submitted.queue.target,target);
+            assert.equal(submitted.count,before+1);
+            await client.eval(`selectBattleTarget(${target});true`);
+            assert.equal((await state()).submissions,before+1,'duplicate confirmation cannot submit twice');
+            checks.allTargetDeclarations.push({skill,returnAndReselect:true,confirmationSubmittedOnce:true});
+        }
+
+        // Real confirmation schedules the next combatant. Clear that fixture timer
+        // before measuring animation geometry so later screenshots stay on this turn.
+        await client.eval(`__touchQaReset('waterBall');true`);
+        const isolated=await client.eval(`({advance:battleAdvanceScheduled,timer:battleAdvanceTimeoutId,phase:battlePhase})`);
+        assert.deepEqual(isolated,{advance:false,timer:null,phase:'declare'});
+        console.log('Battle touch/flood QA: native input and formal support/all-target declarations passed; warming flood atlas');
         await client.eval(`(async()=>{const im=new Image();im.src=v143SkillAnimationManifest.floodBeast.sprite.src;await im.decode();v142SkillAnimationDirector.play({id:'floodBeast',element:'water',category:'magic',targetType:'single',duration:1350,resolveDuration:1350},{side:'player',actorIndex:0,targetSide:'monster',targetId:currentBattleMonsters[0],targetIds:[currentBattleMonsters[0]]});await new Promise(r=>setTimeout(r,100));v142SkillAnimationDirector.dispose();return true;})()`);
         const enemyIds=await client.eval(`currentBattleMonsters.filter(i=>monsters[i]?.alive&&document.getElementById('battleMonster'+i)).slice(0,3)`);
         const slots=await client.eval(`FourSymbolsBattlefieldSlots.allySlots.slice(0,3)`);

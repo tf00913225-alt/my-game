@@ -5,7 +5,7 @@
   "requirements": [
     {
       "id": "TOUCH-01",
-      "title": "Gesture-scoped battle skill touch recovery",
+      "title": "Gesture-scoped battle touch and manual all-target confirmation",
       "status": "IMPLEMENTED",
       "evidence": {
         "files": [
@@ -14,8 +14,8 @@
           "js/35-v141-ui-battle.js",
           "js/42-v148-combat-dungeon-fixes.js"
         ],
-        "verification": "Targeted Node regressions passed; production-bundle native CDP/physical Android checks pending",
-        "result": "Contributing cause confirmed. Original recording SHA/cache unknown."
+        "verification": "#728 native CDP acceptance retained. New all-target regression failed on base and passes after fix; latest-head CI/deployed CDP pending. Physical Android acceptance pending.",
+        "result": "Two contributing mechanisms confirmed. New recording 1000072376.mp4 shows failures; recording SHA/cache/device unknown. Other support/single failures are not fully explained."
       }
     },
     {
@@ -27,8 +27,8 @@
           "js/39-v143-skill-animation.js",
           "css/40-v143-combat-dungeon-polish.css"
         ],
-        "verification": "Reviewed all 12 frames; both-side three-target geometry and cleanup regressions passed. Final browser/physical checks pending",
-        "result": "1350ms, frame-eight hit and source sheet retained; no full-symptom VERIFIED claim."
+        "verification": "#728 latest-head and deployed 36-frame CDP evidence retained; original 12-frame atlas reviewed. Physical acceptance pending.",
+        "result": "1350ms, hit fraction and source sheet retained; new blue effect alone does not establish a Flood Beast/Boss real-device result. No VERIFIED claim."
       }
     }
   ]

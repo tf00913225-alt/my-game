@@ -10,9 +10,10 @@ const ctx={battleActive:true,battlePhase:'declare',activeBattleCharacterIndex:0,
     getPartyCharacterByIndex:i=>party[i],getBattleCharacterByIndex:i=>party[i],getPartyCharacterKey:i=>i,getPartyAutoConfig:()=>({enabled:false}),
     addBattleLog(){},closeMenus(){},clearBattleTargetSelectionMode(){},setBattleTargetSelectionMode(){},setBattleAllyTargetSelectionMode(){},
     updateUI(){},finishPlayerAction(){finished++;ctx.actionReady=false;ctx.pendingAction=null;},populateSkillQuickBar(){},syncTurnTimerWithBattlePickers(){},
-    isValidAllyTargetForSkill:(skill,character)=>character.hp>0,currentBattleMonsters:[0],canSelectHostileBattlePrimary:()=>true,getBattleActionTargetType:()=>"single",getBattleActionDisplayName:()=>"attack",
+    isValidAllyTargetForSkill:(skill,character)=>character.hp>0,currentBattleMonsters:[0],normalizeBattleTargetType:type=>type,getBattleActionTargetType:type=>ctx.skillDatabase[type]?.targetType||"single",getBattleActionDisplayName:()=>"attack",
     $:()=>({textContent:'',classList:{add(){}}}),document:{querySelectorAll:()=>[]},monsters:[{alive:true,hp:100,name:'敵人'}]};
 vm.createContext(ctx);
+vm.runInContext(extract('getBattleTargetEntity','resolveBattlefieldTargets'),ctx);
 vm.runInContext(extract('prepareAction','selectBattleTarget')+extract('selectBattleTarget','executeAction'),ctx);
 // Avoid loading unrelated combat functions; these selection helpers are source slices.
 vm.runInContext(extract('selectBattleAllyTarget','returnFromBattleTargetSelection')+extract('returnFromBattleTargetSelection','clearActiveCharacterHighlight'),ctx);
@@ -28,7 +29,34 @@ for(let i=0;i<3;i++){
     ctx.characterSkillLoadouts[i].equippedSkills=[];ctx.prepareAction('heal');assert.equal(ctx.actionReady,false,'support skill cannot bypass equipment eligibility');
     ctx.characterSkillLoadouts[i].equippedSkills=['attack','heal','buff'];party[i].sp=0;ctx.prepareAction('attack');assert.equal(ctx.actionReady,false);party[i].sp=100;
 }
+// Manual all-target skills use a live enemy as confirmation; no early submit.
+for(const id of ['stormRain','iceArrowRain']){
+    ctx.skillDatabase[id]={name:id,category:'magic',spCost:75,targetType:'all'};
+    for(let i=0;i<3;i++){
+        ctx.activeBattleCharacterIndex=i;
+        ctx.characterSkillLoadouts[i].skillLevels[id]=4;
+        ctx.characterSkillLoadouts[i].equippedSkills.push(id);
+        for(const stealthed of [false,true]){
+            ctx.monsters[0].activeBuffs=stealthed?[{type:'stealthSkill',turnsLeft:2}]:[];
+            ctx.queuedPlayerActions={};ctx.prepareAction(id);
+            assert.equal(ctx.pendingAction,id,'all-target must enter selection with a living confirmation anchor');
+            assert.equal(finished,0,'all-target selection must not submit or spend before confirmation');
+            ctx.returnFromBattleTargetSelection();
+            assert.equal(ctx.actionReady,false);
+            ctx.prepareAction(id);ctx.selectBattleTarget(0);ctx.selectBattleTarget(0);
+            assert.equal(ctx.queuedPlayerActions[i].action,id);
+            assert.equal(ctx.queuedPlayerActions[i].target,0);
+            assert.equal(finished,1,'all-target confirmation must submit exactly once');finished=0;
+        }
+        ctx.monsters[0].alive=false;ctx.prepareAction(id);
+        assert.equal(ctx.pendingAction,null,'dead enemies cannot anchor all-target declarations');
+        ctx.monsters[0].alive=true;
+    }
+}
 ctx.activeBattleCharacterIndex=0;
+ctx.monsters[0].activeBuffs=[{type:'stealthSkill',turnsLeft:2}];
+ctx.prepareAction('attack');assert.equal(ctx.pendingAction,null,'stealth still rejects hostile single-target selection');
+ctx.monsters[0].activeBuffs=[];
 ctx.autoBattle=true;ctx.prepareAction('attack');assert.equal(ctx.actionReady,false);ctx.autoBattle=false;
 ctx.battlePhase='resolve';ctx.prepareAction('attack');assert.equal(ctx.actionReady,false);ctx.battlePhase='declare';
 ctx.prepareAction('unknown');ctx.prepareAction('passive');assert.equal(ctx.actionReady,false);
