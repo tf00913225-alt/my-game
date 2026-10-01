@@ -24,7 +24,7 @@ const PREPARE=String.raw`(async()=>{
  material:{id:'responsive-qa-material',name:'千年玄鐵長名稱材料'.repeat(3),type:'material',count:999,price:999999,stats,icon:art},
  chest:{id:'materialChest',name:'長名稱材料寶箱',type:'chest',count:999,stats:{},icon:art}
  };
- inventoryItems.splice(0,inventoryItems.length,...Object.values(__responsiveItems),...Array.from({length:30},(_,i)=>({...__responsiveItems.equipment,id:'responsive-qa-'+i})));
+ inventoryItems.splice(0,inventoryItems.length,...Object.values(__responsiveItems),...Array.from({length:5},(_,i)=>({...__responsiveItems.equipment,id:'responsive-qa-'+i})),...Array.from({length:110},()=>({...__responsiveItems.potion})));
  characterEquipment.fire.armor={...__responsiveItems.equipment,name:'已穿戴長名稱對照裝備',stats};
  rebuildInventorySlots();renderInventory();showPage('home');closeHomeFeature();
  return {loader:true,productionStyles:[...document.querySelectorAll('link[rel="stylesheet"]')].map(n=>new URL(n.href).pathname)};
@@ -85,14 +85,23 @@ async function run(chrome,url,live){
   for(const v of VIEWPORTS){
    await resize(v);await c.eval(`closeItemModal();showPage('home');showPage('inventory')`);await settle();
    const backpack=[];
-   for(const selector of ['.inventory-title-plate','.map-inventory-overlay-close','.inventory-bottom-actions',...Array.from({length:6},(_,i)=>'.inventory-equipment-cell:nth-child('+(i+1)+') .inventory-equipment-slot-label')]) backpack.push(await check(selector,v,selector.includes('label')));
+   for(const selector of ['.inventory-title-plate','.map-inventory-overlay-close','.inventory-bottom-actions','.inventory-wallet-label','.inventory-wallet-value',...Array.from({length:6},(_,i)=>'.inventory-equipment-cell:nth-child('+(i+1)+') .inventory-equipment-slot-label')]) backpack.push(await check(selector,v,selector.includes('label')||selector.includes('value')||selector.includes('close')));
+   const tabFrame=await measure('.inventory-classic-shell');
+   for(const filter of ['item','material','function','equipment']){
+    await click('#inventoryCategoryTabs [data-filter="'+filter+'"]',v);
+    const after=await measure('.inventory-classic-shell');assert.deepEqual(after.rect,tabFrame.rect,'tab changed inventory frame');
+   }
+   await resize([v[0],v[1]-80]);await check('.inventory-bottom-actions',[v[0],v[1]-80]);await check('.map-inventory-overlay-close',[v[0],v[1]-80],true);await resize(v);
    const grid=await check('#inventoryGridScroll',v);assert.equal(grid.overflowY,'auto');
    const gridScroll=await scroll('#inventoryGridScroll');
+   await c.eval(`openEquippedItem({...__responsiveItems.equipment,name:'鐵甲',stats:{attack:1}},'armor')`);await settle();
+   const shortFrame=await check('#itemModal .item-modal-box',v);await click('#itemModal .close-item-button',v);
    const modes=[];
    for(const mode of ['equipment','comparison','potion','material','chest']){
     await c.eval(`closeItemModal();(()=>{const item=__responsiveItems[${JSON.stringify(mode==='comparison'?'equipment':mode)}];if(${JSON.stringify(mode)}==='equipment')openEquippedItem(item,'armor');else {const i=inventorySlots.findIndex(n=>n?.id===item.id);if(i<0)throw Error('missing QA item');openItemModal(i);}})()`);await settle();
     const frame=await check('#itemModal .item-modal-box',v),state=await measure('#itemModal');
     const expected=mode==='comparison'?'comparison':mode==='equipment'?'equipment':'compact';assert.equal(state.mode,expected);
+    if(mode==='equipment')assert.ok(frame.rect.height>shortFrame.rect.height+20,'short content did not contract naturally');
     const contents=mode==='comparison'?'.v17351-compare-grid':'#itemModalStats';
     const actions=await check('#itemModal .item-modal-buttons',v);
     const back=await check(mode==='comparison'?'.v17351-compare-back':'#itemModal .close-item-button',v,true);
@@ -103,7 +112,9 @@ async function run(chrome,url,live){
     assert.ok(images.length>0,mode+' art missing');for(const img of images){assert.equal(img.fit,'contain');assert.ok(img.loaded,'image decode');assert.equal(img.transform,'none');}
     if(mode==='comparison'&&v[0]<=374)assert.equal((await measure(contents)).columns.split(' ').length,1,'comparison must stack');
     const batch=(mode==='potion'||mode==='chest')?await check('#v17350BatchAction',v):null;
-    const contentScroll=await scroll(contents);modes.push({mode,frame,actions,back,names,art,batch,contentScroll});
+    if(mode==='potion')assert.ok(await c.eval(`Number(document.getElementById('v17350BatchQuantity').max)>=100000`),'large owned count not exercised');
+    const textSizes=await c.eval(`Array.from(document.querySelectorAll('#itemModalName,#itemModalStats div,#itemModalStats b,.v17351-compare-stat span,.v17351-compare-stat b,.v17351-compare-pane>strong,#v17350BatchAction label,#v17350BatchAction input,#v17350BatchAction span,#v17350BatchAction button,#itemModal .item-modal-buttons button')).filter(n=>n.getBoundingClientRect().width>0).map(n=>({text:(n.textContent||n.value||'').slice(0,40),size:parseFloat(getComputedStyle(n).fontSize)*n.getBoundingClientRect().width/n.offsetWidth}))`);for(const t of textSizes)assert.ok(t.size>=12.9,'unreadable text '+JSON.stringify(t));
+    const contentScroll=await scroll(contents);modes.push({mode,frame,actions,back,names,art,batch,contentScroll,textSizes});
     // Resize while open; the state and fixed controls must survive.
     await resize([v[0],v[1]-80]);await check('#itemModal .item-modal-buttons',[v[0],v[1]-80]);assert.equal((await measure('#itemModal')).mode,expected);await resize(v);
     await click(mode==='comparison'?'.v17351-compare-back':'#itemModal .close-item-button',v);

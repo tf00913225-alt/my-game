@@ -282,6 +282,7 @@
 }
 #game-stage #itemModal .item-modal-buttons button,
 #game-stage #itemModal .close-item-button{
+    box-sizing:border-box;
     min-width:0;
     min-height:44px;
     height:auto;
