@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import {spawn,spawnSync} from "node:child_process";
+import {battleSkillTouchFloodQa} from './battle-skill-touch-flood-qa.mjs';
 
 const baseUrl=String(process.env.DEV_BASE_URL||"https://dev.four-symbols-dev.pages.dev").replace(/\/$/,"");
 const expectedSha=String(process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||"");
@@ -701,6 +702,8 @@ try{
     assert.equal(spQuickBar.blockHidden,true,`${spQuickBar.skillId} insufficient-SP overlay should be semantically hidden`);
     assert.equal(spQuickBar.blockDisplay,"none",`${spQuickBar.skillId} insufficient-SP overlay must be visually hidden`);
 
+    evidence.checks.skillTouchFlood=await battleSkillTouchFloodQa(client,artifactDir);
+
     const infoDrawer=await client.eval(`(()=>{
         const region=document.querySelector('#battlePage .battle-info-region');
         const button=document.getElementById('battleInfoToggle');
@@ -1336,6 +1339,9 @@ try{
     assert.equal(bossGate.done,true,"Boss-mode VFX gate must complete");
     assert.equal(bossGate.completionCount,1,"Boss-mode VFX gate must complete exactly once");
     assert.equal(bossGate.stageExists,false,"Boss-mode VFX stage must clean up");
+
+    evidence.checks.bossFloodDirection=await battleSkillTouchFloodQa(client,artifactDir,{animationOnly:true});
+    assert.equal(evidence.checks.bossFloodDirection.actorKind,'boss',"Downward Flood Beast acceptance must use the real Boss entity");
 
     const bossScreenshot=await client.send("Page.captureScreenshot",{format:"png",fromSurface:true});
     if(bossScreenshot.data){ fs.writeFileSync(path.join(artifactDir,"boss-target-entity-live-412x915.png"),Buffer.from(bossScreenshot.data,"base64")); }

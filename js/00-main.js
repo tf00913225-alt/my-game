@@ -12037,6 +12037,7 @@ function prepareAction(type){
 
     if(
         !battleActive ||
+        battlePhase!=="declare" ||
         !activeCharacter ||
         activeCharacter.hp<=0 ||
         autoOn ||
@@ -12048,6 +12049,8 @@ function prepareAction(type){
 
     const skill =
         skillDatabase[type];
+
+    if(type!=="normal"&&(!skill||skill.category==="passive")){ return; }
 
     const activeSkillKey=getPartyCharacterKey(activeBattleCharacterIndex);
     const activeLoadout=characterSkillLoadouts[activeSkillKey];
@@ -12107,13 +12110,6 @@ function prepareAction(type){
             skill.category==="heal"||
             skill.category==="revive"
         ){
-
-            if(activeBattleCharacterIndex!==0){
-                addBattleLog(
-                    "追加角色目前僅支援手動施放攻擊技能。"
-                );
-                return;
-            }
 
             /* 單體我方技能先選角色；全體技能維持直接宣告。 */
             if(skill.targetType==="ally" || skill.targetType==="allyTri" || skill.targetType==="deadAlly"){

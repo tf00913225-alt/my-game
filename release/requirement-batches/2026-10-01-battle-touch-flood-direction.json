@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "battle-touch-flood-direction-20261001",
+  "releaseVersion": "173.72",
+  "requirements": [
+    {
+      "id": "TOUCH-01",
+      "title": "Gesture-scoped battle skill touch recovery",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "js/01-stage-v8-touch-lock.js",
+          "js/00-main.js",
+          "js/35-v141-ui-battle.js",
+          "js/42-v148-combat-dungeon-fixes.js"
+        ],
+        "verification": "Targeted Node regressions passed; production-bundle native CDP/physical Android checks pending",
+        "result": "Contributing cause confirmed. Original recording SHA/cache unknown."
+      }
+    },
+    {
+      "id": "FLOOD-01",
+      "title": "Shared authored-phase Tidal Beast motion",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "js/39-v143-skill-animation.js",
+          "css/40-v143-combat-dungeon-polish.css"
+        ],
+        "verification": "Reviewed all 12 frames; both-side three-target geometry and cleanup regressions passed. Final browser/physical checks pending",
+        "result": "1350ms, frame-eight hit and source sheet retained; no full-symptom VERIFIED claim."
+      }
+    }
+  ]
+}

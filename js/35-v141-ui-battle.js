@@ -321,51 +321,7 @@
         }
     });
 
-    /* =====================================================
-       Additional characters can manually cast support skills
-    ===================================================== */
-    if(typeof prepareAction==="function"){
-        const originalPrepareAction=prepareAction;
-        prepareAction=function(type){
-            const skill=skillDatabase[type];
-            if(
-                activeBattleCharacterIndex<=0 ||
-                !skill ||
-                !["buff","heal","revive"].includes(skill.category)
-            ){
-                return originalPrepareAction.apply(this,arguments);
-            }
-            const character=getPartyCharacterByIndex(activeBattleCharacterIndex);
-            const autoOn=getPartyAutoConfig(activeBattleCharacterIndex).enabled;
-            if(!battleActive||!character||character.hp<=0||autoOn||actionReady){ return; }
-            const spCost=skill.spCost!==undefined?skill.spCost:skill.cost;
-            if(character.sp<spCost){
-                addBattleLog("SP不足，無法使用"+skill.name);
-                return;
-            }
-
-            if(skill.targetType==="ally"||skill.targetType==="allyTri"||skill.targetType==="deadAlly"){
-                const hasTarget=[0,1,2].some(index=>isValidAllyTargetForSkill(
-                    skill,getBattleCharacterByIndex(index),index
-                ));
-                if(!hasTarget){
-                    addBattleLog(skill.targetType==="deadAlly"?"目前沒有陣亡的隊友可供復活。":"目前沒有可選擇的友方目標。");
-                    return;
-                }
-                actionReady=true;
-                pendingAction=type;
-                closeMenus();
-                setBattleAllyTargetSelectionMode(type);
-                return;
-            }
-
-            actionReady=true;
-            queuedPlayerActions[activeBattleCharacterIndex]={action:type,target:null,targetAlly:null};
-            closeMenus();
-            updateUI();
-            finishPlayerAction();
-        };
-    }
+    /* Manual support declarations now belong to 00-main::prepareAction. */
 
     /* =====================================================
        Card effects (legacy visual renderer retired; data/status only)
