@@ -184,6 +184,10 @@ async function runViewport(chrome,url,width,height){
   evidence.legalPanelAfterSwipe=await client.eval('window.__navQaScrollOwner.scrollTop');assert.ok(evidence.legalPanelAfterSwipe>0,'legal panel single-finger swipe did not scroll');
   await client.eval("closeHomeFeature();closeMapInventoryOverlay();showPage('home')");await settle(client);
   evidence.returnHome=await client.eval(MEASURE);assert.equal(evidence.returnHome.sameShell,true);
+  // Discard QA-only inventory mutations before reopening the immutable
+  // read-only cloud fixture. The isolated profile has no real player data.
+  // Keep consent/first-play cache; do not bypass the formal migration gate.
+  await client.eval("(()=>{const keys=['four_symbols_active_uid','four_symbols_privacy_consent','four_symbols_first_play_ready'];const retained=keys.map(k=>[k,localStorage.getItem(k)]);localStorage.clear();for(const [k,v] of retained){if(v!==null)localStorage.setItem(k,v);}})()");evidence.reloadQaAccountReset=true;
   evidence.phase='reload';await client.send('Page.reload',{ignoreCache:true});await client.send('Page.bringToFront');await client.send('Emulation.setFocusEmulationEnabled',{enabled:true});await new Promise(r=>setTimeout(r,300));await client.eval(PREPARE);evidence.reload=await client.eval(MEASURE);assert.equal(evidence.reload.shellCount,1);assert.equal(evidence.reload.legacyCount,0);
   const shot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(ARTIFACT_DIR,`navigation-home-${width}x${height}.png`),Buffer.from(shot.data,'base64'));
   return evidence;
