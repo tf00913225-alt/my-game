@@ -60,8 +60,9 @@ assert.match(source,/<section class="v17363-preview-group"><b>裝備寶箱<\/b><
 assert.match(source,/const odds=equipmentChestOddsText\("　・　"\)/);
 assert.match(source,/dungeon-equipment-v17346\.png/);
 
-assert.match(source,/v17346-potion-detail/);
-assert.match(source,/\.item-modal-buttons\{margin-top:0!important\}/);
+assert.doesNotMatch(source,/v17346-potion-detail/);
+assert.doesNotMatch(source,/#game-stage #itemModal[^\n]*height:auto!important/);
+assert.match(fs.readFileSync("js/00-main.js","utf8"),/setItemModalPresentationMode\(isEquipment\?"equipment":"compact"\)/);
 assert.match(source,/v17346-preview-modal/);
 assert.match(source,/\.v132-preview-list-scroll\{flex:1 1 auto!important/);
 

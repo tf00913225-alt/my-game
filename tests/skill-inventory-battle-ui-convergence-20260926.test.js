@@ -37,8 +37,10 @@ assert.doesNotMatch(context,/if\(dungeonActive\|\|!gameplayPageId\)\{ return ope
 assert.match(mainCss,/grid-template-columns:repeat\(4,minmax\(0,1fr\)/);
 assert.doesNotMatch(mainCss,/\.skill-element-tab\.learn\{/);
 assert.doesNotMatch(mainCss,/skill-section-divider|skill-section-learned|skill-section-unlearned/);
-assert.match(inventoryCss,/app\.inventory-overlay-open[\s\S]*?display:none !important/);
-assert.match(inventoryCss,/app\.on-inventory-page \.content\{[\s\S]*?bottom:0 !important/);
+assert.doesNotMatch(inventoryCss,/inventory-overlay-open/);
+assert.match(inventoryCss,/app\.on-inventory-page \.content\{[^}]*overflow:hidden/);
+assert.match(inventoryCss,/#inventoryPage\{[^}]*height:100%[^}]*overflow:hidden/);
+assert.match(inventoryCss,/\.inventory-grid-scroll\{[^}]*overflow-y:auto[^}]*overflow-x:hidden/);
 assert.match(battleCss,/skill-quick-button \.sq-name\{[\s\S]*?display:block !important/);
 assert.match(battleCss,/skill-quick-button \.v135-sq-scope\{[\s\S]*?display:block !important/);
 assert.doesNotMatch(main,/sq-description|descriptionNode/);

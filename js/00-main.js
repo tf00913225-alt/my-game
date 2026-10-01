@@ -30324,6 +30324,44 @@ function getStatText(stats){
 }
 
 
+/*
+   Item presentation lifecycle owner.
+   The modal always keeps one frame and one scroll contract; later item
+   features may select a semantic content mode, but must not rewrite frame
+   geometry or infer the mode from button text/disabled state.
+*/
+const ITEM_MODAL_PRESENTATION_MODES = new Set([
+    "equipment",
+    "compact",
+    "comparison"
+]);
+
+function setItemModalPresentationMode(mode){
+    const modal=$("itemModal");
+    if(!modal){ return "closed"; }
+
+    const normalized=ITEM_MODAL_PRESENTATION_MODES.has(mode)
+        ?mode
+        :"closed";
+
+    modal.classList.remove(
+        "item-modal-mode-equipment",
+        "item-modal-mode-compact",
+        "item-modal-mode-comparison"
+    );
+
+    if(normalized==="closed"){
+        delete modal.dataset.presentationMode;
+    }else{
+        modal.dataset.presentationMode=normalized;
+        modal.classList.add("item-modal-mode-"+normalized);
+    }
+
+    return normalized;
+}
+window.setItemModalPresentationMode=setItemModalPresentationMode;
+
+
 function openItemModal(
     slotIndex
 ){
@@ -30378,6 +30416,13 @@ function openItemModal(
 
     const equipButton =
         $("itemEquipButton");
+
+    const isEquipment=
+        typeof isEquipmentInventoryType==="function"
+            ?isEquipmentInventoryType(item.type)
+            :!["potion","material","item","chest","ticket","blueprint"].includes(item.type);
+
+    setItemModalPresentationMode(isEquipment?"equipment":"compact");
 
 
     equipButton.removeAttribute(
@@ -30459,6 +30504,8 @@ function openEquippedItem(
     equipButton.dataset.slot =
         slot;
 
+    setItemModalPresentationMode("equipment");
+
 
     $("itemModal")
         .classList
@@ -30482,6 +30529,8 @@ function closeItemModal(){
     $("itemModal")
         .classList
         .remove("show");
+
+    setItemModalPresentationMode("closed");
 
 }
 

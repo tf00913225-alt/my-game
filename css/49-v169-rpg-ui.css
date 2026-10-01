@@ -16,6 +16,8 @@
     --ui-medium-modal-height:540px;
     --ui-medium-modal-safe-space:28px;
     --ui-medium-modal-content-gap:10px;
+    --ui-item-art-min:92px;
+    --ui-item-art-max:156px;
 }
 
 /*
@@ -228,15 +230,16 @@
     animation:none !important;
 }
 
-/* ----- Medium Modal: canonical item/equipment detail. ----- */
+/* ----- Item Presentation: canonical frame for every item-detail mode. ----- */
 #game-stage #itemModal .item-modal-box{
     width:calc(100% - var(--ui-medium-modal-safe-space)) !important;
     max-width:var(--ui-medium-modal-max-width) !important;
-    height:min(var(--ui-medium-modal-height),calc(100% - var(--ui-medium-modal-safe-space))) !important;
-    max-height:calc(100% - var(--ui-medium-modal-safe-space)) !important;
+    height:auto !important;
+    max-height:min(var(--ui-medium-modal-height),calc(100% - var(--ui-medium-modal-safe-space))) !important;
     min-height:0 !important;
     display:flex !important;
     flex-direction:column !important;
+    flex:0 1 auto !important;
     gap:var(--ui-medium-modal-content-gap) !important;
     overflow:hidden !important;
     box-sizing:border-box !important;
@@ -246,14 +249,8 @@
 #game-stage #itemModal .item-modal-buttons{
     flex:0 0 auto !important;
 }
-/*
-   Keep the Medium Modal frame fixed, but let a short potion/material stat card
-   hug its actual content. Long equipment details still shrink into the
-   available space and scroll here; the unused room stays as panel background
-   instead of becoming a giant black stat card.
-*/
 #game-stage #itemModal #itemModalStats{
-    flex:0 1 auto !important;
+    flex:1 1 auto !important;
     min-height:0 !important;
     max-height:none !important;
     overflow-x:hidden !important;
@@ -264,7 +261,194 @@
     scrollbar-gutter:stable !important;
 }
 #game-stage #itemModal .item-modal-buttons{
-    margin-top:auto !important;
+    margin-top:0 !important;
+}
+
+#game-stage #itemModal #itemModalIcon{
+    display:grid !important;
+    place-items:center !important;
+    width:clamp(var(--ui-item-art-min),40%,var(--ui-item-art-max)) !important;
+    max-width:100% !important;
+    aspect-ratio:1 !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:var(--ui-item-art-max) !important;
+    align-self:center !important;
+    overflow:hidden !important;
+}
+#game-stage #itemModal #itemModalIcon > .v169-item-art,
+#game-stage #itemModal #itemModalIcon > .v169-equipment-art,
+#game-stage #itemModal #itemModalIcon > .v169-material-art,
+#game-stage #itemModal #itemModalIcon > .v169-talisman-art,
+#game-stage #itemModal #itemModalIcon > .v169-ticket-art,
+#game-stage #itemModal #itemModalIcon > .v169-blueprint-art{
+    display:grid !important;
+    place-items:center !important;
+    width:100% !important;
+    height:100% !important;
+    max-width:100% !important;
+    max-height:100% !important;
+    flex:0 1 auto !important;
+    overflow:hidden !important;
+    box-sizing:border-box !important;
+}
+#game-stage #itemModal #itemModalIcon img,
+#game-stage #itemModal #itemModalIcon svg{
+    display:block !important;
+    width:100% !important;
+    height:100% !important;
+    max-width:100% !important;
+    max-height:100% !important;
+    object-fit:contain !important;
+    object-position:center !important;
+}
+
+#game-stage #itemModal.item-modal-mode-compact .item-modal-box{
+    max-height:calc(100% - var(--ui-medium-modal-safe-space)) !important;
+    justify-content:flex-start !important;
+}
+#game-stage #itemModal.item-modal-mode-compact #itemModalIcon{
+    --ui-item-art-max:132px;
+}
+#game-stage #itemModal.item-modal-mode-compact #itemModalStats{
+    flex:0 1 auto !important;
+    max-height:180px !important;
+}
+
+#game-stage #itemModal.item-modal-mode-comparison .item-modal-box{
+    max-width:396px !important;
+    max-height:calc(100% - 20px) !important;
+    padding:11px !important;
+    gap:7px !important;
+}
+#game-stage #itemModal.item-modal-mode-comparison .item-modal-box > #itemModalIcon,
+#game-stage #itemModal.item-modal-mode-comparison .item-modal-box > #itemModalName,
+#game-stage #itemModal.item-modal-mode-comparison .item-modal-box > #itemModalStats,
+#game-stage #itemModal.item-modal-mode-comparison .item-modal-box > .close-item-button{
+    display:none !important;
+}
+#game-stage #itemModal.item-modal-mode-comparison .item-modal-buttons{
+    display:grid !important;
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    width:100% !important;
+    min-height:48px !important;
+    gap:6px !important;
+}
+#game-stage #itemModal.item-modal-mode-comparison .item-modal-buttons button{
+    min-width:0 !important;
+    min-height:48px !important;
+    height:auto !important;
+    padding:5px 4px !important;
+    font-size:15px !important;
+    white-space:normal !important;
+    line-height:1.2 !important;
+}
+
+/*
+   The equipment-shop preview is the one compatibility mount in this batch:
+   v132RewardModal is created under document.body, so these values use browser
+   CSS pixels instead of the legacy 420px surface. It shares the same frame /
+   fixed-actions / single-scroll contract and may be moved only when the whole
+   v132 reward-modal family is migrated together.
+*/
+.v132-reward-modal .v17346-shop-preview-modal.item-presentation-frame{
+    width:min(360px,calc(100vw - 28px)) !important;
+    max-width:calc(100vw - 28px) !important;
+    height:auto !important;
+    max-height:calc(100dvh - 28px) !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    display:flex !important;
+    flex-direction:column !important;
+    gap:10px !important;
+    padding:16px !important;
+    overflow:hidden !important;
+    box-sizing:border-box !important;
+    text-align:center !important;
+}
+.v132-reward-modal .v17346-shop-preview-modal.item-presentation-frame,
+.v132-reward-modal .v17346-shop-preview-modal.item-presentation-frame *{
+    min-width:0;
+    box-sizing:border-box;
+}
+.v132-reward-modal .v17346-shop-preview-modal > h3{
+    position:static !important;
+    flex:0 0 auto !important;
+    margin:0 !important;
+    padding:0 !important;
+    color:#f7e7be !important;
+    background:none !important;
+    font-size:22px !important;
+    line-height:1.25 !important;
+    overflow-wrap:anywhere;
+}
+.v132-reward-modal .v17346-shop-preview-modal .item-presentation-scroll{
+    display:flex;
+    flex:1 1 auto;
+    min-height:0;
+    flex-direction:column;
+    gap:10px;
+    overflow-x:hidden;
+    overflow-y:auto;
+    overscroll-behavior-y:contain;
+    -webkit-overflow-scrolling:touch;
+    touch-action:pan-y;
+    scrollbar-gutter:stable;
+}
+.v132-reward-modal .v17346-shop-preview-modal .v17346-shop-preview-art{
+    display:grid !important;
+    place-items:center !important;
+    width:clamp(96px,min(42vw,22dvh),168px) !important;
+    max-width:100% !important;
+    aspect-ratio:1 !important;
+    height:auto !important;
+    flex:0 0 auto !important;
+    margin:0 auto !important;
+    overflow:hidden !important;
+}
+.v132-reward-modal .v17346-shop-preview-modal .v17346-shop-preview-art > .v169-item-art{
+    display:grid !important;
+    place-items:center !important;
+    width:100% !important;
+    height:100% !important;
+    max-width:100% !important;
+    max-height:100% !important;
+    overflow:hidden !important;
+}
+.v132-reward-modal .v17346-shop-preview-modal .v17346-shop-preview-art img,
+.v132-reward-modal .v17346-shop-preview-modal .v17346-shop-preview-art svg{
+    display:block !important;
+    width:100% !important;
+    height:100% !important;
+    max-width:100% !important;
+    max-height:100% !important;
+    object-fit:contain !important;
+    object-position:center !important;
+}
+.v132-reward-modal .v17346-shop-preview-modal .v17346-shop-preview-info{
+    display:grid;
+    gap:7px;
+    padding:10px 12px;
+    border:1px solid rgba(197,151,72,.55);
+    border-radius:9px;
+    background:rgba(12,9,6,.7);
+    font-size:16px;
+    line-height:1.4;
+}
+.v132-reward-modal .v17346-shop-preview-modal .v17346-shop-preview-info strong{color:#ffe09a;font-size:18px;overflow-wrap:anywhere}
+.v132-reward-modal .v17346-shop-preview-modal .v17346-shop-preview-price{color:#ffd078;font-size:18px;font-weight:900}
+.v132-reward-modal .v17346-shop-preview-modal .v17346-shop-preview-reforge{color:#ffbf5b;font-size:14px;font-weight:900}
+.v132-reward-modal .v17346-shop-preview-modal .v132-reward-actions{
+    position:static !important;
+    flex:0 0 auto !important;
+    margin:0 !important;
+    padding:0 !important;
+    background:none !important;
+}
+.v132-reward-modal .v17346-shop-preview-modal .v132-reward-actions button{
+    min-height:44px !important;
+    padding:8px 12px !important;
+    font-size:15px !important;
 }
 
 /* A permanently promoted layer made skill cards shimmer while scrolling. */
