@@ -208,6 +208,20 @@
         "verification": "本機 50 張來源與成品 SHA-256、像素、解碼、透明度通過；最新 PR CI 瀏覽器驗收、DEV 部署及實機顯示尚待核對",
         "result": "風元素素材與引用已在候選 PR；未完成 DEV 與實機驗收前保持 IMPLEMENTED"
       }
+    },
+    {
+      "id": "REQ-WATER-WILD-BATCH1-20261001",
+      "title": "水元素野怪 10 張正式接入第一批",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "release/requirement-batches/2026-10-01-water-wild-monsters-batch1.json",
+          "config/monster-portrait-registry.json",
+          "config/monster-asset-provenance.json"
+        ],
+        "verification": "本機 10 張來源與成品 SHA-256、解碼、透明度及 RGBA 像素相等；最新 PR CI、DEV 部署與手機實機顯示尚待核對",
+        "result": "只有 10 個水系野怪 target 為 runtimeReady；其餘普通怪與水塔普通／精英／小 Boss 未提前接入"
+      }
     }
   ]
 }

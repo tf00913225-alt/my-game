@@ -67,6 +67,7 @@ jobs:
           node --check .github/scripts/battle-runtime-architecture-guard.mjs
           node --check .github/scripts/run-daily-dungeon-webp-browser-qa.mjs
           node --check .github/scripts/run-fire-portrait-browser-qa.mjs
+          node --check .github/scripts/run-water-wild-portrait-browser-qa.mjs
 
       - name: Check all project JavaScript syntax
         run: node .github/scripts/ci.mjs syntax
@@ -367,6 +368,24 @@ jobs:
         with:
           name: fire-portrait-browser-qa-${{ github.sha }}
           path: artifacts/browser-qa/fire-portrait-browser-qa.json
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Run Water wild portrait decode and battle runtime browser QA
+        id: water_wild_portrait_browser
+        if: success() && github.event_name == 'pull_request'
+        run: |
+          python3 -m http.server 4177 --bind 127.0.0.1 > /tmp/four-symbols-water-wild-portrait-qa-server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+          DEV_BASE_URL=http://127.0.0.1:4177 node .github/scripts/run-water-wild-portrait-browser-qa.mjs
+
+      - name: Upload Water wild portrait browser evidence
+        if: always() && steps.water_wild_portrait_browser.outcome != 'skipped'
+        uses: actions/upload-artifact@v4
+        with:
+          name: water-wild-portrait-browser-qa-${{ github.sha }}
+          path: artifacts/browser-qa/water-wild-portrait-browser-qa.json
           if-no-files-found: error
           retention-days: 90
 

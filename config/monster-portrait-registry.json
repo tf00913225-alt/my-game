@@ -71,8 +71,8 @@
   },
   "snapshot": {
     "portraitTargets": 147,
-    "existingTargets": 90,
-    "plannedTargets": 57,
+    "existingTargets": 100,
+    "plannedTargets": 47,
     "uniqueRuntimeNames": 144,
     "assetPoolCounts": {
       "normal": 10,
@@ -95,12 +95,12 @@
       ],
       [
         "wild.zone-01.water-01",
-        "史萊姆",
+        "水靈狐",
         "water",
         "regular",
         "standard",
-        "assets/monsters/wild/zone-01/water-01.png",
-        "planned"
+        "assets/monsters/wild/zone-01/water-01.webp",
+        "existing"
       ],
       [
         "wild.zone-01.wind-01",
@@ -131,12 +131,12 @@
       ],
       [
         "wild.zone-02.water-01",
-        "沙蠍",
+        "浪尾獺",
         "water",
         "regular",
         "standard",
-        "assets/monsters/wild/zone-02/water-01.png",
-        "planned"
+        "assets/monsters/wild/zone-02/water-01.webp",
+        "existing"
       ],
       [
         "wild.zone-02.wind-01",
@@ -167,12 +167,12 @@
       ],
       [
         "wild.zone-03.water-01",
-        "寒冰魔",
+        "澤木妖",
         "water",
         "regular",
         "standard",
-        "assets/monsters/wild/zone-03/water-01.png",
-        "planned"
+        "assets/monsters/wild/zone-03/water-01.webp",
+        "existing"
       ],
       [
         "wild.zone-03.fire-02",
@@ -221,12 +221,12 @@
       ],
       [
         "wild.zone-04.water-01",
-        "深淵水靈",
+        "沼鉤怪",
         "water",
         "regular",
         "standard",
-        "assets/monsters/wild/zone-04/water-01.png",
-        "planned"
+        "assets/monsters/wild/zone-04/water-01.webp",
+        "existing"
       ],
       [
         "wild.zone-04.fire-02",
@@ -275,12 +275,12 @@
       ],
       [
         "wild.zone-05.water-01",
-        "寒潮巨獸",
+        "潮蛙卒",
         "water",
         "regular",
         "standard",
-        "assets/monsters/wild/zone-05/water-01.png",
-        "planned"
+        "assets/monsters/wild/zone-05/water-01.webp",
+        "existing"
       ],
       [
         "wild.zone-05.fire-02",
@@ -329,12 +329,12 @@
       ],
       [
         "wild.zone-06.water-01",
-        "玄冰修羅",
+        "鱗潭獸",
         "water",
         "regular",
         "standard",
-        "assets/monsters/wild/zone-06/water-01.png",
-        "planned"
+        "assets/monsters/wild/zone-06/water-01.webp",
+        "existing"
       ],
       [
         "wild.zone-06.fire-02",
@@ -383,12 +383,12 @@
       ],
       [
         "wild.zone-07.water-01",
-        "絕冰魔君",
+        "瀾花姬",
         "water",
         "regular",
         "standard",
-        "assets/monsters/wild/zone-07/water-01.png",
-        "planned"
+        "assets/monsters/wild/zone-07/water-01.webp",
+        "existing"
       ],
       [
         "wild.zone-07.fire-02",
@@ -437,12 +437,12 @@
       ],
       [
         "wild.zone-08.water-01",
-        "極寒龍獄",
+        "海蜇巫",
         "water",
         "regular",
         "standard",
-        "assets/monsters/wild/zone-08/water-01.png",
-        "planned"
+        "assets/monsters/wild/zone-08/water-01.webp",
+        "existing"
       ],
       [
         "wild.zone-08.fire-02",
@@ -491,12 +491,12 @@
       ],
       [
         "wild.zone-09.water-01",
-        "永凍深淵",
+        "霜鬃狼",
         "water",
         "regular",
         "standard",
-        "assets/monsters/wild/zone-09/water-01.png",
-        "planned"
+        "assets/monsters/wild/zone-09/water-01.webp",
+        "existing"
       ],
       [
         "wild.zone-09.fire-02",
@@ -545,12 +545,12 @@
       ],
       [
         "wild.zone-10.water-01",
-        "末世寒神",
+        "玄潮俠",
         "water",
         "regular",
         "standard",
-        "assets/monsters/wild/zone-10/water-01.png",
-        "planned"
+        "assets/monsters/wild/zone-10/water-01.webp",
+        "existing"
       ],
       [
         "wild.zone-10.fire-02",

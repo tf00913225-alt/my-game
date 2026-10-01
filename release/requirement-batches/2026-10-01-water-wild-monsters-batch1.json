@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "water-wild-monsters-batch1-20261001",
+  "releaseVersion": "173.72",
+  "requirements": [
+    {
+      "id": "WATER-WILD-01",
+      "title": "Ten selected water wild Master PNG become exact lossless Runtime WebP identities",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": ["config/monster-portrait-registry.json", "config/monster-asset-provenance.json", "tests/water-wild-portrait-batch1.test.js"],
+        "verification": "Local SHA-256, 1024x1536 RGBA decode, transparency and exact PNG/WebP RGBA pixel equality passed for all ten; latest PR CI pending.",
+        "result": "Only water wild batch 1 is runtimeReady; the other ten normal sources and all water tower portraits remain unadopted."
+      }
+    },
+    {
+      "id": "WATER-WILD-02",
+      "title": "Water wild identity, first visible frame, redraw and fire/wind isolation",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": ["js/00-main.js", ".github/scripts/run-water-wild-portrait-browser-qa.mjs", ".github/workflows/ci.yml"],
+        "verification": "Exact-candidate browser execution is required on the PR; Android physical-device display remains NOT COMPLETE.",
+        "result": "CI browser evidence and DEV deployment SHA must pass before merge; physical-device display is not claimed VERIFIED."
+      }
+    }
+  ]
+}

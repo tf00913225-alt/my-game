@@ -3537,6 +3537,526 @@
         }
       },
       "runtimeReady": true
+    },
+    {
+      "monsterId": "wild.zone-01.water-01",
+      "displayName": "水靈狐",
+      "portraitKey": "wild.zone-01.water-01",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/水元素/普通怪/file_0000000024d08211979f809b51edc660.png",
+        "sha256": "ee35dc574edf3eb7dcdf5547183814bdc1b5db901726b80c2bfac1e8c01f15f3",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/水元素/普通怪/file_0000000024d08211979f809b51edc660.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/wild/zone-01/water-01.webp",
+        "sha256": "4a472ee18c0aacd9a1932b32b8837d0c63296a47bd27c67bb46d5c844bc3efbe",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "wild.zone-02.water-01",
+      "displayName": "浪尾獺",
+      "portraitKey": "wild.zone-02.water-01",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/水元素/普通怪/file_00000000bdc081f4817a3c39fbb0024d.png",
+        "sha256": "dfafa94f6eb9382f6dffc280179f803ae0d14bf8356771d7c36457979dd3f09b",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/水元素/普通怪/file_00000000bdc081f4817a3c39fbb0024d.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/wild/zone-02/water-01.webp",
+        "sha256": "33f43c33d4552e215f7d43665ad1f5b254d86e30945128f544fd5c0a6f4a501a",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "wild.zone-03.water-01",
+      "displayName": "澤木妖",
+      "portraitKey": "wild.zone-03.water-01",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/水元素/普通怪/file_000000001cbc8211bbcbf65c05ceb173.png",
+        "sha256": "732f3962577f5999eef61fed2a534ccccd2fa2eba3fc554780b5a6f77ae7195d",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/水元素/普通怪/file_000000001cbc8211bbcbf65c05ceb173.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/wild/zone-03/water-01.webp",
+        "sha256": "9e92ba321f4cd304a4d9f7d21aad4e26f8ac2763323828f91a8c354b50fc87c9",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "wild.zone-04.water-01",
+      "displayName": "沼鉤怪",
+      "portraitKey": "wild.zone-04.water-01",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/水元素/普通怪/file_000000005cb081fda0b05d5c7bdd004a.png",
+        "sha256": "3eb4b13680c5ed1b43da2cad89dca7b57e3a2f6718201a21c4eeb5a53067592b",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/水元素/普通怪/file_000000005cb081fda0b05d5c7bdd004a.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/wild/zone-04/water-01.webp",
+        "sha256": "479a399ed2cb3ed86db00208312fc269131332d35358d4abf14337ca12ee5bb4",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "wild.zone-05.water-01",
+      "displayName": "潮蛙卒",
+      "portraitKey": "wild.zone-05.water-01",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/水元素/普通怪/file_000000005f7082118c7bf534d1ea813e.png",
+        "sha256": "e34db9dcadcbe7bb91527d3a4966c89b399312699ea0eed665eaaff15f364f2a",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/水元素/普通怪/file_000000005f7082118c7bf534d1ea813e.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/wild/zone-05/water-01.webp",
+        "sha256": "d7d185ed40565c35e269e1c3fea4a9551d05068ea59d3b30622d1ecf3a9d941d",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "wild.zone-06.water-01",
+      "displayName": "鱗潭獸",
+      "portraitKey": "wild.zone-06.water-01",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/水元素/普通怪/file_00000000437481f4bfa78451befdaedc.png",
+        "sha256": "80f6a92e8a15509deda2bab60b14be351ebf7646a8e6763cc1578e0fc1471ace",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/水元素/普通怪/file_00000000437481f4bfa78451befdaedc.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/wild/zone-06/water-01.webp",
+        "sha256": "5723357932e3fd49120de48be89dec689834278af2537a94d06d7aaa4d272f94",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "wild.zone-07.water-01",
+      "displayName": "瀾花姬",
+      "portraitKey": "wild.zone-07.water-01",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/水元素/普通怪/file_000000006380820d85c4bbe9e468de9f.png",
+        "sha256": "d97e4b3e6d703e785cdb871523d98d47d9c65f3022dce69dfaa259ccc839173a",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/水元素/普通怪/file_000000006380820d85c4bbe9e468de9f.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/wild/zone-07/water-01.webp",
+        "sha256": "aafd12f2ee34778c4b0310cf8e700a0ffb480af628651a546bb865e939cd61b0",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "wild.zone-08.water-01",
+      "displayName": "海蜇巫",
+      "portraitKey": "wild.zone-08.water-01",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/水元素/普通怪/file_000000006f8c8246b776789d1089ecec.png",
+        "sha256": "1c7dac4bee3bb54ebdfc561fec299da093841a336c3842f81fc00c8987092d8c",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/水元素/普通怪/file_000000006f8c8246b776789d1089ecec.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/wild/zone-08/water-01.webp",
+        "sha256": "0800d1c316cd15f78d356158e0755f64e458a8be699d79d8566f9d1513690011",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "wild.zone-09.water-01",
+      "displayName": "霜鬃狼",
+      "portraitKey": "wild.zone-09.water-01",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/水元素/普通怪/file_00000000932c8211b75191e9e4300741.png",
+        "sha256": "395b0b2ce9497c95fecb8a4f2550503f0665d7f2d57c432767e228bf92b0e496",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/水元素/普通怪/file_00000000932c8211b75191e9e4300741.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/wild/zone-09/water-01.webp",
+        "sha256": "626531849b7eeca082949f9ce772bd1bb2b9e4aa36d3b0d80fb63aca0652ee99",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "wild.zone-10.water-01",
+      "displayName": "玄潮俠",
+      "portraitKey": "wild.zone-10.water-01",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/水元素/普通怪/file_0000000074b081f4bfc01a592798cae9.png",
+        "sha256": "920015c7656f0acf06a634fddbfed5b6ec4ca65f2d5b4bac5c9a24955b02f3b1",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/水元素/普通怪/file_0000000074b081f4bfc01a592798cae9.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/wild/zone-10/water-01.webp",
+        "sha256": "3878cf5ad8fde947cc9cbb30ced162c2dc008ea1e510fe3d11dc3df453430fb1",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
     }
   ]
 }

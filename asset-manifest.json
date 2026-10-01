@@ -20,7 +20,7 @@
     "bundles": {
       "app-shell": {
         "scripts": [
-          "build/app-shell.06900aa6a4a4.js"
+          "build/app-shell.74ef183667de.js"
         ],
         "styles": [
           "build/app-shell.95542962b3dd.css"
@@ -562,9 +562,9 @@
         "decode": true
       },
       {
-        "path": "build/app-shell.06900aa6a4a4.js",
-        "sha256": "06900aa6a4a4",
-        "bytes": 993929,
+        "path": "build/app-shell.74ef183667de.js",
+        "sha256": "74ef183667de",
+        "bytes": 994644,
         "priority": "P1",
         "type": "script",
         "decode": false
@@ -818,8 +818,8 @@
         "decode": false
       }
     ],
-    "manifestHash": "fbb89f5dccb9",
-    "totalBytes": 21574312,
+    "manifestHash": "2328048920c5",
+    "totalBytes": 21575027,
     "totalResources": 78
   },
   "assets": {
@@ -827,9 +827,9 @@
       "sha256": "868e7f01718e",
       "bytes": 69305
     },
-    "build/app-shell.06900aa6a4a4.js": {
-      "sha256": "06900aa6a4a4",
-      "bytes": 993929
+    "build/app-shell.74ef183667de.js": {
+      "sha256": "74ef183667de",
+      "bytes": 994644
     },
     "build/gameplay-core-primary.c2173c0b3b88.js": {
       "sha256": "c2173c0b3b88",
@@ -1260,6 +1260,88 @@
         "path": "assets/monsters/tower/fire-pool/mon-fire-miniboss-011.webp",
         "sha256": "4b028b3ba7a1",
         "bytes": 1785386,
+        "decode": true
+      }
+    ],
+    "water": [
+      {
+        "assetId": "wild.zone-01.water-01",
+        "displayName": "水靈狐",
+        "path": "assets/monsters/wild/zone-01/water-01.webp",
+        "sha256": "4a472ee18c0a",
+        "bytes": 1493266,
+        "decode": true
+      },
+      {
+        "assetId": "wild.zone-02.water-01",
+        "displayName": "浪尾獺",
+        "path": "assets/monsters/wild/zone-02/water-01.webp",
+        "sha256": "33f43c33d455",
+        "bytes": 1512312,
+        "decode": true
+      },
+      {
+        "assetId": "wild.zone-03.water-01",
+        "displayName": "澤木妖",
+        "path": "assets/monsters/wild/zone-03/water-01.webp",
+        "sha256": "9e92ba321f4c",
+        "bytes": 1766920,
+        "decode": true
+      },
+      {
+        "assetId": "wild.zone-04.water-01",
+        "displayName": "沼鉤怪",
+        "path": "assets/monsters/wild/zone-04/water-01.webp",
+        "sha256": "479a399ed2cb",
+        "bytes": 1361314,
+        "decode": true
+      },
+      {
+        "assetId": "wild.zone-05.water-01",
+        "displayName": "潮蛙卒",
+        "path": "assets/monsters/wild/zone-05/water-01.webp",
+        "sha256": "d7d185ed4056",
+        "bytes": 1465896,
+        "decode": true
+      },
+      {
+        "assetId": "wild.zone-06.water-01",
+        "displayName": "鱗潭獸",
+        "path": "assets/monsters/wild/zone-06/water-01.webp",
+        "sha256": "5723357932e3",
+        "bytes": 1535978,
+        "decode": true
+      },
+      {
+        "assetId": "wild.zone-07.water-01",
+        "displayName": "瀾花姬",
+        "path": "assets/monsters/wild/zone-07/water-01.webp",
+        "sha256": "aafd12f2ee34",
+        "bytes": 1255240,
+        "decode": true
+      },
+      {
+        "assetId": "wild.zone-08.water-01",
+        "displayName": "海蜇巫",
+        "path": "assets/monsters/wild/zone-08/water-01.webp",
+        "sha256": "0800d1c316cd",
+        "bytes": 1769204,
+        "decode": true
+      },
+      {
+        "assetId": "wild.zone-09.water-01",
+        "displayName": "霜鬃狼",
+        "path": "assets/monsters/wild/zone-09/water-01.webp",
+        "sha256": "626531849b7e",
+        "bytes": 1486400,
+        "decode": true
+      },
+      {
+        "assetId": "wild.zone-10.water-01",
+        "displayName": "玄潮俠",
+        "path": "assets/monsters/wild/zone-10/water-01.webp",
+        "sha256": "3878cf5ad8fd",
+        "bytes": 1432406,
         "decode": true
       }
     ],
