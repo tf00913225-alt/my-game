@@ -8,12 +8,13 @@
 
 ## 1. 目標與工作流
 
-正式工作流分成兩條：
+正式工作流分成三條，依素材目前狀態選最短路徑：
 
-- **素材尚未生成**：自動盤點 → 自動生成 → 自動放置 → batch finalize → batch strict audit。
-- **素材已生成並核准**：正式 WebP 落位 → `portrait:import` 快速導入 → Runtime 契約驗證。
+- **素材尚未生成**：自動盤點 → 自動生成 Master PNG → 放入 `assets-library` 正式 Master 路徑。
+- **Master PNG 已生成並核准，且 Registry target 已存在**：優先執行 `portrait:finalize-master`；同一個 scoped transaction（限定範圍交易）完成 WebP、Provenance（來源追溯）、Registry 升級與 Runtime／Audit／Permanent Gate 驗證。
+- **正式 Runtime WebP 已經生成並核准**：使用 `portrait:import` 快速導入，不重新生成圖片。
 
-已生成素材不得因舊 batch 流程重做生成；尚未生成素材也不得用快速導入假裝完成。
+已生成素材不得因舊 batch 流程重做生成；尚未生成素材也不得用快速導入假裝完成。歷史 batch 工具只保留相容用途，不再是新素材的優先正式路徑。
 
 只有同時滿足以下條件，才可把一隻怪物標示為「立繪完成」：
 
@@ -264,6 +265,17 @@ assets/dungeons/abyss/floor5-soldier.webp
 不得因為名稱像某個現成 IP 角色就模仿該 IP 的特定造型。
 
 ## 9.1 已生成素材的正式快速導入
+
+若已核准的是 **Master PNG**，且該怪物已存在於 Registry，優先使用：
+
+```bash
+npm run portrait:finalize-master -- \
+  --master-root=/absolute/path/to/assets-library \
+  --master-commit=<assets-library full SHA> \
+  --keys=<portraitKey,portraitKey,...>
+```
+
+此流程會依 `sizeClass` 自動選擇 1024×1536 或 1536×2048，建立／更新 Provenance、產生無損 WebP、把 Registry 升成 `existing`，並執行 Runtime contract、portrait audit 與 Permanent Image Asset Gate。任一後置驗證失敗時必須回滾，不得留下半完成狀態。
 
 若圖片已經完成生成、核准、無損 WebP 轉檔，並已放到 registry 指定的正式 `assets/monsters/` 路徑，後續正式接線改由：
 
