@@ -105,9 +105,10 @@ test("ticket choices keep image and label in separate layout boxes",()=>{
 
 test("item preview stays inside the stage with a reachable return button",()=>{
     assert.match(itemCss,/max-height:calc\(100% - 24px\) !important/);
-    assert.match(itemCss,/#itemModal \.item-modal-icon > \.v169-talisman-art\{[\s\S]*?width:150px;[\s\S]*?height:225px;/);
-    assert.match(itemCss,/#itemModal \.item-modal-icon > \.v169-equipment-art\{[\s\S]*?max-height:190px;/);
-    assert.match(itemCss,/#itemModal \.item-stat-list\{[\s\S]*?max-height:none !important;[\s\S]*?overflow:visible !important/);
+    const frameCss=fs.readFileSync("css/49-v169-rpg-ui.css","utf8");
+    assert.match(frameCss,/#itemModal #itemModalIcon\{[^}]*aspect-ratio:1 !important/);
+    assert.doesNotMatch(itemCss,/#itemModal \.item-modal-icon/);
+    assert.match(frameCss,/#itemModal #itemModalStats\{[^}]*overflow-y:auto !important/);
 assert.match(touchSource,/data-scroll-owner="x\|y\|both"/);
     const modal=html.slice(html.indexOf('id="itemModal"'),html.indexOf('id="skillDetailModal"'));
     assert.match(modal,/class="close-item-button"[\s\S]*?>\s*返回\s*<\/button>/);

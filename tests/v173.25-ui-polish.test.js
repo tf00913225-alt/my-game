@@ -35,8 +35,10 @@ test("wear and sell share one exact enabled visual",()=>{
 });
 
 test("equipment preview art and copy fit without clipping",()=>{
-    assert.match(itemCss,/#itemModal \.item-modal-icon > \.v169-equipment-art\{[\s\S]*width:min\(46vw,190px\);[\s\S]*height:min\(46vw,190px\)/);
-    assert.match(itemCss,/#itemModal \.item-stat-list\{[\s\S]*max-height:none !important;[\s\S]*overflow:visible !important/);
+    const frameCss=fs.readFileSync("css/49-v169-rpg-ui.css","utf8");
+    assert.match(frameCss,/#itemModal #itemModalIcon\{[^}]*aspect-ratio:1 !important/);
+    assert.doesNotMatch(itemCss,/#itemModal \.item-modal-icon/);
+    assert.match(frameCss,/#itemModal #itemModalStats\{[^}]*overflow-y:auto !important/);
 });
 
 test("backpack ability details keep the close button outside the scroll owner",()=>{

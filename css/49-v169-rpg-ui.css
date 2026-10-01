@@ -241,6 +241,7 @@
     flex-direction:column !important;
     flex:0 1 auto !important;
     gap:var(--ui-medium-modal-content-gap) !important;
+    padding:16px;
     overflow:hidden !important;
     box-sizing:border-box !important;
 }
@@ -262,6 +263,37 @@
 }
 #game-stage #itemModal .item-modal-buttons{
     margin-top:0 !important;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+}
+/* Text is authored in the documented legacy-content unit. 18px remains
+   readable after projection in normal/short phone space; text never shrinks
+   to force content into the frame. */
+#game-stage #itemModal #itemModalName{
+    margin:5px 0 9px;
+    font-size:20px;
+    line-height:1.35;
+    overflow-wrap:anywhere;
+}
+#game-stage #itemModal #itemModalStats,
+#game-stage #itemModal #itemModalStats *{
+    font-size:18px;
+    line-height:1.55;
+    overflow-wrap:anywhere;
+}
+#game-stage #itemModal .item-modal-buttons button,
+#game-stage #itemModal .close-item-button{
+    box-sizing:border-box;
+    min-width:0;
+    min-height:44px;
+    height:auto;
+    padding:7px;
+    font-size:18px;
+    line-height:1.35;
+    white-space:normal;
+    overflow-wrap:anywhere;
+}
+#game-stage #itemModal .close-item-button{
+    flex:0 0 auto;
 }
 
 #game-stage #itemModal #itemModalIcon{
@@ -339,7 +371,7 @@
     min-height:48px !important;
     height:auto !important;
     padding:5px 4px !important;
-    font-size:15px !important;
+    font-size:18px !important;
     white-space:normal !important;
     line-height:1.2 !important;
 }
@@ -1476,7 +1508,7 @@
 #game-stage .home-feature-modal-box .home-feature-close-btn,
 #game-stage .item-modal-box .close-item-button,
 #game-stage .creation-skill-detail-box .creation-skill-detail-close,
-#game-stage .creation-skill-detail-box .creation-skill-detail-x,
+#game-stage .creation-skill-detail-box .creation-skill-detail-x{
     border-color:#9B773B;
     color:var(--rpg-window-text,#EEE7D8);
     background:linear-gradient(180deg,#342C20,#171510 62%,#0D0C09);

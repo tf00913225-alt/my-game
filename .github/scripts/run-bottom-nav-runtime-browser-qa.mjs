@@ -106,7 +106,7 @@ class Cdp{
 
 const PREPARE=`(async()=>{
  const wait=async f=>{for(let i=0;i<600;i++){if(f())return;await new Promise(r=>setTimeout(r,50));}throw Error('Runtime not READY: '+JSON.stringify({state:window.FourSymbolsStartupPolicy?.getState?.(),loader:document.getElementById('startupLoader')?.outerHTML,error:String(window.FourSymbolsStartupPolicy?.getLastError?.()?.message||''),page:document.body.innerText.slice(0,800)}));};
- await wait(()=>window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden);
+ await wait(()=>window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show'));
  for(const feature of ['gameplay-core','patrol','boss-tower','abyss'])await window.FourSymbolsFeatures.ensure(feature,'navigation-qa');
  showPage('home');
  await new Promise(r=>setTimeout(r,150));
@@ -138,6 +138,18 @@ async function runViewport(chrome,url,width,height){
   await client.send('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:1});
   await client.send('Page.navigate',{url});await new Promise(r=>setTimeout(r,300));evidence.startup=await client.eval(PREPARE);
   assert.equal(evidence.startup.state,'READY');assert.equal(evidence.startup.ready,true);
+  // Dismiss the real, non-forced startup notice through its formal header
+  // return control. Its acknowledgement lives inside long scroll content and
+  // is covered by the native navigation on some tall viewports; that notice
+  // geometry is outside this inventory/navigation QA scope.
+  evidence.releaseNotice=await client.eval(`(()=>{const modal=document.getElementById('homeFeatureModal');if(!modal?.classList.contains('show')||!modal.classList.contains('release-update-modal'))return null;if(modal.classList.contains('release-update-forced'))throw Error('Forced release update blocks navigation QA');const button=modal.querySelector('.home-feature-close-btn[onclick="closeHomeFeature()"]');if(!button)throw Error('Startup release notice has no formal return control');const r=button.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,hit=document.elementFromPoint(x,y);return {x,y,control:'formal-header-return',unobstructed:button.contains(hit),buttonRect:{left:r.left,top:r.top,width:r.width,height:r.height,bottom:r.bottom},hit:hit?.outerHTML.slice(0,700),modal:modal.className};})()`);
+  if(evidence.releaseNotice){
+   assert.equal(evidence.releaseNotice.unobstructed,true,'Release return control is obstructed: '+JSON.stringify(evidence.releaseNotice));
+   const {x,y}=evidence.releaseNotice;
+   await client.send('Input.dispatchMouseEvent',{type:'mousePressed',x,y,button:'left',clickCount:1});
+   await client.send('Input.dispatchMouseEvent',{type:'mouseReleased',x,y,button:'left',clickCount:1});await settle(client);
+   assert.equal(await client.eval("document.getElementById('homeFeatureModal').classList.contains('show')"),false,'formal release return must close the notice');
+  }
   for(let pass=0;pass<2;pass++){
    for(const [mode,action] of SCENARIOS){
     console.log("Navigation QA",width,height,pass,mode);
@@ -170,7 +182,10 @@ async function runViewport(chrome,url,width,height){
   assert.equal(evidence.inventory.overflow,'auto','inventory scroll contract remains enabled');
   assert.equal(evidence.inventory.slots,24,'formal inventory uses 24-slot pagination');
   if(evidence.inventory.scrollHeight>evidence.inventory.clientHeight+1){
+   evidence.inventory.gestureSurface=await client.eval(`(()=>{const x=${ir.left+ir.width/2},y=${ir.top+Math.min(ir.height-20,ir.height*.8)},hit=document.elementFromPoint(x,y),owner=FourSymbolsGestureArbiter.findScrollOwner(hit),ancestors=[];for(let n=hit;n;n=n.parentElement){const s=getComputedStyle(n);ancestors.push({tag:n.tagName,id:n.id,className:n.className,touchAction:s.touchAction,pointerEvents:s.pointerEvents,overflowY:s.overflowY});}window.__navQaGestureEvents=[];for(const type of ['pointerdown','pointermove','pointercancel','pointerup','touchstart','touchmove','touchend'])document.addEventListener(type,e=>{window.__navQaGestureEvents.push({type,target:e.target.id||e.target.className,defaultPrevented:e.defaultPrevented,state:FourSymbolsGestureArbiter.getState(e.pointerId)?.state});},{capture:true,passive:true});return {hit:hit?.outerHTML.slice(0,500),owner:owner?.node.id,authVisible:document.getElementById('firebaseAuthOverlay')?.classList.contains('show'),ancestors};})()`);
+   assert.equal(evidence.inventory.gestureSurface.owner,'inventoryGridScroll','touch must hit the formal inventory scroll owner');
    await swipe(client,ir.left+ir.width/2,ir.top+Math.min(ir.height-20,ir.height*.8));
+   evidence.inventory.gestureEvents=await client.eval('window.__navQaGestureEvents');
    evidence.inventoryAfterSwipe=await client.eval("document.getElementById('inventoryGridScroll').scrollTop");assert.ok(evidence.inventoryAfterSwipe>0,'legal inventory swipe did not scroll');
   }else{evidence.inventoryScrollNeeded=false;}
   // The paginated inventory can fit without scrolling. Exercise an actually
@@ -191,7 +206,7 @@ async function runViewport(chrome,url,width,height){
   evidence.phase='reload';await client.send('Page.reload',{ignoreCache:true});await client.send('Page.bringToFront');await client.send('Emulation.setFocusEmulationEnabled',{enabled:true});await new Promise(r=>setTimeout(r,300));await client.eval(PREPARE);evidence.reload=await client.eval(MEASURE);assert.equal(evidence.reload.shellCount,1);assert.equal(evidence.reload.legacyCount,0);
   const shot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(ARTIFACT_DIR,`navigation-home-${width}x${height}.png`),Buffer.from(shot.data,'base64'));
   return evidence;
- }catch(error){error.navEvidence=evidence;throw error;}finally{client?.close();proc.kill('SIGTERM');try{fs.rmSync(profile,{recursive:true,force:true,maxRetries:3,retryDelay:100});}catch(_){}}
+ }catch(error){if(client){try{const shot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(ARTIFACT_DIR,`navigation-failure-${width}x${height}.png`),Buffer.from(shot.data,'base64'));}catch(captureError){evidence.captureError=String(captureError);}}error.navEvidence=evidence;throw error;}finally{client?.close();proc.kill('SIGTERM');try{fs.rmSync(profile,{recursive:true,force:true,maxRetries:3,retryDelay:100});}catch(_){}}
 }
 fs.mkdirSync(ARTIFACT_DIR,{recursive:true});
 const server=await startServer();const results=[];

@@ -2893,7 +2893,9 @@
   topReturn.remove();
         }
 
-        if(app?.classList?.contains("inventory-overlay-open")){
+        if(app?.classList?.contains("inventory-overlay-open")||
+           app?.classList?.contains("on-inventory-page")||
+           document.getElementById("itemModal")?.dataset.presentationMode){
             window.FourSymbolsBottomNav?.hide();
             return;
         }

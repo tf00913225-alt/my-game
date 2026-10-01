@@ -13,8 +13,8 @@
 
 /* Batch use/open: a compact row above the existing item-detail actions. */
 #game-stage #itemModal .v17350-batch-action{
-    display:grid;
-    grid-template-columns:auto 64px auto minmax(100px,1fr);
+    display:flex;
+    flex-wrap:wrap;
     align-items:center;
     gap:6px;
     flex:0 0 auto;
@@ -28,12 +28,14 @@
     color:#ddcda9;
 }
 #game-stage #itemModal .v17350-batch-action label{
-    font-size:15px;
+    font-size:18px;
     font-weight:800;
     white-space:nowrap;
 }
 #game-stage #itemModal .v17350-batch-action input{
-    width:64px;
+    width:auto;
+    min-width:88px;
+    flex:1 1 88px;
     height:34px;
     min-height:34px;
     padding:2px 5px;
@@ -43,34 +45,27 @@
     outline:0;
     color:#f7e8c2;
     background:#0d0b08;
-    font-size:15px;
+    font-size:18px;
     font-weight:900;
     text-align:center;
 }
 #game-stage #itemModal .v17350-batch-action .v17350-batch-max{
     color:#9e8c70;
-    font-size:13px;
+    font-size:18px;
     white-space:nowrap;
 }
 #game-stage #itemModal .v17350-batch-action button{
-    width:100%;
-    height:36px;
+    width:auto;
+    flex:1 0 100px;
+    height:auto;
     min-height:36px !important;
     padding:4px 9px !important;
     border:1px solid #9d7438;
     border-radius:6px;
     color:#f4d793;
     background:linear-gradient(180deg,#332414,#15100a);
-    font-size:15px !important;
+    font-size:18px !important;
     font-weight:900 !important;
     text-shadow:0 1px 2px #000;
     box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 2px 6px rgba(0,0,0,.4);
-}
-
-@media (max-width:380px){
-    #game-stage #itemModal .v17350-batch-action{
-        grid-template-columns:auto 58px auto minmax(92px,1fr);
-        gap:4px;
-    }
-    #game-stage #itemModal .v17350-batch-action input{width:58px;}
 }

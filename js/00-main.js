@@ -4768,6 +4768,13 @@ function spawnButtonRipple(
     clientY
 ){
 
+    // Item controls already receive the shared V141 pointer feedback.
+    // The legacy per-button ripple uses browser pixels inside the projected
+    // legacy stage and survives close/reopen, creating scrollable overflow.
+    if(button.closest("#itemModal,#inventoryPage")||button.matches("#bottomNav [onclick*='inventory'],[onclick*='v148OpenContextInventory'],[onclick*='openMapInventoryOverlay']")){
+        return;
+    }
+
     const now=
         Date.now();
 
@@ -30299,6 +30306,9 @@ function setItemModalPresentationMode(mode){
         modal.classList.add("item-modal-mode-"+normalized);
     }
 
+    // The native navigation is a separate paint plane. Project modal state
+    // through its existing context owner before exposing item controls.
+    window.v148SyncContextNavigation?.();
     return normalized;
 }
 window.setItemModalPresentationMode=setItemModalPresentationMode;
@@ -30372,7 +30382,7 @@ function openItemModal(
     );
 
 
-    if(item.type==="potion"){
+    if(!isEquipment){
 
         equipButton.disabled=true;
 
@@ -30434,6 +30444,8 @@ function openEquippedItem(
         $("itemEquipButton");
 
 
+    // Reopening equipped gear must retire chest/ticket action visibility.
+    equipButton.style.display="";
     equipButton.disabled=false;
 
     equipButton.textContent =
