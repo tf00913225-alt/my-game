@@ -170,7 +170,10 @@ async function runViewport(chrome,url,width,height){
   assert.equal(evidence.inventory.overflow,'auto','inventory scroll contract remains enabled');
   assert.equal(evidence.inventory.slots,24,'formal inventory uses 24-slot pagination');
   if(evidence.inventory.scrollHeight>evidence.inventory.clientHeight+1){
+   evidence.inventory.gestureSurface=await client.eval(`(()=>{const x=${ir.left+ir.width/2},y=${ir.top+Math.min(ir.height-20,ir.height*.8)},hit=document.elementFromPoint(x,y),owner=FourSymbolsGestureArbiter.findScrollOwner(hit),ancestors=[];for(let n=hit;n;n=n.parentElement){const s=getComputedStyle(n);ancestors.push({tag:n.tagName,id:n.id,className:n.className,touchAction:s.touchAction,pointerEvents:s.pointerEvents,overflowY:s.overflowY});}window.__navQaGestureEvents=[];for(const type of ['pointerdown','pointermove','pointercancel','pointerup','touchstart','touchmove','touchend'])document.addEventListener(type,e=>{window.__navQaGestureEvents.push({type,target:e.target.id||e.target.className,defaultPrevented:e.defaultPrevented,state:FourSymbolsGestureArbiter.getState(e.pointerId)?.state});},{capture:true,passive:true});return {hit:hit?.outerHTML.slice(0,500),owner:owner?.node.id,authVisible:document.getElementById('firebaseAuthOverlay')?.classList.contains('show'),ancestors};})()`);
+   assert.equal(evidence.inventory.gestureSurface.owner,'inventoryGridScroll','touch must hit the formal inventory scroll owner');
    await swipe(client,ir.left+ir.width/2,ir.top+Math.min(ir.height-20,ir.height*.8));
+   evidence.inventory.gestureEvents=await client.eval('window.__navQaGestureEvents');
    evidence.inventoryAfterSwipe=await client.eval("document.getElementById('inventoryGridScroll').scrollTop");assert.ok(evidence.inventoryAfterSwipe>0,'legal inventory swipe did not scroll');
   }else{evidence.inventoryScrollNeeded=false;}
   // The paginated inventory can fit without scrolling. Exercise an actually
