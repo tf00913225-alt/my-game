@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "wind-monster-portraits-20261001",
+  "releaseVersion": "173.72",
+  "requirements": [
+    {
+      "id": "WIND-01",
+      "title": "50 verified wind Master PNG and lossless Runtime WebP with unique identities",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": ["config/monster-portrait-registry.json", "config/monster-asset-provenance.json", "tests/wind-tower-portrait-coverage.test.js"],
+        "verification": "Local SHA-256, PNG/WebP decode, 1024x1536 dimensions, transparency and RGBA pixel equality for all 50; latest PR CI pending.",
+        "result": "10 wild, 20 tower normal, 10 elite, 10 small Boss portraits; deployed asset verification pending."
+      }
+    },
+    {
+      "id": "WIND-02",
+      "title": "Wild and wind tower identity, first visible frame, redraw and floor change",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": ["js/34-v141-core-systems.js", "js/gameplay-boss-tower-system.js", ".github/scripts/run-fire-tower-identity-first-frame-browser-qa.mjs", ".github/workflows/ci.yml"],
+        "verification": "Wind browser run is required on the PR; same floor is launched twice at five levels. Latest PR CI and deployed browser acceptance pending.",
+        "result": "Fire regression and water/earth isolation must also pass; physical device display NOT COMPLETE."
+      }
+    }
+  ]
+}

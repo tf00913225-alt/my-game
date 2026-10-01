@@ -70,10 +70,10 @@
     }
   },
   "snapshot": {
-    "portraitTargets": 107,
-    "existingTargets": 40,
-    "plannedTargets": 67,
-    "uniqueRuntimeNames": 104,
+    "portraitTargets": 147,
+    "existingTargets": 90,
+    "plannedTargets": 57,
+    "uniqueRuntimeNames": 144,
     "assetPoolCounts": {
       "normal": 10,
       "elite": 19,
@@ -104,12 +104,12 @@
       ],
       [
         "wild.zone-01.wind-01",
-        "林間風靈",
+        "風芽魈",
         "wind",
         "regular",
         "standard",
-        "assets/monsters/wild/zone-01/wind-01.png",
-        "planned"
+        "assets/monsters/wild/zone-01/wind-01.webp",
+        "existing"
       ],
       [
         "wild.zone-01.earth-01",
@@ -140,12 +140,12 @@
       ],
       [
         "wild.zone-02.wind-01",
-        "風沙隼",
+        "疾角妖",
         "wind",
         "regular",
         "standard",
-        "assets/monsters/wild/zone-02/wind-01.png",
-        "planned"
+        "assets/monsters/wild/zone-02/wind-01.webp",
+        "existing"
       ],
       [
         "wild.zone-02.earth-01",
@@ -194,12 +194,12 @@
       ],
       [
         "wild.zone-03.wind-01",
-        "霜風妖",
+        "霧鬃狼",
         "wind",
         "regular",
         "standard",
-        "assets/monsters/wild/zone-03/wind-01.png",
-        "planned"
+        "assets/monsters/wild/zone-03/wind-01.webp",
+        "existing"
       ],
       [
         "wild.zone-03.earth-01",
@@ -248,12 +248,12 @@
       ],
       [
         "wild.zone-04.wind-01",
-        "焰風鬼",
+        "旋風鬼",
         "wind",
         "regular",
         "standard",
-        "assets/monsters/wild/zone-04/wind-01.png",
-        "planned"
+        "assets/monsters/wild/zone-04/wind-01.webp",
+        "existing"
       ],
       [
         "wild.zone-04.earth-01",
@@ -302,12 +302,12 @@
       ],
       [
         "wild.zone-05.wind-01",
-        "蒼風巨獸",
+        "青嵐虎",
         "wind",
         "regular",
         "standard",
-        "assets/monsters/wild/zone-05/wind-01.png",
-        "planned"
+        "assets/monsters/wild/zone-05/wind-01.webp",
+        "existing"
       ],
       [
         "wild.zone-05.earth-01",
@@ -356,12 +356,12 @@
       ],
       [
         "wild.zone-06.wind-01",
-        "風刃修羅",
+        "逐風客",
         "wind",
         "regular",
         "standard",
-        "assets/monsters/wild/zone-06/wind-01.png",
-        "planned"
+        "assets/monsters/wild/zone-06/wind-01.webp",
+        "existing"
       ],
       [
         "wild.zone-06.earth-01",
@@ -410,12 +410,12 @@
       ],
       [
         "wild.zone-07.wind-01",
-        "嵐影魔君",
+        "嵐鎧衛",
         "wind",
         "regular",
         "standard",
-        "assets/monsters/wild/zone-07/wind-01.png",
-        "planned"
+        "assets/monsters/wild/zone-07/wind-01.webp",
+        "existing"
       ],
       [
         "wild.zone-07.earth-01",
@@ -464,12 +464,12 @@
       ],
       [
         "wild.zone-08.wind-01",
-        "青嵐龍衛",
+        "翼影魔",
         "wind",
         "regular",
         "standard",
-        "assets/monsters/wild/zone-08/wind-01.png",
-        "planned"
+        "assets/monsters/wild/zone-08/wind-01.webp",
+        "existing"
       ],
       [
         "wild.zone-08.earth-01",
@@ -518,12 +518,12 @@
       ],
       [
         "wild.zone-09.wind-01",
-        "虛空風靈",
+        "風魘使",
         "wind",
         "regular",
         "standard",
-        "assets/monsters/wild/zone-09/wind-01.png",
-        "planned"
+        "assets/monsters/wild/zone-09/wind-01.webp",
+        "existing"
       ],
       [
         "wild.zone-09.earth-01",
@@ -572,12 +572,12 @@
       ],
       [
         "wild.zone-10.wind-01",
-        "終焉風神",
+        "蒼羽尊",
         "wind",
         "regular",
         "standard",
-        "assets/monsters/wild/zone-10/wind-01.png",
-        "planned"
+        "assets/monsters/wild/zone-10/wind-01.webp",
+        "existing"
       ],
       [
         "wild.zone-10.earth-01",
@@ -1061,6 +1061,368 @@
         "assets/monsters/soldiers/heavenly-soldier-earth.png",
         "existing"
       ]
+    ],
+    "tower-wind": [
+      [
+        "MON_WIND_NORMAL_001",
+        "翎爪衛",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-normal-001.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_NORMAL_002",
+        "旋刃卒",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-normal-002.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_NORMAL_003",
+        "踏雲客",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-normal-003.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_NORMAL_004",
+        "嵐鹿靈",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-normal-004.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_NORMAL_005",
+        "飛絮姬",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-normal-005.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_NORMAL_006",
+        "巨牙象",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-normal-006.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_NORMAL_007",
+        "雲翎使",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-normal-007.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_NORMAL_008",
+        "風枝妖",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-normal-008.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_NORMAL_009",
+        "逐嵐俠",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-normal-009.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_NORMAL_010",
+        "青羽劍",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-normal-010.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_NORMAL_011",
+        "風紋祭",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-normal-011.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_NORMAL_012",
+        "翔雲女",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-normal-012.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_NORMAL_013",
+        "浮空傘",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-normal-013.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_NORMAL_014",
+        "疾羽槍",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-normal-014.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_NORMAL_015",
+        "嵐狼騎",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-normal-015.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_NORMAL_016",
+        "流風俠",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-normal-016.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_NORMAL_017",
+        "雲蛇姬",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-normal-017.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_NORMAL_018",
+        "古木巫",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-normal-018.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_NORMAL_019",
+        "風蹄魔",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-normal-019.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_NORMAL_020",
+        "霧羽仙",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-normal-020.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_ELITE_001",
+        "嵐羽鸞",
+        "wind",
+        "elite",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-elite-001.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_ELITE_002",
+        "青風蛟",
+        "wind",
+        "elite",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-elite-002.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_ELITE_003",
+        "裂雲狼",
+        "wind",
+        "elite",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-elite-003.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_ELITE_004",
+        "黑翼祭",
+        "wind",
+        "elite",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-elite-004.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_ELITE_005",
+        "蒼嵐龍",
+        "wind",
+        "elite",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-elite-005.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_ELITE_006",
+        "巨象王",
+        "wind",
+        "elite",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-elite-006.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_ELITE_007",
+        "靈木神",
+        "wind",
+        "elite",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-elite-007.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_ELITE_008",
+        "風角鹿",
+        "wind",
+        "elite",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-elite-008.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_ELITE_009",
+        "破空將",
+        "wind",
+        "elite",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-elite-009.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_ELITE_010",
+        "霜刃使",
+        "wind",
+        "elite",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-elite-010.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_MINIBOSS_001",
+        "天風武尊",
+        "wind",
+        "boss",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-miniboss-001.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_MINIBOSS_002",
+        "蒼龍仙",
+        "wind",
+        "boss",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-miniboss-002.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_MINIBOSS_003",
+        "嵐海龍君",
+        "wind",
+        "boss",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-miniboss-003.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_MINIBOSS_004",
+        "青翼神",
+        "wind",
+        "boss",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-miniboss-004.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_MINIBOSS_005",
+        "雲蝶尊",
+        "wind",
+        "boss",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-miniboss-005.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_MINIBOSS_006",
+        "風鹿天尊",
+        "wind",
+        "boss",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-miniboss-006.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_MINIBOSS_007",
+        "逐風劍聖",
+        "wind",
+        "boss",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-miniboss-007.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_MINIBOSS_008",
+        "鎮嵐巨象",
+        "wind",
+        "boss",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-miniboss-008.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_MINIBOSS_009",
+        "雲角聖獸",
+        "wind",
+        "boss",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-miniboss-009.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_MINIBOSS_010",
+        "風極真君",
+        "wind",
+        "boss",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-miniboss-010.webp",
+        "existing"
+      ]
     ]
   },
   "assetPool": {
@@ -1508,6 +1870,406 @@
         "status": "adopted",
         "usedIn": "Fire Tower / Boss Encounter",
         "notes": "火焰鬃冠、長柄法器與王者構圖，先保留作 100F 高壓候選；仍屬標準尺寸小 Boss，不是大型 Boss。"
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_001",
+        "displayName": "翎爪衛",
+        "element": "wind",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/普通怪/file_00000000110c8211ac3519c8427f5495.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-normal-001.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / normal"
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_002",
+        "displayName": "旋刃卒",
+        "element": "wind",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/普通怪/file_0000000018808211ad89369fdbe5206b.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-normal-002.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / normal"
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_003",
+        "displayName": "踏雲客",
+        "element": "wind",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/普通怪/file_0000000029ec8211954f031267398b64.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-normal-003.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / normal"
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_004",
+        "displayName": "嵐鹿靈",
+        "element": "wind",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/普通怪/file_00000000310c82119a363c77382b3515.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-normal-004.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / normal"
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_005",
+        "displayName": "飛絮姬",
+        "element": "wind",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/普通怪/file_00000000333c8211b66e6e70090be2be.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-normal-005.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / normal"
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_006",
+        "displayName": "巨牙象",
+        "element": "wind",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/普通怪/file_0000000033c082119aea0a5fc2495543.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-normal-006.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / normal"
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_007",
+        "displayName": "雲翎使",
+        "element": "wind",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/普通怪/file_000000004b5c82118d738dff7a5b221c.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-normal-007.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / normal"
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_008",
+        "displayName": "風枝妖",
+        "element": "wind",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/普通怪/file_00000000557482119a78311672e3be09.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-normal-008.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / normal"
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_009",
+        "displayName": "逐嵐俠",
+        "element": "wind",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/普通怪/file_0000000069048210beef99e484d5e855.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-normal-009.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / normal"
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_010",
+        "displayName": "青羽劍",
+        "element": "wind",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/普通怪/file_000000008988821187b754f995c3536e.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-normal-010.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / normal"
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_011",
+        "displayName": "風紋祭",
+        "element": "wind",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/普通怪/file_00000000ab248211958883a19cbd50d9.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-normal-011.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / normal"
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_012",
+        "displayName": "翔雲女",
+        "element": "wind",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/普通怪/file_00000000adac821182e906c6d94ce02f.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-normal-012.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / normal"
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_013",
+        "displayName": "浮空傘",
+        "element": "wind",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/普通怪/file_00000000af588210b29e0d1214e182c4.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-normal-013.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / normal"
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_014",
+        "displayName": "疾羽槍",
+        "element": "wind",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/普通怪/file_00000000b9888211a7c2373ca1164047.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-normal-014.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / normal"
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_015",
+        "displayName": "嵐狼騎",
+        "element": "wind",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/普通怪/file_00000000c2648211ac8c3e8b66777439.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-normal-015.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / normal"
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_016",
+        "displayName": "流風俠",
+        "element": "wind",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/普通怪/file_00000000c87c8211b1d6fa7a4f7ea526.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-normal-016.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / normal"
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_017",
+        "displayName": "雲蛇姬",
+        "element": "wind",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/普通怪/file_00000000ce188211a28bea9d6e268273.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-normal-017.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / normal"
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_018",
+        "displayName": "古木巫",
+        "element": "wind",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/普通怪/file_00000000d1e08211936924ae3e81cde1.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-normal-018.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / normal"
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_019",
+        "displayName": "風蹄魔",
+        "element": "wind",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/普通怪/file_00000000dfe0821180a2176f3da0cb8f.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-normal-019.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / normal"
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_020",
+        "displayName": "霧羽仙",
+        "element": "wind",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/普通怪/file_00000000e164820794f4d6ec26866b49.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-normal-020.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / normal"
+      },
+      {
+        "assetId": "MON_WIND_ELITE_001",
+        "displayName": "嵐羽鸞",
+        "element": "wind",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/菁英怪/file_000000001d908211b1b8e3c1b063f7ef.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-elite-001.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / elite"
+      },
+      {
+        "assetId": "MON_WIND_ELITE_002",
+        "displayName": "青風蛟",
+        "element": "wind",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/菁英怪/file_000000003b8c8206b6b1a8e56f2b0507.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-elite-002.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / elite"
+      },
+      {
+        "assetId": "MON_WIND_ELITE_003",
+        "displayName": "裂雲狼",
+        "element": "wind",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/菁英怪/file_000000004de882438708f3c4296ed161.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-elite-003.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / elite"
+      },
+      {
+        "assetId": "MON_WIND_ELITE_004",
+        "displayName": "黑翼祭",
+        "element": "wind",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/菁英怪/file_000000006bd4820682322ec0b93a2f63.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-elite-004.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / elite"
+      },
+      {
+        "assetId": "MON_WIND_ELITE_005",
+        "displayName": "蒼嵐龍",
+        "element": "wind",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/菁英怪/file_0000000081dc82119419ccb04677fd02.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-elite-005.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / elite"
+      },
+      {
+        "assetId": "MON_WIND_ELITE_006",
+        "displayName": "巨象王",
+        "element": "wind",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/菁英怪/file_0000000093a081f88936974e17db0258.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-elite-006.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / elite"
+      },
+      {
+        "assetId": "MON_WIND_ELITE_007",
+        "displayName": "靈木神",
+        "element": "wind",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/菁英怪/file_00000000a9548211bd28a38a1ccbba95.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-elite-007.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / elite"
+      },
+      {
+        "assetId": "MON_WIND_ELITE_008",
+        "displayName": "風角鹿",
+        "element": "wind",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/菁英怪/file_00000000b048821192b638d45b2301a7.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-elite-008.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / elite"
+      },
+      {
+        "assetId": "MON_WIND_ELITE_009",
+        "displayName": "破空將",
+        "element": "wind",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/菁英怪/file_00000000ba5082089f8f7f862de6521d.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-elite-009.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / elite"
+      },
+      {
+        "assetId": "MON_WIND_ELITE_010",
+        "displayName": "霜刃使",
+        "element": "wind",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/菁英怪/file_00000000bdb48209926106010b80de97.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-elite-010.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / elite"
+      },
+      {
+        "assetId": "MON_WIND_MINIBOSS_001",
+        "displayName": "天風武尊",
+        "element": "wind",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/小Boss/file_0000000017088208be472aaefb2bc243.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-miniboss-001.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / miniboss"
+      },
+      {
+        "assetId": "MON_WIND_MINIBOSS_002",
+        "displayName": "蒼龍仙",
+        "element": "wind",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/小Boss/file_0000000025208211a7bf6854a1830df0.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-miniboss-002.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / miniboss"
+      },
+      {
+        "assetId": "MON_WIND_MINIBOSS_003",
+        "displayName": "嵐海龍君",
+        "element": "wind",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/小Boss/file_0000000026cc8243a22862667dc15e05.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-miniboss-003.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / miniboss"
+      },
+      {
+        "assetId": "MON_WIND_MINIBOSS_004",
+        "displayName": "青翼神",
+        "element": "wind",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/小Boss/file_000000006be88211acc8fa8169a731d0.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-miniboss-004.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / miniboss"
+      },
+      {
+        "assetId": "MON_WIND_MINIBOSS_005",
+        "displayName": "雲蝶尊",
+        "element": "wind",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/小Boss/file_00000000989c821192a06ed6b9878166.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-miniboss-005.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / miniboss"
+      },
+      {
+        "assetId": "MON_WIND_MINIBOSS_006",
+        "displayName": "風鹿天尊",
+        "element": "wind",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/小Boss/file_00000000a2c48211881b6d402543d6c1.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-miniboss-006.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / miniboss"
+      },
+      {
+        "assetId": "MON_WIND_MINIBOSS_007",
+        "displayName": "逐風劍聖",
+        "element": "wind",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/小Boss/file_00000000a7388211a34780e9d89131ce.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-miniboss-007.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / miniboss"
+      },
+      {
+        "assetId": "MON_WIND_MINIBOSS_008",
+        "displayName": "鎮嵐巨象",
+        "element": "wind",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/小Boss/file_00000000ae208211ba58fc8dc23097cb.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-miniboss-008.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / miniboss"
+      },
+      {
+        "assetId": "MON_WIND_MINIBOSS_009",
+        "displayName": "雲角聖獸",
+        "element": "wind",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/小Boss/file_00000000b71c82439792ba4bb9130497.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-miniboss-009.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / miniboss"
+      },
+      {
+        "assetId": "MON_WIND_MINIBOSS_010",
+        "displayName": "風極真君",
+        "element": "wind",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/小Boss/file_00000000c52882468a012d52987a23a0.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-miniboss-010.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / miniboss"
       }
     ]
   },
@@ -1631,5 +2393,96 @@
     "reserved": [
       "MON_FIRE_MINIBOSS_010"
     ]
+  },
+  "windTowerCoverage": {
+    "schemaVersion": 1,
+    "element": "wind",
+    "floorCount": 100,
+    "normalByBand": [
+      [
+        "MON_WIND_NORMAL_001",
+        "MON_WIND_NORMAL_002"
+      ],
+      [
+        "MON_WIND_NORMAL_003",
+        "MON_WIND_NORMAL_004"
+      ],
+      [
+        "MON_WIND_NORMAL_005",
+        "MON_WIND_NORMAL_006"
+      ],
+      [
+        "MON_WIND_NORMAL_007",
+        "MON_WIND_NORMAL_008"
+      ],
+      [
+        "MON_WIND_NORMAL_009",
+        "MON_WIND_NORMAL_010"
+      ],
+      [
+        "MON_WIND_NORMAL_011",
+        "MON_WIND_NORMAL_012"
+      ],
+      [
+        "MON_WIND_NORMAL_013",
+        "MON_WIND_NORMAL_014"
+      ],
+      [
+        "MON_WIND_NORMAL_015",
+        "MON_WIND_NORMAL_016"
+      ],
+      [
+        "MON_WIND_NORMAL_017",
+        "MON_WIND_NORMAL_018"
+      ],
+      [
+        "MON_WIND_NORMAL_019",
+        "MON_WIND_NORMAL_020"
+      ]
+    ],
+    "eliteByBand": [
+      [
+        "MON_WIND_ELITE_001"
+      ],
+      [
+        "MON_WIND_ELITE_002"
+      ],
+      [
+        "MON_WIND_ELITE_003"
+      ],
+      [
+        "MON_WIND_ELITE_004"
+      ],
+      [
+        "MON_WIND_ELITE_005"
+      ],
+      [
+        "MON_WIND_ELITE_006"
+      ],
+      [
+        "MON_WIND_ELITE_007"
+      ],
+      [
+        "MON_WIND_ELITE_008"
+      ],
+      [
+        "MON_WIND_ELITE_009"
+      ],
+      [
+        "MON_WIND_ELITE_010"
+      ]
+    ],
+    "bossByFloor": {
+      "10": "MON_WIND_MINIBOSS_001",
+      "20": "MON_WIND_MINIBOSS_002",
+      "30": "MON_WIND_MINIBOSS_003",
+      "40": "MON_WIND_MINIBOSS_004",
+      "50": "MON_WIND_MINIBOSS_005",
+      "60": "MON_WIND_MINIBOSS_006",
+      "70": "MON_WIND_MINIBOSS_007",
+      "80": "MON_WIND_MINIBOSS_008",
+      "90": "MON_WIND_MINIBOSS_009",
+      "100": "MON_WIND_MINIBOSS_010"
+    }
   }
 }
