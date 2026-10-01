@@ -37,4 +37,5 @@ Local source tests and deterministic build checks pass. Local browser execution 
 
 - PR #747 run 3832 exposed and corrected one stale owner assertion before browser QA.
 - PR #747 run 3834 passed source, owner and build-sync checks, then stalled in the pre-existing CJK font installation step; it is not accepted as browser evidence.
+- PR #747 run 3840 timed out in the pre-existing ImageMagick apt mirror step before project/browser QA; it is not accepted as evidence.
 - A fresh run on the final PR head must complete the browser matrix before merge.

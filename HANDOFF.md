@@ -4507,6 +4507,13 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 - Notification presentation is one semantic class with explicit coordinate-plane conversion: Legacy content uses 9px and the native 1080×1920 bottom navigation uses 22 logical px (about 7–9 screen CSS px across the required phone widths). The competing CSS42 global 7px/zero-border/alternate-animation override is retired. The pulse minimum is 90%, dots remain pointer-inert, and the native offset stays inside each button/icon frame.
 - Existing browser QA now holds gameplay-core network responses during the first real training tap, verifies immediate/settled labels, context, one intent and one shell, then releases lazy modules for the existing two-pass lifecycle matrix. It also records computed dot styles and both animation endpoints at 360×640, 393×873 and 412×915, plus backpack last-row/footer reachability. Local Chrome is unavailable; exact-head CI browser evidence, merge, deployment and deployed-path verification remain pending, so this entry is IMPLEMENTED candidate, not VERIFIED.
 
+# 2026-10-02 — GAME-SESSION-RESUME-20261002（登入工作階段接續）
+
+- 問題：Firebase Google 登入以 browserLocalPersistence 保留，但遊戲憑證只在 sessionStorage；手機關閉分頁後仍顯示登入，卻無憑證且後端禁止舊 auth_time 重建工作階段。此修復從開工時 `dev@b676b2671df7c8195675eae486f6eed5095d3301` 的 `fix/game-session-resume-20261002` 工作分支開始，`main` 不動。
+- 正式 owner：`js/firebase/firebase-session.js` 儲存適配層、`js/firebase/session-client.js::ensure()` 單一工作階段決策、`js/firebase/firebase-auth.js::reauthenticateWithGoogle()` 原帳號驗證、`js/firebase/firebase-auth-ui.js::render()/bind()` 已登入入口；後端 `functions/src/session-authority.js` 仍判定有效憑證。沒有新增 wrapper 或臨時 patch。
+- 新適配層將同 UID 憑證存於同源 localStorage，優先讀取並轉移既有 sessionStorage；登出會清兩處；每次操作繼續經 backend protectedTest，失效與佔用時不自動重建。Google 使用者若被阻擋，可在帳號畫面直接重新驗證同一帳號，無需先手動登出；不觸碰角色、存檔、歷史獎勵與 Phase 4 採納。
+- 本機相關測試涵蓋重開新分頁、舊憑證轉移、登出清理和被撤銷後不可偷取工作階段。PR／CI／DEV 部署與原手機體驗待核對，勿將本機測試標成玩家 VERIFIED；Phase 4 仍 0/6 VERIFIED。
+
 ## 2026-10-02 — Fire monster 2–4 character name replacement (candidate)
 
 - Work ID `FIRE-MONSTER-NAMES-20261002`; branch `feature/fire-monster-name-length-20261002` from `dev@b676b2671df7c8195675eae486f6eed5095d3301`. This is a data Replacement only; `main`, image pixels, portrait keys, paths, encounter levels, ranks and combat behavior are unchanged.

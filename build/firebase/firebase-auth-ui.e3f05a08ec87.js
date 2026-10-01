@@ -1,8 +1,8 @@
 /* Account UI owner. Signed-out production flow cannot be dismissed without Firebase identity. */
 import {
     createAccountWithEmail,getSignedInUser,signInAsAnonymous,signInWithEmail,
-    signInWithGoogle,signOutFirebase
-} from "./firebase-auth.f756f769b4e4.js";
+    signInWithGoogle,reauthenticateWithGoogle,signOutFirebase
+} from "./firebase-auth.9f8c09942b79.js";
 
 const OVERLAY_ID="firebaseAuthOverlay";
 const RESUME_GRACE_MS=5000;
@@ -128,6 +128,7 @@ function markup(){
             </div>
           </div>
           <div class="firebase-auth-actions">
+            <button id="firebaseGoogleReauthButton" class="firebase-auth-button secondary" type="button" hidden>重新驗證 Google 帳號</button>
             <button id="firebaseRetryButton" class="firebase-auth-button secondary" type="button">重試讀取</button>
             <button id="firebaseSignOutButton" class="firebase-auth-button danger" type="button">登出帳號</button>
           </div>
@@ -137,7 +138,7 @@ function markup(){
 }
 function setBusy(value){
     busy=value===true;
-    ["firebaseGoogleButton","firebaseGuestButton","firebaseEmailSignInButton","firebaseEmailCreateButton","firebaseMigrationConfirmButton","firebaseRetryButton","firebaseSignOutButton","firebaseAuthBackButton","firebaseSwitchAccountButton","firebaseSessionTestButton","firebaseCloudEnvelopeTestButton","firebaseCloudPreferencesTestButton","firebaseCloudPreferencesRestoreButton","firebaseMigrationCandidateButton","firebaseMigrationCandidateCancelButton","firebaseCandidateScreeningButton","firebaseMigrationBackupExportButton","firebaseMigrationArchiveRecoveryButton"].forEach(id=>{ const button=byId(id); if(button){ button.disabled=busy; } });
+    ["firebaseGoogleButton","firebaseGoogleReauthButton","firebaseGuestButton","firebaseEmailSignInButton","firebaseEmailCreateButton","firebaseMigrationConfirmButton","firebaseRetryButton","firebaseSignOutButton","firebaseAuthBackButton","firebaseSwitchAccountButton","firebaseSessionTestButton","firebaseCloudEnvelopeTestButton","firebaseCloudPreferencesTestButton","firebaseCloudPreferencesRestoreButton","firebaseMigrationCandidateButton","firebaseMigrationCandidateCancelButton","firebaseCandidateScreeningButton","firebaseMigrationBackupExportButton","firebaseMigrationArchiveRecoveryButton"].forEach(id=>{ const button=byId(id); if(button){ button.disabled=busy; } });
 }
 function renderResumeCountdown(){
     if(!resumeActive){ return; }
@@ -165,6 +166,8 @@ function render(){
         byId("firebaseAccountUid").textContent="UID："+state.user.uid;
         byId("firebaseCloudState").textContent=state.mode==="SAVE_LOADING"?"正在讀取 UID 對應的雲端與本機資料…":"角色資料以此 UID 為 owner。";
     }
+    const reauth=byId("firebaseGoogleReauthButton");
+    if(reauth){ reauth.hidden=!state.sessionError||!state.user?.providerIds?.includes("google.com"); }
     const sessionTestPanel=byId("firebaseSessionTestPanel");
     if(sessionTestPanel){ sessionTestPanel.hidden=!DEV_SESSION_TEST_ENABLED||!state.user||resumeActive; }
     const sessionTestResult=byId("firebaseSessionTestResult");
@@ -633,6 +636,7 @@ function startResumeGrace(){
 }
 function bind(){
     byId("firebaseGoogleButton").addEventListener("click",()=>performInteractive("正在開啟 Google 登入…",signInWithGoogle));
+    byId("firebaseGoogleReauthButton").addEventListener("click",()=>performInteractive("正在重新驗證 Google 帳號…",reauthenticateWithGoogle));
     byId("firebaseGuestButton").addEventListener("click",()=>performInteractive("正在建立 Firebase 訪客 UID…",signInAsAnonymous));
     byId("firebaseEmailSignInButton").addEventListener("click",()=>performInteractive("正在登入 Email 帳號…",()=>{ const value=credentials(); return signInWithEmail(value.email,value.password); }));
     byId("firebaseEmailCreateButton").addEventListener("click",()=>performInteractive("正在建立 Email 帳號…",()=>{ const value=credentials(); return createAccountWithEmail(value.email,value.password); }));
