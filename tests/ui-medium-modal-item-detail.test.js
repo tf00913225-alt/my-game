@@ -6,18 +6,19 @@ const path=require("node:path");
 const cp=require("node:child_process");
 
 const css=fs.readFileSync("css/49-v169-rpg-ui.css","utf8");
-const detailCss=fs.readFileSync("css/23-stage-v77-inventory-detail-ui.css","utf8");
 const itemRuntime=fs.readFileSync("js/35-v141-ui-battle.js","utf8");
+const mainRuntime=fs.readFileSync("js/00-main.js","utf8");
 
 assert.match(css,/--ui-medium-modal-max-width:360px;/);
 assert.match(css,/--ui-medium-modal-height:540px;/);
 assert.match(css,/--ui-medium-modal-safe-space:28px;/);
-assert.match(css,/#itemModal \.item-modal-box\{[\s\S]*?max-width:var\(--ui-medium-modal-max-width\) !important;[\s\S]*?height:min\(var\(--ui-medium-modal-height\),calc\(100% - var\(--ui-medium-modal-safe-space\)\)\) !important;/);
-assert.match(css,/#itemModal #itemModalStats\{[\s\S]*?flex:0 1 auto !important;[\s\S]*?overflow-y:auto !important;[\s\S]*?scrollbar-gutter:stable !important;/);
+assert.match(css,/#itemModal \.item-modal-box\{[\s\S]*?max-width:var\(--ui-medium-modal-max-width\) !important;[\s\S]*?height:auto !important;[\s\S]*?max-height:min\(var\(--ui-medium-modal-height\),calc\(100% - var\(--ui-medium-modal-safe-space\)\)\) !important;/);
+assert.match(css,/#itemModal #itemModalStats\{[\s\S]*?flex:1 1 auto !important;[\s\S]*?overflow-y:auto !important;[\s\S]*?scrollbar-gutter:stable !important;/);
 assert.match(css,/#itemModal \.item-modal-buttons\{[\s\S]*?flex:0 0 auto !important;/);
-assert.match(detailCss,/#itemModal \.item-modal-box:has\(#v17342InventoryPotionUse\),[\s\S]*?#itemModal \.item-modal-box:has\(#itemEquipButton:disabled\)\{[\s\S]*?height:auto !important;[\s\S]*?flex:0 0 auto !important;[\s\S]*?justify-content:flex-start !important;/);
-assert.match(detailCss,/#itemModal \.item-modal-box:has\(#v17342InventoryPotionUse\) #itemModalStats,[\s\S]*?#itemModal \.item-modal-box:has\(#itemEquipButton:disabled\) #itemModalStats\{[\s\S]*?flex:0 0 auto !important;[\s\S]*?max-height:180px !important;/);
-assert.match(detailCss,/#itemModal \.item-modal-box:has\(#v17342InventoryPotionUse\) \.item-modal-buttons,[\s\S]*?#itemModal \.item-modal-box:has\(#itemEquipButton:disabled\) \.item-modal-buttons\{[\s\S]*?margin-top:0 !important;/);
+assert.match(css,/#itemModal\.item-modal-mode-compact #itemModalStats\{[\s\S]*?flex:0 1 auto !important;[\s\S]*?max-height:180px !important;/);
+assert.doesNotMatch(css,/:has\(#itemEquipButton:disabled\)/);
+assert.match(mainRuntime,/ITEM_MODAL_PRESENTATION_MODES[\s\S]*?"equipment"[\s\S]*?"compact"[\s\S]*?"comparison"/);
+assert.match(mainRuntime,/setItemModalPresentationMode\(isEquipment\?"equipment":"compact"\)/);
 assert.match(itemRuntime,/button\.id="v17342InventoryPotionUse"/);
 assert.match(itemRuntime,/const definition=item&&typeof getPotionDefinition==="function"\?getPotionDefinition\(item\.id\):null;/);
 assert.match(itemRuntime,/if\(!definition\)\{[\s\S]*?if\(button\)\{ button\.remove\(\); \}[\s\S]*?return;/);
@@ -48,7 +49,7 @@ html,body{margin:0;width:420px;height:746.6667px;overflow:hidden;background:#000
 #game-stage{position:relative!important;width:420px!important;height:746.6667px!important;overflow:hidden!important;transform:none!important;}
 #itemModal{display:flex!important;position:absolute!important;inset:0!important;width:420px!important;height:746.6667px!important;align-items:center!important;justify-content:center!important;}
 #itemModalIcon{height:150px;}.item-modal-buttons{min-height:46px;}
-</style></head><body><div id="game-stage"><div id="itemModal" class="item-modal">
+</style></head><body><div id="game-stage"><div id="itemModal" class="item-modal item-modal-mode-compact" data-presentation-mode="compact">
 <div class="item-modal-box"><div id="itemModalIcon" class="item-modal-icon">◆</div><div id="itemModalName" class="item-modal-name">回復10%SP藥水</div><div id="itemModalStats" class="item-stat-list"></div><div class="item-modal-buttons"><button id="v17342InventoryPotionUse">使用</button><button id="itemEquipButton">不可裝備</button><button>售出</button></div><button class="close-item-button">返回</button></div>
 </div></div><pre id="result"></pre><script>
 (function(){
@@ -62,7 +63,7 @@ html,body{margin:0;width:420px;height:746.6667px;overflow:hidden;background:#000
  // Match the final real potion DOM signal. Keep equip enabled deliberately:
  // compact behavior must not depend on the legacy disabled state anymore.
  equip.disabled=false;stats.innerHTML='<p>效果：回復最大 SP 的 10%</p><p>售價：25 金幣</p>';void box.offsetHeight;const potion=snap('potion');
- use.remove();equip.textContent='穿戴';stats.innerHTML=Array.from({length:45},(_,i)=>'<p>裝備屬性 '+i+'</p>').join('');void box.offsetHeight;const equipment=snap('equipment');
+ use.remove();document.getElementById('itemModal').classList.remove('item-modal-mode-compact');document.getElementById('itemModal').classList.add('item-modal-mode-equipment');equip.textContent='穿戴';stats.innerHTML=Array.from({length:45},(_,i)=>'<p>裝備屬性 '+i+'</p>').join('');void box.offsetHeight;const equipment=snap('equipment');
  document.getElementById('result').textContent=JSON.stringify({potion,equipment});
 })();
 </script></body></html>`;
@@ -83,8 +84,8 @@ try{
     }
     assert.ok(data.potion.box.height<data.equipment.box.height-40,`potion action dialog must be compact; potion=${data.potion.box.height}, equipment=${data.equipment.box.height}`);
     assert.equal(data.potion.boxStyle.justifyContent,"flex-start","potion modal must not distribute leftover vertical space");
-    assert.ok(data.potion.boxStyle.flex.startsWith("0 0"),"potion modal must not flex-fill its overlay");
-    assert.equal(data.equipment.boxStyle.height,"540px","equipment detail must retain the Medium Modal height");
+    assert.ok(data.potion.boxStyle.flex.startsWith("0 1"),"item frame may shrink but must not flex-fill its overlay");
+    assert.ok(data.equipment.box.height<=540&&data.equipment.box.height>data.potion.box.height,"equipment detail must grow only to the Medium Modal ceiling");
     assert.ok(data.potion.scrollHeight<=data.potion.clientHeight+1,"potion details must not require scrolling");
     assert.ok(data.equipment.scrollHeight>data.equipment.clientHeight,"long equipment detail must scroll internally");
     assert.ok(data.potion.blankGap>=0&&data.potion.blankGap<24,`potion blank spacer must be removed; measured gap=${data.potion.blankGap}px`);

@@ -1,0 +1,60 @@
+{
+  "id": "2026-10-01-responsive-window-item-owner-convergence",
+  "title": "Responsive Window / Item Presentation Owner Convergence",
+  "baseSha": "08d5c3cf6e327e3d9dda033dad4c42b7d66f2d64",
+  "workBranch": "fix/responsive-window-item-owner-convergence-20261001",
+  "targetBranch": "dev",
+  "status": "IMPLEMENTED",
+  "scope": "背包主視窗與既有入口、普通／不可裝備物品詳情、裝備比較、批量操作及商店商品預覽的尺寸、內容、圖像、捲動與生命週期 Owner 收斂；不修改技能、秘寶、登入或戰鬥功能。",
+  "requirements": [
+    {
+      "id": "RW-01",
+      "status": "IMPLEMENTED",
+      "request": "背包在可用寬高改變時保持標題、導覽與格線可用，只有既有 inventoryGridScroll 成為垂直捲動 owner。",
+      "owner": ["css/22-stage-v78-character-inventory-core.css", "css/24-stage-v85-inventory-inner-grid-scroll-root.css"]
+    },
+    {
+      "id": "RW-02",
+      "status": "IMPLEMENTED",
+      "request": "普通裝備、藥水、材料與不可裝備物品共享自適應 Medium Modal 外框，不以縮字或固定高度塞入內容。",
+      "owner": ["css/49-v169-rpg-ui.css", "js/00-main.js"]
+    },
+    {
+      "id": "RW-03",
+      "status": "IMPLEMENTED",
+      "request": "裝備比較在窄寬度改為上下排列，內容區單獨捲動且操作列保持可見。",
+      "owner": ["css/49-v169-rpg-ui.css", "css/53-v173.51-qa.css", "js/55-v173.51-inventory-qa.js"]
+    },
+    {
+      "id": "RW-04",
+      "status": "IMPLEMENTED",
+      "request": "批量使用／批量開啟維持內容與行為責任，但不再影響外框尺寸；模式關閉與再次進入不殘留。",
+      "owner": ["js/53-v173.50-inventory-qol.js", "css/52-v173.50-inventory-qol.css", "js/00-main.js"]
+    },
+    {
+      "id": "RW-05",
+      "status": "IMPLEMENTED",
+      "request": "body 掛載的商店商品預覽以明確相容座標契約自適應，圖框維持 1:1、圖片 contain、內容單一捲動且返回按鈕可見。",
+      "owner": ["css/49-v169-rpg-ui.css", "js/equipment-progression.js"]
+    },
+    {
+      "id": "RW-06",
+      "status": "IMPLEMENTED",
+      "request": "退休固定 400px／138px、potion :has 或 disabled 推測、比較視窗外框覆蓋與 runtime 尺寸注入，不以隱藏或後置覆蓋假退場。",
+      "owner": ["tests/responsive-window-item-owner-convergence.test.js"]
+    },
+    {
+      "id": "RW-07",
+      "status": "IMPLEMENTED",
+      "request": "正式 index、feature loader、production bundle 與 360／393／412 正常及短高度 browser QA 證明最終 computed style、矩形、圖片比例、捲動、操作列及再進入清理。",
+      "owner": ["tests/responsive-window-item-owner-convergence.test.js"]
+    }
+  ],
+  "verification": {
+    "targeted": "PENDING",
+    "productionBuild": "PENDING",
+    "pullRequestCi": "PENDING",
+    "deployedDev": "PENDING",
+    "browserQa": "PENDING"
+  }
+}
