@@ -62,6 +62,14 @@ async function run(chrome,url,live){
   assert.ok(runtime.productionStyles.some(p=>/build\/gameplay-core\.[a-f0-9]+\.css/.test(p)),'production CSS not loaded');
   const measure=selector=>c.eval(`__responsiveMeasure(${JSON.stringify(selector)})`);
   const check=async(selector,v,text=false)=>{const row=await measure(selector);visible(row,v);if(text)assert.ok(row.projectedFont>=13-0.1,selector+' rendered font '+row.projectedFont);return row;};
+  const click=async(selector,v)=>{
+   const row=await check(selector,v),x=row.rect.left+row.rect.width/2,y=row.rect.top+row.rect.height/2;
+   const hit=await c.eval(`(()=>{const n=document.querySelector(${JSON.stringify(selector)}),h=document.elementFromPoint(${x},${y});return !!(h&&(n===h||n.contains(h)))})()`);
+   assert.ok(hit,selector+' is covered and cannot be clicked');
+   await c.send('Input.dispatchMouseEvent',{type:'mouseMoved',x,y});
+   await c.send('Input.dispatchMouseEvent',{type:'mousePressed',x,y,button:'left',clickCount:1});
+   await c.send('Input.dispatchMouseEvent',{type:'mouseReleased',x,y,button:'left',clickCount:1});await settle();
+  };
   const scroll=async(selector)=>{
    const before=await measure(selector);assert.ok(before.clientHeight>24,selector+' has no usable content');
    if(before.scrollHeight>before.clientHeight+1){
@@ -98,7 +106,7 @@ async function run(chrome,url,live){
     const contentScroll=await scroll(contents);modes.push({mode,frame,actions,back,names,art,batch,contentScroll});
     // Resize while open; the state and fixed controls must survive.
     await resize([v[0],v[1]-80]);await check('#itemModal .item-modal-buttons',[v[0],v[1]-80]);assert.equal((await measure('#itemModal')).mode,expected);await resize(v);
-    await c.eval(`document.querySelector(${JSON.stringify(mode==='comparison'?'.v17351-compare-back':'#itemModal .close-item-button')}).click()`);await settle();
+    await click(mode==='comparison'?'.v17351-compare-back':'#itemModal .close-item-button',v);
     const clean=await c.eval(`({show:document.getElementById('itemModal').classList.contains('show'),mode:document.getElementById('itemModal').dataset.presentationMode,compare:!!document.getElementById('v17351EquipmentCompare'),batch:!!document.getElementById('v17350BatchAction')})`);
     assert.equal(clean.show,false);assert.equal(clean.mode,undefined);assert.equal(clean.compare,false);assert.equal(clean.batch,false);
    }
@@ -107,17 +115,24 @@ async function run(chrome,url,live){
    assert.ok(Math.abs(shopArt.rect.width-shopArt.rect.height)<1,'shop art distorted');
    const shopImages=await c.eval(`Array.from(document.querySelectorAll('.v17346-shop-preview-art img')).map(n=>({fit:getComputedStyle(n).objectFit,loaded:n.complete&&n.naturalWidth>0}))`);assert.ok(shopImages.length);for(const img of shopImages){assert.equal(img.fit,'contain');assert.ok(img.loaded);}
    await resize([v[0],v[1]-80]);await check('.v17346-shop-preview-modal .v132-reward-actions button',[v[0],v[1]-80]);await resize(v);
-   await c.eval(`v132CloseRewardModal();closeHomeFeature()`);
+   await click('.v17346-shop-preview-modal .v132-reward-actions button',v);await c.eval(`closeHomeFeature()`);
    // Load later feature styles before re-entering the same inventory owner.
    await c.eval(`(async()=>{await FourSymbolsFeatures.ensure('skill','responsive-item-qa');await FourSymbolsFeatures.ensure('relic','responsive-item-qa')})()`);
    const entrances=[];
    for(const source of ['home','map','gameplay','boss','tower','training']){
     await c.eval(`showPage(${JSON.stringify(source)})`);await settle();
-    const clicked=await c.eval(`(()=>{const p=document.querySelector('.page.active'),n=p?.querySelector('[onclick*="v148OpenContextInventory"],[onclick*="openMapInventoryOverlay"]')||document.querySelector('#bottomNav [onclick*="inventory"]');if(!n)throw Error('missing inventory entrance '+${JSON.stringify(source)});n.click();return n.getAttribute('onclick')})()`);await settle();
+    const selected=await c.eval(`(()=>{const all=[...document.querySelectorAll(${JSON.stringify(source==='home'?'#bottomNav [onclick*="inventory"]':'[onclick*="v148OpenContextInventory"],[onclick*="openMapInventoryOverlay"]')})];const n=all.find(n=>{const r=n.getBoundingClientRect();return r.width>0&&r.height>0&&getComputedStyle(n).visibility!=='hidden'});if(!n)throw Error('missing visible inventory entrance '+${JSON.stringify(source)});n.dataset.responsiveQaEntrance='active';return {selector:'[data-responsive-qa-entrance="active"]',handler:n.getAttribute('onclick')}})()`);
+    await click(selected.selector,v);
     await check('.inventory-title-plate',v);await check('.inventory-bottom-actions',v);
-    await c.eval(`document.querySelector('.map-inventory-overlay-close').click()`);await settle();
+    await click('.map-inventory-overlay-close',v);
     const closed=await c.eval(`!document.getElementById('app').classList.contains('on-inventory-page')`);assert.ok(closed,'inventory did not restore '+source);
-    entrances.push({source,clicked,closed});
+    await c.eval(`document.querySelector('[data-responsive-qa-entrance="active"]').removeAttribute('data-responsive-qa-entrance')`);
+    // Re-enter from the same existing entrance after its formal source restore.
+    await c.eval(`showPage(${JSON.stringify(source)})`);await settle();
+    const again=await c.eval(`(()=>{const nodes=[...document.querySelectorAll(${JSON.stringify(source==='home'?'#bottomNav [onclick*="inventory"]':'[onclick*="v148OpenContextInventory"],[onclick*="openMapInventoryOverlay"]')})];const n=nodes.find(n=>{const r=n.getBoundingClientRect();return r.width>0&&r.height>0});if(!n)throw Error('missing re-entry');n.dataset.responsiveQaEntrance='active';return true})()`);
+    assert.ok(again);await click(selected.selector,v);await check('.inventory-bottom-actions',v);await click('.map-inventory-overlay-close',v);
+    await c.eval(`document.querySelector('[data-responsive-qa-entrance="active"]').removeAttribute('data-responsive-qa-entrance')`);
+    entrances.push({source,handler:selected.handler,closed,reentered:true});
    }
    evidence.push({viewport:v,backpack,grid,gridScroll,modes,shop,shopArt,shopBack,entrances});
    await c.eval(`showPage('inventory')`);await settle();const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(OUT,`backpack-${v.join('x')}.png`),Buffer.from(shot.data,'base64'));
