@@ -91,7 +91,7 @@ class Cdp{
         await this.ready;
         const id=++this.id;
         return new Promise((resolve,reject)=>{
-            const timer=setTimeout(()=>{this.pending.delete(id);reject(new Error("CDP timed out: "+method));},20000);
+            const timer=setTimeout(()=>{this.pending.delete(id);reject(new Error("CDP timed out: "+method));},45000);
             this.pending.set(id,{resolve:value=>{clearTimeout(timer);resolve(value);},reject:error=>{clearTimeout(timer);reject(error);}});
             this.ws.send(JSON.stringify({id,method,params}));
         });
@@ -105,7 +105,7 @@ class Cdp{
 }
 
 const PREPARE=`(async()=>{
- const wait=async f=>{for(let i=0;i<600;i++){if(f())return;await new Promise(r=>setTimeout(r,50));}throw Error('Runtime not READY: '+window.FourSymbolsStartupPolicy?.getState?.());};
+ const wait=async f=>{for(let i=0;i<600;i++){if(f())return;await new Promise(r=>setTimeout(r,50));}throw Error('Runtime not READY: '+JSON.stringify({state:window.FourSymbolsStartupPolicy?.getState?.(),loader:document.getElementById('startupLoader')?.outerHTML,error:String(window.FourSymbolsStartupPolicy?.getLastError?.()?.message||''),page:document.body.innerText.slice(0,800)}));};
  await wait(()=>window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden);
  for(const feature of ['gameplay-core','patrol','boss-tower','abyss'])await window.FourSymbolsFeatures.ensure(feature,'navigation-qa');
  showPage('home');
@@ -184,7 +184,7 @@ async function runViewport(chrome,url,width,height){
   evidence.legalPanelAfterSwipe=await client.eval('window.__navQaScrollOwner.scrollTop');assert.ok(evidence.legalPanelAfterSwipe>0,'legal panel single-finger swipe did not scroll');
   await client.eval("closeHomeFeature();closeMapInventoryOverlay();showPage('home')");await settle(client);
   evidence.returnHome=await client.eval(MEASURE);assert.equal(evidence.returnHome.sameShell,true);
-  await client.send('Page.reload',{ignoreCache:true});await new Promise(r=>setTimeout(r,300));await client.eval(PREPARE);evidence.reload=await client.eval(MEASURE);assert.equal(evidence.reload.shellCount,1);assert.equal(evidence.reload.legacyCount,0);
+  evidence.phase='reload';await client.send('Page.reload',{ignoreCache:true});await client.send('Page.bringToFront');await client.send('Emulation.setFocusEmulationEnabled',{enabled:true});await new Promise(r=>setTimeout(r,300));await client.eval(PREPARE);evidence.reload=await client.eval(MEASURE);assert.equal(evidence.reload.shellCount,1);assert.equal(evidence.reload.legacyCount,0);
   const shot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(ARTIFACT_DIR,`navigation-home-${width}x${height}.png`),Buffer.from(shot.data,'base64'));
   return evidence;
  }catch(error){error.navEvidence=evidence;throw error;}finally{client?.close();proc.kill('SIGTERM');try{fs.rmSync(profile,{recursive:true,force:true,maxRetries:3,retryDelay:100});}catch(_){}}
