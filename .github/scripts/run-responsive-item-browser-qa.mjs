@@ -93,6 +93,8 @@ async function run(chrome,url,live){
    await resize(v);await c.eval(`closeItemModal();showPage('home');showPage('inventory')`);await settle();
    const backpack=[];
    for(const selector of ['.inventory-title-plate','.map-inventory-overlay-close','.inventory-bottom-actions','.inventory-wallet-label','.inventory-wallet-value',...Array.from({length:6},(_,i)=>'.inventory-equipment-cell:nth-child('+(i+1)+') .inventory-equipment-slot-label')]) backpack.push(await check(selector,v,selector.includes('label')||selector.includes('value')||selector.includes('close')));
+   const backpackControlHits=await c.eval(`Array.from(document.querySelectorAll('.inventory-bottom-actions button')).filter(n=>{const r=n.getBoundingClientRect();return r.width>0&&r.height>0&&!n.disabled&&getComputedStyle(n).visibility!=='hidden'}).map(n=>{const r=n.getBoundingClientRect(),h=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return {text:n.textContent,hit:!!(h&&(h===n||n.contains(h)))}})`);
+   assert.ok(backpackControlHits.length,'backpack operations missing');for(const control of backpackControlHits)assert.ok(control.hit,'backpack operation covered '+control.text);
    const tabFrame=await measure('.inventory-classic-shell');
    for(const filter of ['item','material','function','equipment']){
     await click('#inventoryCategoryTabs [data-filter="'+filter+'"]',v);
@@ -160,7 +162,7 @@ async function run(chrome,url,live){
     await c.eval(`document.querySelectorAll('[data-responsive-qa-entrance="active"]').forEach(n=>n.removeAttribute('data-responsive-qa-entrance'))`);
     entrances.push({source,handler:selected.handler,closed,reentered:true});
    }
-   evidence.push({viewport:v,backpack,grid,gridScroll,modes,realImage,shop,shopArt,shopBack,entrances});
+   evidence.push({viewport:v,backpack,backpackControlHits,grid,gridScroll,modes,realImage,shop,shopArt,shopBack,entrances});
    await c.eval(`showPage('inventory')`);await settle();const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(OUT,`backpack-${v.join('x')}.png`),Buffer.from(shot.data,'base64'));
    console.log('PASS responsive production runtime '+v.join('x')+' modes + resize + entrances + late styles');
   }

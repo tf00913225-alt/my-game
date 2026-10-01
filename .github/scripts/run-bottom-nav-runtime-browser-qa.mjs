@@ -106,7 +106,7 @@ class Cdp{
 
 const PREPARE=`(async()=>{
  const wait=async f=>{for(let i=0;i<600;i++){if(f())return;await new Promise(r=>setTimeout(r,50));}throw Error('Runtime not READY: '+JSON.stringify({state:window.FourSymbolsStartupPolicy?.getState?.(),loader:document.getElementById('startupLoader')?.outerHTML,error:String(window.FourSymbolsStartupPolicy?.getLastError?.()?.message||''),page:document.body.innerText.slice(0,800)}));};
- await wait(()=>window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden);
+ await wait(()=>window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show'));
  for(const feature of ['gameplay-core','patrol','boss-tower','abyss'])await window.FourSymbolsFeatures.ensure(feature,'navigation-qa');
  showPage('home');
  await new Promise(r=>setTimeout(r,150));
