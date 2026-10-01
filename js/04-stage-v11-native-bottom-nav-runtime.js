@@ -37,10 +37,11 @@
     function renderMain(page){
         const nav=ensureShell();
         if(!nav){ return; }
-        if(nav.dataset.navContext!=="main"){
+        if(nav.dataset.navSignature!=="main"){
             nav.replaceChildren(...mainButtons);
-            nav.dataset.navContext="main";
         }
+        nav.dataset.navSignature="main";
+        nav.dataset.navContext="main";
         const selected={home:"homeNav",training:"trainingNav",inventory:"inventoryNav",
             dungeon:"dungeonNav",gameplay:"bossNav",boss:"bossNav",tower:"bossNav"}[page]||"homeNav";
         mainButtons.forEach(button=>button.classList.toggle("active",button.id===selected));
@@ -50,7 +51,7 @@
         const nav=ensureShell();
         if(!nav){ return; }
         const key=context+":"+buttons.map(button=>button.join("|")).join(";");
-        if(nav.dataset.navContext!==key){
+        if(nav.dataset.navSignature!==key){
             nav.replaceChildren(...buttons.map(([label,src,action])=>{
                 const button=document.createElement("button");
                 button.type="button";
@@ -70,8 +71,9 @@
                 button.append(frame,assistive);
                 return button;
             }));
-            nav.dataset.navContext=key;
+            nav.dataset.navSignature=key;
         }
+        nav.dataset.navContext=context;
         shell.hidden=false;
     }
     function activeGameplayPageId(){
