@@ -111,6 +111,7 @@ jobs:
 
       - name: Run Fixed Slot battlefield rendering regression
         run: |
+          node tests/boss-snapshot-owner-lifecycle-convergence-20261001.test.js
           node tests/fixed-slot-battlefield-rendering-v2.test.js
           node tests/fixed-battlefield-ally-formation.test.js
 

@@ -133,9 +133,24 @@
         return window.FourSymbolsBattlefieldSlots||null;
     }
 
+    function bossEnemyFormationAuthority(owner){
+        const boss=window.FourSymbolsBossBattle||null;
+        if(!owner||!boss){ return {owns:false,snapshot:null}; }
+        const existing=owner.getActiveEnemySnapshot();
+        const active=typeof boss.isActive==="function"&&boss.isActive();
+        const ownsExisting=typeof boss.ownsEnemyFormationSnapshot==="function"&&
+            boss.ownsEnemyFormationSnapshot(existing);
+        if(!active&&!ownsExisting){ return {owns:false,snapshot:null}; }
+        const snapshot=typeof boss.getEnemyFormationSnapshot==="function"
+            ?boss.getEnemyFormationSnapshot():existing;
+        return {owns:true,snapshot:snapshot||null};
+    }
+
     function ensureEnemyFormationSnapshot(indexes){
         const owner=fixedBattlefieldSlots();
         if(!owner){ return null; }
+        const bossAuthority=bossEnemyFormationAuthority(owner);
+        if(bossAuthority.owns){ return bossAuthority.snapshot; }
         const requested=(Array.isArray(indexes)?indexes:currentBattleMonsters||[])
             .filter(index=>Number.isInteger(index)).slice(0,10);
         if(!requested.length){ return null; }
@@ -155,9 +170,11 @@
         const owner=fixedBattlefieldSlots();
         const requested=(indexes||[]).filter(index=>Number.isInteger(index)).slice(0,10);
         if(!owner){ return requested.length?[requested,[]]:[[],[]]; }
-        let snapshot=owner.getActiveEnemySnapshot();
+        const bossAuthority=bossEnemyFormationAuthority(owner);
+        let snapshot=bossAuthority.owns?bossAuthority.snapshot:owner.getActiveEnemySnapshot();
+        if(bossAuthority.owns&&!snapshot){ return [[],[]]; }
         const activeMatches=snapshot&&requested.every(index=>!!owner.getEnemySlotForMonster(snapshot,index));
-        if(!activeMatches){
+        if(!bossAuthority.owns&&!activeMatches){
             snapshot=owner.createEnemyFormationSnapshot(requested,{
                 originalFormationType:Math.max(1,requested.length),
                 rankWeight:getFormationRankWeight
@@ -198,6 +215,11 @@
         const area=document.getElementById("battleMonsterArea");
         const owner=fixedBattlefieldSlots();
         if(!area||!owner){ return; }
+        /* Large Boss enemy geometry belongs to FourSymbolsBossBattle for the
+           complete battle lifecycle. V131 still renders allies and its other
+           presentation responsibilities, but it must never rebuild or project
+           a normal enemy formation over the Boss-owned snapshot. */
+        if(bossEnemyFormationAuthority(owner).owns){ return; }
         const indexes=currentBattleMonsters.slice(0,10);
         const snapshot=ensureEnemyFormationSnapshot(indexes);
         if(!snapshot){ return; }
