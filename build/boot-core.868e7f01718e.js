@@ -1,4 +1,4 @@
-window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.72","firebaseBootstrap":"build/firebase/firebase-bootstrap.8c0ebfccd99b.js"});
+window.__FOUR_SYMBOLS_BUILD__=Object.freeze({"release":"173.72","firebaseBootstrap":"build/firebase/firebase-bootstrap.4ca23a1300a5.js"});
 (function installFourSymbolsSupportContact(global){
 "use strict";
 if(!global||global.FourSymbolsSupport){ return; }
@@ -483,17 +483,25 @@ const oldKeys=Object.fromEntries(Object.entries(LEGACY_SIDECARS)
 const sealedPrefix=MIGRATION_BACKUP_PREFIX+uid+":";
 const legacyPrefix=BACKUP_PREFIX+uid+":";
 const candidates=[];
+let eligibleSealed=0,legacyArchives=0,exactMainArchives=0,incompleteArchives=0;
+for(let index=0;index<storage().length;index++){
+const key=storage().key(index);
+if(typeof key==="string"&&key.startsWith(legacyPrefix)&&
+/^\d+$/.test(key.slice(legacyPrefix.length))){ legacyArchives++; }
+}
 for(let index=0;index<storage().length;index++){
 const key=storage().key(index);
 if(typeof key!=="string"||!key.startsWith(sealedPrefix)){ continue; }
 const backup=verifyMigrationBackup(uid,key);
 if(missingKeys.some(suffix=>backup.sidecars[suffix].status!=="missing")){ continue; }
+eligibleSealed++;
 const matches=[];
 for(let other=0;other<storage().length;other++){
 const root=storage().key(other);
 if(typeof root!=="string"||!root.startsWith(legacyPrefix)||
 !/^\d+$/.test(root.slice(legacyPrefix.length))||
 storage().getItem(root)!==backup.mainRaw){ continue; }
+exactMainArchives++;
 const recovered={};
 for(const suffix of missingKeys){
 const raw=storage().getItem(root+":"+oldKeys[suffix]);
@@ -503,6 +511,8 @@ recovered[suffix]={status:"present",raw};
 }
 if(Object.keys(recovered).length===missingKeys.length){
 matches.push({root,recovered});
+}else{
+incompleteArchives++;
 }
 }
 if(matches.length>1){
@@ -511,7 +521,12 @@ throw coded("migration-recovery-ambiguous","More than one matching original migr
 if(matches.length===1){ candidates.push({backup,match:matches[0]}); }
 }
 if(candidates.length!==1){
-throw coded(candidates.length?"migration-recovery-ambiguous":"migration-recovery-source-missing",
+const reason=candidates.length?"migration-recovery-ambiguous":
+!eligibleSealed?"migration-recovery-sealed-missing":
+!legacyArchives?"migration-recovery-archive-missing":
+!exactMainArchives?"migration-recovery-main-mismatch":
+incompleteArchives?"migration-recovery-sidecars-missing":"migration-recovery-source-missing";
+throw coded(reason,
 "Exactly one sealed save with a complete matching original archive is required.");
 }
 const {backup,match}=candidates[0];

@@ -16,7 +16,7 @@ let resumeGraceUsed=false;
 let resumeActive=false;
 let resumeDeadline=0;
 let resumeInterval=0;
-let state={mode:"AUTH_RESOLVING",user:null,message:"正在初始化 Firebase Authentication…",error:false,migration:null,sessionTest:"",cloudEnvelopeTest:"",cloudPreferencesTest:"",migrationCandidate:"",candidateScreening:"",backupExport:""};
+let state={mode:"AUTH_RESOLVING",user:null,message:"正在初始化 Firebase Authentication…",error:false,migration:null,sessionTest:"",cloudEnvelopeTest:"",cloudPreferencesTest:"",migrationCandidate:"",candidateScreening:"",backupExport:"",archiveRecovery:""};
 
 const byId=id=>document.getElementById(id);
 function errorText(error){
@@ -110,6 +110,7 @@ function markup(){
               <button id="firebaseMigrationBackupExportButton" class="firebase-auth-button secondary" type="button">下載本機封存副本</button>
               <button id="firebaseMigrationArchiveRecoveryButton" class="firebase-auth-button secondary" type="button">檢查舊封存並補存真實來源</button>
             </div>
+            <div id="firebaseMigrationArchiveRecoveryResult" class="firebase-auth-cloud-state" role="status" aria-live="polite" hidden></div>
             <div class="firebase-auth-footer">
               <button id="firebaseMigrationCandidateButton" class="firebase-auth-button secondary" type="button">封存並準備提交存檔候選</button>
               <button id="firebaseMigrationCandidateCancelButton" class="firebase-auth-button secondary" type="button" hidden>取消提交</button>
@@ -184,6 +185,8 @@ function render(){
     }
     const exportResult=byId("firebaseMigrationBackupExportResult");
     if(exportResult){ exportResult.textContent=state.backupExport||"可將此 UID 已封存的本機副本另存到手機。下載檔未加密，請勿分享；不能直接用於跨裝置恢復。"; }
+    const recoveryResult=byId("firebaseMigrationArchiveRecoveryResult");
+    if(recoveryResult){ recoveryResult.textContent=state.archiveRecovery||""; recoveryResult.hidden=!state.archiveRecovery; }
     const exportButton=byId("firebaseMigrationBackupExportButton");
     if(exportButton){ exportButton.disabled=busy||state.mode!=="READY"; }
     const screeningResult=byId("firebaseCandidateScreeningResult");
@@ -563,12 +566,22 @@ function recoverOriginalDeviceArchivedSidecars(){
         if(!uid){ throw new Error("ACCOUNT_CHANGED"); }
         const result=window.FourSymbolsAccountSave.recoverArchivedMigrationSidecars(uid);
         if(window.FourSymbolsFirebase?.getUser?.()?.uid!==uid){ throw new Error("ACCOUNT_CHANGED"); }
-        state={...state,backupExport:result.unchanged
+        state={...state,archiveRecovery:result.unchanged
             ?"舊來源已在另一份不可變封存中；原候選與原封存未修改。這不代表領獎已驗證或角色已採納。"
             :"找到與封存主存檔完全一致的舊搬移備份，已將三份真實原始來源另存為新不可變封存。請另行下載新封存妥善保管；原候選仍被阻擋，未自動提交。"};
     }catch(error){
         console.info("Archived migration sources unavailable:",error?.code||error);
-        state={...state,backupExport:"找不到唯一且完整、主存檔完全一致的舊搬移來源；沒有補造資料，原封存與私人候選保持不變。"};
+        const reasons={
+            "migration-recovery-sealed-missing":"沒有需要補齊這三份來源的已驗證本機封存。",
+            "migration-recovery-archive-missing":"這個 UID 的瀏覽器資料中沒有舊搬移封存。",
+            "migration-recovery-main-mismatch":"找到舊搬移封存，但主存檔原始內容與目前封存不完全一致，不能接用附屬紀錄。",
+            "migration-recovery-sidecars-missing":"找到主存檔一致的舊搬移封存，但三份歷史附屬紀錄不完整。",
+            "migration-recovery-ambiguous":"找到多份符合條件的來源，無法安全選定唯一來源。",
+            "migration-backup-sidecar-corrupt":"舊附屬紀錄格式損壞，不能安全補存。",
+            "migration-backup-corrupt":"本機封存校驗失敗，不能安全補存。"
+        };
+        state={...state,archiveRecovery:"檢查完成："+(reasons[error?.code]||"無法驗證唯一完整的舊搬移來源。")+
+            "沒有補造資料；原封存與私人候選保持不變，角色尚未採納。"};
     }
     render();
 }
@@ -682,7 +695,7 @@ export function closeFirebaseAuthUi(){
 export function setFirebaseAuthUiState(next={}){
     if(Object.prototype.hasOwnProperty.call(next,"user")&&next.user?.uid!==state.user?.uid){
         candidateConfirmation=null;
-        state={...state,migrationCandidate:"",candidateScreening:"",backupExport:""};
+        state={...state,migrationCandidate:"",candidateScreening:"",backupExport:"",archiveRecovery:""};
     }
     if(next.mode&&next.mode!=="READY"){ candidateConfirmation=null; }
     state={...state,...next}; render();
