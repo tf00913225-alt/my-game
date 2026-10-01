@@ -175,14 +175,14 @@ async function runViewport(chrome,url,width,height){
   }else{evidence.inventoryScrollNeeded=false;}
   // The paginated inventory can fit without scrolling. Exercise an actually
   // overflowing formal skill panel, without injecting geometry or content.
-  await client.eval("closeMapInventoryOverlay();showPage('skill');renderSkillLoadout()");await settle(client);
+  await client.eval("(async()=>{closeMapInventoryOverlay();showPage('home');await FourSymbolsFeatures.ensure('skill','navigation-scroll-qa');openHomeFeature('character');switchCharacterTab('skill');renderSkillLoadout();})()");await settle(client);
   evidence.phase='legal-panel';evidence.legalPanel=await client.eval(`(()=>{
-   const n=[...document.querySelectorAll('#game-stage *')].find(n=>{const r=n.getBoundingClientRect(),s=getComputedStyle(n);return r.width>100&&r.height>100&&r.top>=0&&r.bottom<=innerHeight&&(s.overflowY==='auto'||s.overflowY==='scroll')&&n.scrollHeight>n.clientHeight+1;});
+   const n=[...document.querySelectorAll('#homeFeatureModal *')].reverse().find(n=>{const r=n.getBoundingClientRect(),s=getComputedStyle(n);const x=r.left+r.width/2,y=r.top+r.height*.8;return r.width>100&&r.height>100&&r.top>=0&&r.bottom<=innerHeight&&s.visibility!=='hidden'&&(s.overflowY==='auto'||s.overflowY==='scroll')&&n.scrollHeight>n.clientHeight+1&&FourSymbolsGestureArbiter.findScrollOwner(document.elementFromPoint(x,y))?.node===n;});
    if(!n)return null;window.__navQaScrollOwner=n;n.scrollTop=0;const r=n.getBoundingClientRect();return {id:n.id,className:n.className,clientHeight:n.clientHeight,scrollHeight:n.scrollHeight,rect:{left:r.left,top:r.top,width:r.width,height:r.height}};
   })()`);assert.ok(evidence.legalPanel,'formal skill page has no overflowing legal owner');
   const lr=evidence.legalPanel.rect;await swipe(client,lr.left+lr.width/2,lr.top+lr.height*.8);
   evidence.legalPanelAfterSwipe=await client.eval('window.__navQaScrollOwner.scrollTop');assert.ok(evidence.legalPanelAfterSwipe>0,'legal panel single-finger swipe did not scroll');
-  await client.eval("closeMapInventoryOverlay();showPage('home')");await settle(client);
+  await client.eval("closeHomeFeature();closeMapInventoryOverlay();showPage('home')");await settle(client);
   evidence.returnHome=await client.eval(MEASURE);assert.equal(evidence.returnHome.sameShell,true);
   await client.send('Page.reload',{ignoreCache:true});await new Promise(r=>setTimeout(r,300));await client.eval(PREPARE);evidence.reload=await client.eval(MEASURE);assert.equal(evidence.reload.shellCount,1);assert.equal(evidence.reload.legacyCount,0);
   const shot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(ARTIFACT_DIR,`navigation-home-${width}x${height}.png`),Buffer.from(shot.data,'base64'));
