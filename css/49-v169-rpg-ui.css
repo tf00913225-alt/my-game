@@ -1508,7 +1508,7 @@
 #game-stage .home-feature-modal-box .home-feature-close-btn,
 #game-stage .item-modal-box .close-item-button,
 #game-stage .creation-skill-detail-box .creation-skill-detail-close,
-#game-stage .creation-skill-detail-box .creation-skill-detail-x,
+#game-stage .creation-skill-detail-box .creation-skill-detail-x{
     border-color:#9B773B;
     color:var(--rpg-window-text,#EEE7D8);
     background:linear-gradient(180deg,#342C20,#171510 62%,#0D0C09);

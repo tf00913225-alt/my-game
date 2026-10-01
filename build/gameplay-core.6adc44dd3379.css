@@ -4136,6 +4136,18 @@
         v143RasterTravel var(--v143-sprite-duration,1200ms) linear var(--v143-sprite-delay,0ms) 1 both;
 }
 
+/* Phased motion belongs to the V143 frame metadata / Web Animations track.
+   CSS owns only raster frame selection and visibility for these sprites. */
+.v143-vfx-sprite.v143-vfx-sprite-active[data-motion="phased"]{
+    animation:
+        v143RasterCastFrames var(--v143-sprite-duration,1200ms) steps(1,end) var(--v143-sprite-delay,0ms) 1 both,
+        v143RasterCastOpacity var(--v143-sprite-duration,1200ms) linear var(--v143-sprite-delay,0ms) 1 both;
+}
+@keyframes v143RasterCastOpacity{
+    0%,100%{opacity:0}
+    2%,97%{opacity:1}
+}
+
 .v143-skill-stage[data-element="fire"] .v143-vfx-sprite{
     filter:drop-shadow(0 0 11px rgba(255,87,25,.9));
 }
@@ -7552,7 +7564,7 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 #game-stage .home-feature-modal-box .home-feature-close-btn,
 #game-stage .item-modal-box .close-item-button,
 #game-stage .creation-skill-detail-box .creation-skill-detail-close,
-#game-stage .creation-skill-detail-box .creation-skill-detail-x,
+#game-stage .creation-skill-detail-box .creation-skill-detail-x{
     border-color:#9B773B;
     color:var(--rpg-window-text,#EEE7D8);
     background:linear-gradient(180deg,#342C20,#171510 62%,#0D0C09);

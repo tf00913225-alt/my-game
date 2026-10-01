@@ -41,6 +41,14 @@ assert.match(comparison,/setItemModalPresentationMode\("comparison"\)/);
 assert.match(comparison,/closeItemModal=function\(\)\{clearEquipmentComparison\(\)/);
 assert.doesNotMatch(legacyDetailCss,/:has\(#v17342InventoryPotionUse\)|:has\(#itemEquipButton:disabled\)/);
 
+// The item path retires duplicate feedback that used browser pixels inside
+// the legacy projection; exercise the real owner, without calling its timers.
+const rippleSource=main.slice(main.indexOf("function spawnButtonRipple("),main.indexOf("function handleGlobalButtonPress("));
+const vm=require("node:vm");
+const rippleContext={lastRippleTime:0,document:{createElement(){throw Error("retired item ripple created");}},setTimeout(){throw Error("retired item ripple timer");}};
+vm.runInNewContext(rippleSource,rippleContext);
+rippleContext.spawnButtonRipple({closest:s=>s==="#itemModal"},180,500);
+
 // Replaced geometry is deleted rather than hidden behind another late override.
 assert.doesNotMatch(legacySystemCss,/#itemModal \./);
 assert.match(legacySystemCss,/\.item-modal:not\(#itemModal\)/);

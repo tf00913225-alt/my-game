@@ -35,7 +35,7 @@ const INSTALL_MEASURE=`window.__responsiveMeasure=(selector)=>{
  const rect={left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height};
  const clips=[];for(let p=node.parentElement;p;p=p.parentElement){const ps=getComputedStyle(p);if(/hidden|clip|auto|scroll/.test(ps.overflowX+' '+ps.overflowY)){const a=p.getBoundingClientRect();clips.push({left:a.left,top:a.top,right:a.right,bottom:a.bottom});}}
  const projectedFont=parseFloat(s.fontSize)*(node.offsetWidth?r.width/node.offsetWidth:1);
- return {selector,rect,clips,font:parseFloat(s.fontSize),projectedFont,display:s.display,overflowX:s.overflowX,overflowY:s.overflowY,overflow:node.scrollWidth-node.clientWidth,scrollHeight:node.scrollHeight,clientHeight:node.clientHeight,scrollTop:node.scrollTop,objectFit:s.objectFit,transform:s.transform,columns:s.gridTemplateColumns,mode:node.dataset.presentationMode||null};
+ return {selector,rect,clips,font:parseFloat(s.fontSize),projectedFont,display:s.display,overflowX:s.overflowX,overflowY:s.overflowY,overflow:node.scrollWidth-node.clientWidth,scrollHeight:node.scrollHeight,clientHeight:node.clientHeight,scrollTop:node.scrollTop,objectFit:s.objectFit,transform:s.transform,columns:s.gridTemplateColumns,boxSizing:s.boxSizing,padding:s.padding,width:s.width,children:[...node.children].map(n=>({tag:n.tagName,class:n.className,rect:n.getBoundingClientRect().toJSON()})),mode:node.dataset.presentationMode||null};
 }; true`;
 function visible(row,viewport){
  assert.notEqual(row.display,'none',row.selector+' hidden');
@@ -61,7 +61,7 @@ async function run(chrome,url,live){
   const runtime=await c.eval(PREPARE);await c.eval(INSTALL_MEASURE);
   assert.ok(runtime.productionStyles.some(p=>/build\/gameplay-core\.[a-f0-9]+\.css/.test(p)),'production CSS not loaded');
   const measure=selector=>c.eval(`__responsiveMeasure(${JSON.stringify(selector)})`);
-  const check=async(selector,v,text=false)=>{const row=await measure(selector);visible(row,v);if(text)assert.ok(row.projectedFont>=13-0.1,selector+' rendered font '+row.projectedFont);return row;};
+  const check=async(selector,v,text=false)=>{const row=await measure(selector);try{visible(row,v);}catch(error){console.error('FAILED geometry '+JSON.stringify(row));throw error;}if(text)assert.ok(row.projectedFont>=13-0.1,selector+' rendered font '+row.projectedFont);return row;};
   const click=async(selector,v)=>{
    const row=await check(selector,v),x=row.rect.left+row.rect.width/2,y=row.rect.top+row.rect.height/2;
    const hit=await c.eval(`(()=>{const n=document.querySelector(${JSON.stringify(selector)}),h=document.elementFromPoint(${x},${y});return !!(h&&(n===h||n.contains(h)))})()`);
@@ -70,6 +70,7 @@ async function run(chrome,url,live){
    await c.send('Input.dispatchMouseEvent',{type:'mousePressed',x,y,button:'left',clickCount:1});
    await c.send('Input.dispatchMouseEvent',{type:'mouseReleased',x,y,button:'left',clickCount:1});await settle();
   };
+  const screenshot=async name=>{const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(OUT,name+'.png'),Buffer.from(shot.data,'base64'));};
   const scroll=async(selector)=>{
    const before=await measure(selector);assert.ok(before.overflow<=1,selector+' content overflows horizontally');assert.ok(before.clientHeight>24,selector+' has no usable content');
    if(before.scrollHeight>before.clientHeight+1){
@@ -114,6 +115,7 @@ async function run(chrome,url,live){
     const batch=(mode==='potion'||mode==='chest')?await check('#v17350BatchAction',v):null;
     if(mode==='potion')assert.ok(await c.eval(`Number(document.getElementById('v17350BatchQuantity').max)>=100000`),'large owned count not exercised');
     const textSizes=await c.eval(`Array.from(document.querySelectorAll('#itemModalName,#itemModalStats div,#itemModalStats b,.v17351-compare-stat span,.v17351-compare-stat b,.v17351-compare-pane>strong,#v17350BatchAction label,#v17350BatchAction input,#v17350BatchAction span,#v17350BatchAction button,#itemModal .item-modal-buttons button')).filter(n=>n.getBoundingClientRect().width>0).map(n=>({text:(n.textContent||n.value||'').slice(0,40),size:parseFloat(getComputedStyle(n).fontSize)*n.getBoundingClientRect().width/n.offsetWidth}))`);for(const t of textSizes)assert.ok(t.size>=12.9,'unreadable text '+JSON.stringify(t));
+    await screenshot(mode+'-'+v.join('x'));
     const contentScroll=await scroll(contents);modes.push({mode,frame,actions,back,names,art,batch,contentScroll,textSizes});
     // Resize while open; the state and fixed controls must survive.
     await resize([v[0],v[1]-80]);await check('#itemModal .item-modal-buttons',[v[0],v[1]-80]);assert.equal((await measure('#itemModal')).mode,expected);await resize(v);
@@ -125,7 +127,7 @@ async function run(chrome,url,live){
    const shop=await check('.v17346-shop-preview-modal',v),shopArt=await check('.v17346-shop-preview-art',v),shopBack=await check('.v17346-shop-preview-modal .v132-reward-actions button',v,true);
    assert.ok(Math.abs(shopArt.rect.width-shopArt.rect.height)<1,'shop art distorted');
    const shopImages=await c.eval(`Array.from(document.querySelectorAll('.v17346-shop-preview-art img')).map(n=>({fit:getComputedStyle(n).objectFit,loaded:n.complete&&n.naturalWidth>0}))`);assert.ok(shopImages.length);for(const img of shopImages){assert.equal(img.fit,'contain');assert.ok(img.loaded);}
-   await resize([v[0],v[1]-80]);await check('.v17346-shop-preview-modal .v132-reward-actions button',[v[0],v[1]-80]);await resize(v);
+   await resize([v[0],v[1]-80]);await check('.v17346-shop-preview-modal .v132-reward-actions button',[v[0],v[1]-80]);await screenshot('shop-short-'+v.join('x'));await resize(v);await screenshot('shop-'+v.join('x'));
    await click('.v17346-shop-preview-modal .v132-reward-actions button',v);await c.eval(`closeHomeFeature()`);
    // Load later feature styles before re-entering the same inventory owner.
    await c.eval(`(async()=>{await FourSymbolsFeatures.ensure('skill','responsive-item-qa');await FourSymbolsFeatures.ensure('relic','responsive-item-qa')})()`);
