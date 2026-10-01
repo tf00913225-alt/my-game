@@ -19,7 +19,7 @@ const writerCounts={
  'js/35-v141-ui-battle.js':3,'js/36-v141-content-systems.js':1,
  'js/51-v169-rpg-ui.js':1,'js/53-v173.50-inventory-qol.js':1,
  'js/55-v173.51-inventory-qa.js':1,'js/59-abyss-two-tier-runtime.js':1,
- 'js/firebase/session-client.js':1,'js/release-update-notification.js':1,
+ 'js/firebase/session-client.js':1,'js/firebase/firebase-session.js':2,'js/release-update-notification.js':1,
  'js/startup/account-save-repository.js':10,'js/startup/first-play-resource-loader.js':1,
  'privacy-consent.html':1
 };

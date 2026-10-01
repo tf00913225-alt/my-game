@@ -20,8 +20,24 @@ async function call(name,payload){
     if(getFirebaseAuth()?.currentUser!==user){ throw sessionError("ACCOUNT_CHANGED"); }
     return response.data;
 }
-let storage=null;
-try{ storage=window.sessionStorage; }catch(_){}
+/* The Firebase identity survives a closed tab. Keep its game credential on the
+ * same origin across tabs as well; the backend still checks every use and a
+ * different device can revoke it. Read the old per-tab value once on upgrade. */
+const storage={
+    getItem(key){
+        try{ const value=window.localStorage.getItem(key); if(value!==null){ return value; } }catch(_){}
+        try{ return window.sessionStorage.getItem(key); }catch(_){ return null; }
+    },
+    setItem(key,value){
+        try{ window.localStorage.setItem(key,value); }
+        catch(_){ window.sessionStorage.setItem(key,value); return; }
+        try{ window.sessionStorage.removeItem(key); }catch(_){}
+    },
+    removeItem(key){
+        try{ window.localStorage.removeItem(key); }catch(_){}
+        try{ window.sessionStorage.removeItem(key); }catch(_){}
+    }
+};
 const client=createGameSessionClient({getIdentity,call,storage,onState:state=>{
     window.dispatchEvent(new CustomEvent("four-symbols:game-session-state",{detail:state}));
 }});
