@@ -4506,3 +4506,10 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 - 正式 owner：`js/firebase/firebase-session.js` 儲存適配層、`js/firebase/session-client.js::ensure()` 單一工作階段決策、`js/firebase/firebase-auth.js::reauthenticateWithGoogle()` 原帳號驗證、`js/firebase/firebase-auth-ui.js::render()/bind()` 已登入入口；後端 `functions/src/session-authority.js` 仍判定有效憑證。沒有新增 wrapper 或臨時 patch。
 - 新適配層將同 UID 憑證存於同源 localStorage，優先讀取並轉移既有 sessionStorage；登出會清兩處；每次操作繼續經 backend protectedTest，失效與佔用時不自動重建。Google 使用者若被阻擋，可在帳號畫面直接重新驗證同一帳號，無需先手動登出；不觸碰角色、存檔、歷史獎勵與 Phase 4 採納。
 - 本機相關測試涵蓋重開新分頁、舊憑證轉移、登出清理和被撤銷後不可偷取工作階段。PR／CI／DEV 部署與原手機體驗待核對，勿將本機測試標成玩家 VERIFIED；Phase 4 仍 0/6 VERIFIED。
+
+## 2026-10-02 — Fire monster 2–4 character name replacement (candidate)
+
+- Work ID `FIRE-MONSTER-NAMES-20261002`; branch `feature/fire-monster-name-length-20261002` from `dev@b676b2671df7c8195675eae486f6eed5095d3301`. This is a data Replacement only; `main`, image pixels, portrait keys, paths, encounter levels, ranks and combat behavior are unchanged.
+- Image-reviewed replacements: `炎殼長戟蟲→赤甲槍蟲`, `赤炎修羅王→六臂修羅`, `虛空煉獄皇→獄輪魔尊`, `業火魔君王→業炎法王`, `終焉神魔皇→末炎祭司`, `熔岩巨獸王→熔翼獸王`, `烈焰巨魔王→炎錘巨魔`, `焚天龍獄皇→焚天炎龍`. All 40 fire asset-pool display names are now unique and 2–4 Unicode characters.
+- Canonical sources updated together: wild runtime rows in `js/00-main.js`, `config/monster-portrait-registry.json`, `config/monster-asset-provenance.json`, generated root/build manifests and the content-hashed app-shell bundle. No wrapper, alias resolver or temporary patch was added.
+- Targeted fire coverage, monster portrait runtime, portrait audit, permanent image asset gate, deterministic build check and diff check pass locally. The existing `fire-tower-runtime-identity-first-frame` isolation assertion still expects earth tower portraits to be absent, but earth portraits are now formally integrated; that unrelated stale test is not changed in this naming task. PR CI and exact dev deployment remain pending.

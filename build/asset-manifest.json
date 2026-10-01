@@ -20,7 +20,7 @@
     "bundles": {
       "app-shell": {
         "scripts": [
-          "build/app-shell.bda61f0ab278.js"
+          "build/app-shell.39f9e1fb8c09.js"
         ],
         "styles": [
           "build/app-shell.95542962b3dd.css"
@@ -562,19 +562,19 @@
         "decode": true
       },
       {
+        "path": "build/app-shell.39f9e1fb8c09.js",
+        "sha256": "39f9e1fb8c09",
+        "bytes": 995474,
+        "priority": "P1",
+        "type": "script",
+        "decode": false
+      },
+      {
         "path": "build/app-shell.95542962b3dd.css",
         "sha256": "95542962b3dd",
         "bytes": 102857,
         "priority": "P1",
         "type": "style",
-        "decode": false
-      },
-      {
-        "path": "build/app-shell.bda61f0ab278.js",
-        "sha256": "bda61f0ab278",
-        "bytes": 995495,
-        "priority": "P1",
-        "type": "script",
         "decode": false
       },
       {
@@ -818,8 +818,8 @@
         "decode": false
       }
     ],
-    "manifestHash": "aaa90b475b11",
-    "totalBytes": 21580992,
+    "manifestHash": "b17d45490a48",
+    "totalBytes": 21580971,
     "totalResources": 78
   },
   "assets": {
@@ -827,9 +827,9 @@
       "sha256": "8db1375ab342",
       "bytes": 69305
     },
-    "build/app-shell.bda61f0ab278.js": {
-      "sha256": "bda61f0ab278",
-      "bytes": 995495
+    "build/app-shell.39f9e1fb8c09.js": {
+      "sha256": "39f9e1fb8c09",
+      "bytes": 995474
     },
     "build/gameplay-core-primary.eb5714591dbb.js": {
       "sha256": "eb5714591dbb",
@@ -1072,7 +1072,7 @@
       },
       {
         "assetId": "MON_FIRE_ELITE_008",
-        "displayName": "炎殼長戟蟲",
+        "displayName": "赤甲槍蟲",
         "path": "assets/monsters/tower/fire-pool/mon-fire-elite-008.webp",
         "sha256": "6ea6a910c023",
         "bytes": 988132,
@@ -1112,7 +1112,7 @@
       },
       {
         "assetId": "MON_FIRE_ELITE_010",
-        "displayName": "赤炎修羅王",
+        "displayName": "六臂修羅",
         "path": "assets/monsters/wild/zone-06/fire-02.webp",
         "sha256": "a05572d37d7c",
         "bytes": 1475324,
@@ -1136,7 +1136,7 @@
       },
       {
         "assetId": "MON_FIRE_ELITE_013",
-        "displayName": "虛空煉獄皇",
+        "displayName": "獄輪魔尊",
         "path": "assets/monsters/wild/zone-09/fire-02.webp",
         "sha256": "eaa9372da1c1",
         "bytes": 1370322,
@@ -1144,7 +1144,7 @@
       },
       {
         "assetId": "MON_FIRE_ELITE_014",
-        "displayName": "業火魔君王",
+        "displayName": "業炎法王",
         "path": "assets/monsters/wild/zone-07/fire-02.webp",
         "sha256": "74451027fb10",
         "bytes": 1250002,
@@ -1160,7 +1160,7 @@
       },
       {
         "assetId": "MON_FIRE_ELITE_016",
-        "displayName": "終焉神魔皇",
+        "displayName": "末炎祭司",
         "path": "assets/monsters/wild/zone-10/fire-02.webp",
         "sha256": "e366a282436f",
         "bytes": 1533998,
@@ -1168,7 +1168,7 @@
       },
       {
         "assetId": "MON_FIRE_ELITE_017",
-        "displayName": "熔岩巨獸王",
+        "displayName": "熔翼獸王",
         "path": "assets/monsters/wild/zone-05/fire-02.webp",
         "sha256": "7d4fd2faa58d",
         "bytes": 1134946,
@@ -1176,7 +1176,7 @@
       },
       {
         "assetId": "MON_FIRE_ELITE_018",
-        "displayName": "烈焰巨魔王",
+        "displayName": "炎錘巨魔",
         "path": "assets/monsters/wild/zone-04/fire-02.webp",
         "sha256": "72acb233c67e",
         "bytes": 1868898,
@@ -1184,7 +1184,7 @@
       },
       {
         "assetId": "MON_FIRE_ELITE_019",
-        "displayName": "焚天龍獄皇",
+        "displayName": "焚天炎龍",
         "path": "assets/monsters/wild/zone-08/fire-02.webp",
         "sha256": "da7cce7cd150",
         "bytes": 1572834,
