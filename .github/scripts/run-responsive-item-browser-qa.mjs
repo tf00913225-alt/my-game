@@ -10,7 +10,7 @@ import {ROOT,ASSET_MANIFEST,findChrome,startServer,waitJson,Cdp,qaPrelude,QA_AUT
 const OUT=path.join(ROOT,'artifacts/browser-qa/responsive-item');
 const VIEWPORTS=[[360,800],[360,640],[393,873],[393,660],[412,915],[412,680]];
 const settle=()=>new Promise(resolve=>setTimeout(resolve,150));
-const PREPARE=`(async()=>{
+const PREPARE=String.raw`(async()=>{
  const until=Date.now()+45000;
  while(Date.now()<until&&!(window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden)) await new Promise(r=>setTimeout(r,50));
  if(window.FourSymbolsStartupPolicy?.getState?.()!=='READY') throw Error('formal startup did not reach READY');
@@ -45,7 +45,7 @@ function visible(row,viewport){
 }
 async function run(chrome,url,live){
  const profile=fs.mkdtempSync(path.join(os.tmpdir(),'responsive-item-qa-')),port=9600+Math.floor(Math.random()*300);
- const proc=spawn(chrome,['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage',`--remote-debugging-port=${port}`,`--user-data-dir=${profile}`,'about:blank'],{stdio:['ignore','ignore','pipe']});
+ const proc=spawn(chrome,[...(chrome.includes('headless-shell')?[]:['--headless=new']),'--no-sandbox','--disable-gpu','--disable-dev-shm-usage',`--remote-debugging-port=${port}`,`--user-data-dir=${profile}`,'about:blank'],{stdio:['ignore','ignore','pipe']});
  let c;const evidence=[];let browserError="";proc.stderr.on("data",chunk=>{browserError=(browserError+chunk).slice(-4000)});
  try{
   const target=(await waitJson(`http://127.0.0.1:${port}/json/list`)).find(t=>t.type==='page');c=new Cdp(target.webSocketDebuggerUrl);
@@ -124,7 +124,7 @@ async function run(chrome,url,live){
    console.log('PASS responsive production runtime '+v.join('x')+' modes + resize + entrances + late styles');
   }
   return evidence;
- }catch(error){error.evidence=evidence;if(browserError)error.message+="\nBrowser: "+browserError;throw error;}finally{c?.close();proc.kill('SIGTERM');try{fs.rmSync(profile,{recursive:true,force:true});}catch{}}
+ }catch(error){error.evidence=evidence;if(browserError){error.message+="\nBrowser: "+browserError;error.stack+="\nBrowser: "+browserError;}throw error;}finally{c?.close();proc.kill('SIGTERM');try{fs.rmSync(profile,{recursive:true,force:true});}catch{}}
 }
 fs.mkdirSync(OUT,{recursive:true});let local;
 try{
