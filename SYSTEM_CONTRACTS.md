@@ -154,6 +154,13 @@
 - Persistent state Gate returns a reason. `sameNameDuplicate` is a silent reject before hit rolling or mutation; `exclusiveConflict` (Freeze/Petrify) emits formal status MISS; resistance remains distinct.
 - Skill-name presentation derives color from `skill.element` through `data-skill-element`; character element must not participate. It is a document-level fixed viewport surface and shares the ordinary floating-feedback visual font size.
 
+## Battle Reading Layer Contract (2026-10-01)
+
+- `body.v174-battle-reading-open` is the sole semantic owner for Battle Reading Surface state. It is active while Battle Info, Battle Statistics, Boss Mechanism or Battle Status Detail is visibly open on the active battle page; the last surface closing, battle teardown or page navigation must remove it.
+- While that state is active, every Document-Level Transient Battle Presentation (including skill VFX/Sprite Sheet, skill name, damage/heal/SP/critical/MISS/resist/status feedback, detached popup compatibility surfaces and the complete Team Relic cinematic/dim/target projection/VFX presentation) must suppress paint and must not cover reading UI. The in-stage relic banner follows the same transient-paint rule.
+- Reading state never pauses or cancels Battle Simulation or presentation lifecycle. Hit frames, damage, status, healing/SP settlement, relic triggers, action completion and turn queue continue normally; hidden presentations expire on their original timeline and must not replay when the final reading surface closes.
+- A z-index comparison between elements in different stacking contexts is not sufficient evidence that a Battle Reading Surface paints above document-level VFX. Regression verification must assert the semantic reading state and computed transient-paint suppression while lifecycle completion continues.
+
 ## Six-Stat Combat Attribute Convergence（2026-09-30）
 
 本節為正式六圍、戰鬥能力與防禦 Owner（控制來源）的最新契約；若歷史段落與本節衝突，以本節為準。

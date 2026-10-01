@@ -139,12 +139,24 @@ h1,h2,h3,
     z-index:0;
 }
 
-/* Interactive battle drawers/modals temporarily own the top battle plane.
-   Skill VFX and detached damage popups render on document.body at 16000/17020,
-   so raising the canonical game stage while a drawer is open prevents those
-   transient paint layers from covering controls or readable battle data. */
-#game-stage.battle-ui-priority{
-    z-index:18000;
+/* Battle Reading Layer Contract.
+   Reading surfaces remain inside the isolated game viewport, while transient
+   battle presentation may be mounted directly under document.body. The one
+   semantic reading state therefore suppresses transient paint instead of
+   comparing z-index values across unrelated stacking contexts. Visibility
+   and opacity do not stop animation timers, hit frames, damage/status/heal/SP
+   settlement, relic triggers or the turn queue. */
+body.v174-battle-reading-open > .v143-skill-stage,
+body.v174-battle-reading-open > .v-fixed-slot-popup,
+body.v174-battle-reading-open > .damage-popup,
+body.v174-battle-reading-open > .damage-popup.v152-top-damage,
+body.v174-battle-reading-open > .battle-floating-feedback,
+body.v174-battle-reading-open > .skill-name-badge,
+body.v174-battle-reading-open > .skill-name-badge.v143-caster-skill-label,
+body.v174-battle-reading-open > .team-relic-battle-presentation,
+body.v174-battle-reading-open #game-stage .team-relic-battle-banner{
+    visibility:hidden !important;
+    opacity:0 !important;
 }
 
 /*
