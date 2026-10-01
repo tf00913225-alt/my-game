@@ -140,8 +140,9 @@ async function runViewport(chrome,url,width,height){
   assert.equal(evidence.startup.state,'READY');assert.equal(evidence.startup.ready,true);
   // Acknowledge the real startup release notice through its native control;
   // an open announcement intercepts the later scroll gestures.
-  evidence.releaseNotice=await client.eval(`(()=>{const modal=document.getElementById('homeFeatureModal');if(!modal?.classList.contains('show')||!modal.classList.contains('release-update-modal'))return null;const button=modal.querySelector('[data-release-update-action="acknowledge"]');if(!button)throw Error('Startup release notice has no acknowledge control');const r=button.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2;if(!button.contains(document.elementFromPoint(x,y)))throw Error('Release acknowledge control is obstructed');return {x,y,action:button.dataset.releaseUpdateAction};})()`);
+  evidence.releaseNotice=await client.eval(`(()=>{const modal=document.getElementById('homeFeatureModal');if(!modal?.classList.contains('show')||!modal.classList.contains('release-update-modal'))return null;const button=modal.querySelector('[data-release-update-action="acknowledge"]');if(!button)throw Error('Startup release notice has no acknowledge control');const r=button.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2;const hit=document.elementFromPoint(x,y);return {x,y,action:button.dataset.releaseUpdateAction,unobstructed:button.contains(hit),buttonRect:{left:r.left,top:r.top,width:r.width,height:r.height,bottom:r.bottom},hit:hit?.outerHTML.slice(0,700),modal:modal.className};})()`);
   if(evidence.releaseNotice){
+   assert.equal(evidence.releaseNotice.unobstructed,true,'Release acknowledge control is obstructed: '+JSON.stringify(evidence.releaseNotice));
    const {x,y}=evidence.releaseNotice;
    await client.send('Input.dispatchMouseEvent',{type:'mousePressed',x,y,button:'left',clickCount:1});
    await client.send('Input.dispatchMouseEvent',{type:'mouseReleased',x,y,button:'left',clickCount:1});await settle(client);
@@ -203,7 +204,7 @@ async function runViewport(chrome,url,width,height){
   evidence.phase='reload';await client.send('Page.reload',{ignoreCache:true});await client.send('Page.bringToFront');await client.send('Emulation.setFocusEmulationEnabled',{enabled:true});await new Promise(r=>setTimeout(r,300));await client.eval(PREPARE);evidence.reload=await client.eval(MEASURE);assert.equal(evidence.reload.shellCount,1);assert.equal(evidence.reload.legacyCount,0);
   const shot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(ARTIFACT_DIR,`navigation-home-${width}x${height}.png`),Buffer.from(shot.data,'base64'));
   return evidence;
- }catch(error){error.navEvidence=evidence;throw error;}finally{client?.close();proc.kill('SIGTERM');try{fs.rmSync(profile,{recursive:true,force:true,maxRetries:3,retryDelay:100});}catch(_){}}
+ }catch(error){if(client){try{const shot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(ARTIFACT_DIR,`navigation-failure-${width}x${height}.png`),Buffer.from(shot.data,'base64'));}catch(captureError){evidence.captureError=String(captureError);}}error.navEvidence=evidence;throw error;}finally{client?.close();proc.kill('SIGTERM');try{fs.rmSync(profile,{recursive:true,force:true,maxRetries:3,retryDelay:100});}catch(_){}}
 }
 fs.mkdirSync(ARTIFACT_DIR,{recursive:true});
 const server=await startServer();const results=[];
