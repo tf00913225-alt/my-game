@@ -1340,6 +1340,9 @@ try{
     assert.equal(bossGate.completionCount,1,"Boss-mode VFX gate must complete exactly once");
     assert.equal(bossGate.stageExists,false,"Boss-mode VFX stage must clean up");
 
+    evidence.checks.bossFloodDirection=await battleSkillTouchFloodQa(client,artifactDir,{animationOnly:true});
+    assert.equal(evidence.checks.bossFloodDirection.actorKind,'boss',"Downward Flood Beast acceptance must use the real Boss entity");
+
     const bossScreenshot=await client.send("Page.captureScreenshot",{format:"png",fromSurface:true});
     if(bossScreenshot.data){ fs.writeFileSync(path.join(artifactDir,"boss-target-entity-live-412x915.png"),Buffer.from(bossScreenshot.data,"base64")); }
 

@@ -5,7 +5,7 @@ import crypto from 'node:crypto';
 
 // Runs inside the existing account-first, production-bundle battle QA session.
 // All fixture changes are local to that disposable QA account/document.
-export async function battleSkillTouchFloodQa(rawClient,artifactDir){
+export async function battleSkillTouchFloodQa(rawClient,artifactDir,{animationOnly=false}={}){
     const bounded=(promise,label)=>new Promise((resolve,reject)=>{
         const timer=setTimeout(()=>reject(new Error('Battle touch/flood QA timed out: '+label)),15000);
         promise.then(value=>{clearTimeout(timer);resolve(value);},error=>{clearTimeout(timer);reject(error);});
@@ -51,6 +51,7 @@ export async function battleSkillTouchFloodQa(rawClient,artifactDir){
     };
     try{
         await client.send('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:5});
+        if(!animationOnly){
         await client.eval(`__touchQaReset('waterBall');true`);
         const button='.skill-quick-button[data-skill-id="waterBall"]';
         await tap(button);assert.equal((await state()).pending,'waterBall');
@@ -98,16 +99,20 @@ export async function battleSkillTouchFloodQa(rawClient,artifactDir){
         assert.equal((await point(button)).disabled,true);await tap(button);assert.equal((await state()).ready,false);
         const rejection=await client.eval(`(()=>{__touchQaReset('waterBall');autoBattle=true;prepareAction('waterBall');const auto=!actionReady;autoBattle=false;battlePhase='resolve';prepareAction('waterBall');const phase=!actionReady;battlePhase='declare';characterSkillLoadouts[getPartyCharacterKey(0)].equippedSkills=[];prepareAction('waterBall');return {auto,phase,equipment:!actionReady};})()`);
         assert.deepEqual(rejection,{auto:true,phase:true,equipment:true});checks.rejections=rejection;
+        }
 
         console.log('Battle touch/flood QA: native input and formal support declarations passed; warming flood atlas');
         await client.eval(`(async()=>{const im=new Image();im.src=v143SkillAnimationManifest.floodBeast.sprite.src;await im.decode();v142SkillAnimationDirector.play({id:'floodBeast',element:'water',category:'magic',targetType:'single',duration:1350,resolveDuration:1350},{side:'player',actorIndex:0,targetSide:'monster',targetId:currentBattleMonsters[0],targetIds:[currentBattleMonsters[0]]});await new Promise(r=>setTimeout(r,100));v142SkillAnimationDirector.dispose();return true;})()`);
         const enemyIds=await client.eval(`currentBattleMonsters.filter(i=>monsters[i]?.alive&&document.getElementById('battleMonster'+i)).slice(0,3)`);
         const slots=await client.eval(`FourSymbolsBattlefieldSlots.allySlots.slice(0,3)`);
         const originalSlot=await client.eval(`FourSymbolsBattlefieldSlots.getAllySlotForCharacter(0)`);
+        const bossIndex=await client.eval(`FourSymbolsBossBattle.isActive()?FourSymbolsBossBattle.getBossIndex():null`);
+        checks.actorKind=Number.isInteger(bossIndex)?'boss':'regular-monster';
         // Lossless screenshots at CSS-pixel resolution keep this permanent QA
         // evidence small without changing the viewport or formal artwork.
         const screenshotClip=await client.eval(`({x:0,y:0,width:innerWidth,height:innerHeight,scale:1/devicePixelRatio})`);
-        for(const side of ['player','monster']){
+        for(const side of animationOnly?['monster']:['player','monster']){
+            const actorIndex=side==='monster'&&Number.isInteger(bossIndex)?bossIndex:0;
             for(let column=0;column<3;column++){
                 const targetId=side==='player'?enemyIds[column]:0;
                 assert.ok(Number.isInteger(targetId));
@@ -118,7 +123,7 @@ export async function battleSkillTouchFloodQa(rawClient,artifactDir){
                 for(const [phase,time] of [['cast',.08],['flight',.3],['impact',.65],['dissipate',.92]]){
                     console.log('Battle touch/flood QA: '+side+' target '+column+' '+phase);
                     const snapshot=await client.eval(`(()=>{
-                        v142SkillAnimationDirector.play({id:'floodBeast',name:'洪水猛獸',element:'water',category:'magic',targetType:'single',duration:1350,resolveDuration:1350},{side:${JSON.stringify(side)},actorIndex:0,targetSide:${JSON.stringify(side==='player'?'monster':'player')},targetId:${targetId},targetIds:[${targetId}]});
+                        v142SkillAnimationDirector.play({id:'floodBeast',name:'洪水猛獸',element:'water',category:'magic',targetType:'single',duration:1350,resolveDuration:1350},{side:${JSON.stringify(side)},actorIndex:${actorIndex},targetSide:${JSON.stringify(side==='player'?'monster':'player')},targetId:${targetId},targetIds:[${targetId}]});
                         const n=document.querySelector('.v143-vfx-sprite[data-skill="floodBeast"]');if(!n)return null;
                         for(const a of n.getAnimations()){a.pause();a.currentTime=1350*${time};}
                         const r=n.getBoundingClientRect(),m=new DOMMatrix(getComputedStyle(n).transform);
@@ -138,7 +143,7 @@ export async function battleSkillTouchFloodQa(rawClient,artifactDir){
                     }
                     const shot=await client.send('Page.captureScreenshot',{format:'png',clip:screenshotClip});
                     fs.writeFileSync(path.join(artifactDir,'flood-'+side+'-'+column+'-'+phase+'.png'),Buffer.from(shot.data,'base64'));
-                    checks.animation.push({side,column,phase,...snapshot,imagePngBase64:shot.data});
+                    checks.animation.push({side,actorIndex,column,phase,...snapshot,imagePngBase64:shot.data});
                 }
             }
         }
