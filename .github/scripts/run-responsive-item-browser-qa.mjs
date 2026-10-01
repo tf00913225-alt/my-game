@@ -24,7 +24,7 @@ const PREPARE=String.raw`(async()=>{
  material:{id:'responsive-qa-material',name:'千年玄鐵長名稱材料'.repeat(3),type:'material',count:999,price:999999,stats,icon:art},
  chest:{id:'materialChest',name:'長名稱材料寶箱',type:'chest',count:999,stats:{},icon:art}
  };
- inventoryItems=[...Object.values(__responsiveItems),...Array.from({length:30},(_,i)=>({...__responsiveItems.equipment,id:'responsive-qa-'+i}))];
+ inventoryItems.splice(0,inventoryItems.length,...Object.values(__responsiveItems),...Array.from({length:30},(_,i)=>({...__responsiveItems.equipment,id:'responsive-qa-'+i})));
  characterEquipment.fire.armor={...__responsiveItems.equipment,name:'已穿戴長名稱對照裝備',stats};
  rebuildInventorySlots();renderInventory();showPage('home');
  return {loader:true,productionStyles:[...document.querySelectorAll('link[rel="stylesheet"]')].map(n=>new URL(n.href).pathname)};
