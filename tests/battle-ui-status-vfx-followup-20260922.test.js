@@ -71,17 +71,18 @@ test("battle information handles and turn timer follow the requested interaction
   assert.match(css,/#battleActionRegion > \.turn-target-row\{[\s\S]*?position:absolute;[\s\S]*?bottom:var\(--battle-command-visual-height\)/);
 });
 
-test("interactive battlefield overlays outrank detached VFX and damage popups",()=>{
+test("battle reading state suppresses detached transient paint across stacking contexts",()=>{
   const mainCss=read("css/00-main.css");
   const fixedCss=read("css/fixed-slot-battlefield-rendering-v2.css");
   const statsCss=read("css/battle-statistics-system.css");
   const vfxCss=read("css/40-v143-combat-dungeon-polish.css");
-  assert.match(mainCss,/#game-stage\.battle-ui-priority\{[\s\S]*?z-index:18000/);
+  assert.doesNotMatch(mainCss,/#game-stage\.battle-ui-priority\{[\s\S]*?z-index:/);
+  assert.match(mainCss,/body\.v174-battle-reading-open > \.v143-skill-stage,[\s\S]*?body\.v174-battle-reading-open > \.v-fixed-slot-popup,[\s\S]*?body\.v174-battle-reading-open > \.damage-popup,[\s\S]*?body\.v174-battle-reading-open > \.damage-popup\.v152-top-damage,[\s\S]*?body\.v174-battle-reading-open > \.battle-floating-feedback,[\s\S]*?body\.v174-battle-reading-open > \.skill-name-badge,[\s\S]*?body\.v174-battle-reading-open > \.team-relic-battle-presentation,[\s\S]*?body\.v174-battle-reading-open #game-stage \.team-relic-battle-banner\{[\s\S]*?visibility:hidden !important;[\s\S]*?opacity:0 !important;/);
+  assert.doesNotMatch(mainCss,/body\.v174-battle-reading-open[\s\S]{0,900}display:none/);
   assert.match(fixedCss,/\.battle-info-region\{[\s\S]*?z-index:18060 !important/);
   assert.match(statsCss,/z-index:18072/);
   assert.match(vfxCss,/\.battle-status-detail-modal\{[\s\S]*?z-index:18120/);
-  assert.match(vfxCss,/\.v143-skill-stage\{[\s\S]*?z-index:16000/,
-    "detached VFX remains below the interactive status-detail layer");
+  assert.match(vfxCss,/\.v143-skill-stage\{[\s\S]*?z-index:16000/);
   assert.match(fixedCss,/\.battle-info-region:not\(\.is-expanded\)\{[\s\S]*?background:transparent;[\s\S]*?box-shadow:none/);
   assert.match(fixedCss,/\.battle-info-region\.is-expanded\{[\s\S]*?background:transparent;[\s\S]*?box-shadow:none/);
   assert.match(fixedCss,/\.battle-info-region\.is-expanded > #battleInfo\{[\s\S]*?background:rgba\(0,0,0,\.92\) !important/);

@@ -4174,6 +4174,9 @@ function finishBattleStatisticsSession(result){
     if(owner&&typeof owner.finish==="function"){
         owner.finish({result:String(result||"")});
     }
+    closeBattleStatusDetailModal();
+    setBattleInfoExpanded(false);
+    syncBattleUiPriorityLayer();
     activeBattleStatisticsAction=null;
 }
 
@@ -7976,6 +7979,12 @@ function showPage(page){
     target.classList.add(
         "active"
     );
+
+    /* Page activity is part of the Battle Reading Layer lifecycle. Clear a
+       stale document-level paint suppressor synchronously after navigation. */
+    if(typeof syncBattleUiPriorityLayer==="function"){
+        syncBattleUiPriorityLayer();
+    }
 
 
     /*
@@ -22400,6 +22409,9 @@ function renderBattle(){
     }
 
     runBattleRenderHooks("after",this,arguments);
+    if(typeof syncBattleUiPriorityLayer==="function"){
+        syncBattleUiPriorityLayer();
+    }
 
 
     /*
@@ -31721,15 +31733,19 @@ function syncBattleUiPriorityLayer(){
 
     const stage=$("game-stage");
     const page=$("battlePage");
-    if(!stage||!page){ return false; }
+    const body=document.body;
+    if(!page){
+        if(body){ body.classList.remove("v174-battle-reading-open"); }
+        return false;
+    }
 
     const statusDetail=page.querySelector(".battle-status-detail-modal:not([hidden])");
     const sideDrawer=page.querySelector(".battle-insight-drawer.open");
     const battleInfo=page.querySelector(".battle-info-region.is-expanded");
-    const active=!!(statusDetail||sideDrawer||battleInfo);
+    const active=page.classList.contains("active")&&!!(statusDetail||sideDrawer||battleInfo);
 
-    stage.classList.toggle("battle-ui-priority",active);
-    if(document.body){ document.body.classList.toggle("v174-battle-reading-open",active); }
+    if(stage){ stage.classList.remove("battle-ui-priority"); }
+    if(body){ body.classList.toggle("v174-battle-reading-open",active); }
     return active;
 
 }

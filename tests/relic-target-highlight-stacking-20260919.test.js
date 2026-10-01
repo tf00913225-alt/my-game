@@ -5,6 +5,7 @@ const fs=require("node:fs");
 
 const relic=fs.readFileSync("js/60-team-relic-system.js","utf8");
 const relicCss=fs.readFileSync("css/55-team-relic-system.css","utf8");
+const mainCss=fs.readFileSync("css/00-main.css","utf8");
 const legacyBattleCss=fs.readFileSync("css/12-stage-v45-battle-black-overlay-skill-text.css","utf8");
 const vfxCss=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");
 
@@ -21,29 +22,27 @@ assert.match(
 );
 assert.match(
   relic,
-  /function relicTargetGeometries\(side,index\)[\s\S]*getUnitGeometry[\s\S]*highlightRects/,
-  "all target modes must resolve through canonical battlefield Unit geometry"
+  /function revealRelicTargets\(target\)[\s\S]*getUnitGeometry[\s\S]*appendRelicProjection/,
+  "all target modes must resolve through canonical battlefield projection geometry"
 );
 assert.match(
   relic,
-  /team-relic-mask-holes[\s\S]*createElementNS\(namespace,"rect"\)/,
-  "relic focus must use viewport mask apertures instead of live-DOM elevation"
+  /function appendRelicProjection\(layer,geometry,overlayRect\)[\s\S]*artworkProjection[\s\S]*hpProjection[\s\S]*spProjection/,
+  "relic focus must project transparent artwork and resource bars instead of elevating live DOM"
 );
 assert.doesNotMatch(relic,/relicTargetLayer\(|team-relic-battle-target-layer/,
   "legacy target stacking carrier owner must remain retired");
 
-const rootZ=Number((relicCss.match(/team-relic-battle-presentation\{[^}]*z-index:(\d+)/)||[])[1]);
-const vfxZ=Number((vfxCss.match(/\.v143-skill-stage\{[^}]*z-index:(\d+)/)||[])[1]);
-const activeRelicVfxZ=Number((relicCss.match(/team-relic-cinematic-active > \.v143-skill-stage\{z-index:(\d+)!important/ )||[])[1]);
-
-assert.equal(rootZ,18090,"relic viewport presentation layer changed unexpectedly");
-assert.equal(vfxZ,16000,"formal V143 base layer changed unexpectedly");
-assert.equal(activeRelicVfxZ,18130,"formal V143 relic cast must rise above the cinematic viewport");
-assert.ok(rootZ<activeRelicVfxZ,"formal relic VFX must paint above the viewport mask/identity surface");
+assert.match(relicCss,/body > \.team-relic-battle-presentation\{[\s\S]*?position:fixed/,
+  "relic cinematic remains a document-level surface");
+assert.match(vfxCss,/\.v143-skill-stage\{[\s\S]*?position:fixed/,
+  "formal VFX remains a document-level surface");
+assert.match(mainCss,/body\.v174-battle-reading-open > \.v143-skill-stage,[\s\S]*?body\.v174-battle-reading-open > \.team-relic-battle-presentation,[\s\S]*?visibility:hidden !important;[\s\S]*?opacity:0 !important;/,
+  "semantic reading state, not cross-context z-index arithmetic, must suppress both relic and VFX paint");
 
 assert.doesNotMatch(relic,/team-relic-battle-target-outline/,"Relic must not create a full Unit outline");
 assert.doesNotMatch(relicCss,/team-relic-battle-target-outline/,"Relic CSS must not retain the retired outline owner");
-assert.match(relic,/highlightRect|highlightRects/,"Relic target geometry must expose portrait/HP highlight data");
+assert.match(relic,/artworkProjection|hpProjection/,"Relic target geometry must expose artwork/HP projection data");
 
 const presentationStart=relic.indexOf("const RELIC_VFX_PRESENTATION=Object.freeze({");
 const presentationEnd=relic.indexOf("const RELIC_BATTLE_ICON_PATHS=Object.freeze({");
@@ -73,4 +72,4 @@ assert.match(
   "every relic must use the same resolved target for highlight and formal VFX"
 );
 
-console.log("✓ relic target stacking, all 20 target modes and VFX layer ordering passed");
+console.log("✓ relic target projection, all 20 target modes and reading-layer contract passed");
