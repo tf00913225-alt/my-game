@@ -123,7 +123,12 @@ export async function battleSkillTouchFloodQa(rawClient,artifactDir,{animationOn
             checks.allTargetDeclarations.push({skill,returnAndReselect:true,confirmationSubmittedOnce:true});
         }
 
-        console.log('Battle touch/flood QA: native input and formal support declarations passed; warming flood atlas');
+        // Real confirmation schedules the next combatant. Clear that fixture timer
+        // before measuring animation geometry so later screenshots stay on this turn.
+        await client.eval(`__touchQaReset('waterBall');true`);
+        const isolated=await client.eval(`({advance:battleAdvanceScheduled,timer:battleAdvanceTimeoutId,phase:battlePhase})`);
+        assert.deepEqual(isolated,{advance:false,timer:null,phase:'declare'});
+        console.log('Battle touch/flood QA: native input and formal support/all-target declarations passed; warming flood atlas');
         await client.eval(`(async()=>{const im=new Image();im.src=v143SkillAnimationManifest.floodBeast.sprite.src;await im.decode();v142SkillAnimationDirector.play({id:'floodBeast',element:'water',category:'magic',targetType:'single',duration:1350,resolveDuration:1350},{side:'player',actorIndex:0,targetSide:'monster',targetId:currentBattleMonsters[0],targetIds:[currentBattleMonsters[0]]});await new Promise(r=>setTimeout(r,100));v142SkillAnimationDirector.dispose();return true;})()`);
         const enemyIds=await client.eval(`currentBattleMonsters.filter(i=>monsters[i]?.alive&&document.getElementById('battleMonster'+i)).slice(0,3)`);
         const slots=await client.eval(`FourSymbolsBattlefieldSlots.allySlots.slice(0,3)`);
