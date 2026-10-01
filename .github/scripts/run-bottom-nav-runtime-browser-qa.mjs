@@ -121,17 +121,19 @@ const MEASURE=`(()=>{
 const SCENARIOS=[['home',"showPage('home')"],['training',"showPage('training')"],['patrol',"enterMap()"],['dungeon',"leaveMap();vGameplayOpenDailyDungeons()"],['gameplay',"showPage('gameplay')"],['boss',"vGameplayOpenBoss()"],['tower',"vGameplayOpenTower()"],['abyss',"vGameplayOpenAbyss()"]];
 async function settle(client){await client.eval('new Promise(r=>setTimeout(r,150))');}
 async function swipe(client,x,y){
+ console.log('Touch QA start',x,y);
  await client.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y}]});
  for(let i=1;i<=8;i++){await client.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x,y:y-i*12}]});await new Promise(r=>setTimeout(r,20));}
  await client.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await settle(client);
 }
 async function runViewport(chrome,url,width,height){
  const profile=fs.mkdtempSync(path.join(os.tmpdir(),'nav-runtime-qa-')),port=9600+Math.floor(Math.random()*300);
- const proc=spawn(chrome,['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'],{stdio:'ignore'});
+ const proc=spawn(chrome,['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--disable-background-timer-throttling','--disable-renderer-backgrounding','--disable-backgrounding-occluded-windows','--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'],{stdio:'ignore'});
  let client;const evidence={viewport:{width,height},rows:[]};
  try{
   const page=(await waitJson(`http://127.0.0.1:${port}/json/list`)).find(x=>x.type==='page');client=new Cdp(page.webSocketDebuggerUrl);
   await client.send('Page.enable');await client.send('Runtime.enable');
+  await client.send('Emulation.setFocusEmulationEnabled',{enabled:true});
   await client.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true});
   await client.send('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:1});
   await client.send('Page.navigate',{url});await new Promise(r=>setTimeout(r,300));evidence.startup=await client.eval(PREPARE);
