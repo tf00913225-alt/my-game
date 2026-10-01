@@ -1,3 +1,11 @@
+## 2026-10-01 — Bottom navigation / Home scroll verified on dev
+- PR #727 merged to dev `5c2330b79e807ce92f5971488b1d9f12342521e6`; main unchanged. Source/build sync and whitespace checks PASS.
+- Exact PR head `c8c215e8f8d2089322fd29dbdac2f12682396a3b`, CI run `36821241683`: all required checks PASS; mobile navigation/home artifact `11143767076` passed all three viewports and 48 context rows.
+- Dev CI/deployment run `36821889706` PASS; actual release-manifest SHA matches dev. Eight live UI contexts share `#bottomNav` / `.native-bottom-nav-layer` in `#game-overlay-layer`: 526.5×105.3, bottom 936, five columns 105.3, icon frames 87.75 (screen pixels at current browser scale).
+- Home clientHeight/scrollHeight 653/653, scrollTop/document/viewport remain 0 after scrolling input; formal skill panel still scrolls (mobile native touch 94/87/83; deployed UI 936).
+- Four requirement rows VERIFIED. Full owner classification, lifecycle/fixture limitations and compatibility retirement condition: `docs/qa/2026-10-01-bottom-nav-home-scroll-convergence.md`.
+- This follow-up is documentation-only; its own latest-head CI and subsequent deployment must pass before final closeout.
+
 ## 2026-10-01 — Navigation continuation against latest dev
 
 - PR #727 continues without rebase/force push; latest dev `67ebf68350f67f41b62cea21829d319a45f1281f` is merged into the candidate. Shared artifacts are regenerated from both source changes.
