@@ -19,16 +19,17 @@ function findChrome(){
     throw new Error("Headless Chrome/Chromium is required for Fire Tower browser QA.");
 }
 
-const element=process.env.TOWER_QA_ELEMENT==="wind"?"wind":"fire";
+const requestedElement=String(process.env.TOWER_QA_ELEMENT||"fire").toLowerCase();
+const element=["fire","wind","earth"].includes(requestedElement)?requestedElement:"fire";
 // Tower element follows the actual UTC week; pin this fixture to a matching week.
-const fixtureNow=element==="wind"?"2026-10-19T12:00:00.000Z":"2026-10-26T12:00:00.000Z";
+const fixtureNow={fire:"2026-10-26T12:00:00.000Z",earth:"2026-10-05T12:00:00.000Z",wind:"2026-10-19T12:00:00.000Z"}[element];
 const registry=read("config/monster-portrait-registry.json");
 const v154=escapeScript(read("js/45-v154-dev-fixes.js"));
 const tower=escapeScript(read("js/gameplay-boss-tower-system.js"));
 const expected=JSON.parse(registry).assetPool.entries
     .filter(entry=>entry.element===element&&entry.status==="adopted")
     .reduce((map,entry)=>{map[entry.assetId]=entry;return map;},{});
-const floors=[1,5,10,50,100];
+const floors=element==="earth"?[1,5,10,50,90]:[1,5,10,50,100];
 const fixture=[
 "<!doctype html><meta charset=\"utf-8\"><div id=\"battleMonsterArea\"></div><pre id=\"result\"></pre>",
 "<script>",
@@ -72,7 +73,8 @@ try{
             expectedNames[frame.floor]=expectedNames[frame.floor]||card.name;
         });
     }
-    assert.equal(expectedNames[100],element==="wind"?"風極真君":"焰冠獅魁");
+    const finalExpected={fire:"焰冠獅魁",wind:"風極真君",earth:"磐山帝君"}[element];
+    assert.equal(expectedNames[element==="earth"?90:100],finalExpected);
     console.log("Fire Tower identity / first-frame browser QA passed:",JSON.stringify(expectedNames));
 }finally{
     try{fs.unlinkSync(FIXTURE);}catch(_){}

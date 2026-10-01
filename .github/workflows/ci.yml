@@ -324,6 +324,7 @@ jobs:
           trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
           DEV_BASE_URL=http://127.0.0.1:4174 node .github/scripts/run-fire-tower-identity-first-frame-browser-qa.mjs
           TOWER_QA_ELEMENT=wind DEV_BASE_URL=http://127.0.0.1:4174 node .github/scripts/run-fire-tower-identity-first-frame-browser-qa.mjs
+          TOWER_QA_ELEMENT=earth DEV_BASE_URL=http://127.0.0.1:4174 node .github/scripts/run-fire-tower-identity-first-frame-browser-qa.mjs
 
       - name: Upload Fire Tower identity and first-frame browser evidence
         if: always() && steps.fire_tower_identity_browser.outcome != 'skipped'
@@ -333,6 +334,7 @@ jobs:
           path: |
             artifacts/browser-qa/fire-tower-identity-first-frame-browser-qa.json
             artifacts/browser-qa/wind-tower-identity-first-frame-browser-qa.json
+            artifacts/browser-qa/earth-tower-identity-first-frame-browser-qa.json
           if-no-files-found: error
           retention-days: 90
 

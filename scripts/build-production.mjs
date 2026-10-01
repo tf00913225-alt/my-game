@@ -332,11 +332,11 @@ const portraitFields=Object.fromEntries(portraitRegistry.tupleSchema.map((field,
 const adoptedPoolPortraits=element=>portraitRegistry.assetPool.entries
     .filter(entry=>entry.element===element&&entry.status==="adopted")
     .map(entry=>({assetId:entry.assetId,displayName:entry.displayName,path:entry.runtimePath}));
-const existingWaterWildPortraits=(portraitRegistry.groups.wild||[])
-    .filter(row=>row[portraitFields.element]==="water"&&row[portraitFields.status]==="existing")
+const existingWildPortraits=element=>(portraitRegistry.groups.wild||[])
+    .filter(row=>row[portraitFields.element]===element&&row[portraitFields.status]==="existing")
     .map(row=>({assetId:row[portraitFields.portraitKey],displayName:row[portraitFields.name],path:row[portraitFields.path]}));
-const runtimePortraits=Object.fromEntries(["fire","water","wind"].map(element=>[element,
-    [...adoptedPoolPortraits(element),...(element==="water"?existingWaterWildPortraits:[])]
+const runtimePortraits=Object.fromEntries(["fire","water","wind","earth"].map(element=>[element,
+    [...adoptedPoolPortraits(element),...(["water","earth"].includes(element)?existingWildPortraits(element):[])]
         .map(entry=>{
             const content=bytes(entry.path);
             return {...entry,sha256:hash(content),bytes:content.length,decode:true};

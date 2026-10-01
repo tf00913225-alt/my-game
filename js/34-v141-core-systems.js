@@ -64,16 +64,16 @@
     ===================================================== */
     function getWildZoneSpecs(){
         return [
-            [typeof forestMonsters!=="undefined"?forestMonsters:null,3,"風芽魈","苔岩獸",WILD_ZONE_STRENGTHS[0]],
-            [typeof desertMonsters!=="undefined"?desertMonsters:null,17,"疾角妖","岩甲蠍",WILD_ZONE_STRENGTHS[1]],
-            [typeof iceMountainMonsters!=="undefined"?iceMountainMonsters:null,25,"霧鬃狼","凍岩獸",WILD_ZONE_STRENGTHS[2]],
-            [typeof zone4Monsters!=="undefined"?zone4Monsters:null,35,"旋風鬼","熔岩石怪",WILD_ZONE_STRENGTHS[3]],
-            [typeof zone5Monsters!=="undefined"?zone5Monsters:null,45,"青嵐虎","山岳巨獸",WILD_ZONE_STRENGTHS[4]],
-            [typeof zone6Monsters!=="undefined"?zone6Monsters:null,55,"逐風客","岩鎧修羅",WILD_ZONE_STRENGTHS[5]],
-            [typeof zone7Monsters!=="undefined"?zone7Monsters:null,65,"嵐鎧衛","岳魂魔君",WILD_ZONE_STRENGTHS[6]],
-            [typeof zone8Monsters!=="undefined"?zone8Monsters:null,75,"翼影魔","岩岳龍衛",WILD_ZONE_STRENGTHS[7]],
-            [typeof zone9Monsters!=="undefined"?zone9Monsters:null,85,"風魘使","虛空岩靈",WILD_ZONE_STRENGTHS[8]],
-            [typeof zone10Monsters!=="undefined"?zone10Monsters:null,95,"蒼羽尊","終焉地神",WILD_ZONE_STRENGTHS[9]]
+            [typeof forestMonsters!=="undefined"?forestMonsters:null,3,"風芽魈","岩薯卒",WILD_ZONE_STRENGTHS[0]],
+            [typeof desertMonsters!=="undefined"?desertMonsters:null,17,"疾角妖","岩鬃狸",WILD_ZONE_STRENGTHS[1]],
+            [typeof iceMountainMonsters!=="undefined"?iceMountainMonsters:null,25,"霧鬃狼","石鎧象",WILD_ZONE_STRENGTHS[2]],
+            [typeof zone4Monsters!=="undefined"?zone4Monsters:null,35,"旋風鬼","礦鎬鬼",WILD_ZONE_STRENGTHS[3]],
+            [typeof zone5Monsters!=="undefined"?zone5Monsters:null,45,"青嵐虎","枯根妖",WILD_ZONE_STRENGTHS[4]],
+            [typeof zone6Monsters!=="undefined"?zone6Monsters:null,55,"逐風客","石鬃狼",WILD_ZONE_STRENGTHS[5]],
+            [typeof zone7Monsters!=="undefined"?zone7Monsters:null,65,"嵐鎧衛","岩爪貛",WILD_ZONE_STRENGTHS[6]],
+            [typeof zone8Monsters!=="undefined"?zone8Monsters:null,75,"翼影魔","礦牙妖",WILD_ZONE_STRENGTHS[7]],
+            [typeof zone9Monsters!=="undefined"?zone9Monsters:null,85,"風魘使","荊根魔",WILD_ZONE_STRENGTHS[8]],
+            [typeof zone10Monsters!=="undefined"?zone10Monsters:null,95,"蒼羽尊","山岩巨人",WILD_ZONE_STRENGTHS[9]]
         ].filter(entry=>Array.isArray(entry[0]));
     }
 
@@ -94,7 +94,7 @@
     }
 
     function addWindAndEarthWildMonsters(){
-        getWildZoneSpecs().forEach(([zone,level,windName,earthName,strengthMultiplier])=>{
+        getWildZoneSpecs().forEach(([zone,level,windName,earthName,strengthMultiplier],zoneIndex)=>{
             zone.forEach(monster=>{
                 if(monster){
                     monster.rank="regular";
@@ -114,6 +114,7 @@
                     makeZoneMonster(earthName,level,"earth","regular"),
                     strengthMultiplier
                 );
+                monster.portraitKey="wild.zone-"+String(zoneIndex+1).padStart(2,"0")+".earth-01";
                 monster.v141CurveEliteRate=WILD_ELITE_RATE;
                 zone.push(monster);
             }

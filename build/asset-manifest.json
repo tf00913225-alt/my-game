@@ -49,7 +49,7 @@
       },
       "gameplay-core": {
         "scripts": [
-          "build/gameplay-core-primary.f2c67a156aef.js",
+          "build/gameplay-core-primary.eb5714591dbb.js",
           "build/gameplay-core-secondary.2216f40bf3ae.js"
         ],
         "styles": [
@@ -102,7 +102,7 @@
       },
       "feature-boss-relic": {
         "scripts": [
-          "build/feature-boss-relic.75e9b734744b.js",
+          "build/feature-boss-relic.d3b7dab211b1.js",
           "build/feature-relic-progression.87f6a83606ad.js"
         ],
         "styles": [
@@ -794,9 +794,9 @@
         "decode": false
       },
       {
-        "path": "build/gameplay-core-primary.f2c67a156aef.js",
-        "sha256": "f2c67a156aef",
-        "bytes": 650290,
+        "path": "build/gameplay-core-primary.eb5714591dbb.js",
+        "sha256": "eb5714591dbb",
+        "bytes": 650380,
         "priority": "P2",
         "type": "script",
         "decode": false
@@ -818,8 +818,8 @@
         "decode": false
       }
     ],
-    "manifestHash": "527adce4150f",
-    "totalBytes": 21578981,
+    "manifestHash": "cd3b88111b11",
+    "totalBytes": 21579071,
     "totalResources": 78
   },
   "assets": {
@@ -831,9 +831,9 @@
       "sha256": "bda61f0ab278",
       "bytes": 995495
     },
-    "build/gameplay-core-primary.f2c67a156aef.js": {
-      "sha256": "f2c67a156aef",
-      "bytes": 650290
+    "build/gameplay-core-primary.eb5714591dbb.js": {
+      "sha256": "eb5714591dbb",
+      "bytes": 650380
     },
     "build/gameplay-core-secondary.2216f40bf3ae.js": {
       "sha256": "2216f40bf3ae",
@@ -847,9 +847,9 @@
       "sha256": "3d158554cc2a",
       "bytes": 50656
     },
-    "build/feature-boss-relic.75e9b734744b.js": {
-      "sha256": "75e9b734744b",
-      "bytes": 90387
+    "build/feature-boss-relic.d3b7dab211b1.js": {
+      "sha256": "d3b7dab211b1",
+      "bytes": 91282
     },
     "build/feature-relic-progression.87f6a83606ad.js": {
       "sha256": "87f6a83606ad",
@@ -1664,6 +1664,320 @@
         "path": "assets/monsters/tower/wind-pool/mon-wind-miniboss-010.webp",
         "sha256": "0e6efbbda8b7",
         "bytes": 2035248,
+        "decode": true
+      }
+    ],
+    "earth": [
+      {
+        "assetId": "MON_EARTH_NORMAL_001",
+        "displayName": "岩斧象",
+        "path": "assets/monsters/tower/earth-pool/mon-earth-normal-001.webp",
+        "sha256": "502bc56d3cd8",
+        "bytes": 1429168,
+        "decode": true
+      },
+      {
+        "assetId": "MON_EARTH_NORMAL_002",
+        "displayName": "磐甲蜥",
+        "path": "assets/monsters/tower/earth-pool/mon-earth-normal-002.webp",
+        "sha256": "36727f31d920",
+        "bytes": 1404302,
+        "decode": true
+      },
+      {
+        "assetId": "MON_EARTH_NORMAL_003",
+        "displayName": "沙鎧螳",
+        "path": "assets/monsters/tower/earth-pool/mon-earth-normal-003.webp",
+        "sha256": "ec75b4b5fc8b",
+        "bytes": 1276822,
+        "decode": true
+      },
+      {
+        "assetId": "MON_EARTH_NORMAL_004",
+        "displayName": "地行客",
+        "path": "assets/monsters/tower/earth-pool/mon-earth-normal-004.webp",
+        "sha256": "d6b53c39f4af",
+        "bytes": 1006704,
+        "decode": true
+      },
+      {
+        "assetId": "MON_EARTH_NORMAL_005",
+        "displayName": "岩薯力士",
+        "path": "assets/monsters/tower/earth-pool/mon-earth-normal-005.webp",
+        "sha256": "1734381e2a4c",
+        "bytes": 1654752,
+        "decode": true
+      },
+      {
+        "assetId": "MON_EARTH_NORMAL_006",
+        "displayName": "岳槍衛",
+        "path": "assets/monsters/tower/earth-pool/mon-earth-normal-006.webp",
+        "sha256": "c12258d71951",
+        "bytes": 922498,
+        "decode": true
+      },
+      {
+        "assetId": "MON_EARTH_NORMAL_007",
+        "displayName": "岩弓使",
+        "path": "assets/monsters/tower/earth-pool/mon-earth-normal-007.webp",
+        "sha256": "800ca96593ef",
+        "bytes": 902382,
+        "decode": true
+      },
+      {
+        "assetId": "MON_EARTH_NORMAL_008",
+        "displayName": "坤斧姬",
+        "path": "assets/monsters/tower/earth-pool/mon-earth-normal-008.webp",
+        "sha256": "d875820d4daf",
+        "bytes": 967068,
+        "decode": true
+      },
+      {
+        "assetId": "MON_EARTH_NORMAL_009",
+        "displayName": "菌冠妖",
+        "path": "assets/monsters/tower/earth-pool/mon-earth-normal-009.webp",
+        "sha256": "be1240e4f8d5",
+        "bytes": 1429660,
+        "decode": true
+      },
+      {
+        "assetId": "MON_EARTH_NORMAL_010",
+        "displayName": "石獅靈",
+        "path": "assets/monsters/tower/earth-pool/mon-earth-normal-010.webp",
+        "sha256": "3683819187f5",
+        "bytes": 1460758,
+        "decode": true
+      },
+      {
+        "assetId": "MON_EARTH_ELITE_001",
+        "displayName": "岩薯戰將",
+        "path": "assets/monsters/tower/earth-pool/mon-earth-elite-001.webp",
+        "sha256": "8f0bbadf77ed",
+        "bytes": 1951264,
+        "decode": true
+      },
+      {
+        "assetId": "MON_EARTH_ELITE_002",
+        "displayName": "地角魔",
+        "path": "assets/monsters/tower/earth-pool/mon-earth-elite-002.webp",
+        "sha256": "3cc6773493f5",
+        "bytes": 1646924,
+        "decode": true
+      },
+      {
+        "assetId": "MON_EARTH_ELITE_003",
+        "displayName": "棘木妖王",
+        "path": "assets/monsters/tower/earth-pool/mon-earth-elite-003.webp",
+        "sha256": "cd6e16188220",
+        "bytes": 1426144,
+        "decode": true
+      },
+      {
+        "assetId": "MON_EARTH_ELITE_004",
+        "displayName": "坤術師",
+        "path": "assets/monsters/tower/earth-pool/mon-earth-elite-004.webp",
+        "sha256": "7c7f193cff1d",
+        "bytes": 1292696,
+        "decode": true
+      },
+      {
+        "assetId": "MON_EARTH_ELITE_005",
+        "displayName": "岩角羊",
+        "path": "assets/monsters/tower/earth-pool/mon-earth-elite-005.webp",
+        "sha256": "0ca84db1ecbe",
+        "bytes": 1631348,
+        "decode": true
+      },
+      {
+        "assetId": "MON_EARTH_ELITE_006",
+        "displayName": "玄岩象將",
+        "path": "assets/monsters/tower/earth-pool/mon-earth-elite-006.webp",
+        "sha256": "b97bfffc181b",
+        "bytes": 1495326,
+        "decode": true
+      },
+      {
+        "assetId": "MON_EARTH_ELITE_007",
+        "displayName": "地刃姬",
+        "path": "assets/monsters/tower/earth-pool/mon-earth-elite-007.webp",
+        "sha256": "b2c938f47e6e",
+        "bytes": 1062822,
+        "decode": true
+      },
+      {
+        "assetId": "MON_EARTH_ELITE_008",
+        "displayName": "磐紋虎",
+        "path": "assets/monsters/tower/earth-pool/mon-earth-elite-008.webp",
+        "sha256": "0e22f22a1fe5",
+        "bytes": 1914548,
+        "decode": true
+      },
+      {
+        "assetId": "MON_EARTH_ELITE_009",
+        "displayName": "岩骨巫",
+        "path": "assets/monsters/tower/earth-pool/mon-earth-elite-009.webp",
+        "sha256": "910cfc20af93",
+        "bytes": 1468288,
+        "decode": true
+      },
+      {
+        "assetId": "MON_EARTH_ELITE_010",
+        "displayName": "沙甲刀客",
+        "path": "assets/monsters/tower/earth-pool/mon-earth-elite-010.webp",
+        "sha256": "008c43650d45",
+        "bytes": 1818218,
+        "decode": true
+      },
+      {
+        "assetId": "MON_EARTH_MINIBOSS_001",
+        "displayName": "撼地魔王",
+        "path": "assets/monsters/tower/earth-pool/mon-earth-miniboss-001.webp",
+        "sha256": "8ecd1a428e04",
+        "bytes": 1866056,
+        "decode": true
+      },
+      {
+        "assetId": "MON_EARTH_MINIBOSS_002",
+        "displayName": "玄甲龍王",
+        "path": "assets/monsters/tower/earth-pool/mon-earth-miniboss-002.webp",
+        "sha256": "12b2cf4be200",
+        "bytes": 1911712,
+        "decode": true
+      },
+      {
+        "assetId": "MON_EARTH_MINIBOSS_003",
+        "displayName": "坤靈聖女",
+        "path": "assets/monsters/tower/earth-pool/mon-earth-miniboss-003.webp",
+        "sha256": "a91e2cfca30a",
+        "bytes": 1594494,
+        "decode": true
+      },
+      {
+        "assetId": "MON_EARTH_MINIBOSS_004",
+        "displayName": "岩臂猿皇",
+        "path": "assets/monsters/tower/earth-pool/mon-earth-miniboss-004.webp",
+        "sha256": "f38fa81fece8",
+        "bytes": 1815680,
+        "decode": true
+      },
+      {
+        "assetId": "MON_EARTH_MINIBOSS_005",
+        "displayName": "山靈獸王",
+        "path": "assets/monsters/tower/earth-pool/mon-earth-miniboss-005.webp",
+        "sha256": "764cf1a423e9",
+        "bytes": 1796564,
+        "decode": true
+      },
+      {
+        "assetId": "MON_EARTH_MINIBOSS_006",
+        "displayName": "萬木地尊",
+        "path": "assets/monsters/tower/earth-pool/mon-earth-miniboss-006.webp",
+        "sha256": "3811b1eebad2",
+        "bytes": 2072394,
+        "decode": true
+      },
+      {
+        "assetId": "MON_EARTH_MINIBOSS_007",
+        "displayName": "鎮岳武尊",
+        "path": "assets/monsters/tower/earth-pool/mon-earth-miniboss-007.webp",
+        "sha256": "5085ea56d934",
+        "bytes": 1689816,
+        "decode": true
+      },
+      {
+        "assetId": "MON_EARTH_MINIBOSS_008",
+        "displayName": "坤天戰聖",
+        "path": "assets/monsters/tower/earth-pool/mon-earth-miniboss-008.webp",
+        "sha256": "fe995c0a561d",
+        "bytes": 1782912,
+        "decode": true
+      },
+      {
+        "assetId": "MON_EARTH_MINIBOSS_009",
+        "displayName": "磐山帝君",
+        "path": "assets/monsters/tower/earth-pool/mon-earth-miniboss-009.webp",
+        "sha256": "02ce60d15a6e",
+        "bytes": 1980396,
+        "decode": true
+      },
+      {
+        "assetId": "wild.zone-01.earth-01",
+        "displayName": "岩薯卒",
+        "path": "assets/monsters/wild/zone-01/earth-01.webp",
+        "sha256": "3f437204e0ce",
+        "bytes": 1457552,
+        "decode": true
+      },
+      {
+        "assetId": "wild.zone-02.earth-01",
+        "displayName": "岩鬃狸",
+        "path": "assets/monsters/wild/zone-02/earth-01.webp",
+        "sha256": "6ac2c95b79c4",
+        "bytes": 1303958,
+        "decode": true
+      },
+      {
+        "assetId": "wild.zone-03.earth-01",
+        "displayName": "石鎧象",
+        "path": "assets/monsters/wild/zone-03/earth-01.webp",
+        "sha256": "2f34ad587fe2",
+        "bytes": 1535168,
+        "decode": true
+      },
+      {
+        "assetId": "wild.zone-04.earth-01",
+        "displayName": "礦鎬鬼",
+        "path": "assets/monsters/wild/zone-04/earth-01.webp",
+        "sha256": "61455788c926",
+        "bytes": 1352582,
+        "decode": true
+      },
+      {
+        "assetId": "wild.zone-05.earth-01",
+        "displayName": "枯根妖",
+        "path": "assets/monsters/wild/zone-05/earth-01.webp",
+        "sha256": "ab7c26a7667f",
+        "bytes": 1453254,
+        "decode": true
+      },
+      {
+        "assetId": "wild.zone-06.earth-01",
+        "displayName": "石鬃狼",
+        "path": "assets/monsters/wild/zone-06/earth-01.webp",
+        "sha256": "7609c2d4c3ea",
+        "bytes": 1523012,
+        "decode": true
+      },
+      {
+        "assetId": "wild.zone-07.earth-01",
+        "displayName": "岩爪貛",
+        "path": "assets/monsters/wild/zone-07/earth-01.webp",
+        "sha256": "124aa08dc3e7",
+        "bytes": 1372712,
+        "decode": true
+      },
+      {
+        "assetId": "wild.zone-08.earth-01",
+        "displayName": "礦牙妖",
+        "path": "assets/monsters/wild/zone-08/earth-01.webp",
+        "sha256": "5dd882515eb1",
+        "bytes": 1154632,
+        "decode": true
+      },
+      {
+        "assetId": "wild.zone-09.earth-01",
+        "displayName": "荊根魔",
+        "path": "assets/monsters/wild/zone-09/earth-01.webp",
+        "sha256": "5c23498c58d3",
+        "bytes": 1309962,
+        "decode": true
+      },
+      {
+        "assetId": "wild.zone-10.earth-01",
+        "displayName": "山岩巨人",
+        "path": "assets/monsters/wild/zone-10/earth-01.webp",
+        "sha256": "d0d1dbe8d6f5",
+        "bytes": 1429472,
         "decode": true
       }
     ]
