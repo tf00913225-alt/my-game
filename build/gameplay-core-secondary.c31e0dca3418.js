@@ -1682,6 +1682,7 @@
         setBattleAllyTargetSelectionMode=function(actionType){
             const result=previousSetAllyTargets.apply(this,arguments);
             markReviveTargets(actionType);
+            if(actionType==="purifyMind"){ markPurifyMindDualTargets(); }
             return result;
         };
     }
@@ -1707,21 +1708,6 @@
         if(prompt){ prompt.textContent="選擇 [淨心訣] 的我方或敵方目標"; }
         const targetText=document.getElementById("battleTarget");
         if(targetText){ targetText.textContent="目標：請選擇我方或敵方角色"; }
-    }
-
-    if(typeof prepareAction==="function"){
-        const previousPrepareAction=prepareAction;
-        prepareAction=function(type){
-            const result=previousPrepareAction.apply(this,arguments);
-            if(
-                type==="purifyMind"&&
-                typeof actionReady!=="undefined"&&actionReady&&
-                typeof pendingAction!=="undefined"&&pendingAction==="purifyMind"
-            ){
-                markPurifyMindDualTargets();
-            }
-            return result;
-        };
     }
 
     if(typeof clearBattleTargetSelectionMode==="function"){

@@ -8796,51 +8796,7 @@
         }
     });
 
-    /* =====================================================
-       Additional characters can manually cast support skills
-    ===================================================== */
-    if(typeof prepareAction==="function"){
-        const originalPrepareAction=prepareAction;
-        prepareAction=function(type){
-            const skill=skillDatabase[type];
-            if(
-                activeBattleCharacterIndex<=0 ||
-                !skill ||
-                !["buff","heal","revive"].includes(skill.category)
-            ){
-                return originalPrepareAction.apply(this,arguments);
-            }
-            const character=getPartyCharacterByIndex(activeBattleCharacterIndex);
-            const autoOn=getPartyAutoConfig(activeBattleCharacterIndex).enabled;
-            if(!battleActive||!character||character.hp<=0||autoOn||actionReady){ return; }
-            const spCost=skill.spCost!==undefined?skill.spCost:skill.cost;
-            if(character.sp<spCost){
-                addBattleLog("SP不足，無法使用"+skill.name);
-                return;
-            }
-
-            if(skill.targetType==="ally"||skill.targetType==="allyTri"||skill.targetType==="deadAlly"){
-                const hasTarget=[0,1,2].some(index=>isValidAllyTargetForSkill(
-                    skill,getBattleCharacterByIndex(index),index
-                ));
-                if(!hasTarget){
-                    addBattleLog(skill.targetType==="deadAlly"?"目前沒有陣亡的隊友可供復活。":"目前沒有可選擇的友方目標。");
-                    return;
-                }
-                actionReady=true;
-                pendingAction=type;
-                closeMenus();
-                setBattleAllyTargetSelectionMode(type);
-                return;
-            }
-
-            actionReady=true;
-            queuedPlayerActions[activeBattleCharacterIndex]={action:type,target:null,targetAlly:null};
-            closeMenus();
-            updateUI();
-            finishPlayerAction();
-        };
-    }
+    /* Manual support declarations now belong to 00-main::prepareAction. */
 
     /* =====================================================
        Card effects (legacy visual renderer retired; data/status only)
@@ -12269,7 +12225,9 @@
         iceSpin:{hit:DEFAULT_HIT,deferredStatusTypes:["frostbite"],sprite:castSheet("assets/vfx/water/frost-spinning-slash-vfx.png?v=166","single",{scale:1.95,maxSize:235})},
         frostCrush:{hit:DEFAULT_HIT,deferredStatusTypes:["frostbite"],sprite:castSheet("assets/vfx/water/freeze-heavy-strike-vfx.png?v=166","single",{scale:2.35,maxSize:290})},
         waterBall:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/water-orb-vfx.png?v=173.19","group",{scale:1.22,minSize:150,maxSize:500,alignToSlots:true})},
-        floodBeast:{hit:DEFAULT_HIT,deferredStatusTypes:["frostbite"],sprite:castSheet("assets/vfx/water/tidal-beast-vfx.png?v=166","targetTrajectory",{travelToTargets:true,scale:1.85,minSize:175,maxSize:250})},
+        // Reviewed full sheet: 1-2 cast; 3-5 face right; 6 faces down;
+        // 7-12 impact/dissipation stay upright. Hit frame/timing is unchanged.
+        floodBeast:{hit:DEFAULT_HIT,deferredStatusTypes:["frostbite"],sprite:castSheet("assets/vfx/water/tidal-beast-vfx.png?v=166","targetTrajectory",{travelToTargets:true,scale:1.85,minSize:175,maxSize:250,motionPhases:{flightStart:2,turnFrame:5,impactStart:6,flightSourceAngle:0,turnSourceAngle:90}})},
         iceArrowRain:{hit:DEFAULT_HIT,deferredStatusTypes:["frostbite"],sprite:castSheet("assets/vfx/water/frost-arrow-rain-vfx.png?v=173.19","battlefield",{fixedFormation:true,coverageScale:1.22,minWidth:140,minHeight:140})},
         freeze:{hit:DEFAULT_HIT,deferredStatusTypes:["freeze"],sprite:castSheet("assets/vfx/water/freeze-cast-vfx.png?v=166","single",{scale:2.2,maxSize:270})},
         healSpell:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/water-heal-vfx.png?v=166","single",{scale:2.05,maxSize:250})},
@@ -13221,6 +13179,31 @@
         return clamp(base*scale,minSize,maxSize);
     }
 
+    function placePhasedMotion(current,node,sprite,dx,dy,angle){
+        const phases=sprite.motionPhases;
+        const start=phases.flightStart/sprite.frames;
+        const turn=phases.turnFrame/sprite.frames;
+        const impact=phases.impactStart/sprite.frames;
+        const transform=(progress,rotation)=>"translate(calc(-50% + "+dx*progress+"px),calc(-50% + "+dy*progress+"px)) rotate("+rotation+"deg)";
+        const turnProgress=(turn-start)/(impact-start);
+        const frames=[
+            {offset:0,transform:transform(0,0)},
+            {offset:start,transform:transform(0,0)},
+            {offset:start,transform:transform(0,angle-phases.flightSourceAngle)},
+            {offset:turn,transform:transform(turnProgress,angle-phases.flightSourceAngle)},
+            {offset:turn,transform:transform(turnProgress,angle-phases.turnSourceAngle)},
+            {offset:impact,transform:transform(1,angle-phases.turnSourceAngle)},
+            {offset:impact,transform:transform(1,0)},
+            {offset:1,transform:transform(1,0)}
+        ];
+        node.dataset.motion="phased";
+        // Re-measuring decoded aspect must not restart flight or Frame 1.
+        const elapsed=node.v143MotionAnimation?node.v143MotionAnimation.currentTime:Math.max(0,Date.now()-current.visualStartedAt);
+        if(node.v143MotionAnimation){ node.v143MotionAnimation.cancel(); }
+        node.v143MotionAnimation=node.animate(frames,{duration:current.duration,fill:"both",easing:"linear"});
+        node.v143MotionAnimation.currentTime=elapsed;
+    }
+
     function placeSprite(current,node,index,target){
         const sprite=current.model.sprite;
         const placement=placementFor(current.config,sprite,current.targetType);
@@ -13244,7 +13227,7 @@
             node.dataset.targetIndex=String(index);
             node.dataset.targetIndexes=String(index);
             node.dataset.geometrySlot=target.slot;
-            node.dataset.travel="true";
+            if(!sprite.motionPhases){ node.dataset.travel="true"; }
             node.dataset.travelToTargets="true";
             node.style.left=actor.x+"px";
             node.style.top=actor.y+"px";
@@ -13252,6 +13235,7 @@
             node.style.setProperty("--v143-sprite-dx",target.x-actor.x+"px");
             node.style.setProperty("--v143-sprite-dy",target.y-actor.y+"px");
             node.style.setProperty("--v143-sprite-angle",Math.atan2(target.y-actor.y,target.x-actor.x)*180/Math.PI+"deg");
+            if(sprite.motionPhases){ placePhasedMotion(current,node,sprite,target.x-actor.x,target.y-actor.y,Math.atan2(target.y-actor.y,target.x-actor.x)*180/Math.PI); }
             return;
         }
 
@@ -13416,6 +13400,7 @@
     function cleanupCurrent(current,reason){
         if(!current||current.done){ return; }
         current.done=true;
+        current.spriteNodes.forEach(node=>{ if(node.v143MotionAnimation){ node.v143MotionAnimation.cancel(); } });
         current.targetIndexes.forEach(index=>{
             const card=cardFor(current.targetSide,index);
             if(card&&card.classList){ card.classList.remove("v143-effects-pending"); }

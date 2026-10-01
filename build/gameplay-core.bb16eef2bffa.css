@@ -4226,6 +4226,18 @@
         v143RasterTravel var(--v143-sprite-duration,1200ms) linear var(--v143-sprite-delay,0ms) 1 both;
 }
 
+/* Phased motion belongs to the V143 frame metadata / Web Animations track.
+   CSS owns only raster frame selection and visibility for these sprites. */
+.v143-vfx-sprite.v143-vfx-sprite-active[data-motion="phased"]{
+    animation:
+        v143RasterCastFrames var(--v143-sprite-duration,1200ms) steps(1,end) var(--v143-sprite-delay,0ms) 1 both,
+        v143RasterCastOpacity var(--v143-sprite-duration,1200ms) linear var(--v143-sprite-delay,0ms) 1 both;
+}
+@keyframes v143RasterCastOpacity{
+    0%,100%{opacity:0}
+    2%,97%{opacity:1}
+}
+
 .v143-skill-stage[data-element="fire"] .v143-vfx-sprite{
     filter:drop-shadow(0 0 11px rgba(255,87,25,.9));
 }
