@@ -1,3 +1,14 @@
+## 2026-10-01 — Navigation continuation against latest dev
+
+- PR #727 continues without rebase/force push; latest dev `67ebf68350f67f41b62cea21829d319a45f1281f` is merged into the candidate. Shared artifacts are regenerated from both source changes.
+- `showPage()` and `switchDungeonTab()` call the context projector synchronously; Abyss `refresh()` does the same. Core navMap, gameplay markGameplayNav, and V148 timer/observer navigation synchronization are retired. Existing quest-only wrappers/observer have no navigation responsibility.
+- Browser QA uses formal 24-slot paginated inventory and an actually overflowing skill panel for the single-finger scroll assertion. Final CI/deployed runtime evidence remains pending; no VERIFIED claim.
+
+## 2026-10-01 — Bottom Navigation / Home Scroll Owner Convergence (candidate)
+
+- Base `dev@08d5c3cf6e327e3d9dda033dad4c42b7d66f2d64`; branch `fix/bottom-nav-home-scroll-owner-convergence-20261001`. This is a Convergence/Replacement of the navigation shell and home scroll geometry; `main` remains untouched.
+- Canonical navigation DOM/lifecycle owner: `js/04-stage-v11-native-bottom-nav-runtime.js::FourSymbolsBottomNav`; sole geometry owner: `css/06-stage-v11-native-bottom-nav.css` in the 1080×1920 overlay. `js/42-v148-combat-dungeon-fixes.js::syncContextNavigation()` owns only context selection and items. Legacy `#mapPageNav`, dynamic `#v141DungeonNav`, V13 migration and V143 reparenting are retired, as are their geometry styles and the V30/V31R2 CSS scaling segment. No new temporary wrapper or geometry patch is intended.
+- Home scroll owner remains `#homePage`, now fixed overflow with content geometry compacted in `css/00-main.css` and duplicate bottom-nav reserve removed from `css/19-stage-v54-main-city-moderate-native-scale.css`. Browser measurements and final CI/deployment verification remain pending; this entry is not a VERIFIED claim.
 ## 2026-10-01 — Battle Skill Touch / Flood Beast Direction（IMPLEMENTED candidate）
 
 - Started from live dev `08d5c3cf6e327e3d9dda033dad4c42b7d66f2d64`; incorporated responsive-window dev `8760a89eb505a1c9219dbd698047e1f8344be800` by a normal work-branch merge. No main/dev direct write, rebase or force push.

@@ -1190,7 +1190,7 @@
             !window.v132IsDungeonUsedToday||!window.v132IsDungeonUsedToday(type)
         );
         setNotificationDot(document.getElementById("dungeonNav"),dungeonPending,"副本尚未完成");
-        document.querySelectorAll("#mapPageNav button[aria-label='任務'],#v141DungeonNav button[aria-label='任務']")
+        document.querySelectorAll("#bottomNav button[aria-label='任務']")
             .forEach(button=>setNotificationDot(button,hasQuestNotice,"任務有新進度"));
     }
     window.v141UpdateNotificationDots=updateNotificationDots;

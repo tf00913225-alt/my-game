@@ -35,11 +35,6 @@
     margin:0 !important;
 }
 
-/* Map navigation remains anchored to the bottom of the virtual surface. */
-#game-stage > #app > #game-content #mapPageNav{
-    bottom:0 !important;
-}
-
 /* Never allow the map/training page itself to become the scrolling layer. */
 #game-stage > #app > #game-content #mapPage,
 #game-stage > #app > #game-content #trainingPage{

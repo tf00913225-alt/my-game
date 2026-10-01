@@ -12,29 +12,18 @@ const layout=read("css/02-stage-v3-layout-fix.css");
 const navCss=read("css/38-v141-system-expansion.css");
 const devCss=read("css/45-v152-dev-fixes.css");
 
-test("shared context navigation has one runtime owner",()=>{
-    assert.doesNotMatch(early,/function installDungeonNavigation\(\)[\s\S]*?nav\.innerHTML=/);
-    assert.doesNotMatch(polish,/function dungeonNavMarkup\(/);
-    assert.match(nav,/function contextNavMarkup\(returnAction\)/);
-    assert.match(nav,/\["角色","assets\/ui\/nav-character\.png"/);
-    assert.match(nav,/\["背包","assets\/ui\/nav-backpack\.png"/);
-    assert.match(nav,/\["秘寶","assets\/ui\/nav-relic-v175\.webp"/);
-    assert.match(nav,/\["元素匣","assets\/ui\/nav-element-box\.png"/);
-    assert.match(nav,/buttons\.push\(\["返回","assets\/ui\/map-return\.png",returnAction\]\)/);
-    assert.match(nav,/\["gameplayPage","bossPage","towerPage"\]/);
-    assert.match(nav,/classList\.add\("v148-context-nav"\)/);
-    assert.match(nav,/v148-context-nav-active/);
-    assert.match(nav,/nav\.className="map-page-nav v141-dungeon-nav v148-context-nav"/);
-    assert.doesNotMatch(nav,/nav\.className="bottom-nav map-page-nav/);
-});
-
-test("shared context navigation has one sizing and visibility owner",()=>{
-    assert.match(layout,/\.bottom-nav,/);
-    assert.match(layout,/#game-stage > #app > #game-content #v141DungeonNav/);
-    assert.match(navCss,/v148-context-nav-active #v141DungeonNav\{display:grid !important;\}/);
-    assert.match(navCss,/v148-context-nav-active #bottomNav\{display:none !important;\}/);
-    assert.match(devCss,/#game-stage #v141DungeonNav\.v148-context-nav/);
-    assert.doesNotMatch(devCss,/#game-stage #app\.v141-dungeon-active #v141DungeonNav,/);
+test("one native shell receives context items without another navigation DOM",()=>{
+    const shell=read("js/04-stage-v11-native-bottom-nav-runtime.js");
+    const css=read("css/06-stage-v11-native-bottom-nav.css");
+    assert.match(shell,/nav\.replaceChildren\(\.\.\.mainButtons\)/);
+    assert.match(shell,/nav\.replaceChildren\(\.\.\.buttons\.map/);
+    assert.match(nav,/FourSymbolsBottomNav\?\.renderContext\(buttons,mode\)/);
+    assert.doesNotMatch(nav,/createElement\("div"\)[\s\S]*?v141DungeonNav/);
+    assert.doesNotMatch(layout,/v141DungeonNav|mapPageNav/);
+    assert.doesNotMatch(navCss,/v141DungeonNav|mapPageNav/);
+    assert.doesNotMatch(devCss,/v141DungeonNav|mapPageNav/);
+    assert.match(css,/height:216px/);
+    assert.match(css,/grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/);
 });
 
 test("gameplay presentation removes seal ownership and full-art dark overlays",()=>{
@@ -63,3 +52,18 @@ test("gameplay panel keeps only the top ornament owner",()=>{
     assert.doesNotMatch(gameplay,/gameplay-large-panel::after/);
     assert.doesNotMatch(gameplay,/bottom:8px/);
 });
+
+ test("navigation frames and state styling have only the canonical CSS owner",()=>{
+    const css=read("css/06-stage-v11-native-bottom-nav.css");
+    assert.match(css,/\.nav-icon-frame\{[\s\S]*?width:180px;[\s\S]*?height:180px;/);
+    assert.doesNotMatch(read("css/00-main.css"),/\.nav-art-button\{|\.nav-button\{/);
+    assert.doesNotMatch(read("js/00-main.js"),/enforceVirtualStageLayout|nav\.style\.width/);
+    assert.match(read("js/04-stage-v11-native-bottom-nav-runtime.js"),/frame\.className="nav-icon-frame"/);
+ });
+
+ test("home backdrop cannot force the full legacy surface into the home scroll area",()=>{
+    const css=read("css/00-main.css");
+    assert.match(css,/\.home-bg-fixed-layer\{\s*position:absolute;\s*inset:0;/);
+    assert.doesNotMatch(css,/#game-stage > #app > #game-content \.home-bg-fixed-layer/);
+    assert.doesNotMatch(read("css/02-stage-v3-layout-fix.css"),/#game-stage > #app > #game-content \.home-bg-fixed-layer/);
+ });

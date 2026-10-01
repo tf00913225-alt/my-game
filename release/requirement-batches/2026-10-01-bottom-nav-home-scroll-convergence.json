@@ -1,0 +1,9 @@
+{
+  "batchId": "2026-10-01-bottom-nav-home-scroll-convergence",
+  "requirements": [
+    {"id":"NAV-01","title":"Single native bottom navigation shell with context-projected items","status":"IMPLEMENTED","evidence":"js/04-stage-v11-native-bottom-nav-runtime.js; js/42-v148-combat-dungeon-fixes.js; css/06-stage-v11-native-bottom-nav.css; awaiting mobile browser QA and deployed verification"},
+    {"id":"NAV-02","title":"Retire legacy map and dungeon navigation geometry and migration owners","status":"IMPLEMENTED","evidence":"removed map nav DOM/runtime/style and V143 dungeon move; retired V30/V31R2 nav scaling and later context geometry overrides; awaiting final owner scan"},
+    {"id":"HOME-01","title":"Fixed home geometry without a scrollable home page","status":"IMPLEMENTED","evidence":"css/00-main.css and css/19-stage-v54-main-city-moderate-native-scale.css; awaiting actual clientHeight/scrollHeight and gesture evidence"},
+    {"id":"QA-01","title":"Browser lifecycle, geometry, legal scroll and exact-head CI verification","status":"TODO","evidence":"tests/bottom-nav-home-scroll-browser.test.js; PR CI and device QA pending"}
+  ]
+}

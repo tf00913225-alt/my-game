@@ -40,7 +40,7 @@ test("character and shop are the only two primary entrances",()=>{
     assert.equal(count(actions,/class="home-card home-card-primary"/g),2);
     assert.match(actions,/home-primary-actions[\s\S]*openHomeFeature\('character'\)[\s\S]*openHomeFeature\('shop'\)/);
     assert.match(baseCss,/\.home-primary-actions\{[\s\S]*grid-template-columns:repeat\(2,minmax\(0,46%\)\);[\s\S]*width:100%/);
-    assert.match(baseCss,/\.home-card-primary\{[\s\S]*height:90px;[\s\S]*border:1px solid rgba\(222,170,70,.9\)/);
+    assert.match(baseCss,/\.home-card-primary\{[\s\S]*height:78px;[\s\S]*border:1px solid rgba\(222,170,70,.9\)/);
     assert.match(baseCss,/\.home-card-primary::after\{[\s\S]*linear-gradient/);
     assert.match(baseCss,/\.home-card-primary \.home-card-label\{[\s\S]*height:19px;[\s\S]*border-top:1px solid[\s\S]*background:linear-gradient/);
     assert.ok((28-19)/28>=.30&&(28-19)/28<=.40);
@@ -49,10 +49,10 @@ test("character and shop are the only two primary entrances",()=>{
 test("eight secondary entrances form two substantial vertical button rails",()=>{
     assert.equal(count(actions,/class="home-card home-card-secondary"/g),8);
     ["rest","synthesis","quest","bestiary","achievement","announcement","offlineExp","system"].forEach(type=>assert.match(actions,new RegExp("openHomeFeature\\('"+type+"'\\)")));
-    assert.match(baseCss,/\.home-secondary-actions\{[\s\S]*grid-template-columns:repeat\(2,80px\);[\s\S]*grid-template-rows:repeat\(4,82px\);[\s\S]*min-height:343px/);
+    assert.match(baseCss,/\.home-secondary-actions\{[\s\S]*grid-template-columns:repeat\(2,80px\);[\s\S]*grid-template-rows:repeat\(4,70px\);[\s\S]*min-height:295px/);
     assert.doesNotMatch(baseCss,/margin-inline-(?:start|end):(34|68)px/);
-    assert.match(baseCss,/\.home-card-secondary\{[\s\S]*width:80px;[\s\S]*height:82px;[\s\S]*border:1px solid[\s\S]*background:linear-gradient[\s\S]*box-shadow:/);
-    assert.match(baseCss,/\.home-card-secondary \.home-card-icon\{[\s\S]*width:100%;[\s\S]*height:59px/);
+    assert.match(baseCss,/\.home-card-secondary\{[\s\S]*width:80px;[\s\S]*height:70px;[\s\S]*border:1px solid[\s\S]*background:linear-gradient[\s\S]*box-shadow:/);
+    assert.match(baseCss,/\.home-card-secondary \.home-card-icon\{[\s\S]*width:100%;[\s\S]*height:49px/);
     assert.match(baseCss,/\.home-card-secondary \.home-card-label\{[\s\S]*background:linear-gradient/);
     assert.ok((90-80)/90>=.10&&(90-80)/90<=.15);
     assert.ok((95-82)/95>=.10&&(95-82)/95<=.15);
@@ -122,17 +122,17 @@ test("gold and EXP share one compact formatter without ellipsis",()=>{
     assert.doesNotMatch(baseCss,/\.home-hud-resources b\{[\s\S]{0,180}text-overflow:ellipsis/);
 });
 
-test("the fixed 9:16 home keeps one bounded vertical scroll owner above the fixed navigation",()=>{
-    assert.match(baseCss,/#homePage\{[\s\S]{0,520}height:100%;[\s\S]{0,220}overflow-y:auto;[\s\S]{0,120}overflow-x:hidden/);
-    assert.match(baseCss,/#homePage\{[\s\S]{0,720}scroll-padding-bottom:calc\(var\(--bottom-nav-height,70px\) \+ var\(--safe-bottom,0px\) \+ 14px\)/);
-    assert.match(rosterCss,/\.v146-home-roster\{[\s\S]{0,420}margin:18px 10px calc\(var\(--bottom-nav-height,70px\) \+ var\(--safe-bottom,0px\) \+ 12px\)/);
+test("the fixed 9:16 home has no vertical scroll owner and reserves one navigation height",()=>{
+    assert.match(baseCss,/#homePage\{[\s\S]*?height:100%;[\s\S]*?overflow:hidden;/);
+    assert.match(baseCss,/#app:has\(#homePage\.active\) \.content\{[\s\S]*?padding-bottom:84px;/);
+    assert.match(rosterCss,/\.v146-home-roster\{[\s\S]*?margin:5px 10px 0;/);
     assert.match(baseCss,/\.home-card-grid\{[\s\S]*display:flex;[\s\S]*flex:0 0 auto/);
-    assert.match(baseCss,/\.home-card-primary\{[\s\S]*height:90px/);
-    assert.match(baseCss,/\.home-secondary-actions\{[\s\S]*min-height:343px/);
+    assert.match(baseCss,/\.home-card-primary\{[\s\S]*height:78px/);
+    assert.match(baseCss,/\.home-secondary-actions\{[\s\S]*min-height:295px/);
     assert.doesNotMatch(baseCss,/\.home-card-grid\{[\s\S]{0,220}grid-template-columns:repeat\(4,1fr\)/);
 });
 
-test("the enlarged three-character horizontal roster still fits above the unchanged navigation",()=>{
+test("the three-character roster fits above the shared navigation",()=>{
     const safeHeight=746.6666667-10-78-(14*2);
     const hudHeight=5+48;
     const actionHeight=1+90+1+256;

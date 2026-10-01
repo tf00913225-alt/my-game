@@ -343,15 +343,6 @@
 #game-stage #dungeonTabContent > .v141-abyss-shell{height:100% !important;min-height:0 !important;overflow:hidden !important;}
 #game-stage .v141-abyss-map{height:auto !important;min-height:0 !important;flex:1 1 auto !important;}
 #game-stage #dungeonPage .v141-dungeon-return{display:none !important;}
-#game-stage #v141DungeonNav{
-    width:100% !important;
-    max-width:none !important;
-    height:84px !important;
-    grid-template-columns:repeat(5,minmax(0,1fr)) !important;
-    box-sizing:border-box !important;
-}
-#game-stage #v141DungeonNav .nav-art-button{height:64px !important;max-width:94% !important;}
-
 .v143-abyss-dialogue{
     position:absolute !important;
     inset:0 !important;
@@ -428,8 +419,6 @@
 
 @media (max-height:720px){
     #game-stage #dungeonPage{padding-bottom:82px !important;}
-    #game-stage #v141DungeonNav{height:80px !important;}
-    #game-stage #v141DungeonNav .nav-art-button{height:60px !important;}
     #game-stage .v143-abyss-dialogue b{font-size:19px !important;}
 }
 

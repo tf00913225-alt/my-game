@@ -6,6 +6,16 @@ const read=p=>fs.readFileSync(p,"utf8");
 const nav=read("js/42-v148-combat-dungeon-fixes.js");
 const relic=read("js/60-team-relic-system.js");
 
+test("Navigation selection and lifecycle cannot return to late owners",()=>{
+    const core=read("js/00-main.js");
+    const gameplay=read("js/gameplay-boss-tower-system.js");
+    assert.doesNotMatch(core,/const navMap\s*=/);
+    assert.doesNotMatch(gameplay,/function markGameplayNav/);
+    assert.doesNotMatch(nav,/scheduleDungeonSync|queued=false; syncContextNavigation/);
+    assert.match(core,/window\.v148SyncContextNavigation\(\)/);
+    assert.match(read("js/59-abyss-two-tier-runtime.js"),/content\.innerHTML=renderAbyss\(\);window\.v148SyncContextNavigation\?\.\(\)/);
+});
+
 test("Gameplay shared nav owns context-safe backpack and relic actions",()=>{
     assert.match(nav,/\["背包","assets\/ui\/nav-backpack\.png","v148OpenContextInventory\(\)"\]/);
     assert.match(nav,/\["秘寶","assets\/ui\/nav-relic-v175\.webp","v148OpenContextRelic\(\)"\]/);

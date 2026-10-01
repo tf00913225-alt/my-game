@@ -191,6 +191,20 @@ jobs:
           if-no-files-found: error
           retention-days: 90
 
+      - name: Run canonical bottom navigation and fixed home browser QA
+        id: bottom_nav_home_browser
+        if: success() && github.event_name == 'pull_request'
+        run: node tests/bottom-nav-home-scroll-browser.test.js
+
+      - name: Upload bottom navigation and home geometry evidence
+        if: always() && steps.bottom_nav_home_browser.outcome != 'skipped'
+        uses: actions/upload-artifact@v4
+        with:
+          name: bottom-nav-home-geometry-${{ github.sha }}
+          path: artifacts/browser-qa/bottom-nav-home-scroll-qa.json
+          if-no-files-found: error
+          retention-days: 90
+
       - name: Run Release Update Notification mobile browser QA
         id: release_update_browser
         if: success() && (github.event_name == 'pull_request' || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main')

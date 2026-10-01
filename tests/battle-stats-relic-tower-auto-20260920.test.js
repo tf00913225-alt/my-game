@@ -124,7 +124,7 @@ assert.match(synthesisCss,/#homeFeatureModal\.v141-synthesis-modal \.v141-upgrad
 assert.match(synthesisCss,/#homeFeatureModal\.v141-synthesis-modal \.v141-upgrade-flow \.v169-talisman-art > img\{[\s\S]*?object-fit:contain/);
 assert.doesNotMatch(abyssCss,/#homeFeatureModal\.v141-synthesis-modal \.v141-upgrade-flow \.v169-talisman-art/);
 
-assert.match(mainCss,/#homePage\{[\s\S]*?height:100%;[\s\S]*?overflow-y:auto;[\s\S]*?scroll-padding-bottom:calc\(var\(--bottom-nav-height,70px\) \+ var\(--safe-bottom,0px\) \+ 14px\)/);
-assert.match(homeRosterCss,/\.v146-home-roster\{[\s\S]*?margin:18px 10px calc\(var\(--bottom-nav-height,70px\) \+ var\(--safe-bottom,0px\) \+ 12px\)/,"final team/relic block must reserve exactly the fixed nav and safe area");
+assert.match(mainCss,/#homePage\{[\s\S]*?height:100%;[\s\S]*?overflow:hidden;/);
+assert.match(homeRosterCss,/\.v146-home-roster\{[\s\S]*?margin:5px 10px 0;/,"roster must not reserve a second navigation height");
 
 console.log("Battle statistics / relic / talisman / Boss / Tower focused contracts passed");

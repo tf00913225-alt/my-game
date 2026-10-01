@@ -547,7 +547,7 @@
     }
     function refresh(){
         const content=document&&document.getElementById?document.getElementById("dungeonTabContent"):null;
-        if(content){ content.innerHTML=renderAbyss();if(typeof requestAnimationFrame==="function"){ requestAnimationFrame(syncPlayerArt); } }
+        if(content){ content.innerHTML=renderAbyss();window.v148SyncContextNavigation?.();if(typeof requestAnimationFrame==="function"){ requestAnimationFrame(syncPlayerArt); } }
     }
     function resetStageFlags(run){
         run.isBoss=isBossStage(run);run.phase="ready";run.battleCompleted=false;run.chestSpawned=false;run.chestClaimed=false;

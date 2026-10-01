@@ -9665,7 +9665,7 @@
             !window.v132IsDungeonUsedToday||!window.v132IsDungeonUsedToday(type)
         );
         setNotificationDot(document.getElementById("dungeonNav"),dungeonPending,"副本尚未完成");
-        document.querySelectorAll("#mapPageNav button[aria-label='任務'],#v141DungeonNav button[aria-label='任務']")
+        document.querySelectorAll("#bottomNav button[aria-label='任務']")
             .forEach(button=>setNotificationDot(button,hasQuestNotice,"任務有新進度"));
     }
     window.v141UpdateNotificationDots=updateNotificationDots;
@@ -11979,16 +11979,11 @@
 
     /* ----- 4 / 5. Larger Abyss, tap-to-advance dialogue and correct nav shell. ----- */
     function fixDungeonNavigation(){
-    const nav=document.getElementById("v141DungeonNav");
-    const content=document.getElementById("game-content");
-    if(!nav||!content){ return; }
-    if(nav.parentElement!==content){ content.appendChild(nav); }
-    nav.dataset.v143Fixed="1";
-    const oldReturn=document.getElementById("v141DungeonReturn");
-    if(oldReturn){ oldReturn.remove(); }
-    if(typeof window.v148SyncDungeonShell==="function"){ window.v148SyncDungeonShell(); }
-}
-
+        // Context items are projected by V148 into the shared native shell.
+        if(typeof window.v148SyncContextNavigation==="function"){
+            window.v148SyncContextNavigation();
+        }
+    }
 
 /* ----- 6. Synthesis uses icon pickers and creates ordinary random gear. ----- */
     function definitions(){
@@ -12135,7 +12130,7 @@
         return {
             version:VERSION,
             enemyCards:document.querySelectorAll(".v143-monster-identity").length,
-            dungeonNavFixed:document.getElementById("v141DungeonNav")?.dataset.v143Fixed==="1",
+            dungeonNavFixed:!!window.FourSymbolsBottomNav?.ensureShell(),
             pendingPotion:!!window.v143PendingPotionTarget
         };
     };

@@ -783,12 +783,6 @@
 #game-stage .v141-dungeon-cover-actions button:disabled{opacity:.4;filter:grayscale(.5);}
 #game-stage .v141-dungeon-remaining{padding:1px 8px 7px;color:#b7a68a;font-size:10px;text-align:center;}
 
-#game-stage #app:not(.v141-dungeon-active):not(.v148-context-nav-active) #v141DungeonNav{display:none !important;}
-#game-stage #app.v141-dungeon-active #v141DungeonNav,
-#game-stage #app.v148-context-nav-active #v141DungeonNav{display:grid !important;}
-#game-stage #app.v141-dungeon-active #bottomNav,
-#game-stage #app.v148-context-nav-active #bottomNav{display:none !important;}
-#game-stage #v141DungeonNav{z-index:790 !important;}
 #game-stage #dungeonPage .v141-dungeon-return{display:block !important;position:absolute !important;right:12px !important;top:12px !important;z-index:120 !important;}
 
 /* ----- Notification dots ----- */
@@ -807,9 +801,7 @@
     pointer-events:none;
 }
 
-#game-stage .home-feature-button,
-#game-stage .nav-button,
-#game-stage #dungeonNav{position:relative;}
+#game-stage .home-feature-button{position:relative;}
 @keyframes v141NoticePulse{50%{transform:scale(.78);opacity:.65}}
 
 /* ----- Skill preview moved outside transformed game stage ----- */
