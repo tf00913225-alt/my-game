@@ -15,6 +15,7 @@ import {
     getAuth,
     getRedirectResult,
     onAuthStateChanged,
+    reauthenticateWithPopup,
     setPersistence,
     signInAnonymously,
     signInWithEmailAndPassword,
@@ -123,6 +124,19 @@ export async function signInWithFacebook(){
        OAuth result could return to Firebase. */
     provider.setCustomParameters({ display:"popup" });
     const credential = await signInWithPopup(auth, provider);
+    return completedSignIn(credential);
+}
+
+export async function reauthenticateWithGoogle(){
+    const {auth}=await initializeFirebaseAuth();
+    const user=auth.currentUser;
+    if(!user||!user.providerData?.some(entry=>entry.providerId==="google.com")){
+        throw Object.assign(new Error("Google account required."),{code:"auth/google-account-required"});
+    }
+    const credential=await reauthenticateWithPopup(user,new GoogleAuthProvider());
+    if(auth.currentUser?.uid!==user.uid){
+        throw Object.assign(new Error("Account changed during verification."),{code:"ACCOUNT_CHANGED"});
+    }
     return completedSignIn(credential);
 }
 
