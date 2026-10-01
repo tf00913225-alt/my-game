@@ -120,7 +120,7 @@ class Cdp{
 const PREPARE=`(async()=>{
  const wait=async f=>{for(let i=0;i<600;i++){if(f())return;await new Promise(r=>setTimeout(r,50));}throw Error('Runtime not READY: '+window.FourSymbolsStartupPolicy?.getState?.());};
  await wait(()=>window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden);
- await window.FourSymbolsFeatures.ensure('gameplay-core','navigation-qa');
+ for(const feature of ['gameplay-core','patrol','boss-tower','abyss'])await window.FourSymbolsFeatures.ensure(feature,'navigation-qa');
  showPage('home');
  await new Promise(r=>setTimeout(r,150));
  window.__navQaShell=document.querySelector('.native-bottom-nav-layer');
@@ -175,7 +175,7 @@ async function runViewport(chrome,url,width,height){
   evidence.inventoryAfterSwipe=await client.eval("document.getElementById('inventoryGridScroll').scrollTop");assert.ok(evidence.inventoryAfterSwipe>0,'legal inventory swipe did not scroll');
   await client.eval("closeMapInventoryOverlay();showPage('home')");await settle(client);
   evidence.returnHome=await client.eval(MEASURE);assert.equal(evidence.returnHome.sameShell,true);
-  await client.send('Page.reload',{ignoreCache:true});await client.eval(PREPARE);evidence.reload=await client.eval(MEASURE);assert.equal(evidence.reload.shellCount,1);assert.equal(evidence.reload.legacyCount,0);
+  await client.send('Page.reload',{ignoreCache:true});await new Promise(r=>setTimeout(r,300));await client.eval(PREPARE);evidence.reload=await client.eval(MEASURE);assert.equal(evidence.reload.shellCount,1);assert.equal(evidence.reload.legacyCount,0);
   const shot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(ARTIFACT_DIR,`navigation-home-${width}x${height}.png`),Buffer.from(shot.data,'base64'));
   return evidence;
  }catch(error){error.navEvidence=evidence;throw error;}finally{client?.close();proc.kill('SIGTERM');try{fs.rmSync(profile,{recursive:true,force:true,maxRetries:3,retryDelay:100});}catch(_){}}
