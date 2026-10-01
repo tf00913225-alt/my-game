@@ -57,12 +57,22 @@ export async function battleSkillTouchFloodQa(client,artifactDir){
         assert.equal(submitted.queue.action,'waterBall');assert.equal(submitted.queue.target,target);assert.equal(submitted.count,1);assert.equal(submitted.advance,true);
         await client.eval(`selectBattleTarget(${target});true`);assert.equal((await state()).submissions,1,'duplicate target cannot submit twice');
         checks.skillDeclaration={normalTap:true,returnAndReselect:true,dragRecovery:true,cancelRecovery:true,targetSubmittedOnce:true,hitbox:true};
-        for(const skill of ['healSpell','earthShield']){
+        checks.supportDeclarations=[];
+        for(const skill of ['healSpell','barrier','earthShield','rage']){
             await client.eval(`__touchQaReset(${JSON.stringify(skill)});true`);
+            const before=(await state()).submissions;
             await tap('.skill-quick-button[data-skill-id="'+skill+'"]');
             const declared=await state();
-            assert.equal(declared.ready,true,skill+' must declare through common owner');
-            if(declared.pending){await client.eval(`returnFromBattleTargetSelection();true`);}
+            const formal=await client.eval(`({targetType:skillDatabase[${JSON.stringify(skill)}].targetType,queue:queuedPlayerActions[0]})`);
+            if(['ally','allyTri','deadAlly'].includes(formal.targetType)){
+                assert.equal(declared.ready,true,skill+' must enter ally selection');
+                assert.equal(declared.pending,skill);assert.equal(declared.submissions,before);
+                await client.eval(`returnFromBattleTargetSelection();true`);
+            }else{
+                assert.equal(formal.queue?.action,skill,skill+' must declare the formal self/all action');
+                assert.equal(declared.ready,false);assert.equal(declared.submissions,before+1);
+            }
+            checks.supportDeclarations.push({skill,targetType:formal.targetType,passed:true});
         }
         await client.eval(`__touchQaReset('waterBall');player.sp=0;populateSkillQuickBar();document.getElementById('skillQuickBar').classList.add('show');true`);
         assert.equal((await point(button)).disabled,true);await tap(button);assert.equal((await state()).ready,false);
