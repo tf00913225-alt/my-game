@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import crypto from 'node:crypto';
 
 // Runs inside the existing account-first, production-bundle battle QA session.
 // All fixture changes are local to that disposable QA account/document.
@@ -11,6 +12,20 @@ export async function battleSkillTouchFloodQa(rawClient,artifactDir){
     });
     const client={eval:expression=>bounded(rawClient.eval(expression),expression.slice(0,100)),send:(method,params)=>bounded(rawClient.send(method,params),method)};
     const checks={touchInput:'CDP native touch (browser emulation, not physical Android)',animation:[]};
+    const manifest=JSON.parse(fs.readFileSync('asset-manifest.json','utf8'));
+    const expectedAssets=Object.entries(manifest.assets).filter(([name])=>/^build\/(app-shell\.|gameplay-core[-.])/.test(name)).map(([name,data])=>({name,hash:data.sha256}));
+    const spritePath='assets/vfx/water/tidal-beast-vfx.png';
+    const spriteHash=crypto.createHash('sha256').update(fs.readFileSync(spritePath)).digest('hex');
+    const deployedAssets=await client.eval(`(async()=>{
+        const response=await fetch('/asset-manifest.json',{cache:'no-store'});if(!response.ok)throw new Error('Asset manifest HTTP '+response.status);const actual=await response.json();
+        const files=await Promise.all(${JSON.stringify(expectedAssets.concat([{name:spritePath,hash:spriteHash}]))}.map(async item=>{const response=await fetch('/'+item.name,{cache:'no-store'});if(!response.ok)throw new Error(item.name+' HTTP '+response.status);const digest=await crypto.subtle.digest('SHA-256',await response.arrayBuffer());const hash=Array.from(new Uint8Array(digest),n=>n.toString(16).padStart(2,'0')).join('');return {name:item.name,hash:hash.slice(0,item.hash.length)};}));
+        let deployedSha=null;if(location.hostname==='dev.four-symbols-dev.pages.dev'){const response=await fetch('/release-manifest.json',{cache:'no-store'});if(!response.ok)throw new Error('Release manifest HTTP '+response.status);deployedSha=(await response.json()).commitSha;}
+        return {assets:actual.assets,files,deployedSha};
+    })()`);
+    assert.deepEqual(deployedAssets.assets,manifest.assets,'served asset list must match the exact checkout');
+    assert.deepEqual(deployedAssets.files,expectedAssets.concat([{name:spritePath,hash:spriteHash}]),'served bundles and original atlas must match their hashes');
+    if(deployedAssets.deployedSha){assert.equal(deployedAssets.deployedSha,process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA);}
+    checks.assets={manifestMatches:true,files:deployedAssets.files,deployedSha:deployedAssets.deployedSha};
     await client.eval(`(()=>{
         window.__touchQa={index:activeBattleCharacterIndex,phase:battlePhase,auto:autoBattle,ready:actionReady,pending:pendingAction,queued:queuedPlayerActions,loadouts:JSON.parse(JSON.stringify(characterSkillLoadouts)),sp:player.sp,finish:finishPlayerAction,submissions:0};
         clearInterval(timerId);timerId=null;
