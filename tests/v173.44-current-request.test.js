@@ -32,7 +32,7 @@ assert.doesNotMatch(tuning,/v17342DailyDungeonStatsHalvedAgain/);
 assert.match(battle,/if\(soloProtected\)[\s\S]*slot===4\?"elite":null[\s\S]*slot===4\)\{ return "boss"; \}[\s\S]*slot===3\?"elite":null/);
 assert.match(battle,/material:\{title:"材料副本",requirement:"任一角色達到10級"/);
 assert.match(battle,/gold:\{title:"金幣副本",requirement:"任一角色達到10級"/);
-assert.match(ui,/\.v141-notice-dot,[\s\S]*width:7px !important;[\s\S]*height:7px !important/);
+assert.doesNotMatch(ui,/\.v141-notice-dot,[\s\S]*width:7px !important/);
 assert.match(main,/function getBattleAdvanceDelay\(phase\)/);
 assert.match(main,/v142GetRemainingAnimationMs/);
 assert.doesNotMatch(v131,/finishPlayerAction\s*=|processNextCombatant\s*=/);

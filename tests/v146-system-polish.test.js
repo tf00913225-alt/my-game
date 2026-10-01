@@ -14,7 +14,8 @@ const rules=fs.readFileSync("js/40-v144-rules-and-abyss.js","utf8");
 const progression=fs.readFileSync("js/60-v173.64-skill-progression-rebalance.js","utf8");
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const source=fs.readFileSync("js/41-v146-system-polish.js","utf8");
-const finalNavSource=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");
+const finalNavSource=fs.readFileSync("js/04-stage-v11-native-bottom-nav-runtime.js","utf8");
+const finalNavBridge=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");
 const eagerSource=fs.readFileSync("js/16-stage-v54-main-city-runtime.js","utf8");
 const css=fs.readFileSync("css/42-v146-system-polish.css","utf8");
 const skillNameCss=fs.readFileSync("css/battle-skill-name-presentation-owner.css","utf8");
@@ -218,6 +219,7 @@ test("inventory, home, synthesis, nav and slow exit all use the latest mobile co
     assert.doesNotMatch(source,/function dungeonNavMarkup\(/);
     assert.ok(finalNavSource.includes('buttons.push(["返回","assets/ui/map-return.png",returnAction]);'));
     assert.match(finalNavSource,/abyssSelectionActive\?"v174AbyssLeaveToGameplay\(\)":"showPage\('home'\)"/);
+    assert.match(finalNavBridge,/FourSymbolsBottomNav\?\.syncContext\(\)/);
     assert.doesNotMatch(css,/v141DungeonNav/);
     assert.match(css,/\.v146-abyss-return/);
     assert.match(rules,/"戰鬥失敗"/);

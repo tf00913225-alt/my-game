@@ -4,6 +4,7 @@ const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const read=p=>fs.readFileSync(p,"utf8");
 const nav=read("js/42-v148-combat-dungeon-fixes.js");
+const shell=read("js/04-stage-v11-native-bottom-nav-runtime.js");
 const relic=read("js/60-team-relic-system.js");
 
 test("Navigation selection and lifecycle cannot return to late owners",()=>{
@@ -17,8 +18,8 @@ test("Navigation selection and lifecycle cannot return to late owners",()=>{
 });
 
 test("Gameplay shared nav owns context-safe backpack and relic actions",()=>{
-    assert.match(nav,/\["背包","assets\/ui\/nav-backpack\.png","v148OpenContextInventory\(\)"\]/);
-    assert.match(nav,/\["秘寶","assets\/ui\/nav-relic-v175\.webp","v148OpenContextRelic\(\)"\]/);
+    assert.match(shell,/\["背包","assets\/ui\/nav-backpack\.png","v148OpenContextInventory\(\)"\]/);
+    assert.match(shell,/\["秘寶","assets\/ui\/nav-relic-v175\.webp","v148OpenContextRelic\(\)"\]/);
     const core=read("js/00-main.js");
     assert.match(nav,/window\.v148OpenContextInventory=function\(\)[\s\S]*?openInventoryContext\(\{[\s\S]*?sourcePage,[\s\S]*?returnAction:sourcePage==="map"\?"leaveMap\(\)":"v148ReturnFromGameplay\(\)",[\s\S]*?closeBehavior:"restore-source"[\s\S]*?\}\)/);
     assert.match(core,/function openInventoryContext\(context\)[\s\S]*?inventoryContextSnapshot\(context\)[\s\S]*?showPage\("inventory"\)[\s\S]*?inventoryOpenContext=normalized/);

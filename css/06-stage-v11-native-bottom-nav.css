@@ -70,3 +70,17 @@
     transform:translateZ(0) scale(.92);
 }
 #game-stage > #game-overlay-layer #bottomNav > .nav-button > *{pointer-events:none;}
+/* Notification contract for the native 1080 x 1920 plane.  Twenty-two
+   logical pixels project to roughly 8 CSS px on current phone widths; this is
+   intentionally different from the legacy-content unit below. */
+#game-stage > #game-overlay-layer #bottomNav > .nav-button > .v141-notice-dot{
+    box-sizing:border-box;
+    width:22px;
+    height:22px;
+    min-width:22px;
+    min-height:22px;
+    right:18px;
+    top:18px;
+    border-width:2px;
+    z-index:30;
+}

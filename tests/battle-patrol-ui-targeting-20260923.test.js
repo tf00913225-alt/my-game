@@ -36,13 +36,13 @@ test("patrol navigation is a five-key shared-owner shell and appearance switch i
   const html=read("index.html");
   const mainCss=read("css/00-main.css");
   const patrolCss=read("css/32-v131-patrol-appearance.css");
-  const dungeon=read("js/42-v148-combat-dungeon-fixes.js");
+  const shell=read("js/04-stage-v11-native-bottom-nav-runtime.js");
   assert.doesNotMatch(html,/mapPageReturnFloat/);
   assert.doesNotMatch(mainCss,/\.map-page-return-float/);
   assert.doesNotMatch(html,/<div id="mapPageNav"/);
   assert.match(read("css/06-stage-v11-native-bottom-nav.css"),/grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/);
-  assert.match(dungeon,/\["秘寶","assets\/ui\/nav-relic-v175\.webp"/);
-  assert.match(dungeon,/"leaveMap\(\)"/);
+  assert.match(shell,/\["秘寶","assets\/ui\/nav-relic-v175\.webp"/);
+  assert.match(shell,/"leaveMap\(\)"/);
   assert.match(patrolCss,/#v131PatrolAppearanceSwitchWrap\{[\s\S]*?top:12px;/);
 });
 

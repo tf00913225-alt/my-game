@@ -717,9 +717,12 @@
     right:2px;
     top:2px;
     z-index:30;
-    width:10px;
-    height:10px;
-    border:2px solid #f7dfad;
+    box-sizing:border-box;
+    width:9px;
+    height:9px;
+    min-width:9px;
+    min-height:9px;
+    border:1px solid #f7dfad;
     border-radius:50%;
     background:#e52e2e;
     box-shadow:0 0 8px rgba(255,40,40,.85);
@@ -728,7 +731,7 @@
 }
 
 #game-stage .home-feature-button{position:relative;}
-@keyframes v141NoticePulse{50%{transform:scale(.78);opacity:.65}}
+@keyframes v141NoticePulse{50%{transform:scale(.9);opacity:.72}}
 
 /* ----- Skill preview moved outside transformed game stage ----- */
 .skill-preview-modal.v141-body-preview{

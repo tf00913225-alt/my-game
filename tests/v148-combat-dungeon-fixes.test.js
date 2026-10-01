@@ -341,18 +341,13 @@ test("Abyss projects five context buttons into the canonical native shell",()=>{
     const page=element({classList:classList(["active"]),querySelector:selector=>selector===".v141-abyss-shell"?{}:null});
     const topReturn=element();
     const context=baseContext({
-        FourSymbolsBottomNav:{renderContext:(buttons,mode)=>calls.push({buttons,mode}),renderMain(){},hide(){}},
+        FourSymbolsBottomNav:{syncContext:()=>calls.push("sync")},
         document:{readyState:"complete",body:element(),addEventListener(){},querySelector:()=>null,querySelectorAll:()=>[],
             getElementById:id=>id==="dungeonPage"?page:id==="v146AbyssReturn"?topReturn:null}
     });
     context.v148SyncDungeonShell();
     assert.ok(calls.length>=1);
-    const projected=calls.at(-1);
-    assert.equal(projected.buttons.length,5);
-    assert.equal(projected.buttons[2][0],"秘寶");
-    assert.equal(projected.buttons[2][1],"assets/ui/nav-relic-v175.webp");
-    assert.equal(projected.buttons[4][0],"返回");
-    assert.equal(projected.mode,"abyss-map");
+    assert.equal(calls.at(-1),"sync");
     assert.notEqual(topReturn.removed,true);
     assert.doesNotMatch(source,/createElement\("div"\)[\s\S]*?v141DungeonNav/);
 });

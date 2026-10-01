@@ -8374,7 +8374,7 @@ function showPage(page){
     updateUI();
     if(typeof window.v148SyncContextNavigation==="function"){
         window.v148SyncContextNavigation();
-    }else{ window.FourSymbolsBottomNav?.renderMain(page); }
+    }else{ window.FourSymbolsBottomNav?.syncContext(); }
 
 }
 
