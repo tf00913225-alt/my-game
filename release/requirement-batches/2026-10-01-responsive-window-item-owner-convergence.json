@@ -4,86 +4,228 @@
   "baseSha": "08d5c3cf6e327e3d9dda033dad4c42b7d66f2d64",
   "workBranch": "fix/responsive-window-item-owner-convergence-20261001",
   "targetBranch": "dev",
-  "status": "IMPLEMENTED",
+  "status": "VERIFIED",
   "scope": "背包主視窗與既有入口、普通／不可裝備物品詳情、裝備比較、批量操作及商店商品預覽的尺寸、內容、圖像、捲動與生命週期 Owner 收斂；不修改技能、秘寶、登入或戰鬥功能。",
   "requirements": [
     {
       "id": "RW-01",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "request": "背包在可用寬高改變時保持標題、導覽與格線可用，只有既有 inventoryGridScroll 成為垂直捲動 owner。",
       "owner": [
+        "index.html",
+        "js/00-main.js",
         "css/22-stage-v78-character-inventory-core.css",
         "css/24-stage-v85-inventory-inner-grid-scroll-root.css"
-      ]
+      ],
+      "verification": {
+        "environment": "deployed-dev",
+        "commitSha": "da95fceb5c6f08fc4ae5577760011602af513bef",
+        "runId": 36831446075,
+        "artifactId": 11148395785,
+        "evidence": [
+          "Six normal/short viewports and in-place height reduction: title/equipment labels/footer contained; four footer controls hit-test to themselves; one inventoryGridScroll owner; six entrances and re-entry PASS."
+        ]
+      }
     },
     {
       "id": "RW-02",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "request": "普通裝備、藥水、材料與不可裝備物品共享自適應 Medium Modal 外框，不以縮字或固定高度塞入內容。",
       "owner": [
         "css/49-v169-rpg-ui.css",
         "js/00-main.js"
-      ]
+      ],
+      "verification": {
+        "environment": "deployed-dev",
+        "commitSha": "da95fceb5c6f08fc4ae5577760011602af513bef",
+        "runId": 36831446075,
+        "artifactId": 11148395785,
+        "evidence": [
+          "Equipment/potion/material/chest: strict frame and ancestor containment, projected readable text >=13px, square contain art, native control hits and resize PASS; non-equipment equip disabled; chest-to-equipped restores 脫下."
+        ]
+      }
     },
     {
       "id": "RW-03",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "request": "裝備比較在窄寬度改為上下排列，內容區單獨捲動且操作列保持可見。",
       "owner": [
         "css/49-v169-rpg-ui.css",
         "css/53-v173.51-qa.css",
         "js/55-v173.51-inventory-qa.js"
-      ]
+      ],
+      "verification": {
+        "environment": "deployed-dev",
+        "commitSha": "da95fceb5c6f08fc4ae5577760011602af513bef",
+        "runId": 36831446075,
+        "artifactId": 11148395785,
+        "evidence": [
+          "Narrow comparison stacks naturally; long content scrolls; art remains square; action/back controls are contained and natively reachable without native navigation covering them."
+        ]
+      }
     },
     {
       "id": "RW-04",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "request": "批量使用／批量開啟維持內容與行為責任，但不再影響外框尺寸；模式關閉與再次進入不殘留。",
       "owner": [
         "js/53-v173.50-inventory-qol.js",
         "css/52-v173.50-inventory-qol.css",
         "js/00-main.js"
-      ]
+      ],
+      "verification": {
+        "environment": "deployed-dev",
+        "commitSha": "da95fceb5c6f08fc4ae5577760011602af513bef",
+        "runId": 36831446075,
+        "artifactId": 11148395785,
+        "evidence": [
+          "Bulk quantity and controls remain contained/reachable; legal stacked potion total 110889 exercises >100000; close/re-entry removes batch and comparison DOM. Consumption/reward settlement gameplay is unchanged; this acceptance concerns presentation and existing control reachability."
+        ]
+      }
     },
     {
       "id": "RW-05",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "request": "body 掛載的商店商品預覽以明確相容座標契約自適應，圖框維持 1:1、圖片 contain、內容單一捲動且返回按鈕可見。",
       "owner": [
         "css/49-v169-rpg-ui.css",
-        "js/equipment-progression.js"
-      ]
+        "js/equipment-progression.js",
+        "js/27-v132-content-expansion.js"
+      ],
+      "verification": {
+        "environment": "deployed-dev",
+        "commitSha": "da95fceb5c6f08fc4ae5577760011602af513bef",
+        "runId": 36831446075,
+        "artifactId": 11148395785,
+        "evidence": [
+          "Real production shop equipment artwork decodes with contain in a square frame; browser-pixel body mount remains compatible; return control and shortened-height geometry PASS."
+        ]
+      }
     },
     {
       "id": "RW-06",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "request": "退休固定 400px／138px、potion :has 或 disabled 推測、比較視窗外框覆蓋與 runtime 尺寸注入，不以隱藏或後置覆蓋假退場。",
       "owner": [
         "tests/responsive-window-item-owner-convergence.test.js"
-      ]
+      ],
+      "verification": {
+        "environment": "deployed-dev",
+        "commitSha": "da95fceb5c6f08fc4ae5577760011602af513bef",
+        "runId": 36831446075,
+        "artifactId": 11148395785,
+        "evidence": [
+          "Targeted retirement contracts and production bundle synchronization PASS on exact head and merged dev; no new frame owner, runtime size injection, wrapper, timer or observer."
+        ]
+      }
     },
     {
       "id": "RW-07",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "request": "正式 index、feature loader、production bundle 與 360／393／412 正常及短高度 browser QA 證明最終 computed style、矩形、圖片比例、捲動、操作列及再進入清理。",
       "owner": [
         "tests/responsive-window-item-owner-convergence.test.js",
         ".github/scripts/run-responsive-item-browser-qa.mjs",
         ".github/scripts/runtime-browser-qa-support.mjs"
-      ]
+      ],
+      "verification": {
+        "environment": "deployed-dev",
+        "commitSha": "da95fceb5c6f08fc4ae5577760011602af513bef",
+        "runId": 36831446075,
+        "artifactId": 11148395785,
+        "evidence": [
+          "Production index/feature loader/hashed bundles and deployed DEV six-size suite PASS; 60 Chinese screenshots reviewed; strict native input, wheel, resize, late-style and cleanup checks retained."
+        ]
+      }
     }
   ],
   "verification": {
-    "targeted": "PENDING",
-    "productionBuild": "PENDING",
-    "pullRequestCi": "PENDING",
-    "deployedDev": "PENDING",
-    "browserQa": "PENDING: mandatory real runtime QA; absence of Chrome is failure, not skipped PASS"
+    "targeted": "PASS: exact PR head 91ca3fb82b865f62da14a3df9c247612c545dab7 required retirement/action/runtime checks; merged dev required regressions PASS.",
+    "productionBuild": "PASS: deterministic build:check, loader/resources/release gates; root and build asset manifests synchronized.",
+    "pullRequestCi": "PASS: PR #729 run 36830421602, Repository checks job 110265514078. PR merge snapshot ef3e8abd023130e1f96c4e4fa02122b31a12fb59.",
+    "deployedDev": "PASS: https://dev.four-symbols-dev.pages.dev/ exact deployment commit da95fceb5c6f08fc4ae5577760011602af513bef; release-manifest and Game/Cache 173.72 verified by deployment gate.",
+    "browserQa": "PASS: deployed six-size Responsive Item runtime, artifact 11148395785; 60 Chinese screenshots manually reviewed across all ten capture families.",
+    "physicalS23Ultra": "PENDING: physical Chrome touch/keyboard/browser-chrome height transitions, long-lived Android compositing and real player acceptance are not replaced by emulation.",
+    "fullHistoricalNodeSuite": "NOT RUN under dev CI policy; historical v173.25 retired-owner assertion is not claimed as passing."
   },
   "continuation": {
     "baseSha": "8760a89eb505a1c9219dbd698047e1f8344be800",
     "workBranch": "fix/responsive-window-runtime-verification-20261001",
     "previousPr": 726,
-    "reason": "Repair observed backpack clipping and replace simplified geometry fixture with mandatory real production-runtime and deployed-DEV QA."
-  }
+    "reason": "Repair observed backpack clipping and replace simplified geometry fixture with mandatory real production-runtime and deployed-DEV QA.",
+    "integrationBaseSha": "6e935a59f3aa71f4de497c7ed364a386e5fdf02a",
+    "pr": 729,
+    "verifiedHeadSha": "91ca3fb82b865f62da14a3df9c247612c545dab7",
+    "mergeSha": "da95fceb5c6f08fc4ae5577760011602af513bef",
+    "devCiRunId": 36831446075,
+    "devCiAttempt": 2,
+    "repositoryChecksJobId": 110269794722,
+    "deploymentJobId": 110271061581,
+    "retryReason": "Attempt 1 Chrome dump-DOM fixture exited without a DOM result before layout assertions; unchanged failed-job retry passed.",
+    "deploymentStatus": "SUCCESS",
+    "releaseManifestArtifactId": 11147353517,
+    "deploymentShaVerified": true
+  },
+  "browserEvidence": {
+    "viewports": [
+      [
+        360,
+        800
+      ],
+      [
+        360,
+        640
+      ],
+      [
+        393,
+        873
+      ],
+      [
+        393,
+        660
+      ],
+      [
+        412,
+        915
+      ],
+      [
+        412,
+        680
+      ]
+    ],
+    "prItemArtifact": 11147276827,
+    "prNavigationArtifact": 11147008594,
+    "mergedItemArtifact": 11147935446,
+    "deployedItemArtifact": 11148395785,
+    "navigationContextRows": 48,
+    "nativeInventorySwipePx": [
+      40,
+      28,
+      28
+    ],
+    "nativeSkillSwipePx": [
+      94,
+      87,
+      83
+    ],
+    "backpackFooterControlsPerViewport": 4,
+    "existingEntrancesPerViewport": 6,
+    "screenshotsPerItemRun": 60,
+    "transport": "Existing isolated read-only QA Firebase auth/cloud/session seam only; real production index/loader/bundles and no player cloud writes.",
+    "stressArt": "Synthetic wide art stresses contain; real production equipment and shop artwork are separately decoded and captured."
+  },
+  "bundles": {
+    "css": "build/gameplay-core.f80077fed10a.css",
+    "appShell": "build/app-shell.cd59e458d64e.js",
+    "gameplaySecondary": "build/gameplay-core-secondary.0d245602adb8.js",
+    "gameVersion": "173.72",
+    "cacheVersion": "173.72"
+  },
+  "outOfScopeFindings": [
+    {
+      "issue": "Startup release acknowledgement is below viewport or covered by native bottom navigation on some sizes.",
+      "evidence": "Run 36829399402 artifact 11146662697, 393x873 failure screenshot; formal header 返回 remains visible.",
+      "disposition": "Recorded only; navigation QA natively hit-tests/clicks the formal closeHomeFeature() return control, asserts closure, then preserves original navigation/single-finger scroll assertions. No production announcement/touch/scroll changes."
+    }
+  ]
 }
