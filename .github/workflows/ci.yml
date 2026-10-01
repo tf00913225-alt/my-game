@@ -179,6 +179,13 @@ jobs:
         id: build_sync
         run: npm run build:check
 
+      - name: Ensure CJK font support for player-text browser QA
+        run: |
+          if ! fc-list :lang=zh | rg -q .; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends fonts-noto-cjk
+          fi
+
       - name: Run Responsive Item owner and production runtime regression
         id: responsive_item_browser
         run: |
