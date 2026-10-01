@@ -9,6 +9,8 @@ const ROOT=process.cwd();
 const ARTIFACT_DIR=path.join(ROOT,"artifacts","browser-qa");
 const VIEWPORTS=[[360,640],[393,873],[412,915]];
 const ASSET_MANIFEST=JSON.parse(fs.readFileSync(path.join(ROOT,"build","asset-manifest.json"),"utf8"));
+const GAMEPLAY_BUNDLE=ASSET_MANIFEST.featureManifest.bundles["gameplay-core"];
+const COLD_ENTRY_BLOCK_PATTERNS=[...(GAMEPLAY_BUNDLE.scripts||[]),...(GAMEPLAY_BUNDLE.styles||[])].map(path=>({urlPattern:"*"+path}));
 const QA_AUTH_PATH="/"+Object.keys(ASSET_MANIFEST.assets).find(file=>/build\/firebase\/firebase-auth\.[0-9a-f]{12}\.js$/.test(file));
 const QA_CLOUD_PATH="/"+Object.keys(ASSET_MANIFEST.assets).find(file=>/build\/firebase\/firebase-cloud-save\.[0-9a-f]{12}\.js$/.test(file));
 const QA_SESSION_PATH="/"+Object.keys(ASSET_MANIFEST.assets).find(file=>/build\/firebase\/firebase-session\.[0-9a-f]{12}\.js$/.test(file));
@@ -107,7 +109,6 @@ class Cdp{
 const PREPARE=`(async()=>{
  const wait=async f=>{for(let i=0;i<600;i++){if(f())return;await new Promise(r=>setTimeout(r,50));}throw Error('Runtime not READY: '+JSON.stringify({state:window.FourSymbolsStartupPolicy?.getState?.(),loader:document.getElementById('startupLoader')?.outerHTML,error:String(window.FourSymbolsStartupPolicy?.getLastError?.()?.message||''),page:document.body.innerText.slice(0,800)}));};
  await wait(()=>window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show'));
- for(const feature of ['gameplay-core','patrol','boss-tower','abyss'])await window.FourSymbolsFeatures.ensure(feature,'navigation-qa');
  showPage('home');
  await new Promise(r=>setTimeout(r,150));
  window.__navQaShell=document.querySelector('.native-bottom-nav-layer');
@@ -150,6 +151,31 @@ async function runViewport(chrome,url,width,height){
    await client.send('Input.dispatchMouseEvent',{type:'mouseReleased',x,y,button:'left',clickCount:1});await settle(client);
    assert.equal(await client.eval("document.getElementById('homeFeatureModal').classList.contains('show')"),false,'formal release return must close the notice');
   }
+  // Formal Startup may download first-play resources, but it does not execute
+  // the lazy gameplay owner.  Begin delaying matching module requests only
+  // after READY, immediately before the first real training tap.
+  await client.send('Fetch.enable',{patterns:COLD_ENTRY_BLOCK_PATTERNS});
+  evidence.phase='cold-training';
+  evidence.coldTrainingBefore=await client.eval(`(()=>{const button=document.getElementById('trainingNav'),r=button.getBoundingClientRect();window.__navQaTrainingClicks=0;document.addEventListener('click',event=>{if(event.target.closest?.('#trainingNav'))window.__navQaTrainingClicks+=1;},{capture:true,once:true});return {x:r.left+r.width/2,y:r.top+r.height/2,gameplayReady:FourSymbolsFeatures.isReady('gameplay-core'),labels:[...bottomNav.children].map(n=>n.getAttribute('aria-label')),context:bottomNav.dataset.navContext};})()`);
+  assert.equal(evidence.coldTrainingBefore.gameplayReady,false,'cold-entry test must not preload gameplay-core');
+  await client.send('Input.dispatchMouseEvent',{type:'mousePressed',x:evidence.coldTrainingBefore.x,y:evidence.coldTrainingBefore.y,button:'left',clickCount:1});
+  await client.send('Input.dispatchMouseEvent',{type:'mouseReleased',x:evidence.coldTrainingBefore.x,y:evidence.coldTrainingBefore.y,button:'left',clickCount:1});
+  evidence.coldTrainingImmediate=await client.eval(`({labels:[...bottomNav.children].map(n=>n.getAttribute('aria-label')),context:bottomNav.dataset.navContext,page:document.querySelector('#game-content .page.active')?.id,clicks:window.__navQaTrainingClicks,shellCount:document.querySelectorAll('.native-bottom-nav-layer').length})`);
+  await settle(client);
+  evidence.coldTrainingSettled=await client.eval(`({labels:[...bottomNav.children].map(n=>n.getAttribute('aria-label')),context:bottomNav.dataset.navContext,page:document.querySelector('#game-content .page.active')?.id,gameplayReady:FourSymbolsFeatures.isReady('gameplay-core')})`);
+  const contextLabels=['角色','背包','秘寶','元素匣','返回'];
+  assert.deepEqual(evidence.coldTrainingImmediate.labels,contextLabels,'first training paint must use context navigation');
+  assert.deepEqual(evidence.coldTrainingSettled.labels,contextLabels,'cold entry must not flash or revert to main navigation');
+  assert.equal(evidence.coldTrainingImmediate.context,'training');
+  assert.equal(evidence.coldTrainingImmediate.page,'trainingPage');
+  assert.equal(evidence.coldTrainingImmediate.clicks,1,'one player click must produce one navigation intent');
+  assert.equal(evidence.coldTrainingImmediate.shellCount,1);
+  assert.equal(evidence.coldTrainingSettled.gameplayReady,false,'cold training does not require gameplay-core');
+
+  // Release the deliberately delayed lazy bundles, then run the full existing
+  // lifecycle matrix with every formal gameplay owner loaded.
+  await client.send('Fetch.disable');
+  await client.eval(`(async()=>{for(const feature of ['gameplay-core','patrol','boss-tower','abyss'])await FourSymbolsFeatures.ensure(feature,'navigation-qa');showPage('home');})()`);await settle(client);
   for(let pass=0;pass<2;pass++){
    for(const [mode,action] of SCENARIOS){
     console.log("Navigation QA",width,height,pass,mode);
@@ -188,6 +214,24 @@ async function runViewport(chrome,url,width,height){
    evidence.inventory.gestureEvents=await client.eval('window.__navQaGestureEvents');
    evidence.inventoryAfterSwipe=await client.eval("document.getElementById('inventoryGridScroll').scrollTop");assert.ok(evidence.inventoryAfterSwipe>0,'legal inventory swipe did not scroll');
   }else{evidence.inventoryScrollNeeded=false;}
+  evidence.inventoryReachability=await client.eval(`(()=>{const owner=document.getElementById('inventoryGridScroll'),items=[...document.querySelectorAll('#inventoryGrid .inventory-item-classic')],footer=document.getElementById('inventoryBottomActions'),buttons=[...footer.querySelectorAll('button:not([hidden])')],rect=n=>{const r=n.getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height}};owner.scrollTop=owner.scrollHeight;const ownerRect=rect(owner),lastRect=rect(items.at(-1)),footerRect=rect(footer);return {owner:ownerRect,last:lastRect,footer:footerRect,lastFullyVisible:lastRect.top>=ownerRect.top-1&&lastRect.bottom<=ownerRect.bottom+1,footerBelowOwner:footerRect.top>=ownerRect.bottom-1,controls:buttons.map(button=>{const r=rect(button),hit=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return {id:button.id,text:button.textContent.trim(),rect:r,hit:button.contains(hit)};})};})()`);
+  assert.equal(evidence.inventoryReachability.lastFullyVisible,true,'last backpack row must scroll fully into view');
+  assert.equal(evidence.inventoryReachability.footerBelowOwner,true,'fixed backpack actions must not cover item rows');
+  assert.ok(evidence.inventoryReachability.controls.length>=3,'refresh and pagination controls must remain present');
+  evidence.inventoryReachability.controls.forEach(control=>assert.equal(control.hit,true,'backpack control is obstructed: '+JSON.stringify(control)));
+
+  // Use the formal attention conditions and formal dot writers.  Record both
+  // coordinate planes at the animation endpoints, not a lucky single frame.
+  evidence.phase='notification-dots';
+  evidence.notificationDots=await client.eval(`(async()=>{sharedExp=999999;const sample=async(dot)=>{if(!dot)return null;const button=dot.parentElement,rect=n=>{const r=n.getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height}};const style=getComputedStyle(dot),animations=dot.getAnimations(),animation=animations[0];if(animation){animation.pause();animation.currentTime=0;}await new Promise(requestAnimationFrame);const maximum=rect(dot);if(animation){const timing=animation.effect.getComputedTiming();animation.currentTime=Number(timing.duration||0)/2;}await new Promise(requestAnimationFrame);const minimum=rect(dot),buttonRect=rect(button);return {computed:{width:style.width,height:style.height,right:style.right,top:style.top,animationName:style.animationName,animationDuration:style.animationDuration,borderWidth:style.borderWidth,pointerEvents:style.pointerEvents},maximum,minimum,button:buttonRect,insideButton:minimum.left>=buttonRect.left-1&&minimum.right<=buttonRect.right+1&&minimum.top>=buttonRect.top-1&&minimum.bottom<=buttonRect.bottom+1};};showPage('home');v146SyncCharacterAttentionDots();const legacy=await sample(document.querySelector('#homeIconCharacter')?.parentElement?.querySelector(':scope > .v141-notice-dot'));showPage('training');v146SyncCharacterAttentionDots();const native=await sample(document.querySelector("#bottomNav button[aria-label='角色'] > .v141-notice-dot"));return {legacy,native,context:bottomNav.dataset.navContext,labels:[...bottomNav.children].map(n=>n.getAttribute('aria-label'))};})()`);
+  assert.ok(evidence.notificationDots.legacy,'legacy character reminder dot missing');
+  assert.ok(evidence.notificationDots.native,'native character reminder dot missing');
+  for(const [plane,dot] of Object.entries({legacy:evidence.notificationDots.legacy,native:evidence.notificationDots.native})){
+   assert.equal(dot.computed.pointerEvents,'none',plane+' dot must not block taps');
+   assert.equal(dot.insideButton,true,plane+' dot must not be clipped outside its button');
+   assert.ok(dot.maximum.width>=7&&dot.maximum.width<=9,plane+' static dot screen width '+dot.maximum.width);
+   assert.ok(dot.minimum.width>=6.3&&dot.minimum.width<=8.2,plane+' animated minimum width '+dot.minimum.width);
+  }
   // The paginated inventory can fit without scrolling. Exercise an actually
   // overflowing formal skill panel, without injecting geometry or content.
   await client.eval("(async()=>{closeMapInventoryOverlay();showPage('home');await FourSymbolsFeatures.ensure('skill','navigation-scroll-qa');openHomeFeature('character');switchCharacterTab('skill');renderSkillLoadout();})()");await settle(client);

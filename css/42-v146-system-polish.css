@@ -23,28 +23,11 @@
 }
 
 /* Status floating text is owned by css/battle-floating-feedback-owner.css. */
-/* Growth reminders use the same small breathing red dot as the additional-
-   character creation reminder.  The target remains fully composited so the
-   dot never inherits a disabled/inactive dimming layer. */
+/* Growth reminders use the shared notification-dot presentation contract in
+   css/38.  This file only keeps the attention target fully composited. */
 #game-stage .v146-growth-attention-target{
     opacity:1 !important;
     filter:none !important;
-}
-#game-stage .v141-notice-dot,
-#game-stage .v146-growth-guidance-dot{
-    width:7px !important;
-    height:7px !important;
-    min-width:7px !important;
-    min-height:7px !important;
-    z-index:20050 !important;
-    opacity:1 !important;
-    filter:none !important;
-    background:#e52e2e !important;
-    border:0 !important;
-    border-radius:50% !important;
-    box-shadow:0 0 8px rgba(255,43,43,.9) !important;
-    animation:v131RedDotPulse 1.1s ease-in-out infinite alternate !important;
-    mix-blend-mode:normal !important;
 }
 
 #battlePage .v146-defeated.targetable::after,

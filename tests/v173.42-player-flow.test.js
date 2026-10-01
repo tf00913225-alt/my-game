@@ -8,6 +8,7 @@ const v141=fs.readFileSync("js/35-v141-ui-battle.js","utf8");
 const abyss=fs.readFileSync("js/36-v141-content-systems.js","utf8");
 const homePolish=fs.readFileSync("js/41-v146-system-polish.js","utf8");
 const dungeonPolish=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");
+const navShell=fs.readFileSync("js/04-stage-v11-native-bottom-nav-runtime.js","utf8");
 const recovery=fs.readFileSync("js/45-v154-dev-fixes.js","utf8");
 const tuning=fs.readFileSync("js/47-v158-combat-tuning.js","utf8");
 const settings=fs.readFileSync("js/49-v169-element-box-settings.js","utf8");
@@ -100,11 +101,12 @@ assert.match(homePolish,/normalizeOrdinaryBlueprintItem/);
 assert.match(homePolish,/delete item\.setId/);
 assert.match(homePolish,/隨機普通裝備/);
 
-/* Red dots reuse the small breathing creation prompt and taps never flash blue. */
+/* Red dots use the shared coordinate-aware contract and taps never flash blue. */
 assert.match(homeCss,/#game-stage \*/);
 assert.match(homeCss,/-webkit-tap-highlight-color:rgba\(0,0,0,0\) !important/);
-assert.match(homeCss,/\.v141-notice-dot,[\s\S]*width:7px !important;[\s\S]*height:7px !important/);
-assert.match(homeCss,/animation:v131RedDotPulse 1\.1s ease-in-out infinite alternate !important/);
+assert.doesNotMatch(homeCss,/\.v141-notice-dot,[\s\S]*width:7px !important/);
+assert.match(fs.readFileSync("css/38-v141-system-expansion.css","utf8"),/animation:v141NoticePulse 1\.25s ease-in-out infinite/);
+assert.match(fs.readFileSync("css/06-stage-v11-native-bottom-nav.css","utf8"),/#bottomNav > \.nav-button > \.v141-notice-dot\{[\s\S]*?width:22px;/);
 
 /* Manual actions use one core delay owner extended only by visual remaining time. */
 assert.match(core,/function getBattleAdvanceDelay\(phase\)/);
@@ -154,11 +156,11 @@ assert.match(waterRules,/FROSTBITE_REMAINING_RATE=\.75/);
 assert.match(waterRules,/WATER_DAMAGE_SKILL_IDS/);
 assert.match(waterRules,/frostbitePenaltyPercent:25/);
 
-assert.match(dungeonPolish,/\["秘寶","assets\/ui\/nav-relic-v175\.webp","v148OpenContextRelic\(\)"\]/);
-assert.match(dungeonPolish,/\["元素匣","assets\/ui\/nav-element-box\.png","openHomeFeature\('autoBattleSettings'\)"\]/);
-assert.match(dungeonPolish,/\["返回","assets\/ui\/map-return\.png"/);
+assert.match(navShell,/\["秘寶","assets\/ui\/nav-relic-v175\.webp","v148OpenContextRelic\(\)"\]/);
+assert.match(navShell,/\["元素匣","assets\/ui\/nav-element-box\.png","openHomeFeature\('autoBattleSettings'\)"\]/);
+assert.match(navShell,/\["返回","assets\/ui\/map-return\.png"/);
 assert.match(dungeonPolish,/topReturn\.setAttribute\("aria-label","返回上一層"\)/);
-assert.match(dungeonPolish,/nav\.dataset\.v146Columns="5"/);
+assert.match(navShell,/grid-template-columns|renderGameplayContext/);
 
 assert.match(homeRosterCss,/grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
 assert.match(creationCss,/creation-stat-details\[open\] \.creation-stat-details-body\{[\s\S]*font-size:32px/);

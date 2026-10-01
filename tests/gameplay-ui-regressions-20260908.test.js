@@ -12,7 +12,7 @@ const vfxCss=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");
 const touchLock=fs.readFileSync("js/01-stage-v8-touch-lock.js","utf8");
 const relicCss=fs.readFileSync("css/55-team-relic-system.css","utf8");
 const compactModalCss=fs.readFileSync("css/37-v139-rested-experience.css","utf8");
-const dungeonNav=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");
+const dungeonNav=fs.readFileSync("js/04-stage-v11-native-bottom-nav-runtime.js","utf8");
 
 /* Boss objects share numeric enemy target identity and cardless presentation. */
 assert.match(bossRuntime,/unitKind:"boss-object"/);
