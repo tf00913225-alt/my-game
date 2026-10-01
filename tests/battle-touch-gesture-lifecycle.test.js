@@ -28,5 +28,7 @@ slide(10);pointer("pointerdown",11);pointer("pointerup",11);assert.equal(click(n
 slide(12);win.get("pagehide")();assert.equal(tap(12),false,"page lifecycle resets gestures");
 pointer("pointerdown",13);window.FourSymbolsGestureArbiter.getState(13);win.get("blur")();assert.equal(window.FourSymbolsGestureArbiter.getState(13),null);
 for(let i=0;i<10;i++){assert.equal(tap(),false);}
+pointer("pointerdown",14);listeners.get("stage:pointerleave")({target,pointerId:14});pointer("pointerup",14);assert.equal(click(14),false,"leaving a nested child must not cancel a tap inside the stage");
+pointer("pointerdown",15);listeners.get("stage:pointerleave")({target:stage,pointerId:15});assert.equal(click(15),true,"leaving the stage cancels that gesture");assert.equal(tap(15),false);
 assert.doesNotMatch(fs.readFileSync("js/01-stage-v8-touch-lock.js","utf8"),/suppressedTargets|touchend/);
 console.log("✓ gesture-scoped suppression, no-click recovery, cancel, expiry, delayed click, multitouch and re-entry");
