@@ -53,7 +53,7 @@
 
 - Normal Hit（一般命中）的唯一公式 owner 是 `js/00-main.js::calculateHitChancePercent()`／`rollHitChance()`。正式公式為：`clamp(95 + accuracy×0.15 + finalAccuracyBonus - targetFinalEvasion - finalHitReduction, 70, 99)`。命中提升、命中下降與閃躲都以最終百分點直接加減；禁止再使用「先封頂命中，再乘上 (1 - 閃躲率)」。
 - 普通怪物沒有明確 `evasion` 時，正式預設值為 `min(10, level×0.1)`；明確指定的怪物／Boss 閃躲仍保留。多個閃躲來源由 `v173CombineEvasionRates()` 以百分點相加／相減後統一限制，不得改回獨立機率乘算。
-- Status / Hard Control（異常／硬控）的唯一公式 owner 是 `js/00-main.js::calculateStatusEffectChance()`／`rollStatusEffectHit()`。正式公式在上限前為：`skillBaseChance + offensiveAttribute×0.05 + finalStatusBonus - targetSpirit×0.05 - finalStatusResistance`。不得再加入 level factor（等級差倍率）、`sqrt(attribute)`、硬控專屬 Spirit coefficient（精神係數）或第二套 Boss 乘算抗性。
+- Status / Hard Control（異常／硬控）的唯一公式 owner 是 `js/00-main.js::calculateStatusEffectChance()`／`rollStatusEffectHit()`。正式公式在上限前為：`skillBaseChance + offensiveAttribute×0.05 + finalStatusBonus - targetFinalStatusResistance`。目標抗性只能來自獨立的 Equipment、Skill、EX、Relic、Buff／Debuff、Passive 或 Monster Combat Stat；Spirit 與其他六圍不得提供抗性。不得再加入 level factor（等級差倍率）、`sqrt(attribute)`、六圍衍生抗性或第二套 Boss 乘算抗性。
 - 物理技能的異常主屬性使用有效 Attack Points（攻擊六圍點數）；法術技能使用有效 Intelligence（智力）。符咒、怪物技能、Boss／深淵技能與玩家技能必須走同一公式 owner，不得各自重算。
 - Hard Control 最終上限固定為：Regular 90%、Elite 75%、Boss 60%、Enemy-to-player 60%；上限只在同一套最終成功率公式最後套用一次。Freeze／Petrify 的互斥 Gate 仍先於正式寫入，禁止 Boss 額外再乘第二套隱藏抗性。
 - Frostbite（凍傷）是 Soft Debuff：造成傷害 -30%，最終閃躲 -25%、最終異常狀態抗性 -25%；不禁止使用技能。任何戰鬥狀態文字若再顯示「凍傷＝無法使用技能」都屬 Contract violation。
@@ -153,3 +153,22 @@
 - A live V143 impact is scheduled as one target-plus-`impactId` batch. Its requests register before the batch flushes and sort Shield → Damage/Critical/MISS/Resist → Status. Synthetic feedback without an `impactId` stays on the normal queue; clear cancels every pending batch.
 - Persistent state Gate returns a reason. `sameNameDuplicate` is a silent reject before hit rolling or mutation; `exclusiveConflict` (Freeze/Petrify) emits formal status MISS; resistance remains distinct.
 - Skill-name presentation derives color from `skill.element` through `data-skill-element`; character element must not participate. It is a document-level fixed viewport surface and shares the ordinary floating-feedback visual font size.
+
+## Six-Stat Combat Attribute Convergence（2026-09-30）
+
+本節為正式六圍、戰鬥能力與防禦 Owner（控制來源）的最新契約；若歷史段落與本節衝突，以本節為準。
+
+- 正式六圍唯一為：Attack（攻擊）、Intelligence（智力）、Vitality（體質）、Energy（能量）、Defense（防禦能力值）、Agility（敏捷）。Spirit（精神）不再是六圍。
+- Attack：每 1 點 +4 Physical Attack（物理攻擊），只負責物理攻擊。
+- Intelligence：每 1 點 +2.75 Magic Attack（法術攻擊），並由同一 Intelligence Owner（智力控制來源）支援 Healing（治療）。
+- Vitality：每 1 點 +50 Max HP（最大生命值）；不再提供 Defense。
+- Energy：每 1 點 +15 Max SP（最大能量值）；不再提供命中、回復或速度。
+- Defense：以 defensePoints 作為唯一可分配防禦能力來源，每 1 點 +4 Final Defense（最終防禦）。最終防禦為 Base Defense + Level Defense + Defense Attribute × 4 + Equipment Defense + Buff／Passive modifiers − Debuff modifiers。
+- Defense 對 Physical Damage（物理傷害）與 Magic Damage（法術傷害）共用同一減傷 Owner；遞減因子維持 K / (K + Defense)，其中 K = 400 + Target Level × 10。
+- Agility：每 1 點 +1 Speed（出手速度）；不得派生 Evasion（閃避）。
+- `agilityDown` 與六圍 `statDown` 對敏捷的影響只改變 Speed；不得改變 Evasion。閃避變化必須由獨立 Evasion 詞條或明確技能／狀態效果提供。
+- Accuracy（命中）、Evasion（閃避）、Critical Chance（爆擊率）、Anti-Crit（抗暴）、Status Accuracy（異常命中）、Status Resistance（異常抗性）不得由六圍直接派生，只能由 Equipment、Gem、Skill、EX、Relic、Buff／Debuff 或 Passive 提供。
+- 舊存檔的 Spirit 投入點數必須透過正式可分配能力點池返還；不得轉成 Defense，不得遺失，不得以永久 Legacy Runtime Patch 保留舊公式。舊 Vitality 點數保留，但新版統一不再提供 Defense。
+- 舊裝備／重鑄 Spirit 詞條一次遷移為獨立詞條，按既有數值語意映射：每 1 點轉為 Accuracy +2、Anti-Crit +0.1 個百分點、Status Resistance +0.05 個百分點；不轉成六圍，也不改動其他裝備詞條。遷移涵蓋已裝備、背包與重鑄詞條。
+- Physical Skill Elite/Boss Rank Bonus（物理技能精英／Boss 階級固定傷害加成）正式 RETIRED；相關常數與函式不得存在或被 Runtime、Tests、Skill Description 引用。
+- Character、Additional Character、Monster、Preview、Save／Load、Cloud Save、Equipment、Buff／Debuff 與 UI 必須使用同一套六圍語意；Monster 的命中、閃避與異常能力若存在，必須是獨立 Monster Combat Stat，不得假裝由 Spirit 或 Agility 派生。

@@ -503,8 +503,8 @@
     const EQUIPMENT_SET_PIECES=[
         {key:"blade",slot:"weapon",name:"刀",stats:{attack:10,vitality:-2}},
         {key:"fan",slot:"weapon",name:"扇",stats:{intelligence:10,vitality:-2}},
-        {key:"heavyArmor",slot:"armor",name:"鎧甲",stats:{attack:5,spirit:5}},
-        {key:"robe",slot:"armor",name:"袍",stats:{intelligence:5,spirit:5}},
+        {key:"heavyArmor",slot:"armor",name:"鎧甲",stats:{attack:5,accuracy:10,antiCrit:0.5,statusResistance:0.25}},
+        {key:"robe",slot:"armor",name:"袍",stats:{intelligence:5,accuracy:10,antiCrit:0.5,statusResistance:0.25}},
         {key:"boots",slot:"shoes",name:"靴",stats:{agility:10}},
         {key:"shoes",slot:"shoes",name:"履",stats:{agility:10}},
         {key:"helm",slot:"head",name:"盔",stats:{attack:12}},
@@ -840,14 +840,14 @@
                 ?Math.max(0,Number(skill.freezeChanceByLevel[Math.min(skill.freezeChanceByLevel.length-1,skillLevel-1)])||0)
                 :Math.max(0,Number(skill&&skill.freezeChance)||0);
             const intelligence=Number(stats.intelligence!==undefined?stats.intelligence:character.intelligence)||0;
-            const targetSpirit=typeof getMonsterEffectiveSpiritPoints==="function"
-                ?Number(getMonsterEffectiveSpiritPoints(targetMonster))||0
-                :Number(targetMonster.spiritPoints||targetMonster.spirit)||0;
+            const targetStatusResistance=typeof getMonsterEffectiveStatusResistance==="function"
+                ?Number(getMonsterEffectiveStatusResistance(targetMonster))||0
+                :Number(targetMonster.statusResistance)||0;
             const rank=typeof getMonsterRank==="function"?getMonsterRank(targetMonster):"regular";
             if(typeof rollStatusEffectHit==="function"){
                 return rollStatusEffectHit(
                     baseChance,Number(character.level)||1,Number(targetMonster.level)||1,
-                    intelligence,targetSpirit,true,rank,0
+                    intelligence,targetStatusResistance,true,rank,0
                 );
             }
         }
@@ -1314,9 +1314,12 @@
 
             Object.keys(counts).forEach(setId=>{
                 if(counts[setId]>=3){
-                    ["attack","vitality","energy","intelligence","spirit","agility"].forEach(stat=>{
+                    ["attack","vitality","energy","intelligence","defensePoints","agility"].forEach(stat=>{
                         bonus[stat]=(bonus[stat]||0)+1;
                     });
+                    bonus.accuracy=(bonus.accuracy||0)+2;
+                    bonus.antiCrit=(bonus.antiCrit||0)+0.1;
+                    bonus.statusResistance=(bonus.statusResistance||0)+0.05;
                 }
             });
 

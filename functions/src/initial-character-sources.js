@@ -4,7 +4,7 @@ const {createHash}=require("node:crypto");
 const {LEGACY_BACKUP_SIDECARS}=require("./cloud-save-policy");
 const {newcomerExpNext}=require("./canonical-newcomer-exp");
 
-const STAT_KEYS=["attack","vitality","energy","intelligence","spirit","agility"];
+const STAT_KEYS=["attack","intelligence","vitality","energy","defensePoints","agility"];
 const ELEMENTS=new Set(["fire","water","wind","earth"]);
 const digest=value=>createHash("sha256").update(JSON.stringify(value)).digest("hex");
 const plain=value=>value!==null&&typeof value==="object"&&!Array.isArray(value);

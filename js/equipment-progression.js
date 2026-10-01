@@ -25,7 +25,7 @@
         {key:"purple",label:"紫階",chance:10},
         {key:"orange",label:"橙階",chance:10}
     ];
-    const STAT_LABEL={attack:"攻擊",intelligence:"智力",vitality:"體質",agility:"敏捷",spirit:"精神",energy:"能量"};
+    const STAT_LABEL={attack:"攻擊",intelligence:"智力",vitality:"體質",energy:"能量",defensePoints:"防禦",agility:"敏捷",accuracy:"命中",evasion:"閃避",crit:"爆擊",criticalChance:"爆擊",antiCrit:"抗暴",statusAccuracy:"異常命中",statusResistance:"異常抗性"};
     const SLOT_META={
         shoulder:{label:"護腕",warrior:["vitality","attack"],mage:["vitality","intelligence"]},
         head:{label:"頭盔",warrior:["vitality","attack","agility"],mage:["vitality","intelligence","agility"]},
@@ -62,8 +62,8 @@
     const SET_RULES={
         blade:{stats:{attack:15,vitality:-2}},
         fan:{stats:{intelligence:15,vitality:-2}},
-        heavyArmor:{stats:{attack:7,spirit:5}},
-        robe:{stats:{intelligence:7,spirit:5}},
+        heavyArmor:{stats:{attack:7,accuracy:10,antiCrit:0.5,statusResistance:0.25}},
+        robe:{stats:{intelligence:7,accuracy:10,antiCrit:0.5,statusResistance:0.25}},
         boots:{stats:{attack:2,agility:13}},
         shoes:{stats:{intelligence:2,agility:13}},
         helm:{stats:{attack:15}},

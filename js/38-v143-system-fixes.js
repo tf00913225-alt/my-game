@@ -32,7 +32,7 @@
         armor:{label:"衣服",type:"armor",glyph:"甲"}
     };
     const STAT_KEYS=["attack","intelligence"];
-    const SUBSTAT_KEYS=["vitality","energy","agility","spirit"];
+    const SUBSTAT_KEYS=["vitality","energy","defensePoints","agility","statusResistance"];
     const NORMAL_GEAR_PREFIXES=["古銅","精鍛","雲紋","玄鐵","旅者","守備","靈巧","秘銀"];
 
     function numeric(value){
@@ -474,7 +474,7 @@
     }
     function synthesisResult(item){
         if(!window.v132ShowRewardModal){ return; }
-        const labels={attack:"攻擊",intelligence:"智力",vitality:"體質",energy:"能量",agility:"敏捷",spirit:"精神"};
+        const labels={attack:"攻擊",intelligence:"智力",vitality:"體質",energy:"能量",defensePoints:"防禦",agility:"敏捷",accuracy:"命中",evasion:"閃避",antiCrit:"抗暴",statusAccuracy:"異常命中",statusResistance:"異常抗性"};
         const stats=Object.keys(item.stats||{}).map(key=>'<span>'+labels[key]+' <b>+'+item.stats[key]+'</b></span>').join("");
         window.v132ShowRewardModal('<div class="v132-reward-modal-inner"><h3>合成成功</h3><div class="v141-result-item">'+item.icon+'<b>'+escapeHtml(item.name)+'</b>'+stats+'</div><p>此為系統隨機生成的普通裝備，不屬於四大套裝。</p><div class="v132-reward-actions"><button type="button" onclick="v132CloseRewardModal()">確定</button></div></div>');
     }

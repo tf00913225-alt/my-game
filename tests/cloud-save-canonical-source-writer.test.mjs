@@ -12,7 +12,7 @@ const root=`serverUsers/${uid}`;
 const operationId="init-character-0001";
 
 const selection={displayName:"英雄",element:"fire",gender:"female",
-    attributes:{attack:3,vitality:2,energy:1,intelligence:2,spirit:1,agility:1}};
+    attributes:{attack:3,vitality:2,energy:1,intelligence:2,defensePoints:1,agility:1}};
 
 function harness(candidate="none"){
     let sessionId="creation-session-one";
