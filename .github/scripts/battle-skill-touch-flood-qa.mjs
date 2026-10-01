@@ -96,12 +96,14 @@ export async function battleSkillTouchFloodQa(rawClient,artifactDir,{animationOn
             checks.supportDeclarations.push({skill,targetType:formal.targetType,passed:true});
         }
         await client.eval(`__touchQaReset('revive');true`);
+        await client.eval(`(()=>{window.__touchQaReviveHp=[0,1,2].map(index=>{const character=getBattleCharacterByIndex(index);const hp=character?.hp;if(character){const maxHP=Number(getPartyBattleStats(index)?.maxHP)||Number(character.hp)||1;character.hp=Math.max(1,maxHP);}return {index,hp};});updateUI();return true;})()`);
         const reviveFixture=await client.eval(`[0,1,2].map(index=>({index,hp:getBattleCharacterByIndex(index)?.hp||0}))`);
         assert.ok(reviveFixture.every(item=>item.hp>0),'revive no-target acceptance requires all three allies alive');
         await tap('.skill-quick-button[data-skill-id="revive"]');
         const reviveRejected=await client.eval(`(()=>{const n=document.getElementById('battleActionNotice');return {ready:actionReady,pending:pendingAction,text:n?.textContent||'',visible:!!n&&!n.hidden&&n.classList.contains('show')};})()`);
         assert.deepEqual(reviveRejected,{ready:false,pending:null,text:'我方目前沒有人死亡，無法使用復活術。',visible:true});
         checks.reviveNoTargetNotice=reviveRejected;
+        await client.eval(`(()=>{__touchQaReviveHp.forEach(item=>{const character=getBattleCharacterByIndex(item.index);if(character){character.hp=item.hp;}});updateUI();return true;})()`);
         await client.eval(`__touchQaReset('waterBall');player.sp=0;populateSkillQuickBar();document.getElementById('skillQuickBar').classList.add('show');true`);
         assert.equal((await point(button)).disabled,true);await tap(button);assert.equal((await state()).ready,false);
         const rejection=await client.eval(`(()=>{__touchQaReset('waterBall');autoBattle=true;prepareAction('waterBall');const auto=!actionReady;autoBattle=false;battlePhase='resolve';prepareAction('waterBall');const phase=!actionReady;battlePhase='declare';characterSkillLoadouts[getPartyCharacterKey(0)].equippedSkills=[];prepareAction('waterBall');return {auto,phase,equipment:!actionReady};})()`);
