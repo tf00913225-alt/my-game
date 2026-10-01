@@ -123,11 +123,16 @@ export async function battleSkillTouchFloodQa(rawClient,artifactDir,{animationOn
                 for(const [phase,time] of [['cast',.08],['flight',.3],['impact',.65],['dissipate',.92]]){
                     console.log('Battle touch/flood QA: '+side+' target '+column+' '+phase);
                     const snapshot=await client.eval(`(()=>{
+                        v142SkillAnimationDirector.dispose();
                         v142SkillAnimationDirector.play({id:'floodBeast',name:'洪水猛獸',element:'water',category:'magic',targetType:'single',duration:1350,resolveDuration:1350},{side:${JSON.stringify(side)},actorIndex:${actorIndex},targetSide:${JSON.stringify(side==='player'?'monster':'player')},targetId:${targetId},targetIds:[${targetId}]});
                         const n=document.querySelector('.v143-vfx-sprite[data-skill="floodBeast"]');if(!n)return null;
                         for(const a of n.getAnimations()){a.pause();a.currentTime=1350*${time};}
                         const r=n.getBoundingClientRect(),m=new DOMMatrix(getComputedStyle(n).transform);
                         const dx=parseFloat(n.style.getPropertyValue('--v143-sprite-dx')),dy=parseFloat(n.style.getPropertyValue('--v143-sprite-dy'));
+                        const targetSide=${JSON.stringify(side==='player'?'monster':'player')},targetIndex=${targetId};
+                        const targetSlot=FourSymbolsBattlefieldSlots.getSlotForCombatant(targetSide,targetIndex);
+                        const targetCenter=FourSymbolsBattlefieldSlots.getSlotCenter(targetSlot);
+                        if(Math.abs(parseFloat(n.style.left)+dx-targetCenter.x)>1||Math.abs(parseFloat(n.style.top)+dy-targetCenter.y)>1)throw new Error('Flood endpoint must match the current canonical target, not a reused animation');
                         return {motion:n.dataset.motion,travel:n.dataset.travel||null,center:{x:r.left+r.width/2,y:r.top+r.height/2},actor:{x:parseFloat(n.style.left),y:parseFloat(n.style.top)},dx,dy,angle:Math.atan2(m.b,m.a)*180/Math.PI,background:getComputedStyle(n).backgroundPosition,opacity:getComputedStyle(n).opacity,hit:v143SkillAnimationManifest.floodBeast.hit};
                     })()`);
                     assert.ok(snapshot);assert.equal(snapshot.motion,'phased');assert.equal(snapshot.travel,null);
