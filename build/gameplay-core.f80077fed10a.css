@@ -3731,12 +3731,6 @@
 #game-stage .v141-dungeon-cover-actions button:disabled{opacity:.4;filter:grayscale(.5);}
 #game-stage .v141-dungeon-remaining{padding:1px 8px 7px;color:#b7a68a;font-size:10px;text-align:center;}
 
-#game-stage #app:not(.v141-dungeon-active):not(.v148-context-nav-active) #v141DungeonNav{display:none !important;}
-#game-stage #app.v141-dungeon-active #v141DungeonNav,
-#game-stage #app.v148-context-nav-active #v141DungeonNav{display:grid !important;}
-#game-stage #app.v141-dungeon-active #bottomNav,
-#game-stage #app.v148-context-nav-active #bottomNav{display:none !important;}
-#game-stage #v141DungeonNav{z-index:790 !important;}
 #game-stage #dungeonPage .v141-dungeon-return{display:block !important;position:absolute !important;right:12px !important;top:12px !important;z-index:120 !important;}
 
 /* ----- Notification dots ----- */
@@ -3755,9 +3749,7 @@
     pointer-events:none;
 }
 
-#game-stage .home-feature-button,
-#game-stage .nav-button,
-#game-stage #dungeonNav{position:relative;}
+#game-stage .home-feature-button{position:relative;}
 @keyframes v141NoticePulse{50%{transform:scale(.78);opacity:.65}}
 
 /* ----- Skill preview moved outside transformed game stage ----- */
@@ -4354,15 +4346,6 @@
 #game-stage #dungeonTabContent > .v141-abyss-shell{height:100% !important;min-height:0 !important;overflow:hidden !important;}
 #game-stage .v141-abyss-map{height:auto !important;min-height:0 !important;flex:1 1 auto !important;}
 #game-stage #dungeonPage .v141-dungeon-return{display:none !important;}
-#game-stage #v141DungeonNav{
-    width:100% !important;
-    max-width:none !important;
-    height:84px !important;
-    grid-template-columns:repeat(5,minmax(0,1fr)) !important;
-    box-sizing:border-box !important;
-}
-#game-stage #v141DungeonNav .nav-art-button{height:64px !important;max-width:94% !important;}
-
 .v143-abyss-dialogue{
     position:absolute !important;
     inset:0 !important;
@@ -4439,8 +4422,6 @@
 
 @media (max-height:720px){
     #game-stage #dungeonPage{padding-bottom:82px !important;}
-    #game-stage #v141DungeonNav{height:80px !important;}
-    #game-stage #v141DungeonNav .nav-art-button{height:60px !important;}
     #game-stage .v143-abyss-dialogue b{font-size:19px !important;}
 }
 
@@ -4666,10 +4647,6 @@
 #game-stage .v141-abyss-map.v146-too-far{animation:v146AbyssReject .6s ease;}
 @keyframes v146AbyssReject{25%{box-shadow:inset 0 0 45px rgba(255,72,45,.48)}70%{box-shadow:inset 0 0 20px rgba(255,72,45,.18)}}
 
-#game-stage #v141DungeonNav{display:grid !important;width:100% !important;max-width:none !important;height:82px !important;box-sizing:border-box !important;grid-template-columns:repeat(5,minmax(0,1fr)) !important;gap:0 !important;}
-#game-stage #v141DungeonNav[data-v146-columns="4"]{grid-template-columns:repeat(4,minmax(0,1fr)) !important;}
-#game-stage #v141DungeonNav .nav-button{min-width:0 !important;padding:3px !important;}
-#game-stage #v141DungeonNav .nav-art-button{width:auto !important;height:62px !important;max-width:92% !important;object-fit:contain !important;}
 
 .v143-abyss-dialogue{padding:34px 25px !important;}.v143-abyss-dialogue b{font-size:23px !important;line-height:1.7 !important;}.v143-abyss-dialogue span{font-size:15px !important;}
 
@@ -4720,10 +4697,6 @@
 
 /* Remaining non-battle mobile owners. These rules are intentionally scoped to
    map/home/dungeon surfaces so battlePage typography remains untouched. */
-#game-stage > #app > #game-content #mapPageNav .nav-button{
-    font-size:15px !important;
-    line-height:1.2 !important;
-}
 #game-stage #mapPage .v141-task-tracker-title{
     font-size:15px;
     line-height:20px;
@@ -4842,8 +4815,6 @@
 @media (max-height:720px){
     #game-stage #battlePage #battleMonsterArea:not(.v-fixed-enemy-zone){transform:translateY(12px);}
     #game-stage #dungeonPage.v146-abyss-active{padding-bottom:78px !important;}
-    #game-stage #v141DungeonNav{height:78px !important;}
-    #game-stage #v141DungeonNav .nav-art-button{height:58px !important;}
 }
 @media (max-width:380px){
     #game-stage .shop-potion-purchase-row{grid-template-columns:auto 48px minmax(62px,1fr) 58px !important;gap:3px !important;}
@@ -4940,21 +4911,6 @@
         linear-gradient(180deg,rgba(8,4,2,.05),rgba(7,4,2,.72)),
         url("../assets/battle/element-box.png") center / auto 84% no-repeat,
         radial-gradient(circle at center,#6c2c12 0%,#241008 62%,#0b0705 100%) !important;
-}
-
-/* Deep Abyss uses the same five-slot bottom navigation as Daily Dungeon. */
-#game-stage #mapPageNav,
-#game-stage #v141DungeonNav{
-    background:linear-gradient(0deg,#0e0c0a,#1c1712);
-    border:0;
-    border-radius:0;
-    box-sizing:border-box;
-}
-#game-stage #v146AbyssReturn{display:none !important;}
-#game-stage #v141DungeonNav,
-#game-stage #v141DungeonNav[data-v146-columns="4"],
-#game-stage #v141DungeonNav[data-v146-columns="5"]{
-    grid-template-columns:repeat(5,minmax(0,1fr)) !important;
 }
 
 /* Automatic patrol keeps the original smooth route; the manual click gait is retired. */
@@ -5277,48 +5233,6 @@
     background-image:linear-gradient(180deg,transparent 58%,rgba(7,5,3,.38)),url("../assets/dungeons/covers/equipment.webp") !important;
 }
 
-/* Daily and Abyss share one undistorted five-slot bottom navigation. */
-#game-stage #v141DungeonNav.v148-context-nav,
-#game-stage #v141DungeonNav.v148-context-nav[data-v146-columns="4"],
-#game-stage #v141DungeonNav.v148-context-nav[data-v146-columns="5"]{
-    position:absolute !important;
-    left:0 !important;
-    right:0 !important;
-    bottom:0 !important;
-    z-index:790 !important;
-    display:grid !important;
-    width:420px !important;
-    max-width:none !important;
-    height:84px !important;
-    grid-template-columns:repeat(5,minmax(0,1fr)) !important;
-    gap:0 !important;
-    box-sizing:border-box !important;
-    transform:none !important;
-    overflow:hidden !important;
-}
-#game-stage #v141DungeonNav .nav-button{
-    display:flex !important;
-    width:auto !important;
-    min-width:0 !important;
-    max-width:100% !important;
-    height:100% !important;
-    align-items:center !important;
-    justify-content:center !important;
-    padding:2px !important;
-    box-sizing:border-box !important;
-    overflow:hidden !important;
-}
-#game-stage #v141DungeonNav .nav-art-button{
-    display:block !important;
-    width:100% !important;
-    height:72px !important;
-    max-width:100% !important;
-    max-height:100% !important;
-    object-fit:contain !important;
-    object-position:center !important;
-    transform:none !important;
-}
-
 #game-stage #dungeonPage.v146-abyss-active{
     padding:0 0 84px !important;
 }
@@ -5403,12 +5317,6 @@
     #game-stage #app.v141-dungeon-active #dungeonPage,
     #game-stage #app.v141-dungeon-active #dungeonPage.active{
         padding-bottom:80px !important;
-    }
-    #game-stage #v141DungeonNav.v148-context-nav{
-        height:80px !important;
-    }
-    #game-stage #v141DungeonNav .nav-art-button{
-        height:68px !important;
     }
 }
 

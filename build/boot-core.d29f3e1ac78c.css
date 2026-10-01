@@ -526,10 +526,6 @@ button:disabled{
    讓戰鬥畫面更不容易需要捲動。
 */
 
-#app.in-battle .bottom-nav{
-    display:none;
-}
-
 #app.in-battle .content{
     /* V94：戰鬥頁不應繼承一般頁面的 10px/12px/78px 內距。
        這些內距經 420→1080 放大後就會變成手機上可見的黑邊。 */
@@ -542,35 +538,6 @@ button:disabled{
     width:100%;
     height:100%;
     margin:0;
-}
-
-/*
-   ★ 新增（依照使用者要求，地圖頁面
-   專屬的3按鈕導覽列）：
-   #mapPageNav預設隱藏（display:none，
-   蓋掉它從.bottom-nav繼承來的
-   display:grid），只有#app帶著
-   on-map-page這個class（showPage()
-   切到map頁面時才會加上）才會顯示，
-   同時把主城那套5按鈕的.bottom-nav
-   隱藏掉，兩套導覽列不會同時出現。
-   grid-template-columns改成3欄，
-   對應3個按鈕。
-*/
-
-#mapPageNav{
-    display:none;
-}
-
-#app.on-map-page .bottom-nav:not(.map-page-nav){
-    display:none;
-}
-
-/* 巡怪頁底部導覽固定為五鍵；實際按鈕由共用 context navigation owner 投影。 */
-
-#app.on-map-page #mapPageNav{
-    display:grid;
-    grid-template-columns:repeat(5,1fr);
 }
 
 .player-name{
@@ -633,6 +600,10 @@ button:disabled{
 #app.no-header .content,
 #app:has(#homePage.active) .content{
     top:0;
+}
+
+#app:has(#homePage.active) .content{
+    padding-bottom:84px;
 }
 
 /*
@@ -719,19 +690,14 @@ button:disabled{
     height:100%;
     min-height:0;
     box-sizing:border-box;
-    overflow-y:auto;
-    overflow-x:hidden;
-    overscroll-behavior-y:contain;
-    -webkit-overflow-scrolling:touch;
+    overflow:hidden;
 
     margin:-14px;
     padding:14px;
-    padding-bottom:14px;
-    scroll-padding-bottom:calc(var(--bottom-nav-height,70px) + var(--safe-bottom,0px) + 14px);
 }
 
 .home-bg-fixed-layer{
-    position:fixed;
+    position:absolute;
     inset:0;
     z-index:0;
 
@@ -1036,10 +1002,10 @@ button:disabled{
 .home-secondary-actions{
     display:grid;
     grid-template-columns:repeat(2,80px);
-    grid-template-rows:repeat(4,82px);
+    grid-template-rows:repeat(4,70px);
     justify-content:space-between;
     gap:5px 0;
-    min-height:343px;
+    min-height:295px;
     padding:0;
 }
 
@@ -1100,7 +1066,7 @@ button:disabled{
 }
 
 .home-card-primary{
-    height:90px;
+    height:78px;
     overflow:hidden;
     border:1px solid rgba(222,170,70,.9);
     border-radius:11px;
@@ -1142,11 +1108,11 @@ button:disabled{
 
 .home-card-secondary{
     display:grid;
-    grid-template-rows:59px 21px;
+    grid-template-rows:49px 19px;
     align-content:stretch;
     justify-items:stretch;
     width:80px;
-    height:82px;
+    height:70px;
     overflow:hidden;
     border:1px solid rgba(205,154,65,.82);
     border-radius:11px;
@@ -1165,7 +1131,7 @@ button:disabled{
 
 .home-card-secondary .home-card-icon{
     width:100%;
-    height:59px;
+    height:49px;
     border:0;
     border-bottom:1px solid rgba(198,151,65,.62);
     border-radius:10px 10px 0 0;
@@ -5250,42 +5216,6 @@ button:active{
    只替換對應導覽視覺；原 onclick / active / page 切換機制不變。
    主導覽改為「背包／野怪區／主城／副本／BOSS」；地圖導覽的自動戰鬥改用透明元素匣圖示。
 ===================================================== */
-.nav-button.nav-art-button-wrap{
-    position:relative;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:0;
-    overflow:visible;
-    color:inherit;
-}
-.nav-art-button{
-    display:block;
-    width:auto;
-    height:66px;
-    max-width:96%;
-    object-fit:contain;
-    object-position:center;
-    pointer-events:none;
-    user-select:none;
-    -webkit-user-drag:none;
-    transform:translateZ(0) scale(.96);
-    transform-origin:center;
-    filter:brightness(.88) saturate(.92);
-    transition:filter .14s ease, transform .14s ease;
-}
-.nav-button.nav-art-button-wrap.active .nav-art-button{
-    filter:brightness(1.12) saturate(1.08) drop-shadow(0 0 5px rgba(240,180,41,.58));
-    transform:translateZ(0) scale(1.02);
-}
-.nav-button.nav-art-button-wrap:active .nav-art-button{
-    filter:brightness(1.2) saturate(1.08);
-    transform:translateZ(0) scale(.92);
-}
-#mapPageNav .nav-art-button{
-    height:66px;
-    max-width:90%;
-}
 .nav-sr-only{
     position:absolute!important;
     width:1px!important;
@@ -5298,16 +5228,6 @@ button:active{
     border:0!important;
 }
 
-
-
-/* =====================================================
-   巡怪頁底部導覽
-   角色 / 背包 / 秘寶 / 元素匣 / 返回
-   內容由 js/42-v148-combat-dungeon-fixes.js 的 context navigation owner 投影
-===================================================== */
-#app.on-map-page #mapPageNav{
-    grid-template-columns:repeat(5,1fr) !important;
-}
 
 
 /* =====================================================
@@ -5357,14 +5277,6 @@ button:active{
     filter:brightness(1.12);
 }
 
-#game-stage > #app.inventory-overlay-open > #game-content #bottomNav,
-#game-stage > #app.inventory-overlay-open > #game-content #mapPageNav,
-#game-stage > #app.inventory-overlay-open > #game-content #v141DungeonNav,
-#game-stage > #app.on-inventory-page > #game-content #bottomNav,
-#game-stage > #app.on-inventory-page > #game-content #mapPageNav,
-#game-stage > #app.on-inventory-page > #game-content #v141DungeonNav{
-    display:none !important;
-}
 #game-stage > #app.on-inventory-page > #game-content .content{
     bottom:0 !important;
     padding-bottom:8px !important;
@@ -5373,59 +5285,6 @@ button:active{
 /* =====================================================
    NAV
 ===================================================== */
-
-.bottom-nav{
-    position:fixed;
-
-    left:50%;
-    transform:translateX(-50%);
-
-    bottom:0;
-
-    width:100%;
-    max-width:600px;
-
-    height:var(--bottom-nav-height,70px);
-
-    display:grid;
-
-    grid-template-columns:repeat(5,1fr);
-
-    background:linear-gradient(0deg,#0e0c0a,#1c1712);
-
-    border-top:2px solid #8a6a3a;
-
-    z-index:200;
-}
-
-.nav-button{
-    border:0;
-
-    background:transparent;
-    color:#b3a58c;
-
-    font-size:10px;
-
-    transition:color .15s;
-
-    /*
-       ★ 新增（依照使用者要求，「自動戰鬥」
-       放進地圖頁面導覽列）：
-       4個字比原本「角色」「任務」「返回」
-       這種2字標籤長，4欄變窄之後容易溢出
-       格子，加white-space:nowrap讓文字
-       保持一行，配合scale稍微縮小整個
-       按鈕的內距，確保4個字塞得下。
-    */
-
-    white-space:nowrap;
-    padding:0 2px;
-}
-
-.nav-button.active{
-    color:#f0b429;
-    text-shadow:0 0 8px rgba(240,180,41,.6);
-}
 
 .nav-icon{
     display:block;
@@ -6495,7 +6354,6 @@ html, body{
    transformed 420×746.6667 design surface. 100vw/100vh
    would otherwise escape to the real browser viewport.
 */
-#game-stage > #app > #game-content .home-bg-fixed-layer,
 #game-stage > #app > #game-content .map-bg-fixed-layer,
 #game-stage > #app > #game-content .training-bg-fixed-layer{
     position:absolute !important;
@@ -6532,14 +6390,6 @@ html, body{
     width:1080px !important;
     max-width:1080px !important;
     max-height:96% !important;
-}
-
-#game-stage > #app > #game-content .bottom-nav{
-    position:absolute !important;
-    left:0 !important;
-    bottom:0 !important;
-    width:420px !important;
-    max-width:none !important;
 }
 
 #game-stage > #app > #game-content .exp-toast,

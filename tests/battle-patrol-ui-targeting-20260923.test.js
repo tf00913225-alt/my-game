@@ -39,10 +39,10 @@ test("patrol navigation is a five-key shared-owner shell and appearance switch i
   const dungeon=read("js/42-v148-combat-dungeon-fixes.js");
   assert.doesNotMatch(html,/mapPageReturnFloat/);
   assert.doesNotMatch(mainCss,/\.map-page-return-float/);
-  assert.match(html,/<div id="mapPageNav" class="map-page-nav"><\/div>/);
-  assert.match(mainCss,/#app\.on-map-page #mapPageNav\{[\s\S]*?grid-template-columns:repeat\(5,1fr\)/);
-  assert.match(dungeon,/labels!=="角色\|背包\|秘寶\|元素匣\|返回"/);
-  assert.match(dungeon,/renderContextNav\(patrolNav,"leaveMap\(\)","patrol"\)/);
+  assert.doesNotMatch(html,/<div id="mapPageNav"/);
+  assert.match(read("css/06-stage-v11-native-bottom-nav.css"),/grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/);
+  assert.match(dungeon,/\["秘寶","assets\/ui\/nav-relic-v175\.webp"/);
+  assert.match(dungeon,/"leaveMap\(\)"/);
   assert.match(patrolCss,/#v131PatrolAppearanceSwitchWrap\{[\s\S]*?top:12px;/);
 });
 

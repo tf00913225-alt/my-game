@@ -33,31 +33,7 @@
     }
 })();
 
-/* V3 runtime guard: the wrapper is created before this runs, but keep this
-   idempotent in case another script re-renders/reparents the navigation. */
-(function enforceVirtualStageLayout(){
-    function apply(){
-        const app=document.getElementById('app');
-        const content=document.getElementById('game-content');
-        if(!app || !content) return;
-        const navs=content.querySelectorAll('.bottom-nav');
-        navs.forEach(function(nav){
-            nav.style.position='absolute';
-            nav.style.left='0';
-            nav.style.right='auto';
-            nav.style.bottom='0';
-            nav.style.width='420px';
-            nav.style.maxWidth='none';
-            nav.style.transform='none';
-            nav.style.margin='0';
-        });
-    }
-    if(document.readyState==='loading'){
-        document.addEventListener('DOMContentLoaded',apply,{once:true});
-    }else{
-        apply();
-    }
-})();
+/* Legacy V3 navigation positioning retired; FourSymbolsBottomNav owns the shell. */
 
 const GAME_WIDTH = 1080;
 const GAME_HEIGHT = 1920;
@@ -8314,43 +8290,6 @@ function showPage(page){
     }
 
 
-    document
-    .querySelectorAll(".nav-button")
-    .forEach(b=>{
-        b.classList.remove(
-            "active"
-        );
-    });
-
-
-    const navMap = {
-
-        home:"homeNav",
-
-        training:"trainingNav",
-
-        dungeon:"dungeonNav",
-
-        gameplay:"bossNav",
-
-        boss:"bossNav",
-
-        tower:"bossNav",
-
-        inventory:"inventoryNav"
-
-    };
-
-
-    if(navMap[page]){
-
-        $(navMap[page])
-            .classList
-            .add("active");
-
-    }
-
-
     if(page==="skill"){
         renderSkillLoadout();
     }
@@ -8386,6 +8325,9 @@ function showPage(page){
 
 
     updateUI();
+    if(typeof window.v148SyncContextNavigation==="function"){
+        window.v148SyncContextNavigation();
+    }else{ window.FourSymbolsBottomNav?.renderMain(page); }
 
 }
 
@@ -26795,6 +26737,8 @@ function switchDungeonTab(tabName){
         }
     );
 
+    window.v148SyncContextNavigation?.();
+
 }
 
 
@@ -33580,130 +33524,78 @@ try{
 (function(){
     "use strict";
 
-    /*
-     * Convert the existing bottom navigation into a native-coordinate
-     * overlay without changing its click handlers or game logic.
-     *
-     * We clone no buttons and do not replace existing event listeners.
-     * The original nav is moved into the native overlay layer.
-     */
-    function migrateBottomNav(){
-        const overlay = document.getElementById("game-overlay-layer");
-        if(!overlay) return;
-
-        const candidates = [
-            document.getElementById("bottomNav"),
-            document.querySelector("#game-content .bottom-nav")
-        ].filter(Boolean);
-
-        candidates.forEach(function(nav){
-            if(!nav || nav.dataset.nativeV11 === "true") return;
-
-            /*
-             * Only migrate nav elements that are actual game navigation.
-             * Do not touch unrelated fixed controls.
-             */
-            const isBottomNav =
-                nav.id === "bottomNav" ||
-                nav.classList.contains("bottom-nav");
-
-            if(!isBottomNav) return;
-
-            const wrapper = document.createElement("div");
-            wrapper.className = "native-bottom-nav-layer";
-            wrapper.dataset.nativeV11 = "true";
-
-            const nativeNav = document.createElement("div");
-            nativeNav.className = "native-bottom-nav";
-            nativeNav.dataset.nativeV11 = "true";
-
-            /*
-             * Move the existing element, preserving its existing DOM,
-             * children, IDs, and event listeners.
-             */
-            nav.parentNode.insertBefore(wrapper, nav);
-            wrapper.appendChild(nativeNav);
-            nativeNav.appendChild(nav);
-
-            /*
-             * Remove legacy viewport positioning from the moved element.
-             * Its visual size is preserved by the existing child styles.
-             */
-            nav.style.position = "relative";
-            nav.style.left = "auto";
-            nav.style.right = "auto";
-            nav.style.top = "auto";
-            nav.style.bottom = "auto";
-            nav.style.transform = "none";
-            nav.style.marginLeft = "0";
-            nav.style.marginRight = "0";
-            nav.style.width = "100%";
-
-            nav.dataset.nativeV11 = "true";
-        });
+    // One native shell; gameplay may replace items but cannot position another nav.
+    let mainButtons=null;
+    let shell=null;
+    function ensureShell(){
+        const nav=document.getElementById("bottomNav");
+        const overlay=document.getElementById("game-overlay-layer");
+        if(!nav||!overlay){ return null; }
+        if(!mainButtons){
+            mainButtons=Array.from(nav.children);
+            mainButtons.forEach(button=>{
+                const image=button.querySelector(".nav-art-button");
+                if(image&&!image.parentElement.classList.contains("nav-icon-frame")){
+                    const frame=document.createElement("span");
+                    frame.className="nav-icon-frame";
+                    image.replaceWith(frame);
+                    frame.appendChild(image);
+                }
+            });
+        }
+        if(!shell){
+            shell=document.createElement("div");
+            shell.className="native-bottom-nav-layer";
+            shell.appendChild(nav);
+            overlay.appendChild(shell);
+        }
+        return nav;
     }
-
-    /*
-     * Run after existing initialization and after DOM changes.
-     * This is migration-only; it does not alter game mechanics.
-     */
-    if(document.readyState === "loading"){
-        document.addEventListener("DOMContentLoaded", migrateBottomNav, {once:true});
-    }else{
-        migrateBottomNav();
+    function renderMain(page){
+        const nav=ensureShell();
+        if(!nav){ return; }
+        if(nav.dataset.navContext!=="main"){
+            nav.replaceChildren(...mainButtons);
+            nav.dataset.navContext="main";
+        }
+        const selected={home:"homeNav",training:"trainingNav",inventory:"inventoryNav",
+            dungeon:"dungeonNav",gameplay:"bossNav",boss:"bossNav",tower:"bossNav"}[page]||"homeNav";
+        mainButtons.forEach(button=>button.classList.toggle("active",button.id===selected));
+        shell.hidden=false;
     }
-
-    window.migrateBottomNavToNative1080 = migrateBottomNav;
-})();
-
-
-/* bundled source: js/05-stage-v13-native-map-nav-runtime.js */
-(function(){
-    "use strict";
-
-    function migrateMapNav(){
-        const overlay = document.getElementById("game-overlay-layer");
-        if(!overlay) return;
-
-        const nav = document.getElementById("mapPageNav");
-        if(!nav || nav.dataset.nativeV13 === "true") return;
-
-        /*
-         * Only migrate the map/training navigation.
-         * Existing DOM, children, IDs and event listeners are preserved.
-         */
-        const wrapper = document.createElement("div");
-        wrapper.className = "native-map-nav-layer";
-        wrapper.dataset.nativeV13 = "true";
-
-        const nativeNav = document.createElement("div");
-        nativeNav.className = "native-map-nav";
-        nativeNav.dataset.nativeV13 = "true";
-
-        nav.parentNode.insertBefore(wrapper, nav);
-        wrapper.appendChild(nativeNav);
-        nativeNav.appendChild(nav);
-
-        nav.style.position = "relative";
-        nav.style.left = "auto";
-        nav.style.right = "auto";
-        nav.style.top = "auto";
-        nav.style.bottom = "auto";
-        nav.style.transform = "none";
-        nav.style.marginLeft = "0";
-        nav.style.marginRight = "0";
-        nav.style.width = "100%";
-
-        nav.dataset.nativeV13 = "true";
+    function renderContext(buttons,context){
+        const nav=ensureShell();
+        if(!nav){ return; }
+        const key=context+":"+buttons.map(button=>button.join("|")).join(";");
+        if(nav.dataset.navContext!==key){
+            nav.replaceChildren(...buttons.map(([label,src,action])=>{
+                const button=document.createElement("button");
+                button.type="button";
+                button.className="nav-button nav-art-button-wrap";
+                button.setAttribute("aria-label",label);
+                button.setAttribute("onclick",action);
+                const img=document.createElement("img");
+                img.className="nav-art-button";
+                img.src=src;
+                img.alt="";
+                const assistive=document.createElement("span");
+                assistive.className="nav-sr-only";
+                assistive.textContent=label;
+                const frame=document.createElement("span");
+                frame.className="nav-icon-frame";
+                frame.appendChild(img);
+                button.append(frame,assistive);
+                return button;
+            }));
+            nav.dataset.navContext=key;
+        }
+        shell.hidden=false;
     }
-
-    if(document.readyState === "loading"){
-        document.addEventListener("DOMContentLoaded", migrateMapNav, {once:true});
-    }else{
-        migrateMapNav();
-    }
-
-    window.migrateMapNavToNative1080 = migrateMapNav;
+    function hide(){ if(ensureShell()){ shell.hidden=true; } }
+    window.FourSymbolsBottomNav=Object.freeze({renderMain,renderContext,hide,ensureShell});
+    if(document.readyState==="loading"){
+        document.addEventListener("DOMContentLoaded",()=>renderMain("home"),{once:true});
+    }else{ renderMain("home"); }
 })();
 
 

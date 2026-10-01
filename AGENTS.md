@@ -1,5 +1,10 @@
 # 專案代理規則
 
+## 一般 Bug 預設路徑（2026-10-01 生效）
+
+一般 Bug 必須先讀 `docs/BUG_FIX_FAST_PATH.md`，以該文件為調查範圍、證據升級、自主整合與結案的權威來源。預設最小必要調查＋最小安全修正；只查直接相關責任與呼叫鏈。完整 Owner Convergence／Lifecycle 稽核僅在該文件第四節證據成立或使用者明確要求架構工程時適用。下文不得以「較嚴格優先」恢復一般 Bug 全面稽核、tests-only 限制、固定失敗額度、僅草稿 PR 或正式 Runtime 即硬停止。最新 Head 必要 CI、原症狀驗證與資料安全仍必須遵守；一般 Bug 結案不要求發布 main。
+
+
 1. 開始任何工作前，先完整閱讀 `HANDOFF.md`。
 2. **任何 UI、CSS、版面、美術圖片、背包、裝備、技能、戰鬥介面等修改前，都必須先閱讀 `UI_GUIDELINES.md`。**
 3. `UI_GUIDELINES.md` 是一般 UI 規範的唯一來源；不要把完整規範複製到其他文件，避免版本分歧。**唯一的專項例外是 `docs/ITEM_RARITY_UI_SPEC.md`：凡涉及裝備、道具、材料、設計圖、符咒、寶箱、掉落、背包格、商店格、合成、冶煉或任何物品階級／稀有度顏色時，該文件為階級與色號的最高權威來源。**
@@ -11,7 +16,7 @@
 9. **凡屬修復、fix、failure、test failure、CI failure、fixture、test harness、stale contract 或既有修復分支續修任務，若使用者未在當次任務另行指定不同模式，必須先完整閱讀根目錄 `AUTONOMOUS_REPAIR_CONTRACT.md`，並以該文件作為受控自主修復的唯一正式契約來源；不得依舊對話摘要自行擴張授權。**
 10. **凡涉及怪物／精英／BOSS／日常副本／天兵立繪導入，必須先讀 `MONSTER_PORTRAIT_SPEC.md` 與 `docs/MONSTER_PORTRAIT_SPEC_V1.md`。若素材已經生成並完成正式 WebP 落位，預設使用 `npm run portrait:import -- --keys=<portraitKey,...>` 快速導入；不得為已完成素材重新建立生成 batch、重跑生成或重做母圖搜尋。尚未生成的素材才使用既有 batch 流程。**
 11. **所有新增、修改、替換、重構、UI／CSS、Gameplay、資料、狀態、Lifecycle 與 Bug 修復，施工前都必須完整閱讀 `docs/CHANGE_SAFETY_REPLACEMENT_CONTRACT.md`。使用者說「改成／換成／不要原本的」時預設為 Replacement（取代），代理必須自行完成舊 Owner／Contract／Lifecycle／Semantic State／Regression Test 的遷移與退場判定，不得只疊加新版，也不得把「舊的要不要刪」這類工程責任丟回給不懂程式的專案負責人。**
-12. **凡屬 Bug、fix、failure、regression、修復後仍重現或任何「已修好」判定，必須完整閱讀 `docs/BUG_REPAIR_DOD_OWNER_CONVERGENCE_GATE.md`。同一責任必須先通過 Owner Convergence Gate；DIAGNOSED／IMPLEMENTED／INTEGRATED／DEPLOYED 不得冒稱 VERIFIED。只有原始玩家症狀在最終目標環境依足夠證據不再重現，才可回報「已修好」。若使用者要求的技術做法會形成第二 Owner、Patch／Wrapper 疊加或高風險架構，代理必須主動阻止並改採安全實作；不得把技術退場判斷丟回非技術使用者。**
+12. **凡屬 Bug、fix、failure、regression、修復後仍重現或任何「已修好」判定，必須完整閱讀 `docs/BUG_REPAIR_DOD_OWNER_CONVERGENCE_GATE.md`。一般 Bug 先依 `docs/BUG_FIX_FAST_PATH.md`，達到證據升級條件才啟用完整 Owner Convergence Gate；DIAGNOSED／IMPLEMENTED／INTEGRATED／DEPLOYED 不得冒稱 VERIFIED。只有原始玩家症狀在最終目標環境依足夠證據不再重現，才可回報「已修好」。若使用者要求的技術做法會形成第二 Owner、Patch／Wrapper 疊加或高風險架構，代理必須主動阻止並改採安全實作；不得把技術退場判斷丟回非技術使用者。**
 
 ## 最高優先：Change Safety & Replacement Migration Gate（變更安全與取代遷移閘門）
 

@@ -218,7 +218,7 @@ test("inventory, home, synthesis, nav and slow exit all use the latest mobile co
     assert.doesNotMatch(source,/function dungeonNavMarkup\(/);
     assert.ok(finalNavSource.includes('buttons.push(["返回","assets/ui/map-return.png",returnAction]);'));
     assert.match(finalNavSource,/abyssSelectionActive\?"v174AbyssLeaveToGameplay\(\)":"showPage\('home'\)"/);
-    assert.match(css,/#v141DungeonNav\[data-v146-columns="4"\]/);
+    assert.doesNotMatch(css,/v141DungeonNav/);
     assert.match(css,/\.v146-abyss-return/);
     assert.match(rules,/"戰鬥失敗"/);
     assert.match(index,/assets\/ui\/home-shop\.png/);
