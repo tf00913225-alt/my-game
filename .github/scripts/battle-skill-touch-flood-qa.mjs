@@ -97,8 +97,8 @@ export async function battleSkillTouchFloodQa(rawClient,artifactDir,{animationOn
         }
         await client.eval(`__touchQaReset('revive');true`);
         await client.eval(`(()=>{window.__touchQaReviveHp=[0,1,2].map(index=>{const character=getBattleCharacterByIndex(index);const hp=character?.hp;if(character){const maxHP=Number(getPartyBattleStats(index)?.maxHP)||Number(character.hp)||1;character.hp=Math.max(1,maxHP);}return {index,hp};});updateUI();return true;})()`);
-        const reviveFixture=await client.eval(`[0,1,2].map(index=>({index,hp:getBattleCharacterByIndex(index)?.hp||0}))`);
-        assert.ok(reviveFixture.every(item=>item.hp>0),'revive no-target acceptance requires all three allies alive');
+        const reviveFixture=await client.eval(`[0,1,2].map(index=>{const character=getBattleCharacterByIndex(index);return {index,present:!!character,hp:character?.hp||0};}).filter(item=>item.present)`);
+        assert.ok(reviveFixture.length>0&&reviveFixture.every(item=>item.hp>0),'revive no-target acceptance requires every present ally alive');
         await tap('.skill-quick-button[data-skill-id="revive"]');
         const reviveRejected=await client.eval(`(()=>{const n=document.getElementById('battleActionNotice');return {ready:actionReady,pending:pendingAction,text:n?.textContent||'',visible:!!n&&!n.hidden&&n.classList.contains('show')};})()`);
         assert.deepEqual(reviveRejected,{ready:false,pending:null,text:'我方目前沒有人死亡，無法使用復活術。',visible:true});
