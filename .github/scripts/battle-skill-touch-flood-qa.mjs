@@ -107,6 +107,6 @@ export async function battleSkillTouchFloodQa(client,artifactDir){
         await client.eval(`FourSymbolsBattlefieldSlots.moveAllyCharacter(0,${JSON.stringify(originalSlot)});v142SkillAnimationDirector.dispose();true`);
         return checks;
     }finally{
-        await client.eval(`(()=>{if(!window.__touchQa)return;clearTimeout(battleAdvanceTimeoutId);battleAdvanceTimeoutId=null;battleAdvanceScheduled=false;finishPlayerAction=__touchQa.finish;characterSkillLoadouts=__touchQa.loadouts;player.sp=__touchQa.sp;activeBattleCharacterIndex=__touchQa.index;battlePhase=__touchQa.phase;autoBattle=__touchQa.auto;actionReady=__touchQa.ready;pendingAction=__touchQa.pending;queuedPlayerActions=__touchQa.queued;clearBattleTargetSelectionMode();closeMenus();delete window.__touchQa;delete window.__touchQaReset;updateUI();return true;})()`);
+        await client.eval(`(()=>{if(!window.__touchQa)return;clearTimeout(battleAdvanceTimeoutId);battleAdvanceTimeoutId=null;battleAdvanceScheduled=false;finishPlayerAction=__touchQa.finish;for(const key of Object.keys(characterSkillLoadouts)){delete characterSkillLoadouts[key];}Object.assign(characterSkillLoadouts,__touchQa.loadouts);player.sp=__touchQa.sp;activeBattleCharacterIndex=__touchQa.index;battlePhase=__touchQa.phase;autoBattle=__touchQa.auto;actionReady=__touchQa.ready;pendingAction=__touchQa.pending;queuedPlayerActions=__touchQa.queued;clearBattleTargetSelectionMode();closeMenus();delete window.__touchQa;delete window.__touchQaReset;updateUI();return true;})()`);
     }
 }
