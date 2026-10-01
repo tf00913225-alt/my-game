@@ -124,6 +124,12 @@ async function run(chrome,url,live){
     const clean=await c.eval(`({show:document.getElementById('itemModal').classList.contains('show'),mode:document.getElementById('itemModal').dataset.presentationMode,compare:!!document.getElementById('v17351EquipmentCompare'),batch:!!document.getElementById('v17350BatchAction')})`);
     assert.equal(clean.show,false);assert.equal(clean.mode,undefined);assert.equal(clean.compare,false);assert.equal(clean.batch,false);
    }
+   // Supplement synthetic aspect-ratio stress with the real equipment generator,
+   // formal rarity markup and production artwork on both detail paths.
+   await c.eval(`window.__realGear=v17346GenerateEquipment(()=>0.2,{slot:'armor',classType:'warrior',rarity:'white'});characterEquipment.fire.armor=__realGear;inventoryItems[0]=v17346GenerateEquipment(()=>0.2,{slot:'armor',classType:'warrior',rarity:'orange'});rebuildInventorySlots();renderInventory();openEquippedItem(__realGear,'armor')`);await settle();
+   await check('#itemModal .item-modal-box',v);await check('#itemModalIcon',v);await check('#itemModal .close-item-button',v,true);
+   const realImage=await c.eval(`(async()=>{const n=document.querySelector('#itemModalIcon img');await n.decode();return {src:n.getAttribute('src'),fit:getComputedStyle(n).objectFit,loaded:n.naturalWidth>0}})()`);assert.ok(realImage.src.startsWith('assets/equipment/'));assert.equal(realImage.fit,'contain');assert.ok(realImage.loaded);await screenshot('equipment-real-'+v.join('x'));await click('#itemModal .close-item-button',v);
+   await c.eval(`openItemModal(inventorySlots.findIndex(i=>i?.id===inventoryItems[0].id))`);await settle();await check('.v17351-compare-grid',v);await check('.v17351-compare-back',v,true);await screenshot('comparison-real-'+v.join('x'));await click('.v17351-compare-back',v);
    await c.eval(`showPage('home');openHomeFeature('shop');v17346PreviewEquipmentShopOffer(0)`);await settle();
    const shop=await check('.v17346-shop-preview-modal',v),shopArt=await check('.v17346-shop-preview-art',v),shopBack=await check('.v17346-shop-preview-modal .v132-reward-actions button',v,true);
    assert.ok(Math.abs(shopArt.rect.width-shopArt.rect.height)<1,'shop art distorted');
@@ -148,7 +154,7 @@ async function run(chrome,url,live){
     await c.eval(`document.querySelector('[data-responsive-qa-entrance="active"]').removeAttribute('data-responsive-qa-entrance')`);
     entrances.push({source,handler:selected.handler,closed,reentered:true});
    }
-   evidence.push({viewport:v,backpack,grid,gridScroll,modes,shop,shopArt,shopBack,entrances});
+   evidence.push({viewport:v,backpack,grid,gridScroll,modes,realImage,shop,shopArt,shopBack,entrances});
    await c.eval(`showPage('inventory')`);await settle();const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(OUT,`backpack-${v.join('x')}.png`),Buffer.from(shot.data,'base64'));
    console.log('PASS responsive production runtime '+v.join('x')+' modes + resize + entrances + late styles');
   }
