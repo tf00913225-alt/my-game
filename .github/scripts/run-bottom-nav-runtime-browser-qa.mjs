@@ -8,23 +8,6 @@ import {spawn,spawnSync} from "node:child_process";
 const ROOT=process.cwd();
 const ARTIFACT_DIR=path.join(ROOT,"artifacts","browser-qa");
 const VIEWPORTS=[[360,640],[393,873],[412,915]];
-const QA_LABELS=Object.freeze({
-    heal:"治療術",
-    revive:"復活術",
-    freeze:"冰封",
-    purifyMind:"淨心訣",
-    learn:"學習・",
-    upgrade:"升級・",
-    fireCharacter:"QA 火角色",
-    waterCharacter:"QA 水角色"
-});
-const WATER_CASES=[
-    ["healSpell",QA_LABELS.heal],
-    ["revive",QA_LABELS.revive],
-    ["freeze",QA_LABELS.freeze],
-    ["purifyMind",QA_LABELS.purifyMind]
-];
-const ELEMENT_CASES=[["fire","fireRocket"],["water","healSpell"],["wind","stormFist"],["earth","stoneThrow"]];
 const ASSET_MANIFEST=JSON.parse(fs.readFileSync(path.join(ROOT,"build","asset-manifest.json"),"utf8"));
 const QA_AUTH_PATH="/"+Object.keys(ASSET_MANIFEST.assets).find(file=>/build\/firebase\/firebase-auth\.[0-9a-f]{12}\.js$/.test(file));
 const QA_CLOUD_PATH="/"+Object.keys(ASSET_MANIFEST.assets).find(file=>/build\/firebase\/firebase-cloud-save\.[0-9a-f]{12}\.js$/.test(file));
@@ -161,6 +144,12 @@ async function runViewport(chrome,url,width,height){
     for(const frame of row.frames){assert.ok(Math.abs(frame.height-base.frames[0].height)<=1,mode+' frame height');assert.ok(Math.abs(frame.width-base.frames[0].width)<=1,mode+' frame width');}
    }
   }
+  evidence.lifecycle=[];
+  for(const [name,action] of [['patrol-backpack',"showPage('training');enterMap();v148OpenContextInventory()"],['patrol-backpack-close',"closeMapInventoryOverlay()"],['dungeon-tab',"vGameplayOpenDailyDungeons();switchDungeonTab('daily')"],['battle-exit',"showPage('battle');showPage('dungeon')"],['return-home',"showPage('home')"]]){
+    await client.eval(action);await settle(client);const row={name,...await client.eval(MEASURE)};evidence.lifecycle.push(row);assert.equal(row.sameShell,true);assert.equal(row.shellCount,1);assert.equal(row.legacyCount,0);
+  }
+  await client.send('Page.setWebLifecycleState',{state:'frozen'});await client.send('Page.setWebLifecycleState',{state:'active'});await settle(client);
+  evidence.foreground=await client.eval(MEASURE);assert.equal(evidence.foreground.sameShell,true);assert.equal(evidence.foreground.visible,true);
   await client.eval("showPage('home')");await settle(client);
   evidence.home=await client.eval(`(()=>{const n=document.getElementById('homePage'),r=n.getBoundingClientRect();return {clientHeight:n.clientHeight,scrollHeight:n.scrollHeight,scrollTop:n.scrollTop,overflow:getComputedStyle(n).overflowY,rect:{left:r.left,top:r.top,width:r.width,height:r.height},documentScroll:document.scrollingElement.scrollTop};})()`);
   assert.ok(evidence.home.scrollHeight<=evidence.home.clientHeight+1,JSON.stringify(evidence.home));assert.notEqual(evidence.home.overflow,'auto');
@@ -168,7 +157,7 @@ async function runViewport(chrome,url,width,height){
   evidence.homeAfterSwipe=await client.eval("({scrollTop:homePage.scrollTop,documentScroll:document.scrollingElement.scrollTop})");assert.equal(evidence.homeAfterSwipe.scrollTop,0);assert.equal(evidence.homeAfterSwipe.documentScroll,0);
   // Use the real inventory grid and its real scroll owner. QA-only inventory
   // data supplies enough rows; no production state or CSS is replaced.
-  await client.eval(`inventoryItems=Array.from({length:80},(_,i)=>({id:'qa-scroll-'+i,name:'測試材料',type:'material',rarity:'common',quantity:1}));showPage('inventory');renderInventory();`);await settle(client);
+  await client.eval(`inventoryItems.splice(0,inventoryItems.length,...Array.from({length:80},(_,i)=>({id:'qa-scroll-'+i,name:'測試材料',type:'material',rarityKey:'white',count:1})));showPage('inventory');setInventoryFilter('material');renderInventory();`);await settle(client);
   evidence.inventory=await client.eval(`(()=>{const n=document.getElementById('inventoryGridScroll'),r=n.getBoundingClientRect();n.scrollTop=0;return {clientHeight:n.clientHeight,scrollHeight:n.scrollHeight,overflow:getComputedStyle(n).overflowY,rect:{left:r.left,top:r.top,width:r.width,height:r.height}}})()`);
   const ir=evidence.inventory.rect;assert.ok(evidence.inventory.scrollHeight>evidence.inventory.clientHeight,'real inventory has no scrollable rows');
   await swipe(client,ir.left+ir.width/2,ir.top+Math.min(ir.height-20,ir.height*.8));
