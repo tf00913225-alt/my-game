@@ -4,13 +4,14 @@ const source=fs.readFileSync('js/00-main.js','utf8');
 const extract=(name,next)=>source.slice(source.indexOf('function '+name+'('),source.indexOf('function '+next+'(',source.indexOf('function '+name+'(')));
 const party=[0,1,2].map(()=>({hp:100,sp:100}));
 let finished=0;
+const logs=[],notices=[];
 const ctx={battleActive:true,battlePhase:'declare',activeBattleCharacterIndex:0,autoBattle:false,actionReady:false,pendingAction:null,queuedPlayerActions:{},
-    skillDatabase:{attack:{name:'攻擊',category:'magic',spCost:10,targetType:'single'},heal:{name:'治療',category:'heal',spCost:10,targetType:'ally'},buff:{name:'增益',category:'buff',spCost:10,targetType:'ally'},passive:{name:'被動',category:'passive'}},
-    characterSkillLoadouts:Object.fromEntries([0,1,2].map(i=>[i,{skillLevels:{attack:1,heal:1,buff:1},equippedSkills:['attack','heal','buff']}])),
+    skillDatabase:{attack:{name:'攻擊',category:'magic',spCost:10,targetType:'single'},heal:{name:'治療',category:'heal',spCost:10,targetType:'ally'},buff:{name:'增益',category:'buff',spCost:10,targetType:'ally'},revive:{name:'復活術',category:'revive',spCost:10,targetType:'deadAlly'},passive:{name:'被動',category:'passive'}},
+    characterSkillLoadouts:Object.fromEntries([0,1,2].map(i=>[i,{skillLevels:{attack:1,heal:1,buff:1,revive:1},equippedSkills:['attack','heal','buff','revive']}])),
     getPartyCharacterByIndex:i=>party[i],getBattleCharacterByIndex:i=>party[i],getPartyCharacterKey:i=>i,getPartyAutoConfig:()=>({enabled:false}),
-    addBattleLog(){},closeMenus(){},clearBattleTargetSelectionMode(){},setBattleTargetSelectionMode(){},setBattleAllyTargetSelectionMode(){},
+    addBattleLog(message){logs.push(message);},showBattleActionNotice(message){notices.push(message);},closeMenus(){},clearBattleTargetSelectionMode(){},setBattleTargetSelectionMode(){},setBattleAllyTargetSelectionMode(){},
     updateUI(){},finishPlayerAction(){finished++;ctx.actionReady=false;ctx.pendingAction=null;},populateSkillQuickBar(){},syncTurnTimerWithBattlePickers(){},
-    isValidAllyTargetForSkill:(skill,character)=>character.hp>0,currentBattleMonsters:[0],normalizeBattleTargetType:type=>type,getBattleActionTargetType:type=>ctx.skillDatabase[type]?.targetType||"single",getBattleActionDisplayName:()=>"attack",
+    isValidAllyTargetForSkill:(skill,character)=>skill.targetType==='deadAlly'?character.hp<=0:character.hp>0,currentBattleMonsters:[0],normalizeBattleTargetType:type=>type,getBattleActionTargetType:type=>ctx.skillDatabase[type]?.targetType||"single",getBattleActionDisplayName:()=>"attack",
     $:()=>({textContent:'',classList:{add(){}}}),document:{querySelectorAll:()=>[]},monsters:[{alive:true,hp:100,name:'敵人'}]};
 vm.createContext(ctx);
 vm.runInContext(extract('getBattleTargetEntity','resolveBattlefieldTargets'),ctx);
@@ -27,8 +28,17 @@ for(let i=0;i<3;i++){
         assert.equal(ctx.queuedPlayerActions[i].action,skill);assert.equal(finished,1,'one action declaration completes once');finished=0;
     }
     ctx.characterSkillLoadouts[i].equippedSkills=[];ctx.prepareAction('heal');assert.equal(ctx.actionReady,false,'support skill cannot bypass equipment eligibility');
-    ctx.characterSkillLoadouts[i].equippedSkills=['attack','heal','buff'];party[i].sp=0;ctx.prepareAction('attack');assert.equal(ctx.actionReady,false);party[i].sp=100;
+    ctx.characterSkillLoadouts[i].equippedSkills=['attack','heal','buff','revive'];party[i].sp=0;ctx.prepareAction('attack');assert.equal(ctx.actionReady,false);party[i].sp=100;
 }
+ctx.activeBattleCharacterIndex=0;ctx.actionReady=false;ctx.pendingAction=null;
+ctx.prepareAction('revive');
+assert.equal(ctx.actionReady,false,'revive without a fallen ally must remain unselected');
+assert.equal(ctx.pendingAction,null);
+assert.equal(logs.at(-1),'我方目前沒有人死亡，無法使用復活術。');
+assert.equal(notices.at(-1),'我方目前沒有人死亡，無法使用復活術。','legal revive rejection must be visibly announced');
+party[1].hp=0;ctx.prepareAction('revive');
+assert.equal(ctx.pendingAction,'revive','revive must enter ally selection when a fallen ally exists');
+ctx.returnFromBattleTargetSelection();party[1].hp=100;
 // Manual all-target skills use a live enemy as confirmation; no early submit.
 for(const id of ['stormRain','iceArrowRain']){
     ctx.skillDatabase[id]={name:id,category:'magic',spCost:75,targetType:'all'};

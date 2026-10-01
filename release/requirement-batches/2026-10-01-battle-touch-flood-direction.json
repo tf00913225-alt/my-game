@@ -14,8 +14,8 @@
           "js/35-v141-ui-battle.js",
           "js/42-v148-combat-dungeon-fixes.js"
         ],
-        "verification": "#728 native CDP acceptance retained. New all-target regression failed on base and passes after fix; latest-head CI/deployed CDP pending. Physical Android acceptance pending.",
-        "result": "Two contributing mechanisms confirmed. New recording 1000072376.mp4 shows failures; recording SHA/cache/device unknown. Other support/single failures are not fully explained."
+        "verification": "#728/#734 native CDP acceptance retained. Recording 1000072388.mp4 confirms the apparent revive tap failure occurs with all three allies alive. Runtime rejects deadAlly with no legal target; the new visible notice and existing log are covered by formal owner regression and browser QA. Latest-head CI/deployed CDP and physical follow-up pending.",
+        "result": "The revive tap was a legal no-target rejection, not a touch failure. It now visibly reports: 我方目前沒有人死亡，無法使用復活術。 Other support/single failures remain evidence-scoped."
       }
     },
     {
@@ -27,8 +27,8 @@
           "js/39-v143-skill-animation.js",
           "css/40-v143-combat-dungeon-polish.css"
         ],
-        "verification": "#728 latest-head and deployed 36-frame CDP evidence retained; original 12-frame atlas reviewed. Physical acceptance pending.",
-        "result": "1350ms, hit fraction and source sheet retained; new blue effect alone does not establish a Flood Beast/Boss real-device result. No VERIFIED claim."
+        "verification": "Recording 1000072388.mp4 confirms the live flight phase rotates the sheet with its trajectory. The formal metadata now preserves source orientation for player, regular-monster and Boss travel; browser QA requires zero external rotation at cast, flight, impact and dissipate. Latest-head CI/deployed CDP and physical follow-up pending.",
+        "result": "Original sheet, 1350ms, hit fraction, endpoint, damage and Frostbite remain unchanged. Only the external trajectory rotation is retired. No VERIFIED claim."
       }
     }
   ]

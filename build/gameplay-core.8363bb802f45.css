@@ -166,6 +166,22 @@
     pointer-events:none;
 }
 #battlePage .battle-round-prompt[hidden]{display:none;}
+#battlePage .battle-action-notice{
+    top:112px;
+    width:max-content;
+    max-width:calc(100% - 32px);
+    box-sizing:border-box;
+    font-size:16px;
+    line-height:1.35;
+    white-space:normal;
+    opacity:0;
+    transition:opacity .14s ease,transform .14s ease;
+    transform:translate(-50%,-6px);
+}
+#battlePage .battle-action-notice.show{
+    opacity:1;
+    transform:translate(-50%,0);
+}
 
 #app .battle-statistics-result-modal{
     position:absolute;
