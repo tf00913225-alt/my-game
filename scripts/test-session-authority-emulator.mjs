@@ -245,7 +245,7 @@ const initialWriter=createCanonicalSourceWriter({db,FieldValue,HttpsError,
         return result;
     })});
 const choices={displayName:"英雄",element:"water",gender:"male",
-    attributes:{attack:2,vitality:2,energy:2,intelligence:2,spirit:1,agility:1}};
+    attributes:{attack:2,vitality:2,energy:2,intelligence:2,defensePoints:1,agility:1}};
 // The real callable permits only a newly minted Auth UID and creation choices.
 // The browser cannot supply a starting balance, item or operation identity.
 const freshUser=await login("accounts:signUp",{
