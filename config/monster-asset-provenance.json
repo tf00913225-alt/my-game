@@ -4057,6 +4057,2034 @@
         }
       },
       "runtimeReady": true
+    },
+    {
+      "monsterId": "wild.zone-01.earth-01",
+      "displayName": "岩薯卒",
+      "portraitKey": "wild.zone-01.earth-01",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/土元素/普通怪/file_00000000050081f8a2f6ff657da5d9ca.png",
+        "sha256": "3d7390af185f6570559d8e773880a0f188610a6550087e306c8b7b3b59eee47a",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/土元素/普通怪/file_00000000050081f8a2f6ff657da5d9ca.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/wild/zone-01/earth-01.webp",
+        "sha256": "3f437204e0ceb58cf868d542e14bd91e3212a8be1454c045a086658dd0f20758",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "wild.zone-02.earth-01",
+      "displayName": "岩鬃狸",
+      "portraitKey": "wild.zone-02.earth-01",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/土元素/普通怪/file_0000000008dc8211a5591a019b2aa5d7.png",
+        "sha256": "12761077767083946fa63d779e0dd6348939d1ce0d05814e2a240c630b3a0ec4",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/土元素/普通怪/file_0000000008dc8211a5591a019b2aa5d7.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/wild/zone-02/earth-01.webp",
+        "sha256": "6ac2c95b79c462ceece99e26766fa75310c8782e25a000a5ea0d70e929a74d43",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "wild.zone-03.earth-01",
+      "displayName": "石鎧象",
+      "portraitKey": "wild.zone-03.earth-01",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/土元素/普通怪/file_000000001508821185f5e627aae35ea5.png",
+        "sha256": "544eb115dd5811f93b7d31a54bc7d18cadb81ef606791d8f92a7442c816a0008",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/土元素/普通怪/file_000000001508821185f5e627aae35ea5.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/wild/zone-03/earth-01.webp",
+        "sha256": "2f34ad587fe2e2c9fe8849d2357f6941463ac542cf3b1a7e42e8689a373f42e8",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "wild.zone-04.earth-01",
+      "displayName": "礦鎬鬼",
+      "portraitKey": "wild.zone-04.earth-01",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/土元素/普通怪/file_0000000016d081f98649938f5874e32a.png",
+        "sha256": "a9c6c2c7bb1295ce3b7aca2f6938416694fbf5fc5d9a489e12d6ae4b6a6b4535",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/土元素/普通怪/file_0000000016d081f98649938f5874e32a.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/wild/zone-04/earth-01.webp",
+        "sha256": "61455788c92651349e2f30a1f5daf5aed4d6853fcdc4e903bdc0d64175ba67ff",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "wild.zone-05.earth-01",
+      "displayName": "枯根妖",
+      "portraitKey": "wild.zone-05.earth-01",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/土元素/普通怪/file_000000001c308243994bdbed1ee86a30.png",
+        "sha256": "f1ca4e6e31d8bb816040bb033de88776b9607e07f703768691533f944130fd96",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/土元素/普通怪/file_000000001c308243994bdbed1ee86a30.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/wild/zone-05/earth-01.webp",
+        "sha256": "ab7c26a7667f22f4766646dcdd4282896aa7c2ca4f9cc155dcab8a3308dd88b5",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "wild.zone-06.earth-01",
+      "displayName": "石鬃狼",
+      "portraitKey": "wild.zone-06.earth-01",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/土元素/普通怪/file_000000001f0c81f9b568fed1aaaa7948.png",
+        "sha256": "ab90b87f6b932b3ae99758237982615734671c9dacec05ed2f83e6055d4bce79",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/土元素/普通怪/file_000000001f0c81f9b568fed1aaaa7948.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/wild/zone-06/earth-01.webp",
+        "sha256": "7609c2d4c3eacd46870b69efd962e07216647ae80463ab94766493f7a933b5a2",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "wild.zone-07.earth-01",
+      "displayName": "岩爪貛",
+      "portraitKey": "wild.zone-07.earth-01",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/土元素/普通怪/file_0000000030488211850af8545d66d4be.png",
+        "sha256": "b9c0b4a8cafe7ec05b93226e135091290713a7a4d5c5b33d3cb366c80af099a2",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/土元素/普通怪/file_0000000030488211850af8545d66d4be.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/wild/zone-07/earth-01.webp",
+        "sha256": "124aa08dc3e734640d13150da28cac053ccf3471566851dbf3d61d2910f7cfbb",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "wild.zone-08.earth-01",
+      "displayName": "礦牙妖",
+      "portraitKey": "wild.zone-08.earth-01",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/土元素/普通怪/file_000000005e7882068d0003ba64831cfa.png",
+        "sha256": "07b8537cb0d2e7b7b6e802fb9a4f5e0a55ca9ade1f30b8a8af14b517f12ecd55",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/土元素/普通怪/file_000000005e7882068d0003ba64831cfa.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/wild/zone-08/earth-01.webp",
+        "sha256": "5dd882515eb14c330a00fe936a41f311bc245b47568164041766251086e35ede",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "wild.zone-09.earth-01",
+      "displayName": "荊根魔",
+      "portraitKey": "wild.zone-09.earth-01",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/土元素/普通怪/file_0000000068a881f4813e0188db0474ca.png",
+        "sha256": "304bf773c3f9fe6554c17401a1822d43811ca3d2c9095b1179ed94b61fe47c04",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/土元素/普通怪/file_0000000068a881f4813e0188db0474ca.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/wild/zone-09/earth-01.webp",
+        "sha256": "5c23498c58d38c00f6495d809a91960a061ce8ad8f7f60ec269b5c7d8746f02e",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "wild.zone-10.earth-01",
+      "displayName": "山岩巨人",
+      "portraitKey": "wild.zone-10.earth-01",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/土元素/普通怪/file_00000000690082119965093e85f70c46.png",
+        "sha256": "fe3f017ab3546260c57dbece7b8a6fe0b2c6f45211315f65ebfc880fc823d048",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/土元素/普通怪/file_00000000690082119965093e85f70c46.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/wild/zone-10/earth-01.webp",
+        "sha256": "d0d1dbe8d6f5367ab4262bbbea73174362610751a82879308f92e87b85aca4f0",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_EARTH_NORMAL_001",
+      "displayName": "岩斧象",
+      "portraitKey": "MON_EARTH_NORMAL_001",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/土元素/普通怪/file_00000000902881fda7168b4e91514ba5.png",
+        "sha256": "516d65c612b47dfe8ddd2df72e79db64b315858cf2f26f934238ce4af930b287",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/土元素/普通怪/file_00000000902881fda7168b4e91514ba5.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/earth-pool/mon-earth-normal-001.webp",
+        "sha256": "502bc56d3cd8c47dd62e5a1dc63093f97f8294904ab5ec0b0a72fdb66b49010e",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_EARTH_NORMAL_002",
+      "displayName": "磐甲蜥",
+      "portraitKey": "MON_EARTH_NORMAL_002",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/土元素/普通怪/file_0000000090f4820d94cc0992024081c3.png",
+        "sha256": "26a07940febc67d93160c6a33a94a2937ce272b7061e8b1b2ee17b1b0332bdf7",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/土元素/普通怪/file_0000000090f4820d94cc0992024081c3.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/earth-pool/mon-earth-normal-002.webp",
+        "sha256": "36727f31d9202de8587f458bd9541aac3e4fd873f9dbb372920068101bf9bcd1",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_EARTH_NORMAL_003",
+      "displayName": "沙鎧螳",
+      "portraitKey": "MON_EARTH_NORMAL_003",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/土元素/普通怪/file_0000000098ec8246afe89d32b2540d78.png",
+        "sha256": "d439a1ad8d62664a834cb88f73992924bb5629abcd6c99c262793e4ea5ff64a8",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/土元素/普通怪/file_0000000098ec8246afe89d32b2540d78.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/earth-pool/mon-earth-normal-003.webp",
+        "sha256": "ec75b4b5fc8b4bf1492f9a27463329ab8f9dbf4404fce776ce7478fe254856d4",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_EARTH_NORMAL_004",
+      "displayName": "地行客",
+      "portraitKey": "MON_EARTH_NORMAL_004",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/土元素/普通怪/file_00000000b184820882bb56ae0655ccee.png",
+        "sha256": "2389d8eab27ca444946ae2cc984a3b1ce9643edecebda226973b737cb450b91a",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/土元素/普通怪/file_00000000b184820882bb56ae0655ccee.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/earth-pool/mon-earth-normal-004.webp",
+        "sha256": "d6b53c39f4af2591f5f21ea4f5dccb4fdf03cfef1be98626bec32ca93322e117",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_EARTH_NORMAL_005",
+      "displayName": "岩薯力士",
+      "portraitKey": "MON_EARTH_NORMAL_005",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/土元素/普通怪/file_00000000b3148230863f1bf34eedc12e.png",
+        "sha256": "204ede05f9d688050b8fa8cbdf352b920d5d9838b37e8ef563bf0a689cbc5352",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/土元素/普通怪/file_00000000b3148230863f1bf34eedc12e.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/earth-pool/mon-earth-normal-005.webp",
+        "sha256": "1734381e2a4cfcea1c38c531c383351454b191fc1d8ee713ee3134d5085fca28",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_EARTH_NORMAL_006",
+      "displayName": "岳槍衛",
+      "portraitKey": "MON_EARTH_NORMAL_006",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/土元素/普通怪/file_00000000b37c81f4a77280882385bfdb.png",
+        "sha256": "7ce8e89c95e580a833cca79a108c9b75309832baec9a9fa661e71c6895d7bf65",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/土元素/普通怪/file_00000000b37c81f4a77280882385bfdb.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/earth-pool/mon-earth-normal-006.webp",
+        "sha256": "c12258d71951c9f4c93bc7d9437d37be4d5e15a27b1255154685f4047560c367",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_EARTH_NORMAL_007",
+      "displayName": "岩弓使",
+      "portraitKey": "MON_EARTH_NORMAL_007",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/土元素/普通怪/file_00000000bfa481f4a14bd7a0cce1ab13.png",
+        "sha256": "9598ec16242614bdfe8ad610af39ddced92e4d758dc8e1af1add3673fc5f79d9",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/土元素/普通怪/file_00000000bfa481f4a14bd7a0cce1ab13.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/earth-pool/mon-earth-normal-007.webp",
+        "sha256": "800ca96593ef481e7c1ce0bdd9fc0c59f09eb2b1fcdb66f89b0d552f2e9c2303",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_EARTH_NORMAL_008",
+      "displayName": "坤斧姬",
+      "portraitKey": "MON_EARTH_NORMAL_008",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/土元素/普通怪/file_00000000c70481f7a19b022c19cae212.png",
+        "sha256": "c453bbd85ebce6688fc9e8ffc8a934b049cf67b88cc66a321b74803ffdc910d2",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/土元素/普通怪/file_00000000c70481f7a19b022c19cae212.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/earth-pool/mon-earth-normal-008.webp",
+        "sha256": "d875820d4dafbda59660bdef7c2ec9fae42cb76c352f97d9375bd884dc65319c",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_EARTH_NORMAL_009",
+      "displayName": "菌冠妖",
+      "portraitKey": "MON_EARTH_NORMAL_009",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/土元素/普通怪/file_00000000e124820e9e1af12e694f231f.png",
+        "sha256": "2b128ba1b6d732e56894c8a79b22bf7b2b7ca4c857d724aef066e655602980d4",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/土元素/普通怪/file_00000000e124820e9e1af12e694f231f.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/earth-pool/mon-earth-normal-009.webp",
+        "sha256": "be1240e4f8d5ef83b20ffbc32d846e9299b6b66510cfd6793516aef5484dc9c3",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_EARTH_NORMAL_010",
+      "displayName": "石獅靈",
+      "portraitKey": "MON_EARTH_NORMAL_010",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/土元素/普通怪/file_00000000ecb481f8890a2088100bb7ea.png",
+        "sha256": "8bfc9caf7e21880b3f42cc6e10fe43a2018782a40e3ca147135bd10509c1b378",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/土元素/普通怪/file_00000000ecb481f8890a2088100bb7ea.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/earth-pool/mon-earth-normal-010.webp",
+        "sha256": "3683819187f5909c1b617893b6fe8317c19713dfbcc2014a1c65f1706a617e98",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_EARTH_ELITE_001",
+      "displayName": "岩薯戰將",
+      "portraitKey": "MON_EARTH_ELITE_001",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/土元素/菁英怪/file_0000000006d081fd99927be0ccb5c0fe.png",
+        "sha256": "b5e8b5052136af0fd063e7dba73a8918a43cd7b63c2418341e89c54b029e6b6c",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/土元素/菁英怪/file_0000000006d081fd99927be0ccb5c0fe.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/earth-pool/mon-earth-elite-001.webp",
+        "sha256": "8f0bbadf77ede8dfbc303616ce8e4ca8daa6d18eb81fe2c1949e99c92569fb75",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_EARTH_ELITE_002",
+      "displayName": "地角魔",
+      "portraitKey": "MON_EARTH_ELITE_002",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/土元素/菁英怪/file_0000000008a881f49cc3dcce716f90fe.png",
+        "sha256": "8f0e7fa31bb9d428f3a594a97adac1997294727e5ed86cb1f3dfc66b7108825b",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/土元素/菁英怪/file_0000000008a881f49cc3dcce716f90fe.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/earth-pool/mon-earth-elite-002.webp",
+        "sha256": "3cc6773493f5ee7cc87f1a6abdaac2cf752f7e65774793457a776e6125a1f6b8",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_EARTH_ELITE_003",
+      "displayName": "棘木妖王",
+      "portraitKey": "MON_EARTH_ELITE_003",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/土元素/菁英怪/file_000000000fb481f8bd26cc27cf330911.png",
+        "sha256": "4b15af1aeef981237a081b82bf262306c538fcb8374c1db7121b6966d3475ab4",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/土元素/菁英怪/file_000000000fb481f8bd26cc27cf330911.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/earth-pool/mon-earth-elite-003.webp",
+        "sha256": "cd6e16188220b2fe427b6a4c3e2aaabaf07df139770b429936749fde9b535b91",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_EARTH_ELITE_004",
+      "displayName": "坤術師",
+      "portraitKey": "MON_EARTH_ELITE_004",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/土元素/菁英怪/file_00000000775c81fd9b5d0c0c8fb17b6a.png",
+        "sha256": "d58c6a3dc09c6fabdf85145a8e30a9bbdf748d36e502abc44364fc565e70a882",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/土元素/菁英怪/file_00000000775c81fd9b5d0c0c8fb17b6a.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/earth-pool/mon-earth-elite-004.webp",
+        "sha256": "7c7f193cff1db373cf844b490ec9798af99403d14faf01408a1708082d9a130a",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_EARTH_ELITE_005",
+      "displayName": "岩角羊",
+      "portraitKey": "MON_EARTH_ELITE_005",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/土元素/菁英怪/file_000000008fe0820c9c57803397b48a41.png",
+        "sha256": "e74f9ff4c877a3753c860fb9c60af6164d504dfe9fcc7126f5912e104fd044dd",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/土元素/菁英怪/file_000000008fe0820c9c57803397b48a41.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/earth-pool/mon-earth-elite-005.webp",
+        "sha256": "0ca84db1ecbe99f93b9c3b48412837d5764db07f72cf2c9e8cf3cfc5c0d2f80a",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_EARTH_ELITE_006",
+      "displayName": "玄岩象將",
+      "portraitKey": "MON_EARTH_ELITE_006",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/土元素/菁英怪/file_00000000afb4820ba14c4b173c801ec7.png",
+        "sha256": "07f6eb77a1f92f11b1384f896898b88a3442b806c27ba93b0d8c093fccd33dd8",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/土元素/菁英怪/file_00000000afb4820ba14c4b173c801ec7.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/earth-pool/mon-earth-elite-006.webp",
+        "sha256": "b97bfffc181bf3490e812df4ed3e4960afe2cf3e862e5ec125c98d39393daeee",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_EARTH_ELITE_007",
+      "displayName": "地刃姬",
+      "portraitKey": "MON_EARTH_ELITE_007",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/土元素/菁英怪/file_00000000c7a48211ba05aedaf429894d.png",
+        "sha256": "c20693b2cdf43a731dfe143bc1a1502408228563acf3eb60ee454ae005eeb044",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/土元素/菁英怪/file_00000000c7a48211ba05aedaf429894d.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/earth-pool/mon-earth-elite-007.webp",
+        "sha256": "b2c938f47e6ea103bc713cb934a434abcef643ed4487dacb693a92b601c31641",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_EARTH_ELITE_008",
+      "displayName": "磐紋虎",
+      "portraitKey": "MON_EARTH_ELITE_008",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/土元素/菁英怪/file_00000000ec2c81f484d7e30603dc1c02.png",
+        "sha256": "641952b690bb96c99a6167b4f6222c4a383093f4f6a06dc39b9a26d4362e8444",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/土元素/菁英怪/file_00000000ec2c81f484d7e30603dc1c02.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/earth-pool/mon-earth-elite-008.webp",
+        "sha256": "0e22f22a1fe5f53095d5d97dd9fd93ae814b8adc1b5289a435cf048f1773572d",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_EARTH_ELITE_009",
+      "displayName": "岩骨巫",
+      "portraitKey": "MON_EARTH_ELITE_009",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/土元素/菁英怪/file_00000000f05c82119ba4ee71efbdb800.png",
+        "sha256": "ebdd213c50c97a762711c5cdc76d72c2b4036d356293f4bcba8b6e91e9d59b96",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/土元素/菁英怪/file_00000000f05c82119ba4ee71efbdb800.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/earth-pool/mon-earth-elite-009.webp",
+        "sha256": "910cfc20af935d4e341b8428e02b712696501303fd578f53d072c7f1460656eb",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_EARTH_ELITE_010",
+      "displayName": "沙甲刀客",
+      "portraitKey": "MON_EARTH_ELITE_010",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/土元素/菁英怪/file_00000000fd6c824694589c59d67815dc.png",
+        "sha256": "40c7e0308d11a87a6901395c1fdf6bcb8b25229bf77dce0082858a36e63ec05f",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/土元素/菁英怪/file_00000000fd6c824694589c59d67815dc.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/earth-pool/mon-earth-elite-010.webp",
+        "sha256": "008c43650d454caa43f3b3daabf71203c48b9d77b47b9b17600e96cf28a8168f",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_EARTH_MINIBOSS_001",
+      "displayName": "撼地魔王",
+      "portraitKey": "MON_EARTH_MINIBOSS_001",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/土元素/小Boss/file_000000000fac8243a26a5e3b56c93083.png",
+        "sha256": "f4af805028f93096dcc07074dda86acec5f0f42c1b2da807c80d1996a82edd32",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/土元素/小Boss/file_000000000fac8243a26a5e3b56c93083.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/earth-pool/mon-earth-miniboss-001.webp",
+        "sha256": "8ecd1a428e04995ef61c9550ff4a32608cb4f69603715aefce9ba6196517953a",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_EARTH_MINIBOSS_002",
+      "displayName": "玄甲龍王",
+      "portraitKey": "MON_EARTH_MINIBOSS_002",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/土元素/小Boss/file_000000003124820889eb85f0345350ab.png",
+        "sha256": "49eda948b42d7c930841e93396a8792744c180b85520b873a024fceccd9a71c3",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/土元素/小Boss/file_000000003124820889eb85f0345350ab.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/earth-pool/mon-earth-miniboss-002.webp",
+        "sha256": "12b2cf4be200be4676f69fcf4680020d8171ce89b6747837d3ba49ed8367a43d",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_EARTH_MINIBOSS_003",
+      "displayName": "坤靈聖女",
+      "portraitKey": "MON_EARTH_MINIBOSS_003",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/土元素/小Boss/file_0000000036a48207aa788156c7fbcd58.png",
+        "sha256": "29cd0b90b237ab8b99948b4b051ef588ad1a0d4f8e10c92654799249f2abbca9",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/土元素/小Boss/file_0000000036a48207aa788156c7fbcd58.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/earth-pool/mon-earth-miniboss-003.webp",
+        "sha256": "a91e2cfca30aff505756157331d78d3afc5c5fb47188c1176d3e99e4966921fe",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_EARTH_MINIBOSS_004",
+      "displayName": "岩臂猿皇",
+      "portraitKey": "MON_EARTH_MINIBOSS_004",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/土元素/小Boss/file_000000004d248206a178b0b66ba5a892.png",
+        "sha256": "ac775dd5547e9c8164e06b9fb6c20e70accb8bffe41da634bbb55b046edcabae",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/土元素/小Boss/file_000000004d248206a178b0b66ba5a892.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/earth-pool/mon-earth-miniboss-004.webp",
+        "sha256": "f38fa81fece8ef7c316f431583ee2b28055192d284a98a306519ed6f621e094e",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_EARTH_MINIBOSS_005",
+      "displayName": "山靈獸王",
+      "portraitKey": "MON_EARTH_MINIBOSS_005",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/土元素/小Boss/file_0000000076ac8243a34e1c71875e2993.png",
+        "sha256": "5ce16b4afa3c9ce1bbdf4e630369b335d8e814a4856cd4e3c817e6b2e3de2d60",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/土元素/小Boss/file_0000000076ac8243a34e1c71875e2993.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/earth-pool/mon-earth-miniboss-005.webp",
+        "sha256": "764cf1a423e921f7016ce3a0ed81cbd81136fca2cb34c4017a5343b2a0a734f5",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_EARTH_MINIBOSS_006",
+      "displayName": "萬木地尊",
+      "portraitKey": "MON_EARTH_MINIBOSS_006",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/土元素/小Boss/file_00000000aeb4820db593da5c0165412f.png",
+        "sha256": "8a74c6ad691785d9742eef6d2c05874cc4191c597c0f8587225f38cada96da45",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/土元素/小Boss/file_00000000aeb4820db593da5c0165412f.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/earth-pool/mon-earth-miniboss-006.webp",
+        "sha256": "3811b1eebad273250b121287b28382e48d2f58a15cc8cb3c7e4c583b7a1357da",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_EARTH_MINIBOSS_007",
+      "displayName": "鎮岳武尊",
+      "portraitKey": "MON_EARTH_MINIBOSS_007",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/土元素/小Boss/file_00000000c834820cac4e1af721a6673b.png",
+        "sha256": "363942e910dddf6e750b6fe160f44290882a2a7e84bdaa207b66739f81a6fce4",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/土元素/小Boss/file_00000000c834820cac4e1af721a6673b.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/earth-pool/mon-earth-miniboss-007.webp",
+        "sha256": "5085ea56d934cfe085ff75ecf8e4c04993f8f2ff5723342c3e70647ad1a4ce08",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_EARTH_MINIBOSS_008",
+      "displayName": "坤天戰聖",
+      "portraitKey": "MON_EARTH_MINIBOSS_008",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/土元素/小Boss/file_00000000e8ac820ebb47920fef6237f0.png",
+        "sha256": "639acb5750af53e3e518f1527cbd974e2a00d9b1d6bc2f5f5ad2d17784c706a9",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/土元素/小Boss/file_00000000e8ac820ebb47920fef6237f0.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/earth-pool/mon-earth-miniboss-008.webp",
+        "sha256": "fe995c0a561db0e643cc700ca1d6c184e9d4db6088eaf91256217cc4513a6166",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
+    },
+    {
+      "monsterId": "MON_EARTH_MINIBOSS_009",
+      "displayName": "磐山帝君",
+      "portraitKey": "MON_EARTH_MINIBOSS_009",
+      "identityStatus": "IDENTITY_VERIFIED",
+      "master": {
+        "repository": "tf00913225-alt/my-game",
+        "branch": "assets-library",
+        "commit": "a27a9fd23192cfa82e2eafd69a831c7f980272ce",
+        "path": "assets/inbox/英雄or怪物立繪/土元素/小Boss/file_00000000fb8482119ea228dcfdac6fd6.png",
+        "sha256": "6f9ed39ef17d97ff3baaf59bf4adf6a783bf45fad006acf28b55adb04c3f3ca3",
+        "width": 1024,
+        "height": 1536,
+        "format": "png",
+        "alphaVerified": true,
+        "decodeVerified": true,
+        "source": {
+          "kind": "repository-owner supplied project PNG",
+          "reference": "assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce / assets/inbox/英雄or怪物立繪/土元素/小Boss/file_00000000fb8482119ea228dcfdac6fd6.png",
+          "capturedAt": "2026-10-01",
+          "rightsSourceDeclaration": "repository-owner supplied project asset; provenance recorded for game use"
+        }
+      },
+      "runtime": {
+        "path": "assets/monsters/tower/earth-pool/mon-earth-miniboss-009.webp",
+        "sha256": "02ce60d15a6e9168f04013d7bbdedcacc8392e605c41ca9d36c514a1f01aa470",
+        "format": "webp",
+        "width": 1024,
+        "height": 1536,
+        "background": "transparent",
+        "fit": "contain",
+        "alignment": "center",
+        "crop": "forbidden",
+        "stretch": "forbidden",
+        "generator": {
+          "tool": "ImageMagick",
+          "command": "PNG RGBA to WEBP lossless; canvas unchanged; exact RGBA pixels",
+          "canvas": {
+            "width": 1024,
+            "height": 1536
+          },
+          "fit": "contain",
+          "alignment": "center",
+          "crop": "forbidden",
+          "stretch": "forbidden",
+          "background": "transparent",
+          "format": "webp",
+          "lossless": true
+        }
+      },
+      "runtimeReady": true
     }
   ]
 }

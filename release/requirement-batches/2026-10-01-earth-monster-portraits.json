@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "earth-monster-portraits-20261001",
+  "releaseVersion": "173.72",
+  "requirements": [
+    {
+      "id": "EARTH-01",
+      "title": "Thirty-nine decodable earth Master PNG become exact lossless Runtime WebP identities",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "config/monster-portrait-registry.json",
+          "config/monster-asset-provenance.json",
+          "tests/earth-monster-portrait-coverage.test.js"
+        ],
+        "verification": "Local PNG/WebP decode, 1024x1536 dimensions, transparency and exact RGBA pixel equality are required for all adopted assets; latest PR CI pending.",
+        "result": "10 wild, 10 tower normal, 10 tower elite and 9 tower small Boss portraits are runtimeReady. MON_EARTH_MINIBOSS_010 remains reserved because its repository Master PNG is truncated and fails decode."
+      }
+    },
+    {
+      "id": "EARTH-02",
+      "title": "Earth wild and tower identity, first visible frame, redraw and element isolation",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "js/34-v141-core-systems.js",
+          "js/gameplay-boss-tower-system.js",
+          ".github/scripts/run-fire-tower-identity-first-frame-browser-qa.mjs",
+          ".github/workflows/ci.yml"
+        ],
+        "verification": "Exact-candidate browser execution is required on the PR for floors 1, 5, 10, 50 and 90; Android physical-device display remains NOT COMPLETE.",
+        "result": "Earth floor 100 intentionally retains the existing generic fallback until a valid tenth small Boss Master replaces the corrupt source; no duplicate portrait or false runtimeReady record is allowed."
+      }
+    }
+  ]
+}

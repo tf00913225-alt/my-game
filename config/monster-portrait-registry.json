@@ -70,10 +70,10 @@
     }
   },
   "snapshot": {
-    "portraitTargets": 147,
-    "existingTargets": 100,
-    "plannedTargets": 47,
-    "uniqueRuntimeNames": 144,
+    "portraitTargets": 176,
+    "existingTargets": 139,
+    "plannedTargets": 37,
+    "uniqueRuntimeNames": 173,
     "assetPoolCounts": {
       "normal": 10,
       "elite": 19,
@@ -113,12 +113,12 @@
       ],
       [
         "wild.zone-01.earth-01",
-        "苔岩獸",
+        "岩薯卒",
         "earth",
         "regular",
         "standard",
-        "assets/monsters/wild/zone-01/earth-01.png",
-        "planned"
+        "assets/monsters/wild/zone-01/earth-01.webp",
+        "existing"
       ],
       [
         "wild.zone-02.fire-01",
@@ -149,12 +149,12 @@
       ],
       [
         "wild.zone-02.earth-01",
-        "岩甲蠍",
+        "岩鬃狸",
         "earth",
         "regular",
         "standard",
-        "assets/monsters/wild/zone-02/earth-01.png",
-        "planned"
+        "assets/monsters/wild/zone-02/earth-01.webp",
+        "existing"
       ],
       [
         "wild.zone-03.fire-01",
@@ -203,12 +203,12 @@
       ],
       [
         "wild.zone-03.earth-01",
-        "凍岩獸",
+        "石鎧象",
         "earth",
         "regular",
         "standard",
-        "assets/monsters/wild/zone-03/earth-01.png",
-        "planned"
+        "assets/monsters/wild/zone-03/earth-01.webp",
+        "existing"
       ],
       [
         "wild.zone-04.fire-01",
@@ -257,12 +257,12 @@
       ],
       [
         "wild.zone-04.earth-01",
-        "熔岩石怪",
+        "礦鎬鬼",
         "earth",
         "regular",
         "standard",
-        "assets/monsters/wild/zone-04/earth-01.png",
-        "planned"
+        "assets/monsters/wild/zone-04/earth-01.webp",
+        "existing"
       ],
       [
         "wild.zone-05.fire-01",
@@ -311,12 +311,12 @@
       ],
       [
         "wild.zone-05.earth-01",
-        "山岳巨獸",
+        "枯根妖",
         "earth",
         "regular",
         "standard",
-        "assets/monsters/wild/zone-05/earth-01.png",
-        "planned"
+        "assets/monsters/wild/zone-05/earth-01.webp",
+        "existing"
       ],
       [
         "wild.zone-06.fire-01",
@@ -365,12 +365,12 @@
       ],
       [
         "wild.zone-06.earth-01",
-        "岩鎧修羅",
+        "石鬃狼",
         "earth",
         "regular",
         "standard",
-        "assets/monsters/wild/zone-06/earth-01.png",
-        "planned"
+        "assets/monsters/wild/zone-06/earth-01.webp",
+        "existing"
       ],
       [
         "wild.zone-07.fire-01",
@@ -419,12 +419,12 @@
       ],
       [
         "wild.zone-07.earth-01",
-        "岳魂魔君",
+        "岩爪貛",
         "earth",
         "regular",
         "standard",
-        "assets/monsters/wild/zone-07/earth-01.png",
-        "planned"
+        "assets/monsters/wild/zone-07/earth-01.webp",
+        "existing"
       ],
       [
         "wild.zone-08.fire-01",
@@ -473,12 +473,12 @@
       ],
       [
         "wild.zone-08.earth-01",
-        "岩岳龍衛",
+        "礦牙妖",
         "earth",
         "regular",
         "standard",
-        "assets/monsters/wild/zone-08/earth-01.png",
-        "planned"
+        "assets/monsters/wild/zone-08/earth-01.webp",
+        "existing"
       ],
       [
         "wild.zone-09.fire-01",
@@ -527,12 +527,12 @@
       ],
       [
         "wild.zone-09.earth-01",
-        "虛空岩靈",
+        "荊根魔",
         "earth",
         "regular",
         "standard",
-        "assets/monsters/wild/zone-09/earth-01.png",
-        "planned"
+        "assets/monsters/wild/zone-09/earth-01.webp",
+        "existing"
       ],
       [
         "wild.zone-10.fire-01",
@@ -581,12 +581,12 @@
       ],
       [
         "wild.zone-10.earth-01",
-        "終焉地神",
+        "山岩巨人",
         "earth",
         "regular",
         "standard",
-        "assets/monsters/wild/zone-10/earth-01.png",
-        "planned"
+        "assets/monsters/wild/zone-10/earth-01.webp",
+        "existing"
       ]
     ],
     "daily": [
@@ -1421,6 +1421,269 @@
         "boss",
         "standard",
         "assets/monsters/tower/wind-pool/mon-wind-miniboss-010.webp",
+        "existing"
+      ]
+    ],
+    "tower-earth": [
+      [
+        "MON_EARTH_NORMAL_001",
+        "岩斧象",
+        "earth",
+        "regular",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-normal-001.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_NORMAL_002",
+        "磐甲蜥",
+        "earth",
+        "regular",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-normal-002.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_NORMAL_003",
+        "沙鎧螳",
+        "earth",
+        "regular",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-normal-003.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_NORMAL_004",
+        "地行客",
+        "earth",
+        "regular",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-normal-004.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_NORMAL_005",
+        "岩薯力士",
+        "earth",
+        "regular",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-normal-005.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_NORMAL_006",
+        "岳槍衛",
+        "earth",
+        "regular",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-normal-006.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_NORMAL_007",
+        "岩弓使",
+        "earth",
+        "regular",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-normal-007.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_NORMAL_008",
+        "坤斧姬",
+        "earth",
+        "regular",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-normal-008.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_NORMAL_009",
+        "菌冠妖",
+        "earth",
+        "regular",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-normal-009.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_NORMAL_010",
+        "石獅靈",
+        "earth",
+        "regular",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-normal-010.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_ELITE_001",
+        "岩薯戰將",
+        "earth",
+        "elite",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-elite-001.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_ELITE_002",
+        "地角魔",
+        "earth",
+        "elite",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-elite-002.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_ELITE_003",
+        "棘木妖王",
+        "earth",
+        "elite",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-elite-003.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_ELITE_004",
+        "坤術師",
+        "earth",
+        "elite",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-elite-004.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_ELITE_005",
+        "岩角羊",
+        "earth",
+        "elite",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-elite-005.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_ELITE_006",
+        "玄岩象將",
+        "earth",
+        "elite",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-elite-006.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_ELITE_007",
+        "地刃姬",
+        "earth",
+        "elite",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-elite-007.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_ELITE_008",
+        "磐紋虎",
+        "earth",
+        "elite",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-elite-008.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_ELITE_009",
+        "岩骨巫",
+        "earth",
+        "elite",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-elite-009.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_ELITE_010",
+        "沙甲刀客",
+        "earth",
+        "elite",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-elite-010.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_MINIBOSS_001",
+        "撼地魔王",
+        "earth",
+        "boss",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-miniboss-001.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_MINIBOSS_002",
+        "玄甲龍王",
+        "earth",
+        "boss",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-miniboss-002.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_MINIBOSS_003",
+        "坤靈聖女",
+        "earth",
+        "boss",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-miniboss-003.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_MINIBOSS_004",
+        "岩臂猿皇",
+        "earth",
+        "boss",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-miniboss-004.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_MINIBOSS_005",
+        "山靈獸王",
+        "earth",
+        "boss",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-miniboss-005.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_MINIBOSS_006",
+        "萬木地尊",
+        "earth",
+        "boss",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-miniboss-006.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_MINIBOSS_007",
+        "鎮岳武尊",
+        "earth",
+        "boss",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-miniboss-007.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_MINIBOSS_008",
+        "坤天戰聖",
+        "earth",
+        "boss",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-miniboss-008.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_MINIBOSS_009",
+        "磐山帝君",
+        "earth",
+        "boss",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-miniboss-009.webp",
         "existing"
       ]
     ]
@@ -2270,6 +2533,307 @@
         "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-miniboss-010.webp",
         "status": "adopted",
         "usedIn": "Wind Tower / miniboss"
+      },
+      {
+        "assetId": "MON_EARTH_NORMAL_001",
+        "displayName": "岩斧象",
+        "element": "earth",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/普通怪/file_00000000902881fda7168b4e91514ba5.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-normal-001.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / normal"
+      },
+      {
+        "assetId": "MON_EARTH_NORMAL_002",
+        "displayName": "磐甲蜥",
+        "element": "earth",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/普通怪/file_0000000090f4820d94cc0992024081c3.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-normal-002.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / normal"
+      },
+      {
+        "assetId": "MON_EARTH_NORMAL_003",
+        "displayName": "沙鎧螳",
+        "element": "earth",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/普通怪/file_0000000098ec8246afe89d32b2540d78.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-normal-003.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / normal"
+      },
+      {
+        "assetId": "MON_EARTH_NORMAL_004",
+        "displayName": "地行客",
+        "element": "earth",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/普通怪/file_00000000b184820882bb56ae0655ccee.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-normal-004.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / normal"
+      },
+      {
+        "assetId": "MON_EARTH_NORMAL_005",
+        "displayName": "岩薯力士",
+        "element": "earth",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/普通怪/file_00000000b3148230863f1bf34eedc12e.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-normal-005.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / normal"
+      },
+      {
+        "assetId": "MON_EARTH_NORMAL_006",
+        "displayName": "岳槍衛",
+        "element": "earth",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/普通怪/file_00000000b37c81f4a77280882385bfdb.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-normal-006.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / normal"
+      },
+      {
+        "assetId": "MON_EARTH_NORMAL_007",
+        "displayName": "岩弓使",
+        "element": "earth",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/普通怪/file_00000000bfa481f4a14bd7a0cce1ab13.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-normal-007.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / normal"
+      },
+      {
+        "assetId": "MON_EARTH_NORMAL_008",
+        "displayName": "坤斧姬",
+        "element": "earth",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/普通怪/file_00000000c70481f7a19b022c19cae212.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-normal-008.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / normal"
+      },
+      {
+        "assetId": "MON_EARTH_NORMAL_009",
+        "displayName": "菌冠妖",
+        "element": "earth",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/普通怪/file_00000000e124820e9e1af12e694f231f.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-normal-009.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / normal"
+      },
+      {
+        "assetId": "MON_EARTH_NORMAL_010",
+        "displayName": "石獅靈",
+        "element": "earth",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/普通怪/file_00000000ecb481f8890a2088100bb7ea.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-normal-010.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / normal"
+      },
+      {
+        "assetId": "MON_EARTH_ELITE_001",
+        "displayName": "岩薯戰將",
+        "element": "earth",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/菁英怪/file_0000000006d081fd99927be0ccb5c0fe.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-elite-001.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / elite"
+      },
+      {
+        "assetId": "MON_EARTH_ELITE_002",
+        "displayName": "地角魔",
+        "element": "earth",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/菁英怪/file_0000000008a881f49cc3dcce716f90fe.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-elite-002.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / elite"
+      },
+      {
+        "assetId": "MON_EARTH_ELITE_003",
+        "displayName": "棘木妖王",
+        "element": "earth",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/菁英怪/file_000000000fb481f8bd26cc27cf330911.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-elite-003.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / elite"
+      },
+      {
+        "assetId": "MON_EARTH_ELITE_004",
+        "displayName": "坤術師",
+        "element": "earth",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/菁英怪/file_00000000775c81fd9b5d0c0c8fb17b6a.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-elite-004.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / elite"
+      },
+      {
+        "assetId": "MON_EARTH_ELITE_005",
+        "displayName": "岩角羊",
+        "element": "earth",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/菁英怪/file_000000008fe0820c9c57803397b48a41.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-elite-005.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / elite"
+      },
+      {
+        "assetId": "MON_EARTH_ELITE_006",
+        "displayName": "玄岩象將",
+        "element": "earth",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/菁英怪/file_00000000afb4820ba14c4b173c801ec7.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-elite-006.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / elite"
+      },
+      {
+        "assetId": "MON_EARTH_ELITE_007",
+        "displayName": "地刃姬",
+        "element": "earth",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/菁英怪/file_00000000c7a48211ba05aedaf429894d.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-elite-007.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / elite"
+      },
+      {
+        "assetId": "MON_EARTH_ELITE_008",
+        "displayName": "磐紋虎",
+        "element": "earth",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/菁英怪/file_00000000ec2c81f484d7e30603dc1c02.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-elite-008.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / elite"
+      },
+      {
+        "assetId": "MON_EARTH_ELITE_009",
+        "displayName": "岩骨巫",
+        "element": "earth",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/菁英怪/file_00000000f05c82119ba4ee71efbdb800.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-elite-009.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / elite"
+      },
+      {
+        "assetId": "MON_EARTH_ELITE_010",
+        "displayName": "沙甲刀客",
+        "element": "earth",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/菁英怪/file_00000000fd6c824694589c59d67815dc.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-elite-010.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / elite"
+      },
+      {
+        "assetId": "MON_EARTH_MINIBOSS_001",
+        "displayName": "撼地魔王",
+        "element": "earth",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/小Boss/file_000000000fac8243a26a5e3b56c93083.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-miniboss-001.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / miniboss"
+      },
+      {
+        "assetId": "MON_EARTH_MINIBOSS_002",
+        "displayName": "玄甲龍王",
+        "element": "earth",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/小Boss/file_000000003124820889eb85f0345350ab.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-miniboss-002.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / miniboss"
+      },
+      {
+        "assetId": "MON_EARTH_MINIBOSS_003",
+        "displayName": "坤靈聖女",
+        "element": "earth",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/小Boss/file_0000000036a48207aa788156c7fbcd58.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-miniboss-003.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / miniboss"
+      },
+      {
+        "assetId": "MON_EARTH_MINIBOSS_004",
+        "displayName": "岩臂猿皇",
+        "element": "earth",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/小Boss/file_000000004d248206a178b0b66ba5a892.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-miniboss-004.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / miniboss"
+      },
+      {
+        "assetId": "MON_EARTH_MINIBOSS_005",
+        "displayName": "山靈獸王",
+        "element": "earth",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/小Boss/file_0000000076ac8243a34e1c71875e2993.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-miniboss-005.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / miniboss"
+      },
+      {
+        "assetId": "MON_EARTH_MINIBOSS_006",
+        "displayName": "萬木地尊",
+        "element": "earth",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/小Boss/file_00000000aeb4820db593da5c0165412f.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-miniboss-006.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / miniboss"
+      },
+      {
+        "assetId": "MON_EARTH_MINIBOSS_007",
+        "displayName": "鎮岳武尊",
+        "element": "earth",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/小Boss/file_00000000c834820cac4e1af721a6673b.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-miniboss-007.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / miniboss"
+      },
+      {
+        "assetId": "MON_EARTH_MINIBOSS_008",
+        "displayName": "坤天戰聖",
+        "element": "earth",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/小Boss/file_00000000e8ac820ebb47920fef6237f0.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-miniboss-008.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / miniboss"
+      },
+      {
+        "assetId": "MON_EARTH_MINIBOSS_009",
+        "displayName": "磐山帝君",
+        "element": "earth",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/小Boss/file_00000000fb8482119ea228dcfdac6fd6.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-miniboss-009.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / miniboss"
+      },
+      {
+        "assetId": "MON_EARTH_MINIBOSS_010",
+        "displayName": "地極真君",
+        "element": "earth",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/小Boss/file_00000000fc4c8230bcc34edeab91fbeb.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-miniboss-010.webp",
+        "status": "reserved",
+        "usedIn": "Earth Tower / reserved pending valid Master replacement",
+        "notes": "Source PNG is truncated and fails decode; never promoted to runtimeReady."
       }
     ]
   },
@@ -2483,6 +3047,91 @@
       "80": "MON_WIND_MINIBOSS_008",
       "90": "MON_WIND_MINIBOSS_009",
       "100": "MON_WIND_MINIBOSS_010"
+    }
+  },
+  "earthTowerCoverage": {
+    "schemaVersion": 1,
+    "element": "earth",
+    "floorCount": 100,
+    "normalByBand": [
+      [
+        "MON_EARTH_NORMAL_001"
+      ],
+      [
+        "MON_EARTH_NORMAL_002"
+      ],
+      [
+        "MON_EARTH_NORMAL_003"
+      ],
+      [
+        "MON_EARTH_NORMAL_004"
+      ],
+      [
+        "MON_EARTH_NORMAL_005"
+      ],
+      [
+        "MON_EARTH_NORMAL_006"
+      ],
+      [
+        "MON_EARTH_NORMAL_007"
+      ],
+      [
+        "MON_EARTH_NORMAL_008"
+      ],
+      [
+        "MON_EARTH_NORMAL_009"
+      ],
+      [
+        "MON_EARTH_NORMAL_010"
+      ]
+    ],
+    "eliteByBand": [
+      [
+        "MON_EARTH_ELITE_001"
+      ],
+      [
+        "MON_EARTH_ELITE_002"
+      ],
+      [
+        "MON_EARTH_ELITE_003"
+      ],
+      [
+        "MON_EARTH_ELITE_004"
+      ],
+      [
+        "MON_EARTH_ELITE_005"
+      ],
+      [
+        "MON_EARTH_ELITE_006"
+      ],
+      [
+        "MON_EARTH_ELITE_007"
+      ],
+      [
+        "MON_EARTH_ELITE_008"
+      ],
+      [
+        "MON_EARTH_ELITE_009"
+      ],
+      [
+        "MON_EARTH_ELITE_010"
+      ]
+    ],
+    "bossByFloor": {
+      "10": "MON_EARTH_MINIBOSS_001",
+      "20": "MON_EARTH_MINIBOSS_002",
+      "30": "MON_EARTH_MINIBOSS_003",
+      "40": "MON_EARTH_MINIBOSS_004",
+      "50": "MON_EARTH_MINIBOSS_005",
+      "60": "MON_EARTH_MINIBOSS_006",
+      "70": "MON_EARTH_MINIBOSS_007",
+      "80": "MON_EARTH_MINIBOSS_008",
+      "90": "MON_EARTH_MINIBOSS_009"
+    },
+    "missingFloor100": {
+      "assetId": "MON_EARTH_MINIBOSS_010",
+      "status": "reserved",
+      "reason": "SOURCE_PNG_DECODE_FAILED"
     }
   }
 }
