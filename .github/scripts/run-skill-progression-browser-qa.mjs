@@ -308,3 +308,4 @@ try{
     fs.writeFileSync(path.join(ARTIFACT_DIR,"skill-inventory-semantic-browser-qa.json"),JSON.stringify({suite:"skill-runtime-browser-qa",passed:false,error:String(error?.stack||error),evidence:error?.skillRuntimeEvidence||null},null,2)+"\n","utf8");
     throw error;
 }finally{ await new Promise(resolve=>server.server.close(resolve)); }
+// CI synchronization marker for the current six-stat convergence validation head.
