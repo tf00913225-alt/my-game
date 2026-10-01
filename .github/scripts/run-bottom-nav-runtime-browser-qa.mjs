@@ -140,6 +140,15 @@ async function runViewport(chrome,url,width,height){
   assert.equal(evidence.startup.state,'READY');assert.equal(evidence.startup.ready,true);
   // Acknowledge the real startup release notice through its native control;
   // an open announcement intercepts the later scroll gestures.
+  evidence.releaseScroll=await client.eval(`(()=>{const modal=document.getElementById('homeFeatureModal');if(!modal?.classList.contains('show')||!modal.classList.contains('release-update-modal'))return null;const body=document.getElementById('homeFeatureModalBody'),button=body.querySelector('[data-release-update-action="acknowledge"]');if(!button)throw Error('Startup release notice has no acknowledge control');const r=body.getBoundingClientRect(),b=button.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2;return {needed:b.top<r.top||b.bottom>r.bottom,x,y,hit:body.contains(document.elementFromPoint(x,y)),scrollTop:body.scrollTop,deltaY:body.scrollHeight-body.clientHeight+1};})()`);
+  if(evidence.releaseScroll?.needed){
+   assert.equal(evidence.releaseScroll.hit,true,'release scroll must hit its formal content body');
+   const {x,y,deltaY}=evidence.releaseScroll;
+   await client.send('Input.dispatchMouseEvent',{type:'mouseMoved',x,y});
+   await client.send('Input.dispatchMouseEvent',{type:'mouseWheel',x,y,deltaX:0,deltaY});await settle(client);
+   evidence.releaseScroll.after=await client.eval("document.getElementById('homeFeatureModalBody').scrollTop");
+   assert.ok(evidence.releaseScroll.after>evidence.releaseScroll.scrollTop,'release content did not scroll to acknowledge control');
+  }
   evidence.releaseNotice=await client.eval(`(()=>{const modal=document.getElementById('homeFeatureModal');if(!modal?.classList.contains('show')||!modal.classList.contains('release-update-modal'))return null;const button=modal.querySelector('[data-release-update-action="acknowledge"]');if(!button)throw Error('Startup release notice has no acknowledge control');const r=button.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2;const hit=document.elementFromPoint(x,y);return {x,y,action:button.dataset.releaseUpdateAction,unobstructed:button.contains(hit),buttonRect:{left:r.left,top:r.top,width:r.width,height:r.height,bottom:r.bottom},hit:hit?.outerHTML.slice(0,700),modal:modal.className};})()`);
   if(evidence.releaseNotice){
    assert.equal(evidence.releaseNotice.unobstructed,true,'Release acknowledge control is obstructed: '+JSON.stringify(evidence.releaseNotice));

@@ -227,7 +227,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: bottom-nav-home-geometry-${{ github.sha }}
-          path: artifacts/browser-qa/bottom-nav-home-scroll-qa.json
+          path: |
+            artifacts/browser-qa/bottom-nav-home-scroll-qa.json
+            artifacts/browser-qa/navigation-*.png
           if-no-files-found: error
           retention-days: 90
 
