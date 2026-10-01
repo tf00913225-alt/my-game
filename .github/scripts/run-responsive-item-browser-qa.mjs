@@ -26,7 +26,7 @@ const PREPARE=String.raw`(async()=>{
  };
  inventoryItems.splice(0,inventoryItems.length,...Object.values(__responsiveItems),...Array.from({length:30},(_,i)=>({...__responsiveItems.equipment,id:'responsive-qa-'+i})));
  characterEquipment.fire.armor={...__responsiveItems.equipment,name:'已穿戴長名稱對照裝備',stats};
- rebuildInventorySlots();renderInventory();showPage('home');
+ rebuildInventorySlots();renderInventory();showPage('home');closeHomeFeature();
  return {loader:true,productionStyles:[...document.querySelectorAll('link[rel="stylesheet"]')].map(n=>new URL(n.href).pathname)};
 })()`;
 const INSTALL_MEASURE=`window.__responsiveMeasure=(selector)=>{
@@ -67,8 +67,8 @@ async function run(chrome,url,live){
    if(before.scrollHeight>before.clientHeight+1){
     const x=before.rect.left+before.rect.width/2,y=before.rect.top+before.rect.height/2;
     await c.eval(`document.querySelector(${JSON.stringify(selector)}).scrollTop=0`);
-    await c.send('Input.dispatchMouseEvent',{type:'mouseWheel',x,y,deltaX:0,deltaY:300});await settle();
-    const wheel=await measure(selector);assert.ok(wheel.scrollTop>0,selector+' wheel did not scroll');
+    await c.send('Input.dispatchMouseEvent',{type:'mouseMoved',x,y});await c.send('Input.dispatchMouseEvent',{type:'mouseWheel',x,y,deltaX:0,deltaY:300});await new Promise(r=>setTimeout(r,300));
+    const wheel=await measure(selector);const hit=await c.eval(`(()=>{const n=document.elementFromPoint(${x},${y});return {hit:n?.outerHTML.slice(0,300),modal:document.getElementById('homeFeatureModal').className}})()`);assert.ok(wheel.scrollTop>0,selector+' wheel did not scroll '+JSON.stringify({before,wheel,hit}));
     const last=await c.eval(`(()=>{const n=document.querySelector(${JSON.stringify(selector)});n.scrollTop=n.scrollHeight;return {top:n.scrollTop,max:n.scrollHeight-n.clientHeight}})()`);
     assert.ok(last.top>0&&Math.abs(last.top-last.max)<=1,selector+' cannot reach content end');return {wheel:wheel.scrollTop,end:last.top};
    }
@@ -124,7 +124,7 @@ async function run(chrome,url,live){
    console.log('PASS responsive production runtime '+v.join('x')+' modes + resize + entrances + late styles');
   }
   return evidence;
- }catch(error){error.evidence=evidence;if(browserError){error.message+="\nBrowser: "+browserError;error.stack+="\nBrowser: "+browserError;}throw error;}finally{c?.close();proc.kill('SIGTERM');try{fs.rmSync(profile,{recursive:true,force:true});}catch{}}
+ }catch(error){if(c){try{const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(OUT,'failure.png'),Buffer.from(shot.data,'base64'));}catch{}}error.evidence=evidence;if(browserError){error.message+="\nBrowser: "+browserError;error.stack+="\nBrowser: "+browserError;}throw error;}finally{c?.close();proc.kill('SIGTERM');try{fs.rmSync(profile,{recursive:true,force:true});}catch{}}
 }
 fs.mkdirSync(OUT,{recursive:true});let local;
 try{
