@@ -13,6 +13,7 @@ const comparison=read("js/55-v173.51-inventory-qa.js");
 const equipment=read("js/equipment-progression.js");
 const inventoryCss=read("css/22-stage-v78-character-inventory-core.css")+read("css/24-stage-v85-inventory-inner-grid-scroll-root.css");
 const legacyDetailCss=read("css/23-stage-v77-inventory-detail-ui.css");
+const legacySystemCss=read("css/38-v141-system-expansion.css");
 const legacyRewardCss=read("css/33-v132-content-expansion.css");
 const frameCss=read("css/49-v169-rpg-ui.css");
 const compareCss=read("css/53-v173.51-qa.css");
@@ -41,6 +42,8 @@ assert.match(comparison,/closeItemModal=function\(\)\{clearEquipmentComparison\(
 assert.doesNotMatch(legacyDetailCss,/:has\(#v17342InventoryPotionUse\)|:has\(#itemEquipButton:disabled\)/);
 
 // Replaced geometry is deleted rather than hidden behind another late override.
+assert.doesNotMatch(legacySystemCss,/#itemModal \./);
+assert.match(legacySystemCss,/\.item-modal:not\(#itemModal\)/);
 assert.doesNotMatch(legacyRewardCss,/v17346-shop-preview-modal|height:400px|min-height:400px|max-height:400px/);
 assert.doesNotMatch(equipment,/v17346-potion-detail|v17346-shop-preview-modal\{[^}]*width:|v17346-shop-preview-art\{[^}]*width:/);
 assert.doesNotMatch(compareCss,/v17351-equipment-comparison \.item-modal-box|v17351-locked-equipment \.item-modal-box/);

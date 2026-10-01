@@ -183,8 +183,9 @@
     font-size:13px !important;
 }
 
-/* Item preview: smaller icon, >=15px copy, one clean non-scrolling panel. */
-.item-modal .item-modal-box{
+/* Legacy modal compatibility for other surfaces only.
+   #itemModal frame, art, typography, actions and scroll migrated to css/49. */
+.item-modal:not(#itemModal) .item-modal-box{
     width:min(92vw,470px) !important;
     max-width:470px !important;
     max-height:calc(100% - 24px) !important;
@@ -196,7 +197,7 @@
     box-shadow:inset 0 1px 0 rgba(255,238,196,.04),0 12px 28px rgba(0,0,0,.48) !important;
 }
 
-.item-modal .item-modal-icon{
+.item-modal:not(#itemModal) .item-modal-icon{
     min-height:44px;
     display:flex;
     align-items:center;
@@ -205,111 +206,36 @@
     line-height:1 !important;
 }
 
-.item-modal .item-modal-icon svg{
+.item-modal:not(#itemModal) .item-modal-icon svg{
     width:46px;
     height:46px;
 }
 
-#itemModal .item-modal-box{
-    display:flex;
-    flex-direction:column;
-}
-
-#itemModal .item-modal-icon{
-    flex:0 0 auto;
-    max-height:240px;
-    overflow:hidden;
-}
-
-#itemModal .item-modal-icon > .v169-item-art{
-    display:grid;
-    place-items:center;
-    width:min(42vw,180px);
-    height:min(42vw,180px);
-    max-width:180px;
-    max-height:180px;
-    overflow:hidden;
-    flex:0 0 auto;
-}
-
-#itemModal .item-modal-icon > .v169-item-art > img,
-#itemModal .item-modal-icon > .v169-item-art > svg{
-    display:block;
-    width:100%;
-    height:100%;
-    max-width:100%;
-    max-height:100%;
-    object-fit:contain;
-    object-position:center;
-}
-
-/* Equipment artwork used to inherit width/height:100% from .v169-item-art
-   while its parent had no definite height.  The intrinsic square then grew
-   until the modal's 240px clipping boundary cut the image and pushed copy
-   out of view.  Give equipment one responsive, definite square instead. */
-#itemModal .item-modal-icon > .v169-equipment-art{
-    width:min(46vw,190px);
-    height:min(46vw,190px);
-    max-width:190px;
-    max-height:190px;
-    flex:0 1 auto;
-}
-
-#itemModal .item-modal-icon > .v169-talisman-art{
-    width:150px;
-    height:225px;
-    flex:0 0 auto;
-}
-
-#itemModal .item-modal-icon > .v169-ticket-art{
-    width:216px;
-    height:144px;
-    flex:0 0 auto;
-}
-
-#itemModal .item-modal-icon > .v169-blueprint-art{
-    width:176px;
-    height:176px;
-    flex:0 0 auto;
-}
-
-.item-modal .item-modal-name{
+.item-modal:not(#itemModal) .item-modal-name{
     margin:5px 0 9px !important;
     color:var(--v141-gold-soft);
     font-size:20px !important;
     line-height:1.25;
 }
 
-.item-modal .item-stat-list,
-.item-modal .item-stat-list *{
+.item-modal:not(#itemModal) .item-stat-list,
+.item-modal:not(#itemModal) .item-stat-list *{
     font-size:15px !important;
     line-height:1.55 !important;
 }
 
-.item-modal .item-stat-list{
+.item-modal:not(#itemModal) .item-stat-list{
     max-height:none !important;
     overflow:visible !important;
     padding:11px !important;
 }
 
-#itemModal .item-stat-list{
-    flex:0 1 auto;
-    min-height:0;
-    max-height:none !important;
-    overflow:visible !important;
-}
-
-.item-modal .item-modal-buttons{
+.item-modal:not(#itemModal) .item-modal-buttons{
     grid-template-columns:repeat(3,minmax(0,1fr));
 }
 
-#itemModal .item-modal-buttons,
-#itemModal .close-item-button{
-    flex:0 0 auto;
-}
-
-.item-modal .item-modal-button,
-.item-modal .close-item-button{
+.item-modal:not(#itemModal) .item-modal-button,
+.item-modal:not(#itemModal) .close-item-button{
     min-height:40px;
     font-size:15px;
 }
