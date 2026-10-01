@@ -30497,6 +30497,8 @@ function openEquippedItem(
         $("itemEquipButton");
 
 
+    // Reopening equipped gear must retire chest/ticket action visibility.
+    equipButton.style.display="";
     equipButton.disabled=false;
 
     equipButton.textContent =

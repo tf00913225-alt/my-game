@@ -127,7 +127,7 @@ async function run(chrome,url,live){
    // Supplement synthetic aspect-ratio stress with the real equipment generator,
    // formal rarity markup and production artwork on both detail paths.
    await c.eval(`window.__realGear=v17346GenerateEquipment(()=>0.2,{slot:'armor',classType:'warrior',rarity:'white'});characterEquipment.fire.armor=__realGear;inventoryItems[0]=v17346GenerateEquipment(()=>0.2,{slot:'armor',classType:'warrior',rarity:'orange'});rebuildInventorySlots();renderInventory();openEquippedItem(__realGear,'armor')`);await settle();
-   await check('#itemModal .item-modal-box',v);await check('#itemModalIcon',v);await check('#itemModal .close-item-button',v,true);
+   await check('#itemModal .item-modal-box',v);await check('#itemModalIcon',v);await check('#itemEquipButton',v,true);assert.equal(await c.eval(`document.getElementById('itemEquipButton').textContent.trim()`),'脫下');await check('#itemModal .close-item-button',v,true);
    const realImage=await c.eval(`(async()=>{const n=document.querySelector('#itemModalIcon img');await n.decode();return {src:n.getAttribute('src'),fit:getComputedStyle(n).objectFit,loaded:n.naturalWidth>0}})()`);assert.ok(realImage.src.startsWith('assets/equipment/'));assert.equal(realImage.fit,'contain');assert.ok(realImage.loaded);await screenshot('equipment-real-'+v.join('x'));await click('#itemModal .close-item-button',v);
    await c.eval(`openItemModal(inventorySlots.findIndex(i=>i?.id===inventoryItems[0].id))`);await settle();await check('.v17351-compare-grid',v);await check('.v17351-compare-back',v,true);await screenshot('comparison-real-'+v.join('x'));await click('.v17351-compare-back',v);
    await c.eval(`showPage('home');openHomeFeature('shop');v17346PreviewEquipmentShopOffer(0)`);await settle();
