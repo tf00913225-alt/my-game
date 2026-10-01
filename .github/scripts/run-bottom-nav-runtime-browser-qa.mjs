@@ -165,10 +165,23 @@ async function runViewport(chrome,url,width,height){
   // Use the real inventory grid and its real scroll owner. QA-only inventory
   // data supplies enough rows; no production state or CSS is replaced.
   evidence.phase='inventory';console.log('Inventory scroll QA');await client.eval(`inventoryItems.splice(0,inventoryItems.length,...Array.from({length:80},(_,i)=>({id:'qa-scroll-'+i,name:'測試材料'+i,type:'material',rarityKey:'white',count:1})));showPage('inventory');setInventoryFilter('material');renderInventory();`);await settle(client);
-  evidence.inventory=await client.eval(`(()=>{const n=document.getElementById('inventoryGridScroll'),r=n.getBoundingClientRect();n.scrollTop=0;return {clientHeight:n.clientHeight,scrollHeight:n.scrollHeight,overflow:getComputedStyle(n).overflowY,rect:{left:r.left,top:r.top,width:r.width,height:r.height}}})()`);
-  const ir=evidence.inventory.rect;assert.ok(evidence.inventory.scrollHeight>evidence.inventory.clientHeight,'real inventory has no scrollable rows');
-  await swipe(client,ir.left+ir.width/2,ir.top+Math.min(ir.height-20,ir.height*.8));
-  evidence.inventoryAfterSwipe=await client.eval("document.getElementById('inventoryGridScroll').scrollTop");assert.ok(evidence.inventoryAfterSwipe>0,'legal inventory swipe did not scroll');
+  evidence.inventory=await client.eval(`(()=>{const n=document.getElementById('inventoryGridScroll'),r=n.getBoundingClientRect();n.scrollTop=0;return {clientHeight:n.clientHeight,scrollHeight:n.scrollHeight,overflow:getComputedStyle(n).overflowY,slots:document.querySelectorAll('#inventoryGrid .inventory-item-classic').length,rect:{left:r.left,top:r.top,width:r.width,height:r.height}}})()`);
+  const ir=evidence.inventory.rect;
+  assert.equal(evidence.inventory.overflow,'auto','inventory scroll contract remains enabled');
+  assert.equal(evidence.inventory.slots,24,'formal inventory uses 24-slot pagination');
+  if(evidence.inventory.scrollHeight>evidence.inventory.clientHeight+1){
+   await swipe(client,ir.left+ir.width/2,ir.top+Math.min(ir.height-20,ir.height*.8));
+   evidence.inventoryAfterSwipe=await client.eval("document.getElementById('inventoryGridScroll').scrollTop");assert.ok(evidence.inventoryAfterSwipe>0,'legal inventory swipe did not scroll');
+  }else{evidence.inventoryScrollNeeded=false;}
+  // The paginated inventory can fit without scrolling. Exercise an actually
+  // overflowing formal skill panel, without injecting geometry or content.
+  await client.eval("closeMapInventoryOverlay();showPage('skill');renderSkillLoadout()");await settle(client);
+  evidence.phase='legal-panel';evidence.legalPanel=await client.eval(`(()=>{
+   const n=[...document.querySelectorAll('#game-stage *')].find(n=>{const r=n.getBoundingClientRect(),s=getComputedStyle(n);return r.width>100&&r.height>100&&r.top>=0&&r.bottom<=innerHeight&&(s.overflowY==='auto'||s.overflowY==='scroll')&&n.scrollHeight>n.clientHeight+1;});
+   if(!n)return null;window.__navQaScrollOwner=n;n.scrollTop=0;const r=n.getBoundingClientRect();return {id:n.id,className:n.className,clientHeight:n.clientHeight,scrollHeight:n.scrollHeight,rect:{left:r.left,top:r.top,width:r.width,height:r.height}};
+  })()`);assert.ok(evidence.legalPanel,'formal skill page has no overflowing legal owner');
+  const lr=evidence.legalPanel.rect;await swipe(client,lr.left+lr.width/2,lr.top+lr.height*.8);
+  evidence.legalPanelAfterSwipe=await client.eval('window.__navQaScrollOwner.scrollTop');assert.ok(evidence.legalPanelAfterSwipe>0,'legal panel single-finger swipe did not scroll');
   await client.eval("closeMapInventoryOverlay();showPage('home')");await settle(client);
   evidence.returnHome=await client.eval(MEASURE);assert.equal(evidence.returnHome.sameShell,true);
   await client.send('Page.reload',{ignoreCache:true});await new Promise(r=>setTimeout(r,300));await client.eval(PREPARE);evidence.reload=await client.eval(MEASURE);assert.equal(evidence.reload.shellCount,1);assert.equal(evidence.reload.legacyCount,0);
