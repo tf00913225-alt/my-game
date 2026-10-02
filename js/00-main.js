@@ -12574,6 +12574,26 @@ window.v173GetOrdinaryDamageMultiplier=getOrdinaryDamageMultiplier;
 window.v173GetEnemyPressureMultiplier=getEnemyPressureMultiplier;
 window.v173GetDamageBudgetMultiplier=getDamageBudgetMultiplier;
 
+/* Tower modifiers only project explicit tower metadata into the canonical owners. */
+function getTowerDirectDamageMultiplier(attacker,options={}){
+    const kind=String(options.damageKind||"direct");
+    const skill=options.skill;
+    const directSkill=!skill||skill.category==="physical"||skill.category==="magic";
+    return attacker&&attacker.vGameplayTower===true&&attacker.canAct!==false&&
+        attacker.vGameplayBossObject!==true&&kind==="direct"&&directSkill
+        ?Math.max(1,Number(attacker.vTowerDirectDamageMultiplier)||1):1;
+}
+function getTowerStatusAccuracyBonus(caster){
+    return caster&&caster.vGameplayTower===true&&caster.canAct!==false
+        ?Number(caster.vTowerStatusAccuracyPercent)||0:0;
+}
+function getMonsterCriticalChance(monster,targetAntiCrit=0){
+    const rage=getActiveRageCriticalBonuses(monster);
+    const towerBonus=monster&&monster.vGameplayTower===true?Number(monster.vTowerCriticalBonusPercent)||0:0;
+    const baseChance=10+rage.chance+towerBonus;
+    const chance=monster&&monster.vGameplayTower===true?Math.min(CRIT_CHANCE_MAX,baseChance):baseChance;
+    return Math.max(CRIT_CHANCE_MIN_AFTER_ANTI_CRIT,chance-(Number(targetAntiCrit)||0));
+}
 function calculateDamage(
     attack,
     defense,
@@ -12601,12 +12621,13 @@ function calculateDamage(
     const bossOwner=typeof window!=="undefined"?window.FourSymbolsBossBattle:null;
     const bossDamageFactor=bossOwner&&typeof bossOwner.getOutgoingDamageMultiplier==="function"
         ?Math.max(0,Number(bossOwner.getOutgoingDamageMultiplier(attacker))||0):1;
+    const towerFactor=getTowerDirectDamageMultiplier(attacker,options);
     const budgetFactor=getDamageBudgetMultiplier(options);
     const randomFactor=0.95+Math.random()*0.10;
 
     const result=
         safeAttack*levelFactor*elementFactor*defenseFactor*
-        ordinaryFactor*criticalFactor*pressureFactor*bossDamageFactor*budgetFactor*randomFactor;
+        ordinaryFactor*criticalFactor*pressureFactor*bossDamageFactor*towerFactor*budgetFactor*randomFactor;
 
     if(!Number.isFinite(result)){ return 1; }
     return Math.max(1,Math.round(result));
@@ -13662,20 +13683,7 @@ const STATUS_HIT_MIN_PERCENT = 5;
 
 const STATUS_HIT_MAX_PERCENT = 95;
 
-/*
-   ★ 修正（依照使用者要求，「限制行動的
-   異常狀態常數修改」，改成依怪物等級
-   分三個等級各自的上下限）：
-   鎖死行動類技能（冰封/石化）依目標怪物
-   稀有度使用普通80%、精英60%、BOSS40%的上限。
-   怎麼判斷一隻怪物是「野怪」還是「精英怪」：
-   看getMonsterRank()——目前規則很單純，
-   名字結尾是「王」就算精英怪，其餘都算
-   野怪；如果之後怪物資料想更精準指定
-   （不只靠名字判斷），可以額外加一個
-   monster.rank欄位，getMonsterRank()
-   會優先看這個欄位，沒有才退回看名字。
-*/
+/* Hard control: Player→Regular 90, Elite 75, Boss 60; Enemy→Player 60. */
 
 const LOCKDOWN_HIT_BOUNDS = {
 
@@ -13725,16 +13733,25 @@ function getMonsterRank(monster){
 
 /* The one formal category chooser for enemy skills.  Callers provide only
    legal entries, so an empty category always falls back without re-rolling. */
-function chooseEnemySkillCategory(attackSkillIds,buffSkillIds,randomValue){
+function chooseEnemySkillCategory(attackSkillIds,buffSkillIds,randomValue,monster){
     const attacks=Array.isArray(attackSkillIds)?attackSkillIds.filter(Boolean):[];
     const buffs=Array.isArray(buffSkillIds)?buffSkillIds.filter(Boolean):[];
     if(!attacks.length&&!buffs.length){ return "normal"; }
     if(!attacks.length){ return "buff"; }
     if(!buffs.length){ return "attack"; }
-    return Number(randomValue)<.70?"attack":"buff";
+    const attackWeight=monster&&monster.vGameplayTower===true&&monster.element==="water"?.30:.70;
+    return Number(randomValue)<attackWeight?"attack":"buff";
 }
 window.FourSymbolsEnemySkillAI=Object.freeze({
     chooseCategory:chooseEnemySkillCategory,
+    enterSkillDecision:function(monster,randomValue){
+        if(!monster||monster.alive===false||monster.canAct===false||isMonsterFrozen(monster)||isMonsterPetrified(monster)){ return false; }
+        const pool=typeof window.v144GetLegalMonsterSkillIds==="function"
+            ?[...window.v144GetLegalMonsterSkillIds(monster,"attack"),...window.v144GetLegalMonsterSkillIds(monster,"support")]
+            :[...(monster.skillIds||[]),...(monster.v141SupportSkillIds||[])];
+        const legal=pool.some(id=>skillDatabase[id]&&Number(monster.sp)>=(Number(skillDatabase[id].spCost)||0));
+        return legal&&(randomValue===undefined?Math.random():Number(randomValue))<Number(monster.skillChance||0);
+    },
     healingThresholdPercent:70,
     attackWeightPercent:70,
     buffWeightPercent:30
@@ -14343,6 +14360,7 @@ function rollNamedPersistentStatusEffect(
         return {duplicate:conflict.reason==="sameNameDuplicate",reason:conflict.reason,hit:false};
     }
     const finalRollArguments=(rollArguments||[]).slice();
+    if(targetSide==="player"&&finalRollArguments[5]===true){ finalRollArguments[6]="player"; }
     if(targetSide==="monster"){
         if(finalRollArguments[5]===undefined){ finalRollArguments[5]=false; }
         if(finalRollArguments[6]===undefined&&typeof getMonsterRank==="function"){
@@ -14996,7 +15014,8 @@ function applySkillDebuffEffectsToPlayer(
     targetCharacter,
     targetIndex,
     casterLevel,
-    casterOffensiveAttribute
+    casterOffensiveAttribute,
+    caster
 ){
 
     if(
@@ -15027,7 +15046,7 @@ function applySkillDebuffEffectsToPlayer(
             targetCharacter,"agilityDown",[
                 skill.agilityDownChance,casterLevel,targetCharacter.level,
                 casterOffensiveAttribute,targetFinalStatusResistance,false,"regular",
-                getPlayerStatusResistBonus(targetCharacter)
+                getPlayerStatusResistBonus(targetCharacter),getTowerStatusAccuracyBonus(caster)
             ],"player",targetIndex,skill.name
         ).hit;
 
@@ -15063,7 +15082,7 @@ function applySkillDebuffEffectsToPlayer(
             targetCharacter,"statDown",[
                 skill.statDownChance,casterLevel,targetCharacter.level,
                 casterOffensiveAttribute,targetFinalStatusResistance,false,"regular",
-                getPlayerStatusResistBonus(targetCharacter)
+                getPlayerStatusResistBonus(targetCharacter),getTowerStatusAccuracyBonus(caster)
             ],"player",targetIndex,skill.name
         ).hit;
 
@@ -15100,7 +15119,7 @@ function applySkillDebuffEffectsToPlayer(
             targetCharacter,"damageDown",[
                 skill.damageDownChance,casterLevel,targetCharacter.level,
                 casterOffensiveAttribute,targetFinalStatusResistance,false,"regular",
-                getPlayerStatusResistBonus(targetCharacter)
+                getPlayerStatusResistBonus(targetCharacter),getTowerStatusAccuracyBonus(caster)
             ],"player",targetIndex,skill.name
         ).hit;
 
@@ -15136,7 +15155,7 @@ function applySkillDebuffEffectsToPlayer(
             targetCharacter,"defenseDown",[
                 skill.defenseDownChance,casterLevel,targetCharacter.level,
                 casterOffensiveAttribute,targetFinalStatusResistance,false,"regular",
-                getPlayerStatusResistBonus(targetCharacter)
+                getPlayerStatusResistBonus(targetCharacter),getTowerStatusAccuracyBonus(caster)
             ],"player",targetIndex,skill.name
         ).hit;
 
@@ -15172,7 +15191,7 @@ function applySkillDebuffEffectsToPlayer(
             targetCharacter,"stun",[
                 skill.stunChance,casterLevel,targetCharacter.level,
                 casterOffensiveAttribute,targetFinalStatusResistance,false,"regular",
-                getPlayerStatusResistBonus(targetCharacter)
+                getPlayerStatusResistBonus(targetCharacter),getTowerStatusAccuracyBonus(caster)
             ],"player",targetIndex,skill.name
         ).hit;
 
@@ -15205,7 +15224,7 @@ function applySkillDebuffEffectsToPlayer(
             targetCharacter,"freeze",[
                 skill.freezeChance,casterLevel,targetCharacter.level,
                 casterOffensiveAttribute,targetFinalStatusResistance,true,"player",
-                getPlayerStatusResistBonus(targetCharacter)
+                getPlayerStatusResistBonus(targetCharacter),getTowerStatusAccuracyBonus(caster)
             ],"player",targetIndex,skill.name
         ).hit;
 
@@ -15236,7 +15255,7 @@ function applySkillDebuffEffectsToPlayer(
         const hit=rollNamedPersistentStatusEffect(
             targetCharacter,"petrify",[
                 chance,casterLevel,targetCharacter.level,casterOffensiveAttribute,
-                targetFinalStatusResistance,true,"player",getPlayerStatusResistBonus(targetCharacter)
+                targetFinalStatusResistance,true,"player",getPlayerStatusResistBonus(targetCharacter),getTowerStatusAccuracyBonus(caster)
             ],"player",targetIndex,skill.name
         ).hit;
 
@@ -15280,7 +15299,7 @@ function applySkillDebuffEffectsToPlayer(
             targetCharacter,"burn",[
                 skill.burnChance,casterLevel,targetCharacter.level,
                 casterOffensiveAttribute,targetFinalStatusResistance,false,"regular",
-                getPlayerStatusResistBonus(targetCharacter)
+                getPlayerStatusResistBonus(targetCharacter),getTowerStatusAccuracyBonus(caster)
             ],"player",targetIndex,skill.name,skill.guaranteedBurn===true
         ).hit;
 
@@ -17516,6 +17535,12 @@ function processSingleMonsterAttack(monsterIndex,token){
     }
 
 
+    const towerSkillDecision=monster.vGameplayTower===true
+        ?window.FourSymbolsEnemySkillAI.enterSkillDecision(monster)
+        :null;
+    if(towerSkillDecision===true&&typeof window.v141TryMonsterSpecialAction==="function"){
+        if(window.v141TryMonsterSpecialAction(monsterIndex)===true){ return; }
+    }
     lungeMonsterCard(
         monsterIndex
     );
@@ -17592,9 +17617,9 @@ function processSingleMonsterAttack(monsterIndex,token){
     const forcedAttackIsLegal=affordableSkillIds.includes(forcedAttackSkillId);
     delete monster.v175ForcedAttackSkillId;
     const usesSkill=
-        forcedAttackIsLegal||(
+        (towerSkillDecision!==false&&forcedAttackIsLegal)||(
             affordableSkillIds.length>0 &&
-            Math.random()<
+            (towerSkillDecision===null?Math.random():towerSkillDecision?0:1)<
             (
                 monster.skillChance!==undefined
                 ?monster.skillChance
@@ -17855,7 +17880,7 @@ function processSingleMonsterAttack(monsterIndex,token){
                     targetCharacter,"freeze",[
                         freezeChance,monster.level,targetCharacter.level,
                         getMonsterEffectiveAbilityPoints(monster,"intelligence"),
-                        targetFinalStatusResistance,true,"player",getPlayerStatusResistBonus(targetCharacter)
+                        targetFinalStatusResistance,true,"player",getPlayerStatusResistBonus(targetCharacter),getTowerStatusAccuracyBonus(monster)
                     ],"player",targetIndex,castSkillName
                 );
                 if(freezeResult.hit){
@@ -17926,7 +17951,7 @@ function processSingleMonsterAttack(monsterIndex,token){
                 ?0
                 :Math.max(
                     CRIT_CHANCE_MIN_AFTER_ANTI_CRIT,
-                    10+rageCriticalBonuses.chance-(targetStats.antiCrit||0)
+                    getMonsterCriticalChance(monster,targetStats.antiCrit)
                 );
             const monsterCrit=!isBeginnerForestNormalAttack&&Math.random()*100<monsterCritChance;
             const monsterCritMultiplier=monsterCrit
@@ -18235,7 +18260,8 @@ function processSingleMonsterAttack(monsterIndex,token){
                     getMonsterEffectiveAbilityPoints(
                         monster,
                         castSkillData.category==="physical"?"attack":"intelligence"
-                    )
+                    ),
+                    monster
                 );
 
             }

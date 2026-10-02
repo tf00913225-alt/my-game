@@ -36,6 +36,7 @@ function makeSkills(){
         waterKnife:{id:"waterKnife",name:"水刃",element:"water",category:"physical",tier:1,maxLevel:5,spCost:10},
         frostPunch:{id:"frostPunch",name:"寒拳",element:"water",category:"physical",tier:2,maxLevel:5,spCost:10},
         floodBeast:{id:"floodBeast",name:"洪水猛獸",element:"water",category:"magic",tier:3,maxLevel:5,spCost:10},
+        freeze:{id:"freeze",name:"冰封",element:"water",category:"magic",maxLevel:5,spCost:22},
         healSpell:{id:"healSpell",name:"治療術",element:"water",category:"heal",maxLevel:5,spCost:10,targetType:"allyTri"},
         stoneSlash:{id:"stoneSlash",name:"岩斬",element:"earth",category:"physical",tier:1,maxLevel:5,spCost:10},
         flyingSandStrike:{id:"flyingSandStrike",name:"飛沙瞬擊",element:"earth",category:"magic",tier:3,maxLevel:5,spCost:10},
@@ -173,7 +174,7 @@ for(const element of ["fire","water","earth","wind"]){
     const context=load({now:fixedDate});
     setTowerProgress(context,element,0);
     const roster=Array.from(context.GameplaySystem.buildTowerRoster(1));
-    assert.equal(roster.length,6);
+    assert.equal(roster.length,10);
     roster.forEach(monster=>{
         assert.equal(monster.vGameplayTower,true);
         assert.equal(monster.element,element);
@@ -184,12 +185,13 @@ for(const element of ["fire","water","earth","wind"]){
     context.currentBattleMonsters=roster.map((_,index)=>index);
     const slots=context.FourSymbolsBattlefieldSlots;
     const snapshot=slots.createEnemyFormationSnapshot(context.currentBattleMonsters,{
-        originalFormationType:6,rankWeight:index=>rankWeight(context.monsters[index])
+        originalFormationType:10,rankWeight:index=>rankWeight(context.monsters[index])
     });
     assert.deepEqual(Array.from(Object.values(snapshot.monsterIndexToSlot)).sort(),[
-        "ENEMY_B2","ENEMY_B3","ENEMY_B4","ENEMY_F2","ENEMY_F3","ENEMY_F4"
+        "ENEMY_B1","ENEMY_B2","ENEMY_B3","ENEMY_B4","ENEMY_B5",
+        "ENEMY_F1","ENEMY_F2","ENEMY_F3","ENEMY_F4","ENEMY_F5"
     ]);
-    assert.equal(slots.resolveEnemyTargets(snapshot,0,"all",()=>true).length,6);
+    assert.equal(slots.resolveEnemyTargets(snapshot,0,"all",()=>true).length,10);
 }
 
 {
@@ -295,4 +297,39 @@ assert.match(contracts,/Tower Boss portrait `sizeClass="standard"`/);
 assert.doesNotMatch(uiSource,/rebalanceDungeonElements/);
 assert.doesNotMatch(towerSource,/towerObjectPlan|towerSummonPlan/);
 
-console.log("Tower Element Owner, 6/10 formation, Small Boss and skill-element guard integration passed.");
+console.log("Tower Element Owner, 10-unit formation, Small Boss and skill-element guard integration passed.");
+
+// Every floor/element/rank uses common frequency and the element profile once.
+for(const element of ["fire","water","earth","wind"]){
+    const probe=load(), date=towerDateFor(probe,element).date;
+    const context=load({now:date});setTowerProgress(context,element,0);
+    for(let floor=1;floor<=100;floor++){
+        const roster=Array.from(context.GameplaySystem.buildTowerRoster(floor));
+        assert.equal(roster.length,10,element+" floor "+floor);
+        assert.equal(roster.filter(m=>m.rank==="boss").length,floor%10===0?1:0);
+        assert.equal(roster.filter(m=>m.rank==="elite").length,floor%5===0?2:0);
+        for(const m of roster){
+            assert.equal(m.skillChance,floor<=30?.65:floor<=60?.70:floor<=90?.75:.8);
+            if(element==="fire"){assert.equal(m.vTowerCriticalBonusPercent,15);assert.equal(m.vTowerDirectDamageMultiplier,1.15);}
+            if(element==="water"){assert.equal(m.vTowerHealingMultiplier,1.15);assert.equal(m.vTowerStatusAccuracyPercent,15);assert.ok(m.skillIds.includes("freeze"));assert.ok(m.v141SupportSkillIds.includes("healSpell"));}
+            if(element==="wind"){assert.equal(m.evasion,15);assert.ok(Math.abs(m.agility-115)<1e-10);}
+            if(element==="earth"){assert.equal(m.defense,Math.round((m.rank==="boss"?140:m.rank==="elite"?125:100)*1.15));assert.equal(m.hp,m.maxHP);}
+            const before=JSON.stringify(m);context.GameplaySystem.applyTowerElementProfile(m,element);context.GameplaySystem.applyTowerChallengeProfile(m);assert.equal(JSON.stringify(m),before);
+        }
+        context.monsters=roster;context.currentBattleMonsters=roster.map((_,i)=>i);
+        const slots=context.FourSymbolsBattlefieldSlots;
+        const snapshot=slots.createEnemyFormationSnapshot(context.currentBattleMonsters,{originalFormationType:10,rankWeight:i=>rankWeight(roster[i])});
+        assert.equal(new Set(Object.values(snapshot.monsterIndexToSlot)).size,10);
+        assert.equal(slots.resolveEnemyTargets(snapshot,0,"all",()=>true).length,10);
+        assert.equal(slots.resolveEnemyTargets(snapshot,0,"single",()=>true).length,1);
+        assert.ok(slots.resolveEnemyTargets(snapshot,0,"tri",()=>true).length<=3);
+        const dead=slots.getEnemySlotForMonster(snapshot,9);
+        assert.equal(slots.resolveEnemyTargets(snapshot,0,"all",i=>i!==9).length,9);
+        assert.equal(slots.getEnemySlotForMonster(snapshot,9),dead);
+    }
+    context.battleActive=false;context.vGameplayStartBoss("world","world-40");
+    const large=context.monsters[0], before=JSON.stringify(large);
+    context.GameplaySystem.applyTowerElementProfile(large,element);context.GameplaySystem.applyTowerChallengeProfile(large);
+    assert.equal(JSON.stringify(large),before);assert.equal(large.vTowerElementProfileVersion,undefined);
+}
+console.log("Tower challenge 4 × 100 floor/rank/frequency/profile/slot/target/isolation/idempotency matrix passed.");

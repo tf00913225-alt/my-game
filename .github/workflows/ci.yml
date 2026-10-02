@@ -211,6 +211,25 @@ jobs:
           if-no-files-found: error
           retention-days: 90
 
+      - name: Verify Four Symbols Tower challenge convergence
+        id: tower_challenge
+        env:
+          EXPECTED_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          node tests/tower-challenge-formula.test.js
+          node tests/tower-element-formation-small-boss-20260924.test.js
+          node tests/gameplay-boss-tower-system.test.js
+          node .github/scripts/run-tower-challenge-browser-qa.mjs
+
+      - name: Upload Tower challenge browser evidence
+        if: always() && steps.tower_challenge.outcome != 'skipped'
+        uses: actions/upload-artifact@v4
+        with:
+          name: tower-challenge-${{ github.sha }}
+          path: artifacts/browser-qa/tower-challenge*
+          if-no-files-found: error
+          retention-days: 90
+
       - name: Run Responsive Item owner and production runtime regression
         id: responsive_item_browser
         run: |

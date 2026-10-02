@@ -375,6 +375,18 @@
         "verification": "6/6 第一階段 VERIFIED；候選 CI 36966366859 與 dev 檢查 36967167176 attempt 2 通過，dev@b61f87d 部署 SHA／173.72 版本與快取核對、390／412 deployed-dev Chrome 觸控證據通過（artifact 11210577025）。",
         "result": "鍛造入口／無圖紙冶煉／0/0/0/1/2/3孔／最小寶石／本機 UID 安全鑲嵌與屬性／手機介面逐項通過。雲端權威角色拒絕本機鑲嵌；可信後端交易與寶石取得來源仍在後續範圍，非 Android 實體驗收。"
       }
+    },
+    {
+      "id": "TOWER-CHALLENGE-PROFILE-20261002",
+      "title": "四象塔挑戰特性、共同技能率與每層固定10人",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "release/requirement-batches/2026-10-02-tower-challenge-profile.json"
+        ],
+        "verification": "31 requirement rows; exact candidate production browser and CI pending",
+        "result": "Targeted Node matrix and formula tests pass; NOT COMPLETE until browser / CI / dev deployment verified"
+      }
     }
   ]
 }

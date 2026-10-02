@@ -1,3 +1,13 @@
+## 2026-10-02 — TOWER-CHALLENGE-PROFILE-20261002 (IMPLEMENTED candidate)
+
+- Base dev `3fabca40a841a9b61ff704f9a5db6cc78ba6c353`; branch `feature/tower-challenge-element-profiles-20261002`; target dev, main excluded. Replacement/Convergence of tower common frequency, element profile and normal floor roster.
+- Tower Owner `gameplay-boss-tower-system.js` separates `applyTowerChallengeProfile` (65/70/75/80 by 30/60/90 bands) from idempotent `applyTowerElementProfile`; every floor uses ten real units, normal 10 / elite 2+8 / boss 1+2+7. Shared Boss configuration remains unchanged.
+- Damage/Crit/Status and the single tower skill decision belong to `00-main.js`. V141 support pre-emption is excluded for tower; core gates after hard-control before calling existing legal support selection; no second AI or added wrapper. Water uses formal Heal Support and Freeze; the current water catalog has no independent Buff, so no cross-element/new buff is invented. HP Healing belongs to `v141HealMonsterPreservingShield`, SP unchanged.
+- V141 selection receives the formal category preference; V148 rage pre-emption is excluded for tower to prevent bypassing the common decision. Fire direct modifier excludes non-direct damage kinds; DoT/reflect stay in their original settlement paths. Existing 90/75/60 and Enemy→Player 60 bounds retained. Wind speed does not derive evasion/accuracy.
+- Targeted 4×100 floor/rank/profile/frequency/unique-slot/all-target/idempotency/isolation matrix and direct damage/crit/HP heal/status/single-probability regressions pass. Production build/check passes. Local Chrome launch is blocked by socket EPERM; exact candidate production browser QA is wired into the existing Required CI, never represented as passing locally.
+- Requirement batch `release/requirement-batches/2026-10-02-tower-challenge-profile.json` has 31 IMPLEMENTED rows. Browser 24 scene matrix, real water heal, natural ten-unit 80% queue, all-ten direct AOE/feedback, rules screenshot, CI/merge/deployed SHA remain pending. Game/Cache 173.72 unchanged.
+- Next: remote checkpoint and PR; complete required runtime evidence, fix only evidenced task regressions; merge dev after necessary gates, check deployment and safely delete source branch.
+
 ## 2026-10-02 — HIT-EVASION-PERCENT-V2-20261002（8/8 功能 VERIFIED；整合／部署待完成）
 
 - V1 #750 已合併。V2 base dev `60c1aab27567e2c1e64604b95a0979e97806f59b`，工作分支 `fix/hit-evasion-percent-source-rebalance-v2-20261002`。
