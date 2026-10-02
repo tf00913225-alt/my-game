@@ -10500,7 +10500,6 @@
         closeHomeFeature=function(){
             const modal=document.getElementById("homeFeatureModal");
             if(modal){ modal.classList.remove("v141-synthesis-modal"); delete modal.dataset.craftingFeature; }
-            synthesisState.pendingReforge=null;
             return originalCloseHomeFeature.apply(this,arguments);
         };
     }

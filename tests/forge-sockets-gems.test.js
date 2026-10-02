@@ -35,4 +35,24 @@ assert.doesNotMatch(reforge,/consumeMatching\(candidate=>candidate&&candidate.bl
 assert.doesNotMatch(forge.slice(forge.indexOf("function renderReforgeTab"),forge.indexOf("function availableTalismans")),/blueprintCount/);
 assert.match(reforge,/v132ConsumeStackItem\(info.ore.id,cost\)/);
 assert.match(forge,/sockets.length>=capacity/);
+const socketOperation=forge.slice(forge.indexOf("window.v141SocketGem=function(){"),forge.indexOf("window.v141SwitchSynthesisTab",forge.indexOf("window.v141SocketGem=function(){")));
+const gemStock={id:"gemVitalityI",count:2};
+const gear={v141Uid:"gear-1",rarityKey:"orange",stats:{attack:5}};
+let saved=0;
+const actionContext={window:{FourSymbolsEquipmentGems:api,v132ConsumeStackItem:(id,n)=>{
+    if(id!==gemStock.id||gemStock.count<n){ return false; }
+    gemStock.count-=n;return true;
+}},activeFeature:"forge",synthesisState:{socketUid:"gear-1",gemId:"gemVitalityI",pendingReforge:null},
+    socketEquipment:()=>[{item:gear}],countItem:()=>gemStock.count,runInventoryTransaction:fn=>fn(),
+    rebuildInventorySlots:()=>{},saveGame:()=>{saved++;},updateUI:()=>{},renderSynthesis:()=>{}};
+vm.createContext(actionContext);
+vm.runInContext(socketOperation,actionContext);
+assert.equal(actionContext.window.v141SocketGem(),true);
+assert.equal(gear.sockets.length,1);
+assert.equal(gemStock.count,1);
+assert.equal(saved,1);
+assert.equal(actionContext.window.v141SocketGem(),false,"capacity blocks a second gem and preserves inventory");
+assert.equal(gemStock.count,1);
+actionContext.synthesisState.gemId="missing";
+assert.equal(actionContext.window.v141SocketGem(),false,"unknown gems cannot be embedded");
 console.log("✓ forge sockets, save compatibility, equip bonuses, and blueprint-free reforge");
