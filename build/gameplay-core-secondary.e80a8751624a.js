@@ -8149,6 +8149,9 @@ function maximizeSynthesisPanel(){
     const box=modal.querySelector(".home-feature-modal-box");
     const body=document.getElementById("homeFeatureModalBody");
     setImp(modal,"padding","4px");
+    // The canonical native nav is 216px; this modal belongs to the
+    // existing 420/1080 projection and must keep its last choice tappable.
+    setImp(modal,"padding-bottom","84px");
     setImp(box,"width","calc(100% - 8px)");
     setImp(box,"max-width","none");
     setImp(box,"height","calc(100% - 8px)");
