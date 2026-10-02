@@ -53,7 +53,11 @@ try{
  }
  for(const [width,height] of [[390,844],[412,915]]){
   await c.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true,screenWidth:width,screenHeight:height});
-  await c.send('Page.navigate',{url});assert.equal(await c.eval(READY),true);
+  if(width===390){await c.send('Page.navigate',{url});assert.equal(await c.eval(READY),true);}
+  else{assert.equal(await c.eval(`FourSymbolsStartupPolicy.getState()`),'READY');await c.eval(`showPage('home');closeHomeFeature();true`);}
+  // Use the same real READY runtime across viewport resizes, matching the
+  // existing Responsive Item QA. Reloading a mutated local fixture against the
+  // fixed read-only cloud transport correctly enters account conflict handling.
   // Enter through the actual home card before accessing the lazy runtime.
   await tap('[onclick="openHomeFeature(\'forge\')"]');
   await c.eval(`(async()=>{const end=Date.now()+10000;while(Date.now()<end&&typeof v141SwitchForgeTab!=='function')await new Promise(r=>setTimeout(r,50));return true;})()`);
