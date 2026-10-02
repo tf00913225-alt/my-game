@@ -765,14 +765,15 @@
 
 /* ----- Synthesis system ----- */
 #game-stage #homeFeatureModal.v141-synthesis-modal{
-    padding:5px !important;
+    /* Native navigation is 216px: convert once into the 420px legacy surface. */
+    padding:4px 4px 84px !important;
 }
 
 #game-stage #homeFeatureModal.v141-synthesis-modal .home-feature-modal-box{
     width:min(98%,560px) !important;
     max-width:560px !important;
-    height:96dvh !important;
-    max-height:96dvh !important;
+    height:calc(100% - 8px) !important;
+    max-height:calc(100% - 8px) !important;
     overflow:hidden !important;
     display:flex !important;
     flex-direction:column !important;

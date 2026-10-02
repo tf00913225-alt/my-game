@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {spawn} from 'node:child_process';
-import {ROOT,findChrome,startServer,waitJson,Cdp,qaPrelude} from './runtime-browser-qa-support.mjs';
+import {ROOT,ASSET_MANIFEST,findChrome,startServer,waitJson,Cdp,qaPrelude,QA_AUTH_PATH,QA_CLOUD_PATH,QA_SESSION_PATH,QA_AUTH_MODULE,QA_CLOUD_MODULE,QA_SESSION_MODULE} from './runtime-browser-qa-support.mjs';
 
 // Production loader and UI, disposable UID-local fixtures only. No player
 // credentials or cloud writes; this does not certify a backend transaction.
@@ -22,11 +22,23 @@ const FIXTURE=`(()=>{
 fs.mkdirSync(OUT,{recursive:true});
 let server,proc,c,profile;const evidence=[];
 try{
- server=await startServer();profile=fs.mkdtempSync(path.join(os.tmpdir(),'forge-qa-'));
+ const live=!!process.env.DEV_BASE_URL;let url;
+ if(live){
+  url=new URL('/index.html',process.env.DEV_BASE_URL).href;
+  assert.ok(process.env.EXPECTED_COMMIT_SHA,'live QA requires deployment SHA');
+  const release=await (await fetch(new URL('/release-manifest.json',url),{cache:'no-store'})).json();assert.equal(release.commitSha,process.env.EXPECTED_COMMIT_SHA,'deployed SHA mismatch');
+  const manifest=await (await fetch(new URL('/build/asset-manifest.json',url),{cache:'no-store'})).json();assert.deepEqual(manifest,ASSET_MANIFEST,'deployed bundles mismatch');
+ }else{server=await startServer();url=server.url;}
+ profile=fs.mkdtempSync(path.join(os.tmpdir(),'forge-qa-'));
  const chrome=findChrome(),port=9900+Math.floor(Math.random()*300);
  proc=spawn(chrome,[...(chrome.includes('headless-shell')?[]:['--headless=new']),'--no-sandbox','--disable-gpu','--disable-dev-shm-usage',`--remote-debugging-port=${port}`,`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
  const target=(await waitJson(`http://127.0.0.1:${port}/json/list`)).find(t=>t.type==='page');c=new Cdp(target.webSocketDebuggerUrl);
  await c.send('Page.enable');await c.send('Runtime.enable');
+ if(live){
+  const stubs=new Map([[QA_AUTH_PATH,QA_AUTH_MODULE],[QA_CLOUD_PATH,QA_CLOUD_MODULE],[QA_SESSION_PATH,QA_SESSION_MODULE]]);
+  c.ws.addEventListener('message',event=>{const m=JSON.parse(String(event.data));if(m.method==='Fetch.requestPaused'){const p=m.params,body=stubs.get(new URL(p.request.url).pathname);c.send(body?'Fetch.fulfillRequest':'Fetch.continueRequest',body?{requestId:p.requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'text/javascript'}],body:Buffer.from(body).toString('base64')}:{requestId:p.requestId}).catch(error=>console.error(error));}});
+  await c.send('Fetch.enable',{patterns:[...stubs.keys()].map(p=>({urlPattern:'*'+p+'*',resourceType:'Script'}))});
+ }
  await c.send('Page.addScriptToEvaluateOnNewDocument',{source:qaPrelude().replace(/^<script>|<\/script>$/g,'')});
  async function tap(selector){
   const point=await c.eval(`(()=>{const n=document.querySelector(${JSON.stringify(selector)});if(!n)throw Error('missing control '+${JSON.stringify(selector)});n.scrollIntoView({block:'nearest'});const r=n.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,h=document.elementFromPoint(x,y);if(n.disabled||!r.width||!r.height||!(h&&(n===h||n.contains(h))))throw Error('untappable control '+${JSON.stringify(selector)});return {x,y};})()`);
@@ -34,7 +46,7 @@ try{
  }
  for(const [width,height] of [[390,844],[412,915]]){
   await c.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true,screenWidth:width,screenHeight:height});
-  await c.send('Page.navigate',{url:server.url});assert.equal(await c.eval(READY),true);
+  await c.send('Page.navigate',{url});assert.equal(await c.eval(READY),true);
   // Enter through the actual home card before accessing the lazy runtime.
   await tap('[onclick="openHomeFeature(\'forge\')"]');
   await c.eval(`(async()=>{const end=Date.now()+10000;while(Date.now()<end&&typeof v141SwitchForgeTab!=='function')await new Promise(r=>setTimeout(r,50));return true;})()`);
@@ -47,6 +59,7 @@ try{
   assert.equal(await c.eval(`document.querySelectorAll('.v141-socket').length`),1);
   const geometry=await c.eval(`(()=>{const card=document.querySelector('.v141-socket-card'),body=document.querySelector('.v141-synthesis-body'),r=card.getBoundingClientRect();return {left:r.left,right:r.right,overflow:card.scrollWidth-card.clientWidth,bodyOverflow:getComputedStyle(body).overflowY,fonts:[...card.querySelectorAll('summary,button,small')].filter(n=>{const a=n.getBoundingClientRect();return a.width>0&&a.height>0}).map(n=>{const a=n.getBoundingClientRect();return {tag:n.tagName,text:n.textContent,font:parseFloat(getComputedStyle(n).fontSize)*(n.offsetWidth?a.width/n.offsetWidth:1)}})};})()`);
   assert.ok(geometry.left>=-1&&geometry.right<=width+1&&geometry.overflow<=1,'forge overflow');assert.ok(geometry.fonts.length&&geometry.fonts.every(n=>n.font>=12.9),'forge text below 13px '+JSON.stringify(geometry));
+  assert.equal(await c.eval(`(()=>{const b=document.querySelector('.v141-synthesis-body').getBoundingClientRect(),nav=document.getElementById('bottomNav').getBoundingClientRect();return b.bottom<=nav.top+1;})()`),true,'forge scroll area extends behind native navigation');
   // Long choices scroll in the existing body; selecting returns to one slot.
   await tap('.v141-forge-picker summary');
   const drag=await c.eval(`(()=>{const b=document.querySelector('.v141-synthesis-body'),r=b.getBoundingClientRect();b.scrollTop=0;return {x:r.left+r.width/2,y:r.bottom-25,to:r.top+25};})()`);
@@ -74,6 +87,6 @@ try{
   const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(OUT,`forge-${width}.png`),Buffer.from(shot.data,'base64'));
   evidence.push({width,height,geometry,scrollTop,saved,equippedBonus:1,unequippedBonus:0,cloudMutationBlocked:true});console.log('PASS forge touch runtime '+width+'x'+height);
  }
- fs.writeFileSync(path.join(OUT,'evidence.json'),JSON.stringify({passed:true,sha:process.env.GITHUB_SHA||null,evidence},null,2)+'\n');
+ fs.writeFileSync(path.join(OUT,'evidence.json'),JSON.stringify({passed:true,environment:live?'deployed-dev':'production-local',sha:process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||null,evidence},null,2)+'\n');
 }catch(error){if(c){try{const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(OUT,'failure.png'),Buffer.from(shot.data,'base64'));}catch{}}fs.writeFileSync(path.join(OUT,'evidence.json'),JSON.stringify({passed:false,error:String(error.stack||error),evidence},null,2)+'\n');throw error;
 }finally{c?.close();proc?.kill('SIGTERM');server?.server.close();if(profile)try{fs.rmSync(profile,{recursive:true,force:true});}catch{}}
