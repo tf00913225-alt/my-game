@@ -10,6 +10,8 @@ const expression=`(async()=>{
  await wait(()=>window.FourSymbolsStartupPolicy?.getState?.()==='READY',30000);
  await FourSymbolsFeatures.ensure('gameplay-core','tower-challenge-qa');
  await FourSymbolsFeatures.ensure('feature-boss-relic','tower-challenge-qa');
+ showPage('home');await FourSymbolsReleaseUpdate.checkForUpdate('tower-challenge-qa',{force:true});FourSymbolsReleaseUpdate.notifySafeState();closeHomeFeature();
+ check(!document.getElementById('homeFeatureModal')?.classList.contains('show'),'login announcement closed through official owner');
  autoBattle=false;autoConfig.enabled=false;autoPatrolEnabled=false;player.level=100;player.vitality=100000;player.energy=100000;
  const evidence={matrix:[],actions:[],healing:[],status:[],aoe:[]};
  const dates={};for(const element of ['fire','water','wind','earth']){let date=Date.now();while(GameplaySystem.getWeekInfo(date).element!==element)date-=604800000;dates[element]=date;}
@@ -19,6 +21,7 @@ const expression=`(async()=>{
    try{Date.now=()=>dates[element];const week=GameplaySystem.getWeekInfo(Date.now());GameplaySystem.debugReloadState({tower:{weekKey:week.key,completedFloor:floor-1}},Date.now());roster=GameplaySystem.buildTowerRoster(floor);check(vGameplaySelectTowerBand(floor)===true,'Tower entry refused');}finally{Date.now=realNow;}
    await wait(()=>battleActive);await wait(()=>!document.getElementById('battlePage')?.matches('.v141-preparing-entry,.v141-entry-moving'));
    check(currentBattleMonsters.length===10,'real roster count');
+   check(!document.getElementById('homeFeatureModal')?.classList.contains('show'),'battle has no covering shared modal');
    const slots=FourSymbolsBattlefieldSlots.getActiveEnemySnapshot();
    check(slots&&new Set(Object.values(slots.monsterIndexToSlot)).size===10,'unique battle slots');
    const chance=floor<=30?.65:floor<=60?.7:floor<=90?.75:.8;
