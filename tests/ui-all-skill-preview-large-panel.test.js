@@ -54,7 +54,7 @@ const html=`<!doctype html><html><head><meta charset="utf-8">
  const tabs=document.querySelector('.skill-preview-tabs');
  const body=document.getElementById('body');
  const rect=el=>{const r=el.getBoundingClientRect();return {left:r.left,top:r.top,width:r.width,height:r.height};};
- const snap=()=>{const hint=getComputedStyle(body,'::before');return {dialog:rect(dialog),heading:rect(heading),tabs:rect(tabs),body:rect(body),dialogStyle:{width:getComputedStyle(dialog).width,height:getComputedStyle(dialog).height,maxWidth:getComputedStyle(dialog).maxWidth},bodyStyle:{overflowY:getComputedStyle(body).overflowY,gutter:getComputedStyle(body).scrollbarGutter},hintStyle:{content:hint.content,fontSize:hint.fontSize,lineHeight:hint.lineHeight,whiteSpace:hint.whiteSpace,textAlign:hint.textAlign},scrollHeight:body.scrollHeight,clientHeight:body.clientHeight};};
+ const snap=()=>{const hint=getComputedStyle(body,'::before');return {availableWidth:dialog.parentElement.clientWidth-parseFloat(getComputedStyle(dialog.parentElement).paddingLeft)-parseFloat(getComputedStyle(dialog.parentElement).paddingRight),dialog:rect(dialog),heading:rect(heading),tabs:rect(tabs),body:rect(body),dialogStyle:{width:getComputedStyle(dialog).width,height:getComputedStyle(dialog).height,maxWidth:getComputedStyle(dialog).maxWidth},bodyStyle:{overflowY:getComputedStyle(body).overflowY,gutter:getComputedStyle(body).scrollbarGutter},hintStyle:{content:hint.content,fontSize:hint.fontSize,lineHeight:hint.lineHeight,whiteSpace:hint.whiteSpace,textAlign:hint.textAlign},scrollHeight:body.scrollHeight,clientHeight:body.clientHeight};};
  body.innerHTML='<div class="skill-preview-card"><strong>短內容</strong><p>技能說明</p></div>'; void dialog.offsetHeight; const short=snap();
  body.innerHTML=Array.from({length:40},(_,i)=>'<div class="skill-preview-card"><strong>技能 '+i+'</strong><p>這是一段較長的技能說明，用來確認只有技能列表區可以上下捲動。</p></div>').join(''); void dialog.offsetHeight; const long=snap();
  document.getElementById('result').textContent=JSON.stringify({short,long});
@@ -69,7 +69,8 @@ try{
     assert.ok(match,"all-skill preview browser result missing");
     const data=JSON.parse(match[1].replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"'));
     for(const shot of [data.short,data.long]){
-        assert.equal(shot.dialogStyle.width,"396px","all-skill preview must use Large Panel width");
+        // The body-mounted owner reserves 14px on both sides of the mobile viewport.
+        assert.equal(parseFloat(shot.dialogStyle.width),Math.min(396,shot.availableWidth),"all-skill preview must fill the safe area up to the Large Panel ceiling");
         assert.equal(shot.dialogStyle.maxWidth,"396px","all-skill preview must keep Large Panel width ceiling");
         assert.equal(shot.dialogStyle.height,"620px","all-skill preview must use Large Panel height");
         assert.equal(shot.bodyStyle.overflowY,"auto","skill list must own vertical scrolling");
