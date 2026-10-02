@@ -8,7 +8,7 @@ import {ROOT,ASSET_MANIFEST,findChrome,startServer,waitJson,Cdp,qaPrelude,QA_AUT
 // Production loader and UI, disposable UID-local fixtures only. No player
 // credentials or cloud writes; this does not certify a backend transaction.
 const OUT=path.join(ROOT,'artifacts/browser-qa/responsive-item/forge');
-const pause=()=>new Promise(resolve=>setTimeout(resolve,150));
+const pause=()=>new Promise(resolve=>setTimeout(resolve,350));
 const READY=`(async()=>{const end=Date.now()+45000;while(Date.now()<end&&!(window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show')))await new Promise(r=>setTimeout(r,50));if(window.FourSymbolsStartupPolicy?.getState?.()!=='READY')throw Error('startup not READY');await FourSymbolsFeatures.ensure('gameplay-core','forge-qa');showPage('home');closeHomeFeature();return true;})()`;
 const FIXTURE=`(()=>{
  const repo=FourSymbolsAccountSave,state=repo.readActive();
@@ -41,8 +41,11 @@ try{
  }
  await c.send('Page.addScriptToEvaluateOnNewDocument',{source:qaPrelude().replace(/^<script>|<\/script>$/g,'')});
  async function tap(selector){
-  const point=await c.eval(`(()=>{const n=document.querySelector(${JSON.stringify(selector)});if(!n)throw Error('missing control '+${JSON.stringify(selector)});n.scrollIntoView({block:'nearest'});const r=n.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,h=document.elementFromPoint(x,y);if(n.disabled||!r.width||!r.height||!(h&&(n===h||n.contains(h))))throw Error('untappable control '+${JSON.stringify(selector)}+' '+JSON.stringify({rect:r.toJSON(),hit:h&&{tag:h.tagName,id:h.id,class:h.className},body:document.querySelector('.v141-synthesis-body')?.getBoundingClientRect().toJSON(),nav:document.getElementById('bottomNav')?.getBoundingClientRect().toJSON()}));return {x,y};})()`);
-  await c.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[point]});await c.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await pause();
+  const point=await c.eval(`(()=>{const n=document.querySelector(${JSON.stringify(selector)});if(!n)throw Error('missing control '+${JSON.stringify(selector)});n.scrollIntoView({block:'nearest',behavior:'instant'});const r=n.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,h=document.elementFromPoint(x,y);if(n.disabled||!r.width||!r.height||!(h&&(n===h||n.contains(h))))throw Error('untappable control '+${JSON.stringify(selector)}+' '+JSON.stringify({rect:r.toJSON(),hit:h&&{tag:h.tagName,id:h.id,class:h.className},body:document.querySelector('.v141-synthesis-body')?.getBoundingClientRect().toJSON(),nav:document.getElementById('bottomNav')?.getBoundingClientRect().toJSON(),detailsOpen:n.closest('details')?.open,scrollTop:document.querySelector('.v141-synthesis-body')?.scrollTop}));return {x,y,summary:n.tagName==='SUMMARY',wasOpen:n.tagName==='SUMMARY'?n.parentElement.open:null};})()`);
+  await c.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:point.x,y:point.y}]});await c.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await pause();
+  if(point.summary){
+   assert.equal(await c.eval(`(async()=>{const end=Date.now()+1500;while(Date.now()<end){const n=document.querySelector(${JSON.stringify(selector)});if(n?.parentElement.open!==${point.wasOpen})return true;await new Promise(r=>setTimeout(r,30));}return false;})()`),true,'summary touch did not toggle picker '+selector);
+  }
  }
  for(const [width,height] of [[390,844],[412,915]]){
   await c.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true,screenWidth:width,screenHeight:height});
