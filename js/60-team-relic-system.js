@@ -163,7 +163,7 @@
                 effect("debuff_all_enemies",{attackDownKey:"attackDown",accuracyDownKey:"accuracyDown",durationRounds:1})
             ])],
             limitText:"BOSS套用較低效率；不造成全體硬控。",
-            nextText:{10:"降攻12%並追加命中-5%",20:"降攻15%、命中-8%"}
+            nextText:{10:"降攻12%並追加最終命中-5%",20:"降攻15%、最終命中-8%"}
         },
         {
             id:"relic_tiangang_banner",category:"defense",tags:["attack","defense","anti_swarm"],rarity:"orange",maxLevel:20,iconPath:"assets/relics/icons/relic_tiangang_banner.webp",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
@@ -765,7 +765,6 @@
             if(!monster){ return; }
             if(entry.attack!==undefined){ monster.attack=entry.attack; }
             if(entry.magicAttack!==undefined){ monster.magicAttack=entry.magicAttack; }
-            if(entry.accuracy!==undefined){ monster.accuracy=entry.accuracy; }
         });
         relicBattleState.monsterRestores=keep;
     }
@@ -783,12 +782,13 @@
             return out;
         },{attackPercent:0,defensePercent:0,evasionPercent:0,resistancePercent:0,damageReductionPercent:0});
     }
+    window.v174GetRelicFinalEvasionPercent=index=>playerModTotals(index).evasionPercent;
+
     function decorateStats(index,stats){
         if(!stats||!relicBattleState){ return stats; }
         const mod=playerModTotals(index),copy=Object.assign({},stats);
         if(mod.attackPercent){ copy.attack=numeric(copy.attack)*(1+mod.attackPercent/100); copy.magicAttack=numeric(copy.magicAttack)*(1+mod.attackPercent/100); }
         if(mod.defensePercent){ copy.defense=numeric(copy.defense)*(1+mod.defensePercent/100); }
-        if(mod.evasionPercent){ copy.evasion=numeric(copy.evasion)+mod.evasionPercent; }
         if(mod.resistancePercent){ copy.resistance=numeric(copy.resistance)+mod.resistancePercent; copy.statusResistance=numeric(copy.statusResistance)+mod.resistancePercent; }
         return copy;
     }
@@ -924,6 +924,12 @@
         if(monster.hp<=0&&typeof killMonster==="function"){ withSource(SOURCE_RELIC,()=>killMonster(index)); }
         return final;
     }
+    window.v174GetRelicFinalHitReductionPercent=function(monster){
+        if(!relicBattleState){ return 0; }
+        return relicBattleState.monsterRestores.reduce((sum,entry)=>
+            sum+(entry.monster===monster&&numeric(entry.expiresRound)>=currentRound()
+                ?numeric(entry.finalHitReductionPercent):0),0);
+    };
     function applyEnemyDebuff(monster,attackDown,accuracyDown,duration){
         if(!monster||!monster.alive||!relicBattleState){ return; }
         if(window.GameplaySystem&&typeof window.GameplaySystem.canDirectlyAffectMonster==="function"&&!window.GameplaySystem.canDirectlyAffectMonster(monster)){
@@ -933,7 +939,7 @@
         const attack=Math.max(0,attackDown*efficiency),accuracy=Math.max(0,accuracyDown*efficiency);
         const restore={monster:monster,expiresRound:currentRound()+Math.max(1,Math.floor(duration||1))-1};
         if(attack>0){ restore.attack=monster.attack; restore.magicAttack=monster.magicAttack; monster.attack=numeric(monster.attack)*(1-attack/100); monster.magicAttack=numeric(monster.magicAttack)*(1-attack/100); }
-        if(accuracy>0){ restore.accuracy=monster.accuracy; monster.accuracy=numeric(monster.accuracy)*(1-accuracy/100); }
+        if(accuracy>0){ restore.finalHitReductionPercent=accuracy; }
         relicBattleState.monsterRestores.push(restore);
     }
     function applyPlayerBuffAll(effectDef,def,level){
@@ -1264,7 +1270,7 @@
             return "對敵方全體造成 "+valueFor(def,"damageMultiplier",level).toFixed(2)+"×秘寶威力"+(bonus>0?"；燃燒目標額外+"+bonus+"%":"")+"。";
         }
         if(def.id==="relic_xuanwu_seal"){ return "全隊獲得最大HP "+valueFor(def,"shieldPercent",level).toFixed(1).replace(/\.0$/,"")+"%護盾，持續2回合"+(level>=20?"，並獲得8%減傷1回合":"")+"。"; }
-        if(def.id==="relic_soul_bell"){ return "敵方全體攻擊-"+Math.round(valueFor(def,"attackDown",level))+"%"+(level>=10?"、命中-"+Math.round(valueFor(def,"accuracyDown",level))+"%":"")+"，持續1回合。"; }
+        if(def.id==="relic_soul_bell"){ return "敵方全體攻擊-"+Math.round(valueFor(def,"attackDown",level))+"%"+(level>=10?"、最終命中-"+Math.round(valueFor(def,"accuracyDown",level))+"%":"")+"，持續1回合。"; }
         if(def.id==="relic_tiangang_banner"){ return "對敵方全體造成 "+valueFor(def,"damageMultiplier",level).toFixed(2)+"×秘寶威力"+(level>=10?"並降攻"+Math.round(valueFor(def,"attackDown",level))+"%":"")+"。"; }
         if(def.id==="relic_nine_dragon_fire"){ return "對敵方全體造成 "+valueFor(def,"damageMultiplier",level).toFixed(2)+"×火屬性秘寶傷害"+(level>=10?"，燃燒機率"+Math.round(valueFor(def,"burnChance",level)*100)+"%":"")+(level>=20?"，對燃燒目標額外+15%":"")+"。"; }
         if(def.id==="relic_cold_spring_jade"){ return "急救目標 "+valueFor(def,"healHpPercent",level).toFixed(1).replace(/\.0$/,"")+"%最大HP"+(level>=10?"並淨化1個一般負面":"")+(level>=20?"、恢復4%最大SP":"")+"；HP由35%以上降至35%以下時觸發，每場最多2次，冷卻3回合。"; }

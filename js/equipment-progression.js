@@ -62,8 +62,8 @@
     const SET_RULES={
         blade:{stats:{attack:15,vitality:-2}},
         fan:{stats:{intelligence:15,vitality:-2}},
-        heavyArmor:{stats:{attack:7,accuracy:10,antiCrit:0.5,statusResistance:0.25}},
-        robe:{stats:{intelligence:7,accuracy:10,antiCrit:0.5,statusResistance:0.25}},
+        heavyArmor:{stats:{attack:7,evasion:10,antiCrit:0.5,statusResistance:0.25}},
+        robe:{stats:{intelligence:7,evasion:10,antiCrit:0.5,statusResistance:0.25}},
         boots:{stats:{attack:2,agility:13}},
         shoes:{stats:{intelligence:2,agility:13}},
         helm:{stats:{attack:15}},
@@ -210,6 +210,7 @@
         const asset=assetVariant(classType,slot,random);
         const name=generatedName(rarity,classType,slot,random,asset);
         return {
+            equipmentCombatPercentUnitVersion:2,
             id:makeUid("gear"),v141Uid:makeUid("gearuid"),name,
             icon:artMarkup(asset,rarity.key),type:slot,count:1,price:Math.floor(rarity.shopPrice*.2),
             stats:{[stat]:value},reforgeStats:null,reforgeSlots:rarity.reforgeSlots,reforgeUsed:0,
@@ -321,7 +322,16 @@
         if(!item||!SET_IDS.has(item.setId)){ return item; }
         const key=setPieceKey(item);
         if(!key){ return item; }
-        item.stats={...SET_RULES[key].stats};
+        migrateLegacyEquipmentStats(item);
+        const migratedStats=item.stats;
+        item.stats={...migratedStats,...SET_RULES[key].stats};
+        // These independent extras may already contain the V1/V2 Spirit
+        // migration. Reapplying set base rules must never discard them.
+        ["antiCrit","statusResistance"].forEach(field=>{
+            if(migratedStats[field]!==undefined){
+                item.stats[field]=Math.max(Number(migratedStats[field])||0,Number(item.stats[field])||0);
+            }
+        });
         item.quality="orange";
         item.rarityKey="orange";
         const legacyAffixCount=item.reforgeStats&&typeof item.reforgeStats==="object"?Object.keys(item.reforgeStats).length:0;
@@ -552,7 +562,7 @@
     }
     function statLine(item){
         const [key,value]=Object.entries(item.stats||{})[0]||["",0];
-        return (STAT_LABEL[key]||key)+(Number(value)>=0?" +":" ")+value;
+        return (STAT_LABEL[key]||key)+(Number(value)>=0?" +":" ")+value+(["accuracy","evasion"].includes(key)?"%":"");
     }
     window.v17346PreviewEquipmentShopOffer=function(index){
         const safeIndex=Math.max(0,Math.min(5,Math.floor(Number(index)||0)));

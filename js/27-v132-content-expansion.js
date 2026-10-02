@@ -87,7 +87,7 @@
             '<div class="v132-set-info">'+
             '<div class="v132-set-title">['+escapeHtml(label)+']'+count+'/5</div>'+
             '<div class="v132-set-bonus'+(threeActive ? " active" : " inactive")+'">'+
-            '裝備三件　全能力+1　'+(threeActive ? "[已啟動]" : "[未啟動]")+
+            '裝備三件　全能力+1　閃避+2%　'+(threeActive ? "[已啟動]" : "[未啟動]")+
             '</div>'+
             '<div class="v132-set-bonus'+(fiveActive ? " active" : " inactive")+'">'+
             '裝備五件　'+escapeHtml(elementName)+'元素技能傷害+2%　'+(fiveActive ? "[已啟動]" : "[未啟動]")+
@@ -503,8 +503,8 @@
     const EQUIPMENT_SET_PIECES=[
         {key:"blade",slot:"weapon",name:"刀",stats:{attack:10,vitality:-2}},
         {key:"fan",slot:"weapon",name:"扇",stats:{intelligence:10,vitality:-2}},
-        {key:"heavyArmor",slot:"armor",name:"鎧甲",stats:{attack:5,accuracy:10,antiCrit:0.5,statusResistance:0.25}},
-        {key:"robe",slot:"armor",name:"袍",stats:{intelligence:5,accuracy:10,antiCrit:0.5,statusResistance:0.25}},
+        {key:"heavyArmor",slot:"armor",name:"鎧甲",stats:{attack:5,evasion:10,antiCrit:0.5,statusResistance:0.25}},
+        {key:"robe",slot:"armor",name:"袍",stats:{intelligence:5,evasion:10,antiCrit:0.5,statusResistance:0.25}},
         {key:"boots",slot:"shoes",name:"靴",stats:{agility:10}},
         {key:"shoes",slot:"shoes",name:"履",stats:{agility:10}},
         {key:"helm",slot:"head",name:"盔",stats:{attack:12}},
@@ -532,6 +532,7 @@
                 tierKey:"orange",
                 levelRequirement:20,
                 price:0,
+                equipmentCombatPercentUnitVersion:2,
                 stats:Object.assign({},piece.stats)
             });
         });
@@ -1317,7 +1318,7 @@
                     ["attack","vitality","energy","intelligence","defensePoints","agility"].forEach(stat=>{
                         bonus[stat]=(bonus[stat]||0)+1;
                     });
-                    bonus.accuracy=(bonus.accuracy||0)+2;
+                    bonus.evasion=(bonus.evasion||0)+2;
                     bonus.antiCrit=(bonus.antiCrit||0)+0.1;
                     bonus.statusResistance=(bonus.statusResistance||0)+0.05;
                 }

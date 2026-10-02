@@ -3,10 +3,10 @@
   "bundles": {
     "app-shell": {
       "scripts": [
-        "build/app-shell.3acacd7f7c63.js"
+        "__BUILD_APP_SHELL__"
       ],
       "styles": [
-        "build/app-shell.d90705103c7f.css"
+        "__BUILD_APP_SHELL_STYLE__"
       ],
       "dependencies": [
         "feature-adventure-entry"
@@ -14,16 +14,16 @@
     },
     "feature-adventure-entry": {
       "scripts": [
-        "build/feature-adventure-entry.43c6c9446f8e.js"
+        "__BUILD_ADVENTURE_ENTRY__"
       ],
       "styles": [
-        "build/feature-adventure-entry.3b79bc2d8b41.css"
+        "__BUILD_ADVENTURE_ENTRY_STYLE__"
       ],
       "dependencies": []
     },
     "feature-adventure-items": {
       "scripts": [
-        "build/feature-adventure-items.8edb0431f6e9.js"
+        "__BUILD_ADVENTURE_ITEMS__"
       ],
       "styles": [],
       "dependencies": [
@@ -32,11 +32,11 @@
     },
     "gameplay-core": {
       "scripts": [
-        "build/gameplay-core-primary.891561e4362f.js",
-        "build/gameplay-core-secondary.68c45cec92a3.js"
+        "__BUILD_GAMEPLAY_CORE_PRIMARY__",
+        "__BUILD_GAMEPLAY_CORE_SECONDARY__"
       ],
       "styles": [
-        "build/gameplay-core.7d46c3a33522.css"
+        "__BUILD_GAMEPLAY_CORE_STYLE__"
       ],
       "dependencies": [
         "app-shell",
@@ -45,28 +45,13 @@
     },
     "feature-patrol": {
       "scripts": [
-        "build/feature-patrol.ab5bd3ce5582.js"
+        "__BUILD_PATROL__"
       ],
       "styles": [
-        "build/feature-patrol.1cef20d37f82.css"
+        "__BUILD_PATROL_STYLE__"
       ],
       "assets": [
-        "assets/characters/patrol/patrol-female-earth-back.18f5c279c47f.webp",
-        "assets/characters/patrol/patrol-female-earth-front.cc9b1898e7c0.webp",
-        "assets/characters/patrol/patrol-female-fire-back.c12817139add.webp",
-        "assets/characters/patrol/patrol-female-fire-front.6cb6c8d514b1.webp",
-        "assets/characters/patrol/patrol-female-water-back.67b1492aecc7.webp",
-        "assets/characters/patrol/patrol-female-water-front.5269ab380524.webp",
-        "assets/characters/patrol/patrol-female-wind-back.bf0f5c5067c9.webp",
-        "assets/characters/patrol/patrol-female-wind-front.75dc64898d71.webp",
-        "assets/characters/patrol/patrol-male-earth-back.a421cb635062.webp",
-        "assets/characters/patrol/patrol-male-earth-front.0677960124f5.webp",
-        "assets/characters/patrol/patrol-male-fire-back.e987b7a8e45f.webp",
-        "assets/characters/patrol/patrol-male-fire-front.e8288d5dfe71.webp",
-        "assets/characters/patrol/patrol-male-water-back.db1078669837.webp",
-        "assets/characters/patrol/patrol-male-water-front.67d1d8aebfc8.webp",
-        "assets/characters/patrol/patrol-male-wind-back.cb339ccc0db5.webp",
-        "assets/characters/patrol/patrol-male-wind-front.ee42171e1658.webp"
+        "__PATROL_ASSETS__"
       ],
       "dependencies": [
         "gameplay-core"
@@ -74,10 +59,10 @@
     },
     "feature-abyss": {
       "scripts": [
-        "build/feature-abyss.3d158554cc2a.js"
+        "__BUILD_ABYSS__"
       ],
       "styles": [
-        "build/feature-abyss.0fd197a8e292.css"
+        "__BUILD_ABYSS_STYLE__"
       ],
       "dependencies": [
         "gameplay-core"
@@ -85,12 +70,12 @@
     },
     "feature-boss-relic": {
       "scripts": [
-        "build/feature-boss-relic.d3b7dab211b1.js",
-        "build/feature-relic-progression.87f6a83606ad.js"
+        "__BUILD_BOSS_RELIC__",
+        "__BUILD_RELIC_PROGRESSION__"
       ],
       "styles": [
-        "build/feature-boss-relic.790db1f9bab2.css",
-        "build/feature-relic-progression.8844d5eb6e81.css"
+        "__BUILD_BOSS_RELIC_STYLE__",
+        "__BUILD_RELIC_PROGRESSION_STYLE__"
       ],
       "dependencies": [
         "gameplay-core"
@@ -114,12 +99,12 @@
     },
     "feature-adventure": {
       "scripts": [
-        "build/feature-adventure-content.8a7972750986.js",
-        "build/feature-adventure-runtime.a59a391b4ee7.js",
-        "build/feature-adventure-ui.0c92aaea1139.js"
+        "__BUILD_ADVENTURE_CONTENT__",
+        "__BUILD_ADVENTURE_RUNTIME__",
+        "__BUILD_ADVENTURE_UI__"
       ],
       "styles": [
-        "build/feature-adventure.7a3a29e4a2d0.css"
+        "__BUILD_ADVENTURE_STYLE__"
       ],
       "dependencies": [
         "gameplay-core"

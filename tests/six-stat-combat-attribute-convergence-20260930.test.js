@@ -32,12 +32,13 @@ const context=vm.createContext({
     getCharacterSkillKey:()=>"fire",getSkillLevel:()=>0,getActiveBuffPercent:()=>0,getActiveAccuracyBonusPercent:()=>0,getPlayerDefenseDownPercent:()=>0,
     getLearnedElementEX:()=>null,skillDatabase:{windEX:{accuracyBonusPercent:0,evasionBonusPercent:0},earthEX:{maxHpMultiplier:1,defenseBonusPercent:0}},
     combineEvasionRates:values=>values.reduce((sum,value)=>sum+value,0),getFrostbiteFinalPercentPointPenalty:()=>0,
-    getMonsterDebuffValue:()=>0,getStatDownPercentFor:()=>0,Number,Math:Object.assign(Object.create(Math),{random:()=>0.5}),window:{FourSymbolsBossBattle:null},
+    getMonsterDebuffValue:()=>0,getStatDownPercentFor:()=>0,Number,Math:Object.assign(Object.create(Math),{random:()=>0.5}),window:{FourSymbolsBossBattle:null,FourSymbolsEquipmentCombatMigration:require("../functions/src/equipment-combat-percent-migration")},
     getDamageLevelMultiplier:()=>1,getDamageContextAttacker:()=>null,getElementalDamageMultiplier:()=>1,DAMAGE_FORMULA_BASE_CONSTANT:400,DAMAGE_FORMULA_PER_TARGET_LEVEL:10,
     getOrdinaryDamageMultiplier:()=>1,getEnemyPressureMultiplier:()=>1,getDamageBudgetMultiplier:()=>1
 });
-const names=["getBaseStats","getEquipmentBonus","getEffectivePlayerAbilityPoints","calculateCharacterBaseStats","getMainCharacterStats","migrateLegacySixStats","migrateLegacyEquipmentStats","getMonsterEvasion","getMonsterAccuracy","getMonsterEffectiveDefense","calculateHealingAmount","getDamageFormulaConstant","calculateDamage"];
-vm.runInContext(names.map(name=>extractFunction(main,name)).join("\n"),context);
+const names=["getBaseStats","getEquipmentBonus","getEffectivePlayerAbilityPoints","calculateCharacterBaseStats","getMainCharacterStats","getRelicFinalEvasionPercent","getPartyCharacterIndex","migrateLegacySixStats","migrateLegacyEquipmentStats","getMonsterEvasion","getMonsterAccuracy","getMonsterEffectiveDefense","calculateHealingAmount","getDamageFormulaConstant","calculateDamage"];
+const gemOwner=main.slice(main.indexOf("const EQUIPMENT_SOCKET_CAPACITY="),main.indexOf("window.FourSymbolsEquipmentGems="));
+vm.runInContext(gemOwner+"\n"+names.map(name=>extractFunction(main,name)).join("\n"),context);
 const base=context.getBaseStats();
 assert.equal(base.attack-(30+50*4),400,"100 Attack Points add 400 Physical Attack");
 assert.equal(base.magicAttack-(30+50*4),275,"100 Intelligence Points add 275 Magic Attack");
@@ -68,8 +69,8 @@ context.migrateLegacySixStats(legacy);
 assert.equal(legacy.attributePoints,20,"migration is idempotent");
 const gear={stats:{spirit:5},reforgeStats:{spirit:2}};
 context.migrateLegacyEquipmentStats(gear);
-assert.deepEqual(JSON.parse(JSON.stringify(gear.stats)),{accuracy:10,antiCrit:0.5,statusResistance:0.25});
-assert.deepEqual(JSON.parse(JSON.stringify(gear.reforgeStats)),{accuracy:4,antiCrit:0.2,statusResistance:0.1});
+assert.deepEqual(JSON.parse(JSON.stringify(gear.stats)),{accuracy:1.5,antiCrit:0.5,statusResistance:0.25});
+assert.deepEqual(JSON.parse(JSON.stringify(gear.reforgeStats)),{accuracy:0.6,antiCrit:0.2,statusResistance:0.1});
 const monster={level:50,defense:900,evasion:12,accuracy:4,statusEffects:[{type:"agilityDown",turnsLeft:2,value:80}]};
 assert.equal(context.getMonsterAccuracy(monster),4,"Defense statDown does not reduce independent Accuracy");
 assert.equal(context.getMonsterEvasion(monster),12,"Agility Down does not reduce independent Evasion");

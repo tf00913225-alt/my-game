@@ -151,7 +151,7 @@ test("all forty set pieces receive exact stats, role names and element locks",()
     assert.deepEqual(JSON.parse(JSON.stringify(definitions.find(item=>item.id==="setFire_blade").stats)),{attack:10,vitality:-2});
     assert.deepEqual(JSON.parse(JSON.stringify(definitions.find(item=>item.id==="setWater_boots").stats)),{attack:2,agility:10});
     assert.deepEqual(JSON.parse(JSON.stringify(definitions.find(item=>item.id==="setEarth_shoes").stats)),{intelligence:2,agility:10});
-    assert.deepEqual(JSON.parse(JSON.stringify(definitions.find(item=>item.id==="setWind_heavyArmor").stats)),{attack:5,accuracy:10,antiCrit:0.5,statusResistance:0.25});
+    assert.deepEqual(JSON.parse(JSON.stringify(definitions.find(item=>item.id==="setWind_heavyArmor").stats)),{attack:5,evasion:10,antiCrit:0.5,statusResistance:0.25});
     assert.equal(definitions.find(item=>item.id==="setWater_crown").name,"寒泉冠[法]");
     assert.equal(definitions.find(item=>item.id==="setEarth_wristguard").requiredElement,"earth");
     assert.ok(definitions.every(item=>item.levelRequirement===20));

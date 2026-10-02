@@ -20,19 +20,14 @@
 
     function normalizeMonsterDefaultEvasion(monster){
         if(!monster){ return monster; }
-        const level=Math.max(1,numeric(monster.level)||1);
-        if(monster.evasion===undefined){
-            monster.evasion=typeof window.v173GetDefaultMonsterEvasion==="function"
-                ?window.v173GetDefaultMonsterEvasion(level)
-                :Math.min(10,level*0.1);
-        }
+        if(monster.evasion===undefined){ monster.evasion=0; }
         return monster;
     }
 
     const V17342_HALF_MONSTER_FIELDS=[
         "maxHP","hp","maxSP","sp","attack","magicAttack","defense",
         "attackPoints","vitalityPoints","energyPoints","intelligencePoints","defensePoints","agilityPoints",
-        "vitality","energy","intelligence","defense","agility","accuracy","evasion"
+        "vitality","energy","intelligence","defense","agility"
     ];
 
     function halveMonsterCoreStats(monster,marker){
@@ -65,7 +60,7 @@
     const DAILY_DUNGEON_SCALE_FIELDS=[
         "maxHP","hp","maxSP","sp","attack","magicAttack","defense",
         "attackPoints","vitalityPoints","energyPoints","intelligencePoints","defensePoints","agilityPoints",
-        "vitality","energy","intelligence","defense","agility","accuracy","evasion"
+        "vitality","energy","intelligence","defense","agility"
     ];
 
     function getDailyDungeonScaleContext(){
@@ -248,28 +243,4 @@
     /* Freeze/Hard Control execution is owned by js/00-main.js.
        V158 keeps only combat tuning and must not wrap player skill casts. */
 
-    if(typeof openInventoryCharacterDetail==="function"){
-        const previousOpenInventoryCharacterDetail=openInventoryCharacterDetail;
-        openInventoryCharacterDetail=function(){
-            const result=previousOpenInventoryCharacterDetail.apply(this,arguments);
-            if(typeof document!=="undefined"){
-                const rows=Array.from(document.querySelectorAll("#inventoryCharacterDetailStats .inventory-character-detail-row"));
-                const evasionRow=rows.find(row=>{
-                    const label=row.querySelector("span");
-                    return label&&label.textContent.trim()==="閃避";
-                });
-                const evasionValue=evasionRow&&evasionRow.querySelector("b");
-                if(evasionValue){
-                    evasionValue.textContent=numeric(evasionValue.textContent).toFixed(1)+"%";
-                }
-                const note=document.querySelector("#inventoryCharacterDetailStats .inventory-character-detail-note");
-                if(note){
-                    note.innerHTML=
-                        "最終命中率＝95%＋命中×0.15%＋最終命中加成－目標最終閃躲－最終命中下降，最後限制5%～99%。<br>"+
-                        "命中／閃避／異常抗性的玩家介面統一使用 % 顯示；這些戰鬥詞條不由六圍直接派生。敏捷只影響出手速度。";
-                }
-            }
-            return result;
-        };
-    }
 })();

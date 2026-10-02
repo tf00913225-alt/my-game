@@ -1996,16 +1996,7 @@ const characterEquipment = {
 
 function migrateLegacyEquipmentStats(item){
     if(!item||typeof item!=="object"){ return item; }
-    [item.stats,item.reforgeStats].forEach(stats=>{
-        if(!stats||typeof stats!=="object"||Array.isArray(stats)){ return; }
-        const legacy=Number(stats.spirit);
-        if(!Number.isFinite(legacy)||legacy===0){ delete stats.spirit; return; }
-        stats.accuracy=(Number(stats.accuracy)||0)+legacy*2;
-        stats.antiCrit=(Number(stats.antiCrit)||0)+legacy*0.1;
-        stats.statusResistance=(Number(stats.statusResistance)||0)+legacy*0.05;
-        delete stats.spirit;
-    });
-    return item;
+    return window.FourSymbolsEquipmentCombatMigration.migrateItem(item);
 }
 
 function normalizeEquipmentSlots(equipment){
@@ -2220,6 +2211,14 @@ function getFinalAccuracyBonusPercent(entity){
 
 window.v173GetFinalAccuracyBonusPercent=getFinalAccuracyBonusPercent;
 
+/* Relic is a source of final Evasion points. All character getters settle
+   it here before Frostbite, so party delegation cannot apply it twice. */
+function getRelicFinalEvasionPercent(character){
+    const index=getPartyCharacterIndex(character);
+    return index>=0&&typeof window.v174GetRelicFinalEvasionPercent==="function"
+        ?Number(window.v174GetRelicFinalEvasionPercent(index))||0:0;
+}
+
 /* =====================================================
    主角最終能力
 ===================================================== */
@@ -2241,7 +2240,7 @@ function getMainCharacterStats(){
         maxHP:Math.round(base.maxHP*maxHpPassiveMultiplier),
         defense:Math.max(0,Math.round(buffedDefense*(1-defenseDownPercent/100))),
         accuracy:base.accuracy,
-        evasion:combineEvasionRates([base.evasion,evasionBuffPercent,windEXLevel>0?Number(skillDatabase.windEX.evasionBonusPercent)||0:0,-getFrostbiteFinalPercentPointPenalty(player)])
+        evasion:combineEvasionRates([base.evasion,evasionBuffPercent,windEXLevel>0?Number(skillDatabase.windEX.evasionBonusPercent)||0:0,getRelicFinalEvasionPercent(player),-getFrostbiteFinalPercentPointPenalty(player)])
     };
 }
 
@@ -2331,7 +2330,7 @@ function getAdditionalCharacterBattleStats(character,characterKey){
         maxHP:Math.round(base.maxHP*maxHpPassiveMultiplier),
         defense:Math.max(0,Math.round(buffedDefense*(1-defenseDownPercent/100))),
         accuracy:base.accuracy,
-        evasion:combineEvasionRates([base.evasion,evasionBuffPercent,windEXLevel>0?Number(skillDatabase.windEX.evasionBonusPercent)||0:0,-getFrostbiteFinalPercentPointPenalty(character)])
+        evasion:combineEvasionRates([base.evasion,evasionBuffPercent,windEXLevel>0?Number(skillDatabase.windEX.evasionBonusPercent)||0:0,getRelicFinalEvasionPercent(character),-getFrostbiteFinalPercentPointPenalty(character)])
     };
 }
 
@@ -2659,8 +2658,8 @@ const skillDatabase = {
     /* ===== 風系：增益 ===== */
     dodgeSkill:{
         id:"dodgeSkill", name:"閃躲術", element:"wind", category:"buff", targetType:"allyAll",
-        learnCost:10, maxLevel:1, spCost:20, duration:2,
-        description:"使我方全體閃躲率提升30%，持續2回合。", evasionBonusPercent:30,
+        learnCost:10, maxLevel:1, spCost:20, duration:3,
+        description:"最終閃躲+5%，持續3回合。", evasionBonusPercent:5,
         requires:["windCrossSlash","windHowlLightning"]
     },
     stealthSkill:{
@@ -2783,25 +2782,6 @@ function rollBeginnerForestNormalAttackDamage(){
             (BEGINNER_FOREST_NORMAL_DAMAGE_MAX-BEGINNER_FOREST_NORMAL_DAMAGE_MIN+1)
         );
 }
-
-/* =====================================================
-   怪物預設閃躲唯一 Owner
-   forestMonsters / desertMonsters 等區域 roster 會在 App Shell 頂層
-   立即呼叫 makeZoneMonster()，因此常數必須在第一個 roster 建立前
-   完成初始化。正式值：level×0.1%，最高10%。
-===================================================== */
-const DEFAULT_MONSTER_EVASION_PER_LEVEL = 0.1;
-const DEFAULT_MONSTER_EVASION_CAP = 10;
-
-function getDefaultMonsterEvasion(level){
-    return Math.min(
-        DEFAULT_MONSTER_EVASION_CAP,
-        Math.max(0,Number(level)||0)*DEFAULT_MONSTER_EVASION_PER_LEVEL
-    );
-}
-
-window.v173GetDefaultMonsterEvasion=getDefaultMonsterEvasion;
-
 
 const forestMonsters = [
 
@@ -3212,7 +3192,7 @@ function makeZoneMonster(
         antiCrit:0,
 
         evasion:
-            getDefaultMonsterEvasion(level),
+            0,
 
         agility:
             points.agility,
@@ -12636,16 +12616,15 @@ function calculateDamage(
    命中／閃躲唯一正式公式 Owner
 
    最終命中率 =
-   95 + 命中×0.15 + 最終命中加成
+   95 + 命中% + 最終命中加成
    - 目標最終閃躲 - 最終命中下降。
 
    所有百分比效果皆是「最終百分點」加減，不再先封頂命中後
    乘上 (1 - 閃躲率)。最後統一限制在 5%～99%。
-   普通怪物未明確指定 evasion 時，使用 min(10%, 等級×0.1%)。
+   普通怪物未明確指定 evasion 時為 0%；等級不影響命中／閃避。
 ===================================================== */
 
 const HIT_CHANCE_BASE = 95;
-const HIT_CHANCE_ACCURACY_COEFFICIENT = 0.15;
 const HIT_CHANCE_MIN_PERCENT = 5;
 const HIT_CHANCE_MAX_PERCENT = 99;
 
@@ -12658,14 +12637,12 @@ function getMonsterEvasion(monster){
 
     const base=monster.evasion!==undefined
         ?Number(monster.evasion)||0
-        :getDefaultMonsterEvasion(monster.level);
+        :0;
 
-    const statDown=getStatDownPercentFor(monster,"agility");
     const frostbitePenalty=getFrostbiteFinalPercentPointPenalty(monster);
 
     return combineEvasionRates([
         base,
-        -statDown,
         -frostbitePenalty
     ]);
 
@@ -13588,7 +13565,7 @@ function calculateHitChancePercent(
 ){
     const chance=
         HIT_CHANCE_BASE+
-        Math.max(0,Number(casterAccuracy)||0)*HIT_CHANCE_ACCURACY_COEFFICIENT+
+        (Number(casterAccuracy)||0)+
         (Number(directChanceBonusPercent)||0)-
         Math.max(0,Number(targetEvasion)||0)-
         Math.max(0,Number(directChanceReductionPercent)||0);
@@ -14547,6 +14524,12 @@ function applyMonsterDebuff(
    getMonsterAgility()/getMonsterAccuracy()/
    getMonsterEffectiveDefense()都會呼叫這裡。
 */
+
+function getFinalHitReductionPercent(entity){
+    const relicReduction=typeof window.v174GetRelicFinalHitReductionPercent==="function"
+        ?window.v174GetRelicFinalHitReductionPercent(entity):0;
+    return getMonsterDebuffValue(entity,"stun")+relicReduction;
+}
 
 function getMonsterDebuffValue(
     monster,
@@ -15977,10 +15960,7 @@ function castDamageSkill(skillId){
                 getMonsterEvasion(
                     monster
                 ),
-                getMonsterDebuffValue(
-                    player,
-                    "stun"
-                ),
+                getFinalHitReductionPercent(player),
                 getFinalAccuracyBonusPercent(player)
             );
 
@@ -17049,10 +17029,7 @@ function normalAttack(){
             getMonsterEvasion(
                 monster
             ),
-            getMonsterDebuffValue(
-                    player,
-                    "stun"
-                ),
+            getFinalHitReductionPercent(player),
                 getFinalAccuracyBonusPercent(player)
             );
 
@@ -17898,10 +17875,7 @@ function processSingleMonsterAttack(monsterIndex,token){
                         monster
                     ),
                     targetStats.evasion,
-                    getMonsterDebuffValue(
-                        monster,
-                        "stun"
-                    ),
+                    getFinalHitReductionPercent(monster),
                     getFinalAccuracyBonusPercent(monster)
                     ,targetCharacter
                 );
@@ -20901,7 +20875,7 @@ function secondaryCharacterNormalAttack(characterIndex,index){
     const hit=rollHitChance(
         stats.accuracy,
         getMonsterEvasion(monster),
-        getMonsterDebuffValue(character,"stun"),
+        getFinalHitReductionPercent(character),
         getFinalAccuracyBonusPercent(character)
     );
 
@@ -21046,7 +21020,7 @@ function castSecondaryCharacterSkill(characterIndex,skillId,centerIndex){
         const hit=rollHitChance(
             stats.accuracy,
             getMonsterEvasion(monster),
-            getMonsterDebuffValue(character,"stun"),
+            getFinalHitReductionPercent(character),
         getFinalAccuracyBonusPercent(character)
     );
 
@@ -21246,10 +21220,7 @@ function player2NormalAttack(index){
             getMonsterEvasion(
                 monster
             ),
-            getMonsterDebuffValue(
-                    player2,
-                    "stun"
-                ),
+            getFinalHitReductionPercent(player2),
                 getFinalAccuracyBonusPercent(player2)
             );
 
@@ -21616,10 +21587,7 @@ function castPlayer2Skill(skillId,centerIndex){
                 getMonsterEvasion(
                     monster
                 ),
-                getMonsterDebuffValue(
-                    player2,
-                    "stun"
-                ),
+                getFinalHitReductionPercent(player2),
                 getFinalAccuracyBonusPercent(player2)
             );
 
@@ -29857,65 +29825,18 @@ function getInventoryCharacterCriticalStats(index){
         return null;
     }
 
-    /*
-       V118：背包詳細資料同步顯示物理／法術兩套爆擊。
-       只做顯示，公式與 rollCritical() 保持一致：
-       物理看 attack、法術看 intelligence。
-    */
-    const rageBuff=
-        (
-            (character&&character.activeBuffs)||
-            []
-        )
-        .find(
-            buff=>buff.type==="rage"
-        );
-
-    function buildCriticalProfile(statPoints,chancePerPoint,multiplierPerPoint){
-        let critChance=
-            Math.min(
-                CRIT_CHANCE_MAX,
-                CRIT_CHANCE_BASE+
-                statPoints*
-                chancePerPoint
-            );
-
-        let critMultiplier=
-            Math.min(
-                CRIT_MULTIPLIER_ATTRIBUTE_MAX,
-                CRIT_MULTIPLIER_BASE+
-                statPoints*
-                multiplierPerPoint
-            );
-
-        if(rageBuff){
-            critChance+=
-                rageBuff.bonusPercent;
-
-            critMultiplier=
-                1+
-                rageBuff.bonusPercent/
-                100;
-        }
-
-        return {
-            chance:critChance,
-            multiplier:critMultiplier
-        };
-    }
-
-    return {
-        physical:buildCriticalProfile(
-            (character.attack||0),
-            CRIT_CHANCE_PER_ATTACK_POINT,
-            CRIT_MULTIPLIER_PER_ATTACK_POINT
-        ),
-        magic:buildCriticalProfile(
-            (getBackpackCharacterStats(index).intelligence||0),
-            CRIT_CHANCE_PER_INTELLIGENCE_POINT,
-            CRIT_MULTIPLIER_PER_INTELLIGENCE_POINT
-        )
+    // Display the existing independent combat attributes; retired six-stat
+    // coefficients must not block the Hit / Evasion detail modal.
+    const stats=getBackpackCharacterStats(index);
+    const rageBuff=(character.activeBuffs||[]).find(buff=>buff&&buff.type==="rage");
+    const ex=character.element==="fire"?getLearnedElementEX(character,"fire"):null;
+    const profile={
+        chance:Math.min(CRIT_CHANCE_MAX,CRIT_CHANCE_BASE+(Number(stats.criticalChance)||0)+(Number(stats.statusAccuracy)||0))+
+            (Number(ex&&ex.critChanceBonusPercent)||0)+(Number(rageBuff&&rageBuff.bonusPercent)||0),
+        multiplier:Math.min(CRIT_MULTIPLIER_MAX,CRIT_MULTIPLIER_BASE+(Number(stats.criticalDamage)||0)/100+
+            (Number(ex&&ex.critDamageBonusPercent)||0)/100+(Number(rageBuff&&rageBuff.bonusPercent)||0)/100)
     };
+    return {physical:{...profile},magic:{...profile}};
 }
 
 function openInventoryCharacterDetail(){
@@ -29961,8 +29882,8 @@ function openInventoryCharacterDetail(){
         ["體質",stats.vitality],
         ["能量",stats.energy],
         ["敏捷",stats.agility],
-        ["命中",stats.accuracy],
-        ["閃避",stats.evasion],
+        ["命中",stats.accuracy+"%"],
+        ["閃避",stats.evasion+"%"],
         ["異常抗性",stats.statusResistance.toFixed(1)+"%"],
         ["抗暴",stats.antiCrit.toFixed(1)+"%"],
         ["物理爆擊率",critical.physical.chance.toFixed(1)+"%"],
@@ -29981,7 +29902,7 @@ function openInventoryCharacterDetail(){
             `
         ).join("")+
         `<div class="inventory-character-detail-note">
-            最終命中率＝95%＋獨立命中詞條×0.15%＋其他最終命中加成－目標最終閃避與命中下降，最後限制5%～99%。<br>
+            最終命中率＝95%＋命中%＋最終命中加成%－目標閃避%－最終命中下降%，最後限制5%～99%。<br>
             命中、閃避、異常抗性來自獨立戰鬥詞條或效果；敏捷只提高出手速度。
         </div>`;
 
@@ -30236,7 +30157,7 @@ function getStatText(stats){
         `
         <div>
             ${names[key]||key}：
-            <b>+${value}</b>
+            <b>+${value}${["accuracy","evasion"].includes(key)?"%":""}</b>
         </div>
         `;
 
