@@ -10,7 +10,7 @@ const index=fs.readFileSync("index.html","utf8");
 const balance=fs.readFileSync("js/33-v140-four-element-balance.js","utf8");
 const core=fs.readFileSync("js/00-main.js","utf8");
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
-const finalWater=fs.readFileSync("js/50-v169-water-skill-rules.js","utf8");
+const finalWater=fs.readFileSync("js/60-v173.64-skill-progression-rebalance.js","utf8");
 const recovery=fs.readFileSync("js/45-v154-dev-fixes.js","utf8");
 const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 
@@ -25,7 +25,8 @@ test("V160 corrections remain published under the current cache version",()=>{
 
 test("Ice Arrow Rain follows the current thirty-five percent Frostbite for two rounds",()=>{
     assert.match(finalWater,/iceArrowRain:\{[\s\S]*?frostbiteChance:35,frostbiteDuration:2/);
-    assert.match(finalWater,/35%基礎機率【凍傷】2回合/);
+    assert.match(finalWater,/parts\.push\("凍傷："\+numeric\(skill\.frostbiteChance\)\+"%基礎機率，"/);
+    assert.match(finalWater,/Math\.max\(1,numeric\(skill\.frostbiteDuration\)\|\|1\)/);
 });
 
 test("current hard-control caps are owned by the core directional bounds",()=>{

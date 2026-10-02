@@ -9,7 +9,7 @@ const css=fs.readFileSync("css/gameplay-boss-tower.css","utf8");
 const loader=fs.readFileSync("scripts/build-production.mjs","utf8");
 const runtime=fs.readFileSync("js/gameplay-boss-tower-system.js","utf8");
 const dungeonShell=fs.readFileSync("js/41-v146-system-polish.js","utf8");
-const finalContextNav=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");
+const finalContextNav=fs.readFileSync("js/04-stage-v11-native-bottom-nav-runtime.js","utf8");
 
 function cssRule(source,selector){
     const start=source.indexOf(selector);
