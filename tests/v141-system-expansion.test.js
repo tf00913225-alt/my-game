@@ -223,7 +223,8 @@ test("card VFX cover all requested status groups and battle transitions are dire
     assert.match(cssSource,/v141PlayerEnter/);
     assert.match(cssSource,/v141PlayerExit/);
     assert.match(cssSource,/v141MonsterExit/);
-    assert.match(cssSource,/data-element="earth"\]\.active-turn::after/);
+    assert.match(cssSource,/data-element="earth"\]\.active-turn:not\(\.v174-cardless-unit\)::after/);
+    assert.doesNotMatch(cssSource,/data-element="earth"\]\.active-turn::after/,"legacy earth frame must not reclaim cardless units");
 });
 
 test("battle rewards wait until exit and use one black-gold map toast",()=>{
