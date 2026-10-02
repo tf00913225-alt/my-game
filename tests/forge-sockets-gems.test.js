@@ -1,0 +1,38 @@
+"use strict";
+const assert=require("node:assert/strict");
+const fs=require("node:fs");
+const vm=require("node:vm");
+const main=fs.readFileSync("js/00-main.js","utf8");
+const forge=fs.readFileSync("js/36-v141-content-systems.js","utf8");
+const html=fs.readFileSync("index.html","utf8");
+const equipmentBlock=main.slice(main.indexOf("function getEquipmentBonus(characterId){"),main.indexOf("/* =====================================================\n   V119",main.indexOf("function getEquipmentBonus(characterId){")));
+const context={window:{},characterEquipment:{fire:{head:null}},console};
+vm.createContext(context);
+vm.runInContext(equipmentBlock,context);
+const api=context.window.FourSymbolsEquipmentGems;
+for(const [rarity,expected] of Object.entries({white:0,blue:0,purple:0,orange:1,pink:2,"four-symbol":3,red:2,myriad:3})){
+    assert.equal(api.capacity({rarityKey:rarity}),expected,rarity);
+}
+assert.equal(api.capacity({rarityKey:"orange",sockets:["gemVitalityI"]}),1);
+const old={rarityKey:"orange",stats:{attack:5}};
+context.characterEquipment.fire.head=old;
+assert.equal(context.getEquipmentBonus("fire").attack,5);
+assert.equal(context.getEquipmentBonus("fire").vitality,0);
+old.sockets=["gemVitalityI"];
+assert.equal(context.getEquipmentBonus("fire").vitality,1);
+old.sockets.push("gemVitalityI");
+assert.equal(context.getEquipmentBonus("fire").vitality,1,"extra saved sockets cannot grant attributes");
+context.characterEquipment.fire.head=null;
+assert.equal(context.getEquipmentBonus("fire").vitality,0,"unequipping removes gem effects");
+context.characterEquipment.fire.head={rarityKey:"pink",sockets:["gemVitalityI","gemVitalityI"]};
+assert.equal(context.getEquipmentBonus("fire").vitality,2,"equipping another item reads its own sockets");
+assert.match(html,/openHomeFeature\('forge'\)[^>]*aria-label="鍛造"/);
+assert.doesNotMatch(html,/openHomeFeature\('bestiary'\)/);
+assert.doesNotMatch(main,/function renderBestiaryContent\(/);
+assert.match(main,/bestiaryData/);
+const reforge=forge.slice(forge.indexOf("function reforgeMaterialInfo"),forge.indexOf("window.v141ResolveReforge"));
+assert.doesNotMatch(reforge,/consumeMatching\(candidate=>candidate&&candidate.blueprintSlot/);
+assert.doesNotMatch(forge.slice(forge.indexOf("function renderReforgeTab"),forge.indexOf("function availableTalismans")),/blueprintCount/);
+assert.match(reforge,/v132ConsumeStackItem\(info.ore.id,cost\)/);
+assert.match(forge,/sockets.length>=capacity/);
+console.log("✓ forge sockets, save compatibility, equip bonuses, and blueprint-free reforge");

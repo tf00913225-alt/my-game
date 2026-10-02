@@ -4520,3 +4520,11 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 - Image-reviewed replacements: `炎殼長戟蟲→赤甲槍蟲`, `赤炎修羅王→六臂修羅`, `虛空煉獄皇→獄輪魔尊`, `業火魔君王→業炎法王`, `終焉神魔皇→末炎祭司`, `熔岩巨獸王→熔翼獸王`, `烈焰巨魔王→炎錘巨魔`, `焚天龍獄皇→焚天炎龍`. All 40 fire asset-pool display names are now unique and 2–4 Unicode characters.
 - Canonical sources updated together: wild runtime rows in `js/00-main.js`, `config/monster-portrait-registry.json`, `config/monster-asset-provenance.json`, generated root/build manifests and the content-hashed app-shell bundle. No wrapper, alias resolver or temporary patch was added.
 - Targeted fire coverage, monster portrait runtime, portrait audit, permanent image asset gate, deterministic build check and diff check pass locally. The existing `fire-tower-runtime-identity-first-frame` isolation assertion still expects earth tower portraits to be absent, but earth portraits are now formally integrated; that unrelated stale test is not changed in this naming task. PR CI and exact dev deployment remain pending.
+
+## 2026-10-02 — FORGE-SOCKETS-GEMS-20261002（開發分支）
+
+- 來源：dev `acbe787cb856e4a70f21e5757057e9ccd885f97a`；分支 `feature/forge-sockets-gems-20261002`。
+- 玩家圖鑑入口與渲染退場；`bestiaryData` 擊殺計數／存檔保留，`js/adventure/adventure-runtime-v1-20260915.js` 仍讀取此資料。
+- 合成／鍛造面板 Owner：`js/36-v141-content-systems.js`。合成保留符咒、碎片及 `js/58-v173.63-functional-fixes.js` 的材料合成；鍛造的冶煉沿用 `v141StartReforge`、`v141ResolveReforge`，只消耗礦石和金幣，圖紙道具與既有材料升階合成保留。
+- 裝備孔數、寶石定義及正式屬性匯總 Owner：`js/00-main.js` 的 `getEquipmentSocketCapacity`、`EQUIPMENT_GEMS`、`getEquipmentBonus`。存檔中裝備可選 `sockets: [gemId]`；缺欄位當空陣列，超額孔位不計屬性，未識別寶石不計效果。
+- 目前只有最小資料 `gemVitalityI`（體質 +1）與測試；尚無正式取得來源。正式高價值交易的可信後端驗證仍須依 `DATA_SECURITY_CONTRACTS.md` 完成，本分支不得在沒有相應驗證與 UI 實測前宣稱可正式發布。

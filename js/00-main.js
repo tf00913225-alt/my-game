@@ -2041,7 +2041,7 @@ function getEquipmentBonus(characterId){
     if(!equipment){ return bonus; }
     Object.values(equipment).forEach(item=>{
         if(!item){ return; }
-        [item.stats,item.reforgeStats].forEach(stats=>{
+        [item.stats,item.reforgeStats,...getSocketGemStats(item)].forEach(stats=>{
             if(!stats||typeof stats!=="object"||Array.isArray(stats)){ return; }
             Object.entries(stats).forEach(([stat,value])=>{
                 if(Object.prototype.hasOwnProperty.call(bonus,stat)){
@@ -2052,6 +2052,21 @@ function getEquipmentBonus(characterId){
     });
     return bonus;
 }
+
+/* Equipment rarity owns capacity; socket contents live on the equipment save object.
+   Unknown gem IDs contribute nothing, so old and partially migrated saves load safely. */
+const EQUIPMENT_SOCKET_CAPACITY=Object.freeze({white:0,blue:0,purple:0,orange:1,pink:2,"four-symbol":3});
+const EQUIPMENT_GEMS=Object.freeze({gemVitalityI:Object.freeze({id:"gemVitalityI",name:"體質寶石",type:"gem",icon:"◆",stats:Object.freeze({vitality:1})})});
+function getEquipmentSocketCapacity(item){
+    const aliases={low:"white",mid:"blue",high:"purple",perfect:"orange",red:"pink",myriad:"four-symbol"};
+    const raw=String(item&&(item.rarityKey||item.quality||item.tierKey)||"").toLowerCase();
+    return EQUIPMENT_SOCKET_CAPACITY[aliases[raw]||raw]||0;
+}
+function getSocketGemStats(item){
+    const sockets=Array.isArray(item&&item.sockets)?item.sockets:[];
+    return sockets.slice(0,getEquipmentSocketCapacity(item)).map(id=>EQUIPMENT_GEMS[id]&&EQUIPMENT_GEMS[id].stats).filter(Boolean);
+}
+window.FourSymbolsEquipmentGems=Object.freeze({definitions:EQUIPMENT_GEMS,capacity:getEquipmentSocketCapacity,stats:getSocketGemStats});
 
 /* =====================================================
    V119 — 玩家戰鬥中六圍減益統一入口
@@ -24843,15 +24858,6 @@ function openHomeFeature(type){
             );
 
     }
-    else if(type==="bestiary"){
-
-        titleEl.textContent=
-            "圖鑑";
-
-        bodyEl.innerHTML=
-            renderBestiaryContent();
-
-    }
     else if(type==="achievement"){
 
         titleEl.textContent=
@@ -27022,113 +27028,6 @@ function v17361ClaimAllCommissionQuests(){
 }
 window.v17361ClaimAllDailyQuests=v17361ClaimAllDailyQuests;
 window.v17361ClaimAllCommissionQuests=v17361ClaimAllCommissionQuests;
-
-/* =====================================================
-   ★ 圖鑑
-===================================================== */
-
-function renderBestiaryContent(){
-
-    const allZoneArrays=[
-        forestMonsters,
-        desertMonsters,
-        iceMountainMonsters,
-        zone4Monsters,
-        zone5Monsters,
-        zone6Monsters,
-        zone7Monsters,
-        zone8Monsters
-    ];
-
-
-    const seenNames=
-        new Set();
-
-
-    let html=
-        "";
-
-
-    allZoneArrays.forEach(
-        zoneArray=>{
-
-            zoneArray.forEach(
-                monster=>{
-
-                    if(
-                        seenNames.has(
-                            monster.name
-                        )
-                    ){
-                        return;
-                    }
-
-
-                    seenNames.add(
-                        monster.name
-                    );
-
-
-                    const entry=
-
-                        bestiaryData[
-                            monster.name
-                        ];
-
-
-                    const element=
-
-                        elementDatabase[
-                            monster.element
-                        ]
-                        ||
-                        elementDatabase.fire;
-
-
-                    html+=
-
-                        '<div class="home-feature-row">'+
-
-                        "<span>"+
-
-                        (
-                            entry && entry.seen
-                            ?
-                            getElementIconHTML(
-                                monster.element
-                            )+
-                            ""+monster.name
-                            :
-                            "？？？"
-                        )+
-
-                        "</span>"+
-
-                        "<span>"+
-
-                        (
-                            entry && entry.seen
-                            ?
-                            "擊殺"+(entry.kills||0)
-                            :
-                            "未遇見"
-                        )+
-
-                        "</span>"+
-
-                        "</div>";
-
-                }
-            );
-
-        }
-    );
-
-
-    return html;
-
-}
-
 
 /* =====================================================
    ★ 成就
