@@ -48,7 +48,8 @@ test("backpack ability details keep the close button outside the scroll owner",(
 });
 
 test("the ability page no longer owns a synthetic black spacer",()=>{
-    assert.match(characterCore,/#characterTabContent\{[\s\S]*padding-bottom:0 !important/);
+    // Character layout migrated out of the backpack stylesheet.
+    assert.doesNotMatch(characterCore,/#characterTabContent\{/);
     assert.doesNotMatch(characterCore,/padding-bottom:160px/);
     assert.match(v131LayoutCss,/#homeFeatureModal #characterTabContent\{[\s\S]{0,700}padding-bottom:0 !important/);
     assert.doesNotMatch(v131LayoutCss,/padding-bottom:110px/);
@@ -73,7 +74,11 @@ test("skill labels keep the two-thirds lifetime but remain text-only UI",()=>{
     assert.match(animationTiming,/Math\.round\(config\.duration\*2\/3\)/);
     assert.match(main,/v142GetSkillNameDisplayDuration/);
     assert.match(main,/--skill-name-display-duration/);
-    assert.match(badgeCss,/\.skill-name-badge\.v143-caster-skill-label\{[\s\S]*?text-align:center !important;[\s\S]*?text-overflow:ellipsis !important;/);
+    const labelCss=read("css/battle-skill-name-presentation-owner.css");
+    assert.match(labelCss,/body > \.skill-name-badge\{[^}]*text-align:center;[^}]*white-space:nowrap;[^}]*overflow:visible;/);
+    assert.match(labelCss,/font-size:var\(--battle-feedback-font-size\)/);
+    assert.match(labelCss,/animation:skillBadgePop var\(--skill-name-display-duration,347ms\)/);
+    assert.doesNotMatch(badgeCss,/\.skill-name-badge/);
     assert.doesNotMatch(badgeCss,/v143CasterLabel|animation\s*:\s*v143CasterLabel/);
     assert.doesNotMatch(oldBadgeFix,/V134_SKILL_BADGE_MS|trimSkillBadgeLifetime/);
     assert.doesNotMatch(animationUi,/badge\.remove\(\); \} \},650/);
@@ -84,10 +89,18 @@ test("frostbite soft debuff has no stale skill prohibition overlay",()=>{
     assert.doesNotMatch(frostbiteUi,/凍傷禁止使用技能|v152-frostbite-blocked|v152-frostbite-symbol/);
 });
 
-test("status text sits below damage and stays fully visible for one second",()=>{
-    assert.match(statusUi,/rect\.top\+rect\.height\*\.86/);
-    assert.match(statusCss,/animation:v146StatusPopup 1\.25s/);
-    assert.match(statusCss,/10%,90%\{opacity:1/);
+test("status capsules use shared impact ordering, collision lanes and cleanup",()=>{
+    const feedback=read("js/battle-floating-feedback-owner.js");
+    const feedbackCss=read("css/battle-floating-feedback-owner.css");
+    assert.match(statusUi,/feedback\.emitAtImpact\(\{[^}]*kind:"status",statusType:type/);
+    assert.doesNotMatch(statusUi,/rect\.top\+rect\.height\*\.86/);
+    assert.doesNotMatch(statusCss,/v146StatusPopup/);
+    assert.match(feedback,/function phaseOrder\(kind\)\{[^}]*kind==="status"\?30:20/);
+    assert.match(feedback,/const DEFAULT_DURATION=980/);
+    assert.match(feedback,/const laneY=metrics\.baseline-lane\*LANE_PITCH_PX/);
+    assert.match(feedback,/\},request\.duration\+70\)/);
+    assert.match(feedbackCss,/data-feedback-kind="status"\]\{[^}]*border-radius:999px;[^}]*background:#0b0b0d;[^}]*color:#fff/);
+    assert.match(feedbackCss,/72%\{opacity:1/);
 });
 
 test("development cache and visible build advance to V173.39",()=>{

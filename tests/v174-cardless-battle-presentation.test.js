@@ -2,6 +2,7 @@ const test=require('node:test');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
+const vm=require('node:vm');
 
 const source=fs.readFileSync(path.join(__dirname,'..','js','54-v173.51-battle-qa.js'),'utf8');
 const css=fs.readFileSync(path.join(__dirname,'..','css','fixed-slot-battlefield-rendering-v2.css'),'utf8');
@@ -41,6 +42,36 @@ test('portrait motion keeps lunge while enemy hit feedback has no shake lifecycl
 
 test('Abyss keeps its existing portrait owner but avoids double-rendering artwork',()=>{
     assert.match(source,/--v152-abyss-portrait/);
-    assert.match(css,/img\.v162-abyss-battle-portrait-art\{[\s\S]*?opacity:0 !important;[\s\S]*?pointer-events:none !important;/);
+    const portrait=fs.readFileSync(path.join(__dirname,'..','js','45-v154-dev-fixes.js'),'utf8');
+    // V154 selects the registry record and delegates to V174; no legacy image
+    // is produced, so an opacity patch must not be restored to hide it.
+    assert.match(portrait,/presentation\.applyUnit\(card,"monster"\)/);
+    assert.doesNotMatch(portrait,/v162-abyss-battle-portrait-art/);
+    assert.doesNotMatch(source,/v162-abyss-battle-portrait-art/);
+    assert.doesNotMatch(css,/v162-abyss-battle-portrait-art/);
+    assert.match(source,/card\.querySelector\(":scope > \.v174-battle-art"\)/);
+    assert.match(source,/if\(!art\)\{art=document\.createElement\("div"\)/);
+    assert.match(source,/if\(source\)art\.style\.backgroundImage=source/);
+    assert.match(css,/\.v174-battle-art\{[^}]*background-size:contain !important/);
     assert.doesNotMatch(source,/removeChild\([^)]*v162-abyss-battle-portrait-art/);
+});
+
+test('canonical artwork updates reuse one child and preserve the selected portrait',()=>{
+    const children=[];
+    const makeStyle=()=>({setProperty(name,value){this[name]=value;}});
+    const context=vm.createContext({
+        document:{body:{classList:{remove(){}}},getElementById(){return null;},querySelectorAll(){return [];},createElement(){return {style:makeStyle()};}},
+        getComputedStyle:()=>({getPropertyValue:()=> 'url("abyss-selected.webp")',backgroundImage:"none"}),console
+    });
+    context.window=context;
+    vm.runInContext(source,context);
+    const card={dataset:{},style:makeStyle(),classList:{add(){}},
+        querySelector(){return children.find(node=>node.className==="v174-battle-art")||null;},
+        insertBefore(node){children.unshift(node);},get firstChild(){return children[0]||null;}
+    };
+    context.FourSymbolsBattlePresentation.applyUnit(card,"monster");
+    context.FourSymbolsBattlePresentation.applyUnit(card,"monster");
+    assert.equal(children.length,1,"repeated updates cannot duplicate portrait DOM");
+    assert.equal(children[0].style.backgroundImage,'url("abyss-selected.webp")');
+    assert.equal(card.style["background-image"],"none","the card background cannot draw a second portrait");
 });

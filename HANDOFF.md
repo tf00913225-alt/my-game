@@ -1,3 +1,11 @@
+## 2026-10-02 — RELEASE-SUITES-P0-20261002（第五批）
+
+- 最新基線 dev `7d47379557a716825f794589d249da31af51f678`；#762已合併，run37011016118 checks／部署SHA版本讀回／線上UI及戰鬥QA SUCCESS。第四批分支仍在，現有connector不提供ref刪除。新分支 `fix/v17373-release-suite-recovery-batch5-20261002`，main禁止修改。
+- 原15檔UTC重跑15 FAIL；修改後5 PASS／10 FAIL，累計35/45。正式runner262檔在20/262因本機缺Chrome退出，完整發布測試未PASS，P0／requirement保持BLOCKED。
+- Tests-only Replacement：remaining-ui、v173.25-ui-polish、v173.43-growth-charge、v174-cardless-battle-presentation、v174-relic-navigation-button-polish。共同根因為退役／搬遷的呈現來源：圖片selector、角色padding、技能名／狀態浮字、紅點、legacy立繪與確認視窗primary契約。詳細分類／Owner／前後結果見scope JSON；未選10檔不宣稱已完成正式根因判定。
+- 保留容量／六欄／contain／Boss格位／動畫時序／EXP與副本數值／秘寶導覽等防護；狀態文字遷移到既有黑膠囊與impact/lane/cleanup契約，非恢復舊V146 1.25s座標writer。確認視窗VM驗default／danger／primary／非布林與重用清除tone；立繪VM驗重複applyUnit不新增圖層。
+- 5/5目標、5/5直接相關回歸、build:check與diff check PASS。只改測試與scope／requirement／交接；正式Runtime／CI／素材／Game+Cache173.72未變。最新PR Head必要CI、整合、部署與分支清理以PR耐久狀態為準，目前pending。下一批剩10檔；不進RC／Freeze，不處理P1～P3。
+
 ## 2026-10-02 — RELEASE-SUITES-P0-20261002（第四批）
 
 - 即時基線 dev `92f47835964eabab24d38d613fc3df02a83e66b5`；#761 已合併，run37006601056 Repository checks／DEV部署／SHA讀回與線上UI及戰鬥驗證SUCCESS；第三批來源分支已不存在。工作分支 `fix/v17373-release-suite-recovery-batch4-20261002`；main禁止修改。

@@ -2,6 +2,7 @@
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const vm=require("node:vm");
 
 const rpgUi=fs.readFileSync("js/51-v169-rpg-ui.js","utf8");
 const relicCss=fs.readFileSync("css/55-team-relic-system.css","utf8");
@@ -10,10 +11,40 @@ const abyss=fs.readFileSync("js/59-abyss-two-tier-runtime.js","utf8");
 
 assert.match(rpgUi,/confirmButton\.className="v169-rpg-dialog-button secondary"/,
     "normal RPG confirmation must inherit the same dark gradient as the cancel button");
-assert.match(rpgUi,/confirmButton\.classList\.toggle\("primary",options\.tone==="danger"\)/,
-    "the old bright primary style must be reserved for destructive red danger confirmation only");
+assert.match(rpgUi,/primary:supplied\.primary===true/,
+    "only an explicit primary boolean may opt into the emphasized confirmation");
+assert.match(rpgUi,/confirmButton\.classList\.toggle\("primary",options\.primary\|\|options\.tone==="danger"\)/,
+    "normal confirmation stays dark; explicit primary actions and danger confirmations are emphasized");
 assert.match(rpgUi,/confirmButton\.classList\.toggle\("danger",options\.tone==="danger"\)/);
 assert.doesNotMatch(rpgUi,/confirmButton\.className="v169-rpg-dialog-button primary"/);
+
+// Execute the public dialog entry for each tone. A new default dialog must
+// clear the previous danger/primary state, including on a reused modal.
+const created=[];
+const document={readyState:"loading",activeElement:null,addEventListener(){},getElementById(){return null;}};
+document.createElement=tag=>{
+    const classes=new Set(),listeners={};
+    const node={tagName:tag,dataset:{},children:[],isConnected:true,
+        classList:{add:(...names)=>names.forEach(n=>classes.add(n)),remove:(...names)=>names.forEach(n=>classes.delete(n)),contains:n=>classes.has(n),toggle(n,on){if(on)classes.add(n);else classes.delete(n);}},
+        setAttribute(){},focus(){},addEventListener:(type,fn)=>{listeners[type]=fn;},
+        click(){listeners.click();},appendChild(child){this.children.push(child);return child;},
+        append(...children){children.forEach(child=>this.appendChild(child));},querySelector(){return null;},querySelectorAll(){return [];}
+    };
+    created.push(node);return node;
+};
+document.body=document.createElement("body");
+const context=vm.createContext({document,console,Promise,FourSymbolsAccountSave:{accountKey:name=>"test-uid:"+name}});
+context.window=context;
+vm.runInContext(rpgUi,context);
+for(const [options,primary,danger] of [[{},false,false],[{danger:true},true,true],[{},false,false],[{primary:true},true,false],[{primary:"true"},false,false]]){
+    context.rpgConfirm("確認",options);
+    const buttons=created.filter(node=>node.tagName==="button");
+    const confirm=buttons[1];
+    assert.equal(confirm.classList.contains("primary"),primary);
+    assert.equal(confirm.classList.contains("danger"),danger);
+    confirm.click();
+}
+assert.equal(created.filter(node=>node.id==="v169RpgDialogLayer").length,1,"all tones reuse one dialog layer");
 
 assert.doesNotMatch(relicCss,/map-return\.png/);
 assert.match(relicCss,/\.team-relic-home-tools\{[\s\S]*?width:192px;[\s\S]*?gap:32px;/);
