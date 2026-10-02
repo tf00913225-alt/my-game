@@ -43,9 +43,10 @@ try{
   assert.deepEqual(await c.eval(`Array.from(document.querySelectorAll('.v141-forge-tabs button'),n=>n.textContent)`),['冶煉','鑲嵌']);
   assert.equal(await c.eval(`Array.from(document.querySelectorAll('#homeFeatureModalBody select')).filter(n=>{const r=n.getBoundingClientRect();return r.width&&r.height}).length`),0,'visible native selector in forge');
   await tap('.v141-forge-tabs button:last-child');
+  await tap('.v141-forge-picker summary');await tap('[data-forge-value="forge-qa-orange"]');
   assert.equal(await c.eval(`document.querySelectorAll('.v141-socket').length`),1);
-  const geometry=await c.eval(`(()=>{const card=document.querySelector('.v141-socket-card'),body=document.querySelector('.v141-synthesis-body'),r=card.getBoundingClientRect();return {left:r.left,right:r.right,overflow:card.scrollWidth-card.clientWidth,bodyOverflow:getComputedStyle(body).overflowY,fonts:[...card.querySelectorAll('summary,button,small')].map(n=>{const a=n.getBoundingClientRect();return parseFloat(getComputedStyle(n).fontSize)*(n.offsetWidth?a.width/n.offsetWidth:1)})};})()`);
-  assert.ok(geometry.left>=-1&&geometry.right<=width+1&&geometry.overflow<=1,'forge overflow');assert.ok(geometry.fonts.every(n=>n>=12.9),'forge text below 13px');
+  const geometry=await c.eval(`(()=>{const card=document.querySelector('.v141-socket-card'),body=document.querySelector('.v141-synthesis-body'),r=card.getBoundingClientRect();return {left:r.left,right:r.right,overflow:card.scrollWidth-card.clientWidth,bodyOverflow:getComputedStyle(body).overflowY,fonts:[...card.querySelectorAll('summary,button,small')].filter(n=>{const a=n.getBoundingClientRect();return a.width>0&&a.height>0}).map(n=>{const a=n.getBoundingClientRect();return {tag:n.tagName,text:n.textContent,font:parseFloat(getComputedStyle(n).fontSize)*(n.offsetWidth?a.width/n.offsetWidth:1)}})};})()`);
+  assert.ok(geometry.left>=-1&&geometry.right<=width+1&&geometry.overflow<=1,'forge overflow');assert.ok(geometry.fonts.length&&geometry.fonts.every(n=>n.font>=12.9),'forge text below 13px '+JSON.stringify(geometry));
   // Long choices scroll in the existing body; selecting returns to one slot.
   await tap('.v141-forge-picker summary');
   const drag=await c.eval(`(()=>{const b=document.querySelector('.v141-synthesis-body'),r=b.getBoundingClientRect();b.scrollTop=0;return {x:r.left+r.width/2,y:r.bottom-25,to:r.top+25};})()`);
