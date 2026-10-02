@@ -33,6 +33,7 @@ function fixture(cssHref){
 return `<!doctype html><html><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="stylesheet" href="css/00-main.css">
+<link rel="stylesheet" href="css/22-stage-v78-character-inventory-core.css">
 <link rel="stylesheet" href="${cssHref}">
 <style>
 html,body{margin:0;width:420px;height:746px;overflow:hidden;background:#080706;}
@@ -55,11 +56,11 @@ html,body{margin:0;width:420px;height:746px;overflow:hidden;background:#080706;}
     <div class="sample-tabs"><button id="tabIdle" class="character-tab">能力</button><button id="tabActive" class="character-tab active">技能</button></div>
     <div id="largeBody">大型主視窗內容面板</div>
   </section>
-  <section id="backpackSample" class="inventory-classic-shell">
+  <div id="inventoryPage"><section id="backpackSample" class="inventory-classic-shell">
     <div class="inventory-classic-title">背包</div>
     <div class="sample-tabs"><button class="inventory-category-tab active">裝備</button><button class="inventory-category-tab">材料</button></div>
     <div class="sample-list">${Array.from({length:6},(_,i)=>`<div class="sample-row">道具 ${i+1}</div>`).join("")}</div>
-  </section>
+  </section></div>
   <section id="mediumSample" class="item-modal-box">
     <div class="item-modal-name">裝備資訊</div>
     <div id="mediumStats" class="item-stat-list">攻擊 +10<br>體力 +5<br>附加詞條<br>說明內容</div>
@@ -111,7 +112,12 @@ try{
         }
     }
 
-    for(const id of ["largeSample","backpackSample","mediumSample","rewardSample","smallSample"]){
+    // The scoped backpack composition owner must survive shared window skin.
+    assert.deepEqual(after.backpackSample.style,before.backpackSample.style,"shared skin must preserve the formal backpack style");
+    assert.notEqual(after.backpackSample.style.boxShadow,"none","formal backpack layered frame missing");
+    assert.match(after.backpackSample.style.backgroundImage,/linear-gradient/,"formal backpack background missing");
+    assert.equal(after.backpackSample.style.borderColor,"rgb(111, 89, 52)","formal backpack metal frame missing");
+    for(const id of ["largeSample","mediumSample","rewardSample","smallSample"]){
         assert.notEqual(after[id].style.boxShadow,before[id].style.boxShadow,`${id} thick game frame did not change`);
         assert.notEqual(after[id].style.backgroundImage,before[id].style.backgroundImage,`${id} black-gold panel background did not change`);
         assert.match(after[id].style.boxShadow,/115, 88, 45|240, 211, 138|198, 154, 69/,`${id} is missing bronze/gold layered frame`);
