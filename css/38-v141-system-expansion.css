@@ -764,10 +764,7 @@
 .skill-preview-modal.v141-body-preview .skill-preview-card p{font-size:15px !important;line-height:1.6 !important;}
 
 /* ----- Synthesis system ----- */
-#game-stage #homeFeatureModal.v141-synthesis-modal{
-    /* Native navigation is 216px: convert once into the 420px legacy surface. */
-    padding:4px 4px 84px !important;
-}
+/* Crafting outer spacing is owned by css/49-v169-rpg-ui.css. */
 
 #game-stage #homeFeatureModal.v141-synthesis-modal .home-feature-modal-box{
     width:min(98%,560px) !important;

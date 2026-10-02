@@ -84,10 +84,7 @@ function maximizeSynthesisPanel(){
     if(!modal||!modal.classList.contains("v141-synthesis-modal")){return;}
     const box=modal.querySelector(".home-feature-modal-box");
     const body=document.getElementById("homeFeatureModalBody");
-    setImp(modal,"padding","4px");
-    // The canonical native nav is 216px; this modal belongs to the
-    // existing 420/1080 projection and must keep its last choice tappable.
-    setImp(modal,"padding-bottom","84px");
+    // Crafting outer spacing is owned by CSS49 for every render path.
     setImp(box,"width","calc(100% - 8px)");
     setImp(box,"max-width","none");
     setImp(box,"height","calc(100% - 8px)");
@@ -216,7 +213,6 @@ function ensureFunctionalStyles(){
 #game-stage .v169-material-art.v169-rarity-orange:not(.inventory-backpack-rarity-neutral),#game-stage .v169-material-art.v169-rarity-perfect:not(.inventory-backpack-rarity-neutral){color:#FF9F38!important;border-color:#FF9F38!important;box-shadow:0 0 9px rgba(255,159,56,.9),inset 0 0 8px rgba(255,159,56,.35)!important;}
 #game-stage .v169-material-art.v169-rarity-pink:not(.inventory-backpack-rarity-neutral){color:#FF4FA7!important;border-color:#FF4FA7!important;box-shadow:0 0 10px rgba(255,79,167,.92),inset 0 0 8px rgba(255,79,167,.36)!important;}
 #game-stage .v169-material-art.v169-rarity-four-symbol:not(.inventory-backpack-rarity-neutral){color:#fff!important;border-color:transparent!important;background:linear-gradient(#090b0f,#090b0f) padding-box,conic-gradient(#42A5FF,#47D6A3,#C89B45,#FF5A36,#42A5FF) border-box!important;box-shadow:0 0 9px rgba(255,90,54,.32),0 0 13px rgba(66,165,255,.32)!important;}
-#game-stage #homeFeatureModal.v141-synthesis-modal{padding:4px!important;}
 #game-stage #homeFeatureModal.v141-synthesis-modal .home-feature-modal-box{width:calc(100% - 8px)!important;max-width:none!important;height:calc(100% - 8px)!important;max-height:calc(100% - 8px)!important;}
 #game-stage #dungeonPage:not(.v146-abyss-active) [data-dungeon-cover="equipment"] .v141-dungeon-cover-art{background-image:linear-gradient(180deg,transparent 58%,rgba(7,5,3,.38)),url("assets/dungeons/covers/equipment-v17363.png"),url("assets/dungeons/covers/equipment-v17343.png")!important;background-size:cover!important;background-position:center!important;}
 #game-stage .v17363-text-reward-preview{width:min(392px,calc(100% - 18px))!important;max-width:392px!important;padding:18px!important;border:1px solid rgba(213,164,82,.82)!important;border-radius:15px!important;background:radial-gradient(circle at 50% 0,rgba(232,177,77,.16),transparent 36%),linear-gradient(160deg,#22170e,#090807 76%)!important;box-shadow:0 22px 52px rgba(0,0,0,.78),inset 0 0 0 1px rgba(255,231,171,.07)!important;}

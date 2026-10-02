@@ -41,7 +41,7 @@ try{
  }
  await c.send('Page.addScriptToEvaluateOnNewDocument',{source:qaPrelude().replace(/^<script>|<\/script>$/g,'')});
  async function tap(selector){
-  const point=await c.eval(`(()=>{const n=document.querySelector(${JSON.stringify(selector)});if(!n)throw Error('missing control '+${JSON.stringify(selector)});n.scrollIntoView({block:'nearest'});const r=n.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,h=document.elementFromPoint(x,y);if(n.disabled||!r.width||!r.height||!(h&&(n===h||n.contains(h))))throw Error('untappable control '+${JSON.stringify(selector)});return {x,y};})()`);
+  const point=await c.eval(`(()=>{const n=document.querySelector(${JSON.stringify(selector)});if(!n)throw Error('missing control '+${JSON.stringify(selector)});n.scrollIntoView({block:'nearest'});const r=n.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,h=document.elementFromPoint(x,y);if(n.disabled||!r.width||!r.height||!(h&&(n===h||n.contains(h))))throw Error('untappable control '+${JSON.stringify(selector)}+' '+JSON.stringify({rect:r.toJSON(),hit:h&&{tag:h.tagName,id:h.id,class:h.className},body:document.querySelector('.v141-synthesis-body')?.getBoundingClientRect().toJSON(),nav:document.getElementById('bottomNav')?.getBoundingClientRect().toJSON()}));return {x,y};})()`);
   await c.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[point]});await c.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await pause();
  }
  for(const [width,height] of [[390,844],[412,915]]){
