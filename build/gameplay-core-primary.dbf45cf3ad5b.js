@@ -2213,7 +2213,7 @@
             '<div class="v132-set-info">'+
             '<div class="v132-set-title">['+escapeHtml(label)+']'+count+'/5</div>'+
             '<div class="v132-set-bonus'+(threeActive ? " active" : " inactive")+'">'+
-            '裝備三件　全能力+1　'+(threeActive ? "[已啟動]" : "[未啟動]")+
+            '裝備三件　全能力+1　閃避+2%　'+(threeActive ? "[已啟動]" : "[未啟動]")+
             '</div>'+
             '<div class="v132-set-bonus'+(fiveActive ? " active" : " inactive")+'">'+
             '裝備五件　'+escapeHtml(elementName)+'元素技能傷害+2%　'+(fiveActive ? "[已啟動]" : "[未啟動]")+

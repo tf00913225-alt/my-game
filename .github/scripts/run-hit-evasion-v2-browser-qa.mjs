@@ -61,7 +61,7 @@ try{
     assert.deepEqual(evidence.calm,[5,10,15,20,25].map(v=>[0,v,55+v]));
     assert.deepEqual(evidence.dodge,[5,10,15,20,25]);
     assert.deepEqual([evidence.set.one,evidence.set.three,evidence.set.two],[10,12,10]);
-    assert.match(evidence.detail,/命中0%/);assert.match(evidence.detail,/閃避10%/);
+    assert.match(evidence.detail,/命中\s*0%/);assert.match(evidence.detail,/閃避\s*10%/);
     assert.match(evidence.detail,/5%～99%/);
     assert.equal(evidence.migrated.stats.accuracy,3);assert.deepEqual(evidence.repeated,evidence.migrated);
     assert.deepEqual(evidence.formula,[95,99,65,55,5]);
@@ -69,8 +69,10 @@ try{
     console.log("V2 production mobile Runtime/UI/Save browser QA passed");
 }catch(error){
     fs.writeFileSync(artifact,JSON.stringify({passed:false,error:String(error.stack||error)},null,2)+"\n");
+    console.error(error);
     throw error;
 }finally{
-    client?.close();proc.kill("SIGTERM");fs.rmSync(profile,{recursive:true,force:true});
+    client?.close();proc.kill("SIGTERM");
+    try{fs.rmSync(profile,{recursive:true,force:true,maxRetries:3,retryDelay:100});}catch(_){}
     await new Promise(resolve=>server.server.close(resolve));
 }

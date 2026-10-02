@@ -189,6 +189,7 @@ jobs:
           fi
 
       - name: Verify Hit / Evasion Percentage-Point V2
+        id: hit_evasion_v2
         run: |
           node tests/equipment-combat-percent-migration-v2.test.js
           node tests/six-stat-combat-attribute-convergence-20260930.test.js
@@ -196,6 +197,15 @@ jobs:
           node tests/cloud-save-canonical-review-plan.test.mjs
           node tests/cloud-save-canonical-snapshot.test.mjs
           node .github/scripts/run-hit-evasion-v2-browser-qa.mjs
+
+      - name: Upload Hit / Evasion V2 browser evidence
+        if: always() && steps.hit_evasion_v2.outcome != 'skipped'
+        uses: actions/upload-artifact@v4
+        with:
+          name: hit-evasion-v2-${{ github.sha }}
+          path: artifacts/browser-qa/hit-evasion-v2.json
+          if-no-files-found: error
+          retention-days: 90
 
       - name: Run Responsive Item owner and production runtime regression
         id: responsive_item_browser

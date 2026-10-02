@@ -2626,7 +2626,7 @@ const skillDatabase = {
     /* ===== 風系：增益 ===== */
     dodgeSkill:{
         id:"dodgeSkill", name:"閃躲術", element:"wind", category:"buff", targetType:"allyAll",
-        learnCost:10, maxLevel:1, spCost:20, duration:2,
+        learnCost:10, maxLevel:1, spCost:20, duration:3,
         description:"最終閃躲+5%，持續3回合。", evasionBonusPercent:5,
         requires:["windCrossSlash","windHowlLightning"]
     },
@@ -30013,7 +30013,7 @@ function openInventoryCharacterDetail(){
         ["體質",stats.vitality],
         ["能量",stats.energy],
         ["敏捷",stats.agility],
-        ["命中",stats.accuracy+"%"] ,
+        ["命中",stats.accuracy+"%"],
         ["閃避",stats.evasion+"%"],
         ["異常抗性",stats.statusResistance.toFixed(1)+"%"],
         ["抗暴",stats.antiCrit.toFixed(1)+"%"],

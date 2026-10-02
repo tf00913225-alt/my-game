@@ -218,7 +218,7 @@
         if(bonuses[0]){
             bonuses[0].classList.toggle("active",count>=3);
             bonuses[0].classList.toggle("inactive",count<3);
-            bonuses[0].textContent="裝備三件　全能力+1　["+(count>=3?"已啟動":"未啟動")+"]";
+            bonuses[0].textContent="裝備三件　全能力+1　閃避+2%　["+(count>=3?"已啟動":"未啟動")+"]";
         }
         if(bonuses[1]){
             bonuses[1].classList.toggle("active",count>=5);
