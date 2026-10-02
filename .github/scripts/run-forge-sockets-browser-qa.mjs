@@ -41,7 +41,7 @@ try{
   assert.equal(await c.eval(`typeof v141SwitchForgeTab`),'function');assert.equal(await c.eval(FIXTURE),true);
   await c.eval(`v141SwitchForgeTab('reforge')`);
   assert.deepEqual(await c.eval(`Array.from(document.querySelectorAll('.v141-forge-tabs button'),n=>n.textContent)`),['冶煉','鑲嵌']);
-  assert.equal(await c.eval(`Array.from(document.querySelectorAll('#homeFeatureBody select')).filter(n=>{const r=n.getBoundingClientRect();return r.width&&r.height}).length`),0,'visible native selector in forge');
+  assert.equal(await c.eval(`Array.from(document.querySelectorAll('#homeFeatureModalBody select')).filter(n=>{const r=n.getBoundingClientRect();return r.width&&r.height}).length`),0,'visible native selector in forge');
   await tap('.v141-forge-tabs button:last-child');
   assert.equal(await c.eval(`document.querySelectorAll('.v141-socket').length`),1);
   const geometry=await c.eval(`(()=>{const card=document.querySelector('.v141-socket-card'),body=document.querySelector('.v141-synthesis-body'),r=card.getBoundingClientRect();return {left:r.left,right:r.right,overflow:card.scrollWidth-card.clientWidth,bodyOverflow:getComputedStyle(body).overflowY,fonts:[...card.querySelectorAll('summary,button,small')].map(n=>{const a=n.getBoundingClientRect();return parseFloat(getComputedStyle(n).fontSize)*(n.offsetWidth?a.width/n.offsetWidth:1)})};})()`);
@@ -62,8 +62,11 @@ try{
   await tap('.v141-forge-picker summary');await tap('[data-forge-value="forge-qa-equipped"]');assert.equal(await c.eval(`document.querySelectorAll('.v141-socket').length`),2);
   await tap('.v141-socket-card .v141-synthesis-primary');
   assert.equal(await c.eval(`getEquipmentBonus('fire').vitality`),1);
+  assert.equal(await c.eval(`(()=>{loadGame(JSON.parse(JSON.stringify(FourSymbolsAccountSave.readActive().save)));return getEquipmentBonus('fire').vitality;})()`),1,'hydration lost sockets');
   assert.equal(await c.eval(`(()=>{unequipItem('armor');return getEquipmentBonus('fire').vitality;})()`),0,'unequip retains gem effect');
   assert.deepEqual(await c.eval(`FourSymbolsAccountSave.readActive().save.inventoryItems.find(n=>n.v141Uid==='forge-qa-equipped').sockets`),['gemVitalityI']);
+  await c.eval(`closeHomeFeature();openHomeFeature('synthesis')`);await pause();
+  await tap('[data-v17363-material-tab="1"]');
   await c.eval(`closeHomeFeature();openHomeFeature('forge');v141SwitchForgeTab('socket')`);await pause();
   assert.deepEqual(await c.eval(`Array.from(document.querySelectorAll('.v141-forge-tabs button'),n=>n.textContent)`),['冶煉','鑲嵌']);
   assert.equal(await c.eval(`(()=>{const repo=FourSymbolsAccountSave,s=repo.readActive();repo.writeForUid(s.uid,s.save,{source:'authoritative-cloud-read',cloudBaseFingerprint:'v1:1:00000000000000000000000000000000',localDirty:false});v141SelectSocketItem('forge-qa-equipped');return v141SocketGem();})()`),false,'cloud character used local socket mutation');

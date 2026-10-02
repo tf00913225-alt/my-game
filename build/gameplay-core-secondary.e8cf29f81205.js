@@ -8253,7 +8253,7 @@ window.v148ShowDailyDungeonPreview=function(type){
         ],note:"重點養成資源一眼看懂，不再用獎勵圖片佔據版面。"},
         material:{title:"材料副本獎勵預覽",groups:[
             {title:"材料寶箱",badge:"×1～3",text:"通關回合越少，取得寶箱數越高；寶箱內含礦石、裝備設計圖等養成材料。"},
-            {title:"用途",text:"礦石與同部位設計圖可用於裝備製作、冶煉，以及材料升階合成。"}
+            {title:"用途",text:"礦石可用於冶煉；設計圖紙保留在背包，可用於既有材料升階合成。"}
         ],note:"寶箱數量依副本結算規則決定。"},
         gold:{title:"金幣副本獎勵預覽",groups:[
             {title:"金幣獎勵",badge:"GOLD",text:"依目前副本難度與結算規則獲得金幣，通關後直接入帳。"},
@@ -8408,6 +8408,7 @@ window.v17363CraftMaterial=function(kind){
     return true;
 };
 function ensureMaterialTab(){
+    if(document.getElementById("homeFeatureModal")?.dataset.craftingFeature==="forge"){ return; }
     const tabs=document.querySelector("#homeFeatureModalBody .v141-synthesis-tabs");
     if(!tabs){return;}
     let button=tabs.querySelector('[data-v17363-material-tab="1"]');
