@@ -12,7 +12,8 @@ const navShell=fs.readFileSync("js/04-stage-v11-native-bottom-nav-runtime.js","u
 const recovery=fs.readFileSync("js/45-v154-dev-fixes.js","utf8");
 const tuning=fs.readFileSync("js/47-v158-combat-tuning.js","utf8");
 const settings=fs.readFileSync("js/49-v169-element-box-settings.js","utf8");
-const waterRules=fs.readFileSync("js/50-v169-water-skill-rules.js","utf8");
+const waterRules=fs.readFileSync("js/60-v173.64-skill-progression-rebalance.js","utf8");
+const frostbiteOwner=fs.readFileSync("js/50-v169-water-skill-rules.js","utf8");
 const settingsCss=fs.readFileSync("css/48-v169-element-box-settings.css","utf8");
 const index=fs.readFileSync("index.html","utf8");
 const baseCss=fs.readFileSync("css/00-main.css","utf8");
@@ -62,7 +63,8 @@ assert.match(tuning,/const partyMultiplier=partySize===1\?\.40:partySize===2\?\.
 assert.match(tuning,/const levelMultiplier=highestLevel<=15\?\.80:highestLevel<=20\?\.90:highestLevel<=50\?1:1\.05;/);
 assert.match(tuning,/function getDailyDungeonScaleContext\(\)/);
 assert.match(tuning,/function normalizeDailyDungeonMonster\(monster\)/);
-assert.match(tuning,/factor:partyMultiplier\*levelMultiplier/);
+assert.match(tuning,/factor:partyMultiplier\*levelMultiplier\*DAILY_DUNGEON_DIFFICULTY_MULTIPLIER/);
+assert.match(tuning,/DAILY_DUNGEON_DIFFICULTY_MULTIPLIER=\.5/);
 assert.match(tuning,/monster\.v141Abyss===true/);
 assert.doesNotMatch(tuning,/v17342DailyDungeonStatsHalvedAgain/);
 assert.match(tuning,/rollBeginnerForestNormalAttackDamage=function\(\)\{[\s\S]*return 5\+Math\.floor\(Math\.random\(\)\*4\)/);
@@ -93,8 +95,10 @@ assert.match(homePolish,/characterTabBtnSkill/);
 assert.match(homePolish,/v131-exp-preview-btn/);
 assert.match(homePolish,/v131-exp-confirm/);
 assert.match(homePolish,/confirmStatusButton/);
-assert.match(homePolish,/upgradeSkill\(/);
-assert.match(homePolish,/equipSkill\(/);
+assert.match(core,/upgradeSkill\(/);
+assert.match(homePolish,/card.dataset.skillAction===\"growth\"/);
+assert.match(core,/equipSkill\(/);
+assert.match(homePolish,/card.dataset.skillAction===\"equip\"/);
 assert.match(homePolish,/skill-loadout-slot/);
 assert.match(homePolish,/已學習但尚未裝備/);
 assert.match(homePolish,/normalizeOrdinaryBlueprintItem/);
@@ -142,19 +146,27 @@ assert.match(dungeonPolish,/v132BeginEquipmentDungeon=function\(\)\{ return begi
 assert.match(dungeonPolish,/questRewardReady/);
 assert.match(dungeonPolish,/progress&&state\.progress\[quest\.id\]/);
 
-/* Water V173.43 values and Frostbite semantics. */
-assert.match(waterRules,/waterKnife:\{[\s\S]*frostbiteChance:30,frostbiteDuration:1/);
-assert.match(waterRules,/frostPunch:\{[\s\S]*frostbiteChance:35,frostbiteDuration:2/);
-assert.match(waterRules,/iceSpin:\{[\s\S]*frostbiteChance:35,frostbiteDuration:2/);
-assert.match(waterRules,/frostCrush:\{[\s\S]*frostbiteChance:45,frostbiteDuration:2/);
-assert.match(waterRules,/iceArrowRain:\{[\s\S]*baseDamage:30,damagePerLevel:6[\s\S]*frostbiteChance:35,frostbiteDuration:2/);
-assert.match(waterRules,/freeze:\{[\s\S]*learnCost:20[\s\S]*requires:\["frostPunch","floodBeast"\]/);
-assert.match(waterRules,/healSpell:\{[\s\S]*learnCost:16[\s\S]*requires:\["frostPunch","floodBeast"\]/);
-assert.match(waterRules,/revive:\{[\s\S]*learnCost:18/);
-assert.match(waterRules,/purifyMind:\{[\s\S]*learnCost:1[\s\S]*spCost:22[\s\S]*removeAllStates:true/);
-assert.match(waterRules,/FROSTBITE_REMAINING_RATE=\.75/);
-assert.match(waterRules,/WATER_DAMAGE_SKILL_IDS/);
-assert.match(waterRules,/frostbitePenaltyPercent:25/);
+/* Final Skill Data replaces V169 data patches; outgoing Frostbite stays at its compatibility owner. */
+assert.match(waterRules,/waterKnife:\{[^}]*frostbiteChance:50,frostbiteDuration:3/);
+assert.match(waterRules,/frostPunch:\{[^}]*frostbiteChance:40,frostbiteDuration:2/);
+assert.match(waterRules,/iceSpin:\{[^}]*frostbiteChance:35,frostbiteDuration:2/);
+assert.match(waterRules,/frostCrush:\{[^}]*frostbiteChance:45,frostbiteDuration:2/);
+assert.match(waterRules,/iceArrowRain:\{[^}]*baseDamage:30,damagePerLevel:6[^}]*frostbiteChance:35,frostbiteDuration:2/);
+assert.match(waterRules,/freeze:\{[^}]*learnLevel:25,learnCost:14[^}]*requires:\["iceSpin","iceArrowRain"\]/);
+assert.match(waterRules,/healSpell:\{[^}]*learnLevel:15,learnCost:8[^}]*requires:\["frostPunch","floodBeast"\]/);
+assert.match(waterRules,/revive:\{[^}]*learnLevel:20,learnCost:10/);
+assert.match(waterRules,/purifyMind:\{[^}]*learnLevel:35,learnCost:18[^}]*spCost:22[^}]*removeAllStates:true/);
+assert.match(frostbiteOwner,/FROSTBITE_REMAINING_RATE=\.70/);
+assert.match(waterRules,/PLAYER_DAMAGE_SKILL_IDS/);
+assert.match(frostbiteOwner,/frostbitePenaltyPercent:30/);
+const vm=require("node:vm");
+const frostbiteRuntime={window:null,getOutgoingDamageDownPercent:()=>0};
+frostbiteRuntime.window=frostbiteRuntime;
+vm.createContext(frostbiteRuntime);
+vm.runInContext(frostbiteOwner,frostbiteRuntime);
+assert.equal(frostbiteRuntime.getOutgoingDamageDownPercent({statusEffects:[{type:"frostbite",turnsLeft:2}]}),30);
+assert.equal(frostbiteRuntime.getOutgoingDamageDownPercent({statusEffects:[{type:"frostbite",turnsLeft:0}]}),0);
+assert.equal(frostbiteRuntime.getOutgoingDamageDownPercent({statusEffects:[]}),0);
 
 assert.match(navShell,/\["秘寶","assets\/ui\/nav-relic-v175\.webp","v148OpenContextRelic\(\)"\]/);
 assert.match(navShell,/\["元素匣","assets\/ui\/nav-element-box\.png","openHomeFeature\('autoBattleSettings'\)"\]/);

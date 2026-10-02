@@ -27,6 +27,8 @@ function classList(){
             if(enabled){ values.add(name); }else{ values.delete(name); }
             return enabled;
         },
+        add(name){ values.add(name); },
+        remove(name){ values.delete(name); },
         contains(name){ return values.has(name); }
     };
 }
@@ -59,6 +61,7 @@ function element(){
         },
         remove(){ if(this.parentNode){ this.parentNode.removeChild(this); } },
         querySelector(selector){
+            selector=selector.replace(/^:scope > /,"");
             if(!selector.startsWith(".")){ return null; }
             const name=selector.slice(1);
             return this.children.find(child=>String(child.className||"").split(/\s+/).includes(name))||null;
@@ -75,6 +78,7 @@ function loadRuntime(overrides={}){
     const cards=Array.from({length:10},()=>element());
     const document={
         body,
+        querySelectorAll(){ return []; },
         createElement(){ return element(); },
         getElementById(id){
             if(id==="autoBattleButton"){ return button; }
@@ -85,6 +89,7 @@ function loadRuntime(overrides={}){
     };
     const context=Object.assign({
         window:null,document,console,Math,Number,Object,Array,Set,Map,Promise,
+        getComputedStyle:node=>({getPropertyValue:key=>node.style.getPropertyValue(key),backgroundImage:node.style.backgroundImage||"none"}),
         currentBattleMonsters:[],monsters:[],autoBattle:false,
         updateAutoButton(){},openAutoBattleSettings(){},closeAutoBattleSettings(){},
         openHomeFeature(){},closeHomeFeature(){},
@@ -93,6 +98,7 @@ function loadRuntime(overrides={}){
     },overrides);
     context.window=context;
     vm.createContext(context);
+    vm.runInContext(fs.readFileSync("js/54-v173.51-battle-qa.js","utf8"),context);
     vm.runInContext(source,context);
     return {context,button,battlePage,body,cards};
 }
@@ -163,10 +169,13 @@ test("formal Abyss portraits precede the temporary Boss fallback",()=>{
         const names=[bossName,"天兵天將","天兵天將","天兵天將","天兵天將"];
         const early=loadRuntime({currentBattleMonsters:[0,1,2,3,4],monsters:names.map(name=>({name,v141Abyss:true}))});
         early.context.v154SyncAbyssPortraits();
+        early.context.v154SyncAbyssPortraits();
+        assert.equal(early.cards[0].children.length,1,"repeat sync reuses the canonical portrait child");
+        assert.equal(early.cards[0].style.getPropertyValue("background-image"),"none","card cannot draw a second portrait");
         assert.ok(early.cards[0].style.getPropertyValue("--v152-abyss-portrait").endsWith(portrait+'")'));
         assert.match(early.cards[1].style.getPropertyValue("--v152-abyss-portrait"),/soldier\.webp/);
-        assert.ok(early.cards[0].querySelector(".v162-abyss-battle-portrait-art").src.endsWith(portrait));
-        assert.ok(early.cards[1].querySelector(".v162-abyss-battle-portrait-art").src.endsWith("soldier.webp"));
+        assert.ok(early.cards[0].querySelector(".v174-battle-art").style.backgroundImage.endsWith(portrait+'")'));
+        assert.ok(early.cards[1].querySelector(".v174-battle-art").style.backgroundImage.endsWith("soldier.webp"+'")'));
         assert.equal(early.cards[0].dataset.abyssPortrait,"floor1-4");
     });
 
@@ -182,12 +191,12 @@ test("formal Abyss portraits precede the temporary Boss fallback",()=>{
     final.context.v154SyncAbyssPortraits();
     finalPortraits.forEach((portrait,index)=>{
         assert.ok(final.cards[index].style.getPropertyValue("--v152-abyss-portrait").endsWith(portrait+'")'));
-        assert.ok(final.cards[index].querySelector(".v162-abyss-battle-portrait-art").src.endsWith(portrait));
+        assert.ok(final.cards[index].querySelector(".v174-battle-art").style.backgroundImage.endsWith(portrait+'")'));
         assert.notEqual(final.cards[index].dataset.monsterPortraitKey,"temporary.boss-reference");
     });
     assert.equal(new Set(finalPortraits).size,5);
     assert.match(final.cards[5].style.getPropertyValue("--v152-abyss-portrait"),/soldier\.webp/);
-    assert.ok(final.cards[5].querySelector(".v162-abyss-battle-portrait-art").src.endsWith("soldier.webp"));
+    assert.ok(final.cards[5].querySelector(".v174-battle-art").style.backgroundImage.endsWith("soldier.webp"+'")'));
     assert.equal(final.cards[0].dataset.abyssPortrait,"floor5");
     assert.equal(final.battlePage.classList.contains("v154-abyss-final"),true);
 
@@ -208,12 +217,20 @@ test("all six supplied floor 5 portraits are optimized at the source dimensions"
 test("equipment cover, ability scrolling and Abyss decluttering stay scoped",()=>{
     assert.match(css,/data-dungeon-cover="gold"[\s\S]*?background-size:cover !important/);
     assert.match(css,/#characterTabContent\{[\s\S]*?overflow-y:auto !important/);
-    assert.match(characterRuntime,/root\.style\.setProperty\(\s*"height",\s*"auto",\s*"important"/);
+    const retired=vm.createContext({window:{}});
+    vm.runInContext(characterRuntime,retired);
+    assert.equal(retired.window.v78ApplyCharacterInventoryLayout(),false);
+    assert.doesNotMatch(characterRuntime,/setProperty|querySelector|getBoundingClientRect/);
+    const characterCss=fs.readFileSync("css/49-v169-rpg-ui.css","utf8");
+    assert.match(characterCss,/#homeFeatureModal #characterTabContent\{[^}]*height:auto !important;/);
+    assert.match(characterCss,/\.home-feature-modal-box\.wide #characterTabContent\{[^}]*overflow-y:auto !important;/);
     assert.doesNotMatch(characterRuntime,/bodyRect\.bottom-rootRect\.top-10/);
     assert.match(css,/v141-abyss-intro:not\(\.complete\)::before\{[\s\S]*?aspect-ratio:9\/16/);
     assert.match(css,/v141-abyss-shell > header\{[\s\S]*?position:absolute !important/);
     assert.match(css,/v154-abyss-portrait[\s\S]*?var\(--v152-abyss-portrait\)/);
-    assert.match(css,/v162-abyss-battle-portrait-art\{[\s\S]*?object-fit:cover !important/);
+    // Legacy image CSS has no Runtime producer; canonical art is verified below.
+    assert.doesNotMatch(source,/v162-abyss-battle-portrait-art/);
+    assert.match(fs.readFileSync("css/fixed-slot-battlefield-rendering-v2.css","utf8"),/\.v174-battle-art\{[^}]*background-size:contain !important/);
 });
 
 console.log("\nV154 current request suite: "+passed+" tests passed.");
