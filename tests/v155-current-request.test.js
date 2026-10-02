@@ -98,8 +98,21 @@ test("V155 no longer owns a final-roster patch",()=>{
     assert.equal(Object.keys(context.skillDatabase).includes("fireBurstStrike"),false,"monster-only skill must not leak into player lists");
 });
 
-test("enemy AI keeps 70/30 category selection and hard-control caps directional",()=>{
-    assert.match(coreSource,/Number\(randomValue\)<\.70\?"attack":"buff"/);
+test("enemy AI uses default 70/30 and water-tower 30/70 boundaries with directional hard-control caps",()=>{
+    const chooser=coreSource.slice(coreSource.indexOf("function chooseEnemySkillCategory("),coreSource.indexOf("window.FourSymbolsEnemySkillAI="));
+    const context=vm.createContext({});
+    vm.runInContext(chooser,context);
+    const choose=context.chooseEnemySkillCategory;
+    assert.equal(choose(["attack"],["buff"],.699),"attack");
+    assert.equal(choose(["attack"],["buff"],.70),"buff");
+    const waterTower={vGameplayTower:true,element:"water"};
+    assert.equal(choose(["attack"],["buff"],.299,waterTower),"attack");
+    assert.equal(choose(["attack"],["buff"],.30,waterTower),"buff");
+    assert.equal(choose(["attack"],["buff"],.69,{element:"water"}),"attack");
+    assert.equal(choose(["attack"],["buff"],.69,{vGameplayTower:true,element:"fire"}),"attack");
+    assert.equal(choose([],[],0),"normal");
+    assert.equal(choose([],["buff"],0),"buff");
+    assert.equal(choose(["attack"],[],1),"attack");
     assert.match(coreSource,/regular:\{\s*min:5,\s*max:90/);
     assert.match(coreSource,/elite:\{\s*min:5,\s*max:75/);
     assert.match(coreSource,/boss:\{\s*min:5,\s*max:60/);

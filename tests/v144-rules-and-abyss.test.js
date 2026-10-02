@@ -176,8 +176,8 @@ test("general monsters sample one to three legal skills once per encounter",()=>
         v141SupportSkillIds:["rage","healSpell"]
     };
     context.v144ConfigureMonsterEncounterSkills(abyss,"ignored");
-    assert.deepEqual(abyss.skillIds,["phoenixCry"],"Abyss attacks are validated but not regenerated");
-    assert.deepEqual(abyss.v141SupportSkillIds,["rage"],"Abyss supports also pass the same element guard");
+    assert.deepEqual(Array.from(abyss.skillIds),["phoenixCry"],"Abyss attacks are validated but not regenerated");
+    assert.deepEqual(Array.from(abyss.v141SupportSkillIds),["rage"],"Abyss supports also pass the same element guard");
     assert.equal(abyss.v144SkillEncounter,undefined);
     assert.doesNotMatch(source,/processSingleMonsterAttack\s*=\s*function[\s\S]*configureEncounterSkills/);
 });
@@ -189,9 +189,9 @@ test("fixed loadouts fail closed on cross-element IDs unless explicitly allowlis
         skillIds:["iceArrowRain","phoenixCry"],v141SupportSkillIds:["healSpell","rage"]
     };
     context.v144ConfigureMonsterEncounterSkills(regular,"fixed-water");
-    assert.deepEqual(regular.skillIds,["iceArrowRain"]);
-    assert.deepEqual(regular.v141SupportSkillIds,["healSpell"]);
-    assert.deepEqual(regular.v144LegalSkillPool,["iceArrowRain"]);
+    assert.deepEqual(Array.from(regular.skillIds),["iceArrowRain"]);
+    assert.deepEqual(Array.from(regular.v141SupportSkillIds),["healSpell"]);
+    assert.deepEqual(Array.from(regular.v144LegalSkillPool),["iceArrowRain"]);
 
     const explicit={
         level:80,element:"light",v141Abyss:true,
@@ -199,7 +199,7 @@ test("fixed loadouts fail closed on cross-element IDs unless explicitly allowlis
         v144CrossElementSkillIds:["flyingSandStrike","phoenixCry"]
     };
     context.v144ConfigureMonsterEncounterSkills(explicit,"abyss-explicit");
-    assert.deepEqual(explicit.skillIds,["flyingSandStrike","phoenixCry"]);
+    assert.deepEqual(Array.from(explicit.skillIds),["flyingSandStrike","phoenixCry"]);
 });
 
 test("monster carry limits and fixed skill levels follow the exact five bands",()=>{
@@ -253,7 +253,7 @@ test("later skill progression owner supersedes the V144 player-skill snapshot",(
     assert.match(progressionSource,/freeze:\{[\s\S]*?targetType:"column",targetTypeAtMaxLevel:"tri"[\s\S]*?freezeChanceByLevel:FREEZE_CHANCE_BY_LEVEL\.slice\(\)/);
     assert.match(progressionSource,/dodge\.targetType="allyTri"; dodge\.duration=3; dodge\.spCost=20/);
     assert.match(progressionSource,/calm\.statusResistBonusByLevel=CALM_RESIST_BY_LEVEL\.slice\(\)/);
-    assert.match(progressionSource,/shield\.targetType="allyTri"; shield\.spCost=66/);
+    assert.match(progressionSource,/shield\.targetType="self"; shield\.spCost=45/);
     assert.doesNotMatch(source,/getMainCharacterStats\s*=\s*function[\s\S]*accuracyBonusPercent/);
 });
 
@@ -281,7 +281,8 @@ test("Heal Spell restores its exact level-scaled HP and SP to every living ally"
 
 test("V144 no longer owns or patches the final Lv40 Abyss roster",()=>{
     assert.doesNotMatch(source,/FINAL_BOSS_RULES|FINAL_ELITES|v144PatchFinalAbyssRoster/);
-    assert.match(source,/v174TrueRealmFinal/);
+    assert.doesNotMatch(source,/v174TrueRealmFinal/);
+    assert.match(fs.readFileSync("js/59-abyss-two-tier-runtime.js","utf8"),/v174TrueRealmFinal/);
 });
 
 test("V144 leaves the final support cast to the shared Skill-ID dispatcher",()=>{
