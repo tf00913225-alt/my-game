@@ -132,6 +132,20 @@
         "renderSkillLoadout=function",
         "max-height:12px !important"
       ]
+    },
+    {
+      "id": "DEP-009-hit-evasion-percent-v2",
+      "description": "退休舊 Accuracy 換算係數与等級派生怪物閃避 owner；僅裝備資料遷移容許歷史值換算。",
+      "enabled": true,
+      "forbidden": [
+        "HIT_CHANCE_ACCURACY_COEFFICIENT",
+        "DEFAULT_MONSTER_EVASION_PER_LEVEL",
+        "DEFAULT_MONSTER_EVASION_CAP",
+        "getDefaultMonsterEvasion",
+        "accuracy *=",
+        "accuracy*=(1-",
+        "Math.min(85, evasion)"
+      ]
     }
   ]
 }

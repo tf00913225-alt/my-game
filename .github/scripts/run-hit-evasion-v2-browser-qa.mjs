@@ -39,7 +39,46 @@ const expression=`(async()=>{
     closeInventoryCharacterDetail();
     const migrated=FourSymbolsEquipmentCombatMigration.projectItem({stats:{accuracy:20,antiCrit:1,statusResistance:0.5}});
     const repeated=FourSymbolsEquipmentCombatMigration.projectItem(migrated);
-    return {wind,lowCap,levels,calm,dodge,set:{one,three,two,armor},detail,migrated,repeated,
+    // Explicit tower affinity survives the retired level-derived default.
+    const towerState=GameplaySystem.getSerializableState();towerState.tower.element="wind";
+    GameplaySystem.debugReloadState(towerState);
+    const tower=GameplaySystem.buildTowerRoster(1).map(m=>getMonsterEvasion(m));
+    characterEquipment.fire={};characterEquipment.wind=characterEquipment.fire;
+    player.activeBuffs=[{type:"dodgeSkill",turnsLeft:3,percent:40}];
+    player.statusEffects=[{type:"frostbite",turnsLeft:2}];
+    const frostbite=getMainCharacterStats().evasion;
+    player.activeBuffs=[];player.statusEffects=[];player.hp=getMainCharacterStats().maxHP;
+    const freshMonsters=()=>{monsters=[makeZoneMonster("QA",1,"fire")];monsters[0].hp=monsters[0].maxHP=100000;monsters[0].alive=true;monsters[0].accuracy=0;currentZone="forest";mapCooldown=false;autoBattle=false;startBattle(0);};
+    const waitRelic=async()=>{const deadline=Date.now()+5000;while(!v174RelicDebugState()&&Date.now()<deadline)await new Promise(r=>setTimeout(r,20));if(!v174RelicDebugState())throw new Error("Real relic battle did not initialize");};
+    const relicOwned=v174RelicSystem.getOwnedState(),loadout=v174RelicSystem.getTeamLoadout();
+    const feather=[];
+    for(const level of [1,10,20]){
+        Object.assign(relicOwned.relic_qinglan_feather,{unlocked:true,level});loadout.relicId="relic_qinglan_feather";
+        freshMonsters();await waitRelic();feather.push(getMainCharacterStats().evasion);loseBattle();player.hp=getMainCharacterStats().maxHP;
+    }
+    const bell=[];
+    for(const level of [10,20]){
+        Object.assign(relicOwned.relic_soul_bell,{unlocked:true,level});loadout.relicId="relic_soul_bell";
+        freshMonsters();await waitRelic();turn=4;v174RelicDebugDispatch("round_start",{sourceType:"system"});
+        bell.push({accuracy:monsters[0].accuracy,reduction:getFinalHitReductionPercent(monsters[0]),hit:calculateHitChancePercent(monsters[0].accuracy,0,getFinalHitReductionPercent(monsters[0]),0)});
+        loseBattle();player.hp=getMainCharacterStats().maxHP;
+    }
+    loadout.relicId=null;
+    freshMonsters();
+    Object.assign(monsters[0],{name:"極帝天尊",element:"light",v141Abyss:true,v174TrueRealmFinal:true,v141SupportSkillIds:["yuanZuBlessing"],sp:1000,maxSP:1000,evasion:0,statusEffects:[]});
+    const blessingApplied=v155ResolveExtremeEmperorAction(0,"yuanZuBlessing",false);
+    const blessing={applied:blessingApplied,evasion:getMonsterEvasion(monsters[0]),duration:monsters[0].v155EvasionBlessing?.displayBuff?.turnsLeft};
+    loseBattle();player.hp=getMainCharacterStats().maxHP;
+    // Observe the existing owner during actual manual / auto / enemy resolution.
+    const owner=calculateHitChancePercent,calls=[];
+    calculateHitChancePercent=function(...args){const result=owner(...args);calls.push({args:args.slice(0,4),chance:result});return result;};
+    const combat={};
+    try{
+        freshMonsters();selectedMonster=0;normalAttack();combat.manual=calls.splice(0);
+        queuedPlayerActions[0]={action:"normal",target:0};resolveQueuedPlayerAction(0,battleToken);combat.autoResolution=calls.splice(0);
+        monsters[0].skillChance=0;monsters[0].skill=null;monsters[0].skills=[];processSingleMonsterAttack(0,battleToken);combat.monster=calls.splice(0);
+    }finally{calculateHitChancePercent=owner;loseBattle();}
+    return {wind,lowCap,levels,calm,dodge,set:{one,three,two,armor},detail,migrated,repeated,tower,frostbite,feather,bell,blessing,combat,
         formula:[calculateHitChancePercent(0,0,0,0),calculateHitChancePercent(10,0,0,0),calculateHitChancePercent(10,40,0,0),calculateHitChancePercent(0,40,0,0),calculateHitChancePercent(0,1000,0,0)]};
 })()`;
 const server=await startServer();
@@ -65,6 +104,11 @@ try{
     assert.match(evidence.detail,/5%～99%/);
     assert.equal(evidence.migrated.stats.accuracy,3);assert.deepEqual(evidence.repeated,evidence.migrated);
     assert.deepEqual(evidence.formula,[95,99,65,55,5]);
+    assert.ok(evidence.tower.length>0&&evidence.tower.every(v=>v===8));
+    assert.equal(evidence.frostbite,15);assert.deepEqual(evidence.feather,[8,10,12]);
+    assert.deepEqual(evidence.bell,[{accuracy:0,reduction:5,hit:90},{accuracy:0,reduction:8,hit:87}]);
+    assert.deepEqual(evidence.blessing,{applied:true,evasion:15,duration:2});
+    for(const [mode,calls] of Object.entries(evidence.combat)){assert.ok(calls.length>0,mode+" reaches shared Hit Owner");assert.ok(calls.every(call=>call.chance>=5&&call.chance<=99));}
     fs.writeFileSync(artifact,JSON.stringify({passed:true,commitSha:process.env.GITHUB_SHA||"local",evidence},null,2)+"\n");
     console.log("V2 production mobile Runtime/UI/Save browser QA passed");
 }catch(error){

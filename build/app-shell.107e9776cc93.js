@@ -29972,65 +29972,18 @@ function getInventoryCharacterCriticalStats(index){
         return null;
     }
 
-    /*
-       V118：背包詳細資料同步顯示物理／法術兩套爆擊。
-       只做顯示，公式與 rollCritical() 保持一致：
-       物理看 attack、法術看 intelligence。
-    */
-    const rageBuff=
-        (
-            (character&&character.activeBuffs)||
-            []
-        )
-        .find(
-            buff=>buff.type==="rage"
-        );
-
-    function buildCriticalProfile(statPoints,chancePerPoint,multiplierPerPoint){
-        let critChance=
-            Math.min(
-                CRIT_CHANCE_MAX,
-                CRIT_CHANCE_BASE+
-                statPoints*
-                chancePerPoint
-            );
-
-        let critMultiplier=
-            Math.min(
-                CRIT_MULTIPLIER_ATTRIBUTE_MAX,
-                CRIT_MULTIPLIER_BASE+
-                statPoints*
-                multiplierPerPoint
-            );
-
-        if(rageBuff){
-            critChance+=
-                rageBuff.bonusPercent;
-
-            critMultiplier=
-                1+
-                rageBuff.bonusPercent/
-                100;
-        }
-
-        return {
-            chance:critChance,
-            multiplier:critMultiplier
-        };
-    }
-
-    return {
-        physical:buildCriticalProfile(
-            (character.attack||0),
-            CRIT_CHANCE_PER_ATTACK_POINT,
-            CRIT_MULTIPLIER_PER_ATTACK_POINT
-        ),
-        magic:buildCriticalProfile(
-            (getBackpackCharacterStats(index).intelligence||0),
-            CRIT_CHANCE_PER_INTELLIGENCE_POINT,
-            CRIT_MULTIPLIER_PER_INTELLIGENCE_POINT
-        )
+    // Display the existing independent combat attributes; retired six-stat
+    // coefficients must not block the Hit / Evasion detail modal.
+    const stats=getBackpackCharacterStats(index);
+    const rageBuff=(character.activeBuffs||[]).find(buff=>buff&&buff.type==="rage");
+    const ex=character.element==="fire"?getLearnedElementEX(character,"fire"):null;
+    const profile={
+        chance:Math.min(CRIT_CHANCE_MAX,CRIT_CHANCE_BASE+(Number(stats.criticalChance)||0)+(Number(stats.statusAccuracy)||0))+
+            (Number(ex&&ex.critChanceBonusPercent)||0)+(Number(rageBuff&&rageBuff.bonusPercent)||0),
+        multiplier:Math.min(CRIT_MULTIPLIER_MAX,CRIT_MULTIPLIER_BASE+(Number(stats.criticalDamage)||0)/100+
+            (Number(ex&&ex.critDamageBonusPercent)||0)/100+(Number(rageBuff&&rageBuff.bonusPercent)||0)/100)
     };
+    return {physical:{...profile},magic:{...profile}};
 }
 
 function openInventoryCharacterDetail(){

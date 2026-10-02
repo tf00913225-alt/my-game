@@ -248,6 +248,118 @@
         "verification": "39 張可解碼來源已完成無損 WebP、透明度、尺寸與像素驗證；最新 PR CI、DEV 部署與手機實機顯示尚待核對。",
         "result": "10 張野怪與 29 張土塔素材已接入；第 10 張小 Boss 母圖已確認損毀並隔離為 reserved，未偽造完成。"
       }
+    },
+    {
+      "id": "HIT-V2-01",
+      "title": "直接百分比 Accuracy／Evasion 與 5～99% 單一 Hit Owner",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "SYSTEM_CONTRACTS.md",
+          ".github/scripts/run-hit-evasion-v2-browser-qa.mjs",
+          "tests/equipment-combat-percent-migration-v2.test.js"
+        ],
+        "verification": "V2 targeted unit / integration and exact-candidate production Chrome QA",
+        "result": "Pending latest-head CI and browser result"
+      }
+    },
+    {
+      "id": "HIT-V2-02",
+      "title": "裸裝 95%／無等級派生怪物閃避／無等級差命中",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "SYSTEM_CONTRACTS.md",
+          ".github/scripts/run-hit-evasion-v2-browser-qa.mjs",
+          "tests/equipment-combat-percent-migration-v2.test.js"
+        ],
+        "verification": "V2 targeted unit / integration and exact-candidate production Chrome QA",
+        "result": "Pending latest-head CI and browser result"
+      }
+    },
+    {
+      "id": "HIT-V2-03",
+      "title": "四象鎧甲與袍閃避 10%／3 件套閃避 2%",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "SYSTEM_CONTRACTS.md",
+          ".github/scripts/run-hit-evasion-v2-browser-qa.mjs",
+          "tests/equipment-combat-percent-migration-v2.test.js"
+        ],
+        "verification": "V2 targeted unit / integration and exact-candidate production Chrome QA",
+        "result": "Pending latest-head CI and browser result"
+      }
+    },
+    {
+      "id": "HIT-V2-04",
+      "title": "舊四象與 Spirit 裝備冪等遷移，背包／裝備／Cloud 投影",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "SYSTEM_CONTRACTS.md",
+          ".github/scripts/run-hit-evasion-v2-browser-qa.mjs",
+          "tests/equipment-combat-percent-migration-v2.test.js"
+        ],
+        "verification": "V2 targeted unit / integration and exact-candidate production Chrome QA",
+        "result": "Pending latest-head CI and browser result"
+      }
+    },
+    {
+      "id": "HIT-V2-05",
+      "title": "閃躲術與氣定神閒 5～25%／Wind EX 15% 各一次",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "SYSTEM_CONTRACTS.md",
+          ".github/scripts/run-hit-evasion-v2-browser-qa.mjs",
+          "tests/equipment-combat-percent-migration-v2.test.js"
+        ],
+        "verification": "V2 targeted unit / integration and exact-candidate production Chrome QA",
+        "result": "Pending latest-head CI and browser result"
+      }
+    },
+    {
+      "id": "HIT-V2-06",
+      "title": "凍傷 -25%／元祖祝福 15%／青嵐 8／10／12%",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "SYSTEM_CONTRACTS.md",
+          ".github/scripts/run-hit-evasion-v2-browser-qa.mjs",
+          "tests/equipment-combat-percent-migration-v2.test.js"
+        ],
+        "verification": "V2 targeted unit / integration and exact-candidate production Chrome QA",
+        "result": "Pending latest-head CI and browser result"
+      }
+    },
+    {
+      "id": "HIT-V2-07",
+      "title": "鎮魂古鐘最終命中下降 5／8% 且保留 Boss 效率",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "SYSTEM_CONTRACTS.md",
+          ".github/scripts/run-hit-evasion-v2-browser-qa.mjs",
+          "tests/equipment-combat-percent-migration-v2.test.js"
+        ],
+        "verification": "V2 targeted unit / integration and exact-candidate production Chrome QA",
+        "result": "Pending latest-head CI and browser result"
+      }
+    },
+    {
+      "id": "HIT-V2-08",
+      "title": "Runtime／UI／正式契約／瀏覽器與雙向戰鬥驗證",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "SYSTEM_CONTRACTS.md",
+          ".github/scripts/run-hit-evasion-v2-browser-qa.mjs",
+          "tests/equipment-combat-percent-migration-v2.test.js"
+        ],
+        "verification": "V2 targeted unit / integration and exact-candidate production Chrome QA",
+        "result": "Pending latest-head CI and browser result"
+      }
     }
   ]
 }
