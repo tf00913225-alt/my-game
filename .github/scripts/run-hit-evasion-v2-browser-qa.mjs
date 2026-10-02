@@ -48,8 +48,8 @@ const expression=`(async()=>{
     player.statusEffects=[{type:"frostbite",turnsLeft:2}];
     const frostbite=getMainCharacterStats().evasion;
     player.activeBuffs=[];player.statusEffects=[];player.hp=getMainCharacterStats().maxHP;
-    const freshMonsters=()=>{monsters=[makeZoneMonster("QA",1,"fire")];monsters[0].hp=monsters[0].maxHP=100000;monsters[0].alive=true;monsters[0].accuracy=0;currentZone="forest";mapCooldown=false;autoBattle=false;autoConfig.enabled=false;startBattle(0);startTurn(battleToken);};
-    const waitRelic=async()=>{const deadline=Date.now()+5000;while(!v174RelicDebugState()&&Date.now()<deadline)await new Promise(r=>setTimeout(r,20));if(!v174RelicDebugState())throw new Error("Real relic battle did not initialize: "+JSON.stringify({battleActive,battleToken,turn,log:document.getElementById("battleLog")?.textContent}));};
+    const freshMonsters=()=>{monsters=[makeZoneMonster("QA",1,"fire")];monsters[0].hp=monsters[0].maxHP=100000;monsters[0].alive=true;monsters[0].accuracy=0;currentZone="forest";mapCooldown=false;autoBattle=false;autoConfig.enabled=false;startBattle(0);startTurn(battleToken);notifyBattleRoundBoundary("round_start",battleToken);};
+    const waitRelic=async()=>{const deadline=Date.now()+5000;while(!v174RelicDebugState()&&Date.now()<deadline)await new Promise(r=>setTimeout(r,20));if(!v174RelicDebugState())throw new Error("Real relic battle did not initialize: "+JSON.stringify({battleActive,battleToken,turn,observers:battleRoundStartObservers.size,keys:Array.from(battleRoundBoundaryKeys),startSource:String(startBattle).slice(0,500),turnSource:String(startTurn).slice(0,500),logs:Array.from(document.querySelectorAll(".battle-log")).map(n=>n.textContent)}));};
     const relicOwned=v174RelicSystem.getOwnedState(),loadout=v174RelicSystem.getTeamLoadout();
     const feather=[];
     for(const level of [1,10,20]){
