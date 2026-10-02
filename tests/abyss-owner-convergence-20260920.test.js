@@ -31,7 +31,10 @@ assert.match(roster,/elite\.v141ForceSkillLevel=5/);
 assert.match(roster,/v174TrueRealmFinal=true/);
 
 assert.match(v141Core,/v141TryMonsterSpecialAction\(monsterIndex,token\)/,"the single monster-turn wrapper must call the shared support dispatcher once");
-assert.doesNotMatch(combat,/v141TryMonsterSpecialAction\(monsterIndex\)/,"the base attack function must not create a second dispatcher entry");
+const towerDispatcher= /const towerSkillDecision=monster\.vGameplayTower===true[\s\S]*?if\(towerSkillDecision===true&&typeof window\.v141TryMonsterSpecialAction===\"function\"\)\{[\s\S]*?window\.v141TryMonsterSpecialAction\(monsterIndex\)===true[\s\S]*?\n    \}/;
+assert.match(combat,towerDispatcher,"Tower dispatch only follows its canonical probability gate");
+assert.doesNotMatch(combat.replace(towerDispatcher,""),/v141TryMonsterSpecialAction\(monsterIndex\)/,"non-Tower base attack must not add a second Abyss dispatcher");
+assert.match(v141Core,/monster&&monster\.vGameplayTower!==true&&Array\.isArray\(monster\.v141SupportSkillIds\)/,"Tower cannot also dispatch from V141 pre-emption");
 assert.match(v141,/forcedSupportSkillId[\s\S]*supportIds\.includes\(forcedSupportSkillId\)/);
 assert.match(v155,/chooseFinalAbyssAction[\s\S]*monster\.skillIds/);
 assert.match(v155,/v141SupportSkillIds\|\|\[\]\)\.indexOf\("rockWall"\)/);

@@ -12638,7 +12638,8 @@ window.v173GetEnemyPressureMultiplier=getEnemyPressureMultiplier;
 window.v173GetDamageBudgetMultiplier=getDamageBudgetMultiplier;
 
 /* Tower modifiers only project explicit tower metadata into the canonical owners. */
-function getTowerDirectDamageMultiplier(attacker,options={}){
+function getTowerDirectDamageMultiplier(attacker,damageOptions){
+    const options=damageOptions||{};
     const kind=String(options.damageKind||"direct");
     const skill=options.skill;
     const directSkill=!skill||skill.category==="physical"||skill.category==="magic";

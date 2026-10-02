@@ -48,12 +48,13 @@ const expression=`(async()=>{
  await exit();
  await enter('water',100);
  // Ten-unit highest-frequency natural queue, observed through formal lifecycle subscriptions.
+ const queueRandom=Math.random;Math.random=()=>.4;const skillNames=[];const badgeOwner=showMonsterSkillNameBadge;showMonsterSkillNameBadge=function(name,...args){skillNames.push(name);return badgeOwner(name,...args);};
  const actions=[];const off=FourSymbolsBattleFlow.subscribeBeforeCombatant(event=>{const unit=event.queue[event.index];if(unit?.type==='monster')actions.push(unit.monsterIndex);});
  let ended=false;const endOff=FourSymbolsBattleFlow.subscribeRoundEnd(()=>{ended=true;});
  queuedPlayerActions={};for(const i of getExistingPartyIndexes())queuedPlayerActions[i]={action:'defend'};
  for(const i of currentBattleMonsters){monsters[i].sp=100000;monsters[i].hp=monsters[i].maxHP;}
- startResolutionPhase(battleToken);await wait(()=>ended,100000);off();endOff();
- check(actions.length===10&&new Set(actions).size===10,'10 x 80 queue completes exactly once');evidence.actions=actions;
+ try{startResolutionPhase(battleToken);await wait(()=>ended,100000);}finally{off();endOff();Math.random=queueRandom;showMonsterSkillNameBadge=badgeOwner;}
+ check(actions.length===10&&new Set(actions).size===10,'10 x 80 queue completes exactly once');evidence.actions=actions;evidence.freezeSkills=skillNames;check(skillNames.includes(skillDatabase.freeze.name),'real water Freeze decision');
  await exit();
  await enter('fire',1);
  // Actual all-target skill, ten independent settlements and feedback events.
@@ -62,7 +63,7 @@ const expression=`(async()=>{
  const hitOwner=showMonsterHit, feedback=[];showMonsterHit=function(index,amount,type,...rest){if(type==='hp')feedback.push({index,amount});return hitOwner(index,amount,type,...rest);};
  try{Math.random=()=>.5;castDamageSkill('iceArrowRain');await new Promise(r=>setTimeout(r,5500));}finally{Math.random=oldRandom;showMonsterHit=hitOwner;}
  check(ids.every(i=>monsters[i].hp<100000),'AOE damages all 10');check(feedback.length===10&&new Set(feedback.map(x=>x.index)).size===10,'AOE feedback exactly once per target');evidence.aoe=feedback;
- await exit();vGameplayOpenTower();evidence.rules=document.getElementById('towerPageContent').textContent;check(evidence.rules.includes('每層固定 10 名敵人')&&evidence.rules.includes('65%')&&evidence.rules.includes('80%'),'visible tower rules');
+ evidence.battleScreenshotPending=true;vGameplayRenderTower();evidence.rules=document.getElementById('towerPageContent').textContent;check(evidence.rules.includes('每層固定 10 名敵人')&&evidence.rules.includes('65%')&&evidence.rules.includes('80%'),'visible tower rules');
  return evidence;
 })()`;
 const server=await startServer(),profile=fs.mkdtempSync(path.join(os.tmpdir(),'tower-challenge-')),port=9850+Math.floor(Math.random()*100);
@@ -70,6 +71,6 @@ const proc=spawn(findChrome(),['--headless=new','--no-sandbox','--disable-gpu','
 const artifact=path.join(ROOT,'artifacts/browser-qa/tower-challenge.json');fs.mkdirSync(path.dirname(artifact),{recursive:true});let client,evidence;
 try{
  const targets=await waitJson('http://127.0.0.1:'+port+'/json/list');client=new Cdp(targets.find(x=>x.type==='page').webSocketDebuggerUrl);await client.send('Page.enable');await client.send('Runtime.enable');await client.send('Emulation.setDeviceMetricsOverride',{width:412,height:915,deviceScaleFactor:1,mobile:true});await client.send('Page.navigate',{url:server.url});evidence=await client.eval(expression);assert.equal(evidence.matrix.length,24);
- const shot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(artifact.replace('.json','.png'),Buffer.from(shot.data,'base64'));fs.writeFileSync(artifact,JSON.stringify({passed:true,commitSha:process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||'local',evidence},null,2)+'\n');console.log('Tower challenge production Runtime 24 scenes / 10-unit queue / AOE QA passed');
+ const shot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(artifact.replace('.json','-battle.png'),Buffer.from(shot.data,'base64'));await client.eval('loseBattle()');await new Promise(r=>setTimeout(r,3000));await client.eval('vGameplayOpenTower()');const ruleShot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(artifact.replace('.json','-rules.png'),Buffer.from(ruleShot.data,'base64'));fs.writeFileSync(artifact,JSON.stringify({passed:true,commitSha:process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||'local',evidence},null,2)+'\n');console.log('Tower challenge production Runtime 24 scenes / 10-unit queue / AOE QA passed');
 }catch(error){fs.writeFileSync(artifact,JSON.stringify({passed:false,error:String(error.stack||error),evidence,console:client?.events.filter(e=>e.method==='Runtime.consoleAPICalled').slice(-12)},null,2)+'\n');throw error;}
 finally{client?.close();proc.kill('SIGTERM');try{fs.rmSync(profile,{recursive:true,force:true,maxRetries:3,retryDelay:100});}catch(_){}await new Promise(r=>server.server.close(r));}
