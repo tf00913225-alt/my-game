@@ -6,410 +6,481 @@
   "base_sha": "3fabca40a841a9b61ff704f9a5db6cc78ba6c353",
   "work_branch": "feature/tower-challenge-element-profiles-20261002",
   "officialVersion": "173.72",
-  "status": "IMPLEMENTED",
+  "status": "VERIFIED",
   "requirements": [
     {
       "id": "TOWER-CHALLENGE-01",
       "title": "共同 65/70/75/80% 技能決策",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
-        "verification": "Targeted Node matrix and exact candidate production browser gate pending",
+        "verification": "Production Chrome 412×915, CI run 36984210420, head a1e208abd223c1f6f20d978f65a95822dd79fb34, artifact 11216788440: 27 exact ordered scenes, 10-unit queue, real Heal/Freeze, 10-target AOE/feedback, rules and battle screenshots inspected; targeted 4×100 Node matrix/formula/isolation tests PASS. Integration/deployment tracked separately.",
         "files": [
           "tests/tower-challenge-formula.test.js",
           "tests/tower-element-formation-small-boss-20260924.test.js",
-          ".github/scripts/run-tower-challenge-browser-qa.mjs"
-        ]
+          ".github/scripts/run-tower-challenge-browser-qa.mjs",
+          "docs/qa/tower-challenge-profile-20261002.md"
+        ],
+        "result": "PASS; requirement behavior verified. Latest-head full CI, integration and exact dev deployment remain pending."
       }
     },
     {
       "id": "TOWER-CHALLENGE-02",
       "title": "火塔 +8 技能率退休",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
-        "verification": "Targeted Node matrix and exact candidate production browser gate pending",
+        "verification": "Production Chrome 412×915, CI run 36984210420, head a1e208abd223c1f6f20d978f65a95822dd79fb34, artifact 11216788440: 27 exact ordered scenes, 10-unit queue, real Heal/Freeze, 10-target AOE/feedback, rules and battle screenshots inspected; targeted 4×100 Node matrix/formula/isolation tests PASS. Integration/deployment tracked separately.",
         "files": [
           "tests/tower-challenge-formula.test.js",
           "tests/tower-element-formation-small-boss-20260924.test.js",
-          ".github/scripts/run-tower-challenge-browser-qa.mjs"
-        ]
+          ".github/scripts/run-tower-challenge-browser-qa.mjs",
+          "docs/qa/tower-challenge-profile-20261002.md"
+        ],
+        "result": "PASS; requirement behavior verified. Latest-head full CI, integration and exact dev deployment remain pending."
       }
     },
     {
       "id": "TOWER-CHALLENGE-03",
       "title": "火塔爆擊 +15 百分點",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
-        "verification": "Targeted Node matrix and exact candidate production browser gate pending",
+        "verification": "Production Chrome 412×915, CI run 36984210420, head a1e208abd223c1f6f20d978f65a95822dd79fb34, artifact 11216788440: 27 exact ordered scenes, 10-unit queue, real Heal/Freeze, 10-target AOE/feedback, rules and battle screenshots inspected; targeted 4×100 Node matrix/formula/isolation tests PASS. Integration/deployment tracked separately.",
         "files": [
           "tests/tower-challenge-formula.test.js",
           "tests/tower-element-formation-small-boss-20260924.test.js",
-          ".github/scripts/run-tower-challenge-browser-qa.mjs"
-        ]
+          ".github/scripts/run-tower-challenge-browser-qa.mjs",
+          "docs/qa/tower-challenge-profile-20261002.md"
+        ],
+        "result": "PASS; requirement behavior verified. Latest-head full CI, integration and exact dev deployment remain pending."
       }
     },
     {
       "id": "TOWER-CHALLENGE-04",
       "title": "火塔自身直接傷害 ×1.15",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
-        "verification": "Targeted Node matrix and exact candidate production browser gate pending",
+        "verification": "Production Chrome 412×915, CI run 36984210420, head a1e208abd223c1f6f20d978f65a95822dd79fb34, artifact 11216788440: 27 exact ordered scenes, 10-unit queue, real Heal/Freeze, 10-target AOE/feedback, rules and battle screenshots inspected; targeted 4×100 Node matrix/formula/isolation tests PASS. Integration/deployment tracked separately.",
         "files": [
           "tests/tower-challenge-formula.test.js",
           "tests/tower-element-formation-small-boss-20260924.test.js",
-          ".github/scripts/run-tower-challenge-browser-qa.mjs"
-        ]
+          ".github/scripts/run-tower-challenge-browser-qa.mjs",
+          "docs/qa/tower-challenge-profile-20261002.md"
+        ],
+        "result": "PASS; requirement behavior verified. Latest-head full CI, integration and exact dev deployment remain pending."
       }
     },
     {
       "id": "TOWER-CHALLENGE-05",
       "title": "DoT/反傷/非直接傷害排除",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
-        "verification": "Targeted Node matrix and exact candidate production browser gate pending",
+        "verification": "Production Chrome 412×915, CI run 36984210420, head a1e208abd223c1f6f20d978f65a95822dd79fb34, artifact 11216788440: 27 exact ordered scenes, 10-unit queue, real Heal/Freeze, 10-target AOE/feedback, rules and battle screenshots inspected; targeted 4×100 Node matrix/formula/isolation tests PASS. Integration/deployment tracked separately.",
         "files": [
           "tests/tower-challenge-formula.test.js",
           "tests/tower-element-formation-small-boss-20260924.test.js",
-          ".github/scripts/run-tower-challenge-browser-qa.mjs"
-        ]
+          ".github/scripts/run-tower-challenge-browser-qa.mjs",
+          "docs/qa/tower-challenge-profile-20261002.md"
+        ],
+        "result": "PASS; requirement behavior verified. Latest-head full CI, integration and exact dev deployment remain pending."
       }
     },
     {
       "id": "TOWER-CHALLENGE-06",
       "title": "水塔合法 Heal/Support/Freeze AI",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
-        "verification": "Targeted Node matrix and exact candidate production browser gate pending",
+        "verification": "Production Chrome 412×915, CI run 36984210420, head a1e208abd223c1f6f20d978f65a95822dd79fb34, artifact 11216788440: 27 exact ordered scenes, 10-unit queue, real Heal/Freeze, 10-target AOE/feedback, rules and battle screenshots inspected; targeted 4×100 Node matrix/formula/isolation tests PASS. Integration/deployment tracked separately.",
         "files": [
           "tests/tower-challenge-formula.test.js",
           "tests/tower-element-formation-small-boss-20260924.test.js",
-          ".github/scripts/run-tower-challenge-browser-qa.mjs"
-        ]
+          ".github/scripts/run-tower-challenge-browser-qa.mjs",
+          "docs/qa/tower-challenge-profile-20261002.md"
+        ],
+        "result": "PASS; requirement behavior verified. Latest-head full CI, integration and exact dev deployment remain pending."
       }
     },
     {
       "id": "TOWER-CHALLENGE-07",
       "title": "水塔 HP Healing ×1.15、SP 不變",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
-        "verification": "Targeted Node matrix and exact candidate production browser gate pending",
+        "verification": "Production Chrome 412×915, CI run 36984210420, head a1e208abd223c1f6f20d978f65a95822dd79fb34, artifact 11216788440: 27 exact ordered scenes, 10-unit queue, real Heal/Freeze, 10-target AOE/feedback, rules and battle screenshots inspected; targeted 4×100 Node matrix/formula/isolation tests PASS. Integration/deployment tracked separately.",
         "files": [
           "tests/tower-challenge-formula.test.js",
           "tests/tower-element-formation-small-boss-20260924.test.js",
-          ".github/scripts/run-tower-challenge-browser-qa.mjs"
-        ]
+          ".github/scripts/run-tower-challenge-browser-qa.mjs",
+          "docs/qa/tower-challenge-profile-20261002.md"
+        ],
+        "result": "PASS; requirement behavior verified. Latest-head full CI, integration and exact dev deployment remain pending."
       }
     },
     {
       "id": "TOWER-CHALLENGE-08",
       "title": "水塔異常 +15 百分點",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
-        "verification": "Targeted Node matrix and exact candidate production browser gate pending",
+        "verification": "Production Chrome 412×915, CI run 36984210420, head a1e208abd223c1f6f20d978f65a95822dd79fb34, artifact 11216788440: 27 exact ordered scenes, 10-unit queue, real Heal/Freeze, 10-target AOE/feedback, rules and battle screenshots inspected; targeted 4×100 Node matrix/formula/isolation tests PASS. Integration/deployment tracked separately.",
         "files": [
           "tests/tower-challenge-formula.test.js",
           "tests/tower-element-formation-small-boss-20260924.test.js",
-          ".github/scripts/run-tower-challenge-browser-qa.mjs"
-        ]
+          ".github/scripts/run-tower-challenge-browser-qa.mjs",
+          "docs/qa/tower-challenge-profile-20261002.md"
+        ],
+        "result": "PASS; requirement behavior verified. Latest-head full CI, integration and exact dev deployment remain pending."
       }
     },
     {
       "id": "TOWER-CHALLENGE-09",
       "title": "Enemy→Player 硬控 5～60%",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
-        "verification": "Targeted Node matrix and exact candidate production browser gate pending",
+        "verification": "Production Chrome 412×915, CI run 36984210420, head a1e208abd223c1f6f20d978f65a95822dd79fb34, artifact 11216788440: 27 exact ordered scenes, 10-unit queue, real Heal/Freeze, 10-target AOE/feedback, rules and battle screenshots inspected; targeted 4×100 Node matrix/formula/isolation tests PASS. Integration/deployment tracked separately.",
         "files": [
           "tests/tower-challenge-formula.test.js",
           "tests/tower-element-formation-small-boss-20260924.test.js",
-          ".github/scripts/run-tower-challenge-browser-qa.mjs"
-        ]
+          ".github/scripts/run-tower-challenge-browser-qa.mjs",
+          "docs/qa/tower-challenge-profile-20261002.md"
+        ],
+        "result": "PASS; requirement behavior verified. Latest-head full CI, integration and exact dev deployment remain pending."
       }
     },
     {
       "id": "TOWER-CHALLENGE-10",
       "title": "Player→Regular/Elite/Boss 90/75/60%",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
-        "verification": "Targeted Node matrix and exact candidate production browser gate pending",
+        "verification": "Production Chrome 412×915, CI run 36984210420, head a1e208abd223c1f6f20d978f65a95822dd79fb34, artifact 11216788440: 27 exact ordered scenes, 10-unit queue, real Heal/Freeze, 10-target AOE/feedback, rules and battle screenshots inspected; targeted 4×100 Node matrix/formula/isolation tests PASS. Integration/deployment tracked separately.",
         "files": [
           "tests/tower-challenge-formula.test.js",
           "tests/tower-element-formation-small-boss-20260924.test.js",
-          ".github/scripts/run-tower-challenge-browser-qa.mjs"
-        ]
+          ".github/scripts/run-tower-challenge-browser-qa.mjs",
+          "docs/qa/tower-challenge-profile-20261002.md"
+        ],
+        "result": "PASS; requirement behavior verified. Latest-head full CI, integration and exact dev deployment remain pending."
       }
     },
     {
       "id": "TOWER-CHALLENGE-11",
       "title": "風塔 Evasion +15 百分點",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
-        "verification": "Targeted Node matrix and exact candidate production browser gate pending",
+        "verification": "Production Chrome 412×915, CI run 36984210420, head a1e208abd223c1f6f20d978f65a95822dd79fb34, artifact 11216788440: 27 exact ordered scenes, 10-unit queue, real Heal/Freeze, 10-target AOE/feedback, rules and battle screenshots inspected; targeted 4×100 Node matrix/formula/isolation tests PASS. Integration/deployment tracked separately.",
         "files": [
           "tests/tower-challenge-formula.test.js",
           "tests/tower-element-formation-small-boss-20260924.test.js",
-          ".github/scripts/run-tower-challenge-browser-qa.mjs"
-        ]
+          ".github/scripts/run-tower-challenge-browser-qa.mjs",
+          "docs/qa/tower-challenge-profile-20261002.md"
+        ],
+        "result": "PASS; requirement behavior verified. Latest-head full CI, integration and exact dev deployment remain pending."
       }
     },
     {
       "id": "TOWER-CHALLENGE-12",
       "title": "風塔 Speed ×1.15",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
-        "verification": "Targeted Node matrix and exact candidate production browser gate pending",
+        "verification": "Production Chrome 412×915, CI run 36984210420, head a1e208abd223c1f6f20d978f65a95822dd79fb34, artifact 11216788440: 27 exact ordered scenes, 10-unit queue, real Heal/Freeze, 10-target AOE/feedback, rules and battle screenshots inspected; targeted 4×100 Node matrix/formula/isolation tests PASS. Integration/deployment tracked separately.",
         "files": [
           "tests/tower-challenge-formula.test.js",
           "tests/tower-element-formation-small-boss-20260924.test.js",
-          ".github/scripts/run-tower-challenge-browser-qa.mjs"
-        ]
+          ".github/scripts/run-tower-challenge-browser-qa.mjs",
+          "docs/qa/tower-challenge-profile-20261002.md"
+        ],
+        "result": "PASS; requirement behavior verified. Latest-head full CI, integration and exact dev deployment remain pending."
       }
     },
     {
       "id": "TOWER-CHALLENGE-13",
       "title": "速度不衍生閃避/命中",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
-        "verification": "Targeted Node matrix and exact candidate production browser gate pending",
+        "verification": "Production Chrome 412×915, CI run 36984210420, head a1e208abd223c1f6f20d978f65a95822dd79fb34, artifact 11216788440: 27 exact ordered scenes, 10-unit queue, real Heal/Freeze, 10-target AOE/feedback, rules and battle screenshots inspected; targeted 4×100 Node matrix/formula/isolation tests PASS. Integration/deployment tracked separately.",
         "files": [
           "tests/tower-challenge-formula.test.js",
           "tests/tower-element-formation-small-boss-20260924.test.js",
-          ".github/scripts/run-tower-challenge-browser-qa.mjs"
-        ]
+          ".github/scripts/run-tower-challenge-browser-qa.mjs",
+          "docs/qa/tower-challenge-profile-20261002.md"
+        ],
+        "result": "PASS; requirement behavior verified. Latest-head full CI, integration and exact dev deployment remain pending."
       }
     },
     {
       "id": "TOWER-CHALLENGE-14",
       "title": "土塔 Defense ×1.15",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
-        "verification": "Targeted Node matrix and exact candidate production browser gate pending",
+        "verification": "Production Chrome 412×915, CI run 36984210420, head a1e208abd223c1f6f20d978f65a95822dd79fb34, artifact 11216788440: 27 exact ordered scenes, 10-unit queue, real Heal/Freeze, 10-target AOE/feedback, rules and battle screenshots inspected; targeted 4×100 Node matrix/formula/isolation tests PASS. Integration/deployment tracked separately.",
         "files": [
           "tests/tower-challenge-formula.test.js",
           "tests/tower-element-formation-small-boss-20260924.test.js",
-          ".github/scripts/run-tower-challenge-browser-qa.mjs"
-        ]
+          ".github/scripts/run-tower-challenge-browser-qa.mjs",
+          "docs/qa/tower-challenge-profile-20261002.md"
+        ],
+        "result": "PASS; requirement behavior verified. Latest-head full CI, integration and exact dev deployment remain pending."
       }
     },
     {
       "id": "TOWER-CHALLENGE-15",
       "title": "土塔 Max HP ×1.15",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
-        "verification": "Targeted Node matrix and exact candidate production browser gate pending",
+        "verification": "Production Chrome 412×915, CI run 36984210420, head a1e208abd223c1f6f20d978f65a95822dd79fb34, artifact 11216788440: 27 exact ordered scenes, 10-unit queue, real Heal/Freeze, 10-target AOE/feedback, rules and battle screenshots inspected; targeted 4×100 Node matrix/formula/isolation tests PASS. Integration/deployment tracked separately.",
         "files": [
           "tests/tower-challenge-formula.test.js",
           "tests/tower-element-formation-small-boss-20260924.test.js",
-          ".github/scripts/run-tower-challenge-browser-qa.mjs"
-        ]
+          ".github/scripts/run-tower-challenge-browser-qa.mjs",
+          "docs/qa/tower-challenge-profile-20261002.md"
+        ],
+        "result": "PASS; requirement behavior verified. Latest-head full CI, integration and exact dev deployment remain pending."
       }
     },
     {
       "id": "TOWER-CHALLENGE-16",
       "title": "Regular/Elite/Tower Boss 特性一致",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
-        "verification": "Targeted Node matrix and exact candidate production browser gate pending",
+        "verification": "Production Chrome 412×915, CI run 36984210420, head a1e208abd223c1f6f20d978f65a95822dd79fb34, artifact 11216788440: 27 exact ordered scenes, 10-unit queue, real Heal/Freeze, 10-target AOE/feedback, rules and battle screenshots inspected; targeted 4×100 Node matrix/formula/isolation tests PASS. Integration/deployment tracked separately.",
         "files": [
           "tests/tower-challenge-formula.test.js",
           "tests/tower-element-formation-small-boss-20260924.test.js",
-          ".github/scripts/run-tower-challenge-browser-qa.mjs"
-        ]
+          ".github/scripts/run-tower-challenge-browser-qa.mjs",
+          "docs/qa/tower-challenge-profile-20261002.md"
+        ],
+        "result": "PASS; requirement behavior verified. Latest-head full CI, integration and exact dev deployment remain pending."
       }
     },
     {
       "id": "TOWER-CHALLENGE-17",
       "title": "其他玩法數值隔離",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
-        "verification": "Targeted Node matrix and exact candidate production browser gate pending",
+        "verification": "Production Chrome 412×915, CI run 36984210420, head a1e208abd223c1f6f20d978f65a95822dd79fb34, artifact 11216788440: 27 exact ordered scenes, 10-unit queue, real Heal/Freeze, 10-target AOE/feedback, rules and battle screenshots inspected; targeted 4×100 Node matrix/formula/isolation tests PASS. Integration/deployment tracked separately.",
         "files": [
           "tests/tower-challenge-formula.test.js",
           "tests/tower-element-formation-small-boss-20260924.test.js",
-          ".github/scripts/run-tower-challenge-browser-qa.mjs"
-        ]
+          ".github/scripts/run-tower-challenge-browser-qa.mjs",
+          "docs/qa/tower-challenge-profile-20261002.md"
+        ],
+        "result": "PASS; requirement behavior verified. Latest-head full CI, integration and exact dev deployment remain pending."
       }
     },
     {
       "id": "TOWER-CHALLENGE-18",
       "title": "Profile 冪等",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
-        "verification": "Targeted Node matrix and exact candidate production browser gate pending",
+        "verification": "Production Chrome 412×915, CI run 36984210420, head a1e208abd223c1f6f20d978f65a95822dd79fb34, artifact 11216788440: 27 exact ordered scenes, 10-unit queue, real Heal/Freeze, 10-target AOE/feedback, rules and battle screenshots inspected; targeted 4×100 Node matrix/formula/isolation tests PASS. Integration/deployment tracked separately.",
         "files": [
           "tests/tower-challenge-formula.test.js",
           "tests/tower-element-formation-small-boss-20260924.test.js",
-          ".github/scripts/run-tower-challenge-browser-qa.mjs"
-        ]
+          ".github/scripts/run-tower-challenge-browser-qa.mjs",
+          "docs/qa/tower-challenge-profile-20261002.md"
+        ],
+        "result": "PASS; requirement behavior verified. Latest-head full CI, integration and exact dev deployment remain pending."
       }
     },
     {
       "id": "TOWER-CHALLENGE-19",
       "title": "玩家可見元素與技能率規則",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
-        "verification": "Targeted Node matrix and exact candidate production browser gate pending",
+        "verification": "Production Chrome 412×915, CI run 36984210420, head a1e208abd223c1f6f20d978f65a95822dd79fb34, artifact 11216788440: 27 exact ordered scenes, 10-unit queue, real Heal/Freeze, 10-target AOE/feedback, rules and battle screenshots inspected; targeted 4×100 Node matrix/formula/isolation tests PASS. Integration/deployment tracked separately.",
         "files": [
           "tests/tower-challenge-formula.test.js",
           "tests/tower-element-formation-small-boss-20260924.test.js",
-          ".github/scripts/run-tower-challenge-browser-qa.mjs"
-        ]
+          ".github/scripts/run-tower-challenge-browser-qa.mjs",
+          "docs/qa/tower-challenge-profile-20261002.md"
+        ],
+        "result": "PASS; requirement behavior verified. Latest-head full CI, integration and exact dev deployment remain pending."
       }
     },
     {
       "id": "TOWER-CHALLENGE-20",
       "title": "永久契約同步",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
-        "verification": "Targeted Node matrix and exact candidate production browser gate pending",
+        "verification": "Production Chrome 412×915, CI run 36984210420, head a1e208abd223c1f6f20d978f65a95822dd79fb34, artifact 11216788440: 27 exact ordered scenes, 10-unit queue, real Heal/Freeze, 10-target AOE/feedback, rules and battle screenshots inspected; targeted 4×100 Node matrix/formula/isolation tests PASS. Integration/deployment tracked separately.",
         "files": [
           "tests/tower-challenge-formula.test.js",
           "tests/tower-element-formation-small-boss-20260924.test.js",
-          ".github/scripts/run-tower-challenge-browser-qa.mjs"
-        ]
+          ".github/scripts/run-tower-challenge-browser-qa.mjs",
+          "docs/qa/tower-challenge-profile-20261002.md"
+        ],
+        "result": "PASS; requirement behavior verified. Latest-head full CI, integration and exact dev deployment remain pending."
       }
     },
     {
       "id": "TOWER-CHALLENGE-21",
       "title": "一般層 10 真實單位",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
-        "verification": "Targeted Node matrix and exact candidate production browser gate pending",
+        "verification": "Production Chrome 412×915, CI run 36984210420, head a1e208abd223c1f6f20d978f65a95822dd79fb34, artifact 11216788440: 27 exact ordered scenes, 10-unit queue, real Heal/Freeze, 10-target AOE/feedback, rules and battle screenshots inspected; targeted 4×100 Node matrix/formula/isolation tests PASS. Integration/deployment tracked separately.",
         "files": [
           "tests/tower-challenge-formula.test.js",
           "tests/tower-element-formation-small-boss-20260924.test.js",
-          ".github/scripts/run-tower-challenge-browser-qa.mjs"
-        ]
+          ".github/scripts/run-tower-challenge-browser-qa.mjs",
+          "docs/qa/tower-challenge-profile-20261002.md"
+        ],
+        "result": "PASS; requirement behavior verified. Latest-head full CI, integration and exact dev deployment remain pending."
       }
     },
     {
       "id": "TOWER-CHALLENGE-22",
       "title": "四元素每層 10 人",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
-        "verification": "Targeted Node matrix and exact candidate production browser gate pending",
+        "verification": "Production Chrome 412×915, CI run 36984210420, head a1e208abd223c1f6f20d978f65a95822dd79fb34, artifact 11216788440: 27 exact ordered scenes, 10-unit queue, real Heal/Freeze, 10-target AOE/feedback, rules and battle screenshots inspected; targeted 4×100 Node matrix/formula/isolation tests PASS. Integration/deployment tracked separately.",
         "files": [
           "tests/tower-challenge-formula.test.js",
           "tests/tower-element-formation-small-boss-20260924.test.js",
-          ".github/scripts/run-tower-challenge-browser-qa.mjs"
-        ]
+          ".github/scripts/run-tower-challenge-browser-qa.mjs",
+          "docs/qa/tower-challenge-profile-20261002.md"
+        ],
+        "result": "PASS; requirement behavior verified. Latest-head full CI, integration and exact dev deployment remain pending."
       }
     },
     {
       "id": "TOWER-CHALLENGE-23",
       "title": "Elite 2+8",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
-        "verification": "Targeted Node matrix and exact candidate production browser gate pending",
+        "verification": "Production Chrome 412×915, CI run 36984210420, head a1e208abd223c1f6f20d978f65a95822dd79fb34, artifact 11216788440: 27 exact ordered scenes, 10-unit queue, real Heal/Freeze, 10-target AOE/feedback, rules and battle screenshots inspected; targeted 4×100 Node matrix/formula/isolation tests PASS. Integration/deployment tracked separately.",
         "files": [
           "tests/tower-challenge-formula.test.js",
           "tests/tower-element-formation-small-boss-20260924.test.js",
-          ".github/scripts/run-tower-challenge-browser-qa.mjs"
-        ]
+          ".github/scripts/run-tower-challenge-browser-qa.mjs",
+          "docs/qa/tower-challenge-profile-20261002.md"
+        ],
+        "result": "PASS; requirement behavior verified. Latest-head full CI, integration and exact dev deployment remain pending."
       }
     },
     {
       "id": "TOWER-CHALLENGE-24",
       "title": "Boss 1+2+7",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
-        "verification": "Targeted Node matrix and exact candidate production browser gate pending",
+        "verification": "Production Chrome 412×915, CI run 36984210420, head a1e208abd223c1f6f20d978f65a95822dd79fb34, artifact 11216788440: 27 exact ordered scenes, 10-unit queue, real Heal/Freeze, 10-target AOE/feedback, rules and battle screenshots inspected; targeted 4×100 Node matrix/formula/isolation tests PASS. Integration/deployment tracked separately.",
         "files": [
           "tests/tower-challenge-formula.test.js",
           "tests/tower-element-formation-small-boss-20260924.test.js",
-          ".github/scripts/run-tower-challenge-browser-qa.mjs"
-        ]
+          ".github/scripts/run-tower-challenge-browser-qa.mjs",
+          "docs/qa/tower-challenge-profile-20261002.md"
+        ],
+        "result": "PASS; requirement behavior verified. Latest-head full CI, integration and exact dev deployment remain pending."
       }
     },
     {
       "id": "TOWER-CHALLENGE-25",
       "title": "第100層 10人",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
-        "verification": "Targeted Node matrix and exact candidate production browser gate pending",
+        "verification": "Production Chrome 412×915, CI run 36984210420, head a1e208abd223c1f6f20d978f65a95822dd79fb34, artifact 11216788440: 27 exact ordered scenes, 10-unit queue, real Heal/Freeze, 10-target AOE/feedback, rules and battle screenshots inspected; targeted 4×100 Node matrix/formula/isolation tests PASS. Integration/deployment tracked separately.",
         "files": [
           "tests/tower-challenge-formula.test.js",
           "tests/tower-element-formation-small-boss-20260924.test.js",
-          ".github/scripts/run-tower-challenge-browser-qa.mjs"
-        ]
+          ".github/scripts/run-tower-challenge-browser-qa.mjs",
+          "docs/qa/tower-challenge-profile-20261002.md"
+        ],
+        "result": "PASS; requirement behavior verified. Latest-head full CI, integration and exact dev deployment remain pending."
       }
     },
     {
       "id": "TOWER-CHALLENGE-26",
       "title": "全體技10目標獨立結算",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
-        "verification": "Targeted Node matrix and exact candidate production browser gate pending",
+        "verification": "Production Chrome 412×915, CI run 36984210420, head a1e208abd223c1f6f20d978f65a95822dd79fb34, artifact 11216788440: 27 exact ordered scenes, 10-unit queue, real Heal/Freeze, 10-target AOE/feedback, rules and battle screenshots inspected; targeted 4×100 Node matrix/formula/isolation tests PASS. Integration/deployment tracked separately.",
         "files": [
           "tests/tower-challenge-formula.test.js",
           "tests/tower-element-formation-small-boss-20260924.test.js",
-          ".github/scripts/run-tower-challenge-browser-qa.mjs"
-        ]
+          ".github/scripts/run-tower-challenge-browser-qa.mjs",
+          "docs/qa/tower-challenge-profile-20261002.md"
+        ],
+        "result": "PASS; requirement behavior verified. Latest-head full CI, integration and exact dev deployment remain pending."
       }
     },
     {
       "id": "TOWER-CHALLENGE-27",
       "title": "無6Target舊限制",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
-        "verification": "Targeted Node matrix and exact candidate production browser gate pending",
+        "verification": "Production Chrome 412×915, CI run 36984210420, head a1e208abd223c1f6f20d978f65a95822dd79fb34, artifact 11216788440: 27 exact ordered scenes, 10-unit queue, real Heal/Freeze, 10-target AOE/feedback, rules and battle screenshots inspected; targeted 4×100 Node matrix/formula/isolation tests PASS. Integration/deployment tracked separately.",
         "files": [
           "tests/tower-challenge-formula.test.js",
           "tests/tower-element-formation-small-boss-20260924.test.js",
-          ".github/scripts/run-tower-challenge-browser-qa.mjs"
-        ]
+          ".github/scripts/run-tower-challenge-browser-qa.mjs",
+          "docs/qa/tower-challenge-profile-20261002.md"
+        ],
+        "result": "PASS; requirement behavior verified. Latest-head full CI, integration and exact dev deployment remain pending."
       }
     },
     {
       "id": "TOWER-CHALLENGE-28",
       "title": "10個唯一格位",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
-        "verification": "Targeted Node matrix and exact candidate production browser gate pending",
+        "verification": "Production Chrome 412×915, CI run 36984210420, head a1e208abd223c1f6f20d978f65a95822dd79fb34, artifact 11216788440: 27 exact ordered scenes, 10-unit queue, real Heal/Freeze, 10-target AOE/feedback, rules and battle screenshots inspected; targeted 4×100 Node matrix/formula/isolation tests PASS. Integration/deployment tracked separately.",
         "files": [
           "tests/tower-challenge-formula.test.js",
           "tests/tower-element-formation-small-boss-20260924.test.js",
-          ".github/scripts/run-tower-challenge-browser-qa.mjs"
-        ]
+          ".github/scripts/run-tower-challenge-browser-qa.mjs",
+          "docs/qa/tower-challenge-profile-20261002.md"
+        ],
+        "result": "PASS; requirement behavior verified. Latest-head full CI, integration and exact dev deployment remain pending."
       }
     },
     {
       "id": "TOWER-CHALLENGE-29",
       "title": "第7～10隻 AI 可行動",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
-        "verification": "Targeted Node matrix and exact candidate production browser gate pending",
+        "verification": "Production Chrome 412×915, CI run 36984210420, head a1e208abd223c1f6f20d978f65a95822dd79fb34, artifact 11216788440: 27 exact ordered scenes, 10-unit queue, real Heal/Freeze, 10-target AOE/feedback, rules and battle screenshots inspected; targeted 4×100 Node matrix/formula/isolation tests PASS. Integration/deployment tracked separately.",
         "files": [
           "tests/tower-challenge-formula.test.js",
           "tests/tower-element-formation-small-boss-20260924.test.js",
-          ".github/scripts/run-tower-challenge-browser-qa.mjs"
-        ]
+          ".github/scripts/run-tower-challenge-browser-qa.mjs",
+          "docs/qa/tower-challenge-profile-20261002.md"
+        ],
+        "result": "PASS; requirement behavior verified. Latest-head full CI, integration and exact dev deployment remain pending."
       }
     },
     {
       "id": "TOWER-CHALLENGE-30",
       "title": "10隻×80% Browser 壓力驗收",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
-        "verification": "Targeted Node matrix and exact candidate production browser gate pending",
+        "verification": "Production Chrome 412×915, CI run 36984210420, head a1e208abd223c1f6f20d978f65a95822dd79fb34, artifact 11216788440: 27 exact ordered scenes, 10-unit queue, real Heal/Freeze, 10-target AOE/feedback, rules and battle screenshots inspected; targeted 4×100 Node matrix/formula/isolation tests PASS. Integration/deployment tracked separately.",
         "files": [
           "tests/tower-challenge-formula.test.js",
           "tests/tower-element-formation-small-boss-20260924.test.js",
-          ".github/scripts/run-tower-challenge-browser-qa.mjs"
-        ]
+          ".github/scripts/run-tower-challenge-browser-qa.mjs",
+          "docs/qa/tower-challenge-profile-20261002.md"
+        ],
+        "result": "PASS; requirement behavior verified. Latest-head full CI, integration and exact dev deployment remain pending."
       }
     },
     {
       "id": "TOWER-CHALLENGE-31",
       "title": "其他模式 Enemy Count 隔離",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
-        "verification": "Targeted Node matrix and exact candidate production browser gate pending",
+        "verification": "Production Chrome 412×915, CI run 36984210420, head a1e208abd223c1f6f20d978f65a95822dd79fb34, artifact 11216788440: 27 exact ordered scenes, 10-unit queue, real Heal/Freeze, 10-target AOE/feedback, rules and battle screenshots inspected; targeted 4×100 Node matrix/formula/isolation tests PASS. Integration/deployment tracked separately.",
         "files": [
           "tests/tower-challenge-formula.test.js",
           "tests/tower-element-formation-small-boss-20260924.test.js",
-          ".github/scripts/run-tower-challenge-browser-qa.mjs"
-        ]
+          ".github/scripts/run-tower-challenge-browser-qa.mjs",
+          "docs/qa/tower-challenge-profile-20261002.md"
+        ],
+        "result": "PASS; requirement behavior verified. Latest-head full CI, integration and exact dev deployment remain pending."
       }
     }
-  ]
+  ],
+  "verification": {
+    "candidateSha": "a1e208abd223c1f6f20d978f65a95822dd79fb34",
+    "runId": 36984210420,
+    "artifactId": 11216788440,
+    "viewport": "412x915",
+    "physicalDevice": "PENDING",
+    "integration": "PENDING",
+    "deployment": "PENDING"
+  }
 }

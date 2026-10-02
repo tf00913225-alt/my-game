@@ -379,13 +379,14 @@
     {
       "id": "TOWER-CHALLENGE-PROFILE-20261002",
       "title": "四象塔挑戰特性、共同技能率與每層固定10人",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
         "files": [
-          "release/requirement-batches/2026-10-02-tower-challenge-profile.json"
+          "release/requirement-batches/2026-10-02-tower-challenge-profile.json",
+          "docs/qa/tower-challenge-profile-20261002.md"
         ],
-        "verification": "31 requirement rows; exact candidate production browser and CI pending",
-        "result": "Targeted Node matrix and formula tests pass; NOT COMPLETE until browser / CI / dev deployment verified"
+        "verification": "Production Chrome 412×915, CI run 36984210420, head a1e208abd223c1f6f20d978f65a95822dd79fb34, artifact 11216788440: 27 exact ordered scenes, 10-unit queue, real Heal/Freeze, 10-target AOE/feedback, rules and battle screenshots inspected; targeted 4×100 Node matrix/formula/isolation tests PASS. Integration/deployment tracked separately.",
+        "result": "31/31 functional requirements VERIFIED; latest-head full CI, integration and deployment are separate pending gates. Android physical acceptance is not claimed."
       }
     }
   ]

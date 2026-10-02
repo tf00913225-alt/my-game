@@ -1,3 +1,10 @@
+## 2026-10-02 — TOWER-CHALLENGE-PROFILE-20261002 功能驗收接續
+
+- 沿用 PR #757／feature/tower-challenge-element-profiles-20261002；正常吸收 dev@7911c985 的鍛造冷入口修正。未 rebase、force push 或修改 main。
+- 31/31 功能 VERIFIED：候選 a1e208abd223c1f6f20d978f65a95822dd79fb34，run 36984210420 tower gate PASS，artifact 11216788440。正式 Chrome 412×915 的27場、十隻自然佇列、Heal／Freeze、硬控上限、全體技十次結算與battle／rules PNG已核對；詳細 docs/qa/tower-challenge-profile-20261002.md。Android實體驗收未宣稱。
+- 續修只遷移退休的舊測試、等待Startup owner、核對27場完整順序、透過正式closeHomeFeature關閉登入公告後驗證可見場景。早期遮擋截圖不作證據，沒有降低戰鬥斷言。
+- 功能驗收與整合／部署分離：此文件Head仍須必要CI，通過後PR合併dev、檢查Cloudflare部署與SHA、再安全清理分支。Game／Cache173.72不變，尚未完整結案。
+
 ## 2026-10-02 — TOWER-CHALLENGE-PROFILE-20261002 (IMPLEMENTED candidate)
 
 - Base dev `3fabca40a841a9b61ff704f9a5db6cc78ba6c353`; branch `feature/tower-challenge-element-profiles-20261002`; target dev, main excluded. Replacement/Convergence of tower common frequency, element profile and normal floor roster.
