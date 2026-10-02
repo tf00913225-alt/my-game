@@ -36,7 +36,8 @@ try{
   await c.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true,screenWidth:width,screenHeight:height});
   await c.send('Page.navigate',{url:server.url});assert.equal(await c.eval(READY),true);
   // Enter through the actual home card before accessing the lazy runtime.
-  await tap('[onclick="openHomeFeature(\'forge\')"]');await pause();
+  await tap('[onclick="openHomeFeature(\'forge\')"]');
+  await c.eval(`(async()=>{const end=Date.now()+10000;while(Date.now()<end&&typeof v141SwitchForgeTab!=='function')await new Promise(r=>setTimeout(r,50));return true;})()`);
   assert.equal(await c.eval(`typeof v141SwitchForgeTab`),'function');assert.equal(await c.eval(FIXTURE),true);
   await c.eval(`v141SwitchForgeTab('reforge')`);
   assert.deepEqual(await c.eval(`Array.from(document.querySelectorAll('.v141-forge-tabs button'),n=>n.textContent)`),['冶煉','鑲嵌']);
@@ -47,6 +48,12 @@ try{
   assert.ok(geometry.left>=-1&&geometry.right<=width+1&&geometry.overflow<=1,'forge overflow');assert.ok(geometry.fonts.every(n=>n>=12.9),'forge text below 13px');
   // Long choices scroll in the existing body; selecting returns to one slot.
   await tap('.v141-forge-picker summary');
+  const drag=await c.eval(`(()=>{const b=document.querySelector('.v141-synthesis-body'),r=b.getBoundingClientRect();b.scrollTop=0;return {x:r.left+r.width/2,y:r.bottom-25,to:r.top+25};})()`);
+  await c.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:drag.x,y:drag.y}]});
+  for(let i=1;i<=8;i++){await c.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:drag.x,y:drag.y+(drag.to-drag.y)*i/8}]});await new Promise(r=>setTimeout(r,20));}
+  await c.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await pause();
+  const scrollTop=await c.eval(`document.querySelector('.v141-synthesis-body').scrollTop`);assert.ok(scrollTop>0,'equipment choices cannot touch scroll');
+  assert.equal(await c.eval(`document.querySelector('.v141-forge-option.selected').dataset.forgeValue`),'forge-qa-orange','scroll selected a different item');
   await tap('[data-forge-value="forge-qa-19"]');assert.equal(await c.eval(`document.querySelectorAll('.v141-socket').length`),1);
   await tap('.v141-forge-picker summary');await tap('[data-forge-value="forge-qa-orange"]');
   await tap('.v141-socket-card .v141-synthesis-primary');
@@ -61,7 +68,7 @@ try{
   assert.deepEqual(await c.eval(`Array.from(document.querySelectorAll('.v141-forge-tabs button'),n=>n.textContent)`),['冶煉','鑲嵌']);
   assert.equal(await c.eval(`(()=>{const repo=FourSymbolsAccountSave,s=repo.readActive();repo.writeForUid(s.uid,s.save,{source:'authoritative-cloud-read',cloudBaseFingerprint:'v1:1:00000000000000000000000000000000',localDirty:false});v141SelectSocketItem('forge-qa-equipped');return v141SocketGem();})()`),false,'cloud character used local socket mutation');
   const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(OUT,`forge-${width}.png`),Buffer.from(shot.data,'base64'));
-  evidence.push({width,height,geometry,saved,equippedBonus:1,unequippedBonus:0,cloudMutationBlocked:true});console.log('PASS forge touch runtime '+width+'x'+height);
+  evidence.push({width,height,geometry,scrollTop,saved,equippedBonus:1,unequippedBonus:0,cloudMutationBlocked:true});console.log('PASS forge touch runtime '+width+'x'+height);
  }
  fs.writeFileSync(path.join(OUT,'evidence.json'),JSON.stringify({passed:true,sha:process.env.GITHUB_SHA||null,evidence},null,2)+'\n');
 }catch(error){if(c){try{const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(OUT,'failure.png'),Buffer.from(shot.data,'base64'));}catch{}}fs.writeFileSync(path.join(OUT,'evidence.json'),JSON.stringify({passed:false,error:String(error.stack||error),evidence},null,2)+'\n');throw error;

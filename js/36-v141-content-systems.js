@@ -214,15 +214,17 @@
         const capacity=window.FourSymbolsEquipmentGems.capacity(item);
         const sockets=Array.isArray(item.sockets)?item.sockets.slice(0,capacity):[];
         const defs=window.FourSymbolsEquipmentGems.definitions;
-        const gems=inventoryItems.filter(candidate=>candidate&&defs[candidate.id]&&Number(candidate.count)>0);
+        const gems=inventoryItems.filter(candidate=>candidate&&typeof candidate.id==="string"&&Object.prototype.hasOwnProperty.call(defs,candidate.id)&&Number(candidate.count)>0);
         if(!gems.some(gem=>gem.id===synthesisState.gemId)){ synthesisState.gemId=gems[0]&&gems[0].id||null; }
         const available=nextSocketIndex(item)>=0;
         const local=canUseLocalSockets();
         return '<div class="v141-synthesis-card v141-socket-card">'+
             renderForgePicker('選擇裝備',entries.map(entry=>({value:entry.item.v141Uid,label:entry.item.name+'［'+entry.source+'］'})),synthesisState.socketUid,'v141SelectSocketItem')+
             '<div class="v141-socket-list" aria-label="鑲嵌孔">'+Array.from({length:capacity},(_,index)=>{
-                const gem=defs[sockets[index]];
-                return '<div class="v141-socket"><span aria-hidden="true">'+(gem?escapeHtml(gem.icon):'◇')+'</span><b>'+(gem?escapeHtml(gem.name):'空孔')+'</b><small>'+(gem?statsHtml(gem.stats):'可鑲嵌')+'</small></div>';
+                const id=sockets[index];
+                const gem=typeof id==="string"&&Object.prototype.hasOwnProperty.call(defs,id)?defs[id]:null;
+                const unknown=id!=null&&!gem;
+                return '<div class="v141-socket"><span aria-hidden="true">'+(gem?escapeHtml(gem.icon):'◇')+'</span><b>'+(gem?escapeHtml(gem.name):unknown?'無法識別':'空孔')+'</b><small>'+(gem?statsHtml(gem.stats):unknown?'請保留原資料':'可鑲嵌')+'</small></div>';
             }).join('')+'</div>'+
             (gems.length?renderForgePicker('選擇寶石',gems.map(gem=>({value:gem.id,label:defs[gem.id].name+' ×'+Math.floor(Number(gem.count))+'（'+Object.entries(defs[gem.id].stats).map(([key,value])=>(STAT_LABEL[key]||key)+' +'+value).join('、')+'）'})),synthesisState.gemId,'v141SelectSocketGem'):'<p>背包沒有可鑲嵌的寶石。</p>')+
             (!local?'<p>目前角色尚未開放鑲嵌。</p>':!available?'<p>孔位已滿或孔位資料無法使用。</p>':'')+
