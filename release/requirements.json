@@ -252,15 +252,16 @@
     {
       "id": "REQ-FORGE-SOCKETS-GEMS-20261002",
       "title": "鍛造與裝備寶石第一階段",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
         "files": [
           "release/requirement-batches/2026-10-02-forge-sockets-gems.json",
           "tests/forge-sockets-gems.test.js",
-          ".github/scripts/run-forge-sockets-browser-qa.mjs"
+          ".github/scripts/run-forge-sockets-browser-qa.mjs",
+          "docs/qa/forge-sockets-gems-20261002.md"
         ],
-        "verification": "本機必要回歸通過；最新提交 CI、production 建置與390／412觸控證據待確認。",
-        "result": "依階級0/0/0/1/2/3孔、最小寶石定義、存檔回滾與屬性接入已施工；正式後端交易與取得來源不在本階段完成範圍。"
+        "verification": "6/6 第一階段 VERIFIED；候選 CI 36966366859 與 dev 檢查 36967167176 attempt 2 通過，dev@b61f87d 部署 SHA／173.72 版本與快取核對、390／412 deployed-dev Chrome 觸控證據通過（artifact 11210577025）。",
+        "result": "鍛造入口／無圖紙冶煉／0/0/0/1/2/3孔／最小寶石／本機 UID 安全鑲嵌與屬性／手機介面逐項通過。雲端權威角色拒絕本機鑲嵌；可信後端交易與寶石取得來源仍在後續範圍，非 Android 實體驗收。"
       }
     }
   ]
