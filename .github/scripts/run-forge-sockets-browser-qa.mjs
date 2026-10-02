@@ -41,11 +41,15 @@ try{
  }
  await c.send('Page.addScriptToEvaluateOnNewDocument',{source:qaPrelude().replace(/^<script>|<\/script>$/g,'')});
  async function tap(selector){
-  const point=await c.eval(`(()=>{const n=document.querySelector(${JSON.stringify(selector)});if(!n)throw Error('missing control '+${JSON.stringify(selector)});n.scrollIntoView({block:'nearest',behavior:'instant'});const r=n.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,h=document.elementFromPoint(x,y);if(n.disabled||!r.width||!r.height||!(h&&(n===h||n.contains(h))))throw Error('untappable control '+${JSON.stringify(selector)}+' '+JSON.stringify({rect:r.toJSON(),hit:h&&{tag:h.tagName,id:h.id,class:h.className},body:document.querySelector('.v141-synthesis-body')?.getBoundingClientRect().toJSON(),nav:document.getElementById('bottomNav')?.getBoundingClientRect().toJSON(),detailsOpen:n.closest('details')?.open,scrollTop:document.querySelector('.v141-synthesis-body')?.scrollTop}));return {x,y,summary:n.tagName==='SUMMARY',wasOpen:n.tagName==='SUMMARY'?n.parentElement.open:null};})()`);
+  const point=await c.eval(`(async()=>{const n=document.querySelector(${JSON.stringify(selector)});if(!n)throw Error('missing control '+${JSON.stringify(selector)});n.scrollIntoView({block:'nearest',behavior:'instant'});await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));const r=n.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,h=document.elementFromPoint(x,y);if(n.disabled||!r.width||!r.height||!(h&&(n===h||n.contains(h))))throw Error('untappable control '+${JSON.stringify(selector)}+' '+JSON.stringify({rect:r.toJSON(),hit:h&&{tag:h.tagName,id:h.id,class:h.className},body:document.querySelector('.v141-synthesis-body')?.getBoundingClientRect().toJSON(),nav:document.getElementById('bottomNav')?.getBoundingClientRect().toJSON(),detailsOpen:n.closest('details')?.open,scrollTop:document.querySelector('.v141-synthesis-body')?.scrollTop}));return {x,y,summary:n.tagName==='SUMMARY',wasOpen:n.tagName==='SUMMARY'?n.parentElement.open:null};})()`);
   await c.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:point.x,y:point.y}]});await c.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await pause();
   if(point.summary){
    assert.equal(await c.eval(`(async()=>{const end=Date.now()+1500;while(Date.now()<end){const n=document.querySelector(${JSON.stringify(selector)});if(n?.parentElement.open!==${point.wasOpen})return true;await new Promise(r=>setTimeout(r,30));}return false;})()`),true,'summary touch did not toggle picker '+selector);
   }
+ }
+ async function openEquipmentPicker(){
+  if(!await c.eval(`document.querySelector('.v141-forge-picker').open`))await tap('.v141-forge-picker summary');
+  assert.equal(await c.eval(`document.querySelector('.v141-forge-picker').open`),true,'equipment picker is closed');
  }
  for(const [width,height] of [[390,844],[412,915]]){
   await c.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true,screenWidth:width,screenHeight:height});
@@ -58,25 +62,25 @@ try{
   assert.deepEqual(await c.eval(`Array.from(document.querySelectorAll('.v141-forge-tabs button'),n=>n.textContent)`),['冶煉','鑲嵌']);
   assert.equal(await c.eval(`Array.from(document.querySelectorAll('#homeFeatureModalBody select')).filter(n=>{const r=n.getBoundingClientRect();return r.width&&r.height}).length`),0,'visible native selector in forge');
   await tap('.v141-forge-tabs button:last-child');
-  await tap('.v141-forge-picker summary');await tap('[data-forge-value="forge-qa-orange"]');
+  await openEquipmentPicker();await tap('[data-forge-value="forge-qa-orange"]');
   assert.equal(await c.eval(`document.querySelectorAll('.v141-socket').length`),1);
   const geometry=await c.eval(`(()=>{const card=document.querySelector('.v141-socket-card'),body=document.querySelector('.v141-synthesis-body'),r=card.getBoundingClientRect();return {left:r.left,right:r.right,overflow:card.scrollWidth-card.clientWidth,bodyOverflow:getComputedStyle(body).overflowY,fonts:[...card.querySelectorAll('summary,button,small')].filter(n=>{const a=n.getBoundingClientRect();return a.width>0&&a.height>0}).map(n=>{const a=n.getBoundingClientRect();return {tag:n.tagName,text:n.textContent,font:parseFloat(getComputedStyle(n).fontSize)*(n.offsetWidth?a.width/n.offsetWidth:1)}})};})()`);
   assert.ok(geometry.left>=-1&&geometry.right<=width+1&&geometry.overflow<=1,'forge overflow');assert.ok(geometry.fonts.length&&geometry.fonts.every(n=>n.font>=12.9),'forge text below 13px '+JSON.stringify(geometry));
   assert.equal(await c.eval(`(()=>{const b=document.querySelector('.v141-synthesis-body').getBoundingClientRect(),nav=document.getElementById('bottomNav').getBoundingClientRect();return b.bottom<=nav.top+1;})()`),true,'forge scroll area extends behind native navigation');
   // Long choices scroll in the existing body; selecting returns to one slot.
-  await tap('.v141-forge-picker summary');
+  await openEquipmentPicker();
   const drag=await c.eval(`(()=>{const b=document.querySelector('.v141-synthesis-body'),r=b.getBoundingClientRect();b.scrollTop=0;return {x:r.left+r.width/2,y:r.bottom-25,to:r.top+25};})()`);
   await c.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:drag.x,y:drag.y}]});
   for(let i=1;i<=8;i++){await c.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:drag.x,y:drag.y+(drag.to-drag.y)*i/8}]});await new Promise(r=>setTimeout(r,20));}
   await c.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await pause();
   const scrollTop=await c.eval(`document.querySelector('.v141-synthesis-body').scrollTop`);assert.ok(scrollTop>0,'equipment choices cannot touch scroll');
   assert.equal(await c.eval(`document.querySelector('.v141-forge-option.selected').dataset.forgeValue`),'forge-qa-orange','scroll selected a different item');
-  await tap('[data-forge-value="forge-qa-19"]');assert.equal(await c.eval(`document.querySelectorAll('.v141-socket').length`),1);
-  await tap('.v141-forge-picker summary');await tap('[data-forge-value="forge-qa-orange"]');
+  await tap('[data-forge-value="forge-qa-19"]');assert.equal(await c.eval(`document.querySelector('.v141-forge-option.selected').dataset.forgeValue`),'forge-qa-19','real touch did not select the last equipment');assert.equal(await c.eval(`document.querySelectorAll('.v141-socket').length`),1);
+  await openEquipmentPicker();await tap('[data-forge-value="forge-qa-orange"]');
   await tap('.v141-socket-card .v141-synthesis-primary');
   const saved=await c.eval(`(()=>{const s=FourSymbolsAccountSave.readActive().save;return {sockets:s.inventoryItems.find(n=>n.v141Uid==='forge-qa-orange').sockets,count:s.inventoryItems.find(n=>n.id==='gemVitalityI').count,blocked:v141SocketGem()===false};})()`);
   assert.deepEqual(saved,{sockets:['gemVitalityI'],count:3,blocked:true});
-  await tap('.v141-forge-picker summary');await tap('[data-forge-value="forge-qa-equipped"]');assert.equal(await c.eval(`document.querySelectorAll('.v141-socket').length`),2);
+  await openEquipmentPicker();await tap('[data-forge-value="forge-qa-equipped"]');assert.equal(await c.eval(`document.querySelectorAll('.v141-socket').length`),2);
   await tap('.v141-socket-card .v141-synthesis-primary');
   assert.equal(await c.eval(`getEquipmentBonus('fire').vitality`),1);
   assert.equal(await c.eval(`(()=>{loadGame(JSON.parse(JSON.stringify(FourSymbolsAccountSave.readActive().save)));return getEquipmentBonus('fire').vitality;})()`),1,'hydration lost sockets');
