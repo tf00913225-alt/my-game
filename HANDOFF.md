@@ -1,3 +1,10 @@
+## 2026-10-02 — RELEASE-SCOPE-P0-20261002
+
+- 即時基線 dev `5de3e04690b9f20569b7e789240488f33aa4cd40`、main `4b037b47967544d90c781ad938286777c9576731`。本次 NORMAL DEVELOPMENT 收斂，結論 RELEASE BLOCKED：1 項真正 P0（完整正式發布 Node suites 尚有45個非環境失敗測試檔）。不是45個已確認遊戲bug。
+- 詳見 docs/V17373_RELEASE_SCOPE_20261002.md、release/v17373-scope.json。五項原 IMPLEMENTED 逐字留在 deferred，原 batches／Cloud Phase 進度不改；Checklist22 VERIFIED／1 BLOCKED，沒有硬改完成。
+- 只修土塔 portrait identity／Boss crit 測試 fixture；Runtime不變。Cloud完整恢復、正式獎勵後續、素材完整批次／Android驗收延後，既有active素材安全仍核對。
+- 工作分支 fix/v17373-release-scope-p0-20261002，目標dev PR。此checkpoint尚不宣稱PR合併／新HEAD部署完成；須以GitHub實際CI與部署狀態核對。Game／Cache173.72不變；未指定RC SHA、未進Freeze、未動main。
+
 ## 2026-10-02 — TOWER-CHALLENGE-PROFILE-20261002 功能驗收接續
 
 - 沿用 PR #757／feature/tower-challenge-element-profiles-20261002；正常吸收 dev@7911c985 的鍛造冷入口修正。未 rebase、force push 或修改 main。

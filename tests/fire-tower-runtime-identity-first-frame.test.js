@@ -105,7 +105,13 @@ function testCrossElementIsolation(){
         const id=runtime.context.GameplaySystem.getTowerPortraitAssetId(element,10,"boss",0);
         if(element==="fire") assert.match(id,/^MON_FIRE_/,"fire tower must use the fire portrait plan");
         else if(element==="wind") assert.match(id,/^MON_WIND_/,"wind tower must use the wind portrait plan");
-        else assert.equal(id,null,element+" tower must not inherit fire or wind portrait plans");
+        else if(element==="earth") assert.match(id,/^MON_EARTH_/,"earth tower must use its adopted earth portrait plan");
+        else assert.equal(id,null,"water tower must retain its generic fallback until water tower portraits are adopted");
+        if(id){
+            const record=registry.assetPool.entries.find(entry=>entry.assetId===id);
+            assert.equal(record?.element,element,"portrait plan must resolve to its own element");
+            assert.equal(record?.status,"adopted","only adopted portraits may enter the tower plan");
+        }
     }
 }
 
