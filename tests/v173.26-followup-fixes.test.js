@@ -72,13 +72,14 @@ test("the final character scroll owner has no synthetic bottom spacer",()=>{
     assert.doesNotMatch(v131Css,/padding-bottom:110px/);
 });
 
-test("turn-end status and buff cleanup resynchronize Sprites at one shared boundary",()=>{
+test("round-end cleanup resynchronizes Sprites; round-start only projects settled state",()=>{
     const startTurn=extractFunction(main,"startTurn");
     const entity={
         statusEffects:[{type:"frostbite",turnsLeft:1}],
         activeBuffs:[{type:"dodgeSkill",turnsLeft:1}]
     };
     let synced=null;
+    let ticks=0;
     const context={
         window:null,Set,
         battleActive:true,battleToken:7,turn:2,
@@ -88,10 +89,14 @@ test("turn-end status and buff cleanup resynchronize Sprites at one shared bound
         turnAdvancePending:true,queuedPlayerActions:null,
         addBattleLog(){},$(){ return null; },
         notifyBattleRoundBoundary(){},
-        tickStatusEffects(){ entity.statusEffects=[]; },
+        tickStatusEffects(){ ticks++; },
         tickPlayerBuffs(){ entity.activeBuffs=[]; },
         checkBattleEnd(){ return false; },
-        updateActionHudVisibility(){},showAutoBattleRoundPrompt(){},beginCharacterTurn(){}
+        updateActionHudVisibility(){},showAutoBattleRoundPrompt(){},beginCharacterTurn(){},
+        getExistingPartyIndexes:()=>[0],getPartyCharacterByIndex:()=>entity,
+        currentBattleMonsters:[],monsters:[],updateUI(){},
+        expireBattleActionBuff(entity,buff){ entity.activeBuffs=entity.activeBuffs.filter(item=>item!==buff); },
+        expireBattleActionStatus(entity,status){ entity.statusEffects=entity.statusEffects.filter(item=>item!==status); }
     };
     context.window=context;
     context.v143SyncStatusVisualEffects=function(){
@@ -103,11 +108,28 @@ test("turn-end status and buff cleanup resynchronize Sprites at one shared bound
     vm.createContext(context);
     vm.runInContext(startTurn,context);
     context.startTurn(7);
+    assert.equal(ticks,0,"round start cannot consume durations again");
+    assert.equal(synced.statuses.length,1);
+    assert.equal(synced.buffs.length,1);
+    const roundEnd=main.match(/function consumeRoundEndDurations\(\)\{[\s\S]*?\n\}/);
+    assert.ok(roundEnd);
+    const predicate=main.match(/function shouldConsumeRoundEndState\(entry\)\{[\s\S]*?\n\}/);
+    assert.ok(predicate);
+    vm.runInContext(predicate[0]+roundEnd[0],context);
+    context.consumeRoundEndDurations();
+    assert.equal(ticks,1);
     assert.deepEqual(synced,{statuses:[],buffs:[]});
+    context.battleActive=false;
+    context.consumeRoundEndDurations();
+    assert.equal(ticks,1,"teardown cannot consume expired state");
 });
 
 test("status popup stays below the HP damage lane",()=>{
-    assert.match(statusPopup,/rect\.top\+rect\.height\*\.86/);
+    const feedback=read("js/battle-floating-feedback-owner.js");
+    assert.match(statusPopup,/feedback\.emitAtImpact\(\{[^}]*kind:"status",statusType:type/);
+    assert.match(feedback,/const laneY=metrics\.baseline-lane\*LANE_PITCH_PX/);
+    assert.match(feedback,/function phaseOrder\(kind\)\{[^}]*kind==="status"\?30:20/);
+    assert.doesNotMatch(statusPopup,/rect\.top\+rect\.height\*\.86/);
     assert.doesNotMatch(statusPopup,/rect\.top\+rect\.height\*\.68/);
 });
 

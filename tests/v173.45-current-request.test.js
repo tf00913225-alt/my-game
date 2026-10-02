@@ -3,7 +3,7 @@ const fs=require("fs");
 const read=path=>fs.readFileSync(path,"utf8");
 
 const battle=read("js/42-v148-combat-dungeon-fixes.js");
-const water=read("js/50-v169-water-skill-rules.js");
+const water=read("js/60-v173.64-skill-progression-rebalance.js");
 const elementBox=read("js/45-v154-dev-fixes.js");
 const elementCss=read("css/46-v154-dev-fixes.css");
 const content=read("js/36-v141-content-systems.js");
@@ -11,9 +11,10 @@ const shop=read("js/51-v169-rpg-ui.js");
 const shopCss=read("css/49-v169-rpg-ui.css");
 const touch=read("js/01-stage-v8-touch-lock.js");
 
-// 1. Purify Mind can be aimed at either side; enemies lose positive states only.
-assert.match(water,/purifyMind:\{[\s\S]*?targetType:"ally",enemyTargetAllowed:true/);
-assert.ok(water.includes("對敵方解除所有增益狀態（包含結界、護盾等）"));
+// 1. Purify Mind targets either side and clears removable states via the formal owner.
+assert.match(water,/purifyMind:\{[^}]*targetType:"ally",enemyTargetAllowed:true/);
+assert.match(water,/purifyMind:\{[^}]*removeAllStates:true/);
+assert.match(battle,/removed\+=clearRemovableEntityStates\(entity,targetSide\)/);
 assert.match(battle,/function markPurifyMindDualTargets\(\)[\s\S]*?classList\.toggle\("targetable"[\s\S]*?classList\.add\("ally-targetable"\)/);
 assert.match(battle,/function clearRemovableEntityStates\(entity,side\)[\s\S]*?entity\.activeBuffs=entity\.activeBuffs\.filter[\s\S]*?entity\.v141Shield=null/);
 assert.match(battle,/targetSide==="monster"[\s\S]*?clearRemovableEntityStates\(entity,targetSide\)/);
@@ -62,7 +63,19 @@ assert.ok(battle.includes('setQuestNoticeDot(tab,notices.daily,"每日任務獎�
 // 8. Abyss log is a real touch-scroll owner and the emperor/chest platform is the requested upper arena.
 assert.ok(content.includes("function bossPosition(){ return [61,21]; }"));
 assert.ok(content.includes('class="v17342-abyss-battle-log"'));
-assert.ok(touch.includes(".v17342-abyss-battle-log"));
+// The gesture owner infers legacy scrolling from real overflow, not a whitelist.
+const vm=require("node:vm");
+const documentElement={};
+const gesture={window:null,document:{documentElement,addEventListener(){},getElementById(){return null;}},
+    getComputedStyle:()=>({overflowY:"auto",overflowX:"hidden"}),addEventListener(){}};
+gesture.window=gesture;
+vm.createContext(gesture);
+vm.runInContext(touch,gesture);
+const log={nodeType:1,scrollHeight:900,clientHeight:200,scrollWidth:300,clientWidth:300,parentElement:documentElement};
+assert.equal(gesture.FourSymbolsGestureArbiter.findScrollOwner(log).node,log);
+assert.equal(gesture.FourSymbolsGestureArbiter.findScrollOwner(log).axes,"y");
+log.scrollHeight=200;
+assert.equal(gesture.FourSymbolsGestureArbiter.findScrollOwner(log),null,"a fitting log must not claim scrolling");
 assert.match(elementCss,/\.v17342-abyss-battle-log\{[\s\S]*?overflow-y:auto;[\s\S]*?touch-action:pan-y/);
 
 console.log("V173.50 current request regression checks passed");
