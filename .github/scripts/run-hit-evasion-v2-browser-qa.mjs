@@ -37,6 +37,9 @@ const expression=`(async()=>{
     showPage("home");openInventoryCharacterDetail();
     const detail=document.getElementById("inventoryCharacterDetailStats").textContent;
     closeInventoryCharacterDetail();
+    const legacyArmor={id:"setWind_heavyArmor",setId:"setWind",type:"armor",stats:{accuracy:10,spirit:10,antiCrit:0.5,statusResistance:0.25}};
+    inventoryItems.push(legacyArmor);v17346SyncFourElementSets();v17346SyncFourElementSets();
+    inventoryItems.splice(inventoryItems.indexOf(legacyArmor),1);
     const migrated=FourSymbolsEquipmentCombatMigration.projectItem({stats:{accuracy:20,antiCrit:1,statusResistance:0.5}});
     const repeated=FourSymbolsEquipmentCombatMigration.projectItem(migrated);
     // Explicit tower affinity survives the retired level-derived default.
@@ -93,7 +96,7 @@ const expression=`(async()=>{
         autoBattle=true;autoConfig.skill="normal";autoActionForCharacter(0,battleToken);autoBattle=false;resolveQueuedPlayerAction(0,battleToken);combat.autoResolution=calls.splice(0);
         monsters[0].skillChance=0;monsters[0].skill=null;monsters[0].skills=[];processSingleMonsterAttack(0,battleToken);combat.monster=calls.splice(0);
     }finally{calculateHitChancePercent=owner;await endBattle();}
-    return {wind,lowCap,levels,calm,dodge,set:{one,three,two,armor},detail,migrated,repeated,tower,frostbite,feather,bell,blessing,combat,casts,
+    return {wind,lowCap,levels,calm,dodge,set:{one,three,two,armor},detail,migrated,repeated,legacyArmor,tower,frostbite,feather,bell,blessing,combat,casts,
         formula:[calculateHitChancePercent(0,0,0,0),calculateHitChancePercent(10,0,0,0),calculateHitChancePercent(10,40,0,0),calculateHitChancePercent(0,40,0,0),calculateHitChancePercent(0,1000,0,0)]};
 })()`;
 const server=await startServer();
@@ -117,6 +120,7 @@ try{
     assert.deepEqual([evidence.set.one,evidence.set.three,evidence.set.two],[10,12,10]);
     assert.match(evidence.detail,/命中\s*0%/);assert.match(evidence.detail,/閃避\s*10%/);
     assert.match(evidence.detail,/5%～99%/);
+    assert.equal(evidence.legacyArmor.stats.accuracy,3);assert.equal(evidence.legacyArmor.stats.evasion,10);assert.equal(evidence.legacyArmor.stats.antiCrit,1.5);assert.equal(evidence.legacyArmor.stats.statusResistance,0.75);
     assert.equal(evidence.migrated.stats.accuracy,3);assert.deepEqual(evidence.repeated,evidence.migrated);
     assert.deepEqual(evidence.formula,[95,99,65,55,5]);
     assert.ok(evidence.tower.length>0&&evidence.tower.every(v=>v===8));

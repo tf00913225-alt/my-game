@@ -323,7 +323,15 @@
         const key=setPieceKey(item);
         if(!key){ return item; }
         migrateLegacyEquipmentStats(item);
-        item.stats={...item.stats,...SET_RULES[key].stats};
+        const migratedStats=item.stats;
+        item.stats={...migratedStats,...SET_RULES[key].stats};
+        // These independent extras may already contain the V1/V2 Spirit
+        // migration. Reapplying set base rules must never discard them.
+        ["antiCrit","statusResistance"].forEach(field=>{
+            if(migratedStats[field]!==undefined){
+                item.stats[field]=Math.max(Number(migratedStats[field])||0,Number(item.stats[field])||0);
+            }
+        });
         item.quality="orange";
         item.rarityKey="orange";
         const legacyAffixCount=item.reforgeStats&&typeof item.reforgeStats==="object"?Object.keys(item.reforgeStats).length:0;

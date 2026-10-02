@@ -38,4 +38,18 @@ const inventorySource=fs.readFileSync("js/55-v173.51-inventory-qa.js","utf8");
 const statFunction=inventorySource.split("\n").find(line=>line.startsWith("function statText("));
 const ui=vm.runInNewContext('const num=v=>Number.isFinite(Number(v))?Number(v):0;'+statFunction+';statText');
 assert.equal(ui({stats:{accuracy:1.5,evasion:10},reforgeStats:{accuracy:0.3,evasion:2}}),"命中 +1.8%　閃避 +12%","numeric reforge aggregation precedes the display suffix");
+const setSource=fs.readFileSync("js/equipment-progression.js","utf8");
+const setConstants=setSource.slice(setSource.indexOf("    const SET_RULES="),setSource.indexOf("    const SHOP_STORAGE_KEY="));
+const setOwner=setSource.slice(setSource.indexOf("    function setPieceKey("),setSource.indexOf("    /*\n       First-character equipment"));
+const applySet=vm.runInNewContext(setConstants+setOwner+";applySetRule",{migrateLegacyEquipmentStats:migrateItem});
+for(const setId of ["setFire","setWater","setEarth","setWind"]){
+    for(const suffix of ["heavyArmor","robe"]){
+        for(const stats of [{accuracy:10,spirit:10,antiCrit:0.5,statusResistance:0.25},{accuracy:30,antiCrit:1.5,statusResistance:0.75}]){
+            const item={id:setId+"_"+suffix,setId,stats};applySet(item);applySet(item);
+            assert.equal(item.stats.evasion,10);assert.equal(item.stats.accuracy,3);
+            assert.equal(item.stats.antiCrit,1.5,"set normalization preserves migrated Spirit anti-crit");
+            assert.equal(item.stats.statusResistance,0.75,"set normalization preserves migrated Spirit resistance");
+        }
+    }
+}
 console.log("V2 equipment unit migration: original and V1 Spirit, four sets, reforge separation, atomic failure, immutable archive projection and repeated-load PASS");

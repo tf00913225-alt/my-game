@@ -6,6 +6,7 @@
 - Relic Owner `js/60-team-relic-system.js` 以期限內 reduction entries 投影最終命中下降，保留 Boss 效率。Skill Final Data Owner 不重平衡。
 - PR #752。39 項最終 Runtime 整合、裝備遷移／Cloud 投影／秘寶／V158 7 項回歸與 build/check 通過。正式 production Chrome 393×873 QA 已實際驗證裸裝／等級、四象穿脫 10/12/10、Wind EX 15/15 + 50 cap、兩項技能實際施放 5～25%/3 回合、凍傷、元祖祝福、青嵐 8/10/12、古鐘 5/8、風週塔怪 8、手動／自動／敵方共用 Hit Owner；角色詳情與完整公式截圖已檢視。
 - QA 等待正式進場／退場後才進下一場；不改 Runtime timing。副本難度縮放排除 Accuracy/Evasion，保留其他 scaling。舊 V144 數值／說明同步，UI 重鑄保持先 numeric 加總再加 %。
+- 追加直接 Owner 回歸先重現套裝正規化覆寫 Spirit Anti-Crit/Status Resistance，再修正保留既有總值；raw Spirit 與 V1 已換算四系 armor/robe 全部重複正規化通過。Chrome 背包實際舊套裝確認 Accuracy 3 / Evasion 10 / Anti-Crit 1.5 / Status Resistance 0.75。
 - 最新 Head Required CI、dev merge 與 deployment SHA 尚待完成；不宣稱本批 VERIFIED 或完成。main 排除。
 
 ## 2026-10-01 — Water wild monster portraits batch 1 (candidate)
