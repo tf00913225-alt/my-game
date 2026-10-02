@@ -9,13 +9,17 @@ const markerIndex=css.indexOf(marker);
 assert.ok(markerIndex>=0,"shared black-gold skin marker must exist");
 const skin=css.slice(markerIndex);
 
+// Backpack deliberately has its own V177 frame; shared skin must not reclaim it.
+const backpack=fs.readFileSync("css/22-stage-v78-character-inventory-core.css","utf8");
+assert.doesNotMatch(skin,/\.inventory-classic-shell/);
+assert.match(backpack,/\.inventory-classic-shell\{[^}]*background:[^}]*border:1px solid var\(--bag-frame\);[^}]*box-shadow:inset/);
+
 const requiredPalette=["#0D0C09","#171510","#201D17","#12110E","#C69A45","#F0D38A","#73582D","#EEE7D8","#B9AD98"];
 requiredPalette.forEach(value=>assert.match(skin,new RegExp(value,"i"),`missing palette ${value}`));
 
 [
     ".home-feature-modal-box",
     ".item-modal-box",
-    ".inventory-classic-shell",
     ".creation-skill-detail-box",
     ".v169-rpg-dialog",
     ".v132-reward-modal-inner",
