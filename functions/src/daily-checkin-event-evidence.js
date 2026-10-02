@@ -2,6 +2,7 @@
 
 const {createHash}=require("node:crypto");
 const {REWARD_GOLD}=require("./daily-checkin-policy");
+const {inspectRecoveryArchive}=require("./canonical-recovery-archive");
 function validDay(day){
     if(typeof day!=="string"||!/^\d{8}$/.test(day))return false;
     const iso=`${day.slice(0,4)}-${day.slice(4,6)}-${day.slice(6,8)}`;
@@ -18,7 +19,7 @@ function eventDigest(event){
 // Immutable server observation of the check-in intent, not a browser completion
 // flag. Callers defer create until all transaction reads have completed.
 async function readDailyCheckinEvidence({tx,root,uid,grantId,grant,fail,
-    allowCreate=false,day=null,characterId=null,sourceRevision=null}){
+    allowCreate=false,day=null,characterId=null,sourceRevision=null,sourceSnapshotSha256=null}){
     if(!isDailyGrant(grantId,grant))return null;
     const ref=root.collection("rewardEvents").doc(grantId);
     const snap=await tx.get(ref);
@@ -32,6 +33,7 @@ async function readDailyCheckinEvidence({tx,root,uid,grantId,grant,fail,
         const event={schemaVersion:1,ownerUid:uid,eventId:grantId,
             eventType:"daily-checkin",periodDate:day,kind:"gold",amount:REWARD_GOLD,
             characterId,sourceRevision};
+        await verifySource(event,sourceSnapshotSha256);
         return {ref,event,sha256:eventDigest(event),create:true};
     }
     // Never repair an orphan event or retrofit evidence onto an old grant.
@@ -49,6 +51,34 @@ async function readDailyCheckinEvidence({tx,root,uid,grantId,grant,fail,
        grant.source!=="server-event"||grant.ownerUid!==uid)invalid();
     const sha256=eventDigest(event);
     if(event.sha256!==sha256||grant.sourceEventSha256!==sha256)invalid();
+    await verifySource(event);
     return {ref,event,sha256,create:false};
+
+    // A self-consistent event digest is not proof that its character existed.
+    // Resolve the original revision, never today's mutable account/balance.
+    // Reuse the complete snapshot/archive verifier before any caller writes.
+    async function verifySource(event,expectedSha256){
+        const revision=String(event.sourceRevision);
+        const [snapshot,archive]=await Promise.all([
+            tx.get(root.collection("playableSnapshots").doc(revision)),
+            tx.get(root.collection("recoveryArchives").doc(revision))
+        ]);
+        if(!snapshot.exists||!archive.exists){
+            fail("data-loss","Daily check-in source snapshot or archive is missing.");
+        }
+        let records;
+        try{
+            records=inspectRecoveryArchive(archive.data(),uid,event.sourceRevision,snapshot.data());
+        }catch(_){
+            fail("data-loss","Daily check-in source snapshot or archive is inconsistent.");
+        }
+        const slots=records.account.slots;
+        if(records.account.provenance!=="server-created"||
+           slots[0]!==event.characterId||slots[1]!==null||slots[2]!==null||
+           records.characters.length!==1||
+           (allowCreate&&snapshot.data().sha256!==expectedSha256)){
+            fail("data-loss","Daily check-in source character is not eligible.");
+        }
+    }
 }
 module.exports={readDailyCheckinEvidence,isDailyGrant,eventDigest};
