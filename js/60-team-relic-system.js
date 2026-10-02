@@ -782,12 +782,13 @@
             return out;
         },{attackPercent:0,defensePercent:0,evasionPercent:0,resistancePercent:0,damageReductionPercent:0});
     }
+    window.v174GetRelicFinalEvasionPercent=index=>playerModTotals(index).evasionPercent;
+
     function decorateStats(index,stats){
         if(!stats||!relicBattleState){ return stats; }
         const mod=playerModTotals(index),copy=Object.assign({},stats);
         if(mod.attackPercent){ copy.attack=numeric(copy.attack)*(1+mod.attackPercent/100); copy.magicAttack=numeric(copy.magicAttack)*(1+mod.attackPercent/100); }
         if(mod.defensePercent){ copy.defense=numeric(copy.defense)*(1+mod.defensePercent/100); }
-        if(mod.evasionPercent){ copy.evasion=numeric(copy.evasion)+mod.evasionPercent; }
         if(mod.resistancePercent){ copy.resistance=numeric(copy.resistance)+mod.resistancePercent; copy.statusResistance=numeric(copy.statusResistance)+mod.resistancePercent; }
         return copy;
     }

@@ -33,8 +33,8 @@ assert.match(elementCss,/\.v17342-element-box-use-notice\{[\s\S]*?border:0;[\s\S
 
 // 4. Equipment crafting is no longer a user-facing synthesis tab.
 assert.ok(!content.includes('["craft","裝備合成"]'));
-assert.ok(content.includes('const synthesisState={\n        tab:"reforge"'));
-assert.ok(content.includes('["reforge","裝備冶煉"],["talisman","符咒合成"],["fragment","碎片合成"]'));
+assert.ok(content.includes('const synthesisState={\n        tab:"talisman"'));
+assert.ok(content.includes('["talisman","符咒合成"],["fragment","碎片合成"]'));
 
 // 5. Shop exposes potion/equipment pages and six equipment cards with 5 free / 10 max refreshes.
 assert.ok(shop.includes("const SHOP_FREE_REFRESHES=5;"));

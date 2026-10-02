@@ -7,7 +7,8 @@
 - PR #752。39 項最終 Runtime 整合、裝備遷移／Cloud 投影／秘寶／V158 7 項回歸與 build/check 通過。正式 production Chrome 393×873 QA 已實際驗證裸裝／等級、四象穿脫 10/12/10、Wind EX 15/15 + 50 cap、兩項技能實際施放 5～25%/3 回合、凍傷、元祖祝福、青嵐 8/10/12、古鐘 5/8、風週塔怪 8、手動／自動／敵方共用 Hit Owner；角色詳情與完整公式截圖已檢視。
 - QA 等待正式進場／退場後才進下一場；不改 Runtime timing。副本難度縮放排除 Accuracy/Evasion，保留其他 scaling。舊 V144 數值／說明同步，UI 重鑄保持先 numeric 加總再加 %。
 - 追加直接 Owner 回歸先重現套裝正規化覆寫 Spirit Anti-Crit/Status Resistance，再修正保留既有總值；raw Spirit 與 V1 已換算四系 armor/robe 全部重複正規化通過。Chrome 背包實際舊套裝確認 Accuracy 3 / Evasion 10 / Anti-Crit 1.5 / Status Resistance 0.75。
-- 最新 Head Required CI、dev merge 與 deployment SHA 尚待完成；不宣稱本批 VERIFIED 或完成。main 排除。
+- 青嵐 Browser 雙向 getter 追加檢查先重現 8/16、10/20、12/24；退休 Relic decorator 的 Evasion 寫入，改由原始角色 Evasion Owner 唯一加總 Relic getter（與 Frostbite 同次結算）。Chrome 確認角色／隊伍皆 8/8、10/10、12/12，凍傷皆 0/0；只移動 Evasion 來源，其他秘寶數值不重平衡。
+- 續接核對 remote #752 Head `5adb5dcb` 的 CI / Session Authority SUCCESS；青嵐修正原只在本機，現保留並整合 `dev@b61f87d804edcbb8202c16bfd17f9d8cd78bf115`（#751 鍛造）。JSON gate 合併兩項需求；bundle 由正式 build 重新生成。六圍 isolation fixture 載入正式 gem owner；裝備遷移、六圍、秘寶、鍛造、39 項 final Runtime 與 Cloud 投影測試通過。本輪本機 Chrome 被 socket EPERM 阻擋；沿用 PR Required Browser QA，不修改 Runtime／測試斷言。最新 Head CI、dev merge 與部署 SHA 尚待完成。main 排除。
 
 ## 2026-10-01 — Water wild monster portraits batch 1 (candidate)
 
@@ -4531,3 +4532,14 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 - Image-reviewed replacements: `炎殼長戟蟲→赤甲槍蟲`, `赤炎修羅王→六臂修羅`, `虛空煉獄皇→獄輪魔尊`, `業火魔君王→業炎法王`, `終焉神魔皇→末炎祭司`, `熔岩巨獸王→熔翼獸王`, `烈焰巨魔王→炎錘巨魔`, `焚天龍獄皇→焚天炎龍`. All 40 fire asset-pool display names are now unique and 2–4 Unicode characters.
 - Canonical sources updated together: wild runtime rows in `js/00-main.js`, `config/monster-portrait-registry.json`, `config/monster-asset-provenance.json`, generated root/build manifests and the content-hashed app-shell bundle. No wrapper, alias resolver or temporary patch was added.
 - Targeted fire coverage, monster portrait runtime, portrait audit, permanent image asset gate, deterministic build check and diff check pass locally. The existing `fire-tower-runtime-identity-first-frame` isolation assertion still expects earth tower portraits to be absent, but earth portraits are now formally integrated; that unrelated stale test is not changed in this naming task. PR CI and exact dev deployment remain pending.
+
+
+## FORGE-SOCKETS-GEMS-20261002 接續施工（2026-10-02）
+
+沿用 PR #751／feature/forge-sockets-gems-20261002，依最新 dev 60c1aab 保留 #750 命中／閃避成果，無 rebase／force push／main 修改。鍛造與寶石原始第一階段規格允許最小寶石模型，未要求先新增整套掉落或平衡。
+
+正式 owner：js/36-v141-content-systems.js 的 renderSocketTab、v141SocketGem、renderReforgeTab；js/00-main.js 的 getEquipmentSocketCapacity、getSocketGemStats、getEquipmentBonus。可見 native selectors 已替換為自有 details／button 選擇器，沿用合成內文 scroller，沒有新增 late wrapper。鑲嵌拒絕未知孔資料、重複 UID、超容量與帶雲端權威基底角色；存檔失敗還原孔與寶石。最小 gemVitalityI 體質+1，沒有新增掉落或商店來源。
+
+本機孔數、舊存檔、換裝、滿孔不扣料與回滾回歸通過；390／412 production QA 已接既有 CI 的 Responsive Item 步驟。此工作區無完整二進位素材／Chrome，正式 build 交由現有 CI build-sync evidence 建置後回填，未偽造建置成功。對應 requirement-batches/2026-10-02-forge-sockets-gems.json。
+
+待完成：取得最新提交正式建置產物、必要 CI 與手機 production QA；通過才合併 dev／驗證部署。正式可信後端鑲嵌與宝石取得来源另階段，不可宣稱本機原型等於正式交易；main 仍禁止發布。

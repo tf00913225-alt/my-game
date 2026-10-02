@@ -144,7 +144,18 @@
         "getDefaultMonsterEvasion",
         "accuracy *=",
         "accuracy*=(1-",
-        "Math.min(85, evasion)"
+        "Math.min(85, evasion)",
+        "copy.evasion=numeric(copy.evasion)+mod.evasionPercent"
+      ]
+    },
+    {
+      "id": "DEP-FORGE-BESTIARY-20261002",
+      "description": "可見圖鑑入口與 renderer 已被鍛造替換；擊殺資料仍屬冒險正式 owner。",
+      "enabled": true,
+      "forbidden": [
+        "homeIconBestiary",
+        "renderBestiaryContent",
+        "openHomeFeature('bestiary')"
       ]
     }
   ]

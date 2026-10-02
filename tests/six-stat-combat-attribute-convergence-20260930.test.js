@@ -36,8 +36,9 @@ const context=vm.createContext({
     getDamageLevelMultiplier:()=>1,getDamageContextAttacker:()=>null,getElementalDamageMultiplier:()=>1,DAMAGE_FORMULA_BASE_CONSTANT:400,DAMAGE_FORMULA_PER_TARGET_LEVEL:10,
     getOrdinaryDamageMultiplier:()=>1,getEnemyPressureMultiplier:()=>1,getDamageBudgetMultiplier:()=>1
 });
-const names=["getBaseStats","getEquipmentBonus","getEffectivePlayerAbilityPoints","calculateCharacterBaseStats","getMainCharacterStats","migrateLegacySixStats","migrateLegacyEquipmentStats","getMonsterEvasion","getMonsterAccuracy","getMonsterEffectiveDefense","calculateHealingAmount","getDamageFormulaConstant","calculateDamage"];
-vm.runInContext(names.map(name=>extractFunction(main,name)).join("\n"),context);
+const names=["getBaseStats","getEquipmentBonus","getEffectivePlayerAbilityPoints","calculateCharacterBaseStats","getMainCharacterStats","getRelicFinalEvasionPercent","getPartyCharacterIndex","migrateLegacySixStats","migrateLegacyEquipmentStats","getMonsterEvasion","getMonsterAccuracy","getMonsterEffectiveDefense","calculateHealingAmount","getDamageFormulaConstant","calculateDamage"];
+const gemOwner=main.slice(main.indexOf("const EQUIPMENT_SOCKET_CAPACITY="),main.indexOf("window.FourSymbolsEquipmentGems="));
+vm.runInContext(gemOwner+"\n"+names.map(name=>extractFunction(main,name)).join("\n"),context);
 const base=context.getBaseStats();
 assert.equal(base.attack-(30+50*4),400,"100 Attack Points add 400 Physical Attack");
 assert.equal(base.magicAttack-(30+50*4),275,"100 Intelligence Points add 275 Magic Attack");

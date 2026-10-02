@@ -191,3 +191,5 @@
 - 開工 dev 所有正式裝備 Accuracy 來源只有四象 armor/robe Base 10 與 V1 Spirit mapping；沒有普通生成／重鑄 Accuracy pool。無版本裝備先分離明確四象 Base 10→Evasion 10，剩餘舊 Equipment Accuracy 按 legacy point unit ×0.15 換算；尚存在 Spirit 時每點直接 +0.3% Accuracy/+0.1% Anti-Crit/+0.05% Status Resistance，再移除 Spirit。新定義／生成装備明確標记版本 2。不得將此遷移用於角色、怪物、技能或 Buff Accuracy。
 - 本機／雲端 snapshot 經既有 hydrate/normalize 入口投影；候選與原始 Archive 的 raw bytes、hash、UID、revision 與信任狀態不改寫。後端 review ownedItem 只對副本遷移，不授予權威、不修改原始證據。
 - 鎮魂古鐘命中 -5/-8% 是 Relic Final Hit Reduction Source，依 bossDebuffEfficiency 計算後與暈眩相加，既有期限與清理 owner 保留，禁止乘算 monster.accuracy。
+
+- Relic Evasion 只由 `v174GetRelicFinalEvasionPercent(index)` 提供來源值，`getMainCharacterStats`／`getAdditionalCharacterBattleStats` 的既有 Evasion 加總一次結算並一起處理 Frostbite。Relic stats decorator 不得再次改寫 Evasion；隊伍 getter 委派角色 getter 後不得雙加。

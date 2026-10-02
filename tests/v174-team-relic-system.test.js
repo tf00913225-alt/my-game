@@ -274,7 +274,7 @@ assert.ok(monsters.some(m=>m.hp<2000),"Tiangang Banner naturally charges from be
 assert.equal(context.v174RelicDebugState().allyHitCount,0);context.loseBattle();
 
 context.v174EquipRelic("relic_qinglan_feather");party[0].hp=1000;context.startBattle();
-const boosted=context.getPartyBattleStats(0);assert.ok(boosted.evasion>=8&&boosted.resistance>=8,"Qinglan Feather feeds the shared party stat owner");context.loseBattle();
+const boosted=context.getPartyBattleStats(0);assert.ok(context.v174GetRelicFinalEvasionPercent(0)===8&&boosted.resistance>=8,"Qinglan Feather feeds the shared party stat owner");context.loseBattle();
 
 context.v174EquipRelic("relic_soul_bell");monsters.forEach(m=>{m.alive=true;m.attack=100;m.magicAttack=100;m.accuracy=100;});context.startBattle();context.turn=4;context.startTurn(context.battleToken);
 assert.ok(monsters[1].attack<100,"Soul Bell applies actual live monster attack reduction");context.loseBattle();
@@ -292,7 +292,7 @@ for(const [level,reduction] of [[10,5],[20,8]]){
 for(const [level,evasion] of [[1,8],[10,10],[20,12]]){
     context.v174RelicSystem.getOwnedState().relic_qinglan_feather.level=level;
     context.v174EquipRelic("relic_qinglan_feather");context.startBattle();
-    assert.equal(context.getPartyBattleStats(0).evasion,evasion);
+    assert.equal(context.v174GetRelicFinalEvasionPercent(0),evasion);
     context.loseBattle();
 }
 

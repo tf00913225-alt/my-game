@@ -360,6 +360,20 @@
         "verification": "V2 targeted unit / integration and exact-candidate production Chrome QA",
         "result": "Pending latest-head CI and browser result"
       }
+    },
+    {
+      "id": "REQ-FORGE-SOCKETS-GEMS-20261002",
+      "title": "鍛造與裝備寶石第一階段",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "release/requirement-batches/2026-10-02-forge-sockets-gems.json",
+          "tests/forge-sockets-gems.test.js",
+          ".github/scripts/run-forge-sockets-browser-qa.mjs"
+        ],
+        "verification": "本機必要回歸通過；最新提交 CI、production 建置與390／412觸控證據待確認。",
+        "result": "依階級0/0/0/1/2/3孔、最小寶石定義、存檔回滾與屬性接入已施工；正式後端交易與取得來源不在本階段完成範圍。"
+      }
     }
   ]
 }

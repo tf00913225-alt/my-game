@@ -58,10 +58,10 @@ const expression=`(async()=>{
     const endBattle=async()=>{loseBattle();const deadline=Date.now()+8000;while(battleActive&&Date.now()<deadline)await new Promise(r=>setTimeout(r,30));if(battleActive)throw new Error("Battle exit did not finish");player.hp=getMainCharacterStats().maxHP;};
     const waitRelic=async()=>{const deadline=Date.now()+5000;while(!v174RelicDebugState()&&Date.now()<deadline)await new Promise(r=>setTimeout(r,20));if(!v174RelicDebugState())throw new Error("Real relic battle did not initialize: "+JSON.stringify({battleActive,battleToken,turn,observers:Array.from(battleRoundStartObservers).map(fn=>String(fn).slice(0,800)),keys:Array.from(battleRoundBoundaryKeys),startSource:String(startBattle).slice(0,500),turnSource:String(startTurn).slice(0,500),logs:Array.from(document.querySelectorAll(".battle-log")).map(n=>n.textContent)}));};
     const relicOwned=v174RelicSystem.getOwnedState(),loadout=v174RelicSystem.getTeamLoadout();
-    const feather=[];
+    const feather=[],relicFrostbite=[];
     for(const level of [1,10,20]){
         Object.assign(relicOwned.relic_qinglan_feather,{unlocked:true,level});loadout.relicId="relic_qinglan_feather";
-        await freshMonsters();await waitRelic();feather.push(getMainCharacterStats().evasion);await endBattle();
+        await freshMonsters();await waitRelic();feather.push([getMainCharacterStats().evasion,getPartyBattleStats(0).evasion]);player.statusEffects=[{type:"frostbite",turnsLeft:2}];relicFrostbite.push([getMainCharacterStats().evasion,getPartyBattleStats(0).evasion]);player.statusEffects=[];await endBattle();
     }
     const bell=[];
     for(const level of [10,20]){
@@ -96,7 +96,7 @@ const expression=`(async()=>{
         autoBattle=true;autoConfig.skill="normal";autoActionForCharacter(0,battleToken);autoBattle=false;resolveQueuedPlayerAction(0,battleToken);combat.autoResolution=calls.splice(0);
         monsters[0].skillChance=0;monsters[0].skill=null;monsters[0].skills=[];processSingleMonsterAttack(0,battleToken);combat.monster=calls.splice(0);
     }finally{calculateHitChancePercent=owner;await endBattle();}
-    return {wind,lowCap,levels,calm,dodge,set:{one,three,two,armor},detail,migrated,repeated,legacyArmor,tower,frostbite,feather,bell,blessing,combat,casts,
+    return {wind,lowCap,levels,calm,dodge,set:{one,three,two,armor},detail,migrated,repeated,legacyArmor,tower,frostbite,feather,relicFrostbite,bell,blessing,combat,casts,
         formula:[calculateHitChancePercent(0,0,0,0),calculateHitChancePercent(10,0,0,0),calculateHitChancePercent(10,40,0,0),calculateHitChancePercent(0,40,0,0),calculateHitChancePercent(0,1000,0,0)]};
 })()`;
 const server=await startServer();
@@ -124,7 +124,7 @@ try{
     assert.equal(evidence.migrated.stats.accuracy,3);assert.deepEqual(evidence.repeated,evidence.migrated);
     assert.deepEqual(evidence.formula,[95,99,65,55,5]);
     assert.ok(evidence.tower.length>0&&evidence.tower.every(v=>v===8));
-    assert.equal(evidence.frostbite,15);assert.deepEqual(evidence.feather,[8,10,12]);
+    assert.equal(evidence.frostbite,15);assert.deepEqual(evidence.feather,[[8,8],[10,10],[12,12]]);assert.deepEqual(evidence.relicFrostbite,[[0,0],[0,0],[0,0]]);
     assert.deepEqual(evidence.bell,[{accuracy:0,reduction:5,hit:90},{accuracy:0,reduction:8,hit:87}]);
     for(const values of Object.values(evidence.casts))assert.deepEqual(values,[5,10,15,20,25].map(value=>({value,duration:3,accuracy:0})));
     assert.deepEqual(evidence.blessing,{applied:true,evasion:15,duration:2});
