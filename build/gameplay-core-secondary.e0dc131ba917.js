@@ -1,4 +1,5 @@
 
+
 /* bundled source: js/40-v144-rules-and-abyss.js */
 /* =====================================================
    V144 — shop, carried monster skills, hard-control flow,
@@ -161,7 +162,401 @@
     /* Player-facing skill text is owned by FourSymbolsSkillSpec after the
        gameplay bundle finishes loading. V144 no longer overrides previews. */
 
-    /* 氣定神閒的命中提升要進入實際戰鬥能力，而不只停在描述。 */
+    /* ----- Shop: only 10/20/30% potions, with the existing level multiplier. ----- */
+    function ensurePotion(id,resource,percent,price){
+        if(typeof potionDefinitions==="undefined"||!Array.isArray(potionDefinitions)){ return null; }
+        const presentation=SHOP_POTION_PRESENTATION[id];
+        let potion=potionDefinitions.find(item=>item&&item.id===id);
+        if(!potion){
+            potion={id:id,name:"",shortName:"",icon:"",type:"potion",resource:resource,recoveryPercent:percent,price:price,stats:{}};
+            potionDefinitions.push(potion);
+        }
+        Object.assign(potion,{
+            name:presentation?presentation.name:"回復"+percent+"%"+resource.toUpperCase()+"藥水",
+            shortName:presentation?presentation.name:resource.toUpperCase()+" "+percent+"%",
+            icon:presentation?potionIconMarkup(presentation.iconPath):(potion.icon||""),
+            type:"potion",resource:resource,recoveryPercent:percent,price:price,stats:potion.stats||{}
+        });
+        if(typeof getPotionInventoryItems==="function"){
+            getPotionInventoryItems(id).forEach(item=>{
+                item.name=potion.name;
+                item.shortName=potion.shortName;
+                item.icon=potion.icon;
+                item.type="potion";
+                item.resource=potion.resource;
+                item.recoveryPercent=potion.recoveryPercent;
+                item.price=potion.price;
+                item.stats={};
+            });
+        }
+        return potion;
+    }
+
+    ensurePotion("hpPotion10","hp",10,SHOP_POTION_PRICES.hpPotion10);
+    ensurePotion("hpPotion20","hp",20,SHOP_POTION_PRICES.hpPotion20);
+    ensurePotion("hpPotion30","hp",30,SHOP_POTION_PRICES.hpPotion30);
+    ensurePotion("spPotion10","sp",10,SHOP_POTION_PRICES.spPotion10);
+    ensurePotion("spPotion20","sp",20,SHOP_POTION_PRICES.spPotion20);
+    ensurePotion("spPotion30","sp",30,SHOP_POTION_PRICES.spPotion30);
+
+    function shopTier(){
+        const highest=typeof window.v133GetHighestCreatedCharacterLevel==="function"
+            ?clampLevel(window.v133GetHighestCreatedCharacterLevel()):1;
+        return SHOP_PRICE_TIERS.find(tier=>highest<=tier.maxLevel)||SHOP_PRICE_TIERS[SHOP_PRICE_TIERS.length-1];
+    }
+
+    function shopUnitPrice(item){
+        if(typeof window.v133GetShopItemPrice==="function"){ return window.v133GetShopItemPrice(item); }
+        return Math.round(numeric(item&&item.price)*shopTier().multiplier);
+    }
+
+    function shoppablePotions(){
+        return SHOP_POTION_IDS.map(id=>potionDefinitions.find(item=>item&&item.id===id)).filter(Boolean);
+    }
+
+    if(typeof renderShopContent==="function"){
+        renderShopContent=function(){
+            const tier=shopTier();
+            const cards=shoppablePotions().map(item=>{
+                const label=item.resource==="hp"?"HP":"SP";
+                const price=shopUnitPrice(item);
+                return '<div class="shop-potion-card '+item.resource+'">'+
+                    '<div class="shop-potion-card-head"><span class="shop-potion-type">'+label+'</span><span class="shop-potion-stock">持有 '+getPotionCount(item.id)+'</span></div>'+
+                    '<div class="shop-potion-summary"><div class="shop-potion-icon">'+item.icon+'</div><div class="shop-potion-copy">'+
+                    '<div class="shop-potion-name">'+escapeHtml(item.name)+'</div><div class="shop-potion-effect">回復最大'+label+'的 '+item.recoveryPercent+'%</div></div></div>'+
+                    '<div class="shop-potion-purchase-row"><label for="shopQuantity-'+item.id+'">數量</label><input id="shopQuantity-'+item.id+'" class="shop-potion-quantity" data-unit-price="'+price+'" type="number" inputmode="numeric" min="1" max="999" step="1" value="1" oninput="v146UpdateShopTotal(\''+item.id+'\')" onblur="v146CommitShopQuantity(\''+item.id+'\')">'+
+                    '<span class="v146-shop-total" id="shopTotal-'+item.id+'">'+price+' 金幣</span><button class="home-feature-buy-btn shop-potion-buy" '+(gold<price?'disabled':'')+' onclick="buyShopItem(\''+item.id+'\',document.getElementById(\'shopQuantity-'+item.id+'\').value)">購買</button></div></div>';
+            }).join("");
+            return '<div class="v141-shop-wallet">目前金幣 <b>'+Math.max(0,Math.floor(numeric(gold))).toLocaleString("zh-TW")+'</b></div>'+
+                '<div class="shop-potion-interface"><div class="shop-potion-note">只販售 HP／SP 10%、20%、30% 回復藥水</div>'+
+                '<div class="v133-shop-tier-note">目前商店階級：'+tier.label+'（價格×'+tier.multiplier+'）</div><div class="shop-potion-list">'+cards+'</div></div>';
+        };
+    }
+
+    if(typeof buyShopItem==="function"){
+        buyShopItem=async function(itemId,requestedQuantity){
+            if(!SHOP_POTION_IDS.includes(itemId)){ return false; }
+            const item=getPotionDefinition(itemId);
+            if(!item){ return false; }
+            const quantity=typeof window.normalizeShopPurchaseQuantity==="function"
+                ?window.normalizeShopPurchaseQuantity(requestedQuantity)
+                :Math.max(1,Math.min(999,Math.floor(numeric(requestedQuantity)||1)));
+            const unitPrice=shopUnitPrice(item);
+            const totalPrice=unitPrice*quantity;
+            if(
+                typeof window.rpgConfirm==="function" &&
+                !await window.rpgConfirm(
+                    "確認購買「"+item.name+"」×"+quantity+"？\n將消耗 "+totalPrice.toLocaleString("zh-TW")+" 金幣。",
+                    {title:"商店購買",confirmText:"確定購買",cancelText:"返回"}
+                )
+            ){
+                return false;
+            }
+            if(gold<totalPrice){ alert("金幣不夠，本次需要 "+totalPrice.toLocaleString("zh-TW")+" 金幣。"); return false; }
+            if(!addPotionToInventory(itemId,quantity)){ alert("背包已滿，或該藥水已沒有可用的堆疊空間。"); return false; }
+            gold-=totalPrice;
+            rebuildInventorySlots(); updateGoldDisplay(); saveGame();
+            const body=document.getElementById("homeFeatureModalBody");
+            if(body){ body.innerHTML=renderShopContent(); }
+            return true;
+        };
+    }
+
+    /* ----- General monster carried skills: sample once per encounter. ----- */
+    function monsterCarryLimit(level){
+        const lv=clampLevel(level);
+        return lv<=20?1:lv<=40?2:3;
+    }
+
+    function monsterSkillLevel(level){
+        const lv=clampLevel(level);
+        if(lv<=20){ return 1; }
+        if(lv<=40){ return 2; }
+        if(lv<=60){ return 3; }
+        if(lv<=80){ return 4; }
+        return 5;
+    }
+
+    function tierLimit(level){
+        if(typeof getMonsterSkillTierAndChance==="function"){
+            return Math.max(0,Math.floor(numeric(getMonsterSkillTierAndChance(level).maxTier)));
+        }
+        const lv=clampLevel(level);
+        return lv<=10?0:lv<=40?1:lv<=70?2:3;
+    }
+
+    function isMonsterSkillElementLegal(monster,skillId){
+        if(!monster||!skillId||typeof skillDatabase==="undefined"){ return false; }
+        const skill=skillDatabase[skillId];
+        if(!skill){ return false; }
+        const explicit=Array.isArray(monster.v144CrossElementSkillIds)
+            ?monster.v144CrossElementSkillIds:[];
+        if(explicit.includes(skillId)){ return true; }
+        const skillElement=String(skill.element||"");
+        const monsterElement=String(monster.element||"");
+        return !!skillElement&&!!monsterElement&&skillElement===monsterElement;
+    }
+
+    function legalCarriedMonsterSkillIds(monster,kind){
+        if(!monster){ return []; }
+        const source=kind==="support"?monster.v141SupportSkillIds:monster.skillIds;
+        return Array.from(new Set(Array.isArray(source)?source:[]))
+            .filter(id=>isMonsterSkillElementLegal(monster,id));
+    }
+
+    function normalizeMonsterSkillLoadout(monster){
+        if(!monster){ return monster; }
+        monster.skillIds=legalCarriedMonsterSkillIds(monster,"attack");
+        monster.v141SupportSkillIds=legalCarriedMonsterSkillIds(monster,"support");
+        if(Array.isArray(monster.v144LegalSkillPool)){
+            monster.v144LegalSkillPool=Array.from(new Set(monster.v144LegalSkillPool))
+                .filter(id=>isMonsterSkillElementLegal(monster,id));
+        }
+        if(monster.v175ForcedAttackSkillId&&!monster.skillIds.includes(monster.v175ForcedAttackSkillId)){
+            delete monster.v175ForcedAttackSkillId;
+        }
+        if(monster.v175ForcedSupportSkillId&&!monster.v141SupportSkillIds.includes(monster.v175ForcedSupportSkillId)){
+            delete monster.v175ForcedSupportSkillId;
+        }
+        return monster;
+    }
+
+    function legalMonsterSkillPool(monster){
+        if(!monster||monster.v141Abyss||typeof skillDatabase==="undefined"){ return []; }
+        const maxTier=tierLimit(monster.level);
+        if(maxTier<=0){ return []; }
+        return Object.keys(skillDatabase).filter(id=>{
+            const skill=skillDatabase[id];
+            return skill&&skill.element===monster.element&&
+                (skill.category==="physical"||skill.category==="magic")&&
+                numeric(skill.tier)>0&&numeric(skill.tier)<=maxTier;
+        });
+    }
+
+    function shuffled(values){
+        const list=values.slice();
+        for(let index=list.length-1;index>0;index--){
+            const other=Math.floor(Math.random()*(index+1));
+            [list[index],list[other]]=[list[other],list[index]];
+        }
+        return list;
+    }
+
+    let encounterSequence=0;
+    function configureEncounterSkills(monster,encounterId){
+        if(!monster){ return monster; }
+        if(monster.v141Abyss){
+            return normalizeMonsterSkillLoadout(monster);
+        }
+        if(monster.v132FixedSkillLoadout){
+            normalizeMonsterSkillLoadout(monster);
+            const forcedLevel=Math.max(1,Math.floor(numeric(monster.v141ForceSkillLevel)||1));
+            monster.v144LegalSkillPool=(monster.skillIds||[]).slice();
+            monster.v141SkillLevel=forcedLevel;
+            monster.v144SkillLevel=forcedLevel;
+            monster.v144SkillEncounter=encounterId||("fixed-"+(++encounterSequence));
+            return monster;
+        }
+        const pool=legalMonsterSkillPool(monster);
+        monster.v144LegalSkillPool=pool.slice();
+        monster.skillIds=shuffled(pool).slice(0,monsterCarryLimit(monster.level));
+        monster.v141SkillLevel=monsterSkillLevel(monster.level);
+        monster.v144SkillLevel=monster.v141SkillLevel;
+        monster.v144SkillEncounter=encounterId||("generated-"+(++encounterSequence));
+        return normalizeMonsterSkillLoadout(monster);
+    }
+
+    window.v144IsMonsterSkillElementLegal=isMonsterSkillElementLegal;
+    window.v144GetLegalMonsterSkillIds=legalCarriedMonsterSkillIds;
+    window.v144NormalizeMonsterSkillLoadout=normalizeMonsterSkillLoadout;
+    window.v144GetMonsterSkillCarryLimit=monsterCarryLimit;
+    window.v144GetMonsterFixedSkillLevel=monsterSkillLevel;
+    window.v144GetMonsterLegalSkillPool=legalMonsterSkillPool;
+    window.v144ConfigureMonsterEncounterSkills=configureEncounterSkills;
+
+    if(typeof makeZoneMonster==="function"){
+        const previousMakeZoneMonster=makeZoneMonster;
+        makeZoneMonster=function(){
+            return configureEncounterSkills(previousMakeZoneMonster.apply(this,arguments));
+        };
+    }
+
+    if(typeof window.v141RollWildMonsterRanks==="function"){
+        const previousRollWildRanks=window.v141RollWildMonsterRanks;
+        window.v141RollWildMonsterRanks=function(indexes){
+            const result=previousRollWildRanks.apply(this,arguments);
+            const encounterId="wild-"+(++encounterSequence);
+            (indexes||[]).forEach(index=>{
+                const monster=typeof monsters!=="undefined"?monsters[index]:null;
+                configureEncounterSkills(monster,encounterId);
+            });
+            return result;
+        };
+    }
+
+    /* ----- Hard control skips manual declaration instead of accepting a fake action. ----- */
+    function hardControlName(character){
+        if(!character){ return ""; }
+        if(typeof isMonsterFrozen==="function"&&isMonsterFrozen(character)){ return "冰封"; }
+        if(typeof isMonsterPetrified==="function"&&isMonsterPetrified(character)){ return "石化"; }
+        return "";
+    }
+
+    if(typeof beginCharacterTurn==="function"){
+        const previousBeginCharacterTurn=beginCharacterTurn;
+        beginCharacterTurn=function(token){
+            if(
+                typeof battleActive!=="undefined"&&battleActive&&
+                typeof battlePhase!=="undefined"&&battlePhase==="declare"&&
+                typeof activeBattleCharacterIndex!=="undefined"
+            ){
+                const index=activeBattleCharacterIndex;
+                const character=getPartyCharacterByIndex(index);
+                const control=character&&character.hp>0?hardControlName(character):"";
+                if(control){
+                    if(typeof declaredCharacterIndexes!=="undefined"&&declaredCharacterIndexes.has(index)){ return; }
+                    if(typeof declaredCharacterIndexes!=="undefined"){ declaredCharacterIndexes.add(index); }
+                    actionReady=false; pendingAction=null;
+                    if(typeof closeMenus==="function"){ closeMenus(); }
+                    if(typeof clearBattleTargetSelectionMode==="function"){ clearBattleTargetSelectionMode(); }
+                    if(typeof clearActiveCharacterHighlight==="function"){ clearActiveCharacterHighlight(); }
+                    if(typeof addBattleLog==="function"){ addBattleLog((character.id||"角色")+"正處於"+control+"，本回合直接跳過。"); }
+                    if(typeof updateActionHudVisibility==="function"){ updateActionHudVisibility(); }
+                    finishPlayerAction();
+                    return;
+                }
+            }
+            return previousBeginCharacterTurn.apply(this,arguments);
+        };
+    }
+
+    if(typeof buildInitiativeQueue==="function"){
+        const previousBuildInitiativeQueue=buildInitiativeQueue;
+        buildInitiativeQueue=function(){
+            return previousBuildInitiativeQueue.apply(this,arguments).filter(entry=>
+                entry.type!=="player"||!hardControlName(getPartyCharacterByIndex(entry.characterIndex))
+            );
+        };
+    }
+
+    /* ----- Heal Spell resolves its exact flat values for every living ally. ----- */
+    function resolveAllPartyHeal(characterIndex){
+        const skill=skillDatabase.healSpell;
+        const caster=getPartyCharacterByIndex(characterIndex);
+        const characterKey=getPartyCharacterKey(characterIndex);
+        const level=Math.max(0,Math.floor(numeric(getSkillLevel(characterKey,"healSpell"))));
+        const cost=numeric(skill.spCost);
+        if(!caster||caster.hp<=0||level<=0||caster.sp<cost){
+            if(typeof addBattleLog==="function"){ addBattleLog(!caster||level<=0?"角色尚未學習治療術。":"SP不足，無法使用治療術。"); }
+            finishPlayerAction(); return true;
+        }
+        caster.sp-=cost;
+        if(typeof lungePlayerCard==="function"){ lungePlayerCard(characterIndex); }
+        showSkillNameBadge(skill.name,skill.element,characterIndex);
+        if(typeof showPlayerSpPopup==="function"){ setTimeout(()=>showPlayerSpPopup(cost,characterIndex),500); }
+        const exLevel=Math.max(0,Math.floor(numeric(getSkillLevel(characterKey,"waterEX"))));
+        const recoveryMultiplier=exLevel>0?1+(numeric(skillDatabase.waterEX&&skillDatabase.waterEX.healBonusPercent)||10)/100:1;
+        const hpAmount=Math.floor((350+30*(level-1))*recoveryMultiplier);
+        const spAmount=Math.floor((35+30*(level-1))*recoveryMultiplier);
+        let hpTotal=0;
+        let spTotal=0;
+        getExistingPartyIndexes().forEach(index=>{
+            const target=getPartyCharacterByIndex(index);
+            const stats=getPartyBattleStats(index);
+            if(!target||!stats||target.hp<=0){ return; }
+            const hp=Math.max(0,Math.min(hpAmount,stats.maxHP-target.hp));
+            const sp=Math.max(0,Math.min(spAmount,stats.maxSP-target.sp));
+            target.hp+=hp; target.sp+=sp;
+            hpTotal+=hp; spTotal+=sp;
+            if(hp>0&&typeof showPlayerHit==="function"){ showPlayerHit(hp,"heal",index,true); }
+            if(sp>0&&typeof showPlayerHit==="function"){ showPlayerHit(sp,"sp",index,true); }
+            if(typeof window.v141PlayCardEffect==="function"){ window.v141PlayCardEffect("player",index,"heal"); }
+        });
+        addBattleLog((caster.id||"角色")+"施放治療術，我方全體共恢復"+hpTotal+" HP、"+spTotal+" SP。");
+        updateUI(); finishPlayerAction();
+        return true;
+    }
+
+    if(typeof resolveQueuedPlayerAction==="function"){
+        const previousResolveQueuedPlayerAction=resolveQueuedPlayerAction;
+        resolveQueuedPlayerAction=function(characterIndex){
+            const queued=typeof queuedPlayerActions!=="undefined"?queuedPlayerActions[characterIndex]:null;
+            if(queued&&queued.action==="healSpell"){ return resolveAllPartyHeal(characterIndex); }
+            return previousResolveQueuedPlayerAction.apply(this,arguments);
+        };
+    }
+
+    /* ----- Exact transition wording. ----- */
+    function setTransitionLabel(label,kind){
+        const overlay=document.getElementById("v141BattleTransition");
+        const text=overlay&&overlay.querySelector("b");
+        if(!overlay||!text){ return; }
+        text.textContent=label;
+        overlay.dataset.v144Kind=kind;
+    }
+
+    if(typeof startTurn==="function"){
+        const previousStartTurnForLabel=startTurn;
+        startTurn=function(){
+            const result=previousStartTurnForLabel.apply(this,arguments);
+            setTransitionLabel("進入戰場","entry");
+            setTimeout(()=>setTransitionLabel("進入戰場","entry"),0);
+            return result;
+        };
+    }
+    if(typeof winBattle==="function"){
+        const previousWinBattleForLabel=winBattle;
+        winBattle=function(){
+            const result=previousWinBattleForLabel.apply(this,arguments);
+            setTransitionLabel("勝利","win");
+            return result;
+        };
+    }
+    if(typeof loseBattle==="function"){
+        const previousLoseBattleForLabel=loseBattle;
+        loseBattle=function(){
+            const result=previousLoseBattleForLabel.apply(this,arguments);
+            setTransitionLabel("戰鬥失敗","lose");
+            return result;
+        };
+    }
+
+    if(typeof window.v132LaunchDungeonBattle==="function"){
+        const previousLaunchDungeonBattle=window.v132LaunchDungeonBattle;
+        window.v132LaunchDungeonBattle=function(roster){
+            const options=arguments[2]&&typeof arguments[2]==="object"?arguments[2]:{};
+            const encounterId=String(options.mode||"dungeon")+"-"+(++encounterSequence);
+            (roster||[]).forEach(monster=>configureEncounterSkills(monster,encounterId));
+            return previousLaunchDungeonBattle.apply(this,arguments);
+        };
+    }
+
+    /* 共用 Dungeon launcher 會被 Daily/Tower/Boss/Adventure/Abyss 重用。
+       Render 後只再次驗證正式攜帶技能，不再改寫 monster.element。 */
+    let configuredDungeonBattleToken=null;
+    function configureDungeonBattleSkillsAfterRender(){
+        const roster=typeof monsters!=="undefined"?monsters:null;
+        const token=typeof battleToken!=="undefined"?battleToken:null;
+        if(
+            window.v132ActiveDungeonRun&&
+            token!==configuredDungeonBattleToken
+        ){
+            configuredDungeonBattleToken=token;
+            const encounterId="dungeon-render-"+(++encounterSequence);
+            (typeof currentBattleMonsters!=="undefined"?currentBattleMonsters:[]).forEach(index=>
+                configureEncounterSkills(monsters[index],encounterId)
+            );
+        }
+    }
+    window.v144ConfigureDungeonBattleSkillsAfterRender=configureDungeonBattleSkillsAfterRender;
+
+    function abyssAllies(){
+        return (typeof currentBattleMonsters!=="undefined"?currentBattleMonsters:[])
+            .map(index=>({index:index,monster:monsters[index]}));
+    }
+
+    function hasV144Buff(monster,key){ return !!(monster&&monster[key]&&numeric(monster[key].turnsLeft)>0); }
+
     /* V144 no longer owns an enemy support dispatcher. The shared Skill-ID
        dispatcher in V141/V155 is the sole runtime owner. */
 
@@ -178,7 +573,6 @@
         };
     };
 })();
-
 
 /* bundled source: js/41-v146-system-polish.js */
 /* =====================================================
@@ -4164,6 +4558,7 @@
 })();
 
 
+
 /* bundled source: js/46-v155-dev-fixes.js */
 /* =====================================================
    V155 — hard-control pacing, final Abyss skills and fire ultimates
@@ -5377,7 +5772,6 @@
         };
     }
 })();
-
 
 /* bundled source: js/48-v159-abyss-battle-portraits.js */
 /* V159 retired: portrait synchronization belongs to the canonical

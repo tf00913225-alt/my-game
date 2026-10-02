@@ -1,4 +1,5 @@
 
+
 /* bundled source: js/00-main.js */
 /* =====================================================
    ★ 1080 × 1920 整體等比例縮放控制器
@@ -2182,7 +2183,10 @@ function getActiveRageCriticalBonuses(entity){
 }
 
 window.v173GetActiveAccuracyBonusPercent=getActiveAccuracyBonusPercent;
+window.v173GetActiveRageCriticalBonuses=getActiveRageCriticalBonuses;
 
+/* Final Accuracy is a percentage-point modifier, not a multiplier on raw
+   Accuracy. It joins raw Accuracy only at the single hit-chance owner. */
 function getFinalAccuracyBonusPercent(entity){
     const activeBonus=getActiveAccuracyBonusPercent(entity);
     const windEx=entity&&entity.element==="wind"
@@ -2190,8 +2194,8 @@ function getFinalAccuracyBonusPercent(entity){
         :null;
     return activeBonus+(windEx?Number(windEx.accuracyBonusPercent)||0:0);
 }
+
 window.v173GetFinalAccuracyBonusPercent=getFinalAccuracyBonusPercent;
-window.v173GetActiveRageCriticalBonuses=getActiveRageCriticalBonuses;
 
 /* =====================================================
    主角最終能力
@@ -12613,7 +12617,7 @@ function calculateDamage(
    - 目標最終閃躲 - 最終命中下降。
 
    所有百分比效果皆是「最終百分點」加減，不再先封頂命中後
-   乘上 (1 - 閃躲率)。最後統一限制在 70%～99%。
+   乘上 (1 - 閃躲率)。最後統一限制在 5%～99%。
    普通怪物未明確指定 evasion 時，使用 min(10%, 等級×0.1%)。
 ===================================================== */
 
@@ -30070,7 +30074,7 @@ function openInventoryCharacterDetail(){
             `
         ).join("")+
         `<div class="inventory-character-detail-note">
-            最終命中率＝95%＋獨立命中詞條×0.15%＋其他最終命中加成－目標最終閃避與命中下降，最後限制70%～99%。<br>
+            最終命中率＝95%＋獨立命中詞條×0.15%＋其他最終命中加成－目標最終閃避與命中下降，最後限制5%～99%。<br>
             命中、閃避、異常抗性來自獨立戰鬥詞條或效果；敏捷只提高出手速度。
         </div>`;
 
@@ -33300,7 +33304,6 @@ try{
     );
 
 }
-
 
 /* bundled source: js/01-stage-v8-touch-lock.js */
 (function(){
