@@ -1,3 +1,12 @@
+## 2026-10-02 — RELEASE-SUITES-P0-20261002（第四批）
+
+- 即時基線 dev `92f47835964eabab24d38d613fc3df02a83e66b5`；#761 已合併，run37006601056 Repository checks／DEV部署／SHA讀回與線上UI及戰鬥驗證SUCCESS；第三批來源分支已不存在。工作分支 `fix/v17373-release-suite-recovery-batch4-20261002`；main禁止修改。
+- 262檔發現／0未分類；原20檔UTC修改前20 FAIL，修改後5 PASS／15 FAIL，累計30/45。完整runner因缺Chrome在20/262後exit1，未PASS；完整Chrome與候選發布验收仍pending。P0／requirement保持BLOCKED。
+- Tests-only Replacement：背包字級與中性inner art改驗css/22／css/50；角色自然捲動與padding改驗css/49／css/31，V78相容export實際VM執行不寫DOM；共用背包入口驗正向openInventoryContext與舊入口委派；quick-sell改VM驗正式委派、UID品質key／change／重複安裝；物品square／contain改驗css/49，禁止css/38接管。
+- 5個已通過檔與20檔首失敗分流見scope JSON。Typography只排除冗餘INVENTORY裝飾字，保留22px中文標題與非戰鬥>=13px；秘寶SP已由共用battle floating feedback呈現，保留藍色與戰鬥字級例外。未選檔只是首失敗分流，不宣稱完整Runtime根因已確認。
+- 5/5目標、5/5相關回歸、build:check與diff check PASS。只改測試與進度／交接；正式Runtime／workflow／CI／Game／Cache173.72未變，未RC／Freeze／正式發布。
+- PR最新Head必要CI、整合dev、合併SHA部署與來源分支清理仍待完成；結果以PR即時耐久紀錄為準。下一批剩15檔，不處理P1／P2／P3。
+
 ## 2026-10-02 — RELEASE-SUITES-P0-20261002（第三批）
 
 - Base dev `0974042ca1bf8cc562fc4f0a1131b81c3da73c38`；#760 merged，run37002929499 Repository checks／DEV deploy SUCCESS。Branch `fix/v17373-release-suite-recovery-batch3-20261002`，main禁止修改。

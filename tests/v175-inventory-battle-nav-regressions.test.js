@@ -11,8 +11,12 @@ assert.match(inventory,/const openOnce=getChestOpenOnce\(item\);/);
 assert.match(inventory,/item\.id==="equipmentChest"[\s\S]*?window\.v17346OpenEquipmentChest/);
 
 const inventoryCss=read("css/38-v141-system-expansion.css");
-assert.match(inventoryCss,/#itemModal \.item-modal-icon > \.v169-item-art\{[\s\S]*?width:min\(42vw,180px\);[\s\S]*?height:min\(42vw,180px\);/);
-assert.match(inventoryCss,/#itemModal \.item-modal-icon > \.v169-item-art > img,[\s\S]*?object-fit:contain;/);
+const itemFrameCss=read("css/49-v169-rpg-ui.css");
+// The responsive square belongs to the shared frame owner, not css/38.
+assert.doesNotMatch(inventoryCss,/#itemModal \.item-modal-icon/);
+assert.match(itemFrameCss,/#itemModal #itemModalIcon\{[^}]*width:clamp\(var\(--ui-item-art-min\),40%,var\(--ui-item-art-max\)\) !important;[^}]*aspect-ratio:1 !important;[^}]*height:auto !important;/);
+assert.match(itemFrameCss,/#itemModal #itemModalIcon > \.v169-item-art,[^}]*width:100% !important;[^}]*height:100% !important;/);
+assert.match(itemFrameCss,/#itemModal #itemModalIcon img,[^}]*object-fit:contain !important;/);
 
 const main=read("js/00-main.js");
 const hpMarkup=main.indexOf('class="monster-hp"');

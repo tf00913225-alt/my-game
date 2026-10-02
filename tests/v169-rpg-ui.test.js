@@ -8,7 +8,7 @@ const vm=require("node:vm");
 
 const uiSource=fs.readFileSync("js/51-v169-rpg-ui.js","utf8");
 const css=fs.readFileSync("css/49-v169-rpg-ui.css","utf8");
-const characterCoreCss=fs.readFileSync("css/22-stage-v78-character-inventory-core.css","utf8");
+const characterCoreCss=fs.readFileSync("css/31-v131-fix-batch.css","utf8");
 const baseCss=fs.readFileSync("css/00-main.css","utf8");
 const mainSource=fs.readFileSync("js/00-main.js","utf8");
 const layoutSource=fs.readFileSync("js/19-stage-v78-character-inventory-runtime.js","utf8");
@@ -184,8 +184,12 @@ test("beforeunload only saves and never triggers a browser leave prompt",()=>{
     assert.match(mainSource,/await window\.rpgConfirm\([\s\S]*title:"離開冒險"/);
 });
 
-test("character runtime preserves the previous natural-scroll layout",()=>{
-    assert.match(layoutSource,/inventoryOwnsScroll\s*\? "hidden"\s*: "scroll"/);
+test("character CSS owns natural scrolling after the inline writer retires",()=>{
+    const context=vm.createContext({window:{}});
+    vm.runInContext(layoutSource,context);
+    assert.equal(context.window.v78ApplyCharacterInventoryLayout(),false);
+    assert.doesNotMatch(layoutSource,/setProperty|MutationObserver|setTimeout|requestAnimationFrame/);
+    assert.match(css,/\.home-feature-modal-box\.wide #characterTabContent\{[^}]*overflow-x:hidden !important;[^}]*overflow-y:auto !important;[^}]*touch-action:pan-y !important;/);
     assert.doesNotMatch(layoutSource,/dataset\.characterTab|fixedCharacterTab/);
     assert.doesNotMatch(css,/data-character-tab=/);
 });
@@ -228,7 +232,9 @@ test("successful potion purchases enqueue an RPG receipt only after inventory ch
 
 test("dungeon backpack reuses the shared context-aware inventory lifecycle",()=>{
     assert.match(mainSource,/function openInventoryContext\(context\)/);
-    assert.match(mainSource,/openMapInventoryOverlay\(normalized\)/);
+    const entry=mainSource.slice(mainSource.indexOf("function openInventoryContext("),mainSource.indexOf("function setMapInventoryScrollGate("));
+    assert.match(entry,/showPage\("inventory"\);\s*inventoryOpenContext=normalized;/);
+    assert.match(mainSource,/function openMapInventoryOverlay\(context\)\{\s*return openInventoryContext\(context\);/);
     assert.doesNotMatch(uiSource,/mapPage\.classList\.add\("active"\)|previousOpenMapInventoryOverlay|v169-dungeon-inventory-overlay/);
     assert.doesNotMatch(css,/v169-dungeon-inventory-overlay|maximizeDungeonBackpack/);
 });
