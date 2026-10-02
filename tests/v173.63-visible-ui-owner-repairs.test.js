@@ -7,6 +7,7 @@ const characterRuntime=fs.readFileSync(
     "js/19-stage-v78-character-inventory-runtime.js",
     "utf8"
 );
+const characterCss=fs.readFileSync("css/49-v169-rpg-ui.css","utf8");
 const functionalRepairs=fs.readFileSync(
     "js/58-v173.63-functional-fixes.js",
     "utf8"
@@ -18,15 +19,17 @@ const equipmentProgression=fs.readFileSync(
 const productionBuild=fs.readFileSync("scripts/build-production.mjs","utf8");
 
 assert.match(
-    characterRuntime,
-    /width[\s\S]*calc\(100% - 8px\)[\s\S]*height[\s\S]*calc\(100% - 8px\)/,
-    "character owner must use the full mobile canvas"
+    characterCss,
+    /#homeFeatureModal \.home-feature-modal-box\.wide\{[^}]*width[\s\S]*calc\(100% - 8px\)[^}]*height:[^}]*calc\(100% - 8px\)/,
+    "CSS character owner must use the full mobile canvas"
 );
 assert.doesNotMatch(
     characterRuntime,
     /396px[\s\S]*620px|620px[\s\S]*396px/,
     "legacy medium-panel inline size must not return"
 );
+assert.match(characterRuntime,/function applyCharacterInventoryLayout\(\)\{ return false; \}/);
+assert.doesNotMatch(characterRuntime,/setProperty|MutationObserver|requestAnimationFrame|setTimeout/);
 assert.ok(
     productionBuild.indexOf('"js/53-v173.50-inventory-qol.js"')<productionBuild.indexOf('"js/58-v173.63-functional-fixes.js"'),
     "V173.63 functional repairs must follow their owners inside gameplay-core"

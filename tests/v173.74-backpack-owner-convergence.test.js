@@ -20,7 +20,8 @@ assert.match(core,/\.inventory-grid-scroll\{[\s\S]*?overflow-y:auto/);
 assert.match(core,/\.inventory-classic-shell\{[\s\S]*?border:1px solid/);
 assert.match(core,/\.inventory-right-panel\{[\s\S]*?background:transparent/);
 assert.match(core,/\.v169-item-art>img\{[\s\S]*?object-fit:contain/);
-assert.match(legacyGrid,/overflow-y:auto !important/);
+assert.match(legacyGrid,/\.inventory-grid-scroll\{[^}]*overflow-y:auto;[^}]*overflow-x:hidden;[^}]*touch-action:pan-y;[^}]*scrollbar-gutter:stable;/);
+assert.doesNotMatch(legacyGrid,/inventory-classic-shell|inventory-right-panel|!important/);
 assert.doesNotMatch(oldGrid,/\.inventory-grid-scroll\{/);
 assert.doesNotMatch(polish,/\.inventory-grid-scroll\{/);
 assert.doesNotMatch(windowSkin,/\.inventory-classic-shell,\n/,

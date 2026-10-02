@@ -20,67 +20,37 @@ function test(name,callback){
     console.log("✓ "+name);
 }
 
-function extractFunction(source,name){
-    const start=source.indexOf("function "+name+"(");
-    const end=source.indexOf("\n}\n\nfunction ",start);
-    assert.ok(start>=0&&end>start,"function "+name+" exists");
-    return source.slice(start,end+2);
+function rule(source,selector){
+    const blocks=[...source.replace(/\/\*[\s\S]*?\*\//g,"").matchAll(/([^{}]+)\{([^{}]*)\}/g)]
+        .filter(match=>match[1].trim()===selector);
+    assert.ok(blocks.length,"CSS rule exists: "+selector);
+    const declarations=new Map();
+    for(const block of blocks){
+        for(const declaration of block[2].split(";")){
+            const colon=declaration.indexOf(":");
+            if(colon<0){ continue; }
+            declarations.set(declaration.slice(0,colon).trim(),declaration.slice(colon+1).trim());
+        }
+    }
+    return [...declarations].map(([property,value])=>property+":"+value+";").join("\n");
 }
 
-function makeElement(){
-    const values=new Map();
-    const element={
-        clientHeight:520,
-        parentElement:null,
-        dataset:{},
-        style:{
-            setProperty(name,value,priority){ values.set(name,{value,priority}); },
-            removeProperty(name){ values.delete(name); }
-        },
-        contains(node){
-            let current=node;
-            while(current){
-                if(current===element){ return true; }
-                current=current.parentElement;
-            }
-            return false;
-        },
-        value(name){ return values.get(name)?.value; },
-        priority(name){ return values.get(name)?.priority; }
-    };
-    return element;
-}
-
-test("the V78 owner now makes every character tab fill the mobile canvas",()=>{
-    const body=makeElement();
-    const root=makeElement();
-    const inventory=makeElement();
-    const box=makeElement();
-    const modal=makeElement();
-    root.parentElement=body;
-    modal.classList={contains:name=>name==="show"};
-    modal.querySelector=selector=>selector===".home-feature-modal-box.wide"?box:null;
-
-    const elements={
-        homeFeatureModal:modal,
-        homeFeatureModalBody:body,
-        characterTabContent:root,
-        inventoryPage:inventory
-    };
-    const context={document:{getElementById:id=>elements[id]||null},Math,Number};
-    vm.createContext(context);
-    vm.runInContext(extractFunction(runtime,"applyNow"),context);
-    context.applyNow();
-
-    assert.equal(box.value("width"),"calc(100% - 8px)");
-    assert.equal(box.value("max-width"),"none");
-    assert.equal(box.value("height"),"calc(100% - 8px)");
-    assert.equal(box.value("max-height"),"calc(100% - 8px)");
-    assert.equal(body.value("flex"),"1 1 auto");
-    assert.equal(root.value("flex"),"1 1 auto");
-    assert.equal(root.value("overflow-y"),"scroll");
-    assert.equal(root.value("scrollbar-gutter"),"stable");
-    assert.equal(root.priority("height"),"important");
+test("the retired V78 export cannot write character or backpack geometry",()=>{
+    const context=vm.createContext({window:{}});
+    vm.runInContext(runtime,context);
+    assert.equal(typeof context.window.v78ApplyCharacterInventoryLayout,"function");
+    assert.equal(context.window.v78ApplyCharacterInventoryLayout(),false);
+    assert.doesNotMatch(runtime,/setProperty|MutationObserver|setTimeout|requestAnimationFrame/);
+    const frame=rule(sharedCss,"#game-stage #homeFeatureModal .home-feature-modal-box.wide");
+    for(const property of ["width","height","max-height"]){
+        assert.match(frame,new RegExp("(?:^|[;\\s])"+property+":calc\\(100% - 8px\\) !important;"));
+    }
+    assert.match(frame,/max-width:none !important;/);
+    assert.match(rule(sharedCss,"#game-stage #homeFeatureModal .home-feature-modal-box.wide #homeFeatureModalBody"),/flex:1 1 auto !important;/);
+    const content=rule(sharedCss,"#game-stage #homeFeatureModal #characterTabContent");
+    assert.match(content,/flex:1 1 auto !important;/);
+    assert.match(content,/height:auto !important;/);
+    assert.match(content,/scrollbar-gutter:stable !important;/);
 });
 
 test("the late shared design-system CSS retains the matching fullscreen character override",()=>{
@@ -92,18 +62,19 @@ test("the late shared design-system CSS retains the matching fullscreen characte
     assert.match(sharedCss,/#characterTabContent\{[\s\S]{0,220}flex:1 1 auto !important/);
 });
 
-test("historical character rules remain compatible fallbacks instead of a scale-based layout patch",()=>{
-    assert.match(coreCss,/\.home-feature-modal-box\.wide/);
-    assert.match(finalCss,/\.home-feature-modal-box\.wide/);
-    assert.doesNotMatch(runtime,/transform\s*:\s*scale\s*\(|setProperty\(\s*["']transform["']\s*,\s*["']scale\s*\(/);
-    assert.doesNotMatch(runtime,/dataset\.characterTab|fixedCharacterTab/);
+test("backpack geometry no longer competes with the character modal",()=>{
+    assert.match(coreCss,/#game-stage #inventoryPage \.inventory-classic-shell\{[^}]*width:93\.4%;[^}]*height:100%;/);
+    assert.doesNotMatch(coreCss,/#characterTabContent|\.home-feature-modal-box\.wide/);
+    assert.doesNotMatch(runtime,/transform\s*:\s*scale\s*\(|dataset\.characterTab|fixedCharacterTab/);
 });
 
-test("long character tabs retain the canonical internal scroll owner",()=>{
-    assert.match(runtime,/inventoryOwnsScroll\s*\?\s*"hidden"\s*:\s*"scroll"/);
-    assert.match(runtime,/"scrollbar-gutter",[\s\S]*?"stable"/);
-    assert.match(coreCss,/#characterTabContent\{[\s\S]{0,500}overflow-y:auto !important/);
-    assert.match(finalCss,/#characterTabContent\{[\s\S]{0,500}overflow-y:auto !important/);
+test("long character tabs retain their CSS scroll owner and backpack has its own",()=>{
+    const content=rule(sharedCss,"#game-stage #homeFeatureModal .home-feature-modal-box.wide #characterTabContent");
+    assert.match(content,/overflow-y:auto !important;/);
+    assert.match(content,/overflow-x:hidden !important;/);
+    assert.match(content,/touch-action:pan-y !important;/);
+    assert.match(rule(coreCss,"#game-stage #inventoryPage .inventory-grid-scroll"),/overflow-y:auto;[^}]*scrollbar-gutter:stable;/);
+    assert.doesNotMatch(finalCss,/\.inventory-grid-scroll\{/);
 });
 
 test("the functional V173.63 repair runtime follows late owners inside gameplay-core",()=>{

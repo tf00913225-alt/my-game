@@ -1,3 +1,11 @@
+## 2026-10-02 — RELEASE-SUITES-P0-20261002（第三批）
+
+- Base dev `0974042ca1bf8cc562fc4f0a1131b81c3da73c38`；#760 merged，run37002929499 Repository checks／DEV deploy SUCCESS。Branch `fix/v17373-release-suite-recovery-batch3-20261002`，main禁止修改。
+- 原27檔UTC修改前27 FAIL，修改後7 PASS／20 FAIL；累計25/45。262 suites／0 unclassified；完整發布runner本機仍未PASS，Chrome／exact候選發布驗收pending；P0保持BLOCKED。
+- Tests-only Replacement：V78 inline writer退役，角色尺寸／內捲動驗css/49；背包框／格子驗css/22，捲動驗css/24。保留容量／六欄／single scroller／邊框與44px控制。7檔清單、首失敗A～F分流與Owner見scope JSON；未選檔不得視為已完成根因驗證。
+- 7/7目標、5/5相關回歸、build:check、diff check PASS。Runtime／CI／Game／Cache173.72未改；未RC／Freeze／正式發布。PR最新Head必要CI、merge、DEV exact-SHA、分支清理待完成，結果以PR即時紀錄為準。
+- Next：本批安全整合／部署／清理，再以同Work ID處理剩20檔；不得僅因dev CI綠燈解除P0。
+
 ## 2026-10-02 — RELEASE-SUITES-P0-20261002（第二批接續）
 
 - 即時基線 dev `7fdd316ced57814e7f635e4444ed694ac4620522`；#759 已合併／來源分支已刪，另從最新 dev 建 `fix/v17373-release-suite-recovery-batch2-20261002`。main 禁止修改，Game／Cache 173.72 不變，未建立 RC／Freeze。

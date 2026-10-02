@@ -332,8 +332,8 @@
           ".github/workflows/ci.yml",
           ".github/scripts/ci.mjs"
         ],
-        "verification": "完整 suite preflight、dev workflow skip 條件核對、兩項最小 fixture 修復與 UTC 公告測試重驗",
-        "result": "累計18個原失敗測試檔已完成最小契約／fixture遷移且本機通過；仍有27個非環境失敗檔與完整Chrome發布驗收待完成，P0保持BLOCKED。"
+        "verification": "第三批：262檔發現、原27檔UTC診斷、7/7目標檔、5項相關回歸、build:check及diff check通過；完整正式發布runner未PASS。",
+        "result": "累計25/45個原失敗測試檔已重新執行通過；剩餘20個及完整Chrome發布驗收／候選SHA驗證待完成。P0保持BLOCKED，未進入RC或正式發布。"
       }
     }
   ]
