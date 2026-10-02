@@ -4531,3 +4531,12 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 本機孔數、舊存檔、換裝、滿孔不扣料與回滾回歸通過；390／412 production QA 已接既有 CI 的 Responsive Item 步驟。此工作區無完整二進位素材／Chrome，正式 build 交由現有 CI build-sync evidence 建置後回填，未偽造建置成功。對應 requirement-batches/2026-10-02-forge-sockets-gems.json。
 
 待完成：取得最新提交正式建置產物、必要 CI 與手機 production QA；通過才合併 dev／驗證部署。正式可信後端鑲嵌與宝石取得来源另階段，不可宣稱本機原型等於正式交易；main 仍禁止發布。
+
+
+## 2026-10-02 — 鍛造與寶石第一階段 dev 驗證收尾
+
+PR #751 已合併 dev@b61f87d804edcbb8202c16bfd17f9d8cd78bf115。候選 run 36966366859 與合併 dev run 36967167176 attempt 2 的 Repository checks SUCCESS；固定 dev 部署 SHA／Game+Cache 173.72 核對通過。首次既有 UI layout Chrome 未回傳測量 DOM，同 SHA 重跑後通過，未減少斷言。
+
+第一階段 6/6 VERIFIED：入口／冶煉無圖紙／孔位相容／最小寶石／UID 本機安全鑲嵌與屬性／手機介面。候選 artifact 11209726733、部署 artifact 11210577025，forge/evidence.json 與390／412截圖；deployed-dev SHA 與 dev 一致。詳細證據 docs/qa/forge-sockets-gems-20261002.md。
+
+CSS49 統一合成／鍛造底部間距，退役 CSS38／JS58 的衝突設定。正式後端交易與寶石取得來源未實作；雲端權威角色拒絕本機鑲嵌。Chrome 模擬手機不是 Android 實體裝置驗收；未寫玩家雲端或發送物品。版本不增加，main 未修改，未正式發布。
