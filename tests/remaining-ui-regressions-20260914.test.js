@@ -18,7 +18,7 @@ const finalNavBridge=read("js/42-v148-combat-dungeon-fixes.js");
 assert.match(inventoryJs,/const INVENTORY_PAGE_SIZE=24;/);
 assert.match(inventoryJs,/for\(let index=0;index<INVENTORY_PAGE_SIZE;index\+\+\)/);
 assert.match(inventoryCss,/inventory-grid-classic[\s\S]*grid-template-columns:repeat\(6,minmax\(0,1fr\)\)/);
-assert.match(inventoryCss,/inventory-grid-classic \.inventory-item-classic \.inventory-icon > \.v169-item-art[\s\S]*object-fit:contain/);
+assert.match(inventoryCss,/inventory-grid-classic \.inventory-item-classic \.inventory-icon\s*>\s*\.v169-item-art\s*>\s*img\{[^}]*object-fit:contain;[^}]*object-position:center/);
 assert.doesNotMatch(abyssCss,/#game-stage #inventoryPage \.inventory-item-classic \.inventory-icon > \.v169-item-art\{/);
 assert.doesNotMatch(battle,/battle-monster\.v174-cardless-unit>\.battle-monster-name\{[\s\S]*top:0!important/,
     "legacy V173.51 runtime must not move enemy names above the card");
@@ -38,7 +38,13 @@ assert.match(vfx,/naturalWidth[\s\S]*columns[\s\S]*naturalHeight[\s\S]*rows/);
 assert.match(vfx,/node\.style\.visibility="hidden"/);
 assert.match(vfx,/function confirmTargetVisual/);
 assert.match(vfx,/window\.v143RunAtTargetHit=function\(targetSide,index,callback,allowDefeated\)\{[\s\S]*const wait=delayFor\(targetSide,index,allowDefeated===true\);[\s\S]*setTimer\(callback,wait\)/);
-assert.match(vfx,/popup\.classList\.add\("v152-top-damage"\)/);
+// V143 owns impact timing; the canonical feedback owner creates popup DOM.
+assert.doesNotMatch(vfx,/v152-top-damage|popup\.classList\.add/);
+const feedback=read("js/battle-floating-feedback-owner.js");
+assert.match(vfx,/window\.v143ResolveBattleFeedbackTiming=function/);
+assert.match(feedback,/window\.v143ResolveBattleFeedbackTiming/);
+assert.match(feedback,/node\.className="battle-floating-feedback/);
+assert.match(feedback,/node\.dataset\.feedbackLane=String\(lane\)/);
 assert.match(bossCss,/\.v-fixed-boss-footprint\{/);
 assert.match(bossJs,/function applyBossShield\(amount\)/);
 assert.doesNotMatch(bossJs,/showDamagePopup\(node,"HP-"\+final/);
@@ -46,7 +52,8 @@ assert.match(vfxCss,/@keyframes v143RasterTravel\{[\s\S]*rotate\(var\(--v143-spr
 assert.doesNotMatch(fireCss,/v174FireRocketTravel/);
 assert.doesNotMatch(fireCss,/data-skill="fireRocket"/);
 assert.doesNotMatch(legacyNav,/function fixDungeonNavigation\(\)\{[\s\S]*?nav\.innerHTML=/);
-assert.match(legacyNav,/v148SyncDungeonShell/);
+assert.match(legacyNav,/function fixDungeonNavigation\(\)\{[\s\S]*?window\.v148SyncContextNavigation\(\);/);
+assert.match(finalNavBridge,/window\.FourSymbolsBottomNav\?\.syncContext\(\)/);
 assert.match(finalNav,/\["秘寶","assets\/ui\/nav-relic-v175\.webp","v148OpenContextRelic\(\)"\]/);
 assert.match(finalNav,/buttons\.push\(\["返回","assets\/ui\/map-return\.png",returnAction\]\)/);
 assert.match(finalNav,/const context=trainingActive[\s\S]*?\?"training"[\s\S]*?"gameplay:"\+gameplayPageId[\s\S]*?"abyss-map"[\s\S]*?"abyss-selection"[\s\S]*?"daily"/);
