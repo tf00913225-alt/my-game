@@ -65,7 +65,7 @@
         if(dodge){
             Object.assign(dodge,{
                 learnCost:10,maxLevel:1,spCost:20,targetType:"allyAll",duration:2,
-                evasionBonusPercent:60,requires:["windCrossSlash","windHowlLightning"],
+                evasionBonusPercent:25,requires:["windCrossSlash","windHowlLightning"],
                 description:"需先學習風旋十字斬或風哮電擊其一。使我方全體閃躲率提升60%，持續2回合。"
             });
         }

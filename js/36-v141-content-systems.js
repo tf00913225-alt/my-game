@@ -263,7 +263,7 @@
     function statsHtml(stats){
         const entries=Object.entries(stats||{});
         if(!entries.length){ return '<span class="muted">尚無冶煉詞條</span>'; }
-        return entries.map(([key,value])=>'<span>'+escapeHtml(STAT_LABEL[key]||key)+' <b>+'+value+'</b></span>').join("");
+        return entries.map(([key,value])=>'<span>'+escapeHtml(STAT_LABEL[key]||key)+' <b>+'+value+(["accuracy","evasion"].includes(key)?"%":"")+'</b></span>').join("");
     }
     function rangeText(tierKey,isReforge){
         const meta=TIER_META[normalizeTierKey(tierKey)];
@@ -380,7 +380,7 @@
             ?currentEntries.map(([key,value])=>{
                 const selected=lockSet.has(key);
                 return '<button type="button" class="v17358-affix-lock '+(selected?'locked':'')+'" '+(synthesisState.pendingReforge?'disabled':'')+' onclick="v141ToggleReforgeLock(\''+escapeHtml(key)+'\')">'+
-                    '<span>'+(selected?'🔒':'◇')+'</span><b>'+escapeHtml(STAT_LABEL[key]||key)+' +'+value+'</b><small>'+(selected?'已鎖定':'點擊鎖定')+'</small></button>';
+                    '<span>'+(selected?'🔒':'◇')+'</span><b>'+escapeHtml(STAT_LABEL[key]||key)+' +'+value+(["accuracy","evasion"].includes(key)?"%":"")+'</b><small>'+(selected?'已鎖定':'點擊鎖定')+'</small></button>';
             }).join("")
             :'<div class="v17358-no-affix-lock">首次冶煉尚無詞條可鎖定。</div>';
         return '<div class="v141-synthesis-card v17358-reforge-card">'+

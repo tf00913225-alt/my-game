@@ -1,3 +1,11 @@
+## 2026-10-02 — HIT-EVASION-PERCENT-V2-20261002（施工中）
+
+- V1 #750 已合併。V2 base dev `60c1aab27567e2c1e64604b95a0979e97806f59b`，工作分支 `fix/hit-evasion-percent-source-rebalance-v2-20261002`。
+- Hit Owner 維持 `js/00-main.js::calculateHitChancePercent`；退休 0.15 命中係數與等級預設閃避。Set Owner `js/equipment-progression.js` 與原始 definition 同步 armor/robe evasion 10；V132 3 件套 evasion 2。
+- 共用 Migration Owner `functions/src/equipment-combat-percent-migration.js`，裝備版本 2 標記防止重複換算；主 Runtime 委派，不新增 save wrapper。後端 review 對 legacyItem 副本投影，原始封存不修改。
+- Relic Owner `js/60-team-relic-system.js` 以期限內 reduction entries 投影最終命中下降，保留 Boss 效率。Skill Final Data Owner 不重平衡。
+- Tests/build/browser/PR/CI/merge 待完成，不可回報 VERIFIED。
+
 ## 2026-10-01 — Water wild monster portraits batch 1 (candidate)
 
 - Remote work branch `feature/water-wild-monsters-batch1-20261001` was created from live `dev@bf07c2cdf63f4b358b3e3cbdbb8e012a95ed347e`; `main` and `assets-library` remain unchanged. This batch covers exactly ten water wild portraits and does not adopt water tower assets or the other ten normal sources.

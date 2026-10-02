@@ -1,6 +1,7 @@
 "use strict";
 
 const {createHash}=require("node:crypto");
+const {projectItem}=require("./equipment-combat-percent-migration");
 const {LEGACY_BACKUP_SIDECARS}=require("./cloud-save-policy.js");
 
 const SCHEMA_VERSION=1;
@@ -196,7 +197,7 @@ function assembleCanonicalSnapshot(uid,revision,records){
     const payload={schemaVersion:SCHEMA_VERSION,ownerUid:uid,
         sourceServerRevision:revision,provenance,slots:copy(slots),
         characters:copy(characters),economy:copy(records.economy),
-        inventory:copy(records.inventory),equipment:copy(records.equipment),
+        inventory:records.inventory.map(item=>({...copy(item),state:EQUIPMENT_TYPES[item.state.type]?projectItem(item.state):copy(item.state)})),equipment:copy(records.equipment),
         relics:copy(records.relics),relicLoadout:copy(records.relicLoadout),
         formation:copy(records.account.formation??null),
         progress:copy(records.progress),

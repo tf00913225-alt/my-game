@@ -278,6 +278,24 @@ const boosted=context.getPartyBattleStats(0);assert.ok(boosted.evasion>=8&&boost
 
 context.v174EquipRelic("relic_soul_bell");monsters.forEach(m=>{m.alive=true;m.attack=100;m.magicAttack=100;m.accuracy=100;});context.startBattle();context.turn=4;context.startTurn(context.battleToken);
 assert.ok(monsters[1].attack<100,"Soul Bell applies actual live monster attack reduction");context.loseBattle();
+for(const [level,reduction] of [[10,5],[20,8]]){
+    context.v174RelicSystem.getOwnedState().relic_soul_bell.level=level;
+    monsters.forEach(m=>{m.alive=true;m.hp=2000;m.attack=100;m.accuracy=0;});
+    context.startBattle();context.turn=4;context.startTurn(context.battleToken);
+    assert.equal(monsters[1].accuracy,0,"Soul Bell never multiplies independent Accuracy");
+    assert.equal(context.v174GetRelicFinalHitReductionPercent(monsters[1]),reduction);
+    const efficiency=context.v174GetRelicFinalHitReductionPercent(monsters[0])/reduction;
+    assert.ok(efficiency>0&&efficiency<=1,"existing Boss efficiency applies to percentage points");
+    context.loseBattle();
+    assert.equal(context.v174GetRelicFinalHitReductionPercent(monsters[1]),0,"battle teardown releases reduction");
+}
+for(const [level,evasion] of [[1,8],[10,10],[20,12]]){
+    context.v174RelicSystem.getOwnedState().relic_qinglan_feather.level=level;
+    context.v174EquipRelic("relic_qinglan_feather");context.startBattle();
+    assert.equal(context.getPartyBattleStats(0).evasion,evasion);
+    context.loseBattle();
+}
+
 
 context.v174EquipRelic("relic_rock_mountain_seal");party[0].hp=1000;context.startBattle();
 assert.ok(context.getPartyBattleStats(0).defense>100,"Rock Mountain Seal opening defense uses the real shared stat owner");context.loseBattle();

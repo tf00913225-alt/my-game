@@ -1,6 +1,7 @@
 "use strict";
 
 const {randomUUID}=require("node:crypto");
+const {projectItem}=require("./equipment-combat-percent-migration");
 
 // Internal projection for a future one-time admission transaction. Every ID
 // allocated here is provisional: this object is never persisted or returned
@@ -37,7 +38,7 @@ function buildCanonicalCharacterReviewPlan(uid,draft,allocateId=randomUUID){
     const equipmentRefs=[];
     for(const entry of draft.inventory){
         ownedItems.push({ownedItemId:nextId(),location:"bag",source:entry.source,
-            legacyItem:copy(entry.item)});
+            legacyItem:projectItem(entry.item)});
     }
     for(const entry of draft.equipment){
         if(!slots[entry.slotIndex]){
@@ -45,7 +46,7 @@ function buildCanonicalCharacterReviewPlan(uid,draft,allocateId=randomUUID){
         }
         const ownedItemId=nextId();
         ownedItems.push({ownedItemId,location:"equipped",source:entry.source,
-            legacyItem:copy(entry.item)});
+            legacyItem:projectItem(entry.item)});
         equipmentRefs.push({characterId:slots[entry.slotIndex],slot:entry.slot,ownedItemId});
     }
     const relicRecords=Object.entries(draft.relics).map(([relicId,state])=>({

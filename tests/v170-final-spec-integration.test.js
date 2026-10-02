@@ -241,6 +241,7 @@ function makeContext(){
 function loadFinalRuntime(){
     const context=makeContext();
     const loaded=[];
+    vm.runInContext(fs.readFileSync("functions/src/equipment-combat-percent-migration.js","utf8"),context);
     vm.runInContext(fs.readFileSync("js/startup/account-save-repository.js","utf8"),context,{filename:"js/startup/account-save-repository.js"});
     vm.runInContext('FourSymbolsAccountSave.activate("v170-test-uid")',context);
     EXPECTED_DIRECT_SCRIPT_PATHS.forEach(path=>{
@@ -470,10 +471,10 @@ test("the current owner supplies the rebalanced status definitions",()=>{
 test("final hit, evasion and status chances use one percentage-point model",()=>{
     assert.doesNotMatch(mainSource,/STATUS_RESIST_PER_SPIRIT_POINT/);
     assert.match(mainSource,/const STATUS_OFFENSE_ATTRIBUTE_COEFFICIENT = 0\.05;/);
-    assert.match(mainSource,/const HIT_CHANCE_ACCURACY_COEFFICIENT = 0\.15;/);
+    assert.doesNotMatch(mainSource,/HIT_CHANCE_ACCURACY_COEFFICIENT/);
     assert.match(mainSource,/const HIT_CHANCE_MIN_PERCENT = 5;/);
-    assert.match(mainSource,/const DEFAULT_MONSTER_EVASION_PER_LEVEL = 0\.1;/);
-    assert.match(mainSource,/const DEFAULT_MONSTER_EVASION_CAP = 10;/);
+    assert.doesNotMatch(mainSource,/DEFAULT_MONSTER_EVASION_PER_LEVEL/);
+    assert.doesNotMatch(mainSource,/DEFAULT_MONSTER_EVASION_CAP/);
     assert.doesNotMatch(v140Source,/Math\.sqrt\(power\)|GENERAL_STATUS_COEFFICIENT|LOCKDOWN_STATUS_COEFFICIENT/);
     assert.doesNotMatch(v140Source,/rollHitChance\s*=\s*function|calculateStatusEffectChance\s*=\s*function/);
     assert.doesNotMatch(v158Source,/v158GetHitChancePercent|rollHitChance\s*=\s*function/);
@@ -482,7 +483,7 @@ test("final hit, evasion and status chances use one percentage-point model",()=>
     const hit=runtime.context.v173GetHitChancePercent;
     assert.deepEqual(
         [hit(0,0,0,0),hit(10,0,0,0),hit(0,10,0,0),hit(0,1000,0,0),hit(0,1000,50,0),hit(1000,0,0,0)],
-        [95,96.5,85,5,5,99]
+        [95,99,85,5,5,99]
     );
     assert.equal(hit(0,15,5,10),85,"95 + 10 - 15 - 5 must equal 85 percentage points");
 
@@ -848,7 +849,7 @@ test("player agility does not grant evasion and default monster level retains ex
             custom:custom.evasion,missing:missing.evasion
         };
     })()`);
-    assert.deepEqual(result,{player:0,level40:4,level200:10,custom:24,missing:10});
+    assert.deepEqual(result,{player:0,level40:0,level200:0,custom:24,missing:0});
 });
 
 test("multi-target buffs resolve same-name MISS independently without replacing existing values",()=>{
@@ -1643,6 +1644,28 @@ test("formal EXP chain couples actual patrol reward to target battles from Lv20"
     assert.match(dungeonSource,/const DUNGEON_DAILY_LIMIT_ENABLED=false/);
     assert.match(dailyDungeonSource,/showRewardedAd\(\(\)=>grant\(2\)/);
     console.log("EXP_GROWTH_REPORT="+JSON.stringify(report));
+});
+
+test("V2 final percent sources, naked levels, Calm, Dodge, Wind EX and low-HP cap",()=>{
+    const runtime=loadFinalRuntime();
+    const evidence=evaluateJson(runtime.context,`(()=>{
+        player.element="wind";player.level=100;player.activeBuffs=[];player.statusEffects=[];
+        characterEquipment.fire={};characterEquipment.wind=characterEquipment.fire;
+        characterSkillLoadouts.fire={skillLevels:{windEX:1},equippedSkills:[]};
+        player.hp=getMainCharacterStats().maxHP;
+        const wind={accuracy:getFinalAccuracyBonusPercent(player),evasion:getMainCharacterStats().evasion};
+        player.hp=1;
+        const cap=calculateHitChancePercent(1000,0,0,0,player);
+        characterSkillLoadouts.fire.skillLevels.windEX=0;
+        const naked=[1,100].map(level=>{player.level=level;return calculateHitChancePercent(getMainCharacterStats().accuracy,makeZoneMonster("QA",level,"fire").evasion,0,0);});
+        const calm=[5,10,15,20,25].map(value=>{player.activeBuffs=[{type:"dinghaishenzhen",turnsLeft:3,accuracyBonusPercent:value}];return [getMainCharacterStats().accuracy,getFinalAccuracyBonusPercent(player),calculateHitChancePercent(0,40,0,getFinalAccuracyBonusPercent(player))];});
+        const dodge=[5,10,15,20,25].map(value=>{player.activeBuffs=[{type:"dodgeSkill",turnsLeft:3,percent:value}];return getMainCharacterStats().evasion;});
+        return {wind,cap,naked,calm,dodge};
+    })()`);
+    assert.deepEqual(evidence.wind,{accuracy:15,evasion:15});assert.equal(evidence.cap,50);
+    assert.deepEqual(evidence.naked,[95,95]);
+    assert.deepEqual(evidence.calm,[5,10,15,20,25].map(v=>[0,v,55+v]));
+    assert.deepEqual(evidence.dodge,[5,10,15,20,25]);
 });
 
 console.log("\nV170 final integration suite: "+passed+" tests passed.");

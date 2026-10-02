@@ -2629,8 +2629,8 @@
     const EQUIPMENT_SET_PIECES=[
         {key:"blade",slot:"weapon",name:"刀",stats:{attack:10,vitality:-2}},
         {key:"fan",slot:"weapon",name:"扇",stats:{intelligence:10,vitality:-2}},
-        {key:"heavyArmor",slot:"armor",name:"鎧甲",stats:{attack:5,accuracy:10,antiCrit:0.5,statusResistance:0.25}},
-        {key:"robe",slot:"armor",name:"袍",stats:{intelligence:5,accuracy:10,antiCrit:0.5,statusResistance:0.25}},
+        {key:"heavyArmor",slot:"armor",name:"鎧甲",stats:{attack:5,evasion:10,antiCrit:0.5,statusResistance:0.25}},
+        {key:"robe",slot:"armor",name:"袍",stats:{intelligence:5,evasion:10,antiCrit:0.5,statusResistance:0.25}},
         {key:"boots",slot:"shoes",name:"靴",stats:{agility:10}},
         {key:"shoes",slot:"shoes",name:"履",stats:{agility:10}},
         {key:"helm",slot:"head",name:"盔",stats:{attack:12}},
@@ -2658,6 +2658,7 @@
                 tierKey:"orange",
                 levelRequirement:20,
                 price:0,
+                equipmentCombatPercentUnitVersion:2,
                 stats:Object.assign({},piece.stats)
             });
         });
@@ -3443,7 +3444,7 @@
                     ["attack","vitality","energy","intelligence","defensePoints","agility"].forEach(stat=>{
                         bonus[stat]=(bonus[stat]||0)+1;
                     });
-                    bonus.accuracy=(bonus.accuracy||0)+2;
+                    bonus.evasion=(bonus.evasion||0)+2;
                     bonus.antiCrit=(bonus.antiCrit||0)+0.1;
                     bonus.statusResistance=(bonus.statusResistance||0)+0.05;
                 }
@@ -10039,7 +10040,7 @@
     function statsHtml(stats){
         const entries=Object.entries(stats||{});
         if(!entries.length){ return '<span class="muted">尚無冶煉詞條</span>'; }
-        return entries.map(([key,value])=>'<span>'+escapeHtml(STAT_LABEL[key]||key)+' <b>+'+value+'</b></span>').join("");
+        return entries.map(([key,value])=>'<span>'+escapeHtml(STAT_LABEL[key]||key)+' <b>+'+value+(["accuracy","evasion"].includes(key)?"%":"")+'</b></span>').join("");
     }
     function rangeText(tierKey,isReforge){
         const meta=TIER_META[normalizeTierKey(tierKey)];
@@ -10156,7 +10157,7 @@
             ?currentEntries.map(([key,value])=>{
                 const selected=lockSet.has(key);
                 return '<button type="button" class="v17358-affix-lock '+(selected?'locked':'')+'" '+(synthesisState.pendingReforge?'disabled':'')+' onclick="v141ToggleReforgeLock(\''+escapeHtml(key)+'\')">'+
-                    '<span>'+(selected?'🔒':'◇')+'</span><b>'+escapeHtml(STAT_LABEL[key]||key)+' +'+value+'</b><small>'+(selected?'已鎖定':'點擊鎖定')+'</small></button>';
+                    '<span>'+(selected?'🔒':'◇')+'</span><b>'+escapeHtml(STAT_LABEL[key]||key)+' +'+value+(["accuracy","evasion"].includes(key)?"%":"")+'</b><small>'+(selected?'已鎖定':'點擊鎖定')+'</small></button>';
             }).join("")
             :'<div class="v17358-no-affix-lock">首次冶煉尚無詞條可鎖定。</div>';
         return '<div class="v141-synthesis-card v17358-reforge-card">'+

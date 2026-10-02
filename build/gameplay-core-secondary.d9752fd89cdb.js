@@ -67,7 +67,7 @@
         if(dodge){
             Object.assign(dodge,{
                 learnCost:10,maxLevel:1,spCost:20,targetType:"allyAll",duration:2,
-                evasionBonusPercent:60,requires:["windCrossSlash","windHowlLightning"],
+                evasionBonusPercent:25,requires:["windCrossSlash","windHowlLightning"],
                 description:"需先學習風旋十字斬或風哮電擊其一。使我方全體閃躲率提升60%，持續2回合。"
             });
         }
@@ -668,8 +668,8 @@
     const PIECE_RULES={
         blade:{role:"attack",roleLabel:"攻",name:"刀",stats:{attack:10,vitality:-2}},
         fan:{role:"magic",roleLabel:"法",name:"扇",stats:{intelligence:10,vitality:-2}},
-        heavyArmor:{role:"attack",roleLabel:"攻",name:"鎧甲",stats:{attack:5,accuracy:10,antiCrit:0.5,statusResistance:0.25}},
-        robe:{role:"magic",roleLabel:"法",name:"袍",stats:{intelligence:5,accuracy:10,antiCrit:0.5,statusResistance:0.25}},
+        heavyArmor:{role:"attack",roleLabel:"攻",name:"鎧甲",stats:{attack:5,evasion:10,antiCrit:0.5,statusResistance:0.25}},
+        robe:{role:"magic",roleLabel:"法",name:"袍",stats:{intelligence:5,evasion:10,antiCrit:0.5,statusResistance:0.25}},
         boots:{role:"attack",roleLabel:"攻",name:"靴",stats:{attack:2,agility:10}},
         shoes:{role:"magic",roleLabel:"法",name:"履",stats:{intelligence:2,agility:10}},
         helm:{role:"attack",roleLabel:"攻",name:"盔",stats:{attack:12}},
@@ -5518,12 +5518,7 @@
 
     function normalizeMonsterDefaultEvasion(monster){
         if(!monster){ return monster; }
-        const level=Math.max(1,numeric(monster.level)||1);
-        if(monster.evasion===undefined){
-            monster.evasion=typeof window.v173GetDefaultMonsterEvasion==="function"
-                ?window.v173GetDefaultMonsterEvasion(level)
-                :Math.min(10,level*0.1);
-        }
+        if(monster.evasion===undefined){ monster.evasion=0; }
         return monster;
     }
 
@@ -5746,30 +5741,6 @@
     /* Freeze/Hard Control execution is owned by js/00-main.js.
        V158 keeps only combat tuning and must not wrap player skill casts. */
 
-    if(typeof openInventoryCharacterDetail==="function"){
-        const previousOpenInventoryCharacterDetail=openInventoryCharacterDetail;
-        openInventoryCharacterDetail=function(){
-            const result=previousOpenInventoryCharacterDetail.apply(this,arguments);
-            if(typeof document!=="undefined"){
-                const rows=Array.from(document.querySelectorAll("#inventoryCharacterDetailStats .inventory-character-detail-row"));
-                const evasionRow=rows.find(row=>{
-                    const label=row.querySelector("span");
-                    return label&&label.textContent.trim()==="閃避";
-                });
-                const evasionValue=evasionRow&&evasionRow.querySelector("b");
-                if(evasionValue){
-                    evasionValue.textContent=numeric(evasionValue.textContent).toFixed(1)+"%";
-                }
-                const note=document.querySelector("#inventoryCharacterDetailStats .inventory-character-detail-note");
-                if(note){
-                    note.innerHTML=
-                        "最終命中率＝95%＋命中×0.15%＋最終命中加成－目標最終閃躲－最終命中下降，最後限制5%～99%。<br>"+
-                        "命中／閃避／異常抗性的玩家介面統一使用 % 顯示；這些戰鬥詞條不由六圍直接派生。敏捷只影響出手速度。";
-                }
-            }
-            return result;
-        };
-    }
 })();
 
 
@@ -6536,8 +6507,8 @@
     const SET_RULES={
         blade:{stats:{attack:15,vitality:-2}},
         fan:{stats:{intelligence:15,vitality:-2}},
-        heavyArmor:{stats:{attack:7,accuracy:10,antiCrit:0.5,statusResistance:0.25}},
-        robe:{stats:{intelligence:7,accuracy:10,antiCrit:0.5,statusResistance:0.25}},
+        heavyArmor:{stats:{attack:7,evasion:10,antiCrit:0.5,statusResistance:0.25}},
+        robe:{stats:{intelligence:7,evasion:10,antiCrit:0.5,statusResistance:0.25}},
         boots:{stats:{attack:2,agility:13}},
         shoes:{stats:{intelligence:2,agility:13}},
         helm:{stats:{attack:15}},
@@ -6684,6 +6655,7 @@
         const asset=assetVariant(classType,slot,random);
         const name=generatedName(rarity,classType,slot,random,asset);
         return {
+            equipmentCombatPercentUnitVersion:2,
             id:makeUid("gear"),v141Uid:makeUid("gearuid"),name,
             icon:artMarkup(asset,rarity.key),type:slot,count:1,price:Math.floor(rarity.shopPrice*.2),
             stats:{[stat]:value},reforgeStats:null,reforgeSlots:rarity.reforgeSlots,reforgeUsed:0,
@@ -6795,7 +6767,8 @@
         if(!item||!SET_IDS.has(item.setId)){ return item; }
         const key=setPieceKey(item);
         if(!key){ return item; }
-        item.stats={...SET_RULES[key].stats};
+        migrateLegacyEquipmentStats(item);
+        item.stats={...item.stats,...SET_RULES[key].stats};
         item.quality="orange";
         item.rarityKey="orange";
         const legacyAffixCount=item.reforgeStats&&typeof item.reforgeStats==="object"?Object.keys(item.reforgeStats).length:0;
@@ -7026,7 +6999,7 @@
     }
     function statLine(item){
         const [key,value]=Object.entries(item.stats||{})[0]||["",0];
-        return (STAT_LABEL[key]||key)+(Number(value)>=0?" +":" ")+value;
+        return (STAT_LABEL[key]||key)+(Number(value)>=0?" +":" ")+value+(["accuracy","evasion"].includes(key)?"%":"");
     }
     window.v17346PreviewEquipmentShopOffer=function(index){
         const safeIndex=Math.max(0,Math.min(5,Math.floor(Number(index)||0)));
@@ -7986,7 +7959,7 @@ const alertRpg=(m,o)=>typeof window.rpgAlert==="function"?window.rpgAlert(m,o||{
 function equipment(i){if(!i)return false;try{if(typeof isEquipmentInventoryType==="function")return !!isEquipmentInventoryType(i.type)}catch(_){}return TYPES.has(String(i.type||""));}
 function quality(i){if(!i)return null;return typeof getInventoryRarityDataKey==="function"?getInventoryRarityDataKey(i):String(i.rarityKey||i.quality||"").toLowerCase()||null;}
 function locked(i){return !!(i&&i.v17351Locked===true)}
-function statText(i){const all=Object.assign({},i?.stats||{});Object.entries(i?.reforgeStats||{}).forEach(([k,v])=>all[k]=num(all[k])+num(v));const L={attack:"攻擊",intelligence:"智力",vitality:"體質",agility:"敏捷",energy:"能量",defensePoints:"防禦",accuracy:"命中",evasion:"閃避",antiCrit:"抗暴",statusAccuracy:"異常命中",statusResistance:"異常抗性"};const a=Object.entries(all).filter(([,v])=>num(v)!==0).map(([k,v])=>(L[k]||k)+" "+(num(v)>0?"+":"")+num(v));return a.length?a.join("　"):"無額外能力";}
+function statText(i){const all=Object.assign({},i?.stats||{});Object.entries(i?.reforgeStats||{}).forEach(([k,v])=>all[k]=num(all[k])+num(v)+(["accuracy","evasion"].includes(k)?"%":""));const L={attack:"攻擊",intelligence:"智力",vitality:"體質",agility:"敏捷",energy:"能量",defensePoints:"防禦",accuracy:"命中",evasion:"閃避",antiCrit:"抗暴",statusAccuracy:"異常命中",statusResistance:"異常抗性"};const a=Object.entries(all).filter(([,v])=>num(v)!==0).map(([k,v])=>(L[k]||k)+" "+(num(v)>0?"+":"")+num(v)+(["accuracy","evasion"].includes(k)?"%":""));return a.length?a.join("　"):"無額外能力";}
 const SLOT_ALIAS={weapon:"hand",hand:"hand",head:"head",helmet:"head",shoulder:"shoulder",wristguard:"shoulder",armor:"armor",robe:"armor",shoes:"shoes",boots:"shoes"};
 const SLOT_STORAGE_ALIASES={hand:["hand","weapon"],head:["head","helmet"],shoulder:["shoulder","wristguard"],armor:["armor","robe"],shoes:["shoes","boots"]};
 const SLOT_LABEL={head:"頭部",hand:"武器",shoulder:"護腕",armor:"衣服",shoes:"鞋子"};
@@ -7995,7 +7968,7 @@ function esc(v){return String(v==null?"":v).replace(/&/g,"&amp;").replace(/</g,"
 function slot(t){const key=String(t||"").toLowerCase();return SLOT_ALIAS[key]||key}
 function equippedFor(i){if(!i||typeof characterEquipment==="undefined")return null;let k=null;try{k=typeof getBackpackEquipmentKey==="function"?getBackpackEquipmentKey(typeof inventoryCharacterIndex!=="undefined"?inventoryCharacterIndex:0):null}catch(_){}if(!k)return null;const slots=characterEquipment[k]||{},target=slot(i.type),keys=SLOT_STORAGE_ALIASES[target]||[target];for(const key of keys){if(slots[key])return slots[key]}return null;}
 function itemArt(i){if(!i)return"";if(i.assetPath){const q=quality(i)||"white";return '<span class="v169-item-art v169-equipment-art v17346-rarity-'+esc(q)+'"><img src="'+esc(i.assetPath)+'" alt="" draggable="false" decoding="async"></span>'}return String(i.icon||"◆")}
-function compareStats(i){if(!i)return '<div class="v17351-compare-empty">未穿戴此部位裝備</div>';const all=Object.assign({},i.stats||{});Object.entries(i.reforgeStats||{}).forEach(([k,v])=>all[k]=num(all[k])+num(v));const rows=Object.entries(all).filter(([,v])=>num(v)!==0).map(([k,v])=>'<div class="v17351-compare-stat"><span>'+esc(COMPARE_STAT_LABEL[k]||k)+'</span><b>'+(num(v)>0?"+":"")+num(v)+'</b></div>');return rows.length?rows.join(""):'<div class="v17351-compare-empty">無額外能力</div>'}
+function compareStats(i){if(!i)return '<div class="v17351-compare-empty">未穿戴此部位裝備</div>';const all=Object.assign({},i.stats||{});Object.entries(i.reforgeStats||{}).forEach(([k,v])=>all[k]=num(all[k])+num(v)+(["accuracy","evasion"].includes(k)?"%":""));const rows=Object.entries(all).filter(([,v])=>num(v)!==0).map(([k,v])=>'<div class="v17351-compare-stat"><span>'+esc(COMPARE_STAT_LABEL[k]||k)+'</span><b>'+(num(v)>0?"+":"")+num(v)+(["accuracy","evasion"].includes(k)?"%":"")+'</b></div>');return rows.length?rows.join(""):'<div class="v17351-compare-empty">無額外能力</div>'}
 function saveRefresh(){if(typeof rebuildInventorySlots==="function")rebuildInventorySlots();if(typeof renderInventoryItems==="function")renderInventoryItems();if(typeof renderInventory==="function")renderInventory();if(typeof updateUI==="function")updateUI();if(typeof saveGame==="function")saveGame();}
 function clearEquipmentComparison(){const modal=document.getElementById("itemModal");if(!modal)return;modal.querySelectorAll("#v17351EquipmentCompare,#v17351EquipmentLockButton").forEach(n=>n.remove());}
 function syncDetail(item,slotIndex){
@@ -10566,7 +10539,7 @@ ensureFunctionalStyles();runRepairs();
                 effect("debuff_all_enemies",{attackDownKey:"attackDown",accuracyDownKey:"accuracyDown",durationRounds:1})
             ])],
             limitText:"BOSS套用較低效率；不造成全體硬控。",
-            nextText:{10:"降攻12%並追加命中-5%",20:"降攻15%、命中-8%"}
+            nextText:{10:"降攻12%並追加命中-5%",20:"降攻15%、最終命中-8%"}
         },
         {
             id:"relic_tiangang_banner",category:"defense",tags:["attack","defense","anti_swarm"],rarity:"orange",maxLevel:20,iconPath:"assets/relics/icons/relic_tiangang_banner.webp",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
@@ -11168,7 +11141,6 @@ ensureFunctionalStyles();runRepairs();
             if(!monster){ return; }
             if(entry.attack!==undefined){ monster.attack=entry.attack; }
             if(entry.magicAttack!==undefined){ monster.magicAttack=entry.magicAttack; }
-            if(entry.accuracy!==undefined){ monster.accuracy=entry.accuracy; }
         });
         relicBattleState.monsterRestores=keep;
     }
@@ -11327,6 +11299,12 @@ ensureFunctionalStyles();runRepairs();
         if(monster.hp<=0&&typeof killMonster==="function"){ withSource(SOURCE_RELIC,()=>killMonster(index)); }
         return final;
     }
+    window.v174GetRelicFinalHitReductionPercent=function(monster){
+        if(!relicBattleState){ return 0; }
+        return relicBattleState.monsterRestores.reduce((sum,entry)=>
+            sum+(entry.monster===monster&&numeric(entry.expiresRound)>=currentRound()
+                ?numeric(entry.finalHitReductionPercent):0),0);
+    };
     function applyEnemyDebuff(monster,attackDown,accuracyDown,duration){
         if(!monster||!monster.alive||!relicBattleState){ return; }
         if(window.GameplaySystem&&typeof window.GameplaySystem.canDirectlyAffectMonster==="function"&&!window.GameplaySystem.canDirectlyAffectMonster(monster)){
@@ -11336,7 +11314,7 @@ ensureFunctionalStyles();runRepairs();
         const attack=Math.max(0,attackDown*efficiency),accuracy=Math.max(0,accuracyDown*efficiency);
         const restore={monster:monster,expiresRound:currentRound()+Math.max(1,Math.floor(duration||1))-1};
         if(attack>0){ restore.attack=monster.attack; restore.magicAttack=monster.magicAttack; monster.attack=numeric(monster.attack)*(1-attack/100); monster.magicAttack=numeric(monster.magicAttack)*(1-attack/100); }
-        if(accuracy>0){ restore.accuracy=monster.accuracy; monster.accuracy=numeric(monster.accuracy)*(1-accuracy/100); }
+        if(accuracy>0){ restore.finalHitReductionPercent=accuracy; }
         relicBattleState.monsterRestores.push(restore);
     }
     function applyPlayerBuffAll(effectDef,def,level){
@@ -11667,7 +11645,7 @@ ensureFunctionalStyles();runRepairs();
             return "對敵方全體造成 "+valueFor(def,"damageMultiplier",level).toFixed(2)+"×秘寶威力"+(bonus>0?"；燃燒目標額外+"+bonus+"%":"")+"。";
         }
         if(def.id==="relic_xuanwu_seal"){ return "全隊獲得最大HP "+valueFor(def,"shieldPercent",level).toFixed(1).replace(/\.0$/,"")+"%護盾，持續2回合"+(level>=20?"，並獲得8%減傷1回合":"")+"。"; }
-        if(def.id==="relic_soul_bell"){ return "敵方全體攻擊-"+Math.round(valueFor(def,"attackDown",level))+"%"+(level>=10?"、命中-"+Math.round(valueFor(def,"accuracyDown",level))+"%":"")+"，持續1回合。"; }
+        if(def.id==="relic_soul_bell"){ return "敵方全體攻擊-"+Math.round(valueFor(def,"attackDown",level))+"%"+(level>=10?"、最終命中-"+Math.round(valueFor(def,"accuracyDown",level))+"%":"")+"，持續1回合。"; }
         if(def.id==="relic_tiangang_banner"){ return "對敵方全體造成 "+valueFor(def,"damageMultiplier",level).toFixed(2)+"×秘寶威力"+(level>=10?"並降攻"+Math.round(valueFor(def,"attackDown",level))+"%":"")+"。"; }
         if(def.id==="relic_nine_dragon_fire"){ return "對敵方全體造成 "+valueFor(def,"damageMultiplier",level).toFixed(2)+"×火屬性秘寶傷害"+(level>=10?"，燃燒機率"+Math.round(valueFor(def,"burnChance",level)*100)+"%":"")+(level>=20?"，對燃燒目標額外+15%":"")+"。"; }
         if(def.id==="relic_cold_spring_jade"){ return "急救目標 "+valueFor(def,"healHpPercent",level).toFixed(1).replace(/\.0$/,"")+"%最大HP"+(level>=10?"並淨化1個一般負面":"")+(level>=20?"、恢復4%最大SP":"")+"；HP由35%以上降至35%以下時觸發，每場最多2次，冷卻3回合。"; }

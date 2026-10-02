@@ -91,8 +91,8 @@
     const PIECE_RULES={
         blade:{role:"attack",roleLabel:"攻",name:"刀",stats:{attack:10,vitality:-2}},
         fan:{role:"magic",roleLabel:"法",name:"扇",stats:{intelligence:10,vitality:-2}},
-        heavyArmor:{role:"attack",roleLabel:"攻",name:"鎧甲",stats:{attack:5,accuracy:10,antiCrit:0.5,statusResistance:0.25}},
-        robe:{role:"magic",roleLabel:"法",name:"袍",stats:{intelligence:5,accuracy:10,antiCrit:0.5,statusResistance:0.25}},
+        heavyArmor:{role:"attack",roleLabel:"攻",name:"鎧甲",stats:{attack:5,evasion:10,antiCrit:0.5,statusResistance:0.25}},
+        robe:{role:"magic",roleLabel:"法",name:"袍",stats:{intelligence:5,evasion:10,antiCrit:0.5,statusResistance:0.25}},
         boots:{role:"attack",roleLabel:"攻",name:"靴",stats:{attack:2,agility:10}},
         shoes:{role:"magic",roleLabel:"法",name:"履",stats:{intelligence:2,agility:10}},
         helm:{role:"attack",roleLabel:"攻",name:"盔",stats:{attack:12}},

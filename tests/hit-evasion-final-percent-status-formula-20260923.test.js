@@ -65,20 +65,16 @@ function constObject(name){
 function formulaRuntime(){
     const code=[
         constLine("HIT_CHANCE_BASE"),
-        constLine("HIT_CHANCE_ACCURACY_COEFFICIENT"),
         constLine("HIT_CHANCE_MIN_PERCENT"),
         constLine("HIT_CHANCE_MAX_PERCENT"),
-        constLine("DEFAULT_MONSTER_EVASION_PER_LEVEL"),
-        constLine("DEFAULT_MONSTER_EVASION_CAP"),
         constLine("STATUS_OFFENSE_ATTRIBUTE_COEFFICIENT"),
         constLine("STATUS_HIT_MIN_PERCENT"),
         constLine("STATUS_HIT_MAX_PERCENT"),
         constObject("LOCKDOWN_HIT_BOUNDS"),
         sourceFunction(main,"combineEvasionRates"),
-        sourceFunction(main,"getDefaultMonsterEvasion"),
         sourceFunction(main,"calculateHitChancePercent"),
         sourceFunction(main,"calculateStatusEffectChance"),
-        "this.hit=calculateHitChancePercent;this.ev=getDefaultMonsterEvasion;this.combine=combineEvasionRates;this.status=calculateStatusEffectChance;"
+        "this.hit=calculateHitChancePercent;this.combine=combineEvasionRates;this.status=calculateStatusEffectChance;"
     ].join("\n");
     const context={Math,Number};
     vm.createContext(context);
@@ -94,11 +90,11 @@ function formulaRuntime(){
     assert.equal(r.hit(0,100,0,0),5);
     assert.equal(r.hit(0,200,0,0),5);
     assert.equal(r.hit(1000,0,0,0),99);
-    assert.equal(r.hit(1000,200,0,0),45);
+    assert.equal(r.hit(1000,200,0,0),99);
     assert.equal(r.combine([40,10]),50);
     assert.equal(r.combine([100,100]),200);
     assert.equal(r.hit(0,15,5,10),85,"95 + 10 - 15 - 5 must be 85 percentage points");
-    assert.deepEqual([40,60,80,100,200].map(r.ev),[4,6,8,10,10]);
+    assert.equal(r.hit(10,40,0,0),65);
     assert.equal(r.status(30,10,10,200,0,true,"boss",20),20);
     assert.equal(r.status(30,99,1,200,0,true,"boss",20),20,"level gap must not change status chance");
     assert.deepEqual(
@@ -115,19 +111,7 @@ function formulaRuntime(){
     assert.doesNotMatch(v158,/v158GetHitChancePercent|rollHitChance\s*=\s*function/);
     assert.doesNotMatch(v149,/rollStatusEffectHit\s*=\s*function/);
     assert.doesNotMatch(v169,/getMonsterEvasion\s*=\s*function|getMonsterEffectivetargetStatusResistancePoints\s*=\s*function|getPlayerStatusResistBonus\s*=\s*function/);
-    assert.match(main,/evasion:\s*\n\s*getDefaultMonsterEvasion\(level\)/);
-    const firstZoneRosterCall=main.indexOf('makeZoneMonster("哥布林",3,"fire",undefined,"wild.zone-01.fire-01")');
-    assert.ok(firstZoneRosterCall>0,"first top-level zone roster call must exist");
-    assert.ok(
-        main.indexOf("const DEFAULT_MONSTER_EVASION_PER_LEVEL = 0.1;")<
-        firstZoneRosterCall,
-        "default monster evasion constants must initialize before the first top-level zone roster call"
-    );
-    assert.ok(
-        main.indexOf("function getDefaultMonsterEvasion(level)")<
-        firstZoneRosterCall,
-        "default monster evasion owner must exist before the first top-level zone roster call"
-    );
+    assert.doesNotMatch(main,/getDefaultMonsterEvasion|DEFAULT_MONSTER_EVASION|HIT_CHANCE_ACCURACY_COEFFICIENT/);
     assert.match(main,/function combineEvasionRates\(sources\)[\s\S]*?sum\+\(Number\(source\)\|\|0\)/);
     assert.doesNotMatch(main,/FINAL_EVASION_RATE_CAP|const HIT_CHANCE_MIN_PERCENT = 70;/);
     assert.match(main,/const HIT_CHANCE_MIN_PERCENT = 5;/);

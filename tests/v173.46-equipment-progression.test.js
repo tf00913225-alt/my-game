@@ -16,8 +16,8 @@ assert.match(source,/\{key:"orange",label:"橙階",chance:5,min:10,max:12,reforg
 
 assert.match(source,/blade:\{stats:\{attack:15,vitality:-2\}\}/);
 assert.match(source,/fan:\{stats:\{intelligence:15,vitality:-2\}\}/);
-assert.match(source,/heavyArmor:\{stats:\{attack:7,accuracy:10,antiCrit:0\.5,statusResistance:0\.25\}\}/);
-assert.match(source,/robe:\{stats:\{intelligence:7,accuracy:10,antiCrit:0\.5,statusResistance:0\.25\}\}/);
+assert.match(source,/heavyArmor:\{stats:\{attack:7,evasion:10,antiCrit:0\.5,statusResistance:0\.25\}\}/);
+assert.match(source,/robe:\{stats:\{intelligence:7,evasion:10,antiCrit:0\.5,statusResistance:0\.25\}\}/);
 assert.match(source,/boots:\{stats:\{attack:2,agility:13\}\}/);
 assert.match(source,/shoes:\{stats:\{intelligence:2,agility:13\}\}/);
 assert.match(source,/helm:\{stats:\{attack:15\}\}/);
