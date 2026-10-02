@@ -53,6 +53,8 @@ assert.ok(rollStart>=0&&rollEnd>rollStart,"rollCritical extraction failed");
 const critContext={
     Math:Object.assign(Object.create(Math),{random:()=>0}),Number,
     getCriticalStatPoints:()=>0,
+    getPartyCharacterIndex:()=>0,
+    getPartyBattleStats:()=>({statusAccuracy:0,criticalDamage:0}),
     CRIT_CHANCE_MAX:100,CRIT_CHANCE_BASE:100,CRIT_CHANCE_PER_INTELLIGENCE_POINT:0,
     CRIT_CHANCE_PER_ATTACK_POINT:0,CRIT_MULTIPLIER_ATTRIBUTE_MAX:9,
     CRIT_MULTIPLIER_BASE:2,CRIT_MULTIPLIER_PER_INTELLIGENCE_POINT:0,

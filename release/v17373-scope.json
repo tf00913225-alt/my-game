@@ -1,0 +1,268 @@
+{
+  "schemaVersion": 1,
+  "workId": "RELEASE-SCOPE-P0-20261002",
+  "plannedVersion": "173.73",
+  "currentGameVersion": "173.72",
+  "assessment": "RELEASE BLOCKED",
+  "mode": "NORMAL DEVELOPMENT",
+  "releaseCandidateSha": null,
+  "baseline": {
+    "dev": "5de3e04690b9f20569b7e789240488f33aa4cd40",
+    "main": "4b037b47967544d90c781ad938286777c9576731",
+    "comparison": "完整 main → dev diff／first-parent history，非僅最後一個 PR"
+  },
+  "included": [
+    "四象技能／角色屬性與元素 DNA、跨學習既有內容",
+    "Hit／Evasion V2、裝備屬性遷移與戰鬥相關既有修正",
+    "鍛造第一階段；雲端角色／不符合 UID 與存檔條件時拒絕操作",
+    "背包、角色資訊、首頁導覽與冒險地圖既有整理",
+    "試煉塔每層十隻怪、一般技能率 65／70／75／80%、元素技能率 15%",
+    "已採用火／每日、風 50、水野外 10、土 39 張立繪及安全 fallback",
+    "Visual Ready 與既有戰鬥呈現修正",
+    "登入 session／UID 隔離與 Cloud 已驗證安全基礎；不是完整跨裝置 Cloud Save"
+  ],
+  "trueP0": [
+    {
+      "id": "P0-FULL-RELEASE-SUITES",
+      "problem": "正式發布必要的完整 Node 測試尚未通過。",
+      "rootCause": "dev 的精簡 CI 跳過 main／以 main 為基底 PR 必跑的完整 suites。部分舊測試仍引用退休 owner／舊資料名稱或缺少目前函式依賴；其餘失敗尚待逐項診斷，不能全部當成過時測試。",
+      "playerImpact": "無法完成正式發布必要驗收；不是已確認 45 個遊戲故障。",
+      "dataDamage": "目前未確認此項造成存檔或經濟資料損害；涉及經濟、戰鬥的失敗仍必須辨識。",
+      "minimumRepair": "逐項區分過時斷言、測試 fixture 與真實 Runtime regression；只遷移已證明過時的測試，真實 regression 做最小安全修復。不得刪測試、跳過 suites 或降低 CI。完整必要 CI 與候選 SHA 驗收通過後才能解除。",
+      "remainingFailingSuites": [
+        "tests/gameplay-hub-ui-and-icon.test.js",
+        "tests/monster-portrait-batch-workflow.test.js",
+        "tests/premium-functional-ui-batch3.test.js",
+        "tests/remaining-ui-regressions-20260914.test.js",
+        "tests/skill-action-empty-top-regression.test.js",
+        "tests/ui-backpack-context-layout.test.js",
+        "tests/ui-black-gold-window-skin.test.js",
+        "tests/ui-character-detail-hotfix.test.js",
+        "tests/ui-global-browser-interaction-lock.test.js",
+        "tests/ui-large-panel-followup.test.js",
+        "tests/ui-status-help-medium-modal.test.js",
+        "tests/ui-typography-standard.test.js",
+        "tests/v137-regressions.test.js",
+        "tests/v139-economy-rested-exp.test.js",
+        "tests/v141-system-expansion.test.js",
+        "tests/v143-combat-dungeon-polish.test.js",
+        "tests/v144-rules-and-abyss.test.js",
+        "tests/v152-dev-fixes.test.js",
+        "tests/v153-fire-vfx.test.js",
+        "tests/v154-current-request.test.js",
+        "tests/v155-current-request.test.js",
+        "tests/v160-current-request.test.js",
+        "tests/v166-water-vfx.test.js",
+        "tests/v169-abyss-assets-flow.test.js",
+        "tests/v169-rpg-ui.test.js",
+        "tests/v173.18-final-request.test.js",
+        "tests/v173.2-mobile-touch-scroll.test.js",
+        "tests/v173.25-ui-polish.test.js",
+        "tests/v173.26-followup-fixes.test.js",
+        "tests/v173.27-character-shell.test.js",
+        "tests/v173.40-beginner-balance.test.js",
+        "tests/v173.42-player-flow.test.js",
+        "tests/v173.43-growth-charge.test.js",
+        "tests/v173.44-current-request.test.js",
+        "tests/v173.44-maintenance.test.js",
+        "tests/v173.45-current-request.test.js",
+        "tests/v173.45-shop-touch-scroll.test.js",
+        "tests/v173.45-synthesis-touch-icon.test.js",
+        "tests/v173.55-inventory-observer-stall.test.js",
+        "tests/v173.61-current-request.test.js",
+        "tests/v173.63-visible-ui-owner-repairs.test.js",
+        "tests/v173.74-backpack-owner-convergence.test.js",
+        "tests/v174-cardless-battle-presentation.test.js",
+        "tests/v174-relic-navigation-button-polish.test.js",
+        "tests/v175-inventory-battle-nav-regressions.test.js"
+      ]
+    }
+  ],
+  "deferred": [
+    {
+      "classification": "B",
+      "disposition": "Deferred / Future Development",
+      "reason": "Cloud 後續架構與完整跨裝置恢復仍在建設；未完成路徑 fail-closed，本版不宣稱完整 Cloud Save。",
+      "originalRequirement": {
+        "id": "REQ-CLOUD-HARDEN-20260926",
+        "title": "雲端存檔架構強化：封存候選來源與持久狀態登記",
+        "status": "IMPLEMENTED",
+        "evidence": {
+          "files": [
+            "release/requirement-batches/2026-09-26-cloud-save-architecture-hardening.json",
+            "config/persisted-state-registry.json",
+            "DATA_SECURITY_CONTRACTS.md"
+          ],
+          "verification": "PR checks、Firebase emulator、Boot browser QA、dev merge/deploy SHA 尚待完成",
+          "result": "Phase 4 仍為 0/6 VERIFIED；不可進行第二手機完整角色恢復"
+        }
+      }
+    },
+    {
+      "classification": "B",
+      "disposition": "Deferred / Future Development",
+      "reason": "完整批次與 Android 實體驗收延後；已採用素材安全仍屬本版，不能把延後視為撤除 Runtime 素材。",
+      "originalRequirement": {
+        "id": "REQ-WIND-PORTRAITS-20261001",
+        "title": "風元素野怪與四象塔怪物立繪接入及逐項驗收",
+        "status": "IMPLEMENTED",
+        "evidence": {
+          "files": [
+            "release/requirement-batches/2026-10-01-wind-monster-portraits.json",
+            "config/monster-portrait-registry.json",
+            "config/monster-asset-provenance.json"
+          ],
+          "verification": "本機 50 張來源與成品 SHA-256、像素、解碼、透明度通過；最新 PR CI 瀏覽器驗收、DEV 部署及實機顯示尚待核對",
+          "result": "風元素素材與引用已在候選 PR；未完成 DEV 與實機驗收前保持 IMPLEMENTED"
+        }
+      }
+    },
+    {
+      "classification": "B",
+      "disposition": "Deferred / Future Development",
+      "reason": "完整批次與 Android 實體驗收延後；已採用水野外素材保留，水塔未採用路徑使用 fallback。",
+      "originalRequirement": {
+        "id": "REQ-WATER-WILD-BATCH1-20261001",
+        "title": "水元素野怪 10 張正式接入第一批",
+        "status": "IMPLEMENTED",
+        "evidence": {
+          "files": [
+            "release/requirement-batches/2026-10-01-water-wild-monsters-batch1.json",
+            "config/monster-portrait-registry.json",
+            "config/monster-asset-provenance.json"
+          ],
+          "verification": "本機 10 張來源與成品 SHA-256、解碼、透明度及 RGBA 像素相等；最新 PR CI、DEV 部署與手機實機顯示尚待核對",
+          "result": "只有 10 個水系野怪 target 為 runtimeReady；其餘普通怪與水塔普通／精英／小 Boss 未提前接入"
+        }
+      }
+    },
+    {
+      "classification": "B",
+      "disposition": "Deferred / Future Development",
+      "reason": "完整正式獎勵來源／Phase 4 實機驗收延後；不啟用未驗證正式獎勵，保留交易安全限制。",
+      "originalRequirement": {
+        "id": "REQ-CLOUD-REWARD-EVIDENCE-20261001",
+        "title": "可信獎勵入帳與重試證據完整性",
+        "status": "IMPLEMENTED",
+        "evidence": {
+          "files": [
+            "release/requirement-batches/2026-10-01-cloud-reward-evidence.json"
+          ],
+          "verification": "目標測試通過；真實交易 CI 與部署待核對。",
+          "result": "缺證據即阻擋，不補造歷史、不採納 Revision 1；Phase 4 維持 0/6。"
+        }
+      }
+    },
+    {
+      "classification": "B",
+      "disposition": "Deferred / Future Development",
+      "reason": "完整批次與 Android 實體驗收延後；39 張採用素材保留，損壞的第十張小王來源未進 Runtime，100 層 fallback。",
+      "originalRequirement": {
+        "id": "REQ-EARTH-PORTRAITS-20261001",
+        "title": "土元素野怪與四象塔怪物立繪接入及逐項驗收",
+        "status": "IMPLEMENTED",
+        "evidence": {
+          "files": [
+            "release/requirement-batches/2026-10-01-earth-monster-portraits.json",
+            "config/monster-portrait-registry.json",
+            "config/monster-asset-provenance.json"
+          ],
+          "verification": "39 張可解碼來源已完成無損 WebP、透明度、尺寸與像素驗證；最新 PR CI、DEV 部署與手機實機顯示尚待核對。",
+          "result": "10 張野怪與 29 張土塔素材已接入；第 10 張小 Boss 母圖已確認損毀並隔離為 reserved，未偽造完成。"
+        }
+      }
+    }
+  ],
+  "phaseProgress": {
+    "cloudPhase1": "5/5 VERIFIED",
+    "cloudPhase2": "6/6 VERIFIED",
+    "cloudPhase3": "6/6 VERIFIED",
+    "cloudPhase4": "IN_PROGRESS 0/6",
+    "cloudPhase5To10": "NOT_STARTED",
+    "originalBatchesModified": false
+  },
+  "p1": [
+    "真正 P0 修復後才可固定候選 SHA 並完成 Exact-HEAD 最終驗收",
+    "Freeze 階段才更新 Version／Cache、玩家公告與 CHANGELOG",
+    "逐一核對舊 PR 是否已被取代；有獨有內容者不得直接關閉",
+    "整理 main／dev 差異、受保護發布 PR 與發布後 closeout"
+  ],
+  "p2": [
+    "package.json 的歷史版本標示與模組警告整理",
+    "歷史文件與測試 owner 維護；必要發布測試失敗仍屬上述 P0"
+  ],
+  "p3": [
+    "Cloud Phase 4 剩餘工作與 Phase 5～10",
+    "鍛造第二階段／雲端權威鍛造與寶石來源",
+    "剩餘怪物素材、Android 實體完整批次驗收",
+    "UI 精緻化、後續平衡、玩法與內容擴充"
+  ],
+  "evidence": {
+    "devCI": {
+      "run": 36986724510,
+      "sha": "5de3e04690b9f20569b7e789240488f33aa4cd40",
+      "result": "SUCCESS",
+      "fullNodeSuites": "SKIPPED by dev refined policy"
+    },
+    "devDeployment": {
+      "job": 110776041285,
+      "manifestArtifact": 11217878901,
+      "sha": "5de3e04690b9f20569b7e789240488f33aa4cd40",
+      "result": "SUCCESS; workflow deployed manifest read-back SHA verified",
+      "checks": "responsive six viewports / forge 390×844, 412×915 / battle layout and VFX PASS"
+    },
+    "firebase": {
+      "run": 36975504145,
+      "sha": "3fabca40a841a9b61ff704f9a5db6cc78ba6c353",
+      "result": "Session Authority emulator and deployment SUCCESS",
+      "equivalence": "functions/, js/firebase/, firestore.rules, firebase.json, workflow content unchanged between deployed SHA and baseline dev; not an exact-dev Firebase deployment claim"
+    },
+    "portraitAudit": "176 targets; 139 existing; 37 planned; 130 validated; 0 broken active assets",
+    "portraitPipeline": "117 provenance entries PASS",
+    "portraitBrowserFixtures": [
+      {
+        "pr": 736,
+        "run": 36854396658,
+        "artifact": 11158042032,
+        "scope": "fire/wind first frame and redraw"
+      },
+      {
+        "pr": 742,
+        "run": 36868221253,
+        "artifact": 11166286420,
+        "scope": "10 water wild decode/first-frame/redraw and element isolation"
+      },
+      {
+        "pr": 746,
+        "run": 36890763450,
+        "artifact": 11176488944,
+        "scope": "earth first-frame/redraw with fire/wind isolation"
+      }
+    ],
+    "localFullSuitePreflight": {
+      "discovered": 262,
+      "individualSweepPassed": 212,
+      "individualSweepFailed": 50,
+      "browserEnvironmentFailures": [
+        "tests/battle-presentation-followup-browser.test.js",
+        "tests/premium-functional-ui-responsive-browser.test.js",
+        "tests/v174-cardless-battle-browser.test.js"
+      ],
+      "subsequentPasses": [
+        "tests/boss-world-reinforcement-hit-vfx-timing-shield-crit-20260918.test.js",
+        "tests/release-update-notification-system.test.js"
+      ],
+      "remainingNonEnvironmentFailures": 45,
+      "officialRunner": "stops at first failing browser test because Chrome unavailable; individual sweep is diagnostic, not successful official CI"
+    },
+    "minimalRepairs": [
+      "Earth portrait identity test accepts the adopted earth ID and validates registry element/status; water fallback assertion retained",
+      "Boss crit fixture supplies existing party-index/stats dependencies; shield and unshielded critical assertions retained"
+    ],
+    "limitations": [
+      "Browser portrait fixtures are not full app or Android acceptance",
+      "No main changes, direct dev writes, rebase or force push",
+      "No version/cache bump, production release, player data mutation or freeze"
+    ]
+  }
+}

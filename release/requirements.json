@@ -165,20 +165,6 @@
       }
     },
     {
-      "id": "REQ-CLOUD-HARDEN-20260926",
-      "title": "雲端存檔架構強化：封存候選來源與持久狀態登記",
-      "status": "IMPLEMENTED",
-      "evidence": {
-        "files": [
-          "release/requirement-batches/2026-09-26-cloud-save-architecture-hardening.json",
-          "config/persisted-state-registry.json",
-          "DATA_SECURITY_CONTRACTS.md"
-        ],
-        "verification": "PR checks、Firebase emulator、Boot browser QA、dev merge/deploy SHA 尚待完成",
-        "result": "Phase 4 仍為 0/6 VERIFIED；不可進行第二手機完整角色恢復"
-      }
-    },
-    {
       "id": "REQ-VISUAL-READY-20260927",
       "title": "每日副本立繪與玩法首屏美術 Visual Ready 契約收斂",
       "status": "VERIFIED",
@@ -193,60 +179,6 @@
         ],
         "verification": "targeted regression、production build/build:check、PR #635 CI #3400、dev CI #3401、Cloudflare DEV deployment gate 與 360×800／393×873／412×915 gameplay cover browser QA",
         "result": "Daily Registry Pending／Ready／Failed、三張副本立繪 decode gate、Gameplay Hub critical artwork gate 與 dark fallback 均已驗證；部署 SHA 與 dev HEAD 一致"
-      }
-    },
-    {
-      "id": "REQ-WIND-PORTRAITS-20261001",
-      "title": "風元素野怪與四象塔怪物立繪接入及逐項驗收",
-      "status": "IMPLEMENTED",
-      "evidence": {
-        "files": [
-          "release/requirement-batches/2026-10-01-wind-monster-portraits.json",
-          "config/monster-portrait-registry.json",
-          "config/monster-asset-provenance.json"
-        ],
-        "verification": "本機 50 張來源與成品 SHA-256、像素、解碼、透明度通過；最新 PR CI 瀏覽器驗收、DEV 部署及實機顯示尚待核對",
-        "result": "風元素素材與引用已在候選 PR；未完成 DEV 與實機驗收前保持 IMPLEMENTED"
-      }
-    },
-    {
-      "id": "REQ-WATER-WILD-BATCH1-20261001",
-      "title": "水元素野怪 10 張正式接入第一批",
-      "status": "IMPLEMENTED",
-      "evidence": {
-        "files": [
-          "release/requirement-batches/2026-10-01-water-wild-monsters-batch1.json",
-          "config/monster-portrait-registry.json",
-          "config/monster-asset-provenance.json"
-        ],
-        "verification": "本機 10 張來源與成品 SHA-256、解碼、透明度及 RGBA 像素相等；最新 PR CI、DEV 部署與手機實機顯示尚待核對",
-        "result": "只有 10 個水系野怪 target 為 runtimeReady；其餘普通怪與水塔普通／精英／小 Boss 未提前接入"
-      }
-    },
-    {
-      "id": "REQ-CLOUD-REWARD-EVIDENCE-20261001",
-      "title": "可信獎勵入帳與重試證據完整性",
-      "status": "IMPLEMENTED",
-      "evidence": {
-        "files": [
-          "release/requirement-batches/2026-10-01-cloud-reward-evidence.json"
-        ],
-        "verification": "目標測試通過；真實交易 CI 與部署待核對。",
-        "result": "缺證據即阻擋，不補造歷史、不採納 Revision 1；Phase 4 維持 0/6。"
-      }
-    },
-    {
-      "id": "REQ-EARTH-PORTRAITS-20261001",
-      "title": "土元素野怪與四象塔怪物立繪接入及逐項驗收",
-      "status": "IMPLEMENTED",
-      "evidence": {
-        "files": [
-          "release/requirement-batches/2026-10-01-earth-monster-portraits.json",
-          "config/monster-portrait-registry.json",
-          "config/monster-asset-provenance.json"
-        ],
-        "verification": "39 張可解碼來源已完成無損 WebP、透明度、尺寸與像素驗證；最新 PR CI、DEV 部署與手機實機顯示尚待核對。",
-        "result": "10 張野怪與 29 張土塔素材已接入；第 10 張小 Boss 母圖已確認損毀並隔離為 reserved，未偽造完成。"
       }
     },
     {
@@ -387,6 +319,21 @@
         ],
         "verification": "Production Chrome 412×915, CI run 36984210420, head a1e208abd223c1f6f20d978f65a95822dd79fb34, artifact 11216788440: 27 exact ordered scenes, 10-unit queue, real Heal/Freeze, 10-target AOE/feedback, rules and battle screenshots inspected; targeted 4×100 Node matrix/formula/isolation tests PASS. Integration/deployment tracked separately.",
         "result": "31/31 functional requirements VERIFIED; latest-head full CI, integration and deployment are separate pending gates. Android physical acceptance is not claimed."
+      }
+    },
+    {
+      "id": "REQ-P0-FULL-RELEASE-SUITES-20261002",
+      "title": "V173.73 正式發布必要完整 Node suites 通過",
+      "status": "BLOCKED",
+      "evidence": {
+        "files": [
+          "release/v17373-scope.json",
+          "docs/V17373_RELEASE_SCOPE_20261002.md",
+          ".github/workflows/ci.yml",
+          ".github/scripts/ci.mjs"
+        ],
+        "verification": "完整 suite preflight、dev workflow skip 條件核對、兩項最小 fixture 修復與 UTC 公告測試重驗",
+        "result": "45 個非環境失敗測試檔仍未解除；不能進入 Release Freeze。完整失敗清單與限制見 scope JSON。"
       }
     }
   ]
