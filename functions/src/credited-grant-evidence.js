@@ -1,6 +1,7 @@
 "use strict";
 
 const {inspectRecoveryArchive}=require("./canonical-recovery-archive");
+const {readDailyCheckinEvidence}=require("./daily-checkin-event-evidence");
 const positive=value=>Number.isSafeInteger(value)&&value>=1;
 const balance=value=>Number.isSafeInteger(value)&&value>=0;
 const digest=value=>typeof value==="string"&&/^[a-f0-9]{64}$/.test(value);
@@ -31,6 +32,9 @@ async function verifyCreditedGrant({tx,root,uid,grantId,operationId,currentRevis
        claimRecord.serverRevision<receipt.creditRevision||claimRecord.serverRevision>currentRevision){
         invalid();
     }
+    const eventProof=await readDailyCheckinEvidence({tx,root,uid,grantId,grant,fail});
+    if(eventProof&&(receipt.sourceEventSha256!==eventProof.sha256||
+        ledger.sourceEventSha256!==eventProof.sha256))invalid();
     // Older ledgers are retained, never backfilled from current balances. A
     // separate evidence migration would be required before acknowledging them.
     if(ledger.creditEvidenceVersion===undefined){
@@ -54,6 +58,8 @@ async function verifyCreditedGrant({tx,root,uid,grantId,operationId,currentRevis
         before=inspectRecoveryArchive(beforeArchive.data(),uid,ledger.sourceRevision,beforeSnapshot.data());
         after=inspectRecoveryArchive(afterArchive.data(),uid,receipt.creditRevision,afterSnapshot.data());
     }catch(_){invalid();}
+    if(eventProof&&(eventProof.event.sourceRevision>ledger.sourceRevision||
+        before.account.slots[0]!==eventProof.event.characterId))invalid();
     const key=grant.kind==="gold"?"gold":"sharedExp";
     const otherKey=grant.kind==="gold"?"sharedExp":"gold";
     const archivedClaim=after.claimRecords.find(record=>record.claimKey===grantId);

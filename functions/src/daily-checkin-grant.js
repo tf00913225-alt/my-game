@@ -4,6 +4,7 @@
 // browser battle result is opening today's quest list (the check-in quest).
 // Issuance is internal: it does not publish a playable cloud character or
 // accept a client-supplied day, reward, balance or completion counter.
+const {readDailyCheckinEvidence}=require("./daily-checkin-event-evidence");
 const REWARD_GOLD=50;
 const ZONE="Asia/Taipei";
 
@@ -49,6 +50,7 @@ function createDailyCheckinGrant({db,FieldValue,HttpsError,runProtected,
                 fail("failed-precondition","Canonical first character is not eligible.");
             }
             if(grantSnap.exists){
+                await readDailyCheckinEvidence({tx,root,uid,grantId,grant:grantSnap.data(),fail});
                 const grant=grantSnap.data();
                 if(grant.schemaVersion!==1||grant.ownerUid!==uid||
                    grant.source!=="server-event"||grant.kind!=="gold"||
@@ -61,7 +63,12 @@ function createDailyCheckinGrant({db,FieldValue,HttpsError,runProtected,
                 }
                 return {grantId,periodDate:day,unchanged:true,status:grant.status};
             }
-            tx.create(grantRef,{schemaVersion:1,ownerUid:uid,
+            const sourceGrant={ownerUid:uid,source:"server-event",eventType:"daily-checkin",
+                periodDate:day,kind:"gold",amount:REWARD_GOLD};
+            const proof=await readDailyCheckinEvidence({tx,root,uid,grantId,grant:sourceGrant,fail,
+                allowCreate:true,day,characterId:account.slots[0],sourceRevision:account.serverRevision});
+            tx.create(proof.ref,{...proof.event,sha256:proof.sha256,createdAt:FieldValue.serverTimestamp()});
+            tx.create(grantRef,{schemaVersion:1,ownerUid:uid,sourceEventSha256:proof.sha256,
                 source:"server-event",eventType:"daily-checkin",periodDate:day,
                 kind:"gold",amount:REWARD_GOLD,status:"pending",
                 claimedByOperationId:null,createdAt:FieldValue.serverTimestamp()});

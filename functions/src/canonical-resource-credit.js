@@ -7,6 +7,7 @@ const {verifyCreditedGrant}=require("./credited-grant-evidence");
 const {source,readOwnedSources,advanceOwnedRecords,advanceOwnedSources}=
     require("./canonical-owned-sources");
 const {taipeiDay,REWARD_GOLD}=require("./daily-checkin-grant");
+const {readDailyCheckinEvidence}=require("./daily-checkin-event-evidence");
 const ID=/^[A-Za-z0-9_-]{16,64}$/;
 
 // Internal gold/EXP pool settlement for the first server-created character.
@@ -63,7 +64,8 @@ function createCanonicalResourceCredit({db,FieldValue,HttpsError,runProtected,
             }
             const grant=grantSnap.exists?grantSnap.data():{
                 schemaVersion:1,ownerUid:uid,kind:"gold",source:"server-event",
-                amount:REWARD_GOLD,status:"reserved",claimedByOperationId:operationId};
+                amount:REWARD_GOLD,status:"reserved",claimedByOperationId:operationId,
+                eventType:"daily-checkin",periodDate:dailyDay};
             const receipt=receiptSnap.exists?receiptSnap.data():{
                 schemaVersion:1,ownerUid:uid,operationId,grantId,kind:"gold",
                 amount:REWARD_GOLD,creditedToCharacter:false};
@@ -82,6 +84,16 @@ function createCanonicalResourceCredit({db,FieldValue,HttpsError,runProtected,
                !Number.isSafeInteger(economy.gold)||economy.gold<0||
                !Number.isSafeInteger(economy.sharedExp)||economy.sharedExp<0){
                 fail("data-loss","Grant or canonical source identity is inconsistent.");
+            }
+            const eventProof=await readDailyCheckinEvidence({tx,root,uid,grantId,grant,fail,
+                allowCreate:dailyDay!==null&&!grantSnap.exists,day:dailyDay,
+                characterId:account.slots?.[0],sourceRevision:account.serverRevision});
+            if(eventProof&&(eventProof.event.characterId!==account.slots?.[0]||
+                eventProof.event.sourceRevision>account.serverRevision)){
+                fail("data-loss","Grant event eligibility is inconsistent.");
+            }
+            if(eventProof&&receiptSnap.exists&&receipt.sourceEventSha256!==eventProof.sha256){
+                fail("data-loss","Grant receipt event binding is inconsistent.");
             }
             if(receipt.creditedToCharacter===true){
                 await verifyCreditedGrant({tx,root,uid,grantId,operationId,
@@ -156,6 +168,9 @@ function createCanonicalResourceCredit({db,FieldValue,HttpsError,runProtected,
                     claimDigest:claimRecordsDigest(nextClaims)}};
             const bundle=assembleCanonicalSnapshot(uid,revision,nextRecords);
             const stamp=FieldValue.serverTimestamp();
+            if(eventProof?.create){
+                tx.create(eventProof.ref,{...eventProof.event,sha256:eventProof.sha256,createdAt:stamp});
+            }
             tx.update(accountRef,{serverRevision:revision,snapshotSha256:bundle.sha256,updatedAt:stamp});
             tx.update(characterRef,{serverRevision:revision,updatedAt:stamp});
             tx.update(economyRef,{serverRevision:revision,
@@ -176,6 +191,7 @@ function createCanonicalResourceCredit({db,FieldValue,HttpsError,runProtected,
                 creditRevision:revision,createdAt:stamp});
             tx.create(ledgerRef,{schemaVersion:1,ownerUid:uid,grantId,operationId,
                 kind:grant.kind,amount:grant.amount,
+                ...(eventProof?{sourceEventSha256:eventProof.sha256}:{}),
                 creditEvidenceVersion:1,sourceRevision:previous,
                 sourceSnapshotSha256:previousSnapshotSnap.get("sha256"),
                 balanceBefore:economy[balanceKey],
@@ -188,6 +204,7 @@ function createCanonicalResourceCredit({db,FieldValue,HttpsError,runProtected,
                 }else{
                     tx.create(receiptRef,{schemaVersion:1,ownerUid:uid,operationId,grantId,
                         kind:"gold",amount:REWARD_GOLD,serverRevision:revision,
+                        sourceEventSha256:eventProof.sha256,
                         creditedToCharacter:true,creditRevision:revision,
                         snapshotSha256:bundle.sha256,createdAt:stamp,creditedAt:stamp});
                 }
@@ -197,6 +214,7 @@ function createCanonicalResourceCredit({db,FieldValue,HttpsError,runProtected,
                 }else{
                     tx.create(grantRef,{schemaVersion:1,ownerUid:uid,kind:"gold",
                         source:"server-event",eventType:"daily-checkin",periodDate:dailyDay,
+                        sourceEventSha256:eventProof.sha256,
                         amount:REWARD_GOLD,status:"credited",claimedByOperationId:operationId,
                         createdAt:stamp,creditedAt:stamp});
                 }
