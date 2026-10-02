@@ -56,7 +56,8 @@ function createDailyCheckinGrant({db,FieldValue,HttpsError,runProtected,
             const sourceGrant={ownerUid:uid,source:"server-event",eventType:"daily-checkin",
                 periodDate:day,kind:"gold",amount:REWARD_GOLD};
             const proof=await readDailyCheckinEvidence({tx,root,uid,grantId,grant:sourceGrant,fail,
-                allowCreate:true,day,characterId:account.slots[0],sourceRevision:account.serverRevision});
+                allowCreate:true,day,characterId:account.slots[0],sourceRevision:account.serverRevision,
+                sourceSnapshotSha256:account.snapshotSha256});
             tx.create(proof.ref,{...proof.event,sha256:proof.sha256,createdAt:FieldValue.serverTimestamp()});
             tx.create(grantRef,{schemaVersion:1,ownerUid:uid,sourceEventSha256:proof.sha256,
                 source:"server-event",eventType:"daily-checkin",periodDate:day,

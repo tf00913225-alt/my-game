@@ -329,6 +329,23 @@ assert.equal((await db.collection(`serverUsers/${atomicUid}/pendingGrants`).get(
 assert.equal((await db.collection(`serverUsers/${atomicUid}/ledgerEntries`).get()).empty,true);
 assert.equal((await db.collection(`serverUsers/${atomicUid}/rewardEvents`).get()).empty,true);
 assert.equal((await db.doc(`serverUsers/${atomicUid}/economy/current`).get()).get("gold"),0);
+// The first issuance must prove eligibility at the sealed character revision;
+// a consistent current account alone cannot substitute for missing sources.
+for(const [path,patch] of [
+    ["playableSnapshots/2",null],["recoveryArchives/2",null],
+    ["playableSnapshots/2",{sha256:"0".repeat(64)}],
+    ["recoveryArchives/2",{"sourceRecords.economy.gold":999}]
+]){
+    const ref=db.doc(`serverUsers/${atomicUid}/${path}`),saved=(await ref.get()).data();
+    if(patch===null)await ref.delete();else await ref.update(patch);
+    await rejected("claimDailyCheckin",atomicUser.idToken,atomicRequest.data,"DATA_LOSS");
+    assert.equal((await db.collection(`serverUsers/${atomicUid}/rewardEvents`).get()).empty,true);
+    assert.equal((await db.collection(`serverUsers/${atomicUid}/pendingGrants`).get()).empty,true);
+    assert.equal((await db.collection(`serverUsers/${atomicUid}/ledgerEntries`).get()).empty,true);
+    assert.equal((await db.doc(`serverUsers/${atomicUid}/economy/current`).get()).get("gold"),0);
+    assert.equal((await db.doc(`users/${atomicUid}/saves/current`).get()).get("serverRevision"),2);
+    await ref.set(saved);
+}
 await rejected("claimDailyCheckin",atomicUser.idToken,
     {...atomicRequest.data,expectedRevision:1},"ABORTED");
 await rejected("claimDailyCheckin",atomicUser.idToken,
@@ -374,7 +391,9 @@ for(const [path,patch] of [
     [`grantOperations/${atomicOperation}`,{sourceEventSha256:"0".repeat(64)}],
     [`ledgerEntries/${atomicOperation}`,{sourceEventSha256:"0".repeat(64)}],
     ["playableSnapshots/3",null],["recoveryArchives/3",null],
-    ["recoveryArchives/2",null],
+    ["recoveryArchives/2",null],["playableSnapshots/2",null],
+    ["playableSnapshots/2",{sha256:"0".repeat(64)}],
+    ["recoveryArchives/2",{"sourceRecords.economy.gold":999}],
     ["playableSnapshots/3",{sha256:"0".repeat(64)}],
     ["recoveryArchives/3",{"sourceRecords.economy.gold":999}],
     [`ledgerEntries/${atomicOperation}`,{balanceAfter:51}],
@@ -423,6 +442,15 @@ abortCheckin=false;
 assert.equal((await checkinRef.get()).exists,false);
 const checkinEventRef=db.doc(`serverUsers/${y}/rewardEvents/daily-checkin-20260927`);
 assert.equal((await checkinEventRef.get()).exists,false);
+// Exercise both new and existing issuance against the original source gate.
+for(const path of ["playableSnapshots/2","recoveryArchives/2"]){
+    const ref=db.doc(`serverUsers/${y}/${path}`),saved=(await ref.get()).data();
+    await ref.delete();
+    await assert.rejects(checkinIssuer.issue(yRequest),e=>e.code==="data-loss");
+    assert.equal((await checkinRef.get()).exists,false);
+    assert.equal((await checkinEventRef.get()).exists,false);
+    await ref.set(saved);
+}
 assert.equal((await checkinIssuer.issue(yRequest)).grantId,"daily-checkin-20260927");
 assert.equal((await checkinIssuer.issue(yRequest)).unchanged,true);
 assert.equal((await checkinRef.get()).get("amount"),50);
@@ -433,6 +461,14 @@ await checkinEventRef.delete();
 await assert.rejects(checkinIssuer.issue(yRequest),e=>e.code==="failed-precondition");
 assert.equal((await checkinEventRef.get()).exists,false);
 await checkinEventRef.set(savedCheckinEvent);
+for(const path of ["playableSnapshots/2","recoveryArchives/2"]){
+    const ref=db.doc(`serverUsers/${y}/${path}`),saved=(await ref.get()).data();
+    await ref.delete();
+    await assert.rejects(checkinIssuer.issue(yRequest),e=>e.code==="data-loss");
+    assert.equal((await checkinRef.get()).get("status"),"pending");
+    assert.deepEqual((await checkinEventRef.get()).data(),savedCheckinEvent);
+    await ref.set(saved);
+}
 assert.equal((await db.doc(`users/${y}/saves/current`).get()).get("serverRevision"),2);
 checkinTime=Date.parse("2026-09-27T16:00:00Z");
 assert.equal((await checkinIssuer.issue(yRequest)).grantId,"daily-checkin-20260928");
@@ -1021,6 +1057,18 @@ await rejected("reserveTrustedGrant",yUser.idToken,{uid:y,session:sessionY,
     expectedRevision:beforeCheckin},"DATA_LOSS");
 assert.deepEqual((await checkinRef.get()).data(),uncreditedGrant);
 await checkinEventRef.set(savedCheckinEvent);
+// Pending reservations also require the original source, even after current
+// canonical revisions have moved on. Refusal cannot reserve or change revision.
+for(const path of ["playableSnapshots/2","recoveryArchives/2"]){
+    const ref=db.doc(`serverUsers/${y}/${path}`),saved=(await ref.get()).data();
+    await ref.delete();
+    await rejected("reserveTrustedGrant",yUser.idToken,{
+        uid:y,session:sessionY,grantId:"daily-checkin-20260927",
+        operationId:checkinOperation,expectedRevision:beforeCheckin},"DATA_LOSS");
+    assert.deepEqual((await checkinRef.get()).data(),uncreditedGrant);
+    assert.equal((await db.doc(`users/${y}/saves/current`).get()).get("serverRevision"),beforeCheckin);
+    await ref.set(saved);
+}
 const reservedCheckin=await invoke("reserveTrustedGrant",yUser.idToken,{
     uid:y,session:sessionY,grantId:"daily-checkin-20260927",
     operationId:checkinOperation,expectedRevision:beforeCheckin});

@@ -87,7 +87,8 @@ function createCanonicalResourceCredit({db,FieldValue,HttpsError,runProtected,
             }
             const eventProof=await readDailyCheckinEvidence({tx,root,uid,grantId,grant,fail,
                 allowCreate:dailyDay!==null&&!grantSnap.exists,day:dailyDay,
-                characterId:account.slots?.[0],sourceRevision:account.serverRevision});
+                characterId:account.slots?.[0],sourceRevision:account.serverRevision,
+                sourceSnapshotSha256:account.snapshotSha256});
             if(eventProof&&(eventProof.event.characterId!==account.slots?.[0]||
                 eventProof.event.sourceRevision>account.serverRevision)){
                 fail("data-loss","Grant event eligibility is inconsistent.");
