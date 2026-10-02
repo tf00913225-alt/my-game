@@ -7951,7 +7951,7 @@
         return safeAmount;
     }
 
-    function healMonsterPreservingShield(monster,amount){
+    function healMonsterPreservingShield(monster,amount,caster){
         if(!monster || !monster.alive){ return 0; }
         const shieldRemaining=syncMonsterShield(monster);
         const shield=monster.v141Shield;
@@ -7959,7 +7959,8 @@
         const baseHp=shield
             ? Math.max(0,monster.hp-shieldRemaining)
             : Math.max(0,monster.hp);
-        const healed=Math.max(0,Math.min(Math.floor(Number(amount)||0),baseMax-baseHp));
+        const healingFactor=caster&&caster.vGameplayTower===true?Number(caster.vTowerHealingMultiplier)||1:1;
+        const healed=Math.max(0,Math.min(Math.floor((Number(amount)||0)*healingFactor),baseMax-baseHp));
         monster.hp=baseHp+healed+shieldRemaining;
         if(shield){ shield.baseHp=baseHp+healed; }
         return healed;
@@ -8252,13 +8253,13 @@
                 window.v144NormalizeMonsterSkillLoadout(monster);
             }
             if(
-                monster&&Array.isArray(monster.v141SupportSkillIds)&&monster.v141SupportSkillIds.length>0&&
+                monster&&monster.vGameplayTower!==true&&Array.isArray(monster.v141SupportSkillIds)&&monster.v141SupportSkillIds.length>0&&
                 typeof window.v141TryMonsterSpecialAction==="function"
             ){
                 const handled=window.v141TryMonsterSpecialAction(monsterIndex,token);
                 if(handled===true){ return; }
             }
-            if(monster&&monster.v141AbyssAi==="support"){
+            if(monster&&monster.vGameplayTower!==true&&monster.v141AbyssAi==="support"){
                 const supportResult=supportMonsterAction(monsterIndex);
                 if(supportResult!==false && supportResult!==null){ return supportResult; }
                 if(supportResult===null){ return originalProcessSingleMonsterAttack.apply(this,arguments); }
@@ -10798,10 +10799,12 @@
         });
         if(!skillId){
             const category=window.FourSymbolsEnemySkillAI
-                ?window.FourSymbolsEnemySkillAI.chooseCategory(affordableAttacks,affordableBuffs,Math.random())
+                ?window.FourSymbolsEnemySkillAI.chooseCategory(affordableAttacks,affordableBuffs,Math.random(),monster)
                 :(Math.random()<.70?"attack":"buff");
             if(category==="attack"&&affordableAttacks.length){
-                monster.v175ForcedAttackSkillId=affordableAttacks[Math.floor(Math.random()*affordableAttacks.length)];
+                const preferredAttacks=monster.vGameplayTower===true&&monster.element==="water"&&affordableAttacks.includes("freeze")&&Math.random()<.5
+                    ?["freeze"]:affordableAttacks;
+                monster.v175ForcedAttackSkillId=preferredAttacks[Math.floor(Math.random()*preferredAttacks.length)];
                 return false;
             }
             if(category!=="buff"&&affordableBuffs.length){
@@ -10817,7 +10820,9 @@
         if(!skillId&&supportIds.includes("dodgeSkill")&&!allies.some(item=>item.v141TeamBuffs?.some(buff=>buff.type==="dodge"&&buff.turnsLeft>0))){ skillId="dodgeSkill"; }
         if(!skillId){
             if(affordableAttacks.length){
-                monster.v175ForcedAttackSkillId=affordableAttacks[Math.floor(Math.random()*affordableAttacks.length)];
+                const preferredAttacks=monster.vGameplayTower===true&&monster.element==="water"&&affordableAttacks.includes("freeze")&&Math.random()<.5
+                    ?["freeze"]:affordableAttacks;
+                monster.v175ForcedAttackSkillId=preferredAttacks[Math.floor(Math.random()*preferredAttacks.length)];
             }
             return false;
         }
@@ -10852,7 +10857,7 @@
             let spTotal=0;
             healTargets.forEach(entry=>{
                 const ally=entry.monster;
-                const healed=window.v141HealMonsterPreservingShield(ally,hpAmount);
+                const healed=window.v141HealMonsterPreservingShield(ally,hpAmount,monster);
                 const beforeSP=Math.max(0,Number(ally.sp)||0);
                 const spAmount=entry.index===monsterIndex
                     ?0

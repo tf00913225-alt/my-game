@@ -2249,7 +2249,7 @@
             const supports=monster&&typeof window.v144GetLegalMonsterSkillIds==="function"
                 ?window.v144GetLegalMonsterSkillIds(monster,"support")
                 :(monster&&monster.v141SupportSkillIds||[]);
-            if(supports.includes("rage")){ return tryMonsterRage(monsterIndex); }
+            if(supports.includes("rage")&&monster.vGameplayTower!==true){ return tryMonsterRage(monsterIndex); }
             return previousMonsterSpecial.apply(this,arguments);
         };
     }

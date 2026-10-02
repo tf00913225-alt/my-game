@@ -26,10 +26,13 @@ assert.doesNotMatch(bossCss,/boss-mechanism-card|boss-mechanism-slot/);
    Keep these assertions whitespace-safe so formatting changes do not create a
    false CI failure while the actual combat behavior remains the same. */
 assert.match(bossRuntime,/const ELEMENT_ORDER=Object\.freeze\(\["fire","earth","water","wind"\]\)/);
-assert.match(bossRuntime,/if\(element==="fire"\)\{[\s\S]*?monster\.skillChance=Math\.min\(\.82,numeric\(monster\.skillChance,\.48\)\+\.08\);[\s\S]*?monster\.critChance=[\s\S]*?\}/);
-assert.match(bossRuntime,/if\(element==="water"\)\{[\s\S]*?monster\.v141SupportSkillIds=compatibleSkillIds\(element,ELEMENTS\.water\.supports\);[\s\S]*?monster\.v141AbyssAi="support";[\s\S]*?\}/);
-assert.match(bossRuntime,/if\(element==="wind"\)\{[\s\S]*?monster\.evasion=[\s\S]*?monster\.agility=[\s\S]*?1\.12;[\s\S]*?\}/);
-assert.match(bossRuntime,/if\(element==="earth"\)\{[\s\S]*?monster\.defense=[\s\S]*?monster\.maxHP=[\s\S]*?1\.12\);[\s\S]*?monster\.hp=monster\.maxHP;[\s\S]*?\}/);
+// Element profiles do not own the common skill-frequency roll.
+assert.match(bossRuntime,/return value<=30\?\.65:value<=60\?\.70:value<=90\?\.75:\.80/);
+assert.doesNotMatch(bossRuntime,/monster\.skillChance=Math\.min\(\.82,numeric\(monster\.skillChance,\.48\)\+\.08\)/);
+assert.match(bossRuntime,/if\(element==="fire"\)\{[\s\S]*?monster\.vTowerCriticalBonusPercent=15;[\s\S]*?monster\.vTowerDirectDamageMultiplier=1\.15;/);
+assert.match(bossRuntime,/if\(element==="water"\)\{[\s\S]*?monster\.vTowerHealingMultiplier=1\.15;[\s\S]*?monster\.vTowerStatusAccuracyPercent=15;[\s\S]*?monster\.v141SupportSkillIds=compatibleSkillIds\(element,ELEMENTS\.water\.supports\);[\s\S]*?monster\.v141AbyssAi="support";/);
+assert.match(bossRuntime,/if\(element==="wind"\)\{[\s\S]*?monster\.evasion=[\s\S]*?\+15;[\s\S]*?monster\.agility=[\s\S]*?1\.15;/);
+assert.match(bossRuntime,/if\(element==="earth"\)\{[\s\S]*?monster\.defense=[\s\S]*?monster\.maxHP=[\s\S]*?1\.15\);[\s\S]*?monster\.hp=monster\.maxHP;/);
 
 /* Formal Sprite Sheets own the complete battle action. V142 is now timing-only:
    there is no hidden legacy stage to resurrect and no projectile fallback. */

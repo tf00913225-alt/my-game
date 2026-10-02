@@ -111,7 +111,7 @@
 
 ## Four-Symbol Tower Formation／Small Boss 契約
 
-- 四象塔一般層固定 6 名：`B2/B3/B4 + F2/F3/F4`。第 5 層倍數的精英／特殊層與第 10 層倍數的 Boss 層固定 10 名：`B1...B5 + F1...F5`。
+- 四象塔每個元素、每層（含第 100 層）固定 10 個真實戰鬥單位，唯一格位 `B1...B5 + F1...F5`。一般層 10 Regular；每 5 層且非 10 倍數為 2 Elite + 8 Regular；每 10 層為 1 Tower Boss + 2 Elite + 7 Regular。All 結算所有存活目標；其他目標形狀不變。
 - 10 人 Boss 層 `ENEMY_B3` 永遠是唯一 Tower Boss；沒有 Boss 的 10 人特殊層，`ENEMY_B3` 優先為 Elite。死亡後 Slot 不重排、不補位。
 - Tower Boss gameplay `rank="boss"`，但不是 Large Boss entity：固定單格 `ENEMY_B3`、`unitKind="tower-boss"`、不啟用 `FourSymbolsBossBattle` 的中央六格 footprint、B1/B5 援軍、F1/F5 Boss objects、Boss Shield／Mechanism Inspector。
 - Large Boss 架構只保留 Personal Boss 與 World Boss；Abyss 仍使用自己的正式編成 Owner。
@@ -193,3 +193,14 @@
 - 鎮魂古鐘命中 -5/-8% 是 Relic Final Hit Reduction Source，依 bossDebuffEfficiency 計算後與暈眩相加，既有期限與清理 owner 保留，禁止乘算 monster.accuracy。
 
 - Relic Evasion 只由 `v174GetRelicFinalEvasionPercent(index)` 提供來源值，`getMainCharacterStats`／`getAdditionalCharacterBattleStats` 的既有 Evasion 加總一次結算並一起處理 Frostbite。Relic stats decorator 不得再次改寫 Evasion；隊伍 getter 委派角色 getter 後不得雙加。
+
+## Four Symbols Tower Challenge Profile（四象塔挑戰特性）
+
+- Common Skill Frequency 與 Element Profile 分離，唯一塔 Owner 是 `gameplay-boss-tower-system.js`。1～30 層 65%、31～60 層 70%、61～90 層 75%、91～100 層 80%；Regular／Elite／Tower Boss 相同，canAct=false 機制物件排除。火塔舊額外 +8 Skill Chance 退休。
+- Skill Chance 是輪到可行動且有合法可負擔技能時進入技能決策的機率，不是技能命中率。Tower attack/heal/support/control 只能共用一次 roll；正式 `FourSymbolsEnemySkillAI` 與 V144 合法技能 Guard 選招，不增加第二套 AI。
+- Fire：最終爆擊 +15 個百分點，遵守 Crit Cap；自身普通攻擊與直接物理／法術技能傷害 ×1.15。DoT／Burn／Reflect／Relic／Boss Object／HP Cost／Self Damage／Environment 排除。Damage Owner 只套用一次塔 direct modifier。
+- Water：合法 Heal／Support／Freeze 技能決策偏輔助；友軍 HP <70% 優先治療。HP Healing ×1.15，SP 回復不加成。最新正式水系無獨立 Buff，沿用 Heal Support 及 Freeze，不引入跨元素 Buff 或新控制狀態。
+- Water Status Accuracy +15 個百分點適用 Soft／DoT／Hard Control。先加入 `calculateStatusEffectChance` 正式公式，最後 Clamp：一般 Status 5～95%；Player→Regular 5～90%、Elite 5～75%、Boss 5～60%；Enemy→Player Hard Control 5～60%，與施放怪物 rank 無關。30+15=45；52+15=67→60。
+- Wind：最終 Evasion +15 個百分點（不另設上限）；Agility／Speed ×1.15，只影響速度，不增加 Evasion 或 Accuracy。
+- Earth：Defense ×1.15、Max HP ×1.15、建立時 hp=maxHP，Profile 同場冪等，不在 render/reload/round 疊加。
+- Profile 僅套 Tower metadata；其他玩法的敵人数量、技能頻率與戰鬥數值保持既有規則。入口顯示當週元素特性、樓層施放率與每層固定 10 名敵人。

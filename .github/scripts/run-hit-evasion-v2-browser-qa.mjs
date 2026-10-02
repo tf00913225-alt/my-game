@@ -123,7 +123,7 @@ try{
     assert.equal(evidence.legacyArmor.stats.accuracy,3);assert.equal(evidence.legacyArmor.stats.evasion,10);assert.equal(evidence.legacyArmor.stats.antiCrit,1.5);assert.equal(evidence.legacyArmor.stats.statusResistance,0.75);
     assert.equal(evidence.migrated.stats.accuracy,3);assert.deepEqual(evidence.repeated,evidence.migrated);
     assert.deepEqual(evidence.formula,[95,99,65,55,5]);
-    assert.ok(evidence.tower.length>0&&evidence.tower.every(v=>v===8));
+    assert.ok(evidence.tower.length>0&&evidence.tower.every(v=>v===15));
     assert.equal(evidence.frostbite,15);assert.deepEqual(evidence.feather,[[8,8],[10,10],[12,12]]);assert.deepEqual(evidence.relicFrostbite,[[0,0],[0,0],[0,0]]);
     assert.deepEqual(evidence.bell,[{accuracy:0,reduction:5,hit:90},{accuracy:0,reduction:8,hit:87}]);
     for(const values of Object.values(evidence.casts))assert.deepEqual(values,[5,10,15,20,25].map(value=>({value,duration:3,accuracy:0})));

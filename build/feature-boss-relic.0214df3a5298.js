@@ -23,10 +23,10 @@
 
     const ELEMENT_ORDER=Object.freeze(["fire","earth","water","wind"]);
     const ELEMENTS=Object.freeze({
-        fire:Object.freeze({label:"火",style:"高爆發・爆擊・燃燒・追擊",color:"#c85a3d",glow:"rgba(200,90,61,.3)",skills:Object.freeze(["fireRocket","explosiveFlurry","dragonSlash"]),supports:Object.freeze(["rage"])}),
-        earth:Object.freeze({label:"土",style:"防禦・護盾・反傷・破防",color:"#a77a46",glow:"rgba(167,122,70,.3)",skills:Object.freeze(["stoneSlash","flyingSandStrike","dustStorm"]),supports:Object.freeze(["rockWall"])}),
-        water:Object.freeze({label:"水",style:"回復・凍傷・控制・消耗",color:"#4f83bd",glow:"rgba(79,131,189,.3)",skills:Object.freeze(["waterKnife","frostPunch","floodBeast"]),supports:Object.freeze(["healSpell"])}),
-        wind:Object.freeze({label:"風",style:"閃避・命中干擾・暈眩・速度",color:"#4a9d78",glow:"rgba(74,157,120,.3)",skills:Object.freeze(["stormFlurry","windCrossSlash","windHowlLightning"]),supports:Object.freeze(["dodgeSkill"])} )
+        fire:Object.freeze({label:"火",style:"爆擊 +15%、造成傷害 +15%",color:"#c85a3d",glow:"rgba(200,90,61,.3)",skills:Object.freeze(["fireRocket","explosiveFlurry","dragonSlash"]),supports:Object.freeze(["rage"])}),
+        earth:Object.freeze({label:"土",style:"防禦 +15%、最大生命 +15%",color:"#a77a46",glow:"rgba(167,122,70,.3)",skills:Object.freeze(["stoneSlash","flyingSandStrike","dustStorm"]),supports:Object.freeze(["rockWall"])}),
+        water:Object.freeze({label:"水",style:"偏治療／輔助／冰封，治療 +15%、異常命中 +15%",color:"#4f83bd",glow:"rgba(79,131,189,.3)",skills:Object.freeze(["waterKnife","frostPunch","floodBeast"]),supports:Object.freeze(["healSpell"])}),
+        wind:Object.freeze({label:"風",style:"閃避 +15%、速度 +15%",color:"#4a9d78",glow:"rgba(74,157,120,.3)",skills:Object.freeze(["stormFlurry","windCrossSlash","windHowlLightning"]),supports:Object.freeze(["dodgeSkill"])} )
     });
 
     /*
@@ -418,6 +418,7 @@
         const next=Math.min(TOWER_FLOORS,tower.completedFloor+1);
         content.innerHTML='<div class="tower-home">'+towerChoiceMarkup()+
             '<section class="tower-element-hero" data-tower-element="'+escapeHtml(tower.element)+'" style="--tower-color:'+element.color+';--tower-glow:'+element.glow+'"><div><small>本週元素試煉</small><h3>'+escapeHtml(element.label)+'元素</h3><strong>'+tower.completedFloor+' / 100</strong><p>'+escapeHtml(element.style)+'</p></div></section>'+
+            '<p class="tower-challenge-rules">每層固定 10 名敵人。敵方技能施放率隨樓層提升：1～30 層 65%、31～60 層 70%、61～90 層 75%、91～100 層 80%。</p>'+
             '<div class="tower-summary-grid"><div><small>本週最高</small><b>'+tower.highestThisWeek+' 層</b></div><div><small>歷史最高</small><b>'+tower.historicalHighest+' 層</b></div><div><small>下一層</small><b>第 '+next+' 層</b></div><div><small>下一重要獎勵</small><b>第 '+nextTowerRewardFloor(tower.completedFloor)+' 層</b></div></div>'+
             (level<TOWER_UNLOCK_LEVEL?'<div class="boss-overview-line"><span>四象塔於 Lv30 開放</span><b>目前 Lv.'+level+'</b></div>':'')+
             '<label class="tower-auto-advance"><input type="checkbox" '+(towerAutoAdvanceEnabled?'checked ':'')+(level<TOWER_UNLOCK_LEVEL||tower.pendingRelicChoice||tower.completedFloor>=TOWER_FLOORS?'disabled ':'')+'onchange="vGameplayToggleTowerAutoAdvance(this.checked)"><span>自動挑戰下一層</span></label>'+
@@ -507,22 +508,37 @@
         return map[element]||"四象尊";
     }
     function towerMonsterLevel(floor){ return clamp(Math.round(29+floor*.71),30,100); }
+    function towerSkillChance(floor){
+        const value=clamp(Math.floor(numeric(floor,1)),1,TOWER_FLOORS);
+        return value<=30?.65:value<=60?.70:value<=90?.75:.80;
+    }
+    function applyTowerChallengeProfile(monster){
+        if(!monster||monster.vGameplayTower!==true||monster.canAct===false){ return monster; }
+        monster.skillChance=towerSkillChance(monster.vGameplayTowerFloor);
+        return monster;
+    }
     function applyTowerElementProfile(monster,element){
+        if(!monster||monster.vGameplayTower!==true||monster.canAct===false||monster.vTowerElementProfileVersion===1){ return monster; }
+        monster.vTowerElementProfileVersion=1;
         if(element==="fire"){
-            monster.skillChance=Math.min(.82,numeric(monster.skillChance,.48)+.08);
-            monster.critChance=numeric(monster.critChance,5)+8;
+            monster.vTowerCriticalBonusPercent=15;
+            monster.vTowerDirectDamageMultiplier=1.15;
         }
         if(element==="water"){
+            monster.vTowerHealingMultiplier=1.15;
+            monster.vTowerStatusAccuracyPercent=15;
+            monster.skillIds=Array.from(new Set(monster.skillIds.concat(compatibleSkillIds(element,["freeze"]))));
+            monster.v144LegalSkillPool=monster.skillIds.slice();
             monster.v141SupportSkillIds=compatibleSkillIds(element,ELEMENTS.water.supports);
             if(monster.v141SupportSkillIds.length){ monster.v141AbyssAi="support"; }
         }
         if(element==="wind"){
-            monster.evasion=numeric(monster.evasion,0)+8;
-            monster.agility=numeric(monster.agility,1)*1.12;
+            monster.evasion=numeric(monster.evasion,0)+15;
+            monster.agility=numeric(monster.agility,numeric(monster.level,1)*1.2)*1.15;
         }
         if(element==="earth"){
-            monster.defense=Math.round(numeric(monster.defense,1)*1.18);
-            monster.maxHP=Math.round(numeric(monster.maxHP,1)*1.12);
+            monster.defense=Math.round(numeric(monster.defense,1)*1.15);
+            monster.maxHP=Math.round(numeric(monster.maxHP,1)*1.15);
             monster.hp=monster.maxHP;
         }
         return monster;
@@ -550,6 +566,7 @@
         bindTowerMonsterIdentity(monster);
         configureBossSkills(monster,element,Math.ceil(floor/30));
         applyTowerElementProfile(monster,element);
+        applyTowerChallengeProfile(monster);
         return monster;
     }
     function buildTowerBossMonster(definition,floor){
@@ -571,13 +588,14 @@
         monster.vGameplayPortraitSizeClass="standard";
         configureBossSkills(monster,definition.element,stage);
         applyTowerElementProfile(monster,definition.element);
+        applyTowerChallengeProfile(monster);
         return monster;
     }
     function buildTowerRoster(floor){
         const element=state.tower.element,level=towerMonsterLevel(floor);
         const special=floor%5===0;
         if(!special){
-            return Array.from({length:6},(_,index)=>buildTowerTroop(level,element,"regular",floor,index));
+            return Array.from({length:10},(_,index)=>buildTowerTroop(level,element,"regular",floor,index));
         }
         const roster=[];
         if(floor%10===0){
@@ -1454,6 +1472,9 @@
          getTowerFloorKind:towerFloorKind,
          getTowerPortraitAssetId:towerPortraitAssetId,
          buildTowerRoster:buildTowerRoster,
+         applyTowerElementProfile:applyTowerElementProfile,
+         applyTowerChallengeProfile:applyTowerChallengeProfile,
+         getTowerSkillChance:towerSkillChance,
         getActiveBattleState:function(){ return activeBattleContext?copy({mode:activeBattleContext.mode,definitionId:activeBattleContext.definitionId||null,stage:activeBattleContext.stage||null,floor:activeBattleContext.floor||null,combatPhase:activeBattleContext.combatPhase||1,totalPhases:activeBattleContext.totalPhases||1,bossIndex:bossIndex(),objectIndexes:(activeBattleContext.objectIndexes||[]).slice(),shield:bossShield()}):null; },
         debugSpawnBossObject:spawnBossObject,
         debugProcessBossRound:processBossRound,

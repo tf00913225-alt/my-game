@@ -280,7 +280,7 @@
         return safeAmount;
     }
 
-    function healMonsterPreservingShield(monster,amount){
+    function healMonsterPreservingShield(monster,amount,caster){
         if(!monster || !monster.alive){ return 0; }
         const shieldRemaining=syncMonsterShield(monster);
         const shield=monster.v141Shield;
@@ -288,7 +288,8 @@
         const baseHp=shield
             ? Math.max(0,monster.hp-shieldRemaining)
             : Math.max(0,monster.hp);
-        const healed=Math.max(0,Math.min(Math.floor(Number(amount)||0),baseMax-baseHp));
+        const healingFactor=caster&&caster.vGameplayTower===true?Number(caster.vTowerHealingMultiplier)||1:1;
+        const healed=Math.max(0,Math.min(Math.floor((Number(amount)||0)*healingFactor),baseMax-baseHp));
         monster.hp=baseHp+healed+shieldRemaining;
         if(shield){ shield.baseHp=baseHp+healed; }
         return healed;
@@ -581,13 +582,13 @@
                 window.v144NormalizeMonsterSkillLoadout(monster);
             }
             if(
-                monster&&Array.isArray(monster.v141SupportSkillIds)&&monster.v141SupportSkillIds.length>0&&
+                monster&&monster.vGameplayTower!==true&&Array.isArray(monster.v141SupportSkillIds)&&monster.v141SupportSkillIds.length>0&&
                 typeof window.v141TryMonsterSpecialAction==="function"
             ){
                 const handled=window.v141TryMonsterSpecialAction(monsterIndex,token);
                 if(handled===true){ return; }
             }
-            if(monster&&monster.v141AbyssAi==="support"){
+            if(monster&&monster.vGameplayTower!==true&&monster.v141AbyssAi==="support"){
                 const supportResult=supportMonsterAction(monsterIndex);
                 if(supportResult!==false && supportResult!==null){ return supportResult; }
                 if(supportResult===null){ return originalProcessSingleMonsterAttack.apply(this,arguments); }
