@@ -40,52 +40,67 @@ const expression=`(async()=>{
     const migrated=FourSymbolsEquipmentCombatMigration.projectItem({stats:{accuracy:20,antiCrit:1,statusResistance:0.5}});
     const repeated=FourSymbolsEquipmentCombatMigration.projectItem(migrated);
     // Explicit tower affinity survives the retired level-derived default.
-    const towerState=GameplaySystem.getSerializableState();towerState.tower.element="wind";
-    GameplaySystem.debugReloadState(towerState);
-    const tower=GameplaySystem.buildTowerRoster(1).map(m=>getMonsterEvasion(m));
+    const towerState=GameplaySystem.getSerializableState();let windTime=Date.now();
+    while(GameplaySystem.getWeekInfo(windTime).element!=="wind")windTime-=7*24*60*60*1000;
+    const windState=structuredClone(towerState);windState.tower.weekKey=GameplaySystem.getWeekInfo(windTime).key;
+    let tower;const realNow=Date.now;
+    try{Date.now=()=>windTime;GameplaySystem.debugReloadState(windState,windTime);tower=GameplaySystem.buildTowerRoster(1).map(m=>getMonsterEvasion(m));}
+    finally{Date.now=realNow;GameplaySystem.debugReloadState(towerState);}
     characterEquipment.fire={};characterEquipment.wind=characterEquipment.fire;
     player.activeBuffs=[{type:"dodgeSkill",turnsLeft:3,percent:40}];
     player.statusEffects=[{type:"frostbite",turnsLeft:2}];
     const frostbite=getMainCharacterStats().evasion;
     player.activeBuffs=[];player.statusEffects=[];player.hp=getMainCharacterStats().maxHP;
-    const freshMonsters=()=>{monsters=[makeZoneMonster("QA",1,"fire")];monsters[0].hp=monsters[0].maxHP=100000;monsters[0].alive=true;monsters[0].accuracy=0;currentZone="forest";mapCooldown=false;autoBattle=false;autoConfig.enabled=false;startBattle(0);startTurn(battleToken);notifyBattleRoundBoundary("round_start",battleToken);};
-    const waitRelic=async()=>{const deadline=Date.now()+5000;while(!v174RelicDebugState()&&Date.now()<deadline)await new Promise(r=>setTimeout(r,20));if(!v174RelicDebugState())throw new Error("Real relic battle did not initialize: "+JSON.stringify({battleActive,battleToken,turn,observers:battleRoundStartObservers.size,keys:Array.from(battleRoundBoundaryKeys),startSource:String(startBattle).slice(0,500),turnSource:String(startTurn).slice(0,500),logs:Array.from(document.querySelectorAll(".battle-log")).map(n=>n.textContent)}));};
+    const freshMonsters=async()=>{monsters=[makeZoneMonster("QA",1,"fire")];monsters[0].hp=monsters[0].maxHP=100000;monsters[0].alive=true;monsters[0].accuracy=0;currentZone="forest";mapCooldown=false;autoBattle=false;autoConfig.enabled=false;autoPatrolEnabled=false;startBattle(0);await waitRelic();const deadline=Date.now()+8000;while(Date.now()<deadline&&document.getElementById("battlePage")?.matches(".v141-preparing-entry,.v141-entry-moving"))await new Promise(r=>setTimeout(r,30));};
+    const endBattle=async()=>{loseBattle();const deadline=Date.now()+8000;while(battleActive&&Date.now()<deadline)await new Promise(r=>setTimeout(r,30));if(battleActive)throw new Error("Battle exit did not finish");player.hp=getMainCharacterStats().maxHP;};
+    const waitRelic=async()=>{const deadline=Date.now()+5000;while(!v174RelicDebugState()&&Date.now()<deadline)await new Promise(r=>setTimeout(r,20));if(!v174RelicDebugState())throw new Error("Real relic battle did not initialize: "+JSON.stringify({battleActive,battleToken,turn,observers:Array.from(battleRoundStartObservers).map(fn=>String(fn).slice(0,800)),keys:Array.from(battleRoundBoundaryKeys),startSource:String(startBattle).slice(0,500),turnSource:String(startTurn).slice(0,500),logs:Array.from(document.querySelectorAll(".battle-log")).map(n=>n.textContent)}));};
     const relicOwned=v174RelicSystem.getOwnedState(),loadout=v174RelicSystem.getTeamLoadout();
     const feather=[];
     for(const level of [1,10,20]){
         Object.assign(relicOwned.relic_qinglan_feather,{unlocked:true,level});loadout.relicId="relic_qinglan_feather";
-        freshMonsters();await waitRelic();feather.push(getMainCharacterStats().evasion);loseBattle();player.hp=getMainCharacterStats().maxHP;
+        await freshMonsters();await waitRelic();feather.push(getMainCharacterStats().evasion);await endBattle();
     }
     const bell=[];
     for(const level of [10,20]){
         Object.assign(relicOwned.relic_soul_bell,{unlocked:true,level});loadout.relicId="relic_soul_bell";
-        freshMonsters();await waitRelic();turn=4;v174RelicDebugDispatch("round_start",{sourceType:"system"});
+        await freshMonsters();await waitRelic();turn=4;v174RelicDebugDispatch("round_start",{sourceType:"system"});
         bell.push({accuracy:monsters[0].accuracy,reduction:getFinalHitReductionPercent(monsters[0]),hit:calculateHitChancePercent(monsters[0].accuracy,0,getFinalHitReductionPercent(monsters[0]),0)});
-        loseBattle();player.hp=getMainCharacterStats().maxHP;
+        await endBattle();
     }
     loadout.relicId=null;
-    freshMonsters();
+    await freshMonsters();
+    const casts={};
+    for(const skillId of ["dodgeSkill","dinghaishenzhen"]){
+        casts[skillId]=[];
+        for(let level=1;level<=5;level++){
+            characterSkillLoadouts.fire.skillLevels[skillId]=level;player.activeBuffs=[];player.v141TeamBuffs=[];player.sp=1000;activeBattleCharacterIndex=0;
+            castBuffSkill(skillId);
+            const buff=player.activeBuffs.find(b=>b.type===skillId);
+            casts[skillId].push({value:skillId==="dodgeSkill"?getMainCharacterStats().evasion:getFinalAccuracyBonusPercent(player),duration:buff?.turnsLeft,accuracy:getMainCharacterStats().accuracy});
+        }
+    }
+    player.activeBuffs=[];player.v141TeamBuffs=[];
     Object.assign(monsters[0],{name:"極帝天尊",element:"light",v141Abyss:true,v174TrueRealmFinal:true,v141SupportSkillIds:["yuanZuBlessing"],sp:1000,maxSP:1000,evasion:0,statusEffects:[]});
     const blessingApplied=v155ResolveExtremeEmperorAction(0,"yuanZuBlessing",false);
     const blessing={applied:blessingApplied,evasion:getMonsterEvasion(monsters[0]),duration:monsters[0].v155EvasionBlessing?.displayBuff?.turnsLeft};
-    loseBattle();player.hp=getMainCharacterStats().maxHP;
+    await endBattle();
     // Observe the existing owner during actual manual / auto / enemy resolution.
     const owner=calculateHitChancePercent,calls=[];
     calculateHitChancePercent=function(...args){const result=owner(...args);calls.push({args:args.slice(0,4),chance:result});return result;};
     const combat={};
     try{
-        freshMonsters();selectedMonster=0;normalAttack();combat.manual=calls.splice(0);
+        await freshMonsters();selectedMonster=0;normalAttack();combat.manual=calls.splice(0);
         autoBattle=true;autoConfig.skill="normal";autoActionForCharacter(0,battleToken);autoBattle=false;resolveQueuedPlayerAction(0,battleToken);combat.autoResolution=calls.splice(0);
         monsters[0].skillChance=0;monsters[0].skill=null;monsters[0].skills=[];processSingleMonsterAttack(0,battleToken);combat.monster=calls.splice(0);
-    }finally{calculateHitChancePercent=owner;loseBattle();}
-    return {wind,lowCap,levels,calm,dodge,set:{one,three,two,armor},detail,migrated,repeated,tower,frostbite,feather,bell,blessing,combat,
+    }finally{calculateHitChancePercent=owner;await endBattle();}
+    return {wind,lowCap,levels,calm,dodge,set:{one,three,two,armor},detail,migrated,repeated,tower,frostbite,feather,bell,blessing,combat,casts,
         formula:[calculateHitChancePercent(0,0,0,0),calculateHitChancePercent(10,0,0,0),calculateHitChancePercent(10,40,0,0),calculateHitChancePercent(0,40,0,0),calculateHitChancePercent(0,1000,0,0)]};
 })()`;
 const server=await startServer();
 const profile=fs.mkdtempSync(path.join(os.tmpdir(),"hit-evasion-v2-"));
 const port=9750+Math.floor(Math.random()*200);
 const proc=spawn(findChrome(),["--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--remote-debugging-port="+port,"--user-data-dir="+profile,"about:blank"],{stdio:"ignore"});
-let client;
+let client,evidence;
 const artifact=path.join(ROOT,"artifacts/browser-qa/hit-evasion-v2.json");
 fs.mkdirSync(path.dirname(artifact),{recursive:true});
 try{
@@ -94,7 +109,7 @@ try{
     await client.send("Page.enable");await client.send("Runtime.enable");
     await client.send("Emulation.setDeviceMetricsOverride",{width:393,height:873,deviceScaleFactor:1,mobile:true});
     await client.send("Page.navigate",{url:server.url});
-    const evidence=await client.eval(expression);
+    evidence=await client.eval(expression);
     assert.deepEqual(evidence.wind,{accuracy:15,evasion:15});assert.equal(evidence.lowCap,50);
     assert.deepEqual(evidence.levels,[{hit:95,evasion:0},{hit:95,evasion:0}]);
     assert.deepEqual(evidence.calm,[5,10,15,20,25].map(v=>[0,v,55+v]));
@@ -107,13 +122,21 @@ try{
     assert.ok(evidence.tower.length>0&&evidence.tower.every(v=>v===8));
     assert.equal(evidence.frostbite,15);assert.deepEqual(evidence.feather,[8,10,12]);
     assert.deepEqual(evidence.bell,[{accuracy:0,reduction:5,hit:90},{accuracy:0,reduction:8,hit:87}]);
+    for(const values of Object.values(evidence.casts))assert.deepEqual(values,[5,10,15,20,25].map(value=>({value,duration:3,accuracy:0})));
     assert.deepEqual(evidence.blessing,{applied:true,evasion:15,duration:2});
     for(const [mode,calls] of Object.entries(evidence.combat)){assert.ok(calls.length>0,mode+" reaches shared Hit Owner");assert.ok(calls.every(call=>call.chance>=5&&call.chance<=99));}
-    fs.writeFileSync(artifact,JSON.stringify({passed:true,commitSha:process.env.GITHUB_SHA||"local",evidence},null,2)+"\n");
+    await client.eval('characterEquipment.fire={armor:'+JSON.stringify(evidence.set.armor)+'};characterEquipment.wind=characterEquipment.fire;inventoryCharacterIndex=0;showPage("home");openInventoryCharacterDetail();');
+    const screenshot=await client.send("Page.captureScreenshot",{format:"png"});
+    fs.writeFileSync(artifact.replace(/\.json$/,".png"),Buffer.from(screenshot.data,"base64"));
+    await client.eval('document.getElementById("inventoryCharacterDetailStats").scrollTop=10000');
+    const noteScreenshot=await client.send("Page.captureScreenshot",{format:"png"});
+    fs.writeFileSync(artifact.replace(/\.json$/,"-formula.png"),Buffer.from(noteScreenshot.data,"base64"));
+    fs.writeFileSync(artifact,JSON.stringify({passed:true,commitSha:process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||"local",evidence},null,2)+"\n");
     console.log("V2 production mobile Runtime/UI/Save browser QA passed");
 }catch(error){
-    fs.writeFileSync(artifact,JSON.stringify({passed:false,error:String(error.stack||error)},null,2)+"\n");
+    fs.writeFileSync(artifact,JSON.stringify({passed:false,error:String(error.stack||error),evidence},null,2)+"\n");
     console.error(error);
+    console.error(JSON.stringify(client?.events.filter(e=>e.method==="Runtime.consoleAPICalled").slice(-12)));
     throw error;
 }finally{
     client?.close();proc.kill("SIGTERM");

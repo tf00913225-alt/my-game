@@ -29986,7 +29986,7 @@ function openInventoryCharacterDetail(){
             `
         ).join("")+
         `<div class="inventory-character-detail-note">
-            最終命中率＝95%＋命中%＋其他最終命中加成－目標最終閃避與命中下降，最後限制5%～99%。<br>
+            最終命中率＝95%＋命中%＋最終命中加成%－目標閃避%－最終命中下降%，最後限制5%～99%。<br>
             命中、閃避、異常抗性來自獨立戰鬥詞條或效果；敏捷只提高出手速度。
         </div>`;
 

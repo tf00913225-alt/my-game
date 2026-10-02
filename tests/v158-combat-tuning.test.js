@@ -94,7 +94,7 @@ test("V158 does not override the canonical hit formula",()=>{
     assert.doesNotMatch(source,/rollHitChance\s*=\s*function|v158GetHitChancePercent/);
 });
 
-test("default monster evasion is level times 0.1 capped at 10 without replacing any custom evasion",()=>{
+test("default monster evasion is zero at every level without replacing explicit evasion",()=>{
     const missing={level:20,agilityPoints:12};
     const formerGeneratedValue={level:20,agilityPoints:12,evasion:24};
     const custom={level:20,agilityPoints:12,evasion:37};
@@ -102,12 +102,12 @@ test("default monster evasion is level times 0.1 capped at 10 without replacing 
         monsters:[missing,formerGeneratedValue,custom],
         zoneConfig:{desert:{monsters:()=>[missing,formerGeneratedValue,custom]}}
     });
-    assert.equal(missing.evasion,2);
+    assert.equal(missing.evasion,0);
     assert.equal(formerGeneratedValue.evasion,24);
     assert.equal(custom.evasion,37);
-    assert.equal(context.v158NormalizeMonsterDefaultEvasion({level:30}).evasion,3);
-    assert.equal(context.makeZoneMonster("測試怪",40).evasion,4);
-    assert.equal(context.makeZoneMonster("高等測試怪",200).evasion,10);
+    assert.equal(context.v158NormalizeMonsterDefaultEvasion({level:30}).evasion,0);
+    assert.equal(context.makeZoneMonster("測試怪",40).evasion,0);
+    assert.equal(context.makeZoneMonster("高等測試怪",200).evasion,0);
 });
 
 test("V158 leaves the shared damage formula owned by the core runtime",()=>{

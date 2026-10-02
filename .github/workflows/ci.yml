@@ -190,6 +190,8 @@ jobs:
 
       - name: Verify Hit / Evasion Percentage-Point V2
         id: hit_evasion_v2
+        env:
+          EXPECTED_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
           node tests/equipment-combat-percent-migration-v2.test.js
           node tests/six-stat-combat-attribute-convergence-20260930.test.js
@@ -203,7 +205,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: hit-evasion-v2-${{ github.sha }}
-          path: artifacts/browser-qa/hit-evasion-v2.json
+          path: artifacts/browser-qa/hit-evasion-v2*
           if-no-files-found: error
           retention-days: 90
 

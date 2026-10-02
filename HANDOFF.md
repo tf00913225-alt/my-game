@@ -1,10 +1,12 @@
-## 2026-10-02 — HIT-EVASION-PERCENT-V2-20261002（施工中）
+## 2026-10-02 — HIT-EVASION-PERCENT-V2-20261002（READY FOR CI）
 
 - V1 #750 已合併。V2 base dev `60c1aab27567e2c1e64604b95a0979e97806f59b`，工作分支 `fix/hit-evasion-percent-source-rebalance-v2-20261002`。
 - Hit Owner 維持 `js/00-main.js::calculateHitChancePercent`；退休 0.15 命中係數與等級預設閃避。Set Owner `js/equipment-progression.js` 與原始 definition 同步 armor/robe evasion 10；V132 3 件套 evasion 2。
 - 共用 Migration Owner `functions/src/equipment-combat-percent-migration.js`，裝備版本 2 標記防止重複換算；主 Runtime 委派，不新增 save wrapper。後端 review 對 legacyItem 副本投影，原始封存不修改。
 - Relic Owner `js/60-team-relic-system.js` 以期限內 reduction entries 投影最終命中下降，保留 Boss 效率。Skill Final Data Owner 不重平衡。
-- Tests/build/browser/PR/CI/merge 待完成，不可回報 VERIFIED。
+- PR #752。39 項最終 Runtime 整合、裝備遷移／Cloud 投影／秘寶／V158 7 項回歸與 build/check 通過。正式 production Chrome 393×873 QA 已實際驗證裸裝／等級、四象穿脫 10/12/10、Wind EX 15/15 + 50 cap、兩項技能實際施放 5～25%/3 回合、凍傷、元祖祝福、青嵐 8/10/12、古鐘 5/8、風週塔怪 8、手動／自動／敵方共用 Hit Owner；角色詳情與完整公式截圖已檢視。
+- QA 等待正式進場／退場後才進下一場；不改 Runtime timing。副本難度縮放排除 Accuracy/Evasion，保留其他 scaling。舊 V144 數值／說明同步，UI 重鑄保持先 numeric 加總再加 %。
+- 最新 Head Required CI、dev merge 與 deployment SHA 尚待完成；不宣稱本批 VERIFIED 或完成。main 排除。
 
 ## 2026-10-01 — Water wild monster portraits batch 1 (candidate)
 
