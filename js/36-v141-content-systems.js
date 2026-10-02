@@ -848,7 +848,7 @@
                 buff.originalEvasion=monster.evasion;
                 monster.evasion=typeof window.v173CombineEvasionRates==="function"
                     ?window.v173CombineEvasionRates([buff.originalEvasion,amount])
-                    :Math.min(85,(Number(buff.originalEvasion)||0)+(Number(amount)||0));
+                    :Math.max(0,(Number(buff.originalEvasion)||0)+(Number(amount)||0));
             }
             const displayBuff={
                 type:type==="rage"?"rage":"v141TeamBuff",

@@ -159,28 +159,6 @@
     /* Player-facing skill text is owned by FourSymbolsSkillSpec after the
        gameplay bundle finishes loading. V144 no longer overrides previews. */
 
-    /* 氣定神閒的命中提升要進入實際戰鬥能力，而不只停在描述。 */
-    function accuracyMultiplier(character){
-        if(!character||!Array.isArray(character.activeBuffs)){ return 1; }
-        const active=character.activeBuffs.find(buff=>
-            buff&&buff.type==="dinghaishenzhen"&&numeric(buff.turnsLeft)>0
-        );
-        return active?1+Math.max(0,numeric(active.accuracyBonusPercent))/100:1;
-    }
-
-    function wrapAccuracyStats(name,characterFromArgs){
-        const previous=window[name];
-        if(typeof previous!=="function"){ return; }
-        window[name]=function(){
-            const stats=previous.apply(this,arguments);
-            const character=characterFromArgs(arguments);
-            if(!stats||!character){ return stats; }
-            return Object.assign({},stats,{accuracy:Math.round(numeric(stats.accuracy)*accuracyMultiplier(character))});
-        };
-    }
-    wrapAccuracyStats("getMainCharacterStats",()=>typeof player!=="undefined"?player:null);
-    wrapAccuracyStats("getAdditionalCharacterBattleStats",args=>args[0]);
-
     /* ----- Shop: only 10/20/30% potions, with the existing level multiplier. ----- */
     function ensurePotion(id,resource,percent,price){
         if(typeof potionDefinitions==="undefined"||!Array.isArray(potionDefinitions)){ return null; }

@@ -52,8 +52,10 @@
 
 ## 命中、閃躲與異常判定契約
 
-- Normal Hit（一般命中）的唯一公式 owner 是 `js/00-main.js::calculateHitChancePercent()`／`rollHitChance()`。正式公式為：`clamp(95 + accuracy×0.15 + finalAccuracyBonus - targetFinalEvasion - finalHitReduction, 70, 99)`。命中提升、命中下降與閃躲都以最終百分點直接加減；禁止再使用「先封頂命中，再乘上 (1 - 閃躲率)」。
-- 普通怪物沒有明確 `evasion` 時，正式預設值為 `min(10, level×0.1)`；明確指定的怪物／Boss 閃躲仍保留。多個閃躲來源由 `v173CombineEvasionRates()` 以百分點相加／相減後統一限制，不得改回獨立機率乘算。
+- Normal Hit（一般命中）的唯一公式 owner 是 `js/00-main.js::calculateHitChancePercent()`／`rollHitChance()`。正式公式為：`clamp(95 + accuracy×0.15 + finalAccuracyBonus - targetFinalEvasion - finalHitReduction, 5, 99)`；這是唯一一次一般命中 Clamp。Accuracy 與 Evasion 本身不得預先硬封頂。命中提升、命中下降與閃躲都以最終百分點直接加減；禁止再使用「先封頂命中，再乘上 (1 - 閃躲率)」。
+- Final Hit Chance 最低為 5%、最高為 99%；故一般規則下最高實際 Miss Chance 為 95%、最低為 1%。`HIT_CHANCE_MIN_PERCENT = 70` 已 RETIRED；只有明確 Gameplay Flag 的 Guaranteed Hit／Guaranteed Dodge 才能繞過一般 Roll，不得以極端 Accuracy／Evasion 模擬。
+- Evasion 40% 代表 Final Hit Chance 直接 -40 個百分點；Evasion Buff／Debuff 同樣直接加減，不得乘算。多個閃躲來源由 `v173CombineEvasionRates()` 加總後只限制最低 0；`FINAL_EVASION_RATE_CAP = 85` 已 RETIRED，Evasion 可超過 95% 並繼續對抗高 Accuracy。
+- 普通怪物沒有明確 `evasion` 時，正式預設值為 `min(10, level×0.1)`；明確指定的怪物／Boss 閃躲仍保留。
 - Status / Hard Control（異常／硬控）的唯一公式 owner 是 `js/00-main.js::calculateStatusEffectChance()`／`rollStatusEffectHit()`。正式公式在上限前為：`skillBaseChance + offensiveAttribute×0.05 + finalStatusBonus - targetFinalStatusResistance`。目標抗性只能來自獨立的 Equipment、Skill、EX、Relic、Buff／Debuff、Passive 或 Monster Combat Stat；Spirit 與其他六圍不得提供抗性。不得再加入 level factor（等級差倍率）、`sqrt(attribute)`、六圍衍生抗性或第二套 Boss 乘算抗性。
 - 物理技能的異常主屬性使用有效 Attack Points（攻擊六圍點數）；法術技能使用有效 Intelligence（智力）。符咒、怪物技能、Boss／深淵技能與玩家技能必須走同一公式 owner，不得各自重算。
 - Hard Control 最終上限固定為：Regular 90%、Elite 75%、Boss 60%、Enemy-to-player 60%；上限只在同一套最終成功率公式最後套用一次。Freeze／Petrify 的互斥 Gate 仍先於正式寫入，禁止 Boss 額外再乘第二套隱藏抗性。

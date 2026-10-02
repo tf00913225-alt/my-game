@@ -171,7 +171,7 @@
         if(typeof window.v173CombineEvasionRates==="function"){
             return window.v173CombineEvasionRates(sources);
         }
-        return Math.min(85,(sources||[]).reduce(
+        return Math.max(0,(sources||[]).reduce(
             (sum,source)=>sum+numeric(source),
             0
         ));
