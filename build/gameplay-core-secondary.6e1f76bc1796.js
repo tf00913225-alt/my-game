@@ -161,28 +161,6 @@
     /* Player-facing skill text is owned by FourSymbolsSkillSpec after the
        gameplay bundle finishes loading. V144 no longer overrides previews. */
 
-    /* 氣定神閒的命中提升要進入實際戰鬥能力，而不只停在描述。 */
-    function accuracyMultiplier(character){
-        if(!character||!Array.isArray(character.activeBuffs)){ return 1; }
-        const active=character.activeBuffs.find(buff=>
-            buff&&buff.type==="dinghaishenzhen"&&numeric(buff.turnsLeft)>0
-        );
-        return active?1+Math.max(0,numeric(active.accuracyBonusPercent))/100:1;
-    }
-
-    function wrapAccuracyStats(name,characterFromArgs){
-        const previous=window[name];
-        if(typeof previous!=="function"){ return; }
-        window[name]=function(){
-            const stats=previous.apply(this,arguments);
-            const character=characterFromArgs(arguments);
-            if(!stats||!character){ return stats; }
-            return Object.assign({},stats,{accuracy:Math.round(numeric(stats.accuracy)*accuracyMultiplier(character))});
-        };
-    }
-    wrapAccuracyStats("getMainCharacterStats",()=>typeof player!=="undefined"?player:null);
-    wrapAccuracyStats("getAdditionalCharacterBattleStats",args=>args[0]);
-
     /* ----- Shop: only 10/20/30% potions, with the existing level multiplier. ----- */
     function ensurePotion(id,resource,percent,price){
         if(typeof potionDefinitions==="undefined"||!Array.isArray(potionDefinitions)){ return null; }
@@ -4754,7 +4732,7 @@
         if(typeof window.v173CombineEvasionRates==="function"){
             return window.v173CombineEvasionRates(sources);
         }
-        return Math.min(85,(sources||[]).reduce(
+        return Math.max(0,(sources||[]).reduce(
             (sum,source)=>sum+numeric(source),
             0
         ));
@@ -5785,7 +5763,7 @@
                 const note=document.querySelector("#inventoryCharacterDetailStats .inventory-character-detail-note");
                 if(note){
                     note.innerHTML=
-                        "最終命中率＝95%＋命中×0.15%＋最終命中加成－目標最終閃躲－最終命中下降，最後限制70%～99%。<br>"+
+                        "最終命中率＝95%＋命中×0.15%＋最終命中加成－目標最終閃躲－最終命中下降，最後限制5%～99%。<br>"+
                         "命中／閃避／異常抗性的玩家介面統一使用 % 顯示；這些戰鬥詞條不由六圍直接派生。敏捷只影響出手速度。";
                 }
             }

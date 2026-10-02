@@ -265,7 +265,7 @@
                 const note=document.querySelector("#inventoryCharacterDetailStats .inventory-character-detail-note");
                 if(note){
                     note.innerHTML=
-                        "最終命中率＝95%＋命中×0.15%＋最終命中加成－目標最終閃躲－最終命中下降，最後限制70%～99%。<br>"+
+                        "最終命中率＝95%＋命中×0.15%＋最終命中加成－目標最終閃躲－最終命中下降，最後限制5%～99%。<br>"+
                         "命中／閃避／異常抗性的玩家介面統一使用 % 顯示；這些戰鬥詞條不由六圍直接派生。敏捷只影響出手速度。";
                 }
             }

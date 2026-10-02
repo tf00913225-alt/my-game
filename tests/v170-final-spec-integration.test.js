@@ -471,7 +471,7 @@ test("final hit, evasion and status chances use one percentage-point model",()=>
     assert.doesNotMatch(mainSource,/STATUS_RESIST_PER_SPIRIT_POINT/);
     assert.match(mainSource,/const STATUS_OFFENSE_ATTRIBUTE_COEFFICIENT = 0\.05;/);
     assert.match(mainSource,/const HIT_CHANCE_ACCURACY_COEFFICIENT = 0\.15;/);
-    assert.match(mainSource,/const HIT_CHANCE_MIN_PERCENT = 70;/);
+    assert.match(mainSource,/const HIT_CHANCE_MIN_PERCENT = 5;/);
     assert.match(mainSource,/const DEFAULT_MONSTER_EVASION_PER_LEVEL = 0\.1;/);
     assert.match(mainSource,/const DEFAULT_MONSTER_EVASION_CAP = 10;/);
     assert.doesNotMatch(v140Source,/Math\.sqrt\(power\)|GENERAL_STATUS_COEFFICIENT|LOCKDOWN_STATUS_COEFFICIENT/);
@@ -482,7 +482,7 @@ test("final hit, evasion and status chances use one percentage-point model",()=>
     const hit=runtime.context.v173GetHitChancePercent;
     assert.deepEqual(
         [hit(0,0,0,0),hit(10,0,0,0),hit(0,10,0,0),hit(0,1000,0,0),hit(0,1000,50,0),hit(1000,0,0,0)],
-        [95,96.5,85,70,70,99]
+        [95,96.5,85,5,5,99]
     );
     assert.equal(hit(0,15,5,10),85,"95 + 10 - 15 - 5 must equal 85 percentage points");
 
@@ -771,6 +771,7 @@ test("accuracy, enemy Rage, monster shields and wind-elite Dodge use their forma
         const dodgeCast=v155ResolveWindEliteDodge(0,true);
         return {
             playerAccuracyMultiplier:playerAccuracy/basePlayerAccuracy,
+            playerFinalAccuracyBonus:v173GetFinalAccuracyBonusPercent(player),
             monsterAccuracy:monsterAccuracy,monsterAccuracyBonus:monsterAccuracyBonus,rage:rage,shield:shield,
             dodgeCast:dodgeCast,evasion:elite.evasion,
             dodge:elite.activeBuffs.find(buff=>buff.type==="dodgeSkill"),
@@ -779,7 +780,7 @@ test("accuracy, enemy Rage, monster shields and wind-elite Dodge use their forma
         };
     })()`);
     assert.deepEqual(result,{
-        playerAccuracyMultiplier:2.25,monsterAccuracy:100,monsterAccuracyBonus:50,rage:{chance:25,damage:50},
+        playerAccuracyMultiplier:1,playerFinalAccuracyBonus:50,monsterAccuracy:100,monsterAccuracyBonus:50,rage:{chance:25,damage:50},
         shield:{first:100,second:0,statusName:"岩盾",remaining:37,turnsLeft:2},
         dodgeCast:true,evasion:45,
         dodge:{type:"dodgeSkill",v141BuffType:"dodge",turnsLeft:3,statusName:"風行"},
@@ -811,7 +812,7 @@ test("reflection uses actual HP loss and cannot reflect absorbed or overkill dam
     assert.deepEqual(result,{playerHp:0,attackerHp:995});
 });
 
-test("evasion sources add as final percentage points, cap at 85%, and Barrier spends once per skill cast",()=>{
+test("evasion sources add as final percentage points without an independent cap, and Barrier spends once per skill cast",()=>{
     const runtime=loadFinalRuntime();
     const result=evaluateJson(runtime.context,`(function(){
         const target={activeBuffs:[{
@@ -822,11 +823,11 @@ test("evasion sources add as final percentage points, cap at 85%, and Barrier sp
         });
         return {
             combined:v173CombineEvasionRates([35,75]),
-            capped:v173CombineEvasionRates([80,80]),
+            uncapped:v173CombineEvasionRates([80,80]),
             blocked:blocked,remaining:target.activeBuffs[0].remainingBlocks
         };
     })()`);
-    assert.deepEqual(result,{combined:85,capped:85,blocked:[true,true,true],remaining:5});
+    assert.deepEqual(result,{combined:110,uncapped:160,blocked:[true,true,true],remaining:5});
 });
 
 test("player agility does not grant evasion and default monster level retains explicit evasion",()=>{
@@ -1249,12 +1250,12 @@ test("Extreme Emperor carries only Yuan Zu Blessing and settles its final behavi
     assert.deepEqual(blessing,{
         first:true,second:true,rejectedFormerSkills:[false,false],
         afterFirst:[
-            {hp:600,sp:555,evasion:85,statusEffects:[],turnsLeft:2},
-            {hp:500,sp:110,evasion:85,statusEffects:[{type:"stun",turnsLeft:1}],turnsLeft:2}
+            {hp:600,sp:555,evasion:115,statusEffects:[],turnsLeft:2},
+            {hp:500,sp:110,evasion:115,statusEffects:[{type:"stun",turnsLeft:1}],turnsLeft:2}
         ],
         afterSecond:[
-            {hp:700,sp:555,evasion:85,statusEffects:[],blessings:1},
-            {hp:600,sp:210,evasion:85,statusEffects:[],blessings:1}
+            {hp:700,sp:555,evasion:115,statusEffects:[],blessings:1},
+            {hp:600,sp:210,evasion:115,statusEffects:[],blessings:1}
         ]
     });
 

@@ -129,7 +129,7 @@ test("Extreme Emperor uses only Yuan Zu Blessing with independent cleanse and in
     assert.deepEqual([extreme.hp,extreme.sp],[400,255]);
     assert.deepEqual([ally.hp,ally.sp],[200,110]);
     assert.equal(ally.agility,100,"old agility blessing is removed");
-    assert.equal(ally.evasion,85);
+    assert.equal(ally.evasion,165);
     assert.equal(ally.v155EvasionBlessing.displayBuff.turnsLeft,2);
     ally.hp=200; ally.sp=110;
     assert.equal(context.v155ResolveExtremeEmperorAction(0,"yuanZuBlessing",[false,true]),true);
@@ -176,7 +176,7 @@ test("wind elite uses Dodge, never Stealth",()=>{
     assert.equal(context.v155ResolveWindEliteDodge(0,true),true);
     assert.deepEqual(array(context.getSkillTargets(0,"single")),[0]);
     assert.deepEqual(array(context.getSkillTargets(0,"all")),[0]);
-    assert.equal(elite.evasion,85);
+    assert.equal(elite.evasion,95);
     assert.deepEqual(
         [elite.v155WindDodge.statusName,elite.v155WindDodge.bonusPercent,elite.v155WindDodge.expiresTurn],
         ["風行",75,4]

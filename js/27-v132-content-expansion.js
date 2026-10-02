@@ -855,8 +855,8 @@
         // 隱身／結界是友方符術，不拿友軍閃避懲罰施放者；使用角色自身命中值。
         const accuracy=Number(stats.accuracy);
         if(Number.isFinite(accuracy)&&typeof rollHitChance==="function"){
-            const finalAccuracyBonus=typeof window.v173GetActiveAccuracyBonusPercent==="function"
-                ?window.v173GetActiveAccuracyBonusPercent(character)
+            const finalAccuracyBonus=typeof window.v173GetFinalAccuracyBonusPercent==="function"
+                ?window.v173GetFinalAccuracyBonusPercent(character)
                 :0;
             return rollHitChance(accuracy,0,0,finalAccuracyBonus);
         }
