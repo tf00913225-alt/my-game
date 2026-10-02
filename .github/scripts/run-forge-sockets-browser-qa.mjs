@@ -73,6 +73,9 @@ try{
   await c.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:drag.x,y:drag.y}]});
   for(let i=1;i<=8;i++){await c.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:drag.x,y:drag.y+(drag.to-drag.y)*i/8}]});await new Promise(r=>setTimeout(r,20));}
   await c.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await pause();
+  // A real fling continues after touchEnd. Its first tap stops momentum rather
+  // than activates an option; begin the selection assertion only once idle.
+  assert.equal(await c.eval(`(async()=>{const b=document.querySelector('.v141-synthesis-body'),end=Date.now()+5000;let previous=b.scrollTop,stable=Date.now();while(Date.now()<end){await new Promise(r=>setTimeout(r,50));const next=b.scrollTop;if(Math.abs(next-previous)>.5)stable=Date.now();previous=next;if(Date.now()-stable>=300)return true;}return false;})()`),true,'equipment scroll did not settle');
   const scrollTop=await c.eval(`document.querySelector('.v141-synthesis-body').scrollTop`);assert.ok(scrollTop>0,'equipment choices cannot touch scroll');
   assert.equal(await c.eval(`document.querySelector('.v141-forge-option.selected').dataset.forgeValue`),'forge-qa-orange','scroll selected a different item');
   await tap('[data-forge-value="forge-qa-19"]');assert.equal(await c.eval(`document.querySelector('.v141-forge-option.selected').dataset.forgeValue`),'forge-qa-19','real touch did not select the last equipment');assert.equal(await c.eval(`document.querySelectorAll('.v141-socket').length`),1);
