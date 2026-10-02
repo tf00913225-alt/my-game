@@ -9,9 +9,11 @@ const start = main.indexOf("function buildSkillRowElement");
 assert.notEqual(start, -1, "Canonical skill row renderer is present");
 const renderer = main.slice(start);
 
-assert.equal(renderer.includes('<div class="skill-action-card-top">${actionIcon}</div>'), true);
-assert.equal(renderer.includes('<div class="skill-action-card-top"></div>'), false);
-assert.equal(renderer.includes("actionIcon\\n                ?"), true);
+// The canonical renderer retired icon rows entirely in favor of text-only actions.
+assert.equal(renderer.includes('class="skill-action-card-top"'), false);
+assert.equal(renderer.includes('data-skill-action="growth"'), true);
+assert.equal(renderer.includes('class="skill-action-card-label">${actionLabel}'), true);
+assert.equal(renderer.includes('data-skill-action="equip"'), true);
 assert.equal(renderer.includes("availableSkillPoints<1"), true, "Point-insufficient upgrade state remains covered");
 assert.equal(renderer.includes("eligibility.reason"), true, "Level/prerequisite-ineligible learn state remains covered");
 for (const label of ["學習", "升級", "裝備", "已裝備", "已滿級"]) {

@@ -1,3 +1,13 @@
+## 2026-10-02 — RELEASE-SUITES-P0-20261002（第二批接續）
+
+- 即時基線 dev `7fdd316ced57814e7f635e4444ed694ac4620522`；#759 已合併／來源分支已刪，另從最新 dev 建 `fix/v17373-release-suite-recovery-batch2-20261002`。main 禁止修改，Game／Cache 173.72 不變，未建立 RC／Freeze。
+- 本批7個原失敗測試檔 PASS；原34檔 TZ=UTC 診斷 sweep 為7 PASS／27 FAIL，累計18/45原非環境失敗檔修復。剩餘清單在 release/v17373-scope.json。完整正式發布 suite／Chrome runner 尚未通過；P0與requirement保持BLOCKED。
+- Tests-only Replacement：V153／V160／V173.18／V173.44 maintenance改讀正式V173.64技能資料；洪水猛獸學習Lv7／6點，仍驗證105基礎傷害／21成長／35 SP／單體／waterBall前置。Learn gate改驗現行getSkillLearnEligibilityForUi（等級／前置／跨元素／成本），保留拒絕與owner扣點檢查；未把跨元素無前置誤改回舊规则。
+- 技能按鈕改驗文字動作與data-skill-action；拒絕退休skill-action-card-top，保留點數不足／資格／五種動作狀態。玩法導覽驗收移到FourSymbolsBottomNav現行來源，保留五按鈕、返回語意、icon透明度與Boss格位幾何。
+- V153原fixture只載V143，卻要求它覆寫退休showMonsterHit/showMissEffect。改走V143正式命中時序介面v143RunAtTargetHit／v143ResolveBattleFeedbackTiming；保留命中幀前0次、單timer、第8幀延遲、MISS可見、爆擊及完整動畫閘門。正式popup仍由battle-floating-feedback-owner.js唯一控制，無新wrapper／補丁／Runtime改動。
+- 本機7/7、skill-progression＋battle-declaration 21項、feedback-semantic-sequencing、production build:check、diff check PASS。來源／測試修復IMPLEMENTED；最新PR必要CI、合併、dev部署SHA與安全分支清理待完成。未宣稱遊戲實機症狀VERIFIED。
+- Next：本批PR整合後沿同Work ID處理剩餘27檔；尤其角色／背包CSS與浮字退役來源須逐項查證，不能一律放寬。完整發布驗收通過前不得解除P0。
+
 ## 2026-10-02 — RELEASE-SUITES-P0-20261002（第一批接續）
 
 - 從即時最新 dev `50dd9d50988ab117054a0ded9db6344a028110c4` 建立 `fix/v17373-release-suite-recovery-20261002`；接續已合併 #758，main 禁止修改。

@@ -7,6 +7,8 @@ const zlib=require("node:zlib");
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const timing=fs.readFileSync("js/37-v142-skill-animation.js","utf8");
 const rules=fs.readFileSync("js/43-v149-skill-ui-rules.js","utf8");
+const finalRules=fs.readFileSync("js/60-v173.64-skill-progression-rebalance.js","utf8");
+const feedbackOwner=fs.readFileSync("js/battle-floating-feedback-owner.js","utf8");
 const css=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");
 const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const index=fs.readFileSync("index.html","utf8");
@@ -289,9 +291,9 @@ test("shared metadata binds exact IDs, durations, hit frame and target modes",()
     assert.match(timing,/flameTornado:\[2100/);
     assert.match(timing,/phoenixCry:\[3200/);
     assert.match(timing,/rage:\[1500/);
-    assert.match(rules,/flameTornado:\{[\s\S]*?targetType:"single"/);
-    assert.match(rules,/phoenixCry:\{[\s\S]*?targetType:"all"/);
-    assert.match(rules,/rage:\{[\s\S]*?targetType:"allyTri"/);
+    assert.match(finalRules,/flameTornado:\{[\s\S]*?targetType:"single"/);
+    assert.match(finalRules,/phoenixCry:\{[\s\S]*?targetType:"all"/);
+    assert.match(finalRules,/rage:\{[\s\S]*?targetType:"allyTri"/);
     assert.match(timing,/if\(config\.category==="passive"\|\|config\.targetType==="none"\)\{ return null; \}/);
 });
 
@@ -404,7 +406,7 @@ test("Fire Slash plays one sheet on the selected target and reaches damage at fr
     assert.ok(parseFloat(sprites[0].style.width)<=220,"single-target VFX keeps the original scale ceiling");
     assert.equal(stage.children.some(node=>node.className.includes("v143-skill-flight")),false);
     const before=runtime.scheduled.length;
-    runtime.context.showMonsterHit(1,17,"hp",false);
+    runtime.context.v143RunAtTargetHit("monster",1,()=>runtime.context.showMonsterHit(1,17,"hp",false),true);
     assert.equal(runtime.monsterHits.length,0);
     assert.equal(runtime.scheduled.length,before+1);
     const damageTimer=runtime.scheduled[runtime.scheduled.length-1];
@@ -422,7 +424,7 @@ test("MISS still plays the formal skill Sprite and keeps MISS feedback on hit ti
     assert.ok(sprite);
     assert.equal(sprite.style.visibility,"visible","a positioned cast Sprite is visible before outcome resolution");
     const before=runtime.scheduled.length;
-    runtime.context.showMissEffect(false,1,"MISS");
+    runtime.context.v143RunAtTargetHit("monster",1,()=>runtime.context.showMissEffect(false,1,"MISS"),true);
     assert.equal(sprite.style.visibility,"visible","MISS must not suppress the attempted skill animation");
     assert.equal(sprite.dataset.confirmedHit,"true","MISS resolves the target through the formal V143 endpoint");
     assert.equal(runtime.scheduled.length,before+1);
@@ -488,7 +490,11 @@ test("frame eight delays hit numbers together and Fire Critical keeps its critic
         {side:"player",actorIndex:0,targetSide:"monster",targetId:1,targetIds:[1]}
     );
     const before=runtime.scheduled.length;
-    runtime.context.showMonsterHit(1,55,"hp",false);
+    // V143 authors timing; Floating Feedback consumes it and owns the popup.
+    assert.match(feedbackOwner,/const resolver=window\.v143ResolveBattleFeedbackTiming/);
+    const feedback=runtime.context.v143ResolveBattleFeedbackTiming("monster",1,"damage");
+    assert.equal(feedback.critical,true);
+    runtime.context.setTimeout(()=>runtime.context.showMonsterHit(1,55,"hp",feedback.critical),feedback.delayMs);
     assert.equal(runtime.monsterHits.length,0);
     assert.equal(runtime.scheduled.length,before+1);
     const numberTimer=runtime.scheduled[runtime.scheduled.length-1];
