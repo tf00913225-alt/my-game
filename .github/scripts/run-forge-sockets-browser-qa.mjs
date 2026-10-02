@@ -93,7 +93,7 @@ try{
   await tap('[data-v17363-material-tab="1"]');
   await c.eval(`closeHomeFeature();openHomeFeature('forge');v141SwitchForgeTab('socket')`);await pause();
   assert.deepEqual(await c.eval(`Array.from(document.querySelectorAll('.v141-forge-tabs button'),n=>n.textContent)`),['冶煉','鑲嵌']);
-  assert.equal(await c.eval(`(()=>{const repo=FourSymbolsAccountSave,s=repo.readActive();repo.writeForUid(s.uid,s.save,{source:'authoritative-cloud-read',cloudBaseFingerprint:'v1:1:00000000000000000000000000000000',localDirty:false});v141SelectSocketItem('forge-qa-equipped');return v141SocketGem();})()`),false,'cloud character used local socket mutation');
+  assert.equal(await c.eval(`(()=>{const repo=FourSymbolsAccountSave,s=repo.readActive();repo.writeForUid(s.uid,s.save,{source:'authoritative-cloud-read',cloudBaseFingerprint:'v1:1:00000000000000000000000000000000',localDirty:false});v141SelectSocketItem('forge-qa-equipped');const blocked=v141SocketGem();repo.writeForUid(s.uid,s.save,{source:'local',cloudBaseFingerprint:null,localDirty:true});return blocked;})()`),false,'cloud character used local socket mutation');
   const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(OUT,`forge-${width}.png`),Buffer.from(shot.data,'base64'));
   evidence.push({width,height,geometry,scrollTop,saved,equippedBonus:1,unequippedBonus:0,cloudMutationBlocked:true});console.log('PASS forge touch runtime '+width+'x'+height);
  }
