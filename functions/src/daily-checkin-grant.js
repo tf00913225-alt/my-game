@@ -5,17 +5,7 @@
 // Issuance is internal: it does not publish a playable cloud character or
 // accept a client-supplied day, reward, balance or completion counter.
 const {readDailyCheckinEvidence}=require("./daily-checkin-event-evidence");
-const REWARD_GOLD=50;
-const ZONE="Asia/Taipei";
-
-function taipeiDay(instant){
-    const date=new Date(instant);
-    if(!Number.isFinite(date.getTime())){ throw new Error("Invalid server time"); }
-    const parts=Object.fromEntries(new Intl.DateTimeFormat("en-US",{
-        timeZone:ZONE,year:"numeric",month:"2-digit",day:"2-digit"
-    }).formatToParts(date).map(part=>[part.type,part.value]));
-    return `${parts.year}${parts.month}${parts.day}`;
-}
+const {taipeiDay,REWARD_GOLD}=require("./daily-checkin-policy");
 
 function createDailyCheckinGrant({db,FieldValue,HttpsError,runProtected,
     inspectExistingEnvelope,now=Date.now}){

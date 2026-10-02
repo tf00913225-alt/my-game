@@ -6,7 +6,7 @@ const {createRecoveryArchive,inspectRecoveryArchive}=require("./canonical-recove
 const {verifyCreditedGrant}=require("./credited-grant-evidence");
 const {source,readOwnedSources,advanceOwnedRecords,advanceOwnedSources}=
     require("./canonical-owned-sources");
-const {taipeiDay,REWARD_GOLD}=require("./daily-checkin-grant");
+const {taipeiDay,REWARD_GOLD}=require("./daily-checkin-policy");
 const {readDailyCheckinEvidence}=require("./daily-checkin-event-evidence");
 const ID=/^[A-Za-z0-9_-]{16,64}$/;
 
