@@ -27,6 +27,7 @@ assert.equal(context.getEquipmentBonus("fire").vitality,0,"unequipping removes g
 context.characterEquipment.fire.head={rarityKey:"pink",sockets:["gemVitalityI","gemVitalityI"]};
 assert.equal(context.getEquipmentBonus("fire").vitality,2,"equipping another item reads its own sockets");
 assert.match(html,/openHomeFeature\('forge'\)[^>]*aria-label="鍛造"/);
+assert.match(html,/<button[^>]*data-feature="gameplay-core"[^>]*onclick="openHomeFeature\('forge'\)"/,'forge entry must wait for its lazy owner');
 assert.doesNotMatch(html,/openHomeFeature\('bestiary'\)/);
 assert.doesNotMatch(main,/function renderBestiaryContent\(/);
 assert.match(main,/bestiaryData/);

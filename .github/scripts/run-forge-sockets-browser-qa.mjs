@@ -9,7 +9,7 @@ import {ROOT,ASSET_MANIFEST,findChrome,startServer,waitJson,Cdp,qaPrelude,QA_AUT
 // credentials or cloud writes; this does not certify a backend transaction.
 const OUT=path.join(ROOT,'artifacts/browser-qa/responsive-item/forge');
 const pause=()=>new Promise(resolve=>setTimeout(resolve,350));
-const READY=`(async()=>{const end=Date.now()+45000;while(Date.now()<end&&!(window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show')))await new Promise(r=>setTimeout(r,50));if(window.FourSymbolsStartupPolicy?.getState?.()!=='READY')throw Error('startup not READY');await FourSymbolsFeatures.ensure('gameplay-core','forge-qa');showPage('home');closeHomeFeature();return true;})()`;
+const READY=`(async()=>{const end=Date.now()+45000;while(Date.now()<end&&!(window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show')))await new Promise(r=>setTimeout(r,50));if(window.FourSymbolsStartupPolicy?.getState?.()!=='READY')throw Error('startup not READY');showPage('home');closeHomeFeature();return true;})()`;
 const FIXTURE=`(()=>{
  const repo=FourSymbolsAccountSave,state=repo.readActive();
  repo.writeForUid(state.uid,state.save,{source:'local',cloudBaseFingerprint:null,localDirty:true});
@@ -34,11 +34,12 @@ try{
  proc=spawn(chrome,[...(chrome.includes('headless-shell')?[]:['--headless=new']),'--no-sandbox','--disable-gpu','--disable-dev-shm-usage',`--remote-debugging-port=${port}`,`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
  const target=(await waitJson(`http://127.0.0.1:${port}/json/list`)).find(t=>t.type==='page');c=new Cdp(target.webSocketDebuggerUrl);
  await c.send('Page.enable');await c.send('Runtime.enable');
- if(live){
-  const stubs=new Map([[QA_AUTH_PATH,QA_AUTH_MODULE],[QA_CLOUD_PATH,QA_CLOUD_MODULE],[QA_SESSION_PATH,QA_SESSION_MODULE]]);
-  c.ws.addEventListener('message',event=>{const m=JSON.parse(String(event.data));if(m.method==='Fetch.requestPaused'){const p=m.params,body=stubs.get(new URL(p.request.url).pathname);c.send(body?'Fetch.fulfillRequest':'Fetch.continueRequest',body?{requestId:p.requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'text/javascript'}],body:Buffer.from(body).toString('base64')}:{requestId:p.requestId}).catch(error=>console.error(error));}});
-  await c.send('Fetch.enable',{patterns:[...stubs.keys()].map(p=>({urlPattern:'*'+p+'*',resourceType:'Script'}))});
- }
+ // Hold the real lazy script until the first home-card touch. Background idle
+ // prefetch must not accidentally turn this cold-entry regression into a warm test.
+ let holdGameplay=true;const heldGameplay=[];
+ const stubs=new Map(live?[[QA_AUTH_PATH,QA_AUTH_MODULE],[QA_CLOUD_PATH,QA_CLOUD_MODULE],[QA_SESSION_PATH,QA_SESSION_MODULE]]:[]);
+ c.ws.addEventListener('message',event=>{const m=JSON.parse(String(event.data));if(m.method==='Fetch.requestPaused'){const p=m.params,pathname=new URL(p.request.url).pathname;if(holdGameplay&&/\/build\/gameplay-core-(primary|secondary)\.[0-9a-f]{12}\.js$/.test(pathname)){heldGameplay.push(p.requestId);return;}const body=stubs.get(pathname);c.send(body?'Fetch.fulfillRequest':'Fetch.continueRequest',body?{requestId:p.requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'text/javascript'}],body:Buffer.from(body).toString('base64')}:{requestId:p.requestId}).catch(error=>console.error(error));}});
+ await c.send('Fetch.enable',{patterns:[{urlPattern:'*/build/gameplay-core-*.js*',resourceType:'Script'},...[...stubs.keys()].map(p=>({urlPattern:'*'+p+'*',resourceType:'Script'}))]});
  await c.send('Page.addScriptToEvaluateOnNewDocument',{source:qaPrelude().replace(/^<script>|<\/script>$/g,'')});
  async function tap(selector){
   const point=await c.eval(`(async()=>{const n=document.querySelector(${JSON.stringify(selector)});if(!n)throw Error('missing control '+${JSON.stringify(selector)});n.scrollIntoView({block:'nearest',behavior:'instant'});await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));const r=n.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,h=document.elementFromPoint(x,y);if(n.disabled||!r.width||!r.height||!(h&&(n===h||n.contains(h))))throw Error('untappable control '+${JSON.stringify(selector)}+' '+JSON.stringify({rect:r.toJSON(),hit:h&&{tag:h.tagName,id:h.id,class:h.className},body:document.querySelector('.v141-synthesis-body')?.getBoundingClientRect().toJSON(),nav:document.getElementById('bottomNav')?.getBoundingClientRect().toJSON(),detailsOpen:n.closest('details')?.open,scrollTop:document.querySelector('.v141-synthesis-body')?.scrollTop}));return {x,y,summary:n.tagName==='SUMMARY',wasOpen:n.tagName==='SUMMARY'?n.parentElement.open:null};})()`);
@@ -59,9 +60,25 @@ try{
   // existing Responsive Item QA. Reloading a mutated local fixture against the
   // fixed read-only cloud transport correctly enters account conflict handling.
   // Enter through the actual home card before accessing the lazy runtime.
+  if(width===390){
+   assert.equal(await c.eval(`typeof v141SwitchForgeTab`),'undefined','cold entry was preloaded');
+   // The same shared modal previously displayed an announcement. Its stale
+   // content must never be reopened while the forge owner is still loading.
+   await c.eval(`openHomeFeature('announcement');closeHomeFeature();true`);
+  }
   await tap('[onclick="openHomeFeature(\'forge\')"]');
+  if(width===390){
+   assert.equal(await c.eval(`document.getElementById('homeFeatureModal').classList.contains('show')`),false,'cold forge reopened stale announcement before owner ready');
+   assert.equal(await c.eval(`document.querySelector('[aria-label="鍛造"]').getAttribute('aria-busy')`),'true','first touch did not wait for the forge owner');
+   assert.ok(heldGameplay.length,'cold entry did not exercise a delayed real gameplay script');
+   holdGameplay=false;for(const requestId of heldGameplay.splice(0))await c.send('Fetch.continueRequest',{requestId});
+  }
   await c.eval(`(async()=>{const end=Date.now()+10000;while(Date.now()<end&&typeof v141SwitchForgeTab!=='function')await new Promise(r=>setTimeout(r,50));return true;})()`);
-  assert.equal(await c.eval(`typeof v141SwitchForgeTab`),'function');assert.equal(await c.eval(FIXTURE),true);
+  assert.equal(await c.eval(`typeof v141SwitchForgeTab`),'function');
+  assert.equal(await c.eval(`document.getElementById('homeFeatureModal').classList.contains('show')`),true,'first touch did not open forge after loading');
+  assert.equal(await c.eval(`document.getElementById('homeFeatureModalTitle').textContent`),'鍛造');
+  assert.deepEqual(await c.eval(`Array.from(document.querySelectorAll('.v141-forge-tabs button'),n=>n.textContent)`),['冶煉','鑲嵌']);
+  assert.equal(await c.eval(FIXTURE),true);
   await c.eval(`v141SwitchForgeTab('reforge')`);
   assert.deepEqual(await c.eval(`Array.from(document.querySelectorAll('.v141-forge-tabs button'),n=>n.textContent)`),['冶煉','鑲嵌']);
   assert.equal(await c.eval(`Array.from(document.querySelectorAll('#homeFeatureModalBody select')).filter(n=>{const r=n.getBoundingClientRect();return r.width&&r.height}).length`),0,'visible native selector in forge');
@@ -99,7 +116,7 @@ try{
   assert.deepEqual(await c.eval(`Array.from(document.querySelectorAll('.v141-forge-tabs button'),n=>n.textContent)`),['冶煉','鑲嵌']);
   assert.equal(await c.eval(`(()=>{const repo=FourSymbolsAccountSave,s=repo.readActive();repo.writeForUid(s.uid,s.save,{source:'authoritative-cloud-read',cloudBaseFingerprint:'v1:1:00000000000000000000000000000000',localDirty:false});v141SelectSocketItem('forge-qa-equipped');const blocked=v141SocketGem();repo.writeForUid(s.uid,s.save,{source:'local',cloudBaseFingerprint:null,localDirty:true});return blocked;})()`),false,'cloud character used local socket mutation');
   const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(OUT,`forge-${width}.png`),Buffer.from(shot.data,'base64'));
-  evidence.push({width,height,geometry,scrollTop,saved,equippedBonus:1,unequippedBonus:0,cloudMutationBlocked:true});console.log('PASS forge touch runtime '+width+'x'+height);
+  evidence.push({width,height,entry:width===390?'cold-delayed-owner-after-announcement':'warm-reentry',geometry,scrollTop,saved,equippedBonus:1,unequippedBonus:0,cloudMutationBlocked:true});console.log('PASS forge touch runtime '+width+'x'+height);
  }
  fs.writeFileSync(path.join(OUT,'evidence.json'),JSON.stringify({passed:true,environment:live?'deployed-dev':'production-local',sha:process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||null,evidence},null,2)+'\n');
 }catch(error){if(c){try{const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(OUT,'failure.png'),Buffer.from(shot.data,'base64'));}catch{}}fs.writeFileSync(path.join(OUT,'evidence.json'),JSON.stringify({passed:false,error:String(error.stack||error),evidence},null,2)+'\n');throw error;
