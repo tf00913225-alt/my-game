@@ -25,6 +25,7 @@ const window={
 };
 const document={
     documentElement,
+    getElementById:()=>null,
     addEventListener(name,handler){ listeners.set(name,handler); }
 };
 vm.runInNewContext(touchLock,{document,window});
@@ -45,7 +46,7 @@ const row={
     nodeType:1,parentElement:body,matches:()=>false,
     closest:selector=>selector==="#game-stage"?stage:null
 };
-assert.equal(window.isInsideAllowedScrollerV78(row),true,"status help copy must resolve to its own scroll owner");
+assert.equal(window.FourSymbolsGestureArbiter.findScrollOwner(row)?.node,body,"status help copy must resolve to its own scroll owner");
 
 function findChrome(){
     for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){

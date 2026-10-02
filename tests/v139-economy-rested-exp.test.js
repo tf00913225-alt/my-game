@@ -35,13 +35,13 @@ function makeZoneConfig(){
         assert.notEqual(end,-1,"練功區陣列未結束 "+variable);
         const block=mainSource.slice(start,end);
         const roster=[];
-        const pattern=/makeZoneMonster\("([^"]+)",(\d+),"[^"]+"(?:,"(regular|elite|boss)")?\)/g;
+        const pattern=/makeZoneMonster\("([^"]+)",(\d+),"[^"]+"(?:,(undefined|"regular"|"elite"|"boss"))?(?:,"[^"]+")?\)/g;
         let match;
         while((match=pattern.exec(block))){
             roster.push({
                 name:match[1],
                 level:Number(match[2]),
-                rank:match[3]||undefined
+                rank:match[3]&&match[3]!=="undefined"?match[3].replace(/"/g,""):undefined
             });
         }
         assert.equal(roster.length,6,variable+" 應有6隻怪物");

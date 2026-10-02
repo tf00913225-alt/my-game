@@ -20,6 +20,7 @@ const window={
 };
 const document={
     documentElement,
+    getElementById:()=>null,
     addEventListener(name,handler){ listeners.set(name,handler); }
 };
 vm.runInNewContext(touchLock,{document,window});
@@ -55,13 +56,13 @@ function dispatch(type,target,pointerType){
     return prevented;
 }
 
-assert.equal(window.isInsideAllowedScrollerV78(card),true,"shop card must resolve to the modal body scroll owner");
+assert.equal(window.FourSymbolsGestureArbiter.findScrollOwner(card)?.node,body,"shop card must resolve to the modal body scroll owner");
 assert.equal(dispatch("touchmove",card),false,"touchmove inside scrollable shop content must remain native");
 assert.equal(dispatch("pointermove",card,"touch"),false,"touch pointer movement inside shop content must remain native");
-assert.equal(dispatch("touchmove",background),true,"non-scrollable modal background remains locked");
+assert.equal(dispatch("touchmove",background),false,"single-finger panning remains browser-owned; CSS locks the modal background");
 
 body.scrollHeight=body.clientHeight;
-assert.equal(window.isInsideAllowedScrollerV78(card),false,"body is allowed only when it actually has overflow");
-assert.equal(dispatch("touchmove",card),true,"non-scrollable content still respects the global stage lock");
+assert.equal(window.FourSymbolsGestureArbiter.findScrollOwner(card),null,"body is allowed only when it actually has overflow");
+assert.equal(dispatch("touchmove",card),false,"single-finger panning is never cancelled by the gesture arbiter");
 
 console.log("V173.50 shop touch-scroll regression checks passed");

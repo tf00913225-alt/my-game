@@ -67,6 +67,7 @@ const editable={
 const outside={nodeType:1,parentElement:null,matches:()=>false,closest:()=>null};
 const document={
   documentElement:{},
+  getElementById:()=>null,
   addEventListener(name,handler,options){(listeners[name]??=[]).push({handler,options});}
 };
 const windowObj={

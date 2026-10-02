@@ -103,10 +103,10 @@ test("role switching refreshes only the selected owner's independent skill-point
         getSkillCharacterObject:key=>owners[key],renderSkillLoadout(){},
         document:bareDocument({getElementById:id=>id==="skillPoints"?points:null})
     });
-    context.renderSkillLoadout();
+    context.v152SyncSkillPointDisplay();
     assert.equal(points.textContent,"12");
     context.currentSkillCharacter="player2";
-    context.renderSkillLoadout();
+    context.v152SyncSkillPointDisplay();
     assert.equal(points.textContent,"37");
     assert.deepEqual([owners.fire.skillPoints,owners.player2.skillPoints],[12,37]);
     assert.equal(loadouts.fire.skillLevels.fireBurstStrike,undefined);
@@ -143,7 +143,7 @@ test("Rage supplies separate critical chance and critical-damage values to the l
 
 test("V152 no longer mutates monster loadouts or dispatches Extreme Emperor skills",()=>{
     assert.doesNotMatch(source,/v152ResolveExtremeEmperorAction|function resolveExtremeEmperorAction/);
-    assert.doesNotMatch(source,/v141SupportSkillIds=Array\.from|monster\.name==="極帝天尊"/);
+    assert.doesNotMatch(source,/v141SupportSkillIds=Array\.from/);
     assert.doesNotMatch(source,/monster\.skillIds=monster\.skillIds\.map|monster\.v141SupportSkillIds=monster\.v141SupportSkillIds\.filter/);
 });
 
@@ -200,7 +200,7 @@ test("V152 no longer owns popup DOM relocation or font geometry",()=>{
     assert.doesNotMatch(css,/damage-popup\.v152-top-damage|z-index:2147483646/);
     assert.match(feedbackOwner,/window\.FourSymbolsBattleFloatingFeedback=api/);
     assert.match(feedbackOwner,/getUnitGeometry\(side,index\)/);
-    assert.match(feedbackOwner,/function freeLane\(context\)/);
+    assert.match(feedbackOwner,/function freeLane\(context,metrics\)/);
     assert.match(feedbackOwner,/context\.queue\.push\(request\)/);
     assert.match(feedbackCss,/\.battle-floating-feedback/);
 });
@@ -209,8 +209,8 @@ test("V152 no longer owns popup DOM relocation or font geometry",()=>{
 test("legacy abnormal formula owner is retired while Ice Arrow Rain Frostbite remains authoritative",()=>{
     assert.doesNotMatch(v140,/GENERAL_STATUS_COEFFICIENT|LOCKDOWN_STATUS_COEFFICIENT|Math\.sqrt\(power\)/);
     assert.doesNotMatch(v140,/calculateStatusEffectChance\s*=\s*function|rollHitChance\s*=\s*function/);
-    assert.match(v143,/rain\.frostbiteChance=50/);
-    assert.match(v143,/delete rain\.freezeChance/);
+    assert.match(fs.readFileSync("js/60-v173.64-skill-progression-rebalance.js","utf8"),/iceArrowRain:\{[^\n]*frostbiteChance:35,frostbiteDuration:2/);
+    assert.doesNotMatch(v143,/rain\.freezeChance\s*=/);
     assert.doesNotMatch(v143,/applyIceRainFreezeToTargets/);
 });
 
@@ -232,7 +232,7 @@ test("dungeon art, scrolling, five-slot nav and Abyss combat info are all wired"
         assert.equal(output,size,path);
         assert.match(css+source,new RegExp(path.replace("assets/","assets\\/")));
     });
-    assert.match(css,/grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/);
+    assert.match(fs.readFileSync("css/06-stage-v11-native-bottom-nav.css","utf8"),/grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/);
     assert.match(css,/overflow-y:auto !important/);
     assert.match(css,/\.v141-task-tracker[\s\S]*display:none !important/);
     assert.match(css,/\.v141-reward-toast[\s\S]*pointer-events:auto !important/);

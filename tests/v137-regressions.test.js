@@ -229,6 +229,9 @@ test("auto tri-targeting chooses the center that hits three of six monsters",()=
         getPartyCharacterKey:()=>"fire",
         getSkillLevel:()=>1,
         getEffectiveSkillTargetType:skill=>skill.targetType,
+        isBattleTargetAlive:(_side,index)=>monsters[index]?.alive===true,
+        normalizeBattleTargetType:type=>type,
+        canSelectHostileBattlePrimary:(_side,index)=>monsters[index]?.alive===true,
         getSkillTargets:center=>{
             const row=center<3 ? [0,1,2] : [3,4,5];
             const position=row.indexOf(center);

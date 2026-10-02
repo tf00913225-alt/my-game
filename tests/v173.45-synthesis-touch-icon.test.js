@@ -9,7 +9,7 @@ const synthesisCss=fs.readFileSync("css/38-v141-system-expansion.css","utf8");
 const abyssCss=fs.readFileSync("css/50-v169-abyss-flow.css","utf8");
 
 assert.match(touchLock,/data-scroll-owner="x\|y\|both"/);
-assert.match(touchLock,/const canScrollX =[\s\S]*?overflowX==="auto"[\s\S]*?node\.scrollWidth >[\s\S]*?node\.clientWidth \+ 1/);
+assert.match(touchLock,/const canX=[\s\S]*?overflowX==="auto"[\s\S]*?node\.scrollWidth>node\.clientWidth\+1/);
 assert.match(synthesisCss,/#homeFeatureModal\.v141-synthesis-modal \.v141-upgrade-flow \.v169-talisman-art\{[\s\S]*?width:92px;[\s\S]*?height:138px;[\s\S]*?overflow:hidden;/);
 assert.match(synthesisCss,/#homeFeatureModal\.v141-synthesis-modal \.v141-upgrade-flow \.v169-talisman-art > img\{[\s\S]*?object-fit:contain;/);
 assert.doesNotMatch(abyssCss,/#homeFeatureModal\.v141-synthesis-modal \.v141-upgrade-flow \.v169-talisman-art/,"Abyss feature CSS must not own the synthesis preview size");
@@ -24,6 +24,7 @@ const window={
 };
 const document={
     documentElement,
+    getElementById:()=>null,
     addEventListener(name,handler){ listeners.set(name,handler); }
 };
 vm.runInNewContext(touchLock,{document,window});
@@ -50,11 +51,11 @@ const card={
 
 let prevented=false;
 listeners.get("touchmove")({target:card,preventDefault(){ prevented=true; }});
-assert.equal(window.isInsideAllowedScrollerV78(card),true,"equipment picker must qualify as a horizontal scroll owner");
+assert.equal(window.FourSymbolsGestureArbiter.findScrollOwner(card)?.node,picker,"equipment picker must qualify as a horizontal scroll owner");
 assert.equal(prevented,false,"horizontal equipment picker touchmove must remain native");
 
 picker.scrollWidth=picker.clientWidth;
-assert.equal(window.isInsideAllowedScrollerV78(card),false,"picker is whitelisted only when horizontal overflow actually exists");
+assert.equal(window.FourSymbolsGestureArbiter.findScrollOwner(card),null,"picker is whitelisted only when horizontal overflow actually exists");
 
 const synthesisBody={
     nodeType:1,parentElement:body,
@@ -69,7 +70,7 @@ const synthesisChild={
 };
 prevented=false;
 listeners.get("touchmove")({target:synthesisChild,preventDefault(){ prevented=true; }});
-assert.equal(window.isInsideAllowedScrollerV78(synthesisChild),true,"synthesis content body must qualify as a vertical scroll owner");
+assert.equal(window.FourSymbolsGestureArbiter.findScrollOwner(synthesisChild)?.node,synthesisBody,"synthesis content body must qualify as a vertical scroll owner");
 assert.equal(prevented,false,"vertical synthesis touchmove must remain native");
 
 console.log("Synthesis horizontal/vertical touch and compact talisman checks passed");

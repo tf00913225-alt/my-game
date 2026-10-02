@@ -14,7 +14,7 @@ let passed=0;function test(name,fn){fn();passed++;console.log("✓ "+name);}
 
 test("newbie forest owns zero agility monsters while preserving the six canonical monster rows",()=>{
     const forest=(main.match(/const forestMonsters = \[[\s\S]*?\n\];/)||[])[0]||"";
-    assert.equal((forest.match(/makeZoneMonster\("(?:哥布林|史萊姆)"/g)||[]).length,6);
+    assert.equal((forest.match(/makeZoneMonster\("(?:哥布林|水靈狐)"/g)||[]).length,6);
     assert.match(main,/forestMonsters\.forEach\(monster=>\{[\s\S]*?monster\.agilityPoints=0;[\s\S]*?monster\.agility=0;[\s\S]*?monster\.v173BeginnerForest=true;/);
 });
 
