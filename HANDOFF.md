@@ -1,4 +1,4 @@
-## 2026-10-02 — HIT-EVASION-PERCENT-V2-20261002（READY FOR CI）
+## 2026-10-02 — HIT-EVASION-PERCENT-V2-20261002（8/8 功能 VERIFIED；整合／部署待完成）
 
 - V1 #750 已合併。V2 base dev `60c1aab27567e2c1e64604b95a0979e97806f59b`，工作分支 `fix/hit-evasion-percent-source-rebalance-v2-20261002`。
 - Hit Owner 維持 `js/00-main.js::calculateHitChancePercent`；退休 0.15 命中係數與等級預設閃避。Set Owner `js/equipment-progression.js` 與原始 definition 同步 armor/robe evasion 10；V132 3 件套 evasion 2。
@@ -9,6 +9,7 @@
 - 追加直接 Owner 回歸先重現套裝正規化覆寫 Spirit Anti-Crit/Status Resistance，再修正保留既有總值；raw Spirit 與 V1 已換算四系 armor/robe 全部重複正規化通過。Chrome 背包實際舊套裝確認 Accuracy 3 / Evasion 10 / Anti-Crit 1.5 / Status Resistance 0.75。
 - 青嵐 Browser 雙向 getter 追加檢查先重現 8/16、10/20、12/24；退休 Relic decorator 的 Evasion 寫入，改由原始角色 Evasion Owner 唯一加總 Relic getter（與 Frostbite 同次結算）。Chrome 確認角色／隊伍皆 8/8、10/10、12/12，凍傷皆 0/0；只移動 Evasion 來源，其他秘寶數值不重平衡。
 - 續接核對 remote #752 Head `5adb5dcb` 的 CI / Session Authority SUCCESS；青嵐修正原只在本機，現保留並整合 `dev@b61f87d804edcbb8202c16bfd17f9d8cd78bf115`（#751 鍛造）。JSON gate 合併兩項需求；bundle 由正式 build 重新生成。六圍 isolation fixture 載入正式 gem owner；裝備遷移、六圍、秘寶、鍛造、39 項 final Runtime 與 Cloud 投影測試通過。本輪本機 Chrome 被 socket EPERM 阻擋；沿用 PR Required Browser QA，不修改 Runtime／測試斷言。最新 Head CI、dev merge 與部署 SHA 尚待完成。main 排除。
+- CI run `36967841803` candidate `060082ed` 的全部 Node suites、build-sync 與 V2 production browser gate PASS；artifact `11210537162`（merge snapshot `a292b228`）JSON／CJK 畫面已核對。HIT-V2-01～08 = 8/8 功能 VERIFIED；此後僅更新驗收證據文件，正式 runtime tree 不變。最新文件 Head 必要 CI、merge 與 DEV deployed SHA 仍待完成。
 
 ## 2026-10-01 — Water wild monster portraits batch 1 (candidate)
 

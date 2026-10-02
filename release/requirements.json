@@ -252,113 +252,113 @@
     {
       "id": "HIT-V2-01",
       "title": "直接百分比 Accuracy／Evasion 與 5～99% 單一 Hit Owner",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
         "files": [
           "SYSTEM_CONTRACTS.md",
           ".github/scripts/run-hit-evasion-v2-browser-qa.mjs",
           "tests/equipment-combat-percent-migration-v2.test.js"
         ],
-        "verification": "V2 targeted unit / integration and exact-candidate production Chrome QA",
-        "result": "Pending latest-head CI and browser result"
+        "verification": "CI run 36967841803: integrated candidate 060082edf644863ff5b0d846bc1f0523533f0170, 39 final Runtime tests, migration/cloud/relic suites and exact merge-candidate production Chrome mobile QA",
+        "result": "PASS; artifact 11210537162 (merge snapshot a292b228b32bd971fc0353788da856079a3891a4) JSON plus CJK detail/formula screenshots inspected. Requirement behavior verified; repository integration and deployment are separately pending."
       }
     },
     {
       "id": "HIT-V2-02",
       "title": "裸裝 95%／無等級派生怪物閃避／無等級差命中",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
         "files": [
           "SYSTEM_CONTRACTS.md",
           ".github/scripts/run-hit-evasion-v2-browser-qa.mjs",
           "tests/equipment-combat-percent-migration-v2.test.js"
         ],
-        "verification": "V2 targeted unit / integration and exact-candidate production Chrome QA",
-        "result": "Pending latest-head CI and browser result"
+        "verification": "CI run 36967841803: integrated candidate 060082edf644863ff5b0d846bc1f0523533f0170, 39 final Runtime tests, migration/cloud/relic suites and exact merge-candidate production Chrome mobile QA",
+        "result": "PASS; artifact 11210537162 (merge snapshot a292b228b32bd971fc0353788da856079a3891a4) JSON plus CJK detail/formula screenshots inspected. Requirement behavior verified; repository integration and deployment are separately pending."
       }
     },
     {
       "id": "HIT-V2-03",
       "title": "四象鎧甲與袍閃避 10%／3 件套閃避 2%",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
         "files": [
           "SYSTEM_CONTRACTS.md",
           ".github/scripts/run-hit-evasion-v2-browser-qa.mjs",
           "tests/equipment-combat-percent-migration-v2.test.js"
         ],
-        "verification": "V2 targeted unit / integration and exact-candidate production Chrome QA",
-        "result": "Pending latest-head CI and browser result"
+        "verification": "CI run 36967841803: integrated candidate 060082edf644863ff5b0d846bc1f0523533f0170, 39 final Runtime tests, migration/cloud/relic suites and exact merge-candidate production Chrome mobile QA",
+        "result": "PASS; artifact 11210537162 (merge snapshot a292b228b32bd971fc0353788da856079a3891a4) JSON plus CJK detail/formula screenshots inspected. Requirement behavior verified; repository integration and deployment are separately pending."
       }
     },
     {
       "id": "HIT-V2-04",
       "title": "舊四象與 Spirit 裝備冪等遷移，背包／裝備／Cloud 投影",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
         "files": [
           "SYSTEM_CONTRACTS.md",
           ".github/scripts/run-hit-evasion-v2-browser-qa.mjs",
           "tests/equipment-combat-percent-migration-v2.test.js"
         ],
-        "verification": "V2 targeted unit / integration and exact-candidate production Chrome QA",
-        "result": "Pending latest-head CI and browser result"
+        "verification": "CI run 36967841803: integrated candidate 060082edf644863ff5b0d846bc1f0523533f0170, 39 final Runtime tests, migration/cloud/relic suites and exact merge-candidate production Chrome mobile QA",
+        "result": "PASS; artifact 11210537162 (merge snapshot a292b228b32bd971fc0353788da856079a3891a4) JSON plus CJK detail/formula screenshots inspected. Requirement behavior verified; repository integration and deployment are separately pending."
       }
     },
     {
       "id": "HIT-V2-05",
       "title": "閃躲術與氣定神閒 5～25%／Wind EX 15% 各一次",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
         "files": [
           "SYSTEM_CONTRACTS.md",
           ".github/scripts/run-hit-evasion-v2-browser-qa.mjs",
           "tests/equipment-combat-percent-migration-v2.test.js"
         ],
-        "verification": "V2 targeted unit / integration and exact-candidate production Chrome QA",
-        "result": "Pending latest-head CI and browser result"
+        "verification": "CI run 36967841803: integrated candidate 060082edf644863ff5b0d846bc1f0523533f0170, 39 final Runtime tests, migration/cloud/relic suites and exact merge-candidate production Chrome mobile QA",
+        "result": "PASS; artifact 11210537162 (merge snapshot a292b228b32bd971fc0353788da856079a3891a4) JSON plus CJK detail/formula screenshots inspected. Requirement behavior verified; repository integration and deployment are separately pending."
       }
     },
     {
       "id": "HIT-V2-06",
       "title": "凍傷 -25%／元祖祝福 15%／青嵐 8／10／12%",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
         "files": [
           "SYSTEM_CONTRACTS.md",
           ".github/scripts/run-hit-evasion-v2-browser-qa.mjs",
           "tests/equipment-combat-percent-migration-v2.test.js"
         ],
-        "verification": "V2 targeted unit / integration and exact-candidate production Chrome QA",
-        "result": "Pending latest-head CI and browser result"
+        "verification": "CI run 36967841803: integrated candidate 060082edf644863ff5b0d846bc1f0523533f0170, 39 final Runtime tests, migration/cloud/relic suites and exact merge-candidate production Chrome mobile QA",
+        "result": "PASS; artifact 11210537162 (merge snapshot a292b228b32bd971fc0353788da856079a3891a4) JSON plus CJK detail/formula screenshots inspected. Requirement behavior verified; repository integration and deployment are separately pending."
       }
     },
     {
       "id": "HIT-V2-07",
       "title": "鎮魂古鐘最終命中下降 5／8% 且保留 Boss 效率",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
         "files": [
           "SYSTEM_CONTRACTS.md",
           ".github/scripts/run-hit-evasion-v2-browser-qa.mjs",
           "tests/equipment-combat-percent-migration-v2.test.js"
         ],
-        "verification": "V2 targeted unit / integration and exact-candidate production Chrome QA",
-        "result": "Pending latest-head CI and browser result"
+        "verification": "CI run 36967841803: integrated candidate 060082edf644863ff5b0d846bc1f0523533f0170, 39 final Runtime tests, migration/cloud/relic suites and exact merge-candidate production Chrome mobile QA",
+        "result": "PASS; artifact 11210537162 (merge snapshot a292b228b32bd971fc0353788da856079a3891a4) JSON plus CJK detail/formula screenshots inspected. Requirement behavior verified; repository integration and deployment are separately pending."
       }
     },
     {
       "id": "HIT-V2-08",
       "title": "Runtime／UI／正式契約／瀏覽器與雙向戰鬥驗證",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
         "files": [
           "SYSTEM_CONTRACTS.md",
           ".github/scripts/run-hit-evasion-v2-browser-qa.mjs",
           "tests/equipment-combat-percent-migration-v2.test.js"
         ],
-        "verification": "V2 targeted unit / integration and exact-candidate production Chrome QA",
-        "result": "Pending latest-head CI and browser result"
+        "verification": "CI run 36967841803: integrated candidate 060082edf644863ff5b0d846bc1f0523533f0170, 39 final Runtime tests, migration/cloud/relic suites and exact merge-candidate production Chrome mobile QA",
+        "result": "PASS; artifact 11210537162 (merge snapshot a292b228b32bd971fc0353788da856079a3891a4) JSON plus CJK detail/formula screenshots inspected. Requirement behavior verified; repository integration and deployment are separately pending."
       }
     },
     {
