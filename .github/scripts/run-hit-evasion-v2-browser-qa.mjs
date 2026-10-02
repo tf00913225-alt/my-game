@@ -118,7 +118,7 @@ try{
     assert.deepEqual(evidence.calm,[5,10,15,20,25].map(v=>[0,v,55+v]));
     assert.deepEqual(evidence.dodge,[5,10,15,20,25]);
     assert.deepEqual([evidence.set.one,evidence.set.three,evidence.set.two],[10,12,10]);
-    assert.match(evidence.detail,/命中\s*0%/);assert.match(evidence.detail,/閃避\s*10%/);
+    assert.match(evidence.detail,/命中\s*0%/);assert.match(evidence.detail,/閃避\s*10\.0%/);
     assert.match(evidence.detail,/5%～99%/);
     assert.equal(evidence.legacyArmor.stats.accuracy,3);assert.equal(evidence.legacyArmor.stats.evasion,10);assert.equal(evidence.legacyArmor.stats.antiCrit,1.5);assert.equal(evidence.legacyArmor.stats.statusResistance,0.75);
     assert.equal(evidence.migrated.stats.accuracy,3);assert.deepEqual(evidence.repeated,evidence.migrated);
