@@ -25,6 +25,12 @@ const stylePaths=[
 const runtimeSource=fs.readFileSync(path.join(process.cwd(),"js","54-v173.51-battle-qa.js"),"utf8")
     .replace(/<\/script/gi,"<\\/script");
 
+const mainSource=fs.readFileSync("js/00-main.js","utf8");
+const highlightStart=mainSource.indexOf("function clearActiveCharacterHighlight(){");
+const highlightEnd=mainSource.indexOf("function updateTimer(){",highlightStart);
+assert.ok(highlightStart>=0&&highlightEnd>highlightStart,"formal manual highlight projection missing");
+const highlightSource=mainSource.slice(highlightStart,highlightEnd).replace(/<\/script/gi,"<\\/script");
+
 function escapeAttribute(value){
     return String(value)
         .replace(/&/g,"&amp;")
@@ -36,7 +42,6 @@ function escapeAttribute(value){
 function enemyCard(index){
     const hp=1380-index*5,sp=630-index*3;
     return `<div id="battleMonster${index}" class="battle-monster v154-abyss-portrait" style="--v152-abyss-portrait:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='112'%3E%3Crect width='80' height='112' fill='%23654'%3E%3C/rect%3E%3C/svg%3E&quot;)">
-      <img class="v162-abyss-battle-portrait-art" alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='112'%3E%3Crect width='80' height='112' fill='%23654'/%3E%3C/svg%3E">
       <div class="battle-monster-icon"></div>
       <div class="battle-monster-name">天兵${index+1}</div>
       <div class="battle-monster-level">Lv.100</div>
@@ -51,7 +56,7 @@ function enemySlot(index,row,column){
 }
 
 function playerCard(index,hp,sp){
-    return `<div id="battlePlayerCard${index}" class="battle-player${index===1?" active-turn":""}" style="background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='116' height='144'%3E%3Crect width='116' height='144' fill='%23456'/%3E%3C/svg%3E&quot;)">
+    return `<div id="battlePlayerCard${index}" class="battle-player" style="background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='116' height='144'%3E%3Crect width='116' height='144' fill='%23456'/%3E%3C/svg%3E&quot;)">
       <div class="battle-player-icon"></div>
       <div id="battlePlayerStatus${index}" class="monster-status-badges"></div>
       <div class="hp-bar"><div id="battlePlayerHPBar${index}" class="hp-bar-inner"></div><div id="battlePlayerShieldBar${index}" class="hp-bar-shield-overlay"></div><div class="hp-bar-text">${hp}/1000</div></div>
@@ -83,6 +88,10 @@ function innerHtml(){
 </div></div></div></div></div></div>
 <script>
 var battleActive=true;
+var activeBattleCharacterIndex=1;
+function $(id){return document.getElementById(id)}
+${highlightSource}
+updateActiveCharacterHighlight();
 var monsters=Array.from({length:10},function(_,index){return {hp:1380-index*5,sp:630-index*3,maxHP:2000,maxSP:800};});
 var qaParty=[{hp:835,sp:412},{hp:798,sp:468},{hp:752,sp:506}];
 function getPartyCharacterByIndex(index){return qaParty[index]||null;}
@@ -95,6 +104,20 @@ window.__qaBefore=qaRects();
 (function(){
   var player=document.getElementById('battlePlayerCard0');
   var activePlayer=document.getElementById('battlePlayerCard1');
+  var elementFrames=['fire','water','wind','earth'].map(function(element){
+    activePlayer.dataset.element=element;
+    return {element:element,animation:getComputedStyle(activePlayer,'::after').animationName,
+      border:getComputedStyle(activePlayer,'::after').borderTopColor};
+  });
+  var manualCount=document.querySelectorAll('.battle-player.active-turn').length;
+  // The formal declaration path clears before deciding auto/manual. Exercise
+  // those same projection functions; automatic characters receive no update.
+  clearActiveCharacterHighlight();
+  var autoCount=document.querySelectorAll('.battle-player.active-turn').length;
+  var autoFrameAnimation=getComputedStyle(activePlayer,'::after').animationName;
+  activeBattleCharacterIndex=2;updateActiveCharacterHighlight();
+  var nextManualIds=Array.from(document.querySelectorAll('.battle-player.active-turn')).map(function(card){return card.id});
+  activeBattleCharacterIndex=1;updateActiveCharacterHighlight();
   var activeFrame=getComputedStyle(activePlayer,'::after');
   var art=player.querySelector(':scope > .v174-battle-art');
   var activeArt=activePlayer.querySelector(':scope > .v174-battle-art');
@@ -115,6 +138,7 @@ window.__qaBefore=qaRects();
     var enemy=document.getElementById('battleMonster0');
     var enemyArt=enemy.querySelector(':scope > .v174-battle-art');
     var result={
+      elementFrames:elementFrames,manualCount:manualCount,autoCount:autoCount,autoFrameAnimation:autoFrameAnimation,nextManualIds:nextManualIds,
       rows:document.querySelectorAll('#battleMonsterArea > .v-fixed-enemy-row').length,
       enemies:document.querySelectorAll('#battleMonsterArea .battle-monster').length,
       players:document.querySelectorAll('#battlePlayerRow .battle-player').length,
@@ -148,7 +172,8 @@ window.__qaBefore=qaRects();
       lungeAnimation:lungeAnimation,
       hitAnimation:getComputedStyle(art).animationName,
       footShadowContent:getComputedStyle(art,'::after').content,
-      abyssOwnerOpacity:getComputedStyle(enemy.querySelector('.v162-abyss-battle-portrait-art')).opacity,
+      enemyArtCount:enemy.querySelectorAll(':scope > .v174-battle-art').length,
+      legacyPortraitCount:enemy.querySelectorAll('.v162-abyss-battle-portrait-art').length,
       playerHp:player.querySelector('.hp-bar-text').textContent,
       playerSp:player.querySelector('.sp-bar-text').textContent,
       enemyHp:enemy.querySelector('.monster-hp .monster-bar-text').textContent,
@@ -178,6 +203,14 @@ function runViewport(chrome,width,height){
     const match=result.stdout.match(/<pre id="result">([\s\S]*?)<\/pre>/);
     assert.ok(match,`V174 browser result missing at ${width}x${height}`);
     const data=JSON.parse(decode(match[1]));
+    assert.equal(data.manualCount,1,"one manual current-character indicator");
+    assert.equal(data.autoCount,0,"automatic declaration clears the preceding manual frame");
+    assert.equal(data.autoFrameAnimation,"none");
+    assert.deepEqual(data.nextManualIds,["battlePlayerCard2"],"manual handoff retires preceding indicator");
+    for(const frame of data.elementFrames){
+        assert.equal(frame.animation,"v174ManualActiveTurnFrameFlash",frame.element);
+        assert.equal(frame.border,"rgb(255, 210, 31)",frame.element+" uses the manual frame color owner");
+    }
     assert.equal(data.rows,2);
     assert.equal(data.enemies,10);
     assert.equal(data.players,3);
@@ -210,7 +243,8 @@ function runViewport(chrome,width,height){
     assert.equal(data.lungeAnimation,"v174BattleLungeUp");
     assert.equal(data.hitAnimation,"none","damage popups must not start a persistent portrait animation");
     assert.notEqual(data.footShadowContent,"none");
-    assert.equal(data.abyssOwnerOpacity,"0");
+    assert.equal(data.enemyArtCount,1,"one canonical artwork layer");
+    assert.equal(data.legacyPortraitCount,0,"retired image producer must not be restored");
     assert.equal(data.playerHp,"835");
     assert.equal(data.playerSp,"412");
     assert.equal(data.enemyHp,"1380");
