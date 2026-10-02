@@ -3831,14 +3831,6 @@
 #game-stage .v141-synthesis-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;}
 #game-stage .v141-synthesis-tabs button{min-height:44px;padding:4px 2px;border:1px solid #69502e;border-radius:7px;color:#b5a58c;background:#17120d;font-size:12px;}
 #game-stage .v141-synthesis-tabs button.active{color:#231607;border-color:#d4a14d;background:linear-gradient(180deg,#f0ca79,#b97d2f);font-weight:900;}
-#game-stage .v141-forge-tabs{grid-template-columns:repeat(2,minmax(0,1fr));}
-#game-stage .v141-forge-tabs button{font-size:15px;}
-#game-stage .v141-socket-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:12px 0;}
-#game-stage .v141-socket{min-width:0;padding:8px 4px;border:1px solid #69502e;border-radius:7px;text-align:center;background:#17120d;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:15px;}
-#game-stage .v141-socket>span{font-size:25px;color:#f0ca79;line-height:1.2;}
-#game-stage .v141-socket b,#game-stage .v141-socket small{max-width:100%;overflow-wrap:anywhere;}
-#game-stage .v141-socket small{font-size:13px;color:#d8c6a5;}
-#game-stage .v141-socket-card select{font-size:15px;min-height:44px;}
 #game-stage .v141-synthesis-body{flex:1;min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;scrollbar-gutter:stable;}
 #game-stage .v141-synthesis-card,#game-stage .v141-synthesis-empty{min-height:100%;padding:10px;border:1px solid rgba(200,154,72,.20);border-radius:10px;background:linear-gradient(155deg,rgba(29,22,14,.68),rgba(9,7,5,.86));box-sizing:border-box;
     box-shadow:inset 0 1px 0 rgba(255,238,196,.02);

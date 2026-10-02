@@ -154,7 +154,9 @@ jobs:
         run: node tests/gameplay-context-nav-actions-20260915.test.js
 
       - name: Run Gameplay UI regression
-        run: node tests/gameplay-ui-regressions-20260908.test.js
+        run: |
+          node tests/gameplay-ui-regressions-20260908.test.js
+          node tests/forge-sockets-gems.test.js
 
       - name: Run relic lifecycle and battle input regressions
         run: |
@@ -195,6 +197,7 @@ jobs:
           node tests/ui-critical-regressions-20260909.test.js
           node tests/backpack-grid-bottom-action.test.js
           node .github/scripts/run-responsive-item-browser-qa.mjs
+          node .github/scripts/run-forge-sockets-browser-qa.mjs
 
       - name: Upload Responsive Item browser evidence
         if: always() && steps.responsive_item_browser.outcome != 'skipped'

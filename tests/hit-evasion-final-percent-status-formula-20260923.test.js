@@ -9,6 +9,7 @@ const v140=fs.readFileSync("js/33-v140-four-element-balance.js","utf8");
 const v149=fs.readFileSync("js/43-v149-skill-ui-rules.js","utf8");
 const v158=fs.readFileSync("js/47-v158-combat-tuning.js","utf8");
 const v169=fs.readFileSync("js/50-v169-water-skill-rules.js","utf8");
+const v144=fs.readFileSync("js/40-v144-rules-and-abyss.js","utf8");
 const progression=fs.readFileSync("js/60-v173.64-skill-progression-rebalance.js","utf8");
 const statusVfx=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const patrol=fs.readFileSync("js/26-v131-patrol-appearance.js","utf8");
@@ -73,10 +74,11 @@ function formulaRuntime(){
         constLine("STATUS_HIT_MIN_PERCENT"),
         constLine("STATUS_HIT_MAX_PERCENT"),
         constObject("LOCKDOWN_HIT_BOUNDS"),
+        sourceFunction(main,"combineEvasionRates"),
         sourceFunction(main,"getDefaultMonsterEvasion"),
         sourceFunction(main,"calculateHitChancePercent"),
         sourceFunction(main,"calculateStatusEffectChance"),
-        "this.hit=calculateHitChancePercent;this.ev=getDefaultMonsterEvasion;this.status=calculateStatusEffectChance;"
+        "this.hit=calculateHitChancePercent;this.ev=getDefaultMonsterEvasion;this.combine=combineEvasionRates;this.status=calculateStatusEffectChance;"
     ].join("\n");
     const context={Math,Number};
     vm.createContext(context);
@@ -87,8 +89,14 @@ function formulaRuntime(){
 {
     const r=formulaRuntime();
     assert.equal(r.hit(0,0,0,0),95);
-    assert.equal(r.hit(100,10,0,0),99);
-    assert.equal(r.hit(0,10,0,0),85);
+    assert.equal(r.hit(0,40,0,0),55);
+    assert.equal(r.hit(0,80,0,0),15);
+    assert.equal(r.hit(0,100,0,0),5);
+    assert.equal(r.hit(0,200,0,0),5);
+    assert.equal(r.hit(1000,0,0,0),99);
+    assert.equal(r.hit(1000,200,0,0),45);
+    assert.equal(r.combine([40,10]),50);
+    assert.equal(r.combine([100,100]),200);
     assert.equal(r.hit(0,15,5,10),85,"95 + 10 - 15 - 5 must be 85 percentage points");
     assert.deepEqual([40,60,80,100,200].map(r.ev),[4,6,8,10,10]);
     assert.equal(r.status(30,10,10,200,0,true,"boss",20),20);
@@ -121,6 +129,10 @@ function formulaRuntime(){
         "default monster evasion owner must exist before the first top-level zone roster call"
     );
     assert.match(main,/function combineEvasionRates\(sources\)[\s\S]*?sum\+\(Number\(source\)\|\|0\)/);
+    assert.doesNotMatch(main,/FINAL_EVASION_RATE_CAP|const HIT_CHANCE_MIN_PERCENT = 70;/);
+    assert.match(main,/const HIT_CHANCE_MIN_PERCENT = 5;/);
+    assert.match(main,/function getFinalAccuracyBonusPercent\(entity\)/);
+    assert.doesNotMatch(v144,/accuracyMultiplier|wrapAccuracyStats|getMainCharacterStats\s*=function/);
 }
 
 {

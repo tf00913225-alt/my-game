@@ -34,19 +34,22 @@ const reforge=forge.slice(forge.indexOf("function reforgeMaterialInfo"),forge.in
 assert.doesNotMatch(reforge,/consumeMatching\(candidate=>candidate&&candidate.blueprintSlot/);
 assert.doesNotMatch(forge.slice(forge.indexOf("function renderReforgeTab"),forge.indexOf("function availableTalismans")),/blueprintCount/);
 assert.match(reforge,/v132ConsumeStackItem\(info.ore.id,cost\)/);
-assert.match(forge,/sockets.length>=capacity/);
+assert.match(forge,/sockets.length>capacity/);
+const localSocketHelpers=forge.slice(forge.indexOf("    function canUseLocalSockets(){"),forge.indexOf("    function renderForgePicker("));
 const socketOperation=forge.slice(forge.indexOf("window.v141SocketGem=function(){"),forge.indexOf("window.v141SwitchSynthesisTab",forge.indexOf("window.v141SocketGem=function(){")));
 const gemStock={id:"gemVitalityI",count:2};
 const gear={v141Uid:"gear-1",rarityKey:"orange",stats:{attack:5}};
 let saved=0;
-const actionContext={window:{FourSymbolsEquipmentGems:api,v132ConsumeStackItem:(id,n)=>{
+const metadata={ownerUid:"forge-qa",source:"local",cloudBaseFingerprint:null};
+let saveFails=false;
+const actionContext={window:{FourSymbolsEquipmentGems:api,FourSymbolsAccountSave:{readActive:()=>({status:"ready",uid:"forge-qa",metadata})},v132ConsumeStackItem:(id,n)=>{
     if(id!==gemStock.id||gemStock.count<n){ return false; }
     gemStock.count-=n;return true;
 }},activeFeature:"forge",synthesisState:{socketUid:"gear-1",gemId:"gemVitalityI",pendingReforge:null},
-    socketEquipment:()=>[{item:gear}],countItem:()=>gemStock.count,runInventoryTransaction:fn=>fn(),
-    rebuildInventorySlots:()=>{},saveGame:()=>{saved++;},updateUI:()=>{},renderSynthesis:()=>{}};
+    socketEquipment:()=>[{item:gear}],countItem:()=>gemStock.count,runInventoryTransaction:fn=>{const count=gemStock.count;try{if(fn()){return true;}}catch(_){}gemStock.count=count;return false;},
+    rebuildInventorySlots:()=>{},saveGame:()=>{saved++;return !saveFails;},updateUI:()=>{},renderSynthesis:()=>{}};
 vm.createContext(actionContext);
-vm.runInContext(socketOperation,actionContext);
+vm.runInContext(localSocketHelpers+socketOperation,actionContext);
 assert.equal(actionContext.window.v141SocketGem(),true);
 assert.equal(gear.sockets.length,1);
 assert.equal(gemStock.count,1);
@@ -55,4 +58,34 @@ assert.equal(actionContext.window.v141SocketGem(),false,"capacity blocks a secon
 assert.equal(gemStock.count,1);
 actionContext.synthesisState.gemId="missing";
 assert.equal(actionContext.window.v141SocketGem(),false,"unknown gems cannot be embedded");
+delete gear.sockets;
+actionContext.synthesisState.gemId="gemVitalityI";
+saveFails=true;
+assert.equal(actionContext.window.v141SocketGem(),false,"failed save rolls back gem and socket");
+assert.equal(gemStock.count,1);
+assert.equal(Object.hasOwn(gear,"sockets"),false);
+saveFails=false;
+metadata.cloudBaseFingerprint="v1:cloud-base";
+assert.equal(actionContext.window.v141SocketGem(),false,"authoritative cloud cache cannot use local mutation");
+metadata.cloudBaseFingerprint=null;
+metadata.ownerUid="another-uid";
+assert.equal(actionContext.window.v141SocketGem(),false,"ownership mismatch fails closed");
+metadata.ownerUid="forge-qa";
+gear.sockets=["missing"];
+assert.equal(actionContext.window.v141SocketGem(),false,"invalid saved slots cannot be overwritten");
+assert.equal(gemStock.count,1);
+gear.rarityKey="pink";
+gear.sockets=[null,"gemVitalityI"];
+assert.equal(actionContext.window.v141SocketGem(),true,"explicit empty slot is filled without exceeding capacity");
+assert.deepEqual(Array.from(gear.sockets),["gemVitalityI","gemVitalityI"]);
+assert.equal(gemStock.count,0);
+const loaded=JSON.parse(JSON.stringify(gear));
+assert.deepEqual(loaded.sockets,["gemVitalityI","gemVitalityI"],"existing JSON equipment save retains sockets");
+assert.equal(api.capacity({quality:"unrecognized",tierKey:"orange"}),1,"fallback follows existing rarity field order");
+assert.equal(api.capacity({legacyTierKey:"perfect"}),1);
+assert.equal(api.capacity({rarityKey:"white",tierKey:"orange"}),0,"explicit canonical rarity takes precedence");
+assert.equal(api.stats({rarityKey:"orange",sockets:[{toString:()=>"gemVitalityI"}]}).length,0);
+const socketRender=forge.slice(forge.indexOf("    function renderSocketTab(){"),forge.indexOf("    function inferTier("));
+assert.doesNotMatch(socketRender,/<select|<option/);
+assert.match(socketRender,/renderForgePicker/);
 console.log("✓ forge sockets, save compatibility, equip bonuses, and blueprint-free reforge");

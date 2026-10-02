@@ -248,6 +248,20 @@
         "verification": "39 張可解碼來源已完成無損 WebP、透明度、尺寸與像素驗證；最新 PR CI、DEV 部署與手機實機顯示尚待核對。",
         "result": "10 張野怪與 29 張土塔素材已接入；第 10 張小 Boss 母圖已確認損毀並隔離為 reserved，未偽造完成。"
       }
+    },
+    {
+      "id": "REQ-FORGE-SOCKETS-GEMS-20261002",
+      "title": "鍛造與裝備寶石第一階段",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "release/requirement-batches/2026-10-02-forge-sockets-gems.json",
+          "tests/forge-sockets-gems.test.js",
+          ".github/scripts/run-forge-sockets-browser-qa.mjs"
+        ],
+        "verification": "本機必要回歸通過；最新提交 CI、production 建置與390／412觸控證據待確認。",
+        "result": "依階級0/0/0/1/2/3孔、最小寶石定義、存檔回滾與屬性接入已施工；正式後端交易與取得來源不在本階段完成範圍。"
+      }
     }
   ]
 }

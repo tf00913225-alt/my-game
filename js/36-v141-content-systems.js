@@ -173,6 +173,39 @@
         }));
         return result;
     }
+    function canUseLocalSockets(){
+        // This first-stage operation belongs only to the existing UID-local
+        // prototype. An authoritative cloud character must wait for a backend
+        // operation; local metadata never grants cloud write authority.
+        try{
+            const repo=window.FourSymbolsAccountSave;
+            if(!repo||typeof repo.readActive!=="function"){ return false; }
+            const state=repo.readActive();
+            return state.status==="ready"&&state.metadata&&state.metadata.ownerUid===state.uid&&
+                state.metadata.cloudBaseFingerprint==null&&state.metadata.source!=="authoritative-cloud-read";
+        }catch(_){ return false; }
+    }
+    function nextSocketIndex(item){
+        const capacity=window.FourSymbolsEquipmentGems.capacity(item);
+        if(item&&item.sockets!==undefined&&!Array.isArray(item.sockets)){ return -1; }
+        const sockets=item&&item.sockets||[];
+        const defs=window.FourSymbolsEquipmentGems.definitions;
+        if(sockets.length>capacity||sockets.some(id=>id!=null&&
+            (typeof id!=="string"||!Object.prototype.hasOwnProperty.call(defs,id)))){ return -1; }
+        for(let index=0;index<capacity;index++){
+            if(sockets[index]==null){ return index; }
+        }
+        return -1;
+    }
+    function renderForgePicker(label,entries,selected,handler){
+        const current=entries.find(entry=>entry.value===selected)||entries[0];
+        if(!current){ return ""; }
+        return '<details class="v141-forge-picker"><summary><span>'+escapeHtml(label)+'</span><b>'+escapeHtml(current.label)+'</b><i aria-hidden="true">▾</i></summary>'+
+            '<div class="v141-forge-options" role="group" aria-label="'+escapeHtml(label)+'">'+entries.map(entry=>
+                '<button type="button" class="v141-forge-option'+(entry.value===selected?' selected':'')+'" aria-pressed="'+(entry.value===selected)+'" data-forge-value="'+escapeHtml(entry.value)+'" onclick="'+handler+'(this.dataset.forgeValue)">'+
+                '<span>'+escapeHtml(entry.label)+'</span><b aria-hidden="true">'+(entry.value===selected?'✓':'')+'</b></button>'
+            ).join('')+'</div></details>';
+    }
     function renderSocketTab(){
         const entries=socketEquipment();
         if(!entries.length){ return '<div class="v141-synthesis-empty">目前沒有可鑲嵌的橙階以上裝備。</div>'; }
@@ -183,17 +216,17 @@
         const defs=window.FourSymbolsEquipmentGems.definitions;
         const gems=inventoryItems.filter(candidate=>candidate&&defs[candidate.id]&&Number(candidate.count)>0);
         if(!gems.some(gem=>gem.id===synthesisState.gemId)){ synthesisState.gemId=gems[0]&&gems[0].id||null; }
-        const occupied=sockets.filter(Boolean).length;
+        const available=nextSocketIndex(item)>=0;
+        const local=canUseLocalSockets();
         return '<div class="v141-synthesis-card v141-socket-card">'+
-            '<label>選擇裝備<select onchange="v141SelectSocketItem(this.value)">'+entries.map(entry=>
-                '<option value="'+escapeHtml(entry.item.v141Uid)+'" '+(entry.item===item?'selected':'')+'>'+escapeHtml(entry.item.name)+'［'+entry.source+'］</option>').join('')+'</select></label>'+
+            renderForgePicker('選擇裝備',entries.map(entry=>({value:entry.item.v141Uid,label:entry.item.name+'［'+entry.source+'］'})),synthesisState.socketUid,'v141SelectSocketItem')+
             '<div class="v141-socket-list" aria-label="鑲嵌孔">'+Array.from({length:capacity},(_,index)=>{
                 const gem=defs[sockets[index]];
                 return '<div class="v141-socket"><span aria-hidden="true">'+(gem?escapeHtml(gem.icon):'◇')+'</span><b>'+(gem?escapeHtml(gem.name):'空孔')+'</b><small>'+(gem?statsHtml(gem.stats):'可鑲嵌')+'</small></div>';
             }).join('')+'</div>'+
-            (gems.length?'<label>選擇寶石<select onchange="v141SelectSocketGem(this.value)">'+gems.map(gem=>
-                '<option value="'+escapeHtml(gem.id)+'" '+(gem.id===synthesisState.gemId?'selected':'')+'>'+escapeHtml(defs[gem.id].name)+' ×'+Math.floor(Number(gem.count))+'（'+escapeHtml(Object.entries(defs[gem.id].stats).map(([key,value])=>(STAT_LABEL[key]||key)+' +'+value).join('、'))+'）</option>').join('')+'</select></label>':'<p>背包沒有可鑲嵌的寶石。</p>')+
-            '<button type="button" class="v141-synthesis-primary" '+(gems.length&&occupied<capacity?'':'disabled')+' onclick="v141SocketGem()">鑲嵌寶石</button></div>';
+            (gems.length?renderForgePicker('選擇寶石',gems.map(gem=>({value:gem.id,label:defs[gem.id].name+' ×'+Math.floor(Number(gem.count))+'（'+Object.entries(defs[gem.id].stats).map(([key,value])=>(STAT_LABEL[key]||key)+' +'+value).join('、')+'）'})),synthesisState.gemId,'v141SelectSocketGem'):'<p>背包沒有可鑲嵌的寶石。</p>')+
+            (!local?'<p>目前角色尚未開放鑲嵌。</p>':!available?'<p>孔位已滿或孔位資料無法使用。</p>':'')+
+            '<button type="button" class="v141-synthesis-primary" '+(gems.length&&available&&local?'':'disabled')+' onclick="v141SocketGem()">鑲嵌寶石</button></div>';
     }
 
     function inferTier(item){
@@ -418,9 +451,7 @@
             }).join("")
             :'<div class="v17358-no-affix-lock">首次冶煉尚無詞條可鎖定。</div>';
         return '<div class="v141-synthesis-card v17358-reforge-card">'+
-            '<label>選擇裝備<select onchange="v141SelectReforgeItem(this.value)">'+entries.map(entry=>
-                '<option value="'+entry.item.v141Uid+'" '+(entry.item.v141Uid===item.v141Uid?'selected':'')+'>'+escapeHtml(entry.item.name)+'［'+entry.source+'］</option>'
-            ).join("")+'</select></label>'+
+            renderForgePicker('選擇裝備',entries.map(entry=>({value:entry.item.v141Uid,label:entry.item.name+'［'+entry.source+'］'})),synthesisState.reforgeUid,'v141SelectReforgeItem')+
             '<section class="v141-reforge-current"><b>'+escapeHtml(item.name)+'</b><small>冶煉槽 '+slotCount+' 格・可不限次數重洗</small><div><em>原始詞條</em>'+statsHtml(item.stats)+'</div><div><em>目前冶煉</em>'+statsHtml(item.reforgeStats)+'</div></section>'+
             '<section class="v17358-reforge-material"><div class="v17358-section-title"><b>選擇冶煉材料階級</b><span>裝備品質不限制材料；材料階級只決定本次數值範圍。</span></div><div class="v17358-reforge-tiers">'+tierButtons+'</div></section>'+
             '<section class="v17358-reforge-lock-panel"><div class="v17358-section-title"><b>鎖定詞條</b><span>最多鎖 2 條，且至少保留 1 個槽位重新冶煉。</span></div><div class="v17358-reforge-lock-list">'+lockHtml+'</div><small>目前鎖定 '+locks.length+' / '+maxLocks+' 條</small></section>'+
@@ -495,19 +526,29 @@
     window.v141SelectSocketItem=function(uid){ synthesisState.socketUid=uid; renderSynthesis(); };
     window.v141SelectSocketGem=function(id){ synthesisState.gemId=id; renderSynthesis(); };
     window.v141SocketGem=function(){
-        if(activeFeature!=="forge"||synthesisState.pendingReforge){ return false; }
-        const item=socketEquipment().find(entry=>entry.item.v141Uid===synthesisState.socketUid)?.item;
-        const capacity=window.FourSymbolsEquipmentGems.capacity(item);
+        if(activeFeature!=="forge"||synthesisState.pendingReforge||!canUseLocalSockets()){ return false; }
+        const candidates=socketEquipment().filter(entry=>entry.item.v141Uid===synthesisState.socketUid);
+        if(candidates.length!==1){ return false; }
+        const item=candidates[0].item;
+        const index=nextSocketIndex(item);
         const gem=window.FourSymbolsEquipmentGems.definitions[synthesisState.gemId];
         const sockets=Array.isArray(item&&item.sockets)?item.sockets:[];
-        if(!item||!capacity||sockets.length>=capacity||!gem||countItem(gem.id)<1){ return false; }
+        if(index<0||!Object.prototype.hasOwnProperty.call(window.FourSymbolsEquipmentGems.definitions,synthesisState.gemId)||!gem||countItem(gem.id)<1){ return false; }
+        const hadSockets=Object.prototype.hasOwnProperty.call(item,"sockets");
+        const previousSockets=item.sockets;
+        const next=sockets.slice();
+        next[index]=gem.id;
         const success=runInventoryTransaction(()=>{
             if(!window.v132ConsumeStackItem(gem.id,1)){ return false; }
-            item.sockets=sockets.concat(gem.id);
-            return true;
+            item.sockets=next;
+            return saveGame()!==false;
         });
-        if(!success){ return false; }
-        rebuildInventorySlots(); saveGame(); updateUI(); renderSynthesis();
+        if(!success){
+            if(hadSockets){ item.sockets=previousSockets; }else{ delete item.sockets; }
+            rebuildInventorySlots(); renderSynthesis();
+            return false;
+        }
+        rebuildInventorySlots(); updateUI(); renderSynthesis();
         return true;
     };
     window.v141SwitchSynthesisTab=function(tab){
@@ -908,7 +949,7 @@
                 buff.originalEvasion=monster.evasion;
                 monster.evasion=typeof window.v173CombineEvasionRates==="function"
                     ?window.v173CombineEvasionRates([buff.originalEvasion,amount])
-                    :Math.min(85,(Number(buff.originalEvasion)||0)+(Number(amount)||0));
+                    :Math.max(0,(Number(buff.originalEvasion)||0)+(Number(amount)||0));
             }
             const displayBuff={
                 type:type==="rage"?"rage":"v141TeamBuff",

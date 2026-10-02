@@ -2059,12 +2059,21 @@ const EQUIPMENT_SOCKET_CAPACITY=Object.freeze({white:0,blue:0,purple:0,orange:1,
 const EQUIPMENT_GEMS=Object.freeze({gemVitalityI:Object.freeze({id:"gemVitalityI",name:"體質寶石",type:"gem",icon:"◆",stats:Object.freeze({vitality:1})})});
 function getEquipmentSocketCapacity(item){
     const aliases={low:"white",mid:"blue",high:"purple",perfect:"orange",red:"pink",myriad:"four-symbol"};
-    const raw=String(item&&(item.rarityKey||item.quality||item.tierKey)||"").toLowerCase();
-    return EQUIPMENT_SOCKET_CAPACITY[aliases[raw]||raw]||0;
+    if(!item){ return 0; }
+    for(const value of [item.rarityKey,item.quality,item.tierKey,item.legacyTierKey]){
+        const raw=String(value||"").toLowerCase();
+        const key=aliases[raw]||raw;
+        if(Object.prototype.hasOwnProperty.call(EQUIPMENT_SOCKET_CAPACITY,key)){
+            return EQUIPMENT_SOCKET_CAPACITY[key];
+        }
+    }
+    return 0;
 }
 function getSocketGemStats(item){
     const sockets=Array.isArray(item&&item.sockets)?item.sockets:[];
-    return sockets.slice(0,getEquipmentSocketCapacity(item)).map(id=>EQUIPMENT_GEMS[id]&&EQUIPMENT_GEMS[id].stats).filter(Boolean);
+    return sockets.slice(0,getEquipmentSocketCapacity(item)).filter(id=>
+        typeof id==="string"&&Object.prototype.hasOwnProperty.call(EQUIPMENT_GEMS,id)
+    ).map(id=>EQUIPMENT_GEMS[id].stats);
 }
 window.FourSymbolsEquipmentGems=Object.freeze({definitions:EQUIPMENT_GEMS,capacity:getEquipmentSocketCapacity,stats:getSocketGemStats});
 
@@ -2138,7 +2147,6 @@ function getPlayerDefenseDownPercent(character){
     return Math.max(0,getMonsterDebuffValue(character,"defenseDown"));
 }
 
-const FINAL_EVASION_RATE_CAP=85;
 const FROSTBITE_FINAL_PERCENT_POINT_PENALTY=25;
 
 /*
@@ -2152,7 +2160,7 @@ function combineEvasionRates(sources){
         (sum,source)=>sum+(Number(source)||0),
         0
     );
-    return Math.max(0,Math.min(FINAL_EVASION_RATE_CAP,total));
+    return Math.max(0,total);
 }
 
 function getFrostbiteFinalPercentPointPenalty(entity){
@@ -2200,6 +2208,18 @@ function getActiveRageCriticalBonuses(entity){
 window.v173GetActiveAccuracyBonusPercent=getActiveAccuracyBonusPercent;
 window.v173GetActiveRageCriticalBonuses=getActiveRageCriticalBonuses;
 
+/* Final Accuracy is a percentage-point modifier, not a multiplier on raw
+   Accuracy. It joins raw Accuracy only at the single hit-chance owner. */
+function getFinalAccuracyBonusPercent(entity){
+    const activeBonus=getActiveAccuracyBonusPercent(entity);
+    const windEx=entity&&entity.element==="wind"
+        ?getLearnedElementEX(entity,"wind")
+        :null;
+    return activeBonus+(windEx?Number(windEx.accuracyBonusPercent)||0:0);
+}
+
+window.v173GetFinalAccuracyBonusPercent=getFinalAccuracyBonusPercent;
+
 /* =====================================================
    主角最終能力
 ===================================================== */
@@ -2220,7 +2240,7 @@ function getMainCharacterStats(){
         ...base,
         maxHP:Math.round(base.maxHP*maxHpPassiveMultiplier),
         defense:Math.max(0,Math.round(buffedDefense*(1-defenseDownPercent/100))),
-        accuracy:Math.round(base.accuracy*(1+getActiveAccuracyBonusPercent(player)/100))+(getLearnedElementEX(player,"wind")?Number(skillDatabase.windEX.accuracyBonusPercent)||0:0),
+        accuracy:base.accuracy,
         evasion:combineEvasionRates([base.evasion,evasionBuffPercent,windEXLevel>0?Number(skillDatabase.windEX.evasionBonusPercent)||0:0,-getFrostbiteFinalPercentPointPenalty(player)])
     };
 }
@@ -2310,7 +2330,7 @@ function getAdditionalCharacterBattleStats(character,characterKey){
         ...base,
         maxHP:Math.round(base.maxHP*maxHpPassiveMultiplier),
         defense:Math.max(0,Math.round(buffedDefense*(1-defenseDownPercent/100))),
-        accuracy:Math.round(base.accuracy*(1+getActiveAccuracyBonusPercent(character)/100))+(getLearnedElementEX(character,"wind")?Number(skillDatabase.windEX.accuracyBonusPercent)||0:0),
+        accuracy:base.accuracy,
         evasion:combineEvasionRates([base.evasion,evasionBuffPercent,windEXLevel>0?Number(skillDatabase.windEX.evasionBonusPercent)||0:0,-getFrostbiteFinalPercentPointPenalty(character)])
     };
 }
@@ -12620,13 +12640,13 @@ function calculateDamage(
    - 目標最終閃躲 - 最終命中下降。
 
    所有百分比效果皆是「最終百分點」加減，不再先封頂命中後
-   乘上 (1 - 閃躲率)。最後統一限制在 70%～99%。
+   乘上 (1 - 閃躲率)。最後統一限制在 5%～99%。
    普通怪物未明確指定 evasion 時，使用 min(10%, 等級×0.1%)。
 ===================================================== */
 
 const HIT_CHANCE_BASE = 95;
 const HIT_CHANCE_ACCURACY_COEFFICIENT = 0.15;
-const HIT_CHANCE_MIN_PERCENT = 70;
+const HIT_CHANCE_MIN_PERCENT = 5;
 const HIT_CHANCE_MAX_PERCENT = 99;
 
 
@@ -13556,7 +13576,7 @@ function resolveQueuedPlayerAction(characterIndex,token){
    命中判定的所有加減效果都在最後以百分點結算。
    directChanceReductionPercent 是最終命中下降，
    directChanceBonusPercent 是最終命中提升。
-   目標閃躲同樣直接扣除百分點，最後才統一 clamp 70%～99%。
+   目標閃躲同樣直接扣除百分點，最後才統一 clamp 5%～99%。
 */
 
 function calculateHitChancePercent(
@@ -15961,7 +15981,7 @@ function castDamageSkill(skillId){
                     player,
                     "stun"
                 ),
-                getActiveAccuracyBonusPercent(player)
+                getFinalAccuracyBonusPercent(player)
             );
 
 
@@ -17033,7 +17053,7 @@ function normalAttack(){
                     player,
                     "stun"
                 ),
-                getActiveAccuracyBonusPercent(player)
+                getFinalAccuracyBonusPercent(player)
             );
 
 
@@ -17882,7 +17902,7 @@ function processSingleMonsterAttack(monsterIndex,token){
                         monster,
                         "stun"
                     ),
-                    getActiveAccuracyBonusPercent(monster)
+                    getFinalAccuracyBonusPercent(monster)
                     ,targetCharacter
                 );
 
@@ -20882,7 +20902,7 @@ function secondaryCharacterNormalAttack(characterIndex,index){
         stats.accuracy,
         getMonsterEvasion(monster),
         getMonsterDebuffValue(character,"stun"),
-        getActiveAccuracyBonusPercent(character)
+        getFinalAccuracyBonusPercent(character)
     );
 
     if(!hit){
@@ -21027,7 +21047,7 @@ function castSecondaryCharacterSkill(characterIndex,skillId,centerIndex){
             stats.accuracy,
             getMonsterEvasion(monster),
             getMonsterDebuffValue(character,"stun"),
-        getActiveAccuracyBonusPercent(character)
+        getFinalAccuracyBonusPercent(character)
     );
 
         if(!hit){
@@ -21230,7 +21250,7 @@ function player2NormalAttack(index){
                     player2,
                     "stun"
                 ),
-                getActiveAccuracyBonusPercent(player2)
+                getFinalAccuracyBonusPercent(player2)
             );
 
 
@@ -21600,7 +21620,7 @@ function castPlayer2Skill(skillId,centerIndex){
                     player2,
                     "stun"
                 ),
-                getActiveAccuracyBonusPercent(player2)
+                getFinalAccuracyBonusPercent(player2)
             );
 
 
@@ -29961,7 +29981,7 @@ function openInventoryCharacterDetail(){
             `
         ).join("")+
         `<div class="inventory-character-detail-note">
-            最終命中率＝95%＋獨立命中詞條×0.15%＋其他最終命中加成－目標最終閃避與命中下降，最後限制70%～99%。<br>
+            最終命中率＝95%＋獨立命中詞條×0.15%＋其他最終命中加成－目標最終閃避與命中下降，最後限制5%～99%。<br>
             命中、閃避、異常抗性來自獨立戰鬥詞條或效果；敏捷只提高出手速度。
         </div>`;
 
