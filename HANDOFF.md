@@ -1,3 +1,11 @@
+## 2026-10-02 — RELEASE-SUITES-P0-20261002（第一批接續）
+
+- 從即時最新 dev `50dd9d50988ab117054a0ded9db6344a028110c4` 建立 `fix/v17373-release-suite-recovery-20261002`；接續已合併 #758，main 禁止修改。
+- 原45個非環境失敗檔重跑：11 PASS、34 FAIL（TZ=UTC）。完整清單／已修檔案在 release/v17373-scope.json；這是診斷 sweep，不是完整正式發布 CI PASS。P0 與 requirement 保持 BLOCKED，版本／Cache 173.72，不啟動 Freeze。
+- 只修改測試與交接／證據。怪物經驗 fixture 接受既有第五個 portraitKey 參數；森林新名稱水靈狐；自動 tri 選目標補現行依賴；觸控 fixture 遷移到 FourSymbolsGestureArbiter.findScrollOwner 並保留實際 overflow／單指原生捲動／pinch 契約；日常四個已替換素材對齊 existing，歷史 batch 不修改；V152 技能點改呼叫正式 display owner、浮字 lane／導覽 owner／35%凍傷來源遷移；洪水猛獸飛行與轉段保持原圖0度，位移、命中、1350ms與dispose斷言保留。
+- 11檔全部本機 exit=0，production build:check PASS。status-help 的 Browser 子檢查因無Chrome未執行；不宣稱手機介面已驗證。遠端PR／CI／DEV部署待核對，後續從同Work ID／分支續接，不另開同目的PR。
+- 下一步逐項遷移剩餘34檔已確認失敗；不得把全部當過期測試、刪斷言或改CI。完整發布測試與最終候選驗收通過前不得把P0改VERIFIED。
+
 ## 2026-10-02 — RELEASE-SCOPE-P0-20261002
 
 - 即時基線 dev `5de3e04690b9f20569b7e789240488f33aa4cd40`、main `4b037b47967544d90c781ad938286777c9576731`。本次 NORMAL DEVELOPMENT 收斂，結論 RELEASE BLOCKED：1 項真正 P0（完整正式發布 Node suites 尚有45個非環境失敗測試檔）。不是45個已確認遊戲bug。

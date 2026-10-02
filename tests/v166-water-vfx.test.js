@@ -758,8 +758,8 @@ test("Tidal Beast cast/flight/impact metadata is shared for both sides and all t
             assert.match(frames[0].transform,/0px\).*rotate\(0deg\)/,"cast stays upright at caster");
             const dx=Number.parseFloat(sprite.style["--v143-sprite-dx"]),dy=Number.parseFloat(sprite.style["--v143-sprite-dy"]);
             const angle=Math.atan2(dy,dx)*180/Math.PI;
-            assert.ok(frames[2].transform.endsWith("rotate("+angle+"deg)"),"right-facing beast points toward actual target");
-            assert.ok(frames[4].transform.endsWith("rotate("+(angle-90)+"deg)"),"authored downward frame uses its own correction");
+            assert.match(frames[2].transform,/rotate\(0deg\)$/,"flight preserves the authored upright orientation");
+            assert.match(frames[4].transform,/rotate\(0deg\)$/,"turn preserves the authored upright orientation");
             assert.ok(frames[6].transform.includes(dx+"px")&&frames[6].transform.includes(dy+"px"));
             assert.match(frames[6].transform,/rotate\(0deg\)$/,"impact is upright at destination");
             assert.equal(sprite.motionOptions.duration,1350);

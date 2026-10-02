@@ -333,7 +333,7 @@
           ".github/scripts/ci.mjs"
         ],
         "verification": "完整 suite preflight、dev workflow skip 條件核對、兩項最小 fixture 修復與 UTC 公告測試重驗",
-        "result": "45 個非環境失敗測試檔仍未解除；不能進入 Release Freeze。完整失敗清單與限制見 scope JSON。"
+        "result": "第一批11個原失敗測試檔已完成最小契約／fixture遷移且本機通過；仍有34個非環境失敗檔與完整Chrome發布驗收待完成，P0保持BLOCKED。"
       }
     }
   ]
