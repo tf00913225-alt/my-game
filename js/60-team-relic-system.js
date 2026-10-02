@@ -163,7 +163,7 @@
                 effect("debuff_all_enemies",{attackDownKey:"attackDown",accuracyDownKey:"accuracyDown",durationRounds:1})
             ])],
             limitText:"BOSS套用較低效率；不造成全體硬控。",
-            nextText:{10:"降攻12%並追加命中-5%",20:"降攻15%、最終命中-8%"}
+            nextText:{10:"降攻12%並追加最終命中-5%",20:"降攻15%、最終命中-8%"}
         },
         {
             id:"relic_tiangang_banner",category:"defense",tags:["attack","defense","anti_swarm"],rarity:"orange",maxLevel:20,iconPath:"assets/relics/icons/relic_tiangang_banner.webp",runtimeReady:true,defaultUnlocked:true,unlockSource:null,

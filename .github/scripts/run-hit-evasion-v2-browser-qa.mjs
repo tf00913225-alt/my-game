@@ -48,8 +48,8 @@ const expression=`(async()=>{
     player.statusEffects=[{type:"frostbite",turnsLeft:2}];
     const frostbite=getMainCharacterStats().evasion;
     player.activeBuffs=[];player.statusEffects=[];player.hp=getMainCharacterStats().maxHP;
-    const freshMonsters=()=>{monsters=[makeZoneMonster("QA",1,"fire")];monsters[0].hp=monsters[0].maxHP=100000;monsters[0].alive=true;monsters[0].accuracy=0;currentZone="forest";mapCooldown=false;autoBattle=false;startBattle(0);};
-    const waitRelic=async()=>{const deadline=Date.now()+5000;while(!v174RelicDebugState()&&Date.now()<deadline)await new Promise(r=>setTimeout(r,20));if(!v174RelicDebugState())throw new Error("Real relic battle did not initialize");};
+    const freshMonsters=()=>{monsters=[makeZoneMonster("QA",1,"fire")];monsters[0].hp=monsters[0].maxHP=100000;monsters[0].alive=true;monsters[0].accuracy=0;currentZone="forest";mapCooldown=false;autoBattle=false;autoConfig.enabled=false;startBattle(0);startTurn(battleToken);};
+    const waitRelic=async()=>{const deadline=Date.now()+5000;while(!v174RelicDebugState()&&Date.now()<deadline)await new Promise(r=>setTimeout(r,20));if(!v174RelicDebugState())throw new Error("Real relic battle did not initialize: "+JSON.stringify({battleActive,battleToken,turn,log:document.getElementById("battleLog")?.textContent}));};
     const relicOwned=v174RelicSystem.getOwnedState(),loadout=v174RelicSystem.getTeamLoadout();
     const feather=[];
     for(const level of [1,10,20]){
@@ -75,7 +75,7 @@ const expression=`(async()=>{
     const combat={};
     try{
         freshMonsters();selectedMonster=0;normalAttack();combat.manual=calls.splice(0);
-        queuedPlayerActions[0]={action:"normal",target:0};resolveQueuedPlayerAction(0,battleToken);combat.autoResolution=calls.splice(0);
+        autoBattle=true;autoConfig.skill="normal";autoActionForCharacter(0,battleToken);autoBattle=false;resolveQueuedPlayerAction(0,battleToken);combat.autoResolution=calls.splice(0);
         monsters[0].skillChance=0;monsters[0].skill=null;monsters[0].skills=[];processSingleMonsterAttack(0,battleToken);combat.monster=calls.splice(0);
     }finally{calculateHitChancePercent=owner;loseBattle();}
     return {wind,lowCap,levels,calm,dodge,set:{one,three,two,armor},detail,migrated,repeated,tower,frostbite,feather,bell,blessing,combat,

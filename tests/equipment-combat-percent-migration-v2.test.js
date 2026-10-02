@@ -33,4 +33,9 @@ const before=structuredClone(invalid);assert.throws(()=>migrateItem(invalid));as
 assert.throws(()=>migrateItem({equipmentCombatPercentUnitVersion:3,stats:{accuracy:20}}));
 const current={equipmentCombatPercentUnitVersion:2,stats:{accuracy:10,evasion:10}};
 assert.deepEqual(projectItem(current),current,"new percentage items never converted");
+const fs=require("node:fs"),vm=require("node:vm");
+const inventorySource=fs.readFileSync("js/55-v173.51-inventory-qa.js","utf8");
+const statFunction=inventorySource.split("\n").find(line=>line.startsWith("function statText("));
+const ui=vm.runInNewContext('const num=v=>Number.isFinite(Number(v))?Number(v):0;'+statFunction+';statText');
+assert.equal(ui({stats:{accuracy:1.5,evasion:10},reforgeStats:{accuracy:0.3,evasion:2}}),"命中 +1.8%　閃避 +12%","numeric reforge aggregation precedes the display suffix");
 console.log("V2 equipment unit migration: original and V1 Spirit, four sets, reforge separation, atomic failure, immutable archive projection and repeated-load PASS");

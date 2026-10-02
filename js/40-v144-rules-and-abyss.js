@@ -64,9 +64,9 @@
         const dodge=skillDatabase.dodgeSkill;
         if(dodge){
             Object.assign(dodge,{
-                learnCost:10,maxLevel:1,spCost:20,targetType:"allyAll",duration:2,
-                evasionBonusPercent:25,requires:["windCrossSlash","windHowlLightning"],
-                description:"需先學習風旋十字斬或風哮電擊其一。使我方全體閃躲率提升60%，持續2回合。"
+                learnCost:10,maxLevel:1,spCost:20,targetType:"allyAll",duration:3,
+                evasionBonusPercent:5,requires:["windCrossSlash","windHowlLightning"],
+                description:"需先學習風旋十字斬或風哮電擊其一。使我方全體最終閃躲率提升5%，持續3回合。"
             });
         }
         const stealth=skillDatabase.stealthSkill;
@@ -81,8 +81,8 @@
         if(calm){
             Object.assign(calm,{
                 learnCost:20,maxLevel:1,spCost:77,targetType:"allyAll",duration:3,
-                statusResistBonus:45,accuracyBonusPercent:50,requires:["stealthSkill"],
-                description:"需先學習隱身術。使我方全體異常狀態抗性提升45%、命中提升50%，持續3回合。"
+                statusResistBonus:45,accuracyBonusPercent:5,requires:["stealthSkill"],
+                description:"需先學習隱身術。使我方全體異常狀態抗性提升45%、最終命中提升5%，持續3回合。"
             });
         }
         const earthShield=skillDatabase.earthShield;

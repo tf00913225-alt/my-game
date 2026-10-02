@@ -1668,4 +1668,21 @@ test("V2 final percent sources, naked levels, Calm, Dodge, Wind EX and low-HP ca
     assert.deepEqual(evidence.dodge,[5,10,15,20,25]);
 });
 
+test("V2 explicit monster hit fields survive daily party-level and beginner power scaling",()=>{
+    const runtime=loadFinalRuntime();
+    const values=evaluateJson(runtime.context,`(()=>{
+        const daily=[1,20,100].map(highestPartyLevel=>{
+            window.v132ActiveDungeonRun={partySize:1,highestPartyLevel};
+            const monster={v173DailyDungeonType:"exp",accuracy:10,evasion:8,attack:100,maxHP:1000,hp:1000};
+            v17342NormalizeDailyDungeonMonster(monster);
+            return [monster.accuracy,monster.evasion,calculateHitChancePercent(monster.accuracy,monster.evasion,0,0)];
+        });
+        const beginner={accuracy:10,evasion:8,attack:100,maxHP:1000,hp:1000};
+        v17342NormalizeBeginnerForestMonster(beginner);
+        return {daily,beginner:[beginner.accuracy,beginner.evasion,beginner.attack]};
+    })()`);
+    assert.deepEqual(values.daily,[[10,8,97],[10,8,97],[10,8,97]]);
+    assert.deepEqual(values.beginner,[10,8,50]);
+});
+
 console.log("\nV170 final integration suite: "+passed+" tests passed.");
