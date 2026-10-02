@@ -1,0 +1,82 @@
+{
+  "date": "2026-10-02",
+  "title": "鍛造與裝備寶石第一階段",
+  "workId": "FORGE-SOCKETS-GEMS-20261002",
+  "base_branch": "dev",
+  "base_sha": "60c1aab27567e2c1e64604b95a0979e97806f59b",
+  "work_branch": "feature/forge-sockets-gems-20261002",
+  "officialVersion": "173.72",
+  "status": "IMPLEMENTED",
+  "change_classification": {
+    "replacement": [
+      "圖鑑可見入口→鍛造",
+      "冶煉控制來源搬至鍛造"
+    ],
+    "additive": [
+      "可選 sockets 欄位",
+      "最小寶石定義與屬性匯總"
+    ],
+    "removal": [
+      "可見圖鑑 renderer",
+      "冶煉圖紙依賴"
+    ]
+  },
+  "requirements": [
+    {
+      "id": 1,
+      "title": "入口與冶煉搬遷",
+      "request": "圖鑑入口退役，鍛造包含冶煉／鑲嵌；圖鑑擊殺紀錄保留。",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": 2,
+      "title": "冶煉材料",
+      "request": "取消圖紙檢查與扣除，沿用礦石、金幣與原有冶煉規則。",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": 3,
+      "title": "孔位與相容",
+      "request": "白藍紫0、橙1、紅／粉2、萬象／四象3，舊裝備無 sockets 視為空。",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": 4,
+      "title": "最小寶石模型",
+      "request": "gemVitalityI 體質 +1 可識別與選擇；未新增掉落率、商店價或大規模平衡。",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": 5,
+      "title": "鑲嵌與屬性",
+      "request": "本機 UID 原型扣一顆、填空孔並存檔；满孔、未知資料、失敗回滾及換装移除加成。",
+      "status": "IMPLEMENTED"
+    },
+    {
+      "id": 6,
+      "title": "手機介面",
+      "request": "遊戲風格選擇器、單一內文捲動；390／412 真實 production 觸控驗證待 CI。",
+      "status": "IMPLEMENTED"
+    }
+  ],
+  "evidence": {
+    "local": [
+      "node tests/forge-sockets-gems.test.js",
+      "node tests/v173.58-reforge-redesign.test.js",
+      "node tests/v173.28-main-city-lobby.test.js",
+      "node tests/premium-functional-ui-batch4.test.js",
+      "node tests/premium-functional-ui-batch5.test.js",
+      "node tests/responsive-window-item-owner-convergence.test.js",
+      "node tests/gameplay-context-nav-actions-20260915.test.js",
+      "git diff --check"
+    ],
+    "browserScript": ".github/scripts/run-forge-sockets-browser-qa.mjs",
+    "browserResult": "PENDING",
+    "ciResult": "PENDING"
+  },
+  "boundaries": [
+    "未實作正式可信後端鑲嵌交易；帶雲端權威基底的角色拒絕本機鑲嵌。",
+    "寶石取得來源未定案；最小資料用於第一階段架構驗證，未發送玩家物品。",
+    "main 不變；必要 CI 與 production build 同步通過後才合併 dev。"
+  ]
+}

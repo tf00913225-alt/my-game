@@ -132,7 +132,9 @@ jobs:
 
       - name: Verify deployed Responsive Item production runtime
         id: responsive_item_live
-        run: node .github/scripts/run-responsive-item-browser-qa.mjs
+        run: |
+          node .github/scripts/run-responsive-item-browser-qa.mjs
+          node .github/scripts/run-forge-sockets-browser-qa.mjs
 
       - name: Upload deployed Responsive Item evidence
         if: always() && steps.responsive_item_live.outcome != 'skipped'

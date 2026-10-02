@@ -12,10 +12,10 @@ const shared=read("css/49-v169-rpg-ui.css");
 const info=read("css/38-v141-system-expansion.css");
 const quest=read("css/25-stage-v90-quest-interface-core.css");
 const qa=read("css/53-v173.51-qa.css");
-assert.match(main,/function renderBestiaryContent\(\)/);
+assert.doesNotMatch(main,/function renderBestiaryContent\(\)/);
 assert.match(main,/bestiaryData/);
 assert.match(main,/achievementState/);
-assert.match(main,/type==="bestiary"/);
+assert.doesNotMatch(main,/type==="bestiary"/);
 assert.match(main,/type==="announcement"/);
 assert.match(ui,/ANNOUNCEMENT_READ_KEY=window\.FourSymbolsAccountSave\.accountKey\("announcement-read"\)/);
 assert.match(saves,/v141_announcement_read:"announcement-read"/);
@@ -38,4 +38,4 @@ assert.match(qa,/v17351-achievement-card>button\{[^{}]*min-height:44px!important
 assert.match(qa,/v17351-achievement-pager button\{[^{}]*min-height:44px!important/);
 assert.match(qa,/quest-mode \.quest-tab\{[^{}]*min-height:44px!important/);
 assert.match(qa,/quest-mode \.quest-claim-btn\{[^{}]*min-height:44px!important/);
-console.log("✓ premium functional UI batch 5 preserves achievement, announcement, bestiary, quest and modal runtimes");
+console.log("✓ premium functional UI batch 5 preserves achievement, announcement, quest and modal runtimes");

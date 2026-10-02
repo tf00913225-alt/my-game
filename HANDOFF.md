@@ -4520,3 +4520,14 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 - Image-reviewed replacements: `炎殼長戟蟲→赤甲槍蟲`, `赤炎修羅王→六臂修羅`, `虛空煉獄皇→獄輪魔尊`, `業火魔君王→業炎法王`, `終焉神魔皇→末炎祭司`, `熔岩巨獸王→熔翼獸王`, `烈焰巨魔王→炎錘巨魔`, `焚天龍獄皇→焚天炎龍`. All 40 fire asset-pool display names are now unique and 2–4 Unicode characters.
 - Canonical sources updated together: wild runtime rows in `js/00-main.js`, `config/monster-portrait-registry.json`, `config/monster-asset-provenance.json`, generated root/build manifests and the content-hashed app-shell bundle. No wrapper, alias resolver or temporary patch was added.
 - Targeted fire coverage, monster portrait runtime, portrait audit, permanent image asset gate, deterministic build check and diff check pass locally. The existing `fire-tower-runtime-identity-first-frame` isolation assertion still expects earth tower portraits to be absent, but earth portraits are now formally integrated; that unrelated stale test is not changed in this naming task. PR CI and exact dev deployment remain pending.
+
+
+## FORGE-SOCKETS-GEMS-20261002 接續施工（2026-10-02）
+
+沿用 PR #751／feature/forge-sockets-gems-20261002，依最新 dev 60c1aab 保留 #750 命中／閃避成果，無 rebase／force push／main 修改。鍛造與寶石原始第一階段規格允許最小寶石模型，未要求先新增整套掉落或平衡。
+
+正式 owner：js/36-v141-content-systems.js 的 renderSocketTab、v141SocketGem、renderReforgeTab；js/00-main.js 的 getEquipmentSocketCapacity、getSocketGemStats、getEquipmentBonus。可見 native selectors 已替換為自有 details／button 選擇器，沿用合成內文 scroller，沒有新增 late wrapper。鑲嵌拒絕未知孔資料、重複 UID、超容量與帶雲端權威基底角色；存檔失敗還原孔與寶石。最小 gemVitalityI 體質+1，沒有新增掉落或商店來源。
+
+本機孔數、舊存檔、換裝、滿孔不扣料與回滾回歸通過；390／412 production QA 已接既有 CI 的 Responsive Item 步驟。此工作區無完整二進位素材／Chrome，正式 build 交由現有 CI build-sync evidence 建置後回填，未偽造建置成功。對應 requirement-batches/2026-10-02-forge-sockets-gems.json。
+
+待完成：取得最新提交正式建置產物、必要 CI 與手機 production QA；通過才合併 dev／驗證部署。正式可信後端鑲嵌與宝石取得来源另階段，不可宣稱本機原型等於正式交易；main 仍禁止發布。

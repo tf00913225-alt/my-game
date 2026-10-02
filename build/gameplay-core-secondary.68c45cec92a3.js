@@ -8148,7 +8148,7 @@ function maximizeSynthesisPanel(){
     if(!modal||!modal.classList.contains("v141-synthesis-modal")){return;}
     const box=modal.querySelector(".home-feature-modal-box");
     const body=document.getElementById("homeFeatureModalBody");
-    setImp(modal,"padding","4px");
+    // Crafting outer spacing is owned by CSS49 for every render path.
     setImp(box,"width","calc(100% - 8px)");
     setImp(box,"max-width","none");
     setImp(box,"height","calc(100% - 8px)");
@@ -8253,7 +8253,7 @@ window.v148ShowDailyDungeonPreview=function(type){
         ],note:"重點養成資源一眼看懂，不再用獎勵圖片佔據版面。"},
         material:{title:"材料副本獎勵預覽",groups:[
             {title:"材料寶箱",badge:"×1～3",text:"通關回合越少，取得寶箱數越高；寶箱內含礦石、裝備設計圖等養成材料。"},
-            {title:"用途",text:"礦石與同部位設計圖可用於裝備製作、冶煉，以及材料升階合成。"}
+            {title:"用途",text:"礦石可用於冶煉；設計圖紙保留在背包，可用於既有材料升階合成。"}
         ],note:"寶箱數量依副本結算規則決定。"},
         gold:{title:"金幣副本獎勵預覽",groups:[
             {title:"金幣獎勵",badge:"GOLD",text:"依目前副本難度與結算規則獲得金幣，通關後直接入帳。"},
@@ -8277,7 +8277,6 @@ function ensureFunctionalStyles(){
 #game-stage .v169-material-art.v169-rarity-orange:not(.inventory-backpack-rarity-neutral),#game-stage .v169-material-art.v169-rarity-perfect:not(.inventory-backpack-rarity-neutral){color:#FF9F38!important;border-color:#FF9F38!important;box-shadow:0 0 9px rgba(255,159,56,.9),inset 0 0 8px rgba(255,159,56,.35)!important;}
 #game-stage .v169-material-art.v169-rarity-pink:not(.inventory-backpack-rarity-neutral){color:#FF4FA7!important;border-color:#FF4FA7!important;box-shadow:0 0 10px rgba(255,79,167,.92),inset 0 0 8px rgba(255,79,167,.36)!important;}
 #game-stage .v169-material-art.v169-rarity-four-symbol:not(.inventory-backpack-rarity-neutral){color:#fff!important;border-color:transparent!important;background:linear-gradient(#090b0f,#090b0f) padding-box,conic-gradient(#42A5FF,#47D6A3,#C89B45,#FF5A36,#42A5FF) border-box!important;box-shadow:0 0 9px rgba(255,90,54,.32),0 0 13px rgba(66,165,255,.32)!important;}
-#game-stage #homeFeatureModal.v141-synthesis-modal{padding:4px!important;}
 #game-stage #homeFeatureModal.v141-synthesis-modal .home-feature-modal-box{width:calc(100% - 8px)!important;max-width:none!important;height:calc(100% - 8px)!important;max-height:calc(100% - 8px)!important;}
 #game-stage #dungeonPage:not(.v146-abyss-active) [data-dungeon-cover="equipment"] .v141-dungeon-cover-art{background-image:linear-gradient(180deg,transparent 58%,rgba(7,5,3,.38)),url("assets/dungeons/covers/equipment-v17363.png"),url("assets/dungeons/covers/equipment-v17343.png")!important;background-size:cover!important;background-position:center!important;}
 #game-stage .v17363-text-reward-preview{width:min(392px,calc(100% - 18px))!important;max-width:392px!important;padding:18px!important;border:1px solid rgba(213,164,82,.82)!important;border-radius:15px!important;background:radial-gradient(circle at 50% 0,rgba(232,177,77,.16),transparent 36%),linear-gradient(160deg,#22170e,#090807 76%)!important;box-shadow:0 22px 52px rgba(0,0,0,.78),inset 0 0 0 1px rgba(255,231,171,.07)!important;}
@@ -8408,6 +8407,7 @@ window.v17363CraftMaterial=function(kind){
     return true;
 };
 function ensureMaterialTab(){
+    if(document.getElementById("homeFeatureModal")?.dataset.craftingFeature==="forge"){ return; }
     const tabs=document.querySelector("#homeFeatureModalBody .v141-synthesis-tabs");
     if(!tabs){return;}
     let button=tabs.querySelector('[data-v17363-material-tab="1"]');
