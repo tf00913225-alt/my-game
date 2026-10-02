@@ -327,6 +327,7 @@ await assert.rejects(rollbackCheckin.claimDailyCheckin(atomicRequest),
     /simulated atomic check-in rollback/);
 assert.equal((await db.collection(`serverUsers/${atomicUid}/pendingGrants`).get()).empty,true);
 assert.equal((await db.collection(`serverUsers/${atomicUid}/ledgerEntries`).get()).empty,true);
+assert.equal((await db.collection(`serverUsers/${atomicUid}/rewardEvents`).get()).empty,true);
 assert.equal((await db.doc(`serverUsers/${atomicUid}/economy/current`).get()).get("gold"),0);
 await rejected("claimDailyCheckin",atomicUser.idToken,
     {...atomicRequest.data,expectedRevision:1},"ABORTED");
@@ -365,6 +366,13 @@ const reserveAtomic=()=>invoke("reserveTrustedGrant",atomicUser.idToken,{
     uid:atomicUid,session:atomicSession,grantId:atomicClaim.grantId,
     operationId:atomicOperation,expectedRevision:2});
 for(const [path,patch] of [
+    [`rewardEvents/${atomicClaim.grantId}`,{amount:5000}],
+    [`rewardEvents/${atomicClaim.grantId}`,{ownerUid:"other-uid"}],
+    [`rewardEvents/${atomicClaim.grantId}`,{periodDate:"19000101"}],
+    [`pendingGrants/${atomicClaim.grantId}`,{sourceEventSha256:"0".repeat(64)}],
+    [`pendingGrants/${atomicClaim.grantId}`,{eventType:"unsupported"}],
+    [`grantOperations/${atomicOperation}`,{sourceEventSha256:"0".repeat(64)}],
+    [`ledgerEntries/${atomicOperation}`,{sourceEventSha256:"0".repeat(64)}],
     ["playableSnapshots/3",null],["recoveryArchives/3",null],
     ["recoveryArchives/2",null],
     ["playableSnapshots/3",{sha256:"0".repeat(64)}],
@@ -393,6 +401,8 @@ assert.equal((await replayAtomic()).unchanged,true);
 assert.equal((await reserveAtomic()).creditedToCharacter,true);
 assert.equal((await atomicRoot.collection("ledgerEntries").get()).size,1);
 assert.equal((await atomicRoot.collection("uniqueClaims").get()).size,1);
+const atomicEvent=atomicRoot.collection("rewardEvents").doc(atomicClaim.grantId);
+assert.equal((await atomicEvent.get()).get("sha256"),(await atomicLedger.get()).get("sourceEventSha256"));
 console.log("Credited grant evidence: callable corruption/missing-proof/collision retries rejected without writes.");
 // The server day and the 50 gold award are owned by the issuer, not the request.
 let checkinTime=Date.parse("2026-09-27T15:59:59Z");
@@ -411,9 +421,18 @@ abortCheckin=true;
 await assert.rejects(checkinIssuer.issue(yRequest),/simulated check-in rollback/);
 abortCheckin=false;
 assert.equal((await checkinRef.get()).exists,false);
+const checkinEventRef=db.doc(`serverUsers/${y}/rewardEvents/daily-checkin-20260927`);
+assert.equal((await checkinEventRef.get()).exists,false);
 assert.equal((await checkinIssuer.issue(yRequest)).grantId,"daily-checkin-20260927");
 assert.equal((await checkinIssuer.issue(yRequest)).unchanged,true);
 assert.equal((await checkinRef.get()).get("amount"),50);
+assert.equal((await checkinEventRef.get()).get("sha256"),
+    (await checkinRef.get()).get("sourceEventSha256"));
+const savedCheckinEvent=(await checkinEventRef.get()).data();
+await checkinEventRef.delete();
+await assert.rejects(checkinIssuer.issue(yRequest),e=>e.code==="failed-precondition");
+assert.equal((await checkinEventRef.get()).exists,false);
+await checkinEventRef.set(savedCheckinEvent);
 assert.equal((await db.doc(`users/${y}/saves/current`).get()).get("serverRevision"),2);
 checkinTime=Date.parse("2026-09-27T16:00:00Z");
 assert.equal((await checkinIssuer.issue(yRequest)).grantId,"daily-checkin-20260928");
@@ -995,6 +1014,13 @@ await rejected("protectedTest",yUser.idToken,{uid:y,session:{...sessionB,uid:y}}
 assert.equal((await invoke("protectedTest",yUser.idToken,{uid:y,session:sessionY})).uid,y);
 const beforeCheckin=(await db.doc(`users/${y}/saves/current`).get()).get("serverRevision");
 const checkinOperation="daily-checkin-credit-emulator-0001";
+const uncreditedGrant=(await checkinRef.get()).data();
+await checkinEventRef.update({amount:5000});
+await rejected("reserveTrustedGrant",yUser.idToken,{uid:y,session:sessionY,
+    grantId:"daily-checkin-20260927",operationId:checkinOperation,
+    expectedRevision:beforeCheckin},"DATA_LOSS");
+assert.deepEqual((await checkinRef.get()).data(),uncreditedGrant);
+await checkinEventRef.set(savedCheckinEvent);
 const reservedCheckin=await invoke("reserveTrustedGrant",yUser.idToken,{
     uid:y,session:sessionY,grantId:"daily-checkin-20260927",
     operationId:checkinOperation,expectedRevision:beforeCheckin});
@@ -1005,6 +1031,21 @@ const settledCheckin=await goldWriter.creditReservedGrant(yRequest,{
     expectedRevision:beforeCheckin+1});
 assert.equal(settledCheckin.creditRevision,beforeCheckin+2);
 assert.equal((await checkinIssuer.issue(yRequest)).status,"credited");
+const creditedEconomy=(await db.doc(`serverUsers/${y}/economy/current`).get()).data();
+await checkinEventRef.delete();
+for(const retry of [
+    ()=>goldWriter.creditReservedGrant(yRequest,{grantId:"daily-checkin-20260927",
+        operationId:checkinOperation,expectedRevision:beforeCheckin+1}),
+    ()=>invoke("reserveTrustedGrant",yUser.idToken,{uid:y,session:sessionY,
+        grantId:"daily-checkin-20260927",operationId:checkinOperation,
+        expectedRevision:beforeCheckin+1})]){
+    await assert.rejects(retry(),e=>["failed-precondition","FAILED_PRECONDITION"].includes(e.code));
+}
+assert.deepEqual((await db.doc(`serverUsers/${y}/economy/current`).get()).data(),creditedEconomy);
+assert.equal((await checkinEventRef.get()).exists,false);
+await checkinEventRef.set(savedCheckinEvent);
+assert.equal((await goldWriter.creditReservedGrant(yRequest,{grantId:"daily-checkin-20260927",
+    operationId:checkinOperation,expectedRevision:beforeCheckin+1})).unchanged,true);
 assert.equal((await db.doc(`serverUsers/${y}/claimRecords/daily-checkin-20260927`).get())
     .get("status"),"claimed");
 assert.equal((await db.doc(`serverUsers/${y}/playableSnapshots/${beforeCheckin+2}`).get())

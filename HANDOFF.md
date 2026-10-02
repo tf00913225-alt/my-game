@@ -4532,6 +4532,13 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 
 待完成：取得最新提交正式建置產物、必要 CI 與手機 production QA；通過才合併 dev／驗證部署。正式可信後端鑲嵌與宝石取得来源另階段，不可宣稱本機原型等於正式交易；main 仍禁止發布。
 
+## 2026-10-02 — CLOUDSAVE-CHECKIN-EVENT-PROOF-20261002 (candidate)
+
+- Base `dev@b61f87d804edcbb8202c16bfd17f9d8cd78bf115`; branch `feature/cloud-checkin-event-proof-20261002`; target dev, main excluded. Resumes after merged #744 reward retry evidence and #748 session persistence; neither is repeated.
+- Additive server-owned source proof for the existing daily check-in only. `daily-checkin-event-evidence.js::readDailyCheckinEvidence` verifies immutable private `rewardEvents/{daily-checkin-day}` identity, Taipei period, canonical 50 gold, original character/revision and SHA-256 binding. `daily-checkin-grant.js::issue` and `canonical-resource-credit.js::settle` create the event atomically with a new grant/credit. Reservation, settlement and credited retries bind the same event digest in grant, receipt and ledger. Existing credential/session and snapshot/archive checks remain authoritative; no wrapper or second credit writer.
+- Missing/corrupt source proof blocks without repairing, backfilling or awarding. Old unbound daily grants are retained and fail `REWARD_EVENT_EVIDENCE_REQUIRED` or inconsistent-binding errors. An orphan event cannot authorize a recreated grant; daily grant IDs cannot bypass evidence by removing eventType. No browser writes, new callable, historical adoption, old-phone upload or playable projection is enabled. Generic internal server-issued grants are unchanged; browser battle outcomes remain untrusted and still require a server attempt/result path.
+- Targeted Node cloud tests 105/105 pass locally (12 new event cases). Existing Auth/Firestore/Functions emulator suite now asserts atomic event rollback, real callable event/receipt/ledger tamper refusal, missing event refusal through issuer/reservation/credit retries and exactly-once credit. Exact-head CI, merge, Firebase deployment and DEV SHA verification remain PENDING; no player data is used. Phase 4 stays 0/6 VERIFIED.
+- Next: run exact-head existing CI/emulator gates; integrate via PR after all necessary checks pass; verify matching Firebase/DEV deployment and safely clean the completed branch. After this prerequisite, future combat/quest rewards still need an actual server-proven attempt outcome, not a client win flag.
 
 ## 2026-10-02 — 鍛造與寶石第一階段 dev 驗證收尾
 
@@ -4540,3 +4547,5 @@ PR #751 已合併 dev@b61f87d804edcbb8202c16bfd17f9d8cd78bf115。候選 run 3696
 第一階段 6/6 VERIFIED：入口／冶煉無圖紙／孔位相容／最小寶石／UID 本機安全鑲嵌與屬性／手機介面。候選 artifact 11209726733、部署 artifact 11210577025，forge/evidence.json 與390／412截圖；deployed-dev SHA 與 dev 一致。詳細證據 docs/qa/forge-sockets-gems-20261002.md。
 
 CSS49 統一合成／鍛造底部間距，退役 CSS38／JS58 的衝突設定。正式後端交易與寶石取得來源未實作；雲端權威角色拒絕本機鑲嵌。Chrome 模擬手機不是 Android 實體裝置驗收；未寫玩家雲端或發送物品。版本不增加，main 未修改，未正式發布。
+
+- CLOUDSAVE-CHECKIN-EVENT-PROOF-20261002 / PR #754 integration checkpoint: preserved both HANDOFF sections and dev@1f144c2319cd14c66a778049a8bd6809a547492d forging verification records. Prior candidate 7430aa18 Repository checks 36969002462 / 110718831173 and Session Authority 36969002385 / 110719595619 passed; real callable/emulator assertions passed. Integration changes documentation/evidence only; runtime/build is unchanged, but final latest-head checks are still required. Shared daily-checkin-policy.js is the single reward/day policy; original exports remain compatible.

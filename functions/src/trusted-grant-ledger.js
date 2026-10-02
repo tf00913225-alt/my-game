@@ -3,6 +3,7 @@
 // Only a trusted backend can create a grant record. This owner reserves an
 // entitlement once; it never trusts a browser-supplied kind or amount.
 const {verifyCreditedGrant}=require("./credited-grant-evidence");
+const {readDailyCheckinEvidence}=require("./daily-checkin-event-evidence");
 const ID_PATTERN=/^[A-Za-z0-9_-]{16,64}$/;
 const GRANT_SCHEMA_VERSION=1;
 
@@ -56,6 +57,8 @@ function createTrustedGrantLedger({db,FieldValue,HttpsError,runProtected,inspect
                    grant.claimedByOperationId!==operationId){
                     fail("data-loss","Grant receipt is inconsistent.");
                 }
+                const proof=await readDailyCheckinEvidence({tx:transaction,root:privateRef,uid,grantId,grant,fail});
+                if(proof&&receipt.sourceEventSha256!==proof.sha256)fail("data-loss","Grant event binding is inconsistent.");
                 if(receipt.creditedToCharacter===true){
                     const [claim,claimRecord]=await Promise.all([
                         transaction.get(privateRef.collection("uniqueClaims").doc(grantId)),
@@ -95,12 +98,14 @@ function createTrustedGrantLedger({db,FieldValue,HttpsError,runProtected,inspect
             if(grant.status!=="pending"||grant.claimedByOperationId!==null){
                 fail("already-exists","Grant already has a receipt.");
             }
+            const proof=await readDailyCheckinEvidence({tx:transaction,root:privateRef,uid,grantId,grant,fail});
             const revision=nextRevision(envelope);
             const timestamp=FieldValue.serverTimestamp();
             transaction.update(grantRef,{status:"reserved",claimedByOperationId:operationId,reservedAt:timestamp});
             transaction.create(receiptRef,{
                 schemaVersion:GRANT_SCHEMA_VERSION,ownerUid:uid,grantId,operationId,
                 kind:grant.kind,amount:grant.amount,serverRevision:revision,
+                ...(proof?{sourceEventSha256:proof.sha256}:{}),
                 creditedToCharacter:false,createdAt:timestamp
             });
             transaction.update(saveRef,{serverRevision:revision,updatedAt:timestamp});
