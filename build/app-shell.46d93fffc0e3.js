@@ -29973,7 +29973,7 @@ function openInventoryCharacterDetail(){
         ["能量",stats.energy],
         ["敏捷",stats.agility],
         ["命中",stats.accuracy+"%"],
-        ["閃避",stats.evasion+"%"],
+        ["閃避",stats.evasion.toFixed(1)+"%"],
         ["異常抗性",stats.statusResistance.toFixed(1)+"%"],
         ["抗暴",stats.antiCrit.toFixed(1)+"%"],
         ["物理爆擊率",critical.physical.chance.toFixed(1)+"%"],
