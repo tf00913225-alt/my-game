@@ -7,7 +7,7 @@ import {ROOT,findChrome,startServer,waitJson,Cdp} from './runtime-browser-qa-sup
 const expression=`(async()=>{
  const check=(value,message)=>{if(!value)throw new Error(message);};
  const wait=async(test,ms=12000)=>{const end=performance.now()+ms;while(!test()&&performance.now()<end)await new Promise(r=>setTimeout(r,40));check(test(),'Runtime wait timeout');};
- await wait(()=>FourSymbolsStartupPolicy.getState()==='READY',30000);
+ await wait(()=>window.FourSymbolsStartupPolicy?.getState?.()==='READY',30000);
  await FourSymbolsFeatures.ensure('gameplay-core','tower-challenge-qa');
  await FourSymbolsFeatures.ensure('feature-boss-relic','tower-challenge-qa');
  autoBattle=false;autoConfig.enabled=false;autoPatrolEnabled=false;player.level=100;player.vitality=100000;player.energy=100000;
