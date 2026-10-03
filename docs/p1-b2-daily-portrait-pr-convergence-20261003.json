@@ -1,0 +1,960 @@
+{
+  "workId": "P1-B2-DAILY-PORTRAIT-20261003",
+  "target": "dev",
+  "baseDevSha": "4274454a30f25f5807fa589804413efe8ec13290",
+  "mainSha": "f63d69dbfa66ba75637d1c3cd7fcc7d74782e356",
+  "status": "VERIFIED — MERGE TO DEV REQUIRED BEFORE CLOSEOUT",
+  "prs": [
+    {
+      "number": 640,
+      "head": "fix/daily-dungeon-portrait-owner-convergence-20260928",
+      "headSha": "008eeb6a91c9588e3ccfa3069dea9116a70a6ed0",
+      "baseSha": "7097bb57000ac423ff7d7d5be853e4f6d67b2f36",
+      "changedFiles": [
+        ".github/scripts/run-daily-dungeon-portrait-browser-qa.mjs",
+        ".github/workflows/ci.yml",
+        "css/46-v154-dev-fixes.css",
+        "css/fixed-slot-battlefield-rendering-v2.css",
+        "js/42-v148-combat-dungeon-fixes.js",
+        "js/45-v154-dev-fixes.js",
+        "js/48-v159-abyss-battle-portraits.js",
+        "js/equipment-progression.js",
+        "tests/daily-dungeon-portrait-final-convergence.test.js"
+      ]
+    },
+    {
+      "number": 641,
+      "head": "fix/daily-dungeon-portrait-owner-convergence-20260928-r2",
+      "headSha": "df3dd30479b2f923ceb337b9060f3ae97314cc14",
+      "baseSha": "f082c8b06e7b3bbf27adcac74800ab9114d27d1b",
+      "changedFiles": [
+        ".github/scripts/run-daily-dungeon-portrait-browser-qa.mjs",
+        ".github/workflows/ci.yml",
+        "css/46-v154-dev-fixes.css",
+        "css/fixed-slot-battlefield-rendering-v2.css",
+        "js/42-v148-combat-dungeon-fixes.js",
+        "js/45-v154-dev-fixes.js",
+        "js/48-v159-abyss-battle-portraits.js",
+        "js/equipment-progression.js",
+        "tests/daily-dungeon-portrait-final-convergence.test.js"
+      ]
+    },
+    {
+      "number": 642,
+      "head": "fix/daily-dungeon-portrait-owner-convergence-20260928-r3",
+      "headSha": "78d91522ba3c7fb889ade28d0402edf03a01e7c5",
+      "baseSha": "f082c8b06e7b3bbf27adcac74800ab9114d27d1b",
+      "changedFiles": [
+        ".github/scripts/run-daily-dungeon-portrait-browser-qa.mjs",
+        ".github/workflows/ci.yml",
+        "css/46-v154-dev-fixes.css",
+        "css/fixed-slot-battlefield-rendering-v2.css",
+        "js/42-v148-combat-dungeon-fixes.js",
+        "js/45-v154-dev-fixes.js",
+        "js/48-v159-abyss-battle-portraits.js",
+        "js/equipment-progression.js",
+        "js/gameplay-boss-tower-system.js",
+        "tests/daily-dungeon-portrait-final-convergence.test.js"
+      ]
+    },
+    {
+      "number": 643,
+      "head": "fix/daily-dungeon-portrait-owner-convergence-20260928-r4",
+      "headSha": "78d91522ba3c7fb889ade28d0402edf03a01e7c5",
+      "baseSha": "f082c8b06e7b3bbf27adcac74800ab9114d27d1b",
+      "changedFiles": [
+        ".github/scripts/run-daily-dungeon-portrait-browser-qa.mjs",
+        ".github/workflows/ci.yml",
+        "css/46-v154-dev-fixes.css",
+        "css/fixed-slot-battlefield-rendering-v2.css",
+        "js/42-v148-combat-dungeon-fixes.js",
+        "js/45-v154-dev-fixes.js",
+        "js/48-v159-abyss-battle-portraits.js",
+        "js/equipment-progression.js",
+        "js/gameplay-boss-tower-system.js",
+        "tests/daily-dungeon-portrait-final-convergence.test.js"
+      ]
+    },
+    {
+      "number": 644,
+      "head": "fix/daily-dungeon-portrait-owner-convergence-20260928-r5",
+      "headSha": "debdbb6a49fe8b0f4ea968e07d79b83b576dd058",
+      "baseSha": "f082c8b06e7b3bbf27adcac74800ab9114d27d1b",
+      "changedFiles": [
+        ".github/scripts/run-daily-dungeon-portrait-browser-qa.mjs",
+        ".github/workflows/ci.yml",
+        "css/46-v154-dev-fixes.css",
+        "css/fixed-slot-battlefield-rendering-v2.css",
+        "js/42-v148-combat-dungeon-fixes.js",
+        "js/45-v154-dev-fixes.js",
+        "js/48-v159-abyss-battle-portraits.js",
+        "js/equipment-progression.js",
+        "js/gameplay-boss-tower-system.js",
+        "tests/daily-dungeon-portrait-final-convergence.test.js",
+        "tests/monster-portrait-runtime.test.js"
+      ]
+    },
+    {
+      "number": 645,
+      "head": "fix/daily-dungeon-portrait-owner-convergence-20260928-r9",
+      "headSha": "3371766a6c152bee79361bf523d2866093cd5994",
+      "baseSha": "f082c8b06e7b3bbf27adcac74800ab9114d27d1b",
+      "changedFiles": [
+        ".github/scripts/run-daily-dungeon-portrait-browser-qa.mjs",
+        ".github/workflows/ci.yml",
+        "css/46-v154-dev-fixes.css",
+        "css/fixed-slot-battlefield-rendering-v2.css",
+        "js/42-v148-combat-dungeon-fixes.js",
+        "js/45-v154-dev-fixes.js",
+        "js/48-v159-abyss-battle-portraits.js",
+        "js/equipment-progression.js",
+        "js/gameplay-boss-tower-system.js",
+        "tests/daily-dungeon-portrait-final-convergence.test.js",
+        "tests/monster-portrait-runtime.test.js"
+      ]
+    },
+    {
+      "number": 646,
+      "head": "fix/daily-dungeon-portrait-owner-convergence-20260928-r11",
+      "headSha": "d1669cd551665e271e7ebe8c9c5331c8d90569ea",
+      "baseSha": "f082c8b06e7b3bbf27adcac74800ab9114d27d1b",
+      "changedFiles": [
+        ".github/scripts/run-daily-dungeon-portrait-browser-qa.mjs",
+        ".github/workflows/ci.yml",
+        "css/46-v154-dev-fixes.css",
+        "css/fixed-slot-battlefield-rendering-v2.css",
+        "js/42-v148-combat-dungeon-fixes.js",
+        "js/45-v154-dev-fixes.js",
+        "js/48-v159-abyss-battle-portraits.js",
+        "js/equipment-progression.js",
+        "js/gameplay-boss-tower-system.js",
+        "tests/daily-dungeon-portrait-final-convergence.test.js",
+        "tests/monster-portrait-runtime.test.js"
+      ]
+    },
+    {
+      "number": 647,
+      "head": "fix/daily-dungeon-portrait-owner-convergence-20260928-r12",
+      "headSha": "1503a7d67473464443bb80793b2e763c997bc975",
+      "baseSha": "f082c8b06e7b3bbf27adcac74800ab9114d27d1b",
+      "changedFiles": [
+        ".github/scripts/run-daily-dungeon-portrait-browser-qa.mjs",
+        ".github/workflows/ci.yml",
+        "asset-manifest.json",
+        "build/asset-manifest.json",
+        "build/feature-boss-relic.0656110aaad6.js",
+        "build/feature-boss-relic.6d5ac77bf0f7.js",
+        "build/gameplay-core-secondary.5b669993c6ab.js",
+        "build/gameplay-core.bacc2df42518.css",
+        "css/46-v154-dev-fixes.css",
+        "css/fixed-slot-battlefield-rendering-v2.css",
+        "js/42-v148-combat-dungeon-fixes.js",
+        "js/45-v154-dev-fixes.js",
+        "js/48-v159-abyss-battle-portraits.js",
+        "js/equipment-progression.js",
+        "js/gameplay-boss-tower-system.js",
+        "tests/daily-dungeon-portrait-final-convergence.test.js",
+        "tests/monster-portrait-runtime.test.js"
+      ]
+    },
+    {
+      "number": 648,
+      "head": "fix/daily-dungeon-portrait-owner-convergence-20260928-r13",
+      "headSha": "ded3eebb7eb215e1a5cd7c9d1f6ab5cd6818255b",
+      "baseSha": "f082c8b06e7b3bbf27adcac74800ab9114d27d1b",
+      "changedFiles": [
+        ".github/scripts/run-daily-dungeon-portrait-browser-qa.mjs",
+        ".github/workflows/ci.yml",
+        "asset-manifest.json",
+        "build/asset-manifest.json",
+        "build/feature-boss-relic.0656110aaad6.js",
+        "build/feature-boss-relic.6d5ac77bf0f7.js",
+        "build/gameplay-core-secondary.5b669993c6ab.js",
+        "build/gameplay-core.bacc2df42518.css",
+        "css/46-v154-dev-fixes.css",
+        "css/fixed-slot-battlefield-rendering-v2.css",
+        "js/42-v148-combat-dungeon-fixes.js",
+        "js/45-v154-dev-fixes.js",
+        "js/48-v159-abyss-battle-portraits.js",
+        "js/equipment-progression.js",
+        "js/gameplay-boss-tower-system.js",
+        "tests/daily-dungeon-portrait-final-convergence.test.js",
+        "tests/monster-portrait-runtime.test.js"
+      ]
+    }
+  ],
+  "currentOwners": {
+    "selection": "js/45-v154-dev-fixes.js::resolveMonsterPortraitRecord / prepareDailyDungeonPortraits / syncCardlessPresentation",
+    "presentation": "js/54-v173.51-battle-qa.js::syncUnitArtwork",
+    "geometry": "js/battlefield-render-geometry-adapter.js / css/fixed-slot-battlefield-rendering-v2.css",
+    "launch": "js/42-v148-combat-dungeon-fixes.js::beginFormalDailyDungeon / activateDailyDungeonWave; js/equipment-progression.js::beginEquipmentDungeon",
+    "registry": "config/monster-portrait-registry.json",
+    "browserQA": ".github/scripts/run-daily-dungeon-webp-browser-qa.mjs"
+  },
+  "replacements": [
+    {
+      "pr": 657,
+      "commit": "0a0d5cb0c1d5a9edecc20b63f0e931c73f1a4e62",
+      "merge": "602117d9c1eac36b1881205226106e6b17f93d9f",
+      "capabilities": [
+        "V154 selection-only handoff",
+        "V174 sole artwork DOM",
+        "V159 retirement",
+        "retryable per-key decode",
+        "registry retry",
+        "formal/equipment Visual Ready"
+      ]
+    },
+    {
+      "pr": 661,
+      "merge": "2f5eae6b53143fa1a55eefc24a9cc93b62b13f02",
+      "capabilities": [
+        "valid nine WebP assets",
+        "browser decode and preparation"
+      ]
+    }
+  ],
+  "matrix": [
+    {
+      "requirement": "daily-identity",
+      "oldPRs": [
+        640,
+        641,
+        642,
+        643,
+        644,
+        645,
+        646,
+        647,
+        648
+      ],
+      "currentDev": "4274454a30f25f5807fa589804413efe8ec13290",
+      "status": "ABSORBED",
+      "evidence": "V148 explicit daily.type.rank keys; all nine Registry rows existing"
+    },
+    {
+      "requirement": "portrait-selection-registry",
+      "oldPRs": [
+        640,
+        641,
+        642,
+        643,
+        644,
+        645,
+        646,
+        647,
+        648
+      ],
+      "currentDev": "4274454a30f25f5807fa589804413efe8ec13290",
+      "status": "SUPERSEDED",
+      "evidence": "#657 V154 resolver and per-card V174.applyUnit handoff"
+    },
+    {
+      "requirement": "V154-selection-V174-presentation",
+      "oldPRs": [
+        640,
+        641,
+        642,
+        643,
+        644,
+        645,
+        646,
+        647,
+        648
+      ],
+      "currentDev": "4274454a30f25f5807fa589804413efe8ec13290",
+      "status": "SUPERSEDED",
+      "evidence": "#657; no V154 createElement(img), no duplicate artwork surface"
+    },
+    {
+      "requirement": "V159-retirement",
+      "oldPRs": [
+        640,
+        641,
+        642,
+        643,
+        644,
+        645,
+        646,
+        647,
+        648
+      ],
+      "currentDev": "4274454a30f25f5807fa589804413efe8ec13290",
+      "status": "SUPERSEDED",
+      "evidence": "#657; current V159 is a two-line marker without wrapper/timer/RAF"
+    },
+    {
+      "requirement": "per-key-decode-retry",
+      "oldPRs": [
+        640,
+        641,
+        642,
+        643,
+        644,
+        645,
+        646,
+        647,
+        648
+      ],
+      "currentDev": "4274454a30f25f5807fa589804413efe8ec13290",
+      "status": "SUPERSEDED",
+      "evidence": "#657; Promise.all of ensureAssets([record.path]), failures tracked per key, failed preparation removed"
+    },
+    {
+      "requirement": "registry-failure-retry",
+      "oldPRs": [
+        640,
+        641,
+        642,
+        643,
+        644,
+        645,
+        646,
+        647,
+        648
+      ],
+      "currentDev": "4274454a30f25f5807fa589804413efe8ec13290",
+      "status": "ABSORBED",
+      "evidence": "V154 request catch clears shared failed Promise"
+    },
+    {
+      "requirement": "formal-and-equipment-launch",
+      "oldPRs": [
+        640,
+        641,
+        642,
+        643,
+        644,
+        645,
+        646,
+        647,
+        648
+      ],
+      "currentDev": "4274454a30f25f5807fa589804413efe8ec13290",
+      "status": "SUPERSEDED",
+      "evidence": "Current beginFormalDailyDungeon / beginEquipmentDungeon await same V154 readiness; obsolete v148PrepareDailyDungeonLaunch adapter not restored"
+    },
+    {
+      "requirement": "regular-elite-boss-exp-material-gold",
+      "oldPRs": [
+        640,
+        641,
+        642,
+        643,
+        644,
+        645,
+        646,
+        647,
+        648
+      ],
+      "currentDev": "4274454a30f25f5807fa589804413efe8ec13290",
+      "status": "ABSORBED",
+      "evidence": "V148 canonical wave builder, nine valid 1024x1536 WebP assets"
+    },
+    {
+      "requirement": "asset-completeness-provenance",
+      "oldPRs": [
+        640,
+        641,
+        642,
+        643,
+        644,
+        645,
+        646,
+        647,
+        648
+      ],
+      "currentDev": "4274454a30f25f5807fa589804413efe8ec13290",
+      "status": "SUPERSEDED",
+      "evidence": "#661 c7eb1689 valid nine assets; old branches carry no independent image changes"
+    },
+    {
+      "requirement": "CSS46-artwork-retirement",
+      "oldPRs": [
+        640,
+        641,
+        642,
+        643,
+        644,
+        645,
+        646,
+        647,
+        648
+      ],
+      "currentDev": "4274454a30f25f5807fa589804413efe8ec13290",
+      "status": "MISSING",
+      "evidence": "Old img and card-background rules still shipped in CSS46; this current-dev integration physically removes them"
+    },
+    {
+      "requirement": "production-first-visible-mobile-QA",
+      "oldPRs": [
+        640,
+        641,
+        642,
+        643,
+        644,
+        645,
+        646,
+        647,
+        648
+      ],
+      "currentDev": "4274454a30f25f5807fa589804413efe8ec13290",
+      "status": "MISSING",
+      "evidence": "Current specialized QA only decode; add real production index/launch/waves/27-key-view pairs and screenshots in same QA owner"
+    },
+    {
+      "requirement": "old-browser-fixture",
+      "oldPRs": [
+        640,
+        641,
+        642,
+        643,
+        644,
+        645,
+        646,
+        647,
+        648
+      ],
+      "currentDev": "4274454a30f25f5807fa589804413efe8ec13290",
+      "status": "OBSOLETE",
+      "evidence": "Playwright closure assertion error / hardcoded retired bundle filenames / duplicate html declaration / synthetic DOM and no-op decoder; retain requirements, not fixture"
+    },
+    {
+      "requirement": "old-contract-test-path",
+      "oldPRs": [
+        640,
+        641,
+        642,
+        643,
+        644,
+        645,
+        646,
+        647,
+        648
+      ],
+      "currentDev": "4274454a30f25f5807fa589804413efe8ec13290",
+      "status": "SUPERSEDED",
+      "evidence": "tests/daily-dungeon-portrait-owner-convergence-20260928.test.js and monster-portrait-runtime.test.js"
+    },
+    {
+      "requirement": "historical-generated-bundles",
+      "oldPRs": [
+        647,
+        648
+      ],
+      "currentDev": "4274454a30f25f5807fa589804413efe8ec13290",
+      "status": "OBSOLETE",
+      "evidence": "Current build manifest is authoritative; old hashed artifacts must never be transplanted"
+    },
+    {
+      "requirement": "tower-debug-clock",
+      "oldPRs": [
+        642,
+        643,
+        644,
+        645,
+        646,
+        647,
+        648
+      ],
+      "currentDev": "4274454a30f25f5807fa589804413efe8ec13290",
+      "status": "SUPERSEDED",
+      "evidence": "Old production debugClock workaround replaced by current deterministic test fixture dates and synchronous tower contract; out of Daily Runtime scope, not revived"
+    }
+  ],
+  "restoredRetiredWrapperOrPatch": false,
+  "mainModified": false,
+  "diffEvidence": [
+    {
+      "pr": 640,
+      "mergeBase": "7097bb57000ac423ff7d7d5be853e4f6d67b2f36",
+      "patchSha256": "a56d5510fb11d6436e8924f56cbae59dc1eb1b6995e7fd1c10445b4b1335015a",
+      "nonAncestorCommits": [
+        "008eeb6a91c9588e3ccfa3069dea9116a70a6ed0 fix: converge daily dungeon portrait ownership and retry lifecycle"
+      ]
+    },
+    {
+      "pr": 641,
+      "mergeBase": "f082c8b06e7b3bbf27adcac74800ab9114d27d1b",
+      "patchSha256": "e0121b8e5a0c5c3e99cc7d6cd8acb169e2e5318900d24ee2090669a664b3defb",
+      "nonAncestorCommits": [
+        "df3dd30479b2f923ceb337b9060f3ae97314cc14 fix: converge daily dungeon portrait ownership and retry lifecycle"
+      ]
+    },
+    {
+      "pr": 642,
+      "mergeBase": "f082c8b06e7b3bbf27adcac74800ab9114d27d1b",
+      "patchSha256": "55f4f36b94c382a0873c9ac6442e8301e31a7e0e2591d51d3d385301a508dd41",
+      "nonAncestorCommits": [
+        "78d91522ba3c7fb889ade28d0402edf03a01e7c5 fix: preserve explicit debug clock across tower lifecycle checks",
+        "df3dd30479b2f923ceb337b9060f3ae97314cc14 fix: converge daily dungeon portrait ownership and retry lifecycle"
+      ]
+    },
+    {
+      "pr": 643,
+      "mergeBase": "f082c8b06e7b3bbf27adcac74800ab9114d27d1b",
+      "patchSha256": "55f4f36b94c382a0873c9ac6442e8301e31a7e0e2591d51d3d385301a508dd41",
+      "nonAncestorCommits": [
+        "78d91522ba3c7fb889ade28d0402edf03a01e7c5 fix: preserve explicit debug clock across tower lifecycle checks",
+        "df3dd30479b2f923ceb337b9060f3ae97314cc14 fix: converge daily dungeon portrait ownership and retry lifecycle"
+      ]
+    },
+    {
+      "pr": 644,
+      "mergeBase": "f082c8b06e7b3bbf27adcac74800ab9114d27d1b",
+      "patchSha256": "84c2da149781aee086322e8556371d918277307068963cca8b4958a387d1fc21",
+      "nonAncestorCommits": [
+        "debdbb6a49fe8b0f4ea968e07d79b83b576dd058 test: provide canonical portrait presentation owner fixture",
+        "78d91522ba3c7fb889ade28d0402edf03a01e7c5 fix: preserve explicit debug clock across tower lifecycle checks",
+        "df3dd30479b2f923ceb337b9060f3ae97314cc14 fix: converge daily dungeon portrait ownership and retry lifecycle"
+      ]
+    },
+    {
+      "pr": 645,
+      "mergeBase": "f082c8b06e7b3bbf27adcac74800ab9114d27d1b",
+      "patchSha256": "c6ec9f22f015e9e5e1fee07625242683a8b0497869a6df9086c67b4aeff88c41",
+      "nonAncestorCommits": [
+        "3371766a6c152bee79361bf523d2866093cd5994 test: assert portrait handoff through presentation sync",
+        "debdbb6a49fe8b0f4ea968e07d79b83b576dd058 test: provide canonical portrait presentation owner fixture",
+        "78d91522ba3c7fb889ade28d0402edf03a01e7c5 fix: preserve explicit debug clock across tower lifecycle checks",
+        "df3dd30479b2f923ceb337b9060f3ae97314cc14 fix: converge daily dungeon portrait ownership and retry lifecycle"
+      ]
+    },
+    {
+      "pr": 646,
+      "mergeBase": "f082c8b06e7b3bbf27adcac74800ab9114d27d1b",
+      "patchSha256": "7c4776bef8995f004110a66652e4f90465c45979f291dd7e84c5171afd8ce04d",
+      "nonAncestorCommits": [
+        "d1669cd551665e271e7ebe8c9c5331c8d90569ea test: verify retired V159 bridge has no runtime sync owner",
+        "3371766a6c152bee79361bf523d2866093cd5994 test: assert portrait handoff through presentation sync",
+        "debdbb6a49fe8b0f4ea968e07d79b83b576dd058 test: provide canonical portrait presentation owner fixture",
+        "78d91522ba3c7fb889ade28d0402edf03a01e7c5 fix: preserve explicit debug clock across tower lifecycle checks",
+        "df3dd30479b2f923ceb337b9060f3ae97314cc14 fix: converge daily dungeon portrait ownership and retry lifecycle"
+      ]
+    },
+    {
+      "pr": 647,
+      "mergeBase": "f082c8b06e7b3bbf27adcac74800ab9114d27d1b",
+      "patchSha256": "b4633f9d64f22012f8eccffd36ee1ac89f773de5f93d093cb11c1d937db1d4f2",
+      "nonAncestorCommits": [
+        "1503a7d67473464443bb80793b2e763c997bc975 build: synchronize production output after portrait convergence",
+        "d1669cd551665e271e7ebe8c9c5331c8d90569ea test: verify retired V159 bridge has no runtime sync owner",
+        "3371766a6c152bee79361bf523d2866093cd5994 test: assert portrait handoff through presentation sync",
+        "debdbb6a49fe8b0f4ea968e07d79b83b576dd058 test: provide canonical portrait presentation owner fixture",
+        "78d91522ba3c7fb889ade28d0402edf03a01e7c5 fix: preserve explicit debug clock across tower lifecycle checks",
+        "df3dd30479b2f923ceb337b9060f3ae97314cc14 fix: converge daily dungeon portrait ownership and retry lifecycle"
+      ]
+    },
+    {
+      "pr": 648,
+      "mergeBase": "f082c8b06e7b3bbf27adcac74800ab9114d27d1b",
+      "patchSha256": "dc26e9b0e78975030d952ec599dd7c552441d9a0d23a1f8d3a0c363e07ddb1f6",
+      "nonAncestorCommits": [
+        "ded3eebb7eb215e1a5cd7c9d1f6ab5cd6818255b test(qa): provide account key runtime contract",
+        "eb86a5fb4528fd41031c3ddb9df6d032c1083e01 test(qa): retain earlier browser bundle errors",
+        "c14f401732e3feb4c7bd2a3b703dee2dbab6f705 fix(qa): serialize registry tuple schema in browser fixture",
+        "3b411e7bca03f28ccb0dd5c2553a8ffe1320296b chore(qa): surface browser runtime errors",
+        "e41dec6b2282a4f874c31912df2c64a661255911 test: capture browser runtime exceptions in QA artifact",
+        "5cf5d3c6fd907b5347320e322df68a83f8e03a72 test: allow production bundle initialization time in browser QA",
+        "98faee4e4a36ce31d38f440a7477a80900f31c38 test: parse DOM QA artifact and screenshot over HTTP",
+        "466a80ba0d687cb96c437dfa7eb886942c8f0dba test: serve browser QA fixture from CI HTTP origin",
+        "f6477d94b1a28138be055e4e9dde2e111bb0db5b test: load production bundles through CI HTTP server",
+        "598854444345dee607fe4fd25248272f1b5b329e test: persist browser QA report in DOM output",
+        "5101e25269dfc7dd159946bf983012cc02da839e test: make browser QA result transport robust",
+        "7543ee7212e5e1beae787c97c866b6ed21ffa4ad test: expose daily portrait browser runtime diagnostics",
+        "e73ecc8f841527a9e15b63ec13d9403c9c27fea0 test: run daily portrait browser QA with runner Chrome",
+        "7be8dc4c8641ac203c1dd81fd1af6e200a3d264f test: run daily portrait browser QA with runner Chrome",
+        "1503a7d67473464443bb80793b2e763c997bc975 build: synchronize production output after portrait convergence",
+        "d1669cd551665e271e7ebe8c9c5331c8d90569ea test: verify retired V159 bridge has no runtime sync owner",
+        "3371766a6c152bee79361bf523d2866093cd5994 test: assert portrait handoff through presentation sync",
+        "debdbb6a49fe8b0f4ea968e07d79b83b576dd058 test: provide canonical portrait presentation owner fixture",
+        "78d91522ba3c7fb889ade28d0402edf03a01e7c5 fix: preserve explicit debug clock across tower lifecycle checks",
+        "df3dd30479b2f923ceb337b9060f3ae97314cc14 fix: converge daily dungeon portrait ownership and retry lifecycle"
+      ]
+    }
+  ],
+  "branchDeletionPolicy": "Strict user condition: retain historical heads when git log dev..head still contains independent commits; no force deletion.",
+  "assetProvenance": {
+    "runtimeReplacementCommit": "c7eb1689d872f8a83001b6b893166f9971d4f33b",
+    "runtimeAssetCount": 9,
+    "structuredDailyMasterEntries": 0,
+    "note": "Current nine Runtime WebP files are valid and tracked in the formal replacement commit. config/monster-asset-provenance.json has no daily.* Master entries. Old PRs #640-648 add no assets or provenance; do not fabricate source provenance or expand this batch to image regeneration."
+  },
+  "integration": {
+    "pr": 783,
+    "testedHead": "1f94f9cb185af6c8f7aff08ff7efeb3cd784013f",
+    "browserRun": 37131683805,
+    "browserJob": 111227883241,
+    "browserArtifact": 11276413948,
+    "browserPassed": true,
+    "viewports": [
+      "360x800",
+      "393x873",
+      "412x915"
+    ],
+    "decodedAssets": 9,
+    "uniqueKeyViewportPairs": 27,
+    "waveSnapshots": 27,
+    "firstVisibleStageKeyEntries": 54,
+    "screenshots": 9,
+    "closeoutCondition": "Full latest-head CI success and #783 merged to dev; no old PR is merged or closed before that."
+  },
+  "finalMatrix": [
+    {
+      "requirement": "daily-identity",
+      "oldPRs": [
+        640,
+        641,
+        642,
+        643,
+        644,
+        645,
+        646,
+        647,
+        648
+      ],
+      "currentDev": "dev after #783 merge (required gate)",
+      "status": "ABSORBED",
+      "evidence": "V148 explicit daily.type.rank keys; all nine Registry rows existing"
+    },
+    {
+      "requirement": "portrait-selection-registry",
+      "oldPRs": [
+        640,
+        641,
+        642,
+        643,
+        644,
+        645,
+        646,
+        647,
+        648
+      ],
+      "currentDev": "dev after #783 merge (required gate)",
+      "status": "SUPERSEDED",
+      "evidence": "#657 V154 resolver and per-card V174.applyUnit handoff"
+    },
+    {
+      "requirement": "V154-selection-V174-presentation",
+      "oldPRs": [
+        640,
+        641,
+        642,
+        643,
+        644,
+        645,
+        646,
+        647,
+        648
+      ],
+      "currentDev": "dev after #783 merge (required gate)",
+      "status": "SUPERSEDED",
+      "evidence": "#657; no V154 createElement(img), no duplicate artwork surface"
+    },
+    {
+      "requirement": "V159-retirement",
+      "oldPRs": [
+        640,
+        641,
+        642,
+        643,
+        644,
+        645,
+        646,
+        647,
+        648
+      ],
+      "currentDev": "dev after #783 merge (required gate)",
+      "status": "SUPERSEDED",
+      "evidence": "#657; current V159 is a two-line marker without wrapper/timer/RAF"
+    },
+    {
+      "requirement": "per-key-decode-retry",
+      "oldPRs": [
+        640,
+        641,
+        642,
+        643,
+        644,
+        645,
+        646,
+        647,
+        648
+      ],
+      "currentDev": "dev after #783 merge (required gate)",
+      "status": "SUPERSEDED",
+      "evidence": "#657; Promise.all of ensureAssets([record.path]), failures tracked per key, failed preparation removed"
+    },
+    {
+      "requirement": "registry-failure-retry",
+      "oldPRs": [
+        640,
+        641,
+        642,
+        643,
+        644,
+        645,
+        646,
+        647,
+        648
+      ],
+      "currentDev": "dev after #783 merge (required gate)",
+      "status": "ABSORBED",
+      "evidence": "V154 request catch clears shared failed Promise"
+    },
+    {
+      "requirement": "formal-and-equipment-launch",
+      "oldPRs": [
+        640,
+        641,
+        642,
+        643,
+        644,
+        645,
+        646,
+        647,
+        648
+      ],
+      "currentDev": "dev after #783 merge (required gate)",
+      "status": "SUPERSEDED",
+      "evidence": "Current beginFormalDailyDungeon / beginEquipmentDungeon await same V154 readiness; obsolete v148PrepareDailyDungeonLaunch adapter not restored"
+    },
+    {
+      "requirement": "regular-elite-boss-exp-material-gold",
+      "oldPRs": [
+        640,
+        641,
+        642,
+        643,
+        644,
+        645,
+        646,
+        647,
+        648
+      ],
+      "currentDev": "dev after #783 merge (required gate)",
+      "status": "ABSORBED",
+      "evidence": "V148 canonical wave builder, nine valid 1024x1536 WebP assets"
+    },
+    {
+      "requirement": "asset-completeness-provenance",
+      "oldPRs": [
+        640,
+        641,
+        642,
+        643,
+        644,
+        645,
+        646,
+        647,
+        648
+      ],
+      "currentDev": "dev after #783 merge (required gate)",
+      "status": "SUPERSEDED",
+      "evidence": "#661 c7eb1689 valid nine assets; old branches carry no independent image changes"
+    },
+    {
+      "requirement": "CSS46-artwork-retirement",
+      "oldPRs": [
+        640,
+        641,
+        642,
+        643,
+        644,
+        645,
+        646,
+        647,
+        648
+      ],
+      "currentDev": "dev after #783 merge (required gate)",
+      "status": "SUPERSEDED",
+      "evidence": "#783 current-owner integration; remote Browser QA passed; Old img and card-background rules still shipped in CSS46; this current-dev integration physically removes them"
+    },
+    {
+      "requirement": "production-first-visible-mobile-QA",
+      "oldPRs": [
+        640,
+        641,
+        642,
+        643,
+        644,
+        645,
+        646,
+        647,
+        648
+      ],
+      "currentDev": "dev after #783 merge (required gate)",
+      "status": "SUPERSEDED",
+      "evidence": "#783 current-owner integration; remote Browser QA passed; Current specialized QA only decode; add real production index/launch/waves/27-key-view pairs and screenshots in same QA owner"
+    },
+    {
+      "requirement": "old-browser-fixture",
+      "oldPRs": [
+        640,
+        641,
+        642,
+        643,
+        644,
+        645,
+        646,
+        647,
+        648
+      ],
+      "currentDev": "dev after #783 merge (required gate)",
+      "status": "OBSOLETE",
+      "evidence": "Playwright closure assertion error / hardcoded retired bundle filenames / duplicate html declaration / synthetic DOM and no-op decoder; retain requirements, not fixture"
+    },
+    {
+      "requirement": "old-contract-test-path",
+      "oldPRs": [
+        640,
+        641,
+        642,
+        643,
+        644,
+        645,
+        646,
+        647,
+        648
+      ],
+      "currentDev": "dev after #783 merge (required gate)",
+      "status": "SUPERSEDED",
+      "evidence": "tests/daily-dungeon-portrait-owner-convergence-20260928.test.js and monster-portrait-runtime.test.js"
+    },
+    {
+      "requirement": "historical-generated-bundles",
+      "oldPRs": [
+        647,
+        648
+      ],
+      "currentDev": "dev after #783 merge (required gate)",
+      "status": "OBSOLETE",
+      "evidence": "Current build manifest is authoritative; old hashed artifacts must never be transplanted"
+    },
+    {
+      "requirement": "tower-debug-clock",
+      "oldPRs": [
+        642,
+        643,
+        644,
+        645,
+        646,
+        647,
+        648
+      ],
+      "currentDev": "dev after #783 merge (required gate)",
+      "status": "SUPERSEDED",
+      "evidence": "Old production debugClock workaround replaced by current deterministic test fixture dates and synchronous tower contract; out of Daily Runtime scope, not revived"
+    }
+  ],
+  "prFinalDisposition": [
+    {
+      "pr": 640,
+      "status": "SUPERSEDED",
+      "remainingEffectiveRequirements": [],
+      "closeout": "After #783 merge only",
+      "replacementPRs": [
+        657,
+        661,
+        783
+      ],
+      "branchCleanup": "RETAIN — nonancestor commits remain; strict no-independent-commit condition fails"
+    },
+    {
+      "pr": 641,
+      "status": "SUPERSEDED",
+      "remainingEffectiveRequirements": [],
+      "closeout": "After #783 merge only",
+      "replacementPRs": [
+        657,
+        661,
+        783
+      ],
+      "branchCleanup": "RETAIN — nonancestor commits remain; strict no-independent-commit condition fails"
+    },
+    {
+      "pr": 642,
+      "status": "SUPERSEDED",
+      "remainingEffectiveRequirements": [],
+      "closeout": "After #783 merge only",
+      "replacementPRs": [
+        657,
+        661,
+        783
+      ],
+      "branchCleanup": "RETAIN — nonancestor commits remain; strict no-independent-commit condition fails"
+    },
+    {
+      "pr": 643,
+      "status": "SUPERSEDED",
+      "remainingEffectiveRequirements": [],
+      "closeout": "After #783 merge only",
+      "replacementPRs": [
+        657,
+        661,
+        783
+      ],
+      "branchCleanup": "RETAIN — nonancestor commits remain; strict no-independent-commit condition fails"
+    },
+    {
+      "pr": 644,
+      "status": "SUPERSEDED",
+      "remainingEffectiveRequirements": [],
+      "closeout": "After #783 merge only",
+      "replacementPRs": [
+        657,
+        661,
+        783
+      ],
+      "branchCleanup": "RETAIN — nonancestor commits remain; strict no-independent-commit condition fails"
+    },
+    {
+      "pr": 645,
+      "status": "SUPERSEDED",
+      "remainingEffectiveRequirements": [],
+      "closeout": "After #783 merge only",
+      "replacementPRs": [
+        657,
+        661,
+        783
+      ],
+      "branchCleanup": "RETAIN — nonancestor commits remain; strict no-independent-commit condition fails"
+    },
+    {
+      "pr": 646,
+      "status": "SUPERSEDED",
+      "remainingEffectiveRequirements": [],
+      "closeout": "After #783 merge only",
+      "replacementPRs": [
+        657,
+        661,
+        783
+      ],
+      "branchCleanup": "RETAIN — nonancestor commits remain; strict no-independent-commit condition fails"
+    },
+    {
+      "pr": 647,
+      "status": "SUPERSEDED",
+      "remainingEffectiveRequirements": [],
+      "closeout": "After #783 merge only",
+      "replacementPRs": [
+        657,
+        661,
+        783
+      ],
+      "branchCleanup": "RETAIN — nonancestor commits remain; strict no-independent-commit condition fails"
+    },
+    {
+      "pr": 648,
+      "status": "SUPERSEDED",
+      "remainingEffectiveRequirements": [],
+      "closeout": "After #783 merge only",
+      "replacementPRs": [
+        657,
+        661,
+        783
+      ],
+      "branchCleanup": "RETAIN — nonancestor commits remain; strict no-independent-commit condition fails"
+    }
+  ]
+}

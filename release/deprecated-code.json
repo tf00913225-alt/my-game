@@ -172,6 +172,15 @@
         "V173_32_WILD_ZONE_STRENGTHS",
         "v173WildZoneStrengthMultipliers"
       ]
+    },
+    {
+      "id": "DEP-P1B2-DAILY-LEGACY-ARTWORK-20261003",
+      "description": "每日副本 CSS46 舊 img 與 card-background 立繪呈現已退休；V154 只選圖，V174 為唯一 artwork DOM。",
+      "enabled": true,
+      "forbidden": [
+        "v162-abyss-battle-portrait-art",
+        ".battle-monster.v154-monster-portrait.has-monster-portrait"
+      ]
     }
   ]
 }

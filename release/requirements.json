@@ -471,6 +471,32 @@
         "verification": "15項功能逐項驗證；專項20/20、528projection、56identity、非Wild immutable baseline、40TTK及雙尺寸自然Chrome；build:check PASS",
         "result": "功能15/15 VERIFIED；一般1–2／精英1–3回合為基準隊伍範圍；Tank defensive AI gap明示。最新Head CI／dev整合／部署SHA／分支清理以PR#780為最終Gate owner，未完成前不宣稱全案完成。"
       }
+    },
+    {
+      "id": "REQ-P1B2-DAILY-CSS-RETIREMENT-20261003",
+      "title": "每日副本歷史 PR CSS46 退休立繪呈現移除",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "docs/p1-b2-daily-portrait-pr-convergence-20261003.json",
+          ".github/scripts/run-daily-dungeon-webp-browser-qa.mjs"
+        ],
+        "verification": "Targeted contracts / build check / mandatory current-owner Browser QA",
+        "result": "PASS: GitHub Actions 37131683805 / job 111227883241, Daily Dungeon QA steps 23-24; head 1f94f9cb185af6c8f7aff08ff7efeb3cd784013f. Nine 1024x1536 WebP decodes, 27 unique key/viewport pairs, 27 wave snapshots, 54 first-visible stage/key entries, nine screenshots, redraw and no duplicate/legacy artwork. Full latest-head CI remains mandatory before merge."
+      }
+    },
+    {
+      "id": "REQ-P1B2-DAILY-MOBILE-QA-20261003",
+      "title": "每日副本 3 尺寸與 9 種立繪正式進場／換波呈現驗收",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "docs/p1-b2-daily-portrait-pr-convergence-20261003.json",
+          ".github/scripts/run-daily-dungeon-webp-browser-qa.mjs"
+        ],
+        "verification": "Targeted contracts / build check / mandatory current-owner Browser QA",
+        "result": "PASS: GitHub Actions 37131683805 / job 111227883241, Daily Dungeon QA steps 23-24; head 1f94f9cb185af6c8f7aff08ff7efeb3cd784013f. Nine 1024x1536 WebP decodes, 27 unique key/viewport pairs, 27 wave snapshots, 54 first-visible stage/key entries, nine screenshots, redraw and no duplicate/legacy artwork. Full latest-head CI remains mandatory before merge."
+      }
     }
   ]
 }
