@@ -69,28 +69,7 @@ jobs:
           printf 'CLOUDFLARE_ACCOUNT_ID=%s\n' "$ACCOUNT_ID" >> "$GITHUB_ENV"
 
       - name: Prepare immutable static site
-        shell: bash
-        run: |
-          mkdir -p _deploy
-          rsync -a \
-            --exclude='.git/' \
-            --exclude='.github/' \
-            --exclude='tests/' \
-            --exclude='node_modules/' \
-            --exclude='functions/' \
-            --exclude='.firebaserc' \
-            --exclude='firebase.json' \
-            --exclude='firestore.rules' \
-            --exclude='_deploy/' \
-            --exclude='release-manifest.final.json' \
-            ./ _deploy/
-          test -f _deploy/index.html || { echo "index.html not found"; exit 1; }
-
-          # Deployment is validation-only. Never rewrite Game/Cache versions here.
-          DEPLOY_DIR=_deploy \
-          EXPECTED_COMMIT_SHA="$EXPECTED_COMMIT_SHA" \
-          EXPECTED_BRANCH="$EXPECTED_BRANCH" \
-          node .github/scripts/release-gate.mjs prepare-artifact
+        run: node .github/scripts/prepare-static-deployment.mjs
 
       - name: Ensure Pages project exists
         shell: bash

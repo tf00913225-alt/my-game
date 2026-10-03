@@ -52,7 +52,7 @@ async function run(chrome,url,live){
   await c.send('Page.enable');await c.send('Runtime.enable');
   if(live){
    const stubs=new Map([[QA_AUTH_PATH,QA_AUTH_MODULE],[QA_CLOUD_PATH,QA_CLOUD_MODULE],[QA_SESSION_PATH,QA_SESSION_MODULE]]);
-   c.ws.addEventListener('message',event=>{const m=JSON.parse(String(event.data));if(m.method==='Fetch.requestPaused'){const p=m.params,body=stubs.get(new URL(p.request.url).pathname);c.send(body?'Fetch.fulfillRequest':'Fetch.continueRequest',body?{requestId:p.requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'text/javascript'}],body:Buffer.from(body).toString('base64')}:{requestId:p.requestId}).catch(error=>console.error(error));}});
+   c.ws.addEventListener('message',event=>{const m=JSON.parse(String(event.data));if(m.method==='Fetch.requestPaused'){const p=m.params,body=stubs.get('/'+new URL(p.request.url).pathname.slice(new URL('.',url).pathname.length));c.send(body?'Fetch.fulfillRequest':'Fetch.continueRequest',body?{requestId:p.requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'text/javascript'}],body:Buffer.from(body).toString('base64')}:{requestId:p.requestId}).catch(error=>console.error(error));}});
    await c.send('Fetch.enable',{patterns:[...stubs.keys()].map(p=>({urlPattern:'*'+p+'*',resourceType:'Script'}))});
   }
   await c.send('Page.addScriptToEvaluateOnNewDocument',{source:qaPrelude().replace(/^<script>|<\/script>$/g,'')});
@@ -173,12 +173,12 @@ fs.mkdirSync(OUT,{recursive:true});let local;
 try{
  const live=!!process.env.DEV_BASE_URL;let url;
  if(live){
-  url=new URL('/index.html',process.env.DEV_BASE_URL).href;
-  const deployed=await (await fetch(new URL('/release-manifest.json',url),{cache:'no-store'})).json();
+  url=new URL('index.html',process.env.DEV_BASE_URL.replace(/\/$/,'')+'/').href;
+  const deployed=await (await fetch(new URL('release-manifest.json',url),{cache:'no-store'})).json();
   assert.ok(process.env.EXPECTED_COMMIT_SHA,'live QA requires expected deployment SHA');assert.equal(deployed.commitSha,process.env.EXPECTED_COMMIT_SHA,'deployed SHA mismatch');
-  const manifest=await (await fetch(new URL('/build/asset-manifest.json',url),{cache:'no-store'})).json();assert.deepEqual(manifest,ASSET_MANIFEST,'deployed production bundles mismatch');
+  const manifest=await (await fetch(new URL('build/asset-manifest.json',url),{cache:'no-store'})).json();assert.deepEqual(manifest,ASSET_MANIFEST,'deployed production bundles mismatch');
  }else {local=await startServer();url=local.url;}
  const evidence=await run(findChrome(),url,live);
- fs.writeFileSync(path.join(OUT,'evidence.json'),JSON.stringify({passed:true,environment:live?'deployed-dev':'production-local',sha:process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||null,evidence},null,2)+'\n');
+ fs.writeFileSync(path.join(OUT,'evidence.json'),JSON.stringify({passed:true,environment:live?'deployed-site':'production-local',sha:process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||null,evidence},null,2)+'\n');
  console.log('Responsive Item real runtime QA PASS: '+evidence.length+'/6 viewports');
 }catch(error){fs.writeFileSync(path.join(OUT,'evidence.json'),JSON.stringify({passed:false,error:String(error.stack||error),evidence:error.evidence||[]},null,2)+'\n');throw error;}finally{local?.server.close();}

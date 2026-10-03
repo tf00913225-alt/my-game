@@ -516,6 +516,12 @@ jobs:
           CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: node .github/scripts/release-gate.mjs ci
 
+      - name: Verify immutable deployment artifact
+        env:
+          EXPECTED_COMMIT_SHA: ${{ github.sha }}
+          EXPECTED_BRANCH: ${{ github.base_ref || github.ref_name }}
+        run: node .github/scripts/prepare-static-deployment.mjs
+
       - name: Check Git whitespace and conflict markers
         env:
           CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}

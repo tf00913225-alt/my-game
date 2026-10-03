@@ -24,10 +24,10 @@ let server,proc,c,profile;const evidence=[];
 try{
  const live=!!process.env.DEV_BASE_URL;let url;
  if(live){
-  url=new URL('/index.html',process.env.DEV_BASE_URL).href;
+  url=new URL('index.html',process.env.DEV_BASE_URL.replace(/\/$/,'')+'/').href;
   assert.ok(process.env.EXPECTED_COMMIT_SHA,'live QA requires deployment SHA');
-  const release=await (await fetch(new URL('/release-manifest.json',url),{cache:'no-store'})).json();assert.equal(release.commitSha,process.env.EXPECTED_COMMIT_SHA,'deployed SHA mismatch');
-  const manifest=await (await fetch(new URL('/build/asset-manifest.json',url),{cache:'no-store'})).json();assert.deepEqual(manifest,ASSET_MANIFEST,'deployed bundles mismatch');
+  const release=await (await fetch(new URL('release-manifest.json',url),{cache:'no-store'})).json();assert.equal(release.commitSha,process.env.EXPECTED_COMMIT_SHA,'deployed SHA mismatch');
+  const manifest=await (await fetch(new URL('build/asset-manifest.json',url),{cache:'no-store'})).json();assert.deepEqual(manifest,ASSET_MANIFEST,'deployed bundles mismatch');
  }else{server=await startServer();url=server.url;}
  profile=fs.mkdtempSync(path.join(os.tmpdir(),'forge-qa-'));
  const chrome=findChrome(),port=9900+Math.floor(Math.random()*300);
@@ -38,7 +38,7 @@ try{
  // prefetch must not accidentally turn this cold-entry regression into a warm test.
  let holdGameplay=true;const heldGameplay=[];
  const stubs=new Map(live?[[QA_AUTH_PATH,QA_AUTH_MODULE],[QA_CLOUD_PATH,QA_CLOUD_MODULE],[QA_SESSION_PATH,QA_SESSION_MODULE]]:[]);
- c.ws.addEventListener('message',event=>{const m=JSON.parse(String(event.data));if(m.method==='Fetch.requestPaused'){const p=m.params,pathname=new URL(p.request.url).pathname;if(holdGameplay&&/\/build\/gameplay-core-(primary|secondary)\.[0-9a-f]{12}\.js$/.test(pathname)){heldGameplay.push(p.requestId);return;}const body=stubs.get(pathname);c.send(body?'Fetch.fulfillRequest':'Fetch.continueRequest',body?{requestId:p.requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'text/javascript'}],body:Buffer.from(body).toString('base64')}:{requestId:p.requestId}).catch(error=>console.error(error));}});
+ c.ws.addEventListener('message',event=>{const m=JSON.parse(String(event.data));if(m.method==='Fetch.requestPaused'){const p=m.params,pathname=new URL(p.request.url).pathname;if(holdGameplay&&/\/build\/gameplay-core-(primary|secondary)\.[0-9a-f]{12}\.js$/.test(pathname)){heldGameplay.push(p.requestId);return;}const body=stubs.get('/'+pathname.slice(new URL('.',url).pathname.length));c.send(body?'Fetch.fulfillRequest':'Fetch.continueRequest',body?{requestId:p.requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'text/javascript'}],body:Buffer.from(body).toString('base64')}:{requestId:p.requestId}).catch(error=>console.error(error));}});
  await c.send('Fetch.enable',{patterns:[{urlPattern:'*/build/gameplay-core-*.js*',resourceType:'Script'},...[...stubs.keys()].map(p=>({urlPattern:'*'+p+'*',resourceType:'Script'}))]});
  await c.send('Page.addScriptToEvaluateOnNewDocument',{source:qaPrelude().replace(/^<script>|<\/script>$/g,'')});
  async function tap(selector){
@@ -118,6 +118,6 @@ try{
   const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(OUT,`forge-${width}.png`),Buffer.from(shot.data,'base64'));
   evidence.push({width,height,entry:width===390?'cold-delayed-owner-after-announcement':'warm-reentry',geometry,scrollTop,saved,equippedBonus:1,unequippedBonus:0,cloudMutationBlocked:true});console.log('PASS forge touch runtime '+width+'x'+height);
  }
- fs.writeFileSync(path.join(OUT,'evidence.json'),JSON.stringify({passed:true,environment:live?'deployed-dev':'production-local',sha:process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||null,evidence},null,2)+'\n');
+ fs.writeFileSync(path.join(OUT,'evidence.json'),JSON.stringify({passed:true,environment:live?'deployed-site':'production-local',sha:process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||null,evidence},null,2)+'\n');
 }catch(error){if(c){try{const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(OUT,'failure.png'),Buffer.from(shot.data,'base64'));}catch{}}fs.writeFileSync(path.join(OUT,'evidence.json'),JSON.stringify({passed:false,error:String(error.stack||error),evidence},null,2)+'\n');throw error;
 }finally{c?.close();proc?.kill('SIGTERM');server?.server.close();if(profile)try{fs.rmSync(profile,{recursive:true,force:true});}catch{}}
