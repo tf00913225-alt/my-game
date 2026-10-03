@@ -92,6 +92,13 @@ function runType(type){return `(async()=>{
     const type=${JSON.stringify(type)},qa=window.__dailyRuntimeQa;
     const wait=async test=>{const until=performance.now()+15000;while(!test()&&performance.now()<until)await new Promise(r=>setTimeout(r,25));if(!test())throw Error('Daily lifecycle timeout: '+test);};
     const check=(value,message)=>{if(!value)throw Error(message);};
+    const dismissNotice=async()=>{
+        const modal=document.getElementById('homeFeatureModal');if(!modal?.classList.contains('show'))return;
+        check(modal.classList.contains('release-update-modal')&&!modal.classList.contains('release-update-forced'),'unexpected modal obscures Daily QA');
+        const button=modal.querySelector('.home-feature-close-btn[onclick="closeHomeFeature()"]');check(button,'release notice return control');
+        button.click();await wait(()=>!modal.classList.contains('show'));
+    };
+    await dismissNotice();
     const capture=()=>[...document.querySelectorAll('#battleMonsterArea .battle-monster')].map(card=>{
         const index=Number(card.id.replace('battleMonster','')),monster=monsters[index],art=card.querySelector(':scope > .v174-battle-art');
         const style=art&&getComputedStyle(art),rect=art?.getBoundingClientRect();
@@ -100,7 +107,7 @@ function runType(type){return `(async()=>{
         return {key:card.dataset.monsterPortraitKey,path:card.dataset.monsterPortraitPath,expected:__dailyExpected[monster.portraitKey],stage:monster.v141DungeonStage,rank:monster.rank||monster.v141BattleRank||'regular',background:style?.backgroundImage,backgroundSize:style?.backgroundSize,painted,artCount:card.querySelectorAll(':scope > .v174-battle-art').length,legacyCount:card.querySelectorAll('img.v162-abyss-battle-portrait-art').length,width:rect?.width,height:rect?.height};
     });
     const firstVisible=new Map();let sampling=true;
-    const sample=()=>{if(!sampling)return;for(const row of capture()){if(row.painted){const id=row.stage+':'+row.key;if(!firstVisible.has(id))firstVisible.set(id,row);}}requestAnimationFrame(sample);};
+    const sample=()=>{if(!sampling)return;if(!document.getElementById('homeFeatureModal')?.classList.contains('show'))for(const row of capture()){if(row.painted){const id=row.stage+':'+row.key;if(!firstVisible.has(id))firstVisible.set(id,row);}}requestAnimationFrame(sample);};
     requestAnimationFrame(sample);
     try{
         const entry={exp:'v132BeginExpDungeon',material:'v132BeginMaterialDungeon',gold:'v17346BeginEquipmentDungeon'}[type];
@@ -112,6 +119,7 @@ function runType(type){return `(async()=>{
         const waves=[];
         for(let stage=1;stage<=3;stage++){
             await wait(()=>battleActive&&monsters[currentBattleMonsters[0]]?.v141DungeonStage===stage&&!document.getElementById('battlePage')?.matches('.v141-preparing-entry,.v141-entry-moving'));
+            await dismissNotice();
             await new Promise(requestAnimationFrame);
             const rows=capture();check(rows.length===6,'six formal enemies per wave');
             for(const row of rows){check(row.painted,'portrait must be visible: '+row.key);check(row.path===row.expected&&row.background?.includes(row.expected),'current Registry selection: '+row.key);check(row.artCount===1&&row.legacyCount===0,'single V174 surface');}
@@ -133,6 +141,7 @@ function runType(type){return `(async()=>{
         check(JSON.stringify(covered)===JSON.stringify(['regular','elite','boss'].map(rank=>'daily.'+type+'.'+rank).sort()),'all daily ranks must be covered');
         const snapshot=JSON.stringify(capture().map(r=>({key:r.key,path:r.path,artCount:r.artCount})));
         renderBattle();check(JSON.stringify(capture().map(r=>({key:r.key,path:r.path,artCount:r.artCount})))===snapshot,'redraw preserves selection and single surface');
+        await dismissNotice();
         qa.types[type]={entry,waves,firstVisible:first,covered,redraw:true};
         return qa.types[type];
     }finally{sampling=false;}

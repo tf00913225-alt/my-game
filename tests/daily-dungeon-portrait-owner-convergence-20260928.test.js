@@ -35,3 +35,33 @@ assert.match(v174,/function syncUnitArtwork\(card,kind\)/,
     "V174 must own artwork DOM creation and presentation");
 
 console.log("Daily Dungeon portrait owner convergence contracts: PASS.");
+
+/* Execute the current selection/preparation owner, including its initial
+   failed registry request. Verify isolation and retry behavior rather than
+   importing the old PR's cache or presentation implementation. */
+(async()=>{
+    const vm=require('node:vm');
+    const registry=JSON.parse(fs.readFileSync('config/monster-portrait-registry.json','utf8'));
+    let requests=0,failElite=true;
+    const elitePath=registry.groups.daily.find(row=>row[0]==='daily.exp.elite')[5];
+    const context={console:{warn(){}},fetch:async()=>{
+        requests++;if(requests===1)throw Error('isolated registry failure');
+        return {ok:true,json:async()=>registry};
+    },FourSymbolsFeatures:{ensureAssets:async paths=>{if(failElite&&paths.includes(elitePath))throw Error('isolated elite decode failure');}}};
+    context.window=context;vm.createContext(context);vm.runInContext(v154,context);
+    await context.v154RequestMonsterPortraitRegistry();
+    assert.equal(context.v154GetMonsterPortraitRegistryState(),'failed');
+    const pending=context.v154PrepareDailyDungeonPortraits('exp');
+    assert.equal(context.v154PrepareDailyDungeonPortraits('exp'),pending,'share the pending preparation');
+    const failure=await pending;
+    assert.equal(failure.state,'failed');assert.deepEqual(Array.from(failure.failures),['daily.exp.elite']);
+    assert.equal(requests,2,'retry registry without reloading the app');
+    for(const rank of ['regular','boss'])assert.equal(context.v154ResolveMonsterPortraitRecord({portraitKey:'daily.exp.'+rank}).status,'existing','one decode failure must not poison other ranks');
+    assert.equal(context.v154ResolveMonsterPortraitRecord({portraitKey:'daily.exp.elite',rank:'elite'}).status,'fallback');
+    failElite=false;
+    const success=await context.v154PrepareDailyDungeonPortraits('exp');
+    assert.equal(success.state,'ready');assert.deepEqual(Array.from(success.failures),[]);
+    assert.equal(context.v154ResolveMonsterPortraitRecord({portraitKey:'daily.exp.elite'}).status,'existing','retry clears failed-key state');
+    assert.equal(await context.v154PrepareDailyDungeonPortraits('exp'),success,'cache the successful preparation');
+    console.log('Daily Dungeon registry/decode isolation and retry lifecycle: PASS.');
+})().catch(error=>{console.error(error);process.exitCode=1;});

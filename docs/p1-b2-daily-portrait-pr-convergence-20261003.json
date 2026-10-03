@@ -463,5 +463,115 @@
     }
   ],
   "restoredRetiredWrapperOrPatch": false,
-  "mainModified": false
+  "mainModified": false,
+  "diffEvidence": [
+    {
+      "pr": 640,
+      "mergeBase": "7097bb57000ac423ff7d7d5be853e4f6d67b2f36",
+      "patchSha256": "a56d5510fb11d6436e8924f56cbae59dc1eb1b6995e7fd1c10445b4b1335015a",
+      "nonAncestorCommits": [
+        "008eeb6a91c9588e3ccfa3069dea9116a70a6ed0 fix: converge daily dungeon portrait ownership and retry lifecycle"
+      ]
+    },
+    {
+      "pr": 641,
+      "mergeBase": "f082c8b06e7b3bbf27adcac74800ab9114d27d1b",
+      "patchSha256": "e0121b8e5a0c5c3e99cc7d6cd8acb169e2e5318900d24ee2090669a664b3defb",
+      "nonAncestorCommits": [
+        "df3dd30479b2f923ceb337b9060f3ae97314cc14 fix: converge daily dungeon portrait ownership and retry lifecycle"
+      ]
+    },
+    {
+      "pr": 642,
+      "mergeBase": "f082c8b06e7b3bbf27adcac74800ab9114d27d1b",
+      "patchSha256": "55f4f36b94c382a0873c9ac6442e8301e31a7e0e2591d51d3d385301a508dd41",
+      "nonAncestorCommits": [
+        "78d91522ba3c7fb889ade28d0402edf03a01e7c5 fix: preserve explicit debug clock across tower lifecycle checks",
+        "df3dd30479b2f923ceb337b9060f3ae97314cc14 fix: converge daily dungeon portrait ownership and retry lifecycle"
+      ]
+    },
+    {
+      "pr": 643,
+      "mergeBase": "f082c8b06e7b3bbf27adcac74800ab9114d27d1b",
+      "patchSha256": "55f4f36b94c382a0873c9ac6442e8301e31a7e0e2591d51d3d385301a508dd41",
+      "nonAncestorCommits": [
+        "78d91522ba3c7fb889ade28d0402edf03a01e7c5 fix: preserve explicit debug clock across tower lifecycle checks",
+        "df3dd30479b2f923ceb337b9060f3ae97314cc14 fix: converge daily dungeon portrait ownership and retry lifecycle"
+      ]
+    },
+    {
+      "pr": 644,
+      "mergeBase": "f082c8b06e7b3bbf27adcac74800ab9114d27d1b",
+      "patchSha256": "84c2da149781aee086322e8556371d918277307068963cca8b4958a387d1fc21",
+      "nonAncestorCommits": [
+        "debdbb6a49fe8b0f4ea968e07d79b83b576dd058 test: provide canonical portrait presentation owner fixture",
+        "78d91522ba3c7fb889ade28d0402edf03a01e7c5 fix: preserve explicit debug clock across tower lifecycle checks",
+        "df3dd30479b2f923ceb337b9060f3ae97314cc14 fix: converge daily dungeon portrait ownership and retry lifecycle"
+      ]
+    },
+    {
+      "pr": 645,
+      "mergeBase": "f082c8b06e7b3bbf27adcac74800ab9114d27d1b",
+      "patchSha256": "c6ec9f22f015e9e5e1fee07625242683a8b0497869a6df9086c67b4aeff88c41",
+      "nonAncestorCommits": [
+        "3371766a6c152bee79361bf523d2866093cd5994 test: assert portrait handoff through presentation sync",
+        "debdbb6a49fe8b0f4ea968e07d79b83b576dd058 test: provide canonical portrait presentation owner fixture",
+        "78d91522ba3c7fb889ade28d0402edf03a01e7c5 fix: preserve explicit debug clock across tower lifecycle checks",
+        "df3dd30479b2f923ceb337b9060f3ae97314cc14 fix: converge daily dungeon portrait ownership and retry lifecycle"
+      ]
+    },
+    {
+      "pr": 646,
+      "mergeBase": "f082c8b06e7b3bbf27adcac74800ab9114d27d1b",
+      "patchSha256": "7c4776bef8995f004110a66652e4f90465c45979f291dd7e84c5171afd8ce04d",
+      "nonAncestorCommits": [
+        "d1669cd551665e271e7ebe8c9c5331c8d90569ea test: verify retired V159 bridge has no runtime sync owner",
+        "3371766a6c152bee79361bf523d2866093cd5994 test: assert portrait handoff through presentation sync",
+        "debdbb6a49fe8b0f4ea968e07d79b83b576dd058 test: provide canonical portrait presentation owner fixture",
+        "78d91522ba3c7fb889ade28d0402edf03a01e7c5 fix: preserve explicit debug clock across tower lifecycle checks",
+        "df3dd30479b2f923ceb337b9060f3ae97314cc14 fix: converge daily dungeon portrait ownership and retry lifecycle"
+      ]
+    },
+    {
+      "pr": 647,
+      "mergeBase": "f082c8b06e7b3bbf27adcac74800ab9114d27d1b",
+      "patchSha256": "b4633f9d64f22012f8eccffd36ee1ac89f773de5f93d093cb11c1d937db1d4f2",
+      "nonAncestorCommits": [
+        "1503a7d67473464443bb80793b2e763c997bc975 build: synchronize production output after portrait convergence",
+        "d1669cd551665e271e7ebe8c9c5331c8d90569ea test: verify retired V159 bridge has no runtime sync owner",
+        "3371766a6c152bee79361bf523d2866093cd5994 test: assert portrait handoff through presentation sync",
+        "debdbb6a49fe8b0f4ea968e07d79b83b576dd058 test: provide canonical portrait presentation owner fixture",
+        "78d91522ba3c7fb889ade28d0402edf03a01e7c5 fix: preserve explicit debug clock across tower lifecycle checks",
+        "df3dd30479b2f923ceb337b9060f3ae97314cc14 fix: converge daily dungeon portrait ownership and retry lifecycle"
+      ]
+    },
+    {
+      "pr": 648,
+      "mergeBase": "f082c8b06e7b3bbf27adcac74800ab9114d27d1b",
+      "patchSha256": "dc26e9b0e78975030d952ec599dd7c552441d9a0d23a1f8d3a0c363e07ddb1f6",
+      "nonAncestorCommits": [
+        "ded3eebb7eb215e1a5cd7c9d1f6ab5cd6818255b test(qa): provide account key runtime contract",
+        "eb86a5fb4528fd41031c3ddb9df6d032c1083e01 test(qa): retain earlier browser bundle errors",
+        "c14f401732e3feb4c7bd2a3b703dee2dbab6f705 fix(qa): serialize registry tuple schema in browser fixture",
+        "3b411e7bca03f28ccb0dd5c2553a8ffe1320296b chore(qa): surface browser runtime errors",
+        "e41dec6b2282a4f874c31912df2c64a661255911 test: capture browser runtime exceptions in QA artifact",
+        "5cf5d3c6fd907b5347320e322df68a83f8e03a72 test: allow production bundle initialization time in browser QA",
+        "98faee4e4a36ce31d38f440a7477a80900f31c38 test: parse DOM QA artifact and screenshot over HTTP",
+        "466a80ba0d687cb96c437dfa7eb886942c8f0dba test: serve browser QA fixture from CI HTTP origin",
+        "f6477d94b1a28138be055e4e9dde2e111bb0db5b test: load production bundles through CI HTTP server",
+        "598854444345dee607fe4fd25248272f1b5b329e test: persist browser QA report in DOM output",
+        "5101e25269dfc7dd159946bf983012cc02da839e test: make browser QA result transport robust",
+        "7543ee7212e5e1beae787c97c866b6ed21ffa4ad test: expose daily portrait browser runtime diagnostics",
+        "e73ecc8f841527a9e15b63ec13d9403c9c27fea0 test: run daily portrait browser QA with runner Chrome",
+        "7be8dc4c8641ac203c1dd81fd1af6e200a3d264f test: run daily portrait browser QA with runner Chrome",
+        "1503a7d67473464443bb80793b2e763c997bc975 build: synchronize production output after portrait convergence",
+        "d1669cd551665e271e7ebe8c9c5331c8d90569ea test: verify retired V159 bridge has no runtime sync owner",
+        "3371766a6c152bee79361bf523d2866093cd5994 test: assert portrait handoff through presentation sync",
+        "debdbb6a49fe8b0f4ea968e07d79b83b576dd058 test: provide canonical portrait presentation owner fixture",
+        "78d91522ba3c7fb889ade28d0402edf03a01e7c5 fix: preserve explicit debug clock across tower lifecycle checks",
+        "df3dd30479b2f923ceb337b9060f3ae97314cc14 fix: converge daily dungeon portrait ownership and retry lifecycle"
+      ]
+    }
+  ],
+  "branchDeletionPolicy": "Strict user condition: retain historical heads when git log dev..head still contains independent commits; no force deletion."
 }
