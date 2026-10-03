@@ -8,10 +8,13 @@ const fixture=fs.readFileSync('tests/fixtures/wild-balance-reference-party.js','
 const expression=`(async()=>{
  const check=(v,m)=>{if(!v)throw Error(m);};
  const wait=async(fn,ms=30000)=>{const end=performance.now()+ms;while(!fn()&&performance.now()<end)await new Promise(r=>setTimeout(r,40));check(fn(),'Runtime wait: '+fn);};
- await wait(()=>FourSymbolsStartupPolicy?.getState?.()==='READY');
+ await wait(()=>FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden===true&&getComputedStyle(document.getElementById('gameInterface')).display!=='none'&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show'));
  await FourSymbolsFeatures.ensure('gameplay-core','daily-balance-qa');
+ await wait(()=>FourSymbolsReleaseUpdate?.getState?.().availableReleaseVersion);
  closeHomeFeature();autoConfig.enabled=false;autoBattle=false;autoPatrolEnabled=false;
- const evidence=window.dailyBalanceQaEvidence={encounters:[],captures:[],lateMutation:false},oldRandom=Math.random;
+ const evidence=window.dailyBalanceQaEvidence={encounters:[],captures:[],floatingFeedback:[],lateMutation:false},oldRandom=Math.random;
+ const feedbackObserver=new MutationObserver(records=>{for(const record of records)for(const node of record.addedNodes)if(node.nodeType===1&&node.matches('.battle-floating-feedback')){const r=node.getBoundingClientRect();evidence.floatingFeedback.push({kind:node.dataset.feedbackKind,text:node.textContent,width:r.width,height:r.height});}});
+ feedbackObserver.observe(document.body,{childList:true});
  const stats=m=>({hp:m.maxHP,sp:m.maxSP,attack:m.attack,magic:m.magicAttack,defense:m.defense,speed:m.agility,points:m.balanceProjection.allocation});
  const verify=()=>{
   for(const i of currentBattleMonsters){const m=monsters[i],p=MonsterBalance.debug(m);
@@ -21,10 +24,12 @@ const expression=`(async()=>{
    const box=document.getElementById('battleMonster'+i),art=box?.querySelector('.v174-battle-art'),r=art?.getBoundingClientRect();
    check(r&&r.width>0&&r.height>0&&getComputedStyle(art).backgroundImage!=='none','visible portrait');
    const hp=box.querySelector('.monster-hp-inner'),sp=box.querySelector('.monster-sp-inner');check(hp&&sp,'HP/SP UI');
+   check(box.querySelector('.monster-status-badges'),'formal status presentation');
   }
  };
  async function scene(type,level,size,automatic){
   const reference=prepareWildBalanceReferenceParty(level,size);
+  closeHomeFeature();
   window.v131GrantElementBoxHours(8,32);for(const c of [autoConfig,autoConfig2,autoConfig3])c.skill=reference.skill;
   autoConfig.enabled=false;autoBattle=false;showPage('dungeon');switchDungeonTab('daily');
   const beforeGold=gold,beforeExp=sharedExp,beforeMaterial=inventoryItems.filter(x=>x.id==='materialChest').reduce((s,x)=>s+(x.count||1),0);
@@ -38,10 +43,11 @@ const expression=`(async()=>{
   try{
    let previousWave=0;
    while(battleActive){
-    await wait(()=>!battleActive||battlePhase==='declare',100000);if(!battleActive)break;
+    await wait(()=>!battleActive||(battlePhase==='declare'&&actionReady&&!document.getElementById('battlePage')?.matches('.v141-preparing-entry,.v141-entry-moving')),100000);if(!battleActive)break;
     const wave=monsters[0]?.wave;check(wave>=1&&wave<=3,'wave identity');
     if(wave!==previousWave){
      previousWave=wave;verify();renderBattle();verify();
+     check(!document.getElementById('homeFeatureModal')?.classList.contains('show'),'unobstructed battle');
      encountered.push({wave,ranks:monsters.map(m=>m.rank),before:monsters.map(stats),rounds:0});
      // Expose a stable natural battle frame to the outer screenshot runner.
      window.dailyBalanceQaCapture={type,wave,level,size};await new Promise(r=>setTimeout(r,350));
@@ -58,8 +64,10 @@ const expression=`(async()=>{
   if(automatic){for(const wave of [2,3])if(!encountered.some(x=>x.wave===wave))encountered.push({wave,rounds:Math.max(...snapshots.filter(s=>s.wave===wave).map(s=>s.turn)),automatic:true});}
   check(encountered.length===3,'all three waves naturally activated');check(encountered.every(w=>w.rounds<=2),'natural <=2 round waves '+JSON.stringify(encountered.map(w=>[w.wave,w.rounds])));
   await wait(()=>document.getElementById('v132RewardModal')?.classList.contains('show'));
+  const title=document.querySelector('#v132RewardModal h3')?.textContent;
+  check(title?.includes(type==='material'?'材料':type==='gold'?'金幣':'經驗'),'matching reward '+title);
   const claim=document.querySelector('#v132RewardModal button');check(claim?.textContent==='直接領取','formal reward');claim.click();
-  await wait(()=>document.getElementById('dungeonPage')?.classList.contains('active'));
+  await wait(()=>document.getElementById('dungeonPage')?.classList.contains('active')&&!document.getElementById('v132RewardModal')?.classList.contains('show'));
   // Material claim uses the existing alert; acknowledge it using the formal dialog.
   const alert=document.getElementById('v169RpgDialogLayer');if(alert?.classList.contains('show'))document.querySelectorAll('#v169RpgDialogLayer .v169-rpg-dialog-button')[1].click();
   autoConfig.enabled=false;autoBattle=false;
@@ -72,8 +80,9 @@ const expression=`(async()=>{
   await scene('exp',50,3,false);await scene('material',50,3,false);await scene('gold',50,3,true);
   await scene('exp',50,3,false);
   if(innerWidth===412)await scene('gold',10,1,false);
+  check(evidence.floatingFeedback.some(x=>x.width>0&&x.height>0),'visible natural floating feedback');
   return evidence;
- }finally{Math.random=oldRandom;autoConfig.enabled=false;autoBattle=false;}
+ }finally{feedbackObserver.disconnect();Math.random=oldRandom;autoConfig.enabled=false;autoBattle=false;}
 })()
 `;
 const liveBase=process.env.DAILY_BALANCE_BASE_URL;
@@ -113,5 +122,5 @@ try{
   closeViewport();
  }
  assert.equal(results[0].encounters.length,5);fs.writeFileSync(artifact,JSON.stringify({passed:true,commitSha:process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||'local',results},null,2)+'\n');console.log('Daily balance natural production waves, TTK, manual/auto, rewards, re-entry and beginner: PASS');
-}catch(error){const partial=await client?.eval('({evidence:window.dailyBalanceQaEvidence,startupState:window.FourSymbolsStartupPolicy?.getState?.(),startupUid:window.FourSymbolsStartupPolicy?.getUid?.(),turn,battleActive,battlePhase,autoBattle,currentZone})').catch(()=>null);fs.writeFileSync(artifact,JSON.stringify({passed:false,error:String(error.stack||error),results,partial,console:client?.events.filter(e=>e.method==='Runtime.consoleAPICalled').slice(-15)},null,2)+'\n');throw error;}
+}catch(error){const partial=await client?.eval('({evidence:window.dailyBalanceQaEvidence,startupState:window.FourSymbolsStartupPolicy?.getState?.(),startupUid:window.FourSymbolsStartupPolicy?.getUid?.(),turn,battleActive,battlePhase,autoBattle,currentZone,inventory:inventoryItems,reward:document.getElementById("v132RewardModal")?.innerHTML,dialog:document.getElementById("v169RpgDialogMessage")?.textContent})').catch(()=>null);fs.writeFileSync(artifact,JSON.stringify({passed:false,error:String(error.stack||error),results,partial,console:client?.events.filter(e=>e.method==='Runtime.consoleAPICalled').slice(-15)},null,2)+'\n');throw error;}
 finally{closeViewport();await new Promise(r=>server.server.close(r));}
