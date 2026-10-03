@@ -34,7 +34,7 @@ on:
 
 permissions:
   contents: read
-  checks: read
+  actions: read
 
 concurrency:
   group: session-authority-${{ github.ref }}
@@ -87,8 +87,18 @@ jobs:
         run: |
           test "$(git ls-remote origin refs/heads/dev | cut -f1)" = "$GITHUB_SHA"
           for attempt in $(seq 1 80); do
-            conclusion="$(gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/check-runs" --jq '[.check_runs[] | select(.name == "Repository checks")][0].conclusion // "pending"')"
-            if [[ "$conclusion" == "success" ]]; then exit 0; fi
+            test "$(git ls-remote origin refs/heads/dev | cut -f1)" = "$GITHUB_SHA"
+            # Resolve the exact dev push CI owner, not a newer dev -> main PR
+            # check with the same display name and a longer release test policy.
+            run_id="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs?head_sha=$GITHUB_SHA&event=push&branch=dev&per_page=100" --jq "[.workflow_runs[] | select(.path == \".github/workflows/ci.yml\" and .event == \"push\" and .head_branch == \"dev\" and .head_sha == \"$GITHUB_SHA\")][0].id // empty")"
+            conclusion="pending"
+            if [[ -n "$run_id" ]]; then
+              conclusion="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run_id/jobs?per_page=100" --jq '[.jobs[] | select(.name == "Repository checks")][0].conclusion // "pending"')"
+            fi
+            if [[ "$conclusion" == "success" ]]; then
+              test "$(git ls-remote origin refs/heads/dev | cut -f1)" = "$GITHUB_SHA"
+              exit 0
+            fi
             if [[ "$conclusion" != "pending" ]]; then
               echo "::error::Repository checks did not succeed ($conclusion)."
               exit 1

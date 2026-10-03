@@ -18,7 +18,8 @@ jobs:
   verify:
     name: Repository checks
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    # Main-target releases run all 262 suites and the complete browser gates.
+    timeout-minutes: ${{ (github.ref == 'refs/heads/main' || github.base_ref == 'main') && 30 || 20 }}
 
     steps:
       - name: Check out repository
