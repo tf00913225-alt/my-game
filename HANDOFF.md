@@ -1,3 +1,12 @@
+## 2026-10-03 — MONSTER-BALANCE-OWNER-P2B-DAILY-20261003（施工／驗證中）
+
+- 開工dev4274454a／main f63d69db；main禁止修改；原Phase1/2A契約與#777/#780最終紀錄已核實。Branch feature/monster-balance-owner-phase2b-daily-20261003；本工作PR為耐久狀態Owner。
+- Daily正式V148 spec→MonsterBalance.build；Rank regular1/elite1.5+1.1+1.1/boss2+1.15+1.15；ability budget不變。9個portrait-key固定archetype，三type同Owner；三波與solo特殊編成／等級owner／獎勵原封保留。
+- V158 Daily核心/party/level/.5後置縮放與render hook實體退休；舊Equipment constructor/roster/入口退休，兼容入口仍指Gold。V132倍率僅NON-DAILY COMPATIBILITY，Daily完全切斷；shared其他玩法待2C–2F，不能盲刪。
+- 實測耐久party1/2/3=.04/.08/.12；solo<=20 final pressure=.5僅輸出壓力；不縮六圍/SP/raw attack/敏捷/等級。54encounter/162wave正式公式診斷全部<=2且存活；原起始校正有超時/死亡，歷史明列，不冒稱原值PASS。
+- 專項7/7、972identity、Phase1/2A20/20與7檔直接相關回歸本機PASS；同源生成build。真Chrome本機socket EPERM，該次FAIL，不能稱Browser PASS。Existing CI加入Daily自然390/412 gate，無新workflow；最新Head CI/真Chrome/整合/精確部署/closeout仍pending。
+- 規格與證據：docs/MONSTER_BALANCE_OWNER_PHASE2B.md、daily-ttk-evidence、retirement-map。停止點Daily；未進Tower、未發布main、未改portrait素材。
+
 ## 2026-10-03 — MONSTER-BALANCE-OWNER-P2A-WILD-20261003（功能驗證回填，整合待 Gate）
 
 - 延續原PR#780／原施工分支，已吸收dev ddde74b0（#781文件）；沒有重做Phase1、修改main或進Daily Phase2B。

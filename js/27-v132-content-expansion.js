@@ -1884,8 +1884,6 @@
     */
     const DUNGEON_ELITE_MULTIPLIERS={maxHP:3.20,maxSP:2.00,defense:1.25};
     const DUNGEON_BOSS_MULTIPLIERS={maxHP:4.50,maxSP:2.00,defense:1.40};
-    const EQUIPMENT_DUNGEON_ELITE_MULTIPLIERS={maxHP:1.80,defense:1.10};
-    const EQUIPMENT_DUNGEON_BOSS_MULTIPLIERS={maxHP:2.80,defense:1.20};
 
     function applyDungeonRankStrength(monster){
         if(!monster){ return monster; }
@@ -1904,8 +1902,8 @@
         return monster;
     }
 
-    /* 共用副本／深淵入口：完整普通基準後套共用 rank 倍率。
-       裝備副本使用下方專用入口，避免與共用 rank 倍率疊乘。 */
+    /* NON-DAILY COMPATIBILITY ONLY. Tower/Abyss/Boss/Adventure retain legacy
+       output until their own migrations. Formal Daily never calls this builder. */
     function buildDungeonMonster(name,level,element,rank){
         const monster=makeZoneMonster(name,level,element,rank);
         applyDungeonMonsterStrength(monster);
@@ -1918,38 +1916,6 @@
     window.v132DungeonRankMultipliers=Object.freeze({
         elite:Object.freeze(Object.assign({},DUNGEON_ELITE_MULTIPLIERS)),
         boss:Object.freeze(Object.assign({},DUNGEON_BOSS_MULTIPLIERS))
-    });
-
-    function applyEquipmentDungeonRankStrength(monster){
-        if(!monster){ return monster; }
-        const multipliers=
-            monster.rank==="elite" ? EQUIPMENT_DUNGEON_ELITE_MULTIPLIERS :
-            monster.rank==="boss" ? EQUIPMENT_DUNGEON_BOSS_MULTIPLIERS :
-            null;
-        if(!multipliers){ return monster; }
-        Object.keys(multipliers).forEach(key=>{
-            if(Number.isFinite(Number(monster[key]))){
-                monster[key]=Math.max(1,Math.round(Number(monster[key])*multipliers[key]));
-            }
-        });
-        monster.hp=monster.maxHP;
-        monster.sp=monster.maxSP;
-        return monster;
-    }
-
-    function buildEquipmentDungeonMonster(name,level,element,rank){
-        const monster=makeZoneMonster(name,level,element,rank);
-        applyDungeonMonsterStrength(monster);
-        applyDungeonNormalBonus(monster);
-        applyEquipmentDungeonRankStrength(monster);
-        monster.v132Dungeon=true;
-        monster.v132EquipmentDungeon=true;
-        return monster;
-    }
-    window.v132BuildEquipmentDungeonMonster=buildEquipmentDungeonMonster;
-    window.v173EquipmentDungeonRankMultipliers=Object.freeze({
-        elite:Object.freeze(Object.assign({},EQUIPMENT_DUNGEON_ELITE_MULTIPLIERS)),
-        boss:Object.freeze(Object.assign({},EQUIPMENT_DUNGEON_BOSS_MULTIPLIERS))
     });
 
     function setMonsterSkillTier(monster,tier,chance){
@@ -2548,62 +2514,7 @@
     }
     window.v138GetEquipmentDungeonComposition=getEquipmentDungeonComposition;
 
-    function buildEquipmentDungeonRoster(){
-        const composition=getEquipmentDungeonComposition();
-        const level=getDungeonMonsterLevel();
-        const roster=[];
-        for(let i=0;i<composition.bossCount;i++){
-            const boss=buildEquipmentDungeonMonster(
-                "裝備殿守護者",level,randomElement(),"boss"
-            );
-            setMonsterMaxTierSkills(boss,0.7);
-            lockDungeonSkillConfiguration(boss,3);
-            roster.push(boss);
-        }
-        for(let i=0;i<composition.eliteCount;i++){
-            const monster=buildEquipmentDungeonMonster("殿前護衛精英",level,randomElement(),"elite");
-            setMonsterSkillTier(monster,3,0.7);
-            lockDungeonSkillConfiguration(monster,2);
-            roster.push(monster);
-        }
-        return roster;
-    }
-    window.v132BuildEquipmentDungeonRoster=buildEquipmentDungeonRoster;
-
-    async function beginEquipmentDungeon(){
-        if(!isDungeonAvailable("equipment")){
-            alert("裝備副本今天已經挑戰過了。");
-            return;
-        }
-        if(!hasLevel10CharacterForDailyDungeon()){
-            alert("裝備副本需要任一角色達到10級才能開啟。");
-            return;
-        }
-        if(!ticketDefinitions.some(definition=>canAddItemToInventory(definition,1))){
-            alert("請先預留至少1張裝備抽獎券的背包空間，再挑戰裝備副本。");
-            return;
-        }
-
-        const composition=getEquipmentDungeonComposition();
-        if(!await confirmDungeonEntry(
-            "裝備副本",
-            "固定編成：1隻BOSS與4隻精英怪，共5名敵人。"
-        )){
-            return;
-        }
-
-        const roster=buildEquipmentDungeonRoster();
-
-        launchDungeonBattle(roster,function(outcome){
-            if(outcome.result!=="win"){
-                showPage("dungeon");
-                switchDungeonTab("daily");
-                return;
-            }
-            showEquipmentDungeonRewardModal();
-        },{mode:"daily",dailyDungeonType:"equipment"});
-    }
-    window.v132BeginEquipmentDungeon=beginEquipmentDungeon;
+    /* Equipment encounter retired. Formal Gold entry is owned by V148. */
 
     function showEquipmentDungeonRewardModal(){
         const html=

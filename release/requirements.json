@@ -471,6 +471,22 @@
         "verification": "15項功能逐項驗證；專項20/20、528projection、56identity、非Wild immutable baseline、40TTK及雙尺寸自然Chrome；build:check PASS",
         "result": "功能15/15 VERIFIED；一般1–2／精英1–3回合為基準隊伍範圍；Tank defensive AI gap明示。最新Head CI／dev整合／部署SHA／分支清理以PR#780為最終Gate owner，未完成前不宣稱全案完成。"
       }
+    },
+    {
+      "id": "REQ-MONSTER-BALANCE-OWNER-P2B-DAILY-20261003",
+      "title": "Daily Runtime唯一MonsterBalance／Rank和Mode收斂／舊倍率退休",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "docs/MONSTER_BALANCE_OWNER_PHASE2B.md",
+          "docs/monster-balance-daily-ttk-evidence.json",
+          "tests/monster-balance-owner-phase2b.test.mjs",
+          ".github/scripts/run-daily-balance-browser-qa.mjs",
+          "docs/monster-balance-owner-retirement-map.json"
+        ],
+        "verification": "Focused27/27 + seven direct regression suites; production build/check. Natural Chrome required in existing CI.",
+        "result": "IMPLEMENTED; local Chrome socket EPERM, Browser verification, latest Required CI, dev integration/deployed SHA and cleanup PENDING. main untouched."
+      }
     }
   ]
 }

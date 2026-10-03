@@ -1044,11 +1044,11 @@ test("all daily dungeons share three six-enemy waves and Gold replaces Equipment
                 positions:built.waves.map(wave=>wave.map(monster=>monster.v141FormationPosition)),
                 orders:built.waves.map(wave=>wave.map(monster=>monster.v148TargetOrder))};
         });
-        const one40=v173GetDailyDungeonScaleContext();
+        const one40=v148BuildDailyDungeonWaves("exp").waves[0][0].balanceProjection.profiles.mode;
         player2={id:"角色2",level:40};
-        const two40=v173GetDailyDungeonScaleContext();
+        const two40=v148BuildDailyDungeonWaves("exp").waves[0][0].balanceProjection.profiles.mode;
         player3={id:"角色3",level:80};
-        const three80=v173GetDailyDungeonScaleContext();
+        const three80=v148BuildDailyDungeonWaves("exp").waves[0][0].balanceProjection.profiles.mode;
         return {runs:runs,one40:one40,two40:two40,three80:three80};
     })()`);
     result.runs.forEach(run=>{
@@ -1060,9 +1060,9 @@ test("all daily dungeons share three six-enemy waves and Gold replaces Equipment
         run.positions.forEach(row=>assert.deepEqual(row,[0,1,2,0,1,2]));
         run.orders.forEach(row=>assert.deepEqual(row,[4,1,3,6,2,5]));
     });
-    assert.equal(result.one40.factor,.20);
-    assert.equal(result.two40.factor,.36);
-    assert.equal(result.three80.factor,.525);
+    assert.equal(result.one40.partySizeDurability,.04);
+    assert.equal(result.two40.partySizeDurability,.08);
+    assert.equal(result.three80.partySizeDurability,.12);
     const dungeonSource=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");
     assert.match(dungeonSource,/showDailyGoldReward\(goldDungeonReward\(active\.level\)\)/);
     assert.match(dungeonSource,/金幣副本/);
@@ -1639,13 +1639,17 @@ test("V2 final percent sources, naked levels, Calm, Dodge, Wind EX and low-HP ca
     assert.deepEqual(evidence.dodge,[5,10,15,20,25]);
 });
 
-test("V2 explicit monster hit fields survive daily party-level and beginner power scaling",()=>{
+test("V2 explicit hit fields survive Daily Owner construction and repeated render",()=>{
     const runtime=loadFinalRuntime();
     const values=evaluateJson(runtime.context,`(()=>{
-        const daily=[1,20,100].map(highestPartyLevel=>{
-            window.v132ActiveDungeonRun={partySize:1,highestPartyLevel};
-            const monster={v173DailyDungeonType:"exp",accuracy:10,evasion:8,attack:100,maxHP:1000,hp:1000};
-            v17342NormalizeDailyDungeonMonster(monster);
+        const daily=[10,20,100].map(level=>{
+            Object.assign(player,{id:"QA",level});player2=null;player3=null;
+            const monster=v148BuildDailyDungeonWaves("exp").waves[0][0];
+            monster.accuracy=10;monster.evasion=8;
+            monsters=[monster];currentBattleMonsters=[0];currentZone="dungeon";
+            window.v132ActiveDungeonRun={mode:"daily",partySize:1,highestPartyLevel:level};
+            const attack=monster.attack;v141PrepareBattleRender();v144ConfigureDungeonBattleSkillsAfterRender();v141PrepareBattleRender();v144ConfigureDungeonBattleSkillsAfterRender();
+            if(attack!==monster.attack)throw Error("late attack mutation");
             return [monster.accuracy,monster.evasion,calculateHitChancePercent(monster.accuracy,monster.evasion,0,0)];
         });
         const beginner={accuracy:10,evasion:8,attack:100,maxHP:1000,hp:1000};
@@ -1653,7 +1657,7 @@ test("V2 explicit monster hit fields survive daily party-level and beginner powe
         return {daily,beginner:[beginner.accuracy,beginner.evasion,beginner.attack]};
     })()`);
     assert.deepEqual(values.daily,[[10,8,97],[10,8,97],[10,8,97]]);
-    assert.deepEqual(values.beginner,[10,8,100]); // core-stat halving retired; hit fields and safety unchanged.
+    assert.deepEqual(values.beginner,[10,8,100]);
 });
 
 console.log("\nV170 final integration suite: "+passed+" tests passed.");

@@ -1,6 +1,6 @@
 {
-  "workId": "MONSTER-BALANCE-OWNER-P2A-WILD-20261003",
-  "phase": "2A",
+  "workId": "MONSTER-BALANCE-OWNER-P2B-DAILY-20261003",
+  "phase": "2B",
   "classification": [
     "Convergence",
     "Replacement",
@@ -18,41 +18,41 @@
       "id": "coreAllocation",
       "file": "js/00-main.js",
       "sourceToken": "generateMonsterAttributePoints",
-      "status": "COMPATIBILITY FOR NON-WILD ONLY",
-      "decision": "COMPATIBILITY FOR NON-WILD ONLY",
-      "phase": "Phase 2 Wild then final shared-user migration",
+      "status": "COMPATIBILITY FOR NON-DAILY ONLY",
+      "decision": "COMPATIBILITY FOR NON-DAILY ONLY",
+      "phase": "Phase 2C Tower / 2D Abyss / 2E Adventure / 2F Boss",
       "reason": "(level-1)*5 + archetype allocation; retain legacy only for unmigrated modes",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "Delete after Phase 2B Daily and all subsequent explicit mode migrations",
+      "retirementGate": "Delete legacy responsibility after final dependent mode migrates; Daily caller graph must stay severed",
       "wildForbidden": true,
       "requiredModes": [
-        "daily",
         "tower",
         "abyss",
         "adventure",
         "personalBoss",
         "worldBoss"
-      ]
+      ],
+      "dailyForbidden": true
     },
     {
       "id": "coreStats",
       "file": "js/00-main.js",
       "sourceToken": "makeLegacyModeMonster",
-      "status": "COMPATIBILITY FOR NON-WILD ONLY",
-      "decision": "COMPATIBILITY FOR NON-WILD ONLY",
-      "phase": "Phase 2 Wild → Boss final",
+      "status": "COMPATIBILITY FOR NON-DAILY ONLY",
+      "decision": "COMPATIBILITY FOR NON-DAILY ONLY",
+      "phase": "Phase 2C Tower / 2D Abyss / 2E Adventure / 2F Boss",
       "reason": "stat generation migrates; skill/identity construction responsibility kept separately",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "Delete after Phase 2B Daily and all subsequent explicit mode migrations",
+      "retirementGate": "Delete legacy responsibility after final dependent mode migrates; Daily caller graph must stay severed",
       "wildForbidden": true,
       "requiredModes": [
-        "daily",
         "tower",
         "abyss",
         "adventure",
         "personalBoss",
         "worldBoss"
-      ]
+      ],
+      "dailyForbidden": true
     },
     {
       "id": "playerLevelBase",
@@ -121,45 +121,72 @@
       "id": "dungeonStrength",
       "file": "js/27-v132-content-expansion.js",
       "sourceToken": "applyDungeonMonsterStrength",
-      "status": "CURRENT OWNER",
-      "decision": "TO RETIRE",
-      "phase": "Phase 2 Daily → Tower → Abyss → Boss final",
+      "status": "COMPATIBILITY FOR NON-DAILY ONLY",
+      "decision": "COMPATIBILITY FOR NON-DAILY ONLY",
+      "phase": "Phase 2C Tower / 2D Abyss / 2E Adventure / 2F Boss",
       "reason": "keep for unmigrated users only; remove at last dependent migration",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+      "retirementGate": "Delete legacy responsibility after final dependent mode migrates; Daily caller graph must stay severed",
+      "dailyForbidden": true,
+      "wildForbidden": true,
+      "requiredModes": [
+        "tower",
+        "abyss",
+        "adventure",
+        "personalBoss",
+        "worldBoss"
+      ]
     },
     {
       "id": "dungeonNormal",
       "file": "js/27-v132-content-expansion.js",
       "sourceToken": "applyDungeonNormalBonus",
-      "status": "CURRENT OWNER",
-      "decision": "TO RETIRE",
-      "phase": "Phase 2 Daily → Tower → Abyss → Boss final",
+      "status": "COMPATIBILITY FOR NON-DAILY ONLY",
+      "decision": "COMPATIBILITY FOR NON-DAILY ONLY",
+      "phase": "Phase 2C Tower / 2D Abyss / 2E Adventure / 2F Boss",
       "reason": "same dependency rule; legacy 1.30/1.10 not ratified",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+      "retirementGate": "Delete legacy responsibility after final dependent mode migrates; Daily caller graph must stay severed",
+      "dailyForbidden": true,
+      "wildForbidden": true,
+      "requiredModes": [
+        "tower",
+        "abyss",
+        "adventure",
+        "personalBoss",
+        "worldBoss"
+      ]
     },
     {
       "id": "dungeonRank",
       "file": "js/27-v132-content-expansion.js",
       "sourceToken": "applyDungeonRankStrength",
-      "status": "CURRENT OWNER",
-      "decision": "TO RETIRE",
-      "phase": "Phase 2 Daily → Boss final",
+      "status": "COMPATIBILITY FOR NON-DAILY ONLY",
+      "decision": "COMPATIBILITY FOR NON-DAILY ONLY",
+      "phase": "Phase 2C Tower / 2D Abyss / 2E Adventure / 2F Boss",
       "reason": "3.20/4.50 HP,2 SP,1.25/1.40 defense comparison only",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+      "retirementGate": "Delete legacy responsibility after final dependent mode migrates; Daily caller graph must stay severed",
+      "dailyForbidden": true,
+      "wildForbidden": true,
+      "requiredModes": [
+        "tower",
+        "abyss",
+        "adventure",
+        "personalBoss",
+        "worldBoss"
+      ]
     },
     {
       "id": "equipmentRank",
       "file": "js/27-v132-content-expansion.js",
       "sourceToken": "applyEquipmentDungeonRankStrength",
-      "status": "CURRENT OWNER",
-      "decision": "TO RETIRE",
-      "phase": "Phase 2 Daily (including equipment)",
-      "reason": "equipment 1.80/2.80 HP and1.10/1.20 defense require subtype spec",
+      "status": "RETIRED",
+      "decision": "RETIRED",
+      "phase": "Phase 2B Daily",
+      "reason": "Formal Daily directly builds MonsterBalance projection; equipment construction has no effective final-loader Runtime caller, and V158 render scaling is removed.",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+      "retirementGate": "Old source absent, focused and final-loader regression required"
     },
     {
       "id": "beginnerScaling",
@@ -176,12 +203,12 @@
       "id": "dailyScaling",
       "file": "js/47-v158-combat-tuning.js",
       "sourceToken": "normalizeDailyDungeonMonster",
-      "status": "CURRENT OWNER",
-      "decision": "TO RETIRE",
-      "phase": "Phase 2 Daily",
-      "reason": "party/level/0.5 scaling and point double-scaling move to single prebattle projection; remove render normalization",
+      "status": "RETIRED",
+      "decision": "RETIRED",
+      "phase": "Phase 2B Daily",
+      "reason": "Formal Daily directly builds MonsterBalance projection; equipment construction has no effective final-loader Runtime caller, and V158 render scaling is removed.",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+      "retirementGate": "Old source absent, focused and final-loader regression required"
     },
     {
       "id": "v158Wrapper",
@@ -275,21 +302,21 @@
       "id": "enemyPressure",
       "file": "js/00-main.js",
       "sourceToken": "getEnemyPressureMultiplier",
-      "status": "COMPATIBILITY FOR NON-WILD ONLY",
-      "decision": "COMPATIBILITY FOR NON-WILD ONLY",
-      "phase": "Phase 2 each mode then Boss final",
+      "status": "COMPATIBILITY FOR NON-DAILY ONLY",
+      "decision": "COMPATIBILITY FOR NON-DAILY ONLY",
+      "phase": "Phase 2C Tower / 2D Abyss / 2E Adventure / 2F Boss",
       "reason": "mode explicit; v132Dungeon flag cannot imply daily; damage settlement KEEP single owner consumes resolved profile",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "Delete after Phase 2B Daily and all subsequent explicit mode migrations",
+      "retirementGate": "Delete legacy responsibility after final dependent mode migrates; Daily caller graph must stay severed",
       "wildForbidden": true,
       "requiredModes": [
-        "daily",
         "tower",
         "abyss",
         "adventure",
         "personalBoss",
         "worldBoss"
-      ]
+      ],
+      "dailyForbidden": true
     },
     {
       "id": "adventureBuild",
@@ -325,5 +352,6 @@
       "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
     }
   ],
-  "phase2aGate": "15/15 functional requirements VERIFIED: focused20/20, unchanged non-Wild outputs, 40 diagnostic TTK and both-viewports natural Chrome. Latest Required CI/dev integration/deployed exact SHA remain separate gates owned by PR #780."
+  "phase2aGate": "15/15 functional requirements VERIFIED: focused20/20, unchanged non-Wild outputs, 40 diagnostic TTK and both-viewports natural Chrome. Latest Required CI/dev integration/deployed exact SHA remain separate gates owned by PR #780.",
+  "phase2bGate": "IMPLEMENTED; TTK, natural Chrome, latest CI/integration/deployment gates still pending."
 }

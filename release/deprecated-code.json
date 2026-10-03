@@ -172,6 +172,23 @@
         "V173_32_WILD_ZONE_STRENGTHS",
         "v173WildZoneStrengthMultipliers"
       ]
+    },
+    {
+      "id": "DEP-MONSTER-P2B-DAILY-SCALING",
+      "description": "Daily core rescaling, pre-render normalizer and inactive Equipment builder are retired. V132 common builder is non-Daily compatibility only.",
+      "enabled": true,
+      "forbidden": [
+        "DAILY_DUNGEON_SCALE_FIELDS",
+        "DAILY_DUNGEON_DIFFICULTY_MULTIPLIER",
+        "normalizeDailyDungeonMonster",
+        "getDailyDungeonScaleContext",
+        "v158PrepareBattleRender",
+        "EQUIPMENT_DUNGEON_ELITE_MULTIPLIERS",
+        "EQUIPMENT_DUNGEON_BOSS_MULTIPLIERS",
+        "applyEquipmentDungeonRankStrength",
+        "buildEquipmentDungeonMonster",
+        "buildEquipmentDungeonRoster"
+      ]
     }
   ]
 }
