@@ -17,7 +17,13 @@ fs.mkdirSync(destination);
 const excludes=['.git/','.github/','tests/','node_modules/','functions/',
  '.firebaserc','firebase.json','firestore.rules','_deploy/',
  'artifacts/','assets/inbox/','release-manifest.json','release-manifest.final.json'];
-execFileSync('rsync',['-a','--from0','--files-from=-',...excludes.map(p=>'--exclude='+p),'./',destination+'/'],{input:files,stdio:['pipe','inherit','inherit']});
+// --files-from lists explicit files; directory-only rsync excludes do not
+// reliably filter those entries. Apply this single policy before copying.
+const allowed=files.toString('utf8').split('\0').filter(file=>file&&!excludes.some(rule=>rule.endsWith('/')?file.startsWith(rule):file===rule));
+execFileSync('rsync',['-a','--from0','--files-from=-','./',destination+'/'],{input:Buffer.from(allowed.join('\0')+'\0'),stdio:['pipe','inherit','inherit']});
+for(const rule of excludes){
+ if(fs.existsSync(path.join(destination,rule.replace(/\/$/,'')))) throw Error('Forbidden static deployment source: '+rule);
+}
 if(!fs.existsSync(path.join(destination,'index.html'))) throw Error('Deployment index.html is missing');
 // Pages artifacts forbid links. Reject them for both providers instead of silently
 // dereferencing a source outside the immutable tracked deployment.
