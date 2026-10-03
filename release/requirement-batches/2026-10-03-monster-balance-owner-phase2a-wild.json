@@ -1,0 +1,230 @@
+{
+  "date": "2026-10-03",
+  "title": "Monster Balance Owner Phase 2A Wild Runtime and Legacy Retirement",
+  "workId": "MONSTER-BALANCE-OWNER-P2A-WILD-20261003",
+  "base_branch": "dev",
+  "base_sha": "de5e2049eae20294a173f3e7f5b57fa54c5afe9b",
+  "resume_dev_sha": "8d797b6b9ce91abfa42064a2f044c2028060b672",
+  "work_branch": "feature/monster-balance-owner-phase2a-wild-20261003",
+  "officialVersion": "173.73",
+  "status": "IMPLEMENTED",
+  "requirements": [
+    {
+      "id": "WILD-P2A-01",
+      "title": "Level Base、能力預算與怪物 HP／SP 正式契約",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "js/combat/level-base-contract.mjs",
+          "tests/monster-balance-owner-phase2a.test.mjs",
+          "docs/MONSTER_BALANCE_OWNER_PHASE2A.md"
+        ],
+        "verification": "Focused Phase1 11/11 and Phase2A 9/9; production build; full-loader outputs. Natural production Chrome and final Required CI pending.",
+        "result": "IMPLEMENTED; not yet VERIFIED"
+      }
+    },
+    {
+      "id": "WILD-P2A-02",
+      "title": "六種 Archetype deterministic 與 56 個既有 Identity 映射",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "config/wild-monster-archetypes.json",
+          "tests/monster-balance-owner-phase2a.test.mjs",
+          "docs/MONSTER_BALANCE_OWNER_PHASE2A.md"
+        ],
+        "verification": "Focused Phase1 11/11 and Phase2A 9/9; production build; full-loader outputs. Natural production Chrome and final Required CI pending.",
+        "result": "IMPLEMENTED; not yet VERIFIED"
+      }
+    },
+    {
+      "id": "WILD-P2A-03",
+      "title": "Wild Runtime 由 MonsterBalance.build 唯一產生 pre-battle stats",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "js/combat/monster-balance-owner.mjs",
+          "tests/monster-balance-owner-phase2a.test.mjs",
+          "docs/MONSTER_BALANCE_OWNER_PHASE2A.md"
+        ],
+        "verification": "Focused Phase1 11/11 and Phase2A 9/9; production build; full-loader outputs. Natural production Chrome and final Required CI pending.",
+        "result": "IMPLEMENTED; not yet VERIFIED"
+      }
+    },
+    {
+      "id": "WILD-P2A-04",
+      "title": "makeZoneMonster 僅 Adapter／無新增或殘留建怪 Wrapper chain",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "js/00-main.js",
+          "tests/monster-balance-owner-phase2a.test.mjs",
+          "docs/MONSTER_BALANCE_OWNER_PHASE2A.md"
+        ],
+        "verification": "Focused Phase1 11/11 and Phase2A 9/9; production build; full-loader outputs. Natural production Chrome and final Required CI pending.",
+        "result": "IMPLEMENTED; not yet VERIFIED"
+      }
+    },
+    {
+      "id": "WILD-P2A-05",
+      "title": "V131 Wild strength 與 Zone multiplier 實體退休",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "js/25-v131-fix-batch.js",
+          "tests/monster-balance-owner-phase2a.test.mjs",
+          "docs/MONSTER_BALANCE_OWNER_PHASE2A.md"
+        ],
+        "verification": "Focused Phase1 11/11 and Phase2A 9/9; production build; full-loader outputs. Natural production Chrome and final Required CI pending.",
+        "result": "IMPLEMENTED; not yet VERIFIED"
+      }
+    },
+    {
+      "id": "WILD-P2A-06",
+      "title": "V141 Wind／Earth 第二 strength 實體退休",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "js/34-v141-core-systems.js",
+          "tests/monster-balance-owner-phase2a.test.mjs",
+          "docs/MONSTER_BALANCE_OWNER_PHASE2A.md"
+        ],
+        "verification": "Focused Phase1 11/11 and Phase2A 9/9; production build; full-loader outputs. Natural production Chrome and final Required CI pending.",
+        "result": "IMPLEMENTED; not yet VERIFIED"
+      }
+    },
+    {
+      "id": "WILD-P2A-07",
+      "title": "V158 core halving 及數值 mutation marker 實體退休",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "js/47-v158-combat-tuning.js",
+          "tests/monster-balance-owner-phase2a.test.mjs",
+          "docs/MONSTER_BALANCE_OWNER_PHASE2A.md"
+        ],
+        "verification": "Focused Phase1 11/11 and Phase2A 9/9; production build; full-loader outputs. Natural production Chrome and final Required CI pending.",
+        "result": "IMPLEMENTED; not yet VERIFIED"
+      }
+    },
+    {
+      "id": "WILD-P2A-08",
+      "title": "Canonical rank 唯一化／v141BattleRank 僅 mirror",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "js/34-v141-core-systems.js",
+          "tests/monster-balance-owner-phase2a.test.mjs",
+          "docs/MONSTER_BALANCE_OWNER_PHASE2A.md"
+        ],
+        "verification": "Focused Phase1 11/11 and Phase2A 9/9; production build; full-loader outputs. Natural production Chrome and final Required CI pending.",
+        "result": "IMPLEMENTED; not yet VERIFIED"
+      }
+    },
+    {
+      "id": "WILD-P2A-09",
+      "title": "Elite 能力點及 raw attacks 不變／HP1.50 Defense1.10／damage1.10一次",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "js/combat/monster-balance-owner.mjs",
+          "tests/monster-balance-owner-phase2a.test.mjs",
+          "docs/MONSTER_BALANCE_OWNER_PHASE2A.md"
+        ],
+        "verification": "Focused Phase1 11/11 and Phase2A 9/9; production build; full-loader outputs. Natural production Chrome and final Required CI pending.",
+        "result": "IMPLEMENTED; not yet VERIFIED"
+      }
+    },
+    {
+      "id": "WILD-P2A-10",
+      "title": "Archetype 與既有合法技能能力一致／Tank gap 明示",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "js/40-v144-rules-and-abyss.js",
+          "tests/monster-balance-owner-phase2a.test.mjs",
+          "docs/MONSTER_BALANCE_OWNER_PHASE2A.md"
+        ],
+        "verification": "Focused Phase1 11/11 and Phase2A 9/9; production build; full-loader outputs. Natural production Chrome and final Required CI pending.",
+        "result": "IMPLEMENTED; not yet VERIFIED"
+      }
+    },
+    {
+      "id": "WILD-P2A-11",
+      "title": "同名一致／528組 Shadow=Runtime／無 late mutation／Debug 保留 projection",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "tests/monster-balance-owner-phase2a.test.mjs",
+          "tests/monster-balance-owner-phase2a.test.mjs",
+          "docs/MONSTER_BALANCE_OWNER_PHASE2A.md"
+        ],
+        "verification": "Focused Phase1 11/11 and Phase2A 9/9; production build; full-loader outputs. Natural production Chrome and final Required CI pending.",
+        "result": "IMPLEMENTED; not yet VERIFIED"
+      }
+    },
+    {
+      "id": "WILD-P2A-12",
+      "title": "Daily／Tower／Abyss／Adventure／Personal／World Boss 原始輸出隔離",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "tests/fixtures/monster-balance-p2a-extra-non-wild.json",
+          "tests/monster-balance-owner-phase2a.test.mjs",
+          "docs/MONSTER_BALANCE_OWNER_PHASE2A.md"
+        ],
+        "verification": "Focused Phase1 11/11 and Phase2A 9/9; production build; full-loader outputs. Natural production Chrome and final Required CI pending.",
+        "result": "IMPLEMENTED; not yet VERIFIED"
+      }
+    },
+    {
+      "id": "WILD-P2A-13",
+      "title": "正式玩家公式基準隊伍／40組診斷及自然戰鬥 TTK／集中校正",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "scripts/wild-balance-ttk-matrix.mjs",
+          "tests/monster-balance-owner-phase2a.test.mjs",
+          "docs/MONSTER_BALANCE_OWNER_PHASE2A.md"
+        ],
+        "verification": "Focused Phase1 11/11 and Phase2A 9/9; production build; full-loader outputs. Natural production Chrome and final Required CI pending.",
+        "result": "IMPLEMENTED; not yet VERIFIED"
+      }
+    },
+    {
+      "id": "WILD-P2A-14",
+      "title": "390×844／412×915 巡怪、手動自動、結算重建與新手保護",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          ".github/scripts/run-wild-balance-browser-qa.mjs",
+          "tests/monster-balance-owner-phase2a.test.mjs",
+          "docs/MONSTER_BALANCE_OWNER_PHASE2A.md"
+        ],
+        "verification": "Focused Phase1 11/11 and Phase2A 9/9; production build; full-loader outputs. Natural production Chrome and final Required CI pending.",
+        "result": "IMPLEMENTED; not yet VERIFIED"
+      }
+    },
+    {
+      "id": "WILD-P2A-15",
+      "title": "Retirement Map、相容模式邊界與退休條件完整",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "docs/monster-balance-owner-retirement-map.json",
+          "tests/monster-balance-owner-phase2a.test.mjs",
+          "docs/MONSTER_BALANCE_OWNER_PHASE2A.md"
+        ],
+        "verification": "Focused Phase1 11/11 and Phase2A 9/9; production build; full-loader outputs. Natural production Chrome and final Required CI pending.",
+        "result": "IMPLEMENTED; not yet VERIFIED"
+      }
+    }
+  ],
+  "verification": {
+    "candidateSha": "bad68e6acc754a58da5fd2fcc209802182feb687",
+    "runId": 37122293537,
+    "integration": "PENDING",
+    "deployment": "PENDING",
+    "physicalDevice": "NOT CLAIMED"
+  }
+}

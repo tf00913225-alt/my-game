@@ -11,7 +11,7 @@ const expression=`(async()=>{
  await wait(()=>window.FourSymbolsStartupPolicy?.getState?.()==='READY',30000);
  await FourSymbolsFeatures.ensure('gameplay-core','wild-balance-qa');
  closeHomeFeature();showPage('home');autoConfig.enabled=false;autoBattle=false;autoPatrolEnabled=false;
- const evidence={ttk:[],scenes:[],beginner:null},oldRandom=Math.random;
+ const evidence=window.wildBalanceQaEvidence={ttk:[],scenes:[],beginner:null},oldRandom=Math.random;
  const project=m=>({hp:m.maxHP,sp:m.maxSP,attack:m.attack,magic:m.magicAttack,defense:m.defense,speed:m.agility});
  const verify=()=>{
   for(const i of currentBattleMonsters){const m=monsters[i],p=MonsterBalance.debug(m);check(m.rank===p.identity.rank,'canonical rank');check(JSON.stringify(project(m))===JSON.stringify({hp:p.final.maxHP,sp:p.final.maxSP,attack:p.final.physicalAttack,magic:p.final.magicAttack,defense:p.final.defense,speed:p.final.speed}),'no late stat mutation');
@@ -38,13 +38,13 @@ const expression=`(async()=>{
   }
  }
  // Real zone entry, patrol scheduler, manual action and automatic next encounter at both sizes.
- const reference=prepareWildBalanceReferenceParty(50);enterZone('zone5');await wait(()=>isPatrolMapActive());
+ const reference=prepareWildBalanceReferenceParty(50);window.v131GrantElementBoxHours(8,32);for(const c of [autoConfig,autoConfig2,autoConfig3])c.skill=reference.skill;enterZone('zone5');await wait(()=>isPatrolMapActive());
  const before=monsters.map(project);toggleAutoPatrol();check(autoPatrolEnabled,'auto patrol enabled');await wait(()=>battleActive,20000);toggleAutoPatrol();autoPatrolEnabled=false;
  await wait(()=>!document.getElementById('battlePage')?.matches('.v141-preparing-entry,.v141-entry-moving'));verify();
  const initial=currentBattleMonsters.map(i=>({key:monsters[i].monsterKey,rank:monsters[i].rank,...project(monsters[i])}));
  queuedPlayerActions={};for(const i of getExistingPartyIndexes())queuedPlayerActions[i]=chooseWildBalanceReferenceAction(i,reference.skill);const initialTurn=turn;startResolutionPhase(battleToken);await wait(()=>!battleActive||turn>initialTurn,100000);
  if(battleActive){toggleAutoBattle();check(autoBattle,'auto battle enabled');await wait(()=>!battleActive,100000);}
- await settle();autoConfig.enabled=true;enterZone('zone5');mapCooldown=false;startBattle(0);await wait(()=>battleActive);check(autoBattle,'fresh automatic encounter');await settle();autoConfig.enabled=false;autoBattle=false;evidence.scenes.push({manual:true,automatic:true,patrol:true,initial,before});
+ await settle();enterZone('zone5');if(!autoBattle)toggleAutoBattle();check(autoBattle,'formal auto preference enabled');mapCooldown=false;startBattle(0);await wait(()=>battleActive);check(autoBattle,'fresh automatic encounter');await settle();autoConfig.enabled=false;autoBattle=false;evidence.scenes.push({manual:true,automatic:true,patrol:true,initial,before});
  enterZone('zone5');for(const m of monsters){const p=MonsterBalance.debug(m);check(m.maxHP===p.final.maxHP,'fresh encounter has no repeated multiplier');}
  // Beginner: one natural enemy round against a legal Lv1 character, no inflated health.
  autoConfig.enabled=false;autoBattle=false;prepareWildBalanceReferenceParty(1);player2=null;player3=null;enterZone('forest');mapCooldown=false;Math.random=()=>.999;startBattle(0);Math.random=()=>.5;
@@ -66,5 +66,5 @@ try{
   const shot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(artifact.replace('.json','-'+width+'x'+height+'.png'),Buffer.from(shot.data,'base64'));
  }
  assert.equal(results[0].ttk.length,10);fs.writeFileSync(artifact,JSON.stringify({passed:true,commitSha:process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||'local',results},null,2)+'\n');console.log('Wild balance natural production battles, TTK, patrol, manual/auto and beginner: PASS');
-}catch(error){fs.writeFileSync(artifact,JSON.stringify({passed:false,error:String(error.stack||error),results,console:client?.events.filter(e=>e.method==='Runtime.consoleAPICalled').slice(-15)},null,2)+'\n');throw error;}
+}catch(error){const partial=await client?.eval('({evidence:window.wildBalanceQaEvidence,turn,battleActive,battlePhase,autoBattle,currentZone})').catch(()=>null);fs.writeFileSync(artifact,JSON.stringify({passed:false,error:String(error.stack||error),results,partial,console:client?.events.filter(e=>e.method==='Runtime.consoleAPICalled').slice(-15)},null,2)+'\n');throw error;}
 finally{client?.close();proc.kill('SIGTERM');try{fs.rmSync(profile,{recursive:true,force:true,maxRetries:3,retryDelay:100});}catch{}await new Promise(r=>server.server.close(r));}
