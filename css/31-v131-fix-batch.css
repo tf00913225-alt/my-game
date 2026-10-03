@@ -120,7 +120,7 @@
         0 0 12px var(--v138-element-glow) !important;
 }
 
-#game-stage > #app > #game-content #battlePage .battle-player.active-turn::after{
+#game-stage > #app > #game-content #battlePage .battle-player.active-turn:not(.v174-cardless-unit)::after{
     border-color:var(--v138-element-color) !important;
     animation:v138ElementTurnFrameFlash .34s linear infinite !important;
 }

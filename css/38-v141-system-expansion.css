@@ -376,7 +376,7 @@
 }
 
 /* Earth active frame needed a much brighter value than its static brown frame. */
-#game-stage > #app > #game-content #battlePage .battle-player[data-element="earth"].active-turn::after{
+#game-stage > #app > #game-content #battlePage .battle-player[data-element="earth"].active-turn:not(.v174-cardless-unit)::after{
     border-color:#ffd878 !important;
     background:rgba(255,190,63,.055);
     animation:v141EarthTurnFlash .34s linear infinite !important;

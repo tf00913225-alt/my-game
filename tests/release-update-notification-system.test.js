@@ -348,7 +348,7 @@ async function test(name,callback){
     await test("Case F/G: daily suppression skips the same notice today, but never blocks a new notice",async()=>{
         const v42=releaseManifest("V173.42");
         const v43=releaseManifest("V173.43");
-        const nowValue=Date.parse("2026-09-19T12:00:00+08:00");
+        const nowValue=new Date(2026,8,19,12).getTime();
         const suppressedCurrent=createHarness({
             loadedVersion:"173.42",
             responses:[v42],
@@ -397,7 +397,7 @@ async function test(name,callback){
 
     await test("Case H2: checking 今日不再跳出提醒 suppresses only the same notice for the current local day",async()=>{
         const current=releaseManifest("V173.41");
-        const nowValue=Date.parse("2026-09-19T12:00:00+08:00");
+        const nowValue=new Date(2026,8,19,12).getTime();
         const first=createHarness({loadedVersion:"173.41",responses:[current],nowValue});
         await first.api.checkForUpdate("case-h2-first",{force:true});
         const checkbox=first.body.querySelector(".release-update-suppress-today-input");
@@ -426,7 +426,7 @@ async function test(name,callback){
         const nextDay=createHarness({
             loadedVersion:"173.41",
             responses:[current],
-            nowValue:Date.parse("2026-09-20T08:00:00+08:00"),
+            nowValue:new Date(2026,8,20,12).getTime(),
             suppressToday:previous
         });
         await nextDay.api.checkForUpdate("case-h3",{force:true});
