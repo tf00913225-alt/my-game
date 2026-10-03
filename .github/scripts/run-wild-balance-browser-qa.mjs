@@ -1,0 +1,70 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import {spawn} from 'node:child_process';
+import {ROOT,findChrome,startServer,waitJson,Cdp} from './runtime-browser-qa-support.mjs';
+const fixture=fs.readFileSync('tests/fixtures/wild-balance-reference-party.js','utf8');
+const expression=`(async()=>{
+ const check=(v,m)=>{if(!v)throw new Error(m);};
+ const wait=async(test,ms=15000)=>{const end=performance.now()+ms;while(!test()&&performance.now()<end)await new Promise(r=>setTimeout(r,40));check(test(),'Runtime wait timeout: '+test);};
+ await wait(()=>window.FourSymbolsStartupPolicy?.getState?.()==='READY',30000);
+ await FourSymbolsFeatures.ensure('gameplay-core','wild-balance-qa');
+ closeHomeFeature();showPage('home');autoConfig.enabled=false;autoBattle=false;autoPatrolEnabled=false;
+ const evidence={ttk:[],scenes:[],beginner:null},oldRandom=Math.random;
+ const project=m=>({hp:m.maxHP,sp:m.maxSP,attack:m.attack,magic:m.magicAttack,defense:m.defense,speed:m.agility});
+ const verify=()=>{
+  for(const i of currentBattleMonsters){const m=monsters[i],p=MonsterBalance.debug(m);check(m.rank===p.identity.rank,'canonical rank');check(JSON.stringify(project(m))===JSON.stringify({hp:p.final.maxHP,sp:p.final.maxSP,attack:p.final.physicalAttack,magic:p.final.magicAttack,defense:p.final.defense,speed:p.final.speed}),'no late stat mutation');
+   const node=document.getElementById('battleMonster'+i),r=node?.getBoundingClientRect();check(r&&r.width>0&&r.height>0,'visible monster');check(m.name&&m.element&&m.portraitKey,'identity and portrait');
+  }
+ };
+ const settle=async()=>{await wait(()=>!battleActive,100000);await new Promise(r=>setTimeout(r,1600));check(document.getElementById('mapPage')?.classList.contains('active'),'returns to patrol map');};
+ try{
+ if(innerWidth===412){
+  for(const level of [10,30,50,70,100])for(const elite of [false,true]){
+   const reference=prepareWildBalanceReferenceParty(level),encounter=buildWildBalanceReferenceRoster(level,'water',elite);
+   enterZone(encounter.zone);await wait(()=>document.getElementById('mapPage')?.classList.contains('active'));monsters=encounter.roster;mapCooldown=false;
+   Math.random=()=>.999;startBattle(0);Math.random=()=>.5;
+   // StartBattle owns the normal 10% rank draw. Diagnostics request one Elite tank explicitly.
+   if(elite){const m=monsters.find(m=>m.archetype==='tank');Object.assign(m,MonsterBalance.build({...m.balanceProjection.identity,rank:'elite'}));m.v141BattleRank=m.rank;configureBuiltMonster(m);}
+   await wait(()=>battleActive&&!document.getElementById('battlePage')?.matches('.v141-preparing-entry,.v141-entry-moving'));verify();
+   check(currentBattleMonsters.length===encounter.count,'maximum formal encounter size');
+   let rounds=0;const actions=[];const off=FourSymbolsBattleFlow.subscribeBeforeCombatant(e=>{actions.push(e.queue[e.index]?.type);});
+   try{while(battleActive&&rounds<4){await wait(()=>!battleActive||battlePhase==='declare');if(!battleActive)break;const before=turn;rounds++;queuedPlayerActions={};for(const i of getExistingPartyIndexes())queuedPlayerActions[i]=chooseWildBalanceReferenceAction(i,reference.skill);startResolutionPhase(battleToken);await wait(()=>!battleActive||turn>before,100000);}}
+   finally{off();}
+   const cleared=monsters.filter((m,i)=>currentBattleMonsters.includes(i)).every(m=>!m.alive||m.hp<=0);
+   evidence.ttk.push({level,elite,rounds,cleared,actions,reference});check(cleared,'encounter cleared');check(rounds<=(elite?3:2),'TTK '+level+'/'+elite+' = '+rounds);
+   await settle();
+  }
+ }
+ // Real zone entry, patrol scheduler, manual action and automatic next encounter at both sizes.
+ const reference=prepareWildBalanceReferenceParty(50);enterZone('zone5');await wait(()=>isPatrolMapActive());
+ const before=monsters.map(project);toggleAutoPatrol();check(autoPatrolEnabled,'auto patrol enabled');await wait(()=>battleActive,20000);toggleAutoPatrol();autoPatrolEnabled=false;
+ await wait(()=>!document.getElementById('battlePage')?.matches('.v141-preparing-entry,.v141-entry-moving'));verify();
+ const initial=currentBattleMonsters.map(i=>({key:monsters[i].monsterKey,rank:monsters[i].rank,...project(monsters[i])}));
+ queuedPlayerActions={};for(const i of getExistingPartyIndexes())queuedPlayerActions[i]=chooseWildBalanceReferenceAction(i,reference.skill);const initialTurn=turn;startResolutionPhase(battleToken);await wait(()=>!battleActive||turn>initialTurn,100000);
+ if(battleActive){toggleAutoBattle();check(autoBattle,'auto battle enabled');await wait(()=>!battleActive,100000);}
+ await settle();autoConfig.enabled=true;enterZone('zone5');mapCooldown=false;startBattle(0);await wait(()=>battleActive);check(autoBattle,'fresh automatic encounter');await settle();autoConfig.enabled=false;autoBattle=false;evidence.scenes.push({manual:true,automatic:true,patrol:true,initial,before});
+ enterZone('zone5');for(const m of monsters){const p=MonsterBalance.debug(m);check(m.maxHP===p.final.maxHP,'fresh encounter has no repeated multiplier');}
+ // Beginner: one natural enemy round against a legal Lv1 character, no inflated health.
+ autoConfig.enabled=false;autoBattle=false;prepareWildBalanceReferenceParty(1);player2=null;player3=null;enterZone('forest');mapCooldown=false;Math.random=()=>.999;startBattle(0);Math.random=()=>.5;
+ await wait(()=>battleActive&&!document.getElementById('battlePage')?.matches('.v141-preparing-entry,.v141-entry-moving'));
+ const hp=player.hp,count=currentBattleMonsters.length;check(currentBattleMonsters.every(i=>monsters[i].agility===0&&monsters[i].skillIds.length===0),'beginner speed and skills');
+ queuedPlayerActions={0:{action:'defend'}};const round=turn;startResolutionPhase(battleToken);await wait(()=>!battleActive||turn>round,100000);
+ evidence.beginner={before:hp,after:player.hp,count};check(player.hp>0&&hp-player.hp<=count*8,'beginner safety');
+ verify();return evidence;
+ }finally{Math.random=oldRandom;autoPatrolEnabled=false;}
+})()`;
+const server=await startServer(),profile=fs.mkdtempSync(path.join(os.tmpdir(),'wild-balance-')),port=9900+Math.floor(Math.random()*100);
+const proc=spawn(findChrome(),['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'],{stdio:'ignore'});
+const artifact=path.join(ROOT,'artifacts/browser-qa/wild-balance.json');fs.mkdirSync(path.dirname(artifact),{recursive:true});let client;const results=[];
+try{
+ const tabs=await waitJson('http://127.0.0.1:'+port+'/json/list');client=new Cdp(tabs.find(x=>x.type==='page').webSocketDebuggerUrl);await client.send('Page.enable');await client.send('Runtime.enable');
+ for(const [width,height] of [[412,915],[390,844]]){
+  await client.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true});await client.send('Page.navigate',{url:server.url});
+  await new Promise(r=>setTimeout(r,1000));const result=await client.eval(fixture+'\n'+expression);results.push({width,height,...result});
+  const shot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(artifact.replace('.json','-'+width+'x'+height+'.png'),Buffer.from(shot.data,'base64'));
+ }
+ assert.equal(results[0].ttk.length,10);fs.writeFileSync(artifact,JSON.stringify({passed:true,commitSha:process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||'local',results},null,2)+'\n');console.log('Wild balance natural production battles, TTK, patrol, manual/auto and beginner: PASS');
+}catch(error){fs.writeFileSync(artifact,JSON.stringify({passed:false,error:String(error.stack||error),results,console:client?.events.filter(e=>e.method==='Runtime.consoleAPICalled').slice(-15)},null,2)+'\n');throw error;}
+finally{client?.close();proc.kill('SIGTERM');try{fs.rmSync(profile,{recursive:true,force:true,maxRetries:3,retryDelay:100});}catch{}await new Promise(r=>server.server.close(r));}

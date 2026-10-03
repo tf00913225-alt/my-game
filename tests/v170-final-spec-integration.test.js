@@ -351,55 +351,26 @@ test("new Lv1 characters start with two skill points while level-up remains plus
     assert.match(mainSource,/const player\s*=\s*\{[\s\S]*?skillPoints:0,/);
 });
 
-test("wild zones keep the one-pass curve while the beginner forest applies the final 50% reduction",()=>{
+test("Wild final rosters use the sole balance projection and preserve beginner protection",()=>{
     const runtime=loadFinalRuntime();
-    const result=evaluateJson(runtime.context,`(function(){
-        function expected(monster,multiplier){
-            return {
-                maxHP:Math.max(1,Math.round((100+monster.vitalityPoints*50)*multiplier)),
-                maxSP:Math.max(1,Math.round((50+monster.energyPoints*15)*multiplier)),
-                attack:Math.max(1,Math.round((30+monster.level*4+monster.attackPoints*4)*multiplier)),
-                defense:Math.max(1,Math.round((30+monster.level*3+monster.defensePoints*4)*multiplier)),
-                magicAttack:Math.max(1,Math.round((30+monster.level*4+monster.intelligencePoints*2.75)*multiplier))
-            };
-        }
-        function actual(monster){
-            return {
-                maxHP:monster.maxHP,maxSP:monster.maxSP,attack:monster.attack,
-                defense:monster.defense,magicAttack:monster.magicAttack
-            };
-        }
-        const multipliers=Array.from(v173WildZoneStrengthMultipliers);
-        const zones=[forestMonsters,desertMonsters,iceMountainMonsters,zone4Monsters,zone5Monsters,
-            zone6Monsters,zone7Monsters,zone8Monsters,zone9Monsters,zone10Monsters];
-        return {multipliers:multipliers,zones:zones.map((zone,index)=>zone.map(monster=>({
-            name:monster.name,level:monster.level,actual:actual(monster),
-            expected:expected(monster,multipliers[index]),skillIds:monster.skillIds,
-            skillChance:monster.skillChance,applied:monster._v131StrengthApplied,
-            beginnerHalved:monster.v17342BeginnerStatsHalved===true
-        })))};
-    })()`);
-    assert.deepEqual(result.multipliers,[.75,.90,.95,1,1.05,1.10,1.15,1.20,1.25,1.30]);
-    assert.equal(result.zones.length,10);
-    result.zones.forEach((zone,index)=>zone.forEach(monster=>{
-        if(index===0){
-            assert.equal(monster.beginnerHalved,true,monster.name+" beginner 50% flag");
-            Object.values(monster.actual).forEach(value=>assert.ok(Number.isFinite(value)&&value>=0));
-        }else{
-            assert.deepEqual(monster.actual,monster.expected,monster.name+" zone "+(index+1)+" multiplier");
-        }
-        assert.equal(monster.applied,true,monster.name+" strength flag");
-    }));
-    assert.ok(result.zones[0].length>=8);
-    result.zones[0].forEach(monster=>{
-        assert.ok(monster.level===2||monster.level===3,monster.name+" level");
-        assert.deepEqual(monster.skillIds,[],monster.name+" skill pool");
-        assert.equal(monster.skillChance,0,monster.name+" skill chance");
-    });
+    const result=evaluateJson(runtime.context,`(()=>Object.keys(zoneConfig).map(k=>zoneConfig[k].monsters().map(m=>({
+        mode:m.mode,owner:m.balanceOwner,actual:{maxHP:m.maxHP,maxSP:m.maxSP,physicalAttack:m.attack,magicAttack:m.magicAttack,defense:m.defense,speed:m.agility},
+        expected:MonsterBalance.preview(m.balanceProjection.identity).final,
+        applied:m._v131StrengthApplied||false,halved:m.v17342BeginnerStatsHalved||false,
+        skills:m.skillIds,chance:m.skillChance,level:m.level
+    }))))()`);
+    assert.equal(result.length,10);
+    for(const zone of result)for(const m of zone){
+        assert.equal(m.mode,'wild');assert.equal(m.owner,'MonsterBalance');
+        assert.deepEqual(m.actual,m.expected);assert.equal(m.applied,false);assert.equal(m.halved,false);
+    }
+    assert.ok(result[0].length>=8);
+    for(const m of result[0]){assert.ok(m.level===2||m.level===3);assert.deepEqual(m.skills,[]);assert.equal(m.chance,0);assert.equal(m.actual.speed,0);}
     const tuningSource=fs.readFileSync("js/47-v158-combat-tuning.js","utf8");
-    assert.match(tuningSource,/Math\.round\(Number\(monster\[key\]\)\*0\.5\)/);
+    assert.doesNotMatch(tuningSource,/halveMonsterCoreStats/);
     assert.match(tuningSource,/rollBeginnerForestNormalAttackDamage=function\(\)\{[\s\S]*?return 5\+Math\.floor\(Math\.random\(\)\*4\);/);
 });
+
 
 test("the current four-element owner loads after every historical compatibility module",()=>{
     const skills=loadFinalRuntime().skills;
@@ -1682,7 +1653,7 @@ test("V2 explicit monster hit fields survive daily party-level and beginner powe
         return {daily,beginner:[beginner.accuracy,beginner.evasion,beginner.attack]};
     })()`);
     assert.deepEqual(values.daily,[[10,8,97],[10,8,97],[10,8,97]]);
-    assert.deepEqual(values.beginner,[10,8,50]);
+    assert.deepEqual(values.beginner,[10,8,100]); // core-stat halving retired; hit fields and safety unchanged.
 });
 
 console.log("\nV170 final integration suite: "+passed+" tests passed.");

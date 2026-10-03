@@ -42,7 +42,7 @@ function allocatePoints(budget,archetype){
 const MODES=Object.freeze(['wild','daily','tower','abyss','adventure','personalBoss','worldBoss']);
 const RANKS=Object.freeze(['regular','elite','smallBoss']);
 const GLOBAL_CALIBRATION=Object.freeze({hp:1,sp:1,damage:1,defense:1});
-// Resource baseline retained explicitly for shadow comparison; per-level +30/+10 is pending, never applied.
+// Wild resources are HP100/SP50 plus allocation only; player per-level bonuses never apply.
 const RESOURCE_BASE=Object.freeze({hp:100,sp:50,provenance:'00-main legacy resource baseline'});
 const clone=value=>JSON.parse(JSON.stringify(value));
 function normalizeSpec(spec){
@@ -67,11 +67,11 @@ function preview(spec){
     defense:base.defense+allocation.defensePoints*SIX_STAT_COEFFICIENTS.defense,
     speed:allocation.agilityPoints*SIX_STAT_COEFFICIENTS.agility
   };
-  // Neutral rank/mode are diagnostic placeholders, never approval of final multipliers.
+  // Wild Rank V1 is ratified. Unmigrated modes retain the Phase 1 neutral shadow profile.
   const rank=identity.mode==='wild'
     ?{id:identity.rank,status:'RANK_V1',hp:identity.rank==='elite'?1.5:1,defense:identity.rank==='elite'?1.1:1,finalDamagePressure:identity.rank==='elite'?1.1:1,skillFrequency:null}
     :{id:identity.rank,status:'PENDING_PRODUCT_CALIBRATION',hp:1,defense:1,finalDamagePressure:null,skillFrequency:null};
-  const mode={id:identity.mode,status:identity.mode==='wild'?'RUNTIME_V1':'SHADOW_BASELINE_ONLY',hp:1,sp:1,damage:1,defense:1,ttkTarget:['wild','daily'].includes(identity.mode)?{maxRounds:2,player:'normal same-level progression',scope:'kill/clear wave'}:null};
+  const mode={id:identity.mode,status:identity.mode==='wild'?'RUNTIME_V1':'SHADOW_BASELINE_ONLY',hp:identity.mode==='wild'?0.32:1,sp:1,damage:1,defense:1,speed:identity.mode==='wild'&&identity.context==='wild/zone-01'?0:1,ttkTarget:['wild','daily'].includes(identity.mode)?{maxRounds:2,player:'normal same-level progression',scope:'kill/clear wave'}:null};
   const element={id:identity.element,hp:1,defense:1,speed:1,metadata:{},provenance:'identity only'};
   if(identity.mode==='tower'){
     element.provenance='existing Tower Element Profile (pre-battle only)';
@@ -83,7 +83,7 @@ function preview(spec){
   const globalCalibration={...GLOBAL_CALIBRATION};
   const profiles={rank,mode,element,globalCalibration};
   const afterRank={...derived,maxHP:derived.maxHP*rank.hp,defense:derived.defense*rank.defense};
-  const afterMode={...afterRank,maxHP:afterRank.maxHP*mode.hp,maxSP:afterRank.maxSP*mode.sp,physicalAttack:afterRank.physicalAttack*mode.damage,magicAttack:afterRank.magicAttack*mode.damage,defense:afterRank.defense*mode.defense};
+  const afterMode={...afterRank,maxHP:afterRank.maxHP*mode.hp,maxSP:afterRank.maxSP*mode.sp,physicalAttack:afterRank.physicalAttack*mode.damage,magicAttack:afterRank.magicAttack*mode.damage,defense:afterRank.defense*mode.defense,speed:afterRank.speed*mode.speed};
   const afterElement={...afterMode,maxHP:Math.round(afterMode.maxHP*element.hp),defense:identity.mode==='wild'?afterMode.defense:Math.round(afterMode.defense*element.defense),speed:afterMode.speed*element.speed};
   const final={...afterElement,maxHP:afterElement.maxHP*globalCalibration.hp,maxSP:afterElement.maxSP*globalCalibration.sp,physicalAttack:afterElement.physicalAttack*globalCalibration.damage,magicAttack:afterElement.magicAttack*globalCalibration.damage,defense:afterElement.defense*globalCalibration.defense};
   return {identity,base,allocation,derived,profiles,final,aiIntent:clone(ARCHETYPES[identity.archetype].aiIntent),pendingProductDecisions:identity.mode==='wild'?[]:['monster per-level bonusHP +30 / bonusSP +10','rank and mode final calibration','Tower/Abyss TTK'],breakdown:[

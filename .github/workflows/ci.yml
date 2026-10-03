@@ -119,6 +119,7 @@ jobs:
       - name: Run battle layout, timing and range-VFX regressions
         run: |
           node tests/monster-balance-owner-phase1.test.mjs
+          node tests/monster-balance-owner-phase2a.test.mjs
           node tests/abyss-owner-convergence-20260920.test.js
           node tests/abyss-two-tier-refactor.test.js
           node tests/monster-portrait-runtime.test.js
@@ -222,13 +223,16 @@ jobs:
           node tests/tower-element-formation-small-boss-20260924.test.js
           node tests/gameplay-boss-tower-system.test.js
           node .github/scripts/run-tower-challenge-browser-qa.mjs
+          node .github/scripts/run-wild-balance-browser-qa.mjs
 
       - name: Upload Tower challenge browser evidence
         if: always() && steps.tower_challenge.outcome != 'skipped'
         uses: actions/upload-artifact@v4
         with:
           name: tower-challenge-${{ github.sha }}
-          path: artifacts/browser-qa/tower-challenge*
+          path: |
+            artifacts/browser-qa/tower-challenge*
+            artifacts/browser-qa/wild-balance*
           if-no-files-found: error
           retention-days: 90
 
