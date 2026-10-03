@@ -310,7 +310,7 @@ async function captureRelicPresentationQa(client,relicId,targetKind,mode){
         for(let action=0;action<7;action++){
             await client.eval("(()=>{const index=currentBattleMonsters.find(i=>monsters[i]?.alive&&monsters[i].hp>0);processSingleMonsterAttack(index,battleToken);clearTimeout(battleAdvanceTimeoutId);battleAdvanceTimeoutId=null;battleAdvanceScheduled=false;return true;})()");
             if(action<6){
-                await waitFor(client,"!window.v142GetRemainingAnimationMs?.()", "relic counter action animation",10000);
+                await waitFor(client,"(()=>{clearTimeout(battleAdvanceTimeoutId);battleAdvanceTimeoutId=null;battleAdvanceScheduled=false;return !window.v142GetRemainingAnimationMs?.();})()", "relic counter action animation",10000);
                 assert.equal(await client.eval("window.v174RelicDebugState().enemyActionCount"),action+1,"exactly one effective enemy action must be counted");
             }
         }
