@@ -125,7 +125,24 @@ test('formal reference party and damage/action owners satisfy Wild TTK across 40
  for(const r of rows){assert.ok(r.clear);assert.ok(r.rounds<=(r.elite?3:2),JSON.stringify({level:r.level,element:r.element,elite:r.elite,rounds:r.rounds}));assert.ok(r.survivors>0);assert.ok(r.reference.skillCost<=r.reference.skillBudget);}
 });
 
-test('123 actual Tower, Tower Boss, Personal/World Boss and Adventure projections match starting dev',()=>{
+test('Phase2C migrates Tower while Personal/World Boss and Adventure stay on the Phase2A baseline',()=>{
  const baseline=JSON.parse(fs.readFileSync('tests/fixtures/monster-balance-p2a-extra-non-wild.json','utf8'));
- const actual=collectNonWildOutputs(loadLegacyRuntime);assert.equal(actual.length,123);assert.deepEqual(actual,baseline.rows);
+ const actual=collectNonWildOutputs(loadLegacyRuntime);assert.equal(actual.length,123);
+ const legacyModes=new Set(['personal','world','adventure']);
+ assert.deepEqual(actual.filter(row=>legacyModes.has(row.mode)),baseline.rows.filter(row=>legacyModes.has(row.mode)));
+ const tower=actual.filter(row=>row.mode==='tower'||row.mode==='towerBoss');
+ assert.equal(tower.length,72);
+ for(const row of tower){
+  assert.equal(row.value.level,row.level);
+  assert.ok(['regular','elite','smallBoss'].includes(row.value.rank));
+  if(row.mode==='towerBoss')assert.equal(row.value.rank,'smallBoss');
+  const archetype='balanced',rank=row.mode==='towerBoss'?'smallBoss':row.rank;
+  const projection=MonsterBalance.preview({monsterKey:'tower-test',name:row.value.name,level:row.level,element:row.element,archetype,rank,mode:'tower',context:'tower/floor/'+row.level});
+  assert.equal(row.value.maxHP,projection.final.maxHP);
+  assert.equal(row.value.maxSP,projection.final.maxSP);
+  assert.equal(row.value.attack,projection.final.physicalAttack);
+  assert.equal(row.value.magicAttack,projection.final.magicAttack);
+  assert.equal(row.value.defense,projection.final.defense);
+  assert.equal(row.value.agility,projection.final.speed);
+ }
 });
