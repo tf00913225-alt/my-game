@@ -51,7 +51,7 @@ try{
     const match=result.stdout.match(/<pre id="result">([\s\S]*?)<\/pre>/);
     assert.ok(match,"Daily Dungeon WebP browser QA did not produce a result.");
     const evidence=JSON.parse(match[1]);
-    fs.writeFileSync(path.join(ARTIFACT_DIR,"daily-dungeon-webp-browser-qa.json"),JSON.stringify(evidence,null,2)+"\\n");
+    fs.writeFileSync(path.join(ARTIFACT_DIR,"daily-dungeon-webp-browser-qa.json"),JSON.stringify(evidence,null,2)+"\n");
     assert.deepEqual(evidence.errors,[]);
     assert.equal(evidence.pending,false);
     assert.equal(evidence.preparations.length,3);
