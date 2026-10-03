@@ -5,7 +5,7 @@ const fs=require("node:fs");
 
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const legacyRules=fs.readFileSync("js/43-v149-skill-ui-rules.js","utf8");
-const finalWaterRules=fs.readFileSync("js/50-v169-water-skill-rules.js","utf8");
+const finalWaterRules=fs.readFileSync("js/60-v173.64-skill-progression-rebalance.js","utf8");
 const css=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");
 const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const index=fs.readFileSync("index.html","utf8");
@@ -24,14 +24,19 @@ test("V171 cache-busts every changed combat asset",()=>{
 test("Tidal Beast is single-target Frostbite and has no legacy team Freeze path",()=>{
     assert.doesNotMatch(legacyRules,/teamFreezeChance|teamFreezeDuration/);
     assert.doesNotMatch(legacyRules,/applyTeamFreezeToMonsters|applyTeamFreezeToPlayers/);
-    const finalDefinition=finalWaterRules.match(/floodBeast:\{[\s\S]*?\n\s*\},\n\s*iceArrowRain:/);
+    const finalDefinition=finalWaterRules.match(/floodBeast:\{[^\n]*targetType[^\n]+/);
     assert.ok(finalDefinition);
     assert.match(finalDefinition[0],/targetType:"single"/);
-    assert.match(finalDefinition[0],/frostbiteChance:35,frostbiteDuration:2/);
+    assert.match(finalDefinition[0],/frostbiteChance:40,frostbiteDuration:2/);
     assert.doesNotMatch(finalDefinition[0],/freezeChance|teamFreeze/);
     assert.match(
         animation,
         /floodBeast:\{[\s\S]*?deferredStatusTypes:\["frostbite"\][\s\S]*?scale:1\.85,minSize:175,maxSize:250/
+    );
+    assert.match(
+        animation,
+        /floodBeast:\{[^\n]*preserveSourceOrientation:true/,
+        "Flood Beast keeps the supplied artwork upright for both player and enemy travel"
     );
 });
 

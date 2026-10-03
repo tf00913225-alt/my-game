@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport"content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
-<title>四象江湖傳 V173.72</title>
+<title>四象江湖傳 V173.73</title>
 
 <link rel="preconnect"href="https://fonts.googleapis.com">
 <link rel="preconnect"href="https://fonts.gstatic.com"crossorigin>
@@ -38,7 +38,7 @@
 <link rel="preload" as="image" href="assets/ui/startup-logo.4631c0bc3f2b.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="assets/ui/startup-main-city.d43e67af1c1c.jpg" fetchpriority="high">
 <!-- build:critical-style -->
-<link id="boot-core-style" data-critical-style="true" rel="stylesheet" href="build/boot-core.54b38f5940ad.css">
+<link id="boot-core-style" data-critical-style="true" rel="stylesheet" href="build/boot-core.eea71835cf27.css">
 <!-- /build:critical-style -->
 </head>
 
@@ -317,7 +317,7 @@
 
                 <div class="creation-stat" data-stat="attack">
                     <div class="creation-stat-copy">
-                        <b>攻擊</b><small>物攻／物理爆擊</small>
+                        <b>攻擊</b><small>物理攻擊</small>
                     </div>
                     <div class="creation-stat-right">
                         <button class="creation-stat-button" type="button" onclick="creationAdd('attack',-1)">−</button>
@@ -328,7 +328,7 @@
 
                 <div class="creation-stat" data-stat="vitality">
                     <div class="creation-stat-copy">
-                        <b>體質</b><small>HP／防禦</small>
+                        <b>體質</b><small>最大生命值</small>
                     </div>
                     <div class="creation-stat-right">
                         <button class="creation-stat-button" type="button" onclick="creationAdd('vitality',-1)">−</button>
@@ -350,7 +350,7 @@
 
                 <div class="creation-stat" data-stat="intelligence">
                     <div class="creation-stat-copy">
-                        <b>智力</b><small>法攻／回復／法術爆擊</small>
+                        <b>智力</b><small>法術攻擊／治療回復</small>
                     </div>
                     <div class="creation-stat-right">
                         <button class="creation-stat-button" type="button" onclick="creationAdd('intelligence',-1)">−</button>
@@ -359,20 +359,20 @@
                     </div>
                 </div>
 
-                <div class="creation-stat" data-stat="spirit">
+                <div class="creation-stat" data-stat="defensePoints">
                     <div class="creation-stat-copy">
-                        <b>精神</b><small>抗性／命中／抗暴</small>
+                        <b>防禦</b><small>物理與法術減傷</small>
                     </div>
                     <div class="creation-stat-right">
-                        <button class="creation-stat-button" type="button" onclick="creationAdd('spirit',-1)">−</button>
-                        <b id="creationSpirit">0</b>
-                        <button class="creation-stat-button" type="button" onclick="creationAdd('spirit',1)">+</button>
+                        <button class="creation-stat-button" type="button" onclick="creationAdd('defensePoints',-1)">−</button>
+                        <b id="creationDefense">0</b>
+                        <button class="creation-stat-button" type="button" onclick="creationAdd('defensePoints',1)">+</button>
                     </div>
                 </div>
 
                 <div class="creation-stat" data-stat="agility">
                     <div class="creation-stat-copy">
-                        <b>敏捷</b><small>速度／閃避</small>
+                        <b>敏捷</b><small>出手速度</small>
                     </div>
                     <div class="creation-stat-right">
                         <button class="creation-stat-button" type="button" onclick="creationAdd('agility',-1)">−</button>
@@ -386,12 +386,12 @@
             <details class="stat-explanation creation-stat-details">
                 <summary>查看完整能力值說明</summary>
                 <div class="creation-stat-details-body">
-                    <div><b>攻擊</b>：影響物理攻擊、物理爆擊機率與物理爆擊傷害。</div>
-                    <div><b>體質</b>：影響 HP 與防禦；每1點體質增加50 HP、15防禦值。</div>
-                    <div><b>能量</b>：影響 SP；每1點能量增加15 SP。</div>
-                    <div><b>智力</b>：影響法術攻擊、回復技能、異常狀態命中率、法術爆擊機率與法術爆擊傷害；每1點智力額外增加1.25點HP治療量、0.5點SP治療量（施放者本人不回復SP）。</div>
-                    <div><b>精神</b>：影響異常狀態抗性、命中與抗暴；一般異常每1點精神降低0.05個百分點命中率，另有+2命中、+0.1%抗暴（抗暴上限25%）。硬控維持獨立公式。</div>
-                    <div><b>敏捷</b>：影響出手速度與閃避；每1點有效敏捷=+1速度、+0.6個百分點基礎閃避。</div>
+                    <div><b>攻擊</b>：提高物理攻擊。1點攻擊 +4物理攻擊。</div>
+                    <div><b>智力</b>：提高法術攻擊與治療回復量。1點智力 +2.75法術攻擊。</div>
+                    <div><b>體質</b>：提高最大生命值。1點體質 +50最大生命值。</div>
+                    <div><b>能量</b>：提高最大能量值。1點能量 +15最大能量。</div>
+                    <div><b>防禦</b>：降低受到的物理與法術傷害。1點防禦 +4防禦。</div>
+                    <div><b>敏捷</b>：提高出手速度。1點敏捷 +1速度。</div>
                 </div>
             </details>
 
@@ -602,20 +602,11 @@
         </div>
 
         <div class="creation-stat">
-            <span>精神</span>
-
+            <span>防禦</span>
             <div class="creation-stat-right">
-                <button
-                    class="creation-stat-button"
-                    onclick="creationAdd2('spirit',-1)"
-                >−</button>
-
-                <b id="creation2Spirit">0</b>
-
-                <button
-                    class="creation-stat-button"
-                    onclick="creationAdd2('spirit',1)"
-                >+</button>
+                <button class="creation-stat-button" onclick="creationAdd2('defensePoints',-1)">−</button>
+                <b id="creation2Defense">0</b>
+                <button class="creation-stat-button" onclick="creationAdd2('defensePoints',1)">+</button>
             </div>
         </div>
 
@@ -758,8 +749,8 @@
             <div
                 id="homeVersionBadge"
                 class="home-version-badge"
-                aria-label="目前版本 V173.72"
-            >V173.72</div>
+                aria-label="目前版本 V173.73"
+            >V173.73</div>
         </div>
     </div>
 
@@ -809,9 +800,9 @@
             <span class="home-card-label">任務</span>
         </button>
 
-        <button type="button" class="home-card home-card-secondary" onclick="openHomeFeature('bestiary')" aria-label="圖鑑">
-            <span id="homeIconBestiary" class="home-card-icon" style="background-image:url(assets/ui/home-bestiary.png);"></span>
-            <span class="home-card-label">圖鑑</span>
+        <button type="button" class="home-card home-card-secondary" data-feature="gameplay-core" onclick="openHomeFeature('forge')" aria-label="鍛造">
+            <span id="homeIconForge" class="home-card-icon" aria-hidden="true">⚒︎</span>
+            <span class="home-card-label">鍛造</span>
         </button>
 
         <button type="button" class="home-card home-card-secondary" onclick="openHomeFeature('achievement')" aria-label="成就">
@@ -1662,6 +1653,7 @@
     <div
         id="battlePotionList"
         class="battle-item-list"
+        data-scroll-owner="y"
         role="tabpanel"
     ></div>
 </div>
@@ -1715,6 +1707,7 @@
 <div
     id="autoBattleSettingsPanel"
     class="auto-settings-expanded auto-premium-panel"
+    data-scroll-owner="y"
     style="display:none;"
 >
 
@@ -1999,16 +1992,10 @@
 
 
 <div class="status-row">
-    <span>精神</span>
-    <button
-        id="statusBtnSpiritMinus"
-        class="status-btn"
-    >-</button>
-    <b id="statusSpirit" class="status-number">0</b>
-    <button
-        id="statusBtnSpiritPlus"
-        class="status-btn"
-    >+</button>
+    <span>防禦</span>
+    <button id="statusBtnDefenseMinus" class="status-btn">-</button>
+    <b id="statusDefense" class="status-number">0</b>
+    <button id="statusBtnDefensePlus" class="status-btn">+</button>
 </div>
 
 
@@ -2115,6 +2102,8 @@
 
 </div>
 
+<div id="skillElementTabs" class="skill-element-tabs" role="tablist" aria-label="技能元素分類"></div>
+
 <!--
     ★ 修正（依照使用者要求，「不用特別再做
     一個已學會技能的框了，拿掉，現在技能
@@ -2148,13 +2137,19 @@
 
 <div class="inventory-classic-shell">
 
-    <button
-        type="button"
-        id="mapInventoryOverlayClose"
-        class="map-inventory-overlay-close"
-        onclick="closeMapInventoryOverlay()"
-        aria-label="關閉背包"
-    >關閉</button>
+    <header class="inventory-header" aria-label="背包頁首">
+      <div class="inventory-title-plate" aria-label="背包">
+        <span class="inventory-title-plate-kicker">INVENTORY</span>
+        <h2>背包</h2>
+      </div>
+        <button
+            type="button"
+            id="mapInventoryOverlayClose"
+            class="map-inventory-overlay-close"
+            onclick="closeMapInventoryOverlay()"
+            aria-label="關閉背包"
+        >關閉</button>
+    </header>
 
     <!-- 上方：角色切換 + 立繪 + 六部位裝備 -->
     <section class="inventory-character-panel">
@@ -2170,7 +2165,7 @@
                     class="inventory-character-detail-button"
                     aria-label="查看角色詳細資訊"
                     onclick="openInventoryCharacterDetail()"
-                >🔍</button>
+                >詳</button>
 
                 <div class="inventory-portrait-placeholder">
                     角色立繪
@@ -2203,8 +2198,14 @@
             <div class="inventory-category-tab" role="tab" tabindex="0" data-filter="function" onclick="setInventoryFilter('function')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();setInventoryFilter('function');}">功能</div>
         </div>
 
-        <div class="inventory-grid-scroll" id="inventoryGridScroll">
+        <div class="inventory-grid-scroll" id="inventoryGridScroll" data-scroll-owner="y">
             <div id="inventoryGrid" class="inventory-grid inventory-grid-classic"></div>
+        </div>
+
+        <div class="inventory-bottom-actions" id="inventoryBottomActions" aria-label="背包操作">
+            <button id="inventoryRefreshButton" class="inventory-bottom-action inventory-refresh-action" type="button" onclick="v141RefreshInventory()">重新整理</button>
+            <div id="inventoryPaginationSlot" class="inventory-pagination-slot"></div>
+            <button id="inventoryQuickSellButton" class="inventory-bottom-action inventory-quick-sell-action" type="button" onclick="v17350OpenQuickSellModal()" hidden>一鍵售出</button>
         </div>
 
     </section>
@@ -2369,8 +2370,6 @@
 
 </div>
 
-<!-- 巡怪底部導覽由 js/42-v148-combat-dungeon-fixes.js 的 context navigation owner 投影。 -->
-<div id="mapPageNav" class="bottom-nav map-page-nav"></div>
 
 <!--
    ★ 修正（真的抓到「角色/任務按鈕沒反應」
@@ -2530,6 +2529,7 @@
 <div
     id="itemModalStats"
     class="item-stat-list"
+    data-scroll-owner="y"
 ></div>
 
 <div class="item-modal-buttons">
@@ -2635,17 +2635,17 @@
     class="item-stat-list"
     style="text-align:left;line-height:1.9;"
 >
-    <b>智力</b>　影響法術攻擊、回復技能、異常狀態命中率、法術爆擊機率與法術爆擊傷害；每1點智力額外增加1.25點HP治療量、0.5點SP治療量（施放者本人不回復SP）
+    <b>智力</b>　提高法術攻擊與治療回復量
     <br>
-    <b>攻擊</b>　影響物理攻擊、物理爆擊機率與物理爆擊傷害
+    <b>攻擊</b>　提高物理攻擊
     <br>
-    <b>體質</b>　提升HP最大值與防禦
+    <b>體質</b>　提高最大生命值
     <br>
     <b>能量</b>　提升SP最大值
     <br>
-    <b>精神</b>　影響異常狀態抗性、命中與抗暴；一般異常每1點精神降低0.05個百分點命中率，另有+2命中、+0.1%抗暴（上限25%）；硬控維持獨立公式
+    <b>防禦</b>　降低受到的物理與法術傷害
     <br>
-    <b>敏捷</b>　影響出手速度與閃避；每1點有效敏捷=+1速度、+0.6個百分點基礎閃避
+    <b>敏捷</b>　提高出手速度
     <br><br>
     <span style="color:#b3a58c;">
         （長按可快速加點）
@@ -2729,7 +2729,7 @@
 
 <!-- V136: version the loader itself; otherwise a cached old loader never sees new patch versions. -->
 <!-- build:critical-script -->
-<script id="boot-core-runtime" src="build/boot-core.3161e77e1e98.js"></script>
+<script id="boot-core-runtime" src="build/boot-core.a891c4486126.js"></script>
 <!-- /build:critical-script -->
 </body>
 </html>

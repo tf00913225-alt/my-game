@@ -90,6 +90,21 @@
         });
         execution.set(name,promise); return promise;
     }
+    function bundleVisualAssets(bundle){
+        const paths=Array.isArray(bundle&&bundle.criticalAssets)
+            ?bundle.criticalAssets
+            :Array.isArray(bundle&&bundle.assets)?bundle.assets:[];
+        return [...new Set(paths.filter(path=>typeof path==="string"&&path))];
+    }
+    function prepareBundleVisuals(order,bundles,reason){
+        return Promise.all(order.flatMap(name=>bundleVisualAssets(bundles[name]).map(path=>{
+            cancelQueuedBackground("asset:"+path);
+            return decodeAsset(path,"high").then(()=>{
+                emit("four-symbols:feature-asset-ready",{bundle:name,path,reason});
+                return path;
+            });
+        })));
+    }
     async function ensure(feature,reason="navigation"){
         const data=await manifest();
         Object.entries(data.features||{}).forEach(([key,value])=>{
@@ -104,6 +119,9 @@
         // Start every network fetch before executing the first dependency.
         await Promise.all(order.map(name=>prepareBundle(name,data.bundles[name])));
         for(const name of order){ await executeBundle(name,data.bundles[name]); }
+        // A foreground feature is not navigation-ready until its first-screen
+        // artwork has been fetched and decoded through the shared asset cache.
+        await prepareBundleVisuals(order,data.bundles,reason);
         emit("four-symbols:feature-request-complete",{feature,bundle:target,reason});
         return target;
     }
@@ -112,7 +130,12 @@
             const target=(data.features&&data.features[feature]) || (data.bundles&&data.bundles[feature]?feature:null);
             if(!target){ return false; }
             const order=topology(target,data.bundles||{});
-            return Promise.all(order.map(name=>prepareBundle(name,data.bundles[name]))).then(()=>true);
+            return Promise.all([
+                ...order.map(name=>prepareBundle(name,data.bundles[name])),
+                ...order.flatMap(name=>bundleVisualAssets(data.bundles[name]).map(path=>{
+                    return queueBackground("asset:"+path,()=>decodeAsset(path,"low"));
+                }))
+            ]).then(()=>true);
         }).catch(()=>false);
     }
     function cancelQueuedBackground(key){

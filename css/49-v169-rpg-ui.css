@@ -16,6 +16,8 @@
     --ui-medium-modal-height:540px;
     --ui-medium-modal-safe-space:28px;
     --ui-medium-modal-content-gap:10px;
+    --ui-item-art-min:92px;
+    --ui-item-art-max:156px;
 }
 
 /*
@@ -228,16 +230,18 @@
     animation:none !important;
 }
 
-/* ----- Medium Modal: canonical item/equipment detail. ----- */
+/* ----- Item Presentation: canonical frame for every item-detail mode. ----- */
 #game-stage #itemModal .item-modal-box{
     width:calc(100% - var(--ui-medium-modal-safe-space)) !important;
     max-width:var(--ui-medium-modal-max-width) !important;
-    height:min(var(--ui-medium-modal-height),calc(100% - var(--ui-medium-modal-safe-space))) !important;
-    max-height:calc(100% - var(--ui-medium-modal-safe-space)) !important;
+    height:auto !important;
+    max-height:min(var(--ui-medium-modal-height),calc(100% - var(--ui-medium-modal-safe-space))) !important;
     min-height:0 !important;
     display:flex !important;
     flex-direction:column !important;
+    flex:0 1 auto !important;
     gap:var(--ui-medium-modal-content-gap) !important;
+    padding:16px;
     overflow:hidden !important;
     box-sizing:border-box !important;
 }
@@ -246,14 +250,8 @@
 #game-stage #itemModal .item-modal-buttons{
     flex:0 0 auto !important;
 }
-/*
-   Keep the Medium Modal frame fixed, but let a short potion/material stat card
-   hug its actual content. Long equipment details still shrink into the
-   available space and scroll here; the unused room stays as panel background
-   instead of becoming a giant black stat card.
-*/
 #game-stage #itemModal #itemModalStats{
-    flex:0 1 auto !important;
+    flex:1 1 auto !important;
     min-height:0 !important;
     max-height:none !important;
     overflow-x:hidden !important;
@@ -264,7 +262,225 @@
     scrollbar-gutter:stable !important;
 }
 #game-stage #itemModal .item-modal-buttons{
-    margin-top:auto !important;
+    margin-top:0 !important;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+}
+/* Text is authored in the documented legacy-content unit. 18px remains
+   readable after projection in normal/short phone space; text never shrinks
+   to force content into the frame. */
+#game-stage #itemModal #itemModalName{
+    margin:5px 0 9px;
+    font-size:20px;
+    line-height:1.35;
+    overflow-wrap:anywhere;
+}
+#game-stage #itemModal #itemModalStats,
+#game-stage #itemModal #itemModalStats *{
+    font-size:18px;
+    line-height:1.55;
+    overflow-wrap:anywhere;
+}
+#game-stage #itemModal .item-modal-buttons button,
+#game-stage #itemModal .close-item-button{
+    box-sizing:border-box;
+    min-width:0;
+    min-height:44px;
+    height:auto;
+    padding:7px;
+    font-size:18px;
+    line-height:1.35;
+    white-space:normal;
+    overflow-wrap:anywhere;
+}
+#game-stage #itemModal .close-item-button{
+    flex:0 0 auto;
+}
+
+#game-stage #itemModal #itemModalIcon{
+    display:grid !important;
+    place-items:center !important;
+    width:clamp(var(--ui-item-art-min),40%,var(--ui-item-art-max)) !important;
+    max-width:100% !important;
+    aspect-ratio:1 !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:var(--ui-item-art-max) !important;
+    align-self:center !important;
+    overflow:hidden !important;
+}
+#game-stage #itemModal #itemModalIcon > .v169-item-art,
+#game-stage #itemModal #itemModalIcon > .v169-equipment-art,
+#game-stage #itemModal #itemModalIcon > .v169-material-art,
+#game-stage #itemModal #itemModalIcon > .v169-talisman-art,
+#game-stage #itemModal #itemModalIcon > .v169-ticket-art,
+#game-stage #itemModal #itemModalIcon > .v169-blueprint-art{
+    display:grid !important;
+    place-items:center !important;
+    width:100% !important;
+    height:100% !important;
+    max-width:100% !important;
+    max-height:100% !important;
+    flex:0 1 auto !important;
+    overflow:hidden !important;
+    box-sizing:border-box !important;
+}
+#game-stage #itemModal #itemModalIcon img,
+#game-stage #itemModal #itemModalIcon svg{
+    display:block !important;
+    width:100% !important;
+    height:100% !important;
+    max-width:100% !important;
+    max-height:100% !important;
+    object-fit:contain !important;
+    object-position:center !important;
+}
+
+#game-stage #itemModal.item-modal-mode-compact .item-modal-box{
+    max-height:calc(100% - var(--ui-medium-modal-safe-space)) !important;
+    justify-content:flex-start !important;
+}
+#game-stage #itemModal.item-modal-mode-compact #itemModalIcon{
+    --ui-item-art-max:132px;
+}
+#game-stage #itemModal.item-modal-mode-compact #itemModalStats{
+    flex:0 1 auto !important;
+    max-height:180px !important;
+}
+
+#game-stage #itemModal.item-modal-mode-comparison .item-modal-box{
+    max-width:396px !important;
+    max-height:calc(100% - 20px) !important;
+    padding:11px !important;
+    gap:7px !important;
+}
+#game-stage #itemModal.item-modal-mode-comparison .item-modal-box > #itemModalIcon,
+#game-stage #itemModal.item-modal-mode-comparison .item-modal-box > #itemModalName,
+#game-stage #itemModal.item-modal-mode-comparison .item-modal-box > #itemModalStats,
+#game-stage #itemModal.item-modal-mode-comparison .item-modal-box > .close-item-button{
+    display:none !important;
+}
+#game-stage #itemModal.item-modal-mode-comparison .item-modal-buttons{
+    display:grid !important;
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    width:100% !important;
+    min-height:48px !important;
+    gap:6px !important;
+}
+#game-stage #itemModal.item-modal-mode-comparison .item-modal-buttons button{
+    min-width:0 !important;
+    min-height:48px !important;
+    height:auto !important;
+    padding:5px 4px !important;
+    font-size:18px !important;
+    white-space:normal !important;
+    line-height:1.2 !important;
+}
+
+/*
+   The equipment-shop preview is the one compatibility mount in this batch:
+   v132RewardModal is created under document.body, so these values use browser
+   CSS pixels instead of the legacy 420px surface. It shares the same frame /
+   fixed-actions / single-scroll contract and may be moved only when the whole
+   v132 reward-modal family is migrated together.
+*/
+.v132-reward-modal .v17346-shop-preview-modal.item-presentation-frame{
+    width:min(360px,calc(100vw - 28px)) !important;
+    max-width:calc(100vw - 28px) !important;
+    height:auto !important;
+    max-height:calc(100dvh - 28px) !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    display:flex !important;
+    flex-direction:column !important;
+    gap:10px !important;
+    padding:16px !important;
+    overflow:hidden !important;
+    box-sizing:border-box !important;
+    text-align:center !important;
+}
+.v132-reward-modal .v17346-shop-preview-modal.item-presentation-frame,
+.v132-reward-modal .v17346-shop-preview-modal.item-presentation-frame *{
+    min-width:0;
+    box-sizing:border-box;
+}
+.v132-reward-modal .v17346-shop-preview-modal > h3{
+    position:static !important;
+    flex:0 0 auto !important;
+    margin:0 !important;
+    padding:0 !important;
+    color:#f7e7be !important;
+    background:none !important;
+    font-size:22px !important;
+    line-height:1.25 !important;
+    overflow-wrap:anywhere;
+}
+.v132-reward-modal .v17346-shop-preview-modal .item-presentation-scroll{
+    display:flex;
+    flex:1 1 auto;
+    min-height:0;
+    flex-direction:column;
+    gap:10px;
+    overflow-x:hidden;
+    overflow-y:auto;
+    overscroll-behavior-y:contain;
+    -webkit-overflow-scrolling:touch;
+    touch-action:pan-y;
+    scrollbar-gutter:stable;
+}
+.v132-reward-modal .v17346-shop-preview-modal .v17346-shop-preview-art{
+    display:grid !important;
+    place-items:center !important;
+    width:clamp(96px,min(42vw,22dvh),168px) !important;
+    max-width:100% !important;
+    aspect-ratio:1 !important;
+    height:auto !important;
+    flex:0 0 auto !important;
+    margin:0 auto !important;
+    overflow:hidden !important;
+}
+.v132-reward-modal .v17346-shop-preview-modal .v17346-shop-preview-art > .v169-item-art{
+    display:grid !important;
+    place-items:center !important;
+    width:100% !important;
+    height:100% !important;
+    max-width:100% !important;
+    max-height:100% !important;
+    overflow:hidden !important;
+}
+.v132-reward-modal .v17346-shop-preview-modal .v17346-shop-preview-art img,
+.v132-reward-modal .v17346-shop-preview-modal .v17346-shop-preview-art svg{
+    display:block !important;
+    width:100% !important;
+    height:100% !important;
+    max-width:100% !important;
+    max-height:100% !important;
+    object-fit:contain !important;
+    object-position:center !important;
+}
+.v132-reward-modal .v17346-shop-preview-modal .v17346-shop-preview-info{
+    display:grid;
+    gap:7px;
+    padding:10px 12px;
+    border:1px solid rgba(197,151,72,.55);
+    border-radius:9px;
+    background:rgba(12,9,6,.7);
+    font-size:16px;
+    line-height:1.4;
+}
+.v132-reward-modal .v17346-shop-preview-modal .v17346-shop-preview-info strong{color:#ffe09a;font-size:18px;overflow-wrap:anywhere}
+.v132-reward-modal .v17346-shop-preview-modal .v17346-shop-preview-price{color:#ffd078;font-size:18px;font-weight:900}
+.v132-reward-modal .v17346-shop-preview-modal .v17346-shop-preview-reforge{color:#ffbf5b;font-size:14px;font-weight:900}
+.v132-reward-modal .v17346-shop-preview-modal .v132-reward-actions{
+    position:static !important;
+    flex:0 0 auto !important;
+    margin:0 !important;
+    padding:0 !important;
+    background:none !important;
+}
+.v132-reward-modal .v17346-shop-preview-modal .v132-reward-actions button{
+    min-height:44px !important;
+    padding:8px 12px !important;
+    font-size:15px !important;
 }
 
 /* A permanently promoted layer made skill cards shimmer while scrolling. */
@@ -347,7 +563,8 @@
 
 /* ----- Synthesis: maximum mobile panel; wallet/tabs stay fixed, body scrolls. ----- */
 #game-stage #homeFeatureModal.v141-synthesis-modal{
-    padding:4px !important;
+    /* 216 native-stage units expressed on the existing 420/1080 content plane. */
+    padding:4px 4px 84px !important;
 }
 #game-stage #homeFeatureModal.v141-synthesis-modal .home-feature-modal-box{
     width:calc(100% - 8px) !important;
@@ -587,133 +804,6 @@
 #game-stage #homeFeatureModal .v17345-equipment-pending{
     margin:0;
     padding:0 4px 4px;
-}
-
-/* The dungeon nav is z-index 790; its backpack must be above that layer. */
-#game-stage > #app.v141-dungeon-active > #game-content #inventoryPage.map-inventory-overlay-open.v169-dungeon-inventory-overlay{
-    display:block !important;
-    inset:8px 8px 76px 8px !important;
-    z-index:900 !important;
-}
-
-#game-stage > #app.v141-dungeon-active > #game-content #inventoryPage.map-inventory-overlay-open.v169-dungeon-inventory-overlay::before{
-    z-index:-1 !important;
-}
-
-/* ----- Backpack: standalone page and map/dungeon overlay share one A-level width. ----- */
-#game-stage #app.on-inventory-page #inventoryPage.inventory-page-classic:not(.map-inventory-overlay-open) .inventory-classic-shell{
-    width:calc(100% - var(--ui-large-panel-safe-space)) !important;
-    max-width:var(--ui-large-panel-max-width) !important;
-    margin:0 auto !important;
-}
-
-#game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open{
-    left:50% !important;
-    right:auto !important;
-    top:12px !important;
-    bottom:82px !important;
-    width:calc(100% - var(--ui-large-panel-safe-space)) !important;
-    max-width:var(--ui-large-panel-max-width) !important;
-    transform:translateX(-50%) !important;
-    padding:10px !important;
-}
-
-#game-stage > #app.v141-dungeon-active > #game-content #inventoryPage.map-inventory-overlay-open.v169-dungeon-inventory-overlay{
-    left:50% !important;
-    right:auto !important;
-    top:12px !important;
-    bottom:82px !important;
-    width:calc(100% - var(--ui-large-panel-safe-space)) !important;
-    max-width:var(--ui-large-panel-max-width) !important;
-    transform:translateX(-50%) !important;
-}
-
-#game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open .inventory-classic-shell{
-    width:100% !important;
-    max-width:none !important;
-    margin:0 !important;
-    gap:var(--ui-large-panel-content-gap) !important;
-}
-
-#game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open .inventory-character-switch{
-    padding-right:86px !important;
-}
-
-#game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open .map-inventory-overlay-close{
-    top:8px !important;
-    right:8px !important;
-    min-width:72px !important;
-    height:42px !important;
-    padding:0 12px !important;
-    font-size:15px !important;
-}
-
-#game-stage > #app > #game-content #inventoryPage.map-inventory-overlay-open .inventory-grid-scroll{
-    scrollbar-gutter:stable !important;
-}
-
-/* Backpack character presentation follows the same black-gold language as the panel. */
-#game-stage #inventoryPage .inventory-character-arrow{
-    width:44px !important;
-    height:44px !important;
-    min-width:44px !important;
-    min-height:44px !important;
-    aspect-ratio:1 / 1 !important;
-    padding:0 !important;
-    border:1px solid #b88a42 !important;
-    border-radius:50% !important;
-    color:#f3cf76 !important;
-    background:
-        radial-gradient(circle at 50% 30%,rgba(246,204,112,.18),transparent 52%),
-        linear-gradient(180deg,#362719,#130e09) !important;
-    box-shadow:
-        inset 0 0 0 1px rgba(255,225,151,.08),
-        inset 0 -8px 14px rgba(0,0,0,.28),
-        0 3px 9px rgba(0,0,0,.48),
-        0 0 8px rgba(205,151,65,.12) !important;
-    font-family:"Noto Serif TC",serif !important;
-    font-size:28px !important;
-    font-weight:900 !important;
-    line-height:42px !important;
-    text-align:center !important;
-    text-shadow:0 1px 2px #000,0 0 6px rgba(240,180,41,.28) !important;
-}
-#game-stage #inventoryPage .inventory-character-arrow:active{
-    color:#fff0b8 !important;
-    background:linear-gradient(180deg,#49341e,#1b120b) !important;
-    transform:translateY(1px) !important;
-}
-#game-stage #inventoryPage #inventoryPortraitFrame{
-    background:
-        radial-gradient(circle at 50% 42%,rgba(194,132,47,.09),transparent 60%),
-        linear-gradient(180deg,#100c08,#060504) !important;
-}
-#game-stage #inventoryPage #inventoryPortraitFrame .v131-inventory-portrait{
-    inset:0 !important;
-    width:100% !important;
-    height:100% !important;
-    object-fit:contain !important;
-    object-position:center center !important;
-}
-#game-stage #inventoryPage #inventoryCharacterDetailButton{
-    overflow:hidden !important;
-    color:transparent !important;
-    font-size:0 !important;
-    line-height:0 !important;
-}
-#game-stage #inventoryPage #inventoryCharacterDetailButton::before{
-    content:"!" !important;
-    display:flex !important;
-    width:100% !important;
-    height:100% !important;
-    align-items:center !important;
-    justify-content:center !important;
-    color:#ffe27a !important;
-    font-family:"Noto Serif TC",serif !important;
-    font-size:27px !important;
-    font-weight:900 !important;
-    line-height:1 !important;
-    text-shadow:0 1px 2px #000,0 0 7px rgba(240,180,41,.34) !important;
 }
 
 @media (max-width:430px){
@@ -1220,27 +1310,6 @@
     overscroll-behavior-y:contain !important;
     touch-action:pan-y !important;
 }
-#game-stage > #app.v141-dungeon-active > #game-content #inventoryPage.map-inventory-overlay-open.v169-dungeon-inventory-overlay{
-    inset:0 !important;
-    left:0 !important;
-    right:0 !important;
-    top:0 !important;
-    bottom:0 !important;
-    width:100% !important;
-    max-width:none !important;
-    height:100% !important;
-    max-height:none !important;
-    transform:none !important;
-    padding:8px !important;
-    box-sizing:border-box !important;
-}
-#game-stage > #app.v141-dungeon-active > #game-content #inventoryPage.map-inventory-overlay-open.v169-dungeon-inventory-overlay .inventory-classic-shell{
-    width:100% !important;
-    max-width:none !important;
-    min-height:100% !important;
-    margin:0 !important;
-}
-
 #game-stage .home-feature-modal-box .home-feature-close-btn{
     min-height:38px;
 }
@@ -1263,7 +1332,6 @@
 
 #game-stage .home-feature-modal-box,
 #game-stage .item-modal-box,
-#game-stage .inventory-classic-shell,
 #game-stage .creation-skill-detail-box,
 #game-stage .modal-box,
 .v169-rpg-dialog,
@@ -1331,7 +1399,6 @@
 
 #game-stage .home-feature-modal-box button,
 #game-stage .item-modal-box button,
-#game-stage .inventory-classic-shell button,
 #game-stage .creation-skill-detail-box button,
 #game-stage .modal-box button,
 .v132-reward-modal-inner button,
@@ -1351,7 +1418,6 @@
 
 #game-stage .home-feature-modal-box button:hover,
 #game-stage .item-modal-box button:hover,
-#game-stage .inventory-classic-shell button:hover,
 #game-stage .creation-skill-detail-box button:hover,
 #game-stage .modal-box button:hover,
 .v132-reward-modal-inner button:hover,
@@ -1370,7 +1436,6 @@
 
 #game-stage .home-feature-modal-box button:active,
 #game-stage .item-modal-box button:active,
-#game-stage .inventory-classic-shell button:active,
 #game-stage .creation-skill-detail-box button:active,
 #game-stage .modal-box button:active,
 .v132-reward-modal-inner button:active,
@@ -1389,9 +1454,6 @@
 #game-stage .home-feature-modal-box button[aria-pressed="true"],
 #game-stage .item-modal-box button.active,
 #game-stage .item-modal-box button.selected,
-#game-stage .inventory-classic-shell button.active,
-#game-stage .inventory-classic-shell button.selected,
-#game-stage .inventory-classic-shell button[aria-selected="true"],
 #game-stage .creation-skill-detail-box button.active,
 #game-stage .creation-skill-detail-box button.selected{
     border-color:var(--rpg-window-gold-hi,#F0D38A);
@@ -1409,7 +1471,6 @@
 
 #game-stage .home-feature-modal-box button:disabled,
 #game-stage .item-modal-box button:disabled,
-#game-stage .inventory-classic-shell button:disabled,
 #game-stage .creation-skill-detail-box button:disabled,
 #game-stage .modal-box button:disabled,
 .v132-reward-modal-inner button:disabled,
@@ -1424,7 +1485,6 @@
 #game-stage .home-feature-modal-box .character-tab,
 #game-stage .home-feature-modal-box .v141-synthesis-tabs button,
 #game-stage .home-feature-modal-box .v17345-shop-tabs button,
-#game-stage .inventory-classic-shell .inventory-category-tab{
     border-color:var(--rpg-window-gold-dark,#73582D);
     color:var(--rpg-window-muted,#B9AD98);
     background:linear-gradient(180deg,#242019,#12110E);
@@ -1435,8 +1495,6 @@
 #game-stage .home-feature-modal-box .character-tab.active,
 #game-stage .home-feature-modal-box .v141-synthesis-tabs button.active,
 #game-stage .home-feature-modal-box .v17345-shop-tabs button.active,
-#game-stage .inventory-classic-shell .inventory-category-tab.active,
-#game-stage .inventory-classic-shell .inventory-category-tab.selected{
     border-color:var(--rpg-window-gold-hi,#F0D38A);
     color:#FFF0BE;
     background:
@@ -1451,8 +1509,7 @@
 #game-stage .home-feature-modal-box .home-feature-close-btn,
 #game-stage .item-modal-box .close-item-button,
 #game-stage .creation-skill-detail-box .creation-skill-detail-close,
-#game-stage .creation-skill-detail-box .creation-skill-detail-x,
-#game-stage .inventory-classic-shell .map-inventory-overlay-close{
+#game-stage .creation-skill-detail-box .creation-skill-detail-x{
     border-color:#9B773B;
     color:var(--rpg-window-text,#EEE7D8);
     background:linear-gradient(180deg,#342C20,#171510 62%,#0D0C09);

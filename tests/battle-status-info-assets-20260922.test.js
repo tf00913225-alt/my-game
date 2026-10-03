@@ -19,7 +19,7 @@ test("persistent status icons are static while body states stay pulse/static",()
   const js=read("js/39-v143-skill-animation.js");
   const css=read("css/40-v143-combat-dungeon-polish.css");
   assert.match(js,/frostbite:statusVisual\("","icon","statusEffects"/);
-  assert.match(js,/fireMomentum:statusVisual\("","icon","activeBuffs"/);
+  assert.match(js,/fireMomentum:statusVisual\("","none","activeBuffs"/);
   assert.match(js,/burn:statusVisual\("assets\/vfx\/status\/burn\.webp","pulse"/);
   assert.match(js,/freeze:statusVisual\("assets\/vfx\/status\/freeze\.webp","static"/);
   assert.doesNotMatch(js,/statDown:statusVisual/);
@@ -64,6 +64,7 @@ test("idle card inspection yields to existing target-selection interaction",()=>
 
 test("battle skill owners keep target scope, duration and presentation aligned",()=>{
   const main=read("js/00-main.js");
+  const bottomNav=read("js/04-stage-v11-native-bottom-nav-runtime.js");
   const v141=read("js/36-v141-content-systems.js");
   const v148=read("js/42-v148-combat-dungeon-fixes.js");
   const v155=read("js/46-v155-dev-fixes.js");
@@ -91,13 +92,18 @@ test("battle skill owners keep target scope, duration and presentation aligned",
   assert.match(v155,/function resolveWindEliteDodge[\s\S]*?allyTriTargeting/);
   assert.doesNotMatch(v148,/snapshotActivePartyBuffs|restoreActivePartyBuffs/);
 
-  assert.match(relic,/const host=battlePage\|\|null/);
-  assert.match(relicCss,/team-relic-battle-dim\{[\s\S]*?z-index:18090/);
+  assert.match(relic,/document\.body\.appendChild\(node\)/);
+  assert.match(relic,/function relicOverlayGeometry\(\)[\s\S]*?getBattlefieldOverlayGeometry/);
+  assert.match(relic,/function revealRelicTargets\(target\)[\s\S]*?getUnitGeometry[\s\S]*?artworkProjection[\s\S]*?hpProjection/);
+  assert.doesNotMatch(relic,/team-relic-mask-holes|createElementNS\(namespace,"rect"\)/);
+  assert.match(relicCss,/body > \.team-relic-battle-presentation\{[\s\S]*?z-index:18090/);
   assert.match(relicCss,/team-relic-cinematic-active > \.v143-skill-stage\{z-index:18130/);
   assert.match(fixedCss,/turn-target-row\.skill-picker-open\{[\s\S]*?bottom:calc\(var\(--battle-command-visual-height\) \+ 44px\)/);
-  assert.match(fixedCss,/#skillQuickBar\.skill-quick-bar\{[\s\S]*?top:-24px[\s\S]*?bottom:10px/);
+  assert.match(fixedCss,/#skillQuickBar\.skill-quick-bar\{[\s\S]*?top:-82px[\s\S]*?bottom:0/);
   assert.doesNotMatch(featureBoundary,/MutationObserver/);
-  assert.match(v148,/trainingActive[\s\S]*?\?"training"/);
+  assert.match(bottomNav,/trainingActive[\s\S]*?\?"training"/);
+  assert.match(v148,/FourSymbolsBottomNav\?\.syncContext\(\)/);
+  assert.doesNotMatch(v148,/trainingActive[\s\S]*?\?"training"/);
 });
 
 test("all formal battle status assets are WebP files",()=>{

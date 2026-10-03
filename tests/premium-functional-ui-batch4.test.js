@@ -27,7 +27,7 @@ assert.match(qa,/shop-potion-purchase-row\{[^{}]*grid-template-columns:24px minm
 assert.match(qa,/shop-potion-quantity\{[^{}]*width:24px!important;[^{}]*max-width:24px!important;[^{}]*min-height:38px!important;[^{}]*font-size:13px!important/);
 assert.match(qa,/shop-potion-purchase-row \.shop-potion-buy\{[^{}]*min-height:42px!important/);
 assert.match(qa,/v141-synthesis-modal \.v141-synthesis-tabs button\{[^{}]*min-height:44px!important/);
-assert.match(synthesis,/\["reforge","裝備冶煉"\]/);
+assert.match(synthesis,/v141SwitchForgeTab/);
 assert.match(synthesis,/\["talisman","符咒合成"\]/);
 assert.match(synthesis,/\["fragment","碎片合成"\]/);
 assert.match(fixes,/ensureMaterialTab/);

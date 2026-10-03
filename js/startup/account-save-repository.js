@@ -7,6 +7,7 @@
     const PREFIX="four_symbols_save:";
     const META_PREFIX="four_symbols_save_meta:";
     const BACKUP_PREFIX="four_symbols_legacy_backup:";
+    const MIGRATION_BACKUP_PREFIX="four_symbols_migration_backup:";
     const ACTIVE_UID_KEY="four_symbols_active_uid";
     const SCHEMA_VERSION=2;
     const LEGACY_SIDECARS=Object.freeze({
@@ -24,6 +25,8 @@
         v17351_equipment_shop_purchases:"equipment-shop-purchases",
         v174_abyss_state_v2:"abyss-state"
     });
+    const BACKUP_SIDECARS=Object.freeze([...new Set([...Object.values(LEGACY_SIDECARS),"patrol-character-index"])]);
+    const PLAIN_SIDECARS=new Set(["announcement-read","bulk-sell-quality","patrol-character-index"]);
 
     function storage(){
         if(!global.localStorage){ throw coded("local-storage-unavailable","Local storage is unavailable."); }
@@ -182,6 +185,190 @@
         catch(error){ return {status:"corrupt",save:null,raw,error}; }
     }
     function migrationBackupKey(uid){ return BACKUP_PREFIX+validUid(uid)+":"+Date.now(); }
+    /* Original-device safety copy only.  This is never a cloud authority. */
+    function migrationBackupKeyFor(uid,mainFingerprint,manifestFingerprint){
+        uid=validUid(uid);
+        if(!/^v1:[0-9a-f]+:[0-9a-f]{32}$/.test(mainFingerprint||"")){
+            throw coded("migration-backup-fingerprint-invalid","Migration backup requires a verified main-save fingerprint.");
+        }
+        return MIGRATION_BACKUP_PREFIX+uid+":"+mainFingerprint+(manifestFingerprint?":"+manifestFingerprint:"");
+    }
+    function verifyMigrationBackup(uid,backupKey){
+        uid=validUid(uid);
+        if(getActiveUid()!==uid){ throw coded("account-not-active","Backup owner is not active."); }
+        if(typeof backupKey!=="string"||!backupKey.startsWith(MIGRATION_BACKUP_PREFIX+uid+":")){
+            throw coded("migration-backup-owner-mismatch","Backup does not belong to this UID.");
+        }
+        let backup;
+        try{ backup=JSON.parse(storage().getItem(backupKey)); }
+        catch(_){ throw coded("migration-backup-corrupt","Backup is corrupt."); }
+        if(!backup||backup.schemaVersion!==2||backup.ownerUid!==uid||
+           !backup.mainRaw||!backup.metadataRaw||!backup.sidecars){
+            throw coded("migration-backup-corrupt","Backup is incomplete.");
+        }
+        const main=parseSave(backup.mainRaw,"migration-backup-corrupt");
+        const metadata=parseSave(backup.metadataRaw,"migration-backup-corrupt");
+        if(metadata.ownerUid!==uid||fingerprint(main)!==backup.mainFingerprint){
+            throw coded("migration-backup-corrupt","Backup ownership or main fingerprint changed.");
+        }
+        const keys=Object.keys(backup.sidecars).sort();
+        if(keys.join("|")!==[...BACKUP_SIDECARS].sort().join("|")){
+            throw coded("migration-backup-corrupt","Backup sidecar inventory is incomplete.");
+        }
+        for(const suffix of keys){
+            const item=backup.sidecars[suffix];
+            if(!item||!(["present","missing"].includes(item.status))||
+               (item.status==="missing"?item.raw!==null:typeof item.raw!=="string")){
+                throw coded("migration-backup-corrupt","Backup sidecar record is invalid.");
+            }
+            if(item.status==="present"&&!PLAIN_SIDECARS.has(suffix)){
+                parseSave(item.raw,"migration-backup-sidecar-corrupt");
+            }
+        }
+        const manifestFingerprint=fingerprint(backup.sidecars);
+        if(manifestFingerprint!==backup.sidecarManifestFingerprint||
+           migrationBackupKeyFor(uid,backup.mainFingerprint,manifestFingerprint)!==backupKey){
+            throw coded("migration-backup-corrupt","Backup manifest changed.");
+        }
+        return Object.freeze({...backup,backupKey});
+    }
+    function createMigrationBackup(uid){
+        uid=validUid(uid);
+        if(getActiveUid()!==uid){ throw coded("account-not-active","Refusing to back up a non-active account save."); }
+        const local=readForUid(uid);
+        if(local.status!=="ready"){ throw coded("migration-backup-save-required","A complete UID-owned local save is required."); }
+        const mainRaw=storage().getItem(saveKey(uid));
+        const metadataRaw=storage().getItem(metadataKey(uid));
+        const mainFingerprint=fingerprint(local.save);
+        const sidecars={};
+        for(const suffix of BACKUP_SIDECARS){
+            const key=accountKey(suffix,uid);
+            const raw=storage().getItem(key);
+            if(raw===null){ sidecars[suffix]={status:"missing",raw:null}; continue; }
+            if(!PLAIN_SIDECARS.has(suffix)){ parseSave(raw,"migration-backup-sidecar-corrupt"); }
+            sidecars[suffix]={status:"present",raw};
+        }
+        const sidecarManifestFingerprint=fingerprint(sidecars);
+        const backupKey=migrationBackupKeyFor(uid,mainFingerprint,sidecarManifestFingerprint);
+        const existing=storage().getItem(backupKey);
+        if(existing){
+            const verified=verifyMigrationBackup(uid,backupKey);
+            if(verified.mainRaw!==mainRaw||verified.metadataRaw!==metadataRaw){
+                throw coded("migration-backup-conflict","An existing migration backup cannot be verified.");
+            }
+            return Object.freeze({...verified,unchanged:true});
+        }
+        const backup=Object.freeze({
+            schemaVersion:2,ownerUid:uid,mainFingerprint,sidecarManifestFingerprint,mainRaw,metadataRaw,
+            sidecars,createdAt:Date.now()
+        });
+        try{ storage().setItem(backupKey,JSON.stringify(backup)); }
+        catch(error){ throw coded("migration-backup-write-failed","The immutable migration backup could not be stored.",error); }
+        return Object.freeze({...verifyMigrationBackup(uid,backupKey),unchanged:false});
+    }
+    // Only copies historical bytes that the original UID migration sealed next to
+    // the exact same main-save bytes. No live key is changed, and an absent
+    // archived record remains missing. This does not establish claim entitlement.
+    function recoverArchivedMigrationSidecars(uid){
+        uid=validUid(uid);
+        if(getActiveUid()!==uid){ throw coded("account-not-active","Recovery owner is not active."); }
+        const missingKeys=["daily-dungeon-state","task-tracker","legacy-abyss-state"];
+        const oldKeys=Object.fromEntries(Object.entries(LEGACY_SIDECARS)
+            .map(([oldKey,suffix])=>[suffix,oldKey]));
+        const sealedPrefix=MIGRATION_BACKUP_PREFIX+uid+":";
+        const legacyPrefix=BACKUP_PREFIX+uid+":";
+        const candidates=[];
+        let eligibleSealed=0,legacyArchives=0,exactMainArchives=0,incompleteArchives=0;
+        for(let index=0;index<storage().length;index++){
+            const key=storage().key(index);
+            if(typeof key==="string"&&key.startsWith(legacyPrefix)&&
+               /^\d+$/.test(key.slice(legacyPrefix.length))){ legacyArchives++; }
+        }
+        for(let index=0;index<storage().length;index++){
+            const key=storage().key(index);
+            if(typeof key!=="string"||!key.startsWith(sealedPrefix)){ continue; }
+            const backup=verifyMigrationBackup(uid,key);
+            if(missingKeys.some(suffix=>backup.sidecars[suffix].status!=="missing")){ continue; }
+            eligibleSealed++;
+            const matches=[];
+            for(let other=0;other<storage().length;other++){
+                const root=storage().key(other);
+                if(typeof root!=="string"||!root.startsWith(legacyPrefix)||
+                    !/^\d+$/.test(root.slice(legacyPrefix.length))||
+                    storage().getItem(root)!==backup.mainRaw){ continue; }
+                exactMainArchives++;
+                const recovered={};
+                for(const suffix of missingKeys){
+                    const raw=storage().getItem(root+":"+oldKeys[suffix]);
+                    if(raw===null){ break; }
+                    parseSave(raw,"migration-backup-sidecar-corrupt");
+                    recovered[suffix]={status:"present",raw};
+                }
+                if(Object.keys(recovered).length===missingKeys.length){
+                    matches.push({root,recovered});
+                }else{
+                    incompleteArchives++;
+                }
+            }
+            if(matches.length>1){
+                throw coded("migration-recovery-ambiguous","More than one matching original migration archive exists.");
+            }
+            if(matches.length===1){ candidates.push({backup,match:matches[0]}); }
+        }
+        if(candidates.length!==1){
+            const reason=candidates.length?"migration-recovery-ambiguous":
+                !eligibleSealed?"migration-recovery-sealed-missing":
+                !legacyArchives?"migration-recovery-archive-missing":
+                !exactMainArchives?"migration-recovery-main-mismatch":
+                incompleteArchives?"migration-recovery-sidecars-missing":"migration-recovery-source-missing";
+            throw coded(reason,
+                "Exactly one sealed save with a complete matching original archive is required.");
+        }
+        const {backup,match}=candidates[0];
+        const sidecars={...backup.sidecars,...match.recovered};
+        const sidecarManifestFingerprint=fingerprint(sidecars);
+        const backupKey=migrationBackupKeyFor(uid,backup.mainFingerprint,sidecarManifestFingerprint);
+        const existing=storage().getItem(backupKey);
+        if(existing){
+            const checked=verifyMigrationBackup(uid,backupKey);
+            if(checked.mainRaw!==backup.mainRaw||checked.metadataRaw!==backup.metadataRaw||
+               JSON.stringify(checked.sidecars)!==JSON.stringify(sidecars)){
+                throw coded("migration-backup-conflict","An existing recovery backup differs.");
+            }
+            return {backupKey,unchanged:true,recoveredSources:missingKeys};
+        }
+        const next={schemaVersion:2,ownerUid:uid,mainFingerprint:backup.mainFingerprint,
+            sidecarManifestFingerprint,mainRaw:backup.mainRaw,metadataRaw:backup.metadataRaw,
+            sidecars,createdAt:Date.now()};
+        try{ storage().setItem(backupKey,JSON.stringify(next)); }
+        catch(error){ throw coded("migration-backup-write-failed","Recovered backup could not be sealed.",error); }
+        try{ verifyMigrationBackup(uid,backupKey); }
+        catch(error){
+            try{ storage().removeItem(backupKey); }catch(_){ }
+            throw error;
+        }
+        return {backupKey,unchanged:false,recoveredSources:missingKeys};
+    }
+    // Export only sealed local records owned by the active UID. This is an
+    // offline copy, never a cloud save or a source of reward entitlement.
+    function exportMigrationBackups(uid){
+        uid=validUid(uid);
+        if(getActiveUid()!==uid){ throw coded("account-not-active","Backup owner is not active."); }
+        const prefix=MIGRATION_BACKUP_PREFIX+uid+":";
+        const keys=[];
+        for(let index=0;index<storage().length;index++){
+            const key=storage().key(index);
+            if(typeof key==="string"&&key.startsWith(prefix)){ keys.push(key); }
+        }
+        keys.sort();
+        if(!keys.length){ throw coded("migration-backup-missing","No sealed backup exists for this UID."); }
+        const backups=keys.map(key=>{
+            const {backupKey,unchanged,...backup}=verifyMigrationBackup(uid,key);
+            return {backupKey,...backup};
+        });
+        return JSON.stringify({format:"four-symbols-local-migration-backups-v1",ownerUid:uid,
+            authoritativeStateReady:false,backups});
+    }
     function migrateLegacyToUid(uid,options={}){
         uid=validUid(uid);
         if(options.confirmed!==true){ throw coded("migration-confirmation-required","Legacy migration requires explicit confirmation."); }
@@ -232,6 +419,8 @@
     global.FourSymbolsAccountSave=Object.freeze({
         SCHEMA_VERSION,LEGACY_KEY,ACTIVE_UID_KEY,activate,deactivate,getActiveUid,
         saveKey,metadataKey,readForUid,readActive,writeForUid,inspectLegacy,
-        migrateLegacyToUid,removeActive,accountKey,fingerprint,LEGACY_SIDECARS
+        migrateLegacyToUid,removeActive,accountKey,fingerprint,LEGACY_SIDECARS,
+        migrationBackupKeyFor,createMigrationBackup,verifyMigrationBackup,
+        exportMigrationBackups,recoverArchivedMigrationSidecars,BACKUP_SIDECARS
     });
 })(typeof window!=="undefined"?window:globalThis);

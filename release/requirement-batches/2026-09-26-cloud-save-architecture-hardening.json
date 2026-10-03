@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "batchId": "2026-09-26-cloud-save-architecture-hardening",
+  "baseBranch": "dev",
+  "baseSha": "727279ee0653803c07179e0ff43a1a1b2cb992f8",
+  "workBranch": "fix/cloud-save-architecture-hardening-20260925",
+  "title": "Cloud Save Architecture Hardening",
+  "status": "IN_PROGRESS",
+  "requirements": [
+    {
+      "id": "CLOUD-HARDEN-SOURCE",
+      "status": "IMPLEMENTED",
+      "requirement": "UID backup source and exact-byte candidate submission",
+      "evidence": [
+        "tests/cloud-save-backup-source.test.mjs"
+      ]
+    },
+    {
+      "id": "CLOUD-HARDEN-MANIFEST",
+      "status": "IMPLEMENTED",
+      "requirement": "immutable backup and sidecar manifest, owner check",
+      "evidence": [
+        "js/startup/account-save-repository.js"
+      ]
+    },
+    {
+      "id": "CLOUD-HARDEN-REGISTRY",
+      "status": "IMPLEMENTED",
+      "requirement": "full persisted-state inventory and CI guard",
+      "evidence": [
+        "config/persisted-state-registry.json"
+      ]
+    },
+    {
+      "id": "CLOUD-HARDEN-ROADMAP",
+      "status": "IMPLEMENTED",
+      "requirement": "phase dependency reorder with history retained",
+      "evidence": [
+        "docs/CLOUD_SAVE_IMPLEMENTATION_PROGRESS.md"
+      ]
+    },
+    {
+      "id": "CLOUD-HARDEN-SECURITY",
+      "status": "IMPLEMENTED",
+      "requirement": "permanent browser/server/claim security contract",
+      "evidence": [
+        "DATA_SECURITY_CONTRACTS.md"
+      ]
+    },
+    {
+      "id": "CLOUD-HARDEN-OFFLINE",
+      "status": "IMPLEMENTED",
+      "requirement": "provisional offline authority classifications",
+      "evidence": [
+        "docs/OFFLINE_AUTHORITY_POLICY.md"
+      ]
+    },
+    {
+      "id": "CLOUD-HARDEN-SCHEMA",
+      "status": "IMPLEMENTED",
+      "requirement": "canonical data and materialized snapshot design",
+      "evidence": [
+        "docs/CLOUD_CANONICAL_SCHEMA_AND_RECOVERY.md"
+      ]
+    },
+    {
+      "id": "CLOUD-HARDEN-RECOVERY",
+      "status": "IMPLEMENTED",
+      "requirement": "backup, restore and phone test plan",
+      "evidence": [
+        "docs/CLOUD_CANONICAL_SCHEMA_AND_RECOVERY.md"
+      ]
+    },
+    {
+      "id": "CLOUD-HARDEN-VALIDATION",
+      "status": "TODO",
+      "requirement": "emulator, boot QA, PR CI, merge and exact deploy verification",
+      "evidence": [
+        "scripts/test-session-authority-emulator.mjs"
+      ]
+    },
+    {
+      "id": "CLOUD-HARDEN-GUEST",
+      "status": "IMPLEMENTED",
+      "requirement": "Detect guest→Google sign-in UID switch and block until explicit linking/conflict flow exists",
+      "evidence": [
+        "js/firebase/firebase-auth.js",
+        "tests/cloud-save-guest-link-guard.test.mjs"
+      ]
+    }
+  ],
+  "verification": {
+    "repositoryChecks": "PENDING",
+    "devDeploy": "PENDING",
+    "firebaseDeploy": "PENDING",
+    "characterAuthority": "NOT IMPLEMENTED; Phase 4 remains 0/6 VERIFIED"
+  }
+}

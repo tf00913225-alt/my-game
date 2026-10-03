@@ -1,0 +1,29 @@
+{
+  "batchId": "2026-10-01-bottom-nav-home-scroll-convergence",
+  "requirements": [
+    {
+      "id": "NAV-01",
+      "title": "Single native bottom navigation shell with context-projected items",
+      "status": "VERIFIED",
+      "evidence": "Canonical DOM/lifecycle js/04-stage-v11-native-bottom-nav-runtime.js; CSS geometry css/06-stage-v11-native-bottom-nav.css; context projection js/42-v148-combat-dungeon-fixes.js. PR #727 current-head CI 36821241683 PASS; 48 mobile runtime rows preserve shell identity. Deployed dev 5c2330b79e807ce92f5971488b1d9f12342521e6 verified across eight UI contexts; one shell under game-overlay-layer, zero legacy DOM, one visible nav."
+    },
+    {
+      "id": "NAV-02",
+      "title": "Retire legacy map and dungeon navigation geometry and migration owners",
+      "status": "VERIFIED",
+      "evidence": "Multi-owner scan PASS: retired mapPageNav migration/runtime/CSS, independent v141DungeonNav creation/reparenting, CSS09 V30/V31R2 navigation scaling, later geometry overrides and direct/timer/observer nav writers. v148SyncDungeonShell remains a delegation alias only. Scope, classification and explicit retirement condition: docs/qa/2026-10-01-bottom-nav-home-scroll-convergence.md."
+    },
+    {
+      "id": "HOME-01",
+      "title": "Fixed home geometry without a scrollable home page",
+      "status": "VERIFIED",
+      "evidence": "Home geometry owners css/00-main.css and css/19-stage-v54-main-city-moderate-native-scale.css: mobile and deployed home clientHeight=653, scrollHeight=653; native single-finger swipe leaves home/document scrollTop=0. Legal skill owner characterTabContent scrolls 94/87/83 px in mobile QA and 936 px in deployed UI. Inventory retains auto overflow and 24-slot pagination; no production gesture-lock changes."
+    },
+    {
+      "id": "QA-01",
+      "title": "Browser lifecycle, geometry, legal scroll and exact-head CI verification",
+      "status": "VERIFIED",
+      "evidence": "CI 36821241683 attached to PR head c8c215e8f8d2089322fd29dbdac2f12682396a3b PASS, including real battle regression; mobile navigation evidence artifact 11143767076 PASS. Dev CI/deployment 36821889706 PASS; live release-manifest SHA=5c2330b79e807ce92f5971488b1d9f12342521e6, Game V173.72/Cache 173.72. Source-build sync and git diff --check PASS. Reload and foreground/background simulation PASS; physical Android hardware was not used. Full evidence and fixture limitations: docs/qa/2026-10-01-bottom-nav-home-scroll-convergence.md."
+    }
+  ]
+}

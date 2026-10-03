@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "id": "battle-reading-layer-contract-20261001",
+  "releaseVersion": "173.72",
+  "requirements": [
+    {
+      "id": "READING-LAYER-01",
+      "title": "One semantic reading state covers every battle reading surface",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": ["js/00-main.js", "tests/battle-reading-layer-contract-20261001.test.js"],
+        "verification": "Focused lifecycle regression passes locally; latest-head PR Runtime Browser QA and DEV deployment are pending.",
+        "result": "Battle Info, Battle Statistics, Boss Mechanism and Battle Status Detail share body.v174-battle-reading-open."
+      }
+    },
+    {
+      "id": "READING-LAYER-02",
+      "title": "All detached transient battle presentation suppresses paint while reading",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": ["css/00-main.css", "tests/battle-ui-status-vfx-followup-20260922.test.js", "tests/relic-target-highlight-stacking-20260919.test.js"],
+        "verification": "Source contract and focused VFX/relic regression pass; computed-style browser evidence is pending PR CI.",
+        "result": "Skill VFX, all feedback semantics, skill names, compatibility popups and complete relic presentation are covered without z-index escalation."
+      }
+    },
+    {
+      "id": "READING-LAYER-03",
+      "title": "Reading state suppresses paint without pausing simulation or presentation lifecycle",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": ["js/00-main.js", ".github/scripts/battle-layer-audio-live-qa.mjs"],
+        "verification": "Static/runtime-focused guards pass; exact-candidate browser must prove VFX/relic expiry and no replay while drawers remain open.",
+        "result": "No Battle Flow lock, timer cancellation, damage/status/heal/SP mutation or turn-queue mutation was added."
+      }
+    },
+    {
+      "id": "READING-LAYER-04",
+      "title": "Reading state clears across close, teardown, DOM rebuild and page navigation",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": ["js/00-main.js", "tests/battle-reading-layer-contract-20261001.test.js"],
+        "verification": "Focused lifecycle regression passes; exact deployed Runtime verification remains pending.",
+        "result": "The body state derives from visible surfaces on the active battle page and is resynchronized at render, finish and navigation boundaries."
+      }
+    }
+  ]
+}

@@ -14,13 +14,12 @@ assert.match(shared,/--ui-large-panel-safe-space:24px/);
 
 /* V173.62+ explicit product exception: the main character page uses the
    maximum phone canvas so EXP Pool / abilities are not clipped. */
-assert.match(character,/"width"[\s\S]*?"calc\(100% - 8px\)"/);
-assert.match(character,/"max-width"[\s\S]*?"none"/);
-assert.match(character,/"height"[\s\S]*?"calc\(100% - 8px\)"/);
-assert.match(character,/"max-height"[\s\S]*?"calc\(100% - 8px\)"/);
-assert.match(character,/body\.style\.setProperty\([\s\S]*?"flex",[\s\S]*?"1 1 auto"/);
-assert.match(character,/root\.style\.setProperty\([\s\S]*?"flex",[\s\S]*?"1 1 auto"/);
-assert.match(character,/"scrollbar-gutter",[\s\S]*?"stable"/);
+// The inline V78 writer is retired; CSS owns the character frame and scroll.
+assert.match(character,/function applyCharacterInventoryLayout\(\)\{ return false; \}/);
+assert.doesNotMatch(character,/setProperty|MutationObserver|requestAnimationFrame|setTimeout/);
+assert.match(shared,/#homeFeatureModal \.home-feature-modal-box\.wide\{[^}]*width:calc\(100% - 8px\) !important;[^}]*max-width:none !important;[^}]*height:calc\(100% - 8px\) !important;[^}]*max-height:calc\(100% - 8px\) !important;/);
+assert.match(shared,/#characterTabContent\{[^}]*flex:1 1 auto !important;[^}]*height:auto !important;[^}]*scrollbar-gutter:stable !important;/);
+assert.match(shared,/\.home-feature-modal-box\.wide #characterTabContent\{[^}]*overflow-x:hidden !important;[^}]*overflow-y:auto !important;/);
 
 assert.match(shared,/\.home-feature-modal-box\.wide\{[\s\S]*?max-width:var\(--ui-large-panel-max-width\) !important[\s\S]*?height:min\(var\(--ui-large-panel-height\),calc\(100% - var\(--ui-large-panel-safe-space\)\)\) !important/);
 assert.match(shared,/\.home-feature-modal-box\.wide #homeFeatureModalBody\{[\s\S]*?flex:1 1 auto !important/);

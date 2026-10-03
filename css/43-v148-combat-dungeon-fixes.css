@@ -85,14 +85,6 @@
         radial-gradient(circle at center,#6c2c12 0%,#241008 62%,#0b0705 100%) !important;
 }
 
-/* Deep Abyss uses the same five-slot bottom navigation as Daily Dungeon. */
-#game-stage #v146AbyssReturn{display:none !important;}
-#game-stage #v141DungeonNav,
-#game-stage #v141DungeonNav[data-v146-columns="4"],
-#game-stage #v141DungeonNav[data-v146-columns="5"]{
-    grid-template-columns:repeat(5,minmax(0,1fr)) !important;
-}
-
 /* Automatic patrol keeps the original smooth route; the manual click gait is retired. */
 #game-stage #mapPage #patrolCharacterWrap.v148-auto-route{
     transition:left 1.8s ease-in-out,top 1.8s ease-in-out !important;

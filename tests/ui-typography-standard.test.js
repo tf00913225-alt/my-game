@@ -13,7 +13,7 @@ const owners = {
   homePolish: 'css/42-v146-system-polish.css',
   elementBox: 'css/48-v169-element-box-settings.css',
   abyss: 'css/50-v169-abyss-flow.css',
-  inventory: 'css/52-v173.50-inventory-qol.css',
+  inventory: 'css/22-stage-v78-character-inventory-core.css',
   qa: 'css/53-v173.51-qa.css',
   abyssLayout: 'css/54-v174-abyss-two-tier.css',
   relic: 'css/55-team-relic-system.css',
@@ -55,7 +55,12 @@ const docs = read('UI_GUIDELINES.md');
 // Formal player-facing owners that should contain no sub-13px declarations.
 enforceNoTinyText(owners.elementBox);
 enforceNoTinyText(owners.abyss);
-enforceNoTinyText(owners.inventory);
+// INVENTORY is a redundant decorative kicker above the real Chinese heading;
+// exclude only that documented decorative class, never backpack content text.
+const inventoryHtml=read('index.html');
+assert.match(inventoryHtml, /class="inventory-title-plate" aria-label="背包"[\s\S]*?class="inventory-title-plate-kicker">INVENTORY<\/span>\s*<h2>背包<\/h2>/);
+assert.match(inventory, /\.inventory-title-plate h2\{[^}]*font-size:22px/);
+enforceNoTinyText(owners.inventory, text => text.replace(/#game-stage #inventoryPage \.inventory-title-plate-kicker\{[^}]*\}/, ''));
 enforceNoTinyText(owners.abyssLayout);
 enforceNoTinyText(owners.patrol);
 enforceNoTinyText(owners.inventoryBack);
@@ -87,8 +92,10 @@ assert.match(homePolish, /\.map-player-name\{[^}]*font-size:13px/);
 assert.match(homePolish, /\.v132-reward-modal \.v17363-preview-group p\{font-size:15px/);
 assert.match(homePolish, /#allElementSkillPreviewModal \.skill-preview-card span\{font-size:34px/);
 assert.match(detail, /#skillDetailStats \.v17364-progression-hint\{[\s\S]*?font-size:14px/);
-assert.match(inventory, /\.inventory-category-tab\{[\s\S]*?font-size:15px/);
-assert.match(inventory, /\.inventory-item-classic \.inventory-count,[\s\S]*?font-size:13px/);
+// V177 owns backpack typography in css/22; css/52 must not reclaim it.
+assert.match(inventory, /\.inventory-category-tab\{[^}]*font-size:18px/);
+assert.match(inventory, /\.inventory-item-classic \.inventory-count\{[^}]*font-size:18px/);
+assert.doesNotMatch(read('css/52-v173.50-inventory-qol.css'), /\.inventory-category-tab\{|\.inventory-count\{/);
 assert.match(skillFix, /#creationPage \.creation-step-progress\{font-size:34px/);
 assert.match(skillFix, /#creationPage \.creation-role-description\{font-size:39px/);
 assert.match(skillFix, /#creationPage \.creation-stats-card \.creation-label\{font-size:41px/);
@@ -119,7 +126,12 @@ assert.doesNotMatch(gameplay, /\.boss-shield-value\{/);
 assert.match(gameplay, /\.gameplay-boss-card > \.monster-hp > \.boss-hp-shield-overlay\{[\s\S]*?background:rgba\(255,255,255,\.92\)/);
 assert.doesNotMatch(gameplay,/boss-mechanism/);
 assert.match(relic, /\.team-relic-battle-banner b\{[^}]*17px/);
-assert.match(relic, /#battlePage \.battle-player \.team-relic-sp-float\{[^}]*13px/);
+// Relic SP feedback retired its private float and uses the battle-only owner.
+assert.doesNotMatch(relic, /team-relic-sp-float/);
+assert.match(read('js/60-team-relic-system.js'), /function showRelicSpFloat\(index,amount\)\{[^}]*\}[\s\S]*?emitRelicPlayerHit\(amount,"sp",index,true\)/);
+const feedbackCss=read('css/battle-floating-feedback-owner.css');
+assert.match(feedbackCss, /font-size:var\(--battle-feedback-font-size,18px\)/);
+assert.match(feedbackCss, /data-feedback-kind="sp"\]\{color:#2c8de8;/);
 assert.doesNotMatch(read('css/45-v152-dev-fixes.css'), /v152-frostbite-blocked|凍傷禁止使用技能/);
 
 // Permanent documentation must describe both the floor and the battle carve-out.

@@ -12,7 +12,7 @@ const zlib=require("node:zlib");
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const timing=fs.readFileSync("js/37-v142-skill-animation.js","utf8");
 const support=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");
-const waterRules=fs.readFileSync("js/50-v169-water-skill-rules.js","utf8");
+const waterRules=fs.readFileSync("js/60-v173.64-skill-progression-rebalance.js","utf8");
 const finalRules=fs.readFileSync("js/47-v158-combat-tuning.js","utf8");
 const css=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");
 const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
@@ -145,6 +145,11 @@ function makeNode(rect){
         style:{
             setProperty(name,value){ this[name]=String(value); },
             getPropertyValue(name){ return this[name]||""; }
+        },
+        animate(frames,options){
+            this.motionFrames=frames;
+            this.motionOptions=options;
+            return {currentTime:0,cancel(){ this.cancelled=true; }};
         },
         classList:{
             add(...names){ names.forEach(name=>classes.add(name)); },
@@ -560,7 +565,8 @@ test("enemy Tidal Beast uses its explicit player endpoint even when damage is ab
     const sprites=stageSprites(runtime).sprites;
     assert.equal(sprites.length,1);
     assert.equal(sprites[0].dataset.targetIndex,"2");
-    assert.equal(sprites[0].dataset.travel,"true");
+    assert.equal(sprites[0].dataset.motion,"phased");
+    assert.equal(sprites[0].dataset.travel,undefined);
     assert.equal(sprites[0].style.left,"338px");
     assert.equal(sprites[0].style.top,"140px");
     assert.equal(sprites[0].style["--v143-sprite-dx"],"41px");
@@ -722,7 +728,7 @@ test("revive activation and its HP popup wait for the frame-eight hit",()=>{
     );
 });
 
-test("final combat targeting and Frostbite rules use the Water owner",()=>{
+test("final combat targeting and Frostbite rules use the formal progression owner",()=>{
     assert.doesNotMatch(finalRules,/patchSkill\("freeze"/);
     assert.doesNotMatch(finalRules,/patchSkill\("healSpell"/);
     assert.match(waterRules,/freeze:\{[\s\S]*?targetType:"column"/);
@@ -736,6 +742,35 @@ test("the current cache version publishes the water sheets, choreography and CSS
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
     assert.match(loader,/40-v143-combat-dungeon-polish\.css/);
     assert.match(loader,/39-v143-skill-animation\.js/);
+});
+
+test("Tidal Beast cast/flight/impact metadata is shared for both sides and all target columns",()=>{
+    for(const side of ["player","monster"]){
+        for(const targetId of [0,1,2]){
+            const runtime=loadRuntime();
+            const targetSide=side==="player"?"monster":"player";
+            runtime.context.v142SkillAnimationDirector.play(castConfig("floodBeast","single"),{side,actorIndex:0,targetSide,targetId,targetIds:[targetId]});
+            const sprite=stageSprites(runtime).sprites[0];
+            assert.equal(sprite.dataset.motion,"phased");
+            assert.equal(sprite.dataset.travel,undefined,"whole-sheet travel must retire for this skill");
+            const frames=sprite.motionFrames;
+            assert.deepEqual(Array.from(frames,f=>f.offset),[0,2/12,2/12,5/12,5/12,6/12,6/12,1]);
+            assert.match(frames[0].transform,/0px\).*rotate\(0deg\)/,"cast stays upright at caster");
+            const dx=Number.parseFloat(sprite.style["--v143-sprite-dx"]),dy=Number.parseFloat(sprite.style["--v143-sprite-dy"]);
+            const angle=Math.atan2(dy,dx)*180/Math.PI;
+            assert.match(frames[2].transform,/rotate\(0deg\)$/,"flight preserves the authored upright orientation");
+            assert.match(frames[4].transform,/rotate\(0deg\)$/,"turn preserves the authored upright orientation");
+            assert.ok(frames[6].transform.includes(dx+"px")&&frames[6].transform.includes(dy+"px"));
+            assert.match(frames[6].transform,/rotate\(0deg\)$/,"impact is upright at destination");
+            assert.equal(sprite.motionOptions.duration,1350);
+            const track=sprite.v143MotionAnimation;
+            runtime.context.v142SkillAnimationDirector.dispose();
+            assert.equal(track.cancelled,true,"leave/re-entry cancels the motion track");
+        }
+    }
+    const runtime=loadRuntime();
+    runtime.context.v142SkillAnimationDirector.play(castConfig("fireRocket","single"),{side:"player",actorIndex:0,targetSide:"monster",targetId:1,targetIds:[1]});
+    assert.equal(stageSprites(runtime).sprites[0].dataset.travel,"true","shared legacy flight stays valid for other skills");
 });
 
 console.log("\nV166 Water VFX suite: "+passed+" tests passed.");

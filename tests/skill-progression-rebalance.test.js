@@ -6,6 +6,7 @@ const fs=require("node:fs");
 const vm=require("node:vm");
 
 const source=fs.readFileSync("js/60-v173.64-skill-progression-rebalance.js","utf8");
+const main=fs.readFileSync("js/00-main.js","utf8");
 
 const names={
     flameSlash:"火焰斬",fireCritical:"會心一擊",explosiveFlurry:"火爆亂擊",dragonSlash:"霸龍裂天斬",
@@ -78,13 +79,13 @@ function makeRuntime(options={}){
         getCharacterSkillKey:actor=>actor===owners.player2?"player2":"fire",
         getPartyBattleStats:()=>({maxHP:1000,maxSP:1000}),
         renderSkillLoadout(){},updateUI(){},saveGame(){},alert(message){ context.lastAlert=message; },
-        learnSkill(){},upgradeSkill(){},
+        learnSkill(){},upgradeSkill(){},equipSkill(){},
         rollCritical(){ return {isCrit:critShouldHit}; },
         applyBurnEffect(){ return burnShouldAdd; },
         finishPlayerAction(){ finished++; },
         showSkillNameBadge(){},addBattleLog(){},
         castDamageSkill(skillId){
-            observedBonus=Number(skillDatabase[skillId].damageBonusPercent)||0;
+            observedBonus=Number(this.FourSymbolsSkillDamageContext&&this.FourSymbolsSkillDamageContext.directSkillBonusPercent)||0;
             context.rollCritical();
             context.applyBurnEffect({});
             owners.fire.sp-=10;
@@ -136,6 +137,26 @@ function resetForLearn(runtime,key,level,points=999){
     runtime.context.lastAlert="";
 }
 
+test("cross-element learning uses the formal native gate, doubled initial cost, EX ban and one equipped slot",()=>{
+    const r=makeRuntime({key:"water",level:7,points:30});
+    assert.equal(r.context.learnSkill("fireCritical"),false);
+    assert.match(r.context.lastAlert,/本命元素技能/);
+    r.loadouts.water.skillLevels.waterKnife=1;
+    const before=r.owners.water.skillPoints;
+    assert.equal(r.context.learnSkill("fireCritical"),true);
+    assert.equal(r.loadouts.water.skillLevels.fireCritical,1);
+    assert.equal(r.owners.water.skillPoints,before-12);
+    assert.equal(r.context.upgradeSkill("fireCritical"),false,"Lv2 still observes its character-level gate");
+    r.owners.water.level=50;
+    assert.equal(r.context.learnSkill("fireEX"),false);
+    assert.match(r.context.lastAlert,/本命元素限定/);
+    r.loadouts.water.equippedSkills=[];
+    assert.equal(r.context.equipSkill("fireCritical"),true);
+    r.loadouts.water.skillLevels.stormFist=1;
+    assert.equal(r.context.equipSkill("stormFist"),false);
+    assert.match(r.context.lastAlert,/最多攜帶 1 招跨元素/);
+});
+
 test("final progression data standardizes Lv10 damage skills, EX and support structure",()=>{
     const r=makeRuntime();
     const expected={
@@ -154,8 +175,8 @@ test("final progression data standardizes Lv10 damage skills, EX and support str
     assert.deepEqual([r.skills.fireSoulResonance.learnLevel,r.skills.fireSoulResonance.learnCost,r.skills.fireSoulResonance.maxLevel,r.skills.fireSoulResonance.spCost],[25,14,5,45]);
     assert.deepEqual(Array.from(r.skills.fireSoulResonance.momentumBonusByLevel),[12,15,18,21,25]);
     assert.deepEqual([r.skills.bloodBurnArt.learnLevel,r.skills.bloodBurnArt.learnCost,r.skills.bloodBurnArt.maxLevel,r.skills.bloodBurnArt.spCost],[35,18,5,35]);
-    assert.deepEqual(Array.from(r.skills.bloodBurnArt.hpCostPercentByLevel),[5,10,15,20,25]);
-    assert.deepEqual(Array.from(r.skills.bloodBurnArt.directDamageBonusByLevel),[5,10,15,20,35]);
+    assert.deepEqual(Array.from(r.skills.bloodBurnArt.hpCostPercentByLevel),[20,25,30,35,40]);
+    assert.deepEqual(Array.from(r.skills.bloodBurnArt.directDamageBonusByLevel),[20,25,30,35,50]);
     assert.deepEqual([r.skills.healSpell.maxLevel,r.skills.freeze.maxLevel,r.skills.purifyMind.maxLevel],[5,5,3]);
     assert.deepEqual(Array.from(r.skills.healSpell.healHpByLevel),[550,580,610,640,670]);
     assert.deepEqual(Array.from(r.skills.healSpell.spRestorePercentByLevel),[0,0,5,10,15]);
@@ -176,9 +197,9 @@ test("final progression data standardizes Lv10 damage skills, EX and support str
     assert.deepEqual(Array.from(r.skills.dinghaishenzhen.statusResistBonusByLevel),[5,8,10,12,15]);
     assert.deepEqual(Array.from(r.skills.dinghaishenzhen.accuracyBonusPercentByLevel),[5,10,15,20,25]);
     assert.deepEqual(Array.from(r.skills.rockWall.defenseBonusPercentByLevel),[15,20,25,30,35]);
-    assert.deepEqual(Array.from(r.skills.earthShield.reflectPercentByLevel),[20,30,35,40,50]);
-    assert.deepEqual(Array.from(r.skills.earthShield.durationByLevel),[3,3,3,4,5]);
-    assert.deepEqual([r.skills.barrier.maxLevel,...Array.from(r.skills.barrier.barrierBlockCountByLevel)],[5,3,3,3,4,5]);
+    assert.deepEqual(Array.from(r.skills.earthShield.reflectPercentByLevel),[20,40,60,80,100]);
+    assert.deepEqual(Array.from(r.skills.earthShield.durationByLevel),[3,3,3,3,4]);
+    assert.equal(r.skills.barrier.barrierBlockCountByLevel,undefined,"Barrier is duration-owned, not charge-owned");
     assert.deepEqual(Array.from(r.skills.barrier.durationByLevel),[3,3,3,4,5]);
     assert.deepEqual(Array.from(r.skills.rockWall.requires),["petrifyFist","sandWind"]);
     assert.deepEqual(Array.from(r.skills.earthShield.requires),["rockWall"]);
@@ -186,12 +207,25 @@ test("final progression data standardizes Lv10 damage skills, EX and support str
     assert.equal(r.skills.stormSpell.learnLevel,undefined,"monster-only 暴風術不進玩家 progression");
 });
 
+test("the formal owner supplies every direct skill base value without V149 data writes",()=>{
+    const r=makeRuntime();
+    const expected={
+        flameSlash:[30,6,10],fireCritical:[45,9,28],explosiveFlurry:[50,10,47],dragonSlash:[165,33,65],fireRocket:[13,4,10],blazeSpell:[45,9,28],flameTornado:[150,30,47],phoenixCry:[28,6,60],
+        waterKnife:[21,5,6],frostPunch:[32,7,17],iceSpin:[35,7,45],frostCrush:[116,24,60],waterBall:[10,2,8],floodBeast:[105,21,35],iceArrowRain:[30,6,75],
+        stormFist:[26,6,7],stormFlurry:[13,3,20],windCrossSlash:[128,26,39],dizzyFist:[141,29,55],windSpell:[12,3,9],stormCircle:[14,4,18],windHowlLightning:[128,26,55],stormRain:[24,5,75],
+        stoneSlash:[26,6,7],petrifyFist:[13,3,26],stoneBreakSky:[128,26,42],earthquakeCrush:[47,9,55],stoneThrow:[12,3,7],sandWind:[14,4,19],flyingSandStrike:[24,5,55],dustStorm:[140,28,65]
+    };
+    Object.entries(expected).forEach(([id,values])=>{
+        assert.deepEqual([r.skills[id].baseDamage,r.skills[id].damagePerLevel,r.skills[id].spCost],values,id);
+    });
+});
+
 test("shared level formula preserves gates while every upgrade costs one point",()=>{
     const r=makeRuntime();
     const required=r.context.v17364GetRequiredCharacterLevelForSkillLevel;
-    assert.deepEqual([1,2,3,4,5,6,7,8,9,10].map(level=>required(r.skills.flameSlash,level)),[1,15,30,50,80,80,80,80,80,80]);
-    assert.deepEqual([1,2,3,4,5,6,7,8,9,10].map(level=>required(r.skills.dragonSlash,level)),[30,38,48,60,80,80,80,80,80,80]);
-    assert.deepEqual([1,2,3,4,5].map(level=>required(r.skills.revive,level)),[20,28,38,50,80]);
+    assert.deepEqual([1,2,3,4,5,6,7,8,9,10].map(level=>required(r.skills.flameSlash,level)),[1,10,20,30,40,50,60,70,80,90]);
+    assert.deepEqual([1,2,3,4,5,6,7,8,9,10].map(level=>required(r.skills.dragonSlash,level)),[30,10,20,30,40,50,60,70,80,90]);
+    assert.deepEqual([1,2,3,4,5].map(level=>required(r.skills.revive,level)),[20,20,40,60,80]);
     assert.deepEqual(Object.assign({},r.context.v17364SkillUpgradeCostByTargetLevel),{2:1,3:1,4:1,5:1,6:1,7:1,8:1,9:1,10:1});
 });
 
@@ -219,7 +253,7 @@ test("learning milestones use the selected character own level, prerequisites an
 
 test("Lv10 upgrades keep the established character gates and charge one point every time",()=>{
     const r=makeRuntime();
-    const cases=[[14,1,false],[15,1,true],[29,2,false],[30,2,true],[49,3,false],[50,3,true],[79,4,false],[80,4,true],[80,5,true],[80,6,true],[80,7,true],[80,8,true],[80,9,true]];
+    const cases=[[9,1,false],[10,1,true],[19,2,false],[20,2,true],[39,4,false],[40,4,true],[49,5,false],[50,5,true],[79,8,false],[80,8,true],[80,9,false]];
     for(const [level,current,expected] of cases){
         resetForLearn(r,"fire",level,999);r.loadouts.fire.skillLevels.flameSlash=current;
         assert.equal(r.context.upgradeSkill("flameSlash"),expected,`flameSlash char ${level} skill ${current}`);
@@ -230,10 +264,10 @@ test("Lv10 upgrades keep the established character gates and charge one point ev
     assert.equal(r.loadouts.fire.skillLevels.flameSlash,3);
 });
 
-test("revive keeps 20/40/60/80/100 battle values and uses 20/28/38/50/80 gates",()=>{
+test("revive keeps 20/40/60/80/100 battle values and uses 20/40/60/80 gates",()=>{
     const r=makeRuntime();
     assert.deepEqual(Array.from(r.skills.revive.reviveHealPercentByLevel),[20,40,60,80,100]);
-    assert.deepEqual([1,2,3,4,5].map(level=>r.context.v17364GetRequiredCharacterLevelForSkillLevel(r.skills.revive,level)),[20,28,38,50,80]);
+    assert.deepEqual([1,2,3,4,5].map(level=>r.context.v17364GetRequiredCharacterLevelForSkillLevel(r.skills.revive,level)),[20,20,40,60,80]);
 });
 
 test("Fire Soul Resonance grants persistent momentum and Lv5 extends at most once per formal round",()=>{
@@ -282,22 +316,22 @@ test("Lv1-Lv4 resonance never uses the Lv5 extension rule",()=>{
     assert.equal(resonance.turnsLeft,3);
 });
 
-test("Blood Burn pays each level's max-HP cost and buffs exactly three non-free fire casts",()=>{
+test("Blood Burn pays each level's max-HP cost and buffs exactly four direct casts",()=>{
     const r=makeRuntime();
     r.loadouts.fire.skillLevels.flameSlash=1;
-    for(const [level,cost,bonus] of [[1,50,5],[2,100,10],[3,150,15],[4,200,20],[5,250,35]]){
+    for(const [level,cost,bonus] of [[1,200,20],[2,250,25],[3,300,30],[4,350,35],[5,400,50]]){
         r.owners.fire.activeBuffs=[];r.owners.fire.hp=1000;r.owners.fire.sp=1000;
         r.loadouts.fire.skillLevels.bloodBurnArt=level;
         assert.equal(r.context.v17364CastNewFireTactical(0,"bloodBurnArt"),true,`Lv${level} can cast`);
         assert.equal(r.owners.fire.hp,1000-cost,`Lv${level} pays exact max-HP percentage`);
         r.freeCast("flameSlash");
-        assert.equal(r.observedBonus(),0,`Lv${level} free follow-up receives no Blood Burn bonus`);
-        assert.equal(r.owners.fire.activeBuffs.find(buff=>buff.type==="bloodBurn")?.remainingFireActions,3,"free follow-up does not consume a charge");
-        for(let cast=1;cast<=3;cast++){
+        assert.equal(r.observedBonus(),bonus,`Lv${level} free follow-up uses the original cast bonus`);
+        assert.equal(r.owners.fire.activeBuffs.find(buff=>buff.type==="bloodBurn")?.remainingFireActions,4,"free follow-up does not consume a charge");
+        for(let cast=1;cast<=4;cast++){
             r.context.castDamageSkill("flameSlash",0);
             assert.equal(r.observedBonus(),bonus,`Lv${level} fire cast ${cast} is buffed`);
         }
-        assert.equal(r.owners.fire.activeBuffs.some(buff=>buff.type==="bloodBurn"),false,`Lv${level} ends after the third valid fire cast`);
+        assert.equal(r.owners.fire.activeBuffs.some(buff=>buff.type==="bloodBurn"),false,`Lv${level} ends after the fourth valid direct cast`);
         r.context.castDamageSkill("flameSlash",0);
         assert.equal(r.observedBonus(),0,`Lv${level} fourth fire cast is not buffed`);
     }
@@ -312,28 +346,18 @@ test("resonance and Blood Burn add in one direct-damage bonus bucket",()=>{
     r.context.v17364CastNewFireTactical(0,"bloodBurnArt");
     r.setCrit(false);r.setBurn(false);
     r.context.castDamageSkill("flameSlash",0);
-    assert.equal(r.observedBonus(),17);
-    assert.equal(r.skills.flameSlash.damageBonusPercent,undefined,"temporary bucket contribution is restored after the cast");
+    assert.equal(r.observedBonus(),32);
+    assert.equal(r.skills.flameSlash.damageBonusPercent,undefined,"global skill data is never mutated by a cast bonus");
 });
 
-test("duration lifecycle counts effective actions, blocked actions and never consumes a newly-cast buff",()=>{
-    const r=makeRuntime();
-    const actor=r.owners.fire;
-    actor.activeBuffs=[{type:"rage",turnsLeft:3}];
-    actor.statusEffects=[{type:"freeze",turnsLeft:3},{type:"frostbite",turnsLeft:2}];
-    for(let action=1;action<=3;action++){
-        r.beginAction({type:"player",characterIndex:0});
-        if(action===1){ actor.activeBuffs.push({type:"dodgeSkill",turnsLeft:3}); }
-        r.finishAction();
-        if(action<3){
-            assert.equal(actor.activeBuffs.find(buff=>buff.type==="rage")?.turnsLeft,3-action,`rage action ${action}`);
-            assert.equal(actor.statusEffects.find(effect=>effect.type==="freeze")?.turnsLeft,3-action,`freeze blocks action ${action}`);
-        }
-    }
-    assert.equal(actor.activeBuffs.some(buff=>buff.type==="rage"),false,"three effective actions exhaust a three-turn buff");
-    assert.equal(actor.statusEffects.some(effect=>effect.type==="freeze"),false,"three blocked actions exhaust a three-turn Freeze");
-    assert.equal(actor.activeBuffs.find(buff=>buff.type==="dodgeSkill")?.turnsLeft,1,"a buff created during the action does not lose that action");
-    assert.equal(actor.statusEffects.some(effect=>effect.type==="frostbite"),false,"two affected actions exhaust two-turn Frostbite");
+test("duration lifecycle is owned by the core BattleFlow rather than the late progression module",()=>{
+    const main=fs.readFileSync("js/00-main.js","utf8");
+    assert.match(main,/window\.FourSymbolsDurationLifecycle=Object\.freeze/);
+    assert.match(main,/function beginBattleDurationAction\(event\)/);
+    assert.match(main,/function finishBattleDurationAction\(\)/);
+    assert.match(main,/function finishPlayerAction\(\)[\s\S]*?interceptBattleActionFinish\(\)[\s\S]*?finishBattleDurationAction\(\)/);
+    assert.doesNotMatch(source,/window\.FourSymbolsDurationLifecycle=Object\.freeze/);
+    assert.doesNotMatch(source,/captureActionDurationEntries|restoreActionDurationEntries|previousStartTurnForDuration/);
 });
 
 test("wind and earth support values stay in formal arrays instead of transient skill mutation",()=>{
@@ -342,9 +366,15 @@ test("wind and earth support values stay in formal arrays instead of transient s
     assert.equal(r.skills.dodgeSkill.evasionBonusPercent,undefined);
     assert.deepEqual(Array.from(r.skills.rockWall.defenseBonusPercentByLevel),[15,20,25,30,35]);
     assert.equal(r.skills.rockWall.defenseBonusPercent,undefined);
-    assert.deepEqual(Array.from(r.skills.earthShield.reflectPercentByLevel),[20,30,35,40,50]);
+    assert.deepEqual(Array.from(r.skills.earthShield.reflectPercentByLevel),[20,40,60,80,100]);
     assert.equal(r.skills.earthShield.reflectPercent,undefined);
-    assert.deepEqual(Array.from(r.skills.barrier.barrierBlockCountByLevel),[3,3,3,4,5]);
+    assert.equal(r.skills.barrier.barrierBlockCountByLevel,undefined,"Barrier has no charge lifecycle");
+    assert.equal(r.skills.earthEX.maxHpMultiplier,1.2,"Earth EX applies Max HP after base sources");
+    assert.equal(
+        (main.match(/maxHP:\s*Math\.round\(base\.maxHP\*maxHpPassiveMultiplier\)/g)||[]).length,
+        2,
+        "both player stat owners apply Earth EX after base Max HP"
+    );
 });
 
 test("legacy learned skills remain intact while the next upgrade obeys the new gate",()=>{
@@ -374,4 +404,157 @@ test("player progression is isolated from Abyss fixed levels and lives in gamepl
     assert.match(build,/gameplayScripts=\[[\s\S]*?"js\/60-v173\.64-skill-progression-rebalance\.js"/);
     assert.doesNotMatch(build,/const skillScripts=/);
     assert.equal(featureManifest.features.skill,"gameplay-core");
+});
+
+function battleSourceBetween(sourceText,startToken,endToken){
+    const start=sourceText.indexOf(startToken);
+    const end=sourceText.indexOf(endToken,start+startToken.length);
+    assert.notEqual(start,-1,"missing start token: "+startToken);
+    assert.notEqual(end,-1,"missing end token: "+endToken);
+    return sourceText.slice(start,end);
+}
+
+test("battle quickbar validates the compact canonical structure",()=>{
+    const main=fs.readFileSync("js/00-main.js","utf8");
+    const css=fs.readFileSync("css/36-v135-fixes.css","utf8");
+    assert.match(main,/function isCanonicalSkillQuickBarButton\(button\)/);
+    assert.match(main,/buttons\.every\(isCanonicalSkillQuickBarButton\)/);
+    assert.doesNotMatch(main,/class="sq-description"/);
+    assert.match(main,/formalSpec\.targetLabel/);
+    assert.doesNotMatch(main,/\.sq-description|descriptionNode|formalSpec\.effectText/);
+    assert.doesNotMatch(css,/\.skill-quick-button \.sq-description\{/);
+});
+
+test("one target owner handles both directions and Stealth only blocks hostile primary selection",()=>{
+    const main=fs.readFileSync("js/00-main.js","utf8");
+    const slice=battleSourceBetween(
+        main,
+        "function normalizeBattleTargetType(targetType){",
+        "/* =====================================================\n   Persistent-state identity"
+    );
+    const monsters=[
+        {name:"敵A",alive:true,hp:100,activeBuffs:[]},
+        {name:"敵B",alive:true,hp:100,activeBuffs:[{type:"stealthSkill",turnsLeft:2}]},
+        {name:"敵C",alive:true,hp:100,activeBuffs:[]}
+    ];
+    const party=[
+        {id:"我A",hp:100,activeBuffs:[]},
+        {id:"我B",hp:100,activeBuffs:[{type:"stealthSkill",turnsLeft:2}]},
+        {id:"我C",hp:100,activeBuffs:[]}
+    ];
+    const slotOwner={
+        getActiveEnemySnapshot(){ return {kind:"test"}; },
+        resolveEnemyTargets(_snapshot,primary,shape,isAlive){
+            if(shape==="single"){ return isAlive(primary)?[primary]:[]; }
+            if(shape==="all"){ return [0,1,2].filter(isAlive); }
+            return [0,1,2].filter(isAlive);
+        },
+        ensureAllyFormation(){ return {kind:"ally-formation"}; },
+        resolveAllyTargets(_formation,primary,shape,isAlive){
+            if(shape==="single"){ return isAlive(primary)?[primary]:[]; }
+            if(shape==="all"){ return [0,1,2].filter(isAlive); }
+            return [0,1,2].filter(isAlive);
+        }
+    };
+    const context={
+        console,Math,Number,Object,Array,String,Set,Map,
+        monsters,currentBattleMonsters:[0,1,2],
+        getExistingPartyIndexes:()=>[0,1,2],
+        getPartyCharacterByIndex:index=>party[index]||null,
+        getEffectiveSkillTargetType:skill=>skill&&skill.targetType||"single",
+        getSkillFreezeChanceAtLevel:()=>0,
+        getSkillFreezeDurationAtLevel:()=>1,
+        hasNamedPersistentState:()=>false,
+        FourSymbolsBattlefieldSlots:slotOwner
+    };
+    context.window=context;
+    vm.createContext(context);
+    vm.runInContext(slice,context,{filename:"battle-target-owner-slice.js"});
+
+    const owner=context.FourSymbolsBattleSkillTargeting;
+    assert.equal(owner.canSelectHostilePrimary("monster",1,"single"),false);
+    assert.equal(owner.canSelectHostilePrimary("monster",1,"tri"),false);
+    assert.equal(owner.canSelectHostilePrimary("player",1,"single"),false);
+    assert.equal(owner.canSelectHostilePrimary("player",1,"column"),false);
+    assert.deepEqual(Array.from(owner.resolveTargets("monster",0,"tri",{hostilePrimary:true})),[0,1,2]);
+    assert.deepEqual(Array.from(owner.resolveTargets("player",0,"tri",{hostilePrimary:true})),[0,1,2]);
+    assert.deepEqual(Array.from(owner.resolveTargets("monster",null,"all",{hostilePrimary:true})),[0,1,2]);
+    assert.deepEqual(Array.from(owner.resolveTargets("player",null,"all",{hostilePrimary:true})),[0,1,2]);
+});
+
+test("core duration lifecycle defers timed-effect consumption to round end",()=>{
+    const main=fs.readFileSync("js/00-main.js","utf8");
+    const slice=battleSourceBetween(
+        main,
+        "const BATTLE_ACTION_DURATION_STATUS_TYPES=new Set([",
+        'if(typeof window!=="undefined"){\n    window.FourSymbolsBattleFlow=Object.freeze({'
+    );
+    const actor={
+        id:"測試角色",hp:100,
+        activeBuffs:[
+            {type:"rage",turnsLeft:3},
+            {type:"bloodBurn",turnsLeft:3,remainingFireActions:3}
+        ],
+        statusEffects:[
+            {type:"freeze",turnsLeft:3},
+            {type:"frostbite",turnsLeft:2}
+        ]
+    };
+    const context={
+        console,Math,Number,Object,Array,String,Set,Map,
+        monsters:[],
+        getPartyCharacterByIndex:index=>index===0?actor:null,
+        addBattleLog(){},
+        v143SyncStatusVisualEffects(){}
+    };
+    context.window=context;
+    vm.createContext(context);
+    vm.runInContext(slice,context,{filename:"duration-owner-slice.js"});
+
+    const lifecycle=context.FourSymbolsDurationLifecycle;
+    const event={token:1,index:0,queue:[{type:"player",characterIndex:0}]};
+
+    lifecycle.beginAction(event);
+    actor.activeBuffs.push({type:"dodgeSkill",turnsLeft:3});
+    lifecycle.finishAction();
+    assert.equal(actor.activeBuffs.find(x=>x.type==="rage").turnsLeft,3);
+    assert.equal(actor.activeBuffs.find(x=>x.type==="dodgeSkill").turnsLeft,3);
+    assert.equal(actor.activeBuffs.find(x=>x.type==="bloodBurn").turnsLeft,3);
+    assert.equal(actor.statusEffects.find(x=>x.type==="freeze").turnsLeft,3);
+    assert.equal(actor.statusEffects.find(x=>x.type==="frostbite").turnsLeft,2);
+
+    lifecycle.beginAction(event);
+    lifecycle.finishAction();
+    assert.equal(actor.activeBuffs.find(x=>x.type==="rage").turnsLeft,3);
+    assert.equal(actor.activeBuffs.find(x=>x.type==="dodgeSkill").turnsLeft,3);
+    assert.equal(actor.statusEffects.find(x=>x.type==="frostbite").turnsLeft,2);
+
+    assert.match(main,/function consumeRoundEndDurations\(\)/);
+    assert.match(main,/if\(type==="round_end"\)\{ consumeRoundEndDurations\(\); \}/);
+});
+
+test("repaired battle paths retire duplicate duration owners",()=>{
+    const main=fs.readFileSync("js/00-main.js","utf8");
+    const v141=fs.readFileSync("js/34-v141-core-systems.js","utf8");
+    const enemySupport=fs.readFileSync("js/36-v141-content-systems.js","utf8");
+    const v142=fs.readFileSync("js/37-v142-skill-animation.js","utf8");
+    const v144=fs.readFileSync("js/40-v144-rules-and-abyss.js","utf8");
+    const v155=fs.readFileSync("js/46-v155-dev-fixes.js","utf8");
+    assert.doesNotMatch(source,/FourSymbolsDurationLifecycle=Object\.freeze/);
+    assert.doesNotMatch(source,/captureActionDurationEntries|restoreActionDurationEntries|previousStartTurnForDuration/);
+    assert.doesNotMatch(v141,/lastShieldTickKey/);
+    assert.doesNotMatch(enemySupport,/lastAbyssBuffTick/);
+    assert.doesNotMatch(v142,/v142ResolveExtremeEmperorAction|v142AgilityBlessing|turnsLeft--/);
+    assert.doesNotMatch(v144,/v144AbyssBuffTick/);
+    assert.doesNotMatch(v155,/tickV155TimedStates/);
+    assert.match(main,/function finishPlayerAction\(\)[\s\S]*?interceptBattleActionFinish\(\)[\s\S]*?finishBattleDurationAction\(\)/);
+});
+
+test("Stealth presentation dims only combatant artwork to 35 percent",()=>{
+    const vfx=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
+    const css=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");
+    assert.match(vfx,/classList\.toggle\("v143-unit-stealthed",stealthActive\)/);
+    assert.match(vfx,/querySelectorAll\("\.v143-unit-stealthed"\)[\s\S]*?classList\.remove\("v143-unit-stealthed"\)/);
+    assert.match(css,/\.battle-player\.v143-unit-stealthed > \.v174-battle-art[\s\S]*?opacity:\.35 !important/);
+    assert.match(css,/\.battle-monster\.v143-unit-stealthed > \.v174-battle-art[\s\S]*?opacity:\.35 !important/);
 });

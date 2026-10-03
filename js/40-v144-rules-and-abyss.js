@@ -64,9 +64,9 @@
         const dodge=skillDatabase.dodgeSkill;
         if(dodge){
             Object.assign(dodge,{
-                learnCost:10,maxLevel:1,spCost:20,targetType:"allyAll",duration:2,
-                evasionBonusPercent:60,requires:["windCrossSlash","windHowlLightning"],
-                description:"需先學習風旋十字斬或風哮電擊其一。使我方全體閃躲率提升60%，持續2回合。"
+                learnCost:10,maxLevel:1,spCost:20,targetType:"allyAll",duration:3,
+                evasionBonusPercent:5,requires:["windCrossSlash","windHowlLightning"],
+                description:"需先學習風旋十字斬或風哮電擊其一。使我方全體最終閃躲率提升5%，持續3回合。"
             });
         }
         const stealth=skillDatabase.stealthSkill;
@@ -81,8 +81,8 @@
         if(calm){
             Object.assign(calm,{
                 learnCost:20,maxLevel:1,spCost:77,targetType:"allyAll",duration:3,
-                statusResistBonus:45,accuracyBonusPercent:50,requires:["stealthSkill"],
-                description:"需先學習隱身術。使我方全體異常狀態抗性提升45%、命中提升50%，持續3回合。"
+                statusResistBonus:45,accuracyBonusPercent:5,requires:["stealthSkill"],
+                description:"需先學習隱身術。使我方全體異常狀態抗性提升45%、最終命中提升5%，持續3回合。"
             });
         }
         const earthShield=skillDatabase.earthShield;
@@ -158,28 +158,6 @@
 
     /* Player-facing skill text is owned by FourSymbolsSkillSpec after the
        gameplay bundle finishes loading. V144 no longer overrides previews. */
-
-    /* 氣定神閒的命中提升要進入實際戰鬥能力，而不只停在描述。 */
-    function accuracyMultiplier(character){
-        if(!character||!Array.isArray(character.activeBuffs)){ return 1; }
-        const active=character.activeBuffs.find(buff=>
-            buff&&buff.type==="dinghaishenzhen"&&numeric(buff.turnsLeft)>0
-        );
-        return active?1+Math.max(0,numeric(active.accuracyBonusPercent))/100:1;
-    }
-
-    function wrapAccuracyStats(name,characterFromArgs){
-        const previous=window[name];
-        if(typeof previous!=="function"){ return; }
-        window[name]=function(){
-            const stats=previous.apply(this,arguments);
-            const character=characterFromArgs(arguments);
-            if(!stats||!character){ return stats; }
-            return Object.assign({},stats,{accuracy:Math.round(numeric(stats.accuracy)*accuracyMultiplier(character))});
-        };
-    }
-    wrapAccuracyStats("getMainCharacterStats",()=>typeof player!=="undefined"?player:null);
-    wrapAccuracyStats("getAdditionalCharacterBattleStats",args=>args[0]);
 
     /* ----- Shop: only 10/20/30% potions, with the existing level multiplier. ----- */
     function ensurePotion(id,resource,percent,price){
@@ -304,6 +282,42 @@
         return lv<=10?0:lv<=40?1:lv<=70?2:3;
     }
 
+    function isMonsterSkillElementLegal(monster,skillId){
+        if(!monster||!skillId||typeof skillDatabase==="undefined"){ return false; }
+        const skill=skillDatabase[skillId];
+        if(!skill){ return false; }
+        const explicit=Array.isArray(monster.v144CrossElementSkillIds)
+            ?monster.v144CrossElementSkillIds:[];
+        if(explicit.includes(skillId)){ return true; }
+        const skillElement=String(skill.element||"");
+        const monsterElement=String(monster.element||"");
+        return !!skillElement&&!!monsterElement&&skillElement===monsterElement;
+    }
+
+    function legalCarriedMonsterSkillIds(monster,kind){
+        if(!monster){ return []; }
+        const source=kind==="support"?monster.v141SupportSkillIds:monster.skillIds;
+        return Array.from(new Set(Array.isArray(source)?source:[]))
+            .filter(id=>isMonsterSkillElementLegal(monster,id));
+    }
+
+    function normalizeMonsterSkillLoadout(monster){
+        if(!monster){ return monster; }
+        monster.skillIds=legalCarriedMonsterSkillIds(monster,"attack");
+        monster.v141SupportSkillIds=legalCarriedMonsterSkillIds(monster,"support");
+        if(Array.isArray(monster.v144LegalSkillPool)){
+            monster.v144LegalSkillPool=Array.from(new Set(monster.v144LegalSkillPool))
+                .filter(id=>isMonsterSkillElementLegal(monster,id));
+        }
+        if(monster.v175ForcedAttackSkillId&&!monster.skillIds.includes(monster.v175ForcedAttackSkillId)){
+            delete monster.v175ForcedAttackSkillId;
+        }
+        if(monster.v175ForcedSupportSkillId&&!monster.v141SupportSkillIds.includes(monster.v175ForcedSupportSkillId)){
+            delete monster.v175ForcedSupportSkillId;
+        }
+        return monster;
+    }
+
     function legalMonsterSkillPool(monster){
         if(!monster||monster.v141Abyss||typeof skillDatabase==="undefined"){ return []; }
         const maxTier=tierLimit(monster.level);
@@ -327,8 +341,12 @@
 
     let encounterSequence=0;
     function configureEncounterSkills(monster,encounterId){
-        if(!monster||monster.v141Abyss){ return monster; }
+        if(!monster){ return monster; }
+        if(monster.v141Abyss){
+            return normalizeMonsterSkillLoadout(monster);
+        }
         if(monster.v132FixedSkillLoadout){
+            normalizeMonsterSkillLoadout(monster);
             const forcedLevel=Math.max(1,Math.floor(numeric(monster.v141ForceSkillLevel)||1));
             monster.v144LegalSkillPool=(monster.skillIds||[]).slice();
             monster.v141SkillLevel=forcedLevel;
@@ -342,9 +360,12 @@
         monster.v141SkillLevel=monsterSkillLevel(monster.level);
         monster.v144SkillLevel=monster.v141SkillLevel;
         monster.v144SkillEncounter=encounterId||("generated-"+(++encounterSequence));
-        return monster;
+        return normalizeMonsterSkillLoadout(monster);
     }
 
+    window.v144IsMonsterSkillElementLegal=isMonsterSkillElementLegal;
+    window.v144GetLegalMonsterSkillIds=legalCarriedMonsterSkillIds;
+    window.v144NormalizeMonsterSkillLoadout=normalizeMonsterSkillLoadout;
     window.v144GetMonsterSkillCarryLimit=monsterCarryLimit;
     window.v144GetMonsterFixedSkillLevel=monsterSkillLevel;
     window.v144GetMonsterLegalSkillPool=legalMonsterSkillPool;
@@ -500,24 +521,22 @@
     if(typeof window.v132LaunchDungeonBattle==="function"){
         const previousLaunchDungeonBattle=window.v132LaunchDungeonBattle;
         window.v132LaunchDungeonBattle=function(roster){
-            if(!(Array.isArray(roster)&&roster.some(monster=>monster&&monster.v174TrueRealmFinal))){
-                const encounterId="dungeon-"+(++encounterSequence);
-                (roster||[]).forEach(monster=>configureEncounterSkills(monster,encounterId));
-            }
+            const options=arguments[2]&&typeof arguments[2]==="object"?arguments[2]:{};
+            const encounterId=String(options.mode||"dungeon")+"-"+(++encounterSequence);
+            (roster||[]).forEach(monster=>configureEncounterSkills(monster,encounterId));
             return previousLaunchDungeonBattle.apply(this,arguments);
         };
     }
 
-    /* 日常副本的舊啟動器保留在 V132 私有閉包內；在真正 renderBattle
-       完成元素平均化後再鎖定一次，涵蓋所有副本入口且不會每回合重抽。 */
+    /* 共用 Dungeon launcher 會被 Daily/Tower/Boss/Adventure/Abyss 重用。
+       Render 後只再次驗證正式攜帶技能，不再改寫 monster.element。 */
     let configuredDungeonBattleToken=null;
     function configureDungeonBattleSkillsAfterRender(){
         const roster=typeof monsters!=="undefined"?monsters:null;
         const token=typeof battleToken!=="undefined"?battleToken:null;
         if(
             window.v132ActiveDungeonRun&&
-            token!==configuredDungeonBattleToken&&
-            !(Array.isArray(roster)&&roster.some(monster=>monster&&monster.v174TrueRealmFinal))
+            token!==configuredDungeonBattleToken
         ){
             configuredDungeonBattleToken=token;
             const encounterId="dungeon-render-"+(++encounterSequence);
@@ -538,34 +557,8 @@
     /* V144 no longer owns an enemy support dispatcher. The shared Skill-ID
        dispatcher in V141/V155 is the sole runtime owner. */
 
-    let v144AbyssBuffTick="";
-    if(typeof startTurn==="function"){
-        const previousStartTurnForBuffs=startTurn;
-        startTurn=function(token){
-            const key=String(token)+":"+String(typeof turn!=="undefined"?turn:"");
-            if(key!==v144AbyssBuffTick){
-                v144AbyssBuffTick=key;
-                abyssAllies().forEach(entry=>{
-                    const monster=entry.monster;
-                    if(!monster||!monster.v141Abyss){ return; }
-                    ["v144CalmBuff","v144DodgeBuff"].forEach(prop=>{
-                        const buff=monster[prop];
-                        if(!buff){ return; }
-                        if(typeof turn!=="undefined"&&turn>1){ buff.turnsLeft--; }
-                        buff.display.turnsLeft=buff.turnsLeft;
-                        if(buff.turnsLeft>0){ return; }
-                        if(prop==="v144CalmBuff"){
-                            monster.accuracy=buff.originalAccuracy;
-                            monster.resistance=buff.originalResistance;
-                        }else{ monster.evasion=buff.originalEvasion; }
-                        monster.activeBuffs=(monster.activeBuffs||[]).filter(item=>item!==buff.display);
-                        delete monster[prop];
-                    });
-                });
-            }
-            return previousStartTurnForBuffs.apply(this,arguments);
-        };
-    }
+    /* Legacy V144 timed-buff round ticking is retired. Persistent durations
+       are owned by FourSymbolsDurationLifecycle in the battle core. */
 
     window.v144RuleDiagnostics=function(){
         return {

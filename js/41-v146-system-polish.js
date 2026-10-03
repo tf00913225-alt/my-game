@@ -91,8 +91,8 @@
     const PIECE_RULES={
         blade:{role:"attack",roleLabel:"攻",name:"刀",stats:{attack:10,vitality:-2}},
         fan:{role:"magic",roleLabel:"法",name:"扇",stats:{intelligence:10,vitality:-2}},
-        heavyArmor:{role:"attack",roleLabel:"攻",name:"鎧甲",stats:{attack:5,spirit:5}},
-        robe:{role:"magic",roleLabel:"法",name:"袍",stats:{intelligence:5,spirit:5}},
+        heavyArmor:{role:"attack",roleLabel:"攻",name:"鎧甲",stats:{attack:5,evasion:10,antiCrit:0.5,statusResistance:0.25}},
+        robe:{role:"magic",roleLabel:"法",name:"袍",stats:{intelligence:5,evasion:10,antiCrit:0.5,statusResistance:0.25}},
         boots:{role:"attack",roleLabel:"攻",name:"靴",stats:{attack:2,agility:10}},
         shoes:{role:"magic",roleLabel:"法",name:"履",stats:{intelligence:2,agility:10}},
         helm:{role:"attack",roleLabel:"攻",name:"盔",stats:{attack:12}},
@@ -163,7 +163,7 @@
                 const counts=variantCountsForEquipment(characterId,setId);
                 const total=counts.attack+counts.magic;
                 if(total>=3&&counts.attack<3&&counts.magic<3){
-                    ["attack","vitality","energy","intelligence","spirit","agility"].forEach(stat=>{
+                    ["attack","vitality","energy","intelligence","agility"].forEach(stat=>{
                         bonus[stat]=(numeric(bonus[stat])-1);
                     });
                 }
@@ -218,7 +218,7 @@
         if(bonuses[0]){
             bonuses[0].classList.toggle("active",count>=3);
             bonuses[0].classList.toggle("inactive",count<3);
-            bonuses[0].textContent="裝備三件　全能力+1　["+(count>=3?"已啟動":"未啟動")+"]";
+            bonuses[0].textContent="裝備三件　全能力+1　閃避+2%　["+(count>=3?"已啟動":"未啟動")+"]";
         }
         if(bonuses[1]){
             bonuses[1].classList.toggle("active",count>=5);
@@ -289,37 +289,20 @@
         ));
     }
 
-    function statusHitDelay(location){
-        const current=window.v143SkillAnimationState&&window.v143SkillAnimationState.current;
-        if(!current||current.done||current.targetSide!==location.side){ return 30; }
-        const position=Math.max(0,current.targetIndexes.indexOf(location.index));
-        const stagger=current.model&&current.model.sprite
-            ?0
-            :(current.targetIndexes.length>1?Math.min(210,position*55):0);
-        const hitAt=Math.min(
-            current.startedAt+current.duration-140,
-            current.startedAt+current.duration*numeric(current.model&&current.model.hit)+stagger
-        );
-        return Math.max(30,hitAt-Date.now()+115);
-    }
-
     function showStatusPopup(entity,type){
         const label=STATUS_LABELS[type];
         const location=locateEntity(entity);
-        if(!label||!location||typeof document==="undefined"){ return; }
-        setTimeout(()=>{
-            const card=document.getElementById(location.side==="monster"
-                ?"battleMonster"+location.index:"battlePlayerCard"+location.index);
-            if(!card||card.offsetParent===null){ return; }
-            const rect=card.getBoundingClientRect();
-            const popup=document.createElement("strong");
-            popup.className="v146-status-popup status-"+type;
-            popup.textContent=label;
-            popup.style.left=(rect.left+rect.width/2)+"px";
-            popup.style.top=(rect.top+rect.height*.86)+"px";
-            document.body.appendChild(popup);
-            setTimeout(()=>popup.remove(),1300);
-        },statusHitDelay(location));
+        const feedback=window.FourSymbolsBattleFloatingFeedback;
+        if(!label||!location||!feedback||typeof feedback.emitAtImpact!=="function"){ return; }
+        const emit=()=>feedback.emitAtImpact({side:location.side,index:location.index,kind:"status",statusType:type,text:label,phase:"status",source:"status"});
+        if(
+            window.__fourSymbolsBattleEffectSource==="relic"&&
+            typeof window.v174QueueRelicVisual==="function"
+        ){
+            window.v174QueueRelicVisual(emit);
+            return;
+        }
+        if(typeof queueMicrotask==="function"){ queueMicrotask(emit); }else{ emit(); }
     }
 
     function wrapSimpleStatus(functionName,type){
@@ -442,8 +425,6 @@
         const abyssActive=abyssMapActive||abyssSelectionActive;
         page.classList.toggle("v146-abyss-active",abyssActive);
         page.classList.toggle("v146-abyss-intro-mode",active&&!!page.querySelector(".v141-abyss-intro"));
-        const nav=document.getElementById("v141DungeonNav");
-        if(nav){ nav.dataset.v146Columns="5"; }
         if(typeof window.v148SyncContextNavigation==="function"){
   window.v148SyncContextNavigation();
         }else if(typeof window.v148SyncDungeonShell==="function"){
@@ -583,10 +564,10 @@
             if(!skill||skill.element!==character.element){ return; }
             const level=Math.max(0,numeric(levels[skillId]));
             if(level<=0){
-                const prereqMet=typeof isSkillPrereqMet==="function"
-                    ?!!isSkillPrereqMet(levels,skill)
-                    :(skill.requires||[]).every(requiredId=>numeric(levels[requiredId])>0);
-                if(prereqMet&&points>=Math.max(0,numeric(skill.learnCost))){ canSpend=true; }
+                const eligibility=typeof getSkillLearnEligibilityForUi==="function"
+                    ?getSkillLearnEligibilityForUi(character,skill,levels)
+                    :null;
+                if(eligibility&&eligibility.allowed){ canSpend=true; }
             }else if(level<Math.max(1,numeric(skill.maxLevel)||1)&&points>=1){
                 canSpend=true;
             }
@@ -720,27 +701,24 @@
             const skill=skillId&&skillDatabase[skillId];
             if(!skill){ return; }
             const level=Math.max(0,numeric(levels[skillId]));
-            const actionCards=Array.from(row.querySelectorAll(".skill-action-card"));
-            const growthCard=actionCards.find(card=>{
-                const onclick=card.getAttribute("onclick")||"";
-                return onclick.includes("learnSkill(")||onclick.includes("upgradeSkill(");
-            });
+            const actionCards=Array.from(row.querySelectorAll("button.skill-action-card"));
+            const growthCard=actionCards.find(card=>card.dataset.skillAction==="growth");
             let canSpend=false;
             if(level<=0){
-                const prereqMet=typeof isSkillPrereqMet==="function"
-                    ?!!isSkillPrereqMet(levels,skill)
-                    :(skill.requires||[]).every(requiredId=>numeric(levels[requiredId])>0);
-                canSpend=prereqMet&&points>=Math.max(0,numeric(skill.learnCost));
+                const eligibility=typeof getSkillLearnEligibilityForUi==="function"
+                    ?getSkillLearnEligibilityForUi(character,skill,levels)
+                    :null;
+                canSpend=!!(eligibility&&eligibility.allowed);
             }else{
                 canSpend=level<Math.max(1,numeric(skill.maxLevel)||1)&&points>=1;
             }
             setGrowthGuidanceDot(
                 growthCard,
-                !!(canSpend&&growthCard&&!growthCard.classList.contains("disabled")),
+                !!(canSpend&&growthCard&&!growthCard.disabled),
                 level>0?"技能點足夠，可升級":"技能點足夠，可學習"
             );
 
-            const equipCard=actionCards.find(card=>(card.getAttribute("onclick")||"").includes("equipSkill("));
+            const equipCard=actionCards.find(card=>card.dataset.skillAction==="equip");
             const canEquip=
                 level>0&&
                 EQUIPPABLE_SKILL_CATEGORIES.has(skill.category)&&
@@ -765,7 +743,7 @@
         const attention=getCharacterGrowthAttention();
         const homeButton=document.getElementById("homeIconCharacter")?.parentElement||null;
         setCharacterAttentionDot(homeButton,attention.show,attention.label);
-        document.querySelectorAll("#mapPageNav button[aria-label='角色']").forEach(button=>{
+        document.querySelectorAll("#bottomNav button[aria-label='角色']").forEach(button=>{
             setCharacterAttentionDot(button,attention.show,attention.label);
         });
         clearLegacyHudExpAttention();

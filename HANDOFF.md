@@ -1,3 +1,283 @@
+## 2026-10-03 — RELEASE-CI-DEPLOYMENT-OWNER-20261003（發布檢查控制來源收斂）
+
+- 從 dev/Candidate C `09a6c8d2dc52ebeccc032078c45af6b7b55e4137` 建立 `fix/release-ci-deployment-owner-20261003`；main `4b037b47967544d90c781ad938286777c9576731` 禁止修改，#772 維持 Draft／RELEASE BLOCKED。
+- 新發現 #772 main-target CI 37102172377 在20分鐘期限被取消，已跑過262 suites，但剩餘完整Browser QA與發布閘門未完成，不能算通過。main/main-target Repository checks 改30分鐘，dev仍20分鐘；沒有刪除、略過、放寬測試或失敗續跑。
+- Session deploy 111144393496 的舊 newest-named-check lookup 誤等同SHA的main-target PR check，80次等待逾時。收斂為 exact dev push CI workflow → Repository checks job；保持 current-dev SHA guard，增加 Actions read 權限、退場 check-runs newest-name lookup。只改部署驗證控制來源，不改 Backend、Cloud Save、玩家資料。
+- PR合併後 Candidate C 必須 INVALIDATED，建立新的 Candidate D 並重新執行必要Exact-HEAD驗收；B/C證據不能冒充D。候選Owner仍為PR body，禁止自身SHA提交迴圈。
+- Pages Source 尚待切换／核實GitHub Actions；沒有可用設定修改動作前仍BLOCKED。
+
+## 2026-10-03 — PRODUCTION-PAGES-MANIFEST-20261003（正式部署 Owner 修復）
+
+- Base dev `8e6a635db54ead49f9a43671a836eefd48aa0491`；main `4b037b47967544d90c781ad938286777c9576731` 禁止修改，發布 PR #772 保持 Draft／RELEASE BLOCKED。
+- 分類為 Convergence／Replacement。正式產物準備由 `.github/scripts/prepare-static-deployment.mjs` 共用；`.github/scripts/release-gate.mjs::writeDeployManifest/validateArtifactManifest/verifyDeployed` 仍是清單唯一 Owner，沒有靜態 manifest、SHA 硬寫、Liquid 或第二公式。
+- Production Owner 為 `.github/workflows/deploy-production-pages.yml`：僅成功 main push CI 的 exact SHA，main stale guard、release-ready/build gate、共用 _deploy、官方 Pages artifact/deploy、manifest/notice/critical-resource讀回與既有 item/forge/battle QA。DEV rsync 排除清單已退場，由共用 tracked-only 包裝政策取代。
+- 必須先將 Repository Pages Source 從 legacy 切換為 GitHub Actions，否則舊平台部署 Owner 尚未退役、正式發布仍 BLOCKED。此設定與 main source 分開；不能以 workflow 檔存在冒稱設定完成。
+- 無 Runtime／Gameplay／UI／存檔改動；既有 item/forge QA 僅修正 Pages subpath，仍使用隔離唯讀帳號 transport。沒有暫時補丁。
+- 修復 PR 合併 dev 後 Candidate B 必須 INVALIDATED；Candidate C 為實際 merge/dev SHA，正式記錄在修復 PR／#772 body，必須 NEW 完整262 suites／真實Chrome／三時區／build／Browser QA／DEV exact SHA，不沿用B證據。
+- 此處為施工 checkpoint，不宣稱已通過或發布。當前PR、Pages Source及候選驗收狀態以本工作PR耐久紀錄為準。
+
+## 2026-10-03 — V17373-RELEASE-FREEZE-20261003（發布凍結準備）
+
+- 使用者明確授權 RELEASE FREEZE；最新開工 dev `a959e8bda4d79d55e3af36174921a19b579f5a80`，main `4b037b47967544d90c781ad938286777c9576731`。main 是 dev 祖先；最新必要 CI／DEV SHA 健康，P0 requirement VERIFIED、trueP0=[]。工作分支 `release/v17373-freeze-20261003`，禁止修改 main。
+- 正式版本 owner `release/release.json`／`js/20-anonymous-20.js`／`index.html` 已同步 Game+Cache 173.73；正式 build 再同步產物。玩家公告唯一 owner `release/release-update.json`，CHANGELOG 依 main...dev 完整差異更新；玩法、存檔、帳號與測試實作不改。
+- 暫停非必要功能、Cloud 後續、鍛造第二階段、素材擴充與 P2/P3。本工作只版本／快取／metadata／公告／文件與必要生成產物。Deferred 維持原狀，23 項既有 VERIFIED 不冒充新候選驗收。
+- scope releaseCandidateSha 暫為 null；合併後實際 dev SHA 才固定候選，耐久權威紀錄在本工作 PR body，避免將自身 SHA 寫進 source 又改變 candidate。任何後續 dev commit 立即使原 candidate 失效。
+- 待完成：本分支 release gate、build/check、通知目標測試、PR CI／merge、分支清理、合併精確 SHA 的全套／實際 Chrome／三時區／既有瀏覽器 QA／DEV SHA+版本驗收。完成前不宣稱 RELEASE READY，不推 main。舊 PR #768 全套只屬歷史 P0 證據。
+
+## 2026-10-03 — RELEASE-SUITES-P0-20261002（P0 正式狀態結案，非 Batch 10）
+
+- 開工 dev `81853be234963c8a5250b474c38480dcd0dfa2b4`／main `4b037b47967544d90c781ad938286777c9576731`；重新讀取 PR #768 最終狀態、tested tree、CI jobs/logs 與獨立 DEV SHA read-back，证據仍成立，main 未修改。
+- Independent full suite 262/262 PASS、actual Chrome 154.0.8037.97、Skill20/20／Cardless5/5／V14118/18、通知UTC／Taipei／New York各12/12；來源為#768獨立測試紀錄。dev CI37080384742 attempt2 SUCCESS，但 full Node step SKIPPED，兩者分開；部署job111082274607 SHA／173.72 read-back、responsive／forge／battle live QA PASS。
+- 只更新 release/requirements.json、release/v17373-scope.json、docs/V17373_RELEASE_SCOPE_20261002.md 及本交接；Requirement BLOCKED→VERIFIED，23/23 VERIFIED，trueP0=[]，READY TO ENTER RELEASE FREEZE。舊診斷列表只作歷史，以suiteCloseout20261003為現行證據。Deferred保持，不重開已完成測試、不改Runtime／版本／Cache173.72。
+- Branch：docs/v17373-p0-closeout-20261003；Target dev；必要目標JSON/schema／release gate／diff與PR CI後自行合併，整合／部署／清理最新狀態以本工作PR為準，不能由本checkpoint冒稱完成。
+- 下一階段須明確啟動Freeze，固定候選SHA並跑必要Exact-HEAD full suite與發布驗收；本次未RC、未Freeze、未發布main。
+
+## 2026-10-02 — RELEASE-SUITES-P0-20261002（第五批）
+
+- 最新基線 dev `7d47379557a716825f794589d249da31af51f678`；#762已合併，run37011016118 checks／部署SHA版本讀回／線上UI及戰鬥QA SUCCESS。第四批分支仍在，現有connector不提供ref刪除。新分支 `fix/v17373-release-suite-recovery-batch5-20261002`，main禁止修改。
+- 原15檔UTC重跑15 FAIL；修改後5 PASS／10 FAIL，累計35/45。正式runner262檔在20/262因本機缺Chrome退出，完整發布測試未PASS，P0／requirement保持BLOCKED。
+- Tests-only Replacement：remaining-ui、v173.25-ui-polish、v173.43-growth-charge、v174-cardless-battle-presentation、v174-relic-navigation-button-polish。共同根因為退役／搬遷的呈現來源：圖片selector、角色padding、技能名／狀態浮字、紅點、legacy立繪與確認視窗primary契約。詳細分類／Owner／前後結果見scope JSON；未選10檔不宣稱已完成正式根因判定。
+- 保留容量／六欄／contain／Boss格位／動畫時序／EXP與副本數值／秘寶導覽等防護；狀態文字遷移到既有黑膠囊與impact/lane/cleanup契約，非恢復舊V146 1.25s座標writer。確認視窗VM驗default／danger／primary／非布林與重用清除tone；立繪VM驗重複applyUnit不新增圖層。
+- 5/5目標、5/5直接相關回歸、build:check與diff check PASS。只改測試與scope／requirement／交接；正式Runtime／CI／素材／Game+Cache173.72未變。最新PR Head必要CI、整合、部署與分支清理以PR耐久狀態為準，目前pending。下一批剩10檔；不進RC／Freeze，不處理P1～P3。
+
+## 2026-10-02 — RELEASE-SUITES-P0-20261002（第四批）
+
+- 即時基線 dev `92f47835964eabab24d38d613fc3df02a83e66b5`；#761 已合併，run37006601056 Repository checks／DEV部署／SHA讀回與線上UI及戰鬥驗證SUCCESS；第三批來源分支已不存在。工作分支 `fix/v17373-release-suite-recovery-batch4-20261002`；main禁止修改。
+- 262檔發現／0未分類；原20檔UTC修改前20 FAIL，修改後5 PASS／15 FAIL，累計30/45。完整runner因缺Chrome在20/262後exit1，未PASS；完整Chrome與候選發布验收仍pending。P0／requirement保持BLOCKED。
+- Tests-only Replacement：背包字級與中性inner art改驗css/22／css/50；角色自然捲動與padding改驗css/49／css/31，V78相容export實際VM執行不寫DOM；共用背包入口驗正向openInventoryContext與舊入口委派；quick-sell改VM驗正式委派、UID品質key／change／重複安裝；物品square／contain改驗css/49，禁止css/38接管。
+- 5個已通過檔與20檔首失敗分流見scope JSON。Typography只排除冗餘INVENTORY裝飾字，保留22px中文標題與非戰鬥>=13px；秘寶SP已由共用battle floating feedback呈現，保留藍色與戰鬥字級例外。未選檔只是首失敗分流，不宣稱完整Runtime根因已確認。
+- 5/5目標、5/5相關回歸、build:check與diff check PASS。只改測試與進度／交接；正式Runtime／workflow／CI／Game／Cache173.72未變，未RC／Freeze／正式發布。
+- PR最新Head必要CI、整合dev、合併SHA部署與來源分支清理仍待完成；結果以PR即時耐久紀錄為準。下一批剩15檔，不處理P1／P2／P3。
+
+## 2026-10-02 — RELEASE-SUITES-P0-20261002（第三批）
+
+- Base dev `0974042ca1bf8cc562fc4f0a1131b81c3da73c38`；#760 merged，run37002929499 Repository checks／DEV deploy SUCCESS。Branch `fix/v17373-release-suite-recovery-batch3-20261002`，main禁止修改。
+- 原27檔UTC修改前27 FAIL，修改後7 PASS／20 FAIL；累計25/45。262 suites／0 unclassified；完整發布runner本機仍未PASS，Chrome／exact候選發布驗收pending；P0保持BLOCKED。
+- Tests-only Replacement：V78 inline writer退役，角色尺寸／內捲動驗css/49；背包框／格子驗css/22，捲動驗css/24。保留容量／六欄／single scroller／邊框與44px控制。7檔清單、首失敗A～F分流與Owner見scope JSON；未選檔不得視為已完成根因驗證。
+- 7/7目標、5/5相關回歸、build:check、diff check PASS。Runtime／CI／Game／Cache173.72未改；未RC／Freeze／正式發布。PR最新Head必要CI、merge、DEV exact-SHA、分支清理待完成，結果以PR即時紀錄為準。
+- Next：本批安全整合／部署／清理，再以同Work ID處理剩20檔；不得僅因dev CI綠燈解除P0。
+
+## 2026-10-02 — RELEASE-SUITES-P0-20261002（第二批接續）
+
+- 即時基線 dev `7fdd316ced57814e7f635e4444ed694ac4620522`；#759 已合併／來源分支已刪，另從最新 dev 建 `fix/v17373-release-suite-recovery-batch2-20261002`。main 禁止修改，Game／Cache 173.72 不變，未建立 RC／Freeze。
+- 本批7個原失敗測試檔 PASS；原34檔 TZ=UTC 診斷 sweep 為7 PASS／27 FAIL，累計18/45原非環境失敗檔修復。剩餘清單在 release/v17373-scope.json。完整正式發布 suite／Chrome runner 尚未通過；P0與requirement保持BLOCKED。
+- Tests-only Replacement：V153／V160／V173.18／V173.44 maintenance改讀正式V173.64技能資料；洪水猛獸學習Lv7／6點，仍驗證105基礎傷害／21成長／35 SP／單體／waterBall前置。Learn gate改驗現行getSkillLearnEligibilityForUi（等級／前置／跨元素／成本），保留拒絕與owner扣點檢查；未把跨元素無前置誤改回舊规则。
+- 技能按鈕改驗文字動作與data-skill-action；拒絕退休skill-action-card-top，保留點數不足／資格／五種動作狀態。玩法導覽驗收移到FourSymbolsBottomNav現行來源，保留五按鈕、返回語意、icon透明度與Boss格位幾何。
+- V153原fixture只載V143，卻要求它覆寫退休showMonsterHit/showMissEffect。改走V143正式命中時序介面v143RunAtTargetHit／v143ResolveBattleFeedbackTiming；保留命中幀前0次、單timer、第8幀延遲、MISS可見、爆擊及完整動畫閘門。正式popup仍由battle-floating-feedback-owner.js唯一控制，無新wrapper／補丁／Runtime改動。
+- 本機7/7、skill-progression＋battle-declaration 21項、feedback-semantic-sequencing、production build:check、diff check PASS。來源／測試修復IMPLEMENTED；最新PR必要CI、合併、dev部署SHA與安全分支清理待完成。未宣稱遊戲實機症狀VERIFIED。
+- Next：本批PR整合後沿同Work ID處理剩餘27檔；尤其角色／背包CSS與浮字退役來源須逐項查證，不能一律放寬。完整發布驗收通過前不得解除P0。
+
+## 2026-10-02 — RELEASE-SUITES-P0-20261002（第一批接續）
+
+- 從即時最新 dev `50dd9d50988ab117054a0ded9db6344a028110c4` 建立 `fix/v17373-release-suite-recovery-20261002`；接續已合併 #758，main 禁止修改。
+- 原45個非環境失敗檔重跑：11 PASS、34 FAIL（TZ=UTC）。完整清單／已修檔案在 release/v17373-scope.json；這是診斷 sweep，不是完整正式發布 CI PASS。P0 與 requirement 保持 BLOCKED，版本／Cache 173.72，不啟動 Freeze。
+- 只修改測試與交接／證據。怪物經驗 fixture 接受既有第五個 portraitKey 參數；森林新名稱水靈狐；自動 tri 選目標補現行依賴；觸控 fixture 遷移到 FourSymbolsGestureArbiter.findScrollOwner 並保留實際 overflow／單指原生捲動／pinch 契約；日常四個已替換素材對齊 existing，歷史 batch 不修改；V152 技能點改呼叫正式 display owner、浮字 lane／導覽 owner／35%凍傷來源遷移；洪水猛獸飛行與轉段保持原圖0度，位移、命中、1350ms與dispose斷言保留。
+- 11檔全部本機 exit=0，production build:check PASS。status-help 的 Browser 子檢查因無Chrome未執行；不宣稱手機介面已驗證。遠端PR／CI／DEV部署待核對，後續從同Work ID／分支續接，不另開同目的PR。
+- 下一步逐項遷移剩餘34檔已確認失敗；不得把全部當過期測試、刪斷言或改CI。完整發布測試與最終候選驗收通過前不得把P0改VERIFIED。
+
+## 2026-10-02 — RELEASE-SCOPE-P0-20261002
+
+- 即時基線 dev `5de3e04690b9f20569b7e789240488f33aa4cd40`、main `4b037b47967544d90c781ad938286777c9576731`。本次 NORMAL DEVELOPMENT 收斂，結論 RELEASE BLOCKED：1 項真正 P0（完整正式發布 Node suites 尚有45個非環境失敗測試檔）。不是45個已確認遊戲bug。
+- 詳見 docs/V17373_RELEASE_SCOPE_20261002.md、release/v17373-scope.json。五項原 IMPLEMENTED 逐字留在 deferred，原 batches／Cloud Phase 進度不改；Checklist22 VERIFIED／1 BLOCKED，沒有硬改完成。
+- 只修土塔 portrait identity／Boss crit 測試 fixture；Runtime不變。Cloud完整恢復、正式獎勵後續、素材完整批次／Android驗收延後，既有active素材安全仍核對。
+- 工作分支 fix/v17373-release-scope-p0-20261002，目標dev PR。此checkpoint尚不宣稱PR合併／新HEAD部署完成；須以GitHub實際CI與部署狀態核對。Game／Cache173.72不變；未指定RC SHA、未進Freeze、未動main。
+
+## 2026-10-02 — TOWER-CHALLENGE-PROFILE-20261002 功能驗收接續
+
+- 沿用 PR #757／feature/tower-challenge-element-profiles-20261002；正常吸收 dev@7911c985 的鍛造冷入口修正。未 rebase、force push 或修改 main。
+- 31/31 功能 VERIFIED：候選 a1e208abd223c1f6f20d978f65a95822dd79fb34，run 36984210420 tower gate PASS，artifact 11216788440。正式 Chrome 412×915 的27場、十隻自然佇列、Heal／Freeze、硬控上限、全體技十次結算與battle／rules PNG已核對；詳細 docs/qa/tower-challenge-profile-20261002.md。Android實體驗收未宣稱。
+- 續修只遷移退休的舊測試、等待Startup owner、核對27場完整順序、透過正式closeHomeFeature關閉登入公告後驗證可見場景。早期遮擋截圖不作證據，沒有降低戰鬥斷言。
+- 功能驗收與整合／部署分離：此文件Head仍須必要CI，通過後PR合併dev、檢查Cloudflare部署與SHA、再安全清理分支。Game／Cache173.72不變，尚未完整結案。
+
+## 2026-10-02 — TOWER-CHALLENGE-PROFILE-20261002 (IMPLEMENTED candidate)
+
+- Base dev `3fabca40a841a9b61ff704f9a5db6cc78ba6c353`; branch `feature/tower-challenge-element-profiles-20261002`; target dev, main excluded. Replacement/Convergence of tower common frequency, element profile and normal floor roster.
+- Tower Owner `gameplay-boss-tower-system.js` separates `applyTowerChallengeProfile` (65/70/75/80 by 30/60/90 bands) from idempotent `applyTowerElementProfile`; every floor uses ten real units, normal 10 / elite 2+8 / boss 1+2+7. Shared Boss configuration remains unchanged.
+- Damage/Crit/Status and the single tower skill decision belong to `00-main.js`. V141 support pre-emption is excluded for tower; core gates after hard-control before calling existing legal support selection; no second AI or added wrapper. Water uses formal Heal Support and Freeze; the current water catalog has no independent Buff, so no cross-element/new buff is invented. HP Healing belongs to `v141HealMonsterPreservingShield`, SP unchanged.
+- V141 selection receives the formal category preference; V148 rage pre-emption is excluded for tower to prevent bypassing the common decision. Fire direct modifier excludes non-direct damage kinds; DoT/reflect stay in their original settlement paths. Existing 90/75/60 and Enemy→Player 60 bounds retained. Wind speed does not derive evasion/accuracy.
+- Targeted 4×100 floor/rank/profile/frequency/unique-slot/all-target/idempotency/isolation matrix and direct damage/crit/HP heal/status/single-probability regressions pass. Production build/check passes. Local Chrome launch is blocked by socket EPERM; exact candidate production browser QA is wired into the existing Required CI, never represented as passing locally.
+- Requirement batch `release/requirement-batches/2026-10-02-tower-challenge-profile.json` has 31 IMPLEMENTED rows. Browser 24 scene matrix, real water heal, natural ten-unit 80% queue, all-ten direct AOE/feedback, rules screenshot, CI/merge/deployed SHA remain pending. Game/Cache 173.72 unchanged.
+- Next: remote checkpoint and PR; complete required runtime evidence, fix only evidenced task regressions; merge dev after necessary gates, check deployment and safely delete source branch.
+
+## 2026-10-02 — HIT-EVASION-PERCENT-V2-20261002（8/8 功能 VERIFIED；整合／部署待完成）
+
+- V1 #750 已合併。V2 base dev `60c1aab27567e2c1e64604b95a0979e97806f59b`，工作分支 `fix/hit-evasion-percent-source-rebalance-v2-20261002`。
+- Hit Owner 維持 `js/00-main.js::calculateHitChancePercent`；退休 0.15 命中係數與等級預設閃避。Set Owner `js/equipment-progression.js` 與原始 definition 同步 armor/robe evasion 10；V132 3 件套 evasion 2。
+- 共用 Migration Owner `functions/src/equipment-combat-percent-migration.js`，裝備版本 2 標記防止重複換算；主 Runtime 委派，不新增 save wrapper。後端 review 對 legacyItem 副本投影，原始封存不修改。
+- Relic Owner `js/60-team-relic-system.js` 以期限內 reduction entries 投影最終命中下降，保留 Boss 效率。Skill Final Data Owner 不重平衡。
+- PR #752。39 項最終 Runtime 整合、裝備遷移／Cloud 投影／秘寶／V158 7 項回歸與 build/check 通過。正式 production Chrome 393×873 QA 已實際驗證裸裝／等級、四象穿脫 10/12/10、Wind EX 15/15 + 50 cap、兩項技能實際施放 5～25%/3 回合、凍傷、元祖祝福、青嵐 8/10/12、古鐘 5/8、風週塔怪 8、手動／自動／敵方共用 Hit Owner；角色詳情與完整公式截圖已檢視。
+- QA 等待正式進場／退場後才進下一場；不改 Runtime timing。副本難度縮放排除 Accuracy/Evasion，保留其他 scaling。舊 V144 數值／說明同步，UI 重鑄保持先 numeric 加總再加 %。
+- 追加直接 Owner 回歸先重現套裝正規化覆寫 Spirit Anti-Crit/Status Resistance，再修正保留既有總值；raw Spirit 與 V1 已換算四系 armor/robe 全部重複正規化通過。Chrome 背包實際舊套裝確認 Accuracy 3 / Evasion 10 / Anti-Crit 1.5 / Status Resistance 0.75。
+- 青嵐 Browser 雙向 getter 追加檢查先重現 8/16、10/20、12/24；退休 Relic decorator 的 Evasion 寫入，改由原始角色 Evasion Owner 唯一加總 Relic getter（與 Frostbite 同次結算）。Chrome 確認角色／隊伍皆 8/8、10/10、12/12，凍傷皆 0/0；只移動 Evasion 來源，其他秘寶數值不重平衡。
+- 續接核對 remote #752 Head `5adb5dcb` 的 CI / Session Authority SUCCESS；青嵐修正原只在本機，現保留並整合 `dev@b61f87d804edcbb8202c16bfd17f9d8cd78bf115`（#751 鍛造）。JSON gate 合併兩項需求；bundle 由正式 build 重新生成。六圍 isolation fixture 載入正式 gem owner；裝備遷移、六圍、秘寶、鍛造、39 項 final Runtime 與 Cloud 投影測試通過。本輪本機 Chrome 被 socket EPERM 阻擋；沿用 PR Required Browser QA，不修改 Runtime／測試斷言。最新 Head CI、dev merge 與部署 SHA 尚待完成。main 排除。
+- CI run `36967841803` candidate `060082ed` 的全部 Node suites、build-sync 與 V2 production browser gate PASS；artifact `11210537162`（merge snapshot `a292b228`）JSON／CJK 畫面已核對。HIT-V2-01～08 = 8/8 功能 VERIFIED；此後僅更新驗收證據文件，正式 runtime tree 不變。最新文件 Head 必要 CI、merge 與 DEV deployed SHA 仍待完成。
+
+## 2026-10-01 — Water wild monster portraits batch 1 (candidate)
+
+- Remote work branch `feature/water-wild-monsters-batch1-20261001` was created from live `dev@bf07c2cdf63f4b358b3e3cbdbb8e012a95ed347e`; `main` and `assets-library` remain unchanged. This batch covers exactly ten water wild portraits and does not adopt water tower assets or the other ten normal sources.
+- Selected identities are `wild.zone-01..10.water-01`: 水靈狐、浪尾獺、澤木妖、沼鉤怪、潮蛙卒、鱗潭獸、瀾花姬、海蜇巫、霜鬃狼、玄潮俠. Each gameplay roster entry carries the explicit portrait key; the eight `water-02` registry targets remain planned.
+- Source authority is `assets-library@a27a9fd23192cfa82e2eafd69a831c7f980272ce` under `assets/inbox/英雄or怪物立繪/水元素/普通怪/`. Ten 1024×1536 transparent PNG Masters were converted to lossless WebP with no crop, resize or canvas change. Per-file SHA-256 and source mapping are recorded in `docs/qa/2026-10-01-water-wild-monsters-batch1.md`; PNG/WebP RGBA pixel difference is zero for all ten.
+- V154 remains the sole portrait resolver. Production manifest now exposes a `water` section for the ten existing water wild targets without mixing fire/wind pools. New exact-candidate browser QA decodes all ten and checks first frame, redraw and fire/wind isolation. Local static/image/build gates pass; PR CI, merge, exact DEV deployment and Android physical-device display remain pending. Requirement status is IMPLEMENTED / NOT COMPLETE, never VERIFIED from local or CI evidence alone.
+
+## 2026-10-01 — Physical recording continuation: manual all-target confirmation
+
+- Fresh base: `dev@91700938c6fbd54f0bdd7d75e10c3ade10367308`; branch `fix/battle-all-target-confirmation-recovery-20261001`. #728 remains integrated, and its gesture suppression owner, shared phased flood animation, original atlas, 1350ms duration and hit fraction are retained. main is excluded.
+- New physical recording `1000072376.mp4` (42.942s, 600×1280) shows repeated wind/water quickbar taps without declaration, followed later by a successful single-target water action. Full URL, device/browser details, deployed SHA and cache evidence are absent; the recording cannot prove it used the currently deployed bundle. The blue effect near the end cannot establish a Flood Beast/Boss acceptance result.
+- Direct contributing defect: #721 restored manual all-target confirmation in `prepareAction`, while `canSelectHostileBattlePrimary` still unconditionally rejected target type `all`. This prevented stormRain/iceArrowRain from entering confirmation mode at all. The original helper now accepts living all-target confirmation anchors, including stealth. Dead anchors remain invalid; hostile single/tri/row/column stealth restrictions and the separate full-group resolution remain intact. No added wrapper, touchend click, gesture owner or Boss patch.
+- `tests/battle-skill-declaration-owner.test.js` now uses the actual target helper instead of a permissive stub. New assertions first failed on stormRain against the base and then passed for three characters, stormRain/iceArrowRain, stealth/non-stealth anchors, no pre-confirmation submission, return/reselect, exactly one submission, dead-anchor rejection and retained single-target stealth rejection. Existing gesture lifecycle regression passes. The existing production-bundle native CDP suite now exercises both all-target skills, cancellation and single submission in ordinary and Boss sessions. Latest-head CI and deployed acceptance remain pending at this implementation commit.
+- Production app-shell is regenerated with the exact deterministic build concatenation; the unmodified reconstruction matches base Git blob `ad4fe1ee14df4e4fa5f37e7d504d3d4315d924bf`. New app-shell is `build/app-shell.120ef8d5549e.js`; root/build asset manifests and First Play hash/bytes are synchronized. The existing CI performs the full `npm run build:check`. Game/Cache remain 173.72.
+- TOUCH-01: DIAGNOSED/IMPLEMENTED; #728 INTEGRATED/DEPLOYED, this continuation pending integration/deployment. Other unsuccessful support/single taps in the video are not established as explained by this all-target defect. FLOOD-01: #728 DIAGNOSED/IMPLEMENTED/INTEGRATED/DEPLOYED, unchanged. Both remain physical-device NOT VERIFIED; Requirements 0/2 VERIFIED. Do not infer full symptom resolution from CI or CDP.
+- First PR CI 36842796753 passed build synchronization and native all-target declarations, then rejected a flood endpoint snapshot because the newly appended confirmation left the real next-character advance timer active. That animation evidence is discarded. The existing QA reset now clears this fixture timer before animation measurements and asserts advance=false, timer=null, phase=declare. Canonical endpoint assertions and per-snapshot animation disposal are retained; no animation Runtime change.
+
+## 2026-10-01 — Responsive Item runtime verification continuation (7/7 VERIFIED on deployed DEV; physical S23 Ultra pending)
+
+- Continues merged PR #726 from fresh `dev@8760a89eb505a1c9219dbd698047e1f8344be800` on `fix/responsive-window-runtime-verification-20261001`. Actual deployed desktop QA observed the INVENTORY kicker above the clipped shell and bottom equipment labels outside their shrinking panel. The deployed six-size browser acceptance now passes; physical S23 Ultra acceptance remains pending.
+- Runtime continuation absorbs `dev@67ebf68350f67f41b62cea21829d319a45f1281f` by normal merge, retaining #728 battle owners and both handoff records. Backpack, its existing entrances and item controls retire the duplicate legacy per-button ripple (`spawnButtonRipple`) whose browser-pixel geometry persisted across close/reopen inside the projected stage; shared V141 pointer feedback remains. Browser QA now records failed computed geometry and saves equipment/comparison/potion/material/chest/shop screenshots at all six sizes. Assertions remain strict. Screenshot review also found the material showing an enabled equip control: the core now uses its existing isEquipment decision for both presentation mode and control availability. Real-art screenshot review found chest-to-equipped re-entry retaining display:none on the unequip control. The original openEquippedItem owner now restores that control; browser QA asserts visible 脫下 after the chest path. These implementation-stage pending markers are superseded by the exact-head and deployed evidence below.
+- Normal merge now absorbs `dev@6e935a59f3aa71f4de497c7ed364a386e5fdf02a`. CI `36825378222` produced Chinese-font screenshots for all item/shop modes at 360×800, then failed because QA tried to remove a marker from a navigation button replaced by the canonical shell. Marker cleanup now handles retired nodes. Screenshot review additionally confirmed the native navigation paint plane covering long comparison actions: `setItemModalPresentationMode()` synchronously projects its semantic state through the existing `v148SyncContextNavigation()` owner, which hides its background shell while item mode is active and restores the source context on close. No size/coordinate owner changes. QA records hit-tests for all enabled item controls at normal and shortened heights. Final integration evidence is recorded below.
+- Existing `css/22-stage-v78-character-inventory-core.css` is the geometry owner: title stays in normal flow; character showcase does not shrink below its own three equipment rows; one inherited gap is used in both row placement and stage height; labels retain readable text. `css/24` now owns only scroll interaction, with duplicate shell/page/panel geometry removed. No new runtime wrapper, timer, observer or late size patch.
+- `tests/responsive-window-item-owner-convergence.test.js` keeps retirement contracts. Real production index/feature-loader/bundle, modes, native scroll, six mobile viewports, in-place resize, actual existing inventory entrance handlers, late feature styles and close/reopen are checked by `.github/scripts/run-responsive-item-browser-qa.mjs`. The existing skill QA external read-only transport/CDP support is shared without changing game Runtime. Missing Chrome fails the mandatory browser suite. CI and DEV deployment run this same suite; deployed checks require exact SHA and matching production manifest.
+- Legacy critical-UI assertions now forbid the retired skill-label compression guard and require the formal native label instead. This updates the test contract only; skill gameplay and UI Runtime are untouched. Game/Cache remain 173.72; main untouched. Exact-head CI, dev integration, exact-SHA deployment and deployed responsive acceptance now pass; physical Android acceptance remains separately recorded.
+- Final PR #729 Head `91ca3fb82b865f62da14a3df9c247612c545dab7`; required PR CI `36830421602` / job `110265514078` SUCCESS. PR merge snapshot `ef3e8abd023130e1f96c4e4fa02122b31a12fb59`. Item artifact `11147276827`: 6/6 viewports, 60 Chinese screenshots reviewed. Navigation artifact `11147008594`: three viewports / 48 context rows; native inventory swipe 40/28/28px and legal skill swipe 94/87/83px.
+- Normal dev merge `da95fceb5c6f08fc4ae5577760011602af513bef` has parents `6e935a59f3aa71f4de497c7ed364a386e5fdf02a` and final PR Head; tree `4092ab810115f7ea49311e32aa5b8b85e25dc862` equals the verified candidate. No main change, direct dev write, rebase, force push or git push.
+- Dev CI run `36831446075` attempt 2 / Repository checks `110269794722` PASS. Attempt 1's existing `ui-panel-browser-layout.test.js` Chrome fixture exited with no dumped DOM before geometry assertions; the unchanged failed-job retry passed. Required checks pass; the historical full Node suite is excluded by dev CI policy and `v173.25` historical assertions are not claimed as passing.
+- DEV exact deployment `da95fceb5c6f08fc4ae5577760011602af513bef` / deployment job `110271061581` SUCCESS; final release-manifest artifact `11147353517` reads `deployResult:SUCCESS`, `deploymentShaVerified:true` and this commit SHA; formal release-manifest SHA and Game/Cache `173.72` read back by the deployment gate. Deployed Responsive Item artifact `11148395785` reports `passed:true`, `environment:deployed-dev`, this exact SHA, six normal/short viewports and 60 Chinese screenshots. All ten capture families reviewed: backpack, equipment/comparison stress, real equipment/comparison, potion/material/chest and normal/short shop. Each viewport verifies four backpack footer controls and six existing entrances. Only external account transport uses the established read-only isolated QA seam; no player cloud writes.
+- Requirement batch `release/requirement-batches/2026-10-01-responsive-window-item-owner-convergence.json` is now 7/7 VERIFIED for deployed browser presentation. Bundles remain `build/gameplay-core.f80077fed10a.css`, `build/app-shell.cd59e458d64e.js`, `build/gameplay-core-secondary.0d245602adb8.js`; both asset manifests match. Original base `08d5c3cf6e327e3d9dda033dad4c42b7d66f2d64`, continuation base `8760a89eb505a1c9219dbd698047e1f8344be800` and normal absorption history are retained in the batch.
+- Navigation QA diagnosis: formal startup release notice intercepted the inventory touch. Its acknowledge control was outside 360×640 and, after native scrolling, covered by the native navigation at 393×873 (run `36829399402`, artifact `11146662697`, failure screenshot). This announcement geometry is outside this item task. The existing QA now selects the exact formal `closeHomeFeature()` header 返回 handler, requires native elementFromPoint hit, uses CDP mousePressed/mouseReleased and asserts modal closure. The hidden status-help button is not mistaken for 返回. No DOM click, artificial hiding, weakened item/scroll assertions or game notice/touch CSS edits. Failure screenshots are now uploaded by the existing workflow.
+- Physical S23 Ultra remains PENDING: true mobile Chrome browser-chrome/keyboard height changes, native touch and Android long-lived GPU compositing/paint behavior. Six emulated sizes and Actions Chrome `--disable-gpu` do not establish physical-device acceptance. Bulk acceptance checks presentation/reachability/large legal counts; unchanged reward/consumption settlement is not newly claimed as live player-cloud verification.
+
+## 2026-10-01 — Bottom navigation / Home scroll verified on dev
+- PR #727 merged to dev `5c2330b79e807ce92f5971488b1d9f12342521e6`; main unchanged. Source/build sync and whitespace checks PASS.
+- Exact PR head `c8c215e8f8d2089322fd29dbdac2f12682396a3b`, CI run `36821241683`: all required checks PASS; mobile navigation/home artifact `11143767076` passed all three viewports and 48 context rows.
+- Dev CI/deployment run `36821889706` PASS; actual release-manifest SHA matches dev. Eight live UI contexts share `#bottomNav` / `.native-bottom-nav-layer` in `#game-overlay-layer`: 526.5×105.3, bottom 936, five columns 105.3, icon frames 87.75 (screen pixels at current browser scale).
+- Home clientHeight/scrollHeight 653/653, scrollTop/document/viewport remain 0 after scrolling input; formal skill panel still scrolls (mobile native touch 94/87/83; deployed UI 936).
+- Four requirement rows VERIFIED. Full owner classification, lifecycle/fixture limitations and compatibility retirement condition: `docs/qa/2026-10-01-bottom-nav-home-scroll-convergence.md`.
+- This follow-up is documentation-only; its own latest-head CI and subsequent deployment must pass before final closeout.
+
+## 2026-10-01 — Navigation continuation against latest dev
+
+- PR #727 continues without rebase/force push; latest dev `67ebf68350f67f41b62cea21829d319a45f1281f` is merged into the candidate. Shared artifacts are regenerated from both source changes.
+- `showPage()` and `switchDungeonTab()` call the context projector synchronously; Abyss `refresh()` does the same. Core navMap, gameplay markGameplayNav, and V148 timer/observer navigation synchronization are retired. Existing quest-only wrappers/observer have no navigation responsibility.
+- Browser QA uses formal 24-slot paginated inventory and an actually overflowing skill panel for the single-finger scroll assertion. Final CI/deployed runtime evidence remains pending; no VERIFIED claim.
+
+## 2026-10-01 — Bottom Navigation / Home Scroll Owner Convergence (candidate)
+
+- Base `dev@08d5c3cf6e327e3d9dda033dad4c42b7d66f2d64`; branch `fix/bottom-nav-home-scroll-owner-convergence-20261001`. This is a Convergence/Replacement of the navigation shell and home scroll geometry; `main` remains untouched.
+- Canonical navigation DOM/lifecycle owner: `js/04-stage-v11-native-bottom-nav-runtime.js::FourSymbolsBottomNav`; sole geometry owner: `css/06-stage-v11-native-bottom-nav.css` in the 1080×1920 overlay. `js/42-v148-combat-dungeon-fixes.js::syncContextNavigation()` owns only context selection and items. Legacy `#mapPageNav`, dynamic `#v141DungeonNav`, V13 migration and V143 reparenting are retired, as are their geometry styles and the V30/V31R2 CSS scaling segment. No new temporary wrapper or geometry patch is intended.
+- Home scroll owner remains `#homePage`, now fixed overflow with content geometry compacted in `css/00-main.css` and duplicate bottom-nav reserve removed from `css/19-stage-v54-main-city-moderate-native-scale.css`. Browser measurements and final CI/deployment verification remain pending; this entry is not a VERIFIED claim.
+## 2026-10-01 — Battle Skill Touch / Flood Beast Direction（IMPLEMENTED candidate）
+
+- Started from live dev `08d5c3cf6e327e3d9dda033dad4c42b7d66f2d64`; incorporated responsive-window dev `8760a89eb505a1c9219dbd698047e1f8344be800` by a normal work-branch merge. No main/dev direct write, rebase or force push.
+- Touch owner remains `js/01-stage-v8-touch-lock.js`: completed gestures are keyed by pointer ID, expire after 1000ms, consume once, and retire on new pointer/lifecycle/detached target. Legacy MouseEvent ambiguity clears on next down. Cancel, leave, multi-touch and keyboard activation have explicit behavior; the 10 CSS px slop is unchanged. The node-only unbounded `suppressedTargets` list is removed.
+- Manual declaration owner is `js/00-main.js::prepareAction()` for all three roles. V141 support-skills wrapper is removed; all roles share learned/equipped/SP/auto/phase checks. V148 Purify target projection runs from the existing ally selection hook, not a prepareAction wrapper.
+- V143 remains the raster owner; V142 timing and fixed-slot geometry are unchanged. Reviewed 1536×1152, 4×3 sheet SHA-256 `bfb1a3520a5bb95104e98d3dc6d2b3d1d6c9b2bb686b6e64a0f4840e6fcc7327`: frames 1–2 cast upright at caster; 3–5 right-facing flight; frame 6 downward-facing flight corrected by 90 degrees; 7–12 upright impact/dissipation at target. Existing 1350ms and frame-eight hit are retained. `motionPhases` supplies one V143 Web Animations transform track; CSS owns only frame/opacity for that path. Other skills keep their existing travel mode. Disposal cancels the motion track. No assets were altered or derived.
+- Targeted gesture, three-role declaration and water raster regressions pass locally; two historical Water tests were aligned to the existing V173.64 data owner (no gameplay data change). Build/build:check and diff check pass.
+- Existing CI browser owners now include native CDP touch recovery and full-production battle skill/phase/target/hitbox checks plus both-side/three-column phased-motion screenshots embedded in the existing JSON artifact. PR #728 CI run 36817872202 at head 4118d8ca21968bd95e89ab6555725c3817c2b090 passed native CDP touch declaration/return/drag/cancel/exact-once target, support, hitbox and guard checks. Screenshot review then rejected the multi-target animation evidence because the fixture reused the V142 same-actor/name gate. The QA owner now disposes each isolated cast and checks its endpoint against the current canonical target; replacement head 8456de3ec786bbf0e65322249faaa7cf1a428102 is under fresh CI. Final integration/deployment evidence will be recorded on PR #728 after execution, not inferred from this earlier green run. Local browser checks remain unavailable (no Chromium). Physical S23 Ultra validation is pending; recording SHA/cache remain unknown. Do not call the contributing causes the sole complete root cause or mark VERIFIED.
+- Known unrelated baseline tests also failed locally: V141 inventory grid snapshot and V143 skill-label CSS snapshot. They were not weakened. Exact PR CI, merge and deployment evidence must be recorded only after actual execution.
+
+## 2026-09-29 — Bug Repair DoD / Owner Convergence Gate 永久規範
+
+- 新增永久專項契約 `docs/BUG_REPAIR_DOD_OWNER_CONVERGENCE_GATE.md`；所有 Bug／fix／failure／regression 與「是否已修好」判定都必須遵守。
+- 專案負責人只決定產品／遊戲結果；Owner、Patch、Wrapper、Lifecycle、CSS、Test、資料來源與舊實作退場由代理依專案證據負責判斷。若實作方式會造成多 Owner、Patch 疊加、資料風險或不可維護架構，代理必須主動阻止並改採安全實作。
+- Bug 狀態固定區分 DIAGNOSED → IMPLEMENTED → INTEGRATED → DEPLOYED → VERIFIED；只有 VERIFIED 才能回報 FIXED／RESOLVED／已修好。
+- 同一玩家症狀修復後仍重現時，不得繼續疊局部 Patch；第三次施工前必須回查前兩次修法並執行 Subsystem Convergence Audit。
+- 此規則已掛入 AGENTS、CLAUDE、ARCHITECTURE_RULES、AUTONOMOUS_REPAIR_CONTRACT 與 CHANGE_SAFETY_REPLACEMENT_CONTRACT，後續新對話不得略過。
+
+## 2026-09-28 — Change Safety / Replacement Migration 永久工程把關規則
+
+- 專案負責人明確要求：本人不需懂程式或自行判斷舊 CSS／DOM／函式／Wrapper／Test 是否該刪；其責任是決定遊戲、UI、系統與玩法要變成什麼樣。所有開發代理必須主動承擔工程風險把關與舊版本退場判斷。
+- 新永久契約：`docs/CHANGE_SAFETY_REPLACEMENT_CONTRACT.md`。任何新增／修改／替換／重構／修 Bug 前都必須先分類 Additive／Replacement／Convergence／Removal。
+- 「改成／換成／不要原本的」預設視為 Replacement，不得把 C 疊在 A/B 上後用 `display:none`、`animation:none`、`!important`、Wrapper 或 late patch 壓住舊實作就宣稱完成。
+- 每次變更必須一起檢查 Owner、Contract、Lifecycle、Semantic State、Regression Test；若舊實作仍承擔其他責任，先遷移責任再退場。
+- 代理發現雙 Owner、多份真相、狀態語意混用、Lifecycle 缺口、舊 Test 保護取消行為或一人團隊維護成本風險時，必須在施工前主動提醒並給出正常工程順序，不得等 Bug 發生後才解釋。
+- 完成定義包含舊版本退場：新版能運作本身不等於完成。此規則已掛入 AGENTS、CLAUDE、ARCHITECTURE_RULES 與 AUTONOMOUS_REPAIR_CONTRACT，後續新對話不需使用者重貼全文。
+
+## 2026-09-27 — Same-head canonical recovery transaction (candidate; Phase 4 0/6 VERIFIED)
+
+- Internal `functions/src/canonical-current-recovery.js::restoreCurrent()` repairs only the current first-character server-created revision from its complete sealed archive. It requires an active UID session, exact envelope revision and a matching, unexpired, server-only operator approval. In one Firestore transaction it refuses unexpected source documents, recreates missing sources, advances the complete claim set and account to a new revision, creates an unpublished snapshot and archive, consumes approval and writes operation/audit receipts. Original claim and operation history is retained; replay resolves its receipt.
+- No public recovery callable, approval issuance endpoint, playable pointer or old-revision rollback is enabled. An operator approval must be created by a separately authorized server process; the module cannot restore without it. Same-database archives do not prove independent backup or disaster recovery. Phase 4 remains 0/6 VERIFIED; PR, CI and exact deployment evidence are pending.
+
+## 2026-09-27 — Atomic protected daily check-in settlement (candidate; Phase 4 0/6 VERIFIED)
+
+- `functions/index.js::claimDailyCheckin` verifies Firebase identity and the active game session. Its request accepts only UID, session and expected server revision. The backend freezes a Taipei calendar day, derives the existing 50-gold check-in grant and deterministic operation ID, then `functions/src/canonical-resource-credit.js::claimDailyCheckin()` commits the grant, receipt, unique claim, claim record/checkpoint, ledger, canonical economy/source revisions and unpublished snapshot in one Firestore transaction. A failed transaction leaves none of those writes; a lost response retries the same receipt without paying twice. The earlier internal `daily-checkin-grant.js::issue()` remains a server-only reservation helper and is not required by this atomic path.
+- `functions/src/session-authority.js::runProtected()` remains the session gate. No client amount, local check-in flag, battle result or character snapshot becomes authoritative. No browser/UI hook, gameplay save wrapper, published pointer, legacy adoption or second-device restore is added. The deployment allowlist includes this callable only after PR checks. Kill/win quests remain blocked on trustworthy battle events.
+- PR, merged HEAD, CI and Firebase deployment evidence must be checked separately. Phase 4 remains **0/6 VERIFIED**.
+
+## 2026-09-27 — Server-owned daily check-in grant source (candidate; Phase 4 0/6 VERIFIED)
+
+- Internal owner `functions/src/daily-checkin-grant.js::issue()` derives the `checkin` quest's existing 50 gold award and Taipei calendar day from the server clock. A protected transaction creates one UID-scoped `pendingGrants/daily-checkin-YYYYMMDD` record, or validates the same record on retry. A transaction retry keeps its original day; a corrupt duplicate fails closed. No browser day, reward amount, battle result, or local quest counter is accepted.
+- The existing `reserveTrustedGrant()` and `canonical-resource-credit.js::creditReservedGrant()` remain the only reservation and canonical settlement owners; the emulator exercises the new grant through both steps, claim record and unpublished snapshot. This issuer has no callable or gameplay hook, and is not a player-visible cloud reward. Kill/win quest rewards still lack a trusted battle source. No save wrapper or temporary patch is added.
+- PR, CI, merged-HEAD and deployment evidence must be recorded separately after verification. The playable pointer stays disabled; Phase 4 remains **0/6 VERIFIED**.
+
+## 2026-09-27 — Canonical one-level EXP allocation (candidate; Phase 4 0/6 VERIFIED)
+
+- New internal owner `functions/src/canonical-exp-allocation.js::allocateSharedExp()` spends only the server-owned shared EXP pool for the first server-created character. One protected operation buys exactly one next level using the current game's cost and growth rules. It commits character/economy/source revisions, an unpublished snapshot, a UID-scoped operation receipt and a ledger entry atomically; retries return that receipt.
+- The module has no callable export, browser cost/stats input, local `saveGame()` hook, inventory handling or legacy adoption. It cannot publish a playable snapshot and does not establish a backup or restoration point. Phase 4 remains **0/6 VERIFIED**; PR/CI/deployment evidence is pending.
+
+## 2026-09-27 — Trusted EXP pool settlement (candidate; Phase 4 0/6 VERIFIED)
+
+- Internal resource settlement owner is `functions/src/canonical-resource-credit.js::creditReservedGrant()`, evolved from the prior gold-only owner. It credits only a backend-issued gold or EXP grant already reserved under the active UID session and expected revision; EXP enters `economy.sharedExp` and does not level a character. `functions/src/trusted-grant-ledger.js::reserve()` remains the single public entitlement reservation owner. The browser cannot submit kind or amount.
+- The operation commits a new unpublished source snapshot, unique claim, ledger, receipt and envelope revision together. No callable settlement endpoint, battle-reward authority, local `saveGame()` change, playable pointer or legacy admission is added. `authoritativeStateReady:false`, `readyForPublication:false`; Phase 4 remains **0/6 VERIFIED**. Verification and deployment evidence belong only after completed checks.
+
+## 2026-09-26 — First trusted gold credit transaction (merged / deployed; Phase 4 0/6 VERIFIED)
+
+- PR #605 started from `dev@ec0de75b76e1b6f18ded1a776961cb5408c4380b`, final head `db296cff327ee92445b0ae04bd9d6a5a1242d904`, merged to `dev@1ee74aac6db0dd722201ab815dd2c479cfefc83a`; `main` unchanged. PR Repository checks `36251428353` and Session Authority `36251428154` succeeded. Merged Repository checks/DEV exact-SHA preview `36251732321` and Session Authority emulator/Firebase deployment `36251732172` succeeded.
+- Internal owner `functions/src/canonical-gold-credit.js::creditReservedGrant()` uses the existing protected session transaction to verify a server-issued reserved gold grant and prior first-character source snapshot, then atomically updates economy, all source revisions, a new unready snapshot, unique claim, ledger, receipt and envelope. It rejects stale revision, missing/corrupt sources, duplicate claims and non-initial character state. Existing `reserveTrustedGrant()` returns the credited receipt on a lost-response retry only if claim and ledger still agree. The Firestore emulator verified rollback, credit and both retries. No callable export or browser amount/balance input was added.
+- Canonical snapshot SHA-256 now orders map keys deterministically before hashing because Firestore may return map fields in another order; the stored JSON size check remains independent. `authoritativeStateReady:false` and `readyForPublication:false` remain. The only live deployed functions are the pre-existing endpoint allowlist; this internal transaction is not a player grant path.
+- Deployment read `(default)` Firestore `asia-east1` and `POINT_IN_TIME_RECOVERY_ENABLED`; scheduled backups were `UNVERIFIED` to the deploy identity. First completed backup, restore rehearsal, full mutation coverage, legacy admission and second-device playable recovery remain unverified. Phase 4 remains **0/6 VERIFIED**.
+
+## 2026-09-26 — Foundation B initial source and Firestore transaction (merged / deployed; Phase 4 0/6 VERIFIED)
+
+- PR #603 from `dev@c8acbf29b488fbe7d723dc5c29d9a69f813712aa`, source `ab1b2c4f11c911e562efabe7eb40f532a00f25d8`, merged to `dev@83ee38aa02439fb663d8a59c23c130c59fd21a44`; `main` unchanged. PR Repository checks `36249670805` and Session Authority `36249670668` succeeded. Merged Repository checks/DEV preview `36249942057` succeeded with deployed SHA verified; merged Session Authority emulator/Firebase deploy `36249941912` succeeded from that same SHA.
+- Internal owner `functions/src/initial-character-sources.js::makeInitialCharacterSources()` creates complete new-account sources from validated name, element, gender and exactly ten assigned attribute points. `functions/src/canonical-source-writer.js::commitInitialSources()` is still internal and runs under `session-authority.js::runProtected()`; the operation receipt binds the choices. No callable, local `createCharacter()` or `saveGame()` hook, playable pointer, legacy adoption or grant was added. `readyForPublication:false` and `authoritativeStateReady:false` remain mandatory.
+- Existing Session Authority workflow now exercises the internal writer with actual Firestore emulator transactions: stale revision, forced precommit rollback, atomic first write, identical replay, altered replay and migration-candidate conflict. This is verified server transaction behavior, not a live player character write. No wrapper or temporary runtime patch was added.
+- Deployment read `(default)` Firestore region `asia-east1` and `POINT_IN_TIME_RECOVERY_ENABLED`; scheduled backups remained `UNVERIFIED` to the deploy identity. No completed backup object, restore rehearsal or game-level recovery point was verified. Phase 4 remains **0/6 VERIFIED**. Next practical gate: backend-owned ongoing character/economy/claim mutations and recovery readiness before any publication or second-phone character restore.
+
+## 2026-09-25 — Cloud Phase 4 historical-reward proof gate (merged / deployed; 0/6 VERIFIED)
+
+- Latest verified integration base and current `dev`: `727279ee0653803c07179e0ff43a1a1b2cb992f8`. `main` was not modified. PR #572 (read-only candidate screening), PR #573 (original-device immutable local backup) and PR #574 (this reward-claim gate) are all merged into `dev`.
+- PR #574: `feature/cloud-phase4-reward-proof-gate-20260925` → `dev`; PR head `a18ed111c4d7b9ce7de20b432e1e02ed2b62b4c9`; merge SHA `727279ee0653803c07179e0ff43a1a1b2cb992f8`. It passed PR CI `36155223164` and Session Authority `36155222413`. The merged `dev` checks also passed: CI `36155708169` (Repository checks, DEV exact-commit deployment and deployed live QA) and Session Authority `36155707692` (emulator/account-boot gates and Firebase deployment).
+- New owner `functions/src/legacy-reward-claim-audit.js` is a pure fail-closed audit over historical main-save claim records: daily quests, commissions, achievements, tower floors and Abyss chest/first-clear claims. Its only permissible interpretation is `block_historical_claims_only`: an historical client-side claim may later prevent a duplicate claim, but cannot create a grant entitlement, change gold/EXP/inventory, or establish authoritative character state.
+- `functions/src/legacy-candidate-screening.js::screenLegacyCandidateSnapshot()` includes the audit in the existing read-only protected preflight. It returns source-specific `*_CLAIM_RECORD_INVALID` blockers for missing, malformed or contradictory records; it remains `readyForAcceptance:false` and still requires `SIDECAR_BACKUP_MISSING`. The callable writes no migration marker, ledger, character, economy or restore state.
+- Tests added: `tests/cloud-save-legacy-reward-claim-audit.test.mjs` and updated `tests/cloud-save-legacy-screening.test.mjs`. Local `node --test tests/cloud-save-*.test.mjs` passed 6/6 and `git diff --check` passed before PR; the CI emulator also passed `tests/cloud-save-*.test.mjs tests/firebase-trusted-cloud-save-backend.test.mjs`.
+- Original-device preservation remains local-only through `FourSymbolsAccountSave.createMigrationBackup(uid)`: exact UID main-save bytes, metadata and registered sidecars are preserved immutably; it never uploads, rewrites or promotes gameplay data. There is no phone data submitted by this work.
+- **Do not claim cross-device character restore, authoritative cloud character, or Phase 4 completion.** Phase 4 remains **IN PROGRESS / 0/6 VERIFIED**. Browser gameplay state (gold, EXP, inventory, equipment, rewards) is still not authoritative.
+- Next engineering milestone: design and implement the complete original-device evidence upload and one-time admission transaction. It must use the immutable backup reference, complete main + sidecar evidence, active UID session, server revision and operation ID; validate schema/equipment/claim records; write a unique migration marker plus non-granting historic claim blocks and a separately marked `grandfathered-unverified-history` baseline; and stay non-playable until every future high-value reward writer has a trusted server-issued receipt/ledger path. Do not upload/proceed automatically and do not add a second-device restore before this is fully verified.
+
+## 2026-09-25 — Legacy baseline policy and cloud-authoritative startup guard (candidate)
+
+- Base `dev@0c9e440c303306857b86c1a52c7de3be012a507a`, branch `fix/cloud-authority-startup-conflict-20260925`. Owner `js/52-v173.20-startup-loader.js::resolveSaveFor()`; UID local cache owner `js/startup/account-save-repository.js`; `js/00-main.js::saveGame()` still has a later relic wrapper in `js/60-team-relic-system.js`. No save wrapper or temporary patch added. `DATA_SECURITY_CONTRACTS.md` does not exist at this base.
+- Owner approved one-time historically unverifiable legacy progress as an explicitly marked starting baseline, subject to backup, anomaly review, claim safeguards, and subsequent backend-controlled grants. See `docs/CLOUD_CHARACTER_AUTHORITY_MIGRATION_DESIGN.md`; chat policy consent does not upload or promote a particular phone save.
+- Fixed the forward-looking boot authority gap: a local save differing from a future cloud character blocks and preserves both copies even if its `cloudBaseFingerprint` matches. Only an identical UID cache may load the cloud snapshot. Targeted branch tests are in `tests/cloud-save-authoritative-startup-conflict.test.mjs`.
+- `js/00-main.js::persistBeforeSuspend()` now runs its existing `saveGame()` only after Startup enters READY/OFFLINE_READY. A blocked cloud conflict must not serialize unhydrated memory over the original UID local candidate on pagehide/freeze. The existing Team Relic later wrapper remains; no new wrapper or temporary patch.
+- Still no playable cloud character, trusted reward operations, full restore or second-phone acceptance. Phase 4 IN PROGRESS / 0/6 VERIFIED, Game/Cache 173.72, main unchanged. PR/CI/DEV SHA remain to be verified.
+
+## 2026-09-24 — Cloud Save Phase 3 UID 本機隔離／登入載入（COMPLETE / 6/6 VERIFIED）
+
+- Base：`dev@9a7b702303d22a20f80a20ca732a6953003b38a1`；工作分支：`feature/cloud-save-phase3-uid-local-isolation-20260924`；`main` 全程禁止修改。
+- 真正根因不是 canonical save key：主存檔已有 UID namespace 與 active-UID write guard；風險在同一 document 直接換 UID 時，player／inventory／equipment 等 module globals 與多個 app-shell/gameplay sidecar key 仍綁定前一 UID。
+- Startup State Machine `js/52-v173.20-startup-loader.js` 新增唯一 `reloadForAccountTransition()`：Auth 登出或 UID 改變時，先作廢舊 async resolution、deactivate save owner、移除上一帳號的 session resume marker、隱藏創角／gameplay，再完整 reload。新 document 才解析新 UID 並重新建立所有 sidecar owner。
+- 不新增 save wrapper、第二套 Startup owner 或 vXXX patch；`account-save-repository.js`、`FourSymbolsGameSave`、Firestore readonly reader 與 Phase 2 Envelope 不改。訪客資料不自動合併至 Google／Email；legacy migration 仍只允許明確確認。
+- 新增 `tests/cloud-save-phase3-uid-local-isolation.test.js`，並與 account ownership、auth-before-creation 加入 PR→dev 必跑 CI；既有 Boot browser QA 已具 UID A→登出→UID B 完整隔離案例，將作 deployed candidate 自動證據。
+- 本機 Phase 3／ownership／auth-before-creation／boot／startup／V173.65 auth regressions 全數 PASS；deterministic build 與 `build:check` PASS，`git diff --check` PASS。完整 `npm test` 在 12/212 時只因 runner 無 Chrome/Chromium 停止；未冒稱 full suite 通過，browser QA 留待 PR CI。
+- PR #557 candidate `9ad52534cf154d4f3a470afc8f71eb17a8c19371` 的 Repository checks run `35999834624` SUCCESS，包含 Phase 3 targeted tests 與 Boot browser UID A→登出→UID B 隔離；合併 `dev@eed8dec359eff34727381adfbfa50b7c2ea09bd3`。
+- DEV release manifest 已讀回 exact merge SHA、Game／Cache V173.72；部署頁引用 `boot-core.d8fbf40b153e.js`，bundle 內 Phase 3 transition owner 正確存在。
+- 使用者真實手機驗收 PASS：Google → 訪客未看見 Google 角色／資料；訪客 → Google 後原角色／資料正常恢復。Requirement Batch 已升級 6/6 VERIFIED，Phase 3 COMPLETE。
+- `DATA_SECURITY_CONTRACTS.md` 仍不存在；本次只依既有 Boot／System／Cloud progress 契約施工，未自行假造缺失契約。
+
+## 2026-09-24 — 四象塔 Element Owner／6・10 人陣形／Small Boss 收斂（VERIFIED candidate）
+
+- Base：最新 `dev@ae3bfba3d75c7c40bb4eea07860f525351ffd658`；工作分支：`fix/tower-element-formation-small-boss-20260924`；PR #552 → `dev`；`main` 全程未修改。
+- 四象塔元素／固定技能唯一玩法 Owner 收斂於 `js/gameplay-boss-tower-system.js`；V141 `rebalanceDungeonElements()` 已退休，Daily／Tower／Boss／Adventure／Abyss 共用 launcher 以正式 `v132ActiveDungeonRun.mode` 區分身分。
+- V144 為 Monster Skill Element Guard 唯一 Owner：一般元素怪 Attack／Support／Heal／Buff／Debuff／Hard Control 只能從本元素正式攜帶 ID 選招；Abyss 真正跨元素例外以 `v144CrossElementSkillIds` 明確 allowlist。
+- Tower 一般層固定 6 名（B2/B3/B4 + F2/F3/F4）；5 的倍數特殊層與 10 的倍數 Boss 層固定 10 名。Boss 層 B3 是唯一 Tower Boss；非 Boss 特殊層 B3 優先 Elite；死亡後 Slot 不重排。
+- Tower Boss gameplay rank 保留 `boss`，但為 `unitKind="tower-boss"`／單格 B3；不進 Personal／World 的 Large Boss footprint、B1/B5 援軍、F1/F5 object、Shield／Mechanism lifecycle。
+- `config/monster-portrait-registry.json` 的 8 個 `tower-boss` target 保留 rank=boss，sizeClass 改 standard（1024×1536、2:3）；素材目前仍是 planned，本次未產圖、未建假檔。
+- 技術債已移除：V141 broad element rebalance、Tower large-boss object/summon plan、V152 極帝名稱式技能 dispatcher、V152 全域 monster loadout mutation；V149 追擊與 V158 Daily solo protection 僅保留 action-scoped 暫存/還原用途，不是永久 Owner。
+- 專項 `tests/tower-element-formation-small-boss-20260924.test.js` 已加入 PR→dev 必跑 CI；PR CI run `35978931166` 的 source candidate `a7ba91b90debd18ee246eca142c447363509a5ad` Repository checks SUCCESS，包含專項、Boss/Abyss/Fixed Slot/battle/VFX targeted regressions、deterministic build:check、Fixed Slot 9:16、exact-candidate real battle、Adventure mobile QA、resources、loader、Release Gate 與 git diff。
+- Full Node Suite：PR→dev workflow 依契約跳過；不得誤報為已跑。必跑 targeted Node／integration suites 全部 PASS。
+- Requirement Batch：`release/requirement-batches/2026-09-24-tower-element-formation-small-boss.json` 已 VERIFIED。
+- `DATA_SECURITY_CONTRACTS.md` 在本次 Base 仍不存在；本次未修改帳號、Cloud Save 或安全資料 schema。
+
 ## 2026-09-23 — Lv10 技能／輔助技能／秘寶 Runtime Owner 收斂（VERIFIED candidate）
 
 - Base：`dev@9d32e8cb022ff824e83d5dc3022f2e0a24c8d58a`；工作分支：`fix/skill-relic-runtime-owner-convergence-20260923`；`main` 未修改。
@@ -4241,3 +4521,153 @@ Chromium 架設測試環境，實際操作到出問題的畫面、量測 compute
 - Production build commit：`7567aa216fba3f32e92792ea9dac317ff9f8d942`。Verified source candidate：`1596ea0a36e564facca92432376775d9728bc0fe`。
 - GitHub Actions Repository checks run `35866039901`：SUCCESS。包含 Syntax、Battle Runtime Architecture Guard、專項／既有 battle regressions、production build synchronization、Fixed Slot 9:16 mobile browser QA、exact-candidate real battle mobile browser QA、Adventure mobile QA、static resources、release gate 與 `git diff --check` 全部通過。
 - Requirement Batch：`release/requirement-batches/2026-09-23-battle-ui-hit-status-owner-convergence.json` 已升級為 VERIFIED。
+## 2026-09-24 — Cloud Save Phase 2 Server-owned Envelope（COMPLETE / 6/6 VERIFIED）
+
+- Base：最新 `dev@e9a2f481d5a318050991d475201f359d694871cc`；工作分支：`feature/cloud-save-phase2-envelope-20260924`；`main`／`dev` 均未直接修改。
+- Phase 1 Single Active Session 維持 5/5 VERIFIED。Phase 2 唯一 Envelope owner 新增於 `functions/src/cloud-save-envelope.js`；public `users/{uid}/saves/current` 使用 schema Version 2、server-owned Revision、server timestamps 與嚴格狀態驗證。
+- `bootstrapCloudSave`：新 envelope 從 Revision 1 建立；重複呼叫不亂增 Revision／updatedAt；既有 Phase 1 Version 1／Revision 0 精確骨架受控升級。任意 owner/schema/revision/timestamp/status 損壞一律 fail closed。
+- `submitLegacyMigrationCandidate`：仍只保存 `trusted:false` candidate；metadata 改變與 active Session 驗證同一 transaction，`serverRevision` 原子遞增。Phase 2 不產生正式 gameplay payload、不升格本機資料。
+- PR #553 已合併 `dev@195acb63d4acd36ceada31ed95b5f50e448d297f`。PR CI `35987380366`／Session `35987380024`、merged dev CI＋DEV deploy `35987880895`、Session emulator＋Firebase deploy `35987880460` 均 SUCCESS；正式 deploy job `107595824436` SUCCESS。
+- 最小 live 驗收 bridge 為 `FourSymbolsFirebase.bootstrapCloudSave()`；不自動呼叫、不改 first-use read owner、不傳 local gameplay save。真實 Google 帳號已在手機 Chrome 驗證 Version 2、Revision 1 與重複 bootstrap idempotency；Requirement Batch 現為 COMPLETE / 6/6 VERIFIED。Phase 3–10 未開始。
+- 為無電腦的真實裝置驗收，DEV 帳號面板新增手動「驗證雲端存檔骨架」按鈕；它連續 bootstrap 兩次並讀回 envelope，只顯示 Schema／Revision 結果，不顯示 credential、不送 local save。使用者已以原 Google 帳號在完整手機 Chrome 取得 `Schema V2、Revision 1` 成功結果；ChatGPT 內建瀏覽器的 Google OAuth 未完成不視為後端失敗。PR #555 合併 `dev@b037ced9dad9d1cf67d9aacccb4e064c74a135e1`；merged dev CI `35992274605`、Session Authority／Firebase deploy `35992274447` attempt 2 均 SUCCESS。
+## 2026-09-24 — Cloud Save Phase 4 一般進度遷移啟動（IN PROGRESS / 0/6 VERIFIED）
+
+- 最新基準 `dev@d8986afa62f0c1f2646fad1f4d1ca73b2be389f6`，工作分支 `feature/cloud-save-phase4-general-progress-20260924`；`main` 禁止修改。
+- `docs/CLOUD_SAVE_PHASE4_CONTRACT.md` 先記錄現有 owner、存檔欄位獎勵耦合、revision／session／UID 保護、衝突與驗收條件；Requirement Batch `release/requirement-batches/2026-09-24-cloud-save-phase4-general-progress.json` 為 TODO / 0/6 VERIFIED。
+- 初始設計盤點時沒有修改 Firebase callable、Firestore rules、Gameplay save／Boot owner，也沒有上傳、刪除或重寫任何玩家存檔；當時未建立 PR、未部署、未作真手機驗收。**Phase 4 NOT COMPLETE**。
+- 本輪後續使用者同意保守方向，工作分支草稿 PR #559 已建立；候選實作新增 `functions/src/cloud-preferences.js` 白名單、`functions/index.js::saveCloudPreferences` Session＋revision 交易、`js/firebase/firebase-cloud-save.js` 的 UID 本機設定提取、帳號面板 DEV 手動驗證／取回、`js/00-main.js::restoreAutoBattlePreferences` 同 UID／同角色 ID 恢復。僅設定，不含金幣／角色／獎勵；此為新增候選狀態，前一行記錄的是 PR 建立前的起點。未部署、未實機驗收，仍 **NOT COMPLETE**。
+- 下一步先完成逐欄獎勵審核；可信的局部一般進度才可在受保護後端交易提交／恢復。`gameplayProgress` 的 Boss 首通與四象塔已領獎紀錄不可當一般無害資料直接上傳；無法在 Phase 4 獨立判定的欄位保留至 Phase 5，不得以客戶端整包存檔填入權威 envelope。
+## 2026-09-25 — Cloud Save legacy candidate history (candidate)
+
+- Base: `dev@5c4ae26b0ec2f4d9ecec47c1289d5d6ad1002185`; owner: `functions/index.js::submitLegacyMigrationCandidate()`; existing `functions/src/session-authority.js::runProtected()` and `functions/src/cloud-save-envelope.js` remain the authority gates. No `saveGame()` wrapper or client restore owner changed. `DATA_SECURITY_CONTRACTS.md` remains absent at this baseline.
+- Each new untrusted migration candidate is created under private `serverUsers/{uid}/migrationCandidates/{revision}` in the same transaction as `latest` and the envelope. Same fingerprint retries are idempotent; distinct submissions retain the rate limit and create a new revision. Metadata inconsistencies fail closed. Existing previously overwritten candidates cannot be recovered from this change.
+- This is a candidate retention step only. No client auto-upload, no character authority promotion, no gameplay rewards or restore. Phase 4 remains 0/6 VERIFIED; Game/Cache remain 173.72; `main` untouched. PR/CI/merge/deploy results must be recorded separately when available.
+
+## 2026-09-25 — Server-issued grant reservation candidate
+
+- Base `dev@2f88b6e67135f5d0cabbf0c9a048fb5d437a5f11`. Owner `functions/src/trusted-grant-ledger.js::reserve()` behind `functions/index.js::reserveTrustedGrant`; existing Session owner `functions/src/session-authority.js::runProtected()` and Envelope owner `functions/src/cloud-save-envelope.js` are reused. No `saveGame()` wrapper or temporary patch. `DATA_SECURITY_CONTRACTS.md` is absent at this base.
+- Accept only a private server-issued grant ID, operation ID and expected revision. Protected transaction reserves a unique grant and creates a private receipt; retries return the same result. No client-supplied amount, balance mutation or authoritative playable character. Explicitly `creditedToCharacter:false` until a later complete economy/character operation consumes the reserved receipt.
+- Phase 4 remains 0/6 VERIFIED, Game/Cache 173.72, `main` untouched. This is a prerequisite with no player-facing restore or phone acceptance; CI/emulator/DEV/Firebase deployment evidence must be checked after PR.
+## 2026-09-25 — Private legacy candidate screening (candidate)
+
+- Base `dev@45bd836380d4e5f416b9377fdefed8be0d9bfde3`, branch `feature/cloud-legacy-baseline-admission-20260925`. Backend screening owner `functions/src/legacy-candidate-screening.js::screen()`; callable entry `functions/index.js::screenLegacyMigrationCandidate`. It reads the existing private candidate written by `submitLegacyMigrationCandidate` in `sessions.runProtected()`, checks envelope/candidate revision and UID, then returns blocker codes. No gameplay save wrapper, temporary patch, public payload, client button or authoritative character writer is added. Existing `js/60-team-relic-system.js` save wrapper remains out of scope.
+- Screening is read only and always `readyForAcceptance:false` while historical reward provenance and backed-up claim-bearing sidecars are absent. It neither changes revision nor approves migration. Pure tests pass; emulator CI, PR, merge and DEV verification remain pending. Phase 4 stays IN PROGRESS / 0/6 VERIFIED. `DATA_SECURITY_CONTRACTS.md` is absent; no fabricated contract was used.
+
+## 2026-09-26 — Read-only legacy character conversion draft (candidate)
+
+- Owner remains `functions/src/legacy-candidate-screening.js`: `screenLegacyCandidateSnapshot()` validates sources and `prepareLegacyCharacterDraft()` derives an internal review draft from a complete candidate. The existing `functions/index.js::screenLegacyMigrationCandidate` entry and `runProtected()` session/revision gate remain in place. The late `js/60-team-relic-system.js` save wrapper is an input source only; no new gameplay wrapper or temporary patch was added.
+- The draft preserves three character slots, economy, bag objects and separately equipped objects with source paths, skills, relics, progress and claim-bearing sidecars. The callable exposes only status and counts. It never provides canonical IDs, a trusted baseline, award or playable snapshot; `authoritativeStateReady:false` and Phase 4 0/6 remain. PR/merge/deploy status must be verified separately.
+- Next source-completeness slice: `functions/src/cloud-save-policy.js::LEGACY_BACKUP_SIDECARS` owns the 14-key server backup inventory; `functions/src/legacy-candidate-screening.js::prepareLegacyCharacterDraft()` retains each exact raw sidecar or explicit missing marker and retains every allowlisted main-save field, including fields not yet mapped to canonical records. Claim blockers remain in force even when a review draft can be constructed. No new wrapper, authoritative writer, reward mutation or temporary patch is introduced. PR/CI/merge/deploy evidence remains pending until verified.
+- Historical claim reconciliation candidate: `functions/src/legacy-reward-claim-audit.js::auditLegacyRewardClaims()` additionally parses the quest milestone sidecar and compares the Abyss sidecar's reward/first-clear claim entries against the main-save mirror. `functions/src/legacy-candidate-screening.js::screenLegacyCandidateSnapshot()` passes the sealed sidecar inventory to that owner. Contradictory claims block draft preparation; no gameplay writer or wrapper changes. The audit does not prove historical reward entitlement or replace server claim receipts.
+
+## 2026-09-26 — Foundation B verified boundary and relic projection
+
+- PR #594 merged at `c5995ac04ca8a80704c5dfb1fce4eec2a4028d41`; #595 at `a58ec250e5af6616a898f7e9b26b652c945d51f0`; #596 at `74af409090402bb68ec74db7d3be094af922f0f8`; #597 at `74815ccdd15c57062b6b1184bb4e2a62a7a8c38d`; #598 at `0deda585dda43bd08f531fe957237920fd301735`. For #598, merged SHA CI `36243201543` (Repository checks and DEV preview) and Session Authority `36243201415` (emulator and Firebase deploy) completed successfully. These are read-only prerequisite slices; Phase 4 remains 0/6 VERIFIED.
+- The next candidate keeps `functions/src/legacy-candidate-screening.js::screenLegacyCandidateSnapshot()` as the structural gate and `functions/src/canonical-character-review-plan.js::buildCanonicalCharacterReviewPlan()` as the private conversion owner. The late `js/60-team-relic-system.js::persistIntoSaveDocument()` is the input writer, not a new backend wrapper. Relic source records and a selected relic reference are projected only for review; invalid state or a nonempty legacy secondary slot blocks rather than silently dropping it. No canonical writer, acceptance, reward credit or playable restoration is enabled. PR/CI/merge/deploy status for this candidate is pending verification.
+
+## 2026-09-27 — Canonical claim record continuity candidate
+
+- Base `dev@5948445fa8c6f8fa60daa7c5d42605812b8cc274`. The claim mutation owner is `functions/src/canonical-resource-credit.js::creditReservedGrant()`; `functions/src/canonical-owned-sources.js::readOwnedSources()/advanceOwnedRecords()` reads and advances the complete claim set; `functions/src/canonical-snapshot.js::claimRecordsDigest()` owns the checkpoint digest. Protected Session remains `functions/src/session-authority.js::runProtected()`. No gameplay save wrapper or temporary patch.
+- The internal credit transaction adds a UID-owned claim record and checkpoint digest with its unique grant claim, ledger, receipt, source revision and unpublished snapshot. EXP and attribute allocations preserve the claim records at their next revisions. Browser-submitted amounts, historical migration admission and playable publication remain disabled. This is a candidate pending PR CI and Firestore emulator verification; Phase 4 remains 0/6 VERIFIED.
+
+## 2026-09-30 — Phase 4 private candidate read-only screening UI (candidate)
+
+- Base `dev@c9e8c3608855bde7a6a65226993a1140c9c80d3f`. The backend screening owner remains `functions/src/legacy-candidate-screening.js::screen()` through `functions/index.js::screenLegacyMigrationCandidate`. The browser callable owner is `js/firebase/firebase-cloud-save.js`, exposed by `js/firebase/firebase-bootstrap.js`; DEV account panel presentation and click lifecycle remain in `js/firebase/firebase-auth-ui.js`. No save wrapper, temporary patch, Firestore write or additional authority owner was added.
+- The explicit DEV button reads the current same-UID unadmitted envelope, sends its exact candidate and server revisions through the existing protected session, then reads back the envelope to reject changed revisions/fingerprint. It shows backend blocker codes with Chinese explanations and consistently says the result is blocked, untrusted and unavailable for second-device character restore. It does not create a candidate or replay a failed submission.
+- Targeted tests cover Revision 1 screening, missing candidate, changed revision and UID. PR checks, merge SHA, deployed DEV SHA and original-device read-only result must be verified separately. Phase 4 remains **IN PROGRESS / 0/6 VERIFIED**; original phone save and immutable backup stay in place.
+
+## 2026-09-30 — Phase 4 missing claim-sidecar source diagnosis (candidate)
+
+- Original phone Revision 1 read-only screening returned `HISTORICAL_REWARDS_UNVERIFIED` and `SIDECAR_BACKUP_MISSING`. The latter is aggregate: the immutable backup inventory can be complete while one or more claim-bearing source values are explicitly marked missing. It does not prove upload failure.
+- Screening owner `functions/src/legacy-candidate-screening.js::screenLegacyCandidateSnapshot()` now returns only missing names from its existing eight-key claim-source allowlist when a sealed sidecar inventory exists. The DEV account panel `js/firebase/firebase-auth-ui.js` shows those names in the existing result; older unbundled candidates stay generic. No raw bytes, extra Firestore reads, fabricated defaults, resubmission, gameplay write or acceptance path. Historic reward claims remain unverified and Phase 4 stays 0/6 VERIFIED until separate proof and admission gates are met.
+
+## 2026-10-01 — Phase 4 original-device offline backup export (candidate)
+
+- Original-phone Revision 1 review reported absent `daily-dungeon-state`, `task-tracker` and `legacy-abyss-state` plus unverified historical rewards. These are immutable missing markers; no default record or claim eligibility is inferred.
+- `js/startup/account-save-repository.js::exportMigrationBackups()` verifies each sealed local backup for the active UID and packages its exact main, metadata and sidecar bytes for a DEV-only browser download from the existing account panel. It neither reads another UID nor alters local/cloud state. The downloaded JSON is unencrypted and must be kept private; download request is not proof of a saved file. No import, admission or cross-device restore is enabled. Phase 4 remains 0/6 VERIFIED. PR, CI, merge and deployment must be verified separately.
+- PR/CI/Firebase deploy and original-device read-only verification remain to be recorded separately.
+## 2026-10-01 — Physical follow-up: revive rejection feedback and upright Flood Beast
+
+- New physical recording `1000072388.mp4` (34.647s, 1080×2316) shows a DEV Boss battle with all three allies alive. Repeated `復活術` taps do not enter ally selection because its formal `deadAlly` target contract has no legal target. This is not evidence of another touch failure. `prepareAction` already wrote a hidden battle log; it now also projects the same legal rejection through a visible, non-interactive `aria-live` battle notice: `我方目前沒有人死亡，無法使用復活術。` A fallen ally still enters the existing ally-selection owner.
+- The same recording shows `洪水猛獸` externally rotated along its trajectory. The updated decision is to keep the original sheet orientation for both sides. V143 now uses `preserveSourceOrientation` metadata: actor/target travel and phased timing remain, but cast, flight, impact and dissipate all use zero external rotation. No side/Boss special case, replacement asset, damage, Frostbite, hit fraction, duration or endpoint change.
+- Fresh base `dev@c474d10349472210bfc0c45569aa3741c06221af`; local branch `fix/battle-revive-feedback-flood-upright-20261001`. Formal declaration regression covers revive rejection notice and fallen-ally selection. Existing browser QA now asserts the visible no-target notice and upright Flood Beast for player, regular monster and actual Boss across three targets. Production build/check pass locally. Exact-head CI, integration, deployment and physical follow-up remain pending; both requirements stay IMPLEMENTED / NOT VERIFIED.
+- First exact-candidate CI run `36853827542` exposed the fixture's incorrect assumption that all three party indexes were populated; the disposable QA account has empty slots that the assertion had mapped to HP 0. The fixture now snapshots HP, makes every present ally alive for this no-target case, verifies the real touch-visible rejection, and restores HP. Empty party slots are excluded because formal `prepareAction` does not treat an absent character as a dead ally. The assertions were not weakened and Runtime was not changed for this correction.
+## 2026-10-01 — Battle Reading Layer Contract recovery (candidate)
+
+- Fresh base `dev@b61f50a74753b823bc9b2a37f2424f166df64662`; branch `fix/battle-reading-layer-contract-20261001`. This is the minimal Owner Convergence / Regression Fix for transient battle paint covering Battle Info, Battle Statistics, Boss Mechanism and Battle Status Detail. `main` is excluded.
+- Confirmed regression history: `d36d5e6f9a6968669530ac03221884adbceb0912` introduced paint-only suppression under `body.v174-battle-reading-open`; `9877c06cc0d8debb0143a0f8ffbda8a0a5fcc142` later removed that rule while consolidating battle presentation. `#game-viewport` isolation plus `#game-stage{z-index:0!important}` made the remaining `battle-ui-priority` stage z-index ineffective against document-level VFX/feedback.
+- `body.v174-battle-reading-open` is now the sole reading-state owner. It suppresses paint for V143 skill stages/Sprite Sheets, legacy fixed-slot and damage popup compatibility nodes (including historical `v152-top-damage`), canonical damage/heal/SP/critical/MISS/resist/status feedback, skill names, the full Team Relic document cinematic/dim/projection/VFX and the in-stage relic banner. It uses visibility/opacity only; no battle timer, hit frame, settlement, relic trigger, action completion or turn queue is paused/cancelled.
+- The ineffective `#game-stage.battle-ui-priority` z-index rule is retired. State derivation now requires an active battle page and synchronizes on drawer/modal handlers, render rebuild, battle teardown and page navigation; stale state is cleared if the battle page disappears or becomes inactive.
+- Regression coverage executes state activation/removal for all reading-surface families, forbids simulation/pause mutations, asserts the complete transient selector contract, and replaces the stale relic mask/z-index-number test with the current foreground-projection/semantic-reading contract. Exact-candidate browser QA opens a real Boss mechanism drawer during a real V143 skill lifecycle, checks computed suppression for skill VFX plus all feedback families, waits for cleanup while battle remains active, and keeps the reading drawer open through real relic cinematics across the existing mode matrix to prove normal expiry/no replay.
+- Focused battle/VFX/relic suites: 21/21 pass. Deterministic production build and `build:check` pass. Local full `npm test` stops only because this workspace has no Chrome/Chromium; the mandatory PR runner owns the exact-candidate real Runtime Browser QA. Latest-head PR CI, integration, exact dev deployment and physical-device acceptance remain pending; do not mark VERIFIED from local evidence.
+- PR #745 first-head CI exposed a fixture-only compatibility gap: fixed-slot browser QA extracts `renderBattle()` without its surrounding globals. The render-time reading-state sync is now existence-guarded; the production page still owns and invokes it, while isolated render fixtures no longer throw before their own QA assertions.
+
+## 2026-10-01 — CLOUDSAVE-REWARD-EVIDENCE-20261001 (candidate)
+
+- Base `dev@b61f50a74753b823bc9b2a37f2424f166df64662`; branch `fix/cloud-reward-replay-evidence-20261001`. Scope: future trusted reward credit evidence, not legacy admission. Revision 1 remains blocked by missing daily-dungeon-state/task-tracker/legacy-abyss-state and unverified historical rewards. No phone backup upload, blank-history backfill, new playable projection or second-phone restore. Phase 4 remains 0/6 VERIFIED.
+- Settlement remains `canonical-resource-credit.js::settle`; reservation remains `trusted-grant-ledger.js::reserve`; their credited replay proof converges in `credited-grant-evidence.js::verifyCreditedGrant`, using the existing recovery archive/snapshot verifiers inside the protected transaction. No wrappers, new callable, client changes or second ledger.
+- New credits require the previous recovery archive and write source revision/digest plus balance-before/after evidence in their existing ledger entry. Both replay paths check operation collisions, claim/receipt/ledger identity, and before/after immutable snapshot+archive evidence. Missing or contradictory proof never recreates a receipt or awards again. Legacy receipts without creditEvidenceVersion are retained and fail CREDIT_EVIDENCE_REQUIRED; no current balance or browser history is used to backfill them.
+- Targeted node regressions cover gold/EXP replay after later revisions/balance changes and corrupt/missing evidence. Existing real Firestore emulator suite now exercises both exported callable replay paths and first-credit atomic refusal, plus existing rollback/recovery/revoked-session cases. PR latest-head CI, integration, Firebase deploy and exact DEV SHA remain pending; no live-player reward writes are part of acceptance.
+## 2026-10-01 — Earth monster portraits (candidate)
+
+- Work ID: `EARTH-MONSTER-20261001`; target `dev`; branch `feature/earth-monster-portraits-20261001`; base `dev@1ccbef89dd67e5303ec3a1a1d095d6cecf9361bc`. `main` is unchanged.
+- Assets-library authority remains `a27a9fd23192cfa82e2eafd69a831c7f980272ce`. Ten wild, ten tower normal, ten tower elite and nine tower small-Boss PNG Masters under `assets/inbox/英雄or怪物立繪/土元素/` decode as transparent 1024×1536 images and now have identity-verified, lossless WebP Runtime derivatives. The tenth small-Boss source `file_00000000fc4c8230bcc34edeab91fbeb.png` is truncated in the repository and fails PNG decode, so `MON_EARTH_MINIBOSS_010` is quarantined as `reserved` with no Runtime file or false provenance claim.
+- Canonical portrait resolution remains `js/45-v154-dev-fixes.js`; no wrapper or late patch was added. `js/34-v141-core-systems.js` owns the ten explicit earth wild identities. `js/gameplay-boss-tower-system.js` owns the earth tower band/floor plan for the 29 valid tower identities. Floor 100 intentionally retains the existing generic fallback until a valid tenth Master is supplied; floors 1/5/10/50/90 are covered by exact-candidate browser QA.
+- Local Runtime contract, portrait audit, Permanent Image Asset Gate, earth/wind/water targeted regression, production build and build check pass. Local browser QA is unavailable because this workspace has no Chrome/Chromium; PR CI must execute the earth tower first-frame/decode browser gate. Status remains IMPLEMENTED / NOT COMPLETE pending remote checkpoint, PR CI, merge, exact DEV deployment and Android physical-device display.
+## 2026-10-02 — Cold-entry navigation / notification-dot convergence (candidate)
+
+- Base `dev@b676b2671df7c8195675eae486f6eed5095d3301`; branch `fix/navigation-cold-entry-notification-dots`; `main` remains untouched. Work ID: `NAV-COLD-DOT-20261002`.
+- Confirmed cold path: app-shell `showPage('training')` could run before lazy gameplay-core installed `v148SyncContextNavigation()`, so the core fallback rendered main navigation on the already-active training page. Context selection now belongs to the existing app-shell `FourSymbolsBottomNav.syncContext()` owner. V148 retains only the Abyss top-return lifecycle plus a compatibility call into that owner. No gameplay preload, second shell, timer, MutationObserver or late navigation patch is added.
+- Notification presentation is one semantic class with explicit coordinate-plane conversion: Legacy content uses 9px and the native 1080×1920 bottom navigation uses 22 logical px (about 7–9 screen CSS px across the required phone widths). The competing CSS42 global 7px/zero-border/alternate-animation override is retired. The pulse minimum is 90%, dots remain pointer-inert, and the native offset stays inside each button/icon frame.
+- Existing browser QA now holds gameplay-core network responses during the first real training tap, verifies immediate/settled labels, context, one intent and one shell, then releases lazy modules for the existing two-pass lifecycle matrix. It also records computed dot styles and both animation endpoints at 360×640, 393×873 and 412×915, plus backpack last-row/footer reachability. Local Chrome is unavailable; exact-head CI browser evidence, merge, deployment and deployed-path verification remain pending, so this entry is IMPLEMENTED candidate, not VERIFIED.
+
+# 2026-10-02 — GAME-SESSION-RESUME-20261002（登入工作階段接續）
+
+- 問題：Firebase Google 登入以 browserLocalPersistence 保留，但遊戲憑證只在 sessionStorage；手機關閉分頁後仍顯示登入，卻無憑證且後端禁止舊 auth_time 重建工作階段。此修復從開工時 `dev@b676b2671df7c8195675eae486f6eed5095d3301` 的 `fix/game-session-resume-20261002` 工作分支開始，`main` 不動。
+- 正式 owner：`js/firebase/firebase-session.js` 儲存適配層、`js/firebase/session-client.js::ensure()` 單一工作階段決策、`js/firebase/firebase-auth.js::reauthenticateWithGoogle()` 原帳號驗證、`js/firebase/firebase-auth-ui.js::render()/bind()` 已登入入口；後端 `functions/src/session-authority.js` 仍判定有效憑證。沒有新增 wrapper 或臨時 patch。
+- 新適配層將同 UID 憑證存於同源 localStorage，優先讀取並轉移既有 sessionStorage；登出會清兩處；每次操作繼續經 backend protectedTest，失效與佔用時不自動重建。Google 使用者若被阻擋，可在帳號畫面直接重新驗證同一帳號，無需先手動登出；不觸碰角色、存檔、歷史獎勵與 Phase 4 採納。
+- 本機相關測試涵蓋重開新分頁、舊憑證轉移、登出清理和被撤銷後不可偷取工作階段。PR／CI／DEV 部署與原手機體驗待核對，勿將本機測試標成玩家 VERIFIED；Phase 4 仍 0/6 VERIFIED。
+
+## 2026-10-02 — Fire monster 2–4 character name replacement (candidate)
+
+- Work ID `FIRE-MONSTER-NAMES-20261002`; branch `feature/fire-monster-name-length-20261002` from `dev@b676b2671df7c8195675eae486f6eed5095d3301`. This is a data Replacement only; `main`, image pixels, portrait keys, paths, encounter levels, ranks and combat behavior are unchanged.
+- Image-reviewed replacements: `炎殼長戟蟲→赤甲槍蟲`, `赤炎修羅王→六臂修羅`, `虛空煉獄皇→獄輪魔尊`, `業火魔君王→業炎法王`, `終焉神魔皇→末炎祭司`, `熔岩巨獸王→熔翼獸王`, `烈焰巨魔王→炎錘巨魔`, `焚天龍獄皇→焚天炎龍`. All 40 fire asset-pool display names are now unique and 2–4 Unicode characters.
+- Canonical sources updated together: wild runtime rows in `js/00-main.js`, `config/monster-portrait-registry.json`, `config/monster-asset-provenance.json`, generated root/build manifests and the content-hashed app-shell bundle. No wrapper, alias resolver or temporary patch was added.
+- Targeted fire coverage, monster portrait runtime, portrait audit, permanent image asset gate, deterministic build check and diff check pass locally. The existing `fire-tower-runtime-identity-first-frame` isolation assertion still expects earth tower portraits to be absent, but earth portraits are now formally integrated; that unrelated stale test is not changed in this naming task. PR CI and exact dev deployment remain pending.
+
+
+## FORGE-SOCKETS-GEMS-20261002 接續施工（2026-10-02）
+
+沿用 PR #751／feature/forge-sockets-gems-20261002，依最新 dev 60c1aab 保留 #750 命中／閃避成果，無 rebase／force push／main 修改。鍛造與寶石原始第一階段規格允許最小寶石模型，未要求先新增整套掉落或平衡。
+
+正式 owner：js/36-v141-content-systems.js 的 renderSocketTab、v141SocketGem、renderReforgeTab；js/00-main.js 的 getEquipmentSocketCapacity、getSocketGemStats、getEquipmentBonus。可見 native selectors 已替換為自有 details／button 選擇器，沿用合成內文 scroller，沒有新增 late wrapper。鑲嵌拒絕未知孔資料、重複 UID、超容量與帶雲端權威基底角色；存檔失敗還原孔與寶石。最小 gemVitalityI 體質+1，沒有新增掉落或商店來源。
+
+本機孔數、舊存檔、換裝、滿孔不扣料與回滾回歸通過；390／412 production QA 已接既有 CI 的 Responsive Item 步驟。此工作區無完整二進位素材／Chrome，正式 build 交由現有 CI build-sync evidence 建置後回填，未偽造建置成功。對應 requirement-batches/2026-10-02-forge-sockets-gems.json。
+
+待完成：取得最新提交正式建置產物、必要 CI 與手機 production QA；通過才合併 dev／驗證部署。正式可信後端鑲嵌與宝石取得来源另階段，不可宣稱本機原型等於正式交易；main 仍禁止發布。
+
+## 2026-10-02 — CLOUDSAVE-CHECKIN-EVENT-PROOF-20261002 (candidate)
+
+- Base `dev@b61f87d804edcbb8202c16bfd17f9d8cd78bf115`; branch `feature/cloud-checkin-event-proof-20261002`; target dev, main excluded. Resumes after merged #744 reward retry evidence and #748 session persistence; neither is repeated.
+- Additive server-owned source proof for the existing daily check-in only. `daily-checkin-event-evidence.js::readDailyCheckinEvidence` verifies immutable private `rewardEvents/{daily-checkin-day}` identity, Taipei period, canonical 50 gold, original character/revision and SHA-256 binding. `daily-checkin-grant.js::issue` and `canonical-resource-credit.js::settle` create the event atomically with a new grant/credit. Reservation, settlement and credited retries bind the same event digest in grant, receipt and ledger. Existing credential/session and snapshot/archive checks remain authoritative; no wrapper or second credit writer.
+- Missing/corrupt source proof blocks without repairing, backfilling or awarding. Old unbound daily grants are retained and fail `REWARD_EVENT_EVIDENCE_REQUIRED` or inconsistent-binding errors. An orphan event cannot authorize a recreated grant; daily grant IDs cannot bypass evidence by removing eventType. No browser writes, new callable, historical adoption, old-phone upload or playable projection is enabled. Generic internal server-issued grants are unchanged; browser battle outcomes remain untrusted and still require a server attempt/result path.
+- Targeted Node cloud tests 105/105 pass locally (12 new event cases). Existing Auth/Firestore/Functions emulator suite now asserts atomic event rollback, real callable event/receipt/ledger tamper refusal, missing event refusal through issuer/reservation/credit retries and exactly-once credit. Exact-head CI, merge, Firebase deployment and DEV SHA verification remain PENDING; no player data is used. Phase 4 stays 0/6 VERIFIED.
+- Next: run exact-head existing CI/emulator gates; integrate via PR after all necessary checks pass; verify matching Firebase/DEV deployment and safely clean the completed branch. After this prerequisite, future combat/quest rewards still need an actual server-proven attempt outcome, not a client win flag.
+
+## 2026-10-02 — 鍛造與寶石第一階段 dev 驗證收尾
+
+PR #751 已合併 dev@b61f87d804edcbb8202c16bfd17f9d8cd78bf115。候選 run 36966366859 與合併 dev run 36967167176 attempt 2 的 Repository checks SUCCESS；固定 dev 部署 SHA／Game+Cache 173.72 核對通過。首次既有 UI layout Chrome 未回傳測量 DOM，同 SHA 重跑後通過，未減少斷言。
+
+第一階段 6/6 VERIFIED：入口／冶煉無圖紙／孔位相容／最小寶石／UID 本機安全鑲嵌與屬性／手機介面。候選 artifact 11209726733、部署 artifact 11210577025，forge/evidence.json 與390／412截圖；deployed-dev SHA 與 dev 一致。詳細證據 docs/qa/forge-sockets-gems-20261002.md。
+
+CSS49 統一合成／鍛造底部間距，退役 CSS38／JS58 的衝突設定。正式後端交易與寶石取得來源未實作；雲端權威角色拒絕本機鑲嵌。Chrome 模擬手機不是 Android 實體裝置驗收；未寫玩家雲端或發送物品。版本不增加，main 未修改，未正式發布。
+
+- CLOUDSAVE-CHECKIN-EVENT-PROOF-20261002 / PR #754 integration checkpoint: preserved both HANDOFF sections and dev@1f144c2319cd14c66a778049a8bd6809a547492d forging verification records. Prior candidate 7430aa18 Repository checks 36969002462 / 110718831173 and Session Authority 36969002385 / 110719595619 passed; real callable/emulator assertions passed. Integration changes documentation/evidence only; runtime/build is unchanged, but final latest-head checks are still required. Shared daily-checkin-policy.js is the single reward/day policy; original exports remain compatible.
+
+## 2026-10-02 — CLOUDSAVE-CHECKIN-SOURCE-SNAPSHOT-20261002 (candidate)
+
+- Base dev `e0c4a3e94420d15e91cb68b00bce4f50a1c3607f`; branch `feature/cloud-checkin-source-snapshot-20261002`; target dev; main excluded. Prior #744, #748 and #754 are merged/deployed and are not repeated. #754 closeout verified its later integrated dev/Firebase deployments and deleted its source branch.
+- Additive eligibility gate in the existing `daily-checkin-event-evidence.js::readDailyCheckinEvidence`. All daily issuance/reservation/credit/retry callers now read `playableSnapshots/{event.sourceRevision}` and `recoveryArchives/{event.sourceRevision}` in the protected transaction, using `inspectRecoveryArchive` and the existing complete snapshot verifier. The archived source must be a server-created one-character account containing that event character; creation additionally matches the current account's snapshot pointer. No second validator, wrapper, credit writer, new callable or client change.
+- Missing/corrupt sources, cross-UID archive, self-consistent event with a nonexistent character/revision and structurally valid historical/multi-character sources fail before writes. Later balances/revisions do not invalidate the original event; original event schema/digest remains compatible. No archive backfill, historical adoption, player data, playable publication or second-phone restore.
+- Local cloud Node tests 115/115 PASS; new event suite 22/22; new source assertions reject the old helper as expected. Production build:check and diff check PASS, browser build unchanged. Existing real callable/emulator suite covers missing source before direct credit/new issuer/pending issuer/reservation and both credited retry entry points. Remote latest-head CI, PR merge, Firebase deployment and exact DEV SHA remain PENDING. Phase 4 remains 0/6 VERIFIED.
+- Next: exact-head existing CI/emulator, PR integration, Firebase/DEV SHA verification and safe branch deletion. Next separate Foundation D slice should establish a server-owned battle/run attempt and proven outcome; a browser win flag remains untrusted. Original Revision 1 gaps remain blocked; do not rebuild or resubmit old-phone sources.

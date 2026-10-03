@@ -1,405 +1,101 @@
-
-/* =========================================================
-   V73 UNIQUE CHARACTER / INVENTORY LAYOUT CORE
-   歷史 V67/V69/V70/V71 背包覆寫已移除。
-   此區是唯一背包比例來源。
-========================================================= */
-
-/* ---------- 角色彈窗共用：保留 V65 已驗證的單一 scroll owner 架構 ---------- */
-#game-stage #homeFeatureModal .home-feature-modal-box.wide{
-    width:100% !important;
-    max-width:1080px !important;
-    height:auto !important;
-    max-height:96% !important;
-    min-height:0 !important;
-    display:flex !important;
-    flex-direction:column !important;
-    overflow:hidden !important;
-    box-sizing:border-box !important;
-}
-#game-stage #homeFeatureModal .home-feature-modal-box.wide #homeFeatureModalBody{
-    display:flex !important;
-    flex-direction:column !important;
-    flex:0 1 auto !important;
-    height:auto !important;
-    min-height:0 !important;
-    overflow:hidden !important;
-}
-#game-stage #homeFeatureModal #characterTabContent{
-    display:block !important;
-    width:100% !important;
-    flex:0 1 auto !important;
-    height:auto !important;
-    min-height:0 !important;
-    max-height:none !important;
-    overflow-y:auto !important;
-    overflow-x:hidden !important;
-    -webkit-overflow-scrolling:touch !important;
-    scrollbar-gutter:stable;
-    overscroll-behavior-y:contain !important;
-    touch-action:pan-y !important;
-    box-sizing:border-box !important;
-    /* The shell now shrink-wraps short tabs; long tabs use this sole scroll owner. */
-    padding-bottom:0 !important;
-}
-#game-stage #homeFeatureModal #characterTabContent > #statusPage,
-#game-stage #homeFeatureModal #characterTabContent > #skillPage,
-#game-stage #homeFeatureModal #characterTabContent > #inventoryPage{
-    display:block !important;
-    height:auto !important;
-    min-height:0 !important;
-    max-height:none !important;
-    overflow:visible !important;
+/* V177 Backpack Visual Composition & Style Owner.
+   This is the canonical visual owner for the existing #inventoryPage.
+   The existing #inventoryGridScroll remains the only item-grid scroll owner. */
+#game-stage #inventoryPage{
+    --bag-bg:#090807;--bag-panel:#15120f;--bag-frame:#6f5934;--bag-frame-hi:#a98a50;
+    --bag-gold:#c89b45;--bag-gold-muted:#8a6730;--bag-text:#eee4cf;--bag-muted:#aaa08d;
+    --bag-slot-empty:#3b3328;--bag-slot-border:var(--bag-slot-empty);--bag-selected:#e5c06b;
+    --rarity-white:#D8D8D8;--rarity-blue:#42A5FF;--rarity-purple:#B05CFF;--rarity-orange:#FF9F38;
+    --rarity-red:#FF4FA7;--rarity-myriad:conic-gradient(from 315deg,#FF5A36,#42A5FF,#47D6A3,#C89B45,#FF5A36);color:var(--bag-text);
 }
 
-/* ---------- 背包頁本身不是 scroll owner ---------- */
-#game-stage #inventoryPage.inventory-page-classic{
-    width:100% !important;
-    max-width:none !important;
-    height:auto !important;
-    min-height:0 !important;
-    max-height:none !important;
-    overflow:visible !important;
-    touch-action:auto !important;
-    padding:12px 0 110px !important;
-    box-sizing:border-box !important;
-}
-#game-stage #inventoryPage .inventory-classic-shell{
-    width:93.4% !important;
-    max-width:none !important;
-    min-width:0 !important;
-    margin:0 auto !important;
-    display:flex !important;
-    flex-direction:column !important;
-    gap:10px !important;
-    box-sizing:border-box !important;
-}
+/* Thick frame body and title plate: restrained metal, cut corners, double depth. */
+#game-stage #inventoryPage{height:100%;min-height:0;overflow:hidden;box-sizing:border-box}
+#game-stage #inventoryPage .inventory-classic-shell{position:relative;width:93.4%;height:100%;max-height:100%;min-width:0;min-height:0;margin:0 auto;padding:12px 0;container-type:inline-size;display:flex;flex-direction:column;gap:10px;overflow:hidden;box-sizing:border-box;background:linear-gradient(135deg,rgba(200,155,69,.07),transparent 28%,transparent 72%,rgba(88,58,27,.055)),linear-gradient(180deg,#1b1712 0%,var(--bag-panel) 34%,var(--bag-bg));border:1px solid var(--bag-frame);clip-path:polygon(0 12px,12px 0,calc(100% - 12px) 0,100% 12px,100% calc(100% - 12px),calc(100% - 12px) 100%,12px 100%,0 calc(100% - 12px));box-shadow:inset 0 0 0 1px rgba(229,192,107,.06),inset 0 18px 28px rgba(0,0,0,.28),0 12px 25px rgba(0,0,0,.45)}
+#game-stage #inventoryPage .inventory-classic-shell:before{content:"";position:absolute;inset:5px;pointer-events:none;opacity:.5;border:1px solid rgba(200,155,69,.2);clip-path:inherit}
+#game-stage #inventoryPage .inventory-header{position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:start;flex:0 0 auto;min-height:43px;margin:0 10px}
+#game-stage #inventoryPage .inventory-title-plate{grid-column:2;display:grid;grid-template-columns:auto;justify-items:center;align-items:center;gap:3px;min-width:154px;padding:7px 12px 8px;background:linear-gradient(180deg,#302719,#17130e 70%,#100e0a);border:1px solid var(--bag-frame-hi);clip-path:polygon(0 7px,7px 0,calc(100% - 7px) 0,100% 7px,100% calc(100% - 7px),calc(100% - 7px) 100%,7px 100%,0 calc(100% - 7px));box-shadow:inset 0 1px 0 rgba(246,222,157,.14),0 5px 12px rgba(0,0,0,.38)}
+#game-stage #inventoryPage .inventory-title-plate h2{margin:0;color:var(--bag-text);font-size:22px;line-height:1;letter-spacing:.12em}
+#game-stage #inventoryPage .inventory-title-plate-kicker{color:#b7b19e;font-size:12px;line-height:1;letter-spacing:.1em}
+#game-stage #inventoryPage .inventory-header .map-inventory-overlay-close{grid-column:3;justify-self:end;width:auto;min-width:48px;min-height:32px;margin:5px 0 0;padding:5px 8px;border:1px solid var(--bag-frame);color:#d7c9aa;background:linear-gradient(180deg,#211b12,#100e0a);clip-path:polygon(0 4px,4px 0,100% 0,100% calc(100% - 4px),calc(100% - 4px) 100%,0 100%);font-size:18px;line-height:1.2;box-shadow:inset 0 1px 0 rgba(229,192,107,.08)}
+#game-stage #inventoryPage .inventory-header .map-inventory-overlay-close:active{transform:scale(.97)}
 
-/* ---------- 角色切換：參考圖是窄的一條人物名稱列 ----------
-   ★ 修正（依照使用者回報，「背包介面的角色切換按鈕與返回
-   按鈕重疊了，把兩邊的箭頭切換按鈕都往角色ID靠攏」）：
-   原本用grid-template-columns:13% 74% 13%把整條列撐滿
-   整個外殼寬度，右側箭頭因此被推到最右邊緣，正好卡在
-   絕對定位、貼右上角的「關閉」按鈕（.map-inventory-
-   overlay-close）下面，兩者疊在一起。改成flex置中排列，
-   兩顆箭頭改成貼著角色名稱兩側（用gap控制間距，不用
-   固定寬度撐滿整列），右箭頭自然遠離右上角，不會再跟
-   關閉按鈕重疊。
-*/
-#game-stage #inventoryPage .inventory-character-switch{
-    width:100% !important;
-    min-height:48px !important;
-    display:flex !important;
-    justify-content:center !important;
-    align-items:center !important;
-    gap:14px !important;
-    margin:0 0 4px !important;
-}
-#game-stage #inventoryPage .inventory-character-arrow{
-    width:30px !important;
-    aspect-ratio:1 / 1 !important;
-    height:auto !important;
-    min-height:0 !important;
-    flex:0 0 auto !important;
-    border-radius:10px !important;
-    font-size:20px !important;
-    line-height:1 !important;
-}
-#game-stage #inventoryPage .inventory-character-name{
-    min-width:0 !important;
-    text-align:center !important;
-    font-size:23px !important;
-    line-height:1 !important;
-    color:#f0d18c !important;
-    white-space:nowrap !important;
-    overflow:hidden !important;
-    text-overflow:ellipsis !important;
-}
-#game-stage #inventoryPage .inventory-character-name small{
-    display:inline !important;
-    margin:0 0 0 6px !important;
-    font-size:14px !important;
-    line-height:1 !important;
-    vertical-align:baseline !important;
-}
-#game-stage #inventoryPage .inventory-character-name{
-    display:flex !important;
-    align-items:center !important;
-    justify-content:center !important;
-    flex-wrap:nowrap !important;
-    min-width:0 !important;
-    white-space:nowrap !important;
-}
+/* Character showcase: portrait in the middle, equipment components around it. */
+#game-stage #inventoryPage .inventory-character-switch{width:100%;min-height:42px;flex:0 0 auto;display:flex;justify-content:center;align-items:center;gap:12px;margin:0}
+#game-stage #inventoryPage .inventory-character-arrow{width:30px;height:30px;min-width:30px;padding:0;border:1px solid var(--bag-frame);border-radius:0;color:#d8c28d;background:#17120c;font-size:18px;line-height:1;box-shadow:inset 0 -4px 8px rgba(0,0,0,.4)}
+#game-stage #inventoryPage .inventory-character-arrow:active{transform:scale(.97)}
+#game-stage #inventoryPage .inventory-character-name{min-width:0;display:flex;align-items:center;justify-content:center;gap:6px;color:#e1d1a9;font-size:21px;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#game-stage #inventoryPage .inventory-character-name small{margin:0;color:var(--bag-muted);font-size:18px}
+#game-stage #inventoryPage .inventory-character-panel{flex:0 0 auto;min-height:0}
+#game-stage #inventoryPage .inventory-character-stage{--inventory-equipment-slot-size:clamp(42px,14cqw,64px);--inventory-equipment-label-height:24px;--inventory-equipment-grid-gap:clamp(4px,1.5cqw,10px);--inventory-equipment-row-gap:4px;--inventory-equipment-cell-height:calc(var(--inventory-equipment-slot-size) + var(--inventory-equipment-label-height) + var(--inventory-equipment-row-gap));position:relative;width:100%;height:calc(3 * var(--inventory-equipment-cell-height) + 2 * var(--inventory-equipment-grid-gap));min-height:0;margin:0;padding:0 10px;display:grid;grid-template-columns:minmax(52px,1fr) minmax(112px,2.2fr) minmax(52px,1fr);align-items:stretch;gap:var(--inventory-equipment-grid-gap);box-sizing:border-box}
+#game-stage #inventoryPage .inventory-character-stage:before{content:"";position:absolute;inset:4% 17%;pointer-events:none;background:radial-gradient(ellipse at center,rgba(109,137,117,.18),transparent 58%),radial-gradient(ellipse at center,rgba(180,144,76,.1),transparent 72%);border:1px solid rgba(150,137,96,.18);border-radius:50%;opacity:.7}
+#game-stage #inventoryPage .inventory-portrait-frame{position:relative;grid-column:2;grid-row:1;align-self:stretch;width:100%;height:100%;min-height:0;margin:0;display:grid;place-items:center;overflow:hidden;border:0;background:transparent;box-shadow:none}
+#game-stage #inventoryPage .inventory-portrait-frame:before,#game-stage #inventoryPage .inventory-portrait-frame:after{content:"";position:absolute;pointer-events:none;border:1px solid rgba(166,146,93,.28);border-radius:50%}
+#game-stage #inventoryPage .inventory-portrait-frame:before{inset:8% 12%}
+#game-stage #inventoryPage .inventory-portrait-frame:after{inset:16% 20%;border-color:rgba(93,135,111,.16)}
+#game-stage #inventoryPage .inventory-portrait-frame .v131-inventory-portrait{position:relative;z-index:1;display:block;width:100%;height:100%;object-fit:contain;object-position:center bottom}
+#game-stage #inventoryPage .inventory-portrait-placeholder{position:relative;z-index:1;color:var(--bag-muted);font-size:15px}
+#game-stage #inventoryPage #inventoryCharacterDetailButton{position:absolute;z-index:3;right:3%;top:4%;width:28px;height:28px;min-width:28px;min-height:28px;padding:0;border:1px solid #69715d;border-radius:0;color:#e0c782;background:#131a18;font-size:13px;line-height:1}
+#game-stage #inventoryPage #inventoryCharacterDetailButton:active{transform:scale(.96)}
+#game-stage #inventoryPage .inventory-equipment-grid{position:absolute;inset:0 10px;z-index:2;display:grid;grid-template-columns:minmax(52px,1fr) minmax(112px,2.2fr) minmax(52px,1fr);grid-template-rows:repeat(3,var(--inventory-equipment-cell-height));align-content:start;gap:var(--inventory-equipment-grid-gap);pointer-events:none}
+#game-stage #inventoryPage .inventory-equipment-cell{width:100%;min-width:0;height:var(--inventory-equipment-cell-height);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:var(--inventory-equipment-row-gap);pointer-events:auto}
+#game-stage #inventoryPage .inventory-equipment-cell:nth-child(1){grid-column:1;grid-row:1}#game-stage #inventoryPage .inventory-equipment-cell:nth-child(2){grid-column:3;grid-row:1}#game-stage #inventoryPage .inventory-equipment-cell:nth-child(3){grid-column:1;grid-row:2}#game-stage #inventoryPage .inventory-equipment-cell:nth-child(4){grid-column:3;grid-row:2}#game-stage #inventoryPage .inventory-equipment-cell:nth-child(5){grid-column:1;grid-row:3}#game-stage #inventoryPage .inventory-equipment-cell:nth-child(6){grid-column:3;grid-row:3}
+#game-stage #inventoryPage .inventory-equipment-slot-label{order:2;width:100%;height:var(--inventory-equipment-label-height);min-width:0;color:#a9a695;font-size:18px;line-height:var(--inventory-equipment-label-height);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
+#game-stage #inventoryPage .inventory-equipment-slot{order:1;width:var(--inventory-equipment-slot-size);height:var(--inventory-equipment-slot-size);flex:0 0 var(--inventory-equipment-slot-size);padding:4px;border:1px solid var(--bag-frame);border-radius:0;background:linear-gradient(145deg,#231b12,#0e0c09 70%);box-shadow:inset 0 1px 0 rgba(226,218,185,.07),inset 0 -7px 12px rgba(0,0,0,.4);box-sizing:border-box}
+#game-stage #inventoryPage .inventory-equipment-icon{font-size:clamp(18px,3.5vw,30px);line-height:1}
 
-/* ---------- 角色主區：按參考圖比例，不用固定長條 ---------- */
-#game-stage #inventoryPage .inventory-character-stage{
-    position:relative !important;
-    width:100% !important;
-    height:var(--inventory-stage-height,240px) !important;
-    min-height:var(--inventory-stage-height,240px) !important;
-    max-height:var(--inventory-stage-height,240px) !important;
-    aspect-ratio:auto !important;
-    margin:0 !important;
-    padding:0 !important;
-    display:grid !important;
-    grid-template-columns:14% 64% 14% !important;
-    grid-template-rows:repeat(3,minmax(0,1fr)) !important;
-    column-gap:4% !important;
-    row-gap:0 !important;
-    align-items:center !important;
-    align-content:stretch !important;
-    justify-content:center !important;
-    box-sizing:border-box !important;
-}
+/* Resource, category rail, item slots and the existing single grid scroller. */
+#game-stage #inventoryPage .inventory-right-panel{position:relative;width:100%;min-width:0;min-height:0;flex:1 1 auto;margin:0;padding:8px 10px 0;display:flex;flex-direction:column;overflow:hidden;box-sizing:border-box;background:transparent}
+#game-stage #inventoryPage .inventory-wallet-bar{display:flex;align-items:center;justify-content:flex-end;gap:7px;min-height:26px;margin:0 5px 3px;padding:2px 4px;border:0;background:transparent;box-shadow:none}
+#game-stage #inventoryPage .inventory-wallet-label{color:var(--bag-muted);font-size:18px;line-height:1}
+#game-stage #inventoryPage .inventory-wallet-value{color:#d6bd79;font-size:18px;line-height:1;font-variant-numeric:tabular-nums}
+#game-stage #inventoryPage .inventory-category-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;margin:0 0 7px;padding:0 3px;border-bottom:1px solid var(--bag-frame)}
+#game-stage #inventoryPage .inventory-category-tab{position:relative;min-width:0;min-height:36px;padding:9px 4px 7px;border:0;border-radius:0;color:var(--bag-muted);background:transparent;font-size:18px;font-weight:700;line-height:1;text-align:center;cursor:pointer;user-select:none;transition:color 160ms ease,background 160ms ease}
+#game-stage #inventoryPage .inventory-category-tab:after{content:"";position:absolute;left:18%;right:18%;bottom:-1px;height:2px;background:transparent}
+#game-stage #inventoryPage .inventory-category-tab.active{color:#f0d58f;background:linear-gradient(180deg,rgba(170,140,74,.1),transparent)}
+#game-stage #inventoryPage .inventory-category-tab.active:after{background:var(--bag-gold);box-shadow:0 0 7px rgba(198,164,93,.25)}
+#game-stage #inventoryPage .inventory-category-tab:focus-visible{outline:1px solid var(--bag-gold);outline-offset:-2px}
+#game-stage #inventoryPage .inventory-grid-scroll{display:block;width:100%;min-height:0;flex:1 1 auto;overflow-y:auto;overflow-x:hidden;padding:0 1px 8px;scrollbar-gutter:stable;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y}
+#game-stage #inventoryPage .inventory-grid-classic{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;width:100%;margin:0;align-content:start}
+#game-stage #inventoryPage .inventory-item-classic{position:relative;width:100%;aspect-ratio:1;min-width:0;min-height:0;padding:3px;border:1px solid var(--slot-rarity,var(--bag-slot-border));border-radius:0;background:linear-gradient(145deg,#211a12,#0e0b08 70%);box-shadow:inset 0 1px 0 rgba(226,218,185,.06),inset 0 -8px 13px rgba(0,0,0,.42),0 2px 4px rgba(0,0,0,.22);box-sizing:border-box;transition:filter 160ms ease,transform 100ms ease,box-shadow 160ms ease}
+#game-stage #inventoryPage .inventory-item-classic .inventory-icon{position:relative;z-index:1;display:grid;place-items:center;width:100%;height:100%;font-size:clamp(17px,3vw,28px)}
+#game-stage #inventoryPage .inventory-grid-classic .inventory-item-classic .inventory-icon>.v169-item-art{display:grid;place-items:center;width:100%;height:100%;max-width:100%;max-height:100%;overflow:hidden;box-sizing:border-box}
+#game-stage #inventoryPage .inventory-grid-classic .inventory-item-classic .inventory-icon>.v169-item-art>img{display:block;width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain;object-position:center}
+#game-stage #inventoryPage .inventory-item-classic .inventory-count{position:absolute;z-index:2;right:3px;bottom:2px;min-width:14px;color:#f0eadc;font-size:18px;line-height:22px;text-align:right;text-shadow:0 1px 2px #000}
+#game-stage #inventoryPage .inventory-item-classic .inventory-slot-number{display:none}
+#game-stage #inventoryPage .inventory-item-classic.rarity-white{--slot-rarity:var(--rarity-white)}#game-stage #inventoryPage .inventory-item-classic.rarity-blue{--slot-rarity:var(--rarity-blue)}#game-stage #inventoryPage .inventory-item-classic.rarity-purple{--slot-rarity:var(--rarity-purple)}#game-stage #inventoryPage .inventory-item-classic.rarity-orange{--slot-rarity:var(--rarity-orange)}#game-stage #inventoryPage .inventory-item-classic.rarity-red{--slot-rarity:var(--rarity-red)}#game-stage #inventoryPage .inventory-item-classic.rarity-myriad{--slot-rarity:transparent;background:linear-gradient(145deg,#211a12,#0e0b08 70%) padding-box,var(--rarity-myriad) border-box}
+#game-stage #inventoryPage .inventory-item-classic.is-selected{filter:brightness(1.1);box-shadow:inset 0 0 0 1px rgba(232,210,151,.35),inset 0 -8px 13px rgba(0,0,0,.35),0 0 11px color-mix(in srgb,var(--slot-rarity,var(--bag-selected)) 30%,transparent);animation:inventorySlotShine 2.1s ease-in-out infinite}
+#game-stage #inventoryPage .inventory-item-classic:active{transform:scale(.975)}
+@keyframes inventorySlotShine{0%,100%{filter:brightness(1.07)}50%{filter:brightness(1.14)}}
 
-/* 中央立繪：先空框，日後只換圖片，不再重改版面 */
-#game-stage #inventoryPage .inventory-portrait-frame{
-    grid-column:2 !important;
-    grid-row:1 / 4 !important;
-    width:100% !important;
-    height:100% !important;
-    min-height:0 !important;
-    max-height:none !important;
-    align-self:stretch !important;
-    justify-self:stretch !important;
-    margin:0 !important;
-    border-width:2px !important;
-    border-radius:14px !important;
-    overflow:hidden !important;
-    box-sizing:border-box !important;
-}
-#game-stage #inventoryPage .inventory-portrait-placeholder{
-    width:88% !important;
-    height:90% !important;
-    margin:auto !important;
-    font-size:22px !important;
-    letter-spacing:2px !important;
-}
+/* Bottom Action owner: grid geometry, pagination, refresh and quick-sell share one rail. */
+#game-stage #inventoryPage .inventory-bottom-actions{flex:0 0 auto;display:grid;grid-template-columns:minmax(82px,auto) minmax(0,1fr) minmax(82px,auto);align-items:center;gap:8px;width:100%;min-height:44px;margin:2px 0 0;padding:4px 0 0;border-top:1px solid color-mix(in srgb,var(--bag-frame) 55%,transparent);box-sizing:border-box}
+#game-stage #inventoryPage .inventory-bottom-action{min-width:0;min-height:36px;padding:6px 8px;border:1px solid var(--bag-frame);border-radius:0;color:#d7c9aa;background:linear-gradient(180deg,#241c13,#100d09);font-size:18px;font-weight:800;line-height:1.2;white-space:normal;cursor:pointer;clip-path:polygon(0 4px,4px 0,100% 0,100% calc(100% - 4px),calc(100% - 4px) 100%,0 100%)}
+#game-stage #inventoryPage .inventory-bottom-action:active{transform:scale(.97)}
+#game-stage #inventoryPage .inventory-quick-sell-action{border-color:var(--bag-gold-muted);color:#efd18b;background:linear-gradient(180deg,#2a2114,#151008)}
+#game-stage #inventoryPage .inventory-bottom-action[hidden]{visibility:hidden}
+#game-stage #inventoryPage .inventory-pagination-slot{min-width:0;display:flex;justify-content:center;align-items:center}
+#game-stage #inventoryPage .v141-inventory-pager{display:grid;grid-template-columns:32px minmax(48px,auto) 32px;align-items:center;justify-content:center;gap:6px;margin:0;padding:0;border:0;background:transparent;box-shadow:none}
+#game-stage #inventoryPage .v141-inventory-pager button{width:32px;min-width:32px;height:32px;min-height:32px;padding:0;border:1px solid var(--bag-frame);border-radius:0;color:#d7c9aa;background:#120e0a;font-size:18px;line-height:1}
+#game-stage #inventoryPage .v141-inventory-pager button:active{transform:scale(.96)}
+#game-stage #inventoryPage .v141-inventory-pager span{min-width:48px;color:#bab5a7;font-size:18px;text-align:center}
 
-/* 六裝備：左右各三格，真正做正方形 */
-#game-stage #inventoryPage .inventory-equipment-grid{
-    grid-column:1 / 4 !important;
-    grid-row:1 / 4 !important;
-    width:100% !important;
-    height:100% !important;
-    display:grid !important;
-    grid-template-columns:14% 64% 14% !important;
-    grid-template-rows:repeat(3,minmax(0,1fr)) !important;
-    column-gap:4% !important;
-    row-gap:0 !important;
-    align-items:center !important;
-    align-content:stretch !important;
-    pointer-events:auto !important;
-    z-index:3 !important;
-    box-sizing:border-box !important;
-}
-#game-stage #inventoryPage .inventory-equipment-cell{
-    width:100% !important;
-    min-width:0 !important;
-    min-height:0 !important;
-    align-self:center !important;
-    justify-self:center !important;
-    display:flex !important;
-    flex-direction:column !important;
-    align-items:stretch !important;
-    justify-content:center !important;
-    gap:3px !important;
-    box-sizing:border-box !important;
-}
-#game-stage #inventoryPage .inventory-equipment-cell:nth-child(1){grid-column:1 !important;grid-row:1 !important;}
-#game-stage #inventoryPage .inventory-equipment-cell:nth-child(2){grid-column:3 !important;grid-row:1 !important;}
-#game-stage #inventoryPage .inventory-equipment-cell:nth-child(3){grid-column:1 !important;grid-row:2 !important;}
-#game-stage #inventoryPage .inventory-equipment-cell:nth-child(4){grid-column:3 !important;grid-row:2 !important;}
-#game-stage #inventoryPage .inventory-equipment-cell:nth-child(5){grid-column:1 !important;grid-row:3 !important;}
-#game-stage #inventoryPage .inventory-equipment-cell:nth-child(6){grid-column:3 !important;grid-row:3 !important;}
-#game-stage #inventoryPage .inventory-equipment-slot-label{
-    width:100% !important;
-    text-align:center !important;
-    font-size:12px !important;
-    line-height:1 !important;
-    color:#d6c29a !important;
-    white-space:nowrap !important;
-    overflow:hidden !important;
-    text-overflow:ellipsis !important;
-    pointer-events:none !important;
-}
-#game-stage #inventoryPage .inventory-equipment-slot{
-    width:100% !important;
-    aspect-ratio:1 / 1 !important;
-    height:auto !important;
-    min-width:0 !important;
-    min-height:0 !important;
-    align-self:center !important;
-    justify-self:center !important;
-    border-width:2px !important;
-    border-radius:10px !important;
-    padding:4px !important;
-    box-sizing:border-box !important;
-}
-#game-stage #inventoryPage .inventory-equipment-icon{
-    font-size:clamp(18px,3.5vw,32px) !important;
-    line-height:1 !important;
-}
+/* Quick Sell uses the existing shared Home Feature modal owner. */
+#game-stage #homeFeatureModal.v17350-quick-sell-open .home-feature-modal-box{width:min(92%,390px);max-height:88%;min-height:0}
+#game-stage #homeFeatureModal.v17350-quick-sell-open #homeFeatureModalBody{overflow:auto;padding:0 2px 2px}
+#game-stage #homeFeatureModal .v17350-quick-sell-modal{display:grid;gap:14px;padding:4px 2px;color:#d8d0bd}
+#game-stage #homeFeatureModal .v17350-quick-sell-lede{margin:0;color:#aaa494;font-size:15px;line-height:1.55}
+#game-stage #homeFeatureModal .v17350-quick-sell-field{display:grid;gap:7px;color:#e6d19c;font-size:15px;font-weight:800}
+#game-stage #homeFeatureModal .v17350-quick-sell-field select{width:100%;min-height:42px;padding:7px 9px;border:1px solid #59645a;border-radius:0;color:#eee1c4;background:#111817;font-size:15px}
+#game-stage #homeFeatureModal .v17350-quick-sell-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+#game-stage #homeFeatureModal .v17350-quick-sell-summary>div{display:grid;gap:5px;padding:10px;border:1px solid #3e4a45;background:#151c1a;clip-path:polygon(0 5px,5px 0,100% 0,100% calc(100% - 5px),calc(100% - 5px) 100%,0 100%)}
+#game-stage #homeFeatureModal .v17350-quick-sell-summary span{color:#a9a292;font-size:14px}
+#game-stage #homeFeatureModal .v17350-quick-sell-summary b{color:#f0d58f;font-size:18px}
+#game-stage #homeFeatureModal .v17350-quick-sell-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+#game-stage #homeFeatureModal .v17350-quick-sell-actions button{min-height:44px;border:1px solid #58645b;border-radius:0;color:#d5cbb7;background:#161c1b;font-size:15px;font-weight:800}
+#game-stage #homeFeatureModal .v17350-quick-sell-actions button:last-child{border-color:#9a773f;color:#2b1d08;background:linear-gradient(180deg,#e2c071,#a87831)}
+#game-stage #homeFeatureModal .v17350-quick-sell-actions button:disabled{opacity:.45}
 
-/* ---------- 詳細能力：壓成資訊帶，不再佔半頁 ---------- */
-#game-stage #inventoryPage .inventory-stats-panel{
-    width:100% !important;
-    max-width:none !important;
-    margin:6px 0 8px !important;
-    padding:9px 10px !important;
-    border-radius:12px !important;
-    box-sizing:border-box !important;
-}
-#game-stage #inventoryPage .inventory-stats-title{
-    padding:0 4px 7px !important;
-    font-size:19px !important;
-    line-height:1.1 !important;
-}
-#game-stage #inventoryPage .inventory-detailed-stats{
-    display:grid !important;
-    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
-    gap:5px 8px !important;
-    font-size:13px !important;
-}
-#game-stage #inventoryPage .inventory-stat-row{
-    min-width:0 !important;
-    min-height:27px !important;
-    padding:4px 6px !important;
-}
-
-/* ---------- 背包：參考圖 6 欄，格子為畫面主體 ---------- */
-#game-stage #inventoryPage .inventory-right-panel{
-    position:relative !important;
-    width:100% !important;
-    max-width:none !important;
-    margin:0 !important;
-    padding:10px !important;
-    border:1px solid rgba(200,154,72,.18) !important;
-    border-radius:12px !important;
-    background:linear-gradient(155deg,rgba(28,21,13,.58),rgba(8,7,5,.74)) !important;
-    box-shadow:inset 0 1px 0 rgba(255,238,196,.025) !important;
-    box-sizing:border-box !important;
-}
-#game-stage #inventoryPage .inventory-category-tabs{
-    display:grid !important;
-    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
-    gap:0 !important;
-    margin:0 0 8px !important;
-    padding:0 6px !important;
-    border-bottom:2px solid #6f542f !important;
-    align-items:end !important;
-}
-#game-stage #inventoryPage .inventory-category-tab{
-    position:relative !important;
-    min-width:0 !important;
-    min-height:36px !important;
-    padding:8px 4px 7px !important;
-    border:0 !important;
-    border-radius:0 !important;
-    background:transparent !important;
-    box-shadow:none !important;
-    color:#b9aa91 !important;
-    font-size:14px !important;
-    font-weight:700 !important;
-    line-height:1 !important;
-    text-align:center !important;
-    cursor:pointer !important;
-    user-select:none !important;
-}
-#game-stage #inventoryPage .inventory-category-tab::after{
-    content:"" !important;
-    position:absolute !important;
-    left:12% !important;
-    right:12% !important;
-    bottom:-2px !important;
-    height:3px !important;
-    background:transparent !important;
-    border-radius:3px 3px 0 0 !important;
-}
-#game-stage #inventoryPage .inventory-category-tab.active{
-    color:#ffe27a !important;
-    background:linear-gradient(180deg,rgba(138,106,58,.14),rgba(138,106,58,0)) !important;
-}
-#game-stage #inventoryPage .inventory-category-tab.active::after{
-    background:#f0b429 !important;
-    box-shadow:0 0 8px rgba(240,180,41,.35) !important;
-}
-#game-stage #inventoryPage .inventory-category-tab:focus-visible{
-    outline:1px solid #f0b429 !important;
-    outline-offset:-2px !important;
-}
-#game-stage #inventoryPage .inventory-grid-classic{
-    display:grid !important;
-    grid-template-columns:repeat(6,minmax(0,1fr)) !important;
-    gap:6px !important;
-    width:100% !important;
-    margin:0 !important;
-}
-#game-stage #inventoryPage .inventory-item-classic{
-    width:100% !important;
-    aspect-ratio:1 / 1 !important;
-    height:auto !important;
-    min-width:0 !important;
-    min-height:0 !important;
-    padding:3px !important;
-    border-width:1px !important;
-    border-radius:8px !important;
-    background:radial-gradient(circle at 50% 30%,rgba(200,154,72,.08),transparent 48%),linear-gradient(160deg,#17120d,#090806) !important;
-    box-shadow:inset 0 1px 0 rgba(255,238,196,.025),0 2px 6px rgba(0,0,0,.28) !important;
-    box-sizing:border-box !important;
-}
-#game-stage #inventoryPage .inventory-item-classic .inventory-icon{
-    font-size:clamp(17px,3vw,28px) !important;
-}
-#game-stage #inventoryPage .inventory-item-classic .inventory-count{
-    right:3px !important;
-    bottom:2px !important;
-    font-size:10px !important;
-}
-#game-stage #inventoryPage .inventory-item-classic .inventory-slot-number{
-    left:3px !important;
-    top:2px !important;
-    font-size:8px !important;
-}
-#game-stage #inventoryPage .inventory-pagination{
-    display:flex !important;
-    align-items:center !important;
-    justify-content:center !important;
-    gap:14px !important;
-    margin:8px 0 2px !important;
-}
-#game-stage #inventoryPage .inventory-pagination button{
-    width:42px !important;
-    height:34px !important;
-    min-width:42px !important;
-    min-height:34px !important;
-    font-size:22px !important;
-    border-radius:6px !important;
-}
-#game-stage #inventoryPage #inventoryPageLabel{
-    min-width:64px !important;
-    font-size:14px !important;
-}
-
-/* 避免底部導覽列遮掉最後一排 */
-#game-stage #inventoryPage .inventory-right-panel{
-    margin-bottom:26px !important;
-}
-
-
-/* V75 explicit visual frames — not dependent on legacy border defaults */
-#game-stage #inventoryPage .inventory-portrait-frame{
-    border:2px solid #8a6a3a !important;
-    background:linear-gradient(180deg,rgba(36,28,18,.82),rgba(10,8,5,.92)) !important;
-    box-shadow:inset 0 0 0 1px rgba(240,180,41,.12) !important;
-}
-#game-stage #inventoryPage .inventory-equipment-slot{
-    border:2px solid #8a6a3a !important;
-    background:linear-gradient(180deg,rgba(36,28,18,.88),rgba(10,8,5,.96)) !important;
-    box-shadow:inset 0 0 0 1px rgba(240,180,41,.10) !important;
-}
-#game-stage #inventoryPage .inventory-stats-panel,
-#game-stage #inventoryPage .inventory-right-panel{
-    border:2px solid #8a6a3a !important;
-    background:linear-gradient(180deg,rgba(36,28,18,.90),rgba(12,9,6,.96)) !important;
-}
+@media (max-width:430px){#game-stage #inventoryPage .inventory-title-plate{min-width:154px;gap:7px;padding-inline:9px}#game-stage #inventoryPage .inventory-title-plate h2{font-size:20px}#game-stage #inventoryPage .inventory-character-stage{padding-inline:7px}#game-stage #inventoryPage .inventory-equipment-grid{inset-inline:7px}}
+@media (max-width:380px){#game-stage #inventoryPage .inventory-classic-shell{width:96%}#game-stage #inventoryPage .inventory-character-stage{grid-template-columns:minmax(50px,1fr) minmax(132px,2.2fr) minmax(50px,1fr)}#game-stage #inventoryPage .inventory-equipment-grid{grid-template-columns:minmax(50px,1fr) minmax(132px,2.2fr) minmax(50px,1fr)}#game-stage #inventoryPage .inventory-grid-classic{gap:4px}#game-stage #inventoryPage .inventory-bottom-actions{gap:4px}#game-stage #inventoryPage .inventory-bottom-action{padding-inline:5px}}
+@media (prefers-reduced-motion:reduce){#game-stage #inventoryPage .inventory-item-classic.is-selected{animation:none}}

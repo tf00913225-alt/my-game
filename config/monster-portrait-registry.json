@@ -1,1 +1,3137 @@
-{"schemaVersion":1,"title":"《四象江湖傳》怪物立繪註冊表 v1","spec":"docs/MONSTER_PORTRAIT_SPEC_V1.md","baselineDevHead":"845d5b011352d09763a7f1d5560487ffaba65bfa","tupleSchema":["portraitKey","name","element","rank","sizeClass","path","status"],"policy":{"masterFormat":"png","background":"transparent","newAssetRoot":"assets/monsters","normalEliteSharePortrait":true,"runtimeWebpDerivativeAllowed":true,"runtimeMustResolveByRegistryKeyOrExplicitMonsterMetadata":true,"runtimeMustNotGuessFilenameFromChineseName":true,"soldierResolution":"element","abyssRegionSoldierElements":{"east":"earth","south":"fire","heaven":"wind","north":"water","extreme":"light"},"trueRealmFinalDisplayOrder":["water","earth","fire","wind","water"],"extremePrestageDisplayRule":"unresolved-do-not-invent-light-soldier","legacyUniversalSoldierFiles":["assets/dungeons/abyss/soldier.webp","assets/dungeons/abyss/floor5-soldier.webp"],"runtimeFormat":"webp","runtimeLossless":true},"dimensions":{"standard":{"width":1024,"height":1536,"ratio":"2:3","bodyHeightPercent":"78-85","safeMarginsPercent":{"top":"6-8","bottom":"6-10","left":"5-8","right":"5-8"}},"boss":{"width":1536,"height":2048,"ratio":"3:4","bodyHeightPercent":"85-92","safeMarginsPercent":{"top":"6-8","bottom":"6-10","left":"5-8","right":"5-8"}}},"snapshot":{"portraitTargets":107,"existingTargets":15,"plannedTargets":88,"uniqueRuntimeNames":104},"groups":{"wild":[["wild.zone-01.fire-01","哥布林","fire","regular","standard","assets/monsters/wild/zone-01/fire-01.png","planned"],["wild.zone-01.water-01","史萊姆","water","regular","standard","assets/monsters/wild/zone-01/water-01.png","planned"],["wild.zone-01.wind-01","林間風靈","wind","regular","standard","assets/monsters/wild/zone-01/wind-01.png","planned"],["wild.zone-01.earth-01","苔岩獸","earth","regular","standard","assets/monsters/wild/zone-01/earth-01.png","planned"],["wild.zone-02.fire-01","沙漠豺狼","fire","regular","standard","assets/monsters/wild/zone-02/fire-01.png","planned"],["wild.zone-02.water-01","沙蠍","water","regular","standard","assets/monsters/wild/zone-02/water-01.png","planned"],["wild.zone-02.wind-01","風沙隼","wind","regular","standard","assets/monsters/wild/zone-02/wind-01.png","planned"],["wild.zone-02.earth-01","岩甲蠍","earth","regular","standard","assets/monsters/wild/zone-02/earth-01.png","planned"],["wild.zone-03.fire-01","熾焰狼","fire","regular","standard","assets/monsters/wild/zone-03/fire-01.png","planned"],["wild.zone-03.water-01","寒冰魔","water","regular","standard","assets/monsters/wild/zone-03/water-01.png","planned"],["wild.zone-03.fire-02","熾焰狼王","fire","regular","standard","assets/monsters/wild/zone-03/fire-02.png","planned"],["wild.zone-03.water-02","寒冰魔王","water","regular","standard","assets/monsters/wild/zone-03/water-02.png","planned"],["wild.zone-03.wind-01","霜風妖","wind","regular","standard","assets/monsters/wild/zone-03/wind-01.png","planned"],["wild.zone-03.earth-01","凍岩獸","earth","regular","standard","assets/monsters/wild/zone-03/earth-01.png","planned"],["wild.zone-04.fire-01","烈焰巨魔","fire","regular","standard","assets/monsters/wild/zone-04/fire-01.png","planned"],["wild.zone-04.water-01","深淵水靈","water","regular","standard","assets/monsters/wild/zone-04/water-01.png","planned"],["wild.zone-04.fire-02","烈焰巨魔王","fire","regular","standard","assets/monsters/wild/zone-04/fire-02.png","planned"],["wild.zone-04.water-02","深淵水靈王","water","regular","standard","assets/monsters/wild/zone-04/water-02.png","planned"],["wild.zone-04.wind-01","焰風鬼","wind","regular","standard","assets/monsters/wild/zone-04/wind-01.png","planned"],["wild.zone-04.earth-01","熔岩石怪","earth","regular","standard","assets/monsters/wild/zone-04/earth-01.png","planned"],["wild.zone-05.fire-01","熔岩巨獸","fire","regular","standard","assets/monsters/wild/zone-05/fire-01.png","planned"],["wild.zone-05.water-01","寒潮巨獸","water","regular","standard","assets/monsters/wild/zone-05/water-01.png","planned"],["wild.zone-05.fire-02","熔岩巨獸王","fire","regular","standard","assets/monsters/wild/zone-05/fire-02.png","planned"],["wild.zone-05.water-02","寒潮巨獸王","water","regular","standard","assets/monsters/wild/zone-05/water-02.png","planned"],["wild.zone-05.wind-01","蒼風巨獸","wind","regular","standard","assets/monsters/wild/zone-05/wind-01.png","planned"],["wild.zone-05.earth-01","山岳巨獸","earth","regular","standard","assets/monsters/wild/zone-05/earth-01.png","planned"],["wild.zone-06.fire-01","赤炎修羅","fire","regular","standard","assets/monsters/wild/zone-06/fire-01.png","planned"],["wild.zone-06.water-01","玄冰修羅","water","regular","standard","assets/monsters/wild/zone-06/water-01.png","planned"],["wild.zone-06.fire-02","赤炎修羅王","fire","regular","standard","assets/monsters/wild/zone-06/fire-02.png","planned"],["wild.zone-06.water-02","玄冰修羅王","water","regular","standard","assets/monsters/wild/zone-06/water-02.png","planned"],["wild.zone-06.wind-01","風刃修羅","wind","regular","standard","assets/monsters/wild/zone-06/wind-01.png","planned"],["wild.zone-06.earth-01","岩鎧修羅","earth","regular","standard","assets/monsters/wild/zone-06/earth-01.png","planned"],["wild.zone-07.fire-01","業火魔君","fire","regular","standard","assets/monsters/wild/zone-07/fire-01.png","planned"],["wild.zone-07.water-01","絕冰魔君","water","regular","standard","assets/monsters/wild/zone-07/water-01.png","planned"],["wild.zone-07.fire-02","業火魔君王","fire","regular","standard","assets/monsters/wild/zone-07/fire-02.png","planned"],["wild.zone-07.water-02","絕冰魔君王","water","regular","standard","assets/monsters/wild/zone-07/water-02.png","planned"],["wild.zone-07.wind-01","嵐影魔君","wind","regular","standard","assets/monsters/wild/zone-07/wind-01.png","planned"],["wild.zone-07.earth-01","岳魂魔君","earth","regular","standard","assets/monsters/wild/zone-07/earth-01.png","planned"],["wild.zone-08.fire-01","焚天龍獄","fire","regular","standard","assets/monsters/wild/zone-08/fire-01.png","planned"],["wild.zone-08.water-01","極寒龍獄","water","regular","standard","assets/monsters/wild/zone-08/water-01.png","planned"],["wild.zone-08.fire-02","焚天龍獄皇","fire","regular","standard","assets/monsters/wild/zone-08/fire-02.png","planned"],["wild.zone-08.water-02","極寒龍獄皇","water","regular","standard","assets/monsters/wild/zone-08/water-02.png","planned"],["wild.zone-08.wind-01","青嵐龍衛","wind","regular","standard","assets/monsters/wild/zone-08/wind-01.png","planned"],["wild.zone-08.earth-01","岩岳龍衛","earth","regular","standard","assets/monsters/wild/zone-08/earth-01.png","planned"],["wild.zone-09.fire-01","虛空煉獄","fire","regular","standard","assets/monsters/wild/zone-09/fire-01.png","planned"],["wild.zone-09.water-01","永凍深淵","water","regular","standard","assets/monsters/wild/zone-09/water-01.png","planned"],["wild.zone-09.fire-02","虛空煉獄皇","fire","regular","standard","assets/monsters/wild/zone-09/fire-02.png","planned"],["wild.zone-09.water-02","永凍深淵皇","water","regular","standard","assets/monsters/wild/zone-09/water-02.png","planned"],["wild.zone-09.wind-01","虛空風靈","wind","regular","standard","assets/monsters/wild/zone-09/wind-01.png","planned"],["wild.zone-09.earth-01","虛空岩靈","earth","regular","standard","assets/monsters/wild/zone-09/earth-01.png","planned"],["wild.zone-10.fire-01","終焉神魔","fire","regular","standard","assets/monsters/wild/zone-10/fire-01.png","planned"],["wild.zone-10.water-01","末世寒神","water","regular","standard","assets/monsters/wild/zone-10/water-01.png","planned"],["wild.zone-10.fire-02","終焉神魔皇","fire","regular","standard","assets/monsters/wild/zone-10/fire-02.png","planned"],["wild.zone-10.water-02","末世寒神皇","water","regular","standard","assets/monsters/wild/zone-10/water-02.png","planned"],["wild.zone-10.wind-01","終焉風神","wind","regular","standard","assets/monsters/wild/zone-10/wind-01.png","planned"],["wild.zone-10.earth-01","終焉地神","earth","regular","standard","assets/monsters/wild/zone-10/earth-01.png","planned"]],"daily":[["daily.exp.regular","修行弟子","dynamic","regular","standard","assets/monsters/daily/exp/regular.webp","existing"],["daily.exp.elite","修行精英","dynamic","elite","standard","assets/monsters/daily/exp/elite.webp","existing"],["daily.exp.boss","修行教頭","dynamic","boss","standard","assets/monsters/daily/exp/boss.webp","retired"],["daily.material.regular","礦脈守衛","dynamic","regular","standard","assets/monsters/daily/material/regular.webp","retired"],["daily.material.elite","礦脈精英","dynamic","elite","standard","assets/monsters/daily/material/elite.webp","retired"],["daily.material.boss","礦脈統領","dynamic","boss","standard","assets/monsters/daily/material/boss.webp","retired"],["daily.gold.regular","金庫守衛","dynamic","regular","standard","assets/monsters/daily/gold/regular.png","planned"],["daily.gold.elite","金庫精英","dynamic","elite","standard","assets/monsters/daily/gold/elite.png","planned"],["daily.gold.boss","金庫總管","dynamic","boss","standard","assets/monsters/daily/gold/boss.png","planned"]],"boss-personal":[["boss.personal-20","赤焰君","fire","boss","boss","assets/monsters/boss/personal/personal-20.png","planned"],["boss.personal-30","獄火侯","fire","boss","boss","assets/monsters/boss/personal/personal-30.png","planned"],["boss.personal-40","凍海君","water","boss","boss","assets/monsters/boss/personal/personal-40.png","planned"],["boss.personal-50","霜淵侯","water","boss","boss","assets/monsters/boss/personal/personal-50.png","planned"],["boss.personal-60","雪獄尊","water","boss","boss","assets/monsters/boss/personal/personal-60.png","planned"],["boss.personal-70","寒劫尊","water","boss","boss","assets/monsters/boss/personal/personal-70.png","planned"],["boss.personal-80","凍界皇","water","boss","boss","assets/monsters/boss/personal/personal-80.png","planned"],["boss.personal-90","霜天皇","water","boss","boss","assets/monsters/boss/personal/personal-90.png","planned"],["boss.personal-100","寒獄帝","water","boss","boss","assets/monsters/boss/personal/personal-100.png","planned"]],"boss-world":[["boss.world-40","熔天君","fire","boss","boss","assets/monsters/boss/world/world-40.png","planned"],["boss.world-60","冰海皇","water","boss","boss","assets/monsters/boss/world/world-60.png","planned"],["boss.world-80","九曜龍皇","fire","boss","boss","assets/monsters/boss/world/world-80.png","planned"],["boss.world-100","滅世天魔","fire","boss","boss","assets/monsters/boss/world/world-100.png","planned"]],"boss-support":[["boss-support.fire-01","赤劫炎衛","fire","elite","standard","assets/monsters/boss-support/fire-01.png","planned"],["boss-support.fire-02","燼曜戰侍","fire","elite","standard","assets/monsters/boss-support/fire-02.png","planned"],["boss-support.water-01","玄瀾霜衛","water","elite","standard","assets/monsters/boss-support/water-01.png","planned"],["boss-support.water-02","寒魄冰侍","water","elite","standard","assets/monsters/boss-support/water-02.png","planned"],["boss-support.earth-01","坤嶽玄衛","earth","elite","standard","assets/monsters/boss-support/earth-01.png","planned"],["boss-support.earth-02","鎮岳戰侍","earth","elite","standard","assets/monsters/boss-support/earth-02.png","planned"],["boss-support.wind-01","蒼嵐迅衛","wind","elite","standard","assets/monsters/boss-support/wind-01.png","planned"],["boss-support.wind-02","天罡風侍","wind","elite","standard","assets/monsters/boss-support/wind-02.png","planned"]],"tower-boss":[["tower-boss.fire.envoy","赤焰使","fire","boss","boss","assets/monsters/tower/boss/fire-envoy.png","planned"],["tower-boss.fire.venerable","炎天尊","fire","boss","boss","assets/monsters/tower/boss/fire-venerable.png","planned"],["tower-boss.water.envoy","寒泉使","water","boss","boss","assets/monsters/tower/boss/water-envoy.png","planned"],["tower-boss.water.venerable","玄冥尊","water","boss","boss","assets/monsters/tower/boss/water-venerable.png","planned"],["tower-boss.earth.envoy","岩岳使","earth","boss","boss","assets/monsters/tower/boss/earth-envoy.png","planned"],["tower-boss.earth.venerable","坤嶽尊","earth","boss","boss","assets/monsters/tower/boss/earth-venerable.png","planned"],["tower-boss.wind.envoy","青嵐使","wind","boss","boss","assets/monsters/tower/boss/wind-envoy.png","planned"],["tower-boss.wind.venerable","巽風尊","wind","boss","boss","assets/monsters/tower/boss/wind-venerable.png","planned"]],"abyss-boss":[["abyss.east","東帝","earth","boss","boss","assets/dungeons/abyss/east-emperor.webp","existing"],["abyss.south","南帝","fire","boss","boss","assets/dungeons/abyss/south-emperor.webp","existing"],["abyss.heaven","天帝","wind","boss","boss","assets/dungeons/abyss/heaven-emperor.webp","existing"],["abyss.north","北帝","water","boss","boss","assets/dungeons/abyss/north-emperor.webp","existing"],["abyss.final.east","東帝天尊","earth","boss","boss","assets/dungeons/abyss/floor5-east-emperor.webp","existing"],["abyss.final.heaven","天帝天尊","wind","boss","boss","assets/dungeons/abyss/floor5-heaven-emperor.webp","existing"],["abyss.final.extreme","極帝天尊","light","boss","boss","assets/dungeons/abyss/floor5-extreme-emperor.webp","existing"],["abyss.final.north","北帝天尊","water","boss","boss","assets/dungeons/abyss/floor5-north-emperor.webp","existing"],["abyss.final.south","南帝天尊","fire","boss","boss","assets/dungeons/abyss/floor5-south-emperor.webp","existing"]],"heavenly-soldier":[["soldier.fire","天兵天將","fire","regular","standard","assets/monsters/soldiers/heavenly-soldier-fire.png","existing"],["soldier.water","天兵天將","water","regular","standard","assets/monsters/soldiers/heavenly-soldier-water.png","existing"],["soldier.wind","天兵天將","wind","regular","standard","assets/monsters/soldiers/heavenly-soldier-wind.png","existing"],["soldier.earth","天兵天將","earth","regular","standard","assets/monsters/soldiers/heavenly-soldier-earth.png","existing"]]}}
+{
+  "schemaVersion": 1,
+  "title": "《四象江湖傳》怪物立繪註冊表 v1",
+  "spec": "docs/MONSTER_PORTRAIT_SPEC_V1.md",
+  "baselineDevHead": "845d5b011352d09763a7f1d5560487ffaba65bfa",
+  "tupleSchema": [
+    "portraitKey",
+    "name",
+    "element",
+    "rank",
+    "sizeClass",
+    "path",
+    "status"
+  ],
+  "policy": {
+    "masterFormat": "png",
+    "background": "transparent",
+    "newAssetRoot": "assets/monsters",
+    "normalEliteSharePortrait": true,
+    "runtimeWebpDerivativeAllowed": true,
+    "runtimeMustResolveByRegistryKeyOrExplicitMonsterMetadata": true,
+    "runtimeMustNotGuessFilenameFromChineseName": true,
+    "soldierResolution": "element",
+    "abyssRegionSoldierElements": {
+      "east": "earth",
+      "south": "fire",
+      "heaven": "wind",
+      "north": "water",
+      "extreme": "light"
+    },
+    "trueRealmFinalDisplayOrder": [
+      "water",
+      "earth",
+      "fire",
+      "wind",
+      "water"
+    ],
+    "extremePrestageDisplayRule": "unresolved-do-not-invent-light-soldier",
+    "legacyUniversalSoldierFiles": [
+      "assets/dungeons/abyss/soldier.webp",
+      "assets/dungeons/abyss/floor5-soldier.webp"
+    ],
+    "runtimeFormat": "webp",
+    "runtimeLossless": true
+  },
+  "dimensions": {
+    "standard": {
+      "width": 1024,
+      "height": 1536,
+      "ratio": "2:3",
+      "bodyHeightPercent": "78-85",
+      "safeMarginsPercent": {
+        "top": "6-8",
+        "bottom": "6-10",
+        "left": "5-8",
+        "right": "5-8"
+      }
+    },
+    "boss": {
+      "width": 1536,
+      "height": 2048,
+      "ratio": "3:4",
+      "bodyHeightPercent": "85-92",
+      "safeMarginsPercent": {
+        "top": "6-8",
+        "bottom": "6-10",
+        "left": "5-8",
+        "right": "5-8"
+      }
+    }
+  },
+  "snapshot": {
+    "portraitTargets": 176,
+    "existingTargets": 139,
+    "plannedTargets": 37,
+    "uniqueRuntimeNames": 173,
+    "assetPoolCounts": {
+      "normal": 10,
+      "elite": 19,
+      "miniboss": 11,
+      "boss": 0
+    },
+    "runtimeFinalized": true
+  },
+  "groups": {
+    "wild": [
+      [
+        "wild.zone-01.fire-01",
+        "哥布林",
+        "fire",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-01/fire-01.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-01.water-01",
+        "水靈狐",
+        "water",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-01/water-01.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-01.wind-01",
+        "風芽魈",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-01/wind-01.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-01.earth-01",
+        "岩薯卒",
+        "earth",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-01/earth-01.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-02.fire-01",
+        "沙漠豺狼",
+        "fire",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-02/fire-01.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-02.water-01",
+        "浪尾獺",
+        "water",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-02/water-01.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-02.wind-01",
+        "疾角妖",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-02/wind-01.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-02.earth-01",
+        "岩鬃狸",
+        "earth",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-02/earth-01.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-03.fire-01",
+        "熾焰狼",
+        "fire",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-03/fire-01.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-03.water-01",
+        "澤木妖",
+        "water",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-03/water-01.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-03.fire-02",
+        "熾焰狼王",
+        "fire",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-03/fire-02.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-03.water-02",
+        "寒冰魔王",
+        "water",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-03/water-02.png",
+        "planned"
+      ],
+      [
+        "wild.zone-03.wind-01",
+        "霧鬃狼",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-03/wind-01.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-03.earth-01",
+        "石鎧象",
+        "earth",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-03/earth-01.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-04.fire-01",
+        "烈焰巨魔",
+        "fire",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-04/fire-01.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-04.water-01",
+        "沼鉤怪",
+        "water",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-04/water-01.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-04.fire-02",
+        "炎錘巨魔",
+        "fire",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-04/fire-02.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-04.water-02",
+        "深淵水靈王",
+        "water",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-04/water-02.png",
+        "planned"
+      ],
+      [
+        "wild.zone-04.wind-01",
+        "旋風鬼",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-04/wind-01.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-04.earth-01",
+        "礦鎬鬼",
+        "earth",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-04/earth-01.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-05.fire-01",
+        "熔岩巨獸",
+        "fire",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-05/fire-01.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-05.water-01",
+        "潮蛙卒",
+        "water",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-05/water-01.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-05.fire-02",
+        "熔翼獸王",
+        "fire",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-05/fire-02.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-05.water-02",
+        "寒潮巨獸王",
+        "water",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-05/water-02.png",
+        "planned"
+      ],
+      [
+        "wild.zone-05.wind-01",
+        "青嵐虎",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-05/wind-01.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-05.earth-01",
+        "枯根妖",
+        "earth",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-05/earth-01.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-06.fire-01",
+        "赤炎修羅",
+        "fire",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-06/fire-01.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-06.water-01",
+        "鱗潭獸",
+        "water",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-06/water-01.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-06.fire-02",
+        "六臂修羅",
+        "fire",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-06/fire-02.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-06.water-02",
+        "玄冰修羅王",
+        "water",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-06/water-02.png",
+        "planned"
+      ],
+      [
+        "wild.zone-06.wind-01",
+        "逐風客",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-06/wind-01.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-06.earth-01",
+        "石鬃狼",
+        "earth",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-06/earth-01.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-07.fire-01",
+        "業火魔君",
+        "fire",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-07/fire-01.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-07.water-01",
+        "瀾花姬",
+        "water",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-07/water-01.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-07.fire-02",
+        "業炎法王",
+        "fire",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-07/fire-02.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-07.water-02",
+        "絕冰魔君王",
+        "water",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-07/water-02.png",
+        "planned"
+      ],
+      [
+        "wild.zone-07.wind-01",
+        "嵐鎧衛",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-07/wind-01.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-07.earth-01",
+        "岩爪貛",
+        "earth",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-07/earth-01.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-08.fire-01",
+        "焚天龍獄",
+        "fire",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-08/fire-01.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-08.water-01",
+        "海蜇巫",
+        "water",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-08/water-01.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-08.fire-02",
+        "焚天炎龍",
+        "fire",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-08/fire-02.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-08.water-02",
+        "極寒龍獄皇",
+        "water",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-08/water-02.png",
+        "planned"
+      ],
+      [
+        "wild.zone-08.wind-01",
+        "翼影魔",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-08/wind-01.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-08.earth-01",
+        "礦牙妖",
+        "earth",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-08/earth-01.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-09.fire-01",
+        "虛空煉獄",
+        "fire",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-09/fire-01.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-09.water-01",
+        "霜鬃狼",
+        "water",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-09/water-01.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-09.fire-02",
+        "獄輪魔尊",
+        "fire",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-09/fire-02.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-09.water-02",
+        "永凍深淵皇",
+        "water",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-09/water-02.png",
+        "planned"
+      ],
+      [
+        "wild.zone-09.wind-01",
+        "風魘使",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-09/wind-01.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-09.earth-01",
+        "荊根魔",
+        "earth",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-09/earth-01.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-10.fire-01",
+        "終焉神魔",
+        "fire",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-10/fire-01.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-10.water-01",
+        "玄潮俠",
+        "water",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-10/water-01.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-10.fire-02",
+        "末炎祭司",
+        "fire",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-10/fire-02.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-10.water-02",
+        "末世寒神皇",
+        "water",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-10/water-02.png",
+        "planned"
+      ],
+      [
+        "wild.zone-10.wind-01",
+        "蒼羽尊",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-10/wind-01.webp",
+        "existing"
+      ],
+      [
+        "wild.zone-10.earth-01",
+        "山岩巨人",
+        "earth",
+        "regular",
+        "standard",
+        "assets/monsters/wild/zone-10/earth-01.webp",
+        "existing"
+      ]
+    ],
+    "daily": [
+      [
+        "daily.exp.regular",
+        "修行弟子",
+        "dynamic",
+        "regular",
+        "standard",
+        "assets/monsters/daily/exp/regular.webp",
+        "existing"
+      ],
+      [
+        "daily.exp.elite",
+        "修行精英",
+        "dynamic",
+        "elite",
+        "standard",
+        "assets/monsters/daily/exp/elite.webp",
+        "existing"
+      ],
+      [
+        "daily.exp.boss",
+        "修行教頭",
+        "dynamic",
+        "boss",
+        "standard",
+        "assets/monsters/daily/exp/boss.webp",
+        "existing"
+      ],
+      [
+        "daily.material.regular",
+        "礦脈守衛",
+        "dynamic",
+        "regular",
+        "standard",
+        "assets/monsters/daily/material/regular.webp",
+        "existing"
+      ],
+      [
+        "daily.material.elite",
+        "礦脈精英",
+        "dynamic",
+        "elite",
+        "standard",
+        "assets/monsters/daily/material/elite.webp",
+        "existing"
+      ],
+      [
+        "daily.material.boss",
+        "礦脈統領",
+        "dynamic",
+        "boss",
+        "standard",
+        "assets/monsters/daily/material/boss.webp",
+        "existing"
+      ],
+      [
+        "daily.gold.regular",
+        "金庫守衛",
+        "dynamic",
+        "regular",
+        "standard",
+        "assets/monsters/daily/gold/regular.webp",
+        "existing"
+      ],
+      [
+        "daily.gold.elite",
+        "金庫精英",
+        "dynamic",
+        "elite",
+        "standard",
+        "assets/monsters/daily/gold/elite.webp",
+        "existing"
+      ],
+      [
+        "daily.gold.boss",
+        "金庫總管",
+        "dynamic",
+        "boss",
+        "standard",
+        "assets/monsters/daily/gold/boss.webp",
+        "existing"
+      ]
+    ],
+    "boss-personal": [
+      [
+        "boss.personal-20",
+        "赤焰君",
+        "fire",
+        "boss",
+        "boss",
+        "assets/monsters/boss/personal/personal-20.png",
+        "planned"
+      ],
+      [
+        "boss.personal-30",
+        "獄火侯",
+        "fire",
+        "boss",
+        "boss",
+        "assets/monsters/boss/personal/personal-30.png",
+        "planned"
+      ],
+      [
+        "boss.personal-40",
+        "凍海君",
+        "water",
+        "boss",
+        "boss",
+        "assets/monsters/boss/personal/personal-40.png",
+        "planned"
+      ],
+      [
+        "boss.personal-50",
+        "霜淵侯",
+        "water",
+        "boss",
+        "boss",
+        "assets/monsters/boss/personal/personal-50.png",
+        "planned"
+      ],
+      [
+        "boss.personal-60",
+        "雪獄尊",
+        "water",
+        "boss",
+        "boss",
+        "assets/monsters/boss/personal/personal-60.png",
+        "planned"
+      ],
+      [
+        "boss.personal-70",
+        "寒劫尊",
+        "water",
+        "boss",
+        "boss",
+        "assets/monsters/boss/personal/personal-70.png",
+        "planned"
+      ],
+      [
+        "boss.personal-80",
+        "凍界皇",
+        "water",
+        "boss",
+        "boss",
+        "assets/monsters/boss/personal/personal-80.png",
+        "planned"
+      ],
+      [
+        "boss.personal-90",
+        "霜天皇",
+        "water",
+        "boss",
+        "boss",
+        "assets/monsters/boss/personal/personal-90.png",
+        "planned"
+      ],
+      [
+        "boss.personal-100",
+        "寒獄帝",
+        "water",
+        "boss",
+        "boss",
+        "assets/monsters/boss/personal/personal-100.png",
+        "planned"
+      ]
+    ],
+    "boss-world": [
+      [
+        "boss.world-40",
+        "熔天君",
+        "fire",
+        "boss",
+        "boss",
+        "assets/monsters/boss/world/world-40.png",
+        "planned"
+      ],
+      [
+        "boss.world-60",
+        "冰海皇",
+        "water",
+        "boss",
+        "boss",
+        "assets/monsters/boss/world/world-60.png",
+        "planned"
+      ],
+      [
+        "boss.world-80",
+        "九曜龍皇",
+        "fire",
+        "boss",
+        "boss",
+        "assets/monsters/boss/world/world-80.png",
+        "planned"
+      ],
+      [
+        "boss.world-100",
+        "滅世天魔",
+        "fire",
+        "boss",
+        "boss",
+        "assets/monsters/boss/world/world-100.png",
+        "planned"
+      ]
+    ],
+    "boss-support": [
+      [
+        "boss-support.fire-01",
+        "赤劫炎衛",
+        "fire",
+        "elite",
+        "standard",
+        "assets/monsters/boss-support/fire-01.png",
+        "planned"
+      ],
+      [
+        "boss-support.fire-02",
+        "燼曜戰侍",
+        "fire",
+        "elite",
+        "standard",
+        "assets/monsters/boss-support/fire-02.png",
+        "planned"
+      ],
+      [
+        "boss-support.water-01",
+        "玄瀾霜衛",
+        "water",
+        "elite",
+        "standard",
+        "assets/monsters/boss-support/water-01.png",
+        "planned"
+      ],
+      [
+        "boss-support.water-02",
+        "寒魄冰侍",
+        "water",
+        "elite",
+        "standard",
+        "assets/monsters/boss-support/water-02.png",
+        "planned"
+      ],
+      [
+        "boss-support.earth-01",
+        "坤嶽玄衛",
+        "earth",
+        "elite",
+        "standard",
+        "assets/monsters/boss-support/earth-01.png",
+        "planned"
+      ],
+      [
+        "boss-support.earth-02",
+        "鎮岳戰侍",
+        "earth",
+        "elite",
+        "standard",
+        "assets/monsters/boss-support/earth-02.png",
+        "planned"
+      ],
+      [
+        "boss-support.wind-01",
+        "蒼嵐迅衛",
+        "wind",
+        "elite",
+        "standard",
+        "assets/monsters/boss-support/wind-01.png",
+        "planned"
+      ],
+      [
+        "boss-support.wind-02",
+        "天罡風侍",
+        "wind",
+        "elite",
+        "standard",
+        "assets/monsters/boss-support/wind-02.png",
+        "planned"
+      ]
+    ],
+    "tower-boss": [
+      [
+        "tower-boss.fire.envoy",
+        "赤焰使",
+        "fire",
+        "boss",
+        "standard",
+        "assets/monsters/tower/boss/fire-envoy.png",
+        "planned"
+      ],
+      [
+        "tower-boss.fire.venerable",
+        "炎天尊",
+        "fire",
+        "boss",
+        "standard",
+        "assets/monsters/tower/boss/fire-venerable.png",
+        "planned"
+      ],
+      [
+        "tower-boss.water.envoy",
+        "寒泉使",
+        "water",
+        "boss",
+        "standard",
+        "assets/monsters/tower/boss/water-envoy.png",
+        "planned"
+      ],
+      [
+        "tower-boss.water.venerable",
+        "玄冥尊",
+        "water",
+        "boss",
+        "standard",
+        "assets/monsters/tower/boss/water-venerable.png",
+        "planned"
+      ],
+      [
+        "tower-boss.earth.envoy",
+        "岩岳使",
+        "earth",
+        "boss",
+        "standard",
+        "assets/monsters/tower/boss/earth-envoy.png",
+        "planned"
+      ],
+      [
+        "tower-boss.earth.venerable",
+        "坤嶽尊",
+        "earth",
+        "boss",
+        "standard",
+        "assets/monsters/tower/boss/earth-venerable.png",
+        "planned"
+      ],
+      [
+        "tower-boss.wind.envoy",
+        "青嵐使",
+        "wind",
+        "boss",
+        "standard",
+        "assets/monsters/tower/boss/wind-envoy.png",
+        "planned"
+      ],
+      [
+        "tower-boss.wind.venerable",
+        "巽風尊",
+        "wind",
+        "boss",
+        "standard",
+        "assets/monsters/tower/boss/wind-venerable.png",
+        "planned"
+      ]
+    ],
+    "abyss-boss": [
+      [
+        "abyss.east",
+        "東帝",
+        "earth",
+        "boss",
+        "boss",
+        "assets/dungeons/abyss/east-emperor.webp",
+        "existing"
+      ],
+      [
+        "abyss.south",
+        "南帝",
+        "fire",
+        "boss",
+        "boss",
+        "assets/dungeons/abyss/south-emperor.webp",
+        "existing"
+      ],
+      [
+        "abyss.heaven",
+        "天帝",
+        "wind",
+        "boss",
+        "boss",
+        "assets/dungeons/abyss/heaven-emperor.webp",
+        "existing"
+      ],
+      [
+        "abyss.north",
+        "北帝",
+        "water",
+        "boss",
+        "boss",
+        "assets/dungeons/abyss/north-emperor.webp",
+        "existing"
+      ],
+      [
+        "abyss.final.east",
+        "東帝天尊",
+        "earth",
+        "boss",
+        "boss",
+        "assets/dungeons/abyss/floor5-east-emperor.webp",
+        "existing"
+      ],
+      [
+        "abyss.final.heaven",
+        "天帝天尊",
+        "wind",
+        "boss",
+        "boss",
+        "assets/dungeons/abyss/floor5-heaven-emperor.webp",
+        "existing"
+      ],
+      [
+        "abyss.final.extreme",
+        "極帝天尊",
+        "light",
+        "boss",
+        "boss",
+        "assets/dungeons/abyss/floor5-extreme-emperor.webp",
+        "existing"
+      ],
+      [
+        "abyss.final.north",
+        "北帝天尊",
+        "water",
+        "boss",
+        "boss",
+        "assets/dungeons/abyss/floor5-north-emperor.webp",
+        "existing"
+      ],
+      [
+        "abyss.final.south",
+        "南帝天尊",
+        "fire",
+        "boss",
+        "boss",
+        "assets/dungeons/abyss/floor5-south-emperor.webp",
+        "existing"
+      ]
+    ],
+    "heavenly-soldier": [
+      [
+        "soldier.fire",
+        "天兵天將",
+        "fire",
+        "regular",
+        "standard",
+        "assets/monsters/soldiers/heavenly-soldier-fire.png",
+        "existing"
+      ],
+      [
+        "soldier.water",
+        "天兵天將",
+        "water",
+        "regular",
+        "standard",
+        "assets/monsters/soldiers/heavenly-soldier-water.png",
+        "existing"
+      ],
+      [
+        "soldier.wind",
+        "天兵天將",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/soldiers/heavenly-soldier-wind.png",
+        "existing"
+      ],
+      [
+        "soldier.earth",
+        "天兵天將",
+        "earth",
+        "regular",
+        "standard",
+        "assets/monsters/soldiers/heavenly-soldier-earth.png",
+        "existing"
+      ]
+    ],
+    "tower-wind": [
+      [
+        "MON_WIND_NORMAL_001",
+        "翎爪衛",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-normal-001.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_NORMAL_002",
+        "旋刃卒",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-normal-002.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_NORMAL_003",
+        "踏雲客",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-normal-003.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_NORMAL_004",
+        "嵐鹿靈",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-normal-004.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_NORMAL_005",
+        "飛絮姬",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-normal-005.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_NORMAL_006",
+        "巨牙象",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-normal-006.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_NORMAL_007",
+        "雲翎使",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-normal-007.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_NORMAL_008",
+        "風枝妖",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-normal-008.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_NORMAL_009",
+        "逐嵐俠",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-normal-009.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_NORMAL_010",
+        "青羽劍",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-normal-010.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_NORMAL_011",
+        "風紋祭",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-normal-011.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_NORMAL_012",
+        "翔雲女",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-normal-012.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_NORMAL_013",
+        "浮空傘",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-normal-013.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_NORMAL_014",
+        "疾羽槍",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-normal-014.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_NORMAL_015",
+        "嵐狼騎",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-normal-015.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_NORMAL_016",
+        "流風俠",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-normal-016.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_NORMAL_017",
+        "雲蛇姬",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-normal-017.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_NORMAL_018",
+        "古木巫",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-normal-018.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_NORMAL_019",
+        "風蹄魔",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-normal-019.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_NORMAL_020",
+        "霧羽仙",
+        "wind",
+        "regular",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-normal-020.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_ELITE_001",
+        "嵐羽鸞",
+        "wind",
+        "elite",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-elite-001.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_ELITE_002",
+        "青風蛟",
+        "wind",
+        "elite",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-elite-002.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_ELITE_003",
+        "裂雲狼",
+        "wind",
+        "elite",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-elite-003.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_ELITE_004",
+        "黑翼祭",
+        "wind",
+        "elite",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-elite-004.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_ELITE_005",
+        "蒼嵐龍",
+        "wind",
+        "elite",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-elite-005.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_ELITE_006",
+        "巨象王",
+        "wind",
+        "elite",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-elite-006.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_ELITE_007",
+        "靈木神",
+        "wind",
+        "elite",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-elite-007.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_ELITE_008",
+        "風角鹿",
+        "wind",
+        "elite",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-elite-008.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_ELITE_009",
+        "破空將",
+        "wind",
+        "elite",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-elite-009.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_ELITE_010",
+        "霜刃使",
+        "wind",
+        "elite",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-elite-010.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_MINIBOSS_001",
+        "天風武尊",
+        "wind",
+        "boss",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-miniboss-001.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_MINIBOSS_002",
+        "蒼龍仙",
+        "wind",
+        "boss",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-miniboss-002.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_MINIBOSS_003",
+        "嵐海龍君",
+        "wind",
+        "boss",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-miniboss-003.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_MINIBOSS_004",
+        "青翼神",
+        "wind",
+        "boss",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-miniboss-004.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_MINIBOSS_005",
+        "雲蝶尊",
+        "wind",
+        "boss",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-miniboss-005.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_MINIBOSS_006",
+        "風鹿天尊",
+        "wind",
+        "boss",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-miniboss-006.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_MINIBOSS_007",
+        "逐風劍聖",
+        "wind",
+        "boss",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-miniboss-007.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_MINIBOSS_008",
+        "鎮嵐巨象",
+        "wind",
+        "boss",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-miniboss-008.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_MINIBOSS_009",
+        "雲角聖獸",
+        "wind",
+        "boss",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-miniboss-009.webp",
+        "existing"
+      ],
+      [
+        "MON_WIND_MINIBOSS_010",
+        "風極真君",
+        "wind",
+        "boss",
+        "standard",
+        "assets/monsters/tower/wind-pool/mon-wind-miniboss-010.webp",
+        "existing"
+      ]
+    ],
+    "tower-earth": [
+      [
+        "MON_EARTH_NORMAL_001",
+        "岩斧象",
+        "earth",
+        "regular",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-normal-001.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_NORMAL_002",
+        "磐甲蜥",
+        "earth",
+        "regular",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-normal-002.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_NORMAL_003",
+        "沙鎧螳",
+        "earth",
+        "regular",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-normal-003.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_NORMAL_004",
+        "地行客",
+        "earth",
+        "regular",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-normal-004.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_NORMAL_005",
+        "岩薯力士",
+        "earth",
+        "regular",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-normal-005.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_NORMAL_006",
+        "岳槍衛",
+        "earth",
+        "regular",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-normal-006.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_NORMAL_007",
+        "岩弓使",
+        "earth",
+        "regular",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-normal-007.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_NORMAL_008",
+        "坤斧姬",
+        "earth",
+        "regular",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-normal-008.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_NORMAL_009",
+        "菌冠妖",
+        "earth",
+        "regular",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-normal-009.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_NORMAL_010",
+        "石獅靈",
+        "earth",
+        "regular",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-normal-010.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_ELITE_001",
+        "岩薯戰將",
+        "earth",
+        "elite",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-elite-001.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_ELITE_002",
+        "地角魔",
+        "earth",
+        "elite",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-elite-002.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_ELITE_003",
+        "棘木妖王",
+        "earth",
+        "elite",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-elite-003.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_ELITE_004",
+        "坤術師",
+        "earth",
+        "elite",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-elite-004.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_ELITE_005",
+        "岩角羊",
+        "earth",
+        "elite",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-elite-005.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_ELITE_006",
+        "玄岩象將",
+        "earth",
+        "elite",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-elite-006.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_ELITE_007",
+        "地刃姬",
+        "earth",
+        "elite",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-elite-007.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_ELITE_008",
+        "磐紋虎",
+        "earth",
+        "elite",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-elite-008.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_ELITE_009",
+        "岩骨巫",
+        "earth",
+        "elite",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-elite-009.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_ELITE_010",
+        "沙甲刀客",
+        "earth",
+        "elite",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-elite-010.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_MINIBOSS_001",
+        "撼地魔王",
+        "earth",
+        "boss",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-miniboss-001.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_MINIBOSS_002",
+        "玄甲龍王",
+        "earth",
+        "boss",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-miniboss-002.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_MINIBOSS_003",
+        "坤靈聖女",
+        "earth",
+        "boss",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-miniboss-003.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_MINIBOSS_004",
+        "岩臂猿皇",
+        "earth",
+        "boss",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-miniboss-004.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_MINIBOSS_005",
+        "山靈獸王",
+        "earth",
+        "boss",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-miniboss-005.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_MINIBOSS_006",
+        "萬木地尊",
+        "earth",
+        "boss",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-miniboss-006.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_MINIBOSS_007",
+        "鎮岳武尊",
+        "earth",
+        "boss",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-miniboss-007.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_MINIBOSS_008",
+        "坤天戰聖",
+        "earth",
+        "boss",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-miniboss-008.webp",
+        "existing"
+      ],
+      [
+        "MON_EARTH_MINIBOSS_009",
+        "磐山帝君",
+        "earth",
+        "boss",
+        "standard",
+        "assets/monsters/tower/earth-pool/mon-earth-miniboss-009.webp",
+        "existing"
+      ]
+    ]
+  },
+  "assetPool": {
+    "schemaVersion": 1,
+    "sourceBranch": "assets-library",
+    "sourceCommit": "1e2aa363ea32574a223cafa44b009d327f0e4a95",
+    "scope": "fire",
+    "entries": [
+      {
+        "assetId": "MON_FIRE_NORMAL_001",
+        "displayName": "炎刃流寇",
+        "element": "fire",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_0000000000e482118b5473e014a602f3.png",
+        "runtimePath": "assets/monsters/wild/fire-pool/mon-fire-normal-001.webp",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Normal Rotation",
+        "notes": "火元素游俠型人形，單刃與破布裝束，適合低至中階野怪。"
+      },
+      {
+        "assetId": "MON_FIRE_NORMAL_002",
+        "displayName": "熔牙斥候",
+        "element": "fire",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_000000000da881fd8ae0f20379afb648.png",
+        "runtimePath": "assets/monsters/wild/fire-pool/mon-fire-normal-002.webp",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Normal Rotation",
+        "notes": "小型持矛火蜥人，輪廓清楚，適合普通野怪。"
+      },
+      {
+        "assetId": "MON_FIRE_ELITE_001",
+        "displayName": "裂甲熔蠍",
+        "element": "fire",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_000000003a54821199f123895de6f5d2.png",
+        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-elite-001.webp",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Elite Encounter",
+        "notes": "熔岩甲殼與多足鉗爪，體量與武裝高於普通怪。"
+      },
+      {
+        "assetId": "MON_FIRE_ELITE_002",
+        "displayName": "焚稻魈",
+        "element": "fire",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_000000003d18820e8c32f6773124636f.png",
+        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-elite-002.webp",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Elite Encounter",
+        "notes": "稻草人與長柄鐮刀構成，身形高瘦且具明顯壓迫感。"
+      },
+      {
+        "assetId": "MON_FIRE_NORMAL_003",
+        "displayName": "熾焰狼",
+        "element": "fire",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_00000000465082118dd011205c72c7e5.png",
+        "runtimePath": "assets/monsters/wild/zone-03/fire-01.webp",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Normal Rotation",
+        "notes": "火焰尾猿型生物，動作感強，適合普通野怪。"
+      },
+      {
+        "assetId": "MON_FIRE_NORMAL_004",
+        "displayName": "燼骨槍徒",
+        "element": "fire",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_0000000049bc81f79183cdcfd22f5036.png",
+        "runtimePath": "assets/monsters/wild/fire-pool/mon-fire-normal-004.webp",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Normal Rotation",
+        "notes": "骷髏槍兵視覺清楚，但與既有人形怪的區分度待整合時再確認。"
+      },
+      {
+        "assetId": "MON_FIRE_NORMAL_005",
+        "displayName": "沙漠豺狼",
+        "element": "fire",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_000000005e0881fa826497584af5095a.png",
+        "runtimePath": "assets/monsters/wild/zone-02/fire-01.webp",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Normal Rotation",
+        "notes": "厚甲獠牙獸，體格中等，適合普通野怪。"
+      },
+      {
+        "assetId": "MON_FIRE_ELITE_003",
+        "displayName": "熔岩巨獸",
+        "element": "fire",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_000000005f388209b9596f039c965ead.png",
+        "runtimePath": "assets/monsters/wild/zone-05/fire-01.webp",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Elite Encounter",
+        "notes": "熔巖石象持盾持錘，重裝與體型符合精英視覺。"
+      },
+      {
+        "assetId": "MON_FIRE_NORMAL_006",
+        "displayName": "赤燼雙刃",
+        "element": "fire",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_0000000069c48211bc6a565143ac4764.png",
+        "runtimePath": "assets/monsters/wild/fire-pool/mon-fire-normal-006.webp",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Normal Rotation",
+        "notes": "雙持火刃的人形女戰士，身形敏捷，適合普通野怪。"
+      },
+      {
+        "assetId": "MON_FIRE_ELITE_004",
+        "displayName": "爐心罐衛",
+        "element": "fire",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_000000007854820e87000107b3770159.png",
+        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-elite-004.webp",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Elite Encounter",
+        "notes": "熔爐頭盔與厚重護甲具精英感，但可讀性與塔內重裝類型需後續比較。"
+      },
+      {
+        "assetId": "MON_FIRE_ELITE_005",
+        "displayName": "終焉神魔",
+        "element": "fire",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_000000007eb482109ced9a151a1fca39.png",
+        "runtimePath": "assets/monsters/wild/zone-10/fire-01.webp",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Elite Encounter",
+        "notes": "厚甲羊角戰士，盾斧與體型使其明顯高於普通怪。"
+      },
+      {
+        "assetId": "MON_FIRE_ELITE_006",
+        "displayName": "焚天龍獄",
+        "element": "fire",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_0000000087fc81fa881ce1f0b63b94c7.png",
+        "runtimePath": "assets/monsters/wild/zone-08/fire-01.webp",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Elite Encounter",
+        "notes": "大型多刺鬃毛獸，火焰背棘與獠牙具有精英辨識度。"
+      },
+      {
+        "assetId": "MON_FIRE_NORMAL_007",
+        "displayName": "哥布林",
+        "element": "fire",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_00000000ab9c81faa34a6a9869419b1d.png",
+        "runtimePath": "assets/monsters/wild/zone-01/fire-01.webp",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Normal Rotation",
+        "notes": "小型持哥布林，裝備簡單，適合普通野怪。"
+      },
+      {
+        "assetId": "MON_FIRE_NORMAL_008",
+        "displayName": "灰燼鬼爪",
+        "element": "fire",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_00000000b93c81f483253b355508e0c9.png",
+        "runtimePath": "assets/monsters/wild/fire-pool/mon-fire-normal-008.webp",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Normal Rotation",
+        "notes": "瘦長火焰鬼物，造型偏侵略但仍可作普通怪；保留待整體池比較。"
+      },
+      {
+        "assetId": "MON_FIRE_ELITE_007",
+        "displayName": "虛空煉獄",
+        "element": "fire",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_00000000bd3c8211809f904e2f5b732d.png",
+        "runtimePath": "assets/monsters/wild/zone-09/fire-01.webp",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Elite Encounter",
+        "notes": "人形火術士，法杖與長袍細節適合作為精英施術者。"
+      },
+      {
+        "assetId": "MON_FIRE_ELITE_008",
+        "displayName": "赤甲槍蟲",
+        "element": "fire",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_00000000cf44824387dd10e3ea6a3289.png",
+        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-elite-008.webp",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Elite Encounter",
+        "notes": "昆蟲甲殼、長戟與多足結構，戰鬥辨識度高。"
+      },
+      {
+        "assetId": "MON_FIRE_NORMAL_009",
+        "displayName": "熾焰狼王",
+        "element": "fire",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_00000000e2c08211ab8c3238854b4d82.png",
+        "runtimePath": "assets/monsters/wild/zone-03/fire-02.webp",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Normal Rotation",
+        "notes": "焰羽鳥妖，體型與裝備較輕，適合普通野怪。"
+      },
+      {
+        "assetId": "MON_FIRE_ELITE_009",
+        "displayName": "熔痕巨蛙",
+        "element": "fire",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_00000000e3988211852dedfc423adcf8.png",
+        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-elite-009.webp",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Elite Encounter",
+        "notes": "熔岩裂紋巨蛙，體型厚重且視覺輪廓強。"
+      },
+      {
+        "assetId": "MON_FIRE_MINIBOSS_001",
+        "displayName": "炎脊裂龍",
+        "element": "fire",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_00000000e69c821183ed8ef001fc3711.png",
+        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-miniboss-001.webp",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Boss Encounter",
+        "notes": "長身火龍型怪物，翼、角與熔岩脊柱具小 Boss 壓迫感。"
+      },
+      {
+        "assetId": "MON_FIRE_NORMAL_010",
+        "displayName": "燼羽獵魔",
+        "element": "fire",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/普通怪/file_00000000f4c0820aaae74c3f4ac0a728.png",
+        "runtimePath": "assets/monsters/wild/fire-pool/mon-fire-normal-010.webp",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Normal Rotation",
+        "notes": "持弓人形獵手，外觀可作普通怪，但與其他人形候選需後續取捨。"
+      },
+      {
+        "assetId": "MON_FIRE_ELITE_010",
+        "displayName": "六臂修羅",
+        "element": "fire",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/菁英怪/file_000000000b708211a92314c503198d6f.png",
+        "runtimePath": "assets/monsters/wild/zone-06/fire-02.webp",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Elite Encounter",
+        "notes": "火焰法器、鎖鏈與遠程能量構成，適合施術型精英。"
+      },
+      {
+        "assetId": "MON_FIRE_ELITE_011",
+        "displayName": "烈焰巨魔",
+        "element": "fire",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/菁英怪/file_0000000012ac82069c6fdedaaaa64660.png",
+        "runtimePath": "assets/monsters/wild/zone-04/fire-01.webp",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Elite Encounter",
+        "notes": "重盾熔岩鬼，護甲與體格具有前排精英定位。"
+      },
+      {
+        "assetId": "MON_FIRE_ELITE_012",
+        "displayName": "業火魔君",
+        "element": "fire",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/菁英怪/file_00000000141081f7b30e758feb6e4de0.png",
+        "runtimePath": "assets/monsters/wild/zone-07/fire-01.webp",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Elite Encounter",
+        "notes": "火羽、長槍與人形戰姬構圖完整，適合高辨識度精英。"
+      },
+      {
+        "assetId": "MON_FIRE_ELITE_013",
+        "displayName": "獄輪魔尊",
+        "element": "fire",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/菁英怪/file_000000002e7481f480cf437f43374b04.png",
+        "runtimePath": "assets/monsters/wild/zone-09/fire-02.webp",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Elite Encounter",
+        "notes": "鐮刃肢體與昆蟲身形形成鮮明輪廓，適合作戰型精英。"
+      },
+      {
+        "assetId": "MON_FIRE_ELITE_014",
+        "displayName": "業炎法王",
+        "element": "fire",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/菁英怪/file_0000000054f4820eb78391ba2a7a7aa3.png",
+        "runtimePath": "assets/monsters/wild/zone-07/fire-02.webp",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Elite Encounter",
+        "notes": "蛇身、鱗甲與火焰頭冠具高階野怪氣質。"
+      },
+      {
+        "assetId": "MON_FIRE_ELITE_015",
+        "displayName": "赤炎修羅",
+        "element": "fire",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/菁英怪/file_0000000059fc81f59b5cd12ab7b489c1.png",
+        "runtimePath": "assets/monsters/wild/zone-06/fire-01.webp",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Elite Encounter",
+        "notes": "長柄鐮刀與兜帽死靈構成，適合精英收割者。"
+      },
+      {
+        "assetId": "MON_FIRE_ELITE_016",
+        "displayName": "末炎祭司",
+        "element": "fire",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/菁英怪/file_0000000063f881f7aaa1f65b8783acd8.png",
+        "runtimePath": "assets/monsters/wild/zone-10/fire-02.webp",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Elite Encounter",
+        "notes": "多罐火焰裝置與爆破特徵鮮明，適合特殊機制精英。"
+      },
+      {
+        "assetId": "MON_FIRE_ELITE_017",
+        "displayName": "熔翼獸王",
+        "element": "fire",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/菁英怪/file_000000008430820b8b8a6da7013a6477.png",
+        "runtimePath": "assets/monsters/wild/zone-05/fire-02.webp",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Elite Encounter",
+        "notes": "雙翼重甲魔將，威壓足夠但仍維持標準立繪尺度。"
+      },
+      {
+        "assetId": "MON_FIRE_ELITE_018",
+        "displayName": "炎錘巨魔",
+        "element": "fire",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/菁英怪/file_00000000b9c48246b09f8447ab25c8b2.png",
+        "runtimePath": "assets/monsters/wild/zone-04/fire-02.webp",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Elite Encounter",
+        "notes": "巨型熔巖生物與重錘，適合高階精英或塔中段守衛。"
+      },
+      {
+        "assetId": "MON_FIRE_ELITE_019",
+        "displayName": "焚天炎龍",
+        "element": "fire",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/菁英怪/file_00000000f7208206a6e1e6b237ddeabf.png",
+        "runtimePath": "assets/monsters/wild/zone-08/fire-02.webp",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Elite Encounter",
+        "notes": "焦木妖魈造型獨特，先保留作精英候選，避免與 Boss 視覺過早重疊。"
+      },
+      {
+        "assetId": "MON_FIRE_MINIBOSS_002",
+        "displayName": "熔獄牛魔",
+        "element": "fire",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/小Boss/file_0000000009cc820692478957755501ce.png",
+        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-miniboss-002.webp",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Boss Encounter",
+        "notes": "熔岩牛魔與巨型月刃，正面壓迫感強，適合塔中高段。"
+      },
+      {
+        "assetId": "MON_FIRE_MINIBOSS_003",
+        "displayName": "炎翼蝶后",
+        "element": "fire",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/小Boss/file_000000002de482118662fdb238646a0e.png",
+        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-miniboss-003.webp",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Boss Encounter",
+        "notes": "火蝶翼、法器與女性人形主體，適合魔法型小 Boss。"
+      },
+      {
+        "assetId": "MON_FIRE_MINIBOSS_004",
+        "displayName": "炎輪獅王",
+        "element": "fire",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/小Boss/file_000000005cdc8206a91a8091c1abb3cc.png",
+        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-miniboss-004.webp",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Boss Encounter",
+        "notes": "獅首、金輪與火焰武裝，具明確首領辨識度。"
+      },
+      {
+        "assetId": "MON_FIRE_MINIBOSS_005",
+        "displayName": "焚城魔將",
+        "element": "fire",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/小Boss/file_0000000065d882119879748d42e5e53b.png",
+        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-miniboss-005.webp",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Boss Encounter",
+        "notes": "重甲魔將與巨型火刃，適合塔高層小 Boss。"
+      },
+      {
+        "assetId": "MON_FIRE_MINIBOSS_006",
+        "displayName": "赤焰狐后",
+        "element": "fire",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/小Boss/file_0000000068ec81f686d389e4d8079033.png",
+        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-miniboss-006.webp",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Boss Encounter",
+        "notes": "九尾狐形與火焰扇尾，具高辨識度首領氣質。"
+      },
+      {
+        "assetId": "MON_FIRE_MINIBOSS_007",
+        "displayName": "熔甲鱷王",
+        "element": "fire",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/小Boss/file_0000000082f882468cc2488d6cfd7838.png",
+        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-miniboss-007.webp",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Boss Encounter",
+        "notes": "厚重鱷甲與巨刃，近戰壓迫感明顯。"
+      },
+      {
+        "assetId": "MON_FIRE_MINIBOSS_008",
+        "displayName": "裂地炎蠍",
+        "element": "fire",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/小Boss/file_000000008898820cb6501721612812c9.png",
+        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-miniboss-008.webp",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Boss Encounter",
+        "notes": "蠍尾、重甲與火焰鉗肢，適合高層守關小 Boss。"
+      },
+      {
+        "assetId": "MON_FIRE_MINIBOSS_009",
+        "displayName": "逐日炎侯",
+        "element": "fire",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/小Boss/file_00000000b8f081f7bff2a146a5cb832d.png",
+        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-miniboss-009.webp",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Boss Encounter",
+        "notes": "火焰長弓與侯爵式重裝，適合遠程首領。"
+      },
+      {
+        "assetId": "MON_FIRE_MINIBOSS_010",
+        "displayName": "赤潮鯊將",
+        "element": "fire",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/小Boss/file_00000000bb088243a2bed54c0e5147a6.png",
+        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-miniboss-010.png",
+        "status": "reserved",
+        "usedIn": "Fire Tower / Reserved Replacement Boss",
+        "notes": "鯊首戰將與火焰弓刃，視覺反差與輪廓辨識度高。"
+      },
+      {
+        "assetId": "MON_FIRE_MINIBOSS_011",
+        "displayName": "焰冠獅魁",
+        "element": "fire",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/火元素/小Boss/file_00000000ec88822f8cb282e18c3425b2.png",
+        "runtimePath": "assets/monsters/tower/fire-pool/mon-fire-miniboss-011.webp",
+        "status": "adopted",
+        "usedIn": "Fire Tower / Boss Encounter",
+        "notes": "火焰鬃冠、長柄法器與王者構圖，先保留作 100F 高壓候選；仍屬標準尺寸小 Boss，不是大型 Boss。"
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_001",
+        "displayName": "翎爪衛",
+        "element": "wind",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/普通怪/file_00000000110c8211ac3519c8427f5495.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-normal-001.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / normal"
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_002",
+        "displayName": "旋刃卒",
+        "element": "wind",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/普通怪/file_0000000018808211ad89369fdbe5206b.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-normal-002.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / normal"
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_003",
+        "displayName": "踏雲客",
+        "element": "wind",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/普通怪/file_0000000029ec8211954f031267398b64.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-normal-003.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / normal"
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_004",
+        "displayName": "嵐鹿靈",
+        "element": "wind",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/普通怪/file_00000000310c82119a363c77382b3515.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-normal-004.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / normal"
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_005",
+        "displayName": "飛絮姬",
+        "element": "wind",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/普通怪/file_00000000333c8211b66e6e70090be2be.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-normal-005.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / normal"
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_006",
+        "displayName": "巨牙象",
+        "element": "wind",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/普通怪/file_0000000033c082119aea0a5fc2495543.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-normal-006.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / normal"
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_007",
+        "displayName": "雲翎使",
+        "element": "wind",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/普通怪/file_000000004b5c82118d738dff7a5b221c.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-normal-007.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / normal"
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_008",
+        "displayName": "風枝妖",
+        "element": "wind",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/普通怪/file_00000000557482119a78311672e3be09.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-normal-008.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / normal"
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_009",
+        "displayName": "逐嵐俠",
+        "element": "wind",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/普通怪/file_0000000069048210beef99e484d5e855.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-normal-009.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / normal"
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_010",
+        "displayName": "青羽劍",
+        "element": "wind",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/普通怪/file_000000008988821187b754f995c3536e.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-normal-010.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / normal"
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_011",
+        "displayName": "風紋祭",
+        "element": "wind",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/普通怪/file_00000000ab248211958883a19cbd50d9.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-normal-011.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / normal"
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_012",
+        "displayName": "翔雲女",
+        "element": "wind",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/普通怪/file_00000000adac821182e906c6d94ce02f.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-normal-012.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / normal"
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_013",
+        "displayName": "浮空傘",
+        "element": "wind",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/普通怪/file_00000000af588210b29e0d1214e182c4.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-normal-013.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / normal"
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_014",
+        "displayName": "疾羽槍",
+        "element": "wind",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/普通怪/file_00000000b9888211a7c2373ca1164047.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-normal-014.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / normal"
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_015",
+        "displayName": "嵐狼騎",
+        "element": "wind",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/普通怪/file_00000000c2648211ac8c3e8b66777439.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-normal-015.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / normal"
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_016",
+        "displayName": "流風俠",
+        "element": "wind",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/普通怪/file_00000000c87c8211b1d6fa7a4f7ea526.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-normal-016.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / normal"
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_017",
+        "displayName": "雲蛇姬",
+        "element": "wind",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/普通怪/file_00000000ce188211a28bea9d6e268273.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-normal-017.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / normal"
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_018",
+        "displayName": "古木巫",
+        "element": "wind",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/普通怪/file_00000000d1e08211936924ae3e81cde1.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-normal-018.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / normal"
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_019",
+        "displayName": "風蹄魔",
+        "element": "wind",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/普通怪/file_00000000dfe0821180a2176f3da0cb8f.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-normal-019.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / normal"
+      },
+      {
+        "assetId": "MON_WIND_NORMAL_020",
+        "displayName": "霧羽仙",
+        "element": "wind",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/普通怪/file_00000000e164820794f4d6ec26866b49.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-normal-020.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / normal"
+      },
+      {
+        "assetId": "MON_WIND_ELITE_001",
+        "displayName": "嵐羽鸞",
+        "element": "wind",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/菁英怪/file_000000001d908211b1b8e3c1b063f7ef.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-elite-001.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / elite"
+      },
+      {
+        "assetId": "MON_WIND_ELITE_002",
+        "displayName": "青風蛟",
+        "element": "wind",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/菁英怪/file_000000003b8c8206b6b1a8e56f2b0507.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-elite-002.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / elite"
+      },
+      {
+        "assetId": "MON_WIND_ELITE_003",
+        "displayName": "裂雲狼",
+        "element": "wind",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/菁英怪/file_000000004de882438708f3c4296ed161.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-elite-003.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / elite"
+      },
+      {
+        "assetId": "MON_WIND_ELITE_004",
+        "displayName": "黑翼祭",
+        "element": "wind",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/菁英怪/file_000000006bd4820682322ec0b93a2f63.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-elite-004.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / elite"
+      },
+      {
+        "assetId": "MON_WIND_ELITE_005",
+        "displayName": "蒼嵐龍",
+        "element": "wind",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/菁英怪/file_0000000081dc82119419ccb04677fd02.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-elite-005.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / elite"
+      },
+      {
+        "assetId": "MON_WIND_ELITE_006",
+        "displayName": "巨象王",
+        "element": "wind",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/菁英怪/file_0000000093a081f88936974e17db0258.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-elite-006.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / elite"
+      },
+      {
+        "assetId": "MON_WIND_ELITE_007",
+        "displayName": "靈木神",
+        "element": "wind",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/菁英怪/file_00000000a9548211bd28a38a1ccbba95.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-elite-007.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / elite"
+      },
+      {
+        "assetId": "MON_WIND_ELITE_008",
+        "displayName": "風角鹿",
+        "element": "wind",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/菁英怪/file_00000000b048821192b638d45b2301a7.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-elite-008.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / elite"
+      },
+      {
+        "assetId": "MON_WIND_ELITE_009",
+        "displayName": "破空將",
+        "element": "wind",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/菁英怪/file_00000000ba5082089f8f7f862de6521d.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-elite-009.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / elite"
+      },
+      {
+        "assetId": "MON_WIND_ELITE_010",
+        "displayName": "霜刃使",
+        "element": "wind",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/菁英怪/file_00000000bdb48209926106010b80de97.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-elite-010.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / elite"
+      },
+      {
+        "assetId": "MON_WIND_MINIBOSS_001",
+        "displayName": "天風武尊",
+        "element": "wind",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/小Boss/file_0000000017088208be472aaefb2bc243.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-miniboss-001.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / miniboss"
+      },
+      {
+        "assetId": "MON_WIND_MINIBOSS_002",
+        "displayName": "蒼龍仙",
+        "element": "wind",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/小Boss/file_0000000025208211a7bf6854a1830df0.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-miniboss-002.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / miniboss"
+      },
+      {
+        "assetId": "MON_WIND_MINIBOSS_003",
+        "displayName": "嵐海龍君",
+        "element": "wind",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/小Boss/file_0000000026cc8243a22862667dc15e05.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-miniboss-003.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / miniboss"
+      },
+      {
+        "assetId": "MON_WIND_MINIBOSS_004",
+        "displayName": "青翼神",
+        "element": "wind",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/小Boss/file_000000006be88211acc8fa8169a731d0.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-miniboss-004.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / miniboss"
+      },
+      {
+        "assetId": "MON_WIND_MINIBOSS_005",
+        "displayName": "雲蝶尊",
+        "element": "wind",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/小Boss/file_00000000989c821192a06ed6b9878166.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-miniboss-005.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / miniboss"
+      },
+      {
+        "assetId": "MON_WIND_MINIBOSS_006",
+        "displayName": "風鹿天尊",
+        "element": "wind",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/小Boss/file_00000000a2c48211881b6d402543d6c1.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-miniboss-006.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / miniboss"
+      },
+      {
+        "assetId": "MON_WIND_MINIBOSS_007",
+        "displayName": "逐風劍聖",
+        "element": "wind",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/小Boss/file_00000000a7388211a34780e9d89131ce.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-miniboss-007.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / miniboss"
+      },
+      {
+        "assetId": "MON_WIND_MINIBOSS_008",
+        "displayName": "鎮嵐巨象",
+        "element": "wind",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/小Boss/file_00000000ae208211ba58fc8dc23097cb.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-miniboss-008.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / miniboss"
+      },
+      {
+        "assetId": "MON_WIND_MINIBOSS_009",
+        "displayName": "雲角聖獸",
+        "element": "wind",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/小Boss/file_00000000b71c82439792ba4bb9130497.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-miniboss-009.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / miniboss"
+      },
+      {
+        "assetId": "MON_WIND_MINIBOSS_010",
+        "displayName": "風極真君",
+        "element": "wind",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/風元素/小Boss/file_00000000c52882468a012d52987a23a0.png",
+        "runtimePath": "assets/monsters/tower/wind-pool/mon-wind-miniboss-010.webp",
+        "status": "adopted",
+        "usedIn": "Wind Tower / miniboss"
+      },
+      {
+        "assetId": "MON_EARTH_NORMAL_001",
+        "displayName": "岩斧象",
+        "element": "earth",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/普通怪/file_00000000902881fda7168b4e91514ba5.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-normal-001.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / normal"
+      },
+      {
+        "assetId": "MON_EARTH_NORMAL_002",
+        "displayName": "磐甲蜥",
+        "element": "earth",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/普通怪/file_0000000090f4820d94cc0992024081c3.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-normal-002.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / normal"
+      },
+      {
+        "assetId": "MON_EARTH_NORMAL_003",
+        "displayName": "沙鎧螳",
+        "element": "earth",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/普通怪/file_0000000098ec8246afe89d32b2540d78.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-normal-003.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / normal"
+      },
+      {
+        "assetId": "MON_EARTH_NORMAL_004",
+        "displayName": "地行客",
+        "element": "earth",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/普通怪/file_00000000b184820882bb56ae0655ccee.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-normal-004.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / normal"
+      },
+      {
+        "assetId": "MON_EARTH_NORMAL_005",
+        "displayName": "岩薯力士",
+        "element": "earth",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/普通怪/file_00000000b3148230863f1bf34eedc12e.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-normal-005.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / normal"
+      },
+      {
+        "assetId": "MON_EARTH_NORMAL_006",
+        "displayName": "岳槍衛",
+        "element": "earth",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/普通怪/file_00000000b37c81f4a77280882385bfdb.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-normal-006.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / normal"
+      },
+      {
+        "assetId": "MON_EARTH_NORMAL_007",
+        "displayName": "岩弓使",
+        "element": "earth",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/普通怪/file_00000000bfa481f4a14bd7a0cce1ab13.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-normal-007.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / normal"
+      },
+      {
+        "assetId": "MON_EARTH_NORMAL_008",
+        "displayName": "坤斧姬",
+        "element": "earth",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/普通怪/file_00000000c70481f7a19b022c19cae212.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-normal-008.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / normal"
+      },
+      {
+        "assetId": "MON_EARTH_NORMAL_009",
+        "displayName": "菌冠妖",
+        "element": "earth",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/普通怪/file_00000000e124820e9e1af12e694f231f.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-normal-009.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / normal"
+      },
+      {
+        "assetId": "MON_EARTH_NORMAL_010",
+        "displayName": "石獅靈",
+        "element": "earth",
+        "tier": "normal",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/普通怪/file_00000000ecb481f8890a2088100bb7ea.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-normal-010.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / normal"
+      },
+      {
+        "assetId": "MON_EARTH_ELITE_001",
+        "displayName": "岩薯戰將",
+        "element": "earth",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/菁英怪/file_0000000006d081fd99927be0ccb5c0fe.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-elite-001.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / elite"
+      },
+      {
+        "assetId": "MON_EARTH_ELITE_002",
+        "displayName": "地角魔",
+        "element": "earth",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/菁英怪/file_0000000008a881f49cc3dcce716f90fe.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-elite-002.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / elite"
+      },
+      {
+        "assetId": "MON_EARTH_ELITE_003",
+        "displayName": "棘木妖王",
+        "element": "earth",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/菁英怪/file_000000000fb481f8bd26cc27cf330911.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-elite-003.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / elite"
+      },
+      {
+        "assetId": "MON_EARTH_ELITE_004",
+        "displayName": "坤術師",
+        "element": "earth",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/菁英怪/file_00000000775c81fd9b5d0c0c8fb17b6a.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-elite-004.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / elite"
+      },
+      {
+        "assetId": "MON_EARTH_ELITE_005",
+        "displayName": "岩角羊",
+        "element": "earth",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/菁英怪/file_000000008fe0820c9c57803397b48a41.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-elite-005.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / elite"
+      },
+      {
+        "assetId": "MON_EARTH_ELITE_006",
+        "displayName": "玄岩象將",
+        "element": "earth",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/菁英怪/file_00000000afb4820ba14c4b173c801ec7.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-elite-006.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / elite"
+      },
+      {
+        "assetId": "MON_EARTH_ELITE_007",
+        "displayName": "地刃姬",
+        "element": "earth",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/菁英怪/file_00000000c7a48211ba05aedaf429894d.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-elite-007.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / elite"
+      },
+      {
+        "assetId": "MON_EARTH_ELITE_008",
+        "displayName": "磐紋虎",
+        "element": "earth",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/菁英怪/file_00000000ec2c81f484d7e30603dc1c02.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-elite-008.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / elite"
+      },
+      {
+        "assetId": "MON_EARTH_ELITE_009",
+        "displayName": "岩骨巫",
+        "element": "earth",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/菁英怪/file_00000000f05c82119ba4ee71efbdb800.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-elite-009.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / elite"
+      },
+      {
+        "assetId": "MON_EARTH_ELITE_010",
+        "displayName": "沙甲刀客",
+        "element": "earth",
+        "tier": "elite",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/菁英怪/file_00000000fd6c824694589c59d67815dc.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-elite-010.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / elite"
+      },
+      {
+        "assetId": "MON_EARTH_MINIBOSS_001",
+        "displayName": "撼地魔王",
+        "element": "earth",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/小Boss/file_000000000fac8243a26a5e3b56c93083.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-miniboss-001.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / miniboss"
+      },
+      {
+        "assetId": "MON_EARTH_MINIBOSS_002",
+        "displayName": "玄甲龍王",
+        "element": "earth",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/小Boss/file_000000003124820889eb85f0345350ab.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-miniboss-002.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / miniboss"
+      },
+      {
+        "assetId": "MON_EARTH_MINIBOSS_003",
+        "displayName": "坤靈聖女",
+        "element": "earth",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/小Boss/file_0000000036a48207aa788156c7fbcd58.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-miniboss-003.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / miniboss"
+      },
+      {
+        "assetId": "MON_EARTH_MINIBOSS_004",
+        "displayName": "岩臂猿皇",
+        "element": "earth",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/小Boss/file_000000004d248206a178b0b66ba5a892.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-miniboss-004.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / miniboss"
+      },
+      {
+        "assetId": "MON_EARTH_MINIBOSS_005",
+        "displayName": "山靈獸王",
+        "element": "earth",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/小Boss/file_0000000076ac8243a34e1c71875e2993.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-miniboss-005.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / miniboss"
+      },
+      {
+        "assetId": "MON_EARTH_MINIBOSS_006",
+        "displayName": "萬木地尊",
+        "element": "earth",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/小Boss/file_00000000aeb4820db593da5c0165412f.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-miniboss-006.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / miniboss"
+      },
+      {
+        "assetId": "MON_EARTH_MINIBOSS_007",
+        "displayName": "鎮岳武尊",
+        "element": "earth",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/小Boss/file_00000000c834820cac4e1af721a6673b.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-miniboss-007.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / miniboss"
+      },
+      {
+        "assetId": "MON_EARTH_MINIBOSS_008",
+        "displayName": "坤天戰聖",
+        "element": "earth",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/小Boss/file_00000000e8ac820ebb47920fef6237f0.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-miniboss-008.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / miniboss"
+      },
+      {
+        "assetId": "MON_EARTH_MINIBOSS_009",
+        "displayName": "磐山帝君",
+        "element": "earth",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/小Boss/file_00000000fb8482119ea228dcfdac6fd6.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-miniboss-009.webp",
+        "status": "adopted",
+        "usedIn": "Earth Tower / miniboss"
+      },
+      {
+        "assetId": "MON_EARTH_MINIBOSS_010",
+        "displayName": "地極真君",
+        "element": "earth",
+        "tier": "miniboss",
+        "sourcePath": "assets/inbox/英雄or怪物立繪/土元素/小Boss/file_00000000fc4c8230bcc34edeab91fbeb.png",
+        "runtimePath": "assets/monsters/tower/earth-pool/mon-earth-miniboss-010.webp",
+        "status": "reserved",
+        "usedIn": "Earth Tower / reserved pending valid Master replacement",
+        "notes": "Source PNG is truncated and fails decode; never promoted to runtimeReady."
+      }
+    ]
+  },
+  "fireTowerCoverage": {
+    "schemaVersion": 1,
+    "element": "fire",
+    "floorCount": 100,
+    "floorBands": [
+      "1-10",
+      "11-20",
+      "21-30",
+      "31-40",
+      "41-50",
+      "51-60",
+      "61-70",
+      "71-80",
+      "81-90",
+      "91-100"
+    ],
+    "formalRules": {
+      "eliteEvery": 5,
+      "bossEvery": 10,
+      "normalRotation": "2-4 visual assets per band",
+      "bossUsesMiniBossTier": true
+    },
+    "normalByBand": [
+      [
+        "MON_FIRE_NORMAL_001",
+        "MON_FIRE_NORMAL_003"
+      ],
+      [
+        "MON_FIRE_NORMAL_002",
+        "MON_FIRE_NORMAL_005"
+      ],
+      [
+        "MON_FIRE_NORMAL_006",
+        "MON_FIRE_NORMAL_007"
+      ],
+      [
+        "MON_FIRE_NORMAL_008",
+        "MON_FIRE_NORMAL_009"
+      ],
+      [
+        "MON_FIRE_NORMAL_010",
+        "MON_FIRE_NORMAL_001"
+      ],
+      [
+        "MON_FIRE_NORMAL_003",
+        "MON_FIRE_NORMAL_005"
+      ],
+      [
+        "MON_FIRE_NORMAL_002",
+        "MON_FIRE_NORMAL_006"
+      ],
+      [
+        "MON_FIRE_NORMAL_007",
+        "MON_FIRE_NORMAL_008"
+      ],
+      [
+        "MON_FIRE_NORMAL_009",
+        "MON_FIRE_NORMAL_010"
+      ],
+      [
+        "MON_FIRE_NORMAL_001",
+        "MON_FIRE_NORMAL_004"
+      ]
+    ],
+    "eliteByBand": [
+      [
+        "MON_FIRE_ELITE_001",
+        "MON_FIRE_ELITE_002"
+      ],
+      [
+        "MON_FIRE_ELITE_003",
+        "MON_FIRE_ELITE_004"
+      ],
+      [
+        "MON_FIRE_ELITE_005",
+        "MON_FIRE_ELITE_006"
+      ],
+      [
+        "MON_FIRE_ELITE_007",
+        "MON_FIRE_ELITE_008"
+      ],
+      [
+        "MON_FIRE_ELITE_009",
+        "MON_FIRE_ELITE_010"
+      ],
+      [
+        "MON_FIRE_ELITE_011",
+        "MON_FIRE_ELITE_012"
+      ],
+      [
+        "MON_FIRE_ELITE_013",
+        "MON_FIRE_ELITE_014"
+      ],
+      [
+        "MON_FIRE_ELITE_015",
+        "MON_FIRE_ELITE_016"
+      ],
+      [
+        "MON_FIRE_ELITE_017",
+        "MON_FIRE_ELITE_018"
+      ],
+      [
+        "MON_FIRE_ELITE_019"
+      ]
+    ],
+    "bossByFloor": {
+      "10": "MON_FIRE_MINIBOSS_001",
+      "20": "MON_FIRE_MINIBOSS_002",
+      "30": "MON_FIRE_MINIBOSS_003",
+      "40": "MON_FIRE_MINIBOSS_004",
+      "50": "MON_FIRE_MINIBOSS_005",
+      "60": "MON_FIRE_MINIBOSS_006",
+      "70": "MON_FIRE_MINIBOSS_007",
+      "80": "MON_FIRE_MINIBOSS_008",
+      "90": "MON_FIRE_MINIBOSS_009",
+      "100": "MON_FIRE_MINIBOSS_011"
+    },
+    "reserved": [
+      "MON_FIRE_MINIBOSS_010"
+    ]
+  },
+  "windTowerCoverage": {
+    "schemaVersion": 1,
+    "element": "wind",
+    "floorCount": 100,
+    "normalByBand": [
+      [
+        "MON_WIND_NORMAL_001",
+        "MON_WIND_NORMAL_002"
+      ],
+      [
+        "MON_WIND_NORMAL_003",
+        "MON_WIND_NORMAL_004"
+      ],
+      [
+        "MON_WIND_NORMAL_005",
+        "MON_WIND_NORMAL_006"
+      ],
+      [
+        "MON_WIND_NORMAL_007",
+        "MON_WIND_NORMAL_008"
+      ],
+      [
+        "MON_WIND_NORMAL_009",
+        "MON_WIND_NORMAL_010"
+      ],
+      [
+        "MON_WIND_NORMAL_011",
+        "MON_WIND_NORMAL_012"
+      ],
+      [
+        "MON_WIND_NORMAL_013",
+        "MON_WIND_NORMAL_014"
+      ],
+      [
+        "MON_WIND_NORMAL_015",
+        "MON_WIND_NORMAL_016"
+      ],
+      [
+        "MON_WIND_NORMAL_017",
+        "MON_WIND_NORMAL_018"
+      ],
+      [
+        "MON_WIND_NORMAL_019",
+        "MON_WIND_NORMAL_020"
+      ]
+    ],
+    "eliteByBand": [
+      [
+        "MON_WIND_ELITE_001"
+      ],
+      [
+        "MON_WIND_ELITE_002"
+      ],
+      [
+        "MON_WIND_ELITE_003"
+      ],
+      [
+        "MON_WIND_ELITE_004"
+      ],
+      [
+        "MON_WIND_ELITE_005"
+      ],
+      [
+        "MON_WIND_ELITE_006"
+      ],
+      [
+        "MON_WIND_ELITE_007"
+      ],
+      [
+        "MON_WIND_ELITE_008"
+      ],
+      [
+        "MON_WIND_ELITE_009"
+      ],
+      [
+        "MON_WIND_ELITE_010"
+      ]
+    ],
+    "bossByFloor": {
+      "10": "MON_WIND_MINIBOSS_001",
+      "20": "MON_WIND_MINIBOSS_002",
+      "30": "MON_WIND_MINIBOSS_003",
+      "40": "MON_WIND_MINIBOSS_004",
+      "50": "MON_WIND_MINIBOSS_005",
+      "60": "MON_WIND_MINIBOSS_006",
+      "70": "MON_WIND_MINIBOSS_007",
+      "80": "MON_WIND_MINIBOSS_008",
+      "90": "MON_WIND_MINIBOSS_009",
+      "100": "MON_WIND_MINIBOSS_010"
+    }
+  },
+  "earthTowerCoverage": {
+    "schemaVersion": 1,
+    "element": "earth",
+    "floorCount": 100,
+    "normalByBand": [
+      [
+        "MON_EARTH_NORMAL_001"
+      ],
+      [
+        "MON_EARTH_NORMAL_002"
+      ],
+      [
+        "MON_EARTH_NORMAL_003"
+      ],
+      [
+        "MON_EARTH_NORMAL_004"
+      ],
+      [
+        "MON_EARTH_NORMAL_005"
+      ],
+      [
+        "MON_EARTH_NORMAL_006"
+      ],
+      [
+        "MON_EARTH_NORMAL_007"
+      ],
+      [
+        "MON_EARTH_NORMAL_008"
+      ],
+      [
+        "MON_EARTH_NORMAL_009"
+      ],
+      [
+        "MON_EARTH_NORMAL_010"
+      ]
+    ],
+    "eliteByBand": [
+      [
+        "MON_EARTH_ELITE_001"
+      ],
+      [
+        "MON_EARTH_ELITE_002"
+      ],
+      [
+        "MON_EARTH_ELITE_003"
+      ],
+      [
+        "MON_EARTH_ELITE_004"
+      ],
+      [
+        "MON_EARTH_ELITE_005"
+      ],
+      [
+        "MON_EARTH_ELITE_006"
+      ],
+      [
+        "MON_EARTH_ELITE_007"
+      ],
+      [
+        "MON_EARTH_ELITE_008"
+      ],
+      [
+        "MON_EARTH_ELITE_009"
+      ],
+      [
+        "MON_EARTH_ELITE_010"
+      ]
+    ],
+    "bossByFloor": {
+      "10": "MON_EARTH_MINIBOSS_001",
+      "20": "MON_EARTH_MINIBOSS_002",
+      "30": "MON_EARTH_MINIBOSS_003",
+      "40": "MON_EARTH_MINIBOSS_004",
+      "50": "MON_EARTH_MINIBOSS_005",
+      "60": "MON_EARTH_MINIBOSS_006",
+      "70": "MON_EARTH_MINIBOSS_007",
+      "80": "MON_EARTH_MINIBOSS_008",
+      "90": "MON_EARTH_MINIBOSS_009"
+    },
+    "missingFloor100": {
+      "assetId": "MON_EARTH_MINIBOSS_010",
+      "status": "reserved",
+      "reason": "SOURCE_PNG_DECODE_FAILED"
+    }
+  }
+}

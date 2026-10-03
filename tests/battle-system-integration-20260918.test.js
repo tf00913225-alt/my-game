@@ -10,8 +10,8 @@ const main=read("js/00-main.js");
 const timing=read("js/37-v142-skill-animation.js");
 const vfx=read("js/39-v143-skill-animation.js");
 const support=read("js/42-v148-combat-dungeon-fixes.js");
-const fireWindEarth=read("js/43-v149-skill-ui-rules.js");
-const water=read("js/50-v169-water-skill-rules.js");
+// V149/V169 provide runtime compatibility; V173.64 owns final player skill data.
+const skillData=read("js/60-v173.64-skill-progression-rebalance.js");
 const adapter=read("js/battlefield-render-geometry-adapter.js");
 const css=read("css/fixed-slot-battlefield-rendering-v2.css");
 const index=read("index.html");
@@ -33,7 +33,7 @@ function manifestBlock(id){
 }
 
 for(const [element,ids] of Object.entries(ACTIVE_SKILLS)){
-    const rules=element==="water"?water:fireWindEarth;
+    const rules=skillData;
     ids.forEach(id=>{
         assert.match(rules,new RegExp("\\b"+id+":\\{"),`${id} must remain in the final ${element} rules`);
         const block=manifestBlock(id);

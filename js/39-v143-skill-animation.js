@@ -85,7 +85,9 @@
         iceSpin:{hit:DEFAULT_HIT,deferredStatusTypes:["frostbite"],sprite:castSheet("assets/vfx/water/frost-spinning-slash-vfx.png?v=166","single",{scale:1.95,maxSize:235})},
         frostCrush:{hit:DEFAULT_HIT,deferredStatusTypes:["frostbite"],sprite:castSheet("assets/vfx/water/freeze-heavy-strike-vfx.png?v=166","single",{scale:2.35,maxSize:290})},
         waterBall:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/water-orb-vfx.png?v=173.19","group",{scale:1.22,minSize:150,maxSize:500,alignToSlots:true})},
-        floodBeast:{hit:DEFAULT_HIT,deferredStatusTypes:["frostbite"],sprite:castSheet("assets/vfx/water/tidal-beast-vfx.png?v=166","targetTrajectory",{travelToTargets:true,scale:1.85,minSize:175,maxSize:250})},
+        // Keep every authored frame at its original source angle while the
+        // complete sheet moves between actor and target. Hit timing is unchanged.
+        floodBeast:{hit:DEFAULT_HIT,deferredStatusTypes:["frostbite"],sprite:castSheet("assets/vfx/water/tidal-beast-vfx.png?v=166","targetTrajectory",{travelToTargets:true,preserveSourceOrientation:true,scale:1.85,minSize:175,maxSize:250,motionPhases:{flightStart:2,turnFrame:5,impactStart:6,flightSourceAngle:0,turnSourceAngle:90}})},
         iceArrowRain:{hit:DEFAULT_HIT,deferredStatusTypes:["frostbite"],sprite:castSheet("assets/vfx/water/frost-arrow-rain-vfx.png?v=173.19","battlefield",{fixedFormation:true,coverageScale:1.22,minWidth:140,minHeight:140})},
         freeze:{hit:DEFAULT_HIT,deferredStatusTypes:["freeze"],sprite:castSheet("assets/vfx/water/freeze-cast-vfx.png?v=166","single",{scale:2.2,maxSize:270})},
         healSpell:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/water-heal-vfx.png?v=166","single",{scale:2.05,maxSize:250})},
@@ -163,7 +165,7 @@
         damageDown:statusVisual("","icon","statusEffects",{label:"殤風",statusName:"殤風",iconSrc:"assets/vfx/status/damage-down-icon.webp"}),
         stun:statusVisual("assets/vfx/status/stun.webp","pulse","statusEffects",{label:"暈眩",statusName:"暈眩",iconSrc:"assets/vfx/status/stun-icon.webp"}),
         dodgeSkill:statusVisual("assets/vfx/status/windwalk.webp","pulse","activeBuffs",{label:"風行",statusName:"風行",iconSrc:"assets/vfx/status/windwalk.webp"}),
-        stealthSkill:statusVisual("assets/vfx/status/stealth.webp","static","activeBuffs",{label:"隱身",statusName:"隱身",iconSrc:"assets/vfx/status/stealth.webp"}),
+        stealthSkill:statusVisual("","none","activeBuffs",{label:"隱身",statusName:"隱身",noBodyVisual:true,noHudIcon:true}),
         dinghaishenzhen:statusVisual("assets/vfx/status/calm-mind.webp","pulse","activeBuffs",{label:"氣定神閒",statusName:"氣定神閒",iconSrc:"assets/vfx/status/calm-mind.webp"}),
         defenseDown:statusVisual("","icon","statusEffects",{label:"破防",statusName:"破防",iconSrc:"assets/vfx/status/defense-down-icon.webp"}),
         shield:statusVisual("assets/vfx/status/shield.webp","static","activeBuffs",{label:"護盾",statusName:"岩盾",iconSrc:"assets/vfx/status/shield.webp"}),
@@ -172,7 +174,7 @@
         rockWall:statusVisual("assets/vfx/status/rock-wall.webp","static","activeBuffs",{label:"岩石壁壘",statusName:"岩石壁壘",iconSrc:"assets/vfx/status/rock-wall.webp"}),
         barrier:statusVisual("assets/vfx/status/barrier.webp","static","activeBuffs",{label:"結界",statusName:"結界",iconSrc:"assets/vfx/status/barrier.webp"}),
         yuanZuBlessing:statusVisual("assets/vfx/status/yuan-zu-blessing.webp","pulse","activeBuffs",{label:"元祖賜福",statusName:"元祖賜福",iconSrc:"assets/vfx/status/yuan-zu-blessing.webp"}),
-        fireMomentum:statusVisual("","icon","activeBuffs",{label:"炎勢",statusName:"炎勢",iconSrc:"assets/vfx/status/fire-momentum-icon.webp"}),
+        fireMomentum:statusVisual("","none","activeBuffs",{label:"炎勢",statusName:"炎勢",noBodyVisual:true,noHudIcon:true}),
         phoenixMight:statusVisual("","icon","activeBuffs",{label:"鳳威",statusName:"鳳威",iconSrc:"assets/vfx/status/phoenix-might-icon.webp"}),
         fireSoulResonance:statusVisual("assets/vfx/status/fire-soul-resonance.webp","pulse","activeBuffs",{label:"炎魂共鳴",statusName:"炎魂共鳴",iconSrc:"assets/vfx/status/fire-soul-resonance.webp"}),
         bloodBurn:statusVisual("assets/vfx/status/blood-burn.webp","pulse","activeBuffs",{label:"焚血",statusName:"焚血",iconSrc:"assets/vfx/status/blood-burn.webp"})
@@ -608,6 +610,10 @@
             removeStatusVisual(card,side,index,type);
             return;
         }
+        if(spec.noBodyVisual&&spec.noHudIcon){
+            removeStatusVisual(card,side,index,type);
+            return;
+        }
 
         const host=statusIconHost(side,index,card);
         const existingIcon=statusIconNode(host,type);
@@ -680,6 +686,15 @@
 
     function syncStatusVisualsForUnit(side,index,advanceRotation){
         const entity=entityFor(side,index);
+        const card=cardFor(side,index);
+        const stealthActive=!!(
+            entity&&Number(entity.hp)>0&&
+            (side!=="monster"||entity.alive!==false)&&
+            hasTimedEffect(entity,"stealthSkill")
+        );
+        if(card&&card.classList&&typeof card.classList.toggle==="function"){
+            card.classList.toggle("v143-unit-stealthed",stealthActive);
+        }
         const baseBodyTypes=activeBodyStatusTypesForLayer(
             entity,side,index,STATUS_VISUAL_LAYERS.HARD_CONTROL_BASE
         );
@@ -724,6 +739,9 @@
         if(typeof document==="undefined"||typeof document.querySelectorAll!=="function"){ return; }
         [".v143-status-visual",".v143-status-icon"].forEach(selector=>
             document.querySelectorAll(selector).forEach(node=>node.remove())
+        );
+        document.querySelectorAll(".v143-unit-stealthed").forEach(node=>
+            node.classList.remove("v143-unit-stealthed")
         );
         statusRotationByUnit.clear();
         hardControlContractViolationByUnit.clear();
@@ -771,25 +789,22 @@
             const damage=statusPercent(entry,"critDamageBonusPercent","bonusPercent");
             return "爆擊率 +"+chance+"%，爆擊傷害 +"+damage+"%";
         }
-        if(type==="frostbite"){ return "傷害 -25%、最終閃躲 -25個百分點、最終異常狀態抗性 -25個百分點"; }
+        if(type==="frostbite"){ return "傷害 -30%、最終閃躲 -25%、最終異常狀態抗性 -25%"; }
         if(type==="freeze"){ return "無法行動"; }
-        if(type==="agilityDown"){ return "敏捷降低 "+value+"%、最終閃躲降低 "+value+"個百分點"; }
+        if(type==="agilityDown"){ return "敏捷降低 "+value+"%、出手速度降低 "+value+"%"; }
         if(type==="damageDown"){ return "造成傷害降低 "+value+"%"; }
-        if(type==="stun"){ return "最終命中率降低 "+value+"個百分點"; }
+        if(type==="stun"){ return "最終命中率降低 "+value+"%"; }
         if(type==="dodgeSkill"){
-            const percent=statusPercent(entry,"percent","bonusPercent")||
-                Number(typeof skillDatabase!=="undefined"&&skillDatabase.dodgeSkill&&skillDatabase.dodgeSkill.evasionBonusPercent)||0;
-            return "最終閃躲提升 "+percent+"個百分點";
+            const percent=statusPercent(entry,"bonusPercent","percent");
+            return "最終閃躲提升 "+percent+"%";
         }
         if(type==="stealthSkill"){ return "無法被單體技能選中，仍會受到範圍技能"; }
         if(type==="dinghaishenzhen"){
-            const resist=statusPercent(entry,"resistBonus","amount")||
-                Number(typeof skillDatabase!=="undefined"&&skillDatabase.dinghaishenzhen&&skillDatabase.dinghaishenzhen.statusResistBonus)||0;
-            const accuracy=Number(entry&&entry.accuracyBonusPercent)||
-                Number(typeof skillDatabase!=="undefined"&&skillDatabase.dinghaishenzhen&&skillDatabase.dinghaishenzhen.accuracyBonusPercent)||0;
+            const resist=statusPercent(entry,"resistBonus","amount");
+            const accuracy=Number(entry&&entry.accuracyBonusPercent)||0;
             const parts=[];
-            if(resist){ parts.push("最終異常狀態抗性 +"+resist+"個百分點"); }
-            if(accuracy){ parts.push("最終命中率 +"+accuracy+"個百分點"); }
+            if(resist){ parts.push("最終異常狀態抗性 +"+resist+"%"); }
+            if(accuracy){ parts.push("最終命中率 +"+accuracy+"%"); }
             return parts.join("、")||"異常狀態抗性提升";
         }
         if(type==="defenseDown"){ return "防禦降低 "+value+"%"; }
@@ -799,13 +814,11 @@
         }
         if(type==="petrify"){ return "無法行動"; }
         if(type==="earthShield"){
-            const percent=statusPercent(entry,"percent","reflectPercent")||
-                Number(typeof skillDatabase!=="undefined"&&skillDatabase.earthShield&&skillDatabase.earthShield.reflectPercent)||0;
+            const percent=statusPercent(entry,"percent","reflectPercent");
             return "反彈受到傷害的 "+percent+"%";
         }
         if(type==="rockWall"){
-            const percent=statusPercent(entry,"percent","defenseBonusPercent")||
-                Number(typeof skillDatabase!=="undefined"&&skillDatabase.rockWall&&skillDatabase.rockWall.defenseBonusPercent)||0;
+            const percent=statusPercent(entry,"percent","defenseBonusPercent");
             return "防禦提升 "+percent+"%";
         }
         if(type==="barrier"){
@@ -813,9 +826,8 @@
             return blocks?"完全抵擋傷害，剩餘 "+blocks+" 次":"完全抵擋傷害";
         }
         if(type==="yuanZuBlessing"){
-            const percent=statusPercent(entry,"bonusPercent","evasionBonusPercent")||
-                Number(typeof skillDatabase!=="undefined"&&skillDatabase.yuanZuBlessing&&skillDatabase.yuanZuBlessing.evasionBonusPercent)||0;
-            return "最終閃躲提升 "+percent+"個百分點";
+            const percent=statusPercent(entry,"bonusPercent","evasionBonusPercent");
+            return "最終閃躲提升 "+percent+"%";
         }
         if(type==="fireMomentum"){
             const percent=Number(entry&&entry.bonusPercent)||0;
@@ -858,6 +870,17 @@
         });
     }
 
+    function authoritativeStatusBuffs(entity){
+        if(!entity){ return []; }
+        const entries=[];
+        if(Array.isArray(entity.v141TeamBuffs)){ entries.push(...entity.v141TeamBuffs); }
+        ["v155WindDodge","v155EvasionBlessing"].forEach(key=>{
+            const state=entity[key];
+            if(state&&Number(state.turnsLeft)>0){ entries.push(state); }
+        });
+        return entries;
+    }
+
     window.v143GetBattleStatusSummary=function(entity){
         const buffs=[],debuffs=[],seen=new Set();
         function collect(list,kind){
@@ -872,6 +895,9 @@
                 (kind==="buff"?buffs:debuffs).push(item);
             });
         }
+        /* Gameplay state is authoritative. Display-only activeBuffs are collected
+           only after real sidecars/team buffs and are de-duplicated by status ID. */
+        collect(authoritativeStatusBuffs(entity),"buff");
         collect(entity&&entity.activeBuffs,"buff");
         collect(entity&&entity.statusEffects,"debuff");
         if(entity&&entity.v141Shield&&Number(entity.v141Shield.turnsLeft)>0){
@@ -1013,6 +1039,32 @@
         return clamp(base*scale,minSize,maxSize);
     }
 
+    function placePhasedMotion(current,node,sprite,dx,dy,angle){
+        const phases=sprite.motionPhases;
+        const preserveSourceOrientation=!!sprite.preserveSourceOrientation;
+        const start=phases.flightStart/sprite.frames;
+        const turn=phases.turnFrame/sprite.frames;
+        const impact=phases.impactStart/sprite.frames;
+        const transform=(progress,rotation)=>"translate(calc(-50% + "+dx*progress+"px),calc(-50% + "+dy*progress+"px)) rotate("+rotation+"deg)";
+        const turnProgress=(turn-start)/(impact-start);
+        const frames=[
+            {offset:0,transform:transform(0,0)},
+            {offset:start,transform:transform(0,0)},
+            {offset:start,transform:transform(0,preserveSourceOrientation?0:angle-phases.flightSourceAngle)},
+            {offset:turn,transform:transform(turnProgress,preserveSourceOrientation?0:angle-phases.flightSourceAngle)},
+            {offset:turn,transform:transform(turnProgress,preserveSourceOrientation?0:angle-phases.turnSourceAngle)},
+            {offset:impact,transform:transform(1,preserveSourceOrientation?0:angle-phases.turnSourceAngle)},
+            {offset:impact,transform:transform(1,0)},
+            {offset:1,transform:transform(1,0)}
+        ];
+        node.dataset.motion="phased";
+        // Re-measuring decoded aspect must not restart flight or Frame 1.
+        const elapsed=node.v143MotionAnimation?node.v143MotionAnimation.currentTime:Math.max(0,Date.now()-current.visualStartedAt);
+        if(node.v143MotionAnimation){ node.v143MotionAnimation.cancel(); }
+        node.v143MotionAnimation=node.animate(frames,{duration:current.duration,fill:"both",easing:"linear"});
+        node.v143MotionAnimation.currentTime=elapsed;
+    }
+
     function placeSprite(current,node,index,target){
         const sprite=current.model.sprite;
         const placement=placementFor(current.config,sprite,current.targetType);
@@ -1036,14 +1088,16 @@
             node.dataset.targetIndex=String(index);
             node.dataset.targetIndexes=String(index);
             node.dataset.geometrySlot=target.slot;
-            node.dataset.travel="true";
+            if(!sprite.motionPhases){ node.dataset.travel="true"; }
             node.dataset.travelToTargets="true";
             node.style.left=actor.x+"px";
             node.style.top=actor.y+"px";
             applySpriteBox(node,size,size,sprite);
             node.style.setProperty("--v143-sprite-dx",target.x-actor.x+"px");
             node.style.setProperty("--v143-sprite-dy",target.y-actor.y+"px");
-            node.style.setProperty("--v143-sprite-angle",Math.atan2(target.y-actor.y,target.x-actor.x)*180/Math.PI+"deg");
+            const trajectoryAngle=Math.atan2(target.y-actor.y,target.x-actor.x)*180/Math.PI;
+            node.style.setProperty("--v143-sprite-angle",(sprite.preserveSourceOrientation?0:trajectoryAngle)+"deg");
+            if(sprite.motionPhases){ placePhasedMotion(current,node,sprite,target.x-actor.x,target.y-actor.y,trajectoryAngle); }
             return;
         }
 
@@ -1208,6 +1262,7 @@
     function cleanupCurrent(current,reason){
         if(!current||current.done){ return; }
         current.done=true;
+        current.spriteNodes.forEach(node=>{ if(node.v143MotionAnimation){ node.v143MotionAnimation.cancel(); } });
         current.targetIndexes.forEach(index=>{
             const card=cardFor(current.targetSide,index);
             if(card&&card.classList){ card.classList.remove("v143-effects-pending"); }
@@ -1369,73 +1424,26 @@
         return wait;
     };
 
-    if(typeof showMonsterHit==="function"){
-        const previous=showMonsterHit;
-        showMonsterHit=function(index){
-            const args=Array.prototype.slice.call(arguments);
-            const wait=delayFor("monster",index,true);
-            const current=state.current;
-            if(current&&!current.done&&current.config.id==="fireCritical"&&current.targetSide==="monster"){ args[3]=true; }
-            if(wait>8){
-                state.metrics.delayedNumbers++;
-                setTimer(()=>previous.apply(this,args),wait);
-                return;
-            }
-            return previous.apply(this,args);
-        };
-    }
-
-    if(typeof showPlayerHit==="function"){
-        const previous=showPlayerHit;
-        showPlayerHit=function(amount,type,index){
-            const args=Array.prototype.slice.call(arguments);
-            const wait=delayFor("player",Number(index)||0,true);
-            const current=state.current;
-            if(current&&!current.done&&current.config.id==="fireCritical"&&current.targetSide==="player"&&!args[3]){ args[4]=true; }
-            if(wait>8){
-                state.metrics.delayedNumbers++;
-                setTimer(()=>previous.apply(this,args),wait);
-                return;
-            }
-            return previous.apply(this,args);
-        };
-    }
+    /* V143 owns hit timing only. Battle Floating Feedback owns popup DOM,
+       geometry, collision lanes, typography and cleanup. */
+    window.v143ResolveBattleFeedbackTiming=function(targetSide,index,kind){
+        const side=targetSide==="monster"?"monster":"player";
+        const unitIndex=Number(index)||0;
+        const wait=delayFor(side,unitIndex,true);
+        const current=state.current;
+        const critical=String(kind||"")==="damage"&&!!(
+            current&&!current.done&&current.config&&current.config.id==="fireCritical"&&
+            current.targetSide===side
+        );
+        if(wait>8){ state.metrics.delayedNumbers++; }
+        return Object.freeze({delayMs:wait,impactAt:Date.now()+wait,impactId:current&&!current.done?("v143:"+String(current.sequence)+":"+side+":"+String(unitIndex)):null,sequence:current&&!current.done?current.sequence:0,critical:critical});
+    };
 
     if(typeof applySkillDebuffEffectsToPlayer==="function"){
         const previous=applySkillDebuffEffectsToPlayer;
         applySkillDebuffEffectsToPlayer=function(skill,level,target,index){
             registerTarget("player",Number(index)||0,true);
             return previous.apply(this,arguments);
-        };
-    }
-
-    if(typeof showMissEffect==="function"){
-        const previous=showMissEffect;
-        showMissEffect=function(isPlayerTarget,index,label){
-            const args=Array.prototype.slice.call(arguments);
-            const targetSide=isPlayerTarget?"player":"monster";
-            /* MISS is still an attempted cast. Register the resolved target through
-               the same formal V143 path so late-known monster/Boss targets get
-               their real Sprite Sheet while the MISS popup keeps hit timing. */
-            const wait=delayFor(targetSide,index,true);
-            const invoke=()=>{
-                const result=previous.apply(this,args);
-                const card=cardFor(targetSide,index);
-                if(card&&typeof card.querySelectorAll==="function"&&typeof document!=="undefined"&&document.body){
-                    const popups=card.querySelectorAll(":scope > .damage-popup.miss-popup");
-                    const popup=popups.length?popups[popups.length-1]:null;
-                    const rect=popup&&card.getBoundingClientRect?card.getBoundingClientRect():null;
-                    if(popup&&rect){
-                        popup.classList.add("v152-top-damage");
-                        popup.style.setProperty("left",(rect.left+rect.width/2)+"px","important");
-                        popup.style.setProperty("top",(rect.top+rect.height*.26)+"px","important");
-                        document.body.appendChild(popup);
-                    }
-                }
-                return result;
-            };
-            if(wait>8){ setTimer(invoke,wait); return; }
-            return invoke();
         };
     }
 
@@ -1519,19 +1527,6 @@
         syncStatusVisualsForUnit("player",Number(index));
     };
 
-    function wrapBadge(name){
-        const previous=window[name];
-        if(typeof previous!=="function"){ return; }
-        window[name]=function(){
-            const result=previous.apply(this,arguments);
-            if(typeof document!=="undefined"&&typeof document.querySelectorAll==="function"){
-                document.querySelectorAll(".skill-name-badge").forEach(badge=>badge.classList.add("v143-caster-skill-label"));
-            }
-            return result;
-        };
-    }
-    wrapBadge("showSkillNameBadge");
-    wrapBadge("showMonsterSkillNameBadge");
 
     if(typeof document!=="undefined"){
         const boot=function(){ purgeLegacyCardVfx(); syncStatusVisualEffects(); };

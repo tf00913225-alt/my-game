@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "releaseVersion": "173.72",
+  "releaseVersion": "173.73",
   "requirements": [
     {
       "id": "REQ-01",
@@ -162,6 +162,266 @@
         ],
         "verification": "targeted A–J、production build/build check、Release Gate，以及 PR #344 CI 的 360×800／390×844／412×915 mobile browser QA",
         "result": "GitHub Actions CI run 35445108483 已通過；同一 run 完成更新通知 browser QA、既有戰鬥 QA、靜態資源、loader 與 Release Gate 檢查。"
+      }
+    },
+    {
+      "id": "REQ-VISUAL-READY-20260927",
+      "title": "每日副本立繪與玩法首屏美術 Visual Ready 契約收斂",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "js/45-v154-dev-fixes.js",
+          "js/42-v148-combat-dungeon-fixes.js",
+          "js/startup/feature-loader.js",
+          "config/feature-manifest.json",
+          "css/gameplay-boss-tower.css",
+          "tests/visual-ready-contract-20260927.test.js"
+        ],
+        "verification": "targeted regression、production build/build:check、PR #635 CI #3400、dev CI #3401、Cloudflare DEV deployment gate 與 360×800／393×873／412×915 gameplay cover browser QA",
+        "result": "Daily Registry Pending／Ready／Failed、三張副本立繪 decode gate、Gameplay Hub critical artwork gate 與 dark fallback 均已驗證；部署 SHA 與 dev HEAD 一致"
+      }
+    },
+    {
+      "id": "HIT-V2-01",
+      "title": "直接百分比 Accuracy／Evasion 與 5～99% 單一 Hit Owner",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "SYSTEM_CONTRACTS.md",
+          ".github/scripts/run-hit-evasion-v2-browser-qa.mjs",
+          "tests/equipment-combat-percent-migration-v2.test.js"
+        ],
+        "verification": "CI run 36967841803: integrated candidate 060082edf644863ff5b0d846bc1f0523533f0170, 39 final Runtime tests, migration/cloud/relic suites and exact merge-candidate production Chrome mobile QA",
+        "result": "PASS; artifact 11210537162 (merge snapshot a292b228b32bd971fc0353788da856079a3891a4) JSON plus CJK detail/formula screenshots inspected. Requirement behavior verified; repository integration and deployment are separately pending."
+      }
+    },
+    {
+      "id": "HIT-V2-02",
+      "title": "裸裝 95%／無等級派生怪物閃避／無等級差命中",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "SYSTEM_CONTRACTS.md",
+          ".github/scripts/run-hit-evasion-v2-browser-qa.mjs",
+          "tests/equipment-combat-percent-migration-v2.test.js"
+        ],
+        "verification": "CI run 36967841803: integrated candidate 060082edf644863ff5b0d846bc1f0523533f0170, 39 final Runtime tests, migration/cloud/relic suites and exact merge-candidate production Chrome mobile QA",
+        "result": "PASS; artifact 11210537162 (merge snapshot a292b228b32bd971fc0353788da856079a3891a4) JSON plus CJK detail/formula screenshots inspected. Requirement behavior verified; repository integration and deployment are separately pending."
+      }
+    },
+    {
+      "id": "HIT-V2-03",
+      "title": "四象鎧甲與袍閃避 10%／3 件套閃避 2%",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "SYSTEM_CONTRACTS.md",
+          ".github/scripts/run-hit-evasion-v2-browser-qa.mjs",
+          "tests/equipment-combat-percent-migration-v2.test.js"
+        ],
+        "verification": "CI run 36967841803: integrated candidate 060082edf644863ff5b0d846bc1f0523533f0170, 39 final Runtime tests, migration/cloud/relic suites and exact merge-candidate production Chrome mobile QA",
+        "result": "PASS; artifact 11210537162 (merge snapshot a292b228b32bd971fc0353788da856079a3891a4) JSON plus CJK detail/formula screenshots inspected. Requirement behavior verified; repository integration and deployment are separately pending."
+      }
+    },
+    {
+      "id": "HIT-V2-04",
+      "title": "舊四象與 Spirit 裝備冪等遷移，背包／裝備／Cloud 投影",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "SYSTEM_CONTRACTS.md",
+          ".github/scripts/run-hit-evasion-v2-browser-qa.mjs",
+          "tests/equipment-combat-percent-migration-v2.test.js"
+        ],
+        "verification": "CI run 36967841803: integrated candidate 060082edf644863ff5b0d846bc1f0523533f0170, 39 final Runtime tests, migration/cloud/relic suites and exact merge-candidate production Chrome mobile QA",
+        "result": "PASS; artifact 11210537162 (merge snapshot a292b228b32bd971fc0353788da856079a3891a4) JSON plus CJK detail/formula screenshots inspected. Requirement behavior verified; repository integration and deployment are separately pending."
+      }
+    },
+    {
+      "id": "HIT-V2-05",
+      "title": "閃躲術與氣定神閒 5～25%／Wind EX 15% 各一次",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "SYSTEM_CONTRACTS.md",
+          ".github/scripts/run-hit-evasion-v2-browser-qa.mjs",
+          "tests/equipment-combat-percent-migration-v2.test.js"
+        ],
+        "verification": "CI run 36967841803: integrated candidate 060082edf644863ff5b0d846bc1f0523533f0170, 39 final Runtime tests, migration/cloud/relic suites and exact merge-candidate production Chrome mobile QA",
+        "result": "PASS; artifact 11210537162 (merge snapshot a292b228b32bd971fc0353788da856079a3891a4) JSON plus CJK detail/formula screenshots inspected. Requirement behavior verified; repository integration and deployment are separately pending."
+      }
+    },
+    {
+      "id": "HIT-V2-06",
+      "title": "凍傷 -25%／元祖祝福 15%／青嵐 8／10／12%",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "SYSTEM_CONTRACTS.md",
+          ".github/scripts/run-hit-evasion-v2-browser-qa.mjs",
+          "tests/equipment-combat-percent-migration-v2.test.js"
+        ],
+        "verification": "CI run 36967841803: integrated candidate 060082edf644863ff5b0d846bc1f0523533f0170, 39 final Runtime tests, migration/cloud/relic suites and exact merge-candidate production Chrome mobile QA",
+        "result": "PASS; artifact 11210537162 (merge snapshot a292b228b32bd971fc0353788da856079a3891a4) JSON plus CJK detail/formula screenshots inspected. Requirement behavior verified; repository integration and deployment are separately pending."
+      }
+    },
+    {
+      "id": "HIT-V2-07",
+      "title": "鎮魂古鐘最終命中下降 5／8% 且保留 Boss 效率",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "SYSTEM_CONTRACTS.md",
+          ".github/scripts/run-hit-evasion-v2-browser-qa.mjs",
+          "tests/equipment-combat-percent-migration-v2.test.js"
+        ],
+        "verification": "CI run 36967841803: integrated candidate 060082edf644863ff5b0d846bc1f0523533f0170, 39 final Runtime tests, migration/cloud/relic suites and exact merge-candidate production Chrome mobile QA",
+        "result": "PASS; artifact 11210537162 (merge snapshot a292b228b32bd971fc0353788da856079a3891a4) JSON plus CJK detail/formula screenshots inspected. Requirement behavior verified; repository integration and deployment are separately pending."
+      }
+    },
+    {
+      "id": "HIT-V2-08",
+      "title": "Runtime／UI／正式契約／瀏覽器與雙向戰鬥驗證",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "SYSTEM_CONTRACTS.md",
+          ".github/scripts/run-hit-evasion-v2-browser-qa.mjs",
+          "tests/equipment-combat-percent-migration-v2.test.js"
+        ],
+        "verification": "CI run 36967841803: integrated candidate 060082edf644863ff5b0d846bc1f0523533f0170, 39 final Runtime tests, migration/cloud/relic suites and exact merge-candidate production Chrome mobile QA",
+        "result": "PASS; artifact 11210537162 (merge snapshot a292b228b32bd971fc0353788da856079a3891a4) JSON plus CJK detail/formula screenshots inspected. Requirement behavior verified; repository integration and deployment are separately pending."
+      }
+    },
+    {
+      "id": "REQ-FORGE-SOCKETS-GEMS-20261002",
+      "title": "鍛造與裝備寶石第一階段",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "release/requirement-batches/2026-10-02-forge-sockets-gems.json",
+          "tests/forge-sockets-gems.test.js",
+          ".github/scripts/run-forge-sockets-browser-qa.mjs",
+          "docs/qa/forge-sockets-gems-20261002.md"
+        ],
+        "verification": "6/6 第一階段 VERIFIED；候選 CI 36966366859 與 dev 檢查 36967167176 attempt 2 通過，dev@b61f87d 部署 SHA／173.72 版本與快取核對、390／412 deployed-dev Chrome 觸控證據通過（artifact 11210577025）。",
+        "result": "鍛造入口／無圖紙冶煉／0/0/0/1/2/3孔／最小寶石／本機 UID 安全鑲嵌與屬性／手機介面逐項通過。雲端權威角色拒絕本機鑲嵌；可信後端交易與寶石取得來源仍在後續範圍，非 Android 實體驗收。"
+      }
+    },
+    {
+      "id": "TOWER-CHALLENGE-PROFILE-20261002",
+      "title": "四象塔挑戰特性、共同技能率與每層固定10人",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "release/requirement-batches/2026-10-02-tower-challenge-profile.json",
+          "docs/qa/tower-challenge-profile-20261002.md"
+        ],
+        "verification": "Production Chrome 412×915, CI run 36984210420, head a1e208abd223c1f6f20d978f65a95822dd79fb34, artifact 11216788440: 27 exact ordered scenes, 10-unit queue, real Heal/Freeze, 10-target AOE/feedback, rules and battle screenshots inspected; targeted 4×100 Node matrix/formula/isolation tests PASS. Integration/deployment tracked separately.",
+        "result": "31/31 functional requirements VERIFIED; latest-head full CI, integration and deployment are separate pending gates. Android physical acceptance is not claimed."
+      }
+    },
+    {
+      "id": "REQ-P0-FULL-RELEASE-SUITES-20261002",
+      "title": "V173.73 正式發布必要完整 Node suites 通過",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "release/v17373-scope.json",
+          "docs/V17373_RELEASE_SCOPE_20261002.md",
+          ".github/workflows/ci.yml",
+          ".github/scripts/ci.mjs",
+          "tests/ui-critical-regressions-mobile-browser.test.js",
+          "tests/v174-cardless-battle-browser.test.js",
+          "tests/v141-system-expansion.test.js",
+          "tests/release-update-notification-system.test.js"
+        ],
+        "verification": "PR #768 merged; independent CI=1 TZ=UTC npm test 262/262 PASS with actual Chrome, no missing-Chrome pass. Tested tree equals dev 81853be234963c8a5250b474c38480dcd0dfa2b4. Skill 20/20, cardless 5/5, V141 18/18; UTC/Asia/Taipei/America/New_York notification 12/12 each. PR CI 37079249628 SUCCESS; dev CI 37080384742 attempt 2 SUCCESS, full Node step SKIPPED by existing policy (not full-suite PASS). Deployment job 111082274607 and independent exact deployed SHA/version/cache read-back PASS. Main unchanged at 4b037b47967544d90c781ad938286777c9576731.",
+        "result": "VERIFIED: complete-suite P0 closed; trueP0=0; READY TO ENTER RELEASE FREEZE. Game/Cache remain 173.72; no fixed Release Candidate, Freeze or production release. Candidate Exact-HEAD acceptance belongs to the next explicitly authorized stage.",
+        "closeout": {
+          "workId": "RELEASE-SUITES-P0-20261002",
+          "status": "VERIFIED",
+          "repairPR": 768,
+          "repairPRUrl": "https://github.com/tf00913225-alt/my-game/pull/768",
+          "repairHeadSha": "808676db34da25b15f52ae3cdf4492a5f3853b69",
+          "verifiedDevSha": "81853be234963c8a5250b474c38480dcd0dfa2b4",
+          "testedTree": "967d1c9395e92bf736c7c3500ad45883e5b1dcc7",
+          "independentFullSuite": {
+            "command": "CI=1 TZ=UTC npm test",
+            "runner": ".github/scripts/ci.mjs tests",
+            "discovered": 262,
+            "passed": 262,
+            "failed": 0,
+            "exitCode": 0,
+            "missingChromeSkip": 0,
+            "continueOnFailure": false,
+            "evidenceSource": "https://github.com/tf00913225-alt/my-game/pull/768",
+            "logSha256": "3ec9fb5275f17293b1d2f4d75718dd52aaa2ca1276ef116144882695ac4ee568",
+            "provenance": "PR #768 final independent-run record; distinct from dev CI; exact tested tree equals current dev tree. Closeout does not rerun or claim candidate acceptance."
+          },
+          "browser": {
+            "name": "Google Chrome for Testing headless shell",
+            "version": "154.0.8037.97",
+            "actualChrome": true,
+            "missingChromeSkipCountedAsPass": false
+          },
+          "targeted": {
+            "skillProgression": "20/20 PASS",
+            "cardlessBattlePresentation": "5/5 PASS",
+            "v141": "18/18 PASS",
+            "criticalMobileBrowser": "PASS"
+          },
+          "notificationTimezones": {
+            "UTC": "12/12 PASS",
+            "Asia/Taipei": "12/12 PASS",
+            "America/New_York": "12/12 PASS"
+          },
+          "build": "PASS",
+          "buildCheck": "PASS",
+          "diffCheck": "PASS",
+          "prCI": {
+            "run": 37079249628,
+            "result": "SUCCESS"
+          },
+          "devCI": {
+            "run": 37080384742,
+            "attempt": 2,
+            "job": 111082308123,
+            "sha": "81853be234963c8a5250b474c38480dcd0dfa2b4",
+            "result": "SUCCESS",
+            "fullNodeStep": "SKIPPED by existing dev refined policy; not Full Node PASS",
+            "url": "https://github.com/tf00913225-alt/my-game/actions/runs/37080384742/attempts/2"
+          },
+          "devDeployment": {
+            "job": 111082274607,
+            "run": 37080384742,
+            "attempt": 2,
+            "sha": "81853be234963c8a5250b474c38480dcd0dfa2b4",
+            "result": "SUCCESS",
+            "manifestArtifact": 11258362889,
+            "responsiveItemArtifact": 11258772310,
+            "battleLiveArtifact": 11258248134,
+            "checks": "Responsive Item 6/6 viewports; Forge 390x844/412x915; battle layer/audio live mobile QA PASS",
+            "url": "https://github.com/tf00913225-alt/my-game/actions/runs/37080384742/attempts/2"
+          },
+          "deployedReadBack": {
+            "url": "https://dev.four-symbols-dev.pages.dev/release-manifest.json",
+            "sha": "81853be234963c8a5250b474c38480dcd0dfa2b4",
+            "version": "V173.72",
+            "cacheVersion": "173.72",
+            "result": "PASS",
+            "verification": "GitHub job log and independent release-gate verify-deployed read-back on 2026-10-03; deploymentShaVerified computed by verifier, not inferred from CI green"
+          },
+          "mainUnchanged": {
+            "sha": "4b037b47967544d90c781ad938286777c9576731",
+            "result": "PASS"
+          },
+          "repairBranch": "DELETED; exact ref 404",
+          "releaseCandidateSha": null,
+          "releaseFreezeStarted": false,
+          "productionReleaseStarted": false,
+          "nextStage": "Only after explicit release-freeze authorization: fix candidate SHA and perform required Exact-HEAD full suite and release acceptance."
+        }
       }
     }
   ]

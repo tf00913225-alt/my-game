@@ -167,8 +167,7 @@ test("set bonuses and skill costs are visible before extra detail clicks",()=>{
     assert.ok(v132Source.includes("escapeHtml(label)+']'+count+'/5"));
     assert.match(v132Source,/裝備三件　全能力\+1/);
     assert.match(v132Source,/裝備五件　/);
-    assert.match(v131Source,/v138-skill-learn-cost/);
-    assert.match(v131Source,/學習需要 "\+Math\.max\(0,Number\(skill\.learnCost\)\|\|0\)\+" 技能點/);
+    assert.doesNotMatch(v131Source,/v138-skill-learn-cost|學習需要/);
     assert.match(indexSource,/class="card v138-skill-point-summary"/);
     assert.match(indexSource,/剩餘技能點：/);
 });
@@ -178,7 +177,7 @@ test("current release uses a hashed boot entry and feature manifest",()=>{
     assert.match(indexSource,/build\/boot-core\.[0-9a-f]{12}\.js/);
     const assetVersionMatch=loaderSource.match(/const V_ASSET_VERSION="([^"]+)"/);
     assert.equal(assetVersionMatch?.[1],releaseMeta.cacheVersion);
-    assert.equal(manifest.release,"173.72");
+    assert.equal(manifest.release,releaseMeta.version);
     assert.ok(manifest.featureManifest.bundles["gameplay-core"]);
 });
 

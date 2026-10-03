@@ -1,5 +1,10 @@
 # 《四象江湖傳》受控自主修復契約
 
+## 一般 Bug 預設路徑（2026-10-01 生效）
+
+一般 Bug 必須先讀 `docs/BUG_FIX_FAST_PATH.md`，以該文件為調查範圍、證據升級、自主整合與結案的權威來源。預設最小必要調查＋最小安全修正；只查直接相關責任與呼叫鏈。完整 Owner Convergence／Lifecycle 稽核僅在該文件第四節證據成立或使用者明確要求架構工程時適用。下文不得以「較嚴格優先」恢復一般 Bug 全面稽核、tests-only 限制、固定失敗額度、僅草稿 PR 或正式 Runtime 即硬停止。最新 Head 必要 CI、原症狀驗證與資料安全仍必須遵守；一般 Bug 結案不要求發布 main。
+
+
 > 文件定位：本文件是《四象江湖傳》所有「修復型任務」的唯一自主操作契約來源。
 >
 > 版本：v1.0
@@ -15,6 +20,8 @@
 本契約的目的，是讓後續任何新對話、Codex（程式代理）、GPT（生成式預訓練模型）或其他開發代理，在收到《四象江湖傳》的修復型任務時，不需要使用者重貼整段規則，也能依固定邊界自主完成低風險修復。
 
 本契約只授權「受控自主修復」，不是一般性的自由修改授權。
+
+所有實際修復施工同時受 `docs/CHANGE_SAFETY_REPLACEMENT_CONTRACT.md` 約束；自主修復權限不代表可以用 Wrapper（包裝器）、late patch、`!important`、`display:none` 或過時測試去掩蓋未完成的 Owner／Contract／Lifecycle／Semantic State 遷移。
 
 ---
 
@@ -45,7 +52,9 @@
 3. `HANDOFF.md`
 4. `ARCHITECTURE_RULES.md`
 5. `UI_GUIDELINES.md`（若任務涉及 UI／版面／視覺）
-6. `AUTONOMOUS_REPAIR_CONTRACT.md`（本文件）
+6. `docs/CHANGE_SAFETY_REPLACEMENT_CONTRACT.md`
+7. `docs/BUG_REPAIR_DOD_OWNER_CONVERGENCE_GATE.md`
+8. `AUTONOMOUS_REPAIR_CONTRACT.md`（本文件）
 
 不得只依賴舊對話摘要、記憶中的 SHA（提交雜湊）或過去的工作分支狀態。
 
@@ -261,6 +270,33 @@ B2／E／E+B2 只是既有分類標籤，**分類名稱本身不得被當成擴�
 3. 涉及自主修復邊界時，以本契約較嚴格的停止條件為準。
 4. 涉及正式遊戲規格／架構時，以對應正式規範文件為準。
 5. 無法確定時，停止，不猜。
+
+---
+
+## 15A. Bug Repair DoD / Owner Convergence 優先 Gate（強制）
+
+任何 Bug／failure／regression 任務，不論本契約允許自主修到哪一步，都必須同時符合 `docs/BUG_REPAIR_DOD_OWNER_CONVERGENCE_GATE.md`。
+
+- 本契約只決定「可以自主做什麼」；不降低 Bug 的完成標準。
+- 找到 contributing cause、修改測試、PR CI PASS 或 branch implementation 都不得直接稱為「已修好」。
+- production runtime 修復若受本契約硬停止條件阻擋，應回報 BLOCKED／DIAGNOSED，不得用 tests-only Patch 迴避。
+- 同一責任若仍有多 Owner、Wrapper、Timer、Observer、CSS override 或其他 late patch，Owner Convergence Gate 不得 PASS。
+- 只有該 Bug 達到專項契約的 VERIFIED 條件，才可以對使用者宣稱 FIXED／RESOLVED／已修好。
+- 使用者不需要決定舊 Owner、Patch、Wrapper、CSS 或 Test 如何退場；代理必須先做工程判斷。若安全施工超出本契約授權，再清楚回報所需授權，不得把技術選擇題丟回使用者。
+
+---
+
+## 15A. 修復完成的變更安全 Gate（強制）
+
+即使 failure（失敗）已修好並取得可執行驗證，也必須再確認：
+
+- 修正是回到正式 Owner，而不是新增第二 Owner。
+- 若屬 Replacement／Convergence，舊 Wrapper／Patch／CSS／State／Test 已完成退場或有明確相容性理由。
+- 沒有用 stale test（過時測試）保護舊行為。
+- 沒有用 `display:none`、`animation:none`、`!important` 等遮蔽方式把舊問題藏起來並宣稱完成。
+- Semantic State 與 Lifecycle 已符合新規格。
+
+上述任一未完成，修復不得描述為「已完全收斂」。
 
 ---
 

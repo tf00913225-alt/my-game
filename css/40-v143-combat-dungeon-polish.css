@@ -88,23 +88,7 @@
     cursor:crosshair;
     outline:none !important;
     box-shadow:none !important;
-}
-
-/* Caster label stays text-only. It does not render or substitute skill art. */
-.skill-name-badge.v143-caster-skill-label{
-    z-index:16020 !important;
-    overflow:hidden !important;
-    border:1px solid color-mix(in srgb,currentColor 58%,#fff) !important;
-    border-radius:6px !important;
-    opacity:1;
-    background:rgba(12,10,8,.88) !important;
-    box-shadow:0 3px 10px rgba(0,0,0,.55) !important;
-    text-align:center !important;
-    text-overflow:ellipsis !important;
-    transform:translate(-50%,-118%) !important;
-}
-
-/* Formal cast Sprite Sheet stage. The viewport edge is the only VFX clip owner.
+}/* Formal cast Sprite Sheet stage. The viewport edge is the only VFX clip owner.
    Do not use strict/paint containment here: it creates an additional paint clip. */
 .v143-skill-stage{
     position:fixed;
@@ -139,6 +123,18 @@
     animation:
         v143RasterCastFrames var(--v143-sprite-duration,1200ms) steps(1,end) var(--v143-sprite-delay,0ms) 1 both,
         v143RasterTravel var(--v143-sprite-duration,1200ms) linear var(--v143-sprite-delay,0ms) 1 both;
+}
+
+/* Phased motion belongs to the V143 frame metadata / Web Animations track.
+   CSS owns only raster frame selection and visibility for these sprites. */
+.v143-vfx-sprite.v143-vfx-sprite-active[data-motion="phased"]{
+    animation:
+        v143RasterCastFrames var(--v143-sprite-duration,1200ms) steps(1,end) var(--v143-sprite-delay,0ms) 1 both,
+        v143RasterCastOpacity var(--v143-sprite-duration,1200ms) linear var(--v143-sprite-delay,0ms) 1 both;
+}
+@keyframes v143RasterCastOpacity{
+    0%,100%{opacity:0}
+    2%,97%{opacity:1}
 }
 
 .v143-skill-stage[data-element="fire"] .v143-vfx-sprite{
@@ -317,7 +313,7 @@
 }
 
 @keyframes v143StatusImageBreath{
-    0%,100%{opacity:.42}
+    0%,100%{opacity:0}
     50%{opacity:1}
 }
 
@@ -347,15 +343,6 @@
 #game-stage #dungeonTabContent > .v141-abyss-shell{height:100% !important;min-height:0 !important;overflow:hidden !important;}
 #game-stage .v141-abyss-map{height:auto !important;min-height:0 !important;flex:1 1 auto !important;}
 #game-stage #dungeonPage .v141-dungeon-return{display:none !important;}
-#game-stage #v141DungeonNav{
-    width:100% !important;
-    max-width:none !important;
-    height:84px !important;
-    grid-template-columns:repeat(5,minmax(0,1fr)) !important;
-    box-sizing:border-box !important;
-}
-#game-stage #v141DungeonNav .nav-art-button{height:64px !important;max-width:94% !important;}
-
 .v143-abyss-dialogue{
     position:absolute !important;
     inset:0 !important;
@@ -432,8 +419,6 @@
 
 @media (max-height:720px){
     #game-stage #dungeonPage{padding-bottom:82px !important;}
-    #game-stage #v141DungeonNav{height:80px !important;}
-    #game-stage #v141DungeonNav .nav-art-button{height:60px !important;}
     #game-stage .v143-abyss-dialogue b{font-size:19px !important;}
 }
 
@@ -537,16 +522,9 @@
     padding:6px 8px;
     color:#a99d87;
     font-size:13px;
-}
-
-
-/* Reading surfaces are non-blocking observers, but transient battle paint must
-   not cover them. Animations/timing continue underneath; only the paint is
-   hidden for the short time a status/info/stats drawer is being read. */
-body.v174-battle-reading-open > .v143-skill-stage,
-body.v174-battle-reading-open > .v-fixed-slot-popup,
-body.v174-battle-reading-open > .damage-popup,
-body.v174-battle-reading-open > .skill-name-badge.v143-caster-skill-label{
-    visibility:hidden !important;
-    opacity:0 !important;
+}/* Stealth changes only the combatant artwork. HUD, bars, names and status
+   indicators remain fully readable and range skills may still hit the slot. */
+#game-stage #battlePage .battle-player.v143-unit-stealthed > .v174-battle-art,
+#game-stage #battlePage .battle-monster.v143-unit-stealthed > .v174-battle-art{
+    opacity:.35 !important;
 }

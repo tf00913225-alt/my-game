@@ -1,9 +1,11 @@
 "use strict";
 
+
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const path=require("node:path");
 const cp=require("node:child_process");
+
 
 function findChrome(){
     for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){
@@ -13,15 +15,18 @@ function findChrome(){
     return "";
 }
 
+
 const chrome=findChrome();
 if(!chrome){
     console.log("UI panel browser layout check skipped: Chrome not available");
     process.exit(0);
 }
 
+
 const root=process.cwd();
 const fixture=path.join(root,".ui-panel-layout-smoke.html");
 const fileUrl="file://"+fixture.replace(/\\/g,"/");
+
 
 const html=`<!doctype html>
 <html><head><meta charset="utf-8">
@@ -126,18 +131,20 @@ html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#000;}
 })();
 </script></body></html>`;
 
+
 fs.writeFileSync(fixture,html,"utf8");
 try{
     const run=cp.spawnSync(chrome,[
         "--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage",
         "--allow-file-access-from-files","--force-device-scale-factor=1","--window-size=1080,1920",
-        "--dump-dom",fileUrl
+        "--dump-dom","--virtual-time-budget=1000",fileUrl
     ],{encoding:"utf8",timeout:30000,maxBuffer:8*1024*1024});
     assert.equal(run.status,0,run.stderr||"Chrome layout fixture failed");
     const match=run.stdout.match(/<pre id="result">([\s\S]*?)<\/pre>/);
-    assert.ok(match,"browser layout result missing");
+    assert.ok(match,`browser layout result missing; stdout tail=${run.stdout.slice(-1200)}; stderr tail=${run.stderr.slice(-1200)}`);
     const snapshots=JSON.parse(match[1].replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"'));
     assert.equal(snapshots.length,5);
+
 
     const baseline=snapshots[0];
     const stableKeys=["left","top","width","height"];
@@ -149,12 +156,14 @@ try{
         }
     }
 
+
     snapshots.forEach(shot=>{
         assert.ok(shot.box.top>=shot.modal.top-0.25,"panel escaped top edge");
         assert.ok(shot.box.bottom<=shot.modal.bottom+0.25,"panel escaped bottom edge");
         assert.ok(shot.scrollHeight<=shot.clientHeight+1,`${shot.page} made the shop body scroll`);
         assert.ok(shot.contentScrollHeight<=shot.contentClientHeight+1,`${shot.page} made the tab content scroll`);
     });
+
 
     snapshots.filter(shot=>shot.page==='equipment').forEach(shot=>{
         assert.equal(shot.cardRects.length,6,"equipment shop must show six cards on one screen");
@@ -186,6 +195,7 @@ try{
             assert.ok(image.top>=itemArt.top-0.25&&image.bottom<=itemArt.bottom+0.25,"equipment image escaped its item art vertically");
         });
     });
+
 
     snapshots.filter(shot=>shot.page==='potion').forEach(shot=>{
         assert.equal(shot.potionCardRects.length,6,"potion shop must show six cards on one screen");
@@ -219,6 +229,7 @@ try{
             assert.ok(total.right<=buy.left+0.25,"potion price overlaps buy button");
         });
     });
+
 
     console.log("Headless Chrome: shop stayed fixed, non-scrollable and aligned with six potion icons across 5 tab switches");
 }finally{

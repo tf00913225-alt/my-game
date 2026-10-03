@@ -1,0 +1,30 @@
+{
+  "id": "2026-09-27-gameplay-art-nav-owner-convergence",
+  "baseSha": "5948445fa8c6f8fa60daa7c5d42605812b8cc274",
+  "workBranch": "fix/gameplay-art-nav-owner-convergence-20260927",
+  "targetBranch": "dev",
+  "status": "VERIFIED",
+  "requirements": {
+    "gameplay-cover-art-owner-restores-brightness": "VERIFIED",
+    "tower-hero-art-owner-restores-brightness": "VERIFIED",
+    "gameplay-seal-dom-css-and-layout-retired": "VERIFIED",
+    "context-navigation-decoupled-from-main-bottom-nav": "VERIFIED",
+    "legacy-tests-updated-to-new-contract": "VERIFIED",
+    "targeted-node-and-browser-fixture-tests": "VERIFIED",
+    "mobile-browser-qa-360-393-412": "VERIFIED",
+    "build-ci-pr-and-dev-integration": "VERIFIED"
+  },
+  "scope": {
+    "excluded": [
+      "main",
+      "BOSS battle rules",
+      "Tower floor rules",
+      "Abyss rules",
+      "Relic runtime",
+      "Battlefield",
+      "Cloud Save",
+      "Account",
+      "formal art assets"
+    ]
+  }
+}

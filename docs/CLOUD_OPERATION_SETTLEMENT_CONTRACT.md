@@ -1,0 +1,28 @@
+# First authoritative reward settlement — implementation gate
+
+Status: design and prerequisite hardening only. No gold, EXP, item, claim or playable character mutation is deployed by this contract. `reserveTrustedGrant()` is a pre-migration reservation with `creditedToCharacter:false`; its `grantOperations` receipt is **not** an economy ledger entry or a spendable balance. Do not turn its response into a local award.
+
+## Trusted source and request
+
+The first real reward writer must have a server-owned event/attempt or verified provider record identifying UID, reward source, unique reward key and period, eligibility, canonical reward calculation and expiry/consumption state. A browser may submit only an allowed intent: `operationId`, source reference, expected server revision and active session. The backend derives UID from Auth, checks the current session in the same transaction and computes the reward; reject any client amount, EXP, item list, target balance, `claimed` flag or local timestamp. Start with one enumerated reward path and explicitly reject unsupported sources. Client battle animation or simulated result alone is not proof of eligibility.
+
+## One atomic operation
+
+Within the protected Firestore transaction, read the current envelope, canonical character/economy/inventory state, source record, source-period claim key and `operations/{operationId}`. For a new operation require an exact expected revision, valid source and unclaimed key. Compute the result from server-owned inputs, then write the next canonical revision, bounded playable projection or its fenced rebuild marker, immutable operation receipt, immutable claim record and append-only ledger delta together. If a complete projection cannot be published at the same revision, leave `authoritativeStateReady:false`; never expose a partial character. No external side effects may occur inside a transaction callback.
+
+Receipt identity is UID-scoped and binds `operationId`, operation type, source/key/period, input revision, output revision, result and canonical delta digest. A retry of **the same intent** returns that stored result even when the caller's expected revision is now stale; a different intent reusing the ID fails closed. Another operation ID for the same unique source/key/period cannot award again. A stale *new* operation is rejected. Verify receipt/claim/ledger consistency before responding to retry; missing or contradictory records are `data-loss`, not permission to reissue a reward. Lost responses use receipt lookup and identical retry. Replaced sessions cannot read or retry protected operations.
+
+The ledger records immutable provenance and signed deltas with balance-before/after or asset ownership references; restoration uses a new audited revision and does not delete later receipts, reopen claims or duplicate payment rights. The server enforces bounded document sizes and partitions history by period; the snapshot only contains the compact claim checkpoint needed at startup. If Firestore transaction limits prevent a complete atomic result, redesign the data layout or defer the operation instead of making a partial credit.
+
+## Emulator acceptance before a credit writer
+
+Test identical retry after a lost response, same ID with different intent, different ID for a claimed source, concurrent stale revisions, cross-UID source, revoked session, malformed source, corrupt/missing receipt or claim or ledger, oversized result and an interrupted snapshot build. Assert both the balance/asset delta and exactly one receipt/claim/ledger entry, and that rejected cases change no authoritative document. Payment/refund and offline tickets need their own trusted source checks; this contract alone does not enable them. Require a separately verified server backup/recovery point before `authoritativeStateReady:true` or fresh-device restore.
+
+## Daily check-in server event evidence (2026-10-02)
+
+The existing check-in path records a private immutable `serverUsers/{uid}/rewardEvents/{daily-checkin-YYYYMMDD}` observation in the same protected transaction as issuance or direct credit. It binds the UID, fixed event ID/type, server Taipei day, 50 gold, first canonical character and source revision through a deterministic SHA-256 digest. Grant, reservation receipt and credited ledger carry the same digest. Every daily reservation/credit/replay reads and verifies the event; credited replay also verifies the historical snapshot/archive and delta. No browser completion flag or client amount authorizes it. Missing evidence never permits regeneration of an existing grant or receipt. Previously unbound daily grants stay intact and blocked; an orphan event cannot reopen a claim. This is a prerequisite for unpublished server-created accounts only, not legacy adoption or trusted battle-result validation.
+
+
+### Original check-in eligibility snapshot (2026-10-02)
+
+The shared event reader also resolves the event's original canonical revision and verifies its complete snapshot against the recovery archive. That source must contain the event's first character in an exclusively server-created one-character account. New issuance checks the current account snapshot pointer against that sealed source. Reservation and retry use the original revision even after current balances/revisions advance; they never replace missing proof with today's account. Missing/corrupt archives or snapshots block with data-loss before writes. Existing valid event digests stay compatible and no old event/source is rewritten. This does not authorize historical admission or provide a trusted combat outcome.

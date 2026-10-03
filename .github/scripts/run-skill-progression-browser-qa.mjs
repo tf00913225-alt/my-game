@@ -1,212 +1,219 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
-import {spawnSync} from "node:child_process";
-
-function findChrome(){
-    for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){
-        const probe=spawnSync("bash",["-lc",`command -v ${name}`],{encoding:"utf8"});
-        if(probe.status===0&&probe.stdout.trim()){ return probe.stdout.trim(); }
-    }
-    throw new Error("Headless Chrome/Chromium is required for skill progression browser QA.");
-}
-
-const fixture=path.join(process.cwd(),".skill-progression-browser-qa.html");
-const fileUrl="file://"+fixture.replace(/\\/g,"/");
-const skillIds=[
-    "waterKnife","frostPunch","iceSpin","frostCrush",
-    "waterBall","floodBeast","iceArrowRain","healSpell",
-    "revive","freeze","purifyMind","waterEX"
-];
-const names={
-    waterKnife:"水刀斬",frostPunch:"冰霜拳",iceSpin:"冰旋一閃",frostCrush:"冰封重擊",
-    waterBall:"水球術",floodBeast:"洪水猛獸",iceArrowRain:"冰霜箭雨",healSpell:"治療術",
-    revive:"復活術",freeze:"冰封",purifyMind:"淨心訣",waterEX:"水元素EX"
-};
-
-const html=`<!doctype html>
-<html lang="zh-Hant">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="stylesheet" href="css/00-main.css">
-<link rel="stylesheet" href="css/30-v130-requested-updates.css">
-<link rel="stylesheet" href="css/31-v131-fix-batch.css">
-<link rel="stylesheet" href="css/46-v154-dev-fixes.css">
-<link rel="stylesheet" href="css/49-v169-rpg-ui.css">
-<style>
-html,body{margin:0;width:390px;height:844px;overflow:hidden;background:#050505;}
-#game-stage{width:390px;height:844px;position:relative;transform:none!important;}
-#homeFeatureModal{display:flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;position:absolute!important;inset:0!important;}
-#homeFeatureModal .home-feature-modal-box.wide{width:382px!important;height:836px!important;max-width:none!important;max-height:none!important;}
-#homeFeatureModalBody{display:flex!important;flex:1 1 auto!important;min-height:0!important;}
-#characterTabContent{display:block!important;flex:1 1 auto!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;touch-action:pan-y!important;}
-#skillPage{display:block!important;position:static!important;height:auto!important;min-height:0!important;padding:0 0 12px!important;}
-#allSkillsList{display:block!important;overflow:visible!important;padding-bottom:12px!important;}
-.skill-row{display:grid;grid-template-columns:42px minmax(0,1fr) minmax(96px,auto);gap:8px;align-items:center;width:100%;box-sizing:border-box;min-height:58px;margin:0 0 8px;padding:7px;border:1px solid rgba(210,170,90,.35);}
-.skill-row-text{min-width:0;overflow-wrap:anywhere;}
-.skill-action-card{min-width:0;max-width:132px;white-space:normal;overflow-wrap:anywhere;}
-</style>
-</head>
-<body>
-<div id="game-stage">
-  <div id="homeFeatureModal" class="home-feature-modal show no-padding">
-    <div class="home-feature-modal-box wide">
-      <div id="homeFeatureModalBody">
-        <div id="characterTabContent">
-          <section id="skillPage">
-            <div id="skillPoints">999</div>
-            <div id="allSkillsList"></div>
-            <div id="skillDetailStats"></div>
-          </section>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-<pre id="result"></pre>
-<script>
-var player={id:"寒泉一號",element:"water",level:19,skillPoints:999,hp:1000,sp:1000,activeBuffs:[],statusEffects:[]};
-var player2={id:"寒泉二號",element:"water",level:10,skillPoints:999,hp:1000,sp:1000,activeBuffs:[],statusEffects:[]};
-var player3=null;
-var currentSkillCharacter="water";
-var activeBattleCharacterIndex=0;
-var characterSkillLoadouts={
-  water:{name:"寒泉一號",skillLevels:{healSpell:1},equippedSkills:[]},
-  player2:{name:"寒泉二號",skillLevels:{healSpell:1},equippedSkills:[]}
-};
-var skillDatabase={};
-var fixtureSkillIds=${JSON.stringify(skillIds)};
-var fixtureSkillNames=${JSON.stringify(names)};
-fixtureSkillIds.forEach(function(id){
-  skillDatabase[id]={id:id,name:fixtureSkillNames[id],element:"water",category:"magic",targetType:"single",learnCost:99,maxLevel:5,requires:[],description:"技能說明"};
+import {spawn} from "node:child_process";
+import {ROOT,findChrome,startServer,waitJson,Cdp} from "./runtime-browser-qa-support.mjs";
+const ARTIFACT_DIR=path.join(ROOT,"artifacts","browser-qa");
+const VIEWPORTS=[[360,800],[393,873],[412,915]];
+const QA_LABELS=Object.freeze({
+    heal:"治療術",
+    revive:"復活術",
+    freeze:"冰封",
+    purifyMind:"淨心訣",
+    learn:"學習・",
+    upgrade:"升級・",
+    fireCharacter:"QA 火角色",
+    waterCharacter:"QA 水角色"
 });
-skillDatabase.healSpell.category="heal";skillDatabase.healSpell.targetType="allyTri";
-skillDatabase.revive.category="revive";skillDatabase.revive.targetType="deadAlly";
-skillDatabase.freeze.maxLevel=1;skillDatabase.purifyMind.maxLevel=1;skillDatabase.waterEX.maxLevel=1;
-function getSkillCharacterObject(key){return key==="player2"?player2:player;}
-function getPartyCharacterByIndex(index){return index===1?player2:player;}
-function getPartyCharacterKey(index){return index===1?"player2":"water";}
-function getCharacterSkillKey(actor){return actor===player2?"player2":"water";}
-function saveGame(){}
-function updateUI(){}
-function alert(message){window.__lastAlert=message;}
-function learnSkill(){return false;}
-function upgradeSkill(){return false;}
-function renderSkillLoadout(){
-  var list=document.getElementById("allSkillsList");
-  list.innerHTML=fixtureSkillIds.map(function(id){
-    return '<div class="skill-row">'+
-      '<div id="skillIcon_'+id+'" aria-hidden="true"></div>'+
-      '<div class="skill-row-text"><strong>'+fixtureSkillNames[id]+'</strong></div>'+
-      '<button class="skill-action-card" type="button"><span class="skill-action-card-label">學習</span></button>'+
-      '</div>';
-  }).join("");
-}
-function showSkillDetail(){document.getElementById("skillDetailStats").innerHTML="";}
-</script>
-<script src="js/60-v173.64-skill-progression-rebalance.js"></script>
-<script>
-(function(){
-  function reviveState(){
-    var row=Array.from(document.querySelectorAll("#allSkillsList .skill-row")).find(function(item){return !!item.querySelector("#skillIcon_revive");});
-    var card=row&&row.querySelector(".skill-action-card");
-    var label=card&&card.querySelector(".skill-action-card-label");
-    var rr=row&&row.getBoundingClientRect();
-    var cr=card&&card.getBoundingClientRect();
-    return {
-      exists:!!row,
-      rowHeight:rr?rr.height:0,
-      label:label?label.textContent.replace(/\\s+/g," ").trim():"",
-      disabled:!!(card&&card.classList.contains("disabled")),
-      onclick:card?card.getAttribute("onclick")||"":"",
-      overflow:!!(row&&row.scrollWidth>row.clientWidth+1),
-      actionOutside:!!(rr&&cr&&(cr.left<rr.left-1||cr.right>rr.right+1))
+const WATER_CASES=[
+    ["healSpell",QA_LABELS.heal],
+    ["revive",QA_LABELS.revive],
+    ["freeze",QA_LABELS.freeze],
+    ["purifyMind",QA_LABELS.purifyMind]
+];
+const ELEMENT_CASES=[["fire","fireRocket"],["water","healSpell"],["wind","stormFist"],["earth","stoneThrow"]];
+const PREPARE_RUNTIME=`(async()=>{
+    // Keep hydration failures observable in the browser artifact.
+    const runtimeErrors=[];
+    const originalConsoleError=console.error;
+    console.error=(...args)=>{runtimeErrors.push(args.map(value=>String(value&&value.stack||value)).join(" "));originalConsoleError(...args);};
+    window.addEventListener("error",event=>runtimeErrors.push(String(event.message||event.error||"window error")));
+    window.addEventListener("unhandledrejection",event=>runtimeErrors.push(String(event.reason||"unhandled rejection")));
+    const waitFor=async predicate=>{
+        const until=Date.now()+30000;
+        while(Date.now()<until){ if(predicate()){ return true; } await new Promise(resolve=>setTimeout(resolve,50)); }
+        return false;
     };
-  }
-
-  currentSkillCharacter="water";
-  player.level=19;
-  renderSkillLoadout();
-  var lv19=reviveState();
-
-  player.level=20;
-  renderSkillLoadout();
-  var lv20=reviveState();
-
-  currentSkillCharacter="player2";
-  renderSkillLoadout();
-  var second=reviveState();
-
-  currentSkillCharacter="water";
-  player.level=20;
-  renderSkillLoadout();
-  showSkillDetail("revive");
-  var detail=document.getElementById("skillDetailStats").textContent.replace(/\\s+/g," ").trim();
-  var pageText=document.getElementById("skillPage").textContent;
-  var rows=Array.from(document.querySelectorAll("#allSkillsList .skill-row"));
-  var root=document.getElementById("characterTabContent");
-  var natural={overflowY:getComputedStyle(root).overflowY,touchAction:getComputedStyle(root).touchAction};
-  root.style.setProperty("height","240px","important");
-  root.style.setProperty("max-height","240px","important");
-  root.style.setProperty("overflow-y","scroll","important");
-  void root.offsetHeight;
-  var before=root.scrollTop;
-  root.scrollTop=Math.max(0,root.scrollHeight-root.clientHeight);
-  var after=root.scrollTop;
-
-  document.getElementById("result").textContent=JSON.stringify({
-    installed:window.__v17364SkillProgressionInstalled===true,
-    lv19:lv19,lv20:lv20,second:second,detail:detail,
-    forbidden:["learnLevel","requires","tier","upgradeCost"].filter(function(word){return pageText.includes(word);}),
-    progressionHints:document.querySelectorAll("#allSkillsList .v17364-progression-hint").length,
-    rowCount:rows.length,
-    horizontalOverflow:rows.some(function(row){return row.scrollWidth>row.clientWidth+1;}),
-    natural:natural,
-    scroll:{scrollHeight:root.scrollHeight,clientHeight:root.clientHeight,before:before,after:after}
-  });
-})();
-</script>
-</body>
-</html>`;
-
-fs.writeFileSync(fixture,html,"utf8");
-try{
-    const chrome=findChrome();
-    const run=spawnSync(chrome,[
-        "--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage",
-        "--allow-file-access-from-files","--force-device-scale-factor=1","--window-size=390,844",
-        "--dump-dom",fileUrl
-    ],{encoding:"utf8",timeout:30000,maxBuffer:12*1024*1024});
-    assert.equal(run.status,0,run.stderr||"Skill progression browser fixture failed");
-    const match=run.stdout.match(/<pre id="result">([\s\S]*?)<\/pre>/);
-    assert.ok(match,"Skill progression browser result missing");
-    const decoded=match[1]
-        .replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">")
-        .replace(/&quot;/g,'"').replace(/&#39;/g,"'");
-    const data=JSON.parse(decoded);
-
-    assert.equal(data.installed,true,"V173.64 skill progression owner did not install");
-    assert.equal(data.lv19.exists,true,"Revive row is missing");
-    assert.ok(data.lv19.rowHeight>0,"Revive row is not visibly rendered");
-    assert.equal(data.lv19.disabled,true);assert.match(data.lv19.label,/Lv20/);
-    assert.equal(data.lv19.overflow,false);assert.equal(data.lv19.actionOutside,false);
-
-    assert.equal(data.lv20.disabled,false);assert.match(data.lv20.onclick,/learnSkill\('revive'\)/);
-    assert.equal(data.second.disabled,true,"Second character must use its own Lv10 gate");assert.match(data.second.label,/Lv20/);
-
-    for(const label of ["最低學習等級","目前技能等級","下一級角色需求","學習成本","升級成本","前置技能"]){
-        assert.match(data.detail,new RegExp(label));
+    if(!await waitFor(()=>window.FourSymbolsFeatures&&typeof window.FourSymbolsFeatures.ensure==="function")){
+        throw new Error("feature loader was not initialized");
     }
-    assert.deepEqual(data.forbidden,[]);
-    assert.equal(data.progressionHints,0,"Verbose progression text must live in skill details, not summary rows");
-    assert.ok(data.rowCount>=8,"Water skill list is unexpectedly short");
-    assert.equal(data.horizontalOverflow,false,"Skill rows must not overflow horizontally at 390px");
-    assert.match(data.natural.overflowY,/auto|scroll/);
-    assert.equal(data.natural.touchAction,"pan-y");
-    assert.ok(data.scroll.scrollHeight>data.scroll.clientHeight,"Constrained skill content must overflow vertically");
-    assert.ok(data.scroll.after>data.scroll.before,"Skill scroll owner did not actually scroll");
-    console.log("✓ Skill progression mobile browser QA passed");
-}finally{
-    try{fs.unlinkSync(fixture);}catch(_){ }
+    if(!await waitFor(()=>window.FourSymbolsStartupPolicy?.getState?.()==="READY"&&document.getElementById("startupLoader")?.hidden===true&&getComputedStyle(document.getElementById("gameInterface")).display!=="none")){
+        throw new Error("formal account-first startup did not reach READY: "+JSON.stringify({
+            state:window.FourSymbolsStartupPolicy?.getState?.(),
+            loaderHidden:document.getElementById("startupLoader")?.hidden,
+            gameDisplay:getComputedStyle(document.getElementById("gameInterface")).display,
+            startupError:String(window.FourSymbolsStartupPolicy?.getLastError?.()?.message||""),
+            runtimeErrors:runtimeErrors.slice(-8)
+        }));
+    }
+    await window.FourSymbolsFeatures.ensure("skill","skill-runtime-browser-qa");
+    if(!await waitFor(()=>typeof renderSkillLoadout==="function"&&typeof window.v173GetSkillLearnEligibility==="function"&&typeof window.v17364GetSkillUpgradeEligibility==="function")){
+        throw new Error("formal Skill Runtime owners were not initialized: "+JSON.stringify({
+            skillFeatureReady:window.FourSymbolsFeatures.isReady("skill"),
+            gameplayCoreReady:window.FourSymbolsFeatures.isReady("gameplay-core"),
+            progressionInstalled:!!window.__v17364SkillProgressionInstalled,
+            renderer:typeof renderSkillLoadout,
+            learnEligibility:typeof window.v173GetSkillLearnEligibility,
+            upgradeEligibility:typeof window.v17364GetSkillUpgradeEligibility,
+            errors:runtimeErrors.slice(-8)
+        }));
+    }
+    player.id="QA 火角色";player.element="fire";player.level=70;player.skillPoints=999;
+    player2={id:"QA 水角色",element:"water",level:70,skillPoints:999};
+    player3=null;
+    currentSkillCharacter="fire";
+    // Cross-element learning keeps its formal native-skill gate. Seed one
+    // legitimate native level so the water cases exercise the real cross
+    // element learn actions rather than a separate locked-state scenario.
+    characterSkillLoadouts.fire={skillLevels:{fireRocket:1},equippedSkills:[]};
+    selectedSkillElementCharacterKey="fire";
+    showPage("home");
+    openHomeFeature("character");
+    switchCharacterTab("skill");
+    selectedSkillElementTab="water";
+    renderSkillLoadout();
+    if(!await waitFor(()=>{
+        const list=document.getElementById("allSkillsList");
+        const modal=document.getElementById("homeFeatureModal");
+        const rect=list?.getBoundingClientRect();
+        return !!(modal?.classList.contains("show")&&rect&&rect.width>0&&rect.height>0);
+    })){
+        const describe=id=>{
+            const node=document.getElementById(id);
+            if(!node){return {id,exists:false};}
+            const style=getComputedStyle(node),rect=node.getBoundingClientRect();
+            return {id,exists:true,className:node.className,hidden:node.hidden,inlineDisplay:node.style.display,display:style.display,visibility:style.visibility,opacity:style.opacity,rect:{width:rect.width,height:rect.height,left:rect.left,top:rect.top}};
+        };
+        throw new Error("formal Character Skill surface did not enter the player viewport: "+JSON.stringify({
+            startupState:window.FourSymbolsStartupPolicy?.getState?.(),
+            nodes:["game-viewport","game-stage","app","game-content","homePage","homeFeatureModal","homeFeatureModalBody","characterTabContent","skillPage","allSkillsList"].map(describe)
+        }));
+    }
+    if(typeof window.v146SyncCharacterAttentionDots==="function"){ window.v146SyncCharacterAttentionDots(); }
+    return true;
+})()`;
+
+const COLLECT_EVIDENCE=`(()=>{
+    const rect=node=>{const r=node.getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height};};
+    const visible=node=>{
+        if(!node){ return {exists:false}; }
+        node.scrollIntoView({block:"center",inline:"nearest"});
+        const style=getComputedStyle(node),r=rect(node);
+        const width=Math.max(0,Math.min(r.right,innerWidth)-Math.max(r.left,0));
+        const height=Math.max(0,Math.min(r.bottom,innerHeight)-Math.max(r.top,0));
+        const label=node.querySelector(".skill-action-card-label"),lr=label?rect(label):null;
+        const hasVisualSurface=style.backgroundImage!=="none"||style.backgroundColor!=="rgba(0, 0, 0, 0)"||parseFloat(style.borderTopWidth)>0;
+        return {exists:true,tagName:node.tagName,type:node.getAttribute("type"),disabled:node.disabled,ariaDisabled:node.getAttribute("aria-disabled"),display:style.display,visibility:style.visibility,opacity:Number(style.opacity),rect:r,visibleRectWidth:width,visibleRectHeight:height,label:{exists:!!label,text:String(label?.textContent||"").trim(),rect:lr},hasVisualSurface};
+
+// GitHub UI synchronization marker; no Runtime behavior change.
+    };
+    const findAction=skillId=>document.querySelector('[data-skill-id="'+skillId+'"] button.skill-action-card[data-skill-action="growth"]');
+    const water={};
+    ${JSON.stringify(WATER_CASES)}.forEach(([id,name])=>{water[name]=visible(findAction(id));});
+    const elements={};
+    ${JSON.stringify(ELEMENT_CASES)}.forEach(([element,id])=>{
+        if(element==="fire"){ characterSkillLoadouts.fire.skillLevels={}; }
+        selectedSkillElementTab=element;renderSkillLoadout();
+        const card=findAction(id);elements[element]={skillId:id,action:visible(card)};
+    });
+    characterSkillLoadouts.fire.skillLevels={fireRocket:1};
+    selectedSkillElementTab="water";renderSkillLoadout();
+    if(typeof window.v146SyncCharacterAttentionDots==="function"){ window.v146SyncCharacterAttentionDots(); }
+    player.skillPoints=0;renderSkillLoadout();
+    const disabledLearn=visible(findAction("healSpell"));
+    player.skillPoints=999;selectedSkillElementTab="fire";
+    characterSkillLoadouts.fire.skillLevels={fireRocket:1};renderSkillLoadout();
+    const upgrade=visible(findAction("fireRocket"));
+    const equip=visible(document.querySelector('[data-skill-id="fireRocket"] button.skill-action-card[data-skill-action="equip"]'));
+    characterSkillLoadouts.fire.skillLevels={fireRocket:(skillDatabase.fireRocket.maxLevel||1)};renderSkillLoadout();
+    const maxLevel=visible(findAction("fireRocket"));
+    selectedSkillElementTab="water";renderSkillLoadout();
+    if(typeof window.v146SyncCharacterAttentionDots==="function"){ window.v146SyncCharacterAttentionDots(); }
+    const guidance=[];
+    document.querySelectorAll("#allSkillsList .v146-growth-guidance-dot").forEach(dot=>{
+        const parent=dot.closest("button.skill-action-card");
+        guidance.push({parent:visible(parent),dot:visible(dot)});
+    });
+    const cards=[...document.querySelectorAll("#allSkillsList .skill-action-card")];
+    return {runtime:{renderer:String(renderSkillLoadout).includes("data-skill-action=\\\"growth\\\"")},water,elements,disabledLearn,upgrade,equip,maxLevel,guidance,allCards:cards.map(visible)};
+})()`;
+
+function assertVisibleAction(name,evidence){
+    assert.equal(evidence.exists,true,`${name}: action card is missing`);
+    assert.equal(evidence.tagName,"BUTTON",`${name}: action card must be BUTTON`);
+    assert.equal(evidence.type,"button",`${name}: action button type is wrong`);
+    assert.notEqual(evidence.display,"none",`${name}: display:none`);
+    assert.notEqual(evidence.visibility,"hidden",`${name}: visibility:hidden`);
+    assert.ok(evidence.opacity>0,`${name}: transparent`);
+    assert.ok(evidence.rect.width>0&&evidence.rect.height>0,`${name}: zero geometry`);
+    assert.ok(evidence.visibleRectWidth>0&&evidence.visibleRectHeight>0,`${name}: outside player viewport`);
+    assert.equal(evidence.label.exists,true,`${name}: label is missing`);
+    assert.ok(evidence.label.rect.width>0&&evidence.label.rect.height>0,`${name}: label has zero geometry`);
+    assert.ok(evidence.label.text.length>0,`${name}: label is blank`);
+    assert.equal(evidence.hasVisualSurface,true,`${name}: button has no background or border`);
 }
+
+async function runViewport(chrome,url,width,height,capture){
+    const profile=fs.mkdtempSync(path.join(os.tmpdir(),"skill-runtime-browser-qa-"));
+    const port=9400+Math.floor(Math.random()*300);
+    const proc=spawn(chrome,["--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--remote-debugging-address=127.0.0.1","--remote-debugging-port="+port,"--user-data-dir="+profile,"about:blank"],{stdio:"ignore"});
+    let client=null;
+    let latestEvidence=null;
+    try{
+        const targets=await waitJson(`http://127.0.0.1:${port}/json/list`);
+        const page=targets.find(item=>item.type==="page");
+        assert.ok(page?.webSocketDebuggerUrl);
+        client=new Cdp(page.webSocketDebuggerUrl);
+        await client.send("Page.enable");await client.send("Runtime.enable");await client.send("Log.enable");
+        // This is the production account repository's persisted owner key, seeded before
+        // any formal bundle evaluates.  It supplies a syntactically valid, isolated QA
+        // identity without replacing Firebase, the feature loader, or any Skill Runtime
+        // owner.  Feature modules call accountKey() during installation, so setting this
+        // only after navigation is too late and produces a false bootstrap failure.
+        await client.send("Page.addScriptToEvaluateOnNewDocument",{source:'localStorage.setItem("four_symbols_active_uid","skill-runtime-browser-qa");'});
+        await client.send("Emulation.setDeviceMetricsOverride",{width,height,deviceScaleFactor:1,mobile:true,screenWidth:width,screenHeight:height,screenOrientation:{type:"portraitPrimary",angle:0}});
+        await client.send("Page.navigate",{url});
+        await client.eval(PREPARE_RUNTIME);
+        const evidence=await client.eval(COLLECT_EVIDENCE);
+        latestEvidence=evidence;
+        assert.equal(evidence.runtime.renderer,true,"QA did not execute the formal renderSkillLoadout owner");
+        for(const [name,action] of Object.entries(evidence.water)){ assertVisibleAction(name,action); }
+        for(const [element,item] of Object.entries(evidence.elements)){ assertVisibleAction(element+"/"+item.skillId,item.action); }
+        assertVisibleAction("disabled learn",evidence.disabledLearn);assert.equal(evidence.disabledLearn.disabled,true,"locked action must use native disabled");
+        assertVisibleAction("upgrade",evidence.upgrade);assert.ok(evidence.upgrade.label.text.includes(QA_LABELS.upgrade),"upgrade label is missing");
+        assertVisibleAction("equip",evidence.equip);assert.equal(evidence.equip.disabled,false,"equip action should be enabled");
+        assertVisibleAction("max level",evidence.maxLevel);assert.equal(evidence.maxLevel.disabled,true,"max-level action must use native disabled");
+        assert.ok(evidence.water[QA_LABELS.heal].label.text.includes(QA_LABELS.learn),"cross-element learn label is missing");
+        assert.ok(evidence.guidance.length>0,"learnable action has no Guidance Dot");
+        for(const item of evidence.guidance){ assertVisibleAction("Guidance Dot parent",item.parent);assert.ok(item.dot.visibleRectWidth>0&&item.dot.visibleRectHeight>0,"Guidance Dot is not visible"); }
+        for(const card of evidence.allCards){ assert.equal(card.tagName,"BUTTON","div.skill-action-card is forbidden in formal Runtime"); }
+        if(capture){
+            const screenshot=await client.send("Page.captureScreenshot",{format:"png"});
+            fs.writeFileSync(path.join(ARTIFACT_DIR,"skill-393x873.png"),Buffer.from(screenshot.data,"base64"));
+        }
+        return {viewport:{width,height},evidence};
+    }catch(error){
+        error.skillRuntimeEvidence=latestEvidence;
+        throw error;
+    }finally{
+        client?.close();proc.kill("SIGTERM");
+        try{fs.rmSync(profile,{recursive:true,force:true});}catch(_){}
+    }
+}
+
+fs.mkdirSync(ARTIFACT_DIR,{recursive:true});
+const chrome=findChrome();
+const server=await startServer();
+try{
+    const results=[];
+    for(const [width,height] of VIEWPORTS){ results.push(await runViewport(chrome,server.url,width,height,width===393)); }
+    const manifest=JSON.parse(fs.readFileSync(path.join(ROOT,"build","asset-manifest.json"),"utf8"));
+    const evidence={suite:"skill-runtime-browser-qa",passed:true,commitSha:process.env.GITHUB_SHA||"unknown",runtimeUrl:server.url,productionCascade:[...manifest.critical.styles,...manifest.featureManifest.bundles["app-shell"].styles,...manifest.featureManifest.bundles["gameplay-core"].styles],results};
+    fs.writeFileSync(path.join(ARTIFACT_DIR,"skill-inventory-semantic-browser-qa.json"),JSON.stringify(evidence,null,2)+"\n","utf8");
+    console.log("Real Skill Runtime mobile browser QA passed:",VIEWPORTS.map(item=>item.join("x")).join(", "));
+}catch(error){
+    fs.writeFileSync(path.join(ARTIFACT_DIR,"skill-inventory-semantic-browser-qa.json"),JSON.stringify({suite:"skill-runtime-browser-qa",passed:false,error:String(error?.stack||error),evidence:error?.skillRuntimeEvidence||null},null,2)+"\n","utf8");
+    throw error;
+}finally{ await new Promise(resolve=>server.server.close(resolve)); }
+// CI synchronization marker for the current six-stat convergence validation head.

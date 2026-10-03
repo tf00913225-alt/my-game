@@ -71,7 +71,8 @@ node scripts/audit-monster-portrait-batch.mjs --strict --batch=release/monster-p
 - Library 母檔保留透明 PNG；正式 runtime 新立繪使用無損 WebP。
 - 一般／精英／BOSS 援軍／日常副本全類型／天兵：1024×1536。
 - 日常副本 Boss（修行教頭、礦脈統領、金庫總管）也使用 1024×1536，不使用大型 Boss 尺寸。
-- 個人 Boss／世界 Boss／四象塔 Boss／深淵帝王：1536×2048。
+- 四象塔 Boss：gameplay rank 仍為 boss，但 sizeClass 固定 standard，使用 1024×1536 Small Boss 規格。
+- 個人 Boss／世界 Boss／深淵帝王：1536×2048。
 - 同名普通怪被 roll 成精英時共用同一張立繪。
 - 四象天兵只做 fire / water / wind / earth 四張，四象塔與深淵共用。
 - 深淵東／南／天／北領域前置關分別用土／火／風／水天兵。

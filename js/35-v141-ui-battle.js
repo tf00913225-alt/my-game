@@ -1,6 +1,6 @@
 /*
    V141 — mobile UI and battle presentation
-   - 18-slot / 7-page backpack, compact dialogs and shop confirmation
+   - 24-slot / 5-page backpack, compact dialogs and shop confirmation
    - battle card status effects, monster shield bar, entrance/exit transitions
    - black-gold post-battle reward summary
    - click-to-move patrol character + draggable quest tracker
@@ -15,8 +15,8 @@
         "ticketSetEarth",
         "ticketSetWind"
     ]);
-    const INVENTORY_PAGE_SIZE=18;
-    const INVENTORY_PAGE_COUNT=7;
+    const INVENTORY_PAGE_SIZE=24;
+    const INVENTORY_PAGE_COUNT=Math.ceil(120/INVENTORY_PAGE_SIZE);
     const ANNOUNCEMENT_READ_KEY=window.FourSymbolsAccountSave.accountKey("announcement-read");
     const QUEST_MILESTONE_KEY=window.FourSymbolsAccountSave.accountKey("quest-milestones");
     const TASK_TRACKER_KEY=window.FourSymbolsAccountSave.accountKey("task-tracker");
@@ -63,20 +63,28 @@
     }
 
     /* =====================================================
-       Backpack: 18 slots × 7 pages (the final page keeps the 120-slot cap)
+       Backpack: one canonical 24-slot page for every category.
+       The source inventory cap remains 120; empty cells preserve geometry.
     ===================================================== */
     function ensureInventoryPager(){
-        const scroller=document.getElementById("inventoryGridScroll");
-        if(!scroller||document.getElementById("v141InventoryPager")){ return; }
+        const slot=document.getElementById("inventoryPaginationSlot");
+        if(!slot||document.getElementById("v141InventoryPager")){ return; }
         const pager=document.createElement("div");
         pager.id="v141InventoryPager";
         pager.className="v141-inventory-pager";
         pager.innerHTML=
             '<button type="button" aria-label="上一頁" onclick="v141ChangeInventoryPage(-1)">←</button>'+
-            '<span id="v141InventoryPageLabel">1 / 7</span>'+
+            '<span id="v141InventoryPageLabel">1 / '+INVENTORY_PAGE_COUNT+'</span>'+
             '<button type="button" aria-label="下一頁" onclick="v141ChangeInventoryPage(1)">→</button>';
-        scroller.insertAdjacentElement("afterend",pager);
+        slot.appendChild(pager);
     }
+
+    window.v141RefreshInventory=function(){
+        if(typeof rebuildInventorySlots==="function"){ rebuildInventorySlots(); }
+        if(typeof renderInventory==="function"){ renderInventory(); }
+        if(typeof updateGoldDisplay==="function"){ updateGoldDisplay(); }
+        return true;
+    };
 
     window.v141ChangeInventoryPage=function(direction){
         inventoryPageIndex=(inventoryPageIndex+Number(direction)+INVENTORY_PAGE_COUNT)%INVENTORY_PAGE_COUNT;
@@ -102,14 +110,24 @@
                 const item=pageItems[index]||null;
                 const box=document.createElement("div");
                 box.className="inventory-item inventory-item-classic "+(item?"has-item":"empty");
+                if(item){
+                    const rarity=typeof getInventoryRarityKey==="function"?getInventoryRarityKey(item):"white";
+                    box.classList.add("rarity-"+rarity);
+                    box.dataset.rarity=rarity;
+                }
                 box.draggable=false;
                 box.addEventListener("dragstart",event=>event.preventDefault());
                 if(item){
                     box.innerHTML=
                         '<div class="inventory-icon">'+(item.icon||"◆")+'</div>'+
                         '<div class="inventory-count">'+((Number(item.count)||0)>1?"×"+item.count:"")+'</div>';
+                    box.querySelectorAll(".v169-item-art").forEach(art=>art.classList.add("inventory-backpack-rarity-neutral"));
                     const realIndex=inventoryItems.indexOf(item);
-                    box.onclick=()=>openItemModal(realIndex);
+                    box.onclick=()=>{
+                        document.querySelectorAll("#inventoryGrid .inventory-item-classic.is-selected").forEach(selected=>selected.classList.remove("is-selected"));
+                        box.classList.add("is-selected");
+                        openItemModal(realIndex);
+                    };
                     box.setAttribute("aria-label",item.name||"背包物品");
                 }else{
                     box.innerHTML='<div class="inventory-empty-dot">·</div>';
@@ -120,6 +138,12 @@
 
             const label=document.getElementById("v141InventoryPageLabel");
             if(label){ label.textContent=(inventoryPageIndex+1)+" / "+INVENTORY_PAGE_COUNT; }
+            const quickSell=document.getElementById("inventoryQuickSellButton");
+            if(quickSell){
+                const equipmentPage=typeof inventoryFilter!=="undefined"&&inventoryFilter==="equipment";
+                quickSell.hidden=!equipmentPage;
+                quickSell.setAttribute("aria-hidden",equipmentPage?"false":"true");
+            }
             document.querySelectorAll("#inventoryCategoryTabs [data-filter]").forEach(tab=>{
                 const active=tab.dataset.filter===inventoryFilter;
                 tab.classList.toggle("active",active);
@@ -297,51 +321,7 @@
         }
     });
 
-    /* =====================================================
-       Additional characters can manually cast support skills
-    ===================================================== */
-    if(typeof prepareAction==="function"){
-        const originalPrepareAction=prepareAction;
-        prepareAction=function(type){
-            const skill=skillDatabase[type];
-            if(
-                activeBattleCharacterIndex<=0 ||
-                !skill ||
-                !["buff","heal","revive"].includes(skill.category)
-            ){
-                return originalPrepareAction.apply(this,arguments);
-            }
-            const character=getPartyCharacterByIndex(activeBattleCharacterIndex);
-            const autoOn=getPartyAutoConfig(activeBattleCharacterIndex).enabled;
-            if(!battleActive||!character||character.hp<=0||autoOn||actionReady){ return; }
-            const spCost=skill.spCost!==undefined?skill.spCost:skill.cost;
-            if(character.sp<spCost){
-                addBattleLog("SP不足，無法使用"+skill.name);
-                return;
-            }
-
-            if(skill.targetType==="ally"||skill.targetType==="allyTri"||skill.targetType==="deadAlly"){
-                const hasTarget=[0,1,2].some(index=>isValidAllyTargetForSkill(
-                    skill,getBattleCharacterByIndex(index),index
-                ));
-                if(!hasTarget){
-                    addBattleLog(skill.targetType==="deadAlly"?"目前沒有陣亡的隊友可供復活。":"目前沒有可選擇的友方目標。");
-                    return;
-                }
-                actionReady=true;
-                pendingAction=type;
-                closeMenus();
-                setBattleAllyTargetSelectionMode(type);
-                return;
-            }
-
-            actionReady=true;
-            queuedPlayerActions[activeBattleCharacterIndex]={action:type,target:null,targetAlly:null};
-            closeMenus();
-            updateUI();
-            finishPlayerAction();
-        };
-    }
+    /* Manual support declarations now belong to 00-main::prepareAction. */
 
     /* =====================================================
        Card effects (legacy visual renderer retired; data/status only)
@@ -534,38 +514,8 @@
     }
 
     /* =====================================================
-       Dungeon element balancing and battle rendering
+       Dungeon battle rendering
     ===================================================== */
-    function rebalanceDungeonElements(){
-        if(!window.v132ActiveDungeonRun){ return; }
-        const roster=currentBattleMonsters.map(index=>monsters[index]).filter(Boolean);
-        if(roster.some(monster=>monster.v141Abyss)){ return; }
-        const elements=["fire","water","earth","wind"];
-        for(let i=elements.length-1;i>0;i--){
-            const j=Math.floor(Math.random()*(i+1));
-            [elements[i],elements[j]]=[elements[j],elements[i]];
-        }
-        const bosses=roster.filter(monster=>getMonsterRank(monster)==="boss");
-        bosses.forEach((monster,index)=>{ monster.element=elements[index%elements.length]; });
-        let cursor=bosses.length;
-        roster.filter(monster=>getMonsterRank(monster)!=="boss").forEach(monster=>{
-            monster.element=elements[cursor++%elements.length];
-        });
-        roster.forEach(monster=>{
-            const oldSkills=(monster.skillIds||[]).map(id=>skillDatabase[id]).filter(Boolean);
-            const tier=Math.max(0,...oldSkills.map(skill=>Number(skill.tier)||0));
-            const pool=Object.keys(skillDatabase).filter(id=>{
-                const skill=skillDatabase[id];
-                return skill&&skill.element===monster.element&&
-                    (skill.category==="physical"||skill.category==="magic")&&
-                    (!tier||skill.tier===tier);
-            });
-            if(typeof window.v141ConfigureMonsterSkills==="function"){
-                window.v141ConfigureMonsterSkills(monster,{pool:pool});
-            }
-        });
-    }
-
     function applyFixedAbyssFormation(){
         const area=document.getElementById("battleMonsterArea");
         if(!area){ return; }
@@ -619,21 +569,21 @@
     const startedEntryTokens=new Set();
 
     function v141PrepareBattleRender(){
-        const isDungeon=!!window.v132ActiveDungeonRun;
+        const activeDungeonRun=window.v132ActiveDungeonRun||null;
+        const isDungeon=!!activeDungeonRun;
         if(!isDungeon && lastWildRankToken!==battleToken){
             lastWildRankToken=battleToken;
             if(typeof window.v141RollWildMonsterRanks==="function"){
                 window.v141RollWildMonsterRanks(currentBattleMonsters);
             }
         }
-        if(isDungeon){ rebalanceDungeonElements(); }
-
         battleSnapshot={
             token:battleToken,
             gold:Math.max(0,Number(gold)||0),
             exp:Math.max(0,Number(sharedExp)||0),
             items:getItemCounts(),
-            dungeon:isDungeon
+            dungeon:isDungeon,
+            dungeonMode:activeDungeonRun&&activeDungeonRun.mode||null
         };
     }
 
@@ -795,6 +745,36 @@
             return result;
         },2700);
     }
+
+    window.v141PlayEscapeBattleExit=function(onCovered){
+        if(transitionRunning){ return Promise.resolve(false); }
+        transitionRunning=true;
+        const overlay=ensureBattleTransitionOverlay();
+        const label=overlay&&overlay.querySelector("b");
+        if(label){ label.textContent="撤離"; }
+        if(overlay){
+            overlay.dataset.v144Kind="escape";
+            overlay.classList.add("show");
+        }
+        return new Promise(resolve=>{
+            setTimeout(()=>{
+                let result;
+                try{
+                    result=typeof onCovered==="function"?onCovered():true;
+                }finally{
+                    setTimeout(()=>{
+                        if(overlay){
+                            overlay.classList.remove("show");
+                            delete overlay.dataset.v144Kind;
+                        }
+                        if(label){ label.textContent="戰"; }
+                        transitionRunning=false;
+                        resolve(result);
+                    },120);
+                }
+            },460);
+        });
+    };
 
     if(typeof winBattle==="function"){
         const originalWinBattle=winBattle;
@@ -1210,7 +1190,7 @@
             !window.v132IsDungeonUsedToday||!window.v132IsDungeonUsedToday(type)
         );
         setNotificationDot(document.getElementById("dungeonNav"),dungeonPending,"副本尚未完成");
-        document.querySelectorAll("#mapPageNav button[aria-label='任務'],#v141DungeonNav button[aria-label='任務']")
+        document.querySelectorAll("#bottomNav button[aria-label='任務']")
             .forEach(button=>setNotificationDot(button,hasQuestNotice,"任務有新進度"));
     }
     window.v141UpdateNotificationDots=updateNotificationDots;

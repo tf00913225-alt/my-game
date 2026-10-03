@@ -8,10 +8,12 @@ const v141=fs.readFileSync("js/35-v141-ui-battle.js","utf8");
 const abyss=fs.readFileSync("js/36-v141-content-systems.js","utf8");
 const homePolish=fs.readFileSync("js/41-v146-system-polish.js","utf8");
 const dungeonPolish=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");
+const navShell=fs.readFileSync("js/04-stage-v11-native-bottom-nav-runtime.js","utf8");
 const recovery=fs.readFileSync("js/45-v154-dev-fixes.js","utf8");
 const tuning=fs.readFileSync("js/47-v158-combat-tuning.js","utf8");
 const settings=fs.readFileSync("js/49-v169-element-box-settings.js","utf8");
-const waterRules=fs.readFileSync("js/50-v169-water-skill-rules.js","utf8");
+const waterRules=fs.readFileSync("js/60-v173.64-skill-progression-rebalance.js","utf8");
+const frostbiteOwner=fs.readFileSync("js/50-v169-water-skill-rules.js","utf8");
 const settingsCss=fs.readFileSync("css/48-v169-element-box-settings.css","utf8");
 const index=fs.readFileSync("index.html","utf8");
 const baseCss=fs.readFileSync("css/00-main.css","utf8");
@@ -48,7 +50,7 @@ assert.match(v141,/hasExpLevelUp/);
 assert.match(index,/home-utility-actions team-relic-home-tools/);
 assert.match(index,/team-relic-home-entry[^>]*data-feature="relic"/);
 assert.match(index,/team-element-box-home-entry[^>]*data-feature="gameplay-core"/);
-assert.match(baseCss,/grid-template-rows:repeat\(4,82px\)/);
+assert.match(baseCss,/grid-template-rows:repeat\(4,70px\)/);
 assert.match(v131,/V17342_GLOBAL_EXP_REWARD_MULTIPLIER=3/);
 assert.match(v131,/function getFormalMonsterBaseExp/);
 assert.doesNotMatch(v131,/V131_EXP_MULTIPLIER/);
@@ -61,7 +63,8 @@ assert.match(tuning,/const partyMultiplier=partySize===1\?\.40:partySize===2\?\.
 assert.match(tuning,/const levelMultiplier=highestLevel<=15\?\.80:highestLevel<=20\?\.90:highestLevel<=50\?1:1\.05;/);
 assert.match(tuning,/function getDailyDungeonScaleContext\(\)/);
 assert.match(tuning,/function normalizeDailyDungeonMonster\(monster\)/);
-assert.match(tuning,/factor:partyMultiplier\*levelMultiplier/);
+assert.match(tuning,/factor:partyMultiplier\*levelMultiplier\*DAILY_DUNGEON_DIFFICULTY_MULTIPLIER/);
+assert.match(tuning,/DAILY_DUNGEON_DIFFICULTY_MULTIPLIER=\.5/);
 assert.match(tuning,/monster\.v141Abyss===true/);
 assert.doesNotMatch(tuning,/v17342DailyDungeonStatsHalvedAgain/);
 assert.match(tuning,/rollBeginnerForestNormalAttackDamage=function\(\)\{[\s\S]*return 5\+Math\.floor\(Math\.random\(\)\*4\)/);
@@ -84,7 +87,7 @@ assert.match(homePolish,/getCharacterGrowthAttention/);
 assert.match(homePolish,/characterSkillAttention/);
 assert.match(homePolish,/attributePoints/);
 assert.match(homePolish,/skillPoints/);
-assert.match(homePolish,/#mapPageNav button\[aria-label='角色'\]/);
+assert.match(homePolish,/#bottomNav button\[aria-label='角色'\]/);
 assert.match(homePolish,/clearLegacyHudExpAttention/);
 assert.match(homePolish,/characterTabBtnExpPool/);
 assert.match(homePolish,/characterTabBtnStatus/);
@@ -92,19 +95,22 @@ assert.match(homePolish,/characterTabBtnSkill/);
 assert.match(homePolish,/v131-exp-preview-btn/);
 assert.match(homePolish,/v131-exp-confirm/);
 assert.match(homePolish,/confirmStatusButton/);
-assert.match(homePolish,/upgradeSkill\(/);
-assert.match(homePolish,/equipSkill\(/);
+assert.match(core,/upgradeSkill\(/);
+assert.match(homePolish,/card.dataset.skillAction===\"growth\"/);
+assert.match(core,/equipSkill\(/);
+assert.match(homePolish,/card.dataset.skillAction===\"equip\"/);
 assert.match(homePolish,/skill-loadout-slot/);
 assert.match(homePolish,/已學習但尚未裝備/);
 assert.match(homePolish,/normalizeOrdinaryBlueprintItem/);
 assert.match(homePolish,/delete item\.setId/);
 assert.match(homePolish,/隨機普通裝備/);
 
-/* Red dots reuse the small breathing creation prompt and taps never flash blue. */
+/* Red dots use the shared coordinate-aware contract and taps never flash blue. */
 assert.match(homeCss,/#game-stage \*/);
 assert.match(homeCss,/-webkit-tap-highlight-color:rgba\(0,0,0,0\) !important/);
-assert.match(homeCss,/\.v141-notice-dot,[\s\S]*width:7px !important;[\s\S]*height:7px !important/);
-assert.match(homeCss,/animation:v131RedDotPulse 1\.1s ease-in-out infinite alternate !important/);
+assert.doesNotMatch(homeCss,/\.v141-notice-dot,[\s\S]*width:7px !important/);
+assert.match(fs.readFileSync("css/38-v141-system-expansion.css","utf8"),/animation:v141NoticePulse 1\.25s ease-in-out infinite/);
+assert.match(fs.readFileSync("css/06-stage-v11-native-bottom-nav.css","utf8"),/#bottomNav > \.nav-button > \.v141-notice-dot\{[\s\S]*?width:22px;/);
 
 /* Manual actions use one core delay owner extended only by visual remaining time. */
 assert.match(core,/function getBattleAdvanceDelay\(phase\)/);
@@ -140,25 +146,33 @@ assert.match(dungeonPolish,/v132BeginEquipmentDungeon=function\(\)\{ return begi
 assert.match(dungeonPolish,/questRewardReady/);
 assert.match(dungeonPolish,/progress&&state\.progress\[quest\.id\]/);
 
-/* Water V173.43 values and Frostbite semantics. */
-assert.match(waterRules,/waterKnife:\{[\s\S]*frostbiteChance:30,frostbiteDuration:1/);
-assert.match(waterRules,/frostPunch:\{[\s\S]*frostbiteChance:35,frostbiteDuration:2/);
-assert.match(waterRules,/iceSpin:\{[\s\S]*frostbiteChance:35,frostbiteDuration:2/);
-assert.match(waterRules,/frostCrush:\{[\s\S]*frostbiteChance:45,frostbiteDuration:2/);
-assert.match(waterRules,/iceArrowRain:\{[\s\S]*baseDamage:30,damagePerLevel:6[\s\S]*frostbiteChance:35,frostbiteDuration:2/);
-assert.match(waterRules,/freeze:\{[\s\S]*learnCost:20[\s\S]*requires:\["frostPunch","floodBeast"\]/);
-assert.match(waterRules,/healSpell:\{[\s\S]*learnCost:16[\s\S]*requires:\["frostPunch","floodBeast"\]/);
-assert.match(waterRules,/revive:\{[\s\S]*learnCost:18/);
-assert.match(waterRules,/purifyMind:\{[\s\S]*learnCost:1[\s\S]*spCost:22[\s\S]*removeAllStates:true/);
-assert.match(waterRules,/FROSTBITE_REMAINING_RATE=\.75/);
-assert.match(waterRules,/WATER_DAMAGE_SKILL_IDS/);
-assert.match(waterRules,/frostbitePenaltyPercent:25/);
+/* Final Skill Data replaces V169 data patches; outgoing Frostbite stays at its compatibility owner. */
+assert.match(waterRules,/waterKnife:\{[^}]*frostbiteChance:50,frostbiteDuration:3/);
+assert.match(waterRules,/frostPunch:\{[^}]*frostbiteChance:40,frostbiteDuration:2/);
+assert.match(waterRules,/iceSpin:\{[^}]*frostbiteChance:35,frostbiteDuration:2/);
+assert.match(waterRules,/frostCrush:\{[^}]*frostbiteChance:45,frostbiteDuration:2/);
+assert.match(waterRules,/iceArrowRain:\{[^}]*baseDamage:30,damagePerLevel:6[^}]*frostbiteChance:35,frostbiteDuration:2/);
+assert.match(waterRules,/freeze:\{[^}]*learnLevel:25,learnCost:14[^}]*requires:\["iceSpin","iceArrowRain"\]/);
+assert.match(waterRules,/healSpell:\{[^}]*learnLevel:15,learnCost:8[^}]*requires:\["frostPunch","floodBeast"\]/);
+assert.match(waterRules,/revive:\{[^}]*learnLevel:20,learnCost:10/);
+assert.match(waterRules,/purifyMind:\{[^}]*learnLevel:35,learnCost:18[^}]*spCost:22[^}]*removeAllStates:true/);
+assert.match(frostbiteOwner,/FROSTBITE_REMAINING_RATE=\.70/);
+assert.match(waterRules,/PLAYER_DAMAGE_SKILL_IDS/);
+assert.match(frostbiteOwner,/frostbitePenaltyPercent:30/);
+const vm=require("node:vm");
+const frostbiteRuntime={window:null,getOutgoingDamageDownPercent:()=>0};
+frostbiteRuntime.window=frostbiteRuntime;
+vm.createContext(frostbiteRuntime);
+vm.runInContext(frostbiteOwner,frostbiteRuntime);
+assert.equal(frostbiteRuntime.getOutgoingDamageDownPercent({statusEffects:[{type:"frostbite",turnsLeft:2}]}),30);
+assert.equal(frostbiteRuntime.getOutgoingDamageDownPercent({statusEffects:[{type:"frostbite",turnsLeft:0}]}),0);
+assert.equal(frostbiteRuntime.getOutgoingDamageDownPercent({statusEffects:[]}),0);
 
-assert.match(dungeonPolish,/\["秘寶","assets\/ui\/nav-relic-v175\.webp","v148OpenContextRelic\(\)"\]/);
-assert.match(dungeonPolish,/\["元素匣","assets\/ui\/nav-element-box\.png","openHomeFeature\('autoBattleSettings'\)"\]/);
-assert.match(dungeonPolish,/\["返回","assets\/ui\/map-return\.png"/);
+assert.match(navShell,/\["秘寶","assets\/ui\/nav-relic-v175\.webp","v148OpenContextRelic\(\)"\]/);
+assert.match(navShell,/\["元素匣","assets\/ui\/nav-element-box\.png","openHomeFeature\('autoBattleSettings'\)"\]/);
+assert.match(navShell,/\["返回","assets\/ui\/map-return\.png"/);
 assert.match(dungeonPolish,/topReturn\.setAttribute\("aria-label","返回上一層"\)/);
-assert.match(dungeonPolish,/nav\.dataset\.v146Columns="5"/);
+assert.match(navShell,/grid-template-columns|renderGameplayContext/);
 
 assert.match(homeRosterCss,/grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
 assert.match(creationCss,/creation-stat-details\[open\] \.creation-stat-details-body\{[\s\S]*font-size:32px/);

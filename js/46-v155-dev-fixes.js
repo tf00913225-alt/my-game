@@ -38,7 +38,7 @@
         targetType:"allyAll",baseHeal:100,baseHealSP:100,
         cleanseChance:35,evasionBonusPercent:15,
         duration:2,
-        description:"對我方全體施放祝福，每個目標獨立有35%機率解除身上負面狀態，恢復100 HP、100 SP，並使最終閃躲+15個百分點，持續2回合。"
+        description:"對我方全體施放祝福，每個目標獨立有35%機率解除身上負面狀態，恢復100 HP、100 SP，並使最終閃躲+15%，持續2回合。"
     });
     if(typeof skillDatabase!=="undefined"&&skillDatabase.yuanZuBlessing){
         delete skillDatabase.yuanZuBlessing.agilityBonusPercent;
@@ -171,7 +171,7 @@
         if(typeof window.v173CombineEvasionRates==="function"){
             return window.v173CombineEvasionRates(sources);
         }
-        return Math.min(85,(sources||[]).reduce(
+        return Math.max(0,(sources||[]).reduce(
             (sum,source)=>sum+numeric(source),
             0
         ));
@@ -206,7 +206,7 @@
         const existing=monster.v155EvasionBlessing;
         if(
             existing&&existing.battleToken===currentBattleToken()&&
-            currentRound()<numeric(existing.expiresTurn)
+            numeric(existing.displayBuff&&existing.displayBuff.turnsLeft)>0
         ){
             if(typeof window.v173CanApplyNamedPersistentState==="function"){
                 window.v173CanApplyNamedPersistentState(
@@ -250,7 +250,7 @@
             numeric(entry.monster.sp)<numeric(entry.monster.maxSP));
         const needsBlessing=allies.some(entry=>!(entry.monster.v155EvasionBlessing&&
             entry.monster.v155EvasionBlessing.battleToken===currentBattleToken()&&
-            currentRound()<numeric(entry.monster.v155EvasionBlessing.expiresTurn)));
+            numeric(entry.monster.v155EvasionBlessing.displayBuff&&entry.monster.v155EvasionBlessing.displayBuff.turnsLeft)>0));
         const skillId=forcedSkillId||((hasNegative||needsHeal||needsBlessing)?"yuanZuBlessing":null);
         const skill=skillId&&typeof skillDatabase!=="undefined"?skillDatabase[skillId]:null;
         if(skillId!=="yuanZuBlessing"||!skill||numeric(monster.sp)<numeric(skill.spCost)){ return false; }
@@ -352,6 +352,9 @@
 
     function registerMonsterTeamBuff(monster,buff,display){
         buff.displayBuff=display;
+        ["bonusPercent","percent","evasionBonusPercent","resistBonus","accuracyBonusPercent","defenseBonusPercent","reflectPercent","amount","value","skillLevel"].forEach(key=>{
+            if(display&&display[key]===undefined&&buff&&buff[key]!==undefined){ display[key]=buff[key]; }
+        });
         monster.v141TeamBuffs=monster.v141TeamBuffs||[];
         monster.v141TeamBuffs.push(buff);
         monster.activeBuffs=monster.activeBuffs||[];
@@ -578,10 +581,18 @@
     function chooseFinalAbyssAction(monster){
         const living=currentAbyssEntries();
         const attacks=(monster&&monster.skillIds||[]).filter(id=>{
-            const skill=skillDatabase[id]; return !!(skill&&numeric(monster.sp)>=numeric(skill.spCost));
+            const skill=skillDatabase[id];
+            const legal=typeof window.v144IsMonsterSkillElementLegal==="function"
+                ?window.v144IsMonsterSkillElementLegal(monster,id)
+                :!!(skill&&skill.element&&skill.element===monster.element);
+            return !!(legal&&skill&&numeric(monster.sp)>=numeric(skill.spCost));
         });
         const supports=(monster&&monster.v141SupportSkillIds||[]).filter(id=>{
-            const skill=skillDatabase[id]; return !!(skill&&numeric(monster.sp)>=numeric(skill.spCost));
+            const skill=skillDatabase[id];
+            const legal=typeof window.v144IsMonsterSkillElementLegal==="function"
+                ?window.v144IsMonsterSkillElementLegal(monster,id)
+                :!!(skill&&skill.element&&skill.element===monster.element);
+            return !!(legal&&skill&&numeric(monster.sp)>=numeric(skill.spCost));
         });
         const healNeeded=living.some(entry=>monsterBaseHp(entry.monster)<monsterBaseMaxHp(entry.monster)*.70);
         if(healNeeded&&supports.includes("healSpell")){ return {kind:"heal",skillId:"healSpell"}; }
@@ -654,37 +665,39 @@
     }
     window.v155ClearRemovableCombatStates=clearRemovableCombatStates;
 
-    function tickV155TimedStates(){
+    if(
+        window.FourSymbolsDurationLifecycle&&
+        typeof window.FourSymbolsDurationLifecycle.registerBuffExpiryHandler==="function"
+    ){
+        window.FourSymbolsDurationLifecycle.registerBuffExpiryHandler(({entity,buff})=>{
+            if(!entity||!buff){ return false; }
+            if(entity.v155EvasionBlessing&&entity.v155EvasionBlessing.displayBuff===buff){
+                removeEvasionBlessing(entity);
+                return true;
+            }
+            if(entity.v155WindDodge&&entity.v155WindDodge.displayBuff===buff){
+                removeWindDodge(entity);
+                return true;
+            }
+            if(entity.v155RockWall&&entity.v155RockWall.displayBuff===buff){
+                removeRockWall(entity);
+                return true;
+            }
+            return false;
+        });
+    }
+
+    function tickV155RoundStates(){
         const token=currentBattleToken();
         const round=currentRound();
         if(typeof monsters!=="undefined"&&Array.isArray(monsters)){
             monsters.forEach(monster=>{
-                const blessing=monster&&monster.v155EvasionBlessing;
-                if(blessing){
-                    if(blessing.battleToken!==token||round>=numeric(blessing.expiresTurn)){ removeEvasionBlessing(monster); }
-                    else{ blessing.displayBuff.turnsLeft=Math.max(1,numeric(blessing.expiresTurn)-round); }
-                }
-                const dodge=monster&&monster.v155WindDodge;
-                if(dodge){
-                    if(dodge.battleToken!==token||round>=numeric(dodge.expiresTurn)){ removeWindDodge(monster); }
-                    else{
-                        dodge.turnsLeft=Math.max(1,numeric(dodge.expiresTurn)-round);
-                        dodge.displayBuff.turnsLeft=dodge.turnsLeft;
-                    }
-                }
-                const wall=monster&&monster.v155RockWall;
-                if(wall){
-                    if(wall.battleToken!==token||round>=numeric(wall.expiresTurn)){ removeRockWall(monster); }
-                    else{ wall.displayBuff.turnsLeft=Math.max(1,numeric(wall.expiresTurn)-round); }
-                }
                 if(monster&&Array.isArray(monster.activeBuffs)){
                     monster.activeBuffs=monster.activeBuffs.filter(buff=>{
                         if(!buff||buff.type!=="phoenixMight"){ return true; }
                         const active=buff.battleToken===token&&round<numeric(buff.expiresTurn);
                         if(active){ buff.turnsLeft=Math.max(1,numeric(buff.expiresTurn)-round); }
-                        else if(typeof addBattleLog==="function"){
-                            addBattleLog("⏳鳳威效果已結束。");
-                        }
+                        else if(typeof addBattleLog==="function"){ addBattleLog("⏳鳳威效果已結束。"); }
                         return active;
                     });
                 }
@@ -692,12 +705,11 @@
         }
     }
 
-    if(typeof startTurn==="function"){
-        const previousStartTurn=startTurn;
-        startTurn=function(){
-            tickV155TimedStates();
-            return previousStartTurn.apply(this,arguments);
-        };
+    if(
+        window.FourSymbolsBattleFlow&&
+        typeof window.FourSymbolsBattleFlow.subscribeRoundStart==="function"
+    ){
+        window.FourSymbolsBattleFlow.subscribeRoundStart(tickV155RoundStates);
     }
 
     let phoenixCastContext=null;

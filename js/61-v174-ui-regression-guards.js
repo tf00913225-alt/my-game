@@ -1,8 +1,7 @@
 /* =====================================================
    V174 — dynamic UI regression guards
    Owner for cross-cutting UI invariants created by multiple late runtimes:
-   1) skill learn/upgrade action cards must stay compact;
-   2) dark text on bright gold/yellow buttons must not have a text shadow;
+   1) dark text on bright gold/yellow buttons must not have a text shadow;
    3) system save/delete subflows must always offer an explicit return path.
 
    No gameplay, save, battle, skill-cost or equipment business rules live here.
@@ -16,59 +15,6 @@
     window.__v174UiRegressionGuardsInstalled=true;
 
     let rafId=0;
-
-    function compactSkillActionLabel(source){
-        const text=String(source||"").replace(/\s+/g," ").trim();
-        if(!text){ return text; }
-
-        let match=text.match(/^角色\s*Lv\s*(\d+)\s*可升至技能\s*Lv\s*(\d+)/i);
-        if(match){ return "Lv"+match[1]+" 解鎖"; }
-
-        match=text.match(/^升至\s*Lv\s*(\d+)\s*需要\s*(\d+)\s*技能點/i);
-        if(match){ return "需 "+match[2]+" 點"; }
-
-        match=text.match(/^升至\s*Lv\s*(\d+)\s*[・·]\s*(\d+)\s*點/i);
-        if(match){ return "升 Lv"+match[1]+"・"+match[2]+"點"; }
-
-        match=text.match(/^學習\s*[・·]\s*(\d+)\s*點/i);
-        if(match){ return "學習・"+match[1]+"點"; }
-
-        match=text.match(/Lv\s*(\d+)\s*解鎖/i);
-        if(match){ return "Lv"+match[1]+" 解鎖"; }
-
-        match=text.match(/需要\s*(\d+)\s*技能點/i);
-        if(match){ return "需 "+match[1]+" 點"; }
-
-        if(/前置[:：]/.test(text)){ return "需前置"; }
-        return text;
-    }
-
-    function normalizeSkillActionCards(){
-        const labels=document.querySelectorAll("#allSkillsList .skill-action-card .skill-action-card-label");
-        labels.forEach(label=>{
-            const card=label.closest(".skill-action-card");
-            if(!card){ return; }
-
-            const current=String(label.textContent||"").replace(/\s+/g," ").trim();
-            const previousCompact=label.dataset.v174CompactLabel||"";
-            if(current!==previousCompact){
-                const full=current;
-                const compact=compactSkillActionLabel(full);
-                label.dataset.v174FullLabel=full;
-                label.dataset.v174CompactLabel=compact;
-                if(compact!==full){ label.textContent=compact; }
-                card.title=full;
-                card.setAttribute("aria-label",full);
-            }
-
-            if(card.style.getPropertyValue("width")!=="104px"||card.style.getPropertyPriority("width")!=="important"){
-                card.style.setProperty("width","104px","important");
-                card.style.setProperty("max-width","104px","important");
-                card.style.setProperty("min-width","84px","important");
-                card.style.setProperty("flex-basis","104px","important");
-            }
-        });
-    }
 
     function colorTriples(value){
         const triples=[];
@@ -204,7 +150,6 @@
     }
 
     function apply(){
-        normalizeSkillActionCards();
         normalizeGoldButtonTextShadows();
         normalizeSystemDialogNavigation();
         ensureStylesheetLast();
@@ -220,7 +165,6 @@
 
     const roots=[
         document.getElementById("homeFeatureModal"),
-        document.getElementById("allSkillsList"),
         document.getElementById("creationPage"),
         document.getElementById("v169RpgDialogLayer")
     ].filter(Boolean);

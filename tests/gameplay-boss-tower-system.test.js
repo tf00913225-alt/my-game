@@ -7,6 +7,11 @@ const vm=require("node:vm");
 const source=fs.readFileSync("js/gameplay-boss-tower-system.js","utf8");
 const accountSource=fs.readFileSync("js/startup/account-save-repository.js","utf8");
 const battlefieldSource=fs.readFileSync("js/battlefield-slot-owner.js","utf8");
+const v131Source=fs.readFileSync("js/25-v131-fix-batch.js","utf8");
+const v131FormationSource=v131Source.slice(
+    v131Source.indexOf("    function getFormationRankWeight("),
+    v131Source.indexOf("    function formatDuration(")
+);
 const TEST_UID="boss-tower-test";
 const DUNGEON_RANK_MULTIPLIERS={
     elite:{maxHP:3.2,maxSP:2,defense:1.25},
@@ -96,9 +101,14 @@ function load(options={}){
         v141ShowBlackGoldReward:noop,
         v174RelicDevUnlock:id=>{ (context.relicUnlocks||(context.relicUnlocks=[])).push(id);return true; }
     };
-    context.v132LaunchDungeonBattle=(roster,onComplete)=>{
+    context.v154PreparePortraitsForEncounter=roster=>({
+        state:"ready",
+        records:(Array.isArray(roster)?roster:[]).map(monster=>({portraitKey:monster.portraitKey,path:"test://"+String(monster.portraitKey||"portrait")})),
+        paths:(Array.isArray(roster)?roster:[]).map(monster=>"test://"+String(monster.portraitKey||"portrait"))
+    });
+    context.v132LaunchDungeonBattle=(roster,onComplete,options)=>{
         context.monsters=roster;context.currentBattleMonsters=roster.map((_,index)=>index);
-        context.battleActive=true;context.lastBattleCallback=onComplete;return true;
+        context.battleActive=true;context.lastBattleCallback=onComplete;context.lastBattleOptions=options||{};return true;
     };
     context.window=context;context.globalThis=context;
     vm.createContext(context);
@@ -106,6 +116,7 @@ function load(options={}){
     context.FourSymbolsAccountSave.activate(TEST_UID);
     vm.runInContext(battlefieldSource,context,{filename:"js/battlefield-slot-owner.js"});
     vm.runInContext(source,context,{filename:"js/gameplay-boss-tower-system.js"});
+    vm.runInContext(v131FormationSource,context,{filename:"js/25-v131-fix-batch.js#formation"});
     return {context,localStorage};
 }
 
@@ -246,6 +257,63 @@ test("retiring or destroying a Boss object releases its formal F1/F5 slot",()=>{
     assert.equal(object.vGameplayBattlefieldSlot,null);
 });
 
+test("寒劫尊 object deaths and repeated real render lifecycle preserve the Boss snapshot identity",()=>{
+    const {context}=load();
+    assert.equal(context.vGameplayStartBoss("personal","personal-70"),true);
+    const left=context.GameplaySystem.debugSpawnBossObject("heal","lifecycle-left");
+    const right=context.GameplaySystem.debugSpawnBossObject("amplify","lifecycle-right");
+    const boss=context.monsters[0];
+    boss.hp=Math.floor(boss.maxHP*.5);
+    context.FourSymbolsBossBattle.processRound();
+
+    const slots=context.FourSymbolsBattlefieldSlots;
+    const originalBossSnapshot=slots.getActiveEnemySnapshot();
+    const leftIndex=context.monsters.indexOf(left);
+    const rightIndex=context.monsters.indexOf(right);
+    const reinforcementIndexes=context.currentBattleMonsters.filter(index=>
+        context.monsters[index]?.unitKind==="boss-reinforcement"
+    );
+    assert.deepEqual(value(context,"FourSymbolsBossBattle.getReinforcementSlots()"),["ENEMY_B1","ENEMY_B5"]);
+    assert.deepEqual(
+        JSON.parse(JSON.stringify(reinforcementIndexes.map(index=>slots.getEnemySlotForMonster(originalBossSnapshot,index)))),
+        ["ENEMY_B1","ENEMY_B5"]
+    );
+
+    let renderCount=0;
+    context.renderBattle=function(){
+        renderCount++;
+        context.v138EnsureEnemyFormationSnapshot(context.currentBattleMonsters);
+    };
+    left.alive=false;
+    left.hp=0;
+    assert.equal(context.FourSymbolsBossBattle.onEnemyDeath(leftIndex,left),true);
+    assert.ok(context.currentBattleMonsters.includes(leftIndex),"death animation roster entry remains available");
+    assert.equal(slots.getActiveEnemySnapshot(),originalBossSnapshot);
+    assert.equal(slots.getAssignedMonsterAtEnemySlot(originalBossSnapshot,"ENEMY_F1"),null);
+    assert.equal(slots.getEnemySlotForMonster(originalBossSnapshot,0),"ENEMY_B3");
+
+    right.alive=false;
+    right.hp=0;
+    assert.equal(context.FourSymbolsBossBattle.onEnemyDeath(rightIndex,right),true);
+    context.renderBattle();
+    context.renderBattle();
+    assert.ok(renderCount>=4,"object death and repeated redraws must traverse the render lifecycle");
+    assert.equal(slots.getActiveEnemySnapshot(),originalBossSnapshot);
+    assert.equal(slots.getAssignedMonsterAtEnemySlot(originalBossSnapshot,"ENEMY_F5"),null);
+    assert.equal(slots.getEnemySlotForMonster(originalBossSnapshot,0),"ENEMY_B3");
+    assert.deepEqual(
+        JSON.parse(JSON.stringify(reinforcementIndexes.map(index=>slots.getEnemySlotForMonster(originalBossSnapshot,index)))),
+        ["ENEMY_B1","ENEMY_B5"]
+    );
+
+    const fallenReinforcement=reinforcementIndexes[0];
+    context.monsters[fallenReinforcement].alive=false;
+    context.monsters[fallenReinforcement].hp=0;
+    context.renderBattle();
+    assert.equal(slots.getActiveEnemySnapshot(),originalBossSnapshot);
+    assert.equal(slots.getEnemySlotForMonster(originalBossSnapshot,reinforcementIndexes[1]),"ENEMY_B5");
+});
+
 test("Boss object spawn never publishes an entity when its formal slot is occupied",()=>{
     const {context}=load();
     context.vGameplayStartBoss("personal","personal-70");
@@ -357,6 +425,26 @@ test("a destroyed healing object stops its persistent effect immediately",()=>{
     context.turn=3;
     context.GameplaySystem.debugProcessBossRound();
     assert.equal(boss.hp,afterSecondHit);
+});
+
+test("Tower uses normal Fixed Slot geometry while Personal/World keep Large Boss mode",()=>{
+    const {context}=load();
+    const now=new Date();
+    const week=context.GameplaySystem.getWeekInfo(now);
+    context.GameplaySystem.debugReloadState({tower:{weekKey:week.key,completedFloor:9,highestThisWeek:9,historicalHighest:9,claimedFloors:{},pendingRelicChoice:false}},now);
+    assert.equal(context.vGameplaySelectTowerBand(10),true);
+    assert.equal(context.lastBattleOptions.mode,"tower");
+    assert.equal(context.currentBattleMonsters.length,10);
+    const towerBoss=context.monsters.find(monster=>monster&&monster.vGameplayTowerBoss===true);
+    assert.ok(towerBoss);
+    assert.equal(towerBoss.unitKind,"tower-boss");
+    assert.equal(context.FourSymbolsBossBattle.isActive(),false);
+
+    context.battleActive=false;
+    assert.equal(context.vGameplayStartBoss("personal","personal-30"),true);
+    assert.equal(context.lastBattleOptions.mode,"boss");
+    assert.equal(context.lastBattleOptions.gameplayMode,"personal");
+    assert.equal(context.FourSymbolsBossBattle.isActive(),true);
 });
 
 test("weekly and reward state remains persistent",()=>{

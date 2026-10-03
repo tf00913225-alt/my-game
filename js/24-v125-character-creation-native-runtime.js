@@ -45,8 +45,8 @@
             glyph:"風",
             title:"疾風之道",
             role:"速度干擾 · 傷害削弱 · 閃避控場",
-            description:"透過敏捷、閃避與各式干擾掌握戰鬥節奏，可降低敵方能力、傷害與命中並施加暈眩。",
-            tags:["敏捷干擾","閃避強化","暈眩／降傷"]
+            description:"透過敏捷提升出手速度，並由專屬技能施加干擾、降低敵方能力與傷害及施加暈眩。",
+            tags:["速度干擾","專屬技能","暈眩／降傷"]
         },
         earth:{
             glyph:"土",
@@ -104,7 +104,6 @@
 
         fixedNodes.forEach(function(node){
             if(node){
-                node.classList.remove("creation-scroll-active");
                 node.classList.toggle("creation-fixed-active",!!active);
             }
         });
@@ -591,7 +590,10 @@
             meta.push("消耗 "+spCost+" SP");
         }
         if(skill.learnCost!==undefined){
-            meta.push("學習需要 "+skill.learnCost+" 技能點");
+            const baseLearnCost=typeof window.v173GetInitialLearnCost==="function"
+                ?window.v173GetInitialLearnCost(null,skill)
+                :skill.learnCost;
+            meta.push("學習需要 "+baseLearnCost+" 技能點");
         }
         if(Array.isArray(skill.requires) && skill.requires.length){
             meta.push(

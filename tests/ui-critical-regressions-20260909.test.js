@@ -7,6 +7,7 @@ const bootstrap=read("js/23-v125-character-creation-bootstrap.js");
 const layout=read("js/19-stage-v78-character-inventory-runtime.js");
 const inventory=read("js/55-v173.51-inventory-qa.js");
 const compareCss=read("css/53-v173.51-qa.css");
+const frameCss=read("css/49-v169-rpg-ui.css");
 const guard=read("js/61-v174-ui-regression-guards.js");
 const uiCss=read("css/56-v174-critical-ui-regressions.css");
 const relicCss=read("css/55-team-relic-system.css");
@@ -35,19 +36,19 @@ assert.match(inventory,/armor:\["armor","robe"\]/);
 assert.match(inventory,/shoes:\["shoes","boots"\]/);
 assert.match(inventory,/selectedInventorySlot!==null/);
 assert.match(inventory,/openEquippedItem=function\(\)[\s\S]*?clearEquipmentComparison\(\)/);
-assert.match(compareCss,/v17351-equipment-comparison \.item-modal-box\{[^}]*height:auto!important/);
-assert.match(compareCss,/\.v17351-compare-stats\{[^}]*max-height:190px!important/);
+assert.match(frameCss,/item-modal-mode-comparison \.item-modal-box\{[^}]*max-width:396px !important/);
+assert.match(compareCss,/\.v17351-compare-grid\{[^}]*overflow-y:auto!important/);
+assert.match(compareCss,/\.v17351-compare-stats\{[^}]*max-height:none!important[^}]*overflow:visible!important/);
 
-assert.match(guard,/compactSkillActionLabel/);
-assert.match(guard,/Lv"\+match\[1\]\+" 解鎖/);
+assert.doesNotMatch(guard,/compactSkillActionLabel/);
+assert.doesNotMatch(guard,/Lv"\+match\[1\]\+" 解鎖/);
 assert.match(guard,/text-shadow","none","important/);
-assert.match(guard,/max-width","104px","important/);
+assert.doesNotMatch(guard,/max-width","104px","important/);
+assert.match(read("js/00-main.js"),/skill-action-card-label/);
 
 assert.match(relicCss,/team-relic-modal \.home-feature-modal-box\.wide #homeFeatureModalBody\{[^}]*overflow-y:auto!important/);
-assert.match(touch,/#homeFeatureModal\.team-relic-mode #homeFeatureModalBody, \.team-relic-tabs/);
-assert.match(layout,/modal\.dataset\.v78CharacterLayoutActive="1"/);
-assert.match(layout,/const characterRootMounted=!!root/);
-assert.match(layout,/if\(!characterRootMounted\)\{[\s\S]*?releaseCharacterLayoutOwnership/);
-assert.match(layout,/body\.style\.removeProperty\(property\)/);
+assert.match(touch,/data-scroll-owner="x\|y\|both"/);
+assert.match(layout,/function applyCharacterInventoryLayout\(\)\{ return false; \}/);
+assert.doesNotMatch(layout,/v78CharacterLayoutActive|releaseCharacterLayoutOwnership|setProperty/);
 
-console.log("✓ 2026-09-09 critical UI regression guards");
+console.log("✓ 2026-09-09 critical UI retirement regression contracts");

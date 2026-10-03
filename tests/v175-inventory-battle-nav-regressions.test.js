@@ -11,8 +11,12 @@ assert.match(inventory,/const openOnce=getChestOpenOnce\(item\);/);
 assert.match(inventory,/item\.id==="equipmentChest"[\s\S]*?window\.v17346OpenEquipmentChest/);
 
 const inventoryCss=read("css/38-v141-system-expansion.css");
-assert.match(inventoryCss,/#itemModal \.item-modal-icon > \.v169-item-art\{[\s\S]*?width:min\(42vw,180px\);[\s\S]*?height:min\(42vw,180px\);/);
-assert.match(inventoryCss,/#itemModal \.item-modal-icon > \.v169-item-art > img,[\s\S]*?object-fit:contain;/);
+const itemFrameCss=read("css/49-v169-rpg-ui.css");
+// The responsive square belongs to the shared frame owner, not css/38.
+assert.doesNotMatch(inventoryCss,/#itemModal \.item-modal-icon/);
+assert.match(itemFrameCss,/#itemModal #itemModalIcon\{[^}]*width:clamp\(var\(--ui-item-art-min\),40%,var\(--ui-item-art-max\)\) !important;[^}]*aspect-ratio:1 !important;[^}]*height:auto !important;/);
+assert.match(itemFrameCss,/#itemModal #itemModalIcon > \.v169-item-art,[^}]*width:100% !important;[^}]*height:100% !important;/);
+assert.match(itemFrameCss,/#itemModal #itemModalIcon img,[^}]*object-fit:contain !important;/);
 
 const main=read("js/00-main.js");
 const hpMarkup=main.indexOf('class="monster-hp"');
@@ -39,16 +43,15 @@ assert.doesNotMatch(fireCss,/v174FireRocketTravel/);
 assert.doesNotMatch(fireCss,/data-skill="fireRocket"/);
 
 const html=read("index.html");
-const contextNav=read("js/42-v148-combat-dungeon-fixes.js");
+const contextNav=read("js/04-stage-v11-native-bottom-nav-runtime.js");
 const contextNavStart=contextNav.indexOf("const CONTEXT_NAV_ITEMS=Object.freeze([");
-const contextNavEnd=contextNav.indexOf("function contextNavMarkup",contextNavStart);
+const contextNavEnd=contextNav.indexOf("let mainButtons",contextNavStart);
 const contextNavItems=contextNav.slice(contextNavStart,contextNavEnd);
 const navPositions=["角色","背包","秘寶","元素匣"].map(label=>contextNavItems.indexOf('["'+label+'",'));
 assert.ok(navPositions.every(position=>position>=0)&&navPositions.every((position,index)=>index===0||position>navPositions[index-1]),"shared context navigation must be 角色、背包、秘寶、元素匣、返回");
 assert.match(contextNav,/buttons\.push\(\["返回","assets\/ui\/map-return\.png",returnAction\]\)/);
-assert.match(contextNav,/renderContextNav\(patrolNav,"leaveMap\(\)","patrol"\)/);
-assert.match(contextNav,/const trainingActive=[\s\S]*?contextActive=dungeonActive\|\|gameplayActive\|\|trainingActive/);
-assert.match(contextNav,/const mode=trainingActive[\s\S]*?\?"training"/);
+assert.match(contextNav,/const contextActive=mapActive\|\|dungeonActive\|\|gameplayActive\|\|trainingActive/);
+assert.match(contextNav,/const context=trainingActive[\s\S]*?\?"training"/);
 assert.match(contextNavItems,/assets\/ui\/nav-relic-v175\.webp/);
 assert.ok(fs.existsSync("assets/ui/nav-relic-v175.webp"),"transparent relic navigation asset must ship");
 assert.doesNotMatch(html,/<button[^>]*class="gameplay-back-button v174-gameplay-home-back"[\s\S]*?<\/button>/);

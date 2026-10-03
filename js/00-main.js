@@ -33,31 +33,7 @@
     }
 })();
 
-/* V3 runtime guard: the wrapper is created before this runs, but keep this
-   idempotent in case another script re-renders/reparents the navigation. */
-(function enforceVirtualStageLayout(){
-    function apply(){
-        const app=document.getElementById('app');
-        const content=document.getElementById('game-content');
-        if(!app || !content) return;
-        const navs=content.querySelectorAll('.bottom-nav');
-        navs.forEach(function(nav){
-            nav.style.position='absolute';
-            nav.style.left='0';
-            nav.style.right='auto';
-            nav.style.bottom='0';
-            nav.style.width='420px';
-            nav.style.maxWidth='none';
-            nav.style.transform='none';
-            nav.style.margin='0';
-        });
-    }
-    if(document.readyState==='loading'){
-        document.addEventListener('DOMContentLoaded',apply,{once:true});
-    }else{
-        apply();
-    }
-})();
+/* Legacy V3 navigation positioning retired; FourSymbolsBottomNav owns the shell. */
 
 const GAME_WIDTH = 1080;
 const GAME_HEIGHT = 1920;
@@ -292,6 +268,7 @@ window.FourSymbolsGameSave=Object.freeze({
     load:()=>loadGame(),
     hydrate:save=>loadGame(save),
     save:options=>saveGame(options),
+    restoreAutoBattlePreferences:(uid,preferences)=>restoreAutoBattlePreferences(uid,preferences),
     showCreation:()=>showCreation()
 });
 
@@ -361,6 +338,10 @@ const STARTUP_SESSION_READY_KEY="sixiang_startup_session_ready_v1";
 
     function persistBeforeSuspend(reason){
         try{
+            const startupState=window.FourSymbolsStartupPolicy?.getState?.();
+            if(startupState!=="READY"&&startupState!=="OFFLINE_READY"){
+                return;
+            }
             if(typeof saveGame==="function"){
                 const saved=saveGame({source:"mobile-"+String(reason||"background")});
                 if(saved!==false){ lifecycleDiagnostics.backgroundSaveCount++; }
@@ -435,7 +416,7 @@ const START_ATTRIBUTE_POINTS = 10;
    vitality    = 體質
    energy      = 能量
    intelligence= 智力
-   spirit      = 精神
+   defensePoints= 防禦
    agility     = 敏捷
 
 ===================================================== */
@@ -446,7 +427,7 @@ const STAT_NAMES = {
     vitality:"體質",
     energy:"能量",
     intelligence:"智力",
-    spirit:"精神",
+    defensePoints:"防禦",
     agility:"敏捷"
 
 };
@@ -534,7 +515,7 @@ const creationStats = {
     vitality:0,
     energy:0,
     intelligence:0,
-    spirit:0,
+    defensePoints:0,
     agility:0
 
 };
@@ -638,7 +619,7 @@ const creationStats2 = {
     vitality:0,
     energy:0,
     intelligence:0,
-    spirit:0,
+    defensePoints:0,
     agility:0
 
 };
@@ -678,7 +659,7 @@ const player = {
 
     intelligence:0,
 
-    spirit:0,
+    defensePoints:0,
 
     agility:0,
 
@@ -996,8 +977,7 @@ function showRewardedAd(
            ★ 模擬廣告播放（目前狀態）：
            顯示提示、等1.5秒、直接視為
            看完成功。純粹是為了讓「雙倍
-           獎勵」這類邏輯現在就能測試，
-           不是真的廣告。
+           獎勵」這類邏輯現在就能測試，           不是真的廣告。
         */
 
         addBattleLog(
@@ -1681,6 +1661,14 @@ function setBattleItemCategory(category){
     renderBattleItemMenu();
 }
 
+function battleItemIconMarkup(item){
+    const raw=String(item&&item.icon||"").trim();
+    if(!raw){ return ""; }
+    if(raw.indexOf("<img")>=0||raw.indexOf("<svg")>=0||raw.indexOf("<span")>=0){ return raw; }
+    const escaped=raw.replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    return '<img src="'+escaped+'" alt="" aria-hidden="true" draggable="false" decoding="async">';
+}
+
 function renderBattleItemMenu(){
     const list=$("battlePotionList");
     const potionTab=$("battleItemPotionTab");
@@ -1723,6 +1711,7 @@ function renderBattleItemMenu(){
             const effectLabel=definition.recoveryPercent>=100
                 ? `${resourceLabel} 全回復`
                 : `${resourceLabel} +${definition.recoveryPercent}%`;
+            const iconMarkup=battleItemIconMarkup(definition);
 
             return `
                 <button
@@ -1731,7 +1720,7 @@ function renderBattleItemMenu(){
                     onclick="usePotion('${definition.id}')"
                     title="${definition.name}"
                 >
-                    <span class="battle-item-badge">${resourceLabel}</span>
+                    <span class="battle-item-icon">${iconMarkup}</span>
                     <span class="battle-item-name">${definition.shortName}</span>
                     <span class="battle-item-effect">${effectLabel}</span>
                     <span class="battle-item-count">×${count}</span>
@@ -1776,7 +1765,7 @@ function renderBattleItemMenu(){
                 disabled
                 title="${item.name||item.id}"
             >
-                <span class="battle-item-badge">符</span>
+                <span class="battle-item-icon">${battleItemIconMarkup(item)}</span>
                 <span class="battle-item-name">${item.name||item.id}</span>
                 <span class="battle-item-effect">${skillLabel}</span>
                 <span class="battle-item-count">×${item.count}</span>
@@ -1961,74 +1950,14 @@ const BASE_DEFENSE = 30;
 const ATTACK_PER_LEVEL = 4;
 const MAGIC_ATTACK_PER_LEVEL = 4;
 const DEFENSE_PER_LEVEL = 3;
-const ATTACK_PER_POINT = 3;
-const MAGIC_ATTACK_PER_POINT = 3;
-const DEFENSE_PER_VITALITY_POINT = 4;
+const ATTACK_PER_POINT = 4;
+const MAGIC_ATTACK_PER_POINT = 2.75;
+const DEFENSE_PER_POINT = 4;
 const HP_PER_VITALITY_POINT = 50;
 
 function getBaseStats(){
-
-    return {
-
-        /*
-           這裡只給角色固定基礎值。
-           六項能力仍然完全由玩家配點。
-
-           1體質 = +50HP +4防禦
-           1攻擊 = +3物攻
-           1智力 = +3魔攻
-           每級 = +4物攻／+4魔攻／+3防禦
-           1能量 = +15SP
-
-           bonusHP / bonusSP 是每次升級
-           額外固定獲得的 +30HP +10SP，
-           跟體質/能量的配點加成分開計算。
-        */
-
-        maxHP:
-            100+
-            player.vitality*HP_PER_VITALITY_POINT+
-            player.bonusHP,
-
-        maxSP:
-            50+
-            player.energy*15+
-            player.bonusSP,
-
-        attack:
-            BASE_PHYSICAL_ATTACK+
-            Math.max(1,Number(player.level)||1)*ATTACK_PER_LEVEL+
-            player.attack*ATTACK_PER_POINT,
-
-        defense:
-            BASE_DEFENSE+
-            Math.max(1,Number(player.level)||1)*DEFENSE_PER_LEVEL+
-            player.vitality*DEFENSE_PER_VITALITY_POINT,
-
-        magicAttack:
-            BASE_MAGIC_ATTACK+
-            Math.max(1,Number(player.level)||1)*MAGIC_ATTACK_PER_LEVEL+
-            player.intelligence*MAGIC_ATTACK_PER_POINT,
-
-        accuracy:
-            player.spirit*2,
-
-        resistance:
-            calculateStatusResistancePercent(player.spirit),
-
-        antiCrit:
-            calculateAntiCritPercent(player.spirit),
-
-        speed:
-            player.agility,
-
-        evasion:
-            player.agility*0.6
-
-    };
-
+    return calculateCharacterBaseStats(player,getEquipmentBonus(player.element));
 }
-
 
 /* =====================================================
    裝備
@@ -2065,6 +1994,11 @@ const characterEquipment = {
 
 };
 
+function migrateLegacyEquipmentStats(item){
+    if(!item||typeof item!=="object"){ return item; }
+    return window.FourSymbolsEquipmentCombatMigration.migrateItem(item);
+}
+
 function normalizeEquipmentSlots(equipment){
     if(!equipment || typeof equipment!=="object") return;
     if(!Object.prototype.hasOwnProperty.call(equipment,"head")) equipment.head=equipment.helmet||null;
@@ -2076,6 +2010,7 @@ function normalizeEquipmentSlots(equipment){
     delete equipment.weapon;
     delete equipment.helmet;
     delete equipment.accessory;
+    Object.values(equipment).forEach(migrateLegacyEquipmentStats);
 }
 
 
@@ -2088,69 +2023,50 @@ normalizeEquipmentSlots(characterEquipment.water);
 normalizeEquipmentSlots(characterEquipment.wind);
 
 function getEquipmentBonus(characterId){
-
-    const equipment =
-        characterEquipment[characterId];
-
-    const bonus = {
-
-        attack:0,
-        vitality:0,
-        energy:0,
-        intelligence:0,
-        spirit:0,
-        agility:0,
-
-        maxHP:0,
-        maxSP:0,
-        defense:0
-
+    const equipment=characterEquipment[characterId];
+    const bonus={
+        attack:0,intelligence:0,vitality:0,energy:0,defensePoints:0,agility:0,
+        maxHP:0,maxSP:0,defense:0,accuracy:0,evasion:0,crit:0,criticalChance:0,
+        antiCrit:0,statusAccuracy:0,statusResistance:0,criticalDamage:0
     };
-
-
-    if(!equipment){
-        return bonus;
-    }
-
-
-    Object.values(equipment)
-    .forEach(item=>{
-
-        if(
-            !item ||
-            !item.stats
-        ){
-            return;
-        }
-
-
-        Object.keys(item.stats)
-        .forEach(stat=>{
-
-            if(
-                Object.prototype.hasOwnProperty.call(
-                    bonus,
-                    stat
-                )
-            ){
-
-                bonus[stat] +=
-                    Number(
-                        item.stats[stat] || 0
-                    );
-
-            }
-
+    if(!equipment){ return bonus; }
+    Object.values(equipment).forEach(item=>{
+        if(!item){ return; }
+        [item.stats,item.reforgeStats,...getSocketGemStats(item)].forEach(stats=>{
+            if(!stats||typeof stats!=="object"||Array.isArray(stats)){ return; }
+            Object.entries(stats).forEach(([stat,value])=>{
+                if(Object.prototype.hasOwnProperty.call(bonus,stat)){
+                    bonus[stat]+=Number(value)||0;
+                }
+            });
         });
-
     });
-
-
     return bonus;
-
 }
 
-
+/* Equipment rarity owns capacity; socket contents live on the equipment save object.
+   Unknown gem IDs contribute nothing, so old and partially migrated saves load safely. */
+const EQUIPMENT_SOCKET_CAPACITY=Object.freeze({white:0,blue:0,purple:0,orange:1,pink:2,"four-symbol":3});
+const EQUIPMENT_GEMS=Object.freeze({gemVitalityI:Object.freeze({id:"gemVitalityI",name:"體質寶石",type:"gem",icon:"◆",stats:Object.freeze({vitality:1})})});
+function getEquipmentSocketCapacity(item){
+    const aliases={low:"white",mid:"blue",high:"purple",perfect:"orange",red:"pink",myriad:"four-symbol"};
+    if(!item){ return 0; }
+    for(const value of [item.rarityKey,item.quality,item.tierKey,item.legacyTierKey]){
+        const raw=String(value||"").toLowerCase();
+        const key=aliases[raw]||raw;
+        if(Object.prototype.hasOwnProperty.call(EQUIPMENT_SOCKET_CAPACITY,key)){
+            return EQUIPMENT_SOCKET_CAPACITY[key];
+        }
+    }
+    return 0;
+}
+function getSocketGemStats(item){
+    const sockets=Array.isArray(item&&item.sockets)?item.sockets:[];
+    return sockets.slice(0,getEquipmentSocketCapacity(item)).filter(id=>
+        typeof id==="string"&&Object.prototype.hasOwnProperty.call(EQUIPMENT_GEMS,id)
+    ).map(id=>EQUIPMENT_GEMS[id].stats);
+}
+window.FourSymbolsEquipmentGems=Object.freeze({definitions:EQUIPMENT_GEMS,capacity:getEquipmentSocketCapacity,stats:getSocketGemStats});
 
 /* =====================================================
    V119 — 玩家戰鬥中六圍減益統一入口
@@ -2166,7 +2082,7 @@ function getEquipmentBonus(characterId){
    - agilityDown 再額外降低有效敏捷。
    - defenseDown 在所有防禦加成算完後再降低最終防禦。
    - 暫時性的 vitality / energy 降低「不動態縮減 maxHP / maxSP」，
-     避免減益命中瞬間把現有 HP/SP 強制裁掉；體質仍會降低戰鬥防禦。
+     避免減益命中瞬間把現有 HP/SP 強制裁掉；Vitality 只提供 Max HP。
      這是沿用本專案先前已確認的戰鬥資源穩定原則，不新增隱性扣血/扣SP。
 ===================================================== */
 function getEffectivePlayerAbilityPoints(character,equipmentBonus,statName){
@@ -2187,22 +2103,41 @@ function getEffectivePlayerAbilityPoints(character,equipmentBonus,statName){
     return Math.max(0,effective);
 }
 
+function calculateCharacterBaseStats(character,equipmentBonus){
+    const source=character&&typeof character==="object"?character:{};
+    const bonus=equipmentBonus&&typeof equipmentBonus==="object"?equipmentBonus:{};
+    const level=Math.max(1,Number(source.level)||1);
+    const points={};
+    ["attack","intelligence","vitality","energy","defensePoints","agility"].forEach(stat=>{
+        points[stat]=getEffectivePlayerAbilityPoints(source,bonus,stat);
+    });
+    return {
+        maxHP:100+points.vitality*HP_PER_VITALITY_POINT+(Number(source.bonusHP)||0)+(Number(bonus.maxHP)||0),
+        maxSP:50+points.energy*15+(Number(source.bonusSP)||0)+(Number(bonus.maxSP)||0),
+        attack:BASE_PHYSICAL_ATTACK+level*ATTACK_PER_LEVEL+points.attack*ATTACK_PER_POINT,
+        attackPoints:points.attack,
+        defense:BASE_DEFENSE+level*DEFENSE_PER_LEVEL+points.defensePoints*DEFENSE_PER_POINT+(Number(bonus.defense)||0),
+        defensePoints:points.defensePoints,
+        magicAttack:BASE_MAGIC_ATTACK+level*MAGIC_ATTACK_PER_LEVEL+points.intelligence*MAGIC_ATTACK_PER_POINT,
+        accuracy:Number(bonus.accuracy)||0,
+        statusResistance:Number(bonus.statusResistance)||0,
+        antiCrit:Number(bonus.antiCrit)||0,
+        criticalChance:(Number(bonus.criticalChance)||0)+(Number(bonus.crit)||0),
+        criticalDamage:Number(bonus.criticalDamage)||0,
+        statusAccuracy:Number(bonus.statusAccuracy)||0,
+        speed:points.agility,
+        evasion:Number(bonus.evasion)||0,
+        vitality:points.vitality,
+        energy:points.energy,
+        intelligence:points.intelligence,
+        agility:points.agility
+    };
+}
+
 function getPlayerDefenseDownPercent(character){
     return Math.max(0,getMonsterDebuffValue(character,"defenseDown"));
 }
 
-function getPlayerEvasionBaseAgility(character,equipmentBonus){
-    if(!character){ return 0; }
-    const base=(Number(character.agility)||0)+(Number(equipmentBonus&&equipmentBonus.agility)||0);
-    const statDown=getStatDownPercentFor(character,"agility");
-    return Math.max(0,base*(1-statDown/100));
-}
-
-function getPlayerFinalEvasionReductionPercent(character){
-    return Math.max(0,getMonsterDebuffValue(character,"agilityDown"));
-}
-
-const FINAL_EVASION_RATE_CAP=85;
 const FROSTBITE_FINAL_PERCENT_POINT_PENALTY=25;
 
 /*
@@ -2216,7 +2151,7 @@ function combineEvasionRates(sources){
         (sum,source)=>sum+(Number(source)||0),
         0
     );
-    return Math.max(0,Math.min(FINAL_EVASION_RATE_CAP,total));
+    return Math.max(0,total);
 }
 
 function getFrostbiteFinalPercentPointPenalty(entity){
@@ -2264,102 +2199,50 @@ function getActiveRageCriticalBonuses(entity){
 window.v173GetActiveAccuracyBonusPercent=getActiveAccuracyBonusPercent;
 window.v173GetActiveRageCriticalBonuses=getActiveRageCriticalBonuses;
 
+/* Final Accuracy is a percentage-point modifier, not a multiplier on raw
+   Accuracy. It joins raw Accuracy only at the single hit-chance owner. */
+function getFinalAccuracyBonusPercent(entity){
+    const activeBonus=getActiveAccuracyBonusPercent(entity);
+    const windEx=entity&&entity.element==="wind"
+        ?getLearnedElementEX(entity,"wind")
+        :null;
+    return activeBonus+(windEx?Number(windEx.accuracyBonusPercent)||0:0);
+}
+
+window.v173GetFinalAccuracyBonusPercent=getFinalAccuracyBonusPercent;
+
+/* Relic is a source of final Evasion points. All character getters settle
+   it here before Frostbite, so party delegation cannot apply it twice. */
+function getRelicFinalEvasionPercent(character){
+    const index=getPartyCharacterIndex(character);
+    return index>=0&&typeof window.v174GetRelicFinalEvasionPercent==="function"
+        ?Number(window.v174GetRelicFinalEvasionPercent(index))||0:0;
+}
+
 /* =====================================================
    主角最終能力
 ===================================================== */
 
 function getMainCharacterStats(){
-
     const bonus=getEquipmentBonus(player.element);
-
-    /* 裝備六圍統一先進入有效屬性查詢；攻擊不再於最終物攻重複加一次。 */
-    const effectiveAttackPoints=getEffectivePlayerAbilityPoints(player,bonus,"attack");
-    const effectiveVitality=getEffectivePlayerAbilityPoints(player,bonus,"vitality");
-    const effectiveEnergy=getEffectivePlayerAbilityPoints(player,bonus,"energy");
-    const effectiveIntelligence=getEffectivePlayerAbilityPoints(player,bonus,"intelligence");
-    const effectiveSpirit=getEffectivePlayerAbilityPoints(player,bonus,"spirit");
-    const effectiveAgility=getEffectivePlayerAbilityPoints(player,bonus,"agility");
-
+    const base=calculateCharacterBaseStats(player,bonus);
+    const characterKey=getCharacterSkillKey(player);
+    const windEXLevel=characterKey?getSkillLevel(characterKey,"windEX"):0;
+    const earthEXLevel=characterKey?getSkillLevel(characterKey,"earthEX"):0;
     const evasionBuffPercent=getActiveBuffPercent(player,"dodgeSkill");
     const defenseBuffPercent=getActiveBuffPercent(player,"rockWall");
-
-    const windEXLevel=getSkillLevel("fire","windEX");
-    const earthEXLevel=getSkillLevel("fire","earthEX");
-
-    const evasionPassivePercent=windEXLevel>0
-        ? (skillDatabase.windEX.evasionBonusPercent||0)
-        : 0;
-    const defensePassivePercent=earthEXLevel>0
-        ? (skillDatabase.earthEX.defenseBonusPercent||0)
-        : 0;
-
     const defenseDownPercent=getPlayerDefenseDownPercent(player);
-
-    const rawDefense=(
-        BASE_DEFENSE+
-        Math.max(1,Number(player.level)||1)*DEFENSE_PER_LEVEL+
-        effectiveVitality*DEFENSE_PER_VITALITY_POINT+
-        (Number(bonus.defense)||0)
-    );
-
-    const buffedDefense=rawDefense*(
-        1+(defenseBuffPercent+defensePassivePercent)/100
-    );
-
-    const rawEvasion=getPlayerEvasionBaseAgility(player,bonus)*0.6;
-
+    const maxHpPassiveMultiplier=earthEXLevel>0?Math.max(1,Number(skillDatabase.earthEX.maxHpMultiplier)||1):1;
+    const rawDefense=base.defense;
+    const buffedDefense=rawDefense*(1+(defenseBuffPercent+(earthEXLevel>0?Number(skillDatabase.earthEX.defenseBonusPercent)||0:0))/100);
     return {
-        /* 暫時六圍減益不動態壓縮最大HP/SP；詳見上方統一規則。 */
-        maxHP:
-            100+
-            (player.vitality+(Number(bonus.vitality)||0))*HP_PER_VITALITY_POINT+
-            player.bonusHP+
-            (Number(bonus.maxHP)||0),
-
-        maxSP:
-            50+
-            (player.energy+(Number(bonus.energy)||0))*15+
-            player.bonusSP+
-            (Number(bonus.maxSP)||0),
-
-        attack:
-            BASE_PHYSICAL_ATTACK+
-            Math.max(1,Number(player.level)||1)*ATTACK_PER_LEVEL+
-            effectiveAttackPoints*ATTACK_PER_POINT,
-
-        attackPoints:effectiveAttackPoints,
-
-        defense:Math.max(
-            0,
-            Math.round(buffedDefense*(1-defenseDownPercent/100))
-        ),
-
-        magicAttack:
-            BASE_MAGIC_ATTACK+
-            Math.max(1,Number(player.level)||1)*MAGIC_ATTACK_PER_LEVEL+
-            effectiveIntelligence*MAGIC_ATTACK_PER_POINT,
-        accuracy:effectiveSpirit*2,
-        resistance:calculateStatusResistancePercent(effectiveSpirit),
-        antiCrit:calculateAntiCritPercent(effectiveSpirit),
-        speed:effectiveAgility,
-
-        evasion:combineEvasionRates([
-            rawEvasion,
-            evasionBuffPercent,
-            evasionPassivePercent,
-            -getPlayerFinalEvasionReductionPercent(player),
-            -getFrostbiteFinalPercentPointPenalty(player)
-        ]),
-
-        vitality:effectiveVitality,
-        energy:effectiveEnergy,
-        intelligence:effectiveIntelligence,
-        spirit:effectiveSpirit,
-        agility:effectiveAgility
+        ...base,
+        maxHP:Math.round(base.maxHP*maxHpPassiveMultiplier),
+        defense:Math.max(0,Math.round(buffedDefense*(1-defenseDownPercent/100))),
+        accuracy:base.accuracy,
+        evasion:combineEvasionRates([base.evasion,evasionBuffPercent,windEXLevel>0?Number(skillDatabase.windEX.evasionBonusPercent)||0:0,getRelicFinalEvasionPercent(player),-getFrostbiteFinalPercentPointPenalty(player)])
     };
-
 }
-
 
 /*
    ★ 新增（依照使用者要求）：
@@ -2376,7 +2259,7 @@ function getActiveBuffPercent(
     buffType
 ){
 
-    if(!character.activeBuffs){
+    if(!character || !character.activeBuffs){
         return 0;
     }
 
@@ -2432,94 +2315,24 @@ function hasActiveBuff(
 */
 
 function getAdditionalCharacterBattleStats(character,characterKey){
-
-    if(!character || !characterKey){ return null; }
-
     const bonus=getEquipmentBonus(characterKey);
-
-    const effectiveAttackPoints=getEffectivePlayerAbilityPoints(character,bonus,"attack");
-    const effectiveVitality=getEffectivePlayerAbilityPoints(character,bonus,"vitality");
-    const effectiveEnergy=getEffectivePlayerAbilityPoints(character,bonus,"energy");
-    const effectiveIntelligence=getEffectivePlayerAbilityPoints(character,bonus,"intelligence");
-    const effectiveSpirit=getEffectivePlayerAbilityPoints(character,bonus,"spirit");
-    const effectiveAgility=getEffectivePlayerAbilityPoints(character,bonus,"agility");
-
-    const windEXLevel=getSkillLevel(characterKey,"windEX");
-    const earthEXLevel=getSkillLevel(characterKey,"earthEX");
-
-    const evasionPassivePercent=windEXLevel>0
-        ? (skillDatabase.windEX.evasionBonusPercent||0)
-        : 0;
-    const defensePassivePercent=earthEXLevel>0
-        ? (skillDatabase.earthEX.defenseBonusPercent||0)
-        : 0;
-
+    const base=calculateCharacterBaseStats(character,bonus);
+        const windEXLevel=characterKey?getSkillLevel(characterKey,"windEX"):0;
+    const earthEXLevel=characterKey?getSkillLevel(characterKey,"earthEX"):0;
     const evasionBuffPercent=getActiveBuffPercent(character,"dodgeSkill");
     const defenseBuffPercent=getActiveBuffPercent(character,"rockWall");
     const defenseDownPercent=getPlayerDefenseDownPercent(character);
-
-    const rawDefense=(
-        BASE_DEFENSE+
-        Math.max(1,Number(character.level)||1)*DEFENSE_PER_LEVEL+
-        effectiveVitality*DEFENSE_PER_VITALITY_POINT+
-        (Number(bonus.defense)||0)
-    );
-    const buffedDefense=rawDefense*(
-        1+(defenseBuffPercent+defensePassivePercent)/100
-    );
-    const rawEvasion=getPlayerEvasionBaseAgility(character,bonus)*0.6;
-
+    const maxHpPassiveMultiplier=earthEXLevel>0?Math.max(1,Number(skillDatabase.earthEX.maxHpMultiplier)||1):1;
+    const rawDefense=base.defense;
+    const buffedDefense=rawDefense*(1+(defenseBuffPercent+(earthEXLevel>0?Number(skillDatabase.earthEX.defenseBonusPercent)||0:0))/100);
     return {
-        maxHP:
-            100+
-            (character.vitality+(Number(bonus.vitality)||0))*HP_PER_VITALITY_POINT+
-            (Number(character.bonusHP)||0)+
-            (Number(bonus.maxHP)||0),
-
-        maxSP:
-            50+
-            (character.energy+(Number(bonus.energy)||0))*15+
-            (Number(character.bonusSP)||0)+
-            (Number(bonus.maxSP)||0),
-
-        attack:
-            BASE_PHYSICAL_ATTACK+
-            Math.max(1,Number(character.level)||1)*ATTACK_PER_LEVEL+
-            effectiveAttackPoints*ATTACK_PER_POINT,
-
-        attackPoints:effectiveAttackPoints,
-
-        defense:Math.max(
-            0,
-            Math.round(buffedDefense*(1-defenseDownPercent/100))
-        ),
-
-        magicAttack:
-            BASE_MAGIC_ATTACK+
-            Math.max(1,Number(character.level)||1)*MAGIC_ATTACK_PER_LEVEL+
-            effectiveIntelligence*MAGIC_ATTACK_PER_POINT,
-        accuracy:effectiveSpirit*2,
-        resistance:calculateStatusResistancePercent(effectiveSpirit),
-        antiCrit:calculateAntiCritPercent(effectiveSpirit),
-        speed:effectiveAgility,
-
-        evasion:combineEvasionRates([
-            rawEvasion,
-            evasionBuffPercent,
-            evasionPassivePercent,
-            -getPlayerFinalEvasionReductionPercent(character),
-            -getFrostbiteFinalPercentPointPenalty(character)
-        ]),
-
-        vitality:effectiveVitality,
-        energy:effectiveEnergy,
-        intelligence:effectiveIntelligence,
-        spirit:effectiveSpirit,
-        agility:effectiveAgility
+        ...base,
+        maxHP:Math.round(base.maxHP*maxHpPassiveMultiplier),
+        defense:Math.max(0,Math.round(buffedDefense*(1-defenseDownPercent/100))),
+        accuracy:base.accuracy,
+        evasion:combineEvasionRates([base.evasion,evasionBuffPercent,windEXLevel>0?Number(skillDatabase.windEX.evasionBonusPercent)||0:0,getRelicFinalEvasionPercent(character),-getFrostbiteFinalPercentPointPenalty(character)])
     };
-
 }
-
 
 function getPlayer2BattleStats(){
     return getAdditionalCharacterBattleStats(player2,"player2");
@@ -2845,8 +2658,8 @@ const skillDatabase = {
     /* ===== 風系：增益 ===== */
     dodgeSkill:{
         id:"dodgeSkill", name:"閃躲術", element:"wind", category:"buff", targetType:"allyAll",
-        learnCost:10, maxLevel:1, spCost:20, duration:2,
-        description:"使我方全體閃躲率提升30%，持續2回合。", evasionBonusPercent:30,
+        learnCost:10, maxLevel:1, spCost:20, duration:3,
+        description:"最終閃躲+5%，持續3回合。", evasionBonusPercent:5,
         requires:["windCrossSlash","windHowlLightning"]
     },
     stealthSkill:{
@@ -2953,8 +2766,6 @@ const skillDatabase = {
    constants must be initialized before makeZoneMonster() calculates status
    resistance and anti-crit values.
 ===================================================== */
-const STATUS_RESIST_PER_SPIRIT_POINT = 0.05;
-const ANTI_CRIT_PER_SPIRIT_POINT = 0.1;
 const ANTI_CRIT_MAX_PERCENT = 25;
 const CRIT_CHANCE_MIN_AFTER_ANTI_CRIT = 5;
 
@@ -2972,33 +2783,13 @@ function rollBeginnerForestNormalAttackDamage(){
         );
 }
 
-/* =====================================================
-   怪物預設閃躲唯一 Owner
-   forestMonsters / desertMonsters 等區域 roster 會在 App Shell 頂層
-   立即呼叫 makeZoneMonster()，因此常數必須在第一個 roster 建立前
-   完成初始化。正式值：level×0.1%，最高10%。
-===================================================== */
-const DEFAULT_MONSTER_EVASION_PER_LEVEL = 0.1;
-const DEFAULT_MONSTER_EVASION_CAP = 10;
-
-function getDefaultMonsterEvasion(level){
-    return Math.min(
-        DEFAULT_MONSTER_EVASION_CAP,
-        Math.max(0,Number(level)||0)*DEFAULT_MONSTER_EVASION_PER_LEVEL
-    );
-}
-
-window.v173GetDefaultMonsterEvasion=getDefaultMonsterEvasion;
-
-
 const forestMonsters = [
 
-    makeZoneMonster("哥布林",3,"fire"),
-    makeZoneMonster("史萊姆",2,"water"),
-    makeZoneMonster("哥布林",3,"fire"),
-    makeZoneMonster("史萊姆",2,"water"),
-    makeZoneMonster("哥布林",3,"fire"),
-    makeZoneMonster("史萊姆",2,"water")
+    makeZoneMonster("哥布林",3,"fire",undefined,"wild.zone-01.fire-01"),
+    makeZoneMonster("水靈狐",2,"water",undefined,"wild.zone-01.water-01"),
+    makeZoneMonster("哥布林",3,"fire",undefined,"wild.zone-01.fire-01"),
+    makeZoneMonster("水靈狐",2,"water",undefined,"wild.zone-01.water-01"),    makeZoneMonster("哥布林",3,"fire",undefined,"wild.zone-01.fire-01"),
+    makeZoneMonster("水靈狐",2,"water",undefined,"wild.zone-01.water-01")
 
 ];
 
@@ -3020,12 +2811,12 @@ forestMonsters.forEach(monster=>{
 
 const desertMonsters = [
 
-    makeZoneMonster("沙漠豺狼",16,"fire"),
-    makeZoneMonster("沙蠍",15,"water"),
-    makeZoneMonster("沙漠豺狼",16,"fire"),
-    makeZoneMonster("沙蠍",15,"water"),
-    makeZoneMonster("沙漠豺狼",16,"fire"),
-    makeZoneMonster("沙蠍",15,"water")
+    makeZoneMonster("沙漠豺狼",16,"fire",undefined,"wild.zone-02.fire-01"),
+    makeZoneMonster("浪尾獺",15,"water",undefined,"wild.zone-02.water-01"),
+    makeZoneMonster("沙漠豺狼",16,"fire",undefined,"wild.zone-02.fire-01"),
+    makeZoneMonster("浪尾獺",15,"water",undefined,"wild.zone-02.water-01"),
+    makeZoneMonster("沙漠豺狼",16,"fire",undefined,"wild.zone-02.fire-01"),
+    makeZoneMonster("浪尾獺",15,"water",undefined,"wild.zone-02.water-01")
 
 ];
 
@@ -3050,11 +2841,11 @@ const desertMonsters = [
 
 const iceMountainMonsters = [
 
-    makeZoneMonster("熾焰狼",22,"fire"),
-    makeZoneMonster("寒冰魔",23,"water"),
-    makeZoneMonster("熾焰狼",22,"fire"),
-    makeZoneMonster("寒冰魔",23,"water"),
-    makeZoneMonster("熾焰狼王",27,"fire"),
+    makeZoneMonster("熾焰狼",22,"fire",undefined,"wild.zone-03.fire-01"),
+    makeZoneMonster("澤木妖",23,"water",undefined,"wild.zone-03.water-01"),
+    makeZoneMonster("熾焰狼",22,"fire",undefined,"wild.zone-03.fire-01"),
+    makeZoneMonster("澤木妖",23,"water",undefined,"wild.zone-03.water-01"),
+    makeZoneMonster("熾焰狼王",27,"fire",undefined,"wild.zone-03.fire-02"),
     makeZoneMonster("寒冰魔王",28,"water")
 
 ];
@@ -3084,56 +2875,7 @@ const iceMountainMonsters = [
 */
 
 
-/*
-   ★ 新增（依照使用者要求，怪物六圍系統，
-   完全比照玩家的能力點分配/換算公式，
-   不再是手動填死的HP/SP/攻擊/防禦數字）：
-
-   總能力點 = 10 + 等級×2
-   敏捷點數 = round(等級÷3)，從總能力點裡扣除
-   可分配點數 = 總能力點 − 敏捷點數
-   體質點數 = round(可分配點數 × 10%)，固定
-   剩餘點數平均分配給攻擊／能量／智力／精神，
-   餘數依固定順序補入，確保同名同級怪物數值一致。
-
-   換算成實際數值時，直接套用跟玩家
-   getBaseStats()完全相同的公式：
-   maxHP    = 100 + 體質×50
-   maxSP    = 50  + 能量×15
-   攻擊力    = 10  + 攻擊×8
-   防禦     = 10  + 體質×6
-   法術攻擊  = 10  + 智力×8
-   命中 = 精神×2
-   一般異常抗性 = 精神×0.05（百分點）
-   預設閃避 = min(10%, 等級×0.1%)
-   速度(行動順序用) = 敏捷（原始點數，不額外乘）
-*/
-
-/*
-   ★ 修正（依照使用者要求，「同一區同一個
-   怪物名稱，等級就要一樣，能力值也都要
-   一樣」）：
-   這個函式原本用Math.random()決定攻擊/
-   能量/智力/精神四項怎麼分配，代表就算
-   名稱、等級完全相同的怪物（例如同一區
-   放了三隻「哥布林 Lv.3」），每一隻實際
-   算出來的攻擊力/魔攻/命中/閃避還是會
-   各自不同——不是等級沒對齊，是「等級
-   對齊了，但點數分配是隨機骰的」，一樣
-   會讓玩家覺得「同名同等級的怪，數值
-   卻不一樣」不合理。
-
-   改成固定「平均分配」（四項平分，分不
-   完的餘數依固定順序，不是隨機順序，
-   補給前面幾項），這樣同一個等級不管
-   算幾次、算幾隻，結果永遠一模一樣，
-   跟體質那項「固定10%、不再參與隨機」
-   是同一個精神，只是這裡擴大到全部
-   四項都固定，不留任何隨機成分。
-
-   函式名稱保留沒改（怕漏改到其他呼叫
-   的地方），但函式本體已經不再隨機。
-*/
+/* Monster generation uses the same six-stat roles and coefficients as player characters. */
 
 function distributeRandomPoints(
     totalPoints,
@@ -3183,17 +2925,7 @@ function generateMonsterAttributePoints(
     level
 ){
 
-    /*
-       ★ 修正（依照使用者要求，配點規則
-       第二次調整）：
-       體質改成「固定10%」，不再是「保底
-       40%+隨機加碼」——體質不會再從隨機池
-       裡多拿到額外點數，就是單純的10%，
-       其餘90%（原本能量固定20%的規則也
-       取消了）全部丟進隨機池，由「攻擊/
-       能量/智力/精神」四項均等競爭。
-    */
-
+    /* Monster generation assigns explicit Defense independently of Vitality. */
     const totalPoints=
         10+level*2;
 
@@ -3226,12 +2958,7 @@ function generateMonsterAttributePoints(
         );
 
 
-    /*
-       隨機分配的四項順序固定：
-       [0]攻擊 [1]能量 [2]智力 [3]精神
-       （體質已經固定10%，不再參與這裡的
-       隨機競爭）
-    */
+    /* Stable order keeps same-level monsters deterministic. */
 
     const randomShares=
         distributeRandomPoints(
@@ -3254,7 +2981,7 @@ function generateMonsterAttributePoints(
         intelligence:
             randomShares[2],
 
-        spirit:
+        defense:
             randomShares[3],
 
         agility:
@@ -3372,7 +3099,8 @@ function makeZoneMonster(
     name,
     level,
     element,
-    rank
+    rank,
+    portraitKey
 ){
 
     const points=
@@ -3435,8 +3163,8 @@ function makeZoneMonster(
         intelligencePoints:
             points.intelligence,
 
-        spiritPoints:
-            points.spirit,
+        defensePoints:
+            points.defense,
 
         agilityPoints:
             points.agility,
@@ -3450,24 +3178,21 @@ function makeZoneMonster(
         defense:
             BASE_DEFENSE+
             Math.max(1,Number(level)||1)*DEFENSE_PER_LEVEL+
-            points.vitality*DEFENSE_PER_VITALITY_POINT,
+            points.defense*DEFENSE_PER_POINT,
 
         magicAttack:
             BASE_MAGIC_ATTACK+
             Math.max(1,Number(level)||1)*MAGIC_ATTACK_PER_LEVEL+
             points.intelligence*MAGIC_ATTACK_PER_POINT,
 
-        accuracy:
-            points.spirit*2,
+        accuracy:0,
 
-        resistance:
-            calculateStatusResistancePercent(points.spirit),
+        statusResistance:0,
 
-        antiCrit:
-            calculateAntiCritPercent(points.spirit),
+        antiCrit:0,
 
         evasion:
-            getDefaultMonsterEvasion(level),
+            0,
 
         agility:
             points.agility,
@@ -3475,6 +3200,7 @@ function makeZoneMonster(
 
         alive:true,
         element:element,
+        portraitKey:portraitKey||undefined,
 
         /*
            ★ 新增（依照使用者要求，「以後
@@ -3518,11 +3244,11 @@ function makeZoneMonster(
 
 const zone4Monsters = [
 
-    makeZoneMonster("烈焰巨魔",32,"fire"),
-    makeZoneMonster("深淵水靈",33,"water"),
-    makeZoneMonster("烈焰巨魔",32,"fire"),
-    makeZoneMonster("深淵水靈",33,"water"),
-    makeZoneMonster("烈焰巨魔王",38,"fire"),
+    makeZoneMonster("烈焰巨魔",32,"fire",undefined,"wild.zone-04.fire-01"),
+    makeZoneMonster("沼鉤怪",33,"water",undefined,"wild.zone-04.water-01"),
+    makeZoneMonster("烈焰巨魔",32,"fire",undefined,"wild.zone-04.fire-01"),
+    makeZoneMonster("沼鉤怪",33,"water",undefined,"wild.zone-04.water-01"),
+    makeZoneMonster("炎錘巨魔",38,"fire",undefined,"wild.zone-04.fire-02"),
     makeZoneMonster("深淵水靈王",40,"water")
 
 ];
@@ -3530,11 +3256,11 @@ const zone4Monsters = [
 
 const zone5Monsters = [
 
-    makeZoneMonster("熔岩巨獸",42,"fire"),
-    makeZoneMonster("寒潮巨獸",43,"water"),
-    makeZoneMonster("熔岩巨獸",42,"fire"),
-    makeZoneMonster("寒潮巨獸",43,"water"),
-    makeZoneMonster("熔岩巨獸王",48,"fire"),
+    makeZoneMonster("熔岩巨獸",42,"fire",undefined,"wild.zone-05.fire-01"),
+    makeZoneMonster("潮蛙卒",43,"water",undefined,"wild.zone-05.water-01"),
+    makeZoneMonster("熔岩巨獸",42,"fire",undefined,"wild.zone-05.fire-01"),
+    makeZoneMonster("潮蛙卒",43,"water",undefined,"wild.zone-05.water-01"),
+    makeZoneMonster("熔翼獸王",48,"fire",undefined,"wild.zone-05.fire-02"),
     makeZoneMonster("寒潮巨獸王",50,"water")
 
 ];
@@ -3542,11 +3268,11 @@ const zone5Monsters = [
 
 const zone6Monsters = [
 
-    makeZoneMonster("赤炎修羅",52,"fire"),
-    makeZoneMonster("玄冰修羅",53,"water"),
-    makeZoneMonster("赤炎修羅",52,"fire"),
-    makeZoneMonster("玄冰修羅",53,"water"),
-    makeZoneMonster("赤炎修羅王",58,"fire"),
+    makeZoneMonster("赤炎修羅",52,"fire",undefined,"wild.zone-06.fire-01"),
+    makeZoneMonster("鱗潭獸",53,"water",undefined,"wild.zone-06.water-01"),
+    makeZoneMonster("赤炎修羅",52,"fire",undefined,"wild.zone-06.fire-01"),
+    makeZoneMonster("鱗潭獸",53,"water",undefined,"wild.zone-06.water-01"),
+    makeZoneMonster("六臂修羅",58,"fire",undefined,"wild.zone-06.fire-02"),
     makeZoneMonster("玄冰修羅王",60,"water")
 
 ];
@@ -3554,11 +3280,11 @@ const zone6Monsters = [
 
 const zone7Monsters = [
 
-    makeZoneMonster("業火魔君",62,"fire"),
-    makeZoneMonster("絕冰魔君",63,"water"),
-    makeZoneMonster("業火魔君",62,"fire"),
-    makeZoneMonster("絕冰魔君",63,"water"),
-    makeZoneMonster("業火魔君王",68,"fire"),
+    makeZoneMonster("業火魔君",62,"fire",undefined,"wild.zone-07.fire-01"),
+    makeZoneMonster("瀾花姬",63,"water",undefined,"wild.zone-07.water-01"),
+    makeZoneMonster("業火魔君",62,"fire",undefined,"wild.zone-07.fire-01"),
+    makeZoneMonster("瀾花姬",63,"water",undefined,"wild.zone-07.water-01"),
+    makeZoneMonster("業炎法王",68,"fire",undefined,"wild.zone-07.fire-02"),
     makeZoneMonster("絕冰魔君王",70,"water")
 
 ];
@@ -3566,11 +3292,11 @@ const zone7Monsters = [
 
 const zone8Monsters = [
 
-    makeZoneMonster("焚天龍獄",72,"fire"),
-    makeZoneMonster("極寒龍獄",73,"water"),
-    makeZoneMonster("焚天龍獄",72,"fire"),
-    makeZoneMonster("極寒龍獄",73,"water"),
-    makeZoneMonster("焚天龍獄皇",78,"fire"),
+    makeZoneMonster("焚天龍獄",72,"fire",undefined,"wild.zone-08.fire-01"),
+    makeZoneMonster("海蜇巫",73,"water",undefined,"wild.zone-08.water-01"),
+    makeZoneMonster("焚天龍獄",72,"fire",undefined,"wild.zone-08.fire-01"),
+    makeZoneMonster("海蜇巫",73,"water",undefined,"wild.zone-08.water-01"),
+    makeZoneMonster("焚天炎龍",78,"fire",undefined,"wild.zone-08.fire-02"),
     makeZoneMonster("極寒龍獄皇",80,"water")
 
 ];
@@ -3590,11 +3316,11 @@ const zone8Monsters = [
 
 const zone9Monsters = [
 
-    makeZoneMonster("虛空煉獄",82,"fire"),
-    makeZoneMonster("永凍深淵",83,"water"),
-    makeZoneMonster("虛空煉獄",82,"fire"),
-    makeZoneMonster("永凍深淵",83,"water"),
-    makeZoneMonster("虛空煉獄皇",88,"fire"),
+    makeZoneMonster("虛空煉獄",82,"fire",undefined,"wild.zone-09.fire-01"),
+    makeZoneMonster("霜鬃狼",83,"water",undefined,"wild.zone-09.water-01"),
+    makeZoneMonster("虛空煉獄",82,"fire",undefined,"wild.zone-09.fire-01"),
+    makeZoneMonster("霜鬃狼",83,"water",undefined,"wild.zone-09.water-01"),
+    makeZoneMonster("獄輪魔尊",88,"fire",undefined,"wild.zone-09.fire-02"),
     makeZoneMonster("永凍深淵皇",90,"water")
 
 ];
@@ -3602,11 +3328,11 @@ const zone9Monsters = [
 
 const zone10Monsters = [
 
-    makeZoneMonster("終焉神魔",92,"fire"),
-    makeZoneMonster("末世寒神",93,"water"),
-    makeZoneMonster("終焉神魔",92,"fire"),
-    makeZoneMonster("末世寒神",93,"water"),
-    makeZoneMonster("終焉神魔皇",98,"fire"),
+    makeZoneMonster("終焉神魔",92,"fire",undefined,"wild.zone-10.fire-01"),
+    makeZoneMonster("玄潮俠",93,"water",undefined,"wild.zone-10.water-01"),
+    makeZoneMonster("終焉神魔",92,"fire",undefined,"wild.zone-10.fire-01"),
+    makeZoneMonster("玄潮俠",93,"water",undefined,"wild.zone-10.water-01"),
+    makeZoneMonster("末炎祭司",98,"fire",undefined,"wild.zone-10.fire-02"),
     makeZoneMonster("末世寒神皇",100,"water")
 
 ];
@@ -3894,70 +3620,6 @@ function getSkillIconBackgroundImage(skillId){
    的案例，用一種格式就夠。
 */
 
-function isSkillPrereqMet(skillLevels,skill){
-
-    if(
-        !skill ||
-        !skill.requires ||
-        skill.requires.length===0
-    ){
-        return true;
-    }
-
-
-    return skill.requires.some(
-        reqId=>
-            (skillLevels[reqId]||0)>0
-    );
-
-}
-
-
-/*
-   ★ 新增：把requires陣列轉成給玩家看的
-   中文提示，例如「需先學習：會心一擊」
-   或「需先學習：火爆亂擊或烈焰龍捲其一」，
-   抓不到技能名稱時保底顯示id本身，
-   避免整段消失讓玩家一頭霧水。
-*/
-
-function getSkillPrereqLabel(skill){
-
-    if(
-        !skill ||
-        !skill.requires ||
-        skill.requires.length===0
-    ){
-        return "";
-    }
-
-
-    const names=
-        skill.requires.map(
-            reqId=>
-                (
-                    skillDatabase[reqId]&&
-                    skillDatabase[reqId].name
-                )||
-                reqId
-        );
-
-
-    return (
-        "需先學習："+
-        names.join("或")+
-        (
-            names.length>1
-            ?
-            "其一"
-            :
-            ""
-        )
-    );
-
-}
-
-
 const characterSkillLoadouts = {
 
     fire:{
@@ -3996,8 +3658,7 @@ const characterSkillLoadouts = {
 };
 
 
-/* =====================================================
-   角色
+/* =====================================================   角色
 ===================================================== */
 
 const characters = [
@@ -4187,8 +3848,119 @@ let battleInputResumeToken=null;
 let battleResolutionResumeToken=null;
 let battleAutoActionResume=null;
 let battleRoundPromptTimeoutId=null;
+let battleActionNoticeTimeoutId=null;
 let battleRoundPromptRelease=null;
 let activeBattleStatisticsAction=null;
+/*
+ * Persistent Effect Duration Lifecycle
+ *
+ * BattleFlow owns action boundaries, so duration consumption lives here rather
+ * than in a late skill module. A snapshot is captured immediately before the
+ * combatant acts and consumed once by the matching action-finished signal.
+ * Effects created during that action are not present in the snapshot and do
+ * not lose a turn immediately. Burn and explicitly charge/round-owned states
+ * stay outside this action lifecycle.
+ */
+const BATTLE_ACTION_DURATION_STATUS_TYPES=new Set([
+    "freeze","petrify","frostbite","agilityDown","statDown","damageDown","defenseDown","stun"
+]);
+const BATTLE_ACTION_DURATION_EXCLUDED_BUFFS=new Set(["phoenixMight","bloodBurn"]);
+const battleDurationBuffExpiryHandlers=new Set();
+let battleDurationAction=null;
+
+function battleDurationNumber(value){
+    const number=Number(value);
+    return Number.isFinite(number)?number:0;
+}
+function battleDurationEntityForEntry(entry){
+    if(!entry){ return null; }
+    if(entry.type==="player"){ return getPartyCharacterByIndex(entry.characterIndex); }
+    if(entry.type==="monster"&&Array.isArray(monsters)){ return monsters[entry.monsterIndex]||null; }
+    return null;
+}
+function snapshotBattleActionDuration(entity){
+    return {
+        buffs:new Set((entity&&Array.isArray(entity.activeBuffs)?entity.activeBuffs:[]).filter(buff=>
+            buff&&battleDurationNumber(buff.turnsLeft)>0&&!buff.oneShot&&!BATTLE_ACTION_DURATION_EXCLUDED_BUFFS.has(buff.type)
+        )),
+        statuses:new Set((entity&&Array.isArray(entity.statusEffects)?entity.statusEffects:[]).filter(effect=>
+            effect&&battleDurationNumber(effect.turnsLeft)>0&&BATTLE_ACTION_DURATION_STATUS_TYPES.has(effect.type)
+        ))
+    };
+}
+function runBattleDurationBuffExpiryHandlers(entity,buff,mirrored){
+    battleDurationBuffExpiryHandlers.forEach(handler=>{
+        try{ handler({entity:entity,buff:buff,mirrored:mirrored||null}); }
+        catch(error){ console.error("持續增益到期處理器失敗：",error); }
+    });
+}
+function expireBattleActionBuff(entity,buff){
+    if(!entity||!buff||!Array.isArray(entity.activeBuffs)){ return; }
+    buff.turnsLeft=Math.max(0,battleDurationNumber(buff.turnsLeft)-1);
+    const mirrored=Array.isArray(entity.v141TeamBuffs)
+        ?entity.v141TeamBuffs.find(item=>item&&item.displayBuff===buff):null;
+    if(mirrored){ mirrored.turnsLeft=buff.turnsLeft; }
+    if(buff.turnsLeft>0){ return; }
+
+    entity.activeBuffs=entity.activeBuffs.filter(item=>item!==buff);
+    if(mirrored){
+        entity.v141TeamBuffs=entity.v141TeamBuffs.filter(item=>item!==mirrored);
+        if(mirrored.type==="rage"){
+            entity.attack=mirrored.originalAttack;
+            entity.magicAttack=mirrored.originalMagicAttack;
+        }else if(mirrored.type==="resistance"){
+            entity.resistance=Math.max(0,battleDurationNumber(entity.resistance)-battleDurationNumber(mirrored.amount));
+        }else if(mirrored.type==="dodge"){
+            entity.evasion=mirrored.originalEvasion;
+        }
+    }
+
+    runBattleDurationBuffExpiryHandlers(entity,buff,mirrored);
+    if(typeof addBattleLog==="function"){
+        addBattleLog("⏳"+(buff.statusName||buff.type)+"效果已結束。");
+    }
+}
+function expireBattleActionStatus(entity,effect){
+    if(!entity||!effect||!Array.isArray(entity.statusEffects)){ return; }
+    effect.turnsLeft=Math.max(0,battleDurationNumber(effect.turnsLeft)-1);
+    if(effect.turnsLeft>0){ return; }
+    entity.statusEffects=entity.statusEffects.filter(item=>item!==effect);
+    if(typeof addBattleLog==="function"){
+        const name=effect.type==="freeze"?"冰封":effect.type==="petrify"?"石化":effect.type==="frostbite"?"凍傷":effect.type;
+        addBattleLog((entity.id||entity.name||"目標")+"的"+name+"效果已解除。");
+    }
+}
+function beginBattleDurationAction(event){
+    const entry=event&&event.queue&&event.queue[event.index];
+    const entity=battleDurationEntityForEntry(entry);
+    if(!entity||battleDurationNumber(entity.hp)<=0){ battleDurationAction=null; return; }
+    const snapshot=snapshotBattleActionDuration(entity);
+    battleDurationAction={
+        token:event.token,index:event.index,entry:entry,entity:entity,
+        buffs:snapshot.buffs,statuses:snapshot.statuses
+    };
+}
+function finishBattleDurationAction(){
+    /* Action Finish is notification only. Round-End is the sole consumer. */
+    battleDurationAction=null;
+    if(typeof v143SyncStatusVisualEffects==="function"){
+        v143SyncStatusVisualEffects(false);
+    }
+}
+if(typeof window!=="undefined"){
+    window.v175DurationLifecycleActive=true;
+    window.FourSymbolsDurationLifecycle=Object.freeze({
+        beginAction:beginBattleDurationAction,
+        finishAction:finishBattleDurationAction,
+        snapshotFor:entity=>snapshotBattleActionDuration(entity),
+        registerBuffExpiryHandler(handler){
+            if(typeof handler!=="function"){ return function(){}; }
+            battleDurationBuffExpiryHandlers.add(handler);
+            return function(){ battleDurationBuffExpiryHandlers.delete(handler); };
+        }
+    });
+}
+
 if(typeof window!=="undefined"){
     window.FourSymbolsBattleFlow=Object.freeze({
         subscribeActionFinished(observer){
@@ -4299,6 +4071,43 @@ function clearBattleRoundPrompt(){
     }
 }
 
+function clearBattleActionNotice(){
+    if(battleActionNoticeTimeoutId){
+        clearTimeout(battleActionNoticeTimeoutId);
+        battleActionNoticeTimeoutId=null;
+    }
+    const notice=typeof document!=="undefined"
+        ?document.getElementById("battleActionNotice")
+        :null;
+    if(notice){
+        notice.hidden=true;
+        notice.classList.remove("show");
+    }
+}
+
+function showBattleActionNotice(message){
+    const page=typeof document!=="undefined"
+        ?document.getElementById("battlePage")
+        :null;
+    if(!page){ return false; }
+
+    clearBattleActionNotice();
+    let notice=document.getElementById("battleActionNotice");
+    if(!notice){
+        notice=document.createElement("div");
+        notice.id="battleActionNotice";
+        notice.className="battle-round-prompt battle-action-notice";
+        notice.setAttribute("role","status");
+        notice.setAttribute("aria-live","polite");
+        page.appendChild(notice);
+    }
+    notice.textContent=String(message||"");
+    notice.hidden=false;
+    notice.classList.add("show");
+    battleActionNoticeTimeoutId=setTimeout(clearBattleActionNotice,1800);
+    return true;
+}
+
 function showAutoBattleRoundPrompt(token){
     clearBattleRoundPrompt();
     if(!battleActive||token!==battleToken||!autoBattle){ return false; }
@@ -4380,6 +4189,9 @@ function finishBattleStatisticsSession(result){
     if(owner&&typeof owner.finish==="function"){
         owner.finish({result:String(result||"")});
     }
+    closeBattleStatusDetailModal();
+    setBattleInfoExpanded(false);
+    syncBattleUiPriorityLayer();
     activeBattleStatisticsAction=null;
 }
 
@@ -4485,8 +4297,10 @@ function interceptBattleActionFinish(){
     return false;
 }
 function notifyBeforeCombatant(token){
+    const event={token:token,turn:turn,index:initiativeIndex,queue:initiativeQueue};
+    beginBattleDurationAction(event);
     battleBeforeCombatantObservers.forEach(observer=>{
-        try{ observer({token:token,turn:turn,index:initiativeIndex,queue:initiativeQueue}); }
+        try{ observer(event); }
         catch(error){ console.error("戰鬥佇列觀察器失敗：",error); }
     });
 }
@@ -4500,6 +4314,7 @@ function notifyBattleRoundBoundary(type,token){
         try{ observer({token:token,turn:roundNumber,type:type}); }
         catch(error){ console.error("戰鬥回合邊界觀察器失敗：",error); }
     });
+    if(type==="round_end"){ consumeRoundEndDurations(); }
     return true;
 }
 function getBattleAdvanceDelay(phase){
@@ -4763,6 +4578,53 @@ const autoConfig3 = {
 
 };
 
+/* The only Phase 4 local restore owner: explicit, same-UID preferences only.
+ * Never hydrate a partial cloud record as a full gameplay save. */
+function restoreAutoBattlePreferences(uid,preferences){
+    const repository=window.FourSymbolsAccountSave;
+    if(!repository||!uid||repository.getActiveUid()!==uid||SAVE_KEY!==repository.saveKey(uid)){
+        throw new Error("Cloud preferences cannot be applied to a different UID.");
+    }
+    const local=repository.readForUid(uid);
+    if(local.status!=="ready"||!local.save?.player?.id||player.id!==local.save.player.id){
+        throw new Error("A verified local character is required to restore preferences.");
+    }
+    const keys=["autoConfig","autoConfig2","autoConfig3"];
+    const fields=["enabled","skill","hp","sp","returnToCityWhenEmpty"];
+    if(!preferences||typeof preferences!=="object"||Array.isArray(preferences)||
+       Object.keys(preferences).length!==keys.length+1||Object.keys(preferences).some(key=>key!=="characterIds"&&!keys.includes(key))||
+       !Array.isArray(preferences.characterIds)||preferences.characterIds.length!==3||
+       [local.save.player,local.save.player2,local.save.player3].some((character,index)=>
+           (character?.id||null)!==preferences.characterIds[index])){
+        throw new Error("Cloud preferences contain unsupported fields.");
+    }
+    const snapshot={};
+    for(const key of keys){
+        const value=preferences[key];
+        if(!value||typeof value!=="object"||Array.isArray(value)||
+           Object.keys(value).length!==fields.length||Object.keys(value).some(field=>!fields.includes(field))||
+           typeof value.enabled!=="boolean"||typeof value.returnToCityWhenEmpty!=="boolean"||
+           typeof value.skill!=="string"||!/^[A-Za-z][A-Za-z0-9_-]{0,63}$/.test(value.skill)||
+           !Number.isInteger(value.hp)||value.hp<0||value.hp>100||
+           !Number.isInteger(value.sp)||value.sp<0||value.sp>100){
+            throw new Error("Cloud preferences are invalid.");
+        }
+        snapshot[key]=Object.fromEntries(fields.map(field=>[field,value[field]]));
+    }
+    const targets={autoConfig,autoConfig2,autoConfig3};
+    const previous=Object.fromEntries(keys.map(key=>[key,{...targets[key]}]));
+    try{
+        for(const key of keys){ Object.assign(targets[key],snapshot[key]); }
+        if(saveGame({source:"cloud-preferences-restore"})!==true){
+            throw new Error("Failed to save the restored preferences locally.");
+        }
+        return true;
+    }catch(error){
+        for(const key of keys){ Object.assign(targets[key],previous[key]); }
+        throw error;
+    }
+}
+
 
 /* V111：HP／SP 自動補給門檻統一為 25／50／75／90／100%。
    舊存檔可能仍保存 20、30、40、60、70、80 等值；
@@ -4797,7 +4659,7 @@ const pendingStats = {
 
     intelligence:0,
 
-    spirit:0,
+    defensePoints:0,
 
     agility:0
 
@@ -4827,8 +4689,6 @@ function getStatusCharacterObject(){
     return player;
 
 }
-
-
 let currentSkillCharacter =
     "fire";
 
@@ -4963,6 +4823,13 @@ function spawnButtonRipple(
     clientX,
     clientY
 ){
+
+    // Item controls already receive the shared V141 pointer feedback.
+    // The legacy per-button ripple uses browser pixels inside the projected
+    // legacy stage and survives close/reopen, creating scrollable overflow.
+    if(button.closest("#itemModal,#inventoryPage")||button.matches("#bottomNav [onclick*='inventory'],[onclick*='v148OpenContextInventory'],[onclick*='openMapInventoryOverlay']")){
+        return;
+    }
 
     const now=
         Date.now();
@@ -5827,7 +5694,6 @@ function creationAdd(stat,amount){
         creationStats[stat]++;
 
         creationPoints--;
-
     }
     else{
 
@@ -5876,9 +5742,9 @@ function updateCreationUI(){
         creationStats.intelligence;
 
 
-    $("creationSpirit")
+    $("creationDefense")
         .textContent =
-        creationStats.spirit;
+        creationStats.defensePoints;
 
 
     $("creationAgility")
@@ -6014,9 +5880,9 @@ function updateCreationUI2(){
         creationStats2.intelligence;
 
 
-    $("creation2Spirit")
+    $("creation2Defense")
         .textContent =
-        creationStats2.spirit;
+        creationStats2.defensePoints;
 
 
     $("creation2Agility")
@@ -6167,7 +6033,7 @@ function buildAdditionalCharacter(id,element,gender){
         vitality:creationStats.vitality,
         energy:creationStats.energy,
         intelligence:creationStats.intelligence,
-        spirit:creationStats.spirit,
+        defensePoints:creationStats.defensePoints,
         agility:creationStats.agility,
         bonusHP:0,
         bonusSP:0,
@@ -6455,8 +6321,8 @@ function createSecondCharacter(){
         intelligence:
             creationStats2.intelligence,
 
-        spirit:
-            creationStats2.spirit,
+        defensePoints:
+            creationStats2.defensePoints,
 
         agility:
             creationStats2.agility,
@@ -6586,7 +6452,8 @@ function createSecondCharacter(){
    ★ 創角完成
 ===================================================== */
 
-function createCharacter(){
+let initialCharacterCreationPending=false;
+async function createCharacter(){
 
     if(creationTargetSlot===2 || creationTargetSlot===3){
         createAdditionalCharacter(creationTargetSlot);
@@ -6644,34 +6511,88 @@ function createCharacter(){
         return false;
     }
 
+    if(initialCharacterCreationPending){ return false; }
+    const accountSave=window.FourSymbolsAccountSave;
+    const uid=window.FourSymbolsStartupPolicy.getUid();
+    const firebase=window.FourSymbolsFirebase;
+    let local,legacy;
+    try{
+        local=accountSave.readForUid(uid);
+        legacy=accountSave.inspectLegacy();
+    }catch(error){
+        console.error("創角前無法驗證原裝置資料；未建立角色。",error);
+        return false;
+    }
+    if(accountSave.getActiveUid()!==uid||local.status!=="empty"||
+       legacy.status!=="none"||creationPoints!==0||
+       !firebase||typeof firebase.createInitialCanonicalCharacter!=="function"){
+        console.error("創角需要全新帳號、完整配點與已確認的雲端服務；未建立角色。");
+        return false;
+    }
+    const selection={displayName:id,element:selectedCreationElement,
+        gender:player.gender==="male"?"male":"female",
+        attributes:Object.fromEntries(Object.keys(creationStats).map(key=>
+            [key,creationStats[key]]))};
+    initialCharacterCreationPending=true;
+    try{
+        const bootstrap=await firebase.bootstrapCloudSave();
+        if(accountSave.getActiveUid()!==uid||
+           !window.FourSymbolsStartupPolicy.canCreateCharacter()||
+           accountSave.readForUid(uid).status!=="empty"){
+            throw new Error("Account changed during creation.");
+        }
+        const committed=await firebase.createInitialCanonicalCharacter(
+            selection,bootstrap.serverRevision);
+        if(committed.authoritativeStateReady!==false||
+           !Number.isSafeInteger(committed.sourceRevision)||
+           accountSave.getActiveUid()!==uid||
+           !window.FourSymbolsStartupPolicy.canCreateCharacter()||
+           accountSave.readForUid(uid).status!=="empty"){
+            throw new Error("Canonical creation response or account changed.");
+        }
+    }catch(error){
+        initialCharacterCreationPending=false;
+        console.error("受保護創角未完成；本機角色尚未建立。",error);
+        const oldAccount=String(error&&error.message||"")
+            .includes("Existing accounts require the original-device migration path");
+        alert(oldAccount
+            ?"此帳號需要保留原手機角色並走遷移流程，不能當作全新帳號創角。"
+            :"創角尚未完成，請保持原帳號並重試相同的角色選擇。舊手機角色請走遷移流程。");
+        return false;
+    }
+
     const previousPlayer=JSON.parse(JSON.stringify(player));
+    selectedCreationElement=selection.element;
+    Object.keys(creationStats).forEach(key=>{ creationStats[key]=selection.attributes[key]; });
+    creationPoints=0;
     player.id=id;
+    player.gender=selection.gender;
 
     player.element =
-        selectedCreationElement;
+        selection.element;
 
 
     player.attack =
-        creationStats.attack;
+        selection.attributes.attack;
 
     player.vitality =
-        creationStats.vitality;
+        selection.attributes.vitality;
 
     player.energy =
-        creationStats.energy;
+        selection.attributes.energy;
 
     player.intelligence =
-        creationStats.intelligence;
+        selection.attributes.intelligence;
 
-    player.spirit =
-        creationStats.spirit;
+    player.defensePoints =
+        selection.attributes.defensePoints;
 
     player.agility =
-        creationStats.agility;
+        selection.attributes.agility;
 
 
     player.attributePoints =
-        creationPoints;
+        0;
 
     player.skillPoints =
         INITIAL_CHARACTER_SKILL_POINTS;
@@ -6722,12 +6643,17 @@ function createCharacter(){
         Object.assign(player,previousPlayer);
         console.error("創角存檔失敗；角色未建立。",
             new Error("Account save commit failed."));
+        initialCharacterCreationPending=false;
         return false;
     }
 
+    initialCharacterCreationPending=false;
     window.FourSymbolsStartupPolicy.notifyCharacterCreated();
     $("creationPage").style.display="none";
     $("gameInterface").style.display="block";
+    if(typeof window.syncCreationTouchMode==="function"){
+        window.syncCreationTouchMode();
+    }
     return true;
 
 }
@@ -6740,6 +6666,13 @@ function createCharacter(){
 function saveGame(options={}){
 
     if(deleteAllCharactersInProgress){
+        return false;
+    }
+
+    // Feature runtimes can request a save while the new-account creation
+    // screen is open. An empty shell must not become a UID-owned character
+    // save: it would block the protected first-character transaction.
+    if(!player||!String(player.id||"").trim()){
         return false;
     }
 
@@ -6828,7 +6761,6 @@ function saveGame(options={}){
 
             commissionQuestState:
                 commissionQuestState,
-
             bestiaryData:
                 bestiaryData,
 
@@ -7048,6 +6980,18 @@ function normalizeHydratedRetiredSkillReferences(){
 }
 
 
+function migrateLegacySixStats(character){
+    if(!character||typeof character!=="object"){ return character; }
+    const legacySpirit=Number(character.spirit);
+    if(Number.isFinite(legacySpirit)&&legacySpirit>0){
+        character.attributePoints=Math.max(0,Number(character.attributePoints)||0)+Math.max(0,legacySpirit);
+    }
+    delete character.spirit;
+    if(!Number.isFinite(Number(character.defensePoints))){ character.defensePoints=0; }
+    character.defensePoints=Math.max(0,Number(character.defensePoints)||0);
+    return character;
+}
+
 function loadGame(){
 
     const resolvedSave=arguments[0]||null;
@@ -7102,6 +7046,7 @@ function loadGame(){
             player,
             data.player
         );
+        migrateLegacySixStats(player);
 
 
         /*
@@ -7114,7 +7059,7 @@ function loadGame(){
             "vitality",
             "energy",
             "intelligence",
-            "spirit",
+            "defensePoints",
             "agility"
         ];
 
@@ -7480,6 +7425,7 @@ function loadGame(){
 
             player2=
                 data.player2;
+            migrateLegacySixStats(player2);
 
             if(
                 !characters.some(
@@ -7537,6 +7483,7 @@ function loadGame(){
 
         if(data.player3){
             player3=data.player3;
+            migrateLegacySixStats(player3);
             if(!characters.some(c=>c.id==="player3")){
                 characters.push({id:"player3",name:player3.id});
             }
@@ -7631,6 +7578,9 @@ function loadGame(){
 
 
         normalizeHydratedRetiredSkillReferences();
+        if(typeof window!=="undefined"&&typeof window.v17364NormalizeCrossElementEquips==="function"){
+            window.v17364NormalizeCrossElementEquips();
+        }
 
 
         /*
@@ -7691,7 +7641,7 @@ function loadGame(){
                     item &&
                     item.id
                 ){
-
+                    migrateLegacyEquipmentStats(item);
                     inventoryItems.push(
                         item
                     );
@@ -7827,8 +7777,7 @@ function loadGame(){
            導覽列、真的觸發一次showPage()，
            標題列才會消失。這裡補上，讀檔
            成功、遊戲畫面顯示出來的同時，
-           就正確套用一次。
-        */
+           就正確套用一次。        */
 
         showPage(
             "home"
@@ -7940,7 +7889,28 @@ async function resetGame(){
    V115 — 巡怪頁內背包浮層
    只改開啟方式；背包資料、裝備、物品詳情、出售等仍沿用原函式。
 ===================================================== */
-let mapInventoryOverlayOpen=false;
+let inventoryOpenContext=null;
+
+function inventoryContextSnapshot(context){
+    const sourcePage=String(context&&context.sourcePage||"map");
+    return Object.freeze({
+        sourcePage,
+        returnAction:String(context&&context.returnAction||""),
+        closeBehavior:String(context&&context.closeBehavior||"restore-source")
+    });
+}
+
+function openInventoryContext(context){
+    if(typeof battleActive!=="undefined"&&battleActive){ return false; }
+    const normalized=inventoryContextSnapshot(context);
+    showPage("inventory");
+    inventoryOpenContext=normalized;
+    const app=document.getElementById("app");
+    if(app){ app.classList.add("inventory-context-open"); app.classList.remove("inventory-overlay-open"); }
+    setMapInventoryScrollGate(true);
+    return true;
+}
+window.openInventoryContext=openInventoryContext;
 
 function setMapInventoryScrollGate(enabled){
     [
@@ -7955,41 +7925,16 @@ function setMapInventoryScrollGate(enabled){
     });
 }
 
-function openMapInventoryOverlay(){
-    const mapPage=$("mapPage");
-    const inventoryPage=$("inventoryPage");
-
-    if(
-        battleActive ||
-        !mapPage ||
-        !mapPage.classList.contains("active") ||
-        !inventoryPage
-    ){
-        return;
-    }
-
-    mapInventoryOverlayOpen=true;
-    inventoryPage.classList.add("map-inventory-overlay-open");
-    setMapInventoryScrollGate(true);
-
-    if(typeof renderInventory==="function"){
-        renderInventory();
-    }
-
-    const scroller=$("inventoryGridScroll");
-    if(scroller){
-        scroller.scrollTop=0;
-    }
+function openMapInventoryOverlay(context){
+    return openInventoryContext(context);
 }
 
 function closeMapInventoryOverlay(){
+    const context=inventoryOpenContext||inventoryContextSnapshot({sourcePage:"inventory"});
+    inventoryOpenContext=null;
+    const app=document.getElementById("app");
+    if(app){ app.classList.remove("inventory-context-open","inventory-overlay-open"); }
     const inventoryPage=$("inventoryPage");
-
-    mapInventoryOverlayOpen=false;
-
-    if(inventoryPage){
-        inventoryPage.classList.remove("map-inventory-overlay-open");
-    }
 
     if(typeof closeItemModal==="function"){
         closeItemModal();
@@ -7998,12 +7943,15 @@ function closeMapInventoryOverlay(){
         closeInventoryCharacterDetail();
     }
 
-    /* 若不是正式背包頁，才關閉祖層 pan-y 放行。 */
-    const directInventoryActive=
-        inventoryPage && inventoryPage.classList.contains("active");
-
-    if(!directInventoryActive){
-        setMapInventoryScrollGate(false);
+    if(context.sourcePage==="map"&&typeof leaveMap==="function"){
+        leaveMap();
+    }else if(["dungeon","gameplay","gameplayPage","boss","bossPage","tower","towerPage","training","trainingPage"].includes(context.sourcePage)){
+        if(typeof showPage==="function"){
+            const pageMap={dungeon:"gameplay",gameplay:"gameplay",gameplayPage:"gameplay",boss:"boss",bossPage:"boss",tower:"tower",towerPage:"tower",training:"training",trainingPage:"training"};
+            showPage(pageMap[context.sourcePage]);
+        }
+    }else if(typeof showPage==="function"){
+        showPage("home");
     }
 }
 
@@ -8013,11 +7961,8 @@ function closeMapInventoryOverlay(){
 
 function showPage(page){
 
-    if(
-        page!=="map" &&
-        mapInventoryOverlayOpen
-    ){
-        closeMapInventoryOverlay();
+    if(page==="inventory"&&!inventoryOpenContext){
+        inventoryOpenContext=inventoryContextSnapshot({sourcePage:"inventory",closeBehavior:"navigation"});
     }
 
     if(
@@ -8049,6 +7994,12 @@ function showPage(page){
     target.classList.add(
         "active"
     );
+
+    /* Page activity is part of the Battle Reading Layer lifecycle. Clear a
+       stale document-level paint suppressor synchronously after navigation. */
+    if(typeof syncBattleUiPriorityLayer==="function"){
+        syncBattleUiPriorityLayer();
+    }
 
 
     /*
@@ -8401,43 +8352,6 @@ function showPage(page){
     }
 
 
-    document
-    .querySelectorAll(".nav-button")
-    .forEach(b=>{
-        b.classList.remove(
-            "active"
-        );
-    });
-
-
-    const navMap = {
-
-        home:"homeNav",
-
-        training:"trainingNav",
-
-        dungeon:"dungeonNav",
-
-        gameplay:"bossNav",
-
-        boss:"bossNav",
-
-        tower:"bossNav",
-
-        inventory:"inventoryNav"
-
-    };
-
-
-    if(navMap[page]){
-
-        $(navMap[page])
-            .classList
-            .add("active");
-
-    }
-
-
     if(page==="skill"){
         renderSkillLoadout();
     }
@@ -8473,6 +8387,9 @@ function showPage(page){
 
 
     updateUI();
+    if(typeof window.v148SyncContextNavigation==="function"){
+        window.v148SyncContextNavigation();
+    }else{ window.FourSymbolsBottomNav?.syncContext(); }
 
 }
 
@@ -8827,8 +8744,7 @@ function updateTrainingZoneLocks(){
 
     const lockableZones=[
 
-        {key:"desert",itemId:"trainingZoneItem_desert"},
-        {key:"ice",itemId:"trainingZoneItem_ice"},
+        {key:"desert",itemId:"trainingZoneItem_desert"},        {key:"ice",itemId:"trainingZoneItem_ice"},
         {key:"zone4",itemId:"trainingZoneItem_zone4"},
         {key:"zone5",itemId:"trainingZoneItem_zone5"},
         {key:"zone6",itemId:"trainingZoneItem_zone6"},
@@ -9826,10 +9742,8 @@ function runAutoPatrolCheck(){
                         transitionGeneration!==patrolLifecycleGeneration ||
                         !autoPatrolEnabled ||
                         !isPatrolMapActive()
-                    ){
-                        return;
+                    ){                        return;
                     }
-
 
                     /*
                        ★ 修正（依照使用者回報，
@@ -10652,6 +10566,14 @@ function ensureAutoPatrolInterval(){
    開始戰鬥
 ===================================================== */
 
+function clearTransientBattlePresentation(){
+    if(typeof window==="undefined"){ return; }
+    const feedback=window.FourSymbolsBattleFloatingFeedback;
+    if(feedback&&typeof feedback.clear==="function"){ feedback.clear(); }
+    const presentation=window.FourSymbolsBattlePresentation;
+    if(presentation&&typeof presentation.cleanupEscape==="function"){ presentation.cleanupEscape(); }
+}
+
 function startBattle(triggerIndex){
 
     if(
@@ -10699,6 +10621,7 @@ function startBattle(triggerIndex){
     mapCooldown=true;
 
     battleToken++;
+    clearTransientBattlePresentation();
     battleRoundBoundaryKeys=new Set();
     battlePresentationLocks.clear();
     battleInputResumeToken=null;
@@ -10829,7 +10752,6 @@ function startBattle(triggerIndex){
         player3.isDefending=false;
 
     }
-
 
     /*
        ★ 隨機決定這場戰鬥捲入幾隻怪物（1～3隻），
@@ -11118,14 +11040,8 @@ function startTurn(token){
        結束的話就不要再往下開新回合。
     */
 
-    tickStatusEffects();
-
-    tickPlayerBuffs();
-
-    if(
-        typeof window!=="undefined" &&
-        typeof window.v143SyncStatusVisualEffects==="function"
-    ){
+    /* Round Start only projects already-settled state. */
+    if(typeof window!=="undefined"&&typeof window.v143SyncStatusVisualEffects==="function"){
         window.v143SyncStatusVisualEffects();
     }
 
@@ -11365,6 +11281,11 @@ function beginCharacterTurn(token){
        直接跳過閃爍。
     */
 
+    /* active-turn is a manual-control presentation projection, not a second
+       turn-state owner. Always retire the preceding character's projection
+       before deciding whether the current character needs manual input. */
+    clearActiveCharacterHighlight();
+
     if(!autoOn){
 
         updateActiveCharacterHighlight();
@@ -11547,9 +11468,21 @@ if(typeof window!=="undefined"&&!window.FourSymbolsBattleRuntimeMetrics){
     };
 }
 
+function isCanonicalSkillQuickBarButton(button){
+    if(!button||!button.classList||!button.classList.contains("skill-quick-button")){ return false; }
+    return [
+        ".sq-icon-wrap",".sq-icon-image",".sq-icon-fallback",".sq-sp-block",
+        ".sq-name",".sq-cost",".v135-sq-scope"
+    ].every(selector=>!!button.querySelector(selector));
+}
+
 function ensureSkillQuickBarButtons(bar){
     let buttons=Array.from(bar.children).filter(node=>node.classList&&node.classList.contains("skill-quick-button"));
-    if(bar.children.length===4&&buttons.length===4){
+    if(
+        bar.children.length===4&&
+        buttons.length===4&&
+        buttons.every(isCanonicalSkillQuickBarButton)
+    ){
         return buttons;
     }
 
@@ -11567,9 +11500,7 @@ function ensureSkillQuickBarButtons(bar){
             '<span class="v135-sq-scope"></span>';
         button.onclick=()=>{
             const skillId=button.dataset.skillId||"";
-            if(skillId&&!button.disabled){
-                prepareAction(skillId);
-            }
+            if(skillId&&!button.disabled){ prepareAction(skillId); }
         };
         bar.appendChild(button);
     }
@@ -11592,14 +11523,8 @@ function syncSkillQuickBarButton(button,skillId,skill,skillLevel,spCost,enoughSP
     if(!skillId||!skill){
         button.disabled=true;
         button.classList.remove("sp-insufficient");
-        if(iconImage){
-            iconImage.style.backgroundImage="";
-            iconImage.hidden=true;
-        }
-        if(iconFallback){
-            iconFallback.innerHTML="";
-            iconFallback.hidden=false;
-        }
+        if(iconImage){ iconImage.style.backgroundImage=""; iconImage.hidden=true; }
+        if(iconFallback){ iconFallback.innerHTML=""; iconFallback.hidden=false; }
         if(spBlock){ spBlock.hidden=true; }
         if(nameNode){ nameNode.textContent=skillId?"資料錯誤":"（空）"; }
         if(costNode){ costNode.textContent="—"; }
@@ -11610,10 +11535,8 @@ function syncSkillQuickBarButton(button,skillId,skill,skillLevel,spCost,enoughSP
     button.disabled=!enoughSP;
     button.classList.toggle("sp-insufficient",!enoughSP);
 
-    const iconBackground=
-        typeof getSkillIconBackgroundImage==="function"
-        ?getSkillIconBackgroundImage(skillId)
-        :"";
+    const iconBackground=typeof getSkillIconBackgroundImage==="function"
+        ?getSkillIconBackgroundImage(skillId):"";
 
     if(iconImage){
         iconImage.hidden=!iconBackground;
@@ -11623,11 +11546,9 @@ function syncSkillQuickBarButton(button,skillId,skill,skillLevel,spCost,enoughSP
             iconImage.style.backgroundImage="";
         }
     }
-
     if(iconFallback){
         const fallback=!iconBackground&&typeof getElementIconHTML==="function"
-            ?getElementIconHTML(skill.element)
-            :"";
+            ?getElementIconHTML(skill.element):"";
         iconFallback.hidden=!!iconBackground;
         if(iconFallback.innerHTML!==fallback){ iconFallback.innerHTML=fallback; }
     }
@@ -11641,10 +11562,13 @@ function syncSkillQuickBarButton(button,skillId,skill,skillLevel,spCost,enoughSP
         const text="消耗 "+spCost+" SP";
         if(costNode.textContent!==text){ costNode.textContent=text; }
     }
+
+    const formalSpec=typeof window!=="undefined"?window.FourSymbolsSkillSpec:null;
     if(scopeNode){
-        const targetLabel=typeof window!=="undefined"&&typeof window.v135GetSkillTargetScopeLabel==="function"
-            ?window.v135GetSkillTargetScopeLabel(skill)
-            :"";
+        const targetLabel=formalSpec&&typeof formalSpec.targetLabel==="function"
+            ?formalSpec.targetLabel(skill,Math.max(1,skillLevel||1))
+            :(typeof window!=="undefined"&&typeof window.v135GetSkillTargetScopeLabel==="function"
+                ?window.v135GetSkillTargetScopeLabel(skill):"");
         if(scopeNode.textContent!==targetLabel){ scopeNode.textContent=targetLabel; }
     }
 }
@@ -11786,48 +11710,29 @@ function getBattleActionDisplayName(actionType){
 }
 
 
-function setBattleTargetSelectionMode(actionType){
-
-    const region=
-        $("battleActionRegion");
-
-    const promptAction=
-        $("battleTargetPromptAction");
-
-    if(region){
-        region.classList.add(
-            "target-selecting"
-        );
-    }
-
-    if(promptAction){
-        promptAction.textContent=
-            "選擇 ["+
-            getBattleActionDisplayName(actionType)+
-            "]";
-    }
-
-    currentBattleMonsters.forEach(index=>{
-        const monster=monsters[index];
-        const card=$("battleMonster"+index);
-
-        if(card){
-            card.classList.toggle(
-                "targetable",
-                !!(monster && monster.alive)
-            );
-        }
-    });
-
-    const targetText=
-        $("battleTarget");
-
-    if(targetText){
-        targetText.textContent=
-            "目標：請選擇";
-    }
+function getBattleActionTargetType(actionType,characterIndex){
+    if(actionType==="normal"){ return "single"; }
+    const skill=skillDatabase[actionType];
+    if(!skill){ return "single"; }
+    const key=getPartyCharacterKey(characterIndex);
+    const level=key?getSkillLevel(key,actionType):1;
+    return normalizeBattleTargetType(getEffectiveSkillTargetType(skill,Math.max(1,level||1)));
 }
 
+function setBattleTargetSelectionMode(actionType){
+    const region=$("battleActionRegion");
+    const promptAction=$("battleTargetPromptAction");
+    const targetType=getBattleActionTargetType(actionType,activeBattleCharacterIndex);
+
+    if(region){ region.classList.add("target-selecting"); }
+    if(promptAction){ promptAction.textContent="選擇 ["+getBattleActionDisplayName(actionType)+"]"; }
+    currentBattleMonsters.forEach(index=>{
+        const card=$("battleMonster"+index);
+        if(card){ card.classList.toggle("targetable",canSelectHostileBattlePrimary("monster",index,targetType)); }
+    });
+    const targetText=$("battleTarget");
+    if(targetText){ targetText.textContent="目標：請選擇"; }
+}
 
 function clearBattleTargetSelectionMode(){
 
@@ -11836,7 +11741,6 @@ function clearBattleTargetSelectionMode(){
     if(region){
         region.classList.remove("target-selecting");
     }
-
     document
         .querySelectorAll(
             ".battle-monster.targetable, .battle-monster.target, "+
@@ -12149,6 +12053,7 @@ function prepareAction(type){
 
     if(
         !battleActive ||
+        battlePhase!=="declare" ||
         !activeCharacter ||
         activeCharacter.hp<=0 ||
         autoOn ||
@@ -12161,11 +12066,21 @@ function prepareAction(type){
     const skill =
         skillDatabase[type];
 
+    if(type!=="normal"&&(!skill||skill.category==="passive")){ return; }
+
+    const activeSkillKey=getPartyCharacterKey(activeBattleCharacterIndex);
+    const activeLoadout=characterSkillLoadouts[activeSkillKey];
+
 
     if(
         type!=="normal"&&
         skill
     ){
+        if(!activeLoadout||!(activeLoadout.skillLevels&&Number(activeLoadout.skillLevels[type])>0)||
+            !Array.isArray(activeLoadout.equippedSkills)||!activeLoadout.equippedSkills.includes(type)){
+            addBattleLog("尚未學會或裝備「"+skill.name+"」。");
+            return;
+        }
 
         const spCost =
             skill.spCost!==undefined
@@ -12212,13 +12127,6 @@ function prepareAction(type){
             skill.category==="revive"
         ){
 
-            if(activeBattleCharacterIndex!==0){
-                addBattleLog(
-                    "追加角色目前僅支援手動施放攻擊技能。"
-                );
-                return;
-            }
-
             /* 單體我方技能先選角色；全體技能維持直接宣告。 */
             if(skill.targetType==="ally" || skill.targetType==="allyTri" || skill.targetType==="deadAlly"){
 
@@ -12231,11 +12139,11 @@ function prepareAction(type){
                 );
 
                 if(!hasValidTarget){
-                    addBattleLog(
-                        skill.targetType==="deadAlly"
-                        ? "目前沒有陣亡的隊友可供復活。"
-                        : "目前沒有可選擇的友方目標。"
-                    );
+                    const rejectionMessage=skill.targetType==="deadAlly"
+                        ? "我方目前沒有人死亡，無法使用復活術。"
+                        : "目前沒有可選擇的友方目標。";
+                    addBattleLog(rejectionMessage);
+                    showBattleActionNotice(rejectionMessage);
                     return;
                 }
 
@@ -12263,18 +12171,20 @@ function prepareAction(type){
     }
 
 
-    actionReady=true;
+    const hostileTargetType=getBattleActionTargetType(type,activeBattleCharacterIndex);
 
-    pendingAction=type;
-
-    closeMenus();
-
-    /* V95：選好普攻／傷害技能後立即把戰鬥選項收起，
-       原位置顯示兩行選目標提示，同時讓所有存活敵人
-       出現閃爍準星。傷害與技能結算規則完全不改。 */
-    setBattleTargetSelectionMode(
-        type
+    const hasSelectablePrimary=currentBattleMonsters.some(index=>
+        canSelectHostileBattlePrimary("monster",index,hostileTargetType)
     );
+    if(!hasSelectablePrimary){
+        addBattleLog("目前沒有可被"+getBattleActionDisplayName(type)+"選中的目標。");
+        return;
+    }
+
+    actionReady=true;
+    pendingAction=type;
+    closeMenus();
+    setBattleTargetSelectionMode(type);
 
 }
 
@@ -12289,6 +12199,14 @@ function selectBattleTarget(index){
         return;
     }
 
+    /* During a real hostile-target declaration, Stealth and the formal
+       Target Shape gate primary selection. Outside declaration mode this
+       helper may still project an already-resolved/programmatic target
+       (Boss objects, QA, replay/presentation) without inventing an action. */
+    if(actionReady&&pendingAction){
+        const targetType=getBattleActionTargetType(pendingAction,activeBattleCharacterIndex);
+        if(!canSelectHostileBattlePrimary("monster",index,targetType)){ return; }
+    }
 
     selectedMonster=index;
 
@@ -12582,9 +12500,6 @@ function getOrdinaryDamageBonusPercent(options){
     if(attacker&&typeof getElementDamagePassiveMultiplier==="function"){
         total+=(Math.max(0,Number(getElementDamagePassiveMultiplier(attacker))||1)-1)*100;
     }
-    if(skill&&target&&typeof getPhysicalSkillRankBonusMultiplier==="function"){
-        total+=(Math.max(0,Number(getPhysicalSkillRankBonusMultiplier(skill,target))||1)-1)*100;
-    }
     if(
         attacker&&target&&attacker.element==="fire"&&
         typeof getLearnedElementEX==="function"&&getLearnedElementEX(attacker,"fire")&&
@@ -12598,6 +12513,11 @@ function getOrdinaryDamageBonusPercent(options){
     }
     if(skill&&Number.isFinite(Number(skill.damageBonusPercent))){
         total+=Number(skill.damageBonusPercent);
+    }
+    if(attacker&&typeof window!=="undefined"&&window.FourSymbolsSkillDamageContext&&
+        window.FourSymbolsSkillDamageContext.attacker===attacker&&
+        window.FourSymbolsSkillDamageContext.skill===skill){
+        total+=Number(window.FourSymbolsSkillDamageContext.directSkillBonusPercent)||0;
     }
 
     const extras=Array.isArray(resolved.ordinaryDamageBonusPercent)
@@ -12654,6 +12574,27 @@ window.v173GetOrdinaryDamageMultiplier=getOrdinaryDamageMultiplier;
 window.v173GetEnemyPressureMultiplier=getEnemyPressureMultiplier;
 window.v173GetDamageBudgetMultiplier=getDamageBudgetMultiplier;
 
+/* Tower modifiers only project explicit tower metadata into the canonical owners. */
+function getTowerDirectDamageMultiplier(attacker,damageOptions){
+    const options=damageOptions||{};
+    const kind=String(options.damageKind||"direct");
+    const skill=options.skill;
+    const directSkill=!skill||skill.category==="physical"||skill.category==="magic";
+    return attacker&&attacker.vGameplayTower===true&&attacker.canAct!==false&&
+        attacker.vGameplayBossObject!==true&&kind==="direct"&&directSkill
+        ?Math.max(1,Number(attacker.vTowerDirectDamageMultiplier)||1):1;
+}
+function getTowerStatusAccuracyBonus(caster){
+    return caster&&caster.vGameplayTower===true&&caster.canAct!==false
+        ?Number(caster.vTowerStatusAccuracyPercent)||0:0;
+}
+function getMonsterCriticalChance(monster,targetAntiCrit=0){
+    const rage=getActiveRageCriticalBonuses(monster);
+    const towerBonus=monster&&monster.vGameplayTower===true?Number(monster.vTowerCriticalBonusPercent)||0:0;
+    const baseChance=10+rage.chance+towerBonus;
+    const chance=monster&&monster.vGameplayTower===true?Math.min(CRIT_CHANCE_MAX,baseChance):baseChance;
+    return Math.max(CRIT_CHANCE_MIN_AFTER_ANTI_CRIT,chance-(Number(targetAntiCrit)||0));
+}
 function calculateDamage(
     attack,
     defense,
@@ -12667,7 +12608,9 @@ function calculateDamage(
     const safeAttack=Math.max(0,Number(attack)||0);
     const safeDefense=Math.max(0,Number(defense)||0);
     const levelFactor=getDamageLevelMultiplier(casterLevel,targetLevel);
-    const elementFactor=getElementalDamageMultiplier(casterElement,targetElement);
+    /* Element counter is character DNA, never the skill visual identity. */
+    const attacker=getDamageContextAttacker(options);
+    const elementFactor=getElementalDamageMultiplier((attacker&&attacker.element)||casterElement,targetElement);
     const formulaConstant=getDamageFormulaConstant(targetLevel);
     const defenseFactor=formulaConstant/(formulaConstant+safeDefense);
     const ordinaryFactor=getOrdinaryDamageMultiplier(options);
@@ -12675,17 +12618,17 @@ function calculateDamage(
     const criticalFactor=Number.isFinite(requestedCrit)
         ?Math.max(1,Math.min(FINAL_CRITICAL_MULTIPLIER_MAX,requestedCrit))
         :1;
-    const attacker=getDamageContextAttacker(options);
     const pressureFactor=getEnemyPressureMultiplier(attacker,options.target||null);
     const bossOwner=typeof window!=="undefined"?window.FourSymbolsBossBattle:null;
     const bossDamageFactor=bossOwner&&typeof bossOwner.getOutgoingDamageMultiplier==="function"
         ?Math.max(0,Number(bossOwner.getOutgoingDamageMultiplier(attacker))||0):1;
+    const towerFactor=getTowerDirectDamageMultiplier(attacker,options);
     const budgetFactor=getDamageBudgetMultiplier(options);
     const randomFactor=0.95+Math.random()*0.10;
 
     const result=
         safeAttack*levelFactor*elementFactor*defenseFactor*
-        ordinaryFactor*criticalFactor*pressureFactor*bossDamageFactor*budgetFactor*randomFactor;
+        ordinaryFactor*criticalFactor*pressureFactor*bossDamageFactor*towerFactor*budgetFactor*randomFactor;
 
     if(!Number.isFinite(result)){ return 1; }
     return Math.max(1,Math.round(result));
@@ -12695,47 +12638,20 @@ function calculateDamage(
    命中／閃躲唯一正式公式 Owner
 
    最終命中率 =
-   95 + 命中×0.15 + 最終命中加成
+   95 + 命中% + 最終命中加成
    - 目標最終閃躲 - 最終命中下降。
 
    所有百分比效果皆是「最終百分點」加減，不再先封頂命中後
-   乘上 (1 - 閃躲率)。最後統一限制在 70%～99%。
-   普通怪物未明確指定 evasion 時，使用 min(10%, 等級×0.1%)。
+   乘上 (1 - 閃躲率)。最後統一限制在 5%～99%。
+   普通怪物未明確指定 evasion 時為 0%；等級不影響命中／閃避。
 ===================================================== */
 
 const HIT_CHANCE_BASE = 95;
-const HIT_CHANCE_ACCURACY_COEFFICIENT = 0.15;
-const HIT_CHANCE_MIN_PERCENT = 70;
+const HIT_CHANCE_MIN_PERCENT = 5;
 const HIT_CHANCE_MAX_PERCENT = 99;
 
 
-/*
-   ★ 修正（依照使用者要求，怪物六圍系統
-   完成後，這三個函式改成直接讀怪物身上
-   真正算好的數值，不再用等級概略換算）：
-   makeZoneMonster()已經把evasion/accuracy/
-   resistance/agility這些最終數值算好存在
-   怪物物件上了（跟玩家getBaseStats()同一套
-   公式：預設閃避=min(30%,等級×0.3%)、命中=精神×2、一般異常抗性=精神×0.05、
-   行動順序用的速度=敏捷原始點數），
-   這裡直接讀出來，不用再另外算一次。
-
-   保留monster.xxx===undefined時的舊公式
-   當作防呆備援，理論上不會用到（現在
-   makeZoneMonster()一定會給這些欄位），
-   純粹避免萬一有漏網的怪物資料格式沒對齊
-   而整個壞掉。
-*/
-
-/*
-   ★ 修正（依照使用者要求，接上風系/土系
-   技能的減益效果）：
-   敏捷與命中屬性層只處理 agilityDown 與
-   statDown 等真正會修改能力值的減益。
-   stun（暈眩）不再修改命中屬性本身；它會在
-   rollHitChance() 的最後一步，直接降低最終命中率，
-   讓技能描述與實戰計算一致。
-*/
+/* Evasion, Accuracy, Status Resistance, and Speed are explicit monster combat fields. */
 
 function getMonsterEvasion(monster){
 
@@ -12743,16 +12659,12 @@ function getMonsterEvasion(monster){
 
     const base=monster.evasion!==undefined
         ?Number(monster.evasion)||0
-        :getDefaultMonsterEvasion(monster.level);
+        :0;
 
-    const agilityDown=getMonsterDebuffValue(monster,"agilityDown");
-    const statDown=getStatDownPercentFor(monster,"agility");
     const frostbitePenalty=getFrostbiteFinalPercentPointPenalty(monster);
 
     return combineEvasionRates([
         base,
-        -agilityDown,
-        -statDown,
         -frostbitePenalty
     ]);
 
@@ -12785,20 +12697,10 @@ function getMonsterAccuracy(monster){
 
         monster.accuracy!==undefined
         ? monster.accuracy
-        : monster.level*2;
+        : 0;
 
 
-    const statDown=
-        getStatDownPercentFor(
-            monster,
-            "spirit"
-        );
-
-
-    return Math.max(
-        0,
-        base*(1-statDown/100)
-    );
+    return Math.max(0,Number(base)||0);
 
 }
 
@@ -12817,7 +12719,6 @@ function getMonsterAgility(monster){
             monster,
             "agilityDown"
         );
-
     const statDown=
         getStatDownPercentFor(
             monster,
@@ -13583,7 +13484,6 @@ function resolveQueuedPlayerAction(characterIndex,token){
 
             }
             else{
-
                 castSecondaryCharacterSkill(
                     characterIndex,
                     queued.action,
@@ -13675,39 +13575,48 @@ function resolveQueuedPlayerAction(characterIndex,token){
    命中判定的所有加減效果都在最後以百分點結算。
    directChanceReductionPercent 是最終命中下降，
    directChanceBonusPercent 是最終命中提升。
-   目標閃躲同樣直接扣除百分點，最後才統一 clamp 70%～99%。
+   目標閃躲同樣直接扣除百分點，最後才統一 clamp 5%～99%。
 */
 
 function calculateHitChancePercent(
     casterAccuracy,
     targetEvasion,
     directChanceReductionPercent,
-    directChanceBonusPercent
+    directChanceBonusPercent,
+    targetCharacter
 ){
     const chance=
         HIT_CHANCE_BASE+
-        Math.max(0,Number(casterAccuracy)||0)*HIT_CHANCE_ACCURACY_COEFFICIENT+
+        (Number(casterAccuracy)||0)+
         (Number(directChanceBonusPercent)||0)-
         Math.max(0,Number(targetEvasion)||0)-
         Math.max(0,Number(directChanceReductionPercent)||0);
 
-    return Math.max(
+    const normalFinalChance=Math.max(
         HIT_CHANCE_MIN_PERCENT,
         Math.min(HIT_CHANCE_MAX_PERCENT,chance)
     );
+    const windEx=targetCharacter&&targetCharacter.element==="wind"
+        ?getLearnedElementEX(targetCharacter,"wind"):null;
+    const lowHp=targetCharacter&&Number(targetCharacter.hp)<Number(getPartyBattleStats(getPartyCharacterIndex(targetCharacter))?.maxHP)*0.25;
+    return windEx&&lowHp
+        ?Math.min(normalFinalChance,Number(windEx.lowHpFinalHitCapPercent)||50)
+        :normalFinalChance;
 }
 
 function rollHitChance(
     casterAccuracy,
     targetEvasion,
     directChanceReductionPercent,
-    directChanceBonusPercent
+    directChanceBonusPercent,
+    targetCharacter
 ){
     return Math.random()*100<calculateHitChancePercent(
         casterAccuracy,
         targetEvasion,
         directChanceReductionPercent,
-        directChanceBonusPercent
+        directChanceBonusPercent,
+        targetCharacter
     );
 }
 
@@ -13765,68 +13674,17 @@ function calculateSkillDamage(skillOrOptions,statBonus,monster,casterLevel,caste
 }
 
 
-/* =====================================================
-   ★ 異常狀態命中機率公式（新增）
-
-   規格（使用者原話）：
-   「精神越高，抗性就越高，就不容易被異常狀態命中。
-     智力越高，異常狀態命中機率就越高，
-     再加上等級壓制也會影響整體機率」
-
-   一般異常最終機率 = 基礎機率×等級差倍率
-     + 物理攻擊力或智力×0.05
-     - 目標精神×0.05
-     - 額外異常抗性，最後限制在5%～95%。
-
-   冰封、石化等硬控維持獨立公式：屬性加成為
-   sqrt(物攻或智力)×0.2，精神與稀有度上限沿用既有規則。
-
-   ★ 修正（依照使用者要求，「鎖死行動的
-   技能獨立設一組範圍，5%~60%」）：
-   原本全部異常狀態（燃燒/敏捷降低/防禦
-   降低/暈眩/冰封/石化……）共用同一組
-   5%~95%上下限，但冰封/石化這兩種是
-   「整回合完全無法行動」，跟其他只是
-   削弱數值的debuff，效果份量差太多，
-   不該共用同一組機率上限——不然智力
-   堆一堆，冰封機率也能衝到9成，等於
-   讓對手整場都動不了，太強。
-
-   isLockdown 參數供冰封／石化呼叫時傳 true；
-   其他一般debuff（敏捷/
-   防禦/全屬性降低、暈眩）維持原本的
-   5%~95%，不受影響。
-===================================================== */
+/* Status and hard-control chance owner. Attribute inputs are independent combat stats; no six-stat resistance is injected. */
 
 const STATUS_OFFENSE_ATTRIBUTE_COEFFICIENT = 0.05;
 
-/*
-   一般異常每1點精神降低0.05個百分點命中率；
-   硬控仍在獨立公式使用原本的0.3係數。
-*/
-function calculateStatusResistancePercent(spiritPoints){
-    return Math.max(0,Number(spiritPoints)||0)*STATUS_RESIST_PER_SPIRIT_POINT;
-}
+/* Status resistance is supplied as an independent final combat stat. */
 
 const STATUS_HIT_MIN_PERCENT = 5;
 
 const STATUS_HIT_MAX_PERCENT = 95;
 
-/*
-   ★ 修正（依照使用者要求，「限制行動的
-   異常狀態常數修改」，改成依怪物等級
-   分三個等級各自的上下限）：
-   鎖死行動類技能（冰封/石化）依目標怪物
-   稀有度使用普通80%、精英60%、BOSS40%的上限。
-
-   怎麼判斷一隻怪物是「野怪」還是「精英怪」：
-   看getMonsterRank()——目前規則很單純，
-   名字結尾是「王」就算精英怪，其餘都算
-   野怪；如果之後怪物資料想更精準指定
-   （不只靠名字判斷），可以額外加一個
-   monster.rank欄位，getMonsterRank()
-   會優先看這個欄位，沒有才退回看名字。
-*/
+/* Hard control: Player→Regular 90, Elite 75, Boss 60; Enemy→Player 60. */
 
 const LOCKDOWN_HIT_BOUNDS = {
 
@@ -13876,104 +13734,34 @@ function getMonsterRank(monster){
 
 /* The one formal category chooser for enemy skills.  Callers provide only
    legal entries, so an empty category always falls back without re-rolling. */
-function chooseEnemySkillCategory(attackSkillIds,buffSkillIds,randomValue){
+function chooseEnemySkillCategory(attackSkillIds,buffSkillIds,randomValue,monster){
     const attacks=Array.isArray(attackSkillIds)?attackSkillIds.filter(Boolean):[];
     const buffs=Array.isArray(buffSkillIds)?buffSkillIds.filter(Boolean):[];
     if(!attacks.length&&!buffs.length){ return "normal"; }
     if(!attacks.length){ return "buff"; }
     if(!buffs.length){ return "attack"; }
-    return Number(randomValue)<.70?"attack":"buff";
+    const attackWeight=monster&&monster.vGameplayTower===true&&monster.element==="water"?.30:.70;
+    return Number(randomValue)<attackWeight?"attack":"buff";
 }
 window.FourSymbolsEnemySkillAI=Object.freeze({
     chooseCategory:chooseEnemySkillCategory,
+    enterSkillDecision:function(monster,randomValue){
+        if(!monster||monster.alive===false||monster.canAct===false||isMonsterFrozen(monster)||isMonsterPetrified(monster)){ return false; }
+        const pool=typeof window.v144GetLegalMonsterSkillIds==="function"
+            ?[...window.v144GetLegalMonsterSkillIds(monster,"attack"),...window.v144GetLegalMonsterSkillIds(monster,"support")]
+            :[...(monster.skillIds||[]),...(monster.v141SupportSkillIds||[])];
+        const legal=pool.some(id=>skillDatabase[id]&&Number(monster.sp)>=(Number(skillDatabase[id].spCost)||0));
+        return legal&&(randomValue===undefined?Math.random():Number(randomValue))<Number(monster.skillChance||0);
+    },
     healingThresholdPercent:70,
     attackWeightPercent:70,
     buffWeightPercent:30
 });
 
 
-/*
-   ★ 新增（依照使用者要求，「物理技能，
-   對精英怪傷害加乘10%，boss15%」，
-   跟法術技能靠targetType比較寬廣（tri/
-   row/all）分工——物理技能專精單體
-   硬仗，這裡補上這塊）：
+/* Physical skill Elite/Boss rank bonus retired. */
 
-   只有「技能」吃得到這個加成，普通攻擊
-   （沒有skill物件、或category不是
-   "physical"）不算，這是使用者明確要求
-   保留的區分——普通攻擊不是戰士的特色，
-   物理技能才是。
-
-   野怪（regular）沒有加成，精英怪
-   （名字帶「王」，或未來明確標記
-   monster.rank）+10%，BOSS+15%，跟
-   getMonsterRank()判斷稀有度是同一套
-   規則，不用重寫一次判斷邏輯。
-*/
-
-const PHYSICAL_SKILL_ELITE_BONUS_PERCENT = 10;
-
-const PHYSICAL_SKILL_BOSS_BONUS_PERCENT = 15;
-
-
-function getPhysicalSkillRankBonusMultiplier(
-    skill,
-    monster
-){
-
-    if(
-        !skill||
-        skill.category!==
-        "physical"
-    ){
-        return 1;
-    }
-
-
-    const rank=
-        getMonsterRank(monster);
-
-
-    if(rank==="boss"){
-
-        return 1+
-            PHYSICAL_SKILL_BOSS_BONUS_PERCENT/
-            100;
-
-    }
-
-
-    if(rank==="elite"){
-
-        return 1+
-            PHYSICAL_SKILL_ELITE_BONUS_PERCENT/
-            100;
-
-    }
-
-
-    return 1;
-
-}
-
-/*
-   ★ 新增（依照使用者要求，「智力遞減、
-   不能沒有用，考慮到之後BOSS精神會更高」）：
-   鎖死行動類技能的智力加成，改用開根號
-   （Math.sqrt(智力)×係數）取代原本一般
-   debuff用的線性公式（智力×係數）。
-
-   開根號的效果是「邊際效益遞減」——智力
-   越堆越高，每一點智力換來的機率增幅會
-   自動變小，不會像線性公式那樣，玩家
-   智力養到中期（大約300~500）就直接
-   卡死在60%上限、之後智力再怎麼加都
-   感受不到差異。
-
-   係數維持0.2；BOSS精神仍按硬控原本的0.3
-   係數扣除，不受一般異常0.05調整影響。
-*/
+/* Lockdown chance uses the shared offense attribute coefficient and rank caps. */
 
 const LOCKDOWN_INT_COEFFICIENT = 0.2;
 
@@ -14046,23 +13834,13 @@ function calculateStatusEffectChance(
     casterLevel,
     targetLevel,
     offensiveAttribute,
-    targetSpirit,
+    targetStatusResistance,
     isLockdown,
     targetRank,
     targetBonusResistancePercent,
     finalStatusBonusPercent
 ){
-    /*
-       最終異常／硬控成功率 =
-       技能基礎成功率
-       + 施放者主屬性×0.05%
-       + 最終異常命中加成
-       - 目標精神×0.05%
-       - 其他最終異常抗性。
-
-       casterLevel / targetLevel 保留在參數列只為相容既有 caller，
-       正式公式不再使用等級差倍率、sqrt 屬性公式或硬控專屬精神係數。
-    */
+    /* Final status chance uses an independent final Status Resistance value. */
     void casterLevel;
     void targetLevel;
 
@@ -14070,14 +13848,7 @@ function calculateStatusEffectChance(
         Math.max(0,Number(offensiveAttribute)||0)*
         STATUS_OFFENSE_ATTRIBUTE_COEFFICIENT;
 
-    const spiritResistance=
-        Math.max(0,Number(targetSpirit)||0)*
-        STATUS_RESIST_PER_SPIRIT_POINT;
-
-    const targetResistancePercent=Math.max(
-        0,
-        spiritResistance+(Number(targetBonusResistancePercent)||0)
-    );
+    const targetResistancePercent=Math.max(0,Number(targetStatusResistance)||0)+(Number(targetBonusResistancePercent)||0);
 
     const rawChance=
         (Number(baseChancePercent)||0)+
@@ -14118,7 +13889,7 @@ function rollStatusEffectHit(
     casterLevel,
     targetLevel,
     offensiveAttribute,
-    targetSpirit,
+    targetStatusResistance,
     isLockdown,
     targetRank,
     targetBonusResistancePercent,
@@ -14130,7 +13901,7 @@ function rollStatusEffectHit(
         casterLevel,
         targetLevel,
         offensiveAttribute,
-        targetSpirit,
+        targetStatusResistance,
         isLockdown,
         targetRank,
         targetBonusResistancePercent,
@@ -14298,7 +14069,6 @@ function getSkillLevelArrayValue(values,level,fallback){
     const index=Math.max(0,Math.min(values.length-1,Math.floor(Number(level)||1)-1));
     return Number(values[index])||0;
 }
-
 function getEffectiveSkillTargetType(skill,level){
     const base=String(skill&&skill.targetType||"single");
     if(!skill||!skill.targetTypeAtMaxLevel){ return base; }
@@ -14306,79 +14076,104 @@ function getEffectiveSkillTargetType(skill,level){
     const resolvedLevel=Math.max(1,Math.floor(Number(level)||1));
     return resolvedLevel>=maxLevel?String(skill.targetTypeAtMaxLevel):base;
 }
-
 function getSkillFreezeChanceAtLevel(skill,level){
     return Math.max(0,getSkillLevelArrayValue(skill&&skill.freezeChanceByLevel,level,skill&&skill.freezeChance));
 }
-
 function getSkillFreezeDurationAtLevel(skill,level){
     return Math.max(1,Math.floor(getSkillLevelArrayValue(skill&&skill.freezeDurationByLevel,level,skill&&skill.freezeDuration||1)));
 }
+function normalizeBattleTargetType(targetType){
+    const value=String(targetType||"single");
+    if(value==="allyTri"||value==="horizontal-3"){ return "tri"; }
+    if(value==="allyAll"||value==="enemyAll"){ return "all"; }
+    if(value==="ally"||value==="normal"){ return "single"; }
+    return value;
+}
+function getBattleTargetEntity(targetSide,index){
+    if(targetSide==="player"){ return getPartyCharacterByIndex(index); }
+    return Array.isArray(monsters)?monsters[index]||null:null;
+}
+function isBattleTargetAlive(targetSide,index){
+    const entity=getBattleTargetEntity(targetSide,index);
+    return !!(entity&&Number(entity.hp)>0&&(targetSide!=="monster"||entity.alive!==false));
+}
+function isBattleTargetStealthed(entity){
+    if(!entity){ return false; }
+    if(typeof hasNamedPersistentState==="function"&&hasNamedPersistentState(entity,"stealthSkill")){ return true; }
+    return []
+        .concat(Array.isArray(entity.activeBuffs)?entity.activeBuffs:[])
+        .concat(Array.isArray(entity.v141TeamBuffs)?entity.v141TeamBuffs:[])
+        .some(buff=>buff&&Number(buff.turnsLeft)>0&&(
+            buff.type==="stealthSkill"||buff.v141BuffType==="stealthSkill"||buff.statusName==="隱身"
+        ));
+}
+function canSelectHostileBattlePrimary(targetSide,index,targetType){
+    const normalized=normalizeBattleTargetType(targetType);
+    if(!isBattleTargetAlive(targetSide,index)){ return false; }
+    // All-target declarations use a living confirmation anchor; stealth does not exclude the group.
+    if(normalized==="all"){ return true; }
+    return !isBattleTargetStealthed(getBattleTargetEntity(targetSide,index));
+}
+function resolveBattlefieldTargets(targetSide,primaryIndex,targetType,options){
+    const normalized=normalizeBattleTargetType(targetType);
+    const config=options&&typeof options==="object"?options:{};
+    const indexes=targetSide==="player"?getExistingPartyIndexes():currentBattleMonsters.filter(Number.isInteger);
+    const alive=index=>isBattleTargetAlive(targetSide,index);
 
-window.FourSymbolsBattleSkillTargeting=Object.freeze({
-    effectiveTargetType:getEffectiveSkillTargetType,
-    freezeChanceAtLevel:getSkillFreezeChanceAtLevel,
-    freezeDurationAtLevel:getSkillFreezeDurationAtLevel
-});
+    if(normalized==="all"){ return indexes.filter(alive); }
+    if(!Number.isInteger(primaryIndex)||!alive(primaryIndex)){ return []; }
+    if(config.hostilePrimary!==false&&!canSelectHostileBattlePrimary(targetSide,primaryIndex,normalized)){ return []; }
 
+    const owner=typeof window!=="undefined"?window.FourSymbolsBattlefieldSlots:null;
+    if(owner){
+        if(targetSide==="monster"&&typeof owner.getActiveEnemySnapshot==="function"&&typeof owner.resolveEnemyTargets==="function"){
+            const snapshot=owner.getActiveEnemySnapshot();
+            if(snapshot){ return owner.resolveEnemyTargets(snapshot,primaryIndex,normalized,alive); }
+        }
+        if(targetSide==="player"&&typeof owner.ensureAllyFormation==="function"&&typeof owner.resolveAllyTargets==="function"){
+            const formation=owner.ensureAllyFormation(indexes);
+            return owner.resolveAllyTargets(formation,primaryIndex,normalized,alive);
+        }
+    }
+
+    const position=indexes.indexOf(primaryIndex);
+    if(position<0){ return []; }
+    if(normalized==="single"){ return [primaryIndex]; }
+    if(normalized==="tri"||normalized==="row"){
+        const width=3;
+        const start=Math.floor(position/width)*width;
+        const row=indexes.slice(start,start+width).filter(alive);
+        if(normalized==="row"){ return row; }
+        const centerPosition=position-start;
+        return row.filter(index=>Math.abs((indexes.indexOf(index)-start)-centerPosition)<=1);
+    }
+    if(normalized==="column"){
+        const width=3;
+        const column=position%width;
+        return indexes.filter((index,slotPosition)=>slotPosition%width===column&&alive(index));
+    }
+    return [primaryIndex];
+}
+if(typeof window!=="undefined"){
+    window.FourSymbolsBattleSkillTargeting=Object.freeze({
+        effectiveTargetType:getEffectiveSkillTargetType,
+        freezeChanceAtLevel:getSkillFreezeChanceAtLevel,
+        freezeDurationAtLevel:getSkillFreezeDurationAtLevel,
+        normalizeTargetType:normalizeBattleTargetType,
+        isStealthed:isBattleTargetStealthed,
+        canSelectHostilePrimary:canSelectHostileBattlePrimary,
+        resolveTargets:resolveBattlefieldTargets
+    });
+}
 function getSkillTargets(centerIndex,targetType){
-
+    const normalized=normalizeBattleTargetType(targetType);
     const bossOwner=typeof window!=="undefined"?window.FourSymbolsBossBattle:null;
     if(bossOwner&&typeof bossOwner.isActive==="function"&&bossOwner.isActive()&&
        typeof bossOwner.resolveEnemyDamageTargets==="function"){
-        return bossOwner.resolveEnemyDamageTargets(centerIndex,targetType);
+        if(normalized!=="all"&&!canSelectHostileBattlePrimary("monster",centerIndex,normalized)){ return []; }
+        return bossOwner.resolveEnemyDamageTargets(centerIndex,normalized);
     }
-
-    const slotOwner=typeof window!=="undefined"?window.FourSymbolsBattlefieldSlots:null;
-    const snapshot=slotOwner&&typeof slotOwner.getActiveEnemySnapshot==="function"
-        ?slotOwner.getActiveEnemySnapshot():null;
-    if(slotOwner&&snapshot&&typeof slotOwner.resolveEnemyTargets==="function"&&
-       ["single","tri","row","column","all"].includes(targetType)){
-        return slotOwner.resolveEnemyTargets(
-            snapshot,
-            centerIndex,
-            targetType,
-            index=>!!(monsters[index]&&monsters[index].alive!==false&&Number(monsters[index].hp)>0)
-        );
-    }
-
-    const alive=currentBattleMonsters.filter(
-        i=>monsters[i] && monsters[i].alive
-    );
-
-    if(targetType==="single"){
-        return alive.includes(centerIndex) ? [centerIndex] : [];
-    }
-
-    /*
-       V119：敵方固定每3個「場上位置」為一橫排。
-       不能用 alive 陣列重新排位置，否則前排有人死亡後，
-       後排會被錯誤補進前排，橫排技能就會跨排命中。
-    */
-    if(targetType==="tri" || targetType==="row"){
-        const formationPosition=currentBattleMonsters.indexOf(centerIndex);
-        if(formationPosition<0){ return []; }
-
-        const rowStart=Math.floor(formationPosition/3)*3;
-        return currentBattleMonsters
-            .slice(rowStart,rowStart+3)
-            .filter(i=>monsters[i] && monsters[i].alive);
-    }
-
-    if(targetType==="column"){
-        const formationPosition=currentBattleMonsters.indexOf(centerIndex);
-        if(formationPosition<0){ return []; }
-        const column=formationPosition%3;
-        return currentBattleMonsters.filter((index,position)=>
-            position%3===column&&monsters[index]&&monsters[index].alive
-        );
-    }
-
-    if(targetType==="all"){
-        return alive;
-    }
-
-    return alive.includes(centerIndex) ? [centerIndex] : [];
+    return resolveBattlefieldTargets("monster",centerIndex,normalized,{hostilePrimary:true});
 }
 
 
@@ -14478,10 +14273,12 @@ function getPersistentStateConflict(entity,stateOrType){
         conflictNames.includes(getPersistentStateName(candidate))
     );
     if(!entry){ return null; }
+    const existingName=getPersistentStateName(entry);
     return {
         requestedName:requestedName,
-        existingName:getPersistentStateName(entry),
+        existingName:existingName,
         entry:entry,
+        reason:existingName===requestedName?"sameNameDuplicate":"exclusiveConflict",
         exclusiveHardControl:EXCLUSIVE_HARD_CONTROL_STATE_NAMES.includes(requestedName)
     };
 }
@@ -14511,9 +14308,10 @@ function reportPersistentStateMiss(entity,stateOrType,targetSide,targetIndex,sou
 
 function canApplyNamedPersistentState(entity,stateOrType,targetSide,targetIndex,sourceName){
     const conflict=getPersistentStateConflict(entity,stateOrType);
-    return conflict
-        ?reportPersistentStateMiss(entity,stateOrType,targetSide,targetIndex,sourceName,conflict)
-        :true;
+    if(!conflict){ return true; }
+    return conflict.reason==="sameNameDuplicate"
+        ?false
+        :reportPersistentStateMiss(entity,stateOrType,targetSide,targetIndex,sourceName,conflict);
 }
 
 function getPersistentStateTargetContext(entity){
@@ -14555,10 +14353,15 @@ function rollNamedPersistentStatusEffect(
     sourceName,
     guaranteedHit
 ){
-    if(!canApplyNamedPersistentState(entity,stateOrType,targetSide,targetIndex,sourceName)){
-        return {duplicate:true,hit:false};
+    const conflict=getPersistentStateConflict(entity,stateOrType);
+    if(conflict){
+        if(conflict.reason==="exclusiveConflict"){
+            reportPersistentStateMiss(entity,stateOrType,targetSide,targetIndex,sourceName,conflict);
+        }
+        return {duplicate:conflict.reason==="sameNameDuplicate",reason:conflict.reason,hit:false};
     }
     const finalRollArguments=(rollArguments||[]).slice();
+    if(targetSide==="player"&&finalRollArguments[5]===true){ finalRollArguments[6]="player"; }
     if(targetSide==="monster"){
         if(finalRollArguments[5]===undefined){ finalRollArguments[5]=false; }
         if(finalRollArguments[6]===undefined&&typeof getMonsterRank==="function"){
@@ -14652,11 +14455,7 @@ function applyFreezeEffect(monster,duration){
         !effect||effect.type!=="freeze"||Number(effect.turnsLeft)>0
     );
 
-    const deferredForPlayer=
-        typeof getPartyCharacterIndex==="function"&&getPartyCharacterIndex(monster)>=0;
-
     const freezeState={type:"freeze",turnsLeft:duration};
-    if(deferredForPlayer){ freezeState.deferFirstTick=true; }
     monster.statusEffects.push(markPersistentStateName(freezeState,"freeze"));
 
     return true;
@@ -14727,14 +14526,10 @@ function applyMonsterDebuff(
         !effect||effect.type!==type||Number(effect.turnsLeft)>0
     );
 
-    const deferredForPlayer=
-        typeof getPartyCharacterIndex==="function"&&getPartyCharacterIndex(monster)>=0;
-
     const state=Object.assign(
         {type:type,turnsLeft:duration,value:value},
         extraFields||{}
     );
-    if(deferredForPlayer){ state.deferFirstTick=true; }
     monster.statusEffects.push(markPersistentStateName(state,type));
 
     return true;
@@ -14749,12 +14544,18 @@ function applyMonsterDebuff(
    getMonsterEffectiveDefense()都會呼叫這裡。
 */
 
+function getFinalHitReductionPercent(entity){
+    const relicReduction=typeof window.v174GetRelicFinalHitReductionPercent==="function"
+        ?window.v174GetRelicFinalHitReductionPercent(entity):0;
+    return getMonsterDebuffValue(entity,"stun")+relicReduction;
+}
+
 function getMonsterDebuffValue(
     monster,
     type
 ){
 
-    if(!monster.statusEffects){
+    if(!monster || !monster.statusEffects){
         return 0;
     }
 
@@ -14802,10 +14603,8 @@ function applyOutgoingDamageReduction(damage,attacker){
     if(numericDamage<=0){
         return 0;
     }
-
     const downPercent=getOutgoingDamageDownPercent(attacker);
-    if(downPercent<=0){
-        return Math.floor(numericDamage);
+    if(downPercent<=0){        return Math.floor(numericDamage);
     }
 
     return Math.max(
@@ -14869,7 +14668,7 @@ function getMonsterEffectiveAbilityPoints(monster,statName){
         vitality:"vitalityPoints",
         energy:"energyPoints",
         intelligence:"intelligencePoints",
-        spirit:"spiritPoints",
+        defensePoints:"defensePoints",
         agility:"agilityPoints"
     };
 
@@ -14879,15 +14678,9 @@ function getMonsterEffectiveAbilityPoints(monster,statName){
     return Math.max(0,base*(1-down/100));
 }
 
-function getMonsterEffectiveSpiritPoints(monster){
-    return getMonsterEffectiveAbilityPoints(monster,"spirit");
-}
+function getMonsterEffectiveStatusResistance(monster){ return Math.max(0,Number(monster&&monster.statusResistance)||0); }
 
-function getMonsterEffectiveAntiCrit(monster){
-    return calculateAntiCritPercent(
-        getMonsterEffectiveSpiritPoints(monster)
-    );
-}
+function getMonsterEffectiveAntiCrit(monster){ return Math.max(0,Number(monster&&monster.antiCrit)||0); }
 
 function getMonsterEffectiveDefense(monster){
 
@@ -14900,7 +14693,7 @@ function getMonsterEffectiveDefense(monster){
     const statDownPercent=
         getStatDownPercentFor(
             monster,
-            "vitality"
+            "defensePoints"
         );
 
     return Math.max(
@@ -14960,7 +14753,7 @@ function applySkillDebuffEffects(
         const hit=rollNamedPersistentStatusEffect(
             monster,"agilityDown",[
                 skill.agilityDownChance,casterLevel,monster.level,
-                casterOffensiveAttribute,getMonsterEffectiveSpiritPoints(monster)
+                casterOffensiveAttribute,getMonsterEffectiveStatusResistance(monster)
             ],"monster",index,skill.name
         ).hit;
 
@@ -14996,7 +14789,7 @@ function applySkillDebuffEffects(
         const hit=rollNamedPersistentStatusEffect(
             monster,"statDown",[
                 skill.statDownChance,casterLevel,monster.level,
-                casterOffensiveAttribute,getMonsterEffectiveSpiritPoints(monster)
+                casterOffensiveAttribute,getMonsterEffectiveStatusResistance(monster)
             ],"monster",index,skill.name
         ).hit;
 
@@ -15033,7 +14826,7 @@ function applySkillDebuffEffects(
         const hit=rollNamedPersistentStatusEffect(
             monster,"damageDown",[
                 skill.damageDownChance,casterLevel,monster.level,
-                casterOffensiveAttribute,getMonsterEffectiveSpiritPoints(monster)
+                casterOffensiveAttribute,getMonsterEffectiveStatusResistance(monster)
             ],"monster",index,skill.name
         ).hit;
 
@@ -15069,7 +14862,7 @@ function applySkillDebuffEffects(
         const hit=rollNamedPersistentStatusEffect(
             monster,"defenseDown",[
                 skill.defenseDownChance,casterLevel,monster.level,
-                casterOffensiveAttribute,getMonsterEffectiveSpiritPoints(monster)
+                casterOffensiveAttribute,getMonsterEffectiveStatusResistance(monster)
             ],"monster",index,skill.name
         ).hit;
 
@@ -15105,7 +14898,7 @@ function applySkillDebuffEffects(
         const hit=rollNamedPersistentStatusEffect(
             monster,"stun",[
                 skill.stunChance,casterLevel,monster.level,
-                casterOffensiveAttribute,getMonsterEffectiveSpiritPoints(monster)
+                casterOffensiveAttribute,getMonsterEffectiveStatusResistance(monster)
             ],"monster",index,skill.name
         ).hit;
 
@@ -15146,7 +14939,7 @@ function applySkillDebuffEffects(
         const hit=rollNamedPersistentStatusEffect(
             monster,"petrify",[
                 chance,casterLevel,monster.level,casterOffensiveAttribute,
-                getMonsterEffectiveSpiritPoints(monster),true,getMonsterRank(monster)
+                getMonsterEffectiveStatusResistance(monster),true,getMonsterRank(monster)
             ],"monster",index,skill.name
         ).hit;
 
@@ -15206,17 +14999,13 @@ function applySkillDebuffEffects(
    加一組專門的玩家上下限即可。
 */
 
-/*
-   V118：怪物對玩家施放異常狀態時，必須使用「最終精神」。
-   也就是角色原始精神 + 裝備精神，而不是只讀 character.spirit。
-   這樣裝備面板顯示的精神、異常抗性，與實戰完全一致。
-*/
-function getFinalBattleSpiritForPlayerTarget(targetCharacter,targetIndex){
+/* Player targets provide final independent Status Resistance to status checks. */
+function getFinalBattleStatusResistanceForPlayerTarget(targetCharacter,targetIndex){
     const index=getPartyCharacterIndex(targetCharacter)>=0
         ? getPartyCharacterIndex(targetCharacter)
         : targetIndex;
     const stats=getPartyBattleStats(index);
-    return stats ? stats.spirit : (Number(targetCharacter&&targetCharacter.spirit)||0);
+    return stats ? stats.statusResistance : 0;
 }
 
 
@@ -15226,7 +15015,8 @@ function applySkillDebuffEffectsToPlayer(
     targetCharacter,
     targetIndex,
     casterLevel,
-    casterOffensiveAttribute
+    casterOffensiveAttribute,
+    caster
 ){
 
     if(
@@ -15241,8 +15031,8 @@ function applySkillDebuffEffectsToPlayer(
         targetCharacter.id||
         "你";
 
-    const targetFinalSpirit=
-        getFinalBattleSpiritForPlayerTarget(
+    const targetFinalStatusResistance=
+        getFinalBattleStatusResistanceForPlayerTarget(
             targetCharacter,
             targetIndex
         );
@@ -15256,8 +15046,8 @@ function applySkillDebuffEffectsToPlayer(
         const hit=rollNamedPersistentStatusEffect(
             targetCharacter,"agilityDown",[
                 skill.agilityDownChance,casterLevel,targetCharacter.level,
-                casterOffensiveAttribute,targetFinalSpirit,false,"regular",
-                getPlayerStatusResistBonus(targetCharacter)
+                casterOffensiveAttribute,targetFinalStatusResistance,false,"regular",
+                getPlayerStatusResistBonus(targetCharacter),getTowerStatusAccuracyBonus(caster)
             ],"player",targetIndex,skill.name
         ).hit;
 
@@ -15292,8 +15082,8 @@ function applySkillDebuffEffectsToPlayer(
         const hit=rollNamedPersistentStatusEffect(
             targetCharacter,"statDown",[
                 skill.statDownChance,casterLevel,targetCharacter.level,
-                casterOffensiveAttribute,targetFinalSpirit,false,"regular",
-                getPlayerStatusResistBonus(targetCharacter)
+                casterOffensiveAttribute,targetFinalStatusResistance,false,"regular",
+                getPlayerStatusResistBonus(targetCharacter),getTowerStatusAccuracyBonus(caster)
             ],"player",targetIndex,skill.name
         ).hit;
 
@@ -15329,8 +15119,8 @@ function applySkillDebuffEffectsToPlayer(
         const hit=rollNamedPersistentStatusEffect(
             targetCharacter,"damageDown",[
                 skill.damageDownChance,casterLevel,targetCharacter.level,
-                casterOffensiveAttribute,targetFinalSpirit,false,"regular",
-                getPlayerStatusResistBonus(targetCharacter)
+                casterOffensiveAttribute,targetFinalStatusResistance,false,"regular",
+                getPlayerStatusResistBonus(targetCharacter),getTowerStatusAccuracyBonus(caster)
             ],"player",targetIndex,skill.name
         ).hit;
 
@@ -15365,8 +15155,8 @@ function applySkillDebuffEffectsToPlayer(
         const hit=rollNamedPersistentStatusEffect(
             targetCharacter,"defenseDown",[
                 skill.defenseDownChance,casterLevel,targetCharacter.level,
-                casterOffensiveAttribute,targetFinalSpirit,false,"regular",
-                getPlayerStatusResistBonus(targetCharacter)
+                casterOffensiveAttribute,targetFinalStatusResistance,false,"regular",
+                getPlayerStatusResistBonus(targetCharacter),getTowerStatusAccuracyBonus(caster)
             ],"player",targetIndex,skill.name
         ).hit;
 
@@ -15401,8 +15191,8 @@ function applySkillDebuffEffectsToPlayer(
         const hit=rollNamedPersistentStatusEffect(
             targetCharacter,"stun",[
                 skill.stunChance,casterLevel,targetCharacter.level,
-                casterOffensiveAttribute,targetFinalSpirit,false,"regular",
-                getPlayerStatusResistBonus(targetCharacter)
+                casterOffensiveAttribute,targetFinalStatusResistance,false,"regular",
+                getPlayerStatusResistBonus(targetCharacter),getTowerStatusAccuracyBonus(caster)
             ],"player",targetIndex,skill.name
         ).hit;
 
@@ -15434,8 +15224,8 @@ function applySkillDebuffEffectsToPlayer(
         const hit=rollNamedPersistentStatusEffect(
             targetCharacter,"freeze",[
                 skill.freezeChance,casterLevel,targetCharacter.level,
-                casterOffensiveAttribute,targetFinalSpirit,true,"player",
-                getPlayerStatusResistBonus(targetCharacter)
+                casterOffensiveAttribute,targetFinalStatusResistance,true,"player",
+                getPlayerStatusResistBonus(targetCharacter),getTowerStatusAccuracyBonus(caster)
             ],"player",targetIndex,skill.name
         ).hit;
 
@@ -15466,7 +15256,7 @@ function applySkillDebuffEffectsToPlayer(
         const hit=rollNamedPersistentStatusEffect(
             targetCharacter,"petrify",[
                 chance,casterLevel,targetCharacter.level,casterOffensiveAttribute,
-                targetFinalSpirit,true,"player",getPlayerStatusResistBonus(targetCharacter)
+                targetFinalStatusResistance,true,"player",getPlayerStatusResistBonus(targetCharacter),getTowerStatusAccuracyBonus(caster)
             ],"player",targetIndex,skill.name
         ).hit;
 
@@ -15509,8 +15299,8 @@ function applySkillDebuffEffectsToPlayer(
         const burnHit=rollNamedPersistentStatusEffect(
             targetCharacter,"burn",[
                 skill.burnChance,casterLevel,targetCharacter.level,
-                casterOffensiveAttribute,targetFinalSpirit,false,"regular",
-                getPlayerStatusResistBonus(targetCharacter)
+                casterOffensiveAttribute,targetFinalStatusResistance,false,"regular",
+                getPlayerStatusResistBonus(targetCharacter),getTowerStatusAccuracyBonus(caster)
             ],"player",targetIndex,skill.name,skill.guaranteedBurn===true
         ).hit;
 
@@ -15613,48 +15403,7 @@ function tickStatusEffects(){
                             effect.type==="freeze"||
                             effect.type==="petrify"
                         ){
-
-                            /*
-                               冰封/石化本身不扣血，
-                               這裡只負責倒數回合數，
-                               真正「跳過攻擊」的判斷
-                               在monsterTurn()裡處理。
-                            */
-
-                            effect.turnsLeft--;
-
-
-                            if(
-                                effect.turnsLeft<=0
-                            ){
-
-                                addBattleLog(
-                                    (
-                                        effect.type==="freeze"
-                                        ?
-                                        ""
-                                        :
-                                        ""
-                                    )+
-                                    monster.name+
-                                    "的"+
-                                    (
-                                        effect.type==="freeze"
-                                        ?
-                                        "冰封"
-                                        :
-                                        "石化"
-                                    )+
-                                    "效果已解除。"
-                                );
-
-                            }
-
-
-                            return (
-                                effect.turnsLeft>0
-                            );
-
+                            return Number(effect.turnsLeft)>0;
                         }
 
 
@@ -15663,32 +15412,7 @@ function tickStatusEffects(){
                                 effect.type
                             ]
                         ){
-
-                            effect.turnsLeft--;
-
-
-                            if(
-                                effect.turnsLeft<=0
-                            ){
-
-                                addBattleLog(
-
-                                    simpleDebuffLabels[
-                                        effect.type
-                                    ]+
-                                    "效果已從"+
-                                    monster.name+
-                                    "身上解除。"
-
-                                );
-
-                            }
-
-
-                            return (
-                                effect.turnsLeft>0
-                            );
-
+                            return Number(effect.turnsLeft)>0;
                         }
 
 
@@ -15837,37 +15561,7 @@ function tickStatusEffects(){
                             effect.type==="freeze"||
                             effect.type==="petrify"
                         ){
-
-                            if(effect.deferFirstTick){
-                                effect.deferFirstTick=false;
-                                return true;
-                            }
-
-                            effect.turnsLeft--;
-
-
-                            if(effect.turnsLeft<=0){
-
-                                addBattleLog(
-                                    (character.id||"你")+
-                                    "的"+
-                                    (
-                                        effect.type==="freeze"
-                                        ?
-                                        "冰封"
-                                        :
-                                        "石化"
-                                    )+
-                                    "效果已解除。"
-                                );
-
-                            }
-
-
-                            return (
-                                effect.turnsLeft>0
-                            );
-
+                            return Number(effect.turnsLeft)>0;
                         }
 
 
@@ -15876,33 +15570,7 @@ function tickStatusEffects(){
                                 effect.type
                             ]
                         ){
-
-                            if(effect.deferFirstTick){
-                                effect.deferFirstTick=false;
-                                return true;
-                            }
-
-                            effect.turnsLeft--;
-
-
-                            if(effect.turnsLeft<=0){
-
-                                addBattleLog(
-                                    simpleDebuffLabels[
-                                        effect.type
-                                    ]+
-                                    "效果已從"+
-                                    (character.id||"你")+
-                                    "身上解除。"
-                                );
-
-                            }
-
-
-                            return (
-                                effect.turnsLeft>0
-                            );
-
+                            return Number(effect.turnsLeft)>0;
                         }
 
 
@@ -15926,8 +15594,7 @@ function tickStatusEffects(){
                                     targetStats.maxHP*
                                     effect.percent/
                                     100*
-                                    burnMultiplier
-                                )
+                                    burnMultiplier                                )
                             );
 
 
@@ -15986,208 +15653,53 @@ function tickStatusEffects(){
    （提高的%數就是怒火技能等級對應的數字）。
 */
 
-/*
-   V118 — 正式能力規則：
-   物理爆擊由「攻擊」決定；法術爆擊由「智力」決定。
-   兩者使用完全相同的成長公式：
-   - 爆擊率：基礎10% + 每點對應屬性0.12%，上限35%
-   - 爆擊倍率：基礎1.5倍 + 每點對應屬性0.25%，上限2倍
-
-   對應屬性：
-   - physical / 普通攻擊 => attack
-   - magic              => intelligence
-
-   治療技能不走這個爆擊函式，因此不會因智力新增治療爆擊。
-*/
-
-const CRIT_CHANCE_BASE = 10;
-
-const CRIT_CHANCE_PER_ATTACK_POINT = 0.12;
-const CRIT_CHANCE_PER_INTELLIGENCE_POINT = 0.12;
-
-const CRIT_CHANCE_MAX = 35;
-
-const CRIT_MULTIPLIER_BASE = 1.5;
-
-const CRIT_MULTIPLIER_PER_ATTACK_POINT = 0.0025;
-const CRIT_MULTIPLIER_PER_INTELLIGENCE_POINT = 0.0025;
-
-const CRIT_MULTIPLIER_ATTRIBUTE_MAX = 2;
-const CRIT_MULTIPLIER_MAX = 2.25;
-
-/*
-   V118 — 精神正式加入抗暴：
-   每1點精神 = +0.1%抗暴，抗暴上限25%。
-   抗暴直接從攻擊方算出的爆擊率扣除，
-   但最終爆擊率最低仍保留5%。
-*/
-function calculateAntiCritPercent(spiritPoints){
-    return Math.min(
-        ANTI_CRIT_MAX_PERCENT,
-        Math.max(0,Number(spiritPoints)||0)*ANTI_CRIT_PER_SPIRIT_POINT
-    );
+const CRIT_CHANCE_BASE=10;
+const CRIT_CHANCE_MAX=95;
+const CRIT_MULTIPLIER_BASE=1.5;
+const CRIT_MULTIPLIER_MAX=2.25;
+function calculateAntiCritPercent(value){ return Math.max(0,Number(value)||0); }
+function getCriticalStatPoints(character){
+    const index=getPartyCharacterIndex(character);
+    const stats=index>=0?getPartyBattleStats(index):null;
+    return Math.max(0,Number(stats&&stats.criticalChance!==undefined?stats.criticalChance:character&&character.criticalChance)||0);
 }
-
-function getCriticalStatPoints(character,category){
-    const partyIndex=getPartyCharacterIndex(character);
-    const partyStats=partyIndex>=0
-        ? getPartyBattleStats(partyIndex)
-        : null;
-
-    if(category==="magic"){
-        if(partyStats){ return partyStats.intelligence||0; }
-        return (character&&character.intelligence)||0;
-    }
-
-    if(partyStats){ return partyStats.attackPoints||partyStats.attack||0; }
-
-    return (character&&character.attack)||0;
-}
-
 function getCharacterSkillKey(character){
     if(character===player){ return "fire"; }
     if(character===player2){ return "player2"; }
-    if(typeof player3!=="undefined" && character===player3){ return "player3"; }
+    if(typeof player3!=="undefined"&&character===player3){ return "player3"; }
     return null;
 }
-
 function getLearnedElementEX(character,element){
+    if(!character||character.element!==element){ return null; }
     const key=getCharacterSkillKey(character);
     if(!key){ return null; }
-    const exId=element+"EX";
-    const ex=skillDatabase[exId];
-    if(!ex || getSkillLevel(key,exId)<=0){ return null; }
-    return ex;
+    const ex=skillDatabase[element+"EX"];
+    return !ex||getSkillLevel(key,element+"EX")<=0?null:ex;
 }
-
+function getWaterExAbsorbPercent(character,basePercent,kind){
+    const ex=getLearnedElementEX(character,"water");
+    const multiplier=ex&&(kind==="sp"?ex.spDrainMultiplier:ex.lifestealMultiplier);
+    return Math.max(0,Number(basePercent)||0)*(Number(multiplier)||1);
+}
 function getElementDamagePassiveMultiplier(character){
-    if(!character || !character.element){ return 1; }
+    if(!character||!character.element){ return 1; }
     const ex=getLearnedElementEX(character,character.element);
-    return ex && ex.damageBonusPercent
-        ? 1+ex.damageBonusPercent/100
-        : 1;
+    return ex&&ex.damageBonusPercent?1+ex.damageBonusPercent/100:1;
 }
-
 function rollCritical(character,category="physical",targetAntiCritPercent=0,target){
-    /* Boss Shield is evaluated at the beginning of every independent damage
-       packet. The packet's overflow therefore remains non-critical, while a
-       later multi-hit packet may roll normally after the Shield is gone. */
-    if(target&&target.vBossShield&&Number(target.vBossShield.current)>0){
-        return {isCrit:false,multiplier:1};
-    }
-
-    const isMagic=
-        category==="magic";
-
-    const critStatPoints=
-        getCriticalStatPoints(
-            character,
-            category
-        );
-
-    const chancePerPoint=
-        isMagic
-        ?
-        CRIT_CHANCE_PER_INTELLIGENCE_POINT
-        :
-        CRIT_CHANCE_PER_ATTACK_POINT;
-
-    const multiplierPerPoint=
-        isMagic
-        ?
-        CRIT_MULTIPLIER_PER_INTELLIGENCE_POINT
-        :
-        CRIT_MULTIPLIER_PER_ATTACK_POINT;
-
-
-    const rageBuff=
-
-        (
-            (character&&character.activeBuffs)||
-            []
-        )
-        .find(
-            b=>b.type==="rage"
-        );
-
-
-    let critChance=
-
-        Math.min(
-            CRIT_CHANCE_MAX,
-            CRIT_CHANCE_BASE+
-            critStatPoints*
-            chancePerPoint
-        );
-
-    let critMultiplier=
-
-        Math.min(
-            CRIT_MULTIPLIER_ATTRIBUTE_MAX,
-            CRIT_MULTIPLIER_BASE+
-            critStatPoints*
-            multiplierPerPoint
-        );
-
-
-    /* 火元素EX：屬性公式本身仍受35%/200%上限，
-       EX屬於被動額外加成，所以在基礎上限之後再疊加。 */
-    if(character && character.element==="fire"){
-        const fireEX=getLearnedElementEX(character,"fire");
-        if(fireEX){
-            critChance+=Number(fireEX.critChanceBonusPercent)||0;
-            critMultiplier+=(Number(fireEX.critDamageBonusPercent)||0)/100;
-        }
-    }
-
-
-    if(rageBuff){
-
-        critChance+=
-            rageBuff.bonusPercent;
-
-        critMultiplier+=
-            rageBuff.bonusPercent/
-            100;
-
-    }
-
-    const effectiveAntiCrit=
-        Math.min(
-            ANTI_CRIT_MAX_PERCENT,
-            Math.max(0,Number(targetAntiCritPercent)||0)
-        );
-
-    critChance=
-        Math.max(
-            CRIT_CHANCE_MIN_AFTER_ANTI_CRIT,
-            critChance-effectiveAntiCrit
-        );
-
-
-    const isCrit =
-        Math.random()*100<
-        critChance;
-
-    if(isCrit){
-        battleStatisticsRecordCriticalByActor(character);
-    }
-
-    critMultiplier=Math.min(CRIT_MULTIPLIER_MAX,critMultiplier);
-
-
-    return {
-        isCrit:isCrit,
-        multiplier:
-            isCrit
-            ?
-            critMultiplier
-            :
-            1
-    };
-
+    if(target&&target.vBossShield&&Number(target.vBossShield.current)>0){ return {isCrit:false,multiplier:1}; }
+    const stats=getPartyCharacterIndex(character)>=0?getPartyBattleStats(getPartyCharacterIndex(character)):null;
+    let chance=Math.min(CRIT_CHANCE_MAX,CRIT_CHANCE_BASE+getCriticalStatPoints(character)+(Number(stats&&stats.statusAccuracy)||0));
+    let multiplier=CRIT_MULTIPLIER_BASE+(Number(stats&&stats.criticalDamage)||0)/100;
+    const ex=character&&character.element==="fire"?getLearnedElementEX(character,"fire"):null;
+    if(ex){ chance+=Number(ex.critChanceBonusPercent)||0; multiplier+=(Number(ex.critDamageBonusPercent)||0)/100; }
+    const rage=(character&&character.activeBuffs||[]).find(b=>b&&b.type==="rage");
+    if(rage){ chance+=Number(rage.bonusPercent)||0; multiplier+=(Number(rage.bonusPercent)||0)/100; }
+    chance=Math.max(5,chance-Math.max(0,Number(targetAntiCritPercent)||0));
+    const isCrit=Math.random()*100<chance;
+    if(isCrit){ battleStatisticsRecordCriticalByActor(character); }
+    return {isCrit:isCrit,multiplier:isCrit?Math.min(CRIT_MULTIPLIER_MAX,multiplier):1};
 }
-
 
 /*
    通用傷害技能施放函式。
@@ -16310,20 +15822,19 @@ function castDamageSkill(skillId){
     }
 
 
-    const centerIndex =
-        resolveAttackTargetIndex();
+    const effectiveTargetType=getEffectiveSkillTargetType(skill,level);
+    const centerIndex=normalizeBattleTargetType(effectiveTargetType)==="all"
+        ?null
+        :resolveAttackTargetIndex(effectiveTargetType);
 
+    if(normalizeBattleTargetType(effectiveTargetType)!=="all"&&centerIndex===null){ return; }
 
-    if(centerIndex===null){
+    const targets=getSkillTargets(centerIndex,effectiveTargetType);
+    if(!targets.length){
+        addBattleLog(skill.name+"目前沒有有效目標。");
+        finishPlayerAction();
         return;
     }
-
-    const effectiveTargetType=getEffectiveSkillTargetType(skill,level);
-    const targets =
-        getSkillTargets(
-            centerIndex,
-            effectiveTargetType
-        );
 
 
     player.sp -=
@@ -16440,7 +15951,7 @@ function castDamageSkill(skillId){
                 const freezeRoll=rollNamedPersistentStatusEffect(
                     monster,"freeze",[
                         freezeChance,player.level,monster.level,
-                        stats.intelligence,getMonsterEffectiveSpiritPoints(monster),
+                        stats.intelligence,getMonsterEffectiveStatusResistance(monster),
                         true,getMonsterRank(monster)
                     ],"monster",index,skill.name
                 );
@@ -16469,11 +15980,8 @@ function castDamageSkill(skillId){
                 getMonsterEvasion(
                     monster
                 ),
-                getMonsterDebuffValue(
-                    player,
-                    "stun"
-                ),
-                getActiveAccuracyBonusPercent(player)
+                getFinalHitReductionPercent(player),
+                getFinalAccuracyBonusPercent(player)
             );
 
 
@@ -16564,7 +16072,7 @@ function castDamageSkill(skillId){
             const burnRoll=rollNamedPersistentStatusEffect(
                 monster,"burn",[
                     skill.burnChance,player.level,monster.level,
-                    stats.intelligence,getMonsterEffectiveSpiritPoints(monster)
+                    stats.intelligence,getMonsterEffectiveStatusResistance(monster)
                 ],"monster",index,skill.name,skill.guaranteedBurn===true
             );
 
@@ -16621,7 +16129,7 @@ function castDamageSkill(skillId){
             const freezeRoll=rollNamedPersistentStatusEffect(
                 monster,"freeze",[
                     skill.freezeChance,player.level,monster.level,
-                    stats.intelligence,getMonsterEffectiveSpiritPoints(monster),
+                    stats.intelligence,getMonsterEffectiveStatusResistance(monster),
                     true,getMonsterRank(monster)
                 ],"monster",index,skill.name
             );
@@ -16714,7 +16222,7 @@ function castDamageSkill(skillId){
         const lifestealAmount =
             Math.floor(
                 totalLifestealDamage*
-                lifestealPercent/
+                getWaterExAbsorbPercent(player,lifestealPercent,"hp")/
                 100
             );
 
@@ -16928,7 +16436,6 @@ function getActivePlayerCharacters(){
 
 
 function castBuffSkill(skillId,targetIndex){
-
     const skill=skillDatabase[skillId];
 
     if(!battleActive || !skill){ return; }
@@ -17096,8 +16603,9 @@ function castHealSkill(skillId,targetIndex){
     const targetStats=getPartyBattleStats(resolvedTargetIndex);
 
     const exSkill=skillDatabase.waterEX;
-    const exLevel=getSkillLevel("fire","waterEX");
-    const healBonusMultiplier=(exSkill && exLevel>0 && exSkill.healBonusPercent)
+    const casterKey=getCharacterSkillKey(player);
+    const exLevel=casterKey?getSkillLevel(casterKey,"waterEX"):0;
+    const healBonusMultiplier=(getLearnedElementEX(player,"water") && exSkill && exLevel>0 && exSkill.healBonusPercent)
         ? 1+exSkill.healBonusPercent/100
         : 1;
     const bossOwner=typeof window!=="undefined"?window.FourSymbolsBossBattle:null;
@@ -17109,12 +16617,17 @@ function castHealSkill(skillId,targetIndex){
         calculateHealingAmount(baseHealHP,casterStats.intelligence)*healBonusMultiplier*bossHealingMultiplier
     );
 
-    const potentialHealSP=Math.floor(
-        calculateSPHealingAmount(
-            skill.baseHealSP+(skill.healSPPerLevel||0)*(level-1),
-            casterStats.intelligence
-        )*healBonusMultiplier*bossHealingMultiplier
-    );
+    const spRestorePercent=Array.isArray(skill.spRestorePercentByLevel)
+        ?Number(skill.spRestorePercentByLevel[Math.max(0,Math.min(skill.spRestorePercentByLevel.length-1,level-1))])||0
+        :null;
+    const potentialHealSP=spRestorePercent!==null
+        ?Math.floor(targetStats.maxSP*spRestorePercent/100*healBonusMultiplier*bossHealingMultiplier)
+        :Math.floor(
+            calculateSPHealingAmount(
+                skill.baseHealSP+(skill.healSPPerLevel||0)*(level-1),
+                casterStats.intelligence
+            )*healBonusMultiplier*bossHealingMultiplier
+        );
 
     const actualHealHP=Math.max(
         0,
@@ -17268,10 +16781,7 @@ function castReviveSkill(skillId,targetIndex){
     setTimeout(()=>{ showPlayerSpPopup(skill.spCost); },500);
 
     const exSkill=skillDatabase.waterEX;
-    const exLevel=getSkillLevel("fire","waterEX");
-    const healBonusMultiplier=(exSkill && exLevel>0 && exSkill.healBonusPercent)
-        ? 1+exSkill.healBonusPercent/100
-        : 1;
+    /* Water EX deliberately does not modify revive HP. */
 
     const revivePercent=skill.reviveHealPercentByLevel[level-1];
     const targetStats=getPartyBattleStats(targetIndexResolved);
@@ -17363,36 +16873,34 @@ function tickBuffsForCharacter(character){
                     return false;
                 }
 
-                buff.turnsLeft--;
-
-
-                if(buff.turnsLeft<=0){
-
-                    addBattleLog(
-
-                        "⏳"+
-                        (
-                            BUFF_EXPIRE_LABELS[
-                                buff.type
-                            ]||
-                            buff.type
-                        )+
-                        "效果已結束。"
-
-                    );
-
-                    return false;
-
-                }
-
-
-                return true;
+                /* Timed buffs consume on this character's formal action
+                   boundary through FourSymbolsDurationLifecycle. */
+                return Number(buff.turnsLeft)>0;
 
             }
         );
 
 }
 
+
+function shouldConsumeRoundEndState(entry){
+    if(!entry||Number(entry.turnsLeft)<=0||entry.oneShot){ return false; }
+    return !(Number.isFinite(Number(entry.remainingBlocks))||Number.isFinite(Number(entry.chargeCount))||Number.isFinite(Number(entry.charges))||Number.isFinite(Number(entry.triggerCount))||entry.type==="bloodBurn"||entry.type==="phoenixMight");
+}
+function consumeRoundEndDurations(){
+    if(!battleActive){ return; }
+    tickStatusEffects();
+    const entities=[];
+    getExistingPartyIndexes().forEach(index=>{const entity=getPartyCharacterByIndex(index);if(entity){entities.push(entity);}});
+    currentBattleMonsters.forEach(index=>{const entity=monsters[index];if(entity){entities.push(entity);}});
+    entities.forEach(entity=>{
+        if(Array.isArray(entity.activeBuffs)){entity.activeBuffs.slice().forEach(buff=>{if(shouldConsumeRoundEndState(buff)&&entity.activeBuffs.includes(buff)){expireBattleActionBuff(entity,buff);}});}
+        if(Array.isArray(entity.statusEffects)){entity.statusEffects.slice().forEach(effect=>{if(effect&&effect.type!=="burn"&&shouldConsumeRoundEndState(effect)&&entity.statusEffects.includes(effect)){expireBattleActionStatus(entity,effect);}});}
+    });
+    tickPlayerBuffs();
+    if(typeof window!=="undefined"&&typeof window.v143SyncStatusVisualEffects==="function"){window.v143SyncStatusVisualEffects(false);}
+    updateUI();
+}
 
 function tickPlayerBuffs(){
 
@@ -17467,63 +16975,27 @@ function tickPlayerBuffs(){
    任何既有戰鬥數值機制。
 */
 
-function findAliveTargetIndex(preferredIndex){
-
-    if(
-        preferredIndex!==null &&
-        preferredIndex!==undefined &&
-        monsters[preferredIndex] &&
-        monsters[preferredIndex].alive
-    ){
+function findAliveTargetIndex(preferredIndex,targetType){
+    const resolvedTargetType=normalizeBattleTargetType(targetType||"single");
+    if(resolvedTargetType==="all"){ return null; }
+    if(Number.isInteger(preferredIndex)&&canSelectHostileBattlePrimary("monster",preferredIndex,resolvedTargetType)){
         return preferredIndex;
     }
-
-
-    const fallbackIndex =
-        currentBattleMonsters.find(
-            i=>
-                monsters[i] &&
-                monsters[i].alive
-        );
-
-
-    return (
-        fallbackIndex===undefined
-        ?
-        null
-        :
-        fallbackIndex
+    const fallbackIndex=currentBattleMonsters.find(index=>
+        canSelectHostileBattlePrimary("monster",index,resolvedTargetType)
     );
-
+    return fallbackIndex===undefined?null:fallbackIndex;
 }
-
-
-function resolveAttackTargetIndex(){
-
-    const index =
-        findAliveTargetIndex(
-            selectedMonster
-        );
-
-
-    if(index===null){
-
-        finishPlayerAction();
-
-        return null;
-
-    }
-
-
-    selectedMonster=
-        index;
-
+function resolveAttackTargetIndex(targetType){
+    const index=findAliveTargetIndex(selectedMonster,targetType||"single");
+    if(index===null){ finishPlayerAction(); return null; }
+    selectedMonster=index;
     return index;
-
 }
 
 
 /* =====================================================
+   普通攻擊/* =====================================================
    普通攻擊
 ===================================================== */
 
@@ -17535,7 +17007,7 @@ function normalAttack(){
 
 
     const index =
-        resolveAttackTargetIndex();
+        resolveAttackTargetIndex("single");
 
 
     if(index===null){
@@ -17577,11 +17049,8 @@ function normalAttack(){
             getMonsterEvasion(
                 monster
             ),
-            getMonsterDebuffValue(
-                    player,
-                    "stun"
-                ),
-                getActiveAccuracyBonusPercent(player)
+            getFinalHitReductionPercent(player),
+                getFinalAccuracyBonusPercent(player)
             );
 
 
@@ -17815,6 +17284,11 @@ function finishPlayerAction(){
         return;
     }
 
+    /* Duration consumption belongs to the one real queue advance. Intercepted
+       follow-up casts are still part of the same formal action and must not
+       consume extra turns. */
+    finishBattleDurationAction();
+
     if(!battleActive){
         return;
     }
@@ -17979,8 +17453,7 @@ function finishPlayerAction(){
    ★ 修正（敏捷排序系統）：
    原本的monsterTurn()是「一次把所有怪物
    都打過一輪」的批次處理函式，
-   跟現在「玩家、怪物混在同一份行動順序清單裡
-   輪流行動」的架構不相容了。
+   跟現在「玩家、怪物混在同一份行動順序清單裡   輪流行動」的架構不相容了。
    改寫成processSingleMonsterAttack()，
    一次只處理「這一隻」怪物的攻擊，
    打完呼叫finishPlayerAction()
@@ -18063,6 +17536,12 @@ function processSingleMonsterAttack(monsterIndex,token){
     }
 
 
+    const towerSkillDecision=monster.vGameplayTower===true
+        ?window.FourSymbolsEnemySkillAI.enterSkillDecision(monster)
+        :null;
+    if(towerSkillDecision===true&&typeof window.v141TryMonsterSpecialAction==="function"){
+        if(window.v141TryMonsterSpecialAction(monsterIndex)===true){ return; }
+    }
     lungeMonsterCard(
         monsterIndex
     );
@@ -18101,10 +17580,9 @@ function processSingleMonsterAttack(monsterIndex,token){
        普通攻擊」是同一種行為。
     */
 
-    const hasVisibleSingleTarget=getExistingPartyIndexes().some(index=>{
-        const character=getPartyCharacterByIndex(index);
-        return character&&character.hp>0&&!hasActiveBuff(character,"stealthSkill");
-    });
+    const hasVisibleHostilePrimary=getExistingPartyIndexes().some(index=>
+        canSelectHostileBattlePrimary("player",index,"single")
+    );
 
     const affordableSkillIds=
 
@@ -18117,11 +17595,18 @@ function processSingleMonsterAttack(monsterIndex,token){
                     skillDatabase[skillId];
 
 
-                return (
-                    data &&
-                    monster.sp>=data.spCost&&
-                    (data.targetType!=="single"||hasVisibleSingleTarget)
+                if(!data||monster.sp<data.spCost){ return false; }
+                const dataLevel=Math.min(
+                    data.maxLevel||1,
+                    Math.max(
+                        1,
+                        Number.isFinite(Number(monster.v141ForceSkillLevel))
+                            ?Math.floor(Number(monster.v141ForceSkillLevel))
+                            :Math.round(monster.level/8)
+                    )
                 );
+                const targetType=normalizeBattleTargetType(getEffectiveSkillTargetType(data,dataLevel));
+                return targetType==="all"||hasVisibleHostilePrimary;
 
             }
         )
@@ -18133,9 +17618,9 @@ function processSingleMonsterAttack(monsterIndex,token){
     const forcedAttackIsLegal=affordableSkillIds.includes(forcedAttackSkillId);
     delete monster.v175ForcedAttackSkillId;
     const usesSkill=
-        forcedAttackIsLegal||(
+        (towerSkillDecision!==false&&forcedAttackIsLegal)||(
             affordableSkillIds.length>0 &&
-            Math.random()<
+            (towerSkillDecision===null?Math.random():towerSkillDecision?0:1)<
             (
                 monster.skillChance!==undefined
                 ?monster.skillChance
@@ -18265,13 +17750,14 @@ function processSingleMonsterAttack(monsterIndex,token){
         }))
         .filter(entry=>entry.character && entry.character.hp>0);
 
-    /* 隱身只阻止單體／普通攻擊選中；範圍技能仍會波及。 */
-    const selectableSingleTargets=livingTargets.filter(
-        entry=>!hasActiveBuff(entry.character,"stealthSkill")
+    /* Stealth blocks primary selection for every targeted hostile shape.
+       Range skills still include stealthed units when they are collateral. */
+    const selectablePrimaryTargets=livingTargets.filter(entry=>
+        canSelectHostileBattlePrimary("player",entry.index,skillTargetType)
     );
 
-    if(!isRangeSkill && selectableSingleTargets.length===0){
-        addBattleLog(monster.name+"找不到可被單體攻擊選中的目標。");
+    if(skillTargetType!=="all"&&selectablePrimaryTargets.length===0){
+        addBattleLog(monster.name+"找不到可被此攻擊選中的目標。");
         updateUI();
         finishPlayerAction();
         return;
@@ -18282,40 +17768,17 @@ function processSingleMonsterAttack(monsterIndex,token){
 
     if(skillTargetType==="all"){
         attackTargets=livingTargets;
-    }else if(isRangeSkill){
-        /* The formal formation is already the owner for allyTri and player
-           targeting. Monster range skills must resolve through that same Slot
-           geometry, including a party member placed in the back row. */
-        const battlefieldSlots=typeof window!=="undefined"
-            ? window.FourSymbolsBattlefieldSlots
-            : null;
-        const primary=livingTargets[
-            Math.floor(Math.random()*livingTargets.length)
+    }else{
+        const primary=selectablePrimaryTargets[
+            Math.floor(Math.random()*selectablePrimaryTargets.length)
         ];
         primaryTargetIndex=primary?primary.index:null;
-        const formation=battlefieldSlots&&typeof battlefieldSlots.ensureAllyFormation==="function"
-            ? battlefieldSlots.ensureAllyFormation(getExistingPartyIndexes())
-            : null;
-        const targetIndexes=primary&&formation&&typeof battlefieldSlots.resolveAllyTargets==="function"
-            ? battlefieldSlots.resolveAllyTargets(
-                formation,
-                primary.index,
-                skillTargetType,
-                index=>{
-                    const character=getPartyCharacterByIndex(index);
-                    return !!(character&&character.hp>0);
-                }
-            )
-            : [];
+        const targetIndexes=primary
+            ?resolveBattlefieldTargets("player",primary.index,skillTargetType,{hostilePrimary:true})
+            :[];
         attackTargets=targetIndexes.map(index=>
             livingTargets.find(entry=>entry.index===index)
         ).filter(Boolean);
-    }else{
-        const primary=selectableSingleTargets[
-            Math.floor(Math.random()*selectableSingleTargets.length)
-        ];
-        primaryTargetIndex=primary?primary.index:null;
-        attackTargets=[primary];
     }
 
     if(attackTargets.length===0){
@@ -18413,12 +17876,12 @@ function processSingleMonsterAttack(monsterIndex,token){
             if(isPureControlSkill){
                 const freezeChance=getSkillFreezeChanceAtLevel(castSkillData,effectiveSkillLevel);
                 const freezeDuration=getSkillFreezeDurationAtLevel(castSkillData,effectiveSkillLevel);
-                const targetFinalSpirit=getFinalBattleSpiritForPlayerTarget(targetCharacter,targetIndex);
+                const targetFinalStatusResistance=getFinalBattleStatusResistanceForPlayerTarget(targetCharacter,targetIndex);
                 const freezeResult=rollNamedPersistentStatusEffect(
                     targetCharacter,"freeze",[
                         freezeChance,monster.level,targetCharacter.level,
                         getMonsterEffectiveAbilityPoints(monster,"intelligence"),
-                        targetFinalSpirit,true,"player",getPlayerStatusResistBonus(targetCharacter)
+                        targetFinalStatusResistance,true,"player",getPlayerStatusResistBonus(targetCharacter),getTowerStatusAccuracyBonus(monster)
                     ],"player",targetIndex,castSkillName
                 );
                 if(freezeResult.hit){
@@ -18438,11 +17901,9 @@ function processSingleMonsterAttack(monsterIndex,token){
                         monster
                     ),
                     targetStats.evasion,
-                    getMonsterDebuffValue(
-                        monster,
-                        "stun"
-                    ),
-                    getActiveAccuracyBonusPercent(monster)
+                    getFinalHitReductionPercent(monster),
+                    getFinalAccuracyBonusPercent(monster)
+                    ,targetCharacter
                 );
 
 
@@ -18491,7 +17952,7 @@ function processSingleMonsterAttack(monsterIndex,token){
                 ?0
                 :Math.max(
                     CRIT_CHANCE_MIN_AFTER_ANTI_CRIT,
-                    10+rageCriticalBonuses.chance-(targetStats.antiCrit||0)
+                    getMonsterCriticalChance(monster,targetStats.antiCrit)
                 );
             const monsterCrit=!isBeginnerForestNormalAttack&&Math.random()*100<monsterCritChance;
             const monsterCritMultiplier=monsterCrit
@@ -18563,6 +18024,8 @@ function processSingleMonsterAttack(monsterIndex,token){
                     "barrier"
                 );
 
+            let earthShieldReduction=0;
+
 
             if(damage>0 && hasBarrier){
 
@@ -18577,6 +18040,19 @@ function processSingleMonsterAttack(monsterIndex,token){
 
             }
             else{
+
+                const earthShieldBuff=(targetCharacter.activeBuffs||[]).find(buff=>
+                    buff&&buff.type==="earthShield"&&Number(buff.turnsLeft)>0&&Number(buff.remainingBlocks)>0
+                );
+                if(damage>0&&earthShieldBuff){
+                    const percent=Math.max(0,Math.min(100,Number(earthShieldBuff.percent)||0));
+                    earthShieldReduction=Math.max(0,Math.floor(damage*percent/100));
+                    damage=Math.max(0,damage-earthShieldReduction);
+                    earthShieldBuff.remainingBlocks=Math.max(0,Number(earthShieldBuff.remainingBlocks)-1);
+                    if(earthShieldBuff.remainingBlocks<=0){
+                        targetCharacter.activeBuffs=targetCharacter.activeBuffs.filter(buff=>buff!==earthShieldBuff);
+                    }
+                }
 
                 const shieldBuff=
 
@@ -18648,29 +18124,9 @@ function processSingleMonsterAttack(monsterIndex,token){
                擋下的部分也被誤算進反傷裡。
             */
 
-            const reflectPercent=
+            if(earthShieldReduction>0){
 
-                getActiveBuffPercent(
-                    targetCharacter,
-                    "earthShield"
-                );
-
-
-            if(
-                reflectPercent>0 &&
-                actualHpDamage>0
-            ){
-
-                const reflectDamage=
-
-                    Math.max(
-                        1,
-                        Math.floor(
-                            actualHpDamage*
-                            reflectPercent/
-                            100
-                        )
-                    );
+                const reflectDamage=earthShieldReduction;
 
 
                 const hpBeforeReflect=Math.max(0,Number(monster.hp)||0);
@@ -18805,7 +18261,8 @@ function processSingleMonsterAttack(monsterIndex,token){
                     getMonsterEffectiveAbilityPoints(
                         monster,
                         castSkillData.category==="physical"?"attack":"intelligence"
-                    )
+                    ),
+                    monster
                 );
 
             }
@@ -18996,7 +18453,7 @@ function winBattle(){
 
 
     battleToken++;
-
+    clearTransientBattlePresentation();
 
     /*
        ★ 新增（依照使用者要求，每日任務
@@ -19263,6 +18720,7 @@ function loseBattle(){
 
 
     battleToken++;
+    clearTransientBattlePresentation();
 
 
     /*
@@ -19430,93 +18888,82 @@ function attemptEscape(){
 function resolveEscapeAttempt(characterIndex){
 
     clearInterval(timerId);
+    timerId=null;
 
+    const alive=currentBattleMonsters.map(i=>monsters[i]).filter(m=>m&&m.alive);
+    if(alive.length===0){ checkBattleEnd(); return; }
 
-    const alive =
-        currentBattleMonsters
-        .map(
-            i=>monsters[i]
-        )
-        .filter(
-            m=>m.alive
-        );
-
-
-    if(alive.length===0){
-
-        checkBattleEnd();
-
-        return;
-
-    }
-
-
-    const highestLevel =
-        Math.max(
-            ...alive.map(
-                m=>m.level
-            )
-        );
-
-
+    const highestLevel=Math.max(...alive.map(m=>m.level));
     const escapingCharacter=getPartyCharacterByIndex(characterIndex)||player;
+    const chance=Math.max(10,Math.min(95,50+(escapingCharacter.level-highestLevel)*5));
+    const succeeded=Math.random()*100<chance;
+    const presentationOwner=typeof window!=="undefined"?window.FourSymbolsBattlePresentation:null;
+    const feedbackOwner=typeof window!=="undefined"?window.FourSymbolsBattleFloatingFeedback:null;
+    const motion=presentationOwner&&typeof presentationOwner.playEscape==="function"
+        ?presentationOwner.playEscape(characterIndex,succeeded)
+        :Promise.resolve(true);
 
-    const chance =
-        Math.max(
-            10,
-            Math.min(
-                95,
-                50+
-                (
-                    escapingCharacter.level-
-                    highestLevel
-                )*5
-            )
-        );
+    actionReady=false;
+    pendingAction=null;
 
-
-    if(
-        Math.random()*100<
-        chance
-    ){
-
-        battleActive=false;
-
-        autoBattle=false;
-
-        battleToken++;
-
-
-        addBattleLog(
-            "成功逃脫！"
-        );
-
-
-        setTimeout(()=>{
-
-            showPage("map");
-
-            setMapCooldown(3000);
-
-
-            startMonsterMovement();
-
-            ensureAutoPatrolInterval();
-
-        },1400);
-
-    }
-    else{
-
-        addBattleLog(
-            "逃脫失敗！"
-        );
-
-
-        finishPlayerAction();
-
+    if(!succeeded){
+        addBattleLog("逃脫失敗！");
+        Promise.resolve(motion).then(()=>{
+            const feedback=feedbackOwner&&typeof feedbackOwner.emitEscapeFailure==="function"
+                ?feedbackOwner.emitEscapeFailure(characterIndex)
+                :null;
+            return feedback&&feedback.promise?feedback.promise:Promise.resolve();
+        }).then(()=>{
+            if(typeof battleActive==="undefined"||battleActive){ finishPlayerAction(); }
+        }).catch(()=>{
+            if(typeof battleActive==="undefined"||battleActive){ finishPlayerAction(); }
+        });
+        return;
     }
 
+    addBattleLog("成功逃脫！");
+    Promise.resolve(motion).then(()=>{
+        const finishEscapeRoute=()=>{
+            if(window.v132ActiveDungeonRun&&typeof window.v132AbortDungeonBattle==="function"){
+                window.v132AbortDungeonBattle("escape");
+            }else{
+                battleActive=false;
+                autoBattle=false;
+                actionReady=false;
+                pendingAction=null;
+                clearBattleRoundPrompt();
+                clearInterval(timerId);
+                timerId=null;
+                if(battleAdvanceTimeoutId){
+                    clearTimeout(battleAdvanceTimeoutId);
+                    battleAdvanceTimeoutId=null;
+                }
+                clearBattleActionWatchdog();
+                battleAdvanceScheduled=false;
+                battleToken++;
+                if(typeof finishBattleStatisticsSession==="function"){ finishBattleStatisticsSession("escape"); }
+                closeMenus();
+                if(window.v142SkillAnimationDirector){ window.v142SkillAnimationDirector.dispose(); }
+                if(feedbackOwner&&typeof feedbackOwner.clear==="function"){ feedbackOwner.clear(); }
+                showPage("map");
+                setMapCooldown(3000);
+                startMonsterMovement();
+                ensureAutoPatrolInterval();
+            }
+            if(presentationOwner&&typeof presentationOwner.cleanupEscape==="function"){
+                presentationOwner.cleanupEscape();
+            }
+            return true;
+        };
+        if(typeof window.v141PlayEscapeBattleExit==="function"){
+            return window.v141PlayEscapeBattleExit(finishEscapeRoute);
+        }
+        return finishEscapeRoute();
+    }).catch(()=>{
+        if(presentationOwner&&typeof presentationOwner.cleanupEscape==="function"){
+            presentationOwner.cleanupEscape();
+        }
+    });
 }
 
 
@@ -19992,12 +19439,10 @@ function useDefend(){
 
     /*
        ★ 修正（重要，依照使用者明確指正）：
-       防禦之前是「按了就立刻生效」，
-       跳過宣告/結算流程。
+       防禦之前是「按了就立刻生效」，       跳過宣告/結算流程。
        現在改成跟其他行動一樣先宣告、
        等結算階段照敏捷順序才真正生效——
-       雖然防禦本身「保護的是接下來受到的傷害」，
-       不太受順序影響，但玩家明確要求
+       雖然防禦本身「保護的是接下來受到的傷害」，       不太受順序影響，但玩家明確要求
        「所有行動都要遵循同一套宣告/結算機制」，
        不要有防禦這種特例，這裡就照做。
     */
@@ -20996,8 +20441,7 @@ function closeAutoBattleSettings(){
            關閉的時候搬回battlePage裡原本的
            位置，並把floating-modal這個class
            拿掉，恢復成原本在戰鬥頁面裡
-           的定位方式。不這樣做的話，面板會
-           永遠留在body底下，下次在戰鬥頁面
+           的定位方式。不這樣做的話，面板會           永遠留在body底下，下次在戰鬥頁面
            裡打開時，版面會跑掉。
         */
 
@@ -21363,630 +20807,74 @@ function confirmAutoBattleSettings(){
 /* Automatic combat only declares combat actions. HP/SP recovery is handled
    once after victory by applyPostBattleAutoRecovery(). */
 function autoActionForCharacter(characterIndex,token){
-
     const character=getPartyCharacterByIndex(characterIndex);
     const config=getPartyAutoConfig(characterIndex);
-    const autoOn=characterIndex===0 ? autoBattle : config.enabled;
+    const autoOn=characterIndex===0?autoBattle:config.enabled;
 
-    if(
-        !battleActive ||
-        !character ||
-        character.hp<=0 ||
-        !autoOn ||
-        token!==battleToken
-    ){
-        return;
-    }
+    if(!battleActive||!character||character.hp<=0||!autoOn||token!==battleToken){ return; }
 
     if(config.skill==="defend"){
         queuedPlayerActions[characterIndex]={action:"defend",target:null};
-        updateUI();
-        finishPlayerAction();
-        return;
+        updateUI(); finishPlayerAction(); return;
     }
 
-    const aliveInBattle=currentBattleMonsters.filter(
-        index=>monsters[index] && monsters[index].alive
-    );
+    const aliveInBattle=currentBattleMonsters.filter(index=>isBattleTargetAlive("monster",index));
+    if(aliveInBattle.length===0){ checkBattleEnd(); return; }
 
-    if(aliveInBattle.length===0){
-        checkBattleEnd();
-        return;
-    }
-
-    const skill=skillDatabase[config.skill];
+    let action=config.skill||"normal";
+    let skill=action!=="normal"?skillDatabase[action]:null;
     const skillKey=getPartyCharacterKey(characterIndex);
-    const skillLevel=skill?getSkillLevel(skillKey,config.skill):0;
-    const effectiveTargetType=skill?getEffectiveSkillTargetType(skill,skillLevel):"single";
-    const spreads=skill && ["tri","row","column","all"].includes(effectiveTargetType);
-    let target=aliveInBattle[0];
+    if(action!=="normal"&&(
+        !skill||
+        getSkillLevel(skillKey,action)<=0||
+        character.sp<(skill.spCost!==undefined?skill.spCost:(skill.cost||0))||
+        ["buff","passive","heal","revive"].includes(skill.category)
+    )){
+        action="normal";
+        skill=null;
+    }
 
-    /*
-       V137：怪物擴充到最多10隻、並分成兩排之後，「整份存活清單的
-       中間」不再等於「技能能打最多人的中心」。例如6隻怪時舊算法
-       會選第一排最右邊，tri技能只打到2隻。逐一用真正的
-       getSkillTargets()評估候選中心，選命中數最多的那一個，row／
-       tri技能才會依目前陣形與死亡缺口正確選位。
-    */
-    if(spreads && typeof getSkillTargets==="function"){
+    const skillLevel=skill?getSkillLevel(skillKey,action):0;
+    const targetType=skill
+        ?normalizeBattleTargetType(getEffectiveSkillTargetType(skill,skillLevel))
+        :"single";
+
+    if(targetType==="all"){
+        queuedPlayerActions[characterIndex]={action:action,target:null};
+        updateUI(); finishPlayerAction(); return;
+    }
+
+    const candidates=aliveInBattle.filter(index=>
+        canSelectHostileBattlePrimary("monster",index,targetType)
+    );
+    if(!candidates.length){
+        queuedPlayerActions[characterIndex]={action:"defend",target:null};
+        addBattleLog((character.id||"角色")+"找不到可被單體／指定範圍攻擊選中的目標，改為防禦。");
+        updateUI(); finishPlayerAction(); return;
+    }
+
+    let target=candidates[0];
+    if(skill&&["tri","row","column"].includes(targetType)){
         let bestCount=-1;
-        aliveInBattle.forEach(candidate=>{
-            const hitCount=getSkillTargets(candidate,effectiveTargetType).length;
-            if(hitCount>bestCount){
-                bestCount=hitCount;
-                target=candidate;
-            }
+        candidates.forEach(candidate=>{
+            const hitCount=getSkillTargets(candidate,targetType).length;
+            if(hitCount>bestCount){ bestCount=hitCount; target=candidate; }
         });
     }
 
-    let action=config.skill||"normal";
-
-    if(
-        action!=="normal" &&
-        (
-            !skill ||
-            getSkillLevel(skillKey,action)<=0 ||
-            character.sp<(skill.spCost!==undefined ? skill.spCost : (skill.cost||0)) ||
-            ["buff","passive","heal","revive"].includes(skill.category)
-        )
-    ){
-        action="normal";
-    }
-
-    queuedPlayerActions[characterIndex]={
-        action:action,
-        target:target
-    };
-
+    queuedPlayerActions[characterIndex]={action:action,target:target};
     updateUI();
     finishPlayerAction();
 }
-
 
 function autoAction(token){
-
     return autoActionForCharacter(0,token);
-
-    if(
-        !battleActive ||
-        !autoBattle ||
-        token!==battleToken
-    ){
-        return;
-    }
-
-
-    /*
-       ★ 修正（重要，依照使用者明確指正）：
-       自動戰鬥之前是「輪到自己就立刻執行」，
-       完全跳過宣告/結算機制，
-       等於自動角色永遠無視敏捷排序、
-       永遠是宣告階段那一刻就出手。
-
-       現在改成：自動戰鬥只負責「決定要做什麼」
-       （防禦/藥水/技能+目標），
-       決定好之後一樣存進queuedPlayerActions，
-       真正的執行留到結算階段，
-       跟手動操作的角色用同一套規則、
-       同樣要看敏捷順序，不再有特例。
-    */
-
-    if(autoConfig.skill==="defend"){
-
-        queuedPlayerActions[0]={
-
-            action:"defend",
-
-            target:null
-
-        };
-
-
-        updateUI();
-
-        finishPlayerAction();
-
-        return;
-
-    }
-
-
-    const stats =
-        getMainCharacterStats();
-
-
-    const hpPercent =
-        player.hp/
-        stats.maxHP*
-        100;
-
-
-    const autoHpPotionId=
-        getAutoPotionId("hp");
-
-
-    if(
-        hpPercent<=autoConfig.hp &&
-        autoHpPotionId
-    ){
-
-        queuedPlayerActions[0]={
-
-            action:"potion",
-            potionId:autoHpPotionId,
-            target:null
-
-        };
-
-
-        updateUI();
-
-        finishPlayerAction();
-
-        return;
-
-    }
-
-
-    const spPercent =
-        player.sp/
-        stats.maxSP*
-        100;
-
-
-    const autoSpPotionId=
-        getAutoPotionId("sp");
-
-
-    if(
-        spPercent<=autoConfig.sp &&
-        autoSpPotionId
-    ){
-
-        queuedPlayerActions[0]={
-
-            action:"potion",
-            potionId:autoSpPotionId,
-            target:null
-
-        };
-
-
-        updateUI();
-
-        finishPlayerAction();
-
-        return;
-
-    }
-
-
-    /*
-       ★ 重新設計自動戰鬥選怪邏輯：
-
-       之前不管用什麼技能，都用同一套固定優先順序選目標，
-       導致範圍技能（火箭：中左右三人）
-       常常選到只能打到1~2隻的位置，
-       完全沒有「盡量炸到最多隻」的邏輯，這是主要的怪異之處。
-
-       現在改成：
-       - 範圍技能（目前是火箭）：
-         選「目前戰鬥中還活著的怪物」正中間那一隻，
-         因為火箭是「以選定目標為中心，向左右擴散」，
-         打中間才能盡量涵蓋最多隻。
-         由於一場戰鬥最多只有1~3隻怪，
-         這樣做出來的效果自然就是：
-         3隻都活著 → 全部打到；
-         剩2隻 → 兩隻都打到；
-         剩1隻 → 單體命中。
-         正好符合「優先三連、其次兩連、最後單隻」的邏輯，
-         不需要額外判斷「怪物是否連在一起」，
-         因為現在整場戰鬥的怪物本來就都算「連在一起」。
-       - 單體技能（普通攻擊、會心一擊）：
-         直接打目前還活著的第一隻就好，
-         單體技能本來就不需要考慮誰在中間。
-    */
-
-    const aliveInBattle =
-        currentBattleMonsters
-        .filter(
-            i=>
-                monsters[i] &&
-                monsters[i].alive
-        );
-
-
-    /*
-       ★ 判斷目前選定的自動技能是不是「範圍系」，
-       範圍系（tri/row/all）就挑中間的怪，
-       盡量炸到最多隻；
-       單體技能或普通攻擊，直接打第一隻活著的就好。
-       這裡改成從skillDatabase動態查詢，
-       之後新增技能不用再回來改這段。
-    */
-
-    const autoSkillData =
-        skillDatabase[
-            autoConfig.skill
-        ];
-
-
-    const isSpreadSkill =
-        autoSkillData &&
-        (
-            autoSkillData.targetType==="tri"||
-            autoSkillData.targetType==="row"||
-            autoSkillData.targetType==="column"||
-            autoSkillData.targetType==="all"
-        );
-
-
-    let target;
-
-
-    if(
-        isSpreadSkill &&
-        aliveInBattle.length>0
-    ){
-
-        const midPosition =
-            Math.floor(
-                (
-                    aliveInBattle.length-1
-                )/2
-            );
-
-
-        target =
-            aliveInBattle[
-                midPosition
-            ];
-
-    }
-    else{
-
-        target =
-            aliveInBattle[0];
-
-    }
-
-
-    if(target===undefined){
-
-        checkBattleEnd();
-
-        return;
-
-    }
-
-
-    /*
-       ★ buff類（怒火）不需要選目標，
-       直接宣告「要用怒火」就好。
-    */
-
-    if(
-        autoSkillData &&
-        autoSkillData.category==="buff"
-    ){
-
-        queuedPlayerActions[0]={
-
-            action:
-                autoConfig.skill,
-
-            target:null
-
-        };
-
-
-        updateUI();
-
-        finishPlayerAction();
-
-        return;
-
-    }
-
-
-    let chosenAction=
-        autoConfig.skill;
-
-
-    if(autoSkillData){
-
-        const spCost =
-            autoSkillData.spCost!==undefined
-            ?
-            autoSkillData.spCost
-            :
-            autoSkillData.cost;
-
-
-        if(player.sp<spCost){
-
-            addBattleLog(
-                "SP不足，改用普通攻擊。"
-            );
-
-
-            chosenAction=
-                "normal";
-
-        }
-
-    }
-
-
-    queuedPlayerActions[0]={
-
-        action:chosenAction,
-
-        target:target
-
-    };
-
-
-    updateUI();
-
-    finishPlayerAction();
-
 }
 
-
-/* =====================================================
-   ★ 第二角色自動戰鬥（新增）
-
-   player2沒有手動操作介面，
-   每回合玩家的行動結束之後，
-   會自動用他自己裝備的技能/自動設定
-   （autoConfig2）打一次，
-   邏輯盡量跟autoAction()對稱，
-   但完全獨立運作，不會動到第一角色的任何狀態。
-===================================================== */
-
+/* Additional party members share the same declaration owner. */
 function player2AutoAction(token){
-
     return autoActionForCharacter(1,token);
-
-    if(
-        !battleActive ||
-        !player2 ||
-        player2.hp<=0 ||
-        token!==battleToken
-    ){
-        return;
-    }
-
-
-    /*
-       ★ 修正（重要，依照使用者明確指正）：
-       第二角色的自動戰鬥之前也是「輪到自己
-       就立刻執行」，一樣違反了「所有行動都要
-       照敏捷順序結算」的要求。
-       改成跟player1的autoAction()一樣，
-       只負責「決定要做什麼」並存進
-       queuedPlayerActions，真正執行留到
-       結算階段，並且這裡自己負責呼叫
-       finishPlayerAction()（不再依賴
-       beginCharacterTurn()那邊額外呼叫一次，
-       避免重複推進）。
-    */
-
-    if(autoConfig2.skill==="defend"){
-
-        queuedPlayerActions[1]={
-
-            action:"defend",
-
-            target:null
-
-        };
-
-
-        updateUI();
-
-        finishPlayerAction();
-
-        return;
-
-    }
-
-
-    const stats2=
-        getPlayer2BattleStats();
-
-
-    const hpPercent2=
-        player2.hp/
-        stats2.maxHP*
-        100;
-
-
-    const autoHpPotionId2=
-        getAutoPotionId("hp");
-
-
-    if(
-        hpPercent2<=autoConfig2.hp &&
-        autoHpPotionId2
-    ){
-
-        queuedPlayerActions[1]={
-
-            action:"potion",
-            potionId:autoHpPotionId2,
-            target:null
-
-        };
-
-
-        updateUI();
-
-        finishPlayerAction();
-
-        return;
-
-    }
-
-
-    const spPercent2=
-        player2.sp/
-        stats2.maxSP*
-        100;
-
-
-    const autoSpPotionId2=
-        getAutoPotionId("sp");
-
-
-    if(
-        spPercent2<=autoConfig2.sp &&
-        autoSpPotionId2
-    ){
-
-        queuedPlayerActions[1]={
-
-            action:"potion",
-            potionId:autoSpPotionId2,
-            target:null
-
-        };
-
-
-        updateUI();
-
-        finishPlayerAction();
-
-        return;
-
-    }
-
-
-    const aliveInBattle=
-        currentBattleMonsters.filter(
-            i=>
-                monsters[i] &&
-                monsters[i].alive
-        );
-
-
-    if(aliveInBattle.length===0){
-
-        finishPlayerAction();
-
-        return;
-
-    }
-
-
-    const autoSkillData=
-        skillDatabase[
-            autoConfig2.skill
-        ];
-
-
-    const isSpreadSkill=
-        autoSkillData &&
-        (
-            autoSkillData.targetType==="tri"||
-            autoSkillData.targetType==="row"||
-            autoSkillData.targetType==="column"||
-            autoSkillData.targetType==="all"
-        );
-
-
-    let target;
-
-
-    if(
-        isSpreadSkill &&
-        aliveInBattle.length>0
-    ){
-
-        const midPosition=
-            Math.floor(
-                (
-                    aliveInBattle.length-1
-                )/2
-            );
-
-
-        target=
-            aliveInBattle[
-                midPosition
-            ];
-
-    }
-    else{
-
-        target=
-            aliveInBattle[0];
-
-    }
-
-
-    if(target===undefined){
-
-        finishPlayerAction();
-
-        return;
-
-    }
-
-
-    let chosenAction=
-        autoConfig2.skill;
-
-
-    if(
-        autoSkillData &&
-        autoSkillData.category!=="buff"&&
-        autoSkillData.category!=="passive"&&
-        autoSkillData.category!=="heal"&&
-        autoSkillData.category!=="revive"
-    ){
-
-        const spCost=
-            autoSkillData.spCost!==undefined
-            ?
-            autoSkillData.spCost
-            :
-            autoSkillData.cost;
-
-
-        if(player2.sp<spCost){
-
-            addBattleLog(
-                ""+
-                player2.id+
-                "SP不足，改用普通攻擊。"
-            );
-
-
-            chosenAction=
-                "normal";
-
-        }
-
-    }
-
-
-    queuedPlayerActions[1]={
-
-        action:chosenAction,
-
-        target:target
-
-    };
-
-
-    updateUI();
-
-    finishPlayerAction();
-
 }
-
 
 function player3AutoAction(token){
     return autoActionForCharacter(2,token);
@@ -21998,7 +20886,7 @@ function secondaryCharacterNormalAttack(characterIndex,index){
     const character=getPartyCharacterByIndex(characterIndex);
     const stats=getPartyBattleStats(characterIndex);
 
-    index=findAliveTargetIndex(index);
+    index=findAliveTargetIndex(index,"single");
 
     if(!character || !stats || index===null){
         finishPlayerAction();
@@ -22014,8 +20902,8 @@ function secondaryCharacterNormalAttack(characterIndex,index){
     const hit=rollHitChance(
         stats.accuracy,
         getMonsterEvasion(monster),
-        getMonsterDebuffValue(character,"stun"),
-        getActiveAccuracyBonusPercent(character)
+        getFinalHitReductionPercent(character),
+        getFinalAccuracyBonusPercent(character)
     );
 
     if(!hit){
@@ -22087,15 +20975,21 @@ function castSecondaryCharacterSkill(characterIndex,skillId,centerIndex){
         return;
     }
 
-    centerIndex=findAliveTargetIndex(centerIndex);
+    const effectiveTargetType=getEffectiveSkillTargetType(skill,level);
+    centerIndex=normalizeBattleTargetType(effectiveTargetType)==="all"
+        ?null
+        :findAliveTargetIndex(centerIndex,effectiveTargetType);
 
-    if(centerIndex===null){
+    if(normalizeBattleTargetType(effectiveTargetType)!=="all"&&centerIndex===null){
         finishPlayerAction();
         return;
     }
 
-    const effectiveTargetType=getEffectiveSkillTargetType(skill,level);
     const targets=getSkillTargets(centerIndex,effectiveTargetType);
+    if(!targets.length){
+        finishPlayerAction();
+        return;
+    }
 
     character.sp-=spCost;
     lungePlayerCard(characterIndex);
@@ -22116,7 +21010,7 @@ function castSecondaryCharacterSkill(characterIndex,skillId,centerIndex){
             const freezeResult=rollNamedPersistentStatusEffect(
                 monster,"freeze",[
                     freezeChance,character.level,monster.level,
-                    stats.intelligence,getMonsterEffectiveSpiritPoints(monster),
+                    stats.intelligence,getMonsterEffectiveStatusResistance(monster),
                     true,getMonsterRank(monster)
                 ],"monster",index,skill.name
             );
@@ -22153,8 +21047,8 @@ function castSecondaryCharacterSkill(characterIndex,skillId,centerIndex){
         const hit=rollHitChance(
             stats.accuracy,
             getMonsterEvasion(monster),
-            getMonsterDebuffValue(character,"stun"),
-        getActiveAccuracyBonusPercent(character)
+            getFinalHitReductionPercent(character),
+        getFinalAccuracyBonusPercent(character)
     );
 
         if(!hit){
@@ -22197,7 +21091,7 @@ function castSecondaryCharacterSkill(characterIndex,skillId,centerIndex){
                 "burn",
                 [
                     skill.burnChance,character.level,monster.level,
-                    stats.intelligence,getMonsterEffectiveSpiritPoints(monster)
+                    stats.intelligence,getMonsterEffectiveStatusResistance(monster)
                 ],
                 "monster",
                 index,
@@ -22216,7 +21110,7 @@ function castSecondaryCharacterSkill(characterIndex,skillId,centerIndex){
                 "freeze",
                 [
                     skill.freezeChance,character.level,monster.level,
-                    stats.intelligence,getMonsterEffectiveSpiritPoints(monster),
+                    stats.intelligence,getMonsterEffectiveStatusResistance(monster),
                     true,getMonsterRank(monster)
                 ],
                 "monster",
@@ -22240,7 +21134,7 @@ function castSecondaryCharacterSkill(characterIndex,skillId,centerIndex){
 
     if(skill.lifestealPercentByLevel && totalLifesteal>0){
         const amount=Math.floor(
-            totalLifesteal*skill.lifestealPercentByLevel[level-1]/100
+            totalLifesteal*getWaterExAbsorbPercent(character,skill.lifestealPercentByLevel[level-1],"hp")/100
         );
         character.hp=Math.min(stats.maxHP,character.hp+amount);
         character.sp=Math.min(stats.maxSP,character.sp+amount);
@@ -22353,11 +21247,8 @@ function player2NormalAttack(index){
             getMonsterEvasion(
                 monster
             ),
-            getMonsterDebuffValue(
-                    player2,
-                    "stun"
-                ),
-                getActiveAccuracyBonusPercent(player2)
+            getFinalHitReductionPercent(player2),
+                getFinalAccuracyBonusPercent(player2)
             );
 
 
@@ -22548,7 +21439,6 @@ function castPlayer2Skill(skillId,centerIndex){
         :
         skill.cost;
 
-
     if(player2.sp<spCost){
 
         finishPlayerAction();
@@ -22558,15 +21448,21 @@ function castPlayer2Skill(skillId,centerIndex){
     }
 
 
-    centerIndex=findAliveTargetIndex(centerIndex);
+    const effectiveTargetType=getEffectiveSkillTargetType(skill,level);
+    centerIndex=normalizeBattleTargetType(effectiveTargetType)==="all"
+        ?null
+        :findAliveTargetIndex(centerIndex,effectiveTargetType);
 
-    if(centerIndex===null){
+    if(normalizeBattleTargetType(effectiveTargetType)!=="all"&&centerIndex===null){
         finishPlayerAction();
         return;
     }
 
-    const effectiveTargetType=getEffectiveSkillTargetType(skill,level);
     const targets=getSkillTargets(centerIndex,effectiveTargetType);
+    if(!targets.length){
+        finishPlayerAction();
+        return;
+    }
 
     player2.sp-=spCost;
 
@@ -22642,7 +21538,7 @@ function castPlayer2Skill(skillId,centerIndex){
             const freezeResult=rollNamedPersistentStatusEffect(
                 monster,"freeze",[
                     freezeChance,player2.level,monster.level,
-                    stats2.intelligence,getMonsterEffectiveSpiritPoints(monster),
+                    stats2.intelligence,getMonsterEffectiveStatusResistance(monster),
                     true,getMonsterRank(monster)
                 ],"monster",index,skill.name
             );
@@ -22718,11 +21614,8 @@ function castPlayer2Skill(skillId,centerIndex){
                 getMonsterEvasion(
                     monster
                 ),
-                getMonsterDebuffValue(
-                    player2,
-                    "stun"
-                ),
-                getActiveAccuracyBonusPercent(player2)
+                getFinalHitReductionPercent(player2),
+                getFinalAccuracyBonusPercent(player2)
             );
 
 
@@ -22816,7 +21709,7 @@ function castPlayer2Skill(skillId,centerIndex){
                         player2.level,
                         monster.level,
                         stats2.intelligence,
-                        getMonsterEffectiveSpiritPoints(monster)
+                        getMonsterEffectiveStatusResistance(monster)
                     ],
                     "monster",
                     index,
@@ -22858,7 +21751,7 @@ function castPlayer2Skill(skillId,centerIndex){
                         player2.level,
                         monster.level,
                         stats2.intelligence,
-                        getMonsterEffectiveSpiritPoints(monster),
+                        getMonsterEffectiveStatusResistance(monster),
                         true,
                         getMonsterRank(monster)
                     ],
@@ -23540,13 +22433,15 @@ function renderBattle(){
 
 
     renderPlayers();
-
     const bossPresentationOwner=typeof window!=="undefined"?window.FourSymbolsBossBattle:null;
     if(bossPresentationOwner&&typeof bossPresentationOwner.syncHud==="function"){
         bossPresentationOwner.syncHud();
     }
 
     runBattleRenderHooks("after",this,arguments);
+    if(typeof syncBattleUiPriorityLayer==="function"){
+        syncBattleUiPriorityLayer();
+    }
 
 
     /*
@@ -24043,127 +22938,41 @@ function updateSingleCharacterBars(
 }
 
 
-function triggerCriticalImpact(element){
-
-    if(!element){
-        return;
-    }
-
-    element.classList.remove("critical-impact");
-    void element.offsetWidth;
-    element.classList.add("critical-impact");
-
-    setTimeout(()=>{
-        element.classList.remove("critical-impact");
-    },520);
-}
-
-
 function showDamagePopup(element,text,type,isCrit){
 
-    if(!element){
-        return;
+    const feedback=typeof window!=="undefined"
+        ?window.FourSymbolsBattleFloatingFeedback
+        :null;
+
+    if(!feedback||typeof feedback.emit!=="function"||!element){
+        return null;
+    }
+
+    const unit=typeof feedback.identifyUnit==="function"
+        ?feedback.identifyUnit(element)
+        :null;
+
+    if(!unit){
+        return null;
     }
 
 
-    const popup =
-        document.createElement(
-            "div"
-        );
-
-
-    popup.className =
-        /*
-           ★ 修正（依照使用者回報，「損失
-           血量顯示變成在血條下面」）：
-           真正原因找到了——這裡少打了
-           空格，"damage-popup"直接接
-           "hp-popup"變成
-           "damage-popuphp-popup"這種
-           class屬性根本不存在的字串，
-           .damage-popup那組CSS（position:
-           absolute;top:26%……原本設計
-           成飄在卡片中段、技能名稱跟血條
-           中間）完全沒套用到，popup變成
-           一個沒有任何定位樣式的普通
-           <div>，只能乖乖排在appendChild()
-           放進去的地方，也就是卡片最下面、
-           血條/SP條/名稱都排完之後。
-           每個class之間都補上空格，
-           跟前面「技能按鈕整個不能點」
-           是同一種typo，這已經是這個
-           檔案裡第三次抓到同樣的漏字
-           bug了。
-        */
-
-        "damage-popup "+
-        (
-            type==="sp"
-            ?
-            "sp-popup"
-            :
-            type==="heal"
-            ?
-            "heal-popup"
-            :
-            type==="miss"
-            ?
-            "miss-popup"
-            :
-            type==="shield"
-            ?
-            "shield-popup"
-            :
-            "hp-popup"
-        )+
-        (
-            isCrit
-            ?
-            " critical-popup"
-            :
-            ""
-        );
-
-
-    if(isCrit){
-        /* V100：爆擊浮字只保留「爆擊 + 傷害數字」。
-           showPlayerHit/showMonsterHit 傳進來的 text 可能含 -、HP/SP，
-           這裡只抽出數字做顯示；不影響實際傷害值。 */
-        const criticalNumberMatch =
-            String(text).match(/\d+(?:\.\d+)?/);
-
-        popup.textContent =
-            "爆擊 "+
-            (criticalNumberMatch ? criticalNumberMatch[0] : String(text));
-    }else{
-        popup.textContent = text;
-    }
-
-
-    if(isCrit){
-        triggerCriticalImpact(element);
-    }
-
-
-    element.appendChild(
-        popup
-    );
-
-
-    setTimeout(()=>{
-
-        if(
-            popup &&
-            popup.parentNode
-        ){
-
-            popup.parentNode.removeChild(
-                popup
-            );
-
-        }
-
-    },1800);
+    return feedback.emit({
+        side:unit.side,
+        index:unit.index,
+        kind:type==="heal"
+            ?"heal"
+            :type==="sp"
+                ?"sp"
+                :type==="miss"
+                    ?"miss"
+                    :type==="shield"
+                        ?"shield"
+                        :"damage",
+        text:text,
+        critical:!!isCrit,
+        source:"core-entry"
+    });
 
 }
 
@@ -24540,7 +23349,6 @@ function spawnFireSparkBurst(
     const sparkCount=
         8;
 
-
     for(
         let i=0;
         i<sparkCount;
@@ -24799,9 +23607,8 @@ function showSkillNameBadge(skillName,elementType,characterIndex,targetId,target
         );
 
 
-    badge.className =
-        "skill-name-badge badge-"+
-        elementType;
+    badge.className="skill-name-badge";
+    badge.dataset.skillElement=String(elementType||"normal");
 
 
     badge.textContent =
@@ -24817,43 +23624,12 @@ function showSkillNameBadge(skillName,elementType,characterIndex,targetId,target
         "--skill-name-display-duration",
         badgeDuration+"ms"
     );
+    badge.dataset.skillElement=String(elementType||"normal");
+const badgePoint={x:rect.left+rect.width/2,y:rect.top};
 
-
-
-    /* V38 SOURCE-LEVEL UI SIZE FIX:
-       The badge gets its final visual size at creation time.
-       This is deliberately inline + !important so later CSS cannot
-       silently override it. */
-    badge.style.setProperty("font-size","72px","important");
-    badge.style.setProperty("line-height","1.05","important");
-    badge.style.setProperty("font-weight","900","important");
-    badge.style.setProperty("white-space","nowrap","important");
-    badge.style.setProperty("width","max-content","important");
-    badge.style.setProperty("min-width","max-content","important");
-    badge.style.setProperty("-webkit-text-stroke","1.8px #f2ead9","important");
-const badgePoint =
-        gamePointFromClient(
-            rect.left+rect.width/2,
-            rect.top
-        );
-
-    badge.style.position=
-        "absolute";
-
-    badge.style.left=
-        badgePoint.x+"px";
-
-    badge.style.top=
-        badgePoint.y+"px";
-
-
-    const overlayLayer =
-        $("game-overlay-layer") ||
-        document.getElementById("game-stage");
-
-    overlayLayer.appendChild(
-        badge
-    );
+    badge.style.left=badgePoint.x+"px";
+    badge.style.top=badgePoint.y+"px";
+    document.body.appendChild(badge);
 
 
     setTimeout(()=>{
@@ -24930,9 +23706,8 @@ function showMonsterSkillNameBadge(
         );
 
 
-    badge.className=
-        "skill-name-badge badge-"+
-        elementType;
+    badge.className="skill-name-badge";
+    badge.dataset.skillElement=String(elementType||"normal");
 
 
     badge.textContent=
@@ -24948,43 +23723,12 @@ function showMonsterSkillNameBadge(
         "--skill-name-display-duration",
         badgeDuration+"ms"
     );
+    badge.dataset.skillElement=String(elementType||"normal");
+const badgePoint={x:rect.left+rect.width/2,y:rect.top};
 
-
-
-    /* V38 SOURCE-LEVEL UI SIZE FIX:
-       The badge gets its final visual size at creation time.
-       This is deliberately inline + !important so later CSS cannot
-       silently override it. */
-    badge.style.setProperty("font-size","72px","important");
-    badge.style.setProperty("line-height","1.05","important");
-    badge.style.setProperty("font-weight","900","important");
-    badge.style.setProperty("white-space","nowrap","important");
-    badge.style.setProperty("width","max-content","important");
-    badge.style.setProperty("min-width","max-content","important");
-    badge.style.setProperty("-webkit-text-stroke","1.8px #f2ead9","important");
-const badgePoint =
-        gamePointFromClient(
-            rect.left+rect.width/2,
-            rect.top
-        );
-
-    badge.style.position=
-        "absolute";
-
-    badge.style.left=
-        badgePoint.x+"px";
-
-    badge.style.top=
-        badgePoint.y+"px";
-
-
-    const overlayLayer =
-        $("game-overlay-layer") ||
-        document.getElementById("game-stage");
-
-    overlayLayer.appendChild(
-        badge
-    );
+    badge.style.left=badgePoint.x+"px";
+    badge.style.top=badgePoint.y+"px";
+    document.body.appendChild(badge);
 
 
     setTimeout(()=>{
@@ -25536,13 +24280,11 @@ function checkLevelUp(targetCharacter){
     if(levels>0){
 
         /*
-           ★ 修正：
-           這裡跟之前戰鬥勝利補血是同一種問題——
+           ★ 修正：           這裡跟之前戰鬥勝利補血是同一種問題——
            升級當下直接把HP/SP強制補滿，
            跟你設定的「HP低於X%/SP低於X%」
            自動補藥水門檻完全無關，
-           難怪你會覺得「明明還沒到門檻，
-           它自己就補了」。
+           難怪你會覺得「明明還沒到門檻，           它自己就補了」。
 
            拿掉強制補滿，只重新計算一次
            current hp/sp的上限夾住（避免超過新的maxHP/maxSP），
@@ -26131,15 +24873,6 @@ function openHomeFeature(type){
             );
 
     }
-    else if(type==="bestiary"){
-
-        titleEl.textContent=
-            "圖鑑";
-
-        bodyEl.innerHTML=
-            renderBestiaryContent();
-
-    }
     else if(type==="achievement"){
 
         titleEl.textContent=
@@ -26541,7 +25274,6 @@ function closeHomeFeature(){
 
     const releaseUpdate=
         window.FourSymbolsReleaseUpdate;
-
     if(
         releaseUpdate&&
         typeof releaseUpdate.shouldPreventSharedModalClose==="function"&&
@@ -27541,8 +26273,7 @@ function formatQuestReward(reward){
     if(reward.gold){
         parts.push(
             "金幣 "+reward.gold
-        );
-    }
+        );    }
 
     if(reward.exp){
         parts.push(
@@ -28084,6 +26815,8 @@ function switchDungeonTab(tabName){
         }
     );
 
+    window.v148SyncContextNavigation?.();
+
 }
 
 
@@ -28312,113 +27045,6 @@ window.v17361ClaimAllDailyQuests=v17361ClaimAllDailyQuests;
 window.v17361ClaimAllCommissionQuests=v17361ClaimAllCommissionQuests;
 
 /* =====================================================
-   ★ 圖鑑
-===================================================== */
-
-function renderBestiaryContent(){
-
-    const allZoneArrays=[
-        forestMonsters,
-        desertMonsters,
-        iceMountainMonsters,
-        zone4Monsters,
-        zone5Monsters,
-        zone6Monsters,
-        zone7Monsters,
-        zone8Monsters
-    ];
-
-
-    const seenNames=
-        new Set();
-
-
-    let html=
-        "";
-
-
-    allZoneArrays.forEach(
-        zoneArray=>{
-
-            zoneArray.forEach(
-                monster=>{
-
-                    if(
-                        seenNames.has(
-                            monster.name
-                        )
-                    ){
-                        return;
-                    }
-
-
-                    seenNames.add(
-                        monster.name
-                    );
-
-
-                    const entry=
-
-                        bestiaryData[
-                            monster.name
-                        ];
-
-
-                    const element=
-
-                        elementDatabase[
-                            monster.element
-                        ]
-                        ||
-                        elementDatabase.fire;
-
-
-                    html+=
-
-                        '<div class="home-feature-row">'+
-
-                        "<span>"+
-
-                        (
-                            entry && entry.seen
-                            ?
-                            getElementIconHTML(
-                                monster.element
-                            )+
-                            ""+monster.name
-                            :
-                            "？？？"
-                        )+
-
-                        "</span>"+
-
-                        "<span>"+
-
-                        (
-                            entry && entry.seen
-                            ?
-                            "擊殺"+(entry.kills||0)
-                            :
-                            "未遇見"
-                        )+
-
-                        "</span>"+
-
-                        "</div>";
-
-                }
-            );
-
-        }
-    );
-
-
-    return html;
-
-}
-
-
-/* =====================================================
    ★ 成就
 ===================================================== */
 
@@ -28540,7 +27166,6 @@ function claimAchievement(achievementId){
             achievement.reward.gold;
 
     }
-
 
     updateGoldDisplay();
 
@@ -29220,8 +27845,8 @@ function changeStatusCharacter(direction){
    任何一種放開手指的方式都不能漏接，
    不然計時器會卡住一直加下去）。
 
-   6組+/-按鈕（攻擊/體質/能量/智力/
-   精神/敏捷）全部呼叫這個函式，不用
+   6組+/-按鈕（攻擊/智力/體質/能量/
+   防禦/敏捷）全部呼叫這個函式，不用
    每顆按鈕各寫一份長按邏輯。
 */
 
@@ -29425,9 +28050,9 @@ function updateStatusPreview(){
             targetCharacter.intelligence+
             pendingStats.intelligence,
 
-        spirit:
-            targetCharacter.spirit+
-            pendingStats.spirit,
+        defensePoints:
+            targetCharacter.defensePoints+
+            pendingStats.defensePoints,
 
         agility:
             targetCharacter.agility+
@@ -29541,8 +28166,7 @@ function updateStatusPreview(){
        跟主城、背包頁看到的邏輯一致。
     */
 
-    const equipmentBonus =
-        getEquipmentBonus(
+    const equipmentBonus =        getEquipmentBonus(
             getPartyCharacterKey(
                 getPartyCharacterIndex(targetCharacter)
             )
@@ -29611,12 +28235,7 @@ function updateStatusPreview(){
         );
 
 
-    $("statusSpirit")
-        .textContent =
-        formatStatLine(
-            current.spirit,
-            equipmentBonus.spirit
-        );
+    $("statusDefense").textContent=formatStatLine(current.defensePoints,equipmentBonus.defensePoints);
 
 
     $("statusAgility")
@@ -29969,6 +28588,61 @@ function getSkillCharacterObject(characterId){
 }
 
 
+let selectedSkillElementTab="";
+let selectedSkillElementCharacterKey="";
+const SKILL_ELEMENT_TAB_META=Object.freeze({
+    fire:{label:"火元素",element:"fire",className:"fire"},
+    water:{label:"水元素",element:"water",className:"water"},
+    wind:{label:"風元素",element:"wind",className:"wind"},
+    earth:{label:"土元素",element:"earth",className:"earth"}
+});
+
+function getSkillLearnCostForUi(character,skill){
+    if(typeof window!=="undefined"&&typeof window.v173GetInitialLearnCost==="function"){
+        return Math.max(0,Math.floor(Number(window.v173GetInitialLearnCost(character,skill))||0));
+    }
+    // The progression module owns the player-facing cost, including cross-element rules.
+    // Keep this fallback base-only so a missing module cannot create a second formula.
+    return Math.max(0,Math.floor(Number(skill&&skill.learnCost)||0));
+}
+
+function getSkillLearnEligibilityForUi(character,skill,levels){
+    if(typeof window!=="undefined"&&typeof window.v173GetSkillLearnEligibility==="function"){
+        return window.v173GetSkillLearnEligibility(character,skill,levels);
+    }
+    return {
+        allowed:false,isCrossElement:false,isNativeElement:true,levelOk:false,
+        prerequisiteRequired:false,prerequisiteOk:false,learnCost:0,pointsOk:false,
+        crossGateOk:false,reason:"技能規則載入中"
+    };
+}
+
+function renderSkillElementTabs(character,skillOwner){
+    const host=$("skillElementTabs");
+    if(!host){ return; }
+    const nativeElement=String((skillOwner&&skillOwner.element)||(character&&character.element)||"fire");
+    const characterKey=String(currentSkillCharacter||"");
+    if(selectedSkillElementCharacterKey!==characterKey){
+        selectedSkillElementTab=nativeElement;
+        selectedSkillElementCharacterKey=characterKey;
+    }
+    if(!Object.prototype.hasOwnProperty.call(SKILL_ELEMENT_TAB_META,selectedSkillElementTab)){
+        selectedSkillElementTab=nativeElement;
+    }
+    host.innerHTML=Object.keys(SKILL_ELEMENT_TAB_META).map(key=>{
+        const meta=SKILL_ELEMENT_TAB_META[key];
+        const active=key===selectedSkillElementTab;
+        return '<button type="button" role="tab" class="skill-element-tab '+meta.className+(active?' active':'')+'" aria-selected="'+(active?'true':'false')+'" onclick="selectSkillElementTab(\''+key+'\')">'+meta.label+'</button>';
+    }).join("");
+}
+
+function selectSkillElementTab(tab){
+    if(!Object.prototype.hasOwnProperty.call(SKILL_ELEMENT_TAB_META,tab)){ return; }
+    selectedSkillElementTab=tab;
+    renderSkillLoadout();
+}
+window.selectSkillElementTab=selectSkillElementTab;
+
 function renderSkillLoadout(){
 
     /*
@@ -30140,6 +28814,8 @@ function renderSkillLoadout(){
             currentSkillCharacter
         );
 
+    renderSkillElementTabs(character,skillOwner);
+
 
     const availableSkillPoints=Math.max(
         0,
@@ -30173,35 +28849,31 @@ function renderSkillLoadout(){
                 skillDatabase[skillId];
 
 
-            return (
-                skill &&
-                skill.element===
-                (
-                    skillOwner
-                    ?
-                    skillOwner.element
-                    :
-                    currentSkillCharacter
-                )
+            return !!(
+                skill && skill.element &&
+                Object.prototype.hasOwnProperty.call(skill,"learnLevel") &&
+                skill.category!=="monster" &&
+                skill.element===selectedSkillElementTab
             );
 
         });
 
 
-    const learnedIds=
-
-        matchingSkillIds.filter(
-            skillId=>
-                (skillLevels[skillId]||0)>0
-        );
-
-
-    const unlearnedIds=
-
-        matchingSkillIds.filter(
-            skillId=>
-                !(skillLevels[skillId]>0)
-        );
+    const progressionOrder={physical:0,magic:1,tactical:2,ex:3};
+    matchingSkillIds.sort((a,b)=>{
+        const aSkill=skillDatabase[a]||{};
+        const bSkill=skillDatabase[b]||{};
+        const aLearned=(skillLevels[a]||0)>0;
+        const bLearned=(skillLevels[b]||0)>0;
+        if(aLearned!==bLearned){ return aLearned?-1:1; }
+        const aGroup=progressionOrder[String(aSkill.progressionGroup||"")]??99;
+        const bGroup=progressionOrder[String(bSkill.progressionGroup||"")]??99;
+        if(aGroup!==bGroup){ return aGroup-bGroup; }
+        const aLevel=Number(aSkill.learnLevel)||0;
+        const bLevel=Number(bSkill.learnLevel)||0;
+        if(aLevel!==bLevel){ return aLevel-bLevel; }
+        return String(aSkill.name||a).localeCompare(String(bSkill.name||b));
+    });
 
 
     /*
@@ -30236,9 +28908,14 @@ function renderSkillLoadout(){
             (skill.maxLevel||1);
 
 
-        const canAfford =
-            availableSkillPoints>=
-            (skill.learnCost||0);
+        const eligibility=getSkillLearnEligibilityForUi(skillOwner,skill,skillLevels);
+        const learnCost=eligibility.learnCost;
+        const canAfford=eligibility.pointsOk;
+        const upgradeEligibility=isLearned &&
+            typeof window!=="undefined"&&
+            typeof window.v17364GetSkillUpgradeEligibility==="function"
+            ?window.v17364GetSkillUpgradeEligibility(skillOwner,skill,level)
+            :null;
 
 
         const box =
@@ -30249,25 +28926,18 @@ function renderSkillLoadout(){
 
         box.className =
             "skill-row";
+        box.dataset.skillId=skillId;
 
 
-        let actionIcon;
         let actionLabel;
         let actionOnclick;
         let actionDisabled;
 
 
-        const prereqMet =
-            isSkillPrereqMet(
-                skillLevels,
-                skill
-            );
+        const prereqMet=eligibility.prerequisiteOk;
 
 
         if(!isLearned){
-
-            actionIcon="";
-
 
             /*
                ★ 新增（依照使用者要求，「前置
@@ -30284,30 +28954,18 @@ function renderSkillLoadout(){
                樣式其實從來沒真的生效過）。
             */
 
-            actionLabel=
-                !prereqMet
-                ?
-                "🔒 "+getSkillPrereqLabel(skill)
-                :
-                (
-                    canAfford
-                    ?
-                    "學習"
-                    :
-                    "點數不足"
-                );
+            actionLabel=eligibility.allowed
+                ?"學習・"+learnCost+"點"
+                :eligibility.reason;
 
             actionOnclick=
                 "learnSkill('"+skillId+"')";
 
-            actionDisabled=
-                !prereqMet ||
-                !canAfford;
+            actionDisabled=!eligibility.allowed;
 
         }
         else if(isMaxLevel){
 
-            actionIcon="";
             actionLabel="已滿級";
 
             actionOnclick=
@@ -30319,20 +28977,18 @@ function renderSkillLoadout(){
         }
         else{
 
-            actionIcon="";
-
-            actionLabel=
-                availableSkillPoints<1
-                ?
-                "點數不足"
-                :
-                "升級";
+            actionLabel=upgradeEligibility
+                ?(upgradeEligibility.allowed
+                    ?"升級・"+upgradeEligibility.cost+"點"
+                    :upgradeEligibility.reason)
+                :(availableSkillPoints<1?"點數不足":"升級");
 
             actionOnclick=
                 "upgradeSkill('"+skillId+"')";
 
-            actionDisabled=
-                availableSkillPoints<1;
+            actionDisabled=upgradeEligibility
+                ?!upgradeEligibility.allowed
+                :availableSkillPoints<1;
 
         }
 
@@ -30360,8 +29016,9 @@ function renderSkillLoadout(){
 
         <div class="skill-row-text">
             <b>${skill.name}</b>
+            <span class="skill-category-badge ${skill.category}">${getSkillCategoryLabel(skill.category)}</span>
             ${
-                isLearned
+            isLearned
                 ?
                 "Lv."+level+
                 (
@@ -30372,7 +29029,7 @@ function renderSkillLoadout(){
                     ""
                 )
                 :
-                '<span style="color:#64748b;">未學習</span>'
+                ""
             }
             <br>
             <span class="skill-row-desc">
@@ -30380,12 +29037,12 @@ function renderSkillLoadout(){
             </span>
             ${
                 !isLearned &&
-                !prereqMet
+                !prereqMet&&eligibility.prerequisiteRequired
                 ?
                 `
                 <br>
                 <span style="color:#f59e0b;">
-                    🔒 ${getSkillPrereqLabel(skill)}
+                    🔒 ${eligibility.reason}
                 </span>
                 `
                 :
@@ -30399,7 +29056,8 @@ function renderSkillLoadout(){
             </span>
         </div>
 
-        <div
+        <button
+            type="button"
             class="skill-action-card${
                 actionDisabled
                 ?
@@ -30407,19 +29065,19 @@ function renderSkillLoadout(){
                 :
                 ""
             }"
+            data-skill-action="growth"
+            ${actionDisabled?'disabled aria-disabled="true"':'aria-disabled="false"'}
             onclick="${actionOnclick}"
         >
-            <div class="skill-action-card-top">${actionIcon}</div>
-            <div class="skill-action-card-label">
-                ${actionLabel}
-            </div>
-        </div>
+            <span class="skill-action-card-label">${actionLabel}</span>
+        </button>
 
         ${
             showEquipButton
             ?
             `
-            <div
+            <button
+                type="button"
                 class="skill-action-card${
                     equipped
                     ?
@@ -30427,19 +29085,18 @@ function renderSkillLoadout(){
                     :
                     ""
                 }"
+                data-skill-action="equip"
+                ${equipped?'disabled aria-disabled="true"':'aria-disabled="false"'}
                 onclick="equipSkill('${skillId}')"
             >
-                <div class="skill-action-card-top"></div>
-                <div class="skill-action-card-label">
-                    ${
-                        equipped
-                        ?
-                        "已裝備"
-                        :
-                        "裝備"
-                    }
-                </div>
-            </div>
+                <span class="skill-action-card-label">${
+                    equipped
+                    ?
+                    "已裝備"
+                    :
+                    "裝備"
+                }</span>
+            </button>
             `
             :
             ""
@@ -30452,82 +29109,9 @@ function renderSkillLoadout(){
     }
 
 
-    /*
-       ★ 分隔線用的純文字標籤，故意不用
-       任何框線/底色，只是一行置中的
-       虛線+文字，單純視覺上區隔兩組。
-    */
-
-    function buildSkillSectionDivider(label){
-
-        const divider=
-            document.createElement(
-                "div"
-            );
-
-
-        divider.style.cssText=
-
-            "text-align:center;"+
-            "font-size:11px;"+
-            "color:#8a7a5c;"+
-            "margin:10px 0 4px;";
-
-
-        divider.textContent=
-
-            "─────"+
-            label+
-            "─────";
-
-
-        return divider;
-
-    }
-
-
-    if(learnedIds.length>0){
-
-        allList.appendChild(
-            buildSkillSectionDivider(
-                "已學習"
-            )
-        );
-
-
-        learnedIds.forEach(skillId=>{
-
-            allList.appendChild(
-                buildSkillRowElement(
-                    skillId
-                )
-            );
-
-        });
-
-    }
-
-
-    if(unlearnedIds.length>0){
-
-        allList.appendChild(
-            buildSkillSectionDivider(
-                "未學習"
-            )
-        );
-
-
-        unlearnedIds.forEach(skillId=>{
-
-            allList.appendChild(
-                buildSkillRowElement(
-                    skillId
-                )
-            );
-
-        });
-
-    }
+    matchingSkillIds.forEach(skillId=>{
+        allList.appendChild(buildSkillRowElement(skillId));
+    });
 
 
     /*
@@ -30537,13 +29121,14 @@ function renderSkillLoadout(){
        選單都會自動跟上，不用每個呼叫renderSkillLoadout()
        的地方都各自記得再呼叫一次。
     */
-
     populateAutoSkillOptions();
 
     populateAutoSkillOptions2();
+    if(typeof window!=="undefined"&&typeof window.v152SyncSkillPointDisplay==="function"){
+        window.v152SyncSkillPointDisplay();
+    }
 
 }
-
 
 /*
    組出技能目前等級的效果文字說明，
@@ -30561,23 +29146,23 @@ function renderSkillLoadout(){
 function getSkillCategoryLabel(category){
 
     if(category==="physical"){
-        return"物理主動";
+        return"物理";
     }
 
     if(category==="magic"){
-        return"法術主動";
+        return"法術";
     }
 
     if(category==="buff"){
-        return"增益主動";
+        return"增益";
     }
 
     if(category==="heal"){
-        return"治療主動";
+        return"治療";
     }
 
     if(category==="revive"){
-        return"復活主動";
+        return"復活";
     }
 
     if(category==="passive"){
@@ -30920,18 +29505,17 @@ function learnSkill(skillId){
        後端一樣要擋住，不能只靠前端。
     */
 
-    if(
-        !isSkillPrereqMet(
-            character.skillLevels,
-            skill
-        )
-    ){
+    const eligibility=getSkillLearnEligibilityForUi(
+        owner,
+        skill,
+        character.skillLevels
+    );
+
+    if(!eligibility.allowed){
 
         alert(
-            getSkillPrereqLabel(skill)+
-            "，才能學習「"+
-            skill.name+
-            "」。"
+            eligibility.reason+
+            "，才能學習「"+skill.name+"」。"
         );
 
         return;
@@ -30939,7 +29523,7 @@ function learnSkill(skillId){
     }
 
 
-    const learnCost=Math.max(0,Number(skill.learnCost)||0);
+    const learnCost=eligibility.learnCost;
     const availablePoints=Math.max(0,Number(owner.skillPoints)||0);
 
     if(availablePoints<learnCost){
@@ -31165,24 +29749,7 @@ function getBackpackCharacterStats(index){
     if(index===0) return getMainCharacterStats();
 
     const key=getBackpackEquipmentKey(index);
-    const bonus=getEquipmentBonus(key);
-
-    return {
-        maxHP:100+(character.bonusHP||0)+character.vitality*HP_PER_VITALITY_POINT+bonus.maxHP+bonus.vitality*HP_PER_VITALITY_POINT,
-        maxSP:50+(character.bonusSP||0)+character.energy*15+bonus.maxSP+bonus.energy*15,
-        attack:BASE_PHYSICAL_ATTACK+Math.max(1,Number(character.level)||1)*ATTACK_PER_LEVEL+(character.attack+bonus.attack)*ATTACK_PER_POINT,
-        magicAttack:BASE_MAGIC_ATTACK+Math.max(1,Number(character.level)||1)*MAGIC_ATTACK_PER_LEVEL+(character.intelligence+bonus.intelligence)*MAGIC_ATTACK_PER_POINT,
-        defense:BASE_DEFENSE+Math.max(1,Number(character.level)||1)*DEFENSE_PER_LEVEL+(character.vitality+bonus.vitality)*DEFENSE_PER_VITALITY_POINT+bonus.defense,
-        vitality:character.vitality+bonus.vitality,
-        energy:character.energy+bonus.energy,
-        intelligence:character.intelligence+bonus.intelligence,
-        spirit:character.spirit+bonus.spirit,
-        agility:character.agility+bonus.agility,
-        accuracy:character.spirit*2+bonus.spirit*2,
-        resistance:calculateStatusResistancePercent(character.spirit+bonus.spirit),
-        antiCrit:calculateAntiCritPercent(character.spirit+bonus.spirit),
-        evasion:(character.agility+bonus.agility)*0.6
-    };
+    return getAdditionalCharacterBattleStats(character,key);
 }
 
 function changeInventoryCharacter(direction){
@@ -31285,65 +29852,18 @@ function getInventoryCharacterCriticalStats(index){
         return null;
     }
 
-    /*
-       V118：背包詳細資料同步顯示物理／法術兩套爆擊。
-       只做顯示，公式與 rollCritical() 保持一致：
-       物理看 attack、法術看 intelligence。
-    */
-    const rageBuff=
-        (
-            (character&&character.activeBuffs)||
-            []
-        )
-        .find(
-            buff=>buff.type==="rage"
-        );
-
-    function buildCriticalProfile(statPoints,chancePerPoint,multiplierPerPoint){
-        let critChance=
-            Math.min(
-                CRIT_CHANCE_MAX,
-                CRIT_CHANCE_BASE+
-                statPoints*
-                chancePerPoint
-            );
-
-        let critMultiplier=
-            Math.min(
-                CRIT_MULTIPLIER_ATTRIBUTE_MAX,
-                CRIT_MULTIPLIER_BASE+
-                statPoints*
-                multiplierPerPoint
-            );
-
-        if(rageBuff){
-            critChance+=
-                rageBuff.bonusPercent;
-
-            critMultiplier=
-                1+
-                rageBuff.bonusPercent/
-                100;
-        }
-
-        return {
-            chance:critChance,
-            multiplier:critMultiplier
-        };
-    }
-
-    return {
-        physical:buildCriticalProfile(
-            (character.attack||0),
-            CRIT_CHANCE_PER_ATTACK_POINT,
-            CRIT_MULTIPLIER_PER_ATTACK_POINT
-        ),
-        magic:buildCriticalProfile(
-            (getBackpackCharacterStats(index).intelligence||0),
-            CRIT_CHANCE_PER_INTELLIGENCE_POINT,
-            CRIT_MULTIPLIER_PER_INTELLIGENCE_POINT
-        )
+    // Display the existing independent combat attributes; retired six-stat
+    // coefficients must not block the Hit / Evasion detail modal.
+    const stats=getBackpackCharacterStats(index);
+    const rageBuff=(character.activeBuffs||[]).find(buff=>buff&&buff.type==="rage");
+    const ex=character.element==="fire"?getLearnedElementEX(character,"fire"):null;
+    const profile={
+        chance:Math.min(CRIT_CHANCE_MAX,CRIT_CHANCE_BASE+(Number(stats.criticalChance)||0)+(Number(stats.statusAccuracy)||0))+
+            (Number(ex&&ex.critChanceBonusPercent)||0)+(Number(rageBuff&&rageBuff.bonusPercent)||0),
+        multiplier:Math.min(CRIT_MULTIPLIER_MAX,CRIT_MULTIPLIER_BASE+(Number(stats.criticalDamage)||0)/100+
+            (Number(ex&&ex.critDamageBonusPercent)||0)/100+(Number(rageBuff&&rageBuff.bonusPercent)||0)/100)
     };
+    return {physical:{...profile},magic:{...profile}};
 }
 
 function openInventoryCharacterDetail(){
@@ -31388,11 +29908,10 @@ function openInventoryCharacterDetail(){
         ["智力",stats.intelligence],
         ["體質",stats.vitality],
         ["能量",stats.energy],
-        ["精神",stats.spirit],
         ["敏捷",stats.agility],
-        ["命中",stats.accuracy],
-        ["閃避",stats.evasion],
-        ["異常抗性",stats.resistance.toFixed(1)+"%"],
+        ["命中",stats.accuracy+"%"],
+        ["閃避",stats.evasion.toFixed(1)+"%"],
+        ["異常抗性",stats.statusResistance.toFixed(1)+"%"],
         ["抗暴",stats.antiCrit.toFixed(1)+"%"],
         ["物理爆擊率",critical.physical.chance.toFixed(1)+"%"],
         ["物理爆擊傷害",(critical.physical.multiplier*100).toFixed(1)+"%"],
@@ -31410,8 +29929,8 @@ function openInventoryCharacterDetail(){
             `
         ).join("")+
         `<div class="inventory-character-detail-note">
-            基礎命中率＝clamp(95%＋命中×0.3, 50%, 99%)，先乘上(1－目標最終閃躲率)，最後再扣除暈眩等「最終命中率降低」效果（最低1%）。<br>
-            一般異常每1精神降低0.05個百分點命中率；每1敏捷＝+1速度、+0.6個百分點基礎閃躲。
+            最終命中率＝95%＋命中%＋最終命中加成%－目標閃避%－最終命中下降%，最後限制5%～99%。<br>
+            命中、閃避、異常抗性來自獨立戰鬥詞條或效果；敏捷只提高出手速度。
         </div>`;
 
     modal.classList.add("show");
@@ -31457,6 +29976,7 @@ function renderEquipment(){
         if(item){
             box.classList.add("has-item");
             box.innerHTML=`<div class="inventory-equipment-icon">${item.icon || "◆"}</div>`;
+            box.querySelectorAll(".v169-item-art").forEach(art=>art.classList.add("inventory-backpack-rarity-neutral"));
             box.title=item.name || slot.name;
             box.onclick=()=>openEquippedItem(item,slot.key);
         }else{
@@ -31526,6 +30046,28 @@ function setInventoryFilter(filter){
     if(scroller) scroller.scrollTop=0;
 }
 
+const INVENTORY_RARITY_DATA_TO_UI=Object.freeze({
+    white:"white",blue:"blue",purple:"purple",orange:"orange",
+    pink:"red","four-symbol":"myriad",low:"white",mid:"blue",
+    high:"purple",perfect:"orange"
+});
+
+function getInventoryRarityDataKey(item){
+    if(!item){ return "white"; }
+    const rawKeys=[item.rarityKey,item.quality,item.tierKey,item.legacyTierKey];
+    for(const raw of rawKeys){
+        const key=String(raw||"").toLowerCase();
+        if(Object.prototype.hasOwnProperty.call(INVENTORY_RARITY_DATA_TO_UI,key)){
+            return key;
+        }
+    }
+    return "white";
+}
+
+function getInventoryRarityKey(item){
+    return INVENTORY_RARITY_DATA_TO_UI[getInventoryRarityDataKey(item)]||"white";
+}
+
 function renderInventoryItems(){
     rebuildInventorySlots();
     const grid=$("inventoryGrid");
@@ -31538,12 +30080,21 @@ function renderInventoryItems(){
         const item=items[index] || null;
         const box=document.createElement("div");
         box.className="inventory-item inventory-item-classic "+(item ? "has-item":"empty");
+        if(item){
+            const rarity=getInventoryRarityKey(item);
+            box.classList.add("rarity-"+rarity);
+            box.dataset.rarity=rarity;
+        }
         box.innerHTML=`<div class="inventory-slot-number">${index+1}</div>`;
 
         if(item){
             box.innerHTML+=`<div class="inventory-icon">${item.icon || "◆"}</div><div class="inventory-count">${item.count>1 ? "×"+item.count : ""}</div>`;
             const realIndex=inventoryItems.indexOf(item);
-            box.onclick=()=>openItemModal(realIndex);
+            box.onclick=()=>{
+                document.querySelectorAll("#inventoryGrid .inventory-item-classic.is-selected").forEach(selected=>selected.classList.remove("is-selected"));
+                box.classList.add("is-selected");
+                openItemModal(realIndex);
+            };
         }else{
             box.innerHTML+='<div class="inventory-empty-dot">·</div>';
         }
@@ -31556,10 +30107,7 @@ function renderInventoryItems(){
         tab.setAttribute("aria-selected",active ? "true" : "false");
     });
 
-    if(typeof window!=="undefined"){
-        if(typeof window.v17351SyncInventoryQa==="function"){ window.v17351SyncInventoryQa(); }
-        if(typeof window.v17363SyncFunctionalFixes==="function"){ window.v17363SyncFunctionalFixes(); }
-    }
+    if(typeof window!=="undefined"&&typeof window.v17363SyncFunctionalFixes==="function"){ window.v17363SyncFunctionalFixes(); }
 }
 
 function renderInventory(){
@@ -31572,6 +30120,9 @@ function renderInventory(){
     renderInventoryCharacterTabs();
     renderEquipment();
     renderInventoryItems();
+    if(typeof window!=="undefined"&&typeof window.v131SyncInventoryPortrait==="function"){
+        window.v131SyncInventoryPortrait();
+    }
 }
 
 /* =====================================================
@@ -31600,7 +30151,7 @@ function getStatText(stats){
 
         intelligence:"智力",
 
-        spirit:"精神",
+        defensePoints:"防禦",
 
         agility:"敏捷",
 
@@ -31633,7 +30184,7 @@ function getStatText(stats){
         `
         <div>
             ${names[key]||key}：
-            <b>+${value}</b>
+            <b>+${value}${["accuracy","evasion"].includes(key)?"%":""}</b>
         </div>
         `;
 
@@ -31644,6 +30195,47 @@ function getStatText(stats){
         "沒有額外能力加成。";
 
 }
+
+
+/*
+   Item presentation lifecycle owner.
+   The modal always keeps one frame and one scroll contract; later item
+   features may select a semantic content mode, but must not rewrite frame
+   geometry or infer the mode from button text/disabled state.
+*/
+const ITEM_MODAL_PRESENTATION_MODES = new Set([
+    "equipment",
+    "compact",
+    "comparison"
+]);
+
+function setItemModalPresentationMode(mode){
+    const modal=$("itemModal");
+    if(!modal){ return "closed"; }
+
+    const normalized=ITEM_MODAL_PRESENTATION_MODES.has(mode)
+        ?mode
+        :"closed";
+
+    modal.classList.remove(
+        "item-modal-mode-equipment",
+        "item-modal-mode-compact",
+        "item-modal-mode-comparison"
+    );
+
+    if(normalized==="closed"){
+        delete modal.dataset.presentationMode;
+    }else{
+        modal.dataset.presentationMode=normalized;
+        modal.classList.add("item-modal-mode-"+normalized);
+    }
+
+    // The native navigation is a separate paint plane. Project modal state
+    // through its existing context owner before exposing item controls.
+    window.v148SyncContextNavigation?.();
+    return normalized;
+}
+window.setItemModalPresentationMode=setItemModalPresentationMode;
 
 
 function openItemModal(
@@ -31701,13 +30293,20 @@ function openItemModal(
     const equipButton =
         $("itemEquipButton");
 
+    const isEquipment=
+        typeof isEquipmentInventoryType==="function"
+            ?isEquipmentInventoryType(item.type)
+            :!["potion","material","item","chest","ticket","blueprint"].includes(item.type);
+
+    setItemModalPresentationMode(isEquipment?"equipment":"compact");
+
 
     equipButton.removeAttribute(
         "data-slot"
     );
 
 
-    if(item.type==="potion"){
+    if(!isEquipment){
 
         equipButton.disabled=true;
 
@@ -31769,6 +30368,8 @@ function openEquippedItem(
         $("itemEquipButton");
 
 
+    // Reopening equipped gear must retire chest/ticket action visibility.
+    equipButton.style.display="";
     equipButton.disabled=false;
 
     equipButton.textContent =
@@ -31780,6 +30381,8 @@ function openEquippedItem(
 
     equipButton.dataset.slot =
         slot;
+
+    setItemModalPresentationMode("equipment");
 
 
     $("itemModal")
@@ -31804,6 +30407,8 @@ function closeItemModal(){
     $("itemModal")
         .classList
         .remove("show");
+
+    setItemModalPresentationMode("closed");
 
 }
 
@@ -32177,7 +30782,7 @@ function showSkillDetail(skillId){
             ${
                 skill.learnCost
                 ?
-                "｜學習需要"+skill.learnCost+"技能點"
+                "｜首次學習需要"+getSkillLearnCostForUi(getSkillCharacterObject(currentSkillCharacter),skill)+"點"
                 :
                 ""
             }
@@ -32544,7 +31149,6 @@ async function sellSelectedItem(){
        是空頭支票。現在真的有gold這個共用
        資源了，這裡補上真正的加值。
     */
-
     gold=
         gold+
         price;
@@ -32996,15 +31600,19 @@ function syncBattleUiPriorityLayer(){
 
     const stage=$("game-stage");
     const page=$("battlePage");
-    if(!stage||!page){ return false; }
+    const body=document.body;
+    if(!page){
+        if(body){ body.classList.remove("v174-battle-reading-open"); }
+        return false;
+    }
 
     const statusDetail=page.querySelector(".battle-status-detail-modal:not([hidden])");
     const sideDrawer=page.querySelector(".battle-insight-drawer.open");
     const battleInfo=page.querySelector(".battle-info-region.is-expanded");
-    const active=!!(statusDetail||sideDrawer||battleInfo);
+    const active=page.classList.contains("active")&&!!(statusDetail||sideDrawer||battleInfo);
 
-    stage.classList.toggle("battle-ui-priority",active);
-    if(document.body){ document.body.classList.toggle("v174-battle-reading-open",active); }
+    if(stage){ stage.classList.remove("battle-ui-priority"); }
+    if(body){ body.classList.toggle("v174-battle-reading-open",active); }
     return active;
 
 }
@@ -33544,8 +32152,7 @@ function applyMapZoneBackground(zoneKey){
 
 
     if(!bgLayer){
-        return;
-    }
+        return;    }
 
 
     const imageUrl=
@@ -34500,7 +33107,7 @@ try{
         ["vitality","Vitality"],
         ["energy","Energy"],
         ["intelligence","Intelligence"],
-        ["spirit","Spirit"],
+        ["defensePoints","Defense"],
         ["agility","Agility"]
     ].forEach(([statKey,idPart])=>{
 
@@ -34544,8 +33151,7 @@ try{
 
     startAutoSave();
 
-}
-catch(error){
+}catch(error){
 
     console.error(
         "自動存檔啟動失敗：",

@@ -2,6 +2,7 @@
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 
 const qol=fs.readFileSync("js/53-v173.50-inventory-qol.js","utf8");
 const css=fs.readFileSync("css/52-v173.50-inventory-qol.css","utf8");
@@ -17,7 +18,8 @@ assert.match(qol,/window\.v17350BulkSellEquipment=async function/);
 assert.match(qol,/QUALITY_ORDER=\["white","blue","purple","orange","pink","four-symbol"\]/);
 assert.match(qol,/summary\.hasOrangeOrAbove[\s\S]*?window\.rpgConfirm/);
 assert.match(qol,/高階裝備售出後無法復原/);
-assert.match(qol,/id="v17350BulkSellQuality"/);
+assert.match(qol,/v17350OpenQuickSellModal/);
+assert.match(qol,/id="v17350QuickSellQuality"/);
 assert.match(qol,/window\.v17350RunBatchAction=async function/);
 assert.match(qol,/id="v17350BatchQuantity"[\s\S]*?value="'\+descriptor\.total\+'"/);
 assert.match(qol,/descriptor\.kind==="potion"/);
@@ -32,8 +34,7 @@ assert.match(qol,/const stackKey=inventoryStackIdentity\(item\)/);
 
 /* Quick-sell and batch actions keep the same black/gold readable button
    language instead of the former yellow background + black text treatment. */
-assert.match(css,/\.v17350-bulk-sell-bar button\{[\s\S]*?color:#f4d793;[\s\S]*?background:linear-gradient\(180deg,#332414,#15100a\)/);
-assert.match(css,/\.v17350-bulk-sell-bar button\.danger\{[\s\S]*?background:linear-gradient\(180deg,#8d3928,#4d1812\)/);
+assert.doesNotMatch(qol,/v17350BulkSellBar|insertBefore\(bar,gridScroll\)/);
 assert.match(css,/\.v17350-batch-action button\{[\s\S]*?color:#f4d793;[\s\S]*?background:linear-gradient\(180deg,#332414,#15100a\)/);
 
 assert.match(recovery,/window\.rpgAlert\([\s\S]*?title:"補品不足"[\s\S]*?confirmText:"知道了"/);
@@ -41,8 +42,8 @@ assert.doesNotMatch(recovery,/補品不足[\s\S]{0,180}setTimeout\(/);
 assert.match(build,/"css\/52-v173\.50-inventory-qol\.css"/);
 assert.match(build,/"js\/equipment-progression\.js"[\s\S]*?"js\/53-v173\.50-inventory-qol\.js"/);
 assert.doesNotMatch(equipment,/createElement\(["']script["']\)|script\.onload/);
-assert.ok(loader.includes('const V_ASSET_VERSION="173.72";'));
+assert.ok(loader.includes('const V_ASSET_VERSION="'+releaseMeta.cacheVersion+'";'));
 assert.doesNotMatch(ui,/equipment-progression\.js\?v=|createElement\(["']script["']\)/);
-assert.ok(index.includes('<title>四象江湖傳 V173.72</title>'));
+assert.ok(index.includes('<title>四象江湖傳 V'+releaseMeta.version+'</title>'));
 
 console.log("✓ V173.50 inventory QoL and persistent no-potion warning");

@@ -9,6 +9,7 @@ const v140=fs.readFileSync("js/33-v140-four-element-balance.js","utf8");
 const v149=fs.readFileSync("js/43-v149-skill-ui-rules.js","utf8");
 const v158=fs.readFileSync("js/47-v158-combat-tuning.js","utf8");
 const v169=fs.readFileSync("js/50-v169-water-skill-rules.js","utf8");
+const v144=fs.readFileSync("js/40-v144-rules-and-abyss.js","utf8");
 const progression=fs.readFileSync("js/60-v173.64-skill-progression-rebalance.js","utf8");
 const statusVfx=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const patrol=fs.readFileSync("js/26-v131-patrol-appearance.js","utf8");
@@ -64,20 +65,16 @@ function constObject(name){
 function formulaRuntime(){
     const code=[
         constLine("HIT_CHANCE_BASE"),
-        constLine("HIT_CHANCE_ACCURACY_COEFFICIENT"),
         constLine("HIT_CHANCE_MIN_PERCENT"),
         constLine("HIT_CHANCE_MAX_PERCENT"),
-        constLine("DEFAULT_MONSTER_EVASION_PER_LEVEL"),
-        constLine("DEFAULT_MONSTER_EVASION_CAP"),
-        constLine("STATUS_RESIST_PER_SPIRIT_POINT"),
         constLine("STATUS_OFFENSE_ATTRIBUTE_COEFFICIENT"),
         constLine("STATUS_HIT_MIN_PERCENT"),
         constLine("STATUS_HIT_MAX_PERCENT"),
         constObject("LOCKDOWN_HIT_BOUNDS"),
-        sourceFunction(main,"getDefaultMonsterEvasion"),
+        sourceFunction(main,"combineEvasionRates"),
         sourceFunction(main,"calculateHitChancePercent"),
         sourceFunction(main,"calculateStatusEffectChance"),
-        "this.hit=calculateHitChancePercent;this.ev=getDefaultMonsterEvasion;this.status=calculateStatusEffectChance;"
+        "this.hit=calculateHitChancePercent;this.combine=combineEvasionRates;this.status=calculateStatusEffectChance;"
     ].join("\n");
     const context={Math,Number};
     vm.createContext(context);
@@ -88,10 +85,16 @@ function formulaRuntime(){
 {
     const r=formulaRuntime();
     assert.equal(r.hit(0,0,0,0),95);
-    assert.equal(r.hit(100,10,0,0),99);
-    assert.equal(r.hit(0,10,0,0),85);
+    assert.equal(r.hit(0,40,0,0),55);
+    assert.equal(r.hit(0,80,0,0),15);
+    assert.equal(r.hit(0,100,0,0),5);
+    assert.equal(r.hit(0,200,0,0),5);
+    assert.equal(r.hit(1000,0,0,0),99);
+    assert.equal(r.hit(1000,200,0,0),99);
+    assert.equal(r.combine([40,10]),50);
+    assert.equal(r.combine([100,100]),200);
     assert.equal(r.hit(0,15,5,10),85,"95 + 10 - 15 - 5 must be 85 percentage points");
-    assert.deepEqual([40,60,80,100,200].map(r.ev),[4,6,8,10,10]);
+    assert.equal(r.hit(10,40,0,0),65);
     assert.equal(r.status(30,10,10,200,0,true,"boss",20),20);
     assert.equal(r.status(30,99,1,200,0,true,"boss",20),20,"level gap must not change status chance");
     assert.deepEqual(
@@ -107,21 +110,13 @@ function formulaRuntime(){
     assert.doesNotMatch(v140,/previousCalculateStatusEffectChance|v140PreviousCalculateStatusEffectChance/);
     assert.doesNotMatch(v158,/v158GetHitChancePercent|rollHitChance\s*=\s*function/);
     assert.doesNotMatch(v149,/rollStatusEffectHit\s*=\s*function/);
-    assert.doesNotMatch(v169,/getMonsterEvasion\s*=\s*function|getMonsterEffectiveSpiritPoints\s*=\s*function|getPlayerStatusResistBonus\s*=\s*function/);
-    assert.match(main,/evasion:\s*\n\s*getDefaultMonsterEvasion\(level\)/);
-    const firstZoneRosterCall=main.indexOf('makeZoneMonster("哥布林",3,"fire")');
-    assert.ok(firstZoneRosterCall>0,"first top-level zone roster call must exist");
-    assert.ok(
-        main.indexOf("const DEFAULT_MONSTER_EVASION_PER_LEVEL = 0.1;")<
-        firstZoneRosterCall,
-        "default monster evasion constants must initialize before the first top-level zone roster call"
-    );
-    assert.ok(
-        main.indexOf("function getDefaultMonsterEvasion(level)")<
-        firstZoneRosterCall,
-        "default monster evasion owner must exist before the first top-level zone roster call"
-    );
+    assert.doesNotMatch(v169,/getMonsterEvasion\s*=\s*function|getMonsterEffectivetargetStatusResistancePoints\s*=\s*function|getPlayerStatusResistBonus\s*=\s*function/);
+    assert.doesNotMatch(main,/getDefaultMonsterEvasion|DEFAULT_MONSTER_EVASION|HIT_CHANCE_ACCURACY_COEFFICIENT/);
     assert.match(main,/function combineEvasionRates\(sources\)[\s\S]*?sum\+\(Number\(source\)\|\|0\)/);
+    assert.doesNotMatch(main,/FINAL_EVASION_RATE_CAP|const HIT_CHANCE_MIN_PERCENT = 70;/);
+    assert.match(main,/const HIT_CHANCE_MIN_PERCENT = 5;/);
+    assert.match(main,/function getFinalAccuracyBonusPercent\(entity\)/);
+    assert.doesNotMatch(v144,/accuracyMultiplier|wrapAccuracyStats|getMainCharacterStats\s*=function/);
 }
 
 {
@@ -129,21 +124,25 @@ function formulaRuntime(){
     assert.match(progression,/DODGE_BY_LEVEL=Object\.freeze\(\[5,10,15,20,25\]\)/);
     assert.match(progression,/CALM_RESIST_BY_LEVEL=Object\.freeze\(\[5,8,10,12,15\]\)/);
     assert.match(progression,/CALM_ACCURACY_BY_LEVEL=Object\.freeze\(\[5,10,15,20,25\]\)/);
-    assert.match(progression,/windEX:\{[\s\S]*?evasionBonusPercent:10/);
+    assert.match(progression,/windEX:\{[\s\S]*?evasionBonusPercent:15,accuracyBonusPercent:15/);
+    assert.match(progression,/lowHpFinalHitCapPercent:50/);
     assert.match(progression,/followUpOnCriticalOrDefeat/);
     assert.match(progression,/免費再施放/);
     assert.match(progression,/鳳威/);
-    assert.match(progression,/免費追擊也不消耗3次有效施放次數/);
+    assert.match(progression,/fireActionCharges:4/);
+    assert.match(progression,/免費追擊沿用本次加成但不額外消耗次數/);
     assert.match(progression,/不清除永久被動、EX、裝備效果、Boss固有機制、HP／SP或死亡狀態/);
-    assert.match(progression,/凍傷：[\s\S]*?傷害-25%[\s\S]*?最終閃躲-25%[\s\S]*?最終異常狀態抗性-25%/);
+    assert.match(progression,/凍傷：[\s\S]*?傷害-30%[\s\S]*?最終閃躲-25%[\s\S]*?最終異常狀態抗性-25%/);
 }
 
 {
     const statusText=sourceFunction(statusVfx,"statusEffectText");
     assert.doesNotMatch(statusText,/凍傷.*無法使用技能/);
-    assert.match(statusText,/frostbite[\s\S]*?傷害 -25%[\s\S]*?最終閃躲 -25個百分點[\s\S]*?最終異常狀態抗性 -25個百分點/);
-    const finishDuration=sourceFunction(progression,"finishDurationAction");
+    assert.match(statusText,/frostbite[\s\S]*?傷害 -30%[\s\S]*?最終閃躲 -25%[\s\S]*?最終異常狀態抗性 -25%/);
+assert.doesNotMatch(statusText,/個百分點/,"player-visible status text must use % syntax");
+    const finishDuration=sourceFunction(main,"finishBattleDurationAction");
     assert.match(finishDuration,/v143SyncStatusVisualEffects\("?(?:false)?"?\)|v143SyncStatusVisualEffects\(false\)/);
+    assert.doesNotMatch(progression,/finishDurationAction|FourSymbolsDurationLifecycle=Object\.freeze/);
 }
 
 {
@@ -158,7 +157,7 @@ function formulaRuntime(){
     assert.match(fixedCss,/\.v-fixed-enemy-slot \.battle-monster-name\{[\s\S]*?background:none !important;[\s\S]*?border:0 !important/);
     assert.match(fixedCss,/\.monster-status-badges\{[\s\S]*?bottom:40px !important;[\s\S]*?min-height:24px !important;[\s\S]*?z-index:32 !important/);
     assert.match(statusCss,/--v143-status-layer-hud:34/);
-    assert.match(fixedCss,/\.targetable::after,[\s\S]*?\.ally-targetable::after\{[\s\S]*?content:none !important;[\s\S]*?display:none !important/);
+    assert.match(fixedCss,/\.targetable::after,[\s\S]*?\.ally-targetable:not\(\.active-turn\)::after\{[\s\S]*?content:none !important;[\s\S]*?display:none !important/);
     assert.match(fixedCss,/\.ally-targetable::before,[\s\S]*?\.targetable::before,[\s\S]*?\.target::before\{/);
     assert.match(fixedCss,/\.battle-info-region:not\(\.is-expanded\)\{[\s\S]*?background:transparent/);
     assert.match(fixedCss,/\.battle-info-region\.is-expanded > #battleInfo\{[\s\S]*?background:rgba\(0,0,0,\.92\) !important/);

@@ -228,3 +228,70 @@ CI 無法取代所有 UI／手機實機、操作手感、視覺完整性、使�
 - 該條目必須說明本版本實際修正／新增內容，並列出對應 Requirement Batch。
 - 版本號不得只作為 cache busting 或畫面裝飾；若沒有對應 CHANGELOG，Release Gate 必須失敗。
 - Game Version 與 Cache Version 仍需同步，但兩者用途不同：Game Version 用於版本追蹤，Cache Version 用於資源失效。
+
+
+## 21. Release Readiness Priority Framework（發布整備優先級框架）
+
+本章是全 Repository 唯一的 **Release Readiness Priority Framework** 正式 Owner。它永久適用所有版本、Release（發布）、Bug（錯誤）、功能開發與 P0／P1／P2 分類；AGENTS.md、CLAUDE.md 只能放入口，不得複製、改寫或建立第二份規則。
+
+本框架只界定「發布整備」與「正常開發」的責任邊界。它**不得降低**既有 Bug Repair DoD（錯誤修復完成定義）、Owner Convergence Gate（控制來源收斂閘門）、Change Safety Contract（變更安全契約）、Cloud Save fail-closed（雲端存檔預設拒絕）、main 保護、dev PR（合併請求）流程、Release Verification（發布驗證）或 Repository Closeout（程式庫收尾）規則。
+
+### 21.1 永久優先級定義
+
+P0／P1／P2 是 **Priority Classification（優先級分類）**，不是固定任務清單。每個 Release Cycle（發布週期）都必須依最新 dev、Runtime（執行環境）、CI（持續整合）、Open PR、已知 Bug 與 Release Scope（發布範圍）重新分類；前一版已完成、被取代或已失效的項目不得自動沿用。
+
+- **P0 — Release Blocker（發布阻塞）**：未解決即不得正式發布目前 Candidate（候選版本）。包括真實核心 CI 失敗、正式 Runtime 無法運作、玩家資料／存檔風險、登入／帳號核心失效、付款／獎勵安全、正式 Asset（素材）損毀、Release Candidate 驗收失敗及嚴重玩家可見 Regression（退化）。
+- **P1 — Release Readiness（發布整備）**：近期發布前應完成、但尚不構成真正 Release Blocker 的工作，例如 Release Scope、Dirty PR 清理、被取代 PR 關閉、main／dev 差異整理、CI 強化、發布清單與 Repository Hygiene（程式庫清潔）。若實際造成資料損壞、Runtime 故障、正式發布失敗或玩家高風險，必須立即 **P1 → P0**。
+- **P2 — Maintenance（維護／技術債）**：Warning（警告）、非阻塞版本資訊、空資料夾、舊腳本、命名整理、非必要重構及低風險 Hygiene。若證實造成真實發布風險，必須重新分類為 P0 或 P1。
+
+**P0 ≠ Development Blocker（開發阻塞）。** P0 未完成時仍允許 Bug Repair、Feature Development（功能開發）、Gameplay Adjustment（玩法調整）、UI／CSS、Asset Import（素材導入）、Cloud Save（雲端存檔）與其他獨立 PR；限制只有「目前狀態不得正式發布」。
+
+**P1 與 P2 不得阻止正常開發。** 永久禁止把「P0 沒清完不能修 Bug」、「P1 沒做完不能開新功能」或「P2 沒整理完不能改 Gameplay」當成流程規則。不得因仍有 P2 無限延後正常版本。
+
+### 21.2 預設工作狀態：NORMAL DEVELOPMENT（正常開發）
+
+專案預設且常態狀態永遠是 **NORMAL DEVELOPMENT**。此狀態可同時進行 P0 Repair、P1 Cleanup、P2 Maintenance、Bug、Feature、Gameplay、UI、Assets 與 Cloud 工作；每項仍須遵守既有 owner、測試、PR 與安全規範。
+
+不同對話／Agent 可平行工作，但每項工作必須：
+1. 從當下最新 dev 建立獨立工作分支，禁止直接寫入 dev／main。
+2. 每個 PR 準備合併前重新取得最新 dev HEAD。
+3. 若 dev 已前進，重新核對 Base、Conflict（衝突）、Canonical Owner（正式控制來源）、Lifecycle（生命週期）、Regression 與 CI；不得沿用舊 Base 驗證直接合入。
+
+若兩項工作涉及同一 Canonical Owner、同一 Lifecycle、同一資料權威來源，或高度重疊核心檔案，禁止各自獨立平行修改後直接合入 dev。必須序列化施工，或明確由其中一個 PR 承接另一個已完成結果，以避免雙 Owner、last-write-wins（後寫覆蓋）、舊 Base 覆蓋、Patch 疊加與 Test Contract Drift（測試契約漂移）。
+
+### 21.3 RELEASE FREEZE（發布凍結）與 Candidate
+
+只有專案負責人明確表示「準備正式發布」、「準備下一版上線」、「開始 Release Candidate」或「執行最終發布驗收」，或語意等價指令時，才可進入 **RELEASE FREEZE**。AI／Agent 不得因 P0 清單存在、CI Warning、P1／P2 未清、或自行判斷「差不多可以發布」而擅自 Freeze。
+
+Freeze 開始時必須：
+1. 記錄 Candidate Dev HEAD SHA。
+2. 建立並明確標示 **RELEASE CANDIDATE <SHA>**。
+3. 為保持 Candidate SHA 穩定，暫停非必要 Feature、UI 與 Content 修改進入候選 dev。
+4. 執行本候選版本所需的 P0 Final Exact-HEAD Verification（P0 最終精確 SHA 驗收）、Release Scope P1 檢查，以及既有 Release Verification。
+
+只有 Freeze 期間可建立／重跑 Exact-HEAD Verification。**NORMAL DEVELOPMENT 期間禁止因每次 dev 前進反覆建立 Exact-HEAD Verification PR 或重跑整個 Release Gate。** 日常僅執行本次修改所需的 Targeted Test（目標測試）、Regression Test、Repository CI 與必要 Browser QA（瀏覽器驗收）。
+
+### 21.4 Candidate Invalidated Rule（候選失效規則）
+
+Freeze 時若 Candidate SHA = A，而 P0 驗收發現真正問題，修復流程固定為：
+
+最新 dev → fix branch → 最小修復 → PR → dev → CI → merge dev
+
+若 dev 變成 SHA = B，則 **Candidate A 立即 INVALIDATED（失效）**。A 的 CI、Browser QA、Deployment 或 Release Evidence（發布證據）不得作為 B 的發布證據。新的 Candidate 必須是 RELEASE CANDIDATE B，並以 B 重新執行必要的 Final Verification。禁止只修 main 或在發布 PR head 留下 dev 不具備的獨立修復。
+
+Freeze 時只確認真正影響本次 Release correctness（發布正確性）、Player safety（玩家安全）、Runtime integrity（執行完整性）或 Deployment（部署）的 P1。其餘 P1 可明確標記 **Deferred（延後）**，不阻止發布；P2 預設不阻止發布。
+
+### 21.5 狀態語意與解除 Freeze
+
+狀態必須使用下列語意，且不得混淆：
+
+- **NORMAL DEVELOPMENT**：正常平行施工。
+- **RELEASE FREEZE**：已由專案負責人啟動發布凍結。
+- **RELEASE CANDIDATE <SHA>**：固定候選提交。
+- **RELEASE BLOCKED**：此 Candidate 仍有未解 P0。
+- **RELEASE READY**：此 Candidate 的 P0 Final Verification 已通過。
+- **RELEASED**：main 合併、main CI PASS、Production Deploy PASS、Production SHA verified 與 Repository Closeout 全部完成。
+
+**RELEASE BLOCKED 不等於 DEVELOPMENT BLOCKED。** 除非問題本身會破壞資料、污染 dev 或造成不可逆風險，正常開發仍可繼續。
+
+正式發布完成後，Release Freeze 自動結束並回到 **NORMAL DEVELOPMENT**；Bug、Feature、Gameplay、UI、Assets、Cloud 全部恢復正常施工。

@@ -24,6 +24,7 @@ const ALLOWED_SAVE_KEYS=new Set([
     "selectedCreationElement",
     "characterEquipment",
     "characterSkillLoadouts",
+    "allyFormation",
     "autoConfig",
     "autoConfig2",
     "autoConfig3",
@@ -39,6 +40,13 @@ const FORBIDDEN_OBJECT_KEYS=new Set([
     "prototype",
     "constructor"
 ]);
+const LEGACY_BACKUP_SIDECARS=Object.freeze([
+    "element-box-state","daily-dungeon-state","exp-pool-growth-state",
+    "rested-exp-state","progress","announcement-read","quest-milestones",
+    "task-tracker","legacy-abyss-state","equipment-shop-daily",
+    "bulk-sell-quality","equipment-shop-purchases","abyss-state",
+    "patrol-character-index"
+].sort());
 
 class CloudSavePolicyError extends Error{
     constructor(code,message){
@@ -114,8 +122,7 @@ function validateCharacter(character,path,{required=false}={}){
         fail("invalid-argument",`${path} must be an object or null.`);
     }
 
-    const id=String(character.id||"").trim();
-    if(!id || id.length>64){
+    if(typeof character.id!=="string"||!character.id.trim()||character.id.trim().length>64){
         fail("invalid-argument",`${path}.id is invalid.`);
     }
 
@@ -152,6 +159,9 @@ function validateLegacySaveCandidate(candidate){
     validateCharacter(candidate.player,"save.player",{required:true});
     validateCharacter(candidate.player2,"save.player2");
     validateCharacter(candidate.player3,"save.player3");
+    if(candidate.player3!=null&&candidate.player2==null){
+        fail("invalid-argument","save.player3 cannot exist without save.player2.");
+    }
     validateNonNegativeNumber(candidate.gold,"save.gold",{integer:true,max:1_000_000_000_000});
     validateNonNegativeNumber(candidate.sharedExp,"save.sharedExp",{integer:true,max:10_000_000_000_000_000});
     validateNonNegativeNumber(candidate.lastSaveTimestamp,"save.lastSaveTimestamp",{integer:true,max:9_999_999_999_999});
@@ -184,6 +194,57 @@ function validateLegacySaveCandidate(candidate){
     });
 }
 
+// The caller supplies an untrusted copy of a sealed local backup. Digests
+// establish byte consistency, never historical truth or reward entitlement.
+function validateMigrationBackup(bundle,uid){
+    if(!isPlainObject(bundle)||bundle.schemaVersion!==2||bundle.ownerUid!==uid||
+       typeof bundle.mainRaw!=="string"||typeof bundle.metadataRaw!=="string"||
+       !isPlainObject(bundle.sidecars)||
+       !/^v1:[a-f0-9]+:[a-f0-9]{32}$/.test(bundle.mainFingerprint||"")||
+       !/^v1:[a-f0-9]+:[a-f0-9]{32}$/.test(bundle.sidecarManifestFingerprint||"")||
+       bundle.backupId!==`four_symbols_migration_backup:${uid}:${bundle.mainFingerprint}:${bundle.sidecarManifestFingerprint}`){
+        fail("invalid-argument","A complete UID-owned backup reference is required.");
+    }
+    const sha=value=>createHash("sha256").update(value,"utf8").digest("hex");
+    const keys=Object.keys(bundle.sidecars).sort();
+    if(keys.join("|")!==LEGACY_BACKUP_SIDECARS.join("|")){
+        fail("invalid-argument","Backup sidecar inventory is incomplete.");
+    }
+    for(const suffix of keys){
+        const sidecar=bundle.sidecars[suffix];
+        if(!isPlainObject(sidecar)||!(["present","missing"].includes(sidecar.status))||
+           (sidecar.status==="missing"?sidecar.raw!==null:typeof sidecar.raw!=="string")){
+            fail("invalid-argument","Backup sidecar is invalid.");
+        }
+        if(sidecar.status==="present"&&!new Set(["announcement-read","bulk-sell-quality","patrol-character-index"]).has(suffix)){
+            try{ validateJsonValue(JSON.parse(sidecar.raw),`sidecars.${suffix}`,0); }
+            catch(_){ fail("invalid-argument","Backup sidecar JSON is invalid."); }
+        }
+    }
+    const manifestRaw=JSON.stringify(bundle.sidecars);
+    const backupRaw=JSON.stringify({ownerUid:uid,mainRaw:bundle.mainRaw,
+        metadataRaw:bundle.metadataRaw,sidecars:bundle.sidecars});
+    if(Buffer.byteLength(backupRaw,"utf8")>MAX_CANDIDATE_BYTES ||
+       sha(manifestRaw)!==bundle.sidecarManifestSha256||
+       sha(backupRaw)!==bundle.backupSha256){
+        fail("invalid-argument","Backup bytes or SHA-256 digest do not match.");
+    }
+    let save,metadata;
+    try{ save=JSON.parse(bundle.mainRaw); metadata=JSON.parse(bundle.metadataRaw); }
+    catch(_){ fail("invalid-argument","Backup main save or ownership metadata is corrupt."); }
+    if(!isPlainObject(metadata)||metadata.ownerUid!==uid){
+        fail("invalid-argument","Backup metadata owner is invalid.");
+    }
+    const candidate=validateLegacySaveCandidate(save);
+    if(Buffer.byteLength(JSON.stringify({backup:bundle,snapshot:candidate.snapshot}),"utf8")>800*1024){
+        fail("invalid-argument","Candidate exceeds the safe Firestore document budget.");
+    }
+    // Preserve original bytes for later review, including their key order.
+    return Object.freeze({...candidate,backupId:bundle.backupId,
+        backupSha256:bundle.backupSha256,sidecarManifestSha256:bundle.sidecarManifestSha256,
+        backup:{...bundle},mainRaw:bundle.mainRaw});
+}
+
 function normalizeClientVersion(value){
     const version=String(value||"").trim();
     if(!version){ return null; }
@@ -195,9 +256,11 @@ function normalizeClientVersion(value){
 
 module.exports={
     ALLOWED_SAVE_KEYS,
+    LEGACY_BACKUP_SIDECARS,
     CLOUD_SAVE_SCHEMA_VERSION,
     CloudSavePolicyError,
     MAX_CANDIDATE_BYTES,
     normalizeClientVersion,
-    validateLegacySaveCandidate
+    validateLegacySaveCandidate,
+    validateMigrationBackup
 };

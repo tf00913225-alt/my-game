@@ -27,12 +27,12 @@ const bootScripts=[
     "js/52-v173.20-startup-loader.js"
 ];
 const appScripts=[
+    "functions/src/equipment-combat-percent-migration.js",
     "js/00-main.js",
     "js/01-stage-v8-touch-lock.js",
     "js/02-stage-v9-native-coordinate-api.js",
     "js/03-stage-v10-battle-log-scroll-runtime.js",
     "js/04-stage-v11-native-bottom-nav-runtime.js",
-    "js/05-stage-v13-native-map-nav-runtime.js",
     "js/06-stage-v39-battle-map-background-runtime.js",
     "js/07-stage-v40-root-battle-background-runtime.js",
     "js/08-stage-v41-runtime.js",
@@ -90,6 +90,7 @@ const gameplayScripts=[
     "js/57-v173.51-quest-qa.js",
     "js/58-v173.63-functional-fixes.js",
     "js/battlefield-render-geometry-adapter.js",
+    "js/battle-floating-feedback-owner.js",
     "js/60-v173.64-skill-progression-rebalance.js",
     "js/60-team-relic-system.js"
 ];
@@ -116,7 +117,7 @@ const gameplayScriptParts=[
 const criticalStyles=["css/00-main.css","css/29-v125-character-creation-native.css","css/51-v173.20-startup-loader.css","css/firebase-auth.css"];
 const appStyles=[
     "css/01-stage-v8-map-page-fix.css","css/02-stage-v3-layout-fix.css","css/03-stage-v4-viewport-lock.css",
-    "css/04-v119-ally-target-style.css","css/06-stage-v11-native-bottom-nav.css","css/07-stage-v13-native-map-nav.css",
+    "css/04-v119-ally-target-style.css","css/06-stage-v11-native-bottom-nav.css",
     "css/08-stage-v14-character-scroll-fix.css","css/09-stage-v15-native-character-shell.css",
     "css/19-stage-v54-main-city-moderate-native-scale.css","css/20-stage-v60-training-only-safety.css",
     "css/21-stage-v64-character-touch-action-bridge.css",
@@ -160,7 +161,9 @@ const gameplayStyles=[
     "css/52-v173.50-inventory-qol.css",
     "css/53-v173.51-qa.css",
     "css/fixed-slot-battlefield-rendering-v2.css",
-    "css/55-team-relic-system.css"
+    "css/55-team-relic-system.css",
+    "css/battle-floating-feedback-owner.css",
+    "css/battle-skill-name-presentation-owner.css"
 ];
 const patrolStyles=["css/32-v131-patrol-appearance.css"];
 const abyssStyles=["css/50-v169-abyss-flow.css","css/54-v174-abyss-two-tier.css"];
@@ -325,13 +328,29 @@ for(const asset of firstPlayTemplate.assets||[]){ addFirstPlay(asset.path,asset)
 const firstPlayResources=[...firstPlayByPath.values()].sort((a,b)=>(priorityRank[a.priority]??9)-(priorityRank[b.priority]??9)||a.path.localeCompare(b.path));
 const firstPlayBase={schemaVersion:firstPlayTemplate.schemaVersion||1,id:firstPlayTemplate.id,manifestVersion:firstPlayTemplate.manifestVersion,assetPackVersion:firstPlayTemplate.assetPackVersion,concurrency:firstPlayTemplate.concurrency||5,resources:firstPlayResources};
 const firstPlayPack={...firstPlayBase,manifestHash:hash(JSON.stringify(firstPlayBase)),totalBytes:firstPlayResources.reduce((sum,item)=>sum+item.bytes,0),totalResources:firstPlayResources.length};
+const portraitRegistry=JSON.parse(read("config/monster-portrait-registry.json"));
+const portraitFields=Object.fromEntries(portraitRegistry.tupleSchema.map((field,index)=>[field,index]));
+const adoptedPoolPortraits=element=>portraitRegistry.assetPool.entries
+    .filter(entry=>entry.element===element&&entry.status==="adopted")
+    .map(entry=>({assetId:entry.assetId,displayName:entry.displayName,path:entry.runtimePath}));
+const existingWildPortraits=element=>(portraitRegistry.groups.wild||[])
+    .filter(row=>row[portraitFields.element]===element&&row[portraitFields.status]==="existing")
+    .map(row=>({assetId:row[portraitFields.portraitKey],displayName:row[portraitFields.name],path:row[portraitFields.path]}));
+const runtimePortraits=Object.fromEntries(["fire","water","wind","earth"].map(element=>[element,
+    [...adoptedPoolPortraits(element),...(["water","earth"].includes(element)?existingWildPortraits(element):[])]
+        .map(entry=>{
+            const content=bytes(entry.path);
+            return {...entry,sha256:hash(content),bytes:content.length,decode:true};
+        })
+]));
 const assetManifest={
     schemaVersion:1,release:release.version,generatedAt:"deterministic",
     critical:{scripts:[bootOutput.path],styles:[styleOutputs.critical.path],images:[...criticalImagePaths],firebaseBootstrap:firebaseMap["firebase-bootstrap.js"]},
     featureManifest,
     relicIcons:[...new Set(relicIconPaths)],
     firstPlay:firstPlayPack,
-    assets:Object.fromEntries(declared.map(item=>[item.path,{sha256:item.digest,bytes:Buffer.byteLength(item.content)}]))
+    assets:Object.fromEntries(declared.map(item=>[item.path,{sha256:item.digest,bytes:Buffer.byteLength(item.content)}])),
+    runtimePortraits
 };
 const manifestContent=JSON.stringify(assetManifest,null,2)+"\n";
 const manifestOutput=target("asset-manifest","json",manifestContent);

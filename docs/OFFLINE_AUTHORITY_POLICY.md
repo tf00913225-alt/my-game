@@ -1,0 +1,9 @@
+# Offline authority policy — design, not activated
+
+The current game remains locally playable; this policy defines the eventual transition and does not assert server reward writers exist. `ONLINE_REQUIRED`: paid rights, store purchases/limits, unique daily/weekly claims, Boss first-clear grants, tower milestone/chest grants, abyss first-clear/chest grants, rare relic ownership, high-value synthesis/reforge and refund/revoke. The existing local paths must remain labeled provisional until trusted writers exist.
+
+`OFFLINE_LIMITED`: normal patrol/dungeon battle, ordinary EXP/gold/drop and ordinary quests. Client animates and simulates locally; a future server-issued attempt/ticket carries UID, source, cap, expiry, nonce and operation ID. On reconnect the backend settles only eligible bounded rewards and returns receipts, with duplicate protection and expected revision. Expired, consumed or missing tickets become conflict/review, not automatic upload. An initial simpler release may instead require connectivity for these rewards until tickets are implemented.
+
+`OFFLINE_ALLOWED`: battle animations/VFX, read-only story, UI navigation, sound, auto-battle preference and device cache. They may reset on another phone without affecting durable entitlements.
+
+Three evaluated modes: A (block high-value offline progress) gives strongest first-release safety; B (pre-issued limited tickets) preserves ordinary single-player offline play with bounded issuance and replay cost; C (accept client-only ordinary settlement) is cheapest but unverifiable and must never include unique claims or valuable assets. Proposed hybrid: A for high value, B for ordinary rewards after ticket design, offline display for C. Final exact caps and supported reward paths require an inventory of game reward writers and emulator abuse tests before activation. No every-action Cloud Function or authoritative timestamp comparison.

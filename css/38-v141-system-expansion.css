@@ -53,22 +53,6 @@
 #game-stage .system-panel-row small{font-size:13px;line-height:1.55;}
 
 /* ----- Backpack: exactly 18 visible slots, seven cyclic pages ----- */
-#game-stage #inventoryPage .inventory-grid-scroll{
-    flex:0 0 auto !important;
-    height:auto !important;
-    min-height:0 !important;
-    max-height:none !important;
-    overflow:hidden !important;
-    touch-action:none !important;
-}
-
-#game-stage #inventoryPage .inventory-grid-classic{
-    grid-template-columns:repeat(6,minmax(0,1fr)) !important;
-    grid-template-rows:repeat(3,minmax(0,1fr)) !important;
-    gap:5px !important;
-    overflow:hidden !important;
-}
-
 #game-stage #inventoryPage .inventory-item-classic{
     cursor:pointer;
     user-select:none;
@@ -163,6 +147,17 @@
     transform:none;
 }
 
+/* Context contract: Backpack Slot owns rarity presentation. The shared
+   v169 art remains an image container here, while other contexts keep their
+   own rarity treatment. */
+#game-stage #inventoryPage .inventory-backpack-rarity-neutral{
+    border:0;
+    border-radius:0;
+    box-shadow:none;
+    background:transparent;
+    animation:none;
+}
+
 #game-stage #inventoryPage .inventory-item-classic .inventory-slot-number{
     display:none !important;
 }
@@ -171,40 +166,6 @@
     color:rgba(191,157,99,.3);
     font-size:18px;
     line-height:1;
-}
-
-#game-stage #inventoryPage .v141-inventory-pager{
-    flex:0 0 auto;
-    display:grid;
-    grid-template-columns:42px minmax(58px,auto) 42px;
-    align-items:center;
-    justify-content:center;
-    gap:11px;
-    margin:6px auto 0;
-}
-
-#game-stage #inventoryPage .v141-inventory-pager button{
-    width:42px;
-    height:38px;
-    min-height:38px;
-    padding:0;
-    border:1px solid #85632f;
-    border-radius:7px;
-    color:#ffe09a;
-    background:linear-gradient(180deg,#2c2114,#120e09);
-    font-size:17px;
-    line-height:29px;
-}
-
-#game-stage #inventoryPage .v141-inventory-pager span{
-    color:#d8c49c;
-    font-size:14px;
-    font-weight:800;
-    text-align:center;
-}
-
-#game-stage #inventoryPage .inventory-pagination{
-    display:none !important;
 }
 
 #game-stage #inventoryPage .inventory-character-arrow{
@@ -222,8 +183,9 @@
     font-size:13px !important;
 }
 
-/* Item preview: smaller icon, >=15px copy, one clean non-scrolling panel. */
-.item-modal .item-modal-box{
+/* Legacy modal compatibility for other surfaces only.
+   #itemModal frame, art, typography, actions and scroll migrated to css/49. */
+.item-modal:not(#itemModal) .item-modal-box{
     width:min(92vw,470px) !important;
     max-width:470px !important;
     max-height:calc(100% - 24px) !important;
@@ -235,7 +197,7 @@
     box-shadow:inset 0 1px 0 rgba(255,238,196,.04),0 12px 28px rgba(0,0,0,.48) !important;
 }
 
-.item-modal .item-modal-icon{
+.item-modal:not(#itemModal) .item-modal-icon{
     min-height:44px;
     display:flex;
     align-items:center;
@@ -244,111 +206,36 @@
     line-height:1 !important;
 }
 
-.item-modal .item-modal-icon svg{
+.item-modal:not(#itemModal) .item-modal-icon svg{
     width:46px;
     height:46px;
 }
 
-#itemModal .item-modal-box{
-    display:flex;
-    flex-direction:column;
-}
-
-#itemModal .item-modal-icon{
-    flex:0 0 auto;
-    max-height:240px;
-    overflow:hidden;
-}
-
-#itemModal .item-modal-icon > .v169-item-art{
-    display:grid;
-    place-items:center;
-    width:min(42vw,180px);
-    height:min(42vw,180px);
-    max-width:180px;
-    max-height:180px;
-    overflow:hidden;
-    flex:0 0 auto;
-}
-
-#itemModal .item-modal-icon > .v169-item-art > img,
-#itemModal .item-modal-icon > .v169-item-art > svg{
-    display:block;
-    width:100%;
-    height:100%;
-    max-width:100%;
-    max-height:100%;
-    object-fit:contain;
-    object-position:center;
-}
-
-/* Equipment artwork used to inherit width/height:100% from .v169-item-art
-   while its parent had no definite height.  The intrinsic square then grew
-   until the modal's 240px clipping boundary cut the image and pushed copy
-   out of view.  Give equipment one responsive, definite square instead. */
-#itemModal .item-modal-icon > .v169-equipment-art{
-    width:min(46vw,190px);
-    height:min(46vw,190px);
-    max-width:190px;
-    max-height:190px;
-    flex:0 1 auto;
-}
-
-#itemModal .item-modal-icon > .v169-talisman-art{
-    width:150px;
-    height:225px;
-    flex:0 0 auto;
-}
-
-#itemModal .item-modal-icon > .v169-ticket-art{
-    width:216px;
-    height:144px;
-    flex:0 0 auto;
-}
-
-#itemModal .item-modal-icon > .v169-blueprint-art{
-    width:176px;
-    height:176px;
-    flex:0 0 auto;
-}
-
-.item-modal .item-modal-name{
+.item-modal:not(#itemModal) .item-modal-name{
     margin:5px 0 9px !important;
     color:var(--v141-gold-soft);
     font-size:20px !important;
     line-height:1.25;
 }
 
-.item-modal .item-stat-list,
-.item-modal .item-stat-list *{
+.item-modal:not(#itemModal) .item-stat-list,
+.item-modal:not(#itemModal) .item-stat-list *{
     font-size:15px !important;
     line-height:1.55 !important;
 }
 
-.item-modal .item-stat-list{
+.item-modal:not(#itemModal) .item-stat-list{
     max-height:none !important;
     overflow:visible !important;
     padding:11px !important;
 }
 
-#itemModal .item-stat-list{
-    flex:0 1 auto;
-    min-height:0;
-    max-height:none !important;
-    overflow:visible !important;
-}
-
-.item-modal .item-modal-buttons{
+.item-modal:not(#itemModal) .item-modal-buttons{
     grid-template-columns:repeat(3,minmax(0,1fr));
 }
 
-#itemModal .item-modal-buttons,
-#itemModal .close-item-button{
-    flex:0 0 auto;
-}
-
-.item-modal .item-modal-button,
-.item-modal .close-item-button{
+.item-modal:not(#itemModal) .item-modal-button,
+.item-modal:not(#itemModal) .close-item-button{
     min-height:40px;
     font-size:15px;
 }
@@ -489,7 +376,7 @@
 }
 
 /* Earth active frame needed a much brighter value than its static brown frame. */
-#game-stage > #app > #game-content #battlePage .battle-player[data-element="earth"].active-turn::after{
+#game-stage > #app > #game-content #battlePage .battle-player[data-element="earth"].active-turn:not(.v174-cardless-unit)::after{
     border-color:#ffd878 !important;
     background:rgba(255,190,63,.055);
     animation:v141EarthTurnFlash .34s linear infinite !important;
@@ -822,12 +709,6 @@
 #game-stage .v141-dungeon-cover-actions button:disabled{opacity:.4;filter:grayscale(.5);}
 #game-stage .v141-dungeon-remaining{padding:1px 8px 7px;color:#b7a68a;font-size:10px;text-align:center;}
 
-#game-stage #app:not(.v141-dungeon-active):not(.v148-context-nav-active) #v141DungeonNav{display:none !important;}
-#game-stage #app.v141-dungeon-active #v141DungeonNav,
-#game-stage #app.v148-context-nav-active #v141DungeonNav{display:grid !important;}
-#game-stage #app.v141-dungeon-active #bottomNav,
-#game-stage #app.v148-context-nav-active #bottomNav{display:none !important;}
-#game-stage #v141DungeonNav{z-index:790 !important;}
 #game-stage #dungeonPage .v141-dungeon-return{display:block !important;position:absolute !important;right:12px !important;top:12px !important;z-index:120 !important;}
 
 /* ----- Notification dots ----- */
@@ -836,9 +717,12 @@
     right:2px;
     top:2px;
     z-index:30;
-    width:10px;
-    height:10px;
-    border:2px solid #f7dfad;
+    box-sizing:border-box;
+    width:9px;
+    height:9px;
+    min-width:9px;
+    min-height:9px;
+    border:1px solid #f7dfad;
     border-radius:50%;
     background:#e52e2e;
     box-shadow:0 0 8px rgba(255,40,40,.85);
@@ -846,10 +730,8 @@
     pointer-events:none;
 }
 
-#game-stage .home-feature-button,
-#game-stage .nav-button,
-#game-stage #dungeonNav{position:relative;}
-@keyframes v141NoticePulse{50%{transform:scale(.78);opacity:.65}}
+#game-stage .home-feature-button{position:relative;}
+@keyframes v141NoticePulse{50%{transform:scale(.9);opacity:.72}}
 
 /* ----- Skill preview moved outside transformed game stage ----- */
 .skill-preview-modal.v141-body-preview{
@@ -882,15 +764,13 @@
 .skill-preview-modal.v141-body-preview .skill-preview-card p{font-size:15px !important;line-height:1.6 !important;}
 
 /* ----- Synthesis system ----- */
-#game-stage #homeFeatureModal.v141-synthesis-modal{
-    padding:5px !important;
-}
+/* Crafting outer spacing is owned by css/49-v169-rpg-ui.css. */
 
 #game-stage #homeFeatureModal.v141-synthesis-modal .home-feature-modal-box{
     width:min(98%,560px) !important;
     max-width:560px !important;
-    height:96dvh !important;
-    max-height:96dvh !important;
+    height:calc(100% - 8px) !important;
+    max-height:calc(100% - 8px) !important;
     overflow:hidden !important;
     display:flex !important;
     flex-direction:column !important;
@@ -911,6 +791,25 @@
 #game-stage .v141-synthesis-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;}
 #game-stage .v141-synthesis-tabs button{min-height:44px;padding:4px 2px;border:1px solid #69502e;border-radius:7px;color:#b5a58c;background:#17120d;font-size:12px;}
 #game-stage .v141-synthesis-tabs button.active{color:#231607;border-color:#d4a14d;background:linear-gradient(180deg,#f0ca79,#b97d2f);font-weight:900;}
+#game-stage .v141-forge-tabs{grid-template-columns:repeat(2,minmax(0,1fr));}
+#game-stage .v141-forge-tabs button{font-size:15px;}
+#game-stage .v141-socket-list{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:7px;margin:12px 0;}
+#game-stage .v141-socket{min-width:0;padding:8px 4px;border:1px solid #69502e;border-radius:7px;text-align:center;background:#17120d;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:15px;}
+#game-stage .v141-socket>span{font-size:25px;color:#f0ca79;line-height:1.2;}
+#game-stage .v141-socket b,#game-stage .v141-socket small{max-width:100%;overflow-wrap:anywhere;}
+#game-stage .v141-socket small{font-size:15px;color:#d8c6a5;}
+#game-stage .v141-forge-picker{margin-bottom:12px;border:1px solid #69502e;border-radius:8px;background:#17120d;color:#d8c6a5;}
+#game-stage .v141-forge-picker summary{display:grid;grid-template-columns:1fr auto;gap:4px 8px;min-height:44px;padding:10px;cursor:pointer;list-style:none;font-size:15px;line-height:1.4;}
+#game-stage .v141-forge-picker summary::-webkit-details-marker{display:none;}
+#game-stage .v141-forge-picker summary>span{grid-column:1/-1;color:#b9a98d;}
+#game-stage .v141-forge-picker summary>b{min-width:0;overflow-wrap:anywhere;color:#ffe19a;}
+#game-stage .v141-forge-picker summary>i{font-style:normal;}
+#game-stage .v141-forge-options{display:grid;gap:6px;padding:0 8px 8px;}
+#game-stage .v141-forge-option{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0;min-height:44px;padding:8px;border:1px solid #69502e;border-radius:6px;background:#21190f;color:#d8c6a5;text-align:left;font-size:15px;line-height:1.4;}
+#game-stage .v141-forge-option>span{min-width:0;overflow-wrap:anywhere;}
+#game-stage .v141-forge-option.selected{border-color:#d4a14d;background:#3b2b17;color:#ffe19a;}
+#game-stage .v141-forge-option:active{background:#5b4120;}
+#game-stage .v141-forge-picker summary:focus-visible,#game-stage .v141-forge-option:focus-visible{outline:2px solid #eac47a;outline-offset:2px;}
 #game-stage .v141-synthesis-body{flex:1;min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;scrollbar-gutter:stable;}
 #game-stage .v141-synthesis-card,#game-stage .v141-synthesis-empty{min-height:100%;padding:10px;border:1px solid rgba(200,154,72,.20);border-radius:10px;background:linear-gradient(155deg,rgba(29,22,14,.68),rgba(9,7,5,.86));box-sizing:border-box;
     box-shadow:inset 0 1px 0 rgba(255,238,196,.02);
@@ -1034,7 +933,6 @@
 
 /* ----- Small-height phones: compress while the synthesis body remains the vertical scroll owner. ----- */
 @media (max-height:720px){
-    #game-stage #inventoryPage .inventory-character-stage{--inventory-stage-height:205px !important;}
     #game-stage #homeFeatureModal.v141-synthesis-modal .home-feature-modal-box{height:98dvh !important;max-height:98dvh !important;padding:8px !important;}
     #game-stage .v141-synthesis{gap:4px;}
     #game-stage .v141-synthesis-card{padding:7px;}

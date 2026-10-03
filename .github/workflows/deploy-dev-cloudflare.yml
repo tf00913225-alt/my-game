@@ -69,28 +69,7 @@ jobs:
           printf 'CLOUDFLARE_ACCOUNT_ID=%s\n' "$ACCOUNT_ID" >> "$GITHUB_ENV"
 
       - name: Prepare immutable static site
-        shell: bash
-        run: |
-          mkdir -p _deploy
-          rsync -a \
-            --exclude='.git/' \
-            --exclude='.github/' \
-            --exclude='tests/' \
-            --exclude='node_modules/' \
-            --exclude='functions/' \
-            --exclude='.firebaserc' \
-            --exclude='firebase.json' \
-            --exclude='firestore.rules' \
-            --exclude='_deploy/' \
-            --exclude='release-manifest.final.json' \
-            ./ _deploy/
-          test -f _deploy/index.html || { echo "index.html not found"; exit 1; }
-
-          # Deployment is validation-only. Never rewrite Game/Cache versions here.
-          DEPLOY_DIR=_deploy \
-          EXPECTED_COMMIT_SHA="$EXPECTED_COMMIT_SHA" \
-          EXPECTED_BRANCH="$EXPECTED_BRANCH" \
-          node .github/scripts/release-gate.mjs prepare-artifact
+        run: node .github/scripts/prepare-static-deployment.mjs
 
       - name: Ensure Pages project exists
         shell: bash
@@ -122,6 +101,28 @@ jobs:
             sleep 5
           done
           test "$success" = "1" || { echo "Deployed release manifest did not converge to expected SHA/version"; exit 1; }
+
+      - name: Ensure CJK font support for player-text browser QA
+        run: |
+          if ! fc-list :lang=zh | rg -q .; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends fonts-noto-cjk
+          fi
+
+      - name: Verify deployed Responsive Item production runtime
+        id: responsive_item_live
+        run: |
+          node .github/scripts/run-responsive-item-browser-qa.mjs
+          node .github/scripts/run-forge-sockets-browser-qa.mjs
+
+      - name: Upload deployed Responsive Item evidence
+        if: always() && steps.responsive_item_live.outcome != 'skipped'
+        uses: actions/upload-artifact@v4
+        with:
+          name: responsive-item-live-qa-${{ github.sha }}
+          path: artifacts/browser-qa/responsive-item/
+          if-no-files-found: error
+          retention-days: 90
 
       - name: Run deployed battle layout and VFX live QA
         run: node .github/scripts/battle-layer-audio-live-qa.mjs

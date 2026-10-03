@@ -62,11 +62,57 @@ test("all 31 player direct-damage skills are Lv10 and every upgrade target costs
   assert.doesNotMatch(progression,/\{2:1,3:2,4:3,5:4\}/);
 });
 
+test("skill level requirement owner uses absolute Lv10/Lv5 gates for all four elements",()=>{
+  const required=extractFunction(progression,"getRequiredCharacterLevelForSkillLevel");
+  const context={Math,Number,numeric:(value,fallback)=>Number.isFinite(Number(value))?Number(value):(fallback===undefined?0:fallback),PLAYER_DAMAGE_SKILL_ID_SET:new Set([
+    "flameSlash","fireRocket","waterKnife","waterBall","stormFist","windSpell","stoneSlash","stoneThrow"
+  ])};
+  vm.createContext(context);
+  vm.runInContext(required+"; result=(skill,target)=>getRequiredCharacterLevelForSkillLevel(skill,target);",context);
+  const directByElement={
+    fire:"flameSlash",water:"waterKnife",wind:"stormFist",earth:"stoneSlash"
+  };
+  for(const [element,id] of Object.entries(directByElement)){
+    assert.deepEqual([2,3,4,5,6,7,8,9,10].map(level=>context.result({id,maxLevel:10,learnLevel:45},level)),[10,20,30,40,50,60,70,80,90],element);
+    assert.equal(context.result({id,maxLevel:10,learnLevel:45},1),45,element+" learn gate");
+  }
+  for(const [element,id] of Object.entries({fire:"rage",water:"healSpell",wind:"dodgeSkill",earth:"rockWall"})){
+    assert.deepEqual([2,3,4,5].map(level=>context.result({id,maxLevel:5,learnLevel:45},level)),[20,40,60,80],element+" support");
+    assert.equal(context.result({id,maxLevel:5,learnLevel:45},1),45,element+" learn gate");
+  }
+  assert.equal(context.result({id:"rage",maxLevel:5,learnLevel:45},6),80);
+  assert.match(progression,/function getSkillUpgradeEligibility\(character,skill,currentSkillLevel\)/);
+  assert.match(progression,/v17364GetSkillUpgradeEligibility/);
+});
+
+test("upgrade eligibility covers boundary, max-level, and late-learn cases",()=>{
+  const required=extractFunction(progression,"getRequiredCharacterLevelForSkillLevel");
+  const cost=extractFunction(progression,"getUpgradeCostForTargetLevel");
+  const eligibility=extractFunction(progression,"getSkillUpgradeEligibility");
+  const context={Math,Number,numeric:(value,fallback)=>Number.isFinite(Number(value))?Number(value):(fallback===undefined?0:fallback),
+    PLAYER_DAMAGE_SKILL_ID_SET:new Set(["flameSlash"]),SKILL_UPGRADE_COST_BY_TARGET_LEVEL:{2:1,3:1,4:1,5:1,6:1,7:1,8:1,9:1,10:1}};
+  vm.createContext(context);
+  vm.runInContext(required+";"+cost+";"+eligibility+"; result=(character,skill,current)=>getSkillUpgradeEligibility(character,skill,current);",context);
+  const direct={id:"flameSlash",learnLevel:45,maxLevel:10};
+  for(const [level,current,allowed] of [[9,1,false],[10,1,true],[19,2,false],[20,2,true],[39,4,false],[40,4,true],[49,5,false],[50,5,true],[79,8,false],[80,8,true],[89,9,false],[90,9,true]]){
+    const out=context.result({level,skillPoints:99},direct,current);
+    assert.equal(out.allowed,allowed,"direct Lv"+level+" target Lv"+out.targetLevel);
+  }
+  assert.equal(context.result({level:90,skillPoints:99},direct,10).allowed,false);
+  assert.equal(context.result({level:45,skillPoints:99},direct,1).allowed,true);
+  assert.equal(context.result({level:45,skillPoints:99},direct,5).allowed,false);
+  const support={id:"rage",learnLevel:45,maxLevel:5};
+  for(const [level,current,allowed] of [[19,1,false],[20,1,true],[39,2,false],[40,2,true],[59,3,false],[60,3,true],[79,4,false],[80,4,true]]){
+    assert.equal(context.result({level,skillPoints:99},support,current).allowed,allowed,"support Lv"+level);
+  }
+  assert.equal(context.result({level:80,skillPoints:99},support,5).allowed,false);
+});
+
 test("support skill final arrays and runtime owners match the formal spec",()=>{
   [
     /FIRE_MOMENTUM_BY_LEVEL=Object\.freeze\(\[12,15,18,21,25\]\)/,
-    /BLOOD_BURN_HP_COST_BY_LEVEL=Object\.freeze\(\[5,10,15,20,25\]\)/,
-    /BLOOD_BURN_BY_LEVEL=Object\.freeze\(\[5,10,15,20,35\]\)/,
+    /BLOOD_BURN_HP_COST_BY_LEVEL=Object\.freeze\(\[20,25,30,35,40\]\)/,
+    /BLOOD_BURN_BY_LEVEL=Object\.freeze\(\[20,25,30,35,50\]\)/,
     /HEAL_HP_BY_LEVEL=Object\.freeze\(\[550,580,610,640,670\]\)/,
     /HEAL_SP_PERCENT_BY_LEVEL=Object\.freeze\(\[0,0,5,10,15\]\)/,
     /FREEZE_CHANCE_BY_LEVEL=Object\.freeze\(\[55,65,75,85,95\]\)/,
@@ -76,9 +122,8 @@ test("support skill final arrays and runtime owners match the formal spec",()=>{
     /CALM_RESIST_BY_LEVEL=Object\.freeze\(\[5,8,10,12,15\]\)/,
     /CALM_ACCURACY_BY_LEVEL=Object\.freeze\(\[5,10,15,20,25\]\)/,
     /ROCK_WALL_BY_LEVEL=Object\.freeze\(\[15,20,25,30,35\]\)/,
-    /EARTH_SHIELD_BY_LEVEL=Object\.freeze\(\[20,30,35,40,50\]\)/,
-    /EARTH_SHIELD_DURATION_BY_LEVEL=Object\.freeze\(\[3,3,3,4,5\]\)/,
-    /BARRIER_BLOCKS_BY_LEVEL=Object\.freeze\(\[3,3,3,4,5\]\)/,
+    /EARTH_SHIELD_BY_LEVEL=Object\.freeze\(\[20,40,60,80,100\]\)/,
+    /EARTH_SHIELD_DURATION_BY_LEVEL=Object\.freeze\(\[3,3,3,3,4\]\)/,
     /BARRIER_DURATION_BY_LEVEL=Object\.freeze\(\[3,3,3,4,5\]\)/
   ].forEach(pattern=>assert.match(progression,pattern));
   assert.match(progression,/fireSoulResonance:[\s\S]*?spCost:45/);
@@ -102,13 +147,13 @@ test("formal Heal and Purify runtime keeps robust fallbacks and the selected pri
   assert.match(support,/const presentationTargetType=targets\.length>1[\s\S]*?animateSupportCast\(state,characterIndex,skill,primaryTarget,targets,targetSide,presentationTargetType\)/);
 });
 
-test("Lv5 resonance extension and three-cast Blood Burn exclude free follow-ups",()=>{
+test("Lv5 resonance extension and four-cast Blood Burn share the cast bonus with free follow-ups",()=>{
   assert.match(progression,/maxExtensionRounds:3,maxExtensionsPerRound:1/);
   assert.match(progression,/lastExtendedRound/);
   assert.match(progression,/extensionCount/);
   assert.match(progression,/if\(succeeded&&!freeCast\)/);
-  assert.match(progression,/const bloodBonus=!freeCast&&blood/);
-  assert.match(progression,/remainingFireActions:3/);
+  assert.match(progression,/const bloodBonus=blood/);
+  assert.match(progression,/remainingFireActions:4/);
   assert.match(progression,/blood\.remainingFireActions=Math\.max\(0/);
 });
 

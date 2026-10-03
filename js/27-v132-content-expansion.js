@@ -87,7 +87,7 @@
             '<div class="v132-set-info">'+
             '<div class="v132-set-title">['+escapeHtml(label)+']'+count+'/5</div>'+
             '<div class="v132-set-bonus'+(threeActive ? " active" : " inactive")+'">'+
-            '裝備三件　全能力+1　'+(threeActive ? "[已啟動]" : "[未啟動]")+
+            '裝備三件　全能力+1　閃避+2%　'+(threeActive ? "[已啟動]" : "[未啟動]")+
             '</div>'+
             '<div class="v132-set-bonus'+(fiveActive ? " active" : " inactive")+'">'+
             '裝備五件　'+escapeHtml(elementName)+'元素技能傷害+2%　'+(fiveActive ? "[已啟動]" : "[未啟動]")+
@@ -503,8 +503,8 @@
     const EQUIPMENT_SET_PIECES=[
         {key:"blade",slot:"weapon",name:"刀",stats:{attack:10,vitality:-2}},
         {key:"fan",slot:"weapon",name:"扇",stats:{intelligence:10,vitality:-2}},
-        {key:"heavyArmor",slot:"armor",name:"鎧甲",stats:{attack:5,spirit:5}},
-        {key:"robe",slot:"armor",name:"袍",stats:{intelligence:5,spirit:5}},
+        {key:"heavyArmor",slot:"armor",name:"鎧甲",stats:{attack:5,evasion:10,antiCrit:0.5,statusResistance:0.25}},
+        {key:"robe",slot:"armor",name:"袍",stats:{intelligence:5,evasion:10,antiCrit:0.5,statusResistance:0.25}},
         {key:"boots",slot:"shoes",name:"靴",stats:{agility:10}},
         {key:"shoes",slot:"shoes",name:"履",stats:{agility:10}},
         {key:"helm",slot:"head",name:"盔",stats:{attack:12}},
@@ -529,8 +529,10 @@
                 icon:equipmentSetIcon(set.id,piece.key),
                 type:piece.slot,
                 setId:set.id,
+                tierKey:"orange",
                 levelRequirement:20,
                 price:0,
+                equipmentCombatPercentUnitVersion:2,
                 stats:Object.assign({},piece.stats)
             });
         });
@@ -839,14 +841,14 @@
                 ?Math.max(0,Number(skill.freezeChanceByLevel[Math.min(skill.freezeChanceByLevel.length-1,skillLevel-1)])||0)
                 :Math.max(0,Number(skill&&skill.freezeChance)||0);
             const intelligence=Number(stats.intelligence!==undefined?stats.intelligence:character.intelligence)||0;
-            const targetSpirit=typeof getMonsterEffectiveSpiritPoints==="function"
-                ?Number(getMonsterEffectiveSpiritPoints(targetMonster))||0
-                :Number(targetMonster.spiritPoints||targetMonster.spirit)||0;
+            const targetStatusResistance=typeof getMonsterEffectiveStatusResistance==="function"
+                ?Number(getMonsterEffectiveStatusResistance(targetMonster))||0
+                :Number(targetMonster.statusResistance)||0;
             const rank=typeof getMonsterRank==="function"?getMonsterRank(targetMonster):"regular";
             if(typeof rollStatusEffectHit==="function"){
                 return rollStatusEffectHit(
                     baseChance,Number(character.level)||1,Number(targetMonster.level)||1,
-                    intelligence,targetSpirit,true,rank,0
+                    intelligence,targetStatusResistance,true,rank,0
                 );
             }
         }
@@ -854,8 +856,8 @@
         // 隱身／結界是友方符術，不拿友軍閃避懲罰施放者；使用角色自身命中值。
         const accuracy=Number(stats.accuracy);
         if(Number.isFinite(accuracy)&&typeof rollHitChance==="function"){
-            const finalAccuracyBonus=typeof window.v173GetActiveAccuracyBonusPercent==="function"
-                ?window.v173GetActiveAccuracyBonusPercent(character)
+            const finalAccuracyBonus=typeof window.v173GetFinalAccuracyBonusPercent==="function"
+                ?window.v173GetFinalAccuracyBonusPercent(character)
                 :0;
             return rollHitChance(accuracy,0,0,finalAccuracyBonus);
         }
@@ -1274,7 +1276,7 @@
                 return (
                     '<button type="button" class="battle-item-card talisman" '+
                     'onclick="useTalisman(\''+item.id+'\')" title="'+escapeHtml(item.name)+'">'+
-                    '<span class="battle-item-badge">符</span>'+
+                    '<span class="battle-item-icon">'+battleItemIconMarkup(definition||item)+'</span>'+
                     '<span class="battle-item-name">'+escapeHtml(item.name)+'</span>'+
                     '<span class="battle-item-effect">生效機率 '+chanceLabel+'</span>'+
                     '<span class="battle-item-count">×'+item.count+'</span>'+
@@ -1313,9 +1315,12 @@
 
             Object.keys(counts).forEach(setId=>{
                 if(counts[setId]>=3){
-                    ["attack","vitality","energy","intelligence","spirit","agility"].forEach(stat=>{
+                    ["attack","vitality","energy","intelligence","defensePoints","agility"].forEach(stat=>{
                         bonus[stat]=(bonus[stat]||0)+1;
                     });
+                    bonus.evasion=(bonus.evasion||0)+2;
+                    bonus.antiCrit=(bonus.antiCrit||0)+0.1;
+                    bonus.statusResistance=(bonus.statusResistance||0)+0.05;
                 }
             });
 
@@ -1998,6 +2003,10 @@
         }
 
         window.v132ActiveDungeonRun={
+            identityVersion:1,
+            mode:String(opts.mode||"legacy-dungeon"),
+            gameplayMode:opts.gameplayMode?String(opts.gameplayMode):null,
+            dailyDungeonType:opts.dailyDungeonType?String(opts.dailyDungeonType):null,
             previousMonsters:monsters,
             previousZone:currentZone,
             onComplete:onComplete,
@@ -2094,6 +2103,30 @@
         monsters=run.previousMonsters;
         currentZone=run.previousZone;
     }
+
+    function abortDungeonBattle(reason){
+        const run=window.v132ActiveDungeonRun;
+        if(!run){ return false; }
+        battleActive=false;
+        clearBattleRoundPrompt();
+        finishBattleStatisticsSession(String(reason||"escape"));
+        autoBattle=false;
+        actionReady=false;
+        pendingAction=null;
+        clearInterval(timerId);
+        timerId=null;
+        if(battleAdvanceTimeoutId){ clearTimeout(battleAdvanceTimeoutId); battleAdvanceTimeoutId=null; }
+        battleAdvanceScheduled=false;
+        battleToken++;
+        closeMenus();
+        restoreDungeonMonsters();
+        window.v132ActiveDungeonRun=null;
+        updateUI();
+        saveGame();
+        if(run.onComplete){ run.onComplete({result:String(reason||"escape"),turnsUsed:turn}); }
+        return true;
+    }
+    window.v132AbortDungeonBattle=abortDungeonBattle;
 
     if(typeof winBattle==="function"){
         const originalWinBattle=winBattle;
@@ -2220,7 +2253,7 @@
             }
 
             showExpDungeonRewardModal(rewardExp);
-        });
+        },{mode:"daily",dailyDungeonType:"exp"});
     }
 
     /*
@@ -2360,7 +2393,7 @@
             }
             const chestCount=outcome.turnsUsed<5 ? 3 : (outcome.turnsUsed<10 ? 2 : 1);
             showMaterialDungeonRewardModal(chestCount);
-        });
+        },{mode:"daily",dailyDungeonType:"material"});
     }
     window.v132BeginMaterialDungeon=beginMaterialDungeon;
 
@@ -2568,7 +2601,7 @@
                 return;
             }
             showEquipmentDungeonRewardModal();
-        });
+        },{mode:"daily",dailyDungeonType:"equipment"});
     }
     window.v132BeginEquipmentDungeon=beginEquipmentDungeon;
 

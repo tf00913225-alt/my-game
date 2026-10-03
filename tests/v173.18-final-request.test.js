@@ -109,7 +109,7 @@ test("late runtime files no longer overwrite the four-element skill table",()=>{
         /patchSkill(?:Tuning)?\("(?:dragonSlash|phoenixCry|rage|waterKnife|frostPunch|iceSpin|frostCrush|waterBall|floodBeast|iceArrowRain|freeze|healSpell|revive|windFist|earthSlash)/
     );
     const fireWindEarth=fs.readFileSync("js/43-v149-skill-ui-rules.js","utf8");
-    const water=fs.readFileSync("js/50-v169-water-skill-rules.js","utf8");
+    const water=fs.readFileSync("js/60-v173.64-skill-progression-rebalance.js","utf8");
     assert.doesNotMatch(fireWindEarth,/\bid:\s*"waterKnife"/);
     ["waterKnife","frostPunch","iceSpin","frostCrush","waterBall","floodBeast","iceArrowRain","freeze","healSpell","revive","waterEX"]
         .forEach(id=>assert.match(water,new RegExp("\\b"+id+":\\{"),id));

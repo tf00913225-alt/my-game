@@ -3,6 +3,7 @@
 const assert=require("node:assert/strict");
 const crypto=require("node:crypto");
 const fs=require("node:fs");
+const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 const vm=require("node:vm");
 
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
@@ -33,7 +34,7 @@ const STATUSES={
     damageDown:{file:"damage-down-loop.png",runtimeFile:"damage-down-icon.webp",mode:"icon",collection:"statusEffects",hash:"25e984ef5973616bc6f37cfc5842d445ff484f981a98902894febca59a92ae34"},
     stun:{file:"stun-loop.png",runtimeFile:"stun.webp",mode:"pulse",collection:"statusEffects",hash:"45903df26e32ddc265d45217639211bb9966fb69b3a02389f07afa0500d53071"},
     dodgeSkill:{file:"dodge-skill-loop.png",runtimeFile:"windwalk.webp",mode:"pulse",collection:"activeBuffs",hash:"397338dc6fc01967de860e285c1f65febe5248f0a111c01f789dfb676c141c5b"},
-    stealthSkill:{file:"stealth-skill-loop.png",runtimeFile:"stealth.webp",mode:"static",collection:"activeBuffs",hash:"58523f3066068e2d7a784c309fe072c3cbb92361a0d703ed8b4d9b1da4a0a02b"},
+    stealthSkill:{file:"stealth-skill-loop.png",runtimeFile:"stealth.webp",mode:"none",collection:"activeBuffs",hash:"58523f3066068e2d7a784c309fe072c3cbb92361a0d703ed8b4d9b1da4a0a02b"},
     dinghaishenzhen:{file:"dinghaishenzhen-loop.png",runtimeFile:"calm-mind.webp",mode:"pulse",collection:"activeBuffs",hash:"3607d280f4ff4092d80b8ead216e410425815a4996b22437af556bf28673f31b"}
 };
 
@@ -322,7 +323,7 @@ test("all eleven casts keep Sprite timing while six persistent states use low-mo
         assert.deepEqual(Array.from([visual.cropColumns,visual.cropRows]),[1,1],type);
         assert.equal(
             visual.src,
-            spec.mode==="icon"?"":"assets/vfx/status/"+spec.runtimeFile,
+            spec.mode==="icon"||spec.mode==="none"?"":"assets/vfx/status/"+spec.runtimeFile,
             type
         );
         assert.equal(visual.frames,undefined,type+" must not own a persistent frame loop");
@@ -443,17 +444,16 @@ test("enemy casts use the explicit player target instead of a fixed faction posi
     assert.equal(sprites[0].style.top,"418px");
 });
 
-test("frame seven releases resolved attack results once, while buffs never shake or show damage",()=>{
+test("frame seven exposes formal attack feedback timing while buffs never create damage",()=>{
     const attack=loadRuntime();
     attack.context.v142SkillAnimationDirector.play(
         config("stormFist","single","physical"),
         {side:"player",actorIndex:0,targetId:2}
     );
-    attack.context.showMonsterHit(2,33,"hp");
-    assert.equal(attack.monsterHits.length,0);
-    attack.setClock(600);
-    runTimers(attack,600);
-    assert.equal(attack.monsterHits.length,1,"damage result appears once at frame seven");
+    assert.equal(typeof attack.context.v143ResolveBattleFeedbackTiming,"function");
+    const impact=attack.context.v143ResolveBattleFeedbackTiming("monster",2,"damage");
+    assert.ok(impact.delayMs>0&&impact.delayMs<=700,"damage feedback must resolve at the authored hit frame");
+    assert.equal(impact.critical,false);
     assert.equal(attack.cards.battleMonster2.classList.contains("v143-impact-target"),false,"raster owner must not recreate the retired procedural impact class");
 
     const buff=loadRuntime();
@@ -521,7 +521,8 @@ test("persistent status visuals start only on success, survive duplicate MISS, a
 
     applied.party[1].activeBuffs.push({type:"stealthSkill",turnsLeft:2});
     applied.context.v143SyncStatusVisualEffects();
-    assert.ok(applied.cards.battlePlayerCard1.querySelector(".v143-status-visual-stealthSkill"));
+    assert.equal(applied.cards.battlePlayerCard1.querySelector(".v143-status-visual-stealthSkill"),null,"stealth has no body visual");
+    assert.equal(applied.cards.battlePlayerCard1.querySelector(".v143-status-icon-stealthSkill"),null,"stealth has no HUD icon");
     applied.context.v142SkillAnimationDirector.dispose();
     assert.equal(applied.body.querySelectorAll(".v143-status-visual").length,0,"battle disposal clears body visuals");
     assert.equal(applied.body.querySelectorAll(".v143-status-icon").length,0,"battle disposal clears status icons");
@@ -542,8 +543,8 @@ test("wind casts remain Sprite Sheets while persistent states use noninteractive
 });
 
 test("the development cache release is V173.39",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.72"/);
-    assert.match(index,/<title>四象江湖傳 V173\.72<\/title>/);
+    assert.equal((loader.match(/const V_ASSET_VERSION="([^"]+)"/)||[])[1],releaseMeta.cacheVersion);
+    assert.ok(index.includes('<title>四象江湖傳 V'+releaseMeta.version+'</title>'));
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
 

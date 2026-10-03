@@ -51,8 +51,9 @@ for(const key of [
     "daily.material.boss"
 ]){
     const row=dailyByKey.get(key);
-    assert.ok(row,"missing retired registry row "+key);
-    assert.equal(row[tupleIndex.status],"retired",key+" must be permanently retired");
+    assert.ok(row,"missing restored registry row "+key);
+    assert.equal(row[tupleIndex.status],"existing",key+" must use the later validated replacement");
+    assert.ok(fs.existsSync(path.join(root,row[tupleIndex.path])),key+" replacement must exist");
     assert.equal(liveBatch.committed.includes(key),false,key+" must not remain in committed work");
     assert.equal(liveBatch.pending.includes(key),false,key+" must not remain pending");
 }

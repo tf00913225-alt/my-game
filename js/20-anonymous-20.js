@@ -1,5 +1,5 @@
 /* Critical/feature boundary owner. No global input lock and no network-order patch chain. */
-const V_ASSET_VERSION="173.72";
+const V_ASSET_VERSION="173.73";
 
 (function installFeatureIntentBoundary(){
     "use strict";
@@ -46,6 +46,21 @@ const V_ASSET_VERSION="173.72";
         element.setAttribute("aria-busy",active?"true":"false");
         if(active){ element.dataset.featureLoadingLabel="正在載入"+(label||"功能")+"…"; }
         else{ delete element.dataset.featureLoadingLabel; }
+    }
+    function createNavigationIntent(element,sourceEvent){
+        let executed=false;
+        return function executeNavigationIntent(){
+            if(executed){ return false; }
+            executed=true;
+            const inlineAction=element&&element.onclick;
+            if(typeof inlineAction==="function"){
+                const intentEvent=new MouseEvent("click",{bubbles:false,cancelable:true,view:window});
+                inlineAction.call(element,intentEvent);
+                return !intentEvent.defaultPrevented;
+            }
+            document.dispatchEvent(new CustomEvent("four-symbols:navigation-intent",{detail:{element,sourceEvent}}));
+            return true;
+        };
     }
 
     let expPoolPrimePromise=null;
@@ -95,6 +110,7 @@ const V_ASSET_VERSION="173.72";
         event.preventDefault(); event.stopImmediatePropagation();
         if(element.dataset.featureLoading==="1"){ return; }
         element.dataset.featureLoading="1"; setLocalLoading(element,true,info.label);
+        const intent=createNavigationIntent(element,event);
         api.ensure(info.feature,info.expPool?"exp-pool-safety":"navigation").then(()=>{
             delete element.dataset.featureLoading; setLocalLoading(element,false);
             if(info.expPool){
@@ -103,7 +119,9 @@ const V_ASSET_VERSION="173.72";
                 refreshExpPoolSafetyUiOnce();
                 return;
             }
-            element.dataset.featureReplay="1"; element.click(); delete element.dataset.featureReplay;
+            /* One accepted human gesture produces one intent.  Do not replay
+               a synthetic DOM click: it can be intercepted as a second tap. */
+            intent();
         }).catch(error=>{
             delete element.dataset.featureLoading; setLocalLoading(element,false);
             console.error("Feature failed to load:",info.feature,error);
@@ -113,6 +131,7 @@ const V_ASSET_VERSION="173.72";
     document.addEventListener("pointerdown",prefetch,{capture:true,passive:true});
     document.addEventListener("touchstart",prefetch,{capture:true,passive:true});
     document.addEventListener("click",enter,true);
+    window.FourSymbolsNavigationIntent=Object.freeze({create:createNavigationIntent});
     document.addEventListener("four-symbols:startup-ready",()=>{
         const api=loader();
         if(api){

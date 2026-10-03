@@ -16,20 +16,3 @@
 #game-stage > #app > #game-content #battlePage #battlePlayerCard0{
     background-color:transparent !important;
 }
-
-/* GIANT skill cast name. Deliberately allowed to exceed the card. */
-#game-stage #game-overlay-layer .skill-name-badge{
-    font-size:132px !important;
-    width:760px !important;
-    min-width:760px !important;
-    max-width:none !important;
-    overflow:visible !important;
-    white-space:nowrap !important;
-    text-align:center !important;
-    font-weight:900 !important;
-    line-height:.95 !important;
-    -webkit-text-stroke:0 !important;
-    text-shadow:
-        0 5px 6px rgba(0,0,0,1),
-        0 0 12px rgba(0,0,0,1) !important;
-}

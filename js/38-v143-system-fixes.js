@@ -32,7 +32,7 @@
         armor:{label:"衣服",type:"armor",glyph:"甲"}
     };
     const STAT_KEYS=["attack","intelligence"];
-    const SUBSTAT_KEYS=["vitality","energy","agility","spirit"];
+    const SUBSTAT_KEYS=["vitality","energy","defensePoints","agility","statusResistance"];
     const NORMAL_GEAR_PREFIXES=["古銅","精鍛","雲紋","玄鐵","旅者","守備","靈巧","秘銀"];
 
     function numeric(value){
@@ -53,47 +53,8 @@
 
     /* ----- 11 / 12. Skill data and hard-control caps are one ruleset. ----- */
     function applySkillRuleChanges(){
-        if(typeof skillDatabase==="undefined"){ return; }
-        const storm=skillDatabase.stormRain;
-        if(storm){
-            storm.learnCost=30;
-            storm.maxLevel=5;
-            storm.baseDamage=48;
-            storm.damagePerLevel=14;
-            storm.spCost=75;
-            storm.stunChance=35;
-            storm.stunDuration=1;
-            storm.missBonusByLevel=[15,20,25,30,35];
-            storm.requires=["windHowlLightning"];
-            storm.description="對敵方全體各造成48點基礎法術傷害；35%基礎機率暈眩1回合，使目標最終命中率降低15%/20%/25%/30%/35%。";
-        }
-        const rain=skillDatabase.iceArrowRain;
-        if(rain){
-            rain.learnCost=20;
-            rain.maxLevel=5;
-            rain.baseDamage=30;
-            rain.damagePerLevel=12;
-            rain.spCost=75;
-            /* Ice Arrow Rain is Frostbite, not the hard-control Freeze state. */
-            delete rain.freezeChance;
-            delete rain.freezeDuration;
-            delete rain.freezeSingleTarget;
-            rain.frostbiteChance=50;
-            rain.frostbiteDuration=2;
-            rain.lifestealPercentByLevel=[1,2,3,4,5];
-            rain.requires=["floodBeast"];
-            rain.description="對敵方全體各造成30點基礎法術傷害；吸取實際傷害的1%/2%/3%/4%/5%恢復自身HP；每個命中目標各有50%基礎機率凍傷2回合。";
-        }
-        const freeze=skillDatabase.freeze;
-        if(freeze){
-            freeze.learnCost=25;
-            freeze.maxLevel=1;
-            freeze.spCost=22;
-            freeze.freezeChance=80;
-            freeze.freezeDuration=4;
-            freeze.requires=["iceArrowRain"];
-            freeze.description="80%基礎機率冰封單一目標，使其無法行動4回合；純控場技能，不造成傷害。";
-        }
+        /* Retired data patch: V173.64 exclusively authors player Skill Spec. */
+        return;
     }
     applySkillRuleChanges();
 
@@ -476,62 +437,17 @@
         };
     }
 
-    /* ----- 3. Escaping a dungeon restores the dungeon owner before routing. ----- */
-    if(typeof resolveEscapeAttempt==="function"){
-        const previousEscape=resolveEscapeAttempt;
-        resolveEscapeAttempt=function(characterIndex){
-            const run=window.v132ActiveDungeonRun;
-            if(!run){ return previousEscape.apply(this,arguments); }
-            clearInterval(timerId);
-            timerId=null;
-            const alive=currentBattleMonsters.map(index=>monsters[index]).filter(monster=>monster&&monster.alive);
-            if(!alive.length){ checkBattleEnd(); return; }
-            const highest=Math.max.apply(null,alive.map(monster=>monster.level));
-            const character=getPartyCharacterByIndex(characterIndex)||player;
-            const chance=Math.max(10,Math.min(95,50+(numeric(character.level)-highest)*5));
-            if(Math.random()*100>=chance){ addBattleLog("逃脫失敗！"); finishPlayerAction(); return; }
-
-            battleActive=false;
-            autoBattle=false;
-            actionReady=false;
-            pendingAction=null;
-            battleToken++;
-            if(typeof battleAdvanceTimeoutId!=="undefined"&&battleAdvanceTimeoutId){
-                clearTimeout(battleAdvanceTimeoutId); battleAdvanceTimeoutId=null;
-            }
-            if(typeof battleAdvanceScheduled!=="undefined"){ battleAdvanceScheduled=false; }
-            closeMenus();
-            if(window.v142SkillAnimationDirector){ window.v142SkillAnimationDirector.dispose(); }
-            document.querySelectorAll("#v141BattleTransition,.v141-battle-transition").forEach(node=>node.classList.remove("show"));
-            const battlePage=document.getElementById("battlePage");
-            if(battlePage){ battlePage.classList.remove("preparing","v141-exiting"); }
-            monsters=run.previousMonsters;
-            currentZone=run.previousZone;
-            window.v132ActiveDungeonRun=null;
-            addBattleLog("成功從副本脫逃！");
-            if(typeof saveGame==="function"){ saveGame(); }
-            setTimeout(()=>{
-                if(typeof run.onComplete==="function"){ run.onComplete({result:"escape"}); }
-                else{
-                    showPage("dungeon");
-                    if(typeof switchDungeonTab==="function"){ switchDungeonTab("daily"); }
-                }
-            },260);
-        };
-    }
+    /* Escape routing/presentation is owned by core resolveEscapeAttempt() plus
+       v132AbortDungeonBattle() and FourSymbolsBattlePresentation. The former
+       Dungeon-only resolveEscapeAttempt wrapper is retired. */
 
     /* ----- 4 / 5. Larger Abyss, tap-to-advance dialogue and correct nav shell. ----- */
     function fixDungeonNavigation(){
-    const nav=document.getElementById("v141DungeonNav");
-    const content=document.getElementById("game-content");
-    if(!nav||!content){ return; }
-    if(nav.parentElement!==content){ content.appendChild(nav); }
-    nav.dataset.v143Fixed="1";
-    const oldReturn=document.getElementById("v141DungeonReturn");
-    if(oldReturn){ oldReturn.remove(); }
-    if(typeof window.v148SyncDungeonShell==="function"){ window.v148SyncDungeonShell(); }
-}
-
+        // Context items are projected by V148 into the shared native shell.
+        if(typeof window.v148SyncContextNavigation==="function"){
+            window.v148SyncContextNavigation();
+        }
+    }
 
 /* ----- 6. Synthesis uses icon pickers and creates ordinary random gear. ----- */
     function definitions(){
@@ -553,7 +469,7 @@
     }
     function synthesisResult(item){
         if(!window.v132ShowRewardModal){ return; }
-        const labels={attack:"攻擊",intelligence:"智力",vitality:"體質",energy:"能量",agility:"敏捷",spirit:"精神"};
+        const labels={attack:"攻擊",intelligence:"智力",vitality:"體質",energy:"能量",defensePoints:"防禦",agility:"敏捷",accuracy:"命中",evasion:"閃避",antiCrit:"抗暴",statusAccuracy:"異常命中",statusResistance:"異常抗性"};
         const stats=Object.keys(item.stats||{}).map(key=>'<span>'+labels[key]+' <b>+'+item.stats[key]+'</b></span>').join("");
         window.v132ShowRewardModal('<div class="v132-reward-modal-inner"><h3>合成成功</h3><div class="v141-result-item">'+item.icon+'<b>'+escapeHtml(item.name)+'</b>'+stats+'</div><p>此為系統隨機生成的普通裝備，不屬於四大套裝。</p><div class="v132-reward-actions"><button type="button" onclick="v132CloseRewardModal()">確定</button></div></div>');
     }
@@ -678,7 +594,7 @@
         return {
             version:VERSION,
             enemyCards:document.querySelectorAll(".v143-monster-identity").length,
-            dungeonNavFixed:document.getElementById("v141DungeonNav")?.dataset.v143Fixed==="1",
+            dungeonNavFixed:!!window.FourSymbolsBottomNav?.ensureShell(),
             pendingPotion:!!window.v143PendingPotionTarget
         };
     };

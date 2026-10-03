@@ -1,0 +1,9 @@
+/* Canonical skill-name presentation owner. Element identity comes only from Skill Data. */
+:root{--battle-feedback-font-size:18px;}
+body > .skill-name-badge{position:fixed;z-index:16020;display:block;box-sizing:border-box;width:max-content;min-width:0;margin:0;padding:0;border:0;border-radius:0;background:transparent;color:#fff;font-size:var(--battle-feedback-font-size);font-weight:900;line-height:1.05;letter-spacing:.1px;text-align:center;white-space:nowrap;overflow:visible;pointer-events:none;-webkit-text-stroke:1.15px #fff;paint-order:stroke fill;text-shadow:0 1px 2px #000,0 0 4px rgba(0,0,0,.72);transform:translate(-50%,-100%);animation:skillBadgePop var(--skill-name-display-duration,347ms) ease-out forwards;}
+body > .skill-name-badge[data-skill-element="fire"]{color:#e32626;}
+body > .skill-name-badge[data-skill-element="water"]{color:#3aaeff;}
+body > .skill-name-badge[data-skill-element="wind"]{color:#39c96b;}
+body > .skill-name-badge[data-skill-element="earth"]{color:#e0b833;}
+body > .skill-name-badge[data-skill-element="normal"]{color:#fff;}
+@keyframes skillBadgePop{0%{opacity:0;transform:translate(-50%,4px) scale(.7)}15%{opacity:1;transform:translate(-50%,-6px) scale(1.15)}30%{transform:translate(-50%,-4px) scale(1)}70%{opacity:1;transform:translate(-50%,-12px) scale(1)}100%{opacity:0;transform:translate(-50%,-22px) scale(1)}}

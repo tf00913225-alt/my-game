@@ -2,14 +2,124 @@
 
 本文件是長期工程進度來源。**每個 Phase 結束都必須更新本文件**；聊天、Commit、PR、CI 或部署成功不能取代驗收紀錄。
 
+## 2026-09-27 — atomic daily check-in candidate; Phase 4 0/6 VERIFIED
+
+- The new protected callable derives the existing 50-gold check-in reward, Taipei day and unique operation ID on the server. A single Firestore transaction writes the daily grant, claim receipt, ledger, claim record/checkpoint, economy, canonical revisions and an unpublished snapshot. It requires an active UID session and expected revision; replay returns the original receipt. No client amount, battle outcome or local quest flag can grant value.
+- This is an isolated server-created first-character path. No player UI is connected and no playable snapshot or cross-device restoration is enabled. Kill/win quest rewards still need a trusted run source. CI, merged SHA and deployment evidence are pending; Phase 4 remains **0/6 VERIFIED**.
+
+## 2026-09-26 — historical claim source reconciliation (candidate)
+
+- Read-only reward audit now parses `quest-milestones` claimed thresholds with its recorded date and compares `abyss-state` claim entries against the mirrored main-save `abyssProgress`. Invalid milestone thresholds or contradictory Abyss claim mirrors block character draft preparation. Historical entries remain duplicate blocks only, never evidence of an unpaid reward. Earlier dates that the client no longer retains remain unverifiable.
+- No canonical character or reward writer, claim ledger, accepted baseline, durable server recovery point or second-device restore was introduced. Local targeted checks and PR/merge/deployment evidence are separate gates. Phase 4 remains **IN PROGRESS / 0/6 VERIFIED**.
+
+## 2026-09-26 — complete legacy source retention in read-only draft (candidate)
+
+- The internal draft now retains all 23 allowlisted main-save fields through explicit conversion or present/missing markers and every one of the 14 registered sidecar sources with exact raw bytes or a missing marker. The server backup policy owns the sidecar inventory; the screening owner reuses it. Historical `equipment-shop-purchases` absence remains blocked and is never treated as unclaimed. Claim blockers remain even when character data can be translated for review.
+- This is source preservation for a later canonical admission, not a verified claim, authoritative character write, backup/recovery point or playable snapshot. Targeted local tests and PR/merged deployment evidence must be recorded separately. Phase 4 remains **IN PROGRESS / 0/6 VERIFIED**.
+
+## 2026-09-26 — read-only legacy character conversion draft (candidate)
+
+- `functions/src/legacy-candidate-screening.js::prepareLegacyCharacterDraft()` converts a structurally screened legacy candidate into a private review draft: three explicit character slots, economy, distinct bag/equipped objects with source paths, skill/relic sources, progress and parsed claim-bearing sidecars. It never issues canonical IDs or writes character state. The callable returns only conversion status and object counts, not the draft. Missing/corrupt claim sidecars, missing created-character skill loadouts or an unowned equipped relic block the draft; historical rewards remain unverified even for a prepared draft.
+- Targeted local verification and PR/merge/deploy evidence must be recorded separately. No baseline acceptance, award, authoritative writer, server recovery point or second-device restore exists. Phase 4 remains **IN PROGRESS / 0/6 VERIFIED**.
+
+## 2026-09-26 — live formation field and canonical source screening (candidate)
+
+- `saveGame()` persists `allyFormation` but the candidate field allowlist previously omitted it. The backend now preserves that field; the read-only candidate screen blocks invalid/duplicate/orphaned formation slots and missing economy, skill or relic source fields. This closes a real save-schema drift without trusting client history or making a playable canonical projection.
+- PR #594 head `b7fa64138ae76509f81ae1fe6820359a803ac2d0` passed PR CI runs `36237149443` and `36237149229`, then merged to `dev@c5995ac04ca8a80704c5dfb1fce4eec2a4028d41`. Merged CI run `36237369357` passed Repository checks and exact-commit DEV preview deployment/version verification; Session Authority run `36237369203` passed the emulator and the Firebase deployment job for that same SHA. These are workflow results, not disaster-recovery or second-phone character acceptance.
+- No baseline acceptance, authoritative writer, server backup or second-device character restore is implemented. Phase 4 remains **IN PROGRESS / 0/6 VERIFIED**. PR, emulator, merge and exact deployment evidence are tracked separately.
+
+## 2026-09-26 — Persisted-state owner drift and CI guard strengthening (candidate)
+
+- Full runtime search found no active writer/reader for UID `equipment-shop-purchases`; it survives only as a historical legacy translation/backup key. The 39-entry registry now names that actual preservation owner, removes the false shop-UI writer claim and blocks missing/corrupt claim history pending review. No legacy key or backup is deleted.
+- The CI guard now rejects an unregistered literal key even if the number of writes in an existing module stays unchanged, rejects unreviewed dynamic account suffixes and rejects a runtime reintroduction of the historical-only key without a claim-policy review. Its self-test exercises all three. This is registry coverage, not a new cloud reward authority. Phase 4 remains **0/6 VERIFIED**.
+
+## 2026-09-26 — Legacy equipped-object migration screening (candidate)
+
+- Runtime audit found that `equipSelectedItem()` moves the entire item object from `inventoryItems` into `characterEquipment`; an equipped item is legitimately absent from the bag. The first character's current owner key is `fire`, later characters use `player2`/`player3`, and legacy alias slots exist. A future canonical conversion must take the union, allocate new server-issued ownership IDs and retain any unmapped item for review.
+- The existing read-only candidate screening now reports blockers for duplicate `v141Uid` across bag/equipment, mismatched or ambiguous equipment slots, malformed equipped items and nonempty orphaned owners. An equipped item absent from the bag is not itself a blocker. Legacy marker consistency is only structural; no item entitlement is trusted, no candidate is accepted, and Phase 4 remains **0/6 VERIFIED**.
+
+## 2026-09-26 — Foundation C reservation receipt consistency and settlement gate (candidate)
+
+- `functions/src/trusted-grant-ledger.js` now rejects an inconsistent **existing** reservation receipt if grant amount, status, UID/source, receipt type, credited flag or revision diverges. Emulator regression corrupts each critical field, verifies a retry fails with `DATA_LOSS`, restores the fixture and confirms no extra revision or award. The grant remains only reserved: `creditedToCharacter:false`.
+- `docs/CLOUD_OPERATION_SETTLEMENT_CONTRACT.md` gates the first real reward credit on one transaction containing server-owned eligibility/calculation, canonical delta, expected revision, operation ID, unique claim, idempotent receipt and ledger. No such credit writer or source issuer is added here. This does not complete Foundation C or Phase 4; `authoritativeStateReady:false` and Phase 4 **0/6 VERIFIED** remain.
+
+## 2026-09-26 — Foundation B canonical schema and recovery contract (design only)
+
+- `docs/CLOUD_CANONICAL_SCHEMA_AND_RECOVERY.md` now specifies the planned server-owned account/character/economy/inventory/equipment/relic/progress/claim/operation/ledger records, a bounded materialized playable snapshot, revision and digest consistency gate, and a separate recovery point manifest. A valid player may have one or two created characters; unused slots remain explicitly empty.
+- The first real gold/EXP/item mutation still requires idempotent operation receipt, ledger, expected revision and transaction together. Migration candidates and original-phone immutable copies cannot serve as authoritative recovery points. Corruption, missing registered sources or UID mismatch must leave `authoritativeStateReady:false`.
+- This is a contract and future test skeleton, **not** a canonical writer, server backup, restore implementation, accepted legacy baseline or fresh-device acceptance. Phase 4 remains **IN PROGRESS / 0/6 VERIFIED**. The owner-observed `(default)` PITR and scheduled backup switches remain disabled; Firestore region remains unverified.
+
+## 2026-09-26 — Legacy character identity screening (deployed; no admission)
+
+- Migration policy requires a literal, nonblank string character ID; numeric IDs no longer pass by implicit string coercion. It rejects a new candidate if slot 3 exists without slot 2; the read-only screening reports `CHARACTER_SLOT_GAP` for previously stored candidates. A one-character or two-character party remains valid because the game creates those slots progressively.
+- PR #588 merged as `dev@49ca985fd80be20ec0647e1c4e8b5ff277339d2f`. Targeted local tests passed (38); PR Repository CI run `36232442006` and Session Authority emulator run `36232441874` succeeded. Merged dev CI run `36232695973` succeeded, including DEV deployment; merged Session Authority run `36232695823` passed the emulator and Firebase deployment for the exact SHA. The deployment log shows `submitLegacyMigrationCandidate` and `screenLegacyMigrationCandidate` updated in `us-central1` and Firestore deny-write rules released. This strengthens structural screening of untrusted historical candidates only; it does not accept a baseline, create canonical state, enable `authoritativeStateReady`, provide server backup or allow second-device character restore.
+
+## 2026-09-26 — architecture hardening work branch (not yet verified)
+
+- Start base `dev@727279ee0653803c07179e0ff43a1a1b2cb992f8`; discovered Architecture Contract Drift: `DATA_SECURITY_CONTRACTS.md` absent at base. Current branch adds the contract and a 34-entry persisted-state inventory with CI guard; PR, emulator, merge and deployment status must be recorded after execution.
+- Candidate source at base was `battle_full_version_save_v5` while the immutable copy came from `four_symbols_save:<UID>`. Candidate submission is being changed to an explicit sealed backup ID and raw bundle with SHA-256 consistency checks. Previously submitted unbundled history remains untrusted and blocked; this does not accept a character. The backup inventory also adds the previously omitted `patrol-character-index` preference.
+- Old Phase 1–3 acceptance evidence remains historical. Phase 4 remains **IN PROGRESS / 0/6 VERIFIED**. The grant reservation candidate is a partial prerequisite, not an awarded balance and not Phase 5–7 completion. A passing CI or Firebase deploy cannot certify full character restore.
+
+### Dependency order (preserving original Phase 4–10 history above)
+
+1. Foundation A: persisted-state registry, sealed backup manifest and source unification.
+2. Foundation B: canonical server character schema and materialized playable snapshot design.
+3. Foundation C: operation ID, idempotency, receipt, ledger, expected revision and transaction implemented **together with the first balance/EXP/item mutation**. Old Phase 6/7 cannot wait until after old Phase 5 award writes.
+4. Foundation D: server-issued run/attempt and reward settlement sources.
+5. Foundation E: durable server backup, recovery points and audited restore (old Phase 8 moves ahead of migration acceptance).
+6. Foundation F: one-time local-history acceptance with explicit owner confirmation and claim blocking.
+7. Foundation G: complete schema and claims gate `authoritativeStateReady:true` only after restore rehearsal.
+8. Foundation H: fresh-device full-character recovery acceptance (old Phase 4 success gate).
+9. Foundation I: payment/refund entitlements (old Phase 9).
+10. Foundation J: destructive/disaster/multi-device tests throughout and final release gate (old Phase 10).
+
+`docs/OFFLINE_AUTHORITY_POLICY.md` and `docs/CLOUD_CANONICAL_SCHEMA_AND_RECOVERY.md` specify the provisional offline paths and restoration gates. The owner-provided Google Cloud Console Disaster Recovery screenshot on 2026-09-26 (Asia/Taipei) shows PITR disabled, scheduled backups disabled and no displayed backups for `(default)`; no disaster restore has been rehearsed. Firestore region remains unverified. App Check enforcement, Google guest linking and WIF are unimplemented; an anonymous→Google UID-switch guard is implemented but link/merge remains unavailable.
+
+## 2026-09-25 — Historical reward-claim proof gate (candidate)
+
+- `functions/src/legacy-reward-claim-audit.js` is a pure, fail-closed parser for the five claim-bearing main-save areas: daily quests, commissions, achievements, tower floors and Abyss first-clear/chest records. A structurally valid historical `claimed` entry is classified only as `block_historical_claims_only`; it is never a grant entitlement, balance change or accepted cloud state. Missing, malformed or contradictory records receive a source-specific `*_CLAIM_RECORD_INVALID` blocker.
+- The read-only `screenLegacyMigrationCandidate` preflight includes that audit without exposing the candidate snapshot or writing a migration marker. It remains `readyForAcceptance:false`, has no character/economy write path and still reports `SIDECAR_BACKUP_MISSING` until a complete independently preserved sidecar bundle can be verified.
+- Pure cloud-save tests currently pass locally. This is not the one-time acceptance transaction, does not upload any phone data, and does not make a cloud character playable or recoverable on another device. Phase 4 remains **IN PROGRESS / 0/6 VERIFIED**.
+
+## 2026-09-25 — Original-device immutable backup primitive
+
+- `js/startup/account-save-repository.js::createMigrationBackup(uid)` is the sole local backup owner. It requires the active UID and complete UID-owned save, records original main-save bytes, metadata bytes and all registered UID sidecars as present/missing, then writes a fingerprint-addressed immutable local record. It never deletes, rewrites or uploads gameplay state.
+- `js/firebase/firebase-cloud-save.js::createLocalMigrationBackup()` exposes only that explicit original-device preparation. It rejects UID changes and does not call Firebase, `saveGame()`, `loadGame()` or a restore path.
+- This is a preservation prerequisite, not admission: private server backup upload, one-time acceptance transaction, authoritative character writing and second-device restore remain unimplemented. PR #573 was merged to `dev@0cfd6d994fd598a05677a7c770faf975725a2020`; its Repository checks, Session Authority/Firebase deployment and exact DEV SHA verification succeeded. Phase 4 remains **IN PROGRESS / 0/6 VERIFIED**.
+
+## 2026-09-25 — Private legacy candidate screening
+
+- `functions/src/legacy-candidate-screening.js` owns a read-only preflight for the latest private migration candidate; `functions/index.js::screenLegacyMigrationCandidate` requires Firebase identity and the active single-device session in `runProtected()`. It compares the requested cloud revision and candidate revision, checks UID/trust metadata and stored candidate structure, then reports blocker codes without returning the save snapshot.
+- A main save by itself cannot prove historical rewards or provide a complete backed-up sidecar bundle. Screening always reports `readyForAcceptance:false`; malformed character, inventory, equipment and claim fields add specific blockers. It does not write a review approval, migration marker, character state, economy value or revision. Old candidate revisions cannot be screened as the current candidate.
+- PR #572 was merged before the backup gate. No phone data has been submitted, no cloud character is playable, and Phase 4 remains IN PROGRESS / 0/6 VERIFIED. This gate does not replace the complete future reward operations, sidecar backup or owner-confirmed migration acceptance.
+
+## 2026-09-25 — One-time historical baseline policy and authoritative startup guard
+
+- The owner agreed to a guarded **one-time** acceptance of old local progress as a clearly marked, historically unverifiable baseline, followed by backend-verified new earnings. The exact admission conditions, full main-save/sidecar backup, anomaly/claim checks, unique migration marker, UID/session/revision transaction and post-migration reward receipts are recorded in `docs/CLOUD_CHARACTER_AUTHORITY_MIGRATION_DESIGN.md`. Agreement to the policy does not authorize silently uploading a player's phone save.
+- `js/52-v173.20-startup-loader.js::resolveSaveFor()` no longer treats `localBase===cloudFingerprint` as authority for a changed local save. If a future complete cloud character differs from the local copy, boot keeps the local copy intact and blocks with a conflict message; only an identical cache may be loaded from the cloud snapshot. Targeted tests exercise identical cache, locally modified shared base and unrelated save.
+- `js/00-main.js::persistBeforeSuspend()` now requires Startup READY/OFFLINE_READY before its existing background `saveGame()`. A blocked conflict or unresolved save must never write an unhydrated default character over the UID candidate during pagehide/freeze. Boot browser QA first checks preservation of a dirty local candidate, then backs up the disposable QA records and exercises a fresh no-cache cloud restore.
+- The guard does not create an authoritative character, accept a migration candidate, install reward writers, or restore another device. No second-phone test yet. Phase 4 remains **IN PROGRESS / 0/6 VERIFIED**, Game/Cache `173.72`, `main` untouched. PR, CI, merged SHA and deployment results must be checked separately.
+
+## 2026-09-25 — Server-issued grant reservation candidate
+
+- `functions/src/trusted-grant-ledger.js` is the sole grant reservation owner; `functions/index.js::reserveTrustedGrant` verifies Firebase identity and calls the Phase 1 `runProtected` transaction. A grant must already exist in private `serverUsers/{uid}/pendingGrants/{grantId}` with a server-issued source. Browser Firestore rules deny creation. The request accepts an ID, operation ID and expected revision, never a gold amount.
+- One transaction checks active session, UID, envelope revision and grant eligibility, reserves a grant, writes an immutable operation receipt and advances the envelope revision. Same operation ID retries return the receipt; a second ID cannot reserve the same grant. This is **not a gold award**: the receipt explicitly says `creditedToCharacter:false`, and no local save, character payload, inventory or `authoritativeStateReady` changes. No grant issuer or client button is provided.
+- This isolated backend prerequisite still needs PR CI, emulator, merge and deployment verification. Phase 4 remains IN PROGRESS / 0/6 VERIFIED; the Phase 5 economy backend remains incomplete. A server-validated gameplay event source, complete character state and legacy adoption policy are still required for actual cross-device recovery.
+
+## 2026-09-25 — Legacy candidate revision history (candidate; pending CI/deploy)
+
+- Backend owner `functions/index.js::submitLegacyMigrationCandidate()` now creates a private `migrationCandidates/{revision}` record in the existing protected transaction, while keeping `latest` for compatibility. Each record remains `trusted:false`; it is a server-side record of a client-supplied candidate, **not** a trusted character backup or accepted cloud save. Historical revisions submitted before this change cannot be reconstructed from an overwritten `latest` record.
+- Identical fingerprint retries return the existing receipt and do not increment the envelope revision, including when the first response was lost. A different candidate retains the existing rate limit; the previous revision remains accessible to trusted backend administrators. Inconsistent `latest`/envelope metadata fails closed. Emulator tests cover a second candidate, repeat retry, rate limit, and no authoritative gameplay state.
+- This does not upload the original phone's save automatically, alter local storage, provide a restore button, or enable character recovery. Phase 4 remains IN PROGRESS / 0/6 VERIFIED; Phase 5 remains NOT STARTED. Production Firebase deployment and exact dev SHA still require verification after merging the PR.
+
 ## A. Overall Architecture Status（整體架構狀態）
 
 | Phase | 範圍 | 狀態 |
 | --- | --- | --- |
 | 1 | Single Active Session（單一有效工作階段權威） | COMPLETE / 5/5 VERIFIED |
-| 2 | Cloud Save Skeleton（雲端存檔骨架） | NOT STARTED |
-| 3 | UID Local Isolation / Login Loading（本機隔離／登入載入） | NOT STARTED |
-| 4 | General Progress Migration（一般進度遷移） | NOT STARTED |
+| 2 | Cloud Save Skeleton（雲端存檔骨架） | COMPLETE / 6/6 VERIFIED |
+| 3 | UID Local Isolation / Login Loading（本機隔離／登入載入） | COMPLETE / 6/6 VERIFIED |
+| 4 | General Progress Migration（一般進度遷移） | IN PROGRESS / 0/6 VERIFIED |
 | 5 | High-value Data Backend Authority（高價值資料後端權威） | NOT STARTED |
 | 6 | Operation ID / Idempotency / Atomic Transaction | NOT STARTED |
 | 7 | Audit / Economy Ledger（稽核／經濟帳本） | NOT STARTED |
@@ -19,9 +129,19 @@
 
 既有 UID local repository、唯讀 cloud reader、migration candidate 等是前置實作，**不代表 Phase 2–10 已驗收完成**。Phase 1 使用交易不代表 Phase 6 全部完成。
 
+## 2026-09-24 character-authority audit (next engineering gate)
+
+- At `dev@567375aea927495e0f16c04b836d8d414bd05bff`, audited core save, startup, Firebase backend and representative battle/quest/tower/abyss/relic reward writers. See `docs/CLOUD_CHARACTER_AUTHORITY_MIGRATION_DESIGN.md` for the field-to-writer map, trusted operation contract and legacy migration gates. `DATA_SECURITY_CONTRACTS.md` is absent at this baseline.
+- Corrected the Phase 4 Requirement Batch: its former `IMPLEMENTED` labels described only the deployed preference test, while the written requirements cover character, economy, claims and cross-device recovery. All six remain unverified and full-character implementation remains TODO. This is a documentation/safety gate, not a character cloud deployment.
+- Existing locally earned historical assets cannot be independently authenticated from a client save alone; a separately approved, auditable first-migration acceptance policy is required before treating those values as cloud authority. No second-phone character test should begin yet.
+
 ## B. Current Phase（目前階段）
 
-- Phase 1 — Single Active Session Authority：**COMPLETE / 5/5 VERIFIED**。Phase 2 尚未開始。
+- Phase 1 — Single Active Session Authority：**COMPLETE / 5/5 VERIFIED**。
+- Phase 2 — Cloud Save Skeleton：**COMPLETE / 6/6 VERIFIED**。PR #553／#554／#555 已依序合併 `dev`；最新驗收部署為 `dev@b037ced9dad9d1cf67d9aacccb4e064c74a135e1`。Repository checks、Java 21 emulator、DEV exact-SHA、Firebase deploy 與真實 Google 帳號手機 live envelope 驗證均 SUCCESS。
+- Phase 3 — UID Local Isolation / Login Loading：**COMPLETE / 6/6 VERIFIED**。PR #557 Repository checks run `35999834624` SUCCESS，合併 `dev@eed8dec359eff34727381adfbfa50b7c2ea09bd3`；DEV release manifest 與 hashed Boot Core 已讀回同一 SHA／Phase 3 owner。使用者以真實手機完成 Google → 訪客 → Google 驗收：訪客未看見 Google 角色／資料，重新登入 Google 後原角色／資料正常恢復。
+- Phase 4 — General Progress Migration：**IN PROGRESS / 0/6 VERIFIED**。受保護的自動戰鬥偏好讀寫已經 PR #559／#560／#561 合入 `dev` 並部署；手機已證實上傳、雲端讀回與修復後手動取回成功；使用者指出彈窗的「返回／取回」字樣易混淆，改為「取消／套用雲端設定」。這只是偏好設定測試；等級、EXP、金幣、背包、裝備、任務及領獎資料仍在 UID 本機存檔，不能宣稱換手機能取回角色。詳見 `docs/CLOUD_SAVE_PHASE4_CONTRACT.md` 及本階段 Requirement Batch。
+- Phase 4 已部署的有限範圍：僅 UID＋角色 ID 綁定的三組自動戰鬥設定；受保護寫入核對 `serverRevision`，手動上傳／取回不會建立完整角色。PR #561 修正自訂非同步確認視窗被 `window.confirm` 包裝器一律當作取消的問題，測試涵蓋確認、取消、UID 切換與 revision 變動；合併 `dev@01c543564498400b38dd8778acccb9d76777131f`，merged Repository checks／DEV deploy run `36022298612` SUCCESS，部署 SHA 核對一致、Game／Cache 均 `173.72`，Session Authority run `36022298060` SUCCESS。手機上傳、雲端骨架與 Revision 讀回有使用者截圖；修復後使用者再以手機 Chrome 操作「取回」，看到「此 UID 的自動戰鬥設定已取回並儲存在本機」且 Revision 7，確認窗的操作通過實機驗證。第二台裝置、離線與獎勵驗收仍待完成；UI 成功訊息未單獨證明跨手機角色還原。
 - 起始基準：GitHub 最新 `dev@7dd60dcddc9334902e058123a6084a93353e5943`，2026-09-19 重新 fetch 核對。
 - 原實作分支：`feature/cloud-session-authority-phase1-20260919`，當時只整合 `dev`。本次結案分支：`docs/cloud-session-phase1-closeout-20260919`，基準為重新核對的 `dev@342ef104fa2897f5ae5c3249e0c75c9efca3e762`；使用者已授權完成結案後經受保護 PR 發布 main。禁止直接修改 dev／main、rebase、force push。
 - 官方版本／cache version 維持 `173.65`，沒有升版。
@@ -81,6 +201,32 @@
 
 ## C. Completed Work（已實作／驗證證據）
 
+### Phase 3 UID Local Isolation / Login Loading（2026-09-24，COMPLETE / 6/6 VERIFIED）
+
+- Startup State Machine 新增唯一帳號轉換入口 `reloadForAccountTransition()`。登出或 Auth observer 發現 UID 改變時，先遞增 `transitionToken` 丟棄舊 save resolution、解除 active save owner、移除 session resume marker、隱藏創角與 gameplay，最後完整 reload。
+- 完整 reload 是既有 sidecar 初始化模型的正式收斂方式：`element-box-state`、daily dungeon、EXP、progress、announcement、task、abyss、shop 與 bulk-sell 等模組會在新 document 依當前 active UID 重建 key，不在舊 UID runtime 內直接 hydrate 新帳號。
+- Canonical save 與 metadata 仍由 `account-save-repository.js` 驗證 `ownerUid`；只有 active UID 可寫。Cloud read 失敗只在該 Firebase UID 的 `readForUid()` 回傳完整 ready save 時進 `OFFLINE_READY`，否則維持 ERROR。
+- Anonymous 訪客 UID 不會自動搬到 Google／Email UID；唯一 legacy migration 仍要求使用者明確確認。本階段沒有一般 gameplay cloud write、Envelope schema 變更、版本升級、經濟或戰鬥修改。
+- 新增 `tests/cloud-save-phase3-uid-local-isolation.test.js`，並把它連同 account ownership／auth-before-creation 加入 PR→dev 必跑 CI；既有 Boot browser QA 的 UID A→登出→UID B 流程將驗證 reload 後角色、金幣、EXP、背包、裝備及 metadata 均屬 UID B，UID A 資料保持不變。
+- PR #557 已以 candidate `9ad52534cf154d4f3a470afc8f71eb17a8c19371` 通過 Repository checks run `35999834624`，包含 Phase 3 targeted regressions 與既有 account-first Boot browser UID A→登出→UID B 隔離案例；合併 SHA 為 `eed8dec359eff34727381adfbfa50b7c2ea09bd3`。
+- DEV `release-manifest.json` 已讀回 exact merge SHA、Game／Cache V173.72；部署 HTML 使用 `build/boot-core.d8fbf40b153e.js`，且 deployed bundle 包含 `reloadForAccountTransition`／`signed-out`／`uid-changed`。
+- 真實手機驗收 PASS：Google 帳號進入後登出改用 Firebase 訪客，訪客沒有看到 Google 的角色與進度；再次登出並登入 Google，原 Google 角色／資料正常恢復。
+- Requirement Batch：`release/requirement-batches/2026-09-24-cloud-save-phase3-uid-local-isolation.json`，6/6 VERIFIED；Phase 3 正式 COMPLETE。
+
+### Phase 2 Cloud Save Envelope（2026-09-24，COMPLETE / 6/6 VERIFIED）
+
+- 新增唯一 Envelope owner：`functions/src/cloud-save-envelope.js`。正式 public envelope schema 為 Version 2，固定包含 `ownerUid`、`schemaVersion`、server-owned `serverRevision`、`createdAt`、`updatedAt`、authoritative readiness 與 migration metadata 狀態。
+- `bootstrapCloudSave` 仍在 Session Authority 的同一 Firestore transaction 內執行：新帳號建立 Revision 1；重複 bootstrap 不變更 envelope Revision／updatedAt；Phase 1 的精確 Version 1／Revision 0 骨架可受控升級為 Version 2／Revision 1。
+- `submitLegacyMigrationCandidate` 仍只接受 `trusted:false` candidate；public metadata 變更時把 `serverRevision` 原子遞增。它不會建立 `gameSave`、不會設定 `authoritativeStateReady:true`，也不會把本機 timestamp 當成雲端先後依據。
+- 既有 envelope 的 UID、schema、Revision、server timestamps、status／migration metadata 不一致，或非權威 envelope 混入 gameplay payload 時一律 fail closed；不再以 merge 靜默修補任意損壞文件。
+- 本階段不包裝 `saveGame()`／`loadGame()`，不遷移一般進度或高價值資料，不新增付款、operationId、帳本、快照或 Phase 3 的 account switching owner。
+- 本機精準測試 21/21 PASS、`npm run build:check` PASS、`git diff --check` PASS。當前 runner 僅 Java 17，Firebase CLI 15.30.0 要求 Java 21，因此本機 emulator 明確 BLOCKED；`.github/workflows/session-authority.yml` 已固定安裝 Java 21 並新增 Phase 2 unit／backend gate，遠端結果尚待 PR。
+- PR #553 已合併 `dev@195acb63d4acd36ceada31ed95b5f50e448d297f`。PR Repository checks `35987380366`、PR Session Authority `35987380024`、merged dev Repository checks／DEV deploy `35987880895`、merged dev Session Authority／Firebase deploy `35987880460` 全部 SUCCESS；正式 Firebase deploy job `107595824436` SUCCESS。
+- `js/firebase/firebase-bootstrap.js` 公開最小 `FourSymbolsFirebase.bootstrapCloudSave()` bridge，僅呼叫既有 Session-protected callable，不自動執行、不影響 first-use read resolution、不上傳本機 gameplay save。此入口只供最後 live 驗證與未來受控帳號流程使用。
+- DEV 帳號面板提供手機可點擊的「驗證雲端存檔骨架」按鈕：連續 bootstrap 兩次後讀回 envelope，僅在 owner、Version 2、相同有效 Revision、`authoritativeStateReady:false` 且無 gameplay payload 時顯示成功；不顯示 credential、不提交 legacy／本機存檔，且不在正式網域出現。
+- 2026-09-24 真實裝置驗收：使用者以原 Google 帳號在手機 Chrome 的 DEV 頁面取得 `Schema V2、Revision 1` 成功結果；按鈕連續 bootstrap 未增加 Revision，且未建立正式 gameplay state。先前從 ChatGPT 內建瀏覽器開啟時 Google 流程未完成，改用完整 Chrome 後成功，故判定為嵌入式瀏覽器 OAuth 限制而非 Session Authority 或 Envelope 失敗。PR #555 合併 SHA `b037ced9dad9d1cf67d9aacccb4e064c74a135e1`；merged dev CI `35992274605`、Session Authority／Firebase deploy `35992274447` attempt 2 均 SUCCESS。
+- Requirement Batch：`release/requirement-batches/2026-09-24-cloud-save-phase2-envelope.json`，目前 COMPLETE / 6/6 VERIFIED。
+
 ### Session Authority owner
 
 - `functions/src/session-authority.js`：唯一 session policy／transaction owner。
@@ -133,7 +279,7 @@
 1. Phase 1 功能驗收已完成；本次結案文件仍須 PR → Repository checks SUCCESS → merge dev，然後核對最新 dev 的 CI、DEV deployment、Session Authority emulator 與 Firebase deploy，逐一記錄實際 SHA。
 2. 使用者已授權 dev → main 發布；只有上述最新 dev 驗證成功，且 main←dev 比較無獨立修復、素材分支混入或機密，才可建立及合併受保護發布 PR。正式部署、登入及無 DEV 測試區亦須獨立驗證。完成結果寫入[結案 PR #341](https://github.com/tf00913225-alt/my-game/pull/341) 永久發布記錄，不預填成功。
 3. Artifact Registry 清理政策本身仍有非阻塞警告，保留維運追蹤；不以 Deploy complete 推定政策設定成功。
-4. Phase 2–10 全部 NOT STARTED。本次不做正式 game save schema、一般進度／高價值資料遷移、operationId、帳本、快照或付款，亦不把 local progress 升格為正式雲端資料。
+4. Phase 3 已完成；Phase 4 偏好設定試驗已部署但整批仍 0/6 VERIFIED，手機取回確認操作已通過，跨裝置 QA 未完成；Phase 5–10 仍 NOT STARTED。真正的換機角色恢復需要後端對等級、EXP、金幣、背包、裝備與領獎狀態建立可信權威與遷移策略；不能整包採納本機 gameplay payload 或把偏好測試當作正式角色存檔。
 
 ## E. Architecture Decisions（永久決策）
 
@@ -188,7 +334,7 @@ npx --yes firebase-tools@15.30.0 deploy --project four-symbols-jianghu --non-int
 
 Cloudflare 的靜態部署不部署 Firebase。獨立部署明列三支新 session、兩支既有 save、兩支必要的 native handoff guard，共七支函式；禁止 `--force` 刪除其他函式。部署鎖沿用既有 native-auth backend concurrency group，避免兩個部署互相覆蓋。若需回退，不可部署回沒有 session check 的 protected writer 或沒有 source epoch 的 token issuer；應先停止受保護寫入並保留資料，再另修。
 
-在 DEV 頁面登入後，可於自己的開發工具呼叫（不要貼出 raw credential／ID Token）：
+在 DEV 頁面登入後，可直接於帳號面板點「驗證雲端存檔骨架」。沒有電腦時以手機完成即可；按鈕不會上傳本機角色資料。開發工具仍可用來診斷（不要貼出 raw credential／ID Token）：
 
 ```js
 FourSymbolsFirebase.getUser().uid
@@ -202,13 +348,22 @@ Wire callable 名稱是 `protectedTest`（本文 protected-test 的正式 Fireba
 
 ## G. Next Safe Step（每次結束必更新）
 
-**Phase 1 功能驗收 COMPLETE / 5/5 VERIFIED；本次只完成其發布鏈，Phase 2 尚未開始。**
+**Phase 1 功能驗收 COMPLETE / 5/5 VERIFIED；Phase 2 為 COMPLETE / 6/6 VERIFIED；Phase 3 為 COMPLETE / 6/6 VERIFIED。**
 
 1. 先讀本文件、`AGENTS.md`、`ARCHITECTURE_RULES.md`、`SYSTEM_CONTRACTS.md`、`docs/BOOT_ARCHITECTURE.md`、本次 Requirement Batch。
 2. 看 `functions/src/session-authority.js`、`functions/index.js`、`js/firebase/session-client.js`、`firebase-session.js`、兩個 Firebase client owners 與 `firestore.rules`。
 3. [結案 PR #341](https://github.com/tf00913225-alt/my-game/pull/341) 先以 CI 全綠合併 dev，再核對該最新 SHA 的 Repository checks、DEV 與 Firebase 部署；把最終 dev SHA／run／job 記錄於結案 PR。
 4. 比較 main←dev，完成受保護 PR 與正式部署驗證；把 main SHA、production deployment 及登入／DEV 測試區隔離結果記入永久發布記錄。任一發布環節未完成，整次任務仍回報 NOT COMPLETE。
-5. Phase 2 必須另行開始；後續若獲授權，才處理 server-owned save envelope（ownerUid、schemaVersion、revision、server timestamps）等。本次保持 NOT STARTED。
-6. 不修改戰鬥／VFX／UI、經濟／背包／秘寶、支付或存檔，禁止 local overwrite 與無關 refactor。只透過 PR 發布已驗證 dev，禁止直接修改 main。
+5. Phase 2 已以真實 Google 帳號在手機 Chrome 完成 Version 2／Revision 1／重複 bootstrap 不增 Revision／無 gameplay payload 驗證。ChatGPT 內建瀏覽器曾使 Google OAuth 不完整，不作為後端失敗證據；後續登入驗收必須使用完整瀏覽器或正式 App Auth surface。
+6. Phase 3 已完成自動與真實手機隔離驗收。Phase 4 下一步手機 Chrome 同一 Google UID 的「取回」已顯示成功，彈窗改為「取消／套用雲端設定」並待新標籤上線確認；另一台裝置上不得為了測試局部偏好而建立／覆蓋角色。接著設計並實作可信角色／資產後端與舊存檔遷移，先確定首次採納與衝突策略，再做跨手機角色恢復測試；不得把本機存檔直接升格為雲端權威或整包覆蓋 Phase 2 Envelope。
+7. 不修改戰鬥／VFX／UI、經濟／背包／秘寶、支付或 gameplay save owner，禁止 local overwrite 與無關 refactor。禁止直接修改 main／dev。
 
 官方技術依據：[Callable 身分驗證](https://firebase.google.com/docs/functions/callable)、[Firebase auth_time／撤銷檢查](https://firebase.google.com/docs/auth/admin/manage-sessions)、[Firestore 原子交易與重跑](https://firebase.google.com/docs/firestore/manage-data/transactions)。
+
+## 2026-10-02 — CLOUDSAVE-CHECKIN-SOURCE-SNAPSHOT-20261002 (candidate)
+
+- Base dev `e0c4a3e94420d15e91cb68b00bce4f50a1c3607f`; branch `feature/cloud-checkin-source-snapshot-20261002`; target dev; main excluded. Prior #744, #748 and #754 are merged/deployed and are not repeated. #754 closeout verified its later integrated dev/Firebase deployments and deleted its source branch.
+- Additive eligibility gate in the existing `daily-checkin-event-evidence.js::readDailyCheckinEvidence`. All daily issuance/reservation/credit/retry callers now read `playableSnapshots/{event.sourceRevision}` and `recoveryArchives/{event.sourceRevision}` in the protected transaction, using `inspectRecoveryArchive` and the existing complete snapshot verifier. The archived source must be a server-created one-character account containing that event character; creation additionally matches the current account's snapshot pointer. No second validator, wrapper, credit writer, new callable or client change.
+- Missing/corrupt sources, cross-UID archive, self-consistent event with a nonexistent character/revision and structurally valid historical/multi-character sources fail before writes. Later balances/revisions do not invalidate the original event; original event schema/digest remains compatible. No archive backfill, historical adoption, player data, playable publication or second-phone restore.
+- Local cloud Node tests 115/115 PASS; new event suite 22/22; new source assertions reject the old helper as expected. Production build:check and diff check PASS, browser build unchanged. Existing real callable/emulator suite covers missing source before direct credit/new issuer/pending issuer/reservation and both credited retry entry points. Remote latest-head CI, PR merge, Firebase deployment and exact DEV SHA remain PENDING. Phase 4 remains 0/6 VERIFIED.
+- Next: exact-head existing CI/emulator, PR integration, Firebase/DEV SHA verification and safe branch deletion. Next separate Foundation D slice should establish a server-owned battle/run attempt and proven outcome; a browser win flag remains untrusted. Original Revision 1 gaps remain blocked; do not rebuild or resubmit old-phone sources.

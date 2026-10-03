@@ -115,6 +115,12 @@ if(finalStart<0||finalEnd<0){
 
 discovered.push("天兵天將");
 
+// Tower rotations resolve explicit asset IDs through the Registry at encounter
+// construction time, so their display names are data rather than JS literals.
+const towerIds=new Set(collectMatches(bossTower,/"(MON_(?:FIRE|WIND|EARTH)_(?:NORMAL|ELITE|MINIBOSS)_\d{3})"/g));
+(registry.assetPool?.entries||[]).filter(entry=>["wind","earth"].includes(entry.element)&&entry.status==="adopted"&&towerIds.has(entry.assetId))
+    .forEach(entry=>discovered.push(entry.displayName));
+
 const runtimeNames=uniq(discovered);
 const registryNames=uniq(targets.map(target=>target.name));
 const unregistered=runtimeNames.filter(name=>!registryNames.includes(name)).sort();
@@ -194,8 +200,8 @@ if(!portraitRuntime.includes('monsterPortraitByKey.get("soldier."+element)')){
 if(!portraitRuntime.includes("window.resolveMonsterPortrait")){
     errors.push("V154 portrait owner does not expose resolveMonsterPortrait(monster)");
 }
-if(!portraitTiming.includes("v154SyncMonsterPortraits")){
-    errors.push("V159 timing bridge is not synchronized with the authoritative V154 portrait owner");
+if(/v154SyncMonsterPortraits|updateUI\s*=|requestAnimationFrame|setTimeout|MutationObserver/.test(portraitTiming)){
+    errors.push("V159 retirement audit failed: the retired module still participates in portrait lifecycle or global UI timing");
 }
 
 const soldiers=targets.filter(target=>target.group==="heavenly-soldier");

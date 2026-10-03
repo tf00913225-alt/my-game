@@ -5,6 +5,7 @@ const fs=require("node:fs");
 
 const relic=fs.readFileSync("js/60-team-relic-system.js","utf8");
 const relicCss=fs.readFileSync("css/55-team-relic-system.css","utf8");
+const mainCss=fs.readFileSync("css/00-main.css","utf8");
 const legacyBattleCss=fs.readFileSync("css/12-stage-v45-battle-black-overlay-skill-text.css","utf8");
 const vfxCss=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");
 
@@ -16,49 +17,32 @@ assert.match(
 
 assert.match(
   relic,
-  /const battlePage=document\.getElementById\("battlePage"\);[\s\S]*?const host=battlePage\|\|null[\s\S]*?host\.appendChild\(node\)/,
-  "relic cinematic must live on the complete battlePage surface"
+  /document\.body\.appendChild\(node\)/,
+  "relic cinematic must live on a document-level viewport surface"
 );
 assert.match(
   relic,
-  /function relicTargetLayer\(card\)[\s\S]*?card\.closest\("\.v-fixed-enemy-slot,\.v-fixed-ally-slot,\.v-fixed-boss-footprint"\)\|\|card/,
-  "normal enemies, allies and Boss footprints must expose their real stacking carrier"
+  /function revealRelicTargets\(target\)[\s\S]*getUnitGeometry[\s\S]*appendRelicProjection/,
+  "all target modes must resolve through canonical battlefield projection geometry"
 );
 assert.match(
   relic,
-  /relicFocusedTargetLayers=Array\.from\(new Set\(relicFocusedTargetCards\.map\(relicTargetLayer\)\.filter\(Boolean\)\)\)[\s\S]*?team-relic-battle-target-layer/,
-  "resolved target carriers must be lifted as one shared cinematic layer"
+  /function appendRelicProjection\(layer,geometry,overlayRect\)[\s\S]*artworkProjection[\s\S]*hpProjection[\s\S]*spProjection/,
+  "relic focus must project transparent artwork and resource bars instead of elevating live DOM"
 );
-assert.match(
-  relic,
-  /function clearRelicTargetFocus\(\)[\s\S]*?team-relic-battle-target-layer/,
-  "target carrier elevation must be removed during cinematic cleanup"
-);
+assert.doesNotMatch(relic,/relicTargetLayer\(|team-relic-battle-target-layer/,
+  "legacy target stacking carrier owner must remain retired");
 
-const dimZ=Number((relicCss.match(/team-relic-battle-dim\{[^}]*z-index:(\d+)/)||[])[1]);
-const targetZ=Number((relicCss.match(/team-relic-battle-target-layer\{z-index:(\d+)!important/ )||[])[1]);
-const cutinZ=Number((relicCss.match(/team-relic-battle-cutin\{[^}]*z-index:(\d+)/)||[])[1]);
-const vfxZ=Number((vfxCss.match(/\.v143-skill-stage\{[^}]*z-index:(\d+)/)||[])[1]);
-const activeRelicVfxZ=Number((relicCss.match(/team-relic-cinematic-active > \.v143-skill-stage\{z-index:(\d+)!important/ )||[])[1]);
+assert.match(relicCss,/body > \.team-relic-battle-presentation\{[\s\S]*?position:fixed/,
+  "relic cinematic remains a document-level surface");
+assert.match(vfxCss,/\.v143-skill-stage\{[\s\S]*?position:fixed/,
+  "formal VFX remains a document-level surface");
+assert.match(mainCss,/body\.v174-battle-reading-open > \.v143-skill-stage,[\s\S]*?body\.v174-battle-reading-open > \.team-relic-battle-presentation,[\s\S]*?visibility:hidden !important;[\s\S]*?opacity:0 !important;/,
+  "semantic reading state, not cross-context z-index arithmetic, must suppress both relic and VFX paint");
 
-assert.equal(dimZ,18090,"relic dim layer contract changed unexpectedly");
-assert.equal(targetZ,18110,"target carrier must sit immediately above the relic dim layer");
-assert.equal(cutinZ,18120,"relic identity must remain above highlighted targets");
-assert.equal(vfxZ,16000,"formal V143 base layer changed unexpectedly");
-assert.equal(activeRelicVfxZ,18130,"formal V143 relic cast must rise above the cinematic identity");
-assert.ok(dimZ<targetZ&&targetZ<cutinZ&&cutinZ<activeRelicVfxZ,
-  "relic stack must be dim → targets → identity → active V143 VFX");
-
-assert.match(
-  relicCss,
-  /\.v-fixed-enemy-slot\.team-relic-battle-target-layer,[\s\S]*?\.v-fixed-ally-slot\.team-relic-battle-target-layer,[\s\S]*?\.v-fixed-boss-footprint\.team-relic-battle-target-layer\{z-index:18110!important;\}/,
-  "all fixed-slot target carrier families must share the same safe elevation"
-);
-assert.match(
-  relicCss,
-  /team-relic-battle-target-focus-visible\{[^}]*opacity:1!important[^}]*brightness\(1\.08\)/,
-  "the actual unit root still owns the gradual brightening presentation"
-);
+assert.doesNotMatch(relic,/team-relic-battle-target-outline/,"Relic must not create a full Unit outline");
+assert.doesNotMatch(relicCss,/team-relic-battle-target-outline/,"Relic CSS must not retain the retired outline owner");
+assert.match(relic,/artworkProjection|hpProjection/,"Relic target geometry must expose artwork/HP projection data");
 
 const presentationStart=relic.indexOf("const RELIC_VFX_PRESENTATION=Object.freeze({");
 const presentationEnd=relic.indexOf("const RELIC_BATTLE_ICON_PATHS=Object.freeze({");
@@ -88,4 +72,4 @@ assert.match(
   "every relic must use the same resolved target for highlight and formal VFX"
 );
 
-console.log("✓ relic target stacking, all 20 target modes and VFX layer ordering passed");
+console.log("✓ relic target projection, all 20 target modes and reading-layer contract passed");

@@ -1,37 +1,86 @@
-
-/* ============================================================
-   V11 — FIRST REAL NATIVE UI MIGRATION: BOTTOM NAVIGATION
-
-   The existing bottom navigation is visually preserved.
-   Its final placement is now expressed in the native 1080×1920
-   coordinate system, rather than being tied to browser viewport
-   positioning.
-
-   Legacy gameplay remains untouched.
-============================================================ */
-
+/* Canonical navigation geometry: one shell in the 1080 x 1920 overlay.
+   Context changes only the five button contents. */
 #game-stage > #game-overlay-layer .native-bottom-nav-layer{
-    position:absolute !important;
-    left:0 !important;
-    top:0 !important;
-    width:1080px !important;
-    height:1920px !important;
-    pointer-events:none !important;
+    position:absolute;
+    inset:auto 0 0;
+    width:1080px;
+    height:216px;
+    pointer-events:auto;
+    z-index:200;
 }
-
-#game-stage > #game-overlay-layer .native-bottom-nav-layer .native-bottom-nav{
-    position:absolute !important;
-
-    /* Legacy 420px design translated to native 1080px space */
-    left:0 !important;
-    bottom:0 !important;
-
-    width:1080px !important;
-
-    box-sizing:border-box !important;
-    pointer-events:auto !important;
-
-    display:flex !important;
-    justify-content:center !important;
-    align-items:flex-end !important;
+#game-stage > #game-overlay-layer .native-bottom-nav-layer[hidden]{display:none;}
+#game-stage > #game-overlay-layer .native-bottom-nav-layer > #bottomNav{
+    position:relative;
+    inset:auto;
+    display:grid;
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    width:1080px;
+    max-width:none;
+    height:216px;
+    margin:0;
+    transform:none;
+    box-sizing:border-box;
+    border:0;
+    border-top:5px solid #8a6a3a;
+    border-radius:0;
+    background:linear-gradient(0deg,#0e0c0a,#1c1712);
+}
+#game-stage > #game-overlay-layer #bottomNav > .nav-button{
+    position:relative;
+    border:0;
+    background:transparent;
+    color:#b3a58c;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-width:0;
+    width:100%;
+    height:100%;
+    padding:0;
+    box-sizing:border-box;
+    touch-action:manipulation;
+}
+/* Fixed frame geometry does not change when the contained art is animated. */
+#game-stage > #game-overlay-layer #bottomNav .nav-icon-frame{
+    display:block;
+    flex:0 0 180px;
+    width:180px;
+    height:180px;
+    pointer-events:none;
+}
+#game-stage > #game-overlay-layer #bottomNav .nav-art-button{
+    display:block;
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    object-position:center;
+    pointer-events:none;
+    user-select:none;
+    -webkit-user-drag:none;
+    transform:translateZ(0) scale(.96);
+    filter:brightness(.88) saturate(.92);
+    transition:filter .14s ease, transform .14s ease;
+}
+#game-stage > #game-overlay-layer #bottomNav > .nav-button.active .nav-art-button{
+    filter:brightness(1.12) saturate(1.08) drop-shadow(0 0 5px rgba(240,180,41,.58));
+    transform:translateZ(0) scale(1.02);
+}
+#game-stage > #game-overlay-layer #bottomNav > .nav-button:active .nav-art-button{
+    filter:brightness(1.2) saturate(1.08);
+    transform:translateZ(0) scale(.92);
+}
+#game-stage > #game-overlay-layer #bottomNav > .nav-button > *{pointer-events:none;}
+/* Notification contract for the native 1080 x 1920 plane.  Twenty-two
+   logical pixels project to roughly 8 CSS px on current phone widths; this is
+   intentionally different from the legacy-content unit below. */
+#game-stage > #game-overlay-layer #bottomNav > .nav-button > .v141-notice-dot{
+    box-sizing:border-box;
+    width:22px;
+    height:22px;
+    min-width:22px;
+    min-height:22px;
+    right:18px;
+    top:18px;
+    border-width:2px;
+    z-index:30;
 }

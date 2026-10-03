@@ -91,7 +91,10 @@ test("every known battle skill has an explicit raster-owner manifest contract",(
 
 test("skill names are brief caster labels and hit numbers wait for the target frame",()=>{
     assert.doesNotMatch(css,/#v142-skill-stage/);
-    assert.match(css,/\.skill-name-badge\.v143-caster-skill-label\{[\s\S]*?z-index:16020 !important;[\s\S]*?text-overflow:ellipsis !important;/);
+    const labelCss=fs.readFileSync("css/battle-skill-name-presentation-owner.css","utf8");
+    assert.match(labelCss,/body > \.skill-name-badge\{[^}]*z-index:16020;[^}]*font-size:var\(--battle-feedback-font-size\);[^}]*white-space:nowrap;[^}]*overflow:visible;/);
+    assert.match(labelCss,/animation:skillBadgePop var\(--skill-name-display-duration,347ms\)/);
+    assert.doesNotMatch(css,/\.skill-name-badge/);
     assert.doesNotMatch(css,/v143CasterLabel|--skill-name-display-duration/);
     assert.doesNotMatch(animation,/badge\.remove\(\); \} \},650/);
     assert.match(animation,/state\.metrics\.delayedNumbers\+\+/);
@@ -100,17 +103,12 @@ test("skill names are brief caster labels and hit numbers wait for the target fr
     assert.doesNotMatch(animation,/font-size","72px/);
 });
 
-test("the three revised skills retain their current status identities",()=>{
-    assert.match(system,/storm\.spCost=75/);
-    assert.match(system,/rain\.spCost=75/);
-    assert.match(system,/rain\.frostbiteChance=50/);
-    assert.match(system,/rain\.frostbiteDuration=2/);
-    assert.match(system,/delete rain\.freezeChance/);
-    assert.match(system,/freeze\.freezeChance=80/);
-    assert.match(system,/freeze\.freezeDuration=4/);
+test("V143 retains no player Skill Data owner",()=>{
+    assert.match(system,/Retired data patch: V173\.64 exclusively authors player Skill Spec/);
+    assert.doesNotMatch(system,/storm\.spCost=75|rain\.frostbiteChance=50|freeze\.freezeChance=80/);
 });
 
-test("V143 rule patch applies the requested skill metadata at runtime",()=>{
+test("V143 runtime snapshot does not manufacture legacy skill metadata",()=>{
     const context={
         window:null,console,Math,Date,Event:function(){},
         setTimeout:callback=>{ callback(); return 1; },clearTimeout(){},
@@ -127,11 +125,10 @@ test("V143 rule patch applies the requested skill metadata at runtime",()=>{
     vm.runInContext(system,context);
     const snapshot=context.v143CombatRuleSnapshot();
     assert.deepEqual(JSON.parse(JSON.stringify(snapshot.lockdownCaps)),{regular:90,elite:80,boss:70,player:60});
-    assert.equal(snapshot.stormRain.spCost,75);
-    assert.equal(snapshot.iceArrowRain.spCost,75);
-    assert.equal(snapshot.iceArrowRain.frostbiteChance,50);
-    assert.equal(snapshot.iceArrowRain.freezeChance,undefined);
-    assert.equal(snapshot.freeze.freezeChance,80);
+    assert.equal(snapshot.stormRain.spCost,undefined);
+    assert.equal(snapshot.iceArrowRain.spCost,undefined);
+    assert.equal(snapshot.iceArrowRain.frostbiteChance,undefined);
+    assert.equal(snapshot.freeze.freezeChance,undefined);
 });
 
 test("Ice Arrow Rain has no legacy per-target Freeze wrapper",()=>{
@@ -141,11 +138,14 @@ test("Ice Arrow Rain has no legacy per-target Freeze wrapper",()=>{
 });
 
 test("dungeon escape restores its owner and Abyss portrait opens dialogue directly",()=>{
-    const escapeBlock=system.slice(system.indexOf("if(typeof resolveEscapeAttempt"),system.indexOf("/* ----- 4 / 5."));
-    assert.match(escapeBlock,/monsters=run\.previousMonsters/);
-    assert.match(escapeBlock,/currentZone=run\.previousZone/);
-    assert.match(escapeBlock,/run\.onComplete\(\{result:"escape"\}\)/);
-    assert.doesNotMatch(escapeBlock,/showPage\("map"\)/);
+    // Core owns escape settlement; the historical Dungeon wrapper is retired.
+    const main=fs.readFileSync("js/00-main.js","utf8");
+    const rewardOwner=fs.readFileSync("js/27-v132-content-expansion.js","utf8");
+    assert.match(main,/window\.v132AbortDungeonBattle\("escape"\)/);
+    assert.match(rewardOwner,/monsters=run\.previousMonsters/);
+    assert.match(rewardOwner,/currentZone=run\.previousZone/);
+    assert.match(rewardOwner,/run\.onComplete\(\{result:String\(reason\|\|"escape"\),turnsUsed:turn\}\)/);
+    assert.doesNotMatch(system,/resolveEscapeAttempt\s*=/);
     assert.match(dungeon,/Math\.max\(4,Math\.min\(96/);
     assert.match(dungeon,/Math\.max\(8,Math\.min\(94/);
     assert.match(css,/\.v141-abyss-map\{height:auto !important;min-height:0 !important;flex:1 1 auto !important;\}/);
@@ -156,11 +156,12 @@ test("dungeon escape restores its owner and Abyss portrait opens dialogue direct
 
 test("V143 delegates dungeon destinations to the final owner",()=>{
     const navBlock=system.slice(system.indexOf("function fixDungeonNavigation"),system.indexOf("/* ----- 6. Synthesis"));
-    assert.match(navBlock,/content\.appendChild\(nav\)/);
-    assert.match(navBlock,/oldReturn\.remove\(\)/);
-    assert.match(navBlock,/v148SyncDungeonShell/);
-    assert.doesNotMatch(navBlock,/nav\.innerHTML=/);
-    assert.match(css,/grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/);
+    assert.match(navBlock,/window\.v148SyncContextNavigation\(\)/);
+    assert.doesNotMatch(navBlock,/nav\.innerHTML=|appendChild|oldReturn/);
+    const nav=fs.readFileSync("js/04-stage-v11-native-bottom-nav-runtime.js","utf8");
+    assert.match(nav,/function renderGameplayContext\(/);
+    assert.match(nav,/\["返回","assets\/ui\/map-return\.png"/);
+    assert.match(fs.readFileSync("css/06-stage-v11-native-bottom-nav.css","utf8"),/grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/);
 });
 
 test("synthesis is icon-first and creates ordinary random gear without a set ID",()=>{
@@ -176,7 +177,7 @@ test("earth shield is raster-owned while ally targeting and Barrier rules remain
     assert.doesNotMatch(system,/v143-earth-shield-effect|effect\.innerHTML=.*象/);
     assert.doesNotMatch(css,/v143-earth-shield-effect|v143EarthCornerBreath/);
     assert.match(animation,/earthShield:statusVisual\("assets\/vfx\/status\/earth-shield\.webp","static","activeBuffs"/);
-    assert.match(fixedSlotCss,/\.battle-player\.v174-cardless-unit\.ally-targetable::after/);
+    assert.match(fixedSlotCss,/\.battle-player\.v174-cardless-unit\.ally-targetable:not\(\.active-turn\)::after/);
     assert.match(fixedSlotCss,/\.battle-player\.v174-cardless-unit\.ally-targetable::before/);
     assert.match(system,/targetAlly:index/);
     assert.match(system,/const resolvedBlocks=barrier\?Math\.max\(1,Math\.floor\(numeric\(barrierBlocks\)\|\|3\)\):0/);

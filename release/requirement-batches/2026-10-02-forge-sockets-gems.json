@@ -1,0 +1,163 @@
+{
+  "date": "2026-10-02",
+  "title": "鍛造與裝備寶石第一階段",
+  "workId": "FORGE-SOCKETS-GEMS-20261002",
+  "base_branch": "dev",
+  "base_sha": "60c1aab27567e2c1e64604b95a0979e97806f59b",
+  "work_branch": "feature/forge-sockets-gems-20261002",
+  "officialVersion": "173.72",
+  "status": "VERIFIED",
+  "change_classification": {
+    "replacement": [
+      "圖鑑可見入口→鍛造",
+      "冶煉控制來源搬至鍛造"
+    ],
+    "additive": [
+      "可選 sockets 欄位",
+      "最小寶石定義與屬性匯總"
+    ],
+    "removal": [
+      "可見圖鑑 renderer",
+      "冶煉圖紙依賴"
+    ]
+  },
+  "requirements": [
+    {
+      "id": 1,
+      "title": "入口與冶煉搬遷",
+      "request": "圖鑑入口退役，鍛造包含冶煉／鑲嵌；圖鑑擊殺紀錄保留。",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "js/36-v141-content-systems.js",
+          "js/00-main.js",
+          "css/49-premium-functional-ui.css",
+          "tests/forge-sockets-gems.test.js",
+          "docs/qa/forge-sockets-gems-20261002.md"
+        ],
+        "verification": "必要回歸、production 打包同步與候選／deployed-dev 390×844、412×915 Chrome 觸控操作驗證。",
+        "result": "第一階段範圍通過；dev@b61f87d804edcbb8202c16bfd17f9d8cd78bf115，artifact 11210577025。"
+      }
+    },
+    {
+      "id": 2,
+      "title": "冶煉材料",
+      "request": "取消圖紙檢查與扣除，沿用礦石、金幣與原有冶煉規則。",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "js/36-v141-content-systems.js",
+          "js/00-main.js",
+          "css/49-premium-functional-ui.css",
+          "tests/forge-sockets-gems.test.js",
+          "docs/qa/forge-sockets-gems-20261002.md"
+        ],
+        "verification": "必要回歸、production 打包同步與候選／deployed-dev 390×844、412×915 Chrome 觸控操作驗證。",
+        "result": "第一階段範圍通過；dev@b61f87d804edcbb8202c16bfd17f9d8cd78bf115，artifact 11210577025。"
+      }
+    },
+    {
+      "id": 3,
+      "title": "孔位與相容",
+      "request": "白藍紫0、橙1、紅／粉2、萬象／四象3，舊裝備無 sockets 視為空。",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "js/36-v141-content-systems.js",
+          "js/00-main.js",
+          "css/49-premium-functional-ui.css",
+          "tests/forge-sockets-gems.test.js",
+          "docs/qa/forge-sockets-gems-20261002.md"
+        ],
+        "verification": "必要回歸、production 打包同步與候選／deployed-dev 390×844、412×915 Chrome 觸控操作驗證。",
+        "result": "第一階段範圍通過；dev@b61f87d804edcbb8202c16bfd17f9d8cd78bf115，artifact 11210577025。"
+      }
+    },
+    {
+      "id": 4,
+      "title": "最小寶石模型",
+      "request": "gemVitalityI 體質 +1 可識別與選擇；未新增掉落率、商店價或大規模平衡。",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "js/36-v141-content-systems.js",
+          "js/00-main.js",
+          "css/49-premium-functional-ui.css",
+          "tests/forge-sockets-gems.test.js",
+          "docs/qa/forge-sockets-gems-20261002.md"
+        ],
+        "verification": "必要回歸、production 打包同步與候選／deployed-dev 390×844、412×915 Chrome 觸控操作驗證。",
+        "result": "第一階段範圍通過；dev@b61f87d804edcbb8202c16bfd17f9d8cd78bf115，artifact 11210577025。"
+      }
+    },
+    {
+      "id": 5,
+      "title": "鑲嵌與屬性",
+      "request": "本機 UID 原型扣一顆、填空孔並存檔；满孔、未知資料、失敗回滾及換装移除加成。",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "js/36-v141-content-systems.js",
+          "js/00-main.js",
+          "css/49-premium-functional-ui.css",
+          "tests/forge-sockets-gems.test.js",
+          "docs/qa/forge-sockets-gems-20261002.md"
+        ],
+        "verification": "必要回歸、production 打包同步與候選／deployed-dev 390×844、412×915 Chrome 觸控操作驗證。",
+        "result": "第一階段範圍通過；dev@b61f87d804edcbb8202c16bfd17f9d8cd78bf115，artifact 11210577025。"
+      }
+    },
+    {
+      "id": 6,
+      "title": "手機介面",
+      "request": "遊戲風格選擇器、單一內文捲動；390／412 production Chrome 觸控與導覽避讓。",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "js/36-v141-content-systems.js",
+          "js/00-main.js",
+          "css/49-premium-functional-ui.css",
+          "tests/forge-sockets-gems.test.js",
+          "docs/qa/forge-sockets-gems-20261002.md"
+        ],
+        "verification": "必要回歸、production 打包同步與候選／deployed-dev 390×844、412×915 Chrome 觸控操作驗證。",
+        "result": "第一階段範圍通過；dev@b61f87d804edcbb8202c16bfd17f9d8cd78bf115，artifact 11210577025。"
+      }
+    }
+  ],
+  "evidence": {
+    "local": [
+      "node tests/forge-sockets-gems.test.js",
+      "node tests/v173.58-reforge-redesign.test.js",
+      "node tests/v173.28-main-city-lobby.test.js",
+      "node tests/premium-functional-ui-batch4.test.js",
+      "node tests/premium-functional-ui-batch5.test.js",
+      "node tests/responsive-window-item-owner-convergence.test.js",
+      "node tests/gameplay-context-nav-actions-20260915.test.js",
+      "git diff --check"
+    ],
+    "browserScript": ".github/scripts/run-forge-sockets-browser-qa.mjs",
+    "browserResult": "PASS: production-local 與 deployed-dev 390×844、412×915；末端装備可點、無水平溢出、底部導覽避讓、扣料持久化、穿卸加成、滿孔與雲端權威角色拒絕。Chrome 模擬手機視窗，非 Android 實體驗收。",
+    "ciResult": "PASS: candidate Repository checks run 36966366859；merged dev Repository checks run 36967167176 attempt 2。首次舊版面測試未回傳 Chrome DOM，未改程式同 SHA 重跑後通過。",
+    "buildArtifact": {
+      "sourceSha": "e269070dd1f90097525da8f4720557316fad9b05",
+      "runId": 36966366859,
+      "result": "正式 production build 同步閘門 PASS；未替代素材。"
+    },
+    "deployment": {
+      "sha": "b61f87d804edcbb8202c16bfd17f9d8cd78bf115",
+      "runId": 36967167176,
+      "url": "https://dev.four-symbols-dev.pages.dev",
+      "artifactId": 11210577025,
+      "manifestShaVerified": true,
+      "forgeBrowserResult": "PASS",
+      "gameVersion": "173.72",
+      "cacheVersion": "173.72"
+    }
+  },
+  "boundaries": [
+    "未實作正式可信後端鑲嵌交易；帶雲端權威基底的角色拒絕本機鑲嵌。",
+    "寶石取得來源未定案；最小資料用於第一階段架構驗證，未發送玩家物品。",
+    "main 不變；必要 CI 與 production build 同步通過後才合併 dev。"
+  ]
+}

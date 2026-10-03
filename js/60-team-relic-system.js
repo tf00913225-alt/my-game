@@ -163,7 +163,7 @@
                 effect("debuff_all_enemies",{attackDownKey:"attackDown",accuracyDownKey:"accuracyDown",durationRounds:1})
             ])],
             limitText:"BOSS套用較低效率；不造成全體硬控。",
-            nextText:{10:"降攻12%並追加命中-5%",20:"降攻15%、命中-8%"}
+            nextText:{10:"降攻12%並追加最終命中-5%",20:"降攻15%、最終命中-8%"}
         },
         {
             id:"relic_tiangang_banner",category:"defense",tags:["attack","defense","anti_swarm"],rarity:"orange",maxLevel:20,iconPath:"assets/relics/icons/relic_tiangang_banner.webp",runtimeReady:true,defaultUnlocked:true,unlockSource:null,
@@ -286,8 +286,6 @@
     let relicFinishHeld=false;
     let relicFinishRetryTimer=0;
     let relicCutinNode=null;
-    let relicFocusedTargetCards=[];
-    let relicFocusedTargetLayers=[];
     const relicPresentationLockReleases=new Set();
 
     function numeric(value){ const n=Number(value); return Number.isFinite(n)?n:0; }
@@ -304,7 +302,18 @@
         if(typeof window.v173HasNamedPersistentState==="function"){ try{return !!window.v173HasNamedPersistentState(entity,type);}catch(_){ } }
         return !!(entity&&Array.isArray(entity.statusEffects)&&entity.statusEffects.some(s=>s&&s.type===type&&numeric(s.turnsLeft)>0));
     }
-    function withSource(type,callback){ const previous=sourceContext; sourceContext={sourceType:type}; try{return callback();}finally{sourceContext=previous;} }
+    function withSource(type,callback){
+        const previous=sourceContext;
+        const previousGlobal=window.__fourSymbolsBattleEffectSource;
+        sourceContext={sourceType:type};
+        window.__fourSymbolsBattleEffectSource=type;
+        try{return callback();}
+        finally{
+            sourceContext=previous;
+            if(previousGlobal===undefined){ delete window.__fourSymbolsBattleEffectSource; }
+            else{ window.__fourSymbolsBattleEffectSource=previousGlobal; }
+        }
+    }
     function waitMs(ms){ return new Promise(resolve=>setTimeout(resolve,Math.max(0,Math.floor(numeric(ms))))); }
     function isRelicDevTestingEnvironment(){
         if(typeof window==="undefined"||!window.location){ return false; }
@@ -318,97 +327,106 @@
         return typeof document!=="undefined"&&typeof document.getElementById==="function"&&!!document.getElementById("battlePage");
     }
     function clearRelicTargetFocus(){
-        const cards=relicFocusedTargetCards.slice();
-        const layers=relicFocusedTargetLayers.slice();
-        relicFocusedTargetCards=[];
-        relicFocusedTargetLayers=[];
-        cards.forEach(card=>{
-            if(card&&card.classList){
-                card.classList.remove("team-relic-battle-target-focus","team-relic-battle-target-focus-visible");
-            }
-        });
-        layers.forEach(layer=>{
-            if(layer&&layer.classList){ layer.classList.remove("team-relic-battle-target-layer"); }
-        });
-        if(typeof document!=="undefined"&&typeof document.querySelectorAll==="function"){
-            document.querySelectorAll(".team-relic-battle-target-focus,.team-relic-battle-target-focus-visible").forEach(card=>{
-                card.classList.remove("team-relic-battle-target-focus","team-relic-battle-target-focus-visible");
-            });
-            document.querySelectorAll(".team-relic-battle-target-layer").forEach(layer=>{
-                layer.classList.remove("team-relic-battle-target-layer");
-            });
-        }
+        const presentation=typeof document!=="undefined"?document.getElementById("teamRelicBattlePresentation"):null;
+        const layer=presentation&&presentation.querySelector(".team-relic-target-projection-layer");
+        if(layer){ layer.replaceChildren(); }
+        if(presentation){ presentation.classList.remove("targets-visible"); }
     }
     function cleanupRelicCutin(){
         clearRelicTargetFocus();
         const node=relicCutinNode||(typeof document!=="undefined"&&document.getElementById?document.getElementById("teamRelicBattlePresentation"):null);
         if(node&&typeof node.remove==="function"){ node.remove(); }
-        if(typeof document!=="undefined"&&document.body&&document.body.classList){
-            document.body.classList.remove("team-relic-cinematic-active");
-        }
+        if(typeof document!=="undefined"&&document.body&&document.body.classList){ document.body.classList.remove("team-relic-cinematic-active"); }
         relicCutinNode=null;
     }
-    function relicTargetCard(side,index){
-        if(typeof document==="undefined"||!Number.isInteger(index)){ return null; }
-        return document.getElementById(side==="monster"?"battleMonster"+index:"battlePlayerCard"+index);
+    function relicGeometryOwner(){ return typeof window!=="undefined"?window.FourSymbolsBattlefieldRenderGeometry:null; }
+    function relicOverlayGeometry(){
+        const owner=relicGeometryOwner(), geometry=owner&&typeof owner.getBattlefieldOverlayGeometry==="function"?owner.getBattlefieldOverlayGeometry():null;
+        return geometry&&geometry.rect&&geometry.rect.width>0&&geometry.rect.height>0?geometry:null;
     }
-    function relicTargetLayer(card){
-        if(!card){ return null; }
-        if(typeof card.closest==="function"){
-            return card.closest(".v-fixed-enemy-slot,.v-fixed-ally-slot,.v-fixed-boss-footprint")||card;
+    function relativeRelicRect(rect,overlayRect){
+        if(!rect||!overlayRect){ return null; }
+        const left=Math.max(0,numeric(rect.left)-numeric(overlayRect.left)),top=Math.max(0,numeric(rect.top)-numeric(overlayRect.top));
+        const right=Math.min(numeric(overlayRect.width),numeric(rect.left)+numeric(rect.width)-numeric(overlayRect.left)),bottom=Math.min(numeric(overlayRect.height),numeric(rect.top)+numeric(rect.height)-numeric(overlayRect.top));
+        return {left:left,top:top,width:Math.max(0,right-left),height:Math.max(0,bottom-top)};
+    }
+    function syncRelicPresentationGeometry(node){
+        const overlay=relicOverlayGeometry(),rect=overlay&&overlay.rect;
+        if(!node||!rect){ return null; }
+        node.style.left=numeric(rect.left)+"px";node.style.top=numeric(rect.top)+"px";node.style.width=Math.max(1,numeric(rect.width))+"px";node.style.height=Math.max(1,numeric(rect.height))+"px";
+        return node.__relicOverlayRect={left:numeric(rect.left),top:numeric(rect.top),width:Math.max(1,numeric(rect.width)),height:Math.max(1,numeric(rect.height))};
+    }
+    function appendRelicResourceProjection(kind,projection,overlayRect){
+        const rect=projection&&relativeRelicRect(projection.rect,overlayRect);
+        if(!rect||rect.width<=0||rect.height<=0){ return null; }
+        const node=document.createElement("div"),fill=document.createElement("div");
+        node.className="team-relic-target-projection-resource "+(kind==="hp"?"team-relic-target-projection-hp":"team-relic-target-projection-sp");
+        node.style.left=rect.left+"px";node.style.top=rect.top+"px";node.style.width=rect.width+"px";node.style.height=rect.height+"px";
+        fill.className="team-relic-target-projection-resource-fill";
+        fill.style.width=Math.max(0,Math.min(1,Number(projection.ratio)||0))*100+"%";
+        node.appendChild(fill);
+        if(kind==="hp"&&Number(projection.shieldRatio)>0){
+            const shield=document.createElement("div");
+            shield.className="team-relic-target-projection-shield";
+            shield.style.left=Math.max(0,Math.min(1,Number(projection.ratio)||0))*100+"%";
+            shield.style.width=Math.max(0,Math.min(1,Number(projection.shieldRatio)||0))*100+"%";
+            node.appendChild(shield);
         }
-        return card;
+        return node;
+    }
+    function appendRelicProjection(layer,geometry,overlayRect){
+        const artwork=geometry.artworkProjection,artRect=artwork&&relativeRelicRect(artwork.rect,overlayRect);
+        if(artRect&&artRect.width>0&&artRect.height>0){
+            const art=document.createElement("div");
+            art.className="team-relic-target-projection-art";
+            art.style.left=artRect.left+"px";art.style.top=artRect.top+"px";art.style.width=artRect.width+"px";art.style.height=artRect.height+"px";art.style.backgroundImage=artwork.backgroundImage;art.style.backgroundSize=artwork.backgroundSize;art.style.backgroundPosition=artwork.backgroundPosition;art.style.backgroundRepeat=artwork.backgroundRepeat;
+            layer.append(art);
+        }
+        const hp=appendRelicResourceProjection("hp",geometry.hpProjection,overlayRect);
+        const sp=appendRelicResourceProjection("sp",geometry.spProjection,overlayRect);
+        if(hp){ layer.append(hp); }
+        if(sp){ layer.append(sp); }
     }
     function revealRelicTargets(target){
         clearRelicTargetFocus();
-        const cards=target&&Array.isArray(target.targetIds)
-            ?target.targetIds.map(index=>relicTargetCard(target.targetSide,index)).filter(Boolean)
-            :[];
-        relicFocusedTargetCards=Array.from(new Set(cards));
-        relicFocusedTargetLayers=Array.from(new Set(relicFocusedTargetCards.map(relicTargetLayer).filter(Boolean)));
-        relicFocusedTargetLayers.forEach(layer=>layer.classList.add("team-relic-battle-target-layer"));
-        relicFocusedTargetCards.forEach(card=>card.classList.add("team-relic-battle-target-focus"));
-        const show=()=>relicFocusedTargetCards.forEach(card=>card.classList.add("team-relic-battle-target-focus-visible"));
-        if(typeof requestAnimationFrame==="function"){ requestAnimationFrame(show); }else{ show(); }
+        if(!relicCutinNode||!target||!Array.isArray(target.targetIds)){ return waitMs(RELIC_TARGET_REVEAL_MS); }
+        const overlayRect=syncRelicPresentationGeometry(relicCutinNode)||relicCutinNode.__relicOverlayRect, layer=relicCutinNode.querySelector(".team-relic-target-projection-layer"), owner=relicGeometryOwner();
+        if(layer&&overlayRect&&owner&&typeof owner.getUnitGeometry==="function"){target.targetIds.forEach(index=>{const geometry=owner.getUnitGeometry(target.targetSide,index);if(geometry&&(geometry.artworkProjection||geometry.hpProjection||geometry.spProjection)){appendRelicProjection(layer,geometry,overlayRect);}});}
+        const show=()=>{if(relicCutinNode){relicCutinNode.classList.add("targets-visible");}};
+        if(typeof requestAnimationFrame==="function"){requestAnimationFrame(show);}else{show();}
         return waitMs(RELIC_TARGET_REVEAL_MS);
     }
-    function beginRelicCinematic(def,target){
-        if(!hasLiveBattlePresentationHost()||!def){ return Promise.resolve(null); }
+    function loadBattleIdentityImage(path){
+        return new Promise((resolve,reject)=>{
+            if(!path){reject(new Error("秘寶身份圖示路徑為空"));return;}
+            const image=new Image();image.decoding="async";
+            const ready=()=>Promise.resolve(typeof image.decode==="function"?image.decode():undefined).then(()=>{
+                if(image.complete&&image.naturalWidth>0){resolve(path);}else{reject(new Error("秘寶身份圖示 decode 後無有效尺寸："+path));}
+            },reject);
+            image.onload=ready;image.onerror=()=>reject(new Error("秘寶身份圖示無法載入："+path));image.src=path;
+            if(image.complete&&image.naturalWidth>0){ready();}
+        });
+    }
+    function resolveBattleIdentityIcon(def){
+        const candidates=[def&&def.battleIconPath,def&&def.iconPath].filter(Boolean);
+        let chain=Promise.reject(new Error("沒有可用秘寶身份圖示"));
+        candidates.forEach(path=>{chain=chain.catch(()=>loadBattleIdentityImage(path));});
+        return chain;
+    }
+    async function beginRelicCinematic(def,target){
+        if(!hasLiveBattlePresentationHost()||!def||!document.body){return null;}
+        const iconPath=await resolveBattleIdentityIcon(def);
         cleanupRelicCutin();
-        const battlePage=document.getElementById("battlePage");
-        const host=battlePage||null;
-        if(!host){ return Promise.resolve(null); }
-        const node=document.createElement("div");
-        node.id="teamRelicBattlePresentation";
-        node.className="team-relic-battle-presentation";
-        node.setAttribute("aria-label","秘寶發動："+def.name);
-        node.innerHTML='<span class="team-relic-battle-dim" aria-hidden="true"></span>'+
-            '<div class="team-relic-battle-cutin"><span class="team-relic-battle-cutin-icon">'+
-            '<img src="'+esc(def.battleIconPath||def.iconPath||"")+'" alt=""></span>'+
-            '<span class="team-relic-battle-cutin-copy"><strong>'+esc(def.name)+'</strong></span></div>';
-        host.appendChild(node);
-        if(document.body&&document.body.classList){ document.body.classList.add("team-relic-cinematic-active"); }
-        relicCutinNode=node;
-        const dim=()=>{ if(node===relicCutinNode){ node.classList.add("dim-visible"); } };
-        if(typeof requestAnimationFrame==="function"){ requestAnimationFrame(dim); }else{ dim(); }
-        return waitMs(RELIC_DIM_IN_MS)
-            .then(()=>{
-                if(node!==relicCutinNode){ return null; }
-                node.classList.add("identity-visible");
-                return waitMs(RELIC_IDENTITY_REVEAL_MS);
-            })
-            .then(()=>{
-                if(node!==relicCutinNode){ return null; }
-                return waitMs(RELIC_IDENTITY_HOLD_MS);
-            })
-            .then(()=>{
-                if(node!==relicCutinNode){ return null; }
-                node.classList.add("identity-exiting");
-                return Promise.all([
-                    waitMs(RELIC_IDENTITY_EXIT_MS),
-                    revealRelicTargets(target)
-                ]).then(()=>node);
-            });
+        const node=document.createElement("div"),overlay=relicOverlayGeometry(),overlayRect=overlay&&overlay.rect;
+        if(!overlayRect||overlayRect.width<=0||overlayRect.height<=0){return null;}
+        node.id="teamRelicBattlePresentation";node.className="team-relic-battle-presentation";node.setAttribute("aria-label","秘寶發動："+def.name);
+        node.innerHTML='<div class="team-relic-battle-dim" aria-hidden="true"></div><div class="team-relic-target-projection-layer" aria-hidden="true"></div><div class="team-relic-battle-cutin"><span class="team-relic-battle-cutin-icon"><img src="'+esc(iconPath)+'" alt="" decoding="async"></span><span class="team-relic-battle-cutin-copy"><strong>'+esc(def.name)+'</strong></span></div>';
+        document.body.appendChild(node);relicCutinNode=node;syncRelicPresentationGeometry(node);document.body.classList.add("team-relic-cinematic-active");
+        if(typeof requestAnimationFrame==="function"){
+            await new Promise(resolve=>requestAnimationFrame(()=>{if(node===relicCutinNode){node.classList.add("identity-visible");}resolve();}));
+            await nextVisualPaint();
+        }else{node.classList.add("identity-visible");}
+        return waitMs(RELIC_IDENTITY_REVEAL_MS).then(()=>{if(node!==relicCutinNode){return null;}node.classList.add("dim-visible");return waitMs(RELIC_DIM_IN_MS);}).then(()=>{if(node!==relicCutinNode){return null;}return waitMs(RELIC_IDENTITY_HOLD_MS);}).then(()=>{if(node!==relicCutinNode){return null;}node.classList.add("identity-exiting");return Promise.all([waitMs(RELIC_IDENTITY_EXIT_MS),revealRelicTargets(target)]).then(()=>node);});
     }
     function enterRelicVfxPhase(node){
         if(node&&node===relicCutinNode){ node.classList.add("vfx-running"); }
@@ -570,6 +588,7 @@
         if(relicVisualCollector){ relicVisualCollector.push(callback); return; }
         callback();
     }
+    window.v174QueueRelicVisual=function(callback){ return queueRelicVisual(callback); };
     function flushRelicVisuals(list){ (list||[]).forEach(callback=>{ try{callback();}catch(error){console.error("秘寶視覺效果失敗：",error);} }); }
     function queueRelicPresentation(def,onStart,visualContext){
         if(!hasLiveBattlePresentationHost()){
@@ -708,7 +727,7 @@
 
     if(typeof saveGame==="function"){
         const previousSaveGame=saveGame;
-        saveGame=function(){ const result=previousSaveGame.apply(this,arguments); persistIntoSaveDocument(); return result; };
+        saveGame=function(){ const result=previousSaveGame.apply(this,arguments); if(result===true){ persistIntoSaveDocument(); } return result; };
     }
 
     function saveRelics(){
@@ -746,7 +765,6 @@
             if(!monster){ return; }
             if(entry.attack!==undefined){ monster.attack=entry.attack; }
             if(entry.magicAttack!==undefined){ monster.magicAttack=entry.magicAttack; }
-            if(entry.accuracy!==undefined){ monster.accuracy=entry.accuracy; }
         });
         relicBattleState.monsterRestores=keep;
     }
@@ -764,12 +782,13 @@
             return out;
         },{attackPercent:0,defensePercent:0,evasionPercent:0,resistancePercent:0,damageReductionPercent:0});
     }
+    window.v174GetRelicFinalEvasionPercent=index=>playerModTotals(index).evasionPercent;
+
     function decorateStats(index,stats){
         if(!stats||!relicBattleState){ return stats; }
         const mod=playerModTotals(index),copy=Object.assign({},stats);
         if(mod.attackPercent){ copy.attack=numeric(copy.attack)*(1+mod.attackPercent/100); copy.magicAttack=numeric(copy.magicAttack)*(1+mod.attackPercent/100); }
         if(mod.defensePercent){ copy.defense=numeric(copy.defense)*(1+mod.defensePercent/100); }
-        if(mod.evasionPercent){ copy.evasion=numeric(copy.evasion)+mod.evasionPercent; }
         if(mod.resistancePercent){ copy.resistance=numeric(copy.resistance)+mod.resistancePercent; copy.statusResistance=numeric(copy.statusResistance)+mod.resistancePercent; }
         return copy;
     }
@@ -905,6 +924,12 @@
         if(monster.hp<=0&&typeof killMonster==="function"){ withSource(SOURCE_RELIC,()=>killMonster(index)); }
         return final;
     }
+    window.v174GetRelicFinalHitReductionPercent=function(monster){
+        if(!relicBattleState){ return 0; }
+        return relicBattleState.monsterRestores.reduce((sum,entry)=>
+            sum+(entry.monster===monster&&numeric(entry.expiresRound)>=currentRound()
+                ?numeric(entry.finalHitReductionPercent):0),0);
+    };
     function applyEnemyDebuff(monster,attackDown,accuracyDown,duration){
         if(!monster||!monster.alive||!relicBattleState){ return; }
         if(window.GameplaySystem&&typeof window.GameplaySystem.canDirectlyAffectMonster==="function"&&!window.GameplaySystem.canDirectlyAffectMonster(monster)){
@@ -914,7 +939,7 @@
         const attack=Math.max(0,attackDown*efficiency),accuracy=Math.max(0,accuracyDown*efficiency);
         const restore={monster:monster,expiresRound:currentRound()+Math.max(1,Math.floor(duration||1))-1};
         if(attack>0){ restore.attack=monster.attack; restore.magicAttack=monster.magicAttack; monster.attack=numeric(monster.attack)*(1-attack/100); monster.magicAttack=numeric(monster.magicAttack)*(1-attack/100); }
-        if(accuracy>0){ restore.accuracy=monster.accuracy; monster.accuracy=numeric(monster.accuracy)*(1-accuracy/100); }
+        if(accuracy>0){ restore.finalHitReductionPercent=accuracy; }
         relicBattleState.monsterRestores.push(restore);
     }
     function applyPlayerBuffAll(effectDef,def,level){
@@ -1245,11 +1270,11 @@
             return "對敵方全體造成 "+valueFor(def,"damageMultiplier",level).toFixed(2)+"×秘寶威力"+(bonus>0?"；燃燒目標額外+"+bonus+"%":"")+"。";
         }
         if(def.id==="relic_xuanwu_seal"){ return "全隊獲得最大HP "+valueFor(def,"shieldPercent",level).toFixed(1).replace(/\.0$/,"")+"%護盾，持續2回合"+(level>=20?"，並獲得8%減傷1回合":"")+"。"; }
-        if(def.id==="relic_soul_bell"){ return "敵方全體攻擊-"+Math.round(valueFor(def,"attackDown",level))+"%"+(level>=10?"、命中-"+Math.round(valueFor(def,"accuracyDown",level))+"%":"")+"，持續1回合。"; }
+        if(def.id==="relic_soul_bell"){ return "敵方全體攻擊-"+Math.round(valueFor(def,"attackDown",level))+"%"+(level>=10?"、最終命中-"+Math.round(valueFor(def,"accuracyDown",level))+"%":"")+"，持續1回合。"; }
         if(def.id==="relic_tiangang_banner"){ return "對敵方全體造成 "+valueFor(def,"damageMultiplier",level).toFixed(2)+"×秘寶威力"+(level>=10?"並降攻"+Math.round(valueFor(def,"attackDown",level))+"%":"")+"。"; }
         if(def.id==="relic_nine_dragon_fire"){ return "對敵方全體造成 "+valueFor(def,"damageMultiplier",level).toFixed(2)+"×火屬性秘寶傷害"+(level>=10?"，燃燒機率"+Math.round(valueFor(def,"burnChance",level)*100)+"%":"")+(level>=20?"，對燃燒目標額外+15%":"")+"。"; }
         if(def.id==="relic_cold_spring_jade"){ return "急救目標 "+valueFor(def,"healHpPercent",level).toFixed(1).replace(/\.0$/,"")+"%最大HP"+(level>=10?"並淨化1個一般負面":"")+(level>=20?"、恢復4%最大SP":"")+"；HP由35%以上降至35%以下時觸發，每場最多2次，冷卻3回合。"; }
-        if(def.id==="relic_qinglan_feather"){ return "全隊最終閃躲+"+Math.round(valueFor(def,"evasionBonus",level))+"個百分點、最終異常抗性+"+Math.round(valueFor(def,"resistanceBonus",level))+"個百分點，持續"+Math.round(valueFor(def,"duration",level))+"回合。"; }
+        if(def.id==="relic_qinglan_feather"){ return "全隊最終閃躲+"+Math.round(valueFor(def,"evasionBonus",level))+"%、最終異常抗性+"+Math.round(valueFor(def,"resistanceBonus",level))+"%，持續"+Math.round(valueFor(def,"duration",level))+"回合。"; }
         if(def.id==="relic_rock_mountain_seal"){ return "開場防禦+"+Math.round(valueFor(def,"defenseBonus",level))+"%持續3回合；受擊計數觸發時獲得"+Math.round(valueFor(def,"shieldPercent",level))+"%最大HP護盾"+(level>=20?"；Lv20護盾後準備一次18%秘寶威力反震，作用於下一名實際攻擊者":"")+"。"; }
         if(def.id==="relic_returning_wheel"){ return "阻止本場第一次死亡，保留1HP後恢復"+Math.round(valueFor(def,"healHpPercent",level))+"%最大HP並獲得"+Math.round(valueFor(def,"shieldPercent",level))+"%護盾。"; }
         return def.description;
@@ -1311,7 +1336,7 @@
         const filters=["all","attack","recovery","defense","buff","control","element","special"].map(key=>'<button class="'+(currentFilter===key?'active':'')+'" onclick="v174SetRelicFilter(\''+key+'\')">'+esc(CATEGORY_LABELS[key])+'</button>').join("");
         const cards=sortedRelics().filter(filterMatch).map(cardMarkup).join("");
         return '<div class="team-relic-page"><div class="team-relic-resource-line"><span>隊伍共用戰場神器</span><b>每支隊伍可裝備 1 件秘寶</b></div>'+current+
-            '<div class="team-relic-tabs">'+filters+'</div><div class="team-relic-grid">'+cards+'</div></div>';
+            '<div class="team-relic-tabs" data-scroll-owner="x">'+filters+'</div><div class="team-relic-grid">'+cards+'</div></div>';
     }
     function detailMarkup(def){
         const owned=statusOf(def.id),level=owned.level,next=nextMilestone(def,level),cost=RELIC_BALANCE_CONFIG.upgradeGoldBase+RELIC_BALANCE_CONFIG.upgradeGoldPerLevel*level;

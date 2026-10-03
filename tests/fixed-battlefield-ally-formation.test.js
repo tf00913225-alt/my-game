@@ -46,14 +46,17 @@ const core=fs.readFileSync(new URL("../js/00-main.js",import.meta.url),"utf8");
 const support=fs.readFileSync(new URL("../js/42-v148-combat-dungeon-fixes.js",import.meta.url),"utf8");
 const enemySupport=fs.readFileSync(new URL("../js/36-v141-content-systems.js",import.meta.url),"utf8");
 const water=fs.readFileSync(new URL("../js/50-v169-water-skill-rules.js",import.meta.url),"utf8");
+const finalSkills=fs.readFileSync(new URL("../js/60-v173.64-skill-progression-rebalance.js",import.meta.url),"utf8");
 assert.match(core,/allyFormation\s*:/,"ally formation persists in the formal account save document");
 assert.match(core,/targetType===\"allyTri\"/,"manual allyTri enters ally target selection");
 assert.doesNotMatch(support,/living\.length<=3/,"allyTri no longer expands to every living party member");
 assert.match(support,/resolveAllyTargets\(/,"party buffs/heals share canonical ally slot geometry");
 assert.match(support,/resolveEnemyTargets\(snapshot,center,\"tri\"/,"enemy rage shares canonical enemy slot geometry");
 assert.match(enemySupport,/resolveEnemyTargets\(snapshot,center,\"tri\"/,"enemy heal/support shares canonical enemy slot geometry");
-assert.match(water,/\"column\"/,"water freeze compatibility still resolves to column geometry");
-assert.match(core,/battlefieldSlots\.resolveAllyTargets\([\s\S]*skillTargetType/,"monster range targeting delegates to the canonical ally Slot owner");
+assert.doesNotMatch(water,/freeze\s*:/,"retired V169 compatibility layer does not own freeze targeting");
+assert.match(finalSkills,/freeze:\s*\{[^}]*targetType:"column",targetTypeAtMaxLevel:"tri"/,"canonical V173.64 skill owner defines freeze targeting progression");
+assert.match(core,/function resolveBattlefieldTargets\(targetSide,primaryIndex,targetType,options\)[\s\S]*?owner\.resolveAllyTargets\(formation,primaryIndex,normalized,alive\)/,"shared target resolver delegates ally geometry to the canonical Slot owner");
+assert.match(core,/const targetIndexes=primary\s*\?resolveBattlefieldTargets\("player",primary\.index,skillTargetType,\{hostilePrimary:true\}\)/,"monster range attacks pass their effective skill shape through the shared target resolver");
 assert.doesNotMatch(core,/const attackTargets=isRangeSkill\s*\?\s*livingTargets/,"monster tri and row skills must not expand to all living allies");
 
 // Geometry is element-agnostic: all four elements consume the same shape truth.

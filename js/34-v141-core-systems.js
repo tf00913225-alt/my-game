@@ -64,16 +64,16 @@
     ===================================================== */
     function getWildZoneSpecs(){
         return [
-            [typeof forestMonsters!=="undefined"?forestMonsters:null,3,"林間風靈","苔岩獸",WILD_ZONE_STRENGTHS[0]],
-            [typeof desertMonsters!=="undefined"?desertMonsters:null,17,"風沙隼","岩甲蠍",WILD_ZONE_STRENGTHS[1]],
-            [typeof iceMountainMonsters!=="undefined"?iceMountainMonsters:null,25,"霜風妖","凍岩獸",WILD_ZONE_STRENGTHS[2]],
-            [typeof zone4Monsters!=="undefined"?zone4Monsters:null,35,"焰風鬼","熔岩石怪",WILD_ZONE_STRENGTHS[3]],
-            [typeof zone5Monsters!=="undefined"?zone5Monsters:null,45,"蒼風巨獸","山岳巨獸",WILD_ZONE_STRENGTHS[4]],
-            [typeof zone6Monsters!=="undefined"?zone6Monsters:null,55,"風刃修羅","岩鎧修羅",WILD_ZONE_STRENGTHS[5]],
-            [typeof zone7Monsters!=="undefined"?zone7Monsters:null,65,"嵐影魔君","岳魂魔君",WILD_ZONE_STRENGTHS[6]],
-            [typeof zone8Monsters!=="undefined"?zone8Monsters:null,75,"青嵐龍衛","岩岳龍衛",WILD_ZONE_STRENGTHS[7]],
-            [typeof zone9Monsters!=="undefined"?zone9Monsters:null,85,"虛空風靈","虛空岩靈",WILD_ZONE_STRENGTHS[8]],
-            [typeof zone10Monsters!=="undefined"?zone10Monsters:null,95,"終焉風神","終焉地神",WILD_ZONE_STRENGTHS[9]]
+            [typeof forestMonsters!=="undefined"?forestMonsters:null,3,"風芽魈","岩薯卒",WILD_ZONE_STRENGTHS[0]],
+            [typeof desertMonsters!=="undefined"?desertMonsters:null,17,"疾角妖","岩鬃狸",WILD_ZONE_STRENGTHS[1]],
+            [typeof iceMountainMonsters!=="undefined"?iceMountainMonsters:null,25,"霧鬃狼","石鎧象",WILD_ZONE_STRENGTHS[2]],
+            [typeof zone4Monsters!=="undefined"?zone4Monsters:null,35,"旋風鬼","礦鎬鬼",WILD_ZONE_STRENGTHS[3]],
+            [typeof zone5Monsters!=="undefined"?zone5Monsters:null,45,"青嵐虎","枯根妖",WILD_ZONE_STRENGTHS[4]],
+            [typeof zone6Monsters!=="undefined"?zone6Monsters:null,55,"逐風客","石鬃狼",WILD_ZONE_STRENGTHS[5]],
+            [typeof zone7Monsters!=="undefined"?zone7Monsters:null,65,"嵐鎧衛","岩爪貛",WILD_ZONE_STRENGTHS[6]],
+            [typeof zone8Monsters!=="undefined"?zone8Monsters:null,75,"翼影魔","礦牙妖",WILD_ZONE_STRENGTHS[7]],
+            [typeof zone9Monsters!=="undefined"?zone9Monsters:null,85,"風魘使","荊根魔",WILD_ZONE_STRENGTHS[8]],
+            [typeof zone10Monsters!=="undefined"?zone10Monsters:null,95,"蒼羽尊","山岩巨人",WILD_ZONE_STRENGTHS[9]]
         ].filter(entry=>Array.isArray(entry[0]));
     }
 
@@ -94,7 +94,7 @@
     }
 
     function addWindAndEarthWildMonsters(){
-        getWildZoneSpecs().forEach(([zone,level,windName,earthName,strengthMultiplier])=>{
+        getWildZoneSpecs().forEach(([zone,level,windName,earthName,strengthMultiplier],zoneIndex)=>{
             zone.forEach(monster=>{
                 if(monster){
                     monster.rank="regular";
@@ -114,6 +114,7 @@
                     makeZoneMonster(earthName,level,"earth","regular"),
                     strengthMultiplier
                 );
+                monster.portraitKey="wild.zone-"+String(zoneIndex+1).padStart(2,"0")+".earth-01";
                 monster.v141CurveEliteRate=WILD_ELITE_RATE;
                 zone.push(monster);
             }
@@ -169,7 +170,10 @@
             const skill=typeof skillDatabase!=="undefined" ? skillDatabase[id] : null;
             return !!(
                 skill &&
-                (skill.category==="physical" || skill.category==="magic")
+                (skill.category==="physical" || skill.category==="magic") &&
+                (typeof window.v144IsMonsterSkillElementLegal==="function"
+                    ?window.v144IsMonsterSkillElementLegal(monster,id)
+                    :!!skill.element&&skill.element===monster.element)
             );
         });
         const limit=getMonsterSkillCarryLimit(monster.level);
@@ -276,7 +280,7 @@
         return safeAmount;
     }
 
-    function healMonsterPreservingShield(monster,amount){
+    function healMonsterPreservingShield(monster,amount,caster){
         if(!monster || !monster.alive){ return 0; }
         const shieldRemaining=syncMonsterShield(monster);
         const shield=monster.v141Shield;
@@ -284,7 +288,8 @@
         const baseHp=shield
             ? Math.max(0,monster.hp-shieldRemaining)
             : Math.max(0,monster.hp);
-        const healed=Math.max(0,Math.min(Math.floor(Number(amount)||0),baseMax-baseHp));
+        const healingFactor=caster&&caster.vGameplayTower===true?Number(caster.vTowerHealingMultiplier)||1:1;
+        const healed=Math.max(0,Math.min(Math.floor((Number(amount)||0)*healingFactor),baseMax-baseHp));
         monster.hp=baseHp+healed+shieldRemaining;
         if(shield){ shield.baseHp=baseHp+healed; }
         return healed;
@@ -537,10 +542,16 @@
             const max=ally.v141Shield?ally.v141Shield.baseMaxHP:ally.maxHP;
             return Math.max(0,ally.hp-shield)<max;
         });
-        const healSkill=skillDatabase.yuanXiangGuangMing;
-        const shieldSkill=skillDatabase.yuanGuangShield;
+        const supportIds=typeof window.v144GetLegalMonsterSkillIds==="function"
+            ?window.v144GetLegalMonsterSkillIds(monster,"support")
+            :(monster.v141SupportSkillIds||[]).filter(id=>{
+                const skill=skillDatabase[id];
+                return !!(skill&&skill.element&&skill.element===monster.element);
+            });
+        const healSkill=supportIds.includes("yuanXiangGuangMing")?skillDatabase.yuanXiangGuangMing:null;
+        const shieldSkill=supportIds.includes("yuanGuangShield")?skillDatabase.yuanGuangShield:null;
 
-        if(injured.length>0 && monster.sp>=healSkill.spCost){
+        if(healSkill&&injured.length>0 && monster.sp>=healSkill.spCost){
             monster.sp-=healSkill.spCost;
             showMonsterSkillNameBadge(healSkill.name,"light",monsterIndex);
             let total=0;
@@ -551,7 +562,7 @@
             return true;
         }
 
-        if(allies.some(ally=>getMonsterShieldRemaining(ally)<=0) && monster.sp>=shieldSkill.spCost){
+        if(shieldSkill&&allies.some(ally=>getMonsterShieldRemaining(ally)<=0) && monster.sp>=shieldSkill.spCost){
             monster.sp-=shieldSkill.spCost;
             showMonsterSkillNameBadge(shieldSkill.name,"light",monsterIndex);
             allies.forEach(ally=>applyMonsterShield(ally,200,2));
@@ -567,14 +578,17 @@
         const originalProcessSingleMonsterAttack=processSingleMonsterAttack;
         processSingleMonsterAttack=function(monsterIndex,token){
             const monster=monsters[monsterIndex];
+            if(monster&&typeof window.v144NormalizeMonsterSkillLoadout==="function"){
+                window.v144NormalizeMonsterSkillLoadout(monster);
+            }
             if(
-                monster&&monster.v141Abyss&&
+                monster&&monster.vGameplayTower!==true&&Array.isArray(monster.v141SupportSkillIds)&&monster.v141SupportSkillIds.length>0&&
                 typeof window.v141TryMonsterSpecialAction==="function"
             ){
                 const handled=window.v141TryMonsterSpecialAction(monsterIndex,token);
                 if(handled===true){ return; }
             }
-            if(monster&&monster.v141AbyssAi==="support"){
+            if(monster&&monster.vGameplayTower!==true&&monster.v141AbyssAi==="support"){
                 const supportResult=supportMonsterAction(monsterIndex);
                 if(supportResult!==false && supportResult!==null){ return supportResult; }
                 if(supportResult===null){ return originalProcessSingleMonsterAttack.apply(this,arguments); }
@@ -604,27 +618,21 @@
         };
     }
 
-    let lastShieldTickKey="";
-    if(typeof startTurn==="function"){
-        const originalStartTurn=startTurn;
-        startTurn=function(token){
-            const key=String(token)+":"+String(turn);
-            if(key!==lastShieldTickKey){
-                lastShieldTickKey=key;
-                currentBattleMonsters.forEach(index=>{
-                    const monster=monsters[index];
-                    const shield=monster&&monster.v141Shield;
-                    if(!shield){ return; }
-                    if(turn>1){ shield.turnsLeft--; }
-                    if(shield.turnsLeft<=0){ removeMonsterShield(monster); }
-                    else{ syncMonsterShield(monster); }
-                });
+    if(
+        window.FourSymbolsDurationLifecycle&&
+        typeof window.FourSymbolsDurationLifecycle.registerBuffExpiryHandler==="function"
+    ){
+        window.FourSymbolsDurationLifecycle.registerBuffExpiryHandler(({entity,buff})=>{
+            if(entity&&entity.v141Shield===buff){
+                removeMonsterShield(entity);
+                return true;
             }
-            return originalStartTurn.apply(this,arguments);
-        };
+            return false;
+        });
     }
 
     /* =====================================================
+       Elite single-roll drops + quest progress    /* =====================================================
        Elite single-roll drops + quest progress
     ===================================================== */
     function addEliteSpecialDrop(monster){

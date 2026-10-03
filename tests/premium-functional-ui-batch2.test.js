@@ -15,7 +15,7 @@ assert.match(main,/function renderExpDistributeList\(\)/);
 assert.match(main,/function addPoint\(/);
 assert.match(main,/function removePoint\(/);
 assert.match(main,/function confirmStatus\(\)/);
-["attack","intelligence","vitality","energy","spirit","agility"].forEach(stat=>assert.match(main,new RegExp(stat)));
+["attack","intelligence","vitality","energy","defensePoints","agility"].forEach(stat=>assert.match(main,new RegExp(stat)));
 assert.match(growth,/characterTabBtnExpPool/);
 assert.match(growth,/characterTabBtnStatus/);
 assert.match(growth,/characterTabBtnSkill/);

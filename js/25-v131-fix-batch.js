@@ -133,13 +133,30 @@
         return window.FourSymbolsBattlefieldSlots||null;
     }
 
+    function bossEnemyFormationAuthority(owner){
+        const boss=window.FourSymbolsBossBattle||null;
+        if(!owner||!boss){ return {owns:false,snapshot:null}; }
+        const existing=owner.getActiveEnemySnapshot();
+        const active=typeof boss.isActive==="function"&&boss.isActive();
+        const ownsExisting=typeof boss.ownsEnemyFormationSnapshot==="function"&&
+            boss.ownsEnemyFormationSnapshot(existing);
+        if(!active&&!ownsExisting){ return {owns:false,snapshot:null}; }
+        const snapshot=typeof boss.getEnemyFormationSnapshot==="function"
+            ?boss.getEnemyFormationSnapshot():existing;
+        return {owns:true,snapshot:snapshot||null};
+    }
+
     function ensureEnemyFormationSnapshot(indexes){
         const owner=fixedBattlefieldSlots();
         if(!owner){ return null; }
-        const existing=owner.getActiveEnemySnapshot();
-        if(existing){ return existing; }
+        const bossAuthority=bossEnemyFormationAuthority(owner);
+        if(bossAuthority.owns){ return bossAuthority.snapshot; }
         const requested=(Array.isArray(indexes)?indexes:currentBattleMonsters||[])
             .filter(index=>Number.isInteger(index)).slice(0,10);
+        if(!requested.length){ return null; }
+        const existing=owner.getActiveEnemySnapshot();
+        const activeMatches=existing&&requested.every(index=>!!owner.getEnemySlotForMonster(existing,index));
+        if(activeMatches){ return existing; }
         if(!requested.length){ return null; }
         const snapshot=owner.createEnemyFormationSnapshot(requested,{
             originalFormationType:requested.length,
@@ -153,9 +170,11 @@
         const owner=fixedBattlefieldSlots();
         const requested=(indexes||[]).filter(index=>Number.isInteger(index)).slice(0,10);
         if(!owner){ return requested.length?[requested,[]]:[[],[]]; }
-        let snapshot=owner.getActiveEnemySnapshot();
+        const bossAuthority=bossEnemyFormationAuthority(owner);
+        let snapshot=bossAuthority.owns?bossAuthority.snapshot:owner.getActiveEnemySnapshot();
+        if(bossAuthority.owns&&!snapshot){ return [[],[]]; }
         const activeMatches=snapshot&&requested.every(index=>!!owner.getEnemySlotForMonster(snapshot,index));
-        if(!activeMatches){
+        if(!bossAuthority.owns&&!activeMatches){
             snapshot=owner.createEnemyFormationSnapshot(requested,{
                 originalFormationType:Math.max(1,requested.length),
                 rankWeight:getFormationRankWeight
@@ -196,6 +215,11 @@
         const area=document.getElementById("battleMonsterArea");
         const owner=fixedBattlefieldSlots();
         if(!area||!owner){ return; }
+        /* Large Boss enemy geometry belongs to FourSymbolsBossBattle for the
+           complete battle lifecycle. V131 still renders allies and its other
+           presentation responsibilities, but it must never rebuild or project
+           a normal enemy formation over the Boss-owned snapshot. */
+        if(bossEnemyFormationAuthority(owner).owns){ return; }
         const indexes=currentBattleMonsters.slice(0,10);
         const snapshot=ensureEnemyFormationSnapshot(indexes);
         if(!snapshot){ return; }
@@ -384,18 +408,11 @@
             img.draggable=false;
             frame.insertBefore(img,frame.firstChild);
         }
-        img.src=getCharacterArtworkPath(character);
+        img.src=getCharacterBattleArtworkPath(character);
         img.alt=(character.id||"角色")+"立繪";
     }
 
-    if(typeof renderInventory==="function"){
-        const originalRenderInventory=renderInventory;
-        renderInventory=function(){
-            const result=originalRenderInventory.apply(this,arguments);
-            syncInventoryPortrait();
-            return result;
-        };
-    }
+    window.v131SyncInventoryPortrait=syncInventoryPortrait;
 
     function syncCharacterCreationAvailability(){
         const body=document.getElementById("homeFeatureModalBody");
@@ -462,165 +479,6 @@
         }
     }
     promoteSkillPreview();
-
-    if(typeof learnSkill==="function"){
-        const originalLearnSkill=learnSkill;
-        learnSkill=async function(skillId){
-            const skill=skillDatabase[skillId];
-            const loadout=characterSkillLoadouts[currentSkillCharacter];
-            if(!skill || !loadout){
-                return originalLearnSkill.apply(this,arguments);
-            }
-            const before=Math.max(0,Number(loadout.skillLevels[skillId])||0);
-            const actionText=before>0 ? "升級" : "學習";
-            if(
-                typeof window.rpgConfirm!=="function" ||
-                !await window.rpgConfirm(
-                    "確定要"+actionText+"「"+skill.name+"」嗎？",
-                    {
-                        title:actionText+"技能",
-                        confirmText:"確定"+actionText,
-                        cancelText:"返回"
-                    }
-                )
-            ){
-                return;
-            }
-            const result=originalLearnSkill.apply(this,arguments);
-            const after=Math.max(0,Number(loadout.skillLevels[skillId])||0);
-            if(after>before){
-                window.alert(
-                    before>0
-                    ? "「"+skill.name+"」升級成功！目前 Lv."+after+"。"
-                    : "「"+skill.name+"」學習成功！"
-                );
-            }
-            return result;
-        };
-    }
-
-    /*
-       ★ 修正（依照使用者要求，「技能升級時沒有跳出防呆訊息，
-       只有學習時有跳出來」）：
-       已學過但還沒滿級的技能，畫面上按的其實是upgradeSkill()，
-       不是learnSkill()——上面那段只包了learnSkill，
-       upgradeSkill完全沒被攔到，所以升級的時候
-       不會有確認/成功提示。這裡用同一套邏輯
-       （確認→執行→比對等級有沒有真的變化→跳成功提示）
-       再包一次upgradeSkill。
-    */
-    if(typeof upgradeSkill==="function"){
-        const originalUpgradeSkill=upgradeSkill;
-        upgradeSkill=async function(skillId){
-            const skill=skillDatabase[skillId];
-            const loadout=characterSkillLoadouts[currentSkillCharacter];
-            if(!skill || !loadout){
-                return originalUpgradeSkill.apply(this,arguments);
-            }
-            const before=Math.max(0,Number(loadout.skillLevels[skillId])||0);
-            if(
-                typeof window.rpgConfirm!=="function" ||
-                !await window.rpgConfirm(
-                    "確定要升級「"+skill.name+"」嗎？",
-                    {
-                        title:"升級技能",
-                        confirmText:"確定升級",
-                        cancelText:"返回"
-                    }
-                )
-            ){
-                return;
-            }
-            const result=originalUpgradeSkill.apply(this,arguments);
-            const after=Math.max(0,Number(loadout.skillLevels[skillId])||0);
-            if(after>before){
-                window.alert("「"+skill.name+"」升級成功！目前 Lv."+after+"。");
-            }
-            return result;
-        };
-    }
-
-    /*
-       ★ 修正：
-       原本用 onclick="learnSkill(...)" 這種字串正則去猜
-       這一列是哪個技能，但實際的技能列（.skill-row）
-       用的是 upgradeSkill(...)（已學但未滿級時）而不只
-       learnSkill(...)，正則沒涵蓋到，導致大部分列都抓不到
-       skillId。改成直接讀icon那個<div id="skillIcon_xxx">
-       的id，這個id本來就是渲染時直接塞技能id進去的，
-       比猜onclick字串可靠。
-    */
-    function extractSkillIdFromRow(row){
-        const iconEl=row.querySelector('[id^="skillIcon_"]');
-        if(iconEl){
-            return iconEl.id.slice("skillIcon_".length);
-        }
-        const controls=row.querySelectorAll("[onclick]");
-        for(const control of controls){
-            const code=control.getAttribute("onclick")||"";
-            const match=code.match(/(?:learnSkill|upgradeSkill|equipSkill|unequipSkill)\(['\"]([^'\"]+)['\"]\)/);
-            if(match){ return match[1]; }
-        }
-        return null;
-    }
-
-    /*
-       ★ 修正：
-       真正的技能列容器是 #allSkillsList 底下的
-       .skill-row（不是原本猜的.learned-skill／
-       .learnable-skill，那組class在目前版本的技能頁
-       裡根本不存在，導致這個函式之前完全沒有作用）。
-       技能名稱也是 .skill-row-text 裡的 <b>，不是
-       <strong>。
-    */
-    function decorateSkillRows(){
-        const list=document.getElementById("allSkillsList");
-        if(!list){ return; }
-        list.querySelectorAll(".skill-row").forEach(row=>{
-            const skillId=extractSkillIdFromRow(row);
-            const skill=skillId && skillDatabase[skillId];
-            if(!skill){ return; }
-
-            if(
-                ["physical","magic"].includes(skill.category) &&
-                !row.querySelector(".v131-skill-kind")
-            ){
-                const badge=document.createElement("span");
-                badge.className="v131-skill-kind "+skill.category;
-                badge.textContent=skill.category==="physical" ? "物理" : "法術";
-                const nameHost=row.querySelector(".skill-row-text b,strong,.skill-name,.skill-row-name") || row;
-                if(nameHost===row){ row.insertBefore(badge,row.firstChild); }
-                else{ nameHost.insertAdjacentElement("afterend",badge); }
-            }
-
-            const loadout=characterSkillLoadouts[currentSkillCharacter];
-            const learnedLevel=
-                loadout && loadout.skillLevels
-                ? Math.max(0,Number(loadout.skillLevels[skillId])||0)
-                : 0;
-            const textHost=row.querySelector(".skill-row-text");
-            if(
-                learnedLevel===0 &&
-                textHost &&
-                !textHost.querySelector(".v138-skill-learn-cost")
-            ){
-                const cost=document.createElement("span");
-                cost.className="v138-skill-learn-cost";
-                cost.textContent="學習需要 "+Math.max(0,Number(skill.learnCost)||0)+" 技能點";
-                const detailLink=textHost.querySelector(".skill-row-detail-link");
-                textHost.insertBefore(cost,detailLink||null);
-            }
-        });
-    }
-
-    if(typeof renderSkillLoadout==="function"){
-        const originalRenderSkillLoadout=renderSkillLoadout;
-        renderSkillLoadout=function(){
-            const result=originalRenderSkillLoadout.apply(this,arguments);
-            decorateSkillRows();
-            return result;
-        };
-    }
 
     const expPreviewCounts={0:0,1:0,2:0};
     const originalDistributeExpToCharacter=
@@ -1196,7 +1054,6 @@
         syncElementBoxForBattle({silent:true});
         applyBattleFormation();
         syncInventoryPortrait();
-        decorateSkillRows();
         promoteSkillPreview();
         syncCharacterCreationAvailability();
         renderExpDistributeList();

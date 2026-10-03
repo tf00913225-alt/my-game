@@ -11,9 +11,8 @@
     font-size:9px;
     line-height:12px;
     text-align:center;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
+    white-space:normal;
+    overflow-wrap:anywhere;
 }
 
 .skill-quick-button.sp-insufficient .v135-sq-scope{

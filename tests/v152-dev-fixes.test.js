@@ -8,6 +8,8 @@ const {execFileSync}=require("child_process");
 
 const source=fs.readFileSync("js/44-v152-dev-fixes.js","utf8");
 const css=fs.readFileSync("css/45-v152-dev-fixes.css","utf8");
+const feedbackOwner=fs.readFileSync("js/battle-floating-feedback-owner.js","utf8");
+const feedbackCss=fs.readFileSync("css/battle-floating-feedback-owner.css","utf8");
 const mainCss=fs.readFileSync("css/00-main.css","utf8");
 const loader=fs.readFileSync("js/20-anonymous-20.js","utf8")+fs.readFileSync("scripts/build-production.mjs","utf8");
 const index=fs.readFileSync("index.html","utf8");
@@ -101,10 +103,10 @@ test("role switching refreshes only the selected owner's independent skill-point
         getSkillCharacterObject:key=>owners[key],renderSkillLoadout(){},
         document:bareDocument({getElementById:id=>id==="skillPoints"?points:null})
     });
-    context.renderSkillLoadout();
+    context.v152SyncSkillPointDisplay();
     assert.equal(points.textContent,"12");
     context.currentSkillCharacter="player2";
-    context.renderSkillLoadout();
+    context.v152SyncSkillPointDisplay();
     assert.equal(points.textContent,"37");
     assert.deepEqual([owners.fire.skillPoints,owners.player2.skillPoints],[12,37]);
     assert.equal(loadouts.fire.skillLevels.fireBurstStrike,undefined);
@@ -139,40 +141,10 @@ test("Rage supplies separate critical chance and critical-damage values to the l
     assert.deepEqual([result.chance,result.multiplier],[20,1.9]);
 });
 
-function emperorContext(statuses=[{type:"burn",turnsLeft:2}]){
-    const boss={name:"極帝天尊",alive:true,hp:300,maxHP:500,sp:200,maxSP:200,agility:100,statusEffects:statuses.slice(),v141Abyss:true};
-    const ally={name:"天兵天將",alive:true,hp:100,maxHP:500,sp:10,maxSP:200,agility:80,statusEffects:statuses.slice(),v141Abyss:true};
-    const shields=[];
-    const context=load({
-        monsters:[boss,ally],currentBattleMonsters:[0,1],
-        v141HealMonsterPreservingShield(monster,amount){ const before=monster.hp; monster.hp=Math.min(monster.maxHP,monster.hp+amount); return monster.hp-before; },
-        v141ApplyMonsterShield(monster,amount,turns){ monster.v141Shield={remaining:amount,turnsLeft:turns,baseMaxHP:monster.maxHP}; shields.push([monster.name,amount,turns]); },
-        showMonsterSkillNameBadge(){},showMonsterHit(){},addBattleLog(){},updateUI(){},finishPlayerAction(){},
-        v141PlayCardEffect(){},document:bareDocument()
-    });
-    return {context,boss,ally,shields};
-}
-
-test("Extreme Emperor's three Light skills use the exact final values",()=>{
-    let state=emperorContext([]);
-    assert.equal(state.context.v152ResolveExtremeEmperorAction(0,"yuanXiangGuangMing"),true);
-    assert.equal(state.ally.hp,250);
-    assert.equal(state.ally.sp,65);
-
-    state=emperorContext([]);
-    assert.equal(state.context.v152ResolveExtremeEmperorAction(0,"yuanGuangShield"),true);
-    assert.deepEqual(state.shields,[["極帝天尊",100,2],["天兵天將",100,2]]);
-
-    state=emperorContext();
-    assert.equal(state.context.v152ResolveExtremeEmperorAction(0,"yuanZuBlessing",false),true);
-    assert.equal(state.ally.statusEffects.length,1);
-    assert.equal(state.ally.agility,120);
-    assert.equal(state.ally.v142AgilityBlessing.turnsLeft,2);
-
-    state=emperorContext();
-    assert.equal(state.context.v152ResolveExtremeEmperorAction(0,"yuanZuBlessing",true),true);
-    assert.equal(state.ally.statusEffects.length,0);
-    assert.equal(state.ally.agility,120);
+test("V152 no longer mutates monster loadouts or dispatches Extreme Emperor skills",()=>{
+    assert.doesNotMatch(source,/v152ResolveExtremeEmperorAction|function resolveExtremeEmperorAction/);
+    assert.doesNotMatch(source,/v141SupportSkillIds=Array\.from/);
+    assert.doesNotMatch(source,/monster\.skillIds=monster\.skillIds\.map|monster\.v141SupportSkillIds=monster\.v141SupportSkillIds\.filter/);
 });
 
 test("Frostbite no longer adds a stale Skill-command prohibition",()=>{
@@ -223,23 +195,22 @@ test("entering a map immediately runs configured auto recovery exactly once",()=
     assert.equal(abyssRecovered,2);
 });
 
-test("HP popups are reparented above the full-screen skill stage",()=>{
-    const popup={classList:classList(["damage-popup","hp-popup"]),style:{setProperty(){}},parentNode:null};
-    const appended=[];
-    const element={offsetWidth:76,popup:null,getBoundingClientRect(){ return {left:20,top:30,width:152,height:200}; },querySelectorAll(){ return this.popup?[this.popup]:[]; }};
-    const document=bareDocument({body:{appendChild(node){ appended.push(node); node.parentNode=this; }}});
-    const context=load({document,showDamagePopup(target){ target.popup=popup; }});
-    context.showDamagePopup(element,"HP-100","hp");
-    assert.equal(appended[0],popup);
-    assert.equal(popup.classList.contains("v152-top-damage"),true);
-    assert.match(css,/z-index:2147483646/);
+test("V152 no longer owns popup DOM relocation or font geometry",()=>{
+    assert.doesNotMatch(source,/previousShowDamagePopup|v152-top-damage/);
+    assert.doesNotMatch(css,/damage-popup\.v152-top-damage|z-index:2147483646/);
+    assert.match(feedbackOwner,/window\.FourSymbolsBattleFloatingFeedback=api/);
+    assert.match(feedbackOwner,/getUnitGeometry\(side,index\)/);
+    assert.match(feedbackOwner,/function freeLane\(context,metrics\)/);
+    assert.match(feedbackOwner,/context\.queue\.push\(request\)/);
+    assert.match(feedbackCss,/\.battle-floating-feedback/);
 });
+
 
 test("legacy abnormal formula owner is retired while Ice Arrow Rain Frostbite remains authoritative",()=>{
     assert.doesNotMatch(v140,/GENERAL_STATUS_COEFFICIENT|LOCKDOWN_STATUS_COEFFICIENT|Math\.sqrt\(power\)/);
     assert.doesNotMatch(v140,/calculateStatusEffectChance\s*=\s*function|rollHitChance\s*=\s*function/);
-    assert.match(v143,/rain\.frostbiteChance=50/);
-    assert.match(v143,/delete rain\.freezeChance/);
+    assert.match(fs.readFileSync("js/60-v173.64-skill-progression-rebalance.js","utf8"),/iceArrowRain:\{[^\n]*frostbiteChance:35,frostbiteDuration:2/);
+    assert.doesNotMatch(v143,/rain\.freezeChance\s*=/);
     assert.doesNotMatch(v143,/applyIceRainFreezeToTargets/);
 });
 
@@ -261,7 +232,7 @@ test("dungeon art, scrolling, five-slot nav and Abyss combat info are all wired"
         assert.equal(output,size,path);
         assert.match(css+source,new RegExp(path.replace("assets/","assets\\/")));
     });
-    assert.match(css,/grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/);
+    assert.match(fs.readFileSync("css/06-stage-v11-native-bottom-nav.css","utf8"),/grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/);
     assert.match(css,/overflow-y:auto !important/);
     assert.match(css,/\.v141-task-tracker[\s\S]*display:none !important/);
     assert.match(css,/\.v141-reward-toast[\s\S]*pointer-events:auto !important/);

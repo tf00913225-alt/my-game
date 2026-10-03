@@ -12,7 +12,7 @@ const vfxCss=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");
 const touchLock=fs.readFileSync("js/01-stage-v8-touch-lock.js","utf8");
 const relicCss=fs.readFileSync("css/55-team-relic-system.css","utf8");
 const compactModalCss=fs.readFileSync("css/37-v139-rested-experience.css","utf8");
-const dungeonNav=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");
+const dungeonNav=fs.readFileSync("js/04-stage-v11-native-bottom-nav-runtime.js","utf8");
 
 /* Boss objects share numeric enemy target identity and cardless presentation. */
 assert.match(bossRuntime,/unitKind:"boss-object"/);
@@ -26,10 +26,13 @@ assert.doesNotMatch(bossCss,/boss-mechanism-card|boss-mechanism-slot/);
    Keep these assertions whitespace-safe so formatting changes do not create a
    false CI failure while the actual combat behavior remains the same. */
 assert.match(bossRuntime,/const ELEMENT_ORDER=Object\.freeze\(\["fire","earth","water","wind"\]\)/);
-assert.match(bossRuntime,/if\(element==="fire"\)\{[\s\S]*?monster\.skillChance=Math\.min\(\.82,monster\.skillChance\+\.08\);[\s\S]*?monster\.critChance=[\s\S]*?\}/);
-assert.match(bossRuntime,/if\(element==="water"\)\{[\s\S]*?monster\.v141SupportSkillIds=compatibleSkillIds\(element,ELEMENTS\.water\.supports\);[\s\S]*?monster\.v141AbyssAi="support";[\s\S]*?\}/);
-assert.match(bossRuntime,/if\(element==="wind"\)\{[\s\S]*?monster\.evasion=[\s\S]*?monster\.agility=[\s\S]*?1\.12;[\s\S]*?\}/);
-assert.match(bossRuntime,/if\(element==="earth"\)\{[\s\S]*?monster\.defense=[\s\S]*?monster\.maxHP=[\s\S]*?1\.12\);[\s\S]*?monster\.hp=monster\.maxHP;[\s\S]*?\}/);
+// Element profiles do not own the common skill-frequency roll.
+assert.match(bossRuntime,/return value<=30\?\.65:value<=60\?\.70:value<=90\?\.75:\.80/);
+assert.doesNotMatch(bossRuntime,/monster\.skillChance=Math\.min\(\.82,numeric\(monster\.skillChance,\.48\)\+\.08\)/);
+assert.match(bossRuntime,/if\(element==="fire"\)\{[\s\S]*?monster\.vTowerCriticalBonusPercent=15;[\s\S]*?monster\.vTowerDirectDamageMultiplier=1\.15;/);
+assert.match(bossRuntime,/if\(element==="water"\)\{[\s\S]*?monster\.vTowerHealingMultiplier=1\.15;[\s\S]*?monster\.vTowerStatusAccuracyPercent=15;[\s\S]*?monster\.v141SupportSkillIds=compatibleSkillIds\(element,ELEMENTS\.water\.supports\);[\s\S]*?monster\.v141AbyssAi="support";/);
+assert.match(bossRuntime,/if\(element==="wind"\)\{[\s\S]*?monster\.evasion=[\s\S]*?\+15;[\s\S]*?monster\.agility=[\s\S]*?1\.15;/);
+assert.match(bossRuntime,/if\(element==="earth"\)\{[\s\S]*?monster\.defense=[\s\S]*?monster\.maxHP=[\s\S]*?1\.15\);[\s\S]*?monster\.hp=monster\.maxHP;/);
 
 /* Formal Sprite Sheets own the complete battle action. V142 is now timing-only:
    there is no hidden legacy stage to resurrect and no projectile fallback. */
@@ -43,7 +46,9 @@ assert.match(vfxCss,/@keyframes v143RasterCastFrames/);
 
 /* Relic scrolling must pass the global touch lock from both the body and the
    horizontal category strip. */
-assert.match(touchLock,/#homeFeatureModal\.team-relic-mode #homeFeatureModalBody, \.team-relic-tabs/);
+assert.match(touchLock,/data-scroll-owner="x\|y\|both"/);
+assert.doesNotMatch(touchLock,/allowedSelector|scrollWhitelist/);
+assert.match(fs.readFileSync("js/60-team-relic-system.js","utf8"),/team-relic-tabs" data-scroll-owner="x"/);
 assert.match(relicCss,/\.team-relic-tabs\{[^}]*touch-action:pan-x pan-y;/);
 assert.match(relicCss,/team-relic-modal \.home-feature-modal-box\.wide #homeFeatureModalBody\{[^}]*overflow-y:auto!important;[^}]*touch-action:pan-y!important;/);
 

@@ -30,6 +30,7 @@ function harness(initialReady){
             getItem(k){return store.has(k)?store.get(k):null;},
             setItem(k,v){store.set(k,String(v));}
         },
+        FourSymbolsStartupPolicy:{getState:()=>"READY"},
         saveGame(){saves++;}
     };
     context.window=context;

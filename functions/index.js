@@ -7,16 +7,67 @@ const {FieldValue,Timestamp,getFirestore}=require("firebase-admin/firestore");
 const {setGlobalOptions}=require("firebase-functions/v2");
 const {HttpsError,onCall}=require("firebase-functions/v2/https");
 const {createSessionAuthority}=require("./src/session-authority");
+const {createTrustedGrantLedger}=require("./src/trusted-grant-ledger");
+const {createCanonicalResourceCredit}=require("./src/canonical-resource-credit");
+const {createLegacyCandidateScreening}=require("./src/legacy-candidate-screening");
+const {createCanonicalRecoveryApproval}=require("./src/canonical-recovery-approval");
+const {createCanonicalCurrentRecovery}=require("./src/canonical-current-recovery");
+const {createCanonicalSourceWriter}=require("./src/canonical-source-writer");
+const {createCanonicalShopPurchase}=require("./src/canonical-shop-purchase");
+const {createCanonicalExpAllocation}=require("./src/canonical-exp-allocation");
+const {CloudPreferencesError,PREFERENCES_SCHEMA_VERSION,normalizePreferences}=require("./src/cloud-preferences");
+const {
+    CLOUD_SAVE_ENVELOPE_SCHEMA_VERSION,
+    CloudSaveEnvelopeError,
+    createEmptyEnvelope,
+    inspectExistingEnvelope,
+    nextRevision,
+    upgradeLegacyEnvelopePatch
+}=require("./src/cloud-save-envelope");
 
 const {
     CLOUD_SAVE_SCHEMA_VERSION,
     CloudSavePolicyError,
     normalizeClientVersion,
-    validateLegacySaveCandidate
+    validateLegacySaveCandidate,validateMigrationBackup
 }=require("./src/cloud-save-policy");
 
 initializeApp();
 const sessions=createSessionAuthority({db:getFirestore(),FieldValue,HttpsError});
+const trustedGrantLedger=createTrustedGrantLedger({
+    db:getFirestore(),FieldValue,HttpsError,runProtected:sessions.runProtected,
+    inspectExistingEnvelope,nextRevision
+});
+const canonicalResourceCredit=createCanonicalResourceCredit({
+    db:getFirestore(),FieldValue,HttpsError,runProtected:sessions.runProtected,
+    inspectExistingEnvelope,nextRevision
+});
+const legacyCandidateScreening=createLegacyCandidateScreening({
+    db:getFirestore(),HttpsError,runProtected:sessions.runProtected,
+    inspectExistingEnvelope,validateLegacySaveCandidate,validateMigrationBackup
+});
+const recoveryApprovalIssuer=createCanonicalRecoveryApproval({
+    db:getFirestore(),Timestamp,HttpsError,inspectExistingEnvelope
+});
+const currentRecovery=createCanonicalCurrentRecovery({
+    db:getFirestore(),FieldValue,HttpsError,runProtected:sessions.runProtected,
+    inspectExistingEnvelope,nextRevision
+});
+const initialCharacterWriter=createCanonicalSourceWriter({
+    db:getFirestore(),FieldValue,HttpsError,runProtected:sessions.runProtected,
+    inspectExistingEnvelope,nextRevision
+});
+const canonicalShopPurchase=createCanonicalShopPurchase({
+    db:getFirestore(),FieldValue,HttpsError,runProtected:sessions.runProtected,
+    inspectExistingEnvelope,nextRevision
+});
+const canonicalExpAllocation=createCanonicalExpAllocation({
+    db:getFirestore(),FieldValue,HttpsError,runProtected:sessions.runProtected,
+    inspectExistingEnvelope,nextRevision
+});
+// Existing UIDs may hold an original-phone save that was never submitted.
+// Only Auth accounts minted after this rollout may use the fresh-start path.
+const FRESH_CHARACTER_UID_CUTOFF_MS=Date.parse("2026-09-29T14:15:00Z");
 
 const REGION="us-central1";
 const PUBLIC_SAVE_PATH_SEGMENTS=["saves","current"];
@@ -57,7 +108,7 @@ function authProvider(request){
 
 function asHttpsError(error){
     if(error instanceof HttpsError){ return error; }
-    if(error instanceof CloudSavePolicyError){
+    if(error instanceof CloudSavePolicyError||error instanceof CloudSaveEnvelopeError||error instanceof CloudPreferencesError){
         return new HttpsError(error.code||"invalid-argument",error.message);
     }
     console.error("Trusted Firebase backend failed:",error);
@@ -109,6 +160,103 @@ exports.revokeGameSession=onCall(CALLABLE_OPTIONS,async request=>{
 });
 exports.protectedTest=onCall(CALLABLE_OPTIONS,async request=>{
     try{ return await sessions.protectedTest(await verifyGameIdentity(request)); }
+    catch(error){ throw asHttpsError(error); }
+});
+
+/* Recovery approval is an operator-only administrative operation. It does not
+ * require a player session and is never exposed through the game UI. */
+exports.issueCanonicalRecoveryApproval=onCall(CALLABLE_OPTIONS,async request=>{
+    request=await verifyGameIdentity(request);
+    try{ return await recoveryApprovalIssuer.issue(request); }
+    catch(error){ throw asHttpsError(error); }
+});
+/* An approved repair is executed only by the original UID's active session.
+ * The browser supplies no source records, revision contents or reward values. */
+exports.restoreCanonicalCurrent=onCall(CALLABLE_OPTIONS,async request=>{
+    request=await verifyGameIdentity(request);
+    try{
+        const data=request.data;
+        if(!data||typeof data!=="object"||Array.isArray(data)||
+           Object.keys(data).some(key=>!["uid","session","operationId","expectedRevision"].includes(key))){
+            throw new HttpsError("invalid-argument","Only a session and approved recovery operation are accepted.");
+        }
+        return await currentRecovery.restoreCurrent(request,{
+            operationId:data.operationId,expectedRevision:data.expectedRevision
+        });
+    }catch(error){ throw asHttpsError(error); }
+});
+exports.createInitialCanonicalCharacter=onCall(CALLABLE_OPTIONS,async request=>{
+    request=await verifyGameIdentity(request);
+    try{
+        const data=request.data;
+        if(!data||typeof data!=="object"||Array.isArray(data)||
+           Object.keys(data).some(key=>!["uid","session","selection","expectedRevision"].includes(key))){
+            throw new HttpsError("invalid-argument","Only creation choices and an expected revision are accepted.");
+        }
+        const user=await getAdminAuth().getUser(request.auth.uid);
+        const createdAt=Date.parse(user.metadata.creationTime);
+        if(!Number.isFinite(createdAt)||createdAt<FRESH_CHARACTER_UID_CUTOFF_MS){
+            throw new HttpsError("failed-precondition",
+                "Existing accounts require the original-device migration path.");
+        }
+        const operationId="initial-"+createHash("sha256")
+            .update(request.auth.uid,"utf8").digest("hex").slice(0,32);
+        return await initialCharacterWriter.commitInitialSources(request,{
+            operationId,expectedRevision:data.expectedRevision,selection:data.selection
+        },{requireCurrentReplay:true});
+    }catch(error){ throw asHttpsError(error); }
+});
+// No browser grant issuer exists. This reserves a server-issued entitlement
+// for a future authoritative character transaction without changing gameplay.
+exports.reserveTrustedGrant=onCall(CALLABLE_OPTIONS,async request=>{
+    try{ return await trustedGrantLedger.reserve(await verifyGameIdentity(request)); }
+    catch(error){ throw asHttpsError(error); }
+});
+// The request carries only identity, active session and expected revision.
+// This settles the server-clock check-in once, on an unpublished character.
+exports.claimDailyCheckin=onCall(CALLABLE_OPTIONS,async request=>{
+    try{ return await canonicalResourceCredit.claimDailyCheckin(await verifyGameIdentity(request)); }
+    catch(error){ throw asHttpsError(error); }
+});
+// A server-priced purchase changes only an unpublished canonical character.
+// The browser supplies an item ID and quantity, never price, gold or inventory.
+exports.purchaseCanonicalPotion=onCall(CALLABLE_OPTIONS,async request=>{
+    request=await verifyGameIdentity(request);
+    try{
+        const data=request.data;
+        if(!data||typeof data!=="object"||Array.isArray(data)||
+           Object.keys(data).some(key=>![
+               "uid","session","operationId","expectedRevision","itemId","quantity"
+           ].includes(key))){
+            throw new HttpsError("invalid-argument","Only a catalog purchase is accepted.");
+        }
+        return await canonicalShopPurchase.purchase(request,{
+            operationId:data.operationId,expectedRevision:data.expectedRevision,
+            itemId:data.itemId,quantity:data.quantity
+        });
+    }catch(error){ throw asHttpsError(error); }
+});
+// Spend only the server-owned EXP pool on the unpublished first character.
+// The client supplies no EXP amount, target level or resulting attributes.
+exports.allocateCanonicalSharedExp=onCall(CALLABLE_OPTIONS,async request=>{
+    request=await verifyGameIdentity(request);
+    try{
+        const data=request.data;
+        if(!data||typeof data!=="object"||Array.isArray(data)||
+           Object.keys(data).some(key=>![
+               "uid","session","operationId","expectedRevision"
+           ].includes(key))){
+            throw new HttpsError("invalid-argument","Only an EXP allocation operation is accepted.");
+        }
+        return await canonicalExpAllocation.allocateSharedExp(request,{
+            operationId:data.operationId,expectedRevision:data.expectedRevision
+        });
+    }catch(error){ throw asHttpsError(error); }
+});
+// Reads a private candidate and returns blockers; never approves or copies it
+// into the public cloud-save envelope.
+exports.screenLegacyMigrationCandidate=onCall(CALLABLE_OPTIONS,async request=>{
+    try{ return await legacyCandidateScreening.screen(await verifyGameIdentity(request)); }
     catch(error){ throw asHttpsError(error); }
 });
 
@@ -221,14 +369,10 @@ exports.bootstrapCloudSave=onCall(CALLABLE_OPTIONS,async(request)=>{
                 transaction.get(privateRef)
             ]);
 
-            if(saveSnapshot.exists){
-                const existingOwner=saveSnapshot.get("ownerUid");
-                if(existingOwner && existingOwner!==uid){
-                    throw new HttpsError("failed-precondition","Cloud-save owner mismatch.");
-                }
-            }
-
             const now=FieldValue.serverTimestamp();
+            const existingEnvelope=saveSnapshot.exists
+                ? inspectExistingEnvelope(saveSnapshot.data(),uid)
+                : null;
 
             transaction.set(userRef,{
                 schemaVersion:CLOUD_SAVE_SCHEMA_VERSION,
@@ -238,23 +382,9 @@ exports.bootstrapCloudSave=onCall(CALLABLE_OPTIONS,async(request)=>{
             },{merge:true});
 
             if(!saveSnapshot.exists){
-                transaction.set(saveRef,{
-                    schemaVersion:CLOUD_SAVE_SCHEMA_VERSION,
-                    ownerUid:uid,
-                    status:"awaiting_authoritative_migration",
-                    authoritativeStateReady:false,
-                    authoritativeStateVersion:0,
-                    serverRevision:0,
-                    migrationCandidateStatus:"none",
-                    createdAt:now,
-                    updatedAt:now
-                });
-            }else{
-                transaction.set(saveRef,{
-                    schemaVersion:CLOUD_SAVE_SCHEMA_VERSION,
-                    ownerUid:uid,
-                    updatedAt:now
-                },{merge:true});
+                transaction.create(saveRef,createEmptyEnvelope(uid,now));
+            }else if(existingEnvelope.kind==="legacy-phase1"){
+                transaction.update(saveRef,{...upgradeLegacyEnvelopePatch(),updatedAt:now});
             }
 
             transaction.set(privateRef,{
@@ -283,7 +413,11 @@ exports.bootstrapCloudSave=onCall(CALLABLE_OPTIONS,async(request)=>{
                     : false,
                 migrationCandidateStatus:saveSnapshot.exists
                     ? (saveSnapshot.get("migrationCandidateStatus")||"none")
-                    : "none"
+                    : "none",
+                envelopeSchemaVersion:CLOUD_SAVE_ENVELOPE_SCHEMA_VERSION,
+                serverRevision:existingEnvelope?.kind==="current"
+                    ? existingEnvelope.serverRevision
+                    : 1
             };
         });
 
@@ -306,7 +440,13 @@ exports.submitLegacyMigrationCandidate=onCall(CALLABLE_OPTIONS,async(request)=>{
         const data=request && request.data && typeof request.data==="object"
             ? request.data
             : {};
-        const candidate=validateLegacySaveCandidate(data.save);
+        if(Object.keys(data).some(key=>!["backup","clientVersion","expectedRevision","uid","session"].includes(key))){
+            throw new HttpsError("invalid-argument","Only a sealed backup may be submitted.");
+        }
+        if(!Number.isSafeInteger(data.expectedRevision)||data.expectedRevision<1){
+            throw new HttpsError("invalid-argument","Current expectedRevision is required.");
+        }
+        const candidate=validateMigrationBackup(data.backup,uid);
         const clientVersion=normalizeClientVersion(data.clientVersion);
         const db=getFirestore();
         const saveRef=publicSaveRef(db,uid);
@@ -327,19 +467,35 @@ exports.submitLegacyMigrationCandidate=onCall(CALLABLE_OPTIONS,async(request)=>{
                 );
             }
 
-            const existingOwner=saveSnapshot.get("ownerUid");
-            if(existingOwner && existingOwner!==uid){
-                throw new HttpsError("failed-precondition","Cloud-save owner mismatch.");
-            }
-
-            if(saveSnapshot.get("authoritativeStateReady")===true){
-                throw new HttpsError(
-                    "failed-precondition",
-                    "Authoritative cloud state already exists; legacy migration is closed."
-                );
+            const envelope=inspectExistingEnvelope(saveSnapshot.data(),uid);
+            if(!candidateSnapshot.exists && envelope.data.migrationCandidateStatus==="received"){
+                throw new HttpsError("data-loss","Migration candidate record is missing.");
             }
 
             if(candidateSnapshot.exists){
+                const previousRevision=candidateSnapshot.get("revision");
+                if(candidateSnapshot.get("ownerUid")!==uid ||
+                   candidateSnapshot.get("trusted")!==false ||
+                   !Number.isSafeInteger(previousRevision) || previousRevision<1 ||
+                   envelope.data.migrationCandidateRevision!==previousRevision ||
+                   envelope.data.migrationCandidateFingerprint!==candidateSnapshot.get("fingerprint")){
+                    throw new HttpsError("data-loss","Migration candidate metadata is inconsistent.");
+                }
+                if(candidateSnapshot.get("backup")){
+                    let stored;
+                    try{ stored=validateMigrationBackup(candidateSnapshot.get("backup"),uid); }
+                    catch(_){ throw new HttpsError("data-loss","Stored migration backup is corrupt."); }
+                    if(stored.backupSha256!==candidateSnapshot.get("backupSha256")||
+                       stored.fingerprint!==candidateSnapshot.get("fingerprint")){
+                        throw new HttpsError("data-loss","Stored migration backup differs from its candidate.");
+                    }
+                }
+                // An ambiguous response can be retried without replacing a
+                // candidate or consuming another server revision.
+                if(candidateSnapshot.get("backupSha256")===candidate.backupSha256&&
+                   candidateSnapshot.get("backupId")===candidate.backupId){
+                    return {revision:previousRevision,serverRevision:envelope.serverRevision,unchanged:true};
+                }
                 const submittedAt=candidateSnapshot.get("submittedAt");
                 const submittedMillis=submittedAt && typeof submittedAt.toMillis==="function"
                     ? submittedAt.toMillis()
@@ -352,13 +508,21 @@ exports.submitLegacyMigrationCandidate=onCall(CALLABLE_OPTIONS,async(request)=>{
                 }
             }
 
+            if(envelope.serverRevision!==data.expectedRevision){
+                throw new HttpsError("aborted","CLOUD_REVISION_CONFLICT",{code:"CLOUD_REVISION_CONFLICT"});
+            }
+
             const previousRevision=candidateSnapshot.exists
                 ? Number(candidateSnapshot.get("revision")||0)
                 : 0;
             const revision=Math.max(0,Math.floor(previousRevision))+1;
+            if(!Number.isSafeInteger(revision)){
+                throw new HttpsError("failed-precondition","Migration candidate revision is exhausted.");
+            }
+            const serverRevision=nextRevision(envelope);
             const now=FieldValue.serverTimestamp();
 
-            transaction.set(candidateRef,{
+            const candidateRecord={
                 schemaVersion:CLOUD_SAVE_SCHEMA_VERSION,
                 ownerUid:uid,
                 trustLevel:"client-migration-candidate",
@@ -369,10 +533,18 @@ exports.submitLegacyMigrationCandidate=onCall(CALLABLE_OPTIONS,async(request)=>{
                 clientVersion,
                 byteLength:candidate.byteLength,
                 fingerprint:candidate.fingerprint,
+                backupId:candidate.backupId,
+                backupSha256:candidate.backupSha256,
+                sidecarManifestSha256:candidate.sidecarManifestSha256,
+                backup:candidate.backup,
                 snapshot:candidate.snapshot,
                 submittedAt:now,
                 updatedAt:now
-            });
+            };
+            // Preserve each untrusted original separately. `latest` remains
+            // compatible with existing readers; it is only a moving pointer.
+            transaction.create(privateRef.collection("migrationCandidates").doc(String(revision)),candidateRecord);
+            transaction.set(candidateRef,candidateRecord);
 
             transaction.set(privateRef,{
                 migrationStatus:"candidate_received",
@@ -388,10 +560,11 @@ exports.submitLegacyMigrationCandidate=onCall(CALLABLE_OPTIONS,async(request)=>{
                 migrationCandidateFingerprint:candidate.fingerprint,
                 migrationCandidateGameSaveVersion:candidate.gameSaveVersion,
                 migrationCandidateByteLength:candidate.byteLength,
+                serverRevision,
                 updatedAt:now
             },{merge:true});
 
-            return {revision};
+            return {revision,serverRevision,unchanged:false};
         });
 
         return {
@@ -403,9 +576,49 @@ exports.submitLegacyMigrationCandidate=onCall(CALLABLE_OPTIONS,async(request)=>{
             byteLength:candidate.byteLength,
             gameSaveVersion:candidate.gameSaveVersion,
             clientVersion,
-            revision:result.revision
+            revision:result.revision,
+            serverRevision:result.serverRevision,
+            unchanged:result.unchanged
         };
     }catch(error){
         throw asHttpsError(error);
     }
+});
+
+/* Preferences are not authoritative gameplay. They never create a playable
+ * character, award resources, or alter the full-save migration status. */
+exports.saveCloudPreferences=onCall(CALLABLE_OPTIONS,async request=>{
+    request=await verifyGameIdentity(request);
+    const uid=requireUid(request);
+    try{
+        const preferences=normalizePreferences(request.data?.preferences);
+        const expectedRevision=request.data?.expectedRevision;
+        if(!Number.isSafeInteger(expectedRevision)||expectedRevision<1){
+            throw new CloudPreferencesError("An expected server revision is required.");
+        }
+        const saveRef=publicSaveRef(getFirestore(),uid);
+        const result=await sessions.runProtected(request,async transaction=>{
+            const snapshot=await transaction.get(saveRef);
+            if(!snapshot.exists){
+                throw new HttpsError("failed-precondition","Bootstrap the account before saving preferences.");
+            }
+            const envelope=inspectExistingEnvelope(snapshot.data(),uid);
+            if(envelope.kind!=="current"){
+                throw new HttpsError("failed-precondition","Upgrade the cloud-save envelope first.");
+            }
+            if(envelope.serverRevision!==expectedRevision){
+                throw new HttpsError("aborted","CLOUD_REVISION_CONFLICT",{code:"CLOUD_REVISION_CONFLICT"});
+            }
+            const unchanged=envelope.data.preferencesVersion===PREFERENCES_SCHEMA_VERSION&&
+                JSON.stringify(normalizePreferences(envelope.data.preferences))===JSON.stringify(preferences);
+            if(unchanged){ return {serverRevision:envelope.serverRevision,unchanged:true}; }
+            const serverRevision=nextRevision(envelope);
+            transaction.update(saveRef,{
+                preferencesVersion:PREFERENCES_SCHEMA_VERSION,preferences,serverRevision,
+                updatedAt:FieldValue.serverTimestamp()
+            });
+            return {serverRevision,unchanged:false};
+        });
+        return {ok:true,uid,preferencesVersion:PREFERENCES_SCHEMA_VERSION,...result};
+    }catch(error){ throw asHttpsError(error); }
 });

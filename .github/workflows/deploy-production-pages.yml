@@ -1,0 +1,128 @@
+name: Deploy production to GitHub Pages
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+
+concurrency:
+  group: production-github-pages
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    name: Deploy verified main to production
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    env:
+      EXPECTED_BRANCH: main
+      EXPECTED_COMMIT_SHA: ${{ github.event.workflow_run.head_sha }}
+      CI_BASE_SHA: ''
+
+    steps:
+      - name: Checkout exact verified main commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 1
+
+      - name: Use current Node.js LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Reject stale main before packaging
+        run: |
+          test "$(git ls-remote origin refs/heads/main | cut -f1)" = "$EXPECTED_COMMIT_SHA"
+
+      - name: Enforce release and synchronized build gates
+        run: |
+          node .github/scripts/release-gate.mjs ci
+          node .github/scripts/release-gate.mjs release-ready
+          npm run build:check
+
+      - name: Prepare shared immutable static artifact
+        run: node .github/scripts/prepare-static-deployment.mjs
+
+      - name: Configure GitHub Pages
+        id: pages
+        uses: actions/configure-pages@v5
+        # Source must already be GitHub Actions. Do not silently re-enable legacy.
+
+      - name: Require GitHub Actions Pages source
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const {data}=await github.rest.repos.getPages({...context.repo});
+            if(data.build_type !== 'workflow') core.setFailed('Pages Source must be GitHub Actions; legacy owner is not retired');
+
+      - name: Upload exact deployment artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _deploy/
+
+      - name: Reject stale main immediately before deployment
+        run: |
+          test "$(git ls-remote origin refs/heads/main | cut -f1)" = "$EXPECTED_COMMIT_SHA"
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Verify deployed manifest and player release resources
+        env:
+          DEPLOY_BASE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          verified=0
+          for attempt in 1 2 3 4 5 6; do
+            if node .github/scripts/verify-release-live.mjs; then
+              verified=1
+              break
+            fi
+            sleep 5
+          done
+          test "$verified" = 1
+          test "$(git ls-remote origin refs/heads/main | cut -f1)" = "$EXPECTED_COMMIT_SHA"
+
+      - name: Ensure CJK fonts for existing browser QA
+        run: |
+          if ! fc-list :lang=zh | rg -q .; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends fonts-noto-cjk
+          fi
+
+      - name: Verify production item, forge and battle runtime
+        env:
+          DEV_BASE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          node .github/scripts/run-responsive-item-browser-qa.mjs
+          node .github/scripts/run-forge-sockets-browser-qa.mjs
+          node .github/scripts/battle-layer-audio-live-qa.mjs
+          test "$(git ls-remote origin refs/heads/main | cut -f1)" = "$EXPECTED_COMMIT_SHA"
+
+      - name: Upload production verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-release-verification-${{ github.event.workflow_run.head_sha }}
+          path: |
+            release-manifest.final.json
+            artifacts/browser-qa/responsive-item/
+            artifacts/browser-qa/battle-layer-audio-live-qa.json
+            artifacts/browser-qa/battle-*.png
+          if-no-files-found: error
+          retention-days: 90

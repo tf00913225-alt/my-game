@@ -48,7 +48,9 @@ test("Firebase layer does not wrap or mutate the existing local save owner", ()=
     assert.equal(combined.includes("localStorage.setItem"), false);
     assert.equal(nonMigrationModules.includes("battle_full_version_save_v5"), false);
     assert.match(cloud, /LEGACY_LOCAL_SAVE_KEY\s*=\s*"battle_full_version_save_v5"/);
-    assert.match(cloud, /localStorage\.getItem\(LEGACY_LOCAL_SAVE_KEY\)/);
+    assert.doesNotMatch(cloud, /localStorage\.(?:getItem|setItem)/);
+    assert.match(cloud, /repository\.verifyMigrationBackup\(uid,options\.backupKey\)/);
+    assert.match(cloud, /repository\.createMigrationBackup\(uid\)/);
 });
 
 test("bootstrap exposes the narrow Firebase bridge and cloud-read events", ()=>{
@@ -57,6 +59,22 @@ test("bootstrap exposes the narrow Firebase bridge and cloud-read events", ()=>{
     assert.match(bootstrap, /four-symbols:firebase-cloud-save-read/);
     assert.match(bootstrap, /openAuth:\s*openFirebaseAuthUi/);
     assert.match(bootstrap, /cloudSaveWritePolicy:\s*CLOUD_SAVE_WRITE_POLICY/);
+    assert.match(bootstrap, /bootstrapCloudSave:bootstrapTrustedCloudSave/);
+});
+
+test("DEV account UI provides a tap-only Phase 2 envelope validation without local-save upload", ()=>{
+    assert.match(ui, /SESSION_TEST_HOSTS=new Set\(\["dev\.four-symbols-dev\.pages\.dev","localhost","127\.0\.0\.1"\]\)/);
+    assert.match(ui, /id="firebaseCloudEnvelopeTestButton"[^>]*>驗證雲端存檔骨架<\/button>/);
+    assert.match(ui, /const first=await api\.bootstrapCloudSave\(\)/);
+    assert.match(ui, /const second=await api\.bootstrapCloudSave\(\)/);
+    assert.match(ui, /const cloud=await api\.resolveCloudSave\(user\)/);
+    assert.match(ui, /data\.schemaVersion===2/);
+    assert.match(ui, /first\.serverRevision===revision&&second\.serverRevision===revision/);
+    assert.match(ui, /data\.authoritativeStateReady===false&&!hasGameplayPayload/);
+    const envelopeOnly=ui.slice(ui.indexOf("async function testCloudSaveEnvelope(){"),ui.indexOf("async function testCloudPreferences(){"));
+    assert.doesNotMatch(envelopeOnly, /submitLegacyMigrationCandidate/);
+    assert.doesNotMatch(ui, /localStorage/);
+    assert.match(ui, /cloudEnvelopeTestButton\.addEventListener\("click"/);
 });
 
 test("authentication UI exposes Google, email and Firebase anonymous identity while Facebook remains backend-only", ()=>{
@@ -95,7 +113,8 @@ test("authentication UI exposes Google, email and Firebase anonymous identity wh
     assert.match(css, /\.firebase-auth-field input\{[\s\S]*min-height:44px/);
     assert.match(css, /@media \(max-width:320px\)/);
     assert.doesNotMatch(css, /@media \(max-width:360px\)[\s\S]*grid-template-columns:1fr/);
-    assert.match(touch, /\.firebase-auth-dialog/);
+    assert.match(touch, /data-scroll-owner="x\|y\|both"/);
+    assert.doesNotMatch(touch, /allowedSelector|scrollWhitelist/);
 });
 
 test("retained Facebook auth helper stays in the Firebase popup flow if re-enabled", ()=>{

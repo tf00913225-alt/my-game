@@ -97,6 +97,16 @@ function baseRuntime(){
     assert.equal(c.FourSymbolsAdventure.getNodeStatus("n04b_gate"),"available","unchosen branch becomes backtrackable after chapter clear");
 })();
 
+(function testPlannedChapterSlotsNeverBecomeASecondStateSource(){
+    const c=baseRuntime();
+    runScript(c,"js/adventure/adventure-content-v1-20260915.js");
+    runScript(c,"js/adventure/adventure-runtime-v1-20260915.js");
+    assert.equal(c.FourSymbolsAdventureContent.chapters.chapter_v1.mainProgressNodeCount,20);
+    assert.equal(c.FourSymbolsAdventure.getNodeStatus("n11_reserved"),"planned");
+    assert.equal(c.FourSymbolsAdventure.selectNode("n11_reserved"),true,"planned nodes remain selectable for their canonical detail sheet");
+    assert.equal(c.FourSymbolsAdventure.activateSelectedNode(),false,"planned nodes cannot create a parallel progression path");
+})();
+
 (function testObjectiveUsesUnlockedZonesOnly(){
     const c=baseRuntime();
     c.player.level=20;
@@ -228,9 +238,22 @@ function baseRuntime(){
     assert.match(css,/#adventurePage\.adventure-page\{[\s\S]*?display:flex;[\s\S]*?flex-direction:column;/,"Adventure page must size its view from the actual header height");
     assert.match(css,/\.adventure-view\{[^}]*flex:1 1 auto;[^}]*min-height:0;[^}]*overflow-y:auto;/,"Adventure map must keep one flexible vertical scroll owner");
     assert.doesNotMatch(css,/\.adventure-view\{[^}]*height:calc\(/,"Adventure view must not reserve a guessed header height");
-    assert.match(touchLock,/\.adventure-view/,"Adventure's existing view scroll owner must pass the stage touch-lock whitelist");
+    assert.match(touchLock,/data-scroll-owner="x\|y\|both"/,"Touch owner must use the declarative scroll-owner contract");
+    assert.doesNotMatch(touchLock,/allowedSelector|scrollWhitelist/,"Adventure must not restore a selector whitelist");
     assert.equal((entryCss.match(/pointer-events:none/g)||[]).length>=1,true);
     assert.equal((css.match(/pointer-events:none/g)||[]).length>=1,true);
+
+    const content=read("js/adventure/adventure-content-v1-20260915.js");
+    assert.match(content,/nodeCapacity:20/,"Chapter data must explicitly support twenty progression nodes");
+    assert.match(content,/onboarding:/,"Onboarding belongs to Chapter Node data, not a second map runtime");
+    assert.match(content,/routes:\[/,"Route geometry must be owned by Chapter Data");
+    assert.match(content,/availability:"planned"/,"Future Chapter slots must be explicit data, never renderer hard-code");
+    assert.match(ui,/function nodeDetailSheet\(view\)/,"Map details must use one canonical Bottom Sheet renderer");
+    assert.match(ui,/function mapRoadSvg\(view\)/,"Routes must render from Chapter Data");
+    assert.doesNotMatch(ui,/const mainA=.*M194 1613/,"Legacy hard-coded map route geometry must retire");
+    assert.match(ui,/activateSelectedNode/,"Node selection and node activation must remain separate interactions");
+    assert.match(css,/\.adventure-route-completed/);
+    assert.match(css,/\.adventure-node-sheet/);
 })();
 
 console.log("✓ adventure node system V1 targeted regressions");

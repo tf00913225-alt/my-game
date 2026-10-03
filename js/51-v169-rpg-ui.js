@@ -94,6 +94,7 @@
                 (kind==="confirm"?"確定":"知道了")
             ),
             cancelText:String(supplied.cancelText||"返回"),
+            primary:supplied.primary===true,
             tone:supplied.danger?"danger":String(supplied.tone||"normal")
         };
     }
@@ -114,7 +115,7 @@
         elements.cancelButton.textContent=options.cancelText;
         elements.confirmButton.textContent=options.confirmText;
         elements.cancelButton.hidden=activeDialog.kind!=="confirm";
-        elements.confirmButton.classList.toggle("primary",options.tone==="danger");
+        elements.confirmButton.classList.toggle("primary",options.primary||options.tone==="danger");
         elements.confirmButton.classList.toggle("danger",options.tone==="danger");
 
         elements.layer.classList.add("show");
@@ -382,57 +383,4 @@
 
     /* equipment-progression follows this source inside gameplay-core's fixed execution order. */
 
-    /* ----- Dungeon backpack: reuse the one inventory DOM above the map. ----- */
-    if(typeof openMapInventoryOverlay==="function"){
-        const previousOpenMapInventoryOverlay=openMapInventoryOverlay;
-        openMapInventoryOverlay=function(){
-            const dungeonPage=document.getElementById("dungeonPage");
-            const mapPage=document.getElementById("mapPage");
-            const inventoryPage=document.getElementById("inventoryPage");
-            const fromDungeon=!!(
-                dungeonPage&&
-                dungeonPage.classList.contains("active")
-            );
-
-            if(!fromDungeon){
-                if(inventoryPage){
-                    inventoryPage.classList.remove("v169-dungeon-inventory-overlay");
-                }
-                return previousOpenMapInventoryOverlay.apply(this,arguments);
-            }
-
-            if(typeof battleActive!=="undefined"&&battleActive){ return; }
-            const mapWasActive=!!(
-                mapPage&&
-                mapPage.classList.contains("active")
-            );
-            if(mapPage&&!mapWasActive){ mapPage.classList.add("active"); }
-
-            let result;
-            try{
-                result=previousOpenMapInventoryOverlay.apply(this,arguments);
-            }finally{
-                if(mapPage&&!mapWasActive){ mapPage.classList.remove("active"); }
-            }
-
-            if(
-                inventoryPage&&
-                inventoryPage.classList.contains("map-inventory-overlay-open")
-            ){
-                inventoryPage.classList.add("v169-dungeon-inventory-overlay");
-            }
-            return result;
-        };
-    }
-
-    if(typeof closeMapInventoryOverlay==="function"){
-        const previousCloseMapInventoryOverlay=closeMapInventoryOverlay;
-        closeMapInventoryOverlay=function(){
-            const inventoryPage=document.getElementById("inventoryPage");
-            if(inventoryPage){
-                inventoryPage.classList.remove("v169-dungeon-inventory-overlay");
-            }
-            return previousCloseMapInventoryOverlay.apply(this,arguments);
-        };
-    }
 })();

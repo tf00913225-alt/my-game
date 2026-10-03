@@ -21,10 +21,10 @@
 
     const ELEMENT_ORDER=Object.freeze(["fire","earth","water","wind"]);
     const ELEMENTS=Object.freeze({
-        fire:Object.freeze({label:"火",style:"高爆發・爆擊・燃燒・追擊",color:"#c85a3d",glow:"rgba(200,90,61,.3)",skills:Object.freeze(["fireRocket","explosiveFlurry","dragonSlash"]),supports:Object.freeze(["rage"])}),
-        earth:Object.freeze({label:"土",style:"防禦・護盾・反傷・破防",color:"#a77a46",glow:"rgba(167,122,70,.3)",skills:Object.freeze(["stoneSlash","flyingSandStrike","dustStorm"]),supports:Object.freeze(["rockWall"])}),
-        water:Object.freeze({label:"水",style:"回復・凍傷・控制・消耗",color:"#4f83bd",glow:"rgba(79,131,189,.3)",skills:Object.freeze(["waterKnife","frostPunch","floodBeast"]),supports:Object.freeze(["healSpell"])}),
-        wind:Object.freeze({label:"風",style:"閃避・命中干擾・暈眩・速度",color:"#4a9d78",glow:"rgba(74,157,120,.3)",skills:Object.freeze(["stormFlurry","windCrossSlash","windHowlLightning"]),supports:Object.freeze(["dodgeSkill"])} )
+        fire:Object.freeze({label:"火",style:"爆擊 +15%、造成傷害 +15%",color:"#c85a3d",glow:"rgba(200,90,61,.3)",skills:Object.freeze(["fireRocket","explosiveFlurry","dragonSlash"]),supports:Object.freeze(["rage"])}),
+        earth:Object.freeze({label:"土",style:"防禦 +15%、最大生命 +15%",color:"#a77a46",glow:"rgba(167,122,70,.3)",skills:Object.freeze(["stoneSlash","flyingSandStrike","dustStorm"]),supports:Object.freeze(["rockWall"])}),
+        water:Object.freeze({label:"水",style:"偏治療／輔助／冰封，治療 +15%、異常命中 +15%",color:"#4f83bd",glow:"rgba(79,131,189,.3)",skills:Object.freeze(["waterKnife","frostPunch","floodBeast"]),supports:Object.freeze(["healSpell"])}),
+        wind:Object.freeze({label:"風",style:"閃避 +15%、速度 +15%",color:"#4a9d78",glow:"rgba(74,157,120,.3)",skills:Object.freeze(["stormFlurry","windCrossSlash","windHowlLightning"]),supports:Object.freeze(["dodgeSkill"])} )
     });
 
     /*
@@ -249,10 +249,10 @@
         if(!content){ return; }
         const tower=state.tower,element=ELEMENTS[tower.element];
         content.innerHTML=
-            '<button type="button" class="gameplay-mode-card boss" onclick="vGameplayOpenBoss()"><span class="gameplay-mode-copy"><h3>BOSS</h3><p>個人 BOSS・世界 BOSS</p><span class="gameplay-mode-status">'+escapeHtml(bossHubSummary())+'</span></span><span class="gameplay-mode-seal">戰</span></button>'+
-            '<button type="button" class="gameplay-mode-card tower" onclick="vGameplayOpenTower()"><span class="gameplay-mode-copy"><h3>四象塔</h3><p>本週試煉：'+escapeHtml(element.label)+'元素</p><span class="gameplay-mode-status">目前最高樓層：'+tower.highestThisWeek+' / 100</span></span><span class="gameplay-mode-seal">塔</span></button>'+
-            '<button type="button" class="gameplay-mode-card abyss" onclick="vGameplayOpenAbyss()"><span class="gameplay-mode-copy"><h3>深淵</h3><p>永久高難挑戰</p><span class="gameplay-mode-status">'+escapeHtml(abyssSummary())+'</span></span><span class="gameplay-mode-seal">淵</span></button>'+
-            '<div class="gameplay-mode-card coming-soon" aria-disabled="true"><span class="gameplay-mode-copy"><h3>更多玩法</h3><p>新的特殊戰鬥將統一收錄於此</p><span class="gameplay-mode-status">尚未開放</span></span><span class="gameplay-mode-seal">待</span></div>';
+            '<button type="button" class="gameplay-mode-card boss" onclick="vGameplayOpenBoss()"><span class="gameplay-mode-copy"><h3>BOSS</h3><p>個人 BOSS・世界 BOSS</p><span class="gameplay-mode-status">'+escapeHtml(bossHubSummary())+'</span></span></button>'+
+            '<button type="button" class="gameplay-mode-card tower" onclick="vGameplayOpenTower()"><span class="gameplay-mode-copy"><h3>四象塔</h3><p>本週試煉：'+escapeHtml(element.label)+'元素</p><span class="gameplay-mode-status">目前最高樓層：'+tower.highestThisWeek+' / 100</span></span></button>'+
+            '<button type="button" class="gameplay-mode-card abyss" onclick="vGameplayOpenAbyss()"><span class="gameplay-mode-copy"><h3>深淵</h3><p>永久高難挑戰</p><span class="gameplay-mode-status">'+escapeHtml(abyssSummary())+'</span></button>'+
+            '<div class="gameplay-mode-card coming-soon" aria-disabled="true"><span class="gameplay-mode-copy"><h3>更多玩法</h3><p>新的特殊戰鬥將統一收錄於此</p><span class="gameplay-mode-status">尚未開放</span></span></div>';
     }
 
     function bossListMarkup(type){
@@ -415,7 +415,8 @@
         const tower=state.tower,element=ELEMENTS[tower.element],level=highestCharacterLevel();
         const next=Math.min(TOWER_FLOORS,tower.completedFloor+1);
         content.innerHTML='<div class="tower-home">'+towerChoiceMarkup()+
-            '<section class="tower-element-hero" style="--tower-color:'+element.color+';--tower-glow:'+element.glow+'"><div><small>本週元素試煉</small><h3>'+escapeHtml(element.label)+'元素</h3><strong>'+tower.completedFloor+' / 100</strong><p>'+escapeHtml(element.style)+'</p></div></section>'+
+            '<section class="tower-element-hero" data-tower-element="'+escapeHtml(tower.element)+'" style="--tower-color:'+element.color+';--tower-glow:'+element.glow+'"><div><small>本週元素試煉</small><h3>'+escapeHtml(element.label)+'元素</h3><strong>'+tower.completedFloor+' / 100</strong><p>'+escapeHtml(element.style)+'</p></div></section>'+
+            '<p class="tower-challenge-rules">每層固定 10 名敵人。敵方技能施放率隨樓層提升：1～30 層 65%、31～60 層 70%、61～90 層 75%、91～100 層 80%。</p>'+
             '<div class="tower-summary-grid"><div><small>本週最高</small><b>'+tower.highestThisWeek+' 層</b></div><div><small>歷史最高</small><b>'+tower.historicalHighest+' 層</b></div><div><small>下一層</small><b>第 '+next+' 層</b></div><div><small>下一重要獎勵</small><b>第 '+nextTowerRewardFloor(tower.completedFloor)+' 層</b></div></div>'+
             (level<TOWER_UNLOCK_LEVEL?'<div class="boss-overview-line"><span>四象塔於 Lv30 開放</span><b>目前 Lv.'+level+'</b></div>':'')+
             '<label class="tower-auto-advance"><input type="checkbox" '+(towerAutoAdvanceEnabled?'checked ':'')+(level<TOWER_UNLOCK_LEVEL||tower.pendingRelicChoice||tower.completedFloor>=TOWER_FLOORS?'disabled ':'')+'onchange="vGameplayToggleTowerAutoAdvance(this.checked)"><span>自動挑戰下一層</span></label>'+
@@ -432,7 +433,7 @@
     function compatibleSkillIds(element,ids){
         return (ids||[]).filter(id=>{
             const skill=typeof skillDatabase!=="undefined"&&skillDatabase?skillDatabase[id]:null;
-            return !skill||!skill.element||skill.element===element;
+            return !!(skill&&skill.element&&skill.element===element);
         });
     }
     function configureBossSkills(monster,element,stage){
@@ -452,7 +453,7 @@
     }
     function buildBossMonster(definition,options){
         const profile=options||{};
-        const mode=profile.mode||(String(definition.id||"").indexOf("world-")===0?"world":(String(definition.id||"").indexOf("tower-")===0?"tower":"personal"));
+        const mode=profile.mode||(String(definition.id||"").indexOf("world-")===0?"world":"personal");
         const balance=bossBalanceProfile(definition.level,mode,profile.stage);
         const monster=buildBaseMonster(definition.name,definition.level,definition.element,"boss");
         const hpMultiplier=balance.hpMultiplier*numeric(profile.hpFactor,1);
@@ -483,6 +484,17 @@
             return monster;
         });
     }
+    const FIRE_TOWER_PORTRAIT_PLAN=Object.freeze({"normalByBand":[["MON_FIRE_NORMAL_001","MON_FIRE_NORMAL_002"],["MON_FIRE_NORMAL_004","MON_FIRE_NORMAL_006"],["MON_FIRE_NORMAL_008","MON_FIRE_NORMAL_010"],["MON_FIRE_NORMAL_001","MON_FIRE_NORMAL_004"],["MON_FIRE_NORMAL_002","MON_FIRE_NORMAL_008"],["MON_FIRE_NORMAL_006","MON_FIRE_NORMAL_010"],["MON_FIRE_NORMAL_001","MON_FIRE_NORMAL_008"],["MON_FIRE_NORMAL_002","MON_FIRE_NORMAL_004"],["MON_FIRE_NORMAL_006","MON_FIRE_NORMAL_008"],["MON_FIRE_NORMAL_010","MON_FIRE_NORMAL_001"]],"eliteByBand":[["MON_FIRE_ELITE_001","MON_FIRE_ELITE_002"],["MON_FIRE_ELITE_004","MON_FIRE_ELITE_008"],["MON_FIRE_ELITE_009","MON_FIRE_ELITE_001"],["MON_FIRE_ELITE_002","MON_FIRE_ELITE_004"],["MON_FIRE_ELITE_008","MON_FIRE_ELITE_009"],["MON_FIRE_ELITE_001","MON_FIRE_ELITE_004"],["MON_FIRE_ELITE_002","MON_FIRE_ELITE_008"],["MON_FIRE_ELITE_009","MON_FIRE_ELITE_001"],["MON_FIRE_ELITE_004","MON_FIRE_ELITE_009"],["MON_FIRE_ELITE_008","MON_FIRE_ELITE_002"]],"bossByFloor":{"10":"MON_FIRE_MINIBOSS_001","20":"MON_FIRE_MINIBOSS_002","30":"MON_FIRE_MINIBOSS_003","40":"MON_FIRE_MINIBOSS_004","50":"MON_FIRE_MINIBOSS_005","60":"MON_FIRE_MINIBOSS_006","70":"MON_FIRE_MINIBOSS_007","80":"MON_FIRE_MINIBOSS_008","90":"MON_FIRE_MINIBOSS_009","100":"MON_FIRE_MINIBOSS_011"}});
+    const WIND_TOWER_PORTRAIT_PLAN=Object.freeze({"normalByBand":[["MON_WIND_NORMAL_001","MON_WIND_NORMAL_002"],["MON_WIND_NORMAL_003","MON_WIND_NORMAL_004"],["MON_WIND_NORMAL_005","MON_WIND_NORMAL_006"],["MON_WIND_NORMAL_007","MON_WIND_NORMAL_008"],["MON_WIND_NORMAL_009","MON_WIND_NORMAL_010"],["MON_WIND_NORMAL_011","MON_WIND_NORMAL_012"],["MON_WIND_NORMAL_013","MON_WIND_NORMAL_014"],["MON_WIND_NORMAL_015","MON_WIND_NORMAL_016"],["MON_WIND_NORMAL_017","MON_WIND_NORMAL_018"],["MON_WIND_NORMAL_019","MON_WIND_NORMAL_020"]],"eliteByBand":[["MON_WIND_ELITE_001"],["MON_WIND_ELITE_002"],["MON_WIND_ELITE_003"],["MON_WIND_ELITE_004"],["MON_WIND_ELITE_005"],["MON_WIND_ELITE_006"],["MON_WIND_ELITE_007"],["MON_WIND_ELITE_008"],["MON_WIND_ELITE_009"],["MON_WIND_ELITE_010"]],"bossByFloor":{"10":"MON_WIND_MINIBOSS_001","20":"MON_WIND_MINIBOSS_002","30":"MON_WIND_MINIBOSS_003","40":"MON_WIND_MINIBOSS_004","50":"MON_WIND_MINIBOSS_005","60":"MON_WIND_MINIBOSS_006","70":"MON_WIND_MINIBOSS_007","80":"MON_WIND_MINIBOSS_008","90":"MON_WIND_MINIBOSS_009","100":"MON_WIND_MINIBOSS_010"}});
+    const EARTH_TOWER_PORTRAIT_PLAN=Object.freeze({"normalByBand":[["MON_EARTH_NORMAL_001"],["MON_EARTH_NORMAL_002"],["MON_EARTH_NORMAL_003"],["MON_EARTH_NORMAL_004"],["MON_EARTH_NORMAL_005"],["MON_EARTH_NORMAL_006"],["MON_EARTH_NORMAL_007"],["MON_EARTH_NORMAL_008"],["MON_EARTH_NORMAL_009"],["MON_EARTH_NORMAL_010"]],"eliteByBand":[["MON_EARTH_ELITE_001"],["MON_EARTH_ELITE_002"],["MON_EARTH_ELITE_003"],["MON_EARTH_ELITE_004"],["MON_EARTH_ELITE_005"],["MON_EARTH_ELITE_006"],["MON_EARTH_ELITE_007"],["MON_EARTH_ELITE_008"],["MON_EARTH_ELITE_009"],["MON_EARTH_ELITE_010"]],"bossByFloor":{"10":"MON_EARTH_MINIBOSS_001","20":"MON_EARTH_MINIBOSS_002","30":"MON_EARTH_MINIBOSS_003","40":"MON_EARTH_MINIBOSS_004","50":"MON_EARTH_MINIBOSS_005","60":"MON_EARTH_MINIBOSS_006","70":"MON_EARTH_MINIBOSS_007","80":"MON_EARTH_MINIBOSS_008","90":"MON_EARTH_MINIBOSS_009"}});
+    function towerPortraitAssetId(element,floor,role,slot){
+        const plan=({fire:FIRE_TOWER_PORTRAIT_PLAN,wind:WIND_TOWER_PORTRAIT_PLAN,earth:EARTH_TOWER_PORTRAIT_PLAN})[String(element||"").toLowerCase()];
+        if(!plan){ return null; }
+        const band=Math.max(0,Math.min(9,Math.floor((Number(floor)-1)/10)));
+        if(role==="boss"){ return plan.bossByFloor[String(floor)]||null; }
+        const pool=role==="elite"?plan.eliteByBand[band]:plan.normalByBand[band];
+        return pool&&pool.length?pool[Math.max(0,Number(slot)||0)%pool.length]:null;
+    }
     function towerBossName(element,floor){
         const high=floor>=80;
         const map={
@@ -494,44 +506,115 @@
         return map[element]||"四象尊";
     }
     function towerMonsterLevel(floor){ return clamp(Math.round(29+floor*.71),30,100); }
-    function towerObjectPlan(floor){
-        if(floor===100){ return [{round:2,type:"shield"},{round:4,type:"charge"},{round:7,type:"heal"},{hpBelow:.3,type:"amplify"}]; }
-        if(floor>=70&&floor%10===0){ return [{round:2,type:"heal"},{round:5,type:"amplify"}]; }
-        if(floor>=50&&floor%10===0){ return [{round:2,type:"shield"},{round:5,type:"amplify"}]; }
-        if(floor>=40&&floor%10===0){ return [{round:2,type:"shield"}]; }
-        if(floor>=30&&floor%10===0){ return [{round:2,type:"charge"}]; }
-        if(floor%10===0){ return [{round:3,type:"charge"}]; }
-        return [];
+    function towerSkillChance(floor){
+        const value=clamp(Math.floor(numeric(floor,1)),1,TOWER_FLOORS);
+        return value<=30?.65:value<=60?.70:value<=90?.75:.80;
     }
-    function towerSummonPlan(floor){
-        if(floor===100){ return {hpBelow:.6}; }
-        if(floor>=70&&floor%10===0){ return {round:4}; }
-        if(floor>=50&&floor%10===0){ return {hpBelow:.5}; }
-        return null;
+    function applyTowerChallengeProfile(monster){
+        if(!monster||monster.vGameplayTower!==true||monster.canAct===false){ return monster; }
+        monster.skillChance=towerSkillChance(monster.vGameplayTowerFloor);
+        return monster;
+    }
+    function applyTowerElementProfile(monster,element){
+        if(!monster||monster.vGameplayTower!==true||monster.canAct===false||monster.vTowerElementProfileVersion===1){ return monster; }
+        monster.vTowerElementProfileVersion=1;
+        if(element==="fire"){
+            monster.vTowerCriticalBonusPercent=15;
+            monster.vTowerDirectDamageMultiplier=1.15;
+        }
+        if(element==="water"){
+            monster.vTowerHealingMultiplier=1.15;
+            monster.vTowerStatusAccuracyPercent=15;
+            monster.skillIds=Array.from(new Set(monster.skillIds.concat(compatibleSkillIds(element,["freeze"]))));
+            monster.v144LegalSkillPool=monster.skillIds.slice();
+            monster.v141SupportSkillIds=compatibleSkillIds(element,ELEMENTS.water.supports);
+            if(monster.v141SupportSkillIds.length){ monster.v141AbyssAi="support"; }
+        }
+        if(element==="wind"){
+            monster.evasion=numeric(monster.evasion,0)+15;
+            monster.agility=numeric(monster.agility,numeric(monster.level,1)*1.2)*1.15;
+        }
+        if(element==="earth"){
+            monster.defense=Math.round(numeric(monster.defense,1)*1.15);
+            monster.maxHP=Math.round(numeric(monster.maxHP,1)*1.15);
+            monster.hp=monster.maxHP;
+        }
+        return monster;
+    }
+    function bindTowerMonsterIdentity(monster){
+        if(!monster){ return monster; }
+        if(typeof window.v154BindMonsterPortraitIdentity==="function"){
+            window.v154BindMonsterPortraitIdentity(monster);
+        }
+        // The portrait Registry is the single name owner for tower assets.
+        // Battle UI reads monster.name, so promote the resolved displayName
+        // only after the Registry has resolved the explicit portraitKey.
+        if(monster.portraitKey&&monster.displayName){
+            monster.name=monster.displayName;
+        }
+        return monster;
+    }
+
+    function buildTowerTroop(level,element,rank,floor,portraitSlot){
+        const monster=buildBaseMonster("天兵天將",level,element,rank||"regular");
+        monster.vGameplayTower=true;
+        monster.vGameplayTowerFloor=floor;
+        monster.vGameplayTowerRole=rank==="elite"?"elite":"regular";
+        monster.portraitKey=towerPortraitAssetId(element,floor,monster.vGameplayTowerRole,portraitSlot);
+        bindTowerMonsterIdentity(monster);
+        configureBossSkills(monster,element,Math.ceil(floor/30));
+        applyTowerElementProfile(monster,element);
+        applyTowerChallengeProfile(monster);
+        return monster;
+    }
+    function buildTowerBossMonster(definition,floor){
+        const stage=floor===100?4:(floor>=70?3:(floor>=40?2:1));
+        const balance=bossBalanceProfile(definition.level,"tower",stage);
+        const monster=buildBaseMonster(definition.name,definition.level,definition.element,"boss");
+        monster.maxHP=Math.max(1,Math.round(numeric(monster.maxHP,1)*balance.hpMultiplier));
+        monster.hp=monster.maxHP;
+        monster.attack=Math.max(1,Math.round(numeric(monster.attack,1)*balance.attackMultiplier));
+        monster.magicAttack=Math.max(1,Math.round(numeric(monster.magicAttack,monster.attack)*balance.attackMultiplier));
+        monster.unitKind="tower-boss";
+        monster.vGameplayTower=true;
+        monster.vGameplayTowerBoss=true;
+        monster.vGameplayTowerFloor=floor;
+        monster.vGameplayTowerRole="boss";
+        monster.vGameplayBossId=definition.id;
+        monster.portraitKey=towerPortraitAssetId(definition.element,floor,"boss",0);
+        bindTowerMonsterIdentity(monster);
+        monster.vGameplayPortraitSizeClass="standard";
+        configureBossSkills(monster,definition.element,stage);
+        applyTowerElementProfile(monster,definition.element);
+        applyTowerChallengeProfile(monster);
+        return monster;
     }
     function buildTowerRoster(floor){
         const element=state.tower.element,level=towerMonsterLevel(floor);
+        const special=floor%5===0;
+        if(!special){
+            return Array.from({length:10},(_,index)=>buildTowerTroop(level,element,"regular",floor,index));
+        }
+        const roster=[];
         if(floor%10===0){
             const definition={id:"tower-"+floor,name:towerBossName(element,floor),level:level,element:element};
-            const stage=floor===100?4:(floor>=70?3:(floor>=40?2:1));
-            const boss=buildBossMonster(definition,{stage:stage,mode:"tower"});
-            return [boss];
+            roster.push(buildTowerBossMonster(definition,floor));
         }
-        const elite=floor%5===0,count=elite?2:Math.min(4,2+Math.floor(floor/35));
-        return Array.from({length:count},()=>{
-            const monster=buildBaseMonster("天兵天將",level,element,elite?"elite":"regular");
-            monster.vGameplayTower=true;monster.vGameplayTowerFloor=floor;
-            configureBossSkills(monster,element,Math.ceil(floor/30));
-            if(element==="fire"){ monster.skillChance=Math.min(.82,monster.skillChance+.08);monster.critChance=numeric(monster.critChance,5)+8; }
-            if(element==="water"){ monster.v141SupportSkillIds=compatibleSkillIds(element,ELEMENTS.water.supports);monster.v141AbyssAi="support"; }
-            if(element==="wind"){ monster.evasion=numeric(monster.evasion,0)+8;monster.agility=numeric(monster.agility,1)*1.12; }
-            if(element==="earth"){ monster.defense=Math.round(numeric(monster.defense,1)*1.18);monster.maxHP=Math.round(numeric(monster.maxHP,1)*1.12);monster.hp=monster.maxHP; }
-            return monster;
-        });
+        const eliteCount=2;
+        for(let i=0;i<eliteCount;i++){
+            roster.push(buildTowerTroop(level,element,"elite",floor,i));
+        }
+        while(roster.length<10){
+            roster.push(buildTowerTroop(level,element,"regular",floor,roster.length));
+        }
+        return roster;
     }
 
+    function isLargeBossContext(){
+        return !!(activeBattleContext&&(activeBattleContext.mode==="personal"||activeBattleContext.mode==="world"));
+    }
     function activeBoss(){
-        return activeBattleContext&&activeBattleContext.boss&&activeBattleContext.boss.alive!==false
+        return isLargeBossContext()&&activeBattleContext.boss&&activeBattleContext.boss.alive!==false
             ?activeBattleContext.boss:null;
     }
 
@@ -545,7 +628,7 @@
     function battlefieldSlotOwner(){ return window.FourSymbolsBattlefieldSlots||null; }
     function bossIndex(){
         const context=activeBattleContext;
-        if(!context||typeof monsters==="undefined"){ return null; }
+        if(!isLargeBossContext()||!context||typeof monsters==="undefined"){ return null; }
         const index=Number.isInteger(context.bossIndex)?context.bossIndex:monsters.indexOf(context.boss);
         return index>=0?index:null;
     }
@@ -1121,16 +1204,31 @@
             onClose:onClose
         });
     }
+    function isSettledBossOutcome(outcome){
+        const result=String(outcome&&outcome.result||"");
+        return result==="win"||result==="lose";
+    }
+    function releaseBossBattleContext(detail){
+        /* Battle authority ends when the battle ends, not when the result modal
+           is eventually closed. Holding activeBattleContext here allowed the next
+           Dungeon/Tower battle to inherit the previous Boss snapshot. */
+        cleanupBossBattlePresentation();
+        activeBattleContext=null;
+        bossDetail=detail||null;
+    }
     function completePersonalBoss(definition,outcome){
         const progress=state.personal[definition.id];
         if(outcome&&outcome.result==="win"){
             const first=!progress.firstClear;grantConfiguredReward(definition,first);progress.firstClear=true;progress.clears++;persist();
         }
+        const detail={type:"personal",id:definition.id};
+        releaseBossBattleContext(detail);
         const finish=()=>{
-            cleanupBossBattlePresentation();activeBattleContext=null;bossDetail={type:"personal",id:definition.id};
+            bossDetail=detail;
             if(typeof showPage==="function"){ showPage("boss"); }
             renderBossPage();
         };
+        if(!isSettledBossOutcome(outcome)){ finish();return; }
         if(!showBossBattleResult(definition.name+"・戰鬥詳細結算",outcome,finish)){ finish(); }
     }
     function completeWorldStage(definition,stage,outcome){
@@ -1141,11 +1239,14 @@
                 const first=!progress.firstClear;grantConfiguredReward(definition,first);progress.firstClear=true;progress.completedStages=4;progress.clears++;persist();
             }
         }
+        const detail={type:"world",id:definition.id};
+        releaseBossBattleContext(detail);
         const finish=()=>{
-            cleanupBossBattlePresentation();activeBattleContext=null;bossDetail={type:"world",id:definition.id};
+            bossDetail=detail;
             if(typeof showPage==="function"){ showPage("boss"); }
             renderBossPage();
         };
+        if(!isSettledBossOutcome(outcome)){ finish();return; }
         if(!showBossBattleResult(definition.name+"・"+WORLD_STAGE_PROFILES[stage-1].label+"詳細結算",outcome,finish)){ finish(); }
     }
     function startBoss(type,id){
@@ -1159,7 +1260,11 @@
         const boss=buildBossMonster(definition,{stage:stage,mode:mode,hpFactor:stageProfile.hpFactor,attackFactor:stageProfile.attackFactor});
         activeBattleContext={mode:mode,definitionId:definition.id,stage:stage,combatPhase:1,totalPhases:world?1:definition.phases,boss:boss,bossIndex:null,expectedPartySize:balance.expectedPartySize,supportCount:0,summonPlan:stageProfile.summon,summonsCreated:false,objectIndexes:[],objectPlan:(world?stageProfile.objects:definition.objects).map(item=>Object.assign({},item)),spawnedPlans:{}};
         battleStarting=true;
-        const started=window.v132LaunchDungeonBattle([boss],outcome=>world?completeWorldStage(definition,stage,outcome):completePersonalBoss(definition,outcome));
+        const started=window.v132LaunchDungeonBattle(
+            [boss],
+            outcome=>world?completeWorldStage(definition,stage,outcome):completePersonalBoss(definition,outcome),
+            {mode:"boss",gameplayMode:mode}
+        );
         battleStarting=false;
         if(!started){ cleanupBossBattlePresentation();activeBattleContext=null;return false; }
         seedBossBattlefieldSnapshot();
@@ -1186,7 +1291,8 @@
         }else{
             cancelTowerAutoAdvance(true);
         }
-        cleanupBossBattlePresentation();
+        const slotOwner=battlefieldSlotOwner();
+        if(slotOwner&&typeof slotOwner.clearActiveEnemySnapshot==="function"){ slotOwner.clearActiveEnemySnapshot(); }
         activeBattleContext=null;
         if(typeof showPage==="function"){ showPage("tower"); }
         renderTowerPage();
@@ -1208,14 +1314,55 @@
         ensureCurrentTowerWeek();
         const target=clamp(Math.floor(numeric(floor,state.tower.completedFloor+1)),1,TOWER_FLOORS);
         if(battleStarting||highestCharacterLevel()<TOWER_UNLOCK_LEVEL||state.tower.pendingRelicChoice||target>state.tower.completedFloor+1){ return false; }
-        const roster=buildTowerRoster(target),boss=target%10===0?roster[0]:null;
-        const towerPhases=boss?(target===100?4:(target>=70?3:(target>=40?2:1))):1;
-        const balance=boss?bossBalanceProfile(boss.level,"tower",towerPhases):null;
-        activeBattleContext={mode:"tower",floor:target,boss:boss,bossIndex:null,combatPhase:1,totalPhases:towerPhases,expectedPartySize:balance?balance.expectedPartySize:expectedPartySizeForLevel(towerMonsterLevel(target)),supportCount:0,summonPlan:boss?towerSummonPlan(target):null,summonsCreated:false,objectIndexes:[],objectPlan:boss?towerObjectPlan(target):[],spawnedPlans:{}};
-        battleStarting=true;const started=window.v132LaunchDungeonBattle(roster,outcome=>completeTowerFloor(target,outcome));
-        battleStarting=false;
-        if(!started){ cleanupBossBattlePresentation();activeBattleContext=null;return false; }
-        if(boss){ seedBossBattlefieldSnapshot(); }
+        const roster=buildTowerRoster(target);
+        const towerBoss=roster.find(monster=>monster&&monster.vGameplayTowerBoss===true)||null;
+        activeBattleContext={
+            mode:"tower",
+            floor:target,
+            towerBoss:towerBoss,
+            expectedPartySize:expectedPartySizeForLevel(towerMonsterLevel(target))
+        };
+        battleStarting=true;
+        const launch=()=>{
+            roster.forEach(bindTowerMonsterIdentity);
+            const started=window.v132LaunchDungeonBattle(
+                roster,
+                outcome=>completeTowerFloor(target,outcome),
+                {mode:"tower"}
+            );
+            battleStarting=false;
+            if(!started){ activeBattleContext=null;return false; }
+            return true;
+        };
+        if(typeof window.v154PreparePortraitsForEncounter!=="function"){
+            battleStarting=false;
+            activeBattleContext=null;
+            console.warn("[tower-portrait] shared encounter preparation owner unavailable");
+            return false;
+        }
+        const preparation=window.v154PreparePortraitsForEncounter(roster);
+        if(preparation&&typeof preparation.then!=="function"){
+            if(preparation.state!=="ready"){
+                battleStarting=false;
+                activeBattleContext=null;
+                return false;
+            }
+            return launch();
+        }
+        Promise.resolve(preparation).then(prepared=>{
+            if(!prepared||prepared.state!=="ready"){
+                battleStarting=false;
+                activeBattleContext=null;
+                console.warn("[tower-portrait] shared encounter preparation failed");
+                return false;
+            }
+            return launch();
+        }).catch(error=>{
+            battleStarting=false;
+            activeBattleContext=null;
+            console.warn("[tower-portrait] encounter preparation failed",error);
+            return false;
+        });
         return true;
     }
     function chooseTowerRelic(id){
@@ -1229,10 +1376,6 @@
         state.tower.pendingRelicChoice=false;persist();renderTowerPage();return true;
     }
 
-    function markGameplayNav(){
-        document.querySelectorAll(".nav-button").forEach(button=>button.classList.remove("active"));
-        const button=document.getElementById("bossNav");if(button){ button.classList.add("active"); }
-    }
     function openGameplay(){ cancelTowerAutoAdvance(true);abyssSession=false;if(typeof showPage==="function"){ showPage("gameplay"); }renderGameplayHub(); }
     function openBoss(){ cancelTowerAutoAdvance(true);abyssSession=false;bossDetail=null;if(typeof showPage==="function"){ showPage("boss"); }renderBossPage(); }
     function openTower(){ abyssSession=false;towerOverviewOpen=false;if(typeof showPage==="function"){ showPage("tower"); }renderTowerPage(); }
@@ -1241,7 +1384,7 @@
         abyssSession=true;if(typeof showPage==="function"){ showPage("dungeon"); }
         if(typeof window.v174AbyssBackToSelection==="function"){ window.v174AbyssBackToSelection(); }
         else if(typeof switchDungeonTab==="function"){ switchDungeonTab("abyss"); }
-        markGameplayNav();return true;
+        return true;
     }
     function openDailyDungeons(){ cancelTowerAutoAdvance(true);abyssSession=false;if(typeof showPage==="function"){ showPage("dungeon"); }if(typeof switchDungeonTab==="function"){ switchDungeonTab("daily"); } }
 
@@ -1257,7 +1400,6 @@
             if(page==="gameplay"){ renderGameplayHub(); }
             else if(page==="boss"){ renderBossPage(); }
             else if(page==="tower"){ renderTowerPage(); }
-            else if(page==="dungeon"&&abyssSession){ markGameplayNav(); }
             return result;
         };
     }
@@ -1284,6 +1426,11 @@
     window.FourSymbolsBossBattle=Object.freeze({
         version:"boss-target-entity-v1",
         isActive:function(){ return !!activeBoss(); },
+        getEnemyFormationSnapshot:bossBattlefieldSnapshot,
+        ownsEnemyFormationSnapshot:function(snapshot){
+            return !!(activeBattleContext&&snapshot&&snapshot.bossBattleSnapshot===true&&
+                activeBattleContext.enemySnapshot===snapshot);
+        },
         getBossIndex:bossIndex,
         isBossIndex:isBossIndex,
         isBossObjectIndex:isBossObjectIndex,
@@ -1320,8 +1467,12 @@
         getSerializableState:serializableState,
         normalizeState:normalizeState,
         getWeekInfo:utcWeekInfo,
-        getTowerFloorKind:towerFloorKind,
-        buildTowerRoster:buildTowerRoster,
+         getTowerFloorKind:towerFloorKind,
+         getTowerPortraitAssetId:towerPortraitAssetId,
+         buildTowerRoster:buildTowerRoster,
+         applyTowerElementProfile:applyTowerElementProfile,
+         applyTowerChallengeProfile:applyTowerChallengeProfile,
+         getTowerSkillChance:towerSkillChance,
         getActiveBattleState:function(){ return activeBattleContext?copy({mode:activeBattleContext.mode,definitionId:activeBattleContext.definitionId||null,stage:activeBattleContext.stage||null,floor:activeBattleContext.floor||null,combatPhase:activeBattleContext.combatPhase||1,totalPhases:activeBattleContext.totalPhases||1,bossIndex:bossIndex(),objectIndexes:(activeBattleContext.objectIndexes||[]).slice(),shield:bossShield()}):null; },
         debugSpawnBossObject:spawnBossObject,
         debugProcessBossRound:processBossRound,

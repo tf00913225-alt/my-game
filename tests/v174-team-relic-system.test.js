@@ -8,12 +8,16 @@ const source=fs.readFileSync("js/60-team-relic-system.js","utf8");
 const repositorySource=fs.readFileSync("js/startup/account-save-repository.js","utf8");
 const loader=fs.readFileSync("js/19-stage-v78-character-inventory-runtime.js","utf8");
 const css=fs.readFileSync("css/55-team-relic-system.css","utf8");
+const feedbackSource=fs.readFileSync("js/battle-floating-feedback-owner.js","utf8");
+const feedbackCss=fs.readFileSync("css/battle-floating-feedback-owner.css","utf8");
 const build=fs.readFileSync("scripts/build-production.mjs","utf8");
 const manifest=JSON.parse(fs.readFileSync("asset-manifest.json","utf8"));
 
 assert.match(build,/gameplayScripts=\[[\s\S]*?"js\/60-team-relic-system\.js"/);
 assert.match(build,/const bossRelicScripts=\["js\/gameplay-boss-tower-system\.js"\]/);
 assert.match(build,/gameplayStyles=\[[\s\S]*?"css\/55-team-relic-system\.css"/);
+assert.match(build,/gameplayScripts=\[[\s\S]*?"js\/battle-floating-feedback-owner\.js"/);
+assert.match(build,/gameplayStyles=\[[\s\S]*?"css\/battle-floating-feedback-owner\.css"/);
 assert.match(build,/const abyssScripts=\["js\/59-abyss-two-tier-runtime\.js"\]/);
 assert.equal(manifest.featureManifest.features.relic,"feature-boss-relic");
 assert.equal(manifest.featureManifest.features["boss-tower"],"feature-boss-relic");
@@ -65,8 +69,14 @@ assert.match(css,/#game-stage \.team-relic-home-tools \.home-card-utility\{[\s\S
     "relic and element-box buttons must retain their own hitboxes");
 assert.match(css,/\.team-relic-battle-banner\{[^}]*top:48%/,
     "relic name banner must be centered in the battlefield");
-assert.match(css,/\.team-relic-sp-float\{[^}]*top:72%/,
-    "relic SP recovery text must be vertically separated below the normal HP recovery text");
+assert.doesNotMatch(css,/\.team-relic-sp-float\{|\.damage-popup\.sp-popup\{[^}]*top:/,
+    "Relic CSS must not own a fixed SP popup top offset");
+assert.match(source,/function emitRelicPlayerHit\([\s\S]*?showPlayerHit\(/,
+    "Relic HP/SP recovery must enter the shared player-hit feedback path");
+assert.match(feedbackSource,/const MAX_LANES=4/);
+assert.match(feedbackSource,/context\.queue\.push\(request\)/);
+assert.match(feedbackCss,/body > \.battle-floating-feedback\{/,
+    "Relic recovery text must use the shared floating feedback owner");
 assert.match(source,/document\.getElementById\("battlePage"\)\|\|document\.getElementById\("game-content"\)/,
     "battle relic banner must prefer the battlefield as its positioning host");
 assert.match(source,/battleLog\(def\.name\+"｜"\+currentEffectText/,
@@ -157,6 +167,7 @@ function createRuntime(options={}){
         const data=context.FourSymbolsAccountSave.readForUid(accountUid).save;
         data.gold=context.gold;
         context.FourSymbolsAccountSave.writeForUid(accountUid,data,{source:"test-core"});
+        return true;
     };
     vm.runInContext(source,context);
     return {
@@ -263,10 +274,28 @@ assert.ok(monsters.some(m=>m.hp<2000),"Tiangang Banner naturally charges from be
 assert.equal(context.v174RelicDebugState().allyHitCount,0);context.loseBattle();
 
 context.v174EquipRelic("relic_qinglan_feather");party[0].hp=1000;context.startBattle();
-const boosted=context.getPartyBattleStats(0);assert.ok(boosted.evasion>=8&&boosted.resistance>=8,"Qinglan Feather feeds the shared party stat owner");context.loseBattle();
+const boosted=context.getPartyBattleStats(0);assert.ok(context.v174GetRelicFinalEvasionPercent(0)===8&&boosted.resistance>=8,"Qinglan Feather feeds the shared party stat owner");context.loseBattle();
 
 context.v174EquipRelic("relic_soul_bell");monsters.forEach(m=>{m.alive=true;m.attack=100;m.magicAttack=100;m.accuracy=100;});context.startBattle();context.turn=4;context.startTurn(context.battleToken);
 assert.ok(monsters[1].attack<100,"Soul Bell applies actual live monster attack reduction");context.loseBattle();
+for(const [level,reduction] of [[10,5],[20,8]]){
+    context.v174RelicSystem.getOwnedState().relic_soul_bell.level=level;
+    monsters.forEach(m=>{m.alive=true;m.hp=2000;m.attack=100;m.accuracy=0;});
+    context.startBattle();context.turn=4;context.startTurn(context.battleToken);
+    assert.equal(monsters[1].accuracy,0,"Soul Bell never multiplies independent Accuracy");
+    assert.equal(context.v174GetRelicFinalHitReductionPercent(monsters[1]),reduction);
+    const efficiency=context.v174GetRelicFinalHitReductionPercent(monsters[0])/reduction;
+    assert.ok(efficiency>0&&efficiency<=1,"existing Boss efficiency applies to percentage points");
+    context.loseBattle();
+    assert.equal(context.v174GetRelicFinalHitReductionPercent(monsters[1]),0,"battle teardown releases reduction");
+}
+for(const [level,evasion] of [[1,8],[10,10],[20,12]]){
+    context.v174RelicSystem.getOwnedState().relic_qinglan_feather.level=level;
+    context.v174EquipRelic("relic_qinglan_feather");context.startBattle();
+    assert.equal(context.v174GetRelicFinalEvasionPercent(0),evasion);
+    context.loseBattle();
+}
+
 
 context.v174EquipRelic("relic_rock_mountain_seal");party[0].hp=1000;context.startBattle();
 assert.ok(context.getPartyBattleStats(0).defense>100,"Rock Mountain Seal opening defense uses the real shared stat owner");context.loseBattle();

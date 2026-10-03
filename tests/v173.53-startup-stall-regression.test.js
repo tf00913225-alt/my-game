@@ -11,7 +11,7 @@ const build=fs.readFileSync("scripts/build-production.mjs","utf8");
 assert.doesNotMatch(battle,/MutationObserver|observer\.observe\(/);
 assert.doesNotMatch(battle,/stage\.style\.visibility/);
 assert.doesNotMatch(inventory,/MutationObserver|obs\.observe\(/);
-assert.match(inventory,/classList\.contains\("v17351-inventory-fullscreen"\)!==open/);
+assert.doesNotMatch(inventory,/v17351-inventory-fullscreen|requestAnimationFrame|setTimeout\(/);
 assert.equal((loader.match(/const V_ASSET_VERSION="([^"]+)"/)||[])[1],releaseMeta.cacheVersion);
 for(const name of ["54-v173.51-battle-qa.js","55-v173.51-inventory-qa.js","57-v173.51-quest-qa.js"]){
   assert.ok(build.includes('"js/'+name+'"'),name+" fixed bundle entry");

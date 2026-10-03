@@ -1,5 +1,10 @@
 # 專案開發規則
 
+## 一般 Bug 預設路徑（2026-10-01 生效）
+
+一般 Bug 必須先讀 `docs/BUG_FIX_FAST_PATH.md`，以該文件為調查範圍、證據升級、自主整合與結案的權威來源。預設最小必要調查＋最小安全修正；只查直接相關責任與呼叫鏈。完整 Owner Convergence／Lifecycle 稽核僅在該文件第四節證據成立或使用者明確要求架構工程時適用。下文不得以「較嚴格優先」恢復一般 Bug 全面稽核、tests-only 限制、固定失敗額度、僅草稿 PR 或正式 Runtime 即硬停止。最新 Head 必要 CI、原症狀驗證與資料安全仍必須遵守；一般 Bug 結案不要求發布 main。
+
+
 1. 開始任何工作前，先完整閱讀 `HANDOFF.md`。
 2. **任何 UI、CSS、版面、美術圖片、背包、裝備、技能、戰鬥介面等修改前，都必須先閱讀 `UI_GUIDELINES.md`。**
 3. `UI_GUIDELINES.md` 是一般 UI 規範的唯一來源；不要把完整規範複製到其他文件，避免版本分歧。**唯一的專項例外是 `docs/ITEM_RARITY_UI_SPEC.md`：凡涉及裝備、道具、材料、設計圖、符咒、寶箱、掉落、背包格、商店格、合成、冶煉或任何物品階級／稀有度顏色時，該文件為階級與色號的最高權威來源。**
@@ -10,13 +15,23 @@
 8. **凡涉及新增、替換、轉檔或正式導入任何點陣圖片資產，必須先完整閱讀 `docs/IMAGE_ASSET_SPEC.md`。該文件是圖片格式、WebP 轉換、無損驗證、透明度、尺寸、Sprite Sheet／VFX 幀資料與正式引用流程的最高權威來源。**
 9. **凡屬修復、fix、failure、test failure、CI failure、fixture、test harness、stale contract 或既有修復分支續修任務，若使用者未在當次任務另行指定不同模式，必須先完整閱讀根目錄 `AUTONOMOUS_REPAIR_CONTRACT.md`，並以該文件作為受控自主修復的唯一正式契約來源；不得依舊對話摘要自行擴張授權。**
 10. **凡涉及怪物／精英／BOSS／日常副本／天兵立繪導入，必須先讀 `MONSTER_PORTRAIT_SPEC.md` 與 `docs/MONSTER_PORTRAIT_SPEC_V1.md`。若素材已經生成並完成正式 WebP 落位，預設使用 `npm run portrait:import -- --keys=<portraitKey,...>` 快速導入；不得為已完成素材重新建立生成 batch、重跑生成或重做母圖搜尋。尚未生成的素材才使用既有 batch 流程。**
+11. **所有新增、修改、替換、重構、UI／CSS、Gameplay、資料、狀態、Lifecycle 與 Bug 修復，施工前都必須完整閱讀 `docs/CHANGE_SAFETY_REPLACEMENT_CONTRACT.md`。使用者說「改成／換成／不要原本的」時預設為 Replacement（取代），代理必須自行完成舊 Owner／Contract／Lifecycle／Semantic State／Regression Test 的遷移與退場判定，不得只疊加新版，也不得把「舊的要不要刪」這類工程責任丟回給不懂程式的專案負責人。**
+12. **凡屬 Bug、fix、failure、regression、修復後仍重現或任何「已修好」判定，必須完整閱讀 `docs/BUG_REPAIR_DOD_OWNER_CONVERGENCE_GATE.md`。一般 Bug 先依 `docs/BUG_FIX_FAST_PATH.md`，達到證據升級條件才啟用完整 Owner Convergence Gate；DIAGNOSED／IMPLEMENTED／INTEGRATED／DEPLOYED 不得冒稱 VERIFIED。只有原始玩家症狀在最終目標環境依足夠證據不再重現，才可回報「已修好」。若使用者要求的技術做法會形成第二 Owner、Patch／Wrapper 疊加或高風險架構，代理必須主動阻止並改採安全實作；不得把技術退場判斷丟回非技術使用者。**
+
+## 最高優先：Change Safety & Replacement Migration Gate（變更安全與取代遷移閘門）
+
+- `docs/CHANGE_SAFETY_REPLACEMENT_CONTRACT.md` 是所有變更的永久必讀契約，與 `ARCHITECTURE_RULES.md` 共同適用。 Bug／failure／regression 另必須同時遵守 `docs/BUG_REPAIR_DOD_OWNER_CONVERGENCE_GATE.md`；後者是 Bug 完成狀態與 Owner Convergence Gate 的專項權威來源。
+- 每次先分類 Additive（新增）／Replacement（取代）／Convergence（收斂）／Removal（移除）；「改成／換成／不要原本的」預設不是疊加。
+- Replacement 完成條件包含舊 Owner、舊 DOM/CSS/函式/Wrapper、舊 State 語意、舊 Lifecycle 與舊 Test 的遷移／刪除判定。
+- `display:none`、`animation:none`、更後面的 CSS、`!important`、Wrapper 或 late patch 不得作為「已完成取代」的預設證據。
+- 代理必須主動提醒雙 Owner、多份真相、狀態語意混用、Lifecycle 缺口與維護成本；使用者只需決定產品／遊戲結果，不需替代理判斷技術退場細節。
 
 ## 《四象江湖傳》專案開發、QA 與外部研究固定規則
 
-本章為永久固定開發規範。除非專案負責人日後明確要求修改，所有程式開發、Bug 修正、功能新增／調整、程式重構、GitHub 操作、Pull Request、Repository checks、GitHub Actions、瀏覽器測試、QA、自動化測試、技術研究、除錯與程式碼搜尋，都必須遵守以下原則。既有第 1～9 條為本章的具體前置要求，內容重疊時合併理解，不重複建立第二套標準。
+本章為永久固定開發規範。除非專案負責人日後明確要求修改，所有程式開發、Bug 修正、功能新增／調整、程式重構、GitHub 操作、Pull Request、Repository checks、GitHub Actions、瀏覽器測試、QA、自動化測試、技術研究、除錯與程式碼搜尋，都必須遵守以下原則。既有第 1～11 條為本章的具體前置要求，內容重疊時合併理解，不重複建立第二套標準。
 
 ### 一、專案內部資料永遠優先
-- 所有判斷、修改與除錯，先依據目前 Repository 的正式規格、程式碼、資料結構、函式、模組、遊戲規則、共用工具、既有測試、GitHub Actions、Repository checks，以及 `AGENTS.md`、`CLAUDE.md`、`HANDOFF.md`、`ARCHITECTURE_RULES.md`、`UI_GUIDELINES.md`、`AUTONOMOUS_REPAIR_CONTRACT.md`、`CHECK_REPORT.txt` 等正式文件。
+- 所有判斷、修改與除錯，先依據目前 Repository 的正式規格、程式碼、資料結構、函式、模組、遊戲規則、共用工具、既有測試、GitHub Actions、Repository checks，以及 `AGENTS.md`、`CLAUDE.md`、`HANDOFF.md`、`ARCHITECTURE_RULES.md`、`UI_GUIDELINES.md`、`AUTONOMOUS_REPAIR_CONTRACT.md`、`docs/CHANGE_SAFETY_REPLACEMENT_CONTRACT.md`、`CHECK_REPORT.txt` 等正式文件。
 - 每次先確認：「本專案是不是已經有現成做法？」若已有，優先沿用，不得因外部案例看起來方便就擅自偏離現有架構。
 
 ### 二、禁止無關外部遊戲研究
@@ -141,3 +156,7 @@ QA、測試與 debug 工具不得為方便而永久改變正式戰鬥數值、�
 - 只有 GitHub Connector／API 本身明確回傳 authentication／authorization／permission 錯誤、缺少必要寫入能力，或使用者明確指定必須使用 Git CLI 時，才可把憑證或授權列為阻塞事項。
 - 即使改走 Connector／API，仍必須遵守既有分支政策：禁止直接改寫 `dev`／`main`，必須由最新 `dev` 建立 `fix/`、`feature/`、`docs/` 等工作分支，經 PR、Repository checks／CI 與既有 Release Gate 後再合併。
 - 若修改內容先在本機產生，代理應透過既有 GitHub 檔案／blob／tree／commit／ref 能力發布到工作分支；不得因工作區沒有可持久化 Git 認證而把已完成的修改留在本機或重複要求授權。
+
+## Release Readiness Priority Framework 入口
+
+凡涉及發布、Release Candidate、P0／P1／P2、Release Freeze 或 Exact-HEAD Verification，必須完整遵守 `docs/RELEASE_VERIFICATION_RULES.md` 第 21 章「Release Readiness Priority Framework（發布整備優先級框架）」。該文件為唯一 Owner，不得在本檔複製規則或降低既有發布／安全契約；P0 不等於 Development Blocker，P1／P2 不得阻止 NORMAL DEVELOPMENT。

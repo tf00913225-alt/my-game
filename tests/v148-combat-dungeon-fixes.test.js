@@ -82,7 +82,7 @@ test("V148 remains ordered inside the deterministic gameplay bundle",()=>{
     const v146=buildSource.indexOf("js/41-v146-system-polish.js");
     const v148=buildSource.indexOf("js/42-v148-combat-dungeon-fixes.js");
     assert.ok(v146>=0&&v148>v146);
-    assert.match(touchLock,/\.skill-preview-body, \.creation-skill-detail-levels, #dungeonTabContent/);
+    assert.match(touchLock,/data-scroll-owner="x\|y\|both"/);
     assert.match(css,/touch-action:pan-y !important/);
     assert.match(css,/#dungeonPage:not\(\.v146-abyss-active\)\.active[\s\S]*display:flex !important/);
     ["assets/ui/training-background.jpg","assets/ui/home-synthesis.png","assets/battle/element-box.png"]
@@ -273,6 +273,31 @@ test("Earth Shield visibly and actually reflects fifty percent",()=>{
     assert.deepEqual(hits,[50]);
 });
 
+test("Purify removes temporary Earth Shield and Barrier without touching permanent state",()=>{
+    const party=[{
+        id:"水使",hp:500,sp:100,activeBuffs:[
+            {type:"earthShield",turnsLeft:3,remainingBlocks:2,percent:60},
+            {type:"barrier",turnsLeft:4},
+            {type:"permanentAura",permanent:true,dispellable:false}
+        ],statusEffects:[{type:"frostbite",turnsLeft:2},{type:"bossMark",dispellable:false}]
+    }];
+    const context=baseContext({
+        getExistingPartyIndexes:()=>[0],getPartyCharacterByIndex:index=>party[index],
+        getPartyCharacterKey:()=>"water",getSkillLevel:(key,id)=>id==="purifyMind"?1:0,
+        getPartyBattleStats:()=>({maxHP:500,maxSP:200,intelligence:80}),
+        lungePlayerCard(){},showSkillNameBadge(){},showPlayerSpPopup(){},addBattleLog(){},updateUI(){},finishPlayerAction(){},
+        v141PlayCardEffect(){}
+    });
+    context.skillDatabase.purifyMind={
+        id:"purifyMind",name:"淨心訣",element:"water",category:"buff",targetType:"ally",spCost:22,
+        removeAllStates:true,targetCountByLevel:[1,1,3]
+    };
+    context.v148ResolveSupportAction(0,{action:"purifyMind",targetAlly:0},context.skillDatabase.purifyMind);
+    assert.deepEqual(party[0].activeBuffs.map(buff=>buff.type),["permanentAura"]);
+    assert.deepEqual(party[0].statusEffects.map(effect=>effect.type),["bossMark"]);
+    assert.equal(party[0].sp,78);
+});
+
 test("a queued second player never acts after the enemy team reaches zero HP",()=>{
     let legacyActions=0;
     const monsters=[{name:"敵人",alive:true,hp:0}];
@@ -311,24 +336,20 @@ test("Abyss movement freezes the current frame and accepts a new direction",()=>
     assert.equal(player.style.top,"40%");
 });
 
-test("Abyss final nav heals stale five-button markup even when mode and count match",()=>{
-    let html="";
-    const labels=["角色","背包","商店","元素匣","返回"];
-    const stale=labels.map((label,index)=>element({getAttribute:name=>name==="aria-label"?label:(name==="onclick"?(index===4?"showPage('home')":"legacy()") : ""),querySelector:()=>index===2?{getAttribute:()=>"assets/ui/home-shop-v147.png"}:null}));
-    const nav=element({dataset:{v148Mode:"abyss-map"},children:stale});
-    Object.defineProperty(nav,"innerHTML",{get:()=>html,set:value=>{ html=value; nav.children=[1,2,3,4,5]; }});
+test("Abyss projects five context buttons into the canonical native shell",()=>{
+    const calls=[];
     const page=element({classList:classList(["active"]),querySelector:selector=>selector===".v141-abyss-shell"?{}:null});
     const topReturn=element();
-    const context=baseContext({document:{readyState:"complete",body:element(),addEventListener(){},querySelector:()=>null,querySelectorAll:()=>[],getElementById:id=>id==="dungeonPage"?page:id==="v141DungeonNav"?nav:id==="v146AbyssReturn"?topReturn:null}});
+    const context=baseContext({
+        FourSymbolsBottomNav:{syncContext:()=>calls.push("sync")},
+        document:{readyState:"complete",body:element(),addEventListener(){},querySelector:()=>null,querySelectorAll:()=>[],
+            getElementById:id=>id==="dungeonPage"?page:id==="v146AbyssReturn"?topReturn:null}
+    });
     context.v148SyncDungeonShell();
-    assert.equal((html.match(/<button/g)||[]).length,5);
-    assert.match(html,/aria-label="秘寶"/);
-    assert.match(html,/src="assets\/ui\/nav-relic-v175\.webp"/);
-    assert.match(html,/aria-label="返回"/);
-    assert.doesNotMatch(html,/aria-label="商店"|aria-label="主城"/);
-    assert.equal(nav.dataset.v146Columns,"5");
+    assert.ok(calls.length>=1);
+    assert.equal(calls.at(-1),"sync");
     assert.notEqual(topReturn.removed,true);
-    assert.match(source,/function contextNavMatches\(nav,returnAction\)/);
+    assert.doesNotMatch(source,/createElement\("div"\)[\s\S]*?v141DungeonNav/);
 });
 
 console.log("\nV148 combat/dungeon fixes suite: "+passed+" tests passed.");

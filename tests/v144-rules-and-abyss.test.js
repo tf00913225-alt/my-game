@@ -170,10 +170,36 @@ test("general monsters sample one to three legal skills once per encounter",()=>
     context.v144ConfigureMonsterEncounterSkills(monster,"battle-b");
     assert.equal(monster.skillIds.length,3);
     assert.notDeepEqual(monster.skillIds,first,"a later encounter may roll a different loadout");
-    const abyss={level:90,element:"fire",v141Abyss:true,skillIds:["phoenixCry"]};
+    const abyss={
+        level:90,element:"fire",v141Abyss:true,
+        skillIds:["phoenixCry","stoneThrow"],
+        v141SupportSkillIds:["rage","healSpell"]
+    };
     context.v144ConfigureMonsterEncounterSkills(abyss,"ignored");
-    assert.deepEqual(abyss.skillIds,["phoenixCry"],"Abyss loadouts are excluded");
+    assert.deepEqual(Array.from(abyss.skillIds),["phoenixCry"],"Abyss attacks are validated but not regenerated");
+    assert.deepEqual(Array.from(abyss.v141SupportSkillIds),["rage"],"Abyss supports also pass the same element guard");
+    assert.equal(abyss.v144SkillEncounter,undefined);
     assert.doesNotMatch(source,/processSingleMonsterAttack\s*=\s*function[\s\S]*configureEncounterSkills/);
+});
+
+test("fixed loadouts fail closed on cross-element IDs unless explicitly allowlisted",()=>{
+    const context=run(baseContext());
+    const regular={
+        level:80,element:"water",v132FixedSkillLoadout:true,v141ForceSkillLevel:5,
+        skillIds:["iceArrowRain","phoenixCry"],v141SupportSkillIds:["healSpell","rage"]
+    };
+    context.v144ConfigureMonsterEncounterSkills(regular,"fixed-water");
+    assert.deepEqual(Array.from(regular.skillIds),["iceArrowRain"]);
+    assert.deepEqual(Array.from(regular.v141SupportSkillIds),["healSpell"]);
+    assert.deepEqual(Array.from(regular.v144LegalSkillPool),["iceArrowRain"]);
+
+    const explicit={
+        level:80,element:"light",v141Abyss:true,
+        skillIds:["flyingSandStrike","phoenixCry"],v141SupportSkillIds:[],
+        v144CrossElementSkillIds:["flyingSandStrike","phoenixCry"]
+    };
+    context.v144ConfigureMonsterEncounterSkills(explicit,"abyss-explicit");
+    assert.deepEqual(Array.from(explicit.skillIds),["flyingSandStrike","phoenixCry"]);
 });
 
 test("monster carry limits and fixed skill levels follow the exact five bands",()=>{
@@ -227,7 +253,7 @@ test("later skill progression owner supersedes the V144 player-skill snapshot",(
     assert.match(progressionSource,/freeze:\{[\s\S]*?targetType:"column",targetTypeAtMaxLevel:"tri"[\s\S]*?freezeChanceByLevel:FREEZE_CHANCE_BY_LEVEL\.slice\(\)/);
     assert.match(progressionSource,/dodge\.targetType="allyTri"; dodge\.duration=3; dodge\.spCost=20/);
     assert.match(progressionSource,/calm\.statusResistBonusByLevel=CALM_RESIST_BY_LEVEL\.slice\(\)/);
-    assert.match(progressionSource,/shield\.targetType="allyTri"; shield\.spCost=66/);
+    assert.match(progressionSource,/shield\.targetType="self"; shield\.spCost=45/);
     assert.doesNotMatch(source,/getMainCharacterStats\s*=\s*function[\s\S]*accuracyBonusPercent/);
 });
 
@@ -255,7 +281,8 @@ test("Heal Spell restores its exact level-scaled HP and SP to every living ally"
 
 test("V144 no longer owns or patches the final Lv40 Abyss roster",()=>{
     assert.doesNotMatch(source,/FINAL_BOSS_RULES|FINAL_ELITES|v144PatchFinalAbyssRoster/);
-    assert.match(source,/v174TrueRealmFinal/);
+    assert.doesNotMatch(source,/v174TrueRealmFinal/);
+    assert.match(fs.readFileSync("js/59-abyss-two-tier-runtime.js","utf8"),/v174TrueRealmFinal/);
 });
 
 test("V144 leaves the final support cast to the shared Skill-ID dispatcher",()=>{
@@ -263,14 +290,15 @@ test("V144 leaves the final support cast to the shared Skill-ID dispatcher",()=>
     assert.doesNotMatch(source,/monster\.name===\"極帝天尊\"|monster\.name===\"北帝天尊\"|monster\.name===\"天帝天尊\"/);
 });
 
-test("daily dungeon locking uses the existing post-render owner and never touches Abyss",()=>{
+test("shared dungeon render hook validates every runtime mode without mutating monster elements",()=>{
     const renderBlock=source.slice(source.indexOf("let configuredDungeonBattleToken"),source.indexOf("function abyssAllies"));
     assert.doesNotMatch(renderBlock,/renderBattle\s*=\s*function/);
+    assert.doesNotMatch(renderBlock,/monster\.element\s*=/);
     assert.match(source,/function configureDungeonBattleSkillsAfterRender/);
     assert.match(source,/window\.v144ConfigureDungeonBattleSkillsAfterRender=configureDungeonBattleSkillsAfterRender/);
     assert.match(v143Source,/v144ConfigureDungeonBattleSkillsAfterRender/);
-    assert.match(renderBlock,/v174TrueRealmFinal/);
-    assert.match(source,/if\(!monster\|\|monster\.v141Abyss\)\{ return monster; \}/);
+    assert.match(source,/function isMonsterSkillElementLegal\(monster,skillId\)/);
+    assert.match(source,/window\.v144NormalizeMonsterSkillLoadout=normalizeMonsterSkillLoadout/);
 });
 
 test("the existing V143 render hook invokes V144 dungeon locking once per battle",()=>{

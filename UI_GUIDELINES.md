@@ -380,6 +380,15 @@ UI 與遊戲邏輯盡量分離。UI 任務若發現邏輯問題，應記錄並�
 
 目前已完成遷移的 Large Panel 尺寸 token 位於 `css/49-v169-rpg-ui.css` 的 `--ui-large-panel-*`。這些 token 是大型頁的**上限與共用框架來源**，不是要求所有頁面都套用相同滿版高度。後續調整應優先修改真正 owner／共用 token，禁止散落新的近似 width / height / padding。
 
+### 背包與物品呈現的正式 Owner 契約
+
+- 背包 Large Panel 的 DOM／進出生命週期由 `index.html` 與 `js/00-main.js` 負責；版面與美術由 `css/22-stage-v78-character-inventory-core.css` 負責；`css/24-stage-v85-inventory-inner-grid-scroll-root.css` 只負責既有 `#inventoryGridScroll` 單一垂直捲動契約。主城、野怪、副本與活動入口必須重用同一個 `#inventoryPage`，不得再建立第二個背包視窗或搬移 owner。
+- 物品 Medium Modal 的外框、自適應上限、圖框與固定操作列由 `css/49-v169-rpg-ui.css` 單獨決定；`js/00-main.js` 以 `data-presentation-mode` 與 `item-modal-mode-*` 明確切換 `equipment`、`compact`、`comparison`，建立、切換、關閉及再次開啟都必須同步清理狀態。內容 runtime 可以增減內容與按鈕，不得再注入或覆蓋外框尺寸。
+- 物品詳情使用 legacy 420×746.6667 內容面的 CSS 單位；它由既有 1080×1920 舞台投影，不得另讀瀏覽器寬高來二次縮放。商店商品內容由 `js/equipment-progression.js` 負責，掛載生命週期由 `js/27-v132-content-expansion.js` 的 `v132RewardModal` family 負責，暫屬 `document.body` 相容掛載，因此只能使用 browser CSS pixels（瀏覽器 CSS 像素）；待整個 v132 reward-modal family（獎勵視窗家族）共同遷移後才可移除相容層，禁止只搬其中一個視窗。
+- 背景導覽的語意投影、DOM／殼生命週期由 `js/04-stage-v11-native-bottom-nav-runtime.js::FourSymbolsBottomNav.syncContext()` 控制，使冷進頁面不依賴延遲玩法模組；`js/42-v148-combat-dungeon-fixes.js::syncContextNavigation()` 只保留深淵頂部返回控制與呼叫正式投影的相容橋。背包覆蓋狀態、`app.on-inventory-page` 或 `itemModal.dataset.presentationMode` 啟用時，同步隱藏背景導覽殼；物品模式切換／清理由 `js/00-main.js::setItemModalPresentationMode()` 同步呼叫相容入口，關閉後恢復原情境。導覽幾何仍唯一屬於 `css/06-stage-v11-native-bottom-nav.css`，禁止另增 z-index、尺寸、座標或延遲同步 owner。
+- 每個物品視窗只能有一個標記 `data-scroll-owner="y"` 的內容捲動區；標題與必要操作列保持在外框內且不參與捲動。方形圖框使用 `aspect-ratio:1`，圖片使用 `object-fit:contain`；不得以圖片自身 `scale`、固定 `flex-basis` 或縮小可讀文字來換取塞入固定高度。
+- 裝備比較由兩欄在可讀寬度不足時改為上下排列；批量使用／開啟只擁有內容與操作行為，不得成為外框尺寸 owner。新增物品模式時必須先擴充上述語意狀態與同一外框契約，不得依 disabled、按鈕文字、`:has()` 或偶然 DOM 結構推測模式。
+
 同一視窗內的 Tab 永久遵守以下規則：
 
 1. 同一個功能視窗內切換 Tab 時，Panel、Header、Tab Bar、共用 Footer 與 Close Button 不得因 Tab 內容量不同而跳動；應以該視窗所有 Tab 的合理最大需求作為共同框架。

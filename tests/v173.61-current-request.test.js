@@ -1,6 +1,7 @@
 "use strict";
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 const path=require("node:path");
 const root=path.resolve(__dirname,"..");
 const read=p=>fs.readFileSync(path.join(root,p),"utf8");
@@ -36,10 +37,13 @@ assert.match(dailyCss,/REWARD PREVIEW/);
 assert.match(dailyCss,/共用經驗池  EXP/);
 assert.match(dailyCss,/材料寶箱  ×1～3/);
 assert.match(dailyCss,/裝備寶箱  ×2/);
-assert.match(rarityCss,/\.v169-item-art\.v169-rarity-white/);
-assert.match(rarityCss,/\.v169-item-art\.v169-rarity-blue/);
-assert.match(rarityCss,/\.v169-item-art\.v169-rarity-purple/);
-assert.match(rarityCss,/\.v169-item-art\.v169-rarity-orange/);
+// Shared art colors remain available outside the backpack. Backpack slots
+// own their outer rarity border and deliberately neutralize the inner art.
+for(const [rarity,color] of [["white","D8D8D8"],["blue","42A5FF"],["purple","B05CFF"],["orange","FF9F38"]]){
+    assert.match(rarityCss,new RegExp("\\.v169-item-art:not\\(\\.inventory-backpack-rarity-neutral\\)\\.v169-rarity-"+rarity+"[^}]*border-color:#"+color));
+}
+assert.match(ui,/box\.querySelectorAll\("\.v169-item-art"\)\.forEach\(art=>art\.classList\.add\("inventory-backpack-rarity-neutral"\)\)/);
+assert.match(read("css/22-stage-v78-character-inventory-core.css"),/\.inventory-item-classic\{[^}]*border:1px solid var\(--slot-rarity,var\(--bag-slot-border\)\)/);
 assert.doesNotMatch(equipment,/⬜|🟦|🟪|🟧/);
 assert.match(equipment,/rarity-white/);
 assert.match(quest,/v17361ClaimAllDailyQuests/);
@@ -48,6 +52,6 @@ assert.match(quest,/v17361RefreshOpenQuestPage/);
 assert.match(core,/v17361RefreshOpenQuestPage/);
 assert.match(questQa,/__v17361BulkQuestClaim/);
 assert.match(questQa,/v17351ClaimAllAchievements/);
-assert.ok(loader.includes('const V_ASSET_VERSION="173.72";'));
-assert.ok(html.includes('<title>四象江湖傳 V173.72</title>'));
+assert.ok(loader.includes('const V_ASSET_VERSION="'+releaseMeta.cacheVersion+'";'));
+assert.ok(html.includes('<title>四象江湖傳 V'+releaseMeta.version+'</title>'));
 console.log("✓ V173.62 current request integration");

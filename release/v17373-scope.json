@@ -1,0 +1,1209 @@
+{
+  "schemaVersion": 1,
+  "workId": "RELEASE-SCOPE-P0-20261002",
+  "plannedVersion": "173.73",
+  "currentGameVersion": "173.73",
+  "assessment": "RELEASE FREEZE / CANDIDATE PREPARATION",
+  "mode": "RELEASE FREEZE",
+  "releaseCandidateSha": null,
+  "baseline": {
+    "dev": "81853be234963c8a5250b474c38480dcd0dfa2b4",
+    "main": "4b037b47967544d90c781ad938286777c9576731",
+    "comparison": "PR #768 tested tree equals current dev tree; original main → dev scope preserved. Documentation-only P0 closeout; candidate not fixed."
+  },
+  "included": [
+    "四象技能／角色屬性與元素 DNA、跨學習既有內容",
+    "Hit／Evasion V2、裝備屬性遷移與戰鬥相關既有修正",
+    "鍛造第一階段；雲端角色／不符合 UID 與存檔條件時拒絕操作",
+    "背包、角色資訊、首頁導覽與冒險地圖既有整理",
+    "試煉塔每層十隻怪、一般技能率 65／70／75／80%、元素技能率 15%",
+    "已採用火／每日、風 50、水野外 10、土 39 張立繪及安全 fallback",
+    "Visual Ready 與既有戰鬥呈現修正",
+    "登入 session／UID 隔離與 Cloud 已驗證安全基礎；不是完整跨裝置 Cloud Save"
+  ],
+  "trueP0": [],
+  "deferred": [
+    {
+      "classification": "B",
+      "disposition": "Deferred / Future Development",
+      "reason": "Cloud 後續架構與完整跨裝置恢復仍在建設；未完成路徑 fail-closed，本版不宣稱完整 Cloud Save。",
+      "originalRequirement": {
+        "id": "REQ-CLOUD-HARDEN-20260926",
+        "title": "雲端存檔架構強化：封存候選來源與持久狀態登記",
+        "status": "IMPLEMENTED",
+        "evidence": {
+          "files": [
+            "release/requirement-batches/2026-09-26-cloud-save-architecture-hardening.json",
+            "config/persisted-state-registry.json",
+            "DATA_SECURITY_CONTRACTS.md"
+          ],
+          "verification": "PR checks、Firebase emulator、Boot browser QA、dev merge/deploy SHA 尚待完成",
+          "result": "Phase 4 仍為 0/6 VERIFIED；不可進行第二手機完整角色恢復"
+        }
+      }
+    },
+    {
+      "classification": "B",
+      "disposition": "Deferred / Future Development",
+      "reason": "完整批次與 Android 實體驗收延後；已採用素材安全仍屬本版，不能把延後視為撤除 Runtime 素材。",
+      "originalRequirement": {
+        "id": "REQ-WIND-PORTRAITS-20261001",
+        "title": "風元素野怪與四象塔怪物立繪接入及逐項驗收",
+        "status": "IMPLEMENTED",
+        "evidence": {
+          "files": [
+            "release/requirement-batches/2026-10-01-wind-monster-portraits.json",
+            "config/monster-portrait-registry.json",
+            "config/monster-asset-provenance.json"
+          ],
+          "verification": "本機 50 張來源與成品 SHA-256、像素、解碼、透明度通過；最新 PR CI 瀏覽器驗收、DEV 部署及實機顯示尚待核對",
+          "result": "風元素素材與引用已在候選 PR；未完成 DEV 與實機驗收前保持 IMPLEMENTED"
+        }
+      }
+    },
+    {
+      "classification": "B",
+      "disposition": "Deferred / Future Development",
+      "reason": "完整批次與 Android 實體驗收延後；已採用水野外素材保留，水塔未採用路徑使用 fallback。",
+      "originalRequirement": {
+        "id": "REQ-WATER-WILD-BATCH1-20261001",
+        "title": "水元素野怪 10 張正式接入第一批",
+        "status": "IMPLEMENTED",
+        "evidence": {
+          "files": [
+            "release/requirement-batches/2026-10-01-water-wild-monsters-batch1.json",
+            "config/monster-portrait-registry.json",
+            "config/monster-asset-provenance.json"
+          ],
+          "verification": "本機 10 張來源與成品 SHA-256、解碼、透明度及 RGBA 像素相等；最新 PR CI、DEV 部署與手機實機顯示尚待核對",
+          "result": "只有 10 個水系野怪 target 為 runtimeReady；其餘普通怪與水塔普通／精英／小 Boss 未提前接入"
+        }
+      }
+    },
+    {
+      "classification": "B",
+      "disposition": "Deferred / Future Development",
+      "reason": "完整正式獎勵來源／Phase 4 實機驗收延後；不啟用未驗證正式獎勵，保留交易安全限制。",
+      "originalRequirement": {
+        "id": "REQ-CLOUD-REWARD-EVIDENCE-20261001",
+        "title": "可信獎勵入帳與重試證據完整性",
+        "status": "IMPLEMENTED",
+        "evidence": {
+          "files": [
+            "release/requirement-batches/2026-10-01-cloud-reward-evidence.json"
+          ],
+          "verification": "目標測試通過；真實交易 CI 與部署待核對。",
+          "result": "缺證據即阻擋，不補造歷史、不採納 Revision 1；Phase 4 維持 0/6。"
+        }
+      }
+    },
+    {
+      "classification": "B",
+      "disposition": "Deferred / Future Development",
+      "reason": "完整批次與 Android 實體驗收延後；39 張採用素材保留，損壞的第十張小王來源未進 Runtime，100 層 fallback。",
+      "originalRequirement": {
+        "id": "REQ-EARTH-PORTRAITS-20261001",
+        "title": "土元素野怪與四象塔怪物立繪接入及逐項驗收",
+        "status": "IMPLEMENTED",
+        "evidence": {
+          "files": [
+            "release/requirement-batches/2026-10-01-earth-monster-portraits.json",
+            "config/monster-portrait-registry.json",
+            "config/monster-asset-provenance.json"
+          ],
+          "verification": "39 張可解碼來源已完成無損 WebP、透明度、尺寸與像素驗證；最新 PR CI、DEV 部署與手機實機顯示尚待核對。",
+          "result": "10 張野怪與 29 張土塔素材已接入；第 10 張小 Boss 母圖已確認損毀並隔離為 reserved，未偽造完成。"
+        }
+      }
+    }
+  ],
+  "phaseProgress": {
+    "cloudPhase1": "5/5 VERIFIED",
+    "cloudPhase2": "6/6 VERIFIED",
+    "cloudPhase3": "6/6 VERIFIED",
+    "cloudPhase4": "IN_PROGRESS 0/6",
+    "cloudPhase5To10": "NOT_STARTED",
+    "originalBatchesModified": false
+  },
+  "p1": [
+    "P0 已結案；僅在明確啟動 Release Freeze 後固定候選 SHA 並完成 Exact-HEAD 最終驗收",
+    "Freeze 階段才更新 Version／Cache、玩家公告與 CHANGELOG",
+    "逐一核對舊 PR 是否已被取代；有獨有內容者不得直接關閉",
+    "整理 main／dev 差異、受保護發布 PR 與發布後 closeout"
+  ],
+  "p2": [
+    "package.json 的歷史版本標示與模組警告整理",
+    "歷史文件與測試 owner 維護；新的正式必要測試失敗若經確認再分類，已完成清單不重開"
+  ],
+  "p3": [
+    "Cloud Phase 4 剩餘工作與 Phase 5～10",
+    "鍛造第二階段／雲端權威鍛造與寶石來源",
+    "剩餘怪物素材、Android 實體完整批次驗收",
+    "UI 精緻化、後續平衡、玩法與內容擴充"
+  ],
+  "evidence": {
+    "devCI": {
+      "run": 37080384742,
+      "attempt": 2,
+      "job": 111082308123,
+      "sha": "81853be234963c8a5250b474c38480dcd0dfa2b4",
+      "result": "SUCCESS",
+      "fullNodeStep": "SKIPPED by existing dev refined policy; not Full Node PASS",
+      "url": "https://github.com/tf00913225-alt/my-game/actions/runs/37080384742/attempts/2"
+    },
+    "devDeployment": {
+      "job": 111082274607,
+      "run": 37080384742,
+      "attempt": 2,
+      "sha": "81853be234963c8a5250b474c38480dcd0dfa2b4",
+      "result": "SUCCESS",
+      "manifestArtifact": 11258362889,
+      "responsiveItemArtifact": 11258772310,
+      "battleLiveArtifact": 11258248134,
+      "checks": "Responsive Item 6/6 viewports; Forge 390x844/412x915; battle layer/audio live mobile QA PASS",
+      "url": "https://github.com/tf00913225-alt/my-game/actions/runs/37080384742/attempts/2"
+    },
+    "firebase": {
+      "run": 36975504145,
+      "sha": "3fabca40a841a9b61ff704f9a5db6cc78ba6c353",
+      "result": "Session Authority emulator and deployment SUCCESS",
+      "equivalence": "functions/, js/firebase/, firestore.rules, firebase.json, workflow content unchanged between deployed SHA and baseline dev; not an exact-dev Firebase deployment claim"
+    },
+    "portraitAudit": "176 targets; 139 existing; 37 planned; 130 validated; 0 broken active assets",
+    "portraitPipeline": "117 provenance entries PASS",
+    "portraitBrowserFixtures": [
+      {
+        "pr": 736,
+        "run": 36854396658,
+        "artifact": 11158042032,
+        "scope": "fire/wind first frame and redraw"
+      },
+      {
+        "pr": 742,
+        "run": 36868221253,
+        "artifact": 11166286420,
+        "scope": "10 water wild decode/first-frame/redraw and element isolation"
+      },
+      {
+        "pr": 746,
+        "run": 36890763450,
+        "artifact": 11176488944,
+        "scope": "earth first-frame/redraw with fire/wind isolation"
+      }
+    ],
+    "localFullSuitePreflight": {
+      "discovered": 262,
+      "individualSweepPassed": 212,
+      "individualSweepFailed": 50,
+      "browserEnvironmentFailures": [
+        "tests/battle-presentation-followup-browser.test.js",
+        "tests/premium-functional-ui-responsive-browser.test.js",
+        "tests/v174-cardless-battle-browser.test.js"
+      ],
+      "subsequentPasses": [
+        "tests/boss-world-reinforcement-hit-vfx-timing-shield-crit-20260918.test.js",
+        "tests/release-update-notification-system.test.js"
+      ],
+      "remainingNonEnvironmentFailures": 45,
+      "officialRunner": "stops at first failing browser test because Chrome unavailable; individual sweep is diagnostic, not successful official CI"
+    },
+    "minimalRepairs": [
+      "Earth portrait identity test accepts the adopted earth ID and validates registry element/status; water fallback assertion retained",
+      "Boss crit fixture supplies existing party-index/stats dependencies; shield and unshielded critical assertions retained"
+    ],
+    "limitations": [
+      "Browser portrait fixtures are not full app or Android acceptance",
+      "No main changes, direct dev writes, rebase or force push",
+      "No version/cache bump, production release, player data mutation or freeze"
+    ],
+    "suiteRecovery20261002": {
+      "workId": "RELEASE-SUITES-P0-20261002",
+      "baseSha": "50dd9d50988ab117054a0ded9db6344a028110c4",
+      "branch": "fix/v17373-release-suite-recovery-20261002",
+      "diagnosedOriginalFailures": 45,
+      "repairedSuites": [
+        "tests/monster-portrait-batch-workflow.test.js",
+        "tests/ui-global-browser-interaction-lock.test.js",
+        "tests/ui-status-help-medium-modal.test.js",
+        "tests/v137-regressions.test.js",
+        "tests/v139-economy-rested-exp.test.js",
+        "tests/v152-dev-fixes.test.js",
+        "tests/v166-water-vfx.test.js",
+        "tests/v173.2-mobile-touch-scroll.test.js",
+        "tests/v173.40-beginner-balance.test.js",
+        "tests/v173.45-shop-touch-scroll.test.js",
+        "tests/v173.45-synthesis-touch-icon.test.js"
+      ],
+      "remainingNonEnvironmentFailures": 34,
+      "targetedResult": "11/11 suite exit codes PASS under TZ=UTC; status-help Browser sub-check remains unavailable locally",
+      "buildCheck": "PASS",
+      "ci": "PENDING",
+      "fullReleaseSuite": "NOT PASS; Chrome absent locally and 34 unresolved suites; P0 remains BLOCKED",
+      "runtimeChanged": false
+    },
+    "suiteRecoveryBatch2_20261002": {
+      "workId": "RELEASE-SUITES-P0-20261002",
+      "baseSha": "7fdd316ced57814e7f635e4444ed694ac4620522",
+      "branch": "fix/v17373-release-suite-recovery-batch2-20261002",
+      "repairedSuites": [
+        "tests/gameplay-hub-ui-and-icon.test.js",
+        "tests/skill-action-empty-top-regression.test.js",
+        "tests/v153-fire-vfx.test.js",
+        "tests/v160-current-request.test.js",
+        "tests/v173.18-final-request.test.js",
+        "tests/v173.44-current-request.test.js",
+        "tests/v173.44-maintenance.test.js"
+      ],
+      "remainingNonEnvironmentFailures": 27,
+      "targetedResult": "7/7 PASS under TZ=UTC; prior 34-file diagnostic sweep: 7 PASS / 27 FAIL",
+      "relatedRegression": "skill-progression + battle-declaration 21 PASS; feedback-semantic-sequencing PASS",
+      "buildCheck": "PASS",
+      "ci": "PENDING",
+      "fullReleaseSuite": "NOT PASS; 27 unresolved suites and complete Chrome release runner pending; P0 remains BLOCKED",
+      "runtimeChanged": false
+    },
+    "suiteRecoveryBatch3_20261002": {
+      "workId": "RELEASE-SUITES-P0-20261002",
+      "baseSha": "0974042ca1bf8cc562fc4f0a1131b81c3da73c38",
+      "branch": "fix/v17373-release-suite-recovery-batch3-20261002",
+      "repairedSuites": [
+        "tests/premium-functional-ui-batch3.test.js",
+        "tests/ui-backpack-context-layout.test.js",
+        "tests/ui-black-gold-window-skin.test.js",
+        "tests/ui-large-panel-followup.test.js",
+        "tests/v173.27-character-shell.test.js",
+        "tests/v173.63-visible-ui-owner-repairs.test.js",
+        "tests/v173.74-backpack-owner-convergence.test.js"
+      ],
+      "recoveredOriginalFailures": 25,
+      "remainingNonEnvironmentFailures": 20,
+      "discoveredSuites": 262,
+      "unclassifiedTestJs": 0,
+      "preRepairSweep": "27/27 FAIL under TZ=UTC",
+      "targetedResult": "7/7 PASS; original 27-file diagnostic sweep 7 PASS / 20 FAIL under TZ=UTC",
+      "relatedRegression": "backpack-runtime-css-owner-convergence, backpack-commercial-rpg-ui, backpack-grid-bottom-action, responsive-window-item-owner-convergence, v173.49-exp-pool-scroll-stability: 5/5 PASS",
+      "buildCheck": "PASS",
+      "diffCheck": "PASS",
+      "runtimeChanged": false,
+      "ci": "PENDING",
+      "fullReleaseSuite": "NOT PASS; local official runner exited 1 after first 18 suites, without full release completion; Chrome release QA and exact-candidate release gates remain pending",
+      "priorDevIntegration": {
+        "pr": 760,
+        "mergeSha": "0974042ca1bf8cc562fc4f0a1131b81c3da73c38",
+        "ciRun": 37002929499,
+        "repositoryChecks": "SUCCESS",
+        "devDeploy": "SUCCESS"
+      },
+      "failureInventory": [
+        {
+          "file": "tests/premium-functional-ui-batch3.test.js",
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /inventoryOwnsScroll/. Input:",
+          "classification": "D",
+          "owner": "js/19-stage-v78-character-inventory-runtime.js; css/49; css/22; css/24",
+          "rootCauseGroup": "retired-character-writer",
+          "reason": "仍要求已退役 inventoryOwnsScroll；格子邊框與物品視窗 selector 也須跟隨正式 owner。",
+          "selected": true,
+          "classificationStatus": "CONFIRMED",
+          "runtimeChangeRequired": false
+        },
+        {
+          "file": "tests/remaining-ui-regressions-20260914.test.js",
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /inventory-grid-classic \\.inventory-item-classic \\.inventory-icon > \\.v169-item-art[\\s\\S]*object-fit:contain/. Input:",
+          "classification": "C",
+          "owner": "css/22",
+          "rootCauseGroup": "backpack-css-owner",
+          "reason": "圖片 selector 與排版 owner 已更新，首斷言仍綁定舊空白格式。",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and final runtime diagnosis pending",
+          "runtimeChangeRequired": null
+        },
+        {
+          "file": "tests/ui-backpack-context-layout.test.js",
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /#game-stage #app\\.on-inventory-page #inventoryPage\\.inventory-page-classic \\.inventory-classic-shell\\{[\\s\\S]*?width:calc\\(100% - var\\(--ui-large-panel-safe-space\\)\\) !important;[\\s\\S]*?max-width:var\\(--ui-large-panel-max-width\\) !important;/. Input:",
+          "classification": "C",
+          "owner": "js/00-main.js::openInventoryContext; css/22; css/24",
+          "rootCauseGroup": "backpack-css-owner",
+          "reason": "背包外框已由 css/49 搬到 css/22；捲動不再依賴 !important。",
+          "selected": true,
+          "classificationStatus": "CONFIRMED",
+          "runtimeChangeRequired": false
+        },
+        {
+          "file": "tests/ui-black-gold-window-skin.test.js",
+          "firstFailure": "AssertionError [ERR_ASSERTION]: missing shared skin selector .inventory-classic-shell",
+          "classification": "D",
+          "owner": "css/49; css/22",
+          "rootCauseGroup": "backpack-css-owner",
+          "reason": "共用 skin 已排除背包框，測試仍要求其接管 inventory-classic-shell。",
+          "selected": true,
+          "classificationStatus": "CONFIRMED",
+          "runtimeChangeRequired": false
+        },
+        {
+          "file": "tests/ui-character-detail-hotfix.test.js",
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /label\\.textContent\\.trim\\(\\)===\"閃避\"/. Input:",
+          "classification": "D",
+          "owner": "js/47-v158-combat-tuning.js; js/35-v141-ui-battle.js; js/01-stage-v8-touch-lock.js",
+          "rootCauseGroup": "detail-and-touch-owner",
+          "reason": "仍要求退役的閃避文字後處理；触控 fixture 也仍走舊 API，待下一批。",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and final runtime diagnosis pending",
+          "runtimeChangeRequired": null
+        },
+        {
+          "file": "tests/ui-large-panel-followup.test.js",
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /\"width\"[\\s\\S]*?\"calc\\(100% - 8px\\)\"/. Input:",
+          "classification": "D",
+          "owner": "css/49; js/19-stage-v78-character-inventory-runtime.js",
+          "rootCauseGroup": "retired-character-writer",
+          "reason": "測試仍要求退役 inline writer 寫入角色寬高與捲動。",
+          "selected": true,
+          "classificationStatus": "CONFIRMED",
+          "runtimeChangeRequired": false
+        },
+        {
+          "file": "tests/ui-typography-standard.test.js",
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /\\.inventory-category-tab\\{[\\s\\S]*?font-size:15px/. Input:",
+          "classification": "C",
+          "owner": "css/22; css/52",
+          "rootCauseGroup": "backpack-css-owner",
+          "reason": "背包 tab 字級已搬到正式視覺 owner，測試仍讀 css/52。",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and final runtime diagnosis pending",
+          "runtimeChangeRequired": null
+        },
+        {
+          "file": "tests/v141-system-expansion.test.js",
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /grid-template-rows:repeat\\(3,minmax\\(0,1fr\\)\\)/. Input:",
+          "classification": "C",
+          "owner": "css/22",
+          "rootCauseGroup": "backpack-css-owner",
+          "reason": "裝備格已使用正式 cell-height 排版，仍要求舊 repeat(3,minmax(0,1fr))。",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and final runtime diagnosis pending",
+          "runtimeChangeRequired": null
+        },
+        {
+          "file": "tests/v143-combat-dungeon-polish.test.js",
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /\\.skill-name-badge\\.v143-caster-skill-label\\{[\\s\\S]*?z-index:16020 !important;[\\s\\S]*?text-overflow:ellipsis !important;/. Input:",
+          "classification": "C",
+          "owner": "css/40; css/battle-reading-layer-contract.css",
+          "rootCauseGroup": "battle-reading-owner",
+          "reason": "技能文字層已更新，仍要求歷史 z-index 16020。",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and final runtime diagnosis pending",
+          "runtimeChangeRequired": null
+        },
+        {
+          "file": "tests/v144-rules-and-abyss.test.js",
+          "firstFailure": "AssertionError(obj);",
+          "classification": "E",
+          "owner": "js/40-v144-rules-and-abyss.js::configureEncounterSkills",
+          "rootCauseGroup": "vm-realm-assertion",
+          "reason": "首個 strict deepEqual 顯示同值 phoenixCry，VM array realm 需判定與正規化；本批未更動。",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and final runtime diagnosis pending",
+          "runtimeChangeRequired": null
+        },
+        {
+          "file": "tests/v154-current-request.test.js",
+          "firstFailure": "TypeError: Cannot read properties of null (reading 'src')",
+          "classification": "D",
+          "owner": "js/45-v154-dev-fixes.js; js/54-v173.51-battle-qa.js",
+          "rootCauseGroup": "portrait-presentation-owner",
+          "reason": "引用退休 v162-abyss-battle-portrait-art，querySelector 得 null。",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and final runtime diagnosis pending",
+          "runtimeChangeRequired": null
+        },
+        {
+          "file": "tests/v155-current-request.test.js",
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /Number\\(randomValue\\)<\\.70\\?\"attack\":\"buff\"/. Input:",
+          "classification": "A",
+          "owner": "js/00-main.js; js/gameplay-boss-tower-system.js",
+          "rootCauseGroup": "tower-challenge-profile",
+          "reason": "仍要求舊 .70 attack/buff 分支；共同塔技能率已有正式 profile。",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and final runtime diagnosis pending",
+          "runtimeChangeRequired": null
+        },
+        {
+          "file": "tests/v169-abyss-assets-flow.test.js",
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /素材尚未生成[\\s\\S]*自動盤點 → 自動生成 → 自動放置 → batch finalize → batch strict audit/. Input:",
+          "classification": "C",
+          "owner": "docs/MONSTER_PORTRAIT_SPEC_V1.md",
+          "rootCauseGroup": "portrait-pipeline-contract",
+          "reason": "生成／導入流程文件已改版，測試仍綁定舊流程文字。",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and final runtime diagnosis pending",
+          "runtimeChangeRequired": null
+        },
+        {
+          "file": "tests/v169-rpg-ui.test.js",
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /inventoryOwnsScroll\\s*\\? \"hidden\"\\s*: \"scroll\"/. Input:",
+          "classification": "D",
+          "owner": "js/19-stage-v78-character-inventory-runtime.js; css/49",
+          "rootCauseGroup": "retired-character-writer",
+          "reason": "仍讀已退役 inventoryOwnsScroll inline 排版。",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and final runtime diagnosis pending",
+          "runtimeChangeRequired": null
+        },
+        {
+          "file": "tests/v173.25-ui-polish.test.js",
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /#characterTabContent\\{[\\s\\S]*padding-bottom:0 !important/. Input:",
+          "classification": "C",
+          "owner": "css/22; css/49",
+          "rootCauseGroup": "backpack-css-owner",
+          "reason": "角色 Tab padding 驗證仍讀背包專用 css/22。",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and final runtime diagnosis pending",
+          "runtimeChangeRequired": null
+        },
+        {
+          "file": "tests/v173.26-followup-fixes.test.js",
+          "firstFailure": "AssertionError(obj);",
+          "classification": "B",
+          "owner": "js/00-main.js::startTurn; buff lifecycle",
+          "rootCauseGroup": "turn-lifecycle-fixture",
+          "reason": "startTurn fixture 仍預期舊 tickPlayerBuffs 呼叫階段；需核對正式當回合扣減。",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and final runtime diagnosis pending",
+          "runtimeChangeRequired": null
+        },
+        {
+          "file": "tests/v173.27-character-shell.test.js",
+          "firstFailure": "AssertionError [ERR_ASSERTION]: function applyNow exists",
+          "classification": "D",
+          "owner": "css/49; css/22; js/19-stage-v78-character-inventory-runtime.js",
+          "rootCauseGroup": "retired-character-writer",
+          "reason": "applyNow 已退役；改執行正式相容 export 並驗證不寫 DOM，CSS 保留全幅角色框／內部捲動。",
+          "selected": true,
+          "classificationStatus": "CONFIRMED",
+          "runtimeChangeRequired": false
+        },
+        {
+          "file": "tests/v173.42-player-flow.test.js",
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /upgradeSkill\\(/. Input:",
+          "classification": "D",
+          "owner": "js/00-main.js; js/41-v146-system-polish.js",
+          "rootCauseGroup": "skill-action-owner",
+          "reason": "仍要求退役的 home polish upgradeSkill 包裝入口。",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and final runtime diagnosis pending",
+          "runtimeChangeRequired": null
+        },
+        {
+          "file": "tests/v173.43-growth-charge.test.js",
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /\\.v146-growth-guidance-dot\\{[\\s\\S]*opacity:1 !important/. Input:",
+          "classification": "C",
+          "owner": "notification dot CSS owner",
+          "rootCauseGroup": "notification-dot-owner",
+          "reason": "仍要求舊 polish 中 dot opacity 的文字契約。",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and final runtime diagnosis pending",
+          "runtimeChangeRequired": null
+        },
+        {
+          "file": "tests/v173.45-current-request.test.js",
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /purifyMind:\\{[\\s\\S]*?targetType:\"ally\",enemyTargetAllowed:true/. Input:",
+          "classification": "C",
+          "owner": "js/60-v173.64-skill-progression-rebalance.js",
+          "rootCauseGroup": "skill-data-owner",
+          "reason": "purifyMind 資料已搬遷，仍讀 V169 compatibility 模組。",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and final runtime diagnosis pending",
+          "runtimeChangeRequired": null
+        },
+        {
+          "file": "tests/v173.55-inventory-observer-stall.test.js",
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /if\\(b\\.textContent!==text\\)b\\.textContent=text/. Input:",
+          "classification": "D",
+          "owner": "js/55-v173.51-inventory-qa.js",
+          "rootCauseGroup": "inventory-lifecycle-owner",
+          "reason": "舊文字同步碼已退役，仍要求 b.textContent guard 字串。",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and final runtime diagnosis pending",
+          "runtimeChangeRequired": null
+        },
+        {
+          "file": "tests/v173.61-current-request.test.js",
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /\\.v169-item-art\\.v169-rarity-white/. Input:",
+          "classification": "C",
+          "owner": "css/50; css/22",
+          "rootCauseGroup": "backpack-rarity-owner",
+          "reason": "rarity selector 已增加 neutral-art 排除，測試仍期待舊 selector。",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and final runtime diagnosis pending",
+          "runtimeChangeRequired": null
+        },
+        {
+          "file": "tests/v173.63-visible-ui-owner-repairs.test.js",
+          "firstFailure": "AssertionError [ERR_ASSERTION]: character owner must use the full mobile canvas",
+          "classification": "D",
+          "owner": "css/49; js/19-stage-v78-character-inventory-runtime.js",
+          "rootCauseGroup": "retired-character-writer",
+          "reason": "全幅角色框已由 CSS 控制，舊測試仍讀 JavaScript 寬高字串。",
+          "selected": true,
+          "classificationStatus": "CONFIRMED",
+          "runtimeChangeRequired": false
+        },
+        {
+          "file": "tests/v173.74-backpack-owner-convergence.test.js",
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /overflow-y:auto !important/. Input:",
+          "classification": "C",
+          "owner": "css/22; css/24",
+          "rootCauseGroup": "backpack-css-owner",
+          "reason": "正式 scroll rule 保留 overflow-y:auto，但已移除 !important；測試錯誤綁定其修飾字。",
+          "selected": true,
+          "classificationStatus": "CONFIRMED",
+          "runtimeChangeRequired": false
+        },
+        {
+          "file": "tests/v174-cardless-battle-presentation.test.js",
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /img\\.v162-abyss-battle-portrait-art\\{[\\s\\S]*?opacity:0 !important;[\\s\\S]*?pointer-events:none !important;/. Input:",
+          "classification": "D",
+          "owner": "js/54-v173.51-battle-qa.js; css/fixed-slot-battlefield-rendering-v2.css",
+          "rootCauseGroup": "portrait-presentation-owner",
+          "reason": "仍要求以 opacity 隱藏退休的 v162 portrait DOM。",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and final runtime diagnosis pending",
+          "runtimeChangeRequired": null
+        },
+        {
+          "file": "tests/v174-relic-navigation-button-polish.test.js",
+          "firstFailure": "AssertionError [ERR_ASSERTION]: the old bright primary style must be reserved for destructive red danger confirmation only",
+          "classification": "C",
+          "owner": "js/51-v169-rpg-ui.js",
+          "rootCauseGroup": "dialog-tone-contract",
+          "reason": "確認鍵正式契約增加 options.primary；本批只記錄，不核定所有使用情境。",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and final runtime diagnosis pending",
+          "runtimeChangeRequired": null
+        },
+        {
+          "file": "tests/v175-inventory-battle-nav-regressions.test.js",
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /#itemModal \\.item-modal-icon > \\.v169-item-art\\{[\\s\\S]*?width:min\\(42vw,180px\\);[\\s\\S]*?height:min\\(42vw,180px\\);/. Input:",
+          "classification": "C",
+          "owner": "css/22; css/38",
+          "rootCauseGroup": "responsive-item-owner",
+          "reason": "物品詳情圖框已更新為 responsive owner，仍期待 min(42vw,180px)。",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and final runtime diagnosis pending",
+          "runtimeChangeRequired": null
+        }
+      ]
+    },
+    "suiteRecoveryBatch4_20261002": {
+      "workId": "RELEASE-SUITES-P0-20261002",
+      "baseSha": "92f47835964eabab24d38d613fc3df02a83e66b5",
+      "branch": "fix/v17373-release-suite-recovery-batch4-20261002",
+      "repairedSuites": [
+        "tests/ui-typography-standard.test.js",
+        "tests/v169-rpg-ui.test.js",
+        "tests/v173.55-inventory-observer-stall.test.js",
+        "tests/v173.61-current-request.test.js",
+        "tests/v175-inventory-battle-nav-regressions.test.js"
+      ],
+      "recoveredOriginalFailures": 30,
+      "remainingNonEnvironmentFailures": 15,
+      "discoveredSuites": 262,
+      "unclassifiedTestJs": 0,
+      "preRepairSweep": "20/20 FAIL under TZ=UTC",
+      "targetedResult": "5/5 PASS; original 20-file diagnostic sweep 5 PASS / 15 FAIL under TZ=UTC",
+      "relatedRegression": "backpack-runtime-css-owner-convergence, backpack-commercial-rpg-ui, responsive-window-item-owner-convergence, v173.49-exp-pool-scroll-stability, battle-feedback-semantic-sequencing-20260927: 5/5 PASS",
+      "buildCheck": "PASS",
+      "diffCheck": "PASS",
+      "runtimeChanged": false,
+      "ci": "PENDING; authoritative latest PR / workflow state must be checked",
+      "fullReleaseSuite": "NOT PASS; local official runner exited 1 at missing Chrome after 20/262 suites; 15 original failures and full Chrome / release-candidate gates remain pending",
+      "priorDevIntegration": {
+        "pr": 761,
+        "mergeSha": "92f47835964eabab24d38d613fc3df02a83e66b5",
+        "ciRun": 37006601056,
+        "repositoryChecks": "SUCCESS",
+        "devDeploy": "SUCCESS; workflow deployment SHA read-back and deployed UI/battle QA PASS"
+      },
+      "failureInventory": [
+        {
+          "file": "tests/remaining-ui-regressions-20260914.test.js",
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /inventory-grid-classic \\.inventory-item-classic \\.inventory-icon > \\.v169-item-art[\\s\\S]*object-fit:contain/. Input:",
+          "classification": "C",
+          "owner": "css/22",
+          "rootCauseGroup": "backpack-css-owner",
+          "reason": "圖片 selector 與排版 owner 已更新，首斷言仍綁定舊空白格式。",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and final runtime diagnosis pending",
+          "runtimeChangeRequired": null,
+          "preRepairExitCode": 1,
+          "postRepairExitCode": 1
+        },
+        {
+          "file": "tests/ui-character-detail-hotfix.test.js",
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /label\\.textContent\\.trim\\(\\)===\"閃避\"/. Input:",
+          "classification": "D",
+          "owner": "js/47-v158-combat-tuning.js; js/35-v141-ui-battle.js; js/01-stage-v8-touch-lock.js",
+          "rootCauseGroup": "detail-and-touch-owner",
+          "reason": "仍要求退役的閃避文字後處理；触控 fixture 也仍走舊 API，待下一批。",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and final runtime diagnosis pending",
+          "runtimeChangeRequired": null,
+          "preRepairExitCode": 1,
+          "postRepairExitCode": 1
+        },
+        {
+          "file": "tests/ui-typography-standard.test.js",
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /\\.inventory-category-tab\\{[\\s\\S]*?font-size:15px/. Input:",
+          "classification": "C",
+          "owner": "css/22; css/49; js/60-team-relic-system.js::showRelicSpFloat; battle-floating-feedback-owner",
+          "rootCauseGroup": "retired-backpack-character-item-presentation-contract",
+          "reason": "背包字級已搬到css/22，18px頁籤／數量仍讀css/52；秘寶SP浮字已交給共用戰鬥回饋。只排除重複INVENTORY裝飾kicker，另核對背包中文標題22px、其餘非戰鬥字級>=13px。",
+          "selected": true,
+          "classificationStatus": "CONFIRMED; full selected file PASS",
+          "runtimeChangeRequired": false,
+          "preRepairExitCode": 1,
+          "postRepairExitCode": 0
+        },
+        {
+          "file": "tests/v141-system-expansion.test.js",
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /grid-template-rows:repeat\\(3,minmax\\(0,1fr\\)\\)/. Input:",
+          "classification": "C",
+          "owner": "css/22",
+          "rootCauseGroup": "backpack-css-owner",
+          "reason": "裝備格已使用正式 cell-height 排版，仍要求舊 repeat(3,minmax(0,1fr))。",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and final runtime diagnosis pending",
+          "runtimeChangeRequired": null,
+          "preRepairExitCode": 1,
+          "postRepairExitCode": 1
+        },
+        {
+          "file": "tests/v143-combat-dungeon-polish.test.js",
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /\\.skill-name-badge\\.v143-caster-skill-label\\{[\\s\\S]*?z-index:16020 !important;[\\s\\S]*?text-overflow:ellipsis !important;/. Input:",
+          "classification": "C",
+          "owner": "css/40; css/battle-reading-layer-contract.css",
+          "rootCauseGroup": "battle-reading-owner",
+          "reason": "技能文字層已更新，仍要求歷史 z-index 16020。",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and final runtime diagnosis pending",
+          "runtimeChangeRequired": null,
+          "preRepairExitCode": 1,
+          "postRepairExitCode": 1
+        },
+        {
+          "file": "tests/v144-rules-and-abyss.test.js",
+          "firstFailure": "  throw new AssertionError(obj);",
+          "classification": "E",
+          "owner": "js/40-v144-rules-and-abyss.js::configureEncounterSkills",
+          "rootCauseGroup": "vm-realm-assertion",
+          "reason": "首個 strict deepEqual 顯示同值 phoenixCry，VM array realm 需判定與正規化；本批未更動。",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and final runtime diagnosis pending",
+          "runtimeChangeRequired": null,
+          "preRepairExitCode": 1,
+          "postRepairExitCode": 1
+        },
+        {
+          "file": "tests/v154-current-request.test.js",
+          "firstFailure": "TypeError: Cannot read properties of null (reading 'src')",
+          "classification": "D",
+          "owner": "js/45-v154-dev-fixes.js; js/54-v173.51-battle-qa.js",
+          "rootCauseGroup": "portrait-presentation-owner",
+          "reason": "引用退休 v162-abyss-battle-portrait-art，querySelector 得 null。",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and final runtime diagnosis pending",
+          "runtimeChangeRequired": null,
+          "preRepairExitCode": 1,
+          "postRepairExitCode": 1
+        },
+        {
+          "file": "tests/v155-current-request.test.js",
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /Number\\(randomValue\\)<\\.70\\?\"attack\":\"buff\"/. Input:",
+          "classification": "A",
+          "owner": "js/00-main.js; js/gameplay-boss-tower-system.js",
+          "rootCauseGroup": "tower-challenge-profile",
+          "reason": "仍要求舊 .70 attack/buff 分支；共同塔技能率已有正式 profile。",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and final runtime diagnosis pending",
+          "runtimeChangeRequired": null,
+          "preRepairExitCode": 1,
+          "postRepairExitCode": 1
+        },
+        {
+          "file": "tests/v169-abyss-assets-flow.test.js",
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /素材尚未生成[\\s\\S]*自動盤點 → 自動生成 → 自動放置 → batch finalize → batch strict audit/. Input:",
+          "classification": "C",
+          "owner": "docs/MONSTER_PORTRAIT_SPEC_V1.md",
+          "rootCauseGroup": "portrait-pipeline-contract",
+          "reason": "生成／導入流程文件已改版，測試仍綁定舊流程文字。",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and final runtime diagnosis pending",
+          "runtimeChangeRequired": null,
+          "preRepairExitCode": 1,
+          "postRepairExitCode": 1
+        },
+        {
+          "file": "tests/v169-rpg-ui.test.js",
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /inventoryOwnsScroll\\s*\\? \"hidden\"\\s*: \"scroll\"/. Input:",
+          "classification": "D",
+          "owner": "css/31; css/49; js/19-stage-v78-character-inventory-runtime.js; js/00-main.js::openInventoryContext",
+          "rootCauseGroup": "retired-backpack-character-item-presentation-contract",
+          "reason": "仍要求退休inline inventoryOwnsScroll與css/22角色padding；背包入口呼叫方向已反轉，openMapInventoryOverlay只委派openInventoryContext。相容export實際VM執行不寫DOM，保留角色自然捲動／共用背包入口。",
+          "selected": true,
+          "classificationStatus": "CONFIRMED; full selected file PASS",
+          "runtimeChangeRequired": false,
+          "preRepairExitCode": 1,
+          "postRepairExitCode": 0
+        },
+        {
+          "file": "tests/v173.25-ui-polish.test.js",
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /#characterTabContent\\{[\\s\\S]*padding-bottom:0 !important/. Input:",
+          "classification": "C",
+          "owner": "css/22; css/49",
+          "rootCauseGroup": "backpack-css-owner",
+          "reason": "角色 Tab padding 驗證仍讀背包專用 css/22。",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and final runtime diagnosis pending",
+          "runtimeChangeRequired": null,
+          "preRepairExitCode": 1,
+          "postRepairExitCode": 1
+        },
+        {
+          "file": "tests/v173.26-followup-fixes.test.js",
+          "firstFailure": "  throw new AssertionError(obj);",
+          "classification": "B",
+          "owner": "js/00-main.js::startTurn; buff lifecycle",
+          "rootCauseGroup": "turn-lifecycle-fixture",
+          "reason": "startTurn fixture 仍預期舊 tickPlayerBuffs 呼叫階段；需核對正式當回合扣減。",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and final runtime diagnosis pending",
+          "runtimeChangeRequired": null,
+          "preRepairExitCode": 1,
+          "postRepairExitCode": 1
+        },
+        {
+          "file": "tests/v173.42-player-flow.test.js",
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /upgradeSkill\\(/. Input:",
+          "classification": "D",
+          "owner": "js/00-main.js; js/41-v146-system-polish.js",
+          "rootCauseGroup": "skill-action-owner",
+          "reason": "仍要求退役的 home polish upgradeSkill 包裝入口。",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and final runtime diagnosis pending",
+          "runtimeChangeRequired": null,
+          "preRepairExitCode": 1,
+          "postRepairExitCode": 1
+        },
+        {
+          "file": "tests/v173.43-growth-charge.test.js",
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /\\.v146-growth-guidance-dot\\{[\\s\\S]*opacity:1 !important/. Input:",
+          "classification": "C",
+          "owner": "notification dot CSS owner",
+          "rootCauseGroup": "notification-dot-owner",
+          "reason": "仍要求舊 polish 中 dot opacity 的文字契約。",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and final runtime diagnosis pending",
+          "runtimeChangeRequired": null,
+          "preRepairExitCode": 1,
+          "postRepairExitCode": 1
+        },
+        {
+          "file": "tests/v173.45-current-request.test.js",
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /purifyMind:\\{[\\s\\S]*?targetType:\"ally\",enemyTargetAllowed:true/. Input:",
+          "classification": "C",
+          "owner": "js/60-v173.64-skill-progression-rebalance.js",
+          "rootCauseGroup": "skill-data-owner",
+          "reason": "purifyMind 資料已搬遷，仍讀 V169 compatibility 模組。",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and final runtime diagnosis pending",
+          "runtimeChangeRequired": null,
+          "preRepairExitCode": 1,
+          "postRepairExitCode": 1
+        },
+        {
+          "file": "tests/v173.55-inventory-observer-stall.test.js",
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /if\\(b\\.textContent!==text\\)b\\.textContent=text/. Input:",
+          "classification": "D",
+          "owner": "js/55-v173.51-inventory-qa.js::syncSellUi; js/53-v173.50-inventory-qol.js::v17350SyncQuickSellModal",
+          "rootCauseGroup": "retired-backpack-character-item-presentation-contract",
+          "reason": "仍要求退休的按鈕／meta文字更新；目前由正式quick-sell owner渲染。改VM驗安裝一次、品質更新一次、未知品質white fallback、UID sidecar key與change事件、重複安裝不新增hook；禁止observer／polling與退休writer。",
+          "selected": true,
+          "classificationStatus": "CONFIRMED; full selected file PASS",
+          "runtimeChangeRequired": false,
+          "preRepairExitCode": 1,
+          "postRepairExitCode": 0
+        },
+        {
+          "file": "tests/v173.61-current-request.test.js",
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /\\.v169-item-art\\.v169-rarity-white/. Input:",
+          "classification": "C",
+          "owner": "css/22; css/50; js/35-v141-ui-battle.js",
+          "rootCauseGroup": "retired-backpack-character-item-presentation-contract",
+          "reason": "階級樣式已排除背包neutral inner art；原selector未包含not排除。保留白藍紫橙固定色、背包內圖中性化與唯一外框稀有度來源。",
+          "selected": true,
+          "classificationStatus": "CONFIRMED; full selected file PASS",
+          "runtimeChangeRequired": false,
+          "preRepairExitCode": 1,
+          "postRepairExitCode": 0
+        },
+        {
+          "file": "tests/v174-cardless-battle-presentation.test.js",
+          "firstFailure": "  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /img\\.v162-abyss-battle-portrait-art\\{[\\s\\S]*?opacity:0 !important;[\\s\\S]*?pointer-events:none !important;/. Input:",
+          "classification": "D",
+          "owner": "js/54-v173.51-battle-qa.js; css/fixed-slot-battlefield-rendering-v2.css",
+          "rootCauseGroup": "portrait-presentation-owner",
+          "reason": "仍要求以 opacity 隱藏退休的 v162 portrait DOM。",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and final runtime diagnosis pending",
+          "runtimeChangeRequired": null,
+          "preRepairExitCode": 1,
+          "postRepairExitCode": 1
+        },
+        {
+          "file": "tests/v174-relic-navigation-button-polish.test.js",
+          "firstFailure": "AssertionError [ERR_ASSERTION]: the old bright primary style must be reserved for destructive red danger confirmation only",
+          "classification": "C",
+          "owner": "js/51-v169-rpg-ui.js",
+          "rootCauseGroup": "dialog-tone-contract",
+          "reason": "確認鍵正式契約增加 options.primary；本批只記錄，不核定所有使用情境。",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and final runtime diagnosis pending",
+          "runtimeChangeRequired": null,
+          "preRepairExitCode": 1,
+          "postRepairExitCode": 1
+        },
+        {
+          "file": "tests/v175-inventory-battle-nav-regressions.test.js",
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /#itemModal \\.item-modal-icon > \\.v169-item-art\\{[\\s\\S]*?width:min\\(42vw,180px\\);[\\s\\S]*?height:min\\(42vw,180px\\);/. Input:",
+          "classification": "C",
+          "owner": "css/49; js/00-main.js::setItemModalPresentationMode",
+          "rootCauseGroup": "retired-backpack-character-item-presentation-contract",
+          "reason": "物品圖框由css/38固定42vw／180px搬到css/49共用自適應square owner。改驗clamp、aspect-ratio:1、100%內圖與contain，禁止退休css/38接管；其餘背包排序／Boss／VFX／導覽斷言全部保留。",
+          "selected": true,
+          "classificationStatus": "CONFIRMED; full selected file PASS",
+          "runtimeChangeRequired": false,
+          "preRepairExitCode": 1,
+          "postRepairExitCode": 0
+        }
+      ]
+    },
+    "suiteRecoveryBatch5_20261002": {
+      "workId": "RELEASE-SUITES-P0-20261002",
+      "baseSha": "7d47379557a716825f794589d249da31af51f678",
+      "branch": "fix/v17373-release-suite-recovery-batch5-20261002",
+      "repairedSuites": [
+        "tests/remaining-ui-regressions-20260914.test.js",
+        "tests/v173.25-ui-polish.test.js",
+        "tests/v173.43-growth-charge.test.js",
+        "tests/v174-cardless-battle-presentation.test.js",
+        "tests/v174-relic-navigation-button-polish.test.js"
+      ],
+      "recoveredOriginalFailures": 35,
+      "remainingNonEnvironmentFailures": 10,
+      "discoveredSuites": 262,
+      "preRepairSweep": "15/15 FAIL under TZ=UTC",
+      "targetedResult": "5/5 PASS; original 15-file diagnostic sweep 5 PASS / 10 FAIL under TZ=UTC",
+      "relatedRegression": "battle-feedback-semantic-sequencing, monster-portrait-runtime, shared-nav-owner-regression, responsive-window-item-owner-convergence, v169-rpg-ui: 5/5 PASS",
+      "buildCheck": "PASS",
+      "diffCheck": "PASS",
+      "runtimeChanged": false,
+      "ci": "PENDING; latest PR/workflow is authoritative",
+      "fullReleaseSuite": "NOT PASS; local official runner exited 1 at missing Chrome after 20/262 suites; 10 original failures and final Chrome/candidate gates remain pending",
+      "priorDevIntegration": {
+        "pr": 762,
+        "mergeSha": "7d47379557a716825f794589d249da31af51f678",
+        "ciRun": 37011016118,
+        "repositoryChecks": "SUCCESS",
+        "devDeploy": "SUCCESS; deployed SHA/version/cache read-back and UI/battle QA PASS",
+        "sourceBranch": "Still present; connector has no ref deletion operation"
+      },
+      "failureInventory": [
+        {
+          "file": "tests/remaining-ui-regressions-20260914.test.js",
+          "preRepairExitCode": 1,
+          "postRepairExitCode": 0,
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /inventory-grid-classic \\.inventory-item-classic \\.inventory-icon > \\.v169-item-art[\\s\\S]*object-fit:contain/. Input:",
+          "selected": true,
+          "classificationStatus": "CONFIRMED; full selected file PASS",
+          "runtimeChangeRequired": false,
+          "classification": "C/D",
+          "owner": "css/22; js/battle-floating-feedback-owner.js; js/04-stage-v11-native-bottom-nav-runtime.js; js/42-v148-combat-dungeon-fixes.js",
+          "reason": "圖片selector空白誤綁、V143舊popup class與舊nav委派名字；改驗contain/center、共用浮字DOM/lane及正式nav委派。",
+          "rootCauseGroup": "retired-presentation-owner-contract"
+        },
+        {
+          "file": "tests/ui-character-detail-hotfix.test.js",
+          "preRepairExitCode": 1,
+          "postRepairExitCode": 1,
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /label\\.textContent\\.trim\\(\\)===\"閃避\"/. Input:",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and runtime diagnosis pending",
+          "runtimeChangeRequired": null
+        },
+        {
+          "file": "tests/v141-system-expansion.test.js",
+          "preRepairExitCode": 1,
+          "postRepairExitCode": 1,
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /grid-template-rows:repeat\\(3,minmax\\(0,1fr\\)\\)/. Input:",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and runtime diagnosis pending",
+          "runtimeChangeRequired": null
+        },
+        {
+          "file": "tests/v143-combat-dungeon-polish.test.js",
+          "preRepairExitCode": 1,
+          "postRepairExitCode": 1,
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /\\.skill-name-badge\\.v143-caster-skill-label\\{[\\s\\S]*?z-index:16020 !important;[\\s\\S]*?text-overflow:ellipsis !important;/. Input:",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and runtime diagnosis pending",
+          "runtimeChangeRequired": null
+        },
+        {
+          "file": "tests/v144-rules-and-abyss.test.js",
+          "preRepairExitCode": 1,
+          "postRepairExitCode": 1,
+          "firstFailure": "  throw new AssertionError(obj);",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and runtime diagnosis pending",
+          "runtimeChangeRequired": null
+        },
+        {
+          "file": "tests/v154-current-request.test.js",
+          "preRepairExitCode": 1,
+          "postRepairExitCode": 1,
+          "firstFailure": "TypeError: Cannot read properties of null (reading 'src')",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and runtime diagnosis pending",
+          "runtimeChangeRequired": null
+        },
+        {
+          "file": "tests/v155-current-request.test.js",
+          "preRepairExitCode": 1,
+          "postRepairExitCode": 1,
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /Number\\(randomValue\\)<\\.70\\?\"attack\":\"buff\"/. Input:",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and runtime diagnosis pending",
+          "runtimeChangeRequired": null
+        },
+        {
+          "file": "tests/v169-abyss-assets-flow.test.js",
+          "preRepairExitCode": 1,
+          "postRepairExitCode": 1,
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /素材尚未生成[\\s\\S]*自動盤點 → 自動生成 → 自動放置 → batch finalize → batch strict audit/. Input:",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and runtime diagnosis pending",
+          "runtimeChangeRequired": null
+        },
+        {
+          "file": "tests/v173.25-ui-polish.test.js",
+          "preRepairExitCode": 1,
+          "postRepairExitCode": 0,
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /#characterTabContent\\{[\\s\\S]*padding-bottom:0 !important/. Input:",
+          "selected": true,
+          "classificationStatus": "CONFIRMED; full selected file PASS",
+          "runtimeChangeRequired": false,
+          "classification": "C/D",
+          "owner": "css/31; css/battle-skill-name-presentation-owner.css; js/battle-floating-feedback-owner.js",
+          "reason": "角色padding已搬到css/31；技能名轉共用元素色/字級無裁切，狀態转共用impact排程與黑膠囊，不恢復退休CSS。",
+          "rootCauseGroup": "retired-presentation-owner-contract"
+        },
+        {
+          "file": "tests/v173.26-followup-fixes.test.js",
+          "preRepairExitCode": 1,
+          "postRepairExitCode": 1,
+          "firstFailure": "  throw new AssertionError(obj);",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and runtime diagnosis pending",
+          "runtimeChangeRequired": null
+        },
+        {
+          "file": "tests/v173.42-player-flow.test.js",
+          "preRepairExitCode": 1,
+          "postRepairExitCode": 1,
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /upgradeSkill\\(/. Input:",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and runtime diagnosis pending",
+          "runtimeChangeRequired": null
+        },
+        {
+          "file": "tests/v173.43-growth-charge.test.js",
+          "preRepairExitCode": 1,
+          "postRepairExitCode": 0,
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /\\.v146-growth-guidance-dot\\{[\\s\\S]*opacity:1 !important/. Input:",
+          "selected": true,
+          "classificationStatus": "CONFIRMED; full selected file PASS",
+          "runtimeChangeRequired": false,
+          "classification": "C/D",
+          "owner": "css/38-v141-system-expansion.css; css/06-stage-v11-native-bottom-nav.css",
+          "reason": "growth專用紅點CSS退役；共用9px與native22logical px，保留target opacity/filter及pulse90%契約。",
+          "rootCauseGroup": "retired-presentation-owner-contract"
+        },
+        {
+          "file": "tests/v173.45-current-request.test.js",
+          "preRepairExitCode": 1,
+          "postRepairExitCode": 1,
+          "firstFailure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /purifyMind:\\{[\\s\\S]*?targetType:\"ally\",enemyTargetAllowed:true/. Input:",
+          "selected": false,
+          "classificationStatus": "FIRST_FAILURE_TRIAGE_ONLY; later assertions and runtime diagnosis pending",
+          "runtimeChangeRequired": null
+        },
+        {
+          "file": "tests/v174-cardless-battle-presentation.test.js",
+          "preRepairExitCode": 1,
+          "postRepairExitCode": 0,
+          "firstFailure": "  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /img\\.v162-abyss-battle-portrait-art\\{[\\s\\S]*?opacity:0 !important;[\\s\\S]*?pointer-events:none !important;/. Input:",
+          "selected": true,
+          "classificationStatus": "CONFIRMED; full selected file PASS",
+          "runtimeChangeRequired": false,
+          "classification": "D",
+          "owner": "js/45-v154-dev-fixes.js::syncCardlessPresentation; js/54-v173.51-battle-qa.js::syncUnitArtwork",
+          "reason": "V154只選record並委派V174，未再建立legacy image，不應要求opacity補丁；VM驗重複applyUnit只有一張圖且card不重畫。",
+          "rootCauseGroup": "retired-presentation-owner-contract"
+        },
+        {
+          "file": "tests/v174-relic-navigation-button-polish.test.js",
+          "preRepairExitCode": 1,
+          "postRepairExitCode": 0,
+          "firstFailure": "AssertionError [ERR_ASSERTION]: the old bright primary style must be reserved for destructive red danger confirmation only",
+          "selected": true,
+          "classificationStatus": "CONFIRMED; full selected file PASS",
+          "runtimeChangeRequired": false,
+          "classification": "C",
+          "owner": "js/51-v169-rpg-ui.js::normalizeDialogOptions/pumpDialogQueue",
+          "reason": "確認視窗已允許明確primary布林，雲端設定採納入口使用；VM驗default/danger/primary/非布林與重用後清除舊tone，保留秘寶/深淵其餘斷言。",
+          "rootCauseGroup": "retired-presentation-owner-contract"
+        }
+      ]
+    },
+    "historicalDiagnosticNote": "Preflight and batch1–5 recovery records below are historical snapshots, superseded by suiteCloseout20261003. Their pending/failure lists are not current remaining work.",
+    "historicalP0BeforeCloseout": [
+      {
+        "id": "P0-FULL-RELEASE-SUITES",
+        "problem": "正式發布必要的完整 Node 測試尚未通過。",
+        "rootCause": "dev 的精簡 CI 跳過 main／以 main 為基底 PR 必跑的完整 suites。部分舊測試仍引用退休 owner／舊資料名稱或缺少目前函式依賴；其餘失敗尚待逐項診斷，不能全部當成過時測試。",
+        "playerImpact": "無法完成正式發布必要驗收；不是已確認 45 個遊戲故障。",
+        "dataDamage": "目前未確認此項造成存檔或經濟資料損害；涉及經濟、戰鬥的失敗仍必須辨識。",
+        "minimumRepair": "逐項區分過時斷言、測試 fixture 與真實 Runtime regression；只遷移已證明過時的測試，真實 regression 做最小安全修復。不得刪測試、跳過 suites 或降低 CI。完整必要 CI 與候選 SHA 驗收通過後才能解除。",
+        "remainingFailingSuites": [
+          "tests/ui-character-detail-hotfix.test.js",
+          "tests/v141-system-expansion.test.js",
+          "tests/v143-combat-dungeon-polish.test.js",
+          "tests/v144-rules-and-abyss.test.js",
+          "tests/v154-current-request.test.js",
+          "tests/v155-current-request.test.js",
+          "tests/v169-abyss-assets-flow.test.js",
+          "tests/v173.26-followup-fixes.test.js",
+          "tests/v173.42-player-flow.test.js",
+          "tests/v173.45-current-request.test.js"
+        ]
+      }
+    ],
+    "suiteCloseout20261003": {
+      "workId": "RELEASE-SUITES-P0-20261002",
+      "status": "VERIFIED",
+      "repairPR": 768,
+      "repairPRUrl": "https://github.com/tf00913225-alt/my-game/pull/768",
+      "repairHeadSha": "808676db34da25b15f52ae3cdf4492a5f3853b69",
+      "verifiedDevSha": "81853be234963c8a5250b474c38480dcd0dfa2b4",
+      "testedTree": "967d1c9395e92bf736c7c3500ad45883e5b1dcc7",
+      "independentFullSuite": {
+        "command": "CI=1 TZ=UTC npm test",
+        "runner": ".github/scripts/ci.mjs tests",
+        "discovered": 262,
+        "passed": 262,
+        "failed": 0,
+        "exitCode": 0,
+        "missingChromeSkip": 0,
+        "continueOnFailure": false,
+        "evidenceSource": "https://github.com/tf00913225-alt/my-game/pull/768",
+        "logSha256": "3ec9fb5275f17293b1d2f4d75718dd52aaa2ca1276ef116144882695ac4ee568",
+        "provenance": "PR #768 final independent-run record; distinct from dev CI; exact tested tree equals current dev tree. Closeout does not rerun or claim candidate acceptance."
+      },
+      "browser": {
+        "name": "Google Chrome for Testing headless shell",
+        "version": "154.0.8037.97",
+        "actualChrome": true,
+        "missingChromeSkipCountedAsPass": false
+      },
+      "targeted": {
+        "skillProgression": "20/20 PASS",
+        "cardlessBattlePresentation": "5/5 PASS",
+        "v141": "18/18 PASS",
+        "criticalMobileBrowser": "PASS"
+      },
+      "notificationTimezones": {
+        "UTC": "12/12 PASS",
+        "Asia/Taipei": "12/12 PASS",
+        "America/New_York": "12/12 PASS"
+      },
+      "build": "PASS",
+      "buildCheck": "PASS",
+      "diffCheck": "PASS",
+      "prCI": {
+        "run": 37079249628,
+        "result": "SUCCESS"
+      },
+      "devCI": {
+        "run": 37080384742,
+        "attempt": 2,
+        "job": 111082308123,
+        "sha": "81853be234963c8a5250b474c38480dcd0dfa2b4",
+        "result": "SUCCESS",
+        "fullNodeStep": "SKIPPED by existing dev refined policy; not Full Node PASS",
+        "url": "https://github.com/tf00913225-alt/my-game/actions/runs/37080384742/attempts/2"
+      },
+      "devDeployment": {
+        "job": 111082274607,
+        "run": 37080384742,
+        "attempt": 2,
+        "sha": "81853be234963c8a5250b474c38480dcd0dfa2b4",
+        "result": "SUCCESS",
+        "manifestArtifact": 11258362889,
+        "responsiveItemArtifact": 11258772310,
+        "battleLiveArtifact": 11258248134,
+        "checks": "Responsive Item 6/6 viewports; Forge 390x844/412x915; battle layer/audio live mobile QA PASS",
+        "url": "https://github.com/tf00913225-alt/my-game/actions/runs/37080384742/attempts/2"
+      },
+      "deployedReadBack": {
+        "url": "https://dev.four-symbols-dev.pages.dev/release-manifest.json",
+        "sha": "81853be234963c8a5250b474c38480dcd0dfa2b4",
+        "version": "V173.72",
+        "cacheVersion": "173.72",
+        "result": "PASS",
+        "verification": "GitHub job log and independent release-gate verify-deployed read-back on 2026-10-03; deploymentShaVerified computed by verifier, not inferred from CI green"
+      },
+      "mainUnchanged": {
+        "sha": "4b037b47967544d90c781ad938286777c9576731",
+        "result": "PASS"
+      },
+      "repairBranch": "DELETED; exact ref 404",
+      "releaseCandidateSha": null,
+      "releaseFreezeStarted": false,
+      "productionReleaseStarted": false,
+      "nextStage": "Only after explicit release-freeze authorization: fix candidate SHA and perform required Exact-HEAD full suite and release acceptance."
+    }
+  },
+  "freeze20261003": {
+    "workId": "V17373-RELEASE-FREEZE-20261003",
+    "authorizedBy": "Explicit project owner instruction on 2026-10-03",
+    "baseDevSha": "a959e8bda4d79d55e3af36174921a19b579f5a80",
+    "mainSha": "4b037b47967544d90c781ad938286777c9576731",
+    "branch": "release/v17373-freeze-20261003",
+    "candidateStatus": "PENDING_MERGE",
+    "candidateRecordOwner": "Freeze PR body: immutable merge/dev SHA and exact-SHA acceptance. Do not amend the candidate to embed its own SHA.",
+    "allowedChanges": [
+      "Version",
+      "Cache",
+      "Release metadata",
+      "Release Scope",
+      "Player notice",
+      "CHANGELOG",
+      "Necessary release documentation",
+      "Generated build synchronization"
+    ],
+    "nonessentialDevelopmentPaused": true,
+    "mainPublicationAuthorized": false,
+    "exactCandidateAcceptance": "PENDING; PR #768 historical full suite is not candidate evidence",
+    "invalidationRule": "Any later dev commit invalidates the recorded candidate; fix through a new dev PR and repeat required exact-SHA acceptance."
+  }
+}

@@ -56,38 +56,26 @@ function requireSignedInUid(){
     return uid;
 }
 
-function readLegacyLocalSave(){
-    let raw;
-    try{
-        raw = window.localStorage.getItem(LEGACY_LOCAL_SAVE_KEY);
-    }catch(error){
-        error.code = error.code || "firebase/local-save-unavailable";
-        throw error;
-    }
-
-    if(!raw){
-        const error = new Error("No current local save exists to submit for migration review.");
-        error.code = "firebase/local-save-missing";
-        throw error;
-    }
-
-    try{
-        const parsed = JSON.parse(raw);
-        if(!parsed || typeof parsed !== "object" || Array.isArray(parsed)){
-            throw new Error("Local save is not an object.");
-        }
-        return parsed;
-    }catch(cause){
-        const error = new Error("Current local save is not valid JSON.");
-        error.code = "firebase/local-save-invalid";
-        error.cause = cause;
-        throw error;
-    }
+async function sha256(raw){
+    const bytes=new TextEncoder().encode(raw);
+    const digest=await window.crypto.subtle.digest("SHA-256",bytes);
+    return [...new Uint8Array(digest)].map(byte=>byte.toString(16).padStart(2,"0")).join("");
 }
 
 async function callTrustedFunction(name, payload){
     const expectedUid=requireSignedInUid();
     return callProtectedFunction(name,payload||{},expectedUid);
+}
+
+/* Read-only review of the current private candidate. The backend binds both
+ * revisions to the active UID/session and returns blockers, never save bytes. */
+export async function screenLegacyMigrationCandidate(candidateRevision,expectedRevision){
+    if(!Number.isSafeInteger(candidateRevision)||candidateRevision<1||
+       !Number.isSafeInteger(expectedRevision)||expectedRevision<1){
+        throw Object.assign(new Error("Current candidate and cloud revisions are required."),
+            {code:"CLOUD_REVISION_REQUIRED"});
+    }
+    return callTrustedFunction("screenLegacyMigrationCandidate",{candidateRevision,expectedRevision});
 }
 
 export async function readCurrentCloudSave(){
@@ -112,11 +100,99 @@ export async function bootstrapTrustedCloudSave(){
     return callTrustedFunction("bootstrapCloudSave", {});
 }
 
+/* Only first-character choices cross this boundary. The backend checks Auth
+ * account age, active session, empty canonical sources and expected revision. */
+export async function createInitialCanonicalCharacter(selection,expectedRevision){
+    return callTrustedFunction("createInitialCanonicalCharacter",{selection,expectedRevision});
+}
+
+/* Explicit, same-UID preference upload. Never sends the character save,
+ * and never runs as part of saveGame, login or offline replay. */
+export async function saveLocalAutoBattlePreferences(expectedRevision){
+    const uid=requireSignedInUid();
+    const repository=window.FourSymbolsAccountSave;
+    if(!repository||repository.getActiveUid()!==uid){
+        const error=new Error("The active local save belongs to another account.");
+        error.code="ACCOUNT_CHANGED";
+        throw error;
+    }
+    const local=repository.readForUid(uid);
+    if(local.status!=="ready"){
+        const error=new Error("No verified local character save is available.");
+        error.code="LOCAL_SAVE_REQUIRED";
+        throw error;
+    }
+    const {player,player2,player3}=local.save;
+    const characterIds=[player,player2,player3].map(character=>character?.id||null);
+    /* Old UID saves may contain only some of these fields. Project the five
+     * approved settings with gameplay defaults; never forward other save data. */
+    const projectConfig=(value)=>{
+        if(value!==undefined&&value!==null&&(typeof value!=="object"||Array.isArray(value))){
+            const error=new Error("Local auto-battle settings are invalid.");
+            error.code="LOCAL_PREFERENCES_INVALID";
+            throw error;
+        }
+        const config=value||{};
+        return {
+            enabled:config.enabled??false,
+            skill:config.skill??"normal",
+            hp:config.hp??50,
+            sp:config.sp??25,
+            returnToCityWhenEmpty:config.returnToCityWhenEmpty??false
+        };
+    };
+    const preferences={
+        characterIds,
+        autoConfig:projectConfig(local.save.autoConfig),
+        autoConfig2:projectConfig(local.save.autoConfig2),
+        autoConfig3:projectConfig(local.save.autoConfig3)
+    };
+    return callTrustedFunction("saveCloudPreferences",{preferences,expectedRevision});
+}
+
 export async function submitLegacyMigrationCandidate(options={}){
-    const save = readLegacyLocalSave();
+    const uid=requireSignedInUid();
+    const repository=window.FourSymbolsAccountSave;
+    if(!repository||repository.getActiveUid()!==uid){
+        throw Object.assign(new Error("Active UID changed."),{code:"ACCOUNT_CHANGED"});
+    }
+    // The caller selects a previously sealed backup. No live gameplay or legacy
+    // key is read between owner confirmation and the protected callable.
+    const backup=repository.verifyMigrationBackup(uid,options.backupKey);
+    const sidecarManifest=JSON.stringify(backup.sidecars);
+    const [backupDigest,manifestDigest]=await Promise.all([
+        sha256(JSON.stringify({ownerUid:uid,mainRaw:backup.mainRaw,
+            metadataRaw:backup.metadataRaw,sidecars:backup.sidecars})),
+        sha256(sidecarManifest)
+    ]);
+    if(requireSignedInUid()!==uid||repository.getActiveUid()!==uid){
+        throw Object.assign(new Error("Account changed during backup verification."),{code:"ACCOUNT_CHANGED"});
+    }
     const clientVersion = String(options.clientVersion || "").trim() || null;
+    if(!Number.isSafeInteger(options.expectedRevision)||options.expectedRevision<1){
+        throw Object.assign(new Error("A current cloud revision is required."),{code:"CLOUD_REVISION_REQUIRED"});
+    }
     return callTrustedFunction("submitLegacyMigrationCandidate", {
-        save,
+        expectedRevision:options.expectedRevision,
+        backup:{schemaVersion:backup.schemaVersion,backupId:backup.backupKey,
+            ownerUid:uid,mainFingerprint:backup.mainFingerprint,
+            sidecarManifestFingerprint:backup.sidecarManifestFingerprint,
+            mainRaw:backup.mainRaw,metadataRaw:backup.metadataRaw,
+            sidecars:backup.sidecars,sidecarManifestSha256:manifestDigest,
+            backupSha256:backupDigest},
         clientVersion
     });
+}
+
+/* Creates an explicit immutable UID backup before any future migration
+ * consent. It does not upload, promote or restore gameplay state. */
+export function createLocalMigrationBackup(){
+    const uid=requireSignedInUid();
+    const repository=window.FourSymbolsAccountSave;
+    if(!repository||repository.getActiveUid()!==uid){
+        const error=new Error("The active local save belongs to another account.");
+        error.code="ACCOUNT_CHANGED";
+        throw error;
+    }
+    return repository.createMigrationBackup(uid);
 }

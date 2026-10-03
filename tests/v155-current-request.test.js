@@ -98,16 +98,29 @@ test("V155 no longer owns a final-roster patch",()=>{
     assert.equal(Object.keys(context.skillDatabase).includes("fireBurstStrike"),false,"monster-only skill must not leak into player lists");
 });
 
-test("enemy AI keeps 70/30 category selection and hard-control caps directional",()=>{
-    assert.match(coreSource,/Number\(randomValue\)<\.70\?"attack":"buff"/);
+test("enemy AI uses default 70/30 and water-tower 30/70 boundaries with directional hard-control caps",()=>{
+    const chooser=coreSource.slice(coreSource.indexOf("function chooseEnemySkillCategory("),coreSource.indexOf("window.FourSymbolsEnemySkillAI="));
+    const context=vm.createContext({});
+    vm.runInContext(chooser,context);
+    const choose=context.chooseEnemySkillCategory;
+    assert.equal(choose(["attack"],["buff"],.699),"attack");
+    assert.equal(choose(["attack"],["buff"],.70),"buff");
+    const waterTower={vGameplayTower:true,element:"water"};
+    assert.equal(choose(["attack"],["buff"],.299,waterTower),"attack");
+    assert.equal(choose(["attack"],["buff"],.30,waterTower),"buff");
+    assert.equal(choose(["attack"],["buff"],.69,{element:"water"}),"attack");
+    assert.equal(choose(["attack"],["buff"],.69,{vGameplayTower:true,element:"fire"}),"attack");
+    assert.equal(choose([],[],0),"normal");
+    assert.equal(choose([],["buff"],0),"buff");
+    assert.equal(choose(["attack"],[],1),"attack");
     assert.match(coreSource,/regular:\{\s*min:5,\s*max:90/);
     assert.match(coreSource,/elite:\{\s*min:5,\s*max:75/);
     assert.match(coreSource,/boss:\{\s*min:5,\s*max:60/);
     assert.match(coreSource,/player:\{\s*min:5,\s*max:60/);
-    assert.match(coreSource,/targetFinalSpirit,true,"player"/);
-    const v143=fs.readFileSync("js/38-v143-system-fixes.js","utf8");
-    assert.match(v143,/rain\.frostbiteChance=50/);
-    assert.doesNotMatch(v143,/rain\.freezeChance=50/);
+    assert.match(coreSource,/targetFinalStatusResistance,true,"player"/);
+    const progression=fs.readFileSync("js/60-v173.64-skill-progression-rebalance.js","utf8");
+    assert.match(progression,/waterKnife:\{[^\n]*frostbiteChance:50/);
+    assert.doesNotMatch(progression,/waterKnife:\{[^\n]*freezeChance:50/);
 });
 
 test("Extreme Emperor uses only Yuan Zu Blessing with independent cleanse and instant recovery",()=>{
@@ -129,7 +142,7 @@ test("Extreme Emperor uses only Yuan Zu Blessing with independent cleanse and in
     assert.deepEqual([extreme.hp,extreme.sp],[400,255]);
     assert.deepEqual([ally.hp,ally.sp],[200,110]);
     assert.equal(ally.agility,100,"old agility blessing is removed");
-    assert.equal(ally.evasion,85);
+    assert.equal(ally.evasion,165);
     assert.equal(ally.v155EvasionBlessing.displayBuff.turnsLeft,2);
     ally.hp=200; ally.sp=110;
     assert.equal(context.v155ResolveExtremeEmperorAction(0,"yuanZuBlessing",[false,true]),true);
@@ -176,7 +189,7 @@ test("wind elite uses Dodge, never Stealth",()=>{
     assert.equal(context.v155ResolveWindEliteDodge(0,true),true);
     assert.deepEqual(array(context.getSkillTargets(0,"single")),[0]);
     assert.deepEqual(array(context.getSkillTargets(0,"all")),[0]);
-    assert.equal(elite.evasion,85);
+    assert.equal(elite.evasion,95);
     assert.deepEqual(
         [elite.v155WindDodge.statusName,elite.v155WindDodge.bonusPercent,elite.v155WindDodge.expiresTurn],
         ["風行",75,4]

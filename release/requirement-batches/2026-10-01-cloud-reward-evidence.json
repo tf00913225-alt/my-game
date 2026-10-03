@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "cloud-reward-evidence-20261001",
+  "releaseVersion": "173.72",
+  "requirements": [
+    {
+      "id": "CLOUD-REWARD-EVIDENCE-01",
+      "title": "Trusted credits persist before/after immutable evidence and reject inconsistent replays",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "functions/src/credited-grant-evidence.js",
+          "functions/src/canonical-resource-credit.js",
+          "functions/src/trusted-grant-ledger.js",
+          "tests/cloud-save-credited-grant-evidence.test.mjs",
+          "scripts/test-session-authority-emulator.mjs"
+        ],
+        "verification": "16 targeted node cases pass; real Firestore/callable CI and deployments pending.",
+        "result": "No historical adoption or proof fabrication; Phase 4 remains 0/6 VERIFIED."
+      }
+    }
+  ]
+}

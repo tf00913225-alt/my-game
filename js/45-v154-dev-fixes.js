@@ -28,6 +28,10 @@
     };
     let monsterPortraitRegistry=null;
     let monsterPortraitRegistryPromise=null;
+    let monsterPortraitRegistryState="pending";
+    let monsterPortraitRegistryFailure=null;
+    const monsterPortraitAssetFailures=new Set();
+    const dailyPortraitPreparation=new Map();
     let monsterPortraitByKey=new Map();
     let monsterPortraitByUniqueName=new Map();
 
@@ -65,17 +69,35 @@
             if(byName.has(target.name)){ duplicateNames.add(target.name); }
             else{ byName.set(target.name,target); }
         });
+        const assetPoolEntries=registry.assetPool&&Array.isArray(registry.assetPool.entries)?registry.assetPool.entries:[];
+        assetPoolEntries.forEach(entry=>{
+            if(entry.status!=="adopted"||!entry.assetId||!entry.runtimePath){ return; }
+            const tier=String(entry.tier||"normal");
+            const record={group:"assetPool",portraitKey:entry.assetId,name:entry.displayName||entry.assetId,element:entry.element||"fire",rank:tier==="elite"?"elite":(tier==="miniboss"?"boss":"regular"),sizeClass:"standard",path:entry.runtimePath,status:"existing",assetId:entry.assetId,tier:tier};
+            byKey.set(entry.assetId,record);
+            if(byName.has(entry.displayName)){ duplicateNames.add(entry.displayName); }
+            else{ byName.set(entry.displayName,record); }
+        });
         duplicateNames.forEach(name=>byName.delete(name));
         monsterPortraitRegistry=registry;
         monsterPortraitByKey=byKey;
         monsterPortraitByUniqueName=byName;
+        monsterPortraitRegistryState="ready";
+        monsterPortraitRegistryFailure=null;
         syncMonsterPortraits();
         return registry;
     }
     window.v154InstallMonsterPortraitRegistry=installMonsterPortraitRegistry;
 
     function requestMonsterPortraitRegistry(){
-        if(monsterPortraitRegistryPromise||typeof fetch!=="function"){ return monsterPortraitRegistryPromise; }
+        if(monsterPortraitRegistryPromise){ return monsterPortraitRegistryPromise; }
+        if(typeof fetch!=="function"){
+            monsterPortraitRegistryState="failed";
+            monsterPortraitRegistryFailure=new Error("fetch unavailable");
+            monsterPortraitRegistryPromise=null;
+            return Promise.resolve(null);
+        }
+        monsterPortraitRegistryState="pending";
         monsterPortraitRegistryPromise=fetch(MONSTER_PORTRAIT_REGISTRY_URL,{cache:"no-cache"})
             .then(response=>{
                 if(!response||!response.ok){ throw new Error("HTTP "+(response&&response.status)); }
@@ -83,12 +105,16 @@
             })
             .then(installMonsterPortraitRegistry)
             .catch(error=>{
-                console.warn("[monster-portrait] registry load failed; existing battle art remains active.",error);
+                monsterPortraitRegistryState="failed";
+                monsterPortraitRegistryFailure=error;
+                monsterPortraitRegistryPromise=null;
+                console.warn("[monster-portrait] registry load failed; retry is available on the next dungeon entry.",error);
                 return null;
             });
         return monsterPortraitRegistryPromise;
     }
     window.v154RequestMonsterPortraitRegistry=requestMonsterPortraitRegistry;
+    window.v154GetMonsterPortraitRegistryState=()=>monsterPortraitRegistryState;
 
     function legacyAbyssPortrait(monster,finalFloor){
         if(!monster||!monster.v141Abyss){ return null; }
@@ -112,8 +138,10 @@
             };
         }
         const explicitKey=String(monster.portraitKey||monster.monsterPortraitKey||"").trim();
+        if(monsterPortraitRegistryState==="pending"&&explicitKey){ return null; }
+        const explicitAssetFailed=!!(explicitKey&&monsterPortraitAssetFailures.has(explicitKey));
         if(explicitKey&&monsterPortraitByKey.has(explicitKey)){
-            return monsterPortraitByKey.get(explicitKey);
+            if(!explicitAssetFailed){ return monsterPortraitByKey.get(explicitKey); }
         }
         if(monster.name==="天兵天將"){
             const element=String(monster.portraitElement||monster.element||"").toLowerCase();
@@ -122,9 +150,10 @@
                 if(soldier){ return soldier; }
             }
         }
-        const byName=monsterPortraitByUniqueName.get(monster.name);
+        const byName=explicitAssetFailed?null:monsterPortraitByUniqueName.get(monster.name);
         if(byName){ return byName; }
         const legacy=legacyAbyssPortrait(monster,!!(options&&options.finalAbyss));
+        if(monsterPortraitRegistryState==="pending"){ return null; }
         return legacy?{
             portraitKey:"legacy.abyss."+String(monster.name||"unknown"),
             name:monster.name,
@@ -149,6 +178,87 @@
         })();
     }
     window.v154ResolveMonsterPortraitRecord=resolveMonsterPortraitRecord;
+
+    function prepareDailyDungeonPortraits(type){
+        const key=String(type||"").trim();
+        if(!key){ return Promise.resolve({state:monsterPortraitRegistryState}); }
+        if(dailyPortraitPreparation.has(key)){ return dailyPortraitPreparation.get(key); }
+        const preparation=requestMonsterPortraitRegistry().then(()=>{
+            if(monsterPortraitRegistryState!=="ready"){
+                return {state:"failed",error:monsterPortraitRegistryFailure,keys:[]};
+            }
+            const keys=["regular","elite","boss"].map(rank=>"daily."+key+"."+rank);
+            const results=keys.map(portraitKey=>{
+                const record=monsterPortraitByKey.get(portraitKey);
+                if(!record||!record.path){
+                    monsterPortraitAssetFailures.add(portraitKey);
+                    return Promise.resolve({state:"failed",portraitKey:portraitKey,error:new Error("portrait record missing")});
+                }
+                const assets=window.FourSymbolsFeatures&&typeof window.FourSymbolsFeatures.ensureAssets==="function"
+                    ?window.FourSymbolsFeatures.ensureAssets([record.path])
+                    :Promise.reject(new Error("feature asset decoder unavailable"));
+                return assets.then(()=>{
+                    monsterPortraitAssetFailures.delete(portraitKey);
+                    return {state:"ready",portraitKey:portraitKey,path:record.path};
+                }).catch(error=>{
+                    monsterPortraitAssetFailures.add(portraitKey);
+                    console.warn("[monster-portrait] daily portrait decode failed for "+portraitKey+"; other ranks remain eligible.",error);
+                    return {state:"failed",portraitKey:portraitKey,path:record.path,error:error};
+                });
+            });
+            return Promise.all(results).then(entries=>{
+                const failed=entries.filter(entry=>entry.state!=="ready");
+                return {
+                    state:failed.length?"failed":"ready",
+                    keys:keys,
+                    paths:entries.filter(entry=>entry.state==="ready").map(entry=>entry.path),
+                    failures:failed.map(entry=>entry.portraitKey),
+                    entries:entries
+                };
+            });
+        });
+        const tracked=preparation.then(result=>{
+            if(!result||result.state!=="ready"){ dailyPortraitPreparation.delete(key); }
+            return result;
+        });
+        dailyPortraitPreparation.set(key,tracked);
+        return tracked;
+    }
+    window.v154PrepareDailyDungeonPortraits=prepareDailyDungeonPortraits;
+    function preparePortraitsForEncounter(roster){
+        const list=(Array.isArray(roster)?roster:[roster]).filter(Boolean);
+        if(!list.length){ return Promise.resolve({state:"ready",records:[],paths:[]}); }
+        return requestMonsterPortraitRegistry().then(()=>{
+            if(monsterPortraitRegistryState!=="ready"){
+                return {state:"failed",error:monsterPortraitRegistryFailure,records:[],paths:[]};
+            }
+            const entries=list.map(monster=>{
+                const record=resolveMonsterPortraitRecord(monster);
+                if(!record||!record.path){
+                    return Promise.resolve({state:"failed",monster:monster,error:new Error("portrait record missing")});
+                }
+                const assets=window.FourSymbolsFeatures&&typeof window.FourSymbolsFeatures.ensureAssets==="function"
+                    ?window.FourSymbolsFeatures.ensureAssets([record.path])
+                    :Promise.reject(new Error("feature asset decoder unavailable"));
+                return assets.then(()=>{
+                    const name=record.displayName||record.name||monster.name||"";
+                    if(name){ monster.name=name;monster.displayName=name; }
+                    monster.portraitPath=record.path;
+                    return {state:"ready",monster:monster,record:record};
+                }).catch(error=>({state:"failed",monster:monster,record:record,error:error}));
+            });
+            return Promise.all(entries).then(results=>{
+                const failed=results.filter(entry=>entry.state!=="ready");
+                return {
+                    state:failed.length?"failed":"ready",
+                    records:results.filter(entry=>entry.state==="ready").map(entry=>entry.record),
+                    paths:results.filter(entry=>entry.state==="ready").map(entry=>entry.record.path),
+                    failures:failed.map(entry=>entry.monster&&entry.monster.portraitKey||"unknown")
+                };
+            });
+        });
+    }
+    window.v154PreparePortraitsForEncounter=preparePortraitsForEncounter;
     window.resolveMonsterPortrait=function(monster){
         const roster=currentAbyssRoster();
         const record=resolveMonsterPortraitRecord(monster,{finalAbyss:isFinalAbyssRoster(roster)});
@@ -161,81 +271,20 @@
         return;
     }
 
-    function syncMonsterPortraitArt(card,portrait){
-        if(!card){ return; }
-        const selector=".v162-abyss-battle-portrait-art";
-        const art=typeof card.querySelector==="function"?card.querySelector(selector):null;
-        if(!portrait){
-            if(art&&typeof art.remove==="function"){ art.remove(); }
-            else if(art&&art.parentNode&&typeof art.parentNode.removeChild==="function"){
-                art.parentNode.removeChild(art);
-            }
-            return;
-        }
-        let portraitArt=art;
-        if(!portraitArt&&typeof document.createElement==="function"){
-            portraitArt=document.createElement("img");
-            portraitArt.className="v162-abyss-battle-portrait-art v154-monster-portrait-art";
-            portraitArt.alt="";
-            portraitArt.draggable=false;
-            portraitArt.decoding="async";
-            portraitArt.setAttribute("aria-hidden","true");
-            if(card.firstChild&&typeof card.insertBefore==="function"){
-                card.insertBefore(portraitArt,card.firstChild);
-            }else if(typeof card.appendChild==="function"){
-                card.appendChild(portraitArt);
-            }
-        }
-        if(portraitArt&&portraitArt.dataset.monsterPortraitSrc!==portrait){
-            portraitArt.src=portrait;
-            portraitArt.dataset.monsterPortraitSrc=portrait;
-            portraitArt.dataset.abyssPortraitSrc=portrait;
-        }
-    }
-
     function syncCardlessPresentation(card,record){
         if(!card){ return; }
-        const previousManaged=!!card.dataset.monsterPortraitKey;
-        let art=typeof card.querySelector==="function"?card.querySelector(".v174-battle-art"):null;
+        const presentation=typeof window!=="undefined"?window.FourSymbolsBattlePresentation:null;
         if(record){
             const cssValue='url("'+record.path+'")';
-            if(!previousManaged&&card.dataset.v174BattleArtwork){
-                card.dataset.v154BaseBattleArtwork=card.dataset.v174BattleArtwork;
-            }
-            card.dataset.v174BattleArtwork=cssValue;
-            const presentation=typeof window!=="undefined"?window.FourSymbolsBattlePresentation:null;
-            if(presentation&&typeof presentation.applyUnit==="function"){
-                try{ presentation.applyUnit(card,"monster"); }catch(_){ }
-            }
-            art=typeof card.querySelector==="function"?card.querySelector(".v174-battle-art"):null;
-            if(!art&&typeof document!=="undefined"&&typeof document.createElement==="function"){
-                art=document.createElement("div");
-                art.className="v174-battle-art";
-                if(card.classList&&typeof card.classList.add==="function"){
-                    card.classList.add("v174-cardless-unit");
-                }
-                if(card.firstChild&&typeof card.insertBefore==="function"){
-                    card.insertBefore(art,card.firstChild);
-                }else if(typeof card.appendChild==="function"){
-                    card.appendChild(art);
-                }
-            }
-            if(art&&art.style){
-                if(typeof art.style.setProperty==="function"){
-                    art.style.setProperty("background-image",cssValue,"important");
-                }else{ art.style.backgroundImage=cssValue; }
-            }
-            return;
+            card.dataset.v154PortraitRecordPath=record.path;
+            card.style.setProperty("--v152-abyss-portrait",cssValue);
+        }else{
+            delete card.dataset.v154PortraitRecordPath;
+            card.style.removeProperty("--v152-abyss-portrait");
         }
-        if(!previousManaged){ return; }
-        const base=card.dataset.v154BaseBattleArtwork||"";
-        if(base){ card.dataset.v174BattleArtwork=base; }
-        else{ delete card.dataset.v174BattleArtwork; }
-        delete card.dataset.v154BaseBattleArtwork;
-        if(art&&art.style){
-            if(base){ art.style.backgroundImage=base; }
-            else if(typeof art.style.removeProperty==="function"){ art.style.removeProperty("background-image"); }
-            else{ art.style.backgroundImage=""; }
+        /* V154 selects the record. V174 is the only presentation owner. */
+        if(presentation&&typeof presentation.applyUnit==="function"){
+            try{ presentation.applyUnit(card,"monster"); }catch(_){ }
         }
     }
 
@@ -282,7 +331,6 @@
                 delete card.dataset.monsterPortraitPath;
                 delete card.dataset.abyssPortrait;
             }
-            syncMonsterPortraitArt(card,portrait);
         });
     }
     window.v154SyncMonsterPortraits=syncMonsterPortraits;

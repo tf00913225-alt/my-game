@@ -16,6 +16,7 @@ const statusSource=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const finalNavSource=fs.readFileSync("js/42-v148-combat-dungeon-fixes.js","utf8");
 const contentSource=fs.readFileSync("js/36-v141-content-systems.js","utf8");
 const cssSource=fs.readFileSync("css/38-v141-system-expansion.css","utf8");
+const inventoryCss=fs.readFileSync("css/22-stage-v78-character-inventory-core.css","utf8");
 const indexSource=fs.readFileSync("index.html","utf8");
 
 function extractFunction(source,name){
@@ -87,15 +88,16 @@ test("V141 assets remain ordered before later patches with the current cache ver
     assert.match(indexSource,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
 
-test("backpack is 120 slots rendered as seven cyclic pages of 18 without drag or slot numbers",()=>{
+test("backpack is 120 slots rendered as five cyclic pages of 24 without drag or slot numbers",()=>{
     assert.match(mainSource,/new Array\(120\)\.fill\(null\)/);
     assert.match(mainSource,/const INVENTORY_CATEGORY_SLOT_COUNT = 120/);
-    assert.match(uiSource,/const INVENTORY_PAGE_SIZE=18/);
-    assert.match(uiSource,/const INVENTORY_PAGE_COUNT=7/);
+    assert.match(uiSource,/const INVENTORY_PAGE_SIZE=24/);
+    assert.match(uiSource,/const INVENTORY_PAGE_COUNT=Math\.ceil\(120\/INVENTORY_PAGE_SIZE\)/);
     assert.match(uiSource,/inventoryPageIndex=\(inventoryPageIndex\+Number\(direction\)\+INVENTORY_PAGE_COUNT\)%INVENTORY_PAGE_COUNT/);
     assert.match(uiSource,/box\.draggable=false/);
     assert.doesNotMatch(uiSource,/inventory-slot-number/);
-    assert.match(cssSource,/grid-template-rows:repeat\(3,minmax\(0,1fr\)\)/);
+    assert.match(inventoryCss,/\.inventory-grid-classic\{[^}]*grid-template-columns:repeat\(6,minmax\(0,1fr\)\)/);
+    assert.match(inventoryCss,/\.inventory-grid-scroll\{[^}]*overflow-y:auto/);
     assert.match(cssSource,/\.inventory-slot-number\{\s*display:none/);
 });
 
@@ -164,17 +166,24 @@ test("offline EXP uses highest-character level bands without changing its time c
     assert.match(uiSource,/OFFLINE_EXP_MAX_MINUTES/);
 });
 
-test("daily dungeon formations and element balancing match the requested expansion",()=>{
+test("daily dungeon creation owns formations and elements without render-time rewriting",()=>{
     assert.match(v132Source,/for\(let i=0;i<10;i\+\+\)/);
     assert.match(v132Source,/stage===3 \? "elite" : "regular"/);
     assert.match(v132Source,/bossCount:1/);
     assert.match(v132Source,/eliteCount:4/);
     assert.match(v132Source,/total:5/);
     assert.match(v132Source,/const DUNGEON_DAILY_LIMIT_ENABLED=false/);
-    assert.match(uiSource,/const elements=\["fire","water","earth","wind"\]/);
-    assert.match(uiSource,/monster\.element=elements\[index%elements\.length\]/);
-    assert.match(uiSource,/bosses\.forEach/);
-    assert.match(uiSource,/roster\.filter\(monster=>getMonsterRank\(monster\)!=="boss"\)/);
+    // The dungeon creation owner selects elements; render hooks only validate skills.
+    const rules=fs.readFileSync("js/40-v144-rules-and-abyss.js","utf8");
+    const context=vm.createContext({Math:Object.create(Math)});
+    vm.runInContext(v132Source.match(/const DUNGEON_ELEMENTS=\[[^;]+;/)[0]+extractFunction(v132Source,"randomElement"),context);
+    [0,.25,.5,.75,.999].forEach((roll,index)=>{
+        context.Math.random=()=>roll;
+        assert.equal(context.randomElement(),["fire","water","earth","wind","wind"][index]);
+    });
+    assert.match(extractFunction(v132Source,"startExpDungeonBattle"),/randomElement\(\)/);
+    assert.doesNotMatch(uiSource,/monster\.element=elements\[index%elements\.length\]/);
+    assert.match(rules,/window\.v144ConfigureDungeonBattleSkillsAfterRender=configureDungeonBattleSkillsAfterRender/);
 });
 
 test("monster shields are real HP absorption with their own white HUD bar",()=>{
@@ -196,7 +205,7 @@ test("monster shields are real HP absorption with their own white HUD bar",()=>{
 });
 
 test("all player slots can manually resolve heal, revive and buff skills",()=>{
-    assert.match(uiSource,/activeBattleCharacterIndex<=0/);
+    assert.match(mainSource,/function resolveQueuedPlayerAction\(characterIndex,token\)/);
     assert.match(uiSource,/\["buff","heal","revive"\]\.includes\(skill\.category\)/);
     assert.match(uiSource,/characterIndex>0&&queued&&skill/);
     assert.match(uiSource,/executeAdditionalSupportAction/);
@@ -214,7 +223,8 @@ test("card VFX cover all requested status groups and battle transitions are dire
     assert.match(cssSource,/v141PlayerEnter/);
     assert.match(cssSource,/v141PlayerExit/);
     assert.match(cssSource,/v141MonsterExit/);
-    assert.match(cssSource,/data-element="earth"\]\.active-turn::after/);
+    assert.match(cssSource,/data-element="earth"\]\.active-turn:not\(\.v174-cardless-unit\)::after/);
+    assert.doesNotMatch(cssSource,/data-element="earth"\]\.active-turn::after/,"legacy earth frame must not reclaim cardless units");
 });
 
 test("battle rewards wait until exit and use one black-gold map toast",()=>{
@@ -245,10 +255,12 @@ test("compact UI and daily cover scaffolding meet the mobile layout requirements
     assert.match(cssSource,/\.v141-dungeon-cover-art\{[\s\S]*?aspect-ratio:16 \/ 9/);
     assert.match(uiSource,/獎勵預覽/);
     assert.match(uiSource,/剩餘次數/);
-    assert.match(finalNavSource,/openMapInventoryOverlay\(\)/);
+    assert.match(finalNavSource,/openInventoryContext\(\{/);
+    assert.match(fs.readFileSync("js/04-stage-v11-native-bottom-nav-runtime.js","utf8"),/function renderGameplayContext\(/);
     assert.match(uiSource,/v148SyncContextNavigation/);
     assert.match(uiSource,/v141-dungeon-return/);
-    assert.match(cssSource,/\.v141-dungeon-active #bottomNav,[\s\S]*\.v148-context-nav-active #bottomNav\{display:none !important;\}/);
+    assert.doesNotMatch(cssSource,/v141DungeonNav|mapPageNav/);
+    assert.doesNotMatch(finalNavSource,/bottom-nav map-page-nav v141-dungeon-nav/);
 });
 
 test("new blueprints encode part, tier and series while legacy saves remain selectable",()=>{
@@ -266,7 +278,7 @@ test("synthesis implements exact material costs, replacement-only reforge and pe
     assert.match(contentSource,/ConsumeStackItem\(blueprint\.id,50\)/);
     assert.match(contentSource,/ConsumeStackItem\(ore\.id,50\)/);
     assert.match(contentSource,/return locks===0\?50:\(locks===1\?100:150\)/);
-    assert.match(contentSource,/consumeMatching\([^\n]+,cost\)/);
+    assert.doesNotMatch(contentSource,/consumeMatching\(candidate=>candidate&&candidate\.blueprintSlot/);
     assert.match(contentSource,/ConsumeStackItem\(info\.ore\.id,cost\)/);
     assert.match(contentSource,/reforgeMaterialTier:"white"/);
     assert.match(contentSource,/TIER_ALIASES=\{low:"white",mid:"blue",high:"purple",perfect:"orange"\}/);

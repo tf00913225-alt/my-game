@@ -8,16 +8,20 @@ const index=fs.readFileSync("index.html","utf8");
 const layoutCss=fs.readFileSync("css/fixed-slot-battlefield-rendering-v2.css","utf8");
 const vfx=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const timing=fs.readFileSync("js/37-v142-skill-animation.js","utf8");
-const fireWindEarthRules=fs.readFileSync("js/43-v149-skill-ui-rules.js","utf8");
-const waterRules=fs.readFileSync("js/50-v169-water-skill-rules.js","utf8");
+const finalSkillData=fs.readFileSync("js/60-v173.64-skill-progression-rebalance.js","utf8");
 const bossSystem=fs.readFileSync("js/gameplay-boss-tower-system.js","utf8");
 const relicRuntime=fs.readFileSync("js/60-team-relic-system.js","utf8");
 const relicCss=fs.readFileSync("css/55-team-relic-system.css","utf8");
+const feedback=fs.readFileSync("js/battle-floating-feedback-owner.js","utf8");
+const feedbackCss=fs.readFileSync("css/battle-floating-feedback-owner.css","utf8");
+const geometry=fs.readFileSync("js/battlefield-render-geometry-adapter.js","utf8");
 const legacyBattleCss=fs.readFileSync("css/12-stage-v45-battle-black-overlay-skill-text.css","utf8");
 const v143Css=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");
 
 function sourceTargetType(source,id){
-    const start=source.indexOf(id+":{");
+    const ownerStart=source.indexOf("const FINAL_REBALANCE_DATA");
+    assert.ok(ownerStart>=0,"missing formal Skill Data Owner");
+    const start=source.indexOf(id+":{",ownerStart);
     assert.ok(start>=0,"missing final rule for "+id);
     const block=source.slice(start,start+700);
     const match=block.match(/targetType:"([^"]+)"/);
@@ -61,7 +65,9 @@ const ELEMENT_DAMAGE_SKILLS={
 };
 
 for(const [element,groups] of Object.entries(ELEMENT_DAMAGE_SKILLS)){
-    const rules=element==="water"?waterRules:fireWindEarthRules;
+    // V173.64 is the sole player Skill Data Owner; V149/V169 only retain
+    // compatibility runtime and must never be treated as a data source.
+    const rules=finalSkillData;
     for(const id of groups.single){
         const targetType=sourceTargetType(rules,id);
         assert.equal(targetType,"single",id+" final target type");
@@ -121,33 +127,51 @@ assert.match(bossSystem,/if\(targetType==="all"\|\|targetType==="enemyAll"\)\{ r
 assert.match(bossSystem,/return alive\.includes\(primaryIndex\)\?\[primaryIndex\]:\[\]/,"non-all Boss skills hit only the selected entity");
 assert.doesNotMatch(bossSystem,/blockingShield|mandatoryMechanismTarget|resolveMechanismAction/);
 
-/* Relic cinematic target stacking shares the canonical battle/VFX geometry. */
+/* Relic cinematic shares viewport geometry instead of crossing battlePage stacking contexts. */
 assert.match(legacyBattleCss,/#battlePage > \.battle-wrap\{[\s\S]*z-index:1 !important;/,
-    "the historical battle-wrap stacking context is the regression root");
-assert.match(relicRuntime,/const host=battlePage\|\|null[\s\S]*host\.appendChild\(node\)/,
-    "relic cinematic must render against the complete battle page surface");
-assert.match(relicCss,/\.team-relic-battle-presentation\{[^}]*position:absolute[^}]*inset:0/,
-    "relic dim layer must cover the complete battle page surface");
+    "the historical battle-wrap stacking context remains the regression root");
+assert.match(relicRuntime,/document\.body\.appendChild\(node\)/,
+    "relic cinematic must render on the document viewport, outside battle-wrap stacking contexts");
+assert.match(relicCss,/body > \.team-relic-battle-presentation\{[\s\S]*position:fixed;inset:0;z-index:18090/,
+    "relic cinematic must own one fixed viewport presentation surface");
+assert.match(relicRuntime,/function relicGeometryOwner\(\)[\s\S]*FourSymbolsBattlefieldRenderGeometry/,
+    "relic cinematic must resolve the canonical battlefield geometry owner");
+assert.match(relicRuntime,/function revealRelicTargets\(target\)[\s\S]*getUnitGeometry[\s\S]*artworkProjection[\s\S]*hpProjection/,
+    "relic focus must consume canonical projection geometry");
+assert.doesNotMatch(relicRuntime,/team-relic-mask-holes|createElementNS\(namespace,"rect"\)/,
+    "relic focus must not restore rectangle apertures");
+const relicTargetReveal=relicRuntime.slice(relicRuntime.indexOf("function revealRelicTargets"),relicRuntime.indexOf("function beginRelicCinematic"));
+assert.match(relicTargetReveal,/team-relic-target-projection-layer/,"target reveal must own the foreground projection layer");
+assert.match(relicTargetReveal,/owner\.getUnitGeometry\(target\.targetSide,index\)/,"target reveal must resolve each target through canonical geometry");
+assert.match(relicTargetReveal,/appendRelicProjection\(layer,geometry,overlayRect\)/,"target reveal must project transparent artwork and HP for each target");
+assert.doesNotMatch(relicRuntime,/team-relic-battle-target-layer|relicTargetLayer\(/,
+    "relic focus must not raise live Unit DOM across stacking contexts");
+assert.doesNotMatch(relicCss,/team-relic-battle-target-layer|team-relic-battle-target-focus-visible/,
+    "legacy target z-index/brightness owner must be retired");
 assert.match(relicRuntime,/RELIC_IDENTITY_HOLD_MS=1150/);
 assert.match(relicRuntime,/RELIC_IDENTITY_EXIT_MS=420/);
-assert.match(relicRuntime,/waitMs\(RELIC_IDENTITY_REVEAL_MS\)[\s\S]*waitMs\(RELIC_IDENTITY_HOLD_MS\)[\s\S]*classList\.add\("identity-exiting"\)[\s\S]*Promise\.all\(\[[\s\S]*waitMs\(RELIC_IDENTITY_EXIT_MS\)[\s\S]*revealRelicTargets\(target\)/,
-    "relic sequence must hold identity for 1.15s, then fade identity out while targets brighten, before VFX");
-assert.match(relicRuntime,/function relicTargetLayer\(card\)[\s\S]*\.v-fixed-enemy-slot,\.v-fixed-ally-slot,\.v-fixed-boss-footprint/,
-    "enemy, ally and Boss target entities must elevate their real Fixed Slot carrier");
-assert.match(relicRuntime,/relicFocusedTargetLayers=Array\.from\(new Set\(relicFocusedTargetCards\.map\(relicTargetLayer\)\.filter\(Boolean\)\)\)/);
-assert.match(relicCss,/\.v-fixed-enemy-slot\.team-relic-battle-target-layer,[\s\S]*\.v-fixed-ally-slot\.team-relic-battle-target-layer,[\s\S]*\.v-fixed-boss-footprint\.team-relic-battle-target-layer\{z-index:18110!important;\}/);
-const relicDimZ=Number((relicCss.match(/team-relic-battle-dim\{[^}]*z-index:(\d+)/)||[])[1]);
-const relicTargetZ=Number((relicCss.match(/team-relic-battle-target-layer\{z-index:(\d+)!important/ )||[])[1]);
-const relicIdentityZ=Number((relicCss.match(/team-relic-battle-cutin\{[^}]*z-index:(\d+)/)||[])[1]);
-const formalVfxZ=Number((v143Css.match(/\.v143-skill-stage\{[^}]*z-index:(\d+)/)||[])[1]);
-const activeRelicVfxZ=Number((relicCss.match(/team-relic-cinematic-active > \.v143-skill-stage\{z-index:(\d+)!important/ )||[])[1]);
-assert.equal(relicDimZ,18090);
-assert.equal(relicTargetZ,18110);
-assert.equal(relicIdentityZ,18120);
-assert.equal(formalVfxZ,16000);
-assert.equal(activeRelicVfxZ,18130);
-assert.ok(relicDimZ<relicTargetZ&&relicTargetZ<relicIdentityZ&&relicIdentityZ<activeRelicVfxZ,
-    "relic presentation must paint dim, focused targets, identity, then formal V143 VFX");
+const relicCinematic=relicRuntime.slice(relicRuntime.indexOf("function beginRelicCinematic"),relicRuntime.indexOf("function enterRelicVfxPhase"));
+assert.ok(
+    relicCinematic.indexOf('classList.add("identity-visible")')<relicCinematic.indexOf('classList.add("dim-visible")'),
+    "relic identity must appear before battlefield dimming"
+);
+assert.ok(
+    relicCinematic.indexOf('classList.add("dim-visible")')<relicCinematic.indexOf("revealRelicTargets(target)"),
+    "battlefield dimming must precede target reveal"
+);
+assert.match(relicCinematic,/revealRelicTargets\(target\)/,"target reveal remains part of the serialized relic cinematic");
+assert.match(geometry,/function unitGeometry\(side,index\)[\s\S]*artworkProjection[\s\S]*hpProjection[\s\S]*hudSafeRect[\s\S]*feedbackAnchor/,
+    "one geometry adapter must expose projection, HUD-safe feedback and canonical anchors");
+assert.match(feedback,/function contextFor\(side,index\)[\s\S]*function laneMetrics\(context\)[\s\S]*capacity:[\s\S]*function freeLane\(context,metrics\)[\s\S]*context\.queue\.push\(request\)/,
+    "floating feedback must size target-scoped lanes from canonical geometry and queue overflow");
+assert.match(feedback,/getUnitGeometry\(side,index\)/,
+    "floating feedback must consume the same formal Unit geometry");
+assert.match(feedbackCss,/color:#e32626[\s\S]*-webkit-text-stroke:\.85px #fff[\s\S]*text-shadow:1px 1px 0 #000/,
+    "all battle feedback must share red text, thin white stroke and readability-only black shadow");
+assert.doesNotMatch(feedbackCss,/0 0 (?:7|8|10|14|16)px|rgba\([^)]*(?:255,32,32|0,144,255|25,216,92)/,
+    "canonical battle feedback must not use coloured neon glow");
+assert.match(relicCss,/body\.team-relic-cinematic-active > \.v143-skill-stage\{z-index:18130!important;\}/,
+    "formal relic VFX remains above the viewport cinematic presentation");
 
 const relicPresentation=relicRuntime.slice(
     relicRuntime.indexOf("const RELIC_VFX_PRESENTATION=Object.freeze({"),

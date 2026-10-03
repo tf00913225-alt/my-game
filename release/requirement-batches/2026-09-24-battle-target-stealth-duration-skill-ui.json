@@ -1,0 +1,52 @@
+{
+  "id": "2026-09-24-battle-target-stealth-duration-skill-ui",
+  "title": "Battle target / Stealth / duration / skill quickbar convergence",
+  "baseBranch": "dev",
+  "baseSha": "003cd92a2be3574cadcc67f23d2f2a34872d9233",
+  "workBranch": "fix/battle-target-stealth-duration-skill-ui-20260924",
+  "status": "IMPLEMENTED",
+  "requirements": [
+    {
+      "id": "quickbar-projection",
+      "status": "IMPLEMENTED",
+      "summary": "Battle Quick Bar validates canonical inner nodes and projects skill name, SP, formal target scope and formal effect text."
+    },
+    {
+      "id": "duration-lifecycle",
+      "status": "IMPLEMENTED",
+      "summary": "Timed buffs, debuffs and hard controls consume on the affected combatant's real action boundary; newly-created effects do not lose the casting action, and intercepted follow-ups do not consume extra turns."
+    },
+    {
+      "id": "target-owner",
+      "status": "IMPLEMENTED",
+      "summary": "Player, enemy, auto and support target resolution share FourSymbolsBattleSkillTargeting plus FourSymbolsBattlefieldSlots instead of side-specific target-count logic."
+    },
+    {
+      "id": "stealth-rule",
+      "status": "IMPLEMENTED",
+      "summary": "Stealth blocks hostile primary selection for normal/single/tri/row/column while allowing range collateral and all-target effects."
+    },
+    {
+      "id": "stealth-presentation",
+      "status": "IMPLEMENTED",
+      "summary": "Stealthed combatant artwork is 35% opacity while HP/SP/name/status UI stays fully readable."
+    },
+    {
+      "id": "technical-debt",
+      "status": "IMPLEMENTED",
+      "summary": "Late duration restore wrappers, duplicate round-start duration owners and retired V142 support-gameplay ownership are removed from the repaired paths."
+    }
+  ],
+  "verification": {
+    "focusedTests": "PENDING",
+    "repositoryChecks": "PENDING",
+    "build": "PENDING",
+    "browserQA": "PENDING",
+    "diffCheck": "PENDING",
+    "candidateHead": "336ac5e51aece9fd47145f008f63c611c5aebbff"
+  },
+  "notes": [
+    "main is not modified by this work branch.",
+    "DATA_SECURITY_CONTRACTS.md is absent on the base dev and no account/cloud-save/security schema is changed."
+  ]
+}

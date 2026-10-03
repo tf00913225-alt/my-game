@@ -12,26 +12,7 @@
     position:relative;
     z-index:4;
     transform:translateY(16px);
-}
-
-.skill-name-badge.v143-caster-skill-label{
-    overflow:visible !important;
-    border:0 !important;
-    border-radius:0 !important;
-    color:#fff4d7 !important;
-    background:transparent !important;
-    box-shadow:none !important;
-    -webkit-text-stroke:1.15px #050403 !important;
-    paint-order:stroke fill !important;
-    text-shadow:0 1px 2px #000,0 0 5px #000 !important;
-}
-.skill-name-badge.v143-caster-skill-label.badge-normal,
-.skill-name-badge.v143-caster-skill-label[data-skill="normal"]{
-    color:#fff !important;
-    -webkit-text-fill-color:#fff !important;
-}
-
-.v146-area-impact{animation:v146AreaImpact .66s cubic-bezier(.2,.72,.25,1) both !important;}
+}.v146-area-impact{animation:v146AreaImpact .66s cubic-bezier(.2,.72,.25,1) both !important;}
 @keyframes v146AreaImpact{
     0%,100%{transform:translate(0,0) rotate(0)}
     16%{transform:translate(-7px,-5px) rotate(-1.4deg)}
@@ -41,38 +22,12 @@
     79%{transform:translate(-3px,3px) rotate(-.5deg)}
 }
 
-.v146-status-popup{
-    position:fixed;z-index:17100;min-width:66px;padding:4px 9px;border:1px solid currentColor;border-radius:999px;
-    color:#fff3b1;background:rgba(7,6,5,.82);box-shadow:0 0 16px currentColor;font-family:"Noto Serif TC",serif;
-    font-size:14px;font-weight:900;line-height:1.2;text-align:center;white-space:nowrap;transform:translate(-50%,-50%);
-    pointer-events:none;animation:v146StatusPopup 1.25s ease-out both;
-}
-.v146-status-popup.status-burn{color:#ff8b54;}.v146-status-popup.status-freeze{color:#9fe8ff;}.v146-status-popup.status-petrify{color:#e0bf7c;}
-.v146-status-popup.status-agilityDown{color:#8beac1;}.v146-status-popup.status-defenseDown{color:#ffd17b;}.v146-status-popup.status-stun{color:#e9e6ff;}
-@keyframes v146StatusPopup{0%{opacity:0;transform:translate(-50%,-20%) scale(.82)}10%,90%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-88%) scale(.96)}}
-
-/* Growth reminders use the same small breathing red dot as the additional-
-   character creation reminder.  The target remains fully composited so the
-   dot never inherits a disabled/inactive dimming layer. */
+/* Status floating text is owned by css/battle-floating-feedback-owner.css. */
+/* Growth reminders use the shared notification-dot presentation contract in
+   css/38.  This file only keeps the attention target fully composited. */
 #game-stage .v146-growth-attention-target{
     opacity:1 !important;
     filter:none !important;
-}
-#game-stage .v141-notice-dot,
-#game-stage .v146-growth-guidance-dot{
-    width:7px !important;
-    height:7px !important;
-    min-width:7px !important;
-    min-height:7px !important;
-    z-index:20050 !important;
-    opacity:1 !important;
-    filter:none !important;
-    background:#e52e2e !important;
-    border:0 !important;
-    border-radius:50% !important;
-    box-shadow:0 0 8px rgba(255,43,43,.9) !important;
-    animation:v131RedDotPulse 1.1s ease-in-out infinite alternate !important;
-    mix-blend-mode:normal !important;
 }
 
 #battlePage .v146-defeated.targetable::after,
@@ -80,10 +35,6 @@
 #battlePage .v146-defeated .v141-effect{display:none !important;}
 #battlePage .v146-defeated{pointer-events:none !important;}
 
-#game-stage #inventoryPage .inventory-grid-scroll{flex:0 0 auto !important;overflow:hidden !important;touch-action:none !important;}
-#game-stage #inventoryPage .inventory-grid-classic{grid-template-columns:repeat(6,minmax(0,1fr)) !important;grid-template-rows:repeat(3,minmax(0,1fr)) !important;align-content:start !important;overflow:hidden !important;}
-#game-stage #inventoryPage .v141-inventory-pager{grid-template-columns:44px minmax(62px,auto) 44px !important;}
-#game-stage #inventoryPage .v141-inventory-pager button{font-family:Arial,sans-serif !important;font-size:24px !important;line-height:29px !important;}
 
 #game-stage .shop-potion-purchase-row{display:grid !important;grid-template-columns:auto 52px minmax(70px,1fr) 64px !important;gap:5px !important;align-items:center !important;}
 #game-stage .v146-shop-total{min-width:0;color:#f3cf79;font-size:13px;line-height:17px;font-weight:900;text-align:right;white-space:nowrap;}
@@ -111,10 +62,6 @@
 #game-stage .v141-abyss-map.v146-too-far{animation:v146AbyssReject .6s ease;}
 @keyframes v146AbyssReject{25%{box-shadow:inset 0 0 45px rgba(255,72,45,.48)}70%{box-shadow:inset 0 0 20px rgba(255,72,45,.18)}}
 
-#game-stage #v141DungeonNav{display:grid !important;width:100% !important;max-width:none !important;height:82px !important;box-sizing:border-box !important;grid-template-columns:repeat(5,minmax(0,1fr)) !important;gap:0 !important;}
-#game-stage #v141DungeonNav[data-v146-columns="4"]{grid-template-columns:repeat(4,minmax(0,1fr)) !important;}
-#game-stage #v141DungeonNav .nav-button{min-width:0 !important;padding:3px !important;}
-#game-stage #v141DungeonNav .nav-art-button{width:auto !important;height:62px !important;max-width:92% !important;object-fit:contain !important;}
 
 .v143-abyss-dialogue{padding:34px 25px !important;}.v143-abyss-dialogue b{font-size:23px !important;line-height:1.7 !important;}.v143-abyss-dialogue span{font-size:15px !important;}
 
@@ -165,10 +112,6 @@
 
 /* Remaining non-battle mobile owners. These rules are intentionally scoped to
    map/home/dungeon surfaces so battlePage typography remains untouched. */
-#game-stage > #app > #game-content #mapPageNav .nav-button{
-    font-size:15px !important;
-    line-height:1.2 !important;
-}
 #game-stage #mapPage .v141-task-tracker-title{
     font-size:15px;
     line-height:20px;
@@ -287,13 +230,11 @@
 @media (max-height:720px){
     #game-stage #battlePage #battleMonsterArea:not(.v-fixed-enemy-zone){transform:translateY(12px);}
     #game-stage #dungeonPage.v146-abyss-active{padding-bottom:78px !important;}
-    #game-stage #v141DungeonNav{height:78px !important;}
-    #game-stage #v141DungeonNav .nav-art-button{height:58px !important;}
 }
 @media (max-width:380px){
     #game-stage .shop-potion-purchase-row{grid-template-columns:auto 48px minmax(62px,1fr) 58px !important;gap:3px !important;}
     #game-stage .v146-shop-total{font-size:13px;}
 }
 @media (prefers-reduced-motion:reduce){
-    .v146-area-impact,.v146-status-popup,#game-stage .v141-abyss-map.v146-too-far,.v173-exp-charge-float{animation-duration:.01ms !important;animation-iteration-count:1 !important;}
+    .v146-area-impact,#game-stage .v141-abyss-map.v146-too-far,.v173-exp-charge-float{animation-duration:.01ms !important;animation-iteration-count:1 !important;}
 }

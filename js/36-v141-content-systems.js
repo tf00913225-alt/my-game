@@ -35,16 +35,17 @@
         {setId:"setEarth",label:"岩岳",element:"earth",color:"#c59a54"},
         {setId:"setWind",label:"青嵐",element:"wind",color:"#55cda3"}
     ];
-    const STAT_LABEL={attack:"攻擊",intelligence:"智力",vitality:"體質",energy:"能量",agility:"敏捷",spirit:"精神"};
+    const STAT_LABEL={attack:"攻擊",intelligence:"智力",vitality:"體質",energy:"能量",defensePoints:"防禦",agility:"敏捷",accuracy:"命中",evasion:"閃避",antiCrit:"抗暴",statusAccuracy:"異常命中",statusResistance:"異常抗性"};
     const MAIN_STATS=["attack","intelligence"];
-    const SUB_STATS=["vitality","energy","agility","spirit"];
+    const SUB_STATS=["vitality","energy","defensePoints","agility","statusResistance"];
     const TALISMAN_GOLD={white:300,blue:1000,purple:3000};
     const synthesisState={
-        tab:"reforge",blueprintId:null,seriesId:"setFire",reforgeUid:null,
+        tab:"talisman",forgeTab:"reforge",socketUid:null,gemId:null,blueprintId:null,seriesId:"setFire",reforgeUid:null,
         reforgeMaterialTier:"white",lockedReforgeKeys:[],
         talismanId:null,talismanQty:1,fragmentQty:{setFire:1,setWater:1,setEarth:1,setWind:1},
         pendingReforge:null
     };
+    let activeFeature="synthesis";
 
     function escapeHtml(value){
         return String(value==null?"":value).replace(/&/g,"&amp;").replace(/</g,"&lt;")
@@ -129,9 +130,8 @@
         const tier=TIER_META[normalized]?normalized:"white";
         const meta=TIER_META[tier];
         const ore=definitions().ores.find(item=>normalizeTierKey(item.tierKey)===tier)||null;
-        const blueprintCount=countMatching(item=>item&&item.blueprintSlot&&normalizeTierKey(item.tierKey)===tier);
         const oreCount=ore?countItem(ore.id):0;
-        return {tier,meta,ore,blueprintCount,oreCount};
+        return {tier,meta,ore,oreCount};
     }
     function reforgeMaterialCost(lockCount){
         const locks=Math.max(0,Math.min(2,Math.floor(Number(lockCount)||0)));
@@ -160,6 +160,75 @@
     function findEquipmentByUid(uid){
         const entry=allRefinableEquipment().find(candidate=>candidate.item.v141Uid===uid);
         return entry?entry.item:null;
+    }
+
+    function socketEquipment(){
+        ensureEquipmentUids();
+        const result=[];
+        inventoryItems.forEach(item=>{
+            if(item&&isEquipmentInventoryType(item.type)&&window.FourSymbolsEquipmentGems.capacity(item)>0){ result.push({item,source:"背包"}); }
+        });
+        Object.values(characterEquipment||{}).forEach(slots=>Object.values(slots||{}).forEach(item=>{
+            if(item&&window.FourSymbolsEquipmentGems.capacity(item)>0){ result.push({item,source:"已裝備"}); }
+        }));
+        return result;
+    }
+    function canUseLocalSockets(){
+        // This first-stage operation belongs only to the existing UID-local
+        // prototype. An authoritative cloud character must wait for a backend
+        // operation; local metadata never grants cloud write authority.
+        try{
+            const repo=window.FourSymbolsAccountSave;
+            if(!repo||typeof repo.readActive!=="function"){ return false; }
+            const state=repo.readActive();
+            return state.status==="ready"&&state.metadata&&state.metadata.ownerUid===state.uid&&
+                state.metadata.cloudBaseFingerprint==null&&state.metadata.source!=="authoritative-cloud-read";
+        }catch(_){ return false; }
+    }
+    function nextSocketIndex(item){
+        const capacity=window.FourSymbolsEquipmentGems.capacity(item);
+        if(item&&item.sockets!==undefined&&!Array.isArray(item.sockets)){ return -1; }
+        const sockets=item&&item.sockets||[];
+        const defs=window.FourSymbolsEquipmentGems.definitions;
+        if(sockets.length>capacity||sockets.some(id=>id!=null&&
+            (typeof id!=="string"||!Object.prototype.hasOwnProperty.call(defs,id)))){ return -1; }
+        for(let index=0;index<capacity;index++){
+            if(sockets[index]==null){ return index; }
+        }
+        return -1;
+    }
+    function renderForgePicker(label,entries,selected,handler){
+        const current=entries.find(entry=>entry.value===selected)||entries[0];
+        if(!current){ return ""; }
+        return '<details class="v141-forge-picker"><summary><span>'+escapeHtml(label)+'</span><b>'+escapeHtml(current.label)+'</b><i aria-hidden="true">▾</i></summary>'+
+            '<div class="v141-forge-options" role="group" aria-label="'+escapeHtml(label)+'">'+entries.map(entry=>
+                '<button type="button" class="v141-forge-option'+(entry.value===selected?' selected':'')+'" aria-pressed="'+(entry.value===selected)+'" data-forge-value="'+escapeHtml(entry.value)+'" onclick="'+handler+'(this.dataset.forgeValue)">'+
+                '<span>'+escapeHtml(entry.label)+'</span><b aria-hidden="true">'+(entry.value===selected?'✓':'')+'</b></button>'
+            ).join('')+'</div></details>';
+    }
+    function renderSocketTab(){
+        const entries=socketEquipment();
+        if(!entries.length){ return '<div class="v141-synthesis-empty">目前沒有可鑲嵌的橙階以上裝備。</div>'; }
+        if(!entries.some(entry=>entry.item.v141Uid===synthesisState.socketUid)){ synthesisState.socketUid=entries[0].item.v141Uid; }
+        const item=entries.find(entry=>entry.item.v141Uid===synthesisState.socketUid).item;
+        const capacity=window.FourSymbolsEquipmentGems.capacity(item);
+        const sockets=Array.isArray(item.sockets)?item.sockets.slice(0,capacity):[];
+        const defs=window.FourSymbolsEquipmentGems.definitions;
+        const gems=inventoryItems.filter(candidate=>candidate&&typeof candidate.id==="string"&&Object.prototype.hasOwnProperty.call(defs,candidate.id)&&Number(candidate.count)>0);
+        if(!gems.some(gem=>gem.id===synthesisState.gemId)){ synthesisState.gemId=gems[0]&&gems[0].id||null; }
+        const available=nextSocketIndex(item)>=0;
+        const local=canUseLocalSockets();
+        return '<div class="v141-synthesis-card v141-socket-card">'+
+            renderForgePicker('選擇裝備',entries.map(entry=>({value:entry.item.v141Uid,label:entry.item.name+'［'+entry.source+'］'})),synthesisState.socketUid,'v141SelectSocketItem')+
+            '<div class="v141-socket-list" aria-label="鑲嵌孔">'+Array.from({length:capacity},(_,index)=>{
+                const id=sockets[index];
+                const gem=typeof id==="string"&&Object.prototype.hasOwnProperty.call(defs,id)?defs[id]:null;
+                const unknown=id!=null&&!gem;
+                return '<div class="v141-socket"><span aria-hidden="true">'+(gem?escapeHtml(gem.icon):'◇')+'</span><b>'+(gem?escapeHtml(gem.name):unknown?'無法識別':'空孔')+'</b><small>'+(gem?statsHtml(gem.stats):unknown?'請保留原資料':'可鑲嵌')+'</small></div>';
+            }).join('')+'</div>'+
+            (gems.length?renderForgePicker('選擇寶石',gems.map(gem=>({value:gem.id,label:defs[gem.id].name+' ×'+Math.floor(Number(gem.count))+'（'+Object.entries(defs[gem.id].stats).map(([key,value])=>(STAT_LABEL[key]||key)+' +'+value).join('、')+'）'})),synthesisState.gemId,'v141SelectSocketGem'):'<p>背包沒有可鑲嵌的寶石。</p>')+
+            (!local?'<p>目前角色尚未開放鑲嵌。</p>':!available?'<p>孔位已滿或孔位資料無法使用。</p>':'')+
+            '<button type="button" class="v141-synthesis-primary" '+(gems.length&&available&&local?'':'disabled')+' onclick="v141SocketGem()">鑲嵌寶石</button></div>';
     }
 
     function inferTier(item){
@@ -263,7 +332,7 @@
     function statsHtml(stats){
         const entries=Object.entries(stats||{});
         if(!entries.length){ return '<span class="muted">尚無冶煉詞條</span>'; }
-        return entries.map(([key,value])=>'<span>'+escapeHtml(STAT_LABEL[key]||key)+' <b>+'+value+'</b></span>').join("");
+        return entries.map(([key,value])=>'<span>'+escapeHtml(STAT_LABEL[key]||key)+' <b>+'+value+(["accuracy","evasion"].includes(key)?"%":"")+'</b></span>').join("");
     }
     function rangeText(tierKey,isReforge){
         const meta=TIER_META[normalizeTierKey(tierKey)];
@@ -291,7 +360,7 @@
 
     function renderSynthesisTabs(){
         const tabs=[
-            ["reforge","裝備冶煉"],["talisman","符咒合成"],["fragment","碎片合成"]
+            ["talisman","符咒合成"],["fragment","碎片合成"]
         ];
         return '<div class="v141-synthesis-tabs">'+tabs.map(([id,label])=>
             '<button type="button" class="'+(synthesisState.tab===id?'active':'')+'" onclick="v141SwitchSynthesisTab(\''+id+'\')">'+label+'</button>'
@@ -361,7 +430,7 @@
         const material=reforgeMaterialInfo(tier);
         const materialCost=reforgeMaterialCost(locks.length);
         const currentEntries=Object.entries(item.reforgeStats||{});
-        const can=material.meta.available!==false&&!!material.ore&&material.blueprintCount>=materialCost&&material.oreCount>=materialCost&&gold>=material.meta.reforgeGold&&slotCount>locks.length;
+        const can=material.meta.available!==false&&!!material.ore&&material.oreCount>=materialCost&&gold>=material.meta.reforgeGold&&slotCount>locks.length;
         let compare="";
         if(synthesisState.pendingReforge&&synthesisState.pendingReforge.uid===item.v141Uid){
             const pending=synthesisState.pendingReforge;
@@ -374,26 +443,24 @@
             const unavailable=info.meta.available===false;
             return '<button type="button" class="v17358-reforge-tier '+(key===tier?'active ':'')+(unavailable?'planned':'')+'" '+
                 (unavailable?'disabled aria-disabled="true"':'onclick="v141SelectReforgeMaterialTier(\''+key+'\')"')+'>'+
-                '<b>'+info.meta.label+'材料</b><span>'+(unavailable?'尚未開放':'圖紙 '+info.blueprintCount+'・礦石 '+info.oreCount)+'</span><small>'+reforgeRangeText(key,slotCount)+'</small></button>';
+                '<b>'+info.meta.label+'材料</b><span>'+(unavailable?'尚未開放':'礦石 '+info.oreCount)+'</span><small>'+reforgeRangeText(key,slotCount)+'</small></button>';
         }).join("");
         const lockHtml=currentEntries.length
             ?currentEntries.map(([key,value])=>{
                 const selected=lockSet.has(key);
                 return '<button type="button" class="v17358-affix-lock '+(selected?'locked':'')+'" '+(synthesisState.pendingReforge?'disabled':'')+' onclick="v141ToggleReforgeLock(\''+escapeHtml(key)+'\')">'+
-                    '<span>'+(selected?'🔒':'◇')+'</span><b>'+escapeHtml(STAT_LABEL[key]||key)+' +'+value+'</b><small>'+(selected?'已鎖定':'點擊鎖定')+'</small></button>';
+                    '<span>'+(selected?'🔒':'◇')+'</span><b>'+escapeHtml(STAT_LABEL[key]||key)+' +'+value+(["accuracy","evasion"].includes(key)?"%":"")+'</b><small>'+(selected?'已鎖定':'點擊鎖定')+'</small></button>';
             }).join("")
             :'<div class="v17358-no-affix-lock">首次冶煉尚無詞條可鎖定。</div>';
         return '<div class="v141-synthesis-card v17358-reforge-card">'+
-            '<label>選擇裝備<select onchange="v141SelectReforgeItem(this.value)">'+entries.map(entry=>
-                '<option value="'+entry.item.v141Uid+'" '+(entry.item.v141Uid===item.v141Uid?'selected':'')+'>'+escapeHtml(entry.item.name)+'［'+entry.source+'］</option>'
-            ).join("")+'</select></label>'+
+            renderForgePicker('選擇裝備',entries.map(entry=>({value:entry.item.v141Uid,label:entry.item.name+'［'+entry.source+'］'})),synthesisState.reforgeUid,'v141SelectReforgeItem')+
             '<section class="v141-reforge-current"><b>'+escapeHtml(item.name)+'</b><small>冶煉槽 '+slotCount+' 格・可不限次數重洗</small><div><em>原始詞條</em>'+statsHtml(item.stats)+'</div><div><em>目前冶煉</em>'+statsHtml(item.reforgeStats)+'</div></section>'+
             '<section class="v17358-reforge-material"><div class="v17358-section-title"><b>選擇冶煉材料階級</b><span>裝備品質不限制材料；材料階級只決定本次數值範圍。</span></div><div class="v17358-reforge-tiers">'+tierButtons+'</div></section>'+
             '<section class="v17358-reforge-lock-panel"><div class="v17358-section-title"><b>鎖定詞條</b><span>最多鎖 2 條，且至少保留 1 個槽位重新冶煉。</span></div><div class="v17358-reforge-lock-list">'+lockHtml+'</div><small>目前鎖定 '+locks.length+' / '+maxLocks+' 條</small></section>'+
-            '<div class="v141-material-lines v17358-reforge-cost"><span>設計圖 <b class="'+(material.blueprintCount>=materialCost?'ok':'lack')+'">'+material.blueprintCount+' / '+materialCost+'</b></span>'+
+            '<div class="v141-material-lines v17358-reforge-cost">'+
             '<span>'+escapeHtml(material.ore&&material.ore.name||material.meta.label+'礦石')+' <b class="'+(material.oreCount>=materialCost?'ok':'lack')+'">'+material.oreCount+' / '+materialCost+'</b></span>'+
             '<span>金幣 <b class="'+(gold>=material.meta.reforgeGold?'ok':'lack')+'">'+material.meta.reforgeGold.toLocaleString('zh-TW')+'</b></span></div>'+
-            '<div class="v17358-reforge-cost-note">未鎖定：50 圖紙＋50 礦石・鎖 1 條：100＋100・鎖 2 條：150＋150</div>'+
+            '<div class="v17358-reforge-cost-note">礦石消耗：未鎖定 50・鎖 1 條 100・鎖 2 條 150</div>'+
             '<button type="button" class="v141-synthesis-primary" '+(can&&!synthesisState.pendingReforge?'':'disabled')+' onclick="v141StartReforge()">開始冶煉</button>'+
             '<button type="button" class="v141-affix-info" onclick="v141ShowAffixInfo()">ⓘ 冶煉規則</button>'+compare+'</div>';
     }
@@ -445,14 +512,49 @@
     function renderSynthesis(){
         const body=document.getElementById("homeFeatureModalBody");
         if(!body){ return; }
-        const renderers={reforge:renderReforgeTab,talisman:renderTalismanTab,fragment:renderFragmentTab};
-        if(!renderers[synthesisState.tab]){ synthesisState.tab="reforge"; }
-        const content=renderers[synthesisState.tab]();
-        body.innerHTML='<div class="v141-synthesis"><div class="v141-synthesis-wallet"><span>合成</span><b>金幣 '+Math.floor(gold).toLocaleString('zh-TW')+'</b></div>'+renderSynthesisTabs()+'<div class="v141-synthesis-body">'+content+'</div></div>';
+        const forge=activeFeature==="forge";
+        const renderers=forge?{reforge:renderReforgeTab,socket:renderSocketTab}:{talisman:renderTalismanTab,fragment:renderFragmentTab};
+        const tab=forge?synthesisState.forgeTab:synthesisState.tab;
+        const content=renderers[tab]();
+        const tabs=forge?'<div class="v141-synthesis-tabs v141-forge-tabs"><button type="button" class="'+(tab==="reforge"?'active':'')+'" onclick="v141SwitchForgeTab(\'reforge\')">冶煉</button><button type="button" class="'+(tab==="socket"?'active':'')+'" onclick="v141SwitchForgeTab(\'socket\')">鑲嵌</button></div>':renderSynthesisTabs();
+        body.innerHTML='<div class="v141-synthesis"><div class="v141-synthesis-wallet"><span>'+(forge?'鍛造':'合成')+'</span><b>金幣 '+Math.floor(gold).toLocaleString('zh-TW')+'</b></div>'+tabs+'<div class="v141-synthesis-body">'+content+'</div></div>';
     }
     window.v141RenderSynthesis=renderSynthesis;
+    window.v141SwitchForgeTab=function(tab){
+        if(synthesisState.pendingReforge){ return; }
+        synthesisState.forgeTab=tab==="socket"?"socket":"reforge";
+        renderSynthesis();
+    };
+    window.v141SelectSocketItem=function(uid){ synthesisState.socketUid=uid; renderSynthesis(); };
+    window.v141SelectSocketGem=function(id){ synthesisState.gemId=id; renderSynthesis(); };
+    window.v141SocketGem=function(){
+        if(activeFeature!=="forge"||synthesisState.pendingReforge||!canUseLocalSockets()){ return false; }
+        const candidates=socketEquipment().filter(entry=>entry.item.v141Uid===synthesisState.socketUid);
+        if(candidates.length!==1){ return false; }
+        const item=candidates[0].item;
+        const index=nextSocketIndex(item);
+        const gem=window.FourSymbolsEquipmentGems.definitions[synthesisState.gemId];
+        const sockets=Array.isArray(item&&item.sockets)?item.sockets:[];
+        if(index<0||!Object.prototype.hasOwnProperty.call(window.FourSymbolsEquipmentGems.definitions,synthesisState.gemId)||!gem||countItem(gem.id)<1){ return false; }
+        const hadSockets=Object.prototype.hasOwnProperty.call(item,"sockets");
+        const previousSockets=item.sockets;
+        const next=sockets.slice();
+        next[index]=gem.id;
+        const success=runInventoryTransaction(()=>{
+            if(!window.v132ConsumeStackItem(gem.id,1)){ return false; }
+            item.sockets=next;
+            return saveGame()!==false;
+        });
+        if(!success){
+            if(hadSockets){ item.sockets=previousSockets; }else{ delete item.sockets; }
+            rebuildInventorySlots(); renderSynthesis();
+            return false;
+        }
+        rebuildInventorySlots(); updateUI(); renderSynthesis();
+        return true;
+    };
     window.v141SwitchSynthesisTab=function(tab){
-        synthesisState.tab=["reforge","talisman","fragment"].includes(tab)?tab:"reforge";
+        synthesisState.tab=["talisman","fragment"].includes(tab)?tab:"talisman";
         synthesisState.pendingReforge=null;
         renderSynthesis();
     };
@@ -511,7 +613,7 @@
             const cost=meta.available===false?'尚未開放・數值待定':'金幣 '+meta.reforgeGold.toLocaleString('zh-TW');
             return '<div><b>'+meta.label+'材料</b>　'+reforgeRangeText(tier,2)+'　／　'+cost+'</div>';
         }).join('');
-        window.v132ShowRewardModal('<div class="v132-reward-modal-inner v141-affix-modal"><h3>冶煉規則</h3><p>裝備品質不限制材料階級。選用哪一階材料，本次重洗就使用哪一階的數值範圍。</p>'+lines+'<p>桃紅階、四象階已預留正式階級，但目前不開放數值與取得來源。</p><p>每次會重洗所有未鎖定的冶煉槽；已鎖定詞條保持原數值。冶煉次數不限。</p><p>消耗：未鎖定 50 張設計圖＋50 礦石；鎖 1 條各 100；鎖 2 條各 150。最多鎖 2 條，且至少保留 1 個槽位重洗。</p><p>單槽最高值固定10%；具副詞條範圍的材料，雙詞條同時最高固定5%。</p><div class="v132-reward-actions"><button onclick="v132CloseRewardModal()">返回</button></div></div>');
+        window.v132ShowRewardModal('<div class="v132-reward-modal-inner v141-affix-modal"><h3>冶煉規則</h3><p>裝備品質不限制材料階級。選用哪一階材料，本次重洗就使用哪一階的數值範圍。</p>'+lines+'<p>桃紅階、四象階已預留正式階級，但目前不開放數值與取得來源。</p><p>每次會重洗所有未鎖定的冶煉槽；已鎖定詞條保持原數值。冶煉次數不限。</p><p>消耗：未鎖定消耗 50 礦石；鎖 1 條 100 礦石；鎖 2 條 150 礦石。最多鎖 2 條，且至少保留 1 個槽位重洗。</p><p>單槽最高值固定10%；具副詞條範圍的材料，雙詞條同時最高固定5%。</p><div class="v132-reward-actions"><button onclick="v132CloseRewardModal()">返回</button></div></div>');
     };
 
     window.v141CraftEquipment=function(){
@@ -550,12 +652,11 @@
         const info=reforgeMaterialInfo(tier);
         if(!info.meta||info.meta.available===false){ alert("此材料階級尚未開放。"); return; }
         const cost=reforgeMaterialCost(locks.length);
-        if(!info.ore||info.blueprintCount<cost||info.oreCount<cost||gold<info.meta.reforgeGold){
+        if(!info.ore||info.oreCount<cost||gold<info.meta.reforgeGold){
             alert(info.meta.label+"冶煉材料或金幣不足。");
             return;
         }
         const success=runInventoryTransaction(()=>
-            consumeMatching(candidate=>candidate&&candidate.blueprintSlot&&normalizeTierKey(candidate.tierKey)===tier,cost)&&
             window.v132ConsumeStackItem(info.ore.id,cost)
         );
         if(!success){ alert("冶煉素材扣除失敗，已自動還原。"); return; }
@@ -645,17 +746,19 @@
     if(typeof openHomeFeature==="function"){
         const originalOpenHomeFeature=openHomeFeature;
         openHomeFeature=function(type){
-            if(type!=="synthesis"){ return originalOpenHomeFeature.apply(this,arguments); }
+            if(type!=="synthesis"&&type!=="forge"){ return originalOpenHomeFeature.apply(this,arguments); }
             closeHomeFeature();
+            activeFeature=type;
             const modal=document.getElementById("homeFeatureModal");
             const title=document.getElementById("homeFeatureModalTitle");
-            if(title){ title.textContent="合成"; }
-            if(modal){ modal.classList.add("show","v141-synthesis-modal"); }
+            if(title){ title.textContent=type==="forge"?"鍛造":"合成"; }
+            if(modal){ modal.dataset.craftingFeature=type; modal.classList.add("show","v141-synthesis-modal"); }
             ensureEquipmentUids();
             // Route the very first open through the current public renderer.
             // Calling the closure directly bypasses later presentation owners
             // and is why equipment/talisman art only appears after a click.
-            if(typeof window.v141RenderSynthesis==="function"){ window.v141RenderSynthesis(); }
+            if(type==="forge"){ renderSynthesis(); }
+            else if(typeof window.v141RenderSynthesis==="function"){ window.v141RenderSynthesis(); }
             else{ renderSynthesis(); }
         };
     }
@@ -663,7 +766,7 @@
         const originalCloseHomeFeature=closeHomeFeature;
         closeHomeFeature=function(){
             const modal=document.getElementById("homeFeatureModal");
-            if(modal){ modal.classList.remove("v141-synthesis-modal"); }
+            if(modal){ modal.classList.remove("v141-synthesis-modal"); delete modal.dataset.craftingFeature; }
             return originalCloseHomeFeature.apply(this,arguments);
         };
     }
@@ -787,9 +890,12 @@
         let bestScore=-1;
         living.forEach(centerEntry=>{
             const center=centerEntry.index;
-            const indexes=owner&&snapshot&&typeof owner.resolveEnemyTargets==="function"
-                ?owner.resolveEnemyTargets(snapshot,center,"tri",index=>livingByIndex.has(index))
-                :[center];
+            const targetingOwner=window.FourSymbolsBattleSkillTargeting;
+            const indexes=targetingOwner&&typeof targetingOwner.resolveTargets==="function"
+                ?targetingOwner.resolveTargets("monster",center,"allyTri",{hostilePrimary:false})
+                :(owner&&snapshot&&typeof owner.resolveEnemyTargets==="function"
+                    ?owner.resolveEnemyTargets(snapshot,center,"tri",index=>livingByIndex.has(index))
+                    :[center]);
             const trio=indexes.map(index=>livingByIndex.get(index)).filter(Boolean);
             const score=trio.reduce((sum,entry)=>{
                 const ally=entry.monster;
@@ -845,7 +951,7 @@
                 buff.originalEvasion=monster.evasion;
                 monster.evasion=typeof window.v173CombineEvasionRates==="function"
                     ?window.v173CombineEvasionRates([buff.originalEvasion,amount])
-                    :Math.min(85,(Number(buff.originalEvasion)||0)+(Number(amount)||0));
+                    :Math.max(0,(Number(buff.originalEvasion)||0)+(Number(amount)||0));
             }
             const displayBuff={
                 type:type==="rage"?"rage":"v141TeamBuff",
@@ -873,7 +979,12 @@
 
     window.v141TryMonsterSpecialAction=function(monsterIndex){
         const monster=monsters[monsterIndex];
-        const supportIds=monster&&monster.v141SupportSkillIds||[];
+        const supportIds=monster&&typeof window.v144GetLegalMonsterSkillIds==="function"
+            ?window.v144GetLegalMonsterSkillIds(monster,"support")
+            :(monster&&monster.v141SupportSkillIds||[]).filter(id=>{
+                const skill=skillDatabase[id];
+                return !!(skill&&skill.element&&skill.element===monster.element);
+            });
         if(!monster||!monster.alive||!supportIds.length){ return false; }
         const allyEntries=currentBattleMonsters.map(index=>({index:index,monster:monsters[index]}))
             .filter(entry=>entry.monster&&entry.monster.alive);
@@ -894,7 +1005,13 @@
             healTargets=supportTargeting.entries;
             if(healTargets.length){ skillId="healSpell"; }
         }
-        const affordableAttacks=(monster.skillIds||[]).filter(id=>{
+        const carriedAttacks=typeof window.v144GetLegalMonsterSkillIds==="function"
+            ?window.v144GetLegalMonsterSkillIds(monster,"attack")
+            :(monster.skillIds||[]).filter(id=>{
+                const skill=skillDatabase[id];
+                return !!(skill&&skill.element&&skill.element===monster.element);
+            });
+        const affordableAttacks=carriedAttacks.filter(id=>{
             const skill=skillDatabase[id];
             return !!(skill&&monster.sp>=(skill.spCost||0));
         });
@@ -904,10 +1021,12 @@
         });
         if(!skillId){
             const category=window.FourSymbolsEnemySkillAI
-                ?window.FourSymbolsEnemySkillAI.chooseCategory(affordableAttacks,affordableBuffs,Math.random())
+                ?window.FourSymbolsEnemySkillAI.chooseCategory(affordableAttacks,affordableBuffs,Math.random(),monster)
                 :(Math.random()<.70?"attack":"buff");
             if(category==="attack"&&affordableAttacks.length){
-                monster.v175ForcedAttackSkillId=affordableAttacks[Math.floor(Math.random()*affordableAttacks.length)];
+                const preferredAttacks=monster.vGameplayTower===true&&monster.element==="water"&&affordableAttacks.includes("freeze")&&Math.random()<.5
+                    ?["freeze"]:affordableAttacks;
+                monster.v175ForcedAttackSkillId=preferredAttacks[Math.floor(Math.random()*preferredAttacks.length)];
                 return false;
             }
             if(category!=="buff"&&affordableBuffs.length){
@@ -923,7 +1042,9 @@
         if(!skillId&&supportIds.includes("dodgeSkill")&&!allies.some(item=>item.v141TeamBuffs?.some(buff=>buff.type==="dodge"&&buff.turnsLeft>0))){ skillId="dodgeSkill"; }
         if(!skillId){
             if(affordableAttacks.length){
-                monster.v175ForcedAttackSkillId=affordableAttacks[Math.floor(Math.random()*affordableAttacks.length)];
+                const preferredAttacks=monster.vGameplayTower===true&&monster.element==="water"&&affordableAttacks.includes("freeze")&&Math.random()<.5
+                    ?["freeze"]:affordableAttacks;
+                monster.v175ForcedAttackSkillId=preferredAttacks[Math.floor(Math.random()*preferredAttacks.length)];
             }
             return false;
         }
@@ -958,7 +1079,7 @@
             let spTotal=0;
             healTargets.forEach(entry=>{
                 const ally=entry.monster;
-                const healed=window.v141HealMonsterPreservingShield(ally,hpAmount);
+                const healed=window.v141HealMonsterPreservingShield(ally,hpAmount,monster);
                 const beforeSP=Math.max(0,Number(ally.sp)||0);
                 const spAmount=entry.index===monsterIndex
                     ?0
@@ -989,50 +1110,14 @@
             const evasion=levelValue(skill.evasionBonusPercentByLevel,skill.evasionBonusPercent||0);
             const dodgeTargets=(supportTargeting.entries||[]).map(entry=>entry.monster);
             applyTimedMonsterBuff(dodgeTargets,"dodge",3,evasion);
-            addBattleLog(monster.name+"施放閃躲術，同排最多"+dodgeTargets.length+"名友方最終閃躲提升"+evasion+"個百分點，持續3回合。");
+            addBattleLog(monster.name+"施放閃躲術，同排最多"+dodgeTargets.length+"名友方最終閃躲提升"+evasion+"%，持續3回合。");
         }
         updateUI(); finishPlayerAction();
         return true;
     };
 
-    let lastAbyssBuffTick="";
-    if(typeof startTurn==="function"){
-        const originalStartTurn=startTurn;
-        startTurn=function(token){
-            const key=token+":"+turn;
-            if(key!==lastAbyssBuffTick){
-                lastAbyssBuffTick=key;
-                currentBattleMonsters.forEach(index=>{
-                    const monster=monsters[index];
-                    if(!monster||!monster.v141Abyss||!monster.v141TeamBuffs){ return; }
-                    monster.v141TeamBuffs.forEach(buff=>{
-                        if(turn>1){ buff.turnsLeft--; }
-                        if(buff.displayBuff){ buff.displayBuff.turnsLeft=buff.turnsLeft; }
-                        if(buff.turnsLeft>0){ return; }
-                        if(buff.type==="rage"){
-                            monster.attack=buff.originalAttack; monster.magicAttack=buff.originalMagicAttack;
-                        }else if(buff.type==="resistance"){
-                            monster.resistance=Math.max(0,(Number(monster.resistance)||0)-buff.amount);
-                        }else if(buff.type==="dodge"){
-                            monster.evasion=buff.originalEvasion;
-                        }
-                    });
-                    monster.v141TeamBuffs=monster.v141TeamBuffs.filter(buff=>buff.turnsLeft>0);
-                    monster.activeBuffs=(monster.activeBuffs||[]).filter(buff=>{
-                        if(!buff||buff.turnsLeft<=0){ return false; }
-                        if(buff.type==="v141TeamBuff"){
-                            return monster.v141TeamBuffs.some(team=>team.displayBuff===buff);
-                        }
-                        if(buff.type==="rage"){
-                            return monster.v141TeamBuffs.some(team=>team.displayBuff===buff);
-                        }
-                        return true;
-                    });
-                });
-            }
-            return originalStartTurn.apply(this,arguments);
-        };
-    }
+    /* Timed support buffs consume on each affected monster's formal
+       action boundary through FourSymbolsDurationLifecycle. */
 
     function bossPosition(){ return [61,21]; }
     const ABYSS_DIALOGUE={
@@ -1281,7 +1366,7 @@
                     ?abyssFloors[floor].boss+"已退場。請開啟寶箱，再使用上方傳送點。"
                     :"五帝聯軍消失，深淵寶箱已出現。";
                 persistAbyss(); switchDungeonTab("abyss");
-            });
+            },{mode:"abyss"});
             if(!started){ abyssBattleStarting=false; }
         },180);
         return true;

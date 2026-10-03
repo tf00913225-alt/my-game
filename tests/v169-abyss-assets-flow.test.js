@@ -110,8 +110,10 @@ test("monster portrait v1 spec and registry lock the shared generation rules",()
     const spec=fs.readFileSync("docs/MONSTER_PORTRAIT_SPEC_V1.md","utf8");
     const entry=fs.readFileSync("MONSTER_PORTRAIT_SPEC.md","utf8");
     const registry=JSON.parse(fs.readFileSync("config/monster-portrait-registry.json","utf8"));
-    assert.match(spec,/素材尚未生成[\s\S]*自動盤點 → 自動生成 → 自動放置 → batch finalize → batch strict audit/);
-    assert.match(spec,/素材已生成並核准[\s\S]*正式 WebP 落位 → `portrait:import` 快速導入 → Runtime 契約驗證/);
+    assert.match(spec,/素材尚未生成[^\n]*自動盤點 → 自動生成 Master PNG → 放入 `assets-library` 正式 Master 路徑/);
+    assert.match(spec,/Master PNG 已生成並核准[^\n]*`portrait:finalize-master`[^\n]*Runtime／Audit／Permanent Gate 驗證/);
+    assert.match(spec,/任一後置驗證失敗時必須回滾/);
+    assert.match(spec,/正式 Runtime WebP 已經生成並核准[^\n]*`portrait:import` 快速導入，不重新生成圖片/);
     assert.match(spec,/1024 × 1536/);
     assert.match(spec,/1536 × 2048/);
     assert.match(entry,/docs\/MONSTER_PORTRAIT_SPEC_V1\.md/);

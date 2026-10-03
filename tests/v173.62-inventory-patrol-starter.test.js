@@ -1,6 +1,7 @@
 "use strict";
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 
 const main=fs.readFileSync("js/00-main.js","utf8");
 const equipment=fs.readFileSync("js/equipment-progression.js","utf8");
@@ -34,6 +35,6 @@ assert.doesNotMatch(battle,/stage\.style\.visibility/);
 assert.doesNotMatch(battle,/v17351-management-open.*toggle/);
 assert.match(animation,/stage\.className="v143-skill-stage";[\s\S]*?stage\.style\.visibility="visible";/);
 
-assert.ok(loader.includes('const V_ASSET_VERSION="173.72";'));
-assert.ok(index.includes('<title>四象江湖傳 V173.72</title>'));
+assert.ok(loader.includes('const V_ASSET_VERSION="'+releaseMeta.cacheVersion+'";'));
+assert.ok(index.includes('<title>四象江湖傳 V'+releaseMeta.version+'</title>'));
 console.log("✓ V173.62 inventory / patrol VFX / starter gear regressions");

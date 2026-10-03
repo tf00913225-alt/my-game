@@ -21,7 +21,27 @@ function findChrome(){
 function decode(value){return value.replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"').replace(/&#39;/g,"'");}
 
 const ownerSource=read("js/battlefield-slot-owner.js").replace(/<\/script/gi,"<\\/script");
+const fullV131Source=read("js/25-v131-fix-batch.js");
+const v131FormationSource=fullV131Source.slice(
+    fullV131Source.indexOf("    function getFormationRankWeight("),
+    fullV131Source.indexOf("    function formatDuration(")
+).replace(/<\/script/gi,"<\\/script");
+const v131EnemyApplySource=(fullV131Source.slice(
+    fullV131Source.indexOf("    function applyBattleFormation("),
+    fullV131Source.indexOf("    function ensureAllyFormationState(")
+)+"\nwindow.v131AfterBattleRender=function(){ applyBattleFormation(); };\n").replace(/<\/script/gi,"<\\/script");
+const mainSource=read("js/00-main.js");
+const mainRenderHookSource=mainSource.slice(
+    mainSource.indexOf("const BATTLE_RENDER_HOOK_ORDER="),
+    mainSource.indexOf("function isBattleStatusInspectionBlocked(")
+).replace(/<\/script/gi,"<\\/script");
+const mainRenderSource=mainSource.slice(
+    mainSource.indexOf("function renderBattle(){"),
+    mainSource.indexOf("function fillBattleInfoGap(")
+).replace(/<\/script/gi,"<\\/script");
 const adapterSource=read("js/battlefield-render-geometry-adapter.js").replace(/<\/script/gi,"<\\/script");
+const feedbackSource=read("js/battle-floating-feedback-owner.js").replace(/<\/script/gi,"<\\/script");
+const feedbackCss=read("css/battle-floating-feedback-owner.css").replace(/<\/style/gi,"<\\/style");
 const mainCssSource=read("css/00-main.css");
 const commandGeometryCss=[
     mainCssSource.match(/#battlePage\{\s*--battle-command-row-height:[\s\S]*?\n\}/)?.[0],
@@ -51,7 +71,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#120e09;col
 .v143-skill-stage{position:fixed;inset:0;pointer-events:none}.damage-popup{position:absolute;font-weight:900}
 </style>
 <style id="v174-cardless-battle-style">#battlePage .v174-battle-art{inset:999px!important}#battlePage .battle-wrap{overflow:hidden!important}</style>
-<style>${commandGeometryCss}</style><style>${identityCss}</style><style>${v154Css}</style><style>${geometryCss}</style><style>${bossCss}</style></head><body>
+<style>${commandGeometryCss}</style><style>${identityCss}</style><style>${v154Css}</style><style>${geometryCss}</style><style>${bossCss}</style><style>${feedbackCss}</style></head><body>
 <div id="game-stage"><div id="app"><div id="game-content"><section id="battlePage" class="v-fixed-slot-render-v2"><div class="battle-wrap">
 <section class="battle-enemy-region"><div class="battle-title">戰鬥</div><div id="battleMonsterArea" class="battle-monsters v131-formation"></div></section>
 <section class="battle-center-region"><div class="battle-middle"><div id="battleActionRegion" class="v-fixed-action-zone" style="position:relative;display:flex;flex-direction:column;gap:4px"><div id="turnTargetRow" class="turn-target-row">第 1 回合</div><div id="battleTargetPrompt" class="battle-target-prompt"><div class="battle-target-prompt-copy"><div class="battle-target-prompt-action">選擇［怒火］的我方目標</div><div class="battle-target-prompt-hint">選擇目標</div></div><button class="battle-target-back">返回</button></div><div id="battleCommandRow" style="display:flex;gap:5px;flex:0 0 66px;position:relative"><div id="mainBattleMenu" class="battle-menu" style="flex:1">操作區</div></div></div></div></section>
@@ -62,7 +82,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#120e09;col
 window.__allyIndexes=[0,1,2];
 window.getExistingPartyIndexes=function(){return window.__allyIndexes.slice();};
 window.monsters=Array.from({length:10},function(_,i){return {hp:1000,alive:true,rank:i===2?'boss':(i===1?'elite':'regular')};});
-window.currentBattleMonsters=[];window.getMonsterRank=function(m){return m&&m.rank||'regular';};window.renderBattle=function(){};
+window.currentBattleMonsters=[];window.getMonsterRank=function(m){return m&&m.rank||'regular';};window.$=function(id){return document.getElementById(id);};window.updateMonsterUI=function(){};window.renderPlayers=function(){};window.selectBattleTarget=function(){};window.openBattleStatusDetailModal=function(){};
 window.addEventListener('error',function(event){var result=document.getElementById('result');if(result&&!result.textContent){result.textContent=JSON.stringify({fixtureError:String(event.error&&event.error.stack||event.message||'unknown fixture error')});}});
 /* The focused geometry fixture supplies the public presentation boundary only;
    the exact production implementation is covered by static/runtime suites and
@@ -71,7 +91,7 @@ window.addEventListener('error',function(event){var result=document.getElementBy
 window.FourSymbolsBattlePresentation={applyUnit:function(card){if(!card)return;card.classList.add('v174-cardless-unit');var art=card.querySelector(':scope > .v174-battle-art');if(!art){art=document.createElement('div');art.className='v174-battle-art';card.insertBefore(art,card.firstChild);}card.style.setProperty('background-image','none','important');}};
 window.showDamagePopup=function(element,text,type,isCrit){var p=document.createElement('div');p.className='damage-popup hp-popup'+(isCrit?' crit':'');p.textContent=text||'-100';element.appendChild(p);return p;};
 window.showMissEffect=function(isPlayerTarget,index,label){var el=document.getElementById((isPlayerTarget?'battlePlayerCard':'battleMonster')+index);if(!el)return;var p=document.createElement('div');p.className='damage-popup miss-popup';p.textContent=label||'MISS';el.appendChild(p);};
-</script><script>${ownerSource}</script><script>${adapterSource}</script>
+</script><script>${ownerSource}</script><script>${v131FormationSource}</script><script>${v131EnemyApplySource}</script><script>${adapterSource}</script><script>${feedbackSource}</script><script>${mainRenderHookSource}</script><script>${mainRenderSource}</script>
 <script>
 (function(){
  const owner=window.FourSymbolsBattlefieldSlots,adapter=window.FourSymbolsBattlefieldRenderGeometry;
@@ -98,11 +118,50 @@ window.showMissEffect=function(isPlayerTarget,index,label){var el=document.getEl
  [1,2,3,4,5,6].forEach(function(count){addCards(5,count,false);allyScenarios[count]={lower:lower(),unitRects:unitRects('.v-fixed-ally-slot'),hudRects:hudRects('.v-fixed-ally-slot'),slots:document.querySelectorAll('.v-fixed-ally-slot').length,assigned:Object.assign({},owner.ensureAllyFormation(window.__allyIndexes).characterIndexToSlot)};});
  addCards(5,3,true);var splitAlly={lower:lower(),assigned:Object.assign({},owner.ensureAllyFormation(window.__allyIndexes).characterIndexToSlot)};var artwork={player:artEvidence('#battlePlayerCard0'),regular:artEvidence('#battleMonster0'),elite:artEvidence('#battleMonster1'),boss:artEvidence('#battleMonster2'),abyss:artEvidence('#battleMonster4')};
  addCards(3,3,true);var beforeDeath={e1:rect('#battleMonster1'),e2:rect('#battleMonster2')};document.getElementById('battleMonster1').remove();var afterDeath={e2:rect('#battleMonster2')};var targetSlot=owner.getEnemySlotForMonster(owner.getActiveEnemySnapshot(),2),targetRect=owner.getSlotRect(targetSlot);
- window.showDamagePopup(document.getElementById('battleMonster2'),'-100','hp',false);
- window.showDamagePopup(document.getElementById('battleMonster2'),'-777','hp',true);
- window.showDamagePopup(document.getElementById('battleMonster2'),'+250','heal',false);
- window.showMissEffect(false,2,'MISS');
- var hpPopups=Array.from(document.querySelectorAll('.damage-popup.hp-popup')),damage=hpPopups[hpPopups.length-3],critical=hpPopups[hpPopups.length-2],heal=hpPopups[hpPopups.length-1],miss=Array.from(document.querySelectorAll('.damage-popup.miss-popup')).pop();
+ /* Restore the formal three-enemy DOM after the death-stability probe. Floating
+    feedback must never target a Unit that no longer exists in the battlefield. */
+ addCards(3,3,true);
+ function activeFrame(index){var card=document.getElementById('battlePlayerCard'+index),style=getComputedStyle(card,'::after');return {index:index,content:style.content,border:style.borderTopWidth,borderColor:style.borderTopColor,shadow:style.boxShadow,animationName:style.animationName,animationDuration:style.animationDuration};}
+ function setManualActive(index){document.querySelectorAll('#battlePlayerRow .battle-player').forEach(function(card){card.classList.toggle('active-turn',card.id==='battlePlayerCard'+index);});return {active:Array.from(document.querySelectorAll('#battlePlayerRow .battle-player.active-turn')).map(function(card){return card.id;}),frame:activeFrame(index)};}
+ var manualControl={character0:setManualActive(0),character1:setManualActive(1),character2:setManualActive(2)};
+ var targetSelectingPlayer=document.getElementById('battlePlayerCard1');setManualActive(1);targetSelectingPlayer.classList.add('ally-targetable');manualControl.targetSelection={active:Array.from(document.querySelectorAll('#battlePlayerRow .battle-player.active-turn')).map(function(card){return card.id;}),frame:activeFrame(1),reticleAnimation:getComputedStyle(targetSelectingPlayer,'::before').animationName};targetSelectingPlayer.classList.remove('ally-targetable');
+ document.querySelectorAll('#battlePlayerRow .battle-player').forEach(function(card){card.classList.remove('active-turn');});
+ manualControl.auto={active:Array.from(document.querySelectorAll('#battlePlayerRow .battle-player.active-turn')).map(function(card){return card.id;}),frames:[0,1,2].map(activeFrame)};
+ var feedback=window.FourSymbolsBattleFloatingFeedback;
+ /* A/C: Relic damage + Burn status share the same target context without collision. */
+ feedback.emit({side:'monster',index:0,kind:'damage',text:'-188HP',source:'relic',duration:1500,skipImpactTiming:true});
+	feedback.emit({side:'monster',index:0,kind:'status',statusType:'burn',text:'燃燒',source:'relic-status',duration:1500,skipImpactTiming:true});
+ /* D: Shield + HP damage share another target context. */
+ feedback.emit({side:'monster',index:1,kind:'shield',text:'-88',source:'shield',duration:1500,skipImpactTiming:true});
+ feedback.emit({side:'monster',index:1,kind:'damage',text:'-100HP',source:'damage',duration:1500,skipImpactTiming:true});
+ /* E: MISS + Status share another target context. */
+ feedback.emit({side:'monster',index:2,kind:'miss',text:'MISS',source:'miss',duration:1500,skipImpactTiming:true});
+	feedback.emit({side:'monster',index:2,kind:'status',statusType:'defenseDown',text:'破防',source:'status',duration:1500,skipImpactTiming:true});
+ /* B: HP + SP recovery share one player context. */
+ feedback.emit({side:'player',index:0,kind:'heal',text:'+250HP',source:'heal',duration:1500,skipImpactTiming:true});
+ feedback.emit({side:'player',index:0,kind:'sp',text:'+40SP',source:'sp',duration:1500,skipImpactTiming:true});
+ /* F: two consecutive HP recovery entries must allocate separate lanes. */
+ feedback.emit({side:'player',index:1,kind:'heal',text:'+120HP',source:'heal-1',duration:1500,skipImpactTiming:true});
+ feedback.emit({side:'player',index:1,kind:'heal',text:'+90HP',source:'heal-2',duration:1500,skipImpactTiming:true});
+ /* Queue stress: the fifth simultaneous entry is queued instead of escaping the HUD-safe area. */
+ ['Q1','Q2','Q3','Q4','Q5'].forEach(function(label){
+   feedback.emit({side:'player',index:2,kind:'status',text:label,source:'queue-stress',duration:1500,skipImpactTiming:true});
+ });
+ var monster0Feedback=Array.from(document.querySelectorAll('.battle-floating-feedback[data-feedback-side="monster"][data-feedback-index="0"]'));
+ var monster1Feedback=Array.from(document.querySelectorAll('.battle-floating-feedback[data-feedback-side="monster"][data-feedback-index="1"]'));
+ var monster2Feedback=Array.from(document.querySelectorAll('.battle-floating-feedback[data-feedback-side="monster"][data-feedback-index="2"]'));
+ var player0Feedback=Array.from(document.querySelectorAll('.battle-floating-feedback[data-feedback-side="player"][data-feedback-index="0"]'));
+ var player1Feedback=Array.from(document.querySelectorAll('.battle-floating-feedback[data-feedback-side="player"][data-feedback-index="1"]'));
+ var player2Feedback=Array.from(document.querySelectorAll('.battle-floating-feedback[data-feedback-side="player"][data-feedback-index="2"]'));
+ var feedbackQueueSnapshot=feedback.debugSnapshot();
+ /* Capture the geometry that actually owned these popups before later Boss
+    scenarios intentionally reassign the same Unit indexes to different Slots. */
+ var monster0FeedbackGeometry=adapter.getUnitGeometry('monster',0);
+ var monster1FeedbackGeometry=adapter.getUnitGeometry('monster',1);
+ var monster2FeedbackGeometry=adapter.getUnitGeometry('monster',2);
+ var player0FeedbackGeometry=adapter.getUnitGeometry('player',0);
+ var player1FeedbackGeometry=adapter.getUnitGeometry('player',1);
+ var player2FeedbackGeometry=adapter.getUnitGeometry('player',2);
  var stage=document.createElement('div');stage.className='v143-skill-stage';stage.dataset.geometryOwner='fixed-slot';document.body.appendChild(stage);
  var turnNode=document.getElementById('turnTargetRow'),actionRegion=document.getElementById('battleActionRegion');
  turnNode.style.transition='none';
@@ -117,19 +176,34 @@ window.showMissEffect=function(isPlayerTarget,index,label){var el=document.getEl
  drawer.classList.remove('is-expanded');
  addCards(5,6,false);
  var bossSnapshot=owner.createEnemyFormationSnapshot([0],{originalFormationType:6});
+ bossSnapshot.bossBattleSnapshot=true;
  owner.setActiveEnemySnapshot(bossSnapshot);
  owner.assignMonsterToEnemySlot(bossSnapshot,1,'ENEMY_B1');owner.assignMonsterToEnemySlot(bossSnapshot,2,'ENEMY_B5');
  owner.assignMonsterToEnemySlot(bossSnapshot,3,'ENEMY_F1');owner.assignMonsterToEnemySlot(bossSnapshot,4,'ENEMY_F5');
  window.monsters[0].rank='boss';window.monsters[1].rank='elite';window.monsters[2].rank='elite';
  window.monsters[3].unitKind='boss-object';window.monsters[3].canAct=false;window.monsters[4].unitKind='boss-object';window.monsters[4].canAct=false;
- window.FourSymbolsBossBattle={getBossIndex:function(){return 0;},isBossIndex:function(index){return index===0;}};
+ window.FourSymbolsBossBattle={getBossIndex:function(){return 0;},isBossIndex:function(index){return index===0;},isActive:function(){return true;},getEnemyFormationSnapshot:function(){if(owner.getActiveEnemySnapshot()!==bossSnapshot)owner.setActiveEnemySnapshot(bossSnapshot);return bossSnapshot;},ownsEnemyFormationSnapshot:function(snapshot){return snapshot===bossSnapshot;}};
  adapter.reconcile();
  var bossCard=document.getElementById('battleMonster0'),leftObject=document.getElementById('battleMonster3');
  bossCard.classList.add('targetable');leftObject.classList.add('targetable');
  var bossFootprint=document.querySelector('.v-fixed-boss-footprint'),bossReticle=getComputedStyle(bossCard,'::before'),objectReticle=getComputedStyle(leftObject,'::before');
  var bossHp=bossCard.querySelector('.monster-hp'),bossSp=bossCard.querySelector('.monster-sp'),bossName=bossCard.querySelector('.battle-monster-name');
  var bossEvidence={footprint:rect('.v-fixed-boss-footprint'),card:rect('#battleMonster0'),art:rect('#battleMonster0 > .v174-battle-art'),hud:{hp:rect('#battleMonster0 > .monster-hp'),sp:rect('#battleMonster0 > .monster-sp'),name:rect('#battleMonster0 > .battle-monster-name'),hpPosition:getComputedStyle(bossHp).position,spPosition:getComputedStyle(bossSp).position,hpDisplay:getComputedStyle(bossHp).display,spDisplay:getComputedStyle(bossSp).display},bossCount:document.querySelectorAll('.v-fixed-boss-footprint > #battleMonster0').length,slots:bossFootprint&&bossFootprint.dataset.slots,reinforcements:['#battleMonster1','#battleMonster2'].map(function(selector){return {card:rect(selector),art:rect(selector+' > .v174-battle-art')};}),objects:['#battleMonster3','#battleMonster4'].map(function(selector){return {card:rect(selector),art:rect(selector+' > .v174-battle-art')};}),cardless:Array.from(document.querySelectorAll('.battle-monster')).every(function(card){return card.classList.contains('v174-cardless-unit');}),pointerEvents:getComputedStyle(bossCard).pointerEvents,background:getComputedStyle(bossCard).backgroundImage,reticles:{boss:{content:bossReticle.content,border:bossReticle.borderTopWidth,animation:bossReticle.animationName},object:{content:objectReticle.content,border:objectReticle.borderTopWidth,animation:objectReticle.animationName}}};
- setTimeout(function(){var legacyStyle=document.getElementById('v174-cardless-battle-style');var result={viewport:{width:${width},height:${height}},scenarios:scenarios,allyScenarios:allyScenarios,splitAlly:splitAlly,collapsedDrawer:collapsedDrawer,expandedDrawer:expandedDrawer,turnUi:turnUi,artwork:artwork,beforeDeath:beforeDeath,afterDeath:afterDeath,targetSlot:targetSlot,targetRect:targetRect,boss:bossEvidence,legacyStyle:{owner:legacyStyle&&legacyStyle.dataset.geometryOwner,textLength:legacyStyle?legacyStyle.textContent.length:-1},popup:{damage:{slot:damage&&damage.dataset.slot,kind:damage&&damage.dataset.popupKind,left:damage&&damage.style.left,top:damage&&damage.style.top,fontSize:damage&&damage.style.fontSize},critical:{slot:critical&&critical.dataset.slot,kind:critical&&critical.dataset.popupKind,left:critical&&critical.style.left,top:critical&&critical.style.top,fontSize:critical&&critical.style.fontSize},heal:{slot:heal&&heal.dataset.slot,kind:heal&&heal.dataset.popupKind,left:heal&&heal.style.left,top:heal&&heal.style.top,fontSize:heal&&heal.style.fontSize},miss:{slot:miss&&miss.dataset.slot,kind:miss&&miss.dataset.popupKind,left:miss&&miss.style.left,top:miss&&miss.style.top,fontSize:miss&&miss.style.fontSize}},stageOverflow:getComputedStyle(stage).overflow,pageScroll:{width:document.documentElement.scrollWidth,height:document.documentElement.scrollHeight,clientWidth:document.documentElement.clientWidth,clientHeight:document.documentElement.clientHeight},enemySlots:document.querySelectorAll('.v-fixed-enemy-slot').length,allySlots:document.querySelectorAll('.v-fixed-ally-slot').length,legacyClasses:{enemy:document.getElementById('battleMonsterArea').className,ally:document.getElementById('battlePlayerRow').className}};document.getElementById('result').textContent=JSON.stringify(result);},40);
+ function bossLifecycleEvidence(){var active=owner.getActiveEnemySnapshot(),bossArt=document.querySelector('#battleMonster0 > .v174-battle-art'),bossRect=bossArt&&bossArt.getBoundingClientRect();return {sameSnapshot:active===bossSnapshot,bossSlot:owner.getEnemySlotForMonster(active,0),reinforcementSlots:[owner.getEnemySlotForMonster(active,1),owner.getEnemySlotForMonster(active,2)],objectSlots:[owner.getEnemySlotForMonster(active,3),owner.getEnemySlotForMonster(active,4)],roster:window.currentBattleMonsters.slice(),reinforcements:[1,2].map(function(index){var card=document.getElementById('battleMonster'+index),holder=card&&card.parentElement,art=card&&card.querySelector(':scope > .v174-battle-art'),r=art&&art.getBoundingClientRect();return {holderSlot:holder&&holder.dataset.slot||null,artworkClear:!!(r&&bossRect&&(r.right<=bossRect.left+.5||r.left>=bossRect.right-.5))};})};}
+ var bossLifecycle={initial:bossLifecycleEvidence()};
+ window.monsters[3].alive=false;window.monsters[3].hp=0;owner.removeMonsterFromEnemySlot(bossSnapshot,3);window.renderBattle();bossLifecycle.afterF1=bossLifecycleEvidence();
+ window.monsters[4].alive=false;window.monsters[4].hp=0;owner.removeMonsterFromEnemySlot(bossSnapshot,4);window.renderBattle();window.renderBattle();bossLifecycle.afterF5=bossLifecycleEvidence();
+ setTimeout(function(){var legacyStyle=document.getElementById('v174-cardless-battle-style');var result={viewport:{width:${width},height:${height}},scenarios:scenarios,allyScenarios:allyScenarios,splitAlly:splitAlly,manualControl:manualControl,collapsedDrawer:collapsedDrawer,expandedDrawer:expandedDrawer,turnUi:turnUi,artwork:artwork,beforeDeath:beforeDeath,afterDeath:afterDeath,targetSlot:targetSlot,targetRect:targetRect,boss:bossEvidence,bossLifecycle:bossLifecycle,legacyStyle:{owner:legacyStyle&&legacyStyle.dataset.geometryOwner,textLength:legacyStyle?legacyStyle.textContent.length:-1},feedback:{
+	   monster0:monster0Feedback.map(function(node){var r=node.getBoundingClientRect(),s=getComputedStyle(node);return {kind:node.dataset.feedbackKind,statusType:node.dataset.feedbackStatusType||null,source:node.dataset.feedbackSource,lane:Number(node.dataset.feedbackLane),rect:{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height},color:s.color,stroke:s.webkitTextStroke,textShadow:s.textShadow,background:s.backgroundColor};}),
+	   monster1:monster1Feedback.map(function(node){var r=node.getBoundingClientRect(),s=getComputedStyle(node);return {kind:node.dataset.feedbackKind,statusType:node.dataset.feedbackStatusType||null,source:node.dataset.feedbackSource,lane:Number(node.dataset.feedbackLane),rect:{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height},color:s.color,stroke:s.webkitTextStroke,textShadow:s.textShadow,background:s.backgroundColor};}),
+	   monster2:monster2Feedback.map(function(node){var r=node.getBoundingClientRect(),s=getComputedStyle(node);return {kind:node.dataset.feedbackKind,statusType:node.dataset.feedbackStatusType||null,source:node.dataset.feedbackSource,lane:Number(node.dataset.feedbackLane),rect:{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height},color:s.color,stroke:s.webkitTextStroke,textShadow:s.textShadow,background:s.backgroundColor};}),
+	   player0:player0Feedback.map(function(node){var r=node.getBoundingClientRect(),s=getComputedStyle(node);return {kind:node.dataset.feedbackKind,source:node.dataset.feedbackSource,lane:Number(node.dataset.feedbackLane),rect:{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height},color:s.color,stroke:s.webkitTextStroke,textShadow:s.textShadow,background:s.backgroundColor};}),
+   player1:player1Feedback.map(function(node){var r=node.getBoundingClientRect();return {kind:node.dataset.feedbackKind,source:node.dataset.feedbackSource,lane:Number(node.dataset.feedbackLane),rect:{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height}};}),
+   player2:player2Feedback.map(function(node){var r=node.getBoundingClientRect();return {kind:node.dataset.feedbackKind,source:node.dataset.feedbackSource,lane:Number(node.dataset.feedbackLane),rect:{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height}};}),
+   queueSnapshot:feedbackQueueSnapshot,
+   monster0Geometry:monster0FeedbackGeometry,monster1Geometry:monster1FeedbackGeometry,monster2Geometry:monster2FeedbackGeometry,
+   player0Geometry:player0FeedbackGeometry,player1Geometry:player1FeedbackGeometry,player2Geometry:player2FeedbackGeometry
+ },stageOverflow:getComputedStyle(stage).overflow,pageScroll:{width:document.documentElement.scrollWidth,height:document.documentElement.scrollHeight,clientWidth:document.documentElement.clientWidth,clientHeight:document.documentElement.clientHeight},enemySlots:document.querySelectorAll('.v-fixed-enemy-slot').length,allySlots:document.querySelectorAll('.v-fixed-ally-slot').length,legacyClasses:{enemy:document.getElementById('battleMonsterArea').className,ally:document.getElementById('battlePlayerRow').className}};document.getElementById('result').textContent=JSON.stringify(result);},40);
 })();
 </script></body></html>`;
 }
@@ -168,6 +242,21 @@ function runViewport(chrome,width,height){
     assert.equal(data.turnUi.itemPicker.opacity,"1");
     assert.equal(data.turnUi.targetSelecting.opacity,"1");
     assert.equal(data.turnUi.targetSelecting.pointerEvents,"none");
+    for(const [key,index] of [["character0",0],["character1",1],["character2",2]]){
+        const state=data.manualControl[key];
+        assert.deepEqual(state.active,[`battlePlayerCard${index}`],`${key} must be the only manual active character`);
+        assert.equal(state.frame.content,'""');
+        assert.equal(state.frame.border,"3px");
+        assert.equal(state.frame.borderColor,"rgb(255, 210, 31)");
+        assert.notEqual(state.frame.shadow,"none");
+        assert.equal(state.frame.animationName,"v174ManualActiveTurnFrameFlash");
+        assert.equal(state.frame.animationDuration,"0.3s");
+    }
+    assert.deepEqual(data.manualControl.auto.active,[],"auto control must expose no manual active character");
+    data.manualControl.auto.frames.forEach(frame=>assert.equal(frame.animationName,"none","inactive/auto cards must not run the manual flash"));
+    assert.deepEqual(data.manualControl.targetSelection.active,["battlePlayerCard1"]);
+    assert.equal(data.manualControl.targetSelection.frame.animationName,"v174ManualActiveTurnFrameFlash","ally target selection must not suppress the manual active frame");
+    assert.equal(data.manualControl.targetSelection.reticleAnimation,"none","multi-target reticles remain static");
     close(data.turnUi.normal.rect.bottom,baseline.commandVisualTop,"turn timer bottom aligns with command art visual top",.8);
     assert.ok(data.turnUi.normal.rect.bottom<=baseline.commandVisualTop+.8,"turn timer must not overlap command art");
     assert.ok(data.turnUi.targetSelecting.rect.top>=baseline.center.top-.5,"target-selecting turn timer stays inside center region");
@@ -184,7 +273,53 @@ function runViewport(chrome,width,height){
     assert.ok(data.allyScenarios[3].unitRects[0].height>116,"ally cards are visibly taller than the previous 86px owner");
     close(data.beforeDeath.e2.left,data.afterDeath.e2.left,"death must not move right unit");close(data.beforeDeath.e2.top,data.afterDeath.e2.top,"death must not move right unit vertically");
     for(const [kind,art] of Object.entries(data.artwork)){assert.equal(art.backgroundSize,"contain",`${kind} artwork must use contain`);assert.equal(art.overflow,"visible",`${kind} artwork overflow`);assert.equal(art.contain,"none",`${kind} artwork contain`);assert.equal(art.clipChain.some(entry=>/hidden|clip/.test(entry.overflow)||/hidden|clip/.test(entry.overflowX)||/hidden|clip/.test(entry.overflowY)),false,`${kind} artwork has clipping ancestor`);}
-    for(const kind of ["damage","critical","heal","miss"]){assert.equal(data.popup[kind].slot,data.targetSlot,`${kind} slot anchor`);assert.ok(data.popup[kind].left&&data.popup[kind].top,`${kind} position`);}assert.equal(data.popup.critical.fontSize,"20px");assert.equal(data.popup.damage.fontSize,"18px");assert.equal(data.popup.heal.kind,"heal");assert.equal(data.popup.miss.kind,"miss");
+    function separated(items,label){for(let i=0;i<items.length;i++){for(let j=i+1;j<items.length;j++){const a=items[i].rect,b=items[j].rect;assert.ok(a.bottom<=b.top+.5||b.bottom<=a.top+.5||a.right<=b.left+.5||b.right<=a.left+.5,label+" overlap: "+JSON.stringify({a:items[i],b:items[j]}));}}}
+    assert.equal(data.feedback.monster0.length,2,"Relic damage + Burn status must share one target context");
+    assert.deepEqual(data.feedback.monster0.map(item=>item.source).sort(),["relic","relic-status"]);
+    assert.equal(data.feedback.monster1.length,2,"Shield + HP damage must share one target context");
+    assert.equal(data.feedback.monster2.length,2,"MISS + Status must share one target context");
+    assert.equal(data.feedback.player0.length,2,"HP + SP recovery must share one target context");
+    assert.equal(data.feedback.player1.length,2,"consecutive HP recovery must allocate separate lanes");
+    const queueContext=data.feedback.queueSnapshot.find(item=>item.key==="player:2");
+    assert.ok(queueContext,"queue stress context must exist");
+    assert.ok(queueContext.capacity>=1&&queueContext.capacity<=4,"lane capacity must stay bounded by the formal maximum");
+    assert.equal(data.feedback.player2.length,queueContext.active.length,"rendered feedback must equal active lane count");
+    assert.equal(queueContext.active.length,queueContext.capacity,"queue stress must fill every geometry-safe lane");
+    assert.equal(queueContext.active.length+queueContext.queued.length,5,"all five stress events must remain active or queued");
+    assert.ok(queueContext.queued.length>=1,"overflow feedback must wait in queue instead of entering HUD space");
+    [data.feedback.monster0,data.feedback.monster1,data.feedback.monster2,data.feedback.player0,data.feedback.player1,data.feedback.player2].forEach(function(group){
+        separated(group,"battle feedback");
+        assert.equal(new Set(group.map(item=>item.lane)).size,group.length,"each active feedback item must have a unique lane");
+    });
+    [[data.feedback.monster0,data.feedback.monster0Geometry],[data.feedback.monster1,data.feedback.monster1Geometry],[data.feedback.monster2,data.feedback.monster2Geometry],[data.feedback.player0,data.feedback.player0Geometry],[data.feedback.player1,data.feedback.player1Geometry],[data.feedback.player2,data.feedback.player2Geometry]].forEach(function(pair){
+        pair[0].forEach(function(item){
+            assert.ok(
+                item.rect.bottom<=pair[1].hudSafeRect.top+.5,
+                "feedback must stay above HUD safe area: "+JSON.stringify({
+                    viewport:data.viewport,
+                    item:item,
+                    feedbackSafeRect:pair[1].feedbackSafeRect,
+                    feedbackAnchor:pair[1].feedbackAnchor,
+                    hudSafeRect:pair[1].hudSafeRect,
+                    unitRect:pair[1].unitRect
+                })
+            );
+        });
+    });
+	const damage=data.feedback.monster0.concat(data.feedback.monster1).filter(item=>item.kind==="damage");
+	damage.forEach(function(item){
+		assert.equal(item.color,"rgb(227, 38, 38)");
+		assert.match(item.stroke,/0\.85px rgb\(255, 255, 255\)/);
+		assert.equal(item.background,"rgba(0, 0, 0, 0)");
+		assert.doesNotMatch(item.textShadow,/8px|10px|14px|16px/);
+	});
+	const burn=data.feedback.monster0.find(item=>item.kind==="status");
+	assert.deepEqual({statusType:burn.statusType,color:burn.color,background:burn.background},{statusType:"burn",color:"rgb(255, 255, 255)",background:"rgb(11, 11, 13)"});
+	const defenseDown=data.feedback.monster2.find(item=>item.kind==="status");
+	assert.deepEqual({statusType:defenseDown.statusType,color:defenseDown.color,background:defenseDown.background},{statusType:"defenseDown",color:"rgb(255, 255, 255)",background:"rgb(11, 11, 13)"});
+	const recoveries=Object.fromEntries(data.feedback.player0.map(item=>[item.kind,item]));
+	assert.equal(recoveries.heal.color,"rgb(32, 184, 87)");
+	assert.equal(recoveries.sp.color,"rgb(44, 141, 232)");
     assert.equal(data.stageOverflow,"visible");
     close(data.boss.footprint.left,data.boss.card.left,"Boss card left fills six-Slot footprint");close(data.boss.footprint.right,data.boss.card.right,"Boss card right fills six-Slot footprint");close(data.boss.footprint.top,data.boss.card.top,"Boss card top fills six-Slot footprint");close(data.boss.footprint.bottom,data.boss.card.bottom,"Boss card bottom fills six-Slot footprint");
     assert.equal(data.boss.bossCount,1,"Boss must remain one DOM target");assert.equal(data.boss.slots,"ENEMY_B2 ENEMY_B3 ENEMY_B4 ENEMY_F2 ENEMY_F3 ENEMY_F4");assert.equal(data.boss.cardless,true,"Boss-side dynamic Units must be cardless immediately");assert.equal(data.boss.pointerEvents,"auto");assert.equal(data.boss.background,"none");
@@ -193,12 +328,14 @@ function runViewport(chrome,width,height){
     [data.boss.reinforcements[0],data.boss.objects[0]].forEach(function(side){assert.ok(side.art.centerX<=side.card.centerX-6,"left Boss-side artwork must visibly shift outward");});
     [data.boss.reinforcements[1],data.boss.objects[1]].forEach(function(side){assert.ok(side.art.centerX>=side.card.centerX+6,"right Boss-side artwork must visibly shift outward");});
     assert.equal(data.boss.reticles.boss.content,'""');assert.equal(data.boss.reticles.object.content,'""');assert.equal(data.boss.reticles.boss.border,"3px");assert.equal(data.boss.reticles.object.border,"3px");assert.equal(data.boss.reticles.boss.animation,"none");assert.equal(data.boss.reticles.object.animation,"none");
+    for(const phase of [data.bossLifecycle.initial,data.bossLifecycle.afterF1,data.bossLifecycle.afterF5]){assert.equal(phase.sameSnapshot,true,"Boss lifecycle must preserve snapshot identity");assert.equal(phase.bossSlot,"ENEMY_B3");assert.deepEqual(phase.reinforcementSlots,["ENEMY_B1","ENEMY_B5"]);assert.ok(phase.reinforcements.every(function(item,index){return item.holderSlot===["ENEMY_B1","ENEMY_B5"][index]&&item.artworkClear;}),"Boss reinforcements must remain outside the central artwork footprint");}
+    assert.deepEqual(data.bossLifecycle.initial.objectSlots,["ENEMY_F1","ENEMY_F5"]);assert.deepEqual(data.bossLifecycle.afterF1.objectSlots,[null,"ENEMY_F5"]);assert.deepEqual(data.bossLifecycle.afterF5.objectSlots,[null,null]);assert.ok(data.bossLifecycle.afterF5.roster.includes(3)&&data.bossLifecycle.afterF5.roster.includes(4),"dead Boss objects remain in the lifecycle roster without forcing compaction");
     assert.ok(data.pageScroll.width<=data.pageScroll.clientWidth+1,`horizontal page scroll ${width}x${height}`);assert.ok(data.pageScroll.height<=data.pageScroll.clientHeight+1,`vertical page scroll ${width}x${height}`);return data;
 }
 
 fs.mkdirSync(ARTIFACT_DIR,{recursive:true});
 try{
     const chrome=findChrome();const results=VIEWPORTS.map(([width,height])=>runViewport(chrome,width,height));
-    const evidence={suite:"fixed-slot-battlefield-rendering-v2",passed:true,viewports:results.map(item=>item.viewport),checks:{threeStructuralRegions:true,centerControlsIsolated:true,centerBackgroundRemoved:true,bottomBattleInfoDrawer:true,drawerCollapsedAndExpanded:true,largeElementBox:true,enemyCounts:[1,3,5,6,8,10],allyCounts:[1,2,3,4,5,6],equalEnemyCardGeometry:true,equalAllyCardGeometry:true,sixAllyNoOverlap:true,enlargedUnitCards:true,splitAllyFormation:true,deathDoesNotCompress:true,bossSingleEntity:true,bossSixSlotFootprint:true,bossHudAnchored:true,bossSideUnits:["ENEMY_B1","ENEMY_B5","ENEMY_F1","ENEMY_F5"],bossSideUnitsDoNotOverlap:true,bossSideArtworkSeparated:true,bossSideArtworkShiftedOutward:true,bossAndObjectReticles:true,dynamicCardlessImmediate:true,vfxShapes:["single","tri","row","column","all"],vfxCenterUsesGeometry:true,vfxScaleStable:true,artworkKinds:["player","regular","elite","boss","abyss"],artworkNoBattlefieldClip:true,popupKinds:["damage","critical","heal","miss"],popupUsesSlotAnchor:true,legacyRuntimeGeometryNeutralized:true,noPageScroll:true},results};
+    const evidence={suite:"fixed-slot-battlefield-rendering-v2",passed:true,viewports:results.map(item=>item.viewport),checks:{threeStructuralRegions:true,centerControlsIsolated:true,centerBackgroundRemoved:true,bottomBattleInfoDrawer:true,drawerCollapsedAndExpanded:true,largeElementBox:true,enemyCounts:[1,3,5,6,8,10],allyCounts:[1,2,3,4,5,6],manualActiveCharacterFlash:true,manualActiveCharacterUnique:true,autoHasNoManualFlash:true,equalEnemyCardGeometry:true,equalAllyCardGeometry:true,sixAllyNoOverlap:true,enlargedUnitCards:true,splitAllyFormation:true,deathDoesNotCompress:true,bossSingleEntity:true,bossSixSlotFootprint:true,bossHudAnchored:true,bossSnapshotIdentityStableAfterObjectDeath:true,bossObjectDeathDoesNotCompact:true,bossSideUnits:["ENEMY_B1","ENEMY_B5","ENEMY_F1","ENEMY_F5"],bossSideUnitsDoNotOverlap:true,bossSideArtworkSeparated:true,bossSideArtworkShiftedOutward:true,bossAndObjectReticles:true,dynamicCardlessImmediate:true,vfxShapes:["single","tri","row","column","all"],vfxCenterUsesGeometry:true,vfxScaleStable:true,artworkKinds:["player","regular","elite","boss","abyss"],artworkNoBattlefieldClip:true,popupKinds:["damage","critical","status","shield","miss","heal","sp"],popupUsesCanonicalUnitGeometry:true,popupCollisionFree:true,popupHudSafe:true,unifiedTypography:true,legacyRuntimeGeometryNeutralized:true,noPageScroll:true},results};
     fs.writeFileSync(path.join(ARTIFACT_DIR,"fixed-slot-battlefield-rendering-v2.json"),JSON.stringify(evidence,null,2)+"\n","utf8");console.log("Fixed Slot Battlefield Rendering V2 mobile browser QA passed:",VIEWPORTS.map(v=>v.join("x")).join(", "));
 }finally{try{fs.unlinkSync(FIXTURE);}catch(_){}}

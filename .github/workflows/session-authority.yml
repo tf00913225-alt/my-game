@@ -12,6 +12,10 @@ on:
       - 'firebase*.json'
       - 'scripts/test-session-authority-emulator.mjs'
       - 'tests/session-*.test.mjs'
+      - 'tests/cloud-save-*.test.mjs'
+      - 'tests/firebase-trusted-cloud-save-backend.test.mjs'
+      - 'scripts/firestore-backup-readiness.mjs'
+      - 'tests/firestore-backup-readiness.test.mjs'
       - '.github/workflows/session-authority.yml'
   push:
     branches: [dev]
@@ -22,11 +26,15 @@ on:
       - 'firebase*.json'
       - 'scripts/test-session-authority-emulator.mjs'
       - 'tests/session-*.test.mjs'
+      - 'tests/cloud-save-*.test.mjs'
+      - 'tests/firebase-trusted-cloud-save-backend.test.mjs'
+      - 'scripts/firestore-backup-readiness.mjs'
+      - 'tests/firestore-backup-readiness.test.mjs'
       - '.github/workflows/session-authority.yml'
 
 permissions:
   contents: read
-  checks: read
+  actions: read
 
 concurrency:
   group: session-authority-${{ github.ref }}
@@ -48,6 +56,7 @@ jobs:
           java-version: '21'
       - run: npm --prefix functions ci --no-audit --no-fund
       - run: node --test tests/session-client.test.mjs
+      - run: node --test tests/cloud-save-*.test.mjs tests/firebase-trusted-cloud-save-backend.test.mjs
       - name: Verify account boot with session backend unavailable
         run: node .github/scripts/run-boot-architecture-browser-qa.mjs
       - uses: actions/upload-artifact@v4
@@ -56,6 +65,7 @@ jobs:
           name: session-authority-boot-${{ github.sha }}
           path: artifacts/browser-qa/boot-architecture-browser-qa.json
           if-no-files-found: error
+      - run: node --test tests/firestore-backup-readiness.test.mjs
       - name: Verify actual callable and Firestore authorization
         run: npx --yes firebase-tools@15.30.0 emulators:exec --project demo-four-symbols-session --config firebase.session-emulators.json --only auth,firestore,functions 'node scripts/test-session-authority-emulator.mjs'
 
@@ -77,8 +87,18 @@ jobs:
         run: |
           test "$(git ls-remote origin refs/heads/dev | cut -f1)" = "$GITHUB_SHA"
           for attempt in $(seq 1 80); do
-            conclusion="$(gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/check-runs" --jq '[.check_runs[] | select(.name == "Repository checks")][0].conclusion // "pending"')"
-            if [[ "$conclusion" == "success" ]]; then exit 0; fi
+            test "$(git ls-remote origin refs/heads/dev | cut -f1)" = "$GITHUB_SHA"
+            # Resolve the exact dev push CI owner, not a newer dev -> main PR
+            # check with the same display name and a longer release test policy.
+            run_id="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs?head_sha=$GITHUB_SHA&event=push&branch=dev&per_page=100" --jq "[.workflow_runs[] | select(.path == \".github/workflows/ci.yml\" and .event == \"push\" and .head_branch == \"dev\" and .head_sha == \"$GITHUB_SHA\")][0].id // empty")"
+            conclusion="pending"
+            if [[ -n "$run_id" ]]; then
+              conclusion="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run_id/jobs?per_page=100" --jq '[.jobs[] | select(.name == "Repository checks")][0].conclusion // "pending"')"
+            fi
+            if [[ "$conclusion" == "success" ]]; then
+              test "$(git ls-remote origin refs/heads/dev | cut -f1)" = "$GITHUB_SHA"
+              exit 0
+            fi
             if [[ "$conclusion" != "pending" ]]; then
               echo "::error::Repository checks did not succeed ($conclusion)."
               exit 1
@@ -105,12 +125,47 @@ jobs:
         with:
           credentials_json: ${{ secrets.FIREBASE_DEPLOY_SERVICE_ACCOUNT_JSON }}
           project_id: four-symbols-jianghu
+      - uses: google-github-actions/setup-gcloud@v2
+        continue-on-error: true
+      - name: Inspect Firestore recovery readiness (read only)
+        shell: bash
+        run: |
+          echo "### Firestore (default) recovery readiness at $GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
+          if database_json="$(gcloud firestore databases describe --database='(default)' --project=four-symbols-jianghu --format=json 2>/dev/null)"; then
+            DB_JSON="$database_json" node -e 'const d=JSON.parse(process.env.DB_JSON);const region=d.locationId||"UNVERIFIED";const pitr=d.pointInTimeRecoveryEnablement||"UNVERIFIED";console.log(`Region: ${region}; PITR: ${pitr}`)' | tee -a "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'Region: UNVERIFIED; PITR: UNVERIFIED (database metadata query unavailable)' | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+          if schedules_json="$(gcloud firestore backups schedules list --database='(default)' --project=four-symbols-jianghu --format=json 2>/dev/null)"; then
+            SCHEDULES_JSON="$schedules_json" node -e 'const s=JSON.parse(process.env.SCHEDULES_JSON);if(!Array.isArray(s))throw Error("Unexpected backup schedule response");console.log(`Scheduled backup count: ${s.length}`);for(const v of s)console.log(`Schedule: ${v.name||"UNVERIFIED"}; retention: ${v.retention||"UNVERIFIED"}`)' | tee -a "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'Scheduled backups: UNVERIFIED (schedule query unavailable)' | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+          if backups_json="$(gcloud firestore backups list --project=four-symbols-jianghu --format=json 2>/dev/null)"; then
+            echo 'Backup inventory: query succeeded' >> "$GITHUB_STEP_SUMMARY"
+          else
+            backups_json=''
+            echo 'Backup inventory: query unavailable' >> "$GITHUB_STEP_SUMMARY"
+          fi
+          FIRESTORE_DATABASE_JSON="${database_json:-}" FIRESTORE_BACKUPS_JSON="$backups_json" \
+            node scripts/firestore-backup-readiness.mjs | tee -a "$GITHUB_STEP_SUMMARY"
+          if databases_json="$(gcloud firestore databases list --project=four-symbols-jianghu --format=json)"; then
+            DATABASES_JSON="$databases_json" node -e '
+              const databases=JSON.parse(process.env.DATABASES_JSON);
+              if(!Array.isArray(databases)) throw Error("Unexpected database list");
+              const leftovers=databases.map(d=>d.name).filter(n=>typeof n==="string" && n.startsWith("projects/four-symbols-jianghu/databases/restore-drill-") && /restore-drill-[0-9]+-[0-9]+$/.test(n));
+              console.log(`Restore drill leftovers: ${leftovers.length}`);
+              for(const name of leftovers) console.log(`Leftover: ${name}`);
+            ' | tee -a "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'Restore drill leftovers: UNVERIFIED (database list unavailable)' | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
       - run: npm --prefix functions ci --no-audit --no-fund
-      - name: Deploy only Phase 1 endpoints and deny-write rules
+      - name: Deploy protected cloud endpoints and deny-write rules
         shell: bash
         run: |
           test "$(git ls-remote origin refs/heads/dev | cut -f1)" = "$GITHUB_SHA"
-          npx --yes firebase-tools@15.30.0 deploy --project four-symbols-jianghu --non-interactive --force --only 'functions:createGameSession,functions:revokeGameSession,functions:protectedTest,functions:bootstrapCloudSave,functions:submitLegacyMigrationCandidate,functions:createNativeAuthHandoff,functions:redeemNativeAuthHandoff,firestore:rules'
+          npx --yes firebase-tools@15.30.0 deploy --project four-symbols-jianghu --non-interactive --force --only 'functions:createGameSession,functions:revokeGameSession,functions:protectedTest,functions:issueCanonicalRecoveryApproval,functions:restoreCanonicalCurrent,functions:createInitialCanonicalCharacter,functions:bootstrapCloudSave,functions:submitLegacyMigrationCandidate,functions:screenLegacyMigrationCandidate,functions:saveCloudPreferences,functions:reserveTrustedGrant,functions:claimDailyCheckin,functions:purchaseCanonicalPotion,functions:allocateCanonicalSharedExp,functions:createNativeAuthHandoff,functions:redeemNativeAuthHandoff,firestore:rules'

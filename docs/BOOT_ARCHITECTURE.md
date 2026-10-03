@@ -87,7 +87,7 @@ Gameplay payload 保留既有 schema；ownership 不塞入戰鬥或數值欄位�
 | 未綁定 legacy | `battle_full_version_save_v5` |
 | Migration backup | `four_symbols_legacy_backup:{uid}:{timestamp}` |
 
-讀取時 canonical payload 與 metadata 必須同時存在，且 `metadata.ownerUid` 必須等於要求的 UID；缺一、損壞或 owner mismatch 一律 fail closed。寫入只允許目前 active UID。UID 變更或登出會先 deactivate，再完整 reload，避免 player、inventory、equipment、progress 等 module globals 殘留。
+讀取時 canonical payload 與 metadata 必須同時存在，且 `metadata.ownerUid` 必須等於要求的 UID；缺一、損壞或 owner mismatch 一律 fail closed。寫入只允許目前 active UID。UID 變更或登出由 Startup State Machine 的 `reloadForAccountTransition()` 先作廢進行中的 save resolution、deactivate owner、隱藏創角／gameplay 並移除上一帳號的 UI resume marker，再完整 reload；這會讓所有 app-shell／gameplay sidecar owner 以新 UID 重新初始化，避免 player、inventory、equipment、progress 與模組初始化時固定的 account key 殘留。
 
 ## Legacy migration
 

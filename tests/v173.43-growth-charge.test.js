@@ -157,7 +157,16 @@ test("Element Box uses the modal body as its single scroll owner",()=>{
     assert.match(elementBoxCss,/body\.v162-element-box-settings-open #homeFeatureModalBody\{[\s\S]*overflow-y:auto !important;[\s\S]*touch-action:pan-y !important;[\s\S]*scrollbar-gutter:stable !important/);
     assert.match(elementBoxCss,/body\.v162-element-box-settings-open #autoBattleSettingsPanel\.v131-element-box-panel\{[\s\S]*position:static !important;[\s\S]*overflow:visible !important/);
 });
-test("red dots stay fully bright",()=>{assert.match(polishCss,/\.v146-growth-attention-target\{[\s\S]*opacity:1 !important;[\s\S]*filter:none !important/);assert.match(polishCss,/\.v146-growth-guidance-dot\{[\s\S]*opacity:1 !important/);});
+test("growth targets stay bright and dots share the notification presentation owner",()=>{
+    assert.match(polishCss,/\.v146-growth-attention-target\{[^}]*opacity:1 !important;[^}]*filter:none !important/);
+    assert.match(flow,/dot\.className="v141-notice-dot v146-growth-guidance-dot"/);
+    assert.doesNotMatch(polishCss,/\.v146-growth-guidance-dot\{/);
+    const notificationCss=fs.readFileSync("css/38-v141-system-expansion.css","utf8");
+    const nativeNavCss=fs.readFileSync("css/06-stage-v11-native-bottom-nav.css","utf8");
+    assert.match(notificationCss,/\.v141-notice-dot\{[^}]*width:9px;[^}]*height:9px;[^}]*border:1px solid #f7dfad;[^}]*background:#e52e2e;[^}]*pointer-events:none/);
+    assert.match(notificationCss,/@keyframes v141NoticePulse\{50%\{transform:scale\(\.9\);opacity:\.72\}\}/);
+    assert.match(nativeNavCss,/#bottomNav > \.nav-button > \.v141-notice-dot\{[^}]*width:22px;[^}]*height:22px/);
+});
 test("three-character home HUD grows with readable text but remains three columns",()=>{assert.match(homeRosterCss,/grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);assert.match(homeRosterCss,/grid-template-columns:40px minmax\(0,1fr\)/);assert.match(homeRosterCss,/min-height:84px/);assert.match(homeRosterCss,/width:40px;height:40px/);assert.match(homeRosterCss,/\.v146-home-character-main > div:first-child\{[\s\S]*font-size:15px/);assert.match(homeRosterCss,/\.v146-home-resource strong\{[\s\S]*font-size:13px/);});
 test("ordinary daily dungeons use V173.43 dynamic party/level scaling and Abyss stays excluded",()=>{
     assert.match(dungeon,/const partyMultiplier=partySize===1\?\.40:partySize===2\?\.72:1/);
