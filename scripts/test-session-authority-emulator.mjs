@@ -12,6 +12,7 @@ const {createCanonicalSourceWriter}=require("../functions/src/canonical-source-w
 const {createCanonicalResourceCredit}=require("../functions/src/canonical-resource-credit.js");
 const {createDailyCheckinGrant}=require("../functions/src/daily-checkin-grant.js");
 const {createCanonicalBattleAttempt}=require("../functions/src/canonical-battle-attempt.js");
+const {createCanonicalBattleEncounter}=require("../functions/src/canonical-battle-encounter.js");
 const {createCanonicalExpAllocation}=require("../functions/src/canonical-exp-allocation.js");
 const {createCanonicalAttributeAllocation}=
     require("../functions/src/canonical-attribute-allocation.js");
@@ -360,6 +361,88 @@ assert.deepEqual((await battleRoot.collection("account").doc("current").get()).d
 assert.deepEqual((await battleRoot.collection("economy").doc("current").get()).data(),battleBefore.economy);
 assert.deepEqual((await db.doc(`users/${y}/saves/current`).get()).data(),battleBefore.envelope);
 console.log("Battle preparation real transaction: concurrency, rollback, replay, expiry, corruption, session and zero reward PASS");
+
+// Internal Forest enemy stat binding: still no playable encounter/results/grants.
+let encounterClock=battleStart.issuedAtMs+1,abortEncounter=false;
+const encounterOwner=createCanonicalBattleEncounter({db,FieldValue,HttpsError,
+    inspectExistingEnvelope,now:()=>encounterClock,
+    runProtected:(request,operation)=>writerSessions.runProtected(request,async(tx,session)=>{
+        const result=await operation(tx,session);
+        if(abortEncounter)throw new Error("interrupted encounter seal");
+        return result;
+    })});
+const encounterArgs={attemptId:battleStart.attemptId,operationId:"encounter-seal-emulator-0001",
+    expectedRevision:2,encounterKey:"wild.zone-01.fire-01"};
+for(const path of ["playableSnapshots/2","recoveryArchives/2",`battleAttempts/${battleStart.attemptId}`]){
+    const ref=db.doc(`serverUsers/${y}/${path}`),saved=(await ref.get()).data();
+    await ref.delete();await assert.rejects(encounterOwner.seal(yRequest,encounterArgs),e=>e.code==="data-loss");
+    assert.equal((await battleRoot.collection("battleEncounters").get()).size,0);
+    await ref.set(saved);
+}
+encounterClock=battleStart.expiresAtMs;
+await assert.rejects(encounterOwner.seal(yRequest,encounterArgs),e=>e.code==="failed-precondition");
+encounterClock=battleStart.issuedAtMs+1;
+abortEncounter=true;
+await assert.rejects(encounterOwner.seal(yRequest,encounterArgs),/interrupted encounter seal/);
+abortEncounter=false;
+for(const path of ["battleEncounters","battleEncounterAttempts","battleEncounterPolicies"]){
+    assert.equal((await battleRoot.collection(path).get()).size,0);
+}
+assert.equal((await battleRoot.collection("operations").doc(encounterArgs.operationId).get()).exists,false);
+const encounterContenders=await Promise.allSettled([
+    encounterOwner.seal(yRequest,encounterArgs),
+    encounterOwner.seal(yRequest,{...encounterArgs,operationId:"encounter-seal-emulator-0002"})
+]);
+assert.equal(encounterContenders.filter(r=>r.status==="fulfilled").length,1);
+assert.equal(encounterContenders.filter(r=>r.status==="rejected"&&r.reason.code==="already-exists").length,1);
+const encounterStart=encounterContenders.find(r=>r.status==="fulfilled").value;
+const winningEncounterArgs={...encounterArgs,operationId:encounterStart.operationId};
+assert.equal(encounterStart.combatRulesReady,false);assert.equal(encounterStart.outcomeVerified,false);
+assert.equal(encounterStart.rewardEligible,false);assert.equal(encounterStart.creditedToCharacter,false);
+assert.equal(encounterStart.expiresAtMs,battleStart.expiresAtMs);
+assert.deepEqual(await encounterOwner.seal(yRequest,winningEncounterArgs),{...encounterStart,unchanged:true});
+for(const path of [`battleEncounters/${encounterStart.operationId}`,`operations/${encounterStart.operationId}`,
+    `battleEncounterAttempts/${battleStart.attemptId}`,`battleEncounterPolicies/${encounterStart.policySha256}`,
+    "playableSnapshots/2","recoveryArchives/2"]){
+    const ref=db.doc(`serverUsers/${y}/${path}`),saved=(await ref.get()).data();
+    await ref.delete();await assert.rejects(encounterOwner.seal(yRequest,winningEncounterArgs));
+    assert.equal((await ref.get()).exists,false);await ref.set(saved);
+}
+const sealedEncounterRef=battleRoot.collection("battleEncounters").doc(encounterStart.operationId);
+const savedEncounter=(await sealedEncounterRef.get()).data();
+for(const patch of [{rewardEligible:true},{outcomeVerified:true},{expiresAtMs:battleStart.expiresAtMs+1},
+    {definitionSha256:"0".repeat(64)},{ownerUid:x}]){
+    await sealedEncounterRef.update(patch);
+    await assert.rejects(encounterOwner.seal(yRequest,winningEncounterArgs),e=>e.code==="data-loss");
+    await sealedEncounterRef.set(savedEncounter);
+}
+const encounterPolicyRef=battleRoot.collection("battleEncounterPolicies").doc(encounterStart.policySha256);
+const savedEncounterPolicy=(await encounterPolicyRef.get()).data();
+const tamperedEncounterPolicy=JSON.parse(JSON.stringify(savedEncounterPolicy.policy));
+tamperedEncounterPolicy.entries[encounterArgs.encounterKey].stats.attack=999;
+await encounterPolicyRef.update({policy:tamperedEncounterPolicy});
+await assert.rejects(encounterOwner.seal(yRequest,winningEncounterArgs),e=>e.code==="data-loss");
+await encounterPolicyRef.set(savedEncounterPolicy);
+await assert.rejects(encounterOwner.seal(yRequest,{...winningEncounterArgs,encounterKey:"wild.zone-01.water-01"}),e=>e.code==="data-loss");
+await assert.rejects(encounterOwner.seal({...yRequest,data:{...yRequest.data,won:true}},winningEncounterArgs),e=>e.code==="invalid-argument");
+await assert.rejects(encounterOwner.seal({...yRequest,data:{uid:y,session:sessionB}},winningEncounterArgs),e=>e.message==="SESSION_INVALID");
+await assert.rejects(encounterOwner.seal({auth:{uid:x,token:claims(a.idToken)},data:{uid:x,session:sessionA}},winningEncounterArgs),e=>e.message==="SESSION_REVOKED");
+encounterClock=battleStart.expiresAtMs;
+assert.deepEqual(await encounterOwner.seal(yRequest,winningEncounterArgs),{...encounterStart,unchanged:true,expired:true});
+for(const path of [`battleEncounters/${encounterStart.operationId}`,`battleEncounterPolicies/${encounterStart.policySha256}`]){
+    assert.equal(await rulesRequest(`serverUsers/${y}/${path}`,yUser.idToken),403);
+    assert.equal(await rulesRequest(`serverUsers/${y}/${path}`,yUser.idToken,"PATCH"),403);
+}
+assert.equal((await battleRoot.collection("battleEncounters").get()).size,1);
+assert.equal((await battleRoot.collection("battleEncounterAttempts").get()).size,1);
+assert.equal((await battleRoot.collection("battleEncounterPolicies").get()).size,1);
+assert.equal((await battleRoot.collection("pendingGrants").get()).size,0);
+assert.equal((await battleRoot.collection("ledgerEntries").get()).size,0);
+assert.deepEqual((await battleRoot.collection("account").doc("current").get()).data(),battleBefore.account);
+assert.deepEqual((await battleRoot.collection("economy").doc("current").get()).data(),battleBefore.economy);
+assert.deepEqual((await db.doc(`users/${y}/saves/current`).get()).data(),battleBefore.envelope);
+console.log("Encounter stat seal real transaction: concurrent one-winner, rollback, replay, expiry, original evidence, private rules, tampering, session and zero reward PASS");
+
 
 assert.deepEqual(initialArchive.get("sourceRecords.claimRecords"),[]);
 assert.equal((await db.doc(`serverUsers/${y}/playableSnapshots/2`).get())

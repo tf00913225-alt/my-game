@@ -44,6 +44,73 @@ function createCanonicalBattleAttempt({db,FieldValue,HttpsError,runProtected,
            records.account.slots[2]!==null||records.characters.length!==1){
             fail("failed-precondition","Only a server-created first character may prepare an attempt.");
         }
+        return records;
+    }
+    async function readContext(tx,session,args){
+        const uid=session.uid,{operationId,expectedRevision}=args;
+        const root=db.collection("serverUsers").doc(uid);
+        const attemptRef=root.collection("battleAttempts").doc(operationId);
+        const operationRef=root.collection("operations").doc(operationId);
+        const revisionRef=root.collection("battleAttemptSources").doc(String(expectedRevision));
+        const [envelopeSnap,accountSnap,attemptSnap,operationSnap,revisionSnap,
+            grantSnap,ledgerSnap]=await Promise.all([
+            tx.get(db.collection("users").doc(uid).collection("saves").doc("current")),
+            tx.get(root.collection("account").doc("current")),tx.get(attemptRef),
+            tx.get(operationRef),tx.get(revisionRef),
+            tx.get(root.collection("grantOperations").doc(operationId)),
+            tx.get(root.collection("ledgerEntries").doc(operationId))
+        ]);
+        if(!envelopeSnap.exists||!accountSnap.exists)fail("failed-precondition","Canonical character required.");
+        const envelope=inspectExistingEnvelope(envelopeSnap.data(),uid),account=accountSnap.data();
+        if(envelope.kind!=="current"||envelope.data.authoritativeStateReady!==false||
+           account.ownerUid!==uid||account.provenance!=="server-created"||
+           !Number.isSafeInteger(account.serverRevision)||account.serverRevision<1||
+           account.serverRevision>envelope.serverRevision||!Array.isArray(account.slots)||
+           account.slots.length!==3||typeof account.slots[0]!=="string"||!account.slots[0]||
+           account.slots[1]!==null||account.slots[2]!==null){
+            fail("failed-precondition","Unpublished first-character account required.");
+        }
+        return {root,attemptRef,operationRef,revisionRef,envelope,account,
+            attemptSnap,operationSnap,revisionSnap,grantSnap,ledgerSnap};
+    }
+    async function verifyPreparation(tx,session,args,context,requestTime){
+        const uid=session.uid,{operationId,expectedRevision}=args;
+        const {root,account,attemptSnap,operationSnap,revisionSnap,grantSnap,ledgerSnap}=context;
+        const attempt=attemptSnap.exists?attemptSnap.data():null;
+        const receipt=operationSnap.exists?operationSnap.data():null;
+        const marker=revisionSnap.exists?revisionSnap.data():null;
+        if(!attempt||!receipt||!marker||grantSnap.exists||ledgerSnap.exists||
+           attempt.schemaVersion!==1||attempt.ownerUid!==uid||attempt.attemptId!==operationId||
+           attempt.kind!==KIND||attempt.characterId!==account.slots[0]||
+           attempt.sourceRevision!==expectedRevision||!HASH.test(attempt.snapshotSha256||"")||
+           !Number.isSafeInteger(attempt.issuedAtMs)||attempt.issuedAtMs<1||
+           attempt.expiresAtMs!==attempt.issuedAtMs+TTL_MS||
+           !/^[A-Za-z0-9_-]{32}$/.test(attempt.creationSessionId||"")||
+           attempt.outcomeVerified!==false||attempt.rewardEligible!==false||
+           attempt.sha256!==digest(attempt)||
+           receipt.schemaVersion!==1||receipt.ownerUid!==uid||receipt.operationId!==operationId||
+           receipt.kind!==KIND||receipt.sourceRevision!==expectedRevision||
+           receipt.attemptSha256!==attempt.sha256||receipt.creditedToCharacter!==false||
+           marker.schemaVersion!==1||marker.ownerUid!==uid||marker.sourceRevision!==expectedRevision||
+           marker.attemptId!==operationId||marker.attemptSha256!==attempt.sha256||
+           [attempt,receipt,marker].some(record=>!record.createdAt||
+               typeof record.createdAt.toMillis!=="function")||
+           expectedRevision>account.serverRevision){
+            fail("data-loss","Battle attempt receipt or source marker is inconsistent.");
+        }
+        // A new active session must not inherit an earlier attempt.
+        if(attempt.creationSessionId!==session.sessionId){
+            fail("failed-precondition","Battle attempt belongs to an earlier session.");
+        }
+        const records=await source(tx,root,uid,attempt.sourceRevision,attempt.snapshotSha256,attempt.characterId);
+        return {attempt,records,result:result(attempt,true,requestTime)};
+    }
+    // Internal transaction reader: caller must use the same protected transaction.
+    async function readPreparation(tx,session,args,requestTime){
+        intent(args);
+        if(!Number.isSafeInteger(requestTime)||requestTime<1)fail("internal","Server clock is unavailable.");
+        const context=await readContext(tx,session,args);
+        return verifyPreparation(tx,session,args,context,requestTime);
     }
     async function begin(request,args){
         intent(args);
@@ -55,58 +122,12 @@ function createCanonicalBattleAttempt({db,FieldValue,HttpsError,runProtected,
         if(!Number.isSafeInteger(issuedAtMs)||issuedAtMs<1||
            !Number.isSafeInteger(issuedAtMs+TTL_MS))fail("internal","Server clock is unavailable.");
         return runProtected(request,async(tx,session)=>{
-            const uid=session.uid,{operationId,expectedRevision}=args;
-            const root=db.collection("serverUsers").doc(uid);
-            const attemptRef=root.collection("battleAttempts").doc(operationId);
-            const operationRef=root.collection("operations").doc(operationId);
-            const revisionRef=root.collection("battleAttemptSources").doc(String(expectedRevision));
-            const [envelopeSnap,accountSnap,attemptSnap,operationSnap,revisionSnap,
-                grantSnap,ledgerSnap]=await Promise.all([
-                tx.get(db.collection("users").doc(uid).collection("saves").doc("current")),
-                tx.get(root.collection("account").doc("current")),tx.get(attemptRef),
-                tx.get(operationRef),tx.get(revisionRef),
-                tx.get(root.collection("grantOperations").doc(operationId)),
-                tx.get(root.collection("ledgerEntries").doc(operationId))
-            ]);
-            if(!envelopeSnap.exists||!accountSnap.exists)fail("failed-precondition","Canonical character required.");
-            const envelope=inspectExistingEnvelope(envelopeSnap.data(),uid),account=accountSnap.data();
-            if(envelope.kind!=="current"||envelope.data.authoritativeStateReady!==false||
-               account.ownerUid!==uid||account.provenance!=="server-created"||
-               !Number.isSafeInteger(account.serverRevision)||account.serverRevision<1||
-               account.serverRevision>envelope.serverRevision||!Array.isArray(account.slots)||
-               account.slots.length!==3||typeof account.slots[0]!=="string"||!account.slots[0]||
-               account.slots[1]!==null||account.slots[2]!==null){
-                fail("failed-precondition","Unpublished first-character account required.");
-            }
+            const {operationId,expectedRevision}=args,uid=session.uid;
+            const context=await readContext(tx,session,args);
+            const {root,attemptRef,operationRef,revisionRef,envelope,account,
+                attemptSnap,operationSnap,revisionSnap,grantSnap,ledgerSnap}=context;
             if(attemptSnap.exists||operationSnap.exists){
-                const attempt=attemptSnap.exists?attemptSnap.data():null;
-                const receipt=operationSnap.exists?operationSnap.data():null;
-                const marker=revisionSnap.exists?revisionSnap.data():null;
-                if(!attempt||!receipt||!marker||grantSnap.exists||ledgerSnap.exists||
-                   attempt.schemaVersion!==1||attempt.ownerUid!==uid||attempt.attemptId!==operationId||
-                   attempt.kind!==KIND||attempt.characterId!==account.slots[0]||
-                   attempt.sourceRevision!==expectedRevision||!HASH.test(attempt.snapshotSha256||"")||
-                   !Number.isSafeInteger(attempt.issuedAtMs)||attempt.issuedAtMs<1||
-                   attempt.expiresAtMs!==attempt.issuedAtMs+TTL_MS||
-                   !/^[A-Za-z0-9_-]{32}$/.test(attempt.creationSessionId||"")||
-                   attempt.outcomeVerified!==false||attempt.rewardEligible!==false||
-                   attempt.sha256!==digest(attempt)||
-                   receipt.schemaVersion!==1||receipt.ownerUid!==uid||receipt.operationId!==operationId||
-                   receipt.kind!==KIND||receipt.sourceRevision!==expectedRevision||
-                   receipt.attemptSha256!==attempt.sha256||receipt.creditedToCharacter!==false||
-                   marker.schemaVersion!==1||marker.ownerUid!==uid||marker.sourceRevision!==expectedRevision||
-                   marker.attemptId!==operationId||marker.attemptSha256!==attempt.sha256||
-                   [attempt,receipt,marker].some(record=>!record.createdAt||
-                       typeof record.createdAt.toMillis!=="function")||
-                   expectedRevision>account.serverRevision){
-                    fail("data-loss","Battle attempt receipt or source marker is inconsistent.");
-                }
-                // A new active session must not inherit an earlier attempt.
-                if(attempt.creationSessionId!==session.sessionId){
-                    fail("failed-precondition","Battle attempt belongs to an earlier session.");
-                }
-                await source(tx,root,uid,attempt.sourceRevision,attempt.snapshotSha256,attempt.characterId);
-                return result(attempt,true,issuedAtMs);
+                return (await verifyPreparation(tx,session,args,context,issuedAtMs)).result;
             }
             if(grantSnap.exists||ledgerSnap.exists)fail("failed-precondition","Operation ID is already used.");
             if(revisionSnap.exists)fail("already-exists","This source revision already has a battle preparation.");
@@ -137,6 +158,6 @@ function createCanonicalBattleAttempt({db,FieldValue,HttpsError,runProtected,
             expired:requestTime>=attempt.expiresAtMs,unchanged,
             outcomeVerified:false,rewardEligible:false,creditedToCharacter:false};
     }
-    return Object.freeze({begin});
+    return Object.freeze({begin,readPreparation});
 }
 module.exports={createCanonicalBattleAttempt,TTL_MS};

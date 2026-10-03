@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "policyId": "wild-forest-regular-stats-v1",
+  "scope": "single-enemy-stat-definition-only",
+  "projectionOwner": "MonsterBalance",
+  "sourceDigests": {
+    "js/combat/level-base-contract.mjs": "4db78e4fbb12dc599cd2c8b739dbbf4d9db4217f543c922c4e257b7ae98152fe",
+    "js/combat/monster-archetypes.mjs": "d667081aa6e12ae3d42ba7c172030b45577f1a39bc965cc2c6a7d2e30e89d08a",
+    "js/combat/monster-balance-owner.mjs": "23819ee77d5fd0d6a9ac69ce90673e51a0fa1044b2b19017ed17ae9c79f3ff4d"
+  },
+  "entries": {
+    "wild.zone-01.fire-01": {
+      "spec": {
+        "monsterKey": "wild.zone-01.fire-01",
+        "name": "哥布林",
+        "level": 3,
+        "element": "fire",
+        "archetype": "physical",
+        "rank": "regular",
+        "mode": "wild",
+        "context": "wild/zone-01"
+      },
+      "stats": {
+        "maxHP": 64,
+        "maxSP": 80,
+        "attack": 50,
+        "magicAttack": 38.25,
+        "defense": 42,
+        "agility": 0,
+        "accuracy": 0,
+        "statusResistance": 0,
+        "antiCrit": 0,
+        "evasion": 0
+      },
+      "finalDamagePressure": 1
+    },
+    "wild.zone-01.water-01": {
+      "spec": {
+        "monsterKey": "wild.zone-01.water-01",
+        "name": "水靈狐",
+        "level": 2,
+        "element": "water",
+        "archetype": "balanced",
+        "rank": "regular",
+        "mode": "wild",
+        "context": "wild/zone-01"
+      },
+      "stats": {
+        "maxHP": 48,
+        "maxSP": 65,
+        "attack": 38,
+        "magicAttack": 35.5,
+        "defense": 38,
+        "agility": 0,
+        "accuracy": 0,
+        "statusResistance": 0,
+        "antiCrit": 0,
+        "evasion": 0
+      },
+      "finalDamagePressure": 1
+    }
+  },
+  "combatRulesReady": false,
+  "outcomeVerified": false,
+  "rewardEligible": false,
+  "sha256": "8e6cbdb8b7506ada675ff3aa145cf1b660ad34c3760d22be673ed08e5922b82a"
+}

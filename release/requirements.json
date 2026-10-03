@@ -514,6 +514,23 @@
         "verification": "Targeted contracts / build check / mandatory current-owner Browser QA",
         "result": "PASS: GitHub Actions 37131683805 / job 111227883241, Daily Dungeon QA steps 23-24; head 1f94f9cb185af6c8f7aff08ff7efeb3cd784013f. Nine 1024x1536 WebP decodes, 27 unique key/viewport pairs, 27 wave snapshots, 54 first-visible stage/key entries, nine screenshots, redraw and no duplicate/legacy artwork. Full latest-head CI remains mandatory before merge."
       }
+    },
+    {
+      "id": "REQ-CLOUD-BATTLE-ENCOUNTER-SEAL-20261004",
+      "title": "Internal enemy stat seal binds original preparation and formal MonsterBalance policy without outcome or reward authority",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "functions/src/canonical-battle-encounter.js",
+          "functions/src/canonical-battle-attempt.js",
+          "functions/src/generated/battle-encounter-catalog.json",
+          "scripts/lib/cloud-battle-encounter-catalog.mjs",
+          "tests/cloud-save-battle-encounter.test.mjs",
+          "scripts/test-session-authority-emulator.mjs"
+        ],
+        "verification": "Local targeted55/55 and cloud/backend170/170 PASS; build:check PASS. Real emulator/current-head CI and integration/deploy pending.",
+        "result": "Single enemy stat-definition binding only; no callable/game hook/combat rules/outcome/reward. Phase4 remains0/6 VERIFIED."
+      }
     }
   ]
 }

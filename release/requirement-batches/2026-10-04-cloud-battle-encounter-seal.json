@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "cloud-battle-encounter-seal-20261004",
+  "releaseVersion": "173.73",
+  "requirements": [
+    {
+      "id": "REQ-CLOUD-BATTLE-ENCOUNTER-SEAL-20261004",
+      "title": "Internal enemy stat seal binds original preparation and formal MonsterBalance policy without outcome or reward authority",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "functions/src/canonical-battle-encounter.js",
+          "functions/src/canonical-battle-attempt.js",
+          "functions/src/generated/battle-encounter-catalog.json",
+          "scripts/lib/cloud-battle-encounter-catalog.mjs",
+          "tests/cloud-save-battle-encounter.test.mjs",
+          "scripts/test-session-authority-emulator.mjs"
+        ],
+        "verification": "Local targeted55/55 and cloud/backend170/170 PASS; build:check PASS. Real emulator/current-head CI and integration/deploy pending.",
+        "result": "Single enemy stat-definition binding only; no callable/game hook/combat rules/outcome/reward. Phase4 remains0/6 VERIFIED."
+      }
+    }
+  ]
+}
