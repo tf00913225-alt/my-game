@@ -1,3 +1,11 @@
+## 2026-10-03 — V17373-RELEASE-FREEZE-20261003（發布凍結準備）
+
+- 使用者明確授權 RELEASE FREEZE；最新開工 dev `a959e8bda4d79d55e3af36174921a19b579f5a80`，main `4b037b47967544d90c781ad938286777c9576731`。main 是 dev 祖先；最新必要 CI／DEV SHA 健康，P0 requirement VERIFIED、trueP0=[]。工作分支 `release/v17373-freeze-20261003`，禁止修改 main。
+- 正式版本 owner `release/release.json`／`js/20-anonymous-20.js`／`index.html` 已同步 Game+Cache 173.73；正式 build 再同步產物。玩家公告唯一 owner `release/release-update.json`，CHANGELOG 依 main...dev 完整差異更新；玩法、存檔、帳號與測試實作不改。
+- 暫停非必要功能、Cloud 後續、鍛造第二階段、素材擴充與 P2/P3。本工作只版本／快取／metadata／公告／文件與必要生成產物。Deferred 維持原狀，23 項既有 VERIFIED 不冒充新候選驗收。
+- scope releaseCandidateSha 暫為 null；合併後實際 dev SHA 才固定候選，耐久權威紀錄在本工作 PR body，避免將自身 SHA 寫進 source 又改變 candidate。任何後續 dev commit 立即使原 candidate 失效。
+- 待完成：本分支 release gate、build/check、通知目標測試、PR CI／merge、分支清理、合併精確 SHA 的全套／實際 Chrome／三時區／既有瀏覽器 QA／DEV SHA+版本驗收。完成前不宣稱 RELEASE READY，不推 main。舊 PR #768 全套只屬歷史 P0 證據。
+
 ## 2026-10-03 — RELEASE-SUITES-P0-20261002（P0 正式狀態結案，非 Batch 10）
 
 - 開工 dev `81853be234963c8a5250b474c38480dcd0dfa2b4`／main `4b037b47967544d90c781ad938286777c9576731`；重新讀取 PR #768 最終狀態、tested tree、CI jobs/logs 與獨立 DEV SHA read-back，证據仍成立，main 未修改。
