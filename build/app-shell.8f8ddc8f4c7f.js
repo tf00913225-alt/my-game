@@ -105,10 +105,12 @@ function allocatePoints(budget,archetype){
 }
 
 const MODES=Object.freeze(['wild','daily','tower','abyss','adventure','personalBoss','worldBoss']);
-const RANKS=Object.freeze(['regular','elite','smallBoss']);
+const RANKS=Object.freeze(['regular','elite','smallBoss','boss']);
 const GLOBAL_CALIBRATION=Object.freeze({hp:1,sp:1,damage:1,defense:1});
 // Wild resources are HP100/SP50 plus allocation only; player per-level bonuses never apply.
 const RESOURCE_BASE=Object.freeze({hp:100,sp:50,provenance:'00-main legacy resource baseline'});
+const DAILY_PARTY_DURABILITY=Object.freeze({1:0.04,2:0.08,3:0.12});
+const DAILY_MODE_PROFILE=Object.freeze({hp:1,defense:1,damage:1,sp:1,skillFrequency:1});
 const clone=value=>JSON.parse(JSON.stringify(value));
 function normalizeSpec(spec){
   if(!spec||typeof spec!=='object') throw new TypeError('monster spec required');
@@ -119,8 +121,16 @@ function normalizeSpec(spec){
   if(!Object.hasOwn(ARCHETYPES,archetype)) throw new TypeError('explicit archetype required');
   if(!RANKS.includes(rank)||!MODES.includes(mode)) throw new TypeError('explicit canonical rank and mode required');
   if(typeof context!=='string'||!context.trim()) throw new TypeError('stable context ID required');
-  if(mode==='wild' && rank==='smallBoss') throw new TypeError('Wild has no formal smallBoss runtime');
-  return {...(spec.monsterKey?{monsterKey:spec.monsterKey}:{}),name,level,element,archetype,rank,mode,context};
+  if(['wild','daily'].includes(mode) && rank==='smallBoss') throw new TypeError('Wild/Daily do not use challenge smallBoss');
+  if(rank==='boss'&&mode!=='daily') throw new TypeError('boss is Daily resource enemy only');
+  const daily={};
+  if(mode==='daily'){
+    if(!spec.monsterKey||!['exp','material','gold'].includes(spec.dailyType)||![1,2,3].includes(spec.wave)||!Number.isInteger(spec.slot)||spec.slot<0||spec.slot>5||![1,2,3].includes(spec.partySize)) throw new TypeError('explicit Daily encounter spec required');
+    validateLevel(spec.highestPartyLevel);
+    if(!Number.isFinite(spec.skillFrequency)||spec.skillFrequency<0||spec.skillFrequency>1) throw new TypeError('existing skill frequency required');
+    Object.assign(daily,{dailyType:spec.dailyType,wave:spec.wave,slot:spec.slot,partySize:spec.partySize,highestPartyLevel:spec.highestPartyLevel,skillFrequency:spec.skillFrequency});
+  }
+  return {...daily,...(spec.monsterKey?{monsterKey:spec.monsterKey}:{}),name,level,element,archetype,rank,mode,context};
 }
 function preview(spec){
   const identity=normalizeSpec(spec),base=levelBase(identity.level),allocation=allocatePoints(base.abilityPointBudget,identity.archetype);
@@ -133,10 +143,14 @@ function preview(spec){
     speed:allocation.agilityPoints*SIX_STAT_COEFFICIENTS.agility
   };
   // Wild Rank V1 is ratified. Unmigrated modes retain the Phase 1 neutral shadow profile.
-  const rank=identity.mode==='wild'
-    ?{id:identity.rank,status:'RANK_V1',hp:identity.rank==='elite'?1.5:1,defense:identity.rank==='elite'?1.1:1,finalDamagePressure:identity.rank==='elite'?1.1:1,skillFrequency:null}
+  const rank=['wild','daily'].includes(identity.mode)
+    ?{id:identity.rank,status:'RANK_V1',hp:identity.rank==='boss'?2:identity.rank==='elite'?1.5:1,defense:identity.rank==='boss'?1.15:identity.rank==='elite'?1.1:1,finalDamagePressure:identity.rank==='boss'?1.15:identity.rank==='elite'?1.1:1,skillFrequency:null}
     :{id:identity.rank,status:'PENDING_PRODUCT_CALIBRATION',hp:1,defense:1,finalDamagePressure:null,skillFrequency:null};
   const mode={id:identity.mode,status:identity.mode==='wild'?'RUNTIME_V1':'SHADOW_BASELINE_ONLY',hp:identity.mode==='wild'?0.32:1,sp:1,damage:1,defense:1,speed:identity.mode==='wild'&&identity.context==='wild/zone-01'?0:1,ttkTarget:['wild','daily'].includes(identity.mode)?{maxRounds:2,player:'normal same-level progression',scope:'kill/clear wave'}:null};
+  if(identity.mode==='daily'){
+    const solo=identity.partySize===1&&identity.highestPartyLevel<=20;
+    Object.assign(mode,{...DAILY_MODE_PROFILE,status:'RUNTIME_V1',damage:solo?.5:1,partySizeDurability:DAILY_PARTY_DURABILITY[identity.partySize],skillFrequency:solo?(identity.wave===1?0:Math.min(.45,identity.skillFrequency*.60)):identity.skillFrequency,protection:{solo,noAccuracyCritBoost:solo,bossSkillCooldown:solo}});
+  }
   const element={id:identity.element,hp:1,defense:1,speed:1,metadata:{},provenance:'identity only'};
   if(identity.mode==='tower'){
     element.provenance='existing Tower Element Profile (pre-battle only)';
@@ -148,10 +162,10 @@ function preview(spec){
   const globalCalibration={...GLOBAL_CALIBRATION};
   const profiles={rank,mode,element,globalCalibration};
   const afterRank={...derived,maxHP:derived.maxHP*rank.hp,defense:derived.defense*rank.defense};
-  const afterMode={...afterRank,maxHP:afterRank.maxHP*mode.hp,maxSP:afterRank.maxSP*mode.sp,physicalAttack:afterRank.physicalAttack*mode.damage,magicAttack:afterRank.magicAttack*mode.damage,defense:afterRank.defense*mode.defense,speed:afterRank.speed*mode.speed};
-  const afterElement={...afterMode,maxHP:Math.round(afterMode.maxHP*element.hp),defense:identity.mode==='wild'?afterMode.defense:Math.round(afterMode.defense*element.defense),speed:afterMode.speed*element.speed};
+  const afterMode={...afterRank,maxHP:afterRank.maxHP*mode.hp*(mode.partySizeDurability||1),maxSP:afterRank.maxSP*mode.sp,physicalAttack:afterRank.physicalAttack*(identity.mode==='daily'?1:mode.damage),magicAttack:afterRank.magicAttack*(identity.mode==='daily'?1:mode.damage),defense:afterRank.defense*mode.defense,speed:afterRank.speed*mode.speed};
+  const afterElement={...afterMode,maxHP:Math.round(afterMode.maxHP*element.hp),defense:['wild','daily'].includes(identity.mode)?afterMode.defense:Math.round(afterMode.defense*element.defense),speed:afterMode.speed*element.speed};
   const final={...afterElement,maxHP:afterElement.maxHP*globalCalibration.hp,maxSP:afterElement.maxSP*globalCalibration.sp,physicalAttack:afterElement.physicalAttack*globalCalibration.damage,magicAttack:afterElement.magicAttack*globalCalibration.damage,defense:afterElement.defense*globalCalibration.defense};
-  return {identity,base,resourceBase:{...RESOURCE_BASE,speed:0},allocation,derived,profiles,final,finalDamagePressure:rank.finalDamagePressure,provenance:{stats:'MonsterBalance',damagePressure:'MonsterBalance Rank Profile consumed once by core damage settlement'},aiIntent:clone(ARCHETYPES[identity.archetype].aiIntent),pendingProductDecisions:identity.mode==='wild'?[]:['monster per-level bonusHP +30 / bonusSP +10','rank and mode final calibration','Tower/Abyss TTK'],breakdown:[
+  return {identity,base,resourceBase:{...RESOURCE_BASE,speed:0},allocation,derived,profiles,final,finalDamagePressure:rank.finalDamagePressure===null?null:rank.finalDamagePressure*mode.damage,...(identity.mode==='daily'?{legacyMultiplier:'NONE',skillFrequency:mode.skillFrequency}:{}),provenance:{stats:'MonsterBalance',damagePressure:'MonsterBalance Rank Profile consumed once by core damage settlement'},aiIntent:clone(ARCHETYPES[identity.archetype].aiIntent),pendingProductDecisions:['wild','daily'].includes(identity.mode)?[]:['monster per-level bonusHP +30 / bonusSP +10','rank and mode final calibration','Tower/Abyss TTK'],breakdown:[
     {step:'levelBase',formula:'30 + (level - 1) * growth; budget = (level - 1) * 5',input:identity.level,output:{...base}},
     {step:'allocation',method:'largest remainder; canonical STAT_ORDER ties',weights:{...ARCHETYPES[identity.archetype].weights},output:{...allocation}},
     {step:'sixStatConversion',coefficients:{...SIX_STAT_COEFFICIENTS},resourceBase:{...RESOURCE_BASE},output:{...derived}},
@@ -169,11 +183,12 @@ function previewTowerRoster(spec,floor){
   return ranks.map(rank=>previewTower({...spec,rank},floor));
 }
 function build(spec){
-  if(spec.mode!=='wild'||!spec.monsterKey) throw new TypeError('Runtime build requires explicit Wild identity');
+  if(!['wild','daily'].includes(spec.mode)||!spec.monsterKey) throw new TypeError('Runtime build requires explicit migrated identity');
   const projection=preview(spec),{final,allocation,identity}=projection;
   return {...identity,...allocation,maxHP:final.maxHP,hp:final.maxHP,maxSP:final.maxSP,sp:final.maxSP,
     attack:final.physicalAttack,magicAttack:final.magicAttack,defense:final.defense,agility:final.speed,
     accuracy:0,statusResistance:0,antiCrit:0,evasion:0,alive:true,
+    ...(identity.mode==='daily'?{skillChance:projection.skillFrequency,v173DailySoloProtected:projection.profiles.mode.protection.solo,v173DailyNoAccuracyCritBoost:projection.profiles.mode.protection.noAccuracyCritBoost,v173DailyBossUsedSkillLastAction:false}:{}),
     balanceOwner:'MonsterBalance',balanceProjection:projection};
 }
 function debug(entity){
@@ -184,6 +199,7 @@ const MonsterBalance=Object.freeze({preview,build,debug,previewTower,previewTowe
 
 window.MonsterBalance=MonsterBalance;
 window.MonsterBalanceWildIdentities=Object.freeze({"wild.zone-01.fire-01":{"archetype":"physical","zone":"wild/zone-01","reason":"Existing elemental physical legal damage skill pool.","capabilityGap":null},"wild.zone-01.water-01":{"archetype":"balanced","zone":"wild/zone-01","reason":"No specialized capability evidence; explicit balanced default.","capabilityGap":null},"wild.zone-01.wind-01":{"archetype":"balanced","zone":"wild/zone-01","reason":"No specialized capability evidence; explicit balanced default.","capabilityGap":null},"wild.zone-01.earth-01":{"archetype":"tank","zone":"wild/zone-01","reason":"Established rock/armored portrait identity; defensive AI capability gap is recorded.","capabilityGap":"No new tank AI or skills are introduced."},"wild.zone-02.fire-01":{"archetype":"physical","zone":"wild/zone-02","reason":"Existing elemental physical legal damage skill pool.","capabilityGap":null},"wild.zone-02.water-01":{"archetype":"magic","zone":"wild/zone-02","reason":"Existing water magic damage skill pool.","capabilityGap":null},"wild.zone-02.wind-01":{"archetype":"speedControl","zone":"wild/zone-02","reason":"Existing wind agilityDown/stun legal skills; early tier uses agilityDown.","capabilityGap":null},"wild.zone-02.earth-01":{"archetype":"tank","zone":"wild/zone-02","reason":"Established rock/armored portrait identity; defensive AI capability gap is recorded.","capabilityGap":"No new tank AI or skills are introduced."},"wild.zone-03.fire-01":{"archetype":"physical","zone":"wild/zone-03","reason":"Existing elemental physical legal damage skill pool.","capabilityGap":null},"wild.zone-03.water-01":{"archetype":"magic","zone":"wild/zone-03","reason":"Existing water magic damage skill pool.","capabilityGap":null},"wild.zone-03.fire-02":{"archetype":"physical","zone":"wild/zone-03","reason":"Existing elemental physical legal damage skill pool.","capabilityGap":null},"wild.zone-03.water-02":{"archetype":"magic","zone":"wild/zone-03","reason":"Existing water magic damage skill pool.","capabilityGap":null},"wild.zone-03.wind-01":{"archetype":"speedControl","zone":"wild/zone-03","reason":"Existing wind agilityDown/stun legal skills; early tier uses agilityDown.","capabilityGap":null},"wild.zone-03.earth-01":{"archetype":"tank","zone":"wild/zone-03","reason":"Established rock/armored portrait identity; defensive AI capability gap is recorded.","capabilityGap":"No new tank AI or skills are introduced."},"wild.zone-04.fire-01":{"archetype":"physical","zone":"wild/zone-04","reason":"Existing elemental physical legal damage skill pool.","capabilityGap":null},"wild.zone-04.water-01":{"archetype":"magic","zone":"wild/zone-04","reason":"Existing water magic damage skill pool.","capabilityGap":null},"wild.zone-04.fire-02":{"archetype":"physical","zone":"wild/zone-04","reason":"Existing elemental physical legal damage skill pool.","capabilityGap":null},"wild.zone-04.water-02":{"archetype":"magic","zone":"wild/zone-04","reason":"Existing water magic damage skill pool.","capabilityGap":null},"wild.zone-04.wind-01":{"archetype":"speedControl","zone":"wild/zone-04","reason":"Existing wind agilityDown/stun legal skills; early tier uses agilityDown.","capabilityGap":null},"wild.zone-04.earth-01":{"archetype":"tank","zone":"wild/zone-04","reason":"Established rock/armored portrait identity; defensive AI capability gap is recorded.","capabilityGap":"No new tank AI or skills are introduced."},"wild.zone-05.fire-01":{"archetype":"physical","zone":"wild/zone-05","reason":"Existing elemental physical legal damage skill pool.","capabilityGap":null},"wild.zone-05.water-01":{"archetype":"support","zone":"wild/zone-05","reason":"Existing water healing support resolver; retain a legal heal utility.","capabilityGap":null},"wild.zone-05.fire-02":{"archetype":"physical","zone":"wild/zone-05","reason":"Existing elemental physical legal damage skill pool.","capabilityGap":null},"wild.zone-05.water-02":{"archetype":"support","zone":"wild/zone-05","reason":"Existing water healing support resolver; retain a legal heal utility.","capabilityGap":null},"wild.zone-05.wind-01":{"archetype":"speedControl","zone":"wild/zone-05","reason":"Existing wind agilityDown/stun legal skills; early tier uses agilityDown.","capabilityGap":null},"wild.zone-05.earth-01":{"archetype":"tank","zone":"wild/zone-05","reason":"Established rock/armored portrait identity; defensive AI capability gap is recorded.","capabilityGap":"No new tank AI or skills are introduced."},"wild.zone-06.fire-01":{"archetype":"physical","zone":"wild/zone-06","reason":"Existing elemental physical legal damage skill pool.","capabilityGap":null},"wild.zone-06.water-01":{"archetype":"support","zone":"wild/zone-06","reason":"Existing water healing support resolver; retain a legal heal utility.","capabilityGap":null},"wild.zone-06.fire-02":{"archetype":"physical","zone":"wild/zone-06","reason":"Existing elemental physical legal damage skill pool.","capabilityGap":null},"wild.zone-06.water-02":{"archetype":"support","zone":"wild/zone-06","reason":"Existing water healing support resolver; retain a legal heal utility.","capabilityGap":null},"wild.zone-06.wind-01":{"archetype":"speedControl","zone":"wild/zone-06","reason":"Existing wind agilityDown/stun legal skills; early tier uses agilityDown.","capabilityGap":null},"wild.zone-06.earth-01":{"archetype":"tank","zone":"wild/zone-06","reason":"Established rock/armored portrait identity; defensive AI capability gap is recorded.","capabilityGap":"No new tank AI or skills are introduced."},"wild.zone-07.fire-01":{"archetype":"physical","zone":"wild/zone-07","reason":"Existing elemental physical legal damage skill pool.","capabilityGap":null},"wild.zone-07.water-01":{"archetype":"support","zone":"wild/zone-07","reason":"Existing water healing support resolver; retain a legal heal utility.","capabilityGap":null},"wild.zone-07.fire-02":{"archetype":"magic","zone":"wild/zone-07","reason":"Existing elemental magic legal damage skill pool.","capabilityGap":null},"wild.zone-07.water-02":{"archetype":"support","zone":"wild/zone-07","reason":"Existing water healing support resolver; retain a legal heal utility.","capabilityGap":null},"wild.zone-07.wind-01":{"archetype":"speedControl","zone":"wild/zone-07","reason":"Existing wind agilityDown/stun legal skills; early tier uses agilityDown.","capabilityGap":null},"wild.zone-07.earth-01":{"archetype":"tank","zone":"wild/zone-07","reason":"Established rock/armored portrait identity; defensive AI capability gap is recorded.","capabilityGap":"No new tank AI or skills are introduced."},"wild.zone-08.fire-01":{"archetype":"physical","zone":"wild/zone-08","reason":"Existing elemental physical legal damage skill pool.","capabilityGap":null},"wild.zone-08.water-01":{"archetype":"support","zone":"wild/zone-08","reason":"Existing water healing support resolver; retain a legal heal utility.","capabilityGap":null},"wild.zone-08.fire-02":{"archetype":"magic","zone":"wild/zone-08","reason":"Existing elemental magic legal damage skill pool.","capabilityGap":null},"wild.zone-08.water-02":{"archetype":"support","zone":"wild/zone-08","reason":"Existing water healing support resolver; retain a legal heal utility.","capabilityGap":null},"wild.zone-08.wind-01":{"archetype":"speedControl","zone":"wild/zone-08","reason":"Existing wind agilityDown/stun legal skills; early tier uses agilityDown.","capabilityGap":null},"wild.zone-08.earth-01":{"archetype":"tank","zone":"wild/zone-08","reason":"Established rock/armored portrait identity; defensive AI capability gap is recorded.","capabilityGap":"No new tank AI or skills are introduced."},"wild.zone-09.fire-01":{"archetype":"physical","zone":"wild/zone-09","reason":"Existing elemental physical legal damage skill pool.","capabilityGap":null},"wild.zone-09.water-01":{"archetype":"support","zone":"wild/zone-09","reason":"Existing water healing support resolver; retain a legal heal utility.","capabilityGap":null},"wild.zone-09.fire-02":{"archetype":"magic","zone":"wild/zone-09","reason":"Existing elemental magic legal damage skill pool.","capabilityGap":null},"wild.zone-09.water-02":{"archetype":"support","zone":"wild/zone-09","reason":"Existing water healing support resolver; retain a legal heal utility.","capabilityGap":null},"wild.zone-09.wind-01":{"archetype":"speedControl","zone":"wild/zone-09","reason":"Existing wind agilityDown/stun legal skills; early tier uses agilityDown.","capabilityGap":null},"wild.zone-09.earth-01":{"archetype":"tank","zone":"wild/zone-09","reason":"Established rock/armored portrait identity; defensive AI capability gap is recorded.","capabilityGap":"No new tank AI or skills are introduced."},"wild.zone-10.fire-01":{"archetype":"physical","zone":"wild/zone-10","reason":"Existing elemental physical legal damage skill pool.","capabilityGap":null},"wild.zone-10.water-01":{"archetype":"support","zone":"wild/zone-10","reason":"Existing water healing support resolver; retain a legal heal utility.","capabilityGap":null},"wild.zone-10.fire-02":{"archetype":"magic","zone":"wild/zone-10","reason":"Existing elemental magic legal damage skill pool.","capabilityGap":null},"wild.zone-10.water-02":{"archetype":"support","zone":"wild/zone-10","reason":"Existing water healing support resolver; retain a legal heal utility.","capabilityGap":null},"wild.zone-10.wind-01":{"archetype":"speedControl","zone":"wild/zone-10","reason":"Existing wind agilityDown/stun legal skills; early tier uses agilityDown.","capabilityGap":null},"wild.zone-10.earth-01":{"archetype":"tank","zone":"wild/zone-10","reason":"Established rock/armored portrait identity; defensive AI capability gap is recorded.","capabilityGap":"No new tank AI or skills are introduced."}});
+window.MonsterBalanceDailyIdentities=Object.freeze({"daily.exp.regular":{"archetype":"magic","reason":"Existing elemental damage pool for cultivation disciple."},"daily.exp.elite":{"archetype":"magic","reason":"Cultivation elite uses the same legal spell pool."},"daily.exp.boss":{"archetype":"balanced","reason":"Cultivation instructor has mixed damage skills."},"daily.material.regular":{"archetype":"tank","reason":"Armored ore guard; defensive allocation, no new tank AI."},"daily.material.elite":{"archetype":"physical","reason":"Ore elite uses existing physical damage skills."},"daily.material.boss":{"archetype":"tank","reason":"Ore commander is durable; no new defensive skill."},"daily.gold.regular":{"archetype":"physical","reason":"Vault guard uses existing physical damage pool."},"daily.gold.elite":{"archetype":"speedControl","reason":"Existing elemental control/debuff skills when legal; damage fallback."},"daily.gold.boss":{"archetype":"balanced","reason":"Vault manager uses mixed legal damage pool."}});
 })();
 /* END GENERATED MONSTER BALANCE OWNER */
 
@@ -3300,7 +3316,7 @@ function makeZoneMonster(
         if(identity.zone==="wild/zone-01"){ monster.v173BeginnerForest=true; }
         return configureBuiltMonster(monster);
     }
-    // Legacy-only compatibility: Daily/Tower/Abyss/Adventure/Boss remain unmigrated.
+    // Legacy-only compatibility: Tower/Abyss/Adventure/Boss remain unmigrated.
     return makeLegacyModeMonster(name,level,element,rank,portraitKey);
 }
 
@@ -12760,8 +12776,8 @@ function getEnemyPressureMultiplier(attacker,target){
     if(!attacker||!target||isPartyDamageTarget(attacker)||!isPartyDamageTarget(target)){
         return 1;
     }
-    if(attacker.mode==="wild"&&attacker.balanceOwner==="MonsterBalance"){
-        return attacker.balanceProjection.profiles.rank.finalDamagePressure;
+    if(["wild","daily"].includes(attacker.mode)&&attacker.balanceOwner==="MonsterBalance"){
+        return attacker.balanceProjection.finalDamagePressure;
     }
     const rank=typeof getMonsterRank==="function"?getMonsterRank(attacker):"regular";
     let bonus=ENEMY_PRESSURE_RANK_BONUS[rank]||0;
@@ -22355,7 +22371,6 @@ function killMonster(index){
 
 const BATTLE_RENDER_HOOK_ORDER=Object.freeze({
     before:Object.freeze([
-        "v158PrepareBattleRender",
         "v141PrepareBattleRender"
     ]),
     after:Object.freeze([

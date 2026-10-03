@@ -357,11 +357,11 @@
             return monster;
         }
         let pool=legalMonsterSkillPool(monster);
-        const wild=monster.mode==="wild"&&monster.balanceOwner==="MonsterBalance";
-        if(wild&&["physical","magic"].includes(monster.archetype)){
+        const projected=["wild","daily"].includes(monster.mode)&&monster.balanceOwner==="MonsterBalance";
+        if(projected&&["physical","magic"].includes(monster.archetype)){
             pool=pool.filter(id=>skillDatabase[id].category===monster.archetype);
         }
-        if(wild&&monster.archetype==="speedControl"){
+        if(projected&&monster.archetype==="speedControl"){
             const control=pool.filter(id=>{
                 const skill=skillDatabase[id];
                 return skill.agilityDownChance||skill.stunChance||skill.defenseDownChance||skill.freezeChance;
@@ -370,7 +370,7 @@
         }
         monster.v144LegalSkillPool=pool.slice();
         monster.skillIds=shuffled(pool).slice(0,monsterCarryLimit(monster.level));
-        if(wild){
+        if(projected){
             monster.v141SupportSkillIds=[];
             if(monster.archetype==="support"&&monster.level>10&&isMonsterSkillElementLegal(monster,"healSpell")){
                 monster.v141SupportSkillIds=["healSpell"];
@@ -2400,9 +2400,18 @@
         for(let slot=0;slot<6;slot++){
             const rank=dailyRankForSlot(wave,slot,!!(context&&context.soloProtected));
             const element=DAILY_ELEMENTS[(wave*2+slot)%DAILY_ELEMENTS.length];
-            const monster=typeof window.v132BuildDungeonMonster==="function"
-                ?window.v132BuildDungeonMonster(dailyMonsterName(type,rank),level,element,rank||undefined)
-                :makeZoneMonster(dailyMonsterName(type,rank),level,element,rank||undefined);
+            const monsterKey=dailyMonsterPortraitKey(type,rank);
+            const identity=window.MonsterBalanceDailyIdentities[monsterKey];
+            if(!identity){ throw new Error("Unregistered Daily identity: "+monsterKey); }
+            const monster=window.MonsterBalance.build({
+                monsterKey,name:dailyMonsterName(type,rank),level,element,
+                archetype:identity.archetype,rank:rank||"regular",mode:"daily",dailyType:type,
+                wave,slot,context:"daily/"+type+"/wave-"+wave+"/slot-"+slot,
+                partySize:context.partySize,highestPartyLevel:context.highestLevel,
+                skillFrequency:getMonsterSkillTierAndChance(level).chance
+            });
+            monster.skillIds=getMonsterSkillPoolForLevel(element,level);
+            configureBuiltMonster(monster);
             monster.portraitKey=dailyMonsterPortraitKey(type,rank);
             monster.v132Dungeon=true;
             monster.v173DailyDungeonType=type;
@@ -2410,7 +2419,6 @@
             monster.v141FormationRow=slot<3?0:1;
             monster.v141FormationPosition=slot%3;
             monster.v148TargetOrder=REFERENCE_TARGET_ORDER_6[slot];
-            monster.v173DailySoloProtected=!!(context&&context.soloProtected);
             roster.push(monster);
         }
         return roster;
@@ -5527,92 +5535,9 @@
         return monster;
     }
 
-    const DAILY_DUNGEON_SCALE_FIELDS=[
-        "maxHP","hp","maxSP","sp","attack","magicAttack","defense",
-        "attackPoints","vitalityPoints","energyPoints","intelligencePoints","defensePoints","agilityPoints",
-        "vitality","energy","intelligence","defense","agility"
-    ];
-
-    function getDailyDungeonScaleContext(){
-        const run=window.v132ActiveDungeonRun||null;
-        let partySize=Math.floor(numeric(run&&run.partySize));
-        if(!(partySize>=1&&partySize<=3)&&typeof getExistingPartyIndexes==="function"){
-            partySize=getExistingPartyIndexes().slice(0,3).filter(index=>{
-                const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(index):null;
-                return !!character;
-            }).length;
-        }
-        partySize=Math.max(1,Math.min(3,partySize||1));
-        const partyMultiplier=partySize===1?.40:partySize===2?.72:1;
-
-        let highestLevel=Math.floor(numeric(run&&run.highestPartyLevel));
-        if(!(highestLevel>0)&&typeof getExistingPartyIndexes==="function"){
-            highestLevel=getExistingPartyIndexes().slice(0,3).reduce((highest,index)=>{
-                const character=typeof getPartyCharacterByIndex==="function"?getPartyCharacterByIndex(index):null;
-                return character?Math.max(highest,Math.floor(numeric(character.level)||1)):highest;
-            },1);
-        }
-        highestLevel=Math.max(1,highestLevel||1);
-        const levelMultiplier=highestLevel<=15?.80:highestLevel<=20?.90:highestLevel<=50?1:1.05;
-        return {
-            partySize:partySize,
-            highestLevel:highestLevel,
-            partyMultiplier:partyMultiplier,
-            levelMultiplier:levelMultiplier,
-            difficultyMultiplier:DAILY_DUNGEON_DIFFICULTY_MULTIPLIER,
-            factor:partyMultiplier*levelMultiplier*DAILY_DUNGEON_DIFFICULTY_MULTIPLIER
-        };
-    }
-
-    const DAILY_DUNGEON_DIFFICULTY_MULTIPLIER=.5;
-    const FORMAL_DAILY_DUNGEON_TYPES=new Set(["exp","material","gold"]);
-
-    function isFormalDailyDungeonMonster(monster){
-        return !!(monster&&FORMAL_DAILY_DUNGEON_TYPES.has(String(monster.v173DailyDungeonType||"")));
-    }
-
-    function normalizeDailyDungeonMonster(monster){
-        if(!isFormalDailyDungeonMonster(monster)||monster.v141Abyss===true){ return monster; }
-        normalizeMonsterDefaultEvasion(monster);
-        if(!monster.v173DailyDungeonBaseStats){
-            const base={};
-            DAILY_DUNGEON_SCALE_FIELDS.forEach(key=>{
-                if(Number.isFinite(Number(monster[key]))){ base[key]=Number(monster[key]); }
-            });
-            monster.v173DailyDungeonBaseStats=base;
-        }
-        const context=getDailyDungeonScaleContext();
-        if(!Object.prototype.hasOwnProperty.call(monster,"v173DailyDungeonBaseSkillChance")){
-            monster.v173DailyDungeonBaseSkillChance=Number.isFinite(Number(monster.skillChance))?Number(monster.skillChance):0;
-        }
-        const base=monster.v173DailyDungeonBaseStats;
-        DAILY_DUNGEON_SCALE_FIELDS.forEach(key=>{
-            if(!Object.prototype.hasOwnProperty.call(base,key)){ return; }
-            const minimum=key==="maxHP"||key==="hp"?1:0;
-            monster[key]=Math.max(minimum,Math.round(base[key]*context.factor));
-        });
-        if(Number.isFinite(Number(monster.maxHP))){ monster.hp=Math.max(1,Number(monster.maxHP)); }
-        if(Number.isFinite(Number(monster.maxSP))){ monster.sp=Math.max(0,Number(monster.maxSP)); }
-        monster.v173DailyDungeonScaleFactor=context.factor;
-        monster.v173DailyDungeonPartySize=context.partySize;
-        monster.v173DailyDungeonHighestLevel=context.highestLevel;
-        monster.v173DailySoloProtected=context.partySize===1&&context.highestLevel<=20;
-        monster.v173DailyNoAccuracyCritBoost=monster.v173DailySoloProtected;
-        const baseSkillChance=Math.max(0,Math.min(1,Number(monster.v173DailyDungeonBaseSkillChance)||0));
-        if(monster.v173DailySoloProtected){
-            monster.skillChance=Number(monster.v141DungeonStage)===1?0:Math.min(.45,baseSkillChance*.60);
-        }else{
-            monster.skillChance=baseSkillChance;
-            monster.v173DailyBossUsedSkillLastAction=false;
-        }
-        return monster;
-    }
-
     window.v158NormalizeMonsterDefaultEvasion=normalizeMonsterDefaultEvasion;
     window.v17342NormalizeBeginnerForestMonster=normalizeBeginnerForestMonster;
-    window.v17342NormalizeDailyDungeonMonster=normalizeDailyDungeonMonster;
-    window.v173GetDailyDungeonScaleContext=getDailyDungeonScaleContext;
-    window.v17344IsFormalDailyDungeonMonster=isFormalDailyDungeonMonster;
+    window.v17344IsFormalDailyDungeonMonster=monster=>!!(monster&&monster.mode==="daily");
 
     if(typeof zoneConfig!=="undefined"){
         Object.keys(zoneConfig).forEach(key=>{
@@ -5639,21 +5564,6 @@
             return 5+Math.floor(Math.random()*4);
         };
     }
-
-    function v158PrepareBattleRender(){
-        const isDungeonBattle=
-            typeof currentZone!=="undefined"&&currentZone==="dungeon"&&
-            !!window.v132ActiveDungeonRun&&
-            typeof currentBattleMonsters!=="undefined"&&
-            Array.isArray(currentBattleMonsters)&&
-            typeof monsters!=="undefined"&&Array.isArray(monsters);
-        if(isDungeonBattle){
-            const roster=currentBattleMonsters.map(index=>monsters[index]).filter(Boolean);
-            const isAbyss=roster.some(monster=>monster&&monster.v141Abyss===true);
-            if(!isAbyss){ roster.forEach(normalizeDailyDungeonMonster); }
-        }
-    }
-    window.v158PrepareBattleRender=v158PrepareBattleRender;
 
     /* getMonsterEvasion() remains the single core owner; no late V158 wrapper. */
 

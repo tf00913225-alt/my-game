@@ -36,7 +36,7 @@ assert.deepEqual(ownerDeclarations,["js/00-main.js"],"00-main.js must be the onl
 assert.equal(reassignmentCount,0,"production runtime must not install renderBattle wrappers");
 assert.doesNotMatch(runtimeSources.map(entry=>entry.source).join("\n"),/\brenderBattle(?:2|Final|Fix|V2)\b/);
 
-assert.match(core,/before:Object\.freeze\(\[\s*"v158PrepareBattleRender",\s*"v141PrepareBattleRender"\s*\]\)/);
+assert.match(core,/before:Object\.freeze\(\[\s*"v141PrepareBattleRender"\s*\]\)/);
 assert.match(core,/after:Object\.freeze\(\[\s*"v131AfterBattleRender",\s*"v141AfterBattleRender",\s*"v143AfterBattleRender",\s*"v154AfterBattleRender",\s*"v17351AfterBattleRender",\s*"vFixedSlotAfterBattleRender"\s*\]\)/);
 assert.ok(
     core.indexOf('runBattleRenderHooks("before",this,arguments);')<core.indexOf('const area ='),
@@ -69,8 +69,7 @@ assert.match(v152,/window\.v152SyncAbyssBattleUi=syncAbyssBattleUi;/);
 assert.match(v154,/function v154AfterBattleRender\(\)[\s\S]*?window\.v152SyncAbyssBattleUi\(\);[\s\S]*?syncMonsterPortraits\(\);/);
 assert.match(v154,/window\.v154AfterBattleRender=v154AfterBattleRender;/);
 
-assert.match(v158,/function v158PrepareBattleRender\(\)[\s\S]*?normalizeDailyDungeonMonster/);
-assert.match(v158,/window\.v158PrepareBattleRender=v158PrepareBattleRender;/);
+assert.doesNotMatch(v158,/v158PrepareBattleRender|normalizeDailyDungeonMonster|DAILY_DUNGEON_SCALE_FIELDS/);
 
 assert.match(fixedSlot,/window\.vFixedSlotAfterBattleRender=reconcile;/);
 assert.doesNotMatch(fixedSlot,/window\.renderBattle\s*=/);

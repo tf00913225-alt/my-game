@@ -896,9 +896,18 @@
         for(let slot=0;slot<6;slot++){
             const rank=dailyRankForSlot(wave,slot,!!(context&&context.soloProtected));
             const element=DAILY_ELEMENTS[(wave*2+slot)%DAILY_ELEMENTS.length];
-            const monster=typeof window.v132BuildDungeonMonster==="function"
-                ?window.v132BuildDungeonMonster(dailyMonsterName(type,rank),level,element,rank||undefined)
-                :makeZoneMonster(dailyMonsterName(type,rank),level,element,rank||undefined);
+            const monsterKey=dailyMonsterPortraitKey(type,rank);
+            const identity=window.MonsterBalanceDailyIdentities[monsterKey];
+            if(!identity){ throw new Error("Unregistered Daily identity: "+monsterKey); }
+            const monster=window.MonsterBalance.build({
+                monsterKey,name:dailyMonsterName(type,rank),level,element,
+                archetype:identity.archetype,rank:rank||"regular",mode:"daily",dailyType:type,
+                wave,slot,context:"daily/"+type+"/wave-"+wave+"/slot-"+slot,
+                partySize:context.partySize,highestPartyLevel:context.highestLevel,
+                skillFrequency:getMonsterSkillTierAndChance(level).chance
+            });
+            monster.skillIds=getMonsterSkillPoolForLevel(element,level);
+            configureBuiltMonster(monster);
             monster.portraitKey=dailyMonsterPortraitKey(type,rank);
             monster.v132Dungeon=true;
             monster.v173DailyDungeonType=type;
@@ -906,7 +915,6 @@
             monster.v141FormationRow=slot<3?0:1;
             monster.v141FormationPosition=slot%3;
             monster.v148TargetOrder=REFERENCE_TARGET_ORDER_6[slot];
-            monster.v173DailySoloProtected=!!(context&&context.soloProtected);
             roster.push(monster);
         }
         return roster;

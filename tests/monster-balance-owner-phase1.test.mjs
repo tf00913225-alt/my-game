@@ -5,7 +5,7 @@ import {CombatLevelBase} from '../js/combat/level-base-contract.mjs';
 import {ARCHETYPES,allocatePoints,STAT_ORDER} from '../js/combat/monster-archetypes.mjs';
 import {MonsterBalance,GLOBAL_CALIBRATION} from '../js/combat/monster-balance-owner.mjs';
 import {buildMatrix,loadLegacyRuntime} from '../scripts/monster-balance-shadow-matrix.mjs';
-const spec={name:'測試怪物',level:50,element:'fire',archetype:'physical',rank:'regular',mode:'wild',context:'wild/map-1'};
+const spec={monsterKey:'daily/diagnostic',dailyType:'exp',wave:1,slot:0,partySize:3,highestPartyLevel:50,skillFrequency:.45,name:'測試怪物',level:50,element:'fire',archetype:'physical',rank:'regular',mode:'wild',context:'wild/map-1'};
 const inventory=JSON.parse(fs.readFileSync('docs/monster-balance-owner-retirement-map.json'));
 test('shared level base begins at Lv1, not zero; all six checkpoints exact',()=>{
  for(const level of [1,10,30,50,70,100]){
@@ -51,11 +51,11 @@ test('Shadow never modifies a frozen formal entity or aliases its nested data',(
 });
 test('rank adds no points; seven modes explicit and isolated',()=>{
  assert.deepEqual(MonsterBalance.modes,['wild','daily','tower','abyss','adventure','personalBoss','worldBoss']);
- for(const mode of MonsterBalance.modes)for(const rank of MonsterBalance.ranks.filter(r=>mode!=='wild'||r!=='smallBoss')){
+ for(const mode of MonsterBalance.modes)for(const rank of MonsterBalance.ranks.filter(r=>r==='boss'?mode==='daily':r==='smallBoss'?!['wild','daily'].includes(mode):true)){
   const row=MonsterBalance.preview({...spec,mode,rank});
   assert.equal(row.base.abilityPointBudget,245);assert.equal(row.profiles.mode.id,mode);
   assert.deepEqual(row.allocation,MonsterBalance.preview(spec).allocation);
-  assert.equal(row.profiles.rank.status,mode==='wild'?'RANK_V1':'PENDING_PRODUCT_CALIBRATION');
+  assert.equal(row.profiles.rank.status,['wild','daily'].includes(mode)?'RANK_V1':'PENDING_PRODUCT_CALIBRATION');
  }
  for(const invalid of [{mode:'boss'},{mode:'legacy-dungeon'},{rank:'boss'},{archetype:'unknown'},{context:''},{element:''}])assert.throws(()=>MonsterBalance.preview({...spec,...invalid}));
 });
@@ -77,7 +77,9 @@ test('existing Tower element profile math only; global defaults all1, other mode
  assert.equal(wind.final.speed,wind.derived.speed*1.15);
  assert.deepEqual(wind.profiles.element.metadata,{evasionBonusPercent:15});
  for(const mode of ['daily','abyss','adventure','personalBoss','worldBoss']){
-  const row=MonsterBalance.preview({...spec,mode,element:'earth'});assert.deepEqual(row.final,row.derived);
+  const row=MonsterBalance.preview({...spec,mode,element:'earth'});
+  if(mode==='daily'){assert.equal(row.final.maxHP,Math.round(row.derived.maxHP*row.profiles.mode.partySizeDurability));assert.equal(row.final.physicalAttack,row.derived.physicalAttack);}
+  else assert.deepEqual(row.final,row.derived);
  }
 });
 test('AI intent carries required function, no new executable skills',()=>{
@@ -90,7 +92,7 @@ test('retirement inventory is complete and preserves grandfathered source paths 
  const ids=['coreAllocation','coreStats','wildV131','wildV141','wildRank','dungeonStrength','dungeonNormal','dungeonRank','equipmentRank','beginnerScaling','dailyScaling','legacyAbyss','abyssDurability','bossMultipliers','towerElement','enemyPressure','adventureBuild','v144Wrapper','bossUnusedDefense'];
  for(const id of ids)assert.ok(inventory.items.some(item=>item.id===id),id);
  for(const item of inventory.items){
-  assert.ok(['TO RETIRE','TO MIGRATE','KEEP','RETIRED','COMPATIBILITY FOR NON-WILD ONLY'].includes(item.decision));assert.ok(item.phase&&item.reason&&item.retirementGate);
+  assert.ok(['TO RETIRE','TO MIGRATE','KEEP','RETIRED','COMPATIBILITY FOR NON-WILD ONLY','COMPATIBILITY FOR NON-DAILY ONLY'].includes(item.decision));assert.ok(item.phase&&item.reason&&item.retirementGate);
   assert.equal(fs.readFileSync(item.file,'utf8').includes(item.sourceToken),item.decision!=='RETIRED',item.id);
  }
 });

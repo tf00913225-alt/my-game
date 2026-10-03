@@ -473,6 +473,23 @@
       }
     },
     {
+      "id": "REQ-MONSTER-BALANCE-OWNER-P2B-DAILY-20261003",
+      "title": "Daily Runtime唯一MonsterBalance／Rank和Mode收斂／舊倍率退休",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "docs/MONSTER_BALANCE_OWNER_PHASE2B.md",
+          "docs/monster-balance-daily-ttk-evidence.json",
+          "tests/monster-balance-owner-phase2b.test.mjs",
+          ".github/scripts/run-daily-balance-browser-qa.mjs",
+          "docs/monster-balance-owner-retirement-map.json",
+          "docs/monster-balance-daily-browser-evidence-20261003.json"
+        ],
+        "verification": "Focused27/27;972 identity/preview/render hook/re-entry projections;54 reference encounters/162 cumulative waves;7 direct suites; real Chrome390/412 production bundles,9 natural encounters/27 waves, manual/auto/rewards/re-entry/beginner; reviewed screenshots.",
+        "result": "Functional1/1 VERIFIED on source1b4cb31 / CI merge9dce10c7, artifact11276934048 SHA256 verified. Latest full Required CI, dev integration, exact deployment/live Daily QA and cleanup remain separate PR#784 gates; main untouched."
+      }
+    },
+    {
       "id": "REQ-P1B2-DAILY-CSS-RETIREMENT-20261003",
       "title": "每日副本歷史 PR CSS46 退休立繪呈現移除",
       "status": "VERIFIED",

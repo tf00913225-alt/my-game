@@ -1,3 +1,12 @@
+## 2026-10-03 — MONSTER-BALANCE-OWNER-P2B-DAILY-20261003（功能1/1 VERIFIED；整合／部署待Gate）
+
+- 開工dev4274454a／main f63d69db；main禁止修改；原Phase1/2A契約與#777/#780最終紀錄已核實。Branch feature/monster-balance-owner-phase2b-daily-20261003；本工作PR為耐久狀態Owner。
+- Daily正式V148 spec→MonsterBalance.build；Rank regular1/elite1.5+1.1+1.1/boss2+1.15+1.15；ability budget不變。9個portrait-key固定archetype，三type同Owner；三波與solo特殊編成／等級owner／獎勵原封保留。
+- V158 Daily核心/party/level/.5後置縮放與render hook實體退休；舊Equipment constructor/roster/入口退休，兼容入口仍指Gold。V132倍率僅NON-DAILY COMPATIBILITY，Daily完全切斷；shared其他玩法待2C–2F，不能盲刪。
+- 實測耐久party1/2/3=.04/.08/.12；solo<=20 final pressure=.5僅輸出壓力；不縮六圍/SP/raw attack/敏捷/等級。54encounter/162wave正式公式診斷全部<=2且存活；原起始校正有超時/死亡，歷史明列，不冒稱原值PASS。
+- 專項27/27、972identity、54encounter/162wave診斷與7檔直接相關回歸PASS。自然Chrome run37132447706、source1b4cb31/merge9dce10c7、artifact11276934048 SHA256独立核對PASS；390/412共9場27波、manual/auto/reward/return/re-entry、Lv10solo Gold每波2回合且HP382存活、實際portrait/HP/SP/浮字與projection/render相等PASS；代表wave3截圖已檢視。本機Chrome仍不可啟動，不冒充PASS。功能1/1 VERIFIED，最新Head完整CI／整合／精確dev部署／線上Daily QA／closeout以#784為最終Gate，未完成前不稱全案完成。
+- 規格與證據：docs/MONSTER_BALANCE_OWNER_PHASE2B.md、daily-ttk-evidence、retirement-map。停止點Daily；未進Tower、未發布main、未改portrait素材。
+
 ## 2026-10-03 — MONSTER-BALANCE-OWNER-P2A-WILD-20261003（功能驗證回填，整合待 Gate）
 
 - 延續原PR#780／原施工分支，已吸收dev ddde74b0（#781文件）；沒有重做Phase1、修改main或進Daily Phase2B。
@@ -4704,6 +4713,13 @@ CSS49 統一合成／鍛造底部間距，退役 CSS38／JS58 的衝突設定。
 - Local cloud Node tests 115/115 PASS; new event suite 22/22; new source assertions reject the old helper as expected. Production build:check and diff check PASS, browser build unchanged. Existing real callable/emulator suite covers missing source before direct credit/new issuer/pending issuer/reservation and both credited retry entry points. Remote latest-head CI, PR merge, Firebase deployment and exact DEV SHA remain PENDING. Phase 4 remains 0/6 VERIFIED.
 - Next: exact-head existing CI/emulator, PR integration, Firebase/DEV SHA verification and safe branch deletion. Next separate Foundation D slice should establish a server-owned battle/run attempt and proven outcome; a browser win flag remains untrusted. Original Revision 1 gaps remain blocked; do not rebuild or resubmit old-phone sources.
 
+
+## 2026-10-03 Daily Phase 2B CI execution-cap recovery
+
+PR #784 head 98d1d619b14ca08e202ab78565ad3faef9be7309: CI run 37133129829 / job 111232080558 was CANCELLED, not overall PASS. GitHub job annotation explicitly reports "The job has exceeded the maximum execution time of 30m0s". Daily natural browser QA passed in 6m33s, Tower/Wild passed in 11m46s, and exact-candidate battle QA printed PASS immediately before runner cancellation. Remaining integrity/release gates were skipped and deployment did not run. The existing verify job cap is now 40 minutes; all steps, conditions and assertions remain unchanged. This changes only the execution budget, not game runtime or balance. Latest-head complete CI, dev merge/deploy/live exact-SHA checks and recoverable branch cleanup remain pending.
+
+- Integration with concurrent dev fe357ec7dd2739e0806a4c9ea823e0deb4707411 (#783): preserve CSS46 artwork retirement and production portrait QA, consolidate the single Daily CI step/artifact with natural balance QA after CJK font setup, union both requirement/deprecation entries, and regenerate manifests from combined sources. Local Phase1/2A/2B 27/27, portrait convergence/retry and portrait Runtime tests PASS; build:check and whitespace PASS. New combined-head CI and deployment remain pending.
+
 ## 2026-10-03 — CLOUDSAVE-BATTLE-ATTEMPT-SOURCE-20261003 (candidate)
 
 - Base dev `4274454a30f25f5807fa589804413efe8ec13290`; branch `feature/cloud-battle-attempt-source-20261003`; target dev; main forbidden. #755 is merged and not repeated. Other active monster/portrait PRs are independent and excluded.
@@ -4711,3 +4727,5 @@ CSS49 統一合成／鍛造底部間距，退役 CSS38／JS58 的衝突設定。
 - Binds UID, first server-created character, canonical revision/hash, active creation session and server-clock ten-minute expiry. Retry never extends expiry or regenerates missing evidence; a different operation cannot reopen that revision. New sessions cannot inherit it. Outcome/reward remain explicitly unverified/ineligible; no enemy catalog, combat simulation, completion endpoint, grant, UI hook, callable or playable publication. This is source preparation, NOT proof of battle victory. Future server encounter/outcome owner must explicitly authorize a successor lifecycle before game integration; expiry/abandonment cannot recycle this preparation.
 - Sources/receipts stay private under existing deny-all serverUsers rules. No temporary wrapper, second schema validator or browser authority. Internal preparation is exercised against real emulator transactions, not live player data. Phase4 remains 0/6 VERIFIED; historical sources/admission/second-device restore unchanged.
 - 24/24 targeted tests PASS. Existing cloud test set, required PR CI/emulator, integration, current DEV SHA/deployment and safe branch cleanup remain pending; durable final status owner is this work PR. Game/Cache173.73 unchanged.
+
+- Current-dev convergence with 2bd4a6c (#785) preserves both HANDOFF records; independent internal cloud source preparation has no browser hook, callable or reward grant. Browser source, build artifacts and Daily balance remain unchanged from03f7987c. Full candidate CI37135286723/job111238465129 SUCCESS; this new integration head must obtain its own Required CI before dev merge. No old CI is substituted for latest-head CI.

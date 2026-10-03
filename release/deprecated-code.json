@@ -174,6 +174,23 @@
       ]
     },
     {
+      "id": "DEP-MONSTER-P2B-DAILY-SCALING",
+      "description": "Daily core rescaling, pre-render normalizer and inactive Equipment builder are retired. V132 common builder is non-Daily compatibility only.",
+      "enabled": true,
+      "forbidden": [
+        "DAILY_DUNGEON_SCALE_FIELDS",
+        "DAILY_DUNGEON_DIFFICULTY_MULTIPLIER",
+        "normalizeDailyDungeonMonster",
+        "getDailyDungeonScaleContext",
+        "v158PrepareBattleRender",
+        "EQUIPMENT_DUNGEON_ELITE_MULTIPLIERS",
+        "EQUIPMENT_DUNGEON_BOSS_MULTIPLIERS",
+        "applyEquipmentDungeonRankStrength",
+        "buildEquipmentDungeonMonster",
+        "buildEquipmentDungeonRoster"
+      ]
+    },
+    {
       "id": "DEP-P1B2-DAILY-LEGACY-ARTWORK-20261003",
       "description": "每日副本 CSS46 舊 img 與 card-background 立繪呈現已退休；V154 只選圖，V174 為唯一 artwork DOM。",
       "enabled": true,

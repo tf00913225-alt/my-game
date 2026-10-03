@@ -1,16 +1,16 @@
 /* Diagnostic only. Never imported by production bundles. Uses formal stat and skill owners. */
-function prepareWildBalanceReferenceParty(level){
+function prepareWildBalanceReferenceParty(level,partySize=3){
     const budget=START_ATTRIBUTE_POINTS+(level-1)*5;
     const intelligence=Math.floor(budget*.35),vitality=Math.floor(budget*.2),energy=Math.floor(budget*.1),defensePoints=Math.floor(budget*.15),agility=Math.floor(budget*.15);
     const make=id=>({...player,id,level,element:'fire',attack:budget-intelligence-vitality-energy-defensePoints-agility,intelligence,vitality,energy,defensePoints,agility,
         bonusHP:(level-1)*30,bonusSP:(level-1)*10,attributePoints:0,activeBuffs:[],statusEffects:[],isDefending:false});
-    Object.assign(player,make('Wild reference A'));player2=make('Wild reference B');player3=make('Wild reference C');
+    Object.assign(player,make('Wild reference A'));player2=partySize>=2?make('Wild reference B'):null;player3=partySize>=3?make('Wild reference C'):null;
     const skill=level>=30?'phoenixCry':'fireRocket';
     const skillLevel=level>=10?10:1;
     const skillLevels=skill==='phoenixCry'?{fireRocket:1,blazeSpell:1,flameTornado:1,phoenixCry:10}:{fireRocket:skillLevel};
     const cost=Object.entries(skillLevels).reduce((sum,[id,n])=>sum+skillDatabase[id].learnCost+(n-1),0);
     if(cost>level*2||Object.keys(skillLevels).some(id=>skillDatabase[id].learnLevel>level))throw new Error('Illegal reference skill budget');
-    for(let i=0;i<3;i++){
+    for(let i=0;i<partySize;i++){
         const key=getPartyCharacterKey(i);characterEquipment[key]={};
         characterSkillLoadouts[key]={skillLevels:{...skillLevels},equippedSkills:[skill]};
         const ch=getPartyCharacterByIndex(i),stats=getPartyBattleStats(i);ch.hp=stats.maxHP;ch.sp=stats.maxSP;ch.skillPoints=level*2-cost;

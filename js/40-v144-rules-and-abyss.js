@@ -355,11 +355,11 @@
             return monster;
         }
         let pool=legalMonsterSkillPool(monster);
-        const wild=monster.mode==="wild"&&monster.balanceOwner==="MonsterBalance";
-        if(wild&&["physical","magic"].includes(monster.archetype)){
+        const projected=["wild","daily"].includes(monster.mode)&&monster.balanceOwner==="MonsterBalance";
+        if(projected&&["physical","magic"].includes(monster.archetype)){
             pool=pool.filter(id=>skillDatabase[id].category===monster.archetype);
         }
-        if(wild&&monster.archetype==="speedControl"){
+        if(projected&&monster.archetype==="speedControl"){
             const control=pool.filter(id=>{
                 const skill=skillDatabase[id];
                 return skill.agilityDownChance||skill.stunChance||skill.defenseDownChance||skill.freezeChance;
@@ -368,7 +368,7 @@
         }
         monster.v144LegalSkillPool=pool.slice();
         monster.skillIds=shuffled(pool).slice(0,monsterCarryLimit(monster.level));
-        if(wild){
+        if(projected){
             monster.v141SupportSkillIds=[];
             if(monster.archetype==="support"&&monster.level>10&&isMonsterSkillElementLegal(monster,"healSpell")){
                 monster.v141SupportSkillIds=["healSpell"];

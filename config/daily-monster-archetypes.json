@@ -1,0 +1,41 @@
+{
+  "workId": "MONSTER-BALANCE-OWNER-P2B-DAILY-20261003",
+  "entries": {
+    "daily.exp.regular": {
+      "archetype": "magic",
+      "reason": "Existing elemental damage pool for cultivation disciple."
+    },
+    "daily.exp.elite": {
+      "archetype": "magic",
+      "reason": "Cultivation elite uses the same legal spell pool."
+    },
+    "daily.exp.boss": {
+      "archetype": "balanced",
+      "reason": "Cultivation instructor has mixed damage skills."
+    },
+    "daily.material.regular": {
+      "archetype": "tank",
+      "reason": "Armored ore guard; defensive allocation, no new tank AI."
+    },
+    "daily.material.elite": {
+      "archetype": "physical",
+      "reason": "Ore elite uses existing physical damage skills."
+    },
+    "daily.material.boss": {
+      "archetype": "tank",
+      "reason": "Ore commander is durable; no new defensive skill."
+    },
+    "daily.gold.regular": {
+      "archetype": "physical",
+      "reason": "Vault guard uses existing physical damage pool."
+    },
+    "daily.gold.elite": {
+      "archetype": "speedControl",
+      "reason": "Existing elemental control/debuff skills when legal; damage fallback."
+    },
+    "daily.gold.boss": {
+      "archetype": "balanced",
+      "reason": "Vault manager uses mixed legal damage pool."
+    }
+  }
+}
