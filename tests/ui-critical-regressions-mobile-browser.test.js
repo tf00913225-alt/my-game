@@ -83,9 +83,14 @@ setTimeout(function(){
     var label=action.querySelector('.skill-action-card-label');
     var rect=action.getBoundingClientRect(),text=row.querySelector('.skill-row-text');
     var textRect=text.getBoundingClientRect();
+    var rowRect=row.getBoundingClientRect(),rowStyle=getComputedStyle(row);
+    var iconRect=row.querySelector('.skill-row-icon').getBoundingClientRect();
+    var actionRects=Array.from(row.querySelectorAll('.skill-action-card')).map(function(node){var r=node.getBoundingClientRect();return {left:r.left,right:r.right,width:r.width};});
+    var contentWidth=rowRect.width-parseFloat(rowStyle.paddingLeft)-parseFloat(rowStyle.paddingRight)-parseFloat(rowStyle.borderLeftWidth)-parseFloat(rowStyle.borderRightWidth);
+    var availableTextWidth=contentWidth-iconRect.width-actionRects.reduce(function(total,r){return total+r.width;},0)-parseFloat(rowStyle.columnGap)*(row.children.length-1);
     scenes.push({id:id,label:label.textContent.trim(),disabled:action.disabled,
       width:rect.width,height:rect.height,fontSize:getComputedStyle(label).fontSize,
-      textWidth:textRect.width,textFont:getComputedStyle(text.querySelector(".skill-row-desc")).fontSize,
+      textWidth:textRect.width,availableTextWidth:availableTextWidth,textDoesNotOverlap:textRect.left>=iconRect.right&&actionRects.every(function(r){return textRect.right<=r.left;}),textFits:text.scrollWidth<=text.clientWidth+1,textFont:getComputedStyle(text.querySelector(".skill-row-desc")).fontSize,
       labelFits:label.scrollWidth<=label.clientWidth+1,
       gate:characterSkillLoadouts.fire.skillLevels[id]
         ?window.v17364GetSkillUpgradeEligibility(player,skillDatabase[id],characterSkillLoadouts.fire.skillLevels[id])
@@ -145,7 +150,12 @@ try{
         assert.ok(row.width<=112&&row.width>=72,"canonical compact button width: "+JSON.stringify(row));
         assert.ok(row.height>=44,"skill action touch height");
         assert.ok(parseFloat(row.fontSize)>=13&&parseFloat(row.textFont)>=13,"readable skill text");
-        assert.ok(row.textWidth>row.width,"description retains the main row width");
+        // The flex owner gives text all remaining space after the icon and every
+        // action. Learned skills have both growth and equip buttons; comparing
+        // text with one button depends on font metrics rather than this contract.
+        assert.ok(row.textWidth>0&&Math.abs(row.textWidth-row.availableTextWidth)<=1,"description occupies remaining row width: "+JSON.stringify(row));
+        assert.equal(row.textDoesNotOverlap,true,"description must not overlap icon or actions");
+        assert.equal(row.textFits,true,"skill text must fit its column");
         assert.equal(row.labelFits,true,"skill action label must not overflow");
     }
     assert.equal(data.gold.shadow,"none");
