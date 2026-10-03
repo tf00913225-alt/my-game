@@ -1,3 +1,11 @@
+## 2026-10-03 — V17373-POST-RELEASE-CLOSEOUT-20261003（P1-A 發布後結案）
+
+- 現行生命週期：V173.73 RELEASED／NORMAL DEVELOPMENT；Freeze 已解除。舊 Freeze／Candidate pending／main 未修改段落均為各工作當時歷史，不代表目前狀態。
+- main／Production deployed SHA：`f63d69dbfa66ba75637d1c3cd7fcc7d74782e356`；Game／Cache 173.73／173.73；正式 Requirements 23／23 VERIFIED。#772／#776／#778／#779 均 MERGED。main CI 37120857492、Production deployment 37121755907 SUCCESS；正式六尺寸／鍛造／戰鬥音效／秘寶24場 QA 與 deployed SHA PASS，證據 owner 為該發布鏈最終 PR 紀錄。
+- 開工 dev `8d797b6b9ce91abfa42064a2f044c2028060b672`；CI 37119839493、DEV deployment job111195007801 SUCCESS。逐檔 main→dev／dev→main：12 檔差異全部屬 #777 獨立影子架構；正式驗收 QA owner blob `841295ba8d5dabdc744ceb6b15f5070b5022e6f1` 兩邊一致。沒有 main-only 有效修復；Production acceptance fix absorbed in both main and dev；正式發布有效內容收斂 VERIFIED（不是完整 tree 相同）。禁止為歷史圖合併 main→dev，也不回推 dev 新開發至 main。
+- 分類 Convergence（收斂）；owner 為 release/v17373-scope.json、docs/V17373_RELEASE_SCOPE_20261002.md；永久證據 docs/v17373-post-release-closeout-20261003.json。歷史 Freeze／Candidate／baseline 保留於歷史欄位；正式版本、Gameplay Runtime、CI 與玩家公告不改。需求清單保留23項正式版＋#777，另追加本文件工程驗證，不能把 dev 總數當成正式版23項。
+- Branch `docs/v17373-post-release-closeout-20261003`；Target dev；PR 為本工作即時狀態 owner，記錄最終 CI／合併SHA／DEV部署／分支清理。#780 未關閉、改base、合併或修改分支；歷史PR清理由P1-B另做，本次完全排除一般Bug／怪物Phase2A／Cloud／鍛造後續／UI與新功能。
+
 ## 2026-10-03 — MONSTER-BALANCE-OWNER-P2A-WILD-20261003（PR #780 續接候選）
 
 - 原開工 dev de5e2049，續接觀察 dev8d797b6b/main642727e0；沿用 feature/monster-balance-owner-phase2a-wild-20261003 與 #780，不改 main、不進 Daily。

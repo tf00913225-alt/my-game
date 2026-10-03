@@ -1,0 +1,184 @@
+{
+  "schemaVersion": 1,
+  "workId": "V17373-POST-RELEASE-CLOSEOUT-20261003",
+  "classification": "P1 / Documentation Convergence",
+  "state": "RELEASED",
+  "mode": "NORMAL DEVELOPMENT",
+  "releaseVersion": "173.73",
+  "cacheVersion": "173.73",
+  "mainSha": "f63d69dbfa66ba75637d1c3cd7fcc7d74782e356",
+  "productionDeployedSha": "f63d69dbfa66ba75637d1c3cd7fcc7d74782e356",
+  "reviewedDevSha": "8d797b6b9ce91abfa42064a2f044c2028060b672",
+  "productionRequirements": {
+    "verified": 23,
+    "total": 23,
+    "sourceRef": "f63d69dbfa66ba75637d1c3cd7fcc7d74782e356"
+  },
+  "releaseChain": [
+    772,
+    776,
+    778,
+    779
+  ],
+  "verificationSources": {
+    "mainCI": {
+      "run": 37120857492,
+      "job": 111196518847,
+      "result": "SUCCESS"
+    },
+    "productionDeploy": {
+      "run": 37121755907,
+      "job": 111199073315,
+      "result": "SUCCESS",
+      "manifestAndResourceReadback": "PASS",
+      "pagesSource": "GitHub Actions"
+    },
+    "reviewedDevCI": {
+      "run": 37119839493,
+      "job": 111193660546,
+      "result": "SUCCESS"
+    },
+    "reviewedDevDeploy": {
+      "job": 111195007801,
+      "result": "SUCCESS",
+      "deploymentShaVerified": true
+    },
+    "productionEvidenceArtifact": {
+      "id": 11273931287,
+      "sha256": "48d3309622e6ebcb9681674aa90cfb40dc521f2a6ab47cf009718c0525b3010c",
+      "auditSource": "Final closeout in PR #772/#776/#778/#779; artifact listing and deploy job steps rechecked for this P1. Not downloaded again."
+    }
+  },
+  "productionQA": {
+    "responsive": "6/6 PASS",
+    "forge": [
+      "390x844 PASS",
+      "412x915 PASS"
+    ],
+    "battleAndAudio": "PASS",
+    "relics": "4 relics x 6 modes = 24/24 PASS",
+    "source": "Production run 37121755907 and final release PR closeout. Historical release QA; no new gameplay QA claim."
+  },
+  "freezeEnded": true,
+  "normalDevelopmentRestored": true,
+  "effectiveContentConvergence": {
+    "status": "VERIFIED",
+    "scope": "V173.73 production effective content and acceptance fixes; not full main/dev tree equality",
+    "mainOnlyEffectiveFixes": [],
+    "backflowRequired": false,
+    "qaOwner": {
+      "path": ".github/scripts/battle-layer-audio-live-qa.mjs",
+      "mainBlob": "841295ba8d5dabdc744ceb6b15f5070b5022e6f1",
+      "devBlob": "841295ba8d5dabdc744ceb6b15f5070b5022e6f1",
+      "result": "Production acceptance fix absorbed in both main and dev."
+    },
+    "historyOnlyDivergence": [
+      "6",
+      "7"
+    ],
+    "remainingFileDifferences": [
+      {
+        "path": ".github/workflows/ci.yml",
+        "mainBlob": "94450211399b90903ff6e35b5cd3a1dd41daf18c",
+        "devBlob": "5d6a4d3cf21f0b0fca7ff44cdb8f8d960196480a",
+        "classification": "DEV_POST_RELEASE_PHASE1",
+        "sourcePR": 777,
+        "sourceCommit": "2736e9b7"
+      },
+      {
+        "path": "HANDOFF.md",
+        "mainBlob": "7f61650749daa5d02116f44e9ce590d030909268",
+        "devBlob": "49119861fd99c2b6d7a61e1465f1a48820e417f8",
+        "classification": "DEV_POST_RELEASE_PHASE1",
+        "sourcePR": 777,
+        "sourceCommit": "2736e9b7"
+      },
+      {
+        "path": "docs/MONSTER_BALANCE_OWNER_PHASE1.md",
+        "mainBlob": null,
+        "devBlob": "af9c6ef10d694d4c09787b33627d6d4dd26070e1",
+        "classification": "DEV_POST_RELEASE_PHASE1",
+        "sourcePR": 777,
+        "sourceCommit": "2736e9b7"
+      },
+      {
+        "path": "docs/monster-balance-owner-retirement-map.json",
+        "mainBlob": null,
+        "devBlob": "3d3395d06489ab48b735c42634a2ff73f188a05b",
+        "classification": "DEV_POST_RELEASE_PHASE1",
+        "sourcePR": 777,
+        "sourceCommit": "2736e9b7"
+      },
+      {
+        "path": "docs/monster-balance-shadow-evidence.json",
+        "mainBlob": null,
+        "devBlob": "aeb5ece6d69c34a068f619046d9d9f8b7396b37d",
+        "classification": "DEV_POST_RELEASE_PHASE1",
+        "sourcePR": 777,
+        "sourceCommit": "2736e9b7"
+      },
+      {
+        "path": "docs/monster-balance-shadow-matrix.csv",
+        "mainBlob": null,
+        "devBlob": "8f73bc25cb700c4191e2b69c83cea34cb73b0329",
+        "classification": "DEV_POST_RELEASE_PHASE1",
+        "sourcePR": 777,
+        "sourceCommit": "2736e9b7"
+      },
+      {
+        "path": "js/combat/level-base-contract.mjs",
+        "mainBlob": null,
+        "devBlob": "cb4076aa7e49f5aa8de6ee6b158f0f0afc18ad78",
+        "classification": "DEV_POST_RELEASE_PHASE1",
+        "sourcePR": 777,
+        "sourceCommit": "2736e9b7"
+      },
+      {
+        "path": "js/combat/monster-archetypes.mjs",
+        "mainBlob": null,
+        "devBlob": "b2f3387792ab1a97f0f0ecc3e288fbff6e54321b",
+        "classification": "DEV_POST_RELEASE_PHASE1",
+        "sourcePR": 777,
+        "sourceCommit": "2736e9b7"
+      },
+      {
+        "path": "js/combat/monster-balance-owner.mjs",
+        "mainBlob": null,
+        "devBlob": "3cc78e115dee301d282e96041cb11c14ea02a851",
+        "classification": "DEV_POST_RELEASE_PHASE1",
+        "sourcePR": 777,
+        "sourceCommit": "2736e9b7"
+      },
+      {
+        "path": "release/requirements.json",
+        "mainBlob": "3b9252ae87fe8fe49629522364f9c0f278cc906f",
+        "devBlob": "031780afb497b653e8d72cc10684ddb7ade003c0",
+        "classification": "DEV_POST_RELEASE_PHASE1",
+        "sourcePR": 777,
+        "sourceCommit": "2736e9b7"
+      },
+      {
+        "path": "scripts/monster-balance-shadow-matrix.mjs",
+        "mainBlob": null,
+        "devBlob": "4d7085d17c429f58f35c27dc49be926bcb084614",
+        "classification": "DEV_POST_RELEASE_PHASE1",
+        "sourcePR": 777,
+        "sourceCommit": "2736e9b7"
+      },
+      {
+        "path": "tests/monster-balance-owner-phase1.test.mjs",
+        "mainBlob": null,
+        "devBlob": "05ab00b44db7238635fd4b1e4c70b77ec80c52e6",
+        "classification": "DEV_POST_RELEASE_PHASE1",
+        "sourcePR": 777,
+        "sourceCommit": "2736e9b7"
+      }
+    ],
+    "interpretation": "Separate release merge history (#772/#776/#779) and dev acceptance merge (#778); remaining 12 file deltas all from independent #777 shadow architecture. No merge main into dev, rebase, force push, history rewrite or dev feature publication."
+  },
+  "protectedWork": {
+    "pr": 780,
+    "policy": "Read-only identification; no changes to PR, base, state, branch or merge. Independent active work remains excluded."
+  },
+  "completionOwner": "This Work ID PR body records final CI, merge/dev SHA, deployment and branch cleanup; no self-referential commit SHA stored in source."
+}
