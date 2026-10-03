@@ -16,7 +16,7 @@
           "tests/cloud-save-battle-encounter.test.mjs",
           "scripts/test-session-authority-emulator.mjs"
         ],
-        "verification": "Local targeted55/55 and cloud/backend170/170 PASS; build:check PASS. Real emulator/current-head CI and integration/deploy pending.",
+        "verification": "Local targeted56/56 and cloud/backend171/171 PASS; build:check PASS. Real emulator/current-head CI and integration/deploy pending.",
         "result": "Single enemy stat-definition binding only; no callable/game hook/combat rules/outcome/reward. Phase4 remains0/6 VERIFIED."
       }
     }

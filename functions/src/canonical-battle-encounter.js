@@ -49,20 +49,26 @@ function createCanonicalBattleEncounter(dependencies){
             const proof=await preparations.readPreparation(tx,session,
                 {operationId:attemptId,expectedRevision},requestTime);
             const {attempt}=proof;
-            const ref=root.collection("battleEncounters").doc(operationId);
+            const ref=root.collection("battleEncounters").doc(attemptId);
             const receiptRef=root.collection("operations").doc(operationId);
             const markerRef=root.collection("battleEncounterAttempts").doc(attemptId);
-            const [sealedSnap,receiptSnap,markerSnap,grantSnap,ledgerSnap,accountSnap,envelopeSnap]=
+            const [sealedSnap,receiptSnap,markerSnap,grantSnap,ledgerSnap,accountSnap,envelopeSnap,otherAttemptSnap]=
                 await Promise.all([tx.get(ref),tx.get(receiptRef),tx.get(markerRef),
                     tx.get(root.collection("grantOperations").doc(operationId)),
                     tx.get(root.collection("ledgerEntries").doc(operationId)),
                     tx.get(root.collection("account").doc("current")),
-                    tx.get(db.collection("users").doc(uid).collection("saves").doc("current"))]);
+                    tx.get(db.collection("users").doc(uid).collection("saves").doc("current")),
+                    tx.get(root.collection("battleAttempts").doc(operationId))]);
+            // The primary seal is keyed by preparation too: losing its separate
+            // marker must never allow a different operation to reseal that source.
+            if(sealedSnap.exists&&sealedSnap.data().operationId!==operationId){
+                fail("already-exists","Preparation already has an encounter seal.");
+            }
             if(sealedSnap.exists||receiptSnap.exists){
                 const sealed=sealedSnap.exists?sealedSnap.data():null;
                 const receipt=receiptSnap.exists?receiptSnap.data():null;
                 const marker=markerSnap.exists?markerSnap.data():null;
-                if(!sealed||!receipt||!marker||grantSnap.exists||ledgerSnap.exists||
+                if(!sealed||!receipt||!marker||grantSnap.exists||ledgerSnap.exists||otherAttemptSnap.exists||
                    sealed.schemaVersion!==1||sealed.kind!==KIND||sealed.ownerUid!==uid||
                    sealed.operationId!==operationId||sealed.attemptId!==attemptId||
                    sealed.attemptSha256!==attempt.sha256||sealed.encounterKey!==encounterKey||
@@ -93,7 +99,7 @@ function createCanonicalBattleEncounter(dependencies){
                 }catch(_){fail("data-loss","Original encounter policy is missing or inconsistent.");}
                 return result(sealed,true,requestTime);
             }
-            if(grantSnap.exists||ledgerSnap.exists)fail("failed-precondition","Operation ID is already used.");
+            if(grantSnap.exists||ledgerSnap.exists||otherAttemptSnap.exists)fail("failed-precondition","Operation ID is already used.");
             if(markerSnap.exists)fail("already-exists","Preparation already has an encounter seal.");
             if(proof.result.expired||requestTime<attempt.issuedAtMs){
                 fail("failed-precondition","Preparation is expired or outside its server time window.");

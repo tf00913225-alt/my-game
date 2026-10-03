@@ -108,7 +108,7 @@ for(const name of ['battleAttempts','operations','battleAttemptSources','playabl
 for(const name of ['battleEncounters','operations','battleEncounterAttempts','battleEncounterPolicies']){
   test(`missing ${name} replay cannot regenerate evidence`,async()=>{
     const h=fixture();await h.begin();const first=await h.seal();
-    h.data.delete(`${h.root}/${name}/${name==='battleEncounterPolicies'?first.policySha256:name==='battleEncounterAttempts'?attemptId:operationId}`);
+    h.data.delete(`${h.root}/${name}/${name==='battleEncounterPolicies'?first.policySha256:['battleEncounterAttempts','battleEncounters'].includes(name)?attemptId:operationId}`);
     await assert.rejects(h.seal());assert.equal(h.writes,7);
   });
 }
@@ -117,7 +117,7 @@ for(const [field,value] of Object.entries({ownerUid:'foreign',sourceRevision:9,a
   expiresAtMs:9999999,sealedAtMs:0,creationSessionId:'n'.repeat(32),combatRulesReady:true,
   outcomeVerified:true,rewardEligible:true,creditedToCharacter:true,sha256:'0'.repeat(64)})){
   test(`tampered ${field} fails closed`,async()=>{const h=fixture();await h.begin();await h.seal();
-    h.data.get(`${h.root}/battleEncounters/${operationId}`)[field]=value;
+    h.data.get(`${h.root}/battleEncounters/${attemptId}`)[field]=value;
     await assert.rejects(h.seal(),e=>e.code==='data-loss');assert.equal(h.writes,7);});
 }
 test('policy tampering, foreign policy and corrupt receipt/marker refuse replay',async()=>{
@@ -141,7 +141,15 @@ test('different session, cross UID, operation collisions and client win/stat/rew
     await assert.rejects(h.seal({}, {data:{uid,session:{},[key]:true}}),e=>e.code==='invalid-argument');
   }
   for(const key of ['unknown','__proto__','wild.zone-02.fire-01'])await assert.rejects(h.seal({encounterKey:key}),e=>e.code==='invalid-argument');
-  for(const p of ['grantOperations','ledgerEntries']){h.data.set(`${h.root}/${p}/${operationId}`,{});
+  for(const p of ['grantOperations','ledgerEntries','battleAttempts']){h.data.set(`${h.root}/${p}/${operationId}`,{});
     await assert.rejects(h.seal(),e=>e.code==='failed-precondition');h.data.delete(`${h.root}/${p}/${operationId}`);}
   assert.equal(h.writes,3);
+});
+
+test('missing one uniqueness record cannot let a different operation reseal the same preparation',async()=>{
+  for(const name of ['battleEncounters','battleEncounterAttempts']){
+    const h=fixture();await h.begin();await h.seal();h.data.delete(`${h.root}/${name}/${attemptId}`);
+    await assert.rejects(h.seal({operationId:'battle-encounter-seal-0002'}),e=>e.code==='already-exists');
+    assert.equal(h.writes,7);
+  }
 });

@@ -401,14 +401,20 @@ assert.equal(encounterStart.combatRulesReady,false);assert.equal(encounterStart.
 assert.equal(encounterStart.rewardEligible,false);assert.equal(encounterStart.creditedToCharacter,false);
 assert.equal(encounterStart.expiresAtMs,battleStart.expiresAtMs);
 assert.deepEqual(await encounterOwner.seal(yRequest,winningEncounterArgs),{...encounterStart,unchanged:true});
-for(const path of [`battleEncounters/${encounterStart.operationId}`,`operations/${encounterStart.operationId}`,
+for(const path of [`battleEncounters/${battleStart.attemptId}`,`operations/${encounterStart.operationId}`,
     `battleEncounterAttempts/${battleStart.attemptId}`,`battleEncounterPolicies/${encounterStart.policySha256}`,
     "playableSnapshots/2","recoveryArchives/2"]){
     const ref=db.doc(`serverUsers/${y}/${path}`),saved=(await ref.get()).data();
     await ref.delete();await assert.rejects(encounterOwner.seal(yRequest,winningEncounterArgs));
     assert.equal((await ref.get()).exists,false);await ref.set(saved);
 }
-const sealedEncounterRef=battleRoot.collection("battleEncounters").doc(encounterStart.operationId);
+for(const name of ["battleEncounters","battleEncounterAttempts"]){
+    const ref=battleRoot.collection(name).doc(battleStart.attemptId),saved=(await ref.get()).data();
+    await ref.delete();
+    await assert.rejects(encounterOwner.seal(yRequest,{...winningEncounterArgs,operationId:"encounter-seal-emulator-0003"}),e=>e.code==="already-exists");
+    assert.equal((await ref.get()).exists,false);await ref.set(saved);
+}
+const sealedEncounterRef=battleRoot.collection("battleEncounters").doc(battleStart.attemptId);
 const savedEncounter=(await sealedEncounterRef.get()).data();
 for(const patch of [{rewardEligible:true},{outcomeVerified:true},{expiresAtMs:battleStart.expiresAtMs+1},
     {definitionSha256:"0".repeat(64)},{ownerUid:x}]){
@@ -429,7 +435,7 @@ await assert.rejects(encounterOwner.seal({...yRequest,data:{uid:y,session:sessio
 await assert.rejects(encounterOwner.seal({auth:{uid:x,token:claims(a.idToken)},data:{uid:x,session:sessionA}},winningEncounterArgs),e=>e.message==="SESSION_REVOKED");
 encounterClock=battleStart.expiresAtMs;
 assert.deepEqual(await encounterOwner.seal(yRequest,winningEncounterArgs),{...encounterStart,unchanged:true,expired:true});
-for(const path of [`battleEncounters/${encounterStart.operationId}`,`battleEncounterPolicies/${encounterStart.policySha256}`]){
+for(const path of [`battleEncounters/${battleStart.attemptId}`,`battleEncounterPolicies/${encounterStart.policySha256}`]){
     assert.equal(await rulesRequest(`serverUsers/${y}/${path}`,yUser.idToken),403);
     assert.equal(await rulesRequest(`serverUsers/${y}/${path}`,yUser.idToken,"PATCH"),403);
 }
