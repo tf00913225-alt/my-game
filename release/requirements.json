@@ -423,6 +423,23 @@
           "nextStage": "Only after explicit release-freeze authorization: fix candidate SHA and perform required Exact-HEAD full suite and release acceptance."
         }
       }
+    },
+    {
+      "id": "REQ-MONSTER-BALANCE-OWNER-P1-20261003",
+      "title": "怪物平衡唯一架構／共用等級契約／影子計算與退場地圖第一階段",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "js/combat/level-base-contract.mjs",
+          "js/combat/monster-archetypes.mjs",
+          "js/combat/monster-balance-owner.mjs",
+          "tests/monster-balance-owner-phase1.test.mjs",
+          "docs/monster-balance-owner-retirement-map.json",
+          "docs/monster-balance-shadow-matrix.csv"
+        ],
+        "verification": "focused shadow regression + related Six-Stat/Tower/Abyss tests + unchanged production artifacts",
+        "result": "focused11/11PASS; directly related Node9/9PASS; build/build:check PASS and generated production artifacts unchanged; syntax356/356PASS; CI integration and exact deployed SHA tracked in Work PR"
+      }
     }
   ]
 }

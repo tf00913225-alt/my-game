@@ -1,0 +1,296 @@
+{
+  "workId": "MONSTER-BALANCE-OWNER-P1-20261003",
+  "phase": 1,
+  "classification": [
+    "Convergence",
+    "Replacement Preparation"
+  ],
+  "canonicalOwners": {
+    "level": "js/combat/level-base-contract.mjs",
+    "allocationAndIntent": "js/combat/monster-archetypes.mjs",
+    "monsterProjection": "js/combat/monster-balance-owner.mjs"
+  },
+  "phase1Gate": "shadow architecture PASS only; formal multi-owner convergence intentionally deferred until approved Phase2",
+  "grandfatheredWrappers": {
+    "js/34-v141-core-systems.js": 1,
+    "js/40-v144-rules-and-abyss.js": 1,
+    "js/47-v158-combat-tuning.js": 1
+  },
+  "items": [
+    {
+      "id": "coreAllocation",
+      "file": "js/00-main.js",
+      "sourceToken": "generateMonsterAttributePoints",
+      "status": "CURRENT OWNER",
+      "decision": "TO RETIRE",
+      "phase": "Phase 2 Wild then final shared-user migration",
+      "reason": "(level-1)*5 + archetype allocation; retain legacy only for unmigrated modes",
+      "phase1": "KEEP Runtime exactly unchanged",
+      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+    },
+    {
+      "id": "coreStats",
+      "file": "js/00-main.js",
+      "sourceToken": "makeZoneMonster",
+      "status": "CURRENT OWNER",
+      "decision": "TO MIGRATE",
+      "phase": "Phase 2 Wild → Boss final",
+      "reason": "stat generation migrates; skill/identity construction responsibility kept separately",
+      "phase1": "KEEP Runtime exactly unchanged",
+      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+    },
+    {
+      "id": "playerLevelBase",
+      "file": "js/00-main.js",
+      "sourceToken": "calculateCharacterBaseStats",
+      "status": "CURRENT OWNER",
+      "decision": "TO MIGRATE",
+      "phase": "separate approved player Runtime migration",
+      "reason": "shared new Contract shadows both; player currently level*4/4/3; no Phase 1 switch",
+      "phase1": "KEEP Runtime exactly unchanged",
+      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+    },
+    {
+      "id": "wildV131",
+      "file": "js/25-v131-fix-batch.js",
+      "sourceToken": "strengthenMonster",
+      "status": "CURRENT OWNER",
+      "decision": "TO RETIRE",
+      "phase": "Phase 2 Wild",
+      "reason": "global/zone calibration moves into explicit wild Mode Profile; remove post writes",
+      "phase1": "KEEP Runtime exactly unchanged",
+      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+    },
+    {
+      "id": "wildV141",
+      "file": "js/34-v141-core-systems.js",
+      "sourceToken": "strengthenNewWildMonster",
+      "status": "CURRENT OWNER",
+      "decision": "TO RETIRE",
+      "phase": "Phase 2 Wild",
+      "reason": "wind/earth construction becomes spec; remove duplicate strength writer",
+      "phase1": "KEEP Runtime exactly unchanged",
+      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+    },
+    {
+      "id": "wildRank",
+      "file": "js/34-v141-core-systems.js",
+      "sourceToken": "v141RollWildMonsterRanks",
+      "status": "CURRENT OWNER",
+      "decision": "TO MIGRATE",
+      "phase": "Phase 2 Wild",
+      "reason": "10% rank selection preserved separately; projection moves into Rank Profile; no extra ability budget",
+      "phase1": "KEEP Runtime exactly unchanged",
+      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+    },
+    {
+      "id": "wildV141Wrapper",
+      "file": "js/34-v141-core-systems.js",
+      "sourceToken": "originalMakeZoneMonster",
+      "status": "COMPATIBILITY",
+      "decision": "TO RETIRE",
+      "phase": "Phase 2 final shared construction",
+      "reason": "skill carry selection moves to explicit existing skill owner, not balance owner",
+      "phase1": "KEEP Runtime exactly unchanged",
+      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+    },
+    {
+      "id": "dungeonStrength",
+      "file": "js/27-v132-content-expansion.js",
+      "sourceToken": "applyDungeonMonsterStrength",
+      "status": "CURRENT OWNER",
+      "decision": "TO RETIRE",
+      "phase": "Phase 2 Daily → Tower → Abyss → Boss final",
+      "reason": "keep for unmigrated users only; remove at last dependent migration",
+      "phase1": "KEEP Runtime exactly unchanged",
+      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+    },
+    {
+      "id": "dungeonNormal",
+      "file": "js/27-v132-content-expansion.js",
+      "sourceToken": "applyDungeonNormalBonus",
+      "status": "CURRENT OWNER",
+      "decision": "TO RETIRE",
+      "phase": "Phase 2 Daily → Tower → Abyss → Boss final",
+      "reason": "same dependency rule; legacy 1.30/1.10 not ratified",
+      "phase1": "KEEP Runtime exactly unchanged",
+      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+    },
+    {
+      "id": "dungeonRank",
+      "file": "js/27-v132-content-expansion.js",
+      "sourceToken": "applyDungeonRankStrength",
+      "status": "CURRENT OWNER",
+      "decision": "TO RETIRE",
+      "phase": "Phase 2 Daily → Boss final",
+      "reason": "3.20/4.50 HP,2 SP,1.25/1.40 defense comparison only",
+      "phase1": "KEEP Runtime exactly unchanged",
+      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+    },
+    {
+      "id": "equipmentRank",
+      "file": "js/27-v132-content-expansion.js",
+      "sourceToken": "applyEquipmentDungeonRankStrength",
+      "status": "CURRENT OWNER",
+      "decision": "TO RETIRE",
+      "phase": "Phase 2 Daily (including equipment)",
+      "reason": "equipment 1.80/2.80 HP and1.10/1.20 defense require subtype spec",
+      "phase1": "KEEP Runtime exactly unchanged",
+      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+    },
+    {
+      "id": "beginnerScaling",
+      "file": "js/47-v158-combat-tuning.js",
+      "sourceToken": "halveMonsterCoreStats",
+      "status": "CURRENT OWNER",
+      "decision": "TO RETIRE",
+      "phase": "Phase 2 Wild",
+      "reason": "0.5 scaling, zero agility and fixed normal damage require explicit beginner compatibility decision",
+      "phase1": "KEEP Runtime exactly unchanged",
+      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+    },
+    {
+      "id": "dailyScaling",
+      "file": "js/47-v158-combat-tuning.js",
+      "sourceToken": "normalizeDailyDungeonMonster",
+      "status": "CURRENT OWNER",
+      "decision": "TO RETIRE",
+      "phase": "Phase 2 Daily",
+      "reason": "party/level/0.5 scaling and point double-scaling move to single prebattle projection; remove render normalization",
+      "phase1": "KEEP Runtime exactly unchanged",
+      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+    },
+    {
+      "id": "v158Wrapper",
+      "file": "js/47-v158-combat-tuning.js",
+      "sourceToken": "previousMakeZoneMonster",
+      "status": "COMPATIBILITY",
+      "decision": "TO RETIRE",
+      "phase": "Phase 2 final shared construction",
+      "reason": "default independent evasion0 becomes construction default",
+      "phase1": "KEEP Runtime exactly unchanged",
+      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+    },
+    {
+      "id": "legacyAbyss",
+      "file": "js/36-v141-content-systems.js",
+      "sourceToken": "v141BuildAbyssRoster",
+      "status": "LEGACY OWNER",
+      "decision": "TO RETIRE",
+      "phase": "Phase 2 Abyss",
+      "reason": "formal bundle contains old extra HP path; migrate compatibility API callers and legacy save projection first",
+      "phase1": "KEEP Runtime exactly unchanged",
+      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+    },
+    {
+      "id": "abyssDurability",
+      "file": "js/59-abyss-two-tier-runtime.js",
+      "sourceToken": "applyHpMultiplier",
+      "status": "CURRENT OWNER",
+      "decision": "TO MIGRATE",
+      "phase": "Phase 2 Abyss",
+      "reason": "1.875 and exact existing Lv20/40 roster targets preserved in comparison; not rebalanced in Phase1",
+      "phase1": "KEEP Runtime exactly unchanged",
+      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+    },
+    {
+      "id": "bossMultipliers",
+      "file": "js/gameplay-boss-tower-system.js",
+      "sourceToken": "buildBossMonster",
+      "status": "CURRENT OWNER",
+      "decision": "TO RETIRE",
+      "phase": "Phase 2 Personal/World Boss",
+      "reason": "HP/attack factors become explicit boss mode prebattle profile",
+      "phase1": "KEEP Runtime exactly unchanged",
+      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+    },
+    {
+      "id": "towerBossMultipliers",
+      "file": "js/gameplay-boss-tower-system.js",
+      "sourceToken": "buildTowerBossMonster",
+      "status": "CURRENT OWNER",
+      "decision": "TO RETIRE",
+      "phase": "Phase 2 Tower",
+      "reason": "tower smallBoss final calibration separately approved",
+      "phase1": "KEEP Runtime exactly unchanged",
+      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+    },
+    {
+      "id": "bossUnusedDefense",
+      "file": "js/gameplay-boss-tower-system.js",
+      "sourceToken": "defenseMultiplier",
+      "status": "LEGACY OWNER",
+      "decision": "TO RETIRE",
+      "phase": "Phase 2 Tower/Boss consumer API audit",
+      "reason": "unused metadata field; never apply to construction; remove getter field with consumer contract migration",
+      "phase1": "KEEP Runtime exactly unchanged",
+      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+    },
+    {
+      "id": "towerElement",
+      "file": "js/gameplay-boss-tower-system.js",
+      "sourceToken": "applyTowerElementProfile",
+      "status": "CURRENT OWNER",
+      "decision": "TO MIGRATE",
+      "phase": "Phase 2 Tower",
+      "reason": "HP/defense/speed projection moves into balance owner; skill/effect metadata remains existing Tower owner",
+      "phase1": "KEEP Runtime exactly unchanged",
+      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+    },
+    {
+      "id": "towerLevel",
+      "file": "js/gameplay-boss-tower-system.js",
+      "sourceToken": "towerMonsterLevel",
+      "status": "CURRENT OWNER",
+      "decision": "TO RETIRE",
+      "phase": "Phase 2 Tower",
+      "reason": "floor=N becomes level=N; fixed10 composition and gameplay skill features KEEP",
+      "phase1": "KEEP Runtime exactly unchanged",
+      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+    },
+    {
+      "id": "enemyPressure",
+      "file": "js/00-main.js",
+      "sourceToken": "getEnemyPressureMultiplier",
+      "status": "CURRENT OWNER",
+      "decision": "TO MIGRATE",
+      "phase": "Phase 2 each mode then Boss final",
+      "reason": "mode explicit; v132Dungeon flag cannot imply daily; damage settlement KEEP single owner consumes resolved profile",
+      "phase1": "KEEP Runtime exactly unchanged",
+      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+    },
+    {
+      "id": "adventureBuild",
+      "file": "js/adventure/adventure-runtime-v1-20260915.js",
+      "sourceToken": "buildEncounter",
+      "status": "CURRENT OWNER",
+      "decision": "TO MIGRATE",
+      "phase": "Phase 2 Adventure",
+      "reason": "direct makeZoneMonster rank semantics convert to explicit spec; encounter progression KEEP",
+      "phase1": "KEEP Runtime exactly unchanged",
+      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+    },
+    {
+      "id": "v144Wrapper",
+      "file": "js/40-v144-rules-and-abyss.js",
+      "sourceToken": "previousMakeZoneMonster",
+      "status": "COMPATIBILITY",
+      "decision": "TO RETIRE",
+      "phase": "Phase 2 final shared construction",
+      "reason": "newly scanned wrapper configures legal skills; guard KEEP in V144, no balance owner skill execution",
+      "phase1": "KEEP Runtime exactly unchanged",
+      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+    },
+    {
+      "id": "v144SkillGuard",
+      "file": "js/40-v144-rules-and-abyss.js",
+      "sourceToken": "v144IsMonsterSkillElementLegal",
+      "status": "CURRENT OWNER",
+      "decision": "KEEP",
+      "phase": "all phases",
+      "reason": "existing carried/legal skills remain sole AI legality authority; no invented skills",
+      "phase1": "KEEP Runtime exactly unchanged",
+      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+    }
+  ]
+}
