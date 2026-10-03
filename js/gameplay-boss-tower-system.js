@@ -1323,7 +1323,7 @@
             mode:"tower",
             floor:target,
             towerBoss:towerBoss,
-            expectedPartySize:expectedPartySizeForLevel(towerMonsterLevel(target))
+            expectedPartySize:expectedPartySizeForLevel(target)
         };
         battleStarting=true;
         const launch=()=>{
