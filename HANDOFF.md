@@ -1,3 +1,12 @@
+## 2026-10-03 — MONSTER-BALANCE-OWNER-P1-20261003（影子架構，非正式切換）
+
+- Base dev `9284bff51226119c9c2ffd21e01daefa3c49cec5`；main observed `d71bc663bd8f0b501f68467b7abee6ca018b4734`，本工作禁止修改。Branch `feature/monster-balance-owner-phase1-20261003`；同目的有效分支未發現。PR#776是另一條main發布驗收工作，不變更。
+- Canonical future/shadow：`js/combat/level-base-contract.mjs`共用Lv1/growth/六圍係數，`monster-archetypes.mjs`唯一6職能／最大餘數分配／AI intent，`monster-balance-owner.mjs::MonsterBalance.preview`唯一影子前戰投影／profiles／breakdown。未加入正式build/load鏈、無wrapper/late patch、無entity mutation。
+- 契約/退場：`docs/MONSTER_BALANCE_OWNER_PHASE1.md`與`docs/monster-balance-owner-retirement-map.json`。25項具體決策；新增掃描發現V144建怪wrapper；3既有wrapper列grandfathered，正式Runtime多Owner尚待Phase2退場，不冒称已收斂。boss defenseMultiplier未使用欄位判為TO RETIRE，禁止補算。
+- 540比較矩陣CSV與50實際Abyss roster/source hash evidence JSON；Lv1/10/30/50/70/100×6archetype×3rank×5mode。Abyss只有Lv20/40，actualLevel/element/sameLevel明列，不能當同級TTK答案。HP100/SP50為相容診斷基底；每級HP30/SP10、rank/mode校正、Tower/Abyss TTK仍Pending。
+- Phase2順序Wild→Daily（含equipment）→Tower→Abyss→Adventure→Personal/World Boss，每一玩法接管/驗證/實體退休後才下一個；Phase1完成即停止。既有技能合法性/傷害結算/編成與元素特色KEEP，不新增技能。
+- Checkpoint：focused11/11PASS、直接相關Node9/9PASS、build/build:check及syntax356/356PASS；既有CI相關step追加本套測試，未新增workflow。功能Requirement24/24VERIFIED，PR CI/merge/dev部署/分支清理pending，以本Work PR為即時狀態Owner。Game/Cache173.73不變；正式戰鬥/玩家存檔/Cloud/UI/掉落EXP金幣來源未修改。
+
 ## 2026-10-03 — RELEASE-CI-DEPLOYMENT-OWNER-20261003（發布檢查控制來源收斂）
 
 - 從 dev/Candidate C `09a6c8d2dc52ebeccc032078c45af6b7b55e4137` 建立 `fix/release-ci-deployment-owner-20261003`；main `4b037b47967544d90c781ad938286777c9576731` 禁止修改，#772 維持 Draft／RELEASE BLOCKED。
