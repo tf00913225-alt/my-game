@@ -1,3 +1,11 @@
+## 2026-10-04 — MONSTER-BALANCE-OWNER-P2C-TOWER-20261004（IMPLEMENTED；驗證待 Gate）
+
+- 開工 dev `13c22561afc518ce33b7da798b32e1c215e3cbde`；main `f63d69dbfa66ba75637d1c3cd7fcc7d74782e356` 禁止修改。Branch `feature/monster-balance-owner-phase2c-tower-20261004`。Phase1／2A／2B 已核實，未重做；停止點為 Tower，不進 Abyss Phase2D。
+- Tower 前戰數值切至 `MonsterBalance`：floor=N→LvN；balanced deterministic archetype；Regular 1/1/1、Elite HP1.5/DEF1.1/pressure1.1、smallBoss HP3/DEF1.15/pressure1.15；Rank 不加配點。10倍數 canonical rank=`smallBoss`，generic getMonsterRank 相容回 boss；仍為單格 B3，不進大Boss footprint／援軍／物件機制。
+- 每層10名、5倍數2 Elite、10倍數1 smallBoss+2 Elite、65/70/75/80%技能率與火水風土玩法保留。Earth HP/DEF與Wind speed由Owner投影；Fire crit/direct、Water heal/status/support、Wind evasion仍由Tower gameplay metadata owner。V132 Tower建怪鏈、舊樓層壓縮、Tower bossBalance HP/attack與Earth/Wind stat post-write已退休；Abyss/Adventure/Personal/World Boss legacy依賴保留。
+- V154 已補 canonical smallBoss／vGameplayTowerBoss portrait fallback，避免無正式Boss圖時退成普通天兵。Browser QA 增加 owner/floor/context/rank/no-legacy/projection-equality。新增 4×100 focused gate 與正式 TTK diagnostic；CI尚未執行，所以 Requirement 仍 IMPLEMENTED，不宣稱 VERIFIED。
+- 規格：`docs/MONSTER_BALANCE_OWNER_PHASE2C.md`；退場地圖：`docs/monster-balance-owner-retirement-map.json`；batch：`release/requirement-batches/2026-10-04-monster-balance-owner-phase2c-tower.json`。中央 requirements 暫不新增未驗證項，避免污染 final release-ready；exact-head 功能證據通過後才回填 VERIFIED 並重跑 latest-head CI。
+
 ## 2026-10-03 — MONSTER-BALANCE-OWNER-P2B-DAILY-20261003（功能1/1 VERIFIED；整合／部署待Gate）
 
 - 開工dev4274454a／main f63d69db；main禁止修改；原Phase1/2A契約與#777/#780最終紀錄已核實。Branch feature/monster-balance-owner-phase2b-daily-20261003；本工作PR為耐久狀態Owner。
