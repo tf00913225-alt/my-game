@@ -76,4 +76,14 @@ try{
  const targets=await waitJson('http://127.0.0.1:'+port+'/json/list');client=new Cdp(targets.find(x=>x.type==='page').webSocketDebuggerUrl);await client.send('Page.enable');await client.send('Runtime.enable');await client.send('Emulation.setDeviceMetricsOverride',{width:412,height:915,deviceScaleFactor:1,mobile:true});await client.send('Page.navigate',{url:server.url});evidence=await client.eval(expression);assert.equal(evidence.matrix.length,27);assert.deepEqual(evidence.matrix.map(({element,floor})=>[element,floor]),[...['fire','water','wind','earth'].flatMap(element=>[1,5,10,45,75,100].map(floor=>[element,floor])),['water',100],['water',100],['fire',1]]);
  const shot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(artifact.replace('.json','-battle.png'),Buffer.from(shot.data,'base64'));await client.eval('loseBattle()');await new Promise(r=>setTimeout(r,3000));await client.eval('vGameplayOpenTower()');const ruleShot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(artifact.replace('.json','-rules.png'),Buffer.from(ruleShot.data,'base64'));fs.writeFileSync(artifact,JSON.stringify({passed:true,commitSha:process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||'local',evidence},null,2)+'\n');console.log('Tower challenge production Runtime 24 scenes / 10-unit queue / AOE QA passed');
 }catch(error){fs.writeFileSync(artifact,JSON.stringify({passed:false,error:String(error.stack||error),evidence,console:client?.events.filter(e=>e.method==='Runtime.consoleAPICalled').slice(-12)},null,2)+'\n');throw error;}
-finally{client?.close();proc.kill('SIGTERM');try{fs.rmSync(profile,{recursive:true,force:true,maxRetries:3,retryDelay:100});}catch(_){}await new Promise(r=>{server.server.close(r);server.server.closeAllConnections();});}
+finally{
+ console.log('Tower QA cleanup: closing CDP and Chrome');
+ client?.close();proc.kill('SIGTERM');
+ console.log('Tower QA cleanup: removing temporary profile');
+ try{fs.rmSync(profile,{recursive:true,force:true,maxRetries:3,retryDelay:100});}catch(_){}
+ console.log('Tower QA cleanup: closing HTTP server');
+ await new Promise(r=>{server.server.close(r);server.server.closeAllConnections();});
+ console.log('Tower QA cleanup: HTTP server closed');
+ setTimeout(()=>console.log('Tower QA remaining resources:',process.getActiveResourcesInfo()),5000).unref();
+}
+
