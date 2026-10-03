@@ -30,9 +30,8 @@ const expression=`(async()=>{
  async function scene(type,level,size,automatic){
   const reference=prepareWildBalanceReferenceParty(level,size);
   closeHomeFeature();
-  window.v131GrantElementBoxHours(8,32);for(const c of [autoConfig,autoConfig2,autoConfig3])c.skill=reference.skill;
+  window.v131GrantElementBoxHours(8,32);for(const c of [autoConfig,autoConfig2,autoConfig3]){c.skill=reference.skill;c.enabled=false;}
   autoConfig.enabled=false;autoBattle=false;showPage('dungeon');switchDungeonTab('daily');
-  const beforeGold=gold,beforeExp=sharedExp,beforeMaterial=inventoryItems.filter(x=>x.id==='materialChest').reduce((s,x)=>s+(x.count||1),0);
   const start=type==='exp'?v132BeginExpDungeon:type==='material'?v132BeginMaterialDungeon:v148BeginGoldDungeon;
   const launched=start();await wait(()=>document.getElementById('v169RpgDialogLayer')?.classList.contains('show'));
   const confirm=document.querySelectorAll('#v169RpgDialogLayer .v169-rpg-dialog-button')[1];check(confirm?.textContent==='進入副本','entry confirmation');confirm.click();await launched;
@@ -43,7 +42,7 @@ const expression=`(async()=>{
   try{
    let previousWave=0;
    while(battleActive){
-    await wait(()=>!battleActive||(battlePhase==='declare'&&actionReady&&!document.getElementById('battlePage')?.matches('.v141-preparing-entry,.v141-entry-moving')),100000);if(!battleActive)break;
+    await wait(()=>!battleActive||(battlePhase==='declare'&&battlePresentationLocks.size===0&&!document.getElementById('battlePage')?.matches('.v141-preparing-entry,.v141-entry-moving')),100000);if(!battleActive)break;
     const wave=monsters[0]?.wave;check(wave>=1&&wave<=3,'wave identity');
     if(wave!==previousWave){
      previousWave=wave;verify();renderBattle();verify();
@@ -53,8 +52,18 @@ const expression=`(async()=>{
      window.dailyBalanceQaCapture={type,wave,level,size};await new Promise(r=>setTimeout(r,350));
     }
     const oldRoster=monsters,beforeTurn=turn;encountered.at(-1).rounds=turn;
-    queuedPlayerActions={};for(const i of getExistingPartyIndexes())queuedPlayerActions[i]=chooseWildBalanceReferenceAction(i,reference.skill);
-    startResolutionPhase(battleToken);
+    // Use the real skill button and target card, so declaration timers and
+    // the queue lifecycle are settled by their existing owners.
+    while(battleActive&&battlePhase==='declare'){
+     await wait(()=>!battleActive||battlePhase!=='declare'||(!battleAdvanceScheduled&&battlePresentationLocks.size===0&&declaredCharacterIndexes.has(activeBattleCharacterIndex)));
+     if(!battleActive||battlePhase!=='declare')break;
+     const action=chooseWildBalanceReferenceAction(activeBattleCharacterIndex,reference.skill);
+     toggleSkillQuickBar();
+     const button=document.querySelector('.skill-quick-button[data-skill-id="'+reference.skill+'"]');
+     check(button&&!button.disabled,'manual learned skill button');button.click();
+     check(actionReady&&pendingAction===reference.skill,'formal skill declaration');
+     document.getElementById('battleMonster'+(action.target??currentBattleMonsters.find(i=>monsters[i].alive))).click();
+    }
     await wait(()=>!battleActive||monsters!==oldRoster||turn>beforeTurn,100000);
     if(automatic&&battleActive&&!autoBattle){toggleAutoBattle();check(autoBattle,'formal auto battle');}
     if(autoBattle){await wait(()=>!battleActive,160000);break;}
@@ -66,13 +75,14 @@ const expression=`(async()=>{
   await wait(()=>document.getElementById('v132RewardModal')?.classList.contains('show'));
   const title=document.querySelector('#v132RewardModal h3')?.textContent;
   check(title?.includes(type==='material'?'材料':type==='gold'?'金幣':'經驗'),'matching reward '+title);
+  const beforeClaim={gold,exp:sharedExp,material:inventoryItems.filter(x=>x.id==='materialChest').reduce((s,x)=>s+(x.count||1),0)};
   const claim=document.querySelector('#v132RewardModal button');check(claim?.textContent==='直接領取','formal reward');claim.click();
   await wait(()=>document.getElementById('dungeonPage')?.classList.contains('active')&&!document.getElementById('v132RewardModal')?.classList.contains('show'));
   // Material claim uses the existing alert; acknowledge it using the formal dialog.
   const alert=document.getElementById('v169RpgDialogLayer');if(alert?.classList.contains('show'))document.querySelectorAll('#v169RpgDialogLayer .v169-rpg-dialog-button')[1].click();
   autoConfig.enabled=false;autoBattle=false;
-  const reward={gold:gold-beforeGold,exp:sharedExp-beforeExp,inventory:inventoryItems.filter(x=>/materialChest/.test(x.id)).map(x=>({id:x.id,count:x.count}))};
-  if(type==='gold')check(reward.gold===v148GetGoldDungeonReward(level),'Gold amount');if(type==='exp')check(reward.exp>0,'EXP reward');if(type==='material')check(reward.inventory.length>0,'Material reward');
+  const reward={gold:gold-beforeClaim.gold,exp:sharedExp-beforeClaim.exp,material:inventoryItems.filter(x=>x.id==='materialChest').reduce((s,x)=>s+(x.count||1),0)-beforeClaim.material,inventory:inventoryItems.filter(x=>/materialChest/.test(x.id)).map(x=>({id:x.id,count:x.count}))};
+  if(type==='gold')check(reward.gold===v148GetGoldDungeonReward(level),'Gold amount');if(type==='exp')check(reward.exp>0,'EXP reward');if(type==='material')check(reward.material===3,'Material reward');
   evidence.encounters.push({type,level,size,automatic,initial,waves:encountered,snapshots,reward,partyHp:getExistingPartyIndexes().map(i=>getPartyCharacterByIndex(i).hp)});
   check(!window.v132ActiveDungeonRun,'run cleanup');
  }
@@ -107,6 +117,7 @@ try{
   const tabs=await waitJson('http://127.0.0.1:'+port+'/json/list');client=new Cdp(tabs.find(x=>x.type==='page').webSocketDebuggerUrl);await client.send('Page.enable');await client.send('Runtime.enable');
   await client.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true});await client.send('Page.navigate',{url:server.url});
   await new Promise(r=>setTimeout(r,1000));const active=client.eval(fixture+'\n'+expression);let done=false;active.finally(()=>{done=true;}).catch(()=>{});let captured=new Set();while(!done){await new Promise(r=>setTimeout(r,120));const marker=await client.eval('window.dailyBalanceQaCapture||null').catch(()=>null);if(marker){const key=marker.type+'-'+marker.wave+'-'+marker.size;if(!captured.has(key)){captured.add(key);const shot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(artifact.replace('.json','-'+width+'x'+height+'-'+key+'.png'),Buffer.from(shot.data,'base64'));}}}const result=await active;results.push({width,height,...result,captures:[...captured]});
+  assert.equal(client.events.some(e=>e.method==='Runtime.consoleAPICalled'&&e.params.type==='error'&&JSON.stringify(e.params.args).includes('戰鬥行動超過安全期限')),false,'natural actions must finish without watchdog recovery');
   // A fresh profile can show the normal release notice after combat settles.
   // Use its existing header return control before verifying screenshot visibility.
   const notice=await client.eval(`(()=>{const modal=document.getElementById('homeFeatureModal');if(!modal?.classList.contains('show'))return null;if(!modal.classList.contains('release-update-modal')||modal.classList.contains('release-update-forced'))throw Error('Unexpected blocking modal in Wild QA');const button=modal.querySelector('.home-feature-close-btn[onclick="closeHomeFeature()"]');if(!button)throw Error('Release notice has no formal return control');const r=button.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2;return {x,y,unobstructed:button.contains(document.elementFromPoint(x,y))};})()`);
