@@ -5,6 +5,10 @@ const fs=require("node:fs");
 const vm=require("node:vm");
 
 const towerSource=fs.readFileSync("js/gameplay-boss-tower-system.js","utf8");
+const appSource=fs.readFileSync("js/00-main.js","utf8");
+const balanceStart=appSource.indexOf("/* BEGIN GENERATED MONSTER BALANCE OWNER */");
+const balanceEnd=appSource.indexOf("/* END GENERATED MONSTER BALANCE OWNER */")+"/* END GENERATED MONSTER BALANCE OWNER */".length;
+const balanceSource=appSource.slice(balanceStart,balanceEnd);
 const rulesSource=fs.readFileSync("js/40-v144-rules-and-abyss.js","utf8");
 const uiSource=fs.readFileSync("js/35-v141-ui-battle.js","utf8");
 const slotSource=fs.readFileSync("js/battlefield-slot-owner.js","utf8");
@@ -87,7 +91,7 @@ function load(options={}){
         getPartyCharacterByIndex:index=>index===0?context.player:null,
         getPartyBattleStats:()=>({maxHP:10000,maxSP:2000,attack:1000,magicAttack:1000,defense:100,accuracy:100,intelligence:100}),
         getMonsterSkillTierAndChance:()=>({maxTier:4,chance:.5}),
-        getMonsterRank:monster=>monster&&monster.rank||"regular",
+        getMonsterRank:monster=>monster&&monster.rank==="smallBoss"?"boss":(monster&&monster.rank||"regular"),
         getItemCounts:()=>new Map(),
         v141RollWildMonsterRanks:()=>{},decorateBattleCards:()=>{},
         showPage:()=>{},saveGame:()=>{},rebuildInventorySlots:noop,updateGoldDisplay:noop,
@@ -138,6 +142,7 @@ function load(options={}){
         "window.v141PrepareBattleRender=v141PrepareBattleRender;"
     ].join("\n"),context,{filename:"v141-prepare-slice.js"});
     vm.runInContext(rulesSource,context,{filename:"v144-rules.js"});
+    vm.runInContext(balanceSource,context,{filename:"monster-balance-runtime.js"});
     vm.runInContext(towerSource,context,{filename:"gameplay-boss-tower-system.js"});
     return context;
 }
@@ -161,7 +166,7 @@ function setTowerProgress(context,element,completedFloor){
     },found.date);
 }
 
-function rankWeight(monster){ return monster.rank==="boss"?3:monster.rank==="elite"?2:1; }
+function rankWeight(monster){ return monster.rank==="smallBoss"||monster.rank==="boss"?3:monster.rank==="elite"?2:1; }
 function assertLegalSkills(context,monster){
     for(const id of [...(monster.skillIds||[]),...(monster.v141SupportSkillIds||[])]){
         assert.equal(context.v144IsMonsterSkillElementLegal(monster,id),true,monster.name+" illegal skill "+id);
@@ -226,7 +231,7 @@ for(const element of ["fire","water","earth","wind"]){
     const bossIndex=context.currentBattleMonsters.find(index=>context.monsters[index].vGameplayTowerBoss===true);
     assert.equal(Number.isInteger(bossIndex),true);
     const boss=context.monsters[bossIndex];
-    assert.equal(boss.rank,"boss");
+    assert.equal(boss.rank,"smallBoss");
     assert.equal(boss.unitKind,"tower-boss");
     assert.equal(boss.portraitKey,"MON_FIRE_MINIBOSS_001");
     assert.equal(boss.vGameplayPortraitSizeClass,"standard");
@@ -306,14 +311,24 @@ for(const element of ["fire","water","earth","wind"]){
     for(let floor=1;floor<=100;floor++){
         const roster=Array.from(context.GameplaySystem.buildTowerRoster(floor));
         assert.equal(roster.length,10,element+" floor "+floor);
-        assert.equal(roster.filter(m=>m.rank==="boss").length,floor%10===0?1:0);
+        assert.equal(roster.filter(m=>m.rank==="smallBoss").length,floor%10===0?1:0);
         assert.equal(roster.filter(m=>m.rank==="elite").length,floor%5===0?2:0);
         for(const m of roster){
             assert.equal(m.skillChance,floor<=30?.65:floor<=60?.70:floor<=90?.75:.8);
             if(element==="fire"){assert.equal(m.vTowerCriticalBonusPercent,15);assert.equal(m.vTowerDirectDamageMultiplier,1.15);}
             if(element==="water"){assert.equal(m.vTowerHealingMultiplier,1.15);assert.equal(m.vTowerStatusAccuracyPercent,15);assert.ok(m.skillIds.includes("freeze"));assert.ok(m.v141SupportSkillIds.includes("healSpell"));}
-            if(element==="wind"){assert.equal(m.evasion,15);assert.ok(Math.abs(m.agility-115)<1e-10);}
-            if(element==="earth"){assert.equal(m.defense,Math.round((m.rank==="boss"?140:m.rank==="elite"?125:100)*1.15));assert.equal(m.hp,m.maxHP);}
+            const projection=context.MonsterBalance.debug(m);
+            assert.equal(m.level,floor);
+            assert.equal(m.balanceOwner,"MonsterBalance");
+            assert.equal(m.maxHP,projection.final.maxHP);
+            assert.equal(m.maxSP,projection.final.maxSP);
+            assert.equal(m.attack,projection.final.physicalAttack);
+            assert.equal(m.magicAttack,projection.final.magicAttack);
+            assert.equal(m.defense,projection.final.defense);
+            assert.equal(m.agility,projection.final.speed);
+            assert.equal(Object.hasOwn(m,"v132Dungeon"),false);
+            if(element==="wind"){assert.equal(m.evasion,15);assert.equal(m.agility,projection.final.speed);}
+            if(element==="earth"){assert.equal(m.hp,m.maxHP);assert.equal(m.maxHP,projection.final.maxHP);assert.equal(m.defense,projection.final.defense);}
             const before=JSON.stringify(m);context.GameplaySystem.applyTowerElementProfile(m,element);context.GameplaySystem.applyTowerChallengeProfile(m);assert.equal(JSON.stringify(m),before);
         }
         context.monsters=roster;context.currentBattleMonsters=roster.map((_,i)=>i);
