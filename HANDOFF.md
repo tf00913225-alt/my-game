@@ -1,3 +1,11 @@
+## 2026-10-03 — RELEASE-CI-DEPLOYMENT-OWNER-20261003（發布檢查控制來源收斂）
+
+- 從 dev/Candidate C `09a6c8d2dc52ebeccc032078c45af6b7b55e4137` 建立 `fix/release-ci-deployment-owner-20261003`；main `4b037b47967544d90c781ad938286777c9576731` 禁止修改，#772 維持 Draft／RELEASE BLOCKED。
+- 新發現 #772 main-target CI 37102172377 在20分鐘期限被取消，已跑過262 suites，但剩餘完整Browser QA與發布閘門未完成，不能算通過。main/main-target Repository checks 改30分鐘，dev仍20分鐘；沒有刪除、略過、放寬測試或失敗續跑。
+- Session deploy 111144393496 的舊 newest-named-check lookup 誤等同SHA的main-target PR check，80次等待逾時。收斂為 exact dev push CI workflow → Repository checks job；保持 current-dev SHA guard，增加 Actions read 權限、退場 check-runs newest-name lookup。只改部署驗證控制來源，不改 Backend、Cloud Save、玩家資料。
+- PR合併後 Candidate C 必須 INVALIDATED，建立新的 Candidate D 並重新執行必要Exact-HEAD驗收；B/C證據不能冒充D。候選Owner仍為PR body，禁止自身SHA提交迴圈。
+- Pages Source 尚待切换／核實GitHub Actions；沒有可用設定修改動作前仍BLOCKED。
+
 ## 2026-10-03 — PRODUCTION-PAGES-MANIFEST-20261003（正式部署 Owner 修復）
 
 - Base dev `8e6a635db54ead49f9a43671a836eefd48aa0491`；main `4b037b47967544d90c781ad938286777c9576731` 禁止修改，發布 PR #772 保持 Draft／RELEASE BLOCKED。
