@@ -148,6 +148,10 @@ QA、測試與 debug 工具不得為方便而永久改變正式戰鬥數值、�
 - Cache／版本／Service Worker 更新不得刪除 localStorage、IndexedDB、雲端存檔、帳號、背包、等級、裝備或進度；Cache invalidation 與 Save Data 必須分離。
 - 完成回報必須包含 Requirements N/N VERIFIED、Branch、Commit SHA、Game Version、Cache Version、Repository checks、Deploy、Deployment SHA verified；任一不足即 `NOT COMPLETE`。
 
+## DEV PR 自動整合與 Boss 術語入口
+
+DEV PR 整合授權統一依 `AGENTS.md`「DEV PR 自動整合規則」；已授權任務通過所有 Gate 後，不得要求重複 MERGE-DEV 確認。此入口不擴張 main、資料、帳號、付款或不可逆操作權限，也不授權略過 CI。Boss 術語依 `docs/MONSTER_PORTRAIT_SPEC_V1.md` 第 0 節；不另建規則。
+
 ## GitHub 遠端寫入與憑證固定規則
 - 平台已連線的 GitHub Connector／API 授權，與工作區內 `git`／`gh`／SSH／PAT 的本機憑證是兩套獨立機制；不得把「本機 Git CLI 沒憑證」誤判成「GitHub 未授權」。
 - 當目前代理環境已提供可存取本 Repository 且具備所需寫入權限的 GitHub Connector／API 時，所有遠端寫入必須優先使用該已授權通道完成，包括建立 branch、建立／更新檔案、blob/tree/commit、更新 branch ref、建立或更新 PR、查詢 CI／Repository checks，以及在既有合併規則允許時合併 PR。

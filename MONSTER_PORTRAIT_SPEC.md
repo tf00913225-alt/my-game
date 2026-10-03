@@ -9,6 +9,8 @@
 5. `release/monster-portrait-batches/*.json` — 尚未生成素材的 batch 邊界。
 6. `scripts/audit-monster-portrait-batch.mjs` — 單批 strict gate。
 
+Boss 術語依 `docs/MONSTER_PORTRAIT_SPEC_V1.md` 第 0 節；本入口的尺寸清單不改變大／小 Boss 稱呼，也不授權以術語重新縮放深淵既有素材。
+
 固定流程分成兩條，禁止混用：
 
 ### A. 已生成素材快速導入（預設）
