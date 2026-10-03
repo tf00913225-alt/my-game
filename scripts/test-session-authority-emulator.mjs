@@ -11,6 +11,7 @@ const {createSessionAuthority}=require("../functions/src/session-authority.js");
 const {createCanonicalSourceWriter}=require("../functions/src/canonical-source-writer.js");
 const {createCanonicalResourceCredit}=require("../functions/src/canonical-resource-credit.js");
 const {createDailyCheckinGrant}=require("../functions/src/daily-checkin-grant.js");
+const {createCanonicalBattleAttempt}=require("../functions/src/canonical-battle-attempt.js");
 const {createCanonicalExpAllocation}=require("../functions/src/canonical-exp-allocation.js");
 const {createCanonicalAttributeAllocation}=
     require("../functions/src/canonical-attribute-allocation.js");
@@ -290,6 +291,76 @@ assert.equal((await db.doc(`users/${y}/saves/current`).get()).get("serverRevisio
 const initialized=await initialWriter.commitInitialSources(yRequest,initialArgs);
 assert.equal(initialized.sourceRevision,2);
 const initialArchive=await checkRecoveryArchive(y,2);
+
+// Foundation D preparation: internal owner, real session and Firestore transaction.
+// No callable, game hook, enemy/result acceptance or reward entitlement.
+let battleClock=Date.now(),abortBattle=false;
+const battleOwner=createCanonicalBattleAttempt({db,FieldValue,HttpsError,
+    inspectExistingEnvelope,now:()=>battleClock,
+    runProtected:(request,operation)=>writerSessions.runProtected(request,async(tx,session)=>{
+        const result=await operation(tx,session);
+        if(abortBattle)throw new Error("interrupted battle preparation");
+        return result;
+    })});
+const battleArgs={operationId:"battle-preparation-emulator-0001",expectedRevision:2};
+const battleRoot=db.collection("serverUsers").doc(y);
+const battleBefore={account:(await battleRoot.collection("account").doc("current").get()).data(),
+    economy:(await battleRoot.collection("economy").doc("current").get()).data(),
+    envelope:(await db.doc(`users/${y}/saves/current`).get()).data()};
+for(const path of ["playableSnapshots/2","recoveryArchives/2"]){
+    const ref=db.doc(`serverUsers/${y}/${path}`),saved=(await ref.get()).data();
+    await ref.delete();
+    await assert.rejects(battleOwner.begin(yRequest,battleArgs),e=>e.code==="data-loss");
+    assert.equal((await battleRoot.collection("battleAttempts").get()).size,0);
+    await ref.set(saved);
+}
+abortBattle=true;
+await assert.rejects(battleOwner.begin(yRequest,battleArgs),/interrupted battle/);
+abortBattle=false;
+assert.equal((await battleRoot.collection("battleAttempts").get()).size,0);
+assert.equal((await battleRoot.collection("battleAttemptSources").get()).size,0);
+assert.equal((await battleRoot.collection("operations").doc(battleArgs.operationId).get()).exists,false);
+const battleContenders=await Promise.allSettled([
+    battleOwner.begin(yRequest,battleArgs),
+    battleOwner.begin(yRequest,{...battleArgs,operationId:"battle-preparation-emulator-0002"})
+]);
+assert.equal(battleContenders.filter(r=>r.status==="fulfilled").length,1);
+assert.equal(battleContenders.filter(r=>r.status==="rejected"&&r.reason.code==="already-exists").length,1);
+const battleStart=battleContenders.find(r=>r.status==="fulfilled").value;
+const winningBattleArgs={...battleArgs,operationId:battleStart.attemptId};
+assert.equal(battleStart.rewardEligible,false);assert.equal(battleStart.outcomeVerified,false);
+assert.equal(battleStart.creditedToCharacter,false);
+assert.equal((await battleOwner.begin(yRequest,winningBattleArgs)).unchanged,true);
+battleClock=battleStart.expiresAtMs;
+const expiredBattle=await battleOwner.begin(yRequest,winningBattleArgs);
+assert.equal(expiredBattle.expired,true);assert.equal(expiredBattle.expiresAtMs,battleStart.expiresAtMs);
+for(const path of [`battleAttempts/${battleStart.attemptId}`,
+    `operations/${battleStart.attemptId}`,"battleAttemptSources/2",
+    "playableSnapshots/2","recoveryArchives/2"]){
+    const ref=db.doc(`serverUsers/${y}/${path}`),saved=(await ref.get()).data();
+    await ref.delete();await assert.rejects(battleOwner.begin(yRequest,winningBattleArgs));
+    await ref.set(saved);
+}
+const battleRecordRef=battleRoot.collection("battleAttempts").doc(battleStart.attemptId);
+const battleSaved=(await battleRecordRef.get()).data();
+await battleRecordRef.update({rewardEligible:true});
+await assert.rejects(battleOwner.begin(yRequest,winningBattleArgs),e=>e.code==="data-loss");
+await battleRecordRef.set(battleSaved);
+await assert.rejects(battleOwner.begin({...yRequest,data:{...yRequest.data,won:true}},winningBattleArgs),
+    e=>e.code==="invalid-argument");
+await assert.rejects(battleOwner.begin({auth:{uid:x,token:claims(a.idToken)},
+    data:{uid:x,session:sessionA}},battleArgs),e=>e.message==="SESSION_REVOKED");
+await assert.rejects(battleOwner.begin({...yRequest,data:{uid:y,session:sessionB}},winningBattleArgs),
+    e=>e.message==="SESSION_INVALID");
+assert.equal((await battleRoot.collection("battleAttempts").get()).size,1);
+assert.equal((await battleRoot.collection("battleAttemptSources").get()).size,1);
+assert.equal((await battleRoot.collection("pendingGrants").get()).size,0);
+assert.equal((await battleRoot.collection("ledgerEntries").get()).size,0);
+assert.deepEqual((await battleRoot.collection("account").doc("current").get()).data(),battleBefore.account);
+assert.deepEqual((await battleRoot.collection("economy").doc("current").get()).data(),battleBefore.economy);
+assert.deepEqual((await db.doc(`users/${y}/saves/current`).get()).data(),battleBefore.envelope);
+console.log("Battle preparation real transaction: concurrency, rollback, replay, expiry, corruption, session and zero reward PASS");
+
 assert.deepEqual(initialArchive.get("sourceRecords.claimRecords"),[]);
 assert.equal((await db.doc(`serverUsers/${y}/playableSnapshots/2`).get())
     .get("readyForPublication"),false);
