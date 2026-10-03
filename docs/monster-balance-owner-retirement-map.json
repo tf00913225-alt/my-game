@@ -325,5 +325,5 @@
       "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
     }
   ],
-  "phase2aGate": "IMPLEMENTED candidate; full regression/TTK/browser/CI/deploy pending"
+  "phase2aGate": "15/15 functional requirements VERIFIED: focused20/20, unchanged non-Wild outputs, 40 diagnostic TTK and both-viewports natural Chrome. Latest Required CI/dev integration/deployed exact SHA remain separate gates owned by PR #780."
 }
