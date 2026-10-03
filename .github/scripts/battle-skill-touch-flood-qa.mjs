@@ -17,9 +17,9 @@ export async function battleSkillTouchFloodQa(rawClient,artifactDir,{animationOn
     const spritePath='assets/vfx/water/tidal-beast-vfx.png';
     const spriteHash=crypto.createHash('sha256').update(fs.readFileSync(spritePath)).digest('hex');
     const deployedAssets=await client.eval(`(async()=>{
-        const response=await fetch('/asset-manifest.json',{cache:'no-store'});if(!response.ok)throw new Error('Asset manifest HTTP '+response.status);const actual=await response.json();
-        const files=await Promise.all(${JSON.stringify(expectedAssets.concat([{name:spritePath,hash:spriteHash}]))}.map(async item=>{const response=await fetch('/'+item.name,{cache:'no-store'});if(!response.ok)throw new Error(item.name+' HTTP '+response.status);const digest=await crypto.subtle.digest('SHA-256',await response.arrayBuffer());const hash=Array.from(new Uint8Array(digest),n=>n.toString(16).padStart(2,'0')).join('');return {name:item.name,hash:hash.slice(0,item.hash.length)};}));
-        let deployedSha=null;if(location.hostname==='dev.four-symbols-dev.pages.dev'){const response=await fetch('/release-manifest.json',{cache:'no-store'});if(!response.ok)throw new Error('Release manifest HTTP '+response.status);deployedSha=(await response.json()).commitSha;}
+        const response=await fetch(new URL('asset-manifest.json',document.baseURI),{cache:'no-store'});if(!response.ok)throw new Error('Asset manifest HTTP '+response.status);const actual=await response.json();
+        const files=await Promise.all(${JSON.stringify(expectedAssets.concat([{name:spritePath,hash:spriteHash}]))}.map(async item=>{const response=await fetch(new URL(item.name,document.baseURI),{cache:'no-store'});if(!response.ok)throw new Error(item.name+' HTTP '+response.status);const digest=await crypto.subtle.digest('SHA-256',await response.arrayBuffer());const hash=Array.from(new Uint8Array(digest),n=>n.toString(16).padStart(2,'0')).join('');return {name:item.name,hash:hash.slice(0,item.hash.length)};}));
+        let deployedSha=null;if(location.hostname==='dev.four-symbols-dev.pages.dev'||location.hostname.endsWith('.github.io')){const response=await fetch(new URL('release-manifest.json',document.baseURI),{cache:'no-store'});if(!response.ok)throw new Error('Release manifest HTTP '+response.status);deployedSha=(await response.json()).commitSha;}
         return {assets:actual.assets,files,deployedSha};
     })()`);
     assert.deepEqual(deployedAssets.assets,manifest.assets,'served asset list must match the exact checkout');
