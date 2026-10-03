@@ -1,6 +1,7 @@
 "use strict";
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 const battle=fs.readFileSync("js/54-v173.51-battle-qa.js","utf8");
 const inventory=fs.readFileSync("js/55-v173.51-inventory-qa.js","utf8");
 const shop=fs.readFileSync("js/56-v173.51-shop-qa.js","utf8");
@@ -61,7 +62,7 @@ assert.match(build,/"js\/53-v173\.50-inventory-qol\.js"[\s\S]*?"js\/54-v173\.51-
 assert.doesNotMatch(build,/"js\/56-v173\.51-shop-qa\.js"/);
 assert.doesNotMatch(qol,/createElement\(["']script["']\)|\.onload\s*=/);
 assert.doesNotMatch(equipment,/createElement\(["']script["']\)|__v17351QaReady/);
-assert.ok(loader.includes('const V_ASSET_VERSION="173.72";'));
+assert.ok(loader.includes('const V_ASSET_VERSION="'+releaseMeta.cacheVersion+'";'));
 assert.doesNotMatch(ui,/equipment-progression\.js\?v=|createElement\(["']script["']\)/);
-assert.ok(index.includes('<title>四象江湖傳 V173.72</title>'));
+assert.ok(index.includes('<title>四象江湖傳 V'+releaseMeta.version+'</title>'));
 console.log("✓ V173.51 QA fixes");

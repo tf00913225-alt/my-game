@@ -1,5 +1,6 @@
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 
 const css=fs.readFileSync("css/49-v169-rpg-ui.css","utf8");
 const equip=fs.readFileSync("js/equipment-progression.js","utf8");
@@ -25,11 +26,11 @@ assert.match(css,/\.shop-potion-quantity\{[\s\S]*?width:24px !important;[\s\S]*?
 assert.match(css,/\.shop-potion-quantity::-webkit-inner-spin-button\{[\s\S]*?-webkit-appearance:none !important;/);
 assert.match(css,/\.shop-potion-purchase-row \.shop-potion-buy\{[\s\S]*?grid-column:3 !important;[\s\S]*?grid-row:1 !important;[\s\S]*?height:36px !important;[\s\S]*?font-size:15px !important;/);
 assert.ok(equip.includes("前5次免費；第6～10次尚未開放。"));
-assert.ok(loader.includes('const V_ASSET_VERSION="173.72";'));
+assert.ok(loader.includes('const V_ASSET_VERSION="'+releaseMeta.cacheVersion+'";'));
 assert.ok(build.indexOf('"js/51-v169-rpg-ui.js"')<build.indexOf('"js/equipment-progression.js"'));
 assert.doesNotMatch(ui,/createElement\(["']script["']\)/);
-assert.ok(index.includes('<title>四象江湖傳 V173.72</title>'));
-assert.ok(index.includes('>V173.72</div>'));
+assert.ok(index.includes('<title>四象江湖傳 V'+releaseMeta.version+'</title>'));
+assert.ok(index.includes('>V'+releaseMeta.version+'</div>'));
 assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 
 console.log("✓ V173.50 premium one-screen shop layout");

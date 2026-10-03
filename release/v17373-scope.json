@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "workId": "RELEASE-SCOPE-P0-20261002",
   "plannedVersion": "173.73",
-  "currentGameVersion": "173.72",
-  "assessment": "READY TO ENTER RELEASE FREEZE",
-  "mode": "NORMAL DEVELOPMENT",
+  "currentGameVersion": "173.73",
+  "assessment": "RELEASE FREEZE / CANDIDATE PREPARATION",
+  "mode": "RELEASE FREEZE",
   "releaseCandidateSha": null,
   "baseline": {
     "dev": "81853be234963c8a5250b474c38480dcd0dfa2b4",
@@ -1182,5 +1182,28 @@
       "productionReleaseStarted": false,
       "nextStage": "Only after explicit release-freeze authorization: fix candidate SHA and perform required Exact-HEAD full suite and release acceptance."
     }
+  },
+  "freeze20261003": {
+    "workId": "V17373-RELEASE-FREEZE-20261003",
+    "authorizedBy": "Explicit project owner instruction on 2026-10-03",
+    "baseDevSha": "a959e8bda4d79d55e3af36174921a19b579f5a80",
+    "mainSha": "4b037b47967544d90c781ad938286777c9576731",
+    "branch": "release/v17373-freeze-20261003",
+    "candidateStatus": "PENDING_MERGE",
+    "candidateRecordOwner": "Freeze PR body: immutable merge/dev SHA and exact-SHA acceptance. Do not amend the candidate to embed its own SHA.",
+    "allowedChanges": [
+      "Version",
+      "Cache",
+      "Release metadata",
+      "Release Scope",
+      "Player notice",
+      "CHANGELOG",
+      "Necessary release documentation",
+      "Generated build synchronization"
+    ],
+    "nonessentialDevelopmentPaused": true,
+    "mainPublicationAuthorized": false,
+    "exactCandidateAcceptance": "PENDING; PR #768 historical full suite is not candidate evidence",
+    "invalidationRule": "Any later dev commit invalidates the recorded candidate; fix through a new dev PR and repeat required exact-SHA acceptance."
   }
 }

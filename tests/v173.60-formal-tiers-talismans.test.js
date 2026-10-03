@@ -2,6 +2,7 @@
 const test=require("node:test");
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 
 const content=fs.readFileSync("js/27-v132-content-expansion.js","utf8");
 const synthesis=fs.readFileSync("js/36-v141-content-systems.js","utf8");
@@ -58,6 +59,6 @@ test("rarity visuals use the locked palette and four-symbol border",()=>{
 });
 
 test("release wiring is V173.62",()=>{
-  assert.ok(loader.includes('const V_ASSET_VERSION="173.72";'));
-  assert.ok(html.includes("四象江湖傳 V173.72"));
+  assert.ok(loader.includes('const V_ASSET_VERSION="'+releaseMeta.cacheVersion+'";'));
+  assert.ok(html.includes("四象江湖傳 V"+releaseMeta.version));
 });

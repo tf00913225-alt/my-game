@@ -4,6 +4,7 @@
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 const vm=require("node:vm");
 
 const source=fs.readFileSync("js/37-v142-skill-animation.js","utf8");
@@ -167,7 +168,7 @@ function createContext(options={}){
 
 (async()=>{
     await test("V142 assets are versioned and loaded after V141",()=>{
-        assert.match(loader,/const V_ASSET_VERSION="173\.72"/);
+        assert.equal((loader.match(/const V_ASSET_VERSION="([^"]+)"/)||[])[1],releaseMeta.cacheVersion);
         assert.match(loader,/css\/39-v142-skill-animation\.css/);
         assert.match(loader,/js\/36-v141-content-systems\.js[\s\S]*js\/37-v142-skill-animation\.js/);
         assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
