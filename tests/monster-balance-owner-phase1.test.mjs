@@ -55,7 +55,7 @@ test('rank adds no points; seven modes explicit and isolated',()=>{
   const row=MonsterBalance.preview({...spec,mode,rank});
   assert.equal(row.base.abilityPointBudget,245);assert.equal(row.profiles.mode.id,mode);
   assert.deepEqual(row.allocation,MonsterBalance.preview(spec).allocation);
-  assert.equal(row.profiles.rank.status,['wild','daily'].includes(mode)?'RANK_V1':'PENDING_PRODUCT_CALIBRATION');
+  assert.equal(row.profiles.rank.status,['wild','daily','tower'].includes(mode)?'RANK_V1':'PENDING_PRODUCT_CALIBRATION');
  }
  for(const invalid of [{mode:'boss'},{mode:'legacy-dungeon'},{rank:'boss'},{archetype:'unknown'},{context:''},{element:''}])assert.throws(()=>MonsterBalance.preview({...spec,...invalid}));
 });
