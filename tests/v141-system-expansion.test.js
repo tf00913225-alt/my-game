@@ -112,13 +112,14 @@ test("monster skills cap at 1/2/3 and use fixed Lv1-Lv5 bands",()=>{
 
 test("wild ranks are explicit, independent 10% rolls and never random BOSS",()=>{
     assert.match(coreSource,/const WILD_ELITE_RATE=0\.10/);
-    assert.match(coreSource,/monster\.v141BattleRank=Math\.random\(\)<WILD_ELITE_RATE \? "elite" : "regular"/);
-    assert.match(coreSource,/VALID_RANKS\.has\(monster\.rank\)/);
-    const rankBody=extractAssignedFunction(coreSource,"getMonsterRank");
+    assert.match(coreSource,/const rank=Math\.random\(\)<WILD_ELITE_RATE \? "elite" : "regular"/);
+    assert.doesNotMatch(coreSource,/getMonsterRank\s*=\s*function/);
+    const rankBody=extractFunction(mainSource,"getMonsterRank");
     assert.doesNotMatch(rankBody,/name|王|皇/);
     assert.doesNotMatch(extractFunction(mainSource,"getMonsterRank"),/name|王|皇/);
     assert.doesNotMatch(v133Source,/endsWith\("王"\)/);
-    assert.match(coreSource,/monster\.rank="regular"/);
+    assert.match(coreSource,/Object\.assign\(monster,entity\)/);
+    assert.match(coreSource,/monster\.v141BattleRank=monster\.rank/);
     assert.doesNotMatch(coreSource,/v141BattleRank=.*boss/);
 });
 

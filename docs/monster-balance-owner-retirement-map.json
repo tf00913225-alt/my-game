@@ -1,9 +1,10 @@
 {
-  "workId": "MONSTER-BALANCE-OWNER-P1-20261003",
-  "phase": 1,
+  "workId": "MONSTER-BALANCE-OWNER-P2A-WILD-20261003",
+  "phase": "2A",
   "classification": [
     "Convergence",
-    "Replacement Preparation"
+    "Replacement",
+    "Legacy Retirement"
   ],
   "canonicalOwners": {
     "level": "js/combat/level-base-contract.mjs",
@@ -11,33 +12,47 @@
     "monsterProjection": "js/combat/monster-balance-owner.mjs"
   },
   "phase1Gate": "shadow architecture PASS only; formal multi-owner convergence intentionally deferred until approved Phase2",
-  "grandfatheredWrappers": {
-    "js/34-v141-core-systems.js": 1,
-    "js/40-v144-rules-and-abyss.js": 1,
-    "js/47-v158-combat-tuning.js": 1
-  },
+  "grandfatheredWrappers": {},
   "items": [
     {
       "id": "coreAllocation",
       "file": "js/00-main.js",
       "sourceToken": "generateMonsterAttributePoints",
-      "status": "CURRENT OWNER",
-      "decision": "TO RETIRE",
+      "status": "COMPATIBILITY FOR NON-WILD ONLY",
+      "decision": "COMPATIBILITY FOR NON-WILD ONLY",
       "phase": "Phase 2 Wild then final shared-user migration",
       "reason": "(level-1)*5 + archetype allocation; retain legacy only for unmigrated modes",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+      "retirementGate": "Delete after Phase 2B Daily and all subsequent explicit mode migrations",
+      "wildForbidden": true,
+      "requiredModes": [
+        "daily",
+        "tower",
+        "abyss",
+        "adventure",
+        "personalBoss",
+        "worldBoss"
+      ]
     },
     {
       "id": "coreStats",
       "file": "js/00-main.js",
-      "sourceToken": "makeZoneMonster",
-      "status": "CURRENT OWNER",
-      "decision": "TO MIGRATE",
+      "sourceToken": "makeLegacyModeMonster",
+      "status": "COMPATIBILITY FOR NON-WILD ONLY",
+      "decision": "COMPATIBILITY FOR NON-WILD ONLY",
       "phase": "Phase 2 Wild → Boss final",
       "reason": "stat generation migrates; skill/identity construction responsibility kept separately",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+      "retirementGate": "Delete after Phase 2B Daily and all subsequent explicit mode migrations",
+      "wildForbidden": true,
+      "requiredModes": [
+        "daily",
+        "tower",
+        "abyss",
+        "adventure",
+        "personalBoss",
+        "worldBoss"
+      ]
     },
     {
       "id": "playerLevelBase",
@@ -54,45 +69,53 @@
       "id": "wildV131",
       "file": "js/25-v131-fix-batch.js",
       "sourceToken": "strengthenMonster",
-      "status": "CURRENT OWNER",
-      "decision": "TO RETIRE",
-      "phase": "Phase 2 Wild",
+      "status": "RETIRED",
+      "decision": "RETIRED",
+      "phase": "Phase 2A Wild",
       "reason": "global/zone calibration moves into explicit wild Mode Profile; remove post writes",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+      "retirementGate": "Source token absent; named skill hooks retain non-stat responsibility"
     },
     {
       "id": "wildV141",
       "file": "js/34-v141-core-systems.js",
       "sourceToken": "strengthenNewWildMonster",
-      "status": "CURRENT OWNER",
-      "decision": "TO RETIRE",
-      "phase": "Phase 2 Wild",
+      "status": "RETIRED",
+      "decision": "RETIRED",
+      "phase": "Phase 2A Wild",
       "reason": "wind/earth construction becomes spec; remove duplicate strength writer",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+      "retirementGate": "Source token absent; named skill hooks retain non-stat responsibility"
     },
     {
       "id": "wildRank",
       "file": "js/34-v141-core-systems.js",
-      "sourceToken": "v141RollWildMonsterRanks",
-      "status": "CURRENT OWNER",
-      "decision": "TO MIGRATE",
-      "phase": "Phase 2 Wild",
-      "reason": "10% rank selection preserved separately; projection moves into Rank Profile; no extra ability budget",
+      "sourceToken": "VALID_RANKS.has(monster.v141BattleRank)",
+      "status": "RETIRED",
+      "decision": "RETIRED",
+      "phase": "Phase 2A Wild",
+      "reason": "Canonical monster.rank only; 10% selector builds a fresh Owner projection. v141BattleRank mirror retains unchanged reward/UI consumers only.",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+      "retirementGate": "Second rank read absent; compatibility mirror removed when existing reward/UI readers use canonical rank",
+      "canonicalResolver": "js/00-main.js::getMonsterRank",
+      "retiredInitialRankWriter": true,
+      "compatibilityMirror": {
+        "field": "v141BattleRank",
+        "allowedResponsibility": "Mirror canonical rank for legacy UI/skill UI fallback readers only; never rank or stats decision",
+        "retirementGate": "Remove after js/43, js/42 and js/45 consumers use canonical rank only",
+        "targetPhase": "Future explicit UI/rank consumer semantic migration"
+      }
     },
     {
       "id": "wildV141Wrapper",
       "file": "js/34-v141-core-systems.js",
       "sourceToken": "originalMakeZoneMonster",
-      "status": "COMPATIBILITY",
-      "decision": "TO RETIRE",
-      "phase": "Phase 2 final shared construction",
+      "status": "RETIRED",
+      "decision": "RETIRED",
+      "phase": "Phase 2A Wild",
       "reason": "skill carry selection moves to explicit existing skill owner, not balance owner",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+      "retirementGate": "Source token absent; named skill hooks retain non-stat responsibility"
     },
     {
       "id": "dungeonStrength",
@@ -142,12 +165,12 @@
       "id": "beginnerScaling",
       "file": "js/47-v158-combat-tuning.js",
       "sourceToken": "halveMonsterCoreStats",
-      "status": "CURRENT OWNER",
-      "decision": "TO RETIRE",
-      "phase": "Phase 2 Wild",
+      "status": "RETIRED",
+      "decision": "RETIRED",
+      "phase": "Phase 2A Wild",
       "reason": "0.5 scaling, zero agility and fixed normal damage require explicit beginner compatibility decision",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+      "retirementGate": "Source token absent; named skill hooks retain non-stat responsibility"
     },
     {
       "id": "dailyScaling",
@@ -164,12 +187,12 @@
       "id": "v158Wrapper",
       "file": "js/47-v158-combat-tuning.js",
       "sourceToken": "previousMakeZoneMonster",
-      "status": "COMPATIBILITY",
-      "decision": "TO RETIRE",
-      "phase": "Phase 2 final shared construction",
+      "status": "RETIRED",
+      "decision": "RETIRED",
+      "phase": "Phase 2A Wild",
       "reason": "default independent evasion0 becomes construction default",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+      "retirementGate": "Source token absent; named skill hooks retain non-stat responsibility"
     },
     {
       "id": "legacyAbyss",
@@ -252,12 +275,21 @@
       "id": "enemyPressure",
       "file": "js/00-main.js",
       "sourceToken": "getEnemyPressureMultiplier",
-      "status": "CURRENT OWNER",
-      "decision": "TO MIGRATE",
+      "status": "COMPATIBILITY FOR NON-WILD ONLY",
+      "decision": "COMPATIBILITY FOR NON-WILD ONLY",
       "phase": "Phase 2 each mode then Boss final",
       "reason": "mode explicit; v132Dungeon flag cannot imply daily; damage settlement KEEP single owner consumes resolved profile",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+      "retirementGate": "Delete after Phase 2B Daily and all subsequent explicit mode migrations",
+      "wildForbidden": true,
+      "requiredModes": [
+        "daily",
+        "tower",
+        "abyss",
+        "adventure",
+        "personalBoss",
+        "worldBoss"
+      ]
     },
     {
       "id": "adventureBuild",
@@ -274,12 +306,12 @@
       "id": "v144Wrapper",
       "file": "js/40-v144-rules-and-abyss.js",
       "sourceToken": "previousMakeZoneMonster",
-      "status": "COMPATIBILITY",
-      "decision": "TO RETIRE",
-      "phase": "Phase 2 final shared construction",
+      "status": "RETIRED",
+      "decision": "RETIRED",
+      "phase": "Phase 2A Wild",
       "reason": "newly scanned wrapper configures legal skills; guard KEEP in V144, no balance owner skill execution",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+      "retirementGate": "Source token absent; named skill hooks retain non-stat responsibility"
     },
     {
       "id": "v144SkillGuard",
@@ -292,5 +324,6 @@
       "phase1": "KEEP Runtime exactly unchanged",
       "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
     }
-  ]
+  ],
+  "phase2aGate": "15/15 functional requirements VERIFIED: focused20/20, unchanged non-Wild outputs, 40 diagnostic TTK and both-viewports natural Chrome. Latest Required CI/dev integration/deployed exact SHA remain separate gates owned by PR #780."
 }

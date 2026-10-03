@@ -63,7 +63,7 @@ zoneVariables.forEach(variable=>{
 });
 
 let wildSpecMatch;
-const wildSpecRegex=/,\s*\d+,\s*"([^"]+)",\s*"([^"]+)",\s*WILD_ZONE_STRENGTHS/g;
+const wildSpecRegex=/,\s*\d+,\s*"([^"]+)",\s*"([^"]+)"\s*\]/g;
 while((wildSpecMatch=wildSpecRegex.exec(wildCore))!==null){
     discovered.push(wildSpecMatch[1],wildSpecMatch[2]);
 }

@@ -1075,9 +1075,6 @@
     const V138_ROUND_TRANSITION_MS=1250;
     const V138_ROUND_HANDOFF_DELAY_MS=800;
     const V138_ROUND_ANNOUNCEMENT_DELAY_MS=450;
-    const V173_32_WILD_ZONE_STRENGTHS=Object.freeze([
-        0.75,0.90,0.95,1.00,1.05,1.10,1.15,1.20,1.25,1.30
-    ]);
     const ELEMENT_BOX_REWARD_MS=8*60*60*1000;
     const ELEMENT_BOX_KEY=window.FourSymbolsAccountSave.accountKey("element-box-state");
 
@@ -1409,45 +1406,6 @@
         roundHandoffDelayMs:V138_ROUND_HANDOFF_DELAY_MS,
         roundAnnouncementDelayMs:V138_ROUND_ANNOUNCEMENT_DELAY_MS
     };
-
-    function strengthenMonster(monster,multiplier){
-        if(!monster || monster._v131StrengthApplied){ return; }
-        const strengthMultiplier=Number.isFinite(Number(multiplier))
-            ? Number(multiplier)
-            : V173_32_WILD_ZONE_STRENGTHS[V173_32_WILD_ZONE_STRENGTHS.length-1];
-        monster._v131StrengthApplied=true;
-        ["maxHP","maxSP","attack","defense","magicAttack"].forEach(key=>{
-            if(Number.isFinite(Number(monster[key]))){
-                monster[key]=Math.max(1,Math.round(Number(monster[key])*strengthMultiplier));
-            }
-        });
-        monster.hp=monster.maxHP;
-        monster.sp=monster.maxSP;
-    }
-
-    function strengthenAllZoneMonsters(){
-        const zones=[
-            [typeof forestMonsters!=="undefined" ? forestMonsters : null,V173_32_WILD_ZONE_STRENGTHS[0]],
-            [typeof desertMonsters!=="undefined" ? desertMonsters : null,V173_32_WILD_ZONE_STRENGTHS[1]],
-            [typeof iceMountainMonsters!=="undefined" ? iceMountainMonsters : null,V173_32_WILD_ZONE_STRENGTHS[2]],
-            [typeof zone4Monsters!=="undefined" ? zone4Monsters : null,V173_32_WILD_ZONE_STRENGTHS[3]],
-            [typeof zone5Monsters!=="undefined" ? zone5Monsters : null,V173_32_WILD_ZONE_STRENGTHS[4]],
-            [typeof zone6Monsters!=="undefined" ? zone6Monsters : null,V173_32_WILD_ZONE_STRENGTHS[5]],
-            [typeof zone7Monsters!=="undefined" ? zone7Monsters : null,V173_32_WILD_ZONE_STRENGTHS[6]],
-            [typeof zone8Monsters!=="undefined" ? zone8Monsters : null,V173_32_WILD_ZONE_STRENGTHS[7]],
-            [typeof zone9Monsters!=="undefined" ? zone9Monsters : null,V173_32_WILD_ZONE_STRENGTHS[8]],
-            [typeof zone10Monsters!=="undefined" ? zone10Monsters : null,V173_32_WILD_ZONE_STRENGTHS[9]]
-        ].filter(entry=>Array.isArray(entry[0]));
-        const seen=new Set();
-        zones.forEach(([zone,multiplier])=>zone.forEach(monster=>{
-            if(!seen.has(monster)){
-                seen.add(monster);
-                strengthenMonster(monster,multiplier);
-            }
-        }));
-    }
-    window.v173WildZoneStrengthMultipliers=V173_32_WILD_ZONE_STRENGTHS;
-    strengthenAllZoneMonsters();
 
     function syncInventoryPortrait(){
         const frame=document.getElementById("inventoryPortraitFrame");
@@ -7682,9 +7640,7 @@
     "use strict";
 
     const INVENTORY_CAPACITY=120;
-    const VALID_RANKS=new Set(["regular","elite","boss"]);
     const WILD_ELITE_RATE=0.10;
-    const WILD_ZONE_STRENGTHS=window.v173WildZoneStrengthMultipliers;
     const V141_PROGRESS_KEY=window.FourSymbolsAccountSave.accountKey("progress");
 
     window.V141_INVENTORY_CAPACITY=INVENTORY_CAPACITY;
@@ -7735,56 +7691,35 @@
     ===================================================== */
     function getWildZoneSpecs(){
         return [
-            [typeof forestMonsters!=="undefined"?forestMonsters:null,3,"風芽魈","岩薯卒",WILD_ZONE_STRENGTHS[0]],
-            [typeof desertMonsters!=="undefined"?desertMonsters:null,17,"疾角妖","岩鬃狸",WILD_ZONE_STRENGTHS[1]],
-            [typeof iceMountainMonsters!=="undefined"?iceMountainMonsters:null,25,"霧鬃狼","石鎧象",WILD_ZONE_STRENGTHS[2]],
-            [typeof zone4Monsters!=="undefined"?zone4Monsters:null,35,"旋風鬼","礦鎬鬼",WILD_ZONE_STRENGTHS[3]],
-            [typeof zone5Monsters!=="undefined"?zone5Monsters:null,45,"青嵐虎","枯根妖",WILD_ZONE_STRENGTHS[4]],
-            [typeof zone6Monsters!=="undefined"?zone6Monsters:null,55,"逐風客","石鬃狼",WILD_ZONE_STRENGTHS[5]],
-            [typeof zone7Monsters!=="undefined"?zone7Monsters:null,65,"嵐鎧衛","岩爪貛",WILD_ZONE_STRENGTHS[6]],
-            [typeof zone8Monsters!=="undefined"?zone8Monsters:null,75,"翼影魔","礦牙妖",WILD_ZONE_STRENGTHS[7]],
-            [typeof zone9Monsters!=="undefined"?zone9Monsters:null,85,"風魘使","荊根魔",WILD_ZONE_STRENGTHS[8]],
-            [typeof zone10Monsters!=="undefined"?zone10Monsters:null,95,"蒼羽尊","山岩巨人",WILD_ZONE_STRENGTHS[9]]
+            [typeof forestMonsters!=="undefined"?forestMonsters:null,3,"風芽魈","岩薯卒"],
+            [typeof desertMonsters!=="undefined"?desertMonsters:null,17,"疾角妖","岩鬃狸"],
+            [typeof iceMountainMonsters!=="undefined"?iceMountainMonsters:null,25,"霧鬃狼","石鎧象"],
+            [typeof zone4Monsters!=="undefined"?zone4Monsters:null,35,"旋風鬼","礦鎬鬼"],
+            [typeof zone5Monsters!=="undefined"?zone5Monsters:null,45,"青嵐虎","枯根妖"],
+            [typeof zone6Monsters!=="undefined"?zone6Monsters:null,55,"逐風客","石鬃狼"],
+            [typeof zone7Monsters!=="undefined"?zone7Monsters:null,65,"嵐鎧衛","岩爪貛"],
+            [typeof zone8Monsters!=="undefined"?zone8Monsters:null,75,"翼影魔","礦牙妖"],
+            [typeof zone9Monsters!=="undefined"?zone9Monsters:null,85,"風魘使","荊根魔"],
+            [typeof zone10Monsters!=="undefined"?zone10Monsters:null,95,"蒼羽尊","山岩巨人"]
         ].filter(entry=>Array.isArray(entry[0]));
     }
 
-    function strengthenNewWildMonster(monster,multiplier){
-        if(!monster || monster._v131StrengthApplied){ return monster; }
-        const strengthMultiplier=Number.isFinite(Number(multiplier))
-            ? Number(multiplier)
-            : WILD_ZONE_STRENGTHS[WILD_ZONE_STRENGTHS.length-1];
-        monster._v131StrengthApplied=true;
-        ["maxHP","maxSP","attack","defense","magicAttack"].forEach(key=>{
-            if(Number.isFinite(Number(monster[key]))){
-                monster[key]=Math.max(1,Math.round(Number(monster[key])*strengthMultiplier));
-            }
-        });
-        monster.hp=monster.maxHP;
-        monster.sp=monster.maxSP;
-        return monster;
-    }
-
     function addWindAndEarthWildMonsters(){
-        getWildZoneSpecs().forEach(([zone,level,windName,earthName,strengthMultiplier],zoneIndex)=>{
+        getWildZoneSpecs().forEach(([zone,level,windName,earthName],zoneIndex)=>{
             zone.forEach(monster=>{
                 if(monster){
-                    monster.rank="regular";
                     monster.v141CurveEliteRate=WILD_ELITE_RATE;
                 }
             });
             if(!zone.some(monster=>monster&&monster.name===windName)){
-                const monster=strengthenNewWildMonster(
-                    makeZoneMonster(windName,level,"wind","regular"),
-                    strengthMultiplier
-                );
+                const portraitKey="wild.zone-"+String(zoneIndex+1).padStart(2,"0")+".wind-01";
+                const monster=makeZoneMonster(windName,level,"wind","regular",portraitKey,{mode:"wild",context:"wild/zone-"+String(zoneIndex+1).padStart(2,"0")});
                 monster.v141CurveEliteRate=WILD_ELITE_RATE;
                 zone.push(monster);
             }
             if(!zone.some(monster=>monster&&monster.name===earthName)){
-                const monster=strengthenNewWildMonster(
-                    makeZoneMonster(earthName,level,"earth","regular"),
-                    strengthMultiplier
-                );
+                const portraitKey="wild.zone-"+String(zoneIndex+1).padStart(2,"0")+".earth-01";
+                const monster=makeZoneMonster(earthName,level,"earth","regular",portraitKey,{mode:"wild",context:"wild/zone-"+String(zoneIndex+1).padStart(2,"0")});
                 monster.portraitKey="wild.zone-"+String(zoneIndex+1).padStart(2,"0")+".earth-01";
                 monster.v141CurveEliteRate=WILD_ELITE_RATE;
                 zone.push(monster);
@@ -7792,14 +7727,6 @@
         });
     }
 
-    if(typeof getMonsterRank==="function"){
-        getMonsterRank=function(monster){
-            if(!monster){ return "regular"; }
-            if(VALID_RANKS.has(monster.v141BattleRank)){ return monster.v141BattleRank; }
-            if(VALID_RANKS.has(monster.rank)){ return monster.rank; }
-            return "regular";
-        };
-    }
 
     /* =====================================================
        Monster carried skills
@@ -7857,15 +7784,6 @@
     window.v141GetMonsterFixedSkillLevel=getMonsterFixedSkillLevel;
     window.v141ConfigureMonsterSkills=configureMonsterSkills;
 
-    if(typeof makeZoneMonster==="function"){
-        const originalMakeZoneMonster=makeZoneMonster;
-        makeZoneMonster=function(){
-            const monster=originalMakeZoneMonster.apply(this,arguments);
-            if(monster && !monster.rank){ monster.rank="regular"; }
-            return configureMonsterSkills(monster);
-        };
-    }
-
     addWindAndEarthWildMonsters();
     getWildZoneSpecs().forEach(([zone])=>zone.forEach(configureMonsterSkills));
 
@@ -7884,9 +7802,16 @@
         (indexes||[]).forEach(index=>{
             const monster=typeof monsters!=="undefined" ? monsters[index] : null;
             if(!monster){ return; }
-            monster.rank="regular";
-            monster.v141BattleRank=Math.random()<WILD_ELITE_RATE ? "elite" : "regular";
+            if(monster.mode!=="wild"){ return; }
+            const rank=Math.random()<WILD_ELITE_RATE ? "elite" : "regular";
+            const entity=window.MonsterBalance.build({...monster.balanceProjection.identity,rank});
+            Object.assign(monster,entity);
+            // Compatibility mirror for existing reward/UI readers; never a rank decision source.
+            monster.v141BattleRank=monster.rank;
             configureMonsterSkills(monster);
+            if(typeof window.v144ConfigureMonsterEncounterSkills==="function"){
+                window.v144ConfigureMonsterEncounterSkills(monster,"wild-"+battleToken);
+            }
         });
     };
 

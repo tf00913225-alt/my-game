@@ -356,9 +356,27 @@
             monster.v144SkillEncounter=encounterId||("fixed-"+(++encounterSequence));
             return monster;
         }
-        const pool=legalMonsterSkillPool(monster);
+        let pool=legalMonsterSkillPool(monster);
+        const wild=monster.mode==="wild"&&monster.balanceOwner==="MonsterBalance";
+        if(wild&&["physical","magic"].includes(monster.archetype)){
+            pool=pool.filter(id=>skillDatabase[id].category===monster.archetype);
+        }
+        if(wild&&monster.archetype==="speedControl"){
+            const control=pool.filter(id=>{
+                const skill=skillDatabase[id];
+                return skill.agilityDownChance||skill.stunChance||skill.defenseDownChance||skill.freezeChance;
+            });
+            if(control.length){ pool=control; }
+        }
         monster.v144LegalSkillPool=pool.slice();
         monster.skillIds=shuffled(pool).slice(0,monsterCarryLimit(monster.level));
+        if(wild){
+            monster.v141SupportSkillIds=[];
+            if(monster.archetype==="support"&&monster.level>10&&isMonsterSkillElementLegal(monster,"healSpell")){
+                monster.v141SupportSkillIds=["healSpell"];
+                monster.skillIds=monster.skillIds.slice(0,Math.max(0,monsterCarryLimit(monster.level)-1));
+            }
+        }
         monster.v141SkillLevel=monsterSkillLevel(monster.level);
         monster.v144SkillLevel=monster.v141SkillLevel;
         monster.v144SkillEncounter=encounterId||("generated-"+(++encounterSequence));
@@ -372,26 +390,6 @@
     window.v144GetMonsterFixedSkillLevel=monsterSkillLevel;
     window.v144GetMonsterLegalSkillPool=legalMonsterSkillPool;
     window.v144ConfigureMonsterEncounterSkills=configureEncounterSkills;
-
-    if(typeof makeZoneMonster==="function"){
-        const previousMakeZoneMonster=makeZoneMonster;
-        makeZoneMonster=function(){
-            return configureEncounterSkills(previousMakeZoneMonster.apply(this,arguments));
-        };
-    }
-
-    if(typeof window.v141RollWildMonsterRanks==="function"){
-        const previousRollWildRanks=window.v141RollWildMonsterRanks;
-        window.v141RollWildMonsterRanks=function(indexes){
-            const result=previousRollWildRanks.apply(this,arguments);
-            const encounterId="wild-"+(++encounterSequence);
-            (indexes||[]).forEach(index=>{
-                const monster=typeof monsters!=="undefined"?monsters[index]:null;
-                configureEncounterSkills(monster,encounterId);
-            });
-            return result;
-        };
-    }
 
     /* ----- Hard control skips manual declaration instead of accepting a fake action. ----- */
     function hardControlName(character){
@@ -5522,36 +5520,10 @@
         return monster;
     }
 
-    const V17342_HALF_MONSTER_FIELDS=[
-        "maxHP","hp","maxSP","sp","attack","magicAttack","defense",
-        "attackPoints","vitalityPoints","energyPoints","intelligencePoints","defensePoints","agilityPoints",
-        "vitality","energy","intelligence","defense","agility"
-    ];
-
-    function halveMonsterCoreStats(monster,marker){
-        if(!monster||monster[marker]){ return monster; }
-        V17342_HALF_MONSTER_FIELDS.forEach(key=>{
-            if(!Number.isFinite(Number(monster[key]))){ return; }
-            const minimum=["maxHP","hp","maxSP","sp"].includes(key)?1:0;
-            monster[key]=Math.max(minimum,Math.round(Number(monster[key])*0.5));
-        });
-        if(Number.isFinite(Number(monster.maxHP))){
-            monster.hp=Math.max(1,Math.min(Number(monster.maxHP),Number(monster.hp)||Number(monster.maxHP)));
-        }
-        if(Number.isFinite(Number(monster.maxSP))){
-            monster.sp=Math.max(0,Math.min(Number(monster.maxSP),Number(monster.sp)||Number(monster.maxSP)));
-        }
-        monster[marker]=true;
-        return monster;
-    }
-
     function normalizeBeginnerForestMonster(monster){
         if(!monster){ return monster; }
         monster.v173BeginnerForest=true;
         normalizeMonsterDefaultEvasion(monster);
-        halveMonsterCoreStats(monster,"v17342BeginnerStatsHalved");
-        monster.agilityPoints=0;
-        monster.agility=0;
         return monster;
     }
 
@@ -5641,15 +5613,6 @@
     window.v17342NormalizeDailyDungeonMonster=normalizeDailyDungeonMonster;
     window.v173GetDailyDungeonScaleContext=getDailyDungeonScaleContext;
     window.v17344IsFormalDailyDungeonMonster=isFormalDailyDungeonMonster;
-
-    if(typeof makeZoneMonster==="function"){
-        const previousMakeZoneMonster=makeZoneMonster;
-        makeZoneMonster=function(){
-            return normalizeMonsterDefaultEvasion(
-                previousMakeZoneMonster.apply(this,arguments)
-            );
-        };
-    }
 
     if(typeof zoneConfig!=="undefined"){
         Object.keys(zoneConfig).forEach(key=>{

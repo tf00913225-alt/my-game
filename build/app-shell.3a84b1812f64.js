@@ -63,6 +63,131 @@
 
 
 /* bundled source: js/00-main.js */
+/* BEGIN GENERATED MONSTER BALANCE OWNER */
+(function installMonsterBalanceAuthority(){
+"use strict";
+/** Canonical future player/monster contract. Phase 1: pure shadow only. */
+const LEVEL_BASE = Object.freeze({physicalAttack:30,magicAttack:30,defense:30});
+const LEVEL_GROWTH = Object.freeze({physicalAttack:4,magicAttack:2.75,defense:4});
+const SIX_STAT_COEFFICIENTS = Object.freeze({attack:4,intelligence:2.75,vitality:50,energy:15,defense:4,agility:1});
+function validateLevel(level){
+  if(!Number.isSafeInteger(level)||level<1||level>100) throw new RangeError('level must be an integer from 1 to 100');
+  return level;
+}
+function levelBase(level){
+  validateLevel(level);
+  return {...Object.fromEntries(Object.keys(LEVEL_BASE).map(key=>[key,LEVEL_BASE[key]+(level-1)*LEVEL_GROWTH[key]])),abilityPointBudget:(level-1)*5};
+}
+const CombatLevelBase = Object.freeze({preview:levelBase,base:LEVEL_BASE,growth:LEVEL_GROWTH,coefficients:SIX_STAT_COEFFICIENTS});
+
+/** One registry for allocation and AI intent; no skill execution or invented skills. */
+const define=(weights,priority,requiredCapabilities=[])=>Object.freeze({
+  weights:Object.freeze(weights),aiIntent:Object.freeze({priority:Object.freeze(priority),requiredCapabilities:Object.freeze(requiredCapabilities),policy:'only-existing-carried-legal-affordable-skills'})
+});
+const ARCHETYPES=Object.freeze({
+  physical:define({attack:30,vitality:15,defense:15,energy:15,agility:15,intelligence:10},['physicalAttack','attack']),
+  magic:define({attack:10,vitality:15,defense:15,energy:15,agility:15,intelligence:30},['magicAttack','attack']),
+  tank:define({vitality:30,defense:30,attack:15,energy:10,agility:10,intelligence:5},['protectAlly','shield','reduceDamage','attack'],['shield-or-protection-or-damage-reduction-or-taunt']),
+  speedControl:define({agility:30,intelligence:20,energy:15,vitality:15,defense:10,attack:10},['openingBuffOrSupport','hardControlOrDebuff','attack'],['opening-support-or-control-or-debuff']),
+  support:define({intelligence:25,energy:25,agility:20,vitality:15,defense:10,attack:5},['healLowHpAlly','missingImportantBuff','cleanseDebuff','attack']),
+  balanced:define({attack:20,vitality:20,defense:20,intelligence:15,energy:15,agility:10},['contextAppropriateLegalSkill','attack'])
+});
+// Canonical tie order, independent of registry property order or creation order.
+const STAT_ORDER=Object.freeze(['attack','intelligence','vitality','energy','defense','agility']);
+function allocatePoints(budget,archetype){
+  if(!Number.isSafeInteger(budget)||budget<0) throw new RangeError('budget must be a nonnegative integer');
+  const entry=ARCHETYPES[archetype];
+  if(!Object.hasOwn(ARCHETYPES,archetype)) throw new TypeError('unknown archetype');
+  const shares=STAT_ORDER.map((stat,index)=>({stat,index,points:Math.floor(budget*entry.weights[stat]/100),remainder:budget*entry.weights[stat]%100}));
+  const left=budget-shares.reduce((sum,row)=>sum+row.points,0);
+  [...shares].sort((a,b)=>b.remainder-a.remainder||a.index-b.index).slice(0,left).forEach(row=>row.points++);
+  return Object.fromEntries(shares.map(row=>[row.stat+'Points',row.points]));
+}
+
+const MODES=Object.freeze(['wild','daily','tower','abyss','adventure','personalBoss','worldBoss']);
+const RANKS=Object.freeze(['regular','elite','smallBoss']);
+const GLOBAL_CALIBRATION=Object.freeze({hp:1,sp:1,damage:1,defense:1});
+// Wild resources are HP100/SP50 plus allocation only; player per-level bonuses never apply.
+const RESOURCE_BASE=Object.freeze({hp:100,sp:50,provenance:'00-main legacy resource baseline'});
+const clone=value=>JSON.parse(JSON.stringify(value));
+function normalizeSpec(spec){
+  if(!spec||typeof spec!=='object') throw new TypeError('monster spec required');
+  const {name,level,element,archetype,rank,mode,context}=spec;
+  if(typeof name!=='string'||!name.trim()) throw new TypeError('name required');
+  validateLevel(level);
+  if(!['fire','water','wind','earth','light'].includes(element)) throw new TypeError('explicit element required');
+  if(!Object.hasOwn(ARCHETYPES,archetype)) throw new TypeError('explicit archetype required');
+  if(!RANKS.includes(rank)||!MODES.includes(mode)) throw new TypeError('explicit canonical rank and mode required');
+  if(typeof context!=='string'||!context.trim()) throw new TypeError('stable context ID required');
+  if(mode==='wild' && rank==='smallBoss') throw new TypeError('Wild has no formal smallBoss runtime');
+  return {...(spec.monsterKey?{monsterKey:spec.monsterKey}:{}),name,level,element,archetype,rank,mode,context};
+}
+function preview(spec){
+  const identity=normalizeSpec(spec),base=levelBase(identity.level),allocation=allocatePoints(base.abilityPointBudget,identity.archetype);
+  const derived={
+    maxHP:RESOURCE_BASE.hp+allocation.vitalityPoints*SIX_STAT_COEFFICIENTS.vitality,
+    maxSP:RESOURCE_BASE.sp+allocation.energyPoints*SIX_STAT_COEFFICIENTS.energy,
+    physicalAttack:base.physicalAttack+allocation.attackPoints*SIX_STAT_COEFFICIENTS.attack,
+    magicAttack:base.magicAttack+allocation.intelligencePoints*SIX_STAT_COEFFICIENTS.intelligence,
+    defense:base.defense+allocation.defensePoints*SIX_STAT_COEFFICIENTS.defense,
+    speed:allocation.agilityPoints*SIX_STAT_COEFFICIENTS.agility
+  };
+  // Wild Rank V1 is ratified. Unmigrated modes retain the Phase 1 neutral shadow profile.
+  const rank=identity.mode==='wild'
+    ?{id:identity.rank,status:'RANK_V1',hp:identity.rank==='elite'?1.5:1,defense:identity.rank==='elite'?1.1:1,finalDamagePressure:identity.rank==='elite'?1.1:1,skillFrequency:null}
+    :{id:identity.rank,status:'PENDING_PRODUCT_CALIBRATION',hp:1,defense:1,finalDamagePressure:null,skillFrequency:null};
+  const mode={id:identity.mode,status:identity.mode==='wild'?'RUNTIME_V1':'SHADOW_BASELINE_ONLY',hp:identity.mode==='wild'?0.32:1,sp:1,damage:1,defense:1,speed:identity.mode==='wild'&&identity.context==='wild/zone-01'?0:1,ttkTarget:['wild','daily'].includes(identity.mode)?{maxRounds:2,player:'normal same-level progression',scope:'kill/clear wave'}:null};
+  const element={id:identity.element,hp:1,defense:1,speed:1,metadata:{},provenance:'identity only'};
+  if(identity.mode==='tower'){
+    element.provenance='existing Tower Element Profile (pre-battle only)';
+    if(identity.element==='earth'){element.hp=1.15;element.defense=1.15;}
+    if(identity.element==='wind'){element.speed=1.15;element.metadata={evasionBonusPercent:15};}
+    if(identity.element==='fire') element.metadata={criticalBonusPercent:15,directDamageMultiplier:1.15};
+    if(identity.element==='water') element.metadata={healingMultiplier:1.15,statusAccuracyPercent:15,aiPreference:'support'};
+  }
+  const globalCalibration={...GLOBAL_CALIBRATION};
+  const profiles={rank,mode,element,globalCalibration};
+  const afterRank={...derived,maxHP:derived.maxHP*rank.hp,defense:derived.defense*rank.defense};
+  const afterMode={...afterRank,maxHP:afterRank.maxHP*mode.hp,maxSP:afterRank.maxSP*mode.sp,physicalAttack:afterRank.physicalAttack*mode.damage,magicAttack:afterRank.magicAttack*mode.damage,defense:afterRank.defense*mode.defense,speed:afterRank.speed*mode.speed};
+  const afterElement={...afterMode,maxHP:Math.round(afterMode.maxHP*element.hp),defense:identity.mode==='wild'?afterMode.defense:Math.round(afterMode.defense*element.defense),speed:afterMode.speed*element.speed};
+  const final={...afterElement,maxHP:afterElement.maxHP*globalCalibration.hp,maxSP:afterElement.maxSP*globalCalibration.sp,physicalAttack:afterElement.physicalAttack*globalCalibration.damage,magicAttack:afterElement.magicAttack*globalCalibration.damage,defense:afterElement.defense*globalCalibration.defense};
+  return {identity,base,resourceBase:{...RESOURCE_BASE,speed:0},allocation,derived,profiles,final,finalDamagePressure:rank.finalDamagePressure,provenance:{stats:'MonsterBalance',damagePressure:'MonsterBalance Rank Profile consumed once by core damage settlement'},aiIntent:clone(ARCHETYPES[identity.archetype].aiIntent),pendingProductDecisions:identity.mode==='wild'?[]:['monster per-level bonusHP +30 / bonusSP +10','rank and mode final calibration','Tower/Abyss TTK'],breakdown:[
+    {step:'levelBase',formula:'30 + (level - 1) * growth; budget = (level - 1) * 5',input:identity.level,output:{...base}},
+    {step:'allocation',method:'largest remainder; canonical STAT_ORDER ties',weights:{...ARCHETYPES[identity.archetype].weights},output:{...allocation}},
+    {step:'sixStatConversion',coefficients:{...SIX_STAT_COEFFICIENTS},resourceBase:{...RESOURCE_BASE},output:{...derived}},
+    {step:'rank',profile:{...rank},output:afterRank},{step:'mode',profile:clone(mode),output:afterMode},
+    {step:'element',profile:clone(element),output:afterElement},{step:'globalCalibration',profile:{...globalCalibration},output:{...final}}
+  ]};
+}
+function previewTower(spec,floor){
+  validateLevel(floor);
+  return preview({...spec,mode:'tower',context:'tower/floor/'+floor,level:floor});
+}
+function previewTowerRoster(spec,floor){
+  validateLevel(floor);
+  const ranks=floor%10===0?['smallBoss','elite','elite',...Array(7).fill('regular')]:floor%5===0?['elite','elite',...Array(8).fill('regular')]:Array(10).fill('regular');
+  return ranks.map(rank=>previewTower({...spec,rank},floor));
+}
+function build(spec){
+  if(spec.mode!=='wild'||!spec.monsterKey) throw new TypeError('Runtime build requires explicit Wild identity');
+  const projection=preview(spec),{final,allocation,identity}=projection;
+  return {...identity,...allocation,maxHP:final.maxHP,hp:final.maxHP,maxSP:final.maxSP,sp:final.maxSP,
+    attack:final.physicalAttack,magicAttack:final.magicAttack,defense:final.defense,agility:final.speed,
+    accuracy:0,statusResistance:0,antiCrit:0,evasion:0,alive:true,
+    balanceOwner:'MonsterBalance',balanceProjection:projection};
+}
+function debug(entity){
+  if(!entity||entity.balanceOwner!=='MonsterBalance'||!entity.balanceProjection) throw new TypeError('Owner entity required');
+  return clone(entity.balanceProjection);
+}
+const MonsterBalance=Object.freeze({preview,build,debug,previewTower,previewTowerRoster,archetypes:ARCHETYPES,modes:MODES,ranks:RANKS,globalCalibration:GLOBAL_CALIBRATION});
+
+window.MonsterBalance=MonsterBalance;
+window.MonsterBalanceWildIdentities=Object.freeze({"wild.zone-01.fire-01":{"archetype":"physical","zone":"wild/zone-01","reason":"Existing elemental physical legal damage skill pool.","capabilityGap":null},"wild.zone-01.water-01":{"archetype":"balanced","zone":"wild/zone-01","reason":"No specialized capability evidence; explicit balanced default.","capabilityGap":null},"wild.zone-01.wind-01":{"archetype":"balanced","zone":"wild/zone-01","reason":"No specialized capability evidence; explicit balanced default.","capabilityGap":null},"wild.zone-01.earth-01":{"archetype":"tank","zone":"wild/zone-01","reason":"Established rock/armored portrait identity; defensive AI capability gap is recorded.","capabilityGap":"No new tank AI or skills are introduced."},"wild.zone-02.fire-01":{"archetype":"physical","zone":"wild/zone-02","reason":"Existing elemental physical legal damage skill pool.","capabilityGap":null},"wild.zone-02.water-01":{"archetype":"magic","zone":"wild/zone-02","reason":"Existing water magic damage skill pool.","capabilityGap":null},"wild.zone-02.wind-01":{"archetype":"speedControl","zone":"wild/zone-02","reason":"Existing wind agilityDown/stun legal skills; early tier uses agilityDown.","capabilityGap":null},"wild.zone-02.earth-01":{"archetype":"tank","zone":"wild/zone-02","reason":"Established rock/armored portrait identity; defensive AI capability gap is recorded.","capabilityGap":"No new tank AI or skills are introduced."},"wild.zone-03.fire-01":{"archetype":"physical","zone":"wild/zone-03","reason":"Existing elemental physical legal damage skill pool.","capabilityGap":null},"wild.zone-03.water-01":{"archetype":"magic","zone":"wild/zone-03","reason":"Existing water magic damage skill pool.","capabilityGap":null},"wild.zone-03.fire-02":{"archetype":"physical","zone":"wild/zone-03","reason":"Existing elemental physical legal damage skill pool.","capabilityGap":null},"wild.zone-03.water-02":{"archetype":"magic","zone":"wild/zone-03","reason":"Existing water magic damage skill pool.","capabilityGap":null},"wild.zone-03.wind-01":{"archetype":"speedControl","zone":"wild/zone-03","reason":"Existing wind agilityDown/stun legal skills; early tier uses agilityDown.","capabilityGap":null},"wild.zone-03.earth-01":{"archetype":"tank","zone":"wild/zone-03","reason":"Established rock/armored portrait identity; defensive AI capability gap is recorded.","capabilityGap":"No new tank AI or skills are introduced."},"wild.zone-04.fire-01":{"archetype":"physical","zone":"wild/zone-04","reason":"Existing elemental physical legal damage skill pool.","capabilityGap":null},"wild.zone-04.water-01":{"archetype":"magic","zone":"wild/zone-04","reason":"Existing water magic damage skill pool.","capabilityGap":null},"wild.zone-04.fire-02":{"archetype":"physical","zone":"wild/zone-04","reason":"Existing elemental physical legal damage skill pool.","capabilityGap":null},"wild.zone-04.water-02":{"archetype":"magic","zone":"wild/zone-04","reason":"Existing water magic damage skill pool.","capabilityGap":null},"wild.zone-04.wind-01":{"archetype":"speedControl","zone":"wild/zone-04","reason":"Existing wind agilityDown/stun legal skills; early tier uses agilityDown.","capabilityGap":null},"wild.zone-04.earth-01":{"archetype":"tank","zone":"wild/zone-04","reason":"Established rock/armored portrait identity; defensive AI capability gap is recorded.","capabilityGap":"No new tank AI or skills are introduced."},"wild.zone-05.fire-01":{"archetype":"physical","zone":"wild/zone-05","reason":"Existing elemental physical legal damage skill pool.","capabilityGap":null},"wild.zone-05.water-01":{"archetype":"support","zone":"wild/zone-05","reason":"Existing water healing support resolver; retain a legal heal utility.","capabilityGap":null},"wild.zone-05.fire-02":{"archetype":"physical","zone":"wild/zone-05","reason":"Existing elemental physical legal damage skill pool.","capabilityGap":null},"wild.zone-05.water-02":{"archetype":"support","zone":"wild/zone-05","reason":"Existing water healing support resolver; retain a legal heal utility.","capabilityGap":null},"wild.zone-05.wind-01":{"archetype":"speedControl","zone":"wild/zone-05","reason":"Existing wind agilityDown/stun legal skills; early tier uses agilityDown.","capabilityGap":null},"wild.zone-05.earth-01":{"archetype":"tank","zone":"wild/zone-05","reason":"Established rock/armored portrait identity; defensive AI capability gap is recorded.","capabilityGap":"No new tank AI or skills are introduced."},"wild.zone-06.fire-01":{"archetype":"physical","zone":"wild/zone-06","reason":"Existing elemental physical legal damage skill pool.","capabilityGap":null},"wild.zone-06.water-01":{"archetype":"support","zone":"wild/zone-06","reason":"Existing water healing support resolver; retain a legal heal utility.","capabilityGap":null},"wild.zone-06.fire-02":{"archetype":"physical","zone":"wild/zone-06","reason":"Existing elemental physical legal damage skill pool.","capabilityGap":null},"wild.zone-06.water-02":{"archetype":"support","zone":"wild/zone-06","reason":"Existing water healing support resolver; retain a legal heal utility.","capabilityGap":null},"wild.zone-06.wind-01":{"archetype":"speedControl","zone":"wild/zone-06","reason":"Existing wind agilityDown/stun legal skills; early tier uses agilityDown.","capabilityGap":null},"wild.zone-06.earth-01":{"archetype":"tank","zone":"wild/zone-06","reason":"Established rock/armored portrait identity; defensive AI capability gap is recorded.","capabilityGap":"No new tank AI or skills are introduced."},"wild.zone-07.fire-01":{"archetype":"physical","zone":"wild/zone-07","reason":"Existing elemental physical legal damage skill pool.","capabilityGap":null},"wild.zone-07.water-01":{"archetype":"support","zone":"wild/zone-07","reason":"Existing water healing support resolver; retain a legal heal utility.","capabilityGap":null},"wild.zone-07.fire-02":{"archetype":"magic","zone":"wild/zone-07","reason":"Existing elemental magic legal damage skill pool.","capabilityGap":null},"wild.zone-07.water-02":{"archetype":"support","zone":"wild/zone-07","reason":"Existing water healing support resolver; retain a legal heal utility.","capabilityGap":null},"wild.zone-07.wind-01":{"archetype":"speedControl","zone":"wild/zone-07","reason":"Existing wind agilityDown/stun legal skills; early tier uses agilityDown.","capabilityGap":null},"wild.zone-07.earth-01":{"archetype":"tank","zone":"wild/zone-07","reason":"Established rock/armored portrait identity; defensive AI capability gap is recorded.","capabilityGap":"No new tank AI or skills are introduced."},"wild.zone-08.fire-01":{"archetype":"physical","zone":"wild/zone-08","reason":"Existing elemental physical legal damage skill pool.","capabilityGap":null},"wild.zone-08.water-01":{"archetype":"support","zone":"wild/zone-08","reason":"Existing water healing support resolver; retain a legal heal utility.","capabilityGap":null},"wild.zone-08.fire-02":{"archetype":"magic","zone":"wild/zone-08","reason":"Existing elemental magic legal damage skill pool.","capabilityGap":null},"wild.zone-08.water-02":{"archetype":"support","zone":"wild/zone-08","reason":"Existing water healing support resolver; retain a legal heal utility.","capabilityGap":null},"wild.zone-08.wind-01":{"archetype":"speedControl","zone":"wild/zone-08","reason":"Existing wind agilityDown/stun legal skills; early tier uses agilityDown.","capabilityGap":null},"wild.zone-08.earth-01":{"archetype":"tank","zone":"wild/zone-08","reason":"Established rock/armored portrait identity; defensive AI capability gap is recorded.","capabilityGap":"No new tank AI or skills are introduced."},"wild.zone-09.fire-01":{"archetype":"physical","zone":"wild/zone-09","reason":"Existing elemental physical legal damage skill pool.","capabilityGap":null},"wild.zone-09.water-01":{"archetype":"support","zone":"wild/zone-09","reason":"Existing water healing support resolver; retain a legal heal utility.","capabilityGap":null},"wild.zone-09.fire-02":{"archetype":"magic","zone":"wild/zone-09","reason":"Existing elemental magic legal damage skill pool.","capabilityGap":null},"wild.zone-09.water-02":{"archetype":"support","zone":"wild/zone-09","reason":"Existing water healing support resolver; retain a legal heal utility.","capabilityGap":null},"wild.zone-09.wind-01":{"archetype":"speedControl","zone":"wild/zone-09","reason":"Existing wind agilityDown/stun legal skills; early tier uses agilityDown.","capabilityGap":null},"wild.zone-09.earth-01":{"archetype":"tank","zone":"wild/zone-09","reason":"Established rock/armored portrait identity; defensive AI capability gap is recorded.","capabilityGap":"No new tank AI or skills are introduced."},"wild.zone-10.fire-01":{"archetype":"physical","zone":"wild/zone-10","reason":"Existing elemental physical legal damage skill pool.","capabilityGap":null},"wild.zone-10.water-01":{"archetype":"support","zone":"wild/zone-10","reason":"Existing water healing support resolver; retain a legal heal utility.","capabilityGap":null},"wild.zone-10.fire-02":{"archetype":"magic","zone":"wild/zone-10","reason":"Existing elemental magic legal damage skill pool.","capabilityGap":null},"wild.zone-10.water-02":{"archetype":"support","zone":"wild/zone-10","reason":"Existing water healing support resolver; retain a legal heal utility.","capabilityGap":null},"wild.zone-10.wind-01":{"archetype":"speedControl","zone":"wild/zone-10","reason":"Existing wind agilityDown/stun legal skills; early tier uses agilityDown.","capabilityGap":null},"wild.zone-10.earth-01":{"archetype":"tank","zone":"wild/zone-10","reason":"Established rock/armored portrait identity; defensive AI capability gap is recorded.","capabilityGap":"No new tank AI or skills are introduced."}});
+})();
+/* END GENERATED MONSTER BALANCE OWNER */
+
+
 /* =====================================================
    ★ 1080 × 1920 整體等比例縮放控制器
    - 遊戲邏輯舞台固定 1080 × 1920
@@ -2848,17 +2973,15 @@ function rollBeginnerForestNormalAttackDamage(){
 
 const forestMonsters = [
 
-    makeZoneMonster("哥布林",3,"fire",undefined,"wild.zone-01.fire-01"),
-    makeZoneMonster("水靈狐",2,"water",undefined,"wild.zone-01.water-01"),
-    makeZoneMonster("哥布林",3,"fire",undefined,"wild.zone-01.fire-01"),
-    makeZoneMonster("水靈狐",2,"water",undefined,"wild.zone-01.water-01"),    makeZoneMonster("哥布林",3,"fire",undefined,"wild.zone-01.fire-01"),
-    makeZoneMonster("水靈狐",2,"water",undefined,"wild.zone-01.water-01")
+    makeZoneMonster("哥布林",3,"fire","regular","wild.zone-01.fire-01",{mode:"wild",context:"wild/zone-01"}),
+    makeZoneMonster("水靈狐",2,"water","regular","wild.zone-01.water-01",{mode:"wild",context:"wild/zone-01"}),
+    makeZoneMonster("哥布林",3,"fire","regular","wild.zone-01.fire-01",{mode:"wild",context:"wild/zone-01"}),
+    makeZoneMonster("水靈狐",2,"water","regular","wild.zone-01.water-01",{mode:"wild",context:"wild/zone-01"}),    makeZoneMonster("哥布林",3,"fire","regular","wild.zone-01.fire-01",{mode:"wild",context:"wild/zone-01"}),
+    makeZoneMonster("水靈狐",2,"water","regular","wild.zone-01.water-01",{mode:"wild",context:"wild/zone-01"})
 
 ];
 
 forestMonsters.forEach(monster=>{
-    monster.agilityPoints=0;
-    monster.agility=0;
     monster.v173BeginnerForest=true;
 });
 
@@ -2874,12 +2997,12 @@ forestMonsters.forEach(monster=>{
 
 const desertMonsters = [
 
-    makeZoneMonster("沙漠豺狼",16,"fire",undefined,"wild.zone-02.fire-01"),
-    makeZoneMonster("浪尾獺",15,"water",undefined,"wild.zone-02.water-01"),
-    makeZoneMonster("沙漠豺狼",16,"fire",undefined,"wild.zone-02.fire-01"),
-    makeZoneMonster("浪尾獺",15,"water",undefined,"wild.zone-02.water-01"),
-    makeZoneMonster("沙漠豺狼",16,"fire",undefined,"wild.zone-02.fire-01"),
-    makeZoneMonster("浪尾獺",15,"water",undefined,"wild.zone-02.water-01")
+    makeZoneMonster("沙漠豺狼",16,"fire","regular","wild.zone-02.fire-01",{mode:"wild",context:"wild/zone-02"}),
+    makeZoneMonster("浪尾獺",15,"water","regular","wild.zone-02.water-01",{mode:"wild",context:"wild/zone-02"}),
+    makeZoneMonster("沙漠豺狼",16,"fire","regular","wild.zone-02.fire-01",{mode:"wild",context:"wild/zone-02"}),
+    makeZoneMonster("浪尾獺",15,"water","regular","wild.zone-02.water-01",{mode:"wild",context:"wild/zone-02"}),
+    makeZoneMonster("沙漠豺狼",16,"fire","regular","wild.zone-02.fire-01",{mode:"wild",context:"wild/zone-02"}),
+    makeZoneMonster("浪尾獺",15,"water","regular","wild.zone-02.water-01",{mode:"wild",context:"wild/zone-02"})
 
 ];
 
@@ -2904,12 +3027,12 @@ const desertMonsters = [
 
 const iceMountainMonsters = [
 
-    makeZoneMonster("熾焰狼",22,"fire",undefined,"wild.zone-03.fire-01"),
-    makeZoneMonster("澤木妖",23,"water",undefined,"wild.zone-03.water-01"),
-    makeZoneMonster("熾焰狼",22,"fire",undefined,"wild.zone-03.fire-01"),
-    makeZoneMonster("澤木妖",23,"water",undefined,"wild.zone-03.water-01"),
-    makeZoneMonster("熾焰狼王",27,"fire",undefined,"wild.zone-03.fire-02"),
-    makeZoneMonster("寒冰魔王",28,"water")
+    makeZoneMonster("熾焰狼",22,"fire","regular","wild.zone-03.fire-01",{mode:"wild",context:"wild/zone-03"}),
+    makeZoneMonster("澤木妖",23,"water","regular","wild.zone-03.water-01",{mode:"wild",context:"wild/zone-03"}),
+    makeZoneMonster("熾焰狼",22,"fire","regular","wild.zone-03.fire-01",{mode:"wild",context:"wild/zone-03"}),
+    makeZoneMonster("澤木妖",23,"water","regular","wild.zone-03.water-01",{mode:"wild",context:"wild/zone-03"}),
+    makeZoneMonster("熾焰狼王",27,"fire","regular","wild.zone-03.fire-02",{mode:"wild",context:"wild/zone-03"}),
+    makeZoneMonster("寒冰魔王",28,"water","regular","wild.zone-03.water-02",{mode:"wild",context:"wild/zone-03"})
 
 ];
 
@@ -3163,8 +3286,32 @@ function makeZoneMonster(
     level,
     element,
     rank,
-    portraitKey
+    portraitKey,
+    specOptions
 ){
+    const options=specOptions||{};
+    if(options.mode==="wild"){
+        const identity=window.MonsterBalanceWildIdentities[portraitKey];
+        if(!identity){ throw new Error("Unregistered Wild identity: "+portraitKey); }
+        const monster=window.MonsterBalance.build({monsterKey:portraitKey,name,level,element,archetype:identity.archetype,rank:rank||"regular",mode:"wild",context:options.context||identity.zone});
+        monster.portraitKey=portraitKey;
+        monster.skillIds=getMonsterSkillPoolForLevel(element,level);
+        monster.skillChance=getMonsterSkillTierAndChance(level).chance;
+        if(identity.zone==="wild/zone-01"){ monster.v173BeginnerForest=true; }
+        return configureBuiltMonster(monster);
+    }
+    // Legacy-only compatibility: Daily/Tower/Abyss/Adventure/Boss remain unmigrated.
+    return makeLegacyModeMonster(name,level,element,rank,portraitKey);
+}
+
+function configureBuiltMonster(monster){
+    if(typeof window.v141ConfigureMonsterSkills==="function"){ window.v141ConfigureMonsterSkills(monster); }
+    if(typeof window.v144ConfigureMonsterEncounterSkills==="function"){ window.v144ConfigureMonsterEncounterSkills(monster); }
+    if(typeof window.v158NormalizeMonsterDefaultEvasion==="function"){ window.v158NormalizeMonsterDefaultEvasion(monster); }
+    return monster;
+}
+
+function makeLegacyModeMonster(name,level,element,rank,portraitKey){
 
     const points=
         generateMonsterAttributePoints(
@@ -3194,7 +3341,7 @@ function makeZoneMonster(
        對不上分級規則的情況。
     */
 
-    return {
+    return configureBuiltMonster({
 
         name:name,
         level:level,
@@ -3300,67 +3447,67 @@ function makeZoneMonster(
                 level
             ).chance
 
-    };
+    });
 
 }
 
 
 const zone4Monsters = [
 
-    makeZoneMonster("烈焰巨魔",32,"fire",undefined,"wild.zone-04.fire-01"),
-    makeZoneMonster("沼鉤怪",33,"water",undefined,"wild.zone-04.water-01"),
-    makeZoneMonster("烈焰巨魔",32,"fire",undefined,"wild.zone-04.fire-01"),
-    makeZoneMonster("沼鉤怪",33,"water",undefined,"wild.zone-04.water-01"),
-    makeZoneMonster("炎錘巨魔",38,"fire",undefined,"wild.zone-04.fire-02"),
-    makeZoneMonster("深淵水靈王",40,"water")
+    makeZoneMonster("烈焰巨魔",32,"fire","regular","wild.zone-04.fire-01",{mode:"wild",context:"wild/zone-04"}),
+    makeZoneMonster("沼鉤怪",33,"water","regular","wild.zone-04.water-01",{mode:"wild",context:"wild/zone-04"}),
+    makeZoneMonster("烈焰巨魔",32,"fire","regular","wild.zone-04.fire-01",{mode:"wild",context:"wild/zone-04"}),
+    makeZoneMonster("沼鉤怪",33,"water","regular","wild.zone-04.water-01",{mode:"wild",context:"wild/zone-04"}),
+    makeZoneMonster("炎錘巨魔",38,"fire","regular","wild.zone-04.fire-02",{mode:"wild",context:"wild/zone-04"}),
+    makeZoneMonster("深淵水靈王",40,"water","regular","wild.zone-04.water-02",{mode:"wild",context:"wild/zone-04"})
 
 ];
 
 
 const zone5Monsters = [
 
-    makeZoneMonster("熔岩巨獸",42,"fire",undefined,"wild.zone-05.fire-01"),
-    makeZoneMonster("潮蛙卒",43,"water",undefined,"wild.zone-05.water-01"),
-    makeZoneMonster("熔岩巨獸",42,"fire",undefined,"wild.zone-05.fire-01"),
-    makeZoneMonster("潮蛙卒",43,"water",undefined,"wild.zone-05.water-01"),
-    makeZoneMonster("熔翼獸王",48,"fire",undefined,"wild.zone-05.fire-02"),
-    makeZoneMonster("寒潮巨獸王",50,"water")
+    makeZoneMonster("熔岩巨獸",42,"fire","regular","wild.zone-05.fire-01",{mode:"wild",context:"wild/zone-05"}),
+    makeZoneMonster("潮蛙卒",43,"water","regular","wild.zone-05.water-01",{mode:"wild",context:"wild/zone-05"}),
+    makeZoneMonster("熔岩巨獸",42,"fire","regular","wild.zone-05.fire-01",{mode:"wild",context:"wild/zone-05"}),
+    makeZoneMonster("潮蛙卒",43,"water","regular","wild.zone-05.water-01",{mode:"wild",context:"wild/zone-05"}),
+    makeZoneMonster("熔翼獸王",48,"fire","regular","wild.zone-05.fire-02",{mode:"wild",context:"wild/zone-05"}),
+    makeZoneMonster("寒潮巨獸王",50,"water","regular","wild.zone-05.water-02",{mode:"wild",context:"wild/zone-05"})
 
 ];
 
 
 const zone6Monsters = [
 
-    makeZoneMonster("赤炎修羅",52,"fire",undefined,"wild.zone-06.fire-01"),
-    makeZoneMonster("鱗潭獸",53,"water",undefined,"wild.zone-06.water-01"),
-    makeZoneMonster("赤炎修羅",52,"fire",undefined,"wild.zone-06.fire-01"),
-    makeZoneMonster("鱗潭獸",53,"water",undefined,"wild.zone-06.water-01"),
-    makeZoneMonster("六臂修羅",58,"fire",undefined,"wild.zone-06.fire-02"),
-    makeZoneMonster("玄冰修羅王",60,"water")
+    makeZoneMonster("赤炎修羅",52,"fire","regular","wild.zone-06.fire-01",{mode:"wild",context:"wild/zone-06"}),
+    makeZoneMonster("鱗潭獸",53,"water","regular","wild.zone-06.water-01",{mode:"wild",context:"wild/zone-06"}),
+    makeZoneMonster("赤炎修羅",52,"fire","regular","wild.zone-06.fire-01",{mode:"wild",context:"wild/zone-06"}),
+    makeZoneMonster("鱗潭獸",53,"water","regular","wild.zone-06.water-01",{mode:"wild",context:"wild/zone-06"}),
+    makeZoneMonster("六臂修羅",58,"fire","regular","wild.zone-06.fire-02",{mode:"wild",context:"wild/zone-06"}),
+    makeZoneMonster("玄冰修羅王",60,"water","regular","wild.zone-06.water-02",{mode:"wild",context:"wild/zone-06"})
 
 ];
 
 
 const zone7Monsters = [
 
-    makeZoneMonster("業火魔君",62,"fire",undefined,"wild.zone-07.fire-01"),
-    makeZoneMonster("瀾花姬",63,"water",undefined,"wild.zone-07.water-01"),
-    makeZoneMonster("業火魔君",62,"fire",undefined,"wild.zone-07.fire-01"),
-    makeZoneMonster("瀾花姬",63,"water",undefined,"wild.zone-07.water-01"),
-    makeZoneMonster("業炎法王",68,"fire",undefined,"wild.zone-07.fire-02"),
-    makeZoneMonster("絕冰魔君王",70,"water")
+    makeZoneMonster("業火魔君",62,"fire","regular","wild.zone-07.fire-01",{mode:"wild",context:"wild/zone-07"}),
+    makeZoneMonster("瀾花姬",63,"water","regular","wild.zone-07.water-01",{mode:"wild",context:"wild/zone-07"}),
+    makeZoneMonster("業火魔君",62,"fire","regular","wild.zone-07.fire-01",{mode:"wild",context:"wild/zone-07"}),
+    makeZoneMonster("瀾花姬",63,"water","regular","wild.zone-07.water-01",{mode:"wild",context:"wild/zone-07"}),
+    makeZoneMonster("業炎法王",68,"fire","regular","wild.zone-07.fire-02",{mode:"wild",context:"wild/zone-07"}),
+    makeZoneMonster("絕冰魔君王",70,"water","regular","wild.zone-07.water-02",{mode:"wild",context:"wild/zone-07"})
 
 ];
 
 
 const zone8Monsters = [
 
-    makeZoneMonster("焚天龍獄",72,"fire",undefined,"wild.zone-08.fire-01"),
-    makeZoneMonster("海蜇巫",73,"water",undefined,"wild.zone-08.water-01"),
-    makeZoneMonster("焚天龍獄",72,"fire",undefined,"wild.zone-08.fire-01"),
-    makeZoneMonster("海蜇巫",73,"water",undefined,"wild.zone-08.water-01"),
-    makeZoneMonster("焚天炎龍",78,"fire",undefined,"wild.zone-08.fire-02"),
-    makeZoneMonster("極寒龍獄皇",80,"water")
+    makeZoneMonster("焚天龍獄",72,"fire","regular","wild.zone-08.fire-01",{mode:"wild",context:"wild/zone-08"}),
+    makeZoneMonster("海蜇巫",73,"water","regular","wild.zone-08.water-01",{mode:"wild",context:"wild/zone-08"}),
+    makeZoneMonster("焚天龍獄",72,"fire","regular","wild.zone-08.fire-01",{mode:"wild",context:"wild/zone-08"}),
+    makeZoneMonster("海蜇巫",73,"water","regular","wild.zone-08.water-01",{mode:"wild",context:"wild/zone-08"}),
+    makeZoneMonster("焚天炎龍",78,"fire","regular","wild.zone-08.fire-02",{mode:"wild",context:"wild/zone-08"}),
+    makeZoneMonster("極寒龍獄皇",80,"water","regular","wild.zone-08.water-02",{mode:"wild",context:"wild/zone-08"})
 
 ];
 
@@ -3379,24 +3526,24 @@ const zone8Monsters = [
 
 const zone9Monsters = [
 
-    makeZoneMonster("虛空煉獄",82,"fire",undefined,"wild.zone-09.fire-01"),
-    makeZoneMonster("霜鬃狼",83,"water",undefined,"wild.zone-09.water-01"),
-    makeZoneMonster("虛空煉獄",82,"fire",undefined,"wild.zone-09.fire-01"),
-    makeZoneMonster("霜鬃狼",83,"water",undefined,"wild.zone-09.water-01"),
-    makeZoneMonster("獄輪魔尊",88,"fire",undefined,"wild.zone-09.fire-02"),
-    makeZoneMonster("永凍深淵皇",90,"water")
+    makeZoneMonster("虛空煉獄",82,"fire","regular","wild.zone-09.fire-01",{mode:"wild",context:"wild/zone-09"}),
+    makeZoneMonster("霜鬃狼",83,"water","regular","wild.zone-09.water-01",{mode:"wild",context:"wild/zone-09"}),
+    makeZoneMonster("虛空煉獄",82,"fire","regular","wild.zone-09.fire-01",{mode:"wild",context:"wild/zone-09"}),
+    makeZoneMonster("霜鬃狼",83,"water","regular","wild.zone-09.water-01",{mode:"wild",context:"wild/zone-09"}),
+    makeZoneMonster("獄輪魔尊",88,"fire","regular","wild.zone-09.fire-02",{mode:"wild",context:"wild/zone-09"}),
+    makeZoneMonster("永凍深淵皇",90,"water","regular","wild.zone-09.water-02",{mode:"wild",context:"wild/zone-09"})
 
 ];
 
 
 const zone10Monsters = [
 
-    makeZoneMonster("終焉神魔",92,"fire",undefined,"wild.zone-10.fire-01"),
-    makeZoneMonster("玄潮俠",93,"water",undefined,"wild.zone-10.water-01"),
-    makeZoneMonster("終焉神魔",92,"fire",undefined,"wild.zone-10.fire-01"),
-    makeZoneMonster("玄潮俠",93,"water",undefined,"wild.zone-10.water-01"),
-    makeZoneMonster("末炎祭司",98,"fire",undefined,"wild.zone-10.fire-02"),
-    makeZoneMonster("末世寒神皇",100,"water")
+    makeZoneMonster("終焉神魔",92,"fire","regular","wild.zone-10.fire-01",{mode:"wild",context:"wild/zone-10"}),
+    makeZoneMonster("玄潮俠",93,"water","regular","wild.zone-10.water-01",{mode:"wild",context:"wild/zone-10"}),
+    makeZoneMonster("終焉神魔",92,"fire","regular","wild.zone-10.fire-01",{mode:"wild",context:"wild/zone-10"}),
+    makeZoneMonster("玄潮俠",93,"water","regular","wild.zone-10.water-01",{mode:"wild",context:"wild/zone-10"}),
+    makeZoneMonster("末炎祭司",98,"fire","regular","wild.zone-10.fire-02",{mode:"wild",context:"wild/zone-10"}),
+    makeZoneMonster("末世寒神皇",100,"water","regular","wild.zone-10.water-02",{mode:"wild",context:"wild/zone-10"})
 
 ];
 
@@ -12612,6 +12759,9 @@ function isPartyDamageTarget(entity){
 function getEnemyPressureMultiplier(attacker,target){
     if(!attacker||!target||isPartyDamageTarget(attacker)||!isPartyDamageTarget(target)){
         return 1;
+    }
+    if(attacker.mode==="wild"&&attacker.balanceOwner==="MonsterBalance"){
+        return attacker.balanceProjection.profiles.rank.finalDamagePressure;
     }
     const rank=typeof getMonsterRank==="function"?getMonsterRank(attacker):"regular";
     let bonus=ENEMY_PRESSURE_RANK_BONUS[rank]||0;

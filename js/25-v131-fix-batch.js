@@ -19,9 +19,6 @@
     const V138_ROUND_TRANSITION_MS=1250;
     const V138_ROUND_HANDOFF_DELAY_MS=800;
     const V138_ROUND_ANNOUNCEMENT_DELAY_MS=450;
-    const V173_32_WILD_ZONE_STRENGTHS=Object.freeze([
-        0.75,0.90,0.95,1.00,1.05,1.10,1.15,1.20,1.25,1.30
-    ]);
     const ELEMENT_BOX_REWARD_MS=8*60*60*1000;
     const ELEMENT_BOX_KEY=window.FourSymbolsAccountSave.accountKey("element-box-state");
 
@@ -353,45 +350,6 @@
         roundHandoffDelayMs:V138_ROUND_HANDOFF_DELAY_MS,
         roundAnnouncementDelayMs:V138_ROUND_ANNOUNCEMENT_DELAY_MS
     };
-
-    function strengthenMonster(monster,multiplier){
-        if(!monster || monster._v131StrengthApplied){ return; }
-        const strengthMultiplier=Number.isFinite(Number(multiplier))
-            ? Number(multiplier)
-            : V173_32_WILD_ZONE_STRENGTHS[V173_32_WILD_ZONE_STRENGTHS.length-1];
-        monster._v131StrengthApplied=true;
-        ["maxHP","maxSP","attack","defense","magicAttack"].forEach(key=>{
-            if(Number.isFinite(Number(monster[key]))){
-                monster[key]=Math.max(1,Math.round(Number(monster[key])*strengthMultiplier));
-            }
-        });
-        monster.hp=monster.maxHP;
-        monster.sp=monster.maxSP;
-    }
-
-    function strengthenAllZoneMonsters(){
-        const zones=[
-            [typeof forestMonsters!=="undefined" ? forestMonsters : null,V173_32_WILD_ZONE_STRENGTHS[0]],
-            [typeof desertMonsters!=="undefined" ? desertMonsters : null,V173_32_WILD_ZONE_STRENGTHS[1]],
-            [typeof iceMountainMonsters!=="undefined" ? iceMountainMonsters : null,V173_32_WILD_ZONE_STRENGTHS[2]],
-            [typeof zone4Monsters!=="undefined" ? zone4Monsters : null,V173_32_WILD_ZONE_STRENGTHS[3]],
-            [typeof zone5Monsters!=="undefined" ? zone5Monsters : null,V173_32_WILD_ZONE_STRENGTHS[4]],
-            [typeof zone6Monsters!=="undefined" ? zone6Monsters : null,V173_32_WILD_ZONE_STRENGTHS[5]],
-            [typeof zone7Monsters!=="undefined" ? zone7Monsters : null,V173_32_WILD_ZONE_STRENGTHS[6]],
-            [typeof zone8Monsters!=="undefined" ? zone8Monsters : null,V173_32_WILD_ZONE_STRENGTHS[7]],
-            [typeof zone9Monsters!=="undefined" ? zone9Monsters : null,V173_32_WILD_ZONE_STRENGTHS[8]],
-            [typeof zone10Monsters!=="undefined" ? zone10Monsters : null,V173_32_WILD_ZONE_STRENGTHS[9]]
-        ].filter(entry=>Array.isArray(entry[0]));
-        const seen=new Set();
-        zones.forEach(([zone,multiplier])=>zone.forEach(monster=>{
-            if(!seen.has(monster)){
-                seen.add(monster);
-                strengthenMonster(monster,multiplier);
-            }
-        }));
-    }
-    window.v173WildZoneStrengthMultipliers=V173_32_WILD_ZONE_STRENGTHS;
-    strengthenAllZoneMonsters();
 
     function syncInventoryPortrait(){
         const frame=document.getElementById("inventoryPortraitFrame");

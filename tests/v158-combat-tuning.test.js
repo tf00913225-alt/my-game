@@ -106,8 +106,8 @@ test("default monster evasion is zero at every level without replacing explicit 
     assert.equal(formerGeneratedValue.evasion,24);
     assert.equal(custom.evasion,37);
     assert.equal(context.v158NormalizeMonsterDefaultEvasion({level:30}).evasion,0);
-    assert.equal(context.makeZoneMonster("測試怪",40).evasion,0);
-    assert.equal(context.makeZoneMonster("高等測試怪",200).evasion,0);
+    assert.equal(context.v158NormalizeMonsterDefaultEvasion(context.makeZoneMonster("測試怪",40)).evasion,0);
+    assert.equal(context.v158NormalizeMonsterDefaultEvasion(context.makeZoneMonster("高等測試怪",200)).evasion,0);
 });
 
 test("V158 leaves the shared damage formula owned by the core runtime",()=>{

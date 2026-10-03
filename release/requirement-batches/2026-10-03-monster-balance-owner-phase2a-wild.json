@@ -1,0 +1,246 @@
+{
+  "date": "2026-10-03",
+  "title": "Monster Balance Owner Phase 2A Wild Runtime and Legacy Retirement",
+  "workId": "MONSTER-BALANCE-OWNER-P2A-WILD-20261003",
+  "base_branch": "dev",
+  "base_sha": "de5e2049eae20294a173f3e7f5b57fa54c5afe9b",
+  "resume_dev_sha": "ddde74b0588ca1f8bb5e060cacfd3430e5d909ed",
+  "work_branch": "feature/monster-balance-owner-phase2a-wild-20261003",
+  "officialVersion": "173.73",
+  "status": "VERIFIED",
+  "requirements": [
+    {
+      "id": "WILD-P2A-01",
+      "title": "Level Base、能力預算與怪物 HP／SP 正式契約",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "js/combat/level-base-contract.mjs",
+          "tests/monster-balance-owner-phase2a.test.mjs",
+          "docs/MONSTER_BALANCE_OWNER_PHASE2A.md",
+          "docs/monster-balance-wild-browser-evidence-20261003.json"
+        ],
+        "verification": "Level contract and allocation conservation: focused Phase1/Phase2A tests PASS.",
+        "result": "Functional requirement VERIFIED. Latest CI/integration/deployment gates tracked separately in PR #780."
+      }
+    },
+    {
+      "id": "WILD-P2A-02",
+      "title": "六種 Archetype deterministic 與 56 個既有 Identity 映射",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "config/wild-monster-archetypes.json",
+          "tests/monster-balance-owner-phase2a.test.mjs",
+          "docs/MONSTER_BALANCE_OWNER_PHASE2A.md",
+          "docs/monster-balance-wild-browser-evidence-20261003.json"
+        ],
+        "verification": "Six deterministic archetypes and all 56 formal identities: focused tests PASS.",
+        "result": "Functional requirement VERIFIED. Latest CI/integration/deployment gates tracked separately in PR #780."
+      }
+    },
+    {
+      "id": "WILD-P2A-03",
+      "title": "Wild Runtime 由 MonsterBalance.build 唯一產生 pre-battle stats",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "js/combat/monster-balance-owner.mjs",
+          "tests/monster-balance-owner-phase2a.test.mjs",
+          "docs/MONSTER_BALANCE_OWNER_PHASE2A.md",
+          "docs/monster-balance-wild-browser-evidence-20261003.json"
+        ],
+        "verification": "528 executed Runtime projections equal canonical Owner output; full loader PASS.",
+        "result": "Functional requirement VERIFIED. Latest CI/integration/deployment gates tracked separately in PR #780."
+      }
+    },
+    {
+      "id": "WILD-P2A-04",
+      "title": "makeZoneMonster 僅 Adapter／無新增或殘留建怪 Wrapper chain",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "js/00-main.js",
+          "tests/monster-balance-owner-phase2a.test.mjs",
+          "docs/MONSTER_BALANCE_OWNER_PHASE2A.md",
+          "docs/monster-balance-wild-browser-evidence-20261003.json"
+        ],
+        "verification": "Adapter and physical constructor-wrapper retirement source guards PASS.",
+        "result": "Functional requirement VERIFIED. Latest CI/integration/deployment gates tracked separately in PR #780."
+      }
+    },
+    {
+      "id": "WILD-P2A-05",
+      "title": "V131 Wild strength 與 Zone multiplier 實體退休",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "js/25-v131-fix-batch.js",
+          "tests/monster-balance-owner-phase2a.test.mjs",
+          "docs/MONSTER_BALANCE_OWNER_PHASE2A.md",
+          "docs/monster-balance-wild-browser-evidence-20261003.json"
+        ],
+        "verification": "V131 Wild strength and zone multiplier retirement source guards PASS.",
+        "result": "Functional requirement VERIFIED. Latest CI/integration/deployment gates tracked separately in PR #780."
+      }
+    },
+    {
+      "id": "WILD-P2A-06",
+      "title": "V141 Wind／Earth 第二 strength 實體退休",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "js/34-v141-core-systems.js",
+          "tests/monster-balance-owner-phase2a.test.mjs",
+          "docs/MONSTER_BALANCE_OWNER_PHASE2A.md",
+          "docs/monster-balance-wild-browser-evidence-20261003.json"
+        ],
+        "verification": "V141 Wind/Earth second strength retirement source guards PASS.",
+        "result": "Functional requirement VERIFIED. Latest CI/integration/deployment gates tracked separately in PR #780."
+      }
+    },
+    {
+      "id": "WILD-P2A-07",
+      "title": "V158 core halving 及數值 mutation marker 實體退休",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "js/47-v158-combat-tuning.js",
+          "tests/monster-balance-owner-phase2a.test.mjs",
+          "docs/MONSTER_BALANCE_OWNER_PHASE2A.md",
+          "docs/monster-balance-wild-browser-evidence-20261003.json"
+        ],
+        "verification": "V158 blanket core halving and mutation-marker retirement source guards PASS.",
+        "result": "Functional requirement VERIFIED. Latest CI/integration/deployment gates tracked separately in PR #780."
+      }
+    },
+    {
+      "id": "WILD-P2A-08",
+      "title": "Canonical rank 唯一化／v141BattleRank 僅 mirror",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "js/34-v141-core-systems.js",
+          "tests/monster-balance-owner-phase2a.test.mjs",
+          "docs/MONSTER_BALANCE_OWNER_PHASE2A.md",
+          "docs/monster-balance-wild-browser-evidence-20261003.json"
+        ],
+        "verification": "Formal rank reroll rebuilds once; canonical rank and reward mirror tests PASS.",
+        "result": "Functional requirement VERIFIED. Latest CI/integration/deployment gates tracked separately in PR #780."
+      }
+    },
+    {
+      "id": "WILD-P2A-09",
+      "title": "Elite 能力點及 raw attacks 不變／HP1.50 Defense1.10／damage1.10一次",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "js/combat/monster-balance-owner.mjs",
+          "tests/monster-balance-owner-phase2a.test.mjs",
+          "docs/MONSTER_BALANCE_OWNER_PHASE2A.md",
+          "docs/monster-balance-wild-browser-evidence-20261003.json"
+        ],
+        "verification": "Elite raw points/attacks unchanged; HP1.5/defense1.1/final pressure1.1 exactly once PASS.",
+        "result": "Functional requirement VERIFIED. Latest CI/integration/deployment gates tracked separately in PR #780."
+      }
+    },
+    {
+      "id": "WILD-P2A-10",
+      "title": "Archetype 與既有合法技能能力一致／Tank gap 明示",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "js/40-v144-rules-and-abyss.js",
+          "tests/monster-balance-owner-phase2a.test.mjs",
+          "docs/MONSTER_BALANCE_OWNER_PHASE2A.md",
+          "docs/monster-balance-wild-browser-evidence-20261003.json"
+        ],
+        "verification": "Existing legal archetype skills pass actual encounter hooks; tank defensive AI remains an explicit capability gap.",
+        "result": "Functional requirement VERIFIED. Latest CI/integration/deployment gates tracked separately in PR #780."
+      }
+    },
+    {
+      "id": "WILD-P2A-11",
+      "title": "同名一致／528組 Shadow=Runtime／無 late mutation／Debug 保留 projection",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "tests/monster-balance-owner-phase2a.test.mjs",
+          "docs/MONSTER_BALANCE_OWNER_PHASE2A.md",
+          "docs/monster-balance-wild-browser-evidence-20261003.json"
+        ],
+        "verification": "528 projection equality, 56 identity full-loader checks and natural no-late-mutation assertions PASS.",
+        "result": "Functional requirement VERIFIED. Latest CI/integration/deployment gates tracked separately in PR #780."
+      }
+    },
+    {
+      "id": "WILD-P2A-12",
+      "title": "Daily／Tower／Abyss／Adventure／Personal／World Boss 原始輸出隔離",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "tests/fixtures/monster-balance-p2a-extra-non-wild.json",
+          "tests/monster-balance-owner-phase2a.test.mjs",
+          "docs/MONSTER_BALANCE_OWNER_PHASE2A.md",
+          "docs/monster-balance-wild-browser-evidence-20261003.json"
+        ],
+        "verification": "Immutable starting-dev common/Daily baseline, 50 Abyss rosters and 123 Tower/Boss/Adventure actual outputs unchanged PASS.",
+        "result": "Functional requirement VERIFIED. Latest CI/integration/deployment gates tracked separately in PR #780."
+      }
+    },
+    {
+      "id": "WILD-P2A-13",
+      "title": "正式玩家公式基準隊伍／40組診斷及自然戰鬥 TTK／集中校正",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "scripts/wild-balance-ttk-matrix.mjs",
+          "tests/monster-balance-owner-phase2a.test.mjs",
+          "docs/MONSTER_BALANCE_OWNER_PHASE2A.md",
+          "docs/monster-balance-wild-browser-evidence-20261003.json"
+        ],
+        "verification": "40 formal-formula diagnostic cases and 10 natural Chrome encounters PASS: Regular1–2/Elite1–3 rounds at reference party.",
+        "result": "Functional requirement VERIFIED. Latest CI/integration/deployment gates tracked separately in PR #780."
+      }
+    },
+    {
+      "id": "WILD-P2A-14",
+      "title": "390×844／412×915 巡怪、手動自動、結算重建與新手保護",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          ".github/scripts/run-wild-balance-browser-qa.mjs",
+          "tests/monster-balance-owner-phase2a.test.mjs",
+          "docs/MONSTER_BALANCE_OWNER_PHASE2A.md",
+          "docs/monster-balance-wild-browser-evidence-20261003.json"
+        ],
+        "verification": "Both 390x844/412x915 pass natural patrol/manual/automatic/re-entry; beginner HP200→191 against3 enemies; no blocking screenshot modal.",
+        "result": "Functional requirement VERIFIED. Latest CI/integration/deployment gates tracked separately in PR #780."
+      }
+    },
+    {
+      "id": "WILD-P2A-15",
+      "title": "Retirement Map、相容模式邊界與退休條件完整",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "docs/monster-balance-owner-retirement-map.json",
+          "tests/monster-balance-owner-phase2a.test.mjs",
+          "docs/MONSTER_BALANCE_OWNER_PHASE2A.md",
+          "docs/monster-balance-wild-browser-evidence-20261003.json"
+        ],
+        "verification": "Physical retirement map and compatibility boundaries tested; non-Wild legacy retirement conditions preserved.",
+        "result": "Functional requirement VERIFIED. Latest CI/integration/deployment gates tracked separately in PR #780."
+      }
+    }
+  ],
+  "verification": {
+    "sourceCandidateSha": "80bbe8d79ddfa6e47ee462a51017b779340273d1",
+    "functionalRequirements": "15/15 VERIFIED",
+    "naturalBrowserEvidence": "docs/monster-balance-wild-browser-evidence-20261003.json",
+    "latestRequiredCI": "PENDING; authoritative PR #780",
+    "integration": "PENDING; authoritative PR #780",
+    "deployment": "PENDING; authoritative PR #780",
+    "physicalDevice": "NOT CLAIMED"
+  }
+}

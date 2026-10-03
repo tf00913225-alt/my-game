@@ -47,15 +47,15 @@ test('Shadow never modifies a frozen formal entity or aliases its nested data',(
  assert.equal(result.derived.maxHP,100+result.allocation.vitalityPoints*50);
  assert.equal(result.derived.maxSP,50+result.allocation.energyPoints*15);
  assert.equal(Object.hasOwn(result.final,'evasion'),false);
- assert.ok(result.pendingProductDecisions.some(item=>item.includes('bonusHP')));
+ assert.deepEqual(result.pendingProductDecisions,[]); // Phase 2A ratifies no monster level HP/SP bonus.
 });
 test('rank adds no points; seven modes explicit and isolated',()=>{
  assert.deepEqual(MonsterBalance.modes,['wild','daily','tower','abyss','adventure','personalBoss','worldBoss']);
- for(const mode of MonsterBalance.modes)for(const rank of MonsterBalance.ranks){
+ for(const mode of MonsterBalance.modes)for(const rank of MonsterBalance.ranks.filter(r=>mode!=='wild'||r!=='smallBoss')){
   const row=MonsterBalance.preview({...spec,mode,rank});
   assert.equal(row.base.abilityPointBudget,245);assert.equal(row.profiles.mode.id,mode);
   assert.deepEqual(row.allocation,MonsterBalance.preview(spec).allocation);
-  assert.equal(row.profiles.rank.status,'PENDING_PRODUCT_CALIBRATION');
+  assert.equal(row.profiles.rank.status,mode==='wild'?'RANK_V1':'PENDING_PRODUCT_CALIBRATION');
  }
  for(const invalid of [{mode:'boss'},{mode:'legacy-dungeon'},{rank:'boss'},{archetype:'unknown'},{context:''},{element:''}])assert.throws(()=>MonsterBalance.preview({...spec,...invalid}));
 });
@@ -76,7 +76,7 @@ test('existing Tower element profile math only; global defaults all1, other mode
  const wind=MonsterBalance.preview({...spec,element:'wind',mode:'tower'});
  assert.equal(wind.final.speed,wind.derived.speed*1.15);
  assert.deepEqual(wind.profiles.element.metadata,{evasionBonusPercent:15});
- for(const mode of ['wild','daily','abyss','adventure','personalBoss','worldBoss']){
+ for(const mode of ['daily','abyss','adventure','personalBoss','worldBoss']){
   const row=MonsterBalance.preview({...spec,mode,element:'earth'});assert.deepEqual(row.final,row.derived);
  }
 });
@@ -90,17 +90,17 @@ test('retirement inventory is complete and preserves grandfathered source paths 
  const ids=['coreAllocation','coreStats','wildV131','wildV141','wildRank','dungeonStrength','dungeonNormal','dungeonRank','equipmentRank','beginnerScaling','dailyScaling','legacyAbyss','abyssDurability','bossMultipliers','towerElement','enemyPressure','adventureBuild','v144Wrapper','bossUnusedDefense'];
  for(const id of ids)assert.ok(inventory.items.some(item=>item.id===id),id);
  for(const item of inventory.items){
-  assert.ok(['TO RETIRE','TO MIGRATE','KEEP'].includes(item.decision));assert.ok(item.phase&&item.reason&&item.retirementGate);
-  assert.ok(fs.readFileSync(item.file,'utf8').includes(item.sourceToken),item.id);
+  assert.ok(['TO RETIRE','TO MIGRATE','KEEP','RETIRED','COMPATIBILITY FOR NON-WILD ONLY'].includes(item.decision));assert.ok(item.phase&&item.reason&&item.retirementGate);
+  assert.equal(fs.readFileSync(item.file,'utf8').includes(item.sourceToken),item.decision!=='RETIRED',item.id);
  }
 });
-test('no new makeZoneMonster reassignment; no shadow module on formal loader chain',()=>{
+test('constructor wrapper retirement and pure canonical source remain enforced',()=>{
  const actual={};
  function walk(path){for(const entry of fs.readdirSync(path,{withFileTypes:true})){const file=path+'/'+entry.name;if(entry.isDirectory())walk(file);else if(file.endsWith('.js')||file.endsWith('.mjs')){
   const count=(fs.readFileSync(file,'utf8').match(/\bmakeZoneMonster\s*=\s*(?:function\b|\(?[^;\n]*=>)/g)||[]).length;if(count)actual[file]=count;
  }}}
  walk('js');assert.deepEqual(actual,inventory.grandfatheredWrappers);
- for(const path of ['scripts/build-production.mjs','index.html','config/feature-manifest.json','config/first-play-manifest.json'])assert.doesNotMatch(fs.readFileSync(path,'utf8'),/js\/combat\//);
+ assert.match(fs.readFileSync('scripts/build-production.mjs','utf8'),/syncMonsterBalanceRuntime\(ROOT,checkOnly\)/);
  for(const path of Object.values(inventory.canonicalOwners))assert.doesNotMatch(fs.readFileSync(path,'utf8'),/\b(?:window|document|setTimeout|setInterval|makeZoneMonster|Math\.random)\b/);
 });
 test('540 comparison rows deterministic; old actual builders remain unchanged after shadow',()=>{

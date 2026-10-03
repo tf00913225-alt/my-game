@@ -455,6 +455,22 @@
         "verification": "逐檔雙向內容與 QA blob 比較；最新 main/dev CI 和 Production job 核對；JSON／狀態／歷史保存／必要 release gate／diff 驗證",
         "result": "文件與 metadata 逐項驗證 PASS；原 included/deferred/phase/evidence/Freeze snapshot 完整保留；12檔差異精確等於#777來源、兩邊QA blob一致、無main-only有效修復。正式main與Production CI/job及驗收紀錄核對PASS。PR最新Head CI／整合／部署／清理以本Work PR記錄，不冒稱已完成。"
       }
+    },
+    {
+      "id": "REQ-MONSTER-BALANCE-OWNER-P2A-WILD-20261003",
+      "title": "Wild Runtime 唯一 MonsterBalance Owner／Rank V1／舊倍率實體退休",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "release/requirement-batches/2026-10-03-monster-balance-owner-phase2a-wild.json",
+          "docs/MONSTER_BALANCE_OWNER_PHASE2A.md",
+          "docs/monster-balance-owner-retirement-map.json",
+          "docs/monster-balance-wild-browser-evidence-20261003.json",
+          "tests/monster-balance-owner-phase2a.test.mjs"
+        ],
+        "verification": "15項功能逐項驗證；專項20/20、528projection、56identity、非Wild immutable baseline、40TTK及雙尺寸自然Chrome；build:check PASS",
+        "result": "功能15/15 VERIFIED；一般1–2／精英1–3回合為基準隊伍範圍；Tank defensive AI gap明示。最新Head CI／dev整合／部署SHA／分支清理以PR#780為最終Gate owner，未完成前不宣稱全案完成。"
+      }
     }
   ]
 }

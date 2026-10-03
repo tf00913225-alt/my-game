@@ -157,6 +157,21 @@
         "renderBestiaryContent",
         "openHomeFeature('bestiary')"
       ]
+    },
+    {
+      "id": "DEP-MONSTER-BALANCE-P2A-WILD-20261003",
+      "description": "Wild 舊數值 Owner、Zone strength、core halving 與專用 mutation markers 已實體退休；不得回到正式程式。非 Wild legacy builder 另有明確相容邊界。",
+      "enabled": true,
+      "forbidden": [
+        "strengthenMonster",
+        "strengthenAllZoneMonsters",
+        "strengthenNewWildMonster",
+        "halveMonsterCoreStats",
+        "_v131StrengthApplied",
+        "v17342BeginnerStatsHalved",
+        "V173_32_WILD_ZONE_STRENGTHS",
+        "v173WildZoneStrengthMultipliers"
+      ]
     }
   ]
 }

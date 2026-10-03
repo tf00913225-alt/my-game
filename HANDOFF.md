@@ -1,3 +1,9 @@
+## 2026-10-03 — MONSTER-BALANCE-OWNER-P2A-WILD-20261003（功能驗證回填，整合待 Gate）
+
+- 延續原PR#780／原施工分支，已吸收dev ddde74b0（#781文件）；沒有重做Phase1、修改main或進Daily Phase2B。
+- 功能15/15 VERIFIED；專項20/20、528projection、56identity、非Wild immutable baseline、40診斷TTK與390/412自然Chrome PASS。自然一般1–2／精英1–3回合；新手200→191／3敵。正式公告返回後確認截圖無modal遮擋。
+- 詳細永久證據docs/monster-balance-wild-browser-evidence-20261003.json與15項batch；功能證據source80bbe8d7。dev清單26/26不冒稱正式發布增加需求。最新Head CI、dev合併／部署精確SHA及安全分支清理仍為獨立Gate，最終耐久狀態以PR#780為Owner，通過前不宣稱全案完成。
+
 ## 2026-10-03 — V17373-POST-RELEASE-CLOSEOUT-20261003（P1-A 發布後結案）
 
 - 現行生命週期：V173.73 RELEASED／NORMAL DEVELOPMENT；Freeze 已解除。舊 Freeze／Candidate pending／main 未修改段落均為各工作當時歷史，不代表目前狀態。
@@ -5,6 +11,15 @@
 - 開工 dev `8d797b6b9ce91abfa42064a2f044c2028060b672`；CI 37119839493、DEV deployment job111195007801 SUCCESS。逐檔 main→dev／dev→main：12 檔差異全部屬 #777 獨立影子架構；正式驗收 QA owner blob `841295ba8d5dabdc744ceb6b15f5070b5022e6f1` 兩邊一致。沒有 main-only 有效修復；Production acceptance fix absorbed in both main and dev；正式發布有效內容收斂 VERIFIED（不是完整 tree 相同）。禁止為歷史圖合併 main→dev，也不回推 dev 新開發至 main。
 - 分類 Convergence（收斂）；owner 為 release/v17373-scope.json、docs/V17373_RELEASE_SCOPE_20261002.md；永久證據 docs/v17373-post-release-closeout-20261003.json。歷史 Freeze／Candidate／baseline 保留於歷史欄位；正式版本、Gameplay Runtime、CI 與玩家公告不改。需求清單保留23項正式版＋#777，另追加本文件工程驗證，不能把 dev 總數當成正式版23項。
 - Branch `docs/v17373-post-release-closeout-20261003`；Target dev；PR 為本工作即時狀態 owner，記錄最終 CI／合併SHA／DEV部署／分支清理。#780 未關閉、改base、合併或修改分支；歷史PR清理由P1-B另做，本次完全排除一般Bug／怪物Phase2A／Cloud／鍛造後續／UI與新功能。
+
+## 2026-10-03 — MONSTER-BALANCE-OWNER-P2A-WILD-20261003（PR #780 續接候選）
+
+- 原開工 dev de5e2049，續接觀察 dev8d797b6b/main642727e0；沿用 feature/monster-balance-owner-phase2a-wild-20261003 與 #780，不改 main、不進 Daily。
+- 唯一Wild數值Owner monster-balance-owner.mjs，makeZoneMonster只做explicit spec/identity與既有技能hook；classic同步建怪的生成區塊由相同ESM來源機械生成，build/check防漂移。56 portrait-key映射，六種職能，無新名稱Registry。
+- V131/V141 Wild strength、V158 core半減、三層建怪wrapper與舊marker實體退役。rank canonical，v141BattleRank僅reward/UI鏡像；raw attack/points相同，Elite HP1.5/defense1.1/final pressure1.1一次。非Wild Legacy分支保留並有退場條件。
+- 校正集中Wild HP0.32，其他Wild profile1、Global全1；沒有Zone倍率或玩家追趕。新手speed0在Owner，正常攻擊5–8/不能爆擊/技能限制KEEP。實際40組正式公式診斷Regular1–2/Elite1–3；VM無動畫callback，不能冒充完整自然戰鬥證據。
+- 9/9專項、528projection、56identity、Phase1、SixStat、巡怪、build/check本機PASS；舊測試與portrait scanner依已退休來源遷移，不恢復旧倍率。非Wild baseline內容原封保留。
+- 規格/fixture/證據與相容責任見 docs/MONSTER_BALANCE_OWNER_PHASE2A.md、retirement-map與wild-ttk-evidence。existing Required CI新增Wild自然Chrome QA（390/412、TTK、巡怪、manual/auto、结算、再入場、新手）；本機socket EPERM，Browser尚未PASS。CI、最新dev吸收、合併、exact-SHA部署、分支清理待完成；耐久續接狀態以#780為準。
 
 ## 2026-10-03 — MONSTER-BALANCE-OWNER-P1-20261003（影子架構，非正式切換）
 

@@ -35,7 +35,7 @@ function makeZoneConfig(){
         assert.notEqual(end,-1,"練功區陣列未結束 "+variable);
         const block=mainSource.slice(start,end);
         const roster=[];
-        const pattern=/makeZoneMonster\("([^"]+)",(\d+),"[^"]+"(?:,(undefined|"regular"|"elite"|"boss"))?(?:,"[^"]+")?\)/g;
+        const pattern=/makeZoneMonster\("([^"]+)",(\d+),"[^"]+"(?:,(undefined|"regular"|"elite"|"boss"))?(?:,"[^"]+")?(?:,\{mode:"wild",context:"[^"]+"\})?\)/g;
         let match;
         while((match=pattern.exec(block))){
             roster.push({

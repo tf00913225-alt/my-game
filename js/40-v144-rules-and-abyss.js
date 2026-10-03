@@ -354,9 +354,27 @@
             monster.v144SkillEncounter=encounterId||("fixed-"+(++encounterSequence));
             return monster;
         }
-        const pool=legalMonsterSkillPool(monster);
+        let pool=legalMonsterSkillPool(monster);
+        const wild=monster.mode==="wild"&&monster.balanceOwner==="MonsterBalance";
+        if(wild&&["physical","magic"].includes(monster.archetype)){
+            pool=pool.filter(id=>skillDatabase[id].category===monster.archetype);
+        }
+        if(wild&&monster.archetype==="speedControl"){
+            const control=pool.filter(id=>{
+                const skill=skillDatabase[id];
+                return skill.agilityDownChance||skill.stunChance||skill.defenseDownChance||skill.freezeChance;
+            });
+            if(control.length){ pool=control; }
+        }
         monster.v144LegalSkillPool=pool.slice();
         monster.skillIds=shuffled(pool).slice(0,monsterCarryLimit(monster.level));
+        if(wild){
+            monster.v141SupportSkillIds=[];
+            if(monster.archetype==="support"&&monster.level>10&&isMonsterSkillElementLegal(monster,"healSpell")){
+                monster.v141SupportSkillIds=["healSpell"];
+                monster.skillIds=monster.skillIds.slice(0,Math.max(0,monsterCarryLimit(monster.level)-1));
+            }
+        }
         monster.v141SkillLevel=monsterSkillLevel(monster.level);
         monster.v144SkillLevel=monster.v141SkillLevel;
         monster.v144SkillEncounter=encounterId||("generated-"+(++encounterSequence));
@@ -370,26 +388,6 @@
     window.v144GetMonsterFixedSkillLevel=monsterSkillLevel;
     window.v144GetMonsterLegalSkillPool=legalMonsterSkillPool;
     window.v144ConfigureMonsterEncounterSkills=configureEncounterSkills;
-
-    if(typeof makeZoneMonster==="function"){
-        const previousMakeZoneMonster=makeZoneMonster;
-        makeZoneMonster=function(){
-            return configureEncounterSkills(previousMakeZoneMonster.apply(this,arguments));
-        };
-    }
-
-    if(typeof window.v141RollWildMonsterRanks==="function"){
-        const previousRollWildRanks=window.v141RollWildMonsterRanks;
-        window.v141RollWildMonsterRanks=function(indexes){
-            const result=previousRollWildRanks.apply(this,arguments);
-            const encounterId="wild-"+(++encounterSequence);
-            (indexes||[]).forEach(index=>{
-                const monster=typeof monsters!=="undefined"?monsters[index]:null;
-                configureEncounterSkills(monster,encounterId);
-            });
-            return result;
-        };
-    }
 
     /* ----- Hard control skips manual declaration instead of accepting a fake action. ----- */
     function hardControlName(character){
