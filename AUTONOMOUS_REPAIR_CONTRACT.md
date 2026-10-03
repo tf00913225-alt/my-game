@@ -105,6 +105,12 @@ B2／E／E+B2 只是既有分類標籤，**分類名稱本身不得被當成擴�
 
 ---
 
+### 6.1 DEV PR 整合授權入口
+
+已授權修復的 DEV PR 整合統一依 `AGENTS.md`「DEV PR 自動整合規則」，不另設 MERGE-DEV 二次批准。本入口不增加本契約的修復權限；第 9 節僅供 CI Validation 且不得合併的 Draft PR 仍不能合併。main 發布與高風險資料／帳號／付款／不可逆操作維持各自安全 Gate。
+
+---
+
 ## 7. 可執行驗證門檻
 
 任何 failure（失敗）在進入下一個不同 failure（失敗）之前，必須先取得與該問題直接相關的 executable verification（可執行驗證）。

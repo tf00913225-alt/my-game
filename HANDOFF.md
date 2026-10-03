@@ -1,3 +1,11 @@
+## 2026-10-04 — P1-B3-GOVERNANCE-TERMINOLOGY-20261004（文件收斂候選）
+
+- 開工 dev `13c22561afc518ce33b7da798b32e1c215e3cbde`；main `f63d69dbfa66ba75637d1c3cd7fcc7d74782e356` 禁止修改。分支 `docs/p1-b3-governance-terminology-convergence-20261004`；本工作 PR 是最新 CI／合併／部署／清理的耐久狀態 Owner。
+- #670 在開工 dev 僅由一般 Bug 快速路徑部分吸收；#542 缺完整永久術語。兩個舊 PR 均有衝突，不直接合併；有效規則由本工作最小文件 PR 取代，通過整合後才關閉。
+- DEV merge 唯一 Owner：AGENTS「DEV PR 自動整合規則」。CLAUDE／自主修復契約／Bug Fast Path 只引用；main 發布、高風險操作、驗證草稿、CI、Release Freeze／P0／P1 Gate 保留。
+- 術語唯一 Owner：docs/MONSTER_PORTRAIT_SPEC_V1.md 第 0 節；SYSTEM_CONTRACTS 區分術語與 footprint／rank／mode。未改 Runtime、UI、素材、Monster Balance 或 Cloud；深淵既有尺寸／五帝素材不重製，識別碼不改名。
+- 分類 Convergence；本批只允許正式文件／交接／Closeout evidence。驗證清單與來源 commit 盤點見 docs/P1_B3_GOVERNANCE_TERMINOLOGY_CLOSEOUT_20261004.md。停止點 P1-B3；#566／#548 及其他工程完全排除，未進 P1-B4。
+
 ## 2026-10-03 — MONSTER-BALANCE-OWNER-P2B-DAILY-20261003（功能1/1 VERIFIED；整合／部署待Gate）
 
 - 開工dev4274454a／main f63d69db；main禁止修改；原Phase1/2A契約與#777/#780最終紀錄已核實。Branch feature/monster-balance-owner-phase2b-daily-20261003；本工作PR為耐久狀態Owner。

@@ -6,6 +6,14 @@
 >
 > 自動盤點：`node scripts/audit-monster-portraits.mjs`
 
+## 0. Boss 術語（唯一正式 Owner）
+
+- **大 Boss**：僅指世界 Boss、個人 Boss。
+- **小 Boss**：深淵等一般首領，例如五帝天尊；四象塔與日常副本首領也屬此語意。
+- 大／小是立繪／資產分類的溝通術語，不表示戰力、難度、稀有度、劇情地位、掉落或玩法階級。尺寸語意重要時，需求、PR、文件與回報不得只寫模糊的「Boss」。玩家介面可保留「世界 Boss／個人 Boss／深淵首領」等玩法名稱，不因統稱而強制更改既有文案。
+- `World Boss`、`Personal Boss`、`Abyss Boss` 作為玩法／規格名稱仍有效；內部 identifier、Battle Mode、Registry key、rank、sizeClass 與 legacy 路徑不得因中文統稱自動改名。Monster Balance 的 `smallBoss`／`boss` rank 與 `personalBoss`／`worldBoss` mode 仍依其正式資料契約，不能以文字替換改資料。
+- 術語不自動指定尺寸或 footprint（戰場佔位）。深淵五帝仍保留第 3.2／3.3 節的既有尺寸與已核准素材，不因改稱小 Boss 自動 resize 或重製。四象塔小 Boss 仍是 standard 單格；個人／世界大 Boss 的中央六格、援軍與功能物件規則仍由 `SYSTEM_CONTRACTS.md` 及正式 Battle Owner 管理。
+
 ## 1. 目標與工作流
 
 正式工作流分成三條，依素材目前狀態選最短路徑：
