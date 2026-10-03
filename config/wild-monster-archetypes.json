@@ -1,0 +1,342 @@
+{
+  "schemaVersion": 1,
+  "identitySource": "config/monster-portrait-registry.json",
+  "entries": {
+    "wild.zone-01.fire-01": {
+      "archetype": "physical",
+      "zone": "wild/zone-01",
+      "reason": "Existing elemental physical legal damage skill pool.",
+      "capabilityGap": null
+    },
+    "wild.zone-01.water-01": {
+      "archetype": "balanced",
+      "zone": "wild/zone-01",
+      "reason": "No specialized capability evidence; explicit balanced default.",
+      "capabilityGap": null
+    },
+    "wild.zone-01.wind-01": {
+      "archetype": "balanced",
+      "zone": "wild/zone-01",
+      "reason": "No specialized capability evidence; explicit balanced default.",
+      "capabilityGap": null
+    },
+    "wild.zone-01.earth-01": {
+      "archetype": "tank",
+      "zone": "wild/zone-01",
+      "reason": "Established rock/armored portrait identity; defensive AI capability gap is recorded.",
+      "capabilityGap": "No new tank AI or skills are introduced."
+    },
+    "wild.zone-02.fire-01": {
+      "archetype": "physical",
+      "zone": "wild/zone-02",
+      "reason": "Existing elemental physical legal damage skill pool.",
+      "capabilityGap": null
+    },
+    "wild.zone-02.water-01": {
+      "archetype": "magic",
+      "zone": "wild/zone-02",
+      "reason": "Existing water magic damage skill pool.",
+      "capabilityGap": null
+    },
+    "wild.zone-02.wind-01": {
+      "archetype": "speedControl",
+      "zone": "wild/zone-02",
+      "reason": "Existing wind agilityDown/stun legal skills; early tier uses agilityDown.",
+      "capabilityGap": null
+    },
+    "wild.zone-02.earth-01": {
+      "archetype": "tank",
+      "zone": "wild/zone-02",
+      "reason": "Established rock/armored portrait identity; defensive AI capability gap is recorded.",
+      "capabilityGap": "No new tank AI or skills are introduced."
+    },
+    "wild.zone-03.fire-01": {
+      "archetype": "physical",
+      "zone": "wild/zone-03",
+      "reason": "Existing elemental physical legal damage skill pool.",
+      "capabilityGap": null
+    },
+    "wild.zone-03.water-01": {
+      "archetype": "magic",
+      "zone": "wild/zone-03",
+      "reason": "Existing water magic damage skill pool.",
+      "capabilityGap": null
+    },
+    "wild.zone-03.fire-02": {
+      "archetype": "physical",
+      "zone": "wild/zone-03",
+      "reason": "Existing elemental physical legal damage skill pool.",
+      "capabilityGap": null
+    },
+    "wild.zone-03.water-02": {
+      "archetype": "magic",
+      "zone": "wild/zone-03",
+      "reason": "Existing water magic damage skill pool.",
+      "capabilityGap": null
+    },
+    "wild.zone-03.wind-01": {
+      "archetype": "speedControl",
+      "zone": "wild/zone-03",
+      "reason": "Existing wind agilityDown/stun legal skills; early tier uses agilityDown.",
+      "capabilityGap": null
+    },
+    "wild.zone-03.earth-01": {
+      "archetype": "tank",
+      "zone": "wild/zone-03",
+      "reason": "Established rock/armored portrait identity; defensive AI capability gap is recorded.",
+      "capabilityGap": "No new tank AI or skills are introduced."
+    },
+    "wild.zone-04.fire-01": {
+      "archetype": "physical",
+      "zone": "wild/zone-04",
+      "reason": "Existing elemental physical legal damage skill pool.",
+      "capabilityGap": null
+    },
+    "wild.zone-04.water-01": {
+      "archetype": "magic",
+      "zone": "wild/zone-04",
+      "reason": "Existing water magic damage skill pool.",
+      "capabilityGap": null
+    },
+    "wild.zone-04.fire-02": {
+      "archetype": "physical",
+      "zone": "wild/zone-04",
+      "reason": "Existing elemental physical legal damage skill pool.",
+      "capabilityGap": null
+    },
+    "wild.zone-04.water-02": {
+      "archetype": "magic",
+      "zone": "wild/zone-04",
+      "reason": "Existing water magic damage skill pool.",
+      "capabilityGap": null
+    },
+    "wild.zone-04.wind-01": {
+      "archetype": "speedControl",
+      "zone": "wild/zone-04",
+      "reason": "Existing wind agilityDown/stun legal skills; early tier uses agilityDown.",
+      "capabilityGap": null
+    },
+    "wild.zone-04.earth-01": {
+      "archetype": "tank",
+      "zone": "wild/zone-04",
+      "reason": "Established rock/armored portrait identity; defensive AI capability gap is recorded.",
+      "capabilityGap": "No new tank AI or skills are introduced."
+    },
+    "wild.zone-05.fire-01": {
+      "archetype": "physical",
+      "zone": "wild/zone-05",
+      "reason": "Existing elemental physical legal damage skill pool.",
+      "capabilityGap": null
+    },
+    "wild.zone-05.water-01": {
+      "archetype": "support",
+      "zone": "wild/zone-05",
+      "reason": "Existing water healing support resolver; retain a legal heal utility.",
+      "capabilityGap": null
+    },
+    "wild.zone-05.fire-02": {
+      "archetype": "physical",
+      "zone": "wild/zone-05",
+      "reason": "Existing elemental physical legal damage skill pool.",
+      "capabilityGap": null
+    },
+    "wild.zone-05.water-02": {
+      "archetype": "support",
+      "zone": "wild/zone-05",
+      "reason": "Existing water healing support resolver; retain a legal heal utility.",
+      "capabilityGap": null
+    },
+    "wild.zone-05.wind-01": {
+      "archetype": "speedControl",
+      "zone": "wild/zone-05",
+      "reason": "Existing wind agilityDown/stun legal skills; early tier uses agilityDown.",
+      "capabilityGap": null
+    },
+    "wild.zone-05.earth-01": {
+      "archetype": "tank",
+      "zone": "wild/zone-05",
+      "reason": "Established rock/armored portrait identity; defensive AI capability gap is recorded.",
+      "capabilityGap": "No new tank AI or skills are introduced."
+    },
+    "wild.zone-06.fire-01": {
+      "archetype": "physical",
+      "zone": "wild/zone-06",
+      "reason": "Existing elemental physical legal damage skill pool.",
+      "capabilityGap": null
+    },
+    "wild.zone-06.water-01": {
+      "archetype": "support",
+      "zone": "wild/zone-06",
+      "reason": "Existing water healing support resolver; retain a legal heal utility.",
+      "capabilityGap": null
+    },
+    "wild.zone-06.fire-02": {
+      "archetype": "physical",
+      "zone": "wild/zone-06",
+      "reason": "Existing elemental physical legal damage skill pool.",
+      "capabilityGap": null
+    },
+    "wild.zone-06.water-02": {
+      "archetype": "support",
+      "zone": "wild/zone-06",
+      "reason": "Existing water healing support resolver; retain a legal heal utility.",
+      "capabilityGap": null
+    },
+    "wild.zone-06.wind-01": {
+      "archetype": "speedControl",
+      "zone": "wild/zone-06",
+      "reason": "Existing wind agilityDown/stun legal skills; early tier uses agilityDown.",
+      "capabilityGap": null
+    },
+    "wild.zone-06.earth-01": {
+      "archetype": "tank",
+      "zone": "wild/zone-06",
+      "reason": "Established rock/armored portrait identity; defensive AI capability gap is recorded.",
+      "capabilityGap": "No new tank AI or skills are introduced."
+    },
+    "wild.zone-07.fire-01": {
+      "archetype": "physical",
+      "zone": "wild/zone-07",
+      "reason": "Existing elemental physical legal damage skill pool.",
+      "capabilityGap": null
+    },
+    "wild.zone-07.water-01": {
+      "archetype": "support",
+      "zone": "wild/zone-07",
+      "reason": "Existing water healing support resolver; retain a legal heal utility.",
+      "capabilityGap": null
+    },
+    "wild.zone-07.fire-02": {
+      "archetype": "magic",
+      "zone": "wild/zone-07",
+      "reason": "Existing elemental magic legal damage skill pool.",
+      "capabilityGap": null
+    },
+    "wild.zone-07.water-02": {
+      "archetype": "support",
+      "zone": "wild/zone-07",
+      "reason": "Existing water healing support resolver; retain a legal heal utility.",
+      "capabilityGap": null
+    },
+    "wild.zone-07.wind-01": {
+      "archetype": "speedControl",
+      "zone": "wild/zone-07",
+      "reason": "Existing wind agilityDown/stun legal skills; early tier uses agilityDown.",
+      "capabilityGap": null
+    },
+    "wild.zone-07.earth-01": {
+      "archetype": "tank",
+      "zone": "wild/zone-07",
+      "reason": "Established rock/armored portrait identity; defensive AI capability gap is recorded.",
+      "capabilityGap": "No new tank AI or skills are introduced."
+    },
+    "wild.zone-08.fire-01": {
+      "archetype": "physical",
+      "zone": "wild/zone-08",
+      "reason": "Existing elemental physical legal damage skill pool.",
+      "capabilityGap": null
+    },
+    "wild.zone-08.water-01": {
+      "archetype": "support",
+      "zone": "wild/zone-08",
+      "reason": "Existing water healing support resolver; retain a legal heal utility.",
+      "capabilityGap": null
+    },
+    "wild.zone-08.fire-02": {
+      "archetype": "magic",
+      "zone": "wild/zone-08",
+      "reason": "Existing elemental magic legal damage skill pool.",
+      "capabilityGap": null
+    },
+    "wild.zone-08.water-02": {
+      "archetype": "support",
+      "zone": "wild/zone-08",
+      "reason": "Existing water healing support resolver; retain a legal heal utility.",
+      "capabilityGap": null
+    },
+    "wild.zone-08.wind-01": {
+      "archetype": "speedControl",
+      "zone": "wild/zone-08",
+      "reason": "Existing wind agilityDown/stun legal skills; early tier uses agilityDown.",
+      "capabilityGap": null
+    },
+    "wild.zone-08.earth-01": {
+      "archetype": "tank",
+      "zone": "wild/zone-08",
+      "reason": "Established rock/armored portrait identity; defensive AI capability gap is recorded.",
+      "capabilityGap": "No new tank AI or skills are introduced."
+    },
+    "wild.zone-09.fire-01": {
+      "archetype": "physical",
+      "zone": "wild/zone-09",
+      "reason": "Existing elemental physical legal damage skill pool.",
+      "capabilityGap": null
+    },
+    "wild.zone-09.water-01": {
+      "archetype": "support",
+      "zone": "wild/zone-09",
+      "reason": "Existing water healing support resolver; retain a legal heal utility.",
+      "capabilityGap": null
+    },
+    "wild.zone-09.fire-02": {
+      "archetype": "magic",
+      "zone": "wild/zone-09",
+      "reason": "Existing elemental magic legal damage skill pool.",
+      "capabilityGap": null
+    },
+    "wild.zone-09.water-02": {
+      "archetype": "support",
+      "zone": "wild/zone-09",
+      "reason": "Existing water healing support resolver; retain a legal heal utility.",
+      "capabilityGap": null
+    },
+    "wild.zone-09.wind-01": {
+      "archetype": "speedControl",
+      "zone": "wild/zone-09",
+      "reason": "Existing wind agilityDown/stun legal skills; early tier uses agilityDown.",
+      "capabilityGap": null
+    },
+    "wild.zone-09.earth-01": {
+      "archetype": "tank",
+      "zone": "wild/zone-09",
+      "reason": "Established rock/armored portrait identity; defensive AI capability gap is recorded.",
+      "capabilityGap": "No new tank AI or skills are introduced."
+    },
+    "wild.zone-10.fire-01": {
+      "archetype": "physical",
+      "zone": "wild/zone-10",
+      "reason": "Existing elemental physical legal damage skill pool.",
+      "capabilityGap": null
+    },
+    "wild.zone-10.water-01": {
+      "archetype": "support",
+      "zone": "wild/zone-10",
+      "reason": "Existing water healing support resolver; retain a legal heal utility.",
+      "capabilityGap": null
+    },
+    "wild.zone-10.fire-02": {
+      "archetype": "magic",
+      "zone": "wild/zone-10",
+      "reason": "Existing elemental magic legal damage skill pool.",
+      "capabilityGap": null
+    },
+    "wild.zone-10.water-02": {
+      "archetype": "support",
+      "zone": "wild/zone-10",
+      "reason": "Existing water healing support resolver; retain a legal heal utility.",
+      "capabilityGap": null
+    },
+    "wild.zone-10.wind-01": {
+      "archetype": "speedControl",
+      "zone": "wild/zone-10",
+      "reason": "Existing wind agilityDown/stun legal skills; early tier uses agilityDown.",
+      "capabilityGap": null
+    },
+    "wild.zone-10.earth-01": {
+      "archetype": "tank",
+      "zone": "wild/zone-10",
+      "reason": "Established rock/armored portrait identity; defensive AI capability gap is recorded.",
+      "capabilityGap": "No new tank AI or skills are introduced."
+    }
+  }
+}

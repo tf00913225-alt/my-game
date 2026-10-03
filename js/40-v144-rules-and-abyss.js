@@ -371,26 +371,6 @@
     window.v144GetMonsterLegalSkillPool=legalMonsterSkillPool;
     window.v144ConfigureMonsterEncounterSkills=configureEncounterSkills;
 
-    if(typeof makeZoneMonster==="function"){
-        const previousMakeZoneMonster=makeZoneMonster;
-        makeZoneMonster=function(){
-            return configureEncounterSkills(previousMakeZoneMonster.apply(this,arguments));
-        };
-    }
-
-    if(typeof window.v141RollWildMonsterRanks==="function"){
-        const previousRollWildRanks=window.v141RollWildMonsterRanks;
-        window.v141RollWildMonsterRanks=function(indexes){
-            const result=previousRollWildRanks.apply(this,arguments);
-            const encounterId="wild-"+(++encounterSequence);
-            (indexes||[]).forEach(index=>{
-                const monster=typeof monsters!=="undefined"?monsters[index]:null;
-                configureEncounterSkills(monster,encounterId);
-            });
-            return result;
-        };
-    }
-
     /* ----- Hard control skips manual declaration instead of accepting a fake action. ----- */
     function hardControlName(character){
         if(!character){ return ""; }

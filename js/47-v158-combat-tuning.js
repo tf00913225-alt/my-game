@@ -24,36 +24,10 @@
         return monster;
     }
 
-    const V17342_HALF_MONSTER_FIELDS=[
-        "maxHP","hp","maxSP","sp","attack","magicAttack","defense",
-        "attackPoints","vitalityPoints","energyPoints","intelligencePoints","defensePoints","agilityPoints",
-        "vitality","energy","intelligence","defense","agility"
-    ];
-
-    function halveMonsterCoreStats(monster,marker){
-        if(!monster||monster[marker]){ return monster; }
-        V17342_HALF_MONSTER_FIELDS.forEach(key=>{
-            if(!Number.isFinite(Number(monster[key]))){ return; }
-            const minimum=["maxHP","hp","maxSP","sp"].includes(key)?1:0;
-            monster[key]=Math.max(minimum,Math.round(Number(monster[key])*0.5));
-        });
-        if(Number.isFinite(Number(monster.maxHP))){
-            monster.hp=Math.max(1,Math.min(Number(monster.maxHP),Number(monster.hp)||Number(monster.maxHP)));
-        }
-        if(Number.isFinite(Number(monster.maxSP))){
-            monster.sp=Math.max(0,Math.min(Number(monster.maxSP),Number(monster.sp)||Number(monster.maxSP)));
-        }
-        monster[marker]=true;
-        return monster;
-    }
-
     function normalizeBeginnerForestMonster(monster){
         if(!monster){ return monster; }
         monster.v173BeginnerForest=true;
         normalizeMonsterDefaultEvasion(monster);
-        halveMonsterCoreStats(monster,"v17342BeginnerStatsHalved");
-        monster.agilityPoints=0;
-        monster.agility=0;
         return monster;
     }
 
@@ -143,15 +117,6 @@
     window.v17342NormalizeDailyDungeonMonster=normalizeDailyDungeonMonster;
     window.v173GetDailyDungeonScaleContext=getDailyDungeonScaleContext;
     window.v17344IsFormalDailyDungeonMonster=isFormalDailyDungeonMonster;
-
-    if(typeof makeZoneMonster==="function"){
-        const previousMakeZoneMonster=makeZoneMonster;
-        makeZoneMonster=function(){
-            return normalizeMonsterDefaultEvasion(
-                previousMakeZoneMonster.apply(this,arguments)
-            );
-        };
-    }
 
     if(typeof zoneConfig!=="undefined"){
         Object.keys(zoneConfig).forEach(key=>{
