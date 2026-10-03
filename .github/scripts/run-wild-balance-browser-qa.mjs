@@ -60,11 +60,18 @@ const proc=spawn(findChrome(),['--headless=new','--no-sandbox','--disable-gpu','
 const artifact=path.join(ROOT,'artifacts/browser-qa/wild-balance.json');fs.mkdirSync(path.dirname(artifact),{recursive:true});let client;const results=[];
 try{
  const tabs=await waitJson('http://127.0.0.1:'+port+'/json/list');client=new Cdp(tabs.find(x=>x.type==='page').webSocketDebuggerUrl);await client.send('Page.enable');await client.send('Runtime.enable');
+ const qaOrigin=new URL(server.url).origin;assert.equal(new URL(qaOrigin).hostname,'127.0.0.1');
  for(const [width,height] of [[412,915],[390,844]]){
+  // Each viewport starts from the same read-only QA cloud fixture. Previous
+  // diagnostic battles saved a local candidate, which the formal startup owner
+  // correctly refuses to adopt on reload. Stop that document before clearing
+  // only this temporary loopback origin, as in the existing boot browser QA.
+  await client.send('Page.navigate',{url:'about:blank'});
+  await client.send('Storage.clearDataForOrigin',{origin:qaOrigin,storageTypes:'all'});
   await client.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true});await client.send('Page.navigate',{url:server.url});
   await new Promise(r=>setTimeout(r,1000));const result=await client.eval(fixture+'\n'+expression);results.push({width,height,...result});
   const shot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(artifact.replace('.json','-'+width+'x'+height+'.png'),Buffer.from(shot.data,'base64'));
  }
  assert.equal(results[0].ttk.length,10);fs.writeFileSync(artifact,JSON.stringify({passed:true,commitSha:process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||'local',results},null,2)+'\n');console.log('Wild balance natural production battles, TTK, patrol, manual/auto and beginner: PASS');
-}catch(error){const partial=await client?.eval('({evidence:window.wildBalanceQaEvidence,turn,battleActive,battlePhase,autoBattle,currentZone})').catch(()=>null);fs.writeFileSync(artifact,JSON.stringify({passed:false,error:String(error.stack||error),results,partial,console:client?.events.filter(e=>e.method==='Runtime.consoleAPICalled').slice(-15)},null,2)+'\n');throw error;}
+}catch(error){const partial=await client?.eval('({evidence:window.wildBalanceQaEvidence,startupState:window.FourSymbolsStartupPolicy?.getState?.(),startupUid:window.FourSymbolsStartupPolicy?.getUid?.(),turn,battleActive,battlePhase,autoBattle,currentZone})').catch(()=>null);fs.writeFileSync(artifact,JSON.stringify({passed:false,error:String(error.stack||error),results,partial,console:client?.events.filter(e=>e.method==='Runtime.consoleAPICalled').slice(-15)},null,2)+'\n');throw error;}
 finally{client?.close();proc.kill('SIGTERM');try{fs.rmSync(profile,{recursive:true,force:true,maxRetries:3,retryDelay:100});}catch{}await new Promise(r=>server.server.close(r));}
