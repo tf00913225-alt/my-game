@@ -488,6 +488,32 @@
         "verification": "Focused27/27;972 identity/preview/render hook/re-entry projections;54 reference encounters/162 cumulative waves;7 direct suites; real Chrome390/412 production bundles,9 natural encounters/27 waves, manual/auto/rewards/re-entry/beginner; reviewed screenshots.",
         "result": "Functional1/1 VERIFIED on source1b4cb31 / CI merge9dce10c7, artifact11276934048 SHA256 verified. Latest full Required CI, dev integration, exact deployment/live Daily QA and cleanup remain separate PR#784 gates; main untouched."
       }
+    },
+    {
+      "id": "REQ-P1B2-DAILY-CSS-RETIREMENT-20261003",
+      "title": "每日副本歷史 PR CSS46 退休立繪呈現移除",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "docs/p1-b2-daily-portrait-pr-convergence-20261003.json",
+          ".github/scripts/run-daily-dungeon-webp-browser-qa.mjs"
+        ],
+        "verification": "Targeted contracts / build check / mandatory current-owner Browser QA",
+        "result": "PASS: GitHub Actions 37131683805 / job 111227883241, Daily Dungeon QA steps 23-24; head 1f94f9cb185af6c8f7aff08ff7efeb3cd784013f. Nine 1024x1536 WebP decodes, 27 unique key/viewport pairs, 27 wave snapshots, 54 first-visible stage/key entries, nine screenshots, redraw and no duplicate/legacy artwork. Full latest-head CI remains mandatory before merge."
+      }
+    },
+    {
+      "id": "REQ-P1B2-DAILY-MOBILE-QA-20261003",
+      "title": "每日副本 3 尺寸與 9 種立繪正式進場／換波呈現驗收",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "docs/p1-b2-daily-portrait-pr-convergence-20261003.json",
+          ".github/scripts/run-daily-dungeon-webp-browser-qa.mjs"
+        ],
+        "verification": "Targeted contracts / build check / mandatory current-owner Browser QA",
+        "result": "PASS: GitHub Actions 37131683805 / job 111227883241, Daily Dungeon QA steps 23-24; head 1f94f9cb185af6c8f7aff08ff7efeb3cd784013f. Nine 1024x1536 WebP decodes, 27 unique key/viewport pairs, 27 wave snapshots, 54 first-visible stage/key entries, nine screenshots, redraw and no duplicate/legacy artwork. Full latest-head CI remains mandatory before merge."
+      }
     }
   ]
 }

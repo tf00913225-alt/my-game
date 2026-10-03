@@ -200,6 +200,8 @@ jobs:
 
       - name: Run Daily Dungeon WebP decode and lifecycle browser QA
         id: daily_dungeon_webp_browser
+        env:
+          EXPECTED_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         if: success() && (github.event_name == 'pull_request' || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main')
         run: |
           python3 -m http.server 4175 --bind 127.0.0.1 > /tmp/four-symbols-daily-dungeon-qa-server.log 2>&1 &
@@ -215,6 +217,10 @@ jobs:
           name: daily-dungeon-webp-browser-qa-${{ github.sha }}
           path: |
             artifacts/browser-qa/daily-dungeon-webp-browser-qa.json
+            artifacts/browser-qa/daily-dungeon-portrait-runtime-qa.json
+            artifacts/browser-qa/daily-dungeon-exp-*.png
+            artifacts/browser-qa/daily-dungeon-material-*.png
+            artifacts/browser-qa/daily-dungeon-gold-*.png
             artifacts/browser-qa/daily-balance*
           if-no-files-found: error
           retention-days: 90
