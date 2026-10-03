@@ -119,9 +119,9 @@
         const partyFactor=expectedPartySize>=3?1.75:1.55;
         const baseHp=(4.5+resolvedLevel*.045)*partyFactor;
         const baseAttack=1.12+resolvedLevel*.0045;
-        const resolvedMode=mode==="world"?"world":(mode==="tower"?"tower":"personal");
-        const hpModeFactor=resolvedMode==="world"?1.15:(resolvedMode==="tower"?.72:1);
-        const attackModeFactor=resolvedMode==="world"?1.05:(resolvedMode==="tower"?.96:1);
+        const resolvedMode=mode==="world"?"world":"personal";
+        const hpModeFactor=resolvedMode==="world"?1.15:1;
+        const attackModeFactor=resolvedMode==="world"?1.05:1;
         const bossHpNormalization=dungeonRankRatio("maxHP","elite","boss");
         const bossDefenseMultiplier=dungeonRankRatio("defense","boss","elite");
         return {
@@ -505,7 +505,6 @@
         };
         return map[element]||"四象尊";
     }
-    function towerMonsterLevel(floor){ return clamp(Math.round(29+floor*.71),30,100); }
     function towerSkillChance(floor){
         const value=clamp(Math.floor(numeric(floor,1)),1,TOWER_FLOORS);
         return value<=30?.65:value<=60?.70:value<=90?.75:.80;
@@ -532,12 +531,6 @@
         }
         if(element==="wind"){
             monster.evasion=numeric(monster.evasion,0)+15;
-            monster.agility=numeric(monster.agility,numeric(monster.level,1)*1.2)*1.15;
-        }
-        if(element==="earth"){
-            monster.defense=Math.round(numeric(monster.defense,1)*1.15);
-            monster.maxHP=Math.round(numeric(monster.maxHP,1)*1.15);
-            monster.hp=monster.maxHP;
         }
         return monster;
     }
@@ -555,12 +548,26 @@
         return monster;
     }
 
+    function buildTowerBalanceMonster(name,floor,element,rank,role,portraitKey){
+        if(!window.MonsterBalance||typeof window.MonsterBalance.build!=="function"){
+            throw new Error("Tower requires MonsterBalance Runtime.");
+        }
+        const identityKey=portraitKey||("tower-"+element+"-"+role+"-"+floor);
+        return window.MonsterBalance.build({
+            monsterKey:"tower."+element+"."+role+"."+identityKey,
+            name:name,level:floor,element:element,archetype:"balanced",
+            rank:rank,mode:"tower",context:"tower/floor/"+floor
+        });
+    }
     function buildTowerTroop(level,element,rank,floor,portraitSlot){
-        const monster=buildBaseMonster("天兵天將",level,element,rank||"regular");
+        void level;
+        const role=rank==="elite"?"elite":"regular";
+        const portraitKey=towerPortraitAssetId(element,floor,role,portraitSlot);
+        const monster=buildTowerBalanceMonster("天兵天將",floor,element,rank||"regular",role,portraitKey);
         monster.vGameplayTower=true;
         monster.vGameplayTowerFloor=floor;
-        monster.vGameplayTowerRole=rank==="elite"?"elite":"regular";
-        monster.portraitKey=towerPortraitAssetId(element,floor,monster.vGameplayTowerRole,portraitSlot);
+        monster.vGameplayTowerRole=role;
+        monster.portraitKey=portraitKey;
         bindTowerMonsterIdentity(monster);
         configureBossSkills(monster,element,Math.ceil(floor/30));
         applyTowerElementProfile(monster,element);
@@ -569,19 +576,15 @@
     }
     function buildTowerBossMonster(definition,floor){
         const stage=floor===100?4:(floor>=70?3:(floor>=40?2:1));
-        const balance=bossBalanceProfile(definition.level,"tower",stage);
-        const monster=buildBaseMonster(definition.name,definition.level,definition.element,"boss");
-        monster.maxHP=Math.max(1,Math.round(numeric(monster.maxHP,1)*balance.hpMultiplier));
-        monster.hp=monster.maxHP;
-        monster.attack=Math.max(1,Math.round(numeric(monster.attack,1)*balance.attackMultiplier));
-        monster.magicAttack=Math.max(1,Math.round(numeric(monster.magicAttack,monster.attack)*balance.attackMultiplier));
+        const portraitKey=towerPortraitAssetId(definition.element,floor,"boss",0);
+        const monster=buildTowerBalanceMonster(definition.name,floor,definition.element,"smallBoss","boss",portraitKey);
         monster.unitKind="tower-boss";
         monster.vGameplayTower=true;
         monster.vGameplayTowerBoss=true;
         monster.vGameplayTowerFloor=floor;
         monster.vGameplayTowerRole="boss";
         monster.vGameplayBossId=definition.id;
-        monster.portraitKey=towerPortraitAssetId(definition.element,floor,"boss",0);
+        monster.portraitKey=portraitKey;
         bindTowerMonsterIdentity(monster);
         monster.vGameplayPortraitSizeClass="standard";
         configureBossSkills(monster,definition.element,stage);
@@ -590,7 +593,7 @@
         return monster;
     }
     function buildTowerRoster(floor){
-        const element=state.tower.element,level=towerMonsterLevel(floor);
+        const element=state.tower.element,level=floor;
         const special=floor%5===0;
         if(!special){
             return Array.from({length:10},(_,index)=>buildTowerTroop(level,element,"regular",floor,index));
