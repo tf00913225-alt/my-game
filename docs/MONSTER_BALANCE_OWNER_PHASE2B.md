@@ -1,6 +1,6 @@
 # Monster Balance Owner Phase 2B — Daily
 
-Work ID: MONSTER-BALANCE-OWNER-P2B-DAILY-20261003. Start dev: 4274454a30f25f5807fa589804413efe8ec13290. Main observed: f63d69dbfa66ba75637d1c3cd7fcc7d74782e356; never written. Branch: feature/monster-balance-owner-phase2b-daily-20261003. Status: IMPLEMENTED; natural Chrome, latest Required CI, dev integration/deployment/closeout pending. Current durable status is owned by this work PR.
+Work ID: MONSTER-BALANCE-OWNER-P2B-DAILY-20261003. Start dev: 4274454a30f25f5807fa589804413efe8ec13290. Main observed: f63d69dbfa66ba75637d1c3cd7fcc7d74782e356; never written. Branch: feature/monster-balance-owner-phase2b-daily-20261003. Status: FUNCTIONALLY VERIFIED; natural Chrome PASS on source 1b4cb31 / merge snapshot 9dce10c7. Latest Required CI, dev integration/deployment/closeout remain pending. Current durable status is owned by this work PR.
 
 ## Responsibility inventory / multi-owner decision
 
@@ -46,3 +46,44 @@ Phase1/2A20/20, unchanged common compatibility outputs,50 real Abyss rosters,123
 Real Chrome harness `.github/scripts/run-daily-balance-browser-qa.mjs` uses production index/bundles with existing read-only isolated account transport, fresh profile per390×844/412×915. EXP/Material/Gold full waves, manual/automatic, reward/return and EXP re-entry at both sizes, low-level solo Gold at412. It observes natural turn/wave boundaries, projection equality after actual render, HP/SP and visible artwork; never calls winBattle or changes damage formulas. Existing CI steps extended; no duplicate workflow. Local Chrome154 binary was found but OS socket() EPERM prevents it from launching. That local attempt is FAIL/NO browser evidence, not PASS; runner Chrome evidence is required before completion.
 
 Stop after Phase2B. No Tower Phase2C or production/main release.
+
+## Representative values and damage evidence
+
+EXP, party3, same-level reference. R/E/B use their deterministic name mapping (Boss balanced), so raw allocation differs by archetype, never by rank. HP/SP/physical/magic/defense/speed shown below.
+
+| Lv | Regular | Elite | Daily Boss |
+|---|---|---|---|
+| 10 | 54/155/82/90.5/94/7 | 81/155/82/90.5/103.4/7 | 132/155/102/74/117.3/4 |
+| 20 | 96/260/146/162/162/14 | 144/260/146/162/178.2/14 | 252/260/182/120.75/209.3/10 |
+| 30 | 144/380/202/228/234/22 | 216/380/202/228/257.4/22 | 372/380/262/170.25/301.3/14 |
+| 50 | 234/605/322/365.5/374/37 | 351/605/322/365.5/411.4/37 | 612/605/422/266.5/485.3/24 |
+| 70 | 324/830/442/503/514/52 | 486/830/442/503/565.4/52 | 852/830/582/362.75/669.3/34 |
+| 100 | 456/1160/626/712/722/74 | 684/1160/626/712/794.2/74 | 1212/1160/822/505.75/945.3/50 |
+
+TTK entries are Wave1/2/3; each party cell lists EXP;Material;Gold. Neutral .5 rolls and the existing reference owner, cumulative resources, all cases survive.
+
+| Lv | Solo | Party2 | Party3 |
+|---|---|---|---|
+| 10 | 2/2/2; 2/2/2; 2/2/2 | 1/1/1; 1/1/1; 1/1/1 | 1/1/1; 1/1/1; 1/1/1 |
+| 20 | 2/2/2; 2/2/2; 2/2/2 | 1/1/1; 1/1/2; 1/1/1 | 1/1/1; 1/1/1; 1/1/1 |
+| 30 | 1/1/1; 1/1/1; 1/1/1 | 1/1/1; 1/1/1; 1/1/1 | 1/1/1; 1/1/1; 1/1/1 |
+| 50 | 1/1/1; 1/1/1; 1/1/1 | 1/1/1; 1/1/1; 1/1/1 | 1/1/1; 1/1/1; 1/1/1 |
+| 70 | 1/1/1; 1/1/2; 1/1/1 | 1/1/1; 1/1/2; 1/1/1 | 1/1/1; 1/1/2; 1/1/1 |
+| 100 | 1/1/1; 1/1/2; 1/1/1 | 1/1/1; 1/1/2; 1/1/1 | 1/1/1; 1/1/2; 1/1/1 |
+
+Solo average damage taken per wave (EXP;Material;Gold), cumulative HP is never restored between waves:
+
+| Lv | EXP | Material | Gold |
+|---|---|---|---|
+| 10 | 106/109/125 | 122/137/146 | 152/182/188 |
+| 20 | 178/184/211 | 198/231/247 | 271/310/313 |
+| 30 | 0/0/0 | 0/0/0 | 0/383/357 |
+| 50 | 0/0/0 | 0/0/314 | 0/576/537 |
+| 70 | 0/0/0 | 0/0/419 | 0/765/713 |
+| 100 | 0/0/0 | 0/0/253 | 0/1765/1211 |
+
+Actual skill-hit samples: Lv100 Gold Elite Flame Tornado=927 damage to its single chosen target; Ice Arrow Rain=432 per target (party3 total1296). Lv100 Material Boss Flying Sand=253 per target (party3 total759). The HP920 Lv10 protected solo Gold reference finishes at398; Lv20 HP1720 finishes826. Fast Elite actions are recorded, and no sampled party is wiped by two actions. Full raw events and every final projection are retained in `monster-balance-daily-ttk-evidence.json`. Natural browser survival remains a separate gate.
+
+## Natural Chrome verification — source 1b4cb31
+
+Existing CI run37132447706/job111230087559 Daily step PASS. Artifact11276934048 ZIP SHA256 e782d11d76b9cb2e60a9e76bb0883df73cb7f2e2b65d3e3164d576027aaac01e was independently downloaded and verified. Raw report and exact source/merge provenance: `monster-balance-daily-browser-evidence-20261003.json`. Both390×844/412×915 passed EXP/Material/Gold plus EXP re-entry;412 additionally Lv10 solo Gold. Nine encounters /27 natural waves: reference Lv50 party3 all one round, Lv10 solo all two rounds and final HP382. Manual skill/target declarations and Gold auto actions use existing owners, no watchdog recovery. EXP3180276, material3, Gold4500 (Lv50)/2500 (Lv10), return/run cleanup PASS; actual visible portrait/HP/SP/status/floating feedback and repeated render projection equality PASS. Representative EXP/Material/beginner Gold wave3 screenshots reviewed, unobstructed. Previous local Chrome launch remains unavailable and is not counted as browser evidence. Functional requirement1/1 VERIFIED; latest full CI, dev merge, exact deployed runtime and cleanup remain separate gates owned by PR#784. No Phase2C/main release.
