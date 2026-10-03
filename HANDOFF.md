@@ -5,6 +5,7 @@
 - 每層10名、5倍數2 Elite、10倍數1 smallBoss+2 Elite、65/70/75/80%技能率與火水風土玩法保留。Earth HP/DEF與Wind speed由Owner投影；Fire crit/direct、Water heal/status/support、Wind evasion仍由Tower gameplay metadata owner。V132 Tower建怪鏈、舊樓層壓縮、Tower bossBalance HP/attack與Earth/Wind stat post-write已退休；Abyss/Adventure/Personal/World Boss legacy依賴保留。
 - V154 已補 canonical smallBoss／vGameplayTowerBoss portrait fallback，避免無正式Boss圖時退成普通天兵。Browser QA 增加 owner/floor/context/rank/no-legacy/projection-equality。新增 4×100 focused gate 與正式 TTK diagnostic；CI尚未執行，所以 Requirement 仍 IMPLEMENTED，不宣稱 VERIFIED。
 - 規格：`docs/MONSTER_BALANCE_OWNER_PHASE2C.md`；退場地圖：`docs/monster-balance-owner-retirement-map.json`；batch：`release/requirement-batches/2026-10-04-monster-balance-owner-phase2c-tower.json`。中央 requirements 暫不新增未驗證項，避免污染 final release-ready；exact-head 功能證據通過後才回填 VERIFIED 並重跑 latest-head CI。
+- CI recovery checkpoint：舊 Phase2A regression 原本把 Tower 與 Personal/World/Adventure 一起視為未遷移 baseline；Phase2C 後已收斂為 Tower 驗新 MonsterBalance projection，而 Personal/World/Adventure 仍逐字比對原 Phase2A baseline。未放寬未遷移模式。最新功能 head 需重新跑 exact-head CI。
 
 ## 2026-10-03 — MONSTER-BALANCE-OWNER-P2B-DAILY-20261003（功能1/1 VERIFIED；整合／部署待Gate）
 
