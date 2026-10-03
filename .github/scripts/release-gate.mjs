@@ -214,6 +214,7 @@ function validateArtifactManifest(root,config,summary){
   const manifest=readJson(path.join(root,'release-manifest.json'));
   const expected=process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||'';
   if(manifest.commitSha!==expected) fail(`Artifact commit ${manifest.commitSha} != expected ${expected}.`);
+  if(manifest.branch!==(process.env.EXPECTED_BRANCH||process.env.GITHUB_REF_NAME||'')) fail('Artifact branch mismatch.');
   if(normalizeVersion(manifest.version)!==config.version) fail('Artifact Game Version mismatch.');
   if(normalizeVersion(manifest.cacheVersion)!==config.cacheVersion) fail('Artifact Cache Version mismatch.');
   if(manifest.verificationResult!==`${summary.verified}/${summary.total} VERIFIED`) fail('Artifact requirement result mismatch.');
@@ -225,7 +226,8 @@ async function verifyDeployed(config){
   const response=await fetch(`${base}/release-manifest.json?sha=${encodeURIComponent(expected)}`,{cache:'no-store'});
   if(!response.ok) fail(`Cannot fetch deployed manifest: HTTP ${response.status}`);
   const manifest=await response.json();
-  if(manifest.commitSha!==expected) fail(`Cloudflare deploy SHA ${manifest.commitSha} != branch commit ${expected}.`);
+  if(manifest.commitSha!==expected) fail(`Deployed SHA ${manifest.commitSha} != branch commit ${expected}.`);
+  if(process.env.EXPECTED_BRANCH&&manifest.branch!==process.env.EXPECTED_BRANCH) fail(`Deployed branch ${manifest.branch} != ${process.env.EXPECTED_BRANCH}.`);
   if(normalizeVersion(manifest.version)!==config.version) fail(`Deployed Game Version ${manifest.version} != V${config.version}.`);
   if(normalizeVersion(manifest.cacheVersion)!==config.cacheVersion) fail(`Deployed Cache Version ${manifest.cacheVersion} != ${config.cacheVersion}.`);
   const finalManifest={...manifest,deployResult:'SUCCESS',deploymentShaVerified:true,verifiedAt:new Date().toISOString()};
@@ -269,7 +271,7 @@ async function main(){
     checkDeprecated(deployRoot,config.deprecated);
     writeDeployManifest(deployRoot,config,summary);
     validateArtifactManifest(deployRoot,config,summary);
-    console.log(`✓ Dev preview artifact bound to ${process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA}; requirements ${summary.verified}/${summary.total} VERIFIED.`);
+    console.log(`✓ Deployment artifact bound to ${process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA}; requirements ${summary.verified}/${summary.total} VERIFIED.`);
     return;
   }
   if(mode==='verify-deployed'){

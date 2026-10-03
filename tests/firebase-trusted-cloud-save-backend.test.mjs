@@ -14,6 +14,7 @@ const functionsPackage=JSON.parse(read("functions/package.json"));
 const rules=read("firestore.rules");
 const client=read("js/firebase/firebase-cloud-save.js");
 const deployWorkflow=read(".github/workflows/deploy-dev-cloudflare.yml");
+const deploymentPackaging=read(".github/scripts/prepare-static-deployment.mjs");
 const authorityWorkflow=read(".github/workflows/session-authority.yml");
 
 test("Firebase deployment includes every exported callable and deny-write rules",()=>{
@@ -152,11 +153,13 @@ test("Phase 4 preferences remain session protected, revision checked, and separa
     assert.match(read("js/00-main.js"),/restoreAutoBattlePreferences:\(uid,preferences\)/);
 });
 
-test("Cloudflare deploy is isolated from Firebase backend sources",()=>{
-    assert.match(deployWorkflow,/--exclude='functions\/'/);
-    assert.match(deployWorkflow,/--exclude='\.firebaserc'/);
-    assert.match(deployWorkflow,/--exclude='firebase\.json'/);
-    assert.match(deployWorkflow,/--exclude='firestore\.rules'/);
+test("Shared static deployment isolates Firebase backend sources for both providers",()=>{
+    assert.match(deployWorkflow,/node \.github\/scripts\/prepare-static-deployment\.mjs/);
+    assert.match(read(".github/workflows/deploy-production-pages.yml"),/node \.github\/scripts\/prepare-static-deployment\.mjs/);
+    assert.match(deploymentPackaging,/'functions\/'/);
+    assert.match(deploymentPackaging,/'\.firebaserc'/);
+    assert.match(deploymentPackaging,/'firebase\.json'/);
+    assert.match(deploymentPackaging,/'firestore\.rules'/);
     assert.match(deployWorkflow,/working-directory:\s*_deploy/);
     assert.match(deployWorkflow,/pages deploy \. \\/);
     assert.doesNotMatch(deployWorkflow,/pages deploy _deploy/);

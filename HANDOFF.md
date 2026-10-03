@@ -1,3 +1,13 @@
+## 2026-10-03 — PRODUCTION-PAGES-MANIFEST-20261003（正式部署 Owner 修復）
+
+- Base dev `8e6a635db54ead49f9a43671a836eefd48aa0491`；main `4b037b47967544d90c781ad938286777c9576731` 禁止修改，發布 PR #772 保持 Draft／RELEASE BLOCKED。
+- 分類為 Convergence／Replacement。正式產物準備由 `.github/scripts/prepare-static-deployment.mjs` 共用；`.github/scripts/release-gate.mjs::writeDeployManifest/validateArtifactManifest/verifyDeployed` 仍是清單唯一 Owner，沒有靜態 manifest、SHA 硬寫、Liquid 或第二公式。
+- Production Owner 為 `.github/workflows/deploy-production-pages.yml`：僅成功 main push CI 的 exact SHA，main stale guard、release-ready/build gate、共用 _deploy、官方 Pages artifact/deploy、manifest/notice/critical-resource讀回與既有 item/forge/battle QA。DEV rsync 排除清單已退場，由共用 tracked-only 包裝政策取代。
+- 必須先將 Repository Pages Source 從 legacy 切換為 GitHub Actions，否則舊平台部署 Owner 尚未退役、正式發布仍 BLOCKED。此設定與 main source 分開；不能以 workflow 檔存在冒稱設定完成。
+- 無 Runtime／Gameplay／UI／存檔改動；既有 item/forge QA 僅修正 Pages subpath，仍使用隔離唯讀帳號 transport。沒有暫時補丁。
+- 修復 PR 合併 dev 後 Candidate B 必須 INVALIDATED；Candidate C 為實際 merge/dev SHA，正式記錄在修復 PR／#772 body，必須 NEW 完整262 suites／真實Chrome／三時區／build／Browser QA／DEV exact SHA，不沿用B證據。
+- 此處為施工 checkpoint，不宣稱已通過或發布。當前PR、Pages Source及候選驗收狀態以本工作PR耐久紀錄為準。
+
 ## 2026-10-03 — V17373-RELEASE-FREEZE-20261003（發布凍結準備）
 
 - 使用者明確授權 RELEASE FREEZE；最新開工 dev `a959e8bda4d79d55e3af36174921a19b579f5a80`，main `4b037b47967544d90c781ad938286777c9576731`。main 是 dev 祖先；最新必要 CI／DEV SHA 健康，P0 requirement VERIFIED、trueP0=[]。工作分支 `release/v17373-freeze-20261003`，禁止修改 main。
