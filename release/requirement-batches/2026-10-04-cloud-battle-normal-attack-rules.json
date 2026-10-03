@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "cloud-battle-normal-attack-rules-20261004",
+  "releaseVersion": "173.73",
+  "requirements": [
+    {
+      "id": "REQ-CLOUD-BATTLE-NORMAL-ATTACK-RULES-20261004",
+      "title": "Deterministic internal plain-player normal-attack arithmetic derived from canonical browser formulas, with fail-closed unsupported state admission",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "functions/src/canonical-battle-normal-attack.js",
+          "functions/src/generated/plain-player-normal-attack-rules.js",
+          "functions/src/generated/plain-player-normal-attack-policy.json",
+          "scripts/lib/cloud-battle-normal-attack-rules.mjs",
+          "scripts/build-production.mjs",
+          "tests/cloud-save-battle-normal-attack.test.mjs",
+          "scripts/test-session-authority-emulator.mjs"
+        ],
+        "verification": "Local kernel24/24 and cloud/backend195/195 PASS; 128 element/level/enemy/random-boundary cases match browser rules after V140/V149/V152/V173.64 wrappers; build:check PASS. Final-head required CI/emulator, dev/Firebase deployment and closeout remain mandatory and tracked by this Work PR.",
+        "result": "Single unmodified player attack arithmetic only, not an accepted battle action or victory. All combat/outcome/reward/credit readiness flags remain false. No browser/callable/authoritative-state mutation; Phase4 remains0/6 VERIFIED."
+      }
+    }
+  ]
+}
