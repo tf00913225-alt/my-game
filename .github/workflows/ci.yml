@@ -21,7 +21,9 @@ jobs:
     # Main-target releases run all 262 suites and the complete browser gates.
     # Natural Wild battles add real animation time to the existing dev gates.
     # Keep every gate; 80bbe8d7 hit the prior 20-minute limit after Wild passed.
-    timeout-minutes: 30
+    # Daily natural battles add 6m33s; run 37133129829 reached the 30m cap
+    # after Daily and Tower passed, while the battle QA had printed PASS.
+    timeout-minutes: 40
 
     steps:
       - name: Check out repository
