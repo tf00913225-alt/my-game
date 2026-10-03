@@ -3,6 +3,7 @@
 const assert=require("node:assert/strict");
 const crypto=require("node:crypto");
 const fs=require("node:fs");
+const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 const vm=require("node:vm");
 
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
@@ -542,8 +543,8 @@ test("wind casts remain Sprite Sheets while persistent states use noninteractive
 });
 
 test("the development cache release is V173.39",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.72"/);
-    assert.match(index,/<title>四象江湖傳 V173\.72<\/title>/);
+    assert.equal((loader.match(/const V_ASSET_VERSION="([^"]+)"/)||[])[1],releaseMeta.cacheVersion);
+    assert.ok(index.includes('<title>四象江湖傳 V'+releaseMeta.version+'</title>'));
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
 

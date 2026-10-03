@@ -2,6 +2,7 @@
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 
 const growth=fs.readFileSync("js/28-v133-economy-rebalance.js","utf8");
 const css=fs.readFileSync("css/49-v169-rpg-ui.css","utf8");
@@ -32,7 +33,7 @@ assert.match(featureBoundary,/function primeExpPoolSafetyWhenDomReady\(\)/);
 assert.match(featureBoundary,/DOMContentLoaded",primeExpPoolSafetyWhenDomReady/);
 assert.doesNotMatch(featureBoundary,/if\(info\.expPool\)[\s\S]{0,260}element\.click\(\)/,"old EXP-pool DOM must never be replayed after lazy owner install");
 
-assert.ok(loader.includes('const V_ASSET_VERSION="173.72";'));
-assert.ok(index.includes('<title>四象江湖傳 V173.72</title>'));
+assert.ok(loader.includes('const V_ASSET_VERSION="'+releaseMeta.cacheVersion+'";'));
+assert.ok(index.includes('<title>四象江湖傳 V'+releaseMeta.version+'</title>'));
 
 console.log("V173.50 EXP pool scroll stability + lazy safety-owner regression checks passed");

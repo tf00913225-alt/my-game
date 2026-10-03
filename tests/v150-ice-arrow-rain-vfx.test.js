@@ -2,6 +2,7 @@
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
+const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
 const vm=require("node:vm");
 const zlib=require("node:zlib");
 
@@ -293,7 +294,7 @@ test("all damage feedback resolves frame eight timing while remaining target-spe
 });
 
 test("the current cache version publishes the 1.6 second battlefield choreography",()=>{
-    assert.match(loader,/const V_ASSET_VERSION="173\.72"/);
+    assert.equal((loader.match(/const V_ASSET_VERSION="([^"]+)"/)||[])[1],releaseMeta.cacheVersion);
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
     assert.match(animation,/frost-arrow-rain-vfx\.png\?v=173\.19/);
 });
