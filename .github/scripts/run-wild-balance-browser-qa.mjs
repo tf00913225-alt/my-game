@@ -72,6 +72,17 @@ try{
   const tabs=await waitJson('http://127.0.0.1:'+port+'/json/list');client=new Cdp(tabs.find(x=>x.type==='page').webSocketDebuggerUrl);await client.send('Page.enable');await client.send('Runtime.enable');
   await client.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true});await client.send('Page.navigate',{url:server.url});
   await new Promise(r=>setTimeout(r,1000));const result=await client.eval(fixture+'\n'+expression);results.push({width,height,...result});
+  // A fresh profile can show the normal release notice after combat settles.
+  // Use its existing header return control before verifying screenshot visibility.
+  const notice=await client.eval(`(()=>{const modal=document.getElementById('homeFeatureModal');if(!modal?.classList.contains('show'))return null;if(!modal.classList.contains('release-update-modal')||modal.classList.contains('release-update-forced'))throw Error('Unexpected blocking modal in Wild QA');const button=modal.querySelector('.home-feature-close-btn[onclick="closeHomeFeature()"]');if(!button)throw Error('Release notice has no formal return control');const r=button.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2;return {x,y,unobstructed:button.contains(document.elementFromPoint(x,y))};})()`);
+  if(notice){
+   assert.equal(notice.unobstructed,true,'Release notice return must be accessible');
+   await client.send('Input.dispatchMouseEvent',{type:'mousePressed',x:notice.x,y:notice.y,button:'left',clickCount:1});
+   await client.send('Input.dispatchMouseEvent',{type:'mouseReleased',x:notice.x,y:notice.y,button:'left',clickCount:1});
+   await new Promise(r=>setTimeout(r,300));
+  }
+  assert.equal(await client.eval("!!document.getElementById('homeFeatureModal')?.classList.contains('show')"),false,'Battle screenshot must not be hidden by a modal');
+  results.at(-1).releaseNoticeDismissed=!!notice;
   const shot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(artifact.replace('.json','-'+width+'x'+height+'.png'),Buffer.from(shot.data,'base64'));
   closeViewport();
  }
