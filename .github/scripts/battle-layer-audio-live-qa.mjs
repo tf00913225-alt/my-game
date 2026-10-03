@@ -362,7 +362,7 @@ async function captureRelicPresentationQa(client,relicId,targetKind,mode){
 
     await waitFor(
         client,
-        "(()=>{const p=window.v174RelicPresentationState?.();return !p?.active&&!document.getElementById('teamRelicBattlePresentation')&&!document.getElementById('v143-skill-stage')&&!document.body.classList.contains('team-relic-cinematic-active')&&!window.FourSymbolsBattleFlow?.isPresentationActive?.();})()",
+        "(()=>{const p=window.v174RelicPresentationState?.();return !p?.active&&!document.getElementById('teamRelicBattlePresentation')&&!document.getElementById('v143-skill-stage')&&!document.body.classList.contains('team-relic-cinematic-active')&&!window.FourSymbolsBattleFlow?.isPresentationActive?.()&&!document.querySelector('.battle-floating-feedback');})()",
         relicId+" complete presentation cleanup",
         12000
     );
