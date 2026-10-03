@@ -229,6 +229,7 @@ async function prepareAccountFirstRuntime(client,features){
 
 async function cleanupPresentationQaBattle(client){
     await client.eval("(()=>{"+
+        "try{window.__relicQaFinishRelease?.();delete window.__relicQaFinishRelease;}catch(_){}"+
         "try{if(window.v174RelicPresentationState&&window.v174RelicPresentationState().active){return false;}}catch(_){}"+
         "try{window.FourSymbolsBattleFloatingFeedback?.clear?.();}catch(_){}"+
         "try{window.FourSymbolsBattlePresentation?.cleanupEscape?.();}catch(_){}"+
@@ -243,8 +244,11 @@ async function cleanupPresentationQaBattle(client){
     await sleep(220);
 }
 
-async function launchPresentationQaMode(client,mode){
+async function launchPresentationQaMode(client,mode,relicId){
     await cleanupPresentationQaBattle(client);
+    if(relicId){
+        assert.equal(await client.eval(`(()=>{const owner=window.v174RelicSystem;const owned=owner?.getOwnedState?.()[${JSON.stringify(relicId)}];if(!owned)return false;owned.unlocked=true;owned.level=10;return window.v174EquipRelic(${JSON.stringify(relicId)})===true;})()`),true,"Local QA relic equip failed: "+relicId);
+    }
     await client.eval("(()=>{"+
         "[typeof player!=='undefined'?player:null,typeof player2!=='undefined'?player2:null,typeof player3!=='undefined'?player3:null].forEach(p=>{if(!p)return;p.level=Math.max(100,Number(p.level)||1);p.agility=Math.max(9999,Number(p.agility)||0);p.hp=Math.max(99999,Number(p.hp)||0);p.sp=Math.max(99999,Number(p.sp)||0);});"+
         "window.v133GetHighestCreatedCharacterLevel=()=>100;"+
@@ -292,8 +296,29 @@ async function launchPresentationQaMode(client,mode){
 
 async function captureRelicPresentationQa(client,relicId,targetKind,mode){
     const id=JSON.stringify(relicId);
-    const started=await client.eval("Boolean(window.v174RelicDevPreviewPresentation&&window.v174RelicDevPreviewPresentation("+id+"))");
-    assert.equal(started,true,"Relic DEV presentation did not start: "+relicId);
+    // Use production event owners in the disposable local battle fixture.
+    // DEV preview is deliberately unavailable on the production host.
+    await waitFor(client,`window.v174RelicDebugState?.()?.relicId===${id}`,relicId+" initialized battle owner",7000);
+    await client.eval("(()=>{currentBattleMonsters.forEach(index=>{monsters[index].hp=Math.max(100000,monsters[index].hp);monsters[index].maxHP=Math.max(100000,monsters[index].maxHP||0);});return true;})()");
+    await client.eval("(()=>{window.__relicQaFinishRelease=FourSymbolsBattleFlow.interceptActionFinish(()=>true);return true;})()");
+    const before=await client.eval("window.v174RelicDebugState().totalTriggers");
+    if(relicId==="relic_cold_spring_jade"){
+        await client.eval("(()=>{const max=getPartyBattleStats(0).maxHP;player.hp=Math.max(1,Math.floor(max*.1));showPlayerHit(Math.ceil(max*.4),'hp',0,false);return true;})()");
+    }else if(relicId==="relic_qiankun_flask"){
+        await client.eval("(()=>{turn=1;notifyBattleRoundBoundary('round_end',battleToken);return true;})()");
+    }else if(relicId==="relic_sun_orb"){
+        await client.eval("(()=>{turn=2;notifyBattleRoundBoundary('round_start',battleToken);return true;})()");
+    }else if(relicId==="relic_nine_dragon_fire"){
+        for(let action=0;action<7;action++){
+            await client.eval("(()=>{getExistingPartyIndexes().forEach(i=>{getPartyCharacterByIndex(i).hp=9999999;});const index=currentBattleMonsters.find(i=>monsters[i]?.alive&&monsters[i].hp>0);processSingleMonsterAttack(index,battleToken);clearTimeout(battleAdvanceTimeoutId);battleAdvanceTimeoutId=null;battleAdvanceScheduled=false;return true;})()");
+            if(action<6){
+                await waitFor(client,"(()=>{clearTimeout(battleAdvanceTimeoutId);battleAdvanceTimeoutId=null;battleAdvanceScheduled=false;return !window.v142GetRemainingAnimationMs?.();})()", "relic counter action animation",10000);
+                assert.equal(await client.eval("window.v174RelicDebugState().enemyActionCount"),action+1,"exactly one effective enemy action must be counted");
+            }
+        }
+    }else{ throw new Error("No production relic fixture trigger: "+relicId); }
+    const after=await client.eval("window.v174RelicDebugState().totalTriggers");
+    assert.equal(after,before+1,"Relic production event must trigger exactly once: "+relicId);
     await waitFor(
         client,
         "(()=>{const n=document.getElementById('teamRelicBattlePresentation');const img=n?.querySelector('.team-relic-battle-cutin-icon img');return n?.classList.contains('identity-visible')&&img?.complete&&img.naturalWidth>0;})()",
@@ -337,7 +362,7 @@ async function captureRelicPresentationQa(client,relicId,targetKind,mode){
 
     await waitFor(
         client,
-        "(()=>{const p=window.v174RelicPresentationState?.();return !p?.active&&!document.getElementById('teamRelicBattlePresentation')&&!document.getElementById('v143-skill-stage')&&!document.body.classList.contains('team-relic-cinematic-active')&&!window.FourSymbolsBattleFlow?.isPresentationActive?.();})()",
+        "(()=>{const p=window.v174RelicPresentationState?.();return !p?.active&&!document.getElementById('teamRelicBattlePresentation')&&!document.getElementById('v143-skill-stage')&&!document.body.classList.contains('team-relic-cinematic-active')&&!window.FourSymbolsBattleFlow?.isPresentationActive?.()&&!document.querySelector('.battle-floating-feedback');})()",
         relicId+" complete presentation cleanup",
         12000
     );
@@ -345,6 +370,7 @@ async function captureRelicPresentationQa(client,relicId,targetKind,mode){
     assert.deepEqual(cleanup,{mask:false,vfx:false,focus:0,feedback:0,bodyClass:false,readingState:true,lock:false},relicId+" presentation must expire normally while the reading drawer stays open");
     const readingClosed=await client.eval("(()=>{window.FourSymbolsBattleStatistics?.closeDrawer?.();return {readingState:document.body.classList.contains('v174-battle-reading-open'),vfx:!!document.getElementById('v143-skill-stage'),mask:!!document.getElementById('teamRelicBattlePresentation')};})()");
     assert.deepEqual(readingClosed,{readingState:false,vfx:false,mask:false},relicId+" closing the drawer must not replay expired relic presentation");
+    await client.eval("(()=>{window.__relicQaFinishRelease?.();delete window.__relicQaFinishRelease;return true;})()");
     return {relicId,targetKind,identity,focus,cleanup};
 }
 
@@ -392,9 +418,10 @@ async function runRelicPresentationModeMatrix(client){
     const matrix=[];
     const identityBaseline=new Map();
     for(const mode of modes){
-        const context=await launchPresentationQaMode(client,mode);
+        let context;
         const presentations=[];
         for(const [relicId,targetKind] of relics){
+            context=await launchPresentationQaMode(client,mode,relicId);
             const snapshot=await captureRelicPresentationQa(client,relicId,targetKind,mode);
             presentations.push(snapshot);
             const baseline=identityBaseline.get(relicId);
