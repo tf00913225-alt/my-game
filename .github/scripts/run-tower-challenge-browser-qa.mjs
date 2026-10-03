@@ -22,11 +22,17 @@ const expression=`(async()=>{
    await wait(()=>battleActive);await wait(()=>!document.getElementById('battlePage')?.matches('.v141-preparing-entry,.v141-entry-moving'));
    check(currentBattleMonsters.length===10,'real roster count');
    check(!document.getElementById('homeFeatureModal')?.classList.contains('show'),'battle has no covering shared modal');
+   const active=currentBattleMonsters.map(i=>monsters[i]);
+   check(active.every(m=>m.balanceOwner==='MonsterBalance'&&m.mode==='tower'&&m.level===floor&&m.context==='tower/floor/'+floor),'Tower owner/floor/context');
+   check(active.every(m=>!Object.hasOwn(m,'v132Dungeon')&&!Object.hasOwn(m,'v132EquipmentDungeon')),'no Tower legacy stat markers');
+   check(active.filter(m=>m.rank==='smallBoss').length===(floor%10===0?1:0),'canonical smallBoss count');
+   check(active.filter(m=>m.rank==='elite').length===(floor%5===0?2:0),'canonical elite count');
+   for(const m of active){const p=MonsterBalance.debug(m);check(m.maxHP===p.final.maxHP&&m.maxSP===p.final.maxSP&&m.attack===p.final.physicalAttack&&m.magicAttack===p.final.magicAttack&&m.defense===p.final.defense&&m.agility===p.final.speed,'render stats equal owner projection');}
    const slots=FourSymbolsBattlefieldSlots.getActiveEnemySnapshot();
    check(slots&&new Set(Object.values(slots.monsterIndexToSlot)).size===10,'unique battle slots');
    const chance=floor<=30?.65:floor<=60?.7:floor<=90?.75:.8;
    check(currentBattleMonsters.every(i=>monsters[i].skillChance===chance),'common skill chance');
-   const units=currentBattleMonsters.map(i=>({index:i,rank:monsters[i].rank,chance:monsters[i].skillChance,slot:FourSymbolsBattlefieldSlots.getEnemySlotForMonster(slots,i),evasion:getMonsterEvasion(monsters[i]),speed:getMonsterAgility(monsters[i]),hp:monsters[i].maxHP,defense:getMonsterEffectiveDefense(monsters[i])}));
+   const units=currentBattleMonsters.map(i=>({index:i,rank:monsters[i].rank,level:monsters[i].level,owner:monsters[i].balanceOwner,context:monsters[i].context,chance:monsters[i].skillChance,slot:FourSymbolsBattlefieldSlots.getEnemySlotForMonster(slots,i),evasion:getMonsterEvasion(monsters[i]),speed:getMonsterAgility(monsters[i]),hp:monsters[i].maxHP,defense:getMonsterEffectiveDefense(monsters[i])}));
    check(units.every(u=>{const r=document.getElementById('battleMonster'+u.index)?.getBoundingClientRect();return r&&r.width>0&&r.height>0&&r.left>=0&&r.right<=innerWidth+1;}),'ten visible targets');
    evidence.matrix.push({element,floor,units});return roster;
  };
@@ -74,6 +80,6 @@ const proc=spawn(findChrome(),['--headless=new','--no-sandbox','--disable-gpu','
 const artifact=path.join(ROOT,'artifacts/browser-qa/tower-challenge.json');fs.mkdirSync(path.dirname(artifact),{recursive:true});let client,evidence;
 try{
  const targets=await waitJson('http://127.0.0.1:'+port+'/json/list');client=new Cdp(targets.find(x=>x.type==='page').webSocketDebuggerUrl);await client.send('Page.enable');await client.send('Runtime.enable');await client.send('Emulation.setDeviceMetricsOverride',{width:412,height:915,deviceScaleFactor:1,mobile:true});await client.send('Page.navigate',{url:server.url});evidence=await client.eval(expression);assert.equal(evidence.matrix.length,27);assert.deepEqual(evidence.matrix.map(({element,floor})=>[element,floor]),[...['fire','water','wind','earth'].flatMap(element=>[1,5,10,45,75,100].map(floor=>[element,floor])),['water',100],['water',100],['fire',1]]);
- const shot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(artifact.replace('.json','-battle.png'),Buffer.from(shot.data,'base64'));await client.eval('loseBattle()');await new Promise(r=>setTimeout(r,3000));await client.eval('vGameplayOpenTower()');const ruleShot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(artifact.replace('.json','-rules.png'),Buffer.from(ruleShot.data,'base64'));fs.writeFileSync(artifact,JSON.stringify({passed:true,commitSha:process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||'local',evidence},null,2)+'\n');console.log('Tower challenge production Runtime 24 scenes / 10-unit queue / AOE QA passed');
+ const shot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(artifact.replace('.json','-battle.png'),Buffer.from(shot.data,'base64'));await client.eval('loseBattle()');await new Promise(r=>setTimeout(r,3000));await client.eval('vGameplayOpenTower()');const ruleShot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(artifact.replace('.json','-rules.png'),Buffer.from(ruleShot.data,'base64'));fs.writeFileSync(artifact,JSON.stringify({passed:true,commitSha:process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||'local',evidence},null,2)+'\n');console.log('Tower challenge production Runtime 27 scenes / Phase2C owner / 10-unit queue / AOE QA passed');
 }catch(error){fs.writeFileSync(artifact,JSON.stringify({passed:false,error:String(error.stack||error),evidence,console:client?.events.filter(e=>e.method==='Runtime.consoleAPICalled').slice(-12)},null,2)+'\n');throw error;}
 finally{client?.close();proc.kill('SIGTERM');try{fs.rmSync(profile,{recursive:true,force:true,maxRetries:3,retryDelay:100});}catch(_){}await new Promise(r=>server.server.close(r));}
