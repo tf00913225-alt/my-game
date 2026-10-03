@@ -229,6 +229,7 @@ async function prepareAccountFirstRuntime(client,features){
 
 async function cleanupPresentationQaBattle(client){
     await client.eval("(()=>{"+
+        "try{window.__relicQaFinishRelease?.();delete window.__relicQaFinishRelease;}catch(_){}"+
         "try{if(window.v174RelicPresentationState&&window.v174RelicPresentationState().active){return false;}}catch(_){}"+
         "try{window.FourSymbolsBattleFloatingFeedback?.clear?.();}catch(_){}"+
         "try{window.FourSymbolsBattlePresentation?.cleanupEscape?.();}catch(_){}"+
@@ -299,6 +300,7 @@ async function captureRelicPresentationQa(client,relicId,targetKind,mode){
     // DEV preview is deliberately unavailable on the production host.
     await waitFor(client,`window.v174RelicDebugState?.()?.relicId===${id}`,relicId+" initialized battle owner",7000);
     await client.eval("(()=>{currentBattleMonsters.forEach(index=>{monsters[index].hp=Math.max(100000,monsters[index].hp);monsters[index].maxHP=Math.max(100000,monsters[index].maxHP||0);});return true;})()");
+    await client.eval("(()=>{window.__relicQaFinishRelease=FourSymbolsBattleFlow.interceptActionFinish(()=>true);return true;})()");
     const before=await client.eval("window.v174RelicDebugState().totalTriggers");
     if(relicId==="relic_cold_spring_jade"){
         await client.eval("(()=>{const max=getPartyBattleStats(0).maxHP;player.hp=Math.max(1,Math.floor(max*.1));showPlayerHit(Math.ceil(max*.4),'hp',0,false);return true;})()");
@@ -308,7 +310,7 @@ async function captureRelicPresentationQa(client,relicId,targetKind,mode){
         await client.eval("(()=>{turn=2;notifyBattleRoundBoundary('round_start',battleToken);return true;})()");
     }else if(relicId==="relic_nine_dragon_fire"){
         for(let action=0;action<7;action++){
-            await client.eval("(()=>{const index=currentBattleMonsters.find(i=>monsters[i]?.alive&&monsters[i].hp>0);processSingleMonsterAttack(index,battleToken);clearTimeout(battleAdvanceTimeoutId);battleAdvanceTimeoutId=null;battleAdvanceScheduled=false;return true;})()");
+            await client.eval("(()=>{getExistingPartyIndexes().forEach(i=>{getPartyCharacterByIndex(i).hp=9999999;});const index=currentBattleMonsters.find(i=>monsters[i]?.alive&&monsters[i].hp>0);processSingleMonsterAttack(index,battleToken);clearTimeout(battleAdvanceTimeoutId);battleAdvanceTimeoutId=null;battleAdvanceScheduled=false;return true;})()");
             if(action<6){
                 await waitFor(client,"(()=>{clearTimeout(battleAdvanceTimeoutId);battleAdvanceTimeoutId=null;battleAdvanceScheduled=false;return !window.v142GetRemainingAnimationMs?.();})()", "relic counter action animation",10000);
                 assert.equal(await client.eval("window.v174RelicDebugState().enemyActionCount"),action+1,"exactly one effective enemy action must be counted");
@@ -368,6 +370,7 @@ async function captureRelicPresentationQa(client,relicId,targetKind,mode){
     assert.deepEqual(cleanup,{mask:false,vfx:false,focus:0,feedback:0,bodyClass:false,readingState:true,lock:false},relicId+" presentation must expire normally while the reading drawer stays open");
     const readingClosed=await client.eval("(()=>{window.FourSymbolsBattleStatistics?.closeDrawer?.();return {readingState:document.body.classList.contains('v174-battle-reading-open'),vfx:!!document.getElementById('v143-skill-stage'),mask:!!document.getElementById('teamRelicBattlePresentation')};})()");
     assert.deepEqual(readingClosed,{readingState:false,vfx:false,mask:false},relicId+" closing the drawer must not replay expired relic presentation");
+    await client.eval("(()=>{window.__relicQaFinishRelease?.();delete window.__relicQaFinishRelease;return true;})()");
     return {relicId,targetKind,identity,focus,cleanup};
 }
 
