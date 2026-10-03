@@ -198,6 +198,18 @@
         "v162-abyss-battle-portrait-art",
         ".battle-monster.v154-monster-portrait.has-monster-portrait"
       ]
+    },
+    {
+      "id": "DEP-MONSTER-BALANCE-P2C-TOWER-20261004",
+      "description": "Tower compressed level curve, Tower bossBalance post-write, and Tower earth/wind late stat writers are retired. Shared V132 builders remain only for explicitly unmigrated modes.",
+      "enabled": true,
+      "forbidden": [
+        "function towerMonsterLevel(",
+        "bossBalanceProfile(definition.level,\"tower\"",
+        "monster.agility=numeric(monster.agility,numeric(monster.level,1)*1.2)*1.15",
+        "monster.defense=Math.round(numeric(monster.defense,1)*1.15)",
+        "monster.maxHP=Math.round(numeric(monster.maxHP,1)*1.15)"
+      ]
     }
   ]
 }
