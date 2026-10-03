@@ -102,12 +102,12 @@ function runType(type){return `(async()=>{
     const capture=()=>[...document.querySelectorAll('#battleMonsterArea .battle-monster')].map(card=>{
         const index=Number(card.id.replace('battleMonster','')),monster=monsters[index],art=card.querySelector(':scope > .v174-battle-art');
         const style=art&&getComputedStyle(art),rect=art?.getBoundingClientRect();
-        let painted=!!(art&&rect.width>0&&rect.height>0&&rect.right>0&&rect.left<innerWidth&&rect.bottom>0&&rect.top<innerHeight);
-        for(let node=art;node&&painted;node=node.parentElement){const s=getComputedStyle(node);if(s.display==='none'||s.visibility==='hidden'||Number(s.opacity)<=0)painted=false;}
-        return {key:card.dataset.monsterPortraitKey,path:card.dataset.monsterPortraitPath,expected:__dailyExpected[monster.portraitKey],stage:monster.v141DungeonStage,rank:monster.rank||monster.v141BattleRank||'regular',background:style?.backgroundImage,backgroundSize:style?.backgroundSize,painted,artCount:card.querySelectorAll(':scope > .v174-battle-art').length,legacyCount:card.querySelectorAll('img.v162-abyss-battle-portrait-art').length,width:rect?.width,height:rect?.height};
+        const visible=node=>{if(!node)return false;const box=node.getBoundingClientRect();if(!(box.width>0&&box.height>0&&box.right>0&&box.left<innerWidth&&box.bottom>0&&box.top<innerHeight))return false;for(let parent=node;parent;parent=parent.parentElement){const s=getComputedStyle(parent);if(s.display==='none'||s.visibility==='hidden'||Number(s.opacity)<=0)return false;}return true;};
+        const cardPainted=visible(card),painted=visible(art);
+        return {cardPainted,key:card.dataset.monsterPortraitKey,path:card.dataset.monsterPortraitPath,expected:__dailyExpected[monster.portraitKey],stage:monster.v141DungeonStage,rank:monster.rank||monster.v141BattleRank||'regular',background:style?.backgroundImage,backgroundSize:style?.backgroundSize,painted,artCount:card.querySelectorAll(':scope > .v174-battle-art').length,legacyCount:card.querySelectorAll('img.v162-abyss-battle-portrait-art').length,width:rect?.width,height:rect?.height};
     });
     const firstVisible=new Map();let sampling=true;
-    const sample=()=>{if(!sampling)return;if(!document.getElementById('homeFeatureModal')?.classList.contains('show'))for(const row of capture()){if(row.painted){const id=row.stage+':'+row.key;if(!firstVisible.has(id))firstVisible.set(id,row);}}requestAnimationFrame(sample);};
+    const sample=()=>{if(!sampling)return;if(!document.getElementById('homeFeatureModal')?.classList.contains('show'))for(const row of capture()){if(row.cardPainted){const id=row.stage+':'+row.key;if(!firstVisible.has(id))firstVisible.set(id,row);}}requestAnimationFrame(sample);};
     requestAnimationFrame(sample);
     try{
         const entry={exp:'v132BeginExpDungeon',material:'v132BeginMaterialDungeon',gold:'v17346BeginEquipmentDungeon'}[type];
@@ -136,7 +136,7 @@ function runType(type){return `(async()=>{
         }
         const first=[...firstVisible.values()];
         check(first.length>=6,'first visible frames must be sampled');
-        for(const row of first){check(row.path===row.expected&&row.background?.includes(row.expected),'first visible frame has incorrect art: '+row.key);}
+        for(const row of first){check(row.painted&&row.artCount===1&&row.legacyCount===0,'first visible card must already have single V174 artwork: '+row.key);check(row.path===row.expected&&row.background?.includes(row.expected),'first visible frame has incorrect art: '+row.key);}
         const covered=[...new Set(waves.flatMap(w=>w.rows.map(r=>r.key)))].sort();
         check(JSON.stringify(covered)===JSON.stringify(['regular','elite','boss'].map(rank=>'daily.'+type+'.'+rank).sort()),'all daily ranks must be covered');
         const snapshot=JSON.stringify(capture().map(r=>({key:r.key,path:r.path,artCount:r.artCount})));
