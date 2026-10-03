@@ -324,16 +324,104 @@
     {
       "id": "REQ-P0-FULL-RELEASE-SUITES-20261002",
       "title": "V173.73 正式發布必要完整 Node suites 通過",
-      "status": "BLOCKED",
+      "status": "VERIFIED",
       "evidence": {
         "files": [
           "release/v17373-scope.json",
           "docs/V17373_RELEASE_SCOPE_20261002.md",
           ".github/workflows/ci.yml",
-          ".github/scripts/ci.mjs"
+          ".github/scripts/ci.mjs",
+          "tests/ui-critical-regressions-mobile-browser.test.js",
+          "tests/v174-cardless-battle-browser.test.js",
+          "tests/v141-system-expansion.test.js",
+          "tests/release-update-notification-system.test.js"
         ],
-        "verification": "第五批：262檔發現、原15檔UTC診斷、5/5目標檔、5項直接相關回歸、build:check及diff check通過；完整正式發布runner未PASS。",
-        "result": "累計35/45個原失敗測試檔重新執行通過；剩10個與完整Chrome發布驗收／候選SHA待完成。P0維持BLOCKED，未RC／Freeze／正式發布。"
+        "verification": "PR #768 merged; independent CI=1 TZ=UTC npm test 262/262 PASS with actual Chrome, no missing-Chrome pass. Tested tree equals dev 81853be234963c8a5250b474c38480dcd0dfa2b4. Skill 20/20, cardless 5/5, V141 18/18; UTC/Asia/Taipei/America/New_York notification 12/12 each. PR CI 37079249628 SUCCESS; dev CI 37080384742 attempt 2 SUCCESS, full Node step SKIPPED by existing policy (not full-suite PASS). Deployment job 111082274607 and independent exact deployed SHA/version/cache read-back PASS. Main unchanged at 4b037b47967544d90c781ad938286777c9576731.",
+        "result": "VERIFIED: complete-suite P0 closed; trueP0=0; READY TO ENTER RELEASE FREEZE. Game/Cache remain 173.72; no fixed Release Candidate, Freeze or production release. Candidate Exact-HEAD acceptance belongs to the next explicitly authorized stage.",
+        "closeout": {
+          "workId": "RELEASE-SUITES-P0-20261002",
+          "status": "VERIFIED",
+          "repairPR": 768,
+          "repairPRUrl": "https://github.com/tf00913225-alt/my-game/pull/768",
+          "repairHeadSha": "808676db34da25b15f52ae3cdf4492a5f3853b69",
+          "verifiedDevSha": "81853be234963c8a5250b474c38480dcd0dfa2b4",
+          "testedTree": "967d1c9395e92bf736c7c3500ad45883e5b1dcc7",
+          "independentFullSuite": {
+            "command": "CI=1 TZ=UTC npm test",
+            "runner": ".github/scripts/ci.mjs tests",
+            "discovered": 262,
+            "passed": 262,
+            "failed": 0,
+            "exitCode": 0,
+            "missingChromeSkip": 0,
+            "continueOnFailure": false,
+            "evidenceSource": "https://github.com/tf00913225-alt/my-game/pull/768",
+            "logSha256": "3ec9fb5275f17293b1d2f4d75718dd52aaa2ca1276ef116144882695ac4ee568",
+            "provenance": "PR #768 final independent-run record; distinct from dev CI; exact tested tree equals current dev tree. Closeout does not rerun or claim candidate acceptance."
+          },
+          "browser": {
+            "name": "Google Chrome for Testing headless shell",
+            "version": "154.0.8037.97",
+            "actualChrome": true,
+            "missingChromeSkipCountedAsPass": false
+          },
+          "targeted": {
+            "skillProgression": "20/20 PASS",
+            "cardlessBattlePresentation": "5/5 PASS",
+            "v141": "18/18 PASS",
+            "criticalMobileBrowser": "PASS"
+          },
+          "notificationTimezones": {
+            "UTC": "12/12 PASS",
+            "Asia/Taipei": "12/12 PASS",
+            "America/New_York": "12/12 PASS"
+          },
+          "build": "PASS",
+          "buildCheck": "PASS",
+          "diffCheck": "PASS",
+          "prCI": {
+            "run": 37079249628,
+            "result": "SUCCESS"
+          },
+          "devCI": {
+            "run": 37080384742,
+            "attempt": 2,
+            "job": 111082308123,
+            "sha": "81853be234963c8a5250b474c38480dcd0dfa2b4",
+            "result": "SUCCESS",
+            "fullNodeStep": "SKIPPED by existing dev refined policy; not Full Node PASS",
+            "url": "https://github.com/tf00913225-alt/my-game/actions/runs/37080384742/attempts/2"
+          },
+          "devDeployment": {
+            "job": 111082274607,
+            "run": 37080384742,
+            "attempt": 2,
+            "sha": "81853be234963c8a5250b474c38480dcd0dfa2b4",
+            "result": "SUCCESS",
+            "manifestArtifact": 11258362889,
+            "responsiveItemArtifact": 11258772310,
+            "battleLiveArtifact": 11258248134,
+            "checks": "Responsive Item 6/6 viewports; Forge 390x844/412x915; battle layer/audio live mobile QA PASS",
+            "url": "https://github.com/tf00913225-alt/my-game/actions/runs/37080384742/attempts/2"
+          },
+          "deployedReadBack": {
+            "url": "https://dev.four-symbols-dev.pages.dev/release-manifest.json",
+            "sha": "81853be234963c8a5250b474c38480dcd0dfa2b4",
+            "version": "V173.72",
+            "cacheVersion": "173.72",
+            "result": "PASS",
+            "verification": "GitHub job log and independent release-gate verify-deployed read-back on 2026-10-03; deploymentShaVerified computed by verifier, not inferred from CI green"
+          },
+          "mainUnchanged": {
+            "sha": "4b037b47967544d90c781ad938286777c9576731",
+            "result": "PASS"
+          },
+          "repairBranch": "DELETED; exact ref 404",
+          "releaseCandidateSha": null,
+          "releaseFreezeStarted": false,
+          "productionReleaseStarted": false,
+          "nextStage": "Only after explicit release-freeze authorization: fix candidate SHA and perform required Exact-HEAD full suite and release acceptance."
+        }
       }
     }
   ]

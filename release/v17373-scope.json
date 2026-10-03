@@ -3,13 +3,13 @@
   "workId": "RELEASE-SCOPE-P0-20261002",
   "plannedVersion": "173.73",
   "currentGameVersion": "173.72",
-  "assessment": "RELEASE BLOCKED",
+  "assessment": "READY TO ENTER RELEASE FREEZE",
   "mode": "NORMAL DEVELOPMENT",
   "releaseCandidateSha": null,
   "baseline": {
-    "dev": "5de3e04690b9f20569b7e789240488f33aa4cd40",
+    "dev": "81853be234963c8a5250b474c38480dcd0dfa2b4",
     "main": "4b037b47967544d90c781ad938286777c9576731",
-    "comparison": "完整 main → dev diff／first-parent history，非僅最後一個 PR"
+    "comparison": "PR #768 tested tree equals current dev tree; original main → dev scope preserved. Documentation-only P0 closeout; candidate not fixed."
   },
   "included": [
     "四象技能／角色屬性與元素 DNA、跨學習既有內容",
@@ -21,28 +21,7 @@
     "Visual Ready 與既有戰鬥呈現修正",
     "登入 session／UID 隔離與 Cloud 已驗證安全基礎；不是完整跨裝置 Cloud Save"
   ],
-  "trueP0": [
-    {
-      "id": "P0-FULL-RELEASE-SUITES",
-      "problem": "正式發布必要的完整 Node 測試尚未通過。",
-      "rootCause": "dev 的精簡 CI 跳過 main／以 main 為基底 PR 必跑的完整 suites。部分舊測試仍引用退休 owner／舊資料名稱或缺少目前函式依賴；其餘失敗尚待逐項診斷，不能全部當成過時測試。",
-      "playerImpact": "無法完成正式發布必要驗收；不是已確認 45 個遊戲故障。",
-      "dataDamage": "目前未確認此項造成存檔或經濟資料損害；涉及經濟、戰鬥的失敗仍必須辨識。",
-      "minimumRepair": "逐項區分過時斷言、測試 fixture 與真實 Runtime regression；只遷移已證明過時的測試，真實 regression 做最小安全修復。不得刪測試、跳過 suites 或降低 CI。完整必要 CI 與候選 SHA 驗收通過後才能解除。",
-      "remainingFailingSuites": [
-        "tests/ui-character-detail-hotfix.test.js",
-        "tests/v141-system-expansion.test.js",
-        "tests/v143-combat-dungeon-polish.test.js",
-        "tests/v144-rules-and-abyss.test.js",
-        "tests/v154-current-request.test.js",
-        "tests/v155-current-request.test.js",
-        "tests/v169-abyss-assets-flow.test.js",
-        "tests/v173.26-followup-fixes.test.js",
-        "tests/v173.42-player-flow.test.js",
-        "tests/v173.45-current-request.test.js"
-      ]
-    }
-  ],
+  "trueP0": [],
   "deferred": [
     {
       "classification": "B",
@@ -147,14 +126,14 @@
     "originalBatchesModified": false
   },
   "p1": [
-    "真正 P0 修復後才可固定候選 SHA 並完成 Exact-HEAD 最終驗收",
+    "P0 已結案；僅在明確啟動 Release Freeze 後固定候選 SHA 並完成 Exact-HEAD 最終驗收",
     "Freeze 階段才更新 Version／Cache、玩家公告與 CHANGELOG",
     "逐一核對舊 PR 是否已被取代；有獨有內容者不得直接關閉",
     "整理 main／dev 差異、受保護發布 PR 與發布後 closeout"
   ],
   "p2": [
     "package.json 的歷史版本標示與模組警告整理",
-    "歷史文件與測試 owner 維護；必要發布測試失敗仍屬上述 P0"
+    "歷史文件與測試 owner 維護；新的正式必要測試失敗若經確認再分類，已完成清單不重開"
   ],
   "p3": [
     "Cloud Phase 4 剩餘工作與 Phase 5～10",
@@ -164,17 +143,25 @@
   ],
   "evidence": {
     "devCI": {
-      "run": 36986724510,
-      "sha": "5de3e04690b9f20569b7e789240488f33aa4cd40",
+      "run": 37080384742,
+      "attempt": 2,
+      "job": 111082308123,
+      "sha": "81853be234963c8a5250b474c38480dcd0dfa2b4",
       "result": "SUCCESS",
-      "fullNodeSuites": "SKIPPED by dev refined policy"
+      "fullNodeStep": "SKIPPED by existing dev refined policy; not Full Node PASS",
+      "url": "https://github.com/tf00913225-alt/my-game/actions/runs/37080384742/attempts/2"
     },
     "devDeployment": {
-      "job": 110776041285,
-      "manifestArtifact": 11217878901,
-      "sha": "5de3e04690b9f20569b7e789240488f33aa4cd40",
-      "result": "SUCCESS; workflow deployed manifest read-back SHA verified",
-      "checks": "responsive six viewports / forge 390×844, 412×915 / battle layout and VFX PASS"
+      "job": 111082274607,
+      "run": 37080384742,
+      "attempt": 2,
+      "sha": "81853be234963c8a5250b474c38480dcd0dfa2b4",
+      "result": "SUCCESS",
+      "manifestArtifact": 11258362889,
+      "responsiveItemArtifact": 11258772310,
+      "battleLiveArtifact": 11258248134,
+      "checks": "Responsive Item 6/6 viewports; Forge 390x844/412x915; battle layer/audio live mobile QA PASS",
+      "url": "https://github.com/tf00913225-alt/my-game/actions/runs/37080384742/attempts/2"
     },
     "firebase": {
       "run": 36975504145,
@@ -1087,6 +1074,113 @@
           "rootCauseGroup": "retired-presentation-owner-contract"
         }
       ]
+    },
+    "historicalDiagnosticNote": "Preflight and batch1–5 recovery records below are historical snapshots, superseded by suiteCloseout20261003. Their pending/failure lists are not current remaining work.",
+    "historicalP0BeforeCloseout": [
+      {
+        "id": "P0-FULL-RELEASE-SUITES",
+        "problem": "正式發布必要的完整 Node 測試尚未通過。",
+        "rootCause": "dev 的精簡 CI 跳過 main／以 main 為基底 PR 必跑的完整 suites。部分舊測試仍引用退休 owner／舊資料名稱或缺少目前函式依賴；其餘失敗尚待逐項診斷，不能全部當成過時測試。",
+        "playerImpact": "無法完成正式發布必要驗收；不是已確認 45 個遊戲故障。",
+        "dataDamage": "目前未確認此項造成存檔或經濟資料損害；涉及經濟、戰鬥的失敗仍必須辨識。",
+        "minimumRepair": "逐項區分過時斷言、測試 fixture 與真實 Runtime regression；只遷移已證明過時的測試，真實 regression 做最小安全修復。不得刪測試、跳過 suites 或降低 CI。完整必要 CI 與候選 SHA 驗收通過後才能解除。",
+        "remainingFailingSuites": [
+          "tests/ui-character-detail-hotfix.test.js",
+          "tests/v141-system-expansion.test.js",
+          "tests/v143-combat-dungeon-polish.test.js",
+          "tests/v144-rules-and-abyss.test.js",
+          "tests/v154-current-request.test.js",
+          "tests/v155-current-request.test.js",
+          "tests/v169-abyss-assets-flow.test.js",
+          "tests/v173.26-followup-fixes.test.js",
+          "tests/v173.42-player-flow.test.js",
+          "tests/v173.45-current-request.test.js"
+        ]
+      }
+    ],
+    "suiteCloseout20261003": {
+      "workId": "RELEASE-SUITES-P0-20261002",
+      "status": "VERIFIED",
+      "repairPR": 768,
+      "repairPRUrl": "https://github.com/tf00913225-alt/my-game/pull/768",
+      "repairHeadSha": "808676db34da25b15f52ae3cdf4492a5f3853b69",
+      "verifiedDevSha": "81853be234963c8a5250b474c38480dcd0dfa2b4",
+      "testedTree": "967d1c9395e92bf736c7c3500ad45883e5b1dcc7",
+      "independentFullSuite": {
+        "command": "CI=1 TZ=UTC npm test",
+        "runner": ".github/scripts/ci.mjs tests",
+        "discovered": 262,
+        "passed": 262,
+        "failed": 0,
+        "exitCode": 0,
+        "missingChromeSkip": 0,
+        "continueOnFailure": false,
+        "evidenceSource": "https://github.com/tf00913225-alt/my-game/pull/768",
+        "logSha256": "3ec9fb5275f17293b1d2f4d75718dd52aaa2ca1276ef116144882695ac4ee568",
+        "provenance": "PR #768 final independent-run record; distinct from dev CI; exact tested tree equals current dev tree. Closeout does not rerun or claim candidate acceptance."
+      },
+      "browser": {
+        "name": "Google Chrome for Testing headless shell",
+        "version": "154.0.8037.97",
+        "actualChrome": true,
+        "missingChromeSkipCountedAsPass": false
+      },
+      "targeted": {
+        "skillProgression": "20/20 PASS",
+        "cardlessBattlePresentation": "5/5 PASS",
+        "v141": "18/18 PASS",
+        "criticalMobileBrowser": "PASS"
+      },
+      "notificationTimezones": {
+        "UTC": "12/12 PASS",
+        "Asia/Taipei": "12/12 PASS",
+        "America/New_York": "12/12 PASS"
+      },
+      "build": "PASS",
+      "buildCheck": "PASS",
+      "diffCheck": "PASS",
+      "prCI": {
+        "run": 37079249628,
+        "result": "SUCCESS"
+      },
+      "devCI": {
+        "run": 37080384742,
+        "attempt": 2,
+        "job": 111082308123,
+        "sha": "81853be234963c8a5250b474c38480dcd0dfa2b4",
+        "result": "SUCCESS",
+        "fullNodeStep": "SKIPPED by existing dev refined policy; not Full Node PASS",
+        "url": "https://github.com/tf00913225-alt/my-game/actions/runs/37080384742/attempts/2"
+      },
+      "devDeployment": {
+        "job": 111082274607,
+        "run": 37080384742,
+        "attempt": 2,
+        "sha": "81853be234963c8a5250b474c38480dcd0dfa2b4",
+        "result": "SUCCESS",
+        "manifestArtifact": 11258362889,
+        "responsiveItemArtifact": 11258772310,
+        "battleLiveArtifact": 11258248134,
+        "checks": "Responsive Item 6/6 viewports; Forge 390x844/412x915; battle layer/audio live mobile QA PASS",
+        "url": "https://github.com/tf00913225-alt/my-game/actions/runs/37080384742/attempts/2"
+      },
+      "deployedReadBack": {
+        "url": "https://dev.four-symbols-dev.pages.dev/release-manifest.json",
+        "sha": "81853be234963c8a5250b474c38480dcd0dfa2b4",
+        "version": "V173.72",
+        "cacheVersion": "173.72",
+        "result": "PASS",
+        "verification": "GitHub job log and independent release-gate verify-deployed read-back on 2026-10-03; deploymentShaVerified computed by verifier, not inferred from CI green"
+      },
+      "mainUnchanged": {
+        "sha": "4b037b47967544d90c781ad938286777c9576731",
+        "result": "PASS"
+      },
+      "repairBranch": "DELETED; exact ref 404",
+      "releaseCandidateSha": null,
+      "releaseFreezeStarted": false,
+      "productionReleaseStarted": false,
+      "nextStage": "Only after explicit release-freeze authorization: fix candidate SHA and perform required Exact-HEAD full suite and release acceptance."
     }
   }
 }
