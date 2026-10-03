@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "cloud-battle-attempt-source-20261003",
+  "releaseVersion": "173.73",
+  "requirements": [
+    {
+      "id": "BATTLE-ATTEMPT-SOURCE-01",
+      "title": "Internal battle preparation seals original character source and refuses duplicate or unverified outcome authority",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "functions/src/canonical-battle-attempt.js",
+          "tests/cloud-save-battle-attempt.test.mjs",
+          "scripts/test-session-authority-emulator.mjs"
+        ],
+        "verification": "24/24 targeted cases PASS. Real Firestore emulator, required CI and integration/deployment pending.",
+        "result": "Internal preparation only; no callable, client hook, outcome proof or combat reward. Phase4 remains0/6 VERIFIED."
+      }
+    }
+  ]
+}
