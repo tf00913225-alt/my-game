@@ -1,0 +1,467 @@
+{
+  "workId": "P1-B2-DAILY-PORTRAIT-20261003",
+  "target": "dev",
+  "baseDevSha": "4274454a30f25f5807fa589804413efe8ec13290",
+  "mainSha": "f63d69dbfa66ba75637d1c3cd7fcc7d74782e356",
+  "status": "IN PROGRESS",
+  "prs": [
+    {
+      "number": 640,
+      "head": "fix/daily-dungeon-portrait-owner-convergence-20260928",
+      "headSha": "008eeb6a91c9588e3ccfa3069dea9116a70a6ed0",
+      "baseSha": "7097bb57000ac423ff7d7d5be853e4f6d67b2f36",
+      "changedFiles": [
+        ".github/scripts/run-daily-dungeon-portrait-browser-qa.mjs",
+        ".github/workflows/ci.yml",
+        "css/46-v154-dev-fixes.css",
+        "css/fixed-slot-battlefield-rendering-v2.css",
+        "js/42-v148-combat-dungeon-fixes.js",
+        "js/45-v154-dev-fixes.js",
+        "js/48-v159-abyss-battle-portraits.js",
+        "js/equipment-progression.js",
+        "tests/daily-dungeon-portrait-final-convergence.test.js"
+      ]
+    },
+    {
+      "number": 641,
+      "head": "fix/daily-dungeon-portrait-owner-convergence-20260928-r2",
+      "headSha": "df3dd30479b2f923ceb337b9060f3ae97314cc14",
+      "baseSha": "f082c8b06e7b3bbf27adcac74800ab9114d27d1b",
+      "changedFiles": [
+        ".github/scripts/run-daily-dungeon-portrait-browser-qa.mjs",
+        ".github/workflows/ci.yml",
+        "css/46-v154-dev-fixes.css",
+        "css/fixed-slot-battlefield-rendering-v2.css",
+        "js/42-v148-combat-dungeon-fixes.js",
+        "js/45-v154-dev-fixes.js",
+        "js/48-v159-abyss-battle-portraits.js",
+        "js/equipment-progression.js",
+        "tests/daily-dungeon-portrait-final-convergence.test.js"
+      ]
+    },
+    {
+      "number": 642,
+      "head": "fix/daily-dungeon-portrait-owner-convergence-20260928-r3",
+      "headSha": "78d91522ba3c7fb889ade28d0402edf03a01e7c5",
+      "baseSha": "f082c8b06e7b3bbf27adcac74800ab9114d27d1b",
+      "changedFiles": [
+        ".github/scripts/run-daily-dungeon-portrait-browser-qa.mjs",
+        ".github/workflows/ci.yml",
+        "css/46-v154-dev-fixes.css",
+        "css/fixed-slot-battlefield-rendering-v2.css",
+        "js/42-v148-combat-dungeon-fixes.js",
+        "js/45-v154-dev-fixes.js",
+        "js/48-v159-abyss-battle-portraits.js",
+        "js/equipment-progression.js",
+        "js/gameplay-boss-tower-system.js",
+        "tests/daily-dungeon-portrait-final-convergence.test.js"
+      ]
+    },
+    {
+      "number": 643,
+      "head": "fix/daily-dungeon-portrait-owner-convergence-20260928-r4",
+      "headSha": "78d91522ba3c7fb889ade28d0402edf03a01e7c5",
+      "baseSha": "f082c8b06e7b3bbf27adcac74800ab9114d27d1b",
+      "changedFiles": [
+        ".github/scripts/run-daily-dungeon-portrait-browser-qa.mjs",
+        ".github/workflows/ci.yml",
+        "css/46-v154-dev-fixes.css",
+        "css/fixed-slot-battlefield-rendering-v2.css",
+        "js/42-v148-combat-dungeon-fixes.js",
+        "js/45-v154-dev-fixes.js",
+        "js/48-v159-abyss-battle-portraits.js",
+        "js/equipment-progression.js",
+        "js/gameplay-boss-tower-system.js",
+        "tests/daily-dungeon-portrait-final-convergence.test.js"
+      ]
+    },
+    {
+      "number": 644,
+      "head": "fix/daily-dungeon-portrait-owner-convergence-20260928-r5",
+      "headSha": "debdbb6a49fe8b0f4ea968e07d79b83b576dd058",
+      "baseSha": "f082c8b06e7b3bbf27adcac74800ab9114d27d1b",
+      "changedFiles": [
+        ".github/scripts/run-daily-dungeon-portrait-browser-qa.mjs",
+        ".github/workflows/ci.yml",
+        "css/46-v154-dev-fixes.css",
+        "css/fixed-slot-battlefield-rendering-v2.css",
+        "js/42-v148-combat-dungeon-fixes.js",
+        "js/45-v154-dev-fixes.js",
+        "js/48-v159-abyss-battle-portraits.js",
+        "js/equipment-progression.js",
+        "js/gameplay-boss-tower-system.js",
+        "tests/daily-dungeon-portrait-final-convergence.test.js",
+        "tests/monster-portrait-runtime.test.js"
+      ]
+    },
+    {
+      "number": 645,
+      "head": "fix/daily-dungeon-portrait-owner-convergence-20260928-r9",
+      "headSha": "3371766a6c152bee79361bf523d2866093cd5994",
+      "baseSha": "f082c8b06e7b3bbf27adcac74800ab9114d27d1b",
+      "changedFiles": [
+        ".github/scripts/run-daily-dungeon-portrait-browser-qa.mjs",
+        ".github/workflows/ci.yml",
+        "css/46-v154-dev-fixes.css",
+        "css/fixed-slot-battlefield-rendering-v2.css",
+        "js/42-v148-combat-dungeon-fixes.js",
+        "js/45-v154-dev-fixes.js",
+        "js/48-v159-abyss-battle-portraits.js",
+        "js/equipment-progression.js",
+        "js/gameplay-boss-tower-system.js",
+        "tests/daily-dungeon-portrait-final-convergence.test.js",
+        "tests/monster-portrait-runtime.test.js"
+      ]
+    },
+    {
+      "number": 646,
+      "head": "fix/daily-dungeon-portrait-owner-convergence-20260928-r11",
+      "headSha": "d1669cd551665e271e7ebe8c9c5331c8d90569ea",
+      "baseSha": "f082c8b06e7b3bbf27adcac74800ab9114d27d1b",
+      "changedFiles": [
+        ".github/scripts/run-daily-dungeon-portrait-browser-qa.mjs",
+        ".github/workflows/ci.yml",
+        "css/46-v154-dev-fixes.css",
+        "css/fixed-slot-battlefield-rendering-v2.css",
+        "js/42-v148-combat-dungeon-fixes.js",
+        "js/45-v154-dev-fixes.js",
+        "js/48-v159-abyss-battle-portraits.js",
+        "js/equipment-progression.js",
+        "js/gameplay-boss-tower-system.js",
+        "tests/daily-dungeon-portrait-final-convergence.test.js",
+        "tests/monster-portrait-runtime.test.js"
+      ]
+    },
+    {
+      "number": 647,
+      "head": "fix/daily-dungeon-portrait-owner-convergence-20260928-r12",
+      "headSha": "1503a7d67473464443bb80793b2e763c997bc975",
+      "baseSha": "f082c8b06e7b3bbf27adcac74800ab9114d27d1b",
+      "changedFiles": [
+        ".github/scripts/run-daily-dungeon-portrait-browser-qa.mjs",
+        ".github/workflows/ci.yml",
+        "asset-manifest.json",
+        "build/asset-manifest.json",
+        "build/feature-boss-relic.0656110aaad6.js",
+        "build/feature-boss-relic.6d5ac77bf0f7.js",
+        "build/gameplay-core-secondary.5b669993c6ab.js",
+        "build/gameplay-core.bacc2df42518.css",
+        "css/46-v154-dev-fixes.css",
+        "css/fixed-slot-battlefield-rendering-v2.css",
+        "js/42-v148-combat-dungeon-fixes.js",
+        "js/45-v154-dev-fixes.js",
+        "js/48-v159-abyss-battle-portraits.js",
+        "js/equipment-progression.js",
+        "js/gameplay-boss-tower-system.js",
+        "tests/daily-dungeon-portrait-final-convergence.test.js",
+        "tests/monster-portrait-runtime.test.js"
+      ]
+    },
+    {
+      "number": 648,
+      "head": "fix/daily-dungeon-portrait-owner-convergence-20260928-r13",
+      "headSha": "ded3eebb7eb215e1a5cd7c9d1f6ab5cd6818255b",
+      "baseSha": "f082c8b06e7b3bbf27adcac74800ab9114d27d1b",
+      "changedFiles": [
+        ".github/scripts/run-daily-dungeon-portrait-browser-qa.mjs",
+        ".github/workflows/ci.yml",
+        "asset-manifest.json",
+        "build/asset-manifest.json",
+        "build/feature-boss-relic.0656110aaad6.js",
+        "build/feature-boss-relic.6d5ac77bf0f7.js",
+        "build/gameplay-core-secondary.5b669993c6ab.js",
+        "build/gameplay-core.bacc2df42518.css",
+        "css/46-v154-dev-fixes.css",
+        "css/fixed-slot-battlefield-rendering-v2.css",
+        "js/42-v148-combat-dungeon-fixes.js",
+        "js/45-v154-dev-fixes.js",
+        "js/48-v159-abyss-battle-portraits.js",
+        "js/equipment-progression.js",
+        "js/gameplay-boss-tower-system.js",
+        "tests/daily-dungeon-portrait-final-convergence.test.js",
+        "tests/monster-portrait-runtime.test.js"
+      ]
+    }
+  ],
+  "currentOwners": {
+    "selection": "js/45-v154-dev-fixes.js::resolveMonsterPortraitRecord / prepareDailyDungeonPortraits / syncCardlessPresentation",
+    "presentation": "js/54-v173.51-battle-qa.js::syncUnitArtwork",
+    "geometry": "js/battlefield-render-geometry-adapter.js / css/fixed-slot-battlefield-rendering-v2.css",
+    "launch": "js/42-v148-combat-dungeon-fixes.js::beginFormalDailyDungeon / activateDailyDungeonWave; js/equipment-progression.js::beginEquipmentDungeon",
+    "registry": "config/monster-portrait-registry.json",
+    "browserQA": ".github/scripts/run-daily-dungeon-webp-browser-qa.mjs"
+  },
+  "replacements": [
+    {
+      "pr": 657,
+      "commit": "0a0d5cb0c1d5a9edecc20b63f0e931c73f1a4e62",
+      "merge": "602117d9c1eac36b1881205226106e6b17f93d9f",
+      "capabilities": [
+        "V154 selection-only handoff",
+        "V174 sole artwork DOM",
+        "V159 retirement",
+        "retryable per-key decode",
+        "registry retry",
+        "formal/equipment Visual Ready"
+      ]
+    },
+    {
+      "pr": 661,
+      "merge": "2f5eae6b53143fa1a55eefc24a9cc93b62b13f02",
+      "capabilities": [
+        "valid nine WebP assets",
+        "browser decode and preparation"
+      ]
+    }
+  ],
+  "matrix": [
+    {
+      "requirement": "daily-identity",
+      "oldPRs": [
+        640,
+        641,
+        642,
+        643,
+        644,
+        645,
+        646,
+        647,
+        648
+      ],
+      "currentDev": "4274454a30f25f5807fa589804413efe8ec13290",
+      "status": "ABSORBED",
+      "evidence": "V148 explicit daily.type.rank keys; all nine Registry rows existing"
+    },
+    {
+      "requirement": "portrait-selection-registry",
+      "oldPRs": [
+        640,
+        641,
+        642,
+        643,
+        644,
+        645,
+        646,
+        647,
+        648
+      ],
+      "currentDev": "4274454a30f25f5807fa589804413efe8ec13290",
+      "status": "SUPERSEDED",
+      "evidence": "#657 V154 resolver and per-card V174.applyUnit handoff"
+    },
+    {
+      "requirement": "V154-selection-V174-presentation",
+      "oldPRs": [
+        640,
+        641,
+        642,
+        643,
+        644,
+        645,
+        646,
+        647,
+        648
+      ],
+      "currentDev": "4274454a30f25f5807fa589804413efe8ec13290",
+      "status": "SUPERSEDED",
+      "evidence": "#657; no V154 createElement(img), no duplicate artwork surface"
+    },
+    {
+      "requirement": "V159-retirement",
+      "oldPRs": [
+        640,
+        641,
+        642,
+        643,
+        644,
+        645,
+        646,
+        647,
+        648
+      ],
+      "currentDev": "4274454a30f25f5807fa589804413efe8ec13290",
+      "status": "SUPERSEDED",
+      "evidence": "#657; current V159 is a two-line marker without wrapper/timer/RAF"
+    },
+    {
+      "requirement": "per-key-decode-retry",
+      "oldPRs": [
+        640,
+        641,
+        642,
+        643,
+        644,
+        645,
+        646,
+        647,
+        648
+      ],
+      "currentDev": "4274454a30f25f5807fa589804413efe8ec13290",
+      "status": "SUPERSEDED",
+      "evidence": "#657; Promise.all of ensureAssets([record.path]), failures tracked per key, failed preparation removed"
+    },
+    {
+      "requirement": "registry-failure-retry",
+      "oldPRs": [
+        640,
+        641,
+        642,
+        643,
+        644,
+        645,
+        646,
+        647,
+        648
+      ],
+      "currentDev": "4274454a30f25f5807fa589804413efe8ec13290",
+      "status": "ABSORBED",
+      "evidence": "V154 request catch clears shared failed Promise"
+    },
+    {
+      "requirement": "formal-and-equipment-launch",
+      "oldPRs": [
+        640,
+        641,
+        642,
+        643,
+        644,
+        645,
+        646,
+        647,
+        648
+      ],
+      "currentDev": "4274454a30f25f5807fa589804413efe8ec13290",
+      "status": "SUPERSEDED",
+      "evidence": "Current beginFormalDailyDungeon / beginEquipmentDungeon await same V154 readiness; obsolete v148PrepareDailyDungeonLaunch adapter not restored"
+    },
+    {
+      "requirement": "regular-elite-boss-exp-material-gold",
+      "oldPRs": [
+        640,
+        641,
+        642,
+        643,
+        644,
+        645,
+        646,
+        647,
+        648
+      ],
+      "currentDev": "4274454a30f25f5807fa589804413efe8ec13290",
+      "status": "ABSORBED",
+      "evidence": "V148 canonical wave builder, nine valid 1024x1536 WebP assets"
+    },
+    {
+      "requirement": "asset-completeness-provenance",
+      "oldPRs": [
+        640,
+        641,
+        642,
+        643,
+        644,
+        645,
+        646,
+        647,
+        648
+      ],
+      "currentDev": "4274454a30f25f5807fa589804413efe8ec13290",
+      "status": "SUPERSEDED",
+      "evidence": "#661 c7eb1689 valid nine assets; old branches carry no independent image changes"
+    },
+    {
+      "requirement": "CSS46-artwork-retirement",
+      "oldPRs": [
+        640,
+        641,
+        642,
+        643,
+        644,
+        645,
+        646,
+        647,
+        648
+      ],
+      "currentDev": "4274454a30f25f5807fa589804413efe8ec13290",
+      "status": "MISSING",
+      "evidence": "Old img and card-background rules still shipped in CSS46; this current-dev integration physically removes them"
+    },
+    {
+      "requirement": "production-first-visible-mobile-QA",
+      "oldPRs": [
+        640,
+        641,
+        642,
+        643,
+        644,
+        645,
+        646,
+        647,
+        648
+      ],
+      "currentDev": "4274454a30f25f5807fa589804413efe8ec13290",
+      "status": "MISSING",
+      "evidence": "Current specialized QA only decode; add real production index/launch/waves/27-key-view pairs and screenshots in same QA owner"
+    },
+    {
+      "requirement": "old-browser-fixture",
+      "oldPRs": [
+        640,
+        641,
+        642,
+        643,
+        644,
+        645,
+        646,
+        647,
+        648
+      ],
+      "currentDev": "4274454a30f25f5807fa589804413efe8ec13290",
+      "status": "OBSOLETE",
+      "evidence": "Playwright closure assertion error / hardcoded retired bundle filenames / duplicate html declaration / synthetic DOM and no-op decoder; retain requirements, not fixture"
+    },
+    {
+      "requirement": "old-contract-test-path",
+      "oldPRs": [
+        640,
+        641,
+        642,
+        643,
+        644,
+        645,
+        646,
+        647,
+        648
+      ],
+      "currentDev": "4274454a30f25f5807fa589804413efe8ec13290",
+      "status": "SUPERSEDED",
+      "evidence": "tests/daily-dungeon-portrait-owner-convergence-20260928.test.js and monster-portrait-runtime.test.js"
+    },
+    {
+      "requirement": "historical-generated-bundles",
+      "oldPRs": [
+        647,
+        648
+      ],
+      "currentDev": "4274454a30f25f5807fa589804413efe8ec13290",
+      "status": "OBSOLETE",
+      "evidence": "Current build manifest is authoritative; old hashed artifacts must never be transplanted"
+    },
+    {
+      "requirement": "tower-debug-clock",
+      "oldPRs": [
+        642,
+        643,
+        644,
+        645,
+        646,
+        647,
+        648
+      ],
+      "currentDev": "4274454a30f25f5807fa589804413efe8ec13290",
+      "status": "SUPERSEDED",
+      "evidence": "Old production debugClock workaround replaced by current deterministic test fixture dates and synchronous tower contract; out of Daily Runtime scope, not revived"
+    }
+  ],
+  "restoredRetiredWrapperOrPatch": false,
+  "mainModified": false
+}

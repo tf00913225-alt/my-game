@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
-import {spawnSync} from "node:child_process";
+import os from "node:os";
+import {spawn,spawnSync} from "node:child_process";
+import {startServer,waitJson,Cdp} from "./runtime-browser-qa-support.mjs";
 
 const ROOT=process.cwd();
 const FIXTURE=path.join(ROOT,".daily-dungeon-webp-browser-qa.html");
@@ -65,4 +67,105 @@ try{
     console.log("Daily Dungeon WebP browser decode/lifecycle QA passed: 9/9 runtime portraits, 3/3 preparations.");
 }finally{
     try{fs.unlinkSync(FIXTURE);}catch(_){}
+}
+
+/* Keep the existing decode evidence, then verify the real production index,
+   feature loader, launch/wave lifecycle and V154 -> V174 artwork surface.
+   Only the shared read-only QA account transport is isolated. No portrait,
+   render, launch or geometry owner is replaced by the fixture. */
+const PREPARE_RUNTIME=`(async()=>{
+    const wait=async test=>{const until=performance.now()+30000;while(!test()&&performance.now()<until)await new Promise(r=>setTimeout(r,40));if(!test())throw Error('Daily Runtime readiness timeout: '+test);};
+    await wait(()=>window.FourSymbolsStartupPolicy?.getState?.()==='READY');
+    await FourSymbolsFeatures.ensure('gameplay-core','daily-portrait-qa');
+    closeHomeFeature();showPage('dungeon');
+    autoConfig.enabled=false;autoBattle=false;
+    player.level=70;
+    window.__dailyRuntimeQa={types:{},firstVisible:[],errors:[]};
+    window.addEventListener('error',e=>__dailyRuntimeQa.errors.push(String(e.message)));
+    window.addEventListener('unhandledrejection',e=>__dailyRuntimeQa.errors.push(String(e.reason)));
+    const registry=await (await fetch('config/monster-portrait-registry.json',{cache:'no-store'})).json();
+    window.__dailyExpected=Object.fromEntries(registry.groups.daily.map(row=>[row[0],row[5]]));
+    return {startup:FourSymbolsStartupPolicy.getState(),presentation:typeof FourSymbolsBattlePresentation?.applyUnit};
+})()`;
+
+function runType(type){return `(async()=>{
+    const type=${JSON.stringify(type)},qa=window.__dailyRuntimeQa;
+    const wait=async test=>{const until=performance.now()+15000;while(!test()&&performance.now()<until)await new Promise(r=>setTimeout(r,25));if(!test())throw Error('Daily lifecycle timeout: '+test);};
+    const check=(value,message)=>{if(!value)throw Error(message);};
+    const capture=()=>[...document.querySelectorAll('#battleMonsterArea .battle-monster')].map(card=>{
+        const index=Number(card.id.replace('battleMonster','')),monster=monsters[index],art=card.querySelector(':scope > .v174-battle-art');
+        const style=art&&getComputedStyle(art),rect=art?.getBoundingClientRect();
+        let painted=!!(art&&rect.width>0&&rect.height>0&&rect.right>0&&rect.left<innerWidth&&rect.bottom>0&&rect.top<innerHeight);
+        for(let node=art;node&&painted;node=node.parentElement){const s=getComputedStyle(node);if(s.display==='none'||s.visibility==='hidden'||Number(s.opacity)<=0)painted=false;}
+        return {key:card.dataset.monsterPortraitKey,path:card.dataset.monsterPortraitPath,expected:__dailyExpected[monster.portraitKey],stage:monster.v141DungeonStage,rank:monster.rank||monster.v141BattleRank||'regular',background:style?.backgroundImage,backgroundSize:style?.backgroundSize,painted,artCount:card.querySelectorAll(':scope > .v174-battle-art').length,legacyCount:card.querySelectorAll('img.v162-abyss-battle-portrait-art').length,width:rect?.width,height:rect?.height};
+    });
+    const firstVisible=new Map();let sampling=true;
+    const sample=()=>{if(!sampling)return;for(const row of capture()){if(row.painted){const id=row.stage+':'+row.key;if(!firstVisible.has(id))firstVisible.set(id,row);}}requestAnimationFrame(sample);};
+    requestAnimationFrame(sample);
+    try{
+        const entry={exp:'v132BeginExpDungeon',material:'v132BeginMaterialDungeon',gold:'v17346BeginEquipmentDungeon'}[type];
+        const launch=window[entry]();
+        await wait(()=>document.getElementById('v169RpgDialogLayer')?.classList.contains('show'));
+        document.querySelector('#v169RpgDialogLayer .v169-rpg-dialog-actions button:last-child').click();
+        await launch;
+        check(window.v132ActiveDungeonRun?.dailyDungeonType===type,'formal daily launch identity');
+        const waves=[];
+        for(let stage=1;stage<=3;stage++){
+            await wait(()=>battleActive&&monsters[currentBattleMonsters[0]]?.v141DungeonStage===stage&&!document.getElementById('battlePage')?.matches('.v141-preparing-entry,.v141-entry-moving'));
+            await new Promise(requestAnimationFrame);
+            const rows=capture();check(rows.length===6,'six formal enemies per wave');
+            for(const row of rows){check(row.painted,'portrait must be visible: '+row.key);check(row.path===row.expected&&row.background?.includes(row.expected),'current Registry selection: '+row.key);check(row.artCount===1&&row.legacyCount===0,'single V174 surface');}
+            waves.push({stage,rows});
+            if(stage<3){
+                if(type==='gold'){
+                    // Invoke the registered completion boundary in the isolated
+                    // account; no final win, reward claim or server write occurs.
+                    const done=v132ActiveDungeonRun.onComplete;v132AbortDungeonBattle('qa-wave');done({result:'win',turnsUsed:1});
+                }else{
+                    currentBattleMonsters.forEach(i=>{monsters[i].hp=0;monsters[i].alive=false;});winBattle();
+                }
+            }
+        }
+        const first=[...firstVisible.values()];
+        check(first.length>=6,'first visible frames must be sampled');
+        for(const row of first){check(row.path===row.expected&&row.background?.includes(row.expected),'first visible frame has incorrect art: '+row.key);}
+        const covered=[...new Set(waves.flatMap(w=>w.rows.map(r=>r.key)))].sort();
+        check(JSON.stringify(covered)===JSON.stringify(['regular','elite','boss'].map(rank=>'daily.'+type+'.'+rank).sort()),'all daily ranks must be covered');
+        const snapshot=JSON.stringify(capture().map(r=>({key:r.key,path:r.path,artCount:r.artCount})));
+        renderBattle();check(JSON.stringify(capture().map(r=>({key:r.key,path:r.path,artCount:r.artCount})))===snapshot,'redraw preserves selection and single surface');
+        qa.types[type]={entry,waves,firstVisible:first,covered,redraw:true};
+        return qa.types[type];
+    }finally{sampling=false;}
+})()`;}
+
+const runtimeServer=await startServer(),runtimeReport={commitSha:process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||'local',viewports:[]};
+let client,proc,profile;
+function closeViewport(){client?.close();client=null;proc?.kill('SIGTERM');proc=null;if(profile){try{fs.rmSync(profile,{recursive:true,force:true,maxRetries:3,retryDelay:100});}catch{}profile=null;}}
+try{
+    for(const [width,height] of [[360,800],[393,873],[412,915]]){
+        profile=fs.mkdtempSync(path.join(os.tmpdir(),'daily-portrait-runtime-'));
+        const port=9600+Math.floor(Math.random()*250);
+        proc=spawn(findChrome(),['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'],{stdio:'ignore'});
+        const targets=await waitJson('http://127.0.0.1:'+port+'/json/list');client=new Cdp(targets.find(t=>t.type==='page').webSocketDebuggerUrl);
+        await client.send('Page.enable');await client.send('Runtime.enable');
+        await client.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true});
+        await client.send('Page.navigate',{url:runtimeServer.url});
+        const prepared=await client.eval(PREPARE_RUNTIME);assert.equal(prepared.startup,'READY');assert.equal(prepared.presentation,'function');
+        const viewport={width,height,types:{}};
+        for(const type of types){
+            viewport.types[type]=await client.eval(runType(type));
+            assert.equal(await client.eval("!!document.getElementById('homeFeatureModal')?.classList.contains('show')"),false,'daily screenshot must be unobstructed');
+            const shot=await client.send('Page.captureScreenshot',{format:'png'});
+            fs.writeFileSync(path.join(ARTIFACT_DIR,'daily-dungeon-'+type+'-'+width+'x'+height+'.png'),Buffer.from(shot.data,'base64'));
+            await client.eval("v132AbortDungeonBattle('qa-portrait');showPage('dungeon');true");
+        }
+        assert.deepEqual(await client.eval('__dailyRuntimeQa.errors'),[]);
+        runtimeReport.viewports.push(viewport);closeViewport();
+    }
+    runtimeReport.passed=true;
+    console.log('Daily Dungeon production Runtime presentation: PASS (3 viewports x 9 portrait keys, formal launch/waves/first-visible/redraw).');
+}catch(error){runtimeReport.passed=false;runtimeReport.error=String(error.stack||error);runtimeReport.partial=await client?.eval('window.__dailyRuntimeQa').catch(()=>null);throw error;}
+finally{
+    fs.writeFileSync(path.join(ARTIFACT_DIR,'daily-dungeon-portrait-runtime-qa.json'),JSON.stringify(runtimeReport,null,2)+'\n');
+    closeViewport();await new Promise(resolve=>runtimeServer.server.close(resolve));
 }

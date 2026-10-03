@@ -471,6 +471,32 @@
         "verification": "15項功能逐項驗證；專項20/20、528projection、56identity、非Wild immutable baseline、40TTK及雙尺寸自然Chrome；build:check PASS",
         "result": "功能15/15 VERIFIED；一般1–2／精英1–3回合為基準隊伍範圍；Tank defensive AI gap明示。最新Head CI／dev整合／部署SHA／分支清理以PR#780為最終Gate owner，未完成前不宣稱全案完成。"
       }
+    },
+    {
+      "id": "REQ-P1B2-DAILY-CSS-RETIREMENT-20261003",
+      "title": "每日副本歷史 PR CSS46 退休立繪呈現移除",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "docs/p1-b2-daily-portrait-pr-convergence-20261003.json",
+          ".github/scripts/run-daily-dungeon-webp-browser-qa.mjs"
+        ],
+        "verification": "Targeted contracts / build check / mandatory current-owner Browser QA",
+        "result": "Browser QA pending; local Chrome socket operation is prohibited."
+      }
+    },
+    {
+      "id": "REQ-P1B2-DAILY-MOBILE-QA-20261003",
+      "title": "每日副本 3 尺寸與 9 種立繪正式進場／換波呈現驗收",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "docs/p1-b2-daily-portrait-pr-convergence-20261003.json",
+          ".github/scripts/run-daily-dungeon-webp-browser-qa.mjs"
+        ],
+        "verification": "Targeted contracts / build check / mandatory current-owner Browser QA",
+        "result": "Browser QA pending; local Chrome socket operation is prohibited."
+      }
     }
   ]
 }

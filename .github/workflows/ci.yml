@@ -403,7 +403,12 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: daily-dungeon-webp-browser-qa-${{ github.sha }}
-          path: artifacts/browser-qa/daily-dungeon-webp-browser-qa.json
+          path: |
+            artifacts/browser-qa/daily-dungeon-webp-browser-qa.json
+            artifacts/browser-qa/daily-dungeon-portrait-runtime-qa.json
+            artifacts/browser-qa/daily-dungeon-exp-*.png
+            artifacts/browser-qa/daily-dungeon-material-*.png
+            artifacts/browser-qa/daily-dungeon-gold-*.png
           if-no-files-found: error
           retention-days: 90
 
