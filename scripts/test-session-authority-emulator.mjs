@@ -13,6 +13,7 @@ const {createCanonicalResourceCredit}=require("../functions/src/canonical-resour
 const {createDailyCheckinGrant}=require("../functions/src/daily-checkin-grant.js");
 const {createCanonicalBattleAttempt}=require("../functions/src/canonical-battle-attempt.js");
 const {createCanonicalBattleEncounter}=require("../functions/src/canonical-battle-encounter.js");
+const {resolvePlainPlayerNormalAttack}=require("../functions/src/canonical-battle-normal-attack.js");
 const {createCanonicalExpAllocation}=require("../functions/src/canonical-exp-allocation.js");
 const {createCanonicalAttributeAllocation}=
     require("../functions/src/canonical-attribute-allocation.js");
@@ -448,6 +449,37 @@ assert.deepEqual((await battleRoot.collection("account").doc("current").get()).d
 assert.deepEqual((await battleRoot.collection("economy").doc("current").get()).data(),battleBefore.economy);
 assert.deepEqual((await db.doc(`users/${y}/saves/current`).get()).data(),battleBefore.envelope);
 console.log("Encounter stat seal real transaction: concurrent one-winner, rollback, replay, expiry, original evidence, private rules, tampering, session and zero reward PASS");
+
+// Pure normal-attack arithmetic on actual private, archived sources. This is
+// not an accepted action/turn/result and must not mint a victory entitlement.
+const readNormalAttackInputs=(request,tape)=>writerSessions.runProtected(request,async(tx,session)=>{
+    const [snapshot,archive,policy]=await Promise.all([
+        tx.get(battleRoot.collection("playableSnapshots").doc("2")),
+        tx.get(battleRoot.collection("recoveryArchives").doc("2")),tx.get(encounterPolicyRef)]);
+    return resolvePlainPlayerNormalAttack({uid:session.uid,revision:2,snapshot:snapshot.data(),
+        archive:archive.data(),encounterPolicy:policy.data().policy,
+        encounterKey:encounterArgs.encounterKey,randomTape:tape});
+});
+const normalAttackRuleResult=await readNormalAttackInputs(yRequest,[0.5,0.5,0.5]);
+assert.deepEqual(await readNormalAttackInputs(yRequest,[0.5,0.5,0.5]),normalAttackRuleResult);
+assert.equal(normalAttackRuleResult.hit,true);assert.ok(normalAttackRuleResult.damage>0);
+assert.equal(normalAttackRuleResult.combatRulesReady,false);
+assert.equal(normalAttackRuleResult.outcomeVerified,false);
+assert.equal(normalAttackRuleResult.rewardEligible,false);
+assert.equal(normalAttackRuleResult.creditedToCharacter,false);
+const missedNormalAttackRule=await readNormalAttackInputs(yRequest,[0.95]);
+assert.equal(missedNormalAttackRule.damage,0);
+assert.equal(missedNormalAttackRule.hpBefore,missedNormalAttackRule.hpAfter);
+await assert.rejects(readNormalAttackInputs({...yRequest,data:{uid:y,session:sessionB}},[0.5,0.5,0.5]),
+    e=>e.message==="SESSION_INVALID");
+await assert.rejects(readNormalAttackInputs({auth:{uid:x,token:claims(a.idToken)},
+    data:{uid:x,session:sessionA}},[0.5,0.5,0.5]),e=>e.message==="SESSION_REVOKED");
+assert.deepEqual((await battleRoot.collection("account").doc("current").get()).data(),battleBefore.account);
+assert.deepEqual((await battleRoot.collection("economy").doc("current").get()).data(),battleBefore.economy);
+assert.deepEqual((await db.doc(`users/${y}/saves/current`).get()).data(),battleBefore.envelope);
+assert.equal((await battleRoot.collection("pendingGrants").get()).size,0);
+assert.equal((await battleRoot.collection("ledgerEntries").get()).size,0);
+console.log("Normal attack rule arithmetic on private Firestore sources: deterministic hit/MISS, session refusal and zero authoritative mutation PASS");
 
 
 assert.deepEqual(initialArchive.get("sourceRecords.claimRecords"),[]);

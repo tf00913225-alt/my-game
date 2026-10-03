@@ -144,4 +144,4 @@ function createCanonicalBattleEncounter(dependencies){
     }
     return Object.freeze({seal});
 }
-module.exports={createCanonicalBattleEncounter};
+module.exports={createCanonicalBattleEncounter,inspectPolicy};
