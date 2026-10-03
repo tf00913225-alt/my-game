@@ -125,7 +125,9 @@ jobs:
           retention-days: 90
 
       - name: Run deployed battle layout and VFX live QA
-        run: node .github/scripts/battle-layer-audio-live-qa.mjs
+        run: |
+          node .github/scripts/battle-layer-audio-live-qa.mjs
+          DAILY_BALANCE_BASE_URL="$DEV_BASE_URL" node .github/scripts/run-daily-balance-browser-qa.mjs
 
       - name: Upload battle layout and VFX live QA evidence
         if: always()
@@ -136,6 +138,7 @@ jobs:
             artifacts/browser-qa/battle-layer-audio-live-qa.json
             artifacts/browser-qa/battle-layout-wind-flame-mobile.png
             artifacts/browser-qa/battle-layer-element-box-mobile.png
+            artifacts/browser-qa/daily-balance*
           if-no-files-found: error
           retention-days: 90
 

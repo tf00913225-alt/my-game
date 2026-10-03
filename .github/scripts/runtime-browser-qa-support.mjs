@@ -41,14 +41,25 @@ function mime(file){
     return "application/octet-stream";
 }
 
-async function startServer(){
-    const server=http.createServer((req,res)=>{
+async function startServer({baseUrl}={}){
+    const server=http.createServer(async(req,res)=>{
         const pathname=decodeURIComponent(String(req.url||"/").split("?")[0]);
         const fetchDestination=String(req.headers["sec-fetch-dest"]||"");
         if(fetchDestination==="script"&&pathname===QA_AUTH_PATH){res.writeHead(200,{"content-type":"text/javascript; charset=utf-8","cache-control":"no-store"});res.end(QA_AUTH_MODULE);return;}
         if(fetchDestination==="script"&&pathname===QA_CLOUD_PATH){res.writeHead(200,{"content-type":"text/javascript; charset=utf-8","cache-control":"no-store"});res.end(QA_CLOUD_MODULE);return;}
         if(fetchDestination==="script"&&pathname===QA_SESSION_PATH){res.writeHead(200,{"content-type":"text/javascript; charset=utf-8","cache-control":"no-store"});res.end(QA_SESSION_MODULE);return;}
         const relative=pathname==="/"?"index.html":pathname.replace(/^\/+/,"");
+        if(baseUrl){
+            // Exact deployed assets remain authoritative; only the established
+            // read-only account transport above is isolated from player data.
+            try{
+                const upstream=await fetch(new URL(relative,baseUrl.replace(/\/$/,"")+"/"));
+                res.writeHead(upstream.status,{"content-type":upstream.headers.get("content-type")||mime(relative),"cache-control":"no-store"});
+                if(relative==="index.html"){res.end((await upstream.text()).replace("<!-- build:critical-script -->",qaPrelude()+"\n<!-- build:critical-script -->"));}
+                else{res.end(Buffer.from(await upstream.arrayBuffer()));}
+            }catch(error){res.writeHead(502);res.end(String(error));}
+            return;
+        }
         const file=path.resolve(ROOT,relative);
         if(!file.startsWith(ROOT+path.sep)||!fs.existsSync(file)||fs.statSync(file).isDirectory()){
             res.writeHead(404);res.end("not found");return;

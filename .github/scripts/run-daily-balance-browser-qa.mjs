@@ -20,7 +20,7 @@ const expression=`(async()=>{
    check(m.skillChance===p.skillFrequency,'one skill frequency owner');
    const box=document.getElementById('battleMonster'+i),art=box?.querySelector('.v174-battle-art'),r=art?.getBoundingClientRect();
    check(r&&r.width>0&&r.height>0&&getComputedStyle(art).backgroundImage!=='none','visible portrait');
-   const hp=box.querySelector('.hp-bar-inner'),sp=box.querySelector('.sp-bar-inner');check(hp&&sp,'HP/SP UI');
+   const hp=box.querySelector('.monster-hp-inner'),sp=box.querySelector('.monster-sp-inner');check(hp&&sp,'HP/SP UI');
   }
  };
  async function scene(type,level,size,automatic){
@@ -76,7 +76,12 @@ const expression=`(async()=>{
  }finally{Math.random=oldRandom;autoConfig.enabled=false;autoBattle=false;}
 })()
 `;
-const server=await startServer(),chrome=findChrome();
+const liveBase=process.env.DAILY_BALANCE_BASE_URL;
+if(liveBase){
+ const manifest=await fetch(new URL('release-manifest.json',liveBase+'/')).then(r=>{assert.equal(r.ok,true,'deployed manifest');return r.json();});
+ assert.equal(manifest.commitSha,process.env.EXPECTED_COMMIT_SHA,'Daily live exact SHA');
+}
+const server=await startServer({baseUrl:liveBase}),chrome=findChrome();
 const artifact=path.join(ROOT,'artifacts/browser-qa/daily-balance.json');fs.mkdirSync(path.dirname(artifact),{recursive:true});let client,proc,profile;const results=[];
 function closeViewport(){
  client?.close();client=null;proc?.kill('SIGTERM');proc=null;
