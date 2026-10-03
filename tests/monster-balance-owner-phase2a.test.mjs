@@ -36,6 +36,7 @@ test('full loader, every actual zone and duplicate identity have no late stat mu
  const seen=new Map(),archetypes=new Set();
  for(const zone of zones)for(const m of zone.roster){
   assert.equal(m.mode,'wild');assert.equal(m.balanceOwner,'MonsterBalance');assert.ok(m.monsterKey);
+  assert.deepEqual(plain(c.MonsterBalance.debug(m).resourceBase),{hp:100,sp:50,provenance:'00-main legacy resource baseline',speed:0});
   archetypes.add(m.archetype);
   const p=MonsterBalance.preview(m.balanceProjection.identity);
   assert.equal(m.maxHP,p.final.maxHP);assert.equal(m.maxSP,p.final.maxSP);
@@ -84,6 +85,7 @@ test('unmigrated common builders and all 50 real Abyss rosters retain starting o
 test('physical retirement forbids all old Wild writers and constructor wrapper chains',()=>{
  const source=['js/25-v131-fix-batch.js','js/34-v141-core-systems.js','js/40-v144-rules-and-abyss.js','js/47-v158-combat-tuning.js'].map(p=>fs.readFileSync(p,'utf8')).join('\n');
  assert.doesNotMatch(source,/strengthenMonster|strengthenAllZoneMonsters|strengthenNewWildMonster|V173_32_WILD_ZONE_STRENGTHS|halveMonsterCoreStats|_v131StrengthApplied|v17342BeginnerStatsHalved|previousMakeZoneMonster|originalMakeZoneMonster|makeZoneMonster\s*=\s*function/);
+ assert.doesNotMatch(fs.readFileSync('js/34-v141-core-systems.js','utf8'),/monster\.rank="regular"|getMonsterRank\s*=\s*function/);
  assert.doesNotMatch(source,/VALID_RANKS\.has\(monster\.v141BattleRank\)/);
 });
 

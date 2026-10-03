@@ -96,7 +96,15 @@
       "phase": "Phase 2A Wild",
       "reason": "Canonical monster.rank only; 10% selector builds a fresh Owner projection. v141BattleRank mirror retains unchanged reward/UI consumers only.",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "Second rank read absent; compatibility mirror removed when existing reward/UI readers use canonical rank"
+      "retirementGate": "Second rank read absent; compatibility mirror removed when existing reward/UI readers use canonical rank",
+      "canonicalResolver": "js/00-main.js::getMonsterRank",
+      "retiredInitialRankWriter": true,
+      "compatibilityMirror": {
+        "field": "v141BattleRank",
+        "allowedResponsibility": "Mirror canonical rank for legacy UI/skill UI fallback readers only; never rank or stats decision",
+        "retirementGate": "Remove after js/43, js/42 and js/45 consumers use canonical rank only",
+        "targetPhase": "Future explicit UI/rank consumer semantic migration"
+      }
     },
     {
       "id": "wildV141Wrapper",

@@ -11,7 +11,6 @@
     "use strict";
 
     const INVENTORY_CAPACITY=120;
-    const VALID_RANKS=new Set(["regular","elite","boss"]);
     const WILD_ELITE_RATE=0.10;
     const V141_PROGRESS_KEY=window.FourSymbolsAccountSave.accountKey("progress");
 
@@ -80,7 +79,6 @@
         getWildZoneSpecs().forEach(([zone,level,windName,earthName],zoneIndex)=>{
             zone.forEach(monster=>{
                 if(monster){
-                    monster.rank="regular";
                     monster.v141CurveEliteRate=WILD_ELITE_RATE;
                 }
             });
@@ -100,13 +98,6 @@
         });
     }
 
-    if(typeof getMonsterRank==="function"){
-        getMonsterRank=function(monster){
-            if(!monster){ return "regular"; }
-            if(VALID_RANKS.has(monster.rank)){ return monster.rank; }
-            return "regular";
-        };
-    }
 
     /* =====================================================
        Monster carried skills

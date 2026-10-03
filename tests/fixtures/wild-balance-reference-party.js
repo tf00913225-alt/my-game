@@ -6,7 +6,8 @@ function prepareWildBalanceReferenceParty(level){
         bonusHP:(level-1)*30,bonusSP:(level-1)*10,attributePoints:0,activeBuffs:[],statusEffects:[],isDefending:false});
     Object.assign(player,make('Wild reference A'));player2=make('Wild reference B');player3=make('Wild reference C');
     const skill=level>=30?'phoenixCry':'fireRocket';
-    const skillLevels=skill==='phoenixCry'?{fireRocket:1,blazeSpell:1,flameTornado:1,phoenixCry:10}:{fireRocket:10};
+    const skillLevel=level>=10?10:1;
+    const skillLevels=skill==='phoenixCry'?{fireRocket:1,blazeSpell:1,flameTornado:1,phoenixCry:10}:{fireRocket:skillLevel};
     const cost=Object.entries(skillLevels).reduce((sum,[id,n])=>sum+skillDatabase[id].learnCost+(n-1),0);
     if(cost>level*2||Object.keys(skillLevels).some(id=>skillDatabase[id].learnLevel>level))throw new Error('Illegal reference skill budget');
     for(let i=0;i<3;i++){
@@ -14,17 +15,17 @@ function prepareWildBalanceReferenceParty(level){
         characterSkillLoadouts[key]={skillLevels:{...skillLevels},equippedSkills:[skill]};
         const ch=getPartyCharacterByIndex(i),stats=getPartyBattleStats(i);ch.hp=stats.maxHP;ch.sp=stats.maxSP;ch.skillPoints=level*2-cost;
     }
-    return {level,budget,skill,skillLevel:10,skillCost:cost,skillBudget:level*2,equipment:'none',party:getExistingPartyIndexes().map(i=>getPartyBattleStats(i))};
+    return {level,budget,skill,skillLevel,skillCost:cost,skillBudget:level*2,equipment:'none',party:getExistingPartyIndexes().map(i=>getPartyBattleStats(i))};
 }
 function buildWildBalanceReferenceRoster(level,element,elite){
-    const zone=level===10?'desert':level===30?'ice':level===50?'zone5':level===70?'zone7':'zone10';
+    const zone=level===10?'forest':level===30?'ice':level===50?'zone5':level===70?'zone7':'zone10';
     const count=level===10?3:6;
     const types=level===10?['physical','magic','tank']:['physical','magic','tank','speedControl','support','balanced'];
     const originals=zoneConfig[zone].monsters();
     const roster=types.map((archetype,i)=>{
         const original=originals.find(m=>m.element===element)||originals[i];
         const identity={...original.balanceProjection.identity,monsterKey:'diagnostic/'+i,name:'Reference '+archetype,level,element,archetype,rank:elite&&archetype==='tank'?'elite':'regular'};
-        const m=configureBuiltMonster(MonsterBalance.build(identity));m.portraitKey=original.portraitKey;return m;
+        const m=configureBuiltMonster(MonsterBalance.build(identity));m.portraitKey=original.portraitKey;if(zone==='forest')m.v173BeginnerForest=true;return m;
     });
     return {zone,count,roster};
 }
