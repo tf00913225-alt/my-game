@@ -1,3 +1,11 @@
+## 2026-10-03 — RELEASE-SUITES-P0-20261002（P0 正式狀態結案，非 Batch 10）
+
+- 開工 dev `81853be234963c8a5250b474c38480dcd0dfa2b4`／main `4b037b47967544d90c781ad938286777c9576731`；重新讀取 PR #768 最終狀態、tested tree、CI jobs/logs 與獨立 DEV SHA read-back，证據仍成立，main 未修改。
+- Independent full suite 262/262 PASS、actual Chrome 154.0.8037.97、Skill20/20／Cardless5/5／V14118/18、通知UTC／Taipei／New York各12/12；來源為#768獨立測試紀錄。dev CI37080384742 attempt2 SUCCESS，但 full Node step SKIPPED，兩者分開；部署job111082274607 SHA／173.72 read-back、responsive／forge／battle live QA PASS。
+- 只更新 release/requirements.json、release/v17373-scope.json、docs/V17373_RELEASE_SCOPE_20261002.md 及本交接；Requirement BLOCKED→VERIFIED，23/23 VERIFIED，trueP0=[]，READY TO ENTER RELEASE FREEZE。舊診斷列表只作歷史，以suiteCloseout20261003為現行證據。Deferred保持，不重開已完成測試、不改Runtime／版本／Cache173.72。
+- Branch：docs/v17373-p0-closeout-20261003；Target dev；必要目標JSON/schema／release gate／diff與PR CI後自行合併，整合／部署／清理最新狀態以本工作PR為準，不能由本checkpoint冒稱完成。
+- 下一階段須明確啟動Freeze，固定候選SHA並跑必要Exact-HEAD full suite與發布驗收；本次未RC、未Freeze、未發布main。
+
 ## 2026-10-02 — RELEASE-SUITES-P0-20261002（第五批）
 
 - 最新基線 dev `7d47379557a716825f794589d249da31af51f678`；#762已合併，run37011016118 checks／部署SHA版本讀回／線上UI及戰鬥QA SUCCESS。第四批分支仍在，現有connector不提供ref刪除。新分支 `fix/v17373-release-suite-recovery-batch5-20261002`，main禁止修改。
