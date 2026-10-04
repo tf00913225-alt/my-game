@@ -7,6 +7,20 @@
 - 正式Chrome功能證據：Head e08fdec08d69095b65e6bd464849441e2e03354c／CI37182829899 Nav/Potion step PASS；390/412共204次前景開關、36次正式返回，cold/lazy/reload、10種Base（含深淵20/40地圖）、Shell1/Nav1/legacy0/hidden零hitbox/正確頁面與handlers均PASS。五入口共94個實際HP/SP/扣庫存案例＋4個稀有auto guard均PASS：4066/4520、1066/1190、20/30%保持、batch-cap餘8、舊321/456量不變。artifact11296230697 SHA256 c78d148d376297bc557a177ec266fc66712497d0f1dd566d1a588ffbe32c8e6e獨立核對，正式角色／商店與深淵恢復截圖已檢視；證據與責任退場見 docs/foreground-nav-starter-potion-browser-evidence-20261004.json／docs/FOREGROUND_NAV_STARTER_POTION_20261004.md。
 - 更新舊鍛造QA（原可見Nav邊界不符新產品契約）；fixture使用自然bonus屬性而非替換stats getter，等待帳號遮罩退出／新Document、在pagehide後還原disposable UID，保留真實玩家hit test/Reload。功能2/2 VERIFIED；最終metadata-head必要CI、PR#794→dev、最新dev／部署SHA／線上同矩陣／安全清理仍為獨立Gate，由PR#794保持耐久最新狀態。Game/Cache173.73；main不修改。
 
+- 整合 checkpoint：候選Head49970cb7必要CI37183247827 SUCCESS後，dev已由並行#793前進至dbe58d74f0c13be871512d880cb8dc2e377eab5d。正常merge吸收Phase2D，保留雙方需求／交接／QA與部署入口，hashed build由合併後正式source重建；不rebase或force push。新的整合Head CI／同矩陣與dev部署Gate仍由PR#794追蹤。
+
+## 2026-10-04 — Monster Balance Owner Phase2D Abyss / FUNCTIONAL VERIFIED / PR #793
+
+Work ID `MONSTER-BALANCE-OWNER-P2D-ABYSS-20261004`; branch `feature/monster-balance-owner-phase2d-abyss-20261004`, target dev.
+Start dev `f47862cc592870e359d31da5da52a5d530c831a8`; main `f63d69dbfa66ba75637d1c3cd7fcc7d74782e356` forbidden.
+Phase1/2A/2B/2C complete history preserved. This work only Abyss and stops before Phase2E.
+Current spec: Lv20/Lv40, 5 regions ×5 stages; 402 entities /14 stable identities; emperors canonical single-slot smallBoss.
+MonsterBalance now solely projects stats/pressure; V132 Abyss numerical edge, V141 obsolete extra HP builder and V174 durability late mutation removed. Existing skill/AI/formation/portrait/reward/lifecycle owners remain.
+Baseline150 cases38 losses; calibrated300 cases across neutral/seeded policies:298 clear+survivor; bare Lv40 two-person final losses7/9 rounds retained, Lv50/Lv60 final clear. No forced two-round gate.
+Requirement1/1 VERIFIED; focused8/8 PASS after restoring original V141/V144 carried-skill selection and validating all402 skill metadata against starting dev. True-realm final HP factor0.90 prevents the newly observed seeded Lv50 healing/SP attrition failure; other Abyss profiles and gameplay owners unchanged. Fresh Abyss encounters hand off a cleared snapshot to the unchanged Slot Owner (never clear a live battle). Regression/build/deprecated/syntax gates PASS; source c723c11d complete CI37180059948 (Repository111370640459/Abyss111370640508) and Session37180059842 SUCCESS. Production Chrome14/14,100 rosters/804 projections,390×844+412×915 PASS; actual support/control/portrait/slots/reward/re-entry PASS. Artifact11295260962 SHA256 independently verified; report retained in docs/monster-balance-abyss-browser-evidence-20261004.json. Final metadata-head CI remains pending.
+Closeout still requires final metadata-head CI + latest dev absorption + merge + exact deployment/live Abyss QA + safe branch deletion; do not call COMPLETE yet.
+Full inventory, caller graph, profiles and evidence: `docs/MONSTER_BALANCE_OWNER_PHASE2D.md`.
+
 ## 2026-10-04 — MONSTER-BALANCE-OWNER-P2C-TOWER-20261004（功能1/1 VERIFIED；整合／部署待Gate）
 
 - 開工 dev `13c22561afc518ce33b7da798b32e1c215e3cbde`；main `f63d69dbfa66ba75637d1c3cd7fcc7d74782e356` 禁止修改。Branch `feature/monster-balance-owner-phase2c-tower-20261004`。Phase1／2A／2B 已核實，未重做；停止點為 Tower，不進 Abyss Phase2D。

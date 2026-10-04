@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-04",
+  "title": "Monster Balance Owner Phase2D Abyss",
+  "workId": "MONSTER-BALANCE-OWNER-P2D-ABYSS-20261004",
+  "base_branch": "dev",
+  "base_sha": "f47862cc592870e359d31da5da52a5d530c831a8",
+  "work_branch": "feature/monster-balance-owner-phase2d-abyss-20261004",
+  "officialVersion": "173.73",
+  "status": "VERIFIED",
+  "requirements": [
+    {
+      "id": "REQ-MONSTER-BALANCE-OWNER-P2D-ABYSS-20261004",
+      "title": "Abyss 戰前數值唯一 MonsterBalance／canonical smallBoss／退休 V141 V132 V174 重複數值寫入",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "docs/MONSTER_BALANCE_OWNER_PHASE2D.md",
+          "docs/monster-balance-owner-retirement-map.json",
+          "tests/monster-balance-owner-phase2d.test.mjs",
+          "scripts/abyss-balance-ttk-matrix.mjs",
+          ".github/scripts/run-abyss-balance-browser-qa.mjs",
+          "docs/monster-balance-abyss-baseline-20261004.json",
+          "docs/monster-balance-abyss-ttk-evidence-20261004.json",
+          "docs/monster-balance-abyss-ttk-seeded-evidence-20261004.json",
+          ".github/scripts/run-abyss-live-browser-qa.mjs",
+          "docs/monster-balance-abyss-browser-evidence-20261004.json"
+        ],
+        "verification": "Source c723c11d80ccd90ede37307313162271b2640463: CI37180059948 Repository Job111370640459 and Abyss Job111370640508 SUCCESS; Session37180059842/Job111370640497 SUCCESS. Focused8/8,50 encounters/402 projections/14 identities,402 original carried loadouts/frequencies; neutral150+seeded150 challenge gates PASS,298 clear+survivor,2 explicitly retained bare Lv40 final losses7/9 rounds. Chrome14/14,100 rosters/804 projections,390x844+412x915; actual support/control,geometry,portrait,reward/re-entry and no late writer PASS. Related50/50,365 syntax,build sync,deprecated and all repository CI gates PASS. Artifact11295260962 SHA256 dd476ac3fb2f2b3c2f10129a39c042cf564307b834042f4de0676b7caac6ea23 independently verified; both CI TTK reports exactly match repository JSON.",
+        "result": "VERIFIED functional gates; final metadata-head CI, dev integration/deployment and safe branch cleanup remain independent closeout gates. Stop before Phase2E; main untouched."
+      }
+    }
+  ]
+}

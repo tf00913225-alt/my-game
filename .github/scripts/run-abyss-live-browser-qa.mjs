@@ -3,6 +3,13 @@ import os from "node:os";
 import path from "node:path";
 import {pathToFileURL} from "node:url";
 
+// Phase2D extends this existing Abyss QA entry with the formal production
+// MonsterBalance / natural combat contract. The legacy fixture remains available.
+if(process.env.ABYSS_MONSTER_BALANCE_QA==="1"){
+    await import("./run-abyss-balance-browser-qa.mjs");
+    process.exit(0);
+}
+
 const sourcePath=path.resolve(".github/scripts/abyss-live-browser-qa-v2.mjs");
 const source=fs.readFileSync(sourcePath,"utf8");
 function replaceRequired(input,needle,replacement,label){
