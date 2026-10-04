@@ -637,6 +637,22 @@
         "verification": "Functional Head e08fdec08d69095b65e6bd464849441e2e03354c; CI37182829899 production Chrome step PASS; artifact11296230697 SHA256 c78d148d376297bc557a177ec266fc66712497d0f1dd566d1a588ffbe32c8e6e independently checked. 390/412:204 foreground transitions,36 formal returns,cold/lazy/reload;94 actual resource/stock cases plus4 rare-auto guards; representative final UI screenshots reviewed.",
         "result": "Functional2/2 VERIFIED. Nav sole Owner,hidden/no hitbox/restored page+handlers/shell1/nav1/legacy0. Five actual routes:HP4000→4066/4500→4520;SP1000→1066/1170→1190;20/30 unchanged,rare full protected,old321/456 stock unchanged. Final Head CI/dev merge/exact deployment/deployed QA separate in PR #794."
       }
+    },
+    {
+      "id": "REQ-P2-CI-WARNING-CONVERGENCE-20261004",
+      "title": "P2 CI 警告來源最小安全收斂（不改 Runtime／Gameplay）",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          ".github/workflows/ci.yml",
+          ".github/workflows/deploy-dev-cloudflare.yml",
+          ".github/workflows/deploy-production-pages.yml",
+          ".github/workflows/session-authority.yml",
+          "tests/fixed-battlefield-ally-formation.test.mjs"
+        ],
+        "verification": "ESM 測試直接 PASS 且無 MODULE_TYPELESS；三個相關測試、build/build:check、architecture/deprecated gate、YAML 配置等價檢查 PASS。官方 checkout/setup-node/upload-artifact v7 README/action.yml/Release 核對 node24 與既有 inputs 相容；cache 明確保持停用。",
+        "result": "功能／配置驗證 PASS。最終 Head PR CI、合併後 DEV CI／部署與實際警告讀回仍由本 Work PR 追蹤，未宣稱 Closeout；Game/Cache173.73、main／玩家 Runtime 不變。"
+      }
     }
   ]
 }

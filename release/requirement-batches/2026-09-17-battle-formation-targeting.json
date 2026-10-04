@@ -41,7 +41,7 @@
       "evidence": [
         "js/00-main.js",
         "js/battlefield-slot-owner.js",
-        "tests/fixed-battlefield-ally-formation.test.js",
+        "tests/fixed-battlefield-ally-formation.test.mjs",
         "Subsequent real DEV mobile verification of legal formation targets"
       ],
       "remaining": null
