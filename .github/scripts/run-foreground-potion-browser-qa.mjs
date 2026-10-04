@@ -42,13 +42,14 @@ async function run(width,height){
    rows.push({width,height,pass,base,feature,immediate,opened,closed});
   }
  }
- // Isolated QA-owned character values and stats fixture; all production callers,
+ // Isolated QA-owned character attributes; all production stat getters, callers,
  // inventory consumption and recovery rules remain the final loaded runtime.
  const potions=await c.eval(`(async()=>{
   closeHomeFeature();showPage('home');
-  const originalStats=getPartyBattleStats,originalFinish=finishPlayerAction,originalAlert=window.alert,originalRpgAlert=window.rpgAlert,originalSave=saveGame;
-  const oldInventory=inventoryItems.slice(),oldHP=player.hp,oldSP=player.sp,oldConfig={...autoConfig};
-  const actualStats=originalStats(0);getPartyBattleStats=index=>index===0?{...actualStats,maxHP:4520,maxSP:1190}:originalStats(index);
+  const originalFinish=finishPlayerAction,originalAlert=window.alert,originalRpgAlert=window.rpgAlert,originalSave=saveGame;
+  const oldInventory=inventoryItems.slice(),oldHP=player.hp,oldSP=player.sp,oldBonusHP=player.bonusHP,oldBonusSP=player.bonusSP,oldConfig={...autoConfig};
+  const actualStats=getPartyBattleStats(0);player.bonusHP=(Number(player.bonusHP)||0)+4520-actualStats.maxHP;player.bonusSP=(Number(player.bonusSP)||0)+1190-actualStats.maxSP;
+  if(getPartyBattleStats(0).maxHP!==4520||getMainCharacterStats().maxHP!==4520||getPartyBattleStats(0).maxSP!==1190||getMainCharacterStats().maxSP!==1190)throw Error('Natural character fixture maxima mismatch');
   // Suppress only test feedback/save/action completion; do not replace a recovery or stock owner.
   finishPlayerAction=()=>{};window.alert=()=>{};window.rpgAlert=async()=>true;saveGame=()=>true;
   Object.assign(autoConfig,{enabled:true,hp:100,sp:100,returnToCityWhenEmpty:false});
@@ -73,7 +74,7 @@ async function run(width,height){
    const legacy={hp:getPotionCount('hpPotion10'),sp:getPotionCount('spPotion10'),items:inventoryItems.map(x=>({id:x.id,mode:x.recoveryMode,value:x.recoveryValue,percent:x.recoveryPercent}))};
    const shop=renderShopContent();
    return {rows,legacy,shopFlat:shop.includes('恢復 66 HP')&&shop.includes('恢復 66 SP'),oldShopNote:shop.includes('10%、20%、30%'),descriptions:['hpPotion10','spPotion10','hpPotion20','hpPotion30','spPotion20','spPotion30'].map(getPotionEffectDescription)};
-  }finally{getPartyBattleStats=originalStats;finishPlayerAction=originalFinish;window.alert=originalAlert;window.rpgAlert=originalRpgAlert;saveGame=originalSave;inventoryItems.splice(0,inventoryItems.length,...oldInventory);player.hp=oldHP;player.sp=oldSP;Object.assign(autoConfig,oldConfig);rebuildInventorySlots();}
+  }finally{finishPlayerAction=originalFinish;window.alert=originalAlert;window.rpgAlert=originalRpgAlert;saveGame=originalSave;inventoryItems.splice(0,inventoryItems.length,...oldInventory);player.hp=oldHP;player.sp=oldSP;player.bonusHP=oldBonusHP;player.bonusSP=oldBonusSP;Object.assign(autoConfig,oldConfig);rebuildInventorySlots();}
  })()`);
  for(const row of potions.rows){assert.equal(row.actual,row.expected,JSON.stringify(row));assert.equal(row.stock,row.expectedStock??0,JSON.stringify(row));}
  assert.equal(potions.legacy.hp,321);assert.equal(potions.legacy.sp,456);assert.ok(potions.legacy.items.every(x=>x.mode==='flat'&&x.value===66&&x.percent===undefined));assert.equal(potions.shopFlat,true);assert.equal(potions.oldShopNote,false);
