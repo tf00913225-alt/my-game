@@ -27,14 +27,15 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 2
 
       - name: Use current Node.js LTS
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: "24"
+          package-manager-cache: false
 
       - name: Prepare Git comparison base
         env:
@@ -94,7 +95,7 @@ jobs:
 
       - name: Upload Battle Runtime architecture evidence
         if: always() && steps.battle_architecture.outcome != 'skipped'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: battle-runtime-architecture-${{ github.sha }}
           path: artifacts/architecture/battle-runtime-architecture.json
@@ -118,7 +119,7 @@ jobs:
         run: |
           node tests/boss-snapshot-owner-lifecycle-convergence-20261001.test.js
           node tests/fixed-slot-battlefield-rendering-v2.test.js
-          node tests/fixed-battlefield-ally-formation.test.js
+          node tests/fixed-battlefield-ally-formation.test.mjs
 
       - name: Run battle layout, timing and range-VFX regressions
         run: |
@@ -210,7 +211,7 @@ jobs:
 
       - name: Upload bottom navigation and home geometry evidence
         if: always() && steps.bottom_nav_home_browser.outcome != 'skipped'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: bottom-nav-home-geometry-${{ github.sha }}
           path: |
@@ -234,7 +235,7 @@ jobs:
 
       - name: Upload Daily Dungeon WebP browser evidence
         if: always() && steps.daily_dungeon_webp_browser.outcome != 'skipped'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: daily-dungeon-webp-browser-qa-${{ github.sha }}
           path: |
@@ -261,7 +262,7 @@ jobs:
 
       - name: Upload Hit / Evasion V2 browser evidence
         if: always() && steps.hit_evasion_v2.outcome != 'skipped'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: hit-evasion-v2-${{ github.sha }}
           path: artifacts/browser-qa/hit-evasion-v2*
@@ -283,7 +284,7 @@ jobs:
 
       - name: Upload Tower challenge browser evidence
         if: always() && steps.tower_challenge.outcome != 'skipped'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: tower-challenge-${{ github.sha }}
           path: |
@@ -303,7 +304,7 @@ jobs:
 
       - name: Upload Responsive Item browser evidence
         if: always() && steps.responsive_item_browser.outcome != 'skipped'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: responsive-item-browser-qa-${{ github.sha }}
           path: artifacts/browser-qa/responsive-item/
@@ -317,7 +318,7 @@ jobs:
 
       - name: Upload Touch / Scroll / Navigation browser evidence
         if: always() && steps.touch_scroll_navigation_browser.outcome != 'skipped'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: touch-scroll-navigation-browser-qa-${{ github.sha }}
           path: artifacts/browser-qa/touch-scroll-navigation-browser-qa.json
@@ -331,7 +332,7 @@ jobs:
 
       - name: Upload Release Update Notification browser evidence
         if: always() && steps.release_update_browser.outcome != 'skipped'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: release-update-notification-browser-qa-${{ github.sha }}
           path: |
@@ -356,7 +357,7 @@ jobs:
 
       - name: Upload build synchronization evidence
         if: failure() && steps.build_sync.outcome == 'failure'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: production-build-sync-${{ github.sha }}
           path: artifacts/build-sync
@@ -370,7 +371,7 @@ jobs:
 
       - name: Upload Fixed Slot battlefield browser evidence
         if: always() && steps.fixed_slot_browser.outcome != 'skipped'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: fixed-slot-battlefield-browser-qa-${{ github.sha }}
           path: |
@@ -392,7 +393,7 @@ jobs:
 
       - name: Upload exact-candidate real battle browser evidence
         if: always() && steps.battle_live_browser.outcome != 'skipped'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: battle-layout-vfx-live-qa-${{ github.sha }}
           path: |
@@ -417,7 +418,7 @@ jobs:
 
       - name: Upload Fire Tower identity and first-frame browser evidence
         if: always() && steps.fire_tower_identity_browser.outcome != 'skipped'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: fire-tower-identity-first-frame-browser-qa-${{ github.sha }}
           path: |
@@ -438,7 +439,7 @@ jobs:
 
       - name: Upload Fire portrait browser evidence
         if: always() && steps.fire_portrait_browser.outcome != 'skipped'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: fire-portrait-browser-qa-${{ github.sha }}
           path: artifacts/browser-qa/fire-portrait-browser-qa.json
@@ -456,7 +457,7 @@ jobs:
 
       - name: Upload Water wild portrait browser evidence
         if: always() && steps.water_wild_portrait_browser.outcome != 'skipped'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: water-wild-portrait-browser-qa-${{ github.sha }}
           path: artifacts/browser-qa/water-wild-portrait-browser-qa.json
@@ -470,7 +471,7 @@ jobs:
 
       - name: Upload Adventure V1 browser evidence
         if: always() && steps.adventure_browser.outcome != 'skipped'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: adventure-browser-qa-${{ github.sha }}
           path: artifacts/browser-qa/adventure-node-system-v1.json
@@ -483,7 +484,7 @@ jobs:
 
       - name: Upload boot architecture browser evidence
         if: (github.ref == 'refs/heads/main' || github.base_ref == 'main') && always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: boot-architecture-browser-qa-${{ github.sha }}
           path: artifacts/browser-qa/boot-architecture-browser-qa.json
@@ -497,7 +498,7 @@ jobs:
 
       - name: Upload Skill / Inventory browser evidence
         if: always() && steps.skill_inventory_browser.outcome != 'skipped'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: skill-inventory-semantic-browser-qa-${{ github.sha }}
           path: |
@@ -519,7 +520,7 @@ jobs:
 
       - name: Upload Backpack visual composition evidence
         if: always() && steps.backpack_visual_browser.outcome != 'skipped'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: backpack-visual-composition-${{ github.sha }}
           path: artifacts/browser-qa/backpack-*.png
@@ -561,10 +562,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: "24"
+          package-manager-cache: false
       - name: Ensure CJK font support
         run: |
           if ! fc-list :lang=zh | rg -q .; then
@@ -582,7 +584,7 @@ jobs:
           ABYSS_MONSTER_BALANCE_QA=1 node .github/scripts/run-abyss-live-browser-qa.mjs
       - name: Upload Abyss evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: abyss-balance-${{ github.sha }}
           path: artifacts/browser-qa/abyss-balance*

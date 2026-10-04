@@ -35,15 +35,16 @@ jobs:
 
     steps:
       - name: Checkout exact verified main commit
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: ${{ github.event.workflow_run.head_sha }}
           fetch-depth: 1
 
       - name: Use current Node.js LTS
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: '24'
+          package-manager-cache: false
 
       - name: Reject stale main before packaging
         run: |
@@ -116,7 +117,7 @@ jobs:
 
       - name: Upload production verification evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: production-release-verification-${{ github.event.workflow_run.head_sha }}
           path: |
