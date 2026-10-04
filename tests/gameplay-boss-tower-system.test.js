@@ -362,15 +362,15 @@ test("Boss Shield keeps HP state correct through shield-only, overflow and heal"
     context.vGameplayStartBoss("personal","personal-30");
     const boss=context.monsters[0];
     const full=boss.hp;
-    assert.equal(context.FourSymbolsBossBattle.applyShield(10000),10000);
-    boss.hp=full-5000;
+    assert.equal(context.FourSymbolsBossBattle.applyShield(full*.5),Math.round(full*.5));
+    boss.hp=full-Math.round(full*.2);
     assert.equal(boss.hp,full,"shield-only damage must not reduce Boss HP");
-    assert.equal(context.FourSymbolsBossBattle.getShieldState().current,5000);
-    boss.hp=full-11000;
-    assert.equal(boss.hp,full-6000,"overflow must reduce Boss HP after the shield is exhausted");
+    assert.equal(context.FourSymbolsBossBattle.getShieldState().current,Math.round(full*.5)-Math.round(full*.2));
+    boss.hp=full-Math.round(full*.6);
+    assert.equal(boss.hp,full-(Math.round(full*.6)-(Math.round(full*.5)-Math.round(full*.2))),"overflow must reduce Boss HP after the shield is exhausted");
     assert.equal(context.FourSymbolsBossBattle.getShieldState(),null);
-    boss.hp=Math.min(boss.maxHP,boss.hp+3000);
-    assert.equal(boss.hp,full-3000,"Boss heal must retain the formal HP value after shield settlement");
+    boss.hp=Math.min(boss.maxHP,boss.hp+Math.round(full*.15));
+    assert.equal(boss.hp,full-(Math.round(full*.6)-(Math.round(full*.5)-Math.round(full*.2)))+Math.round(full*.15),"Boss heal must retain the formal HP value after shield settlement");
 });
 
 test("Boss HUD renders the white shield inside its formal HP bar",()=>{

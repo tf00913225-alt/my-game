@@ -232,6 +232,21 @@
       "forbidden": [
         "makeZoneMonster(entry.name,entry.level,entry.element,entry.rank||\"regular\")"
       ]
+    },
+    {
+      "id": "DEP-MONSTER-BALANCE-OWNER-P2F-LEGACY",
+      "description": "全模式舊數值 writer 與 Boss 未使用 defense metadata 退役",
+      "enabled": true,
+      "forbidden": [
+        "makeLegacyModeMonster",
+        "generateMonsterAttributePoints",
+        "v132BuildDungeonMonster",
+        "applyDungeonMonsterStrength",
+        "applyDungeonNormalBonus",
+        "applyDungeonRankStrength",
+        "bossBalanceProfile",
+        "defenseMultiplier"
+      ]
     }
   ]
 }

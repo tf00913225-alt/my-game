@@ -1819,105 +1819,6 @@
     }
     window.v132GetDungeonMonsterLevel=getDungeonMonsterLevel;
 
-    const DUNGEON_ELEMENTS=["fire","water","earth","wind"];
-
-    function randomElement(){
-        return DUNGEON_ELEMENTS[Math.floor(Math.random()*DUNGEON_ELEMENTS.length)];
-    }
-
-    /* 副本普通怪的 HP／SP／防禦沿用既有耐久基準；攻擊與魔攻
-       不在建怪階段放大，怪物對玩家的輸出統一交由敵方壓力倍率。 */
-    const DUNGEON_MONSTER_STRENGTH=1.30;
-
-    function applyDungeonMonsterStrength(monster){
-        if(!monster){ return monster; }
-        ["maxHP","maxSP","defense"].forEach(key=>{
-            if(Number.isFinite(Number(monster[key]))){
-                monster[key]=Math.max(1,Math.round(Number(monster[key])*DUNGEON_MONSTER_STRENGTH));
-            }
-        });
-        monster.hp=monster.maxHP;
-        monster.sp=monster.maxSP;
-        return monster;
-    }
-
-    /*
-       ★ 新增（依照使用者要求，「副本怪物整體仍然偏弱」的
-       第二輪調整）：
-       上面的DUNGEON_MONSTER_STRENGTH（×1.30）只讓副本怪
-       打平一般野怪，這裡疊加「副本普通怪」自己的額外強化
-       （×1.10，含SP），讓同等級的副本普通怪本來就應該比
-       野外普通怪再強一截（1.30×1.10≈1.43倍）。精英/BOSS
-       都是先墊到這一層「副本普通怪」的完整數值，才各自再
-       疊加精英/BOSS專屬倍率（見下面applyDungeonRankStrength），
-       不是另外從裸數值重算，也不會讓×1.30被套用第二次
-       ——這五個函式（makeZoneMonster→
-       applyDungeonMonsterStrength→applyDungeonNormalBonus→
-       applyDungeonRankStrength，全部包在buildDungeonMonster()
-       裡）就是唯一負責副本怪數值的地方，一般野怪完全不會
-       經過這裡，不受影響。
-    */
-    const DUNGEON_NORMAL_BONUS=1.10;
-
-    function applyDungeonNormalBonus(monster){
-        if(!monster){ return monster; }
-        ["maxHP","maxSP","defense"].forEach(key=>{
-            if(Number.isFinite(Number(monster[key]))){
-                monster[key]=Math.max(1,Math.round(Number(monster[key])*DUNGEON_NORMAL_BONUS));
-            }
-        });
-        monster.hp=monster.maxHP;
-        monster.sp=monster.maxSP;
-        return monster;
-    }
-
-    /*
-       精英/BOSS專屬倍率，都是從「副本普通怪」的完整數值
-       （已經套過×1.30跟×1.10）再往上疊加，不重新從裸數值
-       算起。V138 依最新規格在原有強度上再加：精英最終HP
-       再+100%、SP+100%；BOSS最終HP再+50%、SP+100%。
-       V173.38 起 rank 只放大生存資源；攻擊／魔攻不再於建怪階段
-       乘算，敵方輸出壓力統一交由正式 enemyPressure 加算桶控制。
-       HP倍率分別為3.20、4.50，SP兩者皆×2.00，防禦倍率保留。
-       只認monster.rank（makeZoneMonster()第4個參數決定），
-       一般怪（rank是undefined）這裡什麼都不做，直接跳過。
-    */
-    const DUNGEON_ELITE_MULTIPLIERS={maxHP:3.20,maxSP:2.00,defense:1.25};
-    const DUNGEON_BOSS_MULTIPLIERS={maxHP:4.50,maxSP:2.00,defense:1.40};
-
-    function applyDungeonRankStrength(monster){
-        if(!monster){ return monster; }
-        const multipliers=
-            monster.rank==="elite" ? DUNGEON_ELITE_MULTIPLIERS :
-            monster.rank==="boss" ? DUNGEON_BOSS_MULTIPLIERS :
-            null;
-        if(!multipliers){ return monster; }
-        Object.keys(multipliers).forEach(key=>{
-            if(Number.isFinite(Number(monster[key]))){
-                monster[key]=Math.max(1,Math.round(Number(monster[key])*multipliers[key]));
-            }
-        });
-        monster.hp=monster.maxHP;
-        monster.sp=monster.maxSP;
-        return monster;
-    }
-
-    /* NON-DAILY COMPATIBILITY ONLY. Tower/Abyss/Boss/Adventure retain legacy
-       output until their own migrations. Formal Daily never calls this builder. */
-    function buildDungeonMonster(name,level,element,rank){
-        const monster=makeZoneMonster(name,level,element,rank);
-        applyDungeonMonsterStrength(monster);
-        applyDungeonNormalBonus(monster);
-        applyDungeonRankStrength(monster);
-        monster.v132Dungeon=true;
-        return monster;
-    }
-    window.v132BuildDungeonMonster=buildDungeonMonster;
-    window.v132DungeonRankMultipliers=Object.freeze({
-        elite:Object.freeze(Object.assign({},DUNGEON_ELITE_MULTIPLIERS)),
-        boss:Object.freeze(Object.assign({},DUNGEON_BOSS_MULTIPLIERS))
-    });
-
     function setMonsterSkillTier(monster,tier,chance){
         const pool=Object.keys(skillDatabase).filter(skillId=>{
             const skill=skillDatabase[skillId];
@@ -2189,39 +2090,6 @@
        16. 經驗副本：單一角色10級開放，連續3場車輪戰
     ===================================================== */
 
-    function startExpDungeonBattle(stage,rewardExp){
-        const level=getDungeonMonsterLevel();
-        const roster=[];
-        for(let i=0;i<10;i++){
-            const monster=buildDungeonMonster(
-                "經驗軍團兵",
-                level,
-                randomElement(),
-                stage===3 ? "elite" : "regular"
-            );
-            monster.v141DungeonStage=stage;
-            roster.push(monster);
-        }
-        roster.forEach(monster=>{ setMonsterSkillTier(monster,2,0.5); });
-
-        launchDungeonBattle(roster,function(outcome){
-            if(outcome.result!=="win"){
-                showPage("dungeon");
-                switchDungeonTab("daily");
-                return;
-            }
-
-            if(stage<3){
-                setTimeout(()=>{
-                    startExpDungeonBattle(stage+1,rewardExp);
-                },600);
-                return;
-            }
-
-            showExpDungeonRewardModal(rewardExp);
-        },{mode:"daily",dailyDungeonType:"exp"});
-    }
-
     /*
        V139經驗副本基礎獎勵固定為「目前全隊升級需求平均值的11%」，
        正式維持「隊伍當級 expNext 平均 ×33%」；看廣告雙倍沿用既有
@@ -2292,76 +2160,9 @@
         }
     };
 
-    async function beginExpDungeon(){
-        if(!isDungeonAvailable("exp")){
-            alert("經驗副本今天已經挑戰過了。");
-            return;
-        }
-        const mainCharacter=getPartyCharacterByIndex(0);
-        if(!mainCharacter || (mainCharacter.level||1)<10){
-            alert("經驗副本需要主角色等級達到10級才能開啟。");
-            return;
-        }
-        if(!await confirmDungeonEntry(
-            "經驗副本",
-            "將連續進行3場戰鬥，基礎獎勵為目前全隊升級需求平均值的11%。"
-        )){
-            return;
-        }
-        const rewardExp=getExpDungeonRewardExp();
-        startExpDungeonBattle(1,rewardExp);
-    }
-    window.v132BeginExpDungeon=beginExpDungeon;
-
-
     /* =====================================================
        17. 材料副本：雙角色20級開放，5精英+5普通，寶箱獎勵
     ===================================================== */
-
-    async function beginMaterialDungeon(){
-        if(!isDungeonAvailable("material")){
-            alert("材料副本今天已經挑戰過了。");
-            return;
-        }
-        if(!hasLevel10CharacterForDailyDungeon()){
-            alert("材料副本需要任一角色達到10級才能開啟。");
-            return;
-        }
-        if(!canAddItemToInventory(materialChestDefinition,3)){
-            alert("請先預留可放入3個材料寶箱的背包空間，再挑戰材料副本。");
-            return;
-        }
-        if(!await confirmDungeonEntry(
-            "材料副本",
-            "本場共有10隻怪物；通關後材料寶箱只會放進背包，不會自動開啟。"
-        )){
-            return;
-        }
-
-        const level=getDungeonMonsterLevel();
-        const roster=[];
-        for(let i=0;i<5;i++){
-            const monster=buildDungeonMonster("礦脈守衛精英",level,randomElement(),"elite");
-            setMonsterSkillTier(monster,3,0.7);
-            roster.push(monster);
-        }
-        for(let i=0;i<5;i++){
-            const monster=buildDungeonMonster("礦脈守衛",level,randomElement());
-            setMonsterSkillTier(monster,2,0.7);
-            roster.push(monster);
-        }
-
-        launchDungeonBattle(roster,function(outcome){
-            if(outcome.result!=="win"){
-                showPage("dungeon");
-                switchDungeonTab("daily");
-                return;
-            }
-            const chestCount=outcome.turnsUsed<5 ? 3 : (outcome.turnsUsed<10 ? 2 : 1);
-            showMaterialDungeonRewardModal(chestCount);
-        },{mode:"daily",dailyDungeonType:"material"});
-    }
-    window.v132BeginMaterialDungeon=beginMaterialDungeon;
 
     /*
        ★ 修正（依照使用者要求，「副本寶箱領取時，不應該直接

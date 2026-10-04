@@ -85,10 +85,10 @@ test('Tower construction no longer calls legacy V132 stats or post-writes migrat
 
 test('core settlement consumes Tower owner pressure and smallBoss keeps boss compatibility semantics',()=>{
   const core=fs.readFileSync('js/00-main.js','utf8');
-  assert.match(core,/\["wild","daily","tower","abyss","adventure"\]\.includes\(attacker\.mode\)/);
+  assert.match(core,/\["wild","daily","tower","abyss","adventure","personalBoss","worldBoss"\]\.includes\(attacker\.mode\)/);
   assert.match(core,/monster\.rank==="smallBoss"[\s\S]{0,80}return "boss"/);
   const legacy=fs.readFileSync('js/27-v132-content-expansion.js','utf8');
-  assert.match(legacy,/NON-DAILY COMPATIBILITY ONLY/);
+  assert.doesNotMatch(legacy,/function applyDungeonMonsterStrength/);
 });
 
 console.log('Monster Balance Owner Phase 2C Tower contract passed.');

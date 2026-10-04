@@ -120,7 +120,7 @@ test('retired Abyss writers are physically absent and legacy shared callers rema
   const v141=fs.readFileSync('js/36-v141-content-systems.js','utf8');
   assert.doesNotMatch(v141,/function makeAbyssMonster|monster\.maxHP\+=extraHp|monster\.v141ExtraHP=/);
   assert.match(v141,/window\.v174AbyssBuildRoster\(40/);
-  assert.match(fs.readFileSync('js/27-v132-content-expansion.js','utf8'),/window\.v132BuildDungeonMonster=buildDungeonMonster/);
+  assert.doesNotMatch(fs.readFileSync('js/27-v132-content-expansion.js','utf8'),/window\.v132BuildDungeonMonster=buildDungeonMonster/);
 });
 test('formal challenge TTK matrix preserves the bare Lv40 final challenge and clears all progression references',()=>{
   for(const randomPolicy of ['neutral','seeded']){const report=buildAbyssTtkMatrix({randomPolicy});assert.equal(report.cases,150);

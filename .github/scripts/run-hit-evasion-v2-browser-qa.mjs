@@ -21,7 +21,9 @@ const expression=`(async()=>{
     const wind={accuracy:getFinalAccuracyBonusPercent(player),evasion:getMainCharacterStats().evasion};
     player.hp=1;const lowCap=calculateHitChancePercent(1000,0,0,0,player);
     characterSkillLoadouts.fire.skillLevels.windEX=0;
-    const levels=[1,100].map(level=>{player.level=level;return {hit:calculateHitChancePercent(getMainCharacterStats().accuracy,makeZoneMonster("QA",level,"fire").evasion,0,0),evasion:makeZoneMonster("QA",level,"fire").evasion};});
+    // Explicit Owner fixture replaces the retired ambiguous generic constructor.
+    const qaMonster=level=>MonsterBalance.build({monsterKey:"qa.hit-evasion",name:"QA",level,element:"fire",archetype:"balanced",rank:"regular",mode:"wild",context:"qa/hit-evasion"});
+    const levels=[1,100].map(level=>{player.level=level;return {hit:calculateHitChancePercent(getMainCharacterStats().accuracy,qaMonster(level).evasion,0,0),evasion:qaMonster(level).evasion};});
     const calm=[5,10,15,20,25].map(value=>{player.activeBuffs=[{type:"dinghaishenzhen",turnsLeft:3,accuracyBonusPercent:value}];return [getMainCharacterStats().accuracy,getFinalAccuracyBonusPercent(player),calculateHitChancePercent(0,40,0,getFinalAccuracyBonusPercent(player))];});
     const dodge=[5,10,15,20,25].map(value=>{player.activeBuffs=[{type:"dodgeSkill",turnsLeft:3,percent:value}];return getMainCharacterStats().evasion;});
     player.activeBuffs=[];player.statusEffects=[];
@@ -54,7 +56,7 @@ const expression=`(async()=>{
     player.statusEffects=[{type:"frostbite",turnsLeft:2}];
     const frostbite=getMainCharacterStats().evasion;
     player.activeBuffs=[];player.statusEffects=[];player.hp=getMainCharacterStats().maxHP;
-    const freshMonsters=async()=>{monsters=[makeZoneMonster("QA",1,"fire")];monsters[0].hp=monsters[0].maxHP=100000;monsters[0].alive=true;monsters[0].accuracy=0;currentZone="forest";mapCooldown=false;autoBattle=false;autoConfig.enabled=false;autoPatrolEnabled=false;startBattle(0);await waitRelic();const deadline=Date.now()+8000;while(Date.now()<deadline&&document.getElementById("battlePage")?.matches(".v141-preparing-entry,.v141-entry-moving"))await new Promise(r=>setTimeout(r,30));};
+    const freshMonsters=async()=>{monsters=[qaMonster(1)];monsters[0].hp=monsters[0].maxHP=100000;monsters[0].alive=true;monsters[0].accuracy=0;currentZone="forest";mapCooldown=false;autoBattle=false;autoConfig.enabled=false;autoPatrolEnabled=false;startBattle(0);await waitRelic();const deadline=Date.now()+8000;while(Date.now()<deadline&&document.getElementById("battlePage")?.matches(".v141-preparing-entry,.v141-entry-moving"))await new Promise(r=>setTimeout(r,30));};
     const endBattle=async()=>{loseBattle();const deadline=Date.now()+8000;while(battleActive&&Date.now()<deadline)await new Promise(r=>setTimeout(r,30));if(battleActive)throw new Error("Battle exit did not finish");player.hp=getMainCharacterStats().maxHP;};
     const waitRelic=async()=>{const deadline=Date.now()+5000;while(!v174RelicDebugState()&&Date.now()<deadline)await new Promise(r=>setTimeout(r,20));if(!v174RelicDebugState())throw new Error("Real relic battle did not initialize: "+JSON.stringify({battleActive,battleToken,turn,observers:Array.from(battleRoundStartObservers).map(fn=>String(fn).slice(0,800)),keys:Array.from(battleRoundBoundaryKeys),startSource:String(startBattle).slice(0,500),turnSource:String(startTurn).slice(0,500),logs:Array.from(document.querySelectorAll(".battle-log")).map(n=>n.textContent)}));};
     const relicOwned=v174RelicSystem.getOwnedState(),loadout=v174RelicSystem.getTeamLoadout();
@@ -89,11 +91,19 @@ const expression=`(async()=>{
     await endBattle();
     // Observe the existing owner during actual manual / auto / enemy resolution.
     const owner=calculateHitChancePercent,calls=[];
-    calculateHitChancePercent=function(...args){const result=owner(...args);calls.push({args:args.slice(0,4),chance:result});return result;};
+    calculateHitChancePercent=function(...args){const result=owner(...args);calls.push({args:args.slice(0,4),chance:result,side:args[4]?"monster":"player"});return result;};
     const combat={};
     try{
         await freshMonsters();selectedMonster=0;normalAttack();combat.manual=calls.splice(0);
-        autoBattle=true;autoConfig.skill="normal";autoActionForCharacter(0,battleToken);autoBattle=false;resolveQueuedPlayerAction(0,battleToken);combat.autoResolution=calls.splice(0);
+        await endBattle();await freshMonsters();calls.splice(0);
+        // Use the same time entitlement and toggle as real auto battle. Declaration,
+        // initiative and animation must reach the player Hit Owner before inspection.
+        v131GrantElementBoxHours(8,32);autoConfig.skill="normal";toggleAutoBattle();
+        const autoDeadline=Date.now()+15000;
+        while(!calls.some(call=>call.side==="player")&&battleActive&&Date.now()<autoDeadline)await new Promise(r=>setTimeout(r,30));
+        if(!calls.some(call=>call.side==="player"))throw new Error("Natural auto player action did not reach Hit Owner: "+JSON.stringify({battleActive,battlePhase,autoBattle,turn,queued:queuedPlayerActions[0],calls}));
+        if(autoBattle)toggleAutoBattle();combat.autoResolution=calls.splice(0).filter(call=>call.side==="player");
+        await endBattle();await freshMonsters();calls.splice(0);
         monsters[0].skillChance=0;monsters[0].skill=null;monsters[0].skills=[];processSingleMonsterAttack(0,battleToken);combat.monster=calls.splice(0);
     }finally{calculateHitChancePercent=owner;await endBattle();}
     return {wind,lowCap,levels,calm,dodge,set:{one,three,two,armor},detail,migrated,repeated,legacyArmor,tower,frostbite,feather,relicFrostbite,bell,blessing,combat,casts,

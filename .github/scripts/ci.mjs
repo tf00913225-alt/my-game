@@ -347,7 +347,7 @@ function checkSyntax(){
 function checkTests(){
     const allTestJs=walk("tests",file=>PROJECT_JS_EXTENSIONS.has(path.extname(file)));
     const suites=allTestJs.filter(file=>/\.test\.(?:js|cjs|mjs)$/.test(file));
-    const allowedNonSuites=new Set(["tests/v138-browser-smoke.js"]);
+    const allowedNonSuites=new Set(["tests/v138-browser-smoke.js","tests/fixtures/wild-balance-reference-party.js"]);
     const unclassified=allTestJs
         .map(relative)
         .filter(file=>!allowedNonSuites.has(file) && !/\.test\.(?:js|cjs|mjs)$/.test(file));

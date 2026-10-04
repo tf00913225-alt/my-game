@@ -815,8 +815,8 @@ test("player agility does not grant evasion and default monster level retains ex
         v158NormalizeMonsterDefaultEvasion(missing);
         return {
             player:getMainCharacterStats().evasion,
-            level40:makeZoneMonster("四十級怪",40,"fire").evasion,
-            level200:makeZoneMonster("兩百級怪",200,"fire").evasion,
+            level40:MonsterBalance.build({monsterKey:"test",name:"四十級怪",level:40,element:"fire",archetype:"balanced",mode:"wild",rank:"regular",context:"wild/test"}).evasion,
+            level200:v158NormalizeMonsterDefaultEvasion({level:200}).evasion,
             custom:custom.evasion,missing:missing.evasion
         };
     })()`);
@@ -1296,7 +1296,7 @@ test("dynamic defense, recalibrated attributes and modern or legacy skills share
         Math.random=function(){ return .5; };
         Object.assign(player,{attack:10,intelligence:10,vitality:10,energy:0,defensePoints:0,agility:0,bonusHP:0,bonusSP:0});
         const base=getBaseStats();
-        const monster=makeZoneMonster("比例怪",50,"fire","regular");
+        const monster=MonsterBalance.build({monsterKey:"test",name:"比例怪",level:50,element:"fire",archetype:"balanced",mode:"wild",rank:"regular",context:"wild/test"});
         const target={level:50,element:"fire",defense:0,statusEffects:[]};
         const modern=calculateSkillDamage({skill:skillDatabase.flameSlash,skillLevel:1,
             effectiveAttack:100,target:target,targetDefense:0,casterLevel:50,casterElement:"fire"});
@@ -1313,9 +1313,9 @@ test("dynamic defense, recalibrated attributes and modern or legacy skills share
             baseExpected:{maxHP:100+player.vitality*50,attack:30+player.level*4+player.attack*4,
                 magicAttack:30+player.level*4+player.intelligence*2.75,
                 defense:30+player.level*3+player.defensePoints*4},
-            monster:{attack:monster.attack,expectedAttack:30+monster.level*4+monster.attackPoints*4,
-                magicAttack:monster.magicAttack,expectedMagicAttack:30+monster.level*4+monster.intelligencePoints*2.75,
-                defense:monster.defense,expectedDefense:30+monster.level*3+monster.defensePoints*4},
+            monster:{attack:monster.attack,expectedAttack:30+(monster.level-1)*4+monster.attackPoints*4,
+                magicAttack:monster.magicAttack,expectedMagicAttack:30+(monster.level-1)*2.75+monster.intelligencePoints*2.75,
+                defense:monster.defense,expectedDefense:30+(monster.level-1)*4+monster.defensePoints*4},
             modern:modern,modernRaw:v173GetSkillRawAttack(skillDatabase.flameSlash,1,100),
             legacy:legacy,legacyRaw:v173GetSkillRawAttack(legacySkill,3,100)
         };
@@ -1492,9 +1492,8 @@ test("damage safety, full pressure matrix and Abyss level brackets remain formal
         const reverse=v173GetEnemyPressureMultiplier(player,attacker("boss","abyss"));
 
         Math.random=function(){ return .5; };
-        const dailyRegular=v132BuildDungeonMonster("普通",60,"fire","regular");
-        const dailyElite=v132BuildDungeonMonster("精英",60,"fire","elite");
-        const dailyBoss=v132BuildDungeonMonster("首領",60,"fire","boss");
+        const identity={monsterKey:"rank.test",name:"Rank reference",level:60,element:"fire",archetype:"balanced",mode:"daily",context:"daily/test",dailyType:"exp",wave:1,slot:0,partySize:3,highestPartyLevel:60,skillFrequency:.45};
+        const [dailyRegular,dailyElite,dailyBoss]=["regular","elite","boss"].map(rank=>MonsterBalance.build({...identity,rank}));
         const rankAttack=[dailyRegular,dailyElite,dailyBoss].map(monster=>[monster.attack,monster.magicAttack]);
 
         const abyssLevels=[20,50,80,100].map(level=>{
@@ -1628,7 +1627,7 @@ test("V2 final percent sources, naked levels, Calm, Dodge, Wind EX and low-HP ca
         player.hp=1;
         const cap=calculateHitChancePercent(1000,0,0,0,player);
         characterSkillLoadouts.fire.skillLevels.windEX=0;
-        const naked=[1,100].map(level=>{player.level=level;return calculateHitChancePercent(getMainCharacterStats().accuracy,makeZoneMonster("QA",level,"fire").evasion,0,0);});
+        const naked=[1,100].map(level=>{player.level=level;return calculateHitChancePercent(getMainCharacterStats().accuracy,MonsterBalance.build({monsterKey:"test",name:"QA",level,element:"fire",archetype:"balanced",mode:"wild",rank:"regular",context:"wild/test"}).evasion,0,0);});
         const calm=[5,10,15,20,25].map(value=>{player.activeBuffs=[{type:"dinghaishenzhen",turnsLeft:3,accuracyBonusPercent:value}];return [getMainCharacterStats().accuracy,getFinalAccuracyBonusPercent(player),calculateHitChancePercent(0,40,0,getFinalAccuracyBonusPercent(player))];});
         const dodge=[5,10,15,20,25].map(value=>{player.activeBuffs=[{type:"dodgeSkill",turnsLeft:3,percent:value}];return getMainCharacterStats().evasion;});
         return {wind,cap,naked,calm,dodge};

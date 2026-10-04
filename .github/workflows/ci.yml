@@ -627,9 +627,44 @@ jobs:
           if-no-files-found: error
           retention-days: 90
 
+  boss_balance:
+    name: Boss Phase2F production gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          package-manager-cache: false
+      - name: Ensure CJK font support
+        run: |
+          if ! fc-list :lang=zh | rg -q .; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends fonts-noto-cjk
+          fi
+      - name: Verify Boss focus, aggregate, TTK and existing production QA
+        env:
+          EXPECTED_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          mkdir -p artifacts/browser-qa
+          node --test tests/monster-balance-owner-phase*.test.mjs
+          node scripts/monster-balance-final-convergence-audit.mjs
+          node scripts/boss-balance-ttk-matrix.mjs artifacts/browser-qa/boss-balance-ttk.json
+          node scripts/boss-balance-ttk-matrix.mjs artifacts/browser-qa/boss-balance-ttk-seeded.json --seeded
+          BOSS_MONSTER_BALANCE_QA=1 node .github/scripts/battle-layer-audio-live-qa.mjs
+      - name: Upload Boss production evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: boss-balance-${{ github.sha }}
+          path: artifacts/browser-qa/boss-balance*
+          if-no-files-found: error
+          retention-days: 90
+
   deploy_dev:
     name: Dev deployment gate
-    needs: [verify, abyss_balance, adventure_balance]
+    needs: [verify, abyss_balance, adventure_balance, boss_balance]
     if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
     uses: ./.github/workflows/deploy-dev-cloudflare.yml
     secrets: inherit

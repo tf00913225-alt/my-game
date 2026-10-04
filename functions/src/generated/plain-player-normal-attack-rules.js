@@ -216,7 +216,7 @@ function getEnemyPressureMultiplier(attacker,target){
     if(!attacker||!target||isPartyDamageTarget(attacker)||!isPartyDamageTarget(target)){
         return 1;
     }
-    if(["wild","daily","tower","abyss","adventure"].includes(attacker.mode)&&attacker.balanceOwner==="MonsterBalance"){
+    if(["wild","daily","tower","abyss","adventure","personalBoss","worldBoss"].includes(attacker.mode)&&attacker.balanceOwner==="MonsterBalance"){
         return attacker.balanceProjection.finalDamagePressure;
     }
     const rank=typeof getMonsterRank==="function"?getMonsterRank(attacker):"regular";

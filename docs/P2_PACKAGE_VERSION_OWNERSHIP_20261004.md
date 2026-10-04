@@ -119,3 +119,14 @@ preserve parallel requirements/HANDOFF and obtain latest-head CI; no rebase/forc
 Remaining P2: historical documentation/test maintenance and other toolchain
 warnings, retained historical/material branches only as separately scoped work.
 Cloud/Android/Boss/UI development is outside this batch. No automatic next P2/P3.
+
+## Latest-dev integration checkpoint
+
+PR #799 advanced dev to `db8530b59d683231535da717d1f641c391adbbcd`.
+Absorbed by a normal two-parent merge, without rebase or force. Preserve all
+Boss Runtime/source/generated bundles, its VERIFIED requirement/HANDOFF records,
+and its existing CI Boss job/deploy dependency. This batch still changes only
+metadata, the existing release Gate test step and its documentation.
+The existing Cloudflare deployment now also requires the Boss job; Session
+Authority paths are unchanged by this batch relative to current dev.
+Integration Head requires fresh complete CI; earlier-head SUCCESS is historical.
