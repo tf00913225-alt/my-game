@@ -497,6 +497,7 @@
             global.closeHomeFeature();
         }else{
             parts.modal.classList.remove("show");
+            window.FourSymbolsBottomNav?.syncContext();
         }
 
         parts.modal.classList.add("release-update-modal");
@@ -504,6 +505,7 @@
         parts.title.textContent=manifest.title;
         parts.body.innerHTML=renderReleaseContent(manifest,kind);
         parts.modal.classList.add("show");
+        global.FourSymbolsBottomNav?.syncContext();
         state.modalOpen=true;
         state.modalKind=kind;
         state.forcedModalLock=forced;
@@ -548,7 +550,8 @@
             global.closeHomeFeature();
         }else{
             const parts=getSharedModalParts();
-            if(parts){ parts.modal.classList.remove("show"); }
+            if(parts){ parts.modal.classList.remove("show");
+            window.FourSymbolsBottomNav?.syncContext(); }
             onSharedModalClosed();
         }
     }

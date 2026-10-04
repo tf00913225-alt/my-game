@@ -273,10 +273,7 @@
             alert(definition.name+"數量不足。");
             return false;
         }
-        const planned=definition.recoveryPercent>=100
-            ?maxValue-currentValue
-            :Math.max(1,Math.round(maxValue*Number(definition.recoveryPercent||0)/100));
-        const recovered=Math.max(0,Math.min(maxValue-currentValue,planned));
+        const recovered=resolvePotionRecovery(definition,currentValue,maxValue);
         character[resource]=Math.min(maxValue,currentValue+recovered);
         if(typeof rebuildInventorySlots==="function"){ rebuildInventorySlots(); }
         if(typeof renderInventoryItems==="function"){ renderInventoryItems(); }

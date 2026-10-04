@@ -45,7 +45,7 @@
         const selected={home:"homeNav",training:"trainingNav",inventory:"inventoryNav",
             dungeon:"dungeonNav",gameplay:"bossNav",boss:"bossNav",tower:"bossNav"}[page]||"homeNav";
         mainButtons.forEach(button=>button.classList.toggle("active",button.id===selected));
-        shell.hidden=false;
+        shell.hidden=!!foregroundSuppressionReason();
     }
     function renderContext(buttons,context){
         const nav=ensureShell();
@@ -74,7 +74,7 @@
             nav.dataset.navSignature=key;
         }
         nav.dataset.navContext=context;
-        shell.hidden=false;
+        shell.hidden=!!foregroundSuppressionReason();
     }
     function activeGameplayPageId(){
         for(const id of ["gameplayPage","bossPage","towerPage"]){
@@ -91,6 +91,18 @@
     /* Context selection is deliberately app-shell responsibility.  It must be
        correct before lazy gameplay bundles exist, so a cold training entry can
        never expose the main navigation first and replace it later. */
+    function foregroundSuppressionReason(){
+        const app=document.getElementById("app");
+        if(document.getElementById("homeFeatureModal")?.classList?.contains("show")){
+            return "hidden-foreground";
+        }
+        if(app?.classList?.contains("inventory-overlay-open")||
+           app?.classList?.contains("on-inventory-page")||
+           document.getElementById("itemModal")?.dataset.presentationMode){
+            return "hidden-inventory";
+        }
+        return "";
+    }
     function syncContext(){
         const app=document.getElementById("app");
         const dungeonPage=document.getElementById("dungeonPage");
@@ -103,11 +115,10 @@
         const contextActive=mapActive||dungeonActive||gameplayActive||trainingActive;
         app?.classList?.toggle("v148-context-nav-active",contextActive);
 
-        if(app?.classList?.contains("inventory-overlay-open")||
-           app?.classList?.contains("on-inventory-page")||
-           document.getElementById("itemModal")?.dataset.presentationMode){
+        const suppression=foregroundSuppressionReason();
+        if(suppression){
             hide();
-            return "hidden-inventory";
+            return suppression;
         }
         if(!contextActive){
             if(app?.classList?.contains("in-battle")){
@@ -141,8 +152,8 @@
         return context;
     }
     function hide(){ if(ensureShell()){ shell.hidden=true; } }
-    window.FourSymbolsBottomNav=Object.freeze({renderMain,renderContext,syncContext,hide,ensureShell});
+    window.FourSymbolsBottomNav=Object.freeze({renderMain,renderContext,syncContext,hide,ensureShell,foregroundSuppressionReason});
     if(document.readyState==="loading"){
-        document.addEventListener("DOMContentLoaded",()=>renderMain("home"),{once:true});
-    }else{ renderMain("home"); }
+        document.addEventListener("DOMContentLoaded",()=>syncContext(),{once:true});
+    }else{ syncContext(); }
 })();

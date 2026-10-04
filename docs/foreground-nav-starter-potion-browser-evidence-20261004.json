@@ -1,0 +1,1804 @@
+{
+  "workId": "FOREGROUND-NAV-STARTER-POTION-20261004",
+  "status": "FUNCTIONAL_VERIFIED",
+  "sourceHead": "e08fdec08d69095b65e6bd464849441e2e03354c",
+  "testedMergeSha": "a9bf14298cbc5ff72f17ead6343502f610168e6c",
+  "ciRun": 37182829899,
+  "ciJob": 111378661101,
+  "artifactId": 11296230697,
+  "artifactSha256": "c78d148d376297bc557a177ec266fc66712497d0f1dd566d1a588ffbe32c8e6e",
+  "environment": "local-production",
+  "accountTransport": "read-only isolated disposable QA UID; production index, bundles, CSS, lazy owners, stat getters, consumption and UI unchanged",
+  "transitions": 204,
+  "formalReturns": 36,
+  "matrix": [
+    {
+      "width": 390,
+      "base": "abyss",
+      "features": [
+        "autoBattleSettings",
+        "character",
+        "inventory",
+        "relic"
+      ],
+      "transitions": 8,
+      "passes": [
+        0,
+        1
+      ],
+      "openHidden": true,
+      "hiddenHitboxes": 0,
+      "closeContexts": [
+        "abyss-selection"
+      ],
+      "restorePageAndHandlers": true,
+      "shellCount": 1,
+      "bottomNavCount": 1,
+      "legacyNavigation": 0
+    },
+    {
+      "width": 390,
+      "base": "abyss-map20",
+      "features": [
+        "autoBattleSettings",
+        "character",
+        "inventory",
+        "relic"
+      ],
+      "transitions": 8,
+      "passes": [
+        0,
+        1
+      ],
+      "openHidden": true,
+      "hiddenHitboxes": 0,
+      "closeContexts": [
+        "abyss-map"
+      ],
+      "restorePageAndHandlers": true,
+      "shellCount": 1,
+      "bottomNavCount": 1,
+      "legacyNavigation": 0
+    },
+    {
+      "width": 390,
+      "base": "abyss-map40",
+      "features": [
+        "autoBattleSettings",
+        "character",
+        "inventory",
+        "relic"
+      ],
+      "transitions": 8,
+      "passes": [
+        0,
+        1
+      ],
+      "openHidden": true,
+      "hiddenHitboxes": 0,
+      "closeContexts": [
+        "abyss-map"
+      ],
+      "restorePageAndHandlers": true,
+      "shellCount": 1,
+      "bottomNavCount": 1,
+      "legacyNavigation": 0
+    },
+    {
+      "width": 390,
+      "base": "boss",
+      "features": [
+        "autoBattleSettings",
+        "character",
+        "inventory",
+        "relic"
+      ],
+      "transitions": 8,
+      "passes": [
+        0,
+        1
+      ],
+      "openHidden": true,
+      "hiddenHitboxes": 0,
+      "closeContexts": [
+        "gameplay:bossPage"
+      ],
+      "restorePageAndHandlers": true,
+      "shellCount": 1,
+      "bottomNavCount": 1,
+      "legacyNavigation": 0
+    },
+    {
+      "width": 390,
+      "base": "daily",
+      "features": [
+        "autoBattleSettings",
+        "character",
+        "inventory",
+        "relic"
+      ],
+      "transitions": 8,
+      "passes": [
+        0,
+        1
+      ],
+      "openHidden": true,
+      "hiddenHitboxes": 0,
+      "closeContexts": [
+        "daily"
+      ],
+      "restorePageAndHandlers": true,
+      "shellCount": 1,
+      "bottomNavCount": 1,
+      "legacyNavigation": 0
+    },
+    {
+      "width": 390,
+      "base": "gameplay",
+      "features": [
+        "autoBattleSettings",
+        "character",
+        "inventory",
+        "relic"
+      ],
+      "transitions": 8,
+      "passes": [
+        0,
+        1
+      ],
+      "openHidden": true,
+      "hiddenHitboxes": 0,
+      "closeContexts": [
+        "gameplay:gameplayPage"
+      ],
+      "restorePageAndHandlers": true,
+      "shellCount": 1,
+      "bottomNavCount": 1,
+      "legacyNavigation": 0
+    },
+    {
+      "width": 390,
+      "base": "home",
+      "features": [
+        "achievement",
+        "announcement",
+        "autoBattleSettings",
+        "character",
+        "expPool",
+        "forge",
+        "formation",
+        "inventory",
+        "offlineExp",
+        "quest",
+        "relic",
+        "rest",
+        "shop",
+        "synthesis",
+        "system"
+      ],
+      "transitions": 30,
+      "passes": [
+        0,
+        1
+      ],
+      "openHidden": true,
+      "hiddenHitboxes": 0,
+      "closeContexts": [
+        "main"
+      ],
+      "restorePageAndHandlers": true,
+      "shellCount": 1,
+      "bottomNavCount": 1,
+      "legacyNavigation": 0
+    },
+    {
+      "width": 390,
+      "base": "patrol",
+      "features": [
+        "autoBattleSettings",
+        "character",
+        "inventory",
+        "relic"
+      ],
+      "transitions": 8,
+      "passes": [
+        0,
+        1
+      ],
+      "openHidden": true,
+      "hiddenHitboxes": 0,
+      "closeContexts": [
+        "patrol"
+      ],
+      "restorePageAndHandlers": true,
+      "shellCount": 1,
+      "bottomNavCount": 1,
+      "legacyNavigation": 0
+    },
+    {
+      "width": 390,
+      "base": "tower",
+      "features": [
+        "autoBattleSettings",
+        "character",
+        "inventory",
+        "relic"
+      ],
+      "transitions": 8,
+      "passes": [
+        0,
+        1
+      ],
+      "openHidden": true,
+      "hiddenHitboxes": 0,
+      "closeContexts": [
+        "gameplay:towerPage"
+      ],
+      "restorePageAndHandlers": true,
+      "shellCount": 1,
+      "bottomNavCount": 1,
+      "legacyNavigation": 0
+    },
+    {
+      "width": 390,
+      "base": "training",
+      "features": [
+        "autoBattleSettings",
+        "character",
+        "inventory",
+        "relic"
+      ],
+      "transitions": 8,
+      "passes": [
+        0,
+        1
+      ],
+      "openHidden": true,
+      "hiddenHitboxes": 0,
+      "closeContexts": [
+        "training"
+      ],
+      "restorePageAndHandlers": true,
+      "shellCount": 1,
+      "bottomNavCount": 1,
+      "legacyNavigation": 0
+    },
+    {
+      "width": 412,
+      "base": "abyss",
+      "features": [
+        "autoBattleSettings",
+        "character",
+        "inventory",
+        "relic"
+      ],
+      "transitions": 8,
+      "passes": [
+        0,
+        1
+      ],
+      "openHidden": true,
+      "hiddenHitboxes": 0,
+      "closeContexts": [
+        "abyss-selection"
+      ],
+      "restorePageAndHandlers": true,
+      "shellCount": 1,
+      "bottomNavCount": 1,
+      "legacyNavigation": 0
+    },
+    {
+      "width": 412,
+      "base": "abyss-map20",
+      "features": [
+        "autoBattleSettings",
+        "character",
+        "inventory",
+        "relic"
+      ],
+      "transitions": 8,
+      "passes": [
+        0,
+        1
+      ],
+      "openHidden": true,
+      "hiddenHitboxes": 0,
+      "closeContexts": [
+        "abyss-map"
+      ],
+      "restorePageAndHandlers": true,
+      "shellCount": 1,
+      "bottomNavCount": 1,
+      "legacyNavigation": 0
+    },
+    {
+      "width": 412,
+      "base": "abyss-map40",
+      "features": [
+        "autoBattleSettings",
+        "character",
+        "inventory",
+        "relic"
+      ],
+      "transitions": 8,
+      "passes": [
+        0,
+        1
+      ],
+      "openHidden": true,
+      "hiddenHitboxes": 0,
+      "closeContexts": [
+        "abyss-map"
+      ],
+      "restorePageAndHandlers": true,
+      "shellCount": 1,
+      "bottomNavCount": 1,
+      "legacyNavigation": 0
+    },
+    {
+      "width": 412,
+      "base": "boss",
+      "features": [
+        "autoBattleSettings",
+        "character",
+        "inventory",
+        "relic"
+      ],
+      "transitions": 8,
+      "passes": [
+        0,
+        1
+      ],
+      "openHidden": true,
+      "hiddenHitboxes": 0,
+      "closeContexts": [
+        "gameplay:bossPage"
+      ],
+      "restorePageAndHandlers": true,
+      "shellCount": 1,
+      "bottomNavCount": 1,
+      "legacyNavigation": 0
+    },
+    {
+      "width": 412,
+      "base": "daily",
+      "features": [
+        "autoBattleSettings",
+        "character",
+        "inventory",
+        "relic"
+      ],
+      "transitions": 8,
+      "passes": [
+        0,
+        1
+      ],
+      "openHidden": true,
+      "hiddenHitboxes": 0,
+      "closeContexts": [
+        "daily"
+      ],
+      "restorePageAndHandlers": true,
+      "shellCount": 1,
+      "bottomNavCount": 1,
+      "legacyNavigation": 0
+    },
+    {
+      "width": 412,
+      "base": "gameplay",
+      "features": [
+        "autoBattleSettings",
+        "character",
+        "inventory",
+        "relic"
+      ],
+      "transitions": 8,
+      "passes": [
+        0,
+        1
+      ],
+      "openHidden": true,
+      "hiddenHitboxes": 0,
+      "closeContexts": [
+        "gameplay:gameplayPage"
+      ],
+      "restorePageAndHandlers": true,
+      "shellCount": 1,
+      "bottomNavCount": 1,
+      "legacyNavigation": 0
+    },
+    {
+      "width": 412,
+      "base": "home",
+      "features": [
+        "achievement",
+        "announcement",
+        "autoBattleSettings",
+        "character",
+        "expPool",
+        "forge",
+        "formation",
+        "inventory",
+        "offlineExp",
+        "quest",
+        "relic",
+        "rest",
+        "shop",
+        "synthesis",
+        "system"
+      ],
+      "transitions": 30,
+      "passes": [
+        0,
+        1
+      ],
+      "openHidden": true,
+      "hiddenHitboxes": 0,
+      "closeContexts": [
+        "main"
+      ],
+      "restorePageAndHandlers": true,
+      "shellCount": 1,
+      "bottomNavCount": 1,
+      "legacyNavigation": 0
+    },
+    {
+      "width": 412,
+      "base": "patrol",
+      "features": [
+        "autoBattleSettings",
+        "character",
+        "inventory",
+        "relic"
+      ],
+      "transitions": 8,
+      "passes": [
+        0,
+        1
+      ],
+      "openHidden": true,
+      "hiddenHitboxes": 0,
+      "closeContexts": [
+        "patrol"
+      ],
+      "restorePageAndHandlers": true,
+      "shellCount": 1,
+      "bottomNavCount": 1,
+      "legacyNavigation": 0
+    },
+    {
+      "width": 412,
+      "base": "tower",
+      "features": [
+        "autoBattleSettings",
+        "character",
+        "inventory",
+        "relic"
+      ],
+      "transitions": 8,
+      "passes": [
+        0,
+        1
+      ],
+      "openHidden": true,
+      "hiddenHitboxes": 0,
+      "closeContexts": [
+        "gameplay:towerPage"
+      ],
+      "restorePageAndHandlers": true,
+      "shellCount": 1,
+      "bottomNavCount": 1,
+      "legacyNavigation": 0
+    },
+    {
+      "width": 412,
+      "base": "training",
+      "features": [
+        "autoBattleSettings",
+        "character",
+        "inventory",
+        "relic"
+      ],
+      "transitions": 8,
+      "passes": [
+        0,
+        1
+      ],
+      "openHidden": true,
+      "hiddenHitboxes": 0,
+      "closeContexts": [
+        "training"
+      ],
+      "restorePageAndHandlers": true,
+      "shellCount": 1,
+      "bottomNavCount": 1,
+      "legacyNavigation": 0
+    }
+  ],
+  "returnChecks": [
+    {
+      "width": 390,
+      "pass": 0,
+      "base": "training",
+      "context": "main",
+      "visible": true
+    },
+    {
+      "width": 390,
+      "pass": 0,
+      "base": "patrol",
+      "context": "training",
+      "visible": true
+    },
+    {
+      "width": 390,
+      "pass": 0,
+      "base": "daily",
+      "context": "main",
+      "visible": true
+    },
+    {
+      "width": 390,
+      "pass": 0,
+      "base": "gameplay",
+      "context": "main",
+      "visible": true
+    },
+    {
+      "width": 390,
+      "pass": 0,
+      "base": "boss",
+      "context": "gameplay:gameplayPage",
+      "visible": true
+    },
+    {
+      "width": 390,
+      "pass": 0,
+      "base": "tower",
+      "context": "gameplay:gameplayPage",
+      "visible": true
+    },
+    {
+      "width": 390,
+      "pass": 0,
+      "base": "abyss",
+      "context": "gameplay:gameplayPage",
+      "visible": true
+    },
+    {
+      "width": 390,
+      "pass": 0,
+      "base": "abyss-map20",
+      "context": "abyss-selection",
+      "visible": true
+    },
+    {
+      "width": 390,
+      "pass": 0,
+      "base": "abyss-map40",
+      "context": "abyss-selection",
+      "visible": true
+    },
+    {
+      "width": 390,
+      "pass": 1,
+      "base": "training",
+      "context": "main",
+      "visible": true
+    },
+    {
+      "width": 390,
+      "pass": 1,
+      "base": "patrol",
+      "context": "training",
+      "visible": true
+    },
+    {
+      "width": 390,
+      "pass": 1,
+      "base": "daily",
+      "context": "main",
+      "visible": true
+    },
+    {
+      "width": 390,
+      "pass": 1,
+      "base": "gameplay",
+      "context": "main",
+      "visible": true
+    },
+    {
+      "width": 390,
+      "pass": 1,
+      "base": "boss",
+      "context": "gameplay:gameplayPage",
+      "visible": true
+    },
+    {
+      "width": 390,
+      "pass": 1,
+      "base": "tower",
+      "context": "gameplay:gameplayPage",
+      "visible": true
+    },
+    {
+      "width": 390,
+      "pass": 1,
+      "base": "abyss",
+      "context": "gameplay:gameplayPage",
+      "visible": true
+    },
+    {
+      "width": 390,
+      "pass": 1,
+      "base": "abyss-map20",
+      "context": "abyss-selection",
+      "visible": true
+    },
+    {
+      "width": 390,
+      "pass": 1,
+      "base": "abyss-map40",
+      "context": "abyss-selection",
+      "visible": true
+    },
+    {
+      "width": 412,
+      "pass": 0,
+      "base": "training",
+      "context": "main",
+      "visible": true
+    },
+    {
+      "width": 412,
+      "pass": 0,
+      "base": "patrol",
+      "context": "training",
+      "visible": true
+    },
+    {
+      "width": 412,
+      "pass": 0,
+      "base": "daily",
+      "context": "main",
+      "visible": true
+    },
+    {
+      "width": 412,
+      "pass": 0,
+      "base": "gameplay",
+      "context": "main",
+      "visible": true
+    },
+    {
+      "width": 412,
+      "pass": 0,
+      "base": "boss",
+      "context": "gameplay:gameplayPage",
+      "visible": true
+    },
+    {
+      "width": 412,
+      "pass": 0,
+      "base": "tower",
+      "context": "gameplay:gameplayPage",
+      "visible": true
+    },
+    {
+      "width": 412,
+      "pass": 0,
+      "base": "abyss",
+      "context": "gameplay:gameplayPage",
+      "visible": true
+    },
+    {
+      "width": 412,
+      "pass": 0,
+      "base": "abyss-map20",
+      "context": "abyss-selection",
+      "visible": true
+    },
+    {
+      "width": 412,
+      "pass": 0,
+      "base": "abyss-map40",
+      "context": "abyss-selection",
+      "visible": true
+    },
+    {
+      "width": 412,
+      "pass": 1,
+      "base": "training",
+      "context": "main",
+      "visible": true
+    },
+    {
+      "width": 412,
+      "pass": 1,
+      "base": "patrol",
+      "context": "training",
+      "visible": true
+    },
+    {
+      "width": 412,
+      "pass": 1,
+      "base": "daily",
+      "context": "main",
+      "visible": true
+    },
+    {
+      "width": 412,
+      "pass": 1,
+      "base": "gameplay",
+      "context": "main",
+      "visible": true
+    },
+    {
+      "width": 412,
+      "pass": 1,
+      "base": "boss",
+      "context": "gameplay:gameplayPage",
+      "visible": true
+    },
+    {
+      "width": 412,
+      "pass": 1,
+      "base": "tower",
+      "context": "gameplay:gameplayPage",
+      "visible": true
+    },
+    {
+      "width": 412,
+      "pass": 1,
+      "base": "abyss",
+      "context": "gameplay:gameplayPage",
+      "visible": true
+    },
+    {
+      "width": 412,
+      "pass": 1,
+      "base": "abyss-map20",
+      "context": "abyss-selection",
+      "visible": true
+    },
+    {
+      "width": 412,
+      "pass": 1,
+      "base": "abyss-map40",
+      "context": "abyss-selection",
+      "visible": true
+    }
+  ],
+  "resourceResults": [
+    {
+      "width": 390,
+      "height": 844,
+      "cold": {
+        "visible": false,
+        "shellCount": 1,
+        "navCount": 1,
+        "legacy": 0,
+        "context": "main",
+        "signature": "main",
+        "buttons": [
+          "showPage('inventory')",
+          "showPage('training')",
+          "showPage('home')",
+          "vGameplayOpenDailyDungeons()",
+          "showPage('gameplay')"
+        ],
+        "hitboxes": 0,
+        "reason": "hidden-foreground",
+        "active": "homePage"
+      },
+      "coldRelic": {
+        "visible": false,
+        "shellCount": 1,
+        "navCount": 1,
+        "legacy": 0,
+        "context": "main",
+        "signature": "main",
+        "buttons": [
+          "showPage('inventory')",
+          "showPage('training')",
+          "showPage('home')",
+          "vGameplayOpenDailyDungeons()",
+          "showPage('gameplay')"
+        ],
+        "hitboxes": 0,
+        "reason": "hidden-foreground",
+        "active": "homePage"
+      },
+      "potions": {
+        "rows": [
+          {
+            "route": "battle",
+            "id": "hpPotion10",
+            "start": 4000,
+            "expected": 4066,
+            "actual": 4066,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "battle",
+            "id": "hpPotion10",
+            "start": 4500,
+            "expected": 4520,
+            "actual": 4520,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "battle",
+            "id": "spPotion10",
+            "start": 1000,
+            "expected": 1066,
+            "actual": 1066,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "battle",
+            "id": "spPotion10",
+            "start": 1170,
+            "expected": 1190,
+            "actual": 1190,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "battle",
+            "id": "hpPotion20",
+            "start": 3000,
+            "expected": 3904,
+            "actual": 3904,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "battle",
+            "id": "hpPotion30",
+            "start": 3000,
+            "expected": 4356,
+            "actual": 4356,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "battle",
+            "id": "spPotion20",
+            "start": 500,
+            "expected": 738,
+            "actual": 738,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "battle",
+            "id": "spPotion30",
+            "start": 500,
+            "expected": 857,
+            "actual": 857,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "battle",
+            "id": "nineTurnRestorationPill",
+            "start": 4000,
+            "expected": 4520,
+            "actual": 4520,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "battle",
+            "id": "taichingQiPill",
+            "start": 1000,
+            "expected": 1190,
+            "actual": 1190,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "inventory-single",
+            "id": "hpPotion10",
+            "start": 4000,
+            "expected": 4066,
+            "actual": 4066,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "inventory-single",
+            "id": "hpPotion10",
+            "start": 4500,
+            "expected": 4520,
+            "actual": 4520,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "inventory-single",
+            "id": "spPotion10",
+            "start": 1000,
+            "expected": 1066,
+            "actual": 1066,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "inventory-single",
+            "id": "spPotion10",
+            "start": 1170,
+            "expected": 1190,
+            "actual": 1190,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "inventory-single",
+            "id": "hpPotion20",
+            "start": 3000,
+            "expected": 3904,
+            "actual": 3904,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "inventory-single",
+            "id": "hpPotion30",
+            "start": 3000,
+            "expected": 4356,
+            "actual": 4356,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "inventory-single",
+            "id": "spPotion20",
+            "start": 500,
+            "expected": 738,
+            "actual": 738,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "inventory-single",
+            "id": "spPotion30",
+            "start": 500,
+            "expected": 857,
+            "actual": 857,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "inventory-single",
+            "id": "nineTurnRestorationPill",
+            "start": 4000,
+            "expected": 4520,
+            "actual": 4520,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "inventory-single",
+            "id": "taichingQiPill",
+            "start": 1000,
+            "expected": 1190,
+            "actual": 1190,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "inventory-batch",
+            "id": "hpPotion10",
+            "start": 4000,
+            "expected": 4066,
+            "actual": 4066,
+            "stock": 1,
+            "expectedStock": 1
+          },
+          {
+            "route": "inventory-batch",
+            "id": "hpPotion10",
+            "start": 4500,
+            "expected": 4520,
+            "actual": 4520,
+            "stock": 1,
+            "expectedStock": 1
+          },
+          {
+            "route": "inventory-batch",
+            "id": "spPotion10",
+            "start": 1000,
+            "expected": 1066,
+            "actual": 1066,
+            "stock": 1,
+            "expectedStock": 1
+          },
+          {
+            "route": "inventory-batch",
+            "id": "spPotion10",
+            "start": 1170,
+            "expected": 1190,
+            "actual": 1190,
+            "stock": 1,
+            "expectedStock": 1
+          },
+          {
+            "route": "inventory-batch",
+            "id": "hpPotion20",
+            "start": 3000,
+            "expected": 3904,
+            "actual": 3904,
+            "stock": 1,
+            "expectedStock": 1
+          },
+          {
+            "route": "inventory-batch",
+            "id": "hpPotion30",
+            "start": 3000,
+            "expected": 4356,
+            "actual": 4356,
+            "stock": 1,
+            "expectedStock": 1
+          },
+          {
+            "route": "inventory-batch",
+            "id": "spPotion20",
+            "start": 500,
+            "expected": 738,
+            "actual": 738,
+            "stock": 1,
+            "expectedStock": 1
+          },
+          {
+            "route": "inventory-batch",
+            "id": "spPotion30",
+            "start": 500,
+            "expected": 857,
+            "actual": 857,
+            "stock": 1,
+            "expectedStock": 1
+          },
+          {
+            "route": "inventory-batch",
+            "id": "nineTurnRestorationPill",
+            "start": 4000,
+            "expected": 4520,
+            "actual": 4520,
+            "stock": 1,
+            "expectedStock": 1
+          },
+          {
+            "route": "inventory-batch",
+            "id": "taichingQiPill",
+            "start": 1000,
+            "expected": 1190,
+            "actual": 1190,
+            "stock": 1,
+            "expectedStock": 1
+          },
+          {
+            "route": "post-battle",
+            "id": "hpPotion10",
+            "start": 4000,
+            "expected": 4066,
+            "actual": 4066,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "post-battle",
+            "id": "hpPotion10",
+            "start": 4500,
+            "expected": 4520,
+            "actual": 4520,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "post-battle",
+            "id": "spPotion10",
+            "start": 1000,
+            "expected": 1066,
+            "actual": 1066,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "post-battle",
+            "id": "spPotion10",
+            "start": 1170,
+            "expected": 1190,
+            "actual": 1190,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "post-battle",
+            "id": "hpPotion20",
+            "start": 3000,
+            "expected": 3904,
+            "actual": 3904,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "post-battle",
+            "id": "hpPotion30",
+            "start": 3000,
+            "expected": 4356,
+            "actual": 4356,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "post-battle",
+            "id": "spPotion20",
+            "start": 500,
+            "expected": 738,
+            "actual": 738,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "post-battle",
+            "id": "spPotion30",
+            "start": 500,
+            "expected": 857,
+            "actual": 857,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "element-box",
+            "id": "hpPotion10",
+            "start": 4000,
+            "expected": 4066,
+            "actual": 4066,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "element-box",
+            "id": "hpPotion10",
+            "start": 4500,
+            "expected": 4520,
+            "actual": 4520,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "element-box",
+            "id": "spPotion10",
+            "start": 1000,
+            "expected": 1066,
+            "actual": 1066,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "element-box",
+            "id": "spPotion10",
+            "start": 1170,
+            "expected": 1190,
+            "actual": 1190,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "element-box",
+            "id": "hpPotion20",
+            "start": 3000,
+            "expected": 3904,
+            "actual": 3904,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "element-box",
+            "id": "hpPotion30",
+            "start": 3000,
+            "expected": 4356,
+            "actual": 4356,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "element-box",
+            "id": "spPotion20",
+            "start": 500,
+            "expected": 738,
+            "actual": 738,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "element-box",
+            "id": "spPotion30",
+            "start": 500,
+            "expected": 857,
+            "actual": 857,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "batch-cap",
+            "actual": 4520,
+            "expected": 4520,
+            "stock": 8,
+            "expectedStock": 8
+          }
+        ],
+        "guards": [
+          {
+            "route": "post-battle",
+            "hp": 4066,
+            "sp": 1066,
+            "rareHP": 1,
+            "rareSP": 1,
+            "hpStock": 0,
+            "spStock": 0
+          },
+          {
+            "route": "element-box",
+            "hp": 4066,
+            "sp": 1066,
+            "rareHP": 1,
+            "rareSP": 1,
+            "hpStock": 0,
+            "spStock": 0
+          }
+        ],
+        "legacy": {
+          "hp": 321,
+          "sp": 456,
+          "items": [
+            {
+              "id": "hpPotion10",
+              "mode": "flat",
+              "value": 66
+            },
+            {
+              "id": "spPotion10",
+              "mode": "flat",
+              "value": 66
+            }
+          ]
+        },
+        "shopFlat": true,
+        "oldShopNote": false,
+        "descriptions": [
+          "恢復 66 HP",
+          "恢復 66 SP",
+          "回復最大HP的 20%",
+          "回復最大HP的 30%",
+          "回復最大SP的 20%",
+          "回復最大SP的 30%"
+        ]
+      },
+      "reload": true
+    },
+    {
+      "width": 412,
+      "height": 915,
+      "cold": {
+        "visible": false,
+        "shellCount": 1,
+        "navCount": 1,
+        "legacy": 0,
+        "context": "main",
+        "signature": "main",
+        "buttons": [
+          "showPage('inventory')",
+          "showPage('training')",
+          "showPage('home')",
+          "vGameplayOpenDailyDungeons()",
+          "showPage('gameplay')"
+        ],
+        "hitboxes": 0,
+        "reason": "hidden-foreground",
+        "active": "homePage"
+      },
+      "coldRelic": {
+        "visible": false,
+        "shellCount": 1,
+        "navCount": 1,
+        "legacy": 0,
+        "context": "main",
+        "signature": "main",
+        "buttons": [
+          "showPage('inventory')",
+          "showPage('training')",
+          "showPage('home')",
+          "vGameplayOpenDailyDungeons()",
+          "showPage('gameplay')"
+        ],
+        "hitboxes": 0,
+        "reason": "hidden-foreground",
+        "active": "homePage"
+      },
+      "potions": {
+        "rows": [
+          {
+            "route": "battle",
+            "id": "hpPotion10",
+            "start": 4000,
+            "expected": 4066,
+            "actual": 4066,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "battle",
+            "id": "hpPotion10",
+            "start": 4500,
+            "expected": 4520,
+            "actual": 4520,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "battle",
+            "id": "spPotion10",
+            "start": 1000,
+            "expected": 1066,
+            "actual": 1066,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "battle",
+            "id": "spPotion10",
+            "start": 1170,
+            "expected": 1190,
+            "actual": 1190,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "battle",
+            "id": "hpPotion20",
+            "start": 3000,
+            "expected": 3904,
+            "actual": 3904,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "battle",
+            "id": "hpPotion30",
+            "start": 3000,
+            "expected": 4356,
+            "actual": 4356,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "battle",
+            "id": "spPotion20",
+            "start": 500,
+            "expected": 738,
+            "actual": 738,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "battle",
+            "id": "spPotion30",
+            "start": 500,
+            "expected": 857,
+            "actual": 857,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "battle",
+            "id": "nineTurnRestorationPill",
+            "start": 4000,
+            "expected": 4520,
+            "actual": 4520,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "battle",
+            "id": "taichingQiPill",
+            "start": 1000,
+            "expected": 1190,
+            "actual": 1190,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "inventory-single",
+            "id": "hpPotion10",
+            "start": 4000,
+            "expected": 4066,
+            "actual": 4066,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "inventory-single",
+            "id": "hpPotion10",
+            "start": 4500,
+            "expected": 4520,
+            "actual": 4520,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "inventory-single",
+            "id": "spPotion10",
+            "start": 1000,
+            "expected": 1066,
+            "actual": 1066,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "inventory-single",
+            "id": "spPotion10",
+            "start": 1170,
+            "expected": 1190,
+            "actual": 1190,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "inventory-single",
+            "id": "hpPotion20",
+            "start": 3000,
+            "expected": 3904,
+            "actual": 3904,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "inventory-single",
+            "id": "hpPotion30",
+            "start": 3000,
+            "expected": 4356,
+            "actual": 4356,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "inventory-single",
+            "id": "spPotion20",
+            "start": 500,
+            "expected": 738,
+            "actual": 738,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "inventory-single",
+            "id": "spPotion30",
+            "start": 500,
+            "expected": 857,
+            "actual": 857,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "inventory-single",
+            "id": "nineTurnRestorationPill",
+            "start": 4000,
+            "expected": 4520,
+            "actual": 4520,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "inventory-single",
+            "id": "taichingQiPill",
+            "start": 1000,
+            "expected": 1190,
+            "actual": 1190,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "inventory-batch",
+            "id": "hpPotion10",
+            "start": 4000,
+            "expected": 4066,
+            "actual": 4066,
+            "stock": 1,
+            "expectedStock": 1
+          },
+          {
+            "route": "inventory-batch",
+            "id": "hpPotion10",
+            "start": 4500,
+            "expected": 4520,
+            "actual": 4520,
+            "stock": 1,
+            "expectedStock": 1
+          },
+          {
+            "route": "inventory-batch",
+            "id": "spPotion10",
+            "start": 1000,
+            "expected": 1066,
+            "actual": 1066,
+            "stock": 1,
+            "expectedStock": 1
+          },
+          {
+            "route": "inventory-batch",
+            "id": "spPotion10",
+            "start": 1170,
+            "expected": 1190,
+            "actual": 1190,
+            "stock": 1,
+            "expectedStock": 1
+          },
+          {
+            "route": "inventory-batch",
+            "id": "hpPotion20",
+            "start": 3000,
+            "expected": 3904,
+            "actual": 3904,
+            "stock": 1,
+            "expectedStock": 1
+          },
+          {
+            "route": "inventory-batch",
+            "id": "hpPotion30",
+            "start": 3000,
+            "expected": 4356,
+            "actual": 4356,
+            "stock": 1,
+            "expectedStock": 1
+          },
+          {
+            "route": "inventory-batch",
+            "id": "spPotion20",
+            "start": 500,
+            "expected": 738,
+            "actual": 738,
+            "stock": 1,
+            "expectedStock": 1
+          },
+          {
+            "route": "inventory-batch",
+            "id": "spPotion30",
+            "start": 500,
+            "expected": 857,
+            "actual": 857,
+            "stock": 1,
+            "expectedStock": 1
+          },
+          {
+            "route": "inventory-batch",
+            "id": "nineTurnRestorationPill",
+            "start": 4000,
+            "expected": 4520,
+            "actual": 4520,
+            "stock": 1,
+            "expectedStock": 1
+          },
+          {
+            "route": "inventory-batch",
+            "id": "taichingQiPill",
+            "start": 1000,
+            "expected": 1190,
+            "actual": 1190,
+            "stock": 1,
+            "expectedStock": 1
+          },
+          {
+            "route": "post-battle",
+            "id": "hpPotion10",
+            "start": 4000,
+            "expected": 4066,
+            "actual": 4066,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "post-battle",
+            "id": "hpPotion10",
+            "start": 4500,
+            "expected": 4520,
+            "actual": 4520,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "post-battle",
+            "id": "spPotion10",
+            "start": 1000,
+            "expected": 1066,
+            "actual": 1066,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "post-battle",
+            "id": "spPotion10",
+            "start": 1170,
+            "expected": 1190,
+            "actual": 1190,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "post-battle",
+            "id": "hpPotion20",
+            "start": 3000,
+            "expected": 3904,
+            "actual": 3904,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "post-battle",
+            "id": "hpPotion30",
+            "start": 3000,
+            "expected": 4356,
+            "actual": 4356,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "post-battle",
+            "id": "spPotion20",
+            "start": 500,
+            "expected": 738,
+            "actual": 738,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "post-battle",
+            "id": "spPotion30",
+            "start": 500,
+            "expected": 857,
+            "actual": 857,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "element-box",
+            "id": "hpPotion10",
+            "start": 4000,
+            "expected": 4066,
+            "actual": 4066,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "element-box",
+            "id": "hpPotion10",
+            "start": 4500,
+            "expected": 4520,
+            "actual": 4520,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "element-box",
+            "id": "spPotion10",
+            "start": 1000,
+            "expected": 1066,
+            "actual": 1066,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "element-box",
+            "id": "spPotion10",
+            "start": 1170,
+            "expected": 1190,
+            "actual": 1190,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "element-box",
+            "id": "hpPotion20",
+            "start": 3000,
+            "expected": 3904,
+            "actual": 3904,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "element-box",
+            "id": "hpPotion30",
+            "start": 3000,
+            "expected": 4356,
+            "actual": 4356,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "element-box",
+            "id": "spPotion20",
+            "start": 500,
+            "expected": 738,
+            "actual": 738,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "element-box",
+            "id": "spPotion30",
+            "start": 500,
+            "expected": 857,
+            "actual": 857,
+            "stock": 0,
+            "expectedStock": 0
+          },
+          {
+            "route": "batch-cap",
+            "actual": 4520,
+            "expected": 4520,
+            "stock": 8,
+            "expectedStock": 8
+          }
+        ],
+        "guards": [
+          {
+            "route": "post-battle",
+            "hp": 4066,
+            "sp": 1066,
+            "rareHP": 1,
+            "rareSP": 1,
+            "hpStock": 0,
+            "spStock": 0
+          },
+          {
+            "route": "element-box",
+            "hp": 4066,
+            "sp": 1066,
+            "rareHP": 1,
+            "rareSP": 1,
+            "hpStock": 0,
+            "spStock": 0
+          }
+        ],
+        "legacy": {
+          "hp": 321,
+          "sp": 456,
+          "items": [
+            {
+              "id": "hpPotion10",
+              "mode": "flat",
+              "value": 66
+            },
+            {
+              "id": "spPotion10",
+              "mode": "flat",
+              "value": 66
+            }
+          ]
+        },
+        "shopFlat": true,
+        "oldShopNote": false,
+        "descriptions": [
+          "恢復 66 HP",
+          "恢復 66 SP",
+          "回復最大HP的 20%",
+          "回復最大HP的 30%",
+          "回復最大SP的 20%",
+          "回復最大SP的 30%"
+        ]
+      },
+      "reload": true
+    }
+  ],
+  "reviewedScreenshots": [
+    "foreground-390-abyss-map20-restored.png",
+    "foreground-412-daily-character.png",
+    "foreground-412-home-shop.png"
+  ],
+  "remainingGates": "Latest final PR Head necessary CI, dev integration, exact dev deployment, deployed same QA and cleanup remain tracked by PR #794; main unchanged."
+}

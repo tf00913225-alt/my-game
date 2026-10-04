@@ -22,8 +22,9 @@ test("Gameplay shared nav owns context-safe backpack and relic actions",()=>{
     assert.match(shell,/\["秘寶","assets\/ui\/nav-relic-v175\.webp","v148OpenContextRelic\(\)"\]/);
     const core=read("js/00-main.js");
     assert.match(nav,/window\.v148OpenContextInventory=function\(\)[\s\S]*?openInventoryContext\(\{[\s\S]*?sourcePage,[\s\S]*?returnAction:sourcePage==="map"\?"leaveMap\(\)":"v148ReturnFromGameplay\(\)",[\s\S]*?closeBehavior:"restore-source"[\s\S]*?\}\)/);
-    assert.match(core,/function openInventoryContext\(context\)[\s\S]*?inventoryContextSnapshot\(context\)[\s\S]*?showPage\("inventory"\)[\s\S]*?inventoryOpenContext=normalized/);
+    assert.match(core,/function openInventoryContext\(context\)[\s\S]*?inventoryContextSnapshot\(context\)[\s\S]*?inventoryOpenContext=normalized[\s\S]*?showPage\("inventory"\)/);
     assert.match(core,/function closeMapInventoryOverlay\(\)[\s\S]*?if\(context\.sourcePage==="map"&&typeof leaveMap==="function"\)[\s\S]*?else if\(\["dungeon","gameplay","gameplayPage","boss","bossPage","tower","towerPage","training","trainingPage"\]\.includes\(context\.sourcePage\)\)/);
+    assert.match(core,/context\.closeBehavior===\"restore-source\"[\s\S]*?showPage\(sourcePage,\{restoreSource:true\}\)/);
     assert.match(nav,/window\.v148OpenContextRelic=function\(\)[\s\S]*?window\.v174OpenRelicPage\(\)/);
 });
 
@@ -34,4 +35,18 @@ test("Relic modal opens in place without a close/reopen flash cycle",()=>{
     const owner=relic.slice(start,end);
     assert.doesNotMatch(owner,/closeHomeFeature\s*\(/);
     assert.match(owner,/classList\.add\("show","team-relic-modal"\)/);
+});
+
+test('context inventory close restores every actual base page without navigation-away actions',()=>{
+    const vm=require('node:vm'),core=read('js/00-main.js');
+    const source=core.slice(core.indexOf('let inventoryOpenContext=null;'),core.indexOf('function showPage('));
+    const pages=new Set(['home','training','map','dungeon','gameplay','boss','tower','future']);
+    const calls=[];let leaves=0;
+    const classList={add(){},remove(){},toggle(){}};
+    const c={window:null,document:{getElementById:id=>id==='app'?{classList}:pages.has(id.replace(/Page$/,''))?{classList}:null,documentElement:{classList},body:{classList}},$:()=>null,battleActive:false,showPage:(page,options)=>calls.push({page,options}),leaveMap:()=>leaves++,closeItemModal(){},closeInventoryCharacterDetail(){}};c.window=c;vm.createContext(c);vm.runInContext(source,c);
+    for(const sourcePage of ['home','training','map','dungeon','gameplayPage','bossPage','towerPage','future']){
+        calls.length=0;c.openInventoryContext({sourcePage,closeBehavior:'restore-source'});c.closeMapInventoryOverlay();
+        assert.equal(calls.at(-1).page,sourcePage.replace(/Page$/,''));assert.equal(calls.at(-1).options.restoreSource,true);assert.equal(leaves,0,'foreground close cannot leave patrol');
+    }
+    c.openInventoryContext({sourcePage:'map',closeBehavior:'navigation'});c.closeMapInventoryOverlay();assert.equal(leaves,1,'legacy explicit navigation behavior stays compatible');
 });

@@ -1,0 +1,100 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import {spawn} from 'node:child_process';
+import {findChrome,startServer,waitJson,Cdp,ASSET_MANIFEST} from './runtime-browser-qa-support.mjs';
+const out='artifacts/browser-qa';fs.mkdirSync(out,{recursive:true});
+const baseUrl=process.env.QA_BASE_URL||'';
+const expected=process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||'local';
+if(baseUrl){const manifest=await (await fetch(baseUrl+'/release-manifest.json',{cache:'no-store'})).json();assert.equal(manifest.commitSha,expected);assert.equal(manifest.cacheVersion,ASSET_MANIFEST.release);}
+const server=await startServer({baseUrl});
+const bases=[['home',"showPage('home')"],['training',"showPage('training')"],['patrol',"enterMap()"],['daily',"leaveMap();vGameplayOpenDailyDungeons()"],['gameplay',"showPage('gameplay')"],['boss',"vGameplayOpenBoss()"],['tower',"vGameplayOpenTower()"],['abyss',"vGameplayOpenAbyss()"],['abyss-map20',"vGameplayOpenAbyss();v174AbyssSelectDifficulty(20)"],['abyss-map40',"vGameplayOpenAbyss();v174AbyssSelectDifficulty(40)"]];
+const measure=`(()=>{const shell=document.querySelector('.native-bottom-nav-layer'),nav=document.getElementById('bottomNav'),r=nav.getBoundingClientRect();return {visible:!shell.hidden&&getComputedStyle(shell).display!=='none',shellCount:document.querySelectorAll('.native-bottom-nav-layer').length,navCount:document.querySelectorAll('#bottomNav').length,legacy:document.querySelectorAll('#mapPageNav,#v141DungeonNav').length,context:nav.dataset.navContext,signature:nav.dataset.navSignature,buttons:[...nav.children].map(n=>n.getAttribute('onclick')),hitboxes:nav.getClientRects().length,reason:FourSymbolsBottomNav.foregroundSuppressionReason(),active:document.querySelector('#game-content .page.active')?.id};})()`;
+const rows=[];const returns=[];const results=[];
+async function run(width,height){
+ const port=9850+Math.floor(Math.random()*100),profile=fs.mkdtempSync(path.join(os.tmpdir(),'foreground-potion-'));
+ const proc=spawn(findChrome(),['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'],{stdio:'ignore'});let c;
+ try{
+ const page=(await waitJson(`http://127.0.0.1:${port}/json/list`)).find(p=>p.type==='page');c=new Cdp(page.webSocketDebuggerUrl);
+ await c.send('Page.enable');await c.send('Runtime.enable');await c.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true});
+ // Reset only this disposable transport UID in the new document, AFTER the
+ // old production pagehide autosave. Keep the real reload/startup lifecycle.
+ await c.send('Page.addScriptToEvaluateOnNewDocument',{source:"for(const key of Object.keys(localStorage)){if(key.startsWith('four_symbols_save:skill-runtime-browser-qa')||key.startsWith('four_symbols_save_meta:skill-runtime-browser-qa'))localStorage.removeItem(key);}"});
+ async function navigate(method,params){const loads=c.events.filter(e=>e.method==='Page.loadEventFired').length;await c.send(method,params);const end=Date.now()+30000;while(c.events.filter(e=>e.method==='Page.loadEventFired').length===loads){if(Date.now()>end)throw Error('Document load timeout');await new Promise(r=>setTimeout(r,50));}}
+ await navigate('Page.navigate',{url:server.url});
+ await c.send('Page.bringToFront');await c.send('Emulation.setFocusEmulationEnabled',{enabled:true});
+ await c.eval(`(async()=>{for(let i=0;i<600;i++){if(window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show'))return;await new Promise(r=>setTimeout(r,50));}throw Error('Startup/auth not ready');})()`);
+ await c.eval("closeHomeFeature();showPage('home');openHomeFeature('character')");
+ const cold=await c.eval(measure);assert.equal(cold.visible,false);assert.equal(cold.hitboxes,0);await c.eval('closeHomeFeature()');assert.equal((await c.eval(measure)).visible,true);
+ await c.eval(`(async()=>{document.querySelector('#homePage .team-relic-home-entry').click();for(let i=0;i<600;i++){if(document.getElementById('homeFeatureModal').classList.contains('team-relic-modal'))return;await new Promise(r=>setTimeout(r,50));}throw Error('Cold relic failed to open');})()`);const coldRelic=await c.eval(measure);assert.equal(coldRelic.visible,false);assert.equal(coldRelic.hitboxes,0);await c.eval('closeHomeFeature()');assert.equal((await c.eval(measure)).visible,true);
+ await c.eval(`(async()=>{for(const f of ['gameplay-core','patrol','boss-tower','abyss'])await FourSymbolsFeatures.ensure(f,'foreground-potion-qa');closeHomeFeature();showPage('home');})()`);
+ for(let pass=0;pass<2;pass++)for(const [base,action] of bases){
+  await c.eval(action);const before=await c.eval(measure);assert.equal(before.visible,true,base+' base visible');
+  const features=base==='home'?['character','inventory','relic','autoBattleSettings','shop','forge','synthesis','rest','quest','achievement','announcement','offlineExp','expPool','system','formation']:['character','inventory','relic','autoBattleSettings'];
+  for(const feature of features){
+   const open=feature==='inventory'?(base==='home'?"showPage('inventory')":"v148OpenContextInventory()"):feature==='relic'?"v148OpenContextRelic()":`openHomeFeature('${feature}')`;
+   await c.eval(open);const immediate=await c.eval(measure);assert.equal(immediate.visible,false,base+'/'+feature+' immediate');assert.equal(immediate.hitboxes,0,'hidden hitbox');
+   await c.eval('new Promise(r=>setTimeout(r,180))');const opened=await c.eval(measure);assert.equal(opened.visible,false,base+'/'+feature+' final');
+   assert.equal(await c.eval(`(()=>{const panel=document.getElementById('${feature==='inventory'?'inventoryPage':'homeFeatureModal'}');return !document.getElementById('firebaseAuthOverlay')?.classList.contains('show')&&panel.contains(document.elementFromPoint(innerWidth/2,innerHeight/2));})()`),true,base+'/'+feature+' final player foreground');
+   for(const key of ['shellCount','navCount'])assert.equal(opened[key],1);assert.equal(opened.legacy,0);
+   if(pass===0&&(['home','daily'].includes(base)||base.startsWith('abyss'))&&['character','relic','autoBattleSettings','shop'].includes(feature)){
+    const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(`${out}/foreground-${width}-${base}-${feature}.png`,Buffer.from(shot.data,'base64'));
+   }
+   await c.eval(feature==='inventory'?'closeMapInventoryOverlay()':'closeHomeFeature()');const closeImmediate=await c.eval(measure);assert.equal(closeImmediate.visible,true);await c.eval('new Promise(r=>setTimeout(r,180))');const closed=await c.eval(measure);
+   assert.equal(closed.visible,true,base+'/'+feature+' restore');assert.equal(closed.context,before.context);assert.equal(closed.signature,before.signature);assert.deepEqual(closed.buttons,before.buttons);assert.equal(closed.active,before.active);
+   if(pass===0&&feature==='inventory'){const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(`${out}/foreground-${width}-${base}-restored.png`,Buffer.from(shot.data,'base64'));}
+   rows.push({width,height,pass,base,feature,immediate,opened,closed});
+  }
+  if(base!=='home'){
+   await c.eval("document.getElementById('bottomNav').lastElementChild.click()");await c.eval('new Promise(r=>setTimeout(r,180))');const returned=await c.eval(measure);
+   const expectedContext=base==='patrol'?'training':base.startsWith('abyss-map')?'abyss-selection':['boss','tower','abyss'].includes(base)?'gameplay:gameplayPage':'main';
+   assert.equal(returned.visible,true,base+' return visible');assert.equal(returned.context,expectedContext,base+' return context');assert.equal(returned.shellCount,1);assert.equal(returned.navCount,1);assert.equal(returned.legacy,0);returns.push({width,height,pass,base,expectedContext,returned});
+  }
+ }
+ // Isolated QA-owned character attributes; all production stat getters, callers,
+ // inventory consumption and recovery rules remain the final loaded runtime.
+ const potions=await c.eval(`(async()=>{
+  closeHomeFeature();showPage('home');
+  const originalFinish=finishPlayerAction,originalAlert=window.alert,originalRpgAlert=window.rpgAlert,originalSave=saveGame;
+  const oldInventory=inventoryItems.slice(),oldHP=player.hp,oldSP=player.sp,oldBonusHP=player.bonusHP,oldBonusSP=player.bonusSP,oldConfig={...autoConfig};
+  const actualStats=getPartyBattleStats(0);player.bonusHP=(Number(player.bonusHP)||0)+4520-actualStats.maxHP;player.bonusSP=(Number(player.bonusSP)||0)+1190-actualStats.maxSP;
+  if(getPartyBattleStats(0).maxHP!==4520||getMainCharacterStats().maxHP!==4520||getPartyBattleStats(0).maxSP!==1190||getMainCharacterStats().maxSP!==1190)throw Error('Natural character fixture maxima mismatch');
+  // Suppress only test feedback/save/action completion; do not replace a recovery or stock owner.
+  finishPlayerAction=()=>{};window.alert=()=>{};window.rpgAlert=async()=>true;saveGame=()=>true;
+  Object.assign(autoConfig,{enabled:true,hp:100,sp:100,returnToCityWhenEmpty:false});
+  const rows=[];
+  try{
+   for(const route of ['battle','inventory-single','inventory-batch','post-battle','element-box']){
+    for(const [id,resource,start,expected] of [['hpPotion10','hp',4000,4066],['hpPotion10','hp',4500,4520],['spPotion10','sp',1000,1066],['spPotion10','sp',1170,1190],['hpPotion20','hp',3000,3904],['hpPotion30','hp',3000,4356],['spPotion20','sp',500,738],['spPotion30','sp',500,857],['nineTurnRestorationPill','hp',4000,4520],['taichingQiPill','sp',1000,1190]]){
+     if((route==='post-battle'||route==='element-box')&&getPotionDefinition(id).manualOnly)continue;
+     inventoryItems.splice(0,inventoryItems.length);addPotionToInventory(id,route==='inventory-batch'?2:1);player.hp=4520;player.sp=1190;player[resource]=start;
+     rebuildInventorySlots();inventoryCharacterIndex=0;
+     if(route==='battle')applyPotionEffect(id,0);
+     else if(route==='inventory-single')v17342UseInventoryPotion(inventorySlots.findIndex(item=>item?.id===id));
+     else if(route==='inventory-batch'){showPage('inventory');setInventoryFilter('potion');renderInventory();openItemModal(inventorySlots.findIndex(item=>item?.id===id));document.getElementById('v17350BatchQuantity').value='1';await v17350RunBatchAction();closeItemModal();closeMapInventoryOverlay();}
+     else if(route==='post-battle')applyPostBattleAutoRecovery();
+     else v154FinishAutoRecovery();
+     rows.push({route,id,start,expected,actual:player[resource],stock:getPotionCount(id),expectedStock:route==='inventory-batch'?1:0});
+    }
+   }
+   // Batch stops at cap and consumes only necessary quantities.
+   inventoryItems.splice(0,inventoryItems.length);addPotionToInventory('hpPotion10',10);player.hp=4400;showPage('inventory');setInventoryFilter('potion');renderInventory();openItemModal(inventorySlots.findIndex(item=>item?.id==='hpPotion10'));document.getElementById('v17350BatchQuantity').value='10';await v17350RunBatchAction();rows.push({route:'batch-cap',actual:player.hp,expected:4520,stock:getPotionCount('hpPotion10'),expectedStock:8});closeItemModal();closeMapInventoryOverlay();
+   const guards=[];for(const route of ['post-battle','element-box']){inventoryItems.splice(0,inventoryItems.length);for(const id of ['nineTurnRestorationPill','taichingQiPill','hpPotion10','spPotion10'])addPotionToInventory(id,1);player.hp=4000;player.sp=1000;if(route==='post-battle')applyPostBattleAutoRecovery();else v154FinishAutoRecovery();guards.push({route,hp:player.hp,sp:player.sp,rareHP:getPotionCount('nineTurnRestorationPill'),rareSP:getPotionCount('taichingQiPill'),hpStock:getPotionCount('hpPotion10'),spStock:getPotionCount('spPotion10')});}
+   inventoryItems.splice(0,inventoryItems.length,{id:'hpPotion10',type:'potion',count:321,recoveryPercent:10},{id:'spPotion10',type:'potion',count:456,recoveryPercent:10});normalizePotionInventoryFromLegacy({});
+   const legacy={hp:getPotionCount('hpPotion10'),sp:getPotionCount('spPotion10'),items:inventoryItems.map(x=>({id:x.id,mode:x.recoveryMode,value:x.recoveryValue,percent:x.recoveryPercent}))};
+   const shop=renderShopContent();
+   return {rows,guards,legacy,shopFlat:shop.includes('恢復 66 HP')&&shop.includes('恢復 66 SP'),oldShopNote:shop.includes('10%、20%、30%'),descriptions:['hpPotion10','spPotion10','hpPotion20','hpPotion30','spPotion20','spPotion30'].map(getPotionEffectDescription)};
+  }finally{finishPlayerAction=originalFinish;window.alert=originalAlert;window.rpgAlert=originalRpgAlert;saveGame=originalSave;inventoryItems.splice(0,inventoryItems.length,...oldInventory);player.hp=oldHP;player.sp=oldSP;player.bonusHP=oldBonusHP;player.bonusSP=oldBonusSP;Object.assign(autoConfig,oldConfig);rebuildInventorySlots();}
+ })()`);
+ for(const row of potions.rows){assert.equal(row.actual,row.expected,JSON.stringify(row));assert.equal(row.stock,row.expectedStock??0,JSON.stringify(row));}
+ for(const guard of potions.guards)assert.deepEqual(guard,{route:guard.route,hp:4066,sp:1066,rareHP:1,rareSP:1,hpStock:0,spStock:0});
+ assert.equal(potions.legacy.hp,321);assert.equal(potions.legacy.sp,456);assert.ok(potions.legacy.items.every(x=>x.mode==='flat'&&x.value===66&&x.percent===undefined));assert.equal(potions.shopFlat,true);assert.equal(potions.oldShopNote,false);
+ results.push({width,height,cold,coldRelic,potions,reload:false});console.log('Actual potion settlement PASS',width,JSON.stringify(potions));
+ await c.eval("showPage('home');openHomeFeature('character')");await navigate('Page.reload',{ignoreCache:true});await c.send('Page.bringToFront');await c.eval(`(async()=>{for(let i=0;i<600;i++){if(window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show')){closeHomeFeature();showPage('home');return;}await new Promise(r=>setTimeout(r,50));}throw Error('Reload startup/auth not ready '+JSON.stringify({state:window.FourSymbolsStartupPolicy?.getState?.(),error:String(window.FourSymbolsStartupPolicy?.getLastError?.()?.message||''),text:document.body.innerText.slice(0,1000)}));})()`);assert.equal((await c.eval(measure)).visible,true);
+ results.at(-1).reload=true;
+ }finally{c?.close();proc.kill('SIGKILL');fs.rmSync(profile,{recursive:true,force:true});}
+}
+try{for(const [w,h] of [[390,844],[412,915]])await run(w,h);const result={passed:true,expected,environment:baseUrl?'deployed-dev':'local-production',rows,returns,results};fs.writeFileSync(`${out}/foreground-potion-qa.json`,JSON.stringify(result,null,2)+'\n');console.log('Foreground/Potion QA PASS',rows.length,'panel transitions',results.map(x=>x.potions.rows.length));}
+catch(error){fs.writeFileSync(`${out}/foreground-potion-qa.json`,JSON.stringify({passed:false,error:String(error.stack),rows,returns,results},null,2));throw error;}
+finally{await new Promise(r=>server.server.close(r));}

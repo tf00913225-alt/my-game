@@ -198,6 +198,28 @@ jobs:
             sudo apt-get install --yes --no-install-recommends fonts-noto-cjk
           fi
 
+      - name: Run canonical bottom navigation and fixed home browser QA
+        id: bottom_nav_home_browser
+        env:
+          EXPECTED_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        if: success() && github.event_name == 'pull_request'
+        run: |
+          node tests/bottom-nav-home-scroll-browser.test.js
+          node tests/starter-potion-recovery.test.js
+          node .github/scripts/run-foreground-potion-browser-qa.mjs
+
+      - name: Upload bottom navigation and home geometry evidence
+        if: always() && steps.bottom_nav_home_browser.outcome != 'skipped'
+        uses: actions/upload-artifact@v4
+        with:
+          name: bottom-nav-home-geometry-${{ github.sha }}
+          path: |
+            artifacts/browser-qa/bottom-nav-home-scroll-qa.json
+            artifacts/browser-qa/foreground-*
+            artifacts/browser-qa/navigation-*.png
+          if-no-files-found: error
+          retention-days: 90
+
       - name: Run Daily Dungeon WebP decode and lifecycle browser QA
         id: daily_dungeon_webp_browser
         env:
@@ -299,22 +321,6 @@ jobs:
         with:
           name: touch-scroll-navigation-browser-qa-${{ github.sha }}
           path: artifacts/browser-qa/touch-scroll-navigation-browser-qa.json
-          if-no-files-found: error
-          retention-days: 90
-
-      - name: Run canonical bottom navigation and fixed home browser QA
-        id: bottom_nav_home_browser
-        if: success() && github.event_name == 'pull_request'
-        run: node tests/bottom-nav-home-scroll-browser.test.js
-
-      - name: Upload bottom navigation and home geometry evidence
-        if: always() && steps.bottom_nav_home_browser.outcome != 'skipped'
-        uses: actions/upload-artifact@v4
-        with:
-          name: bottom-nav-home-geometry-${{ github.sha }}
-          path: |
-            artifacts/browser-qa/bottom-nav-home-scroll-qa.json
-            artifacts/browser-qa/navigation-*.png
           if-no-files-found: error
           retention-days: 90
 

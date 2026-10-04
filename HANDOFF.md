@@ -1,3 +1,14 @@
+## 2026-10-04 — FOREGROUND-NAV-STARTER-POTION-20261004（功能2/2 VERIFIED；整合／部署待Gate）
+
+- 開工 dev `f47862cc592870e359d31da5da52a5d530c831a8`；分支 `fix/foreground-nav-starter-potion-20261004`；Target dev；main `f63d69dbfa66ba75637d1c3cd7fcc7d74782e356` 禁止修改；本工作 PR 為最新狀態 Owner。
+- Convergence / Replacement。Bottom Nav Owner 仍為 `js/04-stage-v11-native-bottom-nav-runtime.js::FourSymbolsBottomNav`；foregroundSuppressionReason 只讀 homeFeatureModal.show、背包語意與 itemModal presentation。正式 show / close lifecycle 同步通知，renderMain/renderContext 也尊重 suppression。無新 timer/observer/rAF/CSS/z-index/DOM/Owner。
+- 盤點發現背包關閉舊路徑將 dungeon 跳玩法總覽、map 離開巡怪，違反本批 restore-source 產品規格。context 在進入前保存；close restore-source 回真正 source，showPage restoreSource 避免重置 dungeon/Boss Tab；Abyss compatibility lifecycle 不因 context inventory 暫離而清除 map visit。原 navigation/leave 行為只作非 restore-source 相容用途。
+- Potion Data Owner 維持 V144 ensurePotion；app-shell starter 定義亦為 flat66。Canonical rule `js/00-main.js::resolvePotionRecovery`，戰鬥/背包單次/批次/戰後/元素匣全部委派。flat/percent/full 明確區分，legacy recoveryPercent 只允許舊百分比/full 定義讀相容，flat metadata 實體移除。ID/數量不變；20/30 與100稀有保持。Auto selection 原 Adventure manualOnly guard 保留，其排序讀 canonical priority；不承擔 recovery 公式。內容/樣式/保存用途原 Wrapper 保留，未新增 Wrapper。
+- 正式Chrome功能證據：Head e08fdec08d69095b65e6bd464849441e2e03354c／CI37182829899 Nav/Potion step PASS；390/412共204次前景開關、36次正式返回，cold/lazy/reload、10種Base（含深淵20/40地圖）、Shell1/Nav1/legacy0/hidden零hitbox/正確頁面與handlers均PASS。五入口共94個實際HP/SP/扣庫存案例＋4個稀有auto guard均PASS：4066/4520、1066/1190、20/30%保持、batch-cap餘8、舊321/456量不變。artifact11296230697 SHA256 c78d148d376297bc557a177ec266fc66712497d0f1dd566d1a588ffbe32c8e6e獨立核對，正式角色／商店與深淵恢復截圖已檢視；證據與責任退場見 docs/foreground-nav-starter-potion-browser-evidence-20261004.json／docs/FOREGROUND_NAV_STARTER_POTION_20261004.md。
+- 更新舊鍛造QA（原可見Nav邊界不符新產品契約）；fixture使用自然bonus屬性而非替換stats getter，等待帳號遮罩退出／新Document、在pagehide後還原disposable UID，保留真實玩家hit test/Reload。功能2/2 VERIFIED；最終metadata-head必要CI、PR#794→dev、最新dev／部署SHA／線上同矩陣／安全清理仍為獨立Gate，由PR#794保持耐久最新狀態。Game/Cache173.73；main不修改。
+
+- 整合 checkpoint：候選Head49970cb7必要CI37183247827 SUCCESS後，dev已由並行#793前進至dbe58d74f0c13be871512d880cb8dc2e377eab5d。正常merge吸收Phase2D，保留雙方需求／交接／QA與部署入口，hashed build由合併後正式source重建；不rebase或force push。新的整合Head CI／同矩陣與dev部署Gate仍由PR#794追蹤。
+
 ## 2026-10-04 — Monster Balance Owner Phase2D Abyss / FUNCTIONAL VERIFIED / PR #793
 
 Work ID `MONSTER-BALANCE-OWNER-P2D-ABYSS-20261004`; branch `feature/monster-balance-owner-phase2d-abyss-20261004`, target dev.

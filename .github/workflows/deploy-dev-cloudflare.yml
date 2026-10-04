@@ -116,13 +116,16 @@ jobs:
         run: |
           node .github/scripts/run-responsive-item-browser-qa.mjs
           node .github/scripts/run-forge-sockets-browser-qa.mjs
+          QA_BASE_URL="$DEV_BASE_URL" node .github/scripts/run-foreground-potion-browser-qa.mjs
 
       - name: Upload deployed Responsive Item evidence
         if: always() && steps.responsive_item_live.outcome != 'skipped'
         uses: actions/upload-artifact@v4
         with:
           name: responsive-item-live-qa-${{ github.sha }}
-          path: artifacts/browser-qa/responsive-item/
+          path: |
+            artifacts/browser-qa/responsive-item/
+            artifacts/browser-qa/foreground-*
           if-no-files-found: error
           retention-days: 90
 

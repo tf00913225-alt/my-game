@@ -1366,6 +1366,7 @@
             nodes.modal.classList.remove("v131-shop-open");
         }
         nodes.modal.classList.add("show","team-relic-modal");
+        window.FourSymbolsBottomNav?.syncContext();
         const box=nodes.modal.querySelector(".home-feature-modal-box"); if(box){ box.classList.add("wide"); }
         if(nodes.title){ nodes.title.textContent="秘 寶"; }
         const close=nodes.modal.querySelector(".home-feature-close-btn"); if(close){ close.setAttribute("aria-label","返回主城"); close.title="返回主城"; }

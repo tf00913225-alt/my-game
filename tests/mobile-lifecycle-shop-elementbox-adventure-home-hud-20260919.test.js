@@ -143,7 +143,9 @@ function recoveryHarness({hp,sp=100,hpPotion=true,spPotion=true,returnToCityWhen
         battleActive:false
     };
     context.window=context;
-    vm.runInNewContext(source,context,{filename:"element-box-recovery-snippet.js"});
+    const rule=main.slice(main.indexOf("function getPotionRecoveryContract("),main.indexOf("function createPotionInventoryItem("));
+    vm.createContext(context);vm.runInContext(rule,context);
+    vm.runInContext(source,context,{filename:"element-box-recovery-snippet.js"});
     return {context,character,get hpAttempts(){return hpAttempts;},get spAttempts(){return spAttempts;}};
 }
 
