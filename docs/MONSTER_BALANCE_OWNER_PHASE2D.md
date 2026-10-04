@@ -71,7 +71,7 @@ Lv40 same-level16/25, final40 still defeated Lv60 reference. Baseline source is
 f47862cc. Intermediate candidate results were discarded; baseline and final evidence are retained.
 
 Calibrated profiles: mode HP0.45, SP1, defense1, speed1, damage pressure0.22;
-true-realm final pressure0.18, no additional final HP factor.
+true-realm final pressure0.18 and final HP factor0.90 (only the Lv40 extreme final).
 Stage HP factors0.90/0.95/1/1.05/1.10 are projected inside MonsterBalance.
 Rank Regular HP/SP/defense/pressure1; Elite1.8/1.5/1.15/1.1;
 smallBoss3.2/2/1.25/1.2. Raw attack conversion and point budget are unchanged.
@@ -85,9 +85,9 @@ Skill chance/loadouts remain at their existing values. Pre-stage soldiers map ba
 south emperors physical, east/heaven/north magic, extreme support. No random archetype.
 First-round and final player HP, resources, enemy stats, skills and status evidence are retained.
 A second150-case seeded LCG matrix exercises real skill/AI probability draws:149
-clear+survivor, only bare Lv40 final loses in10 rounds. Both policies total300 cases,
-298 clears; aggregated encounter ranges Regular1–8, Elite1–12, smallBoss2–12.
-Seeded cases record the seed and actual hard-control rolls (2 attempts /1 hit);
+clear+survivor, only bare Lv40 final loses in9 rounds. Both policies total300 cases,
+298 clears; aggregated encounter ranges Regular1–9, Elite1–12, smallBoss2–12.
+Seeded cases record the seed and actual hard-control rolls (5 attempts /0 hits);
 neutral cases record10 attempts /0 hits. These are formula-owner observations,
 not deductions from skill names. No first-round wipe under either policy.
 
@@ -106,7 +106,7 @@ No skill IDs, stats, damage math, status math, victory or reward are fabricated.
 Actual portrait image decode,804000 skill-decision boundary draws, control states,
 healing and natural results are recorded. Chrome completion is still pending.
 
-Focused7/7, related48/48, syntax365/365, build:check and deprecated gates PASS locally.
+Focused8/8, related48/48, syntax365/365, build:check and deprecated gates PASS locally.
 Production Chrome and final CI remain pending. Combat Rock Wall intentionally changes
 visible shield-inclusive maxHP under the existing Status Owner; QA checks baseMaxHP
 against projection and verifies the separate shield amount. This is combat execution,
@@ -125,3 +125,36 @@ deployed Abyss QA and safe absorbed branch cleanup. Main untouched; no Phase2E.
 The formal Slot Owner defines every eight-unit encounter as three back slots (B2/B3/B4) and five front slots. Rank ordering places the single emperor at B3 with two elites in back and five elites in front. The older 59 metadata describes five back / three front for ordinary emperor stages, but the final geometry adapter uses the canonical snapshot, not this metadata. Phase 2D preserves this actual runtime contract. Chrome QA compares every card against a fresh snapshot from the unchanged Slot Owner and checks the central emperor and no death reflow; metadata is not treated as a second geometry authority.
 
 Chrome Status Owner audit: V155 Rock Wall stores `originalDefense` and applies the existing skill-level defense percentage during combat. QA verifies the stored original against MonsterBalance and the exact live defense against the official skill percentage; base-stat comparisons use that original while the legal buff exists. This does not allow unregistered defense mutations. A zero-quantile random boundary probe at one naturally attempted enemy hard-control roll exercises the unchanged hit formula and status execution; the calculated chance/cap and actual result are recorded. No status is injected.
+
+## Skill-owner continuity correction — 2026-10-04 resume
+
+Source a1fbc94890b77f14142390ca512bca27f09c901c had passed Abyss Chrome14 scenes
+and its own focused7/7, but independent starting-dev metadata comparison found
+the candidate skipped configureBuiltMonster before the Abyss marker. Regular
+Lv20 soldiers incorrectly retained two skills instead of the original one;
+Lv40 carry selection also bypassed V144. That source is superseded and its
+Chrome evidence is historical only, not evidence for the corrected source.
+
+The existing V141/V144 carry/selection hooks now run before the Abyss marker
+and explicit emperor/final overrides, exactly as the former constructor did.
+No stat builder is called. A new regression compares all50 encounters /402
+entities' names, levels, elements, skill lists, support lists and frequency
+against the immutable starting-dev baseline under its neutral random policy.
+Projection stability is asserted independently of legitimate random skills
+and the skill-owner encounter sequence; archetypes remain deterministic.
+
+Restoring the original random skill draws exposed one seeded Lv50 final
+35-round defeat: emperors died, but surviving healing soldiers replenished
+resources after the reference party exhausted SP. The sole final HP factor
+was calibrated from1 to0.90 inside MonsterBalance; no extra pressure, new AI,
+skill or post-writer was added. Both renewed150-case matrices PASS,298/300
+clear+survivor, only bare Lv40 final losses7/9 remain. Final Lv50 references
+clear in4 rounds, Lv60 in2/3; no first-round wipe. Existing aggregate rank
+ranges and full before/after HP/stat/control evidence remain in the reports.
+
+The prior dev deployment Job111348933484 actually took18m34s without Abyss QA;
+Abyss Job111365559651 took about16m for its production Chrome. The combined
+25-minute deployment allowance was insufficient, so the same deployment job
+has45 minutes with every existing gate retained. Requirement remains
+IMPLEMENTED until the corrected source passes renewed full CI and Chrome.
+No integration or deployment claim; PR#793 remains the live closeout owner.

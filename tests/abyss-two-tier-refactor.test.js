@@ -70,6 +70,9 @@ function load(options={}){
     vm.runInContext(fs.readFileSync("js/00-main.js","utf8").split("/* END GENERATED MONSTER BALANCE OWNER */")[0]+"/* END GENERATED MONSTER BALANCE OWNER */",context);
     context.getMonsterSkillPoolForLevel=(element,level)=>[element+"Skill"];
     context.getMonsterSkillTierAndChance=()=>({chance:.35});
+    // Use the real core hook dispatcher; this isolated progression fixture has no skill hooks.
+    const coreSource=fs.readFileSync("js/00-main.js","utf8");
+    vm.runInContext(coreSource.slice(coreSource.indexOf("function configureBuiltMonster("),coreSource.indexOf("function makeLegacyModeMonster(")),context);
     vm.runInContext(source,context,{filename:"js/59-abyss-two-tier-runtime.js"});
     return {
         context,localStorage,playerEl,mapEl,

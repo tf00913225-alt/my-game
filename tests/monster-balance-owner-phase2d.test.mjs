@@ -22,7 +22,7 @@ test('all 50 formal encounters / 402 projections / 14 identities are stable and 
   const identities=new Map();let projections=0;
   for(const level of [20,40])for(let region=0;region<5;region++)for(let stage=0;stage<5;stage++){
     const roster=c.v174AbyssBuildRoster(level,region,stage),again=c.v174AbyssBuildRoster(level,region,stage);
-    assert.deepEqual(plain(roster),plain(again));
+    assert.deepEqual(plain(roster.map(m=>m.balanceProjection)),plain(again.map(m=>m.balanceProjection)));
     assert.equal(roster.length,level===40&&region===4&&stage===4?10:8);
     assert.equal(roster.filter(m=>m.rank==='smallBoss').length,stage<4?0:level===40&&region===4?5:1);
     for(const m of roster){
@@ -48,6 +48,25 @@ test('Abyss rank changes final profiles without changing points; invalid context
     assert.throws(()=>MonsterBalance.build({...spec,rank:'boss'}));
     assert.throws(()=>MonsterBalance.build({...spec,rank:'regular',level:30}));
     assert.throws(()=>MonsterBalance.build({...spec,rank:'regular',context:'wrong'}));
+  }
+});
+test('formal Abyss carried skills and frequency retain the starting dev baseline',()=>{
+  const {context:c}=loadLegacyRuntime();
+  vm.runInContext('Math.random=()=>.5',c);
+  const baseline=JSON.parse(fs.readFileSync('docs/monster-balance-abyss-baseline-20261004.json','utf8'));
+  assert.equal(baseline.sourceHead,'f47862cc592870e359d31da5da52a5d530c831a8');
+  const encounters=baseline.rows.filter(row=>row.partyLevel===row.difficulty);
+  assert.equal(encounters.length,50);
+  for(const row of encounters){
+    const actual=c.v174AbyssBuildRoster(row.difficulty,row.region,row.stage);
+    assert.equal(actual.length,row.initialMonsters.length);
+    for(let i=0;i<actual.length;i++){
+      const m=actual[i],old=row.initialMonsters[i];
+      c.v144ConfigureMonsterEncounterSkills(m);
+      assert.deepEqual(plain({name:m.name,level:m.level,element:m.element,skillFrequency:m.skillChance,skillIds:m.skillIds,supportIds:m.v141SupportSkillIds||[]}),
+        {name:old.name,level:old.level,element:old.element,skillFrequency:old.skillFrequency,skillIds:old.skillIds,supportIds:old.supportIds});
+      assertProjection(m);
+    }
   }
 });
 test('pressure is consumed exactly once despite legacy-looking compatibility flags',()=>{

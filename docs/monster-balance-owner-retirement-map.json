@@ -419,6 +419,13 @@
       "personalBoss",
       "worldBoss"
     ],
-    "stopAfter": "Phase 2D Abyss"
+    "stopAfter": "Phase 2D Abyss",
+    "skillOwnerContinuity": "Original configureBuiltMonster V141/V144 carry/selection hooks preserved before Abyss marker; immutable baseline checks all402 metadata.",
+    "calibration": {
+      "modeHp": 0.45,
+      "modePressure": 0.22,
+      "trueRealmFinalHp": 0.9,
+      "trueRealmFinalPressure": 0.18
+    }
   }
 }

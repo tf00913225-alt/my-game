@@ -9,7 +9,7 @@ export const DAILY_PARTY_DURABILITY=Object.freeze({1:0.04,2:0.08,3:0.12});
 export const DAILY_MODE_PROFILE=Object.freeze({hp:1,defense:1,damage:1,sp:1,skillFrequency:1});
 // Ten-enemy Tower calibration: keep raw six-stat conversion and rank ratios intact.
 export const TOWER_MODE_PROFILE=Object.freeze({hp:0.2,sp:1,damage:0.25,defense:1,speed:1});
-export const ABYSS_MODE_PROFILE=Object.freeze({hp:0.45,sp:1,damage:0.22,defense:1,speed:1,trueRealmFinalDamage:0.18,trueRealmFinalHp:1});
+export const ABYSS_MODE_PROFILE=Object.freeze({hp:0.45,sp:1,damage:0.22,defense:1,speed:1,trueRealmFinalDamage:0.18,trueRealmFinalHp:0.9});
 export const ABYSS_RANK_PROFILES=Object.freeze({
   regular:Object.freeze({hp:1,sp:1,defense:1,finalDamagePressure:1}),
   elite:Object.freeze({hp:1.8,sp:1.5,defense:1.15,finalDamagePressure:1.1}),

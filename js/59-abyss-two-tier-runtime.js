@@ -359,6 +359,9 @@
         // Preserve the existing skill-pool/frequency owner without calling a stat builder.
         monster.skillIds=getMonsterSkillPoolForLevel(element,config.monsterLevel).slice();
         monster.skillChance=getMonsterSkillTierAndChance(config.monsterLevel).chance;
+        // Preserve the former constructor's skill carry/selection hooks before
+        // marking Abyss or applying its explicit emperor/final loadout.
+        configureBuiltMonster(monster);
         monster.v141Abyss=true;
         monster.v174TwoTierAbyss=true;
         monster.v174AbyssDifficulty=config.id;

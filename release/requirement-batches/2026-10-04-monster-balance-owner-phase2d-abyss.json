@@ -24,7 +24,7 @@
           "docs/monster-balance-abyss-ttk-seeded-evidence-20261004.json",
           ".github/scripts/run-abyss-live-browser-qa.mjs"
         ],
-        "verification": "Focused7/7,50 encounters/402 projections/14 stable identities. Neutral150 and seeded150 diagnostics:298 clear+survivor,2 explicit bare Lv40 final losses7/10 rounds; both formal challenge gates PASS, no first-round wipe. Existing related regressions/build/deprecated/syntax PASS. Chrome/latest-head CI pending.",
+        "verification": "Focused8/8,50 encounters/402 projections/14 stable identities; all402 carried-skill metadata matches immutable starting dev. Renewed neutral150+seeded150:298 clear+survivor,2 explicit bare Lv40 final losses7/9 rounds; formal challenge gates PASS, no first-round wipe. Earlier a1fbc948 Chrome is superseded; corrected source production Chrome and latest-head full CI pending.",
         "result": "IMPLEMENTED; no VERIFIED until all formal gates pass. Stop before Phase2E; main untouched."
       }
     }
