@@ -91,11 +91,19 @@ const expression=`(async()=>{
     await endBattle();
     // Observe the existing owner during actual manual / auto / enemy resolution.
     const owner=calculateHitChancePercent,calls=[];
-    calculateHitChancePercent=function(...args){const result=owner(...args);calls.push({args:args.slice(0,4),chance:result});return result;};
+    calculateHitChancePercent=function(...args){const result=owner(...args);calls.push({args:args.slice(0,4),chance:result,side:args[4]?"monster":"player"});return result;};
     const combat={};
     try{
         await freshMonsters();selectedMonster=0;normalAttack();combat.manual=calls.splice(0);
-        autoBattle=true;autoConfig.skill="normal";autoActionForCharacter(0,battleToken);autoBattle=false;resolveQueuedPlayerAction(0,battleToken);combat.autoResolution=calls.splice(0);
+        await endBattle();await freshMonsters();calls.splice(0);
+        // Use the same time entitlement and toggle as real auto battle. Declaration,
+        // initiative and animation must reach the player Hit Owner before inspection.
+        v131GrantElementBoxHours(8,32);autoConfig.skill="normal";toggleAutoBattle();
+        const autoDeadline=Date.now()+15000;
+        while(!calls.some(call=>call.side==="player")&&battleActive&&Date.now()<autoDeadline)await new Promise(r=>setTimeout(r,30));
+        if(!calls.some(call=>call.side==="player"))throw new Error("Natural auto player action did not reach Hit Owner: "+JSON.stringify({battleActive,battlePhase,autoBattle,turn,queued:queuedPlayerActions[0],calls}));
+        if(autoBattle)toggleAutoBattle();combat.autoResolution=calls.splice(0).filter(call=>call.side==="player");
+        await endBattle();await freshMonsters();calls.splice(0);
         monsters[0].skillChance=0;monsters[0].skill=null;monsters[0].skills=[];processSingleMonsterAttack(0,battleToken);combat.monster=calls.splice(0);
     }finally{calculateHitChancePercent=owner;await endBattle();}
     return {wind,lowCap,levels,calm,dodge,set:{one,three,two,armor},detail,migrated,repeated,legacyArmor,tower,frostbite,feather,relicFrostbite,bell,blessing,combat,casts,
