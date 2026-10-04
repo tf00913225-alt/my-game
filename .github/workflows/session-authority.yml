@@ -46,10 +46,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: '22'
+          package-manager-cache: false
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -59,7 +60,7 @@ jobs:
       - run: node --test tests/cloud-save-*.test.mjs tests/firebase-trusted-cloud-save-backend.test.mjs
       - name: Verify account boot with session backend unavailable
         run: node .github/scripts/run-boot-architecture-browser-qa.mjs
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: session-authority-boot-${{ github.sha }}
@@ -79,7 +80,7 @@ jobs:
       group: firebase-native-auth-backend
       cancel-in-progress: false
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Require current dev and its Repository checks
         env:
           GH_TOKEN: ${{ github.token }}
@@ -160,9 +161,10 @@ jobs:
           else
             echo 'Restore drill leftovers: UNVERIFIED (database list unavailable)' | tee -a "$GITHUB_STEP_SUMMARY"
           fi
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: '22'
+          package-manager-cache: false
       - run: npm --prefix functions ci --no-audit --no-fund
       - name: Deploy protected cloud endpoints and deny-write rules
         shell: bash

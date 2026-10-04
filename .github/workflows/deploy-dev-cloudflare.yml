@@ -28,15 +28,16 @@ jobs:
 
     steps:
       - name: Checkout exact release commit
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: ${{ github.sha }}
           fetch-depth: 1
 
       - name: Use current Node.js LTS
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: "24"
+          package-manager-cache: false
 
       - name: Confirm this commit is still dev HEAD
         shell: bash
@@ -120,7 +121,7 @@ jobs:
 
       - name: Upload deployed Responsive Item evidence
         if: always() && steps.responsive_item_live.outcome != 'skipped'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: responsive-item-live-qa-${{ github.sha }}
           path: |
@@ -136,7 +137,7 @@ jobs:
 
       - name: Upload battle layout and VFX live QA evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: battle-layout-vfx-live-qa-${{ github.sha }}
           path: |
@@ -153,7 +154,7 @@ jobs:
 
       - name: Upload deployed Tower balance evidence
         if: always() && steps.tower_balance_live.outcome != 'skipped'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: tower-balance-live-qa-${{ github.sha }}
           path: artifacts/browser-qa/tower-challenge*
@@ -166,7 +167,7 @@ jobs:
 
       - name: Upload deployed Abyss balance evidence
         if: always() && steps.abyss_balance_live.outcome != 'skipped'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: abyss-balance-live-qa-${{ github.sha }}
           path: artifacts/browser-qa/abyss-balance*
@@ -174,7 +175,7 @@ jobs:
           retention-days: 90
 
       - name: Upload final release manifest
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: release-manifest-${{ github.sha }}
           path: release-manifest.final.json
