@@ -79,3 +79,15 @@ test('288 frozen starting-dev projections preserve every prior-mode numerical pr
  assert.deepEqual([...new Set(evidence.rows.map(r=>r.spec.mode))].sort(),['abyss','adventure','daily','tower','wild']);
  for(const row of evidence.rows){const p=MonsterBalance.preview(row.spec);assert.deepEqual(p.allocation,row.allocation);assert.deepEqual(p.final,row.final);assert.equal(p.finalDamagePressure,row.pressure);}
 });
+
+test('all thirteen Boss definitions, four stage gameplay schedules and six objects preserve the starting-dev contract',()=>{
+ const c=loadBossDiagnostic(),baseline=JSON.parse(fs.readFileSync('tests/fixtures/monster-balance-p2f-boss-gameplay.json','utf8'));
+ assert.equal(baseline.sourceHead,'9fff3664d2767739fe8cd5c893f2985f8032d5ef');
+ assert.deepEqual(plain(c.GameplaySystem.personalBosses),baseline.PERSONAL_BOSSES);
+ assert.deepEqual(plain(c.GameplaySystem.worldBosses),baseline.WORLD_BOSSES);
+ assert.deepEqual(plain(c.GameplaySystem.worldStageProfiles),baseline.WORLD_STAGE_PROFILES);
+ assert.deepEqual(plain(c.GameplaySystem.objects),baseline.BOSS_OBJECT_DEFINITIONS);
+ const map=JSON.parse(fs.readFileSync('docs/monster-balance-owner-retirement-map.json','utf8'));
+ assert.ok(map.items.every(item=>['RETIRED','KEEP','MIGRATED'].includes(item.status)));
+ assert.deepEqual(map.phase2fGate.remainingLegacyModes,[]);
+});

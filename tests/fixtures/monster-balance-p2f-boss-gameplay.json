@@ -1,0 +1,484 @@
+{
+  "sourceHead": "9fff3664d2767739fe8cd5c893f2985f8032d5ef",
+  "PERSONAL_BOSSES": [
+    {
+      "id": "personal-20",
+      "name": "赤焰君",
+      "level": 20,
+      "element": "fire",
+      "phases": 1,
+      "traits": [
+        "護盾",
+        "燃燒"
+      ],
+      "objects": [
+        {
+          "round": 2,
+          "type": "shield"
+        }
+      ],
+      "firstReward": "首通金幣 1,200・藍階礦石 ×2",
+      "repeatReward": "金幣 260・白階礦石",
+      "firstGold": 1200,
+      "repeatGold": 260,
+      "ore": "oreLow",
+      "firstOre": 2
+    },
+    {
+      "id": "personal-30",
+      "name": "獄火侯",
+      "level": 30,
+      "element": "fire",
+      "phases": 1,
+      "traits": [
+        "蓄力",
+        "燃燒",
+        "精英援軍"
+      ],
+      "objects": [
+        {
+          "round": 2,
+          "type": "charge"
+        },
+        {
+          "round": 6,
+          "type": "charge"
+        }
+      ],
+      "summon": {
+        "hpBelow": 0.5
+      },
+      "firstReward": "首通金幣 1,800・藍階礦石 ×2",
+      "repeatReward": "金幣 380・藍階礦石",
+      "firstGold": 1800,
+      "repeatGold": 380,
+      "ore": "oreMid",
+      "firstOre": 2
+    },
+    {
+      "id": "personal-40",
+      "name": "凍海君",
+      "level": 40,
+      "element": "water",
+      "phases": 2,
+      "traits": [
+        "回復",
+        "凍傷"
+      ],
+      "objects": [
+        {
+          "round": 2,
+          "type": "heal"
+        },
+        {
+          "hpBelow": 0.5,
+          "type": "charge"
+        }
+      ],
+      "firstReward": "首通金幣 2,600・紫階礦石 ×2",
+      "repeatReward": "金幣 520・紫階礦石",
+      "firstGold": 2600,
+      "repeatGold": 520,
+      "ore": "oreHigh",
+      "firstOre": 2
+    },
+    {
+      "id": "personal-50",
+      "name": "霜淵侯",
+      "level": 50,
+      "element": "water",
+      "phases": 2,
+      "traits": [
+        "護盾",
+        "回復",
+        "凍傷",
+        "精英援軍"
+      ],
+      "objects": [
+        {
+          "round": 2,
+          "type": "shield"
+        },
+        {
+          "hpBelow": 0.45,
+          "type": "heal"
+        }
+      ],
+      "summon": {
+        "round": 4
+      },
+      "firstReward": "首通金幣 3,400・紫階礦石 ×3",
+      "repeatReward": "金幣 660・紫階礦石",
+      "firstGold": 3400,
+      "repeatGold": 660,
+      "ore": "oreHigh",
+      "firstOre": 3
+    },
+    {
+      "id": "personal-60",
+      "name": "雪獄尊",
+      "level": 60,
+      "element": "water",
+      "phases": 3,
+      "traits": [
+        "護盾",
+        "蓄力",
+        "凍傷"
+      ],
+      "objects": [
+        {
+          "round": 2,
+          "type": "shield"
+        },
+        {
+          "round": 5,
+          "type": "charge"
+        },
+        {
+          "hpBelow": 0.35,
+          "type": "charge"
+        }
+      ],
+      "firstReward": "首通金幣 4,300・橙階礦石 ×2",
+      "repeatReward": "金幣 820・紫階礦石",
+      "firstGold": 4300,
+      "repeatGold": 820,
+      "ore": "orePerfect",
+      "firstOre": 2
+    },
+    {
+      "id": "personal-70",
+      "name": "寒劫尊",
+      "level": 70,
+      "element": "water",
+      "phases": 3,
+      "traits": [
+        "回復",
+        "增幅",
+        "控制",
+        "精英援軍"
+      ],
+      "objects": [
+        {
+          "round": 2,
+          "type": "heal"
+        },
+        {
+          "round": 5,
+          "type": "amplify"
+        },
+        {
+          "hpBelow": 0.35,
+          "type": "charge"
+        }
+      ],
+      "summon": {
+        "hpBelow": 0.55
+      },
+      "firstReward": "首通金幣 5,200・橙階礦石 ×2",
+      "repeatReward": "金幣 980・橙階礦石",
+      "firstGold": 5200,
+      "repeatGold": 980,
+      "ore": "orePerfect",
+      "firstOre": 2
+    },
+    {
+      "id": "personal-80",
+      "name": "凍界皇",
+      "level": 80,
+      "element": "water",
+      "phases": 3,
+      "traits": [
+        "護盾",
+        "蓄力",
+        "回復"
+      ],
+      "objects": [
+        {
+          "round": 2,
+          "type": "shield"
+        },
+        {
+          "round": 5,
+          "type": "charge"
+        },
+        {
+          "hpBelow": 0.4,
+          "type": "heal"
+        }
+      ],
+      "firstReward": "首通回天寶輪・金幣 6,200",
+      "repeatReward": "金幣 1,160・橙階礦石",
+      "firstGold": 6200,
+      "repeatGold": 1160,
+      "ore": "orePerfect",
+      "firstOre": 1,
+      "relic": "relic_returning_wheel"
+    },
+    {
+      "id": "personal-90",
+      "name": "霜天皇",
+      "level": 90,
+      "element": "water",
+      "phases": 4,
+      "traits": [
+        "封鎖",
+        "護盾",
+        "蓄力",
+        "精英援軍"
+      ],
+      "objects": [
+        {
+          "round": 2,
+          "type": "seal"
+        },
+        {
+          "round": 4,
+          "type": "shield"
+        },
+        {
+          "round": 7,
+          "type": "charge"
+        },
+        {
+          "hpBelow": 0.3,
+          "type": "amplify"
+        }
+      ],
+      "summon": {
+        "round": 4
+      },
+      "firstReward": "首通金幣 7,500・橙階礦石 ×3",
+      "repeatReward": "金幣 1,360・橙階礦石",
+      "firstGold": 7500,
+      "repeatGold": 1360,
+      "ore": "orePerfect",
+      "firstOre": 3
+    },
+    {
+      "id": "personal-100",
+      "name": "寒獄帝",
+      "level": 100,
+      "element": "water",
+      "phases": 4,
+      "traits": [
+        "護盾",
+        "蓄力",
+        "回復",
+        "封鎖",
+        "精英援軍"
+      ],
+      "objects": [
+        {
+          "round": 2,
+          "type": "shield"
+        },
+        {
+          "round": 4,
+          "type": "charge"
+        },
+        {
+          "round": 7,
+          "type": "heal"
+        },
+        {
+          "hpBelow": 0.3,
+          "type": "seal"
+        }
+      ],
+      "summon": {
+        "hpBelow": 0.6
+      },
+      "firstReward": "首通金幣 10,000・橙階礦石 ×4",
+      "repeatReward": "金幣 1,600・橙階礦石",
+      "firstGold": 10000,
+      "repeatGold": 1600,
+      "ore": "orePerfect",
+      "firstOre": 4
+    }
+  ],
+  "WORLD_BOSSES": [
+    {
+      "id": "world-40",
+      "name": "熔天君",
+      "level": 40,
+      "element": "fire",
+      "traits": [
+        "四階段",
+        "護盾",
+        "蓄力"
+      ],
+      "firstReward": "特殊首通：回天寶輪・金幣 6,000",
+      "repeatReward": "最終階段再戰：金幣 700",
+      "firstGold": 6000,
+      "repeatGold": 700,
+      "relic": "relic_returning_wheel"
+    },
+    {
+      "id": "world-60",
+      "name": "冰海皇",
+      "level": 60,
+      "element": "water",
+      "traits": [
+        "四階段",
+        "回復",
+        "凍傷"
+      ],
+      "firstReward": "特殊首通：橙階礦石 ×4・金幣 9,000",
+      "repeatReward": "最終階段再戰：金幣 1,000",
+      "firstGold": 9000,
+      "repeatGold": 1000,
+      "ore": "orePerfect",
+      "firstOre": 4
+    },
+    {
+      "id": "world-80",
+      "name": "九曜龍皇",
+      "level": 80,
+      "element": "fire",
+      "traits": [
+        "四階段",
+        "增幅",
+        "蓄力"
+      ],
+      "firstReward": "特殊首通：橙階礦石 ×6・金幣 13,000",
+      "repeatReward": "最終階段再戰：金幣 1,400",
+      "firstGold": 13000,
+      "repeatGold": 1400,
+      "ore": "orePerfect",
+      "firstOre": 6
+    },
+    {
+      "id": "world-100",
+      "name": "滅世天魔",
+      "level": 100,
+      "element": "fire",
+      "traits": [
+        "四階段",
+        "封鎖",
+        "護盾",
+        "蓄力"
+      ],
+      "firstReward": "特殊首通：橙階礦石 ×8・金幣 20,000",
+      "repeatReward": "最終階段再戰：金幣 2,000",
+      "firstGold": 20000,
+      "repeatGold": 2000,
+      "ore": "orePerfect",
+      "firstOre": 8
+    }
+  ],
+  "WORLD_STAGE_PROFILES": [
+    {
+      "number": 1,
+      "label": "第一階段",
+      "objects": [
+        {
+          "round": 3,
+          "type": "charge"
+        }
+      ],
+      "summon": null,
+      "summary": "試探攻勢與一次蓄力。"
+    },
+    {
+      "number": 2,
+      "label": "第二階段",
+      "objects": [
+        {
+          "round": 2,
+          "type": "shield"
+        }
+      ],
+      "summon": null,
+      "summary": "以護盾改變攻擊優先順序。"
+    },
+    {
+      "number": 3,
+      "label": "第三階段",
+      "objects": [
+        {
+          "round": 2,
+          "type": "heal"
+        },
+        {
+          "round": 5,
+          "type": "amplify"
+        }
+      ],
+      "summon": {
+        "hpBelow": 0.55
+      },
+      "summary": "回復與法陣形成持久壓力，生命低於 55% 時召喚兩名同元素精英援軍。"
+    },
+    {
+      "number": 4,
+      "label": "最終階段",
+      "objects": [
+        {
+          "round": 2,
+          "type": "charge"
+        },
+        {
+          "round": 4,
+          "type": "amplify"
+        },
+        {
+          "round": 7,
+          "type": "shield"
+        }
+      ],
+      "summon": {
+        "round": 4
+      },
+      "summary": "狂暴、蓄力與護體交替，第 4 回合召喚兩名同元素精英援軍。"
+    }
+  ],
+  "BOSS_OBJECT_DEFINITIONS": {
+    "shield": {
+      "type": "shield",
+      "kind": "護盾",
+      "name": "金剛護體",
+      "shieldRatio": 0.24,
+      "effect": "傷害先由 BOSS 護盾吸收，溢出才扣生命。"
+    },
+    "charge": {
+      "type": "charge",
+      "kind": "法器",
+      "name": "滅魂陣",
+      "hpRatio": 0.2,
+      "countdown": 2,
+      "effect": "倒數歸零時發動大型攻擊；破壞即可取消。"
+    },
+    "heal": {
+      "type": "heal",
+      "kind": "圖騰",
+      "name": "血祭圖騰",
+      "hpRatio": 0.18,
+      "healRatio": 0.04,
+      "effect": "存活期間，每回合恢復 BOSS 4% 最大生命。"
+    },
+    "amplify": {
+      "type": "amplify",
+      "kind": "戰旗",
+      "name": "煞氣戰旗",
+      "hpRatio": 0.18,
+      "damageMultiplier": 1.25,
+      "effect": "存活期間，BOSS 造成傷害提高 25%。"
+    },
+    "defense": {
+      "type": "defense",
+      "kind": "圖騰",
+      "name": "玄甲圖騰",
+      "hpRatio": 0.18,
+      "effect": "存活期間，BOSS 受到的傷害降低 25%。"
+    },
+    "seal": {
+      "type": "seal",
+      "kind": "法器",
+      "name": "鎖脈法器",
+      "hpRatio": 0.16,
+      "healingMultiplier": 0.6,
+      "effect": "存活期間，我方治療與 SP 回復降低 40%。"
+    }
+  }
+}

@@ -106,3 +106,28 @@ regressions; final neutral/seeded TTK; production Chrome390×844/412×915 Person
 and all World stages; snapshot/mechanism/reward/repeat/transition; final Runtime
 scan; build/check; latest-head CI; dev merge/deployment/exact SHA and absorbed
 branch cleanup. Requirement remains IMPLEMENTED. No COMPLETE claim.
+
+## Continuation checkpoint — 2026-10-05 (Taipei)
+
+Resumed existing PR#799 at b6f02419392f403cc05a184737353a1ef60566e8;
+no duplicate branch. Fresh dev9fff3664 and mainf63d69db unchanged.
+Boss production Run37216148173/Job111476945757 SUCCESS. Downloaded artifact
+11309660021 SHA2564bc8c23163b1e669f16d1c41cb25b624baebad98b0f23cc511259d1c311b1c2c
+independently matches GitHub digest. Report passed:true and exact source SHA;
+18 natural scenes at390×844/412×915, Personal20/30/70 plus repeat20,
+World40 stages1–4 plus repeat4. Observed Personal8–9 rounds and World5/8/8/9.
+Configured first/repeat rewards, existing kill gold, ore and progression PASS;
+representative screenshots reviewed. No reward retune.
+
+Repository checks Job111476945768 failed because the Hit/Evasion QA called
+retired makeZoneMonster("QA",level,"fire") without a registered Wild spec.
+Fixture now builds an explicit MonsterBalance entity; all original formula,
+combat, buff, relic and UI assertions retained. No Runtime fallback resurrected.
+A frozen starting-dev gameplay fixture now checks all13 Boss definitions,
+four stage schedules (stat factors excluded), six mechanism definitions and
+all original first/repeat rewards. Retirement statuses normalized to
+RETIRED/KEEP/MIGRATED, historical evidence retained separately.
+
+Current aggregate53/53 PASS, focused7/7; latest-head remote full CI, Requirement
+VERIFIED, merge/dev deployment/exact SHA/live QA and branch cleanup remain gates.
+Local Chrome unavailable in this continuation; it is not counted as evidence.

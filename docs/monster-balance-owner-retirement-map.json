@@ -205,12 +205,13 @@
       "id": "legacyAbyss",
       "file": "js/36-v141-content-systems.js",
       "sourceToken": "v141BuildAbyssRoster",
-      "status": "COMPATIBILITY API ONLY",
+      "status": "KEEP",
       "decision": "KEEP",
       "phase": "Phase 2D Abyss",
       "reason": "v141BuildAbyssRoster delegates to formal 59 builder; obsolete numerical builder removed",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "No legacy numerical builder; caller delegates to MonsterBalance roster"
+      "retirementGate": "No legacy numerical builder; caller delegates to MonsterBalance roster",
+      "historicalStatus": "COMPATIBILITY API ONLY"
     },
     {
       "id": "abyssDurability",
@@ -228,7 +229,7 @@
       "file": "js/gameplay-boss-tower-system.js",
       "sourceToken": "buildBossMonster",
       "status": "MIGRATED",
-      "decision": "KEEP",
+      "decision": "MIGRATED",
       "phase": "Phase 2F Boss",
       "reason": "Non-stat adapter / projection consumer only; no legacy numerical authority",
       "phase1": "KEEP Runtime exactly unchanged",
@@ -261,12 +262,13 @@
       "id": "towerElement",
       "file": "js/gameplay-boss-tower-system.js",
       "sourceToken": "applyTowerElementProfile",
-      "status": "STAT WRITES RETIRED / GAMEPLAY METADATA OWNER",
+      "status": "KEEP",
       "decision": "KEEP",
       "phase": "Phase 2C Tower",
       "reason": "Earth HP/defense and wind speed moved into MonsterBalance. Existing fire crit/direct damage, water heal/status/support, wind evasion metadata remain the Tower gameplay owner.",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "Stat mutation scan must remain empty; metadata/effect behavior stays under Tower regression."
+      "retirementGate": "Stat mutation scan must remain empty; metadata/effect behavior stays under Tower regression.",
+      "historicalStatus": "STAT WRITES RETIRED / GAMEPLAY METADATA OWNER"
     },
     {
       "id": "towerLevel",
@@ -284,16 +286,13 @@
       "file": "js/00-main.js",
       "sourceToken": "getEnemyPressureMultiplier",
       "status": "MIGRATED",
-      "decision": "KEEP",
+      "decision": "MIGRATED",
       "phase": "Phase 2F Boss",
       "reason": "Non-stat adapter / projection consumer only; no legacy numerical authority",
       "phase1": "KEEP Runtime exactly unchanged",
       "retirementGate": "Phase2F projection and final convergence gates",
       "wildForbidden": true,
-      "requiredModes": [
-        "personalBoss",
-        "worldBoss"
-      ],
+      "requiredModes": [],
       "dailyForbidden": true,
       "abyssForbidden": true,
       "adventureForbidden": true
@@ -302,12 +301,13 @@
       "id": "adventureBuild",
       "file": "js/adventure/adventure-runtime-v1-20260915.js",
       "sourceToken": "buildEncounter",
-      "status": "STAT EDGE RETIRED / CONTENT LIFECYCLE OWNER",
+      "status": "KEEP",
       "decision": "KEEP",
       "phase": "Phase 2E Adventure",
       "reason": "Explicit fixed content specs build MonsterBalance directly; skills/reward/progression preserved.",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity",
+      "historicalStatus": "STAT EDGE RETIRED / CONTENT LIFECYCLE OWNER"
     },
     {
       "id": "v144Wrapper",
@@ -324,12 +324,13 @@
       "id": "v144SkillGuard",
       "file": "js/40-v144-rules-and-abyss.js",
       "sourceToken": "v144IsMonsterSkillElementLegal",
-      "status": "CURRENT OWNER",
+      "status": "KEEP",
       "decision": "KEEP",
       "phase": "all phases",
       "reason": "existing carried/legal skills remain sole AI legality authority; no invented skills",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity",
+      "historicalStatus": "CURRENT OWNER"
     },
     {
       "id": "legacyAbyssStatWriter",
@@ -343,7 +344,7 @@
     }
   ],
   "phase2aGate": "15/15 functional requirements VERIFIED: focused20/20, unchanged non-Wild outputs, 40 diagnostic TTK and both-viewports natural Chrome. Latest Required CI/dev integration/deployed exact SHA remain separate gates owned by PR #780.",
-  "phase2bGate": "IMPLEMENTED; TTK, natural Chrome, latest CI/integration/deployment gates still pending.",
+  "phase2bGate": "COMPLETE per merged/deployed/cleaned PR #784; historical functional record retained in Phase2B documentation.",
   "phase2cGate": {
     "workId": "MONSTER-BALANCE-OWNER-P2C-TOWER-20261004",
     "status": "VERIFIED",
@@ -364,12 +365,6 @@
       "Tower earth HP/defense post-write",
       "Tower wind agility post-write"
     ],
-    "remainingLegacyModes": [
-      "abyss",
-      "adventure",
-      "personalBoss",
-      "worldBoss"
-    ],
     "stopAfter": "Phase 2C Tower",
     "functionalEvidence": {
       "sourceHead": "d7108cead55b297a03c3aa6325ce913690ae17e7",
@@ -387,7 +382,14 @@
       "hp": 0.2,
       "outgoingPressure": 0.25,
       "rawAttackAndPointsUnchanged": true
-    }
+    },
+    "historicalRemainingLegacyModes": [
+      "abyss",
+      "adventure",
+      "personalBoss",
+      "worldBoss"
+    ],
+    "remainingLegacyModes": []
   },
   "phase2dGate": {
     "workId": "MONSTER-BALANCE-OWNER-P2D-ABYSS-20261004",
@@ -399,11 +401,6 @@
       "V141 obsolete builder and extraHP",
       "V174 durability1.875 and HP post-writes",
       "legacy Abyss additive outgoing pressure"
-    ],
-    "remainingLegacyModes": [
-      "adventure",
-      "personalBoss",
-      "worldBoss"
     ],
     "stopAfter": "Phase 2D Abyss",
     "skillOwnerContinuity": "Original configureBuiltMonster V141/V144 carry/selection hooks preserved before Abyss marker; immutable baseline checks all402 metadata.",
@@ -420,7 +417,13 @@
     "identities": 14,
     "ttkCases": 300,
     "browserScenes": 14,
-    "closeout": "Final metadata-head CI, dev integration/deployment and safe branch cleanup are independent pending gates; PR#793 is live owner."
+    "closeout": "Final metadata-head CI, dev integration/deployment and safe branch cleanup are independent pending gates; PR#793 is live owner.",
+    "historicalRemainingLegacyModes": [
+      "adventure",
+      "personalBoss",
+      "worldBoss"
+    ],
+    "remainingLegacyModes": []
   },
   "phase2eGate": {
     "workId": "MONSTER-BALANCE-OWNER-P2E-ADVENTURE-20261004",
@@ -431,10 +434,6 @@
       "Adventure makeZoneMonster constructor edge",
       "Adventure rank post-write",
       "Legacy additive Adventure pressure"
-    ],
-    "remainingLegacyModes": [
-      "personalBoss",
-      "worldBoss"
     ],
     "stopAfter": "Phase2E Adventure",
     "identities": 9,
@@ -453,10 +452,28 @@
       "390x844",
       "412x915"
     ],
-    "browserArtifact": 11301028022
+    "browserArtifact": 11301028022,
+    "historicalRemainingLegacyModes": [
+      "personalBoss",
+      "worldBoss"
+    ],
+    "remainingLegacyModes": []
   },
   "phase2fGate": {
     "status": "IMPLEMENTED",
-    "remaining": "Focused/aggregate/Chrome/latest-head CI/dev deployment and cleanup pending"
+    "remainingLegacyModes": [],
+    "remaining": "Latest-head CI, Requirement VERIFIED, integration, exact deployment/live QA and safe branch cleanup",
+    "functionalEvidence": {
+      "sourceHead": "b6f02419392f403cc05a184737353a1ef60566e8",
+      "ciRun": 37216148173,
+      "ciJob": 111476945757,
+      "artifactId": 11309660021,
+      "artifactSha256": "4bc8c23163b1e669f16d1c41cb25b624baebad98b0f23cc511259d1c311b1c2c",
+      "browserScenes": 18,
+      "viewports": [
+        "390x844",
+        "412x915"
+      ]
+    }
   }
 }

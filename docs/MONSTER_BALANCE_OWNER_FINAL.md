@@ -1,7 +1,7 @@
 # Monster Balance Owner — Final Convergence Record
 
 Work ID: MONSTER-BALANCE-OWNER-P2F-BOSS-20261004. PR #799, base dev.
-Current status: IMPLEMENTED. Functional Boss Chrome, latest-head CI,
+Current status: IMPLEMENTED. Boss production Chrome PASS; latest-head CI,
 integration/deployment and absorbed branch cleanup are not yet closed.
 This document records the implemented authority graph, not a COMPLETE claim.
 
@@ -53,8 +53,8 @@ pressure to formal MonsterBalance entities.
 
 ## Durable gates
 
-- tests/monster-balance-owner-phase1 through phase2f: 52/52 local PASS.
-- Boss focused: 6/6; 9 Personal identities +4 World identities ×4 stages.
+- tests/monster-balance-owner-phase1 through phase2f: 53/53 local PASS.
+- Boss focused: 7/7; 9 Personal identities +4 World identities ×4 stages.
 - Boss formal neutral/seeded TTK: 50/50 clear+survive; Personal7–11,
   World stage1:5–6, stage2:7–8, stage3:7–8, stage4:7–11 rounds.
 - Snapshot/mechanism/Shield critical and direct Boss VFX regressions: PASS.
@@ -63,8 +63,8 @@ pressure to formal MonsterBalance entities.
   classified explicitly. Self-generated audit JSON is excluded from recursive
   evidence-token counting.
 - npm run build / build:check: PASS through official build-production.mjs.
-- Production browser390×844/412×915, rewards, latest-head CI, deployed exact SHA,
-  safe branch cleanup: pending. Requirement remains IMPLEMENTED.
+- Production browser390×844/412×915: 18/18 natural scenes PASS; Personal20/30/70, World40 stage1–4 and Personal/World repeat rewards, projection/slots/snapshot/object/reinforcement/shield PASS. Exact source b6f02419; CI37216148173 Boss job111476945757 SUCCESS; artifact11309660021 SHA2564bc8c23163b1e669f16d1c41cb25b624baebad98b0f23cc511259d1c311b1c2c independently checked and representative screenshots reviewed.
+- Latest-head complete CI, deployed exact SHA and safe branch cleanup: pending. Requirement remains IMPLEMENTED.
 
 After Phase2F closes, stop this engineering program. Return to NORMAL
 DEVELOPMENT; any later balance calibration needs a separate approved project.

@@ -25,78 +25,6 @@
   "priorModeReferences": 288,
   "remainingHits": [
     {
-      "file": "docs/MONSTER_BALANCE_OWNER_FINAL.md",
-      "line": 27,
-      "token": "makeLegacyModeMonster",
-      "classification": "D. docs/history and retirement gate"
-    },
-    {
-      "file": "docs/MONSTER_BALANCE_OWNER_FINAL.md",
-      "line": 27,
-      "token": "generateMonsterAttributePoints",
-      "classification": "D. docs/history and retirement gate"
-    },
-    {
-      "file": "docs/MONSTER_BALANCE_OWNER_FINAL.md",
-      "line": 29,
-      "token": "bossBalanceProfile",
-      "classification": "D. docs/history and retirement gate"
-    },
-    {
-      "file": "docs/MONSTER_BALANCE_OWNER_FINAL.md",
-      "line": 29,
-      "token": "defenseMultiplier",
-      "classification": "D. docs/history and retirement gate"
-    },
-    {
-      "file": "scripts/monster-balance-final-convergence-audit.mjs",
-      "line": 6,
-      "token": "makeLegacyModeMonster",
-      "classification": "C. test fixture / test and diagnostic gate"
-    },
-    {
-      "file": "scripts/monster-balance-final-convergence-audit.mjs",
-      "line": 6,
-      "token": "generateMonsterAttributePoints",
-      "classification": "C. test fixture / test and diagnostic gate"
-    },
-    {
-      "file": "scripts/monster-balance-final-convergence-audit.mjs",
-      "line": 6,
-      "token": "v132BuildDungeonMonster",
-      "classification": "C. test fixture / test and diagnostic gate"
-    },
-    {
-      "file": "scripts/monster-balance-final-convergence-audit.mjs",
-      "line": 6,
-      "token": "applyDungeonMonsterStrength",
-      "classification": "C. test fixture / test and diagnostic gate"
-    },
-    {
-      "file": "scripts/monster-balance-final-convergence-audit.mjs",
-      "line": 6,
-      "token": "applyDungeonNormalBonus",
-      "classification": "C. test fixture / test and diagnostic gate"
-    },
-    {
-      "file": "scripts/monster-balance-final-convergence-audit.mjs",
-      "line": 6,
-      "token": "applyDungeonRankStrength",
-      "classification": "C. test fixture / test and diagnostic gate"
-    },
-    {
-      "file": "scripts/monster-balance-final-convergence-audit.mjs",
-      "line": 6,
-      "token": "bossBalanceProfile",
-      "classification": "C. test fixture / test and diagnostic gate"
-    },
-    {
-      "file": "scripts/monster-balance-final-convergence-audit.mjs",
-      "line": 6,
-      "token": "defenseMultiplier",
-      "classification": "C. test fixture / test and diagnostic gate"
-    },
-    {
       "file": ".github/scripts/run-fire-tower-identity-first-frame-browser-qa.mjs",
       "line": 43,
       "token": "v132BuildDungeonMonster",
@@ -148,6 +76,30 @@
       "file": "HANDOFF.md",
       "line": 3907,
       "token": "applyDungeonMonsterStrength",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "docs/MONSTER_BALANCE_OWNER_FINAL.md",
+      "line": 27,
+      "token": "makeLegacyModeMonster",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "docs/MONSTER_BALANCE_OWNER_FINAL.md",
+      "line": 27,
+      "token": "generateMonsterAttributePoints",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "docs/MONSTER_BALANCE_OWNER_FINAL.md",
+      "line": 29,
+      "token": "bossBalanceProfile",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "docs/MONSTER_BALANCE_OWNER_FINAL.md",
+      "line": 29,
+      "token": "defenseMultiplier",
       "classification": "D. docs/history and retirement gate"
     },
     {
@@ -248,31 +200,31 @@
     },
     {
       "file": "docs/monster-balance-owner-retirement-map.json",
-      "line": 240,
+      "line": 241,
       "token": "bossBalanceProfile",
       "classification": "D. docs/history and retirement gate"
     },
     {
       "file": "docs/monster-balance-owner-retirement-map.json",
-      "line": 244,
+      "line": 245,
       "token": "bossBalanceProfile",
       "classification": "D. docs/history and retirement gate"
     },
     {
       "file": "docs/monster-balance-owner-retirement-map.json",
-      "line": 251,
+      "line": 252,
       "token": "defenseMultiplier",
       "classification": "D. docs/history and retirement gate"
     },
     {
       "file": "docs/monster-balance-owner-retirement-map.json",
-      "line": 362,
+      "line": 363,
       "token": "v132BuildDungeonMonster",
       "classification": "D. docs/history and retirement gate"
     },
     {
       "file": "docs/monster-balance-owner-retirement-map.json",
-      "line": 363,
+      "line": 364,
       "token": "bossBalanceProfile",
       "classification": "D. docs/history and retirement gate"
     },
@@ -335,6 +287,54 @@
       "line": 15,
       "token": "bossBalanceProfile",
       "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "scripts/monster-balance-final-convergence-audit.mjs",
+      "line": 6,
+      "token": "makeLegacyModeMonster",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "scripts/monster-balance-final-convergence-audit.mjs",
+      "line": 6,
+      "token": "generateMonsterAttributePoints",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "scripts/monster-balance-final-convergence-audit.mjs",
+      "line": 6,
+      "token": "v132BuildDungeonMonster",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "scripts/monster-balance-final-convergence-audit.mjs",
+      "line": 6,
+      "token": "applyDungeonMonsterStrength",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "scripts/monster-balance-final-convergence-audit.mjs",
+      "line": 6,
+      "token": "applyDungeonNormalBonus",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "scripts/monster-balance-final-convergence-audit.mjs",
+      "line": 6,
+      "token": "applyDungeonRankStrength",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "scripts/monster-balance-final-convergence-audit.mjs",
+      "line": 6,
+      "token": "bossBalanceProfile",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "scripts/monster-balance-final-convergence-audit.mjs",
+      "line": 6,
+      "token": "defenseMultiplier",
+      "classification": "C. test fixture / test and diagnostic gate"
     },
     {
       "file": "tests/abyss-two-tier-refactor.test.js",

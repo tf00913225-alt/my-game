@@ -92,7 +92,7 @@ test('retirement inventory is complete and preserves grandfathered source paths 
  const ids=['coreAllocation','coreStats','wildV131','wildV141','wildRank','dungeonStrength','dungeonNormal','dungeonRank','equipmentRank','beginnerScaling','dailyScaling','legacyAbyss','abyssDurability','bossMultipliers','towerElement','enemyPressure','adventureBuild','v144Wrapper','bossUnusedDefense'];
  for(const id of ids)assert.ok(inventory.items.some(item=>item.id===id),id);
  for(const item of inventory.items){
-  assert.ok(['TO RETIRE','TO MIGRATE','KEEP','RETIRED','COMPATIBILITY FOR NON-WILD ONLY','COMPATIBILITY FOR NON-DAILY ONLY'].includes(item.decision));assert.ok(item.phase&&item.reason&&item.retirementGate);
+  assert.ok(['TO RETIRE','TO MIGRATE','KEEP','MIGRATED','RETIRED','COMPATIBILITY FOR NON-WILD ONLY','COMPATIBILITY FOR NON-DAILY ONLY'].includes(item.decision));assert.ok(item.phase&&item.reason&&item.retirementGate);
   assert.equal(fs.readFileSync(item.file,'utf8').includes(item.sourceToken),item.decision!=='RETIRED',item.id);
  }
 });

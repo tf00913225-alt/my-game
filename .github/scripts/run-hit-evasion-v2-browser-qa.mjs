@@ -21,7 +21,9 @@ const expression=`(async()=>{
     const wind={accuracy:getFinalAccuracyBonusPercent(player),evasion:getMainCharacterStats().evasion};
     player.hp=1;const lowCap=calculateHitChancePercent(1000,0,0,0,player);
     characterSkillLoadouts.fire.skillLevels.windEX=0;
-    const levels=[1,100].map(level=>{player.level=level;return {hit:calculateHitChancePercent(getMainCharacterStats().accuracy,makeZoneMonster("QA",level,"fire").evasion,0,0),evasion:makeZoneMonster("QA",level,"fire").evasion};});
+    // Explicit Owner fixture replaces the retired ambiguous generic constructor.
+    const qaMonster=level=>MonsterBalance.build({monsterKey:"qa.hit-evasion",name:"QA",level,element:"fire",archetype:"balanced",rank:"regular",mode:"wild",context:"qa/hit-evasion"});
+    const levels=[1,100].map(level=>{player.level=level;return {hit:calculateHitChancePercent(getMainCharacterStats().accuracy,qaMonster(level).evasion,0,0),evasion:qaMonster(level).evasion};});
     const calm=[5,10,15,20,25].map(value=>{player.activeBuffs=[{type:"dinghaishenzhen",turnsLeft:3,accuracyBonusPercent:value}];return [getMainCharacterStats().accuracy,getFinalAccuracyBonusPercent(player),calculateHitChancePercent(0,40,0,getFinalAccuracyBonusPercent(player))];});
     const dodge=[5,10,15,20,25].map(value=>{player.activeBuffs=[{type:"dodgeSkill",turnsLeft:3,percent:value}];return getMainCharacterStats().evasion;});
     player.activeBuffs=[];player.statusEffects=[];
@@ -54,7 +56,7 @@ const expression=`(async()=>{
     player.statusEffects=[{type:"frostbite",turnsLeft:2}];
     const frostbite=getMainCharacterStats().evasion;
     player.activeBuffs=[];player.statusEffects=[];player.hp=getMainCharacterStats().maxHP;
-    const freshMonsters=async()=>{monsters=[makeZoneMonster("QA",1,"fire")];monsters[0].hp=monsters[0].maxHP=100000;monsters[0].alive=true;monsters[0].accuracy=0;currentZone="forest";mapCooldown=false;autoBattle=false;autoConfig.enabled=false;autoPatrolEnabled=false;startBattle(0);await waitRelic();const deadline=Date.now()+8000;while(Date.now()<deadline&&document.getElementById("battlePage")?.matches(".v141-preparing-entry,.v141-entry-moving"))await new Promise(r=>setTimeout(r,30));};
+    const freshMonsters=async()=>{monsters=[qaMonster(1)];monsters[0].hp=monsters[0].maxHP=100000;monsters[0].alive=true;monsters[0].accuracy=0;currentZone="forest";mapCooldown=false;autoBattle=false;autoConfig.enabled=false;autoPatrolEnabled=false;startBattle(0);await waitRelic();const deadline=Date.now()+8000;while(Date.now()<deadline&&document.getElementById("battlePage")?.matches(".v141-preparing-entry,.v141-entry-moving"))await new Promise(r=>setTimeout(r,30));};
     const endBattle=async()=>{loseBattle();const deadline=Date.now()+8000;while(battleActive&&Date.now()<deadline)await new Promise(r=>setTimeout(r,30));if(battleActive)throw new Error("Battle exit did not finish");player.hp=getMainCharacterStats().maxHP;};
     const waitRelic=async()=>{const deadline=Date.now()+5000;while(!v174RelicDebugState()&&Date.now()<deadline)await new Promise(r=>setTimeout(r,20));if(!v174RelicDebugState())throw new Error("Real relic battle did not initialize: "+JSON.stringify({battleActive,battleToken,turn,observers:Array.from(battleRoundStartObservers).map(fn=>String(fn).slice(0,800)),keys:Array.from(battleRoundBoundaryKeys),startSource:String(startBattle).slice(0,500),turnSource:String(startTurn).slice(0,500),logs:Array.from(document.querySelectorAll(".battle-log")).map(n=>n.textContent)}));};
     const relicOwned=v174RelicSystem.getOwnedState(),loadout=v174RelicSystem.getTeamLoadout();
