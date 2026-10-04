@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "policyId": "forest-opening-round-v1",
+  "scope": "two-combatant-declared-normal-attacks-first-round-arithmetic-only",
+  "sourceOwner": "js/00-main.js",
+  "tutorialDamageOwner": "js/47-v158-combat-tuning.js",
+  "compatibilityDigests": {
+    "js/40-v144-rules-and-abyss.js": "5cad5ada547347b97475d98919acd8d03b0e1e9a9f30f063b34e48b73469bfc1",
+    "js/47-v158-combat-tuning.js": "4ebc87b7d7227a5ba3363e0eb4dbd4e40b9da6106c6873ecf831ba6a121079ec"
+  },
+  "declarationDigests": {
+    "HIT_CHANCE_BASE": "340ec586949a9330d6988e79748107a11098b6923a8f43b89d5bf2707b274a31",
+    "HIT_CHANCE_MIN_PERCENT": "07c323b35b73375428d01b1e4d00a6db108bd1365775f6490525713475faae5f",
+    "HIT_CHANCE_MAX_PERCENT": "732c40bc69f9b84e77c777483641d838b68c1cf62215e667f175220b65597ad1",
+    "buildInitiativeQueue": "ccedc22d75a57cbba999548760cddc9cc6d8cfe84179a963fab6c61d22d3dc53",
+    "getMonsterAgility": "bd75fef258f9e1b7e3a0ca22755a5f00bde684c7645bd602bf91c3a26710c179",
+    "getMonsterAccuracy": "e8ada45048b2418f59aaaa4dec510ec7ca6207e9b8e8d3fca9a0bf00ae9b4eef",
+    "calculateHitChancePercent": "c7d45b4c65a986cc6826a6c286fd153b27db29cb5fe9ee00c5d2eb772f00780e",
+    "rollHitChance": "7e25079920606c8178531a2717360ae1820aaae116b6866a64a2be0bd58db805",
+    "rollBeginnerForestNormalAttackDamage": "d69f138dc4a94512bee6dcce6dcf740fec3021e73ef2c9658ff7020c77f8ca50"
+  },
+  "rulesSha256": "17c163b13e9025d479e7a4d65920fa488ffc766b937f1cf1b3b3dad094525459",
+  "combatRulesReady": false,
+  "outcomeVerified": false,
+  "rewardEligible": false
+}

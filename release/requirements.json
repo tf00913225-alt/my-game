@@ -653,6 +653,24 @@
         "verification": "ESM 測試直接 PASS 且無 MODULE_TYPELESS；三個相關測試、build/build:check、architecture/deprecated gate、YAML 配置等價檢查 PASS。官方 checkout/setup-node/upload-artifact v7 README/action.yml/Release 核對 node24 與既有 inputs 相容；cache 明確保持停用。",
         "result": "功能／配置驗證 PASS。最終 Head PR CI、合併後 DEV CI／部署與實際警告讀回仍由本 Work PR 追蹤，未宣稱 Closeout；Game/Cache173.73、main／玩家 Runtime 不變。"
       }
+    },
+    {
+      "id": "REQ-CLOUD-BATTLE-OPENING-ROUND-20261004",
+      "title": "Restricted Forest opening-round arithmetic uses final initiative and enemy tutorial owners, bounded transcript and dead-combatant skipping without outcome or reward authority",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "functions/src/canonical-battle-opening-round.js",
+          "scripts/lib/cloud-battle-opening-round-rules.mjs",
+          "scripts/build-production.mjs",
+          "functions/src/generated/forest-opening-round-rules.js",
+          "functions/src/generated/forest-opening-round-policy.json",
+          "tests/cloud-save-battle-opening-round.test.mjs",
+          "scripts/test-session-authority-emulator.mjs"
+        ],
+        "verification": "Local 128/128 preparation/encounter/player-kernel/proof/opening-round tests PASS, skip0; 11 new cases include96 browser-source parity vectors after actual V144/V158 wrappers and16 tutorial damage boundary vectors. Previous128 player parity vectors retained. Existing Session Authority emulator now tests private source reads, deterministic hit/MISS, session refusal and zero authority mutation. Latest-head CI/emulator/integration/Firebase/DEV SHA and branch cleanup remain pending under this Work PR.",
+        "result": "Pure first-round projection for exactly one plain server-created player and one sealed Forest regular definition, both declared normal attacks. Uses final5-8 noncritical enemy damage, two-actor initiative comparator, and skips dead actor/target without consuming action entropy. No legal encounter, enemy skill/roster draw, repeated battle, terminal verdict, callable, gameplay HP/revision mutation, persisted proof or rewards. All readiness/outcome/reward/credit flags false; Phase4 stays0/6."
+      }
     }
   ]
 }
