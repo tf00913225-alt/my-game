@@ -3,6 +3,9 @@
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
 
+(async()=>{
+const {MonsterBalance,TOWER_MODE_PROFILE}=await import("../js/combat/monster-balance-owner.mjs");
+
 const bossRuntime=fs.readFileSync("js/gameplay-boss-tower-system.js","utf8");
 const bossCss=fs.readFileSync("css/gameplay-boss-tower.css","utf8");
 const v142Runtime=fs.readFileSync("js/37-v142-skill-animation.js","utf8");
@@ -31,8 +34,20 @@ assert.match(bossRuntime,/return value<=30\?\.65:value<=60\?\.70:value<=90\?\.75
 assert.doesNotMatch(bossRuntime,/monster\.skillChance=Math\.min\(\.82,numeric\(monster\.skillChance,\.48\)\+\.08\)/);
 assert.match(bossRuntime,/if\(element==="fire"\)\{[\s\S]*?monster\.vTowerCriticalBonusPercent=15;[\s\S]*?monster\.vTowerDirectDamageMultiplier=1\.15;/);
 assert.match(bossRuntime,/if\(element==="water"\)\{[\s\S]*?monster\.vTowerHealingMultiplier=1\.15;[\s\S]*?monster\.vTowerStatusAccuracyPercent=15;[\s\S]*?monster\.v141SupportSkillIds=compatibleSkillIds\(element,ELEMENTS\.water\.supports\);[\s\S]*?monster\.v141AbyssAi="support";/);
-assert.match(bossRuntime,/if\(element==="wind"\)\{[\s\S]*?monster\.evasion=[\s\S]*?\+15;[\s\S]*?monster\.agility=[\s\S]*?1\.15;/);
-assert.match(bossRuntime,/if\(element==="earth"\)\{[\s\S]*?monster\.defense=[\s\S]*?monster\.maxHP=[\s\S]*?1\.15\);[\s\S]*?monster\.hp=monster\.maxHP;/);
+assert.match(bossRuntime,/if\(element==="wind"\)\{[\s\S]*?monster\.evasion=[\s\S]*?\+15;/);
+// Phase 2C moves Earth/Wind stats into the pre-battle owner. Preserve the
+// elemental bonuses while rejecting the retired gameplay post-writes.
+const towerElementRuntime=bossRuntime.slice(bossRuntime.indexOf("function applyTowerElementProfile("),bossRuntime.indexOf("function bindTowerMonsterIdentity("));
+assert.doesNotMatch(towerElementRuntime,/monster\.(?:agility|defense|maxHP|hp)\s*=/);
+for(const level of [1,30,50,100]){
+    const spec={monsterKey:"tower.ui-regression",name:"塔衛",level,rank:"regular",archetype:"balanced",mode:"tower",context:`tower/floor/${level}`};
+    const wind=MonsterBalance.preview({...spec,element:"wind"});
+    assert.equal(wind.final.speed,wind.derived.speed*1.15);
+    assert.equal(wind.profiles.element.metadata.evasionBonusPercent,15);
+    const earth=MonsterBalance.preview({...spec,element:"earth"});
+    assert.equal(earth.final.maxHP,Math.round(earth.derived.maxHP*TOWER_MODE_PROFILE.hp*1.15));
+    assert.equal(earth.final.defense,Math.round(earth.derived.defense*1.15));
+}
 
 /* Formal Sprite Sheets own the complete battle action. V142 is now timing-only:
    there is no hidden legacy stage to resurrect and no projectile fallback. */
@@ -67,3 +82,5 @@ assert.ok(fs.existsSync("assets/ui/home-element-box-v174.webp"));
 assert.ok(fs.existsSync("assets/ui/nav-relic-v175.webp"));
 
 console.log("✓ 2026-09-08 gameplay/UI regression guards");
+
+})().catch(error=>{console.error(error);process.exitCode=1;});
