@@ -7,6 +7,8 @@ export const GLOBAL_CALIBRATION=Object.freeze({hp:1,sp:1,damage:1,defense:1});
 export const RESOURCE_BASE=Object.freeze({hp:100,sp:50,provenance:'00-main legacy resource baseline'});
 export const DAILY_PARTY_DURABILITY=Object.freeze({1:0.04,2:0.08,3:0.12});
 export const DAILY_MODE_PROFILE=Object.freeze({hp:1,defense:1,damage:1,sp:1,skillFrequency:1});
+// Ten-enemy Tower calibration: keep raw six-stat conversion and rank ratios intact.
+export const TOWER_MODE_PROFILE=Object.freeze({hp:0.2,sp:1,damage:0.25,defense:1,speed:1});
 const clone=value=>JSON.parse(JSON.stringify(value));
 function normalizeSpec(spec){
   if(!spec||typeof spec!=='object') throw new TypeError('monster spec required');
@@ -38,11 +40,14 @@ function preview(spec){
     defense:base.defense+allocation.defensePoints*SIX_STAT_COEFFICIENTS.defense,
     speed:allocation.agilityPoints*SIX_STAT_COEFFICIENTS.agility
   };
-  // Wild Rank V1 is ratified. Unmigrated modes retain the Phase 1 neutral shadow profile.
-  const rank=['wild','daily'].includes(identity.mode)
-    ?{id:identity.rank,status:'RANK_V1',hp:identity.rank==='boss'?2:identity.rank==='elite'?1.5:1,defense:identity.rank==='boss'?1.15:identity.rank==='elite'?1.1:1,finalDamagePressure:identity.rank==='boss'?1.15:identity.rank==='elite'?1.1:1,skillFrequency:null}
+  // Migrated modes own their rank pressure here; unmigrated modes stay neutral shadow-only.
+  const migrated=['wild','daily','tower'].includes(identity.mode);
+  const smallBoss=identity.mode==='tower'&&identity.rank==='smallBoss';
+  const boss=identity.rank==='boss';
+  const rank=migrated
+    ?{id:identity.rank,status:'RANK_V1',hp:smallBoss?3:boss?2:identity.rank==='elite'?1.5:1,defense:(smallBoss||boss)?1.15:identity.rank==='elite'?1.1:1,finalDamagePressure:(smallBoss||boss)?1.15:identity.rank==='elite'?1.1:1,skillFrequency:null}
     :{id:identity.rank,status:'PENDING_PRODUCT_CALIBRATION',hp:1,defense:1,finalDamagePressure:null,skillFrequency:null};
-  const mode={id:identity.mode,status:identity.mode==='wild'?'RUNTIME_V1':'SHADOW_BASELINE_ONLY',hp:identity.mode==='wild'?0.32:1,sp:1,damage:1,defense:1,speed:identity.mode==='wild'&&identity.context==='wild/zone-01'?0:1,ttkTarget:['wild','daily'].includes(identity.mode)?{maxRounds:2,player:'normal same-level progression',scope:'kill/clear wave'}:null};
+  const mode={id:identity.mode,status:identity.mode==='wild'||identity.mode==='tower'?'RUNTIME_V1':'SHADOW_BASELINE_ONLY',hp:identity.mode==='wild'?0.32:identity.mode==='tower'?TOWER_MODE_PROFILE.hp:1,sp:1,damage:identity.mode==='tower'?TOWER_MODE_PROFILE.damage:1,defense:1,speed:identity.mode==='wild'&&identity.context==='wild/zone-01'?0:1,ttkTarget:['wild','daily'].includes(identity.mode)?{maxRounds:2,player:'normal same-level progression',scope:'kill/clear wave'}:identity.mode==='tower'?{player:'normal same-floor progression',scope:'challenge floor',floorEqualsLevel:true}:null};
   if(identity.mode==='daily'){
     const solo=identity.partySize===1&&identity.highestPartyLevel<=20;
     Object.assign(mode,{...DAILY_MODE_PROFILE,status:'RUNTIME_V1',damage:solo?.5:1,partySizeDurability:DAILY_PARTY_DURABILITY[identity.partySize],skillFrequency:solo?(identity.wave===1?0:Math.min(.45,identity.skillFrequency*.60)):identity.skillFrequency,protection:{solo,noAccuracyCritBoost:solo,bossSkillCooldown:solo}});
@@ -58,10 +63,10 @@ function preview(spec){
   const globalCalibration={...GLOBAL_CALIBRATION};
   const profiles={rank,mode,element,globalCalibration};
   const afterRank={...derived,maxHP:derived.maxHP*rank.hp,defense:derived.defense*rank.defense};
-  const afterMode={...afterRank,maxHP:afterRank.maxHP*mode.hp*(mode.partySizeDurability||1),maxSP:afterRank.maxSP*mode.sp,physicalAttack:afterRank.physicalAttack*(identity.mode==='daily'?1:mode.damage),magicAttack:afterRank.magicAttack*(identity.mode==='daily'?1:mode.damage),defense:afterRank.defense*mode.defense,speed:afterRank.speed*mode.speed};
+  const afterMode={...afterRank,maxHP:afterRank.maxHP*mode.hp*(mode.partySizeDurability||1),maxSP:afterRank.maxSP*mode.sp,physicalAttack:afterRank.physicalAttack*(['daily','tower'].includes(identity.mode)?1:mode.damage),magicAttack:afterRank.magicAttack*(['daily','tower'].includes(identity.mode)?1:mode.damage),defense:afterRank.defense*mode.defense,speed:afterRank.speed*mode.speed};
   const afterElement={...afterMode,maxHP:Math.round(afterMode.maxHP*element.hp),defense:['wild','daily'].includes(identity.mode)?afterMode.defense:Math.round(afterMode.defense*element.defense),speed:afterMode.speed*element.speed};
   const final={...afterElement,maxHP:afterElement.maxHP*globalCalibration.hp,maxSP:afterElement.maxSP*globalCalibration.sp,physicalAttack:afterElement.physicalAttack*globalCalibration.damage,magicAttack:afterElement.magicAttack*globalCalibration.damage,defense:afterElement.defense*globalCalibration.defense};
-  return {identity,base,resourceBase:{...RESOURCE_BASE,speed:0},allocation,derived,profiles,final,finalDamagePressure:rank.finalDamagePressure===null?null:rank.finalDamagePressure*mode.damage,...(identity.mode==='daily'?{legacyMultiplier:'NONE',skillFrequency:mode.skillFrequency}:{}),provenance:{stats:'MonsterBalance',damagePressure:'MonsterBalance Rank Profile consumed once by core damage settlement'},aiIntent:clone(ARCHETYPES[identity.archetype].aiIntent),pendingProductDecisions:['wild','daily'].includes(identity.mode)?[]:['monster per-level bonusHP +30 / bonusSP +10','rank and mode final calibration','Tower/Abyss TTK'],breakdown:[
+  return {identity,base,resourceBase:{...RESOURCE_BASE,speed:0},allocation,derived,profiles,final,finalDamagePressure:rank.finalDamagePressure===null?null:rank.finalDamagePressure*mode.damage,...(['daily','tower'].includes(identity.mode)?{legacyMultiplier:'NONE'}:{}),...(identity.mode==='daily'?{skillFrequency:mode.skillFrequency}:{}),provenance:{stats:'MonsterBalance',damagePressure:'MonsterBalance Rank Profile consumed once by core damage settlement'},aiIntent:clone(ARCHETYPES[identity.archetype].aiIntent),pendingProductDecisions:['wild','daily','tower'].includes(identity.mode)?[]:['monster per-level bonusHP +30 / bonusSP +10','rank and mode final calibration','Abyss TTK'],breakdown:[
     {step:'levelBase',formula:'30 + (level - 1) * growth; budget = (level - 1) * 5',input:identity.level,output:{...base}},
     {step:'allocation',method:'largest remainder; canonical STAT_ORDER ties',weights:{...ARCHETYPES[identity.archetype].weights},output:{...allocation}},
     {step:'sixStatConversion',coefficients:{...SIX_STAT_COEFFICIENTS},resourceBase:{...RESOURCE_BASE},output:{...derived}},
@@ -79,7 +84,7 @@ function previewTowerRoster(spec,floor){
   return ranks.map(rank=>previewTower({...spec,rank},floor));
 }
 function build(spec){
-  if(!['wild','daily'].includes(spec.mode)||!spec.monsterKey) throw new TypeError('Runtime build requires explicit migrated identity');
+  if(!['wild','daily','tower'].includes(spec.mode)||!spec.monsterKey) throw new TypeError('Runtime build requires explicit migrated identity');
   const projection=preview(spec),{final,allocation,identity}=projection;
   return {...identity,...allocation,maxHP:final.maxHP,hp:final.maxHP,maxSP:final.maxSP,sp:final.maxSP,
     attack:final.physicalAttack,magicAttack:final.magicAttack,defense:final.defense,agility:final.speed,

@@ -1,6 +1,6 @@
 {
-  "workId": "MONSTER-BALANCE-OWNER-P2B-DAILY-20261003",
-  "phase": "2B",
+  "workId": "MONSTER-BALANCE-OWNER-P2C-TOWER-20261004",
+  "phase": "2C",
   "classification": [
     "Convergence",
     "Replacement",
@@ -20,13 +20,12 @@
       "sourceToken": "generateMonsterAttributePoints",
       "status": "COMPATIBILITY FOR NON-DAILY ONLY",
       "decision": "COMPATIBILITY FOR NON-DAILY ONLY",
-      "phase": "Phase 2C Tower / 2D Abyss / 2E Adventure / 2F Boss",
+      "phase": "Phase 2D Abyss / 2E Adventure / 2F Boss",
       "reason": "(level-1)*5 + archetype allocation; retain legacy only for unmigrated modes",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "Delete legacy responsibility after final dependent mode migrates; Daily caller graph must stay severed",
+      "retirementGate": "Tower caller graph severed in Phase 2C; delete legacy responsibility after Abyss/Adventure/Personal/World Boss migrate",
       "wildForbidden": true,
       "requiredModes": [
-        "tower",
         "abyss",
         "adventure",
         "personalBoss",
@@ -40,13 +39,12 @@
       "sourceToken": "makeLegacyModeMonster",
       "status": "COMPATIBILITY FOR NON-DAILY ONLY",
       "decision": "COMPATIBILITY FOR NON-DAILY ONLY",
-      "phase": "Phase 2C Tower / 2D Abyss / 2E Adventure / 2F Boss",
+      "phase": "Phase 2D Abyss / 2E Adventure / 2F Boss",
       "reason": "stat generation migrates; skill/identity construction responsibility kept separately",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "Delete legacy responsibility after final dependent mode migrates; Daily caller graph must stay severed",
+      "retirementGate": "Tower caller graph severed in Phase 2C; delete legacy responsibility after Abyss/Adventure/Personal/World Boss migrate",
       "wildForbidden": true,
       "requiredModes": [
-        "tower",
         "abyss",
         "adventure",
         "personalBoss",
@@ -123,14 +121,13 @@
       "sourceToken": "applyDungeonMonsterStrength",
       "status": "COMPATIBILITY FOR NON-DAILY ONLY",
       "decision": "COMPATIBILITY FOR NON-DAILY ONLY",
-      "phase": "Phase 2C Tower / 2D Abyss / 2E Adventure / 2F Boss",
+      "phase": "Phase 2D Abyss / 2E Adventure / 2F Boss",
       "reason": "keep for unmigrated users only; remove at last dependent migration",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "Delete legacy responsibility after final dependent mode migrates; Daily caller graph must stay severed",
+      "retirementGate": "Tower caller graph severed in Phase 2C; delete legacy responsibility after Abyss/Adventure/Personal/World Boss migrate",
       "dailyForbidden": true,
       "wildForbidden": true,
       "requiredModes": [
-        "tower",
         "abyss",
         "adventure",
         "personalBoss",
@@ -143,14 +140,13 @@
       "sourceToken": "applyDungeonNormalBonus",
       "status": "COMPATIBILITY FOR NON-DAILY ONLY",
       "decision": "COMPATIBILITY FOR NON-DAILY ONLY",
-      "phase": "Phase 2C Tower / 2D Abyss / 2E Adventure / 2F Boss",
+      "phase": "Phase 2D Abyss / 2E Adventure / 2F Boss",
       "reason": "same dependency rule; legacy 1.30/1.10 not ratified",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "Delete legacy responsibility after final dependent mode migrates; Daily caller graph must stay severed",
+      "retirementGate": "Tower caller graph severed in Phase 2C; delete legacy responsibility after Abyss/Adventure/Personal/World Boss migrate",
       "dailyForbidden": true,
       "wildForbidden": true,
       "requiredModes": [
-        "tower",
         "abyss",
         "adventure",
         "personalBoss",
@@ -163,14 +159,13 @@
       "sourceToken": "applyDungeonRankStrength",
       "status": "COMPATIBILITY FOR NON-DAILY ONLY",
       "decision": "COMPATIBILITY FOR NON-DAILY ONLY",
-      "phase": "Phase 2C Tower / 2D Abyss / 2E Adventure / 2F Boss",
+      "phase": "Phase 2D Abyss / 2E Adventure / 2F Boss",
       "reason": "3.20/4.50 HP,2 SP,1.25/1.40 defense comparison only",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "Delete legacy responsibility after final dependent mode migrates; Daily caller graph must stay severed",
+      "retirementGate": "Tower caller graph severed in Phase 2C; delete legacy responsibility after Abyss/Adventure/Personal/World Boss migrate",
       "dailyForbidden": true,
       "wildForbidden": true,
       "requiredModes": [
-        "tower",
         "abyss",
         "adventure",
         "personalBoss",
@@ -257,13 +252,13 @@
     {
       "id": "towerBossMultipliers",
       "file": "js/gameplay-boss-tower-system.js",
-      "sourceToken": "buildTowerBossMonster",
-      "status": "CURRENT OWNER",
-      "decision": "TO RETIRE",
-      "phase": "Phase 2 Tower",
-      "reason": "tower smallBoss final calibration separately approved",
+      "sourceToken": "bossBalanceProfile(definition.level,\"tower\"",
+      "status": "RETIRED",
+      "decision": "RETIRED",
+      "phase": "Phase 2C Tower",
+      "reason": "Tower smallBoss HP/defense/final pressure are projected by MonsterBalance; old bossBalanceProfile Tower HP/attack post-write is physically removed.",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+      "retirementGate": "VERIFIED by Phase2C source scan + Tower runtime regression"
     },
     {
       "id": "bossUnusedDefense",
@@ -280,23 +275,23 @@
       "id": "towerElement",
       "file": "js/gameplay-boss-tower-system.js",
       "sourceToken": "applyTowerElementProfile",
-      "status": "CURRENT OWNER",
-      "decision": "TO MIGRATE",
-      "phase": "Phase 2 Tower",
-      "reason": "HP/defense/speed projection moves into balance owner; skill/effect metadata remains existing Tower owner",
+      "status": "STAT WRITES RETIRED / GAMEPLAY METADATA OWNER",
+      "decision": "KEEP",
+      "phase": "Phase 2C Tower",
+      "reason": "Earth HP/defense and wind speed moved into MonsterBalance. Existing fire crit/direct damage, water heal/status/support, wind evasion metadata remain the Tower gameplay owner.",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+      "retirementGate": "Stat mutation scan must remain empty; metadata/effect behavior stays under Tower regression."
     },
     {
       "id": "towerLevel",
       "file": "js/gameplay-boss-tower-system.js",
       "sourceToken": "towerMonsterLevel",
-      "status": "CURRENT OWNER",
-      "decision": "TO RETIRE",
-      "phase": "Phase 2 Tower",
-      "reason": "floor=N becomes level=N; fixed10 composition and gameplay skill features KEEP",
+      "status": "RETIRED",
+      "decision": "RETIRED",
+      "phase": "Phase 2C Tower",
+      "reason": "MonsterBalance Tower contract owns floor=N as level=N; old 29+floor*0.71 clamp is removed.",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+      "retirementGate": "VERIFIED by 4 elements × 100 floors owner/runtime tests."
     },
     {
       "id": "enemyPressure",
@@ -304,13 +299,12 @@
       "sourceToken": "getEnemyPressureMultiplier",
       "status": "COMPATIBILITY FOR NON-DAILY ONLY",
       "decision": "COMPATIBILITY FOR NON-DAILY ONLY",
-      "phase": "Phase 2C Tower / 2D Abyss / 2E Adventure / 2F Boss",
+      "phase": "Phase 2D Abyss / 2E Adventure / 2F Boss",
       "reason": "mode explicit; v132Dungeon flag cannot imply daily; damage settlement KEEP single owner consumes resolved profile",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "Delete legacy responsibility after final dependent mode migrates; Daily caller graph must stay severed",
+      "retirementGate": "Tower caller graph severed in Phase 2C; delete legacy responsibility after Abyss/Adventure/Personal/World Boss migrate",
       "wildForbidden": true,
       "requiredModes": [
-        "tower",
         "abyss",
         "adventure",
         "personalBoss",
@@ -353,5 +347,50 @@
     }
   ],
   "phase2aGate": "15/15 functional requirements VERIFIED: focused20/20, unchanged non-Wild outputs, 40 diagnostic TTK and both-viewports natural Chrome. Latest Required CI/dev integration/deployed exact SHA remain separate gates owned by PR #780.",
-  "phase2bGate": "IMPLEMENTED; TTK, natural Chrome, latest CI/integration/deployment gates still pending."
+  "phase2bGate": "IMPLEMENTED; TTK, natural Chrome, latest CI/integration/deployment gates still pending.",
+  "phase2cGate": {
+    "workId": "MONSTER-BALANCE-OWNER-P2C-TOWER-20261004",
+    "status": "VERIFIED",
+    "migratedMode": "tower",
+    "runtimeOwner": "js/combat/monster-balance-owner.mjs",
+    "preservedGameplayOwners": [
+      "fixed 10-unit roster and battlefield slots",
+      "65/70/75/80 percent skill frequency",
+      "fire critical/direct-damage metadata",
+      "water heal/support/freeze/status-accuracy behavior",
+      "wind +15 evasion metadata",
+      "portrait/reward/progression lifecycle"
+    ],
+    "retiredWrites": [
+      "towerMonsterLevel 29+floor*0.71",
+      "Tower v132BuildDungeonMonster stat chain",
+      "Tower bossBalanceProfile HP/attack post-write",
+      "Tower earth HP/defense post-write",
+      "Tower wind agility post-write"
+    ],
+    "remainingLegacyModes": [
+      "abyss",
+      "adventure",
+      "personalBoss",
+      "worldBoss"
+    ],
+    "stopAfter": "Phase 2C Tower",
+    "functionalEvidence": {
+      "sourceHead": "d7108cead55b297a03c3aa6325ce913690ae17e7",
+      "ciRun": 37165953470,
+      "ciJob": 111328746224,
+      "artifactId": 11289725982,
+      "artifactSha256": "d3ba1425e94ad12b6d5a73f592ad3c6c0132b34b81a806f8d4fb97695a15c928",
+      "requiredCi": "SUCCESS at this functional source head",
+      "screenshotsReviewed": true,
+      "scope": "Functional VERIFIED. Final metadata-head CI, integration and exact dev deployment are separate gates owned by PR #788."
+    },
+    "integration": "PENDING FINAL HEAD CI / PR #788",
+    "deployment": "PENDING EXACT DEV SHA AND LIVE TOWER QA",
+    "modeCalibration": {
+      "hp": 0.2,
+      "outgoingPressure": 0.25,
+      "rawAttackAndPointsUnchanged": true
+    }
+  }
 }

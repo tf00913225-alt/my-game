@@ -251,6 +251,8 @@ jobs:
         env:
           EXPECTED_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
+          node tests/monster-balance-owner-phase2c.test.mjs
+          node scripts/tower-balance-ttk-matrix.mjs artifacts/browser-qa/tower-challenge-balance-ttk.json
           node tests/tower-challenge-formula.test.js
           node tests/tower-element-formation-small-boss-20260924.test.js
           node tests/gameplay-boss-tower-system.test.js

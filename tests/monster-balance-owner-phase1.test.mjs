@@ -55,7 +55,7 @@ test('rank adds no points; seven modes explicit and isolated',()=>{
   const row=MonsterBalance.preview({...spec,mode,rank});
   assert.equal(row.base.abilityPointBudget,245);assert.equal(row.profiles.mode.id,mode);
   assert.deepEqual(row.allocation,MonsterBalance.preview(spec).allocation);
-  assert.equal(row.profiles.rank.status,['wild','daily'].includes(mode)?'RANK_V1':'PENDING_PRODUCT_CALIBRATION');
+  assert.equal(row.profiles.rank.status,['wild','daily','tower'].includes(mode)?'RANK_V1':'PENDING_PRODUCT_CALIBRATION');
  }
  for(const invalid of [{mode:'boss'},{mode:'legacy-dungeon'},{rank:'boss'},{archetype:'unknown'},{context:''},{element:''}])assert.throws(()=>MonsterBalance.preview({...spec,...invalid}));
 });
@@ -71,7 +71,7 @@ test('floor N is preview LvN; fixed 10 roster and existing rank composition',()=
 test('existing Tower element profile math only; global defaults all1, other modes isolated',()=>{
  assert.deepEqual(GLOBAL_CALIBRATION,{hp:1,sp:1,damage:1,defense:1});
  const earth=MonsterBalance.preview({...spec,element:'earth',mode:'tower'});
- assert.equal(earth.final.maxHP,Math.round(earth.derived.maxHP*1.15));
+ assert.equal(earth.final.maxHP,Math.round(earth.derived.maxHP*earth.profiles.mode.hp*1.15));
  assert.equal(earth.final.defense,Math.round(earth.derived.defense*1.15));
  const wind=MonsterBalance.preview({...spec,element:'wind',mode:'tower'});
  assert.equal(wind.final.speed,wind.derived.speed*1.15);

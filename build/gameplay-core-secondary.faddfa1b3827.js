@@ -4114,7 +4114,7 @@
             status:"existing",
             legacy:true
         }:(()=>{
-            const temporaryBoss=monster.rank==="boss"||monster.unitKind==="boss"||monster.vGameplayBoss===true||monster.v141BattleRank==="boss";
+            const temporaryBoss=monster.rank==="boss"||monster.rank==="smallBoss"||monster.unitKind==="boss"||monster.vGameplayBoss===true||monster.vGameplayTowerBoss===true||monster.v141BattleRank==="boss";
             return {
                 portraitKey:temporaryBoss?"temporary.boss-reference":"temporary.heavenly-soldier",
                 name:monster.name||"",

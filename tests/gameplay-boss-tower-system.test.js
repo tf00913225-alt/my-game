@@ -5,6 +5,10 @@ const fs=require("node:fs");
 const vm=require("node:vm");
 
 const source=fs.readFileSync("js/gameplay-boss-tower-system.js","utf8");
+const appSource=fs.readFileSync("js/00-main.js","utf8");
+const balanceStart=appSource.indexOf("/* BEGIN GENERATED MONSTER BALANCE OWNER */");
+const balanceEnd=appSource.indexOf("/* END GENERATED MONSTER BALANCE OWNER */")+"/* END GENERATED MONSTER BALANCE OWNER */".length;
+const balanceSource=appSource.slice(balanceStart,balanceEnd);
 const accountSource=fs.readFileSync("js/startup/account-save-repository.js","utf8");
 const battlefieldSource=fs.readFileSync("js/battlefield-slot-owner.js","utf8");
 const v131Source=fs.readFileSync("js/25-v131-fix-batch.js","utf8");
@@ -88,6 +92,7 @@ function load(options={}){
         rebuildInventorySlots:noop,updateGoldDisplay:noop,addBattleLog:message=>{ (context.logs||(context.logs=[])).push(message); },
         showPlayerHit:noop,checkBattleEnd:()=>false,
         v133GetHighestCreatedCharacterLevel:()=>options.level||100,
+        getMonsterRank:monster=>monster&&monster.rank==="smallBoss"?"boss":(monster&&monster.rank||"regular"),
         v132DungeonRankMultipliers:DUNGEON_RANK_MULTIPLIERS,
         v132BuildDungeonMonster:(name,level,element,rank)=>{
             const multiplier=DUNGEON_RANK_MULTIPLIERS[rank]||{maxHP:1,maxSP:1,defense:1};
@@ -115,6 +120,7 @@ function load(options={}){
     vm.runInContext(accountSource,context,{filename:"js/startup/account-save-repository.js"});
     context.FourSymbolsAccountSave.activate(TEST_UID);
     vm.runInContext(battlefieldSource,context,{filename:"js/battlefield-slot-owner.js"});
+    vm.runInContext(balanceSource,context,{filename:"monster-balance-runtime.js"});
     vm.runInContext(source,context,{filename:"js/gameplay-boss-tower-system.js"});
     vm.runInContext(v131FormationSource,context,{filename:"js/25-v131-fix-batch.js#formation"});
     return {context,localStorage};
