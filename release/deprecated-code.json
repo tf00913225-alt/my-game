@@ -221,7 +221,7 @@
         "bossEliteHpMultiplier",
         "bossHpMultiplier",
         "function applyHpMultiplier(",
-        "function makeAbyssMonster(name,element,rank,extraHp)",
+        "function makeAbyssMonster(name,level,element,rank,extraHp,skills,forceLevel)",
         "v141ExtraHP"
       ]
     }

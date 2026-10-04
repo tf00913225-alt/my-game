@@ -344,8 +344,8 @@
     // Stable identity mapping; role intent never invents a skill or AI capability.
     function abyssArchetype(name){
         if(name==="極帝天尊"){ return "support"; }
-        if(["東帝","東帝天尊","南帝","南帝天尊"].includes(name)){ return "physical"; }
-        if(["天帝","天帝天尊","北帝","北帝天尊"].includes(name)){ return "magic"; }
+        if(["南帝","南帝天尊"].includes(name)){ return "physical"; }
+        if(["東帝","東帝天尊","天帝","天帝天尊","北帝","北帝天尊"].includes(name)){ return "magic"; }
         if(name==="天兵天將"){ return "balanced"; }
         throw new Error("Unknown formal Abyss identity: "+name);
     }

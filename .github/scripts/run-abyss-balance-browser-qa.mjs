@@ -9,7 +9,7 @@ const expression=`(async()=>{
  const check=(v,m)=>{if(!v)throw Error(m);};
  const wait=async(fn,ms=30000)=>{const end=performance.now()+ms;while(!fn()&&performance.now()<end)await new Promise(r=>setTimeout(r,40));check(fn(),'Runtime wait: '+fn);};
  await wait(()=>FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden===true&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show'));
- await FourSymbolsFeatures.ensure('gameplay-core','abyss-balance-qa');await FourSymbolsFeatures.ensure('abyss','abyss-balance-qa');
+ await FourSymbolsFeatures.ensure('gameplay-core','abyss-balance-qa');await FourSymbolsFeatures.ensure('abyss','abyss-balance-qa');await FourSymbolsFeatures.ensure('feature-boss-relic','abyss-balance-qa');
  await wait(()=>FourSymbolsReleaseUpdate?.getState?.().availableReleaseVersion);closeHomeFeature();
  const evidence=window.abyssBalanceQaEvidence={matrix:[],scenes:[],skills:[],controls:[],portraitGaps:[]};
  const oldRandom=Math.random;Math.random=()=>.5;autoBattle=false;autoPatrolEnabled=false;
@@ -21,18 +21,18 @@ const expression=`(async()=>{
  async function scene(difficulty,region,stage,partyLevel,manual=false){
   const reference=prepareWildBalanceReferenceParty(partyLevel,partyLevel>=50?3:2);
   for(const cfg of [autoConfig,autoConfig2,autoConfig3]){cfg.enabled=false;cfg.skill=reference.skill;}autoBattle=false;
-  closeHomeFeature();v174AbyssBackToSelection();showPage('dungeon');switchDungeonTab('abyss');v174AbyssSelectDifficulty(difficulty);
+  closeHomeFeature();vGameplayBackToHub();document.querySelector('.gameplay-mode-card.abyss').click();check(document.querySelector('.v174-abyss-selection'),'Gameplay Center Abyss entry');v174AbyssSelectDifficulty(difficulty);
   // Seed progression only in the isolated read-only QA account. Entry, combat,
   // results, chest claim and return remain the unmodified production owners.
   const root=v174AbyssGetRootState();root.selectedDifficulty=difficulty;root.runs[difficulty]={...root.runs[difficulty],active:true,regionIndex:region,encounterIndex:stage,isBoss:stage===4,phase:'ready',battleCompleted:false,chestSpawned:false,chestClaimed:false,portalUnlocked:false,completed:false,completedStages:{},rewardClaims:{},firstClearClaims:{},completedRegions:[false,false,false,false,false],x:50,y:84};
-  localStorage.setItem(FourSymbolsAccountSave.accountKey('abyss-state',FourSymbolsAccountSave.getActiveUid()),JSON.stringify(root));v174AbyssReloadState();v174AbyssSelectDifficulty(difficulty);
+  const uid=FourSymbolsAccountSave.getActiveUid(),save=FourSymbolsAccountSave.readForUid(uid);check(save.status==='ready','isolated QA save');FourSymbolsAccountSave.writeForUid(uid,{...save.save,abyssProgress:root},{source:'abyss-balance-qa'});v174AbyssReloadState();v174AbyssSelectDifficulty(difficulty);
   const entry=document.querySelector('.v174-abyss-encounter');check(entry,'formal entry');entry.click();
   if(stage===4){await wait(()=>document.getElementById('v169RpgDialogLayer')?.classList.contains('show'));document.querySelectorAll('#v169RpgDialogLayer .v169-rpg-dialog-button')[1].click();}
   await wait(()=>battleActive&&window.v132ActiveDungeonRun?.mode==='abyss');await wait(()=>!document.getElementById('battlePage')?.matches('.v141-preparing-entry,.v141-entry-moving'));
   check(!document.getElementById('homeFeatureModal')?.classList.contains('show'),'no blocking shared modal');
-  const initial=monsters.map(stats),ids=currentBattleMonsters.slice(),snapshot=FourSymbolsBattlefieldSlots.getActiveEnemySnapshot(),slots=ids.map(i=>FourSymbolsBattlefieldSlots.getEnemySlotForMonster(snapshot,i));
-  check(new Set(slots).size===ids.length,'unique fixed slots');monsters.forEach(verify);renderBattle();monsters.forEach(verify);
-  for(const i of ids){const card=document.getElementById('battleMonster'+i),art=card?.querySelector('.v174-battle-art'),r=card?.getBoundingClientRect();check(r&&r.width>0&&r.height>0&&r.left>=-1&&r.right<=innerWidth+1,'visible target card');check(art&&getComputedStyle(art).backgroundImage!=='none','formal portrait');check(card.querySelector('.monster-hp-inner')&&card.querySelector('.monster-sp-inner'),'HP SP UI');const record=v154ResolveMonsterPortraitRecord(monsters[i]);if(record.temporary)evidence.portraitGaps.push(record);}
+  const entities=monsters.slice(),initial=entities.map(stats),ids=currentBattleMonsters.slice(),snapshot=FourSymbolsBattlefieldSlots.getActiveEnemySnapshot(),slots=ids.map(i=>FourSymbolsBattlefieldSlots.getEnemySlotForMonster(snapshot,i));
+  check(new Set(slots).size===ids.length,'unique fixed slots');check(monsters.every(m=>m.context==='abyss/'+difficulty+'/'+v174AbyssRegions[region].id+'/stage/'+(stage+1)),'actual encounter context');check(monsters.filter(m=>m.rank==='smallBoss').length===(stage<4?0:difficulty===40&&region===4?5:1),'canonical emperor rank');monsters.forEach(verify);renderBattle();monsters.forEach(verify);
+  for(const i of ids){const card=document.getElementById('battleMonster'+i),art=card?.querySelector('.v174-battle-art'),r=card?.getBoundingClientRect();check(r&&r.width>0&&r.height>0&&r.left>=-1&&r.right<=innerWidth+1,'visible target card');check(card.closest('.v131-monster-row')?.classList.contains('v131-monster-row-'+(monsters[i].v141FormationRow+1)),'preserved visual row');check(art&&getComputedStyle(art).backgroundImage!=='none','formal portrait');check(card.querySelector('.monster-hp-inner')&&card.querySelector('.monster-sp-inner'),'HP SP UI');const record=v154ResolveMonsterPortraitRecord(monsters[i]);if(record.temporary)evidence.portraitGaps.push(record);}
   const shapes={};for(const shape of ['single','all','row','tri']){const targets=FourSymbolsBattlefieldSlots.resolveEnemyTargets(snapshot,ids[0],shape,i=>monsters[i]?.alive);check(targets.length>0&&targets.every(i=>ids.includes(i)),'target geometry '+shape);shapes[shape]=targets;}
   window.abyssBalanceQaCapture={difficulty,region,stage};await new Promise(r=>setTimeout(r,400));
   const events=[];const off=FourSymbolsBattleFlow.subscribeBeforeCombatant(e=>{const actor=e.queue[e.index];events.push({round:turn,type:actor?.type,index:actor?.monsterIndex??actor?.characterIndex});monsters.forEach(verify);check(JSON.stringify(ids.map(i=>FourSymbolsBattlefieldSlots.getEnemySlotForMonster(FourSymbolsBattlefieldSlots.getActiveEnemySnapshot(),i)))===JSON.stringify(slots),'no death reflow');});
@@ -53,7 +53,7 @@ const expression=`(async()=>{
   }finally{off();}
   autoBattle=false;autoConfig.enabled=false;await wait(()=>document.getElementById('battleStatisticsResultModal')?.hidden===false);resultClose();
   await wait(()=>v174AbyssGetRunState(difficulty).phase==='chest');check(!window.v132ActiveDungeonRun,'no background battle');
-  check(JSON.stringify(initial)===JSON.stringify(monsters.map(stats)),'no late stat writer');
+  check(JSON.stringify(initial)===JSON.stringify(entities.map(stats)),'no late stat writer');
   const goldBefore=gold;document.querySelector('.v174-abyss-chest').click();await wait(()=>v174AbyssGetRunState(difficulty).chestClaimed,12000);check(gold>goldBefore,'formal reward');
   document.querySelector('#v132RewardModal button')?.click();document.querySelector('#v141BlackGoldRewardModal button')?.click();
   v174AbyssBackToSelection();v174AbyssLeaveToGameplay();check(!battleActive&&!window.v132ActiveDungeonRun,'return cleanup');

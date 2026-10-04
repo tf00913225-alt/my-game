@@ -79,7 +79,7 @@ progression and party-size significance; it is not a two-round or universal-clea
 Encounter round ranges by participating rank: Regular1–6, Elite1–12, smallBoss2–12;
 these are encounter durations, not fabricated independent per-monster TTK.
 Skill chance/loadouts remain at their existing values. Pre-stage soldiers map balanced;
-east/south emperors physical, heaven/north magic, extreme support. No random archetype.
+south emperors physical, east/heaven/north magic, extreme support. No random archetype.
 First-round and final player HP, resources, enemy stats, skills and status evidence are retained.
 Focused6/6, related48/48, syntax365/365, build:check and deprecated gates PASS locally.
 Production Chrome and final CI remain pending. Combat Rock Wall intentionally changes

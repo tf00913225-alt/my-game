@@ -76,8 +76,8 @@
         3320
       ],
       "firstRoundParty": [
-        2925,
-        2680
+        2910,
+        2665
       ],
       "finalParty": [
         0,
@@ -91,8 +91,8 @@
           "element": "earth",
           "hp": 2455,
           "sp": 970,
-          "attack": 422,
-          "magicAttack": 192.25,
+          "attack": 266,
+          "magicAttack": 299.5,
           "defense": 378,
           "speed": 29,
           "owner": "MonsterBalance",
@@ -1779,11 +1779,11 @@
       ],
       "firstRoundParty": [
         1720,
-        1411
+        1394
       ],
       "finalParty": [
         1720,
-        303
+        252
       ],
       "initialMonsters": [
         {
@@ -1833,8 +1833,8 @@
           "element": "earth",
           "hp": 1267,
           "sp": 520,
-          "attack": 222,
-          "magicAttack": 109.75,
+          "attack": 146,
+          "magicAttack": 162,
           "defense": 203,
           "speed": 14,
           "owner": "MonsterBalance",
@@ -9503,11 +9503,11 @@
       ],
       "firstRoundParty": [
         2520,
-        2254
+        2240
       ],
       "finalParty": [
         2520,
-        2254
+        2240
       ],
       "initialMonsters": [
         {
@@ -9557,8 +9557,8 @@
           "element": "earth",
           "hp": 1267,
           "sp": 520,
-          "attack": 222,
-          "magicAttack": 109.75,
+          "attack": 146,
+          "magicAttack": 162,
           "defense": 203,
           "speed": 14,
           "owner": "MonsterBalance",
@@ -18112,11 +18112,11 @@
       ],
       "firstRoundParty": [
         3320,
-        3073
+        3060
       ],
       "finalParty": [
         3320,
-        3073
+        3060
       ],
       "initialMonsters": [
         {
@@ -18166,8 +18166,8 @@
           "element": "earth",
           "hp": 1267,
           "sp": 520,
-          "attack": 222,
-          "magicAttack": 109.75,
+          "attack": 146,
+          "magicAttack": 162,
           "defense": 203,
           "speed": 14,
           "owner": "MonsterBalance",
@@ -26688,11 +26688,11 @@
       ],
       "firstRoundParty": [
         3320,
-        2796
+        2764
       ],
       "finalParty": [
         3320,
-        2182
+        2086
       ],
       "initialMonsters": [
         {
@@ -26742,8 +26742,8 @@
           "element": "earth",
           "hp": 2455,
           "sp": 970,
-          "attack": 422,
-          "magicAttack": 192.25,
+          "attack": 266,
+          "magicAttack": 299.5,
           "defense": 378,
           "speed": 29,
           "owner": "MonsterBalance",
@@ -33699,8 +33699,8 @@
         3320
       ],
       "firstRoundParty": [
-        2925,
-        2680
+        2910,
+        2665
       ],
       "finalParty": [
         0,
@@ -33714,8 +33714,8 @@
           "element": "earth",
           "hp": 2455,
           "sp": 970,
-          "attack": 422,
-          "magicAttack": 192.25,
+          "attack": 266,
+          "magicAttack": 299.5,
           "defense": 378,
           "speed": 29,
           "owner": "MonsterBalance",
@@ -35701,12 +35701,12 @@
       ],
       "firstRoundParty": [
         4120,
-        3663,
+        3635,
         4120
       ],
       "finalParty": [
         4120,
-        3663,
+        3635,
         4120
       ],
       "initialMonsters": [
@@ -35757,8 +35757,8 @@
           "element": "earth",
           "hp": 2455,
           "sp": 970,
-          "attack": 422,
-          "magicAttack": 192.25,
+          "attack": 266,
+          "magicAttack": 299.5,
           "defense": 378,
           "speed": 29,
           "owner": "MonsterBalance",
@@ -43059,14 +43059,14 @@
         4120
       ],
       "firstRoundParty": [
-        3687,
-        3470,
-        3687
+        3674,
+        3457,
+        3674
       ],
       "finalParty": [
-        2492,
-        2058,
-        2492
+        2452,
+        2018,
+        2452
       ],
       "initialMonsters": [
         {
@@ -43076,8 +43076,8 @@
           "element": "earth",
           "hp": 2455,
           "sp": 970,
-          "attack": 422,
-          "magicAttack": 192.25,
+          "attack": 266,
+          "magicAttack": 299.5,
           "defense": 378,
           "speed": 29,
           "owner": "MonsterBalance",
@@ -45017,12 +45017,12 @@
       ],
       "firstRoundParty": [
         4920,
-        4489,
+        4463,
         4920
       ],
       "finalParty": [
         4920,
-        4489,
+        4463,
         4920
       ],
       "initialMonsters": [
@@ -45073,8 +45073,8 @@
           "element": "earth",
           "hp": 2455,
           "sp": 970,
-          "attack": 422,
-          "magicAttack": 192.25,
+          "attack": 266,
+          "magicAttack": 299.5,
           "defense": 378,
           "speed": 29,
           "owner": "MonsterBalance",
@@ -52362,14 +52362,14 @@
         4920
       ],
       "firstRoundParty": [
-        4440,
-        4237,
-        4440
+        4428,
+        4225,
+        4428
       ],
       "finalParty": [
-        3995,
-        3792,
-        3995
+        3958,
+        3755,
+        3958
       ],
       "initialMonsters": [
         {
@@ -52379,8 +52379,8 @@
           "element": "earth",
           "hp": 2455,
           "sp": 970,
-          "attack": 422,
-          "magicAttack": 192.25,
+          "attack": 266,
+          "magicAttack": 299.5,
           "defense": 378,
           "speed": 29,
           "owner": "MonsterBalance",
