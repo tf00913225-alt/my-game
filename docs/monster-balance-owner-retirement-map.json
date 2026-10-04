@@ -1,6 +1,6 @@
 {
-  "workId": "MONSTER-BALANCE-OWNER-P2B-DAILY-20261003",
-  "phase": "2B",
+  "workId": "MONSTER-BALANCE-OWNER-P2C-TOWER-20261004",
+  "phase": "2C",
   "classification": [
     "Convergence",
     "Replacement",
@@ -350,7 +350,7 @@
   "phase2bGate": "IMPLEMENTED; TTK, natural Chrome, latest CI/integration/deployment gates still pending.",
   "phase2cGate": {
     "workId": "MONSTER-BALANCE-OWNER-P2C-TOWER-20261004",
-    "status": "IMPLEMENTED_PENDING_CI_AND_DEPLOYED_QA",
+    "status": "VERIFIED",
     "migratedMode": "tower",
     "runtimeOwner": "js/combat/monster-balance-owner.mjs",
     "preservedGameplayOwners": [
@@ -374,6 +374,23 @@
       "personalBoss",
       "worldBoss"
     ],
-    "stopAfter": "Phase 2C Tower"
+    "stopAfter": "Phase 2C Tower",
+    "functionalEvidence": {
+      "sourceHead": "d7108cead55b297a03c3aa6325ce913690ae17e7",
+      "ciRun": 37165953470,
+      "ciJob": 111328746224,
+      "artifactId": 11289725982,
+      "artifactSha256": "d3ba1425e94ad12b6d5a73f592ad3c6c0132b34b81a806f8d4fb97695a15c928",
+      "requiredCi": "SUCCESS at this functional source head",
+      "screenshotsReviewed": true,
+      "scope": "Functional VERIFIED. Final metadata-head CI, integration and exact dev deployment are separate gates owned by PR #788."
+    },
+    "integration": "PENDING FINAL HEAD CI / PR #788",
+    "deployment": "PENDING EXACT DEV SHA AND LIVE TOWER QA",
+    "modeCalibration": {
+      "hp": 0.2,
+      "outgoingPressure": 0.25,
+      "rawAttackAndPointsUnchanged": true
+    }
   }
 }

@@ -549,6 +549,25 @@
         "verification": "Local kernel24/24 and cloud/backend195/195 PASS; 128 element/level/enemy/random-boundary cases match browser rules after V140/V149/V152/V173.64 wrappers; build:check PASS. Final-head required CI/emulator, dev/Firebase deployment and closeout remain mandatory and tracked by this Work PR.",
         "result": "Single unmodified player attack arithmetic only, not an accepted battle action or victory. All combat/outcome/reward/credit readiness flags remain false. No browser/callable/authoritative-state mutation; Phase4 remains0/6 VERIFIED."
       }
+    },
+    {
+      "id": "REQ-MONSTER-BALANCE-OWNER-P2C-TOWER-20261004",
+      "title": "Tower Runtime唯一MonsterBalance／floor=level／smallBoss與舊倍率退休",
+      "status": "VERIFIED",
+      "evidence": {
+        "files": [
+          "docs/MONSTER_BALANCE_OWNER_PHASE2C.md",
+          "docs/monster-balance-owner-retirement-map.json",
+          "tests/monster-balance-owner-phase2c.test.mjs",
+          "scripts/tower-balance-ttk-matrix.mjs",
+          ".github/scripts/run-tower-challenge-browser-qa.mjs",
+          "docs/monster-balance-tower-ttk-evidence-20261004.json",
+          "docs/monster-balance-tower-browser-evidence-20261004.json",
+          ".github/scripts/run-fire-tower-identity-first-frame-browser-qa.mjs"
+        ],
+        "verification": "Exact functional Head d7108cead55b297a03c3aa6325ce913690ae17e7; CI Run37165953470 Job111328746224 SUCCESS; Session Authority Run37165952955 Job111328745049 SUCCESS. Focused5/5 and actual4x100, TTK60/60 clear+survivor, Tower production Chrome27/27 with six-stat equality/four elements/B3/queue/AOE, three portrait fixtures300 owner checks/zero V132; Phase1/2A/2B and all related required regressions/build/deprecated/syntax PASS. Artifact11289725982 SHA256 independently verified and screenshots reviewed.",
+        "result": "Phase2C functionality1/1 VERIFIED. Regular1 / Elite1–19 / smallBoss1–11 rounds. Unmigrated legacy outputs protected. Final metadata-head CI, dev integration, exact dev deployment and deployed Tower QA remain separate closeout gates in PR #788. main untouched; no Phase2D."
+      }
     }
   ]
 }

@@ -12170,11 +12170,13 @@
     }
   ],
   "provenance": {
-    "sourceHead": "1c6f48c14230f668cc541255af03402186227156",
-    "ciRun": 37164133231,
-    "ciJob": 111323468239,
-    "artifactId": 11289322164,
-    "artifactSha256": "701da0310420d8e097ea2be78078ee952b98420d9102374410f4b69ab970f1e7",
-    "scope": "Functional evidence. Final head CI, integration and exact dev deployment remain separate gates."
+    "sourceHead": "d7108cead55b297a03c3aa6325ce913690ae17e7",
+    "ciRun": 37165953470,
+    "ciJob": 111328746224,
+    "artifactId": 11289725982,
+    "artifactSha256": "d3ba1425e94ad12b6d5a73f592ad3c6c0132b34b81a806f8d4fb97695a15c928",
+    "requiredCi": "SUCCESS at this functional source head",
+    "screenshotsReviewed": true,
+    "scope": "Functional VERIFIED. Final metadata-head CI, integration and exact dev deployment are separate gates owned by PR #788."
   }
 }
