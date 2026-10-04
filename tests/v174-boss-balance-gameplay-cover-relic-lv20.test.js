@@ -67,6 +67,8 @@ function bossContext(level=100){
     context.window=context;context.globalThis=context;
     vm.createContext(context);
     vm.runInContext(battlefieldSource,context,{filename:"js/battlefield-slot-owner.js"});
+    const app=fs.readFileSync("js/00-main.js","utf8");
+    vm.runInContext(app.slice(app.indexOf("/* BEGIN GENERATED MONSTER BALANCE OWNER */"),app.indexOf("/* END GENERATED MONSTER BALANCE OWNER */")+"/* END GENERATED MONSTER BALANCE OWNER */".length),context);
     vm.runInContext(bossSource,context,{filename:"js/gameplay-boss-tower-system.js"});
     return context;
 }
@@ -110,12 +112,11 @@ function relicContext(level){
    Boss-owned Shield durability and two same-element elite helpers. */
 {
     const context=bossContext(100);
-    const lv20=context.GameplaySystem.getBossBalanceProfile(20,"personal",1);
-    const lv60=context.GameplaySystem.getBossBalanceProfile(60,"personal",1);
-    assert.equal(lv20.expectedPartySize,2,"Lv20 Boss balance must assume two same-level characters");
-    assert.equal(lv60.expectedPartySize,3,"Lv60+ Boss balance must assume the third character slot is available");
-    assert.ok(lv20.hpMultiplier>4.2,"Lv20 Boss HP must be materially stronger than the old fixed multiplier");
-    assert.equal(lv20.defenseMultiplier,1.12,"Boss rank defense must be 12% above the corresponding elite rank baseline");
+    assert.equal(context.GameplaySystem.getBossBalanceProfile,undefined,"retired metadata cannot return");
+    context.vGameplayStartBoss("personal","personal-20");
+    assert.equal(context.monsters[0].vGameplayExpectedPartySize,2);
+    context.battleActive=false;context.vGameplayStartBoss("personal","personal-60");
+    assert.equal(context.monsters[0].vGameplayExpectedPartySize,3);
 
     const personalNames=context.GameplaySystem.personalBosses.map(item=>item.name);
     const worldNames=context.GameplaySystem.worldBosses.map(item=>item.name);
@@ -131,7 +132,7 @@ function relicContext(level){
     const boss=context.lastRoster[0];
     assert.equal(boss.element,"fire");
     assert.equal(boss.rank,"boss");
-    assert.ok(boss.defense>context.v132BuildDungeonMonster("精英基準",20,"fire","elite").defense);
+    assert.equal(boss.defense,boss.balanceProjection.final.defense);
     assert.ok(boss.skillIds.every(id=>context.skillDatabase[id].element===boss.element),"Boss skills must match the Boss element");
     context.turn=2;context.FourSymbolsBossBattle.processRound();
     const shield=context.GameplaySystem.getActiveBattleState().shield;

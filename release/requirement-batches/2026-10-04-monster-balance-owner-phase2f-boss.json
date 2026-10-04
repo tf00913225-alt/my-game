@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-04",
+  "title": "Monster Balance Owner Phase2F Personal/World Boss",
+  "workId": "MONSTER-BALANCE-OWNER-P2F-BOSS-20261004",
+  "base_branch": "dev",
+  "base_sha": "9fff3664d2767739fe8cd5c893f2985f8032d5ef",
+  "work_branch": "feature/monster-balance-owner-phase2f-boss-20261004",
+  "officialVersion": "173.73",
+  "status": "IMPLEMENTED",
+  "requirements": [
+    {
+      "id": "REQ-MONSTER-BALANCE-OWNER-P2F-BOSS-20261004",
+      "title": "Personal/World Boss 戰前數值唯一 MonsterBalance 與七模式 Legacy 退場",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "docs/MONSTER_BALANCE_OWNER_PHASE2F.md",
+          "tests/monster-balance-owner-phase2f.test.mjs",
+          "scripts/boss-balance-ttk-matrix.mjs"
+        ],
+        "verification": "Candidate implementation and synchronous diagnostic only; natural Chrome, aggregate, latest-head CI, deployed SHA and cleanup remain required.",
+        "result": "NOT VERIFIED; do not merge until all required gates pass."
+      }
+    }
+  ]
+}

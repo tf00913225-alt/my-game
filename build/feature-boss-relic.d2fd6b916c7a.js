@@ -71,10 +71,10 @@
     ]);
 
     const WORLD_STAGE_PROFILES=Object.freeze([
-        Object.freeze({number:1,label:"第一階段",hpFactor:.78,attackFactor:.92,objects:Object.freeze([{round:3,type:"charge"}]),summon:null,summary:"試探攻勢與一次蓄力。"}),
-        Object.freeze({number:2,label:"第二階段",hpFactor:.88,attackFactor:1,objects:Object.freeze([{round:2,type:"shield"}]),summon:null,summary:"以護盾改變攻擊優先順序。"}),
-        Object.freeze({number:3,label:"第三階段",hpFactor:.96,attackFactor:1.06,objects:Object.freeze([{round:2,type:"heal"},{round:5,type:"amplify"}]),summon:Object.freeze({hpBelow:.55}),summary:"回復與法陣形成持久壓力，生命低於 55% 時召喚兩名同元素精英援軍。"}),
-        Object.freeze({number:4,label:"最終階段",hpFactor:1,attackFactor:1.12,objects:Object.freeze([{round:2,type:"charge"},{round:4,type:"amplify"},{round:7,type:"shield"}]),summon:Object.freeze({round:4}),summary:"狂暴、蓄力與護體交替，第 4 回合召喚兩名同元素精英援軍。"})
+        Object.freeze({number:1,label:"第一階段",objects:Object.freeze([{round:3,type:"charge"}]),summon:null,summary:"試探攻勢與一次蓄力。"}),
+        Object.freeze({number:2,label:"第二階段",objects:Object.freeze([{round:2,type:"shield"}]),summon:null,summary:"以護盾改變攻擊優先順序。"}),
+        Object.freeze({number:3,label:"第三階段",objects:Object.freeze([{round:2,type:"heal"},{round:5,type:"amplify"}]),summon:Object.freeze({hpBelow:.55}),summary:"回復與法陣形成持久壓力，生命低於 55% 時召喚兩名同元素精英援軍。"}),
+        Object.freeze({number:4,label:"最終階段",objects:Object.freeze([{round:2,type:"charge"},{round:4,type:"amplify"},{round:7,type:"shield"}]),summon:Object.freeze({round:4}),summary:"狂暴、蓄力與護體交替，第 4 回合召喚兩名同元素精英援軍。"})
     ]);
 
     const WORLD_BOSSES=Object.freeze([
@@ -105,35 +105,8 @@
             .replace(/>/g,"&gt;").replace(/\"/g,"&quot;").replace(/'/g,"&#039;");
     }
     function copy(value){ return JSON.parse(JSON.stringify(value)); }
-    function dungeonRankRatio(key,numeratorRank,denominatorRank){
-        const table=window.v132DungeonRankMultipliers;
-        const numerator=numeric(table&&table[numeratorRank]&&table[numeratorRank][key],0);
-        const denominator=numeric(table&&table[denominatorRank]&&table[denominatorRank][key],0);
-        if(numerator<=0||denominator<=0){ throw new Error("Gameplay BOSS requires v132 dungeon rank multipliers."); }
-        return numerator/denominator;
-    }
     function expectedPartySizeForLevel(level){
         return Math.max(1,Math.floor(numeric(level,1)))<=BOSS_BALANCE.twoMemberLevelCap?2:3;
-    }
-    function bossBalanceProfile(level,mode,stage){
-        const resolvedLevel=clamp(Math.floor(numeric(level,1)),1,100);
-        const expectedPartySize=expectedPartySizeForLevel(resolvedLevel);
-        const partyFactor=expectedPartySize>=3?1.75:1.55;
-        const baseHp=(4.5+resolvedLevel*.045)*partyFactor;
-        const baseAttack=1.12+resolvedLevel*.0045;
-        const resolvedMode=mode==="world"?"world":"personal";
-        const hpModeFactor=resolvedMode==="world"?1.15:1;
-        const attackModeFactor=resolvedMode==="world"?1.05:1;
-        const bossHpNormalization=dungeonRankRatio("maxHP","elite","boss");
-        const bossDefenseMultiplier=dungeonRankRatio("defense","boss","elite");
-        return {
-            level:resolvedLevel,
-            mode:resolvedMode,
-            expectedPartySize:expectedPartySize,
-            hpMultiplier:Number((baseHp*hpModeFactor*bossHpNormalization).toFixed(2)),
-            attackMultiplier:Number((baseAttack*attackModeFactor).toFixed(2)),
-            defenseMultiplier:Number(bossDefenseMultiplier.toFixed(4))
-        };
     }
 
     function utcWeekInfo(now){
@@ -281,14 +254,14 @@
         const progress=type==="world"?state.world[definition.id]:state.personal[definition.id];
         const stage=type==="world"?(progress.firstClear?4:Math.min(4,progress.completedStages+1)):1;
         const objectText=type==="world"?WORLD_STAGE_PROFILES[stage-1].summary:definition.traits.join("・");
-        const balance=bossBalanceProfile(definition.level,type==="world"?"world":"personal",stage);
+        const expectedPartySize=expectedPartySizeForLevel(definition.level);
         const summonPlan=type==="world"?WORLD_STAGE_PROFILES[stage-1].summon:(definition.summon||null);
         const supportText=summonPlan?"戰中同元素精英援軍 ×"+BOSS_BALANCE.reinforcementCount:"本階段無精英援軍";
         return '<div class="boss-detail"><button type="button" class="boss-detail-back" onclick="vGameplayCloseBossDetail()">‹ 返回 BOSS 列表</button>'+
             '<section class="boss-hero"><small>'+(type==="world"?'世界觀災厄級・永久單人攻略':'個人挑戰・固定等級')+'</small><h3>'+escapeHtml(definition.name)+'</h3><p>Lv.'+definition.level+'・'+escapeHtml(elementLabel(definition.element))+'元素</p><div class="boss-trait-tags">'+definition.traits.map(item=>'<span>'+escapeHtml(item)+'</span>').join("")+'</div></section>'+
             (type==="world"?worldStageTrack(progress):'')+
             '<button type="button" class="gameplay-primary-action" onclick="vGameplayStartBoss(\''+type+'\',\''+definition.id+'\')">'+(type==="world"?'挑戰'+WORLD_STAGE_PROFILES[stage-1].label:'開始挑戰')+'</button>'+
-            '<div class="boss-detail-grid"><section><h4>建議陣容</h4><p>同級角色 ×'+balance.expectedPartySize+'・'+escapeHtml(supportText)+'</p></section><section><h4>戰鬥特性</h4><p>'+escapeHtml(type==="world"?'四個永久攻略階段；失敗只重打目前階段。':definition.phases+' 個戰鬥階段；可不限次數挑戰，固定等級保留角色成長感。')+'</p></section><section><h4>機制簡介</h4><p>'+escapeHtml(objectText)+'</p></section><section><h4>首次擊敗獎勵</h4><p>'+escapeHtml(definition.firstReward)+'・'+(progress.firstClear?'已領取':'尚未領取')+'</p></section><section><h4>重複掉落</h4><p>'+escapeHtml(definition.repeatReward)+'</p></section></div>'+
+            '<div class="boss-detail-grid"><section><h4>建議陣容</h4><p>同級角色 ×'+expectedPartySize+'・'+escapeHtml(supportText)+'</p></section><section><h4>戰鬥特性</h4><p>'+escapeHtml(type==="world"?'四個永久攻略階段；失敗只重打目前階段。':definition.phases+' 個戰鬥階段；可不限次數挑戰，固定等級保留角色成長感。')+'</p></section><section><h4>機制簡介</h4><p>'+escapeHtml(objectText)+'</p></section><section><h4>首次擊敗獎勵</h4><p>'+escapeHtml(definition.firstReward)+'・'+(progress.firstClear?'已領取':'尚未領取')+'</p></section><section><h4>重複掉落</h4><p>'+escapeHtml(definition.repeatReward)+'</p></section></div>'+
             '</div>';
     }
     function renderBossPage(){
@@ -428,10 +401,6 @@
         content.scrollTop=0;
     }
 
-    function buildBaseMonster(name,level,element,rank){
-        if(typeof window.v132BuildDungeonMonster!=="function"){ throw new Error("Gameplay BOSS requires v132BuildDungeonMonster."); }
-        return window.v132BuildDungeonMonster(name,level,element,rank);
-    }
     function compatibleSkillIds(element,ids){
         return (ids||[]).filter(id=>{
             const skill=typeof skillDatabase!=="undefined"&&skillDatabase?skillDatabase[id]:null;
@@ -456,18 +425,17 @@
     function buildBossMonster(definition,options){
         const profile=options||{};
         const mode=profile.mode||(String(definition.id||"").indexOf("world-")===0?"world":"personal");
-        const balance=bossBalanceProfile(definition.level,mode,profile.stage);
-        const monster=buildBaseMonster(definition.name,definition.level,definition.element,"boss");
-        const hpMultiplier=balance.hpMultiplier*numeric(profile.hpFactor,1);
-        const attackMultiplier=balance.attackMultiplier*numeric(profile.attackFactor,1);
-        monster.maxHP=Math.max(1,Math.round(numeric(monster.maxHP,1)*hpMultiplier));
-        monster.hp=monster.maxHP;
-        monster.attack=Math.max(1,Math.round(numeric(monster.attack,1)*attackMultiplier));
-        monster.magicAttack=Math.max(1,Math.round(numeric(monster.magicAttack,monster.attack)*attackMultiplier));
+        const expectedPartySize=expectedPartySizeForLevel(definition.level);
+        const monster=window.MonsterBalance.build({
+            monsterKey:definition.id,name:definition.name,level:definition.level,element:definition.element,
+            archetype:"balanced",rank:"boss",mode:mode==="world"?"worldBoss":"personalBoss",
+            context:mode+"/"+definition.id+"/stage/"+numeric(profile.stage,1),
+            ...(mode==="world"?{worldStage:numeric(profile.stage,1)}:{})
+        });
         monster.unitKind="boss";
         monster.vGameplayBoss=true;
         monster.vGameplayBossId=definition.id;
-        monster.vGameplayExpectedPartySize=balance.expectedPartySize;
+        monster.vGameplayExpectedPartySize=expectedPartySize;
         monster.vGameplayStage=numeric(profile.stage,1);
         configureBossSkills(monster,definition.element,monster.vGameplayStage);
         return monster;
@@ -477,7 +445,12 @@
         const stage=Math.max(1,Math.floor(numeric(profile.stage,1)));
         const names=BOSS_SUPPORT_NAMES[definition.element]||BOSS_SUPPORT_NAMES.fire;
         return Array.from({length:BOSS_BALANCE.reinforcementCount},(_,index)=>{
-            const monster=buildBaseMonster(names[index%names.length],definition.level,definition.element,"elite");
+            const monster=window.MonsterBalance.build({
+                monsterKey:definition.id+".reinforcement."+index,name:names[index%names.length],level:definition.level,
+                element:definition.element,archetype:"balanced",rank:"elite",
+                mode:profile.mode==="world"?"worldBoss":"personalBoss",worldStage:stage,
+                context:profile.mode+"/"+definition.id+"/reinforcement/"+index
+            });
             monster.vGameplayBossSupport=true;
             monster.vGameplayBossSummon=true;
             monster.vGameplayBossId=definition.id;
@@ -849,7 +822,8 @@
             enumerable:true,
             get:function(){ return health; },
             set:function(nextValue){
-                const requested=clamp(numeric(nextValue,health),0,numeric(boss.maxHP,health));
+                // Keep the entire incoming packet until Shield absorption; clamp HP afterwards.
+                const requested=Math.min(numeric(nextValue,health),numeric(boss.maxHP,health));
                 if(requested>=health){
                     health=requested;
                     boss.vLastDamageSettlement=null;
@@ -923,7 +897,9 @@
         const expected=activeBattleContext.expectedPartySize||expectedPartySizeForLevel(boss.level);
         const scaledHp=Math.round(boss.maxHP*definition.hpRatio);
         const levelFloor=Math.round((BOSS_BALANCE.objectBaseHpPerMember+boss.level*BOSS_BALANCE.objectLevelHpPerMember)*expected);
-        const object=buildBaseMonster(definition.name,boss.level,boss.element,"regular");
+        // Mechanism object durability belongs here, not in MonsterBalance.
+        const object={name:definition.name,level:boss.level,element:boss.element,
+            attack:0,magicAttack:0,agility:0,accuracy:0,evasion:0,statusResistance:0,antiCrit:0};
         Object.assign(object,{
             alive:true,
             hp:Math.max(1,scaledHp,levelFloor),
@@ -1259,11 +1235,11 @@
         const world=type==="world",definition=world?findWorld(id):findPersonal(id);if(!definition||highestCharacterLevel()<definition.level){ return false; }
         const progress=world?state.world[definition.id]:state.personal[definition.id];
         const stage=world?(progress.firstClear?4:Math.min(4,progress.completedStages+1)):1;
-        const stageProfile=world?WORLD_STAGE_PROFILES[stage-1]:{stage:1,hpFactor:1,attackFactor:1,objects:definition.objects,summon:definition.summon||null};
+        const stageProfile=world?WORLD_STAGE_PROFILES[stage-1]:{stage:1,objects:definition.objects,summon:definition.summon||null};
         const mode=world?"world":"personal";
-        const balance=bossBalanceProfile(definition.level,mode,stage);
-        const boss=buildBossMonster(definition,{stage:stage,mode:mode,hpFactor:stageProfile.hpFactor,attackFactor:stageProfile.attackFactor});
-        activeBattleContext={mode:mode,definitionId:definition.id,stage:stage,combatPhase:1,totalPhases:world?1:definition.phases,boss:boss,bossIndex:null,expectedPartySize:balance.expectedPartySize,supportCount:0,summonPlan:stageProfile.summon,summonsCreated:false,objectIndexes:[],objectPlan:(world?stageProfile.objects:definition.objects).map(item=>Object.assign({},item)),spawnedPlans:{}};
+        const expectedPartySize=expectedPartySizeForLevel(definition.level);
+        const boss=buildBossMonster(definition,{stage:stage,mode:mode});
+        activeBattleContext={mode:mode,definitionId:definition.id,stage:stage,combatPhase:1,totalPhases:world?1:definition.phases,boss:boss,bossIndex:null,expectedPartySize:expectedPartySize,supportCount:0,summonPlan:stageProfile.summon,summonsCreated:false,objectIndexes:[],objectPlan:(world?stageProfile.objects:definition.objects).map(item=>Object.assign({},item)),spawnedPlans:{}};
         battleStarting=true;
         const started=window.v132LaunchDungeonBattle(
             [boss],
@@ -1468,7 +1444,6 @@
         objects:BOSS_OBJECT_DEFINITIONS,
         towerConfig:TOWER_CONFIG,
         bossBalance:BOSS_BALANCE,
-        getBossBalanceProfile:function(level,mode,stage){ return copy(bossBalanceProfile(level,mode,stage)); },
         getSerializableState:serializableState,
         normalizeState:normalizeState,
         getWeekInfo:utcWeekInfo,

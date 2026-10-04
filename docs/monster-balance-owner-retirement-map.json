@@ -1,6 +1,6 @@
 {
-  "workId": "MONSTER-BALANCE-OWNER-P2E-ADVENTURE-20261004",
-  "phase": "2E",
+  "workId": "MONSTER-BALANCE-OWNER-P2F-BOSS-20261004",
+  "phase": "2F",
   "classification": [
     "Convergence",
     "Replacement",
@@ -18,17 +18,14 @@
       "id": "coreAllocation",
       "file": "js/00-main.js",
       "sourceToken": "generateMonsterAttributePoints",
-      "status": "COMPATIBILITY FOR NON-DAILY ONLY",
-      "decision": "COMPATIBILITY FOR NON-DAILY ONLY",
-      "phase": "Phase 2D Abyss / 2E Adventure / 2F Boss",
-      "reason": "(level-1)*5 + archetype allocation; retain legacy only for unmigrated modes",
+      "status": "RETIRED",
+      "decision": "RETIRED",
+      "phase": "Phase 2F Boss",
+      "reason": "All formal modes migrated; token physically removed",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "Adventure caller edge severed in Phase2E; shared legacy remains for Personal/World Boss only.",
+      "retirementGate": "Runtime source scan and Phase1–2F regression required",
       "wildForbidden": true,
-      "requiredModes": [
-        "personalBoss",
-        "worldBoss"
-      ],
+      "requiredModes": [],
       "dailyForbidden": true,
       "abyssForbidden": true,
       "adventureForbidden": true
@@ -37,17 +34,14 @@
       "id": "coreStats",
       "file": "js/00-main.js",
       "sourceToken": "makeLegacyModeMonster",
-      "status": "COMPATIBILITY FOR NON-DAILY ONLY",
-      "decision": "COMPATIBILITY FOR NON-DAILY ONLY",
-      "phase": "Phase 2D Abyss / 2E Adventure / 2F Boss",
-      "reason": "stat generation migrates; skill/identity construction responsibility kept separately",
+      "status": "RETIRED",
+      "decision": "RETIRED",
+      "phase": "Phase 2F Boss",
+      "reason": "All formal modes migrated; token physically removed",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "Adventure caller edge severed in Phase2E; shared legacy remains for Personal/World Boss only.",
+      "retirementGate": "Runtime source scan and Phase1–2F regression required",
       "wildForbidden": true,
-      "requiredModes": [
-        "personalBoss",
-        "worldBoss"
-      ],
+      "requiredModes": [],
       "dailyForbidden": true,
       "abyssForbidden": true,
       "adventureForbidden": true
@@ -56,12 +50,12 @@
       "id": "playerLevelBase",
       "file": "js/00-main.js",
       "sourceToken": "calculateCharacterBaseStats",
-      "status": "CURRENT OWNER",
-      "decision": "TO MIGRATE",
+      "status": "KEEP",
+      "decision": "KEEP",
       "phase": "separate approved player Runtime migration",
-      "reason": "shared new Contract shadows both; player currently level*4/4/3; no Phase 1 switch",
+      "reason": "Player stat owner is explicitly outside Monster Balance scope",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+      "retirementGate": "No player migration authorized"
     },
     {
       "id": "wildV131",
@@ -119,18 +113,15 @@
       "id": "dungeonStrength",
       "file": "js/27-v132-content-expansion.js",
       "sourceToken": "applyDungeonMonsterStrength",
-      "status": "COMPATIBILITY FOR NON-DAILY ONLY",
-      "decision": "COMPATIBILITY FOR NON-DAILY ONLY",
-      "phase": "Phase 2D Abyss / 2E Adventure / 2F Boss",
-      "reason": "keep for unmigrated users only; remove at last dependent migration",
+      "status": "RETIRED",
+      "decision": "RETIRED",
+      "phase": "Phase 2F Boss",
+      "reason": "All formal modes migrated; token physically removed",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "Adventure caller edge severed in Phase2E; shared legacy remains for Personal/World Boss only.",
+      "retirementGate": "Runtime source scan and Phase1–2F regression required",
       "dailyForbidden": true,
       "wildForbidden": true,
-      "requiredModes": [
-        "personalBoss",
-        "worldBoss"
-      ],
+      "requiredModes": [],
       "abyssForbidden": true,
       "adventureForbidden": true
     },
@@ -138,18 +129,15 @@
       "id": "dungeonNormal",
       "file": "js/27-v132-content-expansion.js",
       "sourceToken": "applyDungeonNormalBonus",
-      "status": "COMPATIBILITY FOR NON-DAILY ONLY",
-      "decision": "COMPATIBILITY FOR NON-DAILY ONLY",
-      "phase": "Phase 2D Abyss / 2E Adventure / 2F Boss",
-      "reason": "same dependency rule; legacy 1.30/1.10 not ratified",
+      "status": "RETIRED",
+      "decision": "RETIRED",
+      "phase": "Phase 2F Boss",
+      "reason": "All formal modes migrated; token physically removed",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "Adventure caller edge severed in Phase2E; shared legacy remains for Personal/World Boss only.",
+      "retirementGate": "Runtime source scan and Phase1–2F regression required",
       "dailyForbidden": true,
       "wildForbidden": true,
-      "requiredModes": [
-        "personalBoss",
-        "worldBoss"
-      ],
+      "requiredModes": [],
       "abyssForbidden": true,
       "adventureForbidden": true
     },
@@ -157,18 +145,15 @@
       "id": "dungeonRank",
       "file": "js/27-v132-content-expansion.js",
       "sourceToken": "applyDungeonRankStrength",
-      "status": "COMPATIBILITY FOR NON-DAILY ONLY",
-      "decision": "COMPATIBILITY FOR NON-DAILY ONLY",
-      "phase": "Phase 2D Abyss / 2E Adventure / 2F Boss",
-      "reason": "3.20/4.50 HP,2 SP,1.25/1.40 defense comparison only",
+      "status": "RETIRED",
+      "decision": "RETIRED",
+      "phase": "Phase 2F Boss",
+      "reason": "All formal modes migrated; token physically removed",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "Adventure caller edge severed in Phase2E; shared legacy remains for Personal/World Boss only.",
+      "retirementGate": "Runtime source scan and Phase1–2F regression required",
       "dailyForbidden": true,
       "wildForbidden": true,
-      "requiredModes": [
-        "personalBoss",
-        "worldBoss"
-      ],
+      "requiredModes": [],
       "abyssForbidden": true,
       "adventureForbidden": true
     },
@@ -242,12 +227,12 @@
       "id": "bossMultipliers",
       "file": "js/gameplay-boss-tower-system.js",
       "sourceToken": "buildBossMonster",
-      "status": "CURRENT OWNER",
-      "decision": "TO RETIRE",
-      "phase": "Phase 2 Personal/World Boss",
-      "reason": "HP/attack factors become explicit boss mode prebattle profile",
+      "status": "MIGRATED",
+      "decision": "KEEP",
+      "phase": "Phase 2F Boss",
+      "reason": "Non-stat adapter / projection consumer only; no legacy numerical authority",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+      "retirementGate": "Phase2F projection and final convergence gates"
     },
     {
       "id": "towerBossMultipliers",
@@ -264,12 +249,13 @@
       "id": "bossUnusedDefense",
       "file": "js/gameplay-boss-tower-system.js",
       "sourceToken": "defenseMultiplier",
-      "status": "LEGACY OWNER",
-      "decision": "TO RETIRE",
-      "phase": "Phase 2 Tower/Boss consumer API audit",
-      "reason": "unused metadata field; never apply to construction; remove getter field with consumer contract migration",
+      "status": "RETIRED",
+      "decision": "RETIRED",
+      "phase": "Phase 2F Boss",
+      "reason": "All formal modes migrated; token physically removed",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
+      "retirementGate": "Runtime source scan and Phase1–2F regression required",
+      "requiredModes": []
     },
     {
       "id": "towerElement",
@@ -297,12 +283,12 @@
       "id": "enemyPressure",
       "file": "js/00-main.js",
       "sourceToken": "getEnemyPressureMultiplier",
-      "status": "COMPATIBILITY FOR NON-DAILY ONLY",
-      "decision": "COMPATIBILITY FOR NON-DAILY ONLY",
-      "phase": "Phase 2D Abyss / 2E Adventure / 2F Boss",
-      "reason": "mode explicit; v132Dungeon flag cannot imply daily; damage settlement KEEP single owner consumes resolved profile",
+      "status": "MIGRATED",
+      "decision": "KEEP",
+      "phase": "Phase 2F Boss",
+      "reason": "Non-stat adapter / projection consumer only; no legacy numerical authority",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "Adventure caller edge severed in Phase2E; shared legacy remains for Personal/World Boss only.",
+      "retirementGate": "Phase2F projection and final convergence gates",
       "wildForbidden": true,
       "requiredModes": [
         "personalBoss",
@@ -468,5 +454,9 @@
       "412x915"
     ],
     "browserArtifact": 11301028022
+  },
+  "phase2fGate": {
+    "status": "IMPLEMENTED",
+    "remaining": "Focused/aggregate/Chrome/latest-head CI/dev deployment and cleanup pending"
   }
 }

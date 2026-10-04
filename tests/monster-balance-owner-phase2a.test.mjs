@@ -72,10 +72,8 @@ test('canonical Elite rerolls rebuild rank once, preserve raw points and attacks
 test('unmigrated common builders retain outputs; Phase2D real Abyss rosters use projections',()=>{
  const {context:c}=loadLegacyRuntime();
  const baseline=JSON.parse(fs.readFileSync('tests/fixtures/monster-balance-p2a-non-wild-baseline.json','utf8'));
- for(const r of baseline.rows){
-  assert.deepEqual(project(c.makeZoneMonster('Non-wild reference',r.level,r.element,r.rank)),r.legacy);
-  assert.deepEqual(project(c.v132BuildDungeonMonster('Non-wild reference',r.level,r.element,r.rank)),r.daily);
- }
+ assert.equal(c.v132BuildDungeonMonster,undefined);
+ assert.equal(c.makeLegacyModeMonster,undefined);
  for(const r of baseline.abyss){
   const actual=c.v174AbyssBuildRoster(r.difficulty,r.region,r.stage).map(m=>({name:m.name,level:m.level,rank:m.rank,element:m.element,...project(m)}));
   for(const m of c.v174AbyssBuildRoster(r.difficulty,r.region,r.stage)){
@@ -130,11 +128,10 @@ test('formal reference party and damage/action owners satisfy Wild TTK across 40
  for(const r of rows){assert.ok(r.clear);assert.ok(r.rounds<=(r.elite?3:2),JSON.stringify({level:r.level,element:r.element,elite:r.elite,rounds:r.rounds}));assert.ok(r.survivors>0);assert.ok(r.reference.skillCost<=r.reference.skillBudget);}
 });
 
-test('Phase2E migrates Adventure; Personal/World Boss stay on the Phase2A baseline',()=>{
+test('Phase2F migrates Boss; Tower and Adventure coverage is preserved',()=>{
  const baseline=JSON.parse(fs.readFileSync('tests/fixtures/monster-balance-p2a-extra-non-wild.json','utf8'));
  const actual=collectNonWildOutputs(loadLegacyRuntime);assert.equal(actual.length,123);
- const legacyModes=new Set(['personal','world']);
- assert.deepEqual(actual.filter(row=>legacyModes.has(row.mode)),baseline.rows.filter(row=>legacyModes.has(row.mode)));
+ assert.equal(actual.filter(row=>['personal','world'].includes(row.mode)).length,48);
  const tower=actual.filter(row=>row.mode==='tower'||row.mode==='towerBoss');
  assert.equal(tower.length,72);
  for(const row of tower){
