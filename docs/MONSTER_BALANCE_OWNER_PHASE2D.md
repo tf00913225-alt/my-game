@@ -117,3 +117,6 @@ Focused identities/projection, calibration/TTK, relevant regression, production
 Chrome390x844/412x915, build synchronization/deprecated/syntax, latest-head CI,
 Requirement VERIFIED, latest dev absorption, PR merge, exact deployed SHA/version,
 deployed Abyss QA and safe absorbed branch cleanup. Main untouched; no Phase2E.
+
+### Canonical formation audit correction
+The formal Slot Owner defines every eight-unit encounter as three back slots (B2/B3/B4) and five front slots. Rank ordering places the single emperor at B3 with two elites in back and five elites in front. The older 59 metadata describes five back / three front for ordinary emperor stages, but the final geometry adapter uses the canonical snapshot, not this metadata. Phase 2D preserves this actual runtime contract. Chrome QA compares every card against a fresh snapshot from the unchanged Slot Owner and checks the central emperor and no death reflow; metadata is not treated as a second geometry authority.
