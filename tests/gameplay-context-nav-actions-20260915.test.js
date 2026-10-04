@@ -36,3 +36,17 @@ test("Relic modal opens in place without a close/reopen flash cycle",()=>{
     assert.doesNotMatch(owner,/closeHomeFeature\s*\(/);
     assert.match(owner,/classList\.add\("show","team-relic-modal"\)/);
 });
+
+test('context inventory close restores every actual base page without navigation-away actions',()=>{
+    const vm=require('node:vm'),core=read('js/00-main.js');
+    const source=core.slice(core.indexOf('let inventoryOpenContext=null;'),core.indexOf('function showPage('));
+    const pages=new Set(['home','training','map','dungeon','gameplay','boss','tower','future']);
+    const calls=[];let leaves=0;
+    const classList={add(){},remove(){},toggle(){}};
+    const c={window:null,document:{getElementById:id=>id==='app'?{classList}:pages.has(id.replace(/Page$/,''))?{classList}:null,documentElement:{classList},body:{classList}},$:()=>null,battleActive:false,showPage:(page,options)=>calls.push({page,options}),leaveMap:()=>leaves++,closeItemModal(){},closeInventoryCharacterDetail(){}};c.window=c;vm.createContext(c);vm.runInContext(source,c);
+    for(const sourcePage of ['home','training','map','dungeon','gameplayPage','bossPage','towerPage','future']){
+        calls.length=0;c.openInventoryContext({sourcePage,closeBehavior:'restore-source'});c.closeMapInventoryOverlay();
+        assert.equal(calls.at(-1).page,sourcePage.replace(/Page$/,''));assert.equal(calls.at(-1).options.restoreSource,true);assert.equal(leaves,0,'foreground close cannot leave patrol');
+    }
+    c.openInventoryContext({sourcePage:'map',closeBehavior:'navigation'});c.closeMapInventoryOverlay();assert.equal(leaves,1,'legacy explicit navigation behavior stays compatible');
+});
