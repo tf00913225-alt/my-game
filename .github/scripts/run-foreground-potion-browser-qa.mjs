@@ -18,6 +18,9 @@ async function run(width,height){
  try{
  const page=(await waitJson(`http://127.0.0.1:${port}/json/list`)).find(p=>p.type==='page');c=new Cdp(page.webSocketDebuggerUrl);
  await c.send('Page.enable');await c.send('Runtime.enable');await c.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true});
+ // Reset only this disposable transport UID in the new document, AFTER the
+ // old production pagehide autosave. Keep the real reload/startup lifecycle.
+ await c.send('Page.addScriptToEvaluateOnNewDocument',{source:"for(const key of Object.keys(localStorage)){if(key.startsWith('four_symbols_save:skill-runtime-browser-qa')||key.startsWith('four_symbols_save_meta:skill-runtime-browser-qa'))localStorage.removeItem(key);}"});
  async function navigate(method,params){const loads=c.events.filter(e=>e.method==='Page.loadEventFired').length;await c.send(method,params);const end=Date.now()+30000;while(c.events.filter(e=>e.method==='Page.loadEventFired').length===loads){if(Date.now()>end)throw Error('Document load timeout');await new Promise(r=>setTimeout(r,50));}}
  await navigate('Page.navigate',{url:server.url});
  await c.send('Page.bringToFront');await c.send('Emulation.setFocusEmulationEnabled',{enabled:true});
@@ -35,11 +38,12 @@ async function run(width,height){
    await c.eval('new Promise(r=>setTimeout(r,180))');const opened=await c.eval(measure);assert.equal(opened.visible,false,base+'/'+feature+' final');
    assert.equal(await c.eval(`(()=>{const panel=document.getElementById('${feature==='inventory'?'inventoryPage':'homeFeatureModal'}');return !document.getElementById('firebaseAuthOverlay')?.classList.contains('show')&&panel.contains(document.elementFromPoint(innerWidth/2,innerHeight/2));})()`),true,base+'/'+feature+' final player foreground');
    for(const key of ['shellCount','navCount'])assert.equal(opened[key],1);assert.equal(opened.legacy,0);
-   if(pass===0&&['home','daily','abyss'].includes(base)&&['character','relic','autoBattleSettings','shop'].includes(feature)){
+   if(pass===0&&(['home','daily'].includes(base)||base.startsWith('abyss'))&&['character','relic','autoBattleSettings','shop'].includes(feature)){
     const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(`${out}/foreground-${width}-${base}-${feature}.png`,Buffer.from(shot.data,'base64'));
    }
    await c.eval(feature==='inventory'?'closeMapInventoryOverlay()':'closeHomeFeature()');const closeImmediate=await c.eval(measure);assert.equal(closeImmediate.visible,true);await c.eval('new Promise(r=>setTimeout(r,180))');const closed=await c.eval(measure);
    assert.equal(closed.visible,true,base+'/'+feature+' restore');assert.equal(closed.context,before.context);assert.equal(closed.signature,before.signature);assert.deepEqual(closed.buttons,before.buttons);assert.equal(closed.active,before.active);
+   if(pass===0&&feature==='inventory'){const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(`${out}/foreground-${width}-${base}-restored.png`,Buffer.from(shot.data,'base64'));}
    rows.push({width,height,pass,base,feature,immediate,opened,closed});
   }
   if(base!=='home'){
@@ -76,16 +80,18 @@ async function run(width,height){
    }
    // Batch stops at cap and consumes only necessary quantities.
    inventoryItems.splice(0,inventoryItems.length);addPotionToInventory('hpPotion10',10);player.hp=4400;showPage('inventory');setInventoryFilter('potion');renderInventory();openItemModal(inventorySlots.findIndex(item=>item?.id==='hpPotion10'));document.getElementById('v17350BatchQuantity').value='10';await v17350RunBatchAction();rows.push({route:'batch-cap',actual:player.hp,expected:4520,stock:getPotionCount('hpPotion10'),expectedStock:8});closeItemModal();closeMapInventoryOverlay();
+   const guards=[];for(const route of ['post-battle','element-box']){inventoryItems.splice(0,inventoryItems.length);for(const id of ['nineTurnRestorationPill','taichingQiPill','hpPotion10','spPotion10'])addPotionToInventory(id,1);player.hp=4000;player.sp=1000;if(route==='post-battle')applyPostBattleAutoRecovery();else v154FinishAutoRecovery();guards.push({route,hp:player.hp,sp:player.sp,rareHP:getPotionCount('nineTurnRestorationPill'),rareSP:getPotionCount('taichingQiPill'),hpStock:getPotionCount('hpPotion10'),spStock:getPotionCount('spPotion10')});}
    inventoryItems.splice(0,inventoryItems.length,{id:'hpPotion10',type:'potion',count:321,recoveryPercent:10},{id:'spPotion10',type:'potion',count:456,recoveryPercent:10});normalizePotionInventoryFromLegacy({});
    const legacy={hp:getPotionCount('hpPotion10'),sp:getPotionCount('spPotion10'),items:inventoryItems.map(x=>({id:x.id,mode:x.recoveryMode,value:x.recoveryValue,percent:x.recoveryPercent}))};
    const shop=renderShopContent();
-   return {rows,legacy,shopFlat:shop.includes('恢復 66 HP')&&shop.includes('恢復 66 SP'),oldShopNote:shop.includes('10%、20%、30%'),descriptions:['hpPotion10','spPotion10','hpPotion20','hpPotion30','spPotion20','spPotion30'].map(getPotionEffectDescription)};
+   return {rows,guards,legacy,shopFlat:shop.includes('恢復 66 HP')&&shop.includes('恢復 66 SP'),oldShopNote:shop.includes('10%、20%、30%'),descriptions:['hpPotion10','spPotion10','hpPotion20','hpPotion30','spPotion20','spPotion30'].map(getPotionEffectDescription)};
   }finally{finishPlayerAction=originalFinish;window.alert=originalAlert;window.rpgAlert=originalRpgAlert;saveGame=originalSave;inventoryItems.splice(0,inventoryItems.length,...oldInventory);player.hp=oldHP;player.sp=oldSP;player.bonusHP=oldBonusHP;player.bonusSP=oldBonusSP;Object.assign(autoConfig,oldConfig);rebuildInventorySlots();}
  })()`);
  for(const row of potions.rows){assert.equal(row.actual,row.expected,JSON.stringify(row));assert.equal(row.stock,row.expectedStock??0,JSON.stringify(row));}
+ for(const guard of potions.guards)assert.deepEqual(guard,{route:guard.route,hp:4066,sp:1066,rareHP:1,rareSP:1,hpStock:0,spStock:0});
  assert.equal(potions.legacy.hp,321);assert.equal(potions.legacy.sp,456);assert.ok(potions.legacy.items.every(x=>x.mode==='flat'&&x.value===66&&x.percent===undefined));assert.equal(potions.shopFlat,true);assert.equal(potions.oldShopNote,false);
  results.push({width,height,cold,coldRelic,potions,reload:false});console.log('Actual potion settlement PASS',width,JSON.stringify(potions));
- await c.eval("showPage('home');openHomeFeature('character');for(const key of Object.keys(localStorage)){if(key.startsWith('four_symbols_save:skill-runtime-browser-qa')||key.startsWith('four_symbols_save_meta:skill-runtime-browser-qa'))localStorage.removeItem(key);}");await navigate('Page.reload',{ignoreCache:true});await c.send('Page.bringToFront');await c.eval(`(async()=>{for(let i=0;i<600;i++){if(window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show')){closeHomeFeature();showPage('home');return;}await new Promise(r=>setTimeout(r,50));}throw Error('Reload startup/auth not ready');})()`);assert.equal((await c.eval(measure)).visible,true);
+ await c.eval("showPage('home');openHomeFeature('character')");await navigate('Page.reload',{ignoreCache:true});await c.send('Page.bringToFront');await c.eval(`(async()=>{for(let i=0;i<600;i++){if(window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show')){closeHomeFeature();showPage('home');return;}await new Promise(r=>setTimeout(r,50));}throw Error('Reload startup/auth not ready '+JSON.stringify({state:window.FourSymbolsStartupPolicy?.getState?.(),error:String(window.FourSymbolsStartupPolicy?.getLastError?.()?.message||''),text:document.body.innerText.slice(0,1000)}));})()`);assert.equal((await c.eval(measure)).visible,true);
  results.at(-1).reload=true;
  }finally{c?.close();proc.kill('SIGKILL');fs.rmSync(profile,{recursive:true,force:true});}
 }
