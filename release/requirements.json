@@ -589,30 +589,32 @@
     {
       "id": "REQ-FOREGROUND-NAV-20261004",
       "title": "全域前景功能介面隱藏底部導覽並恢復底層情境",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
         "files": [
           "js/04-stage-v11-native-bottom-nav-runtime.js",
           "js/00-main.js",
-          ".github/scripts/run-foreground-potion-browser-qa.mjs"
+          ".github/scripts/run-foreground-potion-browser-qa.mjs",
+          "docs/foreground-nav-starter-potion-browser-evidence-20261004.json"
         ],
-        "verification": "Focused rules and production Chrome lifecycle / actual-resource QA",
-        "result": "Focused rules PASS; remote Chrome and integration pending"
+        "verification": "Functional Head e08fdec08d69095b65e6bd464849441e2e03354c; CI37182829899 production Chrome step PASS; artifact11296230697 SHA256 c78d148d376297bc557a177ec266fc66712497d0f1dd566d1a588ffbe32c8e6e independently checked. 390/412:204 foreground transitions,36 formal returns,cold/lazy/reload;94 actual resource/stock cases plus4 rare-auto guards; representative final UI screenshots reviewed.",
+        "result": "Functional2/2 VERIFIED. Nav sole Owner,hidden/no hitbox/restored page+handlers/shell1/nav1/legacy0. Five actual routes:HP4000→4066/4500→4520;SP1000→1066/1170→1190;20/30 unchanged,rare full protected,old321/456 stock unchanged. Final Head CI/dev merge/exact deployment/deployed QA separate in PR #794."
       }
     },
     {
       "id": "REQ-STARTER-POTION-20261004",
       "title": "回春散與凝氣散固定66回復並收斂所有使用入口",
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "evidence": {
         "files": [
           "js/00-main.js",
           "js/40-v144-rules-and-abyss.js",
           "tests/starter-potion-recovery.test.js",
-          ".github/scripts/run-foreground-potion-browser-qa.mjs"
+          ".github/scripts/run-foreground-potion-browser-qa.mjs",
+          "docs/foreground-nav-starter-potion-browser-evidence-20261004.json"
         ],
-        "verification": "Focused rules and production Chrome lifecycle / actual-resource QA",
-        "result": "Focused rules PASS; remote Chrome and integration pending"
+        "verification": "Functional Head e08fdec08d69095b65e6bd464849441e2e03354c; CI37182829899 production Chrome step PASS; artifact11296230697 SHA256 c78d148d376297bc557a177ec266fc66712497d0f1dd566d1a588ffbe32c8e6e independently checked. 390/412:204 foreground transitions,36 formal returns,cold/lazy/reload;94 actual resource/stock cases plus4 rare-auto guards; representative final UI screenshots reviewed.",
+        "result": "Functional2/2 VERIFIED. Nav sole Owner,hidden/no hitbox/restored page+handlers/shell1/nav1/legacy0. Five actual routes:HP4000→4066/4500→4520;SP1000→1066/1170→1190;20/30 unchanged,rare full protected,old321/456 stock unchanged. Final Head CI/dev merge/exact deployment/deployed QA separate in PR #794."
       }
     }
   ]

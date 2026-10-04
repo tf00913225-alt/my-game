@@ -200,6 +200,8 @@ jobs:
 
       - name: Run canonical bottom navigation and fixed home browser QA
         id: bottom_nav_home_browser
+        env:
+          EXPECTED_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         if: success() && github.event_name == 'pull_request'
         run: |
           node tests/bottom-nav-home-scroll-browser.test.js
