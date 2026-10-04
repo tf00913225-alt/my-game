@@ -14,7 +14,7 @@ async function runBossBalanceProductionQa(){
       const check=(v,m)=>{if(!v)throw Error(m);};
       const wait=async(fn,ms=30000)=>{const end=performance.now()+ms;while(!fn()&&performance.now()<end)await new Promise(r=>setTimeout(r,40));check(fn(),'Boss wait '+fn);};
       await wait(()=>window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden===true&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show'));
-      await FourSymbolsFeatures.ensure('boss-relic','boss-balance-qa');
+      await FourSymbolsFeatures.ensure('gameplay-core','boss-balance-qa');
       await wait(()=>window.GameplaySystem&&window.FourSymbolsBossBattle);closeHomeFeature();
       const evidence=window.bossBalanceQaEvidence={scenes:[],controls:[],skills:[]};
       const stats=m=>[m.maxHP,m.maxSP,m.attack,m.magicAttack,m.defense,m.agility];
@@ -62,19 +62,19 @@ async function runBossBalanceProductionQa(){
     const server=await startServer({baseUrl}),results=[];
     const file=path.resolve('artifacts/browser-qa/boss-balance-production.json');fs.mkdirSync(path.dirname(file),{recursive:true});
     let proc,client,profile;
-    const close=()=>{client?.close();proc?.kill('SIGTERM');client=null;proc=null;if(profile)fs.rmSync(profile,{recursive:true,force:true});};
+    const close=()=>{client?.close();proc?.kill('SIGTERM');client=null;proc=null;if(profile)fs.rmSync(profile,{recursive:true,force:true,maxRetries:6,retryDelay:100});};
     try{
       for(const [width,height] of [[390,844],[412,915]]){
         profile=fs.mkdtempSync(path.join(os.tmpdir(),'boss-balance-'));const port=23000+process.pid%10000;
         proc=spawn(findChrome(),['--headless','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'],{stdio:'ignore'});
         const tabs=await waitJson('http://127.0.0.1:'+port+'/json');client=new Cdp(tabs.find(t=>t.type==='page').webSocketDebuggerUrl);
-        await client.send('Page.enable');await client.send('Runtime.enable');await client.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true});await client.send('Page.navigate',{url:server.url});
+        await client.send('Page.enable');await client.send('Runtime.enable');await client.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true});await client.send('Page.navigate',{url:server.url});await new Promise(r=>setTimeout(r,1000));
         const active=client.eval(reference+'\n'+expression);let done=false;active.finally(()=>{done=true;}).catch(()=>{});const captured=new Set();
         while(!done){await new Promise(r=>setTimeout(r,300));const marker=await client.eval('window.bossBalanceQaCapture||null').catch(()=>null);if(marker&&!captured.has(marker)){captured.add(marker);const shot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(file.replace('.json','-'+width+'x'+height+'-'+marker+'.png'),Buffer.from(shot.data,'base64'));}}
         const result=await active;assert.equal(result.scenes.length,9);assert.ok(result.scenes.some(s=>s.shields));assert.ok(result.scenes.some(s=>s.objects));assert.ok(result.scenes.some(s=>s.reinforcements));results.push({width,height,...result});close();
       }
-      fs.writeFileSync(file,JSON.stringify({passed:true,commitSha:process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||'local',results},null,2)+'\n');
-    }catch(error){const partial=await client?.eval('({evidence:window.bossBalanceQaEvidence,phase:battlePhase,turn,battleActive})').catch(()=>null);fs.writeFileSync(file,JSON.stringify({passed:false,error:String(error.stack||error),results,partial},null,2)+'\n');throw error;}
+      fs.writeFileSync(file,JSON.stringify({passed:true,commitSha:process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||'local',results},null,2)+'\n');console.log('Boss production Chrome: 18 natural scenes, both viewports, Owner/mechanism/snapshot/reward PASS');
+    }catch(error){console.error('Boss production QA failure:',error);const partial=await client?.eval('({evidence:window.bossBalanceQaEvidence,phase:battlePhase,turn,battleActive})').catch(()=>null);fs.writeFileSync(file,JSON.stringify({passed:false,error:String(error.stack||error),results,partial},null,2)+'\n');throw error;}
     finally{close();await new Promise(r=>server.server.close(r));}
 }
 

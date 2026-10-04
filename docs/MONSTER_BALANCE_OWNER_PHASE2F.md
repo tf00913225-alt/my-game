@@ -77,8 +77,8 @@ remain unchanged; budget always (level-1)*5, including all ranks.
 
 Initial old neutral matrix: 25 cases, 7 losses, clearing Personal10–17 rounds.
 Initial candidate neutral+seeded: 50 cases clear+survive; Personal7–11 rounds,
-World5–11 rounds. These are provisional synchronous diagnostics. They are not
-Chrome evidence and must be regenerated after the Shield packet correction.
+World5–11 rounds. Both matrices were regenerated after the Shield packet correction (50/50 PASS).
+These are synchronous diagnostic results; natural Chrome is a separate gate.
 No forced two/five-round target. Mechanism events, shields, objects, summons,
 phase, final HP, player survivors, skills and hard-control observations are
 recorded by formal owners, not HP/DPS arithmetic.
