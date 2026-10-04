@@ -25,6 +25,30 @@
   "priorModeReferences": 288,
   "remainingHits": [
     {
+      "file": "docs/MONSTER_BALANCE_OWNER_FINAL.md",
+      "line": 27,
+      "token": "makeLegacyModeMonster",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "docs/MONSTER_BALANCE_OWNER_FINAL.md",
+      "line": 27,
+      "token": "generateMonsterAttributePoints",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "docs/MONSTER_BALANCE_OWNER_FINAL.md",
+      "line": 29,
+      "token": "bossBalanceProfile",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "docs/MONSTER_BALANCE_OWNER_FINAL.md",
+      "line": 29,
+      "token": "defenseMultiplier",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
       "file": "scripts/monster-balance-final-convergence-audit.mjs",
       "line": 6,
       "token": "makeLegacyModeMonster",

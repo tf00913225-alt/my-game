@@ -28,9 +28,11 @@ async function runBossBalanceProductionQa(){
         const definition=(plan.type==='world'?GameplaySystem.worldBosses:GameplaySystem.personalBosses).find(d=>d.id===plan.id);
         const ref=prepareWildBalanceReferenceParty(definition.level,definition.level<60?2:3);v131GrantElementBoxHours(8,32);
         let seed=definition.level*100+(plan.stage||1);Math.random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};
-        autoBattle=false;autoPatrolEnabled=false;for(const cfg of [autoConfig,autoConfig2,autoConfig3]){cfg.enabled=true;cfg.skill=ref.skill;cfg.hp=0;cfg.sp=0;}
+        autoBattle=false;autoPatrolEnabled=false;for(const cfg of [autoConfig,autoConfig2,autoConfig3]){cfg.enabled=false;cfg.skill=ref.skill;cfg.hp=0;cfg.sp=0;}
         vGameplayOpenBoss();vGameplayOpenBossDetail(plan.type,plan.id);
-        const beforeState=GameplaySystem.getSerializableState(),beforeGold=gold;
+        const oreCount=id=>inventoryItems.filter(i=>i?.id===id).reduce((n,i)=>n+(Number(i.count)||0),0);
+        const beforeState=GameplaySystem.getSerializableState(),beforeGold=gold,beforeOre=oreCount(definition.ore);
+        const beforeRelic=definition.relic?JSON.stringify(v174RelicSystem.getOwnedState()[definition.relic]):null;
         const button=document.querySelector('#bossTabContent .boss-detail .gameplay-primary-action');check(button&&!button.disabled,'formal Boss entry');button.click();
         await wait(()=>battleActive&&FourSymbolsBossBattle.isActive());await wait(()=>!document.getElementById('battlePage')?.matches('.v141-preparing-entry,.v141-entry-moving'));
         const boss=monsters[FourSymbolsBossBattle.getBossIndex()],initial=stats(boss),snapshot=FourSymbolsBattlefieldSlots.getActiveEnemySnapshot();verify(boss);
@@ -38,6 +40,7 @@ async function runBossBalanceProductionQa(){
         check(FourSymbolsBossBattle.getBossFootprintSlots().length===6&&document.querySelector('.v-fixed-boss-footprint'),'six-grid footprint');
         check(FourSymbolsBossBattle.ownsEnemyFormationSnapshot(snapshot),'snapshot');
         const art=document.querySelector('.gameplay-boss-card .v174-battle-art');check(art&&getComputedStyle(art).backgroundImage!=='none','portrait');
+        const image=new Image();image.src=getComputedStyle(art).backgroundImage.split('url(')[1]?.split(')')[0].replaceAll(String.fromCharCode(34),'').replaceAll("'",'');await image.decode();check(image.naturalWidth>0,'Boss portrait decode');
         check(document.querySelector('.gameplay-boss-card .monster-hp-inner')&&document.querySelector('.gameplay-boss-card .monster-sp-inner'),'HP/SP');
         window.bossBalanceQaCapture=plan.type+'-'+plan.id+'-'+caseIndex;
         let rounds=1,shields=0,objects=0,reinforcements=0;const off=FourSymbolsBattleFlow.subscribeBeforeCombatant(()=>{
@@ -52,7 +55,10 @@ async function runBossBalanceProductionQa(){
         check(progress.firstClear===true||(plan.type==='world'&&plan.stage<4),'clear progression');
         if(plan.type==='world')check(progress.completedStages===(plan.stage||4),'stage transition');
         const final=plan.type==='personal'||plan.stage===4,expectedGold=final?(plan.repeat?definition.repeatGold:definition.firstGold):0;
-        check(gold-beforeGold===expectedGold,'unchanged gold reward');check(!FourSymbolsBossBattle.isActive(),'release Boss context');
+        check(gold-beforeGold===expectedGold,'unchanged gold reward');
+        const expectedOre=final&&definition.ore?(plan.repeat?(plan.type==='personal'?1:0):(definition.firstOre||1)):0;check(oreCount(definition.ore)-beforeOre===expectedOre,'unchanged ore reward');
+        const beforeProgress=beforeState[plan.type][plan.id];check(progress.clears===beforeProgress.clears+(final?1:0),'clear count');
+        if(definition.relic){const owned=v174RelicSystem.getOwnedState()[definition.relic];if(final)check(owned.unlocked,'first/repeat relic reward');else check(JSON.stringify(owned)===beforeRelic,'no premature relic reward');}check(!FourSymbolsBossBattle.isActive(),'release Boss context');
         if(document.getElementById('battleStatisticsResultModal')?.hidden===false)FourSymbolsBattleStatistics.hideResultDetails(true);
         evidence.scenes.push({...plan,rounds,survivors,shields,objects,reinforcements,initial,finalHP:getExistingPartyIndexes().map(i=>getPartyCharacterByIndex(i).hp),gold:gold-beforeGold,progress});
        }
