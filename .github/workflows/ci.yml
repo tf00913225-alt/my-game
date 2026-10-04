@@ -647,6 +647,7 @@ jobs:
         run: |
           mkdir -p artifacts/browser-qa
           node --test tests/monster-balance-owner-phase*.test.mjs
+          node scripts/monster-balance-final-convergence-audit.mjs
           node scripts/boss-balance-ttk-matrix.mjs artifacts/browser-qa/boss-balance-ttk.json
           node scripts/boss-balance-ttk-matrix.mjs artifacts/browser-qa/boss-balance-ttk-seeded.json --seeded
           BOSS_MONSTER_BALANCE_QA=1 node .github/scripts/battle-layer-audio-live-qa.mjs

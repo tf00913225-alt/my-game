@@ -1,0 +1,582 @@
+{
+  "workId": "MONSTER-BALANCE-OWNER-P2F-BOSS-20261004",
+  "passed": true,
+  "scope": "All tracked repository text including tests/docs/build; runtime raw-stat writes individually classified. Formal runtime rosters are additionally exercised by Phase1–2F aggregate and natural mode Browser QA.",
+  "modes": [
+    "wild",
+    "daily",
+    "tower",
+    "abyss",
+    "adventure",
+    "personalBoss",
+    "worldBoss"
+  ],
+  "retired": [
+    "makeLegacyModeMonster",
+    "generateMonsterAttributePoints",
+    "v132BuildDungeonMonster",
+    "applyDungeonMonsterStrength",
+    "applyDungeonNormalBonus",
+    "applyDungeonRankStrength",
+    "bossBalanceProfile",
+    "defenseMultiplier"
+  ],
+  "retiredRuntimeHits": 0,
+  "priorModeReferences": 288,
+  "remainingHits": [
+    {
+      "file": "scripts/monster-balance-final-convergence-audit.mjs",
+      "line": 6,
+      "token": "makeLegacyModeMonster",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "scripts/monster-balance-final-convergence-audit.mjs",
+      "line": 6,
+      "token": "generateMonsterAttributePoints",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "scripts/monster-balance-final-convergence-audit.mjs",
+      "line": 6,
+      "token": "v132BuildDungeonMonster",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "scripts/monster-balance-final-convergence-audit.mjs",
+      "line": 6,
+      "token": "applyDungeonMonsterStrength",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "scripts/monster-balance-final-convergence-audit.mjs",
+      "line": 6,
+      "token": "applyDungeonNormalBonus",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "scripts/monster-balance-final-convergence-audit.mjs",
+      "line": 6,
+      "token": "applyDungeonRankStrength",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "scripts/monster-balance-final-convergence-audit.mjs",
+      "line": 6,
+      "token": "bossBalanceProfile",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "scripts/monster-balance-final-convergence-audit.mjs",
+      "line": 6,
+      "token": "defenseMultiplier",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": ".github/scripts/run-fire-tower-identity-first-frame-browser-qa.mjs",
+      "line": 43,
+      "token": "v132BuildDungeonMonster",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "HANDOFF.md",
+      "line": 118,
+      "token": "defenseMultiplier",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "HANDOFF.md",
+      "line": 842,
+      "token": "v132BuildDungeonMonster",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "HANDOFF.md",
+      "line": 3806,
+      "token": "applyDungeonMonsterStrength",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "HANDOFF.md",
+      "line": 3808,
+      "token": "applyDungeonNormalBonus",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "HANDOFF.md",
+      "line": 3810,
+      "token": "applyDungeonRankStrength",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "HANDOFF.md",
+      "line": 3819,
+      "token": "applyDungeonMonsterStrength",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "HANDOFF.md",
+      "line": 3900,
+      "token": "generateMonsterAttributePoints",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "HANDOFF.md",
+      "line": 3907,
+      "token": "applyDungeonMonsterStrength",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "docs/MONSTER_BALANCE_OWNER_PHASE1.md",
+      "line": 55,
+      "token": "defenseMultiplier",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "docs/MONSTER_BALANCE_OWNER_PHASE2A.md",
+      "line": 9,
+      "token": "makeLegacyModeMonster",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "docs/MONSTER_BALANCE_OWNER_PHASE2A.md",
+      "line": 9,
+      "token": "generateMonsterAttributePoints",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "docs/MONSTER_BALANCE_OWNER_PHASE2C.md",
+      "line": 35,
+      "token": "v132BuildDungeonMonster",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "docs/MONSTER_BALANCE_OWNER_PHASE2C.md",
+      "line": 36,
+      "token": "bossBalanceProfile",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "docs/MONSTER_BALANCE_OWNER_PHASE2D.md",
+      "line": 55,
+      "token": "makeLegacyModeMonster",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "docs/MONSTER_BALANCE_OWNER_PHASE2E.md",
+      "line": 80,
+      "token": "makeLegacyModeMonster",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "docs/MONSTER_BALANCE_OWNER_PHASE2E.md",
+      "line": 82,
+      "token": "v132BuildDungeonMonster",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "docs/MONSTER_BALANCE_OWNER_PHASE2E.md",
+      "line": 125,
+      "token": "makeLegacyModeMonster",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "docs/MONSTER_BALANCE_OWNER_PHASE2F.md",
+      "line": 63,
+      "token": "bossBalanceProfile",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "docs/MONSTER_BALANCE_OWNER_PHASE2F.md",
+      "line": 64,
+      "token": "defenseMultiplier",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "docs/monster-balance-owner-retirement-map.json",
+      "line": 20,
+      "token": "generateMonsterAttributePoints",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "docs/monster-balance-owner-retirement-map.json",
+      "line": 36,
+      "token": "makeLegacyModeMonster",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "docs/monster-balance-owner-retirement-map.json",
+      "line": 115,
+      "token": "applyDungeonMonsterStrength",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "docs/monster-balance-owner-retirement-map.json",
+      "line": 131,
+      "token": "applyDungeonNormalBonus",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "docs/monster-balance-owner-retirement-map.json",
+      "line": 147,
+      "token": "applyDungeonRankStrength",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "docs/monster-balance-owner-retirement-map.json",
+      "line": 240,
+      "token": "bossBalanceProfile",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "docs/monster-balance-owner-retirement-map.json",
+      "line": 244,
+      "token": "bossBalanceProfile",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "docs/monster-balance-owner-retirement-map.json",
+      "line": 251,
+      "token": "defenseMultiplier",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "docs/monster-balance-owner-retirement-map.json",
+      "line": 362,
+      "token": "v132BuildDungeonMonster",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "docs/monster-balance-owner-retirement-map.json",
+      "line": 363,
+      "token": "bossBalanceProfile",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "release/deprecated-code.json",
+      "line": 208,
+      "token": "bossBalanceProfile",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "release/deprecated-code.json",
+      "line": 241,
+      "token": "makeLegacyModeMonster",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "release/deprecated-code.json",
+      "line": 242,
+      "token": "generateMonsterAttributePoints",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "release/deprecated-code.json",
+      "line": 243,
+      "token": "v132BuildDungeonMonster",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "release/deprecated-code.json",
+      "line": 244,
+      "token": "applyDungeonMonsterStrength",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "release/deprecated-code.json",
+      "line": 245,
+      "token": "applyDungeonNormalBonus",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "release/deprecated-code.json",
+      "line": 246,
+      "token": "applyDungeonRankStrength",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "release/deprecated-code.json",
+      "line": 247,
+      "token": "bossBalanceProfile",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "release/deprecated-code.json",
+      "line": 248,
+      "token": "defenseMultiplier",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "release/requirement-batches/2026-09-11-boss-balance-gameplay-cover-relic-lv20.json",
+      "line": 15,
+      "token": "bossBalanceProfile",
+      "classification": "D. docs/history and retirement gate"
+    },
+    {
+      "file": "tests/abyss-two-tier-refactor.test.js",
+      "line": 56,
+      "token": "v132BuildDungeonMonster",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "tests/fire-tower-runtime-identity-first-frame.test.js",
+      "line": 26,
+      "token": "v132BuildDungeonMonster",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "tests/gameplay-boss-tower-system.test.js",
+      "line": 97,
+      "token": "v132BuildDungeonMonster",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "tests/monster-balance-owner-phase1.test.mjs",
+      "line": 114,
+      "token": "v132BuildDungeonMonster",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "tests/monster-balance-owner-phase1.test.mjs",
+      "line": 115,
+      "token": "makeLegacyModeMonster",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "tests/monster-balance-owner-phase1.test.mjs",
+      "line": 116,
+      "token": "generateMonsterAttributePoints",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "tests/monster-balance-owner-phase2a.test.mjs",
+      "line": 75,
+      "token": "v132BuildDungeonMonster",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "tests/monster-balance-owner-phase2a.test.mjs",
+      "line": 76,
+      "token": "makeLegacyModeMonster",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "tests/monster-balance-owner-phase2b.test.mjs",
+      "line": 69,
+      "token": "v132BuildDungeonMonster",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "tests/monster-balance-owner-phase2c.test.mjs",
+      "line": 77,
+      "token": "v132BuildDungeonMonster",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "tests/monster-balance-owner-phase2c.test.mjs",
+      "line": 77,
+      "token": "bossBalanceProfile",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "tests/monster-balance-owner-phase2c.test.mjs",
+      "line": 91,
+      "token": "applyDungeonMonsterStrength",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "tests/monster-balance-owner-phase2d.test.mjs",
+      "line": 21,
+      "token": "v132BuildDungeonMonster",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "tests/monster-balance-owner-phase2d.test.mjs",
+      "line": 119,
+      "token": "v132BuildDungeonMonster",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "tests/monster-balance-owner-phase2d.test.mjs",
+      "line": 123,
+      "token": "v132BuildDungeonMonster",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "tests/monster-balance-owner-phase2e.test.mjs",
+      "line": 21,
+      "token": "makeLegacyModeMonster",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "tests/monster-balance-owner-phase2e.test.mjs",
+      "line": 21,
+      "token": "v132BuildDungeonMonster",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "tests/monster-balance-owner-phase2e.test.mjs",
+      "line": 66,
+      "token": "makeLegacyModeMonster",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "tests/monster-balance-owner-phase2e.test.mjs",
+      "line": 66,
+      "token": "v132BuildDungeonMonster",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "tests/monster-balance-owner-phase2e.test.mjs",
+      "line": 67,
+      "token": "makeLegacyModeMonster",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "tests/monster-balance-owner-phase2f.test.mjs",
+      "line": 61,
+      "token": "makeLegacyModeMonster",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "tests/monster-balance-owner-phase2f.test.mjs",
+      "line": 61,
+      "token": "generateMonsterAttributePoints",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "tests/monster-balance-owner-phase2f.test.mjs",
+      "line": 61,
+      "token": "v132BuildDungeonMonster",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "tests/monster-balance-owner-phase2f.test.mjs",
+      "line": 61,
+      "token": "applyDungeonMonsterStrength",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "tests/monster-balance-owner-phase2f.test.mjs",
+      "line": 61,
+      "token": "applyDungeonNormalBonus",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "tests/monster-balance-owner-phase2f.test.mjs",
+      "line": 61,
+      "token": "applyDungeonRankStrength",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "tests/monster-balance-owner-phase2f.test.mjs",
+      "line": 61,
+      "token": "bossBalanceProfile",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "tests/monster-balance-owner-phase2f.test.mjs",
+      "line": 61,
+      "token": "defenseMultiplier",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "tests/monster-balance-owner-phase2f.test.mjs",
+      "line": 64,
+      "token": "makeLegacyModeMonster",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "tests/monster-balance-owner-phase2f.test.mjs",
+      "line": 64,
+      "token": "v132BuildDungeonMonster",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "tests/tower-element-formation-small-boss-20260924.test.js",
+      "line": 101,
+      "token": "v132BuildDungeonMonster",
+      "classification": "C. test fixture / test and diagnostic gate"
+    },
+    {
+      "file": "tests/v174-boss-balance-gameplay-cover-relic-lv20.test.js",
+      "line": 50,
+      "token": "v132BuildDungeonMonster",
+      "classification": "C. test fixture / test and diagnostic gate"
+    }
+  ],
+  "liveMechanismWriters": [
+    {
+      "file": "js/34-v141-core-systems.js",
+      "line": 202,
+      "text": "monster.maxHP=Math.max(1,Number(shield.baseMaxHP)||1);",
+      "classification": "B. KEEP: live generic skill shield lifecycle / explicit Owner rank reconstruction, no pre-battle calibration"
+    },
+    {
+      "file": "js/34-v141-core-systems.js",
+      "line": 220,
+      "text": "monster.maxHP=Math.max(1,Number(shield.baseMaxHP)||1);",
+      "classification": "B. KEEP: live generic skill shield lifecycle / explicit Owner rank reconstruction, no pre-battle calibration"
+    },
+    {
+      "file": "js/34-v141-core-systems.js",
+      "line": 242,
+      "text": "monster.maxHP=shield.baseMaxHP+safeAmount;",
+      "classification": "B. KEEP: live generic skill shield lifecycle / explicit Owner rank reconstruction, no pre-battle calibration"
+    },
+    {
+      "file": "js/38-v143-system-fixes.js",
+      "line": 177,
+      "text": "monster.maxHP=Math.max(1,numeric(shield.baseMaxHP)||numeric(monster.maxHP));",
+      "classification": "B. KEEP: live barrier skill removal"
+    },
+    {
+      "file": "js/42-v148-combat-dungeon-fixes.js",
+      "line": 486,
+      "text": "if(Number.isFinite(Number(buff.originalAttack))){ enemy.attack=Number(buff.originalAttack); }",
+      "classification": "B. KEEP: live rage buff restoration"
+    },
+    {
+      "file": "js/42-v148-combat-dungeon-fixes.js",
+      "line": 487,
+      "text": "if(Number.isFinite(Number(buff.originalMagicAttack))){ enemy.magicAttack=Number(buff.originalMagicAttack); }",
+      "classification": "B. KEEP: live rage buff restoration"
+    },
+    {
+      "file": "js/46-v155-dev-fixes.js",
+      "line": 165,
+      "text": "monster.agility=numeric(blessing.originalAgility);",
+      "classification": "B. KEEP: live blessing/rock-wall skill application and restoration"
+    },
+    {
+      "file": "js/46-v155-dev-fixes.js",
+      "line": 489,
+      "text": "entry.monster.defense=Math.max(0,numeric(entry.monster.defense)*(1+percent/100));",
+      "classification": "B. KEEP: live blessing/rock-wall skill application and restoration"
+    },
+    {
+      "file": "js/46-v155-dev-fixes.js",
+      "line": 653,
+      "text": "monster.defense=numeric(state.originalDefense);",
+      "classification": "B. KEEP: live blessing/rock-wall skill application and restoration"
+    },
+    {
+      "file": "js/60-team-relic-system.js",
+      "line": 766,
+      "text": "if(entry.attack!==undefined){ monster.attack=entry.attack; }",
+      "classification": "B. KEEP: live relic debuff application and expiry; relic owner outside this migration"
+    },
+    {
+      "file": "js/60-team-relic-system.js",
+      "line": 767,
+      "text": "if(entry.magicAttack!==undefined){ monster.magicAttack=entry.magicAttack; }",
+      "classification": "B. KEEP: live relic debuff application and expiry; relic owner outside this migration"
+    },
+    {
+      "file": "js/60-team-relic-system.js",
+      "line": 941,
+      "text": "if(attack>0){ restore.attack=monster.attack; restore.magicAttack=monster.magicAttack; monster.attack=numeric(monster.attack)*(1-attack/100); monster.magicAttack=numeric(monster.magicAttack)*(1-attack/100); }",
+      "classification": "B. KEEP: live relic debuff application and expiry; relic owner outside this migration"
+    }
+  ]
+}

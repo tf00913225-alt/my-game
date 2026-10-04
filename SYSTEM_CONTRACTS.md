@@ -6,6 +6,17 @@
 
 術語唯一 Owner：`docs/MONSTER_PORTRAIT_SPEC_V1.md` 第 0 節。世界／個人 Boss 統稱大 Boss，深淵等一般首領稱小 Boss；rank、mode、sizeClass 與 footprint 是獨立契約。下方 Boss 專屬模式的中央六格／援軍／功能物件規則只適用個人／世界大 Boss，不得因一般敵人 `rank="boss"` 套用到塔、每日副本或深淵。既有 World Boss／Personal Boss／Abyss Boss 名稱及內部 identifier 保留。
 
+## Monster Balance Owner 七模式契約
+
+- `js/combat/monster-balance-owner.mjs` 是 `wild / daily / tower / abyss / adventure / personalBoss / worldBoss` 戰前數值的唯一控制來源；內容 Definition 提供固定 Level Spec，Owner 驗證 Level 並轉換配點、HP、SP、物攻、魔攻、防禦、速度與最終傷害 pressure。
+- Ability Point Budget 固定 `(level - 1) × 5`；rank 不增加能力點。內容 identity 必須指定固定 archetype，禁止每場隨機。
+- Personal／World 大 Boss 本體維持 canonical `rank="boss"`；援軍使用 `rank="elite"`，不得繼承 Boss 本體 rank 或 World Stage 本體倍率。Tower 仍使用原 `smallBoss`，七模式不得互換 rank 語意。
+- `worldStage=1..4` 的戰前 HP／pressure Profile 只在 MonsterBalance 內投影一次；`getEnemyPressureMultiplier()` 對正式 Owner entity 只讀 `balanceProjection.finalDamagePressure`，禁止再疊加 Legacy rank/dungeon/Boss/stage pressure。
+- Boss phases、技能／頻率／合法性、Shield、Object、援軍時機、六格 footprint、snapshot、獎勵、進度、UI／VFX 維持原 Gameplay Owner。Object 是不可行動且無一般掉落的機制 entity，不套 MonsterBalance Boss profile。
+- 戰鬥中的技能、護盾、buff/debuff 與秘寶狀態維持原 Owner；不得把它們誤認為戰前基礎數值倍率或藉遷移重寫機制。
+- 玩家→Boss 與敵方→玩家 Hard Control 上限均為 60%；Boss mode/rank/World stage 不得突破。
+- 舊建怪與倍率 writer 已由 deprecated-code gate 禁止；個別退場紀錄與剩餘非數值責任見 `docs/monster-balance-owner-retirement-map.json`。功能驗證／CI／部署結案狀態由 Phase2F Requirement 與 PR 證據記錄。
+
 ## 戰鬥目標契約
 
 - 一般戰鬥維持 `single / tri / row / column / all` 的 Fixed Slot（固定格位）規則。

@@ -14,7 +14,7 @@ async function runBossBalanceProductionQa(){
       const check=(v,m)=>{if(!v)throw Error(m);};
       const wait=async(fn,ms=30000)=>{const end=performance.now()+ms;while(!fn()&&performance.now()<end)await new Promise(r=>setTimeout(r,40));check(fn(),'Boss wait '+fn);};
       await wait(()=>window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden===true&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show'));
-      await FourSymbolsFeatures.ensure('gameplay-core','boss-balance-qa');
+      await FourSymbolsFeatures.ensure('boss-tower','boss-balance-qa');
       await wait(()=>window.GameplaySystem&&window.FourSymbolsBossBattle);closeHomeFeature();
       const evidence=window.bossBalanceQaEvidence={scenes:[],controls:[],skills:[]};
       const stats=m=>[m.maxHP,m.maxSP,m.attack,m.magicAttack,m.defense,m.agility];
@@ -74,7 +74,7 @@ async function runBossBalanceProductionQa(){
         const result=await active;assert.equal(result.scenes.length,9);assert.ok(result.scenes.some(s=>s.shields));assert.ok(result.scenes.some(s=>s.objects));assert.ok(result.scenes.some(s=>s.reinforcements));results.push({width,height,...result});close();
       }
       fs.writeFileSync(file,JSON.stringify({passed:true,commitSha:process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||'local',results},null,2)+'\n');console.log('Boss production Chrome: 18 natural scenes, both viewports, Owner/mechanism/snapshot/reward PASS');
-    }catch(error){console.error('Boss production QA failure:',error);const partial=await client?.eval('({evidence:window.bossBalanceQaEvidence,phase:battlePhase,turn,battleActive})').catch(()=>null);fs.writeFileSync(file,JSON.stringify({passed:false,error:String(error.stack||error),results,partial},null,2)+'\n');throw error;}
+    }catch(error){console.error('Boss production QA failure:',error);const partial=await client?.eval('({evidence:window.bossBalanceQaEvidence,phase:battlePhase,turn,battleActive,modals:[...document.querySelectorAll(".show")].map(x=>x.id)})').catch(()=>null);fs.writeFileSync(file,JSON.stringify({passed:false,error:String(error.stack||error),results,partial,console:client?.events.filter(e=>e.method==='Runtime.consoleAPICalled'||e.method==='Runtime.exceptionThrown').slice(-15)},null,2)+'\n');throw error;}
     finally{close();await new Promise(r=>server.server.close(r));}
 }
 
