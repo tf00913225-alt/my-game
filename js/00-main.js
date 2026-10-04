@@ -54,6 +54,13 @@ const ABYSS_RANK_PROFILES=Object.freeze({
   elite:Object.freeze({hp:1.8,sp:1.5,defense:1.15,finalDamagePressure:1.1}),
   smallBoss:Object.freeze({hp:3.2,sp:2,defense:1.25,finalDamagePressure:1.2})
 });
+// Chapter exploration calibration is independent of Wild/Daily/Tower/Abyss.
+const ADVENTURE_MODE_PROFILE=Object.freeze({hp:0.5,sp:1,damage:1,defense:1,speed:1});
+const ADVENTURE_RANK_PROFILES=Object.freeze({
+  regular:Object.freeze({hp:1,sp:1,defense:1,finalDamagePressure:1}),
+  elite:Object.freeze({hp:1.4,sp:1,defense:1.05,finalDamagePressure:1.1}),
+  smallBoss:Object.freeze({hp:2,sp:1,defense:1.10,finalDamagePressure:1.2})
+});
 const ABYSS_STAGE_HP=Object.freeze([0.90,0.95,1,1.05,1.10]);
 const clone=value=>JSON.parse(JSON.stringify(value));
 function normalizeSpec(spec){
@@ -71,6 +78,10 @@ function normalizeSpec(spec){
   if(mode==='abyss'){
     if(!spec.monsterKey||![20,40].includes(level)||spec.abyssDifficulty!==level||!['east','south','heaven','north','extreme'].includes(spec.abyssRegion)||!Number.isInteger(spec.abyssStage)||spec.abyssStage<0||spec.abyssStage>4||context!==`abyss/${level}/${spec.abyssRegion}/stage/${spec.abyssStage+1}`||rank==='boss') throw new TypeError('explicit formal Abyss encounter required');
     Object.assign(daily,{abyssDifficulty:level,abyssRegion:spec.abyssRegion,abyssStage:spec.abyssStage});
+  }
+  if(mode==='adventure'){
+    if(!spec.monsterKey||typeof spec.chapterId!=='string'||!spec.chapterId||typeof spec.encounterId!=='string'||!spec.encounterId||context!==`adventure/${spec.chapterId}/${spec.encounterId}`)throw new TypeError('explicit Adventure encounter required');
+    Object.assign(daily,{chapterId:spec.chapterId,encounterId:spec.encounterId});
   }
   if(mode==='daily'){
     if(!spec.monsterKey||!['exp','material','gold'].includes(spec.dailyType)||![1,2,3].includes(spec.wave)||!Number.isInteger(spec.slot)||spec.slot<0||spec.slot>5||![1,2,3].includes(spec.partySize)) throw new TypeError('explicit Daily encounter spec required');
@@ -91,13 +102,14 @@ function preview(spec){
     speed:allocation.agilityPoints*SIX_STAT_COEFFICIENTS.agility
   };
   // Migrated modes own their rank pressure here; unmigrated modes stay neutral shadow-only.
-  const migrated=['wild','daily','tower','abyss'].includes(identity.mode);
+  const migrated=['wild','daily','tower','abyss','adventure'].includes(identity.mode);
   const smallBoss=identity.mode==='tower'&&identity.rank==='smallBoss';
   const boss=identity.rank==='boss';
   const rank=migrated
     ?{id:identity.rank,status:'RANK_V1',hp:smallBoss?3:boss?2:identity.rank==='elite'?1.5:1,defense:(smallBoss||boss)?1.15:identity.rank==='elite'?1.1:1,finalDamagePressure:(smallBoss||boss)?1.15:identity.rank==='elite'?1.1:1,skillFrequency:null}
     :{id:identity.rank,status:'PENDING_PRODUCT_CALIBRATION',hp:1,defense:1,finalDamagePressure:null,skillFrequency:null};
   if(identity.mode==='abyss') Object.assign(rank,ABYSS_RANK_PROFILES[identity.rank],{status:'ABYSS_RUNTIME_V1'});
+  if(identity.mode==='adventure')Object.assign(rank,ADVENTURE_RANK_PROFILES[identity.rank],{status:'ADVENTURE_RUNTIME_V1'});
   const mode={id:identity.mode,status:identity.mode==='wild'||identity.mode==='tower'?'RUNTIME_V1':'SHADOW_BASELINE_ONLY',hp:identity.mode==='wild'?0.32:identity.mode==='tower'?TOWER_MODE_PROFILE.hp:1,sp:1,damage:identity.mode==='tower'?TOWER_MODE_PROFILE.damage:1,defense:1,speed:identity.mode==='wild'&&identity.context==='wild/zone-01'?0:1,ttkTarget:['wild','daily'].includes(identity.mode)?{maxRounds:2,player:'normal same-level progression',scope:'kill/clear wave'}:identity.mode==='tower'?{player:'normal same-floor progression',scope:'challenge floor',floorEqualsLevel:true}:null};
   if(identity.mode==='daily'){
     const solo=identity.partySize===1&&identity.highestPartyLevel<=20;
@@ -107,6 +119,7 @@ function preview(spec){
     const final=identity.level===40&&identity.abyssRegion==='extreme'&&identity.abyssStage===4;
     Object.assign(mode,ABYSS_MODE_PROFILE,{status:'RUNTIME_V1',hp:ABYSS_MODE_PROFILE.hp*ABYSS_STAGE_HP[identity.abyssStage]*(final?ABYSS_MODE_PROFILE.trueRealmFinalHp:1),damage:final?ABYSS_MODE_PROFILE.trueRealmFinalDamage:ABYSS_MODE_PROFILE.damage,ttkTarget:{scope:'challenge encounter; no two-round cap',reference:'formal unequipped party at unlock/+10/+20',trueRealmFinal:final}});
   }
+  if(identity.mode==='adventure')Object.assign(mode,ADVENTURE_MODE_PROFILE,{status:'RUNTIME_V1',ttkTarget:{scope:'chapter exploration encounter; no two-round cap',reference:'formal suggested level/+5/+10; solo and two members'}});
   const element={id:identity.element,hp:1,defense:1,speed:1,metadata:{},provenance:'identity only'};
   if(identity.mode==='tower'){
     element.provenance='existing Tower Element Profile (pre-battle only)';
@@ -118,10 +131,10 @@ function preview(spec){
   const globalCalibration={...GLOBAL_CALIBRATION};
   const profiles={rank,mode,element,globalCalibration};
   const afterRank={...derived,maxSP:derived.maxSP*(rank.sp||1),maxHP:derived.maxHP*rank.hp,defense:derived.defense*rank.defense};
-  const afterMode={...afterRank,maxHP:afterRank.maxHP*mode.hp*(mode.partySizeDurability||1),maxSP:afterRank.maxSP*mode.sp,physicalAttack:afterRank.physicalAttack*(['daily','tower','abyss'].includes(identity.mode)?1:mode.damage),magicAttack:afterRank.magicAttack*(['daily','tower','abyss'].includes(identity.mode)?1:mode.damage),defense:afterRank.defense*mode.defense,speed:afterRank.speed*mode.speed};
+  const afterMode={...afterRank,maxHP:afterRank.maxHP*mode.hp*(mode.partySizeDurability||1),maxSP:afterRank.maxSP*mode.sp,physicalAttack:afterRank.physicalAttack*(['daily','tower','abyss','adventure'].includes(identity.mode)?1:mode.damage),magicAttack:afterRank.magicAttack*(['daily','tower','abyss','adventure'].includes(identity.mode)?1:mode.damage),defense:afterRank.defense*mode.defense,speed:afterRank.speed*mode.speed};
   const afterElement={...afterMode,maxHP:Math.round(afterMode.maxHP*element.hp),defense:['wild','daily'].includes(identity.mode)?afterMode.defense:Math.round(afterMode.defense*element.defense),speed:afterMode.speed*element.speed};
   const final={...afterElement,maxHP:afterElement.maxHP*globalCalibration.hp,maxSP:afterElement.maxSP*globalCalibration.sp,physicalAttack:afterElement.physicalAttack*globalCalibration.damage,magicAttack:afterElement.magicAttack*globalCalibration.damage,defense:afterElement.defense*globalCalibration.defense};
-  return {identity,base,resourceBase:{...RESOURCE_BASE,speed:0},allocation,derived,profiles,final,finalDamagePressure:rank.finalDamagePressure===null?null:rank.finalDamagePressure*mode.damage,...(['daily','tower','abyss'].includes(identity.mode)?{legacyMultiplier:'NONE'}:{}),...(identity.mode==='daily'?{skillFrequency:mode.skillFrequency}:{}),provenance:{stats:'MonsterBalance',damagePressure:'MonsterBalance Rank Profile consumed once by core damage settlement'},aiIntent:clone(ARCHETYPES[identity.archetype].aiIntent),pendingProductDecisions:['wild','daily','tower','abyss'].includes(identity.mode)?[]:['monster per-level bonusHP +30 / bonusSP +10','rank and mode final calibration','Abyss TTK'],breakdown:[
+  return {identity,base,resourceBase:{...RESOURCE_BASE,speed:0},allocation,derived,profiles,final,finalDamagePressure:rank.finalDamagePressure===null?null:rank.finalDamagePressure*mode.damage,...(['daily','tower','abyss','adventure'].includes(identity.mode)?{legacyMultiplier:'NONE'}:{}),...(identity.mode==='daily'?{skillFrequency:mode.skillFrequency}:{}),provenance:{stats:'MonsterBalance',damagePressure:'MonsterBalance Rank Profile consumed once by core damage settlement'},aiIntent:clone(ARCHETYPES[identity.archetype].aiIntent),pendingProductDecisions:['wild','daily','tower','abyss','adventure'].includes(identity.mode)?[]:['monster per-level bonusHP +30 / bonusSP +10','rank and mode final calibration','Abyss TTK'],breakdown:[
     {step:'levelBase',formula:'30 + (level - 1) * growth; budget = (level - 1) * 5',input:identity.level,output:{...base}},
     {step:'allocation',method:'largest remainder; canonical STAT_ORDER ties',weights:{...ARCHETYPES[identity.archetype].weights},output:{...allocation}},
     {step:'sixStatConversion',coefficients:{...SIX_STAT_COEFFICIENTS},resourceBase:{...RESOURCE_BASE},output:{...derived}},
@@ -139,7 +152,7 @@ function previewTowerRoster(spec,floor){
   return ranks.map(rank=>previewTower({...spec,rank},floor));
 }
 function build(spec){
-  if(!['wild','daily','tower','abyss'].includes(spec.mode)||!spec.monsterKey) throw new TypeError('Runtime build requires explicit migrated identity');
+  if(!['wild','daily','tower','abyss','adventure'].includes(spec.mode)||!spec.monsterKey) throw new TypeError('Runtime build requires explicit migrated identity');
   const projection=preview(spec),{final,allocation,identity}=projection;
   return {...identity,...allocation,maxHP:final.maxHP,hp:final.maxHP,maxSP:final.maxSP,sp:final.maxSP,
     attack:final.physicalAttack,magicAttack:final.magicAttack,defense:final.defense,agility:final.speed,
@@ -3308,7 +3321,7 @@ function makeZoneMonster(
         if(identity.zone==="wild/zone-01"){ monster.v173BeginnerForest=true; }
         return configureBuiltMonster(monster);
     }
-    // Legacy-only compatibility: Tower/Abyss/Adventure/Boss remain unmigrated.
+    // Shared legacy compatibility remains for Personal/World Boss callers.
     return makeLegacyModeMonster(name,level,element,rank,portraitKey);
 }
 
@@ -12776,7 +12789,7 @@ function getEnemyPressureMultiplier(attacker,target){
     if(!attacker||!target||isPartyDamageTarget(attacker)||!isPartyDamageTarget(target)){
         return 1;
     }
-    if(["wild","daily","tower","abyss"].includes(attacker.mode)&&attacker.balanceOwner==="MonsterBalance"){
+    if(["wild","daily","tower","abyss","adventure"].includes(attacker.mode)&&attacker.balanceOwner==="MonsterBalance"){
         return attacker.balanceProjection.finalDamagePressure;
     }
     const rank=typeof getMonsterRank==="function"?getMonsterRank(attacker):"regular";

@@ -130,10 +130,10 @@ test('formal reference party and damage/action owners satisfy Wild TTK across 40
  for(const r of rows){assert.ok(r.clear);assert.ok(r.rounds<=(r.elite?3:2),JSON.stringify({level:r.level,element:r.element,elite:r.elite,rounds:r.rounds}));assert.ok(r.survivors>0);assert.ok(r.reference.skillCost<=r.reference.skillBudget);}
 });
 
-test('Phase2C migrates Tower while Personal/World Boss and Adventure stay on the Phase2A baseline',()=>{
+test('Phase2E migrates Adventure; Personal/World Boss stay on the Phase2A baseline',()=>{
  const baseline=JSON.parse(fs.readFileSync('tests/fixtures/monster-balance-p2a-extra-non-wild.json','utf8'));
  const actual=collectNonWildOutputs(loadLegacyRuntime);assert.equal(actual.length,123);
- const legacyModes=new Set(['personal','world','adventure']);
+ const legacyModes=new Set(['personal','world']);
  assert.deepEqual(actual.filter(row=>legacyModes.has(row.mode)),baseline.rows.filter(row=>legacyModes.has(row.mode)));
  const tower=actual.filter(row=>row.mode==='tower'||row.mode==='towerBoss');
  assert.equal(tower.length,72);

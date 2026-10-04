@@ -1,6 +1,6 @@
 {
-  "workId": "MONSTER-BALANCE-OWNER-P2D-ABYSS-20261004",
-  "phase": "2D",
+  "workId": "MONSTER-BALANCE-OWNER-P2E-ADVENTURE-20261004",
+  "phase": "2E",
   "classification": [
     "Convergence",
     "Replacement",
@@ -23,15 +23,15 @@
       "phase": "Phase 2D Abyss / 2E Adventure / 2F Boss",
       "reason": "(level-1)*5 + archetype allocation; retain legacy only for unmigrated modes",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "Abyss caller edge severed in Phase 2D; shared legacy responsibility remains for Adventure/Personal/World Boss",
+      "retirementGate": "Adventure caller edge severed in Phase2E; shared legacy remains for Personal/World Boss only.",
       "wildForbidden": true,
       "requiredModes": [
-        "adventure",
         "personalBoss",
         "worldBoss"
       ],
       "dailyForbidden": true,
-      "abyssForbidden": true
+      "abyssForbidden": true,
+      "adventureForbidden": true
     },
     {
       "id": "coreStats",
@@ -42,15 +42,15 @@
       "phase": "Phase 2D Abyss / 2E Adventure / 2F Boss",
       "reason": "stat generation migrates; skill/identity construction responsibility kept separately",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "Abyss caller edge severed in Phase 2D; shared legacy responsibility remains for Adventure/Personal/World Boss",
+      "retirementGate": "Adventure caller edge severed in Phase2E; shared legacy remains for Personal/World Boss only.",
       "wildForbidden": true,
       "requiredModes": [
-        "adventure",
         "personalBoss",
         "worldBoss"
       ],
       "dailyForbidden": true,
-      "abyssForbidden": true
+      "abyssForbidden": true,
+      "adventureForbidden": true
     },
     {
       "id": "playerLevelBase",
@@ -124,15 +124,15 @@
       "phase": "Phase 2D Abyss / 2E Adventure / 2F Boss",
       "reason": "keep for unmigrated users only; remove at last dependent migration",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "Abyss caller edge severed in Phase 2D; shared legacy responsibility remains for Adventure/Personal/World Boss",
+      "retirementGate": "Adventure caller edge severed in Phase2E; shared legacy remains for Personal/World Boss only.",
       "dailyForbidden": true,
       "wildForbidden": true,
       "requiredModes": [
-        "adventure",
         "personalBoss",
         "worldBoss"
       ],
-      "abyssForbidden": true
+      "abyssForbidden": true,
+      "adventureForbidden": true
     },
     {
       "id": "dungeonNormal",
@@ -143,15 +143,15 @@
       "phase": "Phase 2D Abyss / 2E Adventure / 2F Boss",
       "reason": "same dependency rule; legacy 1.30/1.10 not ratified",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "Abyss caller edge severed in Phase 2D; shared legacy responsibility remains for Adventure/Personal/World Boss",
+      "retirementGate": "Adventure caller edge severed in Phase2E; shared legacy remains for Personal/World Boss only.",
       "dailyForbidden": true,
       "wildForbidden": true,
       "requiredModes": [
-        "adventure",
         "personalBoss",
         "worldBoss"
       ],
-      "abyssForbidden": true
+      "abyssForbidden": true,
+      "adventureForbidden": true
     },
     {
       "id": "dungeonRank",
@@ -162,15 +162,15 @@
       "phase": "Phase 2D Abyss / 2E Adventure / 2F Boss",
       "reason": "3.20/4.50 HP,2 SP,1.25/1.40 defense comparison only",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "Abyss caller edge severed in Phase 2D; shared legacy responsibility remains for Adventure/Personal/World Boss",
+      "retirementGate": "Adventure caller edge severed in Phase2E; shared legacy remains for Personal/World Boss only.",
       "dailyForbidden": true,
       "wildForbidden": true,
       "requiredModes": [
-        "adventure",
         "personalBoss",
         "worldBoss"
       ],
-      "abyssForbidden": true
+      "abyssForbidden": true,
+      "adventureForbidden": true
     },
     {
       "id": "equipmentRank",
@@ -302,24 +302,24 @@
       "phase": "Phase 2D Abyss / 2E Adventure / 2F Boss",
       "reason": "mode explicit; v132Dungeon flag cannot imply daily; damage settlement KEEP single owner consumes resolved profile",
       "phase1": "KEEP Runtime exactly unchanged",
-      "retirementGate": "Abyss caller edge severed in Phase 2D; shared legacy responsibility remains for Adventure/Personal/World Boss",
+      "retirementGate": "Adventure caller edge severed in Phase2E; shared legacy remains for Personal/World Boss only.",
       "wildForbidden": true,
       "requiredModes": [
-        "adventure",
         "personalBoss",
         "worldBoss"
       ],
       "dailyForbidden": true,
-      "abyssForbidden": true
+      "abyssForbidden": true,
+      "adventureForbidden": true
     },
     {
       "id": "adventureBuild",
       "file": "js/adventure/adventure-runtime-v1-20260915.js",
       "sourceToken": "buildEncounter",
-      "status": "CURRENT OWNER",
-      "decision": "TO MIGRATE",
-      "phase": "Phase 2 Adventure",
-      "reason": "direct makeZoneMonster rank semantics convert to explicit spec; encounter progression KEEP",
+      "status": "STAT EDGE RETIRED / CONTENT LIFECYCLE OWNER",
+      "decision": "KEEP",
+      "phase": "Phase 2E Adventure",
+      "reason": "Explicit fixed content specs build MonsterBalance directly; skills/reward/progression preserved.",
       "phase1": "KEEP Runtime exactly unchanged",
       "retirementGate": "migrated caller graph + mode regression + no legacy post-write for migrated entity"
     },
@@ -435,5 +435,27 @@
     "ttkCases": 300,
     "browserScenes": 14,
     "closeout": "Final metadata-head CI, dev integration/deployment and safe branch cleanup are independent pending gates; PR#793 is live owner."
+  },
+  "phase2eGate": {
+    "workId": "MONSTER-BALANCE-OWNER-P2E-ADVENTURE-20261004",
+    "status": "IMPLEMENTED",
+    "runtimeOwner": "js/combat/monster-balance-owner.mjs",
+    "migratedMode": "adventure",
+    "retiredWrites": [
+      "Adventure makeZoneMonster constructor edge",
+      "Adventure rank post-write",
+      "Legacy additive Adventure pressure"
+    ],
+    "remainingLegacyModes": [
+      "personalBoss",
+      "worldBoss"
+    ],
+    "stopAfter": "Phase2E Adventure",
+    "identities": 9,
+    "names": 8,
+    "encounters": 3,
+    "archetypes": 9,
+    "ttkCases": 36,
+    "closeout": "Production Chrome/latest-head CI/integration/deployment/cleanup pending."
   }
 }

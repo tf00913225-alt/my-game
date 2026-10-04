@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-04",
+  "title": "Monster Balance Owner Phase2E Adventure",
+  "workId": "MONSTER-BALANCE-OWNER-P2E-ADVENTURE-20261004",
+  "base_branch": "dev",
+  "base_sha": "a0c4cf3ccf6b83278f9940da7f71516d9c98cfa4",
+  "work_branch": "feature/monster-balance-owner-phase2e-adventure-20261004",
+  "officialVersion": "173.73",
+  "status": "IMPLEMENTED",
+  "requirements": [
+    {
+      "id": "REQ-MONSTER-BALANCE-OWNER-P2E-ADVENTURE-20261004",
+      "title": "Adventure 戰前數值唯一 MonsterBalance、固定遭遇等級／archetype、canonical smallBoss、舊數值 caller 退場",
+      "status": "IMPLEMENTED",
+      "evidence": {
+        "files": [
+          "docs/MONSTER_BALANCE_OWNER_PHASE2E.md",
+          "tests/monster-balance-owner-phase2e.test.mjs",
+          "scripts/adventure-balance-ttk-matrix.mjs",
+          ".github/scripts/run-adventure-browser-qa.mjs",
+          "docs/monster-balance-adventure-baseline-20261004.json",
+          "docs/monster-balance-adventure-ttk-evidence-20261004.json",
+          "docs/monster-balance-adventure-ttk-seeded-evidence-20261004.json"
+        ],
+        "verification": "Local18 neutral+18 seeded formal TTK cases clear+survive. Focused/direct/build and production Chrome/latest-head CI pending.",
+        "result": "IMPLEMENTED; integration/deployment/cleanup not yet verified. Stop before Phase2F."
+      }
+    }
+  ]
+}

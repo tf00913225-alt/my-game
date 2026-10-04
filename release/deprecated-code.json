@@ -224,6 +224,14 @@
         "function makeAbyssMonster(name,level,element,rank,extraHp,skills,forceLevel)",
         "v141ExtraHP"
       ]
+    },
+    {
+      "id": "DEP-MONSTER-BALANCE-P2E-ADVENTURE",
+      "description": "Retired Adventure-only numerical caller. Shared Boss legacy builders remain legal.",
+      "enabled": true,
+      "forbidden": [
+        "makeZoneMonster(entry.name,entry.level,entry.element,entry.rank||\"regular\")"
+      ]
     }
   ]
 }

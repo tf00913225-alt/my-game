@@ -1,0 +1,2316 @@
+{
+  "workId": "MONSTER-BALANCE-OWNER-P2E-ADVENTURE-20261004",
+  "randomPolicy": "neutral",
+  "cases": 18,
+  "method": "All three formal encounters; suggested/+5/+10 level, legal solo/two-member unequipped reference, final stat/skill/initiative/AI/damage/status/round-end owners. No asynchronous animation claims.",
+  "gate": {
+    "passed": true,
+    "failures": [],
+    "instantWipes": []
+  },
+  "rows": [
+    {
+      "encounterId": "enc_road",
+      "partyLevel": 8,
+      "partySize": 1,
+      "randomPolicy": "neutral",
+      "randomSeed": 10081,
+      "reference": {
+        "level": 8,
+        "budget": 45,
+        "skill": "fireRocket",
+        "skillLevel": 1,
+        "skillCost": 2,
+        "skillBudget": 16,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 760,
+            "maxSP": 180,
+            "attack": 82,
+            "attackPoints": 5,
+            "defense": 78,
+            "defensePoints": 6,
+            "magicAttack": 103.25,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 6,
+            "evasion": 0,
+            "vitality": 9,
+            "energy": 4,
+            "intelligence": 15,
+            "agility": 6
+          }
+        ]
+      },
+      "rounds": 4,
+      "clear": true,
+      "survivors": 1,
+      "initialParty": [
+        760
+      ],
+      "firstRoundParty": [
+        545
+      ],
+      "finalParty": [
+        319
+      ],
+      "initialMonsters": [
+        {
+          "name": "攔路山賊",
+          "rank": "regular",
+          "level": 8,
+          "element": "fire",
+          "hp": 200,
+          "sp": 125,
+          "attack": 86,
+          "magicAttack": 75.75,
+          "defense": 74,
+          "speed": 3,
+          "owner": "legacy",
+          "pressure": 1,
+          "skillFrequency": 0,
+          "skillIds": [],
+          "supportIds": [],
+          "portraitKey": null
+        },
+        {
+          "name": "山道惡徒",
+          "rank": "regular",
+          "level": 8,
+          "element": "wind",
+          "hp": 200,
+          "sp": 125,
+          "attack": 86,
+          "magicAttack": 75.75,
+          "defense": 74,
+          "speed": 3,
+          "owner": "legacy",
+          "pressure": 1,
+          "skillFrequency": 0,
+          "skillIds": [],
+          "supportIds": [],
+          "portraitKey": null
+        },
+        {
+          "name": "寨外斥候",
+          "rank": "regular",
+          "level": 9,
+          "element": "earth",
+          "hp": 250,
+          "sp": 140,
+          "attack": 90,
+          "magicAttack": 79.75,
+          "defense": 77,
+          "speed": 3,
+          "owner": "legacy",
+          "pressure": 1,
+          "skillFrequency": 0,
+          "skillIds": [],
+          "supportIds": [],
+          "portraitKey": null
+        }
+      ],
+      "skillUsage": [
+        {
+          "name": "普通攻擊",
+          "round": 1
+        },
+        {
+          "name": "普通攻擊",
+          "round": 1
+        },
+        {
+          "name": "普通攻擊",
+          "round": 1
+        },
+        {
+          "name": "普通攻擊",
+          "round": 2
+        },
+        {
+          "name": "普通攻擊",
+          "round": 2
+        },
+        {
+          "name": "普通攻擊",
+          "round": 3
+        }
+      ],
+      "controlUsage": []
+    },
+    {
+      "encounterId": "enc_road",
+      "partyLevel": 8,
+      "partySize": 2,
+      "randomPolicy": "neutral",
+      "randomSeed": 10082,
+      "reference": {
+        "level": 8,
+        "budget": 45,
+        "skill": "fireRocket",
+        "skillLevel": 1,
+        "skillCost": 2,
+        "skillBudget": 16,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 760,
+            "maxSP": 180,
+            "attack": 82,
+            "attackPoints": 5,
+            "defense": 78,
+            "defensePoints": 6,
+            "magicAttack": 103.25,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 6,
+            "evasion": 0,
+            "vitality": 9,
+            "energy": 4,
+            "intelligence": 15,
+            "agility": 6
+          },
+          {
+            "maxHP": 760,
+            "maxSP": 180,
+            "attack": 82,
+            "attackPoints": 5,
+            "defense": 78,
+            "defensePoints": 6,
+            "magicAttack": 103.25,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 6,
+            "evasion": 0,
+            "vitality": 9,
+            "energy": 4,
+            "intelligence": 15,
+            "agility": 6
+          }
+        ]
+      },
+      "rounds": 2,
+      "clear": true,
+      "survivors": 2,
+      "initialParty": [
+        760,
+        760
+      ],
+      "firstRoundParty": [
+        760,
+        608
+      ],
+      "finalParty": [
+        760,
+        608
+      ],
+      "initialMonsters": [
+        {
+          "name": "攔路山賊",
+          "rank": "regular",
+          "level": 8,
+          "element": "fire",
+          "hp": 200,
+          "sp": 125,
+          "attack": 86,
+          "magicAttack": 75.75,
+          "defense": 74,
+          "speed": 3,
+          "owner": "legacy",
+          "pressure": 1,
+          "skillFrequency": 0,
+          "skillIds": [],
+          "supportIds": [],
+          "portraitKey": null
+        },
+        {
+          "name": "山道惡徒",
+          "rank": "regular",
+          "level": 8,
+          "element": "wind",
+          "hp": 200,
+          "sp": 125,
+          "attack": 86,
+          "magicAttack": 75.75,
+          "defense": 74,
+          "speed": 3,
+          "owner": "legacy",
+          "pressure": 1,
+          "skillFrequency": 0,
+          "skillIds": [],
+          "supportIds": [],
+          "portraitKey": null
+        },
+        {
+          "name": "寨外斥候",
+          "rank": "regular",
+          "level": 9,
+          "element": "earth",
+          "hp": 250,
+          "sp": 140,
+          "attack": 90,
+          "magicAttack": 79.75,
+          "defense": 77,
+          "speed": 3,
+          "owner": "legacy",
+          "pressure": 1,
+          "skillFrequency": 0,
+          "skillIds": [],
+          "supportIds": [],
+          "portraitKey": null
+        }
+      ],
+      "skillUsage": [
+        {
+          "name": "普通攻擊",
+          "round": 1
+        },
+        {
+          "name": "普通攻擊",
+          "round": 1
+        }
+      ],
+      "controlUsage": []
+    },
+    {
+      "encounterId": "enc_road",
+      "partyLevel": 13,
+      "partySize": 1,
+      "randomPolicy": "neutral",
+      "randomSeed": 10131,
+      "reference": {
+        "level": 13,
+        "budget": 70,
+        "skill": "fireRocket",
+        "skillLevel": 10,
+        "skillCost": 11,
+        "skillBudget": 26,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 1160,
+            "maxSP": 275,
+            "attack": 102,
+            "attackPoints": 5,
+            "defense": 109,
+            "defensePoints": 10,
+            "magicAttack": 148,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 10,
+            "evasion": 0,
+            "vitality": 14,
+            "energy": 7,
+            "intelligence": 24,
+            "agility": 10
+          }
+        ]
+      },
+      "rounds": 2,
+      "clear": true,
+      "survivors": 1,
+      "initialParty": [
+        1160
+      ],
+      "firstRoundParty": [
+        1088
+      ],
+      "finalParty": [
+        1088
+      ],
+      "initialMonsters": [
+        {
+          "name": "攔路山賊",
+          "rank": "regular",
+          "level": 8,
+          "element": "fire",
+          "hp": 200,
+          "sp": 125,
+          "attack": 86,
+          "magicAttack": 75.75,
+          "defense": 74,
+          "speed": 3,
+          "owner": "legacy",
+          "pressure": 1,
+          "skillFrequency": 0,
+          "skillIds": [],
+          "supportIds": [],
+          "portraitKey": null
+        },
+        {
+          "name": "山道惡徒",
+          "rank": "regular",
+          "level": 8,
+          "element": "wind",
+          "hp": 200,
+          "sp": 125,
+          "attack": 86,
+          "magicAttack": 75.75,
+          "defense": 74,
+          "speed": 3,
+          "owner": "legacy",
+          "pressure": 1,
+          "skillFrequency": 0,
+          "skillIds": [],
+          "supportIds": [],
+          "portraitKey": null
+        },
+        {
+          "name": "寨外斥候",
+          "rank": "regular",
+          "level": 9,
+          "element": "earth",
+          "hp": 250,
+          "sp": 140,
+          "attack": 90,
+          "magicAttack": 79.75,
+          "defense": 77,
+          "speed": 3,
+          "owner": "legacy",
+          "pressure": 1,
+          "skillFrequency": 0,
+          "skillIds": [],
+          "supportIds": [],
+          "portraitKey": null
+        }
+      ],
+      "skillUsage": [
+        {
+          "name": "普通攻擊",
+          "round": 1
+        }
+      ],
+      "controlUsage": []
+    },
+    {
+      "encounterId": "enc_road",
+      "partyLevel": 13,
+      "partySize": 2,
+      "randomPolicy": "neutral",
+      "randomSeed": 10132,
+      "reference": {
+        "level": 13,
+        "budget": 70,
+        "skill": "fireRocket",
+        "skillLevel": 10,
+        "skillCost": 11,
+        "skillBudget": 26,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 1160,
+            "maxSP": 275,
+            "attack": 102,
+            "attackPoints": 5,
+            "defense": 109,
+            "defensePoints": 10,
+            "magicAttack": 148,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 10,
+            "evasion": 0,
+            "vitality": 14,
+            "energy": 7,
+            "intelligence": 24,
+            "agility": 10
+          },
+          {
+            "maxHP": 1160,
+            "maxSP": 275,
+            "attack": 102,
+            "attackPoints": 5,
+            "defense": 109,
+            "defensePoints": 10,
+            "magicAttack": 148,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 10,
+            "evasion": 0,
+            "vitality": 14,
+            "energy": 7,
+            "intelligence": 24,
+            "agility": 10
+          }
+        ]
+      },
+      "rounds": 1,
+      "clear": true,
+      "survivors": 2,
+      "initialParty": [
+        1160,
+        1160
+      ],
+      "firstRoundParty": [
+        1160,
+        1160
+      ],
+      "finalParty": [
+        1160,
+        1160
+      ],
+      "initialMonsters": [
+        {
+          "name": "攔路山賊",
+          "rank": "regular",
+          "level": 8,
+          "element": "fire",
+          "hp": 200,
+          "sp": 125,
+          "attack": 86,
+          "magicAttack": 75.75,
+          "defense": 74,
+          "speed": 3,
+          "owner": "legacy",
+          "pressure": 1,
+          "skillFrequency": 0,
+          "skillIds": [],
+          "supportIds": [],
+          "portraitKey": null
+        },
+        {
+          "name": "山道惡徒",
+          "rank": "regular",
+          "level": 8,
+          "element": "wind",
+          "hp": 200,
+          "sp": 125,
+          "attack": 86,
+          "magicAttack": 75.75,
+          "defense": 74,
+          "speed": 3,
+          "owner": "legacy",
+          "pressure": 1,
+          "skillFrequency": 0,
+          "skillIds": [],
+          "supportIds": [],
+          "portraitKey": null
+        },
+        {
+          "name": "寨外斥候",
+          "rank": "regular",
+          "level": 9,
+          "element": "earth",
+          "hp": 250,
+          "sp": 140,
+          "attack": 90,
+          "magicAttack": 79.75,
+          "defense": 77,
+          "speed": 3,
+          "owner": "legacy",
+          "pressure": 1,
+          "skillFrequency": 0,
+          "skillIds": [],
+          "supportIds": [],
+          "portraitKey": null
+        }
+      ],
+      "skillUsage": [],
+      "controlUsage": []
+    },
+    {
+      "encounterId": "enc_road",
+      "partyLevel": 18,
+      "partySize": 1,
+      "randomPolicy": "neutral",
+      "randomSeed": 10181,
+      "reference": {
+        "level": 18,
+        "budget": 95,
+        "skill": "fireRocket",
+        "skillLevel": 10,
+        "skillCost": 11,
+        "skillBudget": 36,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 1560,
+            "maxSP": 355,
+            "attack": 126,
+            "attackPoints": 6,
+            "defense": 140,
+            "defensePoints": 14,
+            "magicAttack": 192.75,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 14,
+            "evasion": 0,
+            "vitality": 19,
+            "energy": 9,
+            "intelligence": 33,
+            "agility": 14
+          }
+        ]
+      },
+      "rounds": 2,
+      "clear": true,
+      "survivors": 1,
+      "initialParty": [
+        1560
+      ],
+      "firstRoundParty": [
+        1494
+      ],
+      "finalParty": [
+        1494
+      ],
+      "initialMonsters": [
+        {
+          "name": "攔路山賊",
+          "rank": "regular",
+          "level": 8,
+          "element": "fire",
+          "hp": 200,
+          "sp": 125,
+          "attack": 86,
+          "magicAttack": 75.75,
+          "defense": 74,
+          "speed": 3,
+          "owner": "legacy",
+          "pressure": 1,
+          "skillFrequency": 0,
+          "skillIds": [],
+          "supportIds": [],
+          "portraitKey": null
+        },
+        {
+          "name": "山道惡徒",
+          "rank": "regular",
+          "level": 8,
+          "element": "wind",
+          "hp": 200,
+          "sp": 125,
+          "attack": 86,
+          "magicAttack": 75.75,
+          "defense": 74,
+          "speed": 3,
+          "owner": "legacy",
+          "pressure": 1,
+          "skillFrequency": 0,
+          "skillIds": [],
+          "supportIds": [],
+          "portraitKey": null
+        },
+        {
+          "name": "寨外斥候",
+          "rank": "regular",
+          "level": 9,
+          "element": "earth",
+          "hp": 250,
+          "sp": 140,
+          "attack": 90,
+          "magicAttack": 79.75,
+          "defense": 77,
+          "speed": 3,
+          "owner": "legacy",
+          "pressure": 1,
+          "skillFrequency": 0,
+          "skillIds": [],
+          "supportIds": [],
+          "portraitKey": null
+        }
+      ],
+      "skillUsage": [
+        {
+          "name": "普通攻擊",
+          "round": 1
+        }
+      ],
+      "controlUsage": []
+    },
+    {
+      "encounterId": "enc_road",
+      "partyLevel": 18,
+      "partySize": 2,
+      "randomPolicy": "neutral",
+      "randomSeed": 10182,
+      "reference": {
+        "level": 18,
+        "budget": 95,
+        "skill": "fireRocket",
+        "skillLevel": 10,
+        "skillCost": 11,
+        "skillBudget": 36,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 1560,
+            "maxSP": 355,
+            "attack": 126,
+            "attackPoints": 6,
+            "defense": 140,
+            "defensePoints": 14,
+            "magicAttack": 192.75,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 14,
+            "evasion": 0,
+            "vitality": 19,
+            "energy": 9,
+            "intelligence": 33,
+            "agility": 14
+          },
+          {
+            "maxHP": 1560,
+            "maxSP": 355,
+            "attack": 126,
+            "attackPoints": 6,
+            "defense": 140,
+            "defensePoints": 14,
+            "magicAttack": 192.75,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 14,
+            "evasion": 0,
+            "vitality": 19,
+            "energy": 9,
+            "intelligence": 33,
+            "agility": 14
+          }
+        ]
+      },
+      "rounds": 1,
+      "clear": true,
+      "survivors": 2,
+      "initialParty": [
+        1560,
+        1560
+      ],
+      "firstRoundParty": [
+        1560,
+        1560
+      ],
+      "finalParty": [
+        1560,
+        1560
+      ],
+      "initialMonsters": [
+        {
+          "name": "攔路山賊",
+          "rank": "regular",
+          "level": 8,
+          "element": "fire",
+          "hp": 200,
+          "sp": 125,
+          "attack": 86,
+          "magicAttack": 75.75,
+          "defense": 74,
+          "speed": 3,
+          "owner": "legacy",
+          "pressure": 1,
+          "skillFrequency": 0,
+          "skillIds": [],
+          "supportIds": [],
+          "portraitKey": null
+        },
+        {
+          "name": "山道惡徒",
+          "rank": "regular",
+          "level": 8,
+          "element": "wind",
+          "hp": 200,
+          "sp": 125,
+          "attack": 86,
+          "magicAttack": 75.75,
+          "defense": 74,
+          "speed": 3,
+          "owner": "legacy",
+          "pressure": 1,
+          "skillFrequency": 0,
+          "skillIds": [],
+          "supportIds": [],
+          "portraitKey": null
+        },
+        {
+          "name": "寨外斥候",
+          "rank": "regular",
+          "level": 9,
+          "element": "earth",
+          "hp": 250,
+          "sp": 140,
+          "attack": 90,
+          "magicAttack": 79.75,
+          "defense": 77,
+          "speed": 3,
+          "owner": "legacy",
+          "pressure": 1,
+          "skillFrequency": 0,
+          "skillIds": [],
+          "supportIds": [],
+          "portraitKey": null
+        }
+      ],
+      "skillUsage": [],
+      "controlUsage": []
+    },
+    {
+      "encounterId": "enc_gate_elite",
+      "partyLevel": 10,
+      "partySize": 1,
+      "randomPolicy": "neutral",
+      "randomSeed": 11101,
+      "reference": {
+        "level": 10,
+        "budget": 55,
+        "skill": "fireRocket",
+        "skillLevel": 10,
+        "skillCost": 11,
+        "skillBudget": 20,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 920,
+            "maxSP": 215,
+            "attack": 86,
+            "attackPoints": 4,
+            "defense": 92,
+            "defensePoints": 8,
+            "magicAttack": 122.25,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 8,
+            "evasion": 0,
+            "vitality": 11,
+            "energy": 5,
+            "intelligence": 19,
+            "agility": 8
+          }
+        ]
+      },
+      "rounds": 2,
+      "clear": true,
+      "survivors": 1,
+      "initialParty": [
+        920
+      ],
+      "firstRoundParty": [
+        687
+      ],
+      "finalParty": [
+        687
+      ],
+      "initialMonsters": [
+        {
+          "name": "黑松寨精英",
+          "rank": "elite",
+          "level": 10,
+          "element": "earth",
+          "hp": 250,
+          "sp": 140,
+          "attack": 94,
+          "magicAttack": 86.5,
+          "defense": 84,
+          "speed": 3,
+          "owner": "legacy",
+          "pressure": 1.1,
+          "skillFrequency": 0,
+          "skillIds": [],
+          "supportIds": [],
+          "portraitKey": null
+        },
+        {
+          "name": "持刀寨眾",
+          "rank": "regular",
+          "level": 10,
+          "element": "fire",
+          "hp": 250,
+          "sp": 140,
+          "attack": 94,
+          "magicAttack": 86.5,
+          "defense": 84,
+          "speed": 3,
+          "owner": "legacy",
+          "pressure": 1,
+          "skillFrequency": 0,
+          "skillIds": [],
+          "supportIds": [],
+          "portraitKey": null
+        },
+        {
+          "name": "巡寨快手",
+          "rank": "regular",
+          "level": 10,
+          "element": "wind",
+          "hp": 250,
+          "sp": 140,
+          "attack": 94,
+          "magicAttack": 86.5,
+          "defense": 84,
+          "speed": 3,
+          "owner": "legacy",
+          "pressure": 1,
+          "skillFrequency": 0,
+          "skillIds": [],
+          "supportIds": [],
+          "portraitKey": null
+        }
+      ],
+      "skillUsage": [
+        {
+          "name": "普通攻擊",
+          "round": 1
+        },
+        {
+          "name": "普通攻擊",
+          "round": 1
+        },
+        {
+          "name": "普通攻擊",
+          "round": 1
+        }
+      ],
+      "controlUsage": []
+    },
+    {
+      "encounterId": "enc_gate_elite",
+      "partyLevel": 10,
+      "partySize": 2,
+      "randomPolicy": "neutral",
+      "randomSeed": 11102,
+      "reference": {
+        "level": 10,
+        "budget": 55,
+        "skill": "fireRocket",
+        "skillLevel": 10,
+        "skillCost": 11,
+        "skillBudget": 20,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 920,
+            "maxSP": 215,
+            "attack": 86,
+            "attackPoints": 4,
+            "defense": 92,
+            "defensePoints": 8,
+            "magicAttack": 122.25,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 8,
+            "evasion": 0,
+            "vitality": 11,
+            "energy": 5,
+            "intelligence": 19,
+            "agility": 8
+          },
+          {
+            "maxHP": 920,
+            "maxSP": 215,
+            "attack": 86,
+            "attackPoints": 4,
+            "defense": 92,
+            "defensePoints": 8,
+            "magicAttack": 122.25,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 8,
+            "evasion": 0,
+            "vitality": 11,
+            "energy": 5,
+            "intelligence": 19,
+            "agility": 8
+          }
+        ]
+      },
+      "rounds": 1,
+      "clear": true,
+      "survivors": 2,
+      "initialParty": [
+        920,
+        920
+      ],
+      "firstRoundParty": [
+        920,
+        920
+      ],
+      "finalParty": [
+        920,
+        920
+      ],
+      "initialMonsters": [
+        {
+          "name": "黑松寨精英",
+          "rank": "elite",
+          "level": 10,
+          "element": "earth",
+          "hp": 250,
+          "sp": 140,
+          "attack": 94,
+          "magicAttack": 86.5,
+          "defense": 84,
+          "speed": 3,
+          "owner": "legacy",
+          "pressure": 1.1,
+          "skillFrequency": 0,
+          "skillIds": [],
+          "supportIds": [],
+          "portraitKey": null
+        },
+        {
+          "name": "持刀寨眾",
+          "rank": "regular",
+          "level": 10,
+          "element": "fire",
+          "hp": 250,
+          "sp": 140,
+          "attack": 94,
+          "magicAttack": 86.5,
+          "defense": 84,
+          "speed": 3,
+          "owner": "legacy",
+          "pressure": 1,
+          "skillFrequency": 0,
+          "skillIds": [],
+          "supportIds": [],
+          "portraitKey": null
+        },
+        {
+          "name": "巡寨快手",
+          "rank": "regular",
+          "level": 10,
+          "element": "wind",
+          "hp": 250,
+          "sp": 140,
+          "attack": 94,
+          "magicAttack": 86.5,
+          "defense": 84,
+          "speed": 3,
+          "owner": "legacy",
+          "pressure": 1,
+          "skillFrequency": 0,
+          "skillIds": [],
+          "supportIds": [],
+          "portraitKey": null
+        }
+      ],
+      "skillUsage": [],
+      "controlUsage": []
+    },
+    {
+      "encounterId": "enc_gate_elite",
+      "partyLevel": 15,
+      "partySize": 1,
+      "randomPolicy": "neutral",
+      "randomSeed": 11151,
+      "reference": {
+        "level": 15,
+        "budget": 80,
+        "skill": "fireRocket",
+        "skillLevel": 10,
+        "skillCost": 11,
+        "skillBudget": 30,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 1320,
+            "maxSP": 310,
+            "attack": 106,
+            "attackPoints": 4,
+            "defense": 123,
+            "defensePoints": 12,
+            "magicAttack": 167,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 12,
+            "evasion": 0,
+            "vitality": 16,
+            "energy": 8,
+            "intelligence": 28,
+            "agility": 12
+          }
+        ]
+      },
+      "rounds": 2,
+      "clear": true,
+      "survivors": 1,
+      "initialParty": [
+        1320
+      ],
+      "firstRoundParty": [
+        1167
+      ],
+      "finalParty": [
+        1167
+      ],
+      "initialMonsters": [
+        {
+          "name": "黑松寨精英",
+          "rank": "elite",
+          "level": 10,
+          "element": "earth",
+          "hp": 250,
+          "sp": 140,
+          "attack": 94,
+          "magicAttack": 86.5,
+          "defense": 84,
+          "speed": 3,
+          "owner": "legacy",
+          "pressure": 1.1,
+          "skillFrequency": 0,
+          "skillIds": [],
+          "supportIds": [],
+          "portraitKey": null
+        },
+        {
+          "name": "持刀寨眾",
+          "rank": "regular",
+          "level": 10,
+          "element": "fire",
+          "hp": 250,
+          "sp": 140,
+          "attack": 94,
+          "magicAttack": 86.5,
+          "defense": 84,
+          "speed": 3,
+          "owner": "legacy",
+          "pressure": 1,
+          "skillFrequency": 0,
+          "skillIds": [],
+          "supportIds": [],
+          "portraitKey": null
+        },
+        {
+          "name": "巡寨快手",
+          "rank": "regular",
+          "level": 10,
+          "element": "wind",
+          "hp": 250,
+          "sp": 140,
+          "attack": 94,
+          "magicAttack": 86.5,
+          "defense": 84,
+          "speed": 3,
+          "owner": "legacy",
+          "pressure": 1,
+          "skillFrequency": 0,
+          "skillIds": [],
+          "supportIds": [],
+          "portraitKey": null
+        }
+      ],
+      "skillUsage": [
+        {
+          "name": "普通攻擊",
+          "round": 1
+        },
+        {
+          "name": "普通攻擊",
+          "round": 1
+        }
+      ],
+      "controlUsage": []
+    },
+    {
+      "encounterId": "enc_gate_elite",
+      "partyLevel": 15,
+      "partySize": 2,
+      "randomPolicy": "neutral",
+      "randomSeed": 11152,
+      "reference": {
+        "level": 15,
+        "budget": 80,
+        "skill": "fireRocket",
+        "skillLevel": 10,
+        "skillCost": 11,
+        "skillBudget": 30,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 1320,
+            "maxSP": 310,
+            "attack": 106,
+            "attackPoints": 4,
+            "defense": 123,
+            "defensePoints": 12,
+            "magicAttack": 167,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 12,
+            "evasion": 0,
+            "vitality": 16,
+            "energy": 8,
+            "intelligence": 28,
+            "agility": 12
+          },
+          {
+            "maxHP": 1320,
+            "maxSP": 310,
+            "attack": 106,
+            "attackPoints": 4,
+            "defense": 123,
+            "defensePoints": 12,
+            "magicAttack": 167,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 12,
+            "evasion": 0,
+            "vitality": 16,
+            "energy": 8,
+            "intelligence": 28,
+            "agility": 12
+          }
+        ]
+      },
+      "rounds": 1,
+      "clear": true,
+      "survivors": 2,
+      "initialParty": [
+        1320,
+        1320
+      ],
+      "firstRoundParty": [
+        1320,
+        1320
+      ],
+      "finalParty": [
+        1320,
+        1320
+      ],
+      "initialMonsters": [
+        {
+          "name": "黑松寨精英",
+          "rank": "elite",
+          "level": 10,
+          "element": "earth",
+          "hp": 250,
+          "sp": 140,
+          "attack": 94,
+          "magicAttack": 86.5,
+          "defense": 84,
+          "speed": 3,
+          "owner": "legacy",
+          "pressure": 1.1,
+          "skillFrequency": 0,
+          "skillIds": [],
+          "supportIds": [],
+          "portraitKey": null
+        },
+        {
+          "name": "持刀寨眾",
+          "rank": "regular",
+          "level": 10,
+          "element": "fire",
+          "hp": 250,
+          "sp": 140,
+          "attack": 94,
+          "magicAttack": 86.5,
+          "defense": 84,
+          "speed": 3,
+          "owner": "legacy",
+          "pressure": 1,
+          "skillFrequency": 0,
+          "skillIds": [],
+          "supportIds": [],
+          "portraitKey": null
+        },
+        {
+          "name": "巡寨快手",
+          "rank": "regular",
+          "level": 10,
+          "element": "wind",
+          "hp": 250,
+          "sp": 140,
+          "attack": 94,
+          "magicAttack": 86.5,
+          "defense": 84,
+          "speed": 3,
+          "owner": "legacy",
+          "pressure": 1,
+          "skillFrequency": 0,
+          "skillIds": [],
+          "supportIds": [],
+          "portraitKey": null
+        }
+      ],
+      "skillUsage": [],
+      "controlUsage": []
+    },
+    {
+      "encounterId": "enc_gate_elite",
+      "partyLevel": 20,
+      "partySize": 1,
+      "randomPolicy": "neutral",
+      "randomSeed": 11201,
+      "reference": {
+        "level": 20,
+        "budget": 105,
+        "skill": "fireRocket",
+        "skillLevel": 10,
+        "skillCost": 11,
+        "skillBudget": 40,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 1720,
+            "maxSP": 390,
+            "attack": 142,
+            "attackPoints": 8,
+            "defense": 150,
+            "defensePoints": 15,
+            "magicAttack": 209,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 15,
+            "evasion": 0,
+            "vitality": 21,
+            "energy": 10,
+            "intelligence": 36,
+            "agility": 15
+          }
+        ]
+      },
+      "rounds": 1,
+      "clear": true,
+      "survivors": 1,
+      "initialParty": [
+        1720
+      ],
+      "firstRoundParty": [
+        1720
+      ],
+      "finalParty": [
+        1720
+      ],
+      "initialMonsters": [
+        {
+          "name": "黑松寨精英",
+          "rank": "elite",
+          "level": 10,
+          "element": "earth",
+          "hp": 250,
+          "sp": 140,
+          "attack": 94,
+          "magicAttack": 86.5,
+          "defense": 84,
+          "speed": 3,
+          "owner": "legacy",
+          "pressure": 1.1,
+          "skillFrequency": 0,
+          "skillIds": [],
+          "supportIds": [],
+          "portraitKey": null
+        },
+        {
+          "name": "持刀寨眾",
+          "rank": "regular",
+          "level": 10,
+          "element": "fire",
+          "hp": 250,
+          "sp": 140,
+          "attack": 94,
+          "magicAttack": 86.5,
+          "defense": 84,
+          "speed": 3,
+          "owner": "legacy",
+          "pressure": 1,
+          "skillFrequency": 0,
+          "skillIds": [],
+          "supportIds": [],
+          "portraitKey": null
+        },
+        {
+          "name": "巡寨快手",
+          "rank": "regular",
+          "level": 10,
+          "element": "wind",
+          "hp": 250,
+          "sp": 140,
+          "attack": 94,
+          "magicAttack": 86.5,
+          "defense": 84,
+          "speed": 3,
+          "owner": "legacy",
+          "pressure": 1,
+          "skillFrequency": 0,
+          "skillIds": [],
+          "supportIds": [],
+          "portraitKey": null
+        }
+      ],
+      "skillUsage": [],
+      "controlUsage": []
+    },
+    {
+      "encounterId": "enc_gate_elite",
+      "partyLevel": 20,
+      "partySize": 2,
+      "randomPolicy": "neutral",
+      "randomSeed": 11202,
+      "reference": {
+        "level": 20,
+        "budget": 105,
+        "skill": "fireRocket",
+        "skillLevel": 10,
+        "skillCost": 11,
+        "skillBudget": 40,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 1720,
+            "maxSP": 390,
+            "attack": 142,
+            "attackPoints": 8,
+            "defense": 150,
+            "defensePoints": 15,
+            "magicAttack": 209,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 15,
+            "evasion": 0,
+            "vitality": 21,
+            "energy": 10,
+            "intelligence": 36,
+            "agility": 15
+          },
+          {
+            "maxHP": 1720,
+            "maxSP": 390,
+            "attack": 142,
+            "attackPoints": 8,
+            "defense": 150,
+            "defensePoints": 15,
+            "magicAttack": 209,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 15,
+            "evasion": 0,
+            "vitality": 21,
+            "energy": 10,
+            "intelligence": 36,
+            "agility": 15
+          }
+        ]
+      },
+      "rounds": 1,
+      "clear": true,
+      "survivors": 2,
+      "initialParty": [
+        1720,
+        1720
+      ],
+      "firstRoundParty": [
+        1720,
+        1720
+      ],
+      "finalParty": [
+        1720,
+        1720
+      ],
+      "initialMonsters": [
+        {
+          "name": "黑松寨精英",
+          "rank": "elite",
+          "level": 10,
+          "element": "earth",
+          "hp": 250,
+          "sp": 140,
+          "attack": 94,
+          "magicAttack": 86.5,
+          "defense": 84,
+          "speed": 3,
+          "owner": "legacy",
+          "pressure": 1.1,
+          "skillFrequency": 0,
+          "skillIds": [],
+          "supportIds": [],
+          "portraitKey": null
+        },
+        {
+          "name": "持刀寨眾",
+          "rank": "regular",
+          "level": 10,
+          "element": "fire",
+          "hp": 250,
+          "sp": 140,
+          "attack": 94,
+          "magicAttack": 86.5,
+          "defense": 84,
+          "speed": 3,
+          "owner": "legacy",
+          "pressure": 1,
+          "skillFrequency": 0,
+          "skillIds": [],
+          "supportIds": [],
+          "portraitKey": null
+        },
+        {
+          "name": "巡寨快手",
+          "rank": "regular",
+          "level": 10,
+          "element": "wind",
+          "hp": 250,
+          "sp": 140,
+          "attack": 94,
+          "magicAttack": 86.5,
+          "defense": 84,
+          "speed": 3,
+          "owner": "legacy",
+          "pressure": 1,
+          "skillFrequency": 0,
+          "skillIds": [],
+          "supportIds": [],
+          "portraitKey": null
+        }
+      ],
+      "skillUsage": [],
+      "controlUsage": []
+    },
+    {
+      "encounterId": "enc_boss",
+      "partyLevel": 12,
+      "partySize": 1,
+      "randomPolicy": "neutral",
+      "randomSeed": 12121,
+      "reference": {
+        "level": 12,
+        "budget": 65,
+        "skill": "fireRocket",
+        "skillLevel": 10,
+        "skillCost": 11,
+        "skillBudget": 24,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 1080,
+            "maxSP": 250,
+            "attack": 102,
+            "attackPoints": 6,
+            "defense": 102,
+            "defensePoints": 9,
+            "magicAttack": 138.5,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 9,
+            "evasion": 0,
+            "vitality": 13,
+            "energy": 6,
+            "intelligence": 22,
+            "agility": 9
+          }
+        ]
+      },
+      "rounds": 2,
+      "clear": true,
+      "survivors": 1,
+      "initialParty": [
+        1080
+      ],
+      "firstRoundParty": [
+        802
+      ],
+      "finalParty": [
+        802
+      ],
+      "initialMonsters": [
+        {
+          "name": "黑松寨主",
+          "rank": "boss",
+          "level": 12,
+          "element": "earth",
+          "hp": 250,
+          "sp": 155,
+          "attack": 106,
+          "magicAttack": 97.25,
+          "defense": 90,
+          "speed": 4,
+          "owner": "legacy",
+          "pressure": 1.2,
+          "skillFrequency": 0.35,
+          "skillIds": [
+            "stoneSlash"
+          ],
+          "supportIds": [],
+          "portraitKey": null
+        },
+        {
+          "name": "寨主親衛",
+          "rank": "elite",
+          "level": 11,
+          "element": "fire",
+          "hp": 250,
+          "sp": 140,
+          "attack": 102,
+          "magicAttack": 90.5,
+          "defense": 87,
+          "speed": 4,
+          "owner": "legacy",
+          "pressure": 1.1,
+          "skillFrequency": 0.35,
+          "skillIds": [
+            "flameSlash"
+          ],
+          "supportIds": [],
+          "portraitKey": null
+        },
+        {
+          "name": "寨主親衛",
+          "rank": "elite",
+          "level": 11,
+          "element": "wind",
+          "hp": 250,
+          "sp": 140,
+          "attack": 102,
+          "magicAttack": 90.5,
+          "defense": 87,
+          "speed": 4,
+          "owner": "legacy",
+          "pressure": 1.1,
+          "skillFrequency": 0.35,
+          "skillIds": [
+            "stormFist"
+          ],
+          "supportIds": [],
+          "portraitKey": null
+        }
+      ],
+      "skillUsage": [
+        {
+          "name": "普通攻擊",
+          "round": 1
+        },
+        {
+          "name": "普通攻擊",
+          "round": 1
+        },
+        {
+          "name": "普通攻擊",
+          "round": 1
+        }
+      ],
+      "controlUsage": []
+    },
+    {
+      "encounterId": "enc_boss",
+      "partyLevel": 12,
+      "partySize": 2,
+      "randomPolicy": "neutral",
+      "randomSeed": 12122,
+      "reference": {
+        "level": 12,
+        "budget": 65,
+        "skill": "fireRocket",
+        "skillLevel": 10,
+        "skillCost": 11,
+        "skillBudget": 24,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 1080,
+            "maxSP": 250,
+            "attack": 102,
+            "attackPoints": 6,
+            "defense": 102,
+            "defensePoints": 9,
+            "magicAttack": 138.5,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 9,
+            "evasion": 0,
+            "vitality": 13,
+            "energy": 6,
+            "intelligence": 22,
+            "agility": 9
+          },
+          {
+            "maxHP": 1080,
+            "maxSP": 250,
+            "attack": 102,
+            "attackPoints": 6,
+            "defense": 102,
+            "defensePoints": 9,
+            "magicAttack": 138.5,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 9,
+            "evasion": 0,
+            "vitality": 13,
+            "energy": 6,
+            "intelligence": 22,
+            "agility": 9
+          }
+        ]
+      },
+      "rounds": 1,
+      "clear": true,
+      "survivors": 2,
+      "initialParty": [
+        1080,
+        1080
+      ],
+      "firstRoundParty": [
+        1080,
+        1080
+      ],
+      "finalParty": [
+        1080,
+        1080
+      ],
+      "initialMonsters": [
+        {
+          "name": "黑松寨主",
+          "rank": "boss",
+          "level": 12,
+          "element": "earth",
+          "hp": 250,
+          "sp": 155,
+          "attack": 106,
+          "magicAttack": 97.25,
+          "defense": 90,
+          "speed": 4,
+          "owner": "legacy",
+          "pressure": 1.2,
+          "skillFrequency": 0.35,
+          "skillIds": [
+            "stoneSlash"
+          ],
+          "supportIds": [],
+          "portraitKey": null
+        },
+        {
+          "name": "寨主親衛",
+          "rank": "elite",
+          "level": 11,
+          "element": "fire",
+          "hp": 250,
+          "sp": 140,
+          "attack": 102,
+          "magicAttack": 90.5,
+          "defense": 87,
+          "speed": 4,
+          "owner": "legacy",
+          "pressure": 1.1,
+          "skillFrequency": 0.35,
+          "skillIds": [
+            "flameSlash"
+          ],
+          "supportIds": [],
+          "portraitKey": null
+        },
+        {
+          "name": "寨主親衛",
+          "rank": "elite",
+          "level": 11,
+          "element": "wind",
+          "hp": 250,
+          "sp": 140,
+          "attack": 102,
+          "magicAttack": 90.5,
+          "defense": 87,
+          "speed": 4,
+          "owner": "legacy",
+          "pressure": 1.1,
+          "skillFrequency": 0.35,
+          "skillIds": [
+            "stormFist"
+          ],
+          "supportIds": [],
+          "portraitKey": null
+        }
+      ],
+      "skillUsage": [],
+      "controlUsage": []
+    },
+    {
+      "encounterId": "enc_boss",
+      "partyLevel": 17,
+      "partySize": 1,
+      "randomPolicy": "neutral",
+      "randomSeed": 12171,
+      "reference": {
+        "level": 17,
+        "budget": 90,
+        "skill": "fireRocket",
+        "skillLevel": 10,
+        "skillCost": 11,
+        "skillBudget": 34,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 1480,
+            "maxSP": 345,
+            "attack": 122,
+            "attackPoints": 6,
+            "defense": 133,
+            "defensePoints": 13,
+            "magicAttack": 183.25,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 13,
+            "evasion": 0,
+            "vitality": 18,
+            "energy": 9,
+            "intelligence": 31,
+            "agility": 13
+          }
+        ]
+      },
+      "rounds": 2,
+      "clear": true,
+      "survivors": 1,
+      "initialParty": [
+        1480
+      ],
+      "firstRoundParty": [
+        1296
+      ],
+      "finalParty": [
+        1296
+      ],
+      "initialMonsters": [
+        {
+          "name": "黑松寨主",
+          "rank": "boss",
+          "level": 12,
+          "element": "earth",
+          "hp": 250,
+          "sp": 155,
+          "attack": 106,
+          "magicAttack": 97.25,
+          "defense": 90,
+          "speed": 4,
+          "owner": "legacy",
+          "pressure": 1.2,
+          "skillFrequency": 0.35,
+          "skillIds": [
+            "stoneSlash"
+          ],
+          "supportIds": [],
+          "portraitKey": null
+        },
+        {
+          "name": "寨主親衛",
+          "rank": "elite",
+          "level": 11,
+          "element": "fire",
+          "hp": 250,
+          "sp": 140,
+          "attack": 102,
+          "magicAttack": 90.5,
+          "defense": 87,
+          "speed": 4,
+          "owner": "legacy",
+          "pressure": 1.1,
+          "skillFrequency": 0.35,
+          "skillIds": [
+            "flameSlash"
+          ],
+          "supportIds": [],
+          "portraitKey": null
+        },
+        {
+          "name": "寨主親衛",
+          "rank": "elite",
+          "level": 11,
+          "element": "wind",
+          "hp": 250,
+          "sp": 140,
+          "attack": 102,
+          "magicAttack": 90.5,
+          "defense": 87,
+          "speed": 4,
+          "owner": "legacy",
+          "pressure": 1.1,
+          "skillFrequency": 0.35,
+          "skillIds": [
+            "stormFist"
+          ],
+          "supportIds": [],
+          "portraitKey": null
+        }
+      ],
+      "skillUsage": [
+        {
+          "name": "普通攻擊",
+          "round": 1
+        },
+        {
+          "name": "普通攻擊",
+          "round": 1
+        }
+      ],
+      "controlUsage": []
+    },
+    {
+      "encounterId": "enc_boss",
+      "partyLevel": 17,
+      "partySize": 2,
+      "randomPolicy": "neutral",
+      "randomSeed": 12172,
+      "reference": {
+        "level": 17,
+        "budget": 90,
+        "skill": "fireRocket",
+        "skillLevel": 10,
+        "skillCost": 11,
+        "skillBudget": 34,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 1480,
+            "maxSP": 345,
+            "attack": 122,
+            "attackPoints": 6,
+            "defense": 133,
+            "defensePoints": 13,
+            "magicAttack": 183.25,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 13,
+            "evasion": 0,
+            "vitality": 18,
+            "energy": 9,
+            "intelligence": 31,
+            "agility": 13
+          },
+          {
+            "maxHP": 1480,
+            "maxSP": 345,
+            "attack": 122,
+            "attackPoints": 6,
+            "defense": 133,
+            "defensePoints": 13,
+            "magicAttack": 183.25,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 13,
+            "evasion": 0,
+            "vitality": 18,
+            "energy": 9,
+            "intelligence": 31,
+            "agility": 13
+          }
+        ]
+      },
+      "rounds": 1,
+      "clear": true,
+      "survivors": 2,
+      "initialParty": [
+        1480,
+        1480
+      ],
+      "firstRoundParty": [
+        1480,
+        1480
+      ],
+      "finalParty": [
+        1480,
+        1480
+      ],
+      "initialMonsters": [
+        {
+          "name": "黑松寨主",
+          "rank": "boss",
+          "level": 12,
+          "element": "earth",
+          "hp": 250,
+          "sp": 155,
+          "attack": 106,
+          "magicAttack": 97.25,
+          "defense": 90,
+          "speed": 4,
+          "owner": "legacy",
+          "pressure": 1.2,
+          "skillFrequency": 0.35,
+          "skillIds": [
+            "stoneSlash"
+          ],
+          "supportIds": [],
+          "portraitKey": null
+        },
+        {
+          "name": "寨主親衛",
+          "rank": "elite",
+          "level": 11,
+          "element": "fire",
+          "hp": 250,
+          "sp": 140,
+          "attack": 102,
+          "magicAttack": 90.5,
+          "defense": 87,
+          "speed": 4,
+          "owner": "legacy",
+          "pressure": 1.1,
+          "skillFrequency": 0.35,
+          "skillIds": [
+            "flameSlash"
+          ],
+          "supportIds": [],
+          "portraitKey": null
+        },
+        {
+          "name": "寨主親衛",
+          "rank": "elite",
+          "level": 11,
+          "element": "wind",
+          "hp": 250,
+          "sp": 140,
+          "attack": 102,
+          "magicAttack": 90.5,
+          "defense": 87,
+          "speed": 4,
+          "owner": "legacy",
+          "pressure": 1.1,
+          "skillFrequency": 0.35,
+          "skillIds": [
+            "stormFist"
+          ],
+          "supportIds": [],
+          "portraitKey": null
+        }
+      ],
+      "skillUsage": [],
+      "controlUsage": []
+    },
+    {
+      "encounterId": "enc_boss",
+      "partyLevel": 22,
+      "partySize": 1,
+      "randomPolicy": "neutral",
+      "randomSeed": 12221,
+      "reference": {
+        "level": 22,
+        "budget": 115,
+        "skill": "fireRocket",
+        "skillLevel": 10,
+        "skillCost": 11,
+        "skillBudget": 44,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 1880,
+            "maxSP": 425,
+            "attack": 146,
+            "attackPoints": 7,
+            "defense": 164,
+            "defensePoints": 17,
+            "magicAttack": 228,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 17,
+            "evasion": 0,
+            "vitality": 23,
+            "energy": 11,
+            "intelligence": 40,
+            "agility": 17
+          }
+        ]
+      },
+      "rounds": 1,
+      "clear": true,
+      "survivors": 1,
+      "initialParty": [
+        1880
+      ],
+      "firstRoundParty": [
+        1880
+      ],
+      "finalParty": [
+        1880
+      ],
+      "initialMonsters": [
+        {
+          "name": "黑松寨主",
+          "rank": "boss",
+          "level": 12,
+          "element": "earth",
+          "hp": 250,
+          "sp": 155,
+          "attack": 106,
+          "magicAttack": 97.25,
+          "defense": 90,
+          "speed": 4,
+          "owner": "legacy",
+          "pressure": 1.2,
+          "skillFrequency": 0.35,
+          "skillIds": [
+            "stoneSlash"
+          ],
+          "supportIds": [],
+          "portraitKey": null
+        },
+        {
+          "name": "寨主親衛",
+          "rank": "elite",
+          "level": 11,
+          "element": "fire",
+          "hp": 250,
+          "sp": 140,
+          "attack": 102,
+          "magicAttack": 90.5,
+          "defense": 87,
+          "speed": 4,
+          "owner": "legacy",
+          "pressure": 1.1,
+          "skillFrequency": 0.35,
+          "skillIds": [
+            "flameSlash"
+          ],
+          "supportIds": [],
+          "portraitKey": null
+        },
+        {
+          "name": "寨主親衛",
+          "rank": "elite",
+          "level": 11,
+          "element": "wind",
+          "hp": 250,
+          "sp": 140,
+          "attack": 102,
+          "magicAttack": 90.5,
+          "defense": 87,
+          "speed": 4,
+          "owner": "legacy",
+          "pressure": 1.1,
+          "skillFrequency": 0.35,
+          "skillIds": [
+            "stormFist"
+          ],
+          "supportIds": [],
+          "portraitKey": null
+        }
+      ],
+      "skillUsage": [],
+      "controlUsage": []
+    },
+    {
+      "encounterId": "enc_boss",
+      "partyLevel": 22,
+      "partySize": 2,
+      "randomPolicy": "neutral",
+      "randomSeed": 12222,
+      "reference": {
+        "level": 22,
+        "budget": 115,
+        "skill": "fireRocket",
+        "skillLevel": 10,
+        "skillCost": 11,
+        "skillBudget": 44,
+        "equipment": "none",
+        "party": [
+          {
+            "maxHP": 1880,
+            "maxSP": 425,
+            "attack": 146,
+            "attackPoints": 7,
+            "defense": 164,
+            "defensePoints": 17,
+            "magicAttack": 228,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 17,
+            "evasion": 0,
+            "vitality": 23,
+            "energy": 11,
+            "intelligence": 40,
+            "agility": 17
+          },
+          {
+            "maxHP": 1880,
+            "maxSP": 425,
+            "attack": 146,
+            "attackPoints": 7,
+            "defense": 164,
+            "defensePoints": 17,
+            "magicAttack": 228,
+            "accuracy": 0,
+            "statusResistance": 0,
+            "antiCrit": 0,
+            "criticalChance": 0,
+            "criticalDamage": 0,
+            "statusAccuracy": 0,
+            "speed": 17,
+            "evasion": 0,
+            "vitality": 23,
+            "energy": 11,
+            "intelligence": 40,
+            "agility": 17
+          }
+        ]
+      },
+      "rounds": 1,
+      "clear": true,
+      "survivors": 2,
+      "initialParty": [
+        1880,
+        1880
+      ],
+      "firstRoundParty": [
+        1880,
+        1880
+      ],
+      "finalParty": [
+        1880,
+        1880
+      ],
+      "initialMonsters": [
+        {
+          "name": "黑松寨主",
+          "rank": "boss",
+          "level": 12,
+          "element": "earth",
+          "hp": 250,
+          "sp": 155,
+          "attack": 106,
+          "magicAttack": 97.25,
+          "defense": 90,
+          "speed": 4,
+          "owner": "legacy",
+          "pressure": 1.2,
+          "skillFrequency": 0.35,
+          "skillIds": [
+            "stoneSlash"
+          ],
+          "supportIds": [],
+          "portraitKey": null
+        },
+        {
+          "name": "寨主親衛",
+          "rank": "elite",
+          "level": 11,
+          "element": "fire",
+          "hp": 250,
+          "sp": 140,
+          "attack": 102,
+          "magicAttack": 90.5,
+          "defense": 87,
+          "speed": 4,
+          "owner": "legacy",
+          "pressure": 1.1,
+          "skillFrequency": 0.35,
+          "skillIds": [
+            "flameSlash"
+          ],
+          "supportIds": [],
+          "portraitKey": null
+        },
+        {
+          "name": "寨主親衛",
+          "rank": "elite",
+          "level": 11,
+          "element": "wind",
+          "hp": 250,
+          "sp": 140,
+          "attack": 102,
+          "magicAttack": 90.5,
+          "defense": 87,
+          "speed": 4,
+          "owner": "legacy",
+          "pressure": 1.1,
+          "skillFrequency": 0.35,
+          "skillIds": [
+            "stormFist"
+          ],
+          "supportIds": [],
+          "portraitKey": null
+        }
+      ],
+      "skillUsage": [],
+      "controlUsage": []
+    }
+  ],
+  "sourceHead": "a0c4cf3ccf6b83278f9940da7f71516d9c98cfa4"
+}

@@ -1,3 +1,11 @@
+## 2026-10-04 — MONSTER-BALANCE-OWNER-P2E-ADVENTURE-20261004（IMPLEMENTED；驗證待Gate）
+
+- Base dev a0c4cf3ccf6b83278f9940da7f71516d9c98cfa4；main f63d69dbfa66ba75637d1c3cd7fcc7d74782e356 禁止修改。Branch feature/monster-balance-owner-phase2e-adventure-20261004；PR 為耐久即時狀態 Owner。
+- Adventure僅3正式遭遇／9 element identities／8 names；固定Lv8–12，每場3隻，無玩家等級縮放。Content保留Level Spec、進度／Reward Owner；MonsterBalance唯一戰前stats／pressure，Rank不加點。原direct makeZoneMonster edge與rank post-write退場；shared Personal/World Boss legacy保留。
+- Adventure專用mode HP.50／pressure1；Elite HP1.4/DEF1.05/pressure1.1；smallBoss HP2/DEF1.10/pressure1.2。balanced固定mapping，缺role證據不猜；skills0/.35与V141/V144保持，portrait fallback只記錄。
+- 原版18 baseline、新版neutral18+seeded18公式診斷全部清場存活；一般1–4／精英1–3／smallBoss2–4回合。不冒充自然動畫QA。production Chrome／reward progression／latest-head CI／dev部署SHA／分支清理待Gate，Requirement IMPLEMENTED。
+- 盤點與退場docs/MONSTER_BALANCE_OWNER_PHASE2E.md、retirement-map；Game/Cache173.73、main不改，不進Phase2F。
+
 ## 2026-10-04 — P2-CI-WARNING-CONVERGENCE-20261004（配置驗證完成；遠端 Gate 待驗）
 
 - Base dev `c486af90b117c4a812bff43141d6302d3b183a44`; main `f63d69dbfa66ba75637d1c3cd7fcc7d74782e356` forbidden. Branch `chore/p2-ci-warning-convergence-20261004`, target dev; NORMAL DEVELOPMENT, no Release Freeze. Work PR owns durable current CI/deploy/closeout state.
