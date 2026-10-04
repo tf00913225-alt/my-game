@@ -9,16 +9,17 @@ const baseUrl=process.env.QA_BASE_URL||'';
 const expected=process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||'local';
 if(baseUrl){const manifest=await (await fetch(baseUrl+'/release-manifest.json',{cache:'no-store'})).json();assert.equal(manifest.commitSha,expected);assert.equal(manifest.cacheVersion,ASSET_MANIFEST.release);}
 const server=await startServer({baseUrl});
-const bases=[['home',"showPage('home')"],['training',"showPage('training')"],['patrol',"enterMap()"],['daily',"leaveMap();vGameplayOpenDailyDungeons()"],['gameplay',"showPage('gameplay')"],['boss',"vGameplayOpenBoss()"],['tower',"vGameplayOpenTower()"],['abyss',"vGameplayOpenAbyss()"]];
+const bases=[['home',"showPage('home')"],['training',"showPage('training')"],['patrol',"enterMap()"],['daily',"leaveMap();vGameplayOpenDailyDungeons()"],['gameplay',"showPage('gameplay')"],['boss',"vGameplayOpenBoss()"],['tower',"vGameplayOpenTower()"],['abyss',"vGameplayOpenAbyss()"],['abyss-map20',"vGameplayOpenAbyss();v174AbyssSelectDifficulty(20)"],['abyss-map40',"vGameplayOpenAbyss();v174AbyssSelectDifficulty(40)"]];
 const measure=`(()=>{const shell=document.querySelector('.native-bottom-nav-layer'),nav=document.getElementById('bottomNav'),r=nav.getBoundingClientRect();return {visible:!shell.hidden&&getComputedStyle(shell).display!=='none',shellCount:document.querySelectorAll('.native-bottom-nav-layer').length,navCount:document.querySelectorAll('#bottomNav').length,legacy:document.querySelectorAll('#mapPageNav,#v141DungeonNav').length,context:nav.dataset.navContext,signature:nav.dataset.navSignature,buttons:[...nav.children].map(n=>n.getAttribute('onclick')),hitboxes:nav.getClientRects().length,reason:FourSymbolsBottomNav.foregroundSuppressionReason(),active:document.querySelector('#game-content .page.active')?.id};})()`;
-const rows=[];const results=[];
+const rows=[];const returns=[];const results=[];
 async function run(width,height){
  const port=9850+Math.floor(Math.random()*100),profile=fs.mkdtempSync(path.join(os.tmpdir(),'foreground-potion-'));
  const proc=spawn(findChrome(),['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'],{stdio:'ignore'});let c;
  try{
  const page=(await waitJson(`http://127.0.0.1:${port}/json/list`)).find(p=>p.type==='page');c=new Cdp(page.webSocketDebuggerUrl);
  await c.send('Page.enable');await c.send('Runtime.enable');await c.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true});
- await c.send('Page.navigate',{url:server.url});
+ async function navigate(method,params){const loads=c.events.filter(e=>e.method==='Page.loadEventFired').length;await c.send(method,params);const end=Date.now()+30000;while(c.events.filter(e=>e.method==='Page.loadEventFired').length===loads){if(Date.now()>end)throw Error('Document load timeout');await new Promise(r=>setTimeout(r,50));}}
+ await navigate('Page.navigate',{url:server.url});
  await c.send('Page.bringToFront');await c.send('Emulation.setFocusEmulationEnabled',{enabled:true});
  await c.eval(`(async()=>{for(let i=0;i<600;i++){if(window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show'))return;await new Promise(r=>setTimeout(r,50));}throw Error('Startup/auth not ready');})()`);
  await c.eval("closeHomeFeature();showPage('home');openHomeFeature('character')");
@@ -40,6 +41,11 @@ async function run(width,height){
    await c.eval(feature==='inventory'?'closeMapInventoryOverlay()':'closeHomeFeature()');const closeImmediate=await c.eval(measure);assert.equal(closeImmediate.visible,true);await c.eval('new Promise(r=>setTimeout(r,180))');const closed=await c.eval(measure);
    assert.equal(closed.visible,true,base+'/'+feature+' restore');assert.equal(closed.context,before.context);assert.equal(closed.signature,before.signature);assert.deepEqual(closed.buttons,before.buttons);assert.equal(closed.active,before.active);
    rows.push({width,height,pass,base,feature,immediate,opened,closed});
+  }
+  if(base!=='home'){
+   await c.eval("document.getElementById('bottomNav').lastElementChild.click()");await c.eval('new Promise(r=>setTimeout(r,180))');const returned=await c.eval(measure);
+   const expectedContext=base==='patrol'?'training':base.startsWith('abyss-map')?'abyss-selection':['boss','tower','abyss'].includes(base)?'gameplay:gameplayPage':'main';
+   assert.equal(returned.visible,true,base+' return visible');assert.equal(returned.context,expectedContext,base+' return context');assert.equal(returned.shellCount,1);assert.equal(returned.navCount,1);assert.equal(returned.legacy,0);returns.push({width,height,pass,base,expectedContext,returned});
   }
  }
  // Isolated QA-owned character attributes; all production stat getters, callers,
@@ -78,10 +84,11 @@ async function run(width,height){
  })()`);
  for(const row of potions.rows){assert.equal(row.actual,row.expected,JSON.stringify(row));assert.equal(row.stock,row.expectedStock??0,JSON.stringify(row));}
  assert.equal(potions.legacy.hp,321);assert.equal(potions.legacy.sp,456);assert.ok(potions.legacy.items.every(x=>x.mode==='flat'&&x.value===66&&x.percent===undefined));assert.equal(potions.shopFlat,true);assert.equal(potions.oldShopNote,false);
- await c.eval("showPage('home');openHomeFeature('character')");await c.send('Page.reload',{ignoreCache:true});await c.send('Page.bringToFront');await c.eval(`(async()=>{for(let i=0;i<600;i++){if(window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show')){closeHomeFeature();showPage('home');return;}await new Promise(r=>setTimeout(r,50));}throw Error('Reload startup/auth not ready');})()`);assert.equal((await c.eval(measure)).visible,true);
- results.push({width,height,cold,coldRelic,potions,reload:true});
+ results.push({width,height,cold,coldRelic,potions,reload:false});console.log('Actual potion settlement PASS',width,JSON.stringify(potions));
+ await c.eval("showPage('home');openHomeFeature('character');for(const key of Object.keys(localStorage)){if(key.startsWith('four_symbols_save:skill-runtime-browser-qa')||key.startsWith('four_symbols_save_meta:skill-runtime-browser-qa'))localStorage.removeItem(key);}");await navigate('Page.reload',{ignoreCache:true});await c.send('Page.bringToFront');await c.eval(`(async()=>{for(let i=0;i<600;i++){if(window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show')){closeHomeFeature();showPage('home');return;}await new Promise(r=>setTimeout(r,50));}throw Error('Reload startup/auth not ready');})()`);assert.equal((await c.eval(measure)).visible,true);
+ results.at(-1).reload=true;
  }finally{c?.close();proc.kill('SIGKILL');fs.rmSync(profile,{recursive:true,force:true});}
 }
-try{for(const [w,h] of [[390,844],[412,915]])await run(w,h);const result={passed:true,expected,environment:baseUrl?'deployed-dev':'local-production',rows,results};fs.writeFileSync(`${out}/foreground-potion-qa.json`,JSON.stringify(result,null,2)+'\n');console.log('Foreground/Potion QA PASS',rows.length,'panel transitions',results.map(x=>x.potions.rows.length));}
-catch(error){fs.writeFileSync(`${out}/foreground-potion-qa.json`,JSON.stringify({passed:false,error:String(error.stack),rows,results},null,2));throw error;}
+try{for(const [w,h] of [[390,844],[412,915]])await run(w,h);const result={passed:true,expected,environment:baseUrl?'deployed-dev':'local-production',rows,returns,results};fs.writeFileSync(`${out}/foreground-potion-qa.json`,JSON.stringify(result,null,2)+'\n');console.log('Foreground/Potion QA PASS',rows.length,'panel transitions',results.map(x=>x.potions.rows.length));}
+catch(error){fs.writeFileSync(`${out}/foreground-potion-qa.json`,JSON.stringify({passed:false,error:String(error.stack),rows,returns,results},null,2));throw error;}
 finally{await new Promise(r=>server.server.close(r));}
